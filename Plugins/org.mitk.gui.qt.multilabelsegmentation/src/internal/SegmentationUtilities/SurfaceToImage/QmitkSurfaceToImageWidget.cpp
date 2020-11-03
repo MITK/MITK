@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkSurfaceToImageWidget.h"
 
@@ -34,8 +30,8 @@ QmitkSurfaceToImageWidget::QmitkSurfaceToImageWidget(mitk::SliceNavigationContro
 {
   m_Controls.setupUi(this);
 
-  m_Controls.m_DataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::ImagePredicate);
-  m_Controls.m_DataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::SurfacePredicate);
+  m_Controls.m_DataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::ImagePredicate);
+  m_Controls.m_DataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::SurfacePredicate);
   m_Controls.m_DataSelectionWidget->SetHelpText(HelpText);
 
 //  mitk::IDataStorageService* service =
@@ -120,7 +116,7 @@ void QmitkSurfaceToImageWidget::OnSurface2ImagePressed()
     return;
   }
 
-  mitk::Image::Pointer resultImage(0);
+  mitk::Image::Pointer resultImage(nullptr);
   resultImage = this->ConvertSurfaceToImage( image, surface );
 
   if( resultImage.IsNull() )
@@ -163,7 +159,7 @@ mitk::Image::Pointer QmitkSurfaceToImageWidget::ConvertSurfaceToImage( mitk::Ima
   catch(mitk::Exception& e)
   {
     MITK_ERROR << "exception caught: " << e.GetDescription();
-    return 0;
+    return nullptr;
   }
 
   mitk::Image::Pointer resultImage = filter->GetOutput();

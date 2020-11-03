@@ -52,13 +52,11 @@ of the platform infrastructure:
 \page xp_org_blueberry_core_expressions_propertyTesters org.blueberry.core.expressions.propertyTesters
 \htmlinclude org_blueberry_core_expressions_propertyTesters.html
 
-
 \page xp_org_blueberry_osgi_applications org.blueberry.osgi.applications
 \htmlinclude org_blueberry_osgi_applications.html
 
 \page xp_org_blueberry_core_runtime_products org.blueberry.core.runtime.products
 \htmlinclude org_blueberry_core_runtime_products.html
-
 
 \page xp_org_blueberry_ui_elementFactories org.blueberry.ui.elementFactories
 \htmlinclude org_blueberry_ui_elementFactories.html
@@ -92,8 +90,5 @@ of the platform infrastructure:
 
 \page xp_org_blueberry_ui_views org.blueberry.ui.views
 \htmlinclude org_blueberry_ui_views.html
-
-\page xp_org_blueberry_tests org.blueberry.tests
-\htmlinclude org_blueberry_tests.html
 
 */

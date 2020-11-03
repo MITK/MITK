@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.14.5 FATAL_ERROR)
 
 # Change project and application name to your own
 set(MY_PROJECT_NAME $(project-name))
@@ -80,6 +80,7 @@ set(CMAKE_MODULE_PATH
 # CMake Function(s) and Macro(s)
 #-----------------------------------------------------------------------------
 
+include(CTest)
 include(MacroEmptyExternalProject)
 
 #-----------------------------------------------------------------------------
@@ -126,7 +127,7 @@ endif()
 set(${PROJECT_NAME}_MODULES_PACKAGE_DEPENDS_DIR "${PROJECT_SOURCE_DIR}/CMake/PackageDepends")
 set(MODULES_PACKAGE_DEPENDS_DIRS ${${PROJECT_NAME}_MODULES_PACKAGE_DEPENDS_DIR})
 
-find_package(MITK 2018.04.02 REQUIRED)
+find_package(MITK 2018.04.99 REQUIRED)
 
 if(COMMAND mitkFunctionCheckMitkCompatibility)
   mitkFunctionCheckMitkCompatibility(VERSIONS MITK_VERSION_PLUGIN_SYSTEM 1 REQUIRED)
@@ -241,34 +242,23 @@ set(CMAKE_MODULE_LINKER_FLAGS ${${PROJECT_NAME}_MODULE_LINKER_FLAGS})
 #-----------------------------------------------------------------------------
 
 if(BUILD_TESTING)
-  enable_testing()
-  include(CTest)
-  mark_as_advanced(TCL_TCLSH DART_ROOT)
-
-  # Setup file for setting custom ctest vars
-  configure_file(
-    CMake/CTestCustom.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/CTestCustom.cmake
-    @ONLY
-    )
-
   # Configuration for the CMake-generated test driver
   set(CMAKE_TESTDRIVER_EXTRA_INCLUDES "#include <stdexcept>")
   set(CMAKE_TESTDRIVER_BEFORE_TESTMAIN "
     try
       {")
-  set(CMAKE_TESTDRIVER_AFTER_TESTMAIN " }
-      catch( std::exception & excp )
-        {
-        fprintf(stderr,\"%s\\n\",excp.what());
+  set(CMAKE_TESTDRIVER_AFTER_TESTMAIN "
+      }
+      catch (const std::exception& e)
+      {
+        fprintf(stderr, \"%s\\n\", e.what());
         return EXIT_FAILURE;
-        }
-      catch( ... )
-        {
+      }
+      catch (...)
+      {
         printf(\"Exception caught in the test driver\\n\");
         return EXIT_FAILURE;
-        }
-      ")
+      }")
 endif()
 
 #-----------------------------------------------------------------------------

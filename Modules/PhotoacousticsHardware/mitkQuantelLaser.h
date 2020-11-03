@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #ifndef MITKQUANTELLASER_H_HEADER_INCLUDED
@@ -35,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkPhotoacousticsHardwareExports.h"
 
 namespace mitk {
-    
+
   class MITKPHOTOACOUSTICSHARDWARE_EXPORT QuantelLaser : public itk::LightObject
     {
     public:
@@ -90,7 +86,7 @@ namespace mitk {
       bool m_ShutterOpen = false;
       bool m_LaserEmission = false;
       void LoadResorceFile(std::string filename, std::string* lines);
-      
+
       std::string m_DeviceName;///< Device Name
       PortNumber m_PortNumber; ///< COM Port Number
       BaudRate m_BaudRate;     ///< COM Port Baud Rate

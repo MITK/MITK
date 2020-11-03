@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKVESSELMEANDERSTRATEGY_H
 #define MITKVESSELMEANDERSTRATEGY_H
@@ -31,27 +27,25 @@ namespace mitk {
     class MITKPHOTOACOUSTICSLIB_EXPORT VesselMeanderStrategy : public itk::LightObject
     {
     public:
-      mitkClassMacroItkParent(VesselMeanderStrategy, itk::LightObject)
-        itkFactorylessNewMacro(Self)
+      mitkClassMacroItkParent(VesselMeanderStrategy, itk::LightObject);
+        itkFactorylessNewMacro(Self);
 
         /**
          * @brief CalculateNewPositionInStraightLine calculates the new position by just following the direction vector.
-         * @param position
          * @param direction
          * @param bendingFactor
          */
-        void CalculateNewPositionInStraightLine(Vector::Pointer position, Vector::Pointer direction, double bendingFactor, std::mt19937* rng);
+        void CalculateNewDirectionVectorInStraightLine(Vector::Pointer direction, double bendingFactor, std::mt19937* rng);
 
       /**
        * @brief CalculateRandomlyDivergingPosition calculates the new position by modifying the direction vector randomly,
        * proportional to the selected bendingFactor. This means, that the vessels will bend in each expansion step,
        * if bendingFactor > 0.
        *
-       * @param position
        * @param direction
        * @param bendingFactor
        */
-      void CalculateRandomlyDivergingPosition(Vector::Pointer position, Vector::Pointer direction, double bendingFactor, std::mt19937* rng);
+      void CalculateNewRandomlyDivergingDirectionVector(Vector::Pointer direction, double bendingFactor, std::mt19937* rng);
 
     protected:
       VesselMeanderStrategy();

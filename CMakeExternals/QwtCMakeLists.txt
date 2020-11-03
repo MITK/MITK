@@ -183,40 +183,46 @@ set_target_properties(qwt PROPERTIES
 
 # Build the designer plug-in
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
+option(QWT_BUILD_DESIGNER_PLUGIN "Build the Qt Designer plugin" ON)
+  if (QWT_BUILD_DESIGNER_PLUGIN)
 
-set(_qwt_designer_sources
-  designer/qwt_designer_plotdialog.cpp
-  designer/qwt_designer_plugin.cpp
-)
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/plugins/designer)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/plugins/designer)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/plugins/designer)
+  set(_qwt_designer_sources
+    designer/qwt_designer_plotdialog.cpp
+    designer/qwt_designer_plugin.cpp
+  )
 
-find_package(Qt5Designer REQUIRED)
-include_directories(${Qt5Designer_INCLUDE_DIRS})
-qt5_wrap_cpp(_qwt_designer_sources
-  designer/qwt_designer_plugin.h
-  designer/qwt_designer_plotdialog.h
-)
-qt5_add_resources(_qwt_designer_sources designer/qwt_designer_plugin.qrc)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/plugins/designer)
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/plugins/designer)
+  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/plugins/designer)
 
-add_library(qwt_designer_plugin SHARED ${_qwt_designer_sources})
-target_link_libraries(qwt_designer_plugin qwt Qt5::Designer)
+  find_package(Qt5Designer REQUIRED)
+  include_directories(${Qt5Designer_INCLUDE_DIRS})
+  qt5_wrap_cpp(_qwt_designer_sources
+    designer/qwt_designer_plugin.h
+    designer/qwt_designer_plotdialog.h
+  )
+  qt5_add_resources(_qwt_designer_sources designer/qwt_designer_plugin.qrc)
 
-set_target_properties(qwt_designer_plugin PROPERTIES
-                      SOVERSION ${${PROJECT_NAME}_VERSION}
-                      COMPILE_DEFINITIONS QWT_DLL)
+  add_library(qwt_designer_plugin SHARED ${_qwt_designer_sources})
+  target_link_libraries(qwt_designer_plugin qwt Qt5::Designer)
+
+  set_target_properties(qwt_designer_plugin PROPERTIES
+                        SOVERSION ${${PROJECT_NAME}_VERSION}
+                        COMPILE_DEFINITIONS QWT_DLL)
+endif()
 
 set(${PROJECT_NAME}_LIBRARIES qwt)
 
 # Install support
 
-install(TARGETS qwt_designer_plugin
-  RUNTIME DESTINATION plugins/designer
-  LIBRARY DESTINATION plugins/designer
-)
+if (QWT_BUILD_DESIGNER_PLUGIN)
+  install(TARGETS qwt_designer_plugin
+    RUNTIME DESTINATION plugins/designer
+    LIBRARY DESTINATION plugins/designer
+  )
+endif()
 
 install(TARGETS ${${PROJECT_NAME}_LIBRARIES} EXPORT ${PROJECT_NAME}_TARGETS
   LIBRARY DESTINATION lib

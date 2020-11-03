@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
-BlueBerry Platform
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef BERRYACTIONBARADVISOR_H_
 #define BERRYACTIONBARADVISOR_H_
@@ -43,46 +39,46 @@ struct IWorkbenchWindow;
  * <p>
  * The following advisor methods are called at strategic points in the
  * workbench's lifecycle (all occur within the dynamic scope of the call
- * to {@link PlatformUI#createAndRunWorkbench PlatformUI.createAndRunWorkbench}):
+ * to berry::PlatformUI::CreateAndRunWorkbench()):
  * <ul>
- * <li><code>fillActionBars</code> - called after <code>WorkbenchWindowAdvisor.preWindowOpen</code>
+ * <li>FillActionBars() - called after berry::WorkbenchWindowAdvisor::PreWindowOpen()
  * to configure a window's action bars</li>
  * </ul>
  * </p>
  *
- * @see WorkbenchWindowAdvisor#createActionBarAdvisor(IActionBarConfigurer)
+ * @see berry::WorkbenchWindowAdvisor::CreateActionBarAdvisor()
  */
 class BERRY_UI_QT ActionBarAdvisor : public Object
 {
 
 public:
 
-  berryObjectMacro(berry::ActionBarAdvisor)
+  berryObjectMacro(berry::ActionBarAdvisor);
 
   enum FillType {
     /**
-     * Bit flag for {@link #fillActionBars fillActionBars} indicating that the
+     * Bit flag for FillActionBars() indicating that the
      * operation is not filling the action bars of an actual workbench window,
      * but rather a proxy (used for perspective customization).
      */
     FILL_PROXY = 0x01,
 
     /**
-     * Bit flag for {@link #fillActionBars fillActionBars} indicating that the
+     * Bit flag for FillActionBars() indicating that the
      * operation is supposed to fill (or describe) the workbench window's menu
      * bar.
      */
     FILL_MENU_BAR = 0x02,
 
     /**
-     * Bit flag for {@link #fillActionBars fillActionBars} indicating that the
+     * Bit flag for FillActionBars() indicating that the
      * operation is supposed to fill (or describe) the workbench window's cool
      * bar.
      */
     FILL_TOOL_BAR = 0x04,
 
     /**
-     * Bit flag for {@link #fillActionBars fillActionBars} indicating that the
+     * Bit flag for FillActionBars() indicating that the
      * operation is supposed to fill (or describe) the workbench window's status
      * line.
      */
@@ -105,14 +101,14 @@ public:
   /**
    * Configures the action bars using the given action bar configurer.
    * Under normal circumstances, <code>flags</code> does not include
-   * <code>FILL_PROXY</code>, meaning this is a request to fill the action
+   * #FILL_PROXY, meaning this is a request to fill the action
    * bars of the corresponding workbench window; the
    * remaining flags indicate which combination of
-   * the menu bar (<code>FILL_MENU_BAR</code>),
-   * the tool bar (<code>FILL_TOOL_BAR</code>),
-   * and the status line (<code>FILL_STATUS_LINE</code>) are to be filled.
+   * the menu bar (#FILL_MENU_BAR),
+   * the tool bar (#FILL_TOOL_BAR),
+   * and the status line (#FILL_STATUS_LINE) are to be filled.
    * <p>
-   * If <code>flags</code> does include <code>FILL_PROXY</code>, then this
+   * If <code>flags</code> does include #FILL_PROXY, then this
    * is a request to describe the actions bars of the given workbench window
    * (which will already have been filled);
    * again, the remaining flags indicate which combination of the menu bar,
@@ -121,11 +117,11 @@ public:
    * as in the actual window's action bars.
    * </p>
    * <p>
-   * This method is called just after {@link WorkbenchWindowAdvisor#PreWindowOpen()}.
+   * This method is called just after berry::WorkbenchWindowAdvisor::PreWindowOpen().
    * Clients must not call this method directly (although super calls are okay).
-   * The default implementation calls <code>MakeActions</code> if
-   * <code>FILL_PROXY</code> is specified, then calls <code>FillMenuBar</code>,
-   * <code>FillToolBar</code>, and <code>FillStatusLine</code>
+   * The default implementation calls MakeActions() if
+   * #FILL_PROXY is specified, then calls FillMenuBar(),
+   * FillToolBar(), and FillStatusLine()
    * if the corresponding flags are specified.
    * </p>
    * <p>
@@ -134,10 +130,10 @@ public:
    * </p>
    *
    * @param flags bit mask composed from the constants
-   * {@link #FILL_MENU_BAR FILL_MENU_BAR},
-   * {@link #FILL_TOOL_BAR FILL_TOOL_BAR},
-   * {@link #FILL_STATUS_LINE FILL_STATUS_LINE},
-   * and {@link #FILL_PROXY FILL_PROXY}
+   * #FILL_MENU_BAR,
+   * #FILL_TOOL_BAR,
+   * #FILL_STATUS_LINE,
+   * and #FILL_PROXY
    */
   virtual void FillActionBars(FillFlags flags);
 
@@ -180,7 +176,7 @@ protected:
 
   /**
    * Instantiates the actions used in the fill methods.
-   * Use {@link #Register(QAction*)} to add it to the list of actions to
+   * Use Register() to add it to the list of actions to
    * be disposed when the window is closed.
    *
    * @param window the window containing the action bars

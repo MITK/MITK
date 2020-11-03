@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical Image Computing.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QMITKMODELVIEWSELECTIONCONNECTOR_H
 #define QMITKMODELVIEWSELECTIONCONNECTOR_H
@@ -26,9 +22,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QAbstractItemView>
 
 /**
-* @brief The 'QmitkModelViewSelectionConnector' is used to handle the selections of a model-view-pair.
+* @brief The 'QmitkModelViewSelectionConnector' is used to handle the selections of a model-view-pair and to synchornize them with external node selections
+*   (e.g. communicated by the application).
 *
-*   The class accepts a view and a model, which are used to react to selection changes. This class is able to propagate selection changes
+*   The class accepts a view and its model, which are used to react to selection changes. This class is able to propagate selection changes
 *   to and receive from its surrounding class.
 *
 *   The model-view-pair can be added as a selection listener to a selection service. This should be done by using 'AddPostSelectionListener'
@@ -95,7 +92,7 @@ public Q_SLOTS:
   * @param selectOnlyVisibleNodes   The bool value to define the selection modus.
   */
   void SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes);
-  
+
   /**
   * @brief Transform a list of data nodes into a model selection and set this as a new selection of the
   *        selection model of the private member item view.

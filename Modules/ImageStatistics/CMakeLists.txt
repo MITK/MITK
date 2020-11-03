@@ -6,7 +6,5 @@ MITK_CREATE_MODULE(
 )
 
 if(BUILD_TESTING)
-
   add_subdirectory(Testing)
-
-endif(BUILD_TESTING)
+endif()

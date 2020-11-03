@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #ifndef MITKNAVIGATIONDATAOBJECTVISUALIZATIONFILTER_H_HEADER_INCLUDED_
@@ -36,8 +32,9 @@ namespace mitk {
   public:
     mitkClassMacro(NavigationDataObjectVisualizationFilter, NavigationDataToNavigationDataFilter);
 
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
     /** Defines the rotation modes of this tracking device which results in different representations
      *  of quaternions.
@@ -57,17 +54,22 @@ namespace mitk {
     /**
     * \brief Smart Pointer type to a BaseData.
     */
-    typedef BaseData::ConstPointer RepresentationPointer;
+    typedef BaseData::Pointer RepresentationPointer;
 
     /**
-    * \brief STL map of index to BaseData . Using map to be able to set non continuous indices
-    */
+     * \brief STL map of index to BaseData . Using map to be able to set non continuous indices
+     */
     typedef std::map<unsigned int, RepresentationPointer> RepresentationPointerMap;
 
     /**
-    * \brief Size type of an std::vector
+    * \brief STL vector map of index to BaseData . Using map to be able to set non continuous indices
     */
-    typedef RepresentationPointerMap::size_type RepresentationPointerMapSizeType;
+    typedef std::map<unsigned int, std::vector<RepresentationPointer>> RepresentationVectorPointerMap;
+
+     /**
+     * \brief Size type of an std::vector
+     */
+    typedef RepresentationVectorPointerMap::size_type RepresentationPointerMapSizeType;
 
     /**
     * \brief Set the representation object of the input
@@ -75,8 +77,16 @@ namespace mitk {
     * \param data The BaseData to be associated to the index
     * \param index the index with which data will be associated
     */
-    void SetRepresentationObject(unsigned int index, BaseData* data);
+    void SetRepresentationObject(unsigned int index, BaseData::Pointer data);
 
+    /**
+     * \brief Set the representation objects vector of the input
+     *
+     * \param data The BaseData vector to be associated to the index
+     * \param index the index with which data will be associated
+     */
+    void SetRepresentationObjects(unsigned int index, const std::vector<BaseData::Pointer> &data);
+    
     /**
     * \brief Get the representation object associated with the index idx
     *
@@ -84,7 +94,16 @@ namespace mitk {
     * \return Returns the desired BaseData if it exists for the given input; Returns nullptr
     *         if no BaseData was found.
     */
-    const BaseData* GetRepresentationObject(unsigned int idx);
+    BaseData::Pointer GetRepresentationObject(unsigned int idx) const; 
+
+    /**
+     * \brief Get all the representation objects associated with the index idx
+     *
+     * \param idx the corresponding input number with which the BaseData is associated
+     * \return Returns the desired BaseData if it exists for the given input; Returns nullptr
+     *         if no BaseData was found.
+     */
+    std::vector<RepresentationPointer> GetAllRepresentationObjects(unsigned int idx) const;
 
     virtual void SetTransformPosition(unsigned int index, bool applyTransform); ///< if set to true, the filter will use the position part of the input navigation data at the given index to transform the representation object. If set to false, it will not. If no value is set, it defaults to true.
     virtual bool GetTransformPosition(unsigned int index) const; ///< returns whether position part of the input navigation data at the given index is used for the transformation of the representation object.
@@ -118,7 +137,7 @@ namespace mitk {
     */
     RepresentationPointerMapSizeType GetNumberOfToolRepresentations() const
     {
-      return m_RepresentationList.size();
+      return m_RepresentationVectorMap.size();
     }
 
     /*
@@ -144,7 +163,8 @@ namespace mitk {
     /**
     * \brief An array of the BaseData which represent the tools.
     */
-    RepresentationPointerMap m_RepresentationList;
+
+    RepresentationVectorPointerMap m_RepresentationVectorMap;
     BooleanInputMap m_TransformPosition;    ///< if set to true, the filter will use the position part of the input navigation data at the given index for the calculation of the transform. If no entry for the index exists, it defaults to true.
     BooleanInputMap m_TransformOrientation; ///< if set to true, the filter will use the orientation part of the input navigation data at the given index for the calculation of the transform. If no entry for the index exists, it defaults to true.
     OffsetPointerMap m_OffsetList;

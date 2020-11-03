@@ -1,26 +1,27 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
+============================================================================*/
 
-Raw data from new mathplolib colormaps see:
+/*============================================================================
+
+Raw data from matplotlib colormaps:
 https://github.com/BIDS/colormap/blob/master/colormaps.py
-===================================================================*/
+
+============================================================================*/
 
 #ifndef _lut_Inferno_h_
 #define _lut_Inferno_h_
 
 static const int Inferno[256][3] =
-{ 
+{
   { 0, 0, 4 },{ 1, 0, 5 },{ 1, 1, 6 },{ 1, 1, 8 },{ 2, 1, 10 },{ 2, 2, 12 },{ 2, 2, 14 },{ 3, 2, 16 },{ 4, 3, 18 },{ 4, 3, 20 },
   { 5, 4, 23 },{ 6, 4, 25 },{ 7, 5, 27 },{ 8, 5, 29 },{ 9, 6, 31 },{ 10, 7, 34 },{ 11, 7, 36 },{ 12, 8, 38 },{ 13, 8, 41 },{ 14, 9, 43 },
   { 16, 9, 45 },{ 17, 10, 48 },{ 18, 10, 50 },{ 20, 11, 52 },{ 21, 11, 55 },{ 22, 11, 57 },{ 24, 12, 60 },{ 25, 12, 62 },{ 27, 12, 65 },
@@ -52,7 +53,7 @@ static const int Inferno[256][3] =
   { 245, 217, 73 },{ 245, 219, 76 },{ 244, 221, 79 },{ 244, 223, 83 },{ 244, 225, 86 },{ 243, 227, 90 },{ 243, 229, 93 },{ 242, 230, 97 },
   { 242, 232, 101 },{ 242, 234, 105 },{ 241, 236, 109 },{ 241, 237, 113 },{ 241, 239, 117 },{ 241, 241, 121 },{ 242, 242, 125 },
   { 242, 244, 130 },{ 243, 245, 134 },{ 243, 246, 138 },{ 244, 248, 142 },{ 245, 249, 146 },{ 246, 250, 150 },{ 248, 251, 154 },
-  { 249, 252, 157 },{ 250, 253, 161 },{ 252, 255, 164 } 
+  { 249, 252, 157 },{ 250, 253, 161 },{ 252, 255, 164 }
 };
 
 #endif

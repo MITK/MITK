@@ -1,109 +1,194 @@
 /**
 
-\page org_mitk_views_datamanager The DataManager
+\page org_mitk_views_datamanager The Datamanager
 
-\imageMacro{QmitkDatamanager_Icon.png,"Icon of the Data Manager",2.00}
+\imageMacro{data-manager.svg,"Icon of the Data Manager", 2.00}
 
 \tableofcontents
 
-\section QmitkDataManagerIntroduction Introduction
+\section DataManagerIntroduction Introduction
 
-The Datamanager is the central componenent to manage medical data like images, surfaces, etc.. 
-After loading one or more data into the Datamanager the data are shown in the four-view window, the so called Standard View.
-The user can now start working on the data by just clicking  into the standard view or by using the MITK-modules such as "Segmentation" or "Basic Image Processing".
+The Datamanager is the central component to manage medical data like images, segmentation masks, registrations, surfaces, point sets, annotations, measurements, etc..<br>
+After loading data into the Datamanager the data is shown in the four-view window, the so-called <em>Standard Display</em>.
+The user can now start working on the data by interacting with the data inside the <em>Standard Display</em>,
+by using the MITK-plugins such as <em>Segmentation</em> or <em>Basic Image Processing</em> or by using the context menu inside the data manager.
 
-\imageMacro{QmitkDatamanager_Overview.png,"How MITK looks when started",16.00}
+\section DataManagerLoadingData Loading Data
 
-
-\section QmitkDataManagerLoading Loading Data
-
-There are three ways of loading data into the Datamanager as so called Data-Elements.
-
-The user can just drag and drop data into the Datamanager or directly into one of the four parts of the Standard View. 
-He can as well use the Open-Button in the right upper corner. Or he can use the standard "File->Open"-Dialog on the top.
-
-A lot of file-formats can be loaded into MITK, for example
+There are several ways of loading data into the Datamanager as so-called <em>data nodes</em>:
 
 <ul>
-<li> 2D-images/3D-volumes with or without several timesteps (*.dcm, *.ima, *.pic, ...)
-<li> Surfaces (*.stl, *.vtk, ...)
-<li> Pointsets (*.mps)
-<li> ...
+  <li> drag and drop data (e.g. from a file explorer or desktop) into the Datamanager
+  <li> drag and drop data (e.g. from a file explorer or desktop) into one of the four windows of the <em>Standard Display</em>
+  <li> use the keyboard shortcut <em>Ctrl + o</em>
+  <li> use the <em>Open File</em> Button in the left upper corner and use the <em>Open</em> Dialog
+  <li> use <em>File -> Open File...</em> from the top menu
+</ul>
+
+A lot of file-formats can be loaded into MITK, for example:
+
+<ul>
+  <li> 2D-images / 3D-volumes with or without several time steps (*.dcm, *.ima, *.pic, *.nrrd, ...)
+  <li> Surfaces (*.stl, *.vtk, ...)
+  <li> Point sets (*.mps)
+  <li> and many more
 </ul>
 
 The user can also load a series of 2D images (e.g. image001.png, image002.png ...) to a MITK 3D volume. 
 To do this, just drag and drop one of those 2D data files into the Datamanager by holding the ALT key.
+<em>Note: What really happens is that the data nodes are stored inside a "Data storage" and the Datamanager is just a visual representation of the data inside the "Data storage".
+That's why the documentation sometimes uses the term "Data storage" instead of "Datamanager".</em>
 
-After loading one or more data into the Datamanager they appear as Data-Elements in a sorted list inside the Datamanager. 
-Data-Elements can also be sorted hierarchically as a parent-child-relation.
-For example after using the Segmentation-Module on Data-Element1 the result is created as Data-Element2, which is a child of Data-Element1 (see Screenshot1).
-The order can be changed by drag and drop.
+\section DataManagerSavingData Saving Data
 
-\imageMacro{QmitkDatamanager_ParentChild.png,"Screenshot1",9.61}
-
-The listed Data-Elements are shown in the standard view.
-Here the user can scale or rotate the medical objects or he can change the cutting planes of the object by just using the mouse inside this view.
-
-\section QmitkDataManagerSaving Saving Data
-
-There are two ways of saving data from the Datamanger. The user can either save the whole project with all Data-Elements by clicking on "File"->"Save Project"
-or he can save single Data-Elements by right-clicking->"Save", directly on a Data-Element. 
-When saving the whole project, the sorting of Data-Elements is saved as well. By contrast the sorting is lost, when saving a single Data-Element.
-
-\section QmitkDataManagerProperties Working with the Datamanager
-
-\subsection QmitkDataManagerPropertiesList List of Data-Elements
-
-The Data-Elements are listed in the Datamanager. 
-As described above the elements can be sorted hierarchically as a parent-child-relation.
-For example after using the Segmentation-Module on Data-Element1 the result is created as Data-Element2, which is a child of Data-Element1 (see Screenshot1). 
-By drag and drop the sorting of Data-Elements and their hierarchical relation can be changed.
-
-\subsection QmitkDataManagerPropertiesVisibility Visibility of Data-Elements
-
-By default all loaded Data-Elements are visible in the standard view.
-The visibility can be changed by right-clicking on the Data-Element and then choosing "Toogle visibility".
-The box in front of the Data-Element in the Datamanager shows the visibility.
-A green-filled box means a visible Data-Element, an empty box means an invisible Data-Element (see Screenshot1).
-
-\subsection QmitkDataManagerPropertiesRepresentation Representation of Data-Elements
-
-There are different types of representations how to show the Data-Element inside the standard view. By right-clicking on the Data-Element all options are listed (see Screenshot2 and Screenshot 3).
+There are several ways of saving data from the Datamanager:
 
 <ul>
-<li> An arbitrary color can be chosen
-<li> The opacity can be changed with a slide control
-<li> In case of images a texture interpolation can be switched on or off. The texture interpolation smoothes the image, so that no single pixels are visible anymore.
-<li> In case of surfaces the surface representation can be changed between points, wireframe or surface.
-<li> Global reinit updates all windows to contain all the current data:
-
-     -  The orientation of the worldgeometry, which basically defines the rendering space, is set to the standard coordinate system, i.e. [(0,0,1);(0,1,0);(0,0,1)]
-     -  The size of the worldgeometry is calculated, so that it includes all loaded data (depends on size and position of your data)
-     -  The spacing is set to the smallest existing spacing regarding your data
-
-     Reinit updates a single data item and fits the windows to contain only this data item:
-
-     -  The orientation of the worldgeometry, is aligned according to the orientation of the currently selected datanode
-     -  The size of the worldgeometry is set to the size of the currently selected datanode
-     -  The spacing is set to the spacing of the currently selected datanode
-
+  <li> use the keyboard shortcut <em>Ctrl + s</em> on a single data node
+  <li> use the keyboard shortcut <em>Ctrl + s</em> on multiple data nodes
+  <li> use the context menu <em>right-click -> Save</em> on a single data node
+  <li> use the context menu <em>right-click -> Save</em> on multiple data nodes
+  <li> use <em>File -> Save...</em> from the top menu on a single data node
+  <li> use <em>File -> Save...</em> from the top menu on multiple data nodes
 </ul>
 
-\imageMacro{QmitkDatamanager_ImageProperties.png,"Screenshot2: Properties for images",10.56}
-\imageMacro{QmitkDatamanager_SurfaceProperties.png,"Screenshot3: Properties for surfaces",11.01}
+\section DataManagerWorking Working with the Datamanager
 
+After loading data into the Datamanager the data appears as data nodes in a sorted list inside the Datamanager.
+The user can change the order of the data nodes manually by dragging one or multiple data nodes and dropping them at any position inside the Datamanager.
+Data nodes can also be sorted hierarchically as a parent-child-relation.
+For example after using the <em>Segmentation-Plugin</em> to create a segmentation on <em>DataNode</em>, the result is created as <em>ChildNode</em>,
+which is a child of <em>DataNode</em> (see \ref ParentChild "Parent-Child-Relation" screenshot).<br>
+A parent-child-relation can be changed by dragging a child of a data node and dropping it onto another data node.
+For this the Property <em>Allow changing of parent nodes</em> needs to be enabled (see \ref DataManagerPreferences "Preferences").
 
-\subsection QmitkDataManagerPropertiesPreferences Preferences
+\anchor ParentChild
+\imageMacro{QmitkDatamanager_ParentChild.png, "Parent-Child-Relation", 16.00}
 
-For the datamanager there are already some default hotkeys like the del-key for deleting a Data-Element. The whole list is seen in Screenshot4.
-From here the Hotkeys can also be changed. The preference page is found in "Window"->"Preferences".
+\subsection DataManagerNodeVisibility Visibility of data nodes
 
-\imageMacro{QmitkDatamanager_Preferences.png,"Screenshot4",16.00}
+By default all loaded data nodes are visible in the <em>Standard Display</em>. The visibility is indicated by the checkbox in front of the data node name in the Datamanager.
+If a data node is visible, the checkbox is filled - an empty checkbox indicates a hidden data node (see \ref ParentChild "Parent-Child-Relation" screenshot).
+<em>Hint: The data nodes are rendered on top of each other, such that the topmost visible data node is always displayed on top of other data nodes. By hiding
+the topmost visible data node the next data node becomes the topmost visible data node and the hidden data node is not rendered anymore.</em>
+<em>Note: "Visible" does not mean that the node is correctly displayed inside the render windows. The user might have to re-initialize a data node to have it correctly displayed.</em>
 
-\section QmitkDataManagerPropertyList Property List
+\subsection DataManagerNodeSelection Selection of data nodes
 
-The Property List displays all the properties the currently selected Data-Element has. Which properties these are depends on the Data-Element. Examples are opacity, shader, visibility. These properties can be changed by clicking on the appropriate field in the "value" column.
+Some MITK-plugins contain widgets to control the data nodes that are used for plugin-specific data processing. These widgets can be configured such that they listen to
+the current selection of the Datamanager. Having such a plugin active each selection change of data nodes inside the data manager will change the respective selection of
+the plugin. The data node selection widgets can have specific node predicates, which means that only specific data nodes can be controlled by the widgets. It might happen
+that a selected data node will not be represented in such a selection widget or that the selection widget will be emptied.
 
-\imageMacro{QmitkDatamanager_PropertyList.png,"Screenshot5: Property List",7.85}
+\subsection DataManagerNodeRenaming Renaming data nodes
 
+There are two ways of changing the name of a data node inside the Datamanager:
+
+<ul>
+  <li> use the <em>F2</em> key on a single data node
+  <li> double-click on a single data node
+</ul>
+
+In both cases the new name can be accepted by hitting <em>Enter</em> or by clicking somewhere else.
+
+\section DataManagerContextMenu Context Menu
+
+The Datamanager provides a context menu for each data node that can be opened by right-clicking on a data node.
+An example of the context-menu can be seen in the \ref ContextMenu "Context menu" screenshot.
+The context menu allows to quickly perform common actions on data nodes. These actions differ according to the data type. Some of these actions are described here.
+For more actions see the respective modules and plugins (e.g. <tt>QmitkCreatePolygonModelAction</tt> inside the <tt>org_mitk_gui_qt_segmentation</tt>-plugin.
+
+<ul>
+  <li> <em>Global Reinit</em>: Re-initializes the render windows to the common bounding box of all data nodes of the data storage that
+    <ul>
+      <li> have not set <tt>"includeInBoundingBox"</tt> to false
+      <li> are <tt>"visible"</tt>.
+    </ul>
+    In this case it does not matter on which node this action is performed.
+	<li> <em>Reinit</em>: Re-initializes the render windows to the common bounding box of all selected data nodes of the data storage that
+    <ul>
+      <li> have not set <tt>"includeInBoundingBox"</tt> to false
+      <li> are <tt>"visible"</tt>.
+    </ul>
+  <li> <em>Save</em>: see \ref DataManagerSavingData "Saving Data" section
+  <li> <em>Remove</em>: Removes all selected data nodes from the data storage.
+  <li> <em>Show only selected nodes</em>: Enables the visibility of all selected data nodes and hides all other data nodes.
+  <li> <em>Toggle visibility</em>: Shows / hides each selected data node according to each node's current visibility state.
+  <li> <em>Show details</em>: Opens a pop-up window with detailed information about each node, like data type, geometry, DICOM information, file path etc.
+  <li> <em>Opacity</em>: Sets the opacity via a slider for the rendering of the selected data node.
+  <li> <em>Color</em>: Opens a pop-up window that allows to pick an arbitrary color for the rendering of all selected data nodes.
+  <li> <em>Colormap</em>: Opens another submenu with a list of different colormaps that can be chosen for the rendering of all selected data nodes.
+  <li> <em>Component</em>: Sets the currently visible data component for the rendering of this particular component of the selected data node.
+  <li> <em>Texture Interpolation</em>: Smooths the data visualization for rendering of a selected data node.
+  <li> <em>Surface Representation</em>: Opens another submenu with the following entries:
+    <ul>
+      <li> <em>Points</em>: Visually represents a surface (a data type) as a set of points.
+      <li> <em>Wireframe</em>: Visually represents a surface (a data type) as a wireframe model.
+      <li> <em>Surface</em>: Visually represents a surface (a data type) as a solid surface.
+    </ul>
+</ul>
+
+As the description of the actions showed, it is possible to open / use the context menu with a single data node or with a set of selected data nodes.
+If the data types of multiple selected data nodes differ, the actions might not appear / work as expected. Also some actions are not available for a set of selected data nodes.
+
+\anchor ContextMenu
+\imageMacro{QmitkDatamanager_ContextMenu.png, "Context menu", 16.00}
+
+\section DataManagerPreferences Preferences
+
+The MITK Workbench provides a <em>preference page</em> for specific plugins. The preference page provided for the Datamanager can be seen in the \ref PreferencePage "Preference page" screenshot.
+The user can open the preference page by
+<ul>
+  <li> using the keyboard shortcut <em>Ctrl + p</em>
+  <li> using <em>Window -> Preferences...</em> from the top menu.
+</ul>
+
+It allows to set the following preferences for the Datamanager, which define the behavior of the Datamanager:
+<ul>
+  <li> <em>Place new nodes on top</em>: If enabled, newly added data nodes will be inserted at the top of the list of data nodes inside the Datamanager.
+  If disabled, newly added nodes will be inserted at the bottom of the list.
+  <li> <em>Show helper objects</em>: If enabled, data nodes that have set <tt>"helper object"</tt> to true will be displayed in the Datamanager.
+  If disabled, data nodes that have set <tt>"helper object"</tt> to true will not be visible in the Datamanager.
+  <li> <em>Show nodes containing no data</em>: If enabled, data nodes that have no underlying base data defined will be displayed in the Datamanager.
+  If disabled, data nodes that have no underlying base data defined will not be visible in the Datamanager.
+  <li> <em>Use surface decimation</em>: If enabled, a newly created surface will be decimated to reduce the number of triangles in the triangle mesh.
+  Such a surface can be created as a polygon model from a segmentation (see \ref DataManagerContextMenu "Context Menu").
+  If disabled, the surface will have its original number of triangles in the triangle mesh.
+  <li> <em>Allow changing of parent node</em>: If enabled, the user can change the hierarchy of the data nodes manually by dragging one or multiple data nodes and
+  dropping them at any position inside the Datamanager (see \ref DataManagerWorking "Working with the Datamanager") for changing the order of the data nodes manually).
+</ul>
+
+\anchor PreferencePage
+\imageMacro{QmitkDatamanager_PreferencePage.png, "Preference page", 16.00}
+
+\section DataManagerHotkeys Hotkeys
+
+The MITK Workbench provides hotkeys for specific plugins. The hotkeys provided for the Datamanager can be seen in the \ref Hotkeys "Hotkeys" screenshot.
+They allow to expedite common operations in relation to data nodes or the Datamanager.
+The user can customize the hotkeys by accessing the <em>preference page</em>:
+<ul>
+  <li> using the keyboard shortcut <em>Ctrl + p</em>
+  <li> useing <em>Window -> Preferences...</em> from the top menu
+</ul>
+
+<ul>
+  <li> <em>Delete selected nodes</em> Removes all selected data nodes from the data storage.
+  <li> <em>Global reinit</em> Re-initializes the render windows to the common bounding box of all data nodes of the data storage that
+    <ul>
+      <li> have not set <tt>"includeInBoundingBox"</tt> to false
+      <li> are <tt>"visible"</tt>
+    </ul>
+    In this case it does not matter on which node this action is performed.
+  <li> <em>Make all nodes invisible</em> Hides all data nodes of the data storage.
+  <li> <em>Reinit selected nodes</em> Re-initializes the render windows to the common bounding box of all selected data nodes of the data storage that
+    <ul>
+      <li> have not set <tt>"includeInBoundingBox"</tt> to false
+      <li> are <tt>"visible"</tt>
+    </ul>
+  <li> <em>Show node information</em> Opens a pop-up window with detailed information about each node, like data type, geometry, DICOM information, file path etc.
+  <li> <em>Toggle visibility of selected nodes</em>: Shows / hides each selected data node according to each node's current visibility state.
+</ul>
+
+\anchor Hotkeys
+\imageMacro{QmitkDatamanager_Hotkeys.png, "Hotkeys", 16.00}
 */

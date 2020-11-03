@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef _QMITKSIMPLEEXAMPLEVIEW_H_INCLUDED
 #define _QMITKSIMPLEEXAMPLEVIEW_H_INCLUDED
@@ -40,18 +36,18 @@ public:
   static const std::string VIEW_ID;
 
   QmitkSimpleExampleView();
-  ~QmitkSimpleExampleView();
+  ~QmitkSimpleExampleView() override;
 
 private:
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
   /// \brief Creation of the connections of main and control widget
   virtual void CreateConnections();
 
-  virtual void RenderWindowPartActivated(mitk::IRenderWindowPart *renderWindowPart) override;
-  virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart *renderWindowPart) override;
+  void RenderWindowPartActivated(mitk::IRenderWindowPart *renderWindowPart) override;
+  void RenderWindowPartDeactivated(mitk::IRenderWindowPart *renderWindowPart) override;
 
   /**
    * return the renderwindow of which the movie shall be created, what depends on the combo box

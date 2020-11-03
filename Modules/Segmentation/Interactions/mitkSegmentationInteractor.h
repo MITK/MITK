@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
- The Medical Imaging Interaction Toolkit (MITK)
+The Medical Imaging Interaction Toolkit (MITK)
 
- Copyright (c) German Cancer Research Center,
- Division of Medical and Biological Informatics.
- All rights reserved.
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
 
- This software is distributed WITHOUT ANY WARRANTY; without
- even the implied warranty of MERCHANTABILITY or FITNESS FOR
- A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
- See LICENSE.txt or http://www.mitk.org for details.
-
- ===================================================================*/
+============================================================================*/
 
 #ifndef mitkSegmentationInteractor_h
 #define mitkSegmentationInteractor_h
@@ -24,7 +20,7 @@ namespace mitk
 {
   /**
    *\class SegmentationInteractor
-   *@brief Observer that adds interaction with a segmentation session to the default display interaction.
+   *@brief Observer that adds interaction with a multi-label segmentation session to the default display interaction.
    *
    * At the moment, this includes changing the active label.
    *
@@ -34,7 +30,8 @@ namespace mitk
   class MITKSEGMENTATION_EXPORT SegmentationInteractor : public DisplayInteractor
   {
   public:
-    mitkClassMacro(SegmentationInteractor, DisplayInteractor) itkNewMacro(Self)
+    mitkClassMacro(SegmentationInteractor, DisplayInteractor);
+    itkNewMacro(Self);
 
       protected : SegmentationInteractor(){};
     ~SegmentationInteractor() override{};

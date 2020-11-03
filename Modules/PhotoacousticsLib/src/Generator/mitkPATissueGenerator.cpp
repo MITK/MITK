@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkPATissueGenerator.h"
 #include "mitkPAVector.h"
@@ -23,9 +19,16 @@ mitk::pa::InSilicoTissueVolume::Pointer mitk::pa::InSilicoTissueGenerator::Gener
 {
   MITK_DEBUG << "Initializing Empty Volume";
 
-  auto generatedVolume = mitk::pa::InSilicoTissueVolume::New(parameters);
+  const double RESAMPLING_FACTOR = 2;
 
-  const double DIRECTION_VECTOR_INITIAL_VARIANCE = 0.2;
+  if (parameters->GetDoPartialVolume())
+  {
+    parameters->SetXDim(parameters->GetXDim() * RESAMPLING_FACTOR);
+    parameters->SetYDim(parameters->GetYDim() * RESAMPLING_FACTOR);
+    parameters->SetZDim(parameters->GetZDim() * RESAMPLING_FACTOR);
+    parameters->SetVesselBifurcationFrequency(parameters->GetVesselBifurcationFrequency() * RESAMPLING_FACTOR);
+    parameters->SetVoxelSpacingInCentimeters(parameters->GetVoxelSpacingInCentimeters() / RESAMPLING_FACTOR);
+  }
 
   std::mt19937 randomNumberGenerator;
   std::random_device randomDevice;
@@ -45,12 +48,25 @@ mitk::pa::InSilicoTissueVolume::Pointer mitk::pa::InSilicoTissueGenerator::Gener
     }
   }
 
-  std::uniform_int_distribution<int> randomNumVesselDistribution(parameters->GetMinNumberOfVessels(), parameters->GetMaxNumberOfVessels());
-  std::uniform_real_distribution<double> randomBendingDistribution(parameters->GetMinVesselBending(), parameters->GetMaxVesselBending());
-  std::uniform_real_distribution<double> randomAbsorptionDistribution(parameters->GetMinVesselAbsorption(), parameters->GetMaxVesselAbsorption());
-  std::uniform_real_distribution<double> randomRadiusDistribution(parameters->GetMinVesselRadiusInMillimeters(), parameters->GetMaxVesselRadiusInMillimeters());
-  std::uniform_real_distribution<double> randomScatteringDistribution(parameters->GetMinVesselScattering(), parameters->GetMaxVesselScattering());
-  std::uniform_real_distribution<double> randomAnisotropyDistribution(parameters->GetMinVesselAnisotropy(), parameters->GetMaxVesselAnisotropy());
+  auto generatedVolume = mitk::pa::InSilicoTissueVolume::New(parameters, &randomNumberGenerator);
+
+  double DIRECTION_VECTOR_INITIAL_VARIANCE = 0.2;
+
+  if(parameters->GetForceVesselsMoveAlongYDirection())
+      DIRECTION_VECTOR_INITIAL_VARIANCE = 0;
+
+  std::uniform_int_distribution<int> randomNumVesselDistribution(
+              parameters->GetMinNumberOfVessels(), parameters->GetMaxNumberOfVessels());
+  std::uniform_real_distribution<double> randomBendingDistribution(
+              parameters->GetMinVesselBending(), parameters->GetMaxVesselBending());
+  std::uniform_real_distribution<double> randomAbsorptionDistribution(
+              parameters->GetMinVesselAbsorption(), parameters->GetMaxVesselAbsorption());
+  std::uniform_real_distribution<double> randomRadiusDistribution(
+              parameters->GetMinVesselRadiusInMillimeters(), parameters->GetMaxVesselRadiusInMillimeters());
+  std::uniform_real_distribution<double> randomScatteringDistribution(
+              parameters->GetMinVesselScattering(), parameters->GetMaxVesselScattering());
+  std::uniform_real_distribution<double> randomAnisotropyDistribution(
+              parameters->GetMinVesselAnisotropy(), parameters->GetMaxVesselAnisotropy());
   std::uniform_int_distribution<int> borderTypeDistribution(0, 3);
 
   int numberOfBloodVessels = randomNumVesselDistribution(randomNumberGenerator);
@@ -97,33 +113,45 @@ mitk::pa::InSilicoTissueVolume::Pointer mitk::pa::InSilicoTissueGenerator::Gener
     * DIRECTION_VECTOR_INITIAL_VARIANCE)
     */
     int borderType = borderTypeDistribution(randomNumberGenerator);
+
+    if(parameters->GetForceVesselsMoveAlongYDirection())
+        borderType = 2;
+
     switch (borderType)
     {
     case 0:
-      initialPosition->Randomize(0, 0, initialRadius, parameters->GetYDim() - initialRadius, parameters->GetMinVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(),
+      initialPosition->Randomize(0, 0, initialRadius, parameters->GetYDim() - initialRadius,
+                                 parameters->GetMinVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(),
         parameters->GetMaxVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(), &randomNumberGenerator);
       initialDirection->Randomize(1, 2, -DIRECTION_VECTOR_INITIAL_VARIANCE, DIRECTION_VECTOR_INITIAL_VARIANCE,
         -DIRECTION_VECTOR_INITIAL_VARIANCE, DIRECTION_VECTOR_INITIAL_VARIANCE, &randomNumberGenerator);
       break;
     case 1:
-      initialPosition->Randomize(parameters->GetXDim(), parameters->GetXDim(), initialRadius, parameters->GetYDim() - initialRadius, parameters->GetMinVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(),
+      initialPosition->Randomize(parameters->GetXDim() - 1, parameters->GetXDim() - 1, initialRadius, parameters->GetYDim() - initialRadius,
+                                 parameters->GetMinVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(),
         parameters->GetMaxVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(), &randomNumberGenerator);
       initialDirection->Randomize(-2, -1, -DIRECTION_VECTOR_INITIAL_VARIANCE, DIRECTION_VECTOR_INITIAL_VARIANCE,
         -DIRECTION_VECTOR_INITIAL_VARIANCE, DIRECTION_VECTOR_INITIAL_VARIANCE, &randomNumberGenerator);
       break;
     case 2:
-      initialPosition->Randomize(initialRadius, parameters->GetXDim() - initialRadius, 0, 0, parameters->GetMinVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(),
+      initialPosition->Randomize(initialRadius, parameters->GetXDim() - initialRadius, 0, 0,
+                                 parameters->GetMinVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(),
         parameters->GetMaxVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(), &randomNumberGenerator);
       initialDirection->Randomize(-DIRECTION_VECTOR_INITIAL_VARIANCE, DIRECTION_VECTOR_INITIAL_VARIANCE, 1, 2,
         -DIRECTION_VECTOR_INITIAL_VARIANCE, DIRECTION_VECTOR_INITIAL_VARIANCE, &randomNumberGenerator);
       break;
     case 3:
-      initialPosition->Randomize(initialRadius, parameters->GetXDim() - initialRadius, parameters->GetYDim(), parameters->GetYDim(), parameters->GetMinVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(),
+      initialPosition->Randomize(initialRadius, parameters->GetXDim() - initialRadius, parameters->GetYDim() - 1, parameters->GetYDim() - 1,
+                                 parameters->GetMinVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(),
         parameters->GetMaxVesselZOrigin() / parameters->GetVoxelSpacingInCentimeters(), &randomNumberGenerator);
       initialDirection->Randomize(-DIRECTION_VECTOR_INITIAL_VARIANCE, DIRECTION_VECTOR_INITIAL_VARIANCE, -2, -1,
         -DIRECTION_VECTOR_INITIAL_VARIANCE, DIRECTION_VECTOR_INITIAL_VARIANCE, &randomNumberGenerator);
       break;
     }
+
+    initialDirection->Normalize();
+    MITK_INFO << initialPosition->GetElement(0) << " | " << initialPosition->GetElement(1) << " | " << initialPosition->GetElement(2);
+    MITK_INFO << initialDirection->GetElement(0) << " | " << initialDirection->GetElement(1) << " | " << initialDirection->GetElement(2);
 
     VesselProperties::Pointer vesselParams = VesselProperties::New();
     vesselParams->SetDirectionVector(initialDirection);
@@ -133,6 +161,7 @@ mitk::pa::InSilicoTissueVolume::Pointer mitk::pa::InSilicoTissueGenerator::Gener
     vesselParams->SetScatteringCoefficient(vesselScattering);
     vesselParams->SetAnisotopyCoefficient(vesselAnisotropy);
     vesselParams->SetBifurcationFrequency(parameters->GetVesselBifurcationFrequency());
+    vesselParams->SetDoPartialVolume(parameters->GetDoPartialVolume());
 
     VesselTree::Pointer vesselTree = VesselTree::New(vesselParams);
 
@@ -142,9 +171,15 @@ mitk::pa::InSilicoTissueVolume::Pointer mitk::pa::InSilicoTissueGenerator::Gener
     }
   }
 
-  mitk::pa::VolumeManipulator::GaussianBlur3D(generatedVolume->GetAbsorptionVolume(), parameters->GetVolumeSmoothingSigma());
-  mitk::pa::VolumeManipulator::GaussianBlur3D(generatedVolume->GetScatteringVolume(), parameters->GetVolumeSmoothingSigma());
-  mitk::pa::VolumeManipulator::GaussianBlur3D(generatedVolume->GetAnisotropyVolume(), parameters->GetVolumeSmoothingSigma());
+  if (parameters->GetDoPartialVolume())
+  {
+    VolumeManipulator::RescaleImage(generatedVolume, (1.0 / RESAMPLING_FACTOR));
+    parameters->SetXDim(parameters->GetXDim() / RESAMPLING_FACTOR);
+    parameters->SetYDim(parameters->GetYDim() / RESAMPLING_FACTOR);
+    parameters->SetZDim(parameters->GetZDim() / RESAMPLING_FACTOR);
+    parameters->SetVesselBifurcationFrequency(parameters->GetVesselBifurcationFrequency() / RESAMPLING_FACTOR);
+    parameters->SetVoxelSpacingInCentimeters(parameters->GetVoxelSpacingInCentimeters() * RESAMPLING_FACTOR);
+  }
 
   generatedVolume->FinalizeVolume();
 

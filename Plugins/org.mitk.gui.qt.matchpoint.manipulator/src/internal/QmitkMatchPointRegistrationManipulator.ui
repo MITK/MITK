@@ -53,78 +53,27 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="lbRegistrationName">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="palette">
-         <palette>
-          <active>
-           <colorrole role="Text">
-            <brush brushstyle="SolidPattern">
-             <color alpha="255">
-              <red>0</red>
-              <green>170</green>
-              <blue>0</blue>
-             </color>
-            </brush>
-           </colorrole>
-          </active>
-          <inactive>
-           <colorrole role="Text">
-            <brush brushstyle="SolidPattern">
-             <color alpha="255">
-              <red>0</red>
-              <green>170</green>
-              <blue>0</blue>
-             </color>
-            </brush>
-           </colorrole>
-          </inactive>
-          <disabled>
-           <colorrole role="Text">
-            <brush brushstyle="SolidPattern">
-             <color alpha="255">
-              <red>159</red>
-              <green>158</green>
-              <blue>158</blue>
-             </color>
-            </brush>
-           </colorrole>
-          </disabled>
-         </palette>
-        </property>
-        <property name="font">
-         <font>
-          <weight>75</weight>
-          <bold>true</bold>
-         </font>
-        </property>
-        <property name="toolTip">
-         <string>Registration that should be used to map the moving image...</string>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::StyledPanel</enum>
-        </property>
-        <property name="lineWidth">
-         <number>2</number>
-        </property>
-        <property name="midLineWidth">
-         <number>1</number>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
+        <widget class="QmitkSingleNodeSelectionWidget" name="registrationNodeSelector" native="true">
+          <property name="minimumSize">
+            <size>
+              <width>0</width>
+              <height>40</height>
+            </size>
+          </property>
+        </widget>
+      </item>
+      <item>
+        <widget class="QCheckBox" name="checkAutoSelect">
+          <property name="toolTip">
+            <string>If checked, the target and the moving image will be selected (if available) together with a selected pre registration.</string>
+          </property>
+          <property name="text">
+            <string>Autoselect images by registration</string>
+          </property>
+          <property name="checked">
+            <bool>true</bool>
+          </property>
+        </widget>
       </item>
      </layout>
     </widget>
@@ -132,158 +81,36 @@
    <item>
     <widget class="QLabel" name="label_5">
      <property name="text">
-      <string>Selected moving image:</string>
+      <string>Moving image:</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="lbMovingName">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="palette">
-      <palette>
-       <active>
-        <colorrole role="Text">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>0</red>
-           <green>170</green>
-           <blue>0</blue>
-          </color>
-         </brush>
-        </colorrole>
-       </active>
-       <inactive>
-        <colorrole role="Text">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>0</red>
-           <green>170</green>
-           <blue>0</blue>
-          </color>
-         </brush>
-        </colorrole>
-       </inactive>
-       <disabled>
-        <colorrole role="Text">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>159</red>
-           <green>158</green>
-           <blue>158</blue>
-          </color>
-         </brush>
-        </colorrole>
-       </disabled>
-      </palette>
-     </property>
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="toolTip">
-      <string>Moving image that should be mapped.</string>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
-     </property>
-     <property name="lineWidth">
-      <number>2</number>
-     </property>
-     <property name="midLineWidth">
-      <number>1</number>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
+     <widget class="QmitkSingleNodeSelectionWidget" name="movingNodeSelector" native="true">
+       <property name="minimumSize">
+         <size>
+           <width>0</width>
+           <height>40</height>
+         </size>
+       </property>
+     </widget>
    </item>
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>Selected target image:</string>
+      <string>Target image:</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="lbTargetName">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="palette">
-      <palette>
-       <active>
-        <colorrole role="Text">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>0</red>
-           <green>170</green>
-           <blue>0</blue>
-          </color>
-         </brush>
-        </colorrole>
-       </active>
-       <inactive>
-        <colorrole role="Text">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>0</red>
-           <green>170</green>
-           <blue>0</blue>
-          </color>
-         </brush>
-        </colorrole>
-       </inactive>
-       <disabled>
-        <colorrole role="Text">
-         <brush brushstyle="SolidPattern">
-          <color alpha="255">
-           <red>159</red>
-           <green>158</green>
-           <blue>158</blue>
-          </color>
-         </brush>
-        </colorrole>
-       </disabled>
-      </palette>
-     </property>
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="toolTip">
-      <string>Target image one wants to map onto.</string>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
-     </property>
-     <property name="lineWidth">
-      <number>2</number>
-     </property>
-     <property name="midLineWidth">
-      <number>1</number>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
+     <widget class="QmitkSingleNodeSelectionWidget" name="targetNodeSelector" native="true">
+       <property name="minimumSize">
+         <size>
+           <width>0</width>
+           <height>40</height>
+         </size>
+       </property>
+     </widget>
    </item>
    <item>
     <widget class="QPushButton" name="pbStart">
@@ -470,6 +297,12 @@
    <header>QmitkRegistrationManipulationWidget.h</header>
    <container>1</container>
   </customwidget>
+   <customwidget>
+     <class>QmitkSingleNodeSelectionWidget</class>
+     <extends>QWidget</extends>
+     <header location="global">QmitkSingleNodeSelectionWidget.h</header>
+     <container>1</container>
+   </customwidget>   
  </customwidgets>
  <resources/>
  <connections/>

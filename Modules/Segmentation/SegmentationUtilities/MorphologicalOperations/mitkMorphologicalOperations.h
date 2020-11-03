@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef mitkMorphologicalOperations_h
 #define mitkMorphologicalOperations_h
@@ -55,68 +51,37 @@ namespace mitk
     MorphologicalOperations();
 
     template <class TStructuringElement>
-    static TStructuringElement CreateStructuringElement(StructuralElementType structuralElementFlag, int factor)
-    {
-      TStructuringElement strElem;
-      typename TStructuringElement::SizeType size;
-      size.Fill(0);
-      switch (structuralElementFlag)
-      {
-        case Ball_Axial:
-        case Cross_Axial:
-          size.SetElement(0, factor);
-          size.SetElement(1, factor);
-          break;
-        case Ball_Coronal:
-        case Cross_Coronal:
-          size.SetElement(0, factor);
-          size.SetElement(2, factor);
-          break;
-        case Ball_Sagital:
-        case Cross_Sagital:
-          size.SetElement(1, factor);
-          size.SetElement(2, factor);
-          break;
-        case Ball:
-        case Cross:
-          size.Fill(factor);
-          break;
-      }
-
-      strElem.SetRadius(size);
-      strElem.CreateStructuringElement();
-      return strElem;
-    }
+    static TStructuringElement CreateStructuringElement(StructuralElementType structuralElementFlag, int factor);
 
     ///@{
     /** \brief Perform morphological operation by using corresponding ITK filter.
      */
     template <typename TPixel, unsigned int VDimension>
-    void static itkClosing(itk::Image<TPixel, VDimension> *sourceImage,
+    static void itkClosing(itk::Image<TPixel, VDimension> *sourceImage,
                            mitk::Image::Pointer &resultImage,
                            int factor,
                            StructuralElementType structuralElement);
 
     template <typename TPixel, unsigned int VDimension>
-    void static itkErode(itk::Image<TPixel, VDimension> *sourceImage,
+    static void itkErode(itk::Image<TPixel, VDimension> *sourceImage,
                          mitk::Image::Pointer &resultImage,
                          int factor,
                          StructuralElementType structuralElement);
 
     template <typename TPixel, unsigned int VDimension>
-    void static itkDilate(itk::Image<TPixel, VDimension> *sourceImage,
+    static void itkDilate(itk::Image<TPixel, VDimension> *sourceImage,
                           mitk::Image::Pointer &resultImage,
                           int factor,
                           StructuralElementType structuralElement);
 
     template <typename TPixel, unsigned int VDimension>
-    void static itkOpening(itk::Image<TPixel, VDimension> *sourceImage,
+    static void itkOpening(itk::Image<TPixel, VDimension> *sourceImage,
                            mitk::Image::Pointer &resultImage,
                            int factor,
                            StructuralElementType structuralElement);
 
     template <typename TPixel, unsigned int VDimension>
-    void static itkFillHoles(itk::Image<TPixel, VDimension> *sourceImage, mitk::Image::Pointer &resultImage);
+    static void itkFillHoles(itk::Image<TPixel, VDimension> *sourceImage, mitk::Image::Pointer &resultImage);
     ///@}
   };
 }

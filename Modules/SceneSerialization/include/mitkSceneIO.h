@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef mitkSceneIO_h_included
 #define mitkSceneIO_h_included
@@ -35,7 +31,8 @@ namespace mitk
   {
   public:
     mitkClassMacroItkParent(SceneIO, itk::Object);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       typedef DataStorage::SetOfObjects FailedBaseDataListType;
 
@@ -55,6 +52,25 @@ namespace mitk
     virtual DataStorage::Pointer LoadScene(const std::string &filename,
                                            DataStorage *storage = nullptr,
                                            bool clearStorageFirst = false);
+
+    /**
+    * \brief Load a scene of objects from directory.
+    * \return DataStorage with all scene objects and their relations. If loading failed, query GetFailedNodes() and
+    * GetFailedProperties() for more detail.
+    *
+    * Does the same like LoadScene, but assumes that the given filename is the index.xml of the scene and the working directory
+    * is the directory of the given filename. This function can be used to load an already unpacked scene and create objects with
+    * parent/child relations into a DataStorage.
+    *
+    * \param filename full filename of the scene index file
+    * \param storage If given, this DataStorage is used instead of a newly created one
+    * \param clearStorageFirst If set, the provided DataStorage will be cleared before populating it with the loaded
+    * objects
+    */
+    virtual DataStorage::Pointer LoadSceneUnzipped(const std::string &indexfilename,
+      DataStorage *storage = nullptr,
+      bool clearStorageFirst = false);
+
 
     /**
      * \brief Save a scene of objects to file

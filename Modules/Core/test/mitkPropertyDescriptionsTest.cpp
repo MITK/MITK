@@ -1,47 +1,80 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
+============================================================================*/
 
-===================================================================*/
-
+// Testing
+#include "mitkTestFixture.h"
+#include "mitkTestingMacros.h"
+// std includes
+#include <string>
+#include <algorithm>
+// MITK includes
 #include <mitkCoreServices.h>
 #include <mitkIPropertyDescriptions.h>
-#include <mitkTestingMacros.h>
+// VTK includes
+#include <vtkDebugLeaks.h>
 
-int mitkPropertyDescriptionsTest(int, char *[])
+class mitkPropertyDescriptionsTestSuite : public mitk::TestFixture
 {
-  MITK_TEST_BEGIN("mitkPropertyDescriptionsTest");
+  CPPUNIT_TEST_SUITE(mitkPropertyDescriptionsTestSuite);
+  MITK_TEST(GetPropertyDescriptionService_Success);
+  MITK_TEST(GetPropertyDescription_Success);
+  MITK_TEST(GetOverwrittenDescription_Success);
+  MITK_TEST(GetPropertyDescriptionRestricted_Success);
+  CPPUNIT_TEST_SUITE_END();
 
-  mitk::IPropertyDescriptions *propertyDescriptions = mitk::CoreServices::GetPropertyDescriptions();
-  MITK_TEST_CONDITION_REQUIRED(propertyDescriptions != nullptr, "Get property descriptions service");
+  private:
+  mitk::IPropertyDescriptions *m_PropertyDescriptions;
+  std::string m_Description1;
 
-  propertyDescriptions->AddDescription("propertyName1", "description1a");
-  propertyDescriptions->AddDescription("propertyName1", "description1b");
-  std::string description1 = propertyDescriptions->GetDescription("propertyName1");
+  public:
+  void setUp()
+  {
+    m_PropertyDescriptions = mitk::CoreServices::GetPropertyDescriptions();
+    m_PropertyDescriptions->AddDescription("propertyName1", "description1a");
+    m_PropertyDescriptions->AddDescription("propertyName1", "description1b");
+  }
 
-  MITK_TEST_CONDITION(description1 == "description1a", "Get description of \"propertyName1\"");
+  void tearDown()
+  {
+    m_PropertyDescriptions = nullptr;
+  }
 
-  propertyDescriptions->AddDescription("propertyName1", "description1b", "", true);
-  description1 = propertyDescriptions->GetDescription("propertyName1");
+  void GetPropertyDescriptionService_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Get property descriptions service", m_PropertyDescriptions != nullptr);
+  }
 
-  MITK_TEST_CONDITION(description1 == "description1b", "Get overwritten description of \"propertyName1\"");
+  void GetPropertyDescription_Success()
+  {
+    m_Description1 = m_PropertyDescriptions->GetDescription("propertyName1");
+    CPPUNIT_ASSERT_MESSAGE("Get description of \"propertyName1\"", m_Description1 == "description1a");
+  }
 
-  propertyDescriptions->AddDescription("propertyName1", "description1c", "className");
-  std::string description2 = propertyDescriptions->GetDescription("propertyName1", "className");
-  description1 = propertyDescriptions->GetDescription("propertyName1");
+  void GetOverwrittenDescription_Success()
+  {
+    m_PropertyDescriptions->AddDescription("propertyName1", "description1b", "", true);
+    m_Description1 = m_PropertyDescriptions->GetDescription("propertyName1");
+    CPPUNIT_ASSERT_MESSAGE("Get overwritten description of \"propertyName1\"", m_Description1 == "description1b");
+  }
 
-  MITK_TEST_CONDITION(description1 == "description1b" && description2 == "description1c",
-                      "Get description of \"propertyName1\" restricted to \"className\"");
+  void GetPropertyDescriptionRestricted_Success()
+  {
+    m_PropertyDescriptions->AddDescription("propertyName1", "description1c", "className");
+    std::string description2 = m_PropertyDescriptions->GetDescription("propertyName1", "className");
+    m_Description1 = m_PropertyDescriptions->GetDescription("propertyName1");
+    
+    CPPUNIT_ASSERT_MESSAGE("Get description of \"propertyName1\" restricted to \"className\"",
+                            m_Description1 == "description1b" && description2 == "description1c");
+  }
+};
 
-  MITK_TEST_END();
-}
+MITK_TEST_SUITE_REGISTRATION(mitkPropertyDescriptions)

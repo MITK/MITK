@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "itkBarrier.h"
 #include "mitkIOUtil.h"
@@ -148,12 +144,12 @@ ITK_THREAD_RETURN_TYPE ThreadMethod(void *data)
       }
     }
   }
-  catch (mitk::MemoryIsLockedException &e)
+  catch ( const mitk::MemoryIsLockedException &e )
   {
     threadData->m_Successful = false;
     e.Print(std::cout);
   }
-  catch (mitk::Exception &e)
+  catch ( const mitk::Exception &e )
   {
     threadData->m_Successful = false;
     e.Print(std::cout);
@@ -184,9 +180,9 @@ int mitkImageAccessorTest(int argc, char *argv[])
       MITK_TEST_FAILED_MSG(<< "file could not be loaded [FAILED]")
     }
   }
-  catch (itk::ExceptionObject &ex)
+  catch ( const itk::ExceptionObject &ex )
   {
-    MITK_TEST_FAILED_MSG(<< "Exception: " << ex << "[FAILED]")
+    MITK_TEST_FAILED_MSG(<< "Exception: " << ex.GetDescription() << "[FAILED]")
   }
 
   // CHECK INAPPROPRIATE AND SPECIAL USAGE

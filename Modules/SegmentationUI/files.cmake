@@ -19,10 +19,7 @@ Qmitk/QmitkPixelManipulationToolGUI.cpp
 Qmitk/QmitkSlicesInterpolator.cpp
 Qmitk/QmitkToolGUI.cpp
 Qmitk/QmitkToolGUIArea.cpp
-Qmitk/QmitkToolReferenceDataSelectionBox.cpp
-Qmitk/QmitkToolRoiDataSelectionBox.cpp
 Qmitk/QmitkToolSelectionBox.cpp
-Qmitk/QmitkToolWorkingDataSelectionBox.cpp
 Qmitk/QmitkWatershedToolGUI.cpp
 #Added from ML
 Qmitk/QmitkLabelSetWidget.cpp
@@ -31,6 +28,7 @@ Qmitk/QmitkMaskStampWidget.cpp
 Qmitk/QmitkSliceBasedInterpolatorWidget.cpp
 Qmitk/QmitkSurfaceBasedInterpolatorWidget.cpp
 Qmitk/QmitkSearchLabelDialog.cpp
+Qmitk/QmitkSimpleLabelSetListWidget.cpp
 )
 
 set(MOC_H_FILES
@@ -53,10 +51,7 @@ Qmitk/QmitkPixelManipulationToolGUI.h
 Qmitk/QmitkSlicesInterpolator.h
 Qmitk/QmitkToolGUI.h
 Qmitk/QmitkToolGUIArea.h
-Qmitk/QmitkToolReferenceDataSelectionBox.h
-Qmitk/QmitkToolRoiDataSelectionBox.h
 Qmitk/QmitkToolSelectionBox.h
-Qmitk/QmitkToolWorkingDataSelectionBox.h
 Qmitk/QmitkWatershedToolGUI.h
 #Added from ML
 Qmitk/QmitkLabelSetWidget.h
@@ -65,6 +60,7 @@ Qmitk/QmitkMaskStampWidget.h
 Qmitk/QmitkSliceBasedInterpolatorWidget.h
 Qmitk/QmitkSurfaceBasedInterpolatorWidget.h
 Qmitk/QmitkSearchLabelDialog.h
+Qmitk/QmitkSimpleLabelSetListWidget.h
 )
 
 set(UI_FILES
@@ -73,6 +69,7 @@ Qmitk/QmitkConfirmSegmentationDialog.ui
 Qmitk/QmitkOtsuToolWidgetControls.ui
 Qmitk/QmitkPickingToolGUIControls.ui
 Qmitk/QmitkLiveWireTool2DGUIControls.ui
+Qmitk/QmitkWatershedToolGUIControls.ui
 #Added from ML
 Qmitk/QmitkLabelSetWidgetControls.ui
 Qmitk/QmitkSurfaceStampWidgetGUIControls.ui

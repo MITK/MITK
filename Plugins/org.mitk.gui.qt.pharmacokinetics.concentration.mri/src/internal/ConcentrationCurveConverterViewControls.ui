@@ -1,0 +1,469 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ConcentrationCurveConverterViewControls</class>
+ <widget class="QWidget" name="ConcentrationCurveConverterViewControls">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>475</width>
+    <height>825</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>QmitkTemplate</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <property name="topMargin">
+      <number>10</number>
+     </property>
+     <item>
+      <widget class="QRadioButton" name="radioButton_T1">
+       <property name="text">
+        <string>T1 weighted MRI</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="radioButton_T2">
+       <property name="text">
+        <string>T2 weighted MRI</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_T1">
+     <property name="title">
+      <string>T1 weighted images</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_5">
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <property name="topMargin">
+         <number>10</number>
+        </property>
+        <property name="bottomMargin">
+         <number>10</number>
+        </property>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <property name="topMargin">
+           <number>10</number>
+          </property>
+          <item>
+           <widget class="QRadioButton" name="radioButton3D">
+            <property name="text">
+             <string>3D Image</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="radioButton4D">
+            <property name="text">
+             <string>4D Image</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox4D">
+          <property name="title">
+           <string>4D Image</string>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <widget class="QLabel" name="timeSeriesLabel">
+             <property name="text">
+              <string>Selected Time Series:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QmitkSingleNodeSelectionWidget" name="timeSeriesNodeSelector" native="true"/>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox3D">
+          <property name="title">
+           <string>3D Image</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout">
+           <item row="2" column="1">
+            <widget class="QmitkSingleNodeSelectionWidget" name="baselineImageNodeSelector" native="true"/>
+           </item>
+           <item row="1" column="1">
+            <widget class="QmitkSingleNodeSelectionWidget" name="image3DNodeSelector" native="true"/>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="ImageLabel">
+             <property name="text">
+              <string>Selected 3D Image:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="BaselineImageLabel">
+             <property name="frameShape">
+              <enum>QFrame::NoFrame</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Plain</enum>
+             </property>
+             <property name="text">
+              <string>Selected Baseline Image:</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QWidget" name="groupConcentration" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout_8">
+         <item>
+          <layout class="QVBoxLayout" name="concentrationOptionsLayout">
+           <property name="topMargin">
+            <number>10</number>
+           </property>
+           <item>
+            <widget class="QRadioButton" name="radioButton_absoluteEnhancement">
+             <property name="text">
+              <string>Absolute Signal Enhancement</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="radioButton_relativeEnchancement">
+             <property name="text">
+              <string>Relative Signal Enhancement</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="radioButtonUsingT1viaVFA">
+             <property name="text">
+              <string>Using T1 Map via Variable Flip Angle</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="radioButtonTurboFlash">
+             <property name="text">
+              <string>TurboFLASH Sequence</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="concentrationSettingsLayout">
+           <item>
+            <widget class="QGroupBox" name="groupBoxEnhancement">
+             <property name="title">
+              <string>Enhancement Parameters:</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_7">
+              <item>
+               <widget class="QLabel" name="label_Faktor">
+                <property name="text">
+                 <string>Conversion Factor k:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QDoubleSpinBox" name="factorSpinBox"/>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_baselineRange">
+                <property name="text">
+                 <string>Baseline Range Selection:</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <layout class="QGridLayout" name="gridLayout_4">
+                <item row="0" column="1">
+                 <widget class="QSpinBox" name="spinBox_baselineStartTimeStep"/>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_baselineStartTimeStep">
+                  <property name="text">
+                   <string>Start Time Frame</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="label_baselineEndTimeStep">
+                  <property name="text">
+                   <string>End Time Frame</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QSpinBox" name="spinBox_baselineEndTimeStep"/>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="groupBox_T1MapviaVFA">
+             <property name="title">
+              <string>T1 Map via Variable Flip Angle Parameters:</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_5">
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_7">
+                <property name="text">
+                 <string>Flip Angle [ ° ] : </string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_6">
+                <property name="text">
+                 <string>Repetition Time TR [ms] :</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_9">
+                <property name="text">
+                 <string>Relaxivity [mM⁻¹ s⁻¹] : </string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QDoubleSpinBox" name="FlipangleSpinBox"/>
+              </item>
+              <item row="2" column="1">
+               <widget class="QDoubleSpinBox" name="RelaxivitySpinBox"/>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_8">
+                <property name="text">
+                 <string>Proton Density Weighted Image :</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QDoubleSpinBox" name="TRSpinBox">
+                <property name="maximum">
+                 <double>10000.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QmitkSingleNodeSelectionWidget" name="PDWImageNodeSelector" native="true"/>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="groupBoxTurboFlash">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="title">
+              <string>Turbo FLASH Parameters:</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout">
+              <item row="1" column="0">
+               <widget class="QLabel" name="lable_TRec">
+                <property name="text">
+                 <string>Recovery Time [s]:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QDoubleSpinBox" name="relaxationtime"/>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_25">
+                <property name="text">
+                 <string>AIF Recovery Time [s]:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QDoubleSpinBox" name="AifRecoverytime"/>
+              </item>
+              <item row="3" column="1">
+               <widget class="QDoubleSpinBox" name="relaxivity"/>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_T10">
+                <property name="text">
+                 <string>Relaxation Time [s]:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QDoubleSpinBox" name="recoverytime"/>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label__alpha">
+                <property name="text">
+                 <string>Relaxivity [ ]:</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnConvertToConcentration">
+     <property name="text">
+      <string>Convert To Concentration</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_T2">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>2</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>T2 weighted images</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="1" column="1">
+       <widget class="QmitkSingleNodeSelectionWidget" name="t2TimeSeriesNodeSelector" native="true"/>
+      </item>
+      <item row="5" column="1">
+       <widget class="QDoubleSpinBox" name="T2EchoTimeSpinBox"/>
+      </item>
+      <item row="6" column="0" colspan="2">
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="3" column="1">
+         <widget class="QSpinBox" name="spinBox_baselineEndTimeStepT2"/>
+        </item>
+        <item row="2" column="1">
+         <widget class="QSpinBox" name="spinBox_baselineStartTimeStepT2"/>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_baselineStartTimeStepT2">
+          <property name="text">
+           <string>Start Time Frame</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_baselineEndTimeStepT2">
+          <property name="text">
+           <string>End Time Frame</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_baselineRangeT2">
+          <property name="text">
+           <string>Baseline Range Selection:</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="4" column="1">
+       <widget class="QDoubleSpinBox" name="T2FactorSpinBox"/>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_12">
+        <property name="text">
+         <string>Echo Time TE [ms]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="T2_SeriesLabel">
+        <property name="text">
+         <string>Selected Time Series:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_10">
+        <property name="text">
+         <string>Conversion Factor k</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkSingleNodeSelectionWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkSingleNodeSelectionWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

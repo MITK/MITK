@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef _MITKUNSTRUCTUREDGRIDCLUSTERINGFILTER_h__
 #define _MITKUNSTRUCTUREDGRIDCLUSTERINGFILTER_h__
@@ -66,17 +62,20 @@ namespace mitk
   class MITKALGORITHMSEXT_EXPORT UnstructuredGridClusteringFilter : public UnstructuredGridToUnstructuredGridFilter
   {
   public:
-    mitkClassMacro(UnstructuredGridClusteringFilter, UnstructuredGridToUnstructuredGridFilter)
-      itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(UnstructuredGridClusteringFilter, UnstructuredGridToUnstructuredGridFilter);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /** Sets the distance for the neighbour search */
-      itkSetMacro(eps, double) itkGetMacro(eps, double)
+      itkSetMacro(eps, double);
+      itkGetMacro(eps, double);
 
       /** Sets the number of required neighbours */
-      itkSetMacro(MinPts, int) itkGetMacro(MinPts, int)
+      itkSetMacro(MinPts, int);
+      itkGetMacro(MinPts, int);
 
       /** If activated the clusteres UnstructuredGrid is meshed */
-      itkSetMacro(Meshing, bool)
+      itkSetMacro(Meshing, bool);
 
       /** Returns all clusters as UnstructuredGrids which were found */
       virtual std::vector<mitk::UnstructuredGrid::Pointer> GetAllClusters();

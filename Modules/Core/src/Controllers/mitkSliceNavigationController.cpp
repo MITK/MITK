@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkSliceNavigationController.h"
 #include "mitkAction.h"
@@ -120,24 +116,6 @@ namespace mitk
       m_InputWorldGeometry3D = mitk::BaseGeometry::ConstPointer();
       this->Modified();
     }
-  }
-
-  RenderingManager *SliceNavigationController::GetRenderingManager() const
-  {
-    mitk::RenderingManager *renderingManager = m_RenderingManager.GetPointer();
-
-    if (renderingManager != nullptr)
-      return renderingManager;
-
-    if ( m_Renderer != nullptr )
-    {
-      renderingManager = m_Renderer->GetRenderingManager();
-
-      if (renderingManager != nullptr)
-        return renderingManager;
-    }
-
-    return mitk::RenderingManager::GetInstance();
   }
 
   void SliceNavigationController::SetViewDirectionToDefault() { m_ViewDirection = m_DefaultViewDirection; }
@@ -298,7 +276,7 @@ namespace mitk
         auto createdTimeGeometry = ProportionalTimeGeometry::New();
         createdTimeGeometry->Initialize( slicedWorldGeometry, 1 );
         m_CreatedWorldGeometry = createdTimeGeometry;
-      
+
         m_Time->SetSteps(0);
         m_Time->SetPos(0);
         m_Time->InvalidateRange();
@@ -321,7 +299,7 @@ namespace mitk
       {
         const TimePointType minimumTimePoint =
           worldTimeGeometry->TimeStepToTimePoint( currentTemporalPosition );
-        
+
         const TimePointType stepDuration =
           worldTimeGeometry->TimeStepToTimePoint( currentTemporalPosition + 1 ) - minimumTimePoint;
 
@@ -391,12 +369,7 @@ namespace mitk
       if (m_CreatedWorldGeometry.IsNotNull())
       {
         this->InvokeEvent(GeometrySliceEvent(m_CreatedWorldGeometry, m_Slice->GetPos()));
-
-        // send crosshair event
-        crosshairPositionEvent.Send();
-
-        // Request rendering update for all views
-        this->GetRenderingManager()->RequestUpdateAll();
+        RenderingManager::GetInstance()->RequestUpdateAll();
       }
     }
   }
@@ -408,9 +381,7 @@ namespace mitk
       if (m_CreatedWorldGeometry.IsNotNull())
       {
         this->InvokeEvent(GeometryTimeEvent(m_CreatedWorldGeometry, m_Time->GetPos()));
-
-        // Request rendering update for all views
-        this->GetRenderingManager()->RequestUpdateAll();
+        RenderingManager::GetInstance()->RequestUpdateAll();
       }
     }
   }
@@ -507,6 +478,8 @@ namespace mitk
         this->GetSlice()->SetPos(0);
       }
       this->SendCreatedWorldGeometryUpdate();
+      // send crosshair event
+      SetCrosshairEvent.Send(point);
     }
   }
 
@@ -654,6 +627,30 @@ namespace mitk
         break;
       }
     }
+  }
+
+  TimeStepType SliceNavigationController::GetSelectedTimeStep() const
+  {
+    return this->GetTime()->GetPos();
+  }
+
+  TimePointType SliceNavigationController::GetSelectedTimePoint() const
+  {
+    auto timeStep = this->GetSelectedTimeStep();
+
+    if (m_CreatedWorldGeometry.IsNull())
+    {
+      return 0.0;
+    }
+
+    if (!m_CreatedWorldGeometry->IsValidTimeStep(timeStep))
+    {
+      mitkThrow() << "SliceNavigationController is in an invalid state. It has a time step"
+        << "selected that is not covered by its time geometry. Selected time step: "
+        << timeStep << "; TimeGeometry steps count: " << m_CreatedWorldGeometry->CountTimeSteps();
+    }
+
+    return m_CreatedWorldGeometry->TimeStepToTimePoint(timeStep);
   }
 
 } // namespace

@@ -1,4 +1,4 @@
-set(dependencies_list MitkCore MitkAlgorithmsExt)
+set(dependencies_list MitkCore MitkAlgorithmsExt MitkOpenCVVideoSupport)
 
 IF(MITK_USE_OpenCL)
   add_definitions(-DPHOTOACOUSTICS_USE_GPU)
@@ -7,10 +7,13 @@ IF(MITK_USE_OpenCL)
 ENDIF(MITK_USE_OpenCL)
 
 MITK_CREATE_MODULE(
-  SUBPROJECTS
   DEPENDS ${dependencies_list}
   #AUTOLOAD_WITH MitkCore
-  INCLUDE_DIRS PUBLIC Algorithms/ITKUltrasound Algorithms Algorithms/OCL
+  INCLUDE_DIRS PUBLIC include
   INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}
-  PACKAGE_DEPENDS ITK|ITKFFT+ITKImageCompose+ITKImageIntensity
+  PACKAGE_DEPENDS ITK|ITKFFT+ITKImageCompose+ITKImageIntensity OpenCV tinyxml
 )
+
+add_subdirectory(test)
+add_subdirectory(MitkPABeamformingTool)
+add_subdirectory(MitkPAResampleCropTool)

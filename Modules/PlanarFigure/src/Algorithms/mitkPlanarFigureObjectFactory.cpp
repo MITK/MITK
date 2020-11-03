@@ -1,45 +1,31 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkPlanarFigureObjectFactory.h"
-#include "mitkPlanarFigureWriter.h"
 
 #include "mitkCoreObjectFactory.h"
 
 #include "mitkPlanarFigure.h"
-#include "mitkPlanarFigureIOFactory.h"
 #include "mitkPlanarFigureMapper2D.h"
 #include "mitkPlanarFigureVtkMapper3D.h"
-#include "mitkPlanarFigureWriterFactory.h"
 #include "mitkVtkGLMapperWrapper.h"
 
 typedef std::multimap<std::string, std::string> MultimapType;
 
 mitk::PlanarFigureObjectFactory::PlanarFigureObjectFactory()
-  : m_PlanarFigureIOFactory(PlanarFigureIOFactory::New().GetPointer()),
-    m_PlanarFigureWriterFactory(PlanarFigureWriterFactory::New().GetPointer())
 {
   static bool alreadyDone = false;
   if (!alreadyDone)
   {
-    itk::ObjectFactoryBase::RegisterFactory(m_PlanarFigureIOFactory);
-    itk::ObjectFactoryBase::RegisterFactory(m_PlanarFigureWriterFactory);
-
-    m_FileWriters.push_back(PlanarFigureWriter::New().GetPointer());
-
     CreateFileExtensionsMap();
 
     alreadyDone = true;
@@ -48,8 +34,6 @@ mitk::PlanarFigureObjectFactory::PlanarFigureObjectFactory()
 
 mitk::PlanarFigureObjectFactory::~PlanarFigureObjectFactory()
 {
-  itk::ObjectFactoryBase::UnRegisterFactory(m_PlanarFigureWriterFactory);
-  itk::ObjectFactoryBase::UnRegisterFactory(m_PlanarFigureIOFactory);
 }
 
 mitk::Mapper::Pointer mitk::PlanarFigureObjectFactory::CreateMapper(mitk::DataNode *node, MapperSlotId id)
@@ -93,36 +77,29 @@ void mitk::PlanarFigureObjectFactory::SetDefaultProperties(mitk::DataNode *node)
   }
 }
 
-const char *mitk::PlanarFigureObjectFactory::GetFileExtensions()
+std::string mitk::PlanarFigureObjectFactory::GetFileExtensions()
 {
   return "";
 }
 
 mitk::CoreObjectFactoryBase::MultimapType mitk::PlanarFigureObjectFactory::GetFileExtensionsMap()
 {
-  return m_FileExtensionsMap;
+  return {};
 }
 
-const char *mitk::PlanarFigureObjectFactory::GetSaveFileExtensions()
+std::string mitk::PlanarFigureObjectFactory::GetSaveFileExtensions()
 {
-  // return ";;Planar Figures (*.pf)";  // for mitk::PlanarFigure and derived classes
   std::string fileExtension;
-  this->CreateFileExtensions(m_SaveFileExtensionsMap, fileExtension);
+  this->CreateFileExtensions({}, fileExtension);
   return fileExtension.c_str();
 };
 
 mitk::CoreObjectFactoryBase::MultimapType mitk::PlanarFigureObjectFactory::GetSaveFileExtensionsMap()
 {
-  return m_SaveFileExtensionsMap;
+  return {};
 }
 
 void mitk::PlanarFigureObjectFactory::CreateFileExtensionsMap()
-{
-  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.pf", "Planar Figure Files"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.pf", "Planar Figure Files"));
-}
-
-void mitk::PlanarFigureObjectFactory::RegisterIOFactories()
 {
 }
 

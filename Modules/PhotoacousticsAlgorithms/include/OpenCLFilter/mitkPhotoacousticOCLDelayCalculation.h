@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef _MITKPHOTOACOUSTICSDELAYCALC_H_
 #define _MITKPHOTOACOUSTICSDELAYCALC_H_
@@ -21,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkOclDataSetToDataSetFilter.h"
 #include <itkObject.h>
-#include "mitkPhotoacousticBeamformingSettings.h"
+#include "mitkBeamformingSettings.h"
 
 namespace mitk
 {
@@ -34,21 +30,11 @@ namespace mitk
 
   class OCLDelayCalculation : public OclDataSetToDataSetFilter, public itk::Object
   {
-
   public:
     mitkClassMacroItkParent(OCLDelayCalculation, itk::Object);
-    itkNewMacro(Self);
+    mitkNewMacro1Param(Self, mitk::BeamformingSettings::Pointer);
 
     void Update();
-
-    /** \brief Sets a new configuration to use.
-    *
-    * @param conf The configuration set to use for the calculation of the delays.
-    */
-    void SetConfig(BeamformingSettings conf)
-    {
-      m_Conf = conf;
-    }
 
     /** \brief Sets the usedLines buffer object to use for the calculation of the delays.
     *
@@ -61,7 +47,7 @@ namespace mitk
 
   protected:
 
-    OCLDelayCalculation();
+    OCLDelayCalculation(mitk::BeamformingSettings::Pointer settings);
     virtual ~OCLDelayCalculation();
 
     /** Initialize the filter */
@@ -87,7 +73,7 @@ namespace mitk
     /** The OpenCL kernel for the filter */
     cl_kernel m_PixelCalculation;
 
-    BeamformingSettings m_Conf;
+    BeamformingSettings::Pointer m_Conf;
     cl_mem m_UsedLines;
     unsigned int m_BufferSize;
     float m_DelayMultiplicatorRaw;

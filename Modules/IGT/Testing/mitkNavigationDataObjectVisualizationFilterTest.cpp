@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkNavigationDataObjectVisualizationFilter.h"
 #include "mitkNavigationData.h"
@@ -63,12 +59,14 @@ private:
   mitk::NavigationData::Pointer nd2;
 
   // Test setting BaseData
-  mitk::Surface::Pointer mitkToolData1 ;
-
-  mitk::Surface::Pointer mitkToolData2 ;
+  mitk::Surface::Pointer mitkToolData1;
+  std::vector<mitk::BaseData::Pointer> mitkToolVectorData1;
+  mitk::Surface::Pointer mitkToolData2;
+  std::vector<mitk::BaseData::Pointer> mitkToolVectorData2;
 
   //dummy for test; will not be set but used to test find
-  mitk::Surface::Pointer mitkToolDataDummy ;
+  mitk::Surface::Pointer mitkToolDataDummy;
+  std::vector<mitk::BaseData::Pointer> mitkToolVectorDataDummy;
   //and the Dummy NavigationData for this
   mitk::NavigationData::OrientationType initialOriDummy;
   mitk::NavigationData::PositionType initialPosDummy;
@@ -128,8 +126,13 @@ public:
     mitkToolData1 = mitk::Surface::New();
     mitkToolData2 = mitk::Surface::New();
 
+    // Test setting BaseData vectors
+    mitkToolVectorData1.push_back(mitkToolData1.GetPointer());
+    mitkToolVectorData2.push_back(mitkToolData2.GetPointer());
+
     //dummy for test; will not be set but used to test find
     mitkToolDataDummy = mitk::Surface::New();
+    mitkToolVectorDataDummy.push_back(mitkToolDataDummy.GetPointer());
     //and the Dummy NavigationData for this
     mitk::FillVector3D(initialPosDummy, 8.8, 9.9, 10.10);
     mitk::FillVector4D(initialOriDummy,1.1, 2.2, 3.3, 4.4);
@@ -171,11 +174,11 @@ public:
 
   void TestRepresentationObjects(){
     //setting nodes
-    myFilter->SetRepresentationObject(0, mitkToolData1);
+    myFilter->SetRepresentationObject(0, mitkToolData1.GetPointer());
     CPPUNIT_ASSERT_MESSAGE( "Testing SetRepresentationObject()/GetRepresentationObject() node 1", myFilter->GetRepresentationObject(0) == mitkToolData1);
     CPPUNIT_ASSERT_MESSAGE("Testing GetNumberOfToolRepresentations() after adding first tool", myFilter->GetNumberOfToolRepresentations() == 1);
 
-    myFilter->SetRepresentationObject(1, mitkToolData2);
+    myFilter->SetRepresentationObject(1, mitkToolData2.GetPointer());
     CPPUNIT_ASSERT_MESSAGE( "Testing SetRepresentationObject() node 2", myFilter->GetRepresentationObject(1) == mitkToolData2);
     CPPUNIT_ASSERT_MESSAGE( "Testing GetNumberOfToolRepresentations() after adding second tool", myFilter->GetNumberOfToolRepresentations() == 2);
     //getting nodes
@@ -186,9 +189,27 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Testing GetRepresentationObject() with out of range parameter", myFilter->GetRepresentationObject(111) == nullptr);
   }
 
+  void TestAllRepresentationObjects()
+  {
+    // setting nodes
+    myFilter->SetRepresentationObjects(0, mitkToolVectorData1);
+    CPPUNIT_ASSERT_MESSAGE("Testing SetRepresentationObject()/GetRepresentationObject() node 1", myFilter->GetAllRepresentationObjects(0) == mitkToolVectorData1);
+    CPPUNIT_ASSERT_MESSAGE("Testing GetNumberOfToolRepresentations() after adding first tool", myFilter->GetNumberOfToolRepresentations() == 1);
+
+    myFilter->SetRepresentationObjects(1, mitkToolVectorData2);
+    CPPUNIT_ASSERT_MESSAGE("Testing SetRepresentationObject() node 2", myFilter->GetAllRepresentationObjects(1) == mitkToolVectorData2);
+    CPPUNIT_ASSERT_MESSAGE("Testing GetNumberOfToolRepresentations() after adding second tool", myFilter->GetNumberOfToolRepresentations() == 2);
+    // getting nodes
+    CPPUNIT_ASSERT_MESSAGE("Testing GetRepresentationObject() node 1", myFilter->GetAllRepresentationObjects(0) == mitkToolVectorData1);
+    CPPUNIT_ASSERT_MESSAGE("Testing GetRepresentationObject() != Dummy node", myFilter->GetAllRepresentationObjects(0) != mitkToolVectorDataDummy);
+    CPPUNIT_ASSERT_MESSAGE("Testing GetRepresentationObject() node 2", myFilter->GetAllRepresentationObjects(1) == mitkToolVectorData2);
+    CPPUNIT_ASSERT_MESSAGE("Testing GetRepresentationObject() != Dummy node", myFilter->GetAllRepresentationObjects(1) != mitkToolVectorDataDummy);
+    CPPUNIT_ASSERT_MESSAGE("Testing GetRepresentationObject() with out of range parameter", myFilter->GetAllRepresentationObjects(111).empty() == true);
+  }
+
   void TestTransforms(){
-    myFilter->SetRepresentationObject(0, mitkToolData1);
-    myFilter->SetRepresentationObject(1, mitkToolData2);
+    myFilter->SetRepresentationObject(0, mitkToolData1.GetPointer());
+    myFilter->SetRepresentationObject(1, mitkToolData2.GetPointer());
     //Process
     myFilter->Update();
 
@@ -209,8 +230,8 @@ public:
   }
 
   void TestMessWithRepresentationObjects(){
-    myFilter->SetRepresentationObject(0, mitkToolData1);
-    myFilter->SetRepresentationObject(1, mitkToolData2);
+    myFilter->SetRepresentationObject(0, mitkToolData1.GetPointer());
+    myFilter->SetRepresentationObject(1, mitkToolData2.GetPointer());
     //Process
     myFilter->Update();
 
@@ -224,11 +245,11 @@ public:
 
     //messing with SetRepresentationObject
     //setting nodes
-    myFilter->SetRepresentationObject(0, mitkToolData2);
+    myFilter->SetRepresentationObject(0, mitkToolData2.GetPointer());
     CPPUNIT_ASSERT_MESSAGE("Twisting mitkToolData by using SetRepresentationObject() NavigationData 1 with ToolData 2", myFilter->GetRepresentationObject(0) == mitkToolData2);
     CPPUNIT_ASSERT_MESSAGE( "Testing GetNumberOfToolRepresentations() == 1", myFilter->GetNumberOfToolRepresentations() == 2);
 
-    myFilter->SetRepresentationObject(1, mitkToolData1);
+    myFilter->SetRepresentationObject(1, mitkToolData1.GetPointer());
     CPPUNIT_ASSERT_MESSAGE("Twisting mitkToolData by using SetRepresentationObject() NavigationData 2 with ToolData 1", myFilter->GetRepresentationObject(1) == mitkToolData1);
     CPPUNIT_ASSERT_MESSAGE( "Testing GetNumberOfToolRepresentations() == 2", myFilter->GetNumberOfToolRepresentations() == 2);
 
@@ -262,8 +283,8 @@ public:
   }
 
   void TestThirdInput(){
-    myFilter->SetRepresentationObject(0, mitkToolData1);
-    myFilter->SetRepresentationObject(1, mitkToolData2);
+    myFilter->SetRepresentationObject(0, mitkToolData1.GetPointer());
+    myFilter->SetRepresentationObject(1, mitkToolData2.GetPointer());
     //Process
     myFilter->Update();
 
@@ -274,7 +295,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Testing Input == newly added input", myFilter->GetInput(2) == ndDummy);
     CPPUNIT_ASSERT_MESSAGE("Testing GetOutput(2) != nullptr", myFilter->GetOutput(2) != nullptr);
     CPPUNIT_ASSERT_MESSAGE( "Testing GetOutput(2) != GetOutput(1)", myFilter->GetOutput(2) != myFilter->GetOutput(1));
-    myFilter->SetRepresentationObject(2, mitkToolDataDummy);
+    myFilter->SetRepresentationObject(2, mitkToolDataDummy.GetPointer());
     CPPUNIT_ASSERT_MESSAGE("Testing GetNumberOfToolRepresentations() after adding latest tool", myFilter->GetNumberOfToolRepresentations() == 3);
     CPPUNIT_ASSERT_MESSAGE("Testing Set-/GetRepresentationObject() equals was set", myFilter->GetRepresentationObject(2) == mitkToolDataDummy);
 
@@ -290,7 +311,7 @@ public:
     MITK_TEST_OUTPUT( << "\n latest initOrient="<<initialOriDummy<<" latest affineTransform->GetVnlMatrix():\n "<< m1Latest);
 
     mitk::Surface::Pointer anotherSurface = mitk::Surface::New();
-    myFilter->SetRepresentationObject(0, anotherSurface);
+    myFilter->SetRepresentationObject(0, anotherSurface.GetPointer());
     CPPUNIT_ASSERT_MESSAGE("Overwriting BaseData index 0", myFilter->GetRepresentationObject(0) == anotherSurface);
   }
 
@@ -391,8 +412,8 @@ public:
     nd2->SetPosition(updatedPos2);
     nd2->SetOrientation(updatedOri2);
 
-    myFilter->SetRepresentationObject(0,mitkToolData1);
-    myFilter->SetRepresentationObject(1,mitkToolData2);
+    myFilter->SetRepresentationObject(0, mitkToolData1.GetPointer());
+    myFilter->SetRepresentationObject(1, mitkToolData2.GetPointer());
 
     myFilter->TransformPositionOn(0);
     myFilter->TransformOrientationOff(0);

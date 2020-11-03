@@ -1,22 +1,20 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 #include "mitkImageStatisticsHolder.h"
 
 #include "mitkHistogramGenerator.h"
 #include <mitkProperties.h>
+#include "mitkImageAccessByItk.h"
+//#define BOUNDINGOBJECT_IGNORE
 
 mitk::ImageStatisticsHolder::ImageStatisticsHolder(mitk::Image *image)
   : m_Image(image)
@@ -98,10 +96,7 @@ void mitk::ImageStatisticsHolder::ResetImageStatistics()
   m_CountOfMaxValuedVoxels.assign(1, 0);
 }
 
-#include "mitkImageAccessByItk.h"
-
-//#define BOUNDINGOBJECT_IGNORE
-
+/// \cond SKIP_DOXYGEN
 template <typename ItkImageType>
 void mitk::_ComputeExtremaInItkImage(const ItkImageType *itkImage, mitk::ImageStatisticsHolder *statisticsHolder, int t)
 {
@@ -178,7 +173,9 @@ void mitk::_ComputeExtremaInItkImage(const ItkImageType *itkImage, mitk::ImageSt
   }
   statisticsHolder->m_LastRecomputeTimeStamp.Modified();
 }
+/// \endcond SKIP_DOXYGEN
 
+/// \cond SKIP_DOXYGEN
 template <typename ItkImageType>
 void mitk::_ComputeExtremaInItkVectorImage(const ItkImageType *itkImage,
                                            mitk::ImageStatisticsHolder *statisticsHolder,
@@ -256,7 +253,7 @@ void mitk::_ComputeExtremaInItkVectorImage(const ItkImageType *itkImage,
   }
   statisticsHolder->m_LastRecomputeTimeStamp.Modified();
 }
-
+/// \endcond SKIP_DOXYGEN
 void mitk::ImageStatisticsHolder::ComputeImageStatistics(int t, unsigned int component)
 {
   // timestep valid?

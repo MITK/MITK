@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkImageNavigatorView.h"
 
@@ -474,6 +470,7 @@ void QmitkImageNavigatorView::OnRefetch()
     {
       mitk::TimeStepType timeStep = m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetSliceNavigationController()->GetTime()->GetPos();
       geometry = timeGeometry->GetGeometryForTimeStep(timeStep);
+      SetVisibilityOfTimeSlider(timeGeometry->CountTimeSteps());
     }
 
     if (geometry.IsNotNull())
@@ -605,4 +602,11 @@ void QmitkImageNavigatorView::OnRefetch()
     this->SetBorderColors();
 
   }
+}
+
+
+void QmitkImageNavigatorView::SetVisibilityOfTimeSlider(std::size_t timeSteps)
+{
+  m_Controls.m_SliceNavigatorTime->setVisible(timeSteps > 1);
+  m_Controls.m_TimeLabel->setVisible(timeSteps > 1);
 }

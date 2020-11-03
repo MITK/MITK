@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
@@ -45,7 +41,8 @@ public:
     m_DefaultParameters->SetXDim(5);
     m_DefaultParameters->SetYDim(5);
     m_DefaultParameters->SetZDim(5);
-    m_InSilicoTissueVolume = mitk::pa::InSilicoTissueVolume::New(m_DefaultParameters);
+    auto rng = std::mt19937();
+    m_InSilicoTissueVolume = mitk::pa::InSilicoTissueVolume::New(m_DefaultParameters, &rng);
     m_ComposedVolume = mitk::pa::ComposedVolume::New(m_InSilicoTissueVolume);
   }
 
@@ -54,7 +51,7 @@ public:
     auto* data = new double[125];
     for (int i = 0; i < 125; ++i)
       data[i] = value;
-    mitk::pa::Volume::Pointer volume = mitk::pa::Volume::New(data, 5, 5, 5);
+    mitk::pa::Volume::Pointer volume = mitk::pa::Volume::New(data, 5, 5, 5, 1);
     return mitk::pa::FluenceYOffsetPair::New(volume, yOffset);
   }
 

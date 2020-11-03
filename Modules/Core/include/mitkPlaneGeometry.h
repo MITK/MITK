@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 /**
 * \brief Describes the geometry of a plane object
@@ -83,7 +79,8 @@ namespace mitk
     mitkClassMacro(PlaneGeometry, BaseGeometry);
 
     /** Method for creation through the object factory. */
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       enum PlaneOrientation {
         Axial,
@@ -287,11 +284,12 @@ namespace mitk
     void SetMatrixByVectors(const VnlVector &rightVector, const VnlVector &downVector, ScalarType thickness = 1.0);
 
     /**
-    * \brief Change \a transform so that the third column of the
-    * transform-martix is perpendicular to the first two columns
-    *
+    * \brief Check if matrix is a rotation matrix:
+    * - determinant is 1?
+    * - R*R^T is ID?
+    * Output warning otherwise.
     */
-    static void EnsurePerpendicularNormal(AffineTransform3D *transform);
+    static bool CheckRotationMatrix(AffineTransform3D *transform, double epsilon=mitk::eps);
 
     /**
     * \brief Normal of the plane
@@ -554,6 +552,8 @@ namespace mitk
     */
     const BaseGeometry *GetReferenceGeometry() const;
     bool HasReferenceGeometry() const;
+
+    static std::vector< int > CalculateDominantAxes(mitk::AffineTransform3D::MatrixType::InternalMatrixType& rotation_matrix);
 
   protected:
     PlaneGeometry();

@@ -1,54 +1,48 @@
-/*****************************************************************************
+/*============================================================================
 
- Copyright (c) 1993-2000,  Div. Medical and Biological Informatics, 
- Deutsches Krebsforschungszentrum, Heidelberg, Germany
+ Copyright (c) German Cancer Research Center (DKFZ)
  All rights reserved.
 
- Redistribution and use in source and binary forms, with or without 
+ Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
 
  - Redistributions of source code must retain the above copyright notice, this
    list of conditions and the following disclaimer.
 
- - Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+ - Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
- - All advertising materials mentioning features or use of this software must 
-   display the following acknowledgement: 
-          
-     "This product includes software developed by the Div. Medical and 
-      Biological Informatics, Deutsches Krebsforschungszentrum, Heidelberg, 
-      Germany."
+ - All advertising materials mentioning features or use of this software must
+   display the following acknowledgement:
 
- - Neither the name of the Deutsches Krebsforschungszentrum nor the names of 
-   its contributors may be used to endorse or promote products derived from 
-   this software without specific prior written permission. 
+     "This product includes software developed by the German Cancer Research
+      Center (DKFZ)."
 
-   THIS SOFTWARE IS PROVIDED BY THE DIVISION MEDICAL AND BIOLOGICAL
-   INFORMATICS AND CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED
-   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-   OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-   IN NO EVENT SHALL THE DIVISION MEDICAL AND BIOLOGICAL INFORMATICS,
-   THE DEUTSCHES KREBSFORSCHUNGSZENTRUM OR CONTRIBUTORS BE LIABLE FOR 
-   ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-   DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE 
-   GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER 
-   IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
-   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN 
-   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ - Neither the name of the German Cancer Research Center (DKFZ) nor the names
+   of its contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
 
- Send comments and/or bug reports to:
-   mbi-software@dkfz-heidelberg.de
+   THIS SOFTWARE IS PROVIDED BY THE GERMAN CANCER RESEARCH CENTER (DKFZ) AND
+   CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+   BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+   FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE GERMAN
+   CANCER RESEARCH CENTER (DKFZ) OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+   INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+   SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+   OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+   DAMAGE.
 
-*****************************************************************************/
+============================================================================*/
 
 /**@file
  *  this function performs a smoothing by a mean-value filter
  */
 
-/** @brief performs a smoothing by a mean-value filter     
+/** @brief performs a smoothing by a mean-value filter
  *
  *  @param pic_old    pointer to original image
  *  @param len_mask  number of pixels for each dimension
@@ -70,26 +64,26 @@
 
 mitkIpPicDescriptor *mitkIpFuncMeanF   ( mitkIpPicDescriptor *pic_old,
                                  mitkIpUInt4_t       len_mask,
-                                 mitkIpUInt4_t       dim_mask,  
+                                 mitkIpUInt4_t       dim_mask,
                                  mitkIpFuncFlagI_t   border );
 
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
-  static char *what = { "@(#)????????\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)????????\t\tGerman Cancer Research Center (DKFZ)\t"__DATE__ };
 #endif
 
 
 
 
 /* --------------------------------------------------------------------- */
-/* 
+/*
 */
 /* --------------------------------------------------------------------- */
- 
+
 mitkIpPicDescriptor *mitkIpFuncMeanF   ( mitkIpPicDescriptor *pic_old,
                                  mitkIpUInt4_t       len_mask,
-                                 mitkIpUInt4_t       dim_mask,  
+                                 mitkIpUInt4_t       dim_mask,
                                  mitkIpFuncFlagI_t   border )
 {
   mitkIpPicDescriptor *pic_new;          /* pointer to new image structure   */
@@ -106,17 +100,17 @@ mitkIpPicDescriptor *mitkIpFuncMeanF   ( mitkIpPicDescriptor *pic_old,
        _mitkIpFuncSetErrno ( mitkIpFuncDIMMASC_ERROR );
        return ( mitkIpFuncERROR );
     }
-  if ( len_mask % 2 != 1 ) 
+  if ( len_mask % 2 != 1 )
     {
        _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
-       return ( mitkIpFuncERROR );   
+       return ( mitkIpFuncERROR );
     }
 
   /* initialize mask                                                     */
-  
+
   pic_mask       = mitkIpPicNew();
-  
-  if ( pic_mask == NULL ) 
+
+  if ( pic_mask == NULL )
     {
        _mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
        return ( mitkIpFuncERROR );
@@ -137,8 +131,8 @@ mitkIpPicDescriptor *mitkIpFuncMeanF   ( mitkIpPicDescriptor *pic_old,
     }
 
   no_elem        = _mitkIpPicElements ( pic_mask );
-  help           = 1. / ( mitkIpFloat8_t ) no_elem;                       
-  for ( i = 0; i < no_elem; i++ )                       
+  help           = 1. / ( mitkIpFloat8_t ) no_elem;
+  for ( i = 0; i < no_elem; i++ )
     (( mitkIpFloat8_t * ) pic_mask->data ) [i] = help;
 
   /* convolve image with filtering mask                                 */
@@ -150,8 +144,8 @@ mitkIpPicDescriptor *mitkIpFuncMeanF   ( mitkIpPicDescriptor *pic_old,
   /* Copy Tags */
 
   mitkIpFuncCopyTags(pic_new, pic_old);
-  
-  
+
+
 
   return ( pic_new );
 }

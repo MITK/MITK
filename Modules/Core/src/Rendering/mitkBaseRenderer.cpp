@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
- The Medical Imaging Interaction Toolkit (MITK)
+The Medical Imaging Interaction Toolkit (MITK)
 
- Copyright (c) German Cancer Research Center,
- Division of Medical and Biological Informatics.
- All rights reserved.
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
 
- This software is distributed WITHOUT ANY WARRANTY; without
- even the implied warranty of MERCHANTABILITY or FITNESS FOR
- A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
- See LICENSE.txt or http://www.mitk.org for details.
-
- ===================================================================*/
+============================================================================*/
 
 #include "mitkBaseRenderer.h"
 #include "mitkMapper.h"
@@ -94,14 +90,11 @@ vtkRenderWindow *mitk::BaseRenderer::GetRenderWindowByName(const std::string &na
 }
 
 mitk::BaseRenderer::BaseRenderer(const char *name,
-                                 vtkRenderWindow *renWin,
-                                 mitk::RenderingManager *rm,
-                                 RenderingMode::Type)
+                                 vtkRenderWindow *renWin)
   : m_RenderWindow(nullptr),
     m_VtkRenderer(nullptr),
     m_MapperID(defaultMapper),
     m_DataStorage(nullptr),
-    m_RenderingManager(rm),
     m_LastUpdateTime(0),
     m_CameraController(nullptr),
     m_SliceNavigationController(nullptr),
@@ -184,11 +177,14 @@ mitk::BaseRenderer::BaseRenderer(const char *name,
   m_CameraController->SetRenderer(this);
 
   m_VtkRenderer = vtkRenderer::New();
+  m_VtkRenderer->SetMaximumNumberOfPeels(16);
 
-  if (mitk::VtkLayerController::GetInstance(m_RenderWindow) == nullptr)
-  {
+  if (AntiAliasing::FastApproximate == RenderingManager::GetInstance()->GetAntiAliasing())
+    m_VtkRenderer->UseFXAAOn();
+
+  if (nullptr == mitk::VtkLayerController::GetInstance(m_RenderWindow))
     mitk::VtkLayerController::AddInstance(m_RenderWindow, m_VtkRenderer);
-  }
+
   mitk::VtkLayerController::GetInstance(m_RenderWindow)->InsertSceneRenderer(m_VtkRenderer);
 }
 
@@ -218,6 +214,19 @@ mitk::BaseRenderer::~BaseRenderer()
   {
     m_RenderWindow->Delete();
     m_RenderWindow = nullptr;
+  }
+}
+
+void mitk::BaseRenderer::SetMapperID(MapperSlotId id)
+{
+  if (m_MapperID != id)
+  {
+    bool useDepthPeeling = Standard3D == id;
+    m_VtkRenderer->SetUseDepthPeeling(useDepthPeeling);
+    m_VtkRenderer->SetUseDepthPeelingForVolumes(useDepthPeeling);
+
+    m_MapperID = id;
+    this->Modified();
   }
 }
 
@@ -548,22 +557,17 @@ void mitk::BaseRenderer::DrawOverlayMouse(mitk::Point2D &itkNotUsed(p2d))
 void mitk::BaseRenderer::RequestUpdate()
 {
   SetConstrainZoomingAndPanning(true);
-  m_RenderingManager->RequestUpdate(this->m_RenderWindow);
+  RenderingManager::GetInstance()->RequestUpdate(this->m_RenderWindow);
 }
 
 void mitk::BaseRenderer::ForceImmediateUpdate()
 {
-  m_RenderingManager->ForceImmediateUpdate(this->m_RenderWindow);
+  RenderingManager::GetInstance()->ForceImmediateUpdate(this->m_RenderWindow);
 }
 
 unsigned int mitk::BaseRenderer::GetNumberOfVisibleLODEnabledMappers() const
 {
   return m_NumberOfVisibleLODEnabledMappers;
-}
-
-mitk::RenderingManager *mitk::BaseRenderer::GetRenderingManager() const
-{
-  return m_RenderingManager.GetPointer();
 }
 
 /*!

@@ -11,6 +11,11 @@
 #define MITKCLCORE_EXPORT
 #define MITKCLUTILITIES_EXPORT
 #define ITKCommon_EXPORT
+#define MITKMATCHPOINTREGISTRATION_EXPORT
+#define MAPDeployment_EXPORT
+#define MAPAlgorithms_EXPORT
+#define MITKSEGMENTATION_EXPORT
+#define MITKMULTILABEL_EXPORT
 
 #define ITKCommon_EXPORT
 #define ITK_FORWARD_EXPORT
@@ -25,6 +30,7 @@
 %include <mitkChannelDescriptor.h>
 %include <mitkIOUtil.h>
 
+
 #define DEPRECATED(func) func
 #undef ITK_DISALLOW_COPY_AND_ASSIGN
 #define ITK_DISALLOW_COPY_AND_ASSIGN(TypeName)
@@ -33,6 +39,8 @@
  convertion_list = {}
 %}
 
+SWIG_ADD_NONOBJECT_CLASS(Indent, itkIndent.h, itk)
+SWIG_ADD_MITK_CLASS(LightObject, itkLightObject.h, itk)
 SWIG_ADD_MITK_CLASS(Object, itkObject.h, itk)
 SWIG_ADD_MITK_CLASS(DataObject, itkDataObject.h, itk)
 
@@ -62,8 +70,15 @@ SWIG_ADD_NONOBJECT_CLASS(Vector4D, mitkVector.h, mitk)
 SWIG_ADD_MITK_CLASS(BaseData, mitkBaseData.h, mitk)
 SWIG_ADD_MITK_CLASS(SlicedData, mitkSlicedData.h, mitk)
 SWIG_ADD_MITK_CLASS(Image, mitkImage.h, mitk)
+SWIG_ADD_MITK_CLASS(LabelSetImage, mitkLabelSetImage.h, mitk)
 SWIG_ADD_MITK_CLASS(PointSet, mitkPointSet.h, mitk)
+%{
+using mitk::Message;
+%}
 
+//
+// Phenotyping Related Classes
+//
 SWIG_ADD_MITK_CLASS(AbstractGlobalImageFeature, mitkAbstractGlobalImageFeature.h, mitk)
 SWIG_ADD_MITK_CLASS(GIFImageDescriptionFeatures, mitkGIFImageDescriptionFeatures.h, mitk)
 SWIG_ADD_MITK_CLASS(GIFFirstOrderStatistics, mitkGIFFirstOrderStatistics.h, mitk)
@@ -79,3 +94,64 @@ SWIG_ADD_MITK_CLASS(GIFLocalIntensity, mitkGIFLocalIntensity.h, mitk)
 SWIG_ADD_MITK_CLASS(GIFIntensityVolumeHistogramFeatures, mitkGIFIntensityVolumeHistogramFeatures.h, mitk)
 SWIG_ADD_MITK_CLASS(GIFNeighbourhoodGreyToneDifferenceFeatures, mitkGIFNeighbourhoodGreyToneDifferenceFeatures.h, mitk)
 SWIG_ADD_MITK_CLASS(GIFCurvatureStatistic, mitkGIFCurvatureStatistic.h, mitk)
+
+//
+// Conversion and Segmentation based Classes
+//
+SWIG_ADD_MITK_CLASS(ContourModelSetToImageFilter, mitkContourModelSetToImageFilter.h, mitk)
+SWIG_ADD_NONOBJECT_NOVECTOR_CLASS(BooleanOperation, mitkBooleanOperation.h, mitk)
+SWIG_ADD_NONOBJECT_NOVECTOR_CLASS(MorphologicalOperations, mitkMorphologicalOperations.h, mitk)
+%{
+  #include <itkProcessObject.h>
+  typedef itk::DataObject::DataObjectIdentifierType DataObjectIdentifierType;
+  typedef itk::ProcessObject::DataObjectPointerArraySizeType DataObjectPointerArraySizeType;
+%}
+
+//
+// MatchPoint Related Classes
+//
+%ignore DLLHandle::LibraryHandleType;
+
+%{
+#include <mapDeploymentDLLHandle.h>
+namespace core
+{
+  typedef std::string String;
+}
+typedef map::deployment::DLLHandle::LibraryHandleType LibraryHandleType;
+typedef map::deployment::DLLHandle DLLHandle;
+%}
+namespace core
+{
+  typedef std::string String;
+}
+
+%nodefaultctor LibraryHandleType;
+struct LibraryHandleType {};
+
+%include <mapUID.h>
+SWIG_ADD_MITK_CLASS(UID,mapUID.h, map::algorithm)
+SWIG_ADD_MITK_CLASS(DLLInfo, mapDeploymentDLLInfo.h, map::deployment)
+//SWIG_ADD_MITK_CLASS_VECTORFREE(DLLHandle, mapDeploymentDLLHandle.h, map::deployment)
+
+SWIG_ADD_MITK_CLASS_VECTORFREE(DLLDirectoryBrowser, mapDeploymentDLLDirectoryBrowser.h, ::map::deployment)
+MITKSWIG_ADD_HEADERFILE(mapDeploymentDLLAccess.h)
+%{
+ DLLHandle const *  ConvertDLLHandleSmartPointerToPointer(itk::SmartPointer<map::deployment::DLLHandle> p)
+ {
+   return p.GetPointer();
+ }
+%}
+DLLHandle const * ConvertDLLHandleSmartPointerToPointer(DLLHandle::Pointer p);
+
+MITKSWIG_ADD_CLASS(MAPAlgorithmHelper, mitkMAPAlgorithmHelper.h, mitk)
+MITKSWIG_ADD_CLASS(RegistrationType, mitkImageMappingHelper.h, mitk::ImageMappingHelper)
+MITKSWIG_ADD_CLASS(MITKRegistrationType, mitkImageMappingHelper.h, mitk::ImageMappingHelper)
+
+// SWIG_ADD_MITK_CLASS(FastSymmetricForcesDemonsMultiResDefaultRegistrationAlgorithm, mitkFastSymmetricForcesDemonsMultiResDefaultRegistrationAlgorithm.h, mitk)
+// SWIG_ADD_MITK_CLASS(LevelSetMotionMultiResDefaultRegistrationAlgorithm, mitkLevelSetMotionMultiResDefaultRegistrationAlgorithm.h, mitk)
+// SWIG_ADD_MITK_CLASS(MultiModalAffineDefaultRegistrationAlgorithm, mitkMultiModalAffineDefaultRegistrationAlgorithm.h, mitk)
+// SWIG_ADD_MITK_CLASS(MultiModalRigidDefaultRegistrationAlgorithm, mitkMultiModalRigidDefaultRegistrationAlgorithm.h, mitk)
+// SWIG_ADD_MITK_CLASS(MultiModalTransDefaultRegistrationAlgorithm, mitkMultiModalTransDefaultRegistrationAlgorithm.h, mitk)
+// SWIG_ADD_MITK_CLASS(RigidClosedFormPointsDefaultRegistrationAlgorithm, mitkRigidClosedFormPointsDefaultRegistrationAlgorithm.h, mitk)
+// SWIG_ADD_MITK_CLASS(RigidICPDefaultRegistrationAlgorithm, mitkRigidICPDefaultRegistrationAlgorithm.h, mitk)

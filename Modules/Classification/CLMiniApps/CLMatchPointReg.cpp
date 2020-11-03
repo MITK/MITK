@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkProperties.h"
 
@@ -35,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mapDeploymentDLLAccess.h>
 #include <mapRegistrationBase.h>
 
-#include <mitkAlgorithmHelper.h>
+#include <mitkMAPAlgorithmHelper.h>
 // Qt
 #include <QDir>
 #include <QFileInfo>
@@ -54,14 +50,14 @@ int main(int argc, char* argv[])
   parser.setTitle("Dicom Loader");
   parser.setCategory("Preprocessing Tools");
   parser.setDescription("");
-  parser.setContributor("MBI");
+  parser.setContributor("German Cancer Research Center (DKFZ)");
 
   parser.setArgumentPrefix("--","-");
   // Add command line argument names
   parser.addArgument("help", "h",mitkCommandLineParser::Bool, "Help:", "Show this help text");
-  parser.addArgument("moving", "m", mitkCommandLineParser::InputDirectory, "Input folder:", "Input folder", us::Any(), false);
-  parser.addArgument("fixed", "f", mitkCommandLineParser::InputDirectory, "Input folder:", "Input folder", us::Any(), false);
-  parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output file:", "Output file", us::Any(), false);
+  parser.addArgument("moving", "m", mitkCommandLineParser::Directory, "Input folder:", "Input folder", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("fixed", "f", mitkCommandLineParser::Directory, "Input folder:", "Input folder", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("output", "o", mitkCommandLineParser::File, "Output file:", "Output file", us::Any(), false, false, false, mitkCommandLineParser::Output);
   parser.addArgument("reader", "r", mitkCommandLineParser::Int, "Reader ID", "Reader Name", us::Any(), false);
   parser.addArgument("interpolation", "interp", mitkCommandLineParser::Int, "Reader ID", "Reader Name", us::Any(), false);
 
@@ -146,7 +142,7 @@ int main(int argc, char* argv[])
     return -2;
   }
 
-  mitk::MITKAlgorithmHelper helper(tempAlgorithm);
+  mitk::MAPAlgorithmHelper helper(tempAlgorithm);
   helper.SetData(movingImage, fixedImage);
   auto registration = helper.GetRegistration();
   MITK_INFO << "Well....";

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef _MITK_TUBE_GRAPH_IO_H_
 #define _MITK_TUBE_GRAPH_IO_H_
@@ -40,7 +36,6 @@ namespace mitk
     // -------------- AbstractFileReader -------------
 
     using AbstractFileReader::Read;
-    std::vector<BaseData::Pointer> Read() override;
 
     ConfidenceLevel GetReaderConfidenceLevel() const override;
 
@@ -62,6 +57,9 @@ namespace mitk
       static std::string name = mitk::IOMimeTypes::DEFAULT_BASE_NAME() + ".graphs.tubular-sructure";
       return name;
     }
+
+  protected:
+    std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 
   private:
     TubeGraphIO *IOClone() const override;

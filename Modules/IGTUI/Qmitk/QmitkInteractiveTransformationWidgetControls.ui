@@ -84,7 +84,7 @@
           <item>
            <widget class="QDoubleSpinBox" name="m_XTransSpinBox">
             <property name="decimals">
-             <number>1</number>
+             <number>4</number>
             </property>
             <property name="minimum">
              <double>-500.000000000000000</double>
@@ -146,7 +146,7 @@
           <item>
            <widget class="QDoubleSpinBox" name="m_YTransSpinBox">
             <property name="decimals">
-             <number>1</number>
+             <number>4</number>
             </property>
             <property name="minimum">
              <double>-500.000000000000000</double>
@@ -211,7 +211,7 @@
           <item>
            <widget class="QDoubleSpinBox" name="m_ZTransSpinBox">
             <property name="decimals">
-             <number>1</number>
+             <number>4</number>
             </property>
             <property name="minimum">
              <double>-500.000000000000000</double>
@@ -289,7 +289,7 @@
           <item>
            <widget class="QDoubleSpinBox" name="m_XRotSpinBox">
             <property name="decimals">
-             <number>1</number>
+             <number>4</number>
             </property>
             <property name="minimum">
              <double>-180.000000000000000</double>
@@ -348,7 +348,7 @@
           <item>
            <widget class="QDoubleSpinBox" name="m_YRotSpinBox">
             <property name="decimals">
-             <number>1</number>
+             <number>4</number>
             </property>
             <property name="minimum">
              <double>-180.000000000000000</double>
@@ -407,7 +407,7 @@
           <item>
            <widget class="QDoubleSpinBox" name="m_ZRotSpinBox">
             <property name="decimals">
-             <number>1</number>
+             <number>4</number>
             </property>
             <property name="minimum">
              <double>-180.000000000000000</double>

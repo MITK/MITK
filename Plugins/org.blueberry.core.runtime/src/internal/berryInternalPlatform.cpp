@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
-BlueBerry Platform
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -121,8 +117,11 @@ void InternalPlatform::InitializePluginPaths()
   QMutexLocker lock(&m_Mutex);
 
   // Add search paths for Qt plugins
-  foreach(QString qtPluginPath, m_Context->getProperty(Platform::PROP_QTPLUGIN_PATH).toStringList())
+  for(const auto& qtPluginPath : m_Context->getProperty(Platform::PROP_QTPLUGIN_PATH).toStringList())
   {
+    if (qtPluginPath.isEmpty())
+      continue;
+
     if (QFile::exists(qtPluginPath))
     {
       QCoreApplication::addLibraryPath(qtPluginPath);

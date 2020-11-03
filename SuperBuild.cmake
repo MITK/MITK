@@ -1,5 +1,3 @@
-include(mitkFunctionInstallExternalCMakeProject)
-
 #-----------------------------------------------------------------------------
 # Convenient macro allowing to download a file
 #-----------------------------------------------------------------------------
@@ -66,7 +64,7 @@ endif()
 
 # A list of "nice" external projects, playing well together with CMake
 set(nice_external_projects ${external_projects})
-list(REMOVE_ITEM nice_external_projects Boost Python)
+list(REMOVE_ITEM nice_external_projects Boost)
 foreach(proj ${nice_external_projects})
   if(MITK_USE_${proj})
     set(EXTERNAL_${proj}_DIR "${${proj}_DIR}" CACHE PATH "Path to ${proj} build directory")
@@ -83,13 +81,6 @@ if(EXTERNAL_BOOST_ROOT)
   set(BOOST_ROOT ${EXTERNAL_BOOST_ROOT})
 endif()
 
-# Setup file for setting custom ctest vars
-configure_file(
-  CMake/SuperbuildCTestCustom.cmake.in
-  ${MITK_BINARY_DIR}/CTestCustom.cmake
-  @ONLY
-)
-
 if(BUILD_TESTING)
   set(EXTERNAL_MITK_DATA_DIR "${MITK_DATA_DIR}" CACHE PATH "Path to the MITK data directory")
   mark_as_advanced(EXTERNAL_MITK_DATA_DIR)
@@ -103,6 +94,12 @@ endif()
 #-----------------------------------------------------------------------------
 
 include(ExternalProject)
+include(mitkMacroQueryCustomEPVars)
+include(mitkFunctionInstallExternalCMakeProject)
+include(mitkFunctionCleanExternalProject)
+
+option(MITK_AUTOCLEAN_EXTERNAL_PROJECTS "Experimental: Clean external project builds if updated" OFF)
+mark_as_advanced(MITK_AUTOCLEAN_EXTERNAL_PROJECTS)
 
 set(ep_prefix "${CMAKE_BINARY_DIR}/ep")
 set_property(DIRECTORY PROPERTY EP_PREFIX ${ep_prefix})
@@ -114,6 +111,8 @@ else()
   set(gen "${CMAKE_GENERATOR}")
 endif()
 
+set(gen_platform ${CMAKE_GENERATOR_PLATFORM})
+
 # Use this value where semi-colons are needed in ep_add args:
 set(sep "^^")
 
@@ -122,6 +121,10 @@ set(sep "^^")
 if(MSVC_VERSION)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /bigobj /MP")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj /MP")
+endif()
+
+if(MITK_USE_Boost_LIBRARIES)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBOOST_ALL_DYN_LINK")
 endif()
 
 # This is a workaround for passing linker flags
@@ -177,11 +180,11 @@ set(ep_common_args
   -DCMAKE_MODULE_LINKER_FLAGS:STRING=${CMAKE_MODULE_LINKER_FLAGS}
 )
 
-set(DCMTK_CMAKE_DEBUG_POSTFIX )
+if(MSVC_VERSION)
+  list(APPEND ep_common_args
+    -DCMAKE_DEBUG_POSTFIX:STRING=d
+  )
 
-# python libraries wont work with it
-if(NOT MITK_USE_Python)
-  list(APPEND ep_common_args -DCMAKE_DEBUG_POSTFIX:STRING=d)
   set(DCMTK_CMAKE_DEBUG_POSTFIX d)
 endif()
 
@@ -213,18 +216,37 @@ set(mitk_depends )
 # Include external projects
 include(CMakeExternals/MITKData.cmake)
 foreach(p ${external_projects})
-  if(EXISTS ${CMAKE_SOURCE_DIR}/CMakeExternals/${p}.cmake)
-    include(CMakeExternals/${p}.cmake)
+  set(p_hash "")
+
+  set(p_file "${CMAKE_SOURCE_DIR}/CMakeExternals/${p}.cmake")
+  if(EXISTS ${p_file})
+    file(MD5 ${p_file} p_hash)
   else()
     foreach(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIRS})
       get_filename_component(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIR} ABSOLUTE)
       set(MITK_CMAKE_EXTERNALS_EXTENSION_DIR ${MITK_EXTENSION_DIR}/CMakeExternals)
-      if(EXISTS ${MITK_CMAKE_EXTERNALS_EXTENSION_DIR}/${p}.cmake)
-        include(${MITK_CMAKE_EXTERNALS_EXTENSION_DIR}/${p}.cmake)
+      set(p_file "${MITK_CMAKE_EXTERNALS_EXTENSION_DIR}/${p}.cmake")
+      if(EXISTS ${p_file})
+        file(MD5 ${p_file} p_hash)
         break()
       endif()
     endforeach()
   endif()
+
+  if(p_hash)
+    set(p_hash_file "${ep_prefix}/tmp/${p}-hash.txt")
+    if(MITK_AUTOCLEAN_EXTERNAL_PROJECTS)
+      if(EXISTS ${p_hash_file})
+        file(READ ${p_hash_file} p_prev_hash)
+        if(NOT p_hash STREQUAL p_prev_hash)
+          mitkCleanExternalProject(${p})
+        endif()
+      endif()
+    endif()
+    file(WRITE ${p_hash_file} ${p_hash})
+  endif()
+
+  include(${p_file} OPTIONAL)
 
   list(APPEND mitk_superbuild_ep_args
        -DMITK_USE_${p}:BOOL=${MITK_USE_${p}}
@@ -248,16 +270,14 @@ set(mitk_cmake_boolean_args
   BUILD_SHARED_LIBS
   WITH_COVERAGE
   BUILD_TESTING
-
   MITK_BUILD_ALL_PLUGINS
   MITK_BUILD_ALL_APPS
   MITK_BUILD_EXAMPLES
-
   MITK_USE_Qt5
   MITK_USE_SYSTEM_Boost
   MITK_USE_BLUEBERRY
   MITK_USE_OpenCL
-
+  MITK_USE_OpenMP
   MITK_ENABLE_PIC_READER
   )
 
@@ -322,14 +342,27 @@ foreach(type RUNTIME ARCHIVE LIBRARY)
 endforeach()
 
 # Optional python variables
-if(MITK_USE_Python)
+if(MITK_USE_Python3)
   list(APPEND mitk_optional_cache_args
-       -DMITK_USE_Python:BOOL=${MITK_USE_Python}
-       -DPYTHON_EXECUTABLE:FILEPATH=${PYTHON_EXECUTABLE}
-       -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR}
-       -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
-       -DPYTHON_INCLUDE_DIR2:PATH=${PYTHON_INCLUDE_DIR2}
+       -DMITK_USE_Python3:BOOL=${MITK_USE_Python3}
+       "-DPython3_EXECUTABLE:FILEPATH=${Python3_EXECUTABLE}"
+       "-DPython3_INCLUDE_DIR:PATH=${Python3_INCLUDE_DIRS}"
+       "-DPython3_LIBRARY:FILEPATH=${Python3_LIBRARY}"
+       "-DPython3_STDLIB:FILEPATH=${Python3_STDLIB}"
+       "-DPython3_SITELIB:FILEPATH=${Python3_SITELIB}"
       )
+endif()
+
+if(OPENSSL_ROOT_DIR)
+  list(APPEND mitk_optional_cache_args
+    "-DOPENSSL_ROOT_DIR:PATH=${OPENSSL_ROOT_DIR}"
+  )
+endif()
+
+if(CMAKE_FRAMEWORK_PATH)
+  list(APPEND mitk_optional_cache_args
+    "-DCMAKE_FRAMEWORK_PATH:PATH=${CMAKE_FRAMEWORK_PATH}"
+  )
 endif()
 
 if(Eigen_INCLUDE_DIR)
@@ -345,12 +378,25 @@ if(DOXYGEN_EXECUTABLE)
   )
 endif()
 
+if(MITK_DOXYGEN_BUILD_ALWAYS)
+  list(APPEND mitk_optional_cache_args
+    -DMITK_DOXYGEN_BUILD_ALWAYS:BOOL=${MITK_DOXYGEN_BUILD_ALWAYS}
+  )
+endif()
+
+if(BLUEBERRY_DOC_TOOLS_DIR)
+  list(APPEND mitk_optional_cache_args
+    "-DBLUEBERRY_DOC_TOOLS_DIR:PATH=${BLUEBERRY_DOC_TOOLS_DIR}"
+  )
+endif()
+
 set(proj MITK-Configure)
 
 ExternalProject_Add(${proj}
   LIST_SEPARATOR ${sep}
   DOWNLOAD_COMMAND ""
   CMAKE_GENERATOR ${gen}
+  CMAKE_GENERATOR_PLATFORM ${gen_platform}
   CMAKE_CACHE_ARGS
     # --------------- Build options ----------------
     -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_INSTALL_PREFIX}
@@ -388,6 +434,9 @@ ExternalProject_Add(${proj}
     ${mitk_optional_cache_args}
     -DMITK_USE_SUPERBUILD:BOOL=OFF
     -DMITK_BUILD_CONFIGURATION:STRING=${MITK_BUILD_CONFIGURATION}
+    -DMITK_FAST_TESTING:BOOL=${MITK_FAST_TESTING}
+    -DMITK_XVFB_TESTING:BOOL=${MITK_XVFB_TESTING}
+    -DMITK_XVFB_TESTING_COMMAND:STRING=${MITK_XVFB_TESTING_COMMAND}
     -DCTEST_USE_LAUNCHERS:BOOL=${CTEST_USE_LAUNCHERS}
     # ----------------- Miscellaneous ---------------
     -DCMAKE_LIBRARY_PATH:PATH=${CMAKE_LIBRARY_PATH}
@@ -404,6 +453,7 @@ ExternalProject_Add(${proj}
     -DMITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES}
     -DMITK_ACCESSBYITK_VECTOR_PIXEL_TYPES:STRING=${MITK_ACCESSBYITK_VECTOR_PIXEL_TYPES}
     -DMITK_ACCESSBYITK_DIMENSIONS:STRING=${MITK_ACCESSBYITK_DIMENSIONS}
+    -DMITK_CUSTOM_REVISION_DESC:STRING=${MITK_CUSTOM_REVISION_DESC}
     # --------------- External project options ---------------
     -DMITK_DATA_DIR:PATH=${MITK_DATA_DIR}
     -DMITK_EXTERNAL_PROJECT_PREFIX:PATH=${ep_prefix}

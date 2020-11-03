@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #ifndef PCAExample_h
@@ -43,7 +39,7 @@ public:
 
   PCAExample();
 
-  virtual ~PCAExample();
+  ~PCAExample() override;
 
 protected slots:
 
@@ -51,20 +47,20 @@ protected slots:
   void BtnPerfomPCAClicked();
 
 protected:
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
 
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
   /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
                                   const QList<mitk::DataNode::Pointer> &nodes) override;
 
   /** Performs a PCA on a (3D) point set.
    *  @param input Point set to work on.
-   *  @param[out] eigenVectors Eigenvectors as computed by the PCA. Returns an empty vector 
+   *  @param[out] eigenVectors Eigenvectors as computed by the PCA. Returns an empty vector
    *                           if PCA failed or did not run before.
-   *  @param[out] eigenValues  Eigenvalues as computed by the PCA. Returns an empty vector 
-   *                           if PCA failed or did not run before. The ID inside the vector 
+   *  @param[out] eigenValues  Eigenvalues as computed by the PCA. Returns an empty vector
+   *                           if PCA failed or did not run before. The ID inside the vector
    *                           corresponds to the ID inside the eigenvector vector. For a 3D
    *                           pointset 3 eigenvalues and -vectors will be computed.
    *  @param[out] pointsMean   Returns the mean/center of the pointset

@@ -1,48 +1,42 @@
-/*****************************************************************************
+/*============================================================================
 
- Copyright (c) 1993-2000,  Div. Medical and Biological Informatics, 
- Deutsches Krebsforschungszentrum, Heidelberg, Germany
+ Copyright (c) German Cancer Research Center (DKFZ)
  All rights reserved.
 
- Redistribution and use in source and binary forms, with or without 
+ Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
 
  - Redistributions of source code must retain the above copyright notice, this
    list of conditions and the following disclaimer.
 
- - Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+ - Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
- - All advertising materials mentioning features or use of this software must 
-   display the following acknowledgement: 
-          
-     "This product includes software developed by the Div. Medical and 
-      Biological Informatics, Deutsches Krebsforschungszentrum, Heidelberg, 
-      Germany."
+ - All advertising materials mentioning features or use of this software must
+   display the following acknowledgement:
 
- - Neither the name of the Deutsches Krebsforschungszentrum nor the names of 
-   its contributors may be used to endorse or promote products derived from 
-   this software without specific prior written permission. 
+     "This product includes software developed by the German Cancer Research
+      Center (DKFZ)."
 
-   THIS SOFTWARE IS PROVIDED BY THE DIVISION MEDICAL AND BIOLOGICAL
-   INFORMATICS AND CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED
-   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-   OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-   IN NO EVENT SHALL THE DIVISION MEDICAL AND BIOLOGICAL INFORMATICS,
-   THE DEUTSCHES KREBSFORSCHUNGSZENTRUM OR CONTRIBUTORS BE LIABLE FOR 
-   ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-   DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE 
-   GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER 
-   IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
-   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN 
-   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ - Neither the name of the German Cancer Research Center (DKFZ) nor the names
+   of its contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
 
- Send comments and/or bug reports to:
-   mbi-software@dkfz-heidelberg.de
+   THIS SOFTWARE IS PROVIDED BY THE GERMAN CANCER RESEARCH CENTER (DKFZ) AND
+   CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+   BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+   FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE GERMAN
+   CANCER RESEARCH CENTER (DKFZ) OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+   INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+   SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+   OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+   DAMAGE.
 
-*****************************************************************************/
+============================================================================*/
 
 /** @file
  *  this function calculates the greyvalue histogram of an image
@@ -66,16 +60,16 @@
 
 /* include-Files                                                        */
 
-#include "mitkIpFuncP.h"   
+#include "mitkIpFuncP.h"
 
-mitkIpInt4_t  mitkIpFuncHisto( mitkIpPicDescriptor *pic_old, 
+mitkIpInt4_t  mitkIpFuncHisto( mitkIpPicDescriptor *pic_old,
                        mitkIpFloat8_t      *min_gv,
                        mitkIpFloat8_t      *max_gv,
                        mitkIpUInt4_t       **hist,
                        mitkIpUInt4_t       *size_hist ) ;
 
 #ifndef DOXYGEN_IGNORE
- 
+
 /* definition of HIST-macro                                             */
 
 #define HIST( type, pic, help, factor )                                  \
@@ -94,20 +88,20 @@ mitkIpInt4_t  mitkIpFuncHisto( mitkIpPicDescriptor *pic_old,
        if ( ( index <= *size_hist ) )                                    \
           ( hist_help[index] )++;                                        \
     }                                                                    \
-} 
-               
- 
+}
+
+
 
 /* -------------------------------------------------------------------  */
 /*
 */
 /* -------------------------------------------------------------------  */
 
-mitkIpInt4_t  mitkIpFuncHisto( mitkIpPicDescriptor *pic_old, 
+mitkIpInt4_t  mitkIpFuncHisto( mitkIpPicDescriptor *pic_old,
                        mitkIpFloat8_t      *min_gv,
                        mitkIpFloat8_t      *max_gv,
                        mitkIpUInt4_t       **hist,
-                       mitkIpUInt4_t       *size_hist ) 
+                       mitkIpUInt4_t       *size_hist )
 {
   mitkIpUInt4_t       *hist_help;
   mitkIpFloat8_t      help;            /* absolute of min_gv                */
@@ -120,15 +114,15 @@ mitkIpInt4_t  mitkIpFuncHisto( mitkIpPicDescriptor *pic_old,
   if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   if ( *min_gv == 0 && *max_gv == 0 )
     {
-       if ( mitkIpFuncExtr ( pic_old, min_gv, max_gv ) != mitkIpFuncOK ) 
+       if ( mitkIpFuncExtr ( pic_old, min_gv, max_gv ) != mitkIpFuncOK )
 	{
 	printf("ipFunc: Probleme mit dem eingegebenen Intervall\n");
 	return ( mitkIpFuncERROR );
 	}
     }
-  else 
+  else
     {
-       if ( *min_gv > *max_gv ) 
+       if ( *min_gv > *max_gv )
          {
             _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
 	    printf("ipFunc: Probleme mit dem eingegebenen Intervall\n");
@@ -155,13 +149,13 @@ mitkIpInt4_t  mitkIpFuncHisto( mitkIpPicDescriptor *pic_old,
     factor = 1;
   else if ( pic_old->type == mitkIpPicFloat )
     factor = 1000;
-  else 
+  else
     {
        printf("ipFunc: Probleme mit dem von ipFunc Extrema berechnete Intervall\n");
        _mitkIpFuncSetErrno (mitkIpFuncTYPE_ERROR );
        return ( mitkIpFuncERROR );
     }
-  
+
   /* allocate memory                                                    */
 
   *size_hist = 1 + factor * (mitkIpUInt4_t ) ( ( mitkIpInt4_t )  *max_gv - ( mitkIpInt4_t ) *min_gv );
@@ -169,10 +163,10 @@ mitkIpInt4_t  mitkIpFuncHisto( mitkIpPicDescriptor *pic_old,
 /*hist  = ( mitkIpUInt4_t ** ) malloc ( sizeof ( mitkIpUInt4_t * ) );*/
   *hist = ( mitkIpUInt4_t * )  calloc ( *size_hist+1, sizeof ( mitkIpUInt4_t ) );
   hist_help = *hist;
-  if ( hist_help == NULL ) 
+  if ( hist_help == NULL )
     {
        printf("ipFunc: Probleme mit dem Allokieren von Platz\n");
-       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );                    
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
 

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef __itkAdaptiveThresholdIterator_h
 #define __itkAdaptiveThresholdIterator_h
@@ -164,6 +160,15 @@ namespace itk
     {
       this->m_Image = it.m_Image; // copy the smart pointer
       this->m_Region = it.m_Region;
+      this->m_InitializeValue = it.m_InitializeValue;
+      this->m_RegionGrowingState = it.m_RegionGrowingState;
+      this->m_MinTH = it.m_MinTH;
+      this->m_MaxTH = it.m_MaxTH;
+      this->m_SeedPointValue = it.m_SeedPointValue;
+      this->m_VoxelCounter = it.m_VoxelCounter;
+      this->m_LastVoxelNumber = it.m_LastVoxelNumber;
+      this->m_DetectedLeakagePoint = it.m_DetectedLeakagePoint;
+      this->m_CurrentLeakageRatio = it.m_CurrentLeakageRatio;
       return *this;
     }
 

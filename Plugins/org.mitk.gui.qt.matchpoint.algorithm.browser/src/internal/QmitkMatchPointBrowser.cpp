@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "org_mitk_gui_qt_matchpoint_algorithm_browser_Activator.h"
 
@@ -36,11 +32,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkAlgorithmInfoSelectionProvider.h"
 
 // MatchPoint
-#include <mapRegistrationAlgorithmInterface.h>
-#include <mapAlgorithmEvents.h>
-#include <mapAlgorithmWrapperEvent.h>
-#include <mapExceptionObjectMacros.h>
-#include <mapDeploymentDLLDirectoryBrowser.h>
+#include "mapRegistrationAlgorithmInterface.h"
+#include "mapAlgorithmEvents.h"
+#include "mapAlgorithmWrapperEvent.h"
+#include "mapExceptionObjectMacros.h"
+#include "mapDeploymentDLLDirectoryBrowser.h"
+#include "mapDeploymentEvents.h"
 
 const std::string QmitkMatchPointBrowser::VIEW_ID = "org.mitk.views.matchpoint.algorithm.browser";
 
@@ -82,6 +79,12 @@ void QmitkMatchPointBrowser::OnSearchFolderButtonPushed()
     else
     {
         map::deployment::DLLDirectoryBrowser::Pointer browser = map::deployment::DLLDirectoryBrowser::New();
+        auto validCommand = ::itk::MemberCommand<QmitkMatchPointBrowser>::New();
+        validCommand->SetCallbackFunction(this, &QmitkMatchPointBrowser::OnValidDeploymentEvent);
+        browser->AddObserver(::map::events::ValidDLLEvent(), validCommand);
+        auto invalidCommand = ::itk::MemberCommand<QmitkMatchPointBrowser>::New();
+        invalidCommand->SetCallbackFunction(this, &QmitkMatchPointBrowser::OnInvalidDeploymentEvent);
+        browser->AddObserver(::map::events::InvalidDLLEvent(), invalidCommand);
 
         foreach(QString path, m_currentSearchPaths)
         {
@@ -131,6 +134,24 @@ void QmitkMatchPointBrowser::OnSearchChanged(const QString& text)
     m_filterProxy->setFilterRegExp(text);
     m_filterProxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
 };
+
+void QmitkMatchPointBrowser::OnInvalidDeploymentEvent(const ::itk::Object *, const itk::EventObject &event)
+{
+  auto deployEvent = dynamic_cast<const ::map::events::InvalidDLLEvent*>(&event);
+
+  this->Error(QString("Error when try to inspect deployed registration algorithm. Details: ")+QString::fromStdString(deployEvent->getComment()));
+}
+
+void QmitkMatchPointBrowser::OnValidDeploymentEvent(const ::itk::Object *, const itk::EventObject &event)
+{
+  auto deployEvent = dynamic_cast<const ::map::events::ValidDLLEvent*>(&event);
+
+  auto info = static_cast<const ::map::deployment::DLLInfo*>(deployEvent->getData());
+
+  MITK_INFO << "Successfully inspected deployed registration algorithm. UID: " << info->getAlgorithmUID().toStr() << ". Path: " << info->getLibraryFilePath();
+
+}
+
 
 void QmitkMatchPointBrowser::CreateQtPartControl(QWidget* parent)
 {

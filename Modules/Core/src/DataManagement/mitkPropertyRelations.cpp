@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <algorithm>
 #include <regex>
@@ -63,7 +59,7 @@ mitk::PropertyRelations::RuleResultVectorType mitk::PropertyRelations::GetRulesF
 
   if (source)
   {
-    for (const auto rule : m_RuleMap)
+    for (const auto& rule : m_RuleMap)
     {
       if (rule.second->IsSource(source))
       {
@@ -79,7 +75,7 @@ mitk::PropertyRelations::RuleResultVectorType mitk::PropertyRelations::GetRulesF
 {
   RuleResultVectorType result;
 
-  for (const auto rule : m_RuleMap)
+  for (const auto& rule : m_RuleMap)
   {
     if (rule.second->IsSourceCandidate(sourceCandidate))
     {
@@ -94,7 +90,7 @@ mitk::PropertyRelations::RuleResultVectorType mitk::PropertyRelations::GetRulesF
 {
   RuleResultVectorType result;
 
-  for (const auto rule : m_RuleMap)
+  for (const auto& rule : m_RuleMap)
   {
     if (rule.second->IsDestinationCandidate(destCandidate))
     {

@@ -1,23 +1,20 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkTool.h"
 
 #include <mitkAnatomicalStructureColorPresets.h>
 #include "mitkDisplayInteractor.h"
+#include "mitkDisplayActionEventBroadcast.h"
 #include "mitkImageReadAccessor.h"
 #include "mitkImageWriteAccessor.h"
 #include "mitkLevelWindowProperty.h"
@@ -62,8 +59,11 @@ mitk::Tool::~Tool()
 {
 }
 
-bool mitk::Tool::CanHandle(BaseData *) const
+bool mitk::Tool::CanHandle(const BaseData* referenceData, const BaseData* /*workingData*/) const
 {
+  if (referenceData == nullptr)
+    return false;
+
   return true;
 }
 
@@ -127,18 +127,24 @@ void mitk::Tool::Activated()
   m_DisplayInteractorConfigs.clear();
   std::vector<us::ServiceReference<InteractionEventObserver>> listEventObserver =
     us::GetModuleContext()->GetServiceReferences<InteractionEventObserver>();
-  for (auto it = listEventObserver.begin();
-       it != listEventObserver.end();
-       ++it)
+  for (auto it = listEventObserver.begin(); it != listEventObserver.end(); ++it)
   {
-    auto *displayInteractor =
-      dynamic_cast<DisplayInteractor *>(us::GetModuleContext()->GetService<InteractionEventObserver>(*it));
+    auto displayInteractor = dynamic_cast<DisplayInteractor*>(us::GetModuleContext()->GetService<InteractionEventObserver>(*it));
     if (displayInteractor != nullptr)
     {
       // remember the original configuration
       m_DisplayInteractorConfigs.insert(std::make_pair(*it, displayInteractor->GetEventConfig()));
       // here the alternative configuration is loaded
       displayInteractor->SetEventConfig(m_EventConfig.c_str());
+    }
+
+    auto displayActionEventBroadcast = dynamic_cast<DisplayActionEventBroadcast*>(us::GetModuleContext()->GetService<InteractionEventObserver>(*it));
+    if (displayActionEventBroadcast != nullptr)
+    {
+      // remember the original configuration
+      m_DisplayInteractorConfigs.insert(std::make_pair(*it, displayActionEventBroadcast->GetEventConfig()));
+      // here the alternative configuration is loaded
+      displayActionEventBroadcast->SetEventConfig(m_EventConfig.c_str());
     }
   }
 }
@@ -147,18 +153,22 @@ void mitk::Tool::Deactivated()
 {
   // Re-enabling InteractionEventObservers that have been previously disabled for legacy handling of Tools
   // in new interaction framework
-  for (auto it = m_DisplayInteractorConfigs.begin();
-       it != m_DisplayInteractorConfigs.end();
-       ++it)
+  for (auto it = m_DisplayInteractorConfigs.begin(); it != m_DisplayInteractorConfigs.end(); ++it)
   {
     if (it->first)
     {
-      DisplayInteractor *displayInteractor =
-        static_cast<DisplayInteractor *>(us::GetModuleContext()->GetService<InteractionEventObserver>(it->first));
+      auto displayInteractor = static_cast<DisplayInteractor*>(us::GetModuleContext()->GetService<InteractionEventObserver>(it->first));
       if (displayInteractor != nullptr)
       {
         // here the regular configuration is loaded again
         displayInteractor->SetEventConfig(it->second);
+      }
+
+      auto displayActionEventBroadcast = dynamic_cast<DisplayActionEventBroadcast*>(us::GetModuleContext()->GetService<InteractionEventObserver>(it->first));
+      if (displayActionEventBroadcast != nullptr)
+      {
+        // here the regular configuration is loaded again
+        displayActionEventBroadcast->SetEventConfig(it->second);
       }
     }
   }
@@ -200,7 +210,7 @@ mitk::NodePredicateBase::ConstPointer mitk::Tool::GetWorkingDataPreference() con
   return m_IsSegmentationPredicate.GetPointer();
 }
 
-mitk::DataNode::Pointer mitk::Tool::CreateEmptySegmentationNode(Image *original,
+mitk::DataNode::Pointer mitk::Tool::CreateEmptySegmentationNode(const Image *original,
                                                                 const std::string &organName,
                                                                 const mitk::Color &color)
 {
@@ -269,11 +279,6 @@ mitk::DataNode::Pointer mitk::Tool::CreateEmptySegmentationNode(Image *original,
     Tool::ErrorMessage("Original image does not have a 'Time sliced geometry'! Cannot create a segmentation.");
     return nullptr;
   }
-
-  // Add some DICOM Tags as properties to segmentation image
-  PropertyList::Pointer dicomSegPropertyList = mitk::DICOMSegmentationPropertyHandler::GetDICOMSegmentationProperties(original->GetPropertyList());
-  segmentation->GetPropertyList()->ConcatenatePropertyList(dicomSegPropertyList);
-  mitk::DICOMSegmentationPropertyHandler::GetDICOMSegmentProperties(segmentation->GetActiveLabel(segmentation->GetActiveLayer()));
 
   return CreateSegmentationNode(segmentation, organName, color);
 }

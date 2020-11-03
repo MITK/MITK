@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QMITKRENDERWINDOWMANAGERVIEW_H
 #define QMITKRENDERWINDOWMANAGERVIEW_H
@@ -21,18 +17,21 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkRenderWindowManagerControls.h"
 
 // render window manager UI module
-#include <QmitkRenderWindowManipulatorWidget.h>
+#include <QmitkRenderWindowDataStorageInspector.h>
 
-// blueberry
-#include <berryISelectionListener.h>
+// mitk gui qt application
+#include <QmitkDataNodeContextMenu.h>
 
-// qt
+// mitk gui common plugin
+#include <mitkIRenderWindowPartListener.h>
+
+// mitk gui qt common plugin
 #include <QmitkAbstractView.h>
 
 /**
 * @brief RenderWindowManager
 */
-class QmitkRenderWindowManagerView : public QmitkAbstractView
+class QmitkRenderWindowManagerView : public QmitkAbstractView, public mitk::IRenderWindowPartListener
 {
   Q_OBJECT
 
@@ -40,11 +39,15 @@ public:
 
   static const std::string VIEW_ID;
 
+  void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart) override;
+
 protected:
 
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
-  virtual void CreateQtPartControl(QWidget* parent) override;
+  void CreateQtPartControl(QWidget* parent) override;
 
 private Q_SLOTS:
 
@@ -53,30 +56,24 @@ private Q_SLOTS:
   *
   * @param renderWindowId   The text inside the combo box.
   */
-  void OnRenderWindowSelectionChanged(const QString &renderWindowId);
-  /**
-  * @brief Called when the 'AddLayer'-button of he render window manipulator widget has been pushed.
-  */
-  void OnAddLayerButtonClicked();
+  void OnRenderWindowSelectionChanged(const QString& renderWindowId);
 
 private:
 
   void SetControlledRenderer();
 
-  /**
-  * @brief Reacts to a node that has been added to the data storage.
-  *     1. Insert new node into the node list of all render windows, if it is an "globalObject_RWM"-node.
-  *  or else
-  *     2. Set data node invisible in all render windows, as soon as the node is added to the data storage.
-  */
-  void NodeAdded(const mitk::DataNode* node) override;
+  void RenderWindowChanged();
 
-  // the Qt parent of our GUI
   QWidget* m_Parent;
   Ui::QmitkRenderWindowManagerControls m_Controls;
 
-  QmitkRenderWindowManipulatorWidget* m_RenderWindowManipulatorWidget;
-  RenderWindowLayerUtilities::RendererVector m_ControlledRenderer;
+  mitk::IRenderWindowPart* m_RenderWindowPart;
+
+  QmitkRenderWindowDataStorageInspector* m_RenderWindowInspector;
+  QAbstractItemView* m_InspectorView;
+  QmitkDataNodeContextMenu* m_DataNodeContextMenu;
+
+  QItemSelectionModel* GetDataNodeSelectionModel() const override;
 };
 
 #endif // QMITKRENDERWINDOWMANAGERVIEW_H

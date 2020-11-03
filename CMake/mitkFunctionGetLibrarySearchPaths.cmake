@@ -1,4 +1,20 @@
+#! Helper function that gets all library search paths.
+#!
+#! Usage:
+#!
+#!   mitkFunctionGetLibrarySearchPaths(search_path intermediate_dir [DEBUG|MINSIZEREL|RELWITHDEBINFO])
+#!
+#!
+#! The function creates the variable ${search_path}. The variable intermediate_dir contains
+#! paths that should be added to the search_path but should not be checked for existance,
+#! because the are not yet created. The option DEBUG, MINSIZEREL or RELWITHDEBINFO can be used to indicate that
+#! not the paths for release configuration are requested but the debug, min size release or "release with debug info"
+#! paths.
+#!
+
 function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
+
+  cmake_parse_arguments(PARSE_ARGV 2 GLS "RELEASE;DEBUG;MINSIZEREL;RELWITHDEBINFO" "" "")
 
   set(_dir_candidates
       "${MITK_CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
@@ -41,6 +57,22 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
   endif()
 
   get_property(_additional_paths GLOBAL PROPERTY MITK_ADDITIONAL_LIBRARY_SEARCH_PATHS)
+
+  if(TARGET OpenSSL::SSL)
+    if(GLS_DEBUG)
+      get_target_property(_openssl_location OpenSSL::SSL IMPORTED_LOCATION_DEBUG)
+    else()
+      get_target_property(_openssl_location OpenSSL::SSL IMPORTED_LOCATION_RELEASE)
+    endif()
+    if(_openssl_location)
+      get_filename_component(_openssl_location ${_openssl_location} DIRECTORY)
+      set(_openssl_location "${_openssl_location}/../../bin")
+      if(EXISTS ${_openssl_location})
+        get_filename_component(_openssl_location ${_openssl_location} ABSOLUTE)
+        list(APPEND _dir_candidates ${_openssl_location})
+      endif()
+    endif()
+  endif()
 
   if(MITK_USE_HDF5)
     FIND_PACKAGE(HDF5 COMPONENTS C HL NO_MODULE REQUIRED shared)
@@ -99,9 +131,9 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
     endif()
   endif()
 
-  if(MITK_USE_Python)
+  if(MITK_USE_Python3)
     list(APPEND _dir_candidates "${CTK_DIR}/CMakeExternals/Install/bin")
-    get_filename_component(_python_dir ${PYTHON_EXECUTABLE} DIRECTORY)
+    get_filename_component(_python_dir "${Python3_EXECUTABLE}" DIRECTORY)
     list(APPEND _dir_candidates "${_python_dir}")
   endif()
 
@@ -132,6 +164,27 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
     list(APPEND _dir_candidates ${MITK_LIBRARY_DIRS})
   endif()
 
+  ###################################################################
+  #get the search paths added by the mitkFunctionAddLibrarySearchPath
+  file(GLOB _additional_path_info_files "${MITK_SUPERBUILD_BINARY_DIR}/MITK-AdditionalLibPaths/*.cmake")
+
+  foreach(_additional_path_info_file ${_additional_path_info_files})
+    get_filename_component(_additional_info_name ${_additional_path_info_file} NAME_WE)
+    include(${_additional_path_info_file})
+    if(GLS_DEBUG)
+      list(APPEND _dir_candidates ${${_additional_info_name}_ADDITIONAL_DEBUG_LIBRARY_SEARCH_PATHS})
+    elseif(GLS_MINSIZEREL)
+      list(APPEND _dir_candidates ${${_additional_info_name}_ADDITIONAL_MINSIZEREL_LIBRARY_SEARCH_PATHS})
+    elseif(GLS_RELWITHDEBINFO)
+      list(APPEND _dir_candidates ${${_additional_info_name}_ADDITIONAL_RELWITHDEBINFO_LIBRARY_SEARCH_PATHS})
+    else() #Release
+      list(APPEND _dir_candidates ${${_additional_info_name}_ADDITIONAL_RELEASE_LIBRARY_SEARCH_PATHS})
+    endif()
+  endforeach(_additional_path_info_file ${_additional_path_info_files})
+
+
+  ###############################################
+  #sanitize all candidates and compile final list
   list(REMOVE_DUPLICATES _dir_candidates)
 
   set(_search_dirs )

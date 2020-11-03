@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkAdaptiveRegionGrowingTool.h"
 #include "mitkImage.h"
@@ -42,12 +38,12 @@ mitk::AdaptiveRegionGrowingTool::~AdaptiveRegionGrowingTool()
 {
 }
 
-bool mitk::AdaptiveRegionGrowingTool::CanHandle(BaseData *referenceData) const
+bool mitk::AdaptiveRegionGrowingTool::CanHandle(const BaseData* referenceData, const BaseData* /*workingData*/) const
 {
   if (referenceData == nullptr)
     return false;
 
-  auto *image = dynamic_cast<Image *>(referenceData);
+  auto *image = dynamic_cast<const Image *>(referenceData);
 
   if (image == nullptr)
     return false;

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKMIMETYPE_H
 #define MITKMIMETYPE_H
@@ -22,11 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usSharedData.h>
 
 #include <vector>
-
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4251)
-#endif
 
 namespace mitk
 {
@@ -94,9 +85,5 @@ namespace mitk
 
   MITKCORE_EXPORT std::ostream &operator<<(std::ostream &os, const MimeType &mimeType);
 }
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 #endif // MITKMIMETYPE_H

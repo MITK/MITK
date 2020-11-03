@@ -1,10 +1,5 @@
 project(Workbench)
 
-set(_app_options)
-if(MITK_SHOW_CONSOLE_WINDOW)
-  list(APPEND _app_options SHOW_CONSOLE)
-endif()
-
 # Create a cache entry for the provisioning file which is used to export
 # the file name in the MITKConfig.cmake file. This will keep external projects
 # which rely on this file happy.
@@ -16,10 +11,6 @@ set(MITK_EXTAPP_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/MitkWorkben
 #  - installed if they are external plug-ins
 
 set(_exclude_plugins
-  org.blueberry.test
-  org.blueberry.uitest
-  org.mitk.gui.qt.coreapplication
-  org.mitk.gui.qt.diffusionimagingapp
   org.mitk.example.gui.customviewer
   org.mitk.example.gui.customviewer.views
   org.mitk.example.gui.selectionservicemitk
@@ -35,9 +26,7 @@ mitkFunctionCreateBlueBerryApplication(
   NAME MitkWorkbench
   DESCRIPTION "MITK Workbench"
   EXCLUDE_PLUGINS ${_exclude_plugins}
-  ${_app_options}
 )
-mitk_use_modules(TARGET MitkWorkbench MODULES MitkAppUtil)
 
 # Add meta dependencies (e.g. on auto-load modules from depending modules)
 if(TARGET ${CMAKE_PROJECT_NAME}-autoload)

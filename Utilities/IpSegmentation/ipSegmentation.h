@@ -1,28 +1,24 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 /*! \mainpage
 
-  \author Tobias Kunert, Thomas Boettger, Tobias Heimann (Deutsches Krebsforschungszentrum, Heidelberg)
+  \author Tobias Kunert, Thomas Boettger, Tobias Heimann
   \date October 2002
 
   The ipMITKSegmentation library manages the results of the
   segmentation process. It provides basic capabilities
   to modify segmentation images. It includes also an
-  undo mechanism which allows to trace back the changes. 
+  undo mechanism which allows to trace back the changes.
 
 */
 
@@ -67,7 +63,7 @@ extern "C"
   /*!
     \brief Interpolates the shape of segmentations.
     @param pic1,pic2 the images of the segmentation
-    @param ratio the ratio of the images, the ratios 0.0 and 1.0 will 
+    @param ratio the ratio of the images, the ratios 0.0 and 1.0 will
     produce pic1 and pic2, accordingly.
     */
   extern mitkIpPicDescriptor* ipMITKSegmentationInterpolate (mitkIpPicDescriptor* pic1, mitkIpPicDescriptor* pic2, const mitkIpFloat4_t ratio);
@@ -88,7 +84,7 @@ extern "C"
     by a 2-D vector (x, y)
     @param segmentation the segmentation.
     @param num the number of points
-    @param mask the image which restricts the operation to a particular region 
+    @param mask the image which restricts the operation to a particular region
     @param operation the operation which will be performed (see above)
     @param value the operand value of the operation
     \note The last point is automatically connected with the first one.
@@ -97,7 +93,7 @@ extern "C"
 
   /*!
     \brief Enables the undo operation for the specified segmentation.
-    @param segmentation the segmentation 
+    @param segmentation the segmentation
     @param level the number of undo levels
     */
   extern void ipMITKSegmentationUndoEnable (mitkIpPicDescriptor* segmentation, const mitkIpUInt1_t level);
@@ -105,7 +101,7 @@ extern "C"
   /*!
     \brief Disables the undo operation for the specified segmentation.
     The available data will be discarded.
-    @param segmentation the segmentation 
+    @param segmentation the segmentation
     */
   extern void ipMITKSegmentationUndoDisable (mitkIpPicDescriptor* segmentation);
 
@@ -128,7 +124,7 @@ extern "C"
   extern void ipMITKSegmentationUndoSave (mitkIpPicDescriptor* segmentation);
 
   /*!
-    \brief Steps to the previous undo level. The data which has been saved 
+    \brief Steps to the previous undo level. The data which has been saved
     before the last modifications will be restored.
     */
   extern void ipMITKSegmentationUndo (mitkIpPicDescriptor* segmentation);
@@ -144,11 +140,11 @@ extern "C"
   If maxIterations is > 0, the growing process is stopped after maxIterations.
   If segBuffer is 0, new memory for the segmented image is allocated and returned, else the segBuffer is used
   to store the result (has to be an 8-bit datatype, e.g. mitkIpUInt1_t).
-  histBuffer must be 0 or a pointer to a 16-bit mitkIpPicUInt image of the same size as src. In case of the latter, 
+  histBuffer must be 0 or a pointer to a 16-bit mitkIpPicUInt image of the same size as src. In case of the latter,
   history data is written to that buffer: the seed pixel gets a 1, all direct neighbours 2 etc. The buffer is
   not cleared in this function and can thus hold history data of several growing processes in different areas.
   */
-extern mitkIpPicDescriptor* ipMITKSegmentationGrowRegion4N( mitkIpPicDescriptor *src, int startOfs, bool relativeBounds, float lowerBound, float upperBound, int maxIterations, mitkIpPicDescriptor *segBuffer, mitkIpPicDescriptor *histBuffer=0 );
+extern mitkIpPicDescriptor* ipMITKSegmentationGrowRegion4N( mitkIpPicDescriptor *src, int startOfs, bool relativeBounds, float lowerBound, float upperBound, int maxIterations, mitkIpPicDescriptor *segBuffer, mitkIpPicDescriptor *histBuffer=nullptr );
 
 /*!
   Same as the other ipMITKSegmentationGrowRegion4N with two additional return values:
@@ -156,7 +152,7 @@ extern mitkIpPicDescriptor* ipMITKSegmentationGrowRegion4N( mitkIpPicDescriptor 
   Take care: if the region could not grow at all (e.g. with fixed borders) contourOfs will be -1 !!!
   startCol holds the color that was used as base if relativeBounds is true
   */
-extern mitkIpPicDescriptor* ipMITKSegmentationGrowRegion4N( mitkIpPicDescriptor *src, int startOfs, bool relativeBounds, float lowerBound, float upperBound, int maxIterations, mitkIpPicDescriptor *segBuffer, int &contourOfs, float &startCol, mitkIpPicDescriptor *histBuffer=0 );
+extern mitkIpPicDescriptor* ipMITKSegmentationGrowRegion4N( mitkIpPicDescriptor *src, int startOfs, bool relativeBounds, float lowerBound, float upperBound, int maxIterations, mitkIpPicDescriptor *segBuffer, int &contourOfs, float &startCol, mitkIpPicDescriptor *histBuffer=nullptr );
 
 /*!
   Replaces the 4 neighbourhood region around startOfs (y*picWidth+x) of the 2D segmented image seg with newValue.
@@ -168,7 +164,7 @@ extern int ipMITKSegmentationReplaceRegion4N( mitkIpPicDescriptor *seg, int star
 /*!
   Same as above, but for the 8 neighbourhood contour.
   */
-extern float* ipMITKSegmentationGetContour8N( const mitkIpPicDescriptor *seg, int startOfs, int &numPoints, int &sizeBuffer, float *pointBuffer=0 );
+extern float* ipMITKSegmentationGetContour8N( const mitkIpPicDescriptor *seg, int startOfs, int &numPoints, int &sizeBuffer, float *pointBuffer=nullptr );
 
 
 typedef struct {

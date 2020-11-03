@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <mitkTestingMacros.h>
 #include <mitkTestFixture.h>
@@ -62,8 +58,8 @@ public:
     std::map<std::string, double> results;
     for (auto valuePair : featureList)
     {
-      MITK_INFO << valuePair.first << " : " << valuePair.second;
-      results[valuePair.first] = valuePair.second;
+      MITK_INFO << mitk::AbstractGlobalImageFeature::GenerateLegacyFeatureNameWOEncoding(valuePair.first) << " : " << valuePair.second;
+      results[valuePair.first.featureClass+"::"+valuePair.first.name] = valuePair.second;
     }
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Image Diagnostics should calculate 19 features.", std::size_t(19), featureList.size());
 
@@ -110,8 +106,8 @@ public:
     std::map<std::string, double> results;
     for (auto valuePair : featureList)
     {
-      MITK_INFO << valuePair.first << " : " << valuePair.second;
-      results[valuePair.first] = valuePair.second;
+      MITK_INFO << mitk::AbstractGlobalImageFeature::GenerateLegacyFeatureNameWOEncoding(valuePair.first) << " : " << valuePair.second;
+      results[mitk::AbstractGlobalImageFeature::GenerateLegacyFeatureNameWOEncoding(valuePair.first)] = valuePair.second;
     }
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Image Diagnostics should calculate 114 features.", std::size_t(114), featureList.size());
 

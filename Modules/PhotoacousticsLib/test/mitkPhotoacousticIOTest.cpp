@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
@@ -55,7 +51,8 @@ public:
   void setUp() override
   {
     m_VolumeProperties = createTestVolumeParameters();
-    m_TestInSilicoVolume = mitk::pa::InSilicoTissueVolume::New(m_VolumeProperties);
+    auto rng = std::mt19937();
+    m_TestInSilicoVolume = mitk::pa::InSilicoTissueVolume::New(m_VolumeProperties, &rng);
     m_Test3DVolume = createTest3DVolume(5);
     itk::FileTools::CreateDirectory(TEST_FOLDER_PATH);
     itk::FileTools::CreateDirectory(TEST_QUALIFIED_FOLDER_PATH);
@@ -91,7 +88,7 @@ public:
     for (unsigned int i = 0; i < length; i++)
       data[i] = value;
 
-    return mitk::pa::Volume::New(data, xDim, yDim, zDim);
+    return mitk::pa::Volume::New(data, xDim, yDim, zDim, 1);
   }
 
   mitk::pa::TissueGeneratorParameters::Pointer createTestVolumeParameters()
@@ -100,7 +97,8 @@ public:
     returnParameters->SetXDim(10);
     returnParameters->SetYDim(10);
     returnParameters->SetZDim(10);
-    returnParameters->SetBackgroundAbsorption(0);
+    returnParameters->SetMinBackgroundAbsorption(0);
+    returnParameters->SetMaxBackgroundAbsorption(0);
     returnParameters->SetBackgroundScattering(0);
     returnParameters->SetBackgroundAnisotropy(0);
     return returnParameters;

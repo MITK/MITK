@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "org_mitk_gui_qt_matchpoint_visualizer_Activator.h"
 
@@ -24,7 +20,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkStatusBar.h>
 #include <mitkProperties.h>
 #include <mitkColorProperty.h>
+#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateDataProperty.h>
+#include <mitkNodePredicateFunction.h>
 #include "mitkRegVisDirectionProperty.h"
 #include "mitkRegVisStyleProperty.h"
 #include "mitkRegVisColorStyleProperty.h"
@@ -51,13 +50,12 @@ QmitkMatchPointRegistrationVisualizer::QmitkMatchPointRegistrationVisualizer()
 
 void QmitkMatchPointRegistrationVisualizer::SetFocus()
 {
-    //m_Controls->buttonPerformImageProcessing->setFocus();
 }
 
 void QmitkMatchPointRegistrationVisualizer::CreateConnections()
 {
-    // show first page
-    connect(m_Controls->m_pbLockReg, SIGNAL(clicked()), this, SLOT(OnLockRegButtonPushed()));
+    connect(m_Controls->registrationNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointRegistrationVisualizer::OnNodeSelectionChanged);
+    connect(m_Controls->fovReferenceNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointRegistrationVisualizer::OnNodeSelectionChanged);
 
     connect(m_Controls->m_pbStyleGrid, SIGNAL(clicked()), this, SLOT(OnStyleButtonPushed()));
     connect(m_Controls->m_pbStyleGlyph, SIGNAL(clicked()), this, SLOT(OnStyleButtonPushed()));
@@ -66,8 +64,6 @@ void QmitkMatchPointRegistrationVisualizer::CreateConnections()
     connect(m_Controls->m_comboDirection, SIGNAL(currentIndexChanged(int)), this,
         SLOT(OnDirectionChanged(int)));
     connect(m_Controls->m_pbUpdateViz, SIGNAL(clicked()), this, SLOT(OnUpdateBtnPushed()));
-
-    connect(m_Controls->m_pbUseFOVRef, SIGNAL(clicked()), this, SLOT(OnUseFOVRefBtnPushed()));
 
     connect(m_Controls->radioColorUni, SIGNAL(toggled(bool)), m_Controls->btnUniColor,
         SLOT(setEnabled(bool)));
@@ -79,6 +75,11 @@ void QmitkMatchPointRegistrationVisualizer::CreateConnections()
 
     connect(m_Controls->cbVevMagInterlolate, SIGNAL(toggled(bool)), this,
         SLOT(OnColorInterpolationChecked(bool)));
+
+    connect(m_Controls->m_checkUseRefSize, SIGNAL(clicked()), this, SLOT(TransferFOVRefGeometry()));
+    connect(m_Controls->m_checkUseRefSpacing, SIGNAL(clicked()), this, SLOT(TransferFOVRefGeometry()));
+    connect(m_Controls->m_checkUseRefOrigin, SIGNAL(clicked()), this, SLOT(TransferFOVRefGeometry()));
+    connect(m_Controls->m_checkUseRefOrientation, SIGNAL(clicked()), this, SLOT(TransferFOVRefGeometry()));
 }
 
 void QmitkMatchPointRegistrationVisualizer::Error(QString msg)
@@ -96,6 +97,19 @@ void QmitkMatchPointRegistrationVisualizer::CreateQtPartControl(QWidget* parent)
 
     m_Parent = parent;
 
+    this->m_Controls->registrationNodeSelector->SetDataStorage(this->GetDataStorage());
+    this->m_Controls->registrationNodeSelector->SetSelectionIsOptional(false);
+    this->m_Controls->fovReferenceNodeSelector->SetDataStorage(this->GetDataStorage());
+    this->m_Controls->fovReferenceNodeSelector->SetSelectionIsOptional(false);
+    m_Controls->registrationNodeSelector->SetInvalidInfo("Select registration.");
+    m_Controls->registrationNodeSelector->SetPopUpTitel("Select registration.");
+    m_Controls->registrationNodeSelector->SetPopUpHint("Select the registration object whose registration visualization should be edited.");
+    m_Controls->fovReferenceNodeSelector->SetInvalidInfo("Select a FOV reference image.");
+    m_Controls->fovReferenceNodeSelector->SetPopUpTitel("Select a FOV reference image.");
+    m_Controls->fovReferenceNodeSelector->SetPopUpHint("Select the the image that should be used to define the field of view (FOV) for the registration visualization. The visualization will use the image geometry (size, orientation, spacing...).");
+
+    this->ConfigureNodePredicates();
+
     this->m_Controls->btnVecMagColorSmall->setDisplayColorName(false);
     this->m_Controls->btnVecMagColorMedium->setDisplayColorName(false);
     this->m_Controls->btnVecMagColorLarge->setDisplayColorName(false);
@@ -111,6 +125,23 @@ void QmitkMatchPointRegistrationVisualizer::CreateQtPartControl(QWidget* parent)
     this->CheckInputs();
     this->LoadStateFromNode();
     this->ConfigureVisualizationControls();
+
+    //deactivate because currently not an implemented style
+    this->m_Controls->m_pbStylePoints->setVisible(false);
+}
+
+void QmitkMatchPointRegistrationVisualizer::ConfigureNodePredicates()
+{
+  m_Controls->registrationNodeSelector->SetNodePredicate(mitk::MITKRegistrationHelper::RegNodePredicate());
+
+  auto geometryCheck = [](const mitk::DataNode * node)
+  {
+    return node->GetData() && node->GetData()->GetGeometry();
+  };
+  mitk::NodePredicateFunction::Pointer hasGeometry = mitk::NodePredicateFunction::New(geometryCheck);
+
+  auto nodePredicate = mitk::NodePredicateAnd::New(mitk::MITKRegistrationHelper::ImageNodePredicate().GetPointer(), hasGeometry.GetPointer());
+  m_Controls->fovReferenceNodeSelector->SetNodePredicate(nodePredicate.GetPointer());
 }
 
 mitk::MAPRegistrationWrapper* QmitkMatchPointRegistrationVisualizer::GetCurrentRegistration()
@@ -128,22 +159,7 @@ mitk::MAPRegistrationWrapper* QmitkMatchPointRegistrationVisualizer::GetCurrentR
 
 mitk::DataNode::Pointer QmitkMatchPointRegistrationVisualizer::GetSelectedRegNode() const
 {
-    mitk::DataNode::Pointer spResult = nullptr;
-
-    typedef QList<mitk::DataNode::Pointer> NodeListType;
-
-    NodeListType nodes = this->GetDataManagerSelection();
-
-    for (NodeListType::iterator pos = nodes.begin(); pos != nodes.end(); ++pos)
-    {
-        if (mitk::MITKRegistrationHelper::IsRegNode(*pos))
-        {
-            spResult = *pos;
-            break;
-        }
-    }
-
-    return spResult;
+    return m_Controls->registrationNodeSelector->GetSelectedNode();
 }
 
 mitk::DataNode::Pointer QmitkMatchPointRegistrationVisualizer::GetRefNodeOfReg(bool target) const
@@ -178,41 +194,16 @@ mitk::DataNode::Pointer QmitkMatchPointRegistrationVisualizer::GetRefNodeOfReg(b
 
 mitk::DataNode::Pointer QmitkMatchPointRegistrationVisualizer::GetSelectedDataNode()
 {
-    typedef QList<mitk::DataNode::Pointer> NodeListType;
-
-    NodeListType nodes = this->GetDataManagerSelection();
-    mitk::DataNode::Pointer result;
-
-    for (NodeListType::iterator pos = nodes.begin(); pos != nodes.end(); ++pos)
-    {
-        if (!mitk::MITKRegistrationHelper::IsRegNode(*pos) && (*pos)->GetData()
-            && (*pos)->GetData()->GetGeometry())
-        {
-            result = *pos;
-            break;
-        }
-    }
-
-    return result;
+  return m_Controls->fovReferenceNodeSelector->GetSelectedNode();
 }
 
 void QmitkMatchPointRegistrationVisualizer::CheckInputs()
 {
-    mitk::DataNode::Pointer regNode = this->GetSelectedRegNode();
+  this->m_spSelectedRegNode = this->GetSelectedRegNode();
 
-    if (!m_Controls->m_pbLockReg->isChecked())
-    {
-        this->m_spSelectedRegNode = regNode;
-    }
+  this->InitRegNode();
 
-    this->InitRegNode();
-
-    mitk::DataNode::Pointer fovNode = this->GetSelectedDataNode();
-
-    if (!m_Controls->m_pbLockFOVRef->isChecked())
-    {
-        this->m_spSelectedFOVRefNode = fovNode;
-    }
+  this->m_spSelectedFOVRefNode = this->GetSelectedDataNode();
 }
 
 void QmitkMatchPointRegistrationVisualizer::ConfigureVisualizationControls()
@@ -228,37 +219,12 @@ void QmitkMatchPointRegistrationVisualizer::ConfigureVisualizationControls()
 
         this->ActualizeRegInfo(this->GetCurrentRegistration());
 
-        if (this->m_spSelectedRegNode.IsNull())
-        {
-            m_Controls->m_lbRegistrationName->setText(
-                QString("<font color='red'>no registration selected!</font>"));
-        }
-        else
-        {
-            m_Controls->m_lbRegistrationName->setText(QString::fromStdString(
-                this->m_spSelectedRegNode->GetName()));
-        }
-
-        this->m_Controls->m_pbLockReg->setEnabled(this->m_spSelectedRegNode.IsNotNull());
-        this->m_Controls->m_pbUseFOVRef->setEnabled(this->m_spSelectedRegNode.IsNotNull()
-            && this->m_spSelectedFOVRefNode.IsNotNull());
         this->m_Controls->m_checkUseRefSize->setEnabled(this->m_spSelectedRegNode.IsNotNull()
             && this->m_spSelectedFOVRefNode.IsNotNull());
         this->m_Controls->m_checkUseRefOrigin->setEnabled(this->m_spSelectedRegNode.IsNotNull()
             && this->m_spSelectedFOVRefNode.IsNotNull());
         this->m_Controls->m_checkUseRefSpacing->setEnabled(this->m_spSelectedRegNode.IsNotNull()
             && this->m_spSelectedFOVRefNode.IsNotNull());
-
-        this->m_Controls->m_pbLockFOVRef->setEnabled(this->m_spSelectedFOVRefNode.IsNotNull());
-
-        if (this->m_spSelectedFOVRefNode.IsNull())
-        {
-            m_Controls->m_lbFOVRef->setText(QString("<font color='red'>no valid reference selected!</font>"));
-        }
-        else
-        {
-            m_Controls->m_lbFOVRef->setText(QString::fromStdString(this->m_spSelectedFOVRefNode->GetName()));
-        }
 
         m_internalUpdateGuard = false;
     }
@@ -392,8 +358,8 @@ void QmitkMatchPointRegistrationVisualizer::LoadStateFromNode()
         }
         else
         {
-            this->Error(QString("Cannot configure plugin controlls correctly. Node property ") + QString(
-                mitk::nodeProp_RegVisDirection) + QString(" has not the assumed type."));
+            this->Error(QStringLiteral("Cannot configure plugin controlls correctly. Node property ") + QString(
+                mitk::nodeProp_RegVisDirection) + QStringLiteral(" has not the assumed type."));
         }
 
         bool styleActive = false;
@@ -405,8 +371,8 @@ void QmitkMatchPointRegistrationVisualizer::LoadStateFromNode()
         }
         else
         {
-            this->Error(QString("Cannot configure plugin controlls correctly. Node property ") + QString(
-                mitk::nodeProp_RegVisGrid) + QString(" has not the assumed type."));
+            this->Error(QStringLiteral("Cannot configure plugin controlls correctly. Node property ") + QString(
+                mitk::nodeProp_RegVisGrid) + QStringLiteral(" has not the assumed type."));
         }
 
         if (this->m_spSelectedRegNode->GetBoolProperty(mitk::nodeProp_RegVisGlyph, styleActive))
@@ -415,8 +381,8 @@ void QmitkMatchPointRegistrationVisualizer::LoadStateFromNode()
         }
         else
         {
-            this->Error(QString("Cannot configure plugin controlls correctly. Node property ") + QString(
-                mitk::nodeProp_RegVisGlyph) + QString(" has not the assumed type."));
+            this->Error(QStringLiteral("Cannot configure plugin controlls correctly. Node property ") + QString(
+                mitk::nodeProp_RegVisGlyph) + QStringLiteral(" has not the assumed type."));
         }
 
         if (this->m_spSelectedRegNode->GetBoolProperty(mitk::nodeProp_RegVisPoints, styleActive))
@@ -425,8 +391,8 @@ void QmitkMatchPointRegistrationVisualizer::LoadStateFromNode()
         }
         else
         {
-            this->Error(QString("Cannot configure plugin controlls correctly. Node property ") + QString(
-                mitk::nodeProp_RegVisPoints) + QString(" has not the assumed type."));
+            this->Error(QStringLiteral("Cannot configure plugin controlls correctly. Node property ") + QString(
+                mitk::nodeProp_RegVisPoints) + QStringLiteral(" has not the assumed type."));
         }
 
         ///////////////////////////////////////////////////////
@@ -440,8 +406,8 @@ void QmitkMatchPointRegistrationVisualizer::LoadStateFromNode()
         }
         else
         {
-            this->Error(QString("Cannot configure plugin controlls correctly. Node property ") + QString(
-                mitk::nodeProp_RegVisColorStyle) + QString(" has not the assumed type."));
+            this->Error(QStringLiteral("Cannot configure plugin controlls correctly. Node property ") + QString(
+                mitk::nodeProp_RegVisColorStyle) + QStringLiteral(" has not the assumed type."));
         }
 
         QColor tmpColor;
@@ -496,8 +462,8 @@ void QmitkMatchPointRegistrationVisualizer::LoadStateFromNode()
         }
         else
         {
-            this->Error(QString("Cannot configure plugin controlls correctly. Node property ") + QString(
-                mitk::nodeProp_RegVisGridShowStart) + QString(" is not correctly defined."));
+            this->Error(QStringLiteral("Cannot configure plugin controlls correctly. Node property ") + QString(
+                mitk::nodeProp_RegVisGridShowStart) + QStringLiteral(" is not correctly defined."));
         }
 
         int gridFrequ = 5;
@@ -508,8 +474,8 @@ void QmitkMatchPointRegistrationVisualizer::LoadStateFromNode()
         }
         else
         {
-            this->Error(QString("Cannot configure plugin controlls correctly. Node property ") + QString(
-                mitk::nodeProp_RegVisGridFrequence) + QString(" is not correctly defined."));
+            this->Error(QStringLiteral("Cannot configure plugin controlls correctly. Node property ") + QString(
+                mitk::nodeProp_RegVisGridFrequence) + QStringLiteral(" is not correctly defined."));
         }
 
         float colorStart[3] = { 0.0, 0.0, 0.0 };
@@ -529,8 +495,8 @@ void QmitkMatchPointRegistrationVisualizer::LoadStateFromNode()
         }
         else
         {
-            this->Error(QString("Cannot configure plugin controlls correctly. Node property ") + QString(
-                mitk::nodeProp_RegVisFOVSize) + QString(" is not correctly defined."));
+            this->Error(QStringLiteral("Cannot configure plugin controlls correctly. Node property ") + QString(
+                mitk::nodeProp_RegVisFOVSize) + QStringLiteral(" is not correctly defined."));
         }
 
         if (this->m_spSelectedRegNode->GetProperty(valueProp, mitk::nodeProp_RegVisFOVSpacing))
@@ -541,8 +507,8 @@ void QmitkMatchPointRegistrationVisualizer::LoadStateFromNode()
         }
         else
         {
-            this->Error(QString("Cannot configure plugin controlls correctly. Node property ") + QString(
-                mitk::nodeProp_RegVisFOVSpacing) + QString(" is not correctly defined."));
+            this->Error(QStringLiteral("Cannot configure plugin controlls correctly. Node property ") + QString(
+                mitk::nodeProp_RegVisFOVSpacing) + QStringLiteral(" is not correctly defined."));
         }
 
         mitk::Point3dProperty* originProp = nullptr;
@@ -555,8 +521,8 @@ void QmitkMatchPointRegistrationVisualizer::LoadStateFromNode()
         }
         else
         {
-            this->Error(QString("Cannot configure plugin controlls correctly. Node property ") + QString(
-                mitk::nodeProp_RegVisFOVOrigin) + QString(" is not correctly defined."));
+            this->Error(QStringLiteral("Cannot configure plugin controlls correctly. Node property ") + QString(
+                mitk::nodeProp_RegVisFOVOrigin) + QStringLiteral(" is not correctly defined."));
         }
 
         mitk::Vector3DProperty* orientationProp1;
@@ -578,9 +544,9 @@ void QmitkMatchPointRegistrationVisualizer::LoadStateFromNode()
         {
             m_FOVRefOrientation.SetIdentity();
 
-            this->Error(QString("Cannot configure plugin controlls correctly. One of the node propertiesy ") +
+            this->Error(QStringLiteral("Cannot configure plugin controlls correctly. One of the node propertiesy ") +
                 QString(mitk::nodeProp_RegVisFOVOrientation1) + QString(mitk::nodeProp_RegVisFOVOrientation2) +
-                QString(mitk::nodeProp_RegVisFOVOrientation3) + QString(" is not correctly defined."));
+                QString(mitk::nodeProp_RegVisFOVOrientation3) + QStringLiteral(" is not correctly defined."));
         }
 
         this->UpdateOrientationMatrixWidget();
@@ -595,29 +561,31 @@ void QmitkMatchPointRegistrationVisualizer::CheckAndSetDefaultFOVRef()
         1); //direction value 1 = show inverse mapping -> we need the target image used for the registration.
 
     //if there is a default node and no m_spSelectedFOVRefNode is set -> set default node and transfer values
-    if (defaultRef.IsNotNull() && this->m_spSelectedFOVRefNode.IsNull()
-        && !(this->m_Controls->m_pbLockFOVRef->isDown()))
+    if (defaultRef.IsNotNull() && this->m_spSelectedFOVRefNode.IsNull())
     {
-        //there is a default ref and no ref lock -> select default ref and transfer its values
-        this->m_spSelectedFOVRefNode = defaultRef;
-        this->m_Controls->m_checkUseRefSize->setChecked(true);
-        this->m_Controls->m_checkUseRefOrigin->setChecked(true);
-        this->m_Controls->m_checkUseRefSpacing->setChecked(true);
-        this->m_Controls->m_checkUseRefOrientation->setChecked(true);
+      //there is a default ref and no ref lock -> select default ref and transfer its values
+      this->m_spSelectedFOVRefNode = defaultRef;
+      QmitkSingleNodeSelectionWidget::NodeList selection({ defaultRef });
+      this->m_Controls->fovReferenceNodeSelector->SetCurrentSelection(selection);
+      this->m_Controls->m_checkUseRefSize->setChecked(true);
+      this->m_Controls->m_checkUseRefOrigin->setChecked(true);
+      this->m_Controls->m_checkUseRefSpacing->setChecked(true);
+      this->m_Controls->m_checkUseRefOrientation->setChecked(true);
+    }
 
-        //auto transfere values
-        this->OnUseFOVRefBtnPushed();
+    if (this->m_spSelectedFOVRefNode.IsNotNull())
+    {
+      //auto transfere values
+      this->TransferFOVRefGeometry();
     }
 }
 
-void QmitkMatchPointRegistrationVisualizer::OnSelectionChanged(
-    berry::IWorkbenchPart::Pointer,
-    const QList<mitk::DataNode::Pointer>&)
+void QmitkMatchPointRegistrationVisualizer::OnNodeSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/)
 {
-    this->CheckInputs();
-    this->LoadStateFromNode();
-    this->CheckAndSetDefaultFOVRef();
-    this->ConfigureVisualizationControls();
+  this->CheckInputs();
+  this->LoadStateFromNode();
+  this->CheckAndSetDefaultFOVRef();
+  this->ConfigureVisualizationControls();
 }
 
 void QmitkMatchPointRegistrationVisualizer::ActualizeRegInfo(mitk::MAPRegistrationWrapper*
@@ -659,23 +627,7 @@ void QmitkMatchPointRegistrationVisualizer::OnDirectionChanged(int)
 {
     this->CheckAndSetDefaultFOVRef();
     this->ConfigureVisualizationControls();
-};
-
-void QmitkMatchPointRegistrationVisualizer::OnLockRegButtonPushed()
-{
-    if (this->m_Controls->m_pbLockReg->isChecked())
-    {
-        if (this->m_spSelectedRegNode.IsNotNull())
-        {
-            this->m_spSelectedRegNode->SetSelected(false);
-            this->GetDataStorage()->Modified();
-        }
-    }
-
-    this->CheckInputs();
-    this->ConfigureVisualizationControls();
 }
-
 
 void QmitkMatchPointRegistrationVisualizer::OnUpdateBtnPushed()
 {
@@ -699,17 +651,17 @@ void QmitkMatchPointRegistrationVisualizer::OnColorInterpolationChecked(bool che
 {
     if (checked)
     {
-        this->m_Controls->labelVecMagSmall->setText(QString("="));
-        this->m_Controls->labelVecMagMedium->setText(QString("="));
-        this->m_Controls->labelVecMagLarge->setText(QString("="));
+        this->m_Controls->labelVecMagSmall->setText(QStringLiteral("="));
+        this->m_Controls->labelVecMagMedium->setText(QStringLiteral("="));
+        this->m_Controls->labelVecMagLarge->setText(QStringLiteral("="));
     }
     else
     {
-        this->m_Controls->labelVecMagSmall->setText(QString(">"));
-        this->m_Controls->labelVecMagMedium->setText(QString(">"));
-        this->m_Controls->labelVecMagLarge->setText(QString(">"));
+        this->m_Controls->labelVecMagSmall->setText(QStringLiteral(">"));
+        this->m_Controls->labelVecMagMedium->setText(QStringLiteral(">"));
+        this->m_Controls->labelVecMagLarge->setText(QStringLiteral(">"));
     }
-};
+}
 
 mitk::ScalarType QmitkMatchPointRegistrationVisualizer::GetSaveSpacing(mitk::ScalarType gridRes,
     mitk::ScalarType spacing, unsigned int maxGridRes) const
@@ -725,7 +677,7 @@ mitk::ScalarType QmitkMatchPointRegistrationVisualizer::GetSaveSpacing(mitk::Sca
     return newSpacing;
 }
 
-void QmitkMatchPointRegistrationVisualizer::OnUseFOVRefBtnPushed()
+void QmitkMatchPointRegistrationVisualizer::TransferFOVRefGeometry()
 {
     if (this->m_spSelectedFOVRefNode.IsNotNull())
     {

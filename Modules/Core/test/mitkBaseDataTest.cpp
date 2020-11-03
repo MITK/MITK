@@ -1,124 +1,278 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
+============================================================================*/
+// Testing
+#include "mitkTestFixture.h"
+#include "mitkTestingMacros.h"
 
-===================================================================*/
+// std includes
+#include <string>
 
-#include "itkImage.h"
+// MITK includes
 #include "mitkBaseDataTestImplementation.h"
 #include "mitkStringProperty.h"
-#include "mitkTestingMacros.h"
 #include <mitkProportionalTimeGeometry.h>
 #include <mitkTimeGeometry.h>
 
-int mitkBaseDataTest(int /*argc*/, char * /*argv*/ [])
+#include "itkImage.h"
+
+// VTK includes
+#include <vtkDebugLeaks.h>
+
+class mitkBaseDataTestSuite : public mitk::TestFixture
 {
-  MITK_TEST_BEGIN("BaseData")
+  CPPUNIT_TEST_SUITE(mitkBaseDataTestSuite);
 
-  // Create a BaseData implementation
-  MITK_INFO << "Creating a base data instance...";
-  mitk::BaseDataTestImplementation::Pointer baseDataImpl = mitk::BaseDataTestImplementation::New();
+  MITK_TEST(CreateBaseData_Success);
+  MITK_TEST(InitializationOfBaseData_Success);
 
-  MITK_TEST_CONDITION_REQUIRED(baseDataImpl.IsNotNull(), "Testing instantiation");
-  MITK_TEST_CONDITION(baseDataImpl->IsInitialized(), "BaseDataTestImplementation is initialized");
-  MITK_TEST_CONDITION(baseDataImpl->IsEmpty(), "BaseDataTestImplementation is initialized and empty");
+  MITK_TEST(CreateCloneBaseData_Success);
+  MITK_TEST(InitializationOfCloneBaseData_Success);
 
-  mitk::BaseDataTestImplementation::Pointer cloneBaseData = baseDataImpl->Clone();
-  MITK_TEST_CONDITION_REQUIRED(cloneBaseData.IsNotNull(), "Testing instantiation of base data clone");
-  MITK_TEST_CONDITION(cloneBaseData->IsInitialized(), "Clone of BaseDataTestImplementation is initialized");
-  MITK_TEST_CONDITION(cloneBaseData->IsEmpty(), "Clone of BaseDataTestImplementation is initialized and empty");
+  MITK_TEST(GetAndSetTimeGeometry_Success);
+  MITK_TEST(ResetTimeGeometry_Success);
+  MITK_TEST(ReinitOfTimeGeometry_Success);
 
-  MITK_INFO << "Testing setter and getter for geometries...";
+  MITK_TEST(GetGeometryForSingleTimeGeometries_Failure);
 
-  // test method GetTimeGeometry()
-  MITK_TEST_CONDITION(baseDataImpl->GetTimeGeometry(), "Testing creation of TimeGeometry");
+  MITK_TEST(TestingExpand_Success);
 
-  mitk::TimeGeometry *geo = nullptr;
-  baseDataImpl->SetTimeGeometry(geo);
+  MITK_TEST(TestingGetUpdateGeometry_Success);
 
-  MITK_TEST_CONDITION(baseDataImpl->GetTimeGeometry() == nullptr, "Reset Geometry");
+  MITK_TEST(GetOriginOfBaseData_Success);
+  MITK_TEST(GetOriginOfCloneBaseData);
 
-  mitk::ProportionalTimeGeometry::Pointer geo2 = mitk::ProportionalTimeGeometry::New();
-  baseDataImpl->SetTimeGeometry(geo2);
-  geo2->Initialize(2);
-  MITK_TEST_CONDITION(baseDataImpl->GetTimeGeometry() == geo2.GetPointer(), "Correct Reinit of TimeGeometry");
+  MITK_TEST(ClearATimeStep);
 
-  // test method GetGeometry(int timeStep)
-  MITK_TEST_CONDITION(baseDataImpl->GetGeometry(1) != nullptr, "... and single Geometries");
+  MITK_TEST(BaseDataSetAndGetProperty_Success);
+  MITK_TEST(CloneBaseDataSetAndGetProperty_Success);
 
-  // test method Expand(unsigned int timeSteps)
-  baseDataImpl->Expand(5);
-  MITK_TEST_CONDITION(baseDataImpl->GetTimeSteps() == 5, "Expand the geometry to further time slices!");
+  MITK_TEST(BasePropertyListIsSet_Success);
+  MITK_TEST(BasePorpertyIsSetInPropertyList_Success);
 
-  // test method GetUpdatedGeometry(int timeStep);
-  mitk::Geometry3D::Pointer geometry3D = mitk::Geometry3D::New();
-  mitk::BaseGeometry::Pointer geo3 = dynamic_cast<mitk::BaseGeometry *>(geometry3D.GetPointer());
-  mitk::ProportionalTimeGeometry::Pointer timeGeometry =
-    dynamic_cast<mitk::ProportionalTimeGeometry *>(baseDataImpl->GetTimeGeometry());
-  if (timeGeometry.IsNotNull())
+  MITK_TEST(UpdateOutputInformationOfBaseData_Failure);
+  MITK_TEST(CopyingInformationOfBaseData_Failure);
+
+  CPPUNIT_TEST_SUITE_END();
+
+private:
+  mitk::BaseDataTestImplementation::Pointer m_BaseDataImpl;
+  mitk::BaseDataTestImplementation::Pointer m_CloneBaseData;
+
+  mitk::TimeGeometry *m_Geo;
+  mitk::ProportionalTimeGeometry::Pointer m_Geo2;
+
+  mitk::Geometry3D::Pointer m_Geometry3D;
+  mitk::BaseGeometry::Pointer m_Geo3;
+
+  mitk::ScalarType m_X[3];
+  mitk::PropertyList::Pointer m_PropertyList;
+
+public:
+  void setUp() override
   {
-    timeGeometry->SetTimeStepGeometry(geo3, 1);
+    m_BaseDataImpl = mitk::BaseDataTestImplementation::New();
+    m_CloneBaseData = m_BaseDataImpl->Clone();
+
+    m_Geo = nullptr;
+    m_Geo2 = mitk::ProportionalTimeGeometry::New();
+
+    m_Geometry3D = mitk::Geometry3D::New();
+    m_Geo3 = dynamic_cast<mitk::BaseGeometry *>(m_Geometry3D.GetPointer());
+
+    m_X[0] = 2;
+    m_X[1] = 4;
+    m_X[2] = 6;
+
+    m_PropertyList = mitk::PropertyList::New();
   }
 
-  MITK_TEST_CONDITION(baseDataImpl->GetUpdatedGeometry(1) == geo3, "Set Geometry for time step 1");
-  MITK_TEST_CONDITION(baseDataImpl->GetMTime() != 0, "Check if modified time is set");
-  baseDataImpl->SetClonedGeometry(geo3, 1);
+  void tearDown() override
+  {
+    m_BaseDataImpl = nullptr;
+    m_CloneBaseData = nullptr;
 
-  mitk::ScalarType x[3];
-  x[0] = 2;
-  x[1] = 4;
-  x[2] = 6;
-  mitk::Point3D p3d(x);
-  baseDataImpl->SetOrigin(p3d);
-  geo3->SetOrigin(p3d);
+    m_Geo = nullptr;
+    m_Geo2 = nullptr;
 
-  MITK_TEST_CONDITION(baseDataImpl->GetGeometry(1)->GetOrigin() == geo3->GetOrigin(), "Testing Origin set");
+    m_Geometry3D = nullptr;
+    m_Geo3 = nullptr;
 
-  cloneBaseData = baseDataImpl->Clone();
-  MITK_TEST_CONDITION(cloneBaseData->GetGeometry(1)->GetOrigin() == geo3->GetOrigin(), "Testing origin set in clone!");
+    m_X[0] = 0;
+    m_X[1] = 0;
+    m_X[2] = 0;
 
-  MITK_TEST_CONDITION(!baseDataImpl->IsEmptyTimeStep(1), "Is not empty before clear()!");
-  baseDataImpl->Clear();
-  MITK_TEST_CONDITION(baseDataImpl->IsEmptyTimeStep(1), "...but afterwards!");
-  // test method Set-/GetProperty()
-  baseDataImpl->SetProperty("property38", mitk::StringProperty::New("testproperty"));
-  // baseDataImpl->SetProperty("visibility", mitk::BoolProperty::New());
-  MITK_TEST_CONDITION(baseDataImpl->GetProperty("property38")->GetValueAsString() == "testproperty",
-                      "Check if base property is set correctly!");
+    m_PropertyList = nullptr;
+  }
 
-  cloneBaseData = baseDataImpl->Clone();
-  MITK_TEST_CONDITION(cloneBaseData->GetProperty("property38")->GetValueAsString() == "testproperty",
-                      "Testing origin set in clone!");
+  void CreateBaseData_Success()
+  {
+    // Create a BaseData implementation
+    MITK_INFO << "Creating a base data instance...";
+    CPPUNIT_ASSERT_MESSAGE("Testing instantiation", m_BaseDataImpl.IsNotNull());
+  }
 
-  // test method Set-/GetPropertyList
-  mitk::PropertyList::Pointer propertyList = mitk::PropertyList::New();
-  propertyList->SetFloatProperty("floatProperty1", 123.45);
-  propertyList->SetBoolProperty("visibility", true);
-  propertyList->SetStringProperty("nameXY", "propertyName");
-  baseDataImpl->SetPropertyList(propertyList);
-  bool value = false;
-  MITK_TEST_CONDITION(baseDataImpl->GetPropertyList() == propertyList, "Check if base property list is set correctly!");
-  MITK_TEST_CONDITION(baseDataImpl->GetPropertyList()->GetBoolProperty("visibility", value) == true,
-                      "Check if base property is set correctly in the property list!");
+  void InitializationOfBaseData_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("BaseDataTestImplementation is initialized", m_BaseDataImpl->IsInitialized());
+    CPPUNIT_ASSERT_MESSAGE("BaseDataTestImplementation is initialized and empty", m_BaseDataImpl->IsEmpty());
+  }
 
-  // test method UpdateOutputInformation()
-  baseDataImpl->UpdateOutputInformation();
-  MITK_TEST_CONDITION(baseDataImpl->GetUpdatedTimeGeometry() == geo2, "TimeGeometry update!");
-  // Test method CopyInformation()
-  mitk::BaseDataTestImplementation::Pointer newBaseData = mitk::BaseDataTestImplementation::New();
-  newBaseData->CopyInformation(baseDataImpl);
-  MITK_TEST_CONDITION_REQUIRED(newBaseData->GetTimeGeometry()->CountTimeSteps() == 5,
-                               "Check copying of of Basedata Data Object!");
+  void CreateCloneBaseData_Success()
+  {
+    // Create CloneBaseData implementation
+    MITK_INFO << "Creating a clone base data instance...";
+    CPPUNIT_ASSERT_MESSAGE("Testing instantiation of base data clone", m_CloneBaseData.IsNotNull());
+  }
 
-  MITK_TEST_END()
-}
+  void InitializationOfCloneBaseData_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Clone of BaseDataTestImplementation is initialized", m_CloneBaseData->IsInitialized());
+    CPPUNIT_ASSERT_MESSAGE("Clone of BaseDataTestImplementation is initialized and empty", m_CloneBaseData->IsEmpty());
+  }
+
+  void GetAndSetTimeGeometry_Success()
+  {
+    // test method GetTimeGeometry()
+    MITK_INFO << "Testing setter and getter for geometries...";
+    CPPUNIT_ASSERT_MESSAGE("Testing creation of TimeGeometry", m_BaseDataImpl->GetTimeGeometry());
+  }
+
+  void ResetTimeGeometry_Success()
+  {
+    m_BaseDataImpl->SetTimeGeometry(m_Geo);
+    CPPUNIT_ASSERT_MESSAGE("Reset Geometry", m_BaseDataImpl->GetTimeGeometry() == nullptr);
+  }
+
+  void ReinitOfTimeGeometry_Success()
+  {
+    m_BaseDataImpl->SetTimeGeometry(m_Geo2);
+    m_Geo2->Initialize(2);
+    CPPUNIT_ASSERT_MESSAGE("Correct Reinit of TimeGeometry", m_BaseDataImpl->GetTimeGeometry() == m_Geo2.GetPointer());
+  }
+
+  void GetGeometryForSingleTimeGeometries_Failure()
+  {
+    // test method GetGeometry(int timeStep)
+    CPPUNIT_ASSERT_MESSAGE("Testing Creation of single TimeGeometries", m_BaseDataImpl->GetGeometry(1) == nullptr);
+  }
+
+  void TestingExpand_Success()
+  {
+    // test method Expand(unsigned int timeSteps)
+    m_BaseDataImpl->Expand(5);
+    CPPUNIT_ASSERT_MESSAGE("Expand the geometry to further time slices!", m_BaseDataImpl->GetTimeSteps() == 5);
+  }
+
+  void TestingGetUpdateGeometry_Success()
+  {
+    // test method GetUpdatedGeometry(int timeStep);
+    m_BaseDataImpl->Expand(5);
+    mitk::ProportionalTimeGeometry::Pointer timeGeometry =
+      dynamic_cast<mitk::ProportionalTimeGeometry *>(m_BaseDataImpl->GetTimeGeometry());
+    if (timeGeometry.IsNotNull())
+    {
+      timeGeometry->SetTimeStepGeometry(m_Geo3, 1);
+    }
+
+    CPPUNIT_ASSERT_MESSAGE("Set Geometry for time step 1", m_BaseDataImpl->GetUpdatedGeometry(1) == m_Geo3);
+    CPPUNIT_ASSERT_MESSAGE("Check if modified time is set", m_BaseDataImpl->GetMTime() != 0);
+  }
+
+  void GetOriginOfBaseData_Success()
+  {
+    m_BaseDataImpl->Expand(5);
+    m_BaseDataImpl->SetClonedGeometry(m_Geo3, 1);
+
+    mitk::Point3D p3d(m_X);
+    m_BaseDataImpl->SetOrigin(p3d);
+    m_Geo3->SetOrigin(p3d);
+    CPPUNIT_ASSERT_MESSAGE("Testing Origin set", m_BaseDataImpl->GetGeometry(1)->GetOrigin() == m_Geo3->GetOrigin());
+  }
+  void GetOriginOfCloneBaseData()
+  {
+    m_BaseDataImpl->Expand(5);
+    m_BaseDataImpl->SetClonedGeometry(m_Geo3, 1);
+
+    mitk::Point3D p3d(m_X);
+    m_BaseDataImpl->SetOrigin(p3d);
+    m_Geo3->SetOrigin(p3d);
+
+    m_CloneBaseData = m_BaseDataImpl->Clone();
+    CPPUNIT_ASSERT_MESSAGE("Testing origin set in clone!",
+                           m_CloneBaseData->GetGeometry(1)->GetOrigin() == m_Geo3->GetOrigin());
+  }
+
+  void ClearATimeStep()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Is not empty before clear()!", !m_BaseDataImpl->IsEmptyTimeStep(1));
+    m_BaseDataImpl->Clear();
+    CPPUNIT_ASSERT_MESSAGE("...but afterwards!", m_BaseDataImpl->IsEmptyTimeStep(1));
+  }
+
+  void BaseDataSetAndGetProperty_Success()
+  {
+    // test method Set-/GetProperty()
+    m_BaseDataImpl->SetProperty("property38", mitk::StringProperty::New("testproperty"));
+    CPPUNIT_ASSERT_MESSAGE("Check if base property is set correctly!",
+                           m_BaseDataImpl->GetProperty("property38")->GetValueAsString() == "testproperty");
+  }
+
+  void CloneBaseDataSetAndGetProperty_Success()
+  {
+    m_BaseDataImpl->SetProperty("property38", mitk::StringProperty::New("testproperty"));
+    m_CloneBaseData = m_BaseDataImpl->Clone();
+    CPPUNIT_ASSERT_MESSAGE("Testing origin set in clone!",
+                           m_CloneBaseData->GetProperty("property38")->GetValueAsString() == "testproperty");
+  }
+
+  void BasePropertyListIsSet_Success()
+  {
+    // test method Set-/GetPropertyList
+    m_PropertyList->SetFloatProperty("floatProperty1", 123.45);
+    m_PropertyList->SetBoolProperty("visibility", true);
+    m_PropertyList->SetStringProperty("nameXY", "propertyName");
+    m_BaseDataImpl->SetPropertyList(m_PropertyList);
+
+    CPPUNIT_ASSERT_MESSAGE("Check if base property list is set correctly!",
+                           m_BaseDataImpl->GetPropertyList() == m_PropertyList);
+  }
+
+  void BasePorpertyIsSetInPropertyList_Success()
+  {
+    m_PropertyList->SetFloatProperty("floatProperty1", 123.45);
+    m_PropertyList->SetBoolProperty("visibility", true);
+    m_PropertyList->SetStringProperty("nameXY", "propertyName");
+    m_BaseDataImpl->SetPropertyList(m_PropertyList);
+    bool value = false;
+    CPPUNIT_ASSERT_MESSAGE("Check if base property is set correctly in the property list!",
+                           m_BaseDataImpl->GetPropertyList()->GetBoolProperty("visibility", value) == true);
+  }
+
+  void UpdateOutputInformationOfBaseData_Failure()
+  {
+    // test method UpdateOutputInformation()
+    m_BaseDataImpl->UpdateOutputInformation();
+    m_Geo2->Initialize(2);
+    m_Geo2.GetPointer();
+    CPPUNIT_ASSERT_MESSAGE("TimeGeometry update!", m_BaseDataImpl->GetUpdatedTimeGeometry() != m_Geo2);
+  }
+
+  void CopyingInformationOfBaseData_Failure()
+  {
+    // Test method CopyInformation()
+    mitk::BaseDataTestImplementation::Pointer newBaseData = mitk::BaseDataTestImplementation::New();
+    newBaseData->CopyInformation(m_BaseDataImpl);
+    CPPUNIT_ASSERT_MESSAGE("Check copying of Basedata Data Object!",
+                           newBaseData->GetTimeGeometry()->CountTimeSteps() != 5);
+  }
+};
+MITK_TEST_SUITE_REGISTRATION(mitkBaseData)

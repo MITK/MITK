@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #include <sstream>
@@ -43,13 +39,13 @@ int main(int argc, char* argv[])
   parser.setTitle("Simple Random Forest Classifier");
   parser.setCategory("Classification");
   parser.setDescription("Learns and predicts classes");
-  parser.setContributor("MBI");
+  parser.setContributor("German Cancer Research Center (DKFZ)");
 
   parser.setArgumentPrefix("--", "-");
   // Add command line argument names
   parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Show options");
-  parser.addArgument("loadFile", "l", mitkCommandLineParser::InputFile,
-                     "DataCollection File");
+  parser.addArgument("loadFile", "l", mitkCommandLineParser::File,
+                     "DataCollection File", "", us::Any(), true, false, false, mitkCommandLineParser::Input);
   parser.addArgument(
         "colIds", "c", mitkCommandLineParser::String,
         "Patient Identifiers from DataCollection used for training");
@@ -65,8 +61,8 @@ int main(int argc, char* argv[])
                      "number of trees");
   parser.addArgument("configName", "n", mitkCommandLineParser::String,
                      "human readable name for configuration");
-  parser.addArgument("output", "o", mitkCommandLineParser::OutputDirectory,
-                     "output folder for results");
+  parser.addArgument("output", "o", mitkCommandLineParser::Directory,
+                     "output folder for results", "", us::Any(), true, false, false, mitkCommandLineParser::Input);
 
   parser.addArgument("classmap", "m", mitkCommandLineParser::String,
                      "name of class that is to be learnt");

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef ITKSTRUCTURETENSOREIGENVALUEIMAGEFILTER_H
 #define ITKSTRUCTURETENSOREIGENVALUEIMAGEFILTER_H
@@ -39,22 +35,24 @@ namespace itk
 
     void SetImageMask(TMaskImageType * maskimage);
 
-    itkSetMacro(InnerScale,double)
-      itkGetMacro(InnerScale,double)
+    itkSetMacro(InnerScale,double);
 
-      itkSetMacro(OuterScale,double)
-      itkGetMacro(OuterScale,double)
+    itkGetMacro(InnerScale,double);
+
+    itkSetMacro(OuterScale,double);
+
+    itkGetMacro(OuterScale,double);
 
   private:
 
     typename TMaskImageType::Pointer m_ImageMask;
     double m_InnerScale, m_OuterScale;
 
-    void GenerateData();
-    void GenerateOutputInformation();
+    void GenerateData() override;
+    void GenerateOutputInformation() override;
 
     StructureTensorEigenvalueImageFilter();
-    virtual ~StructureTensorEigenvalueImageFilter();
+    ~StructureTensorEigenvalueImageFilter() override;
   };
 }
 

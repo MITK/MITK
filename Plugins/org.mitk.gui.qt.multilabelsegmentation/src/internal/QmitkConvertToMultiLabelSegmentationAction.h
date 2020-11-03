@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 #ifndef QMITK_ConvertToMultiLabelSegmentation_H
 #define QMITK_ConvertToMultiLabelSegmentation_H
 
@@ -32,14 +28,14 @@ class MITK_QT_SEGMENTATION QmitkConvertToMultiLabelSegmentationAction : public Q
 public:
 
   QmitkConvertToMultiLabelSegmentationAction();
-  virtual ~QmitkConvertToMultiLabelSegmentationAction();
+  ~QmitkConvertToMultiLabelSegmentationAction() override;
 
   //interface methods
-  virtual void Run( const QList<mitk::DataNode::Pointer>& selectedNodes );
-  virtual void SetDataStorage(mitk::DataStorage* dataStorage);
-  virtual void SetFunctionality(berry::QtViewPart* functionality);
-  virtual void SetSmoothed(bool smoothed);
-  virtual void SetDecimated(bool decimated);
+  void Run( const QList<mitk::DataNode::Pointer>& selectedNodes ) override;
+  void SetDataStorage(mitk::DataStorage* dataStorage) override;
+  void SetFunctionality(berry::QtViewPart* functionality) override;
+  void SetSmoothed(bool smoothed) override;
+  void SetDecimated(bool decimated) override;
 
 private:
 

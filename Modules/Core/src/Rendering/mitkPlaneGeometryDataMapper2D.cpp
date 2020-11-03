@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkPlaneGeometryDataMapper2D.h"
 
@@ -655,7 +651,7 @@ void mitk::PlaneGeometryDataMapper2D::SetDefaultProperties(mitk::DataNode *node,
                                                            mitk::BaseRenderer *renderer,
                                                            bool overwrite)
 {
-  mitk::IPropertyAliases *aliases = mitk::CoreServices::GetPropertyAliases();
+  mitk::CoreServicePointer<mitk::IPropertyAliases> aliases(mitk::CoreServices::GetPropertyAliases());
   node->AddProperty("Line width", mitk::FloatProperty::New(1), renderer, overwrite);
   aliases->AddAlias("line width", "Crosshair.Line Width", "");
   node->AddProperty("Crosshair.Gap Size", mitk::IntProperty::New(32), renderer, overwrite);

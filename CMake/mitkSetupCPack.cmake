@@ -40,7 +40,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES Windows)
     execute_process(COMMAND ${vswhere} -latest -property installationPath
       OUTPUT_VARIABLE installationPath
       OUTPUT_STRIP_TRAILING_WHITESPACE)
-    file(TO_CMAKE_PATH ${installationPath} installationPath)
+    file(TO_CMAKE_PATH "${installationPath}" installationPath)
     set(redistPath "${installationPath}/VC/Redist/MSVC")
     file(GLOB redistPath "${installationPath}/VC/Redist/MSVC/*")
     list(LENGTH redistPath length)
@@ -87,13 +87,12 @@ endif()
 include(InstallRequiredSystemLibraries)
 
 set(CPACK_PACKAGE_NAME "MITK")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "MITK is a medical image processing tool")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "The Medical Imaging Interaction Toolkit")
 set(CPACK_PACKAGE_VENDOR "German Cancer Research Center (DKFZ)")
-set(CPACK_PACKAGE_DESCRIPTION_FILE "${MITK_SOURCE_DIR}/LICENSE.txt")
-set(CPACK_RESOURCE_FILE_LICENSE "${MITK_SOURCE_DIR}/LICENSE.txt")
+set(CPACK_PACKAGE_DESCRIPTION_FILE "${MITK_SOURCE_DIR}/LICENSE")
+set(CPACK_RESOURCE_FILE_LICENSE "${MITK_SOURCE_DIR}/LICENSE")
 
-set(CPACK_PACKAGE_VERSION_MAJOR ${MITK_REVISION_DESC})
-string(REPLACE " [local changes]" "-local_changes" CPACK_PACKAGE_VERSION_MAJOR ${CPACK_PACKAGE_VERSION_MAJOR})
+string(REPLACE "/" "_" CPACK_PACKAGE_VERSION_MAJOR "${MITK_REVISION_DESC}")
 
 # tell cpack to strip all debug symbols from all files
 set(CPACK_STRIP_FILES ON)

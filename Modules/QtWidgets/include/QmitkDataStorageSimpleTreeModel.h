@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical Image Computing.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QMITKDATASTORAGESIMPLETREEMODEL_H
 #define QMITKDATASTORAGESIMPLETREEMODEL_H
@@ -31,11 +27,11 @@ class QmitkDataStorageTreeModelInternalItem;
 *  This model can be used in conjunction with a 'QmitkDataStorageSelectionConnector'.
 *  This model is a "light" version of the classic QmitkDataStorgageTreeModel. The differences between both are the following:
 *  - This class currently does not support DragNDrop.
-*  - This class does not have the ability to change hirarchy or changes the layer property
-*of nodes. This was skipped on purpose, because that is not the job of the storage model.
-*  - If a tree item A is removed this class does not attach children of A to the parent
-*of A. Instead the complete tree representation is updated. This was changed on purpose
-*because otherwise the internal representation of the model would not reflect the data storage graph anymore.
+*  - This class does not have the ability to change hierarchy or changes the layer property of nodes.
+*    This was skipped on purpose, because that is not the job of the storage model.
+*  - If a tree item A is removed this class does not attach children of A to the parent of A.
+*    Instead the complete tree representation is updated. This was changed on purpose because otherwise the internal
+*    representation of the model would not reflect the data storage graph anymore.
 */
 class MITKQTWIDGETS_EXPORT QmitkDataStorageSimpleTreeModel : public QmitkAbstractDataStorageModel
 {
@@ -43,7 +39,7 @@ class MITKQTWIDGETS_EXPORT QmitkDataStorageSimpleTreeModel : public QmitkAbstrac
 
 public:
   QmitkDataStorageSimpleTreeModel(QObject *parent);
-  virtual ~QmitkDataStorageSimpleTreeModel();
+  ~QmitkDataStorageSimpleTreeModel() override;
 
   // override from 'QmitkAbstractDataStorageModel'
   /*
@@ -97,9 +93,9 @@ private:
 
   TreeItem *m_Root;
 
-  /**helper structure to check, if a tree item is realy part of the model.
+  /**helper structure to check, if a tree item is really part of the model.
   Prefered over iterating over the tree by hand because we can use std::find.*/
   std::list<const TreeItem*> m_TreeItems;
 };
 
-#endif // QmitkDataStorageSimpleTreeModel_H
+#endif // QMITKDATASTORAGESIMPLETREEMODEL_H

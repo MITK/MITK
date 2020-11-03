@@ -1,20 +1,21 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
+============================================================================*/
 
-Raw data from new mathplolib colormaps see:
+/*============================================================================
+
+Raw data from matplotlib colormaps:
 https://github.com/BIDS/colormap/blob/master/colormaps.py
-===================================================================*/
+
+============================================================================*/
 
 #ifndef _lut_Plasma_h_
 #define _lut_Plasma_h_
@@ -54,6 +55,6 @@ static const int Plasma[256][3] =
   { 253, 202, 38 },{ 253, 203, 38 },{ 252, 205, 37 },{ 252, 206, 37 },{ 252, 208, 37 },{ 252, 210, 37 },{ 251, 211, 36 },
   { 251, 213, 36 },{ 251, 215, 36 },{ 250, 216, 36 },{ 250, 218, 36 },{ 249, 220, 36 },{ 249, 221, 37 },{ 248, 223, 37 },
   { 248, 225, 37 },{ 247, 226, 37 },{ 247, 228, 37 },{ 246, 230, 38 },{ 246, 232, 38 },{ 245, 233, 38 },{ 245, 235, 39 },
-  { 244, 237, 39 },{ 243, 238, 39 },{ 243, 240, 39 },{ 242, 242, 39 },{ 241, 244, 38 },{ 241, 245, 37 },{ 240, 247, 36 },{ 240, 249, 33 } 
+  { 244, 237, 39 },{ 243, 238, 39 },{ 243, 240, 39 },{ 242, 242, 39 },{ 241, 244, 38 },{ 241, 245, 37 },{ 240, 247, 36 },{ 240, 249, 33 }
 };
 #endif

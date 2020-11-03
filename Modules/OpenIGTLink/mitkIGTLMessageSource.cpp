@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkIGTLMessageSource.h"
 #include "mitkUIDGenerator.h"
@@ -110,7 +106,7 @@ void mitk::IGTLMessageSource::RegisterAsMicroservice()
   // Define ServiceProps
   us::ServiceProperties props;
   mitk::UIDGenerator uidGen =
-      mitk::UIDGenerator ("org.mitk.services.IGTLMessageSource.id_", 16);
+      mitk::UIDGenerator ("org.mitk.services.IGTLMessageSource.id_");
   props[ US_PROPKEY_ID ] = uidGen.GetUID();
   props[ US_PROPKEY_DEVICENAME ] = m_Name;
   props[ US_PROPKEY_DEVICETYPE ] = m_Type;
@@ -120,7 +116,9 @@ void mitk::IGTLMessageSource::RegisterAsMicroservice()
 void mitk::IGTLMessageSource::UnRegisterMicroservice()
 {
   if (m_ServiceRegistration != nullptr)
-     m_ServiceRegistration.Unregister();
+  {
+    m_ServiceRegistration.Unregister();
+  }
   m_ServiceRegistration = 0;
 }
 

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef mitkMultiModalAffineDefaultRegistrationAlgorithm_h
 #define mitkMultiModalAffineDefaultRegistrationAlgorithm_h
@@ -29,7 +25,7 @@ namespace mitk
   /** \class MultiModalAffineDefaultRegistrationAlgorithm
   * Algorithm is used as default solution for multimodal affine problem statements in DIPP.
   * Uses 3 Resolution levels. By default initializes via image centers
-  */ 
+  */
   template <class TImageType>
   class MultiModalAffineDefaultRegistrationAlgorithm :
     public map::algorithm::boxed::ITKAffineMattesMIMultiResRegistrationAlgorithm<TImageType, TImageType, ::map::algorithm::mitkMultiModalAffineDefaultRegistrationAlgorithmUIDPolicy, SealedFixedInterpolatorPolicyMacro< ::itk::LinearInterpolateImageFunction<TImageType, map::core::continuous::ScalarType> >, map::algorithm::itk::NoComponentInitializationPolicy>

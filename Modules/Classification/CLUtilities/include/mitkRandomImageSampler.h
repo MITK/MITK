@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 #ifndef __mitkRandomImageSampler_h
 #define __mitkRandomImageSampler_h
 
@@ -39,9 +35,8 @@ namespace mitk
   public:
 
     mitkClassMacro( RandomImageSampler , ImageToImageFilter );
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
-
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
     itkSetMacro(SamplingMode, RandomImageSamplerMode);
     itkGetConstMacro(SamplingMode, RandomImageSamplerMode);
 
@@ -75,17 +70,17 @@ namespace mitk
     /*!
     \brief standard destructor
     */
-    ~RandomImageSampler();
+    ~RandomImageSampler() override;
     /*!
     \brief Method generating the output information of this filter (e.g. image dimension, image type, etc.).
     The interface ImageToImageFilter requires this implementation. Everything is taken from the input image.
     */
-    virtual void GenerateOutputInformation() override;
+    void GenerateOutputInformation() override;
     /*!
     \brief Method generating the output of this filter. Called in the updated process of the pipeline.
     This method generates the smoothed output image.
     */
-    virtual void GenerateData() override;
+    void GenerateData() override;
 
     /*!
     \brief Internal templated method calling the ITK bilteral filter. Here the actual filtering is performed.

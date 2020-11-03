@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 // STD
 #include <stack>
 
@@ -54,8 +50,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkStructureTensorEigenvalueImageFilter.h>
 #include <itkLineHistogramBasedMassImageFilter.h>
 #include <mitkHistogramGenerator.h>
-#include <mitkImageStatisticsHolder.h>
-#include <mitkImageStatisticsCalculator.h>
 
 #include <itkImageRegionConstIteratorWithIndex.h>
 #include <itkImageRegionConstIterator.h>
@@ -188,13 +182,6 @@ void ClassificationRegionGrow::OnInitializeSession(const mitk::DataNode *)
 
 void ClassificationRegionGrow::ProcessFeatureImages(const mitk::Image::Pointer & raw_image)
 {
-  typedef itk::Image<double,3> DoubleImageType;
-  typedef itk::Image<short,3> ShortImageType;
-  typedef itk::ConstNeighborhoodIterator<DoubleImageType> NeighborhoodType; // Neighborhood iterator to access image
-  typedef itk::Functor::NeighborhoodFirstOrderStatistics<NeighborhoodType, double> FunctorType;
-  typedef itk::NeighborhoodFunctorImageFilter<DoubleImageType, DoubleImageType, FunctorType> FOSFilerType;
-  typedef FOSFilerType::MaskImageType MaskImageType;
-
   // RAW
   if (m_Controls.UseIntensity->isChecked()) {
     m_FeatureImageVector.push_back(raw_image);
@@ -351,7 +338,7 @@ void ClassificationRegionGrow::DoAutomSegmentation()
   QmitkDataStorageComboBox * cb_maskimage = dynamic_cast<QmitkDataStorageComboBox *>(m_Controls.m_MaskImageLayout->itemAt(1)->widget());
   mitk::Image::Pointer raw_image;
   mitk::Image::Pointer mask_image;
-  if ((cb_image != NULL) || (cb_maskimage != NULL))
+  if ((cb_image != nullptr) || (cb_maskimage != nullptr))
   {
     raw_image = dynamic_cast<mitk::Image *>(cb_image->GetSelectedNode()->GetData());
     mask_image = dynamic_cast<mitk::Image *>(cb_maskimage->GetSelectedNode()->GetData());
@@ -421,9 +408,6 @@ void ClassificationRegionGrow::TrainClassifier(const mitk::Image::Pointer & raw_
 {
   typedef itk::Image<double, 3> DoubleImageType;
   typedef itk::Image<short, 3> ShortImageType;
-  typedef itk::ConstNeighborhoodIterator<DoubleImageType> NeighborhoodType; // Neighborhood iterator to access image
-  typedef itk::Functor::NeighborhoodFirstOrderStatistics<NeighborhoodType, double> FunctorType;
-  typedef itk::NeighborhoodFunctorImageFilter<DoubleImageType, DoubleImageType, FunctorType> FOSFilerType;
 
   DoubleImageType::Pointer input;
   ShortImageType::Pointer mask;
@@ -540,7 +524,7 @@ void ClassificationRegionGrow::PredictSegmentation(const mitk::Image::Pointer & 
   {
     auto currentLocation = m_SegmentedOrganLocations.back();
     m_SegmentedOrganLocations.pop_back();
-    std::size_t cValue = std::abs(mask->GetPixel(currentLocation));
+    std::size_t cValue = mask->GetPixel(currentLocation);
     resultSegmentation->SetPixel(currentLocation, cValue);
     usedLocation->SetPixel(currentLocation, 1000);
     while (listOfStacks.size() < cValue+1)

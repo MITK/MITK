@@ -1,5 +1,13 @@
-MITK_CREATE_MODULE(DEPENDS MitkDataTypesExt MitkLegacyGL
-                  )
+mitk_create_module(
+  DEPENDS MitkDataTypesExt MitkLegacyGL
+)
 
-add_subdirectory(test)
+if(TARGET ${MODULE_TARGET})
+  if(MITK_USE_OpenMP)
+    target_link_libraries(${MODULE_TARGET} PUBLIC OpenMP::OpenMP_CXX)
+  endif()
 
+  if(BUILD_TESTING)
+    add_subdirectory(test)
+  endif()
+endif()

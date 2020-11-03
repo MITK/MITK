@@ -1,30 +1,40 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkPythonService.h"
 #include <Python.h>
 #include <mitkIOUtil.h>
 #include <QFile>
 #include <QDir>
+
+#ifdef _MSC_VER
+#  pragma warning(push)
+#  pragma warning(disable: 5208)
+#endif
+
 #include <PythonQt.h>
+
+#ifdef _MSC_VER
+#  pragma warning(pop)
+#endif
+
 #include "PythonPath.h"
 #include <vtkPolyData.h>
 #include <mitkRenderingManager.h>
 #include <mitkImageReadAccessor.h>
 #include <mitkImageWriteAccessor.h>
+#include <QFileInfo>
+#include <QCoreApplication>
+#include <itksys/SystemTools.hxx>
 
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #include <numpy/arrayobject.h>
@@ -35,140 +45,84 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <dlfcn.h>
 #endif
 
-const QString mitk::PythonService::m_TmpDataFileName("temp_mitk_data_file");
-#ifdef USE_MITK_BUILTIN_PYTHON
-static char* pHome = nullptr;
-#endif
+typedef itksys::SystemTools ist;
 
 mitk::PythonService::PythonService()
-: m_ItkWrappingAvailable( true ), m_OpenCVWrappingAvailable( true ), m_VtkWrappingAvailable( true ), m_ErrorOccured( false )
+  : m_ItkWrappingAvailable( true )
+  , m_OpenCVWrappingAvailable( true )
+  , m_VtkWrappingAvailable( true )
+  , m_ErrorOccured( false )
 {
-  {
-    MITK_DEBUG << "will init python if necessary";
-  }
   bool pythonInitialized = static_cast<bool>( Py_IsInitialized() ); //m_PythonManager.isPythonInitialized() );
-  {
-    MITK_DEBUG << "pythonInitialized " << pythonInitialized;
-    MITK_DEBUG << "m_PythonManager.isPythonInitialized() " << m_PythonManager.isPythonInitialized();
-  }
 
   // due to strange static var behaviour on windows Py_IsInitialized() returns correct value while
   // m_PythonManager.isPythonInitialized() does not because it has been constructed and destructed again
-  if( !m_PythonManager.isPythonInitialized() )
+  if( !pythonInitialized )
   {
-    try
-    {
-      //TODO a better way to do this
+    MITK_INFO << "Initializing python service";
+    //TODO a better way to do this
 #ifndef WIN32
-#if defined (__APPLE__) || defined(MACOSX)
-      const char* library = "libpython${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}.dylib";
-#else
-      const char* library = "libpython${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}.so";
-#endif
-      dlerror();
-      if(dlopen(library, RTLD_NOW | RTLD_GLOBAL) == 0 )
-      {
-        mitkThrow() << "Python runtime could not be loaded: " << dlerror();
-      }
-#endif
-
-      std::string programPath = mitk::IOUtil::GetProgramPath();
-      QDir programmDir( QString( programPath.c_str() ).append("/Python") );
-      QString pythonCommand;
-
-      // TODO: Check this in the modernization branch with an installer
-      // Set the pythonpath variable depending if
-      // we have an installer or development environment
-      if ( programmDir.exists() ) {
-        // runtime directory used in installers
-        pythonCommand.append( QString("import site, sys\n") );
-        pythonCommand.append( QString("sys.path.append('')\n") );
-        pythonCommand.append( QString("sys.path.append('%1')\n").arg(programPath.c_str()) );
-        pythonCommand.append( QString("sys.path.append('%1/Python')").arg(programPath.c_str()) );
-        // development
-      } else {
-        pythonCommand.append( QString("import site, sys\n") );
-        pythonCommand.append( QString("sys.path.append('')\n") );
-        pythonCommand.append( QString("sys.path.append('%1')\n").arg(EXTERNAL_DIST_PACKAGES) );
-        pythonCommand.append( QString("\nsite.addsitedir('%1')").arg(EXTERNAL_SITE_PACKAGES) );
-      }
-
-      if( pythonInitialized )
-        m_PythonManager.setInitializationFlags(PythonQt::RedirectStdOut|PythonQt::PythonAlreadyInitialized);
-      else
-        m_PythonManager.setInitializationFlags(PythonQt::RedirectStdOut);
-
-      // set python home if own runtime is used
-#ifdef USE_MITK_BUILTIN_PYTHON
-      QString pythonHome;
-      if ( programmDir.exists() )
-        pythonHome.append(QString("%1/Python").arg(programPath.c_str()));
-      else
-        pythonHome.append(PYTHONHOME);
-
-      if(pHome) delete[] pHome;
-      pHome = new char[pythonHome.toStdString().length() + 1];
-
-      strcpy(pHome,pythonHome.toStdString().c_str());
-      Py_SetPythonHome(pHome);
-      MITK_DEBUG("PythonService") << "PythonHome: " << pHome;
-#endif
-
-      MITK_DEBUG("PythonService") << "initalizing python";
-
-      m_PythonManager.initialize();
-
-#ifdef USE_MITK_BUILTIN_PYTHON
-      PyObject* dict = PyDict_New();
-      // Import builtin modules
-      if (PyDict_GetItemString(dict, "__builtins__") == nullptr)
-      {
-        PyObject* builtinMod = PyImport_ImportModule("__builtin__");
-        if (builtinMod == nullptr ||
-            PyDict_SetItemString(dict, "__builtins__", builtinMod) != 0)
-        {
-          Py_DECREF(dict);
-          Py_XDECREF(dict);
-          return;
-        }
-        Py_DECREF(builtinMod);
-      }
-#endif
-
-      MITK_DEBUG("PythonService")<< "Python Search paths: " << Py_GetPath();
-      MITK_DEBUG("PythonService") << "python initalized";
-
-      //MITK_DEBUG("PythonService") << "registering python paths" << PYTHONPATH_COMMAND;
-      m_PythonManager.executeString( pythonCommand, ctkAbstractPythonManager::FileInput );
-    }
-    catch (...)
+    dlerror();
+    if(dlopen(PYTHON_LIBRARY, RTLD_NOW | RTLD_GLOBAL) == nullptr )
     {
-      MITK_DEBUG("PythonService") << "exception initalizing python";
+      mitkThrow() << "Python runtime could not be loaded: " << dlerror();
     }
+#endif
+
+    std::string programPath = QCoreApplication::applicationDirPath().toStdString() + "/";
+
+    QString pythonCommand;
+    pythonCommand.append( QString("import site, sys\n") );
+    pythonCommand.append( QString("import SimpleITK as sitk\n") );
+    pythonCommand.append( QString("import SimpleITK._SimpleITK as _SimpleITK\n") );
+    pythonCommand.append( QString("import numpy\n") );
+
+    pythonCommand.append( QString("sys.path.append('')\n") );
+    pythonCommand.append( QString("sys.path.append('%1')\n").arg(programPath.c_str()) );
+    pythonCommand.append( QString("sys.path.append('%1')\n").arg(EXTERNAL_DIST_PACKAGES) );
+    pythonCommand.append( QString("\nsite.addsitedir('%1')").arg(EXTERNAL_SITE_PACKAGES) );
+
+    if( pythonInitialized )
+      m_PythonManager.setInitializationFlags(PythonQt::RedirectStdOut|PythonQt::PythonAlreadyInitialized);
+    else
+      m_PythonManager.setInitializationFlags(PythonQt::RedirectStdOut);
+    m_PythonManager.initialize();
+
+    m_PythonManager.executeString( pythonCommand, ctkAbstractPythonManager::FileInput );
   }
 }
 
 mitk::PythonService::~PythonService()
 {
   MITK_DEBUG("mitk::PythonService") << "destructing PythonService";
+}
 
-#ifdef USE_MITK_BUILTIN_PYTHON
-  if(pHome)
-    delete[] pHome;
-#endif
+void mitk::PythonService::AddRelativeSearchDirs(std::vector< std::string > dirs)
+{
+  std::string programPath = QCoreApplication::applicationDirPath().toStdString() + "/";
+  std::string cwd = ist::GetCurrentWorkingDirectory() + "/";
+
+  for (auto dir : dirs)
+  {
+    m_PythonManager.executeString(QString("sys.path.append('%1')").arg((programPath + dir).c_str()), ctkAbstractPythonManager::SingleInput );
+    m_PythonManager.executeString(QString("sys.path.append('%1')").arg((cwd + dir).c_str()), ctkAbstractPythonManager::SingleInput );
+  }
+}
+
+void mitk::PythonService::AddAbsoluteSearchDirs(std::vector< std::string > dirs)
+{
+  for (auto dir : dirs)
+  {
+    m_PythonManager.executeString(QString("sys.path.append('%1')").arg(dir.c_str()), ctkAbstractPythonManager::SingleInput );
+  }
 }
 
 std::string mitk::PythonService::Execute(const std::string &stdpythonCommand, int commandType)
 {
   QString pythonCommand = QString::fromStdString(stdpythonCommand);
-  {
-    MITK_DEBUG("mitk::PythonService") << "pythonCommand = " << pythonCommand.toStdString();
-    MITK_DEBUG("mitk::PythonService") << "commandType = " << commandType;
-  }
-
   QVariant result;
-  bool commandIssued = true;
 
+  bool commandIssued = true;
   if(commandType == IPythonService::SINGLE_LINE_COMMAND )
     result = m_PythonManager.executeString(pythonCommand, ctkAbstractPythonManager::SingleInput );
   else if(commandType == IPythonService::MULTI_LINE_COMMAND )
@@ -189,7 +143,12 @@ std::string mitk::PythonService::Execute(const std::string &stdpythonCommand, in
 
 void mitk::PythonService::ExecuteScript( const std::string& pythonScript )
 {
-  m_PythonManager.executeFile(QString::fromStdString(pythonScript));
+  std::ifstream t(pythonScript.c_str());
+  std::string str((std::istreambuf_iterator<char>(t)),
+                  std::istreambuf_iterator<char>());
+  t.close();
+
+  m_PythonManager.executeString(QString::fromStdString(str));
 }
 
 std::vector<mitk::PythonVariable> mitk::PythonService::GetVariableStack() const
@@ -199,7 +158,7 @@ std::vector<mitk::PythonVariable> mitk::PythonService::GetVariableStack() const
   PyObject* dict = PyImport_GetModuleDict();
   PyObject* object = PyDict_GetItemString(dict, "__main__");
   PyObject* dirMain = PyObject_Dir(object);
-  PyObject* tempObject = 0;
+  PyObject* tempObject = nullptr;
   //PyObject* strTempObject = 0;
 
   if(dirMain)
@@ -213,22 +172,32 @@ std::vector<mitk::PythonVariable> mitk::PythonService::GetVariableStack() const
       tempObject = PyObject_GetAttrString( object, name.c_str() );
       attrType = tempObject->ob_type->tp_name;
 
-      //disabled due to strange errors, see T24085
-      //strTempObject = PyObject_Repr(tempObject);
-      //if(strTempObject && ( PyUnicode_Check(strTempObject) || PyString_Check(strTempObject) ) )
-      //  attrValue = PyString_AsString(strTempObject);
-      //else
-      //  attrValue = "";
+      if(tempObject && ( PyUnicode_Check(tempObject) || PyString_Check(tempObject) ) )
+        attrValue = PyString_AsString(tempObject);
+      else
+        attrValue = "";
 
       mitk::PythonVariable var;
       var.m_Name = name;
-      //var.m_Value = attrValue;
+      var.m_Value = attrValue;
       var.m_Type = attrType;
       list.push_back(var);
     }
   }
 
   return list;
+}
+
+std::string mitk::PythonService::GetVariable(const std::string& name) const
+{
+  std::vector<mitk::PythonVariable> allVars = this->GetVariableStack();
+  for(unsigned int i = 0; i< allVars.size(); i++)
+  {
+    if( allVars.at(i).m_Name == name )
+      return allVars.at(i).m_Value;
+  }
+
+  return "";
 }
 
 bool mitk::PythonService::DoesVariableExist(const std::string& name) const
@@ -268,13 +237,6 @@ void mitk::PythonService::NotifyObserver(const std::string &command)
   }
 }
 
-QString mitk::PythonService::GetTempDataFileName(const std::string& ext) const
-{
-  QString tmpFolder = QDir::tempPath();
-  QString fileName = tmpFolder + QDir::separator() + m_TmpDataFileName + QString::fromStdString(ext);
-  return fileName;
-}
-
 bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const std::string &stdvarName)
 {
   QString varName = QString::fromStdString( stdvarName );
@@ -283,7 +245,7 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
   int npy_nd = 1;
 
   // access python module
-  PyObject *pyMod = PyImport_AddModule((char*)"__main__");
+  PyObject *pyMod = PyImport_AddModule("__main__");
   // global dictionary
   PyObject *pyDict = PyModule_GetDict(pyMod);
   const mitk::Vector3D spacing = image->GetGeometry()->GetSpacing();
@@ -292,7 +254,7 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
   itk::ImageIOBase::IOPixelType ioPixelType = image->GetPixelType().GetPixelType();
   PyObject* npyArray = nullptr;
   mitk::ImageReadAccessor racc(image);
-  void* array = (void*) racc.GetData();
+  void* array = const_cast<void*>(racc.GetData());
 
   mitk::Vector3D xDirection;
   mitk::Vector3D yDirection;
@@ -372,9 +334,9 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
     }
   }
   else if ( ioPixelType == itk::ImageIOBase::VECTOR ||
-      ioPixelType == itk::ImageIOBase::RGB ||
-      ioPixelType == itk::ImageIOBase::RGBA
-  )
+            ioPixelType == itk::ImageIOBase::RGB ||
+            ioPixelType == itk::ImageIOBase::RGBA
+            )
   {
     if( pixelType.GetComponentType() == itk::ImageIOBase::DOUBLE ) {
       npy_type = NPY_DOUBLE;
@@ -419,8 +381,8 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
 
   // add temp array it to the python dictionary to access it in python code
   const int status = PyDict_SetItemString( pyDict,QString("%1_numpy_array")
-      .arg(varName).toStdString().c_str(),
-      npyArray );
+                                           .arg(varName).toStdString().c_str(),
+                                           npyArray );
 
 
   // sanity check
@@ -429,18 +391,18 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
 
 
   command.append( QString("%1 = sitk.Image(%2,sitk.%3,%4)\n").arg(varName)
-      .arg(dimensionString)
-      .arg(QString(sitk_type.c_str())).arg(QString::number(pixelType.GetNumberOfComponents())) );
+                  .arg(dimensionString)
+                  .arg(QString(sitk_type.c_str())).arg(QString::number(pixelType.GetNumberOfComponents())) );
   command.append( QString("%1.SetSpacing([%2,%3,%4])\n").arg(varName)
-      .arg(QString::number(spacing[0]))
+                  .arg(QString::number(spacing[0]))
       .arg(QString::number(spacing[1]))
       .arg(QString::number(spacing[2])) );
   command.append( QString("%1.SetOrigin([%2,%3,%4])\n").arg(varName)
-      .arg(QString::number(origin[0]))
+                  .arg(QString::number(origin[0]))
       .arg(QString::number(origin[1]))
       .arg(QString::number(origin[2])) );
   command.append( QString("%1.SetDirection([%2,%3,%4,%5,%6,%7,%8,%9,%10])\n").arg(varName)
-      .arg(QString::number(xDirection[0]))
+                  .arg(QString::number(xDirection[0]))
       .arg(QString::number(xDirection[1]))
       .arg(QString::number(xDirection[2]))
       .arg(QString::number(yDirection[0]))
@@ -449,7 +411,7 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
       .arg(QString::number(zDirection[0]))
       .arg(QString::number(zDirection[1]))
       .arg(QString::number(zDirection[2]))
-  );
+      );
   // directly access the cpp api from the lib
   command.append( QString("_SimpleITK._SetImageFromArray(%1_numpy_array,%1)\n").arg(varName) );
   command.append( QString("del %1_numpy_array").arg(varName) );
@@ -463,7 +425,7 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
 }
 
 
-mitk::PixelType DeterminePixelType(const std::string& pythonPixeltype, int nrComponents, int dimensions)
+mitk::PixelType DeterminePixelType(const std::string& pythonPixeltype, unsigned long nrComponents, int dimensions)
 {
   typedef itk::RGBPixel< unsigned char > UCRGBPixelType;
   typedef itk::RGBPixel< unsigned short > USRGBPixelType;
@@ -482,7 +444,7 @@ mitk::PixelType DeterminePixelType(const std::string& pythonPixeltype, int nrCom
   typedef itk::Image< FloatRGBAPixelType > FloatRGBAImageType;
   typedef itk::Image< DoubleRGBAPixelType > DoubleRGBAImageType;
 
-  mitk::PixelType pixelType = mitk::MakePixelType<char, char >(nrComponents);
+  auto pixelType = mitk::MakePixelType<char, char >(nrComponents);
 
   if (nrComponents == 1)
   {
@@ -565,7 +527,7 @@ mitk::Image::Pointer mitk::PythonService::CopySimpleItkImageFromPython(const std
 {
   double*ds = nullptr;
   // access python module
-  PyObject *pyMod = PyImport_AddModule((char*)"__main__");
+  PyObject *pyMod = PyImport_AddModule("__main__");
   // global dictionarry
   PyObject *pyDict = PyModule_GetDict(pyMod);
   mitk::Image::Pointer mitkImage = mitk::Image::New();
@@ -753,8 +715,8 @@ bool mitk::PythonService::CopyToPythonAsCvImage( mitk::Image* image, const std::
 
   // add temp array it to the python dictionary to access it in python code
   const int status = PyDict_SetItemString( pyDict,QString("%1_numpy_array")
-      .arg(varName).toStdString().c_str(),
-      npyArray );
+                                           .arg(varName).toStdString().c_str(),
+                                           npyArray );
   // sanity check
   if ( status != 0 )
     return false;
@@ -764,8 +726,8 @@ bool mitk::PythonService::CopyToPythonAsCvImage( mitk::Image* image, const std::
   //command.append( QString("  del %1\n").arg(varName));
   command.append( QString("%1_array_tmp=%1_numpy_array.copy()\n").arg(varName));
   command.append( QString("%1_array_tmp=%1_array_tmp.reshape(%2,%3,%4)\n").arg( varName,
-      QString::number(imgDim[1]),
-      QString::number(imgDim[0]),
+                                                                                QString::number(imgDim[1]),
+                  QString::number(imgDim[0]),
       QString::number(pixelType.GetNumberOfComponents())));
 
   command.append( QString("%1 = %1_array_tmp[:,...,::-1]\n").arg(varName));
@@ -817,7 +779,7 @@ mitk::Image::Pointer mitk::PythonService::CopyCvImageFromPython( const std::stri
   // get number of components
   unsigned int nr_Components = (unsigned int) d[2];
 
-  mitk::PixelType pixelType = DeterminePixelType(dtype, nr_Components, nr_dimensions);
+  auto pixelType = DeterminePixelType(dtype, nr_Components, nr_dimensions);
 
   mitkImage->Initialize(pixelType, nr_dimensions, dimensions);
   //mitkImage->SetChannel(py_data->data);
@@ -917,7 +879,7 @@ bool mitk::PythonService::IsSimpleItkPythonWrappingAvailable()
 {
   this->Execute( "import SimpleITK as sitk\n", IPythonService::SINGLE_LINE_COMMAND );
   // directly access cpp lib
-  this->Execute( "import _SimpleITK\n", IPythonService::SINGLE_LINE_COMMAND );
+  this->Execute( "import SimpleITK._SimpleITK as _SimpleITK\n", IPythonService::SINGLE_LINE_COMMAND );
   m_ItkWrappingAvailable = !this->PythonErrorOccured();
 
   // check for numpy

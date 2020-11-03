@@ -1,0 +1,20 @@
+/**
+\page org_mitk_views_radiomicsmaskprocessingview Mask Processing
+
+This view gives the option to process existing masks. Currently this means cleaning the mask to remove areas that are probably wrongly segmented. 
+
+The view expects two inputs. The first input (1) should be an image and the second input (2) a mask that corresponds to the given input. The mask needs to be a multi-label image. If the existing mask is not a multi-label image, it can be converted to such an image type by right-clicking on the corrsponding image in the "Data Manager" and selecting the point "Convert to Segmentation". 
+
+The algorithm expects that the mask and the image share the same geomentry, e.g. have the same spacing, size, and origin. It further works only on the first layer of the segmentation , e.g. it is expected that the image contains only the values 0 and 1, with 1 marking the voxels that are segmented. 
+
+There are two options to clean an existing mask. Either by defining a lower or upper limit or by removing the outlier. 
+
+If the intensity values corresponds to clear image values, as it is for example with CT, it might be possible to limit the segmentation to only fixed intensity range. This can be done by defining an lower or upper limit and pressing the "Clean Mask based on Intervall" button (4). All elements of the mask which cover voxels with images outside of the specified intervall will then be set to zero, i.e. removed from the mask. To specify the limit, the corresponding values needs to be specified in the corresponding input (3). The lower or upper limit will only be applied if they are enabled! It is possible to either apply only a lower limit, only a upper limit, or applying a lower and an upper limit at the same time. 
+
+The second option is to remove all voxels that are outside a three sigma interval from the mean value. The rational behind this is that those values are different from the other values and therefore might represent outliers. This option can be simply perfomed by pressing button "Remove outlier from Mask..." (5). 
+
+The resulting image from all options will be masks again. 
+
+\imageMacro{RadiomicsMaskProcessingView_01_Overview.png,"Overview of the Mask Processing View",1}
+
+*/

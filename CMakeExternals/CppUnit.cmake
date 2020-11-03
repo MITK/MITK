@@ -29,6 +29,7 @@ if(NOT DEFINED CppUnit_DIR)
        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_LIST_DIR}/${proj}config.h.cmake <SOURCE_DIR>/config/config.h.cmake
        COMMAND ${CMAKE_COMMAND} -Dproj=${proj} -Dproj_target:STRING=cppunit -P ${CMAKE_CURRENT_LIST_DIR}/GenerateDefaultCMakeBuildSystem.cmake
      CMAKE_GENERATOR ${gen}
+     CMAKE_GENERATOR_PLATFORM ${gen_platform}
      CMAKE_ARGS
        ${ep_common_args}
        ${additional_args}

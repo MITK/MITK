@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkOpenDicomEditorAction.h"
 
@@ -56,7 +52,7 @@ void QmitkOpenDicomEditorAction::init(berry::IWorkbenchWindow::Pointer window)
   m_Window = window;
   this->setParent(static_cast<QWidget*>(m_Window->GetShell()->GetControl()));
   this->setText("&DICOM");
-  this->setToolTip("Open dicom tool");
+  this->setToolTip("Open dicom browser");
 
   berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
 
@@ -76,6 +72,6 @@ void QmitkOpenDicomEditorAction::Run()
   }
 
   berry::IEditorInput::Pointer editorInput2(new berry::FileEditorInput(QString()));
-  m_Window->GetActivePage()->OpenEditor(editorInput2, "org.mitk.editors.dicomeditor");
+  m_Window->GetActivePage()->OpenEditor(editorInput2, "org.mitk.editors.dicombrowser");
 }
 

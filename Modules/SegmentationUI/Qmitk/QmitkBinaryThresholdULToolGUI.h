@@ -1,25 +1,23 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QmitkBinaryThresholdULToolGUI_h_Included
 #define QmitkBinaryThresholdULToolGUI_h_Included
 
 #include "QmitkToolGUI.h"
 #include "ctkRangeWidget.h"
+#include <qcheckbox.h>
 #include "mitkBinaryThresholdULTool.h"
+
 #include <MitkSegmentationUIExports.h>
 
 /**
@@ -36,9 +34,10 @@ class MITKSEGMENTATIONUI_EXPORT QmitkBinaryThresholdULToolGUI : public QmitkTool
 
 public:
   mitkClassMacro(QmitkBinaryThresholdULToolGUI, QmitkToolGUI);
-  itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+  itkFactorylessNewMacro(Self);
+  itkCloneMacro(Self);
 
-    void OnThresholdingIntervalBordersChanged(double lower, double upper, bool isFloat);
+  void OnThresholdingIntervalBordersChanged(double lower, double upper, bool isFloat);
   void OnThresholdingValuesChanged(mitk::ScalarType lower, mitk::ScalarType upper);
 
 signals:
@@ -57,7 +56,11 @@ protected:
   QmitkBinaryThresholdULToolGUI();
   ~QmitkBinaryThresholdULToolGUI() override;
 
+  void BusyStateChanged(bool) override;
+
   ctkRangeWidget *m_DoubleThresholdSlider;
+  QCheckBox* m_CheckProcessAll = nullptr;
+  QCheckBox* m_CheckCreateNew = nullptr;
 
   mitk::BinaryThresholdULTool::Pointer m_BinaryThresholdULTool;
 };

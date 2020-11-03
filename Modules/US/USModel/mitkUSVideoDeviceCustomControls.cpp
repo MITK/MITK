@@ -1,22 +1,18 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkUSVideoDeviceCustomControls.h"
 
-mitk::USVideoDeviceCustomControls::USVideoDeviceCustomControls(itk::SmartPointer<USVideoDevice> device)
+mitk::USVideoDeviceCustomControls::USVideoDeviceCustomControls(itk::SmartPointer<USDevice> device)
   : mitk::USAbstractControlInterface(device.GetPointer()), m_IsActive(false)
 {
   m_ImageSource = dynamic_cast<mitk::USImageVideoSource*>(m_Device->GetUSImageSource().GetPointer());
@@ -62,12 +58,11 @@ void mitk::USVideoDeviceCustomControls::SetCropArea(mitk::USImageVideoSource::US
 
 void mitk::USVideoDeviceCustomControls::SetNewDepth(double depth)
 {
-  mitk::USVideoDevice::Pointer device = dynamic_cast<mitk::USVideoDevice*>(m_Device.GetPointer());
-  if (device.IsNotNull())
+  if (m_Device.IsNotNull())
   {
-    if( device->GetCurrentProbe().IsNotNull() )
+    if( m_Device->GetCurrentProbe().IsNotNull() )
     {
-      device->GetCurrentProbe()->SetCurrentDepth(depth);
+      m_Device->GetCurrentProbe()->SetCurrentDepth(depth);
       MITK_INFO << "SetCurrentDepth of currentProbe: " << depth;
     }
   }
@@ -76,10 +71,9 @@ void mitk::USVideoDeviceCustomControls::SetNewDepth(double depth)
 
 void mitk::USVideoDeviceCustomControls::SetNewProbeIdentifier(std::string probename)
 {
-  mitk::USVideoDevice::Pointer device = dynamic_cast<mitk::USVideoDevice*>(m_Device.GetPointer());
-  if( device.IsNotNull() )
+  if( m_Device.IsNotNull() )
   {
-    device->SetCurrentProbe(probename);
+    m_Device->SetCurrentProbe(probename);
   }
   m_Device->ProbeChanged(probename);
 }
@@ -115,14 +109,12 @@ void mitk::USVideoDeviceCustomControls::UpdateProbeCropping(mitk::USImageVideoSo
 
 std::vector<mitk::USProbe::Pointer> mitk::USVideoDeviceCustomControls::GetProbes()
 {
-  mitk::USVideoDevice::Pointer device = dynamic_cast<mitk::USVideoDevice*>(m_Device.GetPointer());
-  return device->GetAllProbes();
+  return m_Device->GetAllProbes();
 }
 
 std::vector<int> mitk::USVideoDeviceCustomControls::GetDepthsForProbe(std::string name)
 {
-  mitk::USVideoDevice::Pointer device = dynamic_cast<mitk::USVideoDevice*>(m_Device.GetPointer());
-  mitk::USProbe::Pointer probe = device->GetProbeByName(name);
+  mitk::USProbe::Pointer probe = m_Device->GetProbeByName(name);
   std::map<int, mitk::Vector3D> depthsAndSpacings = probe->GetDepthsAndSpacing();
   std::vector<int> depths;
   for (std::map<int, mitk::Vector3D>::iterator it = depthsAndSpacings.begin(); it != depthsAndSpacings.end(); it++)
@@ -134,6 +126,5 @@ std::vector<int> mitk::USVideoDeviceCustomControls::GetDepthsForProbe(std::strin
 
 void mitk::USVideoDeviceCustomControls::SetDefaultProbeAsCurrentProbe()
 {
-  mitk::USVideoDevice::Pointer device = dynamic_cast<mitk::USVideoDevice*>(m_Device.GetPointer());
-  device->SetDefaultProbeAsCurrentProbe();
+  m_Device->SetDefaultProbeAsCurrentProbe();
 }

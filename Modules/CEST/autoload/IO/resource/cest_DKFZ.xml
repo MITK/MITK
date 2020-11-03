@@ -1,0 +1,11 @@
+<?xml version="1.0" standalone=no>
+<DICOMFileReader
+  label="DKFZ internal CEST image configuration"
+  description="Based on ClassicDICOMSeriesReader for 3D+t images"
+  class="ClassicDICOMSeriesReader"
+  version="2"
+  group3DnT="true"
+  fixTiltByShearing="true"
+  onlyCondenseSameSeries="false"
+  >
+</DICOMFileReader>

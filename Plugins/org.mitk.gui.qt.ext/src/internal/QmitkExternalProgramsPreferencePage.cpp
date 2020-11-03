@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <berryIPreferencesService.h>
 #include <berryPlatform.h>
@@ -72,15 +68,15 @@ void QmitkExternalProgramsPreferencePage::CreateQtControl(QWidget* parent)
 
 void QmitkExternalProgramsPreferencePage::OnFFmpegButtonClicked()
 {
-  QString filter = "ffmpeg/avconv executable ";
+  QString filter = "ffmpeg executable ";
 
 #if defined(WIN32)
-  filter += "(ffmpeg.exe avconv.exe)";
+  filter += "(ffmpeg.exe)";
 #else
-  filter += "(ffmpeg avconv)";
+  filter += "(ffmpeg)";
 #endif
 
-  QString ffmpegPath = QFileDialog::getOpenFileName(m_Control, "FFmpeg/Libav", "", filter);
+  QString ffmpegPath = QFileDialog::getOpenFileName(m_Control, "FFmpeg", "", filter);
 
   if (!ffmpegPath.isEmpty())
   {
@@ -101,7 +97,7 @@ void QmitkExternalProgramsPreferencePage::OnFFmpegProcessFinished(int exitCode, 
   {
     QString output = QTextCodec::codecForName("UTF-8")->toUnicode(m_FFmpegProcess->readAllStandardOutput());
 
-    if (output.startsWith("ffmpeg") || output.startsWith("avconv"))
+    if (output.startsWith("ffmpeg"))
     {
       m_Ui->ffmpegLineEdit->setText(m_FFmpegPath);
       return;

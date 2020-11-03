@@ -175,7 +175,7 @@ digraph event_observer {
 
 \subsection DataInteractionPage_ConfigurationSection Configuration
 In a lot of cases it is preferable to implement interactions independent of a specific event (e.g. left click with mouse), such that it is possible
-to easily change this. This is achieved through configuration of \link mitk::InteractioinEventHandler InteractionEventHandlers\endlink.
+to easily change this. This is achieved through configuration of \link mitk::InteractionEventHandler InteractionEventHandlers\endlink.
 This allows to change the behavior at runtime.
 The mitk::InteractionEventHandler class provides an interface to easily modify the user input that triggers an action by loading a different
 configuration. This allows to implement

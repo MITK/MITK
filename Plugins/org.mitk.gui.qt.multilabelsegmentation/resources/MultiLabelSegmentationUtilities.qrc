@@ -1,10 +1,11 @@
 <RCC>
-  <qresource prefix="/MultiLabelSegmentationUtilities">
-     <file>BooleanOperations_48x48.png</file>
-     <file>ImageMasking_48x48.png</file>
-     <file>MorphologicalOperations_48x48.png</file>
-     <file>SurfaceToImage_48x48.png</file>
-     <file>multilabelsegmentation_utilities.svg</file>
-     <file>CTKWidgets_48x48.png</file>
-  </qresource>
+    <qresource prefix="/MultiLabelSegmentationUtilities">
+        <file>BooleanOperations_48x48.png</file>
+        <file>ImageMasking_48x48.png</file>
+        <file>MorphologicalOperations_48x48.png</file>
+        <file>SurfaceToImage_48x48.png</file>
+        <file>multilabelsegmentation_utilities.svg</file>
+        <file>CTKWidgets_48x48.png</file>
+        <file>multilabelsegmentation.svg</file>
+    </qresource>
 </RCC>

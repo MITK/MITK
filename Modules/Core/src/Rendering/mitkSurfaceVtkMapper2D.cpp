@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkSurfaceVtkMapper2D.h"
 
@@ -385,7 +381,7 @@ void mitk::SurfaceVtkMapper2D::ApplyAllProperties(mitk::BaseRenderer *renderer)
 
 void mitk::SurfaceVtkMapper2D::SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer, bool overwrite)
 {
-  mitk::IPropertyAliases *aliases = mitk::CoreServices::GetPropertyAliases();
+  mitk::CoreServicePointer<mitk::IPropertyAliases> aliases(mitk::CoreServices::GetPropertyAliases());
   node->AddProperty("line width", FloatProperty::New(2.0f), renderer, overwrite);
   aliases->AddAlias("line width", "Surface.2D.Line Width", "Surface");
   node->AddProperty("scalar mode", VtkScalarModeProperty::New(), renderer, overwrite);

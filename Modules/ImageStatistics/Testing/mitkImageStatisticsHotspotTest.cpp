@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkImageStatisticsCalculator.h"
 #include "itkMultiGaussianImageSource.h"
@@ -453,9 +449,8 @@ struct mitkImageStatisticsHotspotTestClass
 
     Uses ImageStatisticsCalculator to find a hotspot in a defined ROI within the given image.
   */
-  static mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer CalculateStatistics(mitk::Image* image, const Parameters& testParameters,  unsigned int label)
+  static mitk::ImageStatisticsContainer::ImageStatisticsObject CalculateStatistics(mitk::Image* image, const Parameters& testParameters,  unsigned int label)
   {
-    mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer result;
     const unsigned int Dimension = 3;
     typedef itk::Image<unsigned short, Dimension> MaskImageType;
     MaskImageType::Pointer mask = MaskImageType::New();
@@ -554,9 +549,8 @@ struct mitkImageStatisticsHotspotTestClass
       }
       MITK_DEBUG << "Masking is set to hotspot only";
     }
-    result = statisticsCalculator->GetStatistics(0);
 
-    return result;
+    return statisticsCalculator->GetStatistics()->GetStatisticsForTimeStep(0);
   }
 
   static void ValidateStatisticsItem(const std::string& label, double testvalue, double reference, double tolerance)
@@ -590,14 +584,18 @@ struct mitkImageStatisticsHotspotTestClass
 
     Checks validness of all statistics aspects. Lets test fail if any aspect is not sufficiently equal.
   */
-  static void ValidateStatistics(const mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer hotspotStatistics, const Parameters& testParameters, unsigned int label)
+  static void ValidateStatistics(const mitk::ImageStatisticsContainer::ImageStatisticsObject hotspotStatistics, const Parameters& testParameters, unsigned int label)
   {
     // check all expected test result against actual results
     double eps = 0.25; // value above the largest tested difference
 
-    ValidateStatisticsItem("Hotspot mean", hotspotStatistics->GetMean(), testParameters.m_HotspotMean[label], eps);
-    ValidateStatisticsItem("Hotspot maximum", hotspotStatistics->GetMax(), testParameters.m_HotspotMax[label], eps);
-    ValidateStatisticsItem("Hotspot minimum", hotspotStatistics->GetMin(), testParameters.m_HotspotMin[label], eps);
+    auto mean = hotspotStatistics.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MEAN());
+    auto max = hotspotStatistics.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MAXIMUM());
+    auto min = hotspotStatistics.GetValueConverted<mitk::ImageStatisticsContainer::RealType>(mitk::ImageStatisticsConstants::MINIMUM());
+
+    ValidateStatisticsItem("Hotspot mean", mean, testParameters.m_HotspotMean[label], eps);
+    ValidateStatisticsItem("Hotspot maximum", max, testParameters.m_HotspotMax[label], eps);
+    ValidateStatisticsItem("Hotspot minimum", min, testParameters.m_HotspotMin[label], eps);
 
     vnl_vector<int> referenceHotspotCenterIndex; referenceHotspotCenterIndex.set_size(3);
     referenceHotspotCenterIndex[0] = testParameters.m_HotspotIndexX[label];
@@ -628,7 +626,7 @@ int mitkImageStatisticsHotspotTest(int argc, char* argv[])
 
       for(unsigned int label = 0; label < parameters.m_NumberOfLabels; ++label)
       {
-        mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer statistics = mitkImageStatisticsHotspotTestClass::CalculateStatistics(image, parameters, label);
+        mitk::ImageStatisticsContainer::ImageStatisticsObject statistics = mitkImageStatisticsHotspotTestClass::CalculateStatistics(image, parameters, label);
 
         mitkImageStatisticsHotspotTestClass::ValidateStatistics(statistics, parameters, label);
         std::cout << std::endl;

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkPAVolume.h"
 #include <mitkImageWriteAccessor.h>
@@ -20,8 +16,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mutex>
 
 mitk::pa::Volume::Volume(double* data,
-  unsigned int xDim, unsigned int yDim, unsigned int zDim)
+  unsigned int xDim, unsigned int yDim, unsigned int zDim, double spacing)
 {
+  MITK_INFO << "Initialized by data*";
   if (data == nullptr)
     mitkThrow() << "You may not initialize a mitk::Volume with a nullptr";
   m_InternalMitkImage = mitk::Image::New();
@@ -38,9 +35,39 @@ mitk::pa::Volume::Volume(double* data,
   m_InternalMitkImage->Initialize(pixelType, NUMBER_OF_SPATIAL_DIMENSIONS, dimensions);
   m_InternalMitkImage->SetImportVolume(data, Image::ImportMemoryManagementType::CopyMemory);
 
+  SetSpacing(spacing);
+
   m_FastAccessDataPointer = GetData();
 
   delete data;
+}
+
+mitk::pa::Volume::Volume(mitk::Image::Pointer image)
+{
+  MITK_INFO << "Initialized by mitk::Image";
+
+  if (image.IsNull())
+    mitkThrow() << "You may not initialize a mitk::Volume with a null reference to an mitk image";
+
+  unsigned int* dimensions = image->GetDimensions();
+  m_YDim = dimensions[0];
+  m_XDim = dimensions[1];
+  m_ZDim = dimensions[2];
+
+  m_InternalMitkImage = image;
+
+  m_FastAccessDataPointer = GetData();
+}
+
+double mitk::pa::Volume::GetSpacing()
+{
+  return m_InternalMitkImage->GetGeometry()->GetSpacing()[0];
+}
+
+void mitk::pa::Volume::SetSpacing(double spacing)
+{
+  const mitk::ScalarType spacingArray[]{ spacing, spacing, spacing };
+  m_InternalMitkImage->SetSpacing(spacingArray);
 }
 
 mitk::pa::Volume::~Volume()
@@ -48,9 +75,16 @@ mitk::pa::Volume::~Volume()
   m_InternalMitkImage = nullptr;
 }
 
-mitk::pa::Volume::Pointer mitk::pa::Volume::New(double* data, unsigned int xDim, unsigned int yDim, unsigned int zDim)
+mitk::pa::Volume::Pointer mitk::pa::Volume::New(double* data, unsigned int xDim, unsigned int yDim, unsigned int zDim, double spacing)
 {
-  mitk::pa::Volume::Pointer smartPtr = new mitk::pa::Volume(data, xDim, yDim, zDim);
+  mitk::pa::Volume::Pointer smartPtr = new mitk::pa::Volume(data, xDim, yDim, zDim, spacing);
+  smartPtr->UnRegister();
+  return smartPtr;
+}
+
+mitk::pa::Volume::Pointer mitk::pa::Volume::New(mitk::Image::Pointer image)
+{
+  mitk::pa::Volume::Pointer smartPtr = new mitk::pa::Volume(image);
   smartPtr->UnRegister();
   return smartPtr;
 }
@@ -66,7 +100,7 @@ mitk::pa::Volume::Pointer mitk::pa::Volume::DeepCopy()
   auto* data = new double[length];
   memcpy(data, GetData(), length * sizeof(double));
 
-  return mitk::pa::Volume::New(data, GetXDim(), GetYDim(), GetZDim());
+  return mitk::pa::Volume::New(data, GetXDim(), GetYDim(), GetZDim(), GetSpacing());
 }
 
 double mitk::pa::Volume::GetData(unsigned int x, unsigned int y, unsigned int z)
@@ -100,7 +134,7 @@ double* mitk::pa::Volume::GetData() const
   return (double*)imgRead.GetData();
 }
 
-int mitk::pa::Volume::GetIndex(unsigned int x, unsigned int y, unsigned int z)
+long long mitk::pa::Volume::GetIndex(unsigned int x, unsigned int y, unsigned int z)
 {
 #ifdef _DEBUG
 
@@ -111,5 +145,5 @@ int mitk::pa::Volume::GetIndex(unsigned int x, unsigned int y, unsigned int z)
   }
 
 #endif
-  return z * m_XDim * m_YDim + x * m_YDim + y;
+  return ((long long)z) * m_XDim * m_YDim + ((long long)x) * m_YDim + ((long long)y);
 }

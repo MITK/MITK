@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #ifndef MITKNAVIGATIONDATASOURCE_H_HEADER_INCLUDED_
@@ -20,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkProcessObject.h>
 #include "mitkNavigationData.h"
+#include <mitkNavigationTool.h>
+#include <mitkNavigationToolStorage.h>
 #include "mitkPropertyList.h"
 #include "MitkIGTExports.h"
 
@@ -68,6 +66,27 @@ namespace mitk {
     *\brief return the output with name navDataName of the filter
     */
     NavigationData* GetOutput(const std::string& navDataName);
+
+    /** @return Returns the metadata of the navigation tool at
+     *          the given idx. Returns an empty object if no
+     *          metadata is available.
+     */
+    NavigationTool::Pointer GetToolMetaData(DataObjectPointerArraySizeType idx);
+
+    /** @return Returns the metadata of the navigation tool with
+    *          the given name. Returns an empty object if no
+    *          metadata is available.
+    */
+    NavigationTool::Pointer GetToolMetaData(const std::string& navDataName);
+
+    /** @return Returns the metadata of all tools identified by the tool name.
+    *           There is no need to set the metadata of the tools, so not
+    *           every tool has metadata available. Returns an empty tool storage
+    *           if no metadata was set at all.*/
+    itkGetMacro(ToolMetaDataCollection, mitk::NavigationToolStorage::Pointer);
+
+    /** Sets the tool metadata as NavigationToolStorage object. */
+    itkSetMacro(ToolMetaDataCollection, mitk::NavigationToolStorage::Pointer);
 
     /**
     *\brief return the index of the output with name navDataName, -1 if no output with that name was found
@@ -175,6 +194,11 @@ namespace mitk {
     std::string m_Name;
 
     bool m_IsFrozen;
+
+    /** Holds the metadata of all tools identified by the tool name.
+     *  There is no need to set the metadata of the tools, so not
+     *  every tool has metadata available. */
+    NavigationToolStorage::Pointer m_ToolMetaDataCollection;
 
 
   private:

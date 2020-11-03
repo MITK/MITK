@@ -4,23 +4,85 @@ MITK_INSTALL(FILES
   "${MITK_SOURCE_DIR}/mitk.ico"
   "${MITK_SOURCE_DIR}/mitk.bmp")
 
+# Helper vars
+
+if(WIN32)
+  set(_prefix "")
+  set(_ext ".dll")
+elseif(UNIX)
+  set(_prefix "lib")
+  if(APPLE)
+    set(_ext ".dylib")
+  else()
+    set(_ext ".so")
+  endif()
+endif()
+
+# Install MITK executables including auto-load modules
+
+get_property(_mitk_executable_targets GLOBAL PROPERTY MITK_EXECUTABLE_TARGETS)
+if(_mitk_executable_targets)
+  get_property(_mitk_module_targets GLOBAL PROPERTY MITK_MODULE_TARGETS)
+  foreach(_mitk_module_target ${_mitk_module_targets})
+    if(TARGET ${_mitk_module_target})
+      get_target_property(_mitk_autoload_targets ${_mitk_module_target} MITK_AUTOLOAD_TARGETS)
+      if (_mitk_autoload_targets)
+        foreach(_mitk_autoload_target ${_mitk_autoload_targets})
+          get_target_property(_mitk_autoload_directory ${_mitk_autoload_target} MITK_AUTOLOAD_DIRECTORY)
+          if (_mitk_autoload_directory)
+            if(WIN32)
+              get_target_property(_target_location ${_mitk_autoload_target} RUNTIME_OUTPUT_DIRECTORY)
+            else()
+              get_target_property(_target_location ${_mitk_autoload_target} LIBRARY_OUTPUT_DIRECTORY)
+            endif()
+            if(NOT CMAKE_CFG_INTDIR STREQUAL ".")
+              set(_target_location "${_target_location}/Release")
+            endif()
+            set(_mitk_autoload_target_filename "${_prefix}${_mitk_autoload_target}${_ext}")
+            set(_mitk_autoload_target_filepath "${_target_location}/${_mitk_autoload_target_filename}")
+            set(_install_DESTINATION "${_mitk_autoload_directory}")
+            MITK_INSTALL(FILES ${_mitk_autoload_target_filepath})
+            if(UNIX AND NOT APPLE)
+              install(CODE "file(RPATH_REMOVE FILE \"\${CMAKE_INSTALL_PREFIX}/bin/${_mitk_autoload_directory}/${_mitk_autoload_target_filename}\")")
+            endif()
+          endif()
+        endforeach()
+      endif()
+    endif()
+  endforeach()
+
+  set(_install_DESTINATION "")
+
+  foreach(_mitk_executable_target ${_mitk_executable_targets})
+    get_target_property(_no_install ${_mitk_executable_target} NO_INSTALL)
+    if(_no_install)
+      continue()
+    endif()
+    MITK_INSTALL_TARGETS(EXECUTABLES ${_mitk_executable_target} GLOB_PLUGINS)
+    if(UNIX AND NOT APPLE)
+      install(PROGRAMS "${MITK_SOURCE_DIR}/CMake/RunInstalledApp.sh" DESTINATION "." RENAME ${_mitk_executable_target}.sh)
+    endif()
+  endforeach()
+endif()
+
+# Install PythonQt
+
+if(MITK_USE_Python3 AND PythonQt_DIR)
+  set(_python_qt_lib "${PythonQt_DIR}/")
+  if(WIN32)
+    set(_python_qt_lib "${_python_qt_lib}bin")
+  else()
+    set(_python_qt_lib "${_python_qt_lib}lib")
+  endif()
+  set(_python_qt_lib "${_python_qt_lib}/${_prefix}PythonQt${_ext}")
+  MITK_INSTALL(FILES ${_python_qt_lib})
+endif()
+
 # Install Qt plugins
 
 if(MITK_USE_Qt5)
   get_property(_qmake_location TARGET ${Qt5Core_QMAKE_EXECUTABLE} PROPERTY IMPORT_LOCATION)
   get_filename_component(_qmake_path ${_qmake_location} DIRECTORY)
-
-  if(WIN32)
-    set(_prefix "")
-    set(_ext ".dll")
-  elseif(UNIX)
-    set(_prefix "lib")
-    if(APPLE)
-      set(_ext ".dylib")
-    else()
-      set(_ext ".so")
-    endif()
-  endif()
 
   set(_install_DESTINATION "plugins/sqldrivers")
   MITK_INSTALL(FILES "${_qmake_path}/../plugins/sqldrivers/${_prefix}qsqlite${_ext}")
@@ -75,11 +137,25 @@ if(MITK_USE_Qt5)
       MITK_INSTALL(PROGRAMS "${_qmake_path}/../libexec/QtWebEngineProcess")
     endif()
 
-    MITK_INSTALL(DIRECTORY "${_qmake_path}/../resources")
+    # make sure resources and translations exist and try system location as well
+    if(EXISTS "${_qmake_path}/../resources")
+      MITK_INSTALL(DIRECTORY "${_qmake_path}/../resources")
+    elseif(EXISTS "/usr/share/qt5/resources")
+      MITK_INSTALL(DIRECTORY "/usr/share/qt5/resources")
+    else()
+      message(WARNING "No webengine resources found!")
+    endif()
 
     set(_install_DESTINATION "translations")
-    MITK_INSTALL(DIRECTORY "${_qmake_path}/../translations/qtwebengine_locales")
-  endif()
+    if(EXISTS "${_qmake_path}/../translations/qtwebengine_locales")
+      MITK_INSTALL(DIRECTORY "${_qmake_path}/../translations/qtwebengine_locales")
+    elseif(EXISTS "/usr/share/qt5/translations/qtwebengine_locales")
+      MITK_INSTALL(DIRECTORY "/usr/share/qt5/translations/qtwebengine_locales")
+    else()
+      message(WARNING "No webengine translations found!")
+    endif()
+
+   endif()
 endif()
 
 set(_install_DESTINATION "")
@@ -88,11 +164,6 @@ set(_install_DESTINATION "")
 if(MITK_USE_MatchPoint)
   MITK_INSTALL(DIRECTORY "${MITK_EXTERNAL_PROJECT_PREFIX}/bin/" FILES_MATCHING PATTERN "MapUtilities*")
   MITK_INSTALL(DIRECTORY "${MITK_EXTERNAL_PROJECT_PREFIX}/bin/" FILES_MATCHING PATTERN "MapAlgorithms*")
-endif()
-
-# Install SimpleITK binaries that are not auto-detected
-if(MITK_USE_SimpleITK)
-  MITK_INSTALL(DIRECTORY "${MITK_EXTERNAL_PROJECT_PREFIX}/bin/" FILES_MATCHING PATTERN "SimpleITK*")
 endif()
 
 # IMPORTANT: Restore default install destination! Do not edit this file beyond this line!

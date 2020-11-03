@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef GEOMETRY3D_H_HEADER_INCLUDED_C1EBD0AD
 #define GEOMETRY3D_H_HEADER_INCLUDED_C1EBD0AD
@@ -37,20 +33,21 @@ namespace mitk
   class MITKCORE_EXPORT Geometry3D : public BaseGeometry
   {
   public:
-    mitkClassMacro(Geometry3D, mitk::BaseGeometry)
+    mitkClassMacro(Geometry3D, mitk::BaseGeometry);
 
-      typedef itk::QuaternionRigidTransform<ScalarType> QuaternionTransformType;
+    typedef itk::QuaternionRigidTransform<ScalarType> QuaternionTransformType;
     typedef QuaternionTransformType::VnlQuaternionType VnlQuaternionType;
 
     /** Method for creation through the object factory. */
-    itkFactorylessNewMacro(Self) mitkNewMacro1Param(Self, const Self &)
+    itkFactorylessNewMacro(Self);
+    mitkNewMacro1Param(Self, const Self&);
 
-      itkCloneMacro(Self)
-      // itkGetConstReferenceMacro(TimeBounds, TimeBounds);
+    itkCloneMacro(Self);
+    // itkGetConstReferenceMacro(TimeBounds, TimeBounds);
 
-      // virtual void SetTimeBounds(const TimeBounds& timebounds);
+    // virtual void SetTimeBounds(const TimeBounds& timebounds);
 
-      protected : Geometry3D();
+  protected : Geometry3D();
     Geometry3D(const Geometry3D &);
 
     //##Documentation

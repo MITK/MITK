@@ -1,3 +1,42 @@
+/*============================================================================
+
+ Copyright (c) German Cancer Research Center (DKFZ)
+ All rights reserved.
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions are met:
+
+ - Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+ - Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+ - All advertising materials mentioning features or use of this software must
+   display the following acknowledgement:
+
+     "This product includes software developed by the German Cancer Research
+      Center (DKFZ)."
+
+ - Neither the name of the German Cancer Research Center (DKFZ) nor the names
+   of its contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
+
+   THIS SOFTWARE IS PROVIDED BY THE GERMAN CANCER RESEARCH CENTER (DKFZ) AND
+   CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+   BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+   FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE GERMAN
+   CANCER RESEARCH CENTER (DKFZ) OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+   INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+   SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+   OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+   DAMAGE.
+
+============================================================================*/
 
 /********************************************************************* /
 /   pic2seq                                                            /
@@ -29,10 +68,9 @@
 /                                                                      /
 /                                                                      /
 /                                                                      /
-/   COPYRIGHT (c) 1992 by DKFZ (Dept. MBI) Heidelberg, FRG             /
 /**********************************************************************/
-static char *what[] = { 
-	"@(#)seqtopic \t06/92\tDKFZ (Dept. MBI)\t08.06.1992",
+static char *what[] = {
+	"@(#)seqtopic \t06/92\tGerman Cancer Research Center (DKFZ)\t08.06.1992",
 };
 /*   standard include files   */
 #include <stdio.h>
@@ -53,9 +91,9 @@ typedef char Bool;
 #endif
 
 void main( int argc, char *argv[] )
-{ 
+{
 	int i;
-	
+
 	int n_infiles;
 	char **infile_names;
 
@@ -65,24 +103,24 @@ void main( int argc, char *argv[] )
 	Bool use_stdin;
 	Bool use_stdout;
 	Bool use_textfile;
-	
+
 	Bool append;
 	int soffset;
 	int aoffset;
-	
+
 	char outfile_name[FILENAME_MAX],
 		outfile_string[FILENAME_MAX];
-	
+
 	mitkIpPicDescriptor *pic = NULL,*header;
-	
-	
-	/*--------------- commandline scaning starts here -----------*/ 
+
+
+	/*--------------- commandline scaning starts here -----------*/
 	append = False;
 	use_stdin = True;
 	use_stdout = True;
 	scan_error = False;
 	use_textfile = False;
-	
+
 	aoffset = 0;
 	soffset = 0;
 
@@ -119,9 +157,9 @@ void main( int argc, char *argv[] )
 		}
 		n++;
     }
-	
+
 	if( scan_error )
-    { 
+    {
 		fprintf( stderr, "Usage:   %s -a -f outfile infiles \n", argv[0] );
 		fprintf( stderr, "  -a         appends the infiles to outfile\n" );
 		fprintf( stderr, "  -f         \"infiles\" is a text file containing the list of inputfiles\n" );
@@ -129,9 +167,9 @@ void main( int argc, char *argv[] )
 		fprintf( stderr, "  infiles    a list of inputfiles\n" );
 		exit( -1 );
     }
-	
+
 	/*--------------- commandline scaning ends here -------------*/
-	
+
 	/* read text file, if specified*/
 	if(use_textfile)
 	{
@@ -184,9 +222,9 @@ void main( int argc, char *argv[] )
 		for(i=0;i<n_infiles;++i)
 			infile_names[i]=argv[aoffset+i+2];
 	}
-		
+
 	/* make filenames */
-	if( !use_stdout) 
+	if( !use_stdout)
 		if( !strchr(outfile_name, '.') )
 			strcat( outfile_name, ".seq" );
 	if( append )
@@ -205,14 +243,14 @@ void main( int argc, char *argv[] )
 	for( i=0; i<n_infiles; i++ )
 	{
 		printf( "%.3i %s\n", i, infile_names[i] );
-		
-		
+
+
 /*		pic = mitkIpPicGetSlice( infile_names[i],
 			pic,
 			1 );*/
 		pic = mitkIpPicGet( infile_names[i],
 			pic);
-		
+
 		if( pic == NULL )
 		{
 			fprintf( stderr, "sorry, can't open %s\n", infile_names[i] );
@@ -223,14 +261,14 @@ void main( int argc, char *argv[] )
 		if((i==0) && (!append))
 		{
 			pic->dim++; pic->n[pic->dim-1]=1;
-			mitkIpPicPut(argv[aoffset+1], pic);	
+			mitkIpPicPut(argv[aoffset+1], pic);
 		}
 		else
 			mitkIpPicPutSlice( argv[aoffset+1],
 				pic,
 				soffset + i + 1 );
-		
+
 	}
-	
+
 	exit( 0 );
 }

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef mitkGIFLocalIntensity_h
 #define mitkGIFLocalIntensity_h
@@ -51,31 +47,25 @@ namespace mitk
   {
   public:
     mitkClassMacro(GIFLocalIntensity, AbstractGlobalImageFeature);
-      itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
-      GIFLocalIntensity();
-
-    /**
-    * \brief Calculates the Cooccurence-Matrix based features for this class.
-    */
-    virtual FeatureListType CalculateFeatures(const Image::Pointer & image, const Image::Pointer &feature);
-
-    /**
-    * \brief Returns a list of the names of all features that are calculated from this class
-    */
-    virtual FeatureNameListType GetFeatureNames();
-
-    virtual void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList);
-    virtual void AddArguments(mitkCommandLineParser &parser);
-
-    virtual std::string GetCurrentFeatureEncoding() override;
+    GIFLocalIntensity();
 
     itkGetConstMacro(Range, double);
     itkSetMacro(Range, double);
 
-  private:
+    FeatureListType CalculateFeatures(const Image* image, const Image* mask, const Image* maskNoNAN) override;
+    using Superclass::CalculateFeatures;
 
+    void AddArguments(mitkCommandLineParser& parser) const override;
+
+  protected:
+    std::string GenerateLegacyFeatureEncoding(const FeatureID& id) const override;
+    FeatureListType DoCalculateFeatures(const Image* image, const Image* mask) override;
+    void ConfigureSettingsByParameters(const ParametersType& parameters) override;
+
+  private:
     double m_Range;
   };
 }

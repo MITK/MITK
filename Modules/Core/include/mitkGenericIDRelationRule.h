@@ -1,28 +1,19 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef mitkGenericIDRelationRule_h
 #define mitkGenericIDRelationRule_h
 
 #include "mitkPropertyRelationRuleBase.h"
-
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4251)
-#endif
 
 namespace mitk
 {
@@ -54,6 +45,8 @@ namespace mitk
     /** Returns an ID string that identifies the rule class */
     RuleIDType GetRuleID() const override;
 
+    bool IsAbstract() const override;
+
     /** Returns a human readable string that can be used to describe the rule. Does not need to be unique.*/
     std::string GetDisplayName() const override;
 
@@ -63,6 +56,9 @@ namespace mitk
     /** Returns a human readable string that can be used to describe the role of a destination in context of the rule
      * instance.*/
     std::string GetDestinationRoleName() const override;
+
+    /** Pass through to base implementation of PropertyRelationRuleBase. See PropertyRelationRuleBase::connect documentation for more information. */
+    RelationUIDType Connect(IPropertyOwner *source, const IPropertyProvider *destination) const;
 
   protected:
     GenericIDRelationRule(const RuleIDType &ruleIDTag);
@@ -76,49 +72,17 @@ namespace mitk
     using InstanceIDType = PropertyRelationRuleBase::InstanceIDType;
     using InstanceIDVectorType = PropertyRelationRuleBase::InstanceIDVectorType;
 
-    /** Is called if a instance ID cannot be deduced on the ID-layer.
-    Implement this method to check which existing relation(s) as Connected_Data exists between
-    both passed instances. If the passed instances have no
-    explicit relation of type Connected_Data, an empty vector will be returned.
-    @remark Per definition of property relation rules only 0 or 1 instance should be found for one provider
-    pair and rule. But the data layer may be ambiguous and there for muliple relation instances of the rule instance
-    could match. The implementation of this function should report all relation instances. The calling function
-    will take care of this violation.
-    @pre source must be a pointer to a valid IPropertyProvider instance.
-    @pre destination must be a pointer to a valid IPropertyProvider instance.*/
-    InstanceIDVectorType GetInstanceID_datalayer(const IPropertyProvider *source,
-                                                         const IPropertyProvider *destination) const override;
+    using DataRelationUIDVectorType = PropertyRelationRuleBase::DataRelationUIDVectorType;
+    DataRelationUIDVectorType GetRelationUIDs_DataLayer(const IPropertyProvider* source,
+      const IPropertyProvider* destination, const InstanceIDVectorType& instances_IDLayer) const override;
 
-    /** Is called by HasRelation() if no relation of type Connected_ID (GetInstanceID_IDLayer()) or
-    Connected_Data (GetInstanceID_datalayer()) is evident.
-      Implement this method to deduce if the passed instances have a relation of type
-      Implicit_Data.
-      @pre source must be a pointer to a valid IPropertyProvider instance.
-      @pre destination must be a pointer to a valid IPropertyProvider instance.
-      */
-    bool HasImplicitDataRelation(const IPropertyProvider *source,
-                                         const IPropertyProvider *destination) const override;
-
-    /**Is called by Connect() to ensure that source has correctly set properties to resemble
-    the relation on the data layer. This means that the method should set the properties that describe
-    and encode the relation on the data layer (data-layer-specific relation properties).
-    If the passed instance are already connected, the old settings should be
-    overwritten. Connect() will ensure that source and destination are valid pointers.
-    @param instanceID is the ID for the relation instance that should be connected. Existance of the relation instance
-    is ensured.
-    @pre source must be a valid instance.
-    @pre destination must be a valid instance.*/
     void Connect_datalayer(IPropertyOwner *source,
                                    const IPropertyProvider *destination,
                                    const InstanceIDType &instanceID) const override;
 
-    /**This method is called by Disconnect() to remove all properties of the relation from the source that
-    are set by Connect_datalayer().
-    @remark All RII-properties of this relation will removed by Disconnect() after this method call.
-    If the relationUID is not part of the source. Nothing will be changed. Disconnect() ensures that source is a valid
-    pointer if called.
-    @remark Disconnect() ensures that sourece is valid and only invokes if instance exists.*/
-    void Disconnect_datalayer(IPropertyOwner *source, const InstanceIDType &instanceID) const override;
+    void Disconnect_datalayer(IPropertyOwner *source, const RelationUIDType& relationUID) const override;
+
+    bool IsSupportedRuleID(const RuleIDType& ruleID) const override;
 
     itk::LightObject::Pointer InternalClone() const override;
 
@@ -130,9 +94,5 @@ namespace mitk
   };
 
 } // namespace mitk
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 #endif

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkIGTTutorialView.h"
 
@@ -183,7 +179,7 @@ void QmitkIGTTutorialView::OnStartIGT()
     //First we create a new filter for the visualization update.
     m_Visualizer = mitk::NavigationDataObjectVisualizationFilter::New();
     m_Visualizer->SetInput(0, m_Source->GetOutput());        //Then we connect to the pipeline.
-    m_Visualizer->SetRepresentationObject(0, cone);  //After that we have to assign the cone to the input
+    m_Visualizer->SetRepresentationObject(0, cone.GetPointer()); // After that we have to assign the cone to the input
 
     //Now this simple pipeline is ready, so we can start the tracking. Here again: We do not call the
     //StartTracking method from the tracker object itself. Instead we call this method from our source.

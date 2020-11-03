@@ -1,9 +1,9 @@
-/*=============================================================================
+/*============================================================================
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) German Cancer Research Center (DKFZ)
+  All rights reserved.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 
-=============================================================================*/
+============================================================================*/
 
 #include "usUtils_p.h"
 
@@ -79,7 +79,7 @@ void ServiceListeners::AddModuleListener(ModuleContext* mc, const ModuleListener
 {
   MutexLock lock(moduleListenerMapMutex);
   ModuleListenerMap::value_type::second_type& listeners = moduleListenerMap[mc];
-  if (std::find_if(listeners.begin(), listeners.end(), std::bind1st(ModuleListenerCompare(), std::make_pair(listener, data))) == listeners.end())
+  if (std::find_if(listeners.begin(), listeners.end(), std::bind(ModuleListenerCompare(), std::make_pair(listener, data), std::placeholders::_1)) == listeners.end())
   {
     listeners.push_back(std::make_pair(listener, data));
   }
@@ -88,7 +88,7 @@ void ServiceListeners::AddModuleListener(ModuleContext* mc, const ModuleListener
 void ServiceListeners::RemoveModuleListener(ModuleContext* mc, const ModuleListener& listener, void* data)
 {
   MutexLock lock(moduleListenerMapMutex);
-  moduleListenerMap[mc].remove_if(std::bind1st(ModuleListenerCompare(), std::make_pair(listener, data)));
+  moduleListenerMap[mc].remove_if(std::bind(ModuleListenerCompare(), std::make_pair(listener, data), std::placeholders::_1));
 }
 
 void ServiceListeners::ModuleChanged(const ModuleEvent& evt)

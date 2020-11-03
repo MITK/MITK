@@ -65,6 +65,7 @@ usFunctionGetResourceSource(TARGET ${_test_driver} OUT _srcs)
 add_executable(${_test_driver} ${_srcs} ${_additional_srcs})
 set_property(TARGET ${_test_driver} APPEND PROPERTY COMPILE_DEFINITIONS US_MODULE_NAME=main)
 set_property(TARGET ${_test_driver} PROPERTY US_MODULE_NAME main)
+set_property(TARGET ${_test_driver} PROPERTY FOLDER "${MITK_ROOT_FOLDER}/CppMicroServices/Tests")
 if(NOT US_BUILD_SHARED_LIBS)
   set_property(TARGET ${_test_driver} APPEND PROPERTY COMPILE_DEFINITIONS US_STATIC_MODULE)
   target_link_libraries(${_test_driver} ${_us_test_module_libs})
@@ -85,10 +86,6 @@ usFunctionEmbedResources(TARGET ${_test_driver}
 foreach(_test ${_tests})
   add_test(NAME ${_test} COMMAND ${_test_driver} ${_test})
 endforeach()
-
-if(US_TEST_LABELS)
-  set_tests_properties(${_tests} PROPERTIES LABELS "${US_TEST_LABELS}")
-endif()
 
 #-----------------------------------------------------------------------------
 # Add dependencies for shared libraries

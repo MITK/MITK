@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <stdio.h>
 #include "ipSegmentationP.h"
@@ -42,16 +38,16 @@ ipMITKSegmentationError (int error)
   }
   if (error > 0) {
     exit (-1);
-  }  
+  }
 }
 
 void
-ipMITKSegmentationCheckImage (mitkIpPicDescriptor* segmentation) 
+ipMITKSegmentationCheckImage (mitkIpPicDescriptor* segmentation)
 {
   if ((segmentation->type != ipMITKSegmentationTYPE_ID) || (segmentation->bpe != ipMITKSegmentationBPE)) {
     ipMITKSegmentationError (ipMITKSegmentationWRONG_TYPE);
   }
   if (!segmentation->data) {
     ipMITKSegmentationError (ipMITKSegmentationUNKNOWN_ERROR);
-  }  
+  }
 }

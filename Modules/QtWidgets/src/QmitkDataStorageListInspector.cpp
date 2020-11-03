@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical Image Computing.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <QmitkDataStorageListInspector.h>
 
@@ -27,20 +23,26 @@ QmitkDataStorageListInspector::QmitkDataStorageListInspector(QWidget* parent/* =
   m_Controls.view->setSelectionBehavior(QAbstractItemView::SelectRows);
   m_Controls.view->setAlternatingRowColors(true);
 
+  m_Overlay = new QmitkSimpleTextOverlayWidget(this);
+  m_Overlay->setVisible(false);
+  m_Overlay->SetOverlayText(QStringLiteral("<font class=\"normal\"><p style=\"text-align:center\">No suitable data available in data storage.</p></center></font>"));
+
   m_StorageModel = new QmitkDataStorageDefaultListModel(this);
 
   m_Controls.view->setModel(m_StorageModel);
+
+  connect(m_StorageModel, &QAbstractItemModel::modelReset, this, &QmitkDataStorageListInspector::OnModelReset);
 }
 
 QAbstractItemView* QmitkDataStorageListInspector::GetView()
 {
   return m_Controls.view;
-};
+}
 
 const QAbstractItemView* QmitkDataStorageListInspector::GetView() const
 {
   return m_Controls.view;
-};
+}
 
 void QmitkDataStorageListInspector::Initialize()
 {
@@ -58,4 +60,9 @@ void QmitkDataStorageListInspector::SetSelectionMode(SelectionMode mode)
 QmitkDataStorageListInspector::SelectionMode QmitkDataStorageListInspector::GetSelectionMode() const
 {
   return m_Controls.view->selectionMode();
-};
+}
+
+void QmitkDataStorageListInspector::OnModelReset()
+{
+  m_Overlay->setVisible(m_StorageModel->rowCount() == 0);
+}

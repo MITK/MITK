@@ -1,0 +1,7 @@
+See [Font Awsome 4] in Licenses/ICONS.md for:
+- history-solid.svg based on Font Awsome's history-solid.svg 
+- list-solid.svg based on Font Awsome's list-solid.svg
+- star-solid.svg based on Font Awsome's star-solid.svg
+- favorite_add.svg based on Font Awsome's star-solid.svg
+- favorite_remove.svg based on Font Awsome's star-solid.svg
+- hourglass-half-solid.svg based on Font Awsome's hourglass-half-solid.svg

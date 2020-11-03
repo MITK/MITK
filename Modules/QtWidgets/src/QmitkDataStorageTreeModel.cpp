@@ -1,18 +1,15 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
+============================================================================*/
 
-===================================================================*/
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateData.h>
 #include <mitkNodePredicateFirstLevel.h>
@@ -302,7 +299,7 @@ bool QmitkDataStorageTreeModel::dropMimeData(
           auto dataStorage = m_DataStorage.Lock();
 
           m_BlockDataStorageEvents = true;
-          mitk::DataNode *droppedNode = (*diIter)->GetDataNode();
+          mitk::DataNode::Pointer droppedNode = (*diIter)->GetDataNode();
           mitk::DataNode *dropOntoNode = dropItem->GetDataNode();
           dataStorage->Remove(droppedNode);
           dataStorage->Add(droppedNode, dropOntoNode);
@@ -340,7 +337,8 @@ bool QmitkDataStorageTreeModel::dropMimeData(
     mitk::DataNode *node = nullptr;
     foreach (node, dataNodeList)
     {
-      if (node && !m_DataStorage.IsExpired() && !m_DataStorage.Lock()->Exists(node))
+      auto datastorage = m_DataStorage.Lock();
+      if (node && datastorage.IsNotNull() && !datastorage->Exists(node))
       {
         m_DataStorage.Lock()->Add(node);
         mitk::BaseData::Pointer basedata = node->GetData();
@@ -395,11 +393,11 @@ QMimeData *QmitkDataStorageTreeModel::mimeDataFromModelIndexList(const QModelInd
     TreeItem *treeItem = static_cast<TreeItem *>(indexes.at(i).internalPointer());
 
     dsTreeItemPtrs << reinterpret_cast<quintptr>(treeItem);
-    dsDataNodePtrs << reinterpret_cast<quintptr>(treeItem->GetDataNode());
+    dsDataNodePtrs << reinterpret_cast<quintptr>(treeItem->GetDataNode().GetPointer());
 
     // --------------- deprecated -----------------
     unsigned long long treeItemAddress = reinterpret_cast<unsigned long long>(treeItem);
-    unsigned long long dataNodeAddress = reinterpret_cast<unsigned long long>(treeItem->GetDataNode());
+    unsigned long long dataNodeAddress = reinterpret_cast<unsigned long long>(treeItem->GetDataNode().GetPointer());
     QTextStream(&treeItemAddresses) << treeItemAddress;
     QTextStream(&dataNodeAddresses) << dataNodeAddress;
 
@@ -506,10 +504,9 @@ void QmitkDataStorageTreeModel::SetDataStorage(mitk::DataStorage *_DataStorage)
 {
   if (m_DataStorage != _DataStorage) // dont take the same again
   {
-    if (!m_DataStorage.IsExpired())
+    auto dataStorage = m_DataStorage.Lock();
+    if (dataStorage.IsNotNull())
     {
-      auto dataStorage = m_DataStorage.Lock();
-
       // remove Listener for the data storage itself
       dataStorage->RemoveObserver(m_DataStorageDeletedTag);
 
@@ -527,6 +524,8 @@ void QmitkDataStorageTreeModel::SetDataStorage(mitk::DataStorage *_DataStorage)
           this, &QmitkDataStorageTreeModel::RemoveNode));
     }
 
+    this->beginResetModel();
+
     // take over the new data storage
     m_DataStorage = _DataStorage;
 
@@ -536,13 +535,10 @@ void QmitkDataStorageTreeModel::SetDataStorage(mitk::DataStorage *_DataStorage)
     mitk::DataNode::Pointer rootDataNode = mitk::DataNode::New();
     rootDataNode->SetName("Data Manager");
     m_Root = new TreeItem(rootDataNode, nullptr);
-    this->beginResetModel();
-    this->endResetModel();
 
-    if (!m_DataStorage.IsExpired())
+    dataStorage = m_DataStorage.Lock();
+    if (dataStorage.IsNotNull())
     {
-      auto dataStorage = m_DataStorage.Lock();
-
       // add Listener for the data storage itself
       auto command = itk::SimpleMemberCommand<QmitkDataStorageTreeModel>::New();
       command->SetCallbackFunction(this, &QmitkDataStorageTreeModel::SetDataStorageDeleted);
@@ -560,11 +556,11 @@ void QmitkDataStorageTreeModel::SetDataStorage(mitk::DataStorage *_DataStorage)
         mitk::MessageDelegate1<QmitkDataStorageTreeModel, const mitk::DataNode *>(
           this, &QmitkDataStorageTreeModel::RemoveNode));
 
-      mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = dataStorage->GetSubset(m_Predicate);
-
       // finally add all nodes to the model
       this->Update();
     }
+
+    this->endResetModel();
   }
 }
 
@@ -666,14 +662,14 @@ void QmitkDataStorageTreeModel::RemoveNodeInternal(const mitk::DataNode *node)
   this->beginRemoveRows(parentIndex, treeItem->GetIndex(), treeItem->GetIndex());
 
   // remove node
-  std::vector<TreeItem *> children = treeItem->GetChildren();
+  std::vector<TreeItem*> children = treeItem->GetChildren();
   delete treeItem;
 
   // emit endRemoveRows event
   endRemoveRows();
 
   // move all children of deleted node into its parent
-  for (std::vector<TreeItem *>::iterator it = children.begin(); it != children.end(); it++)
+  for (std::vector<TreeItem*>::iterator it = children.begin(); it != children.end(); it++)
   {
     // emit beginInsertRows event
     beginInsertRows(parentIndex, parentTreeItem->GetChildCount(), parentTreeItem->GetChildCount());
@@ -857,16 +853,17 @@ QList<QmitkDataStorageTreeModel::TreeItem *> QmitkDataStorageTreeModel::ToTreeIt
 
 void QmitkDataStorageTreeModel::Update()
 {
-  if (!m_DataStorage.IsExpired())
+  auto datastorage = m_DataStorage.Lock();
+  if (datastorage.IsNotNull())
   {
-    mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = m_DataStorage.Lock()->GetAll();
+    mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = datastorage->GetAll();
 
     /// Regardless the value of this preference, the new nodes must not be inserted
     /// at the top now, but at the position according to their layer.
     bool newNodesWereToBePlacedOnTop = m_PlaceNewNodesOnTop;
     m_PlaceNewNodesOnTop = false;
 
-    for (const auto& node: *_NodeSet)
+    for (const auto& node : *_NodeSet)
     {
       this->AddNodeInternal(node);
     }

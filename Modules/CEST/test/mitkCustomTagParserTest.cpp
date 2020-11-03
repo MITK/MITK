@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 // Testing
 #include "mitkTestFixture.h"
@@ -23,6 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // MITK includes
 #include "mitkCustomTagParser.h"
+#include "mitkCESTPropertyHelper.h"
 #include <mitkTemporoSpatialStringProperty.h>
 
 //itksys
@@ -112,7 +109,7 @@ public:
     std::string jsonRevision = "";
     bool hasRevision = parsedPropertyList->GetStringProperty("CEST.Revision", revision);
     parsedPropertyList->GetStringProperty("CEST.Offset", offset);
-    parsedPropertyList->GetStringProperty("CEST.Offsets", offsets);
+    parsedPropertyList->GetStringProperty(mitk::CEST_PROPERTY_NAME_OFFSETS().c_str(), offsets);
     parsedPropertyList->GetStringProperty("CEST.measurements", measurements);
     parsedPropertyList->GetStringProperty("CEST.SamplingType", sampling);
     parsedPropertyList->GetStringProperty("CEST.revision_json", jsonRevision);
@@ -192,7 +189,7 @@ public:
     // we assume the test library will be in the same location as the MitkCEST library on windows
     // on linux the test driver should have a relative path of ../bin/
 #ifdef _WIN32
-    std::string dirname = m_PathToModule + "/CESTRevisionMapping";  
+    std::string dirname = m_PathToModule + "/CESTRevisionMapping";
 #else
     std::string dirname = m_PathToModule + "/../lib/CESTRevisionMapping";
 #endif
@@ -243,7 +240,7 @@ public:
     std::string jsonRevision = "";
     bool hasRevision = parsedPropertyList->GetStringProperty("CEST.Revision", revision);
     parsedPropertyList->GetStringProperty("CEST.Offset", offset);
-    parsedPropertyList->GetStringProperty("CEST.Offsets", offsets);
+    parsedPropertyList->GetStringProperty(mitk::CEST_PROPERTY_NAME_OFFSETS().c_str(), offsets);
     parsedPropertyList->GetStringProperty("CEST.measurements", measurements);
     parsedPropertyList->GetStringProperty("CEST.SamplingType", sampling);
     parsedPropertyList->GetStringProperty("CEST.revision_json", jsonRevision);
@@ -297,7 +294,7 @@ public:
     mitk::CustomTagParser tagParser(m_PathToModule);
     auto parsedPropertyList = tagParser.ParseDicomPropertyString(m_ValidCESTCustomTagAlternatingOffset);
     std::string offsets = "";
-    parsedPropertyList->GetStringProperty("CEST.Offsets", offsets);
+    parsedPropertyList->GetStringProperty(mitk::CEST_PROPERTY_NAME_OFFSETS().c_str(), offsets);
 
     bool offsetsMatch = (offsets == "-300 2 -2 1.86667 -1.86667 1.73333 -1.73333 1.6 -1.6 1.46667 -1.46667 1.33333 -1.33333 1.2 -1.2 1.06667 -1.06667 0.933333 -0.933333 0.8 -0.8 0.666667 -0.666667 0.533333 -0.533333 0.4 -0.4 0.266667 -0.266667 0.133333 -0.133333 0");
 
@@ -308,7 +305,7 @@ public:
     mitk::CustomTagParser tagParser(m_PathToModule);
     auto parsedPropertyList = tagParser.ParseDicomPropertyString(m_ValidCESTCustomTagSingleOffset);
     std::string offsets = "";
-    parsedPropertyList->GetStringProperty("CEST.Offsets", offsets);
+    parsedPropertyList->GetStringProperty(mitk::CEST_PROPERTY_NAME_OFFSETS().c_str(), offsets);
 
     bool offsetsMatch = (offsets == "-300 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2");
 
@@ -330,7 +327,7 @@ public:
     mitk::CustomTagParser tagParser(m_PathToModule);
     auto parsedPropertyList = tagParser.ParseDicomPropertyString(m_ValidCESTCustomTagListOffset);
     std::string offsets = "";
-    parsedPropertyList->GetStringProperty("CEST.Offsets", offsets);
+    parsedPropertyList->GetStringProperty(mitk::CEST_PROPERTY_NAME_OFFSETS().c_str(), offsets);
     std::string referenceString = "-300 -100 -50 -35 -25 -17 -12 -9.5 -8.25 -7 -6.1 -5.4 -4.7 -4 -3.3 -2.7 -2 -1.7 -1.5 -1.1 -0.9 -300 -0.6 -0.4 -0.2 0 0.2 0.4 0.6 0.95 1.1 1.25 1.4 1.55 1.7 1.85 2 2.15 2.3 2.45 2.6 2.75 2.9 3.05 -300 3.2 3.35 3.5 3.65 3.8 3.95 4.1 4.25 4.4 4.7 5.2 6 7 9 12 17 25 35 50 100 -300";
     bool offsetsMatch = (offsets == referenceString);
 

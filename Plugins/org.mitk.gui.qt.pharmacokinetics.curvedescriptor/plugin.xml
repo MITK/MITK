@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.pharmacokinetics.curvedescriptor"
+          name="Perfusion Curve Description Parameters View"
+		  category="Perfusion"
+          class="PerfusionCurveDescriptionParameterView"
+          icon="resources/icon.svg" />
+  </extension>
+
+</plugin>

@@ -1,0 +1,45 @@
+/**
+\page mitkBasicImageProcessingMiniAppsPortalPage MITK Basic Image Processing Mini Apps
+
+\tableofcontents
+
+The Basic Image Processing Mini Apps bundle the functionality that is commonly neeeded for the processing of medical images. As all other MiniApps, they follow the <a href="http://www.slicer.org/slicerWiki/index.php/Slicer3:Execution_Model_Documentation">Slicer Execution Model</a> in describing themselves via xml. You can simply obtain a description by calling the MiniApp without any parameter. If the MiniApp is calles with the option "--xml" a XML description of all possible parameter is added.
+
+\section bipmasec1 Description of Mini Apps
+
+\subsection bipmasub1 mitkFileConverter
+Allows to convert a file from one type to another file type, for example to convert an image, saved in the nifti format to an image saved in the .nrrd format. 
+
+\subsection bipmasub2 mitkForwardWavelet
+Calculates the forward wavelet transformation of an image. The output will consist of multiple images, which will be saved in the format <output>%id%<output-extension>, where <output> and <output-extension> are specified by the user and %id% is a consecutive number.
+
+\subsection bipmasub3 mitkImageAndValueArithmetic
+Mathematical operations with two operants, the individual voxels of the image and a specified floating point value. By default, the floating point value is the right operand.
+
+\subsection bipmasub4 mitkImageTypeCovnerter
+Convert the data fromat that is used to save a voxel of an image. 
+
+\subsection bipmasub5 mitkLaplacianOfGaussian
+Calculate the Laplacian of Gaussian of an image with the specified sigma value.
+
+\subsection bipmasub6 mitkMaskOutlierFiltering
+Can be used to clean an segmentation. The mean and standard deviation of the intensities which are masked is calculated and then all mask voxels are removed that cover image voxels which are not within a 3 sigma range. 
+
+\subsection bipmasub7 mitkMaskRangeBasedFiltering
+Removing all voxels from a mask that cover image voxels which are outside of a given range. The range can be either specified by a lower limit, a upper limit, or both at the same time. 
+
+\subsection bipmasub8 mitkMultiResolutionPyramid
+Calculate a Multi-Resolution Pyramid of the given image. The resolution is reduced by factor 2 for each step. 
+
+\subsection bipmasub9 mitkResampleImage
+Resample a mask to a new spacing
+
+\subsection bipmasub10 mitkResampleMask
+Similar to mitkResampleImage, but specificly tailored to resampling a mask. 
+
+\subsection bipmasub11 mitkSingleImageArithmetic 
+Applies single operand mathematical operations to each voxel of an image
+
+\subsection bipmasub12 mitkTwoImageArithmetic 
+Applied two operand mathematical operations to each voxels of two images.
+*/

@@ -1,24 +1,20 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 #ifndef IPSEGMENTATION_ERROR_H
 #define IPSEGMENTATION_ERROR_H
 
 enum {
   ipMITKSegmentationOK = 0     /*! No errors at all. */,
-  ipMITKSegmentationOUT_OF_MEMORY  /*! Not enough memory available. */,    
+  ipMITKSegmentationOUT_OF_MEMORY  /*! Not enough memory available. */,
   ipMITKSegmentationWRONG_TYPE  /*! Segmentation image has a wrong type. */,
   ipMITKSegmentationUNDO_DISABLED  /*! Undo cannot be performed. */,
   ipMITKSegmentationPIC_NULL    /*! PIC descriptor is null. */,
@@ -26,8 +22,8 @@ enum {
 };
 
 /*!
-\brief Prints an error message and exits 
-if an error has occurred. 
+\brief Prints an error message and exits
+if an error has occurred.
 @param error error code
 */
 void ipMITKSegmentationError (int error);

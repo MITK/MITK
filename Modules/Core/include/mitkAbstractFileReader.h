@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef AbstractFileReader_H_HEADER_INCLUDED_C1E7E521
 #define AbstractFileReader_H_HEADER_INCLUDED_C1E7E521
@@ -59,20 +55,11 @@ namespace mitk
     /**
      * @brief Reads a path or stream and creates a list of BaseData objects.
      *
-     * This method must be implemented for each specific reader. Call
-     * GetInputStream() first and check for a non-null stream to read from.
-     * If the input stream is \c nullptr, use GetInputLocation() to read from a local
-     * file-system path.
-     *
-     * If the reader cannot use streams directly, use GetLocalFileName() instead.
-     *
-     * @return The created BaseData objects.
-     * @throws mitk::Exception
-     *
-     * @see GetLocalFileName()
-     * @see IFileReader::Read()
+     * The default implementation of this method (1) calls DoRead()
+     * (Implement the specific reader operation there) and (2) it addes general
+     * meta information about the loading process.
      */
-    std::vector<itk::SmartPointer<BaseData>> Read() override = 0;
+    std::vector<itk::SmartPointer<BaseData>> Read() override;
 
     DataStorage::SetOfObjects::Pointer Read(mitk::DataStorage &ds) override;
 
@@ -151,6 +138,24 @@ namespace mitk
      * @see RegisterService
      */
     explicit AbstractFileReader(const CustomMimeType &mimeType, const std::string &description);
+
+    /** Method that should be implemented by derived classes and does the real loading.
+     * This method is called by Read().
+     * This method must be implemented for each specific reader. Call
+     * GetInputStream() first and check for a non-null stream to read from.
+     * If the input stream is \c nullptr, use GetInputLocation() to read from a local
+     * file-system path.
+     *
+     * If the reader cannot use streams directly, use GetLocalFileName() instead.
+     *
+     * @return The created BaseData objects.
+     * @throws mitk::Exception
+     *
+     * @see GetLocalFileName()
+     * @see IFileReader::Read()
+     */
+    virtual std::vector<itk::SmartPointer<BaseData>> DoRead() = 0;
+
 
     virtual us::ServiceProperties GetServiceProperties() const;
 

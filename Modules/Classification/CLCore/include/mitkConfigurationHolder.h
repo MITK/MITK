@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #ifndef mitkConfigurationHolder_h
@@ -71,13 +67,6 @@ namespace mitk
     ConfigurationHolder& At(std::string id);
 
   private:
-// this pragma ignores the following warning:
-// warning C4251: 'mitk::Particle::pos' : class   'ATL::CStringT'   needs to have dll-interface to be used   by clients of class 'Particle'
-#ifdef _MSC_VER
-  #pragma warning(push)
-  #pragma warning(disable: 4251)
-#endif
-
     bool m_BoolValue;
     unsigned int m_UIntValue;
     int m_IntValue;
@@ -87,10 +76,6 @@ namespace mitk
     std::map<std::string, ConfigurationHolder> m_GroupValue;
 
     ValueType m_ValueType;
-
-#ifdef _MSC_VER
- #pragma warning(pop)
-#endif
   };
 }
 

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKVESSEL_H
 #define MITKVESSEL_H
@@ -22,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPAInSilicoTissueVolume.h"
 #include "mitkPAVector.h"
 #include "mitkPAVesselProperties.h"
+#include "mitkPAVesselDrawer.h"
 
 #include <MitkPhotoacousticsLibExports.h>
 
@@ -34,14 +31,14 @@ namespace mitk {
     class MITKPHOTOACOUSTICSLIB_EXPORT Vessel : public itk::LightObject
     {
     public:
-      mitkClassMacroItkParent(Vessel, itk::LightObject)
-        mitkNewMacro1Param(Self, VesselProperties::Pointer)
+      mitkClassMacroItkParent(Vessel, itk::LightObject);
+      mitkNewMacro1Param(Self, VesselProperties::Pointer);
 
-        /**
-         * Callback function definition of a VesselMeanderStrategy
-         */
-        typedef void (VesselMeanderStrategy::*CalculateNewVesselPositionCallback)
-        (Vector::Pointer, Vector::Pointer, double, std::mt19937*);
+      /**
+        * Callback function definition of a VesselMeanderStrategy
+        */
+      typedef void (VesselMeanderStrategy::*CalculateNewVesselPositionCallback)
+      (Vector::Pointer, double, std::mt19937*);
 
       /**
        * @brief ExpandVessel makes this Vessel expand one step in its current direction.
@@ -82,13 +79,9 @@ namespace mitk {
 
     private:
 
-      const double MINIMUM_VESSEL_RADIUS = 1;
-      const double SCALING_FACTOR = 0.33;
+      const double MINIMUM_VESSEL_RADIUS = 0.1;
       const double NEW_RADIUS_MINIMUM_RELATIVE_SIZE = 0.6;
       const double NEW_RADIUS_MAXIMUM_RELATIVE_SIZE = 0.8;
-
-      void DrawVesselInVolume(Vector::Pointer toPosition, mitk::pa::InSilicoTissueVolume::Pointer volume);
-      VesselProperties::Pointer m_VesselProperties;
 
       VesselMeanderStrategy::Pointer m_VesselMeanderStrategy;
       bool m_Finished;
@@ -99,6 +92,10 @@ namespace mitk {
       std::uniform_real_distribution<> m_RadiusRangeDistribution;
 
       int GetSign(std::mt19937* rng);
+
+      VesselProperties::Pointer m_VesselProperties;
+
+      VesselDrawer::Pointer m_VesselDrawer;
     };
 
     /**

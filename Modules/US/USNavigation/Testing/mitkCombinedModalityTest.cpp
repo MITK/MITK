@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkUSCombinedModality.h"
 #include <mitkVirtualTrackingDevice.h>
@@ -54,7 +50,7 @@ public:
     source->SetTrackingDevice(tracker);
     source->Connect();
     source->StartTracking();
-    return mitk::USCombinedModality::New(usDevice.GetPointer(), source.GetPointer(), "MBI", "EchoTrack");
+    return mitk::USCombinedModality::New(usDevice.GetPointer(), source.GetPointer(), false);
   }
 
   static void TestInstantiation()
@@ -139,7 +135,7 @@ public:
     source->SetTrackingDevice(tracker);
     source->Connect();
     source->StartTracking();
-    mitk::USCombinedModality::Pointer modality = mitk::USCombinedModality::New(usDevice.GetPointer(), source.GetPointer(), "MBI", "EchoTrack");
+    mitk::USCombinedModality::Pointer modality = mitk::USCombinedModality::New(usDevice.GetPointer(), source.GetPointer(), false);
 
     MITK_TEST_CONDITION(source->GetOutput(0) == modality->GetNavigationDataSource()->GetOutput(0),
                         "Navigation data output of the Combined Modality should be the same as the source output as no filters are active.")

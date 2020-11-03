@@ -11,24 +11,24 @@ set(MODULE_TESTS
   # none
 
   ################## DISABLED TESTS #####################################################
-
-  #mitkSimulationBatchGeneratorTest.cpp #T25298
-  #mitkPhotoacousticIOTest.cpp #T25298
-  #mitkMCThreadHandlerTest.cpp #T25298
-  #mitkPhotoacousticVesselTreeTest.cpp #T25298
-  #mitkPhotoacousticVesselMeanderStrategyTest.cpp #T25298
-  #mitkMcxyzXmlTest.cpp #T25298
+  # mitkMCThreadHandlerTest.cpp #Timing issue on VMs
+  # mitkPhotoacousticIOTest.cpp #Not suitable for large scale testing as it performs IO actions.
   ################# RUNNING TESTS #######################################################
 
   mitkSlicedVolumeGeneratorTest.cpp
   mitkPhotoacousticTissueGeneratorTest.cpp
   mitkPhotoacousticVectorTest.cpp
   mitkPhotoacoustic3dVolumeTest.cpp
-  mitkPhotoacousticVolumeTest.cpp
-  mitkPhotoacousticVesselTest.cpp
+  # mitkPhotoacousticVolumeTest.cpp (See T27024)
+  mitkPhotoacousticVesselTreeTest.cpp
+  mitkMcxyzXmlTest.cpp
   mitkPhotoacousticComposedVolumeTest.cpp
   mitkPhotoacousticNoiseGeneratorTest.cpp
+  mitkSimulationBatchGeneratorTest.cpp
   mitkPropertyCalculatorTest.cpp
+  # mitkSpectralUnmixingTest.cpp (See T27024)
+  mitkPhotoacousticVesselMeanderStrategyTest.cpp
+  mitkPhotoacousticVesselTest.cpp
 )
 
 set(RESOURCE_FILES

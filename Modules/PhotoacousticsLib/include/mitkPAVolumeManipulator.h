@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKPHOTOACOUSTIC3DVOLUMEMANIPULATOR_H
 #define MITKPHOTOACOUSTIC3DVOLUMEMANIPULATOR_H
@@ -20,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCommon.h>
 #include <MitkPhotoacousticsLibExports.h>
 #include "mitkPAVolume.h"
+#include "mitkPAInSilicoTissueVolume.h"
 
 namespace mitk {
   namespace pa {
@@ -30,18 +27,29 @@ namespace mitk {
       /**
       * @brief ThresholdImage applies a binary threshold filter to this image.
       * @param threshold
+      * @param image
       */
-      static void ThresholdImage(mitk::pa::Volume::Pointer image, double threshold);
+      static void ThresholdImage(Volume::Pointer image, double threshold);
 
       /**
       * @brief Multiplies the image with a given factor
       * @param factor
+      * @param image
       */
-      static void MultiplyImage(mitk::pa::Volume::Pointer image, double factor);
+      static void MultiplyImage(Volume::Pointer image, double factor);
 
-      static void GaussianBlur3D(mitk::pa::Volume::Pointer paVolume, double sigma);
+      /**
+      * @brief applies a Gaussian blur to an image
+      * @param sigma
+      * @param paVolume
+      */
+      static void GaussianBlur3D(Volume::Pointer paVolume, double sigma);
 
-      static void Log10Image(mitk::pa::Volume::Pointer image);
+      static void Log10Image(Volume::Pointer image);
+
+      static void RescaleImage(InSilicoTissueVolume::Pointer image, double ratio);
+
+      static Volume::Pointer RescaleImage(Volume::Pointer image, double ratio, double sigma);
 
     private:
       VolumeManipulator();

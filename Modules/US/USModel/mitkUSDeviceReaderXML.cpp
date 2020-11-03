@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 // MITK
 #include "mitkUSDeviceReaderWriterConstants.h"
@@ -38,7 +34,7 @@ mitk::USDeviceReaderXML::~USDeviceReaderXML()
 {
 }
 
-mitk::USDeviceReaderXML::USVideoDeviceConfigData &mitk::USDeviceReaderXML::GetUSVideoDeviceConfigData()
+mitk::USDeviceReaderXML::USDeviceConfigData &mitk::USDeviceReaderXML::GetUSDeviceConfigData()
 {
   return m_DeviceConfig;
 }
@@ -55,7 +51,7 @@ mitk::USDeviceReaderXML* mitk::USDeviceReaderXML::Clone() const
 
 
 
-std::vector<itk::SmartPointer<mitk::BaseData>> mitk::USDeviceReaderXML::Read()
+std::vector<itk::SmartPointer<mitk::BaseData>> mitk::USDeviceReaderXML::DoRead()
 {
   MITK_WARN << "This method is not implemented. \
   Please use the method ReadUltrasoundDeviceConfiguration() instead.";
@@ -135,6 +131,9 @@ void mitk::USDeviceReaderXML::ExtractAttributeInformationOfUltrasoundDeviceTag(T
   ultrasoundTag->QueryStringAttribute(ATTR_MODEL, &m_DeviceConfig.model);
   ultrasoundTag->QueryStringAttribute(ATTR_COMMENT, &m_DeviceConfig.comment);
   ultrasoundTag->QueryIntAttribute(ATTR_IMAGESTREAMS, &m_DeviceConfig.numberOfImageStreams);
+  ultrasoundTag->QueryStringAttribute(ATTR_HOST, &m_DeviceConfig.host);
+  ultrasoundTag->QueryIntAttribute(ATTR_PORT, &m_DeviceConfig.port);
+  ultrasoundTag->QueryBoolAttribute(ATTR_SERVER, &m_DeviceConfig.server);
 }
 
 void mitk::USDeviceReaderXML::ExtractAttributeInformationOfGeneralSettingsTag(TiXmlElement *generalSettingsTag)

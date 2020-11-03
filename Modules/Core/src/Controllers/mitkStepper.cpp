@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkStepper.h"
 
@@ -167,6 +163,35 @@ void mitk::Stepper::Previous()
   {
     this->Increase();
   }
+}
+
+void mitk::Stepper::MoveSlice(int sliceDelta)
+{
+  int newPosition = this->GetPos() + sliceDelta;
+  // if auto repeat is on, increasing continues at the first slice if the last slice was reached and vice versa
+  int maxSlices = this->GetSteps();
+  if (m_AutoRepeat)
+  {
+    while (newPosition < 0)
+    {
+      newPosition += maxSlices;
+    }
+    while (newPosition >= maxSlices)
+    {
+      newPosition -= maxSlices;
+    }
+  }
+  else
+  {
+    // if the new slice is below 0 we still show slice 0
+    // due to the stepper using unsigned int we have to do this ourselves
+    if (newPosition < 1)
+    {
+      newPosition = 0;
+    }
+  }
+
+  this->SetPos(newPosition);
 }
 
 void mitk::Stepper::First()

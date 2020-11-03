@@ -1,63 +1,61 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
+============================================================================*/
 
-===================================================================*/
+#ifndef QMITKPOINTSETINTERACTIONVIEW_H
+#define QMITKPOINTSETINTERACTIONVIEW_H
 
-#if !defined(QmitkPointSetInteraction_H__INCLUDED)
-#define QmitkPointSetInteraction_H__INCLUDED
+#include "ui_QmitkPointSetInteractionViewControls.h"
 
-#include <berryISelectionListener.h>
-#include <QmitkAbstractView.h>
-#include <mitkILifecycleAwarePart.h>
-#include <mitkIRenderWindowPartListener.h>
-#include <mitkWeakPointer.h>
+// mitk core
 #include <mitkDataNode.h>
 
-namespace Ui
-{
-class QmitkPointSetInteractionControls;
-};
+// org mitk gui common plugin
+#include <mitkIRenderWindowPartListener.h>
 
-/*!
-\brief QmitkPointSetInteractionView
+// org mitk gui qt common plugin
+#include <QmitkAbstractView.h>
+
+/**
+* @brief
+*
+*
 */
 class QmitkPointSetInteractionView : public QmitkAbstractView, public mitk::IRenderWindowPartListener
 {
   Q_OBJECT
 
 public:
+
   static const std::string VIEW_ID;
 
-  QmitkPointSetInteractionView(QObject *parent=0);
-  virtual ~QmitkPointSetInteractionView();
+  QmitkPointSetInteractionView();
+  ~QmitkPointSetInteractionView() override;
 
+  void SetFocus() override;
 
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
 
-  ///
-  /// Sets the focus to an internal widget.
-  ///
-  virtual void SetFocus() override;
+private Q_SLOT:
 
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
-  virtual void NodeChanged(const mitk::DataNode* node) override;
-  virtual void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
-  virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
-protected slots:
+  void OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
   void OnAddPointSetClicked();
-protected:
-  Ui::QmitkPointSetInteractionControls * m_Controls;
-  mitk::WeakPointer<mitk::DataNode> m_SelectedPointSetNode;
+
+private:
+
+  void CreateQtPartControl(QWidget *parent) override;
+
+  Ui::QmitkPointSetInteractionViewControls* m_Controls;
+
 };
-#endif // !defined(QmitkPointSetInteraction_H__INCLUDED)
+
+#endif // QMITKPOINTSETINTERACTIONVIEW_H

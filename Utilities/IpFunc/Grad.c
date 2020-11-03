@@ -1,64 +1,58 @@
-/*****************************************************************************
+/*============================================================================
 
- Copyright (c) 1993-2000,  Div. Medical and Biological Informatics, 
- Deutsches Krebsforschungszentrum, Heidelberg, Germany
+ Copyright (c) German Cancer Research Center (DKFZ)
  All rights reserved.
 
- Redistribution and use in source and binary forms, with or without 
+ Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
 
  - Redistributions of source code must retain the above copyright notice, this
    list of conditions and the following disclaimer.
 
- - Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+ - Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
- - All advertising materials mentioning features or use of this software must 
-   display the following acknowledgement: 
-          
-     "This product includes software developed by the Div. Medical and 
-      Biological Informatics, Deutsches Krebsforschungszentrum, Heidelberg, 
-      Germany."
+ - All advertising materials mentioning features or use of this software must
+   display the following acknowledgement:
 
- - Neither the name of the Deutsches Krebsforschungszentrum nor the names of 
-   its contributors may be used to endorse or promote products derived from 
-   this software without specific prior written permission. 
+     "This product includes software developed by the German Cancer Research
+      Center (DKFZ)."
 
-   THIS SOFTWARE IS PROVIDED BY THE DIVISION MEDICAL AND BIOLOGICAL
-   INFORMATICS AND CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED
-   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-   OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-   IN NO EVENT SHALL THE DIVISION MEDICAL AND BIOLOGICAL INFORMATICS,
-   THE DEUTSCHES KREBSFORSCHUNGSZENTRUM OR CONTRIBUTORS BE LIABLE FOR 
-   ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-   DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE 
-   GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER 
-   IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
-   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN 
-   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ - Neither the name of the German Cancer Research Center (DKFZ) nor the names
+   of its contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
 
- Send comments and/or bug reports to:
-   mbi-software@dkfz-heidelberg.de
+   THIS SOFTWARE IS PROVIDED BY THE GERMAN CANCER RESEARCH CENTER (DKFZ) AND
+   CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+   BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+   FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE GERMAN
+   CANCER RESEARCH CENTER (DKFZ) OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+   INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+   SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+   OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+   DAMAGE.
 
-*****************************************************************************/
+============================================================================*/
 
 /**@file
- *  this function performs an absolute gradient to extract 
+ *  this function performs an absolute gradient to extract
  *  edges of an image
  */
 
-/** @brief performs an absolute gradient to extract 
+/** @brief performs an absolute gradient to extract
  *  edges of an image
  *
  *  @param pic_old    pointer to original image
  *  @param dim_mask    dimension of mask
- *  @param border   tells how the edge is transformed        
- *                     mitkIpFuncBorderOld:  original greyvalues        
+ *  @param border   tells how the edge is transformed
+ *                     mitkIpFuncBorderOld:  original greyvalues
  *                     mitkIpFuncBorderZero: edge is set to minimal greyvalue
  *
- *  @return  pointer to transformed iamge 
+ *  @return  pointer to transformed iamge
  *
  * AUTHOR & DATE
  */
@@ -73,7 +67,7 @@ mitkIpPicDescriptor *mitkIpFuncGrad ( mitkIpPicDescriptor *pic_old,
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
-  static char *what = { "@(#)mitkIpFuncGrad\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)mitkIpFuncGrad\t\tGerman Cancer Research Center (DKFZ)\t"__DATE__ };
 #endif
 
 
@@ -158,7 +152,7 @@ mitkIpPicDescriptor *mitkIpFuncGrad ( mitkIpPicDescriptor *pic_old,
 
 mitkIpPicDescriptor *mitkIpFuncGrad ( mitkIpPicDescriptor *pic_old,
                               mitkIpUInt4_t       dim_mask,
-                              mitkIpFuncFlagI_t   border ) 
+                              mitkIpFuncFlagI_t   border )
 {
   #include "gradient.h"
 
@@ -168,7 +162,7 @@ mitkIpPicDescriptor *mitkIpFuncGrad ( mitkIpPicDescriptor *pic_old,
   mitkIpUInt4_t       i, j;               /* loopindex                      */
   mitkIpUInt4_t       off_mask;           /* loopindex                      */
   mitkIpFuncMasc_t    *m;                 /* compressed mask                */
-  mitkIpInt4_t        offset;                 
+  mitkIpInt4_t        offset;
   mitkIpInt4_t        beg[_mitkIpPicNDIM];
   mitkIpInt4_t        end[_mitkIpPicNDIM];
   mitkIpInt4_t        ind[_mitkIpPicNDIM];
@@ -184,7 +178,7 @@ mitkIpPicDescriptor *mitkIpFuncGrad ( mitkIpPicDescriptor *pic_old,
        _mitkIpFuncSetErrno ( mitkIpFuncDIMMASC_ERROR );
        return ( mitkIpFuncERROR );
     }
-  if ( pic_old->dim < dim_mask ) 
+  if ( pic_old->dim < dim_mask )
     {
        _mitkIpFuncSetErrno ( mitkIpFuncDIMMASC_ERROR );
        return ( mitkIpFuncERROR );
@@ -192,14 +186,14 @@ mitkIpPicDescriptor *mitkIpFuncGrad ( mitkIpPicDescriptor *pic_old,
 
   /* create a new picture, copy the header, allocate memory             */
 
-  if ( border == mitkIpFuncBorderOld ) 
+  if ( border == mitkIpFuncBorderOld )
     pic_new = mitkIpPicClone ( pic_old );
   else if ( border == mitkIpFuncBorderZero )
-    { 
+    {
        pic_new = mitkIpPicCopyHeader ( pic_old, 0 );
        pic_new->data = calloc ( _mitkIpPicElements ( pic_new ), pic_new->bpe/8  );
     }
-  else 
+  else
     {
        _mitkIpFuncSetErrno ( mitkIpFuncFLAG_ERROR );
        return ( mitkIpFuncERROR );
@@ -220,7 +214,7 @@ mitkIpPicDescriptor *mitkIpFuncGrad ( mitkIpPicDescriptor *pic_old,
   /* initialisation of pic_mask                                         */
 
   pic_mask = mitkIpPicNew ();
-  if ( pic_mask == NULL ) 
+  if ( pic_mask == NULL )
     {
        mitkIpPicFree ( pic_new );
        _mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
@@ -234,13 +228,13 @@ mitkIpPicDescriptor *mitkIpFuncGrad ( mitkIpPicDescriptor *pic_old,
     pic_mask->n[i] = 3;
   pic_mask->n[dim_mask] = dim_mask;
 
-  if ( dim_mask == 4 ) 
-    pic_mask->data = mask4;      
-  else if ( dim_mask == 3 ) 
-    pic_mask->data = mask3;      
+  if ( dim_mask == 4 )
+    pic_mask->data = mask4;
+  else if ( dim_mask == 3 )
+    pic_mask->data = mask3;
   else if ( dim_mask == 2 )
-    pic_mask->data = mask2; 
-  else 
+    pic_mask->data = mask2;
+  else
     {
        pic_mask->data = NULL;
        mitkIpPicFree ( pic_new );
@@ -258,27 +252,27 @@ mitkIpPicDescriptor *mitkIpFuncGrad ( mitkIpPicDescriptor *pic_old,
 
   for ( i = 0; i < dim_mask; i++ )
     {
-       end[i] = pic_old->n[i] - pic_mask->n[i] / 2;        
+       end[i] = pic_old->n[i] - pic_mask->n[i] / 2;
        beg[i] = ( ( pic_mask->n[i] % 2 ) == 1 ) ?
-                ( pic_mask->n[i] / 2 ) : ( pic_mask->n[i] / 2 - 1 );        
+                ( pic_mask->n[i] / 2 ) : ( pic_mask->n[i] / 2 - 1 );
     }
   for ( i = dim_mask; i < _mitkIpPicNDIM; i++ )
     beg[i] = 0;
 
-  for ( i = dim_mask; i < pic_old->dim; i++ )        
-    end[i] = pic_old->n[i];        
-  for ( i = pic_old->dim; i < _mitkIpPicNDIM; i++ )        
+  for ( i = dim_mask; i < pic_old->dim; i++ )
+    end[i] = pic_old->n[i];
+  for ( i = pic_old->dim; i < _mitkIpPicNDIM; i++ )
     end[i] = beg[i] + 1;
 
-  size [0] = 1;                                                             
-  for ( i = 1; i < pic_old->dim; i++ )                                        
-    size[i] = size[i-1] * pic_old->n[i-1];                                  
+  size [0] = 1;
+  for ( i = 1; i < pic_old->dim; i++ )
+    size[i] = size[i-1] * pic_old->n[i-1];
 
 
   /* allocate mask-structure                                            */
 
   m = malloc ( sizeof ( mitkIpFuncMasc_t ) );
-  if ( m == NULL ) 
+  if ( m == NULL )
     {
        mitkIpPicFree ( pic_new );
        pic_mask->data = NULL;
@@ -287,7 +281,7 @@ mitkIpPicDescriptor *mitkIpFuncGrad ( mitkIpPicDescriptor *pic_old,
        return ( mitkIpFuncERROR );
     }
   m->off_vekt  = malloc ( _mitkIpPicElements( pic_mask ) * sizeof ( mitkIpInt4_t ) );
-  if ( m->off_vekt == NULL ) 
+  if ( m->off_vekt == NULL )
     {
        mitkIpPicFree ( pic_new );
        pic_mask->data = NULL;
@@ -341,7 +335,7 @@ mitkIpPicDescriptor *mitkIpFuncGrad ( mitkIpPicDescriptor *pic_old,
       sum = sum + fabs ( m->mask_vekt[i] );
       pos++;
     }
-  
+
   sum = sum /  ( 2 * dim_mask );
 
   mitkIpPicFORALL_6 ( GRAD, pic_old, pic_new, pic_mask, m, beg, end, dim_mask );
@@ -355,10 +349,10 @@ mitkIpPicDescriptor *mitkIpFuncGrad ( mitkIpPicDescriptor *pic_old,
   /* Copy Tags */
 
   mitkIpFuncCopyTags(pic_new, pic_old);
-  
-  
+
+
 
   return ( pic_new );
 }
-#endif                              
- 
+#endif
+

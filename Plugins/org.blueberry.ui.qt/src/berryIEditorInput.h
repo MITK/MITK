@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
-BlueBerry Platform
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef BERRYIEDITORINPUT_H_
 #define BERRYIEDITORINPUT_H_
@@ -39,7 +35,7 @@ struct IPersistableElement;
  * Clients implementing this editor input interface must override
  * <code>Object#operator==(const Object*)</code> to answer true
  * for two inputs that are
- * the same. The <code>IWorbenchPage.openEditor</code> APIs are dependent on
+ * the same. The <code>IWorkbenchPage.openEditor</code> APIs are dependent on
  * this to find an editor with the same input.
  * </p>
  * <p>
@@ -69,7 +65,7 @@ struct IPersistableElement;
  */
 struct BERRY_UI_QT IEditorInput : public virtual Object, public virtual IAdaptable
 {
-  berryObjectMacro(berry::IEditorInput)
+  berryObjectMacro(berry::IEditorInput);
 
   ~IEditorInput() override;
 

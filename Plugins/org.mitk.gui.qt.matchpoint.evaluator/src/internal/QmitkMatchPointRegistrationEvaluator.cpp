@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 // Blueberry
 #include <berryISelectionService.h>
@@ -21,14 +17,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Mitk
 #include <mitkStatusBar.h>
 #include <mitkNodePredicateDataProperty.h>
-#include <mitkNodePredicateDataType.h>
 #include <mitkMAPRegistrationWrapper.h>
 #include "mitkRegVisPropertyTags.h"
 #include "mitkMatchPointPropertyTags.h"
 #include "mitkRegEvaluationObject.h"
 #include "mitkRegistrationHelper.h"
 #include "mitkRegEvaluationMapper2D.h"
-#include <mitkAlgorithmHelper.h>
+#include <mitkMAPAlgorithmHelper.h>
 
 // Qmitk
 #include "QmitkRenderWindow.h"
@@ -47,7 +42,7 @@ const std::string QmitkMatchPointRegistrationEvaluator::HelperNodeName =
     "RegistrationEvaluationHelper";
 
 QmitkMatchPointRegistrationEvaluator::QmitkMatchPointRegistrationEvaluator()
-  : m_Parent(nullptr), m_activeEvaluation(false), m_autoMoving(false), m_autoTarget(false), m_currentSelectedTimeStep(0)
+  : m_Parent(nullptr), m_activeEvaluation(false), m_currentSelectedTimePoint(0.)
 {
   m_currentSelectedPosition.Fill(0.0);
 }
@@ -78,9 +73,35 @@ void QmitkMatchPointRegistrationEvaluator::CreateQtPartControl(QWidget* parent)
 
 	m_Parent = parent;
 
+  this->m_Controls.registrationNodeSelector->SetDataStorage(this->GetDataStorage());
+  this->m_Controls.registrationNodeSelector->SetSelectionIsOptional(true);
+  this->m_Controls.movingNodeSelector->SetDataStorage(this->GetDataStorage());
+  this->m_Controls.movingNodeSelector->SetSelectionIsOptional(false);
+  this->m_Controls.targetNodeSelector->SetDataStorage(this->GetDataStorage());
+  this->m_Controls.targetNodeSelector->SetSelectionIsOptional(false);
+
+  this->m_Controls.registrationNodeSelector->SetInvalidInfo("Select valid registration.");
+  this->m_Controls.registrationNodeSelector->SetEmptyInfo("Assuming identity. Select registration to change.");
+  this->m_Controls.registrationNodeSelector->SetPopUpTitel("Select registration.");
+  this->m_Controls.registrationNodeSelector->SetPopUpHint("Select a registration object that should be evaluated. If no registration is selected, identity will be assumed for evaluation.");
+
+  this->m_Controls.movingNodeSelector->SetInvalidInfo("Select moving image.");
+  this->m_Controls.movingNodeSelector->SetPopUpTitel("Select moving image.");
+  this->m_Controls.movingNodeSelector->SetPopUpHint("Select the moving image for the evaluation. This is the image that will be mapped by the registration.");
+  this->m_Controls.targetNodeSelector->SetInvalidInfo("Select target image.");
+  this->m_Controls.targetNodeSelector->SetPopUpTitel("Select target image.");
+  this->m_Controls.targetNodeSelector->SetPopUpHint("Select the target image for the evaluation.");
+  this->m_Controls.checkAutoSelect->setChecked(true);
+
+  this->ConfigureNodePredicates();
+
   connect(m_Controls.pbEval, SIGNAL(clicked()), this, SLOT(OnEvalBtnPushed()));
   connect(m_Controls.pbStop, SIGNAL(clicked()), this, SLOT(OnStopBtnPushed()));
   connect(m_Controls.evalSettings, SIGNAL(SettingsChanged(mitk::DataNode*)), this, SLOT(OnSettingsChanged(mitk::DataNode*)));
+
+  connect(m_Controls.registrationNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointRegistrationEvaluator::OnNodeSelectionChanged);
+  connect(m_Controls.movingNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointRegistrationEvaluator::OnNodeSelectionChanged);
+  connect(m_Controls.targetNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointRegistrationEvaluator::OnNodeSelectionChanged);
 
   this->m_SliceChangeListener.RenderWindowPartActivated(this->GetRenderWindowPart());
   connect(&m_SliceChangeListener, SIGNAL(SliceChanged()), this, SLOT(OnSliceChanged()));
@@ -102,25 +123,25 @@ void QmitkMatchPointRegistrationEvaluator::RenderWindowPartDeactivated(
   this->m_SliceChangeListener.RenderWindowPartDeactivated(renderWindowPart);
 }
 
+void QmitkMatchPointRegistrationEvaluator::ConfigureNodePredicates()
+{
+  this->m_Controls.registrationNodeSelector->SetNodePredicate(mitk::MITKRegistrationHelper::RegNodePredicate());
+
+  this->m_Controls.movingNodeSelector->SetNodePredicate(mitk::MITKRegistrationHelper::ImageNodePredicate());
+  this->m_Controls.targetNodeSelector->SetNodePredicate(mitk::MITKRegistrationHelper::ImageNodePredicate());
+}
+
 void QmitkMatchPointRegistrationEvaluator::CheckInputs()
 {
   if (!m_activeEvaluation)
   {
-  QList<mitk::DataNode::Pointer> dataNodes = this->GetDataManagerSelection();
-  this->m_autoMoving = false;
-  this->m_autoTarget = false;
-  this->m_spSelectedMovingNode = nullptr;
-  this->m_spSelectedTargetNode = nullptr;
-  this->m_spSelectedRegNode = nullptr;
+    bool autoSelectInput = m_Controls.checkAutoSelect->isChecked() && this->m_spSelectedRegNode != this->m_Controls.registrationNodeSelector->GetSelectedNode();
+    this->m_spSelectedRegNode = this->m_Controls.registrationNodeSelector->GetSelectedNode();
+    this->m_spSelectedMovingNode = this->m_Controls.movingNodeSelector->GetSelectedNode();
+    this->m_spSelectedTargetNode = this->m_Controls.targetNodeSelector->GetSelectedNode();
 
-  if (dataNodes.size() > 0)
-  {
-    //test if auto select works
-    if (mitk::MITKRegistrationHelper::IsRegNode(dataNodes[0]) && dataNodes[0]->GetData())
+    if (this->m_spSelectedRegNode.IsNotNull() && (this->m_spSelectedMovingNode.IsNull() || autoSelectInput))
     {
-      this->m_spSelectedRegNode = dataNodes[0];
-      dataNodes.pop_front();
-
       mitk::BaseProperty* uidProp = m_spSelectedRegNode->GetData()->GetProperty(mitk::Prop_RegAlgMovingData);
 
       if (uidProp)
@@ -128,58 +149,42 @@ void QmitkMatchPointRegistrationEvaluator::CheckInputs()
         //search for the moving node
         mitk::NodePredicateDataProperty::Pointer predicate = mitk::NodePredicateDataProperty::New(mitk::Prop_UID,
           uidProp);
-        this->m_spSelectedMovingNode = this->GetDataStorage()->GetNode(predicate);
-        this->m_autoMoving = this->m_spSelectedMovingNode.IsNotNull();
+        mitk::DataNode::Pointer movingNode = this->GetDataStorage()->GetNode(predicate);
+        if (movingNode.IsNotNull())
+        {
+          this->m_spSelectedMovingNode = movingNode;
+          QmitkSingleNodeSelectionWidget::NodeList selection({ movingNode });
+          this->m_Controls.movingNodeSelector->SetCurrentSelection(selection);
+        }
       }
+    }
 
-      uidProp = m_spSelectedRegNode->GetData()->GetProperty(mitk::Prop_RegAlgTargetData);
+    if (this->m_spSelectedRegNode.IsNotNull() && (this->m_spSelectedTargetNode.IsNull() || autoSelectInput))
+    {
+      mitk::BaseProperty* uidProp = m_spSelectedRegNode->GetData()->GetProperty(mitk::Prop_RegAlgTargetData);
 
       if (uidProp)
       {
         //search for the target node
         mitk::NodePredicateDataProperty::Pointer predicate = mitk::NodePredicateDataProperty::New(mitk::Prop_UID,
           uidProp);
-        this->m_spSelectedTargetNode = this->GetDataStorage()->GetNode(predicate);
-        this->m_autoTarget = this->m_spSelectedTargetNode.IsNotNull();
+        mitk::DataNode::Pointer targetNode = this->GetDataStorage()->GetNode(predicate);
+        if (targetNode.IsNotNull())
+        {
+          this->m_spSelectedTargetNode = targetNode;
+          QmitkSingleNodeSelectionWidget::NodeList selection({ targetNode });
+          this->m_Controls.targetNodeSelector->SetCurrentSelection(selection);
+        }
       }
     }
-
-    //if still nodes are selected -> ignore possible auto select
-    if (!dataNodes.empty())
-    {
-      mitk::Image* inputImage = dynamic_cast<mitk::Image*>(dataNodes[0]->GetData());
-
-      if (inputImage)
-      {
-        this->m_spSelectedMovingNode = dataNodes[0];
-        this->m_autoMoving = false;
-        dataNodes.pop_front();
-      }
-    }
-
-    if (!dataNodes.empty())
-    {
-      mitk::Image* inputImage = dynamic_cast<mitk::Image*>(dataNodes[0]->GetData());
-
-      if (inputImage)
-      {
-        this->m_spSelectedTargetNode = dataNodes[0];
-        this->m_autoTarget = false;
-        dataNodes.pop_front();
-      }
-    }
-  }
   }
 }
 
-
-void QmitkMatchPointRegistrationEvaluator::OnSelectionChanged(berry::IWorkbenchPart::Pointer,
-        const QList<mitk::DataNode::Pointer>&)
+void QmitkMatchPointRegistrationEvaluator::OnNodeSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/)
 {
   this->CheckInputs();
 	this->ConfigureControls();
-};
-
+}
 
 void QmitkMatchPointRegistrationEvaluator::NodeRemoved(const mitk::DataNode* node)
 {
@@ -199,84 +204,30 @@ void QmitkMatchPointRegistrationEvaluator::NodeRemoved(const mitk::DataNode* nod
 
 void QmitkMatchPointRegistrationEvaluator::ConfigureControls()
 {
-  //configure input data widgets
-  if (this->m_spSelectedRegNode.IsNull())
-  {
-    if (this->m_spSelectedMovingNode.IsNotNull() && this->m_spSelectedTargetNode.IsNotNull())
-    {
-      m_Controls.lbRegistrationName->setText(
-        QString("<font color='gray'>No registration selected! Direct comparison</font>"));
-    }
-    else
-    {
-      m_Controls.lbRegistrationName->setText(
-        QString("<font color='red'>No registration selected!</font>"));
-    }
-  }
-  else
-  {
-    m_Controls.lbRegistrationName->setText(QString::fromStdString(
-      this->m_spSelectedRegNode->GetName()));
-  }
-
-  if (this->m_spSelectedMovingNode.IsNull())
-  {
-    m_Controls.lbMovingName->setText(QString("<font color='red'>no moving image selected!</font>"));
-  }
-  else
-  {
-    if (this->m_autoMoving)
-    {
-      m_Controls.lbMovingName->setText(QString("<font color='gray'>") + QString::fromStdString(
-        this->m_spSelectedMovingNode->GetName()) + QString(" (auto selected)</font>"));
-    }
-    else
-    {
-      m_Controls.lbMovingName->setText(QString::fromStdString(this->m_spSelectedMovingNode->GetName()));
-    }
-  }
-
-  if (this->m_spSelectedTargetNode.IsNull())
-  {
-    m_Controls.lbTargetName->setText(QString("<font color='red'>no target image selected!</font>"));
-  }
-  else
-  {
-    if (this->m_autoTarget)
-    {
-      m_Controls.lbTargetName->setText(QString("<font color='gray'>") + QString::fromStdString(
-        this->m_spSelectedTargetNode->GetName()) + QString(" (auto selected)</font>"));
-    }
-    else
-    {
-      m_Controls.lbTargetName->setText(QString::fromStdString(this->m_spSelectedTargetNode->GetName()));
-    }
-  }
-
   //config settings widget
   this->m_Controls.evalSettings->setVisible(m_activeEvaluation);
   this->m_Controls.pbEval->setEnabled(this->m_spSelectedMovingNode.IsNotNull()
     && this->m_spSelectedTargetNode.IsNotNull());
   this->m_Controls.pbEval->setVisible(!m_activeEvaluation);
   this->m_Controls.pbStop->setVisible(m_activeEvaluation);
-  this->m_Controls.lbMovingName->setEnabled(!m_activeEvaluation);
-  this->m_Controls.lbRegistrationName->setEnabled(!m_activeEvaluation);
-  this->m_Controls.lbTargetName->setEnabled(!m_activeEvaluation);
+  this->m_Controls.registrationNodeSelector->setEnabled(!m_activeEvaluation);
+  this->m_Controls.movingNodeSelector->setEnabled(!m_activeEvaluation);
+  this->m_Controls.targetNodeSelector->setEnabled(!m_activeEvaluation);
 }
 
 
 void QmitkMatchPointRegistrationEvaluator::OnSliceChanged()
 {
   mitk::Point3D currentSelectedPosition = GetRenderWindowPart()->GetSelectedPosition(nullptr);
-  unsigned int currentSelectedTimeStep = GetRenderWindowPart()->GetTimeNavigationController()->GetTime()->GetPos();
+  auto currentTimePoint = GetRenderWindowPart()->GetSelectedTimePoint();
 
   if (m_currentSelectedPosition != currentSelectedPosition
-    || m_currentSelectedTimeStep != currentSelectedTimeStep
+    || m_currentSelectedTimePoint != currentTimePoint
     || m_selectedNodeTime > m_currentPositionTime)
   {
     //the current position has been changed or the selected node has been changed since the last position validation -> check position
     m_currentSelectedPosition = currentSelectedPosition;
-    m_currentSelectedTimeStep = currentSelectedTimeStep;
+    m_currentSelectedTimePoint = currentTimePoint;
     m_currentPositionTime.Modified();
 
     if (this->m_selectedEvalNode.IsNotNull())
@@ -289,7 +240,7 @@ void QmitkMatchPointRegistrationEvaluator::OnSliceChanged()
 void QmitkMatchPointRegistrationEvaluator::OnSettingsChanged(mitk::DataNode*)
 {
 	this->GetRenderWindowPart()->RequestUpdate();
-};
+}
 
 void QmitkMatchPointRegistrationEvaluator::OnEvalBtnPushed()
 {
@@ -351,5 +302,8 @@ void QmitkMatchPointRegistrationEvaluator::OnStopBtnPushed()
 
   this->CheckInputs();
   this->ConfigureControls();
-  this->GetRenderWindowPart()->RequestUpdate();
+  if (nullptr != this->GetRenderWindowPart())
+  {
+    this->GetRenderWindowPart()->RequestUpdate();
+  }
 }

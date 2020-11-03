@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 #ifndef mitkCLResampleImageToReference_cpp
 #define mitkCLResampleImageToReference_cpp
 
@@ -82,15 +78,15 @@ int main(int argc, char* argv[])
   mitkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
   // required params
-  parser.addArgument("fix", "f", mitkCommandLineParser::InputImage, "Input Image", "Path to the input VTK polydata", us::Any(), false);
-  parser.addArgument("moving", "m", mitkCommandLineParser::OutputFile, "Output text file", "Target file. The output statistic is appended to this file.", us::Any(), false);
-  parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Extension", "File extension. Default is .nii.gz", us::Any(), false);
+  parser.addArgument("fix", "f", mitkCommandLineParser::Image, "Input Image", "Path to the input VTK polydata", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("moving", "m", mitkCommandLineParser::File, "Output text file", "Target file. The output statistic is appended to this file.", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("output", "o", mitkCommandLineParser::File, "Extension", "File extension. Default is .nii.gz", us::Any(), false, false, false, mitkCommandLineParser::Output);
 
   // Miniapp Infos
   parser.setCategory("Classification Tools");
   parser.setTitle("Resample Image To Reference");
   parser.setDescription("Resamples an image (moving) to an given image (fix) without additional registration.");
-  parser.setContributor("MBI");
+  parser.setContributor("German Cancer Research Center (DKFZ)");
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
 

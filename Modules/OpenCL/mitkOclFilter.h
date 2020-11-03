@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #ifndef __mitkOclFilter_h
@@ -117,7 +113,7 @@ protected:
       */
   bool ExecuteKernelChunks( cl_kernel kernel, unsigned int workSizeDim, size_t* chunksDim );
 
-  /** @brief Execute the given kernel on the OpenCL Index-Space defined by the local and global work sizes, but divide it into chunks of dimension chunksDim and wait between 
+  /** @brief Execute the given kernel on the OpenCL Index-Space defined by the local and global work sizes, but divide it into chunks of dimension chunksDim and wait between
     * batches of batchSize chunks a time of waitTimems milliseconds
   */
   bool ExecuteKernelChunksInBatches(cl_kernel kernel, unsigned int workSizeDim, size_t* chunksDim, size_t batchSize, int waitTimems);

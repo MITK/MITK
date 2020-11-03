@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKIMAGEPIXELREADACCESSOR_H
 #define MITKIMAGEPIXELREADACCESSOR_H
@@ -172,10 +168,25 @@ namespace mitk
                                          mitk::ScalarType &val,
                                          int component = 0)
   {
-    mitk::ImagePixelReadAccessor<TPixel, 3> imAccess(im, item, mitk::ImageAccessorBase::IgnoreLock);
+    ImagePixelReadAccessor<TPixel, 3> imAccess(im, item, mitk::ImageAccessorBase::IgnoreLock);
     val = imAccess.GetConsecutivePixelsAsVector(idx, component + 1).GetElement(component);
     return val;
   }
+
+  /** Const overload of FastSinglePixelAccess*/
+  template <class TPixel>
+  mitk::ScalarType FastSinglePixelAccess(mitk::PixelType,
+    mitk::Image::ConstPointer im,
+    const ImageDataItem* item,
+    itk::Index<3> idx,
+    mitk::ScalarType& val,
+    int component = 0)
+  {
+    ImagePixelReadAccessor<TPixel, 3> imAccess(im, item, mitk::ImageAccessorBase::IgnoreLock);
+    val = imAccess.GetConsecutivePixelsAsVector(idx, component + 1).GetElement(component);
+    return val;
+  }
+
 }
 
 #endif // MITKIMAGEPIXELREADACCESSOR_H

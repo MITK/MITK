@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef DATATREENODE_H_HEADER_INCLUDED_C1E14338
 #define DATATREENODE_H_HEADER_INCLUDED_C1E14338
@@ -23,15 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkIdentifiable.h"
 #include "mitkIPropertyOwner.h"
 
-#ifdef MBI_NO_STD_NAMESPACE
-#define MBI_STD
-#include <fstream.h>
-#include <iostream.h>
-#else
-#define MBI_STD std
 #include <fstream>
 #include <iostream>
-#endif
 
 #include "mitkColorProperty.h"
 #include "mitkPropertyList.h"
@@ -65,7 +54,7 @@ namespace mitk
    * \warning Change in semantics of SetProperty() since Aug 25th 2006. Check your usage of this method if you do
    *          more with properties than just call <tt>SetProperty( "key", new SomeProperty("value") )</tt>.
    */
-  class MITKCORE_EXPORT DataNode : public itk::DataObject, public Identifiable, public IPropertyOwner
+  class MITKCORE_EXPORT DataNode : public itk::DataObject, public IPropertyOwner
   {
   public:
     typedef mitk::Geometry3D::Pointer Geometry3DPointer;
@@ -79,9 +68,8 @@ namespace mitk
      * a DataInteractor is set on this DataNode.
      */
     itkEventMacro(InteractorChangedEvent, itk::AnyEvent)
-    mitkClassMacroItkParent(DataNode, itk::DataObject)
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    mitkClassMacroItkParent(DataNode, itk::DataObject);
+    itkFactorylessNewMacro(Self);
 
     // IPropertyProvider
     BaseProperty::ConstPointer GetConstProperty(const std::string &propertyKey, const std::string &contextName = "", bool fallBackOnDefaultContext = true) const override;
@@ -602,17 +590,8 @@ namespace mitk
     unsigned long m_PropertyListModifiedObserverTag;
   };
 
-#if (_MSC_VER > 1200) || !defined(_MSC_VER)
-  MITKCORE_EXPORT MBI_STD::istream &operator>>(MBI_STD::istream &i, DataNode::Pointer &dtn);
-
-  MITKCORE_EXPORT MBI_STD::ostream &operator<<(MBI_STD::ostream &o, DataNode::Pointer &dtn);
-#endif
+  MITKCORE_EXPORT std::istream &operator>>(std::istream &i, DataNode::Pointer &dtn);
+  MITKCORE_EXPORT std::ostream &operator<<(std::ostream &o, DataNode::Pointer &dtn);
 } // namespace mitk
-
-#if ((defined(_MSC_VER)) && (_MSC_VER <= 1200))
-MITKCORE_EXPORT MBI_STD::istream &operator>>(MBI_STD::istream &i, mitk::DataNode::Pointer &dtn);
-
-MITKCORE_EXPORT MBI_STD::ostream &operator<<(MBI_STD::ostream &o, mitk::DataNode::Pointer &dtn);
-#endif
 
 #endif /* DATATREENODE_H_HEADER_INCLUDED_C1E14338 */

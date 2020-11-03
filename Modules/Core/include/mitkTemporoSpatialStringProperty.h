@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKTEMPOROSPATIALSTRINGPROPERTY_H_HEADER
 #define MITKTEMPOROSPATIALSTRINGPROPERTY_H_HEADER
@@ -45,7 +41,10 @@ namespace mitk
 
     mitkClassMacro(TemporoSpatialStringProperty, BaseProperty);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self) mitkNewMacro1Param(TemporoSpatialStringProperty, const char *);
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
+    mitkNewMacro1Param(TemporoSpatialStringProperty, const char*);
     mitkNewMacro1Param(TemporoSpatialStringProperty, const std::string &);
 
     /**Returns the value of the first time point in the first slice.
@@ -68,14 +67,25 @@ namespace mitk
     bool HasValueBySlice(const IndexValueType &zSlice, bool allowClose = false) const;
     bool HasValueByTimeStep(const TimeStepType &timeStep, bool allowClose = false) const;
 
-    std::vector<IndexValueType> GetAvailableSlices(const TimeStepType &timeStep) const;
+    /** return all slices stored for the specified timestep.*/
+    std::vector<IndexValueType> GetAvailableSlices(const TimeStepType& timeStep) const;
+    /** return all time steps stored for the specified slice.*/
+    std::vector<TimeStepType> GetAvailableTimeSteps(const IndexValueType& slice) const;
+    /** return all time steps stored in the property.*/
     std::vector<TimeStepType> GetAvailableTimeSteps() const;
+    /** return all slices stored in the property. @Remark not all time steps may contain all slices.*/
+    std::vector<IndexValueType> GetAvailableSlices() const;
 
     void SetValue(const TimeStepType &timeStep, const IndexValueType &zSlice, const ValueType &value);
 
     void SetValue(const ValueType &value);
 
     std::string GetValueAsString() const override;
+
+    /** Inidicates of all values (all time steps, all slices) are the same, or if at least one value stored
+    in the property is different. If IsUniform==true one can i.a. use GetValueAsString() without the loss of
+    information to retrieve the stored value.*/
+    bool IsUniform() const;
 
     using BaseProperty::operator=;
 

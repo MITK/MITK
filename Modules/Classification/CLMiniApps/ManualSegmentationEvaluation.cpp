@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <mitkCoreObjectFactory.h>
 #include "mitkImage.h"
@@ -177,19 +173,19 @@ int main(int argc, char* argv[])
   parser.setArgumentPrefix("--", "-");
 
   // required params
-  parser.addArgument("inputdir", "i", mitkCommandLineParser::InputDirectory, "Input Directory", "Contains input feature files.", us::Any(), false);
-  parser.addArgument("outputdir", "o", mitkCommandLineParser::OutputDirectory, "Output Directory", "Destination of output files.", us::Any(), false);
-  parser.addArgument("mitkprojectdata", "d", mitkCommandLineParser::InputFile, "original class mask and raw image", "Orig. data.", us::Any(), false);
-  parser.addArgument("csfmps", "csf", mitkCommandLineParser::InputFile, "CSF Pointset", ".", us::Any(), false);
-  parser.addArgument("lesmps", "les", mitkCommandLineParser::InputFile, "LES Pointset", ".", us::Any(), false);
-  parser.addArgument("bramps", "bra", mitkCommandLineParser::InputFile, "BRA Pointset", ".", us::Any(), false);
+  parser.addArgument("inputdir", "i", mitkCommandLineParser::Directory, "Input Directory", "Contains input feature files.", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("outputdir", "o", mitkCommandLineParser::Directory, "Output Directory", "Destination of output files.", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("mitkprojectdata", "d", mitkCommandLineParser::File, "original class mask and raw image", "Orig. data.", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("csfmps", "csf", mitkCommandLineParser::File, "CSF Pointset", ".", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("lesmps", "les", mitkCommandLineParser::File, "LES Pointset", ".", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("bramps", "bra", mitkCommandLineParser::File, "BRA Pointset", ".", us::Any(), false, false, false, mitkCommandLineParser::Input);
   //  parser.addArgument("points", "p", mitkCommandLineParser::Int, "Ensure that p points are selected", ".", us::Any(), false);
 
   // Miniapp Infos
   parser.setCategory("Classification Tools");
   parser.setTitle("Evaluationtool for Manual-Segmentation");
   parser.setDescription("Uses Datacollection to calculate DICE scores for CSF LES BRA");
-  parser.setContributor("MBI");
+  parser.setContributor("German Cancer Research Center (DKFZ)");
 
   // Params parsing
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);

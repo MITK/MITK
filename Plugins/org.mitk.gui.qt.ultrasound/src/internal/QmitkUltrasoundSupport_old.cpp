@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 // Blueberry
 #include <berryISelectionService.h>
@@ -295,7 +291,7 @@ void QmitkUltrasoundSupport::RenderImage2d()
     return;
 
   //mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
-  //renderWindow->GetRenderingManager()->RequestUpdate(mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"))->GetRenderWindow());
+  //renderWindow->GetRenderingManager()->RequestUpdate(mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget0"))->GetRenderWindow());
 
   this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
 
@@ -415,7 +411,7 @@ void QmitkUltrasoundSupport::CreateControlWidgets()
 
   // create b mode widget for current device
   m_ControlBModeWidget = new QmitkUSControlsBModeWidget(m_Device->GetControlInterfaceBMode(), m_Controls.m_ToolBoxControlWidgets);
-  
+
   if (m_Device->GetControlInterfaceBMode())
   {
     m_Controls.m_ToolBoxControlWidgets->addItem(m_ControlBModeWidget, "B Mode Controls");
@@ -424,7 +420,7 @@ void QmitkUltrasoundSupport::CreateControlWidgets()
 
   // create doppler widget for current device
   m_ControlDopplerWidget = new QmitkUSControlsDopplerWidget(m_Device->GetControlInterfaceDoppler(), m_Controls.m_ToolBoxControlWidgets);
-  
+
   if (m_Device->GetControlInterfaceDoppler())
   {
     m_Controls.m_ToolBoxControlWidgets->addItem(m_ControlDopplerWidget, "Doppler Controls");

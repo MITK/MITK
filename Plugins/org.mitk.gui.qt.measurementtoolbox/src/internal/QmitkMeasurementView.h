@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QMITK_MEASUREMENT_H__INCLUDED
 #define QMITK_MEASUREMENT_H__INCLUDED
@@ -40,23 +36,29 @@ class QmitkMeasurementView : public QmitkAbstractView
 {
   Q_OBJECT
 
-  public:
+public:
 
     static const std::string VIEW_ID;
     QmitkMeasurementView();
-    virtual ~QmitkMeasurementView();
+    ~QmitkMeasurementView() override;
 
     void CreateQtPartControl(QWidget* parent) override;
-    void SetFocus() override;
+    void SetFocus() override { };
 
-    virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
+    void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
 
     void NodeAdded(const mitk::DataNode* node) override;
+    /**
+    * @brief  Determine if we have to update the information of the currently
+    *         selected planar figures.
+    */
     void NodeChanged(const mitk::DataNode* node) override;
     void NodeRemoved(const mitk::DataNode* node) override;
 
     void PlanarFigureSelected( itk::Object* object, const itk::EventObject& );
-  protected slots:
+
+protected Q_SLOTS:
+
     void OnDrawLineTriggered( bool checked = false );
     void OnDrawPathTriggered( bool checked = false );
     void OnDrawAngleTriggered( bool checked = false );
@@ -70,16 +72,19 @@ class QmitkMeasurementView : public QmitkAbstractView
     void OnDrawSubdivisionPolygonTriggered( bool checked = false );
     void OnCopyToClipboard( bool checked = false );
 
-  private:
+private:
+
     void CreateConnections();
     mitk::DataNode::Pointer AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name);
+
+    void SetAsSelectionListener(bool checked);
+    void OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
+
     void UpdateMeasurementText();
     void AddAllInteractors();
-    mitk::DataNode::Pointer DetectTopMostVisibleImage();
     void EnableCrosshairNavigation();
     void DisableCrosshairNavigation();
     void PlanarFigureInitialized();
-    void CheckForTopMostVisibleImage(mitk::DataNode* nodeToNeglect = nullptr);
     mitk::DataStorage::SetOfObjects::ConstPointer GetAllPlanarFigures() const;
 
     QmitkMeasurementViewData* d;

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkContourModelToImageWidget.h"
 #include "mitkImage.h"
@@ -42,7 +38,7 @@ public:
   void EnableButtons(bool enable = true);
 
   /** @brief Does the actual contour filling */
-  mitk::Image::Pointer FillContourModelSetIntoImage(mitk::Image *image, mitk::ContourModelSet *contourSet, unsigned int timeStep);
+  mitk::Image::Pointer FillContourModelSetIntoImage(mitk::Image *image, mitk::ContourModelSet *contourSet, mitk::TimePointType timePoint);
 
   Ui::QmitkContourModelToImageWidgetControls m_Controls;
   QFutureWatcher<mitk::Image::Pointer> m_Watcher;
@@ -70,17 +66,31 @@ void QmitkContourModelToImageWidgetPrivate::SelectionControl(unsigned int index,
   this->EnableButtons();
 }
 
-mitk::Image::Pointer QmitkContourModelToImageWidgetPrivate::FillContourModelSetIntoImage(mitk::Image* image, mitk::ContourModelSet* contourSet, unsigned int timeStep)
+mitk::Image::Pointer QmitkContourModelToImageWidgetPrivate::FillContourModelSetIntoImage(mitk::Image* image, mitk::ContourModelSet* contourSet, mitk::TimePointType timePoint)
 {
   // Use mitk::ContourModelSetToImageFilter to fill the ContourModelSet into the image
   mitk::ContourModelSetToImageFilter::Pointer contourFiller = mitk::ContourModelSetToImageFilter::New();
+  auto timeStep = image->GetTimeGeometry()->TimePointToTimeStep(timePoint);
   contourFiller->SetTimeStep(timeStep);
   contourFiller->SetImage(image);
   contourFiller->SetInput(contourSet);
   contourFiller->MakeOutputBinaryOn();
-  contourFiller->Update();
+  mitk::Image::Pointer result = nullptr;
 
-  mitk::Image::Pointer result = contourFiller->GetOutput();
+  try
+  {
+    contourFiller->Update();
+    result = contourFiller->GetOutput();
+  }
+  catch (const std::exception & e)
+  {
+    MITK_ERROR << "Error while converting contour model. "<< e.what();
+  }
+  catch (...)
+  {
+    MITK_ERROR << "Unknown error while converting contour model.";
+  }
+
   if (result.IsNull())
   {
     MITK_ERROR<<"Could not write the selected contours into the image!";
@@ -171,7 +181,12 @@ void QmitkContourModelToImageWidget::OnProcessPressed()
     return;
   }
 
-  unsigned int timeStep = this->GetTimeNavigationController()->GetTime()->GetPos();
+  const auto timePoint = this->GetTimeNavigationController()->GetSelectedTimePoint();
+  if (!image->GetTimeGeometry()->IsValidTimePoint(timePoint))
+  {
+    MITK_ERROR << "Error writing contours into image! Currently selected time point is not supported by selected image data.";
+    return;
+  }
 
   // Check if the selected contours are valid
   mitk::ContourModelSet::Pointer contourSet;
@@ -195,7 +210,7 @@ void QmitkContourModelToImageWidget::OnProcessPressed()
   d->EnableButtons(false);
 
   // Start the computation in a background thread
-  QFuture< mitk::Image::Pointer > future = QtConcurrent::run(d, &QmitkContourModelToImageWidgetPrivate::FillContourModelSetIntoImage, image, contourSet, timeStep);
+  QFuture< mitk::Image::Pointer > future = QtConcurrent::run(d, &QmitkContourModelToImageWidgetPrivate::FillContourModelSetIntoImage, image, contourSet, timePoint);
   d->m_Watcher.setFuture(future);
 }
 
@@ -207,8 +222,8 @@ QmitkContourModelToImageWidget::QmitkContourModelToImageWidget(mitk::SliceNaviga
 
   // Set up UI
   d->m_Controls.setupUi(this);
-  d->m_Controls.dataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::ImageAndSegmentationPredicate);
-  d->m_Controls.dataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::ContourModelPredicate);
+  d->m_Controls.dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::ImageAndSegmentationPredicate);
+  d->m_Controls.dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::ContourModelPredicate);
   d->m_Controls.dataSelectionWidget->SetHelpText(HelpText);
   d->EnableButtons(false);
 

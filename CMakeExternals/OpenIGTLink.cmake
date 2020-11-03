@@ -22,11 +22,14 @@ if(MITK_USE_OpenIGTLink)
       )
     endif()
 
+    mitk_query_custom_ep_vars()
+
     ExternalProject_Add(${proj}
-       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/OpenIGTLink-54df50de.tar.gz
-       URL_MD5 b9fd8351b059f4ec615f2dfd74ab2458
-       PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/OpenIGTLink-54df50de.patch
+       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/OpenIGTLink-release-3.0.tar.gz
+       URL_MD5 0a759655da037f6df2087dd2690d1ae2
+       PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/OpenIGTLink-92bc3d7b.patch
        CMAKE_GENERATOR ${gen}
+       CMAKE_GENERATOR_PLATFORM ${gen_platform}
        CMAKE_ARGS
          ${ep_common_args}
          ${additional_cmake_args}
@@ -35,10 +38,13 @@ if(MITK_USE_OpenIGTLink)
          -DOpenIGTLink_INSTALL_LIB_DIR:STRING=lib
          -DOpenIGTLink_INSTALL_PACKAGE_DIR:STRING=lib/cmake/OpenIGTLink
          -DOpenIGTLink_INSTALL_NO_DOCUMENTATION:BOOL=ON
+         ${${proj}_CUSTOM_CMAKE_ARGS}
        CMAKE_CACHE_ARGS
          ${ep_common_cache_args}
+         ${${proj}_CUSTOM_CMAKE_CACHE_ARGS}
        CMAKE_CACHE_DEFAULT_ARGS
          ${ep_common_cache_default_args}
+         ${${proj}_CUSTOM_CMAKE_CACHE_DEFAULT_ARGS}
        DEPENDS ${proj_DEPENDENCIES}
       )
 

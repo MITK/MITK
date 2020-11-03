@@ -1,57 +1,50 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkSliceAnimationItem.h"
 #include "QmitkSliceAnimationWidget.h"
 #include <mitkBaseRenderer.h>
 #include <ui_QmitkSliceAnimationWidget.h>
 
-static int GetNumberOfSlices(int renderWindow)
+namespace
 {
-  const QString renderWindowName = QString("stdmulti.widget%1").arg(renderWindow + 1);
-  vtkRenderWindow* theRenderWindow = mitk::BaseRenderer::GetRenderWindowByName(renderWindowName.toStdString());
-
-  if (theRenderWindow != nullptr)
+  int GetNumberOfSlices(int renderWindow)
   {
-    mitk::Stepper* stepper = mitk::BaseRenderer::GetInstance(theRenderWindow)->GetSliceNavigationController()->GetSlice();
+    const QString renderWindowName = QString("stdmulti.widget%1").arg(renderWindow);
+    vtkRenderWindow* theRenderWindow = mitk::BaseRenderer::GetRenderWindowByName(renderWindowName.toStdString());
 
-    if (stepper != nullptr)
-      return std::max(1, static_cast<int>(stepper->GetSteps()));
+    if (theRenderWindow != nullptr)
+    {
+      mitk::Stepper* stepper = mitk::BaseRenderer::GetInstance(theRenderWindow)->GetSliceNavigationController()->GetSlice();
+
+      if (stepper != nullptr)
+        return std::max(1, static_cast<int>(stepper->GetSteps()));
+    }
+
+    return 1;
   }
-
-  return 1;
 }
 
 QmitkSliceAnimationWidget::QmitkSliceAnimationWidget(QWidget* parent)
   : QmitkAnimationWidget(parent),
-    m_Ui(new Ui::QmitkSliceAnimationWidget)
+    m_Ui(new Ui::QmitkSliceAnimationWidget),
+    m_AnimationItem(nullptr)
 {
   m_Ui->setupUi(this);
 
-  this->connect(m_Ui->windowComboBox, SIGNAL(currentIndexChanged(int)),
-    this, SLOT(OnRenderWindowChanged(int)));
-
-  this->connect(m_Ui->sliceRangeWidget, SIGNAL(minimumValueChanged(double)),
-    this, SLOT(OnFromChanged(double)));
-
-  this->connect(m_Ui->sliceRangeWidget, SIGNAL(maximumValueChanged(double)),
-    this, SLOT(OnToChanged(double)));
-
-  this->connect(m_Ui->reverseCheckBox, SIGNAL(clicked(bool)),
-    this, SLOT(OnReverseChanged(bool)));
+  connect(m_Ui->windowComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnRenderWindowChanged(int)));
+  connect(m_Ui->sliceRangeWidget, SIGNAL(minimumValueChanged(double)), this, SLOT(OnFromChanged(double)));
+  connect(m_Ui->sliceRangeWidget, SIGNAL(maximumValueChanged(double)), this, SLOT(OnToChanged(double)));
+  connect(m_Ui->reverseCheckBox, SIGNAL(clicked(bool)), this, SLOT(OnReverseChanged(bool)));
 }
 
 QmitkSliceAnimationWidget::~QmitkSliceAnimationWidget()
@@ -62,14 +55,17 @@ void QmitkSliceAnimationWidget::SetAnimationItem(QmitkAnimationItem* sliceAnimat
 {
   m_AnimationItem = dynamic_cast<QmitkSliceAnimationItem*>(sliceAnimationItem);
 
-  if (m_AnimationItem == nullptr)
+  if (nullptr == m_AnimationItem)
     return;
 
   m_Ui->windowComboBox->setCurrentIndex(m_AnimationItem->GetRenderWindow());
 
   const int maximum = GetNumberOfSlices(m_AnimationItem->GetRenderWindow()) - 1;
   const int from = std::min(m_AnimationItem->GetFrom(), maximum);
-  const int to = std::min(m_AnimationItem->GetTo(), maximum);
+  int to = std::max(from, std::min(m_AnimationItem->GetTo(), maximum));
+
+  if (0 == to)
+    to = maximum;
 
   m_AnimationItem->SetFrom(from);
   m_AnimationItem->SetTo(to);
@@ -81,7 +77,7 @@ void QmitkSliceAnimationWidget::SetAnimationItem(QmitkAnimationItem* sliceAnimat
 
 void QmitkSliceAnimationWidget::OnRenderWindowChanged(int renderWindow)
 {
-  if (m_AnimationItem == nullptr)
+  if (nullptr == m_AnimationItem)
     return;
 
   const int lastSlice = static_cast<int>(GetNumberOfSlices(renderWindow) - 1);
@@ -101,7 +97,7 @@ void QmitkSliceAnimationWidget::OnRenderWindowChanged(int renderWindow)
 
 void QmitkSliceAnimationWidget::OnFromChanged(double from)
 {
-  if (m_AnimationItem == nullptr)
+  if (nullptr == m_AnimationItem)
     return;
 
   int intFrom = static_cast<int>(from);
@@ -112,7 +108,7 @@ void QmitkSliceAnimationWidget::OnFromChanged(double from)
 
 void QmitkSliceAnimationWidget::OnToChanged(double to)
 {
-  if (m_AnimationItem == nullptr)
+  if (nullptr == m_AnimationItem)
     return;
 
   int intTo = static_cast<int>(to);
@@ -123,7 +119,7 @@ void QmitkSliceAnimationWidget::OnToChanged(double to)
 
 void QmitkSliceAnimationWidget::OnReverseChanged(bool reverse)
 {
-  if (m_AnimationItem == nullptr)
+  if (nullptr == m_AnimationItem)
     return;
 
   if (m_AnimationItem->GetReverse() != reverse)

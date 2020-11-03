@@ -14,8 +14,7 @@ part of <a href="http://www.ucl.ac.uk/">University College London</a> (UCL) and 
 \section CLIIntroduction Introduction
 
 This view provides the facility to run third party command line programs, and load the data back
-into the <a href="qthelp://org.mitk.gui.qt.datamanager/bundle/index.html">DataManager</a> for
-immediate visualisation. All that is required is that the command line application can be called
+into the DataManager for immediate visualisation. All that is required is that the command line application can be called
 with an argument of --xml and respond with a valid XML description of the necessary parameters,
 and currently, that if the program requires images, they must be NifTI images.
 This view can then generate a Graphical User Interface (GUI) dynamically from the XML to enable the
@@ -32,10 +31,9 @@ the interface, and populates a searchable list of available programs.
 the user can pause, resume or cancel running jobs and see console output for each job.
 
 As a consequence of the very flexible nature of this plugin, these instructions can only describe how to launch
-command line modules in a general sense. The examples shown have been constructed by downloading the latest version (subversion commit 329)
-of the NiftyReg package, available <a href="http://sourceforge.net/projects/niftyreg/">here</a>, and described further
-<a href="http://www.cmpbjournal.com/article/S0169-2607(09)00253-3/abstract">here</a>. NiftyReg provides valid XML descriptors
-to enable the integration of the NiftyReg affine (RegAladin) and and non-rigid (RegF3D) image registration algorithms, as well
+command line modules in a general sense. The examples shown have been constructed by the latest version of the NiftyReg package.
+Futher information on the NiftyReg package, including links to the source code, can be found on the wiki page <a href="http://cmictig.cs.ucl.ac.uk/wiki/index.php/NiftyReg">here</a>.
+NiftyReg provides valid XML descriptors to enable the integration of the NiftyReg affine (RegAladin) and and non-rigid (RegF3D) image registration algorithms, as well
 as utility programs to resample an image, and calculate a Jacobian image. These same XML descriptors work within
 <a href="http://www.slicer.org/">Slicer</a> and <a href="http://www.mitk.org/">MITK</a> based applications.
 
@@ -49,6 +47,8 @@ to Figure 1.
 Each of these preferences is now explained in some detail.
 
 \li show debug output: If checked will output more messages to the console for debugging purposes.
+\li show advanced widgets: If selected, additional widgets appear in the front-end for advanced users.
+\li XML time-out (secs): Sets the time-out for the retrieval of the XML.
 \li XML validation mode: The user may select a different mode for XML validation. If this is changed, the application will
 need to be restarted.  There are 3 modes available.  If the user selects "strict" mode, the XML schema produced by the
 command line application must exactly conform to <a href="http://www.slicer.org/slicerWiki/index.php/Slicer3:Execution_Model_Documentation">
@@ -63,12 +63,12 @@ When the maximum number is reached, the green "Run" button is disabled until a j
 The next 7 preferences are to control where the view will search for valid command line programs. By default these are off
 as the searching process can take a long time and slow down the startup time of the GUI. The options provided are:
 
-\li scan home directory: Scan the users home directory. (See QDir::homePath().)
-\li scan home directory/cli-modules: Scans the sub-directory called cli-modules under the users home directory.
-\li scan current directory: Scan the current working directory. (See QDir::homePath().)
-\li scan current directory/cli-modules: Scans the sub-directory called cli-modules under the current working directory.
-\li scan installation directory: This is the directory where the actual application is stored.
-\li scan installation directory/cli-modules: Scans the sub-directory called cli-modules under the application installation directory.
+\li scan installation dir: This is the directory where the actual application is stored.
+\li scan installation dir/cli-modules: Scans the sub-directory called cli-modules under the application installation directory.
+\li scan home dir: Scan the users home directory. (See QDir::homePath().)
+\li scan home dir/cli-modules: Scans the sub-directory called cli-modules under the users home directory.
+\li scan current dir: Scan the current working directory. (See QDir::homePath().)
+\li scan current dir/cli-modules: Scans the sub-directory called cli-modules under the current working directory.
 \li scan CTK_MODULE_LOAD_PATH: Scans the directory or list of directories defined by the environment variable CTK_MODULE_LOAD_PATH.
 A list is colon separated on Linux/Mac, and semi-colon separated on Windows.
 
@@ -78,8 +78,8 @@ a selection box that enables the user to specify custom directories to scan, and
 box that enables the user to select specific modules. Picking specific directories, and specific executables
 will most likely make the application quicker to launch.
 
-\imageMacro{cmdlinemodules_PreferencesAdditionalDirectories.png,"Figure 2. The User can specify specific directories to scan".",7.90}
-\imageMacro{cmdlinemodules_PreferencesAdditionalModules.png,"Figure 3. The User can specify specific command line programs to load".",7.92}
+\imageMacro{cmdlinemodules_PreferencesAdditionalDirectories.png,"Figure 2. The User can specify specific directories to scan.",7.90}
+\imageMacro{cmdlinemodules_PreferencesAdditionalModules.png,"Figure 3. The User can specify specific command line programs to load.",7.92}
 
 These directory and file selection boxes enable directories or files to be added, removed and updated in a similar fashion.
 
@@ -113,7 +113,7 @@ Each section can be individually expanded if necessary to see the parameters.
 
 \imageMacro{cmdlinemodules_NiftyReg.png,"Figure 6. An example program\, showing parameters for NiftyReg's program RegAladin.",10.24}
 
-In this example, the parameters are displayed for <a href="http://www0.cs.ucl.ac.uk/staff/m.modat/Marcs_Page/Software.html">NiftyReg</a>
+In this example, the parameters are displayed for <a href="https://sourceforge.net/projects/niftyreg/">NiftyReg</a>
 produced at <a href="http://www.ucl.ac.uk">UCL</a>, and more specifically for the affine registration program called
 RegAladin. The interface can contain a wide variety of controls. If a parameter for a command line program is an input image,
 then the widget displayed is linked to the DataManager, so that as new images are loaded, the correct image can be easily
@@ -155,7 +155,7 @@ It is up to the user to make sure that any output file names are changed between
 line module to avoid overwritting output data.
 
 In addition, each set of parameters contains an "About" section containing details of the contributors, the licence and acknowledgements and also
-a "Help" section containing a description and a link to any on-line documentation.
+a "Help" section containing a description and a link to any online documentation.
 
 These documentation features are provided by the developers of the third party plugin, and not by the host program.
 If information is missing, the user must contact the third party developers.
@@ -163,10 +163,6 @@ If information is missing, the user must contact the third party developers.
 \section CLITechnicalNotes Technical Notes
 
 From a technical perspective, the Command Line Modules View is a simple view, harnessing the power of the CTK
-command line modules framework. For technical information see:
-
-\li The doxygen generated <a href="http://www.commontk.org/docs/html/CommandLineModules_Page.html">manual page</a>.
-\li The <a href="http://www.commontk.org/index.php/Documentation/Command_Line_Interface">wiki page</a>.
-
+command line modules framework. For technical information see the <a href="http://www.commontk.org/index.php/Documentation/Command_Line_Interface">CTK wiki page</a>
 and obviously the CTK code base.
 */

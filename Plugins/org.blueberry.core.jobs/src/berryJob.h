@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
-BlueBerry Platform
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef _BERRY_JOB_H
 #define _BERRY_JOB_H
@@ -554,7 +550,7 @@ public:
    * @return <code>true</code> if the job manager should schedule this job
    *   and <code>false</code> otherwise
    */
-  virtual bool ShouldSchedule() override;
+  bool ShouldSchedule() override;
 
   /**
    * Requests that this job be suspended.  If the job is currently waiting to be run, it
@@ -603,7 +599,7 @@ protected:
    * Subclasses may override this method to perform additional work when
    * a cancellation request is made.  This default implementation does nothing.
    */
-  virtual void Canceling() override;
+  void Canceling() override;
 
   /**
    * Executes this job.  Returns the result of the execution.
@@ -631,7 +627,7 @@ protected:
    * @see #ASYNC_FINISH
    * @see #Done(IStatus)
    */
-  virtual IStatus::Pointer Run(IProgressMonitor::Pointer myProgressMonitor) override = 0;
+  IStatus::Pointer Run(IProgressMonitor::Pointer myProgressMonitor) override = 0;
 
 };
 

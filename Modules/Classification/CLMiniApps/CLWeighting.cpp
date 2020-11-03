@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 #ifndef mitkForest_cpp
 #define mitkForest_cpp
 
@@ -138,16 +134,16 @@ int main(int argc, char* argv[])
   mitkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
   // required params
-  parser.addArgument("training", "t", mitkCommandLineParser::InputImage, "Input Image", "desc", us::Any(), false);
-  parser.addArgument("prediction", "p", mitkCommandLineParser::InputImage, "Input Image", "desc", us::Any(), false);
-  parser.addArgument("output", "o", mitkCommandLineParser::InputImage, "Normalisation mode", "desc", us::Any(), false);
+  parser.addArgument("training", "t", mitkCommandLineParser::Image, "Input Image", "desc", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("prediction", "p", mitkCommandLineParser::Image, "Input Image", "desc", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("output", "o", mitkCommandLineParser::Image, "Normalisation mode", "desc", us::Any(), false, false, false, mitkCommandLineParser::Input);
   //parser.addArgument("algorithm", "a", mitkCommandLineParser::InputImage, "Input Mask", "desc", us::Any(), false);
 
   // Miniapp Infos
   parser.setCategory("Classification Tools");
   parser.setTitle("Importance weighting algorithm");
   parser.setDescription("Calculates the importance weighting of two input matrixes. ");
-  parser.setContributor("MBI");
+  parser.setContributor("German Cancer Research Center (DKFZ)");
 
   MITK_INFO << "Extracting Parameters....";
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);

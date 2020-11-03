@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkCESTDICOMReaderService.h"
 
@@ -20,8 +16,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkCustomTagParser.h>
 #include <mitkDICOMDCMTKTagScanner.h>
 #include <mitkDICOMFileReaderSelector.h>
+#include "mitkCESTImageNormalizationFilter.h"
 
 #include <itkGDCMImageIO.h>
+
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
+#include <usModuleResource.h>
 
 namespace mitk
 {
@@ -41,7 +42,14 @@ namespace mitk
     mappingStrategy.push_back("Fuzzy");
     defaultOptions["Revision mapping"] = mappingStrategy;
 
+    std::vector<std::string> normalizationStrategy;
+    normalizationStrategy.push_back("Automatic");
+    normalizationStrategy.push_back("No");
+    defaultOptions["Normalize data"] = normalizationStrategy;
+
+
     this->SetDefaultOptions(defaultOptions);
+    this->SetOnlyRegardOwnSeries(false);
 
     this->RegisterService();
   }
@@ -50,8 +58,8 @@ namespace mitk
   {
     mitk::DICOMFileReaderSelector::Pointer selector = mitk::DICOMFileReaderSelector::New();
 
-    selector->LoadBuiltIn3DConfigs();
-    selector->LoadBuiltIn3DnTConfigs();
+    auto r = ::us::GetModuleContext()->GetModule()->GetResource("cest_DKFZ.xml");
+    selector->AddConfigFromResource(r);
     selector->SetInputFiles(relevantFiles);
 
     mitk::DICOMFileReader::Pointer reader = selector->GetFirstReaderWithMinimumNumberOfOutputImages();
@@ -67,14 +75,16 @@ namespace mitk
 
   std::vector<itk::SmartPointer<BaseData>> CESTDICOMReaderService::Read()
   {
-    std::vector<BaseData::Pointer> result = BaseDICOMReaderService::Read();
+    std::vector<BaseData::Pointer> result;
+    std::vector<BaseData::Pointer> dicomResult = BaseDICOMReaderService::Read();
 
     const Options options = this->GetOptions();
 
     const std::string parseStrategy = options.find("Force type")->second.ToString();
     const std::string mappingStrategy = options.find("Revision mapping")->second.ToString();
+    const std::string normalizationStrategy = options.find("Normalize data")->second.ToString();
 
-    for (auto &item : result)
+    for (auto &item : dicomResult)
     {
       auto prop = item->GetProperty("files");
       auto fileProp = dynamic_cast<mitk::StringLookupTableProperty*>(prop.GetPointer());
@@ -106,6 +116,28 @@ namespace mitk
       auto parsedPropertyList = tagParser.ParseDicomPropertyString(byteString);
 
       item->GetPropertyList()->ConcatenatePropertyList(parsedPropertyList);
+
+      auto image = dynamic_cast<mitk::Image*>(item.GetPointer());
+      if (normalizationStrategy == "Automatic" && mitk::IsNotNormalizedCESTImage(image))
+      {
+        MITK_INFO << "Unnormalized CEST image was loaded and will be normalized automatically.";
+        auto normalizationFilter = mitk::CESTImageNormalizationFilter::New();
+        normalizationFilter->SetInput(image);
+        normalizationFilter->Update();
+        auto normalizedImage = normalizationFilter->GetOutput();
+
+        auto nameProp = item->GetProperty("name");
+        if (!nameProp)
+        {
+          mitkThrow() << "Cannot load CEST file. Property \"name\" is missing after BaseDICOMReaderService::Read().";
+        }
+        normalizedImage->SetProperty("name", mitk::StringProperty::New(nameProp->GetValueAsString() + "_normalized"));
+        result.push_back(normalizedImage);
+      }
+      else
+      {
+        result.push_back(item);
+      }
     }
 
     return result;

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkXnatSessionManager.h"
 #include "QmitkXnatTreeBrowserView.h"
@@ -31,17 +27,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ctkXnatException.h"
 
 QmitkXnatSessionManager::QmitkXnatSessionManager()
-  : m_Session(0)
+  : m_Session(nullptr)
 {
 }
 
 QmitkXnatSessionManager::~QmitkXnatSessionManager()
 {
-  if(m_SessionRegistration != 0)
+  if(m_SessionRegistration != nullptr)
   {
     m_SessionRegistration.Unregister();
   }
-  if(m_Session != 0)
+  if(m_Session != nullptr)
   {
     delete m_Session;
   }
@@ -102,5 +98,5 @@ void QmitkXnatSessionManager::CloseXnatSession()
   m_SessionRegistration.Unregister();
   m_SessionRegistration = 0;
   delete m_Session;
-  m_Session = 0;
+  m_Session = nullptr;
 }

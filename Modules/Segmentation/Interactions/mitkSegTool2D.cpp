@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkSegTool2D.h"
 #include "mitkToolManager.h"
@@ -407,6 +403,10 @@ void mitk::SegTool2D::WriteSliceToVolume(const mitk::SegTool2D::SliceInformation
   // the image was modified within the pipeline, but not marked so
   image->Modified();
   image->GetVtkImageData()->Modified();
+
+  // also mark its node as modified (T27308). Can be removed if T27307
+  // is properly solved
+  if (workingNode != nullptr) workingNode->Modified();
 
   /*============= BEGIN undo/redo feature block ========================*/
   // specify the undo operation with the edited slice

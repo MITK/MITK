@@ -7,7 +7,6 @@ if(WIN32)
     SET(MITK_US_DiPhAS_SDK_PATH "" CACHE PATH "Path to DiPhAS SDK header files.")
 
     MITK_CREATE_MODULE(
-      SUBPROJECTS
       DEPENDS MitkUS MitkPhotoacousticsHardware
       INCLUDE_DIRS PUBLIC "${MITK_US_DiPhAS_SDK_PATH}/Debug" "${MITK_US_DiPhAS_SDK_PATH}/Release"
       INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}

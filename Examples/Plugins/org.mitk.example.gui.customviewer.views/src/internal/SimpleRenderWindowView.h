@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef SimpleRenderWindowView_H_
 #define SimpleRenderWindowView_H_
@@ -45,7 +41,7 @@ public:
    */
   SimpleRenderWindowView();
 
-  ~SimpleRenderWindowView();
+  ~SimpleRenderWindowView() override;
 
   /**
    *  String based view identifier.
@@ -61,9 +57,6 @@ public:
    */
   QmitkRenderWindow *GetActiveQmitkRenderWindow() const override;
 
-  /**
-   * \see mitk::IRenderWindowPart::GetRenderWindows()
-   */
   QHash<QString, QmitkRenderWindow *> GetRenderWindows() const;
 
   /**
@@ -71,9 +64,6 @@ public:
    */
   QHash<QString, QmitkRenderWindow *> GetQmitkRenderWindows() const override;
 
-  /**
-   * \see mitk::IRenderWindowPart::GetRenderWindow(QString)
-   */
   QmitkRenderWindow *GetRenderWindow(const QString &id) const;
 
   /**
@@ -82,29 +72,9 @@ public:
   QmitkRenderWindow *GetQmitkRenderWindow(const QString &id) const override;
 
   /**
-   * \see mitk::IRenderWindowPart::GetSelectionPosition()
-   */
-  mitk::Point3D GetSelectedPosition(const QString &id = QString()) const override;
-
-  /**
-   * \see mitk::IRenderWindowPart::SetSelectedPosition()
-   */
-  void SetSelectedPosition(const mitk::Point3D &pos, const QString &id = QString()) override;
-
-  /**
-   * \see mitk::IRenderWindowPart::EnableDecorations()
-   */
-  void EnableDecorations(bool enable, const QStringList &decorations = QStringList()) override;
-
-  /**
-   * \see mitk::IRenderWindowPart::IsDecorationEnabled()
-   */
-  bool IsDecorationEnabled(const QString &decoration) const override;
-
-  /**
-   * \see mitk::IRenderWindowPart::GetDecorations()
-   */
-  QStringList GetDecorations() const override;
+  * \see mitk::IRenderWindowPart::GetQmitkRenderWindow(mitk::BaseRenderer::ViewDirection)
+  */
+  QmitkRenderWindow *GetQmitkRenderWindow(const mitk::BaseRenderer::ViewDirection &viewDirection) const override;
 
   /**
    * \see mitk::QmitkAbstractRenderEditor::GetRenderingManager()
@@ -126,6 +96,36 @@ public:
    * \see mitk::QmitkAbstractRenderEditor::GetTimeNavigationController()
    */
   mitk::SliceNavigationController *GetTimeNavigationController() const override;
+
+  /**
+   * \see mitk::IRenderWindowPart::GetSelectionPosition()
+   */
+  mitk::Point3D GetSelectedPosition(const QString& id = QString()) const override;
+
+  /**
+   * \see mitk::IRenderWindowPart::SetSelectedPosition()
+   */
+  void SetSelectedPosition(const mitk::Point3D& pos, const QString& id = QString()) override;
+
+  /**
+  * \see mitk::IRenderWindowPart::GetSelectedTimePoint()
+  */
+  mitk::TimePointType GetSelectedTimePoint(const QString& id = QString()) const override;
+
+  /**
+   * \see mitk::IRenderWindowPart::EnableDecorations()
+   */
+  void EnableDecorations(bool enable, const QStringList& decorations = QStringList()) override;
+
+  /**
+   * \see mitk::IRenderWindowPart::IsDecorationEnabled()
+   */
+  bool IsDecorationEnabled(const QString& decoration) const override;
+
+  /**
+   * \see mitk::IRenderWindowPart::GetDecorations()
+   */
+  QStringList GetDecorations() const override; 
 
 protected:
   void SetFocus() override;

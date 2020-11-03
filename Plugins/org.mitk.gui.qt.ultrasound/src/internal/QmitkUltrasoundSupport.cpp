@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 // Blueberry
 #include <berryISelectionService.h>
@@ -45,8 +41,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkUltrasoundSupport::VIEW_ID = "org.mitk.views.ultrasoundsupport";
 
 QmitkUltrasoundSupport::QmitkUltrasoundSupport()
-  : m_Controls(nullptr), m_ControlCustomWidget(0), m_ControlBModeWidget(0),
-  m_ControlProbesWidget(0), m_ImageAlreadySetToNode(false),
+  : m_Controls(nullptr), m_ControlCustomWidget(nullptr), m_ControlBModeWidget(nullptr),
+  m_ControlProbesWidget(nullptr), m_ImageAlreadySetToNode(false),
   m_CurrentImageWidth(0), m_CurrentImageHeight(0)
 {
   ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
@@ -126,6 +122,13 @@ void QmitkUltrasoundSupport::CreateQtPartControl(QWidget *parent)
     connect(m_Controls->m_DeviceManagerWidget, SIGNAL(EditDeviceButtonClicked(mitk::USDevice::Pointer)), this, SLOT(OnClickedEditDevice())); //Change Widget Visibilities
     connect(m_Controls->m_DeviceManagerWidget, SIGNAL(EditDeviceButtonClicked(mitk::USDevice::Pointer)), this->m_Controls->m_NewVideoDeviceWidget, SLOT(EditDevice(mitk::USDevice::Pointer)));
 
+    connect(m_Controls->m_SetXPoint1, SIGNAL(clicked()), this, SLOT(SetXPoint1()));
+    connect(m_Controls->m_SetXPoint2, SIGNAL(clicked()), this, SLOT(SetXPoint2()));
+    connect(m_Controls->m_SetYPoint1, SIGNAL(clicked()), this, SLOT(SetYPoint1()));
+    connect(m_Controls->m_SetYPoint2, SIGNAL(clicked()), this, SLOT(SetYPoint2()));
+    connect(m_Controls->m_SaveSpacing, SIGNAL(clicked()), this, SLOT(WriteSpacingToDevice()));
+
+
     // Initializations
     m_Controls->m_NewVideoDeviceWidget->setVisible(false);
     std::string filter = "(&(" + us::ServiceConstants::OBJECTCLASS() + "="
@@ -190,12 +193,12 @@ void QmitkUltrasoundSupport::UpdateImage()
       }
       // if the geometry changed: reinitialize the ultrasound image
       if ((i==0) && (m_OldGeometry.IsNotNull()) &&
-        (curOutput->GetGeometry() != NULL) &&
+        (curOutput->GetGeometry() != nullptr) &&
         (!mitk::Equal(*(m_OldGeometry.GetPointer()), *(curOutput->GetGeometry()), 0.0001, false))
         )
       {
         mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
-        if ((renderWindow != NULL) && (curOutput->GetTimeGeometry()->IsValid()) && (m_Controls->m_ShowImageStream->isChecked()))
+        if ((renderWindow != nullptr) && (curOutput->GetTimeGeometry()->IsValid()) && (m_Controls->m_ShowImageStream->isChecked()))
         {
           renderWindow->GetRenderingManager()->InitializeViews(
             curOutput->GetGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
@@ -293,12 +296,6 @@ void QmitkUltrasoundSupport::OnClickedFreezeButton()
 
 void QmitkUltrasoundSupport::OnChangedActiveDevice()
 {
-  if (m_Controls->m_RunImageTimer->isChecked() == false)
-  {
-    StopTimers();
-    return;
-  }
-
   //clean up and stop timer
   StopTimers();
   this->RemoveControlWidgets();
@@ -388,6 +385,19 @@ void QmitkUltrasoundSupport::CreateControlWidgets()
   if (pluginContext)
   {
     std::string filter = "(org.mitk.services.UltrasoundCustomWidget.deviceClass=" + m_Device->GetDeviceClass() + ")";
+    //Hint: The following three lines are a workaround. Till now the only US video device was an USVideoDevice.
+    // And everything worked fine. However, the ultrasound image source can be an USIGTLDevice (IGTL Client), as well.
+    // This second option wasn't considered yet. So, the custom control widget will work correctly only, if
+    // the filter declares the device class as org.mitk.modules.us.USVideoDevice. Another option, how to deal with
+    // the two possible ultrasound image devices would be to change the returned string of the method
+    // std::string QmitkUSControlsCustomVideoDeviceWidget::GetDeviceClass(), which always returns the string
+    // org.mitk.modules.us.USVideoDevice of the USVideoDevice class. If there is a possility to change the
+    // returned string dynamically between "IGTL Client" and "org.mitk.modules.us.USVideoDevice" the following
+    // three lines will not be needed.
+    if (m_Device->GetDeviceClass().compare("IGTL Client") == 0)
+    {
+      filter = "(org.mitk.services.UltrasoundCustomWidget.deviceClass=" + mitk::USVideoDevice::GetDeviceClassStatic() + ")";
+    }
 
     QString interfaceName = QString::fromStdString(us_service_interface_iid<QmitkUSAbstractCustomWidget>());
     m_CustomWidgetServiceReference = pluginContext->getServiceReferences(interfaceName, QString::fromStdString(filter));
@@ -430,19 +440,19 @@ void QmitkUltrasoundSupport::RemoveControlWidgets()
   // remove probes widget (which is not part of the tool box widget)
   m_Controls->probesWidgetContainer->removeWidget(m_ControlProbesWidget);
   delete m_ControlProbesWidget;
-  m_ControlProbesWidget = 0;
+  m_ControlProbesWidget = nullptr;
 
   delete m_ControlBModeWidget;
-  m_ControlBModeWidget = 0;
+  m_ControlBModeWidget = nullptr;
 
   delete m_ControlDopplerWidget;
-  m_ControlDopplerWidget = 0;
+  m_ControlDopplerWidget = nullptr;
 
   // delete custom widget if it is present
   if (m_ControlCustomWidget)
   {
     ctkPluginContext* pluginContext = mitk::PluginActivator::GetContext();
-    delete m_ControlCustomWidget; m_ControlCustomWidget = 0;
+    delete m_ControlCustomWidget; m_ControlCustomWidget = nullptr;
     if (m_CustomWidgetServiceReference.size() > 0)
     {
       pluginContext->ungetService(m_CustomWidgetServiceReference.at(0));
@@ -531,3 +541,43 @@ void QmitkUltrasoundSupport::SetTimerIntervals(int intervalPipeline, int interva
   m_RenderingTimer2d->setInterval(interval2D);
   m_RenderingTimer3d->setInterval(interval3D);
 }
+
+
+/* Spacing methods */
+void QmitkUltrasoundSupport::SetXPoint1()
+{
+  m_Xpoint1 = this->GetRenderWindowPart()->GetSelectedPosition();
+  m_XSpacing = ComputeSpacing(m_Xpoint1, m_Xpoint2, m_Controls->m_XDistance->value());
+  m_Controls->m_XSpacing->setText(QString("X Spacing: ") + QString::number(m_XSpacing) + " mm");
+}
+void QmitkUltrasoundSupport::SetXPoint2()
+{
+  m_Xpoint2 = this->GetRenderWindowPart()->GetSelectedPosition();
+  m_XSpacing = ComputeSpacing(m_Xpoint1, m_Xpoint2, m_Controls->m_XDistance->value());
+  m_Controls->m_XSpacing->setText(QString("X Spacing: ") + QString::number(m_XSpacing) + " mm");
+}
+void QmitkUltrasoundSupport::SetYPoint1()
+{
+  m_Ypoint1 = this->GetRenderWindowPart()->GetSelectedPosition();
+  m_YSpacing = ComputeSpacing(m_Ypoint1, m_Ypoint2, m_Controls->m_YDistance->value());
+  m_Controls->m_YSpacing->setText(QString("Y Spacing: ") + QString::number(m_YSpacing) + " mm");
+}
+void QmitkUltrasoundSupport::SetYPoint2()
+{
+  m_Ypoint2 = this->GetRenderWindowPart()->GetSelectedPosition();
+  m_YSpacing = ComputeSpacing(m_Ypoint1, m_Ypoint2, m_Controls->m_YDistance->value());
+  m_Controls->m_YSpacing->setText(QString("Y Spacing: ") + QString::number(m_YSpacing) + " mm");
+}
+void QmitkUltrasoundSupport::WriteSpacingToDevice()
+{
+  this->m_Device->SetSpacing(m_XSpacing, m_YSpacing);
+  MITK_INFO << "Spacing saved to device object, please save device data to permanently store the spacing.";
+}
+double QmitkUltrasoundSupport::ComputeSpacing(mitk::Point3D p1, mitk::Point3D p2, double distance)
+{
+  double spacing = 0;
+  double pointDistance = p1.EuclideanDistanceTo(p2);
+  spacing = distance / pointDistance;
+  return spacing;
+}
+

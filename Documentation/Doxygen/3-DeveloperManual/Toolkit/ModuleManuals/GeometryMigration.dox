@@ -5,7 +5,7 @@
 \tableofcontents
 
 
-\section GeneralChanges General Changes
+\section GeometryGeneralChanges General Changes
 
 \subsection OldClasses Old class diagram
 Until now, all geometry classes inherited from Geometry3D. This inheritance didn't make sense. For example, there is no reason, why we need a Geometry2D and a PlaneGeometry as both describe the same thing. Also, why does a two-dimensional class need to inherit from a three-dimensional class?
@@ -16,7 +16,7 @@ Therefore, we inserted an abstract BaseGeometry class, from which all other geom
 \imageMacro{currentClasses.png,"New class diagram.",15.32}
 
 
-\section Howto How to adapt your code
+\section GeometryHowto How to adapt your code
 Most content of the BaseGeometry class consists of functions and variables of the former Geometry3D.
 Here are some guidelines, how to change your code to the new geometry scheme.
 

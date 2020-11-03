@@ -1,60 +1,54 @@
-/*****************************************************************************
+/*============================================================================
 
- Copyright (c) 1993-2000,  Div. Medical and Biological Informatics, 
- Deutsches Krebsforschungszentrum, Heidelberg, Germany
+ Copyright (c) German Cancer Research Center (DKFZ)
  All rights reserved.
 
- Redistribution and use in source and binary forms, with or without 
+ Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
 
  - Redistributions of source code must retain the above copyright notice, this
    list of conditions and the following disclaimer.
 
- - Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+ - Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
- - All advertising materials mentioning features or use of this software must 
-   display the following acknowledgement: 
-          
-     "This product includes software developed by the Div. Medical and 
-      Biological Informatics, Deutsches Krebsforschungszentrum, Heidelberg, 
-      Germany."
+ - All advertising materials mentioning features or use of this software must
+   display the following acknowledgement:
 
- - Neither the name of the Deutsches Krebsforschungszentrum nor the names of 
-   its contributors may be used to endorse or promote products derived from 
-   this software without specific prior written permission. 
+     "This product includes software developed by the German Cancer Research
+      Center (DKFZ)."
 
-   THIS SOFTWARE IS PROVIDED BY THE DIVISION MEDICAL AND BIOLOGICAL
-   INFORMATICS AND CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED
-   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-   OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-   IN NO EVENT SHALL THE DIVISION MEDICAL AND BIOLOGICAL INFORMATICS,
-   THE DEUTSCHES KREBSFORSCHUNGSZENTRUM OR CONTRIBUTORS BE LIABLE FOR 
-   ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-   DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE 
-   GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER 
-   IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
-   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN 
-   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ - Neither the name of the German Cancer Research Center (DKFZ) nor the names
+   of its contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
 
- Send comments and/or bug reports to:
-   mbi-software@dkfz-heidelberg.de
+   THIS SOFTWARE IS PROVIDED BY THE GERMAN CANCER RESEARCH CENTER (DKFZ) AND
+   CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+   BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+   FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE GERMAN
+   CANCER RESEARCH CENTER (DKFZ) OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+   INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+   SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+   OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+   DAMAGE.
 
-*****************************************************************************/
+============================================================================*/
 
 /**@file
  *  this function performs a morphological operation
  */
 
-/** @brief performs a morphological operation. 
+/** @brief performs a morphological operation.
  *
  *  Depending on the parameter kind a erosion or dilation is performed. If the original
  *  image is an binary image each pixel is connected with the surrounding
- *  pixels which are non zero in the kernel by using logical operations 
+ *  pixels which are non zero in the kernel by using logical operations
  *  ( and for erosion, or for dilation ). Greylevel images are transformed
- *  by taking the minimum (erosion) of the surrounding pixels or the      
+ *  by taking the minimum (erosion) of the surrounding pixels or the
  *  maximum (dilation).
  *
  *  @param pic_old   pointer to the original image
@@ -69,7 +63,7 @@
  * @return pointer to the transformed image
  *
  * @par Uses
- *  @arg _mitkIpFuncError()     - check the image data          
+ *  @arg _mitkIpFuncError()     - check the image data
  *  @arg mitkIpFuncHist()      - calculate the greylevel histogram
  *  @arg  _mitkIpFuncCompressM() - compress filtering mask
  *
@@ -82,12 +76,12 @@
 
 mitkIpPicDescriptor *_mitkIpFuncMorph ( mitkIpPicDescriptor *pic_old,
                                mitkIpPicDescriptor *mask,
-                               _mitkIpFuncFlagF_t  kind, 
+                               _mitkIpFuncFlagF_t  kind,
                                mitkIpFuncFlagI_t   border );
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
-  static char *what = { "@(#)mitkIpFuncMorph\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)mitkIpFuncMorph\t\tGerman Cancer Research Center (DKFZ)\t"__DATE__ };
 #endif
 
 /* include files                                                        */
@@ -217,21 +211,21 @@ mitkIpPicDescriptor *_mitkIpFuncMorph ( mitkIpPicDescriptor *pic_old,
 }
 
 /* ---------------------------------------------------------------------- */
-/* 
+/*
 ** function _mitkIpFuncMorph
 */
 /* ---------------------------------------------------------------------- */
 
 mitkIpPicDescriptor *_mitkIpFuncMorph ( mitkIpPicDescriptor *pic_old,
                                mitkIpPicDescriptor *mask,
-                               _mitkIpFuncFlagF_t  kind, 
+                               _mitkIpFuncFlagF_t  kind,
                                mitkIpFuncFlagI_t   border )
 {
   mitkIpPicDescriptor *pic_new;        /* pointer to transformed image         */
   mitkIpFuncMasc_t    *m;              /* compressed mask and belonging offsets*/
   mitkIpInt4_t        beg[_mitkIpPicNDIM];
   mitkIpInt4_t        end[_mitkIpPicNDIM];
-  mitkIpUInt4_t       size[_mitkIpPicNDIM];    /*                                  */  
+  mitkIpUInt4_t       size[_mitkIpPicNDIM];    /*                                  */
   mitkIpUInt4_t       no_gv;           /* number of different greyvalues       */
   mitkIpUInt4_t       i;               /* loop index                           */
   mitkIpUInt4_t       size_hist;       /* number of elements in histogram      */
@@ -242,14 +236,14 @@ mitkIpPicDescriptor *_mitkIpFuncMorph ( mitkIpPicDescriptor *pic_old,
 
   if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   if ( _mitkIpFuncError ( mask ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
-  if ( mask->dim > pic_old->dim ) 
+  if ( mask->dim > pic_old->dim )
     {
        _mitkIpFuncSetErrno ( mitkIpFuncDIMMASC_ERROR );
        return ( mitkIpFuncERROR );
     }
- 
+
   for ( i = 0; i < mask->dim; i++ )
-    if ( mask->n[i] > pic_old->n[i] ) 
+    if ( mask->n[i] > pic_old->n[i] )
       {
          _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
          return ( mitkIpFuncERROR );
@@ -257,17 +251,17 @@ mitkIpPicDescriptor *_mitkIpFuncMorph ( mitkIpPicDescriptor *pic_old,
 
   pic_new = NULL;
 
-  /* initialisation of vectors                                             */  
-                                                                            
-  size [0] = 1;                                                             
-  for ( i = 1; i < _mitkIpPicNDIM; i++ )                                        
-    size[i] = size[i-1] * pic_old->n[i-1];                                  
-  size[pic_old->dim] = 0;                                                   
+  /* initialisation of vectors                                             */
+
+  size [0] = 1;
+  for ( i = 1; i < _mitkIpPicNDIM; i++ )
+    size[i] = size[i-1] * pic_old->n[i-1];
+  size[pic_old->dim] = 0;
 
   /* compress filtering mask                                               */
 
   m = _mitkIpFuncCompressM ( mask, pic_old, mitkIpFuncNoReflect, beg, end );
-  if ( m == NULL ) 
+  if ( m == NULL )
     {
        free ( hist );
        mitkIpPicFree ( pic_new );
@@ -275,11 +269,11 @@ mitkIpPicDescriptor *_mitkIpFuncMorph ( mitkIpPicDescriptor *pic_old,
     }
 
   /* allocate and initialize pic_new                                       */
- 
-  if ( border == mitkIpFuncBorderOld ) 
+
+  if ( border == mitkIpFuncBorderOld )
     pic_new = mitkIpPicClone ( pic_old );
   else if ( border == mitkIpFuncBorderZero )
-    { 
+    {
        pic_new = mitkIpPicCopyHeader ( pic_old, NULL );
        if ( pic_new == NULL )
          {
@@ -294,28 +288,28 @@ mitkIpPicDescriptor *_mitkIpFuncMorph ( mitkIpPicDescriptor *pic_old,
             return ( mitkIpFuncERROR );
          }
 
-       if ( kind == mitkIpFuncEroF ) 
+       if ( kind == mitkIpFuncEroF )
          {
-            mitkIpPicFORALL ( INIT, pic_new );                                       
+            mitkIpPicFORALL ( INIT, pic_new );
          }
     }
-  else 
+  else
     {
        _mitkIpFuncSetErrno ( mitkIpFuncFLAG_ERROR );
        return ( mitkIpFuncERROR );
     }
- 
-  if ( pic_new == NULL )  
-    {  
+
+  if ( pic_new == NULL )
+    {
        _mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
        return ( mitkIpFuncERROR );
     }
 
   /* check whether binary or greylevel image                               */
-  
+
   if ( mitkIpFuncExtr ( pic_old, &min, &max ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   mitkIpFuncHist ( pic_old, min, max, &hist, &size_hist );
-  if ( hist == NULL ) 
+  if ( hist == NULL )
     {
        mitkIpPicFree ( pic_new );
        return ( mitkIpFuncERROR );
@@ -328,7 +322,7 @@ mitkIpPicDescriptor *_mitkIpFuncMorph ( mitkIpPicDescriptor *pic_old,
        if ( hist [i] != 0 ) no_gv++;
        i++;
     }
-  
+
 
   /* transform image (depending on kind and no_gv)                         */
 
@@ -342,7 +336,7 @@ mitkIpPicDescriptor *_mitkIpFuncMorph ( mitkIpPicDescriptor *pic_old,
          {
             mitkIpPicFORALL_5 ( MORPH_G, pic_old, pic_new, m, beg, end, ERO_G );
          }
-       else 
+       else
          {
             free ( hist );
             free ( m->off_vekt );
@@ -362,7 +356,7 @@ mitkIpPicDescriptor *_mitkIpFuncMorph ( mitkIpPicDescriptor *pic_old,
          {
             mitkIpPicFORALL_5 ( MORPH_G, pic_old, pic_new, m, beg, end, DILA_G );
          }
-       else 
+       else
          {
             free ( hist );
             free ( m->off_vekt );

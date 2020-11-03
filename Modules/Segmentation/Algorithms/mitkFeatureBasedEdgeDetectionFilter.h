@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef mitkFeatureBasedEdgeDetectionFilter_h_Included
 #define mitkFeatureBasedEdgeDetectionFilter_h_Included
@@ -35,9 +31,8 @@ namespace mitk
   class MITKSEGMENTATION_EXPORT FeatureBasedEdgeDetectionFilter : public ImageToUnstructuredGridFilter
   {
   public:
-    mitkClassMacro(FeatureBasedEdgeDetectionFilter, ImageToUnstructuredGridFilter)
-
-      itkFactorylessNewMacro(Self)
+    mitkClassMacro(FeatureBasedEdgeDetectionFilter, ImageToUnstructuredGridFilter);
+    itkFactorylessNewMacro(Self);
 
       /** Sets the segmentation for calculating the statistics within that */
       void SetSegmentationMask(mitk::Image::Pointer);
@@ -57,7 +52,7 @@ namespace mitk
 
     /** Execute a thresholding filter with the given lower and upper bound */
     template <typename TPixel, unsigned int VImageDimension>
-    void ITKThresholding(itk::Image<TPixel, VImageDimension> *originalImage,
+    void ITKThresholding(const itk::Image<TPixel, VImageDimension> *originalImage,
                          double lower,
                          double upper,
                          mitk::Image::Pointer &result);

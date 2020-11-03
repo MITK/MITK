@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkPAVesselProperties.h"
 
@@ -25,6 +21,7 @@ mitk::pa::VesselProperties::VesselProperties()
   m_ScatteringCoefficient = 0;
   m_AnisotopyCoefficient = 0;
   m_BifurcationFrequency = 0;
+  m_DoPartialVolume = false;
 }
 
 mitk::pa::VesselProperties::VesselProperties(Self::Pointer other)
@@ -36,6 +33,7 @@ mitk::pa::VesselProperties::VesselProperties(Self::Pointer other)
   m_ScatteringCoefficient = other->GetScatteringCoefficient();
   m_AnisotopyCoefficient = other->GetAnisotopyCoefficient();
   m_BifurcationFrequency = other->GetBifurcationFrequency();
+  m_DoPartialVolume = other->GetDoPartialVolume();
 }
 
 mitk::pa::VesselProperties::~VesselProperties()
@@ -93,7 +91,13 @@ bool mitk::pa::Equal(const VesselProperties::Pointer leftHandSide, const VesselP
 
   if (!Equal(leftHandSide->GetDirectionVector(), rightHandSide->GetDirectionVector(), eps, verbose))
   {
-    MITK_INFO(verbose) << "PositionVector not equal";
+    MITK_INFO(verbose) << "DirectionVector not equal";
+    return false;
+  }
+
+  if (!(leftHandSide->GetDoPartialVolume() == rightHandSide->GetDoPartialVolume()))
+  {
+    MITK_INFO(verbose) << "GetDoPartialVolume not equal";
     return false;
   }
 

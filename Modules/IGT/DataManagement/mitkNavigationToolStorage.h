@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef NAVIGATIONTOOLSTORAGE_H_INCLUDED
 #define NAVIGATIONTOOLSTORAGE_H_INCLUDED
@@ -47,7 +43,7 @@ namespace mitk {
     /** @brief Constructs a NavigationToolStorage without reference to a DataStorage. The Data Nodes of tools have to be added and removed to a data storage outside this class.
      *         Normaly the other constructor should be used.
      */
-    itkFactorylessNewMacro(Self)
+    itkFactorylessNewMacro(Self);
     itkCloneMacro(Self)
     /** @brief Constructs a NavigationToolStorage with reference to a DataStorage. The Data Nodes of tools are added and removed automatically to this data storage. */
     mitkNewMacro1Param(Self,mitk::DataStorage::Pointer);

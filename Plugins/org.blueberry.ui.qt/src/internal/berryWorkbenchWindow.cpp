@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
-BlueBerry Platform
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "tweaklets/berryGuiWidgetsTweaklet.h"
 #include "tweaklets/berryWorkbenchTweaklet.h"
@@ -856,9 +852,12 @@ bool WorkbenchWindow::RestoreState(IMemento::Pointer memento,
     //      public void runWithException() {
     if (!shellBounds.intersects(displayBounds))
     {
+      // Center on default screen
       QRect clientArea(Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetAvailableScreenSize());
-      shellBounds.setX(clientArea.x());
-      shellBounds.setY(clientArea.y());
+      shellBounds.setX(clientArea.width() * 0.05);
+      shellBounds.setY(clientArea.height() * 0.05);
+      shellBounds.setWidth(clientArea.width() * 0.9);
+      shellBounds.setHeight(clientArea.height() * 0.9);
     }
     GetShell()->SetBounds(shellBounds);
     //      }});

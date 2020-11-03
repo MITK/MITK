@@ -1,69 +1,96 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
+============================================================================*/
 
-===================================================================*/
-
-#include <algorithm>
+// Testing
+#include "mitkTestFixture.h"
+#include "mitkTestingMacros.h"
+// std includes
+#include <string>
+#include <utility>
+// MITK includes
 #include <mitkCoreServices.h>
 #include <mitkIPropertyFilters.h>
 #include <mitkProperties.h>
 #include <mitkPropertyFilter.h>
-#include <mitkTestingMacros.h>
-#include <utility>
+// VTK includes
+#include <vtkDebugLeaks.h>
 
-int mitkPropertyFiltersTest(int, char *[])
+class mitkPropertyFiltersTestSuite : public mitk::TestFixture
 {
-  MITK_TEST_BEGIN("mitkPropertyFiltersTest");
+  CPPUNIT_TEST_SUITE(mitkPropertyFiltersTestSuite);
+  MITK_TEST(GetPropertyFiltersService_Success);
+  MITK_TEST(ApplyGlobalPropertyFilter_Success);
+  MITK_TEST(ApplyRestrictedPropertyFilter_Success);
+  CPPUNIT_TEST_SUITE_END();
 
-  mitk::IPropertyFilters *propertyFilters = mitk::CoreServices::GetPropertyFilters();
-  MITK_TEST_CONDITION_REQUIRED(propertyFilters != nullptr, "Get property filters service");
-
+private:
+  mitk::IPropertyFilters *m_PropertyFilters;
   typedef std::map<std::string, mitk::BaseProperty::Pointer> PropertyMap;
   typedef PropertyMap::const_iterator PropertyMapConstIterator;
+  PropertyMap m_PropertyMap;
+  mitk::PropertyFilter m_Filter;
+  mitk::PropertyFilter m_RestrictedFilter;
+  PropertyMap m_FilteredPropertyMap;
+  PropertyMapConstIterator m_It1;
+  PropertyMapConstIterator m_It2;
+  PropertyMapConstIterator m_It3;
 
-  PropertyMap propertyMap;
-  propertyMap.insert(std::make_pair("propertyName1", mitk::BoolProperty::New().GetPointer()));
-  propertyMap.insert(std::make_pair("propertyName2", mitk::BoolProperty::New().GetPointer()));
-  propertyMap.insert(std::make_pair("propertyName3", mitk::BoolProperty::New().GetPointer()));
+public:
+  void setUp()
+  {
+    m_PropertyFilters = mitk::CoreServices::GetPropertyFilters();
 
-  mitk::PropertyFilter filter;
-  filter.AddEntry("propertyName1", mitk::PropertyFilter::Whitelist);
-  filter.AddEntry("propertyName2", mitk::PropertyFilter::Whitelist);
+    m_PropertyMap.insert(std::make_pair("propertyName1", mitk::BoolProperty::New().GetPointer()));
+    m_PropertyMap.insert(std::make_pair("propertyName2", mitk::BoolProperty::New().GetPointer()));
+    m_PropertyMap.insert(std::make_pair("propertyName3", mitk::BoolProperty::New().GetPointer()));
 
-  mitk::PropertyFilter restrictedFilter;
-  restrictedFilter.AddEntry("propertyName2", mitk::PropertyFilter::Blacklist);
+    m_Filter.AddEntry("propertyName1", mitk::PropertyFilter::Whitelist);
+    m_Filter.AddEntry("propertyName2", mitk::PropertyFilter::Whitelist);
 
-  propertyFilters->AddFilter(filter);
-  propertyFilters->AddFilter(restrictedFilter, "className");
+    m_RestrictedFilter.AddEntry("propertyName2", mitk::PropertyFilter::Blacklist);
 
-  PropertyMap filteredPropertyMap = propertyFilters->ApplyFilter(propertyMap);
-  PropertyMapConstIterator it1 = filteredPropertyMap.find("propertyName1");
-  PropertyMapConstIterator it2 = filteredPropertyMap.find("propertyName2");
-  PropertyMapConstIterator it3 = filteredPropertyMap.find("propertyName3");
+    m_PropertyFilters->AddFilter(m_Filter);
+    m_PropertyFilters->AddFilter(m_RestrictedFilter, "className");
+  }
+  void tearDown()
+  {
+    m_PropertyFilters = nullptr;
+  }
 
-  MITK_TEST_CONDITION(
-    it1 != filteredPropertyMap.end() && it2 != filteredPropertyMap.end() && it3 == filteredPropertyMap.end(),
-    "Apply global property filter");
+  void GetPropertyFiltersService_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Get property filters service", m_PropertyFilters != nullptr);
+  }
 
-  filteredPropertyMap = propertyFilters->ApplyFilter(propertyMap, "className");
-  it1 = filteredPropertyMap.find("propertyName1");
-  it2 = filteredPropertyMap.find("propertyName2");
-  it3 = filteredPropertyMap.find("propertyName3");
+  void ApplyGlobalPropertyFilter_Success()
+  {
+    m_FilteredPropertyMap = m_PropertyFilters->ApplyFilter(m_PropertyMap);
+    m_It1 = m_FilteredPropertyMap.find("propertyName1");
+    m_It2 = m_FilteredPropertyMap.find("propertyName2");
+    m_It3 = m_FilteredPropertyMap.find("propertyName3");
+    
+    CPPUNIT_ASSERT_MESSAGE("Apply global property filter",
+      m_It1 != m_FilteredPropertyMap.end() && m_It2 != m_FilteredPropertyMap.end() && m_It3 == m_FilteredPropertyMap.end());
+  }
 
-  MITK_TEST_CONDITION(
-    it1 != filteredPropertyMap.end() && it2 == filteredPropertyMap.end() && it3 == filteredPropertyMap.end(),
-    "Apply restricted property filter (also respects global filter)");
-
-  MITK_TEST_END();
-}
+  void ApplyRestrictedPropertyFilter_Success()
+  {
+    m_FilteredPropertyMap = m_PropertyFilters->ApplyFilter(m_PropertyMap, "className");
+    m_It1 = m_FilteredPropertyMap.find("propertyName1");
+    m_It2 = m_FilteredPropertyMap.find("propertyName2");
+    m_It3 = m_FilteredPropertyMap.find("propertyName3");
+    
+    CPPUNIT_ASSERT_MESSAGE("Apply restricted property filter (also respects global filter)",
+      m_It1 != m_FilteredPropertyMap.end() && m_It2 == m_FilteredPropertyMap.end() && m_It3 == m_FilteredPropertyMap.end());
+  }
+};
+MITK_TEST_SUITE_REGISTRATION(mitkPropertyFilters)

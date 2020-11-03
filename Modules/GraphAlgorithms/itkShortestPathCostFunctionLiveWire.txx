@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef __itkShortestPathCostFunctionLiveWire_txx
 #define __itkShortestPathCostFunctionLiveWire_txx
@@ -33,13 +29,8 @@ namespace itk
 {
   // Constructor
   template <class TInputImageType>
-  ShortestPathCostFunctionLiveWire<TInputImageType>::ShortestPathCostFunctionLiveWire()
+  ShortestPathCostFunctionLiveWire<TInputImageType>::ShortestPathCostFunctionLiveWire(): m_MinCosts(0.0), m_UseRepulsivePoints(false), m_GradientMax(0.0), m_Initialized(false),  m_UseCostMap(false), m_MaxMapCosts(-1.0)
   {
-    m_UseRepulsivePoints = false;
-    m_GradientMax = 0.0;
-    m_Initialized = false;
-    m_UseCostMap = false;
-    m_MaxMapCosts = -1.0;
   }
 
   template <class TInputImageType>
@@ -297,7 +288,7 @@ namespace itk
   template <class TInputImageType>
   double ShortestPathCostFunctionLiveWire<TInputImageType>::GetMinCost()
   {
-    return minCosts;
+    return m_MinCosts;
   }
 
   template <class TInputImageType>
@@ -373,7 +364,7 @@ namespace itk
       m_EdgeImage = cannyEdgeDetectionfilter->GetOutput();
 
       // set minCosts
-      minCosts = 0.0; // The lower, the more thouroughly! 0 = dijkstra. If estimate costs are lower than actual costs
+      m_MinCosts = 0.0; // The lower, the more thouroughly! 0 = dijkstra. If estimate costs are lower than actual costs
                       // everything is fine. If estimation is higher than actual costs, you might not get the shortest
                       // but a different path.
 

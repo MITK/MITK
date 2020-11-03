@@ -1,0 +1,2 @@
+mitk_create_module_tests()
+set_tests_properties(mitkRESTClientTest mitkRESTServerTest PROPERTIES RUN_SERIAL TRUE)

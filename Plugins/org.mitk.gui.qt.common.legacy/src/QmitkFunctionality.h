@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QMITKFUNCTIONALITY_H_
 #define QMITKFUNCTIONALITY_H_
@@ -30,7 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataStorage.h>
 #include <mitkIDataStorageService.h>
 #include <mitkIDataStorageReference.h>
-#include <QmitkStdMultiWidget.h>
+#include <QmitkAbstractMultiWidget.h>
 
 // CTK Includes
 #include <ctkServiceTracker.h>
@@ -60,7 +56,7 @@ class QmitkFunctionalitySelectionProvider;
 ///
 /// <ol>
 ///   <li> Access to the DataStorage (~ the shared data repository)
-///   <li> Access to the StdMultiWidget (the 2x2 RenderWindow arrangement)
+///   <li> Access to the MultiWidget
 ///   <li> Access to and update notification for the functionality/view preferences
 ///   <li> Access to and update notification for the current DataNode selection / to DataNode selection events send through the SelectionService
 ///   <li> Methods to send DataNode selections through the SelectionService
@@ -88,7 +84,7 @@ public:
   ///
   /// Disconnects all standard event listeners
   ///
-  virtual ~QmitkFunctionality();
+  ~QmitkFunctionality() override;
   ///
   /// Called, when the WorkbenchPart gets closed
   /// by the user directly or by closing the whole
@@ -115,20 +111,20 @@ public:
   ///
   bool HandlesMultipleDataStorages() const;
   ///
-  /// Called when a StdMultiWidget is available. Should not be used anymore, see GetActiveStdMultiWidget()
-  /// \see GetActiveStdMultiWidget()
+  /// Called when a MultiWidget is available. Should not be used anymore, see GetActiveMultiWidget()
+  /// \see GetActiveMultiWidget()
   ///
-  virtual void StdMultiWidgetAvailable(QmitkStdMultiWidget& stdMultiWidget);
+  virtual void MultiWidgetAvailable(QmitkAbstractMultiWidget& multiWidget);
   ///
-  /// Called when a StdMultiWidget is available. Should not be used anymore, see GetActiveStdMultiWidget()
-  /// \see GetActiveStdMultiWidget()
+  /// Called when a MultiWidget is available. Should not be used anymore, see GetActiveMultiWidget()
+  /// \see GetActiveMultiWidget()
   ///
-  virtual void StdMultiWidgetClosed(QmitkStdMultiWidget& stdMultiWidget);
+  virtual void MultiWidgetClosed(QmitkAbstractMultiWidget& multiWidget);
   ///
-  /// Called when no StdMultiWidget is available anymore. Should not be used anymore, see GetActiveStdMultiWidget()
-  /// \see GetActiveStdMultiWidget()
+  /// Called when no MultiWidget is available anymore. Should not be used anymore, see GetActiveMultiWidget()
+  /// \see GetActiveMultiWidget()
   ///
-  virtual void StdMultiWidgetNotAvailable();
+  virtual void MultiWidgetNotAvailable();
   ///
   /// Only called when IsExclusiveFunctionality() returns true.
   /// \see IsExclusiveFunctionality()
@@ -144,7 +140,7 @@ public:
   ///
   virtual void Deactivated();
   ///
-  /// Some functionalities need to add special interactors, removes the crosshair from the stdmultiwidget, etc.
+  /// Some functionalities need to add special interactors, removes the crosshair from the multiwidget, etc.
   /// In this case the functionality has to tidy up when changing to another functionality
   /// which also wants to change the "default configuration". In the old Qt3-based
   /// version of MITK, two functionalities could never be opened at the same time so that the
@@ -244,12 +240,12 @@ protected:
   mitk::IDataStorageReference::Pointer GetDataStorageReference() const;
 
   ///
-  /// Returns the default and active StdMultiWidget.
-  /// \param reCreateWidget a boolean flag to en-/disable the attept to re-create the StdWidget
-  /// <b>If there is not StdMultiWidget yet a new one is
+  /// Returns the default and active MultiWidget.
+  /// \param reCreateWidget a boolean flag to en-/disable the attempt to re-create the StdWidget
+  /// <b>If there is not MultiWidget yet a new one is
   /// created in this method when called with default parameter!</b>
   ///
-  QmitkStdMultiWidget* GetActiveStdMultiWidget( bool reCreateWidget = true);
+  QmitkAbstractMultiWidget* GetActiveMultiWidget( bool reCreateWidget = true);
   ///
   /// Outputs an error message to the console and displays a message box containing
   /// the exception description.

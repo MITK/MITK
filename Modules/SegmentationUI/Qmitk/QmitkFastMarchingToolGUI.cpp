@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkFastMarchingToolGUI.h"
 
@@ -232,7 +228,7 @@ void QmitkFastMarchingToolGUI::OnNewToolAssociated(mitk::Tool *tool)
 
     // listen to timestep change events
     mitk::BaseRenderer::Pointer renderer;
-    renderer = mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"));
+    renderer = mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget0"));
     if (renderer.IsNotNull() && !m_TimeIsConnected)
     {
       new QmitkStepperAdapter(this, renderer->GetSliceNavigationController()->GetTime(), "stepper");

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKUSDevice_H_HEADER_INCLUDED_
 #define MITKUSDevice_H_HEADER_INCLUDED_
@@ -141,7 +137,7 @@ namespace mitk {
      * \brief Event for being notified about changes of the micro service properties.
      * This event can be used if no micro service context is available.
      */
-    mitkNewMessage2Macro(PropertyChanged, const std::string&, const std::string&)
+    mitkNewMessage2Macro(PropertyChanged, const std::string&, const std::string&);
 
     /**
      * \return keys for the microservice properties of ultrasound devices
@@ -312,13 +308,59 @@ namespace mitk {
     void SetName(std::string name);
     void SetComment(std::string comment);
 
-    itkGetMacro(DeviceState, DeviceStates)
-    itkGetMacro(ServiceProperties, us::ServiceProperties)
+    itkGetMacro(DeviceState, DeviceStates);
+
+    itkGetMacro(ServiceProperties, us::ServiceProperties);
 
     void GrabImage();
 
-    virtual void SetSpacing(double xSpacing, double ySpacing);
+    /**
+    * \brief Returns all probes for this device or an empty vector it no probes were set
+    * Returns a std::vector of all probes that exist for this device if there were probes set while creating or modifying this USVideoDevice.
+    * Otherwise it returns an empty vector. Therefore always check if vector is filled, before using it!
+    */
+    virtual std::vector<mitk::USProbe::Pointer> GetAllProbes() = 0;
 
+    /**
+    * \brief Cleans the std::vector containing all configured probes.
+    */
+    virtual void DeleteAllProbes() {};
+
+    /**
+    * \brief Return current active probe for this USDevice
+    * Returns a pointer to the probe that is currently in use. If there were probes set while creating or modifying this USDevice.
+    * Returns null otherwise
+    */
+    virtual mitk::USProbe::Pointer GetCurrentProbe() = 0;
+
+    /**
+    \brief adds a new probe to the device
+    */
+    virtual void AddNewProbe(mitk::USProbe::Pointer /*probe*/) {};
+
+    /**
+    * \brief get the probe by its name
+    * Returns a  pointer to the probe identified by the given name. If no probe of given name exists for this Device 0 is returned.
+    */
+    virtual mitk::USProbe::Pointer GetProbeByName(std::string name) = 0;
+
+    /**
+    * \brief Removes the Probe with the given name
+    */
+    virtual void RemoveProbeByName(std::string /*name*/) {};
+
+    /**
+    * \brief Sets the first existing probe or the default probe of the ultrasound device
+    * as the current probe of it.
+    */
+    virtual void SetDefaultProbeAsCurrentProbe() {};
+
+    /**
+    * \brief Sets the probe with the given name as current probe if the named probe exists.
+    */
+    virtual void SetCurrentProbe(std::string /*probename*/) {};
+
+    virtual void SetSpacing(double xSpacing, double ySpacing);
 
   protected:
 
@@ -331,11 +373,11 @@ namespace mitk {
 
     virtual void SetImageVector(std::vector<mitk::Image::Pointer> vec)
     {
-      if (this->m_ImageVector != vec)                   
-      {                                             
+      if (this->m_ImageVector != vec)
+      {
       this->m_ImageVector = vec;
-      this->Modified();                             
-      } 
+      this->Modified();
+      }
     }
 
     static ITK_THREAD_RETURN_TYPE Acquire(void* pInfoStruct);

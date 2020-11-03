@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkNDITrackingDevice.h"
 #include "mitkIGTTimeStamp.h"
@@ -544,7 +540,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
   {
     SetVolume(this->m_Data);
   }
-  catch (mitk::IGTHardwareException e)
+  catch (const mitk::IGTHardwareException& e)
   {
     MITK_WARN << e.GetDescription();
   }
@@ -1068,7 +1064,7 @@ bool mitk::NDITrackingDevice::DiscoverWiredTools()
   //NDI enable all tools (PENA)
   //NDI get all serial numbers (PHINF)
 
-  /** 
+  /**
   NDI handling (PHSR 02, PINIT, PHSR 02, PHSR 00) => all initialized and all handles available
   **/
 

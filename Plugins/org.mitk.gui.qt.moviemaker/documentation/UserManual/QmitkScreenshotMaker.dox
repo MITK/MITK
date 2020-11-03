@@ -3,17 +3,16 @@
 
 This view provides the functionality to create and save screenshots of the data.
 
-Available sections:
-  - \ref QmitkScreenshotMakerUserManualUse
-
 \imageMacro{QmitkMovieMaker_ScreenshotMakerInterface.png,"The Screenshot Maker User Interface",7.09}
 
 \section QmitkScreenshotMakerUserManualUse Usage
 
-The first section offers the option of creating a screenshot of the last activated render window (thus the one, which was last clicked into). Upon clicking the button, the Screenshot Maker asks for a filename in which the screenshot is to be stored. The multiplanar Screenshot button asks for a folder, where screenshots of the three 2D views will be stored with default names.
+The first section offers the option to create a screenshot of selected view plane (axial, sagittal or coronal). Upon clicking the 'Single' button in the '2D Screenshot' section, the Screenshot Maker asks for a filename in which the screenshot is to be stored. The 'Multiplanar' button asks for a folder, in which screenshots of the three 2D views will be stored with default names.
 
-The high resolution screenshot section works the same as the simple screenshot section, aside from the fact, that the user can choose a magnification factor.
+If you tick the 'All Components' checkbox, you can take a screenshot of every channel of your multi-channel image. Otherwise, only the visible channel is captured.
 
-In the option section one can choose the background color for the screenshots, default is black.
+The '3D Screenshots (High-res)' section works the same as the simple screenshot section, aside from the fact, that the user can choose a magnification ('Upsampling') factor. The 'Single' button creates a screenshot of the current 3D render window and the 'Multiplanar' button creates three screenshots from different perspectives.
+
+In the 'Options' section, one can choose the background color for the screenshots, default is black.
 
 */

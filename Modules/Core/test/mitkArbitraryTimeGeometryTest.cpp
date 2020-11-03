@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkArbitraryTimeGeometry.h"
 #include "mitkGeometry3D.h"
@@ -40,6 +36,7 @@ class mitkArbitraryTimeGeometryTestSuite : public mitk::TestFixture
   MITK_TEST(ReplaceTimeStepGeometries);
   MITK_TEST(ClearAllGeometries);
   MITK_TEST(AppendNewTimeStep);
+  MITK_TEST(HasCollapsedFinalTimeStep);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -73,6 +70,8 @@ private:
   mitk::ArbitraryTimeGeometry::Pointer m_initTimeGeometry;
   mitk::ArbitraryTimeGeometry::Pointer m_12345TimeGeometry;
   mitk::ArbitraryTimeGeometry::Pointer m_123TimeGeometry;
+  mitk::ArbitraryTimeGeometry::Pointer m_123TimeGeometryWithCollapsedEnd;
+  mitk::ArbitraryTimeGeometry::Pointer m_123TimeGeometryWithCollapsedInterim;
 
 public:
   void setUp() override
@@ -125,6 +124,18 @@ public:
     m_123TimeGeometry->AppendNewTimeStep(m_Geometry1, m_Geometry1MinTP, m_Geometry1MaxTP);
     m_123TimeGeometry->AppendNewTimeStep(m_Geometry2, m_Geometry2MinTP, m_Geometry2MaxTP);
     m_123TimeGeometry->AppendNewTimeStep(m_Geometry3, m_Geometry3MinTP, m_Geometry3MaxTP);
+
+    m_123TimeGeometryWithCollapsedEnd = mitk::ArbitraryTimeGeometry::New();
+    m_123TimeGeometryWithCollapsedEnd->ClearAllGeometries();
+    m_123TimeGeometryWithCollapsedEnd->AppendNewTimeStep(m_Geometry1, m_Geometry1MinTP, m_Geometry1MaxTP);
+    m_123TimeGeometryWithCollapsedEnd->AppendNewTimeStep(m_Geometry2, m_Geometry2MinTP, m_Geometry2MaxTP);
+    m_123TimeGeometryWithCollapsedEnd->AppendNewTimeStep(m_Geometry3, m_Geometry3MinTP, m_Geometry3MinTP);
+
+    m_123TimeGeometryWithCollapsedInterim = mitk::ArbitraryTimeGeometry::New();
+    m_123TimeGeometryWithCollapsedInterim->ClearAllGeometries();
+    m_123TimeGeometryWithCollapsedInterim->AppendNewTimeStep(m_Geometry1, m_Geometry1MinTP, m_Geometry1MaxTP);
+    m_123TimeGeometryWithCollapsedInterim->AppendNewTimeStep(m_Geometry2, m_Geometry2MinTP, m_Geometry2MinTP);
+    m_123TimeGeometryWithCollapsedInterim->AppendNewTimeStep(m_Geometry3, m_Geometry3MinTP, m_Geometry3MaxTP);
   }
 
   void tearDown() override {}
@@ -274,6 +285,13 @@ public:
                                  "Testing IsValidTimeStep(6) with m_initTimeGeometry");
     MITK_TEST_CONDITION_REQUIRED(m_12345TimeGeometry->IsValidTimeStep(6) == false,
                                  "Testing IsValidTimeStep(6) with m_12345TimeGeometry");
+
+    //checked collapsed cases
+    MITK_TEST_CONDITION_REQUIRED(m_123TimeGeometryWithCollapsedInterim->IsValidTimePoint(m_123TimeGeometryWithCollapsedInterim->GetMaximumTimePoint()) == false,
+      "Testing that m_123TimeGeometryWithCollapsedInterim does not inclued the max bound in validity");
+    MITK_TEST_CONDITION_REQUIRED(m_123TimeGeometryWithCollapsedEnd->IsValidTimePoint(m_123TimeGeometryWithCollapsedEnd->GetMaximumTimePoint()) == true,
+      "Testing that m_123TimeGeometryWithCollapsedEnd does inclued the max bound in validity, because it has an collapsed final time step. (see also T27259)");
+
   }
 
   void TimeStepToTimePoint()
@@ -318,19 +336,26 @@ public:
 
     MITK_TEST_CONDITION_REQUIRED(m_emptyTimeGeometry->TimePointToTimeStep(3.5) == 0,
                                  "Testing TimePointToTimeStep(3.5) with m_emptyTimeGeometry");
-    MITK_TEST_CONDITION_REQUIRED(m_initTimeGeometry->TimePointToTimeStep(3.5) == 0,
+    MITK_TEST_CONDITION_REQUIRED(m_initTimeGeometry->TimePointToTimeStep(3.5) == m_initTimeGeometry->CountTimeSteps(),
                                  "Testing TimePointToTimeStep(3.5) with m_initTimeGeometry");
     MITK_TEST_CONDITION_REQUIRED(m_12345TimeGeometry->TimePointToTimeStep(3.5) == 2,
                                  "Testing TimePointToTimeStep(3.5) with m_12345TimeGeometry");
 
     MITK_TEST_CONDITION_REQUIRED(m_emptyTimeGeometry->TimePointToTimeStep(5.8) == 0,
                                  "Testing TimePointToTimeStep(5.8) with m_emptyTimeGeometry");
-    MITK_TEST_CONDITION_REQUIRED(m_initTimeGeometry->TimePointToTimeStep(5.8) == 0,
+    MITK_TEST_CONDITION_REQUIRED(m_initTimeGeometry->TimePointToTimeStep(5.8) == m_initTimeGeometry->CountTimeSteps(),
                                  "Testing TimePointToTimeStep(5.8) with m_initTimeGeometry");
     MITK_TEST_CONDITION_REQUIRED(m_12345TimeGeometry->TimePointToTimeStep(5.8) == 4,
                                  "Testing TimePointToTimeStep(5.8) with m_12345TimeGeometry");
-    MITK_TEST_CONDITION_REQUIRED(m_12345TimeGeometry->TimePointToTimeStep(5.9) == 0,
+    MITK_TEST_CONDITION_REQUIRED(m_12345TimeGeometry->TimePointToTimeStep(5.9) == m_12345TimeGeometry->CountTimeSteps(),
                                  "Testing TimePointToTimeStep(5.9) with m_12345TimeGeometry");
+
+    //checked collapsed cases
+    MITK_TEST_CONDITION_REQUIRED(m_123TimeGeometryWithCollapsedInterim->TimePointToTimeStep(m_123TimeGeometryWithCollapsedInterim->GetMaximumTimePoint()) == m_123TimeGeometryWithCollapsedInterim->CountTimeSteps(),
+      "Testing m_123TimeGeometryWithCollapsedInterim does not map the max time poit.");
+    MITK_TEST_CONDITION_REQUIRED(m_123TimeGeometryWithCollapsedEnd->TimePointToTimeStep(m_123TimeGeometryWithCollapsedEnd->GetMaximumTimePoint()) == 2,
+      "Testing that m_123TimeGeometryWithCollapsedEnd does map the max bound, because it has an collapsed final time step. (see also T27259)");
+
   }
 
   void GetGeometryCloneForTimeStep()
@@ -464,6 +489,16 @@ public:
     MITK_TEST_CONDITION_REQUIRED(m_123TimeGeometry->GetMinimumTimePoint(3) == 3.9,
                                  "Testing AppendNewTimeStep() with m_123TimeGeometry");
   }
+
+  void HasCollapsedFinalTimeStep()
+  {
+    MITK_TEST_CONDITION_REQUIRED(m_emptyTimeGeometry->HasCollapsedFinalTimeStep() == false, "Testing HasCollapsedFinalTimeStep() with m_emptyTimeGeometry");
+    MITK_TEST_CONDITION_REQUIRED(m_initTimeGeometry->HasCollapsedFinalTimeStep() == false, "Testing HasCollapsedFinalTimeStep() with m_initTimeGeometry");
+    MITK_TEST_CONDITION_REQUIRED(m_12345TimeGeometry->HasCollapsedFinalTimeStep() == false, "Testing HasCollapsedFinalTimeStep() with m_12345TimeGeometry");
+    MITK_TEST_CONDITION_REQUIRED(m_123TimeGeometryWithCollapsedEnd->HasCollapsedFinalTimeStep() == true, "Testing HasCollapsedFinalTimeStep() with m_123TimeGeometryWithCollapsedEnd");
+    MITK_TEST_CONDITION_REQUIRED(m_123TimeGeometryWithCollapsedInterim->HasCollapsedFinalTimeStep() == false, "Testing HasCollapsedFinalTimeStep() with m_123TimeGeometryWithCollapsedInterim");
+  }
+
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkArbitraryTimeGeometry)

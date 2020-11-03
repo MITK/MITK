@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKPHOTOACOUSTICPROBE_H
 #define MITKPHOTOACOUSTICPROBE_H
@@ -39,11 +35,11 @@ namespace mitk {
     {
     public:
 
-      mitkClassMacroItkParent(Probe, itk::LightObject)
-        mitkNewMacro2Param(Self, std::string, bool)
-        mitkNewMacro2Param(Self, const char*, bool)
+      mitkClassMacroItkParent(Probe, itk::LightObject);
+      mitkNewMacro2Param(Self, std::string, bool);
+      mitkNewMacro2Param(Self, const char*, bool);
 
-        const std::string XML_TAG_PROBE = "Probe";
+      const std::string XML_TAG_PROBE = "Probe";
       const std::string XML_TAG_LIGHT_SOURCE = "LightSource";
 
       LightSource::PhotonInformation GetNextPhoton(double rng1, double rnd2, double rnd3, double rnd4,

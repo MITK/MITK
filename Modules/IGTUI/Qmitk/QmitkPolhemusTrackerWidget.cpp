@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkPolhemusTrackerWidget.h"
 
@@ -241,8 +237,8 @@ void QmitkPolhemusTrackerWidget::OnStartTracking(bool _success)
   if (!_success)
     return;
   //Rotate mitk standard multi widget, so that the view matches the sensor. Positive x == right, y == front, z == down;
-  mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetCameraController()->SetViewToPosterior();
-  mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetVtkRenderer()->GetActiveCamera()->SetViewUp(0, 0, -1);
+  mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))->GetCameraController()->SetViewToPosterior();
+  mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))->GetVtkRenderer()->GetActiveCamera()->SetViewUp(0, 0, -1);
 
 }
 

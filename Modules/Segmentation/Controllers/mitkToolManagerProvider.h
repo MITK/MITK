@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITK_TOOLMANAGERPROVIDER_H
 #define MITK_TOOLMANAGERPROVIDER_H
@@ -26,6 +22,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <itkObjectFactory.h>
 #include <mitkCommon.h>
 
+#include <string>
+#include <map>
+
 namespace mitk
 {
   class SegmentationModuleActivator;
@@ -35,22 +34,36 @@ namespace mitk
 
    \sa ToolManager
 
-   Implemented as a singleton to have implicitly only one instance of ToolManager.
+   Implemented as a registry to have implicitly only one instance of ToolManager per context.
+   Context is nothing more than a unique string, for example, use your plugin's id as context.
    Use this service to make sure your Tools are managed by the object.
 
    \note Can only be instantiated by SegmentationModuleActivator. The common way to get the ToolManager is by
-   <code> mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager(); </code>
+   <code> mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager("my context"); </code>
   */
   class MITKSEGMENTATION_EXPORT ToolManagerProvider : public itk::LightObject
   {
   public:
     mitkClassMacroItkParent(ToolManagerProvider, itk::LightObject);
 
+    using ProviderMapType = std::map<std::string, mitk::ToolManager::Pointer>;
+
+    // Known ToolManager contexts
+    static const char* const SEGMENTATION;
+    static const char* const MULTILABEL_SEGMENTATION;
+
     /**
     \brief Returns ToolManager object.
-    \note As this service is implemented as a singleton there is always the same ToolManager instance returned.
+    \param context A unique, non-empty string to retrieve a certain ToolManager instance. For backwards-compatibility, the overload without
+    arguments is returning the classic segmentation ToolManager instance.
+    If a ToolManager instance does not yet exist for a given context, it is created on the fly.
     */
-    virtual mitk::ToolManager *GetToolManager();
+    virtual mitk::ToolManager *GetToolManager(const std::string& context = SEGMENTATION);
+
+    /**
+    \brief Returns all registered ToolManager objects.
+    */
+    ProviderMapType GetToolManagers() const;
 
     /**
     \brief Returns an instance of ToolManagerProvider service.
@@ -61,7 +74,8 @@ namespace mitk
     friend class mitk::SegmentationModuleActivator;
 
   protected:
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       // hide everything
       ToolManagerProvider();
@@ -69,7 +83,7 @@ namespace mitk
     ToolManagerProvider(const ToolManagerProvider &);
     ToolManagerProvider &operator=(const ToolManagerProvider &);
 
-    mitk::ToolManager::Pointer m_ToolManager;
+    ProviderMapType m_ToolManagers;
   };
 }
 

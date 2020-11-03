@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 // std includes
 #include <algorithm>
@@ -49,7 +45,7 @@ int main(int argc, char *argv[])
   parser.setCategory("MITK-Examples");
   parser.setTitle("To Upper Case");
   parser.setDescription("An example MiniApp that converts the contents of a test file to upper case.");
-  parser.setContributor("MBI");
+  parser.setContributor("German Cancer Research Center (DKFZ)");
   //! [create parser]
 
   //! [add arguments]
@@ -59,14 +55,14 @@ int main(int argc, char *argv[])
   // see mitkCommandLineParser::addArgument for more information
   parser.beginGroup("Required I/O parameters");
   parser.addArgument(
-    "input", "i", mitkCommandLineParser::InputFile, "Input file", "input file (.txt/.example)", us::Any(), false);
+    "input", "i", mitkCommandLineParser::File, "Input file", "input file (.txt/.example)", us::Any(), false, false, false, mitkCommandLineParser::Input);
   parser.addArgument("output",
                      "o",
-                     mitkCommandLineParser::OutputFile,
+                     mitkCommandLineParser::File,
                      "Output file",
                      "where to save the output (.txt/.example)",
                      us::Any(),
-                     false);
+                     false, false, false, mitkCommandLineParser::Output);
   parser.endGroup();
 
   parser.beginGroup("Optional parameters");
@@ -143,12 +139,12 @@ int main(int argc, char *argv[])
   }
   //! [do processing]
 
-  catch (itk::ExceptionObject e)
+  catch (itk::ExceptionObject& e)
   {
     MITK_ERROR << e;
     return EXIT_FAILURE;
   }
-  catch (std::exception e)
+  catch (std::exception& e)
   {
     MITK_ERROR << e.what();
     return EXIT_FAILURE;

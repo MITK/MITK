@@ -1,0 +1,16 @@
+SET(MODULE_TESTS
+  itkMultiOutputNaryFunctorImageFilterTest.cpp
+  itkMaskedStatisticsImageFilterTest.cpp
+  itkMaskedNaryStatisticsImageFilterTest.cpp
+  mitkLevenbergMarquardtModelFitFunctorTest.cpp
+  mitkPixelBasedParameterFitImageGeneratorTest.cpp
+  mitkROIBasedParameterFitImageGeneratorTest.cpp
+  mitkMaskedDynamicImageStatisticsGeneratorTest.cpp
+  mitkModelFitInfoTest.cpp
+  mitkModelFitStaticParameterMapTest.cpp
+  mitkSimpleBarrierConstraintCheckerTest.cpp
+  mitkMVConstrainedCostFunctionDecoratorTest.cpp
+  mitkConcreteModelFactoryBaseTest.cpp
+  mitkFormulaParserTest.cpp
+  mitkModelFitResultRelationRuleTest.cpp
+)

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QmitkDataManagerLightView_H_
 #define QmitkDataManagerLightView_H_
@@ -40,23 +36,23 @@ public:
   ///
   /// \brief Standard dtor.
   ///
-  virtual ~QmitkDataManagerLightView();
+  ~QmitkDataManagerLightView() override;
 
   ///
   /// add the node to the list ...
   ///
-  virtual void NodeAdded(const mitk::DataNode* node) override;
+  void NodeAdded(const mitk::DataNode* node) override;
 
   ///
   /// remove the node
   ///
-  virtual void NodeRemoved(const mitk::DataNode* node) override;
+  void NodeRemoved(const mitk::DataNode* node) override;
 
   /**
    * Called when a DataStorage Changed event was thrown. May be reimplemented
    * by deriving classes.
    */
-  virtual void NodeChanged(const mitk::DataNode* node) override;
+  void NodeChanged(const mitk::DataNode* node) override;
 
 protected slots:
   void on_DataItemList_currentRowChanged ( int currentRow );
@@ -68,7 +64,7 @@ protected:
   ///
   /// \brief Create the view here.
   ///
-  virtual void CreateQtPartControl(QWidget* parent) override;
+  void CreateQtPartControl(QWidget* parent) override;
 
   ///
   /// evaluate the new label string

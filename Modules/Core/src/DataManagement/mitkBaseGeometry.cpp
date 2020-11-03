@@ -1,21 +1,18 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <iomanip>
 #include <sstream>
+#include <bitset>
 
 #include <vtkMatrix4x4.h>
 #include <vtkMatrixToLinearTransform.h>
@@ -31,6 +28,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkRotationOperation.h"
 #include "mitkScaleOperation.h"
 #include "mitkVector.h"
+#include "mitkMatrix.h"
 
 mitk::BaseGeometry::BaseGeometry()
   : Superclass(),
@@ -822,21 +820,6 @@ const mitk::GeometryTransformHolder *mitk::BaseGeometry::GetGeometryTransformHol
   return m_GeometryTransform;
 }
 
-bool mitk::Equal(const mitk::BaseGeometry::BoundingBoxType *leftHandSide,
-                 const mitk::BaseGeometry::BoundingBoxType *rightHandSide,
-                 ScalarType eps,
-                 bool verbose)
-{
-  if ((leftHandSide == nullptr) || (rightHandSide == nullptr))
-  {
-    MITK_ERROR << "mitk::Equal( const mitk::Geometry3D::BoundingBoxType *leftHandSide, const "
-                  "mitk::Geometry3D::BoundingBoxType *rightHandSide, ScalarType eps, bool verbose ) does not with nullptr "
-                  "pointer input.";
-    return false;
-  }
-  return Equal(*leftHandSide, *rightHandSide, eps, verbose);
-}
-
 bool mitk::Equal(const mitk::BaseGeometry::BoundingBoxType &leftHandSide,
                  const mitk::BaseGeometry::BoundingBoxType &rightHandSide,
                  ScalarType eps,
@@ -864,47 +847,34 @@ bool mitk::Equal(const mitk::BaseGeometry::BoundingBoxType &leftHandSide,
   return result;
 }
 
-bool mitk::Equal(const mitk::BaseGeometry *leftHandSide,
-                 const mitk::BaseGeometry *rightHandSide,
-                 ScalarType eps,
-                 bool verbose)
-{
-  if ((leftHandSide == nullptr) || (rightHandSide == nullptr))
-  {
-    MITK_ERROR << "mitk::Equal(const mitk::Geometry3D *leftHandSide, const mitk::Geometry3D *rightHandSide, ScalarType "
-                  "eps, bool verbose) does not with nullptr pointer input.";
-    return false;
-  }
-  return Equal(*leftHandSide, *rightHandSide, eps, verbose);
-}
-
 bool mitk::Equal(const mitk::BaseGeometry &leftHandSide,
                  const mitk::BaseGeometry &rightHandSide,
-                 ScalarType eps,
+                 ScalarType coordinateEps,
+                 ScalarType directionEps,
                  bool verbose)
 {
   bool result = true;
 
   // Compare spacings
-  if (!mitk::Equal(leftHandSide.GetSpacing(), rightHandSide.GetSpacing(), eps))
+  if (!mitk::Equal(leftHandSide.GetSpacing(), rightHandSide.GetSpacing(), coordinateEps))
   {
     if (verbose)
     {
       MITK_INFO << "[( Geometry3D )] Spacing differs.";
       MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.GetSpacing() << " : leftHandSide is "
-                << leftHandSide.GetSpacing() << " and tolerance is " << eps;
+                << leftHandSide.GetSpacing() << " and tolerance is " << coordinateEps;
     }
     result = false;
   }
 
   // Compare Origins
-  if (!mitk::Equal(leftHandSide.GetOrigin(), rightHandSide.GetOrigin(), eps))
+  if (!mitk::Equal(leftHandSide.GetOrigin(), rightHandSide.GetOrigin(), coordinateEps))
   {
     if (verbose)
     {
       MITK_INFO << "[( Geometry3D )] Origin differs.";
       MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.GetOrigin() << " : leftHandSide is "
-                << leftHandSide.GetOrigin() << " and tolerance is " << eps;
+                << leftHandSide.GetOrigin() << " and tolerance is " << coordinateEps;
     }
     result = false;
   }
@@ -912,24 +882,24 @@ bool mitk::Equal(const mitk::BaseGeometry &leftHandSide,
   // Compare Axis and Extents
   for (unsigned int i = 0; i < 3; ++i)
   {
-    if (!mitk::Equal(leftHandSide.GetAxisVector(i), rightHandSide.GetAxisVector(i), eps))
+    if (!mitk::Equal(leftHandSide.GetAxisVector(i), rightHandSide.GetAxisVector(i), directionEps))
     {
       if (verbose)
       {
         MITK_INFO << "[( Geometry3D )] AxisVector #" << i << " differ";
         MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.GetAxisVector(i) << " : leftHandSide is "
-                  << leftHandSide.GetAxisVector(i) << " and tolerance is " << eps;
+                  << leftHandSide.GetAxisVector(i) << " and tolerance is " << directionEps;
       }
       result = false;
     }
 
-    if (!mitk::Equal(leftHandSide.GetExtent(i), rightHandSide.GetExtent(i), eps))
+    if (!mitk::Equal(leftHandSide.GetExtent(i), rightHandSide.GetExtent(i), coordinateEps))
     {
       if (verbose)
       {
         MITK_INFO << "[( Geometry3D )] Extent #" << i << " differ";
         MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.GetExtent(i) << " : leftHandSide is "
-                  << leftHandSide.GetExtent(i) << " and tolerance is " << eps;
+                  << leftHandSide.GetExtent(i) << " and tolerance is " << coordinateEps;
       }
       result = false;
     }
@@ -960,31 +930,25 @@ bool mitk::Equal(const mitk::BaseGeometry &leftHandSide,
   }
 
   // Compare BoundingBoxes
-  if (!mitk::Equal(*leftHandSide.GetBoundingBox(), *rightHandSide.GetBoundingBox(), eps, verbose))
+  if (!mitk::Equal(*leftHandSide.GetBoundingBox(), *rightHandSide.GetBoundingBox(), coordinateEps, verbose))
   {
     result = false;
   }
 
   // Compare IndexToWorldTransform Matrix
-  if (!mitk::Equal(*leftHandSide.GetIndexToWorldTransform(), *rightHandSide.GetIndexToWorldTransform(), eps, verbose))
+  if (!mitk::Equal(*leftHandSide.GetIndexToWorldTransform(), *rightHandSide.GetIndexToWorldTransform(), directionEps, verbose))
   {
     result = false;
   }
   return result;
 }
 
-bool mitk::Equal(const mitk::BaseGeometry::TransformType *leftHandSide,
-                 const mitk::BaseGeometry::TransformType *rightHandSide,
-                 ScalarType eps,
-                 bool verbose)
+bool mitk::Equal(const mitk::BaseGeometry& leftHandSide,
+  const mitk::BaseGeometry& rightHandSide,
+  ScalarType eps,
+  bool verbose)
 {
-  if ((leftHandSide == nullptr) || (rightHandSide == nullptr))
-  {
-    MITK_ERROR << "mitk::Equal(const Geometry3D::TransformType *leftHandSide, const Geometry3D::TransformType "
-                  "*rightHandSide, ScalarType eps, bool verbose ) does not with nullptr pointer input.";
-    return false;
-  }
-  return Equal(*leftHandSide, *rightHandSide, eps, verbose);
+  return Equal(leftHandSide, rightHandSide, eps, eps, verbose);
 }
 
 bool mitk::Equal(const mitk::BaseGeometry::TransformType &leftHandSide,
@@ -1004,4 +968,129 @@ bool mitk::Equal(const mitk::BaseGeometry::TransformType &leftHandSide,
     return false;
   }
   return true;
+}
+
+bool mitk::IsSubGeometry(const mitk::BaseGeometry& testGeo,
+  const mitk::BaseGeometry& referenceGeo,
+  ScalarType coordinateEps,
+  ScalarType directionEps,
+  bool verbose)
+{
+  bool result = true;
+
+  // Compare spacings (must be equal)
+  const auto testedSpacing = testGeo.GetSpacing();
+  if (!mitk::Equal(testedSpacing, referenceGeo.GetSpacing(), coordinateEps))
+  {
+    if (verbose)
+    {
+      MITK_INFO << "[( Geometry3D )] Spacing differs.";
+      MITK_INFO << "testedGeometry is " << setprecision(12) << testedSpacing << " : referenceGeometry is "
+        << referenceGeo.GetSpacing() << " and tolerance is " << coordinateEps;
+    }
+    result = false;
+  }
+
+  // Compare ImageGeometry Flag (must be equal)
+  if (referenceGeo.GetImageGeometry() != testGeo.GetImageGeometry())
+  {
+    if (verbose)
+    {
+      MITK_INFO << "[( Geometry3D )] GetImageGeometry is different.";
+      MITK_INFO << "referenceGeo is " << referenceGeo.GetImageGeometry() << " : testGeo is "
+        << testGeo.GetImageGeometry();
+    }
+    result = false;
+  }
+
+  // Compare IndexToWorldTransform Matrix (must be equal -> same axis directions)
+  if (!Equal(*(testGeo.GetIndexToWorldTransform()), *(referenceGeo.GetIndexToWorldTransform()), directionEps, verbose))
+  {
+    result = false;
+  }
+
+  for (int i = 0; i<8; ++i)
+  {
+    auto testCorner = testGeo.GetCornerPoint(i);
+    bool isInside = false;
+    mitk::Point3D testCornerIndex;
+    referenceGeo.WorldToIndex(testCorner, testCornerIndex);
+
+    std::bitset<sizeof(int)> bs(i);
+    //To regard the directionEps, we substract or add it to the index elments
+    //depending on wether it was constructed by a lower or an upper bound value
+    //(see implementation of BaseGeometry::GetCorner()).
+    if (bs.test(0))
+    {
+      testCornerIndex[2] -= directionEps;
+    }
+    else
+    {
+      testCornerIndex[2] += directionEps;
+    }
+
+    if (bs.test(1))
+    {
+      testCornerIndex[1] -= directionEps;
+    }
+    else
+    {
+      testCornerIndex[1] += directionEps;
+    }
+
+    if (bs.test(2))
+    {
+      testCornerIndex[0] -= directionEps;
+    }
+    else
+    {
+      testCornerIndex[0] += directionEps;
+    }
+
+    isInside = referenceGeo.IsIndexInside(testCornerIndex);
+
+    if (!isInside)
+    {
+      if (verbose)
+      {
+        MITK_INFO << "[( Geometry3D )] corner point is not inside. ";
+        MITK_INFO << "referenceGeo is " << setprecision(12) << referenceGeo << " : tested corner is "
+          << testGeo.GetCornerPoint(i);
+      }
+      result = false;
+    }
+  }
+
+  // check grid of test geometry is on the grid of the reference geometry. This is important as the
+  // boundingbox is only checked for containing the tested geometry, but if a corner (one is enough
+  // as we know that axis and spacing are equal, due to equal transfor (see above)) of the tested geometry
+  // is on the grid it is really a sub geometry (as they have the same spacing and axis).
+  auto cornerOffset = testGeo.GetCornerPoint(0) - referenceGeo.GetCornerPoint(0);
+  mitk::Vector3D cornerIndexOffset;
+  referenceGeo.WorldToIndex(cornerOffset, cornerIndexOffset);
+  for (unsigned int i = 0; i < 3; ++i)
+  {
+    auto pixelCountContinous = cornerIndexOffset[i];
+    auto pixelCount = std::round(pixelCountContinous);
+    if (std::abs(pixelCount - pixelCountContinous) > coordinateEps)
+    {
+      if (verbose)
+      {
+        MITK_INFO << "[( Geometry3D )] Tested geometry is not on the grid of the reference geometry. ";
+        MITK_INFO << "referenceGeo is " << setprecision(15) << referenceGeo << " : tested corner offset in pixels is "
+          << pixelCountContinous << " for axis "<<i;
+      }
+      result = false;
+    }
+  }
+
+  return result;
+}
+
+bool mitk::IsSubGeometry(const mitk::BaseGeometry& testGeo,
+  const mitk::BaseGeometry& referenceGeo,
+  ScalarType eps,
+  bool verbose)
+{
+  return IsSubGeometry(testGeo, referenceGeo, eps, eps, verbose);
 }

@@ -1,48 +1,42 @@
-/*****************************************************************************
+/*============================================================================
 
- Copyright (c) 1993-2000,  Div. Medical and Biological Informatics, 
- Deutsches Krebsforschungszentrum, Heidelberg, Germany
+ Copyright (c) German Cancer Research Center (DKFZ)
  All rights reserved.
 
- Redistribution and use in source and binary forms, with or without 
+ Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
 
  - Redistributions of source code must retain the above copyright notice, this
    list of conditions and the following disclaimer.
 
- - Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+ - Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
- - All advertising materials mentioning features or use of this software must 
-   display the following acknowledgement: 
-          
-     "This product includes software developed by the Div. Medical and 
-      Biological Informatics, Deutsches Krebsforschungszentrum, Heidelberg, 
-      Germany."
+ - All advertising materials mentioning features or use of this software must
+   display the following acknowledgement:
 
- - Neither the name of the Deutsches Krebsforschungszentrum nor the names of 
-   its contributors may be used to endorse or promote products derived from 
-   this software without specific prior written permission. 
+     "This product includes software developed by the German Cancer Research
+      Center (DKFZ)."
 
-   THIS SOFTWARE IS PROVIDED BY THE DIVISION MEDICAL AND BIOLOGICAL
-   INFORMATICS AND CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED
-   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-   OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-   IN NO EVENT SHALL THE DIVISION MEDICAL AND BIOLOGICAL INFORMATICS,
-   THE DEUTSCHES KREBSFORSCHUNGSZENTRUM OR CONTRIBUTORS BE LIABLE FOR 
-   ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-   DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE 
-   GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER 
-   IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
-   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN 
-   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ - Neither the name of the German Cancer Research Center (DKFZ) nor the names
+   of its contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
 
- Send comments and/or bug reports to:
-   mbi-software@dkfz-heidelberg.de
+   THIS SOFTWARE IS PROVIDED BY THE GERMAN CANCER RESEARCH CENTER (DKFZ) AND
+   CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+   BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+   FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE GERMAN
+   CANCER RESEARCH CENTER (DKFZ) OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+   INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+   SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+   OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+   DAMAGE.
 
-*****************************************************************************/
+============================================================================*/
 
 
 /**@file
@@ -57,20 +51,20 @@
  */
 
 #ifndef lint
-  static char *what = { "@(#)\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)\t\tGerman Cancer Research Center (DKFZ)\t"__DATE__ };
 #endif
 
 /* include-Files                                                        */
 
-#include "mitkIpFuncP.h"   
- 
+#include "mitkIpFuncP.h"
+
 /* definition of macros and constants                                   */
 
 #define KL <
-#define GR > 
+#define GR >
 
-#define MAX( x, y ) ( x > y ) ? x : y  
-#define MIN( x, y ) ( x < y ) ? x : y  
+#define MAX( x, y ) ( x > y ) ? x : y
+#define MIN( x, y ) ( x < y ) ? x : y
 
 #define RECT( type, pic, beg, end, value )                               \
 {                                                                        \
@@ -84,7 +78,7 @@
         for ( i = beg[0]; i < end[0]; i++ )                              \
          (( type * )pic->data )[i + offset] = ( type ) value;            \
     }                                                                    \
-} 
+}
 #define TRI( type, pic, beg, end, value, a, b, OP )                      \
 {                                                                        \
   mitkIpUInt4_t  i, j, n;                                                    \
@@ -104,9 +98,9 @@
              }                                                           \
          }                                                               \
     }                                                                    \
-} 
-               
- 
+}
+
+
 
 /* -------------------------------------------------------------------  */
 /*
@@ -115,7 +109,7 @@
 
 mitkIpPicDescriptor *mitkIpFuncFillArea ( mitkIpPicDescriptor *pic_old,
                                   mitkIpFuncBox_t     box,
-                                  mitkIpFloat8_t      value, 
+                                  mitkIpFloat8_t      value,
                                   mitkIpFuncFlagI_t   over,
                                   mitkIpPicDescriptor *pic_return )
 {
@@ -132,7 +126,7 @@ mitkIpPicDescriptor *mitkIpFuncFillArea ( mitkIpPicDescriptor *pic_old,
 
   /* create a new picture, copy the header, allocate memory             */
 
-  pic_new = _mitkIpFuncMalloc ( pic_old, pic_return, mitkIpOVERWRITE );     
+  pic_new = _mitkIpFuncMalloc ( pic_old, pic_return, mitkIpOVERWRITE );
   if ( pic_new == NULL ) return ( mitkIpFuncERROR );
   if ( pic_new != pic_old )
     {
@@ -140,8 +134,8 @@ mitkIpPicDescriptor *mitkIpFuncFillArea ( mitkIpPicDescriptor *pic_old,
     }
 
   /* Gerade durch die beiden Punkte                                     */
-  
-  a = ( ( mitkIpFloat8_t ) box.y1 - ( mitkIpFloat8_t ) box.y0 ) / 
+
+  a = ( ( mitkIpFloat8_t ) box.y1 - ( mitkIpFloat8_t ) box.y0 ) /
       ( ( mitkIpFloat8_t ) box.x1 - ( mitkIpFloat8_t ) box.x0 );
 
   b = ( mitkIpFloat8_t ) box.y0 - a *  box.x0;
@@ -162,7 +156,7 @@ mitkIpPicDescriptor *mitkIpFuncFillArea ( mitkIpPicDescriptor *pic_old,
 /*      printf ( "2.Rechteck: beg %d %d end: %d %d \n", beg[0], beg[1], end[0], end[1] ); */
         mitkIpPicFORALL_3 ( RECT, pic_new, beg, end, value );
 
-        beg[0] = box.x0;    end[0] = box.x1; 
+        beg[0] = box.x0;    end[0] = box.x1;
         beg[1] = MIN ( box.y0, box.y1 );
         end[1] = MAX ( box.y0, box.y1 );
 /*      printf ( "1.Dreieck:  beg %d %d end: %d %d \n", beg[0], beg[1], end[0], end[1] ); */
@@ -176,13 +170,13 @@ mitkIpPicDescriptor *mitkIpFuncFillArea ( mitkIpPicDescriptor *pic_old,
         mitkIpPicFORALL_3 ( RECT, pic_new, beg, end, value );
 
         beg[0] = ( box.y0 < box.y1 ) ? 0 : box.x1;
-        end[0] = ( box.y0 < box.y1 ) ? box.x0 : pic_old->n[0]; 
+        end[0] = ( box.y0 < box.y1 ) ? box.x0 : pic_old->n[0];
         beg[1] = MIN ( box.y0, box.y1 );
         end[1] = MAX ( box.y0, box.y1 );
 /*      printf ( "2.Rechteck: beg %d %d end: %d %d \n", beg[0], beg[1], end[0], end[1] ); */
         mitkIpPicFORALL_3 ( RECT, pic_new, beg, end, value );
 
-        beg[0] = box.x0;    end[0] = box.x1; 
+        beg[0] = box.x0;    end[0] = box.x1;
         beg[1] = MIN ( box.y0, box.y1 );
         end[1] = MAX ( box.y0, box.y1 );
 /*      printf ( "1.Dreieck:  beg %d %d end: %d %d \n", beg[0], beg[1], end[0], end[1] ); */
@@ -191,14 +185,14 @@ mitkIpPicDescriptor *mitkIpFuncFillArea ( mitkIpPicDescriptor *pic_old,
   else
     {
        _mitkIpFuncSetErrno ( mitkIpFuncFLAG_ERROR );
-       return ( mitkIpFuncERROR );   
+       return ( mitkIpFuncERROR );
     }
 
   /* Copy Tags */
 
   mitkIpFuncCopyTags(pic_new, pic_old);
-  
-  
+
+
 
 
 

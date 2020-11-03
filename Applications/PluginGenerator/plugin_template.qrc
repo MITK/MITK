@@ -13,6 +13,6 @@
         <file>PluginTemplate/src/internal/QmitkTemplateView.cpp</file>
         <file>PluginTemplate/src/internal/QmitkTemplateView.h</file>
         <file>PluginTemplate/src/internal/QmitkTemplateViewControls.ui</file>
-        <file>MITKLicense.txt</file>
+        <file>COPYRIGHT_HEADER</file>
     </qresource>
 </RCC>

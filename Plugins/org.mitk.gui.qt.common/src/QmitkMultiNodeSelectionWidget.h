@@ -1,19 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
-
+============================================================================*/
 
 #ifndef QMITK_MULTI_NODE_SELECTION_WIDGET_H
 #define QMITK_MULTI_NODE_SELECTION_WIDGET_H
@@ -21,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkDataStorage.h>
 #include <mitkWeakPointer.h>
 #include <mitkNodePredicateBase.h>
+
+#include "QmitkSimpleTextOverlayWidget.h"
 
 #include "org_mitk_gui_qt_common_Export.h"
 
@@ -32,8 +29,8 @@ class QmitkAbstractDataStorageModel;
 class QAbstractItemVew;
 
 /**
-* \class QmitkMultiNodeSelectionWidget
-* \brief Widget that allows to show and edit the content of an mitk::IsoDoseLevel instance.
+* @class QmitkMultiNodeSelectionWidget
+* @brief Widget that allows to perform and represents a multiple node selection.
 */
 class MITK_QT_COMMON QmitkMultiNodeSelectionWidget : public QmitkAbstractNodeSelectionWidget
 {
@@ -44,24 +41,41 @@ public:
 
   using NodeList = QmitkAbstractNodeSelectionWidget::NodeList;
 
-  NodeList GetSelectedNodes() const;
+  /**
+  * @brief Helper function that is used to check the given selection for consistency.
+  *        Returning an empty string assumes that everything is alright and the selection
+  *        is valid. If the string is not empty, the content of the string will be used
+  *        as error message in the overlay to indicate the problem.
+  */
+  using SelectionCheckFunctionType = std::function<std::string(const NodeList &)>;
+  /**
+  * @brief A selection check function can be set. If set the widget uses this function to
+  *        check the made/set selection. If the selection is valid, everything is fine.
+  *        If selection is indicated as invalid, it will not be communicated by the widget
+  *        (no signal emission).
+  */
+  void SetSelectionCheckFunction(const SelectionCheckFunctionType &checkFunction);
 
 public Q_SLOTS:
-  virtual void SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes) override;
-  virtual void SetCurrentSelection(NodeList selectedNodes) override;
   void OnEditSelection();
 
+protected Q_SLOTS:
+  void OnClearSelection(const mitk::DataNode* node);
+
 protected:
-  NodeList CompileEmitSelection() const;
+  void changeEvent(QEvent *event) override;
 
-  virtual void UpdateInfo() override;
-  virtual void UpdateList();
+  void UpdateInfo() override;
+  void OnInternalSelectionChanged() override;
 
-  virtual void OnNodePredicateChanged(mitk::NodePredicateBase* newPredicate) override;
-  virtual void OnDataStorageChanged() override;
+  bool AllowEmissionOfSelection(const NodeList& emissionCandidates) const override;
 
-  NodeList m_CurrentSelection;
+  QmitkSimpleTextOverlayWidget* m_Overlay;
+
+  SelectionCheckFunctionType m_CheckFunction;
+  mutable std::string m_CheckResponse;
 
   Ui_QmitkMultiNodeSelectionWidget m_Controls;
 };
-#endif // QmitkMultiNodeSelectionWidget_H
+
+#endif // QMITK_MULTI_NODE_SELECTION_WIDGET_H

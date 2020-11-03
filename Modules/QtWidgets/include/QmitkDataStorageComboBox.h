@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QmitkDataStorageComboBox_h
 #define QmitkDataStorageComboBox_h
@@ -29,8 +25,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QComboBox>
 #include <map>
 
-// Forward Declartions
-
 ///
 /// \ingroup QmitkModule
 /// \class QmitkDataStorageComboBox
@@ -40,27 +34,24 @@ See LICENSE.txt or http://www.mitk.org for details.
 /// \ingroup Widgets
 /// \brief Displays all or a subset (defined by a predicate) of nodes of the Data Storage.
 ///
-/// Dont forget that this class inherits from QComboBox and you can therefore use the whole API of QComboBox.
 ///
 class MITKQTWIDGETS_EXPORT QmitkDataStorageComboBox : public QComboBox
 {
-  //#CLASS-MACROS,FRIENDS
   Q_OBJECT
 
-  //#CTORS/DTOR
 public:
   ///
   /// \brief Ctor for an empty combobox. Use setDataStorage and setPredicate afterwards.
   ///
-  QmitkDataStorageComboBox(QWidget *parent = nullptr, bool _AutoSelectNewNodes = false);
+  QmitkDataStorageComboBox(QWidget *parent = nullptr, bool autoSelectNewNodes = false);
 
   ///
-  /// \brief Ctor for constructing QmitkDataStorageComboBox with given DataStorageComboBox and given _Predicate.
+  /// \brief Ctor for constructing QmitkDataStorageComboBox with given DataStorageComboBox and given predicate.
   ///
-  QmitkDataStorageComboBox(mitk::DataStorage *_DataStorage,
-                           const mitk::NodePredicateBase *_Predicate,
+  QmitkDataStorageComboBox(mitk::DataStorage *dataStorage,
+                           const mitk::NodePredicateBase *predicate,
                            QWidget *parent = nullptr,
-                           bool _AutoSelectNewNodes = false);
+                           bool autoSelectNewNodes = false);
 
   ///
   /// \brief Standard Dtor. Nothing to do here.
@@ -68,26 +59,25 @@ public:
   ~QmitkDataStorageComboBox() override;
 
   ///
-  /// \brief Seaches for a given node and returns a valid index or -1 if the node was not found.
+  /// \brief Searches for a given node and returns a valid index or -1 if the node was not found.
   ///
-  virtual int Find(const mitk::DataNode *_DataNode) const;
+  virtual int Find(const mitk::DataNode *dataNode) const;
 
-  //#PUBLIC GETTER
 public:
   ///
   /// \brief Get the DataStorage this ComboBox listens to.
   ///
   mitk::DataStorage::Pointer GetDataStorage() const;
   ///
-  /// \brief Return the predicate (may be nullptr) that is responsible for the _DataNode selection of this ComboBox.
+  /// \brief Return the predicate (may be nullptr) that is responsible for the dataNode selection of this ComboBox.
   ///
   const mitk::NodePredicateBase::ConstPointer GetPredicate() const;
   ///
-  /// \brief Returns the _DataNode at Index index or 0 if the index is out of bounds.
+  /// \brief Returns the dataNode at Index index or 0 if the index is out of bounds.
   ///
   virtual mitk::DataNode::Pointer GetNode(int index) const;
   ///
-  /// \brief Returns the selected _DataNode or 0 if there is none.
+  /// \brief Returns the selected dataNode or 0 if there is none.
   ///
   virtual mitk::DataNode::Pointer GetSelectedNode() const;
   ///
@@ -100,22 +90,21 @@ public:
   ///
   virtual bool GetAutoSelectNewItems();
 
-  //#PUBLIC SETTER
 public:
   ///
   /// \brief Set the DataStorage this ComboBox should listen to.
   ///
-  /// If DataStorage is 0 nothing will be shown. If DataStorage is re-set the combobox will be resetted.
+  /// If DataStorage is 0 nothing will be shown. If DataStorage is reset the combobox will be reset.
   void SetDataStorage(mitk::DataStorage *dataStorage);
   ///
   /// \brief Set the predicate for this ComboBox. (QmitkDataStorageComboBox is now owner of the predicate)
   ///
-  /// If predicate is nullptr all nodes will be selected. If predicate changes the whole combobox will be resetted.
-  void SetPredicate(const mitk::NodePredicateBase *_Predicate);
+  /// If predicate is nullptr all nodes will be selected. If predicate changes the whole combobox will be reset.
+  void SetPredicate(const mitk::NodePredicateBase *predicate);
   ///
-  /// Adds a node to the ComboBox. Gets called everytime a DataStorage Add Event was thrown.
+  /// Adds a node to the ComboBox. Gets called every time a DataStorage Add Event was thrown.
   ///
-  virtual void AddNode(const mitk::DataNode *_DataNode);
+  virtual void AddNode(const mitk::DataNode *dataNode);
   ///
   /// Removes a node from the ComboBox at a specified index (if the index exists). Gets called when a DataStorage Remove
   /// Event was thrown.
@@ -124,58 +113,54 @@ public:
   ///
   /// Removes a node from the ComboBox. Gets called when a DataStorage Remove Event was thrown.
   ///
-  virtual void RemoveNode(const mitk::DataNode *_DataNode);
+  virtual void RemoveNode(const mitk::DataNode *dataNode);
   ///
-  /// Set a _DataNode in the ComboBox at the specified index (if the index exists).
+  /// Set a dataNode in the ComboBox at the specified index (if the index exists).
   /// Internally the method just calls RemoveNode(unsigned int)
   ///
-  virtual void SetNode(int index, const mitk::DataNode *_DataNode);
+  virtual void SetNode(int index, const mitk::DataNode *dataNode);
   ///
-  /// Replaces a _DataNode in the combobox by an _OtherDataNode.
+  /// Replaces a dataNode in the combobox by an otherDataNode.
   /// Internally the method just calls SetNode(unsigned int, mitk::DataNode*)
   ///
-  virtual void SetNode(const mitk::DataNode *_DataNode, const mitk::DataNode *_OtherDataNode);
+  virtual void SetNode(const mitk::DataNode *dataNode, const mitk::DataNode *otherDataNode);
   ///
   /// Sets AutoSelectNewItems flag. If set to true new Nodes will be automatically selected. Default is false.
   ///
-  virtual void SetAutoSelectNewItems(bool _AutoSelectNewItems);
+  virtual void SetAutoSelectNewItems(bool autoSelectNewItems);
   ///
-  /// \brief Called when a node is deleted or the name property of the node was modified. Calls RemoveNode or SetNode
-  /// then.
+  /// \brief Called when the name property of the node was modified.
   ///
-  virtual void OnDataNodeDeleteOrModified(const itk::Object *caller, const itk::EventObject &event);
+  virtual void OnPropertyListChanged(const itk::Object *caller, const itk::EventObject &event);
 
 signals:
   ///
-  /// \brief Throw a signal when the _DataNode selection changed.
+  /// \brief Throw a signal when the data node selection changed.
   ///
   void OnSelectionChanged(const mitk::DataNode *);
 
-  //#PROTECTED GETTER
 protected:
   ///
   /// \brief Checks if the given index is within the range of the m_Nodes vector.
   ///
   bool HasIndex(unsigned int index) const;
 
-  //#PROTECTED SETTER
 protected slots:
   ///
   /// \brief Slot for signal when the user selects another item.
   ///
   void OnCurrentIndexChanged(int);
 
-  //#PUBLIC SETTER
 public slots:
   ///
   /// \brief Slot for signal when user wants to set a node as current selected node.
   ///
-  void SetSelectedNode(mitk::DataNode::Pointer item);
+  void SetSelectedNode(const mitk::DataNode::Pointer& node);
 
 protected:
   ///
-  /// \brief Inserts a new node at the given index. If the index does not exist, the _DataNode is simply appended to the
-  /// combobox.
+  /// \brief Inserts a new node at the given index. If the index does not exist,
+  /// the data node is simply appended to the combobox.
   ///
   /// This function is used by AddNode() and SetNode() because they just to the same:
   /// 1. If node is replaced (that is when index exists),
@@ -183,20 +168,23 @@ protected:
   /// 2. Check Node against Predicate
   /// 3. Register for itk::Events on the node
   /// 4. Insert Node and show in combobox
-  virtual void InsertNode(int index, const mitk::DataNode *_DataNode);
+  virtual void InsertNode(int index, const mitk::DataNode *dataNode);
 
   ///
-  /// \brief Init-function this class with the given dataStorage and _Predicate. This function is called by all ctors.
+  /// \brief Init-function this class with the given data storage and predicate. This function is called by all ctors.
   ///
   void Init();
 
   ///
-  /// \brief Reset function whenever datastorage or predicate changes.
+  /// \brief Reset function whenever data storage or predicate changes.
   ///
   virtual void Reset();
 
+  void RemoveNodeAndPropertyLists(int index);
+
+  virtual void UpdateComboBoxText(const mitk::PropertyList*);
+
 protected:
-  //#PROTECTED MEMBER VARS
   ///
   /// Pointer to the DataStorage from which the nodes are selected (remember: in BlueBerry there
   /// might be more than one DataStorage).
@@ -204,31 +192,25 @@ protected:
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
 
   ///
-  /// \brief Holds the predicate that is responsible for the _DataNode selection of this ComboBox.
-  /// If the predicate is 0, every _DataNode will be selected.
+  /// \brief Holds the predicate that is responsible for the dataNode selection of this ComboBox.
+  /// If the predicate is 0, every dataNode will be selected.
   ///
   mitk::NodePredicateBase::ConstPointer m_Predicate;
 
   ///
-  /// Holds all selected Nodes. Dont hold smart pointer as we are in a GUI class.
+  /// Holds all selected Nodes. Don't hold smart pointer as we are in a GUI class.
   ///
   std::vector<mitk::DataNode *> m_Nodes;
 
   ///
-  /// \brief Holds the tags of the node-modified observers. (must be updated everytime m_Nodes changes)
+  /// \brief Holds the tags of the data node property observers.
   ///
-  std::vector<long> m_NodesModifiedObserverTags;
+  std::vector<long> m_DataNodePropertyListObserverTags;
 
   ///
-  /// \brief Holds the tags of the node-modified observers. (must be updated everytime m_Nodes changes)
+  /// \brief Holds the tags of the base data property observers.
   ///
-  std::vector<long> m_NodesDeleteObserverTags;
-
-  ///
-  /// \brief Maps a a specific node to (Name-)property. This is needed because we have to find the assiociated node
-  /// whenever the name property of a node changed.
-  ///
-  std::map<mitk::DataNode *, const mitk::BaseProperty *> m_PropertyToNode;
+  std::vector<long> m_BaseDatapropertyListObserverTags;
 
   ///
   /// \brief Event function guard. Each function which is called by an event mechanism

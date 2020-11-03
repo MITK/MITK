@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
-BlueBerry Platform
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #define NOMINMAX
 #include "berryJobManager.h"
@@ -459,7 +455,8 @@ void JobManager::ChangeState(InternalJob::Pointer sptr_job, int newState)
     case Job::SLEEPING:
       m_JobQueueSleeping.Remove(sptr_job);
       // assert(false, "Tried to remove a job that wasn't in the queue");
-
+      // this silences the warning but should be checked:
+      // FALLTHRU
     case Job::RUNNING:
     case InternalJob::ABOUT_TO_RUN:
       m_running.remove(sptr_job);

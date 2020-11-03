@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 // MITK
 #include "mitkUSDeviceReaderWriterConstants.h"
@@ -61,7 +57,7 @@ void mitk::USDeviceWriterXML::SetFilename(std::string filename)
   m_Filename = filename;
 }
 
-bool mitk::USDeviceWriterXML::WriteUltrasoundVideoDeviceConfiguration(mitk::USDeviceReaderXML::USVideoDeviceConfigData & config)
+bool mitk::USDeviceWriterXML::WriteUltrasoundDeviceConfiguration(mitk::USDeviceReaderXML::USDeviceConfigData & config)
 {
   TiXmlDocument document;
   TiXmlDeclaration* xmlDeclaration = new TiXmlDeclaration("1.0", "", "");
@@ -85,7 +81,7 @@ bool mitk::USDeviceWriterXML::WriteUltrasoundVideoDeviceConfiguration(mitk::USDe
 
 void mitk::USDeviceWriterXML::CreateXmlInformationOfUltrasoundDeviceTag(
   TiXmlDocument &document, TiXmlElement * ultrasoundDeviceTag,
-  mitk::USDeviceReaderXML::USVideoDeviceConfigData &config)
+  mitk::USDeviceReaderXML::USDeviceConfigData &config)
 {
   ultrasoundDeviceTag->SetAttribute(ATTR_FILEVERS, config.fileversion);
   ultrasoundDeviceTag->SetAttribute(ATTR_TYPE, config.deviceType);
@@ -95,10 +91,18 @@ void mitk::USDeviceWriterXML::CreateXmlInformationOfUltrasoundDeviceTag(
   ultrasoundDeviceTag->SetAttribute(ATTR_COMMENT, config.comment);
   ultrasoundDeviceTag->SetAttribute(ATTR_IMAGESTREAMS, config.numberOfImageStreams);
 
+  if (config.deviceType.compare("oigtl") == 0)
+  {
+    ultrasoundDeviceTag->SetAttribute(ATTR_HOST, config.host);
+    ultrasoundDeviceTag->SetAttribute(ATTR_PORT, config.port);
+    std::string value = config.server ? "true" : "false";
+    ultrasoundDeviceTag->SetAttribute(ATTR_SERVER, value);
+  }
+
   document.LinkEndChild(ultrasoundDeviceTag);
 }
 
-void mitk::USDeviceWriterXML::CreateXmlInformationOfGeneralSettingsTag(TiXmlElement *parentTag, TiXmlElement *generalSettingsTag, mitk::USDeviceReaderXML::USVideoDeviceConfigData & config)
+void mitk::USDeviceWriterXML::CreateXmlInformationOfGeneralSettingsTag(TiXmlElement *parentTag, TiXmlElement *generalSettingsTag, mitk::USDeviceReaderXML::USDeviceConfigData & config)
 {
   std::string value = config.useGreyscale ? "true" : "false";
   generalSettingsTag->SetAttribute(ATTR_GREYSCALE, value);
@@ -114,7 +118,7 @@ void mitk::USDeviceWriterXML::CreateXmlInformationOfGeneralSettingsTag(TiXmlElem
   parentTag->LinkEndChild(generalSettingsTag);
 }
 
-void mitk::USDeviceWriterXML::CreateXmlInformationOfProbesTag(TiXmlElement * parentTag, mitk::USDeviceReaderXML::USVideoDeviceConfigData & config)
+void mitk::USDeviceWriterXML::CreateXmlInformationOfProbesTag(TiXmlElement * parentTag, mitk::USDeviceReaderXML::USDeviceConfigData & config)
 {
   if (config.probes.size() != 0)
   {

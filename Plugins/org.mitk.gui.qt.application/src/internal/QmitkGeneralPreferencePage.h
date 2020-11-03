@@ -1,22 +1,17 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
+============================================================================*/
 
-===================================================================*/
-
-
-#ifndef QMITKGENERALPREFERENCEPAGE_H_
-#define QMITKGENERALPREFERENCEPAGE_H_
+#ifndef QMITKGENERALPREFERENCEPAGE_H
+#define QMITKGENERALPREFERENCEPAGE_H
 
 #include "berryIQtPreferencePage.h"
 #include <berryIPreferences.h>
@@ -31,9 +26,6 @@ class QmitkGeneralPreferencePage : public QObject, public berry::IQtPreferencePa
 
 public:
 
-  /**
-  * Default constructor
-  */
   QmitkGeneralPreferencePage();
 
   /**
@@ -70,6 +62,10 @@ protected:
 
     QWidget* m_MainControl;
 
+    QCheckBox* m_GlobalReinitOnNodeDelete;
+    QCheckBox* m_GlobalReinitOnNodeVisibilityChanged;
+
+    berry::IPreferences::Pointer m_GeneralPreferencesNode;
 };
 
-#endif /* QMITKGENERALPREFERENCEPAGE_H_ */
+#endif // QMITKGENERALPREFERENCEPAGE_H

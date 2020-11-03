@@ -1,26 +1,22 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkCESTImageNormalizationFilter.h"
 
-#include <mitkCustomTagParser.h>
+#include <mitkCESTPropertyHelper.h>
+#include <mitkExtractCESTOffset.h>
 #include <mitkImage.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
-#include <mitkLocaleSwitch.h>
 
 #include <boost/algorithm/string.hpp>
 
@@ -57,7 +53,7 @@ void mitk::CESTImageNormalizationFilter::GenerateData()
   resultMitkImage->SetTimeGeometry(resultTimeGeometry);
 
   resultMitkImage->SetPropertyList(this->GetInput()->GetPropertyList()->Clone());
-  resultMitkImage->GetPropertyList()->SetStringProperty(mitk::CustomTagParser::m_OffsetsPropertyName.c_str(), m_RealOffsets.c_str());
+  resultMitkImage->GetPropertyList()->SetStringProperty(CEST_PROPERTY_NAME_OFFSETS().c_str(), m_RealOffsets.c_str());
   // remove uids
   resultMitkImage->GetPropertyList()->DeleteProperty("DICOM.0008.0018");
   resultMitkImage->GetPropertyList()->DeleteProperty("DICOM.0020.000D");
@@ -68,34 +64,28 @@ void mitk::CESTImageNormalizationFilter::GenerateData()
 template <typename TPixel, unsigned int VImageDimension>
 void mitk::CESTImageNormalizationFilter::NormalizeTimeSteps(const itk::Image<TPixel, VImageDimension>* image)
 {
-  mitk::LocaleSwitch localeSwitch("C");
   typedef itk::Image<TPixel, VImageDimension> ImageType;
   typedef itk::Image<double, VImageDimension> OutputImageType;
 
-  std::string offsets = "";
-  this->GetInput()->GetPropertyList()->GetStringProperty(mitk::CustomTagParser::m_OffsetsPropertyName.c_str(), offsets);
-  boost::algorithm::trim(offsets);
-
-  std::vector<std::string> parts;
-  boost::split(parts, offsets, boost::is_any_of(" "));
+  auto offsets = ExtractCESTOffset(this->GetInput());
 
   // determine normalization images
   std::vector<unsigned int> mZeroIndices;
   std::stringstream offsetsWithoutM0;
+  offsetsWithoutM0.imbue(std::locale("C"));
   m_NonM0Indices.clear();
-  for (unsigned int index = 0; index < parts.size(); ++index)
+  for (unsigned int index = 0; index < offsets.size(); ++index)
   {
-    if ((std::stod(parts.at(index)) < -299) || (std::stod(parts.at(index)) > 299))
+    if ((offsets.at(index) < -299) || (offsets.at(index) > 299))
     {
       mZeroIndices.push_back(index);
     }
     else
     {
-      offsetsWithoutM0 << parts.at(index) << " ";
+      offsetsWithoutM0 << offsets.at(index) << " ";
       m_NonM0Indices.push_back(index);
     }
   }
-
 
   auto resultImage = OutputImageType::New();
   typename ImageType::RegionType targetEntireRegion = image->GetLargestPossibleRegion();
@@ -196,3 +186,17 @@ void mitk::CESTImageNormalizationFilter::GenerateOutputInformation()
 
   itkDebugMacro(<< "GenerateOutputInformation()");
 }
+
+bool mitk::IsNotNormalizedCESTImage(const Image* cestImage)
+{
+  auto offsets = ExtractCESTOffset(cestImage);
+
+  for (const auto& offset : offsets)
+  {
+    if (offset < -299 || offset > 299)
+    {
+      return true;
+    }
+  }
+  return false;
+};

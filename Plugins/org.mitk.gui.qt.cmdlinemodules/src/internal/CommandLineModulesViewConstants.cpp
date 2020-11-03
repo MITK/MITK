@@ -1,21 +1,18 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) University College London (UCL).
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "CommandLineModulesViewConstants.h"
 
-const QString CommandLineModulesViewConstants::VIEW_ID = "org.mitk.gui.qt.cmdlinemodules";
+const QString CommandLineModulesViewConstants::VIEW_ID = "org.mitk.views.cmdlinemodules";
 const QString CommandLineModulesViewConstants::TEMPORARY_DIRECTORY_NODE_NAME = "temporary directory";
 const QString CommandLineModulesViewConstants::OUTPUT_DIRECTORY_NODE_NAME = "output directory";
 const QString CommandLineModulesViewConstants::MODULE_DIRECTORIES_NODE_NAME = "module directories";

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkContourModelSerializer.h"
 #include "mitkContourModelWriter.h"
@@ -55,7 +51,7 @@ std::string mitk::ContourModelSerializer::Serialize()
     writer.SetInput(contour);
     writer.Write();
   }
-  catch (std::exception &e)
+  catch ( const std::exception &e )
   {
     MITK_ERROR << " Error serializing object at " << (const void *)this->m_Data << " to " << fullname << ": "
                << e.what();

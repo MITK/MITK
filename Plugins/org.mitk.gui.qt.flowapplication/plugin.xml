@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+  <extension id="org.mitk.qt.flowapplication" point="org.blueberry.osgi.applications">
+    <application>
+      <run class="QmitkFlowApplication"/>
+    </application>
+  </extension>
+
+  <extension id="workbench" point="org.blueberry.core.runtime.products">
+    <product name="MITK FlowBench" application="org.mitk.qt.flowapplication" />
+  </extension>
+
+   <extension point="org.blueberry.ui.preferencePages">
+     <page
+       id="org.blueberry.ui.preferencePages.Style"
+       name="Themes"
+       category="org.mitk.GeneralPreferencePage"
+       class="berry::ExtensionFactory:stylePreferencePage">
+       <keywordreference id="org.blueberry.ui.style"/>
+     </page>
+     <page
+       id="org.blueberry.ui.preferencePages.Perspectives"
+       name="Perspectives"
+       category="org.mitk.GeneralPreferencePage"
+       class="berry::ExtensionFactory:perspectivesPreferencePage">
+       <keywordreference id="org.blueberry.ui.perspectives"/>
+     </page>
+   </extension>
+</plugin>

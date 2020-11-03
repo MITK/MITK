@@ -1,130 +1,327 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
+============================================================================*/
 
-===================================================================*/
-
+// Testing
+#include "mitkTestFixture.h"
+#include <mitkTestingMacros.h>
+// MITK includes
+#include <mitkCoreServices.h>
 #include "mitkImage.h"
 #include "mitkImageGenerator.h"
 #include "mitkImageReadAccessor.h"
 #include "mitkImageStatisticsHolder.h"
-#include <mitkTestingMacros.h>
 
-int mitkImageGeneratorTest(int /*argc*/, char * /*argv*/ [])
+class mitkImageGeneratorTestSuite : public mitk::TestFixture
 {
-  MITK_TEST_BEGIN("ImageGeneratorTest");
+  CPPUNIT_TEST_SUITE(mitkImageGeneratorTestSuite);
+  MITK_TEST(SetSpacingX2D_Success);
+  MITK_TEST(SetDefaultSpacingX2D_Success);
+  MITK_TEST(SetSpacingX3D_Success);
+  MITK_TEST(SetSpacingY2D_Success);
+  MITK_TEST(SetDefaultSpacingY2D_Success);
+  MITK_TEST(SetSpacingY3D_Success);
+  MITK_TEST(SetSpacingZ2D_Success);
+  MITK_TEST(SetDefaultSpacingZ2D_Success);
+  MITK_TEST(SetSpacingZ3D_Success);
+  MITK_TEST(SetDimension2D_Success);
+  MITK_TEST(SetDimension3D_Success);
+  MITK_TEST(SetDimension4D_Success);
+  MITK_TEST(SetDimensionX2D_Success);
+  MITK_TEST(SetDimensionY2D_Success);
+  MITK_TEST(SetDimensionZ3D_Success);
+  MITK_TEST(SetDimensionT4D_Success);
+  MITK_TEST(SetDimensions3Dc_Success);
+  MITK_TEST(SetDataTypeFloat2D_Success);
+  MITK_TEST(SetDataTypeUChar2D_Success);
+  MITK_TEST(SetDataTypeInt3D_Success);
+  MITK_TEST(SetDataTypeDouble3D_Success);
+  MITK_TEST(SetDataTypeFloat4D_Success);
+  MITK_TEST(SetDataTypeUChar4D_Success);
+  MITK_TEST(SetDataTypeUInt3D_Success);
+  MITK_TEST(SetPixelTypeFloat2D_Success);
+  MITK_TEST(SetPixelTypeUChar2D_Success);
+  MITK_TEST(SetPixelTypeInt3D_Success);
+  MITK_TEST(SetPixelTypeDouble3D_Success);
+  MITK_TEST(SetPixelTypeFloat4D_Success);
+  MITK_TEST(SetPixelTypeUChar4D_Success);
+  MITK_TEST(SetPixelTypeUInt3D_Success);
+  MITK_TEST(MaxValueHolds_Success);
+  MITK_TEST(MinValueHolds_Success);
+  MITK_TEST(DefaultMaxValueHolds_Success);
+  MITK_TEST(DefaultMinValueHolds_Success);
+  MITK_TEST(SetGradientImageValues_Success);
+  CPPUNIT_TEST_SUITE_END();
 
+private:
   // create some images with arbitrary parameters (corner cases)
-  mitk::Image::Pointer image2Da =
-    mitk::ImageGenerator::GenerateRandomImage<float>(120, 205, 0, 0, 0.1, 0.2, 0.3, 577, 23);
-  mitk::Image::Pointer image2Db = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(1, 1, 0, 0);
-  mitk::Image::Pointer image3Da = mitk::ImageGenerator::GenerateRandomImage<int>(512, 205, 1, 0);
-  mitk::Image::Pointer image3Db = mitk::ImageGenerator::GenerateRandomImage<double>(512, 532, 112, 0);
-  mitk::Image::Pointer image4Da = mitk::ImageGenerator::GenerateRandomImage<float>(120, 205, 78, 1);
-  mitk::Image::Pointer image4Db = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(550, 33, 78, 150);
+  mitk::Image::Pointer m_Image2Da;
+  mitk::Image::Pointer m_Image2Db;
+  mitk::Image::Pointer m_Image3Da;
+  mitk::Image::Pointer m_Image3Db;
+  mitk::Image::Pointer m_Image4Da;
+  mitk::Image::Pointer m_Image4Db;
+  mitk::Image::Pointer m_Image3Dc;
 
-  mitk::Image::Pointer image3Dc = mitk::ImageGenerator::GenerateGradientImage<unsigned int>(1, 2, 3, 4, 5, 6);
-
-  MITK_TEST_CONDITION_REQUIRED(fabs(image2Da->GetGeometry()->GetSpacing()[0] - 0.1) < 0.0001,
-                               "Testing if spacing x is set correctly.");
-  MITK_TEST_CONDITION_REQUIRED(fabs(image2Da->GetGeometry()->GetSpacing()[1] - 0.2) < 0.0001,
-                               "Testing if spacing y is set correctly.");
-  MITK_TEST_CONDITION_REQUIRED(fabs(image2Da->GetGeometry()->GetSpacing()[2] - 0.3) < 0.0001,
-                               "Testing if spacing z is set correctly.");
-
-  MITK_TEST_CONDITION_REQUIRED(fabs(image2Db->GetGeometry()->GetSpacing()[0] - 1.0) < 0.0001,
-                               "Testing if default spacing x is set correctly.");
-  MITK_TEST_CONDITION_REQUIRED(fabs(image2Db->GetGeometry()->GetSpacing()[1] - 1.0) < 0.0001,
-                               "Testing if default spacing y is set correctly.");
-  MITK_TEST_CONDITION_REQUIRED(fabs(image2Db->GetGeometry()->GetSpacing()[2] - 1.0) < 0.0001,
-                               "Testing if default spacing z is set correctly.");
-
-  MITK_TEST_CONDITION_REQUIRED(fabs(image3Dc->GetGeometry()->GetSpacing()[0] - 4) < 0.0001,
-                               "Testing if spacing x is set correctly.");
-  MITK_TEST_CONDITION_REQUIRED(fabs(image3Dc->GetGeometry()->GetSpacing()[1] - 5) < 0.0001,
-                               "Testing if spacing y is set correctly.");
-  MITK_TEST_CONDITION_REQUIRED(fabs(image3Dc->GetGeometry()->GetSpacing()[2] - 6) < 0.0001,
-                               "Testing if spacing z is set correctly.");
-
-  MITK_TEST_CONDITION_REQUIRED(image2Da->GetDimension() == 2, "Testing if the dimension is set correctly.");
-  MITK_TEST_CONDITION_REQUIRED(image2Db->GetDimension() == 2, "Testing if the dimension is set correctly.");
-  MITK_TEST_CONDITION_REQUIRED(image3Da->GetDimension() == 2, "Testing if the dimension is set correctly.");
-  MITK_TEST_CONDITION_REQUIRED(image3Db->GetDimension() == 3, "Testing if the dimension is set correctly.");
-  MITK_TEST_CONDITION_REQUIRED(image4Da->GetDimension() == 3, "Testing if the dimension is set correctly.");
-  MITK_TEST_CONDITION_REQUIRED(image4Db->GetDimension() == 4, "Testing if the dimension is set correctly.");
-
-  MITK_TEST_CONDITION_REQUIRED(image2Da->GetDimension(0) == 120, "Testing if the dimensions are set correctly.");
-  MITK_TEST_CONDITION_REQUIRED(image2Db->GetDimension(1) == 1, "Testing if the dimensions are set correctly.");
-  MITK_TEST_CONDITION_REQUIRED(image3Da->GetDimension(2) == 1, "Testing if the dimensions are set correctly.");
-  MITK_TEST_CONDITION_REQUIRED(image3Db->GetDimension(2) == 112, "Testing if the dimensions are set correctly.");
-  MITK_TEST_CONDITION_REQUIRED(image4Da->GetDimension(3) == 1, "Testing if the dimensions are set correctly.");
-  MITK_TEST_CONDITION_REQUIRED(image4Db->GetDimension(3) == 150, "Testing if the dimensions are set correctly.");
-
-  MITK_TEST_CONDITION_REQUIRED(image3Dc->GetDimension(0) == 1, "Testing if image3Dc dimension x is set correctly.");
-  MITK_TEST_CONDITION_REQUIRED(image3Dc->GetDimension(1) == 2, "Testing if image3Dc dimension y is set correctly.");
-  MITK_TEST_CONDITION_REQUIRED(image3Dc->GetDimension(2) == 3, "Testing if image3Dc dimension z is set correctly.");
-
-  itk::ImageIOBase::IOPixelType scalarType = itk::ImageIOBase::SCALAR;
-
-  MITK_TEST_CONDITION_REQUIRED(image2Da->GetPixelType().GetComponentType() == itk::ImageIOBase::FLOAT,
-                               "Testing if the data type is set correctly.");
-  MITK_TEST_CONDITION_REQUIRED(image2Da->GetPixelType().GetPixelType() == scalarType,
-                               "Testing if the pixel type is set correctly.");
-  MITK_TEST_CONDITION_REQUIRED(image2Db->GetPixelType().GetComponentType() == itk::ImageIOBase::UCHAR,
-                               "Testing if the data type is set correctly.");
-  MITK_TEST_CONDITION_REQUIRED(image2Db->GetPixelType().GetPixelType() == scalarType,
-                               "Testing if the data type is set correctly.");
-  MITK_TEST_CONDITION_REQUIRED(image3Da->GetPixelType().GetComponentType() == itk::ImageIOBase::INT,
-                               "Testing if the data type is set correctly.");
-  MITK_TEST_CONDITION_REQUIRED(image3Da->GetPixelType().GetPixelType() == scalarType,
-                               "Testing if the pixel type is set correctly.");
-  MITK_TEST_CONDITION_REQUIRED(image3Db->GetPixelType().GetComponentType() == itk::ImageIOBase::DOUBLE,
-                               "Testing if the data type is set correctly.");
-  MITK_TEST_CONDITION_REQUIRED(image3Db->GetPixelType().GetPixelType() == scalarType,
-                               "Testing if the pixel type is set correctly.");
-  MITK_TEST_CONDITION_REQUIRED(image4Da->GetPixelType().GetComponentType() == itk::ImageIOBase::FLOAT,
-                               "Testing if the data type is set correctly.");
-  MITK_TEST_CONDITION_REQUIRED(image4Da->GetPixelType().GetPixelType() == scalarType,
-                               "Testing if the pixel type is set correctly.");
-  MITK_TEST_CONDITION_REQUIRED(image4Db->GetPixelType().GetComponentType() == itk::ImageIOBase::UCHAR,
-                               "Testing if the data type is set correctly.");
-  MITK_TEST_CONDITION_REQUIRED(image4Db->GetPixelType().GetPixelType() == scalarType,
-                               "Testing if the pixel type is set correctly.");
-  MITK_TEST_CONDITION_REQUIRED(image3Dc->GetPixelType().GetComponentType() == itk::ImageIOBase::UINT,
-                               "Testing if the data type is set correctly.");
-  MITK_TEST_CONDITION_REQUIRED(image3Dc->GetPixelType().GetPixelType() == scalarType,
-                               "Testing if the pixel type is set correctly.");
-
-  MITK_TEST_CONDITION_REQUIRED(image2Da->GetStatistics()->GetScalarValueMax() <= 577, "Testing if max value holds");
-  MITK_TEST_CONDITION_REQUIRED(image2Da->GetStatistics()->GetScalarValueMin() >= 23, "Testing if min value holds");
-
-  MITK_TEST_CONDITION_REQUIRED(image3Da->GetStatistics()->GetScalarValueMax() <= 1000, "Testing if max value holds");
-  MITK_TEST_CONDITION_REQUIRED(image3Da->GetStatistics()->GetScalarValueMin() >= 0, "Testing if min value holds");
-
-  const unsigned int *image3DcBuffer = nullptr;
-  try
+public:
+  void setUp()
   {
-    mitk::ImageReadAccessor readAccess(image3Dc);
-    image3DcBuffer = static_cast<const unsigned int *>(readAccess.GetData());
+    m_Image2Da = mitk::ImageGenerator::GenerateRandomImage<float>(120, 205, 0, 0, 0.1, 0.2, 0.3, 577, 23);
+    m_Image2Db = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(1, 1, 0, 0);
+    m_Image3Da = mitk::ImageGenerator::GenerateRandomImage<int>(512, 205, 1, 0);
+    m_Image3Db = mitk::ImageGenerator::GenerateRandomImage<double>(512, 532, 112, 0);
+    m_Image4Da = mitk::ImageGenerator::GenerateRandomImage<float>(120, 205, 78, 1);
+    m_Image4Db = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(550, 33, 78, 150);
+    m_Image3Dc = mitk::ImageGenerator::GenerateGradientImage<unsigned int>(1, 2, 3, 4, 5, 6);
   }
-  catch (...)
+  void tearDown()
   {
-    MITK_ERROR << "Read access not granted on mitk::Image.";
-  }
-  for (unsigned int i = 0; i < 2 * 3; i++)
-  {
-    MITK_TEST_CONDITION_REQUIRED(image3DcBuffer[i] == i, "Testing if gradient image values are set correctly");
+    m_Image2Da = nullptr;
+    m_Image2Db = nullptr;
+    m_Image3Da = nullptr;
+    m_Image3Db = nullptr;
+    m_Image4Da = nullptr;
+    m_Image4Db = nullptr;
+    m_Image3Dc = nullptr;
   }
 
-  MITK_TEST_END();
-}
+  void SetSpacingX2D_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Testing if spacing 2D x is set correctly.",
+        fabs(m_Image2Da->GetGeometry()->GetSpacing()[0] - 0.1) < 0.0001);
+  }
+
+  void SetDefaultSpacingX2D_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Testing if default spacing 2D x is set correctly.",
+                fabs(m_Image2Db->GetGeometry()->GetSpacing()[0] - 1.0) < 0.0001);
+  }
+
+  void SetSpacingX3D_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Testing if spacing 3D x is set correctly.",
+          fabs(m_Image3Dc->GetGeometry()->GetSpacing()[0] - 4) < 0.0001);
+  }
+
+  void SetSpacingY2D_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Testing if spacing 2D y is set correctly.",
+        fabs(m_Image2Da->GetGeometry()->GetSpacing()[1] - 0.2) < 0.0001);
+  }
+
+  void SetDefaultSpacingY2D_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Testing if default spacing 2D y is set correctly.",
+                 fabs(m_Image2Db->GetGeometry()->GetSpacing()[1] - 1.0) < 0.0001);
+  }
+
+  void SetSpacingY3D_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Testing if spacing 3D y is set correctly.",
+          fabs(m_Image3Dc->GetGeometry()->GetSpacing()[1] - 5) < 0.0001);
+  }
+
+  void SetSpacingZ2D_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Testing if spacing 2D z is set correctly.",
+        fabs(m_Image2Da->GetGeometry()->GetSpacing()[2] - 0.3) < 0.0001);
+  }
+
+  void SetDefaultSpacingZ2D_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Testing if default spacing 2D z is set correctly.",
+                 fabs(m_Image2Db->GetGeometry()->GetSpacing()[2] - 1.0) < 0.0001);
+  }
+
+  void SetSpacingZ3D_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Testing if spacing z is set correctly.",
+        fabs(m_Image3Dc->GetGeometry()->GetSpacing()[2] - 6) < 0.0001);
+  }
+
+  void SetDimension2D_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Testing if the dimension 2D is set correctly.", m_Image2Da->GetDimension() == 2);
+    CPPUNIT_ASSERT_MESSAGE("Testing if the dimension 2D is set correctly.", m_Image2Db->GetDimension() == 2);
+  }
+
+  void SetDimension3D_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Testing if the dimension 3D is set correctly.",m_Image3Da->GetDimension() == 2);
+    CPPUNIT_ASSERT_MESSAGE("Testing if the dimension 3D is set correctly.", m_Image3Db->GetDimension() == 3);
+  }
+
+  void SetDimension4D_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Testing if the dimension 4D is set correctly.", m_Image4Da->GetDimension() == 3);
+    CPPUNIT_ASSERT_MESSAGE("Testing if the dimension 4D is set correctly.", m_Image4Db->GetDimension() == 4);
+  }
+
+  void SetDimensionX2D_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Testing if the X dimension of the 2D image is set correctly.", m_Image2Da->GetDimension(0) == 120);
+  }
+
+  void SetDimensionY2D_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Testing if the Y dimension of the 2D image is set correctly.", m_Image2Db->GetDimension(1) == 1);
+  }
+
+  void SetDimensionZ3D_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Testing if the Z dimension of the 3D image is set correctly.", m_Image3Da->GetDimension(2) == 1);
+    CPPUNIT_ASSERT_MESSAGE("Testing if the Z dimension of the 3D image is set correctly.", m_Image3Db->GetDimension(2) == 112);
+  }
+
+  void SetDimensionT4D_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Testing if the T dimension of the 4D image is set correctly.", m_Image4Da->GetDimension(3) == 1);
+    CPPUNIT_ASSERT_MESSAGE("Testing if the T dimension of the 4D image is set correctly.", m_Image4Db->GetDimension(3) == 150);
+  }
+
+  void SetDimensions3Dc_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Testing if image3Dc dimension x is set correctly.", m_Image3Dc->GetDimension(0) == 1);
+    CPPUNIT_ASSERT_MESSAGE("Testing if image3Dc dimension y is set correctly.", m_Image3Dc->GetDimension(1) == 2);
+    CPPUNIT_ASSERT_MESSAGE("Testing if image3Dc dimension z is set correctly.", m_Image3Dc->GetDimension(2) == 3);
+  }
+
+  void SetDataTypeFloat2D_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Testing if the data type for a float 3D image is set correctly.",
+                      m_Image2Da->GetPixelType().GetComponentType() == itk::ImageIOBase::FLOAT);
+  }
+
+  void SetDataTypeUChar2D_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Testing if the data type for a UChar 2D image is set correctly.",
+                      m_Image2Db->GetPixelType().GetComponentType() == itk::ImageIOBase::UCHAR);
+  }
+
+  void SetDataTypeInt3D_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Testing if the data type for a Int 3D image is set correctly.",
+                      m_Image3Da->GetPixelType().GetComponentType() == itk::ImageIOBase::INT);
+  }
+
+  void SetDataTypeDouble3D_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Testing if the data type for a Double 3D image is set correctly.",
+                      m_Image3Db->GetPixelType().GetComponentType() == itk::ImageIOBase::DOUBLE);
+  }
+
+  void SetDataTypeFloat4D_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Testing if the data type for a Float 4D image is set correctly.",
+                      m_Image4Da->GetPixelType().GetComponentType() == itk::ImageIOBase::FLOAT);
+  }
+
+  void SetDataTypeUChar4D_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Testing if the data type for a UChar 4D image is set correctly.",
+                      m_Image4Db->GetPixelType().GetComponentType() == itk::ImageIOBase::UCHAR);
+  }
+
+  void SetDataTypeUInt3D_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Testing if the data type for a UInt 3D image is set correctly.",
+                      m_Image3Dc->GetPixelType().GetComponentType() == itk::ImageIOBase::UINT);
+  }
+
+  void SetPixelTypeFloat2D_Success()
+  {
+    itk::ImageIOBase::IOPixelType scalarType = itk::ImageIOBase::SCALAR;
+    CPPUNIT_ASSERT_MESSAGE("Testing if the pixel type for a Float 2D image is set correctly.",
+                                        m_Image2Da->GetPixelType().GetPixelType() == scalarType);
+  }
+
+  void SetPixelTypeUChar2D_Success()
+  {
+    itk::ImageIOBase::IOPixelType scalarType = itk::ImageIOBase::SCALAR;
+    CPPUNIT_ASSERT_MESSAGE("Testing if the pixel type for a UChar 2D image is set correctly.",
+                                        m_Image2Db->GetPixelType().GetPixelType() == scalarType);
+  }
+
+  void SetPixelTypeInt3D_Success()
+  {
+    itk::ImageIOBase::IOPixelType scalarType = itk::ImageIOBase::SCALAR;
+    CPPUNIT_ASSERT_MESSAGE("Testing if the pixel type for a Int 3D image is set correctly.",
+                                      m_Image3Da->GetPixelType().GetPixelType() == scalarType);
+  }
+
+  void SetPixelTypeDouble3D_Success()
+  {
+    itk::ImageIOBase::IOPixelType scalarType = itk::ImageIOBase::SCALAR;
+    CPPUNIT_ASSERT_MESSAGE("Testing if the pixel type for a Double 3D image is set correctly.",
+                                         m_Image3Db->GetPixelType().GetPixelType() == scalarType);
+  }
+
+  void SetPixelTypeFloat4D_Success()
+  {
+    itk::ImageIOBase::IOPixelType scalarType = itk::ImageIOBase::SCALAR;
+    CPPUNIT_ASSERT_MESSAGE("Testing if the pixel type for a Float 4D image is set correctly.",
+                                        m_Image4Da->GetPixelType().GetPixelType() == scalarType);
+  }
+
+  void SetPixelTypeUChar4D_Success()
+  {
+    itk::ImageIOBase::IOPixelType scalarType = itk::ImageIOBase::SCALAR;
+    CPPUNIT_ASSERT_MESSAGE("Testing if the pixel type for a UChar 4D image is set correctly.",
+                                        m_Image4Db->GetPixelType().GetPixelType() == scalarType);
+  }
+
+  void SetPixelTypeUInt3D_Success()
+  {
+    itk::ImageIOBase::IOPixelType scalarType = itk::ImageIOBase::SCALAR;
+    CPPUNIT_ASSERT_MESSAGE("Testing if the pixel type for a UInt 3D image is set correctly.",
+                                       m_Image3Dc->GetPixelType().GetPixelType() == scalarType);
+  }
+
+  void MaxValueHolds_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Testing if max value holds", m_Image2Da->GetStatistics()->GetScalarValueMax() <= 577);
+  }
+
+  void MinValueHolds_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Testing if min value holds", m_Image2Da->GetStatistics()->GetScalarValueMin() >= 23);
+  }
+
+  void DefaultMaxValueHolds_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Testing if default max value holds", m_Image3Da->GetStatistics()->GetScalarValueMax() <= 1000);
+  }
+
+  void DefaultMinValueHolds_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Testing if default min value holds", m_Image3Da->GetStatistics()->GetScalarValueMin() >= 0);
+  }
+
+  void SetGradientImageValues_Success()
+  {
+    const unsigned int *image3DcBuffer = nullptr;
+    try
+    {
+      mitk::ImageReadAccessor readAccess(m_Image3Dc);
+      image3DcBuffer = static_cast<const unsigned int *>(readAccess.GetData());
+    }
+    catch (...)
+    {
+      MITK_ERROR << "Read access not granted on mitk::Image.";
+    }
+    for (unsigned int i = 0; i < 2 * 3; i++)
+    {
+      CPPUNIT_ASSERT_MESSAGE("Testing if gradient image values are set correctly", image3DcBuffer[i] == i);
+    }
+  }
+};
+MITK_TEST_SUITE_REGISTRATION(mitkImageGenerator)
+

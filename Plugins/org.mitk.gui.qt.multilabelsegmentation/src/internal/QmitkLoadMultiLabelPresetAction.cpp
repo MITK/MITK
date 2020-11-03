@@ -1,76 +1,56 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
+============================================================================*/
 
-===================================================================*/
 #include "QmitkLoadMultiLabelPresetAction.h"
 
-#include "mitkLabelSetImage.h"
-#include "mitkLabelSetIOHelper.h"
-#include "mitkRenderingManager.h"
+#include <mitkLabelSetImage.h>
+#include <mitkLabelSetIOHelper.h>
 
-#include "QFileDialog"
-#include "QInputDialog"
-#include "QMessageBox"
+#include <QFileDialog>
 
-#include "tinyxml.h"
-
-QmitkLoadMultiLabelPresetAction::QmitkLoadMultiLabelPresetAction()
+void QmitkLoadMultiLabelPresetAction::Run(const QList<mitk::DataNode::Pointer> &selectedNodes)
 {
-}
+  const auto filename = QFileDialog::getOpenFileName(nullptr, QStringLiteral("Load LabelSet Preset"),
+    QString(), QStringLiteral("LabelSet Preset (*.lsetp)")).toStdString();
 
-QmitkLoadMultiLabelPresetAction::~QmitkLoadMultiLabelPresetAction()
-{
-}
+  if (filename.empty())
+    return;
 
-void QmitkLoadMultiLabelPresetAction::Run( const QList<mitk::DataNode::Pointer> &selectedNodes )
-{
-  foreach ( mitk::DataNode::Pointer referenceNode, selectedNodes )
+  for (auto node : selectedNodes)
   {
+    if (node.IsNull())
+      continue;
 
-    if (referenceNode.IsNull()) return;
+    mitk::LabelSetImage::Pointer image = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
 
-    mitk::LabelSetImage::Pointer referenceImage = dynamic_cast<mitk::LabelSetImage*>( referenceNode->GetData() );
-    assert(referenceImage);
+    if (image.IsNull())
+      continue;
 
-    std::string sName = referenceNode->GetName();
-    QString qName;
-    qName.sprintf("%s.lsetp",sName.c_str());
-    QString filename = QFileDialog::getOpenFileName(nullptr,"Load file",QString(),"LabelSet Preset(*.lsetp)");
-    if ( filename.isEmpty() )
-      return;
-
-    std::string fileName = filename.toStdString();
-    mitk::LabelSetIOHelper::LoadLabelSetImagePreset(fileName, referenceImage);
+    mitk::LabelSetIOHelper::LoadLabelSetImagePreset(filename, image);
   }
 }
 
-void QmitkLoadMultiLabelPresetAction::SetDataStorage(mitk::DataStorage* dataStorage)
+void QmitkLoadMultiLabelPresetAction::SetDataStorage(mitk::DataStorage*)
 {
-  m_DataStorage = dataStorage;
 }
 
-void QmitkLoadMultiLabelPresetAction::SetFunctionality(berry::QtViewPart* /*functionality*/)
+void QmitkLoadMultiLabelPresetAction::SetFunctionality(berry::QtViewPart*)
 {
-  //not needed
 }
 
 void QmitkLoadMultiLabelPresetAction::SetSmoothed(bool)
 {
-  //not needed
 }
 
 void QmitkLoadMultiLabelPresetAction::SetDecimated(bool)
 {
-  //not needed
 }

@@ -19,7 +19,7 @@
      <item row="0" column="0">
       <widget class="QLabel" name="ffmpegLabel">
        <property name="text">
-        <string>FFmpeg/Libav:</string>
+        <string>FFmpeg:</string>
        </property>
        <property name="textFormat">
         <enum>Qt::PlainText</enum>

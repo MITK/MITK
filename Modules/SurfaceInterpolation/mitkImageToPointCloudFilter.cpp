@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkImageToPointCloudFilter.h"
 
@@ -27,8 +23,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkImageAccessByItk.h>
 #include <mitkImageStatisticsCalculator.h>
 #include <mitkUnstructuredGrid.h>
+#include <mitkImageStatisticsConstants.h>
 
-mitk::ImageToPointCloudFilter::ImageToPointCloudFilter()
+mitk::ImageToPointCloudFilter::ImageToPointCloudFilter() : m_Geometry(nullptr)
 {
   m_Method = DetectionMethod(0);
 
@@ -87,14 +84,14 @@ void mitk::ImageToPointCloudFilter::StdDeviations(itk::Image<TPixel, VImageDimen
 
   lapFilter->SetInput(fImage);
   lapFilter->UpdateLargestPossibleRegion();
-  mitk::Image::Pointer edgeImage = mitk::ImportItkImage(lapFilter->GetOutput());
+  auto edgeImage = mitk::ImportItkImage(lapFilter->GetOutput());
 
   mitk::ImageStatisticsCalculator::Pointer statCalc =
                                          mitk::ImageStatisticsCalculator::New();
-  statCalc->SetInputImage(edgeImage);
-  mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer stats = statCalc->GetStatistics();
-  double mean = stats->GetMean();
-  double stdDev = stats->GetStd();
+  statCalc->SetInputImage(edgeImage.GetPointer());
+  auto stats = statCalc->GetStatistics()->GetStatisticsForTimeStep(0);
+  auto mean = stats.GetValueConverted<double>(mitk::ImageStatisticsConstants::MEAN());
+  auto stdDev = stats.GetValueConverted<double>(mitk::ImageStatisticsConstants::STANDARDDEVIATION());
 
   double upperThreshold = mean + stdDev * amount;
   double lowerThreshold = mean - stdDev * amount;

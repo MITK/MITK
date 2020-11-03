@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #ifndef QMITKABSTRACTRENDEREDITOR_H
@@ -66,7 +62,14 @@ class MITK_QT_COMMON QmitkAbstractRenderEditor : public berry::QtEditorPart,
 
 public:
 
-  berryObjectMacro(QmitkAbstractRenderEditor, QtEditorPart, mitk::IRenderWindowPart)
+  berryObjectMacro(QmitkAbstractRenderEditor, QtEditorPart, mitk::IRenderWindowPart);
+
+  /**
+  * \see mitk::IRenderWindowPart::GetSelectedTimePoint()
+  This default implementation assumes that all renderer use the same TimeNavigationControl
+  provided by this class (GetTimeNavigationControl()).
+  */
+  mitk::TimePointType GetSelectedTimePoint(const QString& id = QString()) const override;
 
   QmitkAbstractRenderEditor();
   ~QmitkAbstractRenderEditor() override;

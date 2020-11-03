@@ -1,3 +1,15 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
 #ifndef MITKIGNOREPIXELMASKGEN_
 #define MITKIGNOREPIXELMASKGEN_
 
@@ -24,10 +36,8 @@ public:
     typedef double RealType;
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self)
-
-    /** Runtime information support. */
-    itkTypeMacro(IgnorePixelMaskGenerator, MaskGenerator)
+    itkNewMacro(Self); /** Runtime information support. */
+    itkTypeMacro(IgnorePixelMaskGenerator, MaskGenerator);
 
     /**
      * @brief The mask will be 0 there inputImage==pixelValue and 1 otherwise

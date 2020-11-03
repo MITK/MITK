@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
-BlueBerry Platform
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef BERRYOBJECT_H_
 #define BERRYOBJECT_H_
@@ -31,9 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #ifdef _MSC_VER
 // disable inheritance by dominance warnings
-#pragma warning( disable : 4250 4275 4251 )
-// disable warning: C++ exception specification ignored except to indicate a function is not __declspec(nothrow)
-#pragma warning( disable : 4290 )
+#pragma warning( disable : 4250 4275 )
 #endif
 
 class QDebug;

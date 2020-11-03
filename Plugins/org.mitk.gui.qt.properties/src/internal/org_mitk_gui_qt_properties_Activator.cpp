@@ -1,21 +1,16 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "org_mitk_gui_qt_properties_Activator.h"
-#include "QmitkPropertiesPreferencePage.h"
 #include "QmitkPropertyTreeView.h"
 
 ctkPluginContext* mitk::org_mitk_gui_qt_properties_Activator::m_Context = nullptr;
@@ -27,7 +22,6 @@ ctkPluginContext* mitk::org_mitk_gui_qt_properties_Activator::GetContext()
 
 void mitk::org_mitk_gui_qt_properties_Activator::start(ctkPluginContext* context)
 {
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkPropertiesPreferencePage, context);
   BERRY_REGISTER_EXTENSION_CLASS(QmitkPropertyTreeView, context);
   m_Context = context;
 }

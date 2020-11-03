@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkLabel.h"
 
@@ -20,7 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "tinyxml.h"
 #include <itkCommand.h>
 #include <mitkProperties.h>
-
+#include <mitkDICOMSegmentationPropertyHelper.h>
 #include <mitkStringProperty.h>
 
 const mitk::Label::PixelType mitk::Label::MAX_LABEL_VALUE = std::numeric_limits<mitk::Label::PixelType>::max();
@@ -61,6 +57,8 @@ mitk::Label::Label() : PropertyList()
     SetValue(0);
   if (GetProperty("layer") == nullptr)
     SetLayer(0);
+
+  DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(this);
 }
 
 mitk::Label::Label(const Label &other) : PropertyList(other)

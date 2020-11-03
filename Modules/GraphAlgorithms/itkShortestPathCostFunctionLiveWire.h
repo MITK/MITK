@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef __itkShortestPathCostFunctionLiveWire_h
 #define __itkShortestPathCostFunctionLiveWire_h
@@ -52,7 +48,8 @@ namespace itk
     typedef itk::ImageRegionConstIterator<TInputImageType> ConstIteratorType;
 
     /** Method for creation through the object factory. */
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /** Run-time type information (and related methods). */
       itkTypeMacro(ShortestPathCostFunctionLiveWire, ShortestPathCostFunction);
@@ -88,10 +85,6 @@ namespace itk
 
     itkSetMacro(RequestedRegion, RegionType);
     itkGetMacro(RequestedRegion, RegionType);
-
-    // Set/Get function for sigma parameter
-    itkSetMacro(UseApproximateGradient, bool);
-    itkGetMacro(UseApproximateGradient, bool);
 
     void SetImage(const TInputImageType *_arg) override;
 
@@ -138,7 +131,7 @@ namespace itk
     UnsignedCharImageType::Pointer m_MaskImage;
     VectorOutputImageType::Pointer m_GradientImage;
 
-    double minCosts;
+    double m_MinCosts;
 
     bool m_UseRepulsivePoints;
 
@@ -150,8 +143,6 @@ namespace itk
     double m_GradientMax;
 
     RegionType m_RequestedRegion;
-
-    bool m_UseApproximateGradient;
 
     bool m_Initialized;
 

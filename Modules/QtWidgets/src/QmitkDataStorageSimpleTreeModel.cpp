@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical Image Computing.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <QmitkDataStorageSimpleTreeModel.h>
 #include <QmitkDataStorageTreeModelInternalItem.h>
@@ -23,7 +19,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkEnums.h"
 
 QmitkDataStorageSimpleTreeModel::QmitkDataStorageSimpleTreeModel(QObject *parent)
-  : QmitkAbstractDataStorageModel(parent), m_Root(nullptr)
+  : QmitkAbstractDataStorageModel(parent)
+  , m_Root(nullptr)
 {
   ResetTree();
 }
@@ -32,13 +29,13 @@ QmitkDataStorageSimpleTreeModel::~QmitkDataStorageSimpleTreeModel()
 {
   m_Root->Delete();
   m_Root = nullptr;
-};
+}
 
 void QmitkDataStorageSimpleTreeModel::ResetTree()
 {
   mitk::DataNode::Pointer rootDataNode = mitk::DataNode::New();
   rootDataNode->SetName("Data Storage");
-  m_Root = new TreeItem(rootDataNode, 0);
+  m_Root = new TreeItem(rootDataNode, nullptr);
 }
 
 void QmitkDataStorageSimpleTreeModel::DataStorageChanged()
@@ -48,14 +45,18 @@ void QmitkDataStorageSimpleTreeModel::DataStorageChanged()
     m_Root->Delete();
   }
 
+  beginResetModel();
   ResetTree();
   UpdateModelData();
+  endResetModel();
 }
 
 void QmitkDataStorageSimpleTreeModel::NodePredicateChanged()
 {
+  beginResetModel();
   ResetTree();
   UpdateModelData();
+  endResetModel();
 }
 
 void QmitkDataStorageSimpleTreeModel::NodeAdded(const mitk::DataNode *node)
@@ -161,7 +162,7 @@ QmitkDataStorageSimpleTreeModel::TreeItem *QmitkDataStorageSimpleTreeModel::Tree
       return nullptr;
     }
     return item;
-  }    
+  }
   else
     return m_Root;
 }
@@ -297,7 +298,7 @@ mitk::DataNode *QmitkDataStorageSimpleTreeModel::GetParentNode(const mitk::DataN
 
 void QmitkDataStorageSimpleTreeModel::AddNodeInternal(const mitk::DataNode *node)
 {
-  if (node == nullptr || m_DataStorage.IsExpired() || !m_DataStorage.Lock()->Exists(node) || m_Root->Find(node) != 0)
+  if (node == nullptr || m_DataStorage.IsExpired() || !m_DataStorage.Lock()->Exists(node) || m_Root->Find(node) != nullptr)
     return;
 
   // find out if we have a root node

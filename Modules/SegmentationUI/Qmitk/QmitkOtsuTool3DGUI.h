@@ -1,31 +1,25 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QmitkOtsuTool3DGUI_h_Included
 #define QmitkOtsuTool3DGUI_h_Included
 
 #include "QmitkToolGUI.h"
 #include "mitkOtsuTool3D.h"
-#include "ui_QmitkOtsuToolWidgetControls.h"
-#include <MitkSegmentationUIExports.h>
-#include <QListWidget>
-#include <QPushButton>
 
-class QSpinBox;
-class QLabel;
+#include "ui_QmitkOtsuToolWidgetControls.h"
+
+#include <MitkSegmentationUIExports.h>
+#include <QPushButton>
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
@@ -42,25 +36,20 @@ class MITKSEGMENTATIONUI_EXPORT QmitkOtsuTool3DGUI : public QmitkToolGUI
 
 public:
   mitkClassMacro(QmitkOtsuTool3DGUI, QmitkToolGUI);
-  itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+  itkFactorylessNewMacro(Self);
+  itkCloneMacro(Self);
 
-    signals :
+protected slots :
 
-    public slots :
-
-    protected slots :
-
-    void OnNewToolAssociated(mitk::Tool *);
+  void OnNewToolAssociated(mitk::Tool *);
 
   void OnSpinboxValueAccept();
 
   void OnSegmentationRegionAccept();
 
-  void OnRegionSelectionChanged();
+  void OnRegionSelectionChanged(const QmitkSimpleLabelSetListWidget::LabelVectorType& selectedLabels);
 
   void OnRegionSpinboxChanged(int);
-
-  void OnVolumePreviewChecked(int);
 
 private slots:
 
@@ -69,6 +58,8 @@ private slots:
 protected:
   QmitkOtsuTool3DGUI();
   ~QmitkOtsuTool3DGUI() override;
+
+  void BusyStateChanged(bool value) override;
 
   mitk::OtsuTool3D::Pointer m_OtsuTool3DTool;
 
@@ -79,8 +70,6 @@ protected:
   bool m_UseValleyEmphasis;
 
   int m_NumberOfBins;
-
-  QList<QListWidgetItem *> m_SelectedItems;
 };
 
 #endif

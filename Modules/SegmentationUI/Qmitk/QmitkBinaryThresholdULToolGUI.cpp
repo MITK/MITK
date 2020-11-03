@@ -1,26 +1,22 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkBinaryThresholdULToolGUI.h"
-#include "QmitkConfirmSegmentationDialog.h"
 
 #include <qlabel.h>
 #include <qlayout.h>
 #include <qpushbutton.h>
 #include <qslider.h>
+#include <QApplication>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkBinaryThresholdULToolGUI, "")
 
@@ -49,14 +45,25 @@ QmitkBinaryThresholdULToolGUI::QmitkBinaryThresholdULToolGUI() : QmitkToolGUI()
   okButton->setFont(f);
   mainLayout->addWidget(okButton);
 
+  m_CheckProcessAll = new QCheckBox("Process all time steps", this);
+  m_CheckProcessAll->setChecked(false);
+  m_CheckProcessAll->setToolTip("Process/overwrite all time steps of the dynamic segmentation and not just the currently visible time step.");
+  mainLayout->addWidget(m_CheckProcessAll);
+
+  m_CheckCreateNew = new QCheckBox("Create as new segmentation", this);
+  m_CheckCreateNew->setChecked(false);
+  m_CheckCreateNew->setToolTip("Add the confirmed segmentation as a new segmentation instead of overwriting the currently selected.");
+  mainLayout->addWidget(m_CheckCreateNew);
+
   connect(this, SIGNAL(NewToolAssociated(mitk::Tool *)), this, SLOT(OnNewToolAssociated(mitk::Tool *)));
 }
 
 QmitkBinaryThresholdULToolGUI::~QmitkBinaryThresholdULToolGUI()
 {
-  // !!!
   if (m_BinaryThresholdULTool.IsNotNull())
   {
+    m_BinaryThresholdULTool->CurrentlyBusy -=
+      mitk::MessageDelegate1<QmitkBinaryThresholdULToolGUI, bool>(this, &QmitkBinaryThresholdULToolGUI::BusyStateChanged);
     m_BinaryThresholdULTool->IntervalBordersChanged -=
       mitk::MessageDelegate3<QmitkBinaryThresholdULToolGUI, double, double, bool>(
         this, &QmitkBinaryThresholdULToolGUI::OnThresholdingIntervalBordersChanged);
@@ -70,6 +77,8 @@ void QmitkBinaryThresholdULToolGUI::OnNewToolAssociated(mitk::Tool *tool)
 {
   if (m_BinaryThresholdULTool.IsNotNull())
   {
+    m_BinaryThresholdULTool->CurrentlyBusy -=
+      mitk::MessageDelegate1<QmitkBinaryThresholdULToolGUI, bool>(this, &QmitkBinaryThresholdULToolGUI::BusyStateChanged);
     m_BinaryThresholdULTool->IntervalBordersChanged -=
       mitk::MessageDelegate3<QmitkBinaryThresholdULToolGUI, double, double, bool>(
         this, &QmitkBinaryThresholdULToolGUI::OnThresholdingIntervalBordersChanged);
@@ -82,38 +91,36 @@ void QmitkBinaryThresholdULToolGUI::OnNewToolAssociated(mitk::Tool *tool)
 
   if (m_BinaryThresholdULTool.IsNotNull())
   {
+    m_BinaryThresholdULTool->CurrentlyBusy +=
+      mitk::MessageDelegate1<QmitkBinaryThresholdULToolGUI, bool>(this, &QmitkBinaryThresholdULToolGUI::BusyStateChanged);
     m_BinaryThresholdULTool->IntervalBordersChanged +=
       mitk::MessageDelegate3<QmitkBinaryThresholdULToolGUI, double, double, bool>(
         this, &QmitkBinaryThresholdULToolGUI::OnThresholdingIntervalBordersChanged);
     m_BinaryThresholdULTool->ThresholdingValuesChanged +=
       mitk::MessageDelegate2<QmitkBinaryThresholdULToolGUI, mitk::ScalarType, mitk::ScalarType>(
         this, &QmitkBinaryThresholdULToolGUI::OnThresholdingValuesChanged);
+
+    m_BinaryThresholdULTool->SetOverwriteExistingSegmentation(true);
+    m_CheckProcessAll->setVisible(m_BinaryThresholdULTool->GetTargetSegmentationNode()->GetData()->GetTimeSteps() > 1);
   }
 }
 
 void QmitkBinaryThresholdULToolGUI::OnAcceptThresholdPreview()
 {
-  QmitkConfirmSegmentationDialog dialog;
-  QString segName = QString::fromStdString(m_BinaryThresholdULTool->GetCurrentSegmentationName());
-
-  dialog.SetSegmentationName(segName);
-  int result = dialog.exec();
-
-  switch (result)
-  {
-    case QmitkConfirmSegmentationDialog::CREATE_NEW_SEGMENTATION:
-      m_BinaryThresholdULTool->SetOverwriteExistingSegmentation(false);
-      break;
-    case QmitkConfirmSegmentationDialog::OVERWRITE_SEGMENTATION:
-      m_BinaryThresholdULTool->SetOverwriteExistingSegmentation(true);
-      break;
-    case QmitkConfirmSegmentationDialog::CANCEL_SEGMENTATION:
-      return;
-  }
-
   if (m_BinaryThresholdULTool.IsNotNull())
   {
-    m_BinaryThresholdULTool->AcceptCurrentThresholdValue();
+    if (m_CheckCreateNew->isChecked())
+    {
+      m_BinaryThresholdULTool->SetOverwriteExistingSegmentation(false);
+    }
+    else
+    {
+      m_BinaryThresholdULTool->SetOverwriteExistingSegmentation(true);
+    }
+
+    m_BinaryThresholdULTool->SetCreateAllTimeSteps(m_CheckProcessAll->isChecked());
+
+    m_BinaryThresholdULTool->ConfirmSegmentation();
   }
 }
 
@@ -139,4 +146,18 @@ void QmitkBinaryThresholdULToolGUI::OnThresholdingValuesChanged(mitk::ScalarType
 void QmitkBinaryThresholdULToolGUI::OnThresholdsChanged(double min, double max)
 {
   m_BinaryThresholdULTool->SetThresholdValues(min, max);
+}
+
+void QmitkBinaryThresholdULToolGUI::BusyStateChanged(bool value)
+{
+  if (value)
+  {
+    QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
+  }
+  else
+  {
+    QApplication::restoreOverrideCursor();
+  }
+
+  m_DoubleThresholdSlider->setEnabled(!value);
 }

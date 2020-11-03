@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef _MITK_PLANAR_CIRCLE_H_
 #define _MITK_PLANAR_CIRCLE_H_
@@ -26,14 +22,17 @@ namespace mitk
 
   /**
    * \brief Implementation of PlanarFigure representing a circle
-   * through two control points
+   * either through two control points or by one control point (fixed radius mode)
+   * The mode is defined by the chosen constructor.
    */
   class MITKPLANARFIGURE_EXPORT PlanarCircle : public PlanarFigure
   {
   public:
     mitkClassMacro(PlanarCircle, PlanarFigure);
+    mitkNewMacro1Param(PlanarCircle, double);
+    itkFactorylessNewMacro(Self);
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkCloneMacro(Self);
 
       /** \brief Place figure in its minimal configuration (a point at least)
        * onto the given 2D geometry.
@@ -45,9 +44,9 @@ namespace mitk
       bool SetControlPoint(unsigned int index, const Point2D &point, bool createIfDoesNotExist = false) override;
 
     /** \brief Circle has 2 control points per definition. */
-    unsigned int GetMinimumNumberOfControlPoints() const override { return 2; }
+    unsigned int GetMinimumNumberOfControlPoints() const override { return (m_RadiusFixed) ? 1 : 2; }
     /** \brief Circle has 2 control points per definition. */
-    unsigned int GetMaximumNumberOfControlPoints() const override { return 2; }
+    unsigned int GetMaximumNumberOfControlPoints() const override { return (m_RadiusFixed) ? 1 : 2; }
     /** \brief Sets the minimum radius
     */
     void SetMinimumRadius(double radius) { m_MinRadius = radius; }
@@ -67,6 +66,8 @@ namespace mitk
 
   protected:
     PlanarCircle();
+    /** Constructor for fixed radius mode.*/
+    PlanarCircle(double fixedRadius);
 
     mitkCloneMacro(Self);
 
@@ -93,6 +94,8 @@ namespace mitk
     double m_MinRadius;
     double m_MaxRadius;
     bool m_MinMaxRadiusContraintsActive;
+    //indicate if the circle is created with fixed radius. The radius is stored in m_MinRadius
+    bool m_RadiusFixed;
 
   private:
   };

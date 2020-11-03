@@ -1,62 +1,80 @@
 /**
 \page org_mitk_views_segmentationutilities The Segmentation Utilities View
 
-\imageMacro{SegmentationUtilities.png,"Icon of the Segmentation Utilities View",5.00}
+\imageMacro{segmentation_utilities.svg,"Icon of the Segmentation Utilities View",5.00}
 
-\imageMacro{QmitkSegmentationUtilities_Overview.png,"The Segmentation Utilities view",16.00}
+\imageMacro{QmitkSegmentationUtilities_Overview.png,"The Segmentation Utilities View",16.00}
 
 \tableofcontents
 
 \section org_mitk_views_segmentationUtilitiesManualOverview Overview
 
-The <b>Segmentation Utilities View</b> allows you to postprocess existing segmentations
-
-
-\section org_mitk_views_segmentationUtilitiesImageSelection Image Selection
-
-Usually the data selection in the Segmentation Utilities View is done via drop down box which let you just select the appropriate data.
-
-\section org_mitk_views_segmentationUtilitiesBooleanOperations Boolean Operations
-
-Boolean operations allow you to create the
+The <b>Segmentation Utilities View</b> allows to postprocess existing segmentations. Currently five different operations exist:
 
 <ul>
-<li> <b>Union:</b> Combines two existing segmentations
-<li> <b>Intersection:</b> Keeps just the overlapping areas of two existing segmentations
-<li> <b>Difference:</b> Subtracts one segmentation from the other
+	<li> \ref org_mitk_views_segmentationUtilitiesBooleanOperations
+	<li> \ref org_mitk_views_segmentationUtilitiesContourToImage
+	<li> \ref org_mitk_views_segmentationUtilitiesImageMasking
+	<li> \ref org_mitk_views_segmentationUtilitiesMorphologicalOperations
+	<li> \ref org_mitk_views_segmentationUtilitiesSurfaceToImage
 </ul>
 
-of two segmentations. The selected segmentations must have the same geometry (size, spacing, ...)
+\section org_mitk_views_segmentationUtilitiesDataSelection Data Selection
 
-\imageMacro{QmitkSegmentationUtilities_IMGBooleanOperations.png,"Boolean operations of the SegmentationUtlitiesView",6.00}
+All postprocessing operations provide one or more selection widgets, which allow to select the data for the operation.
+
+\section org_mitk_views_segmentationUtilitiesBooleanOperations Boolean operations
+
+Boolean operations allows to perform the following fundamental operations on two segmentations:
+
+<ul>
+	<li> <b>Difference:</b> Subtracts the second segmentation from the first segmentation.
+	<li> <b>Intersection:</b> Extracts the overlapping areas of the two selected segmentations.
+	<li> <b>Union:</b> Combines the two existing segmentations.
+</ul>
+
+The selected segmentations must have the same geometry (size, spacing, ...) in order for the operations to work correctly.
+The result will be stored in a new data node as a child node of the first selected segmentation.
+
+\imageMacro{QmitkSegmentationUtilities_BooleanOperations.png,"Boolean operations",6.00}
+
+\section org_mitk_views_segmentationUtilitiesContourToImage Contour to image
+
+Contour to image allows to create a segmentation out of a given contour-model.
+The operation requires a contour model set and a reference image.
+The created segmentation image will have the same geometrical properties like the reference image (dimension, size and Geometry3D).
+
+\imageMacro{QmitkSegmentationUtilities_ContourToImage.png,"Contour to image",6.00}
 
 \section org_mitk_views_segmentationUtilitiesImageMasking Image masking
 
-You can mask your grey value image with either an existing segmentation or a surface. The result will be an image containing only
-the pixels that are cover by the respective mask.
+Image masking allows to mask an image with either an existing segmentation or a surface.
+The operation requires an image and a binary image mask or a surface.
+The result will be an image containing only the pixels that are covered by the respective mask.
 
-\imageMacro{QmitkSegmentationUtilities_IMGImageMasking.png,"Image masking widget of the Segmentation Utilities View",6.00}
+\imageMacro{QmitkSegmentationUtilities_ImageMasking.png,"Image masking",6.00}
 
-\section org_mitk_views_segmentationUtilitiesMorphologicalOperators Morphological Operators
+\section org_mitk_views_segmentationUtilitiesMorphologicalOperations Morphological operations
 
-The morphological operators are applied to a single segmentation image. Based on a given structuring element the underlying segmentation will be modfied.
-MITK provides a <b>ball</b> and a <b>cross</b> as structuring elements. The follow operators are at your disposal:
+Morphological operations are applied to a single segmentation image. Based on a given structuring element the underlying segmentation will be modfied.
+The plugin provides a <b>ball</b> and a <b>cross</b> as structuring elements. The follow operations are available:
 
 <ul>
-<li> <b>Dilation:</b> Each labeled pixel within the segmentation will be dilated based on the selected structuring element
-<li> <b>Erosion:</b> Each labeled pixel within the segmentation will be eroded based on the selected structuring element
-<li> <b>Opening:</b> A dilation followed by an erosion, used for smoothing edges or eliminating small objects
-<li> <b>Closing</b> An erosion followed by an dilation, used for filling small holes
-<li> <b>Fill Holes</b> Fills bigger holes within a segmentation
+	<li> <b>Dilation:</b> Each labeled pixel within the segmentation will be dilated based on the selected structuring element.
+	<li> <b>Erosion:</b> Each labeled pixel within the segmentation will be eroded based on the selected structuring element.
+	<li> <b>Opening:</b> A dilation followed by an erosion, used for smoothing edges or eliminating small objects.
+	<li> <b>Closing:</b> An erosion followed by an dilation, used for filling small holes.
+	<li> <b>Fill Holes:</b> Fills bigger holes within a segmentation.
 </ul>
 
-\imageMacro{QmitkSegmentationUtilities_IMGMorphologicalOperators.png,"Morphological operators widget of the Segmentation Utilities View",6.00}
+\imageMacro{QmitkSegmentationUtilities_MorphologicalOperations.png,"Morphological operations",6.00}
 
-\section org_mitk_views_segmentationUtilitiesSurfaceToImage Surface to binary image
+\section org_mitk_views_segmentationUtilitiesSurfaceToImage Surface to image
 
-This widget lets you fill you meshes into an empty binary image. It is required that a reference grey value image is present.
-The created binary image will have the same geometrical properties like the reference image
+Surface to image allows to create a segmentation out of a given surface.
+The operation requires a surface and a reference image.
+The created segmentation image will have the same geometrical properties like the reference image (dimension, size and Geometry3D).
 
-\imageMacro{QmitkSegmentationUtilities_IMGSurfaceToImage.png,"Surface to image widget of the Segmentation Utilities View",6.00}
+\imageMacro{QmitkSegmentationUtilities_SurfaceToImage.png,"Surface to image",6.00}
 
 **/

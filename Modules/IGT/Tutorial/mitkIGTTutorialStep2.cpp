@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <mitkVirtualTrackingDevice.h>
 #include <mitkNavigationData.h>
@@ -91,7 +87,7 @@ int main(int, char**)
   //Filter for rendering the cone at correct postion and orientation
   mitk::NavigationDataObjectVisualizationFilter::Pointer visualizer = mitk::NavigationDataObjectVisualizationFilter::New();
   visualizer->SetInput(0, source->GetOutput());
-  visualizer->SetRepresentationObject(0, cone);
+  visualizer->SetRepresentationObject(0, cone.GetPointer());
   //! [Moving Object]
 
   //! [Fixed Object]

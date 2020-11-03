@@ -1,48 +1,42 @@
-/*****************************************************************************
+/*============================================================================
 
- Copyright (c) 1993-2000,  Div. Medical and Biological Informatics, 
- Deutsches Krebsforschungszentrum, Heidelberg, Germany
+ Copyright (c) German Cancer Research Center (DKFZ)
  All rights reserved.
 
- Redistribution and use in source and binary forms, with or without 
+ Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
 
  - Redistributions of source code must retain the above copyright notice, this
    list of conditions and the following disclaimer.
 
- - Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+ - Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
- - All advertising materials mentioning features or use of this software must 
-   display the following acknowledgement: 
-          
-     "This product includes software developed by the Div. Medical and 
-      Biological Informatics, Deutsches Krebsforschungszentrum, Heidelberg, 
-      Germany."
+ - All advertising materials mentioning features or use of this software must
+   display the following acknowledgement:
 
- - Neither the name of the Deutsches Krebsforschungszentrum nor the names of 
-   its contributors may be used to endorse or promote products derived from 
-   this software without specific prior written permission. 
+     "This product includes software developed by the German Cancer Research
+      Center (DKFZ)."
 
-   THIS SOFTWARE IS PROVIDED BY THE DIVISION MEDICAL AND BIOLOGICAL
-   INFORMATICS AND CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED
-   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-   OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-   IN NO EVENT SHALL THE DIVISION MEDICAL AND BIOLOGICAL INFORMATICS,
-   THE DEUTSCHES KREBSFORSCHUNGSZENTRUM OR CONTRIBUTORS BE LIABLE FOR 
-   ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-   DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE 
-   GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER 
-   IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
-   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN 
-   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ - Neither the name of the German Cancer Research Center (DKFZ) nor the names
+   of its contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
 
- Send comments and/or bug reports to:
-   mbi-software@dkfz-heidelberg.de
+   THIS SOFTWARE IS PROVIDED BY THE GERMAN CANCER RESEARCH CENTER (DKFZ) AND
+   CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+   BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+   FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE GERMAN
+   CANCER RESEARCH CENTER (DKFZ) OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+   INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+   SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+   OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+   DAMAGE.
 
-*****************************************************************************/
+============================================================================*/
 
 
 /** @file
@@ -50,13 +44,13 @@
  *  (at the moment only datatype mitkIpUInt1_t, mitkIpInt2_t, mitkIpFloat8_t ) are
  *  supported.
  */
- 
+
  /**  this function converts one image to an image of another data type
  *  (at the moment only datatype mitkIpUInt1_t, mitkIpInt2_t, mitkIpFloat8_t ) are
  *  supported.
  *
  *  @param pic_old      pointer to input image
- *  @param type         image data type 
+ *  @param type         image data type
  *                    3    mitkIpPicInt
  *                    4    mitkIpPicUInt
  *                    5    mitkIpPicFloat
@@ -79,7 +73,7 @@ mitkIpPicDescriptor *mitkIpFuncConvert ( mitkIpPicDescriptor *pic_old,
 #ifndef DOXYGEN_IGNORE
 
 #ifndef lint
-  static char *what = { "@(#)mitkIpFuncConvert\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)mitkIpFuncConvert\t\tGerman Cancer Research Center (DKFZ)\t"__DATE__ };
 #endif
 
 
@@ -89,12 +83,12 @@ mitkIpPicDescriptor *mitkIpFuncConvert ( mitkIpPicDescriptor *pic_old,
 {                                                                        \
   mitkIpPicFORALL_4( CONV_2, pic_new, pic_old, type_old, min_gv, max_gv )    \
 }
- 
+
 #define CONV_3( type_old, pic_old, pic_new )                             \
 {                                                                        \
   mitkIpPicFORALL_2( CONV_4, pic_new, pic_old, type_old )                    \
 }
- 
+
 
 #define CONV_4( type_new, pic_new, pic_old, type_old )                   \
 {                                                                        \
@@ -139,7 +133,7 @@ mitkIpPicDescriptor *mitkIpFuncConvert ( mitkIpPicDescriptor *pic_old,
                                  mitkIpUInt4_t       bpe )
 
 {
-  mitkIpFloat8_t      min, max;         /* extreme greyvalues of 1. image   */ 
+  mitkIpFloat8_t      min, max;         /* extreme greyvalues of 1. image   */
   mitkIpFloat8_t      max_gv;
   mitkIpFloat8_t      min_gv;           /* min. possible greyvalue          */
   mitkIpPicDescriptor *pic_new;         /* pointer to new image             */
@@ -156,7 +150,7 @@ mitkIpPicDescriptor *mitkIpFuncConvert ( mitkIpPicDescriptor *pic_old,
        _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
        return ( mitkIpFuncERROR );
      }
-           
+
   /* calculate max. and min. possible greyvalues for output image       */
 
   if ( _mitkIpFuncExtT ( type, bpe, &min_gv, &max_gv ) != mitkIpFuncOK )
@@ -189,12 +183,12 @@ mitkIpPicDescriptor *mitkIpFuncConvert ( mitkIpPicDescriptor *pic_old,
 
   if ( ( min < min_gv ) || ( max > max_gv ) )
     mitkIpPicFORALL_3 ( CONV_1, pic_old, pic_new, min_gv, max_gv )
-  else 
+  else
     mitkIpPicFORALL_1 ( CONV_3, pic_old, pic_new )
 
   mitkIpFuncCopyTags(pic_new, pic_old);
-  
-      
+
+
 
   return pic_new;
 }

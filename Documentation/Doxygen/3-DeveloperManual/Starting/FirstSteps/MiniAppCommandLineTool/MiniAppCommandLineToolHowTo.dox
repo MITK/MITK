@@ -63,7 +63,7 @@ Running the ExampleToUpperCaseMiniApp without an argument or with wrong ones:
 \verbatim
 Command Line Utility *To Upper Case* in Category *MITK-Examples*
 An example MiniApp that converts the contents of a test file to upper case.
-MBI
+German Cancer Research Center (DKFZ)
 
 Use --xml to generate an XML description parsable as a CTK Command Line Module Plugin.
 
@@ -103,7 +103,7 @@ Running the ExampleToUpperCaseMiniApp with argument "--xml" ...
   <category>MITK-Examples</category>
   <title>To Upper Case</title>
   <description>An example MiniApp that converts the contents of a test file to upper case.</description>
-  <contributor>MBI</contributor>
+  <contributor>German Cancer Research Center (DKFZ)</contributor>
   <parameters>
    <label>Parameters</label>
    <description>Parameters</description>

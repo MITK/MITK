@@ -1,33 +1,28 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKCESTIOActivator_H
 #define MITKCESTIOActivator_H
 
 #include <mitkCustomMimeType.h>
+#include <mitkDICOMTagsOfInterestAddHelper.h>
 
 #include <usModuleActivator.h>
-#include <usServiceEvent.h>
 
 #include <memory>
 
 namespace mitk
 {
   struct IFileReader;
-  class IDICOMTagsOfInterest;
 
   class CESTIOActivator : public us::ModuleActivator
   {
@@ -37,8 +32,16 @@ namespace mitk
 
   private:
     std::unique_ptr<IFileReader> m_CESTDICOMReader;
+    std::unique_ptr<IFileReader> m_CESTDICOMManualWithMetaFileReader;
+    std::unique_ptr<IFileReader> m_CESTDICOMManualWithOutMetaFileReader;
     std::vector<mitk::CustomMimeType *> m_MimeTypes;
+
+    // Module context
+    us::ModuleContext* m_Context;
+
+    DICOMTagsOfInterestAddHelper m_TagHelper;
   };
+
 }
 
 #endif // MITKCESTIOActivator_H

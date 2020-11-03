@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkDataManagerLightView.h"
 #include "mitkNodePredicateDataType.h"
@@ -54,9 +50,9 @@ QmitkDataManagerLightView::QmitkDataManagerLightView()
     d->m_Predicate = mitk::NodePredicateDataType::New("Image");
     d->m_ItemIcon = QIcon(":/org.mitk.gui.qt.datamanagerlight/Image_24.png");
     d->m_CurrentIndex = -1;
-    d->m_ListWidget = 0;
-    d->m_ImageInfoLabel = 0;
-    d->m_RemoveButton = 0;
+    d->m_ListWidget = nullptr;
+    d->m_ImageInfoLabel = nullptr;
+    d->m_RemoveButton = nullptr;
 }
 
 QmitkDataManagerLightView::~QmitkDataManagerLightView()
@@ -168,7 +164,7 @@ void QmitkDataManagerLightView::on_Load_pressed()
   QStringList fileNames = QFileDialog::getOpenFileNames(nullptr, "Load data", "", QmitkIOUtil::GetFileOpenFilterString());
   for ( QStringList::Iterator it = fileNames.begin(); it != fileNames.end(); ++it )
   {
-    FileOpen((*it).toLatin1(), 0);
+    FileOpen((*it).toLatin1(), nullptr);
   }
 }
 
@@ -238,7 +234,7 @@ void QmitkDataManagerLightView::ToggleVisibility()
     for(int i=0; i<d->m_DataNodes.size(); ++i)
     {
         isVisible = false;
-        d->m_DataNodes.at(i)->GetVisibility(isVisible, 0 );
+        d->m_DataNodes.at(i)->GetVisibility(isVisible, nullptr );
 
         if( d->m_CurrentIndex == i && isVisible == false )
         {

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QmitkFastMarchingTool3DGUI_h_Included
 #define QmitkFastMarchingTool3DGUI_h_Included
@@ -24,8 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 class ctkSliderWidget;
 class ctkRangeWidget;
 class QPushButton;
-
-#include "QmitkStepperAdapter.h"
+class QCheckBox;
 
 /**
 \ingroup org_mitk_gui_qt_interactivesegmentation_internal
@@ -38,7 +33,8 @@ class MITKSEGMENTATIONUI_EXPORT QmitkFastMarchingTool3DGUI : public QmitkToolGUI
 
 public:
   mitkClassMacro(QmitkFastMarchingTool3DGUI, QmitkToolGUI);
-  itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+  itkFactorylessNewMacro(Self);
+  itkCloneMacro(Self);
 
     void OnThresholdChanged(int current);
 
@@ -52,8 +48,6 @@ protected slots:
   void OnSigmaChanged(double);
   void OnStoppingValueChanged(double);
   void OnConfirmSegmentation();
-  void Refetch();
-  void SetStepper(mitk::Stepper *);
   void OnClearSeeds();
 
 protected:
@@ -73,12 +67,10 @@ protected:
   QPushButton *m_btConfirm;
   QPushButton *m_btClearSeeds;
 
+  QCheckBox* m_CheckProcessAll = nullptr;
+  QCheckBox* m_CheckCreateNew = nullptr;
+
   mitk::FastMarchingTool3D::Pointer m_FastMarchingTool;
-
-  bool m_TimeIsConnected;
-  mitk::Stepper::Pointer m_TimeStepper;
-
-  void OnFastMarchingToolReady();
 
 private:
   void EnableWidgets(bool);

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef mitkGIFFirstOrderStatistics_h
 #define mitkGIFFirstOrderStatistics_h
@@ -131,34 +127,19 @@ namespace mitk
     * - <b>First Order::Number Of Voxels</b>: The volume of a single voxel. If the dimensionality is only 2D, this is the
     * surface of an voxel.
     */
-    mitkClassMacro(GIFFirstOrderStatistics,AbstractGlobalImageFeature)
-      itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    mitkClassMacro(GIFFirstOrderStatistics,AbstractGlobalImageFeature);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       GIFFirstOrderStatistics();
 
-    /**
-    * \brief Calculates the First Order Features based on a binned version of the image.
-    */
-    FeatureListType CalculateFeatures(const Image::Pointer & image, const Image::Pointer &feature) override;
+      FeatureListType CalculateFeatures(const Image* image, const Image* mask, const Image* maskNoNAN) override;
+      using Superclass::CalculateFeatures;
 
-    /**
-    * \brief Returns a list of the names of all features that are calculated from this class
-    */
-    FeatureNameListType GetFeatureNames() override;
-    virtual std::string GetCurrentFeatureEncoding() override;
+      void AddArguments(mitkCommandLineParser& parser) const override;
 
-    virtual void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList);
-    virtual void AddArguments(mitkCommandLineParser &parser);
-
-
-    struct ParameterStruct {
-      double MinimumIntensity;
-      double MaximumIntensity;
-      int Bins;
-      std::string prefix;
-    };
-
+  protected:
+    FeatureListType DoCalculateFeatures(const Image* image, const Image* mask) override;
   };
 }
 #endif //mitkGIFFirstOrderStatistics_h

@@ -1,17 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) University College London (UCL).
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QmitkCmdLineModuleFactoryGui_h
 #define QmitkCmdLineModuleFactoryGui_h
@@ -38,7 +35,7 @@ class QmitkCmdLineModuleFactoryGui
 public:
 
   QmitkCmdLineModuleFactoryGui(const mitk::DataStorage* dataStorage);
-  virtual ~QmitkCmdLineModuleFactoryGui();
+  ~QmitkCmdLineModuleFactoryGui() override;
 
   /**
    * \brief Simply creates QmitkCmdLineModuleGui which is an MITK specific Qt front end.

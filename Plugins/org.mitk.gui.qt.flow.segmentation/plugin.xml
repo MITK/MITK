@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.flow.control"
+          name="Segmentation Flow Control"
+          class="QmitkSegmentationFlowControlView"
+		  category="Flow"
+          icon="resources/icon.svg" />
+  </extension>
+
+  <extension point="org.blueberry.ui.perspectives">
+    <perspective
+      id="org.mitk.qt.flowapplication.defaultperspective"
+      name="Segmentation"
+      class="QmitkFlowSegmentationPerspective"
+      icon="resources/perspectives/segmentation_icon.svg">
+    </perspective>
+  </extension>
+
+</plugin>

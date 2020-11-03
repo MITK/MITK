@@ -1,22 +1,8 @@
-/*===================================================================
+/*============================================================================
 
-The Medical Imaging Interaction Toolkit (MITK)
+libsvm
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
-All rights reserved.
-
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
-
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
-
-/*===================================================================
-
-Copyright (c) 2000-2014 Chih-Chung Chang and Chih-Jen Lin
+Copyright (c) 2000-2019 Chih-Chung Chang and Chih-Jen Lin
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -47,7 +33,7 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-===================================================================*/
+============================================================================*/
 
 #include <cmath>
 #include <cstdio>

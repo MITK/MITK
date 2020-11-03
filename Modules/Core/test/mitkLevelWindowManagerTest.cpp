@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "itkMersenneTwisterRandomVariateGenerator.h"
 #include "mitkLevelWindowManager.h"
@@ -85,7 +81,7 @@ public:
     mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
     manager->SetDataStorage(ds);
 
-    MITK_TEST_CONDITION(manager->isAutoTopMost(), "Testing mitk::LevelWindowManager isAutoTopMost");
+    MITK_TEST_CONDITION(manager->IsAutoTopMost(), "Testing mitk::LevelWindowManager isAutoTopMost");
 
     // It is not clear what the following code is supposed to test. The expression in
     // the catch(...) block does have no effect, so success is always true.
@@ -105,7 +101,7 @@ public:
      */
 
     manager->SetAutoTopMostImage(true);
-    MITK_TEST_CONDITION(manager->isAutoTopMost(), "Testing mitk::LevelWindowManager isAutoTopMost()");
+    MITK_TEST_CONDITION(manager->IsAutoTopMost(), "Testing mitk::LevelWindowManager isAutoTopMost()");
   }
 
   static void TestRemoveObserver(std::string testImageFile)

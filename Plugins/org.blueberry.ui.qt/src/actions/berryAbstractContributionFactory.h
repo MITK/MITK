@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
-BlueBerry Platform
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef BERRYABSTRACTCONTRIBUTIONFACTORY_H_
 #define BERRYABSTRACTCONTRIBUTIONFACTORY_H_
@@ -28,7 +24,7 @@ struct IContributionRoot;
 
 /**
  * ContributionFactories are used by the IMenuService to populate
- * ContributionManagers. In {@link #createContributionItems(IServiceLocator, IContributionRoot)}
+ * ContributionManagers. In CreateContributionItems()
  * you fill in the additions List with {@link IContributionItem} to be inserted at this
  * factory's location. For example:
  * <p>
@@ -36,7 +32,7 @@ struct IContributionRoot;
  * <pre>
  * AbstractContributionFactory contributions = new AbstractContributionFactory(
  *    &quot;menu:org.eclipse.ui.tests.api.MenuTestHarness?after=additions&quot;) {
- *  public void createContributionItems(IMenuService menuService, List additions) {
+ *  public void CreateContributionItems(IMenuService menuService, List additions) {
  *    CommandContributionItem item = new CommandContributionItem(
  *        &quot;org.eclipse.ui.tests.menus.helloWorld&quot;,
  *        &quot;org.eclipse.ui.tests.commands.enabledHelloWorld&quot;, null, null,
@@ -79,7 +75,7 @@ private:
 
 public:
 
-  berryObjectMacro(berry::AbstractContributionFactory)
+  berryObjectMacro(berry::AbstractContributionFactory);
 
   /**
    * The contribution factories must be instantiated with their location,

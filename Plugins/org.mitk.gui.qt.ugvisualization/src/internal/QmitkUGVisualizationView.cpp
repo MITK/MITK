@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 // Blueberry
 #include <berryISelectionService.h>
@@ -55,8 +51,8 @@ protected:
   void PropertyRemoved() override
   {
     m_View->m_VolumeMode = false;
-    m_Property = 0;
-    m_BoolProperty = 0;
+    m_Property = nullptr;
+    m_BoolProperty = nullptr;
   }
 
   QmitkUGVisualizationView* m_View;
@@ -69,12 +65,12 @@ const std::string QmitkUGVisualizationView::VIEW_ID = "org.mitk.views.ugvisualiz
 
 
 QmitkUGVisualizationView::QmitkUGVisualizationView()
-: QmitkAbstractView(), m_Outline2DAction(0), m_Outline2DWidget(0),
-  m_LODAction(0), m_ScalarVisibilityAction(0), m_ScalarVisibilityWidget(0),
+: QmitkAbstractView(), m_Outline2DAction(nullptr), m_Outline2DWidget(nullptr),
+  m_LODAction(nullptr), m_ScalarVisibilityAction(nullptr), m_ScalarVisibilityWidget(nullptr),
   m_FirstVolumeRepId(-1), m_ShowTFGeneratorWidget(true), m_ShowScalarOpacityWidget(false),
-  m_ShowColorWidget(true), m_ShowGradientOpacityWidget(false), m_ShowTFGeneratorAction(0),
-  m_ShowScalarOpacityAction(0), m_ShowColorAction(0), m_ShowGradientOpacityAction(0),
-  m_VolumeModeObserver(0)
+  m_ShowColorWidget(true), m_ShowGradientOpacityWidget(false), m_ShowTFGeneratorAction(nullptr),
+  m_ShowScalarOpacityAction(nullptr), m_ShowColorAction(nullptr), m_ShowGradientOpacityAction(nullptr),
+  m_VolumeModeObserver(nullptr)
 {
 }
 
@@ -205,7 +201,7 @@ void QmitkUGVisualizationView::UpdateGUI()
 {
   bool enable = false;
 
-  mitk::DataNode* node = 0;
+  mitk::DataNode* node = nullptr;
   auto nodes = this->GetDataManagerSelection();
   if (!nodes.empty())
   {
@@ -240,23 +236,23 @@ void QmitkUGVisualizationView::UpdateGUI()
     m_Controls.m_TransferFunctionGeneratorWidget->SetDataNode(node);
     m_Controls.m_TransferFunctionWidget->SetDataNode(node);
 
-    mitk::BoolProperty* outlineProp = 0;
+    mitk::BoolProperty* outlineProp = nullptr;
     node->GetProperty(outlineProp, "outline polygons");
     m_Outline2DWidget->SetProperty(outlineProp);
 
-    mitk::BoolProperty* scalarVisProp = 0;
+    mitk::BoolProperty* scalarVisProp = nullptr;
     node->GetProperty(scalarVisProp, "scalar visibility");
     m_ScalarVisibilityWidget->SetProperty(scalarVisProp);
 
-    mitk::VtkScalarModeProperty* scalarProp = 0;
+    mitk::VtkScalarModeProperty* scalarProp = nullptr;
     if (node->GetProperty(scalarProp, "scalar mode"))
     {
       m_Controls.m_ScalarModeComboBox->SetProperty(scalarProp);
     }
 
-    mitk::GridRepresentationProperty* gridRepProp = 0;
-    mitk::GridVolumeMapperProperty* gridVolumeProp = 0;
-    mitk::BoolProperty* volumeProp = 0;
+    mitk::GridRepresentationProperty* gridRepProp = nullptr;
+    mitk::GridVolumeMapperProperty* gridVolumeProp = nullptr;
+    mitk::BoolProperty* volumeProp = nullptr;
     node->GetProperty(gridRepProp, "grid representation");
     node->GetProperty(gridVolumeProp, "volumerendering.mapper");
     node->GetProperty(volumeProp, "volumerendering");
@@ -265,7 +261,7 @@ void QmitkUGVisualizationView::UpdateGUI()
     if (m_VolumeModeObserver)
     {
       delete m_VolumeModeObserver;
-      m_VolumeModeObserver = 0;
+      m_VolumeModeObserver = nullptr;
     }
 
     if (volumeProp)

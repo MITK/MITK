@@ -62,9 +62,9 @@ If you have selected a XNAT project, subject or experiment, MITK displays detail
 
 \section org_mitk_gui_qt_xnatDownload Download data
 MITK allows you to download your data from XNAT. You can either simply download the data to your file system or your can download it and open it immediately in the workbench.
-\subsection org_mitk_gui_qt_xnatDownload Download data to file system
+\subsection org_mitk_gui_qt_xnatDownload_file_system Download data to file system
 If you just want to download data, simply right-click on a XNAT file or scan on the tree brower and select "Download". The data will be stored in the specified download location.
-\subsection org_mitk_gui_qt_xnatDownload Download data and open it in MITK
+\subsection org_mitk_gui_qt_xnatDownload_in_MITK Download data and open it in MITK
 You can download and open data in three ways:
 <ul>
 <li>One is via right-click on a file or scan and selecting "Download and open".

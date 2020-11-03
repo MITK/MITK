@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkProperties.h"
 
@@ -29,7 +25,6 @@ struct Params {
   bool invert;
   float zeroValue;
 };
-
 template<typename TPixel, unsigned int VImageDimension>
 void
 CreateXRay(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer mask1, std::string output, Params param)
@@ -42,10 +37,10 @@ CreateXRay(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer m
   mitk::CastToItkImage(mask1, itkMask);
 
   NewImageType::SpacingType newSpacing;
-  auto spacing = itkImage->GetSpacing();
-  spacing[0] = itkImage->GetSpacing()[0];
-  spacing[1] = itkImage->GetSpacing()[1];
-  spacing[2] = itkImage->GetSpacing()[2];
+  typename ImageType::SpacingType spacing;
+  spacing[0] = 0;
+  spacing[1] = 0;
+  spacing[2] = 0;
   spacing = itkImage->GetSpacing();
 
   NewImageType::RegionType region1,region2,region3,region1m,region2m,region3m;
@@ -171,14 +166,14 @@ int main(int argc, char* argv[])
   parser.setTitle("Dicom Loader");
   parser.setCategory("Preprocessing Tools");
   parser.setDescription("");
-  parser.setContributor("MBI");
+  parser.setContributor("German Cancer Research Center (DKFZ)");
 
   parser.setArgumentPrefix("-","-");
   // Add command line argument names
   parser.addArgument("help", "h",mitkCommandLineParser::Bool, "Help:", "Show this help text");
-  parser.addArgument("input", "i", mitkCommandLineParser::InputDirectory, "Input image:", "Input folder", us::Any(), false);
-  parser.addArgument("mask", "m", mitkCommandLineParser::InputDirectory, "Input mask:", "Input folder", us::Any(), false);
-  parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output file:", "Output file", us::Any(), false);
+  parser.addArgument("input", "i", mitkCommandLineParser::Directory, "Input image:", "Input folder", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("mask", "m", mitkCommandLineParser::Directory, "Input mask:", "Input folder", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("output", "o", mitkCommandLineParser::File, "Output file:", "Output file", us::Any(), false, false, false, mitkCommandLineParser::Output);
   parser.addArgument("invert", "invert", mitkCommandLineParser::Bool, "Input mask:", "Input folder", us::Any());
   parser.addArgument("zero_value", "zero", mitkCommandLineParser::Float, "Output file:", "Output file", us::Any());
 

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+  <extension point="org.blueberry.ui.views">
+    <!--<view id="org.mitk.views.usnavigation"
+          name="Ultrasound Navigation"
+          class="USNavigation"
+          icon="resources/icon.xpm" /> -->
+    <view id="org.mitk.views.usmarkerplacement"
+          name="IGT USTrackingNavigation"
+          category="IGT"
+          class="QmitkUSNavigationMarkerPlacement"
+          icon="resources/icon_US_navigation.svg" />
+    <view id="org.mitk.views.ultrasoundcalibration"
+          name="IGT USTrackingNavigation Calibration"
+          category="IGT"
+          class="QmitkUltrasoundCalibration"
+          icon="resources/icon_US_calibration.svg" />
+  </extension>
+
+  <extension point="org.blueberry.ui.perspectives">
+    <perspective id="org.mitk.gui.qt.usnavigation.perspective"
+                 name="Ultrasound Navigation"
+                 class="QmitkUSNavigationPerspective"
+                 icon="resources/icon_US_navigation.svg" />
+  </extension>
+</plugin>

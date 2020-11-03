@@ -1,23 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>DicomInspectorViewControls</class>
- <widget class="QWidget" name="DicomInspectorViewControls">
+ <class>QmitkDicomInspectorViewControls</class>
+ <widget class="QWidget" name="QmitkDicomInspectorViewControls">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>402</width>
-    <height>777</height>
+    <width>300</width>
+    <height>600</height>
    </rect>
-  </property>
-  <property name="minimumSize">
-   <size>
-    <width>0</width>
-    <height>0</height>
-   </size>
-  </property>
-  <property name="windowTitle">
-   <string>QmitkTemplate</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
@@ -37,69 +28,78 @@
    </property>
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_5">
-       <property name="text">
-        <string>Time point:</string>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="0">
-      <widget class="QLabel" name="label_6">
+      <widget class="QLabel" name="selectedDataNodeLabel">
+	   <property name="sizePolicy">
+-       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+-        <horstretch>0</horstretch>
+-        <verstretch>0</verstretch>
+-       </sizepolicy>
+-      </property>
        <property name="text">
-        <string>Node:</string>
+        <string>Selected data node</string>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QLabel" name="labelNode">
+      <widget class="QmitkSingleNodeSelectionWidget" name="singleSlot" native="true">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+        <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>40</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="timePointLabel">
+	   <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
        <property name="text">
-        <string>textlabel</string>
+        <string>Time point</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLabel" name="labelTime">
+      <widget class="QLabel" name="timePointValueLabel">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
-       </property>
-       <property name="text">
-        <string>TextLabel</string>
        </property>
       </widget>
      </item>
      <item row="2" column="0">
-      <widget class="QLabel" name="label">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
+      <widget class="QLabel" name="sliceNumberLabel">
+	   <property name="sizePolicy">
+-       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+-        <horstretch>0</horstretch>
+-        <verstretch>0</verstretch>
+-       </sizepolicy>
+-      </property>
        <property name="text">
-        <string>Slice Nr:</string>
+        <string>Slice number</string>
        </property>
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QLabel" name="labelSlice">
+      <widget class="QLabel" name="sliceNumberValueLabel">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
-       </property>
-       <property name="text">
-        <string>TextLabel</string>
        </property>
       </widget>
      </item>
@@ -179,16 +179,17 @@
      </column>
     </widget>
    </item>
-   <item>
-    <widget class="QLabel" name="lInfo">
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkSingleNodeSelectionWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkSingleNodeSelectionWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

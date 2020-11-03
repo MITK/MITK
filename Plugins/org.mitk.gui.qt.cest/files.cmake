@@ -1,20 +1,21 @@
 set(SRC_CPP_FILES
-  QmitkImageStatisticsCalculationThread.cpp
 )
 
 set(INTERNAL_CPP_FILES
   org_mitk_gui_qt_cest_Activator.cpp
   QmitkCESTStatisticsView.cpp
+  QmitkCESTNormalizeView.cpp
 )
 
 set(UI_FILES
   src/internal/QmitkCESTStatisticsViewControls.ui
+  src/internal/QmitkCESTNormalizeViewControls.ui
 )
 
 set(MOC_H_FILES
   src/internal/org_mitk_gui_qt_cest_Activator.h
   src/internal/QmitkCESTStatisticsView.h
-  src/QmitkImageStatisticsCalculationThread.h
+  src/internal/QmitkCESTNormalizeView.h
 )
 
 # list of resource files which can be used by the plug-in
@@ -23,6 +24,7 @@ set(MOC_H_FILES
 # plug-in views in the workbench
 set(CACHED_RESOURCE_FILES
   resources/icon.svg
+  resources/cest_normalize.svg
   plugin.xml
 )
 

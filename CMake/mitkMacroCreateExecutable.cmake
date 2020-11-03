@@ -14,6 +14,7 @@
 #!     [INCLUDE_DIRS <list of additional include directories>]
 #!     [TARGET_DEPENDS <list of additional dependencies>
 #!     [WARNINGS_NO_ERRORS]
+#!     [NO_INSTALL]
 #! \endcode
 #!
 #! \param EXECUTABLE_NAME The name for the new executable target
@@ -28,7 +29,7 @@ macro(mitk_create_executable)
      )
 
   set(_macro_multiparams
-      SUBPROJECTS            # list of CDash labels
+      SUBPROJECTS            # list of CDash labels (deprecated)
       INCLUDE_DIRS           # additional include dirs
       DEPENDS                # list of modules this module depends on
       PACKAGE_DEPENDS        # list of "packages" this module depends on (e.g. Qt, VTK, etc.)
@@ -42,6 +43,7 @@ macro(mitk_create_executable)
       NO_FEATURE_INFO        # do not create a feature info by calling add_feature_info()
       NO_BATCH_FILE          # do not create batch files on Windows
       WARNINGS_NO_ERRORS     # do not treat compiler warnings as errors
+      NO_INSTALL
      )
 
   cmake_parse_arguments(EXEC "${_macro_options}" "${_macro_params}" "${_macro_multiparams}" ${ARGN})
@@ -58,7 +60,6 @@ macro(mitk_create_executable)
   endif()
 
   mitk_create_module(${EXEC_UNPARSED_ARGUMENTS}
-                     SUBPROJECTS ${EXEC_SUBPROJECTS}
                      VERSION ${EXEC_VERSION}
                      INCLUDE_DIRS ${EXEC_INCLUDE_DIRS}
                      DEPENDS ${EXEC_DEPENDS}
@@ -73,7 +74,11 @@ macro(mitk_create_executable)
 
   set(EXECUTABLE_IS_ENABLED ${MODULE_IS_ENABLED})
   set(EXECUTABLE_TARGET ${MODULE_TARGET})
-  if(MODULE_IS_ENABLED)
+  if(EXECUTABLE_IS_ENABLED)
+    set_property(GLOBAL APPEND PROPERTY MITK_EXECUTABLE_TARGETS ${EXECUTABLE_TARGET})
+    if(EXEC_NO_INSTALL)
+      set_target_properties(${EXECUTABLE_TARGET} PROPERTIES NO_INSTALL TRUE)
+    endif()
     # Add meta dependencies (e.g. on auto-load modules from depending modules)
     if(TARGET ${CMAKE_PROJECT_NAME}-autoload)
       add_dependencies(${MODULE_TARGET} ${CMAKE_PROJECT_NAME}-autoload)

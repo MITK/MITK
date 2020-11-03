@@ -1,22 +1,18 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "MatchPointBrowserConstants.h"
 
-const std::string MatchPointBrowserConstants::VIEW_ID = "org.mitk.gui.qt.algorithm.browser";
+const std::string MatchPointBrowserConstants::VIEW_ID = "org.mitk.views.matchpoint.algorithm.browser";
 const std::string MatchPointBrowserConstants::MDAR_DIRECTORIES_NODE_NAME = "Deployed algorithm directories";
 const std::string MatchPointBrowserConstants::MDAR_FILES_NODE_NAME = "Deployed algorithms";
 const std::string MatchPointBrowserConstants::DEBUG_OUTPUT_NODE_NAME = "debug output";

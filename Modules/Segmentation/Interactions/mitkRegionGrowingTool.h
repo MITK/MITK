@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef mitkRegionGrowingTool_h_Included
 #define mitkRegionGrowingTool_h_Included
@@ -57,7 +53,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(RegionGrowingTool, FeedbackContourTool);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       const char **GetXPM() const override;
     us::ModuleResource GetCursorIconResource() const override;
@@ -111,8 +108,8 @@ namespace mitk
      * Example: 1 = 3x3 pixels, 2 = 5x5 pixels, etc.
      */
     template <typename TPixel, unsigned int imageDimension>
-    void GetNeighborhoodAverage(itk::Image<TPixel, imageDimension> *itkImage,
-                                itk::Index<imageDimension> index,
+    void GetNeighborhoodAverage(const itk::Image<TPixel, imageDimension> *itkImage,
+                                const itk::Index<imageDimension>& index,
                                 ScalarType *result,
                                 unsigned int neighborhood = 1);
 
@@ -120,24 +117,31 @@ namespace mitk
      * @brief Template to check whether index is inside already segmented area.
      */
     template <typename TPixel, unsigned int imageDimension>
-    void IsInsideSegmentation(itk::Image<TPixel, imageDimension> *itkImage,
-                              itk::Index<imageDimension> index,
+    void IsInsideSegmentation(const itk::Image<TPixel, imageDimension> *itkImage,
+                              const itk::Index<imageDimension>& index,
                               bool *result);
 
     /**
      * @brief Template that calls an ITK filter to do the region growing.
      */
     template <typename TPixel, unsigned int imageDimension>
-    void StartRegionGrowing(itk::Image<TPixel, imageDimension> *itkImage,
-                            itk::Index<imageDimension> seedPoint,
-                            std::array<ScalarType, 2> thresholds,
+    void StartRegionGrowing(const itk::Image<TPixel, imageDimension> *itkImage,
+                            const itk::Index<imageDimension>& seedPoint,
+                            const std::array<ScalarType, 2>& thresholds,
                             mitk::Image::Pointer &outputImage);
+
+    /**
+     * @brief Template to calculate the initial thresholds for region growing.
+     */
+    template <typename TPixel, unsigned int imageDimension>
+    void CalculateInitialThresholds(const itk::Image<TPixel, imageDimension>* itkImage);
 
     Image::Pointer m_ReferenceSlice;
     Image::Pointer m_WorkingSlice;
 
     ScalarType m_SeedValue;
     itk::Index<3> m_SeedPoint;
+    std::array<ScalarType, 2> m_ThresholdExtrema;
     std::array<ScalarType, 2> m_Thresholds;
     std::array<ScalarType, 2> m_InitialThresholds;
     Point2I m_LastScreenPosition;

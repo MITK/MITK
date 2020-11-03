@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QmitkMultiLabelSegmentationView_h
 #define QmitkMultiLabelSegmentationView_h
@@ -41,19 +37,19 @@ public:
   static const std::string VIEW_ID;
 
   QmitkMultiLabelSegmentationView();
-  virtual ~QmitkMultiLabelSegmentationView();
+  ~QmitkMultiLabelSegmentationView() override;
 
   typedef std::map<mitk::DataNode *, unsigned long> NodeTagMapType;
 
   // GUI setup
-  void CreateQtPartControl(QWidget *parent);
+  void CreateQtPartControl(QWidget *parent) override;
 
   // ILifecycleAwarePart interface
 public:
-  void Activated();
-  void Deactivated();
-  void Visible();
-  void Hidden();
+  void Activated() override;
+  void Deactivated() override;
+  void Visible() override;
+  void Hidden() override;
 
   virtual int GetSizeFlags(bool width);
   virtual int ComputePreferredSize(bool width,
@@ -63,19 +59,31 @@ public:
 
 protected slots:
 
-  /// \brief reaction to the selection of any 2D segmentation tool
+  // reaction to the shortcut for toggling the visibility of the working node
+  void OnVisibilityShortcutActivated();
+
+  // reaction to the shortcut for iterating over all labels
+  void OnLabelToggleShortcutActivated();
+
+  // reaction to the selection of any 2D segmentation tool
   void OnManualTool2DSelected(int id);
 
-  /// \brief reaction to button "New Label"
+  // reaction to button "New Label"
   void OnNewLabel();
 
-  /// \brief reaction to button "Show Label Table"
+  // reaction to button "Save Preset"
+  void OnSavePreset();
+
+  // reaction to button "Load Preset"
+  void OnLoadPreset();
+
+  // reaction to button "Show Label Table"
   void OnShowLabelTable(bool value);
 
-  /// \brief reaction to button "New Segmentation Session"
+  // reaction to button "New Segmentation Session"
   void OnNewSegmentationSession();
 
-  /// \brief reaction to signal "goToLabel" from labelset widget
+  // reaction to signal "goToLabel" from labelset widget
   void OnGoToLabel(const mitk::Point3D &pos);
 
   void OnResetView();
@@ -101,25 +109,19 @@ protected slots:
   // reaction to the button "Lock exterior"
   void OnLockExteriorToggled(bool);
 
-  /// \brief reaction to the selection of a new patient (reference) image in the DataStorage combobox
-  void OnReferenceSelectionChanged(const mitk::DataNode* node);
+  // reaction to the selection of a new patient (reference) image in the DataStorage combobox
+  void OnReferenceSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 
-  /// \brief reaction to the selection of a new Segmentation (working) image in the DataStorage combobox
-  void OnSegmentationSelectionChanged(const mitk::DataNode* node);
+  // reaction to the selection of a new Segmentation (working) image in the DataStorage combobox
+  void OnSegmentationSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 
-  /// \brief reaction to ...
+  // reaction to ...
   void OnInterpolationSelectionChanged(int);
 
 protected:
 
   // reimplemented from QmitkAbstractView
-  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes) override;
-
-  // reimplemented from QmitkAbstractView
   void OnPreferencesChanged(const berry::IBerryPreferences* prefs) override;
-
-  // reimplemented from QmitkAbstractView
-  void NodeAdded(const mitk::DataNode* node) override;
 
   // reimplemented from QmitkAbstractView
   void NodeRemoved(const mitk::DataNode* node) override;
@@ -128,7 +130,7 @@ protected:
 
   void OnLooseLabelSetConnection();
 
-  void SetFocus();
+  void SetFocus() override;
 
   void UpdateControls();
 
@@ -142,12 +144,7 @@ protected:
 
   void InitializeListeners();
 
-  /// \brief Checks if two images have the same size and geometry
-  bool CheckForSameGeometry(const mitk::Image *image1, const mitk::Image *image2) const;
-
-  QString GetLastFileOpenPath();
-
-  void SetLastFileOpenPath(const QString &path);
+  void ReinitializeViews() const;
 
   /// \brief the Qt parent of our GUI (NOT of this object)
   QWidget *m_Parent;

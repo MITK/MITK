@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 // Blueberry
 #include <berryISelectionService.h>
@@ -20,7 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 // Qmitk
 #include "QmitkIGTTrackingSemiAutomaticMeasurementView.h"
-#include "QmitkStdMultiWidget.h"
 
 // Qt
 #include <QMessageBox>
@@ -42,7 +37,7 @@ const std::string QmitkIGTTrackingSemiAutomaticMeasurementView::VIEW_ID = "org.m
 
 QmitkIGTTrackingSemiAutomaticMeasurementView::QmitkIGTTrackingSemiAutomaticMeasurementView()
   : QmitkFunctionality()
-  , m_Controls(0)
+  , m_Controls(nullptr)
   , m_MultiWidget(nullptr)
 {
   m_NextFile = 0;
@@ -119,9 +114,14 @@ void QmitkIGTTrackingSemiAutomaticMeasurementView::CreateQtPartControl(QWidget *
   m_Controls->m_StopTracking->setEnabled(false);
 }
 
-void QmitkIGTTrackingSemiAutomaticMeasurementView::StdMultiWidgetAvailable(QmitkStdMultiWidget &stdMultiWidget)
+void QmitkIGTTrackingSemiAutomaticMeasurementView::MultiWidgetAvailable(QmitkAbstractMultiWidget &multiWidget)
 {
-  m_MultiWidget = &stdMultiWidget;
+  m_MultiWidget = dynamic_cast<QmitkStdMultiWidget*>(&multiWidget);
+}
+
+void QmitkIGTTrackingSemiAutomaticMeasurementView::MultiWidgetNotAvailable()
+{
+  m_MultiWidget = nullptr;
 }
 
 void QmitkIGTTrackingSemiAutomaticMeasurementView::OnUseReferenceToggled(bool state)
@@ -137,11 +137,6 @@ void QmitkIGTTrackingSemiAutomaticMeasurementView::OnUseReferenceToggled(bool st
     m_Controls->m_ReferenceBox->setEnabled(false);
     m_Controls->m_SetReference->setEnabled(false);
   }
-}
-
-void QmitkIGTTrackingSemiAutomaticMeasurementView::StdMultiWidgetNotAvailable()
-{
-  m_MultiWidget = nullptr;
 }
 
 mitk::NavigationToolStorage::Pointer QmitkIGTTrackingSemiAutomaticMeasurementView::ReadStorage(std::string file)

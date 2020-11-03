@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef org_mitk_gui_qt_matchpoint_visualizer_Activator_h
 #define org_mitk_gui_qt_matchpoint_visualizer_Activator_h
@@ -28,8 +24,8 @@ class org_mitk_gui_qt_matchpoint_visualizer_Activator :
 
 public:
 
-    void start(ctkPluginContext* context);
-    void stop(ctkPluginContext* context);
+    void start(ctkPluginContext* context) override;
+    void stop(ctkPluginContext* context) override;
 
     static ctkPluginContext* GetContext();
 

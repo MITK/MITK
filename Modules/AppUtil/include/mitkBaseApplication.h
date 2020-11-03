@@ -1,52 +1,45 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
+============================================================================*/
 
-===================================================================*/
-
-#ifndef MITKBASEAPPLICATION_H
-#define MITKBASEAPPLICATION_H
+#ifndef mitkBaseApplication_h
+#define mitkBaseApplication_h
 
 #include <MitkAppUtilExports.h>
 
 #include <Poco/Util/Application.h>
 
-#include <QHash>
-#include <QScopedPointer>
-#include <QSharedPointer>
 #include <QString>
-#include <QTranslator>
-
-class QCoreApplication;
+#include <QVariant>
 
 class ctkPluginContext;
 class ctkPluginFramework;
 
+class QCoreApplication;
+class QTranslator;
+
 namespace mitk
 {
   /**
-   * A utility classes for starting up BlueBerry applications.
+   * A utility class for starting BlueBerry applications.
    *
-   * In the simplest case, a user creates an instance of this
-   * class and just calls run() which launches a CTK Plugin
-   * Framework instance and executes the default application
-   * registered by a plug-in via the org.blueberry.osgi.applications
-   * extension point.
+   * In the simplest case, create an instance of this class and call run().
+   * This will launch a CTK plugin framework instance and execute the
+   * default application registered by a plug-in via the
+   * org.blueberry.osgi.applications extension point.
    *
    * This class contains many convenience methods to:
    *  - Put the application in \emph{safe mode} which catches unhandled
    *    exceptions thrown in the Qt event loop and displays an error
-   *    message
+   *    message.
    *  - Put the application in \emph{single mode} which by default
    *    sends the command line arguments to an already running instance
    *    of the same application instead of creating a second instance.
@@ -55,21 +48,20 @@ namespace mitk
    *    the caching process of the plug-in meta-data.
    *  - Set a custom provisioning file to start a specific set of CTK
    *    plug-ins during application start-up.
-   *  - Set and get CTK Plugin Framework properties
+   *  - Set and get CTK plugin framework properties
    *
-   * The behavior can further be customized by deriving from
-   * BaseApplication and overriding specific methods, such as:
-   *  - initializeLibraryPaths() to add specific library / plugin search
-   *    paths
-   *  - defineOptions(Poco::Util::OptionSet&) to define a custom set
-   *    of command line options
+   * The behavior can further be customized by deriving from BaseApplication
+   * and overriding specific methods, such as:
+   *  - initializeLibraryPaths() to add specific library / plugin search paths
+   *  - defineOptions(Poco::Util::OptionSet&) to define a custom set of
+   *    command line options
    *  - getQApplication() to provide a custom QCoreApplication instance
    *
-   * A simple but complete usage example:
+   * A simple but complete example:
    * <code>
    * #include <mitkBaseApplication.h>
    *
-   * int main(int argc, char** argv)
+   * int main(int argc, char* argv[])
    * {
    *   mitk::BaseApplication app(argc, argv);
    *   app.setApplicationName("MyApp");
@@ -85,50 +77,41 @@ namespace mitk
   public:
     // Command line arguments
 
-    static QString ARG_NEWINSTANCE;
-    static QString ARG_CLEAN;
-    static QString ARG_APPLICATION;
-    static QString ARG_PRODUCT;
-    static QString ARG_HOME;
-    static QString ARG_STORAGE_DIR;
-    static QString ARG_PLUGIN_CACHE;
-    static QString ARG_PLUGIN_DIRS;
-    static QString ARG_FORCE_PLUGIN_INSTALL;
-    static QString ARG_PRELOAD_LIBRARY;
-    static QString ARG_PROVISIONING;
-    static QString ARG_DEBUG;
+    static const QString ARG_APPLICATION;
+    static const QString ARG_CLEAN;
+    static const QString ARG_CONSOLELOG;
+    static const QString ARG_DEBUG;
+    static const QString ARG_FORCE_PLUGIN_INSTALL;
+    static const QString ARG_HOME;
+    static const QString ARG_NEWINSTANCE;
+    static const QString ARG_NO_LAZY_REGISTRY_CACHE_LOADING;
+    static const QString ARG_NO_REGISTRY_CACHE;
+    static const QString ARG_PLUGIN_CACHE;
+    static const QString ARG_PLUGIN_DIRS;
+    static const QString ARG_PRELOAD_LIBRARY;
+    static const QString ARG_PRODUCT;
+    static const QString ARG_PROVISIONING;
+    static const QString ARG_REGISTRY_MULTI_LANGUAGE;
+    static const QString ARG_SPLASH_IMAGE;
+    static const QString ARG_STORAGE_DIR;
+    static const QString ARG_XARGS;
 
-    static QString ARG_CONSOLELOG;
-    static QString ARG_TESTPLUGIN;
-    static QString ARG_TESTAPPLICATION;
+    // BlueBerry specific plugin framework properties
 
-    static QString ARG_NO_REGISTRY_CACHE;
-    static QString ARG_NO_LAZY_REGISTRY_CACHE_LOADING;
-    static QString ARG_REGISTRY_MULTI_LANGUAGE;
-
-    static QString ARG_SPLASH_IMAGE;
-
-    static QString ARG_XARGS;
-
-    // BlueBerry specific Plugin Framework properties
-
-    static QString PROP_NEWINSTANCE;
-    static QString PROP_FORCE_PLUGIN_INSTALL;
-    static QString PROP_NO_REGISTRY_CACHE;
-    static QString PROP_NO_LAZY_REGISTRY_CACHE_LOADING;
-    static QString PROP_REGISTRY_MULTI_LANGUAGE;
-
-    static QString PROP_PRODUCT;
-    static QString PROP_APPLICATION;
-    static QString PROP_TESTPLUGIN;
-    static QString PROP_TESTAPPLICATION;
+    static const QString PROP_APPLICATION;
+    static const QString PROP_FORCE_PLUGIN_INSTALL;
+    static const QString PROP_NEWINSTANCE;
+    static const QString PROP_NO_LAZY_REGISTRY_CACHE_LOADING;
+    static const QString PROP_NO_REGISTRY_CACHE;
+    static const QString PROP_PRODUCT;
+    static const QString PROP_REGISTRY_MULTI_LANGUAGE;
 
     BaseApplication(int argc, char **argv);
     ~BaseApplication() override;
 
     /**
      * Initialize the Qt library such that a QCoreApplication
-     * instance is available and e.g. Qt Widgets can be created.
+     * instance is available and e.g. Qt widgets can be created.
      *
      * This is usually not called directly by the user.
      */
@@ -327,7 +310,7 @@ namespace mitk
 
 private:
     struct Impl;
-    QScopedPointer<Impl> d;
+    Impl* d;
   };
 }
 

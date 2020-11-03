@@ -14,7 +14,7 @@
     <page id="org.mitk.gui.qt.application.DataManagerPreferencePage" name="Data Manager" class="QmitkDataManagerPreferencePage">
       <keywordreference id="org.mitk.gui.qt.application.DataManagerPreferencePageKeywords"></keywordreference>
     </page>
-    <page id="org.mitk.gui.qt.application.DataManagerHotkeysPrefPage" name="Hotkeys" class="QmitkDataManagerHotkeysPrefPage" category="org.mitk.gui.qt.application.DataManagerPreferencePage">
+	<page id="org.mitk.gui.qt.application.DataManagerHotkeysPrefPage" name="Hotkeys" class="QmitkDataManagerHotkeysPrefPage" category="org.mitk.gui.qt.application.DataManagerPreferencePage">
       <keywordreference id="org.mitk.gui.qt.application.DataManagerHotkeysPrefPageKeywords"></keywordreference>
     </page>
   </extension>

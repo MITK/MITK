@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #ifndef MITKTRACKINGTOOL_H_HEADER_INCLUDED_
@@ -33,10 +29,10 @@ namespace mitk
   * TrackingDevices, or be subclassed for more specific implementations.
   * mitk::MicroBirdTrackingDevice uses this class to manage its tools. Other tracking devices
   * uses specialized versions of this class (e.g. mitk::NDITrackingTool)
-  * 
+  *
   * The TrackingTool class holds all coordinate transforms associated with tracking of a tool.
-  * The sensor attached to the tool is localized in the global tracking coordinate system (m_Position, m_Orientation). 
-  * A tool tip (m_ToolTipPosition) can be defined in sensor coordinates. 
+  * The sensor attached to the tool is localized in the global tracking coordinate system (m_Position, m_Orientation).
+  * A tool tip (m_ToolTipPosition) can be defined in sensor coordinates.
   * The tool axis defines the main axis of the tool and is defined as the negative z-axis of the tool tip coordinate system
   * The main axis of the representation object of the tool (e.g. a surface) has to be defined along the negative z-axis
   * \imageMacro{TrackingTool.png,"Coordinate transforms associated to the tracking tool.",3}
@@ -46,9 +42,9 @@ namespace mitk
   class MITKIGT_EXPORT TrackingTool : public itk::Object
   {
   public:
-    mitkClassMacroItkParent(TrackingTool, itk::Object)
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    mitkClassMacroItkParent(TrackingTool, itk::Object);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     void PrintSelf(std::ostream& os, itk::Indent indent) const override;
 
@@ -93,7 +89,7 @@ namespace mitk
     itk::FastMutexLock::Pointer m_MyMutex;           ///< mutex to control concurrent access to the tool
 
     Point3D m_Position;         ///< holds the position of the tool in global tracking coordinates
-    Quaternion m_Orientation;   ///< holds the orientation of the tool´in global tracking coordinates
+    Quaternion m_Orientation;   ///< holds the orientation of the toolÂ´in global tracking coordinates
     float m_TrackingError;      ///< holds the tracking error of the tool
     bool m_Enabled;             ///< if true, tool is enabled and should receive tracking updates from the tracking device
     bool m_DataValid;           ///< if true, data in m_Position and m_Orientation is valid, e.g. true tracking data

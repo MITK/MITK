@@ -1,22 +1,22 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkCoreActivator.h"
 
+#include <mitkCoreServices.h>
+#include <mitkPropertyPersistenceInfo.h>
+
 // File IO
+#include <mitkIOMetaInformationPropertyConstants.h>
 #include <mitkGeometryDataReaderService.h>
 #include <mitkGeometryDataWriterService.h>
 #include <mitkIOMimeTypes.h>
@@ -37,6 +37,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <itkGDCMImageIO.h>
 #include <itkNiftiImageIO.h>
+
+// PropertyRelationRules
+#include <mitkPropertyRelationRuleBase.h>
 
 // Micro Services
 #include <usGetModuleContext.h>
@@ -103,6 +106,30 @@ void AddMitkAutoLoadPaths(const std::string &programPath)
     us::ModuleSettings::AddAutoLoadPath(additionalPath);
   }
 #endif
+}
+
+void AddPropertyPersistence(const mitk::PropertyKeyPath& propPath)
+{
+  mitk::CoreServicePointer<mitk::IPropertyPersistence> persistenceService(mitk::CoreServices::GetPropertyPersistence());
+
+  auto info = mitk::PropertyPersistenceInfo::New();
+  if (propPath.IsExplicit())
+  {
+    std::string name = mitk::PropertyKeyPathToPropertyName(propPath);
+    std::string key = name;
+    std::replace(key.begin(), key.end(), '.', '_');
+    info->SetNameAndKey(name, key);
+  }
+  else
+  {
+    std::string key = mitk::PropertyKeyPathToPersistenceKeyRegEx(propPath);
+    std::string keyTemplate = mitk::PropertyKeyPathToPersistenceKeyTemplate(propPath);
+    std::string propRegEx = mitk::PropertyKeyPathToPropertyRegEx(propPath);
+    std::string propTemplate = mitk::PropertyKeyPathToPersistenceNameTemplate(propPath);
+    info->UseRegEx(propRegEx, propTemplate, key, keyTemplate);
+  }
+
+  persistenceService->AddInfo(info);
 }
 
 class FixedNiftiImageIO : public itk::NiftiImageIO
@@ -181,6 +208,19 @@ void MitkCoreActivator::Load(us::ModuleContext *context)
   m_FileReaders.push_back(new mitk::GeometryDataReaderService());
   m_FileWriters.push_back(new mitk::GeometryDataWriterService());
   m_FileReaders.push_back(new mitk::RawImageFileReaderService());
+
+  //add properties that should be persistent (if possible/supported by the writer)
+  AddPropertyPersistence(mitk::IOMetaInformationPropertyConstants::READER_DESCRIPTION());
+  AddPropertyPersistence(mitk::IOMetaInformationPropertyConstants::READER_INPUTLOCATION());
+  AddPropertyPersistence(mitk::IOMetaInformationPropertyConstants::READER_MIME_CATEGORY());
+  AddPropertyPersistence(mitk::IOMetaInformationPropertyConstants::READER_MIME_NAME());
+  AddPropertyPersistence(mitk::IOMetaInformationPropertyConstants::READER_VERSION());
+  AddPropertyPersistence(mitk::IOMetaInformationPropertyConstants::READER_OPTIONS_ANY());
+
+  AddPropertyPersistence(mitk::PropertyRelationRuleBase::GetRIIDestinationUIDPropertyKeyPath());
+  AddPropertyPersistence(mitk::PropertyRelationRuleBase::GetRIIRelationUIDPropertyKeyPath());
+  AddPropertyPersistence(mitk::PropertyRelationRuleBase::GetRIIRuleIDPropertyKeyPath());
+  AddPropertyPersistence(mitk::PropertyRelationRuleBase::GetRIIPropertyKeyPath("","").AddAnyElement());
 
   /*
     There IS an option to exchange ALL vtkTexture instances against vtkNeverTranslucentTextureFactory.

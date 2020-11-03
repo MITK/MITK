@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkSceneReaderV1.h"
 #include "Poco/Path.h"
@@ -21,6 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkProgressBar.h"
 #include "mitkPropertyListDeserializer.h"
 #include "mitkSerializerMacros.h"
+#include <mitkUIDManipulator.h>
 #include <mitkRenderingModeProperty.h>
 
 MITK_REGISTER_SERIALIZER(SceneReaderV1)
@@ -274,6 +271,13 @@ mitk::DataNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag(TiXmlElemen
         error = true;
       }
     }
+
+    const char* dataUID = dataElement->Attribute("UID");
+    if (!error && nullptr != dataUID && 0 != strlen(dataUID))
+    {
+      UIDManipulator manip(node->GetData());
+      manip.SetUID(dataUID);
+    }
   }
 
   // in case there was no <data> element we create a new empty node (for appending a propertylist later)
@@ -319,10 +323,6 @@ void mitk::SceneReaderV1::ClearNodePropertyListWithExceptions(DataNode &node, Pr
       As the treatment as multi-component image and the corresponding
       visualization options hinges on that property we should not delete
       it, if it was added by the mapper.
-      Old diffusion images might contain the "DisplayChannel" property
-      which stores the same information, however ignoring it is an acceptable
-      loss of precision as usually which channel is selected is not terribly
-      important.
 
       This is a fix for the issue reported in T19919.
     */

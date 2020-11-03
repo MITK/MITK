@@ -1,17 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkTubeGraphView.h"
 
@@ -283,7 +280,7 @@ void QmitkTubeGraphView::OnTabSwitched(int tabIndex)
   mitk::DataNode::Pointer node = m_Controls.activeGraphComboBox->GetSelectedNode();
   if(node.IsNotNull())
   {
-    if (dynamic_cast<mitk::TubeGraphDataInteractor*>(node->GetDataInteractor().GetPointer()) == 0)
+    if (dynamic_cast<mitk::TubeGraphDataInteractor*>(node->GetDataInteractor().GetPointer()) == nullptr)
     {
       this->UpdateActiveTubeGraphInInteractors();
       /* if (dynamic_cast<mitk::TubeGraphDataInteractor::Pointer>(node->GetDataInteractor().GetPointer()).IsNull());*/
@@ -520,7 +517,7 @@ void QmitkTubeGraphView::OnLabelVisibilityChanged(bool isVisible, QString labelN
   LabelGroupType* labelGroup = m_ActiveProperty->GetLabelGroupByName(labelGroupName.toStdString());
   LabelType* label = m_ActiveProperty->GetLabelByName(labelGroup, labelName.toStdString());
 
-  if(labelGroup == 0 || label == 0 )
+  if(labelGroup == nullptr || label == nullptr )
   {
     MITK_ERROR << "This label group or label doesn't exist!";
     return;
@@ -540,7 +537,7 @@ void QmitkTubeGraphView::OnLabelChanged(QString labelName, QString labelGroupNam
   }
   LabelGroupType* labelGroup = m_ActiveProperty->GetLabelGroupByName(labelGroupName.toStdString());
   LabelType* label = m_ActiveProperty->GetLabelByName(labelGroup, labelName.toStdString());
-  if(labelGroup == 0 || label == 0 )
+  if(labelGroup == nullptr || label == nullptr )
   {
     MITK_ERROR << "This label group or label doesn't exist!";
     return;
@@ -562,7 +559,7 @@ void QmitkTubeGraphView::OnLabelColorChanged (mitk::Color color, QString labelNa
   LabelGroupType* labelGroup = m_ActiveProperty->GetLabelGroupByName(labelGroupName.toStdString());
   LabelType* label = m_ActiveProperty->GetLabelByName(labelGroup, labelName.toStdString());
 
-  if(labelGroup == 0 || label == 0 )
+  if(labelGroup == nullptr || label == nullptr )
   {
     MITK_ERROR << "This label group or label doesn't exist!";
     return;

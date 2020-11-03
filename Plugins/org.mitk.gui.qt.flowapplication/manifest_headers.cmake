@@ -1,0 +1,5 @@
+set(Plugin-Name "MITK Flow Application")
+set(Plugin-Version "1.0.0")
+set(Plugin-Vendor "DKFZ, Medical Image Computing")
+set(Plugin-ContactAddress "http://www.mitk.org")
+set(Require-Plugin org.mitk.core.ext org.mitk.gui.qt.application)

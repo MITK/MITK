@@ -4,9 +4,9 @@
 
 if(WIN32)
   option(VTK_USE_SYSTEM_FREETYPE OFF)
-else(WIN32)
+else()
   option(VTK_USE_SYSTEM_FREETYPE ON)
-endif(WIN32)
+endif()
 
 # Sanity checks
 if(DEFINED VTK_DIR AND NOT EXISTS ${VTK_DIR})
@@ -30,63 +30,54 @@ if(NOT DEFINED VTK_DIR)
   option(MITK_VTK_DEBUG_LEAKS OFF)
   mark_as_advanced(MITK_VTK_DEBUG_LEAKS)
   list(APPEND additional_cmake_args
-       -DVTK_DEBUG_LEAKS:BOOL=${MITK_VTK_DEBUG_LEAKS}
-      )
-
-  if(MITK_USE_Python)
-    set(_vtk_install_python_dir -DVTK_INSTALL_PYTHON_MODULE_DIR:PATH=${ep_prefix}/lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages)
-
-    list(APPEND additional_cmake_args
-         -DVTK_WRAP_PYTHON:BOOL=ON
-         -DVTK_USE_TK:BOOL=OFF
-         -DVTK_WINDOWS_PYTHON_DEBUGGABLE:BOOL=OFF
-         -DPYTHON_EXECUTABLE:FILEPATH=${PYTHON_EXECUTABLE}
-         -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR}
-         -DPYTHON_INCLUDE_DIR2:PATH=${PYTHON_INCLUDE_DIR2}
-         -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
-         -DVTK_PYTHON_VERSION:STRING=3
-         ${_vtk_install_python_dir}
-        )
-  else()
-    list(APPEND additional_cmake_args
-         -DVTK_WRAP_PYTHON:BOOL=OFF
-         -DVTK_WINDOWS_PYTHON_DEBUGGABLE:BOOL=OFF
-        )
-  endif()
+    -DVTK_DEBUG_LEAKS:BOOL=${MITK_VTK_DEBUG_LEAKS}
+    -DVTK_WRAP_PYTHON:BOOL=OFF
+    -DVTK_WINDOWS_PYTHON_DEBUGGABLE:BOOL=OFF
+    )
 
   if(MITK_USE_Qt5)
     list(APPEND additional_cmake_args
-        -DVTK_Group_Qt:BOOL=ON
-        -DQt5_DIR:PATH=${Qt5_DIR}
-     )
+      -DVTK_Group_Qt:BOOL=ON
+      -DQt5_DIR:PATH=${Qt5_DIR}
+      )
   endif()
 
   if(CTEST_USE_LAUNCHERS)
     list(APPEND additional_cmake_args
       "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
-    )
+      )
   endif()
+  
+  set (VTK_PATCH_OPTION
+       PATCH_COMMAND ${PATCH_COMMAND} -p1 -i ${CMAKE_CURRENT_LIST_DIR}/VTK-8.1.0.patch)
+
+  mitk_query_custom_ep_vars()
 
   ExternalProject_Add(${proj}
     LIST_SEPARATOR ${sep}
     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/VTK-8.1.0.tar.gz
     URL_MD5 4fa5eadbc8723ba0b8d203f05376d932
+    ${VTK_PATCH_OPTION}
     CMAKE_GENERATOR ${gen}
+    CMAKE_GENERATOR_PLATFORM ${gen_platform}
     CMAKE_ARGS
-        ${ep_common_args}
-        -DVTK_WRAP_TCL:BOOL=OFF
-        -DVTK_WRAP_PYTHON:BOOL=OFF
-        -DVTK_WRAP_JAVA:BOOL=OFF
-        -DVTK_USE_SYSTEM_FREETYPE:BOOL=${VTK_USE_SYSTEM_FREETYPE}
-        -DVTK_LEGACY_REMOVE:BOOL=ON
-        -DModule_vtkTestingRendering:BOOL=ON
-        ${additional_cmake_args}
+      ${ep_common_args}
+      -DVTK_WRAP_TCL:BOOL=OFF
+      -DVTK_WRAP_PYTHON:BOOL=OFF
+      -DVTK_WRAP_JAVA:BOOL=OFF
+      -DVTK_USE_SYSTEM_FREETYPE:BOOL=${VTK_USE_SYSTEM_FREETYPE}
+      -DVTK_LEGACY_REMOVE:BOOL=ON
+      -DModule_vtkTestingRendering:BOOL=ON
+      ${additional_cmake_args}
+      ${${proj}_CUSTOM_CMAKE_ARGS}
     CMAKE_CACHE_ARGS
       ${ep_common_cache_args}
+      ${${proj}_CUSTOM_CMAKE_CACHE_ARGS}
     CMAKE_CACHE_DEFAULT_ARGS
       ${ep_common_cache_default_args}
+      ${${proj}_CUSTOM_CMAKE_CACHE_DEFAULT_ARGS}
     DEPENDS ${proj_DEPENDENCIES}
-  )
+    )
 
   set(VTK_DIR ${ep_prefix})
   mitkFunctionInstallExternalCMakeProject(${proj})

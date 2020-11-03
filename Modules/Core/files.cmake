@@ -33,6 +33,7 @@ set(CPP_FILES
   Algorithms/mitkSurfaceToSurfaceFilter.cpp
   Algorithms/mitkUIDGenerator.cpp
   Algorithms/mitkVolumeCalculator.cpp
+  Algorithms/mitkTemporalJoinImagesFilter.cpp
 
   Controllers/mitkBaseController.cpp
   Controllers/mitkCallbackFromGUIThread.cpp
@@ -126,7 +127,7 @@ set(CPP_FILES
   DataManagement/mitkNodePredicateProperty.cpp
   DataManagement/mitkNodePredicateDataProperty.cpp
   DataManagement/mitkNodePredicateSource.cpp
-  DataManagement/mitkNodePredicateUID.cpp
+  DataManagement/mitkNodePredicateSubGeometry.cpp
   DataManagement/mitkNumericConstants.cpp
   DataManagement/mitkPlaneGeometry.cpp
   DataManagement/mitkPlaneGeometryData.cpp
@@ -163,6 +164,7 @@ set(CPP_FILES
   DataManagement/mitkStringProperty.cpp
   DataManagement/mitkSurface.cpp
   DataManagement/mitkSurfaceOperation.cpp
+  DataManagement/mitkSourceImageRelationRule.cpp
   DataManagement/mitkThinPlateSplineCurvedGeometry.cpp
   DataManagement/mitkTimeGeometry.cpp
   DataManagement/mitkTransferFunction.cpp
@@ -186,6 +188,12 @@ set(CPP_FILES
   Interactions/mitkCrosshairPositionEvent.cpp
   Interactions/mitkDataInteractor.cpp
   Interactions/mitkDispatcher.cpp
+  Interactions/mitkDisplayActionEventBroadcast.cpp
+  Interactions/mitkDisplayActionEventFunctions.cpp
+  Interactions/mitkDisplayActionEventHandler.cpp
+  Interactions/mitkDisplayActionEventHandlerDesynchronized.cpp
+  Interactions/mitkDisplayActionEventHandlerStd.cpp
+  Interactions/mitkDisplayActionEventHandlerSynchronized.cpp
   Interactions/mitkDisplayCoordinateOperation.cpp
   Interactions/mitkDisplayInteractor.cpp
   Interactions/mitkEventConfig.cpp
@@ -198,6 +206,7 @@ set(CPP_FILES
   Interactions/mitkInteractionEventObserver.cpp
   Interactions/mitkInteractionKeyEvent.cpp
   Interactions/mitkInteractionPositionEvent.cpp
+  Interactions/mitkInteractionSchemeSwitcher.cpp
   Interactions/mitkInternalEvent.cpp
   Interactions/mitkMouseDoubleClickEvent.cpp
   Interactions/mitkMouseModeSwitcher.cpp
@@ -261,6 +270,7 @@ set(CPP_FILES
   IO/mitkSurfaceVtkXmlIO.cpp
   IO/mitkVtkLoggingAdapter.cpp
   IO/mitkPreferenceListReaderOptionsFunctor.cpp
+  IO/mitkIOMetaInformationPropertyConstants.cpp
 
   Rendering/mitkAbstractAnnotationRenderer.cpp
   Rendering/mitkAnnotationUtils.cpp

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #ifndef __Q_MITK_MATCHPOINT_FRAME_CORRECTION_H
@@ -57,10 +53,10 @@ public:
   /**
   * Creates smartpointer typedefs
   */
-  berryObjectMacro(QmitkMatchPointFrameCorrection)
+  berryObjectMacro(QmitkMatchPointFrameCorrection);
 
   QmitkMatchPointFrameCorrection();
-  ~QmitkMatchPointFrameCorrection();
+  ~QmitkMatchPointFrameCorrection() override;
 
 protected slots:
 
@@ -69,8 +65,6 @@ protected slots:
   */
   virtual void CreateConnections();
 
-  /// \brief Called when the user clicks the GUI button
-  void OnMaskCheckBoxToggeled(bool checked);
   void OnLoadAlgorithmButtonPushed();
   void OnSelectedAlgorithmChanged();
 
@@ -94,14 +88,12 @@ protected slots:
   void OnFrameRegistered(double progress);
   void OnFrameMapped(double progress);
 
+  void OnNodeSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
+
 protected:
-  virtual void CreateQtPartControl(QWidget* parent);
+  void CreateQtPartControl(QWidget* parent) override;
 
-  virtual void SetFocus();
-
-  /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
-                                  const QList<mitk::DataNode::Pointer>& nodes);
+  void SetFocus() override;
 
 private:
 
@@ -112,19 +104,20 @@ private:
 
   void Error(QString msg);
 
-  void UpdateAlgorithmList();
-
   /**
   * checks if appropriated nodes are selected in the data manager. If nodes are selected,
-  * they are stored m_MovingData and m_TargetData. It also sets the info lables accordingly.
-  * @return True: All inputs are set and valid (images). False: At least one input is not set
-  * or invalid */
-  bool CheckInputs();
+  * they are stored m_MovingData and m_TargetData.*/
+  void CheckInputs();
 
   /**
   * Updates the state of registration control buttons. Regarding to selected
   * inputs, loaded algorithm and its state.*/
   void ConfigureRegistrationControls();
+
+  /**
+  Configure the node selectors predicates according to the selected algorithm.
+  */
+  void ConfigureNodeSelectorPredicates();
 
   /**
   * Configures the progress bars according to the chosen algorithm.
@@ -143,11 +136,6 @@ private:
 
   /** Returns a proposal for a (unique) default reg job name */
   std::string GetDefaultJobName() const;
-
-  /** Returns the display name of the passed node. Normally it is just node->GetName().
-   * if the node contains a point set it is additionally checked if the point set node
-   * has a source node and its name will be added in parentheses.*/
-  std::string GetInputNodeDisplayName(const mitk::DataNode* node) const;
 
   /** Returns the Pointer to the DLL info of the algorithm currently selected by the system.
   The info is received via m_AlgorithmSelectionListener.
@@ -195,7 +183,6 @@ private:
 
   // boolean variables to control visibility of GUI elements
   bool m_CanLoadAlgorithm;
-  bool m_ValidInputs;
   bool m_Working;
 
   Ui::MatchPointFrameCorrectionControls m_Controls;

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
-BlueBerry Platform
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #ifndef BERRYICONTRIBUTIONROOT_H
@@ -34,13 +30,13 @@ class Expression;
  */
 struct IContributionRoot : public Object
 {
-  berryObjectMacro(berry::IContributionRoot)
+  berryObjectMacro(berry::IContributionRoot);
 
   /**
    * Adds a given contribution item with provided visibility expression and
    * kill-switch filtering as a direct child of this container. This should be
    * called for all top-level elements created in
-   * {@link AbstractContributionFactory#createContributionItems(org.eclipse.ui.services.IServiceLocator, IContributionRoot)}
+   * berry::AbstractContributionFactory::CreateContributionItems().
    *
    * @param item
    *            the item to add
@@ -54,7 +50,7 @@ struct IContributionRoot : public Object
    * Registers visibilty for arbitrary {@link IContributionItem} instances
    * that are <b>NOT</b> direct children of this container. Ie: children of a
    * {@link IContributionManager} that has been previously registered with a
-   * call to {{@link #AddContributionItem(IContributionItem, Expression)}.
+   * call to AddContributionItem().
    *
    * @param item
    *            the item for which to register a visibility clause

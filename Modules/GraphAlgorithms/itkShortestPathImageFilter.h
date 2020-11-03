@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 #ifndef __itkShortestPathImageFilter_h
 #define __itkShortestPathImageFilter_h
 
@@ -82,10 +78,11 @@ namespace itk
     typedef itk::ShapedNeighborhoodIterator<TInputImageType> itkShapedNeighborhoodIteratorType;
 
     // New Macro for smartpointer instantiation
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       // Run-time type information
-      itkTypeMacro(ShortestPathImageFilter, ImageToImageFilter)
+      itkTypeMacro(ShortestPathImageFilter, ImageToImageFilter);
 
       // Display
       void PrintSelf(std::ostream &os, Indent indent) const override;
@@ -112,7 +109,7 @@ namespace itk
 
     // \brief Set Graph_fullNeighbors. false = no diagonal neighbors, in 2D this means N4 Neigborhood. true = would be
     // N8 in 2D
-    itkSetMacro(Graph_fullNeighbors, bool)
+    itkSetMacro(Graph_fullNeighbors, bool);
 
       // \brief (default=true), Produce output image, which shows the shortest path. But you can also get the shortest
       // Path directly as vector with the function GetVectorPath
@@ -167,7 +164,6 @@ namespace itk
     NodeNumType m_Graph_NumberOfNodes;
     NodeNumType m_Graph_StartNode;
     NodeNumType m_Graph_EndNode;
-    unsigned int m_ImageDimensions;
     bool m_Graph_fullNeighbors;
     std::vector<ShortestPathNode *> m_Graph_DiscoveredNodeList;
     ShortestPathImageFilter(Self &); // intentionally not implemented

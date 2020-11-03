@@ -1,7 +1,4 @@
-
-MITK_CREATE_MODULE_TESTS(LABELS)
-
-include(mitkFunctionAddTestLabel)
+MITK_CREATE_MODULE_TESTS()
 
 # verify minimum expectations:
 #   files are recognized as DICOM
@@ -46,7 +43,7 @@ function(AddDicomTestsFromDataRepository CURRENT_DATASET_DIR TESTS_DIR INPUT_LIS
     string(REGEX REPLACE ".*${TESTS_DIR}/([^/]+)/.*" "\\1" input ${input})
     set(inputfilelist "${CURRENT_DATASET_DIR}/${TESTS_DIR}/${input}/${INPUT_LISTNAME}")
     set(expecteddump "${CURRENT_DATASET_DIR}/${TESTS_DIR}/${input}/${EXPECTED_DUMP}")
-    set(testname "DICOM_Load_${input}")
+    set(test_name "DICOM_Load_${input}")
 
     #message(STATUS "DICOM loading test case '${input}'")
     expectFileExists(${inputfilelist})
@@ -64,9 +61,14 @@ function(AddDicomTestsFromDataRepository CURRENT_DATASET_DIR TESTS_DIR INPUT_LIS
     endforeach(raw ${rawDicomFiles})
 
     #message(STATUS "  Load ${dicomFiles}")
-    add_test(${testname}
-             ${VERIFY_DUMP_CMD} ${expecteddump} ${dicomFiles})
-    mitkFunctionAddTestLabel(${testname})
+    add_test(${test_name} ${VERIFY_DUMP_CMD} ${expecteddump} ${dicomFiles})
+    mitkFunctionGetLibrarySearchPaths(MITK_RUNTIME_PATH_RELEASE release RELEASE)
+    mitkFunctionGetLibrarySearchPaths(MITK_RUNTIME_PATH_DEBUG debug DEBUG)
+    set(test_env_path ${MITK_RUNTIME_PATH_RELEASE} ${MITK_RUNTIME_PATH_DEBUG} $ENV{PATH})
+    list(REMOVE_DUPLICATES test_env_path)
+    string (REGEX REPLACE "\;" "\\\;" test_env_path "${test_env_path}")
+    set_property(TEST ${test_name} PROPERTY ENVIRONMENT "PATH=${test_env_path}" APPEND)
+    set_property(TEST ${test_name} PROPERTY SKIP_RETURN_CODE 77)
 
   endforeach(input allInputs)
 

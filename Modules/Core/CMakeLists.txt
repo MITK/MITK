@@ -18,7 +18,6 @@ MITK_CREATE_MODULE(
     PRIVATE ITK
     PUBLIC  VTK|vtkFiltersTexture+vtkFiltersParallel+vtkImagingStencil+vtkImagingMath+vtkInteractionStyle+vtkRenderingOpenGL2+vtkRenderingContextOpenGL2+vtkRenderingVolumeOpenGL2+vtkRenderingFreeType+vtkRenderingLabel+vtkInteractionWidgets+vtkIOGeometry+vtkIOXML
     PUBLIC  Boost|boost
-  SUBPROJECTS MITK-Core
   # Do not automatically create CppMicroServices initialization code.
   # Because the VTK 6 "auto-init" functionality injects file-local static
   # initialization code in every cpp file which includes a VTK header,
@@ -60,6 +59,7 @@ if(MSVC_IDE OR MSVC_VERSION)
   target_link_libraries(${MODULE_TARGET} PRIVATE psapi.lib)
 endif()
 
-add_subdirectory(TestingHelper)
-
-add_subdirectory(test)
+if(BUILD_TESTING)
+  add_subdirectory(TestingHelper)
+  add_subdirectory(test)
+endif()

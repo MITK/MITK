@@ -1,23 +1,19 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkRegistrationJob.h"
 
 // Mitk
-#include <mitkAlgorithmHelper.h>
+#include <mitkMAPAlgorithmHelper.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkImageMappingHelper.h>
 #include <mitkMAPRegistrationWrapper.h>
@@ -38,17 +34,17 @@ See LICENSE.txt or http://www.mitk.org for details.
 const mitk::Image *QmitkRegistrationJob::GetTargetDataAsImage() const
 {
   return dynamic_cast<const mitk::Image *>(m_spTargetData.GetPointer());
-};
+}
 
 const mitk::Image *QmitkRegistrationJob::GetMovingDataAsImage() const
 {
   return dynamic_cast<const mitk::Image *>(m_spMovingData.GetPointer());
-};
+}
 
 const map::algorithm::RegistrationAlgorithmBase *QmitkRegistrationJob::GetLoadedAlgorithm() const
 {
   return m_spLoadedAlgorithm;
-};
+}
 
 void QmitkRegistrationJob::OnMapAlgorithmEvent(::itk::Object *, const itk::EventObject &event)
 {
@@ -158,18 +154,18 @@ QmitkRegistrationJob::QmitkRegistrationJob(map::algorithm::RegistrationAlgorithm
   m_spCommand = ::itk::MemberCommand<QmitkRegistrationJob>::New();
   m_spCommand->SetCallbackFunction(this, &QmitkRegistrationJob::OnMapAlgorithmEvent);
   m_ObserverID = m_spLoadedAlgorithm->AddObserver(::map::events::AlgorithmEvent(), m_spCommand);
-};
+}
 
 QmitkRegistrationJob::~QmitkRegistrationJob()
 {
   m_spLoadedAlgorithm->RemoveObserver(m_ObserverID);
-};
+}
 
 void QmitkRegistrationJob::run()
 {
   try
   {
-    mitk::MITKAlgorithmHelper helper(m_spLoadedAlgorithm);
+    mitk::MAPAlgorithmHelper helper(m_spLoadedAlgorithm);
     mitk::MaskedAlgorithmHelper maskedHelper(m_spLoadedAlgorithm);
 
     //*@TODO Data Check and failure handle
@@ -186,8 +182,7 @@ void QmitkRegistrationJob::run()
     }
     else
     {
-      mitk::MAPRegistrationWrapper::Pointer spRegWrapper = mitk::MAPRegistrationWrapper::New();
-      spRegWrapper->SetRegistration(m_spResultRegistration);
+      auto spRegWrapper = mitk::MAPRegistrationWrapper::New(m_spResultRegistration);
 
       emit RegResultIsAvailable(spRegWrapper, this);
     }
@@ -202,4 +197,4 @@ void QmitkRegistrationJob::run()
   }
 
   emit Finished();
-};
+}

@@ -1,14 +1,3 @@
-#
-# Variables:
-#  MITK_DOXYGEN_OUTPUT_DIR: doxygen output directory (optional)
-
-# Needed early on for redirecting the BlueBerry documentation output dir
-set(MITK_DOXYGEN_OUTPUT_DIR ${PROJECT_BINARY_DIR}/Documentation/Doxygen CACHE PATH
-    "Output directory for doxygen generated documentation." )
-
-# Compile source code snippets
-add_subdirectory(Snippets)
-
 # Different doxygen versions produce significantly different behaviour in the MITK documentation
 # especially in regards to the MITK Qt assistant help files and markdown files.
 # The HTML documentation is supposed to be build with Doxygen 1.8.7 or newer, the
@@ -71,17 +60,6 @@ if(MITK_DOXYGEN_GENERATE_QCH_FILES)
 
 endif()
 
-
-if(MITK_USE_BLUEBERRY)
-  file(RELATIVE_PATH _blueberry_doxygen_path ${MITK_DOXYGEN_OUTPUT_DIR}/html ${BLUEBERRY_DOXYGEN_OUTPUT_DIR}/html)
-  set(BLUEBERRY_DOXYGEN_TAGFILE "${BLUEBERRY_DOXYGEN_TAGFILE_NAME}=${_blueberry_doxygen_path}")
-  set(BLUEBERRY_DOXYGEN_LINK "<a class=\"el\" href=\"${_blueberry_doxygen_path}/index.html\">BlueBerry Documentation</a>")
-  set(MITK_XP_LINK "\\ref mitkExtPointsIndex")
-  configure_file(schema.css ${MITK_DOXYGEN_OUTPUT_DIR}/html/schema.css)
-
-  set(MITK_DOXYGEN_ENABLED_SECTIONS "${MITK_DOXYGEN_ENABLED_SECTIONS} BLUEBERRY")
-endif(MITK_USE_BLUEBERRY)
-
 # Compile a doxygen input filter for processing CMake scripts
 include(mitkFunctionCMakeDoxygenFilterCompile)
 mitkFunctionCMakeDoxygenFilterCompile(NAMESPACE "CMake")
@@ -118,6 +96,19 @@ endif()
 
 if(NOT DEFINED MITK_DOXYGEN_DOT_NUM_THREADS)
   set(MITK_DOXYGEN_DOT_NUM_THREADS 0)
+endif()
+
+if(NOT DEFINED US_PLATFORM)
+  if(UNIX)
+    if(APPLE)
+      set(US_PLATFORM "US_PLATFORM_APPLE=1")
+    else()
+      set(US_PLATFORM "US_PLATFORM_LINUX=1")
+    endif()
+    set(US_PLATFORM "${US_PLATFORM} \\\nUS_PLATFORM_POSIX=1")
+  else()
+    set(US_PLATFORM "US_PLATFORM_WINDOWS=1")
+  endif()
 endif()
 
 # parse which plug-in documentation to activate
@@ -172,6 +163,8 @@ add_custom_target(doc_developersguide
                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                   )
 
+set_property(TARGET doc doc_usersguide doc_developersguide PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Documentation")
+
 if(MITK_USE_BLUEBERRY)
   # convert the extension points schema files into html
   find_package(Ant)
@@ -190,7 +183,7 @@ if(MITK_USE_BLUEBERRY)
 
     add_dependencies(doc mitkXPDoc)
   else()
-    message("Extension-point schema documentation generation disabled due to missing Ant and / or missing BlueBerry doc tools.")
+    message(STATUS "Extension-point schema documentation generation disabled due to missing Ant and / or missing BlueBerry doc tools.")
   endif()
 endif(MITK_USE_BLUEBERRY)
 

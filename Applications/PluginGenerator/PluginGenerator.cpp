@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "ctkCommandLineParser.h"
 #include <PluginGeneratorConfig.h>
@@ -253,8 +249,8 @@ int main(int argc, char **argv)
   parser.addArgument("help", "h", QVariant::Bool, "  Show this help text");
   parser.addArgument("out-dir", "o", QVariant::String, "  Output directory", QDir::tempPath());
   parser.addArgument(
-    "license", "l", QVariant::String, "  Path to a file containing license information", ":/MITKLicense.txt");
-  parser.addArgument("vendor", "v", QVariant::String, "  The vendor of the generated code", "DKFZ");
+    "license", "l", QVariant::String, "  Path to a file containing license information", ":/COPYRIGHT_HEADER");
+  parser.addArgument("vendor", "v", QVariant::String, "  The vendor of the generated code", "German Cancer Research Center (DKFZ)");
   parser.addArgument("quiet", "q", QVariant::Bool, "  Do not print additional information");
   parser.addArgument("confirm-all", "y", QVariant::Bool, "  Answer all questions with 'yes'");
   //parser.addArgument("check-update", "u", QVariant::Bool, "  Check for updates and exit");
@@ -271,7 +267,7 @@ int main(int argc, char **argv)
 
   parser.beginGroup("Project options");
   parser.addArgument(
-    "project-copyright", "", QVariant::String, "  Path to a file containing copyright information", ":/LICENSE.txt");
+    "project-copyright", "", QVariant::String, "  Path to a file containing copyright information", ":/LICENSE");
   parser.addArgument("project-name", "", QVariant::String, "  The project name");
   parser.setExactMatchRegularExpression("--project-name", "^[a-zA-Z_\\-]+$", "Project name invalid");
   parser.addArgument("project-app-name", "", QVariant::String, "  The application name");

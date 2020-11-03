@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef mitkTool_h_Included
 #define mitkTool_h_Included
@@ -61,8 +57,6 @@ namespace mitk
 
   \ingroup Interaction
   \ingroup ToolManagerEtAl
-
-  There is a separate page describing the \ref QmitkInteractiveSegmentationTechnicalPage.
 
   Every tool is a mitk::StateMachine, which can follow any transition pattern that it likes. One important thing to know
   is, that
@@ -190,12 +184,17 @@ namespace mitk
     virtual NodePredicateBase::ConstPointer GetReferenceDataPreference() const;
     virtual NodePredicateBase::ConstPointer GetWorkingDataPreference() const;
 
-    DataNode::Pointer CreateEmptySegmentationNode(Image *original,
+    DataNode::Pointer CreateEmptySegmentationNode(const Image *original,
                                                   const std::string &organName,
                                                   const mitk::Color &color);
     DataNode::Pointer CreateSegmentationNode(Image *image, const std::string &organName, const mitk::Color &color);
 
-    virtual bool CanHandle(BaseData *referenceData) const;
+    /** Function used to check if a tool can handle the referenceData and (if specified) the working data.
+     @pre referenceData must be a valid pointer
+     @param referenceData Pointer to the data that should be checked as valid reference for the tool.
+     @param workingData Pointer to the data that should be checked as valid working data for this tool.
+     This parameter can be null if no working data is specified so far.*/
+    virtual bool CanHandle(const BaseData *referenceData, const BaseData *workingData) const;
 
   protected:
     friend class ToolManager;

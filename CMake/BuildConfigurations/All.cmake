@@ -2,19 +2,10 @@ set(MITK_CONFIG_PACKAGES )
 
 set(_apple_package_excludes)
 
-set(_python_excludes )
-
-if(NOT (CMAKE_SIZEOF_VOID_P EQUAL 8) )
-  set(_python_excludes
-    Python
-    Numpy
-   )
-endif()
-
 set(_package_excludes
   ${_apple_package_excludes}
-  ${_python_excludes}
   OpenCL
+  OpenMP
   SYSTEM_Boost
   Boost_LIBRARIES
   SYSTEM_PYTHON
@@ -24,7 +15,7 @@ set(_package_excludes
 
   US_DiPhAS_SDK
   GALIL_HARDWARE
-  OPHIR_PRYO_HARDWARE
+  OPHIR_PYRO_HARDWARE
 
   MICROBIRD_TRACKER
   MICROBIRD_TRACKER_INCLUDE_DIR
@@ -58,12 +49,3 @@ set(MITK_BUILD_ALL_APPS ON CACHE BOOL "Build all MITK applications" FORCE)
 set(MITK_BUILD_ALL_PLUGINS ON CACHE BOOL "Build all MITK plugins" FORCE)
 set(MITK_BUILD_EXAMPLES ON CACHE BOOL "Build the MITK examples" FORCE)
 set(BLUEBERRY_BUILD_ALL_PLUGINS ON CACHE BOOL "Build all BlueBerry plugins" FORCE)
-
-set(BUILD_DiffusionCoreCmdApps ON CACHE BOOL "Build commandline tools for diffusion" FORCE)
-set(BUILD_DiffusionFiberProcessingCmdApps ON CACHE BOOL "Build commandline tools for diffusion fiber processing" FORCE)
-set(BUILD_DiffusionFiberfoxCmdApps ON CACHE BOOL "Build commandline tools for diffusion data simulation (Fiberfox)" FORCE)
-set(BUILD_DiffusionMiscCmdApps ON CACHE BOOL "Build miscellaneous commandline tools for diffusion" FORCE)
-set(BUILD_DiffusionQuantificationCmdApps ON CACHE BOOL "Build commandline tools for diffusion quantification (IVIM, ADC, ...)" FORCE)
-set(BUILD_DiffusionTractographyCmdApps ON CACHE BOOL "Build commandline tools for diffusion fiber tractography" FORCE)
-set(BUILD_DiffusionTractographyEvaluationCmdApps ON CACHE BOOL "Build commandline tools for diffusion fiber tractography evaluation" FORCE)
-set(BUILD_DiffusionConnectomicsCmdApps ON CACHE BOOL "Build commandline tools for diffusion connectomics" FORCE)

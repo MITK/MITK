@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #ifndef mitkUSDeviceReaderWriterConstants_H_HEADER_INCLUDED_
@@ -29,6 +25,9 @@ const static char* TAG_CROPPING = "CROPPING";
 
 const static char* ATTR_FILEVERS = "filevers";
 const static char* ATTR_TYPE = "type";
+const static char* ATTR_HOST = "host";
+const static char* ATTR_PORT = "port";
+const static char* ATTR_SERVER = "server";
 const static char* ATTR_NAME = "name";
 const static char* ATTR_MANUFACTURER = "manufacturer";
 const static char* ATTR_MODEL = "model";

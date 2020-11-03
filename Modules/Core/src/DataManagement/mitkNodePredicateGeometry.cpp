@@ -1,37 +1,33 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkNodePredicateGeometry.h"
 #include "mitkDataNode.h"
 #include "mitkImage.h"
 
 mitk::NodePredicateGeometry::NodePredicateGeometry(const BaseGeometry* refGeometry, TimePointType relevantTimePoint)
-  : m_RefGeometry(refGeometry), m_RefTimeGeometry(nullptr), m_TimePoint(relevantTimePoint), m_UseTimePoint(true), m_CheckPrecision(mitk::eps)
+  : m_RefGeometry(refGeometry), m_RefTimeGeometry(nullptr), m_TimePoint(relevantTimePoint), m_UseTimePoint(true), m_CheckPrecision(NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION)
 {
   if (m_RefGeometry.IsNull()) mitkThrow() << "Invalid constructor initialization. Reference base geometry instance is nullptr pointer.";
 }
 
 mitk::NodePredicateGeometry::NodePredicateGeometry(const BaseGeometry* refGeometry)
-  : m_RefGeometry(refGeometry), m_RefTimeGeometry(nullptr), m_TimePoint(0), m_UseTimePoint(false), m_CheckPrecision(mitk::eps)
+  : m_RefGeometry(refGeometry), m_RefTimeGeometry(nullptr), m_TimePoint(0), m_UseTimePoint(false), m_CheckPrecision(NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION)
 {
   if (m_RefGeometry.IsNull()) mitkThrow() << "Invalid constructor initialization. Reference base geometry instance is nullptr pointer.";
 }
 
 mitk::NodePredicateGeometry::NodePredicateGeometry(const TimeGeometry* refGeometry)
-  : m_RefGeometry(nullptr), m_RefTimeGeometry(refGeometry), m_TimePoint(0), m_UseTimePoint(false), m_CheckPrecision(mitk::eps)
+  : m_RefGeometry(nullptr), m_RefTimeGeometry(refGeometry), m_TimePoint(0), m_UseTimePoint(false), m_CheckPrecision(NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION)
 {
   if (m_RefTimeGeometry.IsNull()) mitkThrow() << "Invalid constructor initialization. Reference base geometry instance is nullptr pointer.";
 }

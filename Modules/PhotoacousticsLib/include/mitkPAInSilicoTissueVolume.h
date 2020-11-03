@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKPHOTOACOUSTICVOLUME_H
 #define MITKPHOTOACOUSTICVOLUME_H
@@ -32,10 +28,10 @@ namespace mitk {
     class MITKPHOTOACOUSTICSLIB_EXPORT InSilicoTissueVolume : public itk::LightObject
     {
     public:
-      mitkClassMacroItkParent(InSilicoTissueVolume, itk::LightObject)
-        mitkNewMacro1Param(Self, TissueGeneratorParameters::Pointer)
+      mitkClassMacroItkParent(InSilicoTissueVolume, itk::LightObject);
+      mitkNewMacro2Param(Self, TissueGeneratorParameters::Pointer, std::mt19937*);
 
-        enum SegmentationType
+      enum SegmentationType
       {
         AIR = -1,
         BACKGROUND = 0,
@@ -61,7 +57,19 @@ namespace mitk {
        * @param anisotropy
        * @param segmentType
        */
-      void SetVolumeValues(int x, int y, int z, double absorption, double scattering, double anisotropy, SegmentationType segmentType = SegmentationType::BACKGROUND);
+      void SetVolumeValues(int x, int y, int z, double absorption, double scattering, double anisotropy, SegmentationType segmentType);
+
+      /**
+      * @brief SetVolumeValues sets the values for aborption, scattering and anisotropy at the specified voxel location.
+      *
+      * @param x
+      * @param y
+      * @param z
+      * @param absorption
+      * @param scattering
+      * @param anisotropy
+      */
+      void SetVolumeValues(int x, int y, int z, double absorption, double scattering, double anisotropy);
 
       /**
        * @brief IsInsideVolume
@@ -94,6 +102,14 @@ namespace mitk {
       Volume::Pointer GetAnisotropyVolume();
       Volume::Pointer GetSegmentationVolume();
 
+      void SetAbsorptionVolume(Volume::Pointer volume);
+      void SetScatteringVolume(Volume::Pointer volume);
+      void SetAnisotropyVolume(Volume::Pointer volume);
+      void SetSegmentationVolume(Volume::Pointer volume);
+
+      double GetSpacing();
+      void SetSpacing(double spacing);
+
       void FinalizeVolume();
       itkGetMacro(TissueParameters, TissueGeneratorParameters::Pointer);
       itkGetMacro(TDim, unsigned int);
@@ -106,7 +122,7 @@ namespace mitk {
         mitk::PropertyList::Pointer propertyList);
 
     protected:
-      InSilicoTissueVolume(TissueGeneratorParameters::Pointer parameters);
+      InSilicoTissueVolume(TissueGeneratorParameters::Pointer parameters, std::mt19937* rng);
       InSilicoTissueVolume(Volume::Pointer absorptionVolume,
         Volume::Pointer scatteringVolume,
         Volume::Pointer anisotropyVolume,
@@ -123,6 +139,10 @@ namespace mitk {
       TissueGeneratorParameters::Pointer m_TissueParameters;
 
       unsigned int m_TDim;
+
+      double m_InitialBackgroundAbsorption;
+
+      std::mt19937* m_Rng;
 
       void RandomizeTissueCoefficients(long rngSeed, bool useRngSeed, double percentage);
 

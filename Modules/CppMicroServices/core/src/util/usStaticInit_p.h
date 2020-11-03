@@ -1,9 +1,9 @@
-/*=============================================================================
+/*============================================================================
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) German Cancer Research Center (DKFZ)
+  All rights reserved.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 
+============================================================================*/
+
+/*============================================================================
 
 Extracted from qglobal.h from Qt 4.7.3 and adapted for CppMicroServices.
 Original copyright (c) Nokia Corporation. Usage covered by the
@@ -24,7 +27,7 @@ GNU Lesser General Public License version 2.1
 (http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html) and the Nokia Qt
 LGPL Exception version 1.1 (file LGPL_EXCEPTION.txt in Qt 4.7.3 package).
 
-=========================================================================*/
+============================================================================*/
 
 #ifndef US_STATIC_INIT_H
 #define US_STATIC_INIT_H

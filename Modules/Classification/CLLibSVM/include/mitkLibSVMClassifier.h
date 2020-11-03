@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef mitkLibSVMClassifier_h
 #define mitkLibSVMClassifier_h
@@ -21,13 +17,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkAbstractClassifier.h>
 
-namespace LibSVM
-{
-  struct svm_parameter;
-  struct svm_problem;
-  struct svm_node;
-  struct svm_model;
-}
+struct svm_parameter;
+struct svm_problem;
+struct svm_node;
+struct svm_model;
 
 namespace mitk
 {
@@ -35,9 +28,11 @@ namespace mitk
   {
   public:
 
-    mitkClassMacro(LibSVMClassifier,AbstractClassifier)
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    mitkClassMacro(LibSVMClassifier,AbstractClassifier);
+
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
     LibSVMClassifier();
     ~LibSVMClassifier() override;
@@ -67,12 +62,12 @@ namespace mitk
 
   private:
 
-    void ReadXValues(LibSVM::svm_problem * problem, LibSVM::svm_node** xSpace, const Eigen::MatrixXd &X);
-    void ReadYValues(LibSVM::svm_problem * problem, const Eigen::MatrixXi &Y);
-    void ReadWValues(LibSVM::svm_problem * problem);
+    void ReadXValues(svm_problem * problem, svm_node** xSpace, const Eigen::MatrixXd &X);
+    void ReadYValues(svm_problem * problem, const Eigen::MatrixXi &Y);
+    void ReadWValues(svm_problem * problem);
 
-    LibSVM::svm_model* m_Model;
-    LibSVM::svm_parameter * m_Parameter;
+    svm_model* m_Model;
+    svm_parameter * m_Parameter;
 
   };
 }

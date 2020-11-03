@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 /*=========================================================================
 *
@@ -211,20 +207,20 @@ namespace itk
 
     protected:
       EnhancedScalarImageToNeighbourhoodGreyLevelDifferenceFeaturesFilter();
-      virtual ~EnhancedScalarImageToNeighbourhoodGreyLevelDifferenceFeaturesFilter() {}
-      virtual void PrintSelf( std::ostream & os, Indent indent ) const ITK_OVERRIDE;
+      ~EnhancedScalarImageToNeighbourhoodGreyLevelDifferenceFeaturesFilter() override {}
+      void PrintSelf( std::ostream & os, Indent indent ) const ITK_OVERRIDE;
 
       void FastCompute();
 
       void FullCompute();
 
       /** This method causes the filter to generate its output. */
-      virtual void GenerateData() ITK_OVERRIDE;
+      void GenerateData() ITK_OVERRIDE;
 
       /** Make a DataObject to be used for output output. */
       typedef ProcessObject::DataObjectPointerArraySizeType DataObjectPointerArraySizeType;
       using Superclass::MakeOutput;
-      virtual DataObjectPointer MakeOutput(DataObjectPointerArraySizeType) ITK_OVERRIDE;
+      DataObjectPointer MakeOutput(DataObjectPointerArraySizeType) ITK_OVERRIDE;
 
     private:
       typename NeighbourhoodGreyLevelDifferenceMatrixFilterType::Pointer m_NeighbourhoodGreyLevelDifferenceMatrixGenerator;

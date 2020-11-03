@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef OptiTrackErrorMessages_H_HEADER_INCLUDED_
 #define OptiTrackErrorMessages_H_HEADER_INCLUDED_
@@ -41,7 +37,7 @@ namespace mitk
   public:
   /**
    * \brief Helper function to get the error messages from Optitrack API
-   * \author E. Marinetto (emarinetto@hggm.es) Instituto de Investigación Sanitaria Gregorio Marañón, Madrid, Spain. & M. Noll (matthias.noll@igd.fraunhofer.de) Cognitive Computing & Medical Imaging | Fraunhofer IGD
+   * \author E. Marinetto (emarinetto@hggm.es) Instituto de InvestigaciÃ³n Sanitaria Gregorio MaraÃ±Ã³n, Madrid, Spain. & M. Noll (matthias.noll@igd.fraunhofer.de) Cognitive Computing & Medical Imaging | Fraunhofer IGD
    */
   static std::string GetOptitrackErrorMessage(int result);
   };

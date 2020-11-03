@@ -1,17 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef _QMITKTUBEGRAPHVIEW_H_INCLUDED
 #define _QMITKTUBEGRAPHVIEW_H_INCLUDED
@@ -53,9 +50,9 @@ public:
   /**
   * @brief Destructor.
   */
-  virtual ~QmitkTubeGraphView();
+  ~QmitkTubeGraphView() override;
 
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
 
   /** \brief Method to create the connections for the component. This Method is obligatory even if no connections is needed*/
   virtual void CreateConnections();
@@ -92,10 +89,10 @@ public:
 protected:
 
   mitk::TubeGraphDataInteractor::ActivationMode GetActivationMode();
-  virtual void SetFocus() override;
-  virtual void NodeRemoved(const mitk::DataNode*) override;
+  void SetFocus() override;
+  void NodeRemoved(const mitk::DataNode*) override;
   /// \brief called by QmitkAbstractView when DataManager's selection has changed
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,const QList<mitk::DataNode::Pointer>& nodes) override;
+  void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,const QList<mitk::DataNode::Pointer>& nodes) override;
 
   Ui::QmitkTubeGraphViewControls m_Controls;
   // the Qt parent of our GUI (NOT of this object)

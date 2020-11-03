@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkSerialCommunication.h"
 
@@ -239,7 +235,7 @@ int mitk::SerialCommunication::Send(const std::string& input, bool block)
   if (WriteFile(m_ComPortHandle, input.data(), static_cast<DWORD>(input.size()), &bytesWritten, nullptr) == TRUE)
     return OK;
   else
-    return GetLastError();
+    return ERROR_VALUE;
 
 #else // Posix
   if (m_FileDescriptor == INVALID_HANDLE_VALUE)
@@ -310,7 +306,7 @@ int mitk::SerialCommunication::ApplyConfigurationWin()
     controlSettings.fRtsControl = RTS_CONTROL_DISABLE;
   }
   if (SetCommState(m_ComPortHandle, &controlSettings) == FALSE)    // Configure com port
-    return GetLastError();
+    return ERROR_VALUE;
 
   COMMTIMEOUTS timeouts;
 
@@ -320,7 +316,7 @@ int mitk::SerialCommunication::ApplyConfigurationWin()
   timeouts.WriteTotalTimeoutMultiplier = 0;
   timeouts.WriteTotalTimeoutConstant = m_SendTimeout;
   if (SetCommTimeouts(m_ComPortHandle, &timeouts) == FALSE)  // set timeout values
-    return GetLastError();
+    return ERROR_VALUE;
 
   PurgeComm(m_ComPortHandle, PURGE_TXCLEAR | PURGE_RXCLEAR);  // clear read and write buffers
   return OK;

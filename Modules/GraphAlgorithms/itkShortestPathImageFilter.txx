@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 #ifndef __itkShortestPathImageFilter_txx
 #define __itkShortestPathImageFilter_txx
 
@@ -31,6 +27,7 @@ namespace itk
   ShortestPathImageFilter<TInputImageType, TOutputImageType>::ShortestPathImageFilter()
     : m_Nodes(nullptr),
       m_Graph_NumberOfNodes(0),
+      m_Graph_fullNeighbors(false),
       m_FullNeighborsMode(false),
       m_MakeOutputImage(true),
       m_StoreVectorOrder(false),
@@ -436,10 +433,10 @@ namespace itk
       CleanUp();
 
       // Calc Number of nodes
-      m_ImageDimensions = TInputImageType::ImageDimension;
+      auto imageDimensions = TInputImageType::ImageDimension;
       const InputImageSizeType &size = this->GetInput()->GetRequestedRegion().GetSize();
       m_Graph_NumberOfNodes = 1;
-      for (NodeNumType i = 0; i < m_ImageDimensions; ++i)
+      for (NodeNumType i = 0; i < imageDimensions; ++i)
         m_Graph_NumberOfNodes = m_Graph_NumberOfNodes * size[i];
 
       // Initialize mainNodeList with that number

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef mitkBoundingShapeObjectFactory_h
 #define mitkBoundingShapeObjectFactory_h
@@ -25,13 +21,15 @@ namespace mitk
   class MITKBOUNDINGSHAPE_EXPORT BoundingShapeObjectFactory : public CoreObjectFactoryBase
   {
   public:
-    mitkClassMacro(BoundingShapeObjectFactory, CoreObjectFactoryBase) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(BoundingShapeObjectFactory, CoreObjectFactoryBase);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       Mapper::Pointer CreateMapper(DataNode *node, MapperSlotId slotId) override;
     void SetDefaultProperties(DataNode *node) override;
-    const char *GetFileExtensions() override;
+    std::string GetFileExtensions() override;
     CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override;
-    const char *GetSaveFileExtensions() override;
+    std::string GetSaveFileExtensions() override;
     CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override;
     const char *GetDescription() const override;
 

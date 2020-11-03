@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkLevelWindow.h"
 #include "mitkImage.h"
@@ -268,9 +264,9 @@ void mitk::LevelWindow::SetAuto(const mitk::Image *image,
   if (image == nullptr || !image->IsInitialized())
     return;
 
-  if ((image->GetPixelType().GetComponentType() == 9) || (image->GetPixelType().GetComponentType() == 10))
+  if (itk::ImageIOBase::IOComponentType::FLOAT == image->GetPixelType().GetComponentType()
+  ||  itk::ImageIOBase::IOComponentType::DOUBLE == image->GetPixelType().GetComponentType())
   {
-    // Floating image
     m_IsFloatingImage = true;
   }
   else
@@ -373,13 +369,13 @@ void mitk::LevelWindow::SetAuto(const mitk::Image *image,
   SetRangeMinMax(minValue, maxValue);
   SetDefaultBoundaries(minValue, maxValue);
 
-  unsigned int numPixelsInDataset = image->GetDimensions()[0];
-  for (unsigned int k = 0; k < image->GetDimension(); ++k)
+  size_t numPixelsInDataset = image->GetDimensions()[0];
+  for (decltype(image->GetDimension()) k = 1; k < image->GetDimension(); ++k)
     numPixelsInDataset *= image->GetDimensions()[k];
-  unsigned int minCount = image->GetStatistics()->GetCountOfMinValuedVoxelsNoRecompute();
-  unsigned int maxCount = image->GetStatistics()->GetCountOfMaxValuedVoxelsNoRecompute();
-  ScalarType minCountFraction = minCount / ScalarType(numPixelsInDataset);
-  ScalarType maxCountFraction = maxCount / ScalarType(numPixelsInDataset);
+  const auto minCount = image->GetStatistics()->GetCountOfMinValuedVoxelsNoRecompute();
+  const auto maxCount = image->GetStatistics()->GetCountOfMaxValuedVoxelsNoRecompute();
+  const auto minCountFraction = minCount / static_cast<ScalarType>(numPixelsInDataset);
+  const auto maxCountFraction = maxCount / static_cast<ScalarType>(numPixelsInDataset);
 
   //// binary image
   if (min2ndValue == maxValue)

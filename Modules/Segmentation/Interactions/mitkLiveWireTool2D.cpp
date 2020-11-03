@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <mitkContourModelUtils.h>
 #include <mitkLiveWireTool2D.h>
@@ -29,7 +25,8 @@ namespace mitk
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, LiveWireTool2D, "LiveWire tool");
 }
 
-mitk::LiveWireTool2D::LiveWireTool2D() : SegTool2D("LiveWireTool")
+mitk::LiveWireTool2D::LiveWireTool2D()
+  : SegTool2D("LiveWireTool"), m_CreateAndUseDynamicCosts(false)
 {
 }
 
@@ -140,14 +137,16 @@ void mitk::LiveWireTool2D::EnableContourLiveWireInteraction(bool on)
 
 void mitk::LiveWireTool2D::ConfirmSegmentation()
 {
+  auto referenceNode = m_ToolManager->GetReferenceData(0);
   auto workingNode = m_ToolManager->GetWorkingData(0);
 
-  if (nullptr == workingNode)
+  if (nullptr == referenceNode || nullptr == workingNode)
     return;
 
+  auto referenceImage = dynamic_cast<Image *>(referenceNode->GetData());
   auto workingImage = dynamic_cast<Image *>(workingNode->GetData());
 
-  if (nullptr == workingImage)
+  if (nullptr == referenceImage || nullptr == workingImage)
     return;
 
   std::vector<SliceInformation> sliceInfos;
@@ -167,12 +166,15 @@ void mitk::LiveWireTool2D::ConfirmSegmentation()
       if (contour->IsEmptyTimeStep(t))
         continue;
 
-      auto workingSlice = this->GetAffectedImageSliceAs2DImage(workingContour.second, workingImage, t);
+      TimePointType referenceImageTimePoint = referenceImage->GetTimeGeometry()->TimeStepToTimePoint(t);
+      TimeStepType workingImageTimeStep = workingImage->GetTimeGeometry()->TimePointToTimeStep(referenceImageTimePoint);
+
+      auto workingSlice = this->GetAffectedImageSliceAs2DImage(workingContour.second, workingImage, workingImageTimeStep);
       auto projectedContour = ContourModelUtils::ProjectContourTo2DSlice(workingSlice, contour, true, false);
 
-      ContourModelUtils::FillContourInSlice(projectedContour, t, workingSlice, workingImage, 1);
+      ContourModelUtils::FillContourInSlice(projectedContour, referenceImageTimePoint, workingSlice, workingImage, 1);
 
-      sliceInfos.emplace_back(workingSlice, workingContour.second, t);
+      sliceInfos.emplace_back(workingSlice, workingContour.second, referenceImageTimePoint);
       this->WriteSliceToVolume(sliceInfos.back());
     }
   }
@@ -365,7 +367,7 @@ void mitk::LiveWireTool2D::OnMouseMoved(StateMachineAction *, InteractionEvent *
   m_LiveWireContour = this->m_LiveWireFilter->GetOutput();
   m_LiveWireContourNode->SetData(this->m_LiveWireContour);
 
-  positionEvent->GetSender()->GetRenderingManager()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
+  RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
 }
 
 void mitk::LiveWireTool2D::OnMouseMoveNoDynamicCosts(StateMachineAction *, InteractionEvent *interactionEvent)

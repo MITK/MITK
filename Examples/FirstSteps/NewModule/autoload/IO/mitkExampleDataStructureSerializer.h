@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef mitkExampleDataStructureSerializer_h_included
 #define mitkExampleDataStructureSerializer_h_included
@@ -28,11 +24,14 @@ namespace mitk
   {
   public:
     mitkClassMacro(ExampleDataStructureSerializer, BaseDataSerializer);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self) virtual std::string Serialize() override;
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
+
+    std::string Serialize() override;
 
   protected:
     ExampleDataStructureSerializer();
-    virtual ~ExampleDataStructureSerializer();
+    ~ExampleDataStructureSerializer() override;
   };
 } // namespace
 #endif

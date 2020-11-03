@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef _QMITK_NODE_SELECTION_CONSTANTS_H_
 #define _QMITK_NODE_SELECTION_CONSTANTS_H_
@@ -20,11 +16,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <string>
 
 #include "org_mitk_gui_qt_common_Export.h"
-
-#ifdef _MSC_VER
-#  pragma warning(push)
-#  pragma warning(disable:4251)
-#endif
 
 namespace mitk
 {
@@ -36,16 +27,16 @@ struct MITK_QT_COMMON NodeSelectionConstants
   /** ID of main preference node where all visible inspectors are stored (e.g. ROOT_PREFERENCE_NODE_ID+"/"+VISIBLE_INSPECTORS_NODE_ID+"/[orderering #]").
    The sub node naming encodes the ordering number of the visible inspector.*/
   static const std::string VISIBLE_INSPECTORS_NODE_ID;
-  /** ID for the value that stores the favorite inspector ID in the root preference node.*/
-  static const std::string FAVORITE_INSPECTOR_ID;
+  /** ID for the value that stores the preferred inspector ID in the root preference node.*/
+  static const std::string PREFERRED_INSPECTOR_ID;
   /** ID for the value that stores the inspector ID in the preference node.*/
   static const std::string VISIBLE_INSPECTOR_ID;
+  /** ID for the value that stores if the favorite inspector should be visible.*/
+  static const std::string SHOW_FAVORITE_INSPECTOR;
+  /** ID for the value that stores if the history inspector should be visible.*/
+  static const std::string SHOW_HISTORY_INSPECTOR;
 };
 
 }
-
-#ifdef _MSC_VER
-#  pragma warning(pop)
-#endif
 
 #endif

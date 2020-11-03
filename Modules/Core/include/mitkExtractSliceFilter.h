@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef mitkExtractSliceFilter_h_Included
 #define mitkExtractSliceFilter_h_Included
@@ -68,15 +64,19 @@ namespace mitk
   {
   public:
     mitkClassMacro(ExtractSliceFilter, ImageToImageFilter);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
-      mitkNewMacro1Param(Self, vtkImageReslice *);
+    mitkNewMacro1Param(Self, vtkImageReslice *);
 
     /** \brief Set the axis where to reslice at.*/
     void SetWorldGeometry(const PlaneGeometry *geometry)
     {
-      this->m_WorldGeometry = geometry;
-      this->Modified();
+      if (geometry != m_WorldGeometry)
+      {
+        this->m_WorldGeometry = geometry;
+        this->Modified();
+      }
     }
 
     /** \brief Set the time step in the 4D volume */
@@ -170,7 +170,7 @@ namespace mitk
     void GenerateOutputInformation() override;
     void GenerateInputRequestedRegion() override;
 
-    const PlaneGeometry *m_WorldGeometry;
+    PlaneGeometry::ConstPointer m_WorldGeometry;
     vtkSmartPointer<vtkImageReslice> m_Reslicer;
 
     unsigned int m_TimeStep;
@@ -185,8 +185,6 @@ namespace mitk
 
     ResliceInterpolation m_InterpolationMode;
 
-    BaseGeometry::ConstPointer m_ResliceTransform;
-
     bool m_InPlaneResampleExtentByGeometry; // Resampling grid corresponds to:  false->image    true->worldgeometry
 
     mitk::ScalarType *m_OutPutSpacing;
@@ -196,6 +194,14 @@ namespace mitk
     double m_BackgroundLevel;
 
     unsigned int m_Component;
+
+  private:
+    BaseGeometry::ConstPointer m_ResliceTransform;
+    /* Axis vectors of the relevant geometry. Set in GenerateOutputInformation() and also used in GenerateData().*/
+    Vector3D m_Right, m_Bottom;
+    /* Bounds of the relevant plane. Set in GenerateOutputInformation() and also used in GenerateData().*/
+    int m_XMin, m_XMax, m_YMin, m_YMax;
+
   };
 }
 

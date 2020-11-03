@@ -2,7 +2,6 @@ option(BUILD_ClassificationMiniApps "Build commandline tools for classification"
 
 if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
 
-
   include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
@@ -39,7 +38,6 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
         CLWeighting^^MitkCore_MitkCLImportanceWeighting_MitkCLUtilities
         CLOverlayRoiCenterOfMass^^MitkCore_MitkCLUtilities_MitkQtWidgetsExt
         CLLungSegmentation^^MitkCore_MitkSegmentation_MitkMultilabel
-    #    RandomForestPrediction^^MitkCLVigraRandomForest
     )
 
     foreach(classificationminiapps ${classificationminiapps})
@@ -56,7 +54,6 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
       PACKAGE_DEPENDS ITK Qt5|Core Vigra
       CPP_FILES ${appname}.cpp
       )
-      # CPP_FILES ${appname}.cpp mitkCommandLineParser.cpp
 
       if(EXECUTABLE_IS_ENABLED)
 
@@ -102,18 +99,16 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
       endif()
     endforeach()
 
-  # This mini app does not depend on mitkDiffusionImaging at all
-
   mitk_create_executable(CLMatchPointReg
     DEPENDS MitkCore MitkCLUtilities MitkMatchPointRegistration MitkCommandLine MitkMatchPointRegistrationUI
     PACKAGE_DEPENDS ITK Qt5|Core Vigra MatchPoint
-    CPP_FILES CLMatchPointReg.cpp 
+    CPP_FILES CLMatchPointReg.cpp
   )
 
-        # On Linux, create a shell script to start a relocatable application
-        if(UNIX AND NOT APPLE)
-          install(PROGRAMS "${MITK_SOURCE_DIR}/CMake/RunInstalledApp.sh" DESTINATION "." RENAME ${EXECUTABLE_TARGET}.sh)
-        endif()
+  # On Linux, create a shell script to start a relocatable application
+  if(UNIX AND NOT APPLE)
+    install(PROGRAMS "${MITK_SOURCE_DIR}/CMake/RunInstalledApp.sh" DESTINATION "." RENAME ${EXECUTABLE_TARGET}.sh)
+  endif()
 
   if(EXECUTABLE_IS_ENABLED)
     MITK_INSTALL_TARGETS(EXECUTABLES ${EXECUTABLE_TARGET})

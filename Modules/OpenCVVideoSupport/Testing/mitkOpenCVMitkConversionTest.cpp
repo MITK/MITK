@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 // mitk includes
 #include "mitkImageToOpenCVImageFilter.h"
@@ -58,7 +54,6 @@ uchar greyValue3;
 template<typename TPixel, unsigned int VImageDimension>
 void ComparePixels( itk::Image<itk::RGBPixel<TPixel>,VImageDimension>* image );
 void ReadImageDataAndConvertForthAndBack(std::string imageFileName);
-void ConvertIplImageForthAndBack(mitk::Image::Pointer inputForCVMat, std::string imageFileName);
 void ConvertCVMatForthAndBack(mitk::Image::Pointer inputForCVMat, std::string imageFileName);
 
 
@@ -93,10 +88,6 @@ int mitkOpenCVMitkConversionTest(int argc, char* argv[])
   testRGBImage.at<cv::Vec3b>(pos2)= color2;
   testRGBImage.at<cv::Vec3b>(pos3)= color3;
 
-  //cv::namedWindow("debug", CV_WINDOW_FREERATIO );
-  //cv::imshow("debug", testRGBImage.clone());
-  //cv::waitKey(0);
-
   // convert it to a mitk::Image
   MITK_INFO << "converting OpenCV test image to mitk image and comparing scalar rgb values";
   mitk::OpenCVToMitkImageFilter::Pointer openCvToMitkFilter =
@@ -126,7 +117,7 @@ int mitkOpenCVMitkConversionTest(int argc, char* argv[])
 
   MITK_TEST_CONDITION( color3 == convertedColor3, "Testing if initially created color values " << static_cast<int>( color3[0] ) << ", " << static_cast<int>( color3[1] ) << ", " << static_cast<int>( color3[2] ) << " matches the color values " << static_cast<int>( convertedColor3[0] ) << ", " << static_cast<int>( convertedColor3[1] ) << ", " << static_cast<int>( convertedColor3[2] ) << " at the same position " << pos3.x << ", " << pos3.y << " in the back converted OpenCV image" )
 
-  // the second part of this test checks the conversion of mitk::Images to Ipl images and cv::Mat and back.
+  // the second part of this test checks the conversion of mitk::Image to cv::Mat and back.
   for (int i = 1; i < argc; ++i)
   {
     ReadImageDataAndConvertForthAndBack(argv[i]);
@@ -138,7 +129,6 @@ int mitkOpenCVMitkConversionTest(int argc, char* argv[])
 template<typename TPixel, unsigned int VImageDimension>
 void ComparePixels( itk::Image<itk::RGBPixel<TPixel>,VImageDimension>* image )
 {
-
   typedef itk::RGBPixel<TPixel> PixelType;
   typedef itk::Image<PixelType, VImageDimension> ImageType;
 
@@ -205,13 +195,12 @@ void ReadImageDataAndConvertForthAndBack(std::string imageFileName)
     return;   // 4D images are not supported!
   }
 
-  ConvertIplImageForthAndBack(resultImg, imageFileName);
   ConvertCVMatForthAndBack(resultImg, imageFileName);
 }
 
 void ConvertCVMatForthAndBack(mitk::Image::Pointer inputForCVMat, std::string)
 {
-  // now we convert it to OpenCV IplImage
+  // now we convert it to OpenCV Mat
   mitk::ImageToOpenCVImageFilter::Pointer toOCvConverter = mitk::ImageToOpenCVImageFilter::New();
   toOCvConverter->SetImage(inputForCVMat);
   cv::Mat cvmatTestImage = toOCvConverter->GetOpenCVMat();
@@ -255,36 +244,4 @@ void ConvertCVMatForthAndBack(mitk::Image::Pointer inputForCVMat, std::string)
   toMitkConverter->Update();
 
   MITK_TEST_NOT_EQUAL(toMitkConverter->GetOutput(), inputForCVMat, "Converted image must not be the same as before.");
-}
-
-void ConvertIplImageForthAndBack(mitk::Image::Pointer inputForIpl, std::string)
-{
-  // now we convert it to OpenCV IplImage
-  mitk::ImageToOpenCVImageFilter::Pointer toOCvConverter = mitk::ImageToOpenCVImageFilter::New();
-  toOCvConverter->SetImage(inputForIpl);
-  IplImage* iplTestImage = toOCvConverter->GetOpenCVImage();
-
-  MITK_TEST_CONDITION_REQUIRED( iplTestImage != nullptr, "Conversion to OpenCv IplImage successful!");
-
-  mitk::OpenCVToMitkImageFilter::Pointer toMitkConverter = mitk::OpenCVToMitkImageFilter::New();
-  toMitkConverter->SetOpenCVImage(iplTestImage);
-  toMitkConverter->Update();
-
-  // initialize the image with the input image, since we want to test equality and OpenCV does not feature geometries and spacing
-  mitk::Image::Pointer result = inputForIpl->Clone();
-  mitk::ImageReadAccessor resultAcc(toMitkConverter->GetOutput(), toMitkConverter->GetOutput()->GetSliceData());
-  result->SetImportSlice(const_cast<void*>(resultAcc.GetData()));
-
-  if( result->GetPixelType().GetNumberOfComponents() == 1 )
-  {
-    MITK_ASSERT_EQUAL( result, inputForIpl, "Testing equality of input and output image of IplImage conversion" );
-  }
-  else if( result->GetPixelType().GetNumberOfComponents() == 3 )
-  {
-    MITK_ASSERT_EQUAL( result, inputForIpl, "Testing equality of input and output image of cv::Mat conversion" );
-  }
-  else
-  {
-    MITK_WARN << "Unhandled number of components used to test equality, please enhance test!";
-  }
 }

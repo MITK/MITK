@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkAffineTransform3D.h"
 #include "mitkBaseGeometry.h"
@@ -32,6 +28,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <fstream>
 #include <iomanip>
+#include <mitkIOUtil.h>
+#include <mitkImage.h>
 
 static const mitk::ScalarType testEps = 1E-9; // the epsilon used in this test == at least float precision.
 
@@ -50,6 +48,8 @@ class mitkPlaneGeometryTestSuite : public mitk::TestFixture
   MITK_TEST(TestFrontalInitialization);
   MITK_TEST(TestSaggitalInitialization);
   MITK_TEST(TestLefthandedCoordinateSystem);
+  MITK_TEST(TestDominantAxesError);
+  MITK_TEST(TestCheckRotationMatrix);
 
   // Currently commented out, see See bug 15990
   // MITK_TEST(testPlaneGeometryInitializeOrder);
@@ -112,6 +112,21 @@ public:
     plane = mitk::PlaneGeometry::New();
     mitk::AbstractTransformGeometry::Pointer atg = dynamic_cast<mitk::AbstractTransformGeometry *>(plane.GetPointer());
     CPPUNIT_ASSERT_MESSAGE("PlaneGeometry should not be castable to AbstractTransofrmGeometry", atg.IsNull());
+  }
+
+  void TestDominantAxesError()
+  {
+    auto image = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("NotQuiteARotationMatrix.nrrd"));
+    auto matrix = image->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().transpose();
+    std::vector< int > axes = mitk::PlaneGeometry::CalculateDominantAxes(matrix);
+    CPPUNIT_ASSERT_MESSAGE("Domiant axes cannot be determined in this dataset. Output should be default ordering.", axes.at(0)==0 && axes.at(1)==1 && axes.at(2)==2);
+  }
+
+  void TestCheckRotationMatrix()
+  {
+    auto image = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("NotQuiteARotationMatrix.nrrd"));
+    bool is_rotation = mitk::PlaneGeometry::CheckRotationMatrix(image->GetGeometry()->GetIndexToWorldTransform());
+    CPPUNIT_ASSERT_MESSAGE("Since the test data matrix is not quite a rotation matrix, this should be detected.", !is_rotation);
   }
 
   void TestLefthandedCoordinateSystem()

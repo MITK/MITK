@@ -22,13 +22,16 @@ if(MITK_USE_DCMQI)
       )
     endif()
 
+    mitk_query_custom_ep_vars()
+
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      GIT_REPOSITORY https://github.com/nolden/dcmqi.git
-      GIT_TAG d067f81c8a8e43900b91861f771013406868672f
+      GIT_REPOSITORY https://github.com/qiicr/dcmqi.git
+      GIT_TAG ea4f0809c8ba771e262a69b5f81d547a3945b264
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}
+      CMAKE_GENERATOR_PLATFORM ${gen_platform}
       CMAKE_ARGS
         ${ep_common_args}
         ${additional_cmake_args}
@@ -40,10 +43,13 @@ if(MITK_USE_DCMQI)
         -DITK_NO_IO_FACTORY_REGISTER_MANAGER:BOOL=ON
         -DDCMQI_SUPERBUILD:BOOL=OFF
         -DDCMQI_CMAKE_CXX_STANDARD:STRING=14
+        ${${proj}_CUSTOM_CMAKE_ARGS}
       CMAKE_CACHE_ARGS
         ${ep_common_cache_args}
+        ${${proj}_CUSTOM_CMAKE_CACHE_ARGS}
       CMAKE_CACHE_DEFAULT_ARGS
         ${ep_common_cache_default_args}
+        ${${proj}_CUSTOM_CMAKE_CACHE_DEFAULT_ARGS}
       DEPENDS ${proj_DEPENDENCIES}
     )
 

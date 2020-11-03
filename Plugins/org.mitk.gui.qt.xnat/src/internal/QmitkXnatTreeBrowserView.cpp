@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkXnatTreeBrowserView.h"
 
@@ -96,7 +92,7 @@ static bool doesDirExist(QDir myDir)
 QmitkXnatTreeBrowserView::QmitkXnatTreeBrowserView() :
   m_DataStorageServiceTracker(mitk::org_mitk_gui_qt_xnatinterface_Activator::GetContext()),
   m_TreeModel(new QmitkXnatTreeModel()),
-  m_Tracker(0),
+  m_Tracker(nullptr),
   m_DownloadPath(berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node(VIEW_ID)->Get("Download Path", "")),
   m_SilentMode(false)
 {
@@ -137,14 +133,14 @@ void QmitkXnatTreeBrowserView::FilePathNotAvailableWarning(QString file)
 
 void QmitkXnatTreeBrowserView::ToggleConnection()
 {
-  ctkXnatSession* session = 0;
+  ctkXnatSession* session = nullptr;
 
   try
   {
     session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(
           mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
   }
-  catch (std::invalid_argument)
+  catch (std::invalid_argument&)
   {
     mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->CreateXnatSession();
 
@@ -152,14 +148,14 @@ void QmitkXnatTreeBrowserView::ToggleConnection()
           mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
   }
 
-  if (session != 0 && session->isOpen())
+  if (session != nullptr && session->isOpen())
   {
     mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatSessionManager()->CloseXnatSession();
     m_Controls.btnXnatConnect->setToolTip("Connect");
     m_Controls.btnXnatConnect->setIcon(QIcon(":/xnat-plugin/xnat-connect.png"));
     CleanUp();
   }
-  else if (session != 0 && !session->isOpen())
+  else if (session != nullptr && !session->isOpen())
   {
     try
     {
@@ -410,7 +406,7 @@ void QmitkXnatTreeBrowserView::OnActivatedNode(const QModelIndex& index)
 
 void QmitkXnatTreeBrowserView::UpdateSession(ctkXnatSession* session)
 {
-  if (session != 0 && session->isOpen())
+  if (session != nullptr && session->isOpen())
   {
     // Fill model and show in the GUI
     m_TreeModel->addDataModel(session->dataModel());
@@ -424,7 +420,7 @@ void QmitkXnatTreeBrowserView::UpdateSession(ctkXnatSession* session)
 
 void QmitkXnatTreeBrowserView::CleanTreeModel(ctkXnatSession* session)
 {
-  if (session != 0)
+  if (session != nullptr)
   {
     m_TreeModel->removeDataModel(session->dataModel());
     m_Controls.treeView->reset();

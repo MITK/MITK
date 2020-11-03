@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef mitkPURFClassifier_h
 #define mitkPURFClassifier_h
@@ -31,29 +27,31 @@ namespace mitk
   {
   public:
 
-    mitkClassMacro(PURFClassifier, AbstractClassifier)
-      itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    mitkClassMacro(PURFClassifier, AbstractClassifier);
+
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       PURFClassifier();
 
-    ~PURFClassifier();
+    ~PURFClassifier() override;
 
-    void Train(const Eigen::MatrixXd &X, const Eigen::MatrixXi &Y);
+    void Train(const Eigen::MatrixXd &X, const Eigen::MatrixXi &Y) override;
 
-    Eigen::MatrixXi Predict(const Eigen::MatrixXd &X);
+    Eigen::MatrixXi Predict(const Eigen::MatrixXd &X) override;
     Eigen::MatrixXi PredictWeighted(const Eigen::MatrixXd &X);
 
 
-    bool SupportsPointWiseWeight();
-    bool SupportsPointWiseProbability();
+    bool SupportsPointWiseWeight() override;
+    bool SupportsPointWiseProbability() override;
     void ConvertParameter();
     vigra::ArrayVector<double> CalculateKappa(const Eigen::MatrixXd & X_in, const Eigen::MatrixXi &Y_in);
 
     void SetRandomForest(const vigra::RandomForest<int> & rf);
     const vigra::RandomForest<int> & GetRandomForest() const;
 
-    void UsePointWiseWeight(bool);
+    void UsePointWiseWeight(bool) override;
     void SetMaximumTreeDepth(int);
     void SetMinimumSplitNodeSize(int);
     void SetPrecision(double);

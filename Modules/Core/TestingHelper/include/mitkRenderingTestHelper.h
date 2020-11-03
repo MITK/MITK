@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef mitkRenderingTestHelper_h
 #define mitkRenderingTestHelper_h
@@ -44,14 +40,14 @@ namespace mitk
       int height,
       int argc,
       char *argv[],
-      mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard);
+      AntiAliasing antiAliasing = AntiAliasing::None);
 
     /** @brief Generate a rendering test helper object including a render window of the size width * height (in
      * pixel).*/
     RenderingTestHelper(
       int width,
       int height,
-      mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard);
+      AntiAliasing antiAliasing = AntiAliasing::None);
 
     /** Default destructor */
     ~RenderingTestHelper();
@@ -148,9 +144,6 @@ namespace mitk
      */
     bool CompareRenderWindowAgainstReference(int argc, char *argv[], double threshold = 10.0);
 
-    /** @brief Returns true if the opengl context is compatible for advanced vtk effects **/
-    bool IsAdvancedOpenGL();
-
     /**
      * @brief The ArgcHelperClass class is a convinience class to convert a vector
      * of strings to the standard c++ argv and argc arguments. This is necessary for
@@ -194,13 +187,7 @@ namespace mitk
     void Initialize(
       int width,
       int height,
-      mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard);
-
-    /** @brief Prints the opengl information, e.g. version, vendor and extensions,
-       *         This function can only be called after an opengl context is active.
-       *         It only prints the context after the vtkRenderwindow is fully initialized.
-       **/
-    void PrintGLInfo();
+      AntiAliasing antiAliasing = AntiAliasing::None);
 
     /** @brief This method tries to load the given file into a member datastorage, in order to render it.
           @param fileName The filename of the file to be loaded (including path).

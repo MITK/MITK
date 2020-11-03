@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="2048"
+   height="1792"
+   viewBox="0 0 2048 1792"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="transofmration-radiomics.svg">
+  <metadata
+     id="metadata10">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs8">
+    <linearGradient
+       id="linearGradient5601"
+       osb:paint="solid">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop5603" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4151"
+       osb:paint="solid">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop4153" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4151"
+       id="linearGradient4155"
+       x1="1051.9696"
+       y1="1356.9391"
+       x2="1895.7543"
+       y2="1356.9391"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="2560"
+     inkscape:window-height="1378"
+     id="namedview6"
+     showgrid="false"
+     inkscape:zoom="0.26339286"
+     inkscape:cx="634.35459"
+     inkscape:cy="1309.9221"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg2"
+     inkscape:snap-text-baseline="true" />
+  <path
+     style="fill:#00ff00;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:33.79999924;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     d="M 68.339844 664.40625 L 68.339844 1733.1523 L 1110.5078 1733.1523 L 1110.5078 1226.3047 L 577.08398 1226.3047 L 577.08398 664.40625 L 68.339844 664.40625 z "
+     id="rect6281" />
+  <path
+     style="fill:#00ff00;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:33.79999924;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     d="M 654.91602 362.20312 L 654.91602 1140.5078 L 1456 1140.5078 L 1456 673.89844 L 1110.5078 673.89844 L 1110.5078 362.20312 L 654.91602 362.20312 z "
+     id="rect6302-8" />
+  <path
+     style="fill:#00ff00;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:33.79999924;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     d="M 1188.3398 148.06836 L 1188.3398 603.66016 L 1666.7109 603.66016 L 1666.7109 364.47461 L 1423.7285 364.47461 L 1423.7285 148.06836 L 1188.3398 148.06836 z "
+     id="rect6302-8-0-4" />
+  <rect
+     style="fill:#00ff00;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:33.79999924;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     id="rect6302-8-0-4-1-7"
+     width="280.94919"
+     height="277.15259"
+     x="1492.0677"
+     y="20.881319" />
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-weight:normal;font-size:1517.09448242px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#cc0000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     x="786.97015"
+     y="1777.9902"
+     id="text5737"
+     sodipodi:linespacing="125%"
+     transform="scale(1.0082023,0.99186441)"><tspan
+       sodipodi:role="line"
+       id="tspan5739"
+       x="786.97015"
+       y="1777.9902"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold'">R</tspan></text>
+</svg>

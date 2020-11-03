@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKPhotoacousticVesselParameters_H
 #define MITKPhotoacousticVesselParameters_H
@@ -30,25 +26,27 @@ namespace mitk {
     class MITKPHOTOACOUSTICSLIB_EXPORT VesselProperties : public itk::Object
     {
     public:
-      mitkClassMacroItkParent(VesselProperties, itk::Object)
-        itkFactorylessNewMacro(Self)
-        mitkNewMacro1Param(Self, Self::Pointer)
+      mitkClassMacroItkParent(VesselProperties, itk::Object);
+      itkFactorylessNewMacro(Self);
+      mitkNewMacro1Param(Self, Self::Pointer);
 
-        itkGetMacro(PositionVector, Vector::Pointer)
-        itkGetMacro(DirectionVector, Vector::Pointer)
-        itkGetMacro(RadiusInVoxel, double)
-        itkGetMacro(AbsorptionCoefficient, double)
-        itkGetMacro(ScatteringCoefficient, double)
-        itkGetMacro(AnisotopyCoefficient, double)
-        itkGetMacro(BifurcationFrequency, double)
+      itkGetMacro(PositionVector, Vector::Pointer);
+      itkGetMacro(DirectionVector, Vector::Pointer);
+      itkGetMacro(RadiusInVoxel, double);
+      itkGetMacro(AbsorptionCoefficient, double);
+      itkGetMacro(ScatteringCoefficient, double);
+      itkGetMacro(AnisotopyCoefficient, double);
+      itkGetMacro(BifurcationFrequency, double);
+      itkGetMacro(DoPartialVolume, bool);
 
-        itkSetMacro(PositionVector, Vector::Pointer)
-        itkSetMacro(DirectionVector, Vector::Pointer)
-        itkSetMacro(RadiusInVoxel, double)
-        itkSetMacro(AbsorptionCoefficient, double)
-        itkSetMacro(ScatteringCoefficient, double)
-        itkSetMacro(AnisotopyCoefficient, double)
-        itkSetMacro(BifurcationFrequency, double)
+      itkSetMacro(PositionVector, Vector::Pointer);
+      itkSetMacro(DirectionVector, Vector::Pointer);
+      itkSetMacro(RadiusInVoxel, double);
+      itkSetMacro(AbsorptionCoefficient, double);
+      itkSetMacro(ScatteringCoefficient, double);
+      itkSetMacro(AnisotopyCoefficient, double);
+      itkSetMacro(BifurcationFrequency, double);
+      itkSetMacro(DoPartialVolume, bool);
 
     protected:
       VesselProperties();
@@ -63,6 +61,7 @@ namespace mitk {
       double m_ScatteringCoefficient;
       double m_AnisotopyCoefficient;
       double m_BifurcationFrequency;
+      bool m_DoPartialVolume;
     };
 
     /**

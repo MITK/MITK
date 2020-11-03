@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 #include <mitkTimeGeometry.h>
 
 #include <mitkExceptionMacro.h>
@@ -40,7 +36,7 @@ mitk::Point3D mitk::TimeGeometry::GetCornerPointInWorld(int id) const
   assert(id >= 0);
   assert(m_BoundingBox.IsNotNull());
 
-  BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
+  auto& bounds = m_BoundingBox->GetBounds();
 
   Point3D cornerpoint;
   switch (id)
@@ -84,7 +80,7 @@ mitk::Point3D mitk::TimeGeometry::GetCornerPointInWorld(int id) const
 mitk::Point3D mitk::TimeGeometry::GetCornerPointInWorld(bool xFront, bool yFront, bool zFront) const
 {
   assert(m_BoundingBox.IsNotNull());
-  BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
+  auto& bounds = m_BoundingBox->GetBounds();
 
   Point3D cornerpoint;
   cornerpoint[0] = (xFront ? bounds[0] : bounds[1]);
@@ -150,7 +146,7 @@ mitk::ScalarType mitk::TimeGeometry::GetExtentInWorld(unsigned int direction) co
 {
   assert(direction < 3);
   assert(m_BoundingBox.IsNotNull());
-  BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
+  auto& bounds = m_BoundingBox->GetBounds();
   return bounds[direction * 2 + 1] - bounds[direction * 2];
 }
 

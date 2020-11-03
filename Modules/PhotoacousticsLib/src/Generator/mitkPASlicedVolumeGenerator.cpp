@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkPASlicedVolumeGenerator.h"
 #include <mitkException.h>
@@ -69,7 +65,7 @@ mitk::pa::Volume::Pointer mitk::pa::SlicedVolumeGenerator::GetSlicedFluenceImage
         }
       }
 
-  return mitk::pa::Volume::New(imageArray, xDim, fluenceComponents, zDim);
+  return mitk::pa::Volume::New(imageArray, xDim, fluenceComponents, zDim, composedVolume->GetGroundTruthVolume()->GetSpacing());
 }
 
 mitk::pa::Volume::Pointer mitk::pa::SlicedVolumeGenerator::GetSlicedSignalImageFromComposedVolume(
@@ -92,7 +88,7 @@ mitk::pa::Volume::Pointer mitk::pa::SlicedVolumeGenerator::GetSlicedSignalImageF
           * composedVolume->GetGroundTruthVolume()->GetAbsorptionVolume()->GetData(x, y, z);
       }
 
-  return mitk::pa::Volume::New(imageArray, xDim, fluenceComponents, zDim);
+  return mitk::pa::Volume::New(imageArray, xDim, fluenceComponents, zDim, composedVolume->GetGroundTruthVolume()->GetSpacing());
 }
 
 mitk::pa::Volume::Pointer mitk::pa::SlicedVolumeGenerator::GetSlicedGroundTruthImageFromComposedVolume(
@@ -114,5 +110,5 @@ mitk::pa::Volume::Pointer mitk::pa::SlicedVolumeGenerator::GetSlicedGroundTruthI
           composedVolume->GetGroundTruthVolume()->GetAbsorptionVolume()->GetData(x, y, z);
       }
 
-  return mitk::pa::Volume::New(imageArray, xDim, fluenceComponents, zDim);
+  return mitk::pa::Volume::New(imageArray, xDim, fluenceComponents, zDim, composedVolume->GetGroundTruthVolume()->GetSpacing());
 }

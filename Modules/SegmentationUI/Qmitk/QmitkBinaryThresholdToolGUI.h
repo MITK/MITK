@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QmitkBinaryThresholdToolGUI_h_Included
 #define QmitkBinaryThresholdToolGUI_h_Included
@@ -21,9 +17,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkBinaryThresholdTool.h"
 #include <MitkSegmentationUIExports.h>
 
-#include <QDoubleSpinBox>
+#include "ctkSliderWidget.h"
+#include <qcheckbox.h>
 
-class QSlider;
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
   \brief GUI for mitk::BinaryThresholdTool.
@@ -43,10 +39,11 @@ class MITKSEGMENTATIONUI_EXPORT QmitkBinaryThresholdToolGUI : public QmitkToolGU
 
 public:
   mitkClassMacro(QmitkBinaryThresholdToolGUI, QmitkToolGUI);
-  itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+  itkFactorylessNewMacro(Self);
+  itkCloneMacro(Self);
 
-    void OnThresholdingIntervalBordersChanged(double lower, double upper, bool isFloat);
-  void OnThresholdingValueChanged(double current);
+  void OnThresholdingIntervalBordersChanged(double lower, double upper, bool isFloat);
+  void OnThresholdingValuesChanged(mitk::ScalarType lower, mitk::ScalarType upper);
 
 signals:
 
@@ -63,34 +60,19 @@ protected slots:
   void OnNewToolAssociated(mitk::Tool *);
   void OnAcceptThresholdPreview();
 
-  /// \brief Called when Spinner value has changed. Consider: Spinner contains DOUBLE values
-  void OnSpinnerValueChanged();
-
-  /// \brief Called when Slider value has changed. Consider: Slider contains INT values
-  void OnSliderValueChanged(int value);
+  void OnSliderValueChanged(double value);
 
 protected:
   QmitkBinaryThresholdToolGUI();
   ~QmitkBinaryThresholdToolGUI() override;
 
-  /// \brief When Slider (int value) has changed, we need to convert it to a respective double value for the spinner
-  double SliderIntToDouble(int val);
+  void BusyStateChanged(bool) override;
 
-  /// \brief When Spinner (double value) has changed, we need to convert it to a respective int value for the slider
-  int DoubleToSliderInt(double val);
+  ctkSliderWidget* m_ThresholdSlider = nullptr;
+  QCheckBox* m_CheckProcessAll = nullptr;
+  QCheckBox* m_CheckCreateNew = nullptr;
 
-  QSlider *m_Slider;
-  QDoubleSpinBox *m_Spinner;
-
-  /// \brief is image float or int?
-  bool m_isFloat;
-
-  double m_RangeMin;
-  double m_RangeMax;
-  double m_Range;
-
-  /// \brief helper bool values to find out, which of the GUI elements has been touched by the user.
-  bool m_ChangingSlider, m_ChangingSpinner;
+  bool m_InternalUpdate = false;
 
   mitk::BinaryThresholdTool::Pointer m_BinaryThresholdTool;
 };

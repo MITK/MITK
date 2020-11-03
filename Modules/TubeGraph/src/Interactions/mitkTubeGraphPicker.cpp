@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkTubeGraphPicker.h"
 
@@ -21,9 +17,7 @@ mitk::TubeGraphPicker::TubeGraphPicker()
   m_WorldPosition.Fill(0.0);
 }
 
-mitk::TubeGraphPicker::~TubeGraphPicker()
-{
-}
+mitk::TubeGraphPicker::~TubeGraphPicker() {}
 
 void mitk::TubeGraphPicker::SetTubeGraph(const mitk::TubeGraph *tubeGraph)
 {
@@ -33,8 +27,8 @@ void mitk::TubeGraphPicker::SetTubeGraph(const mitk::TubeGraph *tubeGraph)
 }
 
 /**
-* Implements the picking process
-*/
+ * Implements the picking process
+ */
 std::pair<mitk::TubeGraph::TubeDescriptorType, mitk::TubeElement *> mitk::TubeGraphPicker::GetPickedTube(
   const Point3D pickedPosition)
 {
@@ -77,6 +71,13 @@ std::pair<mitk::TubeGraph::TubeDescriptorType, mitk::TubeElement *> mitk::TubeGr
           currentRadius = 0;
 
         // calculate point->point distance
+        itk::Index<3> worldIndex;
+        m_TubeGraph->GetGeometry()->WorldToIndex(pickedPosition, worldIndex);
+
+        m_WorldPosition[0] = worldIndex[0];
+        m_WorldPosition[1] = worldIndex[1];
+        m_WorldPosition[2] = worldIndex[2];
+
         currentDistance = m_WorldPosition.EuclideanDistanceTo(currentPosition);
         if (currentDistance < closestDistance && (currentDistance - currentRadius) < 1.0)
         {

@@ -1,26 +1,23 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 #if defined(PHOTOACOUSTICS_USE_GPU) || DOXYGEN
 
 #include "./OpenCLFilter/mitkPhotoacousticOCLUsedLinesCalculation.h"
 #include "usServiceReference.h"
 #include "mitkImageReadAccessor.h"
 
-mitk::OCLUsedLinesCalculation::OCLUsedLinesCalculation()
-  : m_PixelCalculation(NULL)
+mitk::OCLUsedLinesCalculation::OCLUsedLinesCalculation(mitk::BeamformingSettings::Pointer settings)
+  : m_PixelCalculation(NULL),
+  m_Conf(settings)
 {
   this->AddSourceFile("UsedLinesCalculation.cl");
   this->m_FilterID = "UsedLinesCalculation";
@@ -38,6 +35,16 @@ mitk::OCLUsedLinesCalculation::~OCLUsedLinesCalculation()
   {
     clReleaseKernel(m_PixelCalculation);
   }
+}
+
+void mitk::OCLUsedLinesCalculation::SetElementHeightsBuffer(cl_mem elementHeightsBuffer)
+{
+  m_ElementHeightsBuffer = elementHeightsBuffer;
+}
+
+void mitk::OCLUsedLinesCalculation::SetElementPositionsBuffer(cl_mem elementPositionsBuffer)
+{
+  m_ElementPositionsBuffer = elementPositionsBuffer;
 }
 
 void mitk::OCLUsedLinesCalculation::Update()
@@ -62,7 +69,7 @@ void mitk::OCLUsedLinesCalculation::Execute()
 {
   cl_int clErr = 0;
 
-  unsigned int gridDim[3] = { m_Conf.ReconstructionLines, m_Conf.SamplesPerLine, 1 };
+  unsigned int gridDim[3] = { m_Conf->GetReconstructionLines(), m_Conf->GetSamplesPerLine(), 1 };
   size_t outputSize = gridDim[0] * gridDim[1] * 3;
 
   try
@@ -75,14 +82,46 @@ void mitk::OCLUsedLinesCalculation::Execute()
     return;
   }
 
-  // This calculation is the same for all kernels, so for performance reasons simply perform it here instead of within the kernels
-  m_part = (tan(m_Conf.Angle / 360 * 2 * itk::Math::pi) * ((m_Conf.SpeedOfSound * m_Conf.TimeSpacing)) / (m_Conf.Pitch * m_Conf.TransducerElements)) * m_Conf.inputDim[0];
-  
-  clErr = clSetKernelArg(this->m_PixelCalculation, 1, sizeof(cl_float), &(this->m_part));
-  clErr |= clSetKernelArg(this->m_PixelCalculation, 2, sizeof(cl_uint), &(this->m_Conf.inputDim[0]));
-  clErr |= clSetKernelArg(this->m_PixelCalculation, 3, sizeof(cl_uint), &(this->m_Conf.inputDim[1]));
-  clErr |= clSetKernelArg(this->m_PixelCalculation, 4, sizeof(cl_uint), &(this->m_Conf.ReconstructionLines));
-  clErr |= clSetKernelArg(this->m_PixelCalculation, 5, sizeof(cl_uint), &(this->m_Conf.SamplesPerLine));
+  if (m_Conf->GetGeometry() == mitk::BeamformingSettings::ProbeGeometry::Linear)
+  {
+    // This calculation is the same for all kernels, so for performance reasons simply perform it here instead of within the kernels
+    m_part = (tan(m_Conf->GetAngle() / 360 * 2 * itk::Math::pi) *
+      ((m_Conf->GetSpeedOfSound() * m_Conf->GetTimeSpacing())) /
+      (m_Conf->GetPitchInMeters() * m_Conf->GetTransducerElements())) * m_Conf->GetInputDim()[0];
+    unsigned int reconLines = this->m_Conf->GetReconstructionLines();
+    unsigned int samplesPerLine = this->m_Conf->GetSamplesPerLine();
+
+    float totalSamples_i = (float)(m_Conf->GetReconstructionDepth()) / (float)(m_Conf->GetSpeedOfSound() * m_Conf->GetTimeSpacing());
+    totalSamples_i = totalSamples_i <= m_Conf->GetInputDim()[1] ? totalSamples_i : m_Conf->GetInputDim()[1];
+    clErr = clSetKernelArg(this->m_PixelCalculation, 1, sizeof(cl_float), &(this->m_part));
+    clErr |= clSetKernelArg(this->m_PixelCalculation, 2, sizeof(cl_uint), &(this->m_Conf->GetInputDim()[0]));
+    clErr |= clSetKernelArg(this->m_PixelCalculation, 3, sizeof(cl_uint), &(this->m_Conf->GetInputDim()[1]));
+    clErr |= clSetKernelArg(this->m_PixelCalculation, 4, sizeof(cl_uint), &(reconLines));
+    clErr |= clSetKernelArg(this->m_PixelCalculation, 5, sizeof(cl_uint), &(samplesPerLine));
+    clErr |= clSetKernelArg(this->m_PixelCalculation, 6, sizeof(cl_float), &(totalSamples_i));
+  }
+  else
+  {
+    unsigned int reconLines = this->m_Conf->GetReconstructionLines();
+    unsigned int samplesPerLine = this->m_Conf->GetSamplesPerLine();
+
+    float probeRadius = m_Conf->GetProbeRadius();
+    float sin_deg = std::sin(m_Conf->GetAngle() / 360 * 2 * itk::Math::pi);
+
+    float horizontalExtent = m_Conf->GetHorizontalExtent();
+    float verticalExtent = m_Conf->GetReconstructionDepth();
+
+    clErr = clSetKernelArg(this->m_PixelCalculation, 1, sizeof(cl_mem), &(this->m_ElementHeightsBuffer));
+    clErr |= clSetKernelArg(this->m_PixelCalculation, 2, sizeof(cl_mem), &(this->m_ElementPositionsBuffer));
+    clErr |= clSetKernelArg(this->m_PixelCalculation, 3, sizeof(cl_float), &(sin_deg));
+    clErr |= clSetKernelArg(this->m_PixelCalculation, 4, sizeof(cl_float), &(probeRadius));
+    clErr |= clSetKernelArg(this->m_PixelCalculation, 5, sizeof(cl_uint), &(this->m_Conf->GetInputDim()[0]));
+    clErr |= clSetKernelArg(this->m_PixelCalculation, 6, sizeof(cl_uint), &(this->m_Conf->GetInputDim()[1]));
+    clErr |= clSetKernelArg(this->m_PixelCalculation, 7, sizeof(cl_uint), &(reconLines));
+    clErr |= clSetKernelArg(this->m_PixelCalculation, 8, sizeof(cl_uint), &(samplesPerLine));
+    clErr |= clSetKernelArg(this->m_PixelCalculation, 9, sizeof(cl_float), &(horizontalExtent));
+    clErr |= clSetKernelArg(this->m_PixelCalculation, 10, sizeof(cl_float), &(verticalExtent));
+  }
 
   CHECK_OCL_ERR(clErr);
 
@@ -106,8 +145,16 @@ bool mitk::OCLUsedLinesCalculation::Initialize()
 
   if (OclFilter::Initialize())
   {
-    this->m_PixelCalculation = clCreateKernel(this->m_ClProgram, "ckUsedLines", &clErr);
-    buildErr |= CHECK_OCL_ERR(clErr);
+    if (m_Conf->GetGeometry() == mitk::BeamformingSettings::ProbeGeometry::Linear)
+    {
+      this->m_PixelCalculation = clCreateKernel(this->m_ClProgram, "ckUsedLines", &clErr);
+      buildErr |= CHECK_OCL_ERR(clErr);
+    }
+    else
+    {
+      this->m_PixelCalculation = clCreateKernel(this->m_ClProgram, "ckUsedLines_g", &clErr);
+      buildErr |= CHECK_OCL_ERR(clErr);
+    }
   }
   return (OclFilter::IsInitialized() && buildErr);
 }

@@ -1,39 +1,27 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkBinaryThresholdToolGUI.h"
-#include "QmitkConfirmSegmentationDialog.h"
-#include "QmitkNewSegmentationDialog.h"
 
 #include <qlabel.h>
 #include <qlayout.h>
 #include <qpushbutton.h>
 #include <qslider.h>
+#include <QApplication>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkBinaryThresholdToolGUI, "")
 
 QmitkBinaryThresholdToolGUI::QmitkBinaryThresholdToolGUI()
-  : QmitkToolGUI(),
-    m_Slider(nullptr),
-    m_Spinner(nullptr),
-    m_isFloat(false),
-    m_RangeMin(0),
-    m_RangeMax(0),
-    m_ChangingSlider(false),
-    m_ChangingSpinner(false)
+  : QmitkToolGUI()
 {
   // create the visible widgets
   QBoxLayout *mainLayout = new QVBoxLayout(this);
@@ -46,43 +34,43 @@ QmitkBinaryThresholdToolGUI::QmitkBinaryThresholdToolGUI()
 
   QBoxLayout *layout = new QHBoxLayout();
 
-  m_Spinner = new QDoubleSpinBox();
-  m_Spinner->setMaximum(20);
-  m_Spinner->setMinimum(5);
-  m_Spinner->setValue(1);
-
-  connect(m_Spinner, SIGNAL(valueChanged(double)), this, SLOT(OnSpinnerValueChanged()));
-  layout->addWidget(m_Spinner);
-
-  // m_Slider = new QSlider( 5, 20, 1, 1, Qt::Horizontal, this );
-  m_Slider = new QSlider(Qt::Horizontal, this);
-  m_Slider->setMinimum(5);
-  m_Slider->setMaximum(20);
-  m_Slider->setPageStep(1);
-  m_Slider->setValue(1);
-  connect(m_Slider, SIGNAL(valueChanged(int)), this, SLOT(OnSliderValueChanged(int)));
-  layout->addWidget(m_Slider);
-
+  m_ThresholdSlider = new ctkSliderWidget();
+  connect(
+    m_ThresholdSlider, SIGNAL(valueChanged(double)), this, SLOT(OnSliderValueChanged(double)));
+  layout->addWidget(m_ThresholdSlider);
   mainLayout->addLayout(layout);
+  m_ThresholdSlider->setSingleStep(0.01);
 
   QPushButton *okButton = new QPushButton("Confirm Segmentation", this);
   connect(okButton, SIGNAL(clicked()), this, SLOT(OnAcceptThresholdPreview()));
   okButton->setFont(f);
   mainLayout->addWidget(okButton);
 
+  m_CheckProcessAll = new QCheckBox("Process all time steps", this);
+  m_CheckProcessAll->setChecked(false);
+  m_CheckProcessAll->setToolTip("Process/overwrite all time steps of the dynamic segmentation and not just the currently visible time step.");
+
+  mainLayout->addWidget(m_CheckProcessAll);
+
+  m_CheckCreateNew = new QCheckBox("Create as new segmentation", this);
+  m_CheckCreateNew->setChecked(false);
+  m_CheckCreateNew->setToolTip("Add the confirmed segmentation as a new segmentation instead of overwriting the currently selected.");
+  mainLayout->addWidget(m_CheckCreateNew);
+
   connect(this, SIGNAL(NewToolAssociated(mitk::Tool *)), this, SLOT(OnNewToolAssociated(mitk::Tool *)));
 }
 
 QmitkBinaryThresholdToolGUI::~QmitkBinaryThresholdToolGUI()
 {
-  // !!!
   if (m_BinaryThresholdTool.IsNotNull())
   {
+    m_BinaryThresholdTool->CurrentlyBusy -=
+      mitk::MessageDelegate1<QmitkBinaryThresholdToolGUI, bool>(this, &QmitkBinaryThresholdToolGUI::BusyStateChanged);
     m_BinaryThresholdTool->IntervalBordersChanged -=
       mitk::MessageDelegate3<QmitkBinaryThresholdToolGUI, double, double, bool>(
         this, &QmitkBinaryThresholdToolGUI::OnThresholdingIntervalBordersChanged);
-    m_BinaryThresholdTool->ThresholdingValueChanged -= mitk::MessageDelegate1<QmitkBinaryThresholdToolGUI, double>(
-      this, &QmitkBinaryThresholdToolGUI::OnThresholdingValueChanged);
+    m_BinaryThresholdTool->ThresholdingValuesChanged -= mitk::MessageDelegate2<QmitkBinaryThresholdToolGUI, mitk::ScalarType, mitk::ScalarType>(
+      this, &QmitkBinaryThresholdToolGUI::OnThresholdingValuesChanged);
   }
 }
 
@@ -90,127 +78,91 @@ void QmitkBinaryThresholdToolGUI::OnNewToolAssociated(mitk::Tool *tool)
 {
   if (m_BinaryThresholdTool.IsNotNull())
   {
+    m_BinaryThresholdTool->CurrentlyBusy -=
+      mitk::MessageDelegate1<QmitkBinaryThresholdToolGUI, bool>(this, &QmitkBinaryThresholdToolGUI::BusyStateChanged);
     m_BinaryThresholdTool->IntervalBordersChanged -=
       mitk::MessageDelegate3<QmitkBinaryThresholdToolGUI, double, double, bool>(
         this, &QmitkBinaryThresholdToolGUI::OnThresholdingIntervalBordersChanged);
-    m_BinaryThresholdTool->ThresholdingValueChanged -= mitk::MessageDelegate1<QmitkBinaryThresholdToolGUI, double>(
-      this, &QmitkBinaryThresholdToolGUI::OnThresholdingValueChanged);
+    m_BinaryThresholdTool->ThresholdingValuesChanged -= mitk::MessageDelegate2<QmitkBinaryThresholdToolGUI, mitk::ScalarType, mitk::ScalarType>(
+      this, &QmitkBinaryThresholdToolGUI::OnThresholdingValuesChanged);
   }
 
   m_BinaryThresholdTool = dynamic_cast<mitk::BinaryThresholdTool *>(tool);
 
   if (m_BinaryThresholdTool.IsNotNull())
   {
+    m_BinaryThresholdTool->CurrentlyBusy +=
+      mitk::MessageDelegate1<QmitkBinaryThresholdToolGUI, bool>(this, &QmitkBinaryThresholdToolGUI::BusyStateChanged);
     m_BinaryThresholdTool->IntervalBordersChanged +=
       mitk::MessageDelegate3<QmitkBinaryThresholdToolGUI, double, double, bool>(
         this, &QmitkBinaryThresholdToolGUI::OnThresholdingIntervalBordersChanged);
-    m_BinaryThresholdTool->ThresholdingValueChanged += mitk::MessageDelegate1<QmitkBinaryThresholdToolGUI, double>(
-      this, &QmitkBinaryThresholdToolGUI::OnThresholdingValueChanged);
-  }
-}
+    m_BinaryThresholdTool->ThresholdingValuesChanged += mitk::MessageDelegate2<QmitkBinaryThresholdToolGUI, mitk::ScalarType, mitk::ScalarType>(
+      this, &QmitkBinaryThresholdToolGUI::OnThresholdingValuesChanged);
 
-void QmitkBinaryThresholdToolGUI::OnSpinnerValueChanged()
-{
-  if (m_BinaryThresholdTool.IsNotNull())
-  {
-    m_ChangingSpinner = true;
-    double doubleVal = m_Spinner->value();
-    int intVal = this->DoubleToSliderInt(doubleVal);
-    m_BinaryThresholdTool->SetThresholdValue(doubleVal);
-    if (m_ChangingSlider == false)
-      m_Slider->setValue(intVal);
-    m_ChangingSpinner = false;
-  }
-}
-
-void QmitkBinaryThresholdToolGUI::OnSliderValueChanged(int value)
-{
-  if (m_BinaryThresholdTool.IsNotNull())
-  {
-    m_ChangingSlider = true;
-    double doubleVal = SliderIntToDouble(value);
-    if (m_ChangingSpinner == false)
-      m_Spinner->setValue(doubleVal);
-    m_ChangingSlider = false;
+    m_BinaryThresholdTool->SetOverwriteExistingSegmentation(true);
+    m_CheckProcessAll->setVisible(m_BinaryThresholdTool->GetTargetSegmentationNode()->GetData()->GetTimeSteps()>1);
   }
 }
 
 void QmitkBinaryThresholdToolGUI::OnAcceptThresholdPreview()
 {
-  QmitkConfirmSegmentationDialog dialog;
-  QString segName = QString::fromStdString(m_BinaryThresholdTool->GetCurrentSegmentationName());
-
-  dialog.SetSegmentationName(segName);
-  int result = dialog.exec();
-
-  switch (result)
-  {
-    case QmitkConfirmSegmentationDialog::CREATE_NEW_SEGMENTATION:
-      m_BinaryThresholdTool->SetOverwriteExistingSegmentation(false);
-      break;
-    case QmitkConfirmSegmentationDialog::OVERWRITE_SEGMENTATION:
-      m_BinaryThresholdTool->SetOverwriteExistingSegmentation(true);
-      break;
-    case QmitkConfirmSegmentationDialog::CANCEL_SEGMENTATION:
-      return;
-  }
-
   if (m_BinaryThresholdTool.IsNotNull())
   {
+    if (m_CheckCreateNew->isChecked())
+    {
+      m_BinaryThresholdTool->SetOverwriteExistingSegmentation(false);
+    }
+    else
+    {
+      m_BinaryThresholdTool->SetOverwriteExistingSegmentation(true);
+    }
+
+    m_BinaryThresholdTool->SetCreateAllTimeSteps(m_CheckProcessAll->isChecked());
+
     this->thresholdAccepted();
-    m_BinaryThresholdTool->AcceptCurrentThresholdValue();
+    m_BinaryThresholdTool->ConfirmSegmentation();
   }
 }
 
 void QmitkBinaryThresholdToolGUI::OnThresholdingIntervalBordersChanged(double lower, double upper, bool isFloat)
 {
-  m_isFloat = isFloat;
-  m_RangeMin = lower;
-  m_RangeMax = upper;
-
-  m_Spinner->setRange(lower, upper);
-  if (!m_isFloat)
+  m_InternalUpdate = true;
+  if (!isFloat)
   {
-    m_Slider->setRange(int(lower), int(upper));
-    m_Spinner->setDecimals(0);
-    m_Spinner->setSingleStep(1);
+    m_ThresholdSlider->setRange(int(lower), int(upper));
+    m_ThresholdSlider->setSingleStep(1);
+    m_ThresholdSlider->setDecimals(0);
   }
   else
   {
-    m_Slider->setRange(0, 99);
-    m_Spinner->setDecimals(2);
-    m_Range = upper - lower;
-    m_Spinner->setSingleStep(m_Range / 100);
+    m_ThresholdSlider->setRange(lower, upper);
+  }
+  m_InternalUpdate = false;
+}
+
+void QmitkBinaryThresholdToolGUI::OnThresholdingValuesChanged(mitk::ScalarType lower, mitk::ScalarType /*upper*/)
+{
+  m_ThresholdSlider->setValue(lower);
+}
+
+void QmitkBinaryThresholdToolGUI::OnSliderValueChanged(double value)
+{
+  if (m_BinaryThresholdTool.IsNotNull() && !m_InternalUpdate)
+  {
+    m_BinaryThresholdTool->SetThresholdValue(value);
   }
 }
 
-void QmitkBinaryThresholdToolGUI::OnThresholdingValueChanged(double current)
+void QmitkBinaryThresholdToolGUI::BusyStateChanged(bool value)
 {
-  m_Slider->setValue(DoubleToSliderInt(current));
-  m_Spinner->setValue(current);
-}
-
-double QmitkBinaryThresholdToolGUI::SliderIntToDouble(int val)
-{
-  if (!m_isFloat)
+  if (value)
   {
-    return double(val);
+    QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
   }
   else
   {
-    return double(val * (m_Range) / 100 + m_RangeMin);
+    QApplication::restoreOverrideCursor();
   }
-}
 
-int QmitkBinaryThresholdToolGUI::DoubleToSliderInt(double val)
-{
-  if (!m_isFloat)
-  {
-    return int(val);
-  }
-  else
-  {
-    int intVal = int(((val - m_RangeMin) / m_Range) * 100);
-    return intVal;
-  }
+  m_ThresholdSlider->setEnabled(!value);
 }

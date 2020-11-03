@@ -1,8 +1,0 @@
-<RCC>
-    <qresource prefix="/QmitkDiffusionImaging">
-    
-        <file>ConnectomicsNetwork.png</file>
-        <file>QmitkRandomParcellationIcon.png</file>
-        
-    </qresource>
-</RCC>

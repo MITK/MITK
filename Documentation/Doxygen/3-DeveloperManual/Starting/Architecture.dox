@@ -41,7 +41,7 @@ Based on these libraries, MITK includes the following features:
  <li>Support of 3D + t data.
  <li>Complete application framework, expandable by plug-ins
  <li>Standard tools for medical imaging as default plug-ins (e.g. measurement, segmentation)
- <li>Many specialized modules for different topics on medical imaging (e.g. diffusion imaging, image guided therapy, live image/ultrasound data processing)
+ <li>Many specialized modules for different topics on medical imaging (e.g. image guided therapy, live image/ultrasound data processing)
 </ul>
 
 */

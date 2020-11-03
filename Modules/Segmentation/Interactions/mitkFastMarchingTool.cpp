@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkFastMarchingTool.h"
 #include "mitkToolManager.h"
@@ -273,11 +269,14 @@ void mitk::FastMarchingTool::ConfirmSegmentation()
   {
     // logical or combination of preview and segmentation slice
 
-    mitk::Image::Pointer workingImageSlice;
-    mitk::Image::Pointer workingImage = dynamic_cast<mitk::Image *>(this->m_ToolManager->GetWorkingData(0)->GetData());
-    workingImageSlice = GetAffectedImageSliceAs2DImage(m_WorkingPlane, workingImage, m_CurrentTimeStep);
+    Image::Pointer workingImageSlice;
 
-    mitk::Image::Pointer segmentationResult = mitk::Image::New();
+    Image::Pointer workingImage = dynamic_cast<Image *>(this->m_ToolManager->GetWorkingData(0)->GetData());
+    TimePointType referenceImageTimePoint = m_ReferenceImage->GetTimeGeometry()->TimeStepToTimePoint(m_CurrentTimeStep);
+    TimeStepType workingImageTimeStep = workingImage->GetTimeGeometry()->TimePointToTimeStep(referenceImageTimePoint);
+    workingImageSlice = GetAffectedImageSliceAs2DImage(m_WorkingPlane, workingImage, workingImageTimeStep);
+
+    Image::Pointer segmentationResult = Image::New();
 
     bool isDeprecatedUnsignedCharSegmentation =
       (workingImage->GetPixelType().GetComponentType() == itk::ImageIOBase::UCHAR);
@@ -320,7 +319,7 @@ void mitk::FastMarchingTool::ConfirmSegmentation()
 
     // write to segmentation volume and hide preview image
     // again, current time step is not considered
-    this->WriteBackSegmentationResult(m_WorkingPlane, segmentationResult, m_CurrentTimeStep);
+    this->WriteBackSegmentationResult(m_WorkingPlane, segmentationResult, workingImageTimeStep);
     this->m_ResultImageNode->SetVisibility(false);
 
     this->ClearSeeds();

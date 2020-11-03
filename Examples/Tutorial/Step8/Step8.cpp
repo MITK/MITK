@@ -1,21 +1,19 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "Step8.h"
 
+#include "QmitkLevelWindowWidget.h"
+#include "QmitkRenderWindow.h"
 #include "QmitkStdMultiWidget.h"
 
 #include "mitkRenderingManager.h"
@@ -56,25 +54,22 @@ void Step8::SetupWidgets()
   // Tell the multiWidget which DataStorage to render
   multiWidget->SetDataStorage(m_DataStorage);
 
-  // Initialize views as axial, sagittal, coronar (from
-  // top-left to bottom)
-  auto geo = m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll());
-  mitk::RenderingManager::GetInstance()->InitializeViews(geo);
-
-  // Initialize bottom-right view as 3D view
-  multiWidget->GetRenderWindow4()->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard3D);
-
-  // Enable standard handler for levelwindow-slider
-  multiWidget->EnableStandardLevelWindow();
+  // Initialize the multiWidget with the render windows
+  multiWidget->InitializeMultiWidget();
 
   // Add the displayed views to the DataStorage to see their positions in 2D and 3D
-  multiWidget->AddDisplayPlaneSubTree();
   multiWidget->AddPlanesToDataStorage();
-  multiWidget->SetWidgetPlanesVisibility(true);
 
   //*************************************************************************
-  // Part II: Setup standard interaction with the mouse
+  // Part Ib: create and initialize LevelWindowWidget
   //*************************************************************************
+  QmitkLevelWindowWidget *levelWindowWidget = new QmitkLevelWindowWidget(viewParent);
+
+  hlayout->addWidget(levelWindowWidget);
+
+  // Tell the levelWindowWidget which DataStorage to access
+  levelWindowWidget->SetDataStorage(m_DataStorage);
+
 }
 /**
  \example Step8.cpp

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkCommandLineParser.h"
 #include "mitkIOUtil.h"
@@ -38,19 +34,19 @@ int main(int argc, char* argv[])
   parser.setTitle("Remove empty voxels Sampling");
   parser.setCategory("Classification Command Tools");
   parser.setDescription("");
-  parser.setContributor("MBI");
+  parser.setContributor("German Cancer Research Center (DKFZ)");
 
   parser.setArgumentPrefix("--", "-");
   // Add command line argument names
   parser.addArgument("help", "h", mitkCommandLineParser::Bool, "Help:", "Show this help text");
-  parser.addArgument("mask-input", "mi", mitkCommandLineParser::InputDirectory, "Input file:", "Input file", us::Any(), false);
-  parser.addArgument("mask-output", "mo", mitkCommandLineParser::OutputFile, "Output file:", "Output file", us::Any(), false);
+  parser.addArgument("mask-input", "mi", mitkCommandLineParser::Directory, "Input file:", "Input file", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("mask-output", "mo", mitkCommandLineParser::File, "Output file:", "Output file", us::Any(), false, false, false, mitkCommandLineParser::Output);
 
   for (int i = 0; i < 100; ++i)
   {
     std::stringstream s1; s1 << i; std::string number = s1.str();
-    parser.addArgument("input"+number, "i"+number, mitkCommandLineParser::OutputFile, "Input file", "input file", us::Any(), true);
-    parser.addArgument("output" + number, "o" + number, mitkCommandLineParser::OutputFile, "Output File", "Output file", us::Any(), true);
+    parser.addArgument("input"+number, "i"+number, mitkCommandLineParser::File, "Input file", "input file", us::Any(), true, false, false, mitkCommandLineParser::Output);
+    parser.addArgument("output" + number, "o" + number, mitkCommandLineParser::File, "Output File", "Output file", us::Any(), true, false, false, mitkCommandLineParser::Output);
   }
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);

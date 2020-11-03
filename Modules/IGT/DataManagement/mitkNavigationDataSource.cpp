@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkNavigationDataSource.h"
 #include "mitkUIDGenerator.h"
@@ -30,7 +26,7 @@ const std::string mitk::NavigationDataSource::US_PROPKEY_ID = US_INTERFACE_NAME 
 const std::string mitk::NavigationDataSource::US_PROPKEY_ISACTIVE = US_INTERFACE_NAME + ".isActive";
 
 mitk::NavigationDataSource::NavigationDataSource()
-: itk::ProcessObject(), m_Name("NavigationDataSource (no defined type)"), m_IsFrozen(false)
+: itk::ProcessObject(), m_Name("NavigationDataSource (no defined type)"), m_IsFrozen(false), m_ToolMetaDataCollection(mitk::NavigationToolStorage::New())
 {
 }
 
@@ -80,7 +76,7 @@ void mitk::NavigationDataSource::RegisterAsMicroservice(){
 
   // Define ServiceProps
   us::ServiceProperties props;
-  mitk::UIDGenerator uidGen = mitk::UIDGenerator ("org.mitk.services.NavigationDataSource.id_", 16);
+  mitk::UIDGenerator uidGen = mitk::UIDGenerator ("org.mitk.services.NavigationDataSource.id_");
   props[ US_PROPKEY_ID ] = uidGen.GetUID();
   props[ US_PROPKEY_DEVICENAME ] = m_Name;
   m_ServiceRegistration = context->RegisterService(this, props);
@@ -153,4 +149,17 @@ void mitk::NavigationDataSource::Freeze()
 void mitk::NavigationDataSource::UnFreeze()
 {
   m_IsFrozen = false;
+}
+
+mitk::NavigationTool::Pointer mitk::NavigationDataSource::GetToolMetaData(DataObjectPointerArraySizeType idx)
+{
+  if (idx >= this->GetNumberOfIndexedOutputs()) { return mitk::NavigationTool::New(); }
+  else { return GetToolMetaData(this->GetOutput(idx)->GetName()); }
+}
+
+mitk::NavigationTool::Pointer mitk::NavigationDataSource::GetToolMetaData(const std::string& navDataName)
+{
+  mitk::NavigationTool::Pointer returnValue = m_ToolMetaDataCollection->GetToolByName(navDataName);
+  if (returnValue == nullptr) { returnValue = mitk::NavigationTool::New(); }
+  return returnValue;
 }

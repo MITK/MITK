@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKDATASTORAGE_H
 #define MITKDATASTORAGE_H
@@ -438,9 +434,12 @@ namespace mitk
 
   //##Documentation
   //## @brief returns the topmost visible node of a given list of nodes.
+  //## The function returns a node that is visible and has the highest layer of a set of given nodes.
+  //## The property list, which is used to find the visibility- and layer-property is is specified by the
+  //## given base renderer.
   //##
-  MITKCORE_EXPORT DataNode::Pointer FindTopmostVisibleNode(const DataStorage::SetOfObjects* nodes,
-                                                           const Point3D worldposition,
+  MITKCORE_EXPORT DataNode::Pointer FindTopmostVisibleNode(const DataStorage::SetOfObjects::ConstPointer nodes,
+                                                           const Point3D worldPosition,
                                                            const TimePointType timePoint,
                                                            const BaseRenderer* baseRender);
 } // namespace mitk

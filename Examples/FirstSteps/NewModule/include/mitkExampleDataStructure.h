@@ -1,19 +1,15 @@
 
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef _MITK_ExampleDataStructure_H
 #define _MITK_ExampleDataStructure_H
@@ -33,15 +29,16 @@ namespace mitk
   {
   public:
     // virtual methods that need to be implemented
-    virtual void UpdateOutputInformation() override;
-    virtual void SetRequestedRegionToLargestPossibleRegion() override;
-    virtual bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
-    virtual bool VerifyRequestedRegion() override;
-    virtual void SetRequestedRegion(const itk::DataObject *) override;
+    void UpdateOutputInformation() override;
+    void SetRequestedRegionToLargestPossibleRegion() override;
+    bool RequestedRegionIsOutsideOfTheBufferedRegion() override;
+    bool VerifyRequestedRegion() override;
+    void SetRequestedRegion(const itk::DataObject *) override;
 
     // Macros
     mitkClassMacro(ExampleDataStructure, BaseData);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       ////////////////// Interface ///////////////////
 
@@ -63,7 +60,7 @@ namespace mitk
 
   protected:
     ExampleDataStructure();
-    virtual ~ExampleDataStructure();
+    ~ExampleDataStructure() override;
 
     // this string is the data stored in this example data structure
     std::string m_Data;

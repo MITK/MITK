@@ -1,0 +1,39 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
+#ifndef MITKRadiomicsStatisticACTIVATOR_H
+#define MITKRadiomicsStatisticACTIVATOR_H
+
+#include <ctkPluginActivator.h>
+
+namespace mitk {
+
+class RadiomicsStatisticActivator :
+  public QObject, public ctkPluginActivator
+{
+  Q_OBJECT
+  Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_radiomicsstatistic")
+  Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_radiomicstransformation")
+  Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_radiomicsarithmetric")
+  Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_radiomicsmaskprocessing")
+  Q_INTERFACES(ctkPluginActivator)
+
+public:
+
+  void start(ctkPluginContext* context) override;
+  void stop(ctkPluginContext* context) override;
+
+}; // RadiomicsStatisticActivator
+
+}
+
+#endif // MITKRadiomicsStatisticACTIVATOR_H

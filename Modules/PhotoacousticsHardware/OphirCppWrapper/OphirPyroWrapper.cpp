@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #using "Interop.OphirLMMeasurementLib.dll"
 #include <vector>
@@ -53,7 +49,7 @@ int OphirPyroWrapper::OpenDevice(char* serialNumber)
 {
   int deviceHandle;
   _private->ophirAPI->OpenUSBDevice(gcnew System::String(serialNumber), deviceHandle);
-  
+
   return deviceHandle;
 }
 
@@ -88,7 +84,7 @@ bool OphirPyroWrapper::StartStream(int deviceHandle)
   _private->ophirAPI->StartStream(deviceHandle, 0);
   return true;
 }
-  
+
 bool OphirPyroWrapper::StopStream(int deviceHandle)
 {
   _private->ophirAPI->StopStream(deviceHandle, 0);
@@ -123,7 +119,7 @@ unsigned int OphirPyroWrapper::GetData(int deviceHandle, std::vector<double>* da
       (*data)[i] = managedDataArray[i];
       (*timestamp)[i] = managedTimeStampArray[i];
       (*status)[i] = managedStatusArray[i];
-      // DEBUG: std::cout << "managedDataArray " << i << ": " << managedDataArray[i] << " ts: " << managedTimeStampArray[i] << " status: " << managedStatusArray[i] << std::endl;  
+      // DEBUG: std::cout << "managedDataArray " << i << ": " << managedDataArray[i] << " ts: " << managedTimeStampArray[i] << " status: " << managedStatusArray[i] << std::endl;
     }
     return managedDataArray->Length;
   }

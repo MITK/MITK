@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKANNOTATIONPROPERTY_H_HEADER_INCLUDED
 #define MITKANNOTATIONPROPERTY_H_HEADER_INCLUDED
@@ -38,7 +34,9 @@ namespace mitk
 
     typedef std::string ValueType;
 
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self)
       mitkNewMacro2Param(AnnotationProperty, const char *, const Point3D &);
     mitkNewMacro2Param(AnnotationProperty, const std::string &, const Point3D &);
     mitkNewMacro4Param(AnnotationProperty, const char *, ScalarType, ScalarType, ScalarType);

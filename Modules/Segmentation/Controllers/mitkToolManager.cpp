@@ -1,20 +1,17 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkToolManager.h"
+#include "mitkToolManagerProvider.h"
 #include "mitkCoreObjectFactory.h"
 
 #include <itkCommand.h>
@@ -24,6 +21,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkInteractionEventObserver.h"
 #include "mitkSegTool2D.h"
+#include "mitkRenderingManager.h"
+#include "mitkSliceNavigationController.h"
 
 #include "usGetModuleContext.h"
 #include "usModuleContext.h"
@@ -34,6 +33,44 @@ mitk::ToolManager::ToolManager(DataStorage *storage)
   CoreObjectFactory::GetInstance(); // to make sure a CoreObjectFactory was instantiated (and in turn, possible tools
                                     // are registered) - bug 1029
   this->InitializeTools();
+}
+
+void mitk::ToolManager::EnsureTimeObservation()
+{
+  if (nullptr != mitk::RenderingManager::GetInstance() && nullptr != mitk::RenderingManager::GetInstance()->GetTimeNavigationController())
+  {
+    auto timeController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
+
+    m_LastTimePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+
+    auto currentTimeController = m_CurrentTimeNavigationController.Lock();
+
+    if (timeController != currentTimeController)
+    {
+      if (currentTimeController.IsNotNull())
+      {
+        currentTimeController->RemoveObserver(m_TimePointObserverTag);
+      }
+
+      itk::MemberCommand<ToolManager>::Pointer command = itk::MemberCommand<ToolManager>::New();
+      command->SetCallbackFunction(this, &ToolManager::OnTimeChanged);
+      command->SetCallbackFunction(this, &ToolManager::OnTimeChangedConst);
+      m_CurrentTimeNavigationController = timeController;
+      m_TimePointObserverTag = timeController->AddObserver(SliceNavigationController::GeometryTimeEvent(nullptr,0), command);
+    }
+  }
+}
+
+void mitk::ToolManager::StopTimeObservation()
+{
+  auto currentTimeController = m_CurrentTimeNavigationController.Lock();
+
+  if (currentTimeController.IsNotNull())
+  {
+    currentTimeController->RemoveObserver(m_TimePointObserverTag);
+    m_CurrentTimeNavigationController = nullptr;
+    m_TimePointObserverTag = 0;
+  }
 }
 
 mitk::ToolManager::~ToolManager()
@@ -61,6 +98,7 @@ mitk::ToolManager::~ToolManager()
   {
     observerTagMapIter->first->RemoveObserver(observerTagMapIter->second);
   }
+  this->StopTimeObservation();
 }
 
 void mitk::ToolManager::InitializeTools()
@@ -133,7 +171,21 @@ mitk::Tool *mitk::ToolManager::GetToolById(int id)
 
 bool mitk::ToolManager::ActivateTool(int id)
 {
-  if (id != -1 && !this->GetToolById(id)->CanHandle(this->GetReferenceData(0)->GetData()))
+  const auto workingDataNode = this->GetWorkingData(0);
+  const mitk::BaseData* workingData = nullptr;
+  if (nullptr != workingDataNode)
+  {
+    workingData = workingDataNode->GetData();
+  }
+
+  const auto referenceDataNode = this->GetReferenceData(0);
+  const mitk::BaseData* referenceData = nullptr;
+  if (nullptr != referenceDataNode)
+  {
+    referenceData = referenceDataNode->GetData();
+  }
+
+  if (id != -1 && !this->GetToolById(id)->CanHandle(referenceData, workingData))
     return false;
 
   if (this->GetDataStorage())
@@ -157,10 +209,22 @@ bool mitk::ToolManager::ActivateTool(int id)
 
   while (nextTool != m_ActiveToolID)
   {
-    if (m_ActiveTool)
+    // Deactivate all other active tools to ensure a globally single active tool
+    for (const auto& toolManager : ToolManagerProvider::GetInstance()->GetToolManagers())
     {
-      m_ActiveTool->Deactivated();
-      m_ActiveToolRegistration.Unregister();
+      if (nullptr != toolManager.second->m_ActiveTool)
+      {
+        toolManager.second->m_ActiveTool->Deactivated();
+        toolManager.second->m_ActiveToolRegistration.Unregister();
+
+        // The active tool of *this* ToolManager is handled below this loop
+        if (this != toolManager.second)
+        {
+          toolManager.second->m_ActiveTool = nullptr;
+          toolManager.second->m_ActiveToolID = -1;
+          toolManager.second->ActiveToolChanged.Send();
+        }
+      }
     }
 
     m_ActiveTool = GetToolById(nextTool);
@@ -170,6 +234,7 @@ bool mitk::ToolManager::ActivateTool(int id)
 
     if (m_ActiveTool)
     {
+      this->EnsureTimeObservation();
       if (m_RegisteredClients > 0)
       {
         m_ActiveTool->Activated();
@@ -511,4 +576,28 @@ void mitk::ToolManager::OnNodeRemoved(const mitk::DataNode *node)
   OnOneOfTheReferenceDataDeleted(const_cast<mitk::DataNode *>(node), itk::DeleteEvent());
   OnOneOfTheRoiDataDeleted(const_cast<mitk::DataNode *>(node), itk::DeleteEvent());
   OnOneOfTheWorkingDataDeleted(const_cast<mitk::DataNode *>(node), itk::DeleteEvent());
+}
+
+void mitk::ToolManager::OnTimeChanged(itk::Object* caller, const itk::EventObject& e)
+{
+  this->OnTimeChangedConst(caller, e);
+}
+
+void mitk::ToolManager::OnTimeChangedConst(const itk::Object* caller, const itk::EventObject& /*e*/)
+{
+  auto currentController = m_CurrentTimeNavigationController.Lock();
+  if (caller == currentController)
+  {
+    const auto currentTimePoint = currentController->GetSelectedTimePoint();
+    if (currentTimePoint != m_LastTimePoint)
+    {
+      m_LastTimePoint = currentTimePoint;
+      SelectedTimePointChanged.Send();
+    }
+  }
+}
+
+mitk::TimePointType mitk::ToolManager::GetCurrentTimePoint() const
+{
+  return m_LastTimePoint;
 }

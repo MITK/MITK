@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKPHOTOACOUSTICLIGHTSOURCE_H
 #define MITKPHOTOACOUSTICLIGHTSOURCE_H
@@ -38,11 +34,11 @@ namespace mitk {
     {
     public:
 
-      mitkClassMacroItkParent(LightSource, itk::Object)
-        itkFactorylessNewMacro(Self)
-        mitkNewMacro2Param(Self, TiXmlElement*, bool)
+      mitkClassMacroItkParent(LightSource, itk::Object);
+      itkFactorylessNewMacro(Self);
+      mitkNewMacro2Param(Self, TiXmlElement*, bool);
 
-        const std::string XML_TAG_X_ANGLE = "xAngle";
+      const std::string XML_TAG_X_ANGLE = "xAngle";
       const std::string XML_TAG_Y_ANGLE = "yAngle";
       const std::string XML_TAG_PHOTON_DIRECTION = "PhotonDirection";
       const std::string XML_TAG_MINIMUM = "min";
@@ -92,53 +88,54 @@ namespace mitk {
 
       void ParseAngle(TiXmlElement* direction, std::string angle);
 
-      itkGetMacro(SpawnType, SpawnType)
-        itkSetMacro(SpawnType, SpawnType)
+      itkGetMacro(SpawnType, SpawnType);
 
-        itkGetMacro(SpawnLocationX, double)
-        itkSetMacro(SpawnLocationX, double)
+      itkSetMacro(SpawnType, SpawnType);
 
-        itkGetMacro(SpawnLocationY, double)
-        itkSetMacro(SpawnLocationY, double)
+      itkGetMacro(SpawnLocationX, double);
 
-        itkGetMacro(SpawnLocationZ, double)
-        itkSetMacro(SpawnLocationZ, double)
+      itkSetMacro(SpawnLocationX, double);
+        itkGetMacro(SpawnLocationY, double);
+        itkSetMacro(SpawnLocationY, double);
+        itkGetMacro(SpawnLocationZ, double);
 
-        itkGetMacro(SpawnLocationXLength, double)
-        itkSetMacro(SpawnLocationXLength, double)
+        itkSetMacro(SpawnLocationZ, double);
 
-        itkGetMacro(SpawnLocationYLength, double)
-        itkSetMacro(SpawnLocationYLength, double)
+        itkGetMacro(SpawnLocationXLength, double);
 
-        itkGetMacro(SpawnLocationZLength, double)
-        itkSetMacro(SpawnLocationZLength, double)
+        itkSetMacro(SpawnLocationXLength, double);
+        itkGetMacro(SpawnLocationYLength, double);
+        itkSetMacro(SpawnLocationYLength, double);
+        itkGetMacro(SpawnLocationZLength, double);
 
-        itkGetMacro(SpawnLocationRadius, double)
-        itkSetMacro(SpawnLocationRadius, double)
+        itkSetMacro(SpawnLocationZLength, double);
 
-        itkGetMacro(Energy, double)
-        itkSetMacro(Energy, double)
+        itkGetMacro(SpawnLocationRadius, double);
 
-        itkGetMacro(AngleXMinimum, double)
-        itkSetMacro(AngleXMinimum, double)
+        itkSetMacro(SpawnLocationRadius, double);
+        itkGetMacro(Energy, double);
+        itkSetMacro(Energy, double);
+        itkGetMacro(AngleXMinimum, double);
 
-        itkGetMacro(AngleXMaximum, double)
-        itkSetMacro(AngleXMaximum, double)
+        itkSetMacro(AngleXMinimum, double);
 
-        itkGetMacro(AngleYMinimum, double)
-        itkSetMacro(AngleYMinimum, double)
+        itkGetMacro(AngleXMaximum, double);
 
-        itkGetMacro(AngleYMaximum, double)
-        itkSetMacro(AngleYMaximum, double)
+        itkSetMacro(AngleXMaximum, double);
+        itkGetMacro(AngleYMinimum, double);
+        itkSetMacro(AngleYMinimum, double);
+        itkGetMacro(AngleYMaximum, double);
 
-        itkGetMacro(AngleXMode, DistributionMode)
-        itkSetMacro(AngleXMode, DistributionMode)
+        itkSetMacro(AngleYMaximum, double);
 
-        itkGetMacro(AngleYMode, DistributionMode)
-        itkSetMacro(AngleYMode, DistributionMode)
+        itkGetMacro(AngleXMode, DistributionMode);
 
-        itkGetMacro(Verbose, bool)
-        itkSetMacro(Verbose, bool)
+        itkSetMacro(AngleXMode, DistributionMode);
+        itkGetMacro(AngleYMode, DistributionMode);
+        itkSetMacro(AngleYMode, DistributionMode);
+        itkGetMacro(Verbose, bool);
+
+        itkSetMacro(Verbose, bool);
 
     protected:
 

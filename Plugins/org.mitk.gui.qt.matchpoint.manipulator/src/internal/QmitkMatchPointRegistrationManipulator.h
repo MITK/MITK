@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #ifndef __Q_MITK_MATCHPOINT_REGISTRATION_MANIPULATOR_H
@@ -49,12 +45,12 @@ public:
   /**
   * Creates smartpointer typedefs
   */
-  berryObjectMacro(QmitkMatchPointRegistrationManipulator)
+  berryObjectMacro(QmitkMatchPointRegistrationManipulator);
 
   QmitkMatchPointRegistrationManipulator();
-  ~QmitkMatchPointRegistrationManipulator();
+  ~QmitkMatchPointRegistrationManipulator() override;
 
-  virtual void CreateQtPartControl(QWidget *parent);
+  void CreateQtPartControl(QWidget *parent) override;
 
   protected slots:
 
@@ -65,7 +61,8 @@ public:
   void OnStoreBtnPushed();
   void OnSettingsChanged(mitk::DataNode*);
 
-  void OnSelectionChanged();
+  void OnRegSourceChanged();
+  void OnNodeSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 
   void OnRegistrationChanged();
 
@@ -78,16 +75,13 @@ public:
   void Error(QString msg);
 
 protected:
-  /// \brief called by QmitkFunctionality when DataManager's selection has changed
-  virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
-    const QList<mitk::DataNode::Pointer>& nodes) override;
 
-  virtual void NodeRemoved(const mitk::DataNode* node) override;
+  void NodeRemoved(const mitk::DataNode* node) override;
 
-  virtual void SetFocus();
+  void SetFocus() override;
 
-  virtual void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart);
-  virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart);
+  void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
 
   Ui::MatchPointRegistrationManipulatorControls m_Controls;
 
@@ -109,6 +103,11 @@ private:
   * Updates the state of controls regarding to the state of the view and it objects.*/
   void ConfigureControls();
 
+  /**
+  Configure the node selectors predicates according to the selected algorithm.
+  */
+  void ConfigureNodePredicates();
+
   /** Initialize the state of the view, so the manipulation can start.*/
   void InitSession();
 
@@ -125,14 +124,11 @@ private:
   itk::TimeStamp m_currentPositionTime;
 
   bool m_activeManipulation;
-  bool m_autoMoving;
-  bool m_autoTarget;
 
   /** @brief currently valid selected position in the inspector*/
   mitk::Point3D m_currentSelectedPosition;
-  /** @brief indicates if the currently selected position is valid for the currently selected fit.
-  * This it is within the input image */
-  unsigned int m_currentSelectedTimeStep;
+  /** @brief currently selected timepoint*/
+  mitk::TimePointType m_currentSelectedTimePoint;
 
   mitk::DataNode::Pointer m_SelectedPreRegNode;
 

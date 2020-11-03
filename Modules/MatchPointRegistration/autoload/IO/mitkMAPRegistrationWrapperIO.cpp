@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <iostream>
 #include <fstream>
@@ -26,48 +22,13 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkCustomMimeType.h>
 #include <mitkIOMimeTypes.h>
+#include <mitkLocaleSwitch.h>
 
 #include "mitkMAPRegistrationWrapperIO.h"
 #include "mitkMAPRegistrationWrapper.h"
 
 namespace mitk
 {
-
-  /** Helper structure to change (and reset) the
-  * local settings in a function scope*/
-  struct LocaleSwitch
-  {
-    LocaleSwitch(const std::string& newLocale)
-      : m_OldLocale(std::setlocale(LC_ALL, nullptr))
-      , m_NewLocale(newLocale)
-    {
-      if (m_OldLocale == nullptr)
-      {
-        m_OldLocale = "";
-      }
-      else if (m_NewLocale != m_OldLocale)
-      {
-        // set the locale
-        if (std::setlocale(LC_ALL, m_NewLocale.c_str()) == nullptr)
-        {
-          MITK_INFO << "Could not set locale " << m_NewLocale;
-          m_OldLocale = nullptr;
-        }
-      }
-    }
-
-    ~LocaleSwitch()
-    {
-      if (m_OldLocale != nullptr && std::setlocale(LC_ALL, m_OldLocale) == nullptr)
-      {
-        MITK_INFO << "Could not reset locale " << m_OldLocale;
-      }
-    }
-
-  private:
-    const char* m_OldLocale;
-    const std::string m_NewLocale;
-  };
 
   /** Helper class that allows to use an functor in multiple combinations of
   * moving and target dimensions on a passed MAPRegistrationWrapper instance.\n
@@ -177,9 +138,9 @@ namespace mitk
       {
         writer->write(pReg,data);
       }
-      catch (itk::ExceptionObject e)
+      catch (const itk::ExceptionObject& e)
       {
-        std::cout << e << std::endl;
+        std::cout << e.what() << std::endl;
         throw;
       }
 
@@ -269,7 +230,7 @@ namespace mitk
     return IFileWriter::Supported;
   }
 
-  std::vector<BaseData::Pointer >  MAPRegistrationWrapperIO::Read()
+  std::vector<BaseData::Pointer >  MAPRegistrationWrapperIO::DoRead()
   {
     std::vector<BaseData::Pointer > result;
 
@@ -289,8 +250,7 @@ namespace mitk
     map::io::RegistrationFileReader::Pointer spReader = map::io::RegistrationFileReader::New();
     spReader->setPreferLazyLoading(true);
     map::core::RegistrationBase::Pointer spReg = spReader->read(fileName);
-    mitk::MAPRegistrationWrapper::Pointer spRegWrapper = mitk::MAPRegistrationWrapper::New();
-    spRegWrapper->SetRegistration(spReg);
+    auto spRegWrapper = mitk::MAPRegistrationWrapper::New(spReg);
 
     result.push_back(spRegWrapper.GetPointer());
     return result;

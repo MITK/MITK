@@ -1,66 +1,60 @@
-/*****************************************************************************
+/*============================================================================
 
- Copyright (c) 1993-2000,  Div. Medical and Biological Informatics, 
- Deutsches Krebsforschungszentrum, Heidelberg, Germany
+ Copyright (c) German Cancer Research Center (DKFZ)
  All rights reserved.
 
- Redistribution and use in source and binary forms, with or without 
+ Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
 
  - Redistributions of source code must retain the above copyright notice, this
    list of conditions and the following disclaimer.
 
- - Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+ - Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
- - All advertising materials mentioning features or use of this software must 
-   display the following acknowledgement: 
-          
-     "This product includes software developed by the Div. Medical and 
-      Biological Informatics, Deutsches Krebsforschungszentrum, Heidelberg, 
-      Germany."
+ - All advertising materials mentioning features or use of this software must
+   display the following acknowledgement:
 
- - Neither the name of the Deutsches Krebsforschungszentrum nor the names of 
-   its contributors may be used to endorse or promote products derived from 
-   this software without specific prior written permission. 
+     "This product includes software developed by the German Cancer Research
+      Center (DKFZ)."
 
-   THIS SOFTWARE IS PROVIDED BY THE DIVISION MEDICAL AND BIOLOGICAL
-   INFORMATICS AND CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED
-   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-   OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-   IN NO EVENT SHALL THE DIVISION MEDICAL AND BIOLOGICAL INFORMATICS,
-   THE DEUTSCHES KREBSFORSCHUNGSZENTRUM OR CONTRIBUTORS BE LIABLE FOR 
-   ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-   DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE 
-   GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER 
-   IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
-   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN 
-   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ - Neither the name of the German Cancer Research Center (DKFZ) nor the names
+   of its contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
 
- Send comments and/or bug reports to:
-   mbi-software@dkfz-heidelberg.de
+   THIS SOFTWARE IS PROVIDED BY THE GERMAN CANCER RESEARCH CENTER (DKFZ) AND
+   CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+   BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+   FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE GERMAN
+   CANCER RESEARCH CENTER (DKFZ) OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+   INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+   SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+   OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+   DAMAGE.
 
-*****************************************************************************/
+============================================================================*/
 
 /**@file
  *  this function detects zero-crossings
  */
 
-/** @brief detects zero-crossings              
+/** @brief detects zero-crossings
  *
  *  @param pic_old     pointer to the image that should be transformed
  *
- *  @return pointer to the transformed image 
+ *  @return pointer to the transformed image
  *
  * AUTHOR & DATE
  */
 
 /* include-Files                                                        */
 
-#include "mitkIpFuncP.h"   
- 
+#include "mitkIpFuncP.h"
+
 mitkIpPicDescriptor *mitkIpFuncZeroCr ( mitkIpPicDescriptor *pic_old ) ;
 
 #ifndef DOXYGEN_IGNORE
@@ -119,14 +113,14 @@ mitkIpPicDescriptor *mitkIpFuncZeroCr ( mitkIpPicDescriptor *pic_old ) ;
                     }                                                    \
 }
 
-               
+
 
 /* -------------------------------------------------------------------  */
 /*
 */
 /* -------------------------------------------------------------------  */
 
-mitkIpPicDescriptor *mitkIpFuncZeroCr ( mitkIpPicDescriptor *pic_old )          
+mitkIpPicDescriptor *mitkIpFuncZeroCr ( mitkIpPicDescriptor *pic_old )
 {
 
   mitkIpPicDescriptor *pic_new;           /* convoluted image               */
@@ -140,22 +134,22 @@ mitkIpPicDescriptor *mitkIpFuncZeroCr ( mitkIpPicDescriptor *pic_old )
   if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* initialisation of vectors                                          */
-  
+
   size[0] = 1;
   for ( i = 1; i < _mitkIpPicNDIM; i++ )
     size[i] = size[i-1] * pic_old->n[i-1];
-                                                                          
-  for ( i = 0; i < pic_old->dim; i++ )           
-    n[i] = pic_old->n[i] - 1;                                              
-                                                                          
-  for ( i = pic_old->dim; i < _mitkIpPicNDIM; i++ )                    
-    n[i] = 2;                                                             
-                                                                          
+
+  for ( i = 0; i < pic_old->dim; i++ )
+    n[i] = pic_old->n[i] - 1;
+
+  for ( i = pic_old->dim; i < _mitkIpPicNDIM; i++ )
+    n[i] = 2;
+
   /* allocate and calculate offset vector                               */
 
   off_vekt = malloc ( 2 * pic_old->dim * sizeof ( mitkIpInt4_t ) );
-  if ( off_vekt == NULL ) 
-    {  
+  if ( off_vekt == NULL )
+    {
        _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
@@ -165,7 +159,7 @@ mitkIpPicDescriptor *mitkIpFuncZeroCr ( mitkIpPicDescriptor *pic_old )
        j = 2 * i;
        off_vekt[j]   = - size[i];
        off_vekt[j+1] =   size[i];
-    } 
+    }
 
 
   /* create a new picture, copy the header, allocate memory             */
@@ -174,7 +168,7 @@ mitkIpPicDescriptor *mitkIpFuncZeroCr ( mitkIpPicDescriptor *pic_old )
   if ( pic_new == NULL )
     {
        free ( off_vekt );
-       _mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );                
+       _mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
        free ( off_vekt );
        return ( mitkIpFuncERROR );
     }
@@ -183,24 +177,24 @@ mitkIpPicDescriptor *mitkIpFuncZeroCr ( mitkIpPicDescriptor *pic_old )
     {
        free ( off_vekt );
        mitkIpPicFree ( pic_new );
-       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );                
+       _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        free ( off_vekt );
        return ( mitkIpFuncERROR );
     }
 
- 
+
   /* macro to convolute an image (for all data types)                   */
 
-  mitkIpPicFORALL_3 ( ZERO, pic_old, size, off_vekt, n );                    
+  mitkIpPicFORALL_3 ( ZERO, pic_old, size, off_vekt, n );
 
   free ( off_vekt );
 
   /* Copy Tags */
 
   mitkIpFuncCopyTags(pic_new, pic_old);
-  
-  
-                        
+
+
+
 
   return pic_new;
 }

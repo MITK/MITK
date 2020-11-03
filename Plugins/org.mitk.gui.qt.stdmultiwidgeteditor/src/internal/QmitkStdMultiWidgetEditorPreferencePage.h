@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QmitkStdMultiWidgetEditorPreferencePage_h
 #define QmitkStdMultiWidgetEditorPreferencePage_h
@@ -51,12 +47,6 @@ public slots:
   void ResetPreferencesAndGUI();
 
   /**
-   * @brief ChangeRenderingMode slot to chose the rendering mode via QComboBox.
-   * @param i index of the box.
-   */
-  void ChangeRenderingMode(int i);
-
-  /**
    * @brief OnWidgetComboBoxChanged slot called when the QComboBox to chose the widget was modified.
    * @param i index of the combobox to select the widget (1-4).
    */
@@ -69,11 +59,6 @@ public slots:
   void AnnotationTextChanged(QString text);
 
 protected:
-  /**
-   * @brief m_CurrentRenderingMode String for the rendering mode.
-   */
-  std::string m_CurrentRenderingMode;
-
   /**
    * @brief m_WidgetBackgroundColor1 the background colors.
    *

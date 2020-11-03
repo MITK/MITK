@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 /*=========================================================================
 
   Library:   CTK
@@ -44,226 +40,276 @@ using namespace std;
 
 namespace
 {
-  // --------------------------------------------------------------------------
-  class CommandLineParserArgumentDescription
+// --------------------------------------------------------------------------
+class CommandLineParserArgumentDescription
+{
+public:
+  CommandLineParserArgumentDescription(const string &longArg,
+                                       const string &longArgPrefix,
+                                       const string &shortArg,
+                                       const string &shortArgPrefix,
+                                       mitkCommandLineParser::Type type,
+                                       const string &argHelp,
+                                       const string &argLabel,
+                                       const us::Any &defaultValue,
+                                       bool ignoreRest,
+                                       bool deprecated,
+                                       bool optional,
+                                       mitkCommandLineParser::Channel channel,
+                                       string &argGroup,
+                                       string &groupDescription)
+    : LongArg(longArg),
+      LongArgPrefix(longArgPrefix),
+      ShortArg(shortArg),
+      ShortArgPrefix(shortArgPrefix),
+      ArgHelp(argHelp),
+      ArgLabel(argLabel),
+      ArgGroup(argGroup),
+      ArgGroupDescription(groupDescription),
+      IgnoreRest(ignoreRest),
+      NumberOfParametersToProcess(0),
+      Deprecated(deprecated),
+      Optional(optional),
+      Channel(channel),
+      DefaultValue(defaultValue),
+      Value(type),
+      ValueType(type)
   {
-  public:
-    CommandLineParserArgumentDescription(const string &longArg,
-                                         const string &longArgPrefix,
-                                         const string &shortArg,
-                                         const string &shortArgPrefix,
-                                         mitkCommandLineParser::Type type,
-                                         const string &argHelp,
-                                         const string &argLabel,
-                                         const us::Any &defaultValue,
-                                         bool ignoreRest,
-                                         bool deprecated,
-                                         bool optional,
-                                         string &argGroup,
-                                         string &groupDescription)
-      : LongArg(longArg),
-        LongArgPrefix(longArgPrefix),
-        ShortArg(shortArg),
-        ShortArgPrefix(shortArgPrefix),
-        ArgHelp(argHelp),
-        ArgLabel(argLabel),
-        ArgGroup(argGroup),
-        ArgGroupDescription(groupDescription),
-        IgnoreRest(ignoreRest),
-        NumberOfParametersToProcess(0),
-        Deprecated(deprecated),
-        Optional(optional),
-        DefaultValue(defaultValue),
-        Value(type),
-        ValueType(type)
+    Value = defaultValue;
+
+    switch (type)
     {
-      Value = defaultValue;
-
-      switch (type)
-      {
-        case mitkCommandLineParser::String:
-        {
-          NumberOfParametersToProcess = 1;
-        }
-        break;
-        case mitkCommandLineParser::Bool:
-        {
-          NumberOfParametersToProcess = 0;
-        }
-        break;
-        case mitkCommandLineParser::StringList:
-        {
-          NumberOfParametersToProcess = -1;
-        }
-        break;
-        case mitkCommandLineParser::Int:
-        {
-          NumberOfParametersToProcess = 1;
-        }
-        break;
-        case mitkCommandLineParser::Float:
-        {
-          NumberOfParametersToProcess = 1;
-        }
-        break;
-
-        case mitkCommandLineParser::OutputDirectory:
-        case mitkCommandLineParser::InputDirectory:
-        {
-          NumberOfParametersToProcess = 1;
-        }
-        break;
-
-        case mitkCommandLineParser::OutputFile:
-        case mitkCommandLineParser::InputFile:
-        {
-          NumberOfParametersToProcess = 1;
-        }
-        break;
-        case mitkCommandLineParser::InputImage:
-        {
-          NumberOfParametersToProcess = 1;
-        }
-        break;
-
-        default:
-          std::cout << "Type not supported: " << static_cast<int>(type);
-      }
-    }
-
-    ~CommandLineParserArgumentDescription() {}
-    bool addParameter(const string &value);
-
-    string helpText();
-
-    string LongArg;
-    string LongArgPrefix;
-    string ShortArg;
-    string ShortArgPrefix;
-    string ArgHelp;
-    string ArgLabel;
-    string ArgGroup;
-    string ArgGroupDescription;
-    bool IgnoreRest;
-    int NumberOfParametersToProcess;
-    bool Deprecated;
-    bool Optional;
-
-    us::Any DefaultValue;
-    us::Any Value;
-    mitkCommandLineParser::Type ValueType;
-  };
-
-  // --------------------------------------------------------------------------
-  bool CommandLineParserArgumentDescription::addParameter(const string &value)
-  {
-    switch (ValueType)
+    case mitkCommandLineParser::String:
     {
-      case mitkCommandLineParser::String:
-      {
-        Value = value;
-      }
-      break;
-      case mitkCommandLineParser::Bool:
-      {
-        if (value.compare("true") == 0)
-          Value = true;
-        else
-          Value = false;
-      }
-      break;
-      case mitkCommandLineParser::StringList:
-      {
-        try
-        {
-          mitkCommandLineParser::StringContainerType list =
-            us::any_cast<mitkCommandLineParser::StringContainerType>(Value);
-          list.push_back(value);
-          Value = list;
-        }
-        catch (...)
-        {
-          mitkCommandLineParser::StringContainerType list;
-          list.push_back(value);
-          Value = list;
-        }
-      }
-      break;
-      case mitkCommandLineParser::Int:
-      {
-        stringstream ss(value);
-        int i;
-        ss >> i;
-        Value = i;
-      }
-      break;
-      case mitkCommandLineParser::Float:
-      {
-        stringstream ss(value);
-        float f;
-        ss >> f;
-        Value = f;
-      }
-      break;
-
-      case mitkCommandLineParser::InputDirectory:
-      case mitkCommandLineParser::OutputDirectory:
-      {
-        Value = value;
-      }
-      break;
-
-      case mitkCommandLineParser::InputFile:
-      case mitkCommandLineParser::InputImage:
-      case mitkCommandLineParser::OutputFile:
-      {
-        Value = value;
-      }
-      break;
-
-      default:
-        return false;
+      NumberOfParametersToProcess = 1;
     }
+      break;
+    case mitkCommandLineParser::Bool:
+    {
+      NumberOfParametersToProcess = 0;
+    }
+      break;
+    case mitkCommandLineParser::StringList:
+    {
+      NumberOfParametersToProcess = -1;
+    }
+      break;
+    case mitkCommandLineParser::Int:
+    {
+      NumberOfParametersToProcess = 1;
+    }
+      break;
+    case mitkCommandLineParser::Float:
+    {
+      NumberOfParametersToProcess = 1;
+    }
+      break;
 
-    return true;
+    case mitkCommandLineParser::Directory:
+    {
+      NumberOfParametersToProcess = 1;
+    }
+      break;
+
+    case mitkCommandLineParser::File:
+    {
+      NumberOfParametersToProcess = 1;
+    }
+      break;
+    case mitkCommandLineParser::Image:
+    {
+      NumberOfParametersToProcess = 1;
+    }
+      break;
+
+    default:
+      std::cout << "Type not supported: " << static_cast<int>(type);
+    }
   }
 
-  // --------------------------------------------------------------------------
-  string CommandLineParserArgumentDescription::helpText()
+  ~CommandLineParserArgumentDescription() {}
+  bool addParameter(const string &value);
+
+  string helpText();
+
+  string LongArg;
+  string LongArgPrefix;
+  string ShortArg;
+  string ShortArgPrefix;
+  string ArgHelp;
+  string ArgLabel;
+  string ArgGroup;
+  string ArgGroupDescription;
+  bool IgnoreRest;
+  int NumberOfParametersToProcess;
+  bool Deprecated;
+  bool Optional;
+  mitkCommandLineParser::Channel Channel;
+
+  us::Any DefaultValue;
+  us::Any Value;
+  mitkCommandLineParser::Type ValueType;
+};
+
+// --------------------------------------------------------------------------
+bool CommandLineParserArgumentDescription::addParameter(const string &value)
+{
+  switch (ValueType)
   {
-    string text;
-
-    string shortAndLongArg;
-    if (!this->ShortArg.empty())
+  case mitkCommandLineParser::String:
+  {
+    Value = value;
+  }
+    break;
+  case mitkCommandLineParser::Bool:
+  {
+    if (value.compare("true") == 0)
+      Value = true;
+    else
+      Value = false;
+  }
+    break;
+  case mitkCommandLineParser::StringList:
+  {
+    try
     {
-      shortAndLongArg = "  ";
-      shortAndLongArg += this->ShortArgPrefix;
-      shortAndLongArg += this->ShortArg;
+      mitkCommandLineParser::StringContainerType list =
+          us::any_cast<mitkCommandLineParser::StringContainerType>(Value);
+      list.push_back(value);
+      Value = list;
     }
-
-    if (!this->LongArg.empty())
+    catch (...)
     {
-      if (this->ShortArg.empty())
-        shortAndLongArg.append("  ");
+      mitkCommandLineParser::StringContainerType list;
+      list.push_back(value);
+      Value = list;
+    }
+  }
+    break;
+  case mitkCommandLineParser::Int:
+  {
+    stringstream ss(value);
+    int i;
+    ss >> i;
+    Value = i;
+  }
+    break;
+  case mitkCommandLineParser::Float:
+  {
+    stringstream ss(value);
+    float f;
+    ss >> f;
+    Value = f;
+  }
+    break;
+
+  case mitkCommandLineParser::Directory:
+  case mitkCommandLineParser::Image:
+  case mitkCommandLineParser::File:
+  {
+    Value = value;
+  }
+    break;
+
+  default:
+    return false;
+  }
+
+  return true;
+}
+
+// --------------------------------------------------------------------------
+string CommandLineParserArgumentDescription::helpText()
+{
+  string text;
+
+  string shortAndLongArg;
+  if (!this->ShortArg.empty())
+  {
+    shortAndLongArg = "  ";
+    shortAndLongArg += this->ShortArgPrefix;
+    shortAndLongArg += this->ShortArg;
+  }
+
+  if (!this->LongArg.empty())
+  {
+    if (this->ShortArg.empty())
+      shortAndLongArg.append("  ");
+    else
+      shortAndLongArg.append(", ");
+
+    shortAndLongArg += this->LongArgPrefix;
+    shortAndLongArg += this->LongArg;
+  }
+
+  text = text + shortAndLongArg + ", " + this->ArgHelp;
+
+  if (this->Optional)
+    text += " (optional)";
+
+  if (!this->DefaultValue.Empty())
+  {
+    if (this->ValueType == 1)
+    {
+      if (this->DefaultValue.ToString() == "0")
+        text = text + ", (default: false)";
       else
-        shortAndLongArg.append(", ");
-
-      shortAndLongArg += this->LongArgPrefix;
-      shortAndLongArg += this->LongArg;
+        text = text + ", (default: true)";
     }
-
-    text = text + shortAndLongArg + ", " + this->ArgHelp;
-
-    if (this->Optional)
-      text += " (optional)";
-
-    if (!this->DefaultValue.Empty())
-    {
+    else
       text = text + ", (default: " + this->DefaultValue.ToString() + ")";
-    }
-    text += "\n";
-    return text;
   }
+  string value_type = "Unknown";
+  switch (this->ValueType)
+  {
+  case 0:
+  {
+    value_type = "String";
+    break;
+  }
+  case 1:
+  {
+    value_type = "Bool";
+    break;
+  }
+  case 2:
+  {
+    value_type = "StringList";
+    break;
+  }
+  case 3:
+  {
+    value_type = "Int";
+    break;
+  }
+  case 4:
+  {
+    value_type = "Float";
+    break;
+  }
+  case 5:
+  {
+    value_type = "Directory";
+    break;
+  }
+  case 6:
+  {
+    value_type = "File";
+    break;
+  }
+  case 7:
+  {
+    value_type = "Image";
+  }
+  }
+  text = text + ", Type: " + value_type;
+  if (this->Channel == mitkCommandLineParser::Input)
+    text = text + ", Channel: input";
+  else if (this->Channel == mitkCommandLineParser::Output)
+    text = text + ", Channel: output";
+  text += "\n";
+  return text;
+}
 }
 
 // --------------------------------------------------------------------------
@@ -380,6 +426,12 @@ map<string, us::Any> mitkCommandLineParser::parseArguments(const StringContainer
     {
       std::cout << "Processing" << argument;
     }
+    if (!argument.compare("--version"))
+    {
+      std::cout << "Git commit hash: " << MITK_REVISION << std::endl;
+      std::cout << "Git branch name: " << MITK_REVISION_NAME << "\n" << std::endl;
+    }
+
     if (!argument.compare("--xml") || !argument.compare("-xml") || !argument.compare("--XML") ||
         !argument.compare("-XML"))
     {
@@ -670,7 +722,8 @@ void mitkCommandLineParser::addArgument(const string &longarg,
                                         const us::Any &defaultValue,
                                         bool optional,
                                         bool ignoreRest,
-                                        bool deprecated)
+                                        bool deprecated,
+                                        mitkCommandLineParser::Channel channel)
 {
   if (longarg.empty() && shortarg.empty())
   {
@@ -701,6 +754,7 @@ void mitkCommandLineParser::addArgument(const string &longarg,
                                                           ignoreRest,
                                                           deprecated,
                                                           optional,
+                                                          channel,
                                                           ParameterGroupName,
                                                           ParameterGroupDescription);
 
@@ -737,6 +791,37 @@ void mitkCommandLineParser::addDeprecatedArgument(const string &longarg,
 }
 
 // --------------------------------------------------------------------------
+std::vector < std::map<std::string, us::Any> > mitkCommandLineParser::getArgumentList()
+{
+  std::vector < std::map<std::string, us::Any> > parameterList;
+  //for (CommandLineParserArgumentDescription* argument : this->Internal->ArgumentDescriptionList)
+  for (std::size_t i = 0; i< this->Internal->ArgumentDescriptionList.size(); ++i)
+  {
+    CommandLineParserArgumentDescription* argument = this->Internal->ArgumentDescriptionList[i];
+    std::map<std::string, us::Any> tmpMap;
+    //tmpMap["helptext"] = us::Any(argument->helpText);
+    tmpMap["longarg"] = us::Any(argument->LongArg);
+    tmpMap["longargprefix"] = us::Any(argument->LongArgPrefix);
+    tmpMap["shortarg"] = us::Any(argument->ShortArg);
+    tmpMap["shortargprefix"] = us::Any(argument->ShortArgPrefix);
+    tmpMap["arghelp"] = us::Any(argument->ArgHelp);
+    tmpMap["arglabel"] = us::Any(argument->ArgLabel);
+    tmpMap["arggroup"] = us::Any(argument->ArgGroup);
+    tmpMap["arggroupdescription"] = us::Any(argument->ArgGroupDescription);
+    tmpMap["ignorerest"] = us::Any(argument->IgnoreRest);
+    tmpMap["numberofparameterstoprocess"] = us::Any(argument->NumberOfParametersToProcess);
+    tmpMap["deprecated"] = us::Any(argument->Deprecated);
+    tmpMap["optional"] = us::Any(argument->Optional);
+    tmpMap["defaultvalue"] = argument->DefaultValue;
+    tmpMap["value"] = argument->Value;
+    tmpMap["valuetype"] = us::Any(argument->ValueType);
+    tmpMap["channel"] = us::Any(argument->Channel);
+    parameterList.push_back(tmpMap);
+  }
+  return parameterList;
+}
+
+// --------------------------------------------------------------------------
 std::string::size_type mitkCommandLineParser::fieldWidth() const
 {
   return this->Internal->FieldWidth;
@@ -764,6 +849,7 @@ string mitkCommandLineParser::helpText() const
   text += Description + "\n";
   text += Contributor + "\n\n";
   text += "Use --xml to generate an XML description parsable as a CTK Command Line Module Plugin.\n";
+  text += "Use --version to print MITK revision information.\n";
 
   // Loop over grouped argument descriptions
   map<string, vector<CommandLineParserArgumentDescription *>>::iterator it;
@@ -833,6 +919,7 @@ void mitkCommandLineParser::setStrictModeEnabled(bool strictMode)
   this->Internal->StrictMode = strictMode;
 }
 
+
 void mitkCommandLineParser::generateXmlOutput()
 {
   std::stringstream xml;
@@ -852,39 +939,37 @@ void mitkCommandLineParser::generateXmlOutput()
     std::string type;
     switch ((*it)->ValueType)
     {
-      case mitkCommandLineParser::String:
-        type = "string";
-        break;
+    case mitkCommandLineParser::String:
+      type = "string";
+      break;
 
-      case mitkCommandLineParser::Bool:
-        type = "boolean";
-        break;
+    case mitkCommandLineParser::Bool:
+      type = "boolean";
+      break;
 
-      case mitkCommandLineParser::StringList:
-        type = "string-vector";
-        break;
+    case mitkCommandLineParser::StringList:
+      type = "string-vector";
+      break;
 
-      case mitkCommandLineParser::Int:
-        type = "integer";
-        break;
+    case mitkCommandLineParser::Int:
+      type = "integer";
+      break;
 
-      case mitkCommandLineParser::Float:
-        type = "float";
-        break;
+    case mitkCommandLineParser::Float:
+      type = "float";
+      break;
 
-      case mitkCommandLineParser::OutputDirectory:
-      case mitkCommandLineParser::InputDirectory:
-        type = "directory";
-        break;
+    case mitkCommandLineParser::Directory:
+      type = "directory";
+      break;
 
-      case mitkCommandLineParser::InputImage:
-        type = "image";
-        break;
+    case mitkCommandLineParser::Image:
+      type = "image";
+      break;
 
-      case mitkCommandLineParser::OutputFile:
-      case mitkCommandLineParser::InputFile:
-        type = "file";
-        break;
+    case mitkCommandLineParser::File:
+      type = "file";
+      break;
     }
 
     if (lastParameterGroup.compare((*it)->ArgGroup))
@@ -903,8 +988,12 @@ void mitkCommandLineParser::generateXmlOutput()
     if ((*it)->ShortArg == "h")
       continue;
 
+    auto name = (*it)->LongArg;
+    if (name.empty())
+      name = (*it)->ShortArg;
+
     xml << "<" << type << ">" << endl;
-    xml << "<name>" << (*it)->LongArg << "</name>" << endl;
+    xml << "<name>" << name << "</name>" << endl;
     xml << "<description>" << (*it)->ArgHelp << "</description>" << endl;
     xml << "<label>" << (*it)->ArgLabel << "</label>" << endl;
     if (!(*it)->DefaultValue.Empty())
@@ -913,15 +1002,24 @@ void mitkCommandLineParser::generateXmlOutput()
     xml << "<longflag>" << (*it)->LongArg << "</longflag>" << endl;
     xml << "<flag>" << (*it)->ShortArg << "</flag>" << endl;
 
-    if ((*it)->ValueType == mitkCommandLineParser::InputDirectory ||
-        (*it)->ValueType == mitkCommandLineParser::InputFile || (*it)->ValueType == mitkCommandLineParser::InputImage)
+    if (((*it)->ValueType == mitkCommandLineParser::File ||
+         (*it)->ValueType == mitkCommandLineParser::Directory ||
+         (*it)->ValueType == mitkCommandLineParser::Image) &&
+        (*it)->Channel == mitkCommandLineParser::Channel::Input)
     {
       xml << "<channel>input</channel>" << endl;
     }
-    else if ((*it)->ValueType == mitkCommandLineParser::OutputDirectory ||
-             (*it)->ValueType == mitkCommandLineParser::OutputFile)
+    else if (((*it)->ValueType == mitkCommandLineParser::File ||
+              (*it)->ValueType == mitkCommandLineParser::Directory ||
+              (*it)->ValueType == mitkCommandLineParser::Image) &&
+             (*it)->Channel == mitkCommandLineParser::Channel::Output)
     {
       xml << "<channel>output</channel>" << endl;
+    }
+    else if ((*it)->Channel == mitkCommandLineParser::Channel::Output ||
+             (*it)->Channel == mitkCommandLineParser::Channel::Input)
+    {
+      std::cout << "Only the types Directory, File or Image may be flagged as Input or Output! Ignoring flag for parameter " + name << std::endl;
     }
     xml << "</" << type << ">" << endl;
   }

@@ -232,7 +232,7 @@ switch (actionId)
 \li Use lots of whitespace to separate logical blocks of code, intermixed with
 comments
 
-\li <b>DO NOT USE TABS.</b> The standard indention is <b>2 spaces</b> (see <a href="http://www.insightsoftwareconsortium.org/documents/policies/Style.pdf">ITK Style Guide</a>). Configure your
+\li <b>DO NOT USE TABS.</b> The standard indention is <b>2 spaces</b> (see <a href="https://itk.org/Wiki/images/c/c6/ITKStyle.pdf">ITK Style Guide</a>). Configure your
 editor accordingly.
 
 \li DO NOT USE trailing whitespaces
@@ -249,21 +249,17 @@ ImageType::Pointer 	image;
 
 \li Copyright
 @code
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 @endcode
 
 \li Includes [A .. Z]

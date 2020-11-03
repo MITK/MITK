@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
-BlueBerry Platform
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef BERRYWINDOW_H_
 #define BERRYWINDOW_H_
@@ -88,7 +84,7 @@ class BERRY_UI_QT Window: public IShellProvider
 
 public:
 
-  berryObjectMacro(Window, IShellProvider)
+  berryObjectMacro(Window, IShellProvider);
 
   /**
    * Standard return code constant (value 0) indicating that the window was
@@ -119,7 +115,7 @@ public:
   struct IExceptionHandler: public Object
   {
 
-    berryObjectMacro(IExceptionHandler)
+    berryObjectMacro(IExceptionHandler);
 
     /**
      * Handle the exception.

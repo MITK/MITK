@@ -1,78 +1,51 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
-
+============================================================================*/
 
 #include "QmitkMultiNodeSelectionWidget.h"
 
-#include <QmitkNodeSelectionDialog.h>
-#include <QmitkCustomVariants.h>
+#include <algorithm>
 
-QmitkMultiNodeSelectionWidget::QmitkMultiNodeSelectionWidget(QWidget* parent) : QmitkAbstractNodeSelectionWidget(parent)
+#include "QmitkNodeSelectionDialog.h"
+#include "QmitkCustomVariants.h"
+#include "internal/QmitkNodeSelectionListItemWidget.h"
+
+QmitkMultiNodeSelectionWidget::QmitkMultiNodeSelectionWidget(QWidget* parent)
+  : QmitkAbstractNodeSelectionWidget(parent)
 {
   m_Controls.setupUi(this);
+  m_Overlay = new QmitkSimpleTextOverlayWidget(m_Controls.list);
+  m_Overlay->setVisible(false);
+  m_CheckFunction = [](const NodeList &) { return ""; };
 
-  this->UpdateList();
+  this->OnInternalSelectionChanged();
   this->UpdateInfo();
 
   connect(m_Controls.btnChange, SIGNAL(clicked(bool)), this, SLOT(OnEditSelection()));
 }
 
-QmitkMultiNodeSelectionWidget::NodeList QmitkMultiNodeSelectionWidget::CompileEmitSelection() const
+void QmitkMultiNodeSelectionWidget::SetSelectionCheckFunction(const SelectionCheckFunctionType &checkFunction)
 {
-  NodeList result;
+  m_CheckFunction = checkFunction;
 
-  for (int i = 0; i < m_Controls.list->count(); ++i)
+  auto newEmission = this->CompileEmitSelection();
+  auto newCheckResponse = m_CheckFunction(newEmission);
+
+  if (newCheckResponse.empty() && !m_CheckResponse.empty())
   {
-    QListWidgetItem* item = m_Controls.list->item(i);
-
-    auto node = item->data(Qt::UserRole).value<mitk::DataNode::Pointer>();
-    result.append(node);
+    this->EmitSelection(newEmission);
   }
-
-
-  if (!m_SelectOnlyVisibleNodes)
-  {
-    for (auto node : m_CurrentSelection)
-    {
-      if (!result.contains(node))
-      {
-        result.append(node);
-      }
-    }
-  }
-
-  return result;
+  m_CheckResponse = newCheckResponse;
+  this->UpdateInfo();
 }
-
-void QmitkMultiNodeSelectionWidget::OnNodePredicateChanged(mitk::NodePredicateBase* /*newPredicate*/)
-{
-  this->UpdateInfo();
-  this->UpdateList();
-};
-
-void QmitkMultiNodeSelectionWidget::OnDataStorageChanged()
-{
-  this->UpdateInfo();
-  this->UpdateList();
-};
-
-QmitkMultiNodeSelectionWidget::NodeList QmitkMultiNodeSelectionWidget::GetSelectedNodes() const
-{
-  return m_CurrentSelection;
-};
 
 void QmitkMultiNodeSelectionWidget::OnEditSelection()
 {
@@ -83,90 +56,104 @@ void QmitkMultiNodeSelectionWidget::OnEditSelection()
   dialog->SetCurrentSelection(this->CompileEmitSelection());
   dialog->SetSelectOnlyVisibleNodes(m_SelectOnlyVisibleNodes);
   dialog->SetSelectionMode(QAbstractItemView::MultiSelection);
+  dialog->SetSelectionCheckFunction(m_CheckFunction);
 
   m_Controls.btnChange->setChecked(true);
   if (dialog->exec())
   {
-    auto lastEmission = this->CompileEmitSelection();
-
-    m_CurrentSelection = dialog->GetSelectedNodes();
-    this->UpdateList();
-    this->UpdateInfo();
-
-    auto newEmission = this->CompileEmitSelection();
-
-    if (!EqualNodeSelections(lastEmission, newEmission))
-    {
-      emit CurrentSelectionChanged(newEmission);
-    }
+    this->HandleChangeOfInternalSelection(dialog->GetSelectedNodes());
   }
   m_Controls.btnChange->setChecked(false);
 
   delete dialog;
-};
+}
 
 void QmitkMultiNodeSelectionWidget::UpdateInfo()
 {
-  m_Controls.infoLabel->setVisible(m_Controls.list->count()==0);
-
   if (!m_Controls.list->count())
   {
     if (m_IsOptional)
     {
-      m_Controls.infoLabel->setText(m_EmptyInfo);
+      if (this->isEnabled())
+      {
+        m_Overlay->SetOverlayText(QStringLiteral("<font class=\"normal\">") + m_EmptyInfo + QStringLiteral("</font>"));
+      }
+      else
+      {
+        m_Overlay->SetOverlayText(QStringLiteral("<font class=\"disabled\">") + m_EmptyInfo + QStringLiteral("</font>"));
+      }
     }
     else
     {
-      m_Controls.infoLabel->setText(m_InvalidInfo);
+      if (this->isEnabled())
+      {
+        m_Overlay->SetOverlayText(QStringLiteral("<font class=\"warning\">") + m_InvalidInfo + QStringLiteral("</font>"));
+      }
+      else
+      {
+        m_Overlay->SetOverlayText(QStringLiteral("<font class=\"disabled\">") + m_InvalidInfo + QStringLiteral("</font>"));
+      }
     }
   }
-};
+  else
+  {
+    if (!m_CheckResponse.empty())
+    {
+      m_Overlay->SetOverlayText(QString::fromStdString(m_CheckResponse));
+    }
+  }
 
-void QmitkMultiNodeSelectionWidget::UpdateList()
+  m_Overlay->setVisible(m_Controls.list->count() == 0 || !m_CheckResponse.empty());
+
+  for (auto i = 0; i < m_Controls.list->count(); ++i)
+  {
+    auto item = m_Controls.list->item(i);
+    auto widget = qobject_cast<QmitkNodeSelectionListItemWidget*>(m_Controls.list->itemWidget(item));
+    widget->SetClearAllowed(m_IsOptional || m_Controls.list->count() > 1);
+  }
+}
+
+void QmitkMultiNodeSelectionWidget::OnInternalSelectionChanged()
 {
   m_Controls.list->clear();
-
-  for (auto node : m_CurrentSelection)
+  auto currentSelection = this->GetCurrentInternalSelection();
+  for (auto& node : currentSelection)
   {
     if (m_NodePredicate.IsNull() || m_NodePredicate->CheckNode(node))
     {
       QListWidgetItem *newItem = new QListWidgetItem;
-      newItem->setText(QString::fromStdString(node->GetName()));
+
+      newItem->setSizeHint(QSize(0, 40));
+      QmitkNodeSelectionListItemWidget* widget = new QmitkNodeSelectionListItemWidget;
+
+      widget->SetSelectedNode(node);
+      widget->SetClearAllowed(m_IsOptional || currentSelection.size() > 1);
+
+      connect(widget, &QmitkNodeSelectionListItemWidget::ClearSelection, this, &QmitkMultiNodeSelectionWidget::OnClearSelection);
       newItem->setData(Qt::UserRole, QVariant::fromValue<mitk::DataNode::Pointer>(node));
 
       m_Controls.list->addItem(newItem);
+      m_Controls.list->setItemWidget(newItem, widget);
     }
   }
-};
+}
 
-void QmitkMultiNodeSelectionWidget::SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes)
+void QmitkMultiNodeSelectionWidget::OnClearSelection(const mitk::DataNode* node)
 {
-  auto lastEmission = this->CompileEmitSelection();
+  this->RemoveNodeFromSelection(node);
+}
 
-  m_SelectOnlyVisibleNodes = selectOnlyVisibleNodes;
-
-  auto newEmission = this->CompileEmitSelection();
-
-  if (!EqualNodeSelections(lastEmission, newEmission))
+void QmitkMultiNodeSelectionWidget::changeEvent(QEvent *event)
+{
+  if (event->type() == QEvent::EnabledChange)
   {
-    emit CurrentSelectionChanged(newEmission);
-    this->UpdateList();
     this->UpdateInfo();
   }
-};
+  QmitkAbstractNodeSelectionWidget::changeEvent(event);
+}
 
-void QmitkMultiNodeSelectionWidget::SetCurrentSelection(NodeList selectedNodes)
+bool QmitkMultiNodeSelectionWidget::AllowEmissionOfSelection(const NodeList& emissionCandidates) const
 {
-  auto lastEmission = this->CompileEmitSelection();
-
-  m_CurrentSelection = selectedNodes;
-  this->UpdateList();
-
-  auto newEmission = this->CompileEmitSelection();
-
-  if (!EqualNodeSelections(lastEmission, newEmission))
-  {
-    emit CurrentSelectionChanged(newEmission);
-    this->UpdateInfo();
-  }
-};
+  m_CheckResponse = m_CheckFunction(emissionCandidates);
+  return m_CheckResponse.empty();
+}

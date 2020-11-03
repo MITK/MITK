@@ -1,63 +1,57 @@
-/*****************************************************************************
+/*============================================================================
 
- Copyright (c) 1993-2000,  Div. Medical and Biological Informatics, 
- Deutsches Krebsforschungszentrum, Heidelberg, Germany
+ Copyright (c) German Cancer Research Center (DKFZ)
  All rights reserved.
 
- Redistribution and use in source and binary forms, with or without 
+ Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
 
  - Redistributions of source code must retain the above copyright notice, this
    list of conditions and the following disclaimer.
 
- - Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+ - Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
- - All advertising materials mentioning features or use of this software must 
-   display the following acknowledgement: 
-          
-     "This product includes software developed by the Div. Medical and 
-      Biological Informatics, Deutsches Krebsforschungszentrum, Heidelberg, 
-      Germany."
+ - All advertising materials mentioning features or use of this software must
+   display the following acknowledgement:
 
- - Neither the name of the Deutsches Krebsforschungszentrum nor the names of 
-   its contributors may be used to endorse or promote products derived from 
-   this software without specific prior written permission. 
+     "This product includes software developed by the German Cancer Research
+      Center (DKFZ)."
 
-   THIS SOFTWARE IS PROVIDED BY THE DIVISION MEDICAL AND BIOLOGICAL
-   INFORMATICS AND CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED
-   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-   OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-   IN NO EVENT SHALL THE DIVISION MEDICAL AND BIOLOGICAL INFORMATICS,
-   THE DEUTSCHES KREBSFORSCHUNGSZENTRUM OR CONTRIBUTORS BE LIABLE FOR 
-   ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-   DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE 
-   GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER 
-   IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
-   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN 
-   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ - Neither the name of the German Cancer Research Center (DKFZ) nor the names
+   of its contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
 
- Send comments and/or bug reports to:
-   mbi-software@dkfz-heidelberg.de
+   THIS SOFTWARE IS PROVIDED BY THE GERMAN CANCER RESEARCH CENTER (DKFZ) AND
+   CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+   BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+   FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE GERMAN
+   CANCER RESEARCH CENTER (DKFZ) OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+   INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+   SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+   OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+   DAMAGE.
 
-*****************************************************************************/
+============================================================================*/
 
 /**@file
  *  this function performs a 3*3 nonlinear edge enhancement operation
- *  using a sobel operator. The operator could be used with 2D and 3D 
- *  filtering masks.  
+ *  using a sobel operator. The operator could be used with 2D and 3D
+ *  filtering masks.
  */
 
 /** @brief performs a 3*3 nonlinear edge enhancement operation
- *  using a sobel operator. The operator could be used with 2D and 3D 
- *  filtering masks.  
+ *  using a sobel operator. The operator could be used with 2D and 3D
+ *  filtering masks.
  *
- *  @param pic_old      pointer to the image that should be convolved 
+ *  @param pic_old      pointer to the image that should be convolved
  *  @param mask         pointer to the mask that is used for convolution
- *  @param border       tells how the edge is transformed              
- *  @arg @c              mitkIpFuncBorderOld  : original greyvalues         
+ *  @param border       tells how the edge is transformed
+ *  @arg @c              mitkIpFuncBorderOld  : original greyvalues
  *  @arg @c              mitkIpFuncBorderZero : edge is set to minimal greyvalue
  *
  * @return pointer to the transformed image
@@ -67,13 +61,13 @@
 
 /* include-Files                                                        */
 
-#include "mitkIpFuncP.h"   
+#include "mitkIpFuncP.h"
 
-mitkIpPicDescriptor *mitkIpFuncSobel ( mitkIpPicDescriptor *pic_old,           
-                               mitkIpUInt4_t       dim_mask, 
+mitkIpPicDescriptor *mitkIpFuncSobel ( mitkIpPicDescriptor *pic_old,
+                               mitkIpUInt4_t       dim_mask,
                                mitkIpFuncFlagI_t   border );
 #ifndef DOXYGEN_IGNORE
- 
+
 /* definition of macros                                                 */
 
 #define SOBEL( typ, pic, size, mask_anz, m )                             \
@@ -140,13 +134,13 @@ mitkIpPicDescriptor *mitkIpFuncSobel ( mitkIpPicDescriptor *pic_old,
 
 /* -------------------------------------------------------------------  */
 /*
-**  function mitkIpFuncSobel:                                             
-**                                                                
+**  function mitkIpFuncSobel:
+**
 */
 /* -------------------------------------------------------------------  */
 
-mitkIpPicDescriptor *mitkIpFuncSobel ( mitkIpPicDescriptor *pic_old,           
-                               mitkIpUInt4_t       dim_mask, 
+mitkIpPicDescriptor *mitkIpFuncSobel ( mitkIpPicDescriptor *pic_old,
+                               mitkIpUInt4_t       dim_mask,
                                mitkIpFuncFlagI_t   border )
 {
 
@@ -155,11 +149,11 @@ mitkIpPicDescriptor *mitkIpFuncSobel ( mitkIpPicDescriptor *pic_old,
   mitkIpInt4_t        offset, off_mask;
   mitkIpUInt4_t       i, j;               /* loopindex                      */
   mitkIpUInt4_t       pos;
-  mitkIpUInt1_t       mask_anz;           /* number of masks                */ 
+  mitkIpUInt1_t       mask_anz;           /* number of masks                */
   mitkIpInt4_t        n[_mitkIpPicNDIM];
-  mitkIpInt4_t        ind[_mitkIpPicNDIM];    /* vector of loop indices (image) */ 
+  mitkIpInt4_t        ind[_mitkIpPicNDIM];    /* vector of loop indices (image) */
   mitkIpFuncMasc_t    *m;                 /* length of mask and offsets     */
-  mitkIpUInt4_t       size[_mitkIpPicNDIM];                                    
+  mitkIpUInt4_t       size[_mitkIpPicNDIM];
   mitkIpInt2_t        sobel2[] =          /* 2D Sobel mask                  */
                   {  1,  0, -1,  2,  0, -2,  1,  0, -1,
                      1,  2,  1,  0,  0,  0, -1, -2, -1  };
@@ -168,19 +162,19 @@ mitkIpPicDescriptor *mitkIpFuncSobel ( mitkIpPicDescriptor *pic_old,
                      1,  0, -1,  2,  0, -2,  1,  0, -1,
                      1,  0, -1,  2,  0, -2,  1,  0, -1,
 
-                     1,  0, -1,  1,  0, -1,  1,  0, -1, 
-                     2,  0, -2,  2,  0, -2,  2,  0, -2, 
-                     1,  0, -1,  1,  0, -1,  1,  0, -1, 
-                     
-                     1,  2,  1,  0,  0,  0, -1, -2, -1, 
-                     1,  2,  1,  0,  0,  0, -1, -2, -1, 
-                     1,  2,  1,  0,  0,  0, -1, -2, -1, 
+                     1,  0, -1,  1,  0, -1,  1,  0, -1,
+                     2,  0, -2,  2,  0, -2,  2,  0, -2,
+                     1,  0, -1,  1,  0, -1,  1,  0, -1,
+
+                     1,  2,  1,  0,  0,  0, -1, -2, -1,
+                     1,  2,  1,  0,  0,  0, -1, -2, -1,
+                     1,  2,  1,  0,  0,  0, -1, -2, -1,
 
                      1,  1,  1,  0,  0,  0, -1, -1, -1,
                      2,  2,  2,  0,  0,  0, -2, -2, -2,
                      1,  1,  1,  0,  0,  0, -1, -1, -1,
 
-                     1,  2,  1,  1,  2,  1,  1,  2,  1, 
+                     1,  2,  1,  1,  2,  1,  1,  2,  1,
                      0,  0,  0,  0,  0,  0,  0,  0,  0,
                     -1, -2, -1, -1, -2, -1, -1, -2, -1,
 
@@ -192,7 +186,7 @@ mitkIpPicDescriptor *mitkIpFuncSobel ( mitkIpPicDescriptor *pic_old,
 
   if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
   if ( ( pic_old->dim < dim_mask ) || ( dim_mask < 1 ) )
-    {  
+    {
        _mitkIpFuncSetErrno ( mitkIpFuncDIMMASC_ERROR );
        return ( mitkIpFuncERROR );
     }
@@ -200,8 +194,8 @@ mitkIpPicDescriptor *mitkIpFuncSobel ( mitkIpPicDescriptor *pic_old,
   /* initialisation of pic_mask                                         */
 
   pic_mask = mitkIpPicNew ();
-  if ( pic_mask == NULL ) 
-    {  
+  if ( pic_mask == NULL )
+    {
        _mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
        return ( mitkIpFuncERROR );
     }
@@ -212,11 +206,11 @@ mitkIpPicDescriptor *mitkIpFuncSobel ( mitkIpPicDescriptor *pic_old,
   for ( i = 0; i < dim_mask; i++ )
     pic_mask->n[i] = 3;
 
-  if ( dim_mask == 3 ) 
-    { 
+  if ( dim_mask == 3 )
+    {
        mask_anz = 6;
        pic_mask->n[dim_mask] = mask_anz;
-       pic_mask->data = sobel3;     
+       pic_mask->data = sobel3;
     }
   else if ( dim_mask == 2 )
     {
@@ -225,7 +219,7 @@ mitkIpPicDescriptor *mitkIpFuncSobel ( mitkIpPicDescriptor *pic_old,
        pic_mask->data = sobel2;
     }
   else
-    {  
+    {
        pic_mask->data = NULL;
        mitkIpPicFree ( pic_mask );
        _mitkIpFuncSetErrno ( mitkIpFuncDIM_ERROR );
@@ -233,17 +227,17 @@ mitkIpPicDescriptor *mitkIpFuncSobel ( mitkIpPicDescriptor *pic_old,
     }
 
   /* initialisation of vectors                                          */
-   
+
   for ( i = 0; i < dim_mask; i++ )
-    n[i] = 2;                                  
- 
+    n[i] = 2;
+
   for ( i = dim_mask; i < _mitkIpPicNDIM; i++ )
     n[i] = 0;
 
   /* allocate mask structure                                            */
 
   m = malloc ( sizeof ( mitkIpFuncMasc_t ) );
-  if ( m == NULL ) 
+  if ( m == NULL )
     {
        pic_mask->data = NULL;
        mitkIpPicFree ( pic_mask );
@@ -251,7 +245,7 @@ mitkIpPicDescriptor *mitkIpFuncSobel ( mitkIpPicDescriptor *pic_old,
        return NULL;
     }
   m->off_vekt  = malloc ( _mitkIpPicElements( pic_mask ) * sizeof ( mitkIpInt4_t ) );
-  if ( m->off_vekt == NULL ) 
+  if ( m->off_vekt == NULL )
     {
        free ( m );
        pic_mask->data = NULL;
@@ -260,7 +254,7 @@ mitkIpPicDescriptor *mitkIpFuncSobel ( mitkIpPicDescriptor *pic_old,
        return NULL;
     }
   m->mask_vekt = malloc ( _mitkIpPicElements( pic_mask ) * sizeof ( mitkIpFloat8_t ) );
-  if ( m->mask_vekt == NULL ) 
+  if ( m->mask_vekt == NULL )
     {
        free ( m->off_vekt );
        free ( m );
@@ -268,17 +262,17 @@ mitkIpPicDescriptor *mitkIpFuncSobel ( mitkIpPicDescriptor *pic_old,
        _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return NULL;
     }
- 
+
   /* create a new picture, copy the header, allocate memory             */
 
-  if ( border == mitkIpFuncBorderOld ) 
+  if ( border == mitkIpFuncBorderOld )
     pic_new = mitkIpPicClone ( pic_old );
   else if ( border == mitkIpFuncBorderZero )
-    { 
+    {
        pic_new = mitkIpPicCopyHeader ( pic_old, 0 );
        pic_new->data = malloc ( _mitkIpPicSize ( pic_new ) );
     }
-  else 
+  else
     {
        _mitkIpFuncSetErrno ( mitkIpFuncFLAG_ERROR );
        pic_mask->data = NULL;
@@ -290,17 +284,17 @@ mitkIpPicDescriptor *mitkIpFuncSobel ( mitkIpPicDescriptor *pic_old,
 
   if ( pic_new == NULL )
     {
-       _mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );                
+       _mitkIpFuncSetErrno ( mitkIpFuncPICNEW_ERROR );
        pic_mask->data = NULL;
        mitkIpPicFree ( pic_mask );
        free ( m->off_vekt );
        free ( m );
        return ( mitkIpFuncERROR );
     }
- 
+
   /* calculate offset vector for the compressed mask                    */
 
-  m->length = 0; 
+  m->length = 0;
   size[0] = 1;
   for ( i = 1; i < pic_old->dim; i++ )
     size[i] = size[i-1] * pic_old->n[i-1];
@@ -319,23 +313,23 @@ mitkIpPicDescriptor *mitkIpFuncSobel ( mitkIpPicDescriptor *pic_old,
                  m->off_vekt[m->length] = offset;
                  m->length++;
               }
-            off_mask++;     
+            off_mask++;
           }
-      
-  /* remove elements that are zero from mask                          */  
-                                                                         
-  pos = 0;                                                               
-  for ( i = 0; i < m->length; i++ )                                      
-    {                                                                    
-      while ( (( mitkIpInt2_t * )pic_mask->data)[pos] == 0 ) pos++;           
-      m->mask_vekt[i] = ( mitkIpFloat8_t )(( mitkIpInt2_t * )pic_mask->data)[pos]; 
-      pos++;                                                             
-    }                                                                    
-                                                                         
- 
+
+  /* remove elements that are zero from mask                          */
+
+  pos = 0;
+  for ( i = 0; i < m->length; i++ )
+    {
+      while ( (( mitkIpInt2_t * )pic_mask->data)[pos] == 0 ) pos++;
+      m->mask_vekt[i] = ( mitkIpFloat8_t )(( mitkIpInt2_t * )pic_mask->data)[pos];
+      pos++;
+    }
+
+
   /* macro for the sobel operator                                       */
 
-  mitkIpPicFORALL_3 ( SOBEL, pic_old, size, mask_anz, m );                   
+  mitkIpPicFORALL_3 ( SOBEL, pic_old, size, mask_anz, m );
 
   pic_mask->data = NULL;
   mitkIpPicFree ( pic_mask );
@@ -346,9 +340,9 @@ mitkIpPicDescriptor *mitkIpFuncSobel ( mitkIpPicDescriptor *pic_old,
   /* Copy Tags */
 
   mitkIpFuncCopyTags(pic_new, pic_old);
-  
-  
-  
+
+
+
   return pic_new;
 }
 #endif

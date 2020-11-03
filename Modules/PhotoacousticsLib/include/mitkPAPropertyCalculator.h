@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKPHOTOACOUSTICPROPERTYCALCULATOR_H
 #define MITKPHOTOACOUSTICPROPERTYCALCULATOR_H
@@ -29,10 +25,10 @@ namespace mitk {
     {
     public:
 
-      mitkClassMacroItkParent(PropertyCalculator, itk::LightObject)
-        itkFactorylessNewMacro(Self)
+      mitkClassMacroItkParent(PropertyCalculator, itk::LightObject);
+        itkFactorylessNewMacro(Self);
 
-        struct Properties
+      struct Properties
       {
         double mua;
         double mus;
@@ -48,6 +44,19 @@ namespace mitk {
         STANDARD_TISSUE = 5
       };
 
+      enum ChromophoreType
+      {
+        OXYGENATED = 1,
+        DEOXYGENATED = 2,
+        WATER = 3,
+        FATTY = 4,
+        MELANIN = 5,
+        ONEENDMEMBER = 6
+      };
+
+      double GetAbsorptionForWavelength(
+        ChromophoreType chromophoreType, int wavelength);
+
       Properties CalculatePropertyForSpecificWavelength(
         TissueType tissueType, int wavelength, double oxygenSaturatonInFraction = 0);
 
@@ -59,14 +68,6 @@ namespace mitk {
 
       std::map<int, std::map<int, double>> m_SpectralLibMap;
 
-      enum MapType
-      {
-        OXYGENATED = 1,
-        DEOXYGENATED = 2,
-        WATER = 3,
-        FATTY = 4,
-        MELANIN = 5
-      };
     };
   }
 }

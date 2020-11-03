@@ -1,0 +1,35 @@
+/**
+\page org_mitk_views_pharmacokinetics_concentration_mri The DCE Concentration Curve Converter View
+
+\imageMacro{pharmacokinetics_concentration_doc.svg,"Icon of the DCE Concentration Curve Converter View",3.0}
+
+\tableofcontents
+
+\section org_mitk_views_pharmacokinetics_concentration_mri_overview Overview
+This view offers a dedicated tool for the conversion of DCE MR image signal intensities to contrast agent (CA) concentration.
+It contains a subset of the conversion tools for T1-weighted signal intensities, which are a part of the DCE MR Perfusion Datafit View (see \ref FIT_DCE_Settings_concentration).
+Additionally, it allows for the conversion between T2-weighted MR signal intensities and contrast agent concentration.
+
+\section org_mitk_views_pharmacokinetics_concentration_mri_Contact Contact information
+If you have any questions, need support, find a bug or have a feature request, feel free to contact us at www.mitk.org.
+
+\section org_mitk_views_pharmacokinetics_concentration_mri_T1_conversion Conversion of T1-weighted MRI data
+
+\imageMacro{concentration_curve_converter_T1_weighted4D.png,"Example screenshot of the conversion of T1-weighted MR images",3.0}
+The view offers the choice between a <i>3D Image</i> and a <i>4D image</i>. If a 4D image is selected, the <i>Selected Time Series</i> needs to be specified.
+In this case, the baseline image is automatically extracted as the first time point image of the time series.
+In case of a 3D image to be converted, additionally to the selected 3D image a <i>Baseline Image (without CA)</i> has to be specified.\n\n
+
+In the configuration section, the following types of conversion can be chosen:
+- <i>Absolute Signal Enhancement</i>: The contrast agent concentration <i>c</i> is calculated according to the formula: <i>c = k*(S(t)-S(0))</i>, where <i>S(t)</i> is the dynamic T1-weighted signal intensity, <i>S(0)</i> the baseline signal and <i>k</i> a user-defined conversion factor.
+- <i>Relative Signal Enhancement</i>: The contrast agent concentration <i>c</i> is calculated according to the formula: <i>c = k*(S(t)-S(0))/S(0)</i>, where <i>S(t)</i> is the dynamic T1-weighted signal intensity, <i>S(0)</i> the baseline signal and <i>k</i> a user-defined conversion factor.
+- <i>Turbo FLASH Sequence</i>: The conversion from signal <i>S(t)</i> to contrast agent concentration <i>c</i> is calculated according to the turboFLASH (ultrafast gradient echo) sequence specific formula.
+
+
+\section org_mitk_views_pharmacokinetics_concentration_mri_T2_conversion Conversion of T2-weighted MRI data
+\imageMacro{concentration_curve_converter_T2_weighted.png,"Example screenshot of the conversion of T2-weighted MR images",3.0}
+
+The contrast agent concentration <i>c</i> is calculated according to the formula: <i>c = -k/TE*ln(S(t)/S(0))</i>, where <i>S(t)</i> is the dynamic T2-weighted signal intensity, <i>S(0)</i> the baseline signal, <i>k</i> a user-defined conversion factor and <i>TE</i> the echo time of the employed sequence.
+In practice, the factor <i>k</i> is often set to unity.
+
+*/

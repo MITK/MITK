@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef GizmoObjectFactor_h
 #define GizmoObjectFactor_h
@@ -48,7 +44,7 @@ namespace mitk
     void SetDefaultProperties(mitk::DataNode *node) override;
 
     // Deprecated but required!
-    const char *GetFileExtensions() override { return ""; }
+    std::string GetFileExtensions() override { return ""; }
     // Deprecated but required!
     mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap() override
     {
@@ -56,7 +52,7 @@ namespace mitk
     }
 
     // Deprecated but required!
-    const char *GetSaveFileExtensions() override { return ""; }
+    std::string GetSaveFileExtensions() override { return ""; }
     // Deprecated but required!
     mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap() override
     {

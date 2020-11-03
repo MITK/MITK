@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QmitkSlicesInterpolator_h_Included
 #define QmitkSlicesInterpolator_h_Included
@@ -62,9 +58,6 @@ class QPushButton;
 
   \sa QmitkInteractiveSegmentation
   \sa mitk::SegmentationInterpolation
-
-  There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref
-  QmitkInteractiveSegmentationTechnicalPage
 
   While mitk::SegmentationInterpolation does the bookkeeping of interpolation
   (keeping track of which slices contain how much segmentation) and the algorithmic work,
@@ -221,7 +214,7 @@ protected:
     ToolManager)
     should be interpolated. The actual work is then done by our SegmentationInterpolation object.
    */
-  void Interpolate(mitk::PlaneGeometry *plane, unsigned int timeStep, mitk::SliceNavigationController *slicer);
+  void Interpolate(mitk::PlaneGeometry *plane, mitk::TimePointType timePoint, mitk::SliceNavigationController *slicer);
 
   // void InterpolateSurface();
 
@@ -277,7 +270,7 @@ private:
   mitk::SliceNavigationController *m_LastSNC;
   unsigned int m_LastSliceIndex;
 
-  QHash<mitk::SliceNavigationController *, unsigned int> m_TimeStep;
+  QHash<mitk::SliceNavigationController *, mitk::TimePointType> m_TimePoints;
 
   bool m_2DInterpolationEnabled;
   bool m_3DInterpolationEnabled;

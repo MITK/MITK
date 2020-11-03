@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef _MITKNAVIGATIONDATATOPOINTSETFILTER_H__
 #define _MITKNAVIGATIONDATATOPOINTSETFILTER_H__
@@ -40,8 +36,8 @@ namespace mitk {
   {
   public:
     mitkClassMacro(NavigationDataToPointSetFilter, PointSetSource);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     /**Documentation
     * \brief There are two different operation modes.
@@ -63,13 +59,12 @@ namespace mitk {
     *
     * The size determines the maximum number of timesteps in 4D mode and the number of points in 3D mode of the output PointSet
     */
-    itkSetMacro(RingBufferSize, unsigned int)
-
+    itkSetMacro(RingBufferSize, unsigned int);
 
     /**
     * \brief Sets the number of Navigation Data, which should be averaged.
     */
-    itkSetMacro(NumberForMean, unsigned int)
+    itkSetMacro(NumberForMean, unsigned int);
 
     /**
     * \brief Gets the number of Navigation Data, which should be averaged.

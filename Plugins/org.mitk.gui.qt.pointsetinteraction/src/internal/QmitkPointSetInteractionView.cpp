@@ -1,37 +1,32 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
+============================================================================*/
 
-===================================================================*/
-
-// Qmitk related includes
 #include "QmitkPointSetInteractionView.h"
-#include "ui_QmitkPointSetInteractionViewControls.h"
 
-#include <berryIWorkbenchWindow.h>
-#include <berryISelectionService.h>
 #include <QInputDialog>
 #include <QLineEdit>
-#include <mitkProperties.h>
+
+#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateProperty.h>
+
 #include <QmitkPointListWidget.h>
-#include <mitkDataNodeObject.h>
-#include <mitkDataNodeSelection.h>
+#include <QmitkRenderWindow.h>
 
 const std::string QmitkPointSetInteractionView::VIEW_ID = "org.mitk.views.pointsetinteraction";
 
-
-QmitkPointSetInteractionView::QmitkPointSetInteractionView( QObject* /*parent*/ )
-: m_Controls(0)
+QmitkPointSetInteractionView::QmitkPointSetInteractionView()
+  : m_Controls(nullptr)
 {
 }
 
@@ -39,104 +34,94 @@ QmitkPointSetInteractionView::~QmitkPointSetInteractionView()
 {
 }
 
-void QmitkPointSetInteractionView::CreateQtPartControl( QWidget *parent )
+void QmitkPointSetInteractionView::CreateQtPartControl(QWidget *parent)
 {
-  m_Controls = new Ui::QmitkPointSetInteractionControls;
+  m_Controls = new Ui::QmitkPointSetInteractionViewControls;
   m_Controls->setupUi(parent);
-  m_Controls->m_PbAddPointSet->connect( m_Controls->m_PbAddPointSet, SIGNAL( clicked() )
-    , this, SLOT( OnAddPointSetClicked() ) );
+
+  m_Controls->selectedPointSetWidget->SetDataStorage(GetDataStorage());
+  m_Controls->selectedPointSetWidget->SetNodePredicate(mitk::NodePredicateAnd::New(
+    mitk::TNodePredicateDataType<mitk::PointSet>::New(),
+    mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))));
+
+  m_Controls->selectedPointSetWidget->SetSelectionIsOptional(true);
+  m_Controls->selectedPointSetWidget->SetAutoSelectNewNodes(true);
+  m_Controls->selectedPointSetWidget->SetEmptyInfo(QString("Please select a point set"));
+  m_Controls->selectedPointSetWidget->SetPopUpTitel(QString("Select point set"));
+
+  connect(m_Controls->selectedPointSetWidget, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged,
+    this, &QmitkPointSetInteractionView::OnCurrentSelectionChanged);
+
+  connect(m_Controls->addPointSetPushButton, &QPushButton::clicked,
+    this, &QmitkPointSetInteractionView::OnAddPointSetClicked);
+
+  if (mitk::IRenderWindowPart* renderWindowPart = GetRenderWindowPart())
+  {
+    RenderWindowPartActivated(renderWindowPart);
+  }
 }
 
 void QmitkPointSetInteractionView::SetFocus()
 {
-  m_Controls->m_PbAddPointSet->setFocus();
+  m_Controls->addPointSetPushButton->setFocus();
 }
 
-void QmitkPointSetInteractionView::OnAddPointSetClicked()
+void QmitkPointSetInteractionView::OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
 {
-  //Ask for the name of the point set
-  bool ok = false;
-  QString name = QInputDialog::getText( QApplication::activeWindow()
-    , tr("Add point set..."), tr("Enter name for the new point set"), QLineEdit::Normal, tr("PointSet"), &ok );
-  if ( ! ok || name.isEmpty() )
+  if (nodes.empty() || nodes.front().IsNull())
+  {
+    m_Controls->poinSetListWidget->SetPointSetNode(nullptr);
     return;
-
-  //
-  //Create a new empty pointset
-  //
-  mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
-  //
-  // Create a new data tree node
-  //
-  mitk::DataNode::Pointer pointSetNode = mitk::DataNode::New();
-  //
-  // fill the data tree node with the appropriate information
-  //
-  pointSetNode->SetData( pointSet );
-  pointSetNode->SetProperty( "name", mitk::StringProperty::New( name.toStdString() ) );
-  pointSetNode->SetProperty( "opacity", mitk::FloatProperty::New( 1 ) );
-  pointSetNode->SetColor( 1.0, 1.0, 0.0 );
-  //
-  // add the node to the ds
-  //
-  this->GetDataStorage()->Add(pointSetNode);
-
-  // make new selection and emulate selection for this
-  berry::IWorkbenchPart::Pointer nullPart;
-  QList<mitk::DataNode::Pointer> selection;
-  selection.push_back(pointSetNode);
-  this->OnSelectionChanged(nullPart, selection);
-}
-
-void QmitkPointSetInteractionView::OnSelectionChanged(berry::IWorkbenchPart::Pointer, const QList<mitk::DataNode::Pointer>& nodes)
-{
-  mitk::DataNode::Pointer selectedNode;
-
-  if(!nodes.empty())
-    selectedNode = nodes.front();
-
-  mitk::PointSet::Pointer pointSet;
-
-  if(selectedNode.IsNotNull())
-    pointSet = dynamic_cast<mitk::PointSet*>(selectedNode->GetData());
-
-  if (pointSet.IsNotNull())
-  {
-    m_SelectedPointSetNode = selectedNode;
-    m_Controls->m_CurrentPointSetLabel->setText(QString::fromStdString(selectedNode->GetName()));
-    m_Controls->m_PointListWidget->SetPointSetNode(selectedNode);
   }
-  else
-  {
-    m_Controls->m_CurrentPointSetLabel->setText(tr("None"));
-    m_Controls->m_PointListWidget->SetPointSetNode(nullptr);
-  }
-}
 
-void QmitkPointSetInteractionView::NodeChanged( const mitk::DataNode* node )
-{
-  if(node == m_SelectedPointSetNode && m_Controls->m_CurrentPointSetLabel->text().toStdString() != node->GetName())
+  auto selectedPointSet = dynamic_cast<mitk::PointSet*>(nodes.front()->GetData());
+  if (nullptr == selectedPointSet)
   {
-    m_Controls->m_CurrentPointSetLabel->setText(QString::fromStdString(node->GetName()));
+    m_Controls->poinSetListWidget->SetPointSetNode(nullptr);
+    return;
   }
+
+  m_Controls->poinSetListWidget->SetPointSetNode(nodes.front());
 }
 
 void QmitkPointSetInteractionView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
 {
-  if(m_Controls)
+  if (nullptr != m_Controls)
   {
-    m_Controls->m_PointListWidget->AddSliceNavigationController(renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController());
-    m_Controls->m_PointListWidget->AddSliceNavigationController(renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController());
-    m_Controls->m_PointListWidget->AddSliceNavigationController(renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController());
+    m_Controls->poinSetListWidget->AddSliceNavigationController(renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController());
+    m_Controls->poinSetListWidget->AddSliceNavigationController(renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController());
+    m_Controls->poinSetListWidget->AddSliceNavigationController(renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController());
   }
 }
 
 void QmitkPointSetInteractionView::RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart)
 {
-  if(m_Controls)
+  if (nullptr != m_Controls)
   {
-    m_Controls->m_PointListWidget->RemoveSliceNavigationController(renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController());
-    m_Controls->m_PointListWidget->RemoveSliceNavigationController(renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController());
-    m_Controls->m_PointListWidget->RemoveSliceNavigationController(renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController());
+    m_Controls->poinSetListWidget->RemoveSliceNavigationController(renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController());
+    m_Controls->poinSetListWidget->RemoveSliceNavigationController(renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController());
+    m_Controls->poinSetListWidget->RemoveSliceNavigationController(renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController());
   }
+}
+
+void QmitkPointSetInteractionView::OnAddPointSetClicked()
+{
+  // ask for the name of the point set
+  bool ok = false;
+  QString name = QInputDialog::getText(QApplication::activeWindow(),
+    tr("Add point set..."), tr("Enter name for the new point set"), QLineEdit::Normal, tr("PointSet"), &ok);
+  if (!ok || name.isEmpty())
+  {
+    return;
+  }
+
+  mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
+  mitk::DataNode::Pointer pointSetNode = mitk::DataNode::New();
+  pointSetNode->SetData(pointSet);
+  pointSetNode->SetProperty("name", mitk::StringProperty::New(name.toStdString()));
+  pointSetNode->SetProperty("opacity", mitk::FloatProperty::New(1));
+  pointSetNode->SetColor(1.0, 1.0, 0.0);
+  this->GetDataStorage()->Add(pointSetNode);
+
+  m_Controls->selectedPointSetWidget->SetCurrentSelectedNode(pointSetNode);
 }

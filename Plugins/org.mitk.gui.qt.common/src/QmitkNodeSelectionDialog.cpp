@@ -1,34 +1,38 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
-
+============================================================================*/
 
 #include "QmitkNodeSelectionDialog.h"
 
-#include <mitkDataStorageInspectorGenerator.h>
-#include <QmitkDataStorageTreeInspector.h>
-#include <QmitkNodeSelectionPreferenceHelper.h>
+#include <berryQtStyleManager.h>
 
-QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString title, QString hint) : QDialog(parent),
-  m_NodePredicate(nullptr), m_SelectOnlyVisibleNodes(false), m_SelectedNodes(NodeList()), m_SelectionMode(QAbstractItemView::SingleSelection)
+#include <mitkDataStorageInspectorGenerator.h>
+#include <QmitkNodeSelectionPreferenceHelper.h>
+#include <QmitkDataStorageSelectionHistoryInspector.h>
+#include <QmitkDataStorageFavoriteNodesInspector.h>
+
+QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString title, QString hint)
+  : QDialog(parent)
+  , m_NodePredicate(nullptr)
+  , m_SelectOnlyVisibleNodes(false)
+  , m_SelectedNodes(NodeList())
+  , m_SelectionMode(QAbstractItemView::SingleSelection)
 {
   m_Controls.setupUi(this);
 
+  m_CheckFunction = [](const NodeList &) { return ""; };
+
   auto providers = mitk::DataStorageInspectorGenerator::GetProviders();
   auto visibleProviders = mitk::GetVisibleDataStorageInspectors();
-  auto favoriteID = mitk::GetFavoriteDataStorageInspector();
+  auto preferredID = mitk::GetPreferredDataStorageInspector();
 
   if (visibleProviders.empty())
   {
@@ -37,25 +41,21 @@ QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString titl
     for (auto proIter : providers)
     {
       visibleProviders.insert(std::make_pair(order, proIter.first));
+      ++order;
     }
   }
 
-  int favIndex = 0;
-  bool favoriteFound = false;
+  int preferredIndex = 0;
+  bool preferredFound = false;
   for (auto proIter : visibleProviders)
   {
     auto finding = providers.find(proIter.second);
     if (finding != providers.end())
     {
-      auto inspector = finding->second->CreateInspector();
-      QString name = QString::fromStdString(finding->second->GetInspectorDisplayName());
-      QString desc = QString::fromStdString(finding->second->GetInspectorDescription());
-      AddPanel(inspector, name, desc);
-
-      favoriteFound = favoriteFound || proIter.second == favoriteID;
-      if (!favoriteFound)
+      if (finding->second->GetInspectorID() != QmitkDataStorageFavoriteNodesInspector::INSPECTOR_ID() && finding->second->GetInspectorID() != QmitkDataStorageSelectionHistoryInspector::INSPECTOR_ID())
       {
-        ++favIndex;
+        auto provider = finding->second;
+        this->AddPanel(provider, preferredID, preferredFound, preferredIndex);
       }
     }
     else
@@ -64,15 +64,46 @@ QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString titl
     }
   }
 
-  m_Controls.tabWidget->setCurrentIndex(favIndex);
+  if (mitk::GetShowFavoritesInspector())
+  {
+    auto favoritesPorvider = mitk::DataStorageInspectorGenerator::GetProvider(QmitkDataStorageFavoriteNodesInspector::INSPECTOR_ID());
+    if (favoritesPorvider != nullptr)
+    {
+      this->AddPanel(favoritesPorvider, preferredID, preferredFound, preferredIndex);
+    }
+  }
+
+  if (mitk::GetShowHistoryInspector())
+  {
+    auto historyPorvider = mitk::DataStorageInspectorGenerator::GetProvider(QmitkDataStorageSelectionHistoryInspector::INSPECTOR_ID());
+    if (historyPorvider != nullptr)
+    {
+      this->AddPanel(historyPorvider, preferredID, preferredFound, preferredIndex);
+    }
+  }
+
+  m_Controls.tabWidget->setCurrentIndex(preferredIndex);
   this->setWindowTitle(title);
   this->setToolTip(hint);
 
   m_Controls.hint->setText(hint);
   m_Controls.hint->setVisible(!hint.isEmpty());
+  if(hint.isEmpty())
+  {
+    m_Controls.layoutHint->setContentsMargins(0, 0, 0, 0);
+  }
+  else
+  {
+    m_Controls.layoutHint->setContentsMargins(6, 6, 6, 6);
+  }
 
-  connect(m_Controls.buttonBox, SIGNAL(accepted()), this, SLOT(OnOK()));
-  connect(m_Controls.buttonBox, SIGNAL(rejected()), this, SLOT(OnCancel()));
+  this->SetErrorText("");
+
+  m_Controls.btnAddToFav->setIcon(berry::QtStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/favorite_add.svg")));
+
+  connect(m_Controls.btnAddToFav, &QPushButton::clicked, this, &QmitkNodeSelectionDialog::OnFavoriteNodesButtonClicked);
+  connect(m_Controls.buttonBox, &QDialogButtonBox::accepted, this, &QmitkNodeSelectionDialog::OnOK);
+  connect(m_Controls.buttonBox, &QDialogButtonBox::rejected, this, &QmitkNodeSelectionDialog::OnCancel);
 }
 
 void QmitkNodeSelectionDialog::SetDataStorage(mitk::DataStorage* dataStorage)
@@ -89,9 +120,9 @@ void QmitkNodeSelectionDialog::SetDataStorage(mitk::DataStorage* dataStorage)
       }
     }
   }
-};
+}
 
-void QmitkNodeSelectionDialog::SetNodePredicate(mitk::NodePredicateBase* nodePredicate)
+void QmitkNodeSelectionDialog::SetNodePredicate(const mitk::NodePredicateBase* nodePredicate)
 {
   if (m_NodePredicate != nodePredicate)
   {
@@ -102,9 +133,9 @@ void QmitkNodeSelectionDialog::SetNodePredicate(mitk::NodePredicateBase* nodePre
       panel->SetNodePredicate(m_NodePredicate);
     }
   }
-};
+}
 
-mitk::NodePredicateBase* QmitkNodeSelectionDialog::GetNodePredicate() const
+const mitk::NodePredicateBase* QmitkNodeSelectionDialog::GetNodePredicate() const
 {
   return m_NodePredicate;
 }
@@ -112,7 +143,50 @@ mitk::NodePredicateBase* QmitkNodeSelectionDialog::GetNodePredicate() const
 QmitkNodeSelectionDialog::NodeList QmitkNodeSelectionDialog::GetSelectedNodes() const
 {
   return m_SelectedNodes;
-};
+}
+
+void QmitkNodeSelectionDialog::SetSelectionCheckFunction(const SelectionCheckFunctionType &checkFunction)
+{
+  m_CheckFunction = checkFunction;
+  auto checkResponse = m_CheckFunction(m_SelectedNodes);
+
+  SetErrorText(checkResponse);
+
+  m_Controls.buttonBox->button(QDialogButtonBox::Ok)->setEnabled(checkResponse.empty());
+}
+
+void QmitkNodeSelectionDialog::SetErrorText(const std::string& checkResponse)
+{
+  m_Controls.error->setText(QString::fromStdString(checkResponse));
+  m_Controls.error->setVisible(!checkResponse.empty());
+  if (checkResponse.empty())
+  {
+    m_Controls.layoutError->setContentsMargins(0, 0, 0, 0);
+  }
+  else
+  {
+    m_Controls.layoutError->setContentsMargins(6, 6, 6, 6);
+  }
+}
+
+bool QmitkNodeSelectionDialog::GetSelectOnlyVisibleNodes() const
+{
+  return m_SelectOnlyVisibleNodes;
+}
+
+void QmitkNodeSelectionDialog::SetSelectionMode(SelectionMode mode)
+{
+  m_SelectionMode = mode;
+  for (auto panel : m_Panels)
+  {
+    panel->SetSelectionMode(mode);
+  }
+}
+
+QmitkNodeSelectionDialog::SelectionMode QmitkNodeSelectionDialog::GetSelectionMode() const
+{
+  return m_SelectionMode;
+}
 
 void QmitkNodeSelectionDialog::SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes)
 {
@@ -125,62 +199,93 @@ void QmitkNodeSelectionDialog::SetSelectOnlyVisibleNodes(bool selectOnlyVisibleN
       panel->SetSelectOnlyVisibleNodes(m_SelectOnlyVisibleNodes);
     }
   }
-};
+}
 
 void QmitkNodeSelectionDialog::SetCurrentSelection(NodeList selectedNodes)
 {
   m_SelectedNodes = selectedNodes;
+  auto checkResponse = m_CheckFunction(m_SelectedNodes);
+
+  SetErrorText(checkResponse);
+
+  m_Controls.buttonBox->button(QDialogButtonBox::Ok)->setEnabled(checkResponse.empty());
+
   for (auto panel : m_Panels)
   {
     panel->SetCurrentSelection(selectedNodes);
   }
-};
+}
 
 void QmitkNodeSelectionDialog::OnSelectionChanged(NodeList selectedNodes)
 {
   SetCurrentSelection(selectedNodes);
   emit CurrentSelectionChanged(selectedNodes);
-};
+}
 
-void QmitkNodeSelectionDialog::AddPanel(QmitkAbstractDataStorageInspector* view, QString name, QString desc)
+void QmitkNodeSelectionDialog::OnFavoriteNodesButtonClicked()
 {
-  view->setParent(this);
-  view->SetSelectionMode(m_SelectionMode);
-
-  auto tabPanel = new QWidget();
-  tabPanel->setObjectName(QString("tab_")+name);
-  tabPanel->setToolTip(desc);
-  m_Controls.tabWidget->insertTab(m_Controls.tabWidget->count(), tabPanel, name);
-
-  auto verticalLayout = new QVBoxLayout(tabPanel);
-  verticalLayout->setSpacing(0);
-  verticalLayout->setContentsMargins(0, 0, 0, 0);
-  verticalLayout->addWidget(view);
-
-  m_Panels.push_back(view);
-  connect(view, &QmitkAbstractDataStorageInspector::CurrentSelectionChanged, this, &QmitkNodeSelectionDialog::OnSelectionChanged);
-};
+  for (auto node : m_SelectedNodes)
+  {
+    node->SetBoolProperty("org.mitk.selection.favorite", true);
+  }
+}
 
 void QmitkNodeSelectionDialog::OnOK()
 {
+  for (auto node : m_SelectedNodes)
+  {
+    QmitkDataStorageSelectionHistoryInspector::AddNodeToHistory(node);
+  }
+
   this->accept();
-};
+}
 
 void QmitkNodeSelectionDialog::OnCancel()
 {
   this->reject();
-};
+}
 
-void QmitkNodeSelectionDialog::SetSelectionMode(SelectionMode mode)
+void QmitkNodeSelectionDialog::AddPanel(const mitk::IDataStorageInspectorProvider * provider, const mitk::IDataStorageInspectorProvider::InspectorIDType& preferredID, bool &preferredFound, int &preferredIndex)
 {
-  m_SelectionMode = mode;
-  for (auto panel : m_Panels)
+  auto inspector = provider->CreateInspector();
+  QString name = QString::fromStdString(provider->GetInspectorDisplayName());
+  QString desc = QString::fromStdString(provider->GetInspectorDescription());
+
+  inspector->setParent(this);
+  inspector->SetSelectionMode(m_SelectionMode);
+
+  auto tabPanel = new QWidget();
+  tabPanel->setObjectName(QString("tab_") + name);
+  tabPanel->setToolTip(desc);
+
+  auto verticalLayout = new QVBoxLayout(tabPanel);
+  verticalLayout->setSpacing(0);
+  verticalLayout->setContentsMargins(0, 0, 0, 0);
+  verticalLayout->addWidget(inspector);
+
+  auto panelPos = m_Controls.tabWidget->insertTab(m_Controls.tabWidget->count(), tabPanel, name);
+
+  auto icon = provider->GetInspectorIcon();
+  if (!icon.isNull())
   {
-    panel->SetSelectionMode(mode);
+    m_Controls.tabWidget->setTabIcon(panelPos, icon);
   }
-};
 
-QmitkNodeSelectionDialog::SelectionMode QmitkNodeSelectionDialog::GetSelectionMode() const
+  m_Panels.push_back(inspector);
+  connect(inspector, &QmitkAbstractDataStorageInspector::CurrentSelectionChanged, this, &QmitkNodeSelectionDialog::OnSelectionChanged);
+  connect(inspector->GetView(), &QAbstractItemView::doubleClicked, this, &QmitkNodeSelectionDialog::OnDoubleClicked);
+
+  preferredFound = preferredFound || provider->GetInspectorID() == preferredID;
+  if (!preferredFound)
+  {
+    ++preferredIndex;
+  }
+}
+
+void QmitkNodeSelectionDialog::OnDoubleClicked(const QModelIndex& /*index*/)
 {
-  return m_SelectionMode;
+  if (!m_SelectedNodes.empty())
+  {
+    this->OnOK();
+  }
 }

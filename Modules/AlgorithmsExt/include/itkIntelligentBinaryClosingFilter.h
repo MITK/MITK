@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 #ifndef __itkIntelligentBinaryClosingFilter_h
 #define __itkIntelligentBinaryClosingFilter_h
 
@@ -64,7 +60,8 @@ namespace itk
     itkTypeMacro(IntelligentBinaryClosingFilter, ImageToImageFilter);
 
     /** Method for creation through the object factory. */
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /** Standard process object method.  This filter is not multithreaded. */
       void GenerateData() override;
@@ -100,8 +97,6 @@ namespace itk
   protected:
     IntelligentBinaryClosingFilter();
     ~IntelligentBinaryClosingFilter() override {}
-    IntelligentBinaryClosingFilter(const Self &) {}
-    void operator=(const Self &) {}
     void PrintSelf(std::ostream &os, Indent indent) const override;
 
   private:

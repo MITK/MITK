@@ -1,111 +1,101 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
+============================================================================*/
 
-===================================================================*/
+#ifndef QMITKSTDMULTIWIDGETEDITOR_H
+#define QMITKSTDMULTIWIDGETEDITOR_H
 
-#ifndef QmitkStdMultiWidgetEditor_h
-#define QmitkStdMultiWidgetEditor_h
-
-#include <QmitkAbstractRenderEditor.h>
+// mitk gui qt common plugin
+#include <QmitkAbstractMultiWidgetEditor.h>
 
 #include <mitkILinkedRenderWindowPart.h>
 
 #include <org_mitk_gui_qt_stdmultiwidgeteditor_Export.h>
 
+// c++
+#include <memory>
+
 class QmitkStdMultiWidget;
-class QmitkMouseModeSwitcher;
 class QmitkStdMultiWidgetEditorPrivate;
 
 /**
- * \ingroup org_mitk_gui_qt_stdmultiwidgeteditor
+ * @brief
  */
-class ORG_MITK_GUI_QT_STDMULTIWIDGETEDITOR QmitkStdMultiWidgetEditor
-    : public QmitkAbstractRenderEditor, public mitk::ILinkedRenderWindowPart
+class ORG_MITK_GUI_QT_STDMULTIWIDGETEDITOR QmitkStdMultiWidgetEditor final : public QmitkAbstractMultiWidgetEditor,
+                                                                             public mitk::ILinkedRenderWindowPart
 {
   Q_OBJECT
 
 public:
 
-  berryObjectMacro(QmitkStdMultiWidgetEditor)
-
   static const QString EDITOR_ID;
 
   QmitkStdMultiWidgetEditor();
-  ~QmitkStdMultiWidgetEditor() override;
+  virtual ~QmitkStdMultiWidgetEditor() override;
 
-  QmitkStdMultiWidget* GetStdMultiWidget();
-
-  /// \brief If on=true will request the QmitkStdMultiWidget set the Menu widget to
-  /// whatever was the last known enabled state, and if on=false will turn the Menu widget off.
-  void RequestActivateMenuWidget(bool on);
-
-  // -------------------  mitk::IRenderWindowPart  ----------------------
-
+  virtual QmitkLevelWindowWidget* GetLevelWindowWidget() const override;
   /**
-   * \see mitk::IRenderWindowPart::GetActiveQmitkRenderWindow()
-   */
-  QmitkRenderWindow* GetActiveQmitkRenderWindow() const override;
-
+  * @brief Overridden from mitk::ILinkedRenderWindowPart
+  */
+  virtual void EnableSlicingPlanes(bool enable) override;
   /**
-   * \see mitk::IRenderWindowPart::GetQmitkRenderWindows()
-   */
-  QHash<QString,QmitkRenderWindow*> GetQmitkRenderWindows() const override;
-
+  * @brief Overridden from mitk::ILinkedRenderWindowPart
+  */
+  virtual bool IsSlicingPlanesEnabled() const override;
   /**
-   * \see mitk::IRenderWindowPart::GetQmitkRenderWindow(QString)
-   */
-  QmitkRenderWindow* GetQmitkRenderWindow(const QString& id) const override;
-
+  * @brief Overridden from berry::IPartListener
+  */
+  virtual berry::IPartListener::Events::Types GetPartEventTypes() const override;
   /**
-   * \see mitk::IRenderWindowPart::GetSelectionPosition()
-   */
-  mitk::Point3D GetSelectedPosition(const QString& id = QString()) const override;
-
+  * @brief Overridden from berry::IPartListener
+  */
+  virtual void PartClosed(const berry::IWorkbenchPartReference::Pointer& partRef) override;
   /**
-   * \see mitk::IRenderWindowPart::SetSelectedPosition()
-   */
-  void SetSelectedPosition(const mitk::Point3D& pos, const QString& id = QString()) override;
-
+  * @brief Overridden from berry::IPartListener
+  */
+  virtual void PartOpened(const berry::IWorkbenchPartReference::Pointer& partRef) override;
   /**
-   * \see mitk::IRenderWindowPart::EnableDecorations()
-   */
-  void EnableDecorations(bool enable, const QStringList& decorations = QStringList()) override;
-
+  * @brief Overridden from berry::IPartListener
+  */
+  virtual void PartHidden(const berry::IWorkbenchPartReference::Pointer& partRef) override;
   /**
-   * \see mitk::IRenderWindowPart::IsDecorationEnabled()
-   */
-  bool IsDecorationEnabled(const QString& decoration) const override;
+  * @brief Overridden from berry::IPartListener
+  */
+  virtual void PartVisible(const berry::IWorkbenchPartReference::Pointer& partRef) override;
 
+  void OnInteractionSchemeChanged(mitk::InteractionSchemeSwitcher::InteractionScheme scheme);
+
+  void ShowLevelWindowWidget(bool show);
+
+private:
   /**
-   * \see mitk::IRenderWindowPart::GetDecorations()
-   */
-  QStringList GetDecorations() const override;
-
-  // -------------------  mitk::ILinkedRenderWindowPart  ----------------------
-
-  void EnableSlicingPlanes(bool enable) override;
-  bool IsSlicingPlanesEnabled() const override;
-
-
-protected:
-
+  * @brief Overridden from QmitkAbstractRenderEditor
+  */
+  virtual void SetFocus() override;
   /**
-   * @brief FillMembersWithCurrentDecorations Helper method to fill internal members with
-   * current values of the std multi widget.
-   */
-  void FillMembersWithCurrentDecorations();
-
+  * @brief Overridden from QmitkAbstractRenderEditor
+  */
+  virtual void CreateQtPartControl(QWidget* parent) override;
+  /**
+  * @brief Overridden from QmitkAbstractRenderEditor
+  */
+  virtual void OnPreferencesChanged(const berry::IBerryPreferences* preferences) override;
+  /**
+  * @brief InitializePreferences Internal helper method to set default preferences.
+  * This method is used to show the current preferences in the first call of
+  * the preference page (the GUI).
+  *
+  * @param preferences berry preferences.
+  */
+  void InitializePreferences(berry::IBerryPreferences *preferences);
   /**
    * @brief GetPreferenceDecorations Getter to fill internal members with values of preferences.
    * @param preferences The berry preferences.
@@ -114,19 +104,12 @@ protected:
    * the value will not change.
    */
   void GetPreferenceDecorations(const berry::IBerryPreferences *preferences);
-
-  void SetFocus() override;
-
-  void OnPreferencesChanged(const berry::IBerryPreferences*) override;
-
-  void CreateQtPartControl(QWidget* parent) override;
-
   /**
    * @brief GetColorForWidget helper method to convert a saved color string to mitk::Color.
-   * @param widgetColorInHex color in hex format (#12356) where each diget is in the form (0-F).
+   * @param hexColor color in hex format (#12356) where each digit is in the form (0-F).
    * @return the color in mitk format.
    */
-  mitk::Color HexColorToMitkColor(const QString& widgetColorInHex);
+  mitk::Color HexColorToMitkColor(const QString& hexColor);
   /**
    * @brief MitkColorToHex Convert an mitk::Color to hex string.
    * @param color mitk format.
@@ -134,16 +117,9 @@ protected:
    */
   QString MitkColorToHex(const mitk::Color& color);
 
-  /**
-   * @brief InitializePreferences Internal helper method to set default preferences.
-   * This method is used to show the current preferences in the first call of
-   * the preference page (the GUI).
-   *
-   * @param preferences berry preferences.
-   */
-  void InitializePreferences(berry::IBerryPreferences *preferences);
+  struct Impl;
+  std::unique_ptr<Impl> m_Impl;
 
-private:
-  const QScopedPointer<QmitkStdMultiWidgetEditorPrivate> d;
 };
-#endif /*QmitkStdMultiWidgetEditor_h*/
+
+#endif // QMITKSTDMULTIWIDGETEDITOR_H

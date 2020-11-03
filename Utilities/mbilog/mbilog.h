@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef _MBILOG_H
 #define _MBILOG_H
@@ -25,11 +21,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mbilogExports.h"
 #include "mbilogLogMessage.h"
 #include "mbilogLoggingTypes.h"
-
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4251)
-#endif
 
 namespace mbilog
 {
@@ -207,10 +198,6 @@ namespace mbilog
   //    Callback m_Callback;
   //  };
 }
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 /** \brief Macros for different message levels. Creates an instance of class PseudoStream with the corresponding message
  * level.

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical Image Computing.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <QmitkDataStorageDefaultListModel.h>
 
@@ -21,7 +17,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "QmitkEnums.h"
 #include "QmitkNodeDescriptorManager.h"
 
-QmitkDataStorageDefaultListModel::QmitkDataStorageDefaultListModel(QObject *parent) : QmitkAbstractDataStorageModel(parent)
+QmitkDataStorageDefaultListModel::QmitkDataStorageDefaultListModel(QObject *parent)
+  : QmitkAbstractDataStorageModel(parent)
 {
 }
 
@@ -40,10 +37,20 @@ void QmitkDataStorageDefaultListModel::NodeAdded(const mitk::DataNode* /*node*/)
   UpdateModelData();
 }
 
-void QmitkDataStorageDefaultListModel::NodeChanged(const mitk::DataNode* /*node*/)
+void QmitkDataStorageDefaultListModel::NodeChanged(const mitk::DataNode* node)
 {
-  // nothing here, since the "'NodeChanged'-event is currently sent far too often
-  //UpdateModelData();
+  // since the "NodeChanged" event is sent quite often, we check here, if it is relevant for this model
+  if (m_NodePredicate.IsNull() || m_NodePredicate->CheckNode(node))
+  {
+    UpdateModelData();
+    return;
+  }
+
+  // not relevant - need to check if we have to remove it
+  if (std::find(m_DataNodes.begin(), m_DataNodes.end(), node) != m_DataNodes.end())
+  {
+    UpdateModelData();
+  }
 }
 
 void QmitkDataStorageDefaultListModel::NodeRemoved(const mitk::DataNode* /*node*/)
@@ -146,7 +153,7 @@ void QmitkDataStorageDefaultListModel::UpdateModelData()
   if (!m_DataStorage.IsExpired())
   {
     auto dataStorage = m_DataStorage.Lock();
-    if (m_NodePredicate.IsNotNull())
+    if (dataStorage.IsNotNull() && m_NodePredicate.IsNotNull())
     {
       dataNodes = dataStorage->GetSubset(m_NodePredicate);
     }

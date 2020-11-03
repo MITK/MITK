@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "org_mitk_gui_qt_matchpoint_mapper_Activator.h"
 
@@ -23,19 +19,18 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Mitk
 #include <mitkImageAccessByItk.h>
 #include <mitkStatusBar.h>
-#include <mitkNodePredicateDataProperty.h>
 #include "mitkImageMappingHelper.h"
 #include "mitkMAPRegistrationWrapper.h"
 #include "mitkMatchPointPropertyTags.h"
 #include "mitkRegistrationHelper.h"
 #include <mitkResultNodeGenerationHelper.h>
 #include <mitkUIDHelper.h>
-#include <mitkAlgorithmHelper.h>
+#include <mitkMAPAlgorithmHelper.h>
 #include <mitkResultNodeGenerationHelper.h>
-#include <mitkNodePredicateDataType.h>
+#include <mitkNodePredicateFunction.h>
 #include <mitkNodePredicateOr.h>
 #include <mitkNodePredicateAnd.h>
-#include <mitkNodePredicateProperty.h>
+#include <mitkNodePredicateDataProperty.h>
 
 // Qmitk
 #include "QmitkMatchPointMapper.h"
@@ -60,12 +55,9 @@ void QmitkMatchPointMapper::SetFocus()
 
 void QmitkMatchPointMapper::CreateConnections()
 {
-    // show first page
-    m_Controls.m_tabs->setCurrentIndex(0);
-
-    connect(m_Controls.m_pbLockReg, SIGNAL(clicked()), this, SLOT(OnLockRegButtonPushed()));
-    connect(m_Controls.m_pbLockInput, SIGNAL(clicked()), this, SLOT(OnLockInputButtonPushed()));
-    connect(m_Controls.m_pbLockRef, SIGNAL(clicked()), this, SLOT(OnLockReferenceButtonPushed()));
+    connect(m_Controls.registrationNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointMapper::OnRegNodeSelectionChanged);
+    connect(m_Controls.inputNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointMapper::OnInputNodeSelectionChanged);
+    connect(m_Controls.referenceNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointMapper::OnReferenceNodeSelectionChanged);
 
     connect(m_Controls.m_cbManualRef, SIGNAL(clicked()), this, SLOT(OnManualRefChecked()));
     connect(m_Controls.m_cbLinkFactors, SIGNAL(clicked()), this, SLOT(OnLinkSampleFactorChecked()));
@@ -81,7 +73,7 @@ void QmitkMatchPointMapper::Error(QString msg)
     mitk::StatusBar::GetInstance()->DisplayErrorText(msg.toLatin1());
     MITK_ERROR << msg.toStdString().c_str();
 
-    m_Controls.m_teLog->append(QString("<font color='red'><b>") + msg + QString("</b></font>"));
+    m_Controls.m_teLog->append(QStringLiteral("<font color='red'><b>") + msg + QStringLiteral("</b></font>"));
 }
 
 void QmitkMatchPointMapper::CreateQtPartControl(QWidget* parent)
@@ -90,6 +82,31 @@ void QmitkMatchPointMapper::CreateQtPartControl(QWidget* parent)
     m_Controls.setupUi(parent);
 
     m_Parent = parent;
+
+    this->m_Controls.registrationNodeSelector->SetDataStorage(this->GetDataStorage());
+    this->m_Controls.registrationNodeSelector->SetSelectionIsOptional(true);
+    this->m_Controls.inputNodeSelector->SetDataStorage(this->GetDataStorage());
+    this->m_Controls.inputNodeSelector->SetSelectionIsOptional(false);
+    this->m_Controls.referenceNodeSelector->SetDataStorage(this->GetDataStorage());
+    this->m_Controls.referenceNodeSelector->SetSelectionIsOptional(false);
+
+    this->m_Controls.registrationNodeSelector->SetInvalidInfo("Select valid registration.");
+    this->m_Controls.registrationNodeSelector->SetEmptyInfo("Assuming identity mapping. Select registration to change.");
+    this->m_Controls.registrationNodeSelector->SetPopUpTitel("Select registration.");
+    this->m_Controls.registrationNodeSelector->SetPopUpHint("Select a registration object that should be used for the mapping of the input data. If no registration is selected, identity will be assumed for the mapping.");
+
+    this->m_Controls.inputNodeSelector->SetInvalidInfo("Select input data.");
+    this->m_Controls.inputNodeSelector->SetPopUpTitel("Select input data.");
+    this->m_Controls.inputNodeSelector->SetPopUpHint("Select the input data for the mapping. (Images or point sets are supported so far).");
+    this->m_Controls.referenceNodeSelector->SetInvalidInfo("Select the reference image.");
+    this->m_Controls.referenceNodeSelector->SetPopUpTitel("Select the reference image.");
+    this->m_Controls.referenceNodeSelector->SetPopUpHint("Select the reference image that specifies the target geometrie the input should be mapped into.");
+
+    this->ConfigureRegNodePredicate();
+    this->ConfigureNodePredicates();
+
+    // show first page
+    m_Controls.m_tabs->setCurrentIndex(0);
 
     this->CreateConnections();
     this->CheckInputs();
@@ -118,12 +135,7 @@ bool  QmitkMatchPointMapper::IsAbleToRefineGeometry() const
 
 bool  QmitkMatchPointMapper::IsBinaryInput() const
 {
-    mitk::NodePredicateDataType::Pointer isLabelSet = mitk::NodePredicateDataType::New("LabelSetImage");
-    mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New("Image");
-    mitk::NodePredicateProperty::Pointer isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
-    mitk::NodePredicateAnd::Pointer isLegacyMask = mitk::NodePredicateAnd::New(isImage, isBinary);
-
-    mitk::NodePredicateOr::Pointer maskPredicate = mitk::NodePredicateOr::New(isLegacyMask, isLabelSet);
+    auto maskPredicate = mitk::MITKRegistrationHelper::MaskNodePredicate();
 
     bool result = false;
 
@@ -142,45 +154,6 @@ bool  QmitkMatchPointMapper::IsPointSetInput() const
     if (this->m_spSelectedInputNode.IsNotNull())
     {
         result = dynamic_cast<const mitk::PointSet*>(this->m_spSelectedInputNode->GetData()) != nullptr;
-    }
-
-    return result;
-}
-
-mitk::DataNode::Pointer QmitkMatchPointMapper::GetSelectedRegNode()
-{
-    mitk::DataNode::Pointer spResult = nullptr;
-
-    typedef QList<mitk::DataNode::Pointer> NodeListType;
-
-    NodeListType nodes = this->GetDataManagerSelection();
-
-    for (NodeListType::iterator pos = nodes.begin(); pos != nodes.end(); ++pos)
-    {
-        if (mitk::MITKRegistrationHelper::IsRegNode(*pos))
-        {
-            spResult = *pos;
-            break;
-        }
-    }
-
-    return spResult;
-}
-
-
-QList<mitk::DataNode::Pointer> QmitkMatchPointMapper::GetSelectedDataNodes()
-{
-    typedef QList<mitk::DataNode::Pointer> NodeListType;
-
-    NodeListType nodes = this->GetDataManagerSelection();
-    NodeListType result;
-
-    for (NodeListType::iterator pos = nodes.begin(); pos != nodes.end(); ++pos)
-    {
-        if (!mitk::MITKRegistrationHelper::IsRegNode(*pos))
-        {
-            result.push_back(*pos);
-        }
     }
 
     return result;
@@ -207,235 +180,166 @@ mitk::DataNode::Pointer QmitkMatchPointMapper::GetAutoRefNodeByReg()
     {
         //no really reference is available -> use the input as reference
         spResult = this->m_spSelectedInputNode;
-        m_Controls.m_teLog->append(
-            QString("<font color='gray'><i>Cannot determine reference automatically. Use input image as reference.</i></font>"));
+        if (this->m_spSelectedRefNode != spResult)
+        {
+          m_Controls.m_teLog->append(
+            QStringLiteral("<font color='gray'><i>Cannot determine reference automatically. Use input image as reference.</i></font>"));
+        }
     }
 
     return spResult;
 }
 
+void QmitkMatchPointMapper::ConfigureRegNodePredicate(const mitk::DataNode* input)
+{
+  mitk::NodePredicateBase::ConstPointer nodePredicate = mitk::MITKRegistrationHelper::RegNodePredicate();
+
+  if (input != nullptr)
+  {
+    unsigned int dimension = 0;
+
+    auto inputImage = dynamic_cast<mitk::Image*>(input->GetData());
+    auto pointset = dynamic_cast<const mitk::PointSet*>(input->GetData());
+    if (inputImage)
+    {
+      dimension = inputImage->GetDimension();
+
+      if (inputImage->GetTimeSteps() > 1)
+      {
+        //images has multiple time steps -> remove one dimension.
+        dimension -= 1;
+      }
+    }
+    else if (pointset)
+    {
+      dimension = 3;
+    }
+
+    auto dimCheck = [dimension](const mitk::DataNode * node)
+    {
+      const mitk::MAPRegistrationWrapper* wrapper = dynamic_cast < const mitk::MAPRegistrationWrapper* >(node->GetData());
+
+      return wrapper != nullptr && wrapper->GetMovingDimensions() == dimension;
+    };
+    mitk::NodePredicateFunction::Pointer hasCorrectDim = mitk::NodePredicateFunction::New(dimCheck);
+
+    nodePredicate = mitk::NodePredicateAnd::New(nodePredicate, hasCorrectDim).GetPointer();
+  }
+
+  this->m_Controls.registrationNodeSelector->SetNodePredicate(nodePredicate);
+}
+
+std::function<bool(const mitk::DataNode *)> GenerateDimCheckLambda(unsigned int dim)
+{
+  auto dimCheck = [dim](const mitk::DataNode * node)
+  {
+    auto inputImage = dynamic_cast<mitk::Image*>(node->GetData());
+
+    return inputImage != nullptr &&
+      (inputImage->GetDimension() == dim ||
+      (inputImage->GetDimension() == dim + 1 && inputImage->GetTimeSteps()>1));
+  };
+
+  return dimCheck;
+}
+
+void QmitkMatchPointMapper::ConfigureNodePredicates(const mitk::DataNode* reg)
+{
+  auto isImage = mitk::MITKRegistrationHelper::ImageNodePredicate();
+  auto isPointSet = mitk::MITKRegistrationHelper::PointSetNodePredicate();
+
+  auto isData = mitk::NodePredicateOr::New(isImage, isPointSet);
+
+  mitk::NodePredicateBase::ConstPointer inputPredicate = isData.GetPointer();
+  mitk::NodePredicateBase::ConstPointer refPredicate = isImage.GetPointer();
+
+  if (reg != nullptr)
+  {
+    const mitk::MAPRegistrationWrapper* wrapper = dynamic_cast <const mitk::MAPRegistrationWrapper*>(reg->GetData());
+
+    if (wrapper != nullptr)
+    {
+      auto movingDim = wrapper->GetMovingDimensions();
+
+      auto dimCheck = GenerateDimCheckLambda(movingDim);
+      auto hasCorrectDim = mitk::NodePredicateFunction::New(dimCheck);
+
+      if (movingDim == 3)
+      {
+        //Remark: Point sets are always 3D
+        auto is3DInput = mitk::NodePredicateOr::New(isPointSet, mitk::NodePredicateAnd::New(isImage, hasCorrectDim));
+        inputPredicate = is3DInput.GetPointer();
+      }
+      else
+      {
+        auto is2DInput = mitk::NodePredicateAnd::New(isImage, hasCorrectDim);
+        inputPredicate = is2DInput.GetPointer();
+      }
+
+      auto targetDim = wrapper->GetTargetDimensions();
+
+      auto targetDimCheck = GenerateDimCheckLambda(targetDim);
+      auto hasCorrectTargetDim = mitk::NodePredicateFunction::New(targetDimCheck);
+
+      auto isRef = mitk::NodePredicateAnd::New(isImage, hasCorrectTargetDim);
+      refPredicate = isRef;
+
+    }
+  }
+  this->m_Controls.inputNodeSelector->SetNodePredicate(inputPredicate);
+  this->m_Controls.referenceNodeSelector->SetNodePredicate(refPredicate);
+}
+
 void QmitkMatchPointMapper::CheckInputs()
 {
-    mitk::DataNode::Pointer regNode = this->GetSelectedRegNode();
-
-    QList<mitk::DataNode::Pointer> dataNodes = this->GetSelectedDataNodes();
-
-    //first set the internal nodes according to selection
-    if (!m_Controls.m_pbLockReg->isChecked())
-    {
-        this->m_spSelectedRegNode = regNode;
-    }
-
-    if (!m_Controls.m_pbLockInput->isChecked())
-    {
-        mitk::DataNode::Pointer inputNode = nullptr;
-
-        if (dataNodes.size() > 0)
-        {
-            inputNode = dataNodes[0];
-        }
-
-        this->m_spSelectedInputNode = inputNode;
-    }
+    this->m_spSelectedRegNode = this->m_Controls.registrationNodeSelector->GetSelectedNode();
+    this->m_spSelectedInputNode = this->m_Controls.inputNodeSelector->GetSelectedNode();
+    this->m_spSelectedRefNode = this->m_Controls.referenceNodeSelector->GetSelectedNode();
 
     if (!(m_Controls.m_cbManualRef->isChecked()))
     {
-        this->m_spSelectedRefNode = this->GetAutoRefNodeByReg();
-    }
-    else
-    {
-        if (!m_Controls.m_pbLockRef->isChecked())
+        auto autoRefNode = this->GetAutoRefNodeByReg();
+        if (this->m_spSelectedRefNode != autoRefNode)
         {
-            mitk::DataNode::Pointer refNode = nullptr;
+          this->m_spSelectedRefNode = autoRefNode;
+          QmitkSingleNodeSelectionWidget::NodeList selection;
 
-            int relevantIndex = 1;
-
-            if (m_Controls.m_pbLockInput->isChecked())
-            {
-                //the input is locked thus use the first selected data node
-                relevantIndex = 0;
-            }
-
-            if (dataNodes.size() > relevantIndex)
-            {
-                refNode = dataNodes[relevantIndex];
-            }
-
-            this->m_spSelectedRefNode = refNode;
+          if (this->m_spSelectedRefNode.IsNotNull())
+          {
+            selection.append(this->m_spSelectedRefNode);
+          }
+          this->m_Controls.referenceNodeSelector->SetCurrentSelection(selection);
         }
     }
 
-    //second, check validity of the selected nodes
-    this->CheckNodesValidity(this->m_ValidReg, this->m_ValidInput, this->m_ValidRef);
-
-    //third, configure widgets
-    if (this->m_spSelectedRegNode.IsNull())
+    if (this->m_spSelectedRefNode.IsNotNull() && this->m_spSelectedRefNode->GetData()
+        && this->m_spSelectedRefNode->GetData()->GetTimeSteps() > 1)
     {
-        m_Controls.m_lbRegistrationName->setText(
-            QString("<font color='red'>no registration selected!</font>"));
-    }
-    else
-    {
-        if (this->m_ValidReg)
-        {
-            m_Controls.m_lbRegistrationName->setText(QString::fromStdString(
-                this->m_spSelectedRegNode->GetName()));
-        }
-        else
-        {
-            m_Controls.m_lbRegistrationName->setText(QString("<font color='red'>") + QString::fromStdString(
-                this->m_spSelectedRegNode->GetName()) + QString("</font>"));
-        }
-    }
-
-    if (this->m_spSelectedInputNode.IsNull())
-    {
-        m_Controls.m_lbInputName->setText(QString("<font color='red'>no input selected!</font>"));
-    }
-    else
-    {
-        if (this->m_ValidInput)
-        {
-            m_Controls.m_lbInputName->setText(QString::fromStdString(this->m_spSelectedInputNode->GetName()));
-        }
-        else
-        {
-            m_Controls.m_lbInputName->setText(QString("<font color='red'>") + QString::fromStdString(
-                this->m_spSelectedInputNode->GetName()) + QString("</font>"));
-        }
-
-    }
-
-    if (this->m_spSelectedRefNode.IsNull())
-    {
-        if (this->m_ValidRef)
-        {
-            m_Controls.m_lbReferenceName->setText(QString("input needs no reference needed"));
-        }
-        else
-        {
-            m_Controls.m_lbReferenceName->setText(QString("<font color='red'>no reference selected!</font>"));
-        }
-    }
-    else
-    {
-        if (this->m_ValidRef)
-        {
-            m_Controls.m_lbReferenceName->setText(QString::fromStdString(this->m_spSelectedRefNode->GetName()));
-
-            if (this->m_spSelectedRefNode->GetData()
-                && this->m_spSelectedRefNode->GetData()->GetTimeSteps() > 1)
-            {
-                m_Controls.m_teLog->append(
-                    QString("<font color='gray'><i>Selected reference image has multiple time steps. Only geometry of time step 1 is used as reference.</i></font>"));
-            }
-        }
-        else
-        {
-            m_Controls.m_lbReferenceName->setText(QString("<font color='red'>") + QString::fromStdString(
-                this->m_spSelectedRefNode->GetName()) + QString("</font>"));
-        }
-    }
-
-    this->m_Controls.m_pbLockInput->setEnabled(this->m_spSelectedInputNode.IsNotNull());
-    this->m_Controls.m_pbLockReg->setEnabled(this->m_spSelectedRegNode.IsNotNull());
-    this->m_Controls.m_pbLockRef->setEnabled(this->m_spSelectedRefNode.IsNotNull());
-}
-
-
-void QmitkMatchPointMapper::CheckNodesValidity(bool& validReg, bool& validInput, bool& validRef)
-{
-    validReg = this->m_spSelectedRegNode.IsNotNull();
-    validInput = this->m_spSelectedInputNode.IsNotNull();
-    validRef = this->m_spSelectedRefNode.IsNotNull();
-
-    if (this->m_spSelectedRegNode.IsNotNull())
-    {
-        if (this->m_spSelectedInputNode.IsNotNull())
-        {
-            validInput = false;
-
-            const mitk::MAPRegistrationWrapper* wrapper = dynamic_cast < const mitk::MAPRegistrationWrapper* >
-                (m_spSelectedRegNode->GetData());
-            mitk::Image* inputImage = dynamic_cast<mitk::Image*>(m_spSelectedInputNode->GetData());
-
-            if (inputImage && wrapper)
-            {
-                if (inputImage->GetDimension() - 1 == wrapper->GetMovingDimensions()
-                    && inputImage->GetTimeSteps() > 1)
-                {
-                    //images has multiple time steps and a time step has the correct dimensionality
-                    validInput = true;
-                }
-
-                if (inputImage->GetDimension() == wrapper->GetMovingDimensions())
-                {
-                    validInput = true;
-                }
-            }
-
-            if (this->IsPointSetInput() && wrapper)
-            {
-                if (wrapper->GetMovingDimensions() == 3)
-                {
-                    validInput = true;
-                }
-            }
-        }
-
-        if (this->m_spSelectedRefNode.IsNotNull())
-        {
-            validRef = false;
-
-            const mitk::MAPRegistrationWrapper* wrapper = dynamic_cast < const mitk::MAPRegistrationWrapper* >
-                (m_spSelectedRegNode->GetData());
-            mitk::BaseGeometry* geometry = nullptr;
-
-            if (m_spSelectedRefNode->GetData())
-            {
-                geometry = m_spSelectedRefNode->GetData()->GetGeometry();
-            }
-
-            if (geometry && wrapper)
-            {
-                if (wrapper->GetTargetDimensions() == 3)
-                {
-                    validRef = true;
-                }
-                else if (wrapper->GetTargetDimensions() == 2)
-                {
-                    mitk::BaseGeometry::BoundsArrayType bounds = geometry->GetBounds();
-
-                    if (bounds[4] != 0 || bounds[5] != 0)
-                    {
-                        //array "bounds" is constructed as [min Dim1, max Dim1, min Dim2, max Dim2, min Dim3, max Dim3]
-                        //therfore [4] and [5] must be 0
-
-                        validRef = true;
-                    }
-
-                }
-            }
-        }
-        else if (this->IsPointSetInput())
-        {
-            validRef = true;
-        }
+        m_Controls.m_teLog->append(
+          QStringLiteral("<font color='gray'><i>Selected reference image has multiple time steps. Only geometry of time step 1 is used as reference.</i></font>"));
     }
 }
 
 void QmitkMatchPointMapper::ConfigureMappingControls()
 {
-    this->m_Controls.m_pbMap->setEnabled(this->m_ValidInput  && this->m_ValidRef && (this->m_ValidReg || this->m_spSelectedRegNode.IsNull()));
-    this->m_Controls.m_pbRefine->setEnabled(this->m_ValidInput && this->m_ValidReg
-        && this->IsAbleToRefineGeometry() && !this->IsPointSetInput());
-    this->m_Controls.m_pbLockRef->setEnabled(this->m_Controls.m_cbManualRef->isChecked());
-    this->m_Controls.m_lbReferenceName->setEnabled(this->m_Controls.m_cbManualRef->isChecked());
+    bool validInput = m_spSelectedInputNode.IsNotNull();
+    bool validRef = m_spSelectedRefNode.IsNotNull();
 
-    if (this->m_ValidInput && this->m_ValidReg)
+    this->m_Controls.referenceNodeSelector->setEnabled(this->m_Controls.m_cbManualRef->isChecked());
+    this->m_Controls.m_pbMap->setEnabled(validInput  && validRef);
+    this->m_Controls.m_pbRefine->setEnabled(validInput && this->IsAbleToRefineGeometry() && !this->IsPointSetInput());
+
+    if (validInput)
     {
-        this->m_Controls.m_leMappedName->setText(tr("mapped_by_") + QString::fromStdString(
-            m_spSelectedRegNode->GetName()));
+      if (m_spSelectedRegNode.IsNotNull())
+      {
+        this->m_Controls.m_leMappedName->setText(tr("mapped_") + QString::fromStdString(m_spSelectedInputNode->GetName())
+          + tr("_by_") + QString::fromStdString(m_spSelectedRegNode->GetName()));
+      }
+      else
+      {
+        this->m_Controls.m_leMappedName->setText(tr("resampled_") + QString::fromStdString(m_spSelectedInputNode->GetName()));
+      }
     }
     else
     {
@@ -447,7 +351,7 @@ void QmitkMatchPointMapper::ConfigureMappingControls()
         if (this->IsBinaryInput())
         {
             m_Controls.m_teLog->append(
-                QString("<font color='gray'><i>Binary input (mask) detected. Preparing for mask mapping (default interpolation: nearest neigbour; padding value: 0)</i></font>"));
+              QStringLiteral("<font color='gray'><i>Binary input (mask) detected. Preparing for mask mapping (default interpolation: nearest neigbour; padding value: 0)</i></font>"));
 
             this->m_Controls.m_comboInterpolator->setCurrentIndex(0);
             this->m_Controls.m_sbErrorValue->setValue(0);
@@ -469,56 +373,36 @@ void QmitkMatchPointMapper::ConfigureProgressInfos()
 
 }
 
-void QmitkMatchPointMapper::OnSelectionChanged(berry::IWorkbenchPart::Pointer,
-    const QList<mitk::DataNode::Pointer>&)
+void QmitkMatchPointMapper::OnRegNodeSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
 {
-    this->CheckInputs();
-    this->ConfigureMappingControls();
+  mitk::DataNode::Pointer regNode;
+  if (!nodes.isEmpty())
+  {
+    regNode = nodes.front();
+  }
+
+  this->ConfigureNodePredicates(regNode);
+  this->CheckInputs();
+  this->ConfigureMappingControls();
 }
 
-void QmitkMatchPointMapper::OnLockRegButtonPushed()
+void QmitkMatchPointMapper::OnInputNodeSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
 {
-    if (this->m_Controls.m_pbLockReg->isChecked())
-    {
-        if (this->m_spSelectedRegNode.IsNotNull())
-        {
-            this->m_spSelectedRegNode->SetSelected(false);
-            this->GetDataStorage()->Modified();
-        }
-    }
+  mitk::DataNode::Pointer inputNode;
+  if (!nodes.isEmpty())
+  {
+    inputNode = nodes.front();
+  }
 
-    this->CheckInputs();
-    this->ConfigureMappingControls();
+  this->ConfigureRegNodePredicate(inputNode);
+  this->CheckInputs();
+  this->ConfigureMappingControls();
 }
 
-void QmitkMatchPointMapper::OnLockInputButtonPushed()
+void QmitkMatchPointMapper::OnReferenceNodeSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/)
 {
-    if (this->m_Controls.m_pbLockInput->isChecked())
-    {
-        if (this->m_spSelectedInputNode.IsNotNull())
-        {
-            this->m_spSelectedInputNode->SetSelected(false);
-            this->GetDataStorage()->Modified();
-        }
-    }
-
-    this->CheckInputs();
-    this->ConfigureMappingControls();
-}
-
-void QmitkMatchPointMapper::OnLockReferenceButtonPushed()
-{
-    if (this->m_Controls.m_pbLockRef->isChecked())
-    {
-        if (this->m_spSelectedRefNode.IsNotNull())
-        {
-            this->m_spSelectedRefNode->SetSelected(false);
-            this->GetDataStorage()->Modified();
-        }
-    }
-
-    this->CheckInputs();
-    this->ConfigureMappingControls();
+  this->CheckInputs();
+  this->ConfigureMappingControls();
 }
 
 void QmitkMatchPointMapper::OnManualRefChecked()
@@ -573,7 +457,7 @@ void QmitkMatchPointMapper::SpawnMappingJob(bool doGeometryRefinement)
         pJob->m_spRegNode->SetData(mitk::GenerateIdentityRegistration3D().GetPointer());
         pJob->m_spRegNode->SetName("Auto_Generated_Identity_Transform");
         m_Controls.m_teLog->append(
-            QString("<font color='gray'><i>No registration selected. Preforming mapping with identity transform</i></font>"));
+          QStringLiteral("<font color='gray'><i>No registration selected. Preforming mapping with identity transform</i></font>"));
     }
 
     if (!doGeometryRefinement)
@@ -651,8 +535,8 @@ void QmitkMatchPointMapper::SpawnMappingJob(bool doGeometryRefinement)
         Qt::BlockingQueuedConnection);
     connect(pJob, SIGNAL(AlgorithmInfo(QString)), this, SLOT(OnMappingInfo(QString)));
 
-    m_Controls.m_teLog->append(QString("<b><font color='blue'>Started mapping job. Name: ") +
-        m_Controls.m_leMappedName->text() + QString("</font></b>"));
+    m_Controls.m_teLog->append(QStringLiteral("<b><font color='blue'>Started mapping job. Name: ") +
+        m_Controls.m_leMappedName->text() + QStringLiteral("</font></b>"));
 
     QThreadPool* threadPool = QThreadPool::globalInstance();
     threadPool->start(pJob);
@@ -663,13 +547,13 @@ void QmitkMatchPointMapper::SpawnMappingJob(bool doGeometryRefinement)
 void QmitkMatchPointMapper::OnMapJobError(QString err)
 {
     Error(err);
-};
+}
 
 void QmitkMatchPointMapper::OnMapResultIsAvailable(mitk::BaseData::Pointer spMappedData,
     const QmitkMappingJob* job)
 {
-    m_Controls.m_teLog->append(QString("<b><font color='blue'>Mapped entity stored. Name: ") +
-        QString::fromStdString(job->m_MappedName) + QString("</font></b>"));
+    m_Controls.m_teLog->append(QStringLiteral("<b><font color='blue'>Mapped entity stored. Name: ") +
+        QString::fromStdString(job->m_MappedName) + QStringLiteral("</font></b>"));
 
     mitk::DataNode::Pointer spMappedNode = mitk::generateMappedResultNode(job->m_MappedName,
         spMappedData, job->GetRegistration()->getRegistrationUID(), job->m_InputDataUID,
@@ -679,12 +563,12 @@ void QmitkMatchPointMapper::OnMapResultIsAvailable(mitk::BaseData::Pointer spMap
 
     this->CheckInputs();
     this->ConfigureMappingControls();
-};
+}
 
 void QmitkMatchPointMapper::OnMappingInfo(QString info)
 {
-    m_Controls.m_teLog->append(QString("<font color='gray'><i>") + info + QString("</i></font>"));
-};
+    m_Controls.m_teLog->append(QStringLiteral("<font color='gray'><i>") + info + QStringLiteral("</i></font>"));
+}
 
 void QmitkMatchPointMapper::OnXFactorChanged(double d)
 {

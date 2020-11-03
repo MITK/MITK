@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef BASEDATA_H_HEADER_INCLUDED_C1EBB6FA
 #define BASEDATA_H_HEADER_INCLUDED_C1EBB6FA
@@ -37,12 +33,17 @@ namespace mitk
   //## Base of all data objects, e.g., images, contours, surfaces etc. Inherits
   //## from itk::DataObject and thus can be included in a pipeline.
   //## Inherits also from OperationActor and can be used as a destination for Undo
+  //## @remark Some derived classes may support the persistence of the Identifiable UID.
+  //** but it is no guaranteed feature and also depends on the format the data is stored in
+  //** as not all formats support storing of meta information. Please check the documentation
+  //** of the IFileReader and IFileWriter classes to see if the ID-persistance is supported.
+  //** MITK SceneIO supports the UID persistance for all BaseData derived classes.
   //## @ingroup Data
   class MITKCORE_EXPORT BaseData
     : public itk::DataObject, public OperationActor, public Identifiable, public IPropertyOwner
   {
   public:
-    mitkClassMacroItkParent(BaseData, itk::DataObject)
+    mitkClassMacroItkParent(BaseData, itk::DataObject);
 
     // IPropertyProvider
     BaseProperty::ConstPointer GetConstProperty(const std::string &propertyKey, const std::string &contextName = "", bool fallBackOnDefaultContext = true) const override;

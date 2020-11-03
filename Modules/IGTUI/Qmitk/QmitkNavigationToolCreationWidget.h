@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QmitkNavigationToolCreationWidget_H
 #define QmitkNavigationToolCreationWidget_H
@@ -126,7 +122,7 @@ protected:
 
   Ui::QmitkNavigationToolCreationWidgetControls* m_Controls;
 
-  /** @brief this pointer holds the tool which is edited. If finished is clicked, it will be copied to the final tool, if it is cancled, it is reseted and not used. 
+  /** @brief this pointer holds the tool which is edited. If finished is clicked, it will be copied to the final tool, if it is cancled, it is reseted and not used.
       This can be regarded as the clipboard for all changes.  */
   mitk::NavigationTool::Pointer m_ToolToBeEdited;
 

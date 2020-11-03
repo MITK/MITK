@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical Image Computing.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QMITKABSTRACTDATASTORAGEMODEL_H
 #define QMITKABSTRACTDATASTORAGEMODEL_H
@@ -47,7 +43,7 @@ class MITKQTWIDGETS_EXPORT QmitkAbstractDataStorageModel : public QAbstractItemM
 
 public:
 
-  virtual ~QmitkAbstractDataStorageModel();
+  ~QmitkAbstractDataStorageModel() override;
   /*
   * @brief Sets the data storage and adds listener for node events.
   *
@@ -55,15 +51,15 @@ public:
   */
   void SetDataStorage(mitk::DataStorage* dataStorage);
 
-  mitk::DataStorage* GetDataStorage() { return m_DataStorage.Lock().GetPointer(); }
+  mitk::DataStorage* GetDataStorage() const;
   /*
   * @brief Sets the node predicate and updates the model data, according to the node predicate.
   *
   * @param nodePredicate    A pointer to node predicate.
   */
-  void SetNodePredicate(mitk::NodePredicateBase* nodePredicate);
+  void SetNodePredicate(const mitk::NodePredicateBase* nodePredicate);
 
-  mitk::NodePredicateBase* GetNodePredicate() { return m_NodePredicate; }
+  const mitk::NodePredicateBase* GetNodePredicate() const { return m_NodePredicate; }
 
 protected:
 
@@ -78,7 +74,7 @@ protected:
   QmitkAbstractDataStorageModel(mitk::DataStorage* dataStorage, QObject* parent = nullptr);
 
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
-  mitk::NodePredicateBase::Pointer m_NodePredicate;
+  mitk::NodePredicateBase::ConstPointer m_NodePredicate;
 
 private:
 

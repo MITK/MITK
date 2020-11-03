@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkPATissueGeneratorParameters.h"
 
@@ -22,14 +18,15 @@ mitk::pa::TissueGeneratorParameters::TissueGeneratorParameters()
   m_YDim = 50;
   m_ZDim = 50;
   m_VoxelSpacingInCentimeters = 1;
-  m_VolumeSmoothingSigma = 0;
-  m_DoVolumeSmoothing = false;
+  m_DoPartialVolume = false;
   m_UseRngSeed = false;
   m_RngSeed = 1337L;
   m_RandomizePhysicalProperties = false;
   m_RandomizePhysicalPropertiesPercentage = 0;
+  m_ForceVesselsMoveAlongYDirection = false;
 
-  m_BackgroundAbsorption = 0.1;
+  m_MinBackgroundAbsorption = 0.1;
+  m_MaxBackgroundAbsorption = 0.1;
   m_BackgroundScattering = 15;
   m_BackgroundAnisotropy = 0.9;
   m_AirAbsorption = 0.0001;
@@ -41,7 +38,7 @@ mitk::pa::TissueGeneratorParameters::TissueGeneratorParameters()
   m_SkinAnisotropy = 0.9;
   m_SkinThicknessInMillimeters = 0;
 
-  m_CalculateNewVesselPositionCallback = &VesselMeanderStrategy::CalculateRandomlyDivergingPosition;
+  m_CalculateNewVesselPositionCallback = &VesselMeanderStrategy::CalculateNewRandomlyDivergingDirectionVector;
   m_MinNumberOfVessels = 0;
   m_MaxNumberOfVessels = 0;
   m_MinVesselBending = 0;

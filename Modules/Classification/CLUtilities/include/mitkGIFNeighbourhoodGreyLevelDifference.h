@@ -1,3 +1,15 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
 #ifndef mitkGIFNeighbourhoodGreyLevelDifference_h
 #define mitkGIFNeighbourhoodGreyLevelDifference_h
 
@@ -10,42 +22,34 @@ namespace mitk
   class MITKCLUTILITIES_EXPORT GIFNeighbourhoodGreyLevelDifference : public AbstractGlobalImageFeature
   {
   public:
-    mitkClassMacro(GIFNeighbourhoodGreyLevelDifference,AbstractGlobalImageFeature)
-      itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    mitkClassMacro(GIFNeighbourhoodGreyLevelDifference,AbstractGlobalImageFeature);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
-      GIFNeighbourhoodGreyLevelDifference();
+    GIFNeighbourhoodGreyLevelDifference();
 
-    /**
-    * \brief Calculates the Cooccurence-Matrix based features for this class.
-    */
-    FeatureListType CalculateFeatures(const Image::Pointer & image, const Image::Pointer &feature) override;
+    FeatureListType CalculateFeatures(const Image* image, const Image* mask, const Image* maskNoNAN) override;
+    using Superclass::CalculateFeatures;
 
-    /**
-    * \brief Returns a list of the names of all features that are calculated from this class
-    */
-    FeatureNameListType GetFeatureNames() override;
+    itkGetConstMacro(Ranges, std::vector<double>);
+    void SetRanges(std::vector<double> ranges);
+    void SetRange(double range);
 
-    itkGetConstMacro(Range,double);
-    itkSetMacro(Range, double);
+    itkGetConstMacro(UseCTRange, bool);
+    itkSetMacro(UseCTRange, bool);
 
-    itkGetConstMacro(UseCtRange, bool);
-    itkSetMacro(UseCtRange, bool);
+    void AddArguments(mitkCommandLineParser &parser) const override;
 
-    virtual void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList);
-    virtual void AddArguments(mitkCommandLineParser &parser);
+  protected:
+    std::string GenerateLegacyFeatureName(const FeatureID& id) const override;
 
+    FeatureListType DoCalculateFeatures(const Image* image, const Image* mask) override;
 
-    struct ParameterStruct
-    {
-      bool  m_UseCtRange;
-      double m_Range;
-      unsigned int m_Direction;
-    };
+    void ConfigureSettingsByParameters(const ParametersType& parameters) override;
 
   private:
-    double m_Range;
-    bool m_UseCtRange;
+    std::vector<double> m_Ranges;
+    bool m_UseCTRange;
   };
 }
 #endif //mitkGIFNeighbourhoodGreyLevelDifference_h

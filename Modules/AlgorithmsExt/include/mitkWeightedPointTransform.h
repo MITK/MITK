@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef __WEIGHTEDPOINTTRANSFORM_H__
 #define __WEIGHTEDPOINTTRANSFORM_H__
@@ -71,18 +67,18 @@ namespace mitk
   public:
     mitkClassMacroItkParent(WeightedPointTransform, itk::Object);
     itkFactorylessNewMacro(Self);
-    itkCloneMacro(Self)
+    itkCloneMacro(Self);
 
       /** @brief Method which registers both point sets. */
       void ComputeTransformation();
 
     /** @brief Sets the threshold of the registration. Default value is 0.0001.*/
-    itkSetMacro(Threshold, double)
+    itkSetMacro(Threshold, double);
 
       /** @brief Sets the maximum number of iterations of the registration.
         * Default value is 1000.
         */
-      itkSetMacro(MaxIterations, double)
+      itkSetMacro(MaxIterations, double);
 
       /** @return Returns the number of iterations of the last run
         * of the registration algorithm. Returns -1 if there was no

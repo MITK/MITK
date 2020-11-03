@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkMultilabelObjectFactory.h"
 
@@ -86,31 +82,31 @@ void mitk::MultilabelObjectFactory::SetDefaultProperties(mitk::DataNode *node)
   }
 }
 
-const char *mitk::MultilabelObjectFactory::GetFileExtensions()
+std::string mitk::MultilabelObjectFactory::GetFileExtensions()
 {
   std::string fileExtension;
-  this->CreateFileExtensions(m_FileExtensionsMap, fileExtension);
+  this->CreateFileExtensions({}, fileExtension);
   return fileExtension.c_str();
 }
 
 mitk::CoreObjectFactoryBase::MultimapType mitk::MultilabelObjectFactory::GetFileExtensionsMap()
 {
-  return m_FileExtensionsMap;
+  return {};
 }
 
 mitk::CoreObjectFactoryBase::MultimapType mitk::MultilabelObjectFactory::GetSaveFileExtensionsMap()
 {
-  return m_SaveFileExtensionsMap;
+  return {};
 }
 
 void mitk::MultilabelObjectFactory::CreateFileExtensionsMap()
 {
 }
 
-const char *mitk::MultilabelObjectFactory::GetSaveFileExtensions()
+std::string mitk::MultilabelObjectFactory::GetSaveFileExtensions()
 {
   std::string fileExtension;
-  this->CreateFileExtensions(m_SaveFileExtensionsMap, fileExtension);
+  this->CreateFileExtensions({}, fileExtension);
   return fileExtension.c_str();
 }
 

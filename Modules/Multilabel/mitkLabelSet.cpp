@@ -1,20 +1,18 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkLabelSet.h"
+#include "mitkDICOMSegmentationPropertyHelper.h"
+
 #include <itkCommand.h>
 
 mitk::LabelSet::LabelSet() : m_ActiveLabelValue(0), m_Layer(0)
@@ -131,6 +129,9 @@ void mitk::LabelSet::AddLabel(mitk::Label *label)
   m_LabelContainer[pixelValue] = newLabel;
   UpdateLookupTable(pixelValue);
 
+  // add DICOM information of the label
+  DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(newLabel);
+
   itk::SimpleMemberCommand<LabelSet>::Pointer command = itk::SimpleMemberCommand<LabelSet>::New();
   command->SetCallbackFunction(this, &LabelSet::OnLabelModified);
   newLabel->AddObserver(itk::ModifiedEvent(), command);
@@ -157,6 +158,9 @@ void mitk::LabelSet::RenameLabel(PixelType pixelValue, const std::string &name, 
   mitk::Label *label = GetLabel(pixelValue);
   label->SetName(name);
   label->SetColor(color);
+
+  // change DICOM information of the label
+  DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(label);
 }
 
 void mitk::LabelSet::SetLookupTable(mitk::LookupTable *lut)
@@ -174,7 +178,7 @@ void mitk::LabelSet::RemoveLabel(PixelType pixelValue)
   auto it = m_LabelContainer.rbegin();
   PixelType nextActivePixelValue = it->first;
 
-  for (; it != m_LabelContainer.rend(); it++)
+  for (; it != m_LabelContainer.rend(); ++it)
   {
     if (it->first == pixelValue)
     {
@@ -207,6 +211,28 @@ void mitk::LabelSet::RemoveAllLabels()
     m_LabelContainer.erase(_it++);
   }
   AllLabelsModifiedEvent.Send();
+}
+
+void mitk::LabelSet::SetNextActiveLabel()
+{
+  auto it = m_LabelContainer.begin();
+
+  for (; it != m_LabelContainer.end(); ++it)
+  {
+    if (it->first == m_ActiveLabelValue)
+    {
+      // go to next label
+      ++it;
+      if (it == m_LabelContainer.end())
+      {
+        // end of container; next label is first label
+        it = m_LabelContainer.begin();
+      }
+      break; // found the active label; finish loop
+    }
+  }
+
+  SetActiveLabel(it->first);
 }
 
 void mitk::LabelSet::SetAllLabelsLocked(bool value)

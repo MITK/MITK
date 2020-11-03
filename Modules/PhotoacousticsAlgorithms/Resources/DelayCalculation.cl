@@ -1,44 +1,15 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
+============================================================================*/
 
-===================================================================*/
-
-__kernel void ckDelayCalculationQuad(  __global unsigned short *gDest,
-                         __global unsigned short *usedLines,
-                         unsigned int inputL,
-                         unsigned int inputS,
-                         unsigned int outputL,
-                         unsigned int outputS,
-                         char isPAImage,
-                         float delayMultiplicatorRaw // parameters
-                         )
-{
-  uint globalPosX = get_global_id(0);
-  uint globalPosY = get_global_id(1);
-
-  if (globalPosX * 2 < outputL && globalPosY < outputS)
-  {
-    float l_i = 0; // we calculate the delays relative to line zero
-    float s_i = (float)globalPosY / (float)outputS * (float)inputS / 2;
-
-    float l_s = (float)globalPosX / (float)outputL * (float)inputL; // the currently calculated line
-
-    float delayMultiplicator = delayMultiplicatorRaw / s_i;
-    gDest[globalPosY * (outputL / 2) + globalPosX] = delayMultiplicator * pow((l_s - l_i), 2) + s_i + (1-isPAImage)*s_i;
-  }
-}
- 
 __kernel void ckDelayCalculationSphe(  __global unsigned short *gDest,
                          __global unsigned short *usedLines,
                          unsigned int inputL,
@@ -46,7 +17,8 @@ __kernel void ckDelayCalculationSphe(  __global unsigned short *gDest,
                          unsigned int outputL,
                          unsigned int outputS,
                          char isPAImage,
-                         float delayMultiplicatorRaw // parameters
+                         float delayMultiplicatorRaw,
+                         float totalSamples_i // parameters
                          )
 {
   uint globalPosX = get_global_id(0);
@@ -55,8 +27,7 @@ __kernel void ckDelayCalculationSphe(  __global unsigned short *gDest,
   if (globalPosX * 2 < outputL && globalPosY < outputS)
   {
     float l_i = 0; // we calculate the delays relative to line zero
-    float s_i = (float)globalPosY / (float)outputS * (float)inputS / 2;
-
+    float s_i = (float)globalPosY / (float)outputS * totalSamples_i;
     float l_s = (float)globalPosX / (float)outputL * (float)inputL; // the currently calculated line
 
     gDest[globalPosY * (outputL / 2) + globalPosX] =

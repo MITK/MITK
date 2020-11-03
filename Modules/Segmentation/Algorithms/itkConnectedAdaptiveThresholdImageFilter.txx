@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef _itkConnectedAdaptiveThresholdImageFilter_txx
 #define _itkConnectedAdaptiveThresholdImageFilter_txx
@@ -30,7 +26,16 @@ namespace itk
   */
   template <class TInputImage, class TOutputImage>
   ConnectedAdaptiveThresholdImageFilter<TInputImage, TOutputImage>::ConnectedAdaptiveThresholdImageFilter()
-    : m_FineDetectionMode(false)
+    : m_OutoutImageMaskFineSegmentation(nullptr),
+      m_GrowingDirectionIsUpwards(true),
+      m_SeedpointValue(0),
+      m_DetectedLeakagePoint(0),
+      m_InitValue(0),
+      m_AdjLowerTh(0),
+      m_AdjUpperTh(0),
+      m_FineDetectionMode(false),
+      m_DiscardLastPreview(false),
+      m_SegmentationCancelled(false)
   {
   }
 
@@ -273,7 +278,7 @@ namespace itk
     itk::Index<3> seedPoint,
     bool discardLeafSegmentation)
   {
-    // just to make sure we´re in the right mode and the mask exsits
+    // just to make sure weÂ´re in the right mode and the mask exsits
     if (m_FineDetectionMode && iteratorMaskForFineSegmentation)
     {
       m_OutoutImageMaskFineSegmentation = iteratorMaskForFineSegmentation;

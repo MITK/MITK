@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 #ifndef _itkIntelligentBinaryClosingFilter_txx
 #define _itkIntelligentBinaryClosingFilter_txx
 
@@ -22,7 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace itk
 {
   template <class TInputImage, class TOutputImage>
-  IntelligentBinaryClosingFilter<TInputImage, TOutputImage>::IntelligentBinaryClosingFilter()
+  IntelligentBinaryClosingFilter<TInputImage, TOutputImage>::IntelligentBinaryClosingFilter(): m_ClosingRadius(4.0), m_SurfaceRatio(70)
   {
     m_ErodeImageFilter = BinaryErodeImageFilterType::New();
     m_DilateImageFilter = BinaryDilateImageFilterType::New();
@@ -31,8 +27,6 @@ namespace itk
     m_RelabelComponentImageFilter = RelabelComponentImageFilterType::New();
     m_RelabelComponentImageFilter->SetInPlace(true);
     m_BorderDetectionDilateFilter = DilateComponentImageFilterType::New();
-    m_ClosingRadius = 4.0;
-    m_SurfaceRatio = 70;
   }
 
   template <class TInputImage, class TOutputImage>

@@ -1,3 +1,15 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
 #ifndef mitkGIFGreyLevelRunLength_h
 #define mitkGIFGreyLevelRunLength_h
 
@@ -81,39 +93,20 @@ namespace mitk
   class MITKCLUTILITIES_EXPORT GIFGreyLevelRunLength : public AbstractGlobalImageFeature
   {
   public:
-    mitkClassMacro(GIFGreyLevelRunLength,AbstractGlobalImageFeature)
-      itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    mitkClassMacro(GIFGreyLevelRunLength,AbstractGlobalImageFeature);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
-      GIFGreyLevelRunLength();
+    GIFGreyLevelRunLength();
 
-    /**
-    * \brief Calculates the Cooccurence-Matrix based features for this class.
-    */
-    virtual FeatureListType CalculateFeatures(const Image::Pointer & image, const Image::Pointer &feature) override;
+    FeatureListType CalculateFeatures(const Image* image, const Image* mask, const Image* maskNoNAN) override;
+    using Superclass::CalculateFeatures;
 
-    /**
-    * \brief Returns a list of the names of all features that are calculated from this class
-    */
-    virtual FeatureNameListType GetFeatureNames() override;
+    void AddArguments(mitkCommandLineParser &parser) const override;
 
-    virtual void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList);
-    virtual void AddArguments(mitkCommandLineParser &parser);
+  protected:
 
-    virtual std::string GetCurrentFeatureEncoding() override;
-
-    struct ParameterStruct
-    {
-      unsigned int m_Direction;
-
-      double MinimumIntensity;
-      double MaximumIntensity;
-      int Bins;
-      std::string featurePrefix;
-    };
-
-  private:
-
+    FeatureListType DoCalculateFeatures(const Image* image, const Image* mask) override;
   };
 }
 #endif //mitkGIFGreyLevelRunLength_h

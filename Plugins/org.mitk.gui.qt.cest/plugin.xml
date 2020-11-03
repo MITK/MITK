@@ -2,11 +2,17 @@
 <plugin>
 
   <extension point="org.blueberry.ui.views">
-    <view id="org.mitk.views.ceststatistics"
+    <view id="org.mitk.views.cest.statistics"
           name="CEST Statistics"
           class="QmitkCESTStatisticsView"
           icon="resources/icon.svg"
 		  category="CEST"/>
   </extension>
-
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.cest.normalization"
+          name="CEST normalization"
+          class="QmitkCESTNormalizeView"
+          icon="resources/cest_normalize.svg"
+		  category="CEST"/>
+  </extension>
 </plugin>

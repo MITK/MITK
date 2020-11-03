@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QmitkUltrasoundSupport_h
 #define QmitkUltrasoundSupport_h
@@ -53,14 +49,14 @@ class QmitkUltrasoundSupport : public QmitkAbstractView
 
 public:
 
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
   static const std::string VIEW_ID;
 
-  virtual void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget *parent) override;
 
   QmitkUltrasoundSupport();
-  virtual ~QmitkUltrasoundSupport();
+  ~QmitkUltrasoundSupport() override;
 
   public slots:
   /*
@@ -169,6 +165,17 @@ protected:
   QList<ctkServiceReference>    m_CustomWidgetServiceReference;
 
   double m_CurrentDynamicRange;
+
+  /* Spacing calibration variables and methods */
+  mitk::Point3D m_Xpoint1,m_Xpoint2,m_Ypoint1,m_Ypoint2;
+  double m_XSpacing, m_YSpacing;
+  double ComputeSpacing(mitk::Point3D p1, mitk::Point3D p2, double distance);
+  protected slots:
+  void SetXPoint1();
+  void SetXPoint2();
+  void SetYPoint1();
+  void SetYPoint2();
+  void WriteSpacingToDevice();
 };
 
 #endif // UltrasoundSupport_h

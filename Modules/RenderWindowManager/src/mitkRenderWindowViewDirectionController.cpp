@@ -1,22 +1,18 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkRenderWindowViewDirectionController.h"
 
-// mitk
+// mitk core
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateAnd.h>
@@ -45,17 +41,16 @@ void mitk::RenderWindowViewDirectionController::SetControlledRenderer(RenderWind
   }
 }
 
-void mitk::RenderWindowViewDirectionController::SetViewDirectionOfRenderer(const std::string &viewDirection, BaseRenderer* renderer /*=nullptr*/)
+void mitk::RenderWindowViewDirectionController::SetViewDirectionOfRenderer(const std::string& viewDirection, BaseRenderer* renderer/* =nullptr*/)
 {
   if (nullptr == renderer)
   {
-
     // set visibility of data node in all controlled renderer
     for (auto& renderer : m_ControlledRenderer)
     {
-      if (renderer.IsNotNull())
+      if (nullptr != renderer)
       {
-        //SetViewDirectionOfRenderer(viewDirection, renderer);
+        SetViewDirectionOfRenderer(viewDirection, renderer);
       }
     }
   }
@@ -64,16 +59,48 @@ void mitk::RenderWindowViewDirectionController::SetViewDirectionOfRenderer(const
     mitk::SliceNavigationController* sliceNavigationController = renderer->GetSliceNavigationController();
     if ("axial" == viewDirection)
     {
-      sliceNavigationController->SetDefaultViewDirection(mitk::SliceNavigationController::Axial);
+      sliceNavigationController->SetDefaultViewDirection(ViewDirection::Axial);
     }
     else if ("coronal" == viewDirection)
     {
-      sliceNavigationController->SetDefaultViewDirection(mitk::SliceNavigationController::Frontal);
+      sliceNavigationController->SetDefaultViewDirection(ViewDirection::Frontal);
     }
     else if ("sagittal" == viewDirection)
     {
-      sliceNavigationController->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
+      sliceNavigationController->SetDefaultViewDirection(ViewDirection::Sagittal);
     }
+
+    if ("3D" == viewDirection)
+    {
+      renderer->SetMapperID(mitk::BaseRenderer::Standard3D);
+    }
+    else
+    {
+      renderer->SetMapperID(mitk::BaseRenderer::Standard2D);
+
+    }
+    // initialize the views to the bounding geometry
+    InitializeViewByBoundingObjects(renderer);
+  }
+}
+
+void mitk::RenderWindowViewDirectionController::SetViewDirectionOfRenderer(ViewDirection viewDirection , BaseRenderer* renderer/* =nullptr*/)
+{
+  if (nullptr == renderer)
+  {
+    // set visibility of data node in all controlled renderer
+    for (auto& renderer : m_ControlledRenderer)
+    {
+      if (nullptr != renderer)
+      {
+        SetViewDirectionOfRenderer(viewDirection, renderer);
+      }
+    }
+  }
+  else
+  {
+    mitk::SliceNavigationController* sliceNavigationController = renderer->GetSliceNavigationController();
+    sliceNavigationController->SetDefaultViewDirection(viewDirection);
 
     // initialize the views to the bounding geometry
     InitializeViewByBoundingObjects(renderer);

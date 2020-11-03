@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #ifndef QmitkCESTStatisticsView_h
@@ -24,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QmitkSliceNavigationListener.h>
 
 #include "ui_QmitkCESTStatisticsViewControls.h"
-#include <QmitkImageStatisticsCalculationThread.h>
+#include <QmitkImageStatisticsCalculationJob.h>
 
 #include <mitkPointSet.h>
 
@@ -53,7 +49,7 @@ class QmitkCESTStatisticsView : public QmitkAbstractView, public mitk::IRenderWi
     QmitkCESTStatisticsView(QObject *parent = nullptr, const char *name = nullptr);
     /*!
     \brief default destructor */
-    virtual ~QmitkCESTStatisticsView();
+    ~QmitkCESTStatisticsView() override;
 
   protected slots:
 
@@ -62,12 +58,6 @@ class QmitkCESTStatisticsView : public QmitkAbstractView, public mitk::IRenderWi
 
     /// \brief takes care of processing the computed data
     void OnThreadedStatisticsCalculationEnds();
-
-    /// \brief copy statistics to clipboard
-    void OnCopyStatisticsToClipboardPushButtonClicked();
-
-    /// \brief normalize cest image
-    void OnNormalizeImagePushButtonClicked();
 
     /// \brief Toggle whether or not the plot uses a fixed x range
     void OnFixedRangeCheckBoxToggled(bool state);
@@ -80,24 +70,16 @@ class QmitkCESTStatisticsView : public QmitkAbstractView, public mitk::IRenderWi
 
   protected:
 
-    virtual void CreateQtPartControl(QWidget *parent) override;
+    void CreateQtPartControl(QWidget *parent) override;
 
-    virtual void SetFocus() override;
+    void SetFocus() override;
 
-    virtual void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart);
-    virtual void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart);
+    void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+    void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
 
     /// \brief called by QmitkFunctionality when DataManager's selection has changed
-    virtual void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
+    void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
                                      const QList<mitk::DataNode::Pointer>& nodes ) override;
-
-    /** \brief  Writes the calculated statistics to the GUI */
-    void FillStatisticsTableView(const std::vector<mitk::ImageStatisticsCalculator::StatisticsContainer::Pointer> &s,
-      const mitk::Image *image);
-
-
-    /** \brief  Removes statistics from the GUI */
-    void InvalidateStatisticsTableView();
 
     /// parse string and set data vector returns true if succesfull
     bool SetZSpectrum(mitk::StringProperty* zSpectrumProperty);
@@ -130,7 +112,7 @@ class QmitkCESTStatisticsView : public QmitkAbstractView, public mitk::IRenderWi
     void CopyTimesteps(itk::Image<TPixel, VImageDimension>* image);
 
     Ui::QmitkCESTStatisticsViewControls m_Controls;
-    QmitkImageStatisticsCalculationThread* m_CalculatorThread;
+    QmitkImageStatisticsCalculationJob* m_CalculatorJob;
     QmitkPlotWidget::DataVector m_zSpectrum;
     mitk::Image::Pointer m_ZImage;
     mitk::Image::Pointer m_MaskImage;
@@ -144,9 +126,7 @@ class QmitkCESTStatisticsView : public QmitkAbstractView, public mitk::IRenderWi
     itk::TimeStamp m_currentPositionTime;
     /** @brief currently valid selected position in the inspector*/
     mitk::Point3D m_currentSelectedPosition;
-    /** @brief indicates if the currently selected position is valid for the currently selected fit.
-    * This it is within the input image */
-    unsigned int m_currentSelectedTimeStep;
+    mitk::TimePointType m_currentSelectedTimePoint;
 
 };
 

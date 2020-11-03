@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QmitkInteractiveTransformationWidget_H
 #define QmitkInteractiveTransformationWidget_H
@@ -30,8 +26,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "ui_QmitkInteractiveTransformationWidgetControls.h"
 
  /** Documentation:
-  *   \brief An object of this class offers an UI to create a widget to access the advance tool creation options.
-  *
+  *   \brief An object of this class offers an UI to create a widget to access the advanced tool creation options.
   *
   *   \ingroup IGTUI
   */
@@ -61,7 +56,7 @@ class MITKIGTUI_EXPORT QmitkInteractiveTransformationWidget : public QDialog
     void SetDefaultRotation(const mitk::Quaternion _defaultValues);
 
   protected slots:
-    void OnZTranslationValueChanged( double v );
+    void OnZTranslationValueChanged(double v);
     void OnYTranslationValueChanged(double v);
     void OnXTranslationValueChanged(double v);
     void OnZRotationValueChanged(double v);
@@ -90,13 +85,13 @@ signals:
     // Member variables
     Ui::QmitkInteractiveTransformationWidgetControls* m_Controls;
 
-    mitk::NavigationTool::Pointer m_ToolToEdit;     ///< \brief this mamber holds a copy of the tool that should be edited for visualization
+    mitk::NavigationTool::Pointer m_ToolToEdit;     ///< \brief this member holds a copy of the tool that should be edited for visualization
     mitk::BaseGeometry::Pointer m_Geometry;         ///< \brief The geometry that is manipulated
     mitk::BaseGeometry::Pointer m_ResetGeometry;    ///< \brief Lifeline to reset to the original geometry
 
 private:
   void SetValuesToGUI(const mitk::AffineTransform3D::Pointer _defaultValues);
-  void SetSynchronizedVauesToSliderAndSpinbox(QDoubleSpinBox* _spinbox, QSlider* _slider, double _value);
+  void SetSynchronizedValuesToSliderAndSpinbox(QDoubleSpinBox* _spinbox, QSlider* _slider, double _value);
 
 };
 #endif // QmitkInteractiveTransformationWidget_H

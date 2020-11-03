@@ -1,26 +1,23 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkCustomTagParser.h"
 
 #include <mitkProperties.h>
 #include <mitkStringProperty.h>
-#include <mitkLocaleSwitch.h>
 
+#include "mitkCESTPropertyHelper.h"
 #include "mitkIPropertyPersistence.h"
+
 #include "usGetModuleContext.h"
 #include "usModule.h"
 #include "usModuleContext.h"
@@ -37,7 +34,10 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <boost/tokenizer.hpp>
 
 #include <algorithm>
+#include <cstdint>
 #include <map>
+#include <string>
+#include <vector>
 
 namespace
 {
@@ -61,7 +61,6 @@ namespace
 }
 
 const std::string mitk::CustomTagParser::m_CESTPropertyPrefix = "CEST.";
-const std::string mitk::CustomTagParser::m_OffsetsPropertyName = m_CESTPropertyPrefix + "Offsets";
 const std::string mitk::CustomTagParser::m_RevisionPropertyName = m_CESTPropertyPrefix + "Revision";
 const std::string mitk::CustomTagParser::m_JSONRevisionPropertyName = m_CESTPropertyPrefix + "revision_json";
 
@@ -255,22 +254,58 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
 
   std::map<std::string, std::string> privateParameters;
 
-  // convert hex to ascii
-  // the Siemens private tag contains the information like this
-  // "43\52\23\34" we jump over each \ and convert the number
-  int len = dicomPropertyString.length();
-  std::string asciiString;
-  for (int i = 0; i < len; i += 3)
+  // The Siemens private tag contains information like "43\52\23\34".
+  // We jump over each "\" and convert the number;
+  std::string bytes;
+
   {
-    std::string byte = dicomPropertyString.substr(i, 2);
-    auto chr = (char)(int)strtol(byte.c_str(), nullptr, 16);
-    asciiString.push_back(chr);
+    const std::size_t SUBSTR_LENGTH = 2;
+    const std::size_t INPUT_LENGTH = dicomPropertyString.length();
+
+    if (INPUT_LENGTH < SUBSTR_LENGTH)
+      return results;
+
+    const std::size_t MAX_INPUT_OFFSET = INPUT_LENGTH - SUBSTR_LENGTH;
+    bytes.reserve(INPUT_LENGTH / 3 + 1);
+
+    try
+    {
+      for (std::size_t i = 0; i <= MAX_INPUT_OFFSET; i += 3)
+      {
+        std::string byte_string = dicomPropertyString.substr(i, SUBSTR_LENGTH);
+        int byte = static_cast<std::string::value_type>(std::stoi(byte_string.c_str(), nullptr, 16));
+        bytes.push_back(byte);
+      }
+    }
+    catch (const std::invalid_argument&) // std::stoi() could not perform conversion
+    {
+      return results;
+    }
   }
 
   // extract parameter list
-  std::size_t beginning = asciiString.find("### ASCCONV BEGIN ###") + 21;
-  std::size_t ending = asciiString.find("### ASCCONV END ###");
-  std::string parameterListString = asciiString.substr(beginning, ending - beginning);
+  std::string parameterListString;
+
+  {
+    const std::string ASCCONV_BEGIN = "### ASCCONV BEGIN ###";
+    const std::string ASCCONV_END = "### ASCCONV END ###";
+
+    auto offset = bytes.find(ASCCONV_BEGIN);
+
+    if (std::string::npos == offset)
+      return results;
+
+    offset += ASCCONV_BEGIN.length();
+
+    auto count = bytes.find(ASCCONV_END, offset);
+
+    if (std::string::npos == count)
+      return results;
+
+    count -= offset;
+
+    parameterListString = bytes.substr(offset, count);
+  }
 
   boost::replace_all(parameterListString, "\r\n", "\n");
   boost::char_separator<char> newlineSeparator("\n");
@@ -335,81 +370,81 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
     }
   }
 
-  std::string sampling = "";
   std::string offset = "";
   std::string measurements = "";
-  bool hasSamplingInformation = results->GetStringProperty("CEST.SamplingType", sampling);
   results->GetStringProperty("CEST.Offset", offset);
   results->GetStringProperty("CEST.measurements", measurements);
 
-  if ("" == measurements)
+  if (measurements.empty())
   {
     std::string stringRepetitions = "";
-    std::string stringAverages = "";
     results->GetStringProperty("CEST.repetitions", stringRepetitions);
+
+    std::string stringAverages = "";
     results->GetStringProperty("CEST.averages", stringAverages);
-    std::stringstream  measurementStream;
-    try
+
+    const auto ERROR_STRING = "Could not find measurements, fallback assumption of repetitions + averages could not be determined either.";
+
+    if (!stringRepetitions.empty() && !stringAverages.empty())
     {
-      measurementStream << std::stoi(stringRepetitions) + std::stoi(stringAverages);
-      measurements = measurementStream.str();
-      MITK_INFO << "Could not find measurements, assuming repetitions + averages. Which is: " << measurements;
+      std::stringstream measurementStream;
+
+      try
+      {
+        measurementStream << std::stoi(stringRepetitions) + std::stoi(stringAverages);
+        measurements = measurementStream.str();
+        MITK_INFO << "Could not find measurements, assuming repetitions + averages. That is: " << measurements;
+      }
+      catch (const std::invalid_argument&)
+      {
+        MITK_ERROR << ERROR_STRING;
+      }
     }
-    catch (const std::invalid_argument &ia)
+    else
     {
-      MITK_ERROR
-        << "Could not find measurements, fallback assumption of repetitions + averages could not be determined either: "
-        << ia.what();
+      MITK_WARN << ERROR_STRING;
     }
   }
 
   std::string preparationType = "";
   std::string recoveryMode = "";
   std::string spoilingType = "";
-  results->GetStringProperty("CEST.PreparationType", preparationType);
-  results->GetStringProperty("CEST.RecoveryMode", recoveryMode);
-  results->GetStringProperty("CEST.SpoilingType", spoilingType);
+  results->GetStringProperty(CEST_PROPERTY_NAME_PREPERATIONTYPE().c_str(), preparationType);
+  results->GetStringProperty(CEST_PROPERTY_NAME_RECOVERYMODE().c_str(), recoveryMode);
+  results->GetStringProperty(CEST_PROPERTY_NAME_SPOILINGTYPE().c_str(), spoilingType);
 
   if (this->IsT1Sequence(preparationType, recoveryMode, spoilingType, revisionString))
   {
     MITK_INFO << "Parsed as T1 image";
 
-    mitk::LocaleSwitch localeSwitch("C");
-
     std::stringstream trecStream;
 
     std::string trecPath = m_DicomDataPath + "/TREC.txt";
-    std::ifstream list(trecPath.c_str());
+    auto trec = ReadListFromFile(trecPath);
 
-    if (list.good())
-    {
-      std::string currentTime;
-      while (std::getline(list, currentTime))
-      {
-        trecStream << currentTime << " ";
-      }
-    }
-    else
+    if(trec.empty())
     {
       MITK_WARN << "Assumed T1, but could not load TREC at " << trecPath;
     }
 
-    results->SetStringProperty("CEST.TREC", trecStream.str().c_str());
+    results->SetStringProperty(CEST_PROPERTY_NAME_TREC().c_str(), trec.c_str());
   }
   else
   {
     MITK_INFO << "Parsed as CEST or WASABI image";
+    std::string sampling = "";
+    bool hasSamplingInformation = results->GetStringProperty("CEST.SamplingType", sampling);
+    if (hasSamplingInformation)
+    {
+      std::string offsets = GetOffsetString(sampling, offset, measurements);
+      results->SetStringProperty(CEST_PROPERTY_NAME_OFFSETS().c_str(), offsets.c_str());
+    }
+    else
+    {
+      MITK_WARN << "Could not determine sampling type.";
+    }
   }
 
-  if (hasSamplingInformation)
-  {
-    std::string offsets = GetOffsetString(sampling, offset, measurements);
-    results->SetStringProperty(m_OffsetsPropertyName.c_str(), offsets.c_str());
-  }
-  else
-  {
-    MITK_WARN << "Could not determine sampling type.";
-  }
 
   //persist all properties
   mitk::IPropertyPersistence *persSrv = GetPersistenceService();
@@ -428,6 +463,23 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
   }
 
   return results;
+}
+
+std::string mitk::CustomTagParser::ReadListFromFile(const std::string& filePath)
+{
+  std::stringstream listStream;
+  std::ifstream list(filePath.c_str());
+  list.imbue(std::locale("C"));
+
+  if (list.good())
+  {
+    std::string currentValue;
+    while (std::getline(list, currentValue))
+    {
+      listStream << currentValue << " ";
+    }
+  }
+  return listStream.str();
 }
 
 mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomProperty(mitk::TemporoSpatialStringProperty *dicomProperty)
@@ -454,7 +506,7 @@ std::vector<int> mitk::CustomTagParser::GetInternalRevisions()
 
   std::vector<int> availableRevisionsVector;
 
-  for (auto const resource : configs)
+  for (const auto& resource : configs)
   {
     availableRevisionsVector.push_back(std::stoi(resource.GetBaseName()));
   }
@@ -473,7 +525,7 @@ std::vector<int> mitk::CustomTagParser::GetExternalRevisions()
 
   std::vector<int> availableRevisionsVector;
 
-  for (auto const jsonpath : JsonFiles)
+  for (const auto& jsonpath : JsonFiles)
   {
     std::string jsonDir;
     std::string jsonName;
@@ -647,8 +699,8 @@ std::string mitk::CustomTagParser::GetRevisionAppropriateJSONString(std::string 
 
 std::string mitk::CustomTagParser::GetOffsetString(std::string samplingType, std::string offset, std::string measurements)
 {
-  mitk::LocaleSwitch localeSwitch("C");
   std::stringstream results;
+  results.imbue(std::locale("C"));
 
   std::string normalizationIndicatingOffset = "-300";
 
@@ -721,15 +773,12 @@ std::string mitk::CustomTagParser::GetOffsetString(std::string samplingType, std
   else if (samplingType == "3" || samplingType == "List")
   {
     std::string listPath = m_DicomDataPath + "/LIST.txt";
-    std::ifstream list(listPath.c_str());
 
-    if (list.good())
+    auto values = ReadListFromFile(listPath);
+
+    if (!values.empty())
     {
-      std::string currentOffset;
-      while (std::getline(list, currentOffset))
-      {
-        results << currentOffset << " ";
-      }
+      results << values;
     }
     else
     {

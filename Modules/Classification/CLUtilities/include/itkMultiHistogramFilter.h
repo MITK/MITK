@@ -1,3 +1,15 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
 #ifndef itkMultiHistogramFilter_h
 #define itkMultiHistogramFilter_h
 
@@ -36,10 +48,10 @@ namespace itk
 
     protected:
       MultiHistogramFilter();
-      ~MultiHistogramFilter(){};
+      ~MultiHistogramFilter() override{};
 
-      virtual void ThreadedGenerateData(const OutputImageRegionType & outputRegionForThread, ThreadIdType threadId) override;
-      virtual void BeforeThreadedGenerateData(void) override;
+      void ThreadedGenerateData(const OutputImageRegionType & outputRegionForThread, ThreadIdType threadId) override;
+      void BeforeThreadedGenerateData(void) override;
 
 
       using itk::ProcessObject::MakeOutput;

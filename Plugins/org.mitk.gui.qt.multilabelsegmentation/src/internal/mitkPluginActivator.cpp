@@ -1,24 +1,19 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkPluginActivator.h"
 
 #include "QmitkMultiLabelSegmentationView.h"
 #include "QmitkThresholdAction.h"
-#include "QmitkAutocropAction.h"
 #include "QmitkConvertSurfaceToLabelAction.h"
 #include "QmitkConvertMaskToLabelAction.h"
 #include "QmitkConvertToMultiLabelSegmentationAction.h"
@@ -39,7 +34,6 @@ void mitk::PluginActivator::start(ctkPluginContext *context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(QmitkMultiLabelSegmentationView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkThresholdAction, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkAutocropAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkConvertSurfaceToLabelAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkConvertMaskToLabelAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkConvertToMultiLabelSegmentationAction, context)

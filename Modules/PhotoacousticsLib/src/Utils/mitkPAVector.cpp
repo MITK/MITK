@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkPAVector.h"
 #include "chrono"
@@ -134,6 +130,20 @@ mitk::pa::Vector::Pointer mitk::pa::Vector::Clone()
   returnVector->SetElement(1, this->GetElement(1));
   returnVector->SetElement(2, this->GetElement(2));
   return returnVector;
+}
+
+void mitk::pa::Vector::Subtract(Vector::Pointer other)
+{
+  m_Vector.SetElement(0, m_Vector.GetElement(0) - other->GetElement(0));
+  m_Vector.SetElement(1, m_Vector.GetElement(1) - other->GetElement(1));
+  m_Vector.SetElement(2, m_Vector.GetElement(2) - other->GetElement(2));
+}
+
+void mitk::pa::Vector::Add(Vector::Pointer other)
+{
+  m_Vector.SetElement(0, m_Vector.GetElement(0) + other->GetElement(0));
+  m_Vector.SetElement(1, m_Vector.GetElement(1) + other->GetElement(1));
+  m_Vector.SetElement(2, m_Vector.GetElement(2) + other->GetElement(2));
 }
 
 bool mitk::pa::Equal(const Vector::Pointer leftHandSide, const Vector::Pointer rightHandSide, double eps, bool verbose)

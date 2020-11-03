@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkSurfaceStampWidget.h"
 
@@ -29,8 +25,7 @@ QmitkSurfaceStampWidget::QmitkSurfaceStampWidget(QWidget *parent, const char * /
   m_Controls.setupUi(this);
   m_Controls.m_InformationWidget->hide();
 
-  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-  assert(m_ToolManager);
+  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager(mitk::ToolManagerProvider::MULTILABEL_SEGMENTATION);
   m_ToolManager->ActivateTool(-1);
 
   mitk::NodePredicateAnd::Pointer m_SurfacePredicate = mitk::NodePredicateAnd::New();
@@ -64,7 +59,7 @@ void QmitkSurfaceStampWidget::OnStamp()
     return;
   }
 
-  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager(mitk::ToolManagerProvider::MULTILABEL_SEGMENTATION);
   assert(m_ToolManager);
   m_ToolManager->ActivateTool(-1);
 

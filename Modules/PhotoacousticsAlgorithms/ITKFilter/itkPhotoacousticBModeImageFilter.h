@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 /*=========================================================================
  *
  *  Copyright Insight Software Consortium
@@ -49,7 +45,7 @@ namespace itk
  *
  * \brief Create an Photoacoustic B-Mode (Brightness-Mode) image from raw
  * "RF" data.  The RF's envelope is calculated from the analytic signal and
- * logarithmic intensity transform is NOT applied. This is for now the only 
+ * logarithmic intensity transform is NOT applied. This is for now the only
  * difference to the "normal" BModeImageFilter.
  *
  * Use SetDirection() to define the axis of propagation.

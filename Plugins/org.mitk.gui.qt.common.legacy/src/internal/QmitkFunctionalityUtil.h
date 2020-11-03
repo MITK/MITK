@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #ifndef QMITKFUNCTIONALITYUTIL_H
@@ -36,29 +32,29 @@ public:
   ///
   /// Creates smartpointer typedefs
   ///
-  berryObjectMacro(QmitkFunctionalitySelectionProvider)
+  berryObjectMacro(QmitkFunctionalitySelectionProvider);
 
   QmitkFunctionalitySelectionProvider(QmitkFunctionality* _Functionality);
 
-  virtual ~QmitkFunctionalitySelectionProvider();
+  ~QmitkFunctionalitySelectionProvider() override;
 
   //# ISelectionProvider methods
   ///
   /// \see ISelectionProvider::AddSelectionChangedListener()
   ///
-  virtual void AddSelectionChangedListener(berry::ISelectionChangedListener* listener) override;
+  void AddSelectionChangedListener(berry::ISelectionChangedListener* listener) override;
   ///
   /// \see ISelectionProvider::GetSelection()
   ///
-  virtual berry::ISelection::ConstPointer GetSelection() const override;
+  berry::ISelection::ConstPointer GetSelection() const override;
   ///
   /// \see ISelectionProvider::RemoveSelectionChangedListener()
   ///
-  virtual void RemoveSelectionChangedListener(berry::ISelectionChangedListener* listener) override;
+  void RemoveSelectionChangedListener(berry::ISelectionChangedListener* listener) override;
   ///
   /// \see ISelectionProvider::SetSelection()
   ///
-  virtual void SetSelection(const berry::ISelection::ConstPointer& selection) override;
+  void SetSelection(const berry::ISelection::ConstPointer& selection) override;
   ///
   /// Sends the nodes as selected to the workbench
   ///

@@ -1,24 +1,19 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkExtApplicationPlugin.h"
 #include "perspectives/QmitkExtDefaultPerspective.h"
 #include "perspectives/QmitkEditorPerspective.h"
 #include "perspectives/QmitkVisualizationPerspective.h"
-#include "QmitkMitkWorkbenchIntroPart.h"
 #include "QmitkExtApplication.h"
 
 #include <mitkVersion.h>
@@ -54,7 +49,6 @@ void QmitkExtApplicationPlugin::start(ctkPluginContext* context)
 
   BERRY_REGISTER_EXTENSION_CLASS(QmitkExtDefaultPerspective, context);
   BERRY_REGISTER_EXTENSION_CLASS(QmitkEditorPerspective, context);
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkMitkWorkbenchIntroPart, context);
   BERRY_REGISTER_EXTENSION_CLASS(QmitkExtApplication, context);
   BERRY_REGISTER_EXTENSION_CLASS(QmitkVisualizationPerspective, context);
 

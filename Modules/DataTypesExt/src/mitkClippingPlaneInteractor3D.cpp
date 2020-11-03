@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkClippingPlaneInteractor3D.h"
 
@@ -87,7 +83,7 @@ void mitk::ClippingPlaneInteractor3D::SelectObject(StateMachineAction *, Interac
   // Colorize surface / wireframe dependend on distance from picked point
   this->ColorizeSurface(interactionEvent->GetSender(), 0.0);
 
-  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+  RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::ClippingPlaneInteractor3D::DeselectObject(StateMachineAction *, InteractionEvent *interactionEvent)
@@ -102,7 +98,7 @@ void mitk::ClippingPlaneInteractor3D::DeselectObject(StateMachineAction *, Inter
   // Colorize surface / wireframe as inactive
   this->ColorizeSurface(interactionEvent->GetSender(), -1.0);
 
-  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+  RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::ClippingPlaneInteractor3D::InitTranslate(StateMachineAction *, InteractionEvent *interactionEvent)
@@ -204,7 +200,7 @@ void mitk::ClippingPlaneInteractor3D::TranslateObject(StateMachineAction *, Inte
   this->GetDataNode()->GetData()->GetGeometry(timeStep)->SetOrigin(
     origin + transformedObjectNormal * (interactionMove * transformedObjectNormal));
 
-  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+  RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::ClippingPlaneInteractor3D::RotateObject(StateMachineAction *, InteractionEvent *interactionEvent)
@@ -283,7 +279,7 @@ void mitk::ClippingPlaneInteractor3D::RotateObject(StateMachineAction *, Interac
     if (timeGeometry.IsNotNull())
       timeGeometry->SetTimeStepGeometry(newGeometry, timeStep);
 
-    interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+    RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
 

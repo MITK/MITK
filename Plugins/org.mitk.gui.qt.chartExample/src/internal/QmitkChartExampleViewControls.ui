@@ -1,0 +1,861 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkChartExampleViewControls</class>
+ <widget class="QWidget" name="QmitkChartExampleViewControls">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>455</width>
+    <height>1054</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>QmitkTemplate</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="m_labelInfo">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QToolBox" name="toolBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="currentIndex">
+      <number>1</number>
+     </property>
+     <widget class="QWidget" name="pageChartSettings">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>437</width>
+        <height>154</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <attribute name="label">
+       <string>Chart settings</string>
+      </attribute>
+      <widget class="QWidget" name="formLayoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>10</y>
+         <width>421</width>
+         <height>101</height>
+        </rect>
+       </property>
+       <layout class="QFormLayout" name="formLayout_7">
+        <property name="labelAlignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <item row="1" column="0">
+         <widget class="QLabel" name="m_labelTitle">
+          <property name="text">
+           <string>Title:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="QLineEdit" name="m_lineEditTitle">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="m_labelXAxisLabel">
+          <property name="text">
+           <string>X-Axis label:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLineEdit" name="m_lineEditXAxisLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="m_labelYAxisLabel">
+          <property name="text">
+           <string>Y-Axis label:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QLineEdit" name="m_lineEditYAxisLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="pageData">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>420</width>
+        <height>535</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <attribute name="label">
+       <string>Data</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_7">
+       <item>
+        <layout class="QFormLayout" name="formLayout">
+         <item row="3" column="1">
+          <widget class="QGroupBox" name="m_groupBoxErrors">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="title">
+            <string>Error values</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_4">
+            <item>
+             <layout class="QFormLayout" name="formLayout_3">
+              <item row="0" column="0">
+               <widget class="QCheckBox" name="m_checkBoxEnableYErrors">
+                <property name="text">
+                 <string>y error</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QGroupBox" name="m_groupBoxYErrors">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="title">
+                 <string>GroupBox</string>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_5">
+                 <item>
+                  <layout class="QFormLayout" name="formLayout_4">
+                   <item row="0" column="1">
+                    <widget class="QLineEdit" name="m_lineEditYErrorPlus">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="1">
+                    <widget class="QLineEdit" name="m_lineEditYErrorMinus">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QCheckBox" name="m_checkBoxEnableXErrors">
+                <property name="text">
+                 <string>x error</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QGroupBox" name="m_groupBoxXErrors">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="title">
+                 <string>GroupBox</string>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_6">
+                 <item>
+                  <layout class="QFormLayout" name="formLayout_5">
+                   <item row="0" column="1">
+                    <widget class="QLineEdit" name="m_lineEditXErrorPlus"/>
+                   </item>
+                   <item row="1" column="1">
+                    <widget class="QLineEdit" name="m_lineEditXErrorMinus"/>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="1" column="0" colspan="2">
+          <layout class="QFormLayout" name="formLayout_6">
+           <property name="labelAlignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+           <item row="0" column="0">
+            <widget class="QLabel" name="m_labelXValues">
+             <property name="text">
+              <string>x:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="m_lineEditDataXVector">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="m_labelYValues">
+             <property name="text">
+              <string>y:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="m_labelDataLabel">
+             <property name="text">
+              <string>Data label:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="QLineEdit" name="m_lineEditDataLabel">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+            </widget>
+           </item>
+           <item row="9" column="0">
+            <widget class="QLabel" name="m_labelPieData">
+             <property name="text">
+              <string>Pie data labels:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="9" column="1">
+            <widget class="QLineEdit" name="m_lineEditPieDataLabel">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+            </widget>
+           </item>
+           <item row="11" column="0">
+            <widget class="QLabel" name="m_labelExistingData">
+             <property name="text">
+              <string>Existing data:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="11" column="1">
+            <widget class="QComboBox" name="m_comboBoxExistingData"/>
+           </item>
+           <item row="12" column="1">
+            <widget class="QPushButton" name="m_buttonUpdateData">
+             <property name="toolTip">
+              <string>Creates a test chart</string>
+             </property>
+             <property name="text">
+              <string>Update data</string>
+             </property>
+            </widget>
+           </item>
+           <item row="10" column="1">
+            <widget class="QPushButton" name="m_buttonAddData">
+             <property name="text">
+              <string>Add data</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QLineEdit" name="m_lineEditDataYVector"/>
+           </item>
+           <item row="6" column="0">
+            <widget class="QLabel" name="m_labelColor">
+             <property name="text">
+              <string>Color:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="1">
+            <widget class="QComboBox" name="m_comboBoxColor">
+             <item>
+              <property name="text">
+               <string>red</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>orange</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>yellow</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>green</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>blue</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>purple</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>brown</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>magenta</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>tan</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>cyan</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>olive</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>maroon</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>navy</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>aquamarine</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>turquoise</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>silver</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>lime</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>teal</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>indigo</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>violet</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>pink</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>black</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>white</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>grey</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="8" column="1">
+            <widget class="QComboBox" name="m_comboBoxLineStyle">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <item>
+              <property name="text">
+               <string>solid</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>dashed</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="8" column="0">
+            <widget class="QLabel" name="m_labelLineStyle">
+             <property name="text">
+              <string>Line style:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="1">
+            <widget class="QComboBox" name="m_comboBoxChartType">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <item>
+              <property name="text">
+               <string>bar</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>line</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>area</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>pie</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>spline</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>area-spline</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>scatter</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="7" column="0">
+            <widget class="QLabel" name="m_labelChartType">
+             <property name="text">
+              <string>Chart:</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="3" column="0">
+          <widget class="QCheckBox" name="m_checkBoxEnableErrors">
+           <property name="text">
+            <string>Error</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="m_labelDataEntry">
+           <property name="whatsThis">
+            <string>Zentrieren, Vertikal zentrieren</string>
+           </property>
+           <property name="text">
+            <string>Data entry</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="pageGlobalOptions">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>437</width>
+        <height>158</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <attribute name="label">
+       <string>Global options</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_8">
+       <item>
+        <layout class="QFormLayout" name="formLayout_2">
+         <property name="sizeConstraint">
+          <enum>QLayout::SetDefaultConstraint</enum>
+         </property>
+         <property name="fieldGrowthPolicy">
+          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="m_labelYAxisScale">
+           <property name="text">
+            <string>Y Axis scale</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QComboBox" name="m_comboBoxYAxisScale">
+           <item>
+            <property name="text">
+             <string>linear</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>logarithmic</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="m_lableLegendPosition">
+           <property name="text">
+            <string>Legend position</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QComboBox" name="m_comboBoxLegendPosition">
+           <property name="currentIndex">
+            <number>2</number>
+           </property>
+           <item>
+            <property name="text">
+             <string>bottom middle</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>bottom right</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>top right</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>top left</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>middle right</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QCheckBox" name="m_checkBoxShowLegend">
+           <property name="text">
+            <string>Show legend</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QCheckBox" name="m_checkBoxStackedData">
+           <property name="text">
+            <string>Stacked data</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QCheckBox" name="m_checkBoxShowDataPoints">
+           <property name="text">
+            <string>Show data points</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QCheckBox" name="m_checkBoxShowSubchart">
+           <property name="text">
+            <string>Show Subchart</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="pageZoom">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>437</width>
+        <height>154</height>
+       </rect>
+      </property>
+      <attribute name="label">
+       <string>Zoom</string>
+      </attribute>
+      <widget class="QWidget" name="gridLayoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>431</width>
+         <height>121</height>
+        </rect>
+       </property>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="0">
+         <widget class="QLabel" name="m_labelXZoom">
+          <property name="text">
+           <string>x:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="m_labelYZoom">
+          <property name="text">
+           <string>y:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QDoubleSpinBox" name="m_doubleSpinBox_minZoomX"/>
+        </item>
+        <item row="1" column="1">
+         <widget class="QDoubleSpinBox" name="m_doubleSpinBox_minZoomY"/>
+        </item>
+        <item row="0" column="2">
+         <widget class="QDoubleSpinBox" name="m_doubleSpinBox_maxZoomX"/>
+        </item>
+        <item row="1" column="2">
+         <widget class="QDoubleSpinBox" name="m_doubleSpinBox_maxZoomY"/>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="m_buttonCreateChart">
+     <property name="toolTip">
+      <string>Do image processing</string>
+     </property>
+     <property name="text">
+      <string>Create chart</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="m_buttonClearChart">
+     <property name="text">
+      <string>Clear chart and data</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="Line" name="m_line">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QStackedWidget" name="m_StatisticsWidgetStack">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>250</height>
+      </size>
+     </property>
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QmitkChartWidget" name="m_Chart">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPlainTextEdit" name="m_plainTextEditDataView">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>150</height>
+      </size>
+     </property>
+     <property name="cursor" stdset="0">
+      <cursorShape>ArrowCursor</cursorShape>
+     </property>
+     <property name="acceptDrops">
+      <bool>true</bool>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="m_spacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Expanding</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>0</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkChartWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkChartWidget.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkPivotCalibration.h"
 #include "vnl/algo/vnl_svd.h"
@@ -80,7 +76,7 @@ bool mitk::PivotCalibration::ComputePivotPoint()
   {
     t = _CheckedTransforms.at(i)->GetPosition().GetVnlVector();// t = the current position of the tracked sensor
     t *= -1;
-    b.update(t, currentRow); //b = combines the position for each collected transform in one column vector 
+    b.update(t, currentRow); //b = combines the position for each collected transform in one column vector
     R = _CheckedTransforms.at(i)->GetOrientation().rotation_matrix_transpose().transpose(); // R = the current rotation of the tracked sensor, *rotation_matrix_transpose().transpose() is used to obtain original matrix
     A.update(R, currentRow, 0); //A = the matrix which stores the rotations for each collected transform and -I
     A.update(minusI, currentRow, 3);
@@ -100,7 +96,7 @@ bool mitk::PivotCalibration::ComputePivotPoint()
   {
     x = svdA.solve(b); //x = the resulting pivot point
 
-    m_ResultRMSError = (A * x - b).rms();  //the root mean sqaure error of the computation 
+    m_ResultRMSError = (A * x - b).rms();  //the root mean sqaure error of the computation
 
     //sets the Pivot Point
     m_ResultPivotPoint[0] = x[0];

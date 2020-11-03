@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 // Qmitk
 #include "QmitkNavigationDataPlayerView.h"
@@ -35,7 +31,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 const std::string QmitkNavigationDataPlayerView::VIEW_ID = "org.mitk.views.navigationdataplayer";
 
 QmitkNavigationDataPlayerView::QmitkNavigationDataPlayerView()
-  : m_Controls( 0 )
+  : m_Controls( nullptr )
 {
 }
 
@@ -99,7 +95,7 @@ void QmitkNavigationDataPlayerView::OnOpenFile()
   catch ( const mitk::Exception &e )
   {
     MITK_WARN("NavigationDataPlayerView") << "could not open file " << fileName.toStdString();
-    QMessageBox::critical(0, "Error Reading File", "The file '" + fileName
+    QMessageBox::critical(nullptr, "Error Reading File", "The file '" + fileName
                           +"' could not be read.\n" + e.GetDescription() );
     return;
   }
@@ -169,9 +165,10 @@ void QmitkNavigationDataPlayerView::OnSetMicroservice(){
       currentDummyTool->SetIdentifier(name.str());
       m_ToolStorage->AddTool(currentDummyTool);
     }
-    m_Player->RegisterAsMicroservice();
     m_ToolStorage->SetName("NavigationDataPlayer Tool Storage");
-    m_ToolStorage->SetSourceID(m_Player->GetMicroserviceID());
+    m_Player->SetToolMetaDataCollection(m_ToolStorage);
+    m_Player->RegisterAsMicroservice();
+    m_ToolStorage->SetSourceID(m_Player->GetMicroserviceID()); //DEPRECATED / not needed anymore because NavigationDataSource now holds a member of its tool storage. Only left for backward compatibility.
     m_ToolStorage->RegisterAsMicroservice();
   } else {
     if (m_ToolStorage.IsNotNull()) m_ToolStorage->UnRegisterMicroservice();
@@ -213,7 +210,7 @@ void QmitkNavigationDataPlayerView::CreatePipeline(){
     vtkData->Update();
     mySphere->SetVtkPolyData(vtkData->GetOutput());
     node->SetData(mySphere);
-    m_VisFilter->SetRepresentationObject(i, mySphere);
+    m_VisFilter->SetRepresentationObject(i, mySphere.GetPointer());
 
     // Add Node to DataStorageand to local list of Nodes
     GetDataStorage()->Add(node);

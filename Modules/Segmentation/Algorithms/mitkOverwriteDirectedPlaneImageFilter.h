@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef mitkOverwriteDirectedPlaneImageFilter_h_Included
 #define mitkOverwriteDirectedPlaneImageFilter_h_Included
@@ -38,9 +34,6 @@ namespace mitk
     \ingroup Process
     \ingroup Reliver
 
-    There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref
-    QmitkInteractiveSegmentationTechnicalPage
-
     This class takes a 3D mitk::Image as input and tries to replace one slice in it with the second input image, which
     is specified
     by calling SetSliceImage with a 2D mitk::Image.
@@ -63,7 +56,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(OverwriteDirectedPlaneImageFilter, ImageToImageFilter);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /**
         \brief Which plane to overwrite

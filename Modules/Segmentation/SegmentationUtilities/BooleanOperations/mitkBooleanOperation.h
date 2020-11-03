@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef mitkBooleanOperation_h
 #define mitkBooleanOperation_h
@@ -45,9 +41,9 @@ namespace mitk
      * \param[in] type The type of the boolean operation.
      * \param[in] segmentationA The first operand of the boolean operation.
      * \param[in] segmentationB The second operand of the boolean operation.
-     * \param[in] The time step at which the operation will be executed.
+     * \param[in] The time point at which the operation will be executed.
      */
-    BooleanOperation(Type type, Image::Pointer segmentationA, Image::Pointer segmentationB, unsigned int time = 0);
+    BooleanOperation(Type type, Image::Pointer segmentationA, Image::Pointer segmentationB, TimePointType time = 0.);
     ~BooleanOperation();
 
     /* \brief Execute boolean operation and return resulting segmentation.
@@ -70,7 +66,7 @@ namespace mitk
     Type m_Type;
     Image::Pointer m_SegmentationA;
     Image::Pointer m_SegmentationB;
-    unsigned int m_Time;
+    TimePointType m_TimePoint;
   };
 }
 

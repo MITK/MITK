@@ -1,0 +1,20 @@
+{
+  "1493_3D" : "revision_json",
+  "sWiPMemBlock.alFree[0]" : "AdvancedMode",
+  "sWiPMemBlock.alFree[1]" : "RecoveryMode",
+  "sWiPMemBlock.alFree[2]" : "DoubleIrrMode",
+  "sWiPMemBlock.alFree[3]" : "MtMode",
+  "sWiPMemBlock.alFree[4]" : "PreparationType",
+  "sWiPMemBlock.alFree[5]" : "PulseType",
+  "sWiPMemBlock.alFree[6]" : "SamplingType",
+  "sWiPMemBlock.alFree[7]" : "SpoilingType",
+  "sWiPMemBlock.alFree[8]" : "measurements",
+  "sWiPMemBlock.alFree[9]" : "NumberRFBlocks",
+  "sWiPMemBlock.alFree[10]" : "PulsesPerRFBlock",
+  "sWiPMemBlock.alFree[11]" : "PulseDuration",
+  "sWiPMemBlock.alFree[12]" : "DutyCycle",
+  "sWiPMemBlock.alFree[13]" : "RecoveryTime",
+  "sWiPMemBlock.alFree[14]" : "RecoveryTimeM0",
+  "sWiPMemBlock.adFree[0]" : "Offset",
+  "sWiPMemBlock.adFree[1]" : "B1Amplitude"
+}

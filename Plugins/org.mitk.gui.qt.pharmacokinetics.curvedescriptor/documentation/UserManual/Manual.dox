@@ -1,0 +1,27 @@
+/**
+\page org_mitk_views_pharmacokinetics_curvedescriptor The Perfusion Curve Description Parameters View
+
+\imageMacro{pharmacokinetics_curve_desc_doc.svg,"Icon of the Perfusion Curve Description Parameters View",3.0}
+
+\tableofcontents
+
+\section org_mitk_views_pharmacokinetics_curvedescriptor_overview Overview
+In cases where data quality is not sufficient for dedicated pharmacokinetic analysis, or if global scouting of the overall image is performed to identify regions of interest, it is often advisable to use semi-quantitative measures that describe the general shape and type of the curve.
+The Perfusion Curve Description Parameters View can be used to voxelwise calculate these parameters.
+
+Currently the following parameters are offered by the tool (visualized in figure 1):
+\imageMacro{pharmacokinetics_curve_desc_parameter_description.png,"Figure 1: Calculation of currently available descriptive parameters",3.0}
+
+- <i>area-under-the-curve (AUC)</i>: The area under the signal time curve is calculated by step-wise integration with linear interpolation between sampling points.
+- <i>area-under the first moment curve (AUMC)</i>: The area under the first moment signal time curve is calculated by step-wise integration with linear interpolation between sampling points.
+- <i>mean-residence-time (MRT)</i>: The mean residence time is calculated as MRT = AUMC/AUC.
+- <i>time-to-peak</i>: The duration between the onset time and the time of the maximum signal of the curve.
+- <i>maximum signal</i>: The overall maximum of all data points of the curve.
+
+These parameters are usually calculated directly from the raw data signal intensities of the acquired MR image.
+Alternatively, if semi-quantitative parameters should be calculated from concentration time curves, use the \ref org_mitk_views_pharmacokinetics_concentration_mri prior to the parameter calculation.
+Parameters of interest can be selected from the list. Selecting a 4D image enables the <i>Calculate Parameters</i> button.
+Resulting parameter maps will afterwards be added to the data manager as subnodes to the analyzed 4D image.
+
+
+*/

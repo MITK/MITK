@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKIMAGEVTKMAPPER2D_H_HEADER_INCLUDED_C10E906E
 #define MITKIMAGEVTKMAPPER2D_H_HEADER_INCLUDED_C10E906E
@@ -84,7 +80,7 @@ namespace mitk
    *   - \b "Image Rendering.Mode": This property decides which mode is used to render images. (E.g. if a lookup table
    or
    a transferfunction is applied). Detailed documentation about the modes can be found here: \link
-   mitk::RenderingerModeProperty \endlink
+   mitk::RenderingModeProperty \endlink
    *   - \b "Image Rendering.Transfer Function": (mitkTransferFunctionProperty) If this
    *          property is set, a color transferfunction will be used to color the image.
    *   - \b "binary": (BoolProperty) is the image a binary image or not
@@ -124,12 +120,13 @@ namespace mitk
     mitkClassMacro(ImageVtkMapper2D, VtkMapper);
 
     /** Method for creation through the object factory. */
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /** \brief Get the Image to map */
       const mitk::Image *GetInput(void);
 
-    /** \brief Checks whether this mapper needs to update itself and generate
+      /** \brief Checks whether this mapper needs to update itself and generate
      * data. */
     void Update(mitk::BaseRenderer *renderer) override;
 
@@ -147,10 +144,20 @@ namespace mitk
     class MITKCORE_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
     {
     public:
-      /** \brief Actor of a 2D render window. */
-      vtkSmartPointer<vtkActor> m_Actor;
+      /** \brief Actor of the image in a 2D render window. */
+      vtkSmartPointer<vtkActor> m_ImageActor;
+      /** \brief Actor of the shadowimage in a 2D render window. */
+      vtkSmartPointer<vtkActor> m_ShadowOutlineActor;
 
+      /** Prop assembly containting everything for a regular display of the image.*/
       vtkSmartPointer<vtkPropAssembly> m_Actors;
+      /** Prop assembly used if workspace is in an invalid state (e.g. invalid time point or
+       * invalid world coordinate position is selected) and mapper has to "early out"
+       * in Update() or GenerateDataForRenderer()*/
+      vtkSmartPointer<vtkPropAssembly> m_EmptyActors;
+      /** Prop assembly exposed publicly via ImagVtkMapper2D::GetVTKProp()*/
+      vtkProp* m_PublicActors = nullptr;
+
       /** \brief Mapper of a 2D render window. */
       vtkSmartPointer<vtkPolyDataMapper> m_Mapper;
       vtkSmartPointer<vtkImageExtractComponents> m_VectorComponentExtractor;
@@ -196,21 +203,24 @@ namespace mitk
       ~LocalStorage() override;
     };
 
-    /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
-    mitk::LocalStorageHandler<LocalStorage> m_LSH;
-
     /** \brief Get the LocalStorage corresponding to the current renderer. */
-    LocalStorage *GetLocalStorage(mitk::BaseRenderer *renderer);
+    const LocalStorage *GetConstLocalStorage(mitk::BaseRenderer *renderer);
 
     /** \brief Set the default properties for general image rendering. */
     static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
     /** \brief This method switches between different rendering modes (e.g. use a lookup table or a transfer function).
-     * Detailed documentation about the modes can be found here: \link mitk::RenderingerModeProperty \endlink
+     * Detailed documentation about the modes can be found here: \link mitk::RenderingModeProperty \endlink
      */
     void ApplyRenderingMode(mitk::BaseRenderer *renderer);
 
   protected:
+    /** \brief The LocalStorageHandler holds all (three) LocalStorages for the three 2D render windows. */
+    mitk::LocalStorageHandler<LocalStorage> m_LSH;
+
+    /** \brief Get the LocalStorage corresponding to the current renderer. */
+    LocalStorage* GetLocalStorage(mitk::BaseRenderer* renderer);
+
     /** \brief Transforms the actor to the actual position in 3D.
       *   \param renderer The current renderer corresponding to the render window.
       */
@@ -303,6 +313,9 @@ namespace mitk
       * If the distances have different sign, there is an intersection.
       **/
     bool RenderingGeometryIntersectsImage(const PlaneGeometry *renderingGeometry, SlicedGeometry3D *imageGeometry);
+
+    /** Helper function to reset the local storage in order to indicate an invalid state.*/
+    void SetToInvalidState(mitk::ImageVtkMapper2D::LocalStorage* localStorage);
   };
 
 } // namespace mitk

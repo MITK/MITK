@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKIRENDERWINDOWPART_H
 #define MITKIRENDERWINDOWPART_H
@@ -22,6 +18,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QHash>
 #include <QtPlugin>
 
+#include <mitkBaseRenderer.h>
 #include <mitkNumericTypes.h>
 #include <mitkRenderingManager.h>
 
@@ -46,15 +43,9 @@ class SliceNavigationController;
  *
  * A IRenderWindowPart provides zero or more QmitkRenderWindow instances which can
  * be controlled via this interface. QmitkRenderWindow instances have an associated
- * \e id, which is implementation specific. However, implementations should consider
- * to use one of the following ids for certain QmitkRenderWindow instances to maximize
- * reusability (they are free to map multiple ids to one QmitkRenderWindow internally):
- * <ul>
- * <li>axial</li>
- * <li>sagittal</li>
- * <li>coronal</li>
- * <li>3d</li>
- * </ul>
+ * \e id, which is implementation specific.
+ * Additionally the defined values AXIAL, SAGITTAL, CORONAL, THREE_D from mitk::BaseRenderer
+ * can be used to retrieve a specific QmitkRenderWindow.
  *
  * \see ILinkedRenderWindowPart
  * \see IRenderWindowPartListener
@@ -95,6 +86,14 @@ struct MITK_GUI_COMMON_PLUGIN IRenderWindowPart {
   virtual QmitkRenderWindow* GetQmitkRenderWindow(const QString& id) const = 0;
 
   /**
+  * Get a render window with a specific view direction.
+  *
+  * \param viewDirection The render window view direction.
+  * \return The QmitkRenderWindow instance for <code>viewDirection</code>
+  */
+  virtual QmitkRenderWindow* GetQmitkRenderWindow(const mitk::BaseRenderer::ViewDirection& viewDirection) const = 0;
+
+  /**
    * Get the rendering manager used by this render window part.
    *
    * \return The current IRenderingManager instance or <code>nullptr</code>
@@ -128,7 +127,7 @@ struct MITK_GUI_COMMON_PLUGIN IRenderWindowPart {
 
   /**
    * Get the selected position in the render window with id <code>id</code>
-   * or in the active render window if <code>id</code> is nullptr.
+   * or in the active render window if <code>id</code> is an empty string.
    *
    * \param id The render window id.
    * \return The currently selected position in world coordinates.
@@ -143,6 +142,14 @@ struct MITK_GUI_COMMON_PLUGIN IRenderWindowPart {
    * \param id The render window id in which the selection should take place.
    */
   virtual void SetSelectedPosition(const mitk::Point3D& pos, const QString& id = QString()) = 0;
+
+  /**
+   * Get the time point selected in the render window with id <code>id</code>
+   * or in the active render window if <code>id</code> is an empty string.
+   *
+   * \param id The render window id.
+   * \return The currently selected position in world coordinates.*/
+  virtual TimePointType GetSelectedTimePoint(const QString& id = QString()) const = 0;
 
   /**
    * Enable \e decorations like colored borders, menu widgets, logos, text annotations, etc.

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
@@ -31,26 +27,19 @@ class mitkPhotoacousticVesselMeanderStrategyTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 private:
-  mitk::pa::VesselMeanderStrategy::Pointer m_TestVector;
-  mitk::pa::Vector::Pointer m_TestPostion;
+  mitk::pa::VesselMeanderStrategy::Pointer m_TestStrategy;
   mitk::pa::Vector::Pointer m_TestDirection;
 
 public:
 
   void setUp() override
   {
-    m_TestVector = mitk::pa::VesselMeanderStrategy::New();
-    m_TestPostion = mitk::pa::Vector::New();
+    m_TestStrategy = mitk::pa::VesselMeanderStrategy::New();
     m_TestDirection = mitk::pa::Vector::New();
   }
 
   void TestCalculateNewPositionInStraightLine()
   {
-    std::stringstream output;
-
-    int a = 0;
-    int b = 1;
-    int c = 2;
     int d = 3;
     int e = 4;
     int f = 5;
@@ -69,44 +58,20 @@ public:
           j++;
         }
 
-        m_TestPostion->SetElement(0, a*i);
-        m_TestPostion->SetElement(1, b*i);
-        m_TestPostion->SetElement(2, c*i);
         m_TestDirection->SetElement(0, d*j);
         m_TestDirection->SetElement(1, e*j);
         m_TestDirection->SetElement(2, f*j);
 
-        m_TestVector->CalculateNewPositionInStraightLine(m_TestPostion, m_TestDirection, 0, nullptr);
-
-        MITK_INFO << "m_TestPosition Element(0) =" << m_TestPostion->GetElement(0);
-        MITK_INFO << "Data0 =" << (a*i) + (d*j);
-        MITK_INFO << "m_TestPosition Element(1) =" << m_TestPostion->GetElement(1);
-        MITK_INFO << "Data1 =" << (b*i) + (e*j);
-        MITK_INFO << "m_TestPosition Element(2) =" << m_TestPostion->GetElement(2);
-        MITK_INFO << "Data2 =" << (c*i) + (f*j);
-
-        output << "Element0 from m_TestPosition should be ";
-        output << a*i + d*j;
-        CPPUNIT_ASSERT_EQUAL_MESSAGE(output.str(), true, a*i + d*j == m_TestPostion->GetElement(0));
-        output.flush();
-
-        output << "Element1 from m_TestPosition should be ";
-        output << b*i + e*j;
-        CPPUNIT_ASSERT_EQUAL_MESSAGE(output.str(), true, b*i + e*j == m_TestPostion->GetElement(1));
-        output.flush();
-
-        output << "Element2 from m_TestPosition should be ";
-        output << c*i + f*j;
-        CPPUNIT_ASSERT_EQUAL_MESSAGE(output.str(), true, c*i + f*j == m_TestPostion->GetElement(2));
-        output.flush();
+        mitk::pa::Vector::Pointer directionBefore = m_TestDirection->Clone();
+        m_TestStrategy->CalculateNewDirectionVectorInStraightLine(m_TestDirection, 0, nullptr);
+        CPPUNIT_ASSERT(mitk::pa::Equal(directionBefore, m_TestDirection, 1e-6, false));
       }
     }
   }
 
   void tearDown() override
   {
-    m_TestVector = nullptr;
-    m_TestPostion = nullptr;
+    m_TestStrategy = nullptr;
     m_TestDirection = nullptr;
   }
 };

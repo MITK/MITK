@@ -1,26 +1,23 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <mitkAbstractFileReader.h>
 
 #include <mitkCustomMimeType.h>
 #include <mitkIOUtil.h>
-#include <mitkStandaloneDataStorage.h>
 
 #include <mitkFileReaderWriterBase.h>
+#include <mitkVersion.h>
+#include <mitkIOMetaInformationPropertyConstants.h>
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
@@ -88,17 +85,28 @@ namespace mitk
 
   std::vector<BaseData::Pointer> AbstractFileReader::Read()
   {
-    std::vector<BaseData::Pointer> result;
+    std::vector<BaseData::Pointer> result = this->DoRead();
 
-    DataStorage::Pointer ds = StandaloneDataStorage::New().GetPointer();
-    this->Read(*ds);
-    DataStorage::SetOfObjects::ConstPointer dataNodes = ds->GetAll();
-    for (DataStorage::SetOfObjects::ConstIterator iter = dataNodes->Begin(), iterEnd = dataNodes->End();
-         iter != iterEnd;
-         ++iter)
+    const auto options = this->GetOptions();
+
+    for (auto& data : result)
     {
-      result.push_back(iter.Value()->GetData());
+      data->SetProperty(PropertyKeyPathToPropertyName(IOMetaInformationPropertyConstants::READER_DESCRIPTION()), StringProperty::New(d->GetDescription()));
+      data->SetProperty(PropertyKeyPathToPropertyName(IOMetaInformationPropertyConstants::READER_VERSION()), StringProperty::New(MITK_VERSION_STRING));
+      data->SetProperty(PropertyKeyPathToPropertyName(IOMetaInformationPropertyConstants::READER_MIME_NAME()), StringProperty::New(d->GetMimeType()->GetName()));
+      data->SetProperty(PropertyKeyPathToPropertyName(IOMetaInformationPropertyConstants::READER_MIME_CATEGORY()), StringProperty::New(d->GetMimeType()->GetCategory()));
+      if (this->GetInputStream() == nullptr)
+      {
+        data->SetProperty(PropertyKeyPathToPropertyName(IOMetaInformationPropertyConstants::READER_INPUTLOCATION()), StringProperty::New(this->GetInputLocation()));
+      }
+
+      for (const auto& option : options)
+      {
+        auto optionpath = IOMetaInformationPropertyConstants::READER_OPTION_ROOT().AddElement(option.first);
+        data->SetProperty(PropertyKeyPathToPropertyName(optionpath), StringProperty::New(option.second.ToString()));
+      }
     }
+
     return result;
   }
 

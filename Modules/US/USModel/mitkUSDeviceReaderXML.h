@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #ifndef mitkUSDeviceReaderXML_H_HEADER_INCLUDED_
@@ -35,12 +31,12 @@ namespace mitk {
     ~USDeviceReaderXML() override;
 
     using AbstractFileReader::Read;
-    std::vector<itk::SmartPointer<BaseData>> Read() override;
+
     bool ReadUltrasoundDeviceConfiguration();
 
     void SetFilename(std::string filename);
 
-    typedef struct USVideoDeviceConfigData_
+    typedef struct USDeviceConfigData_
     {
       double fileversion;
       std::string deviceType;
@@ -48,6 +44,9 @@ namespace mitk {
       std::string manufacturer;
       std::string model;
       std::string comment;
+      std::string host;
+      int port;
+      bool server;
       int numberOfImageStreams;
 
       bool useGreyscale;
@@ -60,19 +59,22 @@ namespace mitk {
 
       std::vector <mitk::USProbe::Pointer> probes;
 
-      USVideoDeviceConfigData_()
+      USDeviceConfigData_()
         : fileversion(0), deviceType("Unknown"), deviceName("Unknown"),
-          manufacturer("Unknown"), comment(""), numberOfImageStreams(1),
+          manufacturer("Unknown"), comment(""), host("localhost"),
+          port(18944), server(false), numberOfImageStreams(1),
           useGreyscale(true), useResolutionOverride(true),
           resolutionWidth(640), resolutionHeight(480), sourceID(0),
           filepathVideoSource(""), opencvPort(0)
         { };
 
-    }USVideoDeviceConfigData;
+    }USDeviceConfigData;
 
-    USVideoDeviceConfigData &GetUSVideoDeviceConfigData();
+    USDeviceConfigData &GetUSDeviceConfigData();
 
   protected:
+    std::vector<itk::SmartPointer<BaseData>> DoRead() override;
+
     USDeviceReaderXML(const USDeviceReaderXML& other);
     mitk::USDeviceReaderXML* Clone() const override;
 
@@ -93,7 +95,7 @@ namespace mitk {
 
   private:
     std::string m_Filename;
-    USVideoDeviceConfigData m_DeviceConfig;
+    USDeviceConfigData m_DeviceConfig;
   };
 
 } // namespace mitk

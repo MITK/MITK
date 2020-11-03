@@ -43,6 +43,9 @@
      <property name="defaultDropAction">
       <enum>Qt::MoveAction</enum>
      </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::NoSelection</enum>
+     </property>
      <item>
       <property name="text">
        <string>1</string>
@@ -63,16 +66,6 @@
        <string>4</string>
       </property>
      </item>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="infoLabel">
-     <property name="text">
-      <string>TextLabel</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
     </widget>
    </item>
    <item>

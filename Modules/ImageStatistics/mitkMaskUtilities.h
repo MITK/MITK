@@ -1,8 +1,21 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
 #ifndef MITKMASKUTIL
 #define MITKMASKUTIL
 
 #include <MitkImageStatisticsExports.h>
 #include <mitkImage.h>
+#include <mitkNodePredicateGeometry.h>
 #include <itkImage.h>
 
 namespace mitk
@@ -12,7 +25,7 @@ namespace mitk
  * and it can also crop an image to the LargestPossibleRegion of the Mask
  */
 template <class TPixel, unsigned int VImageDimension>
-class MITKIMAGESTATISTICS_EXPORT MaskUtilities: public itk::Object
+class MaskUtilities: public itk::Object
     {
     public:
         /** Standard Self typedef */
@@ -22,10 +35,8 @@ class MITKIMAGESTATISTICS_EXPORT MaskUtilities: public itk::Object
         typedef itk::SmartPointer< const Self >     ConstPointer;
 
         /** Method for creation through the object factory. */
-        itkNewMacro(Self)
-
-        /** Runtime information support. */
-        itkTypeMacro(MaskUtilities, itk::Object)
+        itkNewMacro(Self); /** Runtime information support. */
+        itkTypeMacro(MaskUtilities, itk::Object);
 
         typedef itk::Image<TPixel, VImageDimension> ImageType;
         typedef itk::Image<unsigned short, VImageDimension> MaskType;
@@ -60,10 +71,18 @@ class MITKIMAGESTATISTICS_EXPORT MaskUtilities: public itk::Object
         itk::Image<TPixel, VImageDimension>* m_Image;
         itk::Image<unsigned short, VImageDimension>* m_Mask;
     };
+
+/** Tolerance used to check if the mask and input image are compatible for
+ * coordinate aspects (orgin, size, grid alignment).*/
+constexpr double MASK_SUITABILITY_TOLERANCE_COORDINATE = NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION;
+/** Tolerance used to check if the mask and input image are compatible for
+ * direction aspects (orientation of mask and image).*/
+constexpr double MASK_SUITABILITY_TOLERANCE_DIRECTION = NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION;
+
 }
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#include <mitkMaskUtilities.cpp>
+#include <mitkMaskUtilities.tpp>
 #endif
 
 #endif

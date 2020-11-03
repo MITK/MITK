@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QmitkSliceBasedInterpolatorWidget_h_Included
 #define QmitkSliceBasedInterpolatorWidget_h_Included
@@ -45,14 +41,13 @@ namespace mitk
   \sa QmitkInteractiveSegmentation
   \sa mitk::SegmentationInterpolation
 
-  There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref
-  QmitkInteractiveSegmentationTechnicalPage
-
   While mitk::SegmentationInterpolation does the bookkeeping of interpolation
   (keeping track of which slices contain how much segmentation) and the algorithmic work,
   QmitkSliceBasedInterpolatorWidget is responsible to watch the GUI, to notice, which slice is currently
   visible. It triggers generation of interpolation suggestions and also triggers acception of
   suggestions.
+
+  This class uses the mitk::ToolManagerProvider::MULTILABEL_SEGMENTATION context.
 
   \todo show/hide feedback on demand
 
@@ -156,7 +151,7 @@ protected:
     ToolManager)
     should be interpolated. The actual work is then done by our SegmentationInterpolation object.
   */
-  void Interpolate(mitk::PlaneGeometry *plane, unsigned int timeStep, mitk::SliceNavigationController *slicer);
+  void Interpolate(mitk::PlaneGeometry *plane, mitk::TimePointType timePoint, mitk::SliceNavigationController *slicer);
 
   /**
     Called internally to update the interpolation suggestion. Finds out about the focused render window and requests an
@@ -190,7 +185,7 @@ private:
 
   mitk::LabelSetImage::Pointer m_WorkingImage;
 
-  QHash<mitk::SliceNavigationController *, unsigned int> m_TimeStep;
+  QHash<mitk::SliceNavigationController *, mitk::TimePointType> m_TimePoints;
 
   mitk::DataStorage::Pointer m_DataStorage;
 

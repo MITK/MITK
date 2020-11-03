@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 // MITK includes
 #include <mitkPURFClassifier.h>
@@ -284,7 +280,7 @@ ITK_THREAD_RETURN_TYPE mitk::PURFClassifier::TrainTreesCallback(void * arg)
     data->m_mutex->Unlock();
   }
 
-  return NULL;
+  return ITK_THREAD_RETURN_VALUE;
 
 }
 
@@ -337,7 +333,7 @@ ITK_THREAD_RETURN_TYPE mitk::PURFClassifier::PredictCallback(void * arg)
   data->m_RandomForest.predictProbabilities(split_features, split_probability);
 
 
-  return NULL;
+  return ITK_THREAD_RETURN_VALUE;
 
 }
 

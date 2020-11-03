@@ -1,28 +1,24 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center, 
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without 
-even the implied warranty of MERCHANTABILITY or FITNESS FOR 
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 #include <assert.h>
 #include "empty.xpm"
 #include "ipSegmentationP.h"
 
-void 
+void
 ipMITKSegmentationClear (mitkIpPicDescriptor* segmentation)
 {
-  ipMITKSegmentationTYPE *cur, *last; 
-  mitkIpPicTSV_t* tag; 
-  const char *src; 
+  ipMITKSegmentationTYPE *cur, *last;
+  mitkIpPicTSV_t* tag;
+  const char *src;
   mitkIpUInt1_t *dst;
   mitkIpUInt4_t i, j;
 
@@ -49,7 +45,7 @@ ipMITKSegmentationClear (mitkIpPicDescriptor* segmentation)
     tag->bpe = sizeof (mitkIpBool_t) / 8;
     tag->dim = 1;
     tag->n[0] = 1;
-    tag->value = malloc (sizeof (mitkIpBool_t)); 
+    tag->value = malloc (sizeof (mitkIpBool_t));
     *((mitkIpBool_t *) tag->value) = mitkIpTrue;
     mitkIpPicAddTag (segmentation, tag);
   }
@@ -63,7 +59,7 @@ ipMITKSegmentationClear (mitkIpPicDescriptor* segmentation)
     tag->bpe = 8;
     tag->dim = 2;
     tag->n[0] = 80;
-    tag->n[1] = 80;  
+    tag->n[1] = 80;
     tag->value = malloc (tag->n[0] * tag->n[1] * sizeof (mitkIpUInt1_t));
     strcpy (tag->tag, "ICON80x80");
     mitkIpPicAddTag (segmentation, tag);
@@ -76,5 +72,5 @@ ipMITKSegmentationClear (mitkIpPicDescriptor* segmentation)
       src++;
       dst++;
     }
-  }    
+  }
 }

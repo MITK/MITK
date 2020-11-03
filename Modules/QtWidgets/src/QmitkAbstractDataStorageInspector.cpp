@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical Image Computing.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <QmitkAbstractDataStorageInspector.h>
 
@@ -42,7 +38,7 @@ void QmitkAbstractDataStorageInspector::SetDataStorage(mitk::DataStorage* dataSt
   }
 }
 
-void QmitkAbstractDataStorageInspector::SetNodePredicate(mitk::NodePredicateBase* nodePredicate)
+void QmitkAbstractDataStorageInspector::SetNodePredicate(const mitk::NodePredicateBase* nodePredicate)
 {
   if (m_NodePredicate != nodePredicate)
   {
@@ -52,7 +48,7 @@ void QmitkAbstractDataStorageInspector::SetNodePredicate(mitk::NodePredicateBase
   }
 }
 
-mitk::NodePredicateBase* QmitkAbstractDataStorageInspector::GetNodePredicate() const
+const mitk::NodePredicateBase* QmitkAbstractDataStorageInspector::GetNodePredicate() const
 {
   return m_NodePredicate;
 }
@@ -60,24 +56,24 @@ mitk::NodePredicateBase* QmitkAbstractDataStorageInspector::GetNodePredicate() c
 QmitkAbstractDataStorageInspector::NodeList QmitkAbstractDataStorageInspector::GetSelectedNodes() const
 {
   return m_Connector->GetSelectedNodes();
-};
+}
 
 bool QmitkAbstractDataStorageInspector::GetSelectOnlyVisibleNodes() const
 {
   return m_Connector->GetSelectOnlyVisibleNodes();
-};
+}
 
 void QmitkAbstractDataStorageInspector::SetSelectOnlyVisibleNodes(bool selectOnlyVisibleNodes)
 {
   m_Connector->SetSelectOnlyVisibleNodes(selectOnlyVisibleNodes);
-};
+}
 
 void QmitkAbstractDataStorageInspector::SetCurrentSelection(NodeList selectedNodes)
 {
   m_Connector->SetCurrentSelection(selectedNodes);
-};
+}
 
 void QmitkAbstractDataStorageInspector::OnSelectionChanged(NodeList selectedNodes)
 {
   emit CurrentSelectionChanged(selectedNodes);
-};
+}

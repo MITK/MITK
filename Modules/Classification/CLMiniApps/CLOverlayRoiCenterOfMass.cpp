@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 #ifndef mitkCLPolyToNrrd_cpp
 #define mitkCLPolyToNrrd_cpp
 
@@ -130,15 +126,15 @@ int main(int argc, char* argv[])
   mitkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
 
-  parser.addArgument("image", "i", mitkCommandLineParser::InputImage, "Input Image", "", us::Any(),false);
-  parser.addArgument("mask", "m", mitkCommandLineParser::InputImage, "Input Image", "", us::Any(),false);
-  parser.addArgument("output", "o", mitkCommandLineParser::InputImage, "Output Image", "", us::Any(),false);
+  parser.addArgument("image", "i", mitkCommandLineParser::Image, "Input Image", "", us::Any(),false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("mask", "m", mitkCommandLineParser::Image, "Input Image", "", us::Any(),false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("output", "o", mitkCommandLineParser::Image, "Output Image", "", us::Any(),false, false, false, mitkCommandLineParser::Input);
 
   // Miniapp Infos
   parser.setCategory("Classification Tools");
   parser.setTitle("Image with Overlay Plotter");
   parser.setDescription("Plots ");
-  parser.setContributor("MBI");
+  parser.setContributor("German Cancer Research Center (DKFZ)");
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
 

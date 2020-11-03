@@ -1,48 +1,42 @@
-/*****************************************************************************
+/*============================================================================
 
- Copyright (c) 1993-2000,  Div. Medical and Biological Informatics, 
- Deutsches Krebsforschungszentrum, Heidelberg, Germany
+ Copyright (c) German Cancer Research Center (DKFZ)
  All rights reserved.
 
- Redistribution and use in source and binary forms, with or without 
+ Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
 
  - Redistributions of source code must retain the above copyright notice, this
    list of conditions and the following disclaimer.
 
- - Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+ - Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
- - All advertising materials mentioning features or use of this software must 
-   display the following acknowledgement: 
-          
-     "This product includes software developed by the Div. Medical and 
-      Biological Informatics, Deutsches Krebsforschungszentrum, Heidelberg, 
-      Germany."
+ - All advertising materials mentioning features or use of this software must
+   display the following acknowledgement:
 
- - Neither the name of the Deutsches Krebsforschungszentrum nor the names of 
-   its contributors may be used to endorse or promote products derived from 
-   this software without specific prior written permission. 
+     "This product includes software developed by the German Cancer Research
+      Center (DKFZ)."
 
-   THIS SOFTWARE IS PROVIDED BY THE DIVISION MEDICAL AND BIOLOGICAL
-   INFORMATICS AND CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED
-   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-   OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-   IN NO EVENT SHALL THE DIVISION MEDICAL AND BIOLOGICAL INFORMATICS,
-   THE DEUTSCHES KREBSFORSCHUNGSZENTRUM OR CONTRIBUTORS BE LIABLE FOR 
-   ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-   DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE 
-   GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER 
-   IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
-   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN 
-   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ - Neither the name of the German Cancer Research Center (DKFZ) nor the names
+   of its contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
 
- Send comments and/or bug reports to:
-   mbi-software@dkfz-heidelberg.de
+   THIS SOFTWARE IS PROVIDED BY THE GERMAN CANCER RESEARCH CENTER (DKFZ) AND
+   CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+   BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+   FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE GERMAN
+   CANCER RESEARCH CENTER (DKFZ) OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+   INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+   SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+   OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+   DAMAGE.
 
-*****************************************************************************/
+============================================================================*/
 
 /*
  * mitkIpFuncInertia
@@ -54,7 +48,7 @@
  * FUNCTION DECLARATION
  *  mitkIpInt4_t mitkIpFuncInertia ( mitkIpPicDescriptor *pic_old,
  *                           mitkIpFloat8_t     **eigen_vekt,
- *                           mitkIpFloat8_t     **eigen_val )            
+ *                           mitkIpFloat8_t     **eigen_val )
  *
  * PARAMETERS
  *  pic_old	- pointer to an image structure which contains the ROI
@@ -63,7 +57,7 @@
  *
  * RETURN VALUES
  *  mitkIpFuncOK        - no error occured
- *  mitkIpFuncERROR     - an error occured              
+ *  mitkIpFuncERROR     - an error occured
  *
  * UPDATES
  *   update of Manu's program to calculate axis of inertia. It's a
@@ -74,7 +68,6 @@
  *  Antje Schroeder	08.06.95
  *
  *---------------------------------------------------------------------
- * COPYRIGHT (c) 1995 by DKFZ (Dept. MBI) HEIDELBERG, FRG
  */
 /* include Files                                                        */
 
@@ -141,7 +134,7 @@
 
 mitkIpInt4_t mitkIpFuncInertia ( mitkIpPicDescriptor *pic_old,
                          mitkIpFloat8_t     **eigen_vekt,
-                         mitkIpFloat8_t     **eigen_val )            
+                         mitkIpFloat8_t     **eigen_val )
 {
 
   mitkIpUInt4_t       index_vect[_mitkIpPicNDIM]; /* loopindex-vector           */
@@ -159,12 +152,12 @@ mitkIpInt4_t mitkIpFuncInertia ( mitkIpPicDescriptor *pic_old,
   /* check data  */
 
   if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
- 
+
   /* initialisation of vectors  */
 
   for ( i = 0; i < pic_old->dim; i++ )
     n[i] = pic_old->n[i];
-  
+
   for ( i = pic_old->dim; i < _mitkIpPicNDIM; i++ )
     n[i] = 1;
 
@@ -174,56 +167,56 @@ mitkIpInt4_t mitkIpFuncInertia ( mitkIpPicDescriptor *pic_old,
   /* memory allocation */
 
   gravity = ( mitkIpFloat8_t * ) malloc ( pic_old->dim * sizeof ( mitkIpFloat8_t ) );
-  if ( gravity == NULL ) 
+  if ( gravity == NULL )
     {
        _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
- 
+
   dist    = ( mitkIpFloat8_t * ) malloc ( pic_old->dim * sizeof ( mitkIpFloat8_t ) );
-  if ( dist == NULL ) 
+  if ( dist == NULL )
     {
        _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        free ( gravity );
        return ( mitkIpFuncERROR );
     }
- 
+
   s_diag  = ( mitkIpFloat8_t * ) malloc ( pic_old->dim * sizeof ( mitkIpFloat8_t ) );
-  if ( s_diag == NULL ) 
+  if ( s_diag == NULL )
     {
        _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        free ( gravity );
-       free ( dist );    
+       free ( dist );
        return ( mitkIpFuncERROR );
     }
- 
+
   s = ( mitkIpFloat8_t * ) malloc ( pic_old->dim * pic_old->dim * sizeof ( mitkIpFloat8_t ) );
-  if ( s == NULL ) 
+  if ( s == NULL )
     {
        _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        free ( gravity );
-       free ( dist );   
+       free ( dist );
        free ( s_diag );
        return ( mitkIpFuncERROR );
     }
- 
+
   tt = m_get ( pic_old->dim, pic_old->dim );
-  if ( tt == NULL ) 
+  if ( tt == NULL )
     {
        _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        free ( gravity );
-       free ( dist );   
+       free ( dist );
        free ( s_diag );
        free ( s );
        return ( mitkIpFuncERROR );
     }
 
   ev = m_get ( pic_old->dim, pic_old->dim );
-  if ( ev == NULL ) 
+  if ( ev == NULL )
     {
        _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        free ( gravity );
-       free ( dist );   
+       free ( dist );
        free ( s_diag );
        free ( s );
        M_FREE ( tt );
@@ -231,11 +224,11 @@ mitkIpInt4_t mitkIpFuncInertia ( mitkIpPicDescriptor *pic_old,
     }
 
   ew = v_get ( pic_old->dim-1 );
-  if ( ew == NULL ) 
+  if ( ew == NULL )
     {
        _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        free ( gravity );
-       free ( dist );   
+       free ( dist );
        free ( s_diag );
        free ( s );
        M_FREE ( tt );
@@ -259,7 +252,7 @@ mitkIpInt4_t mitkIpFuncInertia ( mitkIpPicDescriptor *pic_old,
 
   /* preparation for calculating the tensor of inertia */
 
-  mitkIpPicFORALL_4 ( GRAV, pic_old, index_vect, s, s_diag, dist ) 
+  mitkIpPicFORALL_4 ( GRAV, pic_old, index_vect, s, s_diag, dist )
 
   /* calculate tensor of inertia  */
 
@@ -272,7 +265,7 @@ mitkIpInt4_t mitkIpFuncInertia ( mitkIpPicDescriptor *pic_old,
                tt->me[i][j] = s[i*pic_old->dim+j];
             else if ( j < i )
                tt->me[i][j] = s[j*pic_old->dim+i];
-            if ( i != j ) 
+            if ( i != j )
                tt->me[i][i] = tt->me[i][i] + s_diag[j];
          }
     }
@@ -301,6 +294,6 @@ mitkIpInt4_t mitkIpFuncInertia ( mitkIpPicDescriptor *pic_old,
   free ( s_diag );
   free ( gravity );
 
-  return mitkIpFuncOK;   
+  return mitkIpFuncOK;
 }
 #endif

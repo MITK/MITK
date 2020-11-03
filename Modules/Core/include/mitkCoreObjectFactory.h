@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef COREOBJECTFACTORY_H_INCLUDED
 #define COREOBJECTFACTORY_H_INCLUDED
@@ -32,7 +28,8 @@ namespace mitk
   class MITKCORE_EXPORT CoreObjectFactory : public CoreObjectFactoryBase
   {
   public:
-    mitkClassMacro(CoreObjectFactory, CoreObjectFactoryBase) itkFactorylessNewMacro(CoreObjectFactory)
+    mitkClassMacro(CoreObjectFactory, CoreObjectFactoryBase);
+    itkFactorylessNewMacro(CoreObjectFactory);
 
       Mapper::Pointer CreateMapper(mitk::DataNode *node, MapperSlotId slotId) override;
     void SetDefaultProperties(mitk::DataNode *node) override;
@@ -54,7 +51,7 @@ namespace mitk
      * @return The c-string that contains the file extensions
      * @deprecatedSince{2014_10} See mitk::FileReaderRegistry and QmitkIOUtil
      */
-    DEPRECATED(virtual const char *GetFileExtensions() override);
+    DEPRECATED(virtual std::string GetFileExtensions() override);
 
     /**
      * @brief get the defined (open) file extension map
@@ -72,7 +69,7 @@ namespace mitk
      * @return The c-string that contains the (save) file extensions
      * @deprecatedSince{2014_10} See mitk::FileWriterRegistry and QmitkIOUtil
      */
-    DEPRECATED(virtual const char *GetSaveFileExtensions() override);
+    DEPRECATED(virtual std::string GetSaveFileExtensions() override);
 
     /**
      * @brief get the defined (save) file extension map

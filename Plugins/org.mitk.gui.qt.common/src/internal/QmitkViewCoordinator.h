@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 #ifndef QmitkViewCoordinator_h
@@ -95,19 +91,25 @@ public:
   void PartVisible(const berry::IWorkbenchPartReference::Pointer& partRef) override;
 
   /**
+  * \see IPartListener::PartInputChanged()
+  */
+  void PartInputChanged(const berry::IWorkbenchPartReference::Pointer& partRef) override;
+
+  /**
+  * Notifies this listener that the given window has been opened.
+  */
+  void WindowOpened(const berry::IWorkbenchWindow::Pointer& window) override;
+
+  /**
    * Notifies this listener that the given window has been closed.
    */
   void WindowClosed(const berry::IWorkbenchWindow::Pointer& window) override;
-
-  /**
-   * Notifies this listener that the given window has been opened.
-   */
-  void WindowOpened(const berry::IWorkbenchWindow::Pointer& /*window*/) override;
 
 private:
 
   void RenderWindowPartActivated(mitk::IRenderWindowPart* renderPart);
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderPart);
+  void RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderPart);
 
 private:
 

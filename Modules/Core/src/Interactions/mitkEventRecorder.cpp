@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
- The Medical Imaging Interaction Toolkit (MITK)
+The Medical Imaging Interaction Toolkit (MITK)
 
- Copyright (c) German Cancer Research Center,
- Division of Medical and Biological Informatics.
- All rights reserved.
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
 
- This software is distributed WITHOUT ANY WARRANTY; without
- even the implied warranty of MERCHANTABILITY or FITNESS FOR
- A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
- See LICENSE.txt or http://www.mitk.org for details.
-
- ===================================================================*/
+============================================================================*/
 
 #include "mitkEventRecorder.h"
 #include "mitkEventFactory.h"
@@ -46,7 +42,7 @@ static void WriteEventXMLConfig(std::ofstream &stream)
       (*rendererIterator).second->GetSliceNavigationController()->GetDefaultViewDirection();
     mitk::BaseRenderer::MapperSlotId mapperID = (*rendererIterator).second->GetMapperID();
 
-    //  <renderer RendererName="stdmulti.widget2" ViewDirection="1" MapperID="1" SizeX="200" SizeY="200" SizeZ="1"/>
+    //  <renderer RendererName="stdmulti.widget1" ViewDirection="1" MapperID="1" SizeX="200" SizeY="200" SizeZ="1"/>
     stream << "  <" << mitk::InteractionEventConst::xmlTagRenderer() << " "
            << mitk::InteractionEventConst::xmlEventPropertyRendererName() << "=\"" << rendererName << "\" "
            << mitk::InteractionEventConst::xmlEventPropertyViewDirection() << "=\"" << viewDirection << "\" "
@@ -164,8 +160,8 @@ void mitk::EventRecorder::StartRecording()
   // <?xml version="1.0"?>
   //  <interactions>
   //   <config>
-  //    <renderer RendererName="stdmulti.widget2" ViewDirection="1"/>
-  //    <renderer RendererName="stdmulti.widget1" ViewDirection="0"/>
+  //    <renderer RendererName="stdmulti.widget1" ViewDirection="1"/>
+  //    <renderer RendererName="stdmulti.widget0" ViewDirection="0"/>
   //     ...
   //   </config>
   //   <events>

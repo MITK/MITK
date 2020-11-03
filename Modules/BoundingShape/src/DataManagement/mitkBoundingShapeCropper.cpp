@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkBoundingShapeCropper.h"
 #include "mitkGeometry3D.h"
@@ -216,17 +212,25 @@ namespace mitk
     mitk::SlicedData::SizeType size = m_InputRequestedRegion.GetSize(); // init times and channels
     mitk::BoundingBox::PointType max = bsBoxRelativeToImage->GetMaximum();
     mitk::Point<BoundingBox::PointType::CoordRepType, 5> maxCorrected;
-    maxCorrected[0] = max[0];
-    maxCorrected[1] = max[1];
-    maxCorrected[2] = max[2];
+    mitk::Point<BoundingBox::PointType::CoordRepType, 5> minCorrected;
+
+    for (unsigned int i = 0; i < 3; i++)
+    {
+      maxCorrected[i] = max[i];
+      minCorrected[i] = min[i];
+    }
+
     maxCorrected[3] = input->GetDimensions()[3];
     maxCorrected[4] = 0;
+    minCorrected[3] = 0;
+    minCorrected[4] = 0;
 
     for (unsigned int i = 0; i < dimension; i++)
     {
-      index[i] = (mitk::SlicedData::IndexType::IndexValueType)(std::ceil(min[i]));
+      index[i] = (mitk::SlicedData::IndexType::IndexValueType)(std::ceil(minCorrected[i]));
       size[i] = (mitk::SlicedData::SizeType::SizeValueType)(std::ceil(maxCorrected[i]) - index[i]);
     }
+
     mitk::SlicedData::RegionType bsRegion(index, size);
 
     if (m_UseWholeInputRegion == false)

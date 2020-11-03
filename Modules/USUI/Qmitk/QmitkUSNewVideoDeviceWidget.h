@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef _QmitkUSNewVideoDeviceWidget_H_INCLUDED
 #define _QmitkUSNewVideoDeviceWidget_H_INCLUDED
@@ -133,11 +129,11 @@ protected:
 
   void CleanUpAfterCreatingNewDevice();
 
-  void AddProbesToDevice(mitk::USVideoDevice::Pointer device);
+  void AddProbesToDevice(mitk::USDevice::Pointer device);
 
   mitk::USProbe::Pointer CheckIfProbeExistsAlready(const std::string &probe);
 
-  void CollectUltrasoundVideoDeviceConfigInformation(mitk::USDeviceReaderXML::USVideoDeviceConfigData &config);
+  void CollectUltrasoundDeviceConfigInformation(mitk::USDeviceReaderXML::USDeviceConfigData &config);
 
   /**
   * \brief Enables or disables the GUI elements of the spacing and cropping options.
@@ -155,9 +151,9 @@ protected:
 
   /**
   *   \brief This is the device to edit. It is either the device transmitted in the "EditDevice" signal, or a new one
-  *  if the "CreateNewDevice slot was called.
+  *  if the "CreateNewDevice slot was called. As device type: either mitkUSVideoDevice or mitkUSIGTLDevice
   */
-  mitk::USVideoDevice::Pointer m_TargetDevice;
+  mitk::USDevice::Pointer m_TargetDevice;
 
   /**
   *   \brief The config probes are used to have a possibility to configure ultrasound probes without having an existing

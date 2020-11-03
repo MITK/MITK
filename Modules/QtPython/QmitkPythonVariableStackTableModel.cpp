@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkPythonVariableStackTableModel.h"
 #include <QMimeData>
@@ -62,7 +58,7 @@ bool QmitkPythonVariableStackTableModel::dropMimeData(const QMimeData * data, Qt
         foreach(node, dataNodeList)
         {
           mitk::Image* mitkImage = dynamic_cast<mitk::Image*>(node->GetData());
-          MITK_DEBUG("QmitkPythonVariableStackTableModel") << "mitkImage is not null " << (mitkImage != 0? "true": "false");
+          MITK_DEBUG("QmitkPythonVariableStackTableModel") << "mitkImage is not null " << (mitkImage != nullptr? "true": "false");
 
           QRegExp rx("^\\d");
           QString varName(node->GetName().c_str());

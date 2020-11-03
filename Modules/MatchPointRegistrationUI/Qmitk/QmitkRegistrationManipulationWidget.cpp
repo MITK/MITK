@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 //Qmitk
 #include "QmitkRegistrationManipulationWidget.h"
@@ -130,6 +126,7 @@ void QmitkRegistrationManipulationWidget::InitControls()
   this->ConfigureTransformCenter();
 
   //set bounds of the translation slider widget to have sensible ranges
+  this->m_internalUpdate = true;
   auto currenttrans = m_DirectCurrentTransform->GetTranslation();
   this->slideTransX->setMinimum(currenttrans[0] - 250);
   this->slideTransY->setMinimum(currenttrans[1] - 250);
@@ -137,6 +134,9 @@ void QmitkRegistrationManipulationWidget::InitControls()
   this->slideTransX->setMaximum(currenttrans[0] + 250);
   this->slideTransY->setMaximum(currenttrans[1] + 250);
   this->slideTransZ->setMaximum(currenttrans[2] + 250);
+  this->m_internalUpdate = false;
+
+  this->UpdateTransformWidgets();
 };
 
 void QmitkRegistrationManipulationWidget::UpdateTransformWidgets()

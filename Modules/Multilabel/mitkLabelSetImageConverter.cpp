@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <mitkITKImageImport.h>
 #include <mitkImageAccessByItk.h>
@@ -81,6 +77,8 @@ mitk::Image::Pointer mitk::ConvertLabelSetImageToImage(LabelSetImage::ConstPoint
     {
       AccessByItk_2(labelSetImage->GetLayerImage(0), ::ConvertLabelSetImageToImage, labelSetImage, image);
     }
+
+    image->SetTimeGeometry(labelSetImage->GetTimeGeometry()->Clone());
   }
 
   return image;
@@ -140,6 +138,7 @@ mitk::LabelSetImage::Pointer mitk::ConvertImageToLabelSetImage(Image::Pointer im
       labelSetImage = mitk::LabelSetImage::New();
       labelSetImage->InitializeByLabeledImage(image);
     }
+    labelSetImage->SetTimeGeometry(image->GetTimeGeometry()->Clone());
   }
 
   return labelSetImage;

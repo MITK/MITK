@@ -11,14 +11,8 @@ set(MODULE_TESTS
 #  mitkToolManagerTest.cpp
   mitkToolManagerProviderTest.cpp
   mitkManualSegmentationToSurfaceFilterTest.cpp #new cpp unit style
-)
-
-if(MITK_ENABLE_RENDERING_TESTING) #since mitkInteractionTestHelper is currently creating a vtkRenderWindow
-set(MODULE_TESTS
-  ${MODULE_TESTS}
   mitkToolInteractionTest.cpp
 )
-endif()
 
 set(MODULE_IMAGE_TESTS
   mitkOverwriteSliceImageFilterTest.cpp #only runs on images

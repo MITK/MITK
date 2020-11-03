@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkContourModelSetToImageFilter.h"
 
@@ -60,7 +56,7 @@ void mitk::ContourModelSetToImageFilter::GenerateOutputInformation()
 
   if (m_MakeOutputBinary)
   {
-    output->Initialize(mitk::MakeScalarPixelType<unsigned char>(), *m_ReferenceImage->GetTimeGeometry(), 1, 1);
+    output->Initialize(mitk::MakeScalarPixelType<unsigned char>(), *m_ReferenceImage->GetTimeGeometry(), 1);
   }
   else
   {
@@ -126,14 +122,12 @@ void mitk::ContourModelSetToImageFilter::GenerateData()
 
   if (outputImage.IsNull() || outputImage->IsInitialized() == false || !outputImage->IsVolumeSet(m_TimeStep))
   {
-    MITK_ERROR << "Error creating output for specified image!";
-    return;
+    mitkThrow() << "Error creating output for specified image!";
   }
 
   if (!contourSet || contourSet->GetContourModelList()->size() == 0)
   {
-    MITK_ERROR << "No contours specified!";
-    return;
+    mitkThrow() << "No contours specified!";
   }
 
   mitk::BaseGeometry *outputImageGeo = outputImage->GetGeometry(m_TimeStep);

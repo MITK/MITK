@@ -1,21 +1,18 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 // VTK
 #include <vtkCamera.h>
+#include <vtkOpenGLRenderWindow.h>
 #include <vtkPNGWriter.h>
 #include <vtkRenderLargeImage.h>
 #include <vtkRenderWindow.h>
@@ -30,10 +27,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkException.h>
 #include <mitkTestNotRunException.h>
 #include <mitkTestingMacros.h>
-
-// include gl to read out properties
-#include <vtkOpenGL.h>
-#include <vtksys/SystemTools.hxx>
 
 #if defined _MSC_VER
 #if _MSC_VER >= 1700
@@ -50,35 +43,45 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 mitk::RenderingTestHelper::RenderingTestHelper(int width,
                                                int height,
-                                               mitk::BaseRenderer::RenderingMode::Type renderingMode)
+                                               AntiAliasing antiAliasing)
   : m_AutomaticallyCloseRenderWindow(true)
 {
-  this->Initialize(width, height, renderingMode);
+  this->Initialize(width, height, antiAliasing);
 }
 
 mitk::RenderingTestHelper::RenderingTestHelper(
-  int width, int height, int argc, char *argv[], mitk::BaseRenderer::RenderingMode::Type renderingMode)
+  int width, int height, int argc, char *argv[], AntiAliasing antiAliasing)
   : m_AutomaticallyCloseRenderWindow(true)
 {
-  this->Initialize(width, height, renderingMode);
+  this->Initialize(width, height, antiAliasing);
   this->SetInputFileNames(argc, argv);
 }
 
-void mitk::RenderingTestHelper::Initialize(int width, int height, mitk::BaseRenderer::RenderingMode::Type renderingMode)
+void mitk::RenderingTestHelper::Initialize(int width, int height, AntiAliasing antiAliasing)
 {
-  mitk::UIDGenerator uidGen = mitk::UIDGenerator("UnnamedRenderer_", 8);
-  m_RenderWindow = mitk::RenderWindow::New(nullptr, uidGen.GetUID().c_str(), nullptr, renderingMode);
+  RenderingManager::GetInstance()->SetAntiAliasing(antiAliasing);
+
+  mitk::UIDGenerator uidGen = mitk::UIDGenerator("UnnamedRenderer_");
+  m_RenderWindow = mitk::RenderWindow::New(nullptr, uidGen.GetUID().c_str());
+
+  auto renderWindow = m_RenderWindow->GetVtkRenderWindow();
+
+  if (0 == renderWindow->SupportsOpenGL())
+  {
+    auto openGLRenderWindow = dynamic_cast<vtkOpenGLRenderWindow*>(renderWindow);
+
+    auto message = nullptr != openGLRenderWindow
+      ? openGLRenderWindow->GetOpenGLSupportMessage()
+      : std::string("No details available.");
+
+    mitkThrowException(mitk::TestNotRunException) << "OpenGL not supported: " << message;
+  }
 
   m_DataStorage = mitk::StandaloneDataStorage::New();
 
   m_RenderWindow->GetRenderer()->SetDataStorage(m_DataStorage);
   this->SetMapperIDToRender2D();
   this->GetVtkRenderWindow()->SetSize(width, height);
-
-  if (!IsAdvancedOpenGL())
-  {
-    mitkThrowException(mitk::TestNotRunException) << "Insufficient OpenGL version";
-  }
 
 #ifdef RESIZE_WORKAROUND
 
@@ -124,36 +127,10 @@ void mitk::RenderingTestHelper::Initialize(int width, int height, mitk::BaseRend
 #endif
 
   m_RenderWindow->GetRenderer()->Resize(width, height);
-
-  // Prints the glinfo after creation of the vtkrenderwindow, we always want to do this for debugging.
-  this->PrintGLInfo();
 }
 
 mitk::RenderingTestHelper::~RenderingTestHelper()
 {
-}
-
-bool mitk::RenderingTestHelper::IsAdvancedOpenGL()
-{
-  const GLubyte *version = glGetString(GL_VERSION);
-  if (!version)
-    return false;
-  return *version >= '2';
-}
-
-void mitk::RenderingTestHelper::PrintGLInfo()
-{
-  GLint maxTextureSize;
-
-  glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
-  ;
-
-  //MITK_INFO << "OpenGL Render Context Information: \n"
-  //          << "- GL_VENDOR: " << glGetString(GL_VENDOR) << "\n"
-  //          << "- GL_RENDERER: " << glGetString(GL_RENDERER) << "\n"
-  //          << "- GL_VERSION: " << glGetString(GL_VERSION) << "\n"
-  //          << "- GL_MAX_TEXTURE_SIZE: " << maxTextureSize << "\n"
-  //          << "- GL_EXTENSIONS: " << glGetString(GL_EXTENSIONS);
 }
 
 void mitk::RenderingTestHelper::SetMapperID(mitk::BaseRenderer::StandardMapperSlot id)
@@ -301,7 +278,7 @@ void mitk::RenderingTestHelper::AddToStorage(const std::string &filename)
     mitk::RenderingManager::GetInstance()->InitializeViews(
       m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll()));
   }
-  catch (itk::ExceptionObject &e)
+  catch ( const itk::ExceptionObject &e )
   {
     MITK_ERROR << "Failed loading test data '" << filename << "': " << e.what();
   }

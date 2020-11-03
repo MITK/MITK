@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
- The Medical Imaging Interaction Toolkit (MITK)
+The Medical Imaging Interaction Toolkit (MITK)
 
- Copyright (c) German Cancer Research Center,
- Division of Medical and Biological Informatics.
- All rights reserved.
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
 
- This software is distributed WITHOUT ANY WARRANTY; without
- even the implied warranty of MERCHANTABILITY or FITNESS FOR
- A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
- See LICENSE.txt or http://www.mitk.org for details.
-
- ===================================================================*/
+============================================================================*/
 
 #ifndef MITKDATAINTERACTOR_H_
 #define MITKDATAINTERACTOR_H_
@@ -27,13 +23,13 @@ namespace mitk
 {
   class DataNode;
 
-  itkEventMacro(DataInteractorEvent, itk::AnyEvent)
+  itkEventMacro(DataInteractorEvent, itk::AnyEvent);
 
     /** Triggered when interaction is started */
-    itkEventMacro(StartInteraction, DataInteractorEvent)
+    itkEventMacro(StartInteraction, DataInteractorEvent);
 
     /** Triggered when result is stored in mitk::DataNode */
-    itkEventMacro(ResultReady, DataInteractorEvent)
+    itkEventMacro(ResultReady, DataInteractorEvent);
 
       enum ProcessEventMode {
         REGULAR = 0,
@@ -57,7 +53,11 @@ namespace mitk
     static const std::string IntLeaveWidget;
     static const std::string IntEnterWidget;
 
-    mitkClassMacro(DataInteractor, EventStateMachine) itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(DataInteractor, EventStateMachine);
+
+    itkFactorylessNewMacro(Self);
+
+    itkCloneMacro(Self);
 
       DataNode *GetDataNode() const;
     virtual void SetDataNode(DataNode *dataNode); // TODO: Remove virtual, use DataNodeChanged instead in subclasses

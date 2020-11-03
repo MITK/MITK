@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>945</width>
-    <height>728</height>
+    <height>456</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -21,13 +21,13 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
-    <widget class="QListView" name="selectionListView"/>
+    <widget class="QmitkDataStorageListInspector" name="listInspector"/>
    </item>
    <item row="0" column="1">
-    <widget class="QListView" name="selectionListView2"/>
+    <widget class="QmitkDataStorageTreeInspector" name="treeInspector"/>
    </item>
    <item row="1" column="0">
-    <widget class="QCheckBox" name="selectionProviderCheckBox">
+    <widget class="QCheckBox" name="selectionProviderCheckBox1">
      <property name="text">
       <string>Set as selection provider</string>
      </property>
@@ -41,7 +41,7 @@
     </widget>
    </item>
    <item row="2" column="0">
-    <widget class="QCheckBox" name="selectionListenerCheckBox">
+    <widget class="QCheckBox" name="selectionListenerCheckBox1">
      <property name="text">
       <string>Set as selection listener</string>
      </property>
@@ -56,6 +56,12 @@
    </item>
    <item row="3" column="0">
     <widget class="QmitkSingleNodeSelectionWidget" name="singleSlot" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -74,38 +80,17 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="0">
-    <widget class="QCheckBox" name="selectionListenerCheckBox3">
-     <property name="text">
-      <string>Set as selection listner</string>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="0">
-    <widget class="QCheckBox" name="checkOnlyVisible">
-     <property name="text">
-      <string>Only valid nodes</string>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="0">
-    <widget class="QCheckBox" name="checkOnlyImages">
-     <property name="text">
-      <string>Allow only images </string>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="0">
-    <widget class="QCheckBox" name="checkOptional">
-     <property name="text">
-      <string>Is Optional</string>
-     </property>
-    </widget>
-   </item>
    <item row="4" column="1">
     <widget class="QCheckBox" name="selectionProviderCheckBox4">
      <property name="text">
       <string>Set as selection provider</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QCheckBox" name="selectionListenerCheckBox3">
+     <property name="text">
+      <string>Set as selection listner</string>
      </property>
     </widget>
    </item>
@@ -116,30 +101,97 @@
      </property>
     </widget>
    </item>
-   <item row="6" column="1">
-    <widget class="QCheckBox" name="checkOnlyVisible_2">
+   <item row="6" column="0">
+    <widget class="QCheckBox" name="checkOnlyVisible1">
      <property name="text">
       <string>Only valid nodes</string>
      </property>
     </widget>
    </item>
-   <item row="7" column="1">
-    <widget class="QCheckBox" name="checkOnlyImages_2">
+   <item row="6" column="1">
+    <widget class="QCheckBox" name="checkOnlyVisible2">
+     <property name="text">
+      <string>Only valid nodes</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QCheckBox" name="checkOnlyImages1">
      <property name="text">
       <string>Allow only images </string>
      </property>
     </widget>
    </item>
+    <item row="7" column="1">
+    <widget class="QCheckBox" name="checkOnlyImages2">
+     <property name="text">
+      <string>Allow only images (using NodePredicate feature and general invalid message)</string>
+     </property>
+    </widget>
+   </item>
    <item row="8" column="1">
-    <widget class="QCheckBox" name="checkOptional_2">
+    <widget class="QCheckBox" name="checkOnlyUneven">
+     <property name="text">
+      <string>Allow only uneven selection count (using check funcktion feature)</string>
+     </property>
+    </widget>
+   </item>
+    <item row="9" column="0">
+    <widget class="QCheckBox" name="checkOptional1">
      <property name="text">
       <string>Is Optional</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="1">
+    <widget class="QCheckBox" name="checkOptional2">
+     <property name="text">
+      <string>Is Optional</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="0">
+    <widget class="QCheckBox" name="checkEnabled1">
+     <property name="text">
+      <string>Is Enabled</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="1">
+    <widget class="QCheckBox" name="checkEnabled2">
+     <property name="text">
+      <string>Is Enabled</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="0">
+    <widget class="QCheckBox" name="checkAuto">
+     <property name="text">
+      <string>Auto select node</string>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>QmitkDataStorageListInspector</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkDataStorageListInspector.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkDataStorageTreeInspector</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkDataStorageTreeInspector.h</header>
+   <container>1</container>
+  </customwidget>
   <customwidget>
    <class>QmitkSingleNodeSelectionWidget</class>
    <extends>QWidget</extends>

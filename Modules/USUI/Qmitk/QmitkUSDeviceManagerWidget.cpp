@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 //#define _USE_MATH_DEFINES
 #include <QmitkUSDeviceManagerWidget.h>
@@ -20,6 +16,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <usGetModuleContext.h>
 #include <QMessageBox>
 #include "mitkUSVideoDevice.h"
+#include <mitkUSIGTLDevice.h>
 
 const std::string QmitkUSDeviceManagerWidget::VIEW_ID =
 "org.mitk.views.QmitkUSDeviceManagerWidget";
@@ -148,6 +145,7 @@ void QmitkUSDeviceManagerWidget::OnClickedRemoveDevice()
 {
   mitk::USDevice::Pointer device =
     m_Controls->m_ConnectedDevices->GetSelectedService<mitk::USDevice>();
+
   if (device.IsNull())
   {
     return;
@@ -166,6 +164,19 @@ void QmitkUSDeviceManagerWidget::OnClickedRemoveDevice()
 
     dynamic_cast<mitk::USVideoDevice*>(device.GetPointer())
       ->UnregisterOnService();
+  }
+  else if (device->GetDeviceClass() == "IGTL Client")
+  {
+    mitk::USIGTLDevice::Pointer ultrasoundIGTLDevice = dynamic_cast<mitk::USIGTLDevice*>(device.GetPointer());
+    if (ultrasoundIGTLDevice->GetIsActive())
+    {
+      ultrasoundIGTLDevice->Deactivate();
+    }
+    if (ultrasoundIGTLDevice->GetIsConnected())
+    {
+      ultrasoundIGTLDevice->Disconnect();
+    }
+    ultrasoundIGTLDevice->UnregisterOnService();
   }
 }
 
@@ -215,8 +226,9 @@ void QmitkUSDeviceManagerWidget::OnDeviceSelectionChanged(
     reference.GetProperty(mitk::USDevice::GetPropertyKeys().US_PROPKEY_CLASS)
     .ToString();
   m_Controls->m_BtnRemove->setEnabled(deviceClass ==
-    "org.mitk.modules.us.USVideoDevice");
-  m_Controls->m_BtnEdit->setEnabled((deviceClass == "org.mitk.modules.us.USVideoDevice") && (isActive.compare("false") == 0));
+    "org.mitk.modules.us.USVideoDevice" || deviceClass == "IGTL Client");
+  m_Controls->m_BtnEdit->setEnabled(((deviceClass == "org.mitk.modules.us.USVideoDevice") && (isActive.compare("false") == 0)) ||
+                                    ((deviceClass == "IGTL Client") && (isActive.compare("false") == 0)));
 }
 
 void QmitkUSDeviceManagerWidget::DisconnectAllDevices()

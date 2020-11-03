@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 #ifndef QMITK_QmitkAdaptiveRegionGrowingToolGUI_H
 #define QMITK_QmitkAdaptiveRegionGrowingToolGUI_H
 
@@ -30,7 +26,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include "mitkAdaptiveRegionGrowingTool.h"
 
-class QmitkStdMultiWidget;
 class DataNode;
 class QmitkAdaptiveRegionGrowingToolGUIControls;
 
@@ -52,7 +47,9 @@ public:
    */
   mitkClassMacro(QmitkAdaptiveRegionGrowingToolGUI, QmitkToolGUI);
 
-  itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+  itkFactorylessNewMacro(Self);
+
+  itkCloneMacro(Self);
 
     QmitkAdaptiveRegionGrowingToolGUI(QWidget *parent = nullptr);
 
@@ -62,12 +59,6 @@ public:
 
   ///** \brief Method to set the default data storage.*/
   virtual void SetDataStorage(mitk::DataStorage *dataStorage);
-
-  /**
-   * @brief Method to set the used multiwidget.
-   * @param multiWidget
-   */
-  void SetMultiWidget(QmitkStdMultiWidget *multiWidget);
 
   /**
    * @brief Method to set the name of a data node.
@@ -175,9 +166,6 @@ protected:
   /** \brief Destructor. */
   ~QmitkAdaptiveRegionGrowingToolGUI() override;
 
-  // Pointer to the main widget to be able to reach the renderer
-  QmitkStdMultiWidget *m_MultiWidget;
-
   mitk::DataStorage *m_DataStorage;
 
   mitk::DataNode::Pointer m_InputImageNode;
@@ -186,6 +174,14 @@ protected:
    * @brief Method to calculate parameter settings, when a seed point is set
    */
   void OnPointAdded();
+
+   /**
+   * @brief Method to extract a 3D image based on a given time point that can be taken from the SliceNavigationController
+   *
+   * This ensures that the seed point is taken from the current selected 3D image
+   */
+  mitk::Image::ConstPointer GetImageByTimePoint(const mitk::Image *image,
+                                                          mitk::TimePointType timePoint) const;
 
 private:
   std::string m_NAMEFORORGIMAGE;
@@ -215,9 +211,9 @@ private:
   long m_PointSetMoveObserverTag;
 
   template <typename TPixel, unsigned int VImageDimension>
-  void StartRegionGrowing(itk::Image<TPixel, VImageDimension> *itkImage,
-                          mitk::BaseGeometry *imageGeometry,
-                          mitk::PointSet::PointType seedPoint);
+  void StartRegionGrowing(const itk::Image<TPixel, VImageDimension> *itkImage,
+                          const mitk::BaseGeometry *imageGeometry,
+                          const mitk::PointSet::PointType seedPoint);
 
   template <typename TPixel, unsigned int VImageDimension>
   void ITKThresholding(itk::Image<TPixel, VImageDimension> *inputImage);

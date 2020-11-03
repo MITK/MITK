@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 #include <limits>
 #include <mitkArbitraryTimeGeometry.h>
 
@@ -93,7 +89,8 @@ mitk::TimeBounds mitk::ArbitraryTimeGeometry::GetTimeBounds(TimeStepType step) c
 
 bool mitk::ArbitraryTimeGeometry::IsValidTimePoint(TimePointType timePoint) const
 {
-  return this->GetMinimumTimePoint() <= timePoint && timePoint < this->GetMaximumTimePoint();
+  return this->GetMinimumTimePoint() <= timePoint &&
+    (timePoint < this->GetMaximumTimePoint() || (this->HasCollapsedFinalTimeStep() && timePoint <= this->GetMaximumTimePoint()));
 }
 
 bool mitk::ArbitraryTimeGeometry::IsValidTimeStep(TimeStepType timeStep) const
@@ -117,15 +114,16 @@ mitk::TimeStepType mitk::ArbitraryTimeGeometry::TimePointToTimeStep(TimePointTyp
 {
   mitk::TimeStepType result = 0;
 
-  if ( timePoint >= GetMinimumTimePoint() )
+  if (timePoint >= GetMinimumTimePoint())
   {
-    for ( auto pos = m_MaximumTimePoints.cbegin(); pos != m_MaximumTimePoints.cend(); ++pos )
+    for (auto pos = m_MaximumTimePoints.cbegin(); pos != m_MaximumTimePoints.cend(); ++pos)
     {
-      if (timePoint < *pos)
+      if (timePoint < *pos || (pos==std::prev(m_MaximumTimePoints.cend()) && timePoint <= *pos && this->HasCollapsedFinalTimeStep()))
       {
-        result = pos - m_MaximumTimePoints.begin();
         break;
       }
+
+      ++result;
     }
   }
 
@@ -294,4 +292,16 @@ void mitk::ArbitraryTimeGeometry::PrintSelf(std::ostream &os, itk::Indent indent
   {
     os << indent.GetNextIndent() << "Step " << i << ": " << m_MaximumTimePoints[i] << " ms" << std::endl;
   }
+}
+
+bool mitk::ArbitraryTimeGeometry::HasCollapsedFinalTimeStep() const
+{
+  bool result = false;
+
+  if (!m_MaximumTimePoints.empty() && !m_MinimumTimePoints.empty())
+  {
+    result = m_MinimumTimePoints.back() == m_MaximumTimePoints.back();
+  }
+
+  return result;
 }

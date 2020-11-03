@@ -1,0 +1,5 @@
+set(Plugin-Name "Modelfit Generic Data Fitting")
+set(Plugin-Version "1.0")
+set(Plugin-Vendor "DKFZ, Software Development For Integrated Diagnostics and Therapy")
+set(Plugin-ContactAddress "r.floca@dkfz.de")
+set(Require-Plugin org.mitk.gui.qt.common)

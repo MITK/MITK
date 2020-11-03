@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef _MITK_PLANAR_ELLIPSE_H_
 #define _MITK_PLANAR_ELLIPSE_H_
@@ -31,9 +27,9 @@ namespace mitk
   class MITKPLANARFIGURE_EXPORT PlanarEllipse : public PlanarFigure
   {
   public:
-    mitkClassMacro(PlanarEllipse, PlanarFigure)
-
-      itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(PlanarEllipse, PlanarFigure);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /** \brief Place figure in its minimal configuration (a point at least)
        * onto the given 2D geometry.

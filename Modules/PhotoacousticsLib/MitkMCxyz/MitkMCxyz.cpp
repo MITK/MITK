@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 // Please retain the following copyright notice
 /******************************************************************
  *  based on mcxyz.c Oct2014
@@ -165,7 +161,9 @@ public:
     inputFilename = localInputFilename;
     try
     {
+      if (verbose) std::cout << "Loading input image..." << std::endl;
       m_inputImage = mitk::IOUtil::Load<mitk::Image>(inputFilename);
+      if (verbose) std::cout << "Loading input image... [Done]" << std::endl;
     }
     catch (...)
     {
@@ -643,13 +641,13 @@ int main(int argc, char * argv[]) {
   // see mitkCommandLineParser::addArgument for more information
   parser.beginGroup("Required I/O parameters");
   parser.addArgument(
-    "input", "i", mitkCommandLineParser::InputFile,
+    "input", "i", mitkCommandLineParser::File,
     "Input tissue file", "input tissue file (*.nrrd)",
-    us::Any(), false);
+    us::Any(), false, false, false, mitkCommandLineParser::Input);
   parser.addArgument(
-    "output", "o", mitkCommandLineParser::OutputFile,
+    "output", "o", mitkCommandLineParser::File,
     "Output fluence file", "where to save the simulated fluence (*.nrrd)",
-    us::Any(), false);
+    us::Any(), false, false, false, mitkCommandLineParser::Output);
   parser.endGroup();
   parser.beginGroup("Optional parameters");
   parser.addArgument(
@@ -674,10 +672,10 @@ int main(int argc, char * argv[]) {
     "jobs", "j", mitkCommandLineParser::Int,
     "Number of jobs", "Specifies the number of jobs for simutation (default: -1 which starts as many jobs as supported).");
   parser.addArgument(
-    "probe-xml", "p", mitkCommandLineParser::InputFile,
-    "Xml definition of the probe", "Specifies the absolute path of the location of the xml definition file of the probe design.");
-  parser.addArgument("normalization-file", "nf", mitkCommandLineParser::InputFile,
-    "Input normalization file", "The input normalization file is used for normalization of the number of photons in the PVFC calculations.");
+    "probe-xml", "p", mitkCommandLineParser::File,
+    "Xml definition of the probe", "Specifies the absolute path of the location of the xml definition file of the probe design.", us::Any(), true, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("normalization-file", "nf", mitkCommandLineParser::File,
+    "Input normalization file", "The input normalization file is used for normalization of the number of photons in the PVFC calculations.", us::Any(), true, false, false, mitkCommandLineParser::Input);
   parser.endGroup();
 
   // parse arguments, this method returns a mapping of long argument names and their values

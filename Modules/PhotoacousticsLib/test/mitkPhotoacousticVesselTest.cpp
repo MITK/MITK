@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
@@ -22,7 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "mitkPAInSilicoTissueVolume.h"
 #include "mitkPAVector.h"
 #include "mitkPAVessel.h"
-#include "mitkIOUtil.h"
 
 class mitkPhotoacousticVesselTestSuite : public mitk::TestFixture
 {
@@ -45,10 +40,11 @@ public:
   {
     auto params = mitk::pa::VesselProperties::New();
     m_TestVessel = mitk::pa::Vessel::New(params);
-    m_StraightLine = &mitk::pa::VesselMeanderStrategy::CalculateNewPositionInStraightLine;
-    m_Diverging = &mitk::pa::VesselMeanderStrategy::CalculateRandomlyDivergingPosition;
+    m_StraightLine = &mitk::pa::VesselMeanderStrategy::CalculateNewDirectionVectorInStraightLine;
+    m_Diverging = &mitk::pa::VesselMeanderStrategy::CalculateNewRandomlyDivergingDirectionVector;
     m_TestVolumeParameters = createTestVolumeParameters();
-    m_TestInSilicoVolume = mitk::pa::InSilicoTissueVolume::New(m_TestVolumeParameters);
+    auto rng = std::mt19937();
+    m_TestInSilicoVolume = mitk::pa::InSilicoTissueVolume::New(m_TestVolumeParameters, &rng);
   }
 
   mitk::pa::TissueGeneratorParameters::Pointer createTestVolumeParameters()
@@ -59,7 +55,8 @@ public:
     returnParameters->SetXDim(10);
     returnParameters->SetYDim(10);
     returnParameters->SetZDim(10);
-    returnParameters->SetBackgroundAbsorption(0);
+    returnParameters->SetMinBackgroundAbsorption(0);
+    returnParameters->SetMaxBackgroundAbsorption(0);
     returnParameters->SetBackgroundScattering(0);
     returnParameters->SetBackgroundAnisotropy(0);
     return returnParameters;
@@ -82,6 +79,7 @@ public:
     testDirection->SetElement(1, 0);
     testDirection->SetElement(2, 0);
     auto params = mitk::pa::VesselProperties::New();
+    params->SetDoPartialVolume(false);
     params->SetRadiusInVoxel(1);
     params->SetBifurcationFrequency(100);
     params->SetAbsorptionCoefficient(10);
@@ -94,35 +92,48 @@ public:
     CPPUNIT_ASSERT(m_TestVessel->CanBifurcate() == false);
     CPPUNIT_ASSERT(m_TestVessel->IsFinished() == false);
 
-    CPPUNIT_ASSERT(std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 4, 4)) <= mitk::eps);
+    CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 4, 4)),
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 4, 4)) <= mitk::eps);
 
     m_TestVessel->ExpandVessel(m_TestInSilicoVolume, m_StraightLine, 0, nullptr);
 
-    CPPUNIT_ASSERT(std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 4, 4) - 10) <= mitk::eps);
-    CPPUNIT_ASSERT(std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 5, 4) - 10) <= mitk::eps);
-    CPPUNIT_ASSERT(std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 6, 4)) <= mitk::eps);
+    CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 4, 4)),
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 4, 4) - 10) <= mitk::eps);
+    CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 5, 4)),
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 5, 4)) <= mitk::eps);
+    CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 6, 4)),
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 6, 4)) <= mitk::eps);
+    CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 4, 5)),
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 4, 5)) <= mitk::eps);
+    CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 4, 6)),
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 4, 6)) <= mitk::eps);
 
-    CPPUNIT_ASSERT(std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 4, 4) - 10) <= mitk::eps);
-    CPPUNIT_ASSERT(std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 4, 5) - 10) <= mitk::eps);
-    CPPUNIT_ASSERT(std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 4, 6)) <= mitk::eps);
-
-    CPPUNIT_ASSERT(std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 4, 4) - 10) <= mitk::eps);
-    CPPUNIT_ASSERT(std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 4, 4) - 10) <= mitk::eps);
-    CPPUNIT_ASSERT(std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(2, 4, 4)) <= mitk::eps);
+    CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 4, 4)),
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 4, 4)) <= mitk::eps);
+    CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(2, 4, 4)),
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(2, 4, 4)) <= mitk::eps);
 
     m_TestVessel->ExpandVessel(m_TestInSilicoVolume, m_StraightLine, 0, nullptr);
 
-    CPPUNIT_ASSERT(std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 4, 4) - 10) <= mitk::eps);
-    CPPUNIT_ASSERT(std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 5, 4) - 10) <= mitk::eps);
-    CPPUNIT_ASSERT(std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 6, 4)) <= mitk::eps);
+    CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 4, 4)),
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 4, 4) - 10) <= mitk::eps);
+    CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 5, 4)),
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 5, 4)) <= mitk::eps);
+    CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 6, 4)),
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 6, 4)) <= mitk::eps);
+    CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 4, 5)),
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 4, 5)) <= mitk::eps);
+    CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 4, 6)),
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 4, 6)) <= mitk::eps);
 
-    CPPUNIT_ASSERT(std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 4, 4) - 10) <= mitk::eps);
-    CPPUNIT_ASSERT(std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 4, 5) - 10) <= mitk::eps);
-    CPPUNIT_ASSERT(std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 4, 6)) <= mitk::eps);
-
-    CPPUNIT_ASSERT(std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 4, 4) - 10) <= mitk::eps);
-    CPPUNIT_ASSERT(std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(2, 4, 4) - 10) <= mitk::eps);
-    CPPUNIT_ASSERT(std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(3, 4, 4)) <= mitk::eps);
+    CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 4, 4)),
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(0, 4, 4) - 10) <= mitk::eps);
+    CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 4, 4)),
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(1, 4, 4) - 10) <= mitk::eps);
+    CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(2, 4, 4)),
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(2, 4, 4)) <= mitk::eps);
+    CPPUNIT_ASSERT_MESSAGE(std::to_string(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(3, 4, 4)),
+      std::abs(m_TestInSilicoVolume->GetAbsorptionVolume()->GetData(3, 4, 4)) <= mitk::eps);
   }
 
   void testBifurcate()

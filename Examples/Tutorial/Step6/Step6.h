@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef STEP6_H
 #define STEP6_H
@@ -34,7 +30,7 @@ class Step6 : public QWidget
   Q_OBJECT
 public:
   Step6(int argc, char *argv[], QWidget *parent = nullptr);
-  ~Step6() {}
+  ~Step6() override {}
   virtual void Initialize();
 
   virtual int GetThresholdMin();

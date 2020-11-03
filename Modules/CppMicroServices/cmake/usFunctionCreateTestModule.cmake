@@ -5,6 +5,7 @@ macro(_us_create_test_module_helper)
   set_property(TARGET ${name}
                APPEND PROPERTY COMPILE_DEFINITIONS US_MODULE_NAME=${name})
   set_property(TARGET ${name} PROPERTY US_MODULE_NAME ${name})
+  set_property(TARGET ${name} PROPERTY FOLDER "${MITK_ROOT_FOLDER}/CppMicroServices/Tests")
   if(NOT US_BUILD_SHARED_LIBS OR NOT BUILD_SHARED_LIBS)
     set_property(TARGET ${name} APPEND PROPERTY COMPILE_DEFINITIONS US_STATIC_MODULE)
   endif()

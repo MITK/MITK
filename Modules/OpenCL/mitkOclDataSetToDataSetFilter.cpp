@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkOclDataSetToDataSetFilter.h"
 #include "mitkOclDataSet.h"
@@ -23,7 +19,6 @@ mitk::OclDataSetToDataSetFilter::OclDataSetToDataSetFilter()
 {
   m_Output = mitk::OclDataSet::New();
 }
-
 
 mitk::OclDataSetToDataSetFilter::~OclDataSetToDataSetFilter()
 {
@@ -77,6 +72,7 @@ bool mitk::OclDataSetToDataSetFilter::InitExec(cl_kernel ckKernel, unsigned int*
   if (!clBuffOut || (size_t)m_Output->GetBufferSize() != outputDataSize)
   {
     MITK_DEBUG << "Create GPU DataSet call " << uiDataSetWidth << "x" << uiDataSetHeight << "x" << uiDataSetDepth;
+    MITK_INFO << "Create GPU Buffer of size " << outputDataSize * outputBpE / 1024.f / 1024.f << "MB";
     m_Output->SetBpE(outputBpE);
     m_Output->SetBufferSize(outputDataSize);
     clBuffOut = m_Output->CreateGPUBuffer();

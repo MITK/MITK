@@ -1,6 +1,9 @@
 project(org_mitk_gui_qt_lasercontrol)
 
 if(WIN32)
+  foreach(config_type ${CMAKE_CONFIGURATION_TYPES})
+    execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${MITK_BINARY_DIR}/bin/${config_type}")
+  endforeach()
   if(MITK_USE_GALIL_HARDWARE)
     configure_file( ${MITK_GALIL_API_PATH}/dll/x64/gclib.dll ${MITK_BINARY_DIR}/bin/Debug/ COPYONLY )
     configure_file( ${MITK_GALIL_API_PATH}/dll/x64/gclibo.dll ${MITK_BINARY_DIR}/bin/Debug/ COPYONLY )

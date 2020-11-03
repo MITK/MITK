@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "org_mitk_gui_qt_matchpoint_framereg_Activator.h"
 
@@ -30,6 +26,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkNodePredicateOr.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateProperty.h>
+#include <mitkNodePredicateDimension.h>
+#include <mitkNodePredicateGeometry.h>
 #include <mitkMAPAlgorithmInfoSelection.h>
 #include <mitkRegistrationHelper.h>
 #include <mitkResultNodeGenerationHelper.h>
@@ -61,8 +59,7 @@ const std::string QmitkMatchPointFrameCorrection::VIEW_ID =
   "org.mitk.views.matchpoint.algorithm.framereg";
 
 QmitkMatchPointFrameCorrection::QmitkMatchPointFrameCorrection()
-  : m_Parent(nullptr), m_LoadedDLLHandle(nullptr), m_LoadedAlgorithm(nullptr), m_CanLoadAlgorithm(false),
-    m_ValidInputs(false), m_Working(false)
+  : m_Parent(nullptr), m_LoadedDLLHandle(nullptr), m_LoadedAlgorithm(nullptr), m_CanLoadAlgorithm(false), m_Working(false)
 {
   m_spSelectedTargetData = nullptr;
   m_spSelectedTargetMaskData = nullptr;
@@ -85,9 +82,8 @@ void QmitkMatchPointFrameCorrection::SetFocus()
 
 void QmitkMatchPointFrameCorrection::CreateConnections()
 {
-
-  connect(m_Controls.checkTargetMask, SIGNAL(toggled(bool)), this,
-          SLOT(OnMaskCheckBoxToggeled(bool)));
+  connect(m_Controls.imageNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointFrameCorrection::OnNodeSelectionChanged);
+  connect(m_Controls.maskNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointFrameCorrection::OnNodeSelectionChanged);
 
   // ------
   // Tab 1 - Shared library loading interface
@@ -114,15 +110,6 @@ const map::deployment::DLLInfo* QmitkMatchPointFrameCorrection::GetSelectedAlgor
 {
   return m_SelectedAlgorithmInfo;
 }
-
-void QmitkMatchPointFrameCorrection::OnMaskCheckBoxToggeled(bool)
-{
-  if (!m_Working)
-  {
-    CheckInputs();
-    ConfigureRegistrationControls();
-  }
-};
 
 void QmitkMatchPointFrameCorrection::OnSelectedAlgorithmChanged()
 {
@@ -151,7 +138,7 @@ void QmitkMatchPointFrameCorrection::OnLoadAlgorithmButtonPushed()
 
   if (!dllInfo)
   {
-    Error(QString("No valid algorithm is selected. Cannot load algorithm. ABORTING."));
+    Error(QStringLiteral("No valid algorithm is selected. Cannot load algorithm. ABORTING."));
     return;
   }
 
@@ -162,7 +149,7 @@ void QmitkMatchPointFrameCorrection::OnLoadAlgorithmButtonPushed()
 
   if (tempAlgorithm.IsNull())
   {
-    Error(QString("Error. Cannot load selected algorithm."));
+    Error(QStringLiteral("Error. Cannot load selected algorithm."));
     return;
   }
 
@@ -170,9 +157,9 @@ void QmitkMatchPointFrameCorrection::OnLoadAlgorithmButtonPushed()
   this->m_LoadedDLLHandle = tempDLLHandle;
 
   this->m_Controls.m_AlgoConfigurator->setAlgorithm(m_LoadedAlgorithm);
-  m_Controls.checkTargetMask->setChecked(false);
 
   this->AdaptFolderGUIElements();
+  this->ConfigureNodeSelectorPredicates();
   this->CheckInputs();
   this->ConfigureRegistrationControls();
   this->ConfigureProgressInfos();
@@ -199,7 +186,18 @@ void QmitkMatchPointFrameCorrection::CreateQtPartControl(QWidget* parent)
   m_Controls.setupUi(parent);
   m_Parent = parent;
 
-  m_Controls.checkTargetMask->setChecked(false);
+  this->m_Controls.imageNodeSelector->SetDataStorage(this->GetDataStorage());
+  this->m_Controls.imageNodeSelector->SetSelectionIsOptional(false);
+  this->m_Controls.maskNodeSelector->SetDataStorage(this->GetDataStorage());
+  this->m_Controls.maskNodeSelector->SetSelectionIsOptional(true);
+
+  this->m_Controls.imageNodeSelector->SetInvalidInfo("Select dymamic image.");
+  this->m_Controls.imageNodeSelector->SetPopUpTitel("Select dynamic image.");
+  this->m_Controls.imageNodeSelector->SetPopUpHint("Select a dynamic image (time resolved) that should be frame corrected.");
+  this->m_Controls.maskNodeSelector->SetInvalidInfo("Select target mask.");
+  this->m_Controls.maskNodeSelector->SetPopUpTitel("Select target mask.");
+  this->m_Controls.maskNodeSelector->SetPopUpHint("Select a target mask (mask of the target/first frame).");
+
   m_Controls.m_tabs->setCurrentIndex(0);
 
   m_Controls.m_mapperSettings->AllowSampling(false);
@@ -212,6 +210,7 @@ void QmitkMatchPointFrameCorrection::CreateQtPartControl(QWidget* parent)
   GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddSelectionListener(
     m_AlgorithmSelectionListener.data());
 
+  this->ConfigureNodeSelectorPredicates();
   this->CreateConnections();
   this->AdaptFolderGUIElements();
   this->CheckInputs();
@@ -224,171 +223,64 @@ void QmitkMatchPointFrameCorrection::CreateQtPartControl(QWidget* parent)
   this->UpdateAlgorithmSelection(selection);
 }
 
-bool QmitkMatchPointFrameCorrection::CheckInputs()
+void QmitkMatchPointFrameCorrection::ConfigureNodeSelectorPredicates()
 {
-  bool validTarget = false;
+  auto isImage = mitk::MITKRegistrationHelper::ImageNodePredicate();
+  mitk::NodePredicateBase::Pointer maskDimensionPredicate = mitk::NodePredicateOr::New(mitk::NodePredicateDimension::New(3), mitk::NodePredicateDimension::New(4)).GetPointer();
+  mitk::NodePredicateDimension::Pointer imageDimensionPredicate = mitk::NodePredicateDimension::New(4);
 
-  bool validTargetMask = false;
+  m_Controls.imageNodeSelector->setEnabled(m_LoadedAlgorithm.IsNotNull());
+  m_Controls.maskNodeSelector->setEnabled(m_LoadedAlgorithm.IsNotNull());
 
+  m_Controls.imageNodeSelector->SetNodePredicate(mitk::NodePredicateAnd::New(isImage, imageDimensionPredicate));
+
+  mitk::NodePredicateAnd::Pointer maskPredicate = mitk::NodePredicateAnd::New(mitk::MITKRegistrationHelper::MaskNodePredicate(), maskDimensionPredicate);
+  if (m_spSelectedTargetData != nullptr)
+  {
+    auto hasSameGeometry = mitk::NodePredicateGeometry::New(m_spSelectedTargetData->GetGeometry());
+    hasSameGeometry->SetCheckPrecision(1e-10);
+    maskPredicate = mitk::NodePredicateAnd::New(maskPredicate, hasSameGeometry);
+  }
+
+  m_Controls.maskNodeSelector->SetNodePredicate(maskPredicate);
+}
+
+void QmitkMatchPointFrameCorrection::CheckInputs()
+{
   mitk::DataNode::Pointer oldTargetNode = m_spSelectedTargetNode;
 
-  mitk::NodePredicateDataType::Pointer isLabelSet = mitk::NodePredicateDataType::New("LabelSetImage");
-  mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New("Image");
-  mitk::NodePredicateProperty::Pointer isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
-  mitk::NodePredicateAnd::Pointer isLegacyMask = mitk::NodePredicateAnd::New(isImage, isBinary);
+  m_spSelectedTargetNode = nullptr;
+  m_spSelectedTargetData = nullptr;
 
-  mitk::NodePredicateOr::Pointer maskPredicate = mitk::NodePredicateOr::New(isLegacyMask, isLabelSet);
+  m_spSelectedTargetMaskNode = nullptr;
+  m_spSelectedTargetMaskData = nullptr;
 
   if (m_LoadedAlgorithm.IsNull())
   {
     m_Controls.m_lbLoadedAlgorithmName->setText(
-      QString("<font color='red'>No algorithm seleted!</font>"));
-    m_spSelectedTargetNode = nullptr;
-    m_spSelectedTargetData = nullptr;
-
-    m_spSelectedTargetMaskNode = nullptr;
-    m_spSelectedTargetMaskData = nullptr;
+      QStringLiteral("<font color='red'>No algorithm seleted!</font>"));
   }
   else
   {
-    QList<mitk::DataNode::Pointer> nodes = this->GetDataManagerSelection();
-
-    mitk::Image* targetImage = nullptr;
-    mitk::Image* targetMaskImage = nullptr;
-
-    typedef ::map::algorithm::facet::MaskedRegistrationAlgorithmInterface<3, 3> MaskRegInterface;
-
-    MaskRegInterface* pMaskInterface = dynamic_cast<MaskRegInterface*>(m_LoadedAlgorithm.GetPointer());
-
-    if (nodes.count() < 1)
+    m_spSelectedTargetNode = m_Controls.imageNodeSelector->GetSelectedNode();
+    if (m_spSelectedTargetNode.IsNotNull())
     {
-      m_Controls.m_lbTargetName->setText(QString("<font color='red'>no data selected!</font>"));
-      m_spSelectedTargetNode = nullptr;
-      m_spSelectedTargetData = nullptr;
-    }
-    else
-    {
-      m_spSelectedTargetNode = nodes.front();
       m_spSelectedTargetData = m_spSelectedTargetNode->GetData();
-      targetImage = dynamic_cast<mitk::Image*>(m_spSelectedTargetNode->GetData());
-
-      if (targetImage)
-      {
-        if (targetImage->GetTimeSteps() < 1)
-        {
-          m_Controls.m_lbTargetName->setText(QString("<font color='red'>Image has no mulitple time steps"));
-        }
-        else if (targetImage->GetDimension() != m_LoadedAlgorithm->getTargetDimensions() + 1)
-        {
-          m_Controls.m_lbTargetName->setText(QString("<font color='red'>wrong image dimension. ") +
-                                             QString::number(m_LoadedAlgorithm->getTargetDimensions()) + QString("D+t needed</font>"));
-        }
-        else
-        {
-          validTarget = true;
-        }
-      }
-      else
-      {
-        m_Controls.m_lbTargetName->setText(QString("<font color='red'>no supported data selected!</font>"));
-      }
-
-      nodes.removeFirst();
     }
 
-    if (m_Controls.checkTargetMask->isChecked())
+    m_spSelectedTargetMaskNode = m_Controls.maskNodeSelector->GetSelectedNode();
+    if (m_spSelectedTargetMaskNode.IsNotNull())
     {
-      if (nodes.count() < 1)
-      {
-        m_Controls.m_lbTargetMaskName->setText(QString("<font color='red'>no data selected!</font>"));
-        m_spSelectedTargetMaskNode = nullptr;
-        m_spSelectedTargetMaskData = nullptr;
-      }
-      else
-      {
-        m_spSelectedTargetMaskNode = nodes.front();
-        m_spSelectedTargetMaskData = nullptr;
-        targetMaskImage = dynamic_cast<mitk::Image*>(m_spSelectedTargetMaskNode->GetData());
-
-        bool isMask = maskPredicate->CheckNode(m_spSelectedTargetMaskNode);
-
-        if (!isMask)
-        {
-          m_Controls.m_lbTargetMaskName->setText(QString("<font color='red'>no mask selected!</font>"));
-        }
-        else if (targetMaskImage && pMaskInterface)
-        {
-          m_spSelectedTargetMaskData = targetMaskImage;
-          validTargetMask = true;
-        }
-        else
-        {
-          m_Controls.m_lbTargetMaskName->setText(
-            QString("<font color='red'>no supported data selected!</font>"));
-        }
-      }
-
-    }
-    else
-    {
-      m_Controls.m_lbTargetMaskName->setText(QString("mask deactivated"));
-      validTargetMask = true;
-      m_spSelectedTargetMaskNode = nullptr;
-      m_spSelectedTargetMaskData = nullptr;
-    }
-
-  }
-
-  if (validTarget)
-  {
-    m_Controls.m_lbTargetName->setText(QString::fromStdString(GetInputNodeDisplayName(
-                                         m_spSelectedTargetNode)));
-
-    if (oldTargetNode != m_spSelectedTargetNode)
-    {
-      ConfigureFrameList();
+      m_spSelectedTargetMaskData = dynamic_cast<mitk::Image*>(m_spSelectedTargetMaskNode->GetData());
     }
   }
-  else
-  {
-    m_Controls.m_listFrames->clear();
-  }
 
-  if (validTargetMask && m_Controls.checkTargetMask->isChecked())
+  if (oldTargetNode != m_spSelectedTargetNode)
   {
-    m_Controls.m_lbTargetMaskName->setText(QString::fromStdString(GetInputNodeDisplayName(
-        m_spSelectedTargetMaskNode)));
+    ConfigureFrameList();
   }
-
-  m_ValidInputs = validTarget && validTargetMask;
-  return m_ValidInputs;
 }
 
-std::string QmitkMatchPointFrameCorrection::GetInputNodeDisplayName(const mitk::DataNode* node)
-const
-{
-  std::string result = "UNDEFINED/nullptr";
-
-  if (node)
-  {
-    result = node->GetName();
-
-    const mitk::PointSet* pointSet = dynamic_cast<const mitk::PointSet*>(node->GetData());
-
-    if (pointSet)
-    {
-      mitk::DataStorage::SetOfObjects::ConstPointer sources = this->GetDataStorage()->GetSources(node);
-
-      if (sources.IsNotNull() && sources->Size() > 0)
-      {
-        result = result + " (" + sources->GetElement(0)->GetName() + ")";
-      }
-
-    }
-  }
-
-  return result;
-}
 
 mitk::DataStorage::SetOfObjects::Pointer QmitkMatchPointFrameCorrection::GetRegNodes() const
 {
@@ -439,25 +331,30 @@ void QmitkMatchPointFrameCorrection::ConfigureRegistrationControls()
 {
   m_Controls.m_tabSelection->setEnabled(!m_Working);
   m_Controls.m_leRegJobName->setEnabled(!m_Working);
-  m_Controls.groupMasks->setEnabled(!m_Working);
 
   m_Controls.m_pbStartReg->setEnabled(false);
 
-  m_Controls.m_lbTargetMaskName->setVisible(m_Controls.checkTargetMask->isChecked());
+  m_Controls.imageNodeSelector->setEnabled(!m_Working);
+  m_Controls.maskNodeSelector->setEnabled(!m_Working);
 
   if (m_LoadedAlgorithm.IsNotNull())
   {
     m_Controls.m_tabSettings->setEnabled(!m_Working);
     m_Controls.m_tabExclusion->setEnabled(!m_Working);
     m_Controls.m_tabExecution->setEnabled(true);
-    m_Controls.m_pbStartReg->setEnabled(m_ValidInputs && !m_Working);
+    m_Controls.m_pbStartReg->setEnabled(m_spSelectedTargetNode.IsNotNull() && !m_Working);
     m_Controls.m_leRegJobName->setEnabled(!m_Working);
 
     typedef ::map::algorithm::facet::MaskedRegistrationAlgorithmInterface<3, 3> MaskRegInterface;
     const MaskRegInterface* pMaskReg = dynamic_cast<const MaskRegInterface*>
                                        (m_LoadedAlgorithm.GetPointer());
 
-    m_Controls.groupMasks->setVisible(pMaskReg != nullptr);
+    m_Controls.maskNodeSelector->setVisible(pMaskReg != nullptr);
+    m_Controls.label_TargetMask->setVisible(pMaskReg != nullptr);
+    if (!pMaskReg)
+    {
+      m_Controls.maskNodeSelector->SetCurrentSelection(QmitkSingleNodeSelectionWidget::NodeList());
+    }
 
     this->m_Controls.m_lbLoadedAlgorithmName->setText(
       QString::fromStdString(m_LoadedAlgorithm->getUID()->toStr()));
@@ -468,8 +365,9 @@ void QmitkMatchPointFrameCorrection::ConfigureRegistrationControls()
     m_Controls.m_tabExclusion->setEnabled(false);
     m_Controls.m_tabExecution->setEnabled(false);
     this->m_Controls.m_lbLoadedAlgorithmName->setText(
-      QString("<font color='red'>no algorithm loaded!</font>"));
-    m_Controls.groupMasks->setVisible(false);
+      QStringLiteral("<font color='red'>no algorithm loaded!</font>"));
+    m_Controls.maskNodeSelector->setVisible(false);
+    m_Controls.label_TargetMask->setVisible(false);
   }
 
   if (!m_Working)
@@ -594,11 +492,12 @@ QmitkMatchPointFrameCorrection::GenerateIgnoreList() const
   return result;
 }
 
-void QmitkMatchPointFrameCorrection::OnSelectionChanged(berry::IWorkbenchPart::Pointer,
-    const QList<mitk::DataNode::Pointer>&)
+void QmitkMatchPointFrameCorrection::OnNodeSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/)
+
 {
   if (!m_Working)
   {
+    ConfigureNodeSelectorPredicates();
     CheckInputs();
     ConfigureRegistrationControls();
   }
@@ -764,19 +663,19 @@ void QmitkMatchPointFrameCorrection::OnAlgorithmInfo(QString info)
 
 void QmitkMatchPointFrameCorrection::OnFrameProcessed(double progress)
 {
-  m_Controls.m_teLog->append(QString("<b><font color='blue'>Frame processed...</font></b>"));
+  m_Controls.m_teLog->append(QStringLiteral("<b><font color='blue'>Frame processed...</font></b>"));
   m_Controls.m_progBarFrame->setValue(100 * progress);
 };
 
 void QmitkMatchPointFrameCorrection::OnFrameRegistered(double progress)
 {
-  m_Controls.m_teLog->append(QString("<b><font color='blue'>Frame registered...</font></b>"));
+  m_Controls.m_teLog->append(QStringLiteral("<b><font color='blue'>Frame registered...</font></b>"));
   m_Controls.m_progBarFrame->setValue(100 * progress);
 };
 
 void QmitkMatchPointFrameCorrection::OnFrameMapped(double progress)
 {
-  m_Controls.m_teLog->append(QString("<b><font color='blue'>Frame mapped...</font></b>"));
+  m_Controls.m_teLog->append(QStringLiteral("<b><font color='blue'>Frame mapped...</font></b>"));
   m_Controls.m_progBarFrame->setValue(100 * progress);
 };
 

@@ -57,12 +57,12 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QmitkDataStorageComboBox" name="m_cbReferenceNodeSelector">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+       <widget class="QmitkSingleNodeSelectionWidget" name="m_ReferenceNodeSelector" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>40</height>
+         </size>
         </property>
        </widget>
       </item>
@@ -100,12 +100,12 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QmitkDataStorageComboBox" name="m_cbWorkingNodeSelector">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+       <widget class="QmitkSingleNodeSelectionWidget" name="m_WorkingNodeSelector" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>40</height>
+         </size>
         </property>
        </widget>
       </item>
@@ -323,6 +323,52 @@
         </property>
         <property name="checkable">
          <bool>true</bool>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="m_tbSavePreset">
+        <property name="toolTip">
+         <string>Save LabelSet Preset</string>
+        </property>
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>:/org_mitk_icons/icons/awesome/scalable/actions/document-save.svg</normaloff>:/org_mitk_icons/icons/awesome/scalable/actions/document-save.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>28</width>
+          <height>28</height>
+         </size>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="m_tbLoadPreset">
+        <property name="toolTip">
+         <string>Load LabelSet Preset</string>
+        </property>
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>:/org_mitk_icons/icons/awesome/scalable/actions/document-open.svg</normaloff>:/org_mitk_icons/icons/awesome/scalable/actions/document-open.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>28</width>
+          <height>28</height>
+         </size>
         </property>
         <property name="autoRaise">
          <bool>true</bool>
@@ -715,9 +761,10 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>QmitkDataStorageComboBox</class>
-   <extends>QComboBox</extends>
-   <header location="global">QmitkDataStorageComboBox.h</header>
+   <class>QmitkSingleNodeSelectionWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkSingleNodeSelectionWidget.h</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>QmitkToolSelectionBox</class>
@@ -749,7 +796,6 @@
   </customwidget>
  </customwidgets>
  <includes>
-  <include location="global">QmitkToolReferenceDataSelectionBox.h</include>
   <include location="global">QmitkToolGUIArea.h</include>
   <include location="global">QmitkToolSelectionBox.h</include>
  </includes>

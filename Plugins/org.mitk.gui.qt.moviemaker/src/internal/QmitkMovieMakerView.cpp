@@ -1,72 +1,72 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
+============================================================================*/
 
-===================================================================*/
+#include "QmitkMovieMakerView.h"
+#include <ui_QmitkMovieMakerView.h>
 
 #include "QmitkAnimationItemDelegate.h"
-#include "QmitkFFmpegWriter.h"
-#include "QmitkMovieMakerView.h"
 #include "QmitkOrbitAnimationItem.h"
 #include "QmitkOrbitAnimationWidget.h"
 #include "QmitkSliceAnimationItem.h"
 #include "QmitkSliceAnimationWidget.h"
-#include "QmitkTimeSliceAnimationWidget.h"
 #include "QmitkTimeSliceAnimationItem.h"
-#include <ui_QmitkMovieMakerView.h>
+#include "QmitkTimeSliceAnimationWidget.h"
+
+#include <berryPlatform.h>
+
+#include <mitkGL.h>
+
+#include <QmitkFFmpegWriter.h>
+
 #include <QFileDialog>
 #include <QMenu>
 #include <QMessageBox>
-#include <QStandardItemModel>
 #include <QTimer>
-#include <berryPlatform.h>
-#include <mitkBaseRenderer.h>
-#include <mitkGL.h>
 
-static QmitkAnimationItem* CreateDefaultAnimation(const QString& widgetKey)
+#include <array>
+
+namespace
 {
-  if (widgetKey == "Orbit")
-    return new QmitkOrbitAnimationItem;
+  QmitkAnimationItem* CreateDefaultAnimation(const QString& widgetKey)
+  {
+    if (widgetKey == "Orbit")
+      return new QmitkOrbitAnimationItem;
 
-  if (widgetKey == "Slice")
-    return new QmitkSliceAnimationItem;
+    if (widgetKey == "Slice")
+      return new QmitkSliceAnimationItem;
 
-  if (widgetKey == "Time")
-    return new QmitkTimeSliceAnimationItem;
+    if (widgetKey == "Time")
+      return new QmitkTimeSliceAnimationItem;
 
-  return nullptr;
-}
-
-QString QmitkMovieMakerView::GetFFmpegPath() const
-{
-  berry::IPreferences::Pointer preferences = berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.gui.qt.ext.externalprograms");
-
-  return preferences.IsNotNull()
-    ? preferences->Get("ffmpeg", "")
-    : "";
-}
-
-static unsigned char* ReadPixels(vtkRenderWindow* renderWindow, int x, int y, int width, int height)
-{
-  if (renderWindow == nullptr)
     return nullptr;
+  }
 
-  unsigned char* frame = new unsigned char[width * height * 3];
+  QString GetFFmpegPath()
+  {
+    auto preferences = berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.gui.qt.ext.externalprograms");
 
-  renderWindow->MakeCurrent();
-  glReadPixels(x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE, frame);
+    return preferences.IsNotNull()
+      ? preferences->Get("ffmpeg", "")
+      : "";
+  }
 
-  return frame;
+  void ReadPixels(std::unique_ptr<unsigned char[]>& frame, vtkRenderWindow* renderWindow, int x, int y, int width, int height)
+  {
+    if (nullptr == renderWindow)
+      return;
+
+    renderWindow->MakeCurrent();
+    glReadPixels(x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE, frame.get());
+  }
 }
 
 const std::string QmitkMovieMakerView::VIEW_ID = "org.mitk.views.moviemaker";
@@ -108,12 +108,12 @@ void QmitkMovieMakerView::InitializeAnimationWidgets()
   m_AnimationWidgets["Slice"] = new QmitkSliceAnimationWidget;
   m_AnimationWidgets["Time"] = new QmitkTimeSliceAnimationWidget;
 
-  Q_FOREACH(QWidget* widget, m_AnimationWidgets.values())
+  for (const auto& widget : m_AnimationWidgets)
   {
-    if (widget != nullptr)
+    if (nullptr != widget.second)
     {
-      widget->setVisible(false);
-      m_Ui->animationWidgetGroupBoxLayout->addWidget(widget);
+      widget.second->setVisible(false);
+      m_Ui->animationWidgetGroupBoxLayout->addWidget(widget.second);
     }
   }
 
@@ -137,8 +137,8 @@ void QmitkMovieMakerView::InitializeAnimationModel()
 {
   m_AnimationModel = new QStandardItemModel(m_Ui->animationTreeView);
   m_AnimationModel->setHorizontalHeaderLabels(QStringList() << "Animation" << "Timeline");
-  m_Ui->animationTreeView->setModel(m_AnimationModel);
 
+  m_Ui->animationTreeView->setModel(m_AnimationModel);
   m_Ui->animationTreeView->setItemDelegate(new QmitkAnimationItemDelegate(m_Ui->animationTreeView));
 }
 
@@ -146,27 +146,24 @@ void QmitkMovieMakerView::InitializeAddAnimationMenu()
 {
   m_AddAnimationMenu = new QMenu(m_Ui->addAnimationButton);
 
-  Q_FOREACH(const QString& key, m_AnimationWidgets.keys())
-  {
-    m_AddAnimationMenu->addAction(key);
-  }
+  for(const auto& widget : m_AnimationWidgets)
+    m_AddAnimationMenu->addAction(widget.first);
 }
 
 void QmitkMovieMakerView::InitializeRecordMenu()
 {
-  typedef QPair<QString, QString> PairOfStrings;
+  std::array<std::pair<QString, QString>, 4> renderWindows = {
+    std::make_pair(QStringLiteral("Axial"), QStringLiteral("stdmulti.widget0")),
+    std::make_pair(QStringLiteral("Sagittal"), QStringLiteral("stdmulti.widget1")),
+    std::make_pair(QStringLiteral("Coronal"), QStringLiteral("stdmulti.widget2")),
+    std::make_pair(QStringLiteral("3D"), QStringLiteral("stdmulti.widget3"))
+  };
 
   m_RecordMenu = new QMenu(m_Ui->recordButton);
 
-  QVector<PairOfStrings> renderWindows;
-  renderWindows.push_back(qMakePair(QString("Axial"), QString("stdmulti.widget1")));
-  renderWindows.push_back(qMakePair(QString("Sagittal"), QString("stdmulti.widget2")));
-  renderWindows.push_back(qMakePair(QString("Coronal"), QString("stdmulti.widget3")));
-  renderWindows.push_back(qMakePair(QString("3D"), QString("stdmulti.widget4")));
-
-  Q_FOREACH(const PairOfStrings& renderWindow, renderWindows)
+  for(const auto& renderWindow : renderWindows)
   {
-    QAction* action = new QAction(m_RecordMenu);
+    auto* action = new QAction(m_RecordMenu);
     action->setText(renderWindow.first);
     action->setData(renderWindow.second);
 
@@ -184,59 +181,33 @@ void QmitkMovieMakerView::InitializeTimer(QWidget* parent)
 
 void QmitkMovieMakerView::ConnectAnimationTreeViewWidgets()
 {
-  this->connect(m_AnimationModel, SIGNAL(rowsInserted(const QModelIndex&, int, int)),
-    this, SLOT(OnAnimationTreeViewRowsInserted(const QModelIndex&, int, int)));
-
-  this->connect(m_AnimationModel, SIGNAL(rowsRemoved(const QModelIndex&, int, int)),
-    this, SLOT(OnAnimationTreeViewRowsRemoved(const QModelIndex&, int, int)));
-
-  this->connect(m_Ui->animationTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
-    this, SLOT(OnAnimationTreeViewSelectionChanged(const QItemSelection&, const QItemSelection&)));
-
-  this->connect(m_Ui->moveAnimationUpButton, SIGNAL(clicked()),
-    this, SLOT(OnMoveAnimationUpButtonClicked()));
-
-  this->connect(m_Ui->moveAnimationDownButton, SIGNAL(clicked()),
-    this, SLOT(OnMoveAnimationDownButtonClicked()));
-
-  this->connect(m_Ui->addAnimationButton, SIGNAL(clicked()),
-    this, SLOT(OnAddAnimationButtonClicked()));
-
-  this->connect(m_Ui->removeAnimationButton, SIGNAL(clicked()),
-    this, SLOT(OnRemoveAnimationButtonClicked()));
+  connect(m_AnimationModel, &QStandardItemModel::rowsInserted, this, &QmitkMovieMakerView::OnAnimationTreeViewRowsInserted);
+  connect(m_AnimationModel, &QStandardItemModel::rowsRemoved, this, &QmitkMovieMakerView::OnAnimationTreeViewRowsRemoved);
+  connect(m_Ui->animationTreeView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &QmitkMovieMakerView::OnAnimationTreeViewSelectionChanged);
+  connect(m_Ui->moveAnimationUpButton, &QToolButton::clicked, this, &QmitkMovieMakerView::OnMoveAnimationUpButtonClicked);
+  connect(m_Ui->moveAnimationDownButton, &QToolButton::clicked, this, &QmitkMovieMakerView::OnMoveAnimationDownButtonClicked);
+  connect(m_Ui->addAnimationButton, &QToolButton::clicked, this, &QmitkMovieMakerView::OnAddAnimationButtonClicked);
+  connect(m_Ui->removeAnimationButton, &QToolButton::clicked, this, &QmitkMovieMakerView::OnRemoveAnimationButtonClicked);
 }
 
 void QmitkMovieMakerView::ConnectAnimationWidgets()
 {
-  this->connect(m_Ui->startComboBox, SIGNAL(currentIndexChanged(int)),
-    this, SLOT(OnStartComboBoxCurrentIndexChanged(int)));
-
-  this->connect(m_Ui->durationSpinBox, SIGNAL(valueChanged(double)),
-    this, SLOT(OnDurationSpinBoxValueChanged(double)));
-
-  this->connect(m_Ui->delaySpinBox, SIGNAL(valueChanged(double)),
-    this, SLOT(OnDelaySpinBoxValueChanged(double)));
+  connect(m_Ui->startComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(OnStartComboBoxCurrentIndexChanged(int)));
+  connect(m_Ui->durationSpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnDurationSpinBoxValueChanged(double)));
+  connect(m_Ui->delaySpinBox, SIGNAL(valueChanged(double)), this, SLOT(OnDelaySpinBoxValueChanged(double)));
 }
 
 void QmitkMovieMakerView::ConnectPlaybackAndRecordWidgets()
 {
-  this->connect(m_Ui->playButton, SIGNAL(toggled(bool)),
-    this, SLOT(OnPlayButtonToggled(bool)));
-
-  this->connect(m_Ui->stopButton, SIGNAL(clicked()),
-    this, SLOT(OnStopButtonClicked()));
-
-  this->connect(m_Ui->recordButton, SIGNAL(clicked()),
-    this, SLOT(OnRecordButtonClicked()));
-
-  this->connect(m_Ui->fpsSpinBox, SIGNAL(valueChanged(int)),
-    this, SLOT(OnFPSSpinBoxValueChanged(int)));
+  connect(m_Ui->playButton, &QToolButton::toggled, this, &QmitkMovieMakerView::OnPlayButtonToggled);
+  connect(m_Ui->stopButton, &QToolButton::clicked, this, &QmitkMovieMakerView::OnStopButtonClicked);
+  connect(m_Ui->recordButton, &QToolButton::clicked, this, &QmitkMovieMakerView::OnRecordButtonClicked);
+  connect(m_Ui->fpsSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnFPSSpinBoxValueChanged(int)));
 }
 
 void QmitkMovieMakerView::ConnectTimer()
 {
-  this->connect(m_Timer, SIGNAL(timeout()),
-    this, SLOT(OnTimerTimeout()));
+  connect(m_Timer, &QTimer::timeout, this, &QmitkMovieMakerView::OnTimerTimeout);
 }
 
 void QmitkMovieMakerView::SetFocus()
@@ -277,15 +248,15 @@ void QmitkMovieMakerView::OnMoveAnimationDownButtonClicked()
 
 void QmitkMovieMakerView::OnAddAnimationButtonClicked()
 {
-  QAction* action = m_AddAnimationMenu->exec(QCursor::pos());
+  auto action = m_AddAnimationMenu->exec(QCursor::pos());
 
-  if (action != nullptr)
+  if (nullptr != action)
   {
-    const QString widgetKey = action->text();
+    const auto key = action->text();
 
     m_AnimationModel->appendRow(QList<QStandardItem*>()
-      << new QStandardItem(widgetKey)
-      << CreateDefaultAnimation(widgetKey));
+      << new QStandardItem(key)
+      << CreateDefaultAnimation(key));
 
     m_Ui->playbackAndRecordingGroupBox->setEnabled(true);
   }
@@ -318,30 +289,32 @@ void QmitkMovieMakerView::OnStopButtonClicked()
   this->RenderCurrentFrame();
 }
 
-void QmitkMovieMakerView::OnRecordButtonClicked() // TODO: Refactor
+void QmitkMovieMakerView::OnRecordButtonClicked()
 {
+  if (0 == m_NumFrames || 0.0 == m_TotalDuration)
+    return;
+
   const QString ffmpegPath = GetFFmpegPath();
 
   if (ffmpegPath.isEmpty())
   {
     QMessageBox::information(nullptr, "Movie Maker",
-      "<p>Set path to FFmpeg<sup>1</sup> or Libav<sup>2</sup> (avconv) in preferences (Window -> Preferences... (Ctrl+P) -> External Programs) to be able to record your movies to video files.</p>"
-      "<p>If you are using Linux, chances are good that either FFmpeg or Libav is included in the official package repositories.</p>"
-      "<p>[1] <a href=\"https://www.ffmpeg.org/download.html\">Download FFmpeg from ffmpeg.org</a><br/>"
-      "[2] <a href=\"https://libav.org/download.html\">Download Libav from libav.org</a></p>");
+      "<p>Set path to FFmpeg (<a href=\"https://ffmpeg.org\">ffmpeg.org</a>) in preferences "
+      "(Window -> Preferences... (Ctrl+P) -> External Programs) "
+      "to be able to record your movies to video files.</p>");
     return;
   }
 
   m_FFmpegWriter->SetFFmpegPath(GetFFmpegPath());
 
-  QAction* action = m_RecordMenu->exec(QCursor::pos());
+  auto action = m_RecordMenu->exec(QCursor::pos());
 
-  if (action == nullptr)
+  if (nullptr == action)
     return;
 
-  vtkRenderWindow* renderWindow = mitk::BaseRenderer::GetRenderWindowByName(action->data().toString().toStdString());
+  auto renderWindow = mitk::BaseRenderer::GetRenderWindowByName(action->data().toString().toStdString());
 
-  if (renderWindow == nullptr)
+  if (nullptr == renderWindow)
     return;
 
   const int border = 3;
@@ -374,16 +347,14 @@ void QmitkMovieMakerView::OnRecordButtonClicked() // TODO: Refactor
 
   try
   {
+    auto frame = std::make_unique<unsigned char[]>(width * height * 3);
     m_FFmpegWriter->Start();
 
     for (m_CurrentFrame = 0; m_CurrentFrame < m_NumFrames; ++m_CurrentFrame)
     {
       this->RenderCurrentFrame();
-
-      renderWindow->MakeCurrent();
-      unsigned char* frame = ReadPixels(renderWindow, x, y, width, height);
-      m_FFmpegWriter->WriteFrame(frame);
-      delete[] frame;
+      ReadPixels(frame, renderWindow, x, y, width, height);
+      m_FFmpegWriter->WriteFrame(frame.get());
     }
 
     m_FFmpegWriter->Stop();
@@ -489,17 +460,15 @@ void QmitkMovieMakerView::OnTimerTimeout()
 
 void QmitkMovieMakerView::RenderCurrentFrame()
 {
-  typedef QPair<QmitkAnimationItem*, double> AnimationInterpolationFactorPair;
-
   const double deltaT = m_TotalDuration / (m_NumFrames - 1);
-  const QVector<AnimationInterpolationFactorPair> activeAnimations = this->GetActiveAnimations(m_CurrentFrame * deltaT);
+  const auto activeAnimations = this->GetActiveAnimations(m_CurrentFrame * deltaT);
 
-  Q_FOREACH(const AnimationInterpolationFactorPair& animation, activeAnimations)
+  for (const auto& animation : activeAnimations)
   {
-    const QVector<AnimationInterpolationFactorPair> nextActiveAnimations = this->GetActiveAnimations((m_CurrentFrame + 1) * deltaT);
+    const auto nextActiveAnimations = this->GetActiveAnimations((m_CurrentFrame + 1) * deltaT);
     bool lastFrameForAnimation = true;
 
-    Q_FOREACH(const AnimationInterpolationFactorPair& nextAnimation, nextActiveAnimations)
+    for (const auto& nextAnimation : nextActiveAnimations)
     {
       if (nextAnimation.first == animation.first)
       {
@@ -584,18 +553,16 @@ void QmitkMovieMakerView::ShowAnimationWidget(QmitkAnimationItem* animationItem)
     return;
 
   const QString widgetKey = animationItem->GetWidgetKey();
-  QmitkAnimationWidget* animationWidget = nullptr;
+  auto animationWidgetIter = m_AnimationWidgets.find(widgetKey);
+  auto animationWidget = m_AnimationWidgets.end() != animationWidgetIter
+    ? animationWidgetIter->second
+    : nullptr;
 
-  if (m_AnimationWidgets.contains(widgetKey))
+  if (nullptr != animationWidget)
   {
-    animationWidget = m_AnimationWidgets[widgetKey];
-
-    if (animationWidget != nullptr)
-    {
-      m_Ui->animationWidgetGroupBox->setTitle(widgetKey);
-      animationWidget->SetAnimationItem(animationItem);
-      animationWidget->setVisible(true);
-    }
+    m_Ui->animationWidgetGroupBox->setTitle(widgetKey);
+    animationWidget->SetAnimationItem(animationItem);
+    animationWidget->setVisible(true);
   }
 
   m_Ui->animationWidgetGroupBox->setVisible(animationWidget != nullptr);
@@ -629,9 +596,9 @@ void QmitkMovieMakerView::CalculateTotalDuration()
 
   for (int i = 0; i < rowCount; ++i)
   {
-    QmitkAnimationItem* item = dynamic_cast<QmitkAnimationItem*>(m_AnimationModel->item(i, 1));
+   auto item = dynamic_cast<QmitkAnimationItem*>(m_AnimationModel->item(i, 1));
 
-    if (item == nullptr)
+    if (nullptr == item)
       continue;
 
     if (item->GetStartWithPrevious())
@@ -645,15 +612,15 @@ void QmitkMovieMakerView::CalculateTotalDuration()
     }
   }
 
-  m_TotalDuration = totalDuration; // TODO totalDuration == 0
-  m_NumFrames = static_cast<int>(totalDuration * m_Ui->fpsSpinBox->value()); // TODO numFrames < 2
+  m_TotalDuration = totalDuration;
+  m_NumFrames = static_cast<int>(totalDuration * m_Ui->fpsSpinBox->value());
 }
 
-QVector<QPair<QmitkAnimationItem*, double> > QmitkMovieMakerView::GetActiveAnimations(double t) const
+std::vector<std::pair<QmitkAnimationItem*, double>> QmitkMovieMakerView::GetActiveAnimations(double t) const
 {
   const int rowCount = m_AnimationModel->rowCount();
 
-  QVector<QPair<QmitkAnimationItem*, double> > activeAnimations;
+  std::vector<std::pair<QmitkAnimationItem*, double>> activeAnimations;
 
   double totalDuration = 0.0;
   double previousStart = 0.0;
@@ -672,7 +639,7 @@ QVector<QPair<QmitkAnimationItem*, double> > QmitkMovieMakerView::GetActiveAnima
         : totalDuration + item->GetDelay();
 
       if (start <= t && t <= start + item->GetDuration())
-        activeAnimations.push_back(qMakePair(item, (t - start) / item->GetDuration()));
+        activeAnimations.emplace_back(item, (t - start) / item->GetDuration());
     }
 
     if (item->GetStartWithPrevious())

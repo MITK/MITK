@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/org.mitk.gui.qt.dicombrowser">
+        <file>drive-harddisk_32.png</file>
+        <file>import_32.png</file>
+        <file>network-workgroup_32.png</file>
+        <file>network-idle_16.png</file>
+        <file>network-offline_16.png</file>
+        <file>network-error_16.png</file>
+        <file>viewIcon.png</file>
+        <file>folder_32.png</file>
+    </qresource>
+</RCC>

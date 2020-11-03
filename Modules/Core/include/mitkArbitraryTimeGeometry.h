@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef ArbitraryTimeGeometry_h
 #define ArbitraryTimeGeometry_h
@@ -52,8 +48,8 @@ namespace mitk
 
     ArbitraryTimeGeometry();
     typedef ArbitraryTimeGeometry self;
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
       /**
       * \brief Returns the number of time steps.
@@ -132,16 +128,18 @@ namespace mitk
     */
     TimePointType TimeStepToTimePoint(TimeStepType timeStep) const override;
     /**
-  * \brief Converts a time point to the corresponding time step
-  *
-  * Converts a time point to a time step in a way that
-  * the new time step indicates the same geometry as the time point.
-  * The associated time step is the last step which lower time bound
-  * is smaller or equal then the time point.
-  * If a negative invalid time point is given always time step 0 is
-  * returned. If an positive invalid time step is given an invalid
-  * time step will be returned.
-  */
+    * \brief Converts a time point to the corresponding time step
+    *
+    * Converts a time point to a time step in a way that
+    * the new time step indicates the same geometry as the time point.
+    * The associated time step is the last step which lower time bound
+    * is smaller or equal then the time point.
+    * If a negative invalid time point is given always time step 0 is
+    * returned. If a positive invalid time point is given the last time
+    * step will be returned. This is also true for time points that are
+    * exactly on the upper time bound (the only exception is the final
+    * time step in case that HasCollapsedFinalTimeStep() is true).
+    */
     TimeStepType TimePointToTimeStep(TimePointType timePoint) const override;
     /**
     * \brief Returns the geometry which corresponds to the given time step
@@ -233,6 +231,13 @@ namespace mitk
     void ReserveSpaceForGeometries( TimeStepType numberOfGeometries );
 
     void PrintSelf(std::ostream &os, itk::Indent indent) const override;
+
+    /** This is a helper that indicates problematic corner cases that often occure e.g. when loading
+    dynamic DICOM data. There the final time step is collapsed as min time bound and max time bound
+    have the same value. For a more detailed explanation why it happens please see:
+    https://phabricator.mitk.org/T24766#131411 and https://phabricator.mitk.org/T27259#203524
+    */
+    bool HasCollapsedFinalTimeStep() const;
 
   protected:
     ~ArbitraryTimeGeometry() override;

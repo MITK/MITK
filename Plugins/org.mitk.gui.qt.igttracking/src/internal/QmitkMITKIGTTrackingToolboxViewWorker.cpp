@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 // Qmitk
 #include "QmitkMITKIGTTrackingToolboxViewWorker.h"
@@ -152,8 +148,9 @@ void QmitkMITKIGTTrackingToolboxViewWorker::ConnectDevice()
   {
     m_TrackingDeviceSource->Connect();
     //Microservice registration:
+    m_TrackingDeviceSource->SetToolMetaDataCollection(m_NavigationToolStorage);
     m_TrackingDeviceSource->RegisterAsMicroservice();
-    m_NavigationToolStorage->SetSourceID(m_TrackingDeviceSource->GetMicroserviceID());
+    m_NavigationToolStorage->SetSourceID(m_TrackingDeviceSource->GetMicroserviceID()); //DEPRECATED / not needed anymore because NavigationDataSource now holds a member of its tool storage. Only left for backward compatibility.
     m_NavigationToolStorage->LockStorage();
   }
   catch (...) //todo: change to mitk::IGTException

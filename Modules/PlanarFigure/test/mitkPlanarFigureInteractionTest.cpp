@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkTestingMacros.h"
 #include <mitkTestFixture.h>
@@ -22,8 +18,6 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkInteractionTestHelper.h>
 #include <mitkRenderingTestHelper.h>
 #include <mitkPlanarFigureInteractor.h>
-#include <mitkPlanarFigureReader.h>
-#include <mitkPlanarFigureWriter.h>
 
 #include <mitkPlanarAngle.h>
 #include <mitkPlanarArrow.h>
@@ -103,10 +97,7 @@ public:
     interactionTestHelper.PlaybackInteraction();
 
     // Load reference PlanarFigure
-    mitk::PlanarFigureReader::Pointer reader = mitk::PlanarFigureReader::New();
-    reader->SetFileName(GetTestDataFilePath(referenceFigurePath));
-    reader->Update();
-    mitk::PlanarFigure::Pointer reference = reader->GetOutput(0);
+    auto reference = mitk::IOUtil::Load<mitk::PlanarFigure>(GetTestDataFilePath(referenceFigurePath));
 
     // Compare figures
     MITK_ASSERT_EQUAL(figure, reference, "Compare figure with reference");

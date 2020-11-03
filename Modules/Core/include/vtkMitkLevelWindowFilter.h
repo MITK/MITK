@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef __vtkMitkLevelWindowFilter_h
 #define __vtkMitkLevelWindowFilter_h
@@ -26,10 +22,9 @@ class vtkPiecewiseFunction;
 /** Documentation
 * \brief Applies the grayvalue or color/opacity level window to scalar or RGB(A) images.
 *
-* This filter is used to apply the color level window to RGB images (e.g.
-* diffusion tensor images). Therefore, the RGB channels are converted to
-* the HSI color space, where the level window can be applied. Afterwards,
-* the HSI values transformed back to the RGB space.
+* This filter is used to apply the color level window to RGB images.
+* Therefore, the RGB channels are converted to the HSI color space, where the level
+* window can be applied. Afterwards, the HSI values transformed back to the RGB space.
 *
 * The filter is also able to apply an opacity level window to RGBA images.
 *

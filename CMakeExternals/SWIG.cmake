@@ -53,10 +53,10 @@ if(MITK_USE_SWIG)
                           CC=${CMAKE_C_COMPILER}${CMAKE_C_COMPILER_ARG1}
                           LDFLAGS=${CMAKE_LINKER_FLAGS} ${CMAKE_LINKER_FLAGS_RELEASE}
                           CXX=${CMAKE_CXX_COMPILER}${CMAKE_CXX_COMPILER_ARG1}
-                            --prefix=<INSTALL_DIR>
-                            --with-pcre-prefix=${PCRE_DIR}
+                            "--prefix=<INSTALL_DIR>"
+                            "--with-pcre-prefix=${PCRE_DIR}"
                             --without-octave
-                            --with-python=${PYTHON_EXECUTABLE}
+                            "--with-python=${Python3_EXECUTABLE}"
         DEPENDS ${proj_DEPENDENCIES}
         )
 

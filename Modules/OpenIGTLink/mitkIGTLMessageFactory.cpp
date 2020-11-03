@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkIGTLMessageFactory.h"
 
@@ -52,7 +48,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 // a type of data that will be shared with the message functions
 // of this handler class.
 
-mitkIGTMessageCloneClassMacro(igtl::TransformMessage, TransformMsgCloneHandler);
+mitkIGTMessageCloneClassMacro(igtl::TransformMessage, TransformMsgCloneHandler)
 
 /**
  * \brief Clones the original message interpreted as transform message
@@ -102,7 +98,7 @@ mitk::IGTLMessageFactory::IGTLMessageFactory()
 
   this->AddMessageNewMethod("NONE", nullptr);
 
-  //OpenIGTLink Types V1
+  // OpenIGTLink Types V1
   this->AddMessageNewMethod("IMAGE", (PointerToMessageBaseNew)&igtl::ImageMessage::New);
   this->AddMessageNewMethod("TRANSFORM", (PointerToMessageBaseNew)&igtl::TransformMessage::New);
   this->AddMessageNewMethod("POSITION", (PointerToMessageBaseNew)&igtl::PositionMessage::New);
@@ -113,9 +109,8 @@ mitk::IGTLMessageFactory::IGTLMessageFactory()
   this->AddMessageNewMethod("GET_TRANS", (PointerToMessageBaseNew)&igtl::GetTransformMessage::New);
   //this->AddMessageNewMethod("GET_POS", (PointerToMessageBaseNew)&igtl::GetPositionMessage::New); //not available???
   this->AddMessageNewMethod("GET_STATUS", (PointerToMessageBaseNew)&igtl::GetStatusMessage::New);
-  this->AddMessageNewMethod("GET_CAPABIL", (PointerToMessageBaseNew)&igtl::GetCapabilityMessage::New);
 
-  //  //OpenIGTLink Types V2
+  // OpenIGTLink Types V2
   this->AddMessageNewMethod("IMGMETA", (PointerToMessageBaseNew)&igtl::ImageMetaMessage::New);
   this->AddMessageNewMethod("LBMETA", (PointerToMessageBaseNew)&igtl::LabelMetaMessage::New);
   this->AddMessageNewMethod("COLORT", (PointerToMessageBaseNew)&igtl::ColorTableMessage::New);

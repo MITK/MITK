@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkAffineImageCropperInteractor.h"
 
@@ -77,7 +73,7 @@ bool mitk::AffineImageCropperInteractor::CheckOverObject(const InteractionEvent 
   return object && object->GetGeometry()->GetBoundingBox()->IsInside(currentPickedPoint);
 }
 
-void mitk::AffineImageCropperInteractor::SelectObject(StateMachineAction *, InteractionEvent *interactionEvent)
+void mitk::AffineImageCropperInteractor::SelectObject(StateMachineAction *, InteractionEvent *)
 {
   mitk::DataNode::Pointer dn = this->GetDataNode();
 
@@ -86,7 +82,7 @@ void mitk::AffineImageCropperInteractor::SelectObject(StateMachineAction *, Inte
 
   m_SelectedNode = dn;
 
-  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+  RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::AffineImageCropperInteractor::Deselect()
@@ -99,10 +95,10 @@ void mitk::AffineImageCropperInteractor::Deselect()
   m_SelectedNode = dn;
 }
 
-void mitk::AffineImageCropperInteractor::DeselectObject(StateMachineAction *, InteractionEvent *interactionEvent)
+void mitk::AffineImageCropperInteractor::DeselectObject(StateMachineAction *, InteractionEvent *)
 {
   Deselect();
-  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+  RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::AffineImageCropperInteractor::ScaleRadius(StateMachineAction *, InteractionEvent *interactionEvent)
@@ -122,7 +118,7 @@ void mitk::AffineImageCropperInteractor::ScaleRadius(StateMachineAction *, Inter
   auto *doOp = new mitk::ScaleOperation(OpSCALE, newScale, anchorPoint);
   m_SelectedNode->GetData()->GetGeometry()->ExecuteOperation(doOp);
 
-  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+  RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::AffineImageCropperInteractor::InitTranslate(StateMachineAction *, InteractionEvent *interactionEvent)
@@ -187,7 +183,7 @@ void mitk::AffineImageCropperInteractor::TranslateObject(StateMachineAction *, I
   surGeo->SetOrigin(m_InitialOrigin);
   surGeo->Translate(interactionMove);
 
-  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+  RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::AffineImageCropperInteractor::DeformObject(StateMachineAction *, InteractionEvent *interactionEvent)
@@ -259,6 +255,6 @@ void mitk::AffineImageCropperInteractor::RotateObject(StateMachineAction *, Inte
     newGeometry->ExecuteOperation(&op);
     m_SelectedNode->GetData()->SetGeometry(newGeometry);
 
-    interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+    RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }

@@ -4,9 +4,10 @@
   <extension point="org.blueberry.ui.editors">
     <editor
       id="org.mitk.editors.stdmultiwidget"
-      name="Display"
+      name="Standard Display"
       icon="resources/StdMultiWidgetEditor.svg"
       extensions="mitk"
+	  default="true"
       class="QmitkStdMultiWidgetEditor">
     </editor>
   </extension>
@@ -22,7 +23,7 @@
     <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="zooming panning contraint"/>
     <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="show level window widget"/>
     <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="pacs like mouse interaction select left mouse button action"/>
-    <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="rendering mode standard"/>
+    <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="rendering mode fxaa anti-aliasing"/>
     <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="crosshair gap size background decoration color corner annotation"/>
   </extension>
 </plugin>

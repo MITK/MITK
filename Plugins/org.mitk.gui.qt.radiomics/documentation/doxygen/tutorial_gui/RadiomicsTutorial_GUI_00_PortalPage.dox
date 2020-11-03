@@ -1,0 +1,22 @@
+/**
+\page org_mitk_views_radiomicstutorial_gui_portal GUI based Radiomics Tutorial
+
+This is an basic tutorial to show how MITK Phenotyping can be used to perform the individual steps of an radiomics study. It assumes that you have MITK Phenotyping running on your server, and focuses on the usage of the graphical interface. 
+
+In order to use the Tutorial you need an 3D image. We will use the Pic3D.nrrd image, which can be downloaded from http://mitk.org/download/tutorial-data/Pic3D.nrrd . So if you want to have a better comparability between our results and your results, we suggest that you use this image as well. However, feel free to use your own image if you want. 
+
+The tutorial is designed along the steps that would be perfomed within a radiomics study until to the point where the radiomic features are obtained and the statistical analysis would be necessary. This should be done in the tool of choice of the scientist. Please be aware: This is not a real study, and you might perfom some steps differently or additional steps in a real radiomics study. The main aim of this study is to give the reader an idea how to perfom individual steps in MITK. 
+
+The first step is to make MITK Phenotyping and the MITK Workbench familiar to you. If you know the basic of the MITK Workbench, you can skip this step. 
+\subpage org_mitk_views_radiomicstutorial_gui_01_basic
+
+The second step is to create a segmentation for the next steps. If you want to create the segmentations with a different tool, you can also skip this step. 
+\subpage org_mitk_views_radiomicstutorial_gui_02_Segmentation
+
+The third step is to preprocess the images. This step could also be perfomed before creating the segmentation, which is actually suggested. But it is common that the segmentations are already created for a study. Therefore, we put this step after the segmentation creation process.
+\subpage org_mitk_views_radiomicstutorial_gui_03_preprocessing
+
+The fourth and last step of this tutorial covers the calculation of the features with the graphical interface. We only use a limited amount of features, feel free to calculate more features in one step.
+\subpage org_mitk_views_radiomicstutorial_gui_04_featurecalulation
+
+*/

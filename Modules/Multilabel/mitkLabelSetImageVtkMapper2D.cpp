@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkLabelSetImageVtkMapper2D.h"
 
@@ -644,6 +640,7 @@ mitk::LabelSetImageVtkMapper2D::LocalStorage::LocalStorage()
   m_OutlineShadowActor = vtkSmartPointer<vtkActor>::New();
 
   m_NumberOfLayers = 0;
+  m_mmPerPixel = nullptr;
 
   m_OutlineActor->SetMapper(m_OutlineMapper);
   m_OutlineShadowActor->SetMapper(m_OutlineMapper);

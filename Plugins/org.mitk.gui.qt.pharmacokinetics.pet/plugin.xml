@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.pharmacokinetics.pet"
+          name="Dynamic PET DataFit View"
+		  category="PET"
+          class="PETDynamicView"
+          icon="resources/icon.svg" />
+  </extension>
+
+</plugin>

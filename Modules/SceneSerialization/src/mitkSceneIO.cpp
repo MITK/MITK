@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <Poco/Delegate.h>
 #include <Poco/Path.h>
@@ -52,7 +48,7 @@ mitk::SceneIO::~SceneIO()
 
 std::string mitk::SceneIO::CreateEmptyTempDirectory()
 {
-  mitk::UIDGenerator uidGen("UID_", 6);
+  mitk::UIDGenerator uidGen;
 
   // std::string returnValue = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() +
   // Poco::Path::separator() + "SceneIOTemp" + uidGen.GetUID();
@@ -96,18 +92,6 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene(const std::string &filename,
   if (storage.IsNull())
   {
     storage = StandaloneDataStorage::New().GetPointer();
-  }
-
-  if (clearStorageFirst)
-  {
-    try
-    {
-      storage->Remove(storage->GetAll());
-    }
-    catch (...)
-    {
-      MITK_ERROR << "DataStorage cannot be cleared properly.";
-    }
   }
 
   // test input filename
@@ -155,21 +139,8 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene(const std::string &filename,
   // transcode locale-dependent string
   m_WorkingDirectory = Poco::Path::transcode (m_WorkingDirectory);
 
-  // test if index.xml exists
-  // parse index.xml with TinyXML
-  TiXmlDocument document(m_WorkingDirectory + mitk::IOUtil::GetDirectorySeparator() + "index.xml");
-  if (!document.LoadFile())
-  {
-    MITK_ERROR << "Could not open/read/parse " << m_WorkingDirectory << mitk::IOUtil::GetDirectorySeparator()
-               << "index.xml\nTinyXML reports: " << document.ErrorDesc() << std::endl;
-    return storage;
-  }
-
-  SceneReader::Pointer reader = SceneReader::New();
-  if (!reader->LoadScene(document, m_WorkingDirectory, storage))
-  {
-    MITK_ERROR << "There were errors while loading scene file " << filename << ". Your data may be corrupted";
-  }
+  auto indexFile = m_WorkingDirectory + mitk::IOUtil::GetDirectorySeparator() + "index.xml";
+  storage = LoadSceneUnzipped(indexFile, storage, clearStorageFirst);
 
   // delete temp directory
   try
@@ -180,6 +151,63 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene(const std::string &filename,
   catch (...)
   {
     MITK_ERROR << "Could not delete temporary directory " << m_WorkingDirectory;
+  }
+
+  // return new data storage, even if empty or uncomplete (return as much as possible but notify calling method)
+  return storage;
+}
+
+mitk::DataStorage::Pointer mitk::SceneIO::LoadSceneUnzipped(const std::string &indexfilename,
+  DataStorage *pStorage,
+  bool clearStorageFirst)
+{
+  mitk::LocaleSwitch localeSwitch("C");
+
+  // prepare data storage
+  DataStorage::Pointer storage = pStorage;
+  if (storage.IsNull())
+  {
+    storage = StandaloneDataStorage::New().GetPointer();
+  }
+
+  if (clearStorageFirst)
+  {
+    try
+    {
+      storage->Remove(storage->GetAll());
+    }
+    catch (...)
+    {
+      MITK_ERROR << "DataStorage cannot be cleared properly.";
+    }
+  }
+
+  // test input filename
+  if (indexfilename.empty())
+  {
+    MITK_ERROR << "No filename given. Not possible to load scene.";
+    return storage;
+  }
+
+  // transcode locale-dependent string
+  std::string tempfilename;
+  std::string workingDir;
+  itksys::SystemTools::SplitProgramPath(indexfilename, workingDir, tempfilename);
+
+  // test if index.xml exists
+  // parse index.xml with TinyXML
+  TiXmlDocument document(indexfilename);
+  if (!document.LoadFile())
+  {
+    MITK_ERROR << "Could not open/read/parse " << workingDir << mitk::IOUtil::GetDirectorySeparator()
+      << "index.xml\nTinyXML reports: " << document.ErrorDesc() << std::endl;
+    return storage;
+  }
+
+  SceneReader::Pointer reader = SceneReader::New();
+  if (!reader->LoadScene(document, workingDir, storage))
+  {
+    MITK_ERROR << "There were errors while loading scene file " << indexfilename << ". Your data may be corrupted";
   }
 
   // return new data storage, even if empty or uncomplete (return as much as possible but notify calling method)
@@ -488,6 +516,7 @@ TiXmlElement *mitk::SceneIO::SaveBaseData(BaseData *data, const std::string &fil
       break;
     }
   }
+  element->SetAttribute("UID", data->GetUID());
 
   return element;
 }

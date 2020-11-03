@@ -4,7 +4,7 @@
 
 \tableofcontents
 
-\section Howto How to adapt your code
+\section OverlayHowto How to adapt your code
 All classes have been renamed from "Overlay" to "Annotation", e.g. the mitk::TextOverlay2D is now mitk::TextAnnotation2D. Most of the interface of mitk::Overlay remains unchanged in
 mitk::Annotation, but it is no longer registered at the mitk::OverlayManager. Instead, mitk::ManualPlacementAnnotationRenderer and mitk::LayoutAnnotationRenderer are used the register an annotation.
 

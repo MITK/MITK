@@ -1,26 +1,19 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical Image Computing.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QMITKSELECTIONSERVICECONNECTOR_H
 #define QMITKSELECTIONSERVICECONNECTOR_H
 
 #include <org_mitk_gui_qt_common_Export.h>
-
-// qt widgets module
-#include <QmitkAbstractDataStorageModel.h>
 
 // mitk gui qt common plugin
 #include "QmitkDataNodeSelectionProvider.h"
@@ -62,7 +55,7 @@ class MITK_QT_COMMON QmitkSelectionServiceConnector : public QObject
 public:
 
   QmitkSelectionServiceConnector();
-  ~QmitkSelectionServiceConnector();
+  ~QmitkSelectionServiceConnector() override;
 
   /*
   * @brief 	Create a selection listener and add it to the list of selection listener of the given selection service.
@@ -95,6 +88,13 @@ Q_SIGNALS:
   * @par	nodes		A list of data nodes that are newly selected.
   */
   void ServiceSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
+
+  /*
+  * @brief A signal that will be emitted by the private 'ServiceSelectionChanged'-function. If sourcePart has send an invalid selection
+  * (selection pointer was Null).
+  * @par	sourcePart		Part that sent the null selection.
+  */
+  void ServiceNullSelection(const berry::IWorkbenchPart::Pointer& sourcePart);
 
 public Q_SLOTS:
   /*

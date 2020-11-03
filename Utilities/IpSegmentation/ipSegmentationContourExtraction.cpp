@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <mitkIpPicTypeMultiplex.h>
 #include "ipSegmentation.h"
@@ -70,7 +66,7 @@ float* tmGetContour4N( const mitkIpPicDescriptor *seg, int startOfs, int &numPts
   if (dir==4) return result;  // no contour pixel
 
   bool finished = false;
-  if (result==0) {
+  if (result==nullptr) {
     resSize = 2048;
     result = (float*)malloc( resSize*2*sizeof(float) );
   }
@@ -143,7 +139,7 @@ float* tmGetContour8N( const mitkIpPicDescriptor *seg, int startOfs, int &numPts
   }
 
   bool finished = false;
-  if (result==0) {
+  if (result==nullptr) {
     resSize = 2048;
     result = (float*)malloc( resSize*2*sizeof(float) );
   }

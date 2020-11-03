@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKCORESERVICES_H
 #define MITKCORESERVICES_H
@@ -144,12 +140,18 @@ namespace mitk
   class MITK_LOCAL CoreServicePointer
   {
   public:
-    explicit CoreServicePointer(S *service) : m_service(service) { assert(m_service); }
+    explicit CoreServicePointer(S *service, us::ModuleContext* context = us::GetModuleContext())
+      : m_Service(service),
+        m_Context(context)
+    {
+      assert(service);
+    }
+
     ~CoreServicePointer()
     {
       try
       {
-        CoreServices::Unget(m_service);
+        CoreServices::Unget(m_Service, m_Context);
       }
       catch (const std::exception &e)
       {
@@ -161,13 +163,14 @@ namespace mitk
       }
     }
 
-    S *operator->() const { return m_service; }
-  private:
-    // purposely not implemented
-    CoreServicePointer(const CoreServicePointer &);
-    CoreServicePointer &operator=(const CoreServicePointer &);
+    S *operator->() const
+    {
+      return m_Service;
+    }
 
-    S *const m_service;
+  private:
+    S *const m_Service;
+    us::ModuleContext* m_Context;
   };
 }
 

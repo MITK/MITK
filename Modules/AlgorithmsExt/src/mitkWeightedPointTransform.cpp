@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 // MITK
 #include "mitkWeightedPointTransform.h"
@@ -110,7 +106,7 @@ double ComputeWeightedFRE(vtkPoints *X,
   // compute weighting matrices
   calculateWeightMatrices(CovarianceMatricesMoving, CovarianceMatricesFixed, WeightMatrices, rotation);
 
-#pragma omp parallel for reduction(+ : FRE)
+#pragma omp parallel for
   for (int i = 0; i < static_cast<int>(WeightMatrices.size()); ++i)
   {
     // convert to itk data types (nessecary since itk 4 migration)
@@ -131,6 +127,7 @@ double ComputeWeightedFRE(vtkPoints *X,
 
     // do calculation
     const itk::Vector<double, 3> D = WeightMatrices.at(i) * p;
+#pragma omp critical
     FRE += (D[0] * D[0] + D[1] * D[1] + D[2] * D[2]);
   }
 
@@ -169,7 +166,7 @@ void mitk::WeightedPointTransform::C_maker(vtkPoints *X,
                                            itk::VariableSizeMatrix<double> &returnValue)
 {
 #pragma omp parallel for
-  for (vtkIdType i = 0; i < X->GetNumberOfPoints(); ++i)
+  for (int i = 0; i < X->GetNumberOfPoints(); ++i)
   {
     unsigned int index = 3u * i;
     double point[3];
@@ -194,7 +191,7 @@ void mitk::WeightedPointTransform::E_maker(vtkPoints *X,
                                            vnl_vector<double> &returnValue)
 {
 #pragma omp parallel for
-  for (vtkIdType i = 0; i < X->GetNumberOfPoints(); ++i)
+  for (int i = 0; i < X->GetNumberOfPoints(); ++i)
   {
     unsigned int index = 3u * i;
     double pX[3];

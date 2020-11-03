@@ -1,3 +1,15 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
 #include <mitkPlanarFigureMaskGenerator.h>
 #include <mitkBaseGeometry.h>
 #include <mitkITKImageImport.h>
@@ -54,7 +66,7 @@ void PlanarFigureMaskGenerator::SetPlanarFigure(mitk::PlanarFigure::Pointer plan
 
 }
 
-mitk::Image::Pointer PlanarFigureMaskGenerator::GetReferenceImage()
+mitk::Image::ConstPointer PlanarFigureMaskGenerator::GetReferenceImage()
 {
     if (IsUpdateRequired())
     {
@@ -115,47 +127,28 @@ void PlanarFigureMaskGenerator::InternalCalculateMaskFromPlanarFigure(
   }
 
   // store the polyline contour as vtkPoints object
-  bool outOfBounds = false;
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-  typename PlanarFigure::PolyLineType::const_iterator it;
-  for ( it = planarFigurePolyline.begin();
-    it != planarFigurePolyline.end();
-    ++it )
+  for (const auto& point : planarFigurePolyline)
   {
     Point3D point3D;
 
-    // Convert 2D point back to the local index coordinates of the selected
-    // image
-    // Fabian: From PlaneGeometry documentation:
-    // Converts a 2D point given in mm (pt2d_mm) relative to the upper-left corner of the geometry into the corresponding world-coordinate (a 3D point in mm, pt3d_mm).
-    // To convert a 2D point given in units (e.g., pixels in case of an image) into a 2D point given in mm (as required by this method), use IndexToWorld.
-    planarFigurePlaneGeometry->Map( *it, point3D );
+    // Convert 2D point back to the local index coordinates of the selected image
+    planarFigurePlaneGeometry->Map(point, point3D);
+    imageGeometry3D->WorldToIndex(point3D, point3D);
 
-    // Polygons (partially) outside of the image bounds can not be processed
-    // further due to a bug in vtkPolyDataToImageStencil
-    if ( !imageGeometry3D->IsInside( point3D ) )
-    {
-      outOfBounds = true;
-    }
-
-    imageGeometry3D->WorldToIndex( point3D, point3D );
-
-    points->InsertNextPoint( point3D[i0], point3D[i1], 0 );
+    points->InsertNextPoint(point3D[i0], point3D[i1], 0);
   }
 
-  vtkSmartPointer<vtkPoints> holePoints = nullptr;
+  vtkSmartPointer<vtkPoints> holePoints;
 
   if (!planarFigureHolePolyline.empty())
   {
     holePoints = vtkSmartPointer<vtkPoints>::New();
-
     Point3D point3D;
-    PlanarFigure::PolyLineType::const_iterator end = planarFigureHolePolyline.end();
 
-    for (it = planarFigureHolePolyline.begin(); it != end; ++it)
+    for (const auto& point : planarFigureHolePolyline)
     {
-      // Fabian: same as above
-      planarFigurePlaneGeometry->Map(*it, point3D);
+      planarFigurePlaneGeometry->Map(point, point3D);
       imageGeometry3D->WorldToIndex(point3D, point3D);
       holePoints->InsertNextPoint(point3D[i0], point3D[i1], 0);
     }
@@ -163,28 +156,22 @@ void PlanarFigureMaskGenerator::InternalCalculateMaskFromPlanarFigure(
 
   // mark a malformed 2D planar figure ( i.e. area = 0 ) as out of bounds
   // this can happen when all control points of a rectangle lie on the same line = two of the three extents are zero
-  double bounds[6] = {0, 0, 0, 0, 0, 0};
-  points->GetBounds( bounds );
+  double bounds[6] = {0};
+  points->GetBounds(bounds);
   bool extent_x = (fabs(bounds[0] - bounds[1])) < mitk::eps;
   bool extent_y = (fabs(bounds[2] - bounds[3])) < mitk::eps;
   bool extent_z = (fabs(bounds[4] - bounds[5])) < mitk::eps;
 
   // throw an exception if a closed planar figure is deformed, i.e. has only one non-zero extent
-  if ( m_PlanarFigure->IsClosed() &&
-    ((extent_x && extent_y) || (extent_x && extent_z)  || (extent_y && extent_z)))
+  if (m_PlanarFigure->IsClosed() && ((extent_x && extent_y) || (extent_x && extent_z)  || (extent_y && extent_z)))
   {
     mitkThrow() << "Figure has a zero area and cannot be used for masking.";
-  }
-
-  if ( outOfBounds )
-  {
-    throw std::runtime_error( "Figure at least partially outside of image bounds!" );
   }
 
   // create a vtkLassoStencilSource and set the points of the Polygon
   vtkSmartPointer<vtkLassoStencilSource> lassoStencil = vtkSmartPointer<vtkLassoStencilSource>::New();
   lassoStencil->SetShapeToPolygon();
-  lassoStencil->SetPoints( points );
+  lassoStencil->SetPoints(points);
 
   vtkSmartPointer<vtkLassoStencilSource> holeLassoStencil = nullptr;
 
@@ -296,23 +283,13 @@ void PlanarFigureMaskGenerator::InternalCalculateMaskFromOpenPlanarFigure(
   for ( int lineId = 0; lineId < numPolyLines; ++lineId )
   {
     // store the polyline contour as vtkPoints object
-    bool outOfBounds = false;
     IndexVecType pointIndices;
-    typename PlanarFigure::PolyLineType::const_iterator it;
-    for ( it = planarFigurePolyline.begin();
-      it != planarFigurePolyline.end();
-      ++it )
+    for(const auto& point : planarFigurePolyline)
     {
       Point3D point3D;
 
-      planarFigurePlaneGeometry->Map( *it, point3D );
-
-      if ( !imageGeometry3D->IsInside( point3D ) )
-      {
-        outOfBounds = true;
-      }
-
-      imageGeometry3D->WorldToIndex( point3D, point3D );
+      planarFigurePlaneGeometry->Map(point, point3D);
+      imageGeometry3D->WorldToIndex(point3D, point3D);
 
       IndexType2D index2D;
       index2D[0] = point3D[i0];
@@ -321,20 +298,13 @@ void PlanarFigureMaskGenerator::InternalCalculateMaskFromOpenPlanarFigure(
       pointIndices.push_back( index2D );
     }
 
-    if ( outOfBounds )
+    size_t numLineSegments = pointIndices.size() - 1;
+    for (size_t i = 0; i < numLineSegments; ++i)
     {
-      throw std::runtime_error( "Figure at least partially outside of image bounds!" );
-    }
-
-    for ( IndexVecType::const_iterator it = pointIndices.begin(); it != pointIndices.end()-1; ++it )
-    {
-      IndexType2D ind1 = *it;
-      IndexType2D ind2 = *(it+1);
-
-      LineIteratorType lineIt( maskImage, ind1, ind2 );
-      while ( !lineIt.IsAtEnd() )
+      LineIteratorType lineIt(maskImage, pointIndices[i], pointIndices[i+1]);
+      while (!lineIt.IsAtEnd())
       {
-        lineIt.Set( 1 );
+        lineIt.Set(1);
         ++lineIt;
       }
     }
@@ -342,6 +312,15 @@ void PlanarFigureMaskGenerator::InternalCalculateMaskFromOpenPlanarFigure(
 
   // Store mask
   m_InternalITKImageMask2D = maskImage;
+}
+
+bool PlanarFigureMaskGenerator::CheckPlanarFigureIsNotTilted(const PlaneGeometry* planarGeometry, const BaseGeometry *geometry)
+{
+  if (!planarGeometry) return false;
+  if (!geometry) return false;
+
+  unsigned int axis;
+  return GetPrincipalAxis(geometry,planarGeometry->GetNormal(), axis);
 }
 
 bool PlanarFigureMaskGenerator::GetPrincipalAxis(
@@ -354,7 +333,12 @@ bool PlanarFigureMaskGenerator::GetPrincipalAxis(
     Vector3D axisVector = geometry->GetAxisVector( i );
     axisVector.Normalize();
 
-    if ( fabs( fabs( axisVector * vector ) - 1.0) < mitk::eps )
+    //normal mitk::eps is to pedantic for this check. See e.g. T27122
+    //therefore choose a larger epsilon. The value was set a) as small as
+    //possible but b) still allowing to datasets like in (T27122) to pass
+    //when floating rounding errors sum up.
+    const double epsilon = 5e-5;
+    if ( fabs( fabs( axisVector * vector ) - 1.0) < epsilon)
     {
       axis = i;
       return true;
@@ -422,7 +406,7 @@ void PlanarFigureMaskGenerator::CalculateMask()
     m_PlanarFigureSlice = slice;
 
     // extract image slice which corresponds to the planarFigure and store it in m_InternalImageSlice
-    mitk::Image::Pointer inputImageSlice = extract2DImageSlice(axis, slice);
+    mitk::Image::ConstPointer inputImageSlice = extract2DImageSlice(axis, slice);
     //mitk::IOUtil::Save(inputImageSlice, "/home/fabian/inputSliceImage.nrrd");
     // Compute mask from PlanarFigure
     // rastering for open planar figure:
@@ -474,11 +458,10 @@ mitk::Image::Pointer PlanarFigureMaskGenerator::GetMask()
     return m_InternalMask;
 }
 
-mitk::Image::Pointer PlanarFigureMaskGenerator::extract2DImageSlice(unsigned int axis, unsigned int slice)
+mitk::Image::ConstPointer PlanarFigureMaskGenerator::extract2DImageSlice(unsigned int axis, unsigned int slice)
 {
     // Extract slice with given position and direction from image
     unsigned int dimension = m_InternalTimeSliceImage->GetDimension();
-    mitk::Image::Pointer imageSlice = mitk::Image::New();
 
     if (dimension == 3)
     {
@@ -487,18 +470,17 @@ mitk::Image::Pointer PlanarFigureMaskGenerator::extract2DImageSlice(unsigned int
       imageExtractor->SetSliceDimension( axis );
       imageExtractor->SetSliceIndex( slice );
       imageExtractor->Update();
-      imageSlice = imageExtractor->GetOutput();
+      return imageExtractor->GetOutput();
     }
     else if(dimension == 2)
     {
-      imageSlice = m_InternalTimeSliceImage;
+      return m_InternalTimeSliceImage;
     }
     else
     {
-        MITK_ERROR << "Unsupported image dimension. Dimension is: " << dimension << ". Only 2D and 3D images are supported.";
+      MITK_ERROR << "Unsupported image dimension. Dimension is: " << dimension << ". Only 2D and 3D images are supported.";
+      return nullptr;
     }
-
-    return imageSlice;
 }
 
 bool PlanarFigureMaskGenerator::IsUpdateRequired() const

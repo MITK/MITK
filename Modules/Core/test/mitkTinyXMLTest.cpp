@@ -1,158 +1,159 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
+============================================================================*/
+// Testing
+#include "mitkTestFixture.h"
+#include <mitkTestingMacros.h>
 
-===================================================================*/
-
-#include "mitkTestingMacros.h"
-
-#include <mitkNumericTypes.h>
-
+// std includes
 #include <cmath>
 #include <iomanip>
-#include <string>
 #include <tinyxml.h>
 
+// MITK includes
+#include "mitkStringProperty.h"
+#include <mitkNumericTypes.h>
+
+// itksys
 #include <itksys/SystemTools.hxx>
 
-static const std::string filename = itksys::SystemTools::GetCurrentWorkingDirectory() + "/TinyXMLTest.txt";
-static const std::string elementToStoreAttributeName = "DoubleTest";
-static const std::string attributeToStoreName = "CommaValue";
+// VTK includes
+#include <vtkDebugLeaks.h>
 
-static double calcPrecision(const unsigned int requiredDecimalPlaces)
+// vnl includes
+#include <vnl/vnl_vector_fixed.hxx>
+
+class mitkTinyXMLTestSuite : public mitk::TestFixture
 {
-  return pow(10.0, -1.0 * ((double)requiredDecimalPlaces));
-}
+  CPPUNIT_TEST_SUITE(mitkTinyXMLTestSuite);
 
-/**
- * create a simple xml document which stores the values
- * @param valueToWrite  value which should be stored
- * @return  true, if document was successfully created.
- */
-static bool Setup(double valueToWrite)
-{
-  // 1. create simple document
-  TiXmlDocument document;
-  auto decl = new TiXmlDeclaration("1.0", "", ""); // TODO what to write here? encoding? etc....
-  document.LinkEndChild(decl);
+  MITK_TEST(TestingFunctionSetupWorks_Success);
+  MITK_TEST(TestingReadValueFromSetupDocument_Success);
+  MITK_TEST(TestingReadOutValueWorks_Success);
+  MITK_TEST(TestDoubleValueWriteOut_Success);
+  MITK_TEST(TestDoubleValueWriteOutManyDecimalPlaces_Success);
 
-  auto version = new TiXmlElement("Version");
-  version->SetAttribute("Writer", __FILE__);
-  version->SetAttribute("CVSRevision", "$Revision: 17055 $");
-  version->SetAttribute("FileVersion", 1);
-  document.LinkEndChild(version);
+  CPPUNIT_TEST_SUITE_END();
 
-  // 2. store one element containing a double value with potentially many after comma digits.
-  auto vElement = new TiXmlElement(elementToStoreAttributeName);
-  vElement->SetDoubleAttribute(attributeToStoreName, valueToWrite);
-  document.LinkEndChild(vElement);
+private:
+  const std::string m_Filename = itksys::SystemTools::GetCurrentWorkingDirectory() + "/TinyXMLTest.txt";
+  const std::string m_ElementToStoreAttributeName = "DoubleTest";
+  const std::string m_AttributeToStoreName = "CommaValue";
 
-  // 3. store in file.
-  return document.SaveFile(filename);
-}
+  TiXmlDocument m_Document;
+  TiXmlElement *m_DoubleTest;
 
-static int readValueFromSetupDocument(double &readOutValue)
-{
-  TiXmlDocument document;
-
-  if (!document.LoadFile(filename))
+  double calcPrecision(const unsigned int requiredDecimalPlaces)
   {
-    MITK_TEST_CONDITION_REQUIRED(false, "Test Setup failed, could not open " << filename);
-    return TIXML_NO_ATTRIBUTE;
+    return pow(10.0, -1.0 * ((double)requiredDecimalPlaces));
   }
-  else
+
+  bool Setup(double valueToWrite)
   {
-    TiXmlElement *doubleTest = document.FirstChildElement(elementToStoreAttributeName);
-    return doubleTest->QueryDoubleAttribute(attributeToStoreName, &readOutValue);
+    // 1. create simple document
+    auto decl = new TiXmlDeclaration("1.0", "", ""); // TODO what to write here? encoding? etc....
+    m_Document.LinkEndChild(decl);
+
+    auto version = new TiXmlElement("Version");
+    version->SetAttribute("Writer", __FILE__);
+    version->SetAttribute("CVSRevision", "$Revision: 17055 $");
+    version->SetAttribute("FileVersion", 1);
+    m_Document.LinkEndChild(version);
+
+    // 2. store one element containing a double value with potentially many after comma digits.
+    auto vElement = new TiXmlElement(m_ElementToStoreAttributeName);
+    vElement->SetDoubleAttribute(m_AttributeToStoreName, valueToWrite);
+    m_Document.LinkEndChild(vElement);
+
+    // 3. store in file.
+    return m_Document.SaveFile(m_Filename);
   }
-}
 
-/**
- *
- * @return true if TearDown was successful.
- */
-static bool TearDown()
-{
-  return !remove(filename.c_str());
-}
+public:
+  void setUp() override {}
 
-static void Test_Setup_works()
-{
-  MITK_TEST_CONDITION_REQUIRED(
-    Setup(1.0) && TearDown(),
-    "Test if setup and teardown correctly writes data to " << filename << " and deletes the file after the test");
-}
+  void tearDown() override {}
 
-/**
- * this first test ensures we can correctly readout values from the
- * TinyXMLDocument.
- */
-static void Test_ReadOutValue_works()
-{
-  Setup(1.0);
+  void TestingFunctionSetupWorks_Success()
+  {
+    CPPUNIT_ASSERT_MESSAGE("Test if Setup correctly writes data to file", Setup(1.0));
+  }
 
-  double readValue;
+  int readValueFromSetupDocument(double &readOutValue)
+  {
+    if (!m_Document.LoadFile(m_Filename))
+    {
+      CPPUNIT_ASSERT_MESSAGE("Test Setup failed, could not open file", false);
+      return TIXML_NO_ATTRIBUTE;
+    }
+    else
+    {
+      m_DoubleTest = m_Document.FirstChildElement(m_ElementToStoreAttributeName);
+      return m_DoubleTest->QueryDoubleAttribute(m_AttributeToStoreName, &readOutValue);
+    }
+  }
 
-  MITK_TEST_CONDITION_REQUIRED(TIXML_SUCCESS == readValueFromSetupDocument(readValue),
-                               "checking if readout mechanism works.");
-}
+  void TestingReadValueFromSetupDocument_Success()
+  {
+    if (!m_Document.LoadFile(m_Filename))
+    {
+      CPPUNIT_ASSERT_MESSAGE("Test Setup failed, could not open file", !m_Document.LoadFile(m_Filename));
+    }
+    else
+    {
+      m_DoubleTest = m_Document.FirstChildElement(m_ElementToStoreAttributeName);
+      CPPUNIT_ASSERT_MESSAGE("Test Setup could open file", m_DoubleTest != nullptr);
+    }
+  }
 
-static void Test_DoubleValueWriteOut()
-{
-  const double valueToWrite = -1.123456;
-  const int validDigitsAfterComma = 6; // indicates the number of valid digits after comma of valueToWrite
-  const double neededPrecision = calcPrecision(validDigitsAfterComma + 1);
-  double readValue;
+  /**
+   * this first test ensures we can correctly readout values from the
+   * TinyXMLDocument.
+   */
+  void TestingReadOutValueWorks_Success()
+  {
+    double readValue;
 
-  Setup(valueToWrite);
+    CPPUNIT_ASSERT_MESSAGE("checking if readout mechanism works.",
+                           TIXML_SUCCESS == readValueFromSetupDocument(readValue));
+  }
 
-  readValueFromSetupDocument(readValue);
+  void TestDoubleValueWriteOut_Success()
+  {
+    const double valueToWrite = -1.123456;
+    const int validDigitsAfterComma = 6; // indicates the number of valid digits after comma of valueToWrite
+    const double neededPrecision = calcPrecision(validDigitsAfterComma + 1);
+    double readValue;
 
-  MITK_TEST_CONDITION_REQUIRED(
-    mitk::Equal(valueToWrite, readValue, neededPrecision),
-    std::setprecision(validDigitsAfterComma) << "Testing if value " << valueToWrite << " equals " << readValue
-                                             << " which was retrieved from TinyXML document");
+    Setup(valueToWrite);
+    readValueFromSetupDocument(readValue);
 
-  TearDown();
-}
+    CPPUNIT_ASSERT_MESSAGE("Testing if value valueToWrite  equals  readValue which was retrieved from TinyXML document",
+                           mitk::Equal(valueToWrite, readValue, neededPrecision));
+  }
 
-static void Test_DoubleValueWriteOut_manyDecimalPlaces()
-{
-  const double valueToWrite = -1.12345678910111;
-  const int validDigitsAfterComma = 14; // indicates the number of valid digits after comma of valueToWrite
-  const double neededPrecision = calcPrecision(validDigitsAfterComma + 1);
-  double readValue;
+  void TestDoubleValueWriteOutManyDecimalPlaces_Success()
+  {
+    const double valueToWrite = -1.12345678910111;
+    const int validDigitsAfterComma = 14; // indicates the number of valid digits after comma of valueToWrite
+    const double neededPrecision = calcPrecision(validDigitsAfterComma + 1);
+    double readValue;
 
-  Setup(valueToWrite);
+    Setup(valueToWrite);
 
-  readValueFromSetupDocument(readValue);
+    readValueFromSetupDocument(readValue);
 
-  MITK_TEST_CONDITION_REQUIRED(
-    mitk::Equal(valueToWrite, readValue, neededPrecision),
-    std::setprecision(validDigitsAfterComma) << "Testing if value " << valueToWrite << " equals " << readValue
-                                             << " which was retrieved from TinyXML document");
+    CPPUNIT_ASSERT_MESSAGE("Testing if value valueToWrite equals readValue which was retrieved from TinyXML document",
+                           mitk::Equal(valueToWrite, readValue, neededPrecision));
+  }
+};
 
-  TearDown();
-}
-
-int mitkTinyXMLTest(int /* argc */, char * /*argv*/ [])
-{
-  MITK_TEST_BEGIN("TinyXMLTest");
-
-  Test_Setup_works();
-  Test_ReadOutValue_works();
-  Test_DoubleValueWriteOut();
-  Test_DoubleValueWriteOut_manyDecimalPlaces();
-
-  MITK_TEST_END()
-}
+MITK_TEST_SUITE_REGISTRATION(mitkTinyXML)

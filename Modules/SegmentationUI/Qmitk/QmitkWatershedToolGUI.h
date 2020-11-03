@@ -1,29 +1,24 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QmitkWatershedToolGUI_h_Included
 #define QmitkWatershedToolGUI_h_Included
 
 #include "QmitkToolGUI.h"
 #include "mitkWatershedTool.h"
-#include <MitkSegmentationUIExports.h>
 
-class QSlider;
-class QLabel;
-class QFrame;
+#include "ui_QmitkWatershedToolGUIControls.h"
+
+#include <MitkSegmentationUIExports.h>
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
@@ -40,35 +35,36 @@ class MITKSEGMENTATIONUI_EXPORT QmitkWatershedToolGUI : public QmitkToolGUI
 
 public:
   mitkClassMacro(QmitkWatershedToolGUI, QmitkToolGUI);
-  itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+  itkFactorylessNewMacro(Self);
+  itkCloneMacro(Self);
 
-    protected slots :
+protected slots :
 
-    void OnNewToolAssociated(mitk::Tool *);
+  void OnNewToolAssociated(mitk::Tool *);
 
-  /** \brief Passes the chosen threshold value directly to the watershed tool */
-  void OnSliderValueThresholdChanged(int value);
-  /** \brief Passes the chosen level value directly to the watershed tool */
-  void OnSliderValueLevelChanged(int value);
-  /** \brief Starts segmentation algorithm in the watershed tool */
-  void OnCreateSegmentation();
+  void OnSettingsAccept();
+
+  void OnSegmentationRegionAccept();
+
+  void OnRegionSelectionChanged(const QmitkSimpleLabelSetListWidget::LabelVectorType& selectedLabels);
+
+  void OnLevelChanged(double value);
+  void OnThresholdChanged(double value);
 
 protected:
   QmitkWatershedToolGUI();
   ~QmitkWatershedToolGUI() override;
 
-  QSlider *m_SliderThreshold;
-  QSlider *m_SliderLevel;
+  void BusyStateChanged(bool value) override;
 
-  /** \brief Label showing the current threshold value. */
-  QLabel *m_ThresholdLabel;
-  /** \brief Label showing the current level value. */
-  QLabel *m_LevelLabel;
-  /** \brief Label showing additional informations. */
-  QLabel *m_InformationLabel;
+  //Recommendation from ITK is to have a threshold:level ration around 1:100
+  //we set Level a bit higher. This provokes more oversegmentation,
+  //but produces less objects in the first run and profits form the fact that
+  //decreasing level is quite fast in the filter.
+  double m_Level = 0.6;
+  double m_Threshold = 0.004;
 
-  QFrame *m_Frame;
-
+  Ui_QmitkWatershedToolGUIControls m_Controls;
   mitk::WatershedTool::Pointer m_WatershedTool;
 };
 

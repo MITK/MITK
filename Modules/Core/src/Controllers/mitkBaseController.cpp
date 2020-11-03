@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkBaseController.h"
 #include "mitkBaseRenderer.h"
@@ -36,7 +32,17 @@ mitk::Stepper *mitk::BaseController::GetSlice()
   return m_Slice.GetPointer();
 }
 
+const mitk::Stepper* mitk::BaseController::GetSlice() const
+{
+  return m_Slice.GetPointer();
+}
+
 mitk::Stepper *mitk::BaseController::GetTime()
+{
+  return m_Time.GetPointer();
+}
+
+const mitk::Stepper* mitk::BaseController::GetTime() const
 {
   return m_Time.GetPointer();
 }

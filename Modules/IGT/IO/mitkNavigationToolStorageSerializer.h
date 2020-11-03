@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef NAVIGATIONTOOLSTORAGESERIALIZER_H_INCLUDED
 #define NAVIGATIONTOOLSTORAGESERIALIZER_H_INCLUDED
@@ -36,29 +32,19 @@ namespace mitk {
   {
   public:
     mitkClassMacroItkParent(NavigationToolStorageSerializer,itk::Object);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     /**
-     * @brief  Saves a mitk navigation tool storage to a file.
-     * @return Returns true always true since error handling was converted to exception handling.
-     *         The return value is decrepated. Will be changed to void.
+     * @brief Saves a mitk navigation tool storage to a file.
      * @throw mitk::IGTIOException Throws an exception if the given filename cannot be opened for writing or
      *                             if the temp directory is not accessible.
      */
-    bool Serialize(std::string filename, mitk::NavigationToolStorage::Pointer storage);
-
-    /**
-     * @brief This method is decrepated. Exceptions are used for error handling now!
-     * @return Returns always an empty string since error handling was converted to exception handling.
-     */
-    itkGetMacro(ErrorMessage,std::string);
+    void Serialize(const std::string& filename, mitk::NavigationToolStorage::Pointer storage);
 
   protected:
     NavigationToolStorageSerializer();
     ~NavigationToolStorageSerializer() override;
-
-   std::string m_ErrorMessage;
 
    std::string convertIntToString(int i);
 

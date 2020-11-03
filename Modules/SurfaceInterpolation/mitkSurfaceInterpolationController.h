@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef mitkSurfaceInterpolationController_h_Included
 #define mitkSurfaceInterpolationController_h_Included
@@ -52,12 +48,12 @@ namespace mitk
   class MITKSURFACEINTERPOLATION_EXPORT SurfaceInterpolationController : public itk::Object
   {
   public:
-    mitkClassMacroItkParent(SurfaceInterpolationController, itk::Object) itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    mitkClassMacroItkParent(SurfaceInterpolationController, itk::Object);
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
+    itkGetMacro(DistanceImageSpacing, double);
 
-        itkGetMacro(DistanceImageSpacing, double)
-
-          struct ContourPositionInformation
+    struct ContourPositionInformation
     {
       Surface::Pointer contour;
       Vector3D contourNormal;
@@ -66,16 +62,15 @@ namespace mitk
 
     typedef std::vector<ContourPositionInformation> ContourPositionInformationList;
     typedef std::vector<ContourPositionInformationList> ContourPositionInformationVec2D;
-    // typedef std::map<mitk::Image*, ContourPositionInformationList> ContourListMap;
     typedef std::map<mitk::Image *, ContourPositionInformationVec2D> ContourListMap;
 
     static SurfaceInterpolationController *GetInstance();
 
-    void SetCurrentTimeStep(unsigned int ts)
+    void SetCurrentTimePoint(TimePointType tp)
     {
-      if (m_CurrentTimeStep != ts)
+      if (m_CurrentTimePoint != tp)
       {
-        m_CurrentTimeStep = ts;
+        m_CurrentTimePoint = tp;
 
         if (m_SelectedSegmentation)
         {
@@ -84,7 +79,8 @@ namespace mitk
       }
     };
 
-    unsigned int GetCurrentTimeStep() { return m_CurrentTimeStep; };
+    TimePointType GetCurrentTimePoint() const { return m_CurrentTimePoint; };
+
     /**
      * @brief Adds a new extracted contour to the list
      * @param newContour the contour to be added. If a contour at that position
@@ -248,7 +244,7 @@ namespace mitk
 
     std::map<mitk::Image *, unsigned long> m_SegmentationObserverTags;
 
-    unsigned int m_CurrentTimeStep;
+    mitk::TimePointType m_CurrentTimePoint;
   };
 }
 #endif

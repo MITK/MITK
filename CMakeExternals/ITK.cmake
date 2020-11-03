@@ -37,6 +37,8 @@ if(NOT DEFINED ITK_DIR)
     -DModule_ITKReview:BOOL=ON
   # for 4.7, the OpenJPEG is needed by review but the variable must be set
     -DModule_ITKOpenJPEG:BOOL=ON
+  # Added Module for Wavelets
+    -DModule_IsotropicWavelets:BOOL=ON
   )
 
   if(CTEST_USE_LAUNCHERS)
@@ -45,11 +47,16 @@ if(NOT DEFINED ITK_DIR)
     )
   endif()
 
+  mitk_query_custom_ep_vars()
+
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
-     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-4.13.1.tar.xz
-     URL_MD5 bc7296e7faccdcb5656a7669d4d875d2
+     UPDATE_COMMAND ""
+     # ITK 4.13 release branch snapshot
+     URL https://github.com/InsightSoftwareConsortium/ITK/archive/e53d1d94.tar.gz
+     URL_MD5 977f77cb299cf3d722d13dd5408bcde5
      CMAKE_GENERATOR ${gen}
+     CMAKE_GENERATOR_PLATFORM ${gen_platform}
      CMAKE_ARGS
        ${ep_common_args}
        ${additional_cmake_args}
@@ -58,10 +65,13 @@ if(NOT DEFINED ITK_DIR)
        -DGDCM_DIR:PATH=${GDCM_DIR}
        -DITK_USE_SYSTEM_HDF5:BOOL=ON
        -DHDF5_DIR:PATH=${HDF5_DIR}
+       ${${proj}_CUSTOM_CMAKE_ARGS}
      CMAKE_CACHE_ARGS
        ${ep_common_cache_args}
+       ${${proj}_CUSTOM_CMAKE_CACHE_ARGS}
      CMAKE_CACHE_DEFAULT_ARGS
        ${ep_common_cache_default_args}
+       ${${proj}_CUSTOM_CMAKE_CACHE_DEFAULT_ARGS}
      DEPENDS ${proj_DEPENDENCIES}
     )
 

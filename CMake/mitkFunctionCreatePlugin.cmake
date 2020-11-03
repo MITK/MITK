@@ -51,7 +51,7 @@ function(mitk_create_plugin)
     PACKAGE_DEPENDS
     DOXYGEN_TAGFILES
     MOC_OPTIONS
-    SUBPROJECTS
+    SUBPROJECTS # deprecated
   )
 
   cmake_parse_arguments(_PLUGIN "${arg_options}" "${arg_single}" "${arg_multiple}" ${ARGN})
@@ -81,6 +81,15 @@ function(mitk_create_plugin)
     endif()
     return()
   endif()
+
+  foreach(_module_dep ${_PLUGIN_MODULE_DEPENDS})
+    if(TARGET ${_module_dep})
+      get_target_property(AUTLOAD_DEP ${_module_dep} MITK_AUTOLOAD_DIRECTORY)
+      if (AUTLOAD_DEP)
+        message(SEND_ERROR "Plugin \"${PROJECT_NAME}\" has an invalid dependency on autoload module \"${_module_dep}\". Check MITK_CREATE_PLUGIN usage for \"${PROJECT_NAME}\".")
+      endif()
+    endif()
+  endforeach()
 
   # -------------- All dependencies are resolved ------------------
 
@@ -200,6 +209,18 @@ function(mitk_create_plugin)
   set_property(TARGET ${PLUGIN_TARGET} APPEND PROPERTY COMPILE_DEFINITIONS US_MODULE_NAME=${PLUGIN_TARGET})
   set_property(TARGET ${PLUGIN_TARGET} PROPERTY US_MODULE_NAME ${PLUGIN_TARGET})
 
+  if(NOT CMAKE_CURRENT_SOURCE_DIR MATCHES "^${CMAKE_SOURCE_DIR}.*")
+    foreach(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIRS})
+      if(CMAKE_CURRENT_SOURCE_DIR MATCHES "^${MITK_EXTENSION_DIR}.*")
+        get_filename_component(MITK_EXTENSION_ROOT_FOLDER ${MITK_EXTENSION_DIR} NAME)
+        set_property(TARGET ${PLUGIN_TARGET} PROPERTY FOLDER "${MITK_EXTENSION_ROOT_FOLDER}/Plugins")
+        break()
+      endif()
+    endforeach()
+  else()
+    set_property(TARGET ${PLUGIN_TARGET} PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Plugins")
+  endif()
+
   set(plugin_c_flags)
   set(plugin_cxx_flags)
 
@@ -225,21 +246,6 @@ function(mitk_create_plugin)
   if(plugin_cxx_flags)
     string(REPLACE " " ";" plugin_cxx_flags "${plugin_cxx_flags}")
     target_compile_options(${PLUGIN_TARGET} PRIVATE ${plugin_cxx_flags})
-  endif()
-
-  if(NOT MY_SUBPROJECTS)
-    if(MITK_DEFAULT_SUBPROJECTS)
-      set(MY_SUBPROJECTS ${MITK_DEFAULT_SUBPROJECTS})
-    elseif(TARGET MITK-Plugins)
-      set(MY_SUBPROJECTS MITK-Plugins)
-    endif()
-  endif()
-
-  if(MY_SUBPROJECTS)
-    set_property(TARGET ${PLUGIN_TARGET} PROPERTY LABELS ${MY_SUBPROJECTS})
-    foreach(subproject ${MY_SUBPROJECTS})
-      add_dependencies(${subproject} ${PLUGIN_TARGET})
-    endforeach()
   endif()
 
   if(_PLUGIN_TEST_PLUGIN)

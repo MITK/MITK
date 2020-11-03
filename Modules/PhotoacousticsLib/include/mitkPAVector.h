@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKSMARTVECTOR_H
 #define MITKSMARTVECTOR_H
@@ -31,8 +27,8 @@ namespace mitk {
     class MITKPHOTOACOUSTICSLIB_EXPORT Vector : public itk::LightObject
     {
     public:
-      mitkClassMacroItkParent(Vector, itk::LightObject)
-        itkFactorylessNewMacro(Self)
+      mitkClassMacroItkParent(Vector, itk::LightObject);
+        itkFactorylessNewMacro(Self);
 
         /**
          * @brief GetNorm calculates the length of this vector.
@@ -106,6 +102,10 @@ namespace mitk {
        * @return a new vector with the same values.
        */
       Vector::Pointer Clone();
+
+      void Subtract(Vector::Pointer other);
+
+      void Add(Vector::Pointer other);
 
     protected:
       Vector();

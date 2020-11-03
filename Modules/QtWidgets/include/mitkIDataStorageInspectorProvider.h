@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef __I_DATA_STORAGE_INSPECTOR_PROVIDER_H
 #define __I_DATA_STORAGE_INSPECTOR_PROVIDER_H
@@ -20,6 +16,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkServiceInterface.h>
 
 #include <MitkQtWidgetsExports.h>
+
+#include <QIcon>
 
 class QmitkAbstractDataStorageInspector;
 
@@ -47,12 +45,16 @@ namespace mitk
      */
     virtual QmitkAbstractDataStorageInspector* CreateInspector() const = 0;
 
+    using InspectorIDType = std::string;
     /** Return the uniqe ID for the inspector type provided.*/
-    virtual std::string GetInspectorID() const = 0;
+    virtual InspectorIDType GetInspectorID() const = 0;
     /** Return the display name (e.g. used in the UI) for the inspector type provided.*/
     virtual std::string GetInspectorDisplayName() const = 0;
     /** Returns a description of the inspector type provided.*/
     virtual std::string GetInspectorDescription() const = 0;
+    /** Returns the svg data of the icon of the inspector. Empty array indicates that no icon is defined.
+     @remark It is passed as svg file content and not as icon directly to allow later styling*/
+    virtual QIcon GetInspectorIcon() const = 0;
 
     /**
     * @brief Service property name for the inspector ID.

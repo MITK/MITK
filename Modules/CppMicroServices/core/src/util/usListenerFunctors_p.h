@@ -1,9 +1,9 @@
-/*=============================================================================
+/*============================================================================
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) German Cancer Research Center (DKFZ)
+  All rights reserved.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 
-=============================================================================*/
+============================================================================*/
 
 #ifndef USLISTENERFUNCTORS_P_H
 #define USLISTENERFUNCTORS_P_H
@@ -50,7 +50,7 @@
 US_BEGIN_NAMESPACE
   template<class X>
   US_MODULE_LISTENER_FUNCTOR ModuleListenerMemberFunctor(X* x, void (X::*memFn)(const US_PREPEND_NAMESPACE(ModuleEvent)))
-  { return std::bind1st(std::mem_fun(memFn), x); }
+  { return std::bind(std::mem_fn(memFn), x, std::placeholders::_1); }
 
   struct ModuleListenerCompare : std::binary_function<std::pair<US_MODULE_LISTENER_FUNCTOR, void*>,
                                                       std::pair<US_MODULE_LISTENER_FUNCTOR, void*>, bool>
@@ -65,7 +65,7 @@ US_BEGIN_NAMESPACE
 
   template<class X>
   US_SERVICE_LISTENER_FUNCTOR ServiceListenerMemberFunctor(X* x, void (X::*memFn)(const US_PREPEND_NAMESPACE(ServiceEvent)))
-  { return std::bind1st(std::mem_fun(memFn), x); }
+  { return std::bind(std::mem_fn(memFn), x, std::placeholders::_1); }
 
   struct ServiceListenerCompare : std::binary_function<US_SERVICE_LISTENER_FUNCTOR, US_SERVICE_LISTENER_FUNCTOR, bool>
   {

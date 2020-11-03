@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkPlanarCircle.h"
 #include "mitkPlaneGeometry.h"
@@ -25,10 +21,26 @@ mitk::PlanarCircle::PlanarCircle()
     FEATURE_ID_AREA(this->AddFeature("Area", "mm2")),
     m_MinRadius(0),
     m_MaxRadius(100),
-    m_MinMaxRadiusContraintsActive(false)
+    m_MinMaxRadiusContraintsActive(false),
+    m_RadiusFixed(false)
 {
   // Circle has two control points
   this->ResetNumberOfControlPoints(2);
+  this->SetNumberOfPolyLines(1);
+  this->SetProperty("closed", mitk::BoolProperty::New(true));
+}
+
+mitk::PlanarCircle::PlanarCircle(double fixedRadius)
+  : FEATURE_ID_RADIUS(this->AddFeature("Radius", "mm")),
+  FEATURE_ID_DIAMETER(this->AddFeature("Diameter", "mm")),
+  FEATURE_ID_AREA(this->AddFeature("Area", "mm2")),
+  m_MinRadius(fixedRadius),
+  m_MaxRadius(100),
+  m_MinMaxRadiusContraintsActive(false),
+  m_RadiusFixed(true)
+{
+  // Fixed Circle has 1 control points
+  this->ResetNumberOfControlPoints(1);
   this->SetNumberOfPolyLines(1);
   this->SetProperty("closed", mitk::BoolProperty::New(true));
 }
@@ -39,13 +51,16 @@ bool mitk::PlanarCircle::SetControlPoint(unsigned int index, const Point2D &poin
   if (index == 0)
   {
     const Point2D &centerPoint = GetControlPoint(0);
-    Point2D boundaryPoint = GetControlPoint(1);
-    const vnl_vector<ScalarType> vec = (point.GetVnlVector() - centerPoint.GetVnlVector());
+    if (!m_RadiusFixed)
+    {
+      Point2D boundaryPoint = GetControlPoint(1);
+      const vnl_vector<ScalarType> vec = (point.GetVnlVector() - centerPoint.GetVnlVector());
 
-    boundaryPoint[0] += vec[0];
-    boundaryPoint[1] += vec[1];
+      boundaryPoint[0] += vec[0];
+      boundaryPoint[1] += vec[1];
+      PlanarFigure::SetControlPoint(1, boundaryPoint);
+    }
     PlanarFigure::SetControlPoint(0, point);
-    PlanarFigure::SetControlPoint(1, boundaryPoint);
     return true;
   }
   else if (index == 1)
@@ -123,9 +138,14 @@ void mitk::PlanarCircle::GeneratePolyLine()
   this->ClearPolyLines();
 
   const Point2D &centerPoint = GetControlPoint(0);
-  const Point2D &boundaryPoint = GetControlPoint(1);
 
-  const double radius = centerPoint.EuclideanDistanceTo(boundaryPoint);
+  double radius = m_MinRadius;
+    
+  if (!m_RadiusFixed)
+  {
+    const Point2D &boundaryPoint = GetControlPoint(1);
+    radius = centerPoint.EuclideanDistanceTo(boundaryPoint);
+  }
 
   // Generate poly-line with 64 segments
   for (int t = 0; t < 64; ++t)
@@ -152,9 +172,14 @@ void mitk::PlanarCircle::EvaluateFeaturesInternal()
 {
   // Calculate circle radius and area
   const Point3D &p0 = this->GetWorldControlPoint(0);
-  const Point3D &p1 = this->GetWorldControlPoint(1);
+  double radius = m_MinRadius;
 
-  const double radius = p0.EuclideanDistanceTo(p1);
+  if (!m_RadiusFixed)
+  {
+    const Point3D &p1 = this->GetWorldControlPoint(1);
+    radius = p0.EuclideanDistanceTo(p1);
+  }
+
   const double area = vnl_math::pi * radius * radius;
 
   this->SetQuantity(FEATURE_ID_RADIUS, radius);

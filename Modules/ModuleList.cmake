@@ -4,16 +4,16 @@
 set(MITK_MODULES
   Core
   CommandLine
+  CoreCmdApps
   AppUtil
-  RDF
   LegacyIO
   DataTypesExt
   Annotation
   LegacyGL
   AlgorithmsExt
   MapperExt
-  DICOMReader
-  DICOMReaderServices
+  DICOM
+  DICOMQI
   DICOMTesting
   SceneSerializationBase
   PlanarFigure
@@ -23,19 +23,18 @@ set(MITK_MODULES
   Gizmo
   GraphAlgorithms
   Multilabel
+  Chart
   ImageStatistics
   ContourModel
   SurfaceInterpolation
   Segmentation
-  PlanarFigureSegmentation
   QtWidgets
   QtWidgetsExt
-  Chart
+  ImageStatisticsUI
   SegmentationUI
   MatchPointRegistration
   MatchPointRegistrationUI
   Classification
-  GPGPU
   OpenIGTLink
   IGTBase
   IGT
@@ -51,26 +50,34 @@ set(MITK_MODULES
   PhotoacousticsLib
   US
   USUI
-  DicomUI
+  DICOMUI
   Remeshing
   Python
   QtPython
   Persistence
   OpenIGTLinkUI
   IGTUI
-  DicomRT
+  RT
   RTUI
   IOExt
   XNAT
   TubeGraph
   BiophotonicsHardware
-  DiffusionImaging
-  TumorInvasionAnalysis
   BoundingShape
   RenderWindowManager
   RenderWindowManagerUI
+  SemanticRelations
+  SemanticRelationsUI
   CEST
   BasicImageProcessing
+  ModelFit
+  ModelFitUI
+  Pharmacokinetics
+  PharmacokineticsUI
+  DICOMPM
+  REST
+  RESTService
+  DICOMweb
 )
 
 if(MITK_ENABLE_PIC_READER)

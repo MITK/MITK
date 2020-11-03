@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkIGTPlayerWidget.h"
 
@@ -161,7 +157,7 @@ void QmitkIGTPlayerWidget::OnPlayButtonClicked(bool checked)
         {
           navigationDataSet = dynamic_cast<mitk::NavigationDataSet*> (mitk::IOUtil::Load(m_CmpFilename.toStdString())[0].GetPointer());
         }
-        catch(mitk::IGTException)
+        catch(const mitk::IGTException&)
         {
           std::string errormessage = "Error during start playing. Invalid or wrong file?";
           QMessageBox::warning(nullptr, "IGTPlayer: Error", errormessage.c_str());
@@ -178,7 +174,7 @@ void QmitkIGTPlayerWidget::OnPlayButtonClicked(bool checked)
           {
             m_RealTimePlayer->StartPlaying();
           }
-          catch(mitk::IGTException)
+          catch(const mitk::IGTException&)
           {
             std::string errormessage = "Error during start playing. Invalid or wrong file?";
             QMessageBox::warning(nullptr, "IGTPlayer: Error", errormessage.c_str());
@@ -194,7 +190,7 @@ void QmitkIGTPlayerWidget::OnPlayButtonClicked(bool checked)
           {
             m_SequentialPlayer->SetNavigationDataSet(navigationDataSet);
           }
-          catch(mitk::IGTException)
+          catch(const mitk::IGTException&)
           {
             std::string errormessage = "Error during start playing. Invalid or wrong file type?";
             QMessageBox::warning(nullptr, "IGTPlayer: Error", errormessage.c_str());
@@ -382,7 +378,7 @@ const mitk::PointSet::Pointer QmitkIGTPlayerWidget::GetNavigationDatasPointSet()
 
       if(isRealTimeMode)
         position = m_RealTimePlayer->GetOutput(i)->GetPosition();
-      else if(isSequentialMode)
+      else
         position = m_SequentialPlayer->GetOutput(i)->GetPosition();
 
       pointType[0] = position[0];

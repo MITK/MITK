@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkUSDiPhASDevice.h"
 #include "mitkUSDiPhASCustomControls.h"
@@ -23,7 +19,7 @@ mitk::USDiPhASDevice::USDiPhASDevice(std::string manufacturer, std::string model
   m_ControlInterfaceCustom(mitk::USDiPhASCustomControls::New(this)),
   m_IsRunning(false),
   m_BurstHalfwaveClockCount(7),
-  m_Interleaved(true)  
+  m_Interleaved(true)
 {
   m_NumberOfOutputs = 2;
   this->SetNumberOfIndexedOutputs(m_NumberOfOutputs);
@@ -79,7 +75,7 @@ bool mitk::USDiPhASDevice::OnInitialization()
 mitk::USDiPhASDevice* w_device;
 mitk::USDiPhASImageSource* w_ISource;
 
-void WrapperMessageCallback(const char* message) 
+void WrapperMessageCallback(const char* message)
 {
   w_device->MessageCallback(message);
 }
@@ -100,8 +96,8 @@ void WrapperImageDataCallback(
 bool mitk::USDiPhASDevice::OnConnection()
 {
   w_device = this;
-  w_ISource = m_ImageSource; 
-  // Need those pointers for the forwarders to call member functions; createBeamformer expects non-member function pointers. 
+  w_ISource = m_ImageSource;
+  // Need those pointers for the forwarders to call member functions; createBeamformer expects non-member function pointers.
   createBeamformer((StringMessageCallback)&WrapperMessageCallback, (NewDataCallback)&WrapperImageDataCallback);
 
   InitializeScanMode();
@@ -185,7 +181,7 @@ void mitk::USDiPhASDevice::UpdateTransmitEvents()
 
     for (int i = 0; i < numChannels; ++i)
     {
-      m_ScanMode.TransmitEvents[ev].BurstHalfwaveClockCountPerChannel[i] = m_BurstHalfwaveClockCount; // 120 MHz / (2 * (predefinedBurstHalfwaveClockCount + 1)) --> 7.5 MHz 
+      m_ScanMode.TransmitEvents[ev].BurstHalfwaveClockCountPerChannel[i] = m_BurstHalfwaveClockCount; // 120 MHz / (2 * (predefinedBurstHalfwaveClockCount + 1)) --> 7.5 MHz
       m_ScanMode.TransmitEvents[ev].BurstCountPerChannel[i] = 1; // Burst with 1 cycle
       m_ScanMode.TransmitEvents[ev].BurstUseNegativePolarityPerChannel[i] = true;
       m_ScanMode.TransmitEvents[ev].transmitEventDelays[i] = 2e-6f + (i - numChannels / 2) * tiltStrength;
@@ -262,7 +258,7 @@ void mitk::USDiPhASDevice::InitializeScanMode()
   m_ScanMode.triggerSetup.delayTrigger2Microseconds = 300;
 }
 
-// callback for the DiPhAS API 
+// callback for the DiPhAS API
 
 void mitk::USDiPhASDevice::MessageCallback(const char* message)
 {

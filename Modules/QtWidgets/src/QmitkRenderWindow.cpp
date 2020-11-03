@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
- The Medical Imaging Interaction Toolkit (MITK)
+The Medical Imaging Interaction Toolkit (MITK)
 
- Copyright (c) German Cancer Research Center,
- Division of Medical and Biological Informatics.
- All rights reserved.
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
 
- This software is distributed WITHOUT ANY WARRANTY; without
- even the implied warranty of MERCHANTABILITY or FITNESS FOR
- A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
- See LICENSE.txt or http://www.mitk.org for details.
-
- ===================================================================*/
+============================================================================*/
 
 #include "QmitkRenderWindow.h"
 
@@ -37,25 +33,25 @@
 #include "QmitkMimeTypes.h"
 #include "QmitkRenderWindowMenu.h"
 
-QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const QString &name, mitk::VtkPropRenderer *, mitk::RenderingManager *renderingManager, mitk::BaseRenderer::RenderingMode::Type renderingMode)
-  : QVTKOpenGLWidget(parent),
-    m_ResendQtEvents(true),
-    m_MenuWidget(nullptr),
-    m_MenuWidgetActivated(false),
-    m_LayoutIndex(0)
+QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const QString &name, mitk::VtkPropRenderer *)
+  : QVTKOpenGLWidget(parent)
+  , m_ResendQtEvents(true)
+  , m_MenuWidget(nullptr)
+  , m_MenuWidgetActivated(false)
+  , m_LayoutIndex(QmitkRenderWindowMenu::LayoutIndex::AXIAL)
 {
   m_InternalRenderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
   m_InternalRenderWindow->SetMultiSamples(0);
   m_InternalRenderWindow->SetAlphaBitPlanes(0);
 
-  this->SetRenderWindow(m_InternalRenderWindow);
+  SetRenderWindow(m_InternalRenderWindow);
 
-  this->Initialize(renderingManager, name.toStdString().c_str(), renderingMode);
+  Initialize(name.toStdString().c_str());
 
-  this->setFocusPolicy(Qt::StrongFocus);
-  this->setMouseTracking(true);
+  setFocusPolicy(Qt::StrongFocus);
+  setMouseTracking(true);
   QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  this->setSizePolicy(sizePolicy);
+  setSizePolicy(sizePolicy);
 }
 
 QmitkRenderWindow::~QmitkRenderWindow()
@@ -68,25 +64,78 @@ void QmitkRenderWindow::SetResendQtEvents(bool resend)
   m_ResendQtEvents = resend;
 }
 
-void QmitkRenderWindow::SetLayoutIndex(unsigned int layoutIndex)
+void QmitkRenderWindow::SetLayoutIndex(QmitkRenderWindowMenu::LayoutIndex layoutIndex)
 {
   m_LayoutIndex = layoutIndex;
-  if (m_MenuWidget)
+  if (nullptr != m_MenuWidget)
+  {
     m_MenuWidget->SetLayoutIndex(layoutIndex);
+  }
 }
 
-unsigned int QmitkRenderWindow::GetLayoutIndex()
+QmitkRenderWindowMenu::LayoutIndex QmitkRenderWindow::GetLayoutIndex()
 {
-  if (m_MenuWidget)
+  if (nullptr != m_MenuWidget)
+  {
     return m_MenuWidget->GetLayoutIndex();
+  }
   else
-    return 0;
+  {
+    return QmitkRenderWindowMenu::LayoutIndex::AXIAL;
+  }
 }
 
-void QmitkRenderWindow::LayoutDesignListChanged(int layoutDesignIndex)
+void QmitkRenderWindow::LayoutDesignListChanged(QmitkRenderWindowMenu::LayoutDesign layoutDesign)
 {
-  if (m_MenuWidget)
-    m_MenuWidget->UpdateLayoutDesignList(layoutDesignIndex);
+  if (nullptr != m_MenuWidget)
+  {
+    m_MenuWidget->UpdateLayoutDesignList(layoutDesign);
+  }
+}
+
+void QmitkRenderWindow::ActivateMenuWidget(bool state)
+{
+  if (nullptr == m_MenuWidget)
+  {
+    m_MenuWidget = new QmitkRenderWindowMenu(this, nullptr, m_Renderer);
+    m_MenuWidget->SetLayoutIndex(m_LayoutIndex);
+  }
+
+  m_MenuWidgetActivated = state;
+
+  if (m_MenuWidgetActivated)
+  {
+    connect(m_MenuWidget, &QmitkRenderWindowMenu::LayoutDesignChanged, this, &QmitkRenderWindow::LayoutDesignChanged);
+    connect(m_MenuWidget, &QmitkRenderWindowMenu::ResetView, this, &QmitkRenderWindow::ResetView);
+    connect(m_MenuWidget, &QmitkRenderWindowMenu::CrosshairVisibilityChanged, this, &QmitkRenderWindow::CrosshairVisibilityChanged);
+    connect(m_MenuWidget, &QmitkRenderWindowMenu::CrosshairRotationModeChanged, this, &QmitkRenderWindow::CrosshairRotationModeChanged);
+  }
+  else
+  {
+    disconnect(m_MenuWidget, &QmitkRenderWindowMenu::LayoutDesignChanged, this, &QmitkRenderWindow::LayoutDesignChanged);
+    disconnect(m_MenuWidget, &QmitkRenderWindowMenu::ResetView, this, &QmitkRenderWindow::ResetView);
+    disconnect(m_MenuWidget, &QmitkRenderWindowMenu::CrosshairVisibilityChanged, this, &QmitkRenderWindow::CrosshairVisibilityChanged);
+    disconnect(m_MenuWidget, &QmitkRenderWindowMenu::CrosshairRotationModeChanged, this, &QmitkRenderWindow::CrosshairRotationModeChanged);
+
+    m_MenuWidget->hide();
+  }
+}
+
+void QmitkRenderWindow::moveEvent(QMoveEvent *event)
+{
+  QVTKOpenGLWidget::moveEvent(event);
+
+  // after a move the overlays need to be positioned
+  emit moved();
+}
+
+void QmitkRenderWindow::showEvent(QShowEvent *event)
+{
+  QVTKOpenGLWidget::showEvent(event);
+
+  // this singleshot is necessary to have the overlays positioned correctly after initial show
+  // simple call of moved() is no use here!!
+  QTimer::singleShot(0, this, SIGNAL(moved()));
 }
 
 void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
@@ -103,7 +152,9 @@ void QmitkRenderWindow::mousePressEvent(QMouseEvent *me)
   }
 
   if (m_ResendQtEvents)
+  {
     me->ignore();
+  }
 }
 
 void QmitkRenderWindow::mouseDoubleClickEvent(QMouseEvent *me)
@@ -118,7 +169,9 @@ void QmitkRenderWindow::mouseDoubleClickEvent(QMouseEvent *me)
   }
 
   if (m_ResendQtEvents)
+  {
     me->ignore();
+  }
 }
 
 void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me)
@@ -133,14 +186,16 @@ void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me)
   }
 
   if (m_ResendQtEvents)
+  {
     me->ignore();
+  }
 }
 
 void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
 {
   mitk::Point2D displayPos = GetMousePosition(me);
 
-  this->AdjustRenderWindowMenuVisibility(me->pos());
+  AdjustRenderWindowMenuVisibility(me->pos());
 
   mitk::MouseMoveEvent::Pointer mMoveEvent =
     mitk::MouseMoveEvent::New(m_Renderer, displayPos, GetButtonState(me), GetModifiers(me));
@@ -163,7 +218,9 @@ void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
   }
 
   if (m_ResendQtEvents)
+  {
     we->ignore();
+  }
 }
 
 void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
@@ -178,7 +235,9 @@ void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
   }
 
   if (m_ResendQtEvents)
+  {
     ke->ignore();
+  }
 }
 
 void QmitkRenderWindow::enterEvent(QEvent *e)
@@ -187,106 +246,24 @@ void QmitkRenderWindow::enterEvent(QEvent *e)
   QVTKOpenGLWidget::enterEvent(e);
 }
 
-void QmitkRenderWindow::DeferredHideMenu()
-{
-  MITK_DEBUG << "QmitkRenderWindow::DeferredHideMenu";
-
-  if (m_MenuWidget)
-    m_MenuWidget->HideMenu();
-}
-
 void QmitkRenderWindow::leaveEvent(QEvent *e)
 {
   mitk::InternalEvent::Pointer internalEvent = mitk::InternalEvent::New(this->m_Renderer, nullptr, "LeaveRenderWindow");
 
   this->HandleEvent(internalEvent.GetPointer());
 
-  if (m_MenuWidget)
+  if (nullptr != m_MenuWidget)
+  {
     m_MenuWidget->smoothHide();
+  }
 
   QVTKOpenGLWidget::leaveEvent(e);
 }
 
-//-----------------------------------------------------------------------------
 void QmitkRenderWindow::resizeGL(int w, int h)
 {
-  this->GetRenderer()->GetRenderingManager()->ForceImmediateUpdate(GetRenderWindow());
   QVTKOpenGLWidget::resizeGL(w, h);
-}
-
-void QmitkRenderWindow::moveEvent(QMoveEvent *event)
-{
-  QVTKOpenGLWidget::moveEvent(event);
-
-  // after a move the overlays need to be positioned
-  emit moved();
-}
-
-void QmitkRenderWindow::showEvent(QShowEvent *event)
-{
-  QVTKOpenGLWidget::showEvent(event);
-
-  // this singleshot is necessary to have the overlays positioned correctly after initial show
-  // simple call of moved() is no use here!!
-  QTimer::singleShot(0, this, SIGNAL(moved()));
-}
-
-void QmitkRenderWindow::ActivateMenuWidget(bool state, QmitkStdMultiWidget *stdMultiWidget)
-{
-  m_MenuWidgetActivated = state;
-
-  if (!m_MenuWidgetActivated && m_MenuWidget)
-  {
-    // disconnect Signal/Slot Connection
-    disconnect(m_MenuWidget, SIGNAL(SignalChangeLayoutDesign(int)), this, SLOT(OnChangeLayoutDesign(int)));
-    disconnect(m_MenuWidget, SIGNAL(ResetView()), this, SIGNAL(ResetView()));
-    disconnect(m_MenuWidget, SIGNAL(ChangeCrosshairRotationMode(int)), this, SIGNAL(ChangeCrosshairRotationMode(int)));
-
-    delete m_MenuWidget;
-    m_MenuWidget = nullptr;
-  }
-  else if (m_MenuWidgetActivated && !m_MenuWidget)
-  {
-    // create render window MenuBar for split, close Window or set new setting.
-    m_MenuWidget = new QmitkRenderWindowMenu(this, nullptr, m_Renderer, stdMultiWidget);
-    m_MenuWidget->SetLayoutIndex(m_LayoutIndex);
-
-    // create Signal/Slot Connection
-    connect(m_MenuWidget, SIGNAL(SignalChangeLayoutDesign(int)), this, SLOT(OnChangeLayoutDesign(int)));
-    connect(m_MenuWidget, SIGNAL(ResetView()), this, SIGNAL(ResetView()));
-    connect(m_MenuWidget, SIGNAL(ChangeCrosshairRotationMode(int)), this, SIGNAL(ChangeCrosshairRotationMode(int)));
-  }
-}
-
-void QmitkRenderWindow::AdjustRenderWindowMenuVisibility(const QPoint & /*pos*/)
-{
-  if (m_MenuWidget)
-  {
-    m_MenuWidget->ShowMenu();
-    m_MenuWidget->MoveWidgetToCorrectPos(1.0f);
-  }
-}
-
-void QmitkRenderWindow::HideRenderWindowMenu()
-{
-  // DEPRECATED METHOD
-}
-
-void QmitkRenderWindow::OnChangeLayoutDesign(int layoutDesignIndex)
-{
-  emit SignalLayoutDesignChanged(layoutDesignIndex);
-}
-
-void QmitkRenderWindow::OnWidgetPlaneModeChanged(int mode)
-{
-  if (m_MenuWidget)
-    m_MenuWidget->NotifyNewWidgetPlanesMode(mode);
-}
-
-void QmitkRenderWindow::FullScreenMode(bool state)
-{
-  if (m_MenuWidget)
-    m_MenuWidget->ChangeFullScreenMode(state);
+  mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(GetRenderWindow());
 }
 
 void QmitkRenderWindow::dragEnterEvent(QDragEnterEvent *event)
@@ -303,6 +280,25 @@ void QmitkRenderWindow::dropEvent(QDropEvent *event)
   if (!dataNodeList.empty())
   {
     emit NodesDropped(this, dataNodeList.toVector().toStdVector());
+  }
+}
+
+void QmitkRenderWindow::AdjustRenderWindowMenuVisibility(const QPoint & /*pos*/)
+{
+  if (nullptr != m_MenuWidget)
+  {
+    m_MenuWidget->ShowMenu();
+    m_MenuWidget->MoveWidgetToCorrectPos(1.0f);
+  }
+}
+
+void QmitkRenderWindow::DeferredHideMenu()
+{
+  MITK_DEBUG << "QmitkRenderWindow::DeferredHideMenu";
+
+  if (nullptr != m_MenuWidget)
+  {
+    m_MenuWidget->HideMenu();
   }
 }
 
@@ -329,18 +325,18 @@ mitk::InteractionEvent::MouseButtons QmitkRenderWindow::GetEventButton(QMouseEve
   mitk::InteractionEvent::MouseButtons eventButton;
   switch (me->button())
   {
-    case Qt::LeftButton:
-      eventButton = mitk::InteractionEvent::LeftMouseButton;
-      break;
-    case Qt::RightButton:
-      eventButton = mitk::InteractionEvent::RightMouseButton;
-      break;
-    case Qt::MidButton:
-      eventButton = mitk::InteractionEvent::MiddleMouseButton;
-      break;
-    default:
-      eventButton = mitk::InteractionEvent::NoButton;
-      break;
+  case Qt::LeftButton:
+    eventButton = mitk::InteractionEvent::LeftMouseButton;
+    break;
+  case Qt::RightButton:
+    eventButton = mitk::InteractionEvent::RightMouseButton;
+    break;
+  case Qt::MidButton:
+    eventButton = mitk::InteractionEvent::MiddleMouseButton;
+    break;
+  default:
+    eventButton = mitk::InteractionEvent::NoButton;
+    break;
   }
   return eventButton;
 }
@@ -415,86 +411,86 @@ std::string QmitkRenderWindow::GetKeyLetter(QKeyEvent *ke) const
   { // special keys
     switch (tkey)
     {
-      case Qt::Key_Return:
-        key = mitk::InteractionEvent::KeyReturn;
-        break;
-      case Qt::Key_Enter:
-        key = mitk::InteractionEvent::KeyEnter;
-        break;
-      case Qt::Key_Escape:
-        key = mitk::InteractionEvent::KeyEsc;
-        break;
-      case Qt::Key_Delete:
-        key = mitk::InteractionEvent::KeyDelete;
-        break;
-      case Qt::Key_Up:
-        key = mitk::InteractionEvent::KeyArrowUp;
-        break;
-      case Qt::Key_Down:
-        key = mitk::InteractionEvent::KeyArrowDown;
-        break;
-      case Qt::Key_Left:
-        key = mitk::InteractionEvent::KeyArrowLeft;
-        break;
-      case Qt::Key_Right:
-        key = mitk::InteractionEvent::KeyArrowRight;
-        break;
+    case Qt::Key_Return:
+      key = mitk::InteractionEvent::KeyReturn;
+      break;
+    case Qt::Key_Enter:
+      key = mitk::InteractionEvent::KeyEnter;
+      break;
+    case Qt::Key_Escape:
+      key = mitk::InteractionEvent::KeyEsc;
+      break;
+    case Qt::Key_Delete:
+      key = mitk::InteractionEvent::KeyDelete;
+      break;
+    case Qt::Key_Up:
+      key = mitk::InteractionEvent::KeyArrowUp;
+      break;
+    case Qt::Key_Down:
+      key = mitk::InteractionEvent::KeyArrowDown;
+      break;
+    case Qt::Key_Left:
+      key = mitk::InteractionEvent::KeyArrowLeft;
+      break;
+    case Qt::Key_Right:
+      key = mitk::InteractionEvent::KeyArrowRight;
+      break;
 
-      case Qt::Key_F1:
-        key = mitk::InteractionEvent::KeyF1;
-        break;
-      case Qt::Key_F2:
-        key = mitk::InteractionEvent::KeyF2;
-        break;
-      case Qt::Key_F3:
-        key = mitk::InteractionEvent::KeyF3;
-        break;
-      case Qt::Key_F4:
-        key = mitk::InteractionEvent::KeyF4;
-        break;
-      case Qt::Key_F5:
-        key = mitk::InteractionEvent::KeyF5;
-        break;
-      case Qt::Key_F6:
-        key = mitk::InteractionEvent::KeyF6;
-        break;
-      case Qt::Key_F7:
-        key = mitk::InteractionEvent::KeyF7;
-        break;
-      case Qt::Key_F8:
-        key = mitk::InteractionEvent::KeyF8;
-        break;
-      case Qt::Key_F9:
-        key = mitk::InteractionEvent::KeyF9;
-        break;
-      case Qt::Key_F10:
-        key = mitk::InteractionEvent::KeyF10;
-        break;
-      case Qt::Key_F11:
-        key = mitk::InteractionEvent::KeyF11;
-        break;
-      case Qt::Key_F12:
-        key = mitk::InteractionEvent::KeyF12;
-        break;
+    case Qt::Key_F1:
+      key = mitk::InteractionEvent::KeyF1;
+      break;
+    case Qt::Key_F2:
+      key = mitk::InteractionEvent::KeyF2;
+      break;
+    case Qt::Key_F3:
+      key = mitk::InteractionEvent::KeyF3;
+      break;
+    case Qt::Key_F4:
+      key = mitk::InteractionEvent::KeyF4;
+      break;
+    case Qt::Key_F5:
+      key = mitk::InteractionEvent::KeyF5;
+      break;
+    case Qt::Key_F6:
+      key = mitk::InteractionEvent::KeyF6;
+      break;
+    case Qt::Key_F7:
+      key = mitk::InteractionEvent::KeyF7;
+      break;
+    case Qt::Key_F8:
+      key = mitk::InteractionEvent::KeyF8;
+      break;
+    case Qt::Key_F9:
+      key = mitk::InteractionEvent::KeyF9;
+      break;
+    case Qt::Key_F10:
+      key = mitk::InteractionEvent::KeyF10;
+      break;
+    case Qt::Key_F11:
+      key = mitk::InteractionEvent::KeyF11;
+      break;
+    case Qt::Key_F12:
+      key = mitk::InteractionEvent::KeyF12;
+      break;
 
-      case Qt::Key_End:
-        key = mitk::InteractionEvent::KeyEnd;
-        break;
-      case Qt::Key_Home:
-        key = mitk::InteractionEvent::KeyPos1;
-        break;
-      case Qt::Key_Insert:
-        key = mitk::InteractionEvent::KeyInsert;
-        break;
-      case Qt::Key_PageDown:
-        key = mitk::InteractionEvent::KeyPageDown;
-        break;
-      case Qt::Key_PageUp:
-        key = mitk::InteractionEvent::KeyPageUp;
-        break;
-      case Qt::Key_Space:
-        key = mitk::InteractionEvent::KeySpace;
-        break;
+    case Qt::Key_End:
+      key = mitk::InteractionEvent::KeyEnd;
+      break;
+    case Qt::Key_Home:
+      key = mitk::InteractionEvent::KeyPos1;
+      break;
+    case Qt::Key_Insert:
+      key = mitk::InteractionEvent::KeyInsert;
+      break;
+    case Qt::Key_PageDown:
+      key = mitk::InteractionEvent::KeyPageDown;
+      break;
+    case Qt::Key_PageUp:
+      key = mitk::InteractionEvent::KeyPageUp;
+      break;
+    case Qt::Key_Space:
+      key = mitk::InteractionEvent::KeySpace;
+      break;
     }
   }
   return key;

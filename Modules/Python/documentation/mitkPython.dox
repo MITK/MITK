@@ -1,11 +1,11 @@
 /**
 
-\page mitkPython_Overview The MITK Python Module
+\page mitkPython_Overview Python Module
 
 \section python_sec1 Brief description
-The MITK Python Module provides a service class to interactively run python code (passed as C++ strings) and 
-evaluate the results. Furthermore the service class offers means to convert an MITK Image to an ITK/OpenCV image in their wrapped python environment. 
-<strong>Thus, one can process MITK images with Python Code from the OpenCV and ITK wrapping system</strong>. 
+The MITK Python Module provides a service class to interactively run python code (passed as C++ strings) and
+evaluate the results. Furthermore the service class offers means to convert an MITK Image to an ITK/OpenCV image in their wrapped python environment.
+<strong>Thus, one can process MITK images with Python Code from the OpenCV and ITK wrapping system</strong>.
 Furthermore one can convert an mitk::Surface to a vtkPolyData in its Python environment.<br />
 Under the hood, the MITK build system takes care that the wrapping build process for SimpleITK/VTK/OpenCV is correctly initiated and all paths are correctly set within MITK code.
 To use the features of the different toolkits make sure they are enabled during the superbuild process.
@@ -15,11 +15,11 @@ To use the features of the different toolkits make sure they are enabled during 
 Have a look at \ref python_ssec3 on how to build MITK-Python with Qt5.
 The following CMake build options are available:
 <ul>
-  <li> MITK_USE_Python
+  <li> MITK_USE_Python3
 </ul>
 
-\subsection python_ssec1 MITK_USE_Python 
-MITK_USE_Python enables the python wrapping in MITK. When the option is activated
+\subsection python_ssec1 MITK_USE_Python3
+MITK_USE_Python3 enables the python wrapping in MITK. When the option is activated
 the build of the additional dependency SimpleITK is also enabled. The default behaviour is to use the python runtime from the system is used.
 Only Python 3.x is supported.
 The user can also specify it's own runtime by modifying the variables added by the
@@ -41,7 +41,7 @@ can also be transferred as an OpenCV image to python.
 
 \subsection python_ssec5 Surface
 Surfaces within mitk can be transferred as a vtkPolyData Object to Python.
-The surfaces are fully memory mapped. When changing a python wrapped surface 
+The surfaces are fully memory mapped. When changing a python wrapped surface
 the original object is also modified on the C++ side of MITK.
 
  */

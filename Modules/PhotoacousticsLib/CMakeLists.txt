@@ -3,10 +3,14 @@ MITK_CREATE_MODULE(
   INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}
   DEPENDS PUBLIC MitkAlgorithmsExt tinyxml
   PACKAGE_DEPENDS
-    tinyxml
+    tinyxml Vigra
     PUBLIC ITK
 )
 
 add_subdirectory(MitkMCxyz)
+
+add_subdirectory(MitkTissueBatchGenerator)
+add_subdirectory(MitkPAPhantomGenerator)
+add_subdirectory(MitkSpectralUnmixing)
 
 add_subdirectory(test)

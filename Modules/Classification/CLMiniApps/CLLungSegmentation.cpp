@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkProperties.h"
 
@@ -30,6 +26,22 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkMorphologicalOperations.h>
 
 #include <itkConnectedThresholdImageFilter.h>
+#include <itkImageRegionConstIterator.h>
+
+template<typename TPixel, unsigned int VImageDimension>
+void GetMinimum(itk::Image<TPixel, VImageDimension>* itkImage, double &minimum)
+{
+  typedef itk::Image<TPixel, VImageDimension> InputImageType;
+
+  minimum = std::numeric_limits<double>::max();
+  itk::ImageRegionConstIterator<InputImageType> iter(itkImage, itkImage->GetLargestPossibleRegion());
+
+  while (!iter.IsAtEnd())
+  {
+    minimum = std::min<double>(minimum, iter.Get());
+    ++iter;
+  }
+}
 
 template<typename TPixel, unsigned int VImageDimension>
 void StartRegionGrowing(itk::Image<TPixel, VImageDimension>* itkImage, mitk::Image::Pointer &result)
@@ -112,13 +124,13 @@ int main(int argc, char* argv[])
   parser.setTitle("Dicom Loader");
   parser.setCategory("Preprocessing Tools");
   parser.setDescription("");
-  parser.setContributor("MBI");
+  parser.setContributor("German Cancer Research Center (DKFZ)");
 
   parser.setArgumentPrefix("--","-");
   // Add command line argument names
   parser.addArgument("help", "h",mitkCommandLineParser::Bool, "Help:", "Show this help text");
-  parser.addArgument("input", "i", mitkCommandLineParser::InputDirectory, "Input folder:", "Input folder", us::Any(), false);
-  parser.addArgument("output", "o", mitkCommandLineParser::OutputFile, "Output file:", "Output file",us::Any(),false);
+  parser.addArgument("input", "i", mitkCommandLineParser::Directory, "Input folder:", "Input folder", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("output", "o", mitkCommandLineParser::File, "Output file:", "Output file",us::Any(),false, false, false, mitkCommandLineParser::Output);
 
 
   std::map<std::string, us::Any> parsedArgs = parser.parseArguments(argc, argv);
@@ -141,9 +153,18 @@ int main(int argc, char* argv[])
   mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(inputFile);
 
   MITK_INFO << "Loaded Image";
+  double minimum = 0;
+  AccessByItk_1(image, GetMinimum, minimum);
+
+  unsigned int offset = 0;
+  if (minimum < -3000)
+  {
+    offset = 1;
+  }
+  MITK_INFO << "With Minimum at " << minimum<< " Offset is set to: " << offset;
 
   mitk::OtsuSegmentationFilter::Pointer otsuFilter = mitk::OtsuSegmentationFilter::New();
-  otsuFilter->SetNumberOfThresholds(2);
+  otsuFilter->SetNumberOfThresholds(1+offset);
   otsuFilter->SetValleyEmphasis(false);
   otsuFilter->SetNumberOfBins(128);
   otsuFilter->SetInput(image);
@@ -160,10 +181,10 @@ int main(int argc, char* argv[])
 
   mitk::LabelSetImage::Pointer resultImage = mitk::LabelSetImage::New();
   resultImage->InitializeByLabeledImage(otsuFilter->GetOutput());
-  mitk::Image::Pointer rawMask = resultImage->CreateLabelMask(1);
+  mitk::Image::Pointer rawMask = resultImage->CreateLabelMask(offset);
   mitk::Image::Pointer pickedMask;
 
-  AccessByItk_1(rawMask, StartRegionGrowing, pickedMask);
+  AccessFixedTypeByItk_n(rawMask, StartRegionGrowing, (mitk::LabelSet::PixelType), (2)(3), (pickedMask));
 
   mitk::MorphologicalOperations::FillHoles(pickedMask);
   mitk::MorphologicalOperations::Closing(pickedMask, 5, mitk::MorphologicalOperations::StructuralElementType::Ball);

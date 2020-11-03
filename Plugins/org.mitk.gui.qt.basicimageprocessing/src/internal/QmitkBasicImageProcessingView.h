@@ -1,29 +1,25 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
+============================================================================*/
 
-===================================================================*/
+#ifndef QMITKBASICIMAGEPROCESSINGVIEW_H
+#define QMITKBASICIMAGEPROCESSINGVIEW_H
 
-#if !defined(QmitkBasicImageProcessingView_H__INCLUDED)
-#define QmitkBasicImageProcessingView_H__INCLUDED
+#include <ui_QmitkBasicImageProcessingViewControls.h>
 
-#include <QmitkAbstractView.h>
 #include <org_mitk_gui_qt_basicimageprocessing_Export.h>
-#include "ui_QmitkBasicImageProcessingViewControls.h"
 
-#include "QmitkStepperAdapter.h"
-
-#include <mitkDataStorageSelection.h>
+#include <mitkNodePredicateAnd.h>
+#include <QmitkStepperAdapter.h>
+#include <QmitkAbstractView.h>
 
 /*!
 \brief This module allows to use some basic image processing filters for preprocessing, image enhancement and testing purposes
@@ -50,94 +46,65 @@ class BASICIMAGEPROCESSING_EXPORT QmitkBasicImageProcessing : public QmitkAbstra
   Q_OBJECT
 
 public:
+  static const std::string VIEW_ID;
 
-  /*!
-  \brief default constructor
-  */
   QmitkBasicImageProcessing();
+  ~QmitkBasicImageProcessing() override;
 
-  /*!
-  \brief default destructor
-  */
-  virtual ~QmitkBasicImageProcessing();
+  void SetFocus() override;
 
-  /*!
-  \brief method for creating the widget containing the application controls, like sliders, buttons etc.
-  */
-  virtual void CreateQtPartControl(QWidget *parent) override;
+private Q_SLOTS:
 
-  virtual void SetFocus() override;
-
-  /*!
-  \brief method for creating the connections of main and control widget
-  */
-  virtual void CreateConnections();
-
-  /*!
-  \brief Invoked when the DataManager selection changed
-  */
-  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
-
-
-  protected slots:
+  void OnCurrentSelectionChanged(const QList<mitk::DataNode::Pointer>& nodes);
 
     /*
-    * When an action is selected in the "one image ops" list box
-    */
-    void SelectAction(int action);
+   * When an action is selected in the "one image ops" list box
+   */
+  void SelectAction(int action);
 
-    /*
-    * When an action is selected in the "two image ops" list box
-    */
-    void SelectAction2(int operation);
+  /*
+   * When an action is selected in the "two image ops" list box
+   */
+  void SelectAction2(int operation);
 
-    /*
-    * The "Execute" button in the "one image ops" box was triggered
-    */
-    void StartButtonClicked();
+  /*
+   * The "Execute" button in the "one image ops" box was triggered
+   */
+  void StartButtonClicked();
 
-    /*
-    * The "Execute" button in the "two image ops" box was triggered
-    */
-    void StartButton2Clicked();
+  /*
+   * The "Execute" button in the "two image ops" box was triggered
+   */
+  void StartButton2Clicked();
 
-    /*
-    *  Switch between the one and the two image operations GUI
-    */
-    void ChangeGUI();
+  /*
+   *  Switch between the one and the two image operations GUI
+   */
+  void ChangeGUI();
 
-    void SelectInterpolator(int interpolator);
+  void SelectInterpolator(int interpolator);
 
 private:
 
-  /*
-  * After a one image operation, reset the "one image ops" panel
-  */
-  void ResetOneImageOpPanel();
+  void CreateQtPartControl(QWidget *parent) override;
+  virtual void CreateConnections();
 
   /*
   * Helper method to reset the parameter set panel
   */
   void ResetParameterPanel();
 
-  /*
-  * After a two image operation, reset the "two image ops" panel
-  */
-  void ResetTwoImageOpPanel();
-
   /** retrieve the tnc from renderwindow part */
   void InternalGetTimeNavigationController();
 
-  /*!
-  * controls containing sliders for scrolling through the slices
-  */
-  Ui::QmitkBasicImageProcessingViewControls *m_Controls;
+  Ui::QmitkBasicImageProcessingViewControls* m_Controls;
 
-  //mitk::DataNode*       m_SelectedImageNode;
-  mitk::DataStorageSelection::Pointer m_SelectedImageNode;
-  QmitkStepperAdapter*      m_TimeStepperAdapter;
+  QmitkStepperAdapter* m_TimeStepperAdapter;
 
-  enum ActionType {
+  mitk::NodePredicateAnd::Pointer m_IsImagePredicate;
+
+  enum ActionType
+  {
     NOACTIONSELECTED,
     CATEGORY_DENOISING,
     GAUSSIAN,
@@ -162,7 +129,8 @@ private:
     RESCALE2
   } m_SelectedAction;
 
-  enum OperationType{
+  enum OperationType
+  {
     TWOIMAGESNOACTIONSELECTED,
     CATEGORY_ARITHMETIC,
     ADD,
@@ -176,12 +144,11 @@ private:
     XOR
   } m_SelectedOperation;
 
-  enum InterpolationType{
+  enum InterpolationType
+  {
     LINEAR,
     NEAREST
   } m_SelectedInterpolation;
 };
 
-#endif // !defined(QmitkBasicImageProcessing_H__INCLUDED)
-
-
+#endif // !defined(QmitkBasicImageProcessing_H__INCLUDED)QMITKBASICIMAGEPROCESSINGVIEW_H

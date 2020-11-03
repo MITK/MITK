@@ -1,9 +1,9 @@
-/*=============================================================================
+/*============================================================================
 
   Library: CppMicroServices
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+  Copyright (c) German Cancer Research Center (DKFZ)
+  All rights reserved.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 
-=============================================================================*/
+============================================================================*/
 
 #ifndef USMODULEEVENT_H
 #define USMODULEEVENT_H
@@ -25,11 +25,6 @@
 #include <iostream>
 
 #include "usSharedData.h"
-
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable:4251)
-#endif
 
 US_BEGIN_NAMESPACE
 
@@ -154,9 +149,5 @@ US_Core_EXPORT std::ostream& operator<<(std::ostream& os, const ModuleEvent& eve
 /** @}*/
 
 US_END_NAMESPACE
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 #endif // USMODULEEVENT_H

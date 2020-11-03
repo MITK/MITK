@@ -21,10 +21,10 @@ libraries into the superbuild process.
 
 You need:
   -# Git from http://git-scm.com (there are also numerous third-party graphical
-     clients available). We recomment using Git, but see below for a way how to
+     clients available). We recommend using Git, but see below for a way how to
      get the current source code without using it.
   -# <a href="http://www.cmake.org">CMake</a> (version \minimumCMakeVersion or higher)
-  -# <a href="http://qt.io">Qt</a> 5.11.1 if you plan to develop Qt-based
+  -# <a href="http://qt.io">Qt</a> 5.12 if you plan to develop Qt-based
      applications
   -# If you are using <b>macOS</b> you need an XCode installation and the
      Command Line Tools as it provides the neccessary compilers and SDKs
@@ -69,7 +69,7 @@ and configure the project.
 
 CMake will present you a couple of options, these are the most important ones:
 
- - <tt><b>CMAKE_PREFIX_PATH</b></tt> The path to your Qt installation, e.g., <i>C:/Qt/5.11.1/msvc2017_64</i> or <i>/home/user/Qt/5.11.1/gcc_64</i>
+ - <tt><b>CMAKE_PREFIX_PATH</b></tt> The path to your Qt installation, e.g., <i>C:/Qt/5.12.6/msvc2017_64</i> or <i>/home/user/Qt/5.12.6/gcc_64</i>
  - <tt><b>MITK_USE_ACVD</b></tt> Build MITK code which depends on ACVD (this
    will download and build ACVD)
  - <tt><b>MITK_USE_BLUEBERRY</b></tt> Build the BlueBerry application framework
@@ -77,7 +77,7 @@ CMake will present you a couple of options, these are the most important ones:
    specify them here.
  - <tt><b>MITK_USE_OpenCV</b></tt> Build MITK code which depends on OpenCV (this
    will download and build OpenCV 2.4)
- - <tt><b>MITK_USE_Python</b></tt> Enables Python wrapping in MITK. This will also
+ - <tt><b>MITK_USE_Python3</b></tt> Enables Python wrapping in MITK. This will also
    configure ITK, VTK, and OpenCV (if enabled) to build Python wrappers.
  - <tt><b>MITK_USE_Qt5</b></tt> Build MITK code which depends on Qt 5
 

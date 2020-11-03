@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef mitkGIFIntensityVolumeHistogramFeatures_h
 #define mitkGIFIntensityVolumeHistogramFeatures_h
@@ -28,7 +24,7 @@ namespace mitk
   *
   * This class can be used to calculate the volume histogram and features that are calculated from
   * it. It is based on the intensity-volume histogram (IVH) which describes the relation between the
-  * grey level index i (and the corresponding intensity \f§x_i\f$) and the volume fraction \f$f\f$ that
+  * grey level index i (and the corresponding intensity \f$x_i\f$) and the volume fraction \f$f\f$ that
   * with an intensity that is equal or greater than \f$x_i\f$. This feature is original proposed in
   * El Naqa et al. Exploring feature-based approaches in PET images for prediciting cancer treatment outcomes.
   * Pattern recognition 2009.
@@ -62,27 +58,19 @@ namespace mitk
   {
   public:
     mitkClassMacro(GIFIntensityVolumeHistogramFeatures, AbstractGlobalImageFeature);
-      itkFactorylessNewMacro(Self)
-      itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
-      GIFIntensityVolumeHistogramFeatures();
+    GIFIntensityVolumeHistogramFeatures();
 
-    /**
-    * \brief Calculates the Cooccurence-Matrix based features for this class.
-    */
-    virtual FeatureListType CalculateFeatures(const Image::Pointer & image, const Image::Pointer &feature);
+    FeatureListType CalculateFeatures(const Image* image, const Image* mask, const Image* maskNoNAN) override;
+    using Superclass::CalculateFeatures;
 
-    /**
-    * \brief Returns a list of the names of all features that are calculated from this class
-    */
-    virtual FeatureNameListType GetFeatureNames();
-    virtual void AddArguments(mitkCommandLineParser &parser);
+    void AddArguments(mitkCommandLineParser& parser) const override;
 
-    virtual void CalculateFeaturesUsingParameters(const Image::Pointer & feature, const Image::Pointer &mask, const Image::Pointer &maskNoNAN, FeatureListType &featureList);
+  protected:
 
-    virtual std::string GetCurrentFeatureEncoding() override;
-
-  private:
+    FeatureListType DoCalculateFeatures(const Image* image, const Image* mask) override;
   };
 }
 #endif //mitkGIFIntensityVolumeHistogramFeatures_h

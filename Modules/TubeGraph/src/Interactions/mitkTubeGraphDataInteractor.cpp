@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkTubeGraphDataInteractor.h"
 
@@ -36,9 +32,7 @@ mitk::TubeGraphDataInteractor::TubeGraphDataInteractor()
 {
 }
 
-mitk::TubeGraphDataInteractor::~TubeGraphDataInteractor()
-{
-}
+mitk::TubeGraphDataInteractor::~TubeGraphDataInteractor() {}
 
 void mitk::TubeGraphDataInteractor::ConnectActionsAndFunctions()
 {
@@ -79,10 +73,13 @@ bool mitk::TubeGraphDataInteractor::CheckOverTube(const InteractionEvent *intera
   auto *picker = new mitk::TubeGraphPicker();
   picker->SetTubeGraph(m_TubeGraph);
 
-  TubeGraph::TubeDescriptorType tubeDescriptor = picker->GetPickedTube(positionEvent->GetPositionInWorld()).first;
+  auto pickedTube = picker->GetPickedTube(positionEvent->GetPositionInWorld());
+
+  TubeGraph::TubeDescriptorType tubeDescriptor = pickedTube.first;
 
   if (tubeDescriptor != TubeGraph::ErrorId)
   {
+    m_LastPickedElement = pickedTube.second;
     m_SecondLastPickedTube = m_LastPickedTube;
     m_LastPickedTube = tubeDescriptor;
     return true;
@@ -91,14 +88,14 @@ bool mitk::TubeGraphDataInteractor::CheckOverTube(const InteractionEvent *intera
     return false;
 }
 
-void mitk::TubeGraphDataInteractor::SelectTube(StateMachineAction *, InteractionEvent *interactionEvent)
+void mitk::TubeGraphDataInteractor::SelectTube(StateMachineAction *, InteractionEvent *)
 {
   if (m_TubeGraph.IsNull())
     return;
 
   this->SelectTubesByActivationModus();
 
-  interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+  RenderingManager::GetInstance()->RequestUpdateAll();
 
   if (m_ActivationMode != None)
   {
@@ -110,7 +107,7 @@ void mitk::TubeGraphDataInteractor::SelectTube(StateMachineAction *, Interaction
   }
 }
 
-void mitk::TubeGraphDataInteractor::DeselectTube(StateMachineAction *, InteractionEvent *interactionEvent)
+void mitk::TubeGraphDataInteractor::DeselectTube(StateMachineAction *, InteractionEvent *)
 {
   if (m_TubeGraph.IsNull())
     return;
@@ -118,7 +115,7 @@ void mitk::TubeGraphDataInteractor::DeselectTube(StateMachineAction *, Interacti
   if ((m_ActivationMode != Multiple) && (m_ActivationMode != Points))
   {
     m_TubeGraphProperty->DeactivateAllTubes();
-    interactionEvent->GetSender()->GetRenderingManager()->RequestUpdateAll();
+    RenderingManager::GetInstance()->RequestUpdateAll();
     // TODO!!!this->InvokeEvent(SelectionChangedTubeGraphEvent());
   }
   // show info on status bar
@@ -277,4 +274,12 @@ void mitk::TubeGraphDataInteractor::ResetPickedTubes()
 {
   m_LastPickedTube = TubeGraph::ErrorId;
   m_SecondLastPickedTube = TubeGraph::ErrorId;
+}
+
+mitk::Point3D mitk::TubeGraphDataInteractor::GetLastPickedPosition()
+{
+  if (m_LastPickedElement)
+    return m_LastPickedElement->GetCoordinates();
+  else
+    return mitk::Point3D();
 }

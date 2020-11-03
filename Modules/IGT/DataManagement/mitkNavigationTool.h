@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef NAVIGATIONTOOL_H_INCLUDED
 #define NAVIGATIONTOOL_H_INCLUDED
@@ -45,8 +41,8 @@ namespace mitk {
   public:
 
     mitkClassMacroItkParent(NavigationTool,itk::DataObject);
-    itkFactorylessNewMacro(Self)
-    itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
     enum NavigationToolType {Instrument, Fiducial, Skinmarker, Unknown};
 
@@ -80,8 +76,8 @@ namespace mitk {
     //Tool Axis definition:
     /** @return Returns the main tool axis which is defined as the z-coordinate of the tool coordinate system. */
     mitk::Point3D GetToolAxis();
-    /** Convenience function to define the tool orientation given the main tool axis. As the main tool axis 
-    is defined as the negative z-axis of the tool coordinate system, the tool orientation is calculated as 
+    /** Convenience function to define the tool orientation given the main tool axis. As the main tool axis
+    is defined as the negative z-axis of the tool coordinate system, the tool orientation is calculated as
     a rotation of the actual tool axis in tool coordinates as obtained by a calibration  to the main axis.*/
     void SetToolAxis(mitk::Point3D toolAxis);
 

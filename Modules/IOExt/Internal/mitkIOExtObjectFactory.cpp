@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkIOExtObjectFactory.h"
 
@@ -97,7 +93,7 @@ mitk::Mapper::Pointer mitk::IOExtObjectFactory::CreateMapper(mitk::DataNode *nod
   }
   else if (id == mitk::BaseRenderer::Standard3D)
   {
-    if ((dynamic_cast<Image *>(data) != nullptr))
+    if ((dynamic_cast<Image *>(data) != nullptr) && std::string("Image").compare(node->GetData()->GetNameOfClass())==0)
     {
       newMapper = mitk::VolumeMapperVtkSmart3D::New();
       newMapper->SetDataNode(node);
@@ -135,7 +131,7 @@ void mitk::IOExtObjectFactory::SetDefaultProperties(mitk::DataNode *node)
   }
 }
 
-const char *mitk::IOExtObjectFactory::GetFileExtensions()
+std::string mitk::IOExtObjectFactory::GetFileExtensions()
 {
   std::string fileExtension;
   this->CreateFileExtensions(m_FileExtensionsMap, fileExtension);
@@ -163,7 +159,7 @@ void mitk::IOExtObjectFactory::CreateFileExtensionsMap()
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", "VTK Legacy Unstructured Grid"));
 }
 
-const char *mitk::IOExtObjectFactory::GetSaveFileExtensions()
+std::string mitk::IOExtObjectFactory::GetSaveFileExtensions()
 {
   std::string fileExtension;
   this->CreateFileExtensions(m_SaveFileExtensionsMap, fileExtension);

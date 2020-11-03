@@ -22,10 +22,10 @@ if(MITK_USE_POLHEMUS_TRACKER)
 endif(MITK_USE_POLHEMUS_TRACKER)
 
 MITK_CREATE_MODULE(
-  SUBPROJECTS MITK-IGT
-  INCLUDE_DIRS Algorithms Common DataManagement ExceptionHandling IO Rendering TrackingDevices TestingHelper
-  INTERNAL_INCLUDE_DIRS ${ADDITIONAL_INCLUDE_DIRS}
-  DEPENDS MitkImageStatistics MitkSceneSerialization MitkIGTBase MitkOpenIGTLink
+  INCLUDE_DIRS
+    PUBLIC Algorithms Common DataManagement ExceptionHandling IO Rendering TrackingDevices TestingHelper
+    PRIVATE ${ADDITIONAL_INCLUDE_DIRS}
+  DEPENDS PUBLIC MitkImageStatistics MitkSceneSerialization MitkIGTBase MitkOpenIGTLink
   PACKAGE_DEPENDS ITK|ITKRegistrationCommon tinyxml OpenIGTLink
   ADDITIONAL_LIBS "${ADDITIONAL_LIBS}"
 )

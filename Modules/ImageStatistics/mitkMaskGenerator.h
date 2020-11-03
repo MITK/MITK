@@ -1,3 +1,15 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
 #ifndef MITKMASKGENERATOR
 #define MITKMASKGENERATOR
 
@@ -25,10 +37,8 @@ public:
     typedef itk::SmartPointer< const Self >     ConstPointer;
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self)
-
-    /** Runtime information support. */
-    itkTypeMacro(MaskGenerator, itk::Object)
+    itkNewMacro(Self); /** Runtime information support. */
+    itkTypeMacro(MaskGenerator, itk::Object);
 
     //~MaskGenerator();
 
@@ -41,12 +51,12 @@ public:
     /**
      * @brief GetReferenceImage per default returns the inputImage (as set by SetInputImage). If no input image is set it will return a nullptr.
      */
-    virtual mitk::Image::Pointer GetReferenceImage();
+    virtual mitk::Image::ConstPointer GetReferenceImage();
 
     /**
      * @brief SetInputImage is used to set the input image to the mask generator. Some subclasses require an input image, others don't. See the documentation of the specific Mask Generator for more information.
      */
-    void SetInputImage(mitk::Image::Pointer inputImg);
+    void SetInputImage(mitk::Image::ConstPointer inputImg);
 
     virtual void SetTimeStep(unsigned int timeStep);
 
@@ -55,7 +65,7 @@ protected:
 
     unsigned int m_TimeStep;
     mitk::Image::Pointer m_InternalMask;
-    mitk::Image::Pointer m_inputImage;
+    mitk::Image::ConstPointer m_inputImage;
 
 private:
 

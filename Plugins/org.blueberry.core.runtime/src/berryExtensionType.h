@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
-BlueBerry Platform
+The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef BERRY_EXTENSION_TYPES_H
 #define BERRY_EXTENSION_TYPES_H
@@ -25,7 +21,6 @@ namespace berry {
 
 /**
  * \brief The ExtensionType class manages named types
- * \threadsafe
  *
  * The class associates a type
  * name to a type so that it can be created and destructed
@@ -156,7 +151,6 @@ struct ExtensionTypeIdHelper<T, false>
 } // end namespace internal
 
 /**
- * \threadsafe
  *
  * Registers the type name typeName for the type T. Returns
  * the internal ID used by ExtensionType. Any class or struct that has a

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkBooleanOperationsWidget.h"
 #include "../../Common/QmitkDataSelectionWidget.h"
@@ -57,8 +53,8 @@ QmitkBooleanOperationsWidget::QmitkBooleanOperationsWidget(mitk::SliceNavigation
 {
   m_Controls.setupUi(this);
 
-  m_Controls.dataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::MaskPredicate);
-  m_Controls.dataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::MaskPredicate);
+  m_Controls.dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::MaskPredicate);
+  m_Controls.dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::MaskPredicate);
 
   m_Controls.dataSelectionWidget->SetHelpText(HelpText);
 
@@ -124,7 +120,7 @@ void QmitkBooleanOperationsWidget::DoBooleanOperation(mitk::BooleanOperation::Ty
 
   try
   {
-    mitk::BooleanOperation booleanOperation(type, segmentation0, segmentation1, timeNavigationController->GetTime()->GetPos());
+    mitk::BooleanOperation booleanOperation(type, segmentation0, segmentation1, timeNavigationController->GetSelectedTimePoint());
     result = booleanOperation.GetResult();
   }
   catch (const mitk::Exception &exception)

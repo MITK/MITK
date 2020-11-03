@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef _MITKPHOTOACOUSTICSOCLBEAMFORMER_H_
 #define _MITKPHOTOACOUSTICSOCLBEAMFORMER_H_
@@ -22,10 +18,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #if defined(PHOTOACOUSTICS_USE_GPU) || DOXYGEN
 
 #include "mitkOclDataSetToDataSetFilter.h"
-
+#include "mitkBeamformingSettings.h"
 #include "mitkPhotoacousticOCLDelayCalculation.h"
 #include "mitkPhotoacousticOCLUsedLinesCalculation.h"
-#include "mitkPhotoacousticBeamformingSettings.h"
 
 #include <chrono>
 
@@ -38,100 +33,94 @@ namespace mitk
   *  Additional configuration of the apodisation function is needed.
   */
 
-class PhotoacousticOCLBeamformingFilter : public OclDataSetToDataSetFilter, public itk::Object
-{
-
-public:
-  mitkClassMacroItkParent(PhotoacousticOCLBeamformingFilter, itk::Object);
-  itkNewMacro(Self);
-
-  /**
-  * @brief SetInput Set the input data through an image. Arbitrary images are supported
-  */
-  void SetInput(Image::Pointer image);
-  /**
-  *  brief SetInput Manually set the input data while providing 3 dimensions and memory size of the input data (Bytes per element).
-  */
-  void SetInput(void* data, unsigned int* dimensions, unsigned int BpE);
-  /**
-  * @brief GetOutput Get a pointer to the processed data. The standard datatype is float.
-  */
-  void* GetOutput();
-
-  /**
-  * @brief GetOutputAsImage Returns an mitk::Image constructed from the processed data
-  */
-  mitk::Image::Pointer GetOutputAsImage();
-
-  /** \brief Update the filter */
-  void Update();
-
-  /** \brief Set the Apodisation function to apply when beamforming */
-  void SetApodisation(float* apodisation, unsigned short apodArraySize)
+  class PhotoacousticOCLBeamformingFilter : public OclDataSetToDataSetFilter, public itk::Object
   {
-    m_ApodArraySize = apodArraySize;
-    m_Apodisation = apodisation;
-  }
+  public:
+    mitkClassMacroItkParent(PhotoacousticOCLBeamformingFilter, itk::Object);
+    mitkNewMacro1Param(Self, BeamformingSettings::Pointer);
 
-  /** \brief Set beamforming settings to use when beamforming */
-  void SetConfig(BeamformingSettings settings)
-  {
-    m_ConfOld = m_Conf;
-    m_Conf = settings;
-  }
+    /**
+    * @brief SetInput Set the input data through an image. Arbitrary images are supported
+    */
+    void SetInput(Image::Pointer image);
+    /**
+    *  brief SetInput Manually set the input data while providing 3 dimensions and memory size of the input data (Bytes per element).
+    */
+    void SetInput(void* data, unsigned int* dimensions, unsigned int BpE);
+    /**
+    * @brief GetOutput Get a pointer to the processed data. The standard datatype is float.
+    */
+    void* GetOutput();
 
-protected:
+    /**
+    * @brief GetOutputAsImage Returns an mitk::Image constructed from the processed data
+    */
+    mitk::Image::Pointer GetOutputAsImage();
 
-  PhotoacousticOCLBeamformingFilter();
-  virtual ~PhotoacousticOCLBeamformingFilter();
+    /** \brief Update the filter */
+    void Update();
 
-  /** \brief Initialize the filter */
-  bool Initialize();
+    /** \brief Set the Apodisation function to apply when beamforming */
+    void SetApodisation(const float* apodisation, unsigned short apodArraySize)
+    {
+      m_ApodArraySize = apodArraySize;
+      m_Apodisation = apodisation;
+    }
 
-  /** \brief Updated the used data for beamforming depending on whether the configuration has significantly changed */
-  void UpdateDataBuffers();
+  protected:
 
-  /** \brief Execute the filter */
-  void Execute();
+    PhotoacousticOCLBeamformingFilter(BeamformingSettings::Pointer settings);
+    virtual ~PhotoacousticOCLBeamformingFilter();
 
-  mitk::PixelType GetOutputType()
-  {
-    return mitk::MakeScalarPixelType<float>();
-  }
+    /** \brief Initialize the filter */
+    bool Initialize();
 
-  int GetBytesPerElem()
-  {
-    return sizeof(float);
-  }
+    /** \brief Updated the used data for beamforming depending on whether the configuration has significantly changed */
+    void UpdateDataBuffers();
 
-  virtual us::Module* GetModule();
+    /** \brief Execute the filter */
+    void Execute();
 
-private:
-  /** The OpenCL kernel for the filter */
-  cl_kernel m_PixelCalculation;
+    mitk::PixelType GetOutputType()
+    {
+      return mitk::MakeScalarPixelType<float>();
+    }
 
-  unsigned int m_OutputDim[3];
+    int GetBytesPerElem()
+    {
+      return sizeof(float);
+    }
 
-  float* m_Apodisation;
-  unsigned short m_ApodArraySize;
+    virtual us::Module* GetModule();
 
-  unsigned short m_PAImage;
+  private:
+    /** The OpenCL kernel for the filter */
+    cl_kernel m_PixelCalculation;
 
-  BeamformingSettings m_Conf;
-  BeamformingSettings m_ConfOld;
+    unsigned int m_OutputDim[3];
 
-  mitk::Image::Pointer m_InputImage;
+    const float* m_Apodisation;
+    unsigned short m_ApodArraySize;
+    unsigned int m_inputSlices;
 
-  size_t m_ChunkSize[3];
+    unsigned short m_PAImage;
 
-  mitk::OCLUsedLinesCalculation::Pointer m_UsedLinesCalculation;
-  mitk::OCLDelayCalculation::Pointer m_DelayCalculation;
+    BeamformingSettings::Pointer m_Conf;
 
-  cl_mem m_ApodizationBuffer;
-  cl_mem m_MemoryLocationsBuffer;
-  cl_mem m_DelaysBuffer;
-  cl_mem m_UsedLinesBuffer;
-};
+    mitk::Image::Pointer m_InputImage;
+
+    size_t m_ChunkSize[3];
+
+    mitk::OCLUsedLinesCalculation::Pointer m_UsedLinesCalculation;
+    mitk::OCLDelayCalculation::Pointer m_DelayCalculation;
+
+    cl_mem m_ApodizationBuffer;
+    cl_mem m_DelaysBuffer;
+    cl_mem m_UsedLinesBuffer;
+    cl_mem m_ElementHeightsBuffer;
+    cl_mem m_ElementPositionsBuffer;
+
+  };
 }
 #else
 namespace mitk

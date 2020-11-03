@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkSimpleExampleView.h"
 
@@ -191,12 +187,11 @@ void QmitkSimpleExampleView::GenerateMovie()
     QMessageBox::information(
       nullptr,
       "Movie Maker",
-      "<p>Set path to FFmpeg<sup>1</sup> or Libav<sup>2</sup> (avconv) in preferences (Window -> Preferences... "
+      "<p>Set path to FFmpeg<sup>1</sup> in preferences (Window -> Preferences... "
       "(Ctrl+P) -> External Programs) to be able to record your movies to video files.</p>"
-      "<p>If you are using Linux, chances are good that either FFmpeg or Libav is included in the official package "
+      "<p>If you are using Linux, chances are good that FFmpeg is included in the official package "
       "repositories.</p>"
-      "<p>[1] <a href=\"https://www.ffmpeg.org/download.html\">Download FFmpeg from ffmpeg.org</a><br/>"
-      "[2] <a href=\"https://libav.org/download.html\">Download Libav from libav.org</a></p>");
+      "<p>[1] <a href=\"https://www.ffmpeg.org/download.html\">Download FFmpeg from ffmpeg.org</a></p>");
     return;
   }
 

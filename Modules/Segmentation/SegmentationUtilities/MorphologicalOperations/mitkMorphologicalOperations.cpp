@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkMorphologicalOperations.h"
 #include <itkBinaryBallStructuringElement.h>
@@ -381,4 +377,38 @@ void mitk::MorphologicalOperations::itkFillHoles(itk::Image<TPixel, VDimension> 
   fillHoleFilter->UpdateLargestPossibleRegion();
 
   mitk::CastToMitkImage(fillHoleFilter->GetOutput(), resultImage);
+}
+
+template <class TStructuringElement>
+TStructuringElement  mitk::MorphologicalOperations::CreateStructuringElement(StructuralElementType structuralElementFlag, int factor)
+{
+  TStructuringElement strElem;
+  typename TStructuringElement::SizeType size;
+  size.Fill(0);
+  switch (structuralElementFlag)
+  {
+  case Ball_Axial:
+  case Cross_Axial:
+    size.SetElement(0, factor);
+    size.SetElement(1, factor);
+    break;
+  case Ball_Coronal:
+  case Cross_Coronal:
+    size.SetElement(0, factor);
+    size.SetElement(2, factor);
+    break;
+  case Ball_Sagital:
+  case Cross_Sagital:
+    size.SetElement(1, factor);
+    size.SetElement(2, factor);
+    break;
+  case Ball:
+  case Cross:
+    size.Fill(factor);
+    break;
+  }
+
+  strElem.SetRadius(size);
+  strElem.CreateStructuringElement();
+  return strElem;
 }

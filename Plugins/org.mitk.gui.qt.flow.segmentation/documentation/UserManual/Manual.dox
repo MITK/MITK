@@ -1,0 +1,8 @@
+/**
+\page org_mitk_gui_qt_flow_segmentation The Segmentation Flow
+
+The view offers a simple way to directly save the first segmentation found in the data storage.
+The save location will be determined given the application argument flags (--flow.outputdir and --flow.outputextension).
+If no flags where set when starting the application the current working directory and "nrrd" as extensions will be used. 
+*/
+

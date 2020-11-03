@@ -1,8 +1,0 @@
-/**
-\page org_mitk_gui_qt_diffusionimagingapp What is the Diffusion Imaging Application
-
-MITK Diffusion offers a selection of image analysis methods for dMRI processing. It encompasses the research of the <a href="https://www.dkfz.de/en/mic/index.php">Division of Medical Image Computing</a> of the German Cancer Research Center (DKFZ).
-
-For a detailed description of MITK Diffusion refer to \ref org_mitk_gui_qt_diffusionimaging .
-
-*/

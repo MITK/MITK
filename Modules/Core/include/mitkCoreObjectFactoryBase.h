@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef COREOBJECTFACTORYBASE_H_INCLUDED
 #define COREOBJECTFACTORYBASE_H_INCLUDED
@@ -44,7 +40,7 @@ namespace mitk
     typedef std::list<mitk::FileWriterWithInformation::Pointer> FileWriterList;
     typedef std::multimap<std::string, std::string> MultimapType;
 
-    mitkClassMacroItkParent(CoreObjectFactoryBase, itk::Object)
+    mitkClassMacroItkParent(CoreObjectFactoryBase, itk::Object);
 
       virtual Mapper::Pointer CreateMapper(mitk::DataNode *node, MapperSlotId slotId) = 0;
     virtual void SetDefaultProperties(mitk::DataNode *node) = 0;
@@ -52,7 +48,7 @@ namespace mitk
     /**
      * @deprecatedSince{2014_10} See mitk::FileReaderRegistry and QmitkIOUtil
      */
-    virtual const char *GetFileExtensions() = 0;
+    virtual std::string GetFileExtensions() = 0;
 
     /**
      * @deprecatedSince{2014_10} See mitk::FileReaderRegistry and QmitkIOUtil
@@ -62,7 +58,7 @@ namespace mitk
     /**
      * @deprecatedSince{2014_10} See mitk::FileWriterRegistry and QmitkIOUtil
      */
-    virtual const char *GetSaveFileExtensions() = 0;
+    virtual std::string GetSaveFileExtensions() = 0;
 
     /**
      * @deprecatedSince{2014_10} See mitk::FileWriterRegistry and QmitkIOUtil

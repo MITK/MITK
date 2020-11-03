@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef mitkVtkPropRenderer_h
 #define mitkVtkPropRenderer_h
@@ -67,12 +63,7 @@ namespace mitk
 
   public:
     mitkClassMacro(VtkPropRenderer, BaseRenderer);
-    mitkNewMacro3Param(VtkPropRenderer, const char *, vtkRenderWindow *, mitk::RenderingManager *);
-    mitkNewMacro4Param(VtkPropRenderer,
-                       const char *,
-                       vtkRenderWindow *,
-                       mitk::RenderingManager *,
-                       mitk::BaseRenderer::RenderingMode::Type);
+    mitkNewMacro2Param(VtkPropRenderer, const char*, vtkRenderWindow*);
 
     typedef std::map<int, Mapper *> MappersMapType;
 
@@ -84,6 +75,9 @@ namespace mitk
       Overlay,
       Volumetric
     };
+
+    /** \brief Store/propagate vtkInformation during rendering */
+    void SetPropertyKeys(vtkInformation *info);
 
     int Render(RenderType type);
 
@@ -193,11 +187,7 @@ namespace mitk
     static bool useImmediateModeRendering();
 
   protected:
-    VtkPropRenderer(
-      const char *name = "VtkPropRenderer",
-      vtkRenderWindow *renWin = nullptr,
-      mitk::RenderingManager *rm = nullptr,
-      mitk::BaseRenderer::RenderingMode::Type renderingMode = mitk::BaseRenderer::RenderingMode::Standard);
+    VtkPropRenderer(const char *name = "VtkPropRenderer", vtkRenderWindow *renWin = nullptr);
     ~VtkPropRenderer() override;
     void Update() override;
 
@@ -211,6 +201,9 @@ namespace mitk
 
     // prepare all mitk::mappers for rendering
     void PrepareMapperQueue();
+
+    /** \brief Propagate vtkInformation object to all VTK-based mappers */
+    void PropagateRenderInfoToMappers();
 
     /** \brief Set parallel projection, remove the interactor and the lights of VTK. */
     bool Initialize2DvtkCamera();
@@ -238,6 +231,14 @@ namespace mitk
     vtkRenderer *m_TextRenderer;
     typedef std::map<unsigned int, vtkTextActor *> TextMapType;
     TextMapType m_TextCollection;
+
+   /** \brief Information passed from VTK's rendering to props.
+
+       Used e.g. by vtkDualDepthPeelingPass to pass information.
+       Not passing this to all the MITK generated vktProps will
+       essentially break VTK's depth peeling / transparency.
+    */
+    vtkInformation* m_VtkRenderInfo = nullptr;
   };
 } // namespace mitk
 

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 
 // Blueberry
@@ -149,7 +145,7 @@ void OpenIGTLinkProviderExample::CreatePipeline()
 
     this->GetDataStorage()->Add(newNode);
 
-    m_NavDataVisualizer->SetRepresentationObject(i, mySphere);
+    m_NavDataVisualizer->SetRepresentationObject(i, mySphere.GetPointer());
 
     m_DemoNodes.append(newNode);
   }
@@ -217,7 +213,7 @@ void OpenIGTLinkProviderExample::OnOpenFile(){
   catch ( const mitk::Exception &e )
   {
     MITK_WARN("NavigationDataPlayerView") << "could not open file " << fileName.toStdString();
-    QMessageBox::critical(0, "Error Reading File", "The file '" + fileName
+    QMessageBox::critical(nullptr, "Error Reading File", "The file '" + fileName
                           +"' could not be read.\n" + e.GetDescription() );
     return;
   }

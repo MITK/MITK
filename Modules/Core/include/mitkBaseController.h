@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef BASECONTROLLER_H_HEADER_INCLUDED_C1E745A3
 #define BASECONTROLLER_H_HEADER_INCLUDED_C1E745A3
@@ -38,23 +34,22 @@ namespace mitk
   //## there is 3D+t data.
   //## @note not yet implemented
   //## @ingroup NavigationControl
-  class MITKCORE_EXPORT BaseController : public mitk::OperationActor, public itk::Object
+  class MITKCORE_EXPORT BaseController : public OperationActor, public itk::Object
   {
   public:
     /** Standard class typedefs. */
-    mitkClassMacroItkParent(BaseController, mitk::OperationActor);
-    itkFactorylessNewMacro(Self)
+    mitkClassMacroItkParent(BaseController, OperationActor);
+    itkFactorylessNewMacro(Self);
 
-      /** Method for creation through ::New */
-      // mitkNewMacro(Self);
-
-      //##Documentation
-      //## @brief Get the Stepper through the slices
-      mitk::Stepper *GetSlice();
+    //##Documentation
+    //## @brief Get the Stepper through the slices
+    Stepper *GetSlice();
+    const Stepper* GetSlice() const;
 
     //##Documentation
     //## @brief Get the Stepper through the time
-    mitk::Stepper *GetTime();
+    Stepper *GetTime();
+    const Stepper* GetTime() const;
 
   protected:
     /**

@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkCtkPythonShell.h"
 
@@ -35,6 +31,12 @@ struct QmitkCtkPythonShellData
 QmitkCtkPythonShell::QmitkCtkPythonShell(QWidget* parent)
     : ctkPythonConsole(parent), d( new QmitkCtkPythonShellData )
 {
+  this->setWelcomeTextColor(Qt::green);
+  this->setPromptColor(Qt::gray);
+  this->setStdinTextColor(Qt::white);
+  this->setCommandTextColor(Qt::white);
+  this->setOutputTextColor(Qt::white);
+
   MITK_DEBUG("QmitkCtkPythonShell") << "retrieving  IPythonService";
   us::ModuleContext* context = us::GetModuleContext();
   d->m_PythonServiceRef = context->GetServiceReference<mitk::IPythonService>();

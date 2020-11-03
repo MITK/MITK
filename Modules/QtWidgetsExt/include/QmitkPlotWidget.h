@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef _QmitkPlotWidget_H_
 #define _QmitkPlotWidget_H_
@@ -51,10 +47,12 @@ See LICENSE.txt or http://www.mitk.org for details.
 * 3. You can modify the behavior of the plot by directly referencing
 *    the QwtPlot instance using the method GetPlot().
 * @see QwtPlot
+* @deprecatedSince{2018_04} Use QmitkChartWidget instead
 */
 
-class MITKQTWIDGETSEXT_EXPORT QmitkPlotWidget : public QWidget
-{
+class MITKQTWIDGETSEXT_EXPORT QmitkPlotWidget
+  : public QWidget
+  {
 private:
   Q_OBJECT
 

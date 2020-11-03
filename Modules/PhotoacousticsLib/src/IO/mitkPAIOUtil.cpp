@@ -1,3 +1,15 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
 #include "mitkPAIOUtil.h"
 
 #include "mitkIOUtil.h"
@@ -44,24 +56,14 @@ mitk::pa::Volume::Pointer mitk::pa::IOUtil::LoadNrrd(std::string filename, doubl
   if (filename.empty() || filename == "")
     return nullptr;
 
-  auto inputImage = mitk::IOUtil::Load<mitk::Image>(filename);
+  mitk::Image::Pointer inputImage = mitk::IOUtil::Load<mitk::Image>(filename);
 
   if (inputImage.IsNull())
     return nullptr;
 
-  int xDim = inputImage->GetDimensions()[1];
-  int yDim = inputImage->GetDimensions()[0];
-  int zDim = inputImage->GetDimensions()[2];
+  auto returnImage = Volume::New(inputImage);
 
-  mitk::ImageReadAccessor readAccess(inputImage, inputImage->GetVolumeData(0));
-
-  auto* dataArray = new double[xDim*yDim*zDim];
-  const auto* srcData = (const double*)readAccess.GetData();
-  memcpy(dataArray, srcData, xDim*yDim*zDim * sizeof(double));
-
-  auto returnImage = mitk::pa::Volume::New(dataArray, xDim, yDim, zDim);
-
-  mitk::pa::VolumeManipulator::GaussianBlur3D(returnImage, blur);
+  VolumeManipulator::GaussianBlur3D(returnImage, blur);
 
   return returnImage;
 }
@@ -202,17 +204,17 @@ mitk::pa::InSilicoTissueVolume::Pointer mitk::pa::IOUtil::LoadInSilicoTissueVolu
   mitk::ImageReadAccessor readAccess0(inputImage, inputImage->GetVolumeData(0));
   auto* m_AbsorptionArray = new double[xDim*yDim*zDim];
   memcpy(m_AbsorptionArray, readAccess0.GetData(), xDim*yDim*zDim * sizeof(double));
-  auto absorptionVolume = Volume::New(m_AbsorptionArray, xDim, yDim, zDim);
+  auto absorptionVolume = Volume::New(m_AbsorptionArray, xDim, yDim, zDim, xSpacing);
 
   mitk::ImageReadAccessor readAccess1(inputImage, inputImage->GetVolumeData(1));
   auto*  m_ScatteringArray = new double[xDim*yDim*zDim];
   memcpy(m_ScatteringArray, readAccess1.GetData(), xDim*yDim*zDim * sizeof(double));
-  auto scatteringVolume = Volume::New(m_ScatteringArray, xDim, yDim, zDim);
+  auto scatteringVolume = Volume::New(m_ScatteringArray, xDim, yDim, zDim, xSpacing);
 
   mitk::ImageReadAccessor readAccess2(inputImage, inputImage->GetVolumeData(2));
   auto*  m_AnisotropyArray = new double[xDim*yDim*zDim];
   memcpy(m_AnisotropyArray, readAccess2.GetData(), xDim*yDim*zDim * sizeof(double));
-  auto anisotropyVolume = Volume::New(m_AnisotropyArray, xDim, yDim, zDim);
+  auto anisotropyVolume = Volume::New(m_AnisotropyArray, xDim, yDim, zDim, xSpacing);
 
   Volume::Pointer segmentationVolume;
 
@@ -221,7 +223,7 @@ mitk::pa::InSilicoTissueVolume::Pointer mitk::pa::IOUtil::LoadInSilicoTissueVolu
     mitk::ImageReadAccessor readAccess3(inputImage, inputImage->GetVolumeData(3));
     auto*  m_SegmentationArray = new double[xDim*yDim*zDim];
     memcpy(m_SegmentationArray, readAccess3.GetData(), xDim*yDim*zDim * sizeof(double));
-    segmentationVolume = Volume::New(m_SegmentationArray, xDim, yDim, zDim);
+    segmentationVolume = Volume::New(m_SegmentationArray, xDim, yDim, zDim, xSpacing);
   }
 
   return mitk::pa::InSilicoTissueVolume::New(absorptionVolume, scatteringVolume,
@@ -232,15 +234,7 @@ mitk::pa::FluenceYOffsetPair::Pointer mitk::pa::IOUtil::LoadFluenceSimulation(st
 {
   MITK_INFO << "Adding slice...";
 
-  auto inputImage = mitk::IOUtil::Load<mitk::Image>(fluenceSimulation);
-  mitk::ImageReadAccessor readAccess0(inputImage, inputImage->GetVolumeData(0));
-
-  unsigned int xDim = inputImage->GetDimensions()[1];
-  unsigned int yDim = inputImage->GetDimensions()[0];
-  unsigned int zDim = inputImage->GetDimensions()[2];
-  int size = xDim*yDim*zDim;
-  auto* fluenceArray = new double[size];
-  memcpy(fluenceArray, readAccess0.GetData(), size * sizeof(double));
+  mitk::Image::Pointer inputImage = mitk::IOUtil::Load<mitk::Image>(fluenceSimulation);
 
   auto yOffsetProperty = inputImage->GetProperty("y-offset");
 
@@ -254,5 +248,5 @@ mitk::pa::FluenceYOffsetPair::Pointer mitk::pa::IOUtil::LoadFluenceSimulation(st
 #endif // __linux__
   double yOffset = std::stod(yOff);
   MITK_INFO << "Converted offset " << yOffset;
-  return mitk::pa::FluenceYOffsetPair::New(mitk::pa::Volume::New(fluenceArray, xDim, yDim, zDim), yOffset);
+  return FluenceYOffsetPair::New(Volume::New(inputImage), yOffset);
 }

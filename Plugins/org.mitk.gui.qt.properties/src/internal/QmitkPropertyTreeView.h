@@ -1,26 +1,30 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QmitkPropertyTreeView_h
 #define QmitkPropertyTreeView_h
 
-#include <mitkDataNode.h>
-#include <mitkIRenderWindowPartListener.h>
-#include <QmitkAbstractView.h>
 #include <ui_QmitkPropertyTreeView.h>
+
+// mitk core module
+#include <mitkCoreServices.h>
+#include <mitkDataNode.h>
+
+// mitk gui common plugin
+#include <mitkIRenderWindowPartListener.h>
+
+// mitk gui qt common plugin
+#include <QmitkAbstractView.h>
+#include "QmitkSelectionServiceConnector.h"
 
 class QmitkPropertyItemDelegate;
 class QmitkPropertyItemModel;
@@ -38,6 +42,7 @@ class QmitkPropertyTreeView : public QmitkAbstractView, public mitk::IRenderWind
   Q_OBJECT
 
 public:
+
   static const std::string VIEW_ID;
 
   berryObjectMacro(QmitkPropertyTreeView);
@@ -51,16 +56,20 @@ public:
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart*) override;
 
 protected:
+
   void CreateQtPartControl(QWidget* parent) override;
 
 private:
+
+  void SetAsSelectionListener(bool checked);
+
   QString GetPropertyNameOrAlias(const QModelIndex& index);
-  void OnPreferencesChanged(const berry::IBerryPreferences* preferences) override;
-  void OnPropertyNameChanged(const itk::EventObject& event);
-  void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
+
+  void OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
   void HideAllIcons();
 
-private slots:
+private Q_SLOTS:
+
   void OnCurrentRowChanged(const QModelIndex& current, const QModelIndex& previous);
   void OnPropertyListChanged(int index);
   void OnAddNewProperty();
@@ -68,21 +77,19 @@ private slots:
   void OnModelReset();
 
 private:
-  QWidget* m_Parent;
-  unsigned long m_PropertyNameChangedTag;
+
   std::string m_SelectionClassName;
-  mitk::IPropertyAliases* m_PropertyAliases;
-  mitk::IPropertyDescriptions* m_PropertyDescriptions;
-  mitk::IPropertyPersistence* m_PropertyPersistence;
-  bool m_ShowAliasesInDescription;
-  bool m_ShowPersistenceInDescription;
-  bool m_DeveloperMode;
+  mitk::CoreServicePointer<mitk::IPropertyAliases> m_PropertyAliases;
+  mitk::CoreServicePointer<mitk::IPropertyDescriptions> m_PropertyDescriptions;
+  mitk::CoreServicePointer<mitk::IPropertyPersistence> m_PropertyPersistence;
   Ui::QmitkPropertyTreeView m_Controls;
   QmitkPropertyItemSortFilterProxyModel* m_ProxyModel;
   QmitkPropertyItemModel* m_Model;
   QmitkPropertyItemDelegate* m_Delegate;
   mitk::DataNode::Pointer m_SelectedNode;
   mitk::BaseRenderer* m_Renderer;
+
+  std::unique_ptr<QmitkSelectionServiceConnector> m_SelectionServiceConnector;
 };
 
 #endif

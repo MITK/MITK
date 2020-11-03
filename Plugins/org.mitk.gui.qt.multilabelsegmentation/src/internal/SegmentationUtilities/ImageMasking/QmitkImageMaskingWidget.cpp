@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkImageMaskingWidget.h"
 #include "../../Common/QmitkDataSelectionWidget.h"
@@ -38,8 +34,8 @@ QmitkImageMaskingWidget::QmitkImageMaskingWidget(mitk::SliceNavigationController
 {
   m_Controls.setupUi(this);
 
-  m_Controls.dataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::ImagePredicate);
-  m_Controls.dataSelectionWidget->AddDataStorageComboBox(QmitkDataSelectionWidget::MaskPredicate);
+  m_Controls.dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::ImagePredicate);
+  m_Controls.dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::MaskPredicate);
   m_Controls.dataSelectionWidget->SetHelpText(HelpText);
 
 //  mitk::IDataStorageService::Pointer service =
@@ -151,7 +147,7 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
   QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
 
   //create result image, get mask node and reference image
-  mitk::Image::Pointer resultImage(0);
+  mitk::Image::Pointer resultImage(nullptr);
   mitk::DataNode::Pointer maskingNode = dataSelectionWidget->GetSelection(1);
   mitk::Image::Pointer referenceImage = static_cast<mitk::Image*>(dataSelectionWidget->GetSelection(0)->GetData());
 
@@ -251,7 +247,7 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
 
 mitk::Image::Pointer QmitkImageMaskingWidget::MaskImage(mitk::Image::Pointer referenceImage, mitk::Image::Pointer maskImage )
 {
-  mitk::Image::Pointer resultImage(0);
+  mitk::Image::Pointer resultImage(nullptr);
 
   mitk::MaskImageFilter::Pointer maskFilter = mitk::MaskImageFilter::New();
   maskFilter->SetInput( referenceImage );
@@ -277,7 +273,7 @@ mitk::Image::Pointer QmitkImageMaskingWidget::MaskImage(mitk::Image::Pointer ref
   catch(itk::ExceptionObject& excpt)
   {
     MITK_ERROR << excpt.GetDescription();
-    return 0;
+    return nullptr;
   }
 
   resultImage = maskFilter->GetOutput();
@@ -301,7 +297,7 @@ mitk::Image::Pointer QmitkImageMaskingWidget::ConvertSurfaceToImage( mitk::Image
   catch(itk::ExceptionObject& excpt)
   {
     MITK_ERROR << excpt.GetDescription();
-    return 0;
+    return nullptr;
   }
 
   mitk::ProgressBar::GetInstance()->Progress();

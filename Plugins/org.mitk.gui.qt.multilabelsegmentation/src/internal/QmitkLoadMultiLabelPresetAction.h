@@ -1,50 +1,34 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
+============================================================================*/
 
-===================================================================*/
-#ifndef QMITK_QmitkLoadMultiLabelPresetAction_H
-#define QMITK_QmitkLoadMultiLabelPresetAction_H
+#ifndef QmitkLoadMultiLabelPresetAction_h
+#define QmitkLoadMultiLabelPresetAction_h
 
-#include "mitkIContextMenuAction.h"
+#include <mitkIContextMenuAction.h>
 
-#include "org_mitk_gui_qt_multilabelsegmentation_Export.h"
-
-#include "vector"
-#include "mitkDataNode.h"
-
-class MITK_QT_SEGMENTATION QmitkLoadMultiLabelPresetAction : public QObject, public mitk::IContextMenuAction
+class QmitkLoadMultiLabelPresetAction : public QObject, public mitk::IContextMenuAction
 {
   Q_OBJECT
   Q_INTERFACES(mitk::IContextMenuAction)
 
 public:
+  QmitkLoadMultiLabelPresetAction() = default;
+  ~QmitkLoadMultiLabelPresetAction() override = default;
 
-  QmitkLoadMultiLabelPresetAction();
-  virtual ~QmitkLoadMultiLabelPresetAction();
-
-  //interface methods
-  virtual void Run( const QList<mitk::DataNode::Pointer>& selectedNodes );
-  virtual void SetDataStorage(mitk::DataStorage* dataStorage);
-  virtual void SetFunctionality(berry::QtViewPart* functionality);
-  virtual void SetSmoothed(bool smoothed);
-  virtual void SetDecimated(bool decimated);
-
-private:
-
-  typedef QList<mitk::DataNode::Pointer> NodeList;
-
-  mitk::DataStorage::Pointer m_DataStorage;
+  void Run(const QList<mitk::DataNode::Pointer>& selectedNodes) override;
+  void SetDataStorage(mitk::DataStorage*) override;
+  void SetFunctionality(berry::QtViewPart*) override;
+  void SetSmoothed(bool) override;
+  void SetDecimated(bool) override;
 };
 
-#endif // QMITK_CreateMultiLabelSegmentation_H
+#endif

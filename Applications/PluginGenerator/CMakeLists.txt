@@ -1,5 +1,5 @@
 if (${CMAKE_SOURCE_DIR} EQUAL ${PROJECT_SOURCE_DIR})
-  cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
+  cmake_minimum_required(VERSION 3.14.5 FATAL_ERROR)
 endif()
 
 project(MitkPluginGenerator)
@@ -40,13 +40,9 @@ qt5_add_resources(src_files plugin_template.qrc project_template.qrc)
 
 set(exec_target ${PROJECT_NAME})
 add_executable(${exec_target} ${src_files})
+set_property(TARGET ${exec_target} PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Applications/PluginGenerator")
 
 target_link_libraries(${exec_target} Qt5::Core)
-
-if(NOT standalone_build)
-  # subproject support
-  add_dependencies(MITK-CoreUI ${exec_target})
-endif()
 
 #-----------------------------------------------------------------------------
 # Win32 Convenience
@@ -56,6 +52,7 @@ if(WIN32 AND NOT standalone_build)
   file(TO_NATIVE_PATH "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}" native_runtime_dir)
   add_custom_target(NewPlugin start "MITK PluginGenerator" /D "${native_runtime_dir}" cmd /K ${exec_target}.exe -h
                     DEPENDS ${exec_target})
+  set_property(TARGET NewPlugin PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Applications/PluginGenerator")
 endif()
 
 #-----------------------------------------------------------------------------

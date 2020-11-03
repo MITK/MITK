@@ -20,12 +20,6 @@ set(CPP_FILES
   DataManagement/mitkPlanarSubdivisionPolygon.cpp
   DataManagement/mitkPlanarRectangle.cpp
   DataManagement/mitkPlanarFigureControlPointStyleProperty.cpp
-  IO/mitkPlanarFigureIOFactory.cpp
-  IO/mitkPlanarFigureReader.cpp
-  IO/mitkPlanarFigureWriter.cpp
-  IO/mitkPlanarFigureWriterFactory.cpp
-  IO/mitkPlanarFigureSerializer.cpp
-  IO/mitkPlanarFigureSubclassesSerializer.cpp
   Interactions/mitkPlanarFigureInteractor.cpp
   Rendering/mitkPlanarFigureMapper2D.cpp
   Rendering/mitkPlanarFigureVtkMapper3D.cpp

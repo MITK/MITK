@@ -1,23 +1,25 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 //#define MBILOG_ENABLE_DEBUG
 
 #include "mitkTestDICOMLoading.h"
+#include "mitkDICOMIOMetaInformationPropertyConstants.h"
+#include "mitkDICOMProperty.h"
 
 #include <stack>
+
+#include <gdcmVersion.h>
+#include <dcmtk/config/osconfig.h>
+#include "itksys/SystemTools.hxx"
 
 mitk::TestDICOMLoading::TestDICOMLoading()
 :m_PreviousCLocale(nullptr)
@@ -71,6 +73,7 @@ mitk::TestDICOMLoading
   ImageList result;
 
   ClassicDICOMSeriesReader::Pointer reader = this->BuildDICOMReader();
+  reader->SetTagLookupTableToPropertyFunctor(mitk::GetDICOMPropertyForDICOMValuesFunctor);
   reader->SetInputFiles( files );
   reader->AnalyzeInputFiles();
   reader->PrintOutputs(std::cout,true);
@@ -122,6 +125,7 @@ mitk::TestDICOMLoading
 ::DecorateVerifyCachedImage( const StringList& files, mitk::Image::Pointer cachedImage )
 {
   ClassicDICOMSeriesReader::Pointer reader = this->BuildDICOMReader();
+  reader->SetTagLookupTableToPropertyFunctor(mitk::GetDICOMPropertyForDICOMValuesFunctor);
   reader->SetInputFiles( files );
   reader->AnalyzeInputFiles(); // This just creates a "tag cache and a nice DICOMImageBlockDescriptor.
                                // Both of these could also be produced in a different way. The only
@@ -259,9 +263,52 @@ mitk::TestDICOMLoading::DumpImageInformation( const Image* image )
     }
   }
 
+  // io dicom meta information
+  AddPropertyToDump(mitk::DICOMIOMetaInformationPropertyConstants::READER_CONFIGURATION(), image, result);
+  AddPropertyToDump(mitk::DICOMIOMetaInformationPropertyConstants::READER_FILES(), image, result);
+  AddPropertyToDump(mitk::DICOMIOMetaInformationPropertyConstants::READER_GANTRY_TILT_CORRECTED(), image, result);
+  AddPropertyToDump(mitk::DICOMIOMetaInformationPropertyConstants::READER_IMPLEMENTATION_LEVEL(), image, result);
+  AddPropertyToDump(mitk::DICOMIOMetaInformationPropertyConstants::READER_IMPLEMENTATION_LEVEL_STRING(), image, result);
+  AddPropertyToDump(mitk::DICOMIOMetaInformationPropertyConstants::READER_PIXEL_SPACING_INTERPRETATION(), image, result);
+  AddPropertyToDump(mitk::DICOMIOMetaInformationPropertyConstants::READER_PIXEL_SPACING_INTERPRETATION_STRING(), image, result);
+  AddPropertyToDump(mitk::DICOMIOMetaInformationPropertyConstants::READER_3D_plus_t(), image, result);
+  AddPropertyToDump(mitk::DICOMIOMetaInformationPropertyConstants::READER_DCMTK(), image, result);
+  AddPropertyToDump(mitk::DICOMIOMetaInformationPropertyConstants::READER_GDCM(), image, result);
+
   ResetUserLocale();
 
   return result.str();
+}
+
+void mitk::TestDICOMLoading::AddPropertyToDump(const mitk::PropertyKeyPath& key, const mitk::Image* image, std::stringstream& result)
+{
+  auto propKey = mitk::PropertyKeyPathToPropertyName(key);
+  auto prop = image->GetProperty(propKey.c_str());
+  if (prop.IsNotNull())
+  {
+    auto value = prop->GetValueAsString();
+    auto dicomProp = dynamic_cast< mitk::DICOMProperty*>(prop.GetPointer());
+    if (dicomProp != nullptr)
+    {
+      auto strippedProp = dicomProp->Clone();
+      if (key == mitk::DICOMIOMetaInformationPropertyConstants::READER_FILES())
+      {//strip dicom file information from path to ensure generalized dump files
+        auto timePoints = strippedProp->GetAvailableTimeSteps();
+        for (auto timePoint : timePoints)
+        {
+          auto slices = strippedProp->GetAvailableSlices(timePoint);
+          for (auto slice : slices)
+          {
+            auto value = strippedProp->GetValue(timePoint, slice);
+            value = itksys::SystemTools::GetFilenameName(value);
+            strippedProp->SetValue(timePoint, slice, value);
+          }
+        }
+      }
+      value = mitk::PropertyPersistenceSerialization::serializeTemporoSpatialStringPropertyToJSON(strippedProp);
+    }
+    result << propKey << ": " << value << "\n";
+  }
 }
 
 std::string
@@ -391,11 +438,27 @@ mitk::TestDICOMLoading::CompareImageInformationDumps( const std::string& referen
     if ( test.find(refKey) != test.end() )
     {
       const std::string& testValue = test[refKey];
+      if (refKey == mitk::PropertyKeyPathToPropertyName(mitk::DICOMIOMetaInformationPropertyConstants::READER_DCMTK()))
+      { //check dcmtk version always against the current version of the system
+        bool thisTestResult = testValue == std::string(" ") + PACKAGE_VERSION;
+        testResult &= thisTestResult;
 
-      bool thisTestResult = CompareSpacedValueFields( refValue, testValue );
-      testResult &= thisTestResult;
+        MITK_DEBUG << refKey << ": '" << PACKAGE_VERSION << "' == '" << testValue << "' ? " << (thisTestResult ? "YES" : "NO");
+      }
+      else if (refKey == mitk::PropertyKeyPathToPropertyName(mitk::DICOMIOMetaInformationPropertyConstants::READER_GDCM()))
+      {//check gdcm version always against the current version of the system
+        bool thisTestResult = testValue == std::string(" ") + gdcm::Version::GetVersion();
+        testResult &= thisTestResult;
 
-      MITK_DEBUG << refKey << ": '" << refValue << "' == '" << testValue << "' ? " << (thisTestResult?"YES":"NO");
+        MITK_DEBUG << refKey << ": '" << gdcm::Version::GetVersion() << "' == '" << testValue << "' ? " << (thisTestResult ? "YES" : "NO");
+      }
+      else
+      {
+        bool thisTestResult = CompareSpacedValueFields(refValue, testValue);
+        testResult &= thisTestResult;
+
+        MITK_DEBUG << refKey << ": '" << refValue << "' == '" << testValue << "' ? " << (thisTestResult ? "YES" : "NO");
+      }
     }
     else
     {
@@ -413,7 +476,21 @@ mitk::TestDICOMLoading::CompareImageInformationDumps( const std::string& referen
     const std::string& key = testIter->first;
     const std::string& value = testIter->second;
 
-    if ( reference.find(key) == reference.end() )
+    if (key == mitk::PropertyKeyPathToPropertyName(mitk::DICOMIOMetaInformationPropertyConstants::READER_DCMTK()))
+    {//check dcmtk version always against the current version of the system
+      bool thisTestResult = value == std::string(" ")+PACKAGE_VERSION;
+      testResult &= thisTestResult;
+
+      MITK_DEBUG << key << ": '" << PACKAGE_VERSION << "' == '" << value << "' ? " << (thisTestResult ? "YES" : "NO");
+    }
+    else if (key == mitk::PropertyKeyPathToPropertyName(mitk::DICOMIOMetaInformationPropertyConstants::READER_GDCM()))
+    {//check gdcm version always against the current version of the system
+      bool thisTestResult = value == std::string(" ") + gdcm::Version::GetVersion();
+      testResult &= thisTestResult;
+
+      MITK_DEBUG << key << ": '" << gdcm::Version::GetVersion() << "' == '" << value << "' ? " << (thisTestResult ? "YES" : "NO");
+    }
+    else if ( reference.find(key) == reference.end() )
     {
       MITK_ERROR << "Test dump contains an unexpected key'" << key << "' (value '" << value << "')." ;
       MITK_ERROR << "This key is not expected. Most probably you need to update your test data.";
@@ -459,18 +536,21 @@ mitk::TestDICOMLoading::ParseDump( const std::string& dump )
       // more indent than before
       expectedIndents.push(keyPosition);
     }
-    else if (keyPosition == expectedIndents.top() )
+    else 
     {
       if (!surroundingKeys.empty())
       {
         surroundingKeys.pop(); // last of same length
       }
-    }
-    else
-    {
-      // less indent than before
-      do expectedIndents.pop();
-      while (expectedIndents.top() != keyPosition); // unwind until current indent is found
+
+      while (expectedIndents.top() != keyPosition)
+      {
+        expectedIndents.pop();
+        if (!surroundingKeys.empty())
+        {
+          surroundingKeys.pop();
+        }
+      }; // unwind until current indent is found
     }
 
     if (!surroundingKeys.empty())

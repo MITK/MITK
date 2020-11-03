@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkXnatConnectionPreferencePage.h"
 #include "QmitkXnatTreeBrowserView.h"
@@ -40,7 +36,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 using namespace berry;
 
 QmitkXnatConnectionPreferencePage::QmitkXnatConnectionPreferencePage()
-  : m_Control(0)
+  : m_Control(nullptr)
 {
 }
 
@@ -65,7 +61,7 @@ void QmitkXnatConnectionPreferencePage::CreateQtControl(QWidget* parent)
     session = mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetService(
           mitk::org_mitk_gui_qt_xnatinterface_Activator::GetXnatModuleContext()->GetServiceReference<ctkXnatSession>());
   }
-  catch (std::invalid_argument)
+  catch (std::invalid_argument&)
   {
     session = nullptr;
   }

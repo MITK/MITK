@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkFileReaderOptionsDialog.h"
 #include "ui_QmitkFileReaderOptionsDialog.h"
@@ -28,7 +24,6 @@ QmitkFileReaderOptionsDialog::QmitkFileReaderOptionsDialog(mitk::IOUtil::LoadInf
 
   m_ReaderItems = loadInfo.m_ReaderSelector.Get();
 
-  bool hasOptions = false;
   int selectedIndex = 0;
   long selectedReaderId = loadInfo.m_ReaderSelector.GetSelectedId();
   int i = 0;
@@ -41,7 +36,6 @@ QmitkFileReaderOptionsDialog::QmitkFileReaderOptionsDialog(mitk::IOUtil::LoadInf
     mitk::IFileReader::Options options = iter->GetReader()->GetOptions();
     if (!options.empty())
     {
-      hasOptions = true;
     }
     ui->m_StackedOptionsWidget->addWidget(new QmitkFileReaderWriterOptionsWidget(options));
     if (iter->GetServiceId() == selectedReaderId)
@@ -49,12 +43,9 @@ QmitkFileReaderOptionsDialog::QmitkFileReaderOptionsDialog(mitk::IOUtil::LoadInf
       selectedIndex = i;
     }
   }
-  ui->m_ReaderComboBox->setCurrentIndex(selectedIndex);
 
-  if (!hasOptions)
-  {
-    ui->m_OptionsBox->setVisible(false);
-  }
+  connect(ui->m_ReaderComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(SetCurrentReader(int)));
+  ui->m_ReaderComboBox->setCurrentIndex(selectedIndex);
 
   if (m_ReaderItems.size() < 2)
   {
@@ -67,12 +58,20 @@ QmitkFileReaderOptionsDialog::QmitkFileReaderOptionsDialog(mitk::IOUtil::LoadInf
     ui->m_FilePathLabel->setText(QString("for %1").arg(QString::fromStdString(loadInfo.m_Path)));
   }
 
+  ui->m_OptionsBox->setVisible(!qobject_cast<QmitkFileReaderWriterOptionsWidget*>(ui->m_StackedOptionsWidget->currentWidget())->GetOptions().empty());
+
   this->setWindowTitle("File reading options");
 }
 
 QmitkFileReaderOptionsDialog::~QmitkFileReaderOptionsDialog()
 {
   delete ui;
+}
+
+void QmitkFileReaderOptionsDialog::SetCurrentReader(int index)
+{
+  ui->m_StackedOptionsWidget->setCurrentIndex(index);
+  ui->m_OptionsBox->setVisible(!qobject_cast<QmitkFileReaderWriterOptionsWidget*>(ui->m_StackedOptionsWidget->currentWidget())->GetOptions().empty());
 }
 
 bool QmitkFileReaderOptionsDialog::ReuseOptions() const

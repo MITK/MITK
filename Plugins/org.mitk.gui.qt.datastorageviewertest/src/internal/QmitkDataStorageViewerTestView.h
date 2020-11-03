@@ -1,32 +1,25 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical Image Computing.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QMITKDATASTORAGEVIEWERTESTVIEW_H
 #define QMITKDATASTORAGEVIEWERTESTVIEW_H
+
+// data storage viewer test plugin
+#include "ui_QmitkDataStorageViewerTestControls.h"
 
 // mitk gui qt common plugin
 #include <QmitkAbstractView.h>
 #include "QmitkModelViewSelectionConnector.h"
 #include "QmitkSelectionServiceConnector.h"
-
-// data storage viewer test plugin
-#include "ui_QmitkDataStorageViewerTestControls.h"
-
-// qt widgets module
-#include "QmitkDataStorageDefaultListModel.h"
 
 /**
 * @brief DataStorageViewerTestView
@@ -41,9 +34,9 @@ public:
 
 protected:
 
-  virtual void SetFocus() override;
+  void SetFocus() override;
 
-  virtual void CreateQtPartControl(QWidget* parent) override;
+  void CreateQtPartControl(QWidget* parent) override;
 
 private Q_SLOTS:
 
@@ -56,17 +49,16 @@ private Q_SLOTS:
   void SetAsSelectionListener3(bool checked);
   void SetAsSelectionListener4(bool checked);
 
-  void OnOnlyImages(bool checked);
+  void OnOnlyImages1(bool checked);
   void OnOnlyImages2(bool checked);
+  void OnOnlyUneven(bool checked);
 
 private:
 
   Ui::QmitkDataStorageViewerTestControls m_Controls;
-  QmitkDataStorageDefaultListModel* m_DataStorageDefaultListModel;
-  QmitkDataStorageDefaultListModel* m_DataStorageDefaultListModel2;
 
-  std::unique_ptr<QmitkModelViewSelectionConnector> m_ModelViewSelectionConnector;
-  std::unique_ptr<QmitkSelectionServiceConnector> m_SelectionServiceConnector;
+  std::unique_ptr<QmitkModelViewSelectionConnector> m_ModelViewSelectionConnector1;
+  std::unique_ptr<QmitkSelectionServiceConnector> m_SelectionServiceConnector1;
   std::unique_ptr<QmitkModelViewSelectionConnector> m_ModelViewSelectionConnector2;
   std::unique_ptr<QmitkSelectionServiceConnector> m_SelectionServiceConnector2;
 

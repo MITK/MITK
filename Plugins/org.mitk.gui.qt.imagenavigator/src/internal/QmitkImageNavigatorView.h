@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef _QMITKIMAGENAVIGATORVIEW_H_INCLUDED
 #define _QMITKIMAGENAVIGATORVIEW_H_INCLUDED
@@ -81,6 +77,7 @@ protected:
   void SetStepSize(int axis);
   void SetStepSize(int axis, double stepSize);
   int  GetClosestAxisIndex(mitk::Vector3D normal);
+  void SetVisibilityOfTimeSlider(std::size_t timeSteps);
 
   Ui::QmitkImageNavigatorViewControls m_Controls;
 

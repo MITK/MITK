@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef MITKRENDERWINDOWLAYERCONTROLLER_H
 #define MITKRENDERWINDOWLAYERCONTROLLER_H
@@ -88,6 +84,14 @@ namespace mitk
     * @post After a successful call, the "fixedLayer" and "visibility" property will be false and the "layer" property will be deleted.
     */
     void RemoveLayerNode(DataNode* dataNode, const BaseRenderer* renderer = nullptr);
+    /**
+    * @brief Move the data node to the given layer. This will change only the "layer" property.
+    *
+    * @param dataNode   The data node that should be moved.
+    * @param renderer   Pointer to the renderer instance for which the data node should be moved.
+    *                   If it is a nullptr (default) all controlled renderer will be affected.
+    */
+    bool MoveNodeToPosition(DataNode* dataNode, int newLayer, const BaseRenderer* renderer = nullptr);
     /**
     * @brief Set the node in the given renderer as the topmost layer. This will change only the "layer" property.
     *

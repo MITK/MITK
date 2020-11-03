@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "mitkProportionalTimeGeometryToXML.h"
 
@@ -98,7 +94,7 @@ mitk::ProportionalTimeGeometry::Pointer mitk::ProportionalTimeGeometryToXML::Fro
       stepDuration = std::numeric_limits<TimePointType>::infinity();
     }
   }
-  catch (boost::bad_lexical_cast &e)
+  catch ( const boost::bad_lexical_cast &e )
   {
     MITK_ERROR << "Could not parse string as number: " << e.what();
     return nullptr;

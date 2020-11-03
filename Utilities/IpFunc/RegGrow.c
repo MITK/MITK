@@ -1,48 +1,42 @@
-/*****************************************************************************
+/*============================================================================
 
- Copyright (c) 1993-2000,  Div. Medical and Biological Informatics, 
- Deutsches Krebsforschungszentrum, Heidelberg, Germany
+ Copyright (c) German Cancer Research Center (DKFZ)
  All rights reserved.
 
- Redistribution and use in source and binary forms, with or without 
+ Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
 
  - Redistributions of source code must retain the above copyright notice, this
    list of conditions and the following disclaimer.
 
- - Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+ - Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
- - All advertising materials mentioning features or use of this software must 
-   display the following acknowledgement: 
-          
-     "This product includes software developed by the Div. Medical and 
-      Biological Informatics, Deutsches Krebsforschungszentrum, Heidelberg, 
-      Germany."
+ - All advertising materials mentioning features or use of this software must
+   display the following acknowledgement:
 
- - Neither the name of the Deutsches Krebsforschungszentrum nor the names of 
-   its contributors may be used to endorse or promote products derived from 
-   this software without specific prior written permission. 
+     "This product includes software developed by the German Cancer Research
+      Center (DKFZ)."
 
-   THIS SOFTWARE IS PROVIDED BY THE DIVISION MEDICAL AND BIOLOGICAL
-   INFORMATICS AND CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED
-   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-   OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-   IN NO EVENT SHALL THE DIVISION MEDICAL AND BIOLOGICAL INFORMATICS,
-   THE DEUTSCHES KREBSFORSCHUNGSZENTRUM OR CONTRIBUTORS BE LIABLE FOR 
-   ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-   DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE 
-   GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER 
-   IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
-   OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN 
-   IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ - Neither the name of the German Cancer Research Center (DKFZ) nor the names
+   of its contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
 
- Send comments and/or bug reports to:
-   mbi-software@dkfz-heidelberg.de
+   THIS SOFTWARE IS PROVIDED BY THE GERMAN CANCER RESEARCH CENTER (DKFZ) AND
+   CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+   BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+   FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE GERMAN
+   CANCER RESEARCH CENTER (DKFZ) OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+   INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+   SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+   OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+   DAMAGE.
 
-*****************************************************************************/
+============================================================================*/
 
 /**@file
  *  this function performs a region growing by mean and standard deviation.
@@ -50,13 +44,13 @@
 
 /** @brief performs a region growing by mean and standard deviation.
  *
- *  The growing criteria is, that the new pixels greyvalue must be in the       
+ *  The growing criteria is, that the new pixels greyvalue must be in the
  *  standard deviation of the seed region.
  *  After calculating the mean and standard deviation of the seed region, all
- *  pixels of this region are investigated whether they belong to a region  
- *  or not. All accepted pixels are marked with a region_label. In the next 
+ *  pixels of this region are investigated whether they belong to a region
+ *  or not. All accepted pixels are marked with a region_label. In the next
  *  step the neigbours of all accepted pixels are investigated whether they
- *  belong to the region or to the border or to none of them. At the end all 
+ *  belong to the region or to the border or to none of them. At the end all
  *  pixels which belong to the boder (which contains the first pixel of the
  *  outside region) are marked.
  *
@@ -101,7 +95,7 @@
  */
 
 /* include files                                                              */
- 
+
 #include "mitkIpFuncP.h"
 
 mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
@@ -110,18 +104,18 @@ mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
                                  mitkIpUInt4_t       *end_seed,
                                  mitkIpUInt4_t       border_label,
                                  mitkIpUInt4_t       region_label,
-                                 mitkIpFloat8_t      std_fact,  
+                                 mitkIpFloat8_t      std_fact,
                                  mitkIpUInt4_t       kind ) ;
 
 #ifndef DOXYGEN_IGNORE
 
 
 #ifndef lint
-  static char *what = { "@(#)????????\t\tDKFZ (Dept. MBI)\t"__DATE__ };
+  static char *what = { "@(#)????????\t\tGerman Cancer Research Center (DKFZ)\t"__DATE__ };
 #endif
 
 /* include files                                                              */
- 
+
 #include "mitkIpFuncP.h"
 
 /* definition of macros                                                       */
@@ -359,7 +353,7 @@ mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
 /*
 ** mitkIpFuncRegGrow
 */
-/* -------------------------------------------------------------------------- */ 
+/* -------------------------------------------------------------------------- */
 
 mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
                                  mitkIpUInt4_t       dim_seed,
@@ -367,8 +361,8 @@ mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
                                  mitkIpUInt4_t       *end_seed,
                                  mitkIpUInt4_t       border_label,
                                  mitkIpUInt4_t       region_label,
-                                 mitkIpFloat8_t      std_fact,  
-                                 mitkIpUInt4_t       kind ) 
+                                 mitkIpFloat8_t      std_fact,
+                                 mitkIpUInt4_t       kind )
 {
   mitkIpPicDescriptor *pic_new;           /* pointer to new image                */
   mitkIpUInt4_t        i;                     /* loop index                          */
@@ -380,7 +374,7 @@ mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
   mitkIpInt4_t         offset_v;              /* offset                              */
   mitkIpInt4_t         *off_vekt;         /* offsets of all neighbour pixels     */
   mitkIpUInt4_t        no_neigh;          /* number of neighbour pixels          */
-  
+
   /* parameters of seed region                                               */
 
   mitkIpFloat8_t       mean;              /* mean of greyvalues in seed region   */
@@ -400,10 +394,10 @@ mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
   mitkIpUInt4_t        *next;             /* offsets of acc. pixels for next step*/
   mitkIpUInt4_t        *help;             /*                                     */
   mitkIpUInt4_t        *border;           /* offsets of all border pixels        */
-  
+
   /* check image data                                                        */
 
-  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );               
+  if ( _mitkIpFuncError ( pic_old ) != mitkIpFuncOK ) return ( mitkIpFuncERROR );
 
   /* check parameters                                                        */
 
@@ -411,7 +405,7 @@ mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
   for ( i = 0; i < dim_seed; i++ )
     {
        if ( end_seed[i] <= beg_seed[i] || end_seed[i] > pic_old->n[i] ||
-            beg_seed[i] < 0 )           
+            beg_seed[i] < 0 )
          {
             _mitkIpFuncSetErrno ( mitkIpFuncDATA_ERROR );
             return ( mitkIpFuncERROR );
@@ -420,18 +414,18 @@ mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
 
   /* allocate vectors                                                        */
 
-  no_neigh = ( mitkIpUInt4_t ) pow ( 3., pic_old->dim );        
+  no_neigh = ( mitkIpUInt4_t ) pow ( 3., pic_old->dim );
 
   off_vekt = malloc ( no_neigh * sizeof ( mitkIpInt4_t ) );
-  if ( off_vekt == NULL ) 
-    { 
+  if ( off_vekt == NULL )
+    {
        _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
-  
+
   acpt = malloc ( _mitkIpPicElements ( pic_old ) * sizeof ( mitkIpUInt4_t ) );
-  if ( acpt == NULL ) 
-    { 
+  if ( acpt == NULL )
+    {
        free ( off_vekt );
        _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
@@ -439,7 +433,7 @@ mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
 
   next = malloc ( _mitkIpPicElements ( pic_old ) * sizeof ( mitkIpUInt4_t ) );
   if ( next == NULL )
-    { 
+    {
        free ( off_vekt );
        free ( acpt );
        _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
@@ -448,8 +442,8 @@ mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
 
   /*
   help = malloc ( _mitkIpPicElements ( pic_old ) * sizeof ( mitkIpUInt4_t ) );
-  if ( help == NULL ) 
-    { 
+  if ( help == NULL )
+    {
        free ( off_vekt );
        free ( acpt );
        free ( next );
@@ -459,20 +453,20 @@ mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
   */
 
   border = malloc ( _mitkIpPicElements ( pic_old ) * sizeof ( mitkIpUInt4_t ) );
-  if ( border == NULL ) 
-    { 
+  if ( border == NULL )
+    {
        free ( off_vekt );
        free ( acpt );
        free ( next );
        _mitkIpFuncSetErrno ( mitkIpFuncMALLOC_ERROR );
        return ( mitkIpFuncERROR );
     }
-  
+
   /* allocate pic_new and initialize it to zero                              */
 
   pic_new = mitkIpPicCopyHeader ( pic_old, NULL );
-  if ( pic_new == NULL ) 
-    { 
+  if ( pic_new == NULL )
+    {
        free ( off_vekt );
        free ( acpt );
        free ( next );
@@ -481,8 +475,8 @@ mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
        return ( mitkIpFuncERROR );
     }
   pic_new->data = calloc ( _mitkIpPicElements (pic_new), pic_new->bpe / 8 );
-  if ( pic_new->data == NULL ) 
-    { 
+  if ( pic_new->data == NULL )
+    {
        free ( off_vekt );
        free ( acpt );
        free ( next );
@@ -495,7 +489,7 @@ mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
   /* initialize variables and vectors                                        */
 
   size[0] = 1;
-  for ( i = 1; i < pic_old->dim; i++ ) 
+  for ( i = 1; i < pic_old->dim; i++ )
     size[i] = size[i-1] * pic_old->n[i-1];
   for ( i = pic_old->dim; i < _mitkIpPicNDIM; i++ )
     size[i] = 0;
@@ -505,11 +499,11 @@ mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
         beg[i] = ( i < pic_old->n[i] ) ? -1 : 0 ;
         end[i] = ( i < pic_old->n[i] ) ?  2 : 1 ;
     }
-  
+
   acpt_len = 0;
   next_len = 0;
   border_len = 0;
-   
+
   /* calculate offset vector                                                 */
 
   offset_v = 0;
@@ -534,7 +528,7 @@ mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
               for ( ind[1] = beg[1]; ind[1] < end[1]; ind[1]++ )
               {
                 off[1] = size[1] * ind[1] + off[2];
-                off[0] = off[1] + beg[0]; 
+                off[0] = off[1] + beg[0];
                 for ( ind[0] = beg[0]; ind[0] < end[0]; ind[0]++ )
                 {
                   off_vekt[offset_v] = off[0];
@@ -552,7 +546,7 @@ mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
   /* calculate parameters of seed region                                     */
 
   size_seed = 1;
-   
+
   for ( i = 0; i < dim_seed; i++ )
     {
        beg[i] = beg_seed[i];
@@ -565,16 +559,16 @@ mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
        beg[i] = 0;
        end[i] = 1;
     }
-  
+
   mitkIpPicFORALL_6 ( STAT, pic_old, pic_new, mean, std_win, size_seed, beg, end );
 
   /* find accepted pixels in seed region                                     */
- 
+
   mitkIpPicFORALL_5 ( ACPT, pic_old, pic_new, acpt, acpt_len, region_label, std_win );
 
   /* region growing                                                          */
 
-  mitkIpPicFORALL_6 ( REGGROW, pic_old, pic_new, acpt, acpt_len, 
+  mitkIpPicFORALL_6 ( REGGROW, pic_old, pic_new, acpt, acpt_len,
                   border, border_len, std_win );
 
   /* free memory                                                             */
@@ -584,16 +578,16 @@ mitkIpPicDescriptor *mitkIpFuncRegGrow ( mitkIpPicDescriptor *pic_old,
   free ( next );
  /* free ( help );*/
   free ( border );
- 
+
   /* Copy Tags */
 
   strncpy( pic_new->info->version, pic_old->info->version, _mitkIpPicTAGLEN );
   pic_new->info->tags_head = _mitkIpPicCloneTags( pic_old->info->tags_head );
   pic_new->info->write_protect = pic_old->info->write_protect;
-                        
+
   return ( pic_new );
-  
+
 }
-                             
-#endif                             
+
+#endif
 

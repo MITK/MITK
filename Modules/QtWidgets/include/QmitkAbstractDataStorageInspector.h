@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical Image Computing.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef QMITKABSTRACTDATASTORAGEINSPECTOR_H
 #define QMITKABSTRACTDATASTORAGEINSPECTOR_H
@@ -31,7 +27,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 class QAbstractItemVew;
 
 /**
-* @brief This abstract class is a convinient base class for easy implementation of widgets that
+* @brief This abstract class is a convenient base class for easy implementation of widgets that
 * offer a specific view onto a given DataStorage instance to inspect its contents.
 * One may also get the selection in this inspector of the data storage.
 */
@@ -40,7 +36,8 @@ class MITKQTWIDGETS_EXPORT QmitkAbstractDataStorageInspector : public QWidget
   Q_OBJECT
 
 public:
-  virtual ~QmitkAbstractDataStorageInspector();
+
+  ~QmitkAbstractDataStorageInspector() override;
 
   /**
   * @brief Sets the data storage that will be used /monitored by the widget.
@@ -54,9 +51,9 @@ public:
   *
   * @param nodePredicate    A pointer to node predicate.
   */
-  virtual void SetNodePredicate(mitk::NodePredicateBase* nodePredicate);
+  virtual void SetNodePredicate(const mitk::NodePredicateBase* nodePredicate);
 
-  mitk::NodePredicateBase* GetNodePredicate() const;
+  const mitk::NodePredicateBase* GetNodePredicate() const;
 
   using NodeList = QList<mitk::DataNode::Pointer>;
 
@@ -71,6 +68,7 @@ public:
   bool GetSelectOnlyVisibleNodes() const;
 
   using SelectionMode = QAbstractItemView::SelectionMode;
+
   /** Sets the selection mode of the inspector.*/
   virtual void SetSelectionMode(SelectionMode mode) = 0;
   virtual SelectionMode GetSelectionMode() const = 0;
@@ -120,7 +118,7 @@ protected:
   virtual void Initialize() = 0;
 
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
-  mitk::NodePredicateBase::Pointer m_NodePredicate;
+  mitk::NodePredicateBase::ConstPointer m_NodePredicate;
 
   std::unique_ptr<QmitkModelViewSelectionConnector> m_Connector;
 

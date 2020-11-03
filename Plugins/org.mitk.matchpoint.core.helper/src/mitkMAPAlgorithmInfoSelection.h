@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #ifndef _MITK_MAP_ALGORITHM_INFO_SELECTION_H
 #define _MITK_MAP_ALGORITHM_INFO_SELECTION_H
@@ -27,8 +23,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 namespace mitk {
 
 /**
- * @class Used by plugins to communicate selections of deployed algorithms
- * E.G. used by the algorithm browser to inform about the currently selected algorithm.
+ * \brief Used by plugins to communicate selections of deployed algorithms
+ *
+ * For example used by the algorithm browser to inform about the currently selected algorithm.
  */
 class MITK_MATCHPOINT_CORE_HELPER_EXPORT MAPAlgorithmInfoSelection : public virtual berry::IStructuredSelection
 {
@@ -44,22 +41,22 @@ public:
   MAPAlgorithmInfoSelection(AlgorithmInfoType::ConstPointer info);
   MAPAlgorithmInfoSelection(const AlgorithmInfoVectorType& infos);
 
-  virtual Object::Pointer GetFirstElement() const;
-  virtual iterator Begin() const;
-  virtual iterator End() const;
+  Object::Pointer GetFirstElement() const override;
+  iterator Begin() const override;
+  iterator End() const override;
 
-  virtual int Size() const;
+  int Size() const override;
 
-  virtual ContainerType::Pointer ToVector() const;
+  ContainerType::Pointer ToVector() const override;
 
   AlgorithmInfoVectorType GetSelectedAlgorithmInfo() const;
 
   /**
    * @see berry::ISelection::IsEmpty()
    */
-  bool IsEmpty() const;
+  bool IsEmpty() const override;
 
-  bool operator==(const berry::Object* obj) const;
+  bool operator==(const berry::Object* obj) const override;
 
 protected:
 

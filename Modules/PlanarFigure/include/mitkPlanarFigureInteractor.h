@@ -1,21 +1,17 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
+============================================================================*/
 
-===================================================================*/
-
-#ifndef MITKPLANARFIGUREINTERACTOR_H_HEADER_INCLUDED
-#define MITKPLANARFIGUREINTERACTOR_H_HEADER_INCLUDED
+#ifndef MITKPLANARFIGUREINTERACTOR_H
+#define MITKPLANARFIGUREINTERACTOR_H
 
 #include <MitkPlanarFigureExports.h>
 
@@ -61,10 +57,11 @@ namespace mitk
   {
   public:
     mitkClassMacro(PlanarFigureInteractor, DataInteractor);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    itkFactorylessNewMacro(Self);
+    itkCloneMacro(Self);
 
-      /** \brief Sets the amount of precision */
-      void SetPrecision(ScalarType precision);
+    /** \brief Sets the amount of precision */
+    void SetPrecision(ScalarType precision);
 
     /** \brief Sets the minimal distance between two control points. */
     void SetMinimumPointDistance(ScalarType minimumDistance);
@@ -194,11 +191,7 @@ namespace mitk
 
     /** \brief True if the mouse is currently hovering over the image. */
     bool m_IsHovering;
-
-    bool m_LastPointWasValid;
-
-    // mitk::PlanarFigure::Pointer m_PlanarFigure;
   };
 }
 
-#endif // MITKPLANARFIGUREINTERACTOR_H_HEADER_INCLUDED
+#endif // MITKPLANARFIGUREINTERACTOR_H

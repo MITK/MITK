@@ -1,85 +1,55 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
+============================================================================*/
 
-===================================================================*/
-
+// Testing
+#include "mitkTestFixture.h"
+#include "mitkTestingMacros.h"
+// std includes
+#include <string>
+// MITK includes
 #include "mitkUIDGenerator.h"
 #include <mitkLogMacros.h>
+#include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
-void newGeneratorInstancesHeapTest()
+class mitkUIDGeneratorTestSuite : public mitk::TestFixture
 {
-  auto uidGen1 = new mitk::UIDGenerator("UID_", 8);
-  mitk::UIDGenerator *uidGen2 = uidGen1;
-  std::string uid1_1, uid2_1;
+  CPPUNIT_TEST_SUITE(mitkUIDGeneratorTestSuite);
+  MITK_TEST(UIDGeneratorInstanceRenewalSucceed);
+  MITK_TEST(UIDGeneratorMultipleInstancesSucceed);
 
-  uid1_1 = uidGen1->GetUID();
+  CPPUNIT_TEST_SUITE_END();
 
-  uidGen1 = new mitk::UIDGenerator("UID_", 8);
+  void UIDGeneratorInstanceRenewalSucceed()
+  {
+    mitk::UIDGenerator uidGen1("UID_");
+    auto uid1_1 = uidGen1.GetUID();
 
-  uid2_1 = uidGen1->GetUID();
+    uidGen1 = mitk::UIDGenerator("UID_");
+    auto uid2_1 = uidGen1.GetUID();
 
-  delete uidGen1;
-  delete uidGen2;
+    CPPUNIT_ASSERT_MESSAGE("Different UIDs are not allowed to be equal", uid1_1 != uid2_1);
+  }
 
-  MITK_TEST_CONDITION(uid1_1 != uid2_1, "Different UIDs are not allowed to be equal");
-}
+  void UIDGeneratorMultipleInstancesSucceed()
+  {
+    mitk::UIDGenerator uidGen1("UID_");
+    mitk::UIDGenerator uidGen2("UID_");
 
-void multipleUIDsFromSameGeneratorTest(int /*UIDlength*/)
-{
-  auto uidGen = new mitk::UIDGenerator("UID_", 8);
-  std::string uid1, uid2;
-  uid1 = uidGen->GetUID();
-  uid2 = uidGen->GetUID();
-  delete uidGen;
-  MITK_TEST_CONDITION(uid1 != uid2,
-                      "Testing two UIDs from the same generator. Different UIDs are not allowed to be equal");
-}
+    auto uid1_1 = uidGen1.GetUID();
+    auto uid2_1 = uidGen2.GetUID();
 
-void newGeneratorInstancesTest()
-{
-  mitk::UIDGenerator uidGen1("UID_", 8);
-  std::string uid1_1, uid2_1;
+    CPPUNIT_ASSERT_MESSAGE("Different UIDs are not allowed to be equal", uid1_1 != uid2_1);
+  }
+};
 
-  uid1_1 = uidGen1.GetUID();
-
-  uidGen1 = mitk::UIDGenerator("UID_", 8);
-
-  uid2_1 = uidGen1.GetUID();
-
-  MITK_TEST_CONDITION(uid1_1 != uid2_1, "Different UIDs are not allowed to be equal");
-}
-
-void severalGeneratorInstancesTest()
-{
-  mitk::UIDGenerator uidGen1("UID_", 8);
-  mitk::UIDGenerator uidGen2("UID_", 8);
-  std::string uid1_1, uid2_1;
-
-  uid1_1 = uidGen1.GetUID();
-  uid2_1 = uidGen2.GetUID();
-
-  MITK_TEST_CONDITION(uid1_1 != uid2_1, "Different UIDs are not allowed to be equal");
-}
-
-int mitkUIDGeneratorTest(int /*argc*/, char * /*argv*/ [])
-{
-  MITK_TEST_BEGIN("mitkUIDGeneratorTest");
-  severalGeneratorInstancesTest();
-  newGeneratorInstancesTest();
-  newGeneratorInstancesHeapTest();
-  multipleUIDsFromSameGeneratorTest(8);
-  multipleUIDsFromSameGeneratorTest(16);
-  MITK_TEST_END();
-}
+MITK_TEST_SUITE_REGISTRATION(mitkUIDGenerator)

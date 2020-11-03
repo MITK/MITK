@@ -1,18 +1,14 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include "QmitkSlicesInterpolator.h"
 
@@ -173,13 +169,13 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget *parent, const char * /
   m_3DContourNode->SetProperty("3DContourContainer", mitk::BoolProperty::New(true));
   m_3DContourNode->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
   m_3DContourNode->SetVisibility(
+    false, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget0")));
+  m_3DContourNode->SetVisibility(
     false, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")));
   m_3DContourNode->SetVisibility(
     false, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2")));
   m_3DContourNode->SetVisibility(
     false, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")));
-  m_3DContourNode->SetVisibility(
-    false, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
 
   QWidget::setContentsMargins(0, 0, 0, 0);
   if (QWidget::layout() != nullptr)
@@ -264,7 +260,7 @@ void QmitkSlicesInterpolator::Initialize(mitk::ToolManager *toolManager,
     {
       // Has to be initialized
       m_LastSNC = slicer;
-      m_TimeStep.insert(slicer, slicer->GetTime()->GetPos());
+      m_TimePoints.insert(slicer, slicer->GetSelectedTimePoint());
 
       itk::MemberCommand<QmitkSlicesInterpolator>::Pointer deleteCommand =
         itk::MemberCommand<QmitkSlicesInterpolator>::New();
@@ -503,9 +499,10 @@ void QmitkSlicesInterpolator::OnTimeChanged(itk::Object *sender, const itk::Even
   mitk::SliceNavigationController *slicer = dynamic_cast<mitk::SliceNavigationController *>(sender);
   Q_ASSERT(slicer);
 
-  m_TimeStep[slicer] = slicer->GetTime()->GetPos();
+  const auto timePoint = slicer->GetSelectedTimePoint();
+  m_TimePoints[slicer] = timePoint;
 
-  m_SurfaceInterpolator->SetCurrentTimeStep(slicer->GetTime()->GetPos());
+  m_SurfaceInterpolator->SetCurrentTimePoint(timePoint);
 
   if (m_LastSNC == slicer)
   {
@@ -539,17 +536,17 @@ bool QmitkSlicesInterpolator::TranslateAndInterpolateChangedSlice(const itk::Eve
       dynamic_cast<const mitk::SliceNavigationController::GeometrySliceEvent &>(e);
 
     mitk::TimeGeometry *tsg = event.GetTimeGeometry();
-    if (tsg && m_TimeStep.contains(slicer))
+    if (tsg && m_TimePoints.contains(slicer) && tsg->IsValidTimePoint(m_TimePoints[slicer]))
     {
       mitk::SlicedGeometry3D *slicedGeometry =
-        dynamic_cast<mitk::SlicedGeometry3D *>(tsg->GetGeometryForTimeStep(m_TimeStep[slicer]).GetPointer());
+        dynamic_cast<mitk::SlicedGeometry3D *>(tsg->GetGeometryForTimePoint(m_TimePoints[slicer]).GetPointer());
       if (slicedGeometry)
       {
         m_LastSNC = slicer;
         mitk::PlaneGeometry *plane =
           dynamic_cast<mitk::PlaneGeometry *>(slicedGeometry->GetPlaneGeometry(event.GetPos()));
         if (plane)
-          Interpolate(plane, m_TimeStep[slicer], slicer);
+          Interpolate(plane, m_TimePoints[slicer], slicer);
         return true;
       }
     }
@@ -563,7 +560,7 @@ bool QmitkSlicesInterpolator::TranslateAndInterpolateChangedSlice(const itk::Eve
 }
 
 void QmitkSlicesInterpolator::Interpolate(mitk::PlaneGeometry *plane,
-                                          unsigned int timeStep,
+                                          mitk::TimePointType timePoint,
                                           mitk::SliceNavigationController *slicer)
 {
   if (m_ToolManager)
@@ -574,6 +571,13 @@ void QmitkSlicesInterpolator::Interpolate(mitk::PlaneGeometry *plane,
       m_Segmentation = dynamic_cast<mitk::Image *>(node->GetData());
       if (m_Segmentation)
       {
+        if (!m_Segmentation->GetTimeGeometry()->IsValidTimePoint(timePoint))
+        {
+          MITK_WARN << "Cannot interpolate segmentation. Passed time point is not within the time bounds of WorkingImage. Time point: " << timePoint;
+          return;
+        }
+        const auto timeStep = m_Segmentation->GetTimeGeometry()->TimePointToTimeStep(timePoint);
+
         int clickedSliceDimension(-1);
         int clickedSliceIndex(-1);
 
@@ -598,7 +602,7 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
 
   if (interpolatedSurface.IsNotNull() && workingNode &&
       workingNode->IsVisible(
-        mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))))
+        mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2"))))
   {
     m_BtnApply3D->setEnabled(true);
     m_BtnSuggestPlane->setEnabled(true);
@@ -650,13 +654,20 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
     reslice->SetOverwriteMode(true);
     reslice->Modified();
 
+    const auto timePoint = m_LastSNC->GetSelectedTimePoint();
+    if (!m_Segmentation->GetTimeGeometry()->IsValidTimePoint(timePoint))
+    {
+      MITK_WARN << "Cannot accept interpolation. Time point selected by SliceNavigationController is not within the time bounds of segmentation. Time point: " << timePoint;
+      return;
+    }
+
     mitk::ExtractSliceFilter::Pointer extractor = mitk::ExtractSliceFilter::New(reslice);
     extractor->SetInput(m_Segmentation);
-    unsigned int timestep = m_LastSNC->GetTime()->GetPos();
-    extractor->SetTimeStep(timestep);
+    const auto timeStep = m_Segmentation->GetTimeGeometry()->TimePointToTimeStep(timePoint);
+    extractor->SetTimeStep(timeStep);
     extractor->SetWorldGeometry(m_LastSNC->GetCurrentPlaneGeometry());
     extractor->SetVtkOutputRequest(true);
-    extractor->SetResliceTransformByGeometry(m_Segmentation->GetTimeGeometry()->GetGeometryForTimeStep(timestep));
+    extractor->SetResliceTransformByGeometry(m_Segmentation->GetTimeGeometry()->GetGeometryForTimeStep(timeStep));
 
     extractor->Modified();
     extractor->Update();
@@ -681,9 +692,17 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
   if (m_Segmentation)
   {
     mitk::Image::Pointer image3D = m_Segmentation;
-    unsigned int timeStep(slicer->GetTime()->GetPos());
+    unsigned int timeStep(0);
+    const auto timePoint = slicer->GetSelectedTimePoint();
     if (m_Segmentation->GetDimension() == 4)
     {
+      if (!m_Segmentation->GetTimeGeometry()->IsValidTimePoint(timePoint))
+      {
+        MITK_WARN << "Cannot accept all interpolations. Time point selected by passed SliceNavigationController is not within the time bounds of segmentation. Time point: " << timePoint;
+        return;
+      }
+
+      timeStep = m_Segmentation->GetTimeGeometry()->TimePointToTimeStep(timePoint);
       mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
       timeSelector->SetInput(m_Segmentation);
       timeSelector->SetTimeNr(timeStep);
@@ -840,13 +859,22 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
 
     mitk::Image::Pointer newSeg = s2iFilter->GetOutput();
 
-    unsigned int timestep = m_LastSNC->GetTime()->GetPos();
-    mitk::ImageReadAccessor readAccess(newSeg, newSeg->GetVolumeData(timestep));
+    const auto timePoint = m_LastSNC->GetSelectedTimePoint();
+    if (!m_ToolManager->GetReferenceData(0)->GetData()->GetTimeGeometry()->IsValidTimePoint(timePoint) ||
+        !m_ToolManager->GetWorkingData(0)->GetData()->GetTimeGeometry()->IsValidTimePoint(timePoint))
+    {
+      MITK_WARN << "Cannot accept interpolation. Time point selected by SliceNavigationController is not within the time bounds of reference or working image. Time point: " << timePoint;
+      return;
+    }
+
+    const auto newTimeStep = newSeg->GetTimeGeometry()->TimePointToTimeStep(timePoint);
+    mitk::ImageReadAccessor readAccess(newSeg, newSeg->GetVolumeData(newTimeStep));
     const void *cPointer = readAccess.GetData();
 
     if (currSeg && cPointer)
     {
-      currSeg->SetVolume(cPointer, timestep, 0);
+      const auto curTimeStep = currSeg->GetTimeGeometry()->TimePointToTimeStep(timePoint);
+      currSeg->SetVolume(cPointer, curTimeStep, 0);
     }
     else
     {
@@ -940,7 +968,7 @@ void ::QmitkSlicesInterpolator::RunPlaneSuggestion()
 
   // Create plane suggestion
   mitk::BaseRenderer::Pointer br =
-    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1"));
+    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget0"));
   mitk::PlaneProposer planeProposer;
   std::vector<mitk::UnstructuredGrid::Pointer> grids = clusterFilter->GetAllClusters();
 
@@ -1082,7 +1110,7 @@ void QmitkSlicesInterpolator::StopUpdateInterpolationTimer()
   m_Timer->stop();
   m_InterpolatedSurfaceNode->SetProperty("color", mitk::ColorProperty::New(SURFACE_COLOR_RGB));
   mitk::RenderingManager::GetInstance()->RequestUpdate(
-    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetRenderWindow());
+    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))->GetRenderWindow());
 }
 
 void QmitkSlicesInterpolator::ChangeSurfaceColor()
@@ -1100,7 +1128,7 @@ void QmitkSlicesInterpolator::ChangeSurfaceColor()
   }
   m_InterpolatedSurfaceNode->Update();
   mitk::RenderingManager::GetInstance()->RequestUpdate(
-    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4"))->GetRenderWindow());
+    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))->GetRenderWindow());
 }
 
 void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
@@ -1132,7 +1160,7 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
         }
 
         if ((workingNode->IsVisible(
-              mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")))) &&
+              mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2")))) &&
             !isInterpolationResult && m_3DInterpolationEnabled)
         {
           int ret = QMessageBox::Yes;
@@ -1240,10 +1268,15 @@ void QmitkSlicesInterpolator::SetCurrentContourListID()
       {
         QWidget::setEnabled(true);
 
+        const auto timePoint = m_LastSNC->GetSelectedTimePoint();
         // In case the time is not valid use 0 to access the time geometry of the working node
         unsigned int time_position = 0;
-        if (m_LastSNC->GetTime() != nullptr)
-          time_position = m_LastSNC->GetTime()->GetPos();
+        if (!workingNode->GetData()->GetTimeGeometry()->IsValidTimePoint(timePoint))
+        {
+          MITK_WARN << "Cannot accept interpolation. Time point selected by SliceNavigationController is not within the time bounds of WorkingImage. Time point: " << timePoint;
+          return;
+        }
+        time_position = workingNode->GetData()->GetTimeGeometry()->TimePointToTimeStep(timePoint);
 
         mitk::Vector3D spacing = workingNode->GetData()->GetGeometry(time_position)->GetSpacing();
         double minSpacing(100);
@@ -1265,13 +1298,9 @@ void QmitkSlicesInterpolator::SetCurrentContourListID()
         m_SurfaceInterpolator->SetDistanceImageVolume(50000);
 
         mitk::Image *segmentationImage = dynamic_cast<mitk::Image *>(workingNode->GetData());
-        /*if (segmentationImage->GetDimension() == 3)
-        {*/
+
         m_SurfaceInterpolator->SetCurrentInterpolationSession(segmentationImage);
-        m_SurfaceInterpolator->SetCurrentTimeStep(time_position);
-        //}
-        /*else
-          MITK_INFO<<"3D Interpolation is only supported for 3D images at the moment!";*/
+        m_SurfaceInterpolator->SetCurrentTimePoint(timePoint);
 
         if (m_3DInterpolationEnabled)
         {
@@ -1296,7 +1325,7 @@ void QmitkSlicesInterpolator::Show3DInterpolationResult(bool status)
 
   if (m_3DContourNode.IsNotNull())
     m_3DContourNode->SetVisibility(
-      status, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget4")));
+      status, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")));
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

@@ -1,42 +1,35 @@
-/*===================================================================
+/*============================================================================
 
 The Medical Imaging Interaction Toolkit (MITK)
 
-Copyright (c) German Cancer Research Center,
-Division of Medical and Biological Informatics.
+Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
-This software is distributed WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR
-A PARTICULAR PURPOSE.
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
 
-See LICENSE.txt or http://www.mitk.org for details.
-
-===================================================================*/
+============================================================================*/
 
 #include <mitkLibSVMClassifier.h>
 
 #include <mitkConfigurationHolder.h>
-namespace LibSVM
-{
-#include "svm.h"
-}
+#include <svm.h>
 #include <mitkExceptionMacro.h>
 
 mitk::LibSVMClassifier::LibSVMClassifier():
   m_Model(nullptr),m_Parameter(nullptr)
 {
-  this->m_Parameter = new LibSVM::svm_parameter();
+  this->m_Parameter = new svm_parameter();
 }
 
 mitk::LibSVMClassifier::~LibSVMClassifier()
 {
   if (m_Model)
   {
-    LibSVM::svm_free_and_destroy_model(&m_Model);
+    svm_free_and_destroy_model(&m_Model);
   }
   if( m_Parameter)
-    LibSVM::svm_destroy_param(m_Parameter);
+    svm_destroy_param(m_Parameter);
 }
 
 void mitk::LibSVMClassifier::Train(const Eigen::MatrixXd &X, const Eigen::MatrixXi &Y)
@@ -44,8 +37,8 @@ void mitk::LibSVMClassifier::Train(const Eigen::MatrixXd &X, const Eigen::Matrix
   this->SetPointWiseWeight(Eigen::MatrixXd(Y.rows(),1));
   this->UsePointWiseWeight(false);
 
-  LibSVM::svm_node *xSpace;
-  LibSVM::svm_problem problem;
+  svm_node *xSpace;
+  svm_problem problem;
 
   ConvertParameter();
   ReadYValues(&problem, Y);
@@ -53,17 +46,17 @@ void mitk::LibSVMClassifier::Train(const Eigen::MatrixXd &X, const Eigen::Matrix
   ReadWValues(&problem);
 
   const char * error_msg = nullptr;
-  error_msg = LibSVM::svm_check_parameter(&problem, m_Parameter);
+  error_msg = svm_check_parameter(&problem, m_Parameter);
   if (error_msg)
   {
-    LibSVM::svm_destroy_param(m_Parameter);
+    svm_destroy_param(m_Parameter);
     free(problem.y);
     free(problem.x);
     free(xSpace);
     mitkThrow() << "Error: " << error_msg;
   }
 
-  m_Model = LibSVM::svm_train(&problem, m_Parameter);
+  m_Model = svm_train(&problem, m_Parameter);
 
   // free(problem.y);
   // free(problem.x);
@@ -81,7 +74,7 @@ Eigen::MatrixXi mitk::LibSVMClassifier::Predict(const Eigen::MatrixXd &X)
 
   Eigen::MatrixXi result(noOfPoints,1);
 
-  auto * xVector = static_cast<LibSVM::svm_node *>(malloc(sizeof(LibSVM::svm_node) * (noOfFeatures+1)));
+  auto * xVector = static_cast<svm_node *>(malloc(sizeof(svm_node) * (noOfFeatures+1)));
   for (int point = 0; point < noOfPoints; ++point)
   {
     for (int feature = 0; feature < noOfFeatures; ++feature)
@@ -90,7 +83,7 @@ Eigen::MatrixXi mitk::LibSVMClassifier::Predict(const Eigen::MatrixXd &X)
       xVector[feature].value = X(point, feature);
     }
     xVector[noOfFeatures].index = -1;
-    result(point,0) = LibSVM::svm_predict(m_Model,xVector);
+    result(point,0) = svm_predict(m_Model,xVector);
   }
 
   free(xVector);
@@ -289,13 +282,13 @@ void mitk::LibSVMClassifier::PrintParameter(std::ostream & str)
 }
 
 // Trying to assign from matrix to noOfPoints
-void mitk::LibSVMClassifier::ReadXValues(LibSVM::svm_problem * problem, LibSVM::svm_node** xSpace, const Eigen::MatrixXd &X)
+void mitk::LibSVMClassifier::ReadXValues(svm_problem * problem, svm_node** xSpace, const Eigen::MatrixXd &X)
 {
   auto noOfPoints = static_cast<int>(X.rows());
   auto features = static_cast<int>(X.cols());
 
-  problem->x = static_cast<LibSVM::svm_node **>(malloc(sizeof(LibSVM::svm_node *)  * noOfPoints));
-  (*xSpace) = static_cast<LibSVM::svm_node *> (malloc(sizeof(LibSVM::svm_node) * noOfPoints * (features+1)));
+  problem->x = static_cast<svm_node **>(malloc(sizeof(svm_node *)  * noOfPoints));
+  (*xSpace) = static_cast<svm_node *> (malloc(sizeof(svm_node) * noOfPoints * (features+1)));
 
   for (int row = 0; row < noOfPoints; ++row)
   {
@@ -310,7 +303,7 @@ void mitk::LibSVMClassifier::ReadXValues(LibSVM::svm_problem * problem, LibSVM::
   }
 }
 
-void mitk::LibSVMClassifier::ReadYValues(LibSVM::svm_problem * problem, const Eigen::MatrixXi &Y)
+void mitk::LibSVMClassifier::ReadYValues(svm_problem * problem, const Eigen::MatrixXi &Y)
 {
   problem->l = static_cast<int>(Y.rows());
   problem->y = static_cast<double *>(malloc(sizeof(double)  * problem->l));
@@ -321,7 +314,7 @@ void mitk::LibSVMClassifier::ReadYValues(LibSVM::svm_problem * problem, const Ei
   }
 }
 
-void mitk::LibSVMClassifier::ReadWValues(LibSVM::svm_problem * problem)
+void mitk::LibSVMClassifier::ReadWValues(svm_problem * problem)
 {
   Eigen::MatrixXd & W = this->GetPointWiseWeight();
   int noOfPoints = problem->l;

@@ -81,20 +81,12 @@ public:
 
 protected:
 
+  // catch-all event handler
+  bool event(QEvent *e) override;
   // overloaded move handler
   void moveEvent(QMoveEvent *event) override;
   // overloaded show handler
   void showEvent(QShowEvent *event) override;
-  // overloaded mouse press handler
-  void mousePressEvent(QMouseEvent *event) override;
-  // overloaded mouse double-click handler
-  void mouseDoubleClickEvent(QMouseEvent *event) override;
-  // overloaded mouse move handler
-  void mouseMoveEvent(QMouseEvent *event) override;
-  // overloaded mouse release handler
-  void mouseReleaseEvent(QMouseEvent *event) override;
-  // overloaded key press handler
-  void keyPressEvent(QKeyEvent *event) override;
   // overloaded enter handler
   void enterEvent(QEvent *) override;
   // overloaded leave handler
@@ -110,11 +102,6 @@ protected:
   /// \brief If the dropped type is application/x-mitk-datanodes we process the request by converting to mitk::DataNode
   /// pointers and emitting the NodesDropped signal.
   void dropEvent(QDropEvent *event) override;
-
-#ifndef QT_NO_WHEELEVENT
-  // overload wheel mouse event
-  void wheelEvent(QWheelEvent *) override;
-#endif
 
   void AdjustRenderWindowMenuVisibility(const QPoint &pos);
 

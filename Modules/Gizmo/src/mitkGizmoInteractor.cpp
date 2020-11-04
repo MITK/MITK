@@ -218,11 +218,20 @@ void mitk::GizmoInteractor::MoveAlongAxis(StateMachineAction *, InteractionEvent
     return;
   }
 
-  Vector3D mouseMovement3D = positionEvent->GetPositionInWorld() - m_InitialClickPosition3D;
-  double projectedMouseMovement3D = mouseMovement3D * m_AxisOfMovement;
-  Vector3D movement3D = projectedMouseMovement3D * m_AxisOfMovement;
+  Point2D currentPosition2D = positionEvent->GetPointerPositionOnScreen();
 
-  ApplyTranslationToManipulatedObject(movement3D);
+  // re-use the initial z value to calculate movements parallel to the camera plane
+  auto renderer = positionEvent->GetSender()->GetVtkRenderer();
+  renderer->SetDisplayPoint(currentPosition2D[0], currentPosition2D[1], m_InitialClickPosition2DZ);
+  renderer->DisplayToWorld();
+  vtkVector3d worldPointVTK(renderer->GetWorldPoint());
+  Point3D worldPointITK(worldPointVTK.GetData());
+  Vector3D freeMouseMovement3D(worldPointITK - m_InitialClickPosition3D);
+
+  double projectedMouseMovement3D = freeMouseMovement3D * m_AxisOfMovement;
+  Vector3D appliedMovement3D = projectedMouseMovement3D * m_AxisOfMovement;
+
+  ApplyTranslationToManipulatedObject(appliedMovement3D);
   RenderingManager::GetInstance()->ForceImmediateUpdateAll();
 }
 

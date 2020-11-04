@@ -180,6 +180,10 @@ bool QmitkRenderWindow::event(QEvent* e)
       mitkEvent = mitk::InteractionKeyEvent::New(m_Renderer, GetKeyLetter(ke), GetModifiers(ke));
       break;
     }
+    default:
+    {
+      break;
+    }
   }
 
   if (mitkEvent != nullptr)

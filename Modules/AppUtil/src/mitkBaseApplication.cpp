@@ -28,7 +28,7 @@ found in the LICENSE file.
 #include <usModuleSettings.h>
 
 #include <vtkOpenGLRenderWindow.h>
-#include <QVTKOpenGLWidget.h>
+#include <QVTKOpenGLNativeWidget.h>
 
 #include <QCoreApplication>
 #include <QDir>
@@ -638,7 +638,7 @@ namespace mitk
     {
       vtkOpenGLRenderWindow::SetGlobalMaximumNumberOfMultiSamples(0);
 
-      auto defaultFormat = QVTKOpenGLWidget::defaultFormat();
+      auto defaultFormat = QVTKOpenGLNativeWidget::defaultFormat();
       defaultFormat.setSamples(0);
       QSurfaceFormat::setDefaultFormat(defaultFormat);
 

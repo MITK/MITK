@@ -71,7 +71,7 @@ void mitk::ReduceContourSetFilter::GenerateData()
 
     existingPolys->InitTraversal();
 
-    vtkIdType *cell(nullptr);
+    const vtkIdType *cell(nullptr);
     vtkIdType cellSize(0);
 
     for (existingPolys->InitTraversal(); existingPolys->GetNextCell(cellSize, cell);)
@@ -134,7 +134,7 @@ void mitk::ReduceContourSetFilter::GenerateData()
 }
 
 void mitk::ReduceContourSetFilter::ReduceNumberOfPointsByNthPoint(
-  vtkIdType cellSize, vtkIdType *cell, vtkPoints *points, vtkPolygon *reducedPolygon, vtkPoints *reducedPoints)
+  vtkIdType cellSize, const vtkIdType *cell, vtkPoints *points, vtkPolygon *reducedPolygon, vtkPoints *reducedPoints)
 {
   unsigned int newNumberOfPoints(0);
   unsigned int mod = cellSize % m_StepSize;
@@ -173,7 +173,7 @@ void mitk::ReduceContourSetFilter::ReduceNumberOfPointsByNthPoint(
 }
 
 void mitk::ReduceContourSetFilter::ReduceNumberOfPointsByDouglasPeucker(
-  vtkIdType cellSize, vtkIdType *cell, vtkPoints *points, vtkPolygon *reducedPolygon, vtkPoints *reducedPoints)
+  vtkIdType cellSize, const vtkIdType *cell, vtkPoints *points, vtkPolygon *reducedPolygon, vtkPoints *reducedPoints)
 {
   // If the cell is too small to obtain a reduced polygon with the given stepsize return
   if (cellSize <= static_cast<vtkIdType>(m_StepSize * 3))
@@ -352,7 +352,7 @@ void mitk::ReduceContourSetFilter::ReduceNumberOfPointsByDouglasPeucker(
 }
 
 bool mitk::ReduceContourSetFilter::CheckForIntersection(
-  vtkIdType *currentCell,
+  const vtkIdType *currentCell,
   vtkIdType currentCellSize,
   vtkPoints *currentPoints,
   /* vtkIdType numberOfIntersections, vtkIdType* intersectionPoints,*/ unsigned int currentInputIndex)
@@ -379,7 +379,7 @@ bool mitk::ReduceContourSetFilter::CheckForIntersection(
     vtkSmartPointer<vtkCellArray> polygonArray = poly->GetPolys();
     polygonArray->InitTraversal();
     vtkIdType anotherInputPolygonSize(0);
-    vtkIdType *anotherInputPolygonIDs(nullptr);
+    const vtkIdType *anotherInputPolygonIDs(nullptr);
 
     /*
     The procedure is:

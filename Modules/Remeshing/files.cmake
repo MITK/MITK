@@ -1,3 +1,7 @@
+set(H_FILES
+  include/mitkRemeshing.h
+)
+
 set(CPP_FILES
-  mitkACVD.cpp
+  mitkRemeshing.cpp
 )

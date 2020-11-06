@@ -35,7 +35,7 @@ public:
   void SetFocus() override;
 
 private slots:
-  void OnSelectedMeshChanged(const QmitkSingleNodeSelectionWidget::NodeList& nodes);
+  void OnSurfaceChanged(const QmitkSingleNodeSelectionWidget::NodeList& nodes);
   void OnPolygonCountChanged(int polygonCount);
   void OnDecimateButtonClicked();
 

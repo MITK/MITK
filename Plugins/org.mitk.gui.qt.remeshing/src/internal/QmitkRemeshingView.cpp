@@ -42,7 +42,7 @@ void QmitkRemeshingView::CreateQtPartControl(QWidget* parent)
 
   m_Controls->selectionWidget->SetDataStorage(this->GetDataStorage());
   m_Controls->selectionWidget->SetSelectionIsOptional(true);
-  m_Controls->selectionWidget->SetEmptyInfo(QStringLiteral("Select a mesh"));
+  m_Controls->selectionWidget->SetEmptyInfo(QStringLiteral("Select a surface"));
   m_Controls->selectionWidget->SetAutoSelectNewNodes(true);
   m_Controls->selectionWidget->SetNodePredicate(mitk::NodePredicateAnd::New(
     mitk::TNodePredicateDataType<mitk::Surface>::New(),
@@ -50,15 +50,15 @@ void QmitkRemeshingView::CreateQtPartControl(QWidget* parent)
       mitk::NodePredicateProperty::New("helper object"),
       mitk::NodePredicateProperty::New("hidden object")))));
 
-  connect(m_Controls->selectionWidget, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkRemeshingView::OnSelectedMeshChanged);
+  connect(m_Controls->selectionWidget, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkRemeshingView::OnSurfaceChanged);
   connect(m_Controls->polygonCountSlider, SIGNAL(valueChanged(int)), this, SLOT(OnPolygonCountChanged(int)));
   connect(m_Controls->polygonCountSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnPolygonCountChanged(int)));
   connect(m_Controls->decimatePushButton, SIGNAL(clicked()), this, SLOT(OnDecimateButtonClicked()));
 
-  this->OnSelectedMeshChanged(m_Controls->selectionWidget->GetSelectedNodes());
+  this->OnSurfaceChanged(m_Controls->selectionWidget->GetSelectedNodes());
 }
 
-void QmitkRemeshingView::OnSelectedMeshChanged(const QmitkSingleNodeSelectionWidget::NodeList& nodes)
+void QmitkRemeshingView::OnSurfaceChanged(const QmitkSingleNodeSelectionWidget::NodeList& nodes)
 {
   this->EnableWidgets(!nodes.empty() && nodes.front().IsNotNull());
 }

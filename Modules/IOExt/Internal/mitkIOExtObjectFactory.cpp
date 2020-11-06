@@ -23,9 +23,6 @@ found in the LICENSE file.
 #include "mitkUnstructuredGridVtkWriterFactory.h"
 
 #include "mitkVolumeMapperVtkSmart3D.h"
-#include "mitkMesh.h"
-#include "mitkMeshMapper2D.h"
-#include "mitkMeshVtkMapper3D.h"
 #include "mitkUnstructuredGridMapper2D.h"
 #include "mitkUnstructuredGridVtkMapper3D.h"
 #include "mitkVtkGLMapperWrapper.h"
@@ -80,12 +77,7 @@ mitk::Mapper::Pointer mitk::IOExtObjectFactory::CreateMapper(mitk::DataNode *nod
 
   if (id == mitk::BaseRenderer::Standard2D)
   {
-    if ((dynamic_cast<Mesh *>(data) != nullptr))
-    {
-      newMapper = mitk::MeshMapper2D::New();
-      newMapper->SetDataNode(node);
-    }
-    else if ((dynamic_cast<UnstructuredGrid *>(data) != nullptr))
+    if ((dynamic_cast<UnstructuredGrid *>(data) != nullptr))
     {
       newMapper = mitk::VtkGLMapperWrapper::New(mitk::UnstructuredGridMapper2D::New().GetPointer());
       newMapper->SetDataNode(node);
@@ -96,11 +88,6 @@ mitk::Mapper::Pointer mitk::IOExtObjectFactory::CreateMapper(mitk::DataNode *nod
     if ((dynamic_cast<Image *>(data) != nullptr) && std::string("Image").compare(node->GetData()->GetNameOfClass())==0)
     {
       newMapper = mitk::VolumeMapperVtkSmart3D::New();
-      newMapper->SetDataNode(node);
-    }
-    else if ((dynamic_cast<Mesh *>(data) != nullptr))
-    {
-      newMapper = mitk::MeshVtkMapper3D::New();
       newMapper->SetDataNode(node);
     }
     else if ((dynamic_cast<UnstructuredGrid *>(data) != nullptr))

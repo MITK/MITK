@@ -80,7 +80,7 @@ vtkRenderWindow* QmitkPAUSViewerView::GetPARenderWindow()
   if (m_Controls == nullptr)
     return nullptr;
 
-  return m_Controls->m_PARenderWindow->GetRenderWindow();
+  return m_Controls->m_PARenderWindow->renderWindow();
 }
 
 vtkRenderWindow* QmitkPAUSViewerView::GetUSRenderWindow()
@@ -88,7 +88,7 @@ vtkRenderWindow* QmitkPAUSViewerView::GetUSRenderWindow()
   if (m_Controls == nullptr)
     return nullptr;
 
-  return m_Controls->m_USRenderWindow->GetRenderWindow();
+  return m_Controls->m_USRenderWindow->renderWindow();
 }
 
 

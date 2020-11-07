@@ -467,32 +467,32 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
   if (m_DistanceImageNode.IsNotNull())
   {
     this->m_DistanceImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
-    this->m_DistanceImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("sagittal")->GetRenderWindow() ) );
-    this->m_DistanceImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("coronal")->GetRenderWindow() ) );
-    this->m_DistanceImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderWindow() ) );
+    this->m_DistanceImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("sagittal")->renderWindow() ) );
+    this->m_DistanceImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("coronal")->renderWindow() ) );
+    this->m_DistanceImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("3d")->renderWindow() ) );
     this->m_DistanceImageNode->SetProperty("Image Rendering.Mode", renderingModePropertyForTransferFunction);
   }
   if (m_AmplitudeImageNode.IsNotNull())
   {
-    this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("axial")->GetRenderWindow() ) );
-    this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("coronal")->GetRenderWindow() ) );
-    this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderWindow() ) );
+    this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("axial")->renderWindow() ) );
+    this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("coronal")->renderWindow() ) );
+    this->m_AmplitudeImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("3d")->renderWindow() ) );
     this->m_AmplitudeImageNode->SetProperty("Image Rendering.Mode", renderingModePropertyForTransferFunction);
   }
   if (m_IntensityImageNode.IsNotNull())
   {
       this->m_IntensityImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
-      this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("axial")->GetRenderWindow() ) );
-      this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("sagittal")->GetRenderWindow() ) );
-      this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderWindow() ) );
+      this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("axial")->renderWindow() ) );
+      this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("sagittal")->renderWindow() ) );
+      this->m_IntensityImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("3d")->renderWindow() ) );
       this->m_IntensityImageNode->SetProperty("Image Rendering.Mode", renderingModePropertyForTransferFunction);
   }
   if ((m_RGBImageNode.IsNotNull()))
   {
       this->m_RGBImageNode->SetProperty( "visible" , mitk::BoolProperty::New( true ));
-      this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("axial")->GetRenderWindow() ) );
-      this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("sagittal")->GetRenderWindow() ) );
-      this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderWindow() ) );
+      this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("axial")->renderWindow() ) );
+      this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("sagittal")->renderWindow() ) );
+      this->m_RGBImageNode->SetVisibility( !useToF, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("3d")->renderWindow() ) );
   }
   // initialize images
   if (m_MitkDistanceImage.IsNotNull())
@@ -506,9 +506,9 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
     QHashIterator<QString, QmitkRenderWindow*> i(renderWindowHashMap);
     while (i.hasNext()){
       i.next();
-      this->m_SurfaceNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(i.value()->GetRenderWindow()) );
+      this->m_SurfaceNode->SetVisibility( false, mitk::BaseRenderer::GetInstance(i.value()->renderWindow()) );
     }
-    this->m_SurfaceNode->SetVisibility( true, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderWindow() ) );
+    this->m_SurfaceNode->SetVisibility( true, mitk::BaseRenderer::GetInstance(GetRenderWindowPart()->GetQmitkRenderWindow("3d")->renderWindow() ) );
   }
   //disable/enable gradient background
   this->GetRenderWindowPart()->EnableDecorations(!useToF, QStringList(QString("background")));
@@ -520,7 +520,7 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
     if(RGBImageHasDifferentResolution)
     {
       //update the display geometry by using the RBG image node. Only for renderwindow coronal
-      mitk::RenderingManager::GetInstance()->InitializeView( GetRenderWindowPart()->GetQmitkRenderWindow("coronal")->GetRenderWindow(), this->m_RGBImageNode->GetData()->GetGeometry() );
+      mitk::RenderingManager::GetInstance()->InitializeView( GetRenderWindowPart()->GetQmitkRenderWindow("coronal")->renderWindow(), this->m_RGBImageNode->GetData()->GetGeometry() );
     }
   }
 }

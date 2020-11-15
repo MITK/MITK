@@ -53,6 +53,7 @@ void QmitkRemeshingView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls->selectionWidget, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkRemeshingView::OnSurfaceChanged);
   connect(m_Controls->polygonCountSlider, SIGNAL(valueChanged(int)), this, SLOT(OnPolygonCountChanged(int)));
   connect(m_Controls->polygonCountSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnPolygonCountChanged(int)));
+  connect(m_Controls->calculateNormalsCheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnCalculateNormalsChanged(int)));
   connect(m_Controls->decimatePushButton, SIGNAL(clicked()), this, SLOT(OnDecimateButtonClicked()));
 
   this->OnSurfaceChanged(m_Controls->selectionWidget->GetSelectedNodes());
@@ -72,6 +73,11 @@ void QmitkRemeshingView::OnPolygonCountChanged(int polygonCount)
     m_Controls->polygonCountSpinBox->setValue(polygonCount);
 }
 
+void QmitkRemeshingView::OnCalculateNormalsChanged(int checkState)
+{
+  m_Controls->flipNormalsCheckBox->setEnabled(Qt::Unchecked != checkState);
+}
+
 void QmitkRemeshingView::OnDecimateButtonClicked()
 {
   mitk::DataNode::Pointer selectedNode = m_Controls->selectionWidget->GetSelectedNode();
@@ -80,7 +86,10 @@ void QmitkRemeshingView::OnDecimateButtonClicked()
 
   try
   {
-    output = mitk::Remeshing::Decimate(input);
+    output = mitk::Remeshing::Decimate(input,
+      0.01 * m_Controls->polygonCountSpinBox->value(),
+      m_Controls->calculateNormalsCheckBox->isChecked(),
+      m_Controls->flipNormalsCheckBox->isChecked());
   }
   catch(const mitk::Exception& exception)
   {
@@ -88,8 +97,11 @@ void QmitkRemeshingView::OnDecimateButtonClicked()
     return;
   }
 
+  if (output.IsNull())
+    return;
+
   auto newNode = mitk::DataNode::New();
-  newNode->SetName(QString("%1 (%2%)").arg(selectedNode->GetName().c_str()).arg(m_Controls->polygonCountSpinBox->value()).toStdString());
+  newNode->SetName(QString("%1 (decimated)").arg(selectedNode->GetName().c_str()).toStdString());
   newNode->SetData(output);
 
   this->GetDataStorage()->Add(newNode, selectedNode);
@@ -99,7 +111,8 @@ void QmitkRemeshingView::EnableWidgets(bool enable)
 {
   m_Controls->polygonCountSlider->setEnabled(enable);
   m_Controls->polygonCountSpinBox->setEnabled(enable);
-  m_Controls->polygonDistributionComboBox->setEnabled(enable);
+  m_Controls->calculateNormalsCheckBox->setEnabled(enable);
+  m_Controls->flipNormalsCheckBox->setEnabled(enable && m_Controls->calculateNormalsCheckBox->isChecked());
   m_Controls->decimatePushButton->setEnabled(enable);
 }
 

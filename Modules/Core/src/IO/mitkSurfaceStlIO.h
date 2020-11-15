@@ -36,7 +36,9 @@ namespace mitk
   private:
     SurfaceStlIO *IOClone() const override;
 
-    static std::string OPTION_MERGE_POINTS();
+    // vtkSTLReader crashes with this option
+    // static std::string OPTION_MERGE_POINTS();
+
     static std::string OPTION_TAG_SOLIDS();
     static std::string OPTION_CLEAN();
   };

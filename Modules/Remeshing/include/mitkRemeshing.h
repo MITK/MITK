@@ -20,7 +20,19 @@ namespace mitk
 {
   namespace Remeshing
   {
-    MITKREMESHING_EXPORT Surface::Pointer Decimate(Surface::ConstPointer input);
+    /** \brief Reduce the number of vertices of an mitk::Surface.
+      *
+      * The decimation is applied separately to all time steps of the input surface.
+      * The meshes of the resulting surface are guaranteed to consist of triangles only.
+      *
+      * \param[in] input Input surface
+      * \param[in] percent Relative number of vertices after decimation [0, 1]
+      * \param[in] calculateNormals Calculate normals after decimation (\c true by default)
+      * \param[in] flipNormals Flip calculated normals (\c false by default)
+      *
+      * \return Decimated surface
+      */
+    MITKREMESHING_EXPORT Surface::Pointer Decimate(const Surface* input, double percent, bool calculateNormals = true, bool flipNormals = false);
   }
 }
 

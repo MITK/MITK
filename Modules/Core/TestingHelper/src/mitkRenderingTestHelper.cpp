@@ -17,7 +17,6 @@ found in the LICENSE file.
 #include <vtkRenderLargeImage.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
-#include <vtk_glew.h>
 
 // MITK
 #include <mitkNodePredicateDataType.h>
@@ -54,11 +53,6 @@ void mitk::RenderingTestHelper::Initialize(int width, int height, AntiAliasing a
 
   mitk::UIDGenerator uidGen = mitk::UIDGenerator("UnnamedRenderer_");
   m_RenderWindow = mitk::RenderWindow::New(nullptr, uidGen.GetUID().c_str());
-
-  auto err = glewInit();
-
-  if (GLEW_OK != err)
-    mitkThrowException(mitk::TestNotRunException) << "GLEW could not be initialized";
 
   auto renderWindow = m_RenderWindow->GetVtkRenderWindow();
 

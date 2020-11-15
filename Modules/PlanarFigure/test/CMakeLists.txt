@@ -31,7 +31,7 @@ if(TARGET ${TESTDRIVER})
     #message(STATUS "Testing viewport of ${vpWidth}x${vpHeight} at ${vpLeft},${vpBottom} in render window of size ${rwWidth}x${rwHeight} ('${testPostfix}')")
 
     # add the actual test
-    mitkAddCustomModuleTest(
+    mitkAddCustomModuleRenderingTest(
         mitkViewportRenderingTest_${testPostfix}
         mitkViewportRenderingTest
         ${rwWidth} ${rwHeight}

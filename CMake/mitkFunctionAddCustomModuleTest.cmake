@@ -28,7 +28,7 @@ endfunction()
 
 function(mitkAddCustomModuleRenderingTest test_name test_function)
 
-  mitkAddCustomModuleTest(${test_name} ${test_function})
+  mitkAddCustomModuleTest(${test_name} ${test_function} ${ARGN})
   if(TEST ${test_name})
     set_property(TEST ${test_name} APPEND PROPERTY LABELS "Rendering Tests")
   endif()

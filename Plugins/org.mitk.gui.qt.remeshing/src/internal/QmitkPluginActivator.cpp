@@ -10,14 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "org_mitk_gui_qt_remeshing_Activator.h"
+#include "QmitkPluginActivator.h"
 #include "QmitkRemeshingView.h"
 
-void mitk::org_mitk_gui_qt_remeshing_Activator::start(ctkPluginContext* context)
+void QmitkPluginActivator::start(ctkPluginContext* context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(QmitkRemeshingView, context);
 }
 
-void mitk::org_mitk_gui_qt_remeshing_Activator::stop(ctkPluginContext*)
+void QmitkPluginActivator::stop(ctkPluginContext*)
 {
 }

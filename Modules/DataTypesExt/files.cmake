@@ -23,7 +23,6 @@ set(CPP_FILES
   mitkLabeledImageVolumeCalculator.cpp
   mitkLineOperation.cpp
   mitkLookupTableSource.cpp
-  mitkMesh.cpp
   mitkMultiStepper.cpp
   mitkPlane.cpp
   mitkSurfaceDeformationDataInteractor3D.cpp

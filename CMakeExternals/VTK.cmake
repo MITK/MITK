@@ -2,12 +2,6 @@
 # VTK
 #-----------------------------------------------------------------------------
 
-if(WIN32)
-  option(VTK_USE_SYSTEM_FREETYPE OFF)
-else()
-  option(VTK_USE_SYSTEM_FREETYPE ON)
-endif()
-
 # Sanity checks
 if(DEFINED VTK_DIR AND NOT EXISTS ${VTK_DIR})
   message(FATAL_ERROR "VTK_DIR variable is defined but corresponds to non-existing directory")
@@ -25,19 +19,27 @@ if(NOT DEFINED VTK_DIR)
 
   set(additional_cmake_args )
 
+  if(WIN32)
+    list(APPEND additional_cmake_args
+      -DCMAKE_CXX_MP_FLAG:BOOL=ON
+      )
+  else()
+    list(APPEND additional_cmake_args
+      -DVTK_MODULE_USE_EXTERNAL_VTK_freetype:BOOL=ON
+      )
+  endif()
+
   # Optionally enable memory leak checks for any objects derived from vtkObject. This
   # will force unit tests to fail if they have any of these memory leaks.
   option(MITK_VTK_DEBUG_LEAKS OFF)
   mark_as_advanced(MITK_VTK_DEBUG_LEAKS)
   list(APPEND additional_cmake_args
     -DVTK_DEBUG_LEAKS:BOOL=${MITK_VTK_DEBUG_LEAKS}
-    -DVTK_WRAP_PYTHON:BOOL=OFF
-    -DVTK_WINDOWS_PYTHON_DEBUGGABLE:BOOL=OFF
     )
 
   if(MITK_USE_Qt5)
     list(APPEND additional_cmake_args
-      -DVTK_Group_Qt:BOOL=ON
+      -DVTK_GROUP_ENABLE_Qt:STRING=YES
       -DQt5_DIR:PATH=${Qt5_DIR}
       )
   endif()
@@ -47,27 +49,22 @@ if(NOT DEFINED VTK_DIR)
       "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
       )
   endif()
-  
-  set (VTK_PATCH_OPTION
-       PATCH_COMMAND ${PATCH_COMMAND} -p1 -i ${CMAKE_CURRENT_LIST_DIR}/VTK-8.1.0.patch)
 
   mitk_query_custom_ep_vars()
 
   ExternalProject_Add(${proj}
     LIST_SEPARATOR ${sep}
-    URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/VTK-8.1.0.tar.gz
-    URL_MD5 4fa5eadbc8723ba0b8d203f05376d932
-    ${VTK_PATCH_OPTION}
+    URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/VTK-9.0.0.tar.gz
+    URL_MD5 fa61cd36491d89a17edab18522bdda49
     CMAKE_GENERATOR ${gen}
     CMAKE_GENERATOR_PLATFORM ${gen_platform}
     CMAKE_ARGS
       ${ep_common_args}
-      -DVTK_WRAP_TCL:BOOL=OFF
-      -DVTK_WRAP_PYTHON:BOOL=OFF
-      -DVTK_WRAP_JAVA:BOOL=OFF
-      -DVTK_USE_SYSTEM_FREETYPE:BOOL=${VTK_USE_SYSTEM_FREETYPE}
+      -DVTK_ENABLE_WRAPPING:BOOL=OFF
       -DVTK_LEGACY_REMOVE:BOOL=ON
-      -DModule_vtkTestingRendering:BOOL=ON
+      -DVTK_MODULE_ENABLE_VTK_TestingRendering:STRING=YES
+      -DVTK_MODULE_ENABLE_VTK_RenderingContextOpenGL2:STRING=YES
+      -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2:STRING=YES
       ${additional_cmake_args}
       ${${proj}_CUSTOM_CMAKE_ARGS}
     CMAKE_CACHE_ARGS

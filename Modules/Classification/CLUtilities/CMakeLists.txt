@@ -1,6 +1,6 @@
 mitk_create_module(
   DEPENDS MitkCore MitkCLCore MitkCommandLine MitkDICOM
-  PACKAGE_DEPENDS PUBLIC Eigen PRIVATE tinyxml
+  PACKAGE_DEPENDS PUBLIC Eigen PRIVATE tinyxml VTK|FiltersStatistics
 )
 
 if(TARGET ${MODULE_TARGET})

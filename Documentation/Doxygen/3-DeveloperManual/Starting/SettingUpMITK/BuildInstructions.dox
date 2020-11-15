@@ -69,9 +69,7 @@ and configure the project.
 
 CMake will present you a couple of options, these are the most important ones:
 
- - <tt><b>CMAKE_PREFIX_PATH</b></tt> The path to your Qt installation, e.g., <i>C:/Qt/5.12.6/msvc2017_64</i> or <i>/home/user/Qt/5.12.6/gcc_64</i>
- - <tt><b>MITK_USE_ACVD</b></tt> Build MITK code which depends on ACVD (this
-   will download and build ACVD)
+ - <tt><b>CMAKE_PREFIX_PATH</b></tt> The path to your Qt installation, e.g., <i>C:/Qt/5.12.9/msvc2017_64</i> or <i>/home/user/Qt/5.12.9/gcc_64</i>
  - <tt><b>MITK_USE_BLUEBERRY</b></tt> Build the BlueBerry application framework
  - <tt><b>MITK_USE_Boost_LIBRARIES</b></tt> If you need binary Boost libraries,
    specify them here.

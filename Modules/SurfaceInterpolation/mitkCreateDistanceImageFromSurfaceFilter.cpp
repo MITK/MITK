@@ -188,7 +188,7 @@ void mitk::CreateDistanceImageFromSurfaceFilter::PreprocessContourPoints()
 
     existingPolys->InitTraversal();
 
-    vtkIdType *cell(nullptr);
+    const vtkIdType *cell(nullptr);
     vtkIdType cellSize(0);
 
     for (existingPolys->InitTraversal(); existingPolys->GetNextCell(cellSize, cell);)

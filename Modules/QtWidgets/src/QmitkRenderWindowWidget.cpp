@@ -52,7 +52,7 @@ void QmitkRenderWindowWidget::SetDataStorage(mitk::DataStorage* dataStorage)
   m_DataStorage = dataStorage;
   if (nullptr != m_RenderWindow)
   {
-    mitk::BaseRenderer::GetInstance(m_RenderWindow->GetRenderWindow())->SetDataStorage(dataStorage);
+    mitk::BaseRenderer::GetInstance(m_RenderWindow->renderWindow())->SetDataStorage(dataStorage);
   }
 }
 
@@ -63,12 +63,12 @@ mitk::SliceNavigationController* QmitkRenderWindowWidget::GetSliceNavigationCont
 
 void QmitkRenderWindowWidget::RequestUpdate()
 {
-  mitk::RenderingManager::GetInstance()->RequestUpdate(m_RenderWindow->GetRenderWindow());
+  mitk::RenderingManager::GetInstance()->RequestUpdate(m_RenderWindow->renderWindow());
 }
 
 void QmitkRenderWindowWidget::ForceImmediateUpdate()
 {
-  mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(m_RenderWindow->GetRenderWindow());
+  mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(m_RenderWindow->renderWindow());
 }
 
 void QmitkRenderWindowWidget::SetGradientBackgroundColors(const mitk::Color& upper, const mitk::Color& lower)
@@ -194,7 +194,7 @@ void QmitkRenderWindowWidget::InitializeGUI()
   m_RenderWindow->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
   m_RenderWindow->GetSliceNavigationController()->SetCrosshairEvent.AddListener(mitk::MessageDelegate1<QmitkRenderWindowWidget, mitk::Point3D>(this, &QmitkRenderWindowWidget::SetCrosshair));
 
-  connect(m_RenderWindow, &QVTKOpenGLWidget::mouseEvent, this, &QmitkRenderWindowWidget::MouseEvent);
+  connect(m_RenderWindow, &QmitkRenderWindow::mouseEvent, this, &QmitkRenderWindowWidget::MouseEvent);
 
   mitk::TimeGeometry::ConstPointer timeGeometry = m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll());
   mitk::RenderingManager::GetInstance()->InitializeViews(timeGeometry);
@@ -250,5 +250,5 @@ void QmitkRenderWindowWidget::InitializeDecorations()
 void QmitkRenderWindowWidget::SetCrosshair(mitk::Point3D selectedPoint)
 {
   m_PointSet->SetPoint(1, selectedPoint, 0);
-  mitk::RenderingManager::GetInstance()->RequestUpdate(m_RenderWindow->GetRenderWindow());
+  mitk::RenderingManager::GetInstance()->RequestUpdate(m_RenderWindow->renderWindow());
 }

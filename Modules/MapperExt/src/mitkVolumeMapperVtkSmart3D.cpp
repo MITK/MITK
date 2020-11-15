@@ -15,10 +15,9 @@ found in the LICENSE file.
 #include "mitkTransferFunctionInitializer.h"
 #include "mitkLevelWindowProperty.h"
 #include <vtkObjectFactory.h>
-#include <vtkRenderingOpenGL2ObjectFactory.h>
-#include <vtkRenderingVolumeOpenGL2ObjectFactory.h>
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
+#include <vtkAutoInit.h>
 
 void mitk::VolumeMapperVtkSmart3D::GenerateDataForRenderer(mitk::BaseRenderer *renderer)
 {
@@ -223,12 +222,6 @@ void mitk::VolumeMapperVtkSmart3D::UpdateRenderMode(mitk::BaseRenderer *renderer
 
 mitk::VolumeMapperVtkSmart3D::VolumeMapperVtkSmart3D()
 {
-  m_RenderingOpenGL2ObjectFactory = vtkSmartPointer<vtkRenderingOpenGL2ObjectFactory>::New();
-  m_RenderingVolumeOpenGL2ObjectFactory = vtkSmartPointer<vtkRenderingVolumeOpenGL2ObjectFactory>::New();
-
-  vtkObjectFactory::RegisterFactory(m_RenderingOpenGL2ObjectFactory);
-  vtkObjectFactory::RegisterFactory(m_RenderingVolumeOpenGL2ObjectFactory);
-
   m_SmartVolumeMapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
   m_SmartVolumeMapper->SetBlendModeToComposite();
   m_ImageChangeInformation = vtkSmartPointer<vtkImageChangeInformation>::New();

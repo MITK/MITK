@@ -10,23 +10,20 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef org_mitk_gui_qt_remeshing_Activator_h
-#define org_mitk_gui_qt_remeshing_Activator_h
+#ifndef QmitkPluginActivator_h
+#define QmitkPluginActivator_h
 
 #include <ctkPluginActivator.h>
 
-namespace mitk
+class QmitkPluginActivator : public QObject, public ctkPluginActivator
 {
-  class org_mitk_gui_qt_remeshing_Activator : public QObject, public ctkPluginActivator
-  {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_remeshing")
-    Q_INTERFACES(ctkPluginActivator)
+  Q_OBJECT
+  Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_remeshing")
+  Q_INTERFACES(ctkPluginActivator)
 
-  public:
-    void start(ctkPluginContext* context) override;
-    void stop(ctkPluginContext* context) override;
-  };
-}
+public:
+  void start(ctkPluginContext* context) override;
+  void stop(ctkPluginContext* context) override;
+};
 
 #endif

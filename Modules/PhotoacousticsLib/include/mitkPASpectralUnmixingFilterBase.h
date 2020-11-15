@@ -106,7 +106,7 @@ namespace mitk {
       */
       virtual void AddRelativeErrorSettings(int value);
 
-      ofstream myfile; // just for testing purposes; has to be removeed
+      std::ofstream myfile; // just for testing purposes; has to be removeed
 
     protected:
       /**

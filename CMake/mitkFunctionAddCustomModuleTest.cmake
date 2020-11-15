@@ -25,3 +25,12 @@ function(mitkAddCustomModuleTest test_name test_function)
   endif()
 
 endfunction()
+
+function(mitkAddCustomModuleRenderingTest test_name test_function)
+
+  mitkAddCustomModuleTest(${test_name} ${test_function})
+  if(TEST ${test_name})
+    set_property(TEST ${test_name} APPEND PROPERTY LABELS "Rendering Tests")
+  endif()
+
+endfunction()

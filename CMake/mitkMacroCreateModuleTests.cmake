@@ -57,7 +57,7 @@ macro(MITK_CREATE_MODULE_TESTS)
     # are run for each image in the TESTIMAGES list.
     #
     include(files.cmake)
-    foreach( test ${MODULE_TESTS} )
+    foreach(test ${MODULE_TESTS} ${MODULE_RENDERING_TESTS})
       get_filename_component(TName ${test} NAME_WE)
       add_test(NAME ${TName} COMMAND ${xvfb_run} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} ${TName})
       mitkFunctionGetLibrarySearchPaths(MITK_RUNTIME_PATH_RELEASE release RELEASE)
@@ -67,6 +67,11 @@ macro(MITK_CREATE_MODULE_TESTS)
       string (REGEX REPLACE "\;" "\\\;" test_env_path "${test_env_path}")
       set_property(TEST ${TName} PROPERTY ENVIRONMENT "PATH=${test_env_path}" APPEND)
       set_property(TEST ${TName} PROPERTY SKIP_RETURN_CODE 77)
+    endforeach()
+
+    foreach(test ${MODULE_RENDERING_TESTS})
+      get_filename_component(TName ${test} NAME_WE)
+      set_property(TEST ${TName} APPEND PROPERTY LABELS "Rendering Tests")
     endforeach()
 
     set(TEST_TYPES IMAGE SURFACE POINTSET) # add other file types here

@@ -807,7 +807,7 @@ void mitk::DisplayInteractor::Rotate(mitk::StateMachineAction *, mitk::Interacti
   const InteractionPositionEvent* posEvent = dynamic_cast<const InteractionPositionEvent*>(event);
   if (posEvent == nullptr) return;
 
-  Point3D cursor = posEvent->GetPositionInWorld();
+  Point3D cursor = posEvent->GetPlanePositionInWorld();
 
   Vector3D toProjected = m_LastCursorPosition - m_CenterOfRotation;
   Vector3D toCursor = cursor - m_CenterOfRotation;

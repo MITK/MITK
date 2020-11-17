@@ -113,7 +113,7 @@ public:
 
     // Since label with value 1 already exists the new label will get the value m_InitialNumberOfValues
     CPPUNIT_ASSERT_MESSAGE("Wrong label value", m_LabelSet->GetActiveLabel()->GetValue() == m_InitialNumberOfLabels);
-    CPPUNIT_ASSERT_MESSAGE("Wrong number of label", m_LabelSet->GetNumberOfLabels() == m_InitialNumberOfLabels + 1);
+    CPPUNIT_ASSERT_MESSAGE("Wrong number of label", m_LabelSet->GetNumberOfLabels() == static_cast<decltype(m_LabelSet->GetNumberOfLabels())>(m_InitialNumberOfLabels + 1));
   }
 
   void TestRenameLabel()

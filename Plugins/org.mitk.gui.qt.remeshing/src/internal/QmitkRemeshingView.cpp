@@ -51,8 +51,8 @@ void QmitkRemeshingView::CreateQtPartControl(QWidget* parent)
       mitk::NodePredicateProperty::New("hidden object")))));
 
   connect(m_Controls->selectionWidget, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkRemeshingView::OnSurfaceChanged);
-  connect(m_Controls->polygonCountSlider, SIGNAL(valueChanged(int)), this, SLOT(OnPolygonCountChanged(int)));
-  connect(m_Controls->polygonCountSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnPolygonCountChanged(int)));
+  connect(m_Controls->vertexCountSlider, SIGNAL(valueChanged(int)), this, SLOT(OnVertexCountChanged(int)));
+  connect(m_Controls->vertexCountSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnVertexCountChanged(int)));
   connect(m_Controls->calculateNormalsCheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnCalculateNormalsChanged(int)));
   connect(m_Controls->decimatePushButton, SIGNAL(clicked()), this, SLOT(OnDecimateButtonClicked()));
 
@@ -64,13 +64,13 @@ void QmitkRemeshingView::OnSurfaceChanged(const QmitkSingleNodeSelectionWidget::
   this->EnableWidgets(!nodes.empty() && nodes.front().IsNotNull());
 }
 
-void QmitkRemeshingView::OnPolygonCountChanged(int polygonCount)
+void QmitkRemeshingView::OnVertexCountChanged(int vertexCount)
 {
-  if (polygonCount != m_Controls->polygonCountSlider->value())
-    m_Controls->polygonCountSlider->setValue(polygonCount);
+  if (vertexCount != m_Controls->vertexCountSlider->value())
+    m_Controls->vertexCountSlider->setValue(vertexCount);
 
-  if (polygonCount != m_Controls->polygonCountSpinBox->value())
-    m_Controls->polygonCountSpinBox->setValue(polygonCount);
+  if (vertexCount != m_Controls->vertexCountSpinBox->value())
+    m_Controls->vertexCountSpinBox->setValue(vertexCount);
 }
 
 void QmitkRemeshingView::OnCalculateNormalsChanged(int checkState)
@@ -87,7 +87,7 @@ void QmitkRemeshingView::OnDecimateButtonClicked()
   try
   {
     output = mitk::Remeshing::Decimate(input,
-      0.01 * m_Controls->polygonCountSpinBox->value(),
+      0.01 * m_Controls->vertexCountSpinBox->value(),
       m_Controls->calculateNormalsCheckBox->isChecked(),
       m_Controls->flipNormalsCheckBox->isChecked());
   }
@@ -109,8 +109,8 @@ void QmitkRemeshingView::OnDecimateButtonClicked()
 
 void QmitkRemeshingView::EnableWidgets(bool enable)
 {
-  m_Controls->polygonCountSlider->setEnabled(enable);
-  m_Controls->polygonCountSpinBox->setEnabled(enable);
+  m_Controls->vertexCountSlider->setEnabled(enable);
+  m_Controls->vertexCountSpinBox->setEnabled(enable);
   m_Controls->calculateNormalsCheckBox->setEnabled(enable);
   m_Controls->flipNormalsCheckBox->setEnabled(enable && m_Controls->calculateNormalsCheckBox->isChecked());
   m_Controls->decimatePushButton->setEnabled(enable);

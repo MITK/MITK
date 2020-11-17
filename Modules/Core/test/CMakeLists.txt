@@ -178,11 +178,4 @@ if(TARGET ${TESTDRIVER})
                           -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/PlaneGeometryMapper640x480REF.png #corresponding reference screenshot
   )
 
-
-  SET_PROPERTY(TEST mitkRotatedSlice4DTest mitkImageVtkMapper2D_rgbaImage640x480 mitkImageVtkMapper2D_pic3d640x480 mitkImageVtkMapper2D_pic3dColorBlue640x480 mitkImageVtkMapper2D_pic3dLevelWindow640x480 mitkImageVtkMapper2D_pic3dSwivel640x480 mitkImageVtkMapper2DTransferFunctionTest_Png2D-bw
-    # mitkImageVtkMapper2D_pic3dOpacity640x480
-    mitkSurfaceVtkMapper2DTest mitkSurfaceVtkMapper3DTest_TextureProperty mitkPointSetVtkMapper2D_Pic3DPointSetForPic3D640x480 mitkPointSetVtkMapper2D_openMeAlone640x480 mitkPointSetVtkMapper2D_openMeAloneGlyphType640x480 mitkPointSetVtkMapper2D_openMeAloneTransformed640x480
-    mitkPlaneGeometryDataMapper2DTest
-  PROPERTY RUN_SERIAL TRUE)
-
 endif() # TARGET ${TESTDRIVER}

@@ -72,6 +72,7 @@ macro(MITK_CREATE_MODULE_TESTS)
     foreach(test ${MODULE_RENDERING_TESTS})
       get_filename_component(TName ${test} NAME_WE)
       set_property(TEST ${TName} APPEND PROPERTY LABELS "Rendering Tests")
+      set_property(TEST ${TName} PROPERTY RUN_SERIAL TRUE)
     endforeach()
 
     set(TEST_TYPES IMAGE SURFACE POINTSET) # add other file types here

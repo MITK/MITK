@@ -5,15 +5,21 @@
 
 \tableofcontents
 
-\section org_mitk_views_remeshingOverview Overview
+\section org_mitk_views_remeshingDecimate Decimate surfaces
 
-The Remeshing View allows you to remesh surfaces.
-If done right, remeshing can dramatically increase the quality of your surface mesh.
-However, you might lose precision if you reduce the vertex density of your surface mesh too strong.
-Even when you preserve the detail of your mesh, there might be a tiny distance between your original surface and the remeshed surface.
-Hence, be careful when using remeshed surfaces for evaluation purposes and always keep the original versions.
+Decimating surfaces effectively reduces their number of vertices and hence their number of polygons.
+In other words, decimating surfaces coarsens their meshes.
 
-\section org_mitk_views_remeshingUsage Usage
+Vertices are successively eliminated until the desired relative number of vertices remain.
+During this process, the decimation algorithm tries to keep the spatial difference between original meshes and decimated meshes to a minimum.
 
-The Remeshing View provides details on its parameters in its user interface. When in doubt, start with the default parameters and iterate to your desired result by reducing the density parameter.
+A surface may consist of multiple meshes in different time steps.
+The decimation is applied to all time steps.
+
+Before the actual decimation, meshes are triangulated, i. e., polygons with more than three edges like quadrilaterals are converted to triangles.
+Lines and points are ignored.
+Resulting meshes are guaranteed to consist of triangles only.
+
+Vertex normals can be optionally (re-)calculated for decimated meshes.
+To decide if you should flip normals, enable the Backface Culling property of the decimated surface in the Properties View - otherwise it is impossible to tell, as by default, both sides of polygons are shaded in MITK.
 */

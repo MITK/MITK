@@ -36,7 +36,7 @@ public:
 
 private slots:
   void OnSurfaceChanged(const QmitkSingleNodeSelectionWidget::NodeList& nodes);
-  void OnPolygonCountChanged(int polygonCount);
+  void OnVertexCountChanged(int vertexCount);
   void OnCalculateNormalsChanged(int checkState);
   void OnDecimateButtonClicked();
 

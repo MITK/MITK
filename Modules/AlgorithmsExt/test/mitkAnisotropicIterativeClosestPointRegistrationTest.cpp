@@ -15,6 +15,8 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 #include <vtkCleanPolyData.h>
+#include <vtkTransformPolyDataFilter.h>
+#include <vtkTransform.h>
 
 #include "mitkAnisotropicIterativeClosestPointRegistration.h"
 #include "mitkAnisotropicRegistrationCommon.h"
@@ -57,8 +59,8 @@ public:
   {
     mitk::CovarianceMatrixCalculator::Pointer matrixCalculator = mitk::CovarianceMatrixCalculator::New();
 
-    m_MovingSurface = mitk::IOUtil::Load<mitk::Surface>(GetTestDataFilePath("AICPRegistration/head_green.stl"));
-    m_FixedSurface = mitk::IOUtil::Load<mitk::Surface>(GetTestDataFilePath("AICPRegistration/head_red.stl"));
+    m_MovingSurface = mitk::IOUtil::Load<mitk::Surface>(GetTestDataFilePath("AICPRegistration/head_green.vtp"));
+    m_FixedSurface = mitk::IOUtil::Load<mitk::Surface>(GetTestDataFilePath("AICPRegistration/head_red.vtp"));
 
     m_TargetsMovingSurface = mitk::IOUtil::Load<mitk::PointSet>(GetTestDataFilePath("AICPRegistration/targets_head_green.mps"));
     m_TargetsFixedSurface = mitk::IOUtil::Load<mitk::PointSet>(GetTestDataFilePath("AICPRegistration/targets_head_red.mps"));
@@ -91,8 +93,8 @@ public:
 
   void testAicpRegistration()
   {
-    const double expFRE = 27.5799;
-    const double expTRE = 1.68835;
+    const double expFRE = 26.3453;
+    const double expTRE = 3.8707;
     mitk::AnisotropicIterativeClosestPointRegistration::Pointer aICP =
       mitk::AnisotropicIterativeClosestPointRegistration::New();
 
@@ -127,8 +129,8 @@ public:
 
   void testTrimmedAicpregistration()
   {
-    const double expFRE = 4.8912;
-    const double expTRE = 0.0484215;
+    const double expFRE = 18.5469;
+    const double expTRE = 5.5871;
 
     mitk::AnisotropicIterativeClosestPointRegistration::Pointer aICP =
       mitk::AnisotropicIterativeClosestPointRegistration::New();
@@ -140,7 +142,7 @@ public:
     aICP->SetCovarianceMatricesFixedSurface(m_SigmasFixedSurface);
     aICP->SetFRENormalizationFactor(m_FRENormalizationFactor);
     aICP->SetThreshold(0.000001);
-    aICP->SetTrimmFactor(0.50);
+    aICP->SetTrimmFactor(0.80);
 
     // run the algorithm
     aICP->Update();

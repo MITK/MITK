@@ -9,7 +9,7 @@
   preferences dialog.
 
   The plug-in is usually used as a dependency for plug-ins contributing a
-  \ref xp_org_blueberry_osgi_applications extension and providing workbench advisor
+  \ref BlueBerryExtPointsIndex_PlatformRuntime_App extension and providing workbench advisor
   classes which customize the main application menu and toolbar.
 */
 

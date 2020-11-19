@@ -70,10 +70,8 @@ struct BERRY_UI_QT ISelectionListener: public virtual Object
    * it happens when the mouse or key is released.  The exact key or
    * mouse gesture that causes this event is platform specific.
    * </p>
-   *
-   * @param e an event containing information about the selection
    */
-  virtual void WidgetSelected(SelectionEvent::Pointer  /*e*/) {}
+  virtual void WidgetSelected(SelectionEvent::Pointer) {}
 
   /**
    * Sent when default selection occurs in the control.
@@ -85,10 +83,8 @@ struct BERRY_UI_QT ISelectionListener: public virtual Object
    * The exact key or mouse gesture that causes this event is platform
    * specific.
    * </p>
-   *
-   * @param e an event containing information about the default selection
    */
-  virtual void WidgetDefaultSelected(SelectionEvent::Pointer  /*e*/) {}
+  virtual void WidgetDefaultSelected(SelectionEvent::Pointer) {}
 };
 
 }

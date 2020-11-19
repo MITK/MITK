@@ -21,7 +21,7 @@ namespace mitk
 
   /** \brief Executes operations to clean-up Masks.
   *
-  * It is assumed that the segmentation is of type <unsigned short>
+  * It is assumed that the segmentation is of type "unsigned short"
   */
   class MITKBASICIMAGEPROCESSING_EXPORT MaskCleaningOperation {
   public:

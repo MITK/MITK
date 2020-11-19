@@ -2,7 +2,7 @@
 
 \page org_mitk_views_calibrationtoolmanager The MITK-IGT Navigation Tool Calibration
 
-\imageMacro{../resources/iconTrackingToolCalibration.png,"Icon of the MITK-IGT Tracking Toolbox",2.00}
+\imageMacro{iconTrackingToolCalibration.png,"Icon of the MITK-IGT Tracking Toolbox",2.00}
 
 \tableofcontents
 

@@ -285,7 +285,7 @@ public:
    * in the general form <i>&lt;plug-in id&gt;/&lt;option-path&gt;</i>.
    * For example, <code>org.blueberry.core.runtime/debug</code>
    * <p>
-   * Clients are also able to acquire the {@link DebugOptions} service
+   * Clients are also able to acquire the \c DebugOptions service
    * and query it for debug options.
    * </p>
    * @param option the name of the option to lookup
@@ -378,7 +378,9 @@ public:
    * other configuration parameters.
    * </p>
    *
+   * @param statePath
    * @param plugin the plug-in whose state location is returned
+   * @param create
    * @return a local file system path
    * TODO Investigate the usage of a service factory
    * @deprecatedSince{2015_05} Use GetStateLocation instead.

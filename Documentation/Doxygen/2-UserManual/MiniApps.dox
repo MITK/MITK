@@ -45,7 +45,7 @@ The configured command line tools are now available via the drop-down box of the
 
 <div align="center"><h1>Technical Information</h1></div>
 
-MiniApps follow the <a href="http://www.slicer.org/slicerWiki/index.php/Slicer3:Execution_Model_Documentation">Slicer Execution Model</a> in describing themselves via xml:
+MiniApps follow the <a href="https://www.slicer.org/slicerWiki/index.php/Slicer3:Execution_Model_Documentation">Slicer Execution Model</a> in describing themselves via xml:
 
 \code
 $./GibbsTracking --xml

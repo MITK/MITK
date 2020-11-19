@@ -75,7 +75,7 @@ public:
    * in this method. Instead a worker thread is waken up every time this method is called,
    * if foreground model points were set before.
    *
-   * \param OpenCV image to be segmentated
+   * \param image OpenCV image to be segmentated
    * \return false if an empty image was set, true otherwise
    */
   bool OnFilterImage( cv::Mat& image ) override;

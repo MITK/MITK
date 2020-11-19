@@ -75,13 +75,13 @@ the CMake variables MITK_ACCESSBYITK_*.
 AccessByItk(mitkImage, MyAccessMethod)
 \endcode
 
-An example is given in \ref Step6Page.
+An example is given in \ref Step06Page.
 
 The AccessBy... macros create quite a lot of code: the user defined access method has to be compiled for
 all considered pixel types \em times the supported dimensions (default is 2 and 3). Therefore, depending
 on the complexity of the access method, some compilers may run into problems with memory.
 One workaround is to use explicit instantiation and distribute it on multiple files. The macro
-#InstantiateAccessFunction and its variants are for this purpose. An example is again given in \ref Step6Page.
+#InstantiateAccessFunction and its variants are for this purpose. An example is again given in \ref Step06Page.
 Another workaround is to reduce the created code by fixing either the type (#AccessFixedTypeByItk) or
 dimension (#AccessFixedDimensionByItk).
 

@@ -69,7 +69,7 @@ public:
   virtual double GetScanningFrequency( ) = 0;
 
   /**
-    * \param depth new frequency value
+    * \param frequency new frequency value
     * Do not override this method in a subclass. Implement
     * mitk::USControlInterfaceBMode::OnSetScanningFrequency instead.
     */
@@ -91,7 +91,7 @@ public:
   virtual double GetScanningPower( ) = 0;
 
   /**
-    * \param depth new power value
+    * \param power new power value
     * Do not override this method in a subclass. Implement
     * mitk::USControlInterfaceBMode::OnSetScanningPower instead.
     */
@@ -217,7 +217,7 @@ public:
   virtual double GetScanningDynamicRange( ) = 0;
 
   /**
-    * \param rejection new dynamic range value
+    * \param dynamicRange new dynamic range value
     * Do not override this method in a subclass. Implement
     * mitk::USControlInterfaceBMode::OnSetScanningDynamicRange instead.
     */

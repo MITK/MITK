@@ -66,9 +66,9 @@ class MITKTOFUI_EXPORT QmitkToFPointSetWidget :public QWidget
     /*!
     \brief initializes the widget. Observers to the change events of the point sets are created, text actors are activated
     to be rendered into the foreground of the render window.
-    \param stdMultiWidget QmitkStdMultiWidget used for painting overlays for measurement
+    \param renderWindowHashMap
     \param dataStorage DataStorage to add PointSets
-    \param distanceImage range image used to calculate 3D PointSet from 2D index
+    \param cameraIntrinsics
     */
     void InitializeWidget(QHash<QString, QmitkRenderWindow*> renderWindowHashMap, mitk::DataStorage::Pointer dataStorage, mitk::CameraIntrinsics::Pointer cameraIntrinsics=nullptr);
     /*!

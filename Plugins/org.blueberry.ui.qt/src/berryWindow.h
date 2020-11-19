@@ -90,7 +90,7 @@ public:
    * Standard return code constant (value 0) indicating that the window was
    * opened.
    *
-   * @see #open
+   * @see #Open
    */
   static const int OK; // = 0;
 
@@ -98,7 +98,7 @@ public:
    * Standard return code constant (value 1) indicating that the window was
    * canceled.
    *
-   * @see #open
+   * @see #Open
    */
   static const int CANCEL; // = 1;
 
@@ -156,23 +156,9 @@ private:
   /**
    * Menu bar manager, or <code>null</code> if none (default).
    *
-   * @see #addMenuBar
+   * @see #AddMenuBar
    */
   SmartPointer<MenuManager> menuBarManager;
-
-  /**
-   * Tool bar manager, or <code>null</code> if none (default).
-   *
-   * @see #addToolBar
-   */
-  //SmartPointer<IToolBarManager> toolBarManager;
-
-  /**
-   * Status line manager, or <code>null</code> if none (default).
-   *
-   * @see #addStatusLine
-   */
-  //SmartPointer<StatusLineManager> statusLineManager;
 
   /**
    * The exception handler for this application.
@@ -237,28 +223,6 @@ private:
    */
   bool block; // = false;
 
-  //  /**
-  //   * Internal class for informing this window when fonts change.
-  //   */
-  //  class FontChangeListener implements IPropertyChangeListener {
-  //    public void propertyChange(PropertyChangeEvent event) {
-  //      handleFontChange(event);
-  //    }
-  //  }
-
-  //  /**
-  //   * Internal font change listener.
-  //   */
-  //  private FontChangeListener fontChangeListener;
-
-  /**
-   * Internal fields to detect if shell size has been set
-   */
-  //bool resizeHasOccurred = false;
-
-  //Listener resizeListener;
-
-
   /**
    * Returns the most specific modal child from the given list of Shells.
    *
@@ -269,14 +233,6 @@ private:
    */
   static Shell::Pointer GetModalChild(
       const QList<Shell::Pointer>& toSearch);
-
-  /**
-   * Runs the event loop for the given shell.
-   *
-   * @param loopShell
-   *            the shell
-   */
-  //void RunEventLoop();
 
 protected:
 
@@ -289,8 +245,7 @@ protected:
    *            the parent shell, or <code>null</code> to create a top-level
    *            shell. Try passing "(Shell)null" to this method instead of "null"
    *            if your compiler complains about an ambiguity error.
-   * @see #setBlockOnOpen
-   * @see #getDefaultOrientation()
+   * @see #SetBlockOnOpen
    */
   Window(Shell::Pointer parentShell);
 
@@ -349,13 +304,6 @@ protected:
    *            the shell
    */
   virtual void ConfigureShell(Shell::Pointer newShell);
-
-  /**
-   * Constrain the shell size to be no larger than the display bounds.
-   *
-   * @since 2.0
-   */
-  //void ConstrainShellSize();
 
   /**
    * Creates and returns this window's contents. Subclasses may attach any
@@ -584,7 +532,7 @@ public:
    * default image unless one is installed via <code>setDefaultImage</code>.
    *
    * @return the default image, or <code>null</code> if none
-   * @see #setDefaultImage
+   * @see #SetDefaultImage
    */
   static QIcon GetDefaultImage();
 
@@ -596,7 +544,7 @@ public:
    * @see org.blueberry.swt.widgets.Decorations#setImages(org.blueberry.swt.graphics.Image[])
    *
    * @return the array of images to be used when a new window is opened
-   * @see #setDefaultImages
+   * @see #SetDefaultImages
    * @since 3.0
    */
   static QList<QIcon> GetDefaultImages();
@@ -630,7 +578,7 @@ public:
    *
    * @return the menu bar manager, or <code>null</code> if
    *   this window does not have a menu bar
-   * @see #addMenuBar()
+   * @see #AddMenuBar()
    */
   MenuManager* GetMenuBarManager() const;
 
@@ -647,7 +595,7 @@ public:
    *
    * @return the return code
    *
-   * @see #create()
+   * @see #Create()
    */
   int Open();
 

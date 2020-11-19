@@ -1,7 +1,7 @@
 message(STATUS "Configuring MITK Navigation Modules Build")
 
 set(MITK_CONFIG_PACKAGES
-  ACVD
+  OpenMesh
   Qt5
   BLUEBERRY
 )

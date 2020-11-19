@@ -45,8 +45,8 @@ struct IHandlerActivation;
  * </ul>
  * </p>
 
- * @noimplement This interface is not intended to be implemented by clients.
- * @noextend This interface is not intended to be extended by clients.
+ * @note This interface is not intended to be implemented by clients.
+ * @note This interface is not intended to be extended by clients.
  *
  * @since 3.1
  */
@@ -110,8 +110,7 @@ struct BERRY_UI_QT IHandlerService : public IServiceWithSources
    * Activates the given handler within the context of this service. The
    * handler becomes active when <code>expression</code> evaluates to
    * <code>true</code>. This is the same as calling
-   * {@link #activateHandler(String, IHandler, Expression, boolean)} with
-   * global==false.
+   * {@link #ActivateHandler} with \c global==false .
    * </p>
    * <p>
    * Also, it is guaranteed that the handlers submitted through a particular
@@ -191,13 +190,11 @@ struct BERRY_UI_QT IHandlerService : public IServiceWithSources
    * @param command
    *            The command for which an execution event should be created;
    *            must not be <code>null</code>.
-   * @param event
-   *            The SWT event triggering the command execution; may be
-   *            <code>null</code>.
+   * @param uielement
    * @return An execution event suitable for calling
-   *         {@link Command#executeWithChecks(ExecutionEvent)}.
+   *         {@link Command#ExecuteWithChecks}.
    * @since 3.2
-   * @see Command#executeWithChecks(ExecutionEvent)
+   * @see Command#ExecuteWithChecks
    */
   virtual SmartPointer<const ExecutionEvent> CreateExecutionEvent(
       const SmartPointer<const Command>& command,
@@ -211,14 +208,12 @@ struct BERRY_UI_QT IHandlerService : public IServiceWithSources
    * @param command
    *            The parameterized command for which an execution event should
    *            be created; must not be <code>null</code>.
-   * @param event
-   *            The SWT event triggering the command execution; may be
-   *            <code>null</code>.
+   * @param uielement
    * @return An execution event suitable for calling
-   *         {@link Command#executeWithChecks(ExecutionEvent)}.
+   *         {@link Command#ExecuteWithChecks}.
    * @since 3.2
-   * @see ParameterizedCommand#getCommand()
-   * @see Command#executeWithChecks(ExecutionEvent)
+   * @see ParameterizedCommand#GetCommand
+   * @see Command#ExecuteWithChecks
    */
   virtual SmartPointer<const ExecutionEvent> CreateExecutionEvent(
       const SmartPointer<const ParameterizedCommand>& command,
@@ -259,9 +254,7 @@ struct BERRY_UI_QT IHandlerService : public IServiceWithSources
    * @param commandId
    *            The identifier of the command to execute; must not be
    *            <code>null</code>.
-   * @param event
-   *            The SWT event triggering the command execution; may be
-   *            <code>null</code>.
+   * @param uielement
    * @return The return value from the execution; may be <code>null</code>.
    * @throws ExecutionException
    *             If the handler has problems executing this command.
@@ -272,7 +265,7 @@ struct BERRY_UI_QT IHandlerService : public IServiceWithSources
    * @throws NotHandledException
    *             If there is no handler.
    * @since 3.2
-   * @see Command#executeWithChecks(ExecutionEvent)
+   * @see Command#ExecuteWithChecks
    */
   virtual Object::Pointer ExecuteCommand(const QString& commandId,
                                          const SmartPointer<const UIElement>& uielement) = 0;
@@ -283,9 +276,7 @@ struct BERRY_UI_QT IHandlerService : public IServiceWithSources
    * @param command
    *            The parameterized command to be executed; must not be
    *            <code>null</code>.
-   * @param event
-   *            The SWT event triggering the command execution; may be
-   *            <code>null</code>.
+   * @param uielement
    * @return The return value from the execution; may be <code>null</code>.
    * @throws ExecutionException
    *             If the handler has problems executing this command.
@@ -296,7 +287,7 @@ struct BERRY_UI_QT IHandlerService : public IServiceWithSources
    * @throws NotHandledException
    *             If there is no handler.
    * @since 3.2
-   * @see Command#executeWithChecks(ExecutionEvent)
+   * @see Command#ExecuteWithChecks
    */
   virtual Object::Pointer ExecuteCommand(const SmartPointer<ParameterizedCommand>& command,
                                          const SmartPointer<const UIElement>& uielement) = 0;
@@ -304,15 +295,13 @@ struct BERRY_UI_QT IHandlerService : public IServiceWithSources
   /**
    * Executes the given parameterized command in the provided context. It
    * takes care of finding the correct active handler given the context, calls
-   * {@link IHandler2#setEnabled(Object)} to update the enabled state if
+   * \c IHandler2.setEnabled(Object) to update the enabled state if
    * supported, and executes with that handler.
    *
    * @param command
    *            The parameterized command to be executed; must not be
    *            <code>null</code>.
-   * @param event
-   *            The SWT event triggering the command execution; may be
-   *            <code>null</code>.
+   * @param uielement
    * @param context
    *            the evaluation context to run against. Must not be
    *            <code>null</code>
@@ -326,8 +315,8 @@ struct BERRY_UI_QT IHandlerService : public IServiceWithSources
    * @throws NotHandledException
    *             If there is no handler.
    * @since 3.4
-   * @see Command#executeWithChecks(ExecutionEvent)
-   * @see #createContextSnapshot(boolean)
+   * @see Command#ExecuteWithChecks
+   * @see #CreateContextSnapshot
    */
   virtual Object::Pointer ExecuteCommandInContext(
       const SmartPointer<ParameterizedCommand>& command,
@@ -336,7 +325,7 @@ struct BERRY_UI_QT IHandlerService : public IServiceWithSources
 
   /**
    * This method creates a copy of the application context returned by
-   * {@link #getCurrentState()}.
+   * {@link #GetCurrentState}.
    *
    * @param includeSelection
    *            if <code>true</code>, include the default variable and
@@ -352,10 +341,9 @@ struct BERRY_UI_QT IHandlerService : public IServiceWithSources
    * {@link ExecutionEvent}.
    *
    * @return the current state of the application; never <code>null</code>.
-   * @see ParameterizedCommand#executeWithChecks(Object, Object)
-   * @see ExecutionEvent#ExecutionEvent(Command, java.util.Map, Object,
-   *      Object)
-   * @see org.eclipse.ui.services.IEvaluationService
+   * @see ParameterizedCommand#ExecuteWithChecks
+   * @see ExecutionEvent#ExecutionEvent
+   * @see IEvaluationService
    */
   virtual SmartPointer<IEvaluationContext> GetCurrentState() const = 0;
 

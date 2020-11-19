@@ -34,7 +34,7 @@ public:
 
   /**
    * \brief Updates the widget according to the new info.
-   * \param pointer to the info instance.
+   * \param newInfo pointer to the info instance.
    * \remark The DLLInfo is not stored internally or as reference
    * to update the widget you must use the updateInfo() method.
    */

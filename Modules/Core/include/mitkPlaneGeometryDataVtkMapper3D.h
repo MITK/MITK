@@ -84,12 +84,6 @@ namespace mitk
   * inhabit the same space, higher layer occludes lower layer.
   *   - \b "opacity": (FloatProperty) Set the opacity for each rendered image.
   *   - \b "color": (FloatProperty) Set the color for each rendered image.
-  *
-  *  The internal filter pipeline which combines a (sometimes deformed) 2D surface
-  *  with a nice frame and image textures is illustrated in the following sketch:
-  *
-  *  \image html mitkPlaneGeometryDataVtkMapper3D.png "Internal filter pipeline"
-  *
   */
   class MITKCORE_EXPORT PlaneGeometryDataVtkMapper3D : public VtkMapper
   {

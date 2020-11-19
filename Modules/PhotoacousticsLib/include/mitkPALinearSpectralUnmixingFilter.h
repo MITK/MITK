@@ -71,7 +71,7 @@ namespace mitk {
 
       /**
       * \brief Takes a mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType and fix it for usage at the "SpectralUnmixingAlgorithm" method.
-      * @param algorithmName has to be a mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType
+      * @param inputAlgorithmName has to be a mitk::pa::LinearSpectralUnmixingFilter::AlgortihmType
       */
       void SetAlgorithm(AlgortihmType inputAlgorithmName);
 

@@ -17,10 +17,9 @@ The MITK OpenCL Module provides a basic class structure to allow usage of OpenCL
 
 <h1> Build Instructions </h1>
 
-The MITK OpenCL module needs an OpenCL Device ( most likely a graphics card, but works also on some CPUs ) and the corresponding driver. Furthermore the OpenCL library and the headers are needed. A list of supported hardware is provided by <a href="http://www.khronos.org/conformance/adopters/conformant-products#topencl"> Khronos.org </a>. For the driver and the libraries please look at the support pages of the hardware manufacturer. Quick Links to the most likely of them:
+The MITK OpenCL module needs an OpenCL Device ( most likely a graphics card, but works also on some CPUs ) and the corresponding driver. Furthermore the OpenCL library and the headers are needed. A list of supported hardware is provided by <a href="https://www.khronos.org/conformance/adopters/conformant-products/opencl"> Khronos.org </a>. For the driver and the libraries please look at the support pages of the hardware manufacturer. Quick Links to the most likely of them:
 - <a href="https://developer.nvidia.com/opencl"> NVIDIA OpenCL Page </a>
-- <a href="http://www.amd.com/de/products/technologies/stream-technology/opencl/pages/opencl.aspx"> AMD/ATI OpenCL Page </a>
-- <a href="http://software.intel.com/en-us/vcsource/tools/opencl-sdk"> Intel OpenCL SDK </a>
+- <a href="https://software.intel.com/content/www/us/en/develop/tools/opencl-sdk.html"> Intel OpenCL SDK </a>
 
 To activate the module, you have to activate the CMake option
 

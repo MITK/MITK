@@ -54,7 +54,7 @@ namespace mitk
      * Overwritten, per design this class will always have a maximal number of one.
      * @param maxNumber
      */
-    virtual void SetMaxPoints(unsigned int /*maxNumber*/ = 0) {}
+    virtual void SetMaxPoints(unsigned int maxNumber = 0);
     void DataNodeChanged() override;
   };
 }

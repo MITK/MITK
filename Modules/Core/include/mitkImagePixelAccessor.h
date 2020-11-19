@@ -41,7 +41,10 @@ namespace mitk
   friend class Image;
 
   protected:
-    /**  \param ImageDataItem* specifies the allocated image part */
+    /** 
+     * \param iP
+     * \param iDI specifies the allocated image part
+     */
     ImagePixelAccessor(ImageConstPointer iP, const mitk::ImageDataItem *iDI) : m_ImageDataItem(iDI)
     {
       if (iDI == nullptr)

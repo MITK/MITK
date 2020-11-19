@@ -100,3 +100,7 @@ void mitk::SinglePointDataInteractor::DataNodeChanged()
     }
   }
 }
+
+void mitk::SinglePointDataInteractor::SetMaxPoints(unsigned int)
+{
+}

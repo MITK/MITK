@@ -27,7 +27,7 @@ However, not all grabbers are created equal. Make sure your grabber supports
 the video-out offered by your ultrasound device and that it can achieve a
 satisfying framerate. We have made good experiences with epiphan Grabbers and
 currently recommend the <a
-href="http://www.epiphan.com/products/dvi-frame-grabbers/dvi2usb-3-0/">Epiphan
+href="https://www.epiphan.com/products/dvi2usb-3-0/">Epiphan
 DVI2USB 3.0 device</a> which supports HDMI, DVI and VGA, but less costly
 grabbers certainly are an option.
 
@@ -44,7 +44,7 @@ empty now.
 
 The creation of API devices depends on the device. A Telemed device would be
 listed in the box if this version of MITK was compiled with support for Telemed
-devices (see \link USHardwareTelemedPage\endlink). Such a device requires no
+devices (see \link USHardwareTelemedPage \endlink). Such a device requires no
 configuration.
 
 Click "New Video Device" if you want to create a new video device.

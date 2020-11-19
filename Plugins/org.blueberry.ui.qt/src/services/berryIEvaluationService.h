@@ -70,8 +70,8 @@ class Expression;
  * </ul>
  * </p>
  *
- * @noextend This interface is not intended to be extended by clients.
- * @noimplement This interface is not intended to be implemented by clients.
+ * @note This interface is not intended to be extended by clients.
+ * @note This interface is not intended to be implemented by clients.
  */
 struct BERRY_UI_QT IEvaluationService : public IServiceWithSources
 {
@@ -129,7 +129,7 @@ struct BERRY_UI_QT IEvaluationService : public IServiceWithSources
    * @param property
    *            the property contained in the notification
    * @return a token that can be used to remove this listener.
-   * {@link #removeEvaluationListener(IEvaluationReference)}
+   * {@link #RemoveEvaluationListener}
    */
   virtual SmartPointer<IEvaluationReference> AddEvaluationListener(
       const SmartPointer<Expression>& expression,
@@ -138,12 +138,10 @@ struct BERRY_UI_QT IEvaluationService : public IServiceWithSources
 
   /**
    * Re-add a property change listener that has already been removed by
-   * {@link #removeEvaluationListener(IEvaluationReference)}.
+   * {@link #RemoveEvaluationListener}.
    * <p>
    * It will only accept IEvaluationReferences returned from a previous call
-   * to
-   * {@link #addEvaluationListener(Expression, IPropertyChangeListener, String)}
-   * on this service.
+   * to {@link #AddEvaluationListener} on this service.
    * </p>
    * <p>
    * <b>Note:</b> references should be removed when no longer necessary. If
@@ -153,7 +151,7 @@ struct BERRY_UI_QT IEvaluationService : public IServiceWithSources
    *
    * @param ref
    *            The listener to re-add.
-   * @see #removeEvaluationListener(IEvaluationReference)
+   * @see #RemoveEvaluationListener
    */
   virtual void AddEvaluationReference(const SmartPointer<IEvaluationReference>& ref) = 0;
 

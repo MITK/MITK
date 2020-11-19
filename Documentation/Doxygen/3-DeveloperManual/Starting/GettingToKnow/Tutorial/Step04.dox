@@ -2,11 +2,9 @@
 
 \page Step04Page MITK Tutorial - Step 4: Use several views to explore data
 
-\li \ref Step4.cpp "Step4.cpp"\n
-Contains the code of step 4a + b.
-\li Path to files used in this step: \n
-http://mitk.org/download/tutorial-data/Pic3D.nrrd (image) \n
-http://mitk.org/download/tutorial-data/lungs.vtk (surface)
+\li Examples/Tutorial/Step4
+\li https://www.mitk.org/download/tutorial-data/Pic3D.nrrd (image) \n
+https://www.mitk.org/download/tutorial-data/lungs.vtk (surface)
 
 As in Step 2 and Step 3 one or more data sets may be loaded.
 

@@ -69,8 +69,7 @@ namespace itk
     mapIt = m_LabelStatistics.find(label);
     if ( mapIt == m_LabelStatistics.end() )
     {
-      // label does not exist, return a default value
-      return NumericTraits< PixelType >::Zero;
+      mitkThrow() << "Label does not exist";
     }
     else
     {
@@ -89,8 +88,7 @@ namespace itk
     mapIt = m_LabelStatistics.find(label);
     if ( mapIt == m_LabelStatistics.end() )
     {
-      // label does not exist, return a default value
-      return NumericTraits< PixelType >::Zero;
+      mitkThrow() << "Label does not exist";
     }
     else
     {
@@ -108,8 +106,7 @@ namespace itk
     mapIt = m_LabelStatistics.find(label);
     if ( mapIt == m_LabelStatistics.end() )
     {
-      // label does not exist, return a default value
-      return NumericTraits< PixelType >::Zero;
+      mitkThrow() << "Label does not exist";
     }
     else
     {
@@ -127,8 +124,7 @@ namespace itk
     mapIt = m_LabelStatistics.find(label);
     if ( mapIt == m_LabelStatistics.end() )
     {
-      // label does not exist, return a default value
-      return NumericTraits< PixelType >::Zero;
+      mitkThrow() << "Label does not exist";
     }
     else
     {
@@ -146,8 +142,7 @@ namespace itk
     mapIt = m_LabelStatistics.find(label);
     if ( mapIt == m_LabelStatistics.end() )
     {
-      // label does not exist, return a default value
-      return NumericTraits< PixelType >::Zero;
+      mitkThrow() << "Label does not exist";
     }
     else
     {
@@ -165,8 +160,7 @@ namespace itk
     mapIt = m_LabelStatistics.find(label);
     if ( mapIt == m_LabelStatistics.end() )
     {
-      // label does not exist, return a default value
-      return NumericTraits< PixelType >::Zero;
+      mitkThrow() << "Label does not exist";
     }
     else
     {
@@ -185,8 +179,7 @@ namespace itk
     mapIt = m_LabelStatistics.find(label);
     if ( mapIt == m_LabelStatistics.end() )
     {
-      // label does not exist, return a default value
-      return NumericTraits< PixelType >::Zero;
+      mitkThrow() << "Label does not exist";
     }
     else
     {
@@ -206,8 +199,7 @@ namespace itk
     mapIt = m_LabelStatistics.find(label);
     if ( mapIt == m_LabelStatistics.end() )
       {
-      // label does not exist, return a default value
-      return NumericTraits< PixelType >::max();
+      mitkThrow() << "Label does not exist";
       }
     else
       {
@@ -225,8 +217,7 @@ namespace itk
     mapIt = m_LabelStatistics.find(label);
     if ( mapIt == m_LabelStatistics.end() )
       {
-      // label does not exist, return a default value
-      return NumericTraits< PixelType >::NonpositiveMin();
+      mitkThrow() << "Label does not exist";
       }
     else
       {
@@ -244,8 +235,7 @@ namespace itk
     mapIt = m_LabelStatistics.find(label);
     if ( mapIt == m_LabelStatistics.end() )
       {
-      // label does not exist, return a default value
-      return NumericTraits< PixelType >::ZeroValue();
+      mitkThrow() << "Label does not exist";
       }
     else
       {
@@ -263,8 +253,7 @@ namespace itk
     mapIt = m_LabelStatistics.find(label);
     if ( mapIt == m_LabelStatistics.end() )
       {
-      // label does not exist, return a default value
-      return NumericTraits< PixelType >::ZeroValue();
+      mitkThrow() << "Label does not exist";
       }
     else
       {
@@ -282,8 +271,7 @@ namespace itk
     mapIt = m_LabelStatistics.find(label);
     if ( mapIt == m_LabelStatistics.end() )
       {
-      // label does not exist, return a default value
-      return NumericTraits< PixelType >::ZeroValue();
+      mitkThrow() << "Label does not exist";
       }
     else
       {
@@ -301,8 +289,7 @@ namespace itk
     mapIt = m_LabelStatistics.find(label);
     if ( mapIt == m_LabelStatistics.end() )
       {
-      // label does not exist, return a default value
-      return NumericTraits< PixelType >::ZeroValue();
+      mitkThrow() << "Label does not exist";
       }
     else
       {
@@ -320,9 +307,7 @@ namespace itk
     mapIt = m_LabelStatistics.find(label);
     if ( mapIt == m_LabelStatistics.end() )
       {
-      typename Superclass::BoundingBoxType emptyBox;
-      // label does not exist, return a default value
-      return emptyBox;
+      mitkThrow() << "Label does not exist";
       }
     else
       {
@@ -341,9 +326,7 @@ namespace itk
 
     if ( mapIt == m_LabelStatistics.end() )
       {
-      typename Superclass::RegionType emptyRegion;
-      // label does not exist, return a default value
-      return emptyRegion;
+      mitkThrow() << "Label does not exist";
       }
     else
       {
@@ -376,8 +359,7 @@ namespace itk
     mapIt = m_LabelStatistics.find(label);
     if ( mapIt == m_LabelStatistics.end() )
       {
-      // label does not exist, return a default value
-      return 0;
+      mitkThrow() << "Label does not exist";
       }
     else
       {
@@ -396,8 +378,7 @@ namespace itk
     mapIt = m_LabelStatistics.find(label);
     if ( mapIt == m_LabelStatistics.end() )
       {
-      // label does not exist, return a default value
-      return ITK_NULLPTR;
+      mitkThrow() << "Label does not exist";
       }
     else
       {

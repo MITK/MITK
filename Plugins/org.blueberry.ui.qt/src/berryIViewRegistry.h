@@ -36,7 +36,6 @@ namespace berry {
  *
  * @see IViewDescriptor
  * @see IStickyViewDescriptor
- * @noimplement This interface is not intended to be implemented by clients.
  */
 struct BERRY_UI_QT IViewRegistry
 {

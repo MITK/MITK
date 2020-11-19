@@ -23,7 +23,8 @@ class mitkCreateDistanceImageFromSurfaceFilterTestSuite : public mitk::TestFixtu
 {
   CPPUNIT_TEST_SUITE(mitkCreateDistanceImageFromSurfaceFilterTestSuite);
   vtkDebugLeaks::SetExitError(0);
-  MITK_TEST(TestCreateDistanceImageForLiver);
+  // Basically tests the same as the other test below
+  // MITK_TEST(TestCreateDistanceImageForLiver);
   MITK_TEST(TestCreateDistanceImageForTube);
   CPPUNIT_TEST_SUITE_END();
 

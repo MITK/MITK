@@ -31,7 +31,7 @@ namespace mitk
    * Helper method to check if the difference is bigger or equal to a given epsilon
    *
    * @param diff the difference to be checked against the epsilon
-   * @param the epsilon. The absolute difference needs to be smaller than this.
+   * @param epsilon The absolute difference needs to be smaller than this.
    * @return true if abs(diff) >= eps
    */
   template <typename DifferenceType>

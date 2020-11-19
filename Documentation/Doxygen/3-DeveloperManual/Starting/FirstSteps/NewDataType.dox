@@ -47,6 +47,6 @@ If your data type needs a special way to render its data for the user, you need 
 <p>
 If you meet any difficulties during this How-To, don't hesitate to ask on the MITK mailing list mitk-users@lists.sourceforge.net!
 People there are kind and will try to help you.
-If you notice that there is an error, or that the code has changed so the way shown here is no longer correct, please open a bug report a http://bugs.mitk.org .</p>
+If you notice that there is an error, or that the code has changed so the way shown here is no longer correct, please open a bug report at https://phabricator.mitk.org/maniphest/ .</p>
 
 */

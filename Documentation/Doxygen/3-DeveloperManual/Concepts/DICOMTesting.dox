@@ -30,10 +30,10 @@ mitk::Image objects, MITK needs a way to build image stacks and this needs to be
 
 For more background information, see David Clunie's most valuable posts on comp.protocols.dicom, e.g.:
 
- - http://groups.google.com/group/comp.protocols.dicom/browse_thread/thread/6db91972e161f0d4/6e0304ac264a6eb5
- - http://groups.google.com/group/comp.protocols.dicom/browse_thread/thread/e9bd1497bea3e66b/187a7dc8810613d2
- - http://groups.google.com/group/comp.protocols.dicom/browse_thread/thread/5d80bb0b7fafcb81/cf96119e3b024ed8
- - http://groups.google.com/group/comp.protocols.dicom/browse_thread/thread/4568635e083a3fba/e2a8ceec23032601
+ - https://groups.google.com/g/comp.protocols.dicom/c/bbkZcuFh8NQ
+ - https://groups.google.com/g/comp.protocols.dicom/c/6b0Ul76j5ms
+ - https://groups.google.com/g/comp.protocols.dicom/c/XYC7C3-vy4E
+ - https://groups.google.com/g/comp.protocols.dicom/c/RWhjXgg6P7o
 
 \section DICOMTesting_testidea Test principle
 

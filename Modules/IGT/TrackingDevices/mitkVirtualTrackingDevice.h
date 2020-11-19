@@ -147,7 +147,7 @@ namespace mitk
     * Together with GetSplineChordLength(), the speed in millimeter per second can be estimated.
     * roundsPerSecond must be positive and larger than 0.0001.
     * \warning Tool speed is currently not used.
-    * \TODO: use tool speed
+    * \todo use tool speed
     */
     void SetToolSpeed(unsigned int idx, mitk::ScalarType roundsPerSecond);
 

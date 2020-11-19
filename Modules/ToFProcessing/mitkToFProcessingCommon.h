@@ -30,9 +30,9 @@ namespace mitk
   * </ul>
   * The coordinate conversion follows the model of a common pinhole camera where the origin of the camera
   * coordinate system (world coordinates) is at the pinhole
-  * \image html ../Modules/ToFProcessing/Documentation/PinholeCameraModel.png
+  * \image html Modules/ToFProcessing/Documentation/PinholeCameraModel.png
   * The definition of the image plane and its coordinate systems (pixel and mm) is depicted in the following image
-  * \image html ../Modules/ToFProcessing/Documentation/ImagePlane.png
+  * \image html Modules/ToFProcessing/Documentation/ImagePlane.png
   * @ingroup ToFProcessing
   */
   class MITKTOFPROCESSING_EXPORT ToFProcessingCommon
@@ -259,8 +259,6 @@ namespace mitk
     }
 
     /** \ingroup KinectReconstruction
-     * @{
-     *
      * @brief KinectIndexToCartesianCoordinates Convert a pixel (i,j) with value d to a 3D world point. This conversion is meant for Kinect and slightly different then ToF reconstruction. See also "Hacking the Kinect" - Jeff Kramer, Matt Parker, Daniel Herrera C., Nicolas Burrus, Florian Echtler, Chapter 7, Part 1 "Moving from Depth Map to Point Cloud.
      * @param i Pixel index i.
      * @param j Pixel index j.
@@ -289,9 +287,8 @@ namespace mitk
     {
         return KinectIndexToCartesianCoordinates(index[0],index[1],distance,focalLength[0],focalLength[1],principalPoint[0], principalPoint[1]);
     }
-    /** @}*/
+
     /** \ingroup KinectReconstructionInverse
-     * @{
      * @brief CartesianCoordinatesToKinectIndexCoordinates Transform a 3D world point back to distance image pixel coordinates.
      * @param cartesianPointX x value of the cartesian point.
      * @param cartesianPointY y value of the cartesian point.
@@ -312,7 +309,7 @@ namespace mitk
     {
       return CartesianToKinectIndexCoordinates( cartesianPoint[0], cartesianPoint[1], cartesianPoint[2], focalLength[0], focalLength[1], principalPoint[0], principalPoint[1], calculateDistance);
     }
-    /** @}*/
+
     /**
      * @brief ContinuousKinectIndexToCartesianCoordinates This method is escpially meant for reconstructing a Kinect point
      * with continuous index coordinates (i.e. not exactly a pixel position, but a point interpolated between two pixels).

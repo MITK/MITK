@@ -25,7 +25,7 @@ see the corresponding section for more information.
 
 \subsection DirectoryStructurePageApplications Applications
 
-This directory contains the different applications. Each application has its own subfolder, including the necessary code, icons and other resources. For more information on applications see \ref ModularizationPageApplications or \ref ApplicationsPageApplications .
+This directory contains the different applications. Each application has its own subfolder, including the necessary code, icons and other resources. For more information on applications see \ref ModularizationPageApplications .
 
 \subsection DirectoryStructurePageCMake CMake
 

@@ -32,13 +32,13 @@ struct INamedHandleStateIds {
 
   /**
    * The state id used for overriding the description of a named handle
-   * object. This state's value must return a {@link String}.
+   * object. This state's value must return a \c String .
    */
   static const QString DESCRIPTION; // = "DESCRIPTION";
 
   /**
    * The state id used for overriding the name of a named handle object. This
-   * state's value must return a {@link String}.
+   * state's value must return a \c String .
    */
   static const QString NAME; // = "NAME";
 };

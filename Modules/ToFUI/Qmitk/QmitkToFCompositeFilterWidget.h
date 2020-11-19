@@ -46,7 +46,7 @@ class MITKTOFUI_EXPORT QmitkToFCompositeFilterWidget :public QWidget
 
     /*!
     \brief Sets the ToFCompositeFilter used by this widget
-    \param tofCompositeFilter pointer to the internally used ToFCompositeFilter
+    \param toFCompositeFilter pointer to the internally used ToFCompositeFilter
     */
     void SetToFCompositeFilter(mitk::ToFCompositeFilter* toFCompositeFilter);
     /*!

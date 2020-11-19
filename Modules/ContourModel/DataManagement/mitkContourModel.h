@@ -106,7 +106,7 @@ namespace mitk
     \param vertex - coordinate representation of a control point
     \param timestep - the timestep at which the vertex will be add ( default 0)
 
-    @Note Adding a vertex to a timestep which exceeds the timebounds of the contour
+    @note Adding a vertex to a timestep which exceeds the timebounds of the contour
     will not be added, the TimeGeometry will not be expanded.
     */
     void AddVertex(mitk::Point3D &vertex, int timestep = 0);
@@ -117,7 +117,7 @@ namespace mitk
     \param vertex - coordinate representation of a control point
     \param timestep - the timestep at which the vertex will be add ( default 0)
 
-    @Note Adding a vertex to a timestep which exceeds the timebounds of the contour
+    @note Adding a vertex to a timestep which exceeds the timebounds of the contour
     will not be added, the TimeGeometry will not be expanded.
     */
     void AddVertex(VertexType &vertex, int timestep = 0);
@@ -128,7 +128,7 @@ namespace mitk
     \param vertex - coordinate representation of a control point
     \param timestep - the timestep at which the vertex will be add ( default 0)
 
-    @Note Adding a vertex to a timestep which exceeds the timebounds of the contour
+    @note Adding a vertex to a timestep which exceeds the timebounds of the contour
     will not be added, the TimeSlicedGeometry will not be expanded.
     */
     void AddVertex(const VertexType *vertex, int timestep = 0);
@@ -141,7 +141,7 @@ namespace mitk
     will be rendered).
 
 
-    @Note Adding a vertex to a timestep which exceeds the timebounds of the contour
+    @note Adding a vertex to a timestep which exceeds the timebounds of the contour
     will not be added, the TimeGeometry will not be expanded.
     */
     void AddVertex(mitk::Point3D &vertex, bool isControlPoint, int timestep = 0);
@@ -152,7 +152,7 @@ namespace mitk
     \param vertex - coordinate representation of a control point
     \param timestep - the timestep at which the vertex will be add ( default 0)
 
-    @Note Adding a vertex to a timestep which exceeds the timebounds of the contour
+    @note Adding a vertex to a timestep which exceeds the timebounds of the contour
     will not be added, the TimeGeometry will not be expanded.
     */
     void AddVertexAtFront(mitk::Point3D &vertex, int timestep = 0);
@@ -163,7 +163,7 @@ namespace mitk
     \param vertex - coordinate representation of a control point
     \param timestep - the timestep at which the vertex will be add ( default 0)
 
-    @Note Adding a vertex to a timestep which exceeds the timebounds of the contour
+    @note Adding a vertex to a timestep which exceeds the timebounds of the contour
     will not be added, the TimeGeometry will not be expanded.
     */
     void AddVertexAtFront(VertexType &vertex, int timestep = 0);
@@ -176,7 +176,7 @@ namespace mitk
     will be rendered).
 
 
-    @Note Adding a vertex to a timestep which exceeds the timebounds of the contour
+    @note Adding a vertex to a timestep which exceeds the timebounds of the contour
     will not be added, the TimeGeometry will not be expanded.
     */
     void AddVertexAtFront(mitk::Point3D &vertex, bool isControlPoint, int timestep = 0);
@@ -199,8 +199,9 @@ namespace mitk
 
     /** \brief Concatenate two contours.
     The starting control point of the other will be added at the end of the contour.
-    \pararm timestep - the timestep at which the vertex will be add ( default 0)
-    \pararm check - check for intersections ( default false)
+    \param other
+    \param timestep - the timestep at which the vertex will be add ( default 0)
+    \param check - check for intersections ( default false)
     */
     void Concatenate(mitk::ContourModel *other, int timestep = 0, bool check = false);
 
@@ -247,7 +248,7 @@ namespace mitk
     int GetNumberOfVertices(int timestep = 0) const;
 
     /** \brief Returns whether the contour model is empty at a given timestep.
-    \pararm timestep - default = 0
+    \param timestep - default = 0
     */
     virtual bool IsEmpty(int timestep) const;
 

@@ -39,8 +39,8 @@ struct ISourceProvider;
  * </ul>
  * </p>
  *
- * @noimplement This interface is not intended to be implemented by clients.
- * @noextend This interface is not intended to be extended by clients.
+ * @note This interface is not intended to be implemented by clients.
+ * @note This interface is not intended to be extended by clients.
  *
  * @see IEvaluationService
  */

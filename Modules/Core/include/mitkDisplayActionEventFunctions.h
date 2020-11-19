@@ -64,7 +64,7 @@ namespace mitk
     *   The function performs a slice selection of the slice navigation controller and will set
     *   the cross hair for all 2D-render windows.
     *   The new position was previously determined by the mouse interaction event.
-    *   #TODO: currently there is no need to distinguish between this and the non-synchronized version
+    * @todo Currently there is no need to distinguish between this and the non-synchronized version
     */
     MITKCORE_EXPORT StdFunctionCommand::ActionFunction SetCrosshairSynchronizedAction();
     /**

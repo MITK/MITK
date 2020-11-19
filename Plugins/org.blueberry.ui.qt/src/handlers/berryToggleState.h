@@ -22,7 +22,7 @@ namespace berry {
  * A piece of state storing a \c bool.
  * </p>
  * <p>
- * If this state is registered using {@link IMenuStateIds#STYLE}, then it will
+ * If this state is registered using \c IMenuStateIds.STYLE , then it will
  * control the presentation of the command if displayed in the menus, tool bars
  * or status line.
  * </p>

@@ -21,8 +21,8 @@ namespace berry {
 /**
  * Provides utilities and constants for use with the new menus API.
  *
- * @noextend This class is not intended to be subclassed by clients.
- * @noinstantiate This class is not intended to be instantiated by clients.
+ * @note This class is not intended to be subclassed by clients.
+ * @note This class is not intended to be instantiated by clients.
  */
 class BERRY_UI_QT MenuUtil
 {

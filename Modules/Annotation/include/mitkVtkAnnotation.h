@@ -39,7 +39,7 @@ namespace mitk
     * \brief Paints the Annotation.
     *
     * This method forces a paint of the Annotation as it is configured at the moment.
-    * \warn Should only be used as alternative to the AnnotationManager mechanism
+    * \warning Should only be used as alternative to the AnnotationManager mechanism
     * in GL-Mappers.
     */
     void Paint(BaseRenderer *renderer);

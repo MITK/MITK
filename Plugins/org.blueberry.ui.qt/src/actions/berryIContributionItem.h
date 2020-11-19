@@ -38,7 +38,7 @@ struct IContributionManager;
  * A contribution item can realize itself in different Qt widgets, using the different
  * <code>fill</code> methods.  The same type of contribution item can be used with a
  * <code>MenuBarManager</code>, <code>ToolBarManager</code>,
- * </code>or a <code>StatusLineManager</code>.
+ * or a <code>StatusLineManager</code>.
  * </p>
  * <p>
  * This interface is internal to the framework; it should not be implemented outside
@@ -46,7 +46,6 @@ struct IContributionManager;
  * </p>
  *
  * @see IContributionManager
- * @noimplement This interface is not intended to be implemented by clients.
  */
 struct IContributionItem : public virtual Object
 {
@@ -67,8 +66,7 @@ struct IContributionItem : public virtual Object
    * Used by <code>MenuBarManager</code>.
    *
    * @param parent the parent menu
-   * @param index the index where the controls are inserted,
-   *   or <code>-1</code> to insert at the end
+   * @param before
    */
   virtual void Fill(QMenuBar* parent, QAction* before) = 0;
 
@@ -77,8 +75,7 @@ struct IContributionItem : public virtual Object
    * Used by <code>MenuManager</code>.
    *
    * @param parent the parent menu
-   * @param index the index where the controls are inserted,
-   *   or <code>-1</code> to insert at the end
+   * @param before
    */
   virtual void Fill(QMenu* parent, QAction* before) = 0;
 
@@ -87,8 +84,7 @@ struct IContributionItem : public virtual Object
    * Used by <code>ToolBarManager</code>.
    *
    * @param parent the parent tool bar
-   * @param index the index where the controls are inserted,
-   *   or <code>-1</code> to insert at the end
+   * @param before
    */
   virtual void Fill(QToolBar* parent, QAction* before) = 0;
 

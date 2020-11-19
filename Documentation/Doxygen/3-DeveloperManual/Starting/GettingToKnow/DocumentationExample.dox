@@ -11,9 +11,9 @@ For the generated documentation page see DocumentationExample .
 For more information on doxygen and its use you can take a look at one of the following resources.
 
 <ul>
-  <li> The doxygen <a href="http://www.stack.nl/~dimitri/doxygen/commands.html">Command List</a>
-  <li> The doxygen <a href="http://www.stack.nl/~dimitri/doxygen/manual.html">Manual</a>
-  <li> The doxygen <a href="http://www.stack.nl/~dimitri/doxygen/faq.html">FAQ</a>
+  <li> The doxygen <a href="https://www.doxygen.nl/manual/commands.html">Command List</a>
+  <li> The doxygen <a href="https://www.doxygen.nl/manual/index.html">Manual</a>
+  <li> The doxygen <a href="https://www.doxygen.nl/manual/faq.html">FAQ</a>
 </ul>
 
 \section DocumentationExampleTheSourceFile The Source File

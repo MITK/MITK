@@ -47,15 +47,15 @@ The following table gives an overview about the icons of the treeview and the re
 <table>
 <caption id="multi_row">XNAT Icon Overview</caption>
 <tr><th>Icon                     <th>XNAT object
-<tr><td>\imageMacro{xnat-server.png, "" ,0.50} <td>XNAT Server
-<tr><td>\imageMacro{xnat-project.png, "" ,0.50} <td>XNAT Project
-<tr><td>\imageMacro{xnat-subject.png, "" ,0.50} <td>XNAT Subject
-<tr><td>\imageMacro{xnat-experiment.png, "" ,0.50} <td>XNAT Experiment
-<tr><td>\imageMacro{xnat-folder-icon.png, "" ,0.50} <td>XNAT Scan top-level folder
-<tr><td>\imageMacro{xnat-scan.png, "" ,0.50} <td>XNAT Scan
-<tr><td>\imageMacro{xnat-folder-icon.png, "" ,0.50} <td>XNAT Resource top-level folder
-<tr><td>\imageMacro{xnat-resource.png, "" ,0.50} <td>XNAT Resource folder
-<tr><td>\imageMacro{xnat-file.png, "" ,0.50} <td>XNAT File
+<tr><td>\image html xnat-server.png <td>XNAT Server
+<tr><td>\image html xnat-project.png <td>XNAT Project
+<tr><td>\image html xnat-subject.png <td>XNAT Subject
+<tr><td>\image html xnat-experiment.png <td>XNAT Experiment
+<tr><td>\image html xnat-folder-icon.png <td>XNAT Scan top-level folder
+<tr><td>\image html xnat-scan.png <td>XNAT Scan
+<tr><td>\image html xnat-folder-icon.png <td>XNAT Resource top-level folder
+<tr><td>\image html xnat-resource.png <td>XNAT Resource folder
+<tr><td>\image html xnat-file.png <td>XNAT File
 </table>
 
 If you have selected a XNAT project, subject or experiment, MITK displays detailed information in a separate info area below the tree browser

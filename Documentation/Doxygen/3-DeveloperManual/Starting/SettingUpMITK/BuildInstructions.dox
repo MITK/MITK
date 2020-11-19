@@ -20,11 +20,11 @@ libraries into the superbuild process.
 \section BuildInstructions_Prerequisites Prerequisites
 
 You need:
-  -# Git from http://git-scm.com (there are also numerous third-party graphical
+  -# <a href="https://git-scm.com/">Git</a> (there are also numerous third-party graphical
      clients available). We recommend using Git, but see below for a way how to
      get the current source code without using it.
-  -# <a href="http://www.cmake.org">CMake</a> (version \minimumCMakeVersion or higher)
-  -# <a href="http://qt.io">Qt</a> 5.12 if you plan to develop Qt-based
+  -# <a href="https://cmake.org/">CMake</a> (version \minimumCMakeVersion or higher)
+  -# <a href="https://www.qt.io/">Qt</a> 5.12 if you plan to develop Qt-based
      applications
   -# If you are using <b>macOS</b> you need an XCode installation and the
      Command Line Tools as it provides the neccessary compilers and SDKs
@@ -32,7 +32,7 @@ You need:
 \section BuildInstructions_Qt A note about Qt
 
 As we do not provide Qt in the MITK superbuild you need to install Qt manually.
-The Qt Company provides <a href="http://www.qt.io/download/">online installers
+The Qt Company provides <a href="https://www.qt.io/download/">online installers
 for all supported platforms</a>.
 
 \section BuildInstructions_Get_Source Get a source tree
@@ -40,10 +40,10 @@ for all supported platforms</a>.
 Since MITK is under active development we recommend to use Git to check out
 the latest stable release from the homepage. If you decide to use the most
 current nightly release, make sure to get a stable tree: Check the
-<a href="http://cdash.mitk.org/index.php?project=MITK">MITK dashboard</a>
+<a href="https://cdash.mitk.org/index.php?project=MITK">MITK dashboard</a>
 before checking out. If the build tree is not clean, you can specify an
 older revision for the checkout or get a stable tar ball from
-<a href="http://www.mitk.org">www.mitk.org</a>.
+<a href="https://www.mitk.org">www.mitk.org</a>.
 
 To clone MITK's current Git repository do:
 
@@ -69,9 +69,7 @@ and configure the project.
 
 CMake will present you a couple of options, these are the most important ones:
 
- - <tt><b>CMAKE_PREFIX_PATH</b></tt> The path to your Qt installation, e.g., <i>C:/Qt/5.12.6/msvc2017_64</i> or <i>/home/user/Qt/5.12.6/gcc_64</i>
- - <tt><b>MITK_USE_ACVD</b></tt> Build MITK code which depends on ACVD (this
-   will download and build ACVD)
+ - <tt><b>CMAKE_PREFIX_PATH</b></tt> The path to your Qt installation, e.g., <i>C:/Qt/5.12.9/msvc2017_64</i> or <i>/home/user/Qt/5.12.9/gcc_64</i>
  - <tt><b>MITK_USE_BLUEBERRY</b></tt> Build the BlueBerry application framework
  - <tt><b>MITK_USE_Boost_LIBRARIES</b></tt> If you need binary Boost libraries,
    specify them here.
@@ -132,7 +130,7 @@ For running the applications directly use the generated batch files in the
 
 \section BuildInstructions_Documentation Documentation
 
-If you have the <a href="http://www.doxygen.org">Doxygen</a> documentation tool
+If you have the <a href="https://www.doxygen.nl/">Doxygen</a> documentation tool
 installed, you get a new project (Visual Studio) or "make" target named "doc".
 You can build this to generate the HTML documentation of MITK in the
 Documentation/Doxygen directory of your MITK-build binary tree or in the

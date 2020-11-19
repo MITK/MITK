@@ -4,6 +4,9 @@ set(MODULE_TESTS
   mitkPlanarSubdivisionPolygonTest.cpp
   mitkPlanarFigureIOTest.cpp
   mitkPlanarArrowTest.cpp
+)
+
+set(MODULE_RENDERING_TESTS
   mitkPlanarFigureInteractionTest.cpp
 )
 

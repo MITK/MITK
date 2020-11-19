@@ -74,12 +74,12 @@ private:
 public:
   void setUp()
   {
-    m_Image2Da = mitk::ImageGenerator::GenerateRandomImage<float>(120, 205, 0, 0, 0.1, 0.2, 0.3, 577, 23);
+    m_Image2Da = mitk::ImageGenerator::GenerateRandomImage<float>(2, 4, 0, 0, 0.1, 0.2, 0.3, 577, 23);
     m_Image2Db = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(1, 1, 0, 0);
-    m_Image3Da = mitk::ImageGenerator::GenerateRandomImage<int>(512, 205, 1, 0);
-    m_Image3Db = mitk::ImageGenerator::GenerateRandomImage<double>(512, 532, 112, 0);
-    m_Image4Da = mitk::ImageGenerator::GenerateRandomImage<float>(120, 205, 78, 1);
-    m_Image4Db = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(550, 33, 78, 150);
+    m_Image3Da = mitk::ImageGenerator::GenerateRandomImage<int>(2, 4, 1, 0);
+    m_Image3Db = mitk::ImageGenerator::GenerateRandomImage<double>(2, 4, 8, 0);
+    m_Image4Da = mitk::ImageGenerator::GenerateRandomImage<float>(2, 4, 8, 1);
+    m_Image4Db = mitk::ImageGenerator::GenerateRandomImage<unsigned char>(2, 4, 8, 2);
     m_Image3Dc = mitk::ImageGenerator::GenerateGradientImage<unsigned int>(1, 2, 3, 4, 5, 6);
   }
   void tearDown()
@@ -167,7 +167,7 @@ public:
 
   void SetDimensionX2D_Success()
   {
-    CPPUNIT_ASSERT_MESSAGE("Testing if the X dimension of the 2D image is set correctly.", m_Image2Da->GetDimension(0) == 120);
+    CPPUNIT_ASSERT_MESSAGE("Testing if the X dimension of the 2D image is set correctly.", m_Image2Da->GetDimension(0) == 2);
   }
 
   void SetDimensionY2D_Success()
@@ -178,13 +178,13 @@ public:
   void SetDimensionZ3D_Success()
   {
     CPPUNIT_ASSERT_MESSAGE("Testing if the Z dimension of the 3D image is set correctly.", m_Image3Da->GetDimension(2) == 1);
-    CPPUNIT_ASSERT_MESSAGE("Testing if the Z dimension of the 3D image is set correctly.", m_Image3Db->GetDimension(2) == 112);
+    CPPUNIT_ASSERT_MESSAGE("Testing if the Z dimension of the 3D image is set correctly.", m_Image3Db->GetDimension(2) == 8);
   }
 
   void SetDimensionT4D_Success()
   {
     CPPUNIT_ASSERT_MESSAGE("Testing if the T dimension of the 4D image is set correctly.", m_Image4Da->GetDimension(3) == 1);
-    CPPUNIT_ASSERT_MESSAGE("Testing if the T dimension of the 4D image is set correctly.", m_Image4Db->GetDimension(3) == 150);
+    CPPUNIT_ASSERT_MESSAGE("Testing if the T dimension of the 4D image is set correctly.", m_Image4Db->GetDimension(3) == 2);
   }
 
   void SetDimensions3Dc_Success()

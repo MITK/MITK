@@ -48,6 +48,7 @@ namespace mitk {
        * @param calculateNewPosition a callback function of the VesselMeanderStrategy class.
        * It is used to  calculate the final position after taking the step.
        * @param bendingFactor a metric of how much the Vessel should bend. If set to 0 the vessel will go in a straight line.
+       * @param rng
        */
       void ExpandVessel(mitk::pa::InSilicoTissueVolume::Pointer volume,
         CalculateNewVesselPositionCallback calculateNewPosition, double bendingFactor, std::mt19937* rng);

@@ -72,6 +72,7 @@ namespace mitk
     /*!
     \brief convenience method for faster access to distance and rgb data
     \param distances pointer to memory location where distances should be stored
+    \param amplitudes
     \param rgb pointer to memory location where rgb information should be stored
     */
     void GetAllData(float* distances, float* amplitudes, unsigned char* rgb);

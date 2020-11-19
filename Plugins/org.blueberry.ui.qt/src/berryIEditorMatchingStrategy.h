@@ -26,8 +26,8 @@ namespace berry {
  * An editor matching strategy allows editor extensions to provide their own
  * algorithm for matching the input of an open editor of that type to a
  * given editor input.  This is used to find a matching editor during
- * {@link org.blueberry.ui.IWorkbenchPage#openEditor(IEditorInput, String, boolean)} and
- * {@link org.blueberry.ui.IWorkbenchPage#findEditor(IEditorInput)}.
+ * {@link IWorkbenchPage#OpenEditor} and
+ * {@link IWorkbenchPage#FindEditor}.
  */
 struct BERRY_UI_QT IEditorMatchingStrategy : public Object
 {

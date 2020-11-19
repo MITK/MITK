@@ -24,16 +24,6 @@
     <br><br>
     Supported event properties are:
       - \e url Show the given url
-      
-  The example below demonstrates how to provide configuration data for the
-  org.blueberry.ui.qt.help plug-in.
-  
-  \snippet org.blueberry.ui.qt.help-config/main.cpp 0
-  
-  Requesting context help may look like this:
-  
-  \snippet org.blueberry.ui.qt.help-config/main.cpp 1
-  
 */
 
 /**

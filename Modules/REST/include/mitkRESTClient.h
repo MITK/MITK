@@ -30,7 +30,7 @@ namespace mitk
      *
      * @throw mitk::Exception if request went wrong
      * @param uri the URI resulting the target of the HTTP request
-     * @param the additional headers to be set to the HTTP request
+     * @param headers the additional headers to be set to the HTTP request
      * @return task to wait for with resulting json object
      */
     pplx::task<web::json::value> Get(const web::uri &uri, const std::map<utility::string_t, utility::string_t> headers);
@@ -41,7 +41,8 @@ namespace mitk
      *
      * @throw mitk::Exception if request went wrong
      * @param uri the URI resulting the target of the HTTP request
-     * @param the additional headers to be set to the HTTP request
+     * @param filePath
+     * @param headers the additional headers to be set to the HTTP request
      * @return task to wait for returning an empty json object
      */
     pplx::task<web::json::value> Get(const web::uri &uri,

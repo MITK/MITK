@@ -28,7 +28,7 @@ found in the LICENSE file.
 * This offers the possibility to position custom widgets 'on top of' other
 * widgets using the positioning mechanism of all overlays.
 *
-* \warn The custom widgets need to be configured and connected manually.
+* \warning The custom widgets need to be configured and connected manually.
 * Properties cannot be set.
 *
 * \ingroup Overlays

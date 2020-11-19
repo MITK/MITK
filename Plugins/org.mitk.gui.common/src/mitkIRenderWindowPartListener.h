@@ -51,10 +51,8 @@ namespace mitk {
 
     /**
     * Called when an IRenderWindowPart changes and if it was active before.
-    *
-    * \param renderWindowPart The modified IRenderWindowPart.
     */
-    virtual void RenderWindowPartInputChanged(mitk::IRenderWindowPart* /*renderWindowPart*/) {};
+    virtual void RenderWindowPartInputChanged(mitk::IRenderWindowPart*) {};
   };
 }
 

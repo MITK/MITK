@@ -57,7 +57,7 @@ public:
   static bool is3D(const RegistrationBaseType* regBase);
 
   /** Checks if the passed Node contains a MatchPoint registration
-   @param Pointer to the node to be checked.*
+   @param node Pointer to the node to be checked.*
    @return true: node contains a MAPRegistrationWrapper. false: "node" does not point to a valid instance or does not contain
     a registration wrapper.*/;
   static bool IsRegNode(const mitk::DataNode* node);

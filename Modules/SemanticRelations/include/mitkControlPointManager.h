@@ -99,7 +99,7 @@ namespace mitk
   *        If such a control point is found, the 'FindFittingExaminationPeriod'-function with this control point as an argument is used
   *        to actually find the corresponding examination period.
   *
-  * @param datanode   A data node pointer, whose date should be included in the newly generated control point.
+  * @param dataNode   A data node pointer, whose date should be included in the newly generated control point.
   *
   * @return The examination period that contains the given data node.
   */

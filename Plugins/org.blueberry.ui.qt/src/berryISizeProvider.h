@@ -23,7 +23,7 @@ namespace berry {
  * a preferred size
  *
  * @since 3.1
- * @noimplement This interface is not intended to be implemented by clients.
+ * @note This interface is not intended to be implemented by clients.
  */
 struct BERRY_UI_QT ISizeProvider {
 

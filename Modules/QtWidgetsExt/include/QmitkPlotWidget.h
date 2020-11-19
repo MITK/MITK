@@ -109,6 +109,7 @@ public:
   /**
   * Inserts a new curve into the plot-window.
   * @param title the name of the curve
+  * @param color
   * @returns the id of the curve. Use this id to
   * refer to the curve, if you want to modify or add data.
   */
@@ -199,14 +200,16 @@ public:
   /**
   * Sets the style how the line is drawn for the curve; like, plain line,
   * or with the data points marked with a symbol;
-  * @param: style A QwtPlotCurve::CurveStyle
+  * @param curveId
+  * @param style A QwtPlotCurve::CurveStyle
   */
   void SetCurveStyle(unsigned int curveId, const QwtPlotCurve::CurveStyle style);
 
   /**
   * Sets the style data points are drawn for the curve; like, a line,
   * or dots;
-  * @param: symbol A QwtSymbol
+  * @param curveId
+  * @param symbol A QwtSymbol
   */
   void SetCurveSymbol(unsigned int curveId, QwtSymbol *symbol);
 
@@ -281,8 +284,6 @@ protected:
   * All errors should be absolutes. The magnitude will be used.
   *
   * @param curveId Which curve should the error curve be added to
-  * @param xValues Vector of x values an error bar belongs to
-  * @param values The original data value
   * @param lessError Error in the negative direction (value - lessError)
   * @param moreError Error in the positive direction (value + lessError)
   * @param isXError Should the error bars be drawn horizontally

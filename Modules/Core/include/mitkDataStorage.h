@@ -351,7 +351,6 @@ namespace mitk
     //## The methods returns only [-infinity, +infinity], if all data-objects have an infinite live-span. Otherwise,
     //## all data-objects with infinite live-span are ignored.
     //## Simply calls ComputeTimeBounds(it, "visible", renderer, boolPropertyKey).
-    //## @param it an iterator to a data tree structure
     //## @param boolPropertyKey if a BoolProperty with this boolPropertyKey exists for a node (for @a renderer)
     //## and is set to @a false, the node is ignored for the time-bounds calculation.
     //## @param renderer see @a boolPropertyKey
@@ -416,11 +415,7 @@ namespace mitk
     //## to suppress NodeChangedEvent to be emitted.
     bool m_BlockNodeModifiedEvents;
 
-    //##Documentation
-    //## @brief Standard Constructor for ::New() instantiation
     DataStorage();
-    //##Documentation
-    //## @brief Standard Destructor
     ~DataStorage() override;
 
     //##Documentation

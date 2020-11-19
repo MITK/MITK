@@ -2,10 +2,10 @@
 \page CodingPage Coding
 
 \section CodingPageGeneral General Information
-Conceptually MITK is mainly geared to ITK (<a href="http://www.itk.org">The Insight Toolkit</a>).
+Conceptually MITK is mainly geared to ITK (<a href="https://itk.org/">The Insight Toolkit</a>).
 Thus, most of the ITK coding concepts can be transferred to MITK.
 
-The ITK coding concepts can be found in the free ITK software guide, downloadable at ITKs <a href="http://itk.org/ITK/resources/software.html">homepage</a>.
+The ITK coding concepts can be found in the free <a href="https://itk.org/ItkSoftwareGuide.pdf">ITK software guide</a>.
 
 The main ITK concepts which one should look into before using MITK are:
 <ul>

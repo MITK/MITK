@@ -21,8 +21,7 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-   * \brief Data structure which stores a set of points. Superclass of
-   * mitk::Mesh.
+   * \brief Data structure which stores a set of points.
    *
    * 3D points are grouped within a point set; for time resolved usage, one point
    * set is created and maintained per time step. A point entry consists of the
@@ -44,10 +43,7 @@ namespace mitk
    * (MapContainer). The points are best accessed by using a ConstIterator (as
    * defined in MapContainer); avoid access via index.
    *
-   * The class internally uses an itk::Mesh for each time step, because
-   * mitk::Mesh is derived from mitk::PointSet and needs the itk::Mesh structure
-   * which is also derived from itk::PointSet. Thus several typedefs which seem
-   * to be in wrong place, are declared here (for example SelectedLinesType).
+   * The class internally uses an itk::Mesh for each time step.
    *
    * \section mitkPointSetDisplayOptions
    *
@@ -248,6 +244,7 @@ namespace mitk
      *
      * \param point is in world coordinates.
      * \param distance is in mm.
+     * \param t
      * returns -1 if no point is found
      * or the position in the list of the first match
      */

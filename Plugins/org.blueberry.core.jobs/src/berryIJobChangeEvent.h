@@ -31,7 +31,7 @@ class Job;
  * An event describing a change to the state of a job.
  *
  * @see IJobChangeListener
- * @noimplement This interface is not intended to be implemented by clients.
+ * @note This interface is not intended to be implemented by clients.
  */
 struct BERRY_JOBS IJobChangeEvent : public Object
 {

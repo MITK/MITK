@@ -27,7 +27,7 @@ You can create a tarball (.tar.gz) of your MITK application which includes all n
 
 \subsection DeploymentPagePlatformWindows Windows
 
-You can create a Zip file (.zip) or an NSIS 2 installer (needs an installation of <a href="http://nsis.sourceforge.net/Main_Page">NSIS</a>) for Windows platforms. Only "Release" builds are supported during packaging, the results of trying to package "Debug" builds are undefined.
+You can create a Zip file (.zip) or an NSIS 3 installer (needs an installation of <a href="https://nsis.sourceforge.io/">NSIS</a>) for Windows platforms. Only "Release" builds are supported during packaging, the results of trying to package "Debug" builds are undefined.
 
 <ul>
   <li> In Visual Studio, build the "PACKAGE" project, this will create a .zip file and a .exe NSIS installer (if NSIS is installed).

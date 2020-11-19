@@ -12,6 +12,13 @@ found in the LICENSE file.
 
 #include "QmitkSimpleExampleView.h"
 
+#include <vtkImageWriter.h>
+#include <vtkJPEGWriter.h>
+#include <vtkPNGWriter.h>
+#include <vtkRenderLargeImage.h>
+#include <vtkRenderWindow.h>
+#include <vtkOpenGL.h>
+
 #include "QmitkRenderWindow.h"
 #include "QmitkStepperAdapter.h"
 
@@ -25,13 +32,6 @@ found in the LICENSE file.
 #include <QFileInfo>
 #include <QMessageBox>
 #include <berryPlatform.h>
-
-#include <vtkImageWriter.h>
-#include <vtkJPEGWriter.h>
-#include <vtkPNGWriter.h>
-#include <vtkRenderLargeImage.h>
-#include <vtkRenderWindow.h>
-#include <vtkOpenGL.h>
 
 const std::string QmitkSimpleExampleView::VIEW_ID = "org.mitk.views.simpleexample";
 
@@ -197,7 +197,7 @@ void QmitkSimpleExampleView::GenerateMovie()
 
   movieWriter->SetFFmpegPath(GetFFmpegPath());
 
-  vtkRenderWindow *renderWindow = movieRenderWindow->GetRenderWindow();
+  vtkRenderWindow *renderWindow = movieRenderWindow->renderWindow();
 
   if (renderWindow == nullptr)
     return;

@@ -413,8 +413,8 @@ int testGeometryAfterCasting()
   float eps = 0.0001;
 
   // Cast ITK and MITK images and see if geometry stays
-  typedef itk::Image<double, 2> Image2DType;
-  typedef itk::Image<double, 3> Image3DType;
+  typedef itk::Image<char, 2> Image2DType;
+  typedef itk::Image<char, 3> Image3DType;
 
   // Create 3D ITK Image from Scratch, cast to 3D MITK image, compare Geometries
   Image3DType::Pointer image3DItk = Image3DType::New();
@@ -431,7 +431,7 @@ int testGeometryAfterCasting()
   myIndex[2] = 12;
   mySize[0] = 10;
   mySize[1] = 2;
-  mySize[2] = 555;
+  mySize[2] = 5;
   myRegion.SetSize(mySize);
   myRegion.SetIndex(myIndex);
   image3DItk->SetSpacing(mySpacing);
@@ -448,7 +448,7 @@ int testGeometryAfterCasting()
 
   // direction [row] [coloum]
   MITK_TEST_OUTPUT(<< "Casting a rotated 3D ITK Image to a MITK Image and check if Geometry is still same");
-  for (double rotX = 0; rotX < (itk::Math::pi * 2); rotX += 0.4)
+  for (double rotX = 0; rotX < itk::Math::pi * 2; rotX += itk::Math::pi * 0.4)
   {
     // Set Rotation X
     rotMatrixX[1][1] = cos(rotX);
@@ -456,7 +456,7 @@ int testGeometryAfterCasting()
     rotMatrixX[2][1] = sin(rotX);
     rotMatrixX[2][2] = cos(rotX);
 
-    for (double rotY = 0; rotY < (itk::Math::pi * 2); rotY += 0.33)
+    for (double rotY = 0; rotY < itk::Math::pi * 2; rotY += itk::Math::pi * 0.3)
     {
       // Set Rotation Y
       rotMatrixY[0][0] = cos(rotY);
@@ -464,7 +464,7 @@ int testGeometryAfterCasting()
       rotMatrixY[2][0] = -sin(rotY);
       rotMatrixY[2][2] = cos(rotY);
 
-      for (double rotZ = 0; rotZ < (itk::Math::pi * 2); rotZ += 0.5)
+      for (double rotZ = 0; rotZ < itk::Math::pi * 2; rotZ += itk::Math::pi * 0.2)
       {
         // Set Rotation Z
         rotMatrixZ[0][0] = cos(rotZ);
@@ -528,7 +528,7 @@ int testGeometryAfterCasting()
 
   // direction [row] [coloum]
   MITK_TEST_OUTPUT(<< "Casting a rotated 2D ITK Image to a MITK Image and check if Geometry is still same");
-  for (double rotTheta = 0; rotTheta < (itk::Math::pi * 2); rotTheta += 0.1)
+  for (double rotTheta = 0; rotTheta < itk::Math::pi * 2; rotTheta += itk::Math::pi * 0.2)
   {
     // Set Rotation
     rotMatrix[0][0] = cos(rotTheta);

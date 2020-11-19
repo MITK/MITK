@@ -182,7 +182,7 @@ public:
    * constructor or using this method.
    *
    * @param itemId
-   * @see #getId()
+   * @see #GetId
    */
   void SetId(const QString& itemId);
 

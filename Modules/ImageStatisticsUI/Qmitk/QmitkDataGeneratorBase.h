@@ -104,6 +104,7 @@ signals:
 protected:
   /*! @brief Constructor
   @param storage the data storage where all produced data should be stored
+  @param parent
   */
   QmitkDataGeneratorBase(mitk::DataStorage::Pointer storage, QObject* parent = nullptr);
   QmitkDataGeneratorBase(QObject* parent = nullptr);

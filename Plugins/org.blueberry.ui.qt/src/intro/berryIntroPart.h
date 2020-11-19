@@ -103,7 +103,7 @@ protected:
   /**
    * Sets the part site.
    * <p>
-   * Subclasses must invoke this method from {@link org.eclipse.ui.intro.IIntroPart#init(IIntroSite, IMemento)}.
+   * Subclasses must invoke this method from {@link IIntroPart#Init}.
    * </p>
    *
    * @param site the intro part site
@@ -140,19 +140,6 @@ public:
    */
   ~IntroPart() override;
 
-  /**
-   * This implementation of the method declared by <code>IAdaptable</code>
-   * passes the request along to the platform's adapter manager; roughly
-   * <code>Platform.getAdapterManager().getAdapter(this, adapter)</code>.
-   * Subclasses may override this method (however, if they do so, they should
-   * invoke the method on their superclass to ensure that the Platform's
-   * adapter manager is consulted).
-   */
-  //    Object getAdapter(Class adapter) {
-  //        return Platform.getAdapterManager().getAdapter(this, adapter);
-  //    }
-
-
   /*
    * (non-Javadoc)
    *
@@ -171,7 +158,7 @@ public:
   QString GetPartName() const override;
 
   /**
-   * The base implementation of this {@link org.eclipse.ui.intro.IIntroPart}method ignores the
+   * The base implementation of this {@link IIntroPart} method ignores the
    * memento and initializes the part in a fresh state. Subclasses may extend
    * to perform any state restoration, but must call the super method.
    *
@@ -186,12 +173,12 @@ public:
   void Init(IIntroSite::Pointer site, IMemento::Pointer memento) override;
 
   /* (non-Javadoc)
-   * @see org.eclipse.ui.intro.IIntroPart#removePropertyListener(org.eclipse.ui.IPropertyListener)
+   * @see IIntroPart#RemovePropertyListener
    */
   void RemovePropertyListener(IPropertyChangeListener* l) override;
 
   /**
-   * The base implementation of this {@link org.eclipse.ui.intro.IIntroPart} method does nothing.
+   * The base implementation of this {@link IIntroPart} method does nothing.
    * Subclasses may override.
    *
    * @param memento

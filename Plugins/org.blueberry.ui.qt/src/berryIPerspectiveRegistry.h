@@ -32,24 +32,10 @@ namespace berry {
  * This interface is not intended to be implemented by clients.
  * </p>
  * @see IWorkbench#getPerspectiveRegistry
- * @noimplement This interface is not intended to be implemented by clients.
  */
 struct BERRY_UI_QT IPerspectiveRegistry {
 
   virtual ~IPerspectiveRegistry();
-
-  /**
-   * Create a new perspective.
-   *
-   * @param label
-   *            the name of the new descriptor
-   * @param originalDescriptor
-   *            the descriptor on which to base the new descriptor
-   * @return a new perspective descriptor or <code>null</code> if the
-   *         creation failed.
-   */
-  //virtual IPerspectiveDescriptor::Pointer CreatePerspective(const QString& label,
-  //                                                          IPerspectiveDescriptor::Pointer originalDescriptor) = 0;
 
   /**
    * Clones an existing perspective.

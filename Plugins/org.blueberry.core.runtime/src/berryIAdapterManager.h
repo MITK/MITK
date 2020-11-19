@@ -46,7 +46,7 @@ namespace berry
  * <code>com.example.acme.Sticky</code> on resources in the workspace.
  * <p>
  *
- * <pre>
+ * \code
  *  IAdapterFactory pr = new IAdapterFactory() {
  *    public Class[] getAdapterList() {
  *      return new Class[] { com.example.acme.Sticky.class };
@@ -67,7 +67,7 @@ namespace berry
  *    }
  *  }
  *  Platform.getAdapterManager().registerAdapters(pr, IResource.class);
- *   </pre>
+ * \endcode
  *
  * </p><p>
  * This interface can be used without OSGi running.
@@ -114,7 +114,6 @@ struct org_blueberry_core_runtime_EXPORT IAdapterManager: public Object
    *
    * @param adaptable the adaptable object being queried (usually an instance
    * of <code>IAdaptable</code>)
-   * @param adapterTypeName the fully qualified name of the type of adapter to look up
    * @return a Poco::Any castable to the given adapter type, or empty
    * if the given adaptable object does not have an available adapter of the
    * given type
@@ -162,9 +161,9 @@ struct org_blueberry_core_runtime_EXPORT IAdapterManager: public Object
    * loaded, or if the factory itself returns nothing, then
    * <code>GetAdapter</code> will still return an empty Poco::Any.
    *
-   * @param adaptable the adaptable object being queried (usually an instance
+   * @param adaptableType the adaptable object being queried (usually an instance
    * of <code>IAdaptable</code>)
-   * @param adapterTypeName the fully qualified class name of an adapter to
+   * @param adapterType the fully qualified class name of an adapter to
    * look up
    * @return <code>true</code> if there is an adapter factory that claims
    * it can convert <code>adaptable</code> to an object of type <code>adapterType</code>,
@@ -195,9 +194,9 @@ struct org_blueberry_core_runtime_EXPORT IAdapterManager: public Object
    * <li>{@link berry::IAdapterManager::NOT_LOADED} if an adapter factory was found, but has not been loaded;</li>
    * <li>{@link berry::IAdapterManager::LOADED} if an adapter factory was found, and it is loaded.</li>
    * </ul></p>
-   * @param adaptable the adaptable object being queried (usually an instance
+   * @param adaptableType the adaptable object being queried (usually an instance
    * of <code>IAdaptable</code>)
-   * @param adapterTypeName the fully qualified class name of an adapter to
+   * @param adapterType the fully qualified class name of an adapter to
    * look up
    * @return a status of the adapter
    */
@@ -216,7 +215,6 @@ struct org_blueberry_core_runtime_EXPORT IAdapterManager: public Object
    *
    * @param adaptable the adaptable object being queried (usually an instance
    * of <code>IAdaptable</code>)
-   * @param adapterTypeName the fully qualified name of the type of adapter to look up
    * @return a Poco::Any castable to the given adapter type, or empty
    * if the given adaptable object does not have an available adapter of the
    * given type
@@ -241,8 +239,7 @@ struct org_blueberry_core_runtime_EXPORT IAdapterManager: public Object
    *
    * @param factory the adapter factory
    * @param adaptableTypeName the fully qualified typename being extended
-   * @see #UnregisterAdapters(IAdapterFactory*)
-   * @see #UnregisterAdapters(IAdapterFactory*, const std::adaptableTypeName&)
+   * @see #UnregisterAdapters
    */
   virtual void RegisterAdapters(IAdapterFactory* factory,
                                 const QString& adaptableTypeName) = 0;
@@ -254,7 +251,7 @@ struct org_blueberry_core_runtime_EXPORT IAdapterManager: public Object
    * nothing if the given factory is not currently registered.
    *
    * @param factory the adapter factory to remove
-   * @see #RegisterAdapters(IAdapterFactory*, const std::string&)
+   * @see #RegisterAdapters
    */
   virtual void UnregisterAdapters(IAdapterFactory* factory) = 0;
 
@@ -266,7 +263,7 @@ struct org_blueberry_core_runtime_EXPORT IAdapterManager: public Object
    * @param factory the adapter factory to remove
    * @param adaptableTypeName one of the type names against which the given factory is
    * registered
-   * @see #RegisterAdapters(IAdapterFactory*, const std::string&)
+   * @see #RegisterAdapters
    */
   virtual void UnregisterAdapters(IAdapterFactory* factory,
                                   const QString& adaptableTypeName) = 0;

@@ -1,6 +1,6 @@
 MITK_CREATE_MODULE_TESTS()
 if(TARGET ${TESTDRIVER})
-  mitk_use_modules(TARGET ${TESTDRIVER} PACKAGES VTK|vtkTestingRendering)
+  mitk_use_modules(TARGET ${TESTDRIVER} PACKAGES VTK|TestingRendering)
 
   set(testcaseBasename mitkViewportRenderingTest)
 
@@ -31,7 +31,7 @@ if(TARGET ${TESTDRIVER})
     #message(STATUS "Testing viewport of ${vpWidth}x${vpHeight} at ${vpLeft},${vpBottom} in render window of size ${rwWidth}x${rwHeight} ('${testPostfix}')")
 
     # add the actual test
-    mitkAddCustomModuleTest(
+    mitkAddCustomModuleRenderingTest(
         mitkViewportRenderingTest_${testPostfix}
         mitkViewportRenderingTest
         ${rwWidth} ${rwHeight}
@@ -40,8 +40,6 @@ if(TARGET ${TESTDRIVER})
         ${data}
         -V ${MITK_DATA_DIR}/RenderingTestData/viewport/mitkViewportRenderingTest_${testPostfix}.png #corresponding reference screenshot
         )
-    set_property(TEST mitkViewportRenderingTest_${testPostfix}
-                 PROPERTY RUN_SERIAL TRUE)
   endfunction()
 
   function(getFirstCharacter string charVar)

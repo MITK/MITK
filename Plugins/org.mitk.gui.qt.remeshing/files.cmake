@@ -2,7 +2,7 @@ set(SRC_CPP_FILES
 )
 
 set(INTERNAL_CPP_FILES
-  org_mitk_gui_qt_remeshing_Activator.cpp
+  QmitkPluginActivator.cpp
   QmitkRemeshingView.cpp
 )
 
@@ -11,7 +11,7 @@ set(UI_FILES
 )
 
 set(MOC_H_FILES
-  src/internal/org_mitk_gui_qt_remeshing_Activator.h
+  src/internal/QmitkPluginActivator.h
   src/internal/QmitkRemeshingView.h
 )
 

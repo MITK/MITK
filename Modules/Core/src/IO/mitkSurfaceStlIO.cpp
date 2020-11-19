@@ -26,11 +26,11 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  std::string SurfaceStlIO::OPTION_MERGE_POINTS()
-  {
-    static std::string s = "Merge points";
-    return s;
-  }
+  // std::string SurfaceStlIO::OPTION_MERGE_POINTS()
+  // {
+  //   static std::string s = "Merge points";
+  //   return s;
+  // }
 
   std::string SurfaceStlIO::OPTION_TAG_SOLIDS()
   {
@@ -49,7 +49,7 @@ namespace mitk
   {
     Options defaultOptions;
 
-    defaultOptions[OPTION_MERGE_POINTS()] = us::Any(true);
+    // defaultOptions[OPTION_MERGE_POINTS()] = us::Any(true);
     defaultOptions[OPTION_TAG_SOLIDS()] = us::Any(false);
     defaultOptions[OPTION_CLEAN()] = us::Any(true);
 
@@ -69,13 +69,13 @@ namespace mitk
     vtkSmartPointer<vtkSTLReader> stlReader = vtkSmartPointer<vtkSTLReader>::New();
     stlReader->SetFileName(this->GetLocalFileName().c_str());
 
-    bool mergePoints = true;
+    // bool mergePoints = true;
     bool tagSolids = false;
     bool cleanData = true;
 
     try
     {
-      mergePoints = us::any_cast<bool>(options[OPTION_MERGE_POINTS()]);
+      // mergePoints = us::any_cast<bool>(options[OPTION_MERGE_POINTS()]);
       tagSolids = us::any_cast<bool>(options[OPTION_TAG_SOLIDS()]);
       cleanData = us::any_cast<bool>(options[OPTION_CLEAN()]);
     }
@@ -84,7 +84,7 @@ namespace mitk
       MITK_WARN << "Unexpected error: " << e.what();
     }
 
-    stlReader->SetMerging(mergePoints);
+    // stlReader->SetMerging(mergePoints);
     stlReader->SetScalarTags(tagSolids);
 
     vtkSmartPointer<vtkPolyDataNormals> normalsGenerator = vtkSmartPointer<vtkPolyDataNormals>::New();
@@ -99,10 +99,10 @@ namespace mitk
       cleanPolyDataFilter->ConvertLinesToPointsOff();
       cleanPolyDataFilter->ConvertPolysToLinesOff();
       cleanPolyDataFilter->ConvertStripsToPolysOff();
-      if (mergePoints)
-      {
+      // if (mergePoints)
+      // {
         cleanPolyDataFilter->PointMergingOn();
-      }
+      // }
       algo = cleanPolyDataFilter;
     }
     algo->Update();

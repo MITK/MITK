@@ -36,7 +36,7 @@ namespace mitk
    *
    * in 2d and 3d render windows.
    *
-   * \warn If this Interactor is assigned (SetDataNode) an empty mitk::DataNode it creates a point set,
+   * \warning If this Interactor is assigned (SetDataNode) an empty mitk::DataNode it creates a point set,
    * changing the point set of the assigned mitk::DataNode after this assignment will cause the
   mitk::PointSetDataInteractor
    * to not work properly. So the usage has follow this general scheme:

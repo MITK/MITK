@@ -199,7 +199,7 @@ namespace mitk
     //## Call this method to re-initialize the renderer to the current DataStorage
     //## (e.g. after loading an additional dataset), to ensure that the view is
     //## aligned correctly.
-    //## \warn This is not implemented yet.
+    //## \warning This is not implemented yet.
     virtual bool SetWorldGeometryToDataStorageBounds() { return false; }
     //##Documentation
     //## @brief Set/Get m_Slice which defines together with m_TimeStep the 2D geometry

@@ -27,7 +27,7 @@ BlueBerry makes use of the Eclipse UI guidlines which state some concepts on how
 \imageMacro{workbench.jpg,"The Workbech",11.64}
 
 \section WorkbenchWindow WorkbenchWindow
-\li has one \ref Workbench-Page "page"
+\li has one page
 \imageMacro{workbench-window.jpg,"Workbench Windows",8.47}
 
 \section WorkbenchPage Workbench Page
@@ -43,7 +43,7 @@ BlueBerry makes use of the Eclipse UI guidlines which state some concepts on how
 <LI> Like a page within a book: </LI>
     <UL>
     <LI> Only one perspective is visible at any time </LI>
-    <LI> There are several perspectives inside a \ref Workbench-Page "page" </LI>
+    <LI> There are several perspectives inside a page </LI>
     </UL>
 </UL>
 \imageMacro{workbench-window-perspective.png,"A Perspective",11.79}

@@ -77,23 +77,23 @@ struct org_blueberry_core_runtime_EXPORT IExecutableExtension
    * form. For example, if the extension point specifies an attribute
    * <code>"run"</code> to contain the name of the extension implementation,
    * an adapter can be configured as
-   * <pre>
-   *     &lt;action run="com.example.ExternalAdapter:./cmds/util.exe -opt 3"/&gt;
-   * </pre>
+   * \code{.unparsed}
+   * <action run="com.example.ExternalAdapter:./cmds/util.exe -opt 3"/>
+   * \endcode
    * </p>
    * <p>
    * (2) by converting the attribute used to specify the executable
    * extension to a child element of the original configuration element,
    * and specifying the adapter data in the form of xml markup.
    * Using this form, the example above would become
-   * <pre>
-   *     &lt;action&gt;
-   *         &lt;<it>run</it> class="com.xyz.ExternalAdapter"&gt;
-   *             &lt;parameter name="exec" value="./cmds/util.exe"/&gt;
-   *             &lt;parameter name="opt"  value="3"/&gt;
-   *         &lt;/<it>run</it>&gt;
-   *     &lt;/action&gt;
-   * </pre>
+   * \code{.unparsed}
+   * <action>
+   *   <run class="com.xyz.ExternalAdapter">
+   *     <parameter name="exec" value="./cmds/util.exe"/>
+   *     <parameter name="opt"  value="3"/>
+   *   </run>
+   * </action>
+   * \endcode
    * </p>
    * <p>
    * Form (2) will typically only be

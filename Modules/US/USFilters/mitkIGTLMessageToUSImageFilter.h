@@ -55,7 +55,7 @@ namespace mitk
     /**
      * \brief Copies the data from the next OIGTL message to an mitk::Image.
      *
-     * \param img the image to fill with the data from the OIGTL message.
+     * \param imgVector the image to fill with the data from the OIGTL message.
      */
     void GetNextRawImage(std::vector<mitk::Image::Pointer>& imgVector) override;
 

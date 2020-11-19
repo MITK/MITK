@@ -8,7 +8,7 @@ While it might be possible to use MITK in conjunction with other options, such a
 As we do have no experience with this, we will not be able to help you.
 Be prepared to do a lot of tweaking on by yourself.
 
-This guide does not try to give a general introduction to CMake, instead it tries to answer some basic questions that might arise for those new to %CMake, to help you get started on MITK. For a more comprehensive introduction on %CMake see <a href="http://www.cmake.org/cmake/help/cmake_tutorial.html">here</a>.
+This guide does not try to give a general introduction to CMake, instead it tries to answer some basic questions that might arise for those new to %CMake, to help you get started on MITK. For a more comprehensive introduction on %CMake see <a href="https://cmake.org/cmake/help/latest/guide/tutorial/index.html">here</a>.
 
 We will assume in this guide, that the path to your source is /MITK/.
 
@@ -18,7 +18,7 @@ We will assume in this guide, that the path to your source is /MITK/.
 See \ref BuildInstructions_Prerequisites.
 
 \subsection CMAKE_FAQ_Question_NewPluginNothing I coded a new plugin for the Workbench and nothing happened. Why?
-The correct way to create a new plugin is described in \ref NewPluginOnly. Do note that you need to move the source to the MITK/Plugins directory and you will have to add the plugin to the config file (most likely MITK/Plugins/Plugins.cmake</tt>). After that see \ref CMAKE_FAQ_Question_HowDoIActivatePlugin.
+The correct way to create a new plugin is described in \ref NewPluginOnly. Do note that you need to move the source to the MITK/Plugins directory and you will have to add the plugin to the config file (most likely MITK/Plugins/Plugins.cmake). After that see \ref CMAKE_FAQ_Question_HowDoIActivatePlugin.
 
 \subsection CMAKE_FAQ_Question_HowDoIActivatePlugin I want to use a plugin, how do I activate it?
 <ol>

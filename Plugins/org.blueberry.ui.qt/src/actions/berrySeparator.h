@@ -27,7 +27,6 @@ namespace berry {
  * This class may be instantiated; it is not intended to be
  * subclassed outside the framework.
  * </p>
- * @noextend This class is not intended to be subclassed by clients.
  */
 class BERRY_UI_QT Separator : public AbstractGroupMarker
 {

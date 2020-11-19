@@ -51,7 +51,7 @@ namespace mitk
     *
     * No input validation is done. The data and the learned model might not match!
     *
-    * @paaram c Column for which the data is guessed.
+    * @param c Column for which the data is guessed.
     */
     double Predict(const vnl_vector<double> &c);
 
@@ -64,7 +64,7 @@ namespace mitk
     *
     * No input validation is done. The data and the learned model might not match!
     *
-    * @paaram x Matrix for which the data is guessed.
+    * @param x Matrix for which the data is guessed.
     */
     vnl_vector<double> Predict(const vnl_matrix<double> &x);
 

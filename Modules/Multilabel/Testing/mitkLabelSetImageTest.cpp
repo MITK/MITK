@@ -34,14 +34,6 @@ class mitkLabelSetImageTestSuite : public mitk::TestFixture
   MITK_TEST(TestRemoveLayer);
   MITK_TEST(TestRemoveLabels);
   MITK_TEST(TestMergeLabel);
-  // TODO check it these functionalities can be moved into a process object
-  //  MITK_TEST(TestMergeLabels);
-  //  MITK_TEST(TestConcatenate);
-  //  MITK_TEST(TestClearBuffer);
-  //  MITK_TEST(TestUpdateCenterOfMass);
-  //  MITK_TEST(TestGetVectorImage);
-  //  MITK_TEST(TestSetVectorImage);
-  //  MITK_TEST(TestGetLayerImage);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -53,8 +45,8 @@ public:
     // Create a new labelset image
     m_LabelSetImage = mitk::LabelSetImage::New();
     mitk::Image::Pointer regularImage = mitk::Image::New();
-    unsigned int dimensions[3] = {256, 256, 312};
-    regularImage->Initialize(mitk::MakeScalarPixelType<int>(), 3, dimensions);
+    unsigned int dimensions[3] = { 96, 128, 52 };
+    regularImage->Initialize(mitk::MakeScalarPixelType<char>(), 3, dimensions);
     m_LabelSetImage->Initialize(regularImage);
   }
 
@@ -64,7 +56,6 @@ public:
     m_LabelSetImage = nullptr;
   }
 
-  // Reduce contours with nth point
   void TestInitialize()
   {
     // LabelSet image should always has the pixel type mitk::Label::PixelType
@@ -72,8 +63,8 @@ public:
                            m_LabelSetImage->GetPixelType() == mitk::MakeScalarPixelType<mitk::Label::PixelType>());
 
     mitk::Image::Pointer regularImage = mitk::Image::New();
-    unsigned int dimensions[3] = {256, 256, 312};
-    regularImage->Initialize(mitk::MakeScalarPixelType<int>(), 3, dimensions);
+    unsigned int dimensions[3] = { 96, 128, 52 };
+    regularImage->Initialize(mitk::MakeScalarPixelType<char>(), 3, dimensions);
 
     mitk::BaseGeometry::Pointer regularImageGeo = regularImage->GetGeometry();
     mitk::BaseGeometry::Pointer labelImageGeo = m_LabelSetImage->GetGeometry();

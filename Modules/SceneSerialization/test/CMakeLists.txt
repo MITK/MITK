@@ -18,12 +18,12 @@ if(TARGET ${TESTDRIVER})
     set_property(TEST mitkSceneIOTest_Pic3D.nrrd_binary.stl APPEND PROPERTY ENVIRONMENT "PATH=${test_env_path}")
     set_property(TEST mitkSceneIOTest_Pic3D.nrrd_binary.stl PROPERTY SKIP_RETURN_CODE 77)
 
-    mitkAddCustomModuleTest(mitkSceneIOCompatibility_NoRainbowCT mitkSceneIOCompatibilityTest
+    mitkAddCustomModuleRenderingTest(mitkSceneIOCompatibility_NoRainbowCT mitkSceneIOCompatibilityTest
                             ${MITK_DATA_DIR}/RenderingTestData/SceneFiles/rainbows-post-17547.mitk # scene to load
                             -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/rainbows-post-17547.png) # reference rendering
 
     if (FALSE) # fix not yet integrated
-      mitkAddCustomModuleTest(mitkSceneIOCompatibility_SurfaceIntLineWidth mitkSceneIOCompatibilityTest
+      mitkAddCustomModuleRenderingTest(mitkSceneIOCompatibility_SurfaceIntLineWidth mitkSceneIOCompatibilityTest
                               ${MITK_DATA_DIR}/RenderingTestData/SceneFiles/surface-pre-18528.mitk # scene to load
                               -V ${MITK_DATA_DIR}/RenderingTestData/ReferenceScreenshots/surface-pre-18528.png) # reference rendering
     endif()

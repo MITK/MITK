@@ -73,10 +73,9 @@ namespace mitk
     * @brief AddData Add a data item
     * @param data Images/Fibers/DataCollections
     * @param name name that allows identifying this data (e.g. a category T2, Segmentation , etc ...)
-    * @param description
+    * @param filePath
     * @return
     */
-
     size_t AddData(DataObject::Pointer data, std::string name, std::string filePath = "");
 
     /**
@@ -144,7 +143,7 @@ namespace mitk
     /**
     * @brief GetData Get original data by index
     *
-    *  To ensure a mitk::Image is returned use \ref mitk::GetMitkImage
+    *  To ensure a mitk::Image is returned use GetMitkImage
     *
     * @param index
     * @return
@@ -154,7 +153,7 @@ namespace mitk
     /**
     * @brief GetData Get original data by name
     *
-    * To ensure a mitk::Image is returned use \ref mitk::GetMitkImage
+    * To ensure a mitk::Image is returned use GetMitkImage
     *
     * @param name
     * @return

@@ -1,7 +1,7 @@
 ﻿/**
 \page org_mitk_views_photoacoustics_imageprocessing The Photoacoustics Imageprocessing Plugin
 
-\imageMacro{pai.png,"Icon of Imageprocessing",2.00}
+\imageMacro{pai-dox.png,"Icon of Imageprocessing",2.00}
 
 \tableofcontents
 

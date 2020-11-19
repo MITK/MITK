@@ -59,7 +59,7 @@ namespace mitk
     *
     * @param filePath the path to a valid DICOM file which should be send
     * @param studyUID the DICOM study uid
-    * @param the task to wait for
+    * @return the task to wait for
     */
    pplx::task<void> SendSTOW(utility::string_t filePath, utility::string_t studyUID);
 

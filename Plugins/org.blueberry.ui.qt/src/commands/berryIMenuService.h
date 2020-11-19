@@ -38,8 +38,8 @@ struct IEvaluationContext;
  * </ul>
  * </p>
  *
- * @noimplement This interface is not intended to be implemented by clients.
- * @noextend This interface is not intended to be extended by clients.
+ * @note This interface is not intended to be implemented by clients.
+ * @note This interface is not intended to be extended by clients.
  */
 struct IMenuService : public IServiceWithSources
 {
@@ -58,7 +58,7 @@ struct IMenuService : public IServiceWithSources
    *
    * @param factory
    *            the contribution factory. Must not be <code>null</code>
-   * @see #removeContributionFactory(AbstractContributionFactory)
+   * @see #RemoveContributionFactory
    */
   virtual void AddContributionFactory(const SmartPointer<AbstractContributionFactory>& factory) = 0;
 
@@ -83,7 +83,7 @@ struct IMenuService : public IServiceWithSources
    * @param location
    *            The starting location to begin populating this contribution
    *            manager. The format is the Menu API URI format.
-   * @see #releaseContributions(ContributionManager)
+   * @see #ReleaseContributions
    */
   virtual void PopulateContributionManager(ContributionManager* mgr,
                                            const QString& location) = 0;
@@ -96,7 +96,7 @@ struct IMenuService : public IServiceWithSources
    *
    * @param mgr
    *            The manager that was populated by a call to
-   *            {@link #populateContributionManager(ContributionManager, String)}
+   *            {@link #PopulateContributionManager}
    */
   virtual void ReleaseContributions(ContributionManager* mgr) = 0;
 

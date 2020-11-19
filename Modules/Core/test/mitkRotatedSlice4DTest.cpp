@@ -37,8 +37,9 @@ int mitkRotatedSlice4DTest(int, char *argv[])
     return false;
   }
 
-  // for each time step...
-  for (unsigned int ts = 0; ts < image4D->GetTimeSteps(); ts++)
+  auto numTimeSteps = std::min(2, static_cast<int>(image4D->GetTimeSteps()));
+
+  for (int ts = 0; ts < numTimeSteps; ++ts)
   {
     mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
     timeSelector->SetInput(image4D);
@@ -46,7 +47,7 @@ int mitkRotatedSlice4DTest(int, char *argv[])
     timeSelector->Update();
     mitk::Image::Pointer image3D = timeSelector->GetOutput();
 
-    int sliceNumber = 5;
+    int sliceNumber = std::min(5, static_cast<int>(image3D->GetSlicedGeometry()->GetSlices()));
 
     mitk::PlaneGeometry::Pointer plane = mitk::PlaneGeometry::New();
     plane->InitializeStandardPlane(image3D->GetGeometry(), mitk::PlaneGeometry::Frontal, sliceNumber, true, false);

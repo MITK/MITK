@@ -10,7 +10,7 @@ a global reinit.
 
 The symbol of this view is the following:
 
-\imageMacro{../../resources/icon_igt_simple_example.png,"",2}
+\imageMacro{icon_igt_simple_example.png,"",2}
 
 and the whole view looks like this:
 
@@ -45,11 +45,11 @@ Let's now have a deeper look at these functions.
 
 \section OnStartIGT OnStartIGT
 
-\snippet ../../src/internal/QmitkIGTTutorialView.cpp OnStart 1
+\snippet QmitkIGTTutorialView.cpp OnStart 1
 
 We first check in a try environment, if we should use an NDI tracking device or a virtual device. Let's start with NDI, we hardcode the parameters here and give out a warning. In your propper application, the parameters should be set via the gui aswell (see \ref org_mitk_views_igttrackingtoolbox ), but for simplicity, we just set hardcoded parameters here. If you want to try it with your own NDI device, you need to adapt these parameters here in the code:
 
-\snippet ../../src/internal/QmitkIGTTutorialView.cpp OnStart 2
+\snippet QmitkIGTTutorialView.cpp OnStart 2
 
 The tracking device has to be set to a source. For more information on the tracking pipeline, please have a look at the \ref IGTTutorialStepFilterPipeline.
 
@@ -88,7 +88,7 @@ Each time, the timer is updated, the following code is executed:
 This function will stop the pipeline and clean up everything:
 \snippet QmitkIGTTutorialView.cpp OnStop
 
-You now have a very simple plugin, which creates an own tracking device and starts or stops tracking. Of course, for your more advanced project, you could implement a new tracking device to be available in every plugin (see \ref IGTHowToImplementATrackingDevice) or use already implemented tracking devices via the tracking toolbox and/or microservices. This small example should just show you the most simple way to start tracking.
+You now have a very simple plugin, which creates an own tracking device and starts or stops tracking. Of course, for your more advanced project, you could implement a new tracking device to be available in every plugin (see \ref IGTHowToImplementATrackingDevice ) or use already implemented tracking devices via the tracking toolbox and/or microservices. This small example should just show you the most simple way to start tracking.
 
-\ref Return to the \ref IGTTutorialOverview "[IGT Tutorial Overview]"
+Return to the \ref IGTTutorialOverview "[IGT Tutorial Overview]"
 */

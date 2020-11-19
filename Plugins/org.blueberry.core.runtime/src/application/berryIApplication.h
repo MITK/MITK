@@ -74,12 +74,12 @@ struct org_blueberry_core_runtime_EXPORT IApplication
 
     /**
      * Forces this running application to exit.  This method should wait until the
-     * running application is ready to exit.  The {@link #start()}
+     * running application is ready to exit.  The {@link #Start}
      * should already have exited or should exit very soon after this method exits<p>
      *
      * This method is only called to force an application to exit.
      * This method will not be called if an application exits normally from
-     * the {@link #start()} method.
+     * the {@link #Start} method.
      * <p>
      * Note: This method is called by the platform; it is not intended
      * to be called directly by clients.

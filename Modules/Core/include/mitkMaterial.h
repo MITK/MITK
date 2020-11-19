@@ -57,9 +57,6 @@ namespace mitk
      * Color (0.5, 0.5, 0.5) color coefficient 1.0, specular color (1.0, 1.0, 1.0),
      * specular coefficient 1.0, specular power 10, opacity 1.0, interpolation
      * Gouraud, representation Surface.
-     * @param node optinally a data tree node may be defined to which the properties
-     *             are forwarded. Please note, that if this node doesn't have the
-     *             needed properties associated, they will be added.
      */
     static Pointer New()
     {
@@ -75,9 +72,6 @@ namespace mitk
      *              range [0..1]
      * @param opacity the opacity of the material. 0.0 means fully transparent
      *              and 1.0 means solid.
-     * @param node optinally a data tree node may be defined to which the properties
-     *              are forwarded. Please note, that if this node doesn't have the
-     *              needed properties associated, they will be added.
      */
     static Pointer New(Color color, double opacity = 1.0f)
     {
@@ -94,9 +88,6 @@ namespace mitk
      * @param blue the blue component of the materials color (range [0..1])
      * @param opacity the opacity of the material. 0.0 means fully transparent
      *        and 1.0 means solid.
-     * @param node optionally a data tree node may be defined to which the properties
-     *        are forwarded. Please note, that if this node doesn't have the
-     *        needed properties associated, they will be added.
      */
     static Pointer New(double red, double green, double blue, double opacity = 1.0f)
     {
@@ -119,9 +110,6 @@ namespace mitk
      *        how shiny the material will appear (range [0..inf]).
      * @param opacity the opacity of the material. 0.0 means fully transparent
      *        and 1.0 means solid.
-     * @param node optionally a data tree node may be defined to which the properties
-     *        are forwarded. Please note, that if this node doesn't have the
-     *        needed properties associated, they will be added.
      */
     static Pointer New(double red,
                        double green,
@@ -150,9 +138,6 @@ namespace mitk
      *        how shiny the material will appear (range [0..inf]).
      * @param opacity the opacity of the material. 0.0 means fully transparent
      *        and 1.0 means solid.
-     * @param node optionally a data tree node may be defined to which the properties
-     *        are forwarded. Please note, that if this node doesn't have the
-     *        needed properties associated, they will be added.
      */
     static Pointer New(
       Color color, double colorCoefficient, double specularCoefficient, double specularPower, double opacity)
@@ -230,7 +215,7 @@ namespace mitk
     /**
      * Sets the specular power which controls the shininess of the object
      * together with the specular coefficient
-     * @param specularCoefficient the new specular coefficient. Valid range
+     * @param specularPower the new specular coefficient. Valid range
      *        is [0..inf]
      */
     virtual void SetSpecularPower(double specularPower);
@@ -361,9 +346,6 @@ namespace mitk
      * Color (0.5, 0.5, 0.5) color coefficient 1.0, specular color (1.0, 1.0, 1.0),
      * specular coefficient 1.0, specular power 10, opacity 1.0, interpolation
      * Gouraud, representation Surface.
-     * @param node optinally a data tree node may be defined to which the properties
-     *             are forwarded. Please note, that if this node doesn't have the
-     *             needed properties associated, they will be added.
      */
     Material();
 
@@ -374,9 +356,6 @@ namespace mitk
      *              range [0..1]
      * @param opacity the opacity of the material. 0.0 means fully transparent
      *              and 1.0 means solid.
-     * @param node optinally a data tree node may be defined to which the properties
-     *              are forwarded. Please note, that if this node doesn't have the
-     *              needed properties associated, they will be added.
      */
     Material(Color color, double opacity = 1.0f);
 
@@ -388,9 +367,6 @@ namespace mitk
      * @param blue the blue component of the materials color (range [0..1])
      * @param opacity the opacity of the material. 0.0 means fully transparent
      *        and 1.0 means solid.
-     * @param node optionally a data tree node may be defined to which the properties
-     *        are forwarded. Please note, that if this node doesn't have the
-     *        needed properties associated, they will be added.
      */
     Material(double red, double green, double blue, double opacity = 1.0f);
 
@@ -408,9 +384,6 @@ namespace mitk
      *        how shiny the material will appear (range [0..inf]).
      * @param opacity the opacity of the material. 0.0 means fully transparent
      *        and 1.0 means solid.
-     * @param node optionally a data tree node may be defined to which the properties
-     *        are forwarded. Please note, that if this node doesn't have the
-     *        needed properties associated, they will be added.
      */
     Material(double red,
              double green,
@@ -434,9 +407,6 @@ namespace mitk
      *        how shiny the material will appear (range [0..inf]).
      * @param opacity the opacity of the material. 0.0 means fully transparent
      *        and 1.0 means solid.
-     * @param node optionally a data tree node may be defined to which the properties
-     *        are forwarded. Please note, that if this node doesn't have the
-     *        needed properties associated, they will be added.
      */
     Material(Color color, double colorCoefficient, double specularCoefficient, double specularPower, double opacity);
 

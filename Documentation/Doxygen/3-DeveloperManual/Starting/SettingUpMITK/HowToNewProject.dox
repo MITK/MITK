@@ -22,8 +22,7 @@ To bootstrap your project MITK offers two convenient options:
 
 <ol>
  <li> Use the MITK Plugin Generator, a command line tool used to generate a customized
-      MITK project and/or MITK plug-ins (available for download
-      <a href="http://www.mitk.org/Download#Plugin_Generator">here</a>).
+      MITK project and/or MITK plug-ins.
  <li> Use the <a href="https://github.com/MITK/MITK-ProjectTemplate">MITK project template</a>
       as an example project.
 </ol>
@@ -61,7 +60,7 @@ The usage of the Plugin Generator for creating a new project is described in
 Download the project as a tarball or zipball and extract it to your desired source
 directory.
 
-\note This is a \b template \b. You must modify it such that it fits the needs of
+\note This is a <b>template</b>. You must modify it such that it fits the needs of
 your particular project. Especially you should do a global search and replace for
 the string "awesome" to rename the template application and plug-in. You may want
 to rename some files too.
@@ -156,7 +155,7 @@ You can either inject an already build MITK to be used by your project or config
 some MITK options directly in your project's superbuild configuration if MITK is
 going to be build inside your project.
 
-\subsubsection HowToNewProjectCustomizingMITKInjectMITK  Inject a MITK build
+\subsection HowToNewProjectCustomizingMITKInjectMITK Inject a MITK build
 
 By setting the \b EXTERNAL_MITK_DIR \b variable in your project's superbuild
 %CMake configuration to a MITK build directory (containing the MITKConfig.cmake)
@@ -167,7 +166,7 @@ the superbuild of your project completely (set <your-proj-name>_USE_SUPERBUILD
 to OFF or edit your CMakeLists.txt file to set it to OFF by default) and set
 the \b MITK_DIR \b %CMake variable to your MITK build directory.
 
-\subsubsection HowToNewProjectCustomizingMITKConfigure Configure the MITK superbuild
+\subsection HowToNewProjectCustomizingMITKConfigure Configure the MITK superbuild
 
 If MITK is being build inside your project's superbuild process, you can enable
 the use of certain third-party libraries inside of MITK. The following variables
@@ -211,7 +210,7 @@ superbuild configuration by using the following %CMake variables:
       from MITK_GIT_REPOSITORY.
 </ul>
 
-\subsubsection HowToNewProjectProjectStructure Project Structure
+\subsection HowToNewProjectProjectStructure Project Structure
 
 If you are using the superbuild feature of the generated project (the default),
 you might want to familiarise yourself with the layout of your build tree.
@@ -242,7 +241,7 @@ MyProject-superbuild/MITK-superbuild/MITK-build build directory.
 
 \imageMacro{HowToNewProject-MyProjectLayout.png,"Layout of MyProject",4.02}
 
-\subsubsection HowToNewProjectPackaging Packaging
+\subsection HowToNewProjectPackaging Packaging
 
 The project template and the generated projects by the Plugin Generator come
 with full packaging support. You can create deployable packages of your project

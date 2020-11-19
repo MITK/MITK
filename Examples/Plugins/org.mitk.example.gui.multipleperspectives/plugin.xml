@@ -12,7 +12,7 @@
       id="org.mitk.example.minimalperspective"
       name="Minimal Perspective 1"
       icon="resources/perspectiveIcon1.png"
-      class="MinimalPerspective">
+      class="MinimumPerspective">
     </perspective>
   </extension>
 

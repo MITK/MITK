@@ -132,6 +132,7 @@ public:
   /*!
   * \brief Adds 1D data to the widget
   * \details internally, the list is converted to a map with increasing integers keys starting at 0.
+  * \param data1D
   * \param label the name of the data that is also used as identifier.
   * \param chartType the chart type that should be used for this data entry
   * \note the data can be cleared with ClearDiagram()
@@ -164,6 +165,7 @@ public:
   /*!
   * \brief Adds 2D data to the widget. Call repeatedly for displaying multiple charts.
   * \details each entry represents a data point: key: value --> x-value: y-value.
+  * \param data2D
   * \param label the name of the data that is also used as identifier.
   * \param chartType the chart type that should be used for this data entry
   * \note the data can be cleared with ClearDiagram()
@@ -196,7 +198,7 @@ public:
 
   /*!
   * \brief Sets the color of one data entry (identifier is previously assigned label)
-  * \details the color name can be "red" or a hex number (#FF0000).
+  * \details the color name can be "red" or a hex number (\c \#FF0000 ).
   * \warning Either define all data entries with a color or no data entry. If a mixed approach is used,
   * plotly choses the color of the data entry (that could be the same as a user defined color).
   * \note If an unknown label is given, nothing happens.

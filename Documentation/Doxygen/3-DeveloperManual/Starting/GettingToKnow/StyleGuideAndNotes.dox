@@ -363,12 +363,12 @@ for ( unsigned int i = 0; i < 3; ++i) { x[i] = 0.0; }
 
 \section StyleGuideAndNotesPage_IncludeGuards Include Guards
 
-\li #inlcude guard is a particular construct used to avoid the problem of
-double inclusion when dealing with the #include directive.
+\li \#include guard is a particular construct used to avoid the problem of
+double inclusion when dealing with the \#include directive.
 
-\li Naming convention for #inlcude guards is: ClassName_h
+\li Naming convention for \#include guards is: ClassName_h
 
-\li Following example demonstrates a problem that can arise if #include guards
+\li Following example demonstrates a problem that can arise if \#include guards
 are missing: Here, the file child.cpp has indirectly included two copies of the text in the
 header file grandfather.h. This causes a compilation error, since the structure
 type foo is apparently defined twice.
@@ -385,10 +385,10 @@ child.h        #include "grandfather.h"
 @endcode
 
 
-\subsection StyleGuideAndNotesPage_Useofincludeguards Use of #include guards
+\subsection StyleGuideAndNotesPage_Useofincludeguards Use of \#include guards
 \li Here, the first inclusion of grandfather.h causes the macro grandfather h to
 be defined. Then, when child.cpp includes grandfather.h the second time,
-the #ifndef test fails, and the preprocessor skips down to the #endif, thus
+the \#ifndef test fails, and the preprocessor skips down to the \#endif, thus
 avoiding the second definition of struct foo. The program compiles correctly.
 @code
 grandfather.h  #ifndef grandfather h
@@ -429,8 +429,7 @@ protected:
 
 \li Set- and Get-methods can be created with the macros @a itkSetObjectMacro(name,type) and
 @a itkGetObjectMacro(name,type), respectively, if the @a type is derived from @a itk::LightObject or
-@a itk::Object. There are also macros for other types, e.g., strings, see
-<a href="http://www.itk.org/Doxygen12/html/itkMacro_8h.html">itkMacro.h</a>.
+@a itk::Object.
 
 \li When using inner classes of a parent class which is templated, you have
 to use the keyword @a typename for gcc 3.x and standard compliance. For example,
@@ -462,8 +461,6 @@ Prefixes for the constants are to be used like corresponding others. See file @a
 
 We offer a .clang-format file, which can be used to automatically format code acceptably.
 
-\include .clang-format
-
-For an explanation of the different options check out http://clang.llvm.org/docs/ClangFormatStyleOptions.html
+For an explanation of the different options check out https://clang.llvm.org/docs/ClangFormatStyleOptions.html
 
 */

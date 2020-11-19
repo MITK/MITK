@@ -37,14 +37,14 @@ public:
 
   ///
   /// @brief Build a forest of trees from the training set (X, y).
-  /// @param X, The training input samples. Matrix of shape = [n_samples, n_features]
-  /// @param Y, The target values (class labels in classification, real numbers in regression). Matrix of shape = [n_samples, 1]
+  /// @param X The training input samples. Matrix of shape = [n_samples, n_features]
+  /// @param Y The target values (class labels in classification, real numbers in regression). Matrix of shape = [n_samples, 1]
   ///
   virtual void Train(const Eigen::MatrixXd &X, const Eigen::MatrixXi &Y) = 0;
 
   ///
   /// @brief Predict class for X.
-  /// @param X, The input samples.
+  /// @param X The input samples.
   /// @return The predicted classes. Y matrix of shape = [n_samples, 1]
   ///
   virtual Eigen::MatrixXi Predict(const Eigen::MatrixXd &X) = 0;
@@ -84,7 +84,7 @@ public:
 
   ///
   /// @brief SetPointWiseWeight
-  /// @param W, The pointwise weights. W matrix of shape = [n_samples, 1]
+  /// @param W The pointwise weights. W matrix of shape = [n_samples, 1]
   ///
   virtual void SetPointWiseWeight(const Eigen::MatrixXd& W)
   {
@@ -93,7 +93,7 @@ public:
 
   ///
   /// @brief UsePointWiseWeight
-  /// @param toggle weighting on/off
+  /// @param value weighting on/off
   ///
   virtual void UsePointWiseWeight(bool value)
   {

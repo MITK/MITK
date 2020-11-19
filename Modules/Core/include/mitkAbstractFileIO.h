@@ -99,6 +99,7 @@ namespace mitk
      * If the given MIME type has nothing but its name set, the according MIME type
      * is looked up in the service registry.
      *
+     * @param baseDataType
      * @param mimeType The MIME type this reader can read.
      * @param description A human readable description of this reader.
      *

@@ -47,31 +47,31 @@ namespace mitk
 
     bool operator<(const MimeType &other) const;
 
-    /** @See mitk::CustomMimeType::GetName()*/
+    /** @see mitk::CustomMimeType::GetName()*/
     std::string GetName() const;
 
-    /** @See mitk::CustomMimeType::GetCategory()*/
+    /** @see mitk::CustomMimeType::GetCategory()*/
     std::string GetCategory() const;
 
-    /** @See mitk::CustomMimeType::GetExtensions()*/
+    /** @see mitk::CustomMimeType::GetExtensions()*/
     std::vector<std::string> GetExtensions() const;
 
-    /** @See mitk::CustomMimeType::GetComment()*/
+    /** @see mitk::CustomMimeType::GetComment()*/
     std::string GetComment() const;
 
-    /** @See mitk::CustomMimeType::GetFileNameWithoutExtension()*/
+    /** @see mitk::CustomMimeType::GetFileNameWithoutExtension()*/
     std::string GetFilenameWithoutExtension(const std::string &path) const;
 
-    /** @See mitk::CustomMimeType::AppliesTo()*/
+    /** @see mitk::CustomMimeType::AppliesTo()*/
     bool AppliesTo(const std::string &path) const;
 
-    /** @See mitk::CustomMimeType::MatchesExtension()*/
+    /** @see mitk::CustomMimeType::MatchesExtension()*/
     bool MatchesExtension(const std::string &path) const;
 
-    /** @See mitk::CustomMimeType::IsValid()*/
+    /** @see mitk::CustomMimeType::IsValid()*/
     bool IsValid() const;
 
-    /** @See mitk::CustomMimeType::Swap()*/
+    /** @see mitk::CustomMimeType::Swap()*/
     void Swap(MimeType &m);
 
   private:

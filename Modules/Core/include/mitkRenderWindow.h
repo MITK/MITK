@@ -70,7 +70,7 @@ namespace mitk
     * This makes sure that VTK-Events are correctly translated into
     * MITK-Events.
     *
-    * \warn This method needs to be called MANUALLY as soon as the MapperID
+    * \warning This method needs to be called MANUALLY as soon as the MapperID
     * for this RenderWindow is changed or the vtkInteractorStyle is modified
     * somehow else!
     */

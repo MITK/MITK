@@ -56,8 +56,6 @@ struct BERRY_UI_QT IWindowListener
    * <b>Note:</b> This event is not fired if no perspective is
    * open (the window is empty).
    * </p>
-   *
-   * @param window the window that was activated
    */
   virtual void WindowActivated(const IWorkbenchWindow::Pointer& /*window*/) {}
 
@@ -67,15 +65,12 @@ struct BERRY_UI_QT IWindowListener
    * <b>Note:</b> This event is not fired if no perspective is
    * open (the window is empty).
    * </p>
-   *
-   * @param window the window that was activated
    */
   virtual void WindowDeactivated(const IWorkbenchWindow::Pointer& /*window*/) {}
 
   /**
    * Notifies this listener that the given window has been closed.
    *
-   * @param window the window that was closed
    * @see IWorkbenchWindow#close
    */
   virtual void WindowClosed(const IWorkbenchWindow::Pointer& /*window*/) {}
@@ -83,7 +78,6 @@ struct BERRY_UI_QT IWindowListener
   /**
    * Notifies this listener that the given window has been opened.
    *
-   * @param window the window that was opened
    * @see IWorkbench#openWorkbenchWindow
    */
   virtual void WindowOpened(const IWorkbenchWindow::Pointer& /*window*/) {}

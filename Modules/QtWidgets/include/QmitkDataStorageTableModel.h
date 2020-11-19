@@ -31,7 +31,7 @@ found in the LICENSE file.
 /// \class QmitkDataStorageTableModel
 ///
 /// \brief A table model for a set of DataNodes defined by a predicate.
-/// \TODO make columns interchangeable, select which properties to show as columns
+/// \todo make columns interchangeable, select which properties to show as columns
 ///
 class MITKQTWIDGETS_EXPORT QmitkDataStorageTableModel : public QAbstractTableModel
 {

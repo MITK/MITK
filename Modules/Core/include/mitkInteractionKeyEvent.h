@@ -29,13 +29,10 @@ found in the LICENSE file.
  */
 namespace mitk
 {
-  /**
-   * \class InteractionKeyEvent
-   * \brief Handles key events.
-   * Takes a std::string for pressed key or special key description, mitk::ModifierKeys for modifiers
-   * \ingroup Interaction.
-   */
-
+  /** \brief Handles key events
+    * Takes a std::string for pressed key or special key description, mitk::ModifierKeys for modifiers
+    * \ingroup Interaction
+    */
   class MITKCORE_EXPORT InteractionKeyEvent : public InteractionEvent
   {
   public:

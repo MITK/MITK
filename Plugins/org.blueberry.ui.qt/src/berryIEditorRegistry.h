@@ -43,7 +43,6 @@ namespace berry {
  * </p>
  *
  * @see org.blueberry.ui.IWorkbench#getEditorRegistry()
- * @noimplement This interface is not intended to be implemented by clients.
  */
 struct BERRY_UI_QT IEditorRegistry {
 
@@ -55,10 +54,7 @@ struct BERRY_UI_QT IEditorRegistry {
     /**
      * The identifier for the system external editor descriptor. This descriptor
      * is always present in the registry on all platforms.
-     * This editor requires an input which implements
-     * {@link org.blueberry.ui.IPathEditorInput IPathEditorInput}.
-     * Use {@link #findEditor findEditor} to access the editor descriptor for
-     * this identifier.
+     * Use {@link #FindEditor} to access the editor descriptor for this identifier.
      *
      * @since 3.0
      */
@@ -67,10 +63,8 @@ struct BERRY_UI_QT IEditorRegistry {
     /**
      * The identifier for the system in-place editor descriptor. This descriptor
      * is only present in the registry on platforms that support in-place editing
-     * (for example Win32). This editor requires an input which implements
-     * {@link org.blueberry.ui.IInPlaceEditorInput IInPlaceEditorInput}. Use
-     * {@link #findEditor findEditor} to access the editor descriptor for this
-     * identifier.
+     * (for example Win32). Use {@link #FindEditor} to access the editor
+     * descriptor for this identifier.
      *
      * @since 3.0
      */

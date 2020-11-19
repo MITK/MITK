@@ -536,8 +536,10 @@ namespace mitk
               texture->SetColorModeToDirectScalars();
 
               // re-use properties from the 2D image mapper
-              imageActor->SetProperty(localStorage->m_ImageActor->GetProperty());
-              imageActor->GetProperty()->SetAmbient(0.5);
+              auto property = vtkSmartPointer<vtkProperty>::New();
+              localStorage->m_ImageActor->GetProperty()->DeepCopy(property);
+              property->LightingOff();
+              imageActor->SetProperty(property);
 
               // Set texture interpolation on/off
               bool textureInterpolation = node->IsOn("texture interpolation", renderer);

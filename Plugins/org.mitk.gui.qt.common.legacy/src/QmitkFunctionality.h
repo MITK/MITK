@@ -250,6 +250,7 @@ protected:
   /// Outputs an error message to the console and displays a message box containing
   /// the exception description.
   /// \param e the exception which should be handled
+  /// \param parent
   /// \param showDialog controls, whether additionally a message box should be
   ///        displayed to inform the user that something went wrong
   ///

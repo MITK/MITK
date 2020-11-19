@@ -31,8 +31,7 @@ namespace berry {
  * Not intended to be implemented by clients.
  *
  * @since 3.0
- * @since 3.4 now extends {@link org.blueberry.ui.ISizeProvider}
- * @noimplement This interface is not intended to be implemented by clients.
+ * @since 3.4 now extends {@link ISizeProvider}
  */
 struct BERRY_UI_QT IPresentablePart : public Object, public ISizeProvider {
 
@@ -237,7 +236,7 @@ struct BERRY_UI_QT IPresentablePart : public Object, public ISizeProvider {
     /**
      * Returns an SWT control that can be used to indicate the tab order for
      * this part. This can be returned as part of the result to
-     * {@link StackPresentation#getTabList(IPresentablePart)}. Any other use of this control is
+     * {@link StackPresentation#GetTabList}. Any other use of this control is
      * unsupported. This may return a placeholder control that is only
      * meaningful in the context of <code>getTabList</code>.
      *

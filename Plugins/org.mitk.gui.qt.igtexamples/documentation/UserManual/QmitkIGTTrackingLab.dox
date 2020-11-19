@@ -17,7 +17,7 @@ The IGT-TrackingLab is the last step of the IGT tutorial. In the following you c
 
 The symbol of the Tracking Lab View is the following:
 
-\imageMacro{../../resources/icon_igt_tracking_lab.png,"",2}
+\imageMacro{icon_igt_tracking_lab.png,"",2}
 
 The view looks like this:
 \imageMacro{IGT_TrackingLab_PluginView.png,"",15.90}
@@ -38,7 +38,7 @@ Now we need to register the object marker to the surface it's fixed upon, in our
 Press the <i>plus</i> button in the <i>Image fiducials</i> column. Shift + click on the corners on the book in the <i>MITK Display</i>.
 2. Point to the corresponding landmarks in the real world using the pointer.
 Now press the <i>plus</i> button in the <i>Real world fiducials</i> column and point to the corners on the real book. Press <i>Add current instrument position</i> whenever you targeted a corner to tell MITK this is the desired landmark. Make sure you select the "real" edges in the same order as the edges in the image.
-\imageMacro{IGT_TrackingLab_InitialRegistration.png,"Here the landmarks of the virtual object are already set",15.90}
+\imageMacro{IGT_TrackingLab_InitialRegistration.PNG,"Here the landmarks of the virtual object are already set",15.90}
 
 Press <i>Register</i> to finalize the initial registration.
 Now the object marker is registered onto the book. You can see this in the MITK image. If needed the FRE is shown in the widget.
@@ -64,5 +64,5 @@ You may need to adjust the Needle View Direction and the View Up Vector. This is
 
 In the above case, the camera should look in inverse z-direction, and the view up vector should probably be set to positive x. Note this is just an example and may be different depending on your pointer.
 
-\ref Return to the \ref IGTTutorialOverview "[IGT Tutorial Overview]"
+Return to the \ref IGTTutorialOverview "[IGT Tutorial Overview]"
 */

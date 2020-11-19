@@ -55,7 +55,7 @@ namespace mitk
     /**
      * Check for equality. Equality is given if event variant is the same and
      * classes are the same or the first argument is a superclass of the second.
-     * \warn Here the order of arguments matters. !
+     * \warning Here the order of arguments matters. !
      */
     bool operator==(const StateMachineTransition &transition) const;
 

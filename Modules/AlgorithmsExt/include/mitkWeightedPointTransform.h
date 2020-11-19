@@ -227,7 +227,6 @@ namespace mitk
      * @param Threshold        (input) the relative size of the change to the moving set above which the iteration
      * continues
      * @param MaxIterations    (input) the maximum number of iterations allowed
-     * @param Threshold        (input) the threshold used to terminate the algorithm
      * @param TransformationR  (output) this variable will hold the computed rotation matrix
      * @param TransformationT  (output) this variable will hold the computed translation vector
      * @param FRE              (output) this variable will hold the computed rotation FRE of the transformation

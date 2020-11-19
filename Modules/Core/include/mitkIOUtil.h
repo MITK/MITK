@@ -146,7 +146,7 @@ namespace mitk
      * This method generates a unique temporary filename from \c templateName, creates
      * and opens the file using the output stream \c tmpStream and the specified open
      * mode \c mode and returns the name of the newly create file. The open mode is always
-     * OR'd with \begin{code}std::ios_base::out | std::ios_base::trunc\end{code}.
+     * OR'd with <code>std::ios_base::out | std::ios_base::trunc</code>.
      *
      * The \c templateName argument must contain six consective 'X' characters ("XXXXXX")
      * and these are replaced with a string that makes the filename unique.
@@ -337,6 +337,7 @@ namespace mitk
      * @param path The path to the image including file name and and optional file extension.
      *        If no extension is set, the default extension and mime-type for the
      *        BaseData type of \c data is used.
+     * @param setPathProperty
      * @throws mitk::Exception if no writer for \c data is available or the writer
      *         is not able to write the image.
      */
@@ -349,6 +350,7 @@ namespace mitk
      *        If no extension is set, the default extension and mime-type for the
      *        BaseData type of \c data is used.
      * @param options The IFileWriter options to use for the selected writer.
+     * @param setPathProperty
      * @throws mitk::Exception if no writer for \c data is available or the writer
      *         is not able to write the image.
      */
@@ -362,6 +364,7 @@ namespace mitk
      * @param addExtension If \c true, an extension according to the given \c mimeType
      *        is added to \c path if it does not contain one. If \c path already contains
      *        a file name extension, it is not checked for compatibility with \c mimeType.
+     * @param setPathProperty
      *
      * @throws mitk::Exception if no writer for the combination of \c data and \c mimeType is
      *         available or the writer is not able to write the image.
@@ -381,6 +384,7 @@ namespace mitk
      * @param addExtension If \c true, an extension according to the given \c mimeType
      *        is added to \c path if it does not contain one. If \c path already contains
      *        a file name extension, it is not checked for compatibility with \c mimeType.
+     * @param setPathProperty
      *
      * @throws mitk::Exception if no writer for the combination of \c data and \c mimeType is
      *         available or the writer is not able to write the image.
@@ -399,6 +403,7 @@ namespace mitk
      * the Save() methods taking a BaseData object as an argument are more appropriate.
      *
      * @param saveInfos A list of SaveInfo objects for saving contained BaseData objects.
+     * @param setPathProperty
      *
      * @see Save(const mitk::BaseData*, const std::string&)
      */

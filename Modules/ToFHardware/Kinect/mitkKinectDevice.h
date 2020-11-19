@@ -96,7 +96,11 @@ namespace mitk
     \brief gets the 3 images (distance, amplitude, intensity) from the ToF camera. Caution! The user is responsible for allocating and deleting the images.
     \param distanceArray contains the returned distance data as an array.
     \param amplitudeArray contains the returned amplitude data as an array.
+    \param intensityArray
+    \param sourceDataArray
+    \param requiredImageSequence
     \param capturedImageSequence the actually captured image sequence number.
+    \param rgbDataArray
     */
     virtual void GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* sourceDataArray,
                               int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray=nullptr);

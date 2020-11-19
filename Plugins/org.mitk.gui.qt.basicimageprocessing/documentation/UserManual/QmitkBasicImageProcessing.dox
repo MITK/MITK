@@ -29,7 +29,7 @@ This document will tell you how to use this view, but it is assumed that you alr
 \section QmitkBasicImageProcessingUserManualFilters Filters
 
 This section will not describe the fundamental functioning of the single filters in detail, though.
-If you want to know more about a single filter, please have a look at http://www.itk.org/Doxygen316/html/classes.html
+If you want to know more about a single filter, please have a look at https://itk.org/Doxygen/html/index.html
 or in any good digital image processing book. For total denoising filter, please see Tony F. Chan et al., "The digital TV filter and nonlinear denoising".
 
 Available filters are:
@@ -122,5 +122,5 @@ Try downsampling your image first.
 
 <B>All other problems.</B><BR>
 Please report to the MITK mailing list.
-See http://www.mitk.org/wiki/Mailinglist on how to do this.
+See https://www.mitk.org/wiki/MITK_Mailinglist on how to do this.
 */

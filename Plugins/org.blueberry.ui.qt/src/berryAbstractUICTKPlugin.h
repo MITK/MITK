@@ -101,20 +101,9 @@ private:
    static const QString FN_DIALOG_SETTINGS;
 
     /**
-     * Storage for dialog and wizard data; <code>null</code> if not yet
-     * initialized.
-     */
-    //DialogSettings dialogSettings = null;
-
-    /**
      * Storage for preferences.
      */
     mutable IPreferencesService* preferencesService;
-
-    /**
-     * The bundle listener used for kicking off refreshPluginActions().
-     */
-    //BundleListener bundleListener;
 
 public:
 
@@ -126,22 +115,6 @@ public:
      * the associated bundle is being activated.
      */
    AbstractUICTKPlugin();
-
-    /**
-     * Returns the dialog settings for this UI plug-in.
-     * The dialog settings is used to hold persistent state data for the various
-     * wizards and dialogs of this plug-in in the context of a workbench.
-     * <p>
-     * If an error occurs reading the dialog store, an empty one is quietly created
-     * and returned.
-     * </p>
-     * <p>
-     * Subclasses may override this method but are not expected to.
-     * </p>
-     *
-     * @return the dialog settings
-     */
-//    IDialogSettings getDialogSettings();
 
     /**
      * Returns the preferences service for this UI plug-in.
@@ -169,83 +142,14 @@ public:
      */
     IWorkbench* GetWorkbench();
 
-
-protected:
-
-    /**
-     * Returns a new image registry for this plugin-in.  The registry will be
-     * used to manage images which are frequently used by the plugin-in.
-     * <p>
-     * The default implementation of this method creates an empty registry.
-     * Subclasses may override this method if needed.
-     * </p>
-     *
-     * @return ImageRegistry the resulting registry.
-     * @see #getImageRegistry
-     */
-//    ImageRegistry createImageRegistry();
-
-    /**
-     * Initializes an image registry with images which are frequently used by the
-     * plugin.
-     * <p>
-     * The image registry contains the images used by this plug-in that are very
-     * frequently used and so need to be globally shared within the plug-in. Since
-     * many OSs have a severe limit on the number of images that can be in memory
-     * at any given time, each plug-in should only keep a small number of images in
-     * its registry.
-     * </p><p>
-     * Implementors should create a JFace image descriptor for each frequently used
-     * image.  The descriptors describe how to create/find the image should it be needed.
-     * The image described by the descriptor is not actually allocated until someone
-     * retrieves it.
-     * </p><p>
-     * Subclasses may override this method to fill the image registry.
-     * </p>
-     * @param reg the registry to initalize
-     *
-     * @see #getImageRegistry
-     */
-//    void initializeImageRegistry(ImageRegistry reg);
-
-    /**
-     * Loads the dialog settings for this plug-in.
-     * The default implementation first looks for a standard named file in the
-     * plug-in's read/write state area; if no such file exists, the plug-in's
-     * install directory is checked to see if one was installed with some default
-     * settings; if no file is found in either place, a new empty dialog settings
-     * is created. If a problem occurs, an empty settings is silently used.
-     * <p>
-     * This framework method may be overridden, although this is typically
-     * unnecessary.
-     * </p>
-     */
-//    void loadDialogSettings();
-
-
-    /**
-     * Refreshes the actions for the plugin.
-     * This method is called from <code>startup</code>.
-     * <p>
-     * This framework method may be overridden, although this is typically
-     * unnecessary.
-     * </p>
-     */
-//    void refreshPluginActions();
-
-    /**
-     * Saves this plug-in's dialog settings.
-     * Any problems which arise are silently ignored.
-     */
-//    void saveDialogSettings();
-
-
 public:
 
     /**
      * The <code>AbstractUIPlugin</code> implementation of this <code>Plugin</code>
      * method refreshes the plug-in actions.  Subclasses may extend this method,
      * but must send super <b>first</b>.
+     * 
+     * \param context
      */
     void start(ctkPluginContext* context) override;
 

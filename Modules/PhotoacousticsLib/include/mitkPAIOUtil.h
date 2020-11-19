@@ -46,15 +46,17 @@ namespace mitk {
       /**
        * @brief LoadFluenceContributionMaps loads multiple nrrd files from a given folder
        * and sorts them into a position map if such meta information is available in
-       * the filename. </br>
+       * the filename.
+       * 
        * As this method was specifically designed to load many fluence files, the
-       * naming convention for the position values is: </br>
+       * naming convention for the position values is:
        *
        * <b>*_pN,N,NFluence*.nrrd</b>
        *
        * @param foldername
        * @param blur
        * @param progress
+       * @param log10
        *
        * @return
        */
@@ -104,7 +106,7 @@ namespace mitk {
        * This method ensures that all added slices are in the correct order
        * corresponding to their y-offset.
        *
-       * @param nrrdFile path to the nrrd file on hard drive
+       * @param fluenceSimulation path to the nrrd file on hard drive
        */
       static FluenceYOffsetPair::Pointer LoadFluenceSimulation(std::string fluenceSimulation);
 

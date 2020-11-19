@@ -64,7 +64,7 @@ public:
    * @param resolvers an array of <code>IVariableResolvers</code> to
    *  resolve additional variables.
    *
-   * @see #resolveVariable(String, Object[])
+   * @see #ResolveVariable
    */
   EvaluationContext(IEvaluationContext* parent, const Object::ConstPointer& defaultVariable,
                     const std::vector<IVariableResolver*>& resolvers);

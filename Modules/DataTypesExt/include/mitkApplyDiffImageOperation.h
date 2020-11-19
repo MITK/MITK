@@ -55,6 +55,10 @@ namespace mitk
   public:
     /**
       Pass only 2D images here.
+      \param operationType
+      \param image
+      \param diffImage
+      \param timeStep
       \param sliceIndex brief Which slice to extract (first one has index 0).
       \param sliceDimension Number of the dimension which is constant for all pixels of the desired slice (e.g. 0 for
       axial)

@@ -32,7 +32,7 @@ namespace mitk
    * level window (e.g. LEVELWINDOW_COLOR). Make sure to check the documentation
    * of the mitk::RenderingModeProperty. For a code example how to use the
    * mitk::LevelWindowProperty check the mitkImageVtkMapper2DLevelWindowTest.cpp
-   * in Core\Code\Testing.
+   * in Core/Code/Testing.
    */
   class MITKCORE_EXPORT LevelWindowProperty : public BaseProperty
   {

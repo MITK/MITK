@@ -290,8 +290,8 @@ void vtkApplyLookupTableOnScalarsFast(
   lookupTable->GetTableRange(tableRange);
 
   // access elements of the vtkLookupTable
-  const int *realLookupTable = reinterpret_cast<int *>(lookupTable->GetTable()->GetPointer(0));
-  int maxIndex = lookupTable->GetNumberOfColors() - 1;
+  auto *realLookupTable = lookupTable->GetPointer(0);
+  size_t maxIndex = lookupTable->GetNumberOfColors() - 1;
 
   const float scale = (tableRange[1] - tableRange[0] > 0 ? (maxIndex + 1) / (tableRange[1] - tableRange[0]) : 0.0);
   // ensuring that starting point is zero
@@ -310,14 +310,9 @@ void vtkApplyLookupTableOnScalarsFast(
     while (outputSI != outputSIEnd)
     {
       // map to an index
-      auto idx = static_cast<int>(*inputSI * scale + bias);
+      auto idx = std::min(static_cast<size_t>(std::max(0, static_cast<int>(*inputSI * scale + bias))), maxIndex) * 4;
 
-      if (idx < 0)
-        idx = 0;
-      else if (idx > maxIndex)
-        idx = maxIndex;
-
-      *reinterpret_cast<int *>(outputSI) = realLookupTable[idx];
+      memcpy(outputSI, &realLookupTable[idx], 4);
 
       inputSI++;
       outputSI += 4;
@@ -349,7 +344,7 @@ void vtkApplyLookupTableOnScalars(vtkMitkLevelWindowFilter *self,
   while (!outputIt.IsAtEnd())
   {
     unsigned char *outputSI = outputIt.BeginSpan();
-    unsigned char *outputSIEnd = outputIt.EndSpan();
+    const unsigned char * const outputSIEnd = outputIt.EndSpan();
 
     // do we iterate over the inner vertical clipping bounds
     if (y >= clippingBounds[2] && y < clippingBounds[3])
@@ -365,13 +360,13 @@ void vtkApplyLookupTableOnScalars(vtkMitkLevelWindowFilter *self,
         {
           // fetching original value
           auto grayValue = static_cast<double>(*inputSI);
-          // applying lookuptable - copy the 4 (RGBA) chars as a single int
-          *reinterpret_cast<int *>(outputSI) = *reinterpret_cast<int *>(lookupTable->MapValue(grayValue));
+          // applying lookuptable
+          memcpy(outputSI, lookupTable->MapValue(grayValue), 4);
         }
         else
         {
           // outer horizontal clipping bounds - write a transparent RGBA pixel as a single int
-          *reinterpret_cast<int *>(outputSI) = 0;
+          memset(outputSI, 0, 4);
         }
 
         inputSI++;

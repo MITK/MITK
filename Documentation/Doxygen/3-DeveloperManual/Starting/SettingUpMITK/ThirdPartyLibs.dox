@@ -3,17 +3,13 @@
 
 The following third-party libraries can be used with MITK by default and can, in part, be automatically downloaded during superbuild.
 
-\par ACVD
-
-http://www.creatis.insa-lyon.fr/site/en/acvd
-
 \par ANN
 
-http://www.cs.umd.edu/~mount/ANN/
+https://www.cs.umd.edu/~mount/ANN/
 
 \par Boost
 
-http://www.boost.org/
+https://www.boost.org/
 
 \par C++ REST SDK
 
@@ -21,15 +17,15 @@ https://github.com/Microsoft/cpprestsdk/
 
 \par CppUnit
 
-http://sourceforge.net/projects/cppunit/
+https://sourceforge.net/projects/cppunit/
 
 \par CTK
 
-http://www.commontk.org/
+https://commontk.org/
 
 \par DCMTK
 
-http://dicom.offis.de/dcmtk.php.en
+https://dicom.offis.de/dcmtk
 
 \par Eigen
 
@@ -37,7 +33,7 @@ http://eigen.tuxfamily.org/index.php?title=Main_Page
 
 \par GDCM
 
-http://gdcm.sourceforge.net/
+https://gdcm.sourceforge.net/
 
 \par HDF5
 
@@ -45,15 +41,11 @@ https://support.hdfgroup.org/HDF5/
 
 \par ITK
 
-http://www.itk.org/
+https://itk.org/
 
 \par MatchPoint
 
-https://www.dkfz.de/en/sidt/projects/matchpoint/info.html
-
-\par NumPy
-
-http://www.numpy.org/
+https://www.dkfz.de/en/sidt/projects/MatchPoint/info.html
 
 \par OpenCL
 
@@ -61,19 +53,23 @@ https://www.khronos.org/opencl/
 
 \par OpenCV
 
-http://opencv.willowgarage.com/wiki/Welcome
+https://opencv.org/
 
 \par OpenIGTLink
 
 http://openigtlink.org/
 
+\par OpenMesh
+
+https://www.openmesh.org/
+
 \par PCRE
 
-http://www.pcre.org/
+https://www.pcre.org/
 
 \par POCO
 
-http://pocoproject.org
+https://pocoproject.org/
 
 \par Python
 
@@ -81,7 +77,7 @@ https://www.python.org/
 
 \par Qt
 
-http://www.qt.io/
+https://www.qt.io/
 
 \par Qwt
 
@@ -89,23 +85,23 @@ http://qwt.sourceforge.net/
 
 \par SWIG
 
-http://swig.org/
+http://www.swig.org/
 
 \par tinyxml
 
-http://sourceforge.net/projects/tinyxml/
+http://www.grinninglizard.com/tinyxml/
 
 \par VIGRA
 
-http://ukoethe.github.io/vigra/
+https://ukoethe.github.io/vigra/
 
 \par VTK
 
-http://www.vtk.org/
+https://vtk.org/
 
 \par zlib
 
-https://github.com/madler/zlib/
+https://zlib.net/
 
 For copyright information on any of the above toolkits see the corresponding home page or the corresponding source folder.
 */

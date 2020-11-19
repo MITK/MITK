@@ -253,7 +253,7 @@ namespace mitk
     - red: the output of ITK ImageSeriesReader: wrong, larger spacing, no tilt
     - blue: how much a shear must correct
 
-    \image tilt-correction.jpg
+    \image html Modules/DICOM/doc/Doxygen/tilt-correction.jpg
 
    \section DicomSeriesReader_whatweknowaboutitk The actual image loading process
 
@@ -558,6 +558,9 @@ namespace mitk
      \param filenames The filenames to load.
      \param sort Whether files should be sorted spatially (true) or not (false - maybe useful if presorted)
      \param load4D Whether to load the files as 3D+t (if possible)
+     \param correctGantryTilt
+     \param callback
+     \param preLoadedImageBlock
     */
     static DataNode::Pointer LoadDicomSeries(const StringContainer &filenames,
                                              bool sort = true,
@@ -569,8 +572,15 @@ namespace mitk
     /**
       \brief See LoadDicomSeries! Just a slightly different interface.
 
-      If \p preLoadedImageBlock is provided, the reader will only "fake" loading and create appropriate
-      mitk::Properties.
+      If \p preLoadedImageBlock is provided, the reader will only "fake" loading and create appropriate mitk::Properties.
+
+      \param filenames
+      \param node
+      \param sort
+      \param load4D
+      \param correctGantryTilt
+      \param callback
+      \param preLoadedImageBlock
     */
     static bool LoadDicomSeries(const StringContainer &filenames,
                                 DataNode &node,
@@ -897,7 +907,11 @@ namespace mitk
     /**
       \brief Feed files into itk::ImageSeriesReader and retrieve a 3D MITK image.
 
+      \param correctTilt
+      \param tiltInfo
+      \param io
       \param command can be used for progress reporting
+      \param preLoadedImageBlock
     */
     template <typename PixelType>
     static itk::SmartPointer<Image> LoadDICOMByITK(const StringContainer &,

@@ -28,16 +28,6 @@ found in the LICENSE file.
 #include <mitkTestNotRunException.h>
 #include <mitkTestingMacros.h>
 
-#if defined _MSC_VER
-#if _MSC_VER >= 1700
-#define RESIZE_WORKAROUND
-#endif
-#endif
-
-#ifdef RESIZE_WORKAROUND
-#include "vtkWin32OpenGLRenderWindow.h"
-#endif
-
 // VTK Testing to compare the rendered image pixel-wise against a reference screen shot
 #include "vtkTesting.h"
 
@@ -82,49 +72,6 @@ void mitk::RenderingTestHelper::Initialize(int width, int height, AntiAliasing a
   m_RenderWindow->GetRenderer()->SetDataStorage(m_DataStorage);
   this->SetMapperIDToRender2D();
   this->GetVtkRenderWindow()->SetSize(width, height);
-
-#ifdef RESIZE_WORKAROUND
-
-  HWND hWnd = static_cast<vtkWin32OpenGLRenderWindow *>(this->GetVtkRenderWindow())->GetWindowId();
-
-  RECT r;
-  r.left = 10;
-  r.top = 10;
-  r.right = r.left + width;
-  r.bottom = r.top + height;
-
-  LONG style = GetWindowLong(hWnd, GWL_STYLE);
-  AdjustWindowRect(&r, style, FALSE);
-
-  MITK_INFO << "WANTED:";
-  MITK_INFO << r.right - r.left;
-  MITK_INFO << r.bottom - r.top;
-
-  RECT rect;
-  if (GetWindowRect(hWnd, &rect))
-  {
-    int width = rect.right - rect.left;
-    int height = rect.bottom - rect.top;
-
-    MITK_INFO << "ACTUAL:";
-    MITK_INFO << width;
-    MITK_INFO << height;
-  }
-
-  SetWindowPos(hWnd, HWND_TOP, 0, 0, r.right - r.left, r.bottom - r.top, SWP_NOZORDER);
-
-  GetWindowRect(hWnd, &rect);
-
-  int width2 = rect.right - rect.left;
-  int height2 = rect.bottom - rect.top;
-
-  MITK_INFO << "ACTUAL2:";
-  MITK_INFO << width2;
-  MITK_INFO << height2;
-
-  SetWindowPos(hWnd, HWND_TOP, 0, 0, 2 * (r.right - r.left) - width2, 2 * (r.bottom - r.top) - height2, SWP_NOZORDER);
-
-#endif
 
   m_RenderWindow->GetRenderer()->Resize(width, height);
 }

@@ -32,7 +32,9 @@ namespace mitk
     typedef itk::SmartPointer<Image> ImagePointer;
 
     /** \brief Creates an ImageVtkWriteAccessor for a whole Image
-     *  \param Image::Pointer specifies the associated Image
+     *  \param iP specifies the associated Image
+     *  \param iDI
+     *  \param imageDataVtk
      */
     ImageVtkWriteAccessor(ImagePointer iP, const ImageDataItem *iDI, vtkImageData *imageDataVtk);
 

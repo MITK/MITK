@@ -46,7 +46,7 @@ struct BERRY_EXPRESSIONS IPropertyTester : public Object
    * Returns whether the property tester can handle the given
    * property or not.
    *
-   * @param namespace the name space to be considered
+   * @param namespaze the name space to be considered
    * @param property the property to test
    * @return <code>true</code> if the tester provides an implementation
    *  for the given property; otherwise <code>false</code> is returned
@@ -93,7 +93,7 @@ struct BERRY_EXPRESSIONS IPropertyTester : public Object
    *  of type <code>java.lang.String</code> or a boxed base type. If no value was
    *  specified in the <code>test</code> expressions then <code>null</code> is passed
    *
-   * @return returns <code>true<code> if the property is equal to the expected value;
+   * @return returns <code>true</code> if the property is equal to the expected value;
    *  otherwise <code>false</code> is returned
    */
   virtual bool Test(Object::ConstPointer receiver, const QString& property,

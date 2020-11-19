@@ -27,7 +27,7 @@ namespace mitk
 
   protected:
     /**
-      \brief tries to create one DataNode from a given XML <node> element
+      \brief tries to create one DataNode from a given XML \<node\> element
     */
     DataNode::Pointer LoadBaseDataFromDataTag(TiXmlElement *dataElement,
                                               const std::string &workingDirectory,
@@ -54,7 +54,7 @@ namespace mitk
     /**
       \brief reads all properties assigned to a base data element and assigns the list to the base data object
 
-      The baseDataNodeElem is supposed to be the <properties file="..."> element.
+      The baseDataNodeElem is supposed to be the \c \<properties file="..."\> element.
     */
     bool DecorateBaseDataWithProperties(BaseData::Pointer data,
                                         TiXmlElement *baseDataNodeElem,

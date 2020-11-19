@@ -29,17 +29,17 @@ namespace berry {
  * <p>
  * A property tester implements the property tests enumerated in the property
  * tester extension point. For the following property test extension
- * <pre>
- *   &lt;propertyTester
- *       namespace="org.blueberry.jdt.core"
- *       id="org.blueberry.jdt.core.IPackageFragmentTester"
- *       properties="isDefaultPackage"
- *       type="org.blueberry.jdt.core.IPackageFragment"
- *       class="org.blueberry.demo.MyPackageFragmentTester"&gt;
- *     &lt;/propertyTester&gt;
- * </pre>
+ * \code{.unparsed}
+ * <propertyTester
+ *   namespace="org.blueberry.jdt.core"
+ *   id="org.blueberry.jdt.core.IPackageFragmentTester"
+ *   properties="isDefaultPackage"
+ *   type="org.blueberry.jdt.core.IPackageFragment"
+ *   class="org.blueberry.demo.MyPackageFragmentTester">
+ * </propertyTester>
+ * \endcode
  * the corresponding implementation class looks like:
- * <pre>
+ * \code
  *   public class MyPackageFragmentTester {
  *       public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
  *           IPackageFragment fragement= (IPackageFragment)receiver;
@@ -52,7 +52,7 @@ namespace berry {
  *           return false;
  *       }
  *   }
- * </pre>
+ * \endcode
  * The property can then be used in a test expression as follows:
  * <pre>
  *   &lt;instanceof value="org.blueberry.core.IPackageFragment"/&gt;

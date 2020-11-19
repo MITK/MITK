@@ -31,7 +31,6 @@ namespace berry
  * </p><p>
  * This class is not intended to be subclassed by clients.
  * </p>
- * @noextend This class is not intended to be subclassed by clients.ds
  */
 struct BERRY_JOBS QualifiedName
 {
@@ -65,7 +64,7 @@ struct BERRY_JOBS QualifiedName
    * Qualified names are not equal to objects other than qualified names.
    * </p>
    *
-   * @param obj the object to compare to
+   * @param qName the object to compare to
    * @return <code>true</code> if these are equivalent qualified
    *    names, and <code>false</code> otherwise
    */

@@ -102,7 +102,7 @@ public:
   /**
   * @brief Set the item data of this item.
   *
-  * @param value   LesionData that provides information about this item.
+  * @param lesionData LesionData that provides information about this item.
   */
   void SetData(const mitk::LesionData& lesionData);
 

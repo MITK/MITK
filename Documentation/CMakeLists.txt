@@ -164,39 +164,3 @@ add_custom_target(doc_developersguide
                   )
 
 set_property(TARGET doc doc_usersguide doc_developersguide PROPERTY FOLDER "${MITK_ROOT_FOLDER}/Documentation")
-
-if(MITK_USE_BLUEBERRY)
-  # convert the extension points schema files into html
-  find_package(Ant)
-  set(BLUEBERRY_DOC_TOOLS_DIR "" CACHE PATH "Directory containing additional tools needed for generating the documentation")
-  if(ANT_FOUND AND BLUEBERRY_DOC_TOOLS_DIR)
-
-    list(APPEND MITK_XP_GLOB_EXPRESSIONS
-         ${MITK_SOURCE_DIR}/Plugins/plugin.xml)
-
-    file(GLOB_RECURSE _plugin_xmls ${MITK_XP_GLOB_EXPRESSIONS})
-
-    mitkFunctionConvertXPSchema(INPUT ${_plugin_xmls}
-                                OUTPUT_DIR "${MITK_DOXYGEN_OUTPUT_DIR}/html/extension-points/html"
-                                TARGET_NAME mitkXPDoc
-                               )
-
-    add_dependencies(doc mitkXPDoc)
-  else()
-    message(STATUS "Extension-point schema documentation generation disabled due to missing Ant and / or missing BlueBerry doc tools.")
-  endif()
-endif(MITK_USE_BLUEBERRY)
-
-#if(MITK_DOXYGEN_GENERATE_ITK_QCH_FILE)
-#  # add the command to generate the ITK documentation
-#  add_custom_target(doc-itk
-#                    COMMAND ${DOXYGEN} ${CMAKE_CURRENT_BINARY_DIR}/doxygen.itk.conf)
-#  add_dependencies(doc doc-itk)
-#endif()
-
-#if(MITK_DOXYGEN_GENERATE_VTK_QCH_FILE)
-#  # add the command to generate the VTK documentation
-#  add_custom_target(doc-vtk
-#                    COMMAND ${DOXYGEN} ${CMAKE_CURRENT_BINARY_DIR}/doxygen.vtk.conf)
-#  add_dependencies(doc doc-vtk)
-#endif()

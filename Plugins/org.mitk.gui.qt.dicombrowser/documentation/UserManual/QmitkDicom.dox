@@ -1,7 +1,7 @@
 /**
 \page org_mitk_editors_dicombrowser The Dicom Browser Plugin
 
-\imageMacro{dicom.svg,"Icon of the DICOM Plugin",2.00}
+\imageMacro{dicombrowser-dox.svg,"Icon of the DICOM Plugin",2.00}
 
 \note This article requires a basic knowledge of the DICOM Standard.
 
@@ -15,7 +15,7 @@ The DICOM browser allows you to navigate the DICOM folder/cd depending on its me
 and import selected series for viewing in your MITK based application.
 It also allows you to store your dicom data in an internal database so you can easily access often used dicom images.
 
-It is based on the <a href="http://www.commontk.org/index.php/Documentation/Dicom_Overview">commonTK (CTK) DICOM funcionality</a>.
+It is based on the <a href="https://commontk.org/index.php/Documentation/DICOM_Overview">commonTK (CTK) DICOM funcionality</a>.
 
 \section org_mitk_gui_qt_dicomDataHandling Data handling
 \imageMacro{QmitkDicom_PluginControls.png,"The dicom Plugin controls",7.37}

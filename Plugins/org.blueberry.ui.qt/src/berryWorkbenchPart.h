@@ -36,7 +36,6 @@ namespace berry {
  *
  * @see org.blueberry.ui.part.ViewPart
  * @see org.blueberry.ui.part.EditorPart
- * @noextend This class is not intended to be subclassed by clients.
  */
 class BERRY_UI_QT WorkbenchPart : public QObject,
     public virtual IWorkbenchPart, public IExecutableExtension

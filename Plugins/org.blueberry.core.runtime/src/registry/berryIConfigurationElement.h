@@ -55,7 +55,6 @@ class Handle;
  * </p><p>
  * This interface is not intended to be implemented by clients.
  * </p>
- * @noimplement This interface is not intended to be implemented by clients.
  */
 struct org_blueberry_core_runtime_EXPORT IConfigurationElement : public virtual Object
 {
@@ -76,7 +75,7 @@ struct org_blueberry_core_runtime_EXPORT IConfigurationElement : public virtual 
    * <p>
    * Then the following checks are done:<br>
    * If the specified class implements the {@link IExecutableExtension}
-   * interface, the method {@link IExecutableExtension#SetInitializationData(IConfigurationElement, QString, Object*)}
+   * interface, the method {@link IExecutableExtension#SetInitializationData}
    * is called, passing to the object the configuration information that was used to create it.
    * <p>
    * If the specified class implements {@link IExecutableExtensionFactory}
@@ -163,19 +162,18 @@ struct org_blueberry_core_runtime_EXPORT IConfigurationElement : public virtual 
    * Each child corresponds to a nested
    * XML element in the configuration markup.
    * For example, the configuration markup
-   * <pre>
-   * &lt;view&gt;
-   * &nbsp&nbsp&nbsp&nbsp&lt;verticalHint&gt;top&lt;/verticalHint&gt;
-   * &nbsp&nbsp&nbsp&nbsp&lt;horizontalHint&gt;left&lt;/horizontalHint&gt;
-   * &lt;/view&gt;
-   * </pre>
+   * \code{.unparsed}
+   * <view>
+   *   <verticalHint>top</verticalHint>
+   *   <horizontalHint>left</horizontalHint>
+   * </view>
+   * \endcode
    * corresponds to a configuration element, named <code>"view"</code>,
    * with two children.
    * </p>
    *
    * @return the child configuration elements
    * @throws InvalidRegistryObjectException if this configuration element is no longer valid
-   * @see #getChildren(String)
    */
   virtual QList<IConfigurationElement::Pointer> GetChildren() const = 0;
 
@@ -187,7 +185,6 @@ struct org_blueberry_core_runtime_EXPORT IConfigurationElement : public virtual 
    * @param name the name of the child configuration element
    * @return the child configuration elements with that name
    * @throws InvalidRegistryObjectException if this configuration element is no longer valid
-   * @see #getChildren()
    */
   virtual QList<IConfigurationElement::Pointer> GetChildren(const QString& name) const = 0;
 
@@ -230,10 +227,10 @@ struct org_blueberry_core_runtime_EXPORT IConfigurationElement : public virtual 
   /**
    * Returns the text value of this configuration element.
    * For example, the configuration markup
-   * <pre>
-   * &lt;script lang="javascript"&gt;.\scripts\cp.js&lt;/script&gt;
-   * </pre>
-   * corresponds to a configuration element <code>"script"</code>
+   * \code{.unparsed}
+   * <script lang="javascript">./scripts/cp.js</script>
+   * \endcode
+    * corresponds to a configuration element <code>"script"</code>
    * with value <code>".\scripts\cp.js"</code>.
    * <p> Values may span multiple lines (i.e., contain carriage returns
    * and/or line feeds).
@@ -255,13 +252,12 @@ struct org_blueberry_core_runtime_EXPORT IConfigurationElement : public virtual 
    * locale ("en_US") is not available.
    * </p><p>
    * If multi-language support is not enabled, this method is equivalent to the method
-   * {@link #getValue()}.
+   * {@link #GetValue()}.
    * </p>
    * @param locale the requested locale
    * @return the text value of this configuration element in the specified locale,
    * or <code>null</code>
    * @throws InvalidRegistryObjectException if this configuration element is no longer valid
-   * @see #GetValue(String)
    * @see IExtensionRegistry#IsMultiLanguage()
    */
   virtual QString GetValue(const QLocale& locale) const = 0;

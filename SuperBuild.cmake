@@ -222,12 +222,11 @@ foreach(p ${external_projects})
   if(EXISTS ${p_file})
     file(MD5 ${p_file} p_hash)
   else()
-    foreach(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIRS})
-      get_filename_component(MITK_EXTENSION_DIR ${MITK_EXTENSION_DIR} ABSOLUTE)
-      set(MITK_CMAKE_EXTERNALS_EXTENSION_DIR ${MITK_EXTENSION_DIR}/CMakeExternals)
+    foreach(MITK_EXTENSION_DIR ${MITK_ABSOLUTE_EXTENSION_DIRS})
+      set(MITK_CMAKE_EXTERNALS_EXTENSION_DIR "${MITK_EXTENSION_DIR}/CMakeExternals")
       set(p_file "${MITK_CMAKE_EXTERNALS_EXTENSION_DIR}/${p}.cmake")
-      if(EXISTS ${p_file})
-        file(MD5 ${p_file} p_hash)
+      if(EXISTS "${p_file}")
+        file(MD5 "${p_file}" p_hash)
         break()
       endif()
     endforeach()
@@ -236,17 +235,17 @@ foreach(p ${external_projects})
   if(p_hash)
     set(p_hash_file "${ep_prefix}/tmp/${p}-hash.txt")
     if(MITK_AUTOCLEAN_EXTERNAL_PROJECTS)
-      if(EXISTS ${p_hash_file})
-        file(READ ${p_hash_file} p_prev_hash)
+      if(EXISTS "${p_hash_file}")
+        file(READ "${p_hash_file}" p_prev_hash)
         if(NOT p_hash STREQUAL p_prev_hash)
           mitkCleanExternalProject(${p})
         endif()
       endif()
     endif()
-    file(WRITE ${p_hash_file} ${p_hash})
+    file(WRITE "${p_hash_file}" ${p_hash})
   endif()
 
-  include(${p_file} OPTIONAL)
+  include("${p_file}" OPTIONAL)
 
   list(APPEND mitk_superbuild_ep_args
        -DMITK_USE_${p}:BOOL=${MITK_USE_${p}}
@@ -381,12 +380,6 @@ endif()
 if(MITK_DOXYGEN_BUILD_ALWAYS)
   list(APPEND mitk_optional_cache_args
     -DMITK_DOXYGEN_BUILD_ALWAYS:BOOL=${MITK_DOXYGEN_BUILD_ALWAYS}
-  )
-endif()
-
-if(BLUEBERRY_DOC_TOOLS_DIR)
-  list(APPEND mitk_optional_cache_args
-    "-DBLUEBERRY_DOC_TOOLS_DIR:PATH=${BLUEBERRY_DOC_TOOLS_DIR}"
   )
 endif()
 

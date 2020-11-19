@@ -39,8 +39,8 @@ class Shell;
  * </ul>
  * </p>
  *
- * @noextend This interface is not intended to be extended by clients.
- * @noimplement This interface is not intended to be implemented by clients.
+ * @note This interface is not intended to be extended by clients.
+ * @note This interface is not intended to be implemented by clients.
  */
 struct IContextService : public IServiceWithSources
 {
@@ -122,7 +122,7 @@ struct IContextService : public IServiceWithSources
    * Activates the given context within the context of this service. The
    * context becomes active when <code>expression</code> evaluates to
    * <code>true</code>. This is the same as calling
-   * {@link #activateContext(String, Expression, boolean)} with global==<code>false</code>.
+   * {@link #ActivateContext} with <code>global==false</code>.
    * </p>
    * <p>
    * Also, it is guaranteed that the context submitted through a particular

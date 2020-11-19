@@ -70,7 +70,7 @@ namespace mitk
     bool IsEmpty() const override;
 
     /** \brief Remove the given ContourModel from the container if exists.
-    \param ContourModel - the ContourModel to be removed.
+    \param contourModel - the ContourModel to be removed.
     */
     virtual bool RemoveContourModel(mitk::ContourModel *contourModel);
 

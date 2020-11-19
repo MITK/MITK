@@ -84,9 +84,9 @@ public:
    * @param location
    *            the addition location in Menu API URI format. It must not be
    *            <code>null</code>.
-   * @param namespace
+   * @param namespaze
    *            the namespace for this contribution. May be <code>null</code>.
-   * @see #getNamespace()
+   * @see #GetNamespace
    */
   AbstractContributionFactory(const QString& location,
                               const QString& namespaze);

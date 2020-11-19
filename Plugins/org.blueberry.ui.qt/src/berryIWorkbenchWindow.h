@@ -42,8 +42,8 @@ struct IWorkbench;
  * in a window at a time.
  * </p>
  * <p>
- * The workbench window supports a few {@link IServiceLocator services} by
- * default. If these services are used to allocate resources, it is important to
+ * The workbench window supports a few services by default.
+ * If these services are used to allocate resources, it is important to
  * remember to clean up those resources after you are done with them. Otherwise,
  * the resources will exist until the workbench window is closed. The supported
  * services are:
@@ -51,16 +51,12 @@ struct IWorkbench;
  * <ul>
  * <li>{@link ICommandService}</li>
  * <li>{@link IContextService}</li>
- * <li>{@link IHandlerService}</li>
- * <li>{@link IBindingService}. Resources allocated through this service will
- * not be cleaned up until the workbench shuts down.</li>
  * </ul>
  * <p>
  * This interface is not intended to be implemented by clients.
  * </p>
  *
  * @see IWorkbenchPage
- * @noimplement This interface is not intended to be implemented by clients.
  *
  */
 struct BERRY_UI_QT IWorkbenchWindow : public IPageService, public IServiceLocator, public virtual Object
@@ -136,24 +132,6 @@ struct BERRY_UI_QT IWorkbenchWindow : public IPageService, public IServiceLocato
    * @return the workbench
    */
   virtual IWorkbench* GetWorkbench() const = 0;
-
-  /**
-   * Returns whether the specified menu is an application menu as opposed to
-   * a part menu. Application menus contain items which affect the workbench
-   * or window. Part menus contain items which affect the active part (view
-   * or editor).
-   * <p>
-   * This is typically used during "in place" editing. Application menus
-   * should be preserved during menu merging. All other menus may be removed
-   * from the window.
-   * </p>
-   *
-   * @param menuId
-   *            the menu id
-   * @return <code>true</code> if the specified menu is an application
-   *         menu, and <code>false</code> if it is not
-   */
-  //virtual bool IsApplicationMenu(const QString& menuId) = 0;
 
   /**
    * Creates and opens a new workbench page. The perspective of the new page

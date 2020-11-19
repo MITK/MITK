@@ -2,7 +2,7 @@
 
 \page org_mitk_views_igttrackingtoolbox The MITK-IGT Tracking Toolbox
 
-\imageMacro{../resources/iconTrackingToolbox.png,"Icon of the MITK-IGT Tracking Toolbox",2.00}
+\imageMacro{iconTrackingToolbox.png,"Icon of the MITK-IGT Tracking Toolbox",2.00}
 
 \tableofcontents
 
@@ -16,7 +16,7 @@ for the tutorial begin with the bold printed label <b>Tutorial</b>.
 
 \section QmitkMITKIGTTrackingToolboxWorkflow General workflow Introduction
 
-Currently the devices Polaris, Aurora (both Northern Digital Inc. (NDI); Waterloo, Ontario, Canada), MicronTracker (Claron Technology, Inc.; Toronto, Ontario, Canada) and Optitrack (NaturalPoint) are supported (see <a href="http://mitk.org/wiki/Mitk-Tracking-Device_Support_Levels"> Hardware Tracking Device Support</a>). Different tracking hardware can be used via OpenIGTLink connections (see \ref IGTTutorialStepOpenIGTLink "Open IGT Link tutorial"
+Currently the devices Polaris, Aurora (both Northern Digital Inc. (NDI); Waterloo, Ontario, Canada), MicronTracker (Claron Technology, Inc.; Toronto, Ontario, Canada) and Optitrack (NaturalPoint) are supported (see <a href="https://www.mitk.org/wiki/Mitk-Tracking-Device_Support_Levels"> Hardware Tracking Device Support</a>). Different tracking hardware can be used via OpenIGTLink connections (see \ref IGTTutorialStepOpenIGTLink "Open IGT Link tutorial"
 ). For this Tracking Toolbox tutorial, we will use a virtual tracking device, which allows you to use simulated tracking data. This is very helpful if you want to test or implement some tracking application and don't have the hardware always available.
 
 A general Workflow with the Tracking Toolbox may be:

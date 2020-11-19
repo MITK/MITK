@@ -31,7 +31,7 @@ found in the LICENSE file.
 #include <vtkSampleFunction.h>
 #include <vtkSphereSource.h>
 #include <vtkTubeFilter.h>
-#include <vtkUnsignedIntArray.h>
+#include <vtkUnsignedCharArray.h>
 
 mitk::TubeGraphVtkMapper3D::TubeGraphVtkMapper3D()
 {

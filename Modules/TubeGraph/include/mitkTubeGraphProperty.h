@@ -81,7 +81,7 @@ namespace mitk
 
     /**
     * Checks, if a given tube is activated
-    * @param id the tube id of the tube to check
+    * @param tube the to check
     * @returns true, if the tube with id is active or false otherwise
     */
     bool IsTubeActive(const TubeDescriptorType &tube);

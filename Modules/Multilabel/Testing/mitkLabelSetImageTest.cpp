@@ -45,7 +45,7 @@ public:
     // Create a new labelset image
     m_LabelSetImage = mitk::LabelSetImage::New();
     mitk::Image::Pointer regularImage = mitk::Image::New();
-    unsigned int dimensions[3] = {2, 4, 8};
+    unsigned int dimensions[3] = { 96, 128, 52 };
     regularImage->Initialize(mitk::MakeScalarPixelType<char>(), 3, dimensions);
     m_LabelSetImage->Initialize(regularImage);
   }
@@ -63,7 +63,7 @@ public:
                            m_LabelSetImage->GetPixelType() == mitk::MakeScalarPixelType<mitk::Label::PixelType>());
 
     mitk::Image::Pointer regularImage = mitk::Image::New();
-    unsigned int dimensions[3] = {2, 4, 8};
+    unsigned int dimensions[3] = { 96, 128, 52 };
     regularImage->Initialize(mitk::MakeScalarPixelType<char>(), 3, dimensions);
 
     mitk::BaseGeometry::Pointer regularImageGeo = regularImage->GetGeometry();

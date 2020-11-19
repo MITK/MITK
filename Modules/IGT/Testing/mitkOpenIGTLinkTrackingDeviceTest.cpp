@@ -66,7 +66,8 @@ public:
   m_OpenIGTLinkTrackingDevice->SetPortNumber(10);
   CPPUNIT_ASSERT_MESSAGE("Testing DiscoverTools() with initialization, but without existing server. (Warnings are expected)", m_OpenIGTLinkTrackingDevice->DiscoverTools()==false);
 
-  m_OpenIGTLinkTrackingDevice->SetHostname("193.174.50.103");
+  // This takes a pretty long time but it is not tested.
+  /*m_OpenIGTLinkTrackingDevice->SetHostname("193.174.50.103");
   m_OpenIGTLinkTrackingDevice->SetPortNumber(18944);
   m_OpenIGTLinkTrackingDevice->DiscoverTools(20000);
   m_OpenIGTLinkTrackingDevice->OpenConnection();
@@ -75,7 +76,7 @@ public:
   std::this_thread::sleep_for(std::chrono::seconds(20));
 
   m_OpenIGTLinkTrackingDevice->StopTracking();
-  m_OpenIGTLinkTrackingDevice->CloseConnection();
+  m_OpenIGTLinkTrackingDevice->CloseConnection();*/
 
   }
 

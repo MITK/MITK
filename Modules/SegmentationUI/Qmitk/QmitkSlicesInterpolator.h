@@ -89,6 +89,7 @@ const static QString TR_REINIT_INTERPOLATION;
 const static QString TR_DISABLED;
 const static QString TR_2D;
 const static QString TR_3D;
+const static QString TR_3D_MODIFICATION;
 const static QString TR_CONFIRM_SINGLE;
 const static QString TR_CONFIRM_ALL;
 const static QString TR_CONFIRM;
@@ -202,6 +203,7 @@ const static QString TR_INTERPOLATION_REINIT;
     void OnInterpolationActivated(bool);
 
     void On3DInterpolationActivated(bool);
+    void On3DModificationActivated(bool on);
 
     void OnInterpolationMethodChanged(int index);
 
@@ -254,11 +256,40 @@ const static QString TR_INTERPOLATION_REINIT;
 
     void SetCurrentContourListID();
 
+    class CommandProgressUpdate : public itk::Command
+    {
+    public:
+      using Self = CommandProgressUpdate;
+      using Superclass = itk::Command;
+      using Pointer = itk::SmartPointer<Self>;
+
+      itkNewMacro(Self);
+
+      void Execute(itk::Object* caller, const itk::EventObject& event) override
+      {
+        Execute((const itk::Object*) caller, event);
+      }
+
+      void Execute(const itk::Object* caller, const itk::EventObject& event) override;
+
+      void setNumberOfSteps(int steps)
+      {
+        m_NumberOfSteps = steps;
+      }
+
+    protected:
+      CommandProgressUpdate() {};
+
+      int m_LastStep = 0;
+      int m_NumberOfSteps = 100;
+    };
+
 private:
 
     void HideAllInterpolationControls();
     void Show2DInterpolationControls(bool show);
     void Show3DInterpolationControls(bool show);
+    void Show3DModificationControls(bool show);
     void CheckSupportedImageDimension();
     void WaitForFutures();
     void nodeRemoved(const mitk::DataNode* node);
@@ -285,6 +316,13 @@ private:
     QPushButton* m_BtnApplyForAllSlices2D;
     QPushButton* m_BtnApply3D;
 
+    // Interpolation 3D Modification
+    QPushButton* m_BtnUnion;
+    QPushButton* m_BtnSubtraction;
+    QPushButton* m_BtnIntersection;
+    QPushButton* m_BtnDifference;
+    QPushButton* m_TempSegClear;
+
     QPushButton* m_BtnSuggestPlane;
 
     QCheckBox* m_ChkShowPositionNodes;
@@ -295,6 +333,9 @@ private:
     mitk::DataNode::Pointer m_3DContourNode;
 
     mitk::Image* m_Segmentation;
+    mitk::Image::Pointer m_TempSegmentation;
+    mitk::Image::Pointer m_OrigSegmentation;
+    mitk::DataNode::Pointer m_TempSegmentationNode;
 
     mitk::SliceNavigationController* m_LastSNC;
 
@@ -302,6 +343,7 @@ private:
 
     bool m_2DInterpolationEnabled;
     bool m_3DInterpolationEnabled;
+    bool m_3DModificationEnabled;
     //unsigned int m_CurrentListID;
 
     mitk::DataStorage::Pointer m_DataStorage;
@@ -315,6 +357,15 @@ private:
 
     bool m_FirstRun;
     bool m_Activate3DInterpolation;
+
+    void tempSegmentationUnion();
+    void tempSegmentationSubtraction();
+    void tempSegmentationIntersection();
+    void tempSegmentationDifference();
+    void tempSegmentationClear();
+    void rebuildOrigSegmentationSurface();
+
+    QIcon colorizeIcon(QIcon);
 };
 
 #endif

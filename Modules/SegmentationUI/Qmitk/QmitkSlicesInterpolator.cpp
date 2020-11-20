@@ -41,6 +41,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <mitkUnstructuredGridClusteringFilter.h>
 #include <mitkVtkImageOverwrite.h>
 #include <mitkImageVtkAccessor.h>
+#include <ThemeUtils.h>
+#include <mitkSurfaceUtils.h>
 
 #include <itkCommand.h>
 
@@ -52,6 +54,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <QMessageBox>
 
 #include <vtkPolyVertex.h>
+#include <vtkSMPTools.h>
 #include <vtkUnstructuredGrid.h>
 
 
@@ -59,6 +62,7 @@ const QString QmitkSlicesInterpolator::TR_INTERPOLATION = QGroupBox::tr("Interpo
 const QString QmitkSlicesInterpolator::TR_DISABLED = QGroupBox::tr("Disabled");
 const QString QmitkSlicesInterpolator::TR_2D = QGroupBox::tr("2-Dimensional");
 const QString QmitkSlicesInterpolator::TR_3D = QGroupBox::tr("3-Dimensional");
+const QString QmitkSlicesInterpolator::TR_3D_MODIFICATION = QGroupBox::tr("3-Dimensional Modification");
 const QString QmitkSlicesInterpolator::TR_CONFIRM_SINGLE = QPushButton::tr("Confirm for single slice");
 const QString QmitkSlicesInterpolator::TR_CONFIRM_ALL = QPushButton::tr("Confirm for all slices");
 const QString QmitkSlicesInterpolator::TR_CONFIRM = QPushButton::tr("Confirm");
@@ -98,6 +102,7 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
     m_LastSNC(0),
     m_2DInterpolationEnabled(false),
     m_3DInterpolationEnabled(false),
+    m_3DModificationEnabled(false),
     m_FirstRun(true),
     m_Activate3DInterpolation(false)
 {
@@ -115,6 +120,7 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
   m_CmbInterpolation->addItem(TR_DISABLED);
   m_CmbInterpolation->addItem(TR_2D);
   m_CmbInterpolation->addItem(TR_3D);
+  m_CmbInterpolation->addItem(TR_3D_MODIFICATION);
 
   vboxLayout->addWidget(m_CmbInterpolation);
 
@@ -126,6 +132,37 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
 
   m_BtnApply3D = new QPushButton(TR_CONFIRM, m_GroupBoxEnableExclusiveInterpolationMode);
   vboxLayout->addWidget(m_BtnApply3D);
+
+  QHBoxLayout* mod3DLayout = new QHBoxLayout();
+  vboxLayout->addLayout(mod3DLayout);
+
+  m_BtnUnion = new QPushButton("", m_GroupBoxEnableExclusiveInterpolationMode);
+  m_BtnUnion->setToolTip(tr("Union"));
+  m_BtnUnion->setIcon(mitk::themeUtils::colorizeIcon(QIcon(":/SegmentationUI/union.png"), qApp->palette()));
+  connect(m_BtnUnion, &QAbstractButton::pressed, this, &QmitkSlicesInterpolator::tempSegmentationUnion);
+  mod3DLayout->addWidget(m_BtnUnion);
+
+  m_BtnSubtraction = new QPushButton("", m_GroupBoxEnableExclusiveInterpolationMode);
+  m_BtnSubtraction->setToolTip(tr("Subtraction"));
+  m_BtnSubtraction->setIcon(mitk::themeUtils::colorizeIcon(QIcon(":/SegmentationUI/subtract.png"), qApp->palette()));
+  connect(m_BtnSubtraction, &QAbstractButton::pressed, this, &QmitkSlicesInterpolator::tempSegmentationSubtraction);
+  mod3DLayout->addWidget(m_BtnSubtraction);
+
+  m_BtnIntersection = new QPushButton("", m_GroupBoxEnableExclusiveInterpolationMode);
+  m_BtnIntersection->setToolTip(tr("Intersection"));
+  m_BtnIntersection->setIcon(mitk::themeUtils::colorizeIcon(QIcon(":/SegmentationUI/intersection.png"), qApp->palette()));
+  connect(m_BtnIntersection, &QAbstractButton::pressed, this, &QmitkSlicesInterpolator::tempSegmentationIntersection);
+  mod3DLayout->addWidget(m_BtnIntersection);
+  
+  m_BtnDifference = new QPushButton("", m_GroupBoxEnableExclusiveInterpolationMode);
+  m_BtnDifference->setToolTip(tr("Difference"));
+  m_BtnDifference->setIcon(mitk::themeUtils::colorizeIcon(QIcon(":/SegmentationUI/difference.png"), qApp->palette()));
+  connect(m_BtnDifference, &QAbstractButton::pressed, this, &QmitkSlicesInterpolator::tempSegmentationDifference);
+  mod3DLayout->addWidget(m_BtnDifference);
+
+  m_TempSegClear = new QPushButton(tr("Clear"), m_GroupBoxEnableExclusiveInterpolationMode);
+  connect(m_TempSegClear, &QAbstractButton::pressed, this, &QmitkSlicesInterpolator::tempSegmentationClear);
+  vboxLayout->addWidget(m_TempSegClear);
 
   m_BtnSuggestPlane = new QPushButton(tr("Suggest a plane"), m_GroupBoxEnableExclusiveInterpolationMode);
   vboxLayout->addWidget(m_BtnSuggestPlane);
@@ -213,6 +250,199 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
   connect(&m_Watcher, SIGNAL(finished()), this, SLOT(StopUpdateInterpolationTimer()));
   m_Timer = new QTimer(this);
   connect(m_Timer, SIGNAL(timeout()), this, SLOT(ChangeSurfaceColor()));
+
+  m_TempSegmentation = mitk::Image::New();
+  m_TempSegmentationNode = mitk::DataNode::New();
+  m_TempSegmentationNode->SetData(m_TempSegmentation);
+  m_TempSegmentationNode->SetBoolProperty("binary", true);
+  m_TempSegmentationNode->SetBoolProperty("visible", true);
+  m_TempSegmentationNode->SetBoolProperty("helper object", true);
+  m_TempSegmentationNode->SetColor(1.f, 1.f, 0.f);
+}
+
+void QmitkSlicesInterpolator::tempSegmentationClear()
+{
+  size_t segSize = 1;
+  for (unsigned int dim = 0; dim < m_TempSegmentation->GetDimension(); ++dim) {
+    segSize *= m_TempSegmentation->GetDimension(dim);
+  }
+
+  {
+    mitk::ImageRegionAccessor accessor(m_TempSegmentation);
+    mitk::ImageAccessLock lock(&accessor, true);
+    memset(accessor.getData(), 0, segSize * m_Segmentation->GetPixelType(0).GetSize());
+  }
+
+  m_TempSegmentation->Modified();
+
+  m_SurfaceInterpolator->RemoveInterpolationSession(m_TempSegmentation);
+  m_DataStorage->Remove(m_DataStorage->GetDerivations(m_TempSegmentationNode, nullptr, false));
+
+  SetCurrentContourListID();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+template<typename T, T(*OP)(T, T)>
+struct vtkSMPOperation {
+  T* a;
+  T* b;
+  void operator()(vtkIdType begin, vtkIdType end) {
+    for (int i = begin; i < end; i++) {
+      a[i] = OP(a[i], b[i]);
+    }
+  }
+};
+
+template<typename T, T(*OP)(T,T)>
+void applyTempSegmentationOperation(mitk::Surface::Pointer m_InterpolatedSurface, mitk::Image::Pointer m_OrigSegmentation, mitk::Image::Pointer refImage)
+{
+  if (m_InterpolatedSurface == nullptr) {
+    return;
+  }
+
+  mitk::SurfaceToImageFilter::Pointer s2iFilter = mitk::SurfaceToImageFilter::New();
+  s2iFilter->MakeOutputBinaryOn();
+  if (m_OrigSegmentation->GetPixelType().GetComponentType() == itk::ImageIOBase::USHORT) {
+    s2iFilter->SetUShortBinaryPixelType(true);
+  }
+  s2iFilter->SetInput(m_InterpolatedSurface);
+  s2iFilter->SetImage(refImage);
+  s2iFilter->Update();
+
+  mitk::Image::Pointer interpolatedSeg = s2iFilter->GetOutput();
+
+  mitk::ImageRegionAccessor tempAccessor(interpolatedSeg);
+  mitk::ImageAccessLock tempLock(&tempAccessor, false);
+
+  mitk::ImageRegionAccessor accessor(m_OrigSegmentation);
+  mitk::ImageAccessLock lock(&accessor, true);
+  
+  size_t segSize = 1;
+  for (unsigned int dim = 0; dim < m_OrigSegmentation->GetDimension(); ++dim) {
+    segSize *= m_OrigSegmentation->GetDimension(dim);
+  }
+
+  T* segData = (T*)accessor.getData();
+  T* tempSegData = (T*)tempAccessor.getData();
+  vtkSMPOperation<T, OP> vtkParalelOp;
+  vtkParalelOp.a = segData;
+  vtkParalelOp.b = tempSegData;
+  vtkSMPTools::For(0, segSize, vtkParalelOp);
+  //for (size_t i = 0; i < segSize; i++) {
+  //  segData[i] = OP(segData[i], tempSegData[i]);
+  //}
+  m_OrigSegmentation->Modified();
+}
+
+template<typename T>
+T fUnion(T a, T b) { return a | b; }
+void QmitkSlicesInterpolator::tempSegmentationUnion()
+{
+  mitk::Surface* surf = dynamic_cast<mitk::Surface*>(m_InterpolatedSurfaceNode->GetData());
+  mitk::Image* ref = dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData()[0]->GetData());
+  int pixelSize = m_OrigSegmentation->GetPixelType().GetSize();
+  if (pixelSize == 1) {
+    applyTempSegmentationOperation<uchar, fUnion<uchar>>(surf, m_OrigSegmentation, ref);
+  } else if (pixelSize == 2) {
+    applyTempSegmentationOperation<ushort, fUnion<ushort>>(surf, m_OrigSegmentation, ref);
+  }
+  tempSegmentationClear();
+  rebuildOrigSegmentationSurface();
+}
+
+template<typename T>
+T fSubtract(T a, T b) { return a & (b == 0); }
+void QmitkSlicesInterpolator::tempSegmentationSubtraction()
+{
+  mitk::Surface* surf = dynamic_cast<mitk::Surface*>(m_InterpolatedSurfaceNode->GetData());
+  mitk::Image* ref = dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData()[0]->GetData());
+  int pixelSize = m_OrigSegmentation->GetPixelType().GetSize();
+  if (pixelSize == 1) {
+    applyTempSegmentationOperation<uchar, fSubtract<uchar>>(surf, m_OrigSegmentation, ref);
+  } else if (pixelSize == 2) {
+    applyTempSegmentationOperation<ushort, fSubtract<ushort>>(surf, m_OrigSegmentation, ref);
+  }
+  tempSegmentationClear();
+  rebuildOrigSegmentationSurface();
+}
+
+template<typename T>
+T fIntersect(T a, T b) { return (a > 0) && (b > 0); }
+void QmitkSlicesInterpolator::tempSegmentationIntersection()
+{
+  mitk::Surface* surf = dynamic_cast<mitk::Surface*>(m_InterpolatedSurfaceNode->GetData());
+  mitk::Image* ref = dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData()[0]->GetData());
+  int pixelSize = m_OrigSegmentation->GetPixelType().GetSize();
+  if (pixelSize == 1) {
+    applyTempSegmentationOperation<uchar, fIntersect<uchar>>(surf, m_OrigSegmentation, ref);
+  } else if (pixelSize == 2) {
+    applyTempSegmentationOperation<ushort, fIntersect<ushort>>(surf, m_OrigSegmentation, ref);
+  }
+  tempSegmentationClear();
+  rebuildOrigSegmentationSurface();
+}
+
+template<typename T>
+T fDifference(T a, T b) { return a != b; }
+void QmitkSlicesInterpolator::tempSegmentationDifference()
+{
+  mitk::Surface* surf = dynamic_cast<mitk::Surface*>(m_InterpolatedSurfaceNode->GetData());
+  mitk::Image* ref = dynamic_cast<mitk::Image*>(m_ToolManager->GetReferenceData()[0]->GetData());
+  int pixelSize = m_OrigSegmentation->GetPixelType().GetSize();
+  if (pixelSize == 1) {
+    applyTempSegmentationOperation<uchar, fDifference<uchar>>(surf, m_OrigSegmentation, ref);
+  } else if (pixelSize == 2) {
+    applyTempSegmentationOperation<ushort, fDifference<ushort>>(surf, m_OrigSegmentation, ref);
+  }
+  tempSegmentationClear();
+  rebuildOrigSegmentationSurface();
+}
+
+void QmitkSlicesInterpolator::rebuildOrigSegmentationSurface()
+{
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData()[0];
+  auto childs = m_DataStorage->GetDerivations(workingNode);
+  bool hasSurface = false;
+  for (const auto& children : *childs) {
+    mitk::Surface* surf = dynamic_cast<mitk::Surface*>(children->GetData());
+    if (surf != nullptr) {
+      hasSurface = true;
+      break;
+    }
+  }
+  if (!hasSurface) {
+    return;
+  }
+
+  mitk::ProgressBar::GetInstance()->Reset();
+  mitk::ProgressBar::GetInstance()->AddStepsToDo(100);
+
+  mitk::SurfaceCreator::Pointer surfaceCreator = mitk::SurfaceCreator::New();
+  mitk::SurfaceCreator::SurfaceCreationArgs surfaceArgs;
+  surfaceArgs.outputStorage = m_ToolManager->GetDataStorage();
+  surfaceArgs.recreate = true;
+  surfaceArgs.timestep = m_LastSNC->GetTime()->GetPos();
+  surfaceCreator->setArgs(surfaceArgs);
+  surfaceCreator->setInput(m_ToolManager->GetWorkingData()[0]);
+
+  CommandProgressUpdate::Pointer progressCommand = CommandProgressUpdate::New();
+  surfaceCreator->AddObserver(itk::ProgressEvent(), progressCommand);
+
+  surfaceCreator->Update();
+}
+
+void QmitkSlicesInterpolator::CommandProgressUpdate::Execute(const itk::Object* caller, const itk::EventObject& event)
+{
+  const itk::ProcessObject* filter = static_cast<const itk::ProcessObject*>(caller);
+  if (!itk::ProgressEvent().CheckEvent(&event)) {
+    return;
+  }
+
+  int nextStep = (int)(filter->GetProgress() * m_NumberOfSteps);
+  if (nextStep > m_LastStep) {
+    mitk::ProgressBar::GetInstance()->Progress(nextStep - m_LastStep);
+    m_LastStep = nextStep;
+  }
 }
 
 void QmitkSlicesInterpolator::SetDataStorage( mitk::DataStorage::Pointer storage )
@@ -367,6 +597,10 @@ void QmitkSlicesInterpolator::setEnabled( bool enable )
     enable &= referenceNode && workingNode;
   }
 
+  if (QWidget::isEnabled() == enable) {
+    return;
+  }
+
   QWidget::setEnabled(enable);
 
   //Set the gui elements of the different interpolation modi enabled
@@ -377,9 +611,12 @@ void QmitkSlicesInterpolator::setEnabled( bool enable )
       this->Show2DInterpolationControls(true);
       m_Interpolator->Activate2DInterpolation(true);
     }
-    else if (m_3DInterpolationEnabled)
+    else if (m_3DInterpolationEnabled && !m_3DModificationEnabled)
     {
       this->Show3DInterpolationControls(true);
+      this->Show3DInterpolationResult(true);
+    } else {
+      this->Show3DModificationControls(true);
       this->Show3DInterpolationResult(true);
     }
   }
@@ -418,6 +655,7 @@ void QmitkSlicesInterpolator::HideAllInterpolationControls()
 {
   this->Show2DInterpolationControls(false);
   this->Show3DInterpolationControls(false);
+  this->Show3DModificationControls(false);
 }
 
 void QmitkSlicesInterpolator::Show2DInterpolationControls(bool show)
@@ -434,7 +672,14 @@ void QmitkSlicesInterpolator::Show3DInterpolationControls(bool show)
   m_BtnReinit3DInterpolation->setVisible(show);
 }
 
-
+void QmitkSlicesInterpolator::Show3DModificationControls(bool show)
+{
+  m_BtnUnion->setVisible(show);
+  m_BtnSubtraction->setVisible(show);
+  m_BtnIntersection->setVisible(show);
+  m_BtnDifference->setVisible(show);
+  m_TempSegClear->setVisible(show);
+}
 
 void QmitkSlicesInterpolator::OnInterpolationMethodChanged(int index)
 {
@@ -446,6 +691,7 @@ void QmitkSlicesInterpolator::OnInterpolationMethodChanged(int index)
       this->HideAllInterpolationControls();
       this->OnInterpolationActivated(false);
       this->On3DInterpolationActivated(false);
+      this->On3DModificationActivated(false);
       this->Show3DInterpolationResult(false);
       m_Interpolator->Activate2DInterpolation(false);
 
@@ -461,6 +707,7 @@ void QmitkSlicesInterpolator::OnInterpolationMethodChanged(int index)
       m_Activate3DInterpolation = false;
       this->HideAllInterpolationControls();
       this->Show2DInterpolationControls(true);
+      this->On3DModificationActivated(false);
       this->OnInterpolationActivated(true);
       this->On3DInterpolationActivated(false);
       m_Interpolator->Activate2DInterpolation(true);
@@ -471,11 +718,22 @@ void QmitkSlicesInterpolator::OnInterpolationMethodChanged(int index)
       m_Activate3DInterpolation = true;
       this->HideAllInterpolationControls();
       this->Show3DInterpolationControls(true);
+      this->On3DModificationActivated(false);
       this->OnInterpolationActivated(false);
       this->On3DInterpolationActivated(true);
       m_Interpolator->Activate2DInterpolation(false);
       break;
 
+    case 3: // 3D Modification
+      m_GroupBoxEnableExclusiveInterpolationMode->setTitle(TR_INTERPOLATION_ENB);
+      m_Activate3DInterpolation = true;
+      HideAllInterpolationControls();
+      Show3DModificationControls(true);
+      OnInterpolationActivated(false);
+      On3DInterpolationActivated(false);
+      On3DModificationActivated(true);
+      m_Interpolator->Activate2DInterpolation(false);
+      break;
     default:
       MITK_ERROR << "Unknown interpolation method!";
       m_CmbInterpolation->setCurrentIndex(0);
@@ -513,6 +771,17 @@ void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
     m_BtnReinit3DInterpolation->setEnabled(false);
     return;
   }
+
+  if (m_3DModificationEnabled) {
+    tempSegmentationClear();
+    if (m_ToolManager->GetWorkingData().size() > 0) {
+      m_OrigSegmentation = dynamic_cast<mitk::Image*>(m_ToolManager->GetWorkingData()[0]->GetData());
+      if (!m_DataStorage->Exists(m_TempSegmentationNode)) {
+        m_DataStorage->Add(m_TempSegmentationNode, m_ToolManager->GetWorkingData()[0]);
+      }
+    }
+  }
+
   //Updating the current selected segmentation for the 3D interpolation
   SetCurrentContourListID();
 
@@ -1216,6 +1485,60 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
   {
     MITK_ERROR<<"Error with 3D surface interpolation!";
   }
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkSlicesInterpolator::On3DModificationActivated(bool on)
+{
+  if (m_Watcher.isRunning())
+    m_Watcher.waitForFinished();
+  m_3DModificationEnabled = on;
+
+  // In reality only initialized m_Segmentation for convienience
+  CheckSupportedImageDimension();
+
+  if (m_3DModificationEnabled) {
+    mitk::DataNode* segNode = m_ToolManager->GetWorkingData(0);
+    m_TempSegmentationNode->SetName(segNode->GetName() + "_temp");
+
+    m_OrigSegmentation = m_Segmentation;
+    m_TempSegmentation->Initialize(m_Segmentation->GetPixelType(0), m_Segmentation->GetDimension(), m_Segmentation->GetDimensions());
+    m_TempSegmentation->SetGeometry(m_Segmentation->GetGeometry());
+
+    size_t segSize = 1;
+    for (unsigned int dim = 0; dim < m_Segmentation->GetDimension(); ++dim) {
+      segSize *= m_Segmentation->GetDimension(dim);
+    }
+
+    {
+      mitk::ImageRegionAccessor accessor(m_TempSegmentation);
+      mitk::ImageAccessLock lock(&accessor, true);
+      memset(accessor.getData(), 0, segSize * m_Segmentation->GetPixelType(0).GetSize());
+    }
+
+    if (m_TempSegmentation->GetTimeGeometry()) {
+      mitk::TimeGeometry::Pointer originalGeometry = m_Segmentation->GetTimeGeometry()->Clone();
+      m_TempSegmentation->SetTimeGeometry(originalGeometry);
+    }
+
+    m_ToolManager->overwirteWorkingData = m_TempSegmentationNode;
+    m_DataStorage->Add(m_TempSegmentationNode, segNode);
+
+    SetCurrentContourListID();
+    On3DInterpolationActivated(true);
+  } else {
+    On3DInterpolationActivated(false);
+    
+    if (m_ToolManager->overwirteWorkingData != nullptr) {
+      m_ToolManager->overwirteWorkingData = nullptr;
+      SetCurrentContourListID();
+    }
+
+    m_SurfaceInterpolator->RemoveInterpolationSession(m_TempSegmentation);
+    m_DataStorage->Remove(m_DataStorage->GetDerivations(m_TempSegmentationNode, nullptr, false));
+    m_DataStorage->Remove(m_TempSegmentationNode);
+  }
+
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 

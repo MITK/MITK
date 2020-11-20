@@ -41,6 +41,7 @@ QmitkSynchronizeSelectedData.cpp
 QmitkShadowWidget.cpp
 mitkCrosshairManager.cpp
 HumanViewActor.cpp
+ThemeUtils.cpp
 )
 
 set(MOC_H_FILES

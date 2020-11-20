@@ -67,3 +67,7 @@ Qmitk/QmitkPickingToolGUIControls.ui
 Qmitk/QmitkLiveWireTool2DGUIControls.ui
 Qmitk/QmitkRegionGrowingToolGUIControls.ui
 )
+
+set(QRC_FILES
+  resources/SegmentationUI.qrc
+)

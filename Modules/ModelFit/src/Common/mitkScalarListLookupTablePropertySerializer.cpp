@@ -110,7 +110,7 @@ MITK_REGISTER_SERIALIZER(ScalarListLookupTablePropertySerializer);
   lutSerializer->SetProperty(prop);
 
   tinyxml2::XMLDocument doc;
-  auto xmlLut = lutSerializer->Serialize(doc);
+  lutSerializer->Serialize(doc);
 
   tinyxml2::XMLPrinter printer;
   doc.Print(&printer);

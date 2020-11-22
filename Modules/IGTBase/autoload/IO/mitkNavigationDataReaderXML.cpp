@@ -180,7 +180,7 @@ mitk::NavigationDataSet::Pointer mitk::NavigationDataReaderXML::Read(std::istrea
   auto navDataSet = NavigationDataSet::New(static_cast<unsigned int>(toolCount));
   NavigationData::Pointer navData;
 
-  const auto* ndElem = dataElem->FirstChildElement("ND");
+  const auto* ndElem = dataElem->FirstChildElement();
 
   if (nullptr != ndElem)
   {
@@ -201,7 +201,7 @@ mitk::NavigationDataSet::Pointer mitk::NavigationDataReaderXML::Read(std::istrea
         }
 
         navDatas[i] = navData;
-        ndElem = ndElem->NextSiblingElement("ND");
+        ndElem = ndElem->NextSiblingElement();
       }
 
       if (navData.IsNotNull())

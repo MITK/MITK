@@ -226,8 +226,9 @@ bool mitk::AbstractUltrasoundTrackerDevice::GetContainsAtLeastOneCalibration()
 std::string mitk::AbstractUltrasoundTrackerDevice::SerializeCalibration()
 {
   tinyxml2::XMLDocument doc;
-  std::stringstream result;
-  result << "<calibrations>" << std::endl;
+  auto* calibrations = doc.NewElement("calibrations");
+  doc.InsertEndChild(calibrations);
+
   // For each calibration in the set
   for (std::map<std::string, mitk::AffineTransform3D::Pointer>::iterator it = m_Calibrations.begin();
        it != m_Calibrations.end();
@@ -251,11 +252,13 @@ std::string mitk::AbstractUltrasoundTrackerDevice::SerializeCalibration()
     elem->SetAttribute("T1", translation[1]);
     elem->SetAttribute("T2", translation[2]);
 
-    result << elem << std::endl;
+    calibrations->InsertEndChild(elem);
   }
-  result << "</calibrations>" << std::endl;
 
-  return result.str();
+  tinyxml2::XMLPrinter printer;
+  doc.Print(&printer);
+
+  return printer.CStr();
 }
 
 void mitk::AbstractUltrasoundTrackerDevice::DeserializeCalibration(const std::string &xmlString,

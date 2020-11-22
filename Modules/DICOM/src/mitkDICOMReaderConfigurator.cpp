@@ -523,10 +523,10 @@ mitk::DICOMReaderConfigurator
   auto* root = this->CreateDICOMFileReaderTag(doc, reader);
   assert(root);
 
-  root->SetAttribute("fixTiltByShearing", toString(reader->GetFixTiltByShearing()));
-  root->SetAttribute("acceptTwoSlicesGroups", toString(reader->GetAcceptTwoSlicesGroups()));
+  root->SetAttribute("fixTiltByShearing", reader->GetFixTiltByShearing());
+  root->SetAttribute("acceptTwoSlicesGroups", reader->GetAcceptTwoSlicesGroups());
   root->SetAttribute("toleratedOriginError", reader->GetToleratedOriginError());
-  root->SetAttribute("toleratedOriginErrorIsAbsolute", toString(reader->IsToleratedOriginOffsetAbsolute()));
+  root->SetAttribute("toleratedOriginErrorIsAbsolute", reader->IsToleratedOriginOffsetAbsolute());
   root->SetAttribute("decimalPlacesForOrientation", reader->GetDecimalPlacesForOrientation());
 
   // iterate DICOMDatasetSorter objects
@@ -559,8 +559,8 @@ mitk::DICOMReaderConfigurator
 
   auto *sorterTag = doc.NewElement("DICOMDatasetSorter");
   sorterTag->SetAttribute("class", sorter->GetNameOfClass());
-  sorterTag->SetAttribute("strictSorting", toString(sorter->GetStrictSorting()));
-  sorterTag->SetAttribute("expectDistanceOne", toString(sorter->GetExpectDistanceOne()));
+  sorterTag->SetAttribute("strictSorting", sorter->GetStrictSorting());
+  sorterTag->SetAttribute("expectDistanceOne", sorter->GetExpectDistanceOne());
 
   auto *distinguishingTagsElement = doc.NewElement("Distinguishing");
   sorterTag->InsertEndChild(distinguishingTagsElement);
@@ -647,16 +647,9 @@ mitk::DICOMReaderConfigurator
   auto* root = this->CreateConfigStringFromReader(doc, static_cast<const DICOMITKSeriesGDCMReader*>(reader));
   assert(root);
 
-  root->SetAttribute("group3DnT", toString(reader->GetGroup3DandT()));
+  root->SetAttribute("group3DnT", reader->GetGroup3DandT());
 
   return root;
-}
-
-const char*
-mitk::DICOMReaderConfigurator
-::toString(bool b) const
-{
-  return b ? "true" : "false";
 }
 
 tinyxml2::XMLElement*

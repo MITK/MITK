@@ -93,8 +93,7 @@ void mitk::USDeviceWriterXML::CreateXmlInformationOfUltrasoundDeviceTag(
   {
     ultrasoundDeviceTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_HOST, config.host.c_str());
     ultrasoundDeviceTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_PORT, config.port);
-    std::string value = config.server ? "true" : "false";
-    ultrasoundDeviceTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_SERVER, value.c_str());
+    ultrasoundDeviceTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_SERVER, config.server);
   }
 
   document.InsertEndChild(ultrasoundDeviceTag);
@@ -102,10 +101,8 @@ void mitk::USDeviceWriterXML::CreateXmlInformationOfUltrasoundDeviceTag(
 
 void mitk::USDeviceWriterXML::CreateXmlInformationOfGeneralSettingsTag(tinyxml2::XMLElement *parentTag, tinyxml2::XMLElement *generalSettingsTag, mitk::USDeviceReaderXML::USDeviceConfigData & config)
 {
-  std::string value = config.useGreyscale ? "true" : "false";
-  generalSettingsTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_GREYSCALE, value.c_str());
-  value = config.useResolutionOverride ? "true" : "false";
-  generalSettingsTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_RESOLUTIONOVERRIDE, value.c_str());
+  generalSettingsTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_GREYSCALE, config.useGreyscale);
+  generalSettingsTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_RESOLUTIONOVERRIDE, config.useResolutionOverride);
   generalSettingsTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_RESOLUTIONWIDTH, config.resolutionWidth);
   generalSettingsTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_RESOLUTIONHEIGHT, config.resolutionHeight);
 

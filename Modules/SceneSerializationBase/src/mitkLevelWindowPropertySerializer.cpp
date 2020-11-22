@@ -37,15 +37,8 @@ namespace mitk
         auto *element = doc.NewElement("LevelWindow");
 
         LevelWindow lw = prop->GetLevelWindow();
-        std::string boolString("false");
-        if (lw.IsFixed() == true)
-          boolString = "true";
-        element->SetAttribute("fixed", boolString.c_str());
-
-        std::string boolStringFltImage("false");
-        if (lw.IsFloatingValues() == true)
-          boolStringFltImage = "true";
-        element->SetAttribute("isFloatingImage", boolStringFltImage.c_str());
+        element->SetAttribute("fixed", lw.IsFixed());
+        element->SetAttribute("isFloatingImage", lw.IsFloatingValues());
 
         auto *child = doc.NewElement("CurrentSettings");
         element->InsertEndChild(child);

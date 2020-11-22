@@ -35,7 +35,7 @@ tinyxml2::XMLElement *mitk::Geometry3DToXML::ToXML(tinyxml2::XMLDocument& doc, c
   // create XML file
   // construct XML tree describing the geometry
   auto *geomElem = doc.NewElement("Geometry3D");
-  geomElem->SetAttribute("ImageGeometry", isImageGeometry ? "true" : "false");
+  geomElem->SetAttribute("ImageGeometry", isImageGeometry);
   geomElem->SetAttribute("FrameOfReferenceID", geom3D->GetFrameOfReferenceID());
 
   // coefficients are matrix[row][column]!

@@ -40,10 +40,7 @@ namespace mitk
         LocaleSwitch localeSwitch("C");
 
         auto *element = doc.NewElement("clipping");
-        if (prop->GetClippingEnabled())
-          element->SetAttribute("enabled", "true");
-        else
-          element->SetAttribute("enabled", "false");
+        element->SetAttribute("enabled", prop->GetClippingEnabled());
         auto *originElement = doc.NewElement("origin");
         const Point3D origin = prop->GetOrigin();
         originElement->SetAttribute("x", boost::lexical_cast<std::string>(origin[0]).c_str());

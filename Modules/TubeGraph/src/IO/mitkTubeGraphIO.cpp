@@ -467,7 +467,7 @@ namespace mitk
             auto *labelXML = documentXML.NewElement(mitk::TubeGraphDefinitions::XML_LABEL.c_str());
             labelXML->SetAttribute(mitk::TubeGraphDefinitions::XML_LABEL_NAME.c_str(), labelVector[labelIndex]->labelName.c_str());
             labelXML->SetAttribute(mitk::TubeGraphDefinitions::XML_LABEL_VISIBILITY.c_str(),
-                                   labelVector[labelIndex]->isVisible);
+                                   labelVector[labelIndex]->isVisible ? 1 : 0);
             labelXML->SetAttribute(mitk::TubeGraphDefinitions::XML_LABEL_COLOR_R.c_str(),
                                          labelVector[labelIndex]->labelColor[0]);
             labelXML->SetAttribute(mitk::TubeGraphDefinitions::XML_LABEL_COLOR_G.c_str(),

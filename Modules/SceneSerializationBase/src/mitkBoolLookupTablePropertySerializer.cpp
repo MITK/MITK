@@ -43,10 +43,7 @@ namespace mitk
       {
         auto *tableEntry = doc.NewElement("LUTValue");
         tableEntry->SetAttribute("id", it->first);
-        if (it->second == true)
-          tableEntry->SetAttribute("value", "true");
-        else
-          tableEntry->SetAttribute("value", "false");
+        tableEntry->SetAttribute("value", it->second);
         element->InsertEndChild(tableEntry);
       }
       return element;

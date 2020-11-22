@@ -31,14 +31,7 @@ namespace mitk
       if (const BoolProperty *prop = dynamic_cast<const BoolProperty *>(m_Property.GetPointer()))
       {
         auto element = doc.NewElement("bool");
-        if (prop->GetValue() == true)
-        {
-          element->SetAttribute("value", "true");
-        }
-        else
-        {
-          element->SetAttribute("value", "false");
-        }
+        element->SetAttribute("value", prop->GetValue());
         return element;
       }
       else

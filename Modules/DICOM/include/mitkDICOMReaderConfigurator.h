@@ -133,7 +133,7 @@ class MITKDICOM_EXPORT DICOMReaderConfigurator : public itk::LightObject
     tinyxml2::XMLElement* CreateConfigStringFromDICOMTag(tinyxml2::XMLDocument& doc, const DICOMTag& tag) const;
 
     tinyxml2::XMLElement* CreateDICOMFileReaderTag(tinyxml2::XMLDocument& doc, const DICOMFileReader* reader) const;
-    const char* toString(bool) const;
+
     std::string toHexString(unsigned int i) const;
 
     /** Helper that queries an boolean xml attribute. If the attribute does not exist, the passed default value is used.*/

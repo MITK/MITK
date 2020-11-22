@@ -89,7 +89,7 @@ void mitk::NavigationDataSetWriterXML::StreamData (std::ostream* stream, mitk::N
 
       elem->SetAttribute("Time", nd->GetIGTTimeStamp());
       // elem->SetAttribute("SystemTime", sysTimeStr); // tag for system time
-      elem->SetAttribute("Tool", toolIndex);
+      elem->SetAttribute("Tool", static_cast<int>(toolIndex));
       elem->SetAttribute("X", nd->GetPosition()[0]);
       elem->SetAttribute("Y", nd->GetPosition()[1]);
       elem->SetAttribute("Z", nd->GetPosition()[2]);

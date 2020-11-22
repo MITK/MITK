@@ -90,8 +90,8 @@ void AddSOPInstanceUIDs(const mitk::Image* image, tinyxml2::XMLElement* xmlNode)
         for (auto slice : slices)
         {
           auto instanceUIDNode = doc->NewElement("mp:sopInstanceUID");
-          instanceUIDNode->SetAttribute("z", slice);
-          instanceUIDNode->SetAttribute("t", timeStep);
+          instanceUIDNode->SetAttribute("z", static_cast<int>(slice));
+          instanceUIDNode->SetAttribute("t", static_cast<int>(timeStep));
           auto* valueText = doc->NewText(dicomProp->GetValue(timeStep, slice).c_str());
           instanceUIDNode->InsertEndChild(valueText);
           instanceUIDsNode->InsertEndChild(instanceUIDNode);

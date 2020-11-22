@@ -14,22 +14,23 @@ found in the LICENSE file.
 #define mitkBoolPropertySerializer_h_included
 
 #include "mitkBasePropertySerializer.h"
-
 #include "mitkProperties.h"
+#include <tinyxml2.h>
 
 namespace mitk
 {
   class BoolPropertySerializer : public BasePropertySerializer
   {
   public:
-    mitkClassMacro(BoolPropertySerializer, BasePropertySerializer);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(BoolPropertySerializer, BasePropertySerializer)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
-      TiXmlElement *Serialize() override
+    tinyxml2::XMLElement* Serialize(tinyxml2::XMLDocument& doc) override
     {
       if (const BoolProperty *prop = dynamic_cast<const BoolProperty *>(m_Property.GetPointer()))
       {
-        auto element = new TiXmlElement("bool");
+        auto element = doc.NewElement("bool");
         if (prop->GetValue() == true)
         {
           element->SetAttribute("value", "true");
@@ -44,7 +45,7 @@ namespace mitk
         return nullptr;
     }
 
-    BaseProperty::Pointer Deserialize(TiXmlElement *element) override
+    BaseProperty::Pointer Deserialize(const tinyxml2::XMLElement *element) override
     {
       if (!element)
         return nullptr;

@@ -44,7 +44,7 @@ namespace mitk
 
     itkCloneMacro(Self);
 
-      mitkNewMacro1Param(PlaneOrientationProperty, const IdType &);
+    mitkNewMacro1Param(PlaneOrientationProperty, const IdType &);
 
     mitkNewMacro1Param(PlaneOrientationProperty, const std::string &);
 

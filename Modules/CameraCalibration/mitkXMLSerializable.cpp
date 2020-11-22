@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include "mitkEndoDebug.h"
 #include "mitkEndoMacros.h"
 #include <itksys/SystemTools.hxx>
+#include <tinyxml2.h>
 
 namespace mitk
 {
@@ -22,18 +23,17 @@ namespace mitk
   void mitk::XMLSerializable::ToXMLFile(const std::string& file
                                         , const std::string& elemName)
   {
-    TiXmlElement * rootElem=nullptr;
-    TiXmlElement * element=nullptr;
+    tinyxml2::XMLElement * rootElem=nullptr;
+    tinyxml2::XMLElement* element=nullptr;
 
     // determine element to write to
     std::string elementName = elemName;
     if(elementName.empty())
       elementName = this->GetNameOfClass();
 
-    TiXmlDocument doc( file.c_str() );
-    bool loadOkay = doc.LoadFile();
+    tinyxml2::XMLDocument doc;
     // if the document already exists ...
-    if(loadOkay)
+    if(tinyxml2::XML_SUCCESS == doc.LoadFile(file.c_str()))
     {
       // try to identify the XML element of this class as the root
       // or as the child of the root
@@ -41,43 +41,42 @@ namespace mitk
       endoAssertMsg( rootElem, "No root element found in " << file );
 
       // if root element represents this element remove the root
-      if( rootElem->ValueStr() == elementName )
+      if( std::string(rootElem->Value() != nullptr ? rootElem->Value() : "") == elementName )
       {
-        doc.RemoveChild(rootElem);
+        doc.DeleteChild(rootElem);
         rootElem = nullptr;
       }
       else
       {
         // if it is a child of the root remove it too
-        element = rootElem->FirstChildElement(elementName);
+        element = rootElem->FirstChildElement(elementName.c_str());
         if(element)
-          rootElem->RemoveChild(element);
+          rootElem->DeleteChild(element);
       }
     }
     else
     {
       // document did not exist, create new one with declration
-      auto  decl = new TiXmlDeclaration( "1.0", "", "" );
-      doc.LinkEndChild( decl );
+      doc.InsertEndChild( doc.NewDeclaration() );
     }
 
     m_XMLFileName = file;
 
     // create element (if the document already exists this element was removed)
-    element = new TiXmlElement( elementName );
+    element = doc.NewElement( elementName.c_str() );
     this->ToXML( element );
 
     // if we do not have a root element create a new one
     if(!rootElem)
-      rootElem = new TiXmlElement( ROOT_NAME );
+      rootElem = doc.NewElement( ROOT_NAME.c_str() );
     // add the element node as child
-    rootElem->LinkEndChild(element);
+    rootElem->InsertEndChild(element);
 
     // if no root element exists, add it now
     if(doc.RootElement() == nullptr)
-      doc.LinkEndChild( rootElem );
+      doc.InsertEndChild( rootElem );
 
-    if(!doc.SaveFile( file ))
+    if(tinyxml2::XML_SUCCESS != doc.SaveFile( file.c_str() ))
     {
       std::ostringstream s; s << "File " << file
           << " could not be written. Please check permissions.";
@@ -95,9 +94,8 @@ namespace mitk
   {
     endodebug( "Trying to read from " << file )
 
-    TiXmlDocument doc( file.c_str() );
-    bool loadOkay = doc.LoadFile();
-    if(!loadOkay)
+    tinyxml2::XMLDocument doc;
+    if(tinyxml2::XML_SUCCESS != doc.LoadFile(file.c_str()))
     {
       std::ostringstream s; s << "File " << file
           << " could not be loaded!";
@@ -106,7 +104,7 @@ namespace mitk
 
     m_XMLFileName = file;
 
-    TiXmlElement* elem = doc.FirstChildElement();
+    auto* elem = doc.FirstChildElement();
     endoAssertMsg( elem, "No root element found" );
 
     // determine element to read from
@@ -122,9 +120,11 @@ namespace mitk
 
     // if theres an attribute as file reference try to load the class
     // from that file
-    std::string filename;
-    if(elem->QueryStringAttribute(FILE_REFERENCE_ATTRIBUTE_NAME.c_str(), &filename)
-      == TIXML_SUCCESS)
+    const char* filenameC = elem->Attribute(FILE_REFERENCE_ATTRIBUTE_NAME.c_str());
+    std::string filename = nullptr != filenameC
+      ? filenameC
+      : "";
+    if(!filename.empty())
     {
       if( !itksys::SystemTools::FileIsFullPath(filename.c_str()) )
         filename = itksys::SystemTools::GetFilenamePath(file) + "/" + filename;

@@ -50,8 +50,6 @@ found in the LICENSE file.
 #include <QMessageBox>
 #include <QShortcut>
 
-#include "tinyxml.h"
-
 #include <itksys/SystemTools.hxx>
 
 #include <regex>

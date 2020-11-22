@@ -13,10 +13,14 @@ found in the LICENSE file.
 #define MITKXMLSerializable_H
 
 #include <string>
-#include <tinyxml.h>
 #include <itkObject.h>
 #include <itkMacro.h>
 #include <MitkCameraCalibrationExports.h>
+
+namespace tinyxml2
+{
+  class XMLElement;
+}
 
 namespace mitk
 {
@@ -45,11 +49,11 @@ namespace mitk
     ///
     /// write your values here to elem
     ///
-    virtual void ToXML(TiXmlElement* elem) const = 0;
+    virtual void ToXML(tinyxml2::XMLElement* elem) const = 0;
     ///
     /// read your values here from elem
     ///
-    virtual void FromXML(TiXmlElement* elem) = 0;
+    virtual void FromXML(const tinyxml2::XMLElement* elem) = 0;
 
     ///
     /// tries to write the xml data obtained in ToXML() to file

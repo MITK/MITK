@@ -19,8 +19,9 @@ found in the LICENSE file.
 #include <mitkAbstractFileReader.h>
 #include <mitkUSProbe.h>
 
-class TiXmlElement;
-class TiXmlNode;
+namespace tinyxml2 {
+  class XMLElement;
+}
 
 namespace mitk {
 
@@ -81,17 +82,17 @@ namespace mitk {
     /**
     * \brief Extracts all stored attribute information of the ULTRASOUNDDEVICE-Tag.
     */
-    void ExtractAttributeInformationOfUltrasoundDeviceTag(TiXmlElement *element);
+    void ExtractAttributeInformationOfUltrasoundDeviceTag(const tinyxml2::XMLElement *element);
 
     /**
     * \brief Extracts all stored attribute information of the GENERALSETTINGS-Tag.
     */
-    void ExtractAttributeInformationOfGeneralSettingsTag(TiXmlElement *element);
+    void ExtractAttributeInformationOfGeneralSettingsTag(const tinyxml2::XMLElement *element);
 
     /**
     * \brief Extracts all stored information of a single ultrasound probe.
     */
-    void ExtractProbe(TiXmlElement *element);
+    void ExtractProbe(const tinyxml2::XMLElement *element);
 
   private:
     std::string m_Filename;

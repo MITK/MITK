@@ -13,10 +13,13 @@ found in the LICENSE file.
 #ifndef mitkProportionalTimeGeometryToXML_h
 #define mitkProportionalTimeGeometryToXML_h
 
-// MITK
 #include "mitkProportionalTimeGeometry.h"
 
-class TiXmlElement;
+namespace tinyxml2
+{
+  class XMLDocument;
+  class XMLElement;
+}
 
 namespace mitk
 {
@@ -38,13 +41,13 @@ namespace mitk
     /**
      * @brief Serialize given geometry to XML.
      */
-    static TiXmlElement *ToXML(const ProportionalTimeGeometry *geometry);
+    static tinyxml2::XMLElement *ToXML(tinyxml2::XMLDocument& doc, const ProportionalTimeGeometry *geometry);
 
     /**
      * @brief Create a ProportionalTimeGeometry from XML.
      * Interprets only the format created by ToXML().
      */
-    static ProportionalTimeGeometry::Pointer FromXML(TiXmlElement *node);
+    static ProportionalTimeGeometry::Pointer FromXML(const tinyxml2::XMLElement *node);
   };
 }
 

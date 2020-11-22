@@ -19,7 +19,7 @@ found in the LICENSE file.
 #include <usModuleResource.h>
 #include <usModuleResourceStream.h>
 
-#include <tinyxml.h>
+#include <tinyxml2.h>
 
 mitk::ToFCameraDevice::Pointer mitk::AbstractToFDeviceFactory::ConnectToFDevice()
 {
@@ -61,13 +61,14 @@ mitk::CameraIntrinsics::Pointer mitk::AbstractToFDeviceFactory::GetCameraIntrins
 
   // Create ResourceStream from Resource
   us::ModuleResourceStream resStream(resource);
+  std::string resString(std::istreambuf_iterator<char>(resStream), {});
 
   // Parse XML
-  TiXmlDocument xmlDocument;
-  resStream >> xmlDocument;
+  tinyxml2::XMLDocument xmlDocument;
+  xmlDocument.Parse(resString.c_str());
 
   //Retrieve Child Element and convert to CamerIntrinsics
-  TiXmlElement* element = xmlDocument.FirstChildElement();
+  auto* element = xmlDocument.FirstChildElement();
   mitk::CameraIntrinsics::Pointer intrinsics = mitk::CameraIntrinsics::New();
   intrinsics->FromXML(element);
 

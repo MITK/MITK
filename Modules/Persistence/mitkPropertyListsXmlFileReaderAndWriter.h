@@ -15,7 +15,10 @@ found in the LICENSE file.
 
 #include "mitkDataStorage.h"
 
-class TiXmlElement;
+namespace tinyxml2
+{
+  class XMLElement;
+}
 
 namespace mitk
 {
@@ -39,8 +42,8 @@ namespace mitk
     PropertyListsXmlFileReaderAndWriter();
     ~PropertyListsXmlFileReaderAndWriter() override;
 
-    bool PropertyFromXmlElem(std::string &name, mitk::BaseProperty::Pointer &prop, TiXmlElement *elem) const;
-    bool PropertyToXmlElem(const std::string &name, const mitk::BaseProperty *prop, TiXmlElement *elem) const;
+    bool PropertyFromXmlElem(std::string &name, mitk::BaseProperty::Pointer &prop, const tinyxml2::XMLElement *elem) const;
+    bool PropertyToXmlElem(const std::string &name, const mitk::BaseProperty *prop, tinyxml2::XMLElement *elem) const;
   };
 }
 

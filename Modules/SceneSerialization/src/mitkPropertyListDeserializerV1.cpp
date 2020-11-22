@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "mitkPropertyListDeserializerV1.h"
 #include "mitkBasePropertySerializer.h"
 #include "mitkSerializerMacros.h"
-#include <tinyxml.h>
+#include <tinyxml2.h>
 
 MITK_REGISTER_SERIALIZER(PropertyListDeserializerV1)
 
@@ -31,15 +31,15 @@ bool mitk::PropertyListDeserializerV1::Deserialize()
 
   m_PropertyList = PropertyList::New();
 
-  TiXmlDocument document(m_Filename);
-  if (!document.LoadFile())
+  tinyxml2::XMLDocument document;
+  if (tinyxml2::XML_SUCCESS != document.LoadFile(m_Filename.c_str()))
   {
-    MITK_ERROR << "Could not open/read/parse " << m_Filename << "\nTinyXML reports: " << document.ErrorDesc()
+    MITK_ERROR << "Could not open/read/parse " << m_Filename << "\nTinyXML reports: " << document.ErrorStr()
                << std::endl;
     return false;
   }
 
-  for (TiXmlElement *propertyElement = document.FirstChildElement("property"); propertyElement != nullptr;
+  for (auto *propertyElement = document.FirstChildElement("property"); propertyElement != nullptr;
        propertyElement = propertyElement->NextSiblingElement("property"))
   {
     const char *keya = propertyElement->Attribute("key");

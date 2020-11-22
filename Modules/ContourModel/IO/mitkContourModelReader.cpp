@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include <iostream>
 #include <mitkCustomMimeType.h>
 #include <mitkLocaleSwitch.h>
+#include <tinyxml2.h>
 
 mitk::ContourModelReader::ContourModelReader(const mitk::ContourModelReader &other) : mitk::AbstractFileReader(other)
 {
@@ -47,14 +48,13 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::ContourModelReader::DoRead(
 
   try
   {
-    TiXmlDocument doc(location.c_str());
-    bool loadOkay = doc.LoadFile();
-    if (loadOkay)
+    tinyxml2::XMLDocument doc;
+    if (tinyxml2::XML_SUCCESS == doc.LoadFile(location.c_str()))
     {
-      TiXmlHandle docHandle(&doc);
+      tinyxml2::XMLHandle docHandle(&doc);
 
       /*++++ handle n contourModels within data tags ++++*/
-      for (TiXmlElement *currentContourElement = docHandle.FirstChildElement("contourModel").ToElement();
+      for (auto *currentContourElement = docHandle.FirstChildElement("contourModel").ToElement();
            currentContourElement != nullptr;
            currentContourElement = currentContourElement->NextSiblingElement())
       {
@@ -67,7 +67,7 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::ContourModelReader::DoRead(
           ///////////// NOT SUPPORTED YET ////////////////
 
           /*++++ handle n timesteps within timestep tags ++++*/
-          for (TiXmlElement *currentTimeSeries =
+          for (auto *currentTimeSeries =
                  currentContourElement->FirstChildElement("data")->FirstChildElement("timestep")->ToElement();
                currentTimeSeries != nullptr;
                currentTimeSeries = currentTimeSeries->NextSiblingElement())
@@ -117,7 +117,7 @@ mitk::ContourModelReader *mitk::ContourModelReader::Clone() const
 }
 
 void mitk::ContourModelReader::ReadPoints(mitk::ContourModel::Pointer newContourModel,
-                                          TiXmlElement *currentTimeSeries,
+                                          const tinyxml2::XMLElement *currentTimeSeries,
                                           unsigned int currentTimeStep)
 {
   // check if the timesteps in contourModel have to be expanded
@@ -129,7 +129,7 @@ void mitk::ContourModelReader::ReadPoints(mitk::ContourModel::Pointer newContour
   // read all points within controlPoints tag
   if (currentTimeSeries->FirstChildElement("controlPoints")->FirstChildElement("point") != nullptr)
   {
-    for (TiXmlElement *currentPoint =
+    for (auto *currentPoint =
            currentTimeSeries->FirstChildElement("controlPoints")->FirstChildElement("point")->ToElement();
          currentPoint != nullptr;
          currentPoint = currentPoint->NextSiblingElement())

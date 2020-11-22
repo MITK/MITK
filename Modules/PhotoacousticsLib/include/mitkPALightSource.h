@@ -22,7 +22,9 @@ found in the LICENSE file.
 #include "itkObject.h"
 #include "itkMacro.h"
 
-#include <tinyxml.h>
+namespace tinyxml2 {
+  class XMLElement;
+}
 
 namespace mitk {
   namespace pa {
@@ -36,7 +38,7 @@ namespace mitk {
 
       mitkClassMacroItkParent(LightSource, itk::Object);
       itkFactorylessNewMacro(Self);
-      mitkNewMacro2Param(Self, TiXmlElement*, bool);
+      mitkNewMacro2Param(Self, const tinyxml2::XMLElement*, bool);
 
       const std::string XML_TAG_X_ANGLE = "xAngle";
       const std::string XML_TAG_Y_ANGLE = "yAngle";
@@ -82,11 +84,11 @@ namespace mitk {
 
       bool IsValid();
 
-      LightSource(TiXmlElement* element, bool verbose);
+      LightSource(const tinyxml2::XMLElement* element, bool verbose);
       LightSource();
       ~LightSource() override;
 
-      void ParseAngle(TiXmlElement* direction, std::string angle);
+      void ParseAngle(const tinyxml2::XMLElement* direction, const std::string& angle);
 
       itkGetMacro(SpawnType, SpawnType);
 
@@ -168,12 +170,13 @@ namespace mitk {
         double z1;
       };
 
-      void ParsePhotonDirection(TiXmlElement* element);
-      void ParseEnergy(TiXmlElement* element);
-      void ParsePhotonSpawnArea(TiXmlElement* element);
+      void ParsePhotonDirection(const tinyxml2::XMLElement* element);
+      void ParseEnergy(const tinyxml2::XMLElement* element);
+      void ParsePhotonSpawnArea(const tinyxml2::XMLElement* element);
 
       TransformResult BoxMuellerTransform(double u1, double u2, double mu, double sigma);
     };
   }
 }
+
 #endif // MITKPHOTOACOUSTICLIGHTSOURCE_H

@@ -17,48 +17,50 @@ found in the LICENSE file.
 #include "mitkProperties.h"
 #include "mitkStringsToNumbers.h"
 #include <mitkLocaleSwitch.h>
+#include <array>
+#include <tinyxml2.h>
 
 namespace mitk
 {
   class Point4dPropertySerializer : public BasePropertySerializer
   {
   public:
-    mitkClassMacro(Point4dPropertySerializer, BasePropertySerializer);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(Point4dPropertySerializer, BasePropertySerializer)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
-      TiXmlElement *Serialize() override
+    tinyxml2::XMLElement* Serialize(tinyxml2::XMLDocument& doc) override
     {
       if (const Point4dProperty *prop = dynamic_cast<const Point4dProperty *>(m_Property.GetPointer()))
       {
         LocaleSwitch localeSwitch("C");
 
-        auto element = new TiXmlElement("point");
+        auto *element = doc.NewElement("point");
         Point4D point = prop->GetValue();
-        element->SetAttribute("x", boost::lexical_cast<std::string>(point[0]));
-        element->SetAttribute("y", boost::lexical_cast<std::string>(point[1]));
-        element->SetAttribute("z", boost::lexical_cast<std::string>(point[2]));
-        element->SetAttribute("t", boost::lexical_cast<std::string>(point[3]));
+        element->SetAttribute("x", boost::lexical_cast<std::string>(point[0]).c_str());
+        element->SetAttribute("y", boost::lexical_cast<std::string>(point[1]).c_str());
+        element->SetAttribute("z", boost::lexical_cast<std::string>(point[2]).c_str());
+        element->SetAttribute("t", boost::lexical_cast<std::string>(point[3]).c_str());
         return element;
       }
       else
         return nullptr;
     }
 
-    BaseProperty::Pointer Deserialize(TiXmlElement *element) override
+    BaseProperty::Pointer Deserialize(const tinyxml2::XMLElement* element) override
     {
       if (!element)
         return nullptr;
 
       LocaleSwitch localeSwitch("C");
 
-      std::string v_str[4];
-      if (element->QueryStringAttribute("x", &v_str[0]) != TIXML_SUCCESS)
-        return nullptr;
-      if (element->QueryStringAttribute("y", &v_str[1]) != TIXML_SUCCESS)
-        return nullptr;
-      if (element->QueryStringAttribute("z", &v_str[2]) != TIXML_SUCCESS)
-        return nullptr;
-      if (element->QueryStringAttribute("t", &v_str[3]) != TIXML_SUCCESS)
+      std::array<const char*, 4> v_str = {
+        element->Attribute("x"),
+        element->Attribute("y"),
+        element->Attribute("z"),
+        element->Attribute("t")
+      };
+      if(nullptr == v_str[0] || nullptr == v_str[1] || nullptr == v_str[2] || nullptr == v_str[2])
         return nullptr;
       Point4D v;
       try

@@ -1,4 +1,4 @@
-<?xml version="1.0" standalone=no>
+<?xml version="1.0" standalone="no"?>
 <DICOMFileReader
   label="Instance Number, consecutive"
   description="Sort images by Instance Number, require equal distances of 1"

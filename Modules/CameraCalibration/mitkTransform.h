@@ -17,7 +17,6 @@ found in the LICENSE file.
 #include <mitkCommon.h>
 #include <mitkNumericTypes.h>
 #include <mitkNavigationData.h>
-#include <tinyxml.h>
 #include <sstream>
 #include <vtkMatrix4x4.h>
 #include <mitkXMLSerializable.h>
@@ -117,7 +116,7 @@ namespace mitk {
     ///
     /// read from xml
     ///
-    void FromXML(TiXmlElement* elem) override;
+    void FromXML(const tinyxml2::XMLElement* elem) override;
     ///
     /// read csv file
     ///
@@ -239,7 +238,7 @@ namespace mitk {
     ///
     /// create xml representation
     ///
-    void ToXML(TiXmlElement* elem) const override;
+    void ToXML(tinyxml2::XMLElement* elem) const override;
     ///
     /// create string representation
     ///

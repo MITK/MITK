@@ -19,7 +19,11 @@ found in the LICENSE file.
 
 #include <itkObjectFactoryBase.h>
 
-class TiXmlElement;
+namespace tinyxml2
+{
+  class XMLDocument;
+  class XMLElement;
+}
 
 namespace mitk
 {
@@ -52,7 +56,7 @@ namespace mitk
     PropertyListSerializer();
     ~PropertyListSerializer() override;
 
-    TiXmlElement *SerializeOneProperty(const std::string &key, const BaseProperty *property);
+    tinyxml2::XMLElement *SerializeOneProperty(tinyxml2::XMLDocument &doc, const std::string &key, const BaseProperty *property);
 
     std::string m_FilenameHint;
     std::string m_WorkingDirectory;

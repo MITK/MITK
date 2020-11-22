@@ -13,7 +13,6 @@ found in the LICENSE file.
 #include "mitkLabel.h"
 
 #include "itkProcessObject.h"
-#include "tinyxml.h"
 #include <itkCommand.h>
 #include <mitkProperties.h>
 #include <mitkDICOMSegmentationPropertyHelper.h>

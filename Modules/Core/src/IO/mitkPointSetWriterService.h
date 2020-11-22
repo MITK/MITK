@@ -16,7 +16,11 @@ found in the LICENSE file.
 #include <mitkAbstractFileWriter.h>
 #include <mitkPointSet.h>
 
-class TiXmlElement;
+namespace tinyxml2
+{
+  class XMLDocument;
+  class XMLElement;
+}
 
 namespace mitk
 {
@@ -51,7 +55,7 @@ namespace mitk
     template <typename T>
     std::string ConvertToString(T value);
 
-    TiXmlElement *ToXML(const mitk::PointSet *pointSet);
+    tinyxml2::XMLElement *ToXML(tinyxml2::XMLDocument &doc, const mitk::PointSet *pointSet);
 
     static const std::string XML_POINT_SET;
     static const std::string XML_TIME_SERIES;

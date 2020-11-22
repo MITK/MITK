@@ -33,6 +33,8 @@ found in the LICENSE file.
 #include "itkMetaDataObject.h"
 #include "itkNrrdImageIO.h"
 
+#include <tinyxml2.h>
+
 namespace mitk
 {
 
@@ -204,22 +206,16 @@ namespace mitk
         unsigned int count(0);
         while (iter != input->GetLabelSet(layerIdx)->IteratorConstEnd())
         {
-          std::unique_ptr<TiXmlDocument> document;
-          document.reset(new TiXmlDocument());
-
-          auto *decl = new TiXmlDeclaration("1.0", "", ""); // TODO what to write here? encoding? etc....
-          document->LinkEndChild(decl);
-          TiXmlElement *labelElem = mitk::LabelSetIOHelper::GetLabelAsTiXmlElement(iter->second);
-          document->LinkEndChild(labelElem);
-          TiXmlPrinter printer;
-          printer.SetIndent("");
-          printer.SetLineBreak("");
-
-          document->Accept(&printer);
+          tinyxml2::XMLDocument document;
+          document.InsertEndChild(document.NewDeclaration());
+          auto *labelElem = mitk::LabelSetIOHelper::GetLabelAsXMLElement(document, iter->second);
+          document.InsertEndChild(labelElem);
+          tinyxml2::XMLPrinter printer;
+          document.Print(&printer);
 
           sprintf(keybuffer, "org.mitk.label_%03u_%05u", layerIdx, count);
           itk::EncapsulateMetaData<std::string>(
-            nrrdImageIo->GetMetaDataDictionary(), std::string(keybuffer), printer.Str());
+            nrrdImageIo->GetMetaDataDictionary(), std::string(keybuffer), printer.CStr());
           ++iter;
           ++count;
         }
@@ -491,16 +487,16 @@ namespace mitk
 
       for (int labelIdx = 0; labelIdx < numberOfLabels; labelIdx++)
       {
-        TiXmlDocument doc;
+        tinyxml2::XMLDocument doc;
         sprintf(keybuffer, "label_%03u_%05d", layerIdx, labelIdx);
         _xmlStr = GetStringByKey(dictionary, keybuffer);
-        doc.Parse(_xmlStr.c_str());
+        doc.Parse(_xmlStr.c_str(), _xmlStr.size());
 
-        TiXmlElement *labelElem = doc.FirstChildElement("Label");
+        auto *labelElem = doc.FirstChildElement("Label");
         if (labelElem == nullptr)
           mitkThrow() << "Error parsing NRRD header for mitk::LabelSetImage IO";
 
-        label = mitk::LabelSetIOHelper::LoadLabelFromTiXmlDocument(labelElem);
+        label = mitk::LabelSetIOHelper::LoadLabelFromXMLDocument(labelElem);
 
         if (label->GetValue() == 0) // set exterior label is needed to hold exterior information
           output->SetExteriorLabel(label);

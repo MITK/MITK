@@ -18,44 +18,49 @@ found in the LICENSE file.
 #include "mitkStringsToNumbers.h"
 #include <mitkLocaleSwitch.h>
 
+#include <array>
+
+#include <tinyxml2.h>
+
 namespace mitk
 {
   class Point3dPropertySerializer : public BasePropertySerializer
   {
   public:
-    mitkClassMacro(Point3dPropertySerializer, BasePropertySerializer);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(Point3dPropertySerializer, BasePropertySerializer)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
-      TiXmlElement *Serialize() override
+    tinyxml2::XMLElement* Serialize(tinyxml2::XMLDocument& doc) override
     {
       if (const Point3dProperty *prop = dynamic_cast<const Point3dProperty *>(m_Property.GetPointer()))
       {
         LocaleSwitch localeSwitch("C");
 
-        auto element = new TiXmlElement("point");
+        auto *element = doc.NewElement("point");
         Point3D point = prop->GetValue();
-        element->SetAttribute("x", boost::lexical_cast<std::string>(point[0]));
-        element->SetAttribute("y", boost::lexical_cast<std::string>(point[1]));
-        element->SetAttribute("z", boost::lexical_cast<std::string>(point[2]));
+        element->SetAttribute("x", boost::lexical_cast<std::string>(point[0]).c_str());
+        element->SetAttribute("y", boost::lexical_cast<std::string>(point[1]).c_str());
+        element->SetAttribute("z", boost::lexical_cast<std::string>(point[2]).c_str());
         return element;
       }
       else
         return nullptr;
     }
 
-    BaseProperty::Pointer Deserialize(TiXmlElement *element) override
+    BaseProperty::Pointer Deserialize(const tinyxml2::XMLElement *element) override
     {
       if (!element)
         return nullptr;
 
       LocaleSwitch localeSwitch("C");
 
-      std::string v_str[3];
-      if (element->QueryStringAttribute("x", &v_str[0]) != TIXML_SUCCESS)
-        return nullptr;
-      if (element->QueryStringAttribute("y", &v_str[1]) != TIXML_SUCCESS)
-        return nullptr;
-      if (element->QueryStringAttribute("z", &v_str[2]) != TIXML_SUCCESS)
+      std::array<const char*, 3> v_str = {
+        element->Attribute("x"),
+        element->Attribute("y"),
+        element->Attribute("z")
+      };
+      if (nullptr == v_str[0] || nullptr == v_str[1] || nullptr == v_str[2])
         return nullptr;
       Point3D v;
       try

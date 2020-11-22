@@ -14,10 +14,9 @@ found in the LICENSE file.
 #define mitkVectorPropertySerializer_h
 
 #include "mitkBasePropertySerializer.h"
-
 #include "mitkVectorProperty.h"
-
 #include <mitkLexicalCast.h>
+#include <tinyxml2.h>
 
 namespace mitk
 {
@@ -69,10 +68,10 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      //! Build an XML version of this property
-      TiXmlElement *Serialize() override
+    //! Build an XML version of this property
+    tinyxml2::XMLElement* Serialize(tinyxml2::XMLDocument& doc) override
     {
-      auto listElement = new TiXmlElement("Values");
+      auto *listElement = doc.NewElement("Values");
 
       if (const PropertyType *prop = dynamic_cast<const PropertyType *>(m_Property.GetPointer()))
       {
@@ -83,10 +82,10 @@ namespace mitk
           std::stringstream indexS;
           indexS << index++;
 
-          auto entryElement = new TiXmlElement("Value");
-          entryElement->SetAttribute("idx", indexS.str());
-          entryElement->SetAttribute("value", boost::lexical_cast<std::string>(listEntry));
-          listElement->LinkEndChild(entryElement);
+          auto *entryElement = doc.NewElement("Value");
+          entryElement->SetAttribute("idx", indexS.str().c_str());
+          entryElement->SetAttribute("value", boost::lexical_cast<std::string>(listEntry).c_str());
+          listElement->InsertEndChild(entryElement);
         }
 
         return listElement;
@@ -98,7 +97,7 @@ namespace mitk
     }
 
     //! Construct a property from an XML serialization
-    BaseProperty::Pointer Deserialize(TiXmlElement *listElement) override
+    BaseProperty::Pointer Deserialize(const tinyxml2::XMLElement *listElement) override
     {
       typename PropertyType::VectorType datalist;
 
@@ -109,10 +108,11 @@ namespace mitk
         unsigned int index(0);
         std::string valueString;
         DATATYPE value;
-        for (TiXmlElement *valueElement = listElement->FirstChildElement("Value"); valueElement;
+        for (auto *valueElement = listElement->FirstChildElement("Value"); valueElement;
              valueElement = valueElement->NextSiblingElement("Value"))
         {
-          if (valueElement->QueryValueAttribute("value", &valueString) != TIXML_SUCCESS)
+          valueString = valueElement->Attribute("value");
+          if (valueString.empty())
           {
             MITK_ERROR << "Missing value attribute in <Values> list";
             return nullptr;

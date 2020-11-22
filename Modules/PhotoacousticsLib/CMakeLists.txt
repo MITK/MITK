@@ -1,11 +1,17 @@
 MITK_CREATE_MODULE(
   INCLUDE_DIRS PUBLIC include
   INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}
-  DEPENDS PUBLIC MitkAlgorithmsExt tinyxml
+  DEPENDS PUBLIC MitkAlgorithmsExt
   PACKAGE_DEPENDS
-    tinyxml Vigra
+    tinyxml2|tinyxml2 Vigra
     PUBLIC ITK
 )
+
+if(TARGET ${MODULE_TARGET})
+  target_link_libraries(${MODULE_TARGET}
+    PRIVATE tinyxml2::tinyxml2
+  )
+endif()
 
 add_subdirectory(MitkMCxyz)
 

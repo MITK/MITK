@@ -12,13 +12,14 @@ found in the LICENSE file.
 
 #include "mitkPALightSource.h"
 #include <cmath>
+#include <tinyxml2.h>
 
 mitk::pa::LightSource::LightSource() :
   m_IsValid(false)
 {
 }
 
-mitk::pa::LightSource::LightSource(TiXmlElement* element, bool verbose) :
+mitk::pa::LightSource::LightSource(const tinyxml2::XMLElement* element, bool verbose) :
   m_IsValid(true),
   m_Verbose(verbose)
 {
@@ -50,9 +51,9 @@ mitk::pa::LightSource::TransformResult mitk::pa::LightSource::BoxMuellerTransfor
   return result;
 }
 
-void mitk::pa::LightSource::ParsePhotonDirection(TiXmlElement* element)
+void mitk::pa::LightSource::ParsePhotonDirection(const tinyxml2::XMLElement* element)
 {
-  TiXmlElement* direction = element->FirstChildElement(XML_TAG_PHOTON_DIRECTION);
+  auto* direction = element->FirstChildElement(XML_TAG_PHOTON_DIRECTION.c_str());
   if (direction)
   {
     ParseAngle(direction, XML_TAG_X_ANGLE);
@@ -67,7 +68,7 @@ void mitk::pa::LightSource::ParsePhotonDirection(TiXmlElement* element)
     m_AngleXMode = DistributionMode::UNIFORM;
   }
 
-  direction = element->FirstChildElement(XML_TAG_PHOTON_DIRECTION);
+  direction = element->FirstChildElement(XML_TAG_PHOTON_DIRECTION.c_str());
   if (direction)
   {
     ParseAngle(direction, XML_TAG_Y_ANGLE);
@@ -83,7 +84,7 @@ void mitk::pa::LightSource::ParsePhotonDirection(TiXmlElement* element)
   }
 }
 
-void mitk::pa::LightSource::ParseAngle(TiXmlElement* direction, std::string angle)
+void mitk::pa::LightSource::ParseAngle(const tinyxml2::XMLElement* direction, const std::string& angle)
 {
   double minimum;
   double maximum;
@@ -91,10 +92,10 @@ void mitk::pa::LightSource::ParseAngle(TiXmlElement* direction, std::string angl
 
   if (m_Verbose)
     std::cout << "Parsing " << angle << std::endl;
-  TiXmlElement* angleElement = direction->FirstChildElement(angle);
+  auto* angleElement = direction->FirstChildElement(angle.c_str());
   if (angleElement)
   {
-    TiXmlElement* angleMin = angleElement->FirstChildElement(XML_TAG_MINIMUM);
+    auto* angleMin = angleElement->FirstChildElement(XML_TAG_MINIMUM.c_str());
     if (angleMin)
     {
       std::string angleMinText = angleMin->GetText();
@@ -109,7 +110,7 @@ void mitk::pa::LightSource::ParseAngle(TiXmlElement* direction, std::string angl
       minimum = 0;
     }
 
-    TiXmlElement* angleMax = angleElement->FirstChildElement(XML_TAG_MAXIMUM);
+    auto* angleMax = angleElement->FirstChildElement(XML_TAG_MAXIMUM.c_str());
     if (angleMax)
     {
       std::string angleMaxText = angleMax->GetText();
@@ -124,7 +125,7 @@ void mitk::pa::LightSource::ParseAngle(TiXmlElement* direction, std::string angl
       maximum = 0;
     }
 
-    TiXmlElement* angleMode = angleElement->FirstChildElement(XML_TAG_MODE);
+    auto* angleMode = angleElement->FirstChildElement(XML_TAG_MODE.c_str());
     if (angleMode)
     {
       std::string angleModeText = angleMode->GetText();
@@ -172,9 +173,9 @@ void mitk::pa::LightSource::ParseAngle(TiXmlElement* direction, std::string angl
   }
 }
 
-void mitk::pa::LightSource::ParseEnergy(TiXmlElement* element)
+void mitk::pa::LightSource::ParseEnergy(const tinyxml2::XMLElement* element)
 {
-  TiXmlElement* energy = element->FirstChildElement(XML_TAG_ENERGY);
+  auto* energy = element->FirstChildElement(XML_TAG_ENERGY.c_str());
   if (energy)
   {
     std::string energyText = energy->GetText();
@@ -190,12 +191,12 @@ void mitk::pa::LightSource::ParseEnergy(TiXmlElement* element)
   }
 }
 
-void mitk::pa::LightSource::ParsePhotonSpawnArea(TiXmlElement* element)
+void mitk::pa::LightSource::ParsePhotonSpawnArea(const tinyxml2::XMLElement* element)
 {
-  TiXmlElement* spawnArea = element->FirstChildElement("PhotonSpawnArea");
+  auto* spawnArea = element->FirstChildElement("PhotonSpawnArea");
   if (spawnArea)
   {
-    TiXmlElement* spawnType = spawnArea->FirstChildElement(XML_TAG_SPAWN_TYPE);
+    auto* spawnType = spawnArea->FirstChildElement(XML_TAG_SPAWN_TYPE.c_str());
     if (spawnType)
     {
       std::string spawnTypeText = spawnType->GetText();
@@ -229,7 +230,7 @@ void mitk::pa::LightSource::ParsePhotonSpawnArea(TiXmlElement* element)
       m_IsValid = false;
     }
 
-    TiXmlElement* xLocation = spawnArea->FirstChildElement(XML_TAG_X);
+    auto* xLocation = spawnArea->FirstChildElement(XML_TAG_X.c_str());
     if (xLocation)
     {
       std::string xLocationText = xLocation->GetText();
@@ -244,7 +245,7 @@ void mitk::pa::LightSource::ParsePhotonSpawnArea(TiXmlElement* element)
       m_SpawnLocationX = 0;
     }
 
-    TiXmlElement* yLocation = spawnArea->FirstChildElement(XML_TAG_Y);
+    auto* yLocation = spawnArea->FirstChildElement(XML_TAG_Y.c_str());
     if (yLocation)
     {
       std::string yLocationText = yLocation->GetText();
@@ -259,7 +260,7 @@ void mitk::pa::LightSource::ParsePhotonSpawnArea(TiXmlElement* element)
       m_SpawnLocationY = 0;
     }
 
-    TiXmlElement* zLocation = spawnArea->FirstChildElement(XML_TAG_Z);
+    auto* zLocation = spawnArea->FirstChildElement(XML_TAG_Z.c_str());
     if (zLocation)
     {
       std::string zLocationText = zLocation->GetText();
@@ -274,7 +275,7 @@ void mitk::pa::LightSource::ParsePhotonSpawnArea(TiXmlElement* element)
       m_SpawnLocationZ = 0.1;
     }
 
-    TiXmlElement* rLocation = spawnArea->FirstChildElement(XML_TAG_R);
+    auto* rLocation = spawnArea->FirstChildElement(XML_TAG_R.c_str());
     if (rLocation)
     {
       std::string rLocationText = rLocation->GetText();
@@ -289,7 +290,7 @@ void mitk::pa::LightSource::ParsePhotonSpawnArea(TiXmlElement* element)
       m_SpawnLocationRadius = 0;
     }
 
-    TiXmlElement* xLength = spawnArea->FirstChildElement(XML_TAG_X_LENGTH);
+    auto* xLength = spawnArea->FirstChildElement(XML_TAG_X_LENGTH.c_str());
     if (xLength)
     {
       std::string xLengthText = xLength->GetText();
@@ -304,7 +305,7 @@ void mitk::pa::LightSource::ParsePhotonSpawnArea(TiXmlElement* element)
       m_SpawnLocationXLength = 0;
     }
 
-    TiXmlElement* yLength = spawnArea->FirstChildElement(XML_TAG_Y_LENGTH);
+    auto* yLength = spawnArea->FirstChildElement(XML_TAG_Y_LENGTH.c_str());
     if (yLength)
     {
       std::string yLengthText = yLength->GetText();
@@ -319,7 +320,7 @@ void mitk::pa::LightSource::ParsePhotonSpawnArea(TiXmlElement* element)
       m_SpawnLocationYLength = 0;
     }
 
-    TiXmlElement* zLength = spawnArea->FirstChildElement(XML_TAG_Z_LENGTH);
+    auto* zLength = spawnArea->FirstChildElement(XML_TAG_Z_LENGTH.c_str());
     if (zLength)
     {
       std::string zLengthText = zLength->GetText();

@@ -22,8 +22,8 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      TiXmlElement *Serialize() override;
-    BaseProperty::Pointer Deserialize(TiXmlElement *element) override;
+    tinyxml2::XMLElement *Serialize(tinyxml2::XMLDocument &doc) override;
+    BaseProperty::Pointer Deserialize(const tinyxml2::XMLElement *element) override;
 
     static bool SerializeTransferFunction(const char *filename, TransferFunction::Pointer tf);
     static TransferFunction::Pointer DeserializeTransferFunction(const char *filePath);

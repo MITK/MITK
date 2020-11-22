@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "mitkPropertyListDeserializer.h"
 
-#include <tinyxml.h>
+#include <tinyxml2.h>
 
 mitk::PropertyListDeserializer::PropertyListDeserializer()
 {
@@ -26,20 +26,20 @@ bool mitk::PropertyListDeserializer::Deserialize()
 {
   bool error(false);
 
-  TiXmlDocument document(m_Filename);
-  if (!document.LoadFile())
+  tinyxml2::XMLDocument document;
+  if (tinyxml2::XML_SUCCESS != document.LoadFile(m_Filename.c_str()))
   {
-    MITK_ERROR << "Could not open/read/parse " << m_Filename << "\nTinyXML reports: " << document.ErrorDesc()
+    MITK_ERROR << "Could not open/read/parse " << m_Filename << "\nTinyXML reports: " << document.ErrorStr()
                << std::endl;
     return false;
   }
 
   // find version node --> note version in some variable
   int fileVersion = 1;
-  TiXmlElement *versionObject = document.FirstChildElement("Version");
+  auto *versionObject = document.FirstChildElement("Version");
   if (versionObject)
   {
-    if (versionObject->QueryIntAttribute("FileVersion", &fileVersion) != TIXML_SUCCESS)
+    if (versionObject->QueryIntAttribute("FileVersion", &fileVersion) != tinyxml2::XML_SUCCESS)
     {
       MITK_ERROR << "Property file " << m_Filename << " does not contain version information! Trying version 1 format."
                  << std::endl;

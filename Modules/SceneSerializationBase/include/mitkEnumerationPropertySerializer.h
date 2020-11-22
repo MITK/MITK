@@ -24,7 +24,7 @@ namespace mitk
   public:
     mitkClassMacro(EnumerationPropertySerializer, BasePropertySerializer);
 
-    TiXmlElement *Serialize() override;
+    tinyxml2::XMLElement *Serialize(tinyxml2::XMLDocument& doc) override;
 
   protected:
     EnumerationPropertySerializer();

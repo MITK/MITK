@@ -16,6 +16,8 @@ found in the LICENSE file.
 #include <mitkVnlVectorFromCvMat.h>
 #include <mitkVnlMatrixFromCvMat.h>
 #include <mitkCvMatFromVnlVector.h>
+#include <tinyxml2.h>
+
 namespace mitk
 {
   // DO NOT CHANGE THE VALUES OF THESE CONSTANTS!!
@@ -585,9 +587,9 @@ namespace mitk
     return s.str();
   }
 
-  void mitk::Transform::ToXML(TiXmlElement* elem) const
+  void mitk::Transform::ToXML(tinyxml2::XMLElement* elem) const
   {
-    std::string value = elem->ValueStr();
+    std::string value = elem->Value() != nullptr ? elem->Value() : "";
     if(value.empty())
       elem->SetValue(this->GetNameOfClass());
 
@@ -610,29 +612,29 @@ namespace mitk
     dataValid = m_NavData->IsDataValid();
     mitk::NavigationData::TimeStampType timestamp=0.0;
 
-    elem->SetAttribute("Type", m_Type);
-    elem->SetDoubleAttribute("Time", timestamp);
-    elem->SetDoubleAttribute("X", position[0]);
-    elem->SetDoubleAttribute("Y", position[1]);
-    elem->SetDoubleAttribute("Z", position[2]);
+    elem->SetAttribute("Type", m_Type.c_str());
+    elem->SetAttribute("Time", timestamp);
+    elem->SetAttribute("X", position[0]);
+    elem->SetAttribute("Y", position[1]);
+    elem->SetAttribute("Z", position[2]);
 
-    elem->SetDoubleAttribute("QX", orientation[0]);
-    elem->SetDoubleAttribute("QY", orientation[1]);
-    elem->SetDoubleAttribute("QZ", orientation[2]);
-    elem->SetDoubleAttribute("QR", orientation[3]);
+    elem->SetAttribute("QX", orientation[0]);
+    elem->SetAttribute("QY", orientation[1]);
+    elem->SetAttribute("QZ", orientation[2]);
+    elem->SetAttribute("QR", orientation[3]);
 
-    elem->SetDoubleAttribute("C00", matrix[0][0]);
-    elem->SetDoubleAttribute("C01", matrix[0][1]);
-    elem->SetDoubleAttribute("C02", matrix[0][2]);
-    elem->SetDoubleAttribute("C03", matrix[0][3]);
-    elem->SetDoubleAttribute("C04", matrix[0][4]);
-    elem->SetDoubleAttribute("C05", matrix[0][5]);
-    elem->SetDoubleAttribute("C10", matrix[1][0]);
-    elem->SetDoubleAttribute("C11", matrix[1][1]);
-    elem->SetDoubleAttribute("C12", matrix[1][2]);
-    elem->SetDoubleAttribute("C13", matrix[1][3]);
-    elem->SetDoubleAttribute("C14", matrix[1][4]);
-    elem->SetDoubleAttribute("C15", matrix[1][5]);
+    elem->SetAttribute("C00", matrix[0][0]);
+    elem->SetAttribute("C01", matrix[0][1]);
+    elem->SetAttribute("C02", matrix[0][2]);
+    elem->SetAttribute("C03", matrix[0][3]);
+    elem->SetAttribute("C04", matrix[0][4]);
+    elem->SetAttribute("C05", matrix[0][5]);
+    elem->SetAttribute("C10", matrix[1][0]);
+    elem->SetAttribute("C11", matrix[1][1]);
+    elem->SetAttribute("C12", matrix[1][2]);
+    elem->SetAttribute("C13", matrix[1][3]);
+    elem->SetAttribute("C14", matrix[1][4]);
+    elem->SetAttribute("C15", matrix[1][5]);
 
     if (dataValid)
       elem->SetAttribute("Valid",1);
@@ -650,7 +652,7 @@ namespace mitk
       elem->SetAttribute("hP",0);
   }
 
-  void mitk::Transform::FromXML(TiXmlElement* elem)
+  void mitk::Transform::FromXML(const tinyxml2::XMLElement* elem)
   {
     assert(elem);
 
@@ -667,25 +669,28 @@ namespace mitk
     position.Fill(0.0);
     matrix.SetIdentity();
 
-    std::string type = Transform::UNKNOWN_TYPE;
-    elem->QueryStringAttribute("Type", &type);
+    const char* typeC = elem->Attribute("Type");
+    std::string type = nullptr == typeC
+      ? Transform::UNKNOWN_TYPE
+      : typeC;
+
     elem->QueryDoubleAttribute("Time",&timestamp);
 
     // position and orientation is mandatory!
-    if(elem->QueryDoubleAttribute("X", &position[0]) != TIXML_SUCCESS)
+    if(elem->QueryDoubleAttribute("X", &position[0]) != tinyxml2::XML_SUCCESS)
       throw std::invalid_argument("No X position found in xml");
-    if(elem->QueryDoubleAttribute("Y", &position[1]) != TIXML_SUCCESS)
+    if(elem->QueryDoubleAttribute("Y", &position[1]) != tinyxml2::XML_SUCCESS)
       throw std::invalid_argument("No Y position found in xml");
-    if(elem->QueryDoubleAttribute("Z", &position[2]) != TIXML_SUCCESS)
+    if(elem->QueryDoubleAttribute("Z", &position[2]) != tinyxml2::XML_SUCCESS)
       throw std::invalid_argument("No Z position found in xml");
 
-    if(elem->QueryDoubleAttribute("QX", &orientation[0]) != TIXML_SUCCESS)
+    if(elem->QueryDoubleAttribute("QX", &orientation[0]) != tinyxml2::XML_SUCCESS)
       throw std::invalid_argument("No QX orientation found in xml");
-    if(elem->QueryDoubleAttribute("QY", &orientation[1]) != TIXML_SUCCESS)
+    if(elem->QueryDoubleAttribute("QY", &orientation[1]) != tinyxml2::XML_SUCCESS)
       throw std::invalid_argument("No QY orientation found in xml");
-    if(elem->QueryDoubleAttribute("QZ", &orientation[2]) != TIXML_SUCCESS)
+    if(elem->QueryDoubleAttribute("QZ", &orientation[2]) != tinyxml2::XML_SUCCESS)
       throw std::invalid_argument("No QZ orientation found in xml");
-    if(elem->QueryDoubleAttribute("QR", &orientation[3]) != TIXML_SUCCESS)
+    if(elem->QueryDoubleAttribute("QR", &orientation[3]) != tinyxml2::XML_SUCCESS)
       throw std::invalid_argument("No QR orientation found in xml");
 
     elem->QueryDoubleAttribute("C00", &matrix[0][0]);

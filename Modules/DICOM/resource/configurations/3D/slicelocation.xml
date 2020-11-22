@@ -1,4 +1,4 @@
-<?xml version="1.0" standalone=no>
+<?xml version="1.0" standalone="no"?>
 <DICOMFileReader
   label="Slice Location"
   description="Sort images by Slice Location, require equal distance between locations"

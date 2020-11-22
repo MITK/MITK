@@ -11,15 +11,16 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkSceneReader.h"
+#include <tinyxml2.h>
 
-bool mitk::SceneReader::LoadScene(TiXmlDocument &document, const std::string &workingDirectory, DataStorage *storage)
+bool mitk::SceneReader::LoadScene(tinyxml2::XMLDocument &document, const std::string &workingDirectory, DataStorage *storage)
 {
   // find version node --> note version in some variable
   int fileVersion = 1;
-  TiXmlElement *versionObject = document.FirstChildElement("Version");
+  auto *versionObject = document.FirstChildElement("Version");
   if (versionObject)
   {
-    if (versionObject->QueryIntAttribute("FileVersion", &fileVersion) != TIXML_SUCCESS)
+    if (versionObject->QueryIntAttribute("FileVersion", &fileVersion) != tinyxml2::XML_SUCCESS)
     {
       MITK_ERROR << "Scene file " << workingDirectory + "/index.xml"
                  << " does not contain version information! Trying version 1 format." << std::endl;

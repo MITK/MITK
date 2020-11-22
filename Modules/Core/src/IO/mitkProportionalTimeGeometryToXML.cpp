@@ -23,7 +23,7 @@ tinyxml2::XMLElement *mitk::ProportionalTimeGeometryToXML::ToXML(tinyxml2::XMLDo
   assert(timeGeom);
 
   auto *timeGeomElem = doc.NewElement("ProportionalTimeGeometry");
-  timeGeomElem->SetAttribute("NumberOfTimeSteps", timeGeom->CountTimeSteps());
+  timeGeomElem->SetAttribute("NumberOfTimeSteps", static_cast<int>(timeGeom->CountTimeSteps()));
   // TinyXML cannot serialize infinity (default value for time step)
   // So we guard this value and the first time point against serialization problems
   // by not writing them. The reader can then tell that absence of those values
@@ -40,7 +40,7 @@ tinyxml2::XMLElement *mitk::ProportionalTimeGeometryToXML::ToXML(tinyxml2::XMLDo
     if ((geom3D = dynamic_cast<const Geometry3D *>(timeGeom->GetGeometryForTimeStep(t).GetPointer())))
     {
       auto *geom3DElement = Geometry3DToXML::ToXML(doc, geom3D);
-      geom3DElement->SetAttribute("TimeStep", t); // mark order for us
+      geom3DElement->SetAttribute("TimeStep", static_cast<int>(t)); // mark order for us
       timeGeomElem->InsertEndChild(geom3DElement);
     }
     else

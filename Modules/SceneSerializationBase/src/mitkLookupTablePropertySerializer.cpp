@@ -38,7 +38,7 @@ tinyxml2::XMLElement *mitk::LookupTablePropertySerializer::Serialize(tinyxml2::X
     double *range;
     double *rgba;
 
-    element->SetAttribute("NumberOfColors", lut->GetNumberOfTableValues());
+    element->SetAttribute("NumberOfColors", static_cast<int>(lut->GetNumberOfTableValues()));
     element->SetAttribute("Scale", lut->GetScale());
     element->SetAttribute("Ramp", lut->GetRamp());
 

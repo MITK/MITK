@@ -241,7 +241,7 @@ void mitk::CameraIntrinsics::ToXML(tinyxml2::XMLElement* elem) const
   elem->SetAttribute( "p1", s.str().c_str());
   s.str(""); s << DistorsionCoeffs.at<double>(0,3);
   elem->SetAttribute( "p2", s.str().c_str());
-  elem->SetAttribute("Valid", m_Valid);
+  elem->SetAttribute("Valid", static_cast<int>(m_Valid));
   //s.str(""); s << DistorsionCoeffs.at<double>(4,0);
   //elem->SetAttribute( "k3", s.str().c_str() );
 }

@@ -82,11 +82,6 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::ContourModelReader::DoRead(
         mitk::ContourModel::Pointer newContourModel = mitk::ContourModel::New();
         if (currentContourElement->FirstChildElement("data")->FirstChildElement("timestep") != nullptr)
         {
-          // handle geometry information
-          // TiXmlElement* currentGeometryInfo =
-          // currentContourElement->FirstChildElement("head")->FirstChildElement("geometryInformation")->ToElement();
-          ///////////// NOT SUPPORTED YET ////////////////
-
           /*++++ handle n timesteps within timestep tags ++++*/
           for (auto *currentTimeSeries =
                  currentContourElement->FirstChildElement("data")->FirstChildElement("timestep")->ToElement();

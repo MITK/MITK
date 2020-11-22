@@ -421,7 +421,7 @@ bool mitk::SceneReaderV1::DecorateBaseDataWithProperties(BaseData::Pointer data,
   }
   else
   {
-    MITK_ERROR << "Function DecorateBaseDataWithProperties(...) called with false TiXmlElement. \n \t ->Given element "
+    MITK_ERROR << "Function DecorateBaseDataWithProperties(...) called with false XML element. \n \t ->Given element "
                   "does not contain a 'file' attribute. \n";
     error = true;
   }

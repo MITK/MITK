@@ -18,9 +18,6 @@ found in the LICENSE file.
 #include <mitkPropertyList.h>
 #include <mitkVector.h>
 
-class TiXmlDocument;
-class TiXmlElement;
-
 namespace mitk
 {
   //##

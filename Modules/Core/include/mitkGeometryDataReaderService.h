@@ -17,8 +17,6 @@ found in the LICENSE file.
 #include <mitkAbstractFileReader.h>
 #include <mitkGeometryData.h>
 
-class TiXmlElement;
-
 namespace mitk
 {
   /**

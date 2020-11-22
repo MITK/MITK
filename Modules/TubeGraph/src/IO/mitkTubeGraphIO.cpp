@@ -389,7 +389,7 @@ namespace mitk
         {
           auto *vertexXML = documentXML.NewElement(mitk::TubeGraphDefinitions::XML_VERTEX.c_str());
           vertexXML->SetAttribute(mitk::TubeGraphDefinitions::XML_VERTEX_ID.c_str(),
-                                  tubeGraph->GetVertexDescriptor(vertexVector[index]));
+                                  static_cast<int>(tubeGraph->GetVertexDescriptor(vertexVector[index])));
           // element of each vertex
           const mitk::TubeElement *element = vertexVector[index].GetTubeElement();
           auto *elementXML = documentXML.NewElement(mitk::TubeGraphDefinitions::XML_ELEMENT.c_str());
@@ -423,9 +423,9 @@ namespace mitk
           std::pair<mitk::TubeGraphVertex, mitk::TubeGraphVertex> soureTargetPair =
             tubeGraph->GetVerticesOfAnEdge(tubeGraph->GetEdgeDescriptor(edgeVector[index]));
           edgeXML->SetAttribute(mitk::TubeGraphDefinitions::XML_EDGE_SOURCE_ID.c_str(),
-                                tubeGraph->GetVertexDescriptor(soureTargetPair.first));
+            static_cast<int>(tubeGraph->GetVertexDescriptor(soureTargetPair.first)));
           edgeXML->SetAttribute(mitk::TubeGraphDefinitions::XML_EDGE_TARGET_ID.c_str(),
-                                tubeGraph->GetVertexDescriptor(soureTargetPair.second));
+            static_cast<int>(tubeGraph->GetVertexDescriptor(soureTargetPair.second)));
 
           // begin elements of the edge
           std::vector<mitk::TubeElement *> elementVector = edgeVector[index].GetElementVector();
@@ -491,8 +491,8 @@ namespace mitk
              it++)
         {
           auto *attributXML = documentXML.NewElement(mitk::TubeGraphDefinitions::XML_ATTRIBUTION.c_str());
-          attributXML->SetAttribute(mitk::TubeGraphDefinitions::XML_TUBE_ID_1.c_str(), it->first.first.first);
-          attributXML->SetAttribute(mitk::TubeGraphDefinitions::XML_TUBE_ID_2.c_str(), it->first.first.second);
+          attributXML->SetAttribute(mitk::TubeGraphDefinitions::XML_TUBE_ID_1.c_str(), static_cast<int>(it->first.first.first));
+          attributXML->SetAttribute(mitk::TubeGraphDefinitions::XML_TUBE_ID_2.c_str(), static_cast<int>(it->first.first.second));
           attributXML->SetAttribute(mitk::TubeGraphDefinitions::XML_LABELGROUP_NAME.c_str(), it->first.second.c_str());
           attributXML->SetAttribute(mitk::TubeGraphDefinitions::XML_LABEL_NAME.c_str(), it->second.c_str());
           attributionsXML->InsertEndChild(attributXML);
@@ -509,8 +509,8 @@ namespace mitk
           auto *annotationXML = documentXML.NewElement(mitk::TubeGraphDefinitions::XML_ANNOTATION.c_str());
           annotationXML->SetAttribute(mitk::TubeGraphDefinitions::XML_ANNOTATION_NAME.c_str(), annotations[index]->name.c_str());
           annotationXML->SetAttribute(mitk::TubeGraphDefinitions::XML_ANNOTATION_DESCRIPTION.c_str(), annotations[index]->description.c_str());
-          annotationXML->SetAttribute(mitk::TubeGraphDefinitions::XML_TUBE_ID_1.c_str(), annotations[index]->tube.first);
-          annotationXML->SetAttribute(mitk::TubeGraphDefinitions::XML_TUBE_ID_2.c_str(), annotations[index]->tube.second);
+          annotationXML->SetAttribute(mitk::TubeGraphDefinitions::XML_TUBE_ID_1.c_str(), static_cast<int>(annotations[index]->tube.first));
+          annotationXML->SetAttribute(mitk::TubeGraphDefinitions::XML_TUBE_ID_2.c_str(), static_cast<int>(annotations[index]->tube.second));
 
           annotationsXML->InsertEndChild(annotationXML);
         }

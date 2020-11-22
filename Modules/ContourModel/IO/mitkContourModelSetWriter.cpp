@@ -57,10 +57,13 @@ void mitk::ContourModelSetWriter::Write()
     mitkThrow() << "Stream not good.";
   }
 
+  *out << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+
   // Use regular ContourModel writer to write each contour of the set to a single file.
   // Just use a different file extension .cnt_set
 
-  mitk::ContourModelWriter writer;
+  bool writeXMLHeader = false;
+  mitk::ContourModelWriter writer(writeXMLHeader);
 
   mitk::ContourModelSet::ConstPointer contourModelSet = dynamic_cast<const mitk::ContourModelSet *>(this->GetInput());
 

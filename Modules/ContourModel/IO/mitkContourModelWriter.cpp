@@ -64,8 +64,8 @@ const char *mitk::ContourModelWriter::XML_Y = "y";
 
 const char *mitk::ContourModelWriter::XML_Z = "z";
 
-mitk::ContourModelWriter::ContourModelWriter()
-  : AbstractFileWriter(ContourModel::GetStaticNameOfClass()), m_IndentDepth(0), m_Indent(2)
+mitk::ContourModelWriter::ContourModelWriter(bool writeXMLHeader)
+  : AbstractFileWriter(ContourModel::GetStaticNameOfClass()), m_WriteXMLHeader(writeXMLHeader), m_IndentDepth(0), m_Indent(2)
 {
   std::string category = "Contour File";
   mitk::CustomMimeType customMimeType;
@@ -108,13 +108,13 @@ void mitk::ContourModelWriter::Write()
   }
 
   std::locale previousLocale(out->getloc());
-  std::locale I("C");
-  out->imbue(I);
+  out->imbue(std::locale::classic());
 
   /*+++++++++++ Here the actual xml writing begins +++++++++*/
 
   /*++++ <?xml version="1.0" encoding="utf-8"?> ++++*/
-  WriteXMLHeader(*out);
+  if (m_WriteXMLHeader)
+    WriteXMLHeader(*out);
 
   //
   // for each input object write its xml representation to

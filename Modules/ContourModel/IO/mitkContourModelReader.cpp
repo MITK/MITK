@@ -13,9 +13,28 @@ found in the LICENSE file.
 #include "mitkContourModelReader.h"
 #include <fstream>
 #include <iostream>
+#include <regex>
 #include <mitkCustomMimeType.h>
 #include <mitkLocaleSwitch.h>
 #include <tinyxml2.h>
+
+namespace
+{
+  // Previous versions of the ContourModelSetWriter produced flawed
+  // XML files with multiple XML declarations.
+  std::string RemoveErroneousXMLDeclarations(const std::string& filename)
+  {
+    std::ifstream file(filename);
+    file.seekg(0, std::ios_base::end);
+    auto size = file.tellg();
+    std::string string(size, '\0');
+    file.seekg(0);
+    file.read(&string[0], size);
+    file.close();
+    std::regex regex("><\\?xml.+\\?>");
+    return std::regex_replace(string, regex, ">");
+  }
+}
 
 mitk::ContourModelReader::ContourModelReader(const mitk::ContourModelReader &other) : mitk::AbstractFileReader(other)
 {
@@ -48,8 +67,10 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::ContourModelReader::DoRead(
 
   try
   {
+    auto string = RemoveErroneousXMLDeclarations(location);
+
     tinyxml2::XMLDocument doc;
-    if (tinyxml2::XML_SUCCESS == doc.LoadFile(location.c_str()))
+    if (tinyxml2::XML_SUCCESS == doc.Parse(string.c_str()))
     {
       tinyxml2::XMLHandle docHandle(&doc);
 

@@ -205,7 +205,7 @@ namespace mitk
 
     doc.InsertEndChild(propertyListsElem);
 
-    return (allPropsConverted && doc.SaveFile(fileName.c_str()));
+    return (allPropsConverted && tinyxml2::XML_SUCCESS == doc.SaveFile(fileName.c_str()));
   }
 
   bool PropertyListsXmlFileReaderAndWriter::ReadLists(const std::string &fileName,
@@ -230,6 +230,8 @@ namespace mitk
       std::string propListId = ReadStringAttribute(elem, GetPropertyListIdElementName());
       if (propListId.empty())
         break;
+
+      opRead = true;
 
       auto propList = mitk::PropertyList::New();
 

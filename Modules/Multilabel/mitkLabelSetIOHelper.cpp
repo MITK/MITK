@@ -53,7 +53,7 @@ bool mitk::LabelSetIOHelper::SaveLabelSetImagePreset(const std::string &presetFi
       layerElement->InsertEndChild(LabelSetIOHelper::GetLabelAsXMLElement(xmlDocument, inputImage->GetLabel(labelIndex, layerIndex)));
   }
 
-  return xmlDocument.SaveFile(filename.c_str());
+  return tinyxml2::XML_SUCCESS == xmlDocument.SaveFile(filename.c_str());
 }
 
 void mitk::LabelSetIOHelper::LoadLabelSetImagePreset(const std::string &presetFilename,

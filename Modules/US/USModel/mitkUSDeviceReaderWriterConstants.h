@@ -14,39 +14,44 @@ found in the LICENSE file.
 #ifndef mitkUSDeviceReaderWriterConstants_H_HEADER_INCLUDED_
 #define mitkUSDeviceReaderWriterConstants_H_HEADER_INCLUDED_
 
-const static char* TAG_ULTRASOUNDDEVICE = "ULTRASOUNDDEVICE";
-const static char* TAG_GENERALSETTINGS = "GENERALSETTINGS";
-const static char* TAG_PROBES = "PROBES";
-const static char* TAG_PROBE = "PROBE";
-const static char* TAG_DEPTHS = "DEPTHS";
-const static char* TAG_DEPTH = "DEPTH";
-const static char* TAG_SPACING = "SPACING";
-const static char* TAG_CROPPING = "CROPPING";
+namespace mitk
+{
+  struct USDeviceReaderWriterConstants
+  {
+    static const char* TAG_ULTRASOUNDDEVICE;
+    static const char* TAG_GENERALSETTINGS;
+    static const char* TAG_PROBES;
+    static const char* TAG_PROBE;
+    static const char* TAG_DEPTHS;
+    static const char* TAG_DEPTH;
+    static const char* TAG_SPACING;
+    static const char* TAG_CROPPING;
 
-const static char* ATTR_FILEVERS = "filevers";
-const static char* ATTR_TYPE = "type";
-const static char* ATTR_HOST = "host";
-const static char* ATTR_PORT = "port";
-const static char* ATTR_SERVER = "server";
-const static char* ATTR_NAME = "name";
-const static char* ATTR_MANUFACTURER = "manufacturer";
-const static char* ATTR_MODEL = "model";
-const static char* ATTR_COMMENT = "comment";
-const static char* ATTR_IMAGESTREAMS = "imagestreams";
-const static char* ATTR_GREYSCALE = "greyscale";
-const static char* ATTR_RESOLUTIONOVERRIDE = "resolutionOverride";
-const static char* ATTR_RESOLUTIONWIDTH = "resolutionWidth";
-const static char* ATTR_RESOLUTIONHEIGHT = "resolutionHeight";
-const static char* ATTR_SOURCEID = "sourceID";
-const static char* ATTR_FILEPATH = "filepath";
-const static char* ATTR_OPENCVPORT = "opencvPort";
-const static char* ATTR_DEPTH = "depth";
-const static char* ATTR_X = "x";
-const static char* ATTR_Y = "y";
-const static char* ATTR_TOP = "top";
-const static char* ATTR_BOTTOM = "bottom";
-const static char* ATTR_LEFT = "left";
-const static char* ATTR_RIGHT = "right";
-
+    static const char* ATTR_FILEVERS;
+    static const char* ATTR_TYPE;
+    static const char* ATTR_HOST;
+    static const char* ATTR_PORT;
+    static const char* ATTR_SERVER;
+    static const char* ATTR_NAME;
+    static const char* ATTR_MANUFACTURER;
+    static const char* ATTR_MODEL;
+    static const char* ATTR_COMMENT;
+    static const char* ATTR_IMAGESTREAMS;
+    static const char* ATTR_GREYSCALE;
+    static const char* ATTR_RESOLUTIONOVERRIDE;
+    static const char* ATTR_RESOLUTIONWIDTH;
+    static const char* ATTR_RESOLUTIONHEIGHT;
+    static const char* ATTR_SOURCEID;
+    static const char* ATTR_FILEPATH;
+    static const char* ATTR_OPENCVPORT;
+    static const char* ATTR_DEPTH;
+    static const char* ATTR_X;
+    static const char* ATTR_Y;
+    static const char* ATTR_TOP;
+    static const char* ATTR_BOTTOM;
+    static const char* ATTR_LEFT;
+    static const char* ATTR_RIGHT;
+  };
+}
 
 #endif // mitkUSDeviceReaderWriterConstants_H_HEADER_INCLUDED_

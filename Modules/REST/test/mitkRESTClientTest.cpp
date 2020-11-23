@@ -24,6 +24,8 @@ found in the LICENSE file.
 
 #include <vtkDebugLeaks.h>
 
+#include <atomic>
+
 class mitkRESTClientTestSuite : public mitk::TestFixture, mitk::IRESTObserver
 {
   CPPUNIT_TEST_SUITE(mitkRESTClientTestSuite);
@@ -104,7 +106,7 @@ public:
 
   void MultipleGetRequestValidURI_AllTasksFinish()
   {
-    int count = 0;
+    std::atomic<int> count {0};
 
     // Create multiple tasks e.g. as shown below
     std::vector<pplx::task<void>> tasks;

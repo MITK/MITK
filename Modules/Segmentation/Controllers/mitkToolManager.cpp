@@ -67,6 +67,8 @@ mitk::ToolManager::~ToolManager()
 
 void mitk::ToolManager::InitializeTools()
 {
+  overwirteWorkingData = nullptr;
+
   if (m_ActiveTool) {
     m_ActiveTool->Deactivated();
     m_ActiveToolRegistration.Unregister();
@@ -441,6 +443,10 @@ void mitk::ToolManager::SetDataStorage(DataStorage& storage)
 
 mitk::DataNode* mitk::ToolManager::GetWorkingData(int idx)
 {
+  if (overwirteWorkingData) {
+    return overwirteWorkingData;
+  }
+
   try
   {
     return m_WorkingData.at(idx);

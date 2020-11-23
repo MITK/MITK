@@ -99,6 +99,8 @@ class MITKSEGMENTATION_EXPORT ToolManager : public itk::Object
     mitkClassMacroItkParent(ToolManager, itk::Object);
     mitkNewMacro1Param(ToolManager, DataStorage*);
 
+    DataNode::Pointer overwirteWorkingData; // Overwrites at index 0
+
     /**
       \brief Gives you a list of all tools.
       This is const on purpose.

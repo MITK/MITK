@@ -1,0 +1,8 @@
+<RCC>
+  <qresource prefix="/SegmentationUI">
+    <file>difference.png</file>
+    <file>intersection.png</file>
+    <file>subtract.png</file>
+    <file>union.png</file>
+  </qresource>
+</RCC>

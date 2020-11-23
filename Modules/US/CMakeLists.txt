@@ -15,7 +15,6 @@ endif()
 #CONFIGURE_FILE(mitkUSConfig.h.in ${PROJECT_BINARY_DIR}/mitkUSConfig.h @ONLY)
 
 ADD_SUBDIRECTORY(USHardwareTelemed)
-ADD_SUBDIRECTORY(USHardwareDiPhAS)
 ADD_SUBDIRECTORY(USNavigation)
 
 ADD_SUBDIRECTORY(Testing)

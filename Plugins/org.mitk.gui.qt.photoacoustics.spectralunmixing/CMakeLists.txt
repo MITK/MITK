@@ -1,7 +1,0 @@
-project(org_mitk_gui_qt_photoacoustics_spectralunmixing)
-
-mitk_create_plugin(
-  EXPORT_DIRECTIVE SPECTRALUNMIXING_EXPORT
-  EXPORTED_INCLUDE_SUFFIXES src
-  MODULE_DEPENDS MitkQtWidgetsExt MitkPhotoacousticsLib
-)

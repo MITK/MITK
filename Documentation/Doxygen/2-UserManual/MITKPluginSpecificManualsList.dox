@@ -24,9 +24,7 @@
   \li \subpage org_mitk_gui_qt_mitkphenotyping
   \li \subpage org_mitk_gui_qt_preprocessing_resampling
   \li \subpage org_mitk_views_pharmacokinetics_curvedescriptor
-  \li \subpage org_mitk_views_photoacoustics_imageprocessing
   \li \subpage org_mitk_gui_qt_pharmacokinetics_simulation
-  \li \subpage org_mitk_gui_qt_photoacoustics_spectralunmixing
   \li \subpage org_surfacematerialeditor
   \li \subpage org_blueberry_ui_qt_objectinspector
   \li \subpage org_toftutorial

@@ -1,4 +1,4 @@
-<?xml version="1.0" standalone=no>
+<?xml version="1.0" standalone="no"?>
 <DICOMFileReader
   label="DKFZ internal CEST image configuration"
   description="Based on ClassicDICOMSeriesReader for 3D+t images"

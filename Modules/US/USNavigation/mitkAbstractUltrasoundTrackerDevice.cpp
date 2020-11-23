@@ -31,7 +31,7 @@ found in the LICENSE file.
 #include <algorithm>
 
 // TempIncludes
-#include <tinyxml.h>
+#include <tinyxml2.h>
 
 const std::string mitk::AbstractUltrasoundTrackerDevice::DeviceClassIdentifier =
   "org.mitk.modules.us.AbstractUltrasoundTrackerDevice";
@@ -225,8 +225,10 @@ bool mitk::AbstractUltrasoundTrackerDevice::GetContainsAtLeastOneCalibration()
 
 std::string mitk::AbstractUltrasoundTrackerDevice::SerializeCalibration()
 {
-  std::stringstream result;
-  result << "<calibrations>" << std::endl;
+  tinyxml2::XMLDocument doc;
+  auto* calibrations = doc.NewElement("calibrations");
+  doc.InsertEndChild(calibrations);
+
   // For each calibration in the set
   for (std::map<std::string, mitk::AffineTransform3D::Pointer>::iterator it = m_Calibrations.begin();
        it != m_Calibrations.end();
@@ -234,27 +236,29 @@ std::string mitk::AbstractUltrasoundTrackerDevice::SerializeCalibration()
   {
     mitk::AffineTransform3D::MatrixType matrix = it->second->GetMatrix();
     mitk::AffineTransform3D::TranslationType translation = it->second->GetTranslation();
-    TiXmlElement elem(it->first);
+    auto *elem = doc.NewElement(it->first.c_str());
     // Serialize Matrix
-    elem.SetDoubleAttribute("M00", matrix[0][0]);
-    elem.SetDoubleAttribute("M01", matrix[0][1]);
-    elem.SetDoubleAttribute("M02", matrix[0][2]);
-    elem.SetDoubleAttribute("M10", matrix[1][0]);
-    elem.SetDoubleAttribute("M11", matrix[1][1]);
-    elem.SetDoubleAttribute("M12", matrix[1][2]);
-    elem.SetDoubleAttribute("M20", matrix[2][0]);
-    elem.SetDoubleAttribute("M21", matrix[2][1]);
-    elem.SetDoubleAttribute("M22", matrix[2][2]);
+    elem->SetAttribute("M00", matrix[0][0]);
+    elem->SetAttribute("M01", matrix[0][1]);
+    elem->SetAttribute("M02", matrix[0][2]);
+    elem->SetAttribute("M10", matrix[1][0]);
+    elem->SetAttribute("M11", matrix[1][1]);
+    elem->SetAttribute("M12", matrix[1][2]);
+    elem->SetAttribute("M20", matrix[2][0]);
+    elem->SetAttribute("M21", matrix[2][1]);
+    elem->SetAttribute("M22", matrix[2][2]);
     // Serialize Offset
-    elem.SetDoubleAttribute("T0", translation[0]);
-    elem.SetDoubleAttribute("T1", translation[1]);
-    elem.SetDoubleAttribute("T2", translation[2]);
+    elem->SetAttribute("T0", translation[0]);
+    elem->SetAttribute("T1", translation[1]);
+    elem->SetAttribute("T2", translation[2]);
 
-    result << elem << std::endl;
+    calibrations->InsertEndChild(elem);
   }
-  result << "</calibrations>" << std::endl;
 
-  return result.str();
+  tinyxml2::XMLPrinter printer;
+  doc.Print(&printer);
+
+  return printer.CStr();
 }
 
 void mitk::AbstractUltrasoundTrackerDevice::DeserializeCalibration(const std::string &xmlString,
@@ -272,14 +276,14 @@ void mitk::AbstractUltrasoundTrackerDevice::DeserializeCalibration(const std::st
     m_Calibrations.clear();
 
   // Parse Input
-  TiXmlDocument doc;
-  if (!doc.Parse(xmlString.c_str()))
+  tinyxml2::XMLDocument doc;
+  if (tinyxml2::XML_SUCCESS != doc.Parse(xmlString.c_str()))
   {
-    MITK_ERROR << "Unable to deserialize calibrations in CombinedModality. Error was: " << doc.ErrorDesc();
-    mitkThrow() << "Unable to deserialize calibrations in CombinedModality. Error was: " << doc.ErrorDesc();
+    MITK_ERROR << "Unable to deserialize calibrations in CombinedModality. Error was: " << doc.ErrorStr();
+    mitkThrow() << "Unable to deserialize calibrations in CombinedModality. Error was: " << doc.ErrorStr();
     return;
   }
-  TiXmlElement *root = doc.FirstChildElement();
+  auto *root = doc.FirstChildElement();
   if (root == nullptr)
   {
     MITK_ERROR << "Unable to deserialize calibrations in CombinedModality. String contained no root element.";
@@ -287,7 +291,7 @@ void mitk::AbstractUltrasoundTrackerDevice::DeserializeCalibration(const std::st
     return;
   }
   // Read Calibrations
-  for (TiXmlElement *elem = root->FirstChildElement(); elem != nullptr; elem = elem->NextSiblingElement())
+  for (auto *elem = root->FirstChildElement(); elem != nullptr; elem = elem->NextSiblingElement())
   {
     mitk::AffineTransform3D::MatrixType matrix;
     mitk::AffineTransform3D::OffsetType translation;

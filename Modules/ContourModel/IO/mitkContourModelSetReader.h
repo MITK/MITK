@@ -21,7 +21,6 @@ found in the LICENSE file.
 
 #include <stack>
 #include <string>
-#include <tinyxml.h>
 #include <vtkXMLParser.h>
 
 namespace mitk

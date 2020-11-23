@@ -18,8 +18,11 @@ found in the LICENSE file.
 #include <mitkAbstractFileWriter.h>
 #include <mitkUSDeviceReaderXML.h>
 
-class TiXmlDocument;
-class TiXmlElement;
+namespace tinyxml2
+{
+  class XMLDocument;
+  class XMLElement;
+}
 
 namespace mitk {
   class MITKUS_EXPORT USDeviceWriterXML : public AbstractFileWriter
@@ -53,8 +56,8 @@ namespace mitk {
     * \param ultrasoundDeviceTag The ULTRASOUNDDEVICETAG which should be created.
     * \param config The struct containing all information of the ultrasound device.
     */
-    void CreateXmlInformationOfUltrasoundDeviceTag( TiXmlDocument &document,
-                                                    TiXmlElement *ultrasoundDeviceTag,
+    void CreateXmlInformationOfUltrasoundDeviceTag( tinyxml2::XMLDocument &document,
+                                                    tinyxml2::XMLElement *ultrasoundDeviceTag,
                                                     mitk::USDeviceReaderXML::USDeviceConfigData &config);
 
     /**
@@ -63,8 +66,8 @@ namespace mitk {
     * \param generalSettingsTag The GENERALSETTINGS-Tag which should be created.
     * \param config The struct containing all information of the ultrasound device.
     */
-    void CreateXmlInformationOfGeneralSettingsTag( TiXmlElement *parentTag,
-                                                   TiXmlElement *generalSettingsTag,
+    void CreateXmlInformationOfGeneralSettingsTag( tinyxml2::XMLElement *parentTag,
+                                                   tinyxml2::XMLElement *generalSettingsTag,
                                                    mitk::USDeviceReaderXML::USDeviceConfigData &config);
 
     /**
@@ -73,7 +76,7 @@ namespace mitk {
     * \param parentTag The xml parent tag of the GENERALSETTINGS-Tag. This is the ULTRASOUNDDEVICE-Tag.
     * \param config The struct containing all information of the ultrasound device.
     */
-    void CreateXmlInformationOfProbesTag( TiXmlElement *parentTag,
+    void CreateXmlInformationOfProbesTag( tinyxml2::XMLElement*parentTag,
                                           mitk::USDeviceReaderXML::USDeviceConfigData &config);
   private:
     /**

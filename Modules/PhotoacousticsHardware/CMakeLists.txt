@@ -13,8 +13,14 @@ if(WIN32)
       DEPENDS MitkIGT
       INCLUDE_DIRS PUBLIC "${MITK_GALIL_API_PATH}/include" "${MITK_OPHIR_API_PATH}"
       INTERNAL_INCLUDE_DIRS ${INCLUDE_DIRS_INTERNAL}
-      ADDITIONAL_LIBS "${MITK_GALIL_API_PATH}/lib/dynamic/x64/gclib.lib" "${MITK_GALIL_API_PATH}/lib/dynamic/x64/gclibo.lib" tinyxml "${MITK_OPHIR_API_PATH}/OphirPyroWrapper.lib"
-      PACKAGE_DEPENDS tinyxml
+      ADDITIONAL_LIBS "${MITK_GALIL_API_PATH}/lib/dynamic/x64/gclib.lib" "${MITK_GALIL_API_PATH}/lib/dynamic/x64/gclibo.lib" "${MITK_OPHIR_API_PATH}/OphirPyroWrapper.lib"
+      PACKAGE_DEPENDS tinyxml2|tinyxml2
     )
+
+    if(TARGET ${MODULE_TARGET})
+      target_link_libraries(${MODULE_TARGET}
+        PRIVATE tinyxml2::tinyxml2
+      )
+    endif()
   endif()
 endif()

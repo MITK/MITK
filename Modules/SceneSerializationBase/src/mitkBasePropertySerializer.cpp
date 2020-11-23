@@ -20,14 +20,13 @@ mitk::BasePropertySerializer::~BasePropertySerializer()
 {
 }
 
-TiXmlElement *mitk::BasePropertySerializer::Serialize()
+tinyxml2::XMLElement *mitk::BasePropertySerializer::Serialize(tinyxml2::XMLDocument&)
 {
   MITK_INFO << this->GetNameOfClass() << " is asked to serialize an object " << (const void *)this->m_Property;
-
   return nullptr;
 }
 
-mitk::BaseProperty::Pointer mitk::BasePropertySerializer::Deserialize(TiXmlElement *)
+mitk::BaseProperty::Pointer mitk::BasePropertySerializer::Deserialize(const tinyxml2::XMLElement *)
 {
   MITK_ERROR << this->GetNameOfClass() << " is asked to deserialize an object but has no implementation. This is bad.";
   return nullptr;

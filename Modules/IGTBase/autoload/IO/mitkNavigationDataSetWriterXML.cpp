@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include <mitkLocaleSwitch.h>
 
 // Third Party
-#include <tinyxml.h>
+#include <tinyxml2.h>
 #include <itksys/SystemTools.hxx>
 #include <fstream>
 #include <iostream>
@@ -84,32 +84,33 @@ void mitk::NavigationDataSetWriterXML::StreamData (std::ostream* stream, mitk::N
     for (std::size_t toolIndex = 0; toolIndex < it->size(); toolIndex++)
     {
       mitk::NavigationData::Pointer nd = it->at(toolIndex);
-      auto  elem = new TiXmlElement("ND");
+      tinyxml2::XMLDocument doc;
+      auto *elem = doc.NewElement("ND");
 
-      elem->SetDoubleAttribute("Time", nd->GetIGTTimeStamp());
+      elem->SetAttribute("Time", nd->GetIGTTimeStamp());
       // elem->SetAttribute("SystemTime", sysTimeStr); // tag for system time
-      elem->SetDoubleAttribute("Tool", toolIndex);
-      elem->SetDoubleAttribute("X", nd->GetPosition()[0]);
-      elem->SetDoubleAttribute("Y", nd->GetPosition()[1]);
-      elem->SetDoubleAttribute("Z", nd->GetPosition()[2]);
+      elem->SetAttribute("Tool", static_cast<int>(toolIndex));
+      elem->SetAttribute("X", nd->GetPosition()[0]);
+      elem->SetAttribute("Y", nd->GetPosition()[1]);
+      elem->SetAttribute("Z", nd->GetPosition()[2]);
 
-      elem->SetDoubleAttribute("QX", nd->GetOrientation()[0]);
-      elem->SetDoubleAttribute("QY", nd->GetOrientation()[1]);
-      elem->SetDoubleAttribute("QZ", nd->GetOrientation()[2]);
-      elem->SetDoubleAttribute("QR", nd->GetOrientation()[3]);
+      elem->SetAttribute("QX", nd->GetOrientation()[0]);
+      elem->SetAttribute("QY", nd->GetOrientation()[1]);
+      elem->SetAttribute("QZ", nd->GetOrientation()[2]);
+      elem->SetAttribute("QR", nd->GetOrientation()[3]);
 
-      elem->SetDoubleAttribute("C00", nd->GetCovErrorMatrix()[0][0]);
-      elem->SetDoubleAttribute("C01", nd->GetCovErrorMatrix()[0][1]);
-      elem->SetDoubleAttribute("C02", nd->GetCovErrorMatrix()[0][2]);
-      elem->SetDoubleAttribute("C03", nd->GetCovErrorMatrix()[0][3]);
-      elem->SetDoubleAttribute("C04", nd->GetCovErrorMatrix()[0][4]);
-      elem->SetDoubleAttribute("C05", nd->GetCovErrorMatrix()[0][5]);
-      elem->SetDoubleAttribute("C10", nd->GetCovErrorMatrix()[1][0]);
-      elem->SetDoubleAttribute("C11", nd->GetCovErrorMatrix()[1][1]);
-      elem->SetDoubleAttribute("C12", nd->GetCovErrorMatrix()[1][2]);
-      elem->SetDoubleAttribute("C13", nd->GetCovErrorMatrix()[1][3]);
-      elem->SetDoubleAttribute("C14", nd->GetCovErrorMatrix()[1][4]);
-      elem->SetDoubleAttribute("C15", nd->GetCovErrorMatrix()[1][5]);
+      elem->SetAttribute("C00", nd->GetCovErrorMatrix()[0][0]);
+      elem->SetAttribute("C01", nd->GetCovErrorMatrix()[0][1]);
+      elem->SetAttribute("C02", nd->GetCovErrorMatrix()[0][2]);
+      elem->SetAttribute("C03", nd->GetCovErrorMatrix()[0][3]);
+      elem->SetAttribute("C04", nd->GetCovErrorMatrix()[0][4]);
+      elem->SetAttribute("C05", nd->GetCovErrorMatrix()[0][5]);
+      elem->SetAttribute("C10", nd->GetCovErrorMatrix()[1][0]);
+      elem->SetAttribute("C11", nd->GetCovErrorMatrix()[1][1]);
+      elem->SetAttribute("C12", nd->GetCovErrorMatrix()[1][2]);
+      elem->SetAttribute("C13", nd->GetCovErrorMatrix()[1][3]);
+      elem->SetAttribute("C14", nd->GetCovErrorMatrix()[1][4]);
+      elem->SetAttribute("C15", nd->GetCovErrorMatrix()[1][5]);
 
       if (nd->IsDataValid())
         elem->SetAttribute("Valid",1);
@@ -126,9 +127,10 @@ void mitk::NavigationDataSetWriterXML::StreamData (std::ostream* stream, mitk::N
       else
         elem->SetAttribute("hP",0);
 
-      *stream << "        " << *elem << std::endl;
+      tinyxml2::XMLPrinter printer;
+      doc.Print(&printer);
 
-      delete elem;
+      *stream << "        " << printer.CStr() << std::endl;
     }
   }
 }

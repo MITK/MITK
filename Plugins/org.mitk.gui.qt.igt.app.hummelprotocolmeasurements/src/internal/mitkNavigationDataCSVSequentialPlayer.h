@@ -15,8 +15,6 @@ found in the LICENSE file.
 #define MITKNavigationDataCSVSequentialPlayer_H_HEADER_INCLUDED_
 
 #include <mitkNavigationDataPlayerBase.h>
-#include "tinyxml.h"
-
 
 namespace mitk
 {

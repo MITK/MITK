@@ -14,7 +14,8 @@ found in the LICENSE file.
 
 #include "mitkLabelSetImage.h"
 #include <mitkBasePropertySerializer.h>
-#include <tinyxml.h>
+
+#include <tinyxml2.h>
 
 namespace
 {
@@ -34,25 +35,25 @@ bool mitk::LabelSetIOHelper::SaveLabelSetImagePreset(const std::string &presetFi
 {
   const auto filename = EnsureExtension(presetFilename);
 
-  TiXmlDocument xmlDocument;
-  xmlDocument.LinkEndChild(new TiXmlDeclaration("1.0", "", ""));
+  tinyxml2::XMLDocument xmlDocument;
+  xmlDocument.InsertEndChild(xmlDocument.NewDeclaration());
 
-  auto *rootElement = new TiXmlElement("LabelSetImagePreset");
+  auto *rootElement = xmlDocument.NewElement("LabelSetImagePreset");
   rootElement->SetAttribute("layers", inputImage->GetNumberOfLayers());
-  xmlDocument.LinkEndChild(rootElement);
+  xmlDocument.InsertEndChild(rootElement);
 
   for (unsigned int layerIndex = 0; layerIndex < inputImage->GetNumberOfLayers(); layerIndex++)
   {
-    auto *layerElement = new TiXmlElement("Layer");
+    auto *layerElement = xmlDocument.NewElement("Layer");
     layerElement->SetAttribute("index", layerIndex);
     layerElement->SetAttribute("labels", inputImage->GetNumberOfLabels(layerIndex));
-    rootElement->LinkEndChild(layerElement);
+    rootElement->InsertEndChild(layerElement);
 
     for (unsigned int labelIndex = 0; labelIndex < inputImage->GetNumberOfLabels(layerIndex); labelIndex++)
-      layerElement->LinkEndChild(LabelSetIOHelper::GetLabelAsTiXmlElement(inputImage->GetLabel(labelIndex, layerIndex)));
+      layerElement->InsertEndChild(LabelSetIOHelper::GetLabelAsXMLElement(xmlDocument, inputImage->GetLabel(labelIndex, layerIndex)));
   }
 
-  return xmlDocument.SaveFile(filename);
+  return tinyxml2::XML_SUCCESS == xmlDocument.SaveFile(filename.c_str());
 }
 
 void mitk::LabelSetIOHelper::LoadLabelSetImagePreset(const std::string &presetFilename,
@@ -63,9 +64,9 @@ void mitk::LabelSetIOHelper::LoadLabelSetImagePreset(const std::string &presetFi
 
   const auto filename = EnsureExtension(presetFilename);
 
-  TiXmlDocument xmlDocument;
+  tinyxml2::XMLDocument xmlDocument;
 
-  if(!xmlDocument.LoadFile(filename))
+  if(tinyxml2::XML_SUCCESS != xmlDocument.LoadFile(filename.c_str()))
     return;
 
   auto *rootElement = xmlDocument.FirstChildElement("LabelSetImagePreset");
@@ -110,7 +111,7 @@ void mitk::LabelSetIOHelper::LoadLabelSetImagePreset(const std::string &presetFi
 
     for (int labelIndex = 0; labelIndex < numberOfLabels; labelIndex++)
     {
-      auto label = mitk::LabelSetIOHelper::LoadLabelFromTiXmlDocument(labelElement);
+      auto label = mitk::LabelSetIOHelper::LoadLabelFromXMLDocument(labelElement);
       const auto labelValue = label->GetValue();
 
       if (0 != labelValue)
@@ -145,9 +146,9 @@ void mitk::LabelSetIOHelper::LoadLabelSetImagePreset(const std::string &presetFi
   inputImage->SetActiveLayer(activeLayerBackup);
 }
 
-TiXmlElement *mitk::LabelSetIOHelper::GetLabelAsTiXmlElement(Label *label)
+tinyxml2::XMLElement *mitk::LabelSetIOHelper::GetLabelAsXMLElement(tinyxml2::XMLDocument &doc, Label *label)
 {
-  auto *labelElem = new TiXmlElement("Label");
+  auto *labelElem = doc.NewElement("Label");
 
   // add XML contents
   const PropertyList::PropertyMap *propmap = label->GetMap();
@@ -155,17 +156,17 @@ TiXmlElement *mitk::LabelSetIOHelper::GetLabelAsTiXmlElement(Label *label)
   {
     std::string key = iter->first;
     const BaseProperty *property = iter->second;
-    TiXmlElement *element = PropertyToXmlElem(key, property);
+    auto *element = PropertyToXMLElement(doc, key, property);
     if (element)
-      labelElem->LinkEndChild(element);
+      labelElem->InsertEndChild(element);
   }
   return labelElem;
 }
 
-mitk::Label::Pointer mitk::LabelSetIOHelper::LoadLabelFromTiXmlDocument(TiXmlElement *labelElem)
+mitk::Label::Pointer mitk::LabelSetIOHelper::LoadLabelFromXMLDocument(const tinyxml2::XMLElement *labelElem)
 {
   // reread
-  TiXmlElement *propElem = labelElem->FirstChildElement("property");
+  auto *propElem = labelElem->FirstChildElement("property");
 
   std::string name;
   mitk::BaseProperty::Pointer prop;
@@ -173,7 +174,7 @@ mitk::Label::Pointer mitk::LabelSetIOHelper::LoadLabelFromTiXmlDocument(TiXmlEle
   mitk::Label::Pointer label = mitk::Label::New();
   while (propElem)
   {
-    LabelSetIOHelper::PropertyFromXmlElem(name, prop, propElem);
+    LabelSetIOHelper::PropertyFromXMLElement(name, prop, propElem);
     label->SetProperty(name, prop);
     propElem = propElem->NextSiblingElement("property");
   }
@@ -181,10 +182,10 @@ mitk::Label::Pointer mitk::LabelSetIOHelper::LoadLabelFromTiXmlDocument(TiXmlEle
   return label.GetPointer();
 }
 
-TiXmlElement *mitk::LabelSetIOHelper::PropertyToXmlElem(const std::string &key, const BaseProperty *property)
+tinyxml2::XMLElement *mitk::LabelSetIOHelper::PropertyToXMLElement(tinyxml2::XMLDocument &doc, const std::string &key, const BaseProperty *property)
 {
-  auto *keyelement = new TiXmlElement("property");
-  keyelement->SetAttribute("key", key);
+  auto *keyelement = doc.NewElement("property");
+  keyelement->SetAttribute("key", key.c_str());
   keyelement->SetAttribute("type", property->GetNameOfClass());
 
   // construct name of serializer class
@@ -207,9 +208,9 @@ TiXmlElement *mitk::LabelSetIOHelper::PropertyToXmlElem(const std::string &key, 
       serializer->SetProperty(property);
       try
       {
-        TiXmlElement *valueelement = serializer->Serialize();
+        auto *valueelement = serializer->Serialize(doc);
         if (valueelement)
-          keyelement->LinkEndChild(valueelement);
+          keyelement->InsertEndChild(valueelement);
       }
       catch (std::exception &e)
       {
@@ -221,13 +222,19 @@ TiXmlElement *mitk::LabelSetIOHelper::PropertyToXmlElem(const std::string &key, 
   return keyelement;
 }
 
-bool mitk::LabelSetIOHelper::PropertyFromXmlElem(std::string &key,
-                                                 mitk::BaseProperty::Pointer &prop,
-                                                 TiXmlElement *elem)
+bool mitk::LabelSetIOHelper::PropertyFromXMLElement(std::string &key,
+                                                    mitk::BaseProperty::Pointer &prop,
+                                                    const tinyxml2::XMLElement *elem)
 {
-  std::string type;
-  elem->QueryStringAttribute("type", &type);
-  elem->QueryStringAttribute("key", &key);
+  const char* typeC = elem->Attribute("type");
+  std::string type = nullptr != typeC
+    ? typeC
+    : "";
+
+  const char* keyC = elem->Attribute("key");
+  key = nullptr != keyC
+    ? keyC
+    : "";
 
   // construct name of serializer class
   std::string serializername(type);

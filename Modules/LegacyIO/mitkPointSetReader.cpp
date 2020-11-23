@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include <fstream>
 #include <iostream>
 #include <mitkLocaleSwitch.h>
+#include <tinyxml2.h>
 
 mitk::PointSetReader::PointSetReader()
 {
@@ -43,13 +44,12 @@ void mitk::PointSetReader::GenerateData()
 
   try
   {
-    TiXmlDocument doc(m_FileName.c_str());
-    bool loadOkay = doc.LoadFile();
-    if (loadOkay)
+    tinyxml2::XMLDocument doc;
+    if (tinyxml2::XML_SUCCESS == doc.LoadFile(m_FileName.c_str()))
     {
-      TiXmlHandle docHandle(&doc);
+      tinyxml2::XMLHandle docHandle(&doc);
       unsigned int pointSetCounter(0);
-      for (TiXmlElement *currentPointSetElement =
+      for (auto *currentPointSetElement =
              docHandle.FirstChildElement("point_set_file").FirstChildElement("point_set").ToElement();
            currentPointSetElement != nullptr;
            currentPointSetElement = currentPointSetElement->NextSiblingElement())
@@ -57,12 +57,12 @@ void mitk::PointSetReader::GenerateData()
         mitk::PointSet::Pointer newPointSet = mitk::PointSet::New();
         if (currentPointSetElement->FirstChildElement("time_series") != nullptr)
         {
-          for (TiXmlElement *currentTimeSeries = currentPointSetElement->FirstChildElement("time_series")->ToElement();
+          for (auto *currentTimeSeries = currentPointSetElement->FirstChildElement("time_series");
                currentTimeSeries != nullptr;
                currentTimeSeries = currentTimeSeries->NextSiblingElement())
           {
             unsigned int currentTimeStep(0);
-            TiXmlElement *currentTimeSeriesID = currentTimeSeries->FirstChildElement("time_series_id");
+            auto *currentTimeSeriesID = currentTimeSeries->FirstChildElement("time_series_id");
 
             currentTimeStep = atoi(currentTimeSeriesID->GetText());
 
@@ -91,12 +91,12 @@ void mitk::PointSetReader::GenerateData()
 }
 
 mitk::PointSet::Pointer mitk::PointSetReader::ReadPoint(mitk::PointSet::Pointer newPointSet,
-                                                        TiXmlElement *currentTimeSeries,
+                                                        const tinyxml2::XMLElement *currentTimeSeries,
                                                         unsigned int currentTimeStep)
 {
   if (currentTimeSeries->FirstChildElement("point") != nullptr)
   {
-    for (TiXmlElement *currentPoint = currentTimeSeries->FirstChildElement("point")->ToElement();
+    for (auto *currentPoint = currentTimeSeries->FirstChildElement("point");
          currentPoint != nullptr;
          currentPoint = currentPoint->NextSiblingElement())
     {

@@ -14,32 +14,31 @@ found in the LICENSE file.
 #define mitkGroupTagPropertySerializer_h_included
 
 #include "mitkBasePropertySerializer.h"
-
 #include "mitkGroupTagProperty.h"
+#include <tinyxml2.h>
 
 namespace mitk
 {
   class GroupTagPropertySerializer : public BasePropertySerializer
   {
   public:
-    mitkClassMacro(GroupTagPropertySerializer, BasePropertySerializer);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(GroupTagPropertySerializer, BasePropertySerializer)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
-      TiXmlElement *Serialize() override
+    tinyxml2::XMLElement* Serialize(tinyxml2::XMLDocument& doc) override
     {
       if (dynamic_cast<const GroupTagProperty *>(m_Property.GetPointer()) != nullptr)
       {
-        auto element = new TiXmlElement("GroupTag");
+        auto *element = doc.NewElement("GroupTag");
         return element;
       }
       else
         return nullptr;
     }
 
-    BaseProperty::Pointer Deserialize(TiXmlElement *) override
+    BaseProperty::Pointer Deserialize(const tinyxml2::XMLElement *) override
     {
-      // if (!element)
-      //  return nullptr;
       return GroupTagProperty::New().GetPointer();
     }
 

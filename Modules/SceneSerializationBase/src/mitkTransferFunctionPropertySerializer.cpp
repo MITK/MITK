@@ -13,12 +13,13 @@ found in the LICENSE file.
 #include "mitkTransferFunctionPropertySerializer.h"
 #include <mitkLexicalCast.h>
 #include <mitkLocaleSwitch.h>
+#include <tinyxml2.h>
 
 namespace mitk
 {
   mitk::TransferFunctionPropertySerializer::TransferFunctionPropertySerializer() {}
   mitk::TransferFunctionPropertySerializer::~TransferFunctionPropertySerializer() {}
-  TiXmlElement *mitk::TransferFunctionPropertySerializer::Serialize()
+  tinyxml2::XMLElement *mitk::TransferFunctionPropertySerializer::Serialize(tinyxml2::XMLDocument &doc)
   {
     if (const auto *prop =
           dynamic_cast<const TransferFunctionProperty *>(mitk::BasePropertySerializer::m_Property.GetPointer()))
@@ -29,51 +30,51 @@ namespace mitk
       if (!transferfunction)
         return nullptr;
 
-      auto element = new TiXmlElement("TransferFunction");
+      auto *element = doc.NewElement("TransferFunction");
 
       // serialize scalar opacity function
-      auto scalarOpacityPointlist = new TiXmlElement("ScalarOpacity");
+      auto *scalarOpacityPointlist = doc.NewElement("ScalarOpacity");
 
       TransferFunction::ControlPoints scalarOpacityPoints = transferfunction->GetScalarOpacityPoints();
       for (auto iter = scalarOpacityPoints.begin(); iter != scalarOpacityPoints.end(); ++iter)
       {
-        auto pointel = new TiXmlElement("point");
-        pointel->SetAttribute("x", boost::lexical_cast<std::string>(iter->first));
-        pointel->SetAttribute("y", boost::lexical_cast<std::string>(iter->second));
-        scalarOpacityPointlist->LinkEndChild(pointel);
+        auto *pointel = doc.NewElement("point");
+        pointel->SetAttribute("x", boost::lexical_cast<std::string>(iter->first).c_str());
+        pointel->SetAttribute("y", boost::lexical_cast<std::string>(iter->second).c_str());
+        scalarOpacityPointlist->InsertEndChild(pointel);
       }
-      element->LinkEndChild(scalarOpacityPointlist);
+      element->InsertEndChild(scalarOpacityPointlist);
       // serialize gradient opacity function
-      auto gradientOpacityPointlist = new TiXmlElement("GradientOpacity");
+      auto *gradientOpacityPointlist = doc.NewElement("GradientOpacity");
       TransferFunction::ControlPoints gradientOpacityPoints = transferfunction->GetGradientOpacityPoints();
       for (auto iter = gradientOpacityPoints.begin(); iter != gradientOpacityPoints.end(); ++iter)
       {
-        auto pointel = new TiXmlElement("point");
-        pointel->SetAttribute("x", boost::lexical_cast<std::string>(iter->first));
-        pointel->SetAttribute("y", boost::lexical_cast<std::string>(iter->second));
-        gradientOpacityPointlist->LinkEndChild(pointel);
+        auto *pointel = doc.NewElement("point");
+        pointel->SetAttribute("x", boost::lexical_cast<std::string>(iter->first).c_str());
+        pointel->SetAttribute("y", boost::lexical_cast<std::string>(iter->second).c_str());
+        gradientOpacityPointlist->InsertEndChild(pointel);
       }
-      element->LinkEndChild(gradientOpacityPointlist);
+      element->InsertEndChild(gradientOpacityPointlist);
 
       // serialize color function
       vtkColorTransferFunction *ctf = transferfunction->GetColorTransferFunction();
       if (ctf == nullptr)
         return nullptr;
-      auto pointlist = new TiXmlElement("Color");
+      auto *pointlist = doc.NewElement("Color");
       for (int i = 0; i < ctf->GetSize(); i++)
       {
         double myVal[6];
         ctf->GetNodeValue(i, myVal);
-        auto pointel = new TiXmlElement("point");
-        pointel->SetAttribute("x", boost::lexical_cast<std::string>(myVal[0]));
-        pointel->SetAttribute("r", boost::lexical_cast<std::string>(myVal[1]));
-        pointel->SetAttribute("g", boost::lexical_cast<std::string>(myVal[2]));
-        pointel->SetAttribute("b", boost::lexical_cast<std::string>(myVal[3]));
-        pointel->SetAttribute("midpoint", boost::lexical_cast<std::string>(myVal[4]));
-        pointel->SetAttribute("sharpness", boost::lexical_cast<std::string>(myVal[5]));
-        pointlist->LinkEndChild(pointel);
+        auto *pointel = doc.NewElement("point");
+        pointel->SetAttribute("x", boost::lexical_cast<std::string>(myVal[0]).c_str());
+        pointel->SetAttribute("r", boost::lexical_cast<std::string>(myVal[1]).c_str());
+        pointel->SetAttribute("g", boost::lexical_cast<std::string>(myVal[2]).c_str());
+        pointel->SetAttribute("b", boost::lexical_cast<std::string>(myVal[3]).c_str());
+        pointel->SetAttribute("midpoint", boost::lexical_cast<std::string>(myVal[4]).c_str());
+        pointel->SetAttribute("sharpness", boost::lexical_cast<std::string>(myVal[5]).c_str());
+        pointlist->InsertEndChild(pointel);
       }
-      element->LinkEndChild(pointlist);
+      element->InsertEndChild(pointlist);
       return element;
     }
     else
@@ -85,7 +86,9 @@ namespace mitk
   {
     TransferFunctionPropertySerializer::Pointer tfps = TransferFunctionPropertySerializer::New();
     tfps->SetProperty(TransferFunctionProperty::New(tf));
-    TiXmlElement *s = tfps->Serialize();
+
+    tinyxml2::XMLDocument doc;
+    auto *s = tfps->Serialize(doc);
 
     if (!s)
     {
@@ -94,28 +97,24 @@ namespace mitk
       return false;
     }
 
-    TiXmlDocument document;
-    auto decl = new TiXmlDeclaration(
-      "1.0",
-      "UTF-8",
-      ""); // TODO what to write here? encoding? standalone would mean that we provide a DTD somewhere...
-    document.LinkEndChild(decl);
+    tinyxml2::XMLDocument doc2;
+    doc2.InsertEndChild(doc2.NewDeclaration());
 
-    auto version = new TiXmlElement("Version");
+    auto *version = doc2.NewElement("Version");
     version->SetAttribute("TransferfunctionVersion", 1);
 
-    document.LinkEndChild(version);
-    document.LinkEndChild(s);
+    doc2.InsertEndChild(version);
+    doc2.InsertEndChild(s->DeepClone(&doc2));
 
-    if (!document.SaveFile(filename))
+    if (tinyxml2::XML_SUCCESS != doc2.SaveFile(filename))
     {
-      MITK_ERROR << "Could not write scene to " << filename << "\nTinyXML reports '" << document.ErrorDesc() << "'";
+      MITK_ERROR << "Could not write scene to " << filename << "\nTinyXML reports '" << doc2.ErrorStr() << "'";
       return false;
     }
     return true;
   }
 
-  BaseProperty::Pointer mitk::TransferFunctionPropertySerializer::Deserialize(TiXmlElement *element)
+  BaseProperty::Pointer mitk::TransferFunctionPropertySerializer::Deserialize(const tinyxml2::XMLElement *element)
   {
     if (!element)
       return nullptr;
@@ -125,7 +124,7 @@ namespace mitk
     TransferFunction::Pointer tf = TransferFunction::New();
 
     // deserialize scalar opacity function
-    TiXmlElement *scalarOpacityPointlist = element->FirstChildElement("ScalarOpacity");
+    auto *scalarOpacityPointlist = element->FirstChildElement("ScalarOpacity");
     if (scalarOpacityPointlist == nullptr)
     {
       return nullptr;
@@ -135,19 +134,17 @@ namespace mitk
 
     try
     {
-      for (TiXmlElement *pointElement = scalarOpacityPointlist->FirstChildElement("point"); pointElement != nullptr;
+      for (auto *pointElement = scalarOpacityPointlist->FirstChildElement("point"); pointElement != nullptr;
            pointElement = pointElement->NextSiblingElement("point"))
       {
-        std::string x;
-        std::string y;
-        if (pointElement->QueryStringAttribute("x", &x) != TIXML_SUCCESS)
-          return nullptr;
-        if (pointElement->QueryStringAttribute("y", &y) != TIXML_SUCCESS)
+        const char* x = pointElement->Attribute("x");
+        const char* y = pointElement->Attribute("y");
+        if (nullptr == x || nullptr == y)
           return nullptr;
         tf->AddScalarOpacityPoint(boost::lexical_cast<double>(x), boost::lexical_cast<double>(y));
       }
 
-      TiXmlElement *gradientOpacityPointlist = element->FirstChildElement("GradientOpacity");
+      auto *gradientOpacityPointlist = element->FirstChildElement("GradientOpacity");
       if (gradientOpacityPointlist == nullptr)
       {
         return nullptr;
@@ -155,19 +152,17 @@ namespace mitk
 
       tf->ClearGradientOpacityPoints();
 
-      for (TiXmlElement *pointElement = gradientOpacityPointlist->FirstChildElement("point"); pointElement != nullptr;
+      for (auto *pointElement = gradientOpacityPointlist->FirstChildElement("point"); pointElement != nullptr;
            pointElement = pointElement->NextSiblingElement("point"))
       {
-        std::string x;
-        std::string y;
-        if (pointElement->QueryStringAttribute("x", &x) != TIXML_SUCCESS)
-          return nullptr;
-        if (pointElement->QueryStringAttribute("y", &y) != TIXML_SUCCESS)
+        const char* x = pointElement->Attribute("x");
+        const char* y = pointElement->Attribute("y");
+        if (nullptr == x || nullptr == y)
           return nullptr;
         tf->AddGradientOpacityPoint(boost::lexical_cast<double>(x), boost::lexical_cast<double>(y));
       }
 
-      TiXmlElement *rgbPointlist = element->FirstChildElement("Color");
+      auto *rgbPointlist = element->FirstChildElement("Color");
       if (rgbPointlist == nullptr)
       {
         return nullptr;
@@ -180,22 +175,16 @@ namespace mitk
 
       ctf->RemoveAllPoints();
 
-      for (TiXmlElement *pointElement = rgbPointlist->FirstChildElement("point"); pointElement != nullptr;
+      for (auto *pointElement = rgbPointlist->FirstChildElement("point"); pointElement != nullptr;
            pointElement = pointElement->NextSiblingElement("point"))
       {
-        std::string x;
-        std::string r, g, b, midpoint, sharpness;
-        if (pointElement->QueryStringAttribute("x", &x) != TIXML_SUCCESS)
-          return nullptr;
-        if (pointElement->QueryStringAttribute("r", &r) != TIXML_SUCCESS)
-          return nullptr;
-        if (pointElement->QueryStringAttribute("g", &g) != TIXML_SUCCESS)
-          return nullptr;
-        if (pointElement->QueryStringAttribute("b", &b) != TIXML_SUCCESS)
-          return nullptr;
-        if (pointElement->QueryStringAttribute("midpoint", &midpoint) != TIXML_SUCCESS)
-          return nullptr;
-        if (pointElement->QueryStringAttribute("sharpness", &sharpness) != TIXML_SUCCESS)
+        const char* x = pointElement->Attribute("x");
+        const char* r = pointElement->Attribute("r");
+        const char* g = pointElement->Attribute("g");
+        const char* b = pointElement->Attribute("b");
+        const char* midpoint = pointElement->Attribute("midpoint");
+        const char* sharpness = pointElement->Attribute("sharpness");
+        if (nullptr == x || nullptr == r || nullptr == g || nullptr == b || nullptr == midpoint || nullptr == sharpness)
           return nullptr;
         ctf->AddRGBPoint(boost::lexical_cast<double>(x),
                          boost::lexical_cast<double>(r),
@@ -218,28 +207,28 @@ namespace mitk
   mitk::TransferFunction::Pointer mitk::TransferFunctionPropertySerializer::DeserializeTransferFunction(
     const char *filePath)
   {
-    TiXmlDocument document(filePath);
+    tinyxml2::XMLDocument document;
 
-    if (!document.LoadFile())
+    if (tinyxml2::XML_SUCCESS != document.LoadFile(filePath))
     {
-      MITK_ERROR << "Could not open/read/parse " << filePath << "\nTinyXML reports: " << document.ErrorDesc()
+      MITK_ERROR << "Could not open/read/parse " << filePath << "\nTinyXML reports: " << document.ErrorStr()
                  << std::endl;
       return nullptr;
     }
 
     // find version node --> note version in some variable
     int fileVersion = 1;
-    TiXmlElement *versionObject = document.FirstChildElement("Version");
+    auto *versionObject = document.FirstChildElement("Version");
     if (versionObject)
     {
-      if (versionObject->QueryIntAttribute("TransferfunctionVersion", &fileVersion) != TIXML_SUCCESS)
+      if (versionObject->QueryIntAttribute("TransferfunctionVersion", &fileVersion) != tinyxml2::XML_SUCCESS)
       {
         MITK_WARN << "Transferfunction file " << filePath
                   << " does not contain version information! Trying version 1 format.";
       }
     }
 
-    TiXmlElement *input = document.FirstChildElement("TransferFunction");
+    auto *input = document.FirstChildElement("TransferFunction");
 
     TransferFunctionPropertySerializer::Pointer tfpd = TransferFunctionPropertySerializer::New();
     BaseProperty::Pointer bp = tfpd->Deserialize(input);

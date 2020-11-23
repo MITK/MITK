@@ -18,38 +18,40 @@ found in the LICENSE file.
 #include "mitkProperties.h"
 #include "mitkStringsToNumbers.h"
 #include <mitkLocaleSwitch.h>
+#include <tinyxml2.h>
 
 namespace mitk
 {
   class FloatPropertySerializer : public BasePropertySerializer
   {
   public:
-    mitkClassMacro(FloatPropertySerializer, BasePropertySerializer);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(FloatPropertySerializer, BasePropertySerializer)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
-      TiXmlElement *Serialize() override
+    tinyxml2::XMLElement* Serialize(tinyxml2::XMLDocument& doc) override
     {
       if (const FloatProperty *prop = dynamic_cast<const FloatProperty *>(m_Property.GetPointer()))
       {
         LocaleSwitch localeSwitch("C");
 
-        auto element = new TiXmlElement("float");
-        element->SetAttribute("value", boost::lexical_cast<std::string>(prop->GetValue()));
+        auto *element = doc.NewElement("float");
+        element->SetAttribute("value", boost::lexical_cast<std::string>(prop->GetValue()).c_str());
         return element;
       }
       else
         return nullptr;
     }
 
-    BaseProperty::Pointer Deserialize(TiXmlElement *element) override
+    BaseProperty::Pointer Deserialize(const tinyxml2::XMLElement *element) override
     {
       if (!element)
         return nullptr;
 
       LocaleSwitch localeSwitch("C");
 
-      std::string f_string;
-      if (element->QueryStringAttribute("value", &f_string) == TIXML_SUCCESS)
+      const char* f_string = element->Attribute("value");
+      if (nullptr != f_string)
       {
         try
         {

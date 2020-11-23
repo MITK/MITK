@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include "mitkProportionalTimeGeometryToXML.h"
 
-#include <tinyxml.h>
+#include <tinyxml2.h>
 
 #include <mitkLocaleSwitch.h>
 
@@ -53,28 +53,25 @@ void mitk::GeometryDataWriterService::Write()
   // loop over all inputs,
   //   call appropriate serializing functions
 
-  TiXmlDocument doc;
+  tinyxml2::XMLDocument doc;
+  doc.InsertEndChild(doc.NewDeclaration());
 
-  auto *decl = new TiXmlDeclaration(
-    "1.0", "UTF-8", ""); // TODO what to write here? encoding? standalone would mean that we provide a DTD somewhere...
-  doc.LinkEndChild(decl);
-
-  auto *rootNode = new TiXmlElement("GeometryData");
-  doc.LinkEndChild(rootNode);
+  auto* rootNode = doc.NewElement("GeometryData");
+  doc.InsertEndChild(rootNode);
 
   // note version info
-  auto *version = new TiXmlElement("Version");
+  auto *version = doc.NewElement("Version");
   version->SetAttribute("Writer", __FILE__);
   version->SetAttribute("FileVersion", 1);
-  rootNode->LinkEndChild(version);
+  rootNode->InsertEndChild(version);
 
   const auto *data = static_cast<const GeometryData *>(this->GetInput());
 
   const ProportionalTimeGeometry *timeGeometry(nullptr);
   if ((timeGeometry = dynamic_cast<const ProportionalTimeGeometry *>(data->GetTimeGeometry())))
   {
-    TiXmlElement *timeGeometryElement = ProportionalTimeGeometryToXML::ToXML(timeGeometry);
-    rootNode->LinkEndChild(timeGeometryElement);
+    auto *timeGeometryElement = ProportionalTimeGeometryToXML::ToXML(doc, timeGeometry);
+    rootNode->InsertEndChild(timeGeometryElement);
   }
   else
   {
@@ -82,7 +79,9 @@ void mitk::GeometryDataWriterService::Write()
   }
 
   // Write out document
-  out << doc;
+  tinyxml2::XMLPrinter printer;
+  doc.Print(&printer);
+  out << printer.CStr();
 }
 
 mitk::GeometryDataWriterService *mitk::GeometryDataWriterService::Clone() const

@@ -18,7 +18,7 @@ found in the LICENSE file.
 
 #include <mitkIOMimeTypes.h>
 
-#include <tinyxml.h>
+#include <tinyxml2.h>
 
 #include <vtkMatrix4x4.h>
 
@@ -41,23 +41,16 @@ namespace mitk
     std::vector<itk::SmartPointer<mitk::BaseData>> result;
 
     InputStream stream(this);
+    std::string string(std::istreambuf_iterator<char>(stream), {});
+    tinyxml2::XMLDocument doc;
 
-    TiXmlDocument doc;
-    stream >> doc;
-    if (!doc.Error())
+    if (tinyxml2::XML_SUCCESS == doc.Parse(string.c_str()))
     {
       TubeGraph::Pointer newTubeGraph = TubeGraph::New();
 
-      TiXmlHandle hDoc(&doc);
-      TiXmlElement *pElem;
-      TiXmlHandle hRoot(nullptr);
-
-      pElem = hDoc.FirstChildElement().Element();
-
-      // save this for later
-      hRoot = TiXmlHandle(pElem);
-
-      pElem = hRoot.FirstChildElement(mitk::TubeGraphDefinitions::XML_GEOMETRY).Element();
+      tinyxml2::XMLHandle hDoc(&doc);
+      tinyxml2::XMLHandle hRoot = hDoc.FirstChildElement();
+      tinyxml2::XMLElement *pElem = hRoot.FirstChildElement(mitk::TubeGraphDefinitions::XML_GEOMETRY.c_str()).ToElement();
 
       // read geometry
       mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
@@ -66,43 +59,43 @@ namespace mitk
       // read origin
       mitk::Point3D origin;
       double temp = 0;
-      pElem->Attribute(mitk::TubeGraphDefinitions::XML_ORIGIN_X, &temp);
+      pElem->QueryAttribute(mitk::TubeGraphDefinitions::XML_ORIGIN_X.c_str(), &temp);
       origin[0] = temp;
-      pElem->Attribute(mitk::TubeGraphDefinitions::XML_ORIGIN_Y, &temp);
+      pElem->QueryAttribute(mitk::TubeGraphDefinitions::XML_ORIGIN_Y.c_str(), &temp);
       origin[1] = temp;
-      pElem->Attribute(mitk::TubeGraphDefinitions::XML_ORIGIN_Z, &temp);
+      pElem->QueryAttribute(mitk::TubeGraphDefinitions::XML_ORIGIN_Z.c_str(), &temp);
       origin[2] = temp;
       geometry->SetOrigin(origin);
 
       // read spacing
       Vector3D spacing;
-      pElem->Attribute(mitk::TubeGraphDefinitions::XML_SPACING_X, &temp);
+      pElem->QueryAttribute(mitk::TubeGraphDefinitions::XML_SPACING_X.c_str(), &temp);
       spacing.SetElement(0, temp);
-      pElem->Attribute(mitk::TubeGraphDefinitions::XML_SPACING_Y, &temp);
+      pElem->QueryAttribute(mitk::TubeGraphDefinitions::XML_SPACING_Y.c_str(), &temp);
       spacing.SetElement(1, temp);
-      pElem->Attribute(mitk::TubeGraphDefinitions::XML_SPACING_Z, &temp);
+      pElem->QueryAttribute(mitk::TubeGraphDefinitions::XML_SPACING_Z.c_str(), &temp);
       spacing.SetElement(2, temp);
       geometry->SetSpacing(spacing);
 
       // read transform
       vtkMatrix4x4 *m = vtkMatrix4x4::New();
-      pElem->Attribute(mitk::TubeGraphDefinitions::XML_MATRIX_XX, &temp);
+      pElem->QueryAttribute(mitk::TubeGraphDefinitions::XML_MATRIX_XX.c_str(), &temp);
       m->SetElement(0, 0, temp);
-      pElem->Attribute(mitk::TubeGraphDefinitions::XML_MATRIX_XY, &temp);
+      pElem->QueryAttribute(mitk::TubeGraphDefinitions::XML_MATRIX_XY.c_str(), &temp);
       m->SetElement(1, 0, temp);
-      pElem->Attribute(mitk::TubeGraphDefinitions::XML_MATRIX_XZ, &temp);
+      pElem->QueryAttribute(mitk::TubeGraphDefinitions::XML_MATRIX_XZ.c_str(), &temp);
       m->SetElement(2, 0, temp);
-      pElem->Attribute(mitk::TubeGraphDefinitions::XML_MATRIX_YX, &temp);
+      pElem->QueryAttribute(mitk::TubeGraphDefinitions::XML_MATRIX_YX.c_str(), &temp);
       m->SetElement(0, 1, temp);
-      pElem->Attribute(mitk::TubeGraphDefinitions::XML_MATRIX_YY, &temp);
+      pElem->QueryAttribute(mitk::TubeGraphDefinitions::XML_MATRIX_YY.c_str(), &temp);
       m->SetElement(1, 1, temp);
-      pElem->Attribute(mitk::TubeGraphDefinitions::XML_MATRIX_YZ, &temp);
+      pElem->QueryAttribute(mitk::TubeGraphDefinitions::XML_MATRIX_YZ.c_str(), &temp);
       m->SetElement(2, 1, temp);
-      pElem->Attribute(mitk::TubeGraphDefinitions::XML_MATRIX_ZX, &temp);
+      pElem->QueryAttribute(mitk::TubeGraphDefinitions::XML_MATRIX_ZX.c_str(), &temp);
       m->SetElement(0, 2, temp);
-      pElem->Attribute(mitk::TubeGraphDefinitions::XML_MATRIX_ZY, &temp);
+      pElem->QueryAttribute(mitk::TubeGraphDefinitions::XML_MATRIX_ZY.c_str(), &temp);
       m->SetElement(1, 2, temp);
-      pElem->Attribute(mitk::TubeGraphDefinitions::XML_MATRIX_ZZ, &temp);
+      pElem->QueryAttribute(mitk::TubeGraphDefinitions::XML_MATRIX_ZZ.c_str(), &temp);
       m->SetElement(2, 2, temp);
 
       m->SetElement(0, 3, origin[0]);
@@ -116,28 +109,28 @@ namespace mitk
       // read tube graph
 
       // read vertices
-      pElem = hRoot.FirstChildElement(mitk::TubeGraphDefinitions::XML_VERTICES).Element();
+      pElem = hRoot.FirstChildElement(mitk::TubeGraphDefinitions::XML_VERTICES.c_str()).ToElement();
       if (pElem != nullptr)
       {
         // walk through the vertices
-        for (TiXmlElement *vertexElement = pElem->FirstChildElement(); vertexElement != nullptr; vertexElement = vertexElement->NextSiblingElement())
+        for (auto *vertexElement = pElem->FirstChildElement(); vertexElement != nullptr; vertexElement = vertexElement->NextSiblingElement())
         {
           int vertexID(0);
           mitk::Point3D coordinate;
           coordinate.Fill(0.0);
           double diameter(0);
 
-          vertexElement->Attribute(mitk::TubeGraphDefinitions::XML_VERTEX_ID, &vertexID);
+          vertexElement->QueryAttribute(mitk::TubeGraphDefinitions::XML_VERTEX_ID.c_str(), &vertexID);
 
-          TiXmlElement *tubeElement = vertexElement->FirstChildElement();
+          auto *tubeElement = vertexElement->FirstChildElement();
 
-          tubeElement->Attribute(mitk::TubeGraphDefinitions::XML_ELEMENT_X, &temp);
+          tubeElement->QueryAttribute(mitk::TubeGraphDefinitions::XML_ELEMENT_X.c_str(), &temp);
           coordinate[0] = temp;
-          tubeElement->Attribute(mitk::TubeGraphDefinitions::XML_ELEMENT_Y, &temp);
+          tubeElement->QueryAttribute(mitk::TubeGraphDefinitions::XML_ELEMENT_Y.c_str(), &temp);
           coordinate[1] = temp;
-          tubeElement->Attribute(mitk::TubeGraphDefinitions::XML_ELEMENT_Z, &temp);
+          tubeElement->QueryAttribute(mitk::TubeGraphDefinitions::XML_ELEMENT_Z.c_str(), &temp);
           coordinate[2] = temp;
-          tubeElement->Attribute(mitk::TubeGraphDefinitions::XML_ELEMENT_DIAMETER, &diameter);
+          tubeElement->QueryAttribute(mitk::TubeGraphDefinitions::XML_ELEMENT_DIAMETER.c_str(), &diameter);
 
           mitk::TubeGraphVertex vertexData;
           auto *newElement = new mitk::CircularProfileTubeElement(coordinate, diameter);
@@ -154,7 +147,7 @@ namespace mitk
       }
 
       // read edges
-      pElem = hRoot.FirstChildElement(mitk::TubeGraphDefinitions::XML_EDGES).Element();
+      pElem = hRoot.FirstChildElement(mitk::TubeGraphDefinitions::XML_EDGES.c_str()).ToElement();
       if (pElem != nullptr)
       {
         // walk through the edges
@@ -165,21 +158,21 @@ namespace mitk
           mitk::Point3D coordinate;
           double diameter(0);
 
-          edgeElement->Attribute(mitk::TubeGraphDefinitions::XML_EDGE_ID, &edgeID);
-          edgeElement->Attribute(mitk::TubeGraphDefinitions::XML_EDGE_SOURCE_ID, &edgeSourceID);
-          edgeElement->Attribute(mitk::TubeGraphDefinitions::XML_EDGE_TARGET_ID, &edgeTargetID);
+          edgeElement->QueryAttribute(mitk::TubeGraphDefinitions::XML_EDGE_ID.c_str(), &edgeID);
+          edgeElement->QueryAttribute(mitk::TubeGraphDefinitions::XML_EDGE_SOURCE_ID.c_str(), &edgeSourceID);
+          edgeElement->QueryAttribute(mitk::TubeGraphDefinitions::XML_EDGE_TARGET_ID.c_str(), &edgeTargetID);
 
           mitk::TubeGraphEdge edgeData;
 
-          for (TiXmlElement *tubeElement = edgeElement->FirstChildElement(mitk::TubeGraphDefinitions::XML_ELEMENT); tubeElement != nullptr; tubeElement = tubeElement->NextSiblingElement())
+          for (auto *tubeElement = edgeElement->FirstChildElement(mitk::TubeGraphDefinitions::XML_ELEMENT.c_str()); tubeElement != nullptr; tubeElement = tubeElement->NextSiblingElement())
           {
-            tubeElement->Attribute(mitk::TubeGraphDefinitions::XML_ELEMENT_X, &temp);
+            tubeElement->QueryAttribute(mitk::TubeGraphDefinitions::XML_ELEMENT_X.c_str(), &temp);
             coordinate[0] = temp;
-            tubeElement->Attribute(mitk::TubeGraphDefinitions::XML_ELEMENT_Y, &temp);
+            tubeElement->QueryAttribute(mitk::TubeGraphDefinitions::XML_ELEMENT_Y.c_str(), &temp);
             coordinate[1] = temp;
-            tubeElement->Attribute(mitk::TubeGraphDefinitions::XML_ELEMENT_Z, &temp);
+            tubeElement->QueryAttribute(mitk::TubeGraphDefinitions::XML_ELEMENT_Z.c_str(), &temp);
             coordinate[2] = temp;
-            tubeElement->Attribute(mitk::TubeGraphDefinitions::XML_ELEMENT_DIAMETER, &diameter);
+            tubeElement->QueryAttribute(mitk::TubeGraphDefinitions::XML_ELEMENT_DIAMETER.c_str(), &diameter);
 
             auto *newElement = new mitk::CircularProfileTubeElement(coordinate, diameter);
 
@@ -209,11 +202,11 @@ namespace mitk
       mitk::TubeGraphProperty::Pointer newProperty = mitk::TubeGraphProperty::New();
 
       // read label groups
-      pElem = hRoot.FirstChildElement(mitk::TubeGraphDefinitions::XML_LABELGROUPS).Element();
+      pElem = hRoot.FirstChildElement(mitk::TubeGraphDefinitions::XML_LABELGROUPS.c_str()).ToElement();
       if (pElem != nullptr)
       {
         // walk through the label groups
-        for (TiXmlElement *labelGroupElement = pElem->FirstChildElement(); labelGroupElement != nullptr; labelGroupElement = labelGroupElement->NextSiblingElement())
+        for (auto *labelGroupElement = pElem->FirstChildElement(); labelGroupElement != nullptr; labelGroupElement = labelGroupElement->NextSiblingElement())
         {
           auto *newLabelGroup = new mitk::TubeGraphProperty::LabelGroup();
           const char *labelGroupName;
@@ -223,7 +216,7 @@ namespace mitk
           if (labelGroupName)
             newLabelGroup->labelGroupName = labelGroupName;
 
-          for (TiXmlElement *labelElement = labelGroupElement->FirstChildElement(mitk::TubeGraphDefinitions::XML_LABEL); labelElement != nullptr; labelElement = labelElement->NextSiblingElement())
+          for (auto *labelElement = labelGroupElement->FirstChildElement(mitk::TubeGraphDefinitions::XML_LABEL.c_str()); labelElement != nullptr; labelElement = labelElement->NextSiblingElement())
           {
             auto *newLabel = new mitk::TubeGraphProperty::LabelGroup::Label();
             const char *labelName;
@@ -234,16 +227,16 @@ namespace mitk
             if (labelName)
               newLabel->labelName = labelName;
 
-            labelElement->Attribute(mitk::TubeGraphDefinitions::XML_LABEL_VISIBILITY, &temp);
+            labelElement->QueryAttribute(mitk::TubeGraphDefinitions::XML_LABEL_VISIBILITY.c_str(), &temp);
             if (temp == 0)
               isVisible = false;
             else
               isVisible = true;
-            labelElement->Attribute(mitk::TubeGraphDefinitions::XML_LABEL_COLOR_R, &temp);
+            labelElement->QueryAttribute(mitk::TubeGraphDefinitions::XML_LABEL_COLOR_R.c_str(), &temp);
             color[0] = temp;
-            labelElement->Attribute(mitk::TubeGraphDefinitions::XML_LABEL_COLOR_G, &temp);
+            labelElement->QueryAttribute(mitk::TubeGraphDefinitions::XML_LABEL_COLOR_G.c_str(), &temp);
             color[1] = temp;
-            labelElement->Attribute(mitk::TubeGraphDefinitions::XML_LABEL_COLOR_B, &temp);
+            labelElement->QueryAttribute(mitk::TubeGraphDefinitions::XML_LABEL_COLOR_B.c_str(), &temp);
             color[2] = temp;
 
             newLabel->isVisible = isVisible;
@@ -254,27 +247,27 @@ namespace mitk
         }
       }
       // read attributations
-      pElem = hRoot.FirstChildElement(mitk::TubeGraphDefinitions::XML_ATTRIBUTIONS).Element();
+      pElem = hRoot.FirstChildElement(mitk::TubeGraphDefinitions::XML_ATTRIBUTIONS.c_str()).ToElement();
       if (pElem != nullptr)
       {
         std::map<TubeGraphProperty::TubeToLabelGroupType, std::string> tubeToLabelsMap;
-        for (TiXmlElement *tubeToLabelElement = pElem->FirstChildElement(); tubeToLabelElement != nullptr; tubeToLabelElement = tubeToLabelElement->NextSiblingElement())
+        for (auto *tubeToLabelElement = pElem->FirstChildElement(); tubeToLabelElement != nullptr; tubeToLabelElement = tubeToLabelElement->NextSiblingElement())
         {
           TubeGraph::TubeDescriptorType tube;
           auto *labelGroup = new mitk::TubeGraphProperty::LabelGroup();
           auto *label = new mitk::TubeGraphProperty::LabelGroup::Label();
 
-          tubeToLabelElement->Attribute(mitk::TubeGraphDefinitions::XML_TUBE_ID_1, &temp);
+          tubeToLabelElement->QueryAttribute(mitk::TubeGraphDefinitions::XML_TUBE_ID_1.c_str(), &temp);
           tube.first = temp;
-          tubeToLabelElement->Attribute(mitk::TubeGraphDefinitions::XML_TUBE_ID_2, &temp);
+          tubeToLabelElement->QueryAttribute(mitk::TubeGraphDefinitions::XML_TUBE_ID_2.c_str(), &temp);
           tube.second = temp;
           const char *labelGroupName =
-            tubeToLabelElement->Attribute((char *)mitk::TubeGraphDefinitions::XML_LABELGROUP_NAME.c_str());
+            tubeToLabelElement->Attribute(mitk::TubeGraphDefinitions::XML_LABELGROUP_NAME.c_str());
           if (labelGroupName)
             labelGroup = newProperty->GetLabelGroupByName(labelGroupName);
 
           const char *labelName =
-            tubeToLabelElement->Attribute((char *)mitk::TubeGraphDefinitions::XML_LABEL_NAME.c_str());
+            tubeToLabelElement->Attribute(mitk::TubeGraphDefinitions::XML_LABEL_NAME.c_str());
           if (labelName)
             label = newProperty->GetLabelByName(labelGroup, labelName);
 
@@ -289,27 +282,25 @@ namespace mitk
           newProperty->SetTubesToLabels(tubeToLabelsMap);
       }
       // read annotations
-      pElem = hRoot.FirstChildElement(mitk::TubeGraphDefinitions::XML_ANNOTATIONS).Element();
+      pElem = hRoot.FirstChildElement(mitk::TubeGraphDefinitions::XML_ANNOTATIONS.c_str()).ToElement();
       if (pElem != nullptr)
       {
-        for (TiXmlElement *annotationElement = pElem->FirstChildElement(); annotationElement != nullptr; annotationElement = annotationElement->NextSiblingElement())
+        for (auto *annotationElement = pElem->FirstChildElement(); annotationElement != nullptr; annotationElement = annotationElement->NextSiblingElement())
         {
           auto *annotation = new mitk::TubeGraphProperty::Annotation();
-          std::string annotationName;
-          std::string annotationDescription;
           TubeGraph::TubeDescriptorType tube;
 
-          annotationName =
-            annotationElement->Attribute((char *)mitk::TubeGraphDefinitions::XML_ANNOTATION_NAME.c_str());
-          annotation->name = annotationName;
+          const char *annotationName =
+            annotationElement->Attribute(mitk::TubeGraphDefinitions::XML_ANNOTATION_NAME.c_str());
+          annotation->name = nullptr != annotationName ? annotationName : "";
 
-          annotationDescription =
-            annotationElement->Attribute((char *)mitk::TubeGraphDefinitions::XML_ANNOTATION_DESCRIPTION.c_str());
-          annotation->description = annotationDescription;
+          const char *annotationDescription =
+            annotationElement->Attribute(mitk::TubeGraphDefinitions::XML_ANNOTATION_DESCRIPTION.c_str());
+          annotation->description = nullptr != annotationDescription ? annotationDescription : "";
 
-          annotationElement->Attribute(mitk::TubeGraphDefinitions::XML_TUBE_ID_1, &temp);
+          annotationElement->QueryAttribute(mitk::TubeGraphDefinitions::XML_TUBE_ID_1.c_str(), &temp);
           tube.first = temp;
-          annotationElement->Attribute(mitk::TubeGraphDefinitions::XML_TUBE_ID_2, &temp);
+          annotationElement->QueryAttribute(mitk::TubeGraphDefinitions::XML_TUBE_ID_2.c_str(), &temp);
           tube.second = temp;
 
           if (tube != TubeGraph::ErrorId)
@@ -326,11 +317,9 @@ namespace mitk
       newTubeGraph->SetProperty("Tube Graph.Visualization Information", newProperty);
       result.push_back(newTubeGraph.GetPointer());
     }
-
     else
     {
-      mitkThrow() << "Parsing error at line " << doc.ErrorRow() << ", col " << doc.ErrorCol() << ": "
-                  << doc.ErrorDesc();
+      mitkThrow() << "Parsing error at line " << doc.ErrorLineNum() << ": " << doc.ErrorStr();
     }
     return result;
   }
@@ -362,138 +351,137 @@ namespace mitk
     mitk::TubeGraphProperty::Pointer tubeGraphProperty = dynamic_cast<mitk::TubeGraphProperty *>(
       tubeGraph->GetProperty("Tube Graph.Visualization Information").GetPointer());
     // Create XML document
-    TiXmlDocument documentXML;
+    tinyxml2::XMLDocument documentXML;
     { // Begin document
-      auto *declXML = new TiXmlDeclaration("1.0", "", "");
-      documentXML.LinkEndChild(declXML);
+      documentXML.InsertEndChild(documentXML.NewDeclaration());
 
-      auto *mainXML = new TiXmlElement(mitk::TubeGraphDefinitions::XML_TUBEGRAPH_FILE);
-      mainXML->SetAttribute(mitk::TubeGraphDefinitions::XML_FILE_VERSION, mitk::TubeGraphDefinitions::VERSION_STRING);
-      documentXML.LinkEndChild(mainXML);
+      auto *mainXML = documentXML.NewElement(mitk::TubeGraphDefinitions::XML_TUBEGRAPH_FILE.c_str());
+      mainXML->SetAttribute(mitk::TubeGraphDefinitions::XML_FILE_VERSION.c_str(), mitk::TubeGraphDefinitions::VERSION_STRING.c_str());
+      documentXML.InsertEndChild(mainXML);
 
-      auto *geometryXML = new TiXmlElement(mitk::TubeGraphDefinitions::XML_GEOMETRY);
+      auto *geometryXML = documentXML.NewElement(mitk::TubeGraphDefinitions::XML_GEOMETRY.c_str());
       { // begin geometry
-        geometryXML->SetDoubleAttribute(mitk::TubeGraphDefinitions::XML_MATRIX_XX, geometry->GetMatrixColumn(0)[0]);
-        geometryXML->SetDoubleAttribute(mitk::TubeGraphDefinitions::XML_MATRIX_XY, geometry->GetMatrixColumn(0)[1]);
-        geometryXML->SetDoubleAttribute(mitk::TubeGraphDefinitions::XML_MATRIX_XZ, geometry->GetMatrixColumn(0)[2]);
-        geometryXML->SetDoubleAttribute(mitk::TubeGraphDefinitions::XML_MATRIX_YX, geometry->GetMatrixColumn(1)[0]);
-        geometryXML->SetDoubleAttribute(mitk::TubeGraphDefinitions::XML_MATRIX_YY, geometry->GetMatrixColumn(1)[1]);
-        geometryXML->SetDoubleAttribute(mitk::TubeGraphDefinitions::XML_MATRIX_YZ, geometry->GetMatrixColumn(1)[2]);
-        geometryXML->SetDoubleAttribute(mitk::TubeGraphDefinitions::XML_MATRIX_ZX, geometry->GetMatrixColumn(2)[0]);
-        geometryXML->SetDoubleAttribute(mitk::TubeGraphDefinitions::XML_MATRIX_ZY, geometry->GetMatrixColumn(2)[1]);
-        geometryXML->SetDoubleAttribute(mitk::TubeGraphDefinitions::XML_MATRIX_ZZ, geometry->GetMatrixColumn(2)[2]);
+        geometryXML->SetAttribute(mitk::TubeGraphDefinitions::XML_MATRIX_XX.c_str(), geometry->GetMatrixColumn(0)[0]);
+        geometryXML->SetAttribute(mitk::TubeGraphDefinitions::XML_MATRIX_XY.c_str(), geometry->GetMatrixColumn(0)[1]);
+        geometryXML->SetAttribute(mitk::TubeGraphDefinitions::XML_MATRIX_XZ.c_str(), geometry->GetMatrixColumn(0)[2]);
+        geometryXML->SetAttribute(mitk::TubeGraphDefinitions::XML_MATRIX_YX.c_str(), geometry->GetMatrixColumn(1)[0]);
+        geometryXML->SetAttribute(mitk::TubeGraphDefinitions::XML_MATRIX_YY.c_str(), geometry->GetMatrixColumn(1)[1]);
+        geometryXML->SetAttribute(mitk::TubeGraphDefinitions::XML_MATRIX_YZ.c_str(), geometry->GetMatrixColumn(1)[2]);
+        geometryXML->SetAttribute(mitk::TubeGraphDefinitions::XML_MATRIX_ZX.c_str(), geometry->GetMatrixColumn(2)[0]);
+        geometryXML->SetAttribute(mitk::TubeGraphDefinitions::XML_MATRIX_ZY.c_str(), geometry->GetMatrixColumn(2)[1]);
+        geometryXML->SetAttribute(mitk::TubeGraphDefinitions::XML_MATRIX_ZZ.c_str(), geometry->GetMatrixColumn(2)[2]);
 
-        geometryXML->SetDoubleAttribute(mitk::TubeGraphDefinitions::XML_ORIGIN_X, geometry->GetOrigin()[0]);
-        geometryXML->SetDoubleAttribute(mitk::TubeGraphDefinitions::XML_ORIGIN_Y, geometry->GetOrigin()[1]);
-        geometryXML->SetDoubleAttribute(mitk::TubeGraphDefinitions::XML_ORIGIN_Z, geometry->GetOrigin()[2]);
+        geometryXML->SetAttribute(mitk::TubeGraphDefinitions::XML_ORIGIN_X.c_str(), geometry->GetOrigin()[0]);
+        geometryXML->SetAttribute(mitk::TubeGraphDefinitions::XML_ORIGIN_Y.c_str(), geometry->GetOrigin()[1]);
+        geometryXML->SetAttribute(mitk::TubeGraphDefinitions::XML_ORIGIN_Z.c_str(), geometry->GetOrigin()[2]);
 
-        geometryXML->SetDoubleAttribute(mitk::TubeGraphDefinitions::XML_SPACING_X, geometry->GetSpacing()[0]);
-        geometryXML->SetDoubleAttribute(mitk::TubeGraphDefinitions::XML_SPACING_Y, geometry->GetSpacing()[1]);
-        geometryXML->SetDoubleAttribute(mitk::TubeGraphDefinitions::XML_SPACING_Z, geometry->GetSpacing()[2]);
+        geometryXML->SetAttribute(mitk::TubeGraphDefinitions::XML_SPACING_X.c_str(), geometry->GetSpacing()[0]);
+        geometryXML->SetAttribute(mitk::TubeGraphDefinitions::XML_SPACING_Y.c_str(), geometry->GetSpacing()[1]);
+        geometryXML->SetAttribute(mitk::TubeGraphDefinitions::XML_SPACING_Z.c_str(), geometry->GetSpacing()[2]);
 
       } // end geometry
-      mainXML->LinkEndChild(geometryXML);
+      mainXML->InsertEndChild(geometryXML);
 
-      auto *verticesXML = new TiXmlElement(mitk::TubeGraphDefinitions::XML_VERTICES);
+      auto *verticesXML = documentXML.NewElement(mitk::TubeGraphDefinitions::XML_VERTICES.c_str());
       { // begin vertices section
         std::vector<mitk::TubeGraphVertex> vertexVector = tubeGraph->GetVectorOfAllVertices();
         for (unsigned int index = 0; index < vertexVector.size(); index++)
         {
-          auto *vertexXML = new TiXmlElement(mitk::TubeGraphDefinitions::XML_VERTEX);
-          vertexXML->SetAttribute(mitk::TubeGraphDefinitions::XML_VERTEX_ID,
-                                  tubeGraph->GetVertexDescriptor(vertexVector[index]));
+          auto *vertexXML = documentXML.NewElement(mitk::TubeGraphDefinitions::XML_VERTEX.c_str());
+          vertexXML->SetAttribute(mitk::TubeGraphDefinitions::XML_VERTEX_ID.c_str(),
+                                  static_cast<int>(tubeGraph->GetVertexDescriptor(vertexVector[index])));
           // element of each vertex
           const mitk::TubeElement *element = vertexVector[index].GetTubeElement();
-          auto *elementXML = new TiXmlElement(mitk::TubeGraphDefinitions::XML_ELEMENT);
-          elementXML->SetDoubleAttribute(mitk::TubeGraphDefinitions::XML_ELEMENT_X,
+          auto *elementXML = documentXML.NewElement(mitk::TubeGraphDefinitions::XML_ELEMENT.c_str());
+          elementXML->SetAttribute(mitk::TubeGraphDefinitions::XML_ELEMENT_X.c_str(),
                                          element->GetCoordinates().GetElement(0));
-          elementXML->SetDoubleAttribute(mitk::TubeGraphDefinitions::XML_ELEMENT_Y,
+          elementXML->SetAttribute(mitk::TubeGraphDefinitions::XML_ELEMENT_Y.c_str(),
                                          element->GetCoordinates().GetElement(1));
-          elementXML->SetDoubleAttribute(mitk::TubeGraphDefinitions::XML_ELEMENT_Z,
+          elementXML->SetAttribute(mitk::TubeGraphDefinitions::XML_ELEMENT_Z.c_str(),
                                          element->GetCoordinates().GetElement(2));
           if (dynamic_cast<const mitk::CircularProfileTubeElement *>(element))
-            elementXML->SetDoubleAttribute(
-              mitk::TubeGraphDefinitions::XML_ELEMENT_DIAMETER,
+            elementXML->SetAttribute(
+              mitk::TubeGraphDefinitions::XML_ELEMENT_DIAMETER.c_str(),
               (dynamic_cast<const mitk::CircularProfileTubeElement *>(element))->GetDiameter());
           else
-            elementXML->SetDoubleAttribute(mitk::TubeGraphDefinitions::XML_ELEMENT_DIAMETER, 2);
+            elementXML->SetAttribute(mitk::TubeGraphDefinitions::XML_ELEMENT_DIAMETER.c_str(), 2);
 
-          vertexXML->LinkEndChild(elementXML);
+          vertexXML->InsertEndChild(elementXML);
 
-          verticesXML->LinkEndChild(vertexXML);
+          verticesXML->InsertEndChild(vertexXML);
         }
       } // end vertices section
-      mainXML->LinkEndChild(verticesXML);
+      mainXML->InsertEndChild(verticesXML);
 
-      auto *edgesXML = new TiXmlElement(mitk::TubeGraphDefinitions::XML_EDGES);
+      auto *edgesXML = documentXML.NewElement(mitk::TubeGraphDefinitions::XML_EDGES.c_str());
       { // begin edges section
         std::vector<mitk::TubeGraphEdge> edgeVector = tubeGraph->GetVectorOfAllEdges();
         for (unsigned int index = 0; index < edgeVector.size(); index++)
         {
-          auto *edgeXML = new TiXmlElement(mitk::TubeGraphDefinitions::XML_EDGE);
-          edgeXML->SetAttribute(mitk::TubeGraphDefinitions::XML_EDGE_ID, index);
+          auto *edgeXML = documentXML.NewElement(mitk::TubeGraphDefinitions::XML_EDGE.c_str());
+          edgeXML->SetAttribute(mitk::TubeGraphDefinitions::XML_EDGE_ID.c_str(), index);
           std::pair<mitk::TubeGraphVertex, mitk::TubeGraphVertex> soureTargetPair =
             tubeGraph->GetVerticesOfAnEdge(tubeGraph->GetEdgeDescriptor(edgeVector[index]));
-          edgeXML->SetAttribute(mitk::TubeGraphDefinitions::XML_EDGE_SOURCE_ID,
-                                tubeGraph->GetVertexDescriptor(soureTargetPair.first));
-          edgeXML->SetAttribute(mitk::TubeGraphDefinitions::XML_EDGE_TARGET_ID,
-                                tubeGraph->GetVertexDescriptor(soureTargetPair.second));
+          edgeXML->SetAttribute(mitk::TubeGraphDefinitions::XML_EDGE_SOURCE_ID.c_str(),
+            static_cast<int>(tubeGraph->GetVertexDescriptor(soureTargetPair.first)));
+          edgeXML->SetAttribute(mitk::TubeGraphDefinitions::XML_EDGE_TARGET_ID.c_str(),
+            static_cast<int>(tubeGraph->GetVertexDescriptor(soureTargetPair.second)));
 
           // begin elements of the edge
           std::vector<mitk::TubeElement *> elementVector = edgeVector[index].GetElementVector();
           for (unsigned int elementIndex = 0; elementIndex < elementVector.size(); elementIndex++)
           {
-            auto *elementXML = new TiXmlElement(mitk::TubeGraphDefinitions::XML_ELEMENT);
-            elementXML->SetDoubleAttribute(mitk::TubeGraphDefinitions::XML_ELEMENT_X,
+            auto *elementXML = documentXML.NewElement(mitk::TubeGraphDefinitions::XML_ELEMENT.c_str());
+            elementXML->SetAttribute(mitk::TubeGraphDefinitions::XML_ELEMENT_X.c_str(),
                                            elementVector[elementIndex]->GetCoordinates().GetElement(0));
-            elementXML->SetDoubleAttribute(mitk::TubeGraphDefinitions::XML_ELEMENT_Y,
+            elementXML->SetAttribute(mitk::TubeGraphDefinitions::XML_ELEMENT_Y.c_str(),
                                            elementVector[elementIndex]->GetCoordinates().GetElement(1));
-            elementXML->SetDoubleAttribute(mitk::TubeGraphDefinitions::XML_ELEMENT_Z,
+            elementXML->SetAttribute(mitk::TubeGraphDefinitions::XML_ELEMENT_Z.c_str(),
                                            elementVector[elementIndex]->GetCoordinates().GetElement(2));
             if (dynamic_cast<const mitk::CircularProfileTubeElement *>(elementVector[elementIndex]))
-              elementXML->SetDoubleAttribute(
-                mitk::TubeGraphDefinitions::XML_ELEMENT_DIAMETER,
+              elementXML->SetAttribute(
+                mitk::TubeGraphDefinitions::XML_ELEMENT_DIAMETER.c_str(),
                 (dynamic_cast<const mitk::CircularProfileTubeElement *>(elementVector[elementIndex]))->GetDiameter());
             else
-              elementXML->SetDoubleAttribute(mitk::TubeGraphDefinitions::XML_ELEMENT_DIAMETER, 2);
-            edgeXML->LinkEndChild(elementXML);
-            // elementsXML->LinkEndChild(elementXML);
+              elementXML->SetAttribute(mitk::TubeGraphDefinitions::XML_ELEMENT_DIAMETER.c_str(), 2);
+            edgeXML->InsertEndChild(elementXML);
+            // elementsXML->InsertEndChild(elementXML);
           }
-          edgesXML->LinkEndChild(edgeXML);
+          edgesXML->InsertEndChild(edgeXML);
         }
       } // end edges section
-      mainXML->LinkEndChild(edgesXML);
+      mainXML->InsertEndChild(edgesXML);
 
-      auto *labelGroupsXML = new TiXmlElement(mitk::TubeGraphDefinitions::XML_LABELGROUPS);
+      auto *labelGroupsXML = documentXML.NewElement(mitk::TubeGraphDefinitions::XML_LABELGROUPS.c_str());
       { // begin label group  section
         std::vector<TubeGraphProperty::LabelGroup *> labelGroupVector = tubeGraphProperty->GetLabelGroups();
         for (unsigned int index = 0; index < labelGroupVector.size(); index++)
         {
-          auto *labelGroupXML = new TiXmlElement(mitk::TubeGraphDefinitions::XML_LABELGROUP);
-          labelGroupXML->SetAttribute(mitk::TubeGraphDefinitions::XML_LABELGROUP_NAME,
-                                      labelGroupVector[index]->labelGroupName);
+          auto *labelGroupXML = documentXML.NewElement(mitk::TubeGraphDefinitions::XML_LABELGROUP.c_str());
+          labelGroupXML->SetAttribute(mitk::TubeGraphDefinitions::XML_LABELGROUP_NAME.c_str(),
+                                      labelGroupVector[index]->labelGroupName.c_str());
           // begin labels of the label group
           std::vector<TubeGraphProperty::LabelGroup::Label *> labelVector = labelGroupVector[index]->labels;
           for (unsigned int labelIndex = 0; labelIndex < labelVector.size(); labelIndex++)
           {
-            auto *labelXML = new TiXmlElement(mitk::TubeGraphDefinitions::XML_LABEL);
-            labelXML->SetAttribute(mitk::TubeGraphDefinitions::XML_LABEL_NAME, labelVector[labelIndex]->labelName);
-            labelXML->SetAttribute(mitk::TubeGraphDefinitions::XML_LABEL_VISIBILITY,
-                                   labelVector[labelIndex]->isVisible);
-            labelXML->SetDoubleAttribute(mitk::TubeGraphDefinitions::XML_LABEL_COLOR_R,
+            auto *labelXML = documentXML.NewElement(mitk::TubeGraphDefinitions::XML_LABEL.c_str());
+            labelXML->SetAttribute(mitk::TubeGraphDefinitions::XML_LABEL_NAME.c_str(), labelVector[labelIndex]->labelName.c_str());
+            labelXML->SetAttribute(mitk::TubeGraphDefinitions::XML_LABEL_VISIBILITY.c_str(),
+                                   labelVector[labelIndex]->isVisible ? 1 : 0);
+            labelXML->SetAttribute(mitk::TubeGraphDefinitions::XML_LABEL_COLOR_R.c_str(),
                                          labelVector[labelIndex]->labelColor[0]);
-            labelXML->SetDoubleAttribute(mitk::TubeGraphDefinitions::XML_LABEL_COLOR_G,
+            labelXML->SetAttribute(mitk::TubeGraphDefinitions::XML_LABEL_COLOR_G.c_str(),
                                          labelVector[labelIndex]->labelColor[1]);
-            labelXML->SetDoubleAttribute(mitk::TubeGraphDefinitions::XML_LABEL_COLOR_B,
+            labelXML->SetAttribute(mitk::TubeGraphDefinitions::XML_LABEL_COLOR_B.c_str(),
                                          labelVector[labelIndex]->labelColor[2]);
-            labelGroupXML->LinkEndChild(labelXML);
+            labelGroupXML->InsertEndChild(labelXML);
           }
-          labelGroupsXML->LinkEndChild(labelGroupXML);
+          labelGroupsXML->InsertEndChild(labelGroupXML);
         }
       } // end labe group section
-      mainXML->LinkEndChild(labelGroupsXML);
+      mainXML->InsertEndChild(labelGroupsXML);
 
-      auto *attributionsXML = new TiXmlElement(mitk::TubeGraphDefinitions::XML_ATTRIBUTIONS);
+      auto *attributionsXML = documentXML.NewElement(mitk::TubeGraphDefinitions::XML_ATTRIBUTIONS.c_str());
       { // begin attributions section
         std::map<mitk::TubeGraphProperty::TubeToLabelGroupType, std::string> tubeToLabelGroup =
           tubeGraphProperty->GetTubesToLabels();
@@ -502,39 +490,38 @@ namespace mitk
              it != tubeToLabelGroup.end();
              it++)
         {
-          auto *attributXML = new TiXmlElement(mitk::TubeGraphDefinitions::XML_ATTRIBUTION);
-          attributXML->SetDoubleAttribute(mitk::TubeGraphDefinitions::XML_TUBE_ID_1, it->first.first.first);
-          attributXML->SetDoubleAttribute(mitk::TubeGraphDefinitions::XML_TUBE_ID_2, it->first.first.second);
-          attributXML->SetAttribute(mitk::TubeGraphDefinitions::XML_LABELGROUP_NAME, it->first.second);
-          attributXML->SetAttribute(mitk::TubeGraphDefinitions::XML_LABEL_NAME, it->second);
-          attributionsXML->LinkEndChild(attributXML);
+          auto *attributXML = documentXML.NewElement(mitk::TubeGraphDefinitions::XML_ATTRIBUTION.c_str());
+          attributXML->SetAttribute(mitk::TubeGraphDefinitions::XML_TUBE_ID_1.c_str(), static_cast<int>(it->first.first.first));
+          attributXML->SetAttribute(mitk::TubeGraphDefinitions::XML_TUBE_ID_2.c_str(), static_cast<int>(it->first.first.second));
+          attributXML->SetAttribute(mitk::TubeGraphDefinitions::XML_LABELGROUP_NAME.c_str(), it->first.second.c_str());
+          attributXML->SetAttribute(mitk::TubeGraphDefinitions::XML_LABEL_NAME.c_str(), it->second.c_str());
+          attributionsXML->InsertEndChild(attributXML);
         }
 
       } // end attributions section
-      mainXML->LinkEndChild(attributionsXML);
+      mainXML->InsertEndChild(attributionsXML);
 
-      auto *annotationsXML = new TiXmlElement(mitk::TubeGraphDefinitions::XML_ANNOTATIONS);
+      auto *annotationsXML = documentXML.NewElement(mitk::TubeGraphDefinitions::XML_ANNOTATIONS.c_str());
       { // begin annotations section
         std::vector<mitk::TubeGraphProperty::Annotation *> annotations = tubeGraphProperty->GetAnnotations();
         for (unsigned int index = 0; index < annotations.size(); index++)
         {
-          auto *annotationXML = new TiXmlElement(mitk::TubeGraphDefinitions::XML_ANNOTATION);
-          annotationXML->SetAttribute(mitk::TubeGraphDefinitions::XML_ANNOTATION_NAME, annotations[index]->name);
-          annotationXML->SetAttribute(mitk::TubeGraphDefinitions::XML_ANNOTATION_DESCRIPTION,
-                                      annotations[index]->description);
-          annotationXML->SetDoubleAttribute(mitk::TubeGraphDefinitions::XML_TUBE_ID_1, annotations[index]->tube.first);
-          annotationXML->SetDoubleAttribute(mitk::TubeGraphDefinitions::XML_TUBE_ID_2, annotations[index]->tube.second);
+          auto *annotationXML = documentXML.NewElement(mitk::TubeGraphDefinitions::XML_ANNOTATION.c_str());
+          annotationXML->SetAttribute(mitk::TubeGraphDefinitions::XML_ANNOTATION_NAME.c_str(), annotations[index]->name.c_str());
+          annotationXML->SetAttribute(mitk::TubeGraphDefinitions::XML_ANNOTATION_DESCRIPTION.c_str(), annotations[index]->description.c_str());
+          annotationXML->SetAttribute(mitk::TubeGraphDefinitions::XML_TUBE_ID_1.c_str(), static_cast<int>(annotations[index]->tube.first));
+          annotationXML->SetAttribute(mitk::TubeGraphDefinitions::XML_TUBE_ID_2.c_str(), static_cast<int>(annotations[index]->tube.second));
 
-          annotationsXML->LinkEndChild(annotationXML);
+          annotationsXML->InsertEndChild(annotationXML);
         }
       } // end annotations section
-      mainXML->LinkEndChild(annotationsXML);
+      mainXML->InsertEndChild(annotationsXML);
     } // end document
 
-    TiXmlPrinter printer;
-    printer.SetStreamPrinting();
-    documentXML.Accept(&printer);
-    out << printer.Str();
+    tinyxml2::XMLPrinter printer;
+    documentXML.Print(&printer);
+
+    out << printer.CStr();
   }
 
   AbstractFileIO::ConfidenceLevel TubeGraphIO::GetWriterConfidenceLevel() const

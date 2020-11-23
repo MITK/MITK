@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include <itkMutexLockHolder.h>
 #include <mitkEndoMacros.h>
 #include <mitkEndoDebug.h>
+#include <tinyxml2.h>
 
 mitk::CameraIntrinsics::CameraIntrinsics()
   : m_Valid(false), m_Mutex(itk::FastMutexLock::New())
@@ -216,74 +217,74 @@ std::string mitk::CameraIntrinsics::ToString() const
   return s.str();
 }
 
-void mitk::CameraIntrinsics::ToXML(TiXmlElement* elem) const
+void mitk::CameraIntrinsics::ToXML(tinyxml2::XMLElement* elem) const
 {
   itk::MutexLockHolder<itk::FastMutexLock> lock(*m_Mutex);
   elem->SetValue(this->GetNameOfClass());
   std::ostringstream s; s.precision(12);
   const cv::Mat& CameraMatrix = m_CameraMatrix;
   s.str(""); s << CameraMatrix.at<double>(0,0);
-  elem->SetAttribute( "fx", s.str() );
+  elem->SetAttribute( "fx", s.str().c_str() );
   s.str(""); s << CameraMatrix.at<double>(1,1);
-  elem->SetAttribute( "fy", s.str() );
+  elem->SetAttribute( "fy", s.str().c_str());
   s.str(""); s << CameraMatrix.at<double>(0,2);
-  elem->SetAttribute( "cx", s.str() );
+  elem->SetAttribute( "cx", s.str().c_str());
   s.str(""); s << CameraMatrix.at<double>(1,2);
-  elem->SetAttribute( "cy", s.str() );
+  elem->SetAttribute( "cy", s.str().c_str());
 
   const cv::Mat& DistorsionCoeffs = m_DistorsionCoeffs;
   s.str(""); s << DistorsionCoeffs.at<double>(0,0);
-  elem->SetAttribute( "k1", s.str() );
+  elem->SetAttribute( "k1", s.str().c_str());
   s.str(""); s << DistorsionCoeffs.at<double>(0,1);
-  elem->SetAttribute( "k2", s.str() );
+  elem->SetAttribute( "k2", s.str().c_str());
   s.str(""); s << DistorsionCoeffs.at<double>(0,2);
-  elem->SetAttribute( "p1", s.str() );
+  elem->SetAttribute( "p1", s.str().c_str());
   s.str(""); s << DistorsionCoeffs.at<double>(0,3);
-  elem->SetAttribute( "p2", s.str() );
-  elem->SetAttribute("Valid", m_Valid);
+  elem->SetAttribute( "p2", s.str().c_str());
+  elem->SetAttribute("Valid", static_cast<int>(m_Valid));
   //s.str(""); s << DistorsionCoeffs.at<double>(4,0);
-  //elem->SetAttribute( "k3", s.str() );
+  //elem->SetAttribute( "k3", s.str().c_str() );
 }
 
-void mitk::CameraIntrinsics::FromGMLCalibrationXML(TiXmlElement* elem)
+void mitk::CameraIntrinsics::FromGMLCalibrationXML(const tinyxml2::XMLElement* elem)
 {
   assert( elem );
-  assert( elem->ValueStr() == "results" );
+  assert( std::string(elem->Value()) == "results" );
   cv::Mat CameraMatrix = cv::Mat::zeros(3, 3, cv::DataType<double>::type);
   CameraMatrix.at<double>(2,2) = 1.0;
   cv::Mat DistorsionCoeffs = cv::Mat::zeros(1, 5, cv::DataType<double>::type);
 
-  TiXmlElement* focus_lenXElem = elem->FirstChildElement("focus_lenX");
+  const auto* focus_lenXElem = elem->FirstChildElement("focus_lenX");
   endoAssert( focus_lenXElem != nullptr );
   CameraMatrix.at<double>(0,0) = atof( focus_lenXElem->GetText() );
 
-  TiXmlElement* focus_lenYElem = elem->FirstChildElement("focus_lenY");
+  const auto* focus_lenYElem = elem->FirstChildElement("focus_lenY");
   endoAssert( focus_lenYElem != nullptr );
   CameraMatrix.at<double>(1,1) = atof( focus_lenYElem->GetText() );
 
-  TiXmlElement* PrincipalXElem = elem->FirstChildElement("PrincipalX");
+  const auto* PrincipalXElem = elem->FirstChildElement("PrincipalX");
   endoAssert( PrincipalXElem != nullptr );
   CameraMatrix.at<double>(0,2) = atof( PrincipalXElem->GetText() );
 
-  TiXmlElement* PrincipalYElem = elem->FirstChildElement("PrincipalY");
+  const auto* PrincipalYElem = elem->FirstChildElement("PrincipalY");
   endoAssert( PrincipalYElem != nullptr );
   CameraMatrix.at<double>(1,2) = atof( PrincipalYElem->GetText() );
 
   // DISTORSION COEFFS
 
-  TiXmlElement* Dist1Elem = elem->FirstChildElement("Dist1");
+  const auto* Dist1Elem = elem->FirstChildElement("Dist1");
   endoAssert( Dist1Elem != nullptr );
   DistorsionCoeffs.at<double>(0,0) = atof( Dist1Elem->GetText() );
 
-  TiXmlElement* Dist2Elem = elem->FirstChildElement("Dist2");
+  const auto* Dist2Elem = elem->FirstChildElement("Dist2");
   endoAssert( Dist2Elem != nullptr );
   DistorsionCoeffs.at<double>(0,1) = atof( Dist2Elem->GetText() );
 
-  TiXmlElement* Dist3Elem = elem->FirstChildElement("Dist3");
+  const auto* Dist3Elem = elem->FirstChildElement("Dist3");
   endoAssert( Dist3Elem != nullptr );
   DistorsionCoeffs.at<double>(0,2) = atof( Dist3Elem->GetText() );
 
-  TiXmlElement* Dist4Elem = elem->FirstChildElement("Dist4");
+  const auto* Dist4Elem = elem->FirstChildElement("Dist4");
   endoAssert( Dist4Elem != nullptr );
   DistorsionCoeffs.at<double>(0,3) = atof( Dist4Elem->GetText() );
 
@@ -300,12 +301,12 @@ void mitk::CameraIntrinsics::FromGMLCalibrationXML(TiXmlElement* elem)
   this->Modified();
 }
 
-void mitk::CameraIntrinsics::FromXML(TiXmlElement* elem)
+void mitk::CameraIntrinsics::FromXML(const tinyxml2::XMLElement* elem)
 {
   endoAssert ( elem );
   MITK_DEBUG << elem->Value();
-  std::string filename;
-  if(elem->QueryStringAttribute("file", &filename) == TIXML_SUCCESS)
+  const char* filename = elem->Attribute("file");
+  if(nullptr != filename)
   {
     this->FromXMLFile(filename);
     return;
@@ -325,22 +326,22 @@ void mitk::CameraIntrinsics::FromXML(TiXmlElement* elem)
   cv::Mat CameraMatrix = cv::Mat::zeros(3, 3, cv::DataType<double>::type);
   CameraMatrix.at<double>(2,2) = 1.0;
   double val = 0.0;
-  if(elem->QueryDoubleAttribute("fx", &val) == TIXML_SUCCESS)
+  if(elem->QueryDoubleAttribute("fx", &val) == tinyxml2::XML_SUCCESS)
     CameraMatrix.at<double>(0,0) = val;
   else
     err << "fx, ";
 
-  if(elem->QueryDoubleAttribute("fy", &val) == TIXML_SUCCESS)
+  if(elem->QueryDoubleAttribute("fy", &val) == tinyxml2::XML_SUCCESS)
     CameraMatrix.at<double>(1,1) = val;
   else
     err << "fy, ";
 
-  if(elem->QueryDoubleAttribute("cx", &val) == TIXML_SUCCESS)
+  if(elem->QueryDoubleAttribute("cx", &val) == tinyxml2::XML_SUCCESS)
     CameraMatrix.at<double>(0,2) = val;
   else
     err << "cx, ";
 
-  if(elem->QueryDoubleAttribute("cy", &val) == TIXML_SUCCESS)
+  if(elem->QueryDoubleAttribute("cy", &val) == tinyxml2::XML_SUCCESS)
     CameraMatrix.at<double>(1,2) = val;
   else
     err << "cy, ";
@@ -348,29 +349,29 @@ void mitk::CameraIntrinsics::FromXML(TiXmlElement* elem)
   // DISTORSION COEFFS
   endodebug( "creating DistorsionCoeffs from XML file")
   cv::Mat DistorsionCoeffs = cv::Mat::zeros(1, 5, cv::DataType<double>::type);
-  if(elem->QueryDoubleAttribute("k1", &val) == TIXML_SUCCESS)
+  if(elem->QueryDoubleAttribute("k1", &val) == tinyxml2::XML_SUCCESS)
     DistorsionCoeffs.at<double>(0,0) = val;
   else
     err << "k1, ";
 
-  if(elem->QueryDoubleAttribute("k2", &val) == TIXML_SUCCESS)
+  if(elem->QueryDoubleAttribute("k2", &val) == tinyxml2::XML_SUCCESS)
     DistorsionCoeffs.at<double>(0,1) = val;
   else
     err << "k2, ";
 
-  if(elem->QueryDoubleAttribute("p1", &val) == TIXML_SUCCESS)
+  if(elem->QueryDoubleAttribute("p1", &val) == tinyxml2::XML_SUCCESS)
     DistorsionCoeffs.at<double>(0,2) = val;
   else
     err << "p1, ";
 
-  if(elem->QueryDoubleAttribute("p2", &val) == TIXML_SUCCESS)
+  if(elem->QueryDoubleAttribute("p2", &val) == tinyxml2::XML_SUCCESS)
     DistorsionCoeffs.at<double>(0,3) = val;
   else
     err << "p2, ";
 
   DistorsionCoeffs.at<double>(0,4) = 0.0;
 
-  /*if(elem->QueryDoubleAttribute("k3", &val) == TIXML_SUCCESS)
+  /*if(elem->QueryDoubleAttribute("k3", &val) == tinyxml2::XML_SUCCESS)
     DistorsionCoeffs.at<double>(4,0) = val;
   else
     err << "k3, ";*/

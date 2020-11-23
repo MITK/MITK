@@ -16,7 +16,11 @@ found in the LICENSE file.
 // MITK
 #include "mitkGeometry3D.h"
 
-class TiXmlElement;
+namespace tinyxml2
+{
+  class XMLDocument;
+  class XMLElement;
+}
 
 namespace mitk
 {
@@ -38,13 +42,13 @@ namespace mitk
     /**
      * @brief Serialize given geometry to XML.
      */
-    static TiXmlElement *ToXML(const Geometry3D *geometry);
+    static tinyxml2::XMLElement *ToXML(tinyxml2::XMLDocument& doc, const Geometry3D *geometry);
 
     /**
      * @brief Create a Geometry3D from XML.
      * Interprets only the format created by ToXML().
      */
-    static Geometry3D::Pointer FromXML(TiXmlElement *node);
+    static Geometry3D::Pointer FromXML(const tinyxml2::XMLElement *node);
   };
 }
 

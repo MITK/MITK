@@ -83,7 +83,7 @@ namespace mitk
     cv::Mat GetCameraMatrix() const;
     cv::Mat GetDistorsionCoeffs();
     cv::Mat GetDistorsionCoeffs() const;
-    void ToXML(TiXmlElement* elem) const override;
+    void ToXML(tinyxml2::XMLElement* elem) const override;
     std::string ToString() const;
     std::string GetString();
     double GetFocalLengthX() const;
@@ -113,8 +113,8 @@ namespace mitk
                         const mitk::Point3D& principalPoint,
                         const mitk::Point4D& distortionCoefficients);
 
-    void FromXML(TiXmlElement* elem) override;
-    void FromGMLCalibrationXML(TiXmlElement* elem);
+    void FromXML(const tinyxml2::XMLElement* elem) override;
+    void FromGMLCalibrationXML(const tinyxml2::XMLElement* elem);
     std::string ToOctaveString(const std::string& varName="CameraIntrinsics");
 
     ~CameraIntrinsics() override;

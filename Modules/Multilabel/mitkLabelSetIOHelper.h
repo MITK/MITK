@@ -16,7 +16,11 @@ found in the LICENSE file.
 #include <MitkMultilabelExports.h>
 #include <itkSmartPointer.h>
 
-class TiXmlElement;
+namespace tinyxml2
+{
+  class XMLDocument;
+  class XMLElement;
+}
 
 namespace mitk
 {
@@ -52,27 +56,29 @@ namespace mitk
                                         itk::SmartPointer<mitk::LabelSetImage> &inputImage);
 
     /**
-     * @brief Creates a mitk::Label from a TiXmlElement
+     * @brief Creates a mitk::Label from an XML element
      * @param labelElem the xml element from which a mitk::Label will be created
      * @return the created mitk::Label
      */
-    static itk::SmartPointer<mitk::Label> LoadLabelFromTiXmlDocument(TiXmlElement *labelElem);
+    static itk::SmartPointer<mitk::Label> LoadLabelFromXMLDocument(const tinyxml2::XMLElement *labelElem);
 
     /**
-     * @brief Creates a TiXmlElement from a mitk::Label
+     * @brief Creates an XML element from a mitk::Label
+     * @param doc
      * @param label the mitk::Label from which the xml element will be created
-     * @return the created TiXmlElement
+     * @return the created XML element
      */
-    static TiXmlElement *GetLabelAsTiXmlElement(Label *label);
+    static tinyxml2::XMLElement *GetLabelAsXMLElement(tinyxml2::XMLDocument &doc, Label *label);
 
     /**
      * @brief Since a mitk::Label is basically a mitk::PropertyList this function coverts the label's properties into
      * XML
+     * @param doc
      * @param key the property's key which will be used in the XML element
      * @param property the mitk::BaseProperty that should be converted
-     * @return the created TiXmlElement
+     * @return the created XML element
      */
-    static TiXmlElement *PropertyToXmlElem(const std::string &key, const BaseProperty *property);
+    static tinyxml2::XMLElement *PropertyToXMLElement(tinyxml2::XMLDocument& doc, const std::string &key, const BaseProperty *property);
 
     /**
      * @brief Since a mitk::Label is basically a mitk::PropertyList this function coverts a XML element into a property
@@ -81,7 +87,7 @@ namespace mitk
      * @param elem the XML elem from which the property will be created
      * @return true if the conversion was successful and false otherwise
      */
-    static bool PropertyFromXmlElem(std::string &key, itk::SmartPointer<mitk::BaseProperty> &prop, TiXmlElement *elem);
+    static bool PropertyFromXMLElement(std::string &key, itk::SmartPointer<mitk::BaseProperty> &prop, const tinyxml2::XMLElement *elem);
 
   private:
     LabelSetIOHelper();

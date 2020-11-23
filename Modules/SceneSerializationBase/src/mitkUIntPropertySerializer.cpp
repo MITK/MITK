@@ -14,22 +14,23 @@ found in the LICENSE file.
 #define mitkUIntPropertySerializer_h_included
 
 #include "mitkBasePropertySerializer.h"
-
 #include "mitkProperties.h"
+#include <tinyxml2.h>
 
 namespace mitk
 {
   class UIntPropertySerializer : public BasePropertySerializer
   {
   public:
-    mitkClassMacro(UIntPropertySerializer, BasePropertySerializer);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(UIntPropertySerializer, BasePropertySerializer)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
-      TiXmlElement *Serialize() override
+    tinyxml2::XMLElement* Serialize(tinyxml2::XMLDocument& doc) override
     {
       if (const UIntProperty *prop = dynamic_cast<const UIntProperty *>(m_Property.GetPointer()))
       {
-        auto element = new TiXmlElement("unsigned");
+        auto *element = doc.NewElement("unsigned");
         element->SetAttribute("value", static_cast<unsigned int>(prop->GetValue()));
         return element;
       }
@@ -37,13 +38,13 @@ namespace mitk
         return nullptr;
     }
 
-    BaseProperty::Pointer Deserialize(TiXmlElement *element) override
+    BaseProperty::Pointer Deserialize(const tinyxml2::XMLElement *element) override
     {
       if (!element)
         return nullptr;
 
       unsigned int integer;
-      if (element->QueryUnsignedAttribute("value", &integer) == TIXML_SUCCESS)
+      if (element->QueryUnsignedAttribute("value", &integer) == tinyxml2::XML_SUCCESS)
       {
         return UIntProperty::New(integer).GetPointer();
       }

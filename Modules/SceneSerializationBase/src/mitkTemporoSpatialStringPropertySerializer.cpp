@@ -14,25 +14,26 @@ found in the LICENSE file.
 #define mitkTemporoSpatialStringPropertySerializer_h_included
 
 #include "mitkBasePropertySerializer.h"
-
 #include "mitkTemporoSpatialStringProperty.h"
+#include <tinyxml2.h>
 
 namespace mitk
 {
   class TemporoSpatialStringPropertySerializer : public BasePropertySerializer
   {
   public:
-    mitkClassMacro(TemporoSpatialStringPropertySerializer, BasePropertySerializer);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(TemporoSpatialStringPropertySerializer, BasePropertySerializer)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
-      TiXmlElement *Serialize() override
+    tinyxml2::XMLElement* Serialize(tinyxml2::XMLDocument& doc) override
     {
       if (const TemporoSpatialStringProperty *prop =
             dynamic_cast<const TemporoSpatialStringProperty *>(m_Property.GetPointer()))
       {
-        auto element = new TiXmlElement("temporo_spatial_string");
+        auto *element = doc.NewElement("temporo_spatial_string");
         std::string content = PropertyPersistenceSerialization::serializeTemporoSpatialStringPropertyToJSON(prop);
-        TiXmlText text(content.c_str());
+        auto* text = doc.NewText(content.c_str());
         element->InsertEndChild(text);
         return element;
       }
@@ -40,7 +41,7 @@ namespace mitk
         return nullptr;
     }
 
-    BaseProperty::Pointer Deserialize(TiXmlElement *element) override
+    BaseProperty::Pointer Deserialize(const tinyxml2::XMLElement *element) override
     {
       if (!element)
         return nullptr;

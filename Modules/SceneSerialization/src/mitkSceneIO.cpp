@@ -30,13 +30,13 @@ found in the LICENSE file.
 
 #include <itkObjectFactoryBase.h>
 
-#include <tinyxml.h>
-
 #include <fstream>
 #include <mitkIOUtil.h>
 #include <sstream>
 
 #include "itksys/SystemTools.hxx"
+
+#include <tinyxml2.h>
 
 mitk::SceneIO::SceneIO() : m_WorkingDirectory(""), m_UnzipErrors(0)
 {
@@ -196,11 +196,11 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadSceneUnzipped(const std::string &i
 
   // test if index.xml exists
   // parse index.xml with TinyXML
-  TiXmlDocument document(indexfilename);
-  if (!document.LoadFile())
+  tinyxml2::XMLDocument document;
+  if (tinyxml2::XML_SUCCESS != document.LoadFile(indexfilename.c_str()))
   {
     MITK_ERROR << "Could not open/read/parse " << workingDir << mitk::IOUtil::GetDirectorySeparator()
-      << "index.xml\nTinyXML reports: " << document.ErrorDesc() << std::endl;
+      << "index.xml\nTinyXML reports: " << document.ErrorStr() << std::endl;
     return storage;
   }
 
@@ -244,18 +244,14 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
     m_FailedProperties = PropertyList::New();
 
     // start XML DOM
-    TiXmlDocument document;
-    auto *decl = new TiXmlDeclaration(
-      "1.0",
-      "UTF-8",
-      ""); // TODO what to write here? encoding? standalone would mean that we provide a DTD somewhere...
-    document.LinkEndChild(decl);
+    tinyxml2::XMLDocument document;
+    document.InsertEndChild(document.NewDeclaration());
 
-    auto *version = new TiXmlElement("Version");
+    auto *version = document.NewElement("Version");
     version->SetAttribute("Writer", __FILE__);
     version->SetAttribute("Revision", "$Revision: 17055 $");
     version->SetAttribute("FileVersion", 1);
-    document.LinkEndChild(version);
+    document.InsertEndChild(version);
 
     // DataStorage::SetOfObjects::ConstPointer sceneNodes = storage->GetSubset( predicate );
 
@@ -328,7 +324,7 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
 
         if (node)
         {
-          auto *nodeElement = new TiXmlElement("node");
+          auto *nodeElement = document.NewElement("node");
           std::string filenameHint(node->GetName());
           filenameHint = itksys::SystemTools::MakeCindentifier(
             filenameHint.c_str()); // escape filename <-- only allow [A-Za-z0-9_], replace everything else with _
@@ -349,9 +345,9 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
                  sourceUIDIter != searchSourcesIter->second.end();
                  ++sourceUIDIter)
             {
-              auto *uidElement = new TiXmlElement("source");
+              auto *uidElement = document.NewElement("source");
               uidElement->SetAttribute("UID", sourceUIDIter->c_str());
-              nodeElement->LinkEndChild(uidElement);
+              nodeElement->InsertEndChild(uidElement);
             }
           }
 
@@ -360,7 +356,7 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
           {
             // std::string filenameHint( node->GetName() );
             bool error(false);
-            TiXmlElement *dataElement(SaveBaseData(data, filenameHint, error)); // returns a reference to a file
+            auto *dataElement = SaveBaseData(document, data, filenameHint, error); // returns a reference to a file
             if (error)
             {
               m_FailedNodes->push_back(node);
@@ -370,12 +366,12 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
             PropertyList *propertyList = data->GetPropertyList();
             if (propertyList && !propertyList->IsEmpty())
             {
-              TiXmlElement *baseDataPropertiesElement(
-                SavePropertyList(propertyList, filenameHint + "-data")); // returns a reference to a file
-              dataElement->LinkEndChild(baseDataPropertiesElement);
+              auto *baseDataPropertiesElement =
+                SavePropertyList(document, propertyList, filenameHint + "-data"); // returns a reference to a file
+              dataElement->InsertEndChild(baseDataPropertiesElement);
             }
 
-            nodeElement->LinkEndChild(dataElement);
+            nodeElement->InsertEndChild(dataElement);
           }
 
           // store all renderwindow specific propertylists
@@ -385,10 +381,10 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
             PropertyList *propertyList = node->GetPropertyList(renderWindowName);
             if (propertyList && !propertyList->IsEmpty())
             {
-              TiXmlElement *renderWindowPropertiesElement(
-                SavePropertyList(propertyList, filenameHint + "-" + renderWindowName)); // returns a reference to a file
-              renderWindowPropertiesElement->SetAttribute("renderwindow", renderWindowName);
-              nodeElement->LinkEndChild(renderWindowPropertiesElement);
+              auto *renderWindowPropertiesElement =
+                SavePropertyList(document, propertyList, filenameHint + "-" + renderWindowName); // returns a reference to a file
+              renderWindowPropertiesElement->SetAttribute("renderwindow", renderWindowName.c_str());
+              nodeElement->InsertEndChild(renderWindowPropertiesElement);
             }
           }
 
@@ -396,11 +392,11 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
           PropertyList *propertyList = node->GetPropertyList();
           if (propertyList && !propertyList->IsEmpty())
           {
-            TiXmlElement *propertiesElement(
-              SavePropertyList(propertyList, filenameHint + "-node")); // returns a reference to a file
-            nodeElement->LinkEndChild(propertiesElement);
+            auto *propertiesElement =
+              SavePropertyList(document, propertyList, filenameHint + "-node"); // returns a reference to a file
+            nodeElement->InsertEndChild(propertiesElement);
           }
-          document.LinkEndChild(nodeElement);
+          document.InsertEndChild(nodeElement);
         }
         else
         {
@@ -413,10 +409,11 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
 
     std::string defaultLocale_WorkingDirectory = Poco::Path::transcode( m_WorkingDirectory );
 
-    if (!document.SaveFile(defaultLocale_WorkingDirectory + Poco::Path::separator() + "index.xml"))
+    auto xmlFilename = defaultLocale_WorkingDirectory + Poco::Path::separator() + "index.xml";
+    if (tinyxml2::XML_SUCCESS != document.SaveFile(xmlFilename.c_str()))
     {
       MITK_ERROR << "Could not write scene to " << defaultLocale_WorkingDirectory << Poco::Path::separator() << "index.xml"
-                 << "\nTinyXML reports '" << document.ErrorDesc() << "'";
+                 << "\nTinyXML reports '" << document.ErrorStr() << "'";
       return false;
     }
     else
@@ -469,7 +466,7 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
   }
 }
 
-TiXmlElement *mitk::SceneIO::SaveBaseData(BaseData *data, const std::string &filenamehint, bool &error)
+tinyxml2::XMLElement *mitk::SceneIO::SaveBaseData(tinyxml2::XMLDocument &doc, BaseData *data, const std::string &filenamehint, bool &error)
 {
   assert(data);
   error = true;
@@ -479,7 +476,7 @@ TiXmlElement *mitk::SceneIO::SaveBaseData(BaseData *data, const std::string &fil
   //  - create a file containing all information to recreate the BaseData object --> needs to know where to put this
   //  file (and a filename?)
   //  - TODO what to do about writers that creates one file per timestep?
-  auto *element = new TiXmlElement("data");
+  auto *element = doc.NewElement("data");
   element->SetAttribute("type", data->GetNameOfClass());
 
   // construct name of serializer class
@@ -506,7 +503,7 @@ TiXmlElement *mitk::SceneIO::SaveBaseData(BaseData *data, const std::string &fil
       try
       {
         std::string writtenfilename = serializer->Serialize();
-        element->SetAttribute("file", writtenfilename);
+        element->SetAttribute("file", writtenfilename.c_str());
         error = false;
       }
       catch (std::exception &e)
@@ -516,17 +513,17 @@ TiXmlElement *mitk::SceneIO::SaveBaseData(BaseData *data, const std::string &fil
       break;
     }
   }
-  element->SetAttribute("UID", data->GetUID());
+  element->SetAttribute("UID", data->GetUID().c_str());
 
   return element;
 }
 
-TiXmlElement *mitk::SceneIO::SavePropertyList(PropertyList *propertyList, const std::string &filenamehint)
+tinyxml2::XMLElement *mitk::SceneIO::SavePropertyList(tinyxml2::XMLDocument &doc, PropertyList *propertyList, const std::string &filenamehint)
 {
   assert(propertyList);
 
   //  - TODO what to do about shared properties (same object in two lists or behind several keys)?
-  auto *element = new TiXmlElement("properties");
+  auto *element = doc.NewElement("properties");
 
   // construct name of serializer class
   PropertyListSerializer::Pointer serializer = PropertyListSerializer::New();
@@ -538,7 +535,7 @@ TiXmlElement *mitk::SceneIO::SavePropertyList(PropertyList *propertyList, const 
   try
   {
     std::string writtenfilename = serializer->Serialize();
-    element->SetAttribute("file", writtenfilename);
+    element->SetAttribute("file", writtenfilename.c_str());
     PropertyList::Pointer failedProperties = serializer->GetFailedProperties();
     if (failedProperties.IsNotNull())
     {

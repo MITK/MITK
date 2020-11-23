@@ -11,15 +11,16 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkEnumerationPropertySerializer.h"
+#include <tinyxml2.h>
 
 namespace mitk
 {
-  TiXmlElement *EnumerationPropertySerializer::Serialize()
+  tinyxml2::XMLElement *EnumerationPropertySerializer::Serialize(tinyxml2::XMLDocument &doc)
   {
     if (const auto *prop = dynamic_cast<const EnumerationProperty *>(m_Property.GetPointer()))
     {
-      auto element = new TiXmlElement("enum");
-      element->SetAttribute("value", prop->GetValueAsString());
+      auto element = doc.NewElement("enum");
+      element->SetAttribute("value", prop->GetValueAsString().c_str());
       return element;
     }
     else

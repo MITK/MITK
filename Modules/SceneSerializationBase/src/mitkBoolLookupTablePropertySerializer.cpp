@@ -17,15 +17,18 @@ found in the LICENSE file.
 
 #include "mitkProperties.h"
 
+#include <tinyxml2.h>
+
 namespace mitk
 {
   class BoolLookupTablePropertySerializer : public BasePropertySerializer
   {
   public:
-    mitkClassMacro(BoolLookupTablePropertySerializer, BasePropertySerializer);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(BoolLookupTablePropertySerializer, BasePropertySerializer)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
-      TiXmlElement *Serialize() override
+    tinyxml2::XMLElement *Serialize(tinyxml2::XMLDocument &doc) override
     {
       const BoolLookupTableProperty *prop = dynamic_cast<const BoolLookupTableProperty *>(m_Property.GetPointer());
       if (prop == nullptr)
@@ -35,31 +38,28 @@ namespace mitk
       //  return nullptr; // really?
       const BoolLookupTable::LookupTableType &map = lut.GetLookupTable();
 
-      auto element = new TiXmlElement("BoolLookupTable");
+      auto *element = doc.NewElement("BoolLookupTable");
       for (auto it = map.begin(); it != map.end(); ++it)
       {
-        auto tableEntry = new TiXmlElement("LUTValue");
+        auto *tableEntry = doc.NewElement("LUTValue");
         tableEntry->SetAttribute("id", it->first);
-        if (it->second == true)
-          tableEntry->SetAttribute("value", "true");
-        else
-          tableEntry->SetAttribute("value", "false");
-        element->LinkEndChild(tableEntry);
+        tableEntry->SetAttribute("value", it->second);
+        element->InsertEndChild(tableEntry);
       }
       return element;
     }
 
-    BaseProperty::Pointer Deserialize(TiXmlElement *element) override
+    BaseProperty::Pointer Deserialize(const tinyxml2::XMLElement *element) override
     {
       if (!element)
         return nullptr;
 
       BoolLookupTable lut;
-      for (TiXmlElement *child = element->FirstChildElement("LUTValue"); child != nullptr;
+      for (auto *child = element->FirstChildElement("LUTValue"); child != nullptr;
            child = child->NextSiblingElement("LUTValue"))
       {
         int xmlID;
-        if (child->QueryIntAttribute("id", &xmlID) == TIXML_WRONG_TYPE)
+        if (child->QueryIntAttribute("id", &xmlID) != tinyxml2::XML_SUCCESS)
           return nullptr; // TODO: can we do a better error handling?
         BoolLookupTable::IdentifierType id = static_cast<BoolLookupTable::IdentifierType>(xmlID);
         BoolLookupTable::ValueType val = std::string(child->Attribute("value")) == std::string("true");

@@ -19,8 +19,12 @@ found in the LICENSE file.
 #include <mitkPointSetSource.h>
 #include <stack>
 #include <string>
-#include <tinyxml.h>
 #include <vtkXMLParser.h>
+
+namespace tinyxml2
+{
+  class XMLElement;
+}
 
 namespace mitk
 {
@@ -106,7 +110,7 @@ namespace mitk
     void GenerateData() override;
 
     virtual mitk::PointSet::Pointer ReadPoint(mitk::PointSet::Pointer newPointSet,
-                                              TiXmlElement *currentTimeSeries,
+                                              const tinyxml2::XMLElement *currentTimeSeries,
                                               unsigned int currentTimeStep);
 
     /**

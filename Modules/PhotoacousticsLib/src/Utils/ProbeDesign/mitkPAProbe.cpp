@@ -11,13 +11,14 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkPAProbe.h"
+#include <tinyxml2.h>
 
 mitk::pa::Probe::Probe(std::string file, bool verbose) :
   m_TotalEnergy(0),
   m_Verbose(verbose)
 {
-  TiXmlDocument xmlDoc(file);
-  bool success = xmlDoc.LoadFile(TIXML_ENCODING_UTF8);
+  tinyxml2::XMLDocument xmlDoc;
+  bool success = xmlDoc.LoadFile(file.c_str()) == tinyxml2::XML_SUCCESS;
   if (m_Verbose)
   {
     std::cout << "reading of document was " << (success ? "" : "not ") << "successful" << std::endl;
@@ -41,15 +42,15 @@ mitk::pa::Probe::Probe(const char* fileStream, bool verbose) :
   m_TotalEnergy(0),
   m_Verbose(verbose)
 {
-  TiXmlDocument xmlDoc;
-  const char* success = xmlDoc.Parse(fileStream, nullptr, TIXML_ENCODING_UTF8);
+  tinyxml2::XMLDocument xmlDoc;
+  auto success = xmlDoc.Parse(fileStream);
   if (m_Verbose)
   {
-    std::cout << "reading document was " << (success == nullptr ? "" : "not ") << "successful (" << (success == nullptr ? "NULL" : success) << ")" << std::endl;
+    std::cout << "reading document was " << (success == tinyxml2::XML_SUCCESS ? "" : "not ") << "successful" << std::endl;
     std::cout << "Content of the Xml file:" << std::endl;
     xmlDoc.Print();
   }
-  if (success == nullptr || atoi(success) == 0)
+  if (success == tinyxml2::XML_SUCCESS)
   {
     InitProbe(xmlDoc);
   }
@@ -88,15 +89,15 @@ bool mitk::pa::Probe::IsValid()
   return m_IsValid;
 }
 
-void mitk::pa::Probe::InitProbe(TiXmlDocument xmlDoc)
+void mitk::pa::Probe::InitProbe(const tinyxml2::XMLDocument& xmlDoc)
 {
   m_IsValid = true;
 
-  TiXmlElement* root = xmlDoc.FirstChildElement(XML_TAG_PROBE);
+  auto* root = xmlDoc.FirstChildElement(XML_TAG_PROBE.c_str());
   if (root)
   {
-    for (TiXmlElement* element = root->FirstChildElement(XML_TAG_LIGHT_SOURCE);
-      element != nullptr; element = element->NextSiblingElement(XML_TAG_LIGHT_SOURCE))
+    for (auto* element = root->FirstChildElement(XML_TAG_LIGHT_SOURCE.c_str());
+      element != nullptr; element = element->NextSiblingElement(XML_TAG_LIGHT_SOURCE.c_str()))
     {
       LightSource::Pointer lightSource = LightSource::New(element, m_Verbose);
       if (lightSource.IsNotNull() && lightSource->IsValid())

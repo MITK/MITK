@@ -12,6 +12,7 @@ USModel/mitkUSVideoDevice.cpp
 USModel/mitkUSVideoDeviceCustomControls.cpp
 USModel/mitkUSProbe.cpp
 USModel/mitkUSDevicePersistence.cpp
+USModel/mitkUSDeviceReaderWriterConstants.cpp
 USModel/mitkUSDeviceReaderXML.cpp
 USModel/mitkUSDeviceWriterXML.cpp
 

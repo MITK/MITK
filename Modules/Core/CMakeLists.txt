@@ -11,7 +11,7 @@ MITK_CREATE_MODULE(
     PRIVATE src/Algorithms src/Controllers src/DataManagement src/Interactions src/IO src/Rendering ${OPENGL_INCLUDE_DIR}
   DEPENDS PUBLIC mbilog CppMicroServices
   PACKAGE_DEPENDS
-    PRIVATE tinyxml OpenGL
+    PRIVATE tinyxml2|tinyxml2 OpenGL
     PUBLIC  ITK|ITKTransform+ITKImageGrid+ITKImageFeature+ITKIOImageBase+ITKIOHDF5+ITKIOLSM+ITKIOMRC+ITKIOBioRad+ITKIOGE+ITKIOStimulate+ITKIOBruker+ITKIOMINC
     # We privately use/link all ITK modules in order to support all IO, Transform, etc.
     # factories from ITK which are registered "automatically" via a factory manager.
@@ -32,6 +32,11 @@ MITK_CREATE_MODULE(
 if(NOT TARGET ${MODULE_TARGET})
   message(SEND_ERROR "Core target ${MODULE_TARGET} does not exist")
 endif()
+
+target_link_libraries(${MODULE_TARGET}
+  PRIVATE tinyxml2::tinyxml2
+)
+
 function(_itk_create_factory_register_manager)
   # In MITK_ITK_Config.cmake, we do *not* include ITK_USE_FILE, which
   # prevents multiple registrations/unregistrations of ITK IO factories

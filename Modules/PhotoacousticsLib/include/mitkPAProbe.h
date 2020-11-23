@@ -23,7 +23,10 @@ found in the LICENSE file.
 
 #include "mitkPALightSource.h"
 #include <vector>
-#include <tinyxml.h>
+
+namespace tinyxml2 {
+  class XMLDocument;
+}
 
 namespace mitk {
   namespace pa {
@@ -58,7 +61,7 @@ namespace mitk {
       double m_TotalEnergy;
       bool m_Verbose;
 
-      void InitProbe(TiXmlDocument document);
+      void InitProbe(const tinyxml2::XMLDocument& document);
     };
   }
 }

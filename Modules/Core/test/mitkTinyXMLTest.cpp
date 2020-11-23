@@ -16,7 +16,7 @@ found in the LICENSE file.
 // std includes
 #include <cmath>
 #include <iomanip>
-#include <tinyxml.h>
+#include <tinyxml2.h>
 
 // MITK includes
 #include "mitkStringProperty.h"
@@ -48,8 +48,8 @@ private:
   const std::string m_ElementToStoreAttributeName = "DoubleTest";
   const std::string m_AttributeToStoreName = "CommaValue";
 
-  TiXmlDocument m_Document;
-  TiXmlElement *m_DoubleTest;
+  tinyxml2::XMLDocument m_Document;
+  tinyxml2::XMLElement *m_DoubleTest;
 
   double calcPrecision(const unsigned int requiredDecimalPlaces)
   {
@@ -58,23 +58,26 @@ private:
 
   bool Setup(double valueToWrite)
   {
-    // 1. create simple document
-    auto decl = new TiXmlDeclaration("1.0", "", ""); // TODO what to write here? encoding? etc....
-    m_Document.LinkEndChild(decl);
+    m_Document.Clear();
+    m_DoubleTest = nullptr;
 
-    auto version = new TiXmlElement("Version");
+    // 1. create simple document
+    m_Document.InsertEndChild(m_Document.NewDeclaration());
+
+    auto *version = m_Document.NewElement("Version");
     version->SetAttribute("Writer", __FILE__);
     version->SetAttribute("CVSRevision", "$Revision: 17055 $");
     version->SetAttribute("FileVersion", 1);
-    m_Document.LinkEndChild(version);
+    m_Document.InsertEndChild(version);
 
     // 2. store one element containing a double value with potentially many after comma digits.
-    auto vElement = new TiXmlElement(m_ElementToStoreAttributeName);
-    vElement->SetDoubleAttribute(m_AttributeToStoreName, valueToWrite);
-    m_Document.LinkEndChild(vElement);
+    auto *vElement = m_Document.NewElement(m_ElementToStoreAttributeName.c_str());
+    vElement->SetAttribute(m_AttributeToStoreName.c_str(), valueToWrite);
+    m_Document.InsertEndChild(vElement);
 
     // 3. store in file.
-    return m_Document.SaveFile(m_Filename);
+    auto err = m_Document.SaveFile(m_Filename.c_str());
+    return tinyxml2::XML_SUCCESS == err;
   }
 
 public:
@@ -89,27 +92,27 @@ public:
 
   int readValueFromSetupDocument(double &readOutValue)
   {
-    if (!m_Document.LoadFile(m_Filename))
+    if (tinyxml2::XML_SUCCESS != m_Document.LoadFile(m_Filename.c_str()))
     {
       CPPUNIT_ASSERT_MESSAGE("Test Setup failed, could not open file", false);
-      return TIXML_NO_ATTRIBUTE;
+      return tinyxml2::XML_NO_ATTRIBUTE;
     }
     else
     {
-      m_DoubleTest = m_Document.FirstChildElement(m_ElementToStoreAttributeName);
-      return m_DoubleTest->QueryDoubleAttribute(m_AttributeToStoreName, &readOutValue);
+      m_DoubleTest = m_Document.FirstChildElement(m_ElementToStoreAttributeName.c_str());
+      return m_DoubleTest->QueryDoubleAttribute(m_AttributeToStoreName.c_str(), &readOutValue);
     }
   }
 
   void TestingReadValueFromSetupDocument_Success()
   {
-    if (!m_Document.LoadFile(m_Filename))
+    if (tinyxml2::XML_SUCCESS != m_Document.LoadFile(m_Filename.c_str()))
     {
-      CPPUNIT_ASSERT_MESSAGE("Test Setup failed, could not open file", !m_Document.LoadFile(m_Filename));
+      CPPUNIT_ASSERT_MESSAGE("Test Setup failed, could not open file", tinyxml2::XML_SUCCESS != m_Document.LoadFile(m_Filename.c_str()));
     }
     else
     {
-      m_DoubleTest = m_Document.FirstChildElement(m_ElementToStoreAttributeName);
+      m_DoubleTest = m_Document.FirstChildElement(m_ElementToStoreAttributeName.c_str());
       CPPUNIT_ASSERT_MESSAGE("Test Setup could open file", m_DoubleTest != nullptr);
     }
   }
@@ -123,7 +126,7 @@ public:
     double readValue;
 
     CPPUNIT_ASSERT_MESSAGE("checking if readout mechanism works.",
-                           TIXML_SUCCESS == readValueFromSetupDocument(readValue));
+                           tinyxml2::XML_SUCCESS == readValueFromSetupDocument(readValue));
   }
 
   void TestDoubleValueWriteOut_Success()

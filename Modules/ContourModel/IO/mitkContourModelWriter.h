@@ -56,7 +56,7 @@ namespace mitk
   class ContourModelWriter : public mitk::AbstractFileWriter
   {
   public:
-    ContourModelWriter();
+    explicit ContourModelWriter(bool writeXMLHeader = true);
     ~ContourModelWriter() override;
 
     using AbstractFileWriter::Write;
@@ -138,6 +138,8 @@ namespace mitk
 
     /** Writes empty spaces to the stream according to m_IndentDepth and m_Indent */
     void WriteIndent(std::ostream &file);
+
+    bool m_WriteXMLHeader;
 
     unsigned int m_IndentDepth;
 

@@ -1,17 +1,17 @@
 #-----------------------------------------------------------------------------
-# tinyxml
+# tinyxml2
 #-----------------------------------------------------------------------------
 
 # Sanity checks
-if(DEFINED tinyxml_DIR AND NOT EXISTS ${tinyxml_DIR})
-  message(FATAL_ERROR "tinyxml_DIR variable is defined but corresponds to non-existing directory")
+if(DEFINED tinyxml2_DIR AND NOT EXISTS ${tinyxml2_DIR})
+  message(FATAL_ERROR "tinyxml2_DIR variable is defined but corresponds to non-existing directory")
 endif()
 
-set(proj tinyxml)
+set(proj tinyxml2)
 set(proj_DEPENDENCIES )
 set(${proj}_DEPENDS ${proj})
 
-if(NOT DEFINED tinyxml_DIR)
+if(NOT DEFINED tinyxml2_DIR)
 
   set(additional_cmake_args )
   if(WIN32)
@@ -26,10 +26,8 @@ if(NOT DEFINED tinyxml_DIR)
 
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
-     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/tinyxml_2_6_2.tar.gz
-     URL_MD5 c1b864c96804a10526540c664ade67f0
-     PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/tinyxml-2.6.2.patch
-       COMMAND ${CMAKE_COMMAND} -Dproj=${proj} -Dproj_target:STRING=tinyxml -P ${CMAKE_CURRENT_LIST_DIR}/GenerateDefaultCMakeBuildSystem.cmake
+     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/tinyxml2-8.0.0.tar.gz
+     URL_MD5 5dc535c8b34ee621fe2128f072d275b5
      CMAKE_GENERATOR ${gen}
      CMAKE_GENERATOR_PLATFORM ${gen_platform}
      CMAKE_ARGS
@@ -37,6 +35,8 @@ if(NOT DEFINED tinyxml_DIR)
        ${additional_cmake_args}
      CMAKE_CACHE_ARGS
        ${ep_common_cache_args}
+       -DBUILD_TESTING:BOOL=OFF
+       -DBUILD_TESTS:BOOL=OFF
      CMAKE_CACHE_DEFAULT_ARGS
        ${ep_common_cache_default_args}
      DEPENDS ${proj_DEPENDENCIES}

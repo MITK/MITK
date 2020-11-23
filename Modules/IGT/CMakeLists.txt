@@ -26,9 +26,15 @@ MITK_CREATE_MODULE(
     PUBLIC Algorithms Common DataManagement ExceptionHandling IO Rendering TrackingDevices TestingHelper
     PRIVATE ${ADDITIONAL_INCLUDE_DIRS}
   DEPENDS PUBLIC MitkImageStatistics MitkSceneSerialization MitkIGTBase MitkOpenIGTLink
-  PACKAGE_DEPENDS ITK|ITKRegistrationCommon tinyxml OpenIGTLink
+  PACKAGE_DEPENDS ITK|ITKRegistrationCommon tinyxml2|tinyxml2 OpenIGTLink
   ADDITIONAL_LIBS "${ADDITIONAL_LIBS}"
 )
+
+if(TARGET ${MODULE_TARGET})
+  target_link_libraries(${MODULE_TARGET}
+    PRIVATE tinyxml2::tinyxml2
+  )
+endif()
 
 if(MitkIGT_IS_ENABLED)
   MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Modules/IGT/Resources/ClaronMicron.stl )

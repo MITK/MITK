@@ -1,4 +1,4 @@
-<?xml version="1.0" standalone=no>
+<?xml version="1.0" standalone="no"?>
 <DICOMFileReader
   label="2013 default sorting for 3D+t"
   description="ClassicDICOMSeriesReader that is equal to the 2013 implementation for 3D+t images, except it only condenses blocks with same series."

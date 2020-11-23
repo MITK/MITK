@@ -42,6 +42,8 @@ found in the LICENSE file.
 #include <mitkSurface.h>
 #include <mitkVtkWidgetRendering.h>
 
+#include <tinyxml2.h>
+
 void TestAllProperties(const mitk::PropertyList *propList);
 
 /**Documentation
@@ -166,10 +168,11 @@ void TestAllProperties(const mitk::PropertyList *propList)
     if (serializer != nullptr)
     {
       serializer->SetProperty(prop);
-      TiXmlElement *valueelement = nullptr;
+      tinyxml2::XMLDocument doc;
+      tinyxml2::XMLElement *valueelement = nullptr;
       try
       {
-        valueelement = serializer->Serialize();
+        valueelement = serializer->Serialize(doc);
       }
       catch (...)
       {

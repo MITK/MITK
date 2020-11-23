@@ -12,11 +12,9 @@ found in the LICENSE file.
 
 #include "mitkPropertyListSerializer.h"
 #include "mitkBasePropertySerializer.h"
-
-#include <tinyxml.h>
-
 #include "mitkStandardFileLocations.h"
 #include <itksys/SystemTools.hxx>
+#include <tinyxml2.h>
 
 mitk::PropertyListSerializer::PropertyListSerializer() : m_FilenameHint("unnamed"), m_WorkingDirectory("")
 {
@@ -59,15 +57,14 @@ std::string mitk::PropertyListSerializer::Serialize()
   if (length >= 2 && fullname[0] == '"' && fullname[length - 1] == '"')
     fullname = fullname.substr(1, length - 2);
 
-  TiXmlDocument document;
-  auto decl = new TiXmlDeclaration("1.0", "", ""); // TODO what to write here? encoding? etc....
-  document.LinkEndChild(decl);
+  tinyxml2::XMLDocument document;
+  document.InsertEndChild(document.NewDeclaration());
 
-  auto version = new TiXmlElement("Version");
+  auto *version = document.NewElement("Version");
   version->SetAttribute("Writer", __FILE__);
   version->SetAttribute("Revision", "$Revision: 17055 $");
   version->SetAttribute("FileVersion", 1);
-  document.LinkEndChild(version);
+  document.InsertEndChild(version);
 
   // add XML contents
   const PropertyList::PropertyMap *propmap = m_PropertyList->GetMap();
@@ -75,10 +72,10 @@ std::string mitk::PropertyListSerializer::Serialize()
   {
     std::string key = iter->first;
     const BaseProperty *property = iter->second;
-    TiXmlElement *element = SerializeOneProperty(key, property);
+    auto *element = SerializeOneProperty(document, key, property);
     if (element)
     {
-      document.LinkEndChild(element);
+      document.InsertEndChild(element);
       // TODO test serializer for error
     }
     else
@@ -88,9 +85,9 @@ std::string mitk::PropertyListSerializer::Serialize()
   }
 
   // save XML file
-  if (!document.SaveFile(fullname))
+  if (tinyxml2::XML_SUCCESS != document.SaveFile(fullname.c_str()))
   {
-    MITK_ERROR << "Could not write PropertyList to " << fullname << "\nTinyXML reports '" << document.ErrorDesc()
+    MITK_ERROR << "Could not write PropertyList to " << fullname << "\nTinyXML reports '" << document.ErrorStr()
                << "'";
     return "";
   }
@@ -98,10 +95,10 @@ std::string mitk::PropertyListSerializer::Serialize()
   return filename;
 }
 
-TiXmlElement *mitk::PropertyListSerializer::SerializeOneProperty(const std::string &key, const BaseProperty *property)
+tinyxml2::XMLElement *mitk::PropertyListSerializer::SerializeOneProperty(tinyxml2::XMLDocument &doc, const std::string &key, const BaseProperty *property)
 {
-  auto keyelement = new TiXmlElement("property");
-  keyelement->SetAttribute("key", key);
+  auto *keyelement = doc.NewElement("property");
+  keyelement->SetAttribute("key", key.c_str());
   keyelement->SetAttribute("type", property->GetNameOfClass());
 
   // construct name of serializer class
@@ -126,10 +123,10 @@ TiXmlElement *mitk::PropertyListSerializer::SerializeOneProperty(const std::stri
       serializer->SetProperty(property);
       try
       {
-        TiXmlElement *valueelement = serializer->Serialize();
+        auto *valueelement = serializer->Serialize(doc);
         if (valueelement)
         {
-          keyelement->LinkEndChild(valueelement);
+          keyelement->InsertEndChild(valueelement);
         }
       }
       catch (std::exception &e)

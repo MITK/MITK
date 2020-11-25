@@ -1,0 +1,1 @@
+set(ALL_LIBRARIES OpenMP::OpenMP_CXX)

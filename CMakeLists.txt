@@ -876,8 +876,6 @@ if(MITK_USE_DCMQI)
   find_package(DCMQI REQUIRED)
 endif()
 
-link_directories(${Boost_LIBRARY_DIRS})
-
 if(MITK_USE_OpenIGTLink)
   link_directories(${OpenIGTLink_LIBRARY_DIRS})
 endif()

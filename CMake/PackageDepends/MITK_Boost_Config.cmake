@@ -1,17 +1,13 @@
-if(MITK_USE_Boost_LIBRARIES)
-  find_package(Boost 1.68.0 REQUIRED COMPONENTS ${MITK_USE_Boost_LIBRARIES} QUIET)
-else()
-  find_package(Boost 1.68.0 REQUIRED QUIET)
+find_package(Boost REQUIRED COMPONENTS ${Boost_REQUIRED_COMPONENTS_BY_MODULE})
+
+if(Boost_REQUIRED_COMPONENTS_BY_MODULE)
+  foreach(boost_component ${Boost_REQUIRED_COMPONENTS_BY_MODULE})
+    list(APPEND ALL_LIBRARIES "Boost::${boost_component}")
+  endforeach()
 endif()
 
-list(APPEND ALL_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS})
+list(APPEND ALL_LIBRARIES "Boost::boost")
 
-if(Boost_LIBRARIES)
-  if(WIN32)
-    # Force dynamic linking
-    list(APPEND ALL_COMPILE_OPTIONS -DBOOST_ALL_DYN_LINK)
-  else()
-    # Boost has an auto link feature (pragma comment lib) for Windows
-    list(APPEND ALL_LIBRARIES ${Boost_LIBRARIES})
-  endif()
+if(MSVC)
+  list(APPEND ALL_LIBRARIES "Boost::dynamic_linking" "bcrypt")
 endif()

@@ -7,7 +7,6 @@ MITK_CREATE_MODULE(ModelFit
     PRIVATE	MitkMultilabel
   PACKAGE_DEPENDS
     PUBLIC ITK|ITKOptimizers
-    PRIVATE Boost
 )
 
 if(BUILD_TESTING)

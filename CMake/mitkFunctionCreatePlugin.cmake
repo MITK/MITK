@@ -26,6 +26,7 @@
 #!        will be available in the set of include directories of depending plug-ins.
 #! \param MODULE_DEPENDS (optional) A list of Modules this plug-in depends on.
 #! \param PACKAGE_DEPENDS (optional) A list of external packages this plug-in depends on.
+#! \param TARGET_DEPENDS (optional) A list of CMake targets this plug-in depends on.
 #! \param DOXYGEN_TAGFILES (optional) Which external tag files should be available for the plugin documentation
 #! \param MOC_OPTIONS (optional) Additional options to pass to the Qt MOC compiler
 #! \param WARNINGS_NO_ERRORS (optional) Do not handle compiler warnings as errors
@@ -49,6 +50,7 @@ function(mitk_create_plugin)
     EXPORTED_INCLUDE_SUFFIXES # (optional) additional public include directories
     MODULE_DEPENDS            # (optional)
     PACKAGE_DEPENDS
+    TARGET_DEPENDS
     DOXYGEN_TAGFILES
     MOC_OPTIONS
     SUBPROJECTS # deprecated
@@ -205,6 +207,10 @@ function(mitk_create_plugin)
     MODULES ${_PLUGIN_MODULE_DEPENDS}
     PACKAGES ${_PLUGIN_PACKAGE_DEPENDS}
   )
+
+  if(_PLUGIN_TARGET_DEPENDS)
+    target_link_libraries(${PLUGIN_TARGET} ${_PLUGIN_TARGET_DEPENDS})
+  endif()
 
   set_property(TARGET ${PLUGIN_TARGET} APPEND PROPERTY COMPILE_DEFINITIONS US_MODULE_NAME=${PLUGIN_TARGET})
   set_property(TARGET ${PLUGIN_TARGET} PROPERTY US_MODULE_NAME ${PLUGIN_TARGET})

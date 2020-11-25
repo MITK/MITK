@@ -1,13 +1,8 @@
-if(MITK_USE_cpprestsdk)
+mitk_create_module(
+  DEPENDS MitkCore
+  PACKAGE_DEPENDS PUBLIC cpprestsdk OpenSSL|SSL
+)
 
-  mitk_create_module(
-    DEPENDS MitkCore
-  )
-
-  if(TARGET ${MODULE_TARGET})
-    target_link_libraries(${MODULE_TARGET} PUBLIC cpprestsdk::cpprest OpenSSL::SSL)
-  endif()
-
+if(TARGET ${MODULE_TARGET})
   add_subdirectory(test)
-
 endif()

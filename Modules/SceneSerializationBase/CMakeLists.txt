@@ -1,11 +1,6 @@
 MITK_CREATE_MODULE(
   DEPENDS MitkCore
-  PACKAGE_DEPENDS PUBLIC tinyxml2|tinyxml2
+  PACKAGE_DEPENDS PUBLIC tinyxml2
 )
 
-if(TARGET ${MODULE_TARGET})
-  target_link_libraries(${MODULE_TARGET} PUBLIC tinyxml2::tinyxml2)
-endif()
-
 add_subdirectory(test)
-

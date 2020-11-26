@@ -1,7 +1,7 @@
-MITK_CREATE_MODULE(MatchPointRegistrationIO
+mitk_create_module(MatchPointRegistrationIO
   DEPENDS
     PUBLIC MitkMatchPointRegistration MitkSceneSerializationBase
   PACKAGE_DEPENDS
-    PRIVATE ITK MatchPoint
+    PRIVATE MatchPoint
   AUTOLOAD_WITH MitkCore
 )

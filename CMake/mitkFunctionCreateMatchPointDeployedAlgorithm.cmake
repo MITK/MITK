@@ -85,7 +85,7 @@ function(mitkFunctionCreateMatchPointDeployedAlgorithm)
 
   mitk_use_modules(TARGET ${ALG_TARGET}
                    MODULES ${ALG_DEPENDS}
-                   PACKAGES PRIVATE ITK MatchPoint ${ALG_PACKAGE_DEPENDS}
+                   PACKAGES PRIVATE MatchPoint ${ALG_PACKAGE_DEPENDS}
                    )
 
   if(ALG_TARGET_DEPENDS)

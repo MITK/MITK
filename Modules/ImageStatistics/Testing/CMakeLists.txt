@@ -1,5 +1,9 @@
 MITK_CREATE_MODULE_TESTS()
 
+if(TARGET ${TESTDRIVER})
+  mitk_use_modules(TARGET ${TESTDRIVER} PACKAGES ITK|IOXML)
+endif()
+
 # mitkAddCustomModuleTest(mitkRoiMeasurementsTests mitkRoiMeasurementsTest ${MITK_DATA_DIR}/ImageStatisticsTestData/)
 
 file(GLOB allHotSpotTests RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/Data/Hotspot" "${CMAKE_CURRENT_SOURCE_DIR}/Data/Hotspot/*.xml")

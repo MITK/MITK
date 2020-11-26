@@ -1,8 +1,8 @@
 mitk_create_module(
   DEPENDS MitkDataTypesExt MitkLegacyGL
   PACKAGE_DEPENDS
-    PUBLIC ITK|ITKThresholding OpenMP
-    PRIVATE ANN ITK|ITKIOImageBase VTK|ImagingGeneral
+    PUBLIC OpenMP
+    PRIVATE ANN VTK|ImagingGeneral
 )
 
 if(TARGET ${MODULE_TARGET})

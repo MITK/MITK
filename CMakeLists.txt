@@ -638,10 +638,6 @@ mark_as_advanced(BLUEBERRY_DEBUG_SMARTPOINTER)
 option(MITK_SHOW_CONSOLE_WINDOW "Use this to enable or disable the console window when starting MITK GUI Applications" ON)
 mark_as_advanced(MITK_SHOW_CONSOLE_WINDOW)
 
-# TODO: check if necessary
-option(USE_ITKZLIB "Use the ITK zlib for pic compression." ON)
-mark_as_advanced(USE_ITKZLIB)
-
 if(NOT MITK_FAST_TESTING)
   if(MITK_CTEST_SCRIPT_MODE STREQUAL "Continuous" OR MITK_CTEST_SCRIPT_MODE STREQUAL "Experimental")
     set(MITK_FAST_TESTING ON)

@@ -1,8 +1,6 @@
-MITK_CREATE_MODULE(
+mitk_create_module(
   DEPENDS MitkImageExtraction MitkPlanarFigure MitkMultilabel
-  PACKAGE_DEPENDS
-    PUBLIC  ITK|ITKIOXML
-    PRIVATE ITK|ITKVTK+ITKConvolution VTK|IOImage
+  PACKAGE_DEPENDS PRIVATE ITK|VTK VTK|IOImage
 )
 
 if(BUILD_TESTING)

@@ -26,7 +26,6 @@ if(BUILD_MatchPointCmdApps OR MITK_BUILD_ALL_APPS)
       mitkFunctionCreateCommandLineApp(
         NAME ${appname}
         DEPENDS MitkCore MitkMatchPointRegistration ${dependencies_list}
-        PACKAGE_DEPENDS ITK
       )
     endforeach()
 

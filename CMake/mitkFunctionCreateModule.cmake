@@ -11,7 +11,7 @@
 #!     DEPENDS PUBLIC MitkCore
 #!     PACKAGE_DEPENDS
 #!       PRIVATE Qt5|Xml+Networking
-#!       PUBLIC  ITK|Watershed
+#!       PUBLIC  ITK|Watersheds
 #! \endcode
 #!
 #! The <moduleName> parameter specifies the name of the module which is used

@@ -1,14 +1,6 @@
-set(_additional_libs)
-if(USE_ITKZLIB)
-  list(APPEND _additional_libs itkzlib)
-else()
-  list(APPEND _additional_libs z)
-endif(USE_ITKZLIB)
-
-MITK_CREATE_MODULE(DEPENDS MitkCore
-                   PACKAGE_DEPENDS PRIVATE ITK|ITKIOImageBase
-                   ADDITIONAL_LIBS ${_additional_libs}
-                  )
+mitk_create_module(
+  DEPENDS MitkCore
+  PACKAGE_DEPENDS PRIVATE ITK|ZLIB
+)
 
 add_subdirectory(test)
-

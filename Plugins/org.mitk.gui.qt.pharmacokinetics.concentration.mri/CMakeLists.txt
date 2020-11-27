@@ -1,9 +1,7 @@
 project(org_mitk_gui_qt_pharmacokinetics_concentration_mri)
 
 mitk_create_plugin(
-        EXPORT_DIRECTIVE CONCENTRATIONCURVECONVERTER_EXPORT
+  EXPORT_DIRECTIVE CONCENTRATIONCURVECONVERTER_EXPORT
 	EXPORTED_INCLUDE_SUFFIXES src
-        MODULE_DEPENDS MitkQtWidgetsExt MitkPharmacokinetics
-        PACKAGE_DEPENDS ITK|ITKOptimizers
-
+  MODULE_DEPENDS MitkQtWidgetsExt MitkPharmacokinetics
 )

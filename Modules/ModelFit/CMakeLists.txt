@@ -1,4 +1,4 @@
-MITK_CREATE_MODULE(ModelFit
+mitk_create_module(ModelFit
   INCLUDE_DIRS
     PUBLIC ${MITK_BINARY_DIR}
     PRIVATE src/Common src/Functors src/Models src/TestingHelper
@@ -6,14 +6,13 @@ MITK_CREATE_MODULE(ModelFit
     PUBLIC MitkCore MitkSceneSerializationBase
     PRIVATE	MitkMultilabel
   PACKAGE_DEPENDS
-    PUBLIC ITK|ITKOptimizers
-    PRIVATE Boost
+    PUBLIC ITK|Optimizers
 )
 
 if(BUILD_TESTING)
-  ADD_SUBDIRECTORY(test)
-endif(BUILD_TESTING)
+  add_subdirectory(test)
+endif()
 
-ADD_SUBDIRECTORY(autoload/IO)
-ADD_SUBDIRECTORY(autoload/Models)
-ADD_SUBDIRECTORY(cmdapps)
+add_subdirectory(autoload/IO)
+add_subdirectory(autoload/Models)
+add_subdirectory(cmdapps)

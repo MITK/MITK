@@ -8,13 +8,10 @@ mitk_create_plugin(
     src/dynamichelpers
     src/registry
   MODULE_DEPENDS PUBLIC mbilog
+  PACKAGE_DEPENDS
+    PUBLIC Poco|Foundation+Util+XML
+    PRIVATE Qt5|Gui+Xml
 )
-
-target_link_libraries(${PLUGIN_TARGET} PUBLIC Poco::Foundation Poco::Util Poco::XML)
-
-if(MITK_USE_Qt5)
-  target_link_libraries(${PLUGIN_TARGET} PRIVATE Qt5::Gui Qt5::Xml)
-endif()
 
 target_compile_definitions(${PLUGIN_TARGET} PUBLIC "$<$<PLATFORM_ID:Windows>:POCO_NO_UNWINDOWS;WIN32_LEAN_AND_MEAN>")
 

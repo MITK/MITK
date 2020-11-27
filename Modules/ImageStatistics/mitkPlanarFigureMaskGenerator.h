@@ -15,13 +15,9 @@ found in the LICENSE file.
 
 #include <MitkImageStatisticsExports.h>
 #include <itkImage.h>
-#include <itkVTKImageExport.h>
-#include <itkVTKImageImport.h>
 #include <mitkImage.h>
 #include <mitkMaskGenerator.h>
 #include <mitkPlanarFigure.h>
-#include <vtkImageExport.h>
-#include <vtkImageImport.h>
 #include <vtkSmartPointer.h>
 
 namespace mitk

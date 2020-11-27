@@ -7,7 +7,7 @@
 #
 macro(MITK_CREATE_MODULE_TESTS)
   cmake_parse_arguments(MODULE_TEST
-                        "US_MODULE;NO_INIT" "EXTRA_DRIVER_INIT;EXTRA_DRIVER_INCLUDE" "EXTRA_DEPENDS;DEPENDS;PACKAGE_DEPENDS" ${ARGN})
+                        "US_MODULE;NO_INIT" "EXTRA_DRIVER_INIT;EXTRA_DRIVER_INCLUDE" "EXTRA_DEPENDS;DEPENDS;PACKAGE_DEPENDS;TARGET_DEPENDS" ${ARGN})
 
   if(BUILD_TESTING AND MODULE_IS_ENABLED)
     include(files.cmake)
@@ -44,6 +44,7 @@ macro(MITK_CREATE_MODULE_TESTS)
     mitk_create_executable(${TESTDRIVER}
                            DEPENDS ${MODULE_NAME} ${MODULE_TEST_DEPENDS} ${MODULE_TEST_EXTRA_DEPENDS} MitkTestingHelper
                            PACKAGE_DEPENDS ${MODULE_TEST_PACKAGE_DEPENDS}
+                           TARGET_DEPENDS ${MODULE_TEST_TARGET_DEPENDS}
                            FILES_CMAKE ${_testdriver_file_list}
                            NO_FEATURE_INFO
                            NO_BATCH_FILE

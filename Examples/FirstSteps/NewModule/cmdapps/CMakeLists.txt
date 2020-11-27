@@ -5,7 +5,6 @@ if(BUILD_NewModuleMiniApps)
   mitkFunctionCreateCommandLineApp(
     NAME ExampleToUpperCaseMiniApp
     DEPENDS MitkNewModule
-    PACKAGE_DEPENDS ITK
-    )
+  )
 
 endif()

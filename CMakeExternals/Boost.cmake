@@ -105,14 +105,12 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
     else()
 
       #[[ We support GCC and Clang on Unix. On macOS, the toolset must be set
-          to darwin. The actual compiler for all of these toolkits is set
+          to clang. The actual compiler for all of these toolkits is set
           further below, after the bootstrap script but before b2. ]]
 
-      if(APPLE)
-        set(toolset darwin)
-      elseif(CMAKE_CXX_COMPILER_ID STREQUAL GNU)
+      if(CMAKE_CXX_COMPILER_ID STREQUAL GNU)
         set(toolset gcc)
-      elseif(CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+      elseif(CMAKE_CXX_COMPILER_ID STREQUAL Clang OR APPLE)
         set(toolset clang)
       endif()
 

@@ -15,7 +15,7 @@ if(MITK_USE_CTK)
 
   if(NOT DEFINED CTK_DIR)
 
-    set(revision_tag "78341aba")
+    set(revision_tag "7210c5bc")
 
     set(ctk_optional_cache_args )
     if(MITK_USE_Python3)

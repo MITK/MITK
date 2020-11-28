@@ -98,8 +98,7 @@ include(mitkMacroQueryCustomEPVars)
 include(mitkFunctionInstallExternalCMakeProject)
 include(mitkFunctionCleanExternalProject)
 
-option(MITK_AUTOCLEAN_EXTERNAL_PROJECTS "Experimental: Clean external project builds if updated" OFF)
-mark_as_advanced(MITK_AUTOCLEAN_EXTERNAL_PROJECTS)
+option(MITK_AUTOCLEAN_EXTERNAL_PROJECTS "Experimental: Clean external project builds if updated" ON)
 
 set(ep_prefix "${CMAKE_BINARY_DIR}/ep")
 set_property(DIRECTORY PROPERTY EP_PREFIX ${ep_prefix})

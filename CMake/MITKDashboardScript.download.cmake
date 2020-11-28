@@ -385,7 +385,7 @@ endfunction()
 
  ]============================================================================]
 
-cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 
 find_program(CTEST_GIT_COMMAND git)
 

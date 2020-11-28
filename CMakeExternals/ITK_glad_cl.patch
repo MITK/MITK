@@ -1,0 +1,3197 @@
+commit c965ad15f72ac86af4cc55f2ee36e14b4bd99030
+Author: Black-Cat <iblackcatw@gmail.com>
+Date:   Sat Nov 28 14:22:47 2020 +0400
+
+    Add dynamic opencl loading
+
+diff --git a/CMake/itkOpenCL.cmake b/CMake/itkOpenCL.cmake
+index f1ce6c0..f2a652b 100644
+--- a/CMake/itkOpenCL.cmake
++++ b/CMake/itkOpenCL.cmake
+@@ -1,8 +1,8 @@
+ if (ITK_USE_GPU)
+-  find_package ( OpenCL REQUIRED )
+-  if ( NOT ${OPENCL_FOUND} )
+-     message ( FATAL "Could not find OpenCL" )
+-  endif ()
++  #find_package ( OpenCL REQUIRED )
++  #if ( NOT ${OPENCL_FOUND} )
++  #   message ( FATAL "Could not find OpenCL" )
++  #endif ()
+ 
+  macro(sourcefile_to_string SOURCE_FILE RESULT_CMAKE_VAR)
+      file(STRINGS ${SOURCE_FILE} FileStrings)
+diff --git a/Modules/Core/GPUCommon/CMakeLists.txt b/Modules/Core/GPUCommon/CMakeLists.txt
+index 5668e06..8e25809 100644
+--- a/Modules/Core/GPUCommon/CMakeLists.txt
++++ b/Modules/Core/GPUCommon/CMakeLists.txt
+@@ -11,8 +11,8 @@ endif()
+ 
+ if (ITK_USE_GPU)
+   set(ITKGPUCommon_LIBRARIES ITKGPUCommon)
+-  set(ITKGPUCommon_SYSTEM_INCLUDE_DIRS ${OPENCL_INCLUDE_DIRS})
+-  set(ITKGPUCommon_SYSTEM_LIBRARY_DIRS ${OPENCL_LIBRARIES})
++#  set(ITKGPUCommon_SYSTEM_INCLUDE_DIRS ${OPENCL_INCLUDE_DIRS})
++#  set(ITKGPUCommon_SYSTEM_LIBRARY_DIRS ${OPENCL_LIBRARIES})
+ endif()
+ 
+ itk_module_impl()
+diff --git a/Modules/Core/GPUCommon/include/CL/cl_platform.h b/Modules/Core/GPUCommon/include/CL/cl_platform.h
+new file mode 100644
+index 0000000..8ba168a
+--- /dev/null
++++ b/Modules/Core/GPUCommon/include/CL/cl_platform.h
+@@ -0,0 +1,1384 @@
++/*******************************************************************************
++ * Copyright (c) 2008-2020 The Khronos Group Inc.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *    http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ ******************************************************************************/
++
++#ifndef __CL_PLATFORM_H
++#define __CL_PLATFORM_H
++
++#include <CL/cl_version.h>
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++#if defined(_WIN32)
++    #define CL_API_ENTRY
++    #define CL_API_CALL     __stdcall
++    #define CL_CALLBACK     __stdcall
++#else
++    #define CL_API_ENTRY
++    #define CL_API_CALL
++    #define CL_CALLBACK
++#endif
++
++/*
++ * Deprecation flags refer to the last version of the header in which the
++ * feature was not deprecated.
++ *
++ * E.g. VERSION_1_1_DEPRECATED means the feature is present in 1.1 without
++ * deprecation but is deprecated in versions later than 1.1.
++ */
++
++#define CL_EXTENSION_WEAK_LINK
++#define CL_API_SUFFIX__VERSION_1_0
++#define CL_EXT_SUFFIX__VERSION_1_0
++#define CL_API_SUFFIX__VERSION_1_1
++#define CL_EXT_SUFFIX__VERSION_1_1
++#define CL_API_SUFFIX__VERSION_1_2
++#define CL_EXT_SUFFIX__VERSION_1_2
++#define CL_API_SUFFIX__VERSION_2_0
++#define CL_EXT_SUFFIX__VERSION_2_0
++#define CL_API_SUFFIX__VERSION_2_1
++#define CL_EXT_SUFFIX__VERSION_2_1
++#define CL_API_SUFFIX__VERSION_2_2
++#define CL_EXT_SUFFIX__VERSION_2_2
++#define CL_API_SUFFIX__VERSION_3_0
++#define CL_EXT_SUFFIX__VERSION_3_0
++#define CL_API_SUFFIX__EXPERIMENTAL
++#define CL_EXT_SUFFIX__EXPERIMENTAL
++
++
++#ifdef __GNUC__
++  #define CL_EXT_SUFFIX_DEPRECATED __attribute__((deprecated))
++  #define CL_EXT_PREFIX_DEPRECATED
++#elif defined(_WIN32)
++  #define CL_EXT_SUFFIX_DEPRECATED
++  #define CL_EXT_PREFIX_DEPRECATED __declspec(deprecated)
++#else
++  #define CL_EXT_SUFFIX_DEPRECATED
++  #define CL_EXT_PREFIX_DEPRECATED
++#endif
++
++#ifdef CL_USE_DEPRECATED_OPENCL_1_0_APIS
++    #define CL_EXT_SUFFIX__VERSION_1_0_DEPRECATED
++    #define CL_EXT_PREFIX__VERSION_1_0_DEPRECATED
++#else
++    #define CL_EXT_SUFFIX__VERSION_1_0_DEPRECATED CL_EXT_SUFFIX_DEPRECATED
++    #define CL_EXT_PREFIX__VERSION_1_0_DEPRECATED CL_EXT_PREFIX_DEPRECATED
++#endif
++
++#ifdef CL_USE_DEPRECATED_OPENCL_1_1_APIS
++    #define CL_EXT_SUFFIX__VERSION_1_1_DEPRECATED
++    #define CL_EXT_PREFIX__VERSION_1_1_DEPRECATED
++#else
++    #define CL_EXT_SUFFIX__VERSION_1_1_DEPRECATED CL_EXT_SUFFIX_DEPRECATED
++    #define CL_EXT_PREFIX__VERSION_1_1_DEPRECATED CL_EXT_PREFIX_DEPRECATED
++#endif
++
++#ifdef CL_USE_DEPRECATED_OPENCL_1_2_APIS
++    #define CL_EXT_SUFFIX__VERSION_1_2_DEPRECATED
++    #define CL_EXT_PREFIX__VERSION_1_2_DEPRECATED
++#else
++    #define CL_EXT_SUFFIX__VERSION_1_2_DEPRECATED CL_EXT_SUFFIX_DEPRECATED
++    #define CL_EXT_PREFIX__VERSION_1_2_DEPRECATED CL_EXT_PREFIX_DEPRECATED
++ #endif
++
++#ifdef CL_USE_DEPRECATED_OPENCL_2_0_APIS
++    #define CL_EXT_SUFFIX__VERSION_2_0_DEPRECATED
++    #define CL_EXT_PREFIX__VERSION_2_0_DEPRECATED
++#else
++    #define CL_EXT_SUFFIX__VERSION_2_0_DEPRECATED CL_EXT_SUFFIX_DEPRECATED
++    #define CL_EXT_PREFIX__VERSION_2_0_DEPRECATED CL_EXT_PREFIX_DEPRECATED
++#endif
++
++#ifdef CL_USE_DEPRECATED_OPENCL_2_1_APIS
++    #define CL_EXT_SUFFIX__VERSION_2_1_DEPRECATED
++    #define CL_EXT_PREFIX__VERSION_2_1_DEPRECATED
++#else
++    #define CL_EXT_SUFFIX__VERSION_2_1_DEPRECATED CL_EXT_SUFFIX_DEPRECATED
++    #define CL_EXT_PREFIX__VERSION_2_1_DEPRECATED CL_EXT_PREFIX_DEPRECATED
++#endif
++
++#ifdef CL_USE_DEPRECATED_OPENCL_2_2_APIS
++    #define CL_EXT_SUFFIX__VERSION_2_2_DEPRECATED
++    #define CL_EXT_PREFIX__VERSION_2_2_DEPRECATED
++#else
++    #define CL_EXT_SUFFIX__VERSION_2_2_DEPRECATED CL_EXT_SUFFIX_DEPRECATED
++    #define CL_EXT_PREFIX__VERSION_2_2_DEPRECATED CL_EXT_PREFIX_DEPRECATED
++#endif
++
++#if (defined (_WIN32) && defined(_MSC_VER))
++
++/* scalar types  */
++typedef signed   __int8         cl_char;
++typedef unsigned __int8         cl_uchar;
++typedef signed   __int16        cl_short;
++typedef unsigned __int16        cl_ushort;
++typedef signed   __int32        cl_int;
++typedef unsigned __int32        cl_uint;
++typedef signed   __int64        cl_long;
++typedef unsigned __int64        cl_ulong;
++
++typedef unsigned __int16        cl_half;
++typedef float                   cl_float;
++typedef double                  cl_double;
++
++/* Macro names and corresponding values defined by OpenCL */
++#define CL_CHAR_BIT         8
++#define CL_SCHAR_MAX        127
++#define CL_SCHAR_MIN        (-127-1)
++#define CL_CHAR_MAX         CL_SCHAR_MAX
++#define CL_CHAR_MIN         CL_SCHAR_MIN
++#define CL_UCHAR_MAX        255
++#define CL_SHRT_MAX         32767
++#define CL_SHRT_MIN         (-32767-1)
++#define CL_USHRT_MAX        65535
++#define CL_INT_MAX          2147483647
++#define CL_INT_MIN          (-2147483647-1)
++#define CL_UINT_MAX         0xffffffffU
++#define CL_LONG_MAX         ((cl_long) 0x7FFFFFFFFFFFFFFFLL)
++#define CL_LONG_MIN         ((cl_long) -0x7FFFFFFFFFFFFFFFLL - 1LL)
++#define CL_ULONG_MAX        ((cl_ulong) 0xFFFFFFFFFFFFFFFFULL)
++
++#define CL_FLT_DIG          6
++#define CL_FLT_MANT_DIG     24
++#define CL_FLT_MAX_10_EXP   +38
++#define CL_FLT_MAX_EXP      +128
++#define CL_FLT_MIN_10_EXP   -37
++#define CL_FLT_MIN_EXP      -125
++#define CL_FLT_RADIX        2
++#define CL_FLT_MAX          340282346638528859811704183484516925440.0f
++#define CL_FLT_MIN          1.175494350822287507969e-38f
++#define CL_FLT_EPSILON      1.1920928955078125e-7f
++
++#define CL_HALF_DIG          3
++#define CL_HALF_MANT_DIG     11
++#define CL_HALF_MAX_10_EXP   +4
++#define CL_HALF_MAX_EXP      +16
++#define CL_HALF_MIN_10_EXP   -4
++#define CL_HALF_MIN_EXP      -13
++#define CL_HALF_RADIX        2
++#define CL_HALF_MAX          65504.0f
++#define CL_HALF_MIN          6.103515625e-05f
++#define CL_HALF_EPSILON      9.765625e-04f
++
++#define CL_DBL_DIG          15
++#define CL_DBL_MANT_DIG     53
++#define CL_DBL_MAX_10_EXP   +308
++#define CL_DBL_MAX_EXP      +1024
++#define CL_DBL_MIN_10_EXP   -307
++#define CL_DBL_MIN_EXP      -1021
++#define CL_DBL_RADIX        2
++#define CL_DBL_MAX          1.7976931348623158e+308
++#define CL_DBL_MIN          2.225073858507201383090e-308
++#define CL_DBL_EPSILON      2.220446049250313080847e-16
++
++#define CL_M_E              2.7182818284590452354
++#define CL_M_LOG2E          1.4426950408889634074
++#define CL_M_LOG10E         0.43429448190325182765
++#define CL_M_LN2            0.69314718055994530942
++#define CL_M_LN10           2.30258509299404568402
++#define CL_M_PI             3.14159265358979323846
++#define CL_M_PI_2           1.57079632679489661923
++#define CL_M_PI_4           0.78539816339744830962
++#define CL_M_1_PI           0.31830988618379067154
++#define CL_M_2_PI           0.63661977236758134308
++#define CL_M_2_SQRTPI       1.12837916709551257390
++#define CL_M_SQRT2          1.41421356237309504880
++#define CL_M_SQRT1_2        0.70710678118654752440
++
++#define CL_M_E_F            2.718281828f
++#define CL_M_LOG2E_F        1.442695041f
++#define CL_M_LOG10E_F       0.434294482f
++#define CL_M_LN2_F          0.693147181f
++#define CL_M_LN10_F         2.302585093f
++#define CL_M_PI_F           3.141592654f
++#define CL_M_PI_2_F         1.570796327f
++#define CL_M_PI_4_F         0.785398163f
++#define CL_M_1_PI_F         0.318309886f
++#define CL_M_2_PI_F         0.636619772f
++#define CL_M_2_SQRTPI_F     1.128379167f
++#define CL_M_SQRT2_F        1.414213562f
++#define CL_M_SQRT1_2_F      0.707106781f
++
++#define CL_NAN              (CL_INFINITY - CL_INFINITY)
++#define CL_HUGE_VALF        ((cl_float) 1e50)
++#define CL_HUGE_VAL         ((cl_double) 1e500)
++#define CL_MAXFLOAT         CL_FLT_MAX
++#define CL_INFINITY         CL_HUGE_VALF
++
++#else
++
++#include <stdint.h>
++
++/* scalar types  */
++typedef int8_t          cl_char;
++typedef uint8_t         cl_uchar;
++typedef int16_t         cl_short;
++typedef uint16_t        cl_ushort;
++typedef int32_t         cl_int;
++typedef uint32_t        cl_uint;
++typedef int64_t         cl_long;
++typedef uint64_t        cl_ulong;
++
++typedef uint16_t        cl_half;
++typedef float           cl_float;
++typedef double          cl_double;
++
++/* Macro names and corresponding values defined by OpenCL */
++#define CL_CHAR_BIT         8
++#define CL_SCHAR_MAX        127
++#define CL_SCHAR_MIN        (-127-1)
++#define CL_CHAR_MAX         CL_SCHAR_MAX
++#define CL_CHAR_MIN         CL_SCHAR_MIN
++#define CL_UCHAR_MAX        255
++#define CL_SHRT_MAX         32767
++#define CL_SHRT_MIN         (-32767-1)
++#define CL_USHRT_MAX        65535
++#define CL_INT_MAX          2147483647
++#define CL_INT_MIN          (-2147483647-1)
++#define CL_UINT_MAX         0xffffffffU
++#define CL_LONG_MAX         ((cl_long) 0x7FFFFFFFFFFFFFFFLL)
++#define CL_LONG_MIN         ((cl_long) -0x7FFFFFFFFFFFFFFFLL - 1LL)
++#define CL_ULONG_MAX        ((cl_ulong) 0xFFFFFFFFFFFFFFFFULL)
++
++#define CL_FLT_DIG          6
++#define CL_FLT_MANT_DIG     24
++#define CL_FLT_MAX_10_EXP   +38
++#define CL_FLT_MAX_EXP      +128
++#define CL_FLT_MIN_10_EXP   -37
++#define CL_FLT_MIN_EXP      -125
++#define CL_FLT_RADIX        2
++#define CL_FLT_MAX          340282346638528859811704183484516925440.0f
++#define CL_FLT_MIN          1.175494350822287507969e-38f
++#define CL_FLT_EPSILON      1.1920928955078125e-7f
++
++#define CL_HALF_DIG          3
++#define CL_HALF_MANT_DIG     11
++#define CL_HALF_MAX_10_EXP   +4
++#define CL_HALF_MAX_EXP      +16
++#define CL_HALF_MIN_10_EXP   -4
++#define CL_HALF_MIN_EXP      -13
++#define CL_HALF_RADIX        2
++#define CL_HALF_MAX          65504.0f
++#define CL_HALF_MIN          6.103515625e-05f
++#define CL_HALF_EPSILON      9.765625e-04f
++
++#define CL_DBL_DIG          15
++#define CL_DBL_MANT_DIG     53
++#define CL_DBL_MAX_10_EXP   +308
++#define CL_DBL_MAX_EXP      +1024
++#define CL_DBL_MIN_10_EXP   -307
++#define CL_DBL_MIN_EXP      -1021
++#define CL_DBL_RADIX        2
++#define CL_DBL_MAX          179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245490090389328944075868508455133942304583236903222948165808559332123348274797826204144723168738177180919299881250404026184124858368.0
++#define CL_DBL_MIN          2.225073858507201383090e-308
++#define CL_DBL_EPSILON      2.220446049250313080847e-16
++
++#define CL_M_E              2.7182818284590452354
++#define CL_M_LOG2E          1.4426950408889634074
++#define CL_M_LOG10E         0.43429448190325182765
++#define CL_M_LN2            0.69314718055994530942
++#define CL_M_LN10           2.30258509299404568402
++#define CL_M_PI             3.14159265358979323846
++#define CL_M_PI_2           1.57079632679489661923
++#define CL_M_PI_4           0.78539816339744830962
++#define CL_M_1_PI           0.31830988618379067154
++#define CL_M_2_PI           0.63661977236758134308
++#define CL_M_2_SQRTPI       1.12837916709551257390
++#define CL_M_SQRT2          1.41421356237309504880
++#define CL_M_SQRT1_2        0.70710678118654752440
++
++#define CL_M_E_F            2.718281828f
++#define CL_M_LOG2E_F        1.442695041f
++#define CL_M_LOG10E_F       0.434294482f
++#define CL_M_LN2_F          0.693147181f
++#define CL_M_LN10_F         2.302585093f
++#define CL_M_PI_F           3.141592654f
++#define CL_M_PI_2_F         1.570796327f
++#define CL_M_PI_4_F         0.785398163f
++#define CL_M_1_PI_F         0.318309886f
++#define CL_M_2_PI_F         0.636619772f
++#define CL_M_2_SQRTPI_F     1.128379167f
++#define CL_M_SQRT2_F        1.414213562f
++#define CL_M_SQRT1_2_F      0.707106781f
++
++#if defined( __GNUC__ )
++   #define CL_HUGE_VALF     __builtin_huge_valf()
++   #define CL_HUGE_VAL      __builtin_huge_val()
++   #define CL_NAN           __builtin_nanf( "" )
++#else
++   #define CL_HUGE_VALF     ((cl_float) 1e50)
++   #define CL_HUGE_VAL      ((cl_double) 1e500)
++   float nanf( const char * );
++   #define CL_NAN           nanf( "" )
++#endif
++#define CL_MAXFLOAT         CL_FLT_MAX
++#define CL_INFINITY         CL_HUGE_VALF
++
++#endif
++
++#include <stddef.h>
++
++/* Mirror types to GL types. Mirror types allow us to avoid deciding which 87s to load based on whether we are using GL or GLES here. */
++typedef unsigned int cl_GLuint;
++typedef int          cl_GLint;
++typedef unsigned int cl_GLenum;
++
++/*
++ * Vector types
++ *
++ *  Note:   OpenCL requires that all types be naturally aligned.
++ *          This means that vector types must be naturally aligned.
++ *          For example, a vector of four floats must be aligned to
++ *          a 16 byte boundary (calculated as 4 * the natural 4-byte
++ *          alignment of the float).  The alignment qualifiers here
++ *          will only function properly if your compiler supports them
++ *          and if you don't actively work to defeat them.  For example,
++ *          in order for a cl_float4 to be 16 byte aligned in a struct,
++ *          the start of the struct must itself be 16-byte aligned.
++ *
++ *          Maintaining proper alignment is the user's responsibility.
++ */
++
++/* Define basic vector types */
++#if defined( __VEC__ )
++  #if !defined(__clang__)
++     #include <altivec.h>   /* may be omitted depending on compiler. AltiVec spec provides no way to detect whether the header is required. */
++  #endif
++   typedef __vector unsigned char     __cl_uchar16;
++   typedef __vector signed char       __cl_char16;
++   typedef __vector unsigned short    __cl_ushort8;
++   typedef __vector signed short      __cl_short8;
++   typedef __vector unsigned int      __cl_uint4;
++   typedef __vector signed int        __cl_int4;
++   typedef __vector float             __cl_float4;
++   #define  __CL_UCHAR16__  1
++   #define  __CL_CHAR16__   1
++   #define  __CL_USHORT8__  1
++   #define  __CL_SHORT8__   1
++   #define  __CL_UINT4__    1
++   #define  __CL_INT4__     1
++   #define  __CL_FLOAT4__   1
++#endif
++
++#if defined( __SSE__ )
++    #if defined( __MINGW64__ )
++        #include <intrin.h>
++    #else
++        #include <xmmintrin.h>
++    #endif
++    #if defined( __GNUC__ )
++        typedef float __cl_float4   __attribute__((vector_size(16)));
++    #else
++        typedef __m128 __cl_float4;
++    #endif
++    #define __CL_FLOAT4__   1
++#endif
++
++#if defined( __SSE2__ )
++    #if defined( __MINGW64__ )
++        #include <intrin.h>
++    #else
++        #include <emmintrin.h>
++    #endif
++    #if defined( __GNUC__ )
++        typedef cl_uchar    __cl_uchar16    __attribute__((vector_size(16)));
++        typedef cl_char     __cl_char16     __attribute__((vector_size(16)));
++        typedef cl_ushort   __cl_ushort8    __attribute__((vector_size(16)));
++        typedef cl_short    __cl_short8     __attribute__((vector_size(16)));
++        typedef cl_uint     __cl_uint4      __attribute__((vector_size(16)));
++        typedef cl_int      __cl_int4       __attribute__((vector_size(16)));
++        typedef cl_ulong    __cl_ulong2     __attribute__((vector_size(16)));
++        typedef cl_long     __cl_long2      __attribute__((vector_size(16)));
++        typedef cl_double   __cl_double2    __attribute__((vector_size(16)));
++    #else
++        typedef __m128i __cl_uchar16;
++        typedef __m128i __cl_char16;
++        typedef __m128i __cl_ushort8;
++        typedef __m128i __cl_short8;
++        typedef __m128i __cl_uint4;
++        typedef __m128i __cl_int4;
++        typedef __m128i __cl_ulong2;
++        typedef __m128i __cl_long2;
++        typedef __m128d __cl_double2;
++    #endif
++    #define __CL_UCHAR16__  1
++    #define __CL_CHAR16__   1
++    #define __CL_USHORT8__  1
++    #define __CL_SHORT8__   1
++    #define __CL_INT4__     1
++    #define __CL_UINT4__    1
++    #define __CL_ULONG2__   1
++    #define __CL_LONG2__    1
++    #define __CL_DOUBLE2__  1
++#endif
++
++#if defined( __MMX__ )
++    #include <mmintrin.h>
++    #if defined( __GNUC__ )
++        typedef cl_uchar    __cl_uchar8     __attribute__((vector_size(8)));
++        typedef cl_char     __cl_char8      __attribute__((vector_size(8)));
++        typedef cl_ushort   __cl_ushort4    __attribute__((vector_size(8)));
++        typedef cl_short    __cl_short4     __attribute__((vector_size(8)));
++        typedef cl_uint     __cl_uint2      __attribute__((vector_size(8)));
++        typedef cl_int      __cl_int2       __attribute__((vector_size(8)));
++        typedef cl_ulong    __cl_ulong1     __attribute__((vector_size(8)));
++        typedef cl_long     __cl_long1      __attribute__((vector_size(8)));
++        typedef cl_float    __cl_float2     __attribute__((vector_size(8)));
++    #else
++        typedef __m64       __cl_uchar8;
++        typedef __m64       __cl_char8;
++        typedef __m64       __cl_ushort4;
++        typedef __m64       __cl_short4;
++        typedef __m64       __cl_uint2;
++        typedef __m64       __cl_int2;
++        typedef __m64       __cl_ulong1;
++        typedef __m64       __cl_long1;
++        typedef __m64       __cl_float2;
++    #endif
++    #define __CL_UCHAR8__   1
++    #define __CL_CHAR8__    1
++    #define __CL_USHORT4__  1
++    #define __CL_SHORT4__   1
++    #define __CL_INT2__     1
++    #define __CL_UINT2__    1
++    #define __CL_ULONG1__   1
++    #define __CL_LONG1__    1
++    #define __CL_FLOAT2__   1
++#endif
++
++#if defined( __AVX__ )
++    #if defined( __MINGW64__ )
++        #include <intrin.h>
++    #else
++        #include <immintrin.h>
++    #endif
++    #if defined( __GNUC__ )
++        typedef cl_float    __cl_float8     __attribute__((vector_size(32)));
++        typedef cl_double   __cl_double4    __attribute__((vector_size(32)));
++    #else
++        typedef __m256      __cl_float8;
++        typedef __m256d     __cl_double4;
++    #endif
++    #define __CL_FLOAT8__   1
++    #define __CL_DOUBLE4__  1
++#endif
++
++/* Define capabilities for anonymous struct members. */
++#if !defined(__cplusplus) && defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
++#define  __CL_HAS_ANON_STRUCT__ 1
++#define  __CL_ANON_STRUCT__
++#elif defined( __GNUC__) && ! defined( __STRICT_ANSI__ )
++#define  __CL_HAS_ANON_STRUCT__ 1
++#define  __CL_ANON_STRUCT__ __extension__
++#elif defined( _WIN32) && defined(_MSC_VER) && ! defined(__STDC__)
++    #if _MSC_VER >= 1500
++   /* Microsoft Developer Studio 2008 supports anonymous structs, but
++    * complains by default. */
++    #define  __CL_HAS_ANON_STRUCT__ 1
++    #define  __CL_ANON_STRUCT__
++   /* Disable warning C4201: nonstandard extension used : nameless
++    * struct/union */
++    #pragma warning( push )
++    #pragma warning( disable : 4201 )
++    #endif
++#else
++#define  __CL_HAS_ANON_STRUCT__ 0
++#define  __CL_ANON_STRUCT__
++#endif
++
++/* Define alignment keys */
++#if defined( __GNUC__ )
++    #define CL_ALIGNED(_x)          __attribute__ ((aligned(_x)))
++#elif defined( _WIN32) && (_MSC_VER)
++    /* Alignment keys neutered on windows because MSVC can't swallow function arguments with alignment requirements     */
++    /* http://msdn.microsoft.com/en-us/library/373ak2y1%28VS.71%29.aspx                                                 */
++    /* #include <crtdefs.h>                                                                                             */
++    /* #define CL_ALIGNED(_x)          _CRT_ALIGN(_x)                                                                   */
++    #define CL_ALIGNED(_x)
++#else
++   #warning  Need to implement some method to align data here
++   #define  CL_ALIGNED(_x)
++#endif
++
++/* Indicate whether .xyzw, .s0123 and .hi.lo are supported */
++#if __CL_HAS_ANON_STRUCT__
++    /* .xyzw and .s0123...{f|F} are supported */
++    #define CL_HAS_NAMED_VECTOR_FIELDS 1
++    /* .hi and .lo are supported */
++    #define CL_HAS_HI_LO_VECTOR_FIELDS 1
++#endif
++
++/* Define cl_vector types */
++
++/* ---- cl_charn ---- */
++typedef union
++{
++    cl_char  CL_ALIGNED(2) s[2];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_char  x, y; };
++   __CL_ANON_STRUCT__ struct{ cl_char  s0, s1; };
++   __CL_ANON_STRUCT__ struct{ cl_char  lo, hi; };
++#endif
++#if defined( __CL_CHAR2__)
++    __cl_char2     v2;
++#endif
++}cl_char2;
++
++typedef union
++{
++    cl_char  CL_ALIGNED(4) s[4];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_char  x, y, z, w; };
++   __CL_ANON_STRUCT__ struct{ cl_char  s0, s1, s2, s3; };
++   __CL_ANON_STRUCT__ struct{ cl_char2 lo, hi; };
++#endif
++#if defined( __CL_CHAR2__)
++    __cl_char2     v2[2];
++#endif
++#if defined( __CL_CHAR4__)
++    __cl_char4     v4;
++#endif
++}cl_char4;
++
++/* cl_char3 is identical in size, alignment and behavior to cl_char4. See section 6.1.5. */
++typedef  cl_char4  cl_char3;
++
++typedef union
++{
++    cl_char   CL_ALIGNED(8) s[8];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_char  x, y, z, w; };
++   __CL_ANON_STRUCT__ struct{ cl_char  s0, s1, s2, s3, s4, s5, s6, s7; };
++   __CL_ANON_STRUCT__ struct{ cl_char4 lo, hi; };
++#endif
++#if defined( __CL_CHAR2__)
++    __cl_char2     v2[4];
++#endif
++#if defined( __CL_CHAR4__)
++    __cl_char4     v4[2];
++#endif
++#if defined( __CL_CHAR8__ )
++    __cl_char8     v8;
++#endif
++}cl_char8;
++
++typedef union
++{
++    cl_char  CL_ALIGNED(16) s[16];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_char  x, y, z, w, __spacer4, __spacer5, __spacer6, __spacer7, __spacer8, __spacer9, sa, sb, sc, sd, se, sf; };
++   __CL_ANON_STRUCT__ struct{ cl_char  s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF; };
++   __CL_ANON_STRUCT__ struct{ cl_char8 lo, hi; };
++#endif
++#if defined( __CL_CHAR2__)
++    __cl_char2     v2[8];
++#endif
++#if defined( __CL_CHAR4__)
++    __cl_char4     v4[4];
++#endif
++#if defined( __CL_CHAR8__ )
++    __cl_char8     v8[2];
++#endif
++#if defined( __CL_CHAR16__ )
++    __cl_char16    v16;
++#endif
++}cl_char16;
++
++
++/* ---- cl_ucharn ---- */
++typedef union
++{
++    cl_uchar  CL_ALIGNED(2) s[2];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_uchar  x, y; };
++   __CL_ANON_STRUCT__ struct{ cl_uchar  s0, s1; };
++   __CL_ANON_STRUCT__ struct{ cl_uchar  lo, hi; };
++#endif
++#if defined( __cl_uchar2__)
++    __cl_uchar2     v2;
++#endif
++}cl_uchar2;
++
++typedef union
++{
++    cl_uchar  CL_ALIGNED(4) s[4];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_uchar  x, y, z, w; };
++   __CL_ANON_STRUCT__ struct{ cl_uchar  s0, s1, s2, s3; };
++   __CL_ANON_STRUCT__ struct{ cl_uchar2 lo, hi; };
++#endif
++#if defined( __CL_UCHAR2__)
++    __cl_uchar2     v2[2];
++#endif
++#if defined( __CL_UCHAR4__)
++    __cl_uchar4     v4;
++#endif
++}cl_uchar4;
++
++/* cl_uchar3 is identical in size, alignment and behavior to cl_uchar4. See section 6.1.5. */
++typedef  cl_uchar4  cl_uchar3;
++
++typedef union
++{
++    cl_uchar   CL_ALIGNED(8) s[8];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_uchar  x, y, z, w; };
++   __CL_ANON_STRUCT__ struct{ cl_uchar  s0, s1, s2, s3, s4, s5, s6, s7; };
++   __CL_ANON_STRUCT__ struct{ cl_uchar4 lo, hi; };
++#endif
++#if defined( __CL_UCHAR2__)
++    __cl_uchar2     v2[4];
++#endif
++#if defined( __CL_UCHAR4__)
++    __cl_uchar4     v4[2];
++#endif
++#if defined( __CL_UCHAR8__ )
++    __cl_uchar8     v8;
++#endif
++}cl_uchar8;
++
++typedef union
++{
++    cl_uchar  CL_ALIGNED(16) s[16];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_uchar  x, y, z, w, __spacer4, __spacer5, __spacer6, __spacer7, __spacer8, __spacer9, sa, sb, sc, sd, se, sf; };
++   __CL_ANON_STRUCT__ struct{ cl_uchar  s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF; };
++   __CL_ANON_STRUCT__ struct{ cl_uchar8 lo, hi; };
++#endif
++#if defined( __CL_UCHAR2__)
++    __cl_uchar2     v2[8];
++#endif
++#if defined( __CL_UCHAR4__)
++    __cl_uchar4     v4[4];
++#endif
++#if defined( __CL_UCHAR8__ )
++    __cl_uchar8     v8[2];
++#endif
++#if defined( __CL_UCHAR16__ )
++    __cl_uchar16    v16;
++#endif
++}cl_uchar16;
++
++
++/* ---- cl_shortn ---- */
++typedef union
++{
++    cl_short  CL_ALIGNED(4) s[2];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_short  x, y; };
++   __CL_ANON_STRUCT__ struct{ cl_short  s0, s1; };
++   __CL_ANON_STRUCT__ struct{ cl_short  lo, hi; };
++#endif
++#if defined( __CL_SHORT2__)
++    __cl_short2     v2;
++#endif
++}cl_short2;
++
++typedef union
++{
++    cl_short  CL_ALIGNED(8) s[4];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_short  x, y, z, w; };
++   __CL_ANON_STRUCT__ struct{ cl_short  s0, s1, s2, s3; };
++   __CL_ANON_STRUCT__ struct{ cl_short2 lo, hi; };
++#endif
++#if defined( __CL_SHORT2__)
++    __cl_short2     v2[2];
++#endif
++#if defined( __CL_SHORT4__)
++    __cl_short4     v4;
++#endif
++}cl_short4;
++
++/* cl_short3 is identical in size, alignment and behavior to cl_short4. See section 6.1.5. */
++typedef  cl_short4  cl_short3;
++
++typedef union
++{
++    cl_short   CL_ALIGNED(16) s[8];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_short  x, y, z, w; };
++   __CL_ANON_STRUCT__ struct{ cl_short  s0, s1, s2, s3, s4, s5, s6, s7; };
++   __CL_ANON_STRUCT__ struct{ cl_short4 lo, hi; };
++#endif
++#if defined( __CL_SHORT2__)
++    __cl_short2     v2[4];
++#endif
++#if defined( __CL_SHORT4__)
++    __cl_short4     v4[2];
++#endif
++#if defined( __CL_SHORT8__ )
++    __cl_short8     v8;
++#endif
++}cl_short8;
++
++typedef union
++{
++    cl_short  CL_ALIGNED(32) s[16];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_short  x, y, z, w, __spacer4, __spacer5, __spacer6, __spacer7, __spacer8, __spacer9, sa, sb, sc, sd, se, sf; };
++   __CL_ANON_STRUCT__ struct{ cl_short  s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF; };
++   __CL_ANON_STRUCT__ struct{ cl_short8 lo, hi; };
++#endif
++#if defined( __CL_SHORT2__)
++    __cl_short2     v2[8];
++#endif
++#if defined( __CL_SHORT4__)
++    __cl_short4     v4[4];
++#endif
++#if defined( __CL_SHORT8__ )
++    __cl_short8     v8[2];
++#endif
++#if defined( __CL_SHORT16__ )
++    __cl_short16    v16;
++#endif
++}cl_short16;
++
++
++/* ---- cl_ushortn ---- */
++typedef union
++{
++    cl_ushort  CL_ALIGNED(4) s[2];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_ushort  x, y; };
++   __CL_ANON_STRUCT__ struct{ cl_ushort  s0, s1; };
++   __CL_ANON_STRUCT__ struct{ cl_ushort  lo, hi; };
++#endif
++#if defined( __CL_USHORT2__)
++    __cl_ushort2     v2;
++#endif
++}cl_ushort2;
++
++typedef union
++{
++    cl_ushort  CL_ALIGNED(8) s[4];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_ushort  x, y, z, w; };
++   __CL_ANON_STRUCT__ struct{ cl_ushort  s0, s1, s2, s3; };
++   __CL_ANON_STRUCT__ struct{ cl_ushort2 lo, hi; };
++#endif
++#if defined( __CL_USHORT2__)
++    __cl_ushort2     v2[2];
++#endif
++#if defined( __CL_USHORT4__)
++    __cl_ushort4     v4;
++#endif
++}cl_ushort4;
++
++/* cl_ushort3 is identical in size, alignment and behavior to cl_ushort4. See section 6.1.5. */
++typedef  cl_ushort4  cl_ushort3;
++
++typedef union
++{
++    cl_ushort   CL_ALIGNED(16) s[8];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_ushort  x, y, z, w; };
++   __CL_ANON_STRUCT__ struct{ cl_ushort  s0, s1, s2, s3, s4, s5, s6, s7; };
++   __CL_ANON_STRUCT__ struct{ cl_ushort4 lo, hi; };
++#endif
++#if defined( __CL_USHORT2__)
++    __cl_ushort2     v2[4];
++#endif
++#if defined( __CL_USHORT4__)
++    __cl_ushort4     v4[2];
++#endif
++#if defined( __CL_USHORT8__ )
++    __cl_ushort8     v8;
++#endif
++}cl_ushort8;
++
++typedef union
++{
++    cl_ushort  CL_ALIGNED(32) s[16];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_ushort  x, y, z, w, __spacer4, __spacer5, __spacer6, __spacer7, __spacer8, __spacer9, sa, sb, sc, sd, se, sf; };
++   __CL_ANON_STRUCT__ struct{ cl_ushort  s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF; };
++   __CL_ANON_STRUCT__ struct{ cl_ushort8 lo, hi; };
++#endif
++#if defined( __CL_USHORT2__)
++    __cl_ushort2     v2[8];
++#endif
++#if defined( __CL_USHORT4__)
++    __cl_ushort4     v4[4];
++#endif
++#if defined( __CL_USHORT8__ )
++    __cl_ushort8     v8[2];
++#endif
++#if defined( __CL_USHORT16__ )
++    __cl_ushort16    v16;
++#endif
++}cl_ushort16;
++
++
++/* ---- cl_halfn ---- */
++typedef union
++{
++    cl_half  CL_ALIGNED(4) s[2];
++#if __CL_HAS_ANON_STRUCT__
++    __CL_ANON_STRUCT__ struct{ cl_half  x, y; };
++    __CL_ANON_STRUCT__ struct{ cl_half  s0, s1; };
++    __CL_ANON_STRUCT__ struct{ cl_half  lo, hi; };
++#endif
++#if defined( __CL_HALF2__)
++    __cl_half2     v2;
++#endif
++}cl_half2;
++
++typedef union
++{
++    cl_half  CL_ALIGNED(8) s[4];
++#if __CL_HAS_ANON_STRUCT__
++    __CL_ANON_STRUCT__ struct{ cl_half  x, y, z, w; };
++    __CL_ANON_STRUCT__ struct{ cl_half  s0, s1, s2, s3; };
++    __CL_ANON_STRUCT__ struct{ cl_half2 lo, hi; };
++#endif
++#if defined( __CL_HALF2__)
++    __cl_half2     v2[2];
++#endif
++#if defined( __CL_HALF4__)
++    __cl_half4     v4;
++#endif
++}cl_half4;
++
++/* cl_half3 is identical in size, alignment and behavior to cl_half4. See section 6.1.5. */
++typedef  cl_half4  cl_half3;
++
++typedef union
++{
++    cl_half   CL_ALIGNED(16) s[8];
++#if __CL_HAS_ANON_STRUCT__
++    __CL_ANON_STRUCT__ struct{ cl_half  x, y, z, w; };
++    __CL_ANON_STRUCT__ struct{ cl_half  s0, s1, s2, s3, s4, s5, s6, s7; };
++    __CL_ANON_STRUCT__ struct{ cl_half4 lo, hi; };
++#endif
++#if defined( __CL_HALF2__)
++    __cl_half2     v2[4];
++#endif
++#if defined( __CL_HALF4__)
++    __cl_half4     v4[2];
++#endif
++#if defined( __CL_HALF8__ )
++    __cl_half8     v8;
++#endif
++}cl_half8;
++
++typedef union
++{
++    cl_half  CL_ALIGNED(32) s[16];
++#if __CL_HAS_ANON_STRUCT__
++    __CL_ANON_STRUCT__ struct{ cl_half  x, y, z, w, __spacer4, __spacer5, __spacer6, __spacer7, __spacer8, __spacer9, sa, sb, sc, sd, se, sf; };
++    __CL_ANON_STRUCT__ struct{ cl_half  s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF; };
++    __CL_ANON_STRUCT__ struct{ cl_half8 lo, hi; };
++#endif
++#if defined( __CL_HALF2__)
++    __cl_half2     v2[8];
++#endif
++#if defined( __CL_HALF4__)
++    __cl_half4     v4[4];
++#endif
++#if defined( __CL_HALF8__ )
++    __cl_half8     v8[2];
++#endif
++#if defined( __CL_HALF16__ )
++    __cl_half16    v16;
++#endif
++}cl_half16;
++
++/* ---- cl_intn ---- */
++typedef union
++{
++    cl_int  CL_ALIGNED(8) s[2];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_int  x, y; };
++   __CL_ANON_STRUCT__ struct{ cl_int  s0, s1; };
++   __CL_ANON_STRUCT__ struct{ cl_int  lo, hi; };
++#endif
++#if defined( __CL_INT2__)
++    __cl_int2     v2;
++#endif
++}cl_int2;
++
++typedef union
++{
++    cl_int  CL_ALIGNED(16) s[4];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_int  x, y, z, w; };
++   __CL_ANON_STRUCT__ struct{ cl_int  s0, s1, s2, s3; };
++   __CL_ANON_STRUCT__ struct{ cl_int2 lo, hi; };
++#endif
++#if defined( __CL_INT2__)
++    __cl_int2     v2[2];
++#endif
++#if defined( __CL_INT4__)
++    __cl_int4     v4;
++#endif
++}cl_int4;
++
++/* cl_int3 is identical in size, alignment and behavior to cl_int4. See section 6.1.5. */
++typedef  cl_int4  cl_int3;
++
++typedef union
++{
++    cl_int   CL_ALIGNED(32) s[8];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_int  x, y, z, w; };
++   __CL_ANON_STRUCT__ struct{ cl_int  s0, s1, s2, s3, s4, s5, s6, s7; };
++   __CL_ANON_STRUCT__ struct{ cl_int4 lo, hi; };
++#endif
++#if defined( __CL_INT2__)
++    __cl_int2     v2[4];
++#endif
++#if defined( __CL_INT4__)
++    __cl_int4     v4[2];
++#endif
++#if defined( __CL_INT8__ )
++    __cl_int8     v8;
++#endif
++}cl_int8;
++
++typedef union
++{
++    cl_int  CL_ALIGNED(64) s[16];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_int  x, y, z, w, __spacer4, __spacer5, __spacer6, __spacer7, __spacer8, __spacer9, sa, sb, sc, sd, se, sf; };
++   __CL_ANON_STRUCT__ struct{ cl_int  s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF; };
++   __CL_ANON_STRUCT__ struct{ cl_int8 lo, hi; };
++#endif
++#if defined( __CL_INT2__)
++    __cl_int2     v2[8];
++#endif
++#if defined( __CL_INT4__)
++    __cl_int4     v4[4];
++#endif
++#if defined( __CL_INT8__ )
++    __cl_int8     v8[2];
++#endif
++#if defined( __CL_INT16__ )
++    __cl_int16    v16;
++#endif
++}cl_int16;
++
++
++/* ---- cl_uintn ---- */
++typedef union
++{
++    cl_uint  CL_ALIGNED(8) s[2];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_uint  x, y; };
++   __CL_ANON_STRUCT__ struct{ cl_uint  s0, s1; };
++   __CL_ANON_STRUCT__ struct{ cl_uint  lo, hi; };
++#endif
++#if defined( __CL_UINT2__)
++    __cl_uint2     v2;
++#endif
++}cl_uint2;
++
++typedef union
++{
++    cl_uint  CL_ALIGNED(16) s[4];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_uint  x, y, z, w; };
++   __CL_ANON_STRUCT__ struct{ cl_uint  s0, s1, s2, s3; };
++   __CL_ANON_STRUCT__ struct{ cl_uint2 lo, hi; };
++#endif
++#if defined( __CL_UINT2__)
++    __cl_uint2     v2[2];
++#endif
++#if defined( __CL_UINT4__)
++    __cl_uint4     v4;
++#endif
++}cl_uint4;
++
++/* cl_uint3 is identical in size, alignment and behavior to cl_uint4. See section 6.1.5. */
++typedef  cl_uint4  cl_uint3;
++
++typedef union
++{
++    cl_uint   CL_ALIGNED(32) s[8];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_uint  x, y, z, w; };
++   __CL_ANON_STRUCT__ struct{ cl_uint  s0, s1, s2, s3, s4, s5, s6, s7; };
++   __CL_ANON_STRUCT__ struct{ cl_uint4 lo, hi; };
++#endif
++#if defined( __CL_UINT2__)
++    __cl_uint2     v2[4];
++#endif
++#if defined( __CL_UINT4__)
++    __cl_uint4     v4[2];
++#endif
++#if defined( __CL_UINT8__ )
++    __cl_uint8     v8;
++#endif
++}cl_uint8;
++
++typedef union
++{
++    cl_uint  CL_ALIGNED(64) s[16];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_uint  x, y, z, w, __spacer4, __spacer5, __spacer6, __spacer7, __spacer8, __spacer9, sa, sb, sc, sd, se, sf; };
++   __CL_ANON_STRUCT__ struct{ cl_uint  s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF; };
++   __CL_ANON_STRUCT__ struct{ cl_uint8 lo, hi; };
++#endif
++#if defined( __CL_UINT2__)
++    __cl_uint2     v2[8];
++#endif
++#if defined( __CL_UINT4__)
++    __cl_uint4     v4[4];
++#endif
++#if defined( __CL_UINT8__ )
++    __cl_uint8     v8[2];
++#endif
++#if defined( __CL_UINT16__ )
++    __cl_uint16    v16;
++#endif
++}cl_uint16;
++
++/* ---- cl_longn ---- */
++typedef union
++{
++    cl_long  CL_ALIGNED(16) s[2];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_long  x, y; };
++   __CL_ANON_STRUCT__ struct{ cl_long  s0, s1; };
++   __CL_ANON_STRUCT__ struct{ cl_long  lo, hi; };
++#endif
++#if defined( __CL_LONG2__)
++    __cl_long2     v2;
++#endif
++}cl_long2;
++
++typedef union
++{
++    cl_long  CL_ALIGNED(32) s[4];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_long  x, y, z, w; };
++   __CL_ANON_STRUCT__ struct{ cl_long  s0, s1, s2, s3; };
++   __CL_ANON_STRUCT__ struct{ cl_long2 lo, hi; };
++#endif
++#if defined( __CL_LONG2__)
++    __cl_long2     v2[2];
++#endif
++#if defined( __CL_LONG4__)
++    __cl_long4     v4;
++#endif
++}cl_long4;
++
++/* cl_long3 is identical in size, alignment and behavior to cl_long4. See section 6.1.5. */
++typedef  cl_long4  cl_long3;
++
++typedef union
++{
++    cl_long   CL_ALIGNED(64) s[8];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_long  x, y, z, w; };
++   __CL_ANON_STRUCT__ struct{ cl_long  s0, s1, s2, s3, s4, s5, s6, s7; };
++   __CL_ANON_STRUCT__ struct{ cl_long4 lo, hi; };
++#endif
++#if defined( __CL_LONG2__)
++    __cl_long2     v2[4];
++#endif
++#if defined( __CL_LONG4__)
++    __cl_long4     v4[2];
++#endif
++#if defined( __CL_LONG8__ )
++    __cl_long8     v8;
++#endif
++}cl_long8;
++
++typedef union
++{
++    cl_long  CL_ALIGNED(128) s[16];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_long  x, y, z, w, __spacer4, __spacer5, __spacer6, __spacer7, __spacer8, __spacer9, sa, sb, sc, sd, se, sf; };
++   __CL_ANON_STRUCT__ struct{ cl_long  s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF; };
++   __CL_ANON_STRUCT__ struct{ cl_long8 lo, hi; };
++#endif
++#if defined( __CL_LONG2__)
++    __cl_long2     v2[8];
++#endif
++#if defined( __CL_LONG4__)
++    __cl_long4     v4[4];
++#endif
++#if defined( __CL_LONG8__ )
++    __cl_long8     v8[2];
++#endif
++#if defined( __CL_LONG16__ )
++    __cl_long16    v16;
++#endif
++}cl_long16;
++
++
++/* ---- cl_ulongn ---- */
++typedef union
++{
++    cl_ulong  CL_ALIGNED(16) s[2];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_ulong  x, y; };
++   __CL_ANON_STRUCT__ struct{ cl_ulong  s0, s1; };
++   __CL_ANON_STRUCT__ struct{ cl_ulong  lo, hi; };
++#endif
++#if defined( __CL_ULONG2__)
++    __cl_ulong2     v2;
++#endif
++}cl_ulong2;
++
++typedef union
++{
++    cl_ulong  CL_ALIGNED(32) s[4];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_ulong  x, y, z, w; };
++   __CL_ANON_STRUCT__ struct{ cl_ulong  s0, s1, s2, s3; };
++   __CL_ANON_STRUCT__ struct{ cl_ulong2 lo, hi; };
++#endif
++#if defined( __CL_ULONG2__)
++    __cl_ulong2     v2[2];
++#endif
++#if defined( __CL_ULONG4__)
++    __cl_ulong4     v4;
++#endif
++}cl_ulong4;
++
++/* cl_ulong3 is identical in size, alignment and behavior to cl_ulong4. See section 6.1.5. */
++typedef  cl_ulong4  cl_ulong3;
++
++typedef union
++{
++    cl_ulong   CL_ALIGNED(64) s[8];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_ulong  x, y, z, w; };
++   __CL_ANON_STRUCT__ struct{ cl_ulong  s0, s1, s2, s3, s4, s5, s6, s7; };
++   __CL_ANON_STRUCT__ struct{ cl_ulong4 lo, hi; };
++#endif
++#if defined( __CL_ULONG2__)
++    __cl_ulong2     v2[4];
++#endif
++#if defined( __CL_ULONG4__)
++    __cl_ulong4     v4[2];
++#endif
++#if defined( __CL_ULONG8__ )
++    __cl_ulong8     v8;
++#endif
++}cl_ulong8;
++
++typedef union
++{
++    cl_ulong  CL_ALIGNED(128) s[16];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_ulong  x, y, z, w, __spacer4, __spacer5, __spacer6, __spacer7, __spacer8, __spacer9, sa, sb, sc, sd, se, sf; };
++   __CL_ANON_STRUCT__ struct{ cl_ulong  s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF; };
++   __CL_ANON_STRUCT__ struct{ cl_ulong8 lo, hi; };
++#endif
++#if defined( __CL_ULONG2__)
++    __cl_ulong2     v2[8];
++#endif
++#if defined( __CL_ULONG4__)
++    __cl_ulong4     v4[4];
++#endif
++#if defined( __CL_ULONG8__ )
++    __cl_ulong8     v8[2];
++#endif
++#if defined( __CL_ULONG16__ )
++    __cl_ulong16    v16;
++#endif
++}cl_ulong16;
++
++
++/* --- cl_floatn ---- */
++
++typedef union
++{
++    cl_float  CL_ALIGNED(8) s[2];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_float  x, y; };
++   __CL_ANON_STRUCT__ struct{ cl_float  s0, s1; };
++   __CL_ANON_STRUCT__ struct{ cl_float  lo, hi; };
++#endif
++#if defined( __CL_FLOAT2__)
++    __cl_float2     v2;
++#endif
++}cl_float2;
++
++typedef union
++{
++    cl_float  CL_ALIGNED(16) s[4];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_float   x, y, z, w; };
++   __CL_ANON_STRUCT__ struct{ cl_float   s0, s1, s2, s3; };
++   __CL_ANON_STRUCT__ struct{ cl_float2  lo, hi; };
++#endif
++#if defined( __CL_FLOAT2__)
++    __cl_float2     v2[2];
++#endif
++#if defined( __CL_FLOAT4__)
++    __cl_float4     v4;
++#endif
++}cl_float4;
++
++/* cl_float3 is identical in size, alignment and behavior to cl_float4. See section 6.1.5. */
++typedef  cl_float4  cl_float3;
++
++typedef union
++{
++    cl_float   CL_ALIGNED(32) s[8];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_float   x, y, z, w; };
++   __CL_ANON_STRUCT__ struct{ cl_float   s0, s1, s2, s3, s4, s5, s6, s7; };
++   __CL_ANON_STRUCT__ struct{ cl_float4  lo, hi; };
++#endif
++#if defined( __CL_FLOAT2__)
++    __cl_float2     v2[4];
++#endif
++#if defined( __CL_FLOAT4__)
++    __cl_float4     v4[2];
++#endif
++#if defined( __CL_FLOAT8__ )
++    __cl_float8     v8;
++#endif
++}cl_float8;
++
++typedef union
++{
++    cl_float  CL_ALIGNED(64) s[16];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_float  x, y, z, w, __spacer4, __spacer5, __spacer6, __spacer7, __spacer8, __spacer9, sa, sb, sc, sd, se, sf; };
++   __CL_ANON_STRUCT__ struct{ cl_float  s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF; };
++   __CL_ANON_STRUCT__ struct{ cl_float8 lo, hi; };
++#endif
++#if defined( __CL_FLOAT2__)
++    __cl_float2     v2[8];
++#endif
++#if defined( __CL_FLOAT4__)
++    __cl_float4     v4[4];
++#endif
++#if defined( __CL_FLOAT8__ )
++    __cl_float8     v8[2];
++#endif
++#if defined( __CL_FLOAT16__ )
++    __cl_float16    v16;
++#endif
++}cl_float16;
++
++/* --- cl_doublen ---- */
++
++typedef union
++{
++    cl_double  CL_ALIGNED(16) s[2];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_double  x, y; };
++   __CL_ANON_STRUCT__ struct{ cl_double s0, s1; };
++   __CL_ANON_STRUCT__ struct{ cl_double lo, hi; };
++#endif
++#if defined( __CL_DOUBLE2__)
++    __cl_double2     v2;
++#endif
++}cl_double2;
++
++typedef union
++{
++    cl_double  CL_ALIGNED(32) s[4];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_double  x, y, z, w; };
++   __CL_ANON_STRUCT__ struct{ cl_double  s0, s1, s2, s3; };
++   __CL_ANON_STRUCT__ struct{ cl_double2 lo, hi; };
++#endif
++#if defined( __CL_DOUBLE2__)
++    __cl_double2     v2[2];
++#endif
++#if defined( __CL_DOUBLE4__)
++    __cl_double4     v4;
++#endif
++}cl_double4;
++
++/* cl_double3 is identical in size, alignment and behavior to cl_double4. See section 6.1.5. */
++typedef  cl_double4  cl_double3;
++
++typedef union
++{
++    cl_double   CL_ALIGNED(64) s[8];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_double  x, y, z, w; };
++   __CL_ANON_STRUCT__ struct{ cl_double  s0, s1, s2, s3, s4, s5, s6, s7; };
++   __CL_ANON_STRUCT__ struct{ cl_double4 lo, hi; };
++#endif
++#if defined( __CL_DOUBLE2__)
++    __cl_double2     v2[4];
++#endif
++#if defined( __CL_DOUBLE4__)
++    __cl_double4     v4[2];
++#endif
++#if defined( __CL_DOUBLE8__ )
++    __cl_double8     v8;
++#endif
++}cl_double8;
++
++typedef union
++{
++    cl_double  CL_ALIGNED(128) s[16];
++#if __CL_HAS_ANON_STRUCT__
++   __CL_ANON_STRUCT__ struct{ cl_double  x, y, z, w, __spacer4, __spacer5, __spacer6, __spacer7, __spacer8, __spacer9, sa, sb, sc, sd, se, sf; };
++   __CL_ANON_STRUCT__ struct{ cl_double  s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, sA, sB, sC, sD, sE, sF; };
++   __CL_ANON_STRUCT__ struct{ cl_double8 lo, hi; };
++#endif
++#if defined( __CL_DOUBLE2__)
++    __cl_double2     v2[8];
++#endif
++#if defined( __CL_DOUBLE4__)
++    __cl_double4     v4[4];
++#endif
++#if defined( __CL_DOUBLE8__ )
++    __cl_double8     v8[2];
++#endif
++#if defined( __CL_DOUBLE16__ )
++    __cl_double16    v16;
++#endif
++}cl_double16;
++
++/* Macro to facilitate debugging
++ * Usage:
++ *   Place CL_PROGRAM_STRING_DEBUG_INFO on the line before the first line of your source.
++ *   The first line ends with:   CL_PROGRAM_STRING_DEBUG_INFO \"
++ *   Each line thereafter of OpenCL C source must end with: \n\
++ *   The last line ends in ";
++ *
++ *   Example:
++ *
++ *   const char *my_program = CL_PROGRAM_STRING_DEBUG_INFO "\
++ *   kernel void foo( int a, float * b )             \n\
++ *   {                                               \n\
++ *      // my comment                                \n\
++ *      *b[ get_global_id(0)] = a;                   \n\
++ *   }                                               \n\
++ *   ";
++ *
++ * This should correctly set up the line, (column) and file information for your source
++ * string so you can do source level debugging.
++ */
++#define  __CL_STRINGIFY( _x )               # _x
++#define  _CL_STRINGIFY( _x )                __CL_STRINGIFY( _x )
++#define  CL_PROGRAM_STRING_DEBUG_INFO       "#line "  _CL_STRINGIFY(__LINE__) " \"" __FILE__ "\" \n\n"
++
++#ifdef __cplusplus
++}
++#endif
++
++#if defined( _WIN32) && defined(_MSC_VER) && ! defined(__STDC__)
++    #if _MSC_VER >=1500
++    #pragma warning( pop )
++    #endif
++#endif
++
++#endif  /* __CL_PLATFORM_H  */
+diff --git a/Modules/Core/GPUCommon/include/CL/cl_version.h b/Modules/Core/GPUCommon/include/CL/cl_version.h
+new file mode 100644
+index 0000000..3844938
+--- /dev/null
++++ b/Modules/Core/GPUCommon/include/CL/cl_version.h
+@@ -0,0 +1,81 @@
++/*******************************************************************************
++ * Copyright (c) 2018-2020 The Khronos Group Inc.
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *    http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ ******************************************************************************/
++
++#ifndef __CL_VERSION_H
++#define __CL_VERSION_H
++
++/* Detect which version to target */
++#if !defined(CL_TARGET_OPENCL_VERSION)
++#pragma message("cl_version.h: CL_TARGET_OPENCL_VERSION is not defined. Defaulting to 300 (OpenCL 3.0)")
++#define CL_TARGET_OPENCL_VERSION 300
++#endif
++#if CL_TARGET_OPENCL_VERSION != 100 && \
++    CL_TARGET_OPENCL_VERSION != 110 && \
++    CL_TARGET_OPENCL_VERSION != 120 && \
++    CL_TARGET_OPENCL_VERSION != 200 && \
++    CL_TARGET_OPENCL_VERSION != 210 && \
++    CL_TARGET_OPENCL_VERSION != 220 && \
++    CL_TARGET_OPENCL_VERSION != 300
++#pragma message("cl_version: CL_TARGET_OPENCL_VERSION is not a valid value (100, 110, 120, 200, 210, 220, 300). Defaulting to 300 (OpenCL 3.0)")
++#undef CL_TARGET_OPENCL_VERSION
++#define CL_TARGET_OPENCL_VERSION 300
++#endif
++
++
++/* OpenCL Version */
++#if CL_TARGET_OPENCL_VERSION >= 300 && !defined(CL_VERSION_3_0)
++#define CL_VERSION_3_0  1
++#endif
++#if CL_TARGET_OPENCL_VERSION >= 220 && !defined(CL_VERSION_2_2)
++#define CL_VERSION_2_2  1
++#endif
++#if CL_TARGET_OPENCL_VERSION >= 210 && !defined(CL_VERSION_2_1)
++#define CL_VERSION_2_1  1
++#endif
++#if CL_TARGET_OPENCL_VERSION >= 200 && !defined(CL_VERSION_2_0)
++#define CL_VERSION_2_0  1
++#endif
++#if CL_TARGET_OPENCL_VERSION >= 120 && !defined(CL_VERSION_1_2)
++#define CL_VERSION_1_2  1
++#endif
++#if CL_TARGET_OPENCL_VERSION >= 110 && !defined(CL_VERSION_1_1)
++#define CL_VERSION_1_1  1
++#endif
++#if CL_TARGET_OPENCL_VERSION >= 100 && !defined(CL_VERSION_1_0)
++#define CL_VERSION_1_0  1
++#endif
++
++/* Allow deprecated APIs for older OpenCL versions. */
++#if CL_TARGET_OPENCL_VERSION <= 220 && !defined(CL_USE_DEPRECATED_OPENCL_2_2_APIS)
++#define CL_USE_DEPRECATED_OPENCL_2_2_APIS
++#endif
++#if CL_TARGET_OPENCL_VERSION <= 210 && !defined(CL_USE_DEPRECATED_OPENCL_2_1_APIS)
++#define CL_USE_DEPRECATED_OPENCL_2_1_APIS
++#endif
++#if CL_TARGET_OPENCL_VERSION <= 200 && !defined(CL_USE_DEPRECATED_OPENCL_2_0_APIS)
++#define CL_USE_DEPRECATED_OPENCL_2_0_APIS
++#endif
++#if CL_TARGET_OPENCL_VERSION <= 120 && !defined(CL_USE_DEPRECATED_OPENCL_1_2_APIS)
++#define CL_USE_DEPRECATED_OPENCL_1_2_APIS
++#endif
++#if CL_TARGET_OPENCL_VERSION <= 110 && !defined(CL_USE_DEPRECATED_OPENCL_1_1_APIS)
++#define CL_USE_DEPRECATED_OPENCL_1_1_APIS
++#endif
++#if CL_TARGET_OPENCL_VERSION <= 100 && !defined(CL_USE_DEPRECATED_OPENCL_1_0_APIS)
++#define CL_USE_DEPRECATED_OPENCL_1_0_APIS
++#endif
++
++#endif  /* __CL_VERSION_H */
+diff --git a/Modules/Core/GPUCommon/include/glad/opencl.h b/Modules/Core/GPUCommon/include/glad/opencl.h
+new file mode 100644
+index 0000000..5c11479
+--- /dev/null
++++ b/Modules/Core/GPUCommon/include/glad/opencl.h
+@@ -0,0 +1,833 @@
++/**
++ * Loader generated by glad 2.0.0-beta on Thu Nov 26 10:35:42 2020
++ *
++ * Generator: C/C++
++ * Specification: cl
++ * Extensions: 6
++ *
++ * APIs:
++ *  - opencl=1.1
++ *
++ * Options:
++ *  - ALIAS = False
++ *  - DEBUG = False
++ *  - HEADER_ONLY = False
++ *  - LOADER = True
++ *  - MX = False
++ *  - MX_GLOBAL = False
++ *  - ON_DEMAND = False
++ *
++ * Commandline:
++ *    --api='opencl=1.1' --extensions='cl_ext_migrate_memobject,cl_img_cached_allocations,cl_img_generate_mipmap,cl_img_mem_properties,cl_img_use_gralloc_ptr,cl_img_yuv_image' c --loader
++ *
++ * Online:
++ *    http://glad.sh/#api=opencl%3D1.1&extensions=cl_ext_migrate_memobject%2Ccl_img_cached_allocations%2Ccl_img_generate_mipmap%2Ccl_img_mem_properties%2Ccl_img_use_gralloc_ptr%2Ccl_img_yuv_image&generator=c&options=LOADER
++ *
++ */
++
++#include "itkGPUCommonExport.h"
++
++#define CL_TARGET_OPENCL_VERSION 110
++#define GLAD_API_CALL_EXPORT
++#ifdef ITKGPUCommon_EXPORTS
++#define GLAD_API_CALL_EXPORT_BUILD
++#endif
++
++#ifndef GLAD_OPENCL_H_
++#define GLAD_OPENCL_H_
++
++
++#define GLAD_OPENCL
++#define GLAD_OPTION_OPENCL_LOADER
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++#ifndef GLAD_PLATFORM_H_
++#define GLAD_PLATFORM_H_
++
++#ifndef GLAD_PLATFORM_WIN32
++  #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32) || defined(__MINGW32__)
++    #define GLAD_PLATFORM_WIN32 1
++  #else
++    #define GLAD_PLATFORM_WIN32 0
++  #endif
++#endif
++
++#ifndef GLAD_PLATFORM_APPLE
++  #ifdef __APPLE__
++    #define GLAD_PLATFORM_APPLE 1
++  #else
++    #define GLAD_PLATFORM_APPLE 0
++  #endif
++#endif
++
++#ifndef GLAD_PLATFORM_EMSCRIPTEN
++  #ifdef __EMSCRIPTEN__
++    #define GLAD_PLATFORM_EMSCRIPTEN 1
++  #else
++    #define GLAD_PLATFORM_EMSCRIPTEN 0
++  #endif
++#endif
++
++#ifndef GLAD_PLATFORM_UWP
++  #if defined(_MSC_VER) && !defined(GLAD_INTERNAL_HAVE_WINAPIFAMILY)
++    #ifdef __has_include
++      #if __has_include(<winapifamily.h>)
++        #define GLAD_INTERNAL_HAVE_WINAPIFAMILY 1
++      #endif
++    #elif _MSC_VER >= 1700 && !_USING_V110_SDK71_
++      #define GLAD_INTERNAL_HAVE_WINAPIFAMILY 1
++    #endif
++  #endif
++
++  #ifdef GLAD_INTERNAL_HAVE_WINAPIFAMILY
++    #include <winapifamily.h>
++    #if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) && WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP)
++      #define GLAD_PLATFORM_UWP 1
++    #endif
++  #endif
++
++  #ifndef GLAD_PLATFORM_UWP
++    #define GLAD_PLATFORM_UWP 0
++  #endif
++#endif
++
++#ifdef __GNUC__
++  #define GLAD_GNUC_EXTENSION __extension__
++#else
++  #define GLAD_GNUC_EXTENSION
++#endif
++
++#ifndef GLAD_API_CALL
++  #if defined(GLAD_API_CALL_EXPORT)
++    #if GLAD_PLATFORM_WIN32 || defined(__CYGWIN__)
++      #if defined(GLAD_API_CALL_EXPORT_BUILD)
++        #if defined(__GNUC__)
++          #define GLAD_API_CALL __attribute__ ((dllexport)) extern
++        #else
++          #define GLAD_API_CALL __declspec(dllexport) extern
++        #endif
++      #else
++        #if defined(__GNUC__)
++          #define GLAD_API_CALL __attribute__ ((dllimport)) extern
++        #else
++          #define GLAD_API_CALL __declspec(dllimport) extern
++        #endif
++      #endif
++    #elif defined(__GNUC__) && defined(GLAD_API_CALL_EXPORT_BUILD)
++      #define GLAD_API_CALL __attribute__ ((visibility ("default"))) extern
++    #else
++      #define GLAD_API_CALL extern
++    #endif
++  #else
++    #define GLAD_API_CALL extern
++  #endif
++#endif
++
++#ifdef APIENTRY
++  #define GLAD_API_PTR APIENTRY
++#elif GLAD_PLATFORM_WIN32
++  #define GLAD_API_PTR __stdcall
++#else
++  #define GLAD_API_PTR
++#endif
++
++#ifndef GLAPI
++#define GLAPI GLAD_API_CALL
++#endif
++
++#ifndef GLAPIENTRY
++#define GLAPIENTRY GLAD_API_PTR
++#endif
++
++#define GLAD_MAKE_VERSION(major, minor) (major * 10000 + minor)
++#define GLAD_VERSION_MAJOR(version) (version / 10000)
++#define GLAD_VERSION_MINOR(version) (version % 10000)
++
++#define GLAD_GENERATOR_VERSION "2.0.0-beta"
++
++typedef void (*GLADapiproc)(void);
++
++typedef GLADapiproc (*GLADloadfunc)(const char *name);
++typedef GLADapiproc (*GLADuserptrloadfunc)(void *userptr, const char *name);
++
++typedef void (*GLADprecallback)(const char *name, GLADapiproc apiproc, int len_args, ...);
++typedef void (*GLADpostcallback)(void *ret, const char *name, GLADapiproc apiproc, int len_args, ...);
++
++#endif /* GLAD_PLATFORM_H_ */
++
++#define CL_A 0x10B1
++#define CL_ADDRESS_CLAMP 0x1132
++#define CL_ADDRESS_CLAMP_TO_EDGE 0x1131
++#define CL_ADDRESS_MIRRORED_REPEAT 0x1134
++#define CL_ADDRESS_NONE 0x1130
++#define CL_ADDRESS_REPEAT 0x1133
++#define CL_ARGB 0x10B7
++#define CL_BGRA 0x10B6
++#define CL_BUFFER_CREATE_TYPE_REGION 0x1220
++#define CL_BUILD_ERROR -2
++#define CL_BUILD_IN_PROGRESS -3
++#define CL_BUILD_NONE -1
++#define CL_BUILD_PROGRAM_FAILURE -11
++#define CL_BUILD_SUCCESS 0
++#define CL_CHAR_BIT 8
++#define CL_CHAR_MAX CL_SCHAR_MAX
++#define CL_CHAR_MIN CL_SCHAR_MIN
++#define CL_COMMAND_ACQUIRE_GL_OBJECTS 0x11FF
++#define CL_COMMAND_ACQUIRE_GRALLOC_OBJECTS_IMG 0x40D2
++#define CL_COMMAND_COPY_BUFFER 0x11F5
++#define CL_COMMAND_COPY_BUFFER_RECT 0x1203
++#define CL_COMMAND_COPY_BUFFER_TO_IMAGE 0x11FA
++#define CL_COMMAND_COPY_IMAGE 0x11F8
++#define CL_COMMAND_COPY_IMAGE_TO_BUFFER 0x11F9
++#define CL_COMMAND_GENERATE_MIPMAP_IMG 0x40D6
++#define CL_COMMAND_MAP_BUFFER 0x11FB
++#define CL_COMMAND_MAP_IMAGE 0x11FC
++#define CL_COMMAND_MARKER 0x11FE
++#define CL_COMMAND_MIGRATE_MEM_OBJECT_EXT 0x4040
++#define CL_COMMAND_NATIVE_KERNEL 0x11F2
++#define CL_COMMAND_NDRANGE_KERNEL 0x11F0
++#define CL_COMMAND_READ_BUFFER 0x11F3
++#define CL_COMMAND_READ_BUFFER_RECT 0x1201
++#define CL_COMMAND_READ_IMAGE 0x11F6
++#define CL_COMMAND_RELEASE_GL_OBJECTS 0x1200
++#define CL_COMMAND_RELEASE_GRALLOC_OBJECTS_IMG 0x40D3
++#define CL_COMMAND_TASK 0x11F1
++#define CL_COMMAND_UNMAP_MEM_OBJECT 0x11FD
++#define CL_COMMAND_USER 0x1204
++#define CL_COMMAND_WRITE_BUFFER 0x11F4
++#define CL_COMMAND_WRITE_BUFFER_RECT 0x1202
++#define CL_COMMAND_WRITE_IMAGE 0x11F7
++#define CL_COMPILER_NOT_AVAILABLE -3
++#define CL_COMPLETE 0x0
++#define CL_CONTEXT_DEVICES 0x1081
++#define CL_CONTEXT_NUM_DEVICES 0x1083
++#define CL_CONTEXT_PLATFORM 0x1084
++#define CL_CONTEXT_PROPERTIES 0x1082
++#define CL_CONTEXT_REFERENCE_COUNT 0x1080
++#define CL_DBL_DIG 15
++#define CL_DBL_EPSILON 2.220446049250313080847e-16
++#define CL_DBL_MANT_DIG 53
++#define CL_DBL_MAX 1.7976931348623158e+308
++#define CL_DBL_MAX_10_EXP +308
++#define CL_DBL_MAX_EXP +1024
++#define CL_DBL_MIN 2.225073858507201383090e-308
++#define CL_DBL_MIN_10_EXP -307
++#define CL_DBL_MIN_EXP -1021
++#define CL_DBL_RADIX 2
++#define CL_DEVICE_ADDRESS_BITS 0x100D
++#define CL_DEVICE_AVAILABLE 0x1027
++#define CL_DEVICE_COMPILER_AVAILABLE 0x1028
++#define CL_DEVICE_ENDIAN_LITTLE 0x1026
++#define CL_DEVICE_ERROR_CORRECTION_SUPPORT 0x1024
++#define CL_DEVICE_EXECUTION_CAPABILITIES 0x1029
++#define CL_DEVICE_EXTENSIONS 0x1030
++#define CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE 0x101D
++#define CL_DEVICE_GLOBAL_MEM_CACHE_SIZE 0x101E
++#define CL_DEVICE_GLOBAL_MEM_CACHE_TYPE 0x101C
++#define CL_DEVICE_GLOBAL_MEM_SIZE 0x101F
++#define CL_DEVICE_HOST_UNIFIED_MEMORY 0x1035
++#define CL_DEVICE_IMAGE2D_MAX_HEIGHT 0x1012
++#define CL_DEVICE_IMAGE2D_MAX_WIDTH 0x1011
++#define CL_DEVICE_IMAGE3D_MAX_DEPTH 0x1015
++#define CL_DEVICE_IMAGE3D_MAX_HEIGHT 0x1014
++#define CL_DEVICE_IMAGE3D_MAX_WIDTH 0x1013
++#define CL_DEVICE_IMAGE_SUPPORT 0x1016
++#define CL_DEVICE_LOCAL_MEM_SIZE 0x1023
++#define CL_DEVICE_LOCAL_MEM_TYPE 0x1022
++#define CL_DEVICE_MAX_CLOCK_FREQUENCY 0x100C
++#define CL_DEVICE_MAX_COMPUTE_UNITS 0x1002
++#define CL_DEVICE_MAX_CONSTANT_ARGS 0x1021
++#define CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE 0x1020
++#define CL_DEVICE_MAX_MEM_ALLOC_SIZE 0x1010
++#define CL_DEVICE_MAX_PARAMETER_SIZE 0x1017
++#define CL_DEVICE_MAX_READ_IMAGE_ARGS 0x100E
++#define CL_DEVICE_MAX_SAMPLERS 0x1018
++#define CL_DEVICE_MAX_WORK_GROUP_SIZE 0x1004
++#define CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS 0x1003
++#define CL_DEVICE_MAX_WORK_ITEM_SIZES 0x1005
++#define CL_DEVICE_MAX_WRITE_IMAGE_ARGS 0x100F
++#define CL_DEVICE_MEM_BASE_ADDR_ALIGN 0x1019
++#define CL_DEVICE_MIN_DATA_TYPE_ALIGN_SIZE 0x101A
++#define CL_DEVICE_NAME 0x102B
++#define CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR 0x1036
++#define CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE 0x103B
++#define CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT 0x103A
++#define CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF 0x103C
++#define CL_DEVICE_NATIVE_VECTOR_WIDTH_INT 0x1038
++#define CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG 0x1039
++#define CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT 0x1037
++#define CL_DEVICE_NOT_AVAILABLE -2
++#define CL_DEVICE_NOT_FOUND -1
++#define CL_DEVICE_OPENCL_C_VERSION 0x103D
++#define CL_DEVICE_PLATFORM 0x1031
++#define CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR 0x1006
++#define CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE 0x100B
++#define CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT 0x100A
++#define CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF 0x1034
++#define CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT 0x1008
++#define CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG 0x1009
++#define CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT 0x1007
++#define CL_DEVICE_PROFILE 0x102E
++#define CL_DEVICE_PROFILING_TIMER_RESOLUTION 0x1025
++#define CL_DEVICE_QUEUE_PROPERTIES 0x102A
++#define CL_DEVICE_SINGLE_FP_CONFIG 0x101B
++#define CL_DEVICE_TYPE 0x1000
++#define CL_DEVICE_TYPE_ACCELERATOR 8
++#define CL_DEVICE_TYPE_ALL 0xFFFFFFFF
++#define CL_DEVICE_TYPE_CPU 2
++#define CL_DEVICE_TYPE_DEFAULT 1
++#define CL_DEVICE_TYPE_GPU 4
++#define CL_DEVICE_VENDOR 0x102C
++#define CL_DEVICE_VENDOR_ID 0x1001
++#define CL_DEVICE_VERSION 0x102F
++#define CL_DRIVER_VERSION 0x102D
++#define CL_EVENT_COMMAND_EXECUTION_STATUS 0x11D3
++#define CL_EVENT_COMMAND_QUEUE 0x11D0
++#define CL_EVENT_COMMAND_TYPE 0x11D1
++#define CL_EVENT_CONTEXT 0x11D4
++#define CL_EVENT_REFERENCE_COUNT 0x11D2
++#define CL_EXEC_KERNEL 1
++#define CL_EXEC_NATIVE_KERNEL 2
++#define CL_EXEC_STATUS_ERROR_FOR_EVENTS_IN_WAIT_LIST -14
++#define CL_FALSE 0
++#define CL_FILTER_LINEAR 0x1141
++#define CL_FILTER_NEAREST 0x1140
++#define CL_FLOAT 0x10DE
++#define CL_FLT_DIG 6
++#define CL_FLT_EPSILON 1.1920928955078125e-7f
++#define CL_FLT_MANT_DIG 24
++#define CL_FLT_MAX 340282346638528859811704183484516925440.0f
++#define CL_FLT_MAX_10_EXP +38
++#define CL_FLT_MAX_EXP +128
++#define CL_FLT_MIN 1.175494350822287507969e-38f
++#define CL_FLT_MIN_10_EXP -37
++#define CL_FLT_MIN_EXP -125
++#define CL_FLT_RADIX 2
++#define CL_FP_DENORM 1
++#define CL_FP_FMA 32
++#define CL_FP_INF_NAN 2
++#define CL_FP_ROUND_TO_INF 16
++#define CL_FP_ROUND_TO_NEAREST 4
++#define CL_FP_ROUND_TO_ZERO 8
++#define CL_FP_SOFT_FLOAT 64
++#define CL_GLOBAL 0x2
++#define CL_GRALLOC_RESOURCE_NOT_ACQUIRED_IMG 0x40D4
++#define CL_HALF_FLOAT 0x10DD
++#define CL_HUGE_VAL ((cl_double) 1e500)
++#define CL_HUGE_VALF ((cl_float) 1e50)
++#define CL_IMAGE_DEPTH 0x1116
++#define CL_IMAGE_ELEMENT_SIZE 0x1111
++#define CL_IMAGE_FORMAT 0x1110
++#define CL_IMAGE_FORMAT_MISMATCH -9
++#define CL_IMAGE_FORMAT_NOT_SUPPORTED -10
++#define CL_IMAGE_HEIGHT 0x1115
++#define CL_IMAGE_ROW_PITCH 0x1112
++#define CL_IMAGE_SLICE_PITCH 0x1113
++#define CL_IMAGE_WIDTH 0x1114
++#define CL_INFINITY CL_HUGE_VALF
++#define CL_INTENSITY 0x10B8
++#define CL_INT_MAX 2147483647
++#define CL_INT_MIN (-2147483647-1)
++#define CL_INVALID_ARG_INDEX -49
++#define CL_INVALID_ARG_SIZE -51
++#define CL_INVALID_ARG_VALUE -50
++#define CL_INVALID_BINARY -42
++#define CL_INVALID_BUFFER_SIZE -61
++#define CL_INVALID_BUILD_OPTIONS -43
++#define CL_INVALID_COMMAND_QUEUE -36
++#define CL_INVALID_CONTEXT -34
++#define CL_INVALID_DEVICE -33
++#define CL_INVALID_DEVICE_TYPE -31
++#define CL_INVALID_EVENT -58
++#define CL_INVALID_EVENT_WAIT_LIST -57
++#define CL_INVALID_GLOBAL_OFFSET -56
++#define CL_INVALID_GLOBAL_WORK_SIZE -63
++#define CL_INVALID_GL_OBJECT -60
++#define CL_INVALID_GRALLOC_OBJECT_IMG 0x40D5
++#define CL_INVALID_HOST_PTR -37
++#define CL_INVALID_IMAGE_FORMAT_DESCRIPTOR -39
++#define CL_INVALID_IMAGE_SIZE -40
++#define CL_INVALID_KERNEL -48
++#define CL_INVALID_KERNEL_ARGS -52
++#define CL_INVALID_KERNEL_DEFINITION -47
++#define CL_INVALID_KERNEL_NAME -46
++#define CL_INVALID_MEM_OBJECT -38
++#define CL_INVALID_MIP_LEVEL -62
++#define CL_INVALID_OPERATION -59
++#define CL_INVALID_PLATFORM -32
++#define CL_INVALID_PROGRAM -44
++#define CL_INVALID_PROGRAM_EXECUTABLE -45
++#define CL_INVALID_PROPERTY -64
++#define CL_INVALID_QUEUE_PROPERTIES -35
++#define CL_INVALID_SAMPLER -41
++#define CL_INVALID_VALUE -30
++#define CL_INVALID_WORK_DIMENSION -53
++#define CL_INVALID_WORK_GROUP_SIZE -54
++#define CL_INVALID_WORK_ITEM_SIZE -55
++#define CL_KERNEL_COMPILE_WORK_GROUP_SIZE 0x11B1
++#define CL_KERNEL_CONTEXT 0x1193
++#define CL_KERNEL_FUNCTION_NAME 0x1190
++#define CL_KERNEL_LOCAL_MEM_SIZE 0x11B2
++#define CL_KERNEL_NUM_ARGS 0x1191
++#define CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE 0x11B3
++#define CL_KERNEL_PRIVATE_MEM_SIZE 0x11B4
++#define CL_KERNEL_PROGRAM 0x1194
++#define CL_KERNEL_REFERENCE_COUNT 0x1192
++#define CL_KERNEL_WORK_GROUP_SIZE 0x11B0
++#define CL_LOCAL 0x1
++#define CL_LONG_MAX ((cl_long) 0x7FFFFFFFFFFFFFFFLL)
++#define CL_LONG_MIN ((cl_long) -0x7FFFFFFFFFFFFFFFLL - 1LL)
++#define CL_LUMINANCE 0x10B9
++#define CL_MAP_FAILURE -12
++#define CL_MAP_READ 1
++#define CL_MAP_WRITE 2
++#define CL_MAXFLOAT CL_FLT_MAX
++#define CL_MEM_ALLOC_FLAGS_IMG 0x40D7
++#define CL_MEM_ALLOC_HOST_PTR 16
++#define CL_MEM_ALLOC_RELAX_REQUIREMENTS_IMG 1
++#define CL_MEM_ASSOCIATED_MEMOBJECT 0x1107
++#define CL_MEM_CONTEXT 0x1106
++#define CL_MEM_COPY_HOST_PTR 32
++#define CL_MEM_COPY_OVERLAP -8
++#define CL_MEM_FLAGS 0x1101
++#define CL_MEM_HOST_PTR 0x1103
++#define CL_MEM_MAP_COUNT 0x1104
++#define CL_MEM_OBJECT_ALLOCATION_FAILURE -4
++#define CL_MEM_OBJECT_BUFFER 0x10F0
++#define CL_MEM_OBJECT_IMAGE2D 0x10F1
++#define CL_MEM_OBJECT_IMAGE3D 0x10F2
++#define CL_MEM_OFFSET 0x1108
++#define CL_MEM_READ_ONLY 4
++#define CL_MEM_READ_WRITE 1
++#define CL_MEM_REFERENCE_COUNT 0x1105
++#define CL_MEM_SIZE 0x1102
++#define CL_MEM_TYPE 0x1100
++#define CL_MEM_USE_CACHED_CPU_MEMORY_IMG 134217728
++#define CL_MEM_USE_GRALLOC_PTR_IMG 268435456
++#define CL_MEM_USE_HOST_PTR 8
++#define CL_MEM_USE_UNCACHED_CPU_MEMORY_IMG 67108864
++#define CL_MEM_WRITE_ONLY 2
++#define CL_MIGRATE_MEM_OBJECT_HOST_EXT 1
++#define CL_MIPMAP_FILTER_ANY_IMG 0x0
++#define CL_MIPMAP_FILTER_BOX_IMG 0x1
++#define CL_MISALIGNED_SUB_BUFFER_OFFSET -13
++#define CL_NAN (CL_INFINITY - CL_INFINITY)
++#define CL_NONE 0x0
++#define CL_NV21_IMG 0x40D0
++#define CL_OUT_OF_HOST_MEMORY -6
++#define CL_OUT_OF_RESOURCES -5
++#define CL_PLATFORM_EXTENSIONS 0x0904
++#define CL_PLATFORM_NAME 0x0902
++#define CL_PLATFORM_PROFILE 0x0900
++#define CL_PLATFORM_VENDOR 0x0903
++#define CL_PLATFORM_VERSION 0x0901
++#define CL_PROFILING_COMMAND_END 0x1283
++#define CL_PROFILING_COMMAND_QUEUED 0x1280
++#define CL_PROFILING_COMMAND_START 0x1282
++#define CL_PROFILING_COMMAND_SUBMIT 0x1281
++#define CL_PROFILING_INFO_NOT_AVAILABLE -7
++#define CL_PROGRAM_BINARIES 0x1166
++#define CL_PROGRAM_BINARY_SIZES 0x1165
++#define CL_PROGRAM_BUILD_LOG 0x1183
++#define CL_PROGRAM_BUILD_OPTIONS 0x1182
++#define CL_PROGRAM_BUILD_STATUS 0x1181
++#define CL_PROGRAM_CONTEXT 0x1161
++#define CL_PROGRAM_DEVICES 0x1163
++#define CL_PROGRAM_NUM_DEVICES 0x1162
++#define CL_PROGRAM_REFERENCE_COUNT 0x1160
++#define CL_PROGRAM_SOURCE 0x1164
++#define CL_QUEUED 0x3
++#define CL_QUEUE_CONTEXT 0x1090
++#define CL_QUEUE_DEVICE 0x1091
++#define CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE 1
++#define CL_QUEUE_PROFILING_ENABLE 2
++#define CL_QUEUE_PROPERTIES 0x1093
++#define CL_QUEUE_REFERENCE_COUNT 0x1092
++#define CL_R 0x10B0
++#define CL_RA 0x10B3
++#define CL_READ_ONLY_CACHE 0x1
++#define CL_READ_WRITE_CACHE 0x2
++#define CL_RG 0x10B2
++#define CL_RGB 0x10B4
++#define CL_RGBA 0x10B5
++#define CL_RGBx 0x10BC
++#define CL_RGx 0x10BB
++#define CL_RUNNING 0x1
++#define CL_Rx 0x10BA
++#define CL_SAMPLER_ADDRESSING_MODE 0x1153
++#define CL_SAMPLER_CONTEXT 0x1151
++#define CL_SAMPLER_FILTER_MODE 0x1154
++#define CL_SAMPLER_NORMALIZED_COORDS 0x1152
++#define CL_SAMPLER_REFERENCE_COUNT 0x1150
++#define CL_SCHAR_MAX 127
++#define CL_SCHAR_MIN (-127-1)
++#define CL_SHRT_MAX 32767
++#define CL_SHRT_MIN (-32767-1)
++#define CL_SIGNED_INT16 0x10D8
++#define CL_SIGNED_INT32 0x10D9
++#define CL_SIGNED_INT8 0x10D7
++#define CL_SNORM_INT16 0x10D1
++#define CL_SNORM_INT8 0x10D0
++#define CL_SUBMITTED 0x2
++#define CL_SUCCESS 0
++#define CL_TRUE 1
++#define CL_UCHAR_MAX 255
++#define CL_UINT_MAX 0xffffffffU
++#define CL_ULONG_MAX ((cl_ulong) 0xFFFFFFFFFFFFFFFFULL)
++#define CL_UNORM_INT16 0x10D3
++#define CL_UNORM_INT8 0x10D2
++#define CL_UNORM_INT_101010 0x10D6
++#define CL_UNORM_SHORT_555 0x10D5
++#define CL_UNORM_SHORT_565 0x10D4
++#define CL_UNSIGNED_INT16 0x10DB
++#define CL_UNSIGNED_INT32 0x10DC
++#define CL_UNSIGNED_INT8 0x10DA
++#define CL_USHRT_MAX 65535
++#define CL_YV12_IMG 0x40D1
++
++
++#include <stdint.h>
++#include <CL/cl_platform.h>
++#include <CL/cl_version.h>
++
++
++
++
++
++
++
++
++#ifdef _MSC_VER
++typedef int32_t __declspec(align(4)) cl_int;
++typedef uint32_t __declspec(align(4)) cl_uint;
++typedef uint64_t __declspec(align(8)) cl_ulong;
++#else
++typedef int32_t  cl_int  __attribute__((aligned(4)));
++typedef uint32_t cl_uint __attribute__((aligned(4)));
++typedef uint64_t cl_ulong __attribute__((aligned(8)));
++#endif
++typedef struct _cl_platform_id *      cl_platform_id;
++typedef struct _cl_device_id *        cl_device_id;
++typedef struct _cl_context *          cl_context;
++typedef struct _cl_command_queue *    cl_command_queue;
++typedef struct _cl_mem *              cl_mem;
++typedef struct _cl_program *          cl_program;
++typedef struct _cl_kernel *           cl_kernel;
++typedef struct _cl_event *            cl_event;
++typedef struct _cl_sampler *          cl_sampler;
++typedef cl_uint          cl_bool;
++typedef cl_ulong         cl_bitfield;
++typedef cl_bitfield      cl_device_type;
++typedef cl_uint          cl_platform_info;
++typedef cl_uint          cl_device_info;
++typedef cl_bitfield      cl_device_fp_config;
++typedef cl_uint          cl_device_mem_cache_type;
++typedef cl_uint          cl_device_local_mem_type;
++typedef cl_bitfield      cl_device_exec_capabilities;
++typedef cl_bitfield      cl_command_queue_properties;
++typedef intptr_t         cl_context_properties;
++typedef cl_uint          cl_context_info;
++typedef cl_uint          cl_command_queue_info;
++typedef cl_uint          cl_channel_order;
++typedef cl_uint          cl_channel_type;
++typedef cl_bitfield      cl_mem_flags;
++typedef cl_uint          cl_mem_object_type;
++typedef cl_uint          cl_mem_info;
++typedef cl_uint          cl_image_info;
++typedef cl_uint          cl_buffer_create_type;
++typedef cl_uint          cl_addressing_mode;
++typedef cl_uint          cl_filter_mode;
++typedef cl_uint          cl_sampler_info;
++typedef cl_bitfield      cl_map_flags;
++typedef cl_uint          cl_program_info;
++typedef cl_uint          cl_program_build_info;
++typedef cl_int           cl_build_status;
++typedef cl_uint          cl_kernel_info;
++typedef cl_uint          cl_kernel_work_group_info;
++typedef cl_uint          cl_event_info;
++typedef cl_uint          cl_command_type;
++typedef cl_uint          cl_profiling_info;
++typedef struct cl_image_format {
++    cl_channel_order      image_channel_order;
++    cl_channel_type       image_channel_data_type;
++} cl_image_format;
++typedef struct cl_buffer_region {
++    size_t                origin;
++    size_t                size;
++} cl_buffer_region;
++typedef cl_bitfield      cl_mem_migration_flags_ext;
++
++
++#define CL_VERSION_1_0 1
++GLAD_API_CALL int GLAD_CL_VERSION_1_0;
++#define CL_VERSION_1_1 1
++GLAD_API_CALL int GLAD_CL_VERSION_1_1;
++#define cl_ext_migrate_memobject 1
++GLAD_API_CALL int GLAD_cl_ext_migrate_memobject;
++#define cl_img_cached_allocations 1
++GLAD_API_CALL int GLAD_cl_img_cached_allocations;
++#define cl_img_generate_mipmap 1
++GLAD_API_CALL int GLAD_cl_img_generate_mipmap;
++#define cl_img_mem_properties 1
++GLAD_API_CALL int GLAD_cl_img_mem_properties;
++#define cl_img_use_gralloc_ptr 1
++GLAD_API_CALL int GLAD_cl_img_use_gralloc_ptr;
++#define cl_img_yuv_image 1
++GLAD_API_CALL int GLAD_cl_img_yuv_image;
++
++
++typedef cl_int (GLAD_API_PTR *PFNCLBUILDPROGRAMPROC)(cl_program program, cl_uint num_devices, const cl_device_id * device_list, const char * options, void (CL_CALLBACK* pfn_notify )(cl_program program, void* user_data), void * user_data);
++typedef cl_mem (GLAD_API_PTR *PFNCLCREATEBUFFERPROC)(cl_context context, cl_mem_flags flags, size_t size, void * host_ptr, cl_int * errcode_ret);
++typedef cl_command_queue (GLAD_API_PTR *PFNCLCREATECOMMANDQUEUEPROC)(cl_context context, cl_device_id device, cl_command_queue_properties properties, cl_int * errcode_ret);
++typedef cl_context (GLAD_API_PTR *PFNCLCREATECONTEXTPROC)(const cl_context_properties * properties, cl_uint num_devices, const cl_device_id * devices, void (CL_CALLBACK* pfn_notify )(const char* errinfo, const void* private_info, size_t cb, void* user_data), void * user_data, cl_int * errcode_ret);
++typedef cl_context (GLAD_API_PTR *PFNCLCREATECONTEXTFROMTYPEPROC)(const cl_context_properties * properties, cl_device_type device_type, void (CL_CALLBACK* pfn_notify )(const char* errinfo, const void* private_info, size_t cb, void* user_data), void * user_data, cl_int * errcode_ret);
++typedef cl_mem (GLAD_API_PTR *PFNCLCREATEIMAGE2DPROC)(cl_context context, cl_mem_flags flags, const cl_image_format * image_format, size_t image_width, size_t image_height, size_t image_row_pitch, void * host_ptr, cl_int * errcode_ret);
++typedef cl_mem (GLAD_API_PTR *PFNCLCREATEIMAGE3DPROC)(cl_context context, cl_mem_flags flags, const cl_image_format * image_format, size_t image_width, size_t image_height, size_t image_depth, size_t image_row_pitch, size_t image_slice_pitch, void * host_ptr, cl_int * errcode_ret);
++typedef cl_kernel (GLAD_API_PTR *PFNCLCREATEKERNELPROC)(cl_program program, const char * kernel_name, cl_int * errcode_ret);
++typedef cl_int (GLAD_API_PTR *PFNCLCREATEKERNELSINPROGRAMPROC)(cl_program program, cl_uint num_kernels, cl_kernel * kernels, cl_uint * num_kernels_ret);
++typedef cl_program (GLAD_API_PTR *PFNCLCREATEPROGRAMWITHBINARYPROC)(cl_context context, cl_uint num_devices, const cl_device_id * device_list, const size_t * lengths, const unsigned char ** binaries, cl_int * binary_status, cl_int * errcode_ret);
++typedef cl_program (GLAD_API_PTR *PFNCLCREATEPROGRAMWITHSOURCEPROC)(cl_context context, cl_uint count, const char ** strings, const size_t * lengths, cl_int * errcode_ret);
++typedef cl_sampler (GLAD_API_PTR *PFNCLCREATESAMPLERPROC)(cl_context context, cl_bool normalized_coords, cl_addressing_mode addressing_mode, cl_filter_mode filter_mode, cl_int * errcode_ret);
++typedef cl_mem (GLAD_API_PTR *PFNCLCREATESUBBUFFERPROC)(cl_mem buffer, cl_mem_flags flags, cl_buffer_create_type buffer_create_type, const void * buffer_create_info, cl_int * errcode_ret);
++typedef cl_event (GLAD_API_PTR *PFNCLCREATEUSEREVENTPROC)(cl_context context, cl_int * errcode_ret);
++typedef cl_int (GLAD_API_PTR *PFNCLENQUEUEACQUIREGRALLOCOBJECTSIMGPROC)(cl_command_queue command_queue, cl_uint num_objects, const cl_mem * mem_objects, cl_uint num_events_in_wait_list, const cl_event * event_wait_list, cl_event * event);
++typedef cl_int (GLAD_API_PTR *PFNCLENQUEUEBARRIERPROC)(cl_command_queue command_queue);
++typedef cl_int (GLAD_API_PTR *PFNCLENQUEUECOPYBUFFERPROC)(cl_command_queue command_queue, cl_mem src_buffer, cl_mem dst_buffer, size_t src_offset, size_t dst_offset, size_t size, cl_uint num_events_in_wait_list, const cl_event * event_wait_list, cl_event * event);
++typedef cl_int (GLAD_API_PTR *PFNCLENQUEUECOPYBUFFERRECTPROC)(cl_command_queue command_queue, cl_mem src_buffer, cl_mem dst_buffer, const size_t * src_origin, const size_t * dst_origin, const size_t * region, size_t src_row_pitch, size_t src_slice_pitch, size_t dst_row_pitch, size_t dst_slice_pitch, cl_uint num_events_in_wait_list, const cl_event * event_wait_list, cl_event * event);
++typedef cl_int (GLAD_API_PTR *PFNCLENQUEUECOPYBUFFERTOIMAGEPROC)(cl_command_queue command_queue, cl_mem src_buffer, cl_mem dst_image, size_t src_offset, const size_t * dst_origin, const size_t * region, cl_uint num_events_in_wait_list, const cl_event * event_wait_list, cl_event * event);
++typedef cl_int (GLAD_API_PTR *PFNCLENQUEUECOPYIMAGEPROC)(cl_command_queue command_queue, cl_mem src_image, cl_mem dst_image, const size_t * src_origin, const size_t * dst_origin, const size_t * region, cl_uint num_events_in_wait_list, const cl_event * event_wait_list, cl_event * event);
++typedef cl_int (GLAD_API_PTR *PFNCLENQUEUECOPYIMAGETOBUFFERPROC)(cl_command_queue command_queue, cl_mem src_image, cl_mem dst_buffer, const size_t * src_origin, const size_t * region, size_t dst_offset, cl_uint num_events_in_wait_list, const cl_event * event_wait_list, cl_event * event);
++typedef void* (GLAD_API_PTR *PFNCLENQUEUEMAPBUFFERPROC)(cl_command_queue command_queue, cl_mem buffer, cl_bool blocking_map, cl_map_flags map_flags, size_t offset, size_t size, cl_uint num_events_in_wait_list, const cl_event * event_wait_list, cl_event * event, cl_int * errcode_ret);
++typedef void* (GLAD_API_PTR *PFNCLENQUEUEMAPIMAGEPROC)(cl_command_queue command_queue, cl_mem image, cl_bool blocking_map, cl_map_flags map_flags, const size_t * origin, const size_t * region, size_t * image_row_pitch, size_t * image_slice_pitch, cl_uint num_events_in_wait_list, const cl_event * event_wait_list, cl_event * event, cl_int * errcode_ret);
++typedef cl_int (GLAD_API_PTR *PFNCLENQUEUEMARKERPROC)(cl_command_queue command_queue, cl_event * event);
++typedef cl_int (GLAD_API_PTR *PFNCLENQUEUEMIGRATEMEMOBJECTEXTPROC)(cl_command_queue command_queue, cl_uint num_mem_objects, const cl_mem * mem_objects, cl_mem_migration_flags_ext flags, cl_uint num_events_in_wait_list, const cl_event * event_wait_list, cl_event * event);
++typedef cl_int (GLAD_API_PTR *PFNCLENQUEUENDRANGEKERNELPROC)(cl_command_queue command_queue, cl_kernel kernel, cl_uint work_dim, const size_t * global_work_offset, const size_t * global_work_size, const size_t * local_work_size, cl_uint num_events_in_wait_list, const cl_event * event_wait_list, cl_event * event);
++typedef cl_int (GLAD_API_PTR *PFNCLENQUEUENATIVEKERNELPROC)(cl_command_queue command_queue, void (CL_CALLBACK* user_func )(void*), void * args, size_t cb_args, cl_uint num_mem_objects, const cl_mem * mem_list, const void ** args_mem_loc, cl_uint num_events_in_wait_list, const cl_event * event_wait_list, cl_event * event);
++typedef cl_int (GLAD_API_PTR *PFNCLENQUEUEREADBUFFERPROC)(cl_command_queue command_queue, cl_mem buffer, cl_bool blocking_read, size_t offset, size_t size, void * ptr, cl_uint num_events_in_wait_list, const cl_event * event_wait_list, cl_event * event);
++typedef cl_int (GLAD_API_PTR *PFNCLENQUEUEREADBUFFERRECTPROC)(cl_command_queue command_queue, cl_mem buffer, cl_bool blocking_read, const size_t * buffer_offset, const size_t * host_offset, const size_t * region, size_t buffer_row_pitch, size_t buffer_slice_pitch, size_t host_row_pitch, size_t host_slice_pitch, void * ptr, cl_uint num_events_in_wait_list, const cl_event * event_wait_list, cl_event * event);
++typedef cl_int (GLAD_API_PTR *PFNCLENQUEUEREADIMAGEPROC)(cl_command_queue command_queue, cl_mem image, cl_bool blocking_read, const size_t * origin, const size_t * region, size_t row_pitch, size_t slice_pitch, void * ptr, cl_uint num_events_in_wait_list, const cl_event * event_wait_list, cl_event * event);
++typedef cl_int (GLAD_API_PTR *PFNCLENQUEUERELEASEGRALLOCOBJECTSIMGPROC)(cl_command_queue command_queue, cl_uint num_objects, const cl_mem * mem_objects, cl_uint num_events_in_wait_list, const cl_event * event_wait_list, cl_event * event);
++typedef cl_int (GLAD_API_PTR *PFNCLENQUEUETASKPROC)(cl_command_queue command_queue, cl_kernel kernel, cl_uint num_events_in_wait_list, const cl_event * event_wait_list, cl_event * event);
++typedef cl_int (GLAD_API_PTR *PFNCLENQUEUEUNMAPMEMOBJECTPROC)(cl_command_queue command_queue, cl_mem memobj, void * mapped_ptr, cl_uint num_events_in_wait_list, const cl_event * event_wait_list, cl_event * event);
++typedef cl_int (GLAD_API_PTR *PFNCLENQUEUEWAITFOREVENTSPROC)(cl_command_queue command_queue, cl_uint num_events, const cl_event * event_list);
++typedef cl_int (GLAD_API_PTR *PFNCLENQUEUEWRITEBUFFERPROC)(cl_command_queue command_queue, cl_mem buffer, cl_bool blocking_write, size_t offset, size_t size, const void * ptr, cl_uint num_events_in_wait_list, const cl_event * event_wait_list, cl_event * event);
++typedef cl_int (GLAD_API_PTR *PFNCLENQUEUEWRITEBUFFERRECTPROC)(cl_command_queue command_queue, cl_mem buffer, cl_bool blocking_write, const size_t * buffer_offset, const size_t * host_offset, const size_t * region, size_t buffer_row_pitch, size_t buffer_slice_pitch, size_t host_row_pitch, size_t host_slice_pitch, const void * ptr, cl_uint num_events_in_wait_list, const cl_event * event_wait_list, cl_event * event);
++typedef cl_int (GLAD_API_PTR *PFNCLENQUEUEWRITEIMAGEPROC)(cl_command_queue command_queue, cl_mem image, cl_bool blocking_write, const size_t * origin, const size_t * region, size_t input_row_pitch, size_t input_slice_pitch, const void * ptr, cl_uint num_events_in_wait_list, const cl_event * event_wait_list, cl_event * event);
++typedef cl_int (GLAD_API_PTR *PFNCLFINISHPROC)(cl_command_queue command_queue);
++typedef cl_int (GLAD_API_PTR *PFNCLFLUSHPROC)(cl_command_queue command_queue);
++typedef cl_int (GLAD_API_PTR *PFNCLGETCOMMANDQUEUEINFOPROC)(cl_command_queue command_queue, cl_command_queue_info param_name, size_t param_value_size, void * param_value, size_t * param_value_size_ret);
++typedef cl_int (GLAD_API_PTR *PFNCLGETCONTEXTINFOPROC)(cl_context context, cl_context_info param_name, size_t param_value_size, void * param_value, size_t * param_value_size_ret);
++typedef cl_int (GLAD_API_PTR *PFNCLGETDEVICEIDSPROC)(cl_platform_id platform, cl_device_type device_type, cl_uint num_entries, cl_device_id * devices, cl_uint * num_devices);
++typedef cl_int (GLAD_API_PTR *PFNCLGETDEVICEINFOPROC)(cl_device_id device, cl_device_info param_name, size_t param_value_size, void * param_value, size_t * param_value_size_ret);
++typedef cl_int (GLAD_API_PTR *PFNCLGETEVENTINFOPROC)(cl_event event, cl_event_info param_name, size_t param_value_size, void * param_value, size_t * param_value_size_ret);
++typedef cl_int (GLAD_API_PTR *PFNCLGETEVENTPROFILINGINFOPROC)(cl_event event, cl_profiling_info param_name, size_t param_value_size, void * param_value, size_t * param_value_size_ret);
++typedef void* (GLAD_API_PTR *PFNCLGETEXTENSIONFUNCTIONADDRESSPROC)(const char * func_name);
++typedef cl_int (GLAD_API_PTR *PFNCLGETIMAGEINFOPROC)(cl_mem image, cl_image_info param_name, size_t param_value_size, void * param_value, size_t * param_value_size_ret);
++typedef cl_int (GLAD_API_PTR *PFNCLGETKERNELINFOPROC)(cl_kernel kernel, cl_kernel_info param_name, size_t param_value_size, void * param_value, size_t * param_value_size_ret);
++typedef cl_int (GLAD_API_PTR *PFNCLGETKERNELWORKGROUPINFOPROC)(cl_kernel kernel, cl_device_id device, cl_kernel_work_group_info param_name, size_t param_value_size, void * param_value, size_t * param_value_size_ret);
++typedef cl_int (GLAD_API_PTR *PFNCLGETMEMOBJECTINFOPROC)(cl_mem memobj, cl_mem_info param_name, size_t param_value_size, void * param_value, size_t * param_value_size_ret);
++typedef cl_int (GLAD_API_PTR *PFNCLGETPLATFORMIDSPROC)(cl_uint num_entries, cl_platform_id * platforms, cl_uint * num_platforms);
++typedef cl_int (GLAD_API_PTR *PFNCLGETPLATFORMINFOPROC)(cl_platform_id platform, cl_platform_info param_name, size_t param_value_size, void * param_value, size_t * param_value_size_ret);
++typedef cl_int (GLAD_API_PTR *PFNCLGETPROGRAMBUILDINFOPROC)(cl_program program, cl_device_id device, cl_program_build_info param_name, size_t param_value_size, void * param_value, size_t * param_value_size_ret);
++typedef cl_int (GLAD_API_PTR *PFNCLGETPROGRAMINFOPROC)(cl_program program, cl_program_info param_name, size_t param_value_size, void * param_value, size_t * param_value_size_ret);
++typedef cl_int (GLAD_API_PTR *PFNCLGETSAMPLERINFOPROC)(cl_sampler sampler, cl_sampler_info param_name, size_t param_value_size, void * param_value, size_t * param_value_size_ret);
++typedef cl_int (GLAD_API_PTR *PFNCLGETSUPPORTEDIMAGEFORMATSPROC)(cl_context context, cl_mem_flags flags, cl_mem_object_type image_type, cl_uint num_entries, cl_image_format * image_formats, cl_uint * num_image_formats);
++typedef cl_int (GLAD_API_PTR *PFNCLRELEASECOMMANDQUEUEPROC)(cl_command_queue command_queue);
++typedef cl_int (GLAD_API_PTR *PFNCLRELEASECONTEXTPROC)(cl_context context);
++typedef cl_int (GLAD_API_PTR *PFNCLRELEASEEVENTPROC)(cl_event event);
++typedef cl_int (GLAD_API_PTR *PFNCLRELEASEKERNELPROC)(cl_kernel kernel);
++typedef cl_int (GLAD_API_PTR *PFNCLRELEASEMEMOBJECTPROC)(cl_mem memobj);
++typedef cl_int (GLAD_API_PTR *PFNCLRELEASEPROGRAMPROC)(cl_program program);
++typedef cl_int (GLAD_API_PTR *PFNCLRELEASESAMPLERPROC)(cl_sampler sampler);
++typedef cl_int (GLAD_API_PTR *PFNCLRETAINCOMMANDQUEUEPROC)(cl_command_queue command_queue);
++typedef cl_int (GLAD_API_PTR *PFNCLRETAINCONTEXTPROC)(cl_context context);
++typedef cl_int (GLAD_API_PTR *PFNCLRETAINEVENTPROC)(cl_event event);
++typedef cl_int (GLAD_API_PTR *PFNCLRETAINKERNELPROC)(cl_kernel kernel);
++typedef cl_int (GLAD_API_PTR *PFNCLRETAINMEMOBJECTPROC)(cl_mem memobj);
++typedef cl_int (GLAD_API_PTR *PFNCLRETAINPROGRAMPROC)(cl_program program);
++typedef cl_int (GLAD_API_PTR *PFNCLRETAINSAMPLERPROC)(cl_sampler sampler);
++typedef cl_int (GLAD_API_PTR *PFNCLSETCOMMANDQUEUEPROPERTYPROC)(cl_command_queue command_queue, cl_command_queue_properties properties, cl_bool enable, cl_command_queue_properties * old_properties);
++typedef cl_int (GLAD_API_PTR *PFNCLSETEVENTCALLBACKPROC)(cl_event event, cl_int command_exec_callback_type, void (CL_CALLBACK* pfn_notify )(cl_event event, cl_int event_command_status, void *user_data), void * user_data);
++typedef cl_int (GLAD_API_PTR *PFNCLSETKERNELARGPROC)(cl_kernel kernel, cl_uint arg_index, size_t arg_size, const void * arg_value);
++typedef cl_int (GLAD_API_PTR *PFNCLSETMEMOBJECTDESTRUCTORCALLBACKPROC)(cl_mem memobj, void (CL_CALLBACK* pfn_notify )(cl_mem memobj, void* user_data), void * user_data);
++typedef cl_int (GLAD_API_PTR *PFNCLSETUSEREVENTSTATUSPROC)(cl_event event, cl_int execution_status);
++typedef cl_int (GLAD_API_PTR *PFNCLUNLOADCOMPILERPROC)(void);
++typedef cl_int (GLAD_API_PTR *PFNCLWAITFOREVENTSPROC)(cl_uint num_events, const cl_event * event_list);
++
++GLAD_API_CALL PFNCLBUILDPROGRAMPROC glad_clBuildProgram;
++#define clBuildProgram glad_clBuildProgram
++GLAD_API_CALL PFNCLCREATEBUFFERPROC glad_clCreateBuffer;
++#define clCreateBuffer glad_clCreateBuffer
++GLAD_API_CALL PFNCLCREATECOMMANDQUEUEPROC glad_clCreateCommandQueue;
++#define clCreateCommandQueue glad_clCreateCommandQueue
++GLAD_API_CALL PFNCLCREATECONTEXTPROC glad_clCreateContext;
++#define clCreateContext glad_clCreateContext
++GLAD_API_CALL PFNCLCREATECONTEXTFROMTYPEPROC glad_clCreateContextFromType;
++#define clCreateContextFromType glad_clCreateContextFromType
++GLAD_API_CALL PFNCLCREATEIMAGE2DPROC glad_clCreateImage2D;
++#define clCreateImage2D glad_clCreateImage2D
++GLAD_API_CALL PFNCLCREATEIMAGE3DPROC glad_clCreateImage3D;
++#define clCreateImage3D glad_clCreateImage3D
++GLAD_API_CALL PFNCLCREATEKERNELPROC glad_clCreateKernel;
++#define clCreateKernel glad_clCreateKernel
++GLAD_API_CALL PFNCLCREATEKERNELSINPROGRAMPROC glad_clCreateKernelsInProgram;
++#define clCreateKernelsInProgram glad_clCreateKernelsInProgram
++GLAD_API_CALL PFNCLCREATEPROGRAMWITHBINARYPROC glad_clCreateProgramWithBinary;
++#define clCreateProgramWithBinary glad_clCreateProgramWithBinary
++GLAD_API_CALL PFNCLCREATEPROGRAMWITHSOURCEPROC glad_clCreateProgramWithSource;
++#define clCreateProgramWithSource glad_clCreateProgramWithSource
++GLAD_API_CALL PFNCLCREATESAMPLERPROC glad_clCreateSampler;
++#define clCreateSampler glad_clCreateSampler
++GLAD_API_CALL PFNCLCREATESUBBUFFERPROC glad_clCreateSubBuffer;
++#define clCreateSubBuffer glad_clCreateSubBuffer
++GLAD_API_CALL PFNCLCREATEUSEREVENTPROC glad_clCreateUserEvent;
++#define clCreateUserEvent glad_clCreateUserEvent
++GLAD_API_CALL PFNCLENQUEUEACQUIREGRALLOCOBJECTSIMGPROC glad_clEnqueueAcquireGrallocObjectsIMG;
++#define clEnqueueAcquireGrallocObjectsIMG glad_clEnqueueAcquireGrallocObjectsIMG
++GLAD_API_CALL PFNCLENQUEUEBARRIERPROC glad_clEnqueueBarrier;
++#define clEnqueueBarrier glad_clEnqueueBarrier
++GLAD_API_CALL PFNCLENQUEUECOPYBUFFERPROC glad_clEnqueueCopyBuffer;
++#define clEnqueueCopyBuffer glad_clEnqueueCopyBuffer
++GLAD_API_CALL PFNCLENQUEUECOPYBUFFERRECTPROC glad_clEnqueueCopyBufferRect;
++#define clEnqueueCopyBufferRect glad_clEnqueueCopyBufferRect
++GLAD_API_CALL PFNCLENQUEUECOPYBUFFERTOIMAGEPROC glad_clEnqueueCopyBufferToImage;
++#define clEnqueueCopyBufferToImage glad_clEnqueueCopyBufferToImage
++GLAD_API_CALL PFNCLENQUEUECOPYIMAGEPROC glad_clEnqueueCopyImage;
++#define clEnqueueCopyImage glad_clEnqueueCopyImage
++GLAD_API_CALL PFNCLENQUEUECOPYIMAGETOBUFFERPROC glad_clEnqueueCopyImageToBuffer;
++#define clEnqueueCopyImageToBuffer glad_clEnqueueCopyImageToBuffer
++GLAD_API_CALL PFNCLENQUEUEMAPBUFFERPROC glad_clEnqueueMapBuffer;
++#define clEnqueueMapBuffer glad_clEnqueueMapBuffer
++GLAD_API_CALL PFNCLENQUEUEMAPIMAGEPROC glad_clEnqueueMapImage;
++#define clEnqueueMapImage glad_clEnqueueMapImage
++GLAD_API_CALL PFNCLENQUEUEMARKERPROC glad_clEnqueueMarker;
++#define clEnqueueMarker glad_clEnqueueMarker
++GLAD_API_CALL PFNCLENQUEUEMIGRATEMEMOBJECTEXTPROC glad_clEnqueueMigrateMemObjectEXT;
++#define clEnqueueMigrateMemObjectEXT glad_clEnqueueMigrateMemObjectEXT
++GLAD_API_CALL PFNCLENQUEUENDRANGEKERNELPROC glad_clEnqueueNDRangeKernel;
++#define clEnqueueNDRangeKernel glad_clEnqueueNDRangeKernel
++GLAD_API_CALL PFNCLENQUEUENATIVEKERNELPROC glad_clEnqueueNativeKernel;
++#define clEnqueueNativeKernel glad_clEnqueueNativeKernel
++GLAD_API_CALL PFNCLENQUEUEREADBUFFERPROC glad_clEnqueueReadBuffer;
++#define clEnqueueReadBuffer glad_clEnqueueReadBuffer
++GLAD_API_CALL PFNCLENQUEUEREADBUFFERRECTPROC glad_clEnqueueReadBufferRect;
++#define clEnqueueReadBufferRect glad_clEnqueueReadBufferRect
++GLAD_API_CALL PFNCLENQUEUEREADIMAGEPROC glad_clEnqueueReadImage;
++#define clEnqueueReadImage glad_clEnqueueReadImage
++GLAD_API_CALL PFNCLENQUEUERELEASEGRALLOCOBJECTSIMGPROC glad_clEnqueueReleaseGrallocObjectsIMG;
++#define clEnqueueReleaseGrallocObjectsIMG glad_clEnqueueReleaseGrallocObjectsIMG
++GLAD_API_CALL PFNCLENQUEUETASKPROC glad_clEnqueueTask;
++#define clEnqueueTask glad_clEnqueueTask
++GLAD_API_CALL PFNCLENQUEUEUNMAPMEMOBJECTPROC glad_clEnqueueUnmapMemObject;
++#define clEnqueueUnmapMemObject glad_clEnqueueUnmapMemObject
++GLAD_API_CALL PFNCLENQUEUEWAITFOREVENTSPROC glad_clEnqueueWaitForEvents;
++#define clEnqueueWaitForEvents glad_clEnqueueWaitForEvents
++GLAD_API_CALL PFNCLENQUEUEWRITEBUFFERPROC glad_clEnqueueWriteBuffer;
++#define clEnqueueWriteBuffer glad_clEnqueueWriteBuffer
++GLAD_API_CALL PFNCLENQUEUEWRITEBUFFERRECTPROC glad_clEnqueueWriteBufferRect;
++#define clEnqueueWriteBufferRect glad_clEnqueueWriteBufferRect
++GLAD_API_CALL PFNCLENQUEUEWRITEIMAGEPROC glad_clEnqueueWriteImage;
++#define clEnqueueWriteImage glad_clEnqueueWriteImage
++GLAD_API_CALL PFNCLFINISHPROC glad_clFinish;
++#define clFinish glad_clFinish
++GLAD_API_CALL PFNCLFLUSHPROC glad_clFlush;
++#define clFlush glad_clFlush
++GLAD_API_CALL PFNCLGETCOMMANDQUEUEINFOPROC glad_clGetCommandQueueInfo;
++#define clGetCommandQueueInfo glad_clGetCommandQueueInfo
++GLAD_API_CALL PFNCLGETCONTEXTINFOPROC glad_clGetContextInfo;
++#define clGetContextInfo glad_clGetContextInfo
++GLAD_API_CALL PFNCLGETDEVICEIDSPROC glad_clGetDeviceIDs;
++#define clGetDeviceIDs glad_clGetDeviceIDs
++GLAD_API_CALL PFNCLGETDEVICEINFOPROC glad_clGetDeviceInfo;
++#define clGetDeviceInfo glad_clGetDeviceInfo
++GLAD_API_CALL PFNCLGETEVENTINFOPROC glad_clGetEventInfo;
++#define clGetEventInfo glad_clGetEventInfo
++GLAD_API_CALL PFNCLGETEVENTPROFILINGINFOPROC glad_clGetEventProfilingInfo;
++#define clGetEventProfilingInfo glad_clGetEventProfilingInfo
++GLAD_API_CALL PFNCLGETEXTENSIONFUNCTIONADDRESSPROC glad_clGetExtensionFunctionAddress;
++#define clGetExtensionFunctionAddress glad_clGetExtensionFunctionAddress
++GLAD_API_CALL PFNCLGETIMAGEINFOPROC glad_clGetImageInfo;
++#define clGetImageInfo glad_clGetImageInfo
++GLAD_API_CALL PFNCLGETKERNELINFOPROC glad_clGetKernelInfo;
++#define clGetKernelInfo glad_clGetKernelInfo
++GLAD_API_CALL PFNCLGETKERNELWORKGROUPINFOPROC glad_clGetKernelWorkGroupInfo;
++#define clGetKernelWorkGroupInfo glad_clGetKernelWorkGroupInfo
++GLAD_API_CALL PFNCLGETMEMOBJECTINFOPROC glad_clGetMemObjectInfo;
++#define clGetMemObjectInfo glad_clGetMemObjectInfo
++GLAD_API_CALL PFNCLGETPLATFORMIDSPROC glad_clGetPlatformIDs;
++#define clGetPlatformIDs glad_clGetPlatformIDs
++GLAD_API_CALL PFNCLGETPLATFORMINFOPROC glad_clGetPlatformInfo;
++#define clGetPlatformInfo glad_clGetPlatformInfo
++GLAD_API_CALL PFNCLGETPROGRAMBUILDINFOPROC glad_clGetProgramBuildInfo;
++#define clGetProgramBuildInfo glad_clGetProgramBuildInfo
++GLAD_API_CALL PFNCLGETPROGRAMINFOPROC glad_clGetProgramInfo;
++#define clGetProgramInfo glad_clGetProgramInfo
++GLAD_API_CALL PFNCLGETSAMPLERINFOPROC glad_clGetSamplerInfo;
++#define clGetSamplerInfo glad_clGetSamplerInfo
++GLAD_API_CALL PFNCLGETSUPPORTEDIMAGEFORMATSPROC glad_clGetSupportedImageFormats;
++#define clGetSupportedImageFormats glad_clGetSupportedImageFormats
++GLAD_API_CALL PFNCLRELEASECOMMANDQUEUEPROC glad_clReleaseCommandQueue;
++#define clReleaseCommandQueue glad_clReleaseCommandQueue
++GLAD_API_CALL PFNCLRELEASECONTEXTPROC glad_clReleaseContext;
++#define clReleaseContext glad_clReleaseContext
++GLAD_API_CALL PFNCLRELEASEEVENTPROC glad_clReleaseEvent;
++#define clReleaseEvent glad_clReleaseEvent
++GLAD_API_CALL PFNCLRELEASEKERNELPROC glad_clReleaseKernel;
++#define clReleaseKernel glad_clReleaseKernel
++GLAD_API_CALL PFNCLRELEASEMEMOBJECTPROC glad_clReleaseMemObject;
++#define clReleaseMemObject glad_clReleaseMemObject
++GLAD_API_CALL PFNCLRELEASEPROGRAMPROC glad_clReleaseProgram;
++#define clReleaseProgram glad_clReleaseProgram
++GLAD_API_CALL PFNCLRELEASESAMPLERPROC glad_clReleaseSampler;
++#define clReleaseSampler glad_clReleaseSampler
++GLAD_API_CALL PFNCLRETAINCOMMANDQUEUEPROC glad_clRetainCommandQueue;
++#define clRetainCommandQueue glad_clRetainCommandQueue
++GLAD_API_CALL PFNCLRETAINCONTEXTPROC glad_clRetainContext;
++#define clRetainContext glad_clRetainContext
++GLAD_API_CALL PFNCLRETAINEVENTPROC glad_clRetainEvent;
++#define clRetainEvent glad_clRetainEvent
++GLAD_API_CALL PFNCLRETAINKERNELPROC glad_clRetainKernel;
++#define clRetainKernel glad_clRetainKernel
++GLAD_API_CALL PFNCLRETAINMEMOBJECTPROC glad_clRetainMemObject;
++#define clRetainMemObject glad_clRetainMemObject
++GLAD_API_CALL PFNCLRETAINPROGRAMPROC glad_clRetainProgram;
++#define clRetainProgram glad_clRetainProgram
++GLAD_API_CALL PFNCLRETAINSAMPLERPROC glad_clRetainSampler;
++#define clRetainSampler glad_clRetainSampler
++GLAD_API_CALL PFNCLSETCOMMANDQUEUEPROPERTYPROC glad_clSetCommandQueueProperty;
++#define clSetCommandQueueProperty glad_clSetCommandQueueProperty
++GLAD_API_CALL PFNCLSETEVENTCALLBACKPROC glad_clSetEventCallback;
++#define clSetEventCallback glad_clSetEventCallback
++GLAD_API_CALL PFNCLSETKERNELARGPROC glad_clSetKernelArg;
++#define clSetKernelArg glad_clSetKernelArg
++GLAD_API_CALL PFNCLSETMEMOBJECTDESTRUCTORCALLBACKPROC glad_clSetMemObjectDestructorCallback;
++#define clSetMemObjectDestructorCallback glad_clSetMemObjectDestructorCallback
++GLAD_API_CALL PFNCLSETUSEREVENTSTATUSPROC glad_clSetUserEventStatus;
++#define clSetUserEventStatus glad_clSetUserEventStatus
++GLAD_API_CALL PFNCLUNLOADCOMPILERPROC glad_clUnloadCompiler;
++#define clUnloadCompiler glad_clUnloadCompiler
++GLAD_API_CALL PFNCLWAITFOREVENTSPROC glad_clWaitForEvents;
++#define clWaitForEvents glad_clWaitForEvents
++
++
++
++
++
++GLAD_API_CALL int gladLoadOpenCLUserPtr(cl_device_id device, GLADuserptrloadfunc load, void *userptr);
++GLAD_API_CALL int gladLoadOpenCL(cl_device_id device, GLADloadfunc load);
++
++#ifdef GLAD_OPENCL
++
++GLAD_API_CALL int gladLoaderLoadOpenCL(cl_device_id device);
++
++GLAD_API_CALL void gladLoaderUnloadOpenCL(void);
++
++#endif
++
++#ifdef __cplusplus
++}
++#endif
++#endif
+diff --git a/Modules/Core/GPUCommon/include/itkGPUContextManager.h b/Modules/Core/GPUCommon/include/itkGPUContextManager.h
+index def423a..b1ad248 100644
+--- a/Modules/Core/GPUCommon/include/itkGPUContextManager.h
++++ b/Modules/Core/GPUCommon/include/itkGPUContextManager.h
+@@ -31,7 +31,7 @@ namespace itk
+  *
+  * \ingroup ITKGPUCommon
+  */
+-class GPUContextManager : public LightObject
++class ITKGPUCommon_EXPORT GPUContextManager : public LightObject
+ {
+ public:
+ 
+diff --git a/Modules/Core/GPUCommon/include/itkGPUDataManager.h b/Modules/Core/GPUCommon/include/itkGPUDataManager.h
+index 256c0d8..fa55d3c 100644
+--- a/Modules/Core/GPUCommon/include/itkGPUDataManager.h
++++ b/Modules/Core/GPUCommon/include/itkGPUDataManager.h
+@@ -40,7 +40,7 @@ namespace itk
+  *
+  * \ingroup ITKGPUCommon
+  */
+-class GPUDataManager : public Object   //DataObject//
++class ITKGPUCommon_EXPORT GPUDataManager : public Object   //DataObject//
+ {
+   /** allow GPUKernelManager to access GPU buffer pointer */
+   friend class GPUKernelManager;
+diff --git a/Modules/Core/GPUCommon/include/itkGPUFunctorBase.h b/Modules/Core/GPUCommon/include/itkGPUFunctorBase.h
+index d75860f..f077f71 100644
+--- a/Modules/Core/GPUCommon/include/itkGPUFunctorBase.h
++++ b/Modules/Core/GPUCommon/include/itkGPUFunctorBase.h
+@@ -30,7 +30,7 @@ namespace Functor
+  *
+  * \ingroup ITKGPUCommon
+  */
+-class GPUFunctorBase
++class ITKGPUCommon_EXPORT GPUFunctorBase
+ {
+ public:
+ 
+diff --git a/Modules/Core/GPUCommon/include/itkGPUImageOps.h b/Modules/Core/GPUCommon/include/itkGPUImageOps.h
+index 8d30c65..f694423 100644
+--- a/Modules/Core/GPUCommon/include/itkGPUImageOps.h
++++ b/Modules/Core/GPUCommon/include/itkGPUImageOps.h
+@@ -20,6 +20,8 @@
+ 
+ #include "itkMacro.h"
+ 
++#include "itkGPUCommonExport.h"
++
+ namespace itk
+ {
+ /** Create a helper GPU Kernel class for GPUImageOps */
+@@ -31,7 +33,7 @@ itkGPUKernelClassMacro(GPUImageOpsKernel);
+  *
+  * \ingroup ITKGPUCommon
+  */
+-class GPUImageOps
++class ITKGPUCommon_EXPORT GPUImageOps
+ {
+ public:
+   /** Standard class typedefs. */
+diff --git a/Modules/Core/GPUCommon/include/itkGPUKernelManager.h b/Modules/Core/GPUCommon/include/itkGPUKernelManager.h
+index 2124156..1d29a82 100644
+--- a/Modules/Core/GPUCommon/include/itkGPUKernelManager.h
++++ b/Modules/Core/GPUCommon/include/itkGPUKernelManager.h
+@@ -41,7 +41,7 @@ namespace itk
+  *
+  * \ingroup ITKGPUCommon
+  */
+-class GPUKernelManager : public LightObject
++class ITKGPUCommon_EXPORT GPUKernelManager : public LightObject
+ {
+ public:
+ 
+diff --git a/Modules/Core/GPUCommon/include/itkOpenCLUtil.h b/Modules/Core/GPUCommon/include/itkOpenCLUtil.h
+index 0b658d5..df5f1df 100644
+--- a/Modules/Core/GPUCommon/include/itkOpenCLUtil.h
++++ b/Modules/Core/GPUCommon/include/itkOpenCLUtil.h
+@@ -25,22 +25,18 @@
+ #include <iostream>
+ #include <sstream>
+ 
+-#include <itkVector.h>
+-
+-#ifdef __APPLE__
+-
+-#include <OpenCL/opencl.h>
++#include "itkGPUCommonExport.h"
+ 
+-#else
++#include <itkVector.h>
+ 
+-#include <CL/opencl.h>
+-
+-#endif
++#include <glad/opencl.h>
+ 
+ #include <itkMacro.h>
+ 
+ namespace itk
+ {
++
++extern bool openClHasLoaded;
+ /** Get the local block size based on the desired Image Dimension
+  * currently set as follows:
+  * OpenCL workgroup (block) size for 1/2/3D - needs to be tuned based on the GPU architecture
+@@ -48,41 +44,47 @@ namespace itk
+  * 2D : 16x16 = 256
+  * 3D : 4x4x4 = 64
+  */
+-int OpenCLGetLocalBlockSize(unsigned int ImageDim);
++ITKGPUCommon_EXPORT int OpenCLGetLocalBlockSize(unsigned int ImageDim);
+ 
+ /** Get the devices that are available */
+-cl_device_id* OpenCLGetAvailableDevices(cl_platform_id platform, cl_device_type devType, cl_uint* numAvailableDevices);
++ITKGPUCommon_EXPORT cl_device_id* OpenCLGetAvailableDevices(cl_platform_id platform, cl_device_type devType, cl_uint* numAvailableDevices);
+ 
+ /** Get the device that has the maximum FLOPS in the current context */
+-cl_device_id OpenCLGetMaxFlopsDev(cl_context cxGPUContext);
++ITKGPUCommon_EXPORT cl_device_id OpenCLGetMaxFlopsDev(cl_context cxGPUContext);
+ 
+ /** Print device name and info */
+-void OpenCLPrintDeviceInfo(cl_device_id device, bool verbose=false);
++ITKGPUCommon_EXPORT void OpenCLPrintDeviceInfo(cl_device_id device, bool verbose=false);
+ 
+ /** Find the OpenCL platform that matches the "name" */
+-cl_platform_id OpenCLSelectPlatform();
++ITKGPUCommon_EXPORT cl_platform_id OpenCLSelectPlatform();
+ 
+ /** Check OpenCL error */
+-void OpenCLCheckError(cl_int error, const char* filename="", int lineno=0, const char* location="");
++ITKGPUCommon_EXPORT void OpenCLCheckError(cl_int error, const char* filename="", int lineno=0, const char* location="");
+ 
+ /** Check if OpenCL-enabled GPU is present. */
+-bool IsGPUAvailable();
++ITKGPUCommon_EXPORT bool IsGPUAvailable();
++
++// Returns false in case OpenCL was not loaded
++ITKGPUCommon_EXPORT bool LoadOpenCL();
++
++// Returns result of last LoadOpenCL();
++ITKGPUCommon_EXPORT bool IsOpenClLoaded();
+ 
+ /** Get Typename */
+-std::string GetTypename(const std::type_info& intype);
++ITKGPUCommon_EXPORT std::string GetTypename(const std::type_info& intype);
+ 
+ /** Get Typename in String if a valid type */
+-bool GetValidTypename(const std::type_info& intype, const std::vector<std::string>& validtypes, std::string& retTypeName);
++ITKGPUCommon_EXPORT bool GetValidTypename(const std::type_info& intype, const std::vector<std::string>& validtypes, std::string& retTypeName);
+ 
+ /** Get 64-bit pragma */
+-std::string Get64BitPragma();
++ITKGPUCommon_EXPORT std::string Get64BitPragma();
+ 
+ /** Get Typename in String */
+-void GetTypenameInString( const std::type_info& intype, std::ostringstream& ret );
++ITKGPUCommon_EXPORT void GetTypenameInString( const std::type_info& intype, std::ostringstream& ret );
+ 
+ /** Get pixel dimension (number of channels).
+  * For high-dimensional pixel format, only itk::Vector< type, 2/3 > is acceptable. */
+-int GetPixelDimension( const std::type_info& intype );
++ITKGPUCommon_EXPORT int GetPixelDimension( const std::type_info& intype );
+ 
+ }
+ 
+diff --git a/Modules/Core/GPUCommon/itk-module.cmake b/Modules/Core/GPUCommon/itk-module.cmake
+index 83e36cd..17b716a 100644
+--- a/Modules/Core/GPUCommon/itk-module.cmake
++++ b/Modules/Core/GPUCommon/itk-module.cmake
+@@ -5,6 +5,7 @@ the GPU.  These classes manage the GPU kernel, transferring the data to and
+ from the GPU, and managing the GPU contexts.")
+ 
+ itk_module(ITKGPUCommon
++  ENABLE_SHARED
+   DEPENDS
+     ITKCommon
+   TEST_DEPENDS
+diff --git a/Modules/Core/GPUCommon/src/CMakeLists.txt b/Modules/Core/GPUCommon/src/CMakeLists.txt
+index 0b39f2a..7e2af70 100644
+--- a/Modules/Core/GPUCommon/src/CMakeLists.txt
++++ b/Modules/Core/GPUCommon/src/CMakeLists.txt
+@@ -4,6 +4,7 @@ if (ITK_USE_GPU)
+     itkGPUDataManager.cxx
+     itkGPUKernelManager.cxx
+     itkOpenCLUtil.cxx
++    glad_opencl.c
+     )
+ 
+   set(ITKGPUCommon_Kernels
+@@ -14,5 +15,5 @@ if (ITK_USE_GPU)
+   write_gpu_kernels("${ITKGPUCommon_Kernels}" ITKGPUCommon_SRCS)
+ 
+   itk_module_add_library(ITKGPUCommon ${ITKGPUCommon_SRCS})
+-  target_link_libraries(ITKGPUCommon LINK_PUBLIC ${OPENCL_LIBRARIES})
++  #target_link_libraries(ITKGPUCommon LINK_PUBLIC ${OPENCL_LIBRARIES})
+ endif()
+diff --git a/Modules/Core/GPUCommon/src/glad_opencl.c b/Modules/Core/GPUCommon/src/glad_opencl.c
+new file mode 100644
+index 0000000..d8759c9
+--- /dev/null
++++ b/Modules/Core/GPUCommon/src/glad_opencl.c
+@@ -0,0 +1,437 @@
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <glad/opencl.h>
++
++#ifndef GLAD_IMPL_UTIL_C_
++#define GLAD_IMPL_UTIL_C_
++
++#ifdef _MSC_VER
++#define GLAD_IMPL_UTIL_SSCANF sscanf_s
++#else
++#define GLAD_IMPL_UTIL_SSCANF sscanf
++#endif
++
++#endif /* GLAD_IMPL_UTIL_C_ */
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++
++
++int GLAD_CL_VERSION_1_0 = 0;
++int GLAD_CL_VERSION_1_1 = 0;
++int GLAD_cl_ext_migrate_memobject = 0;
++int GLAD_cl_img_cached_allocations = 0;
++int GLAD_cl_img_generate_mipmap = 0;
++int GLAD_cl_img_mem_properties = 0;
++int GLAD_cl_img_use_gralloc_ptr = 0;
++int GLAD_cl_img_yuv_image = 0;
++
++
++
++PFNCLBUILDPROGRAMPROC glad_clBuildProgram = NULL;
++PFNCLCREATEBUFFERPROC glad_clCreateBuffer = NULL;
++PFNCLCREATECOMMANDQUEUEPROC glad_clCreateCommandQueue = NULL;
++PFNCLCREATECONTEXTPROC glad_clCreateContext = NULL;
++PFNCLCREATECONTEXTFROMTYPEPROC glad_clCreateContextFromType = NULL;
++PFNCLCREATEIMAGE2DPROC glad_clCreateImage2D = NULL;
++PFNCLCREATEIMAGE3DPROC glad_clCreateImage3D = NULL;
++PFNCLCREATEKERNELPROC glad_clCreateKernel = NULL;
++PFNCLCREATEKERNELSINPROGRAMPROC glad_clCreateKernelsInProgram = NULL;
++PFNCLCREATEPROGRAMWITHBINARYPROC glad_clCreateProgramWithBinary = NULL;
++PFNCLCREATEPROGRAMWITHSOURCEPROC glad_clCreateProgramWithSource = NULL;
++PFNCLCREATESAMPLERPROC glad_clCreateSampler = NULL;
++PFNCLCREATESUBBUFFERPROC glad_clCreateSubBuffer = NULL;
++PFNCLCREATEUSEREVENTPROC glad_clCreateUserEvent = NULL;
++PFNCLENQUEUEACQUIREGRALLOCOBJECTSIMGPROC glad_clEnqueueAcquireGrallocObjectsIMG = NULL;
++PFNCLENQUEUEBARRIERPROC glad_clEnqueueBarrier = NULL;
++PFNCLENQUEUECOPYBUFFERPROC glad_clEnqueueCopyBuffer = NULL;
++PFNCLENQUEUECOPYBUFFERRECTPROC glad_clEnqueueCopyBufferRect = NULL;
++PFNCLENQUEUECOPYBUFFERTOIMAGEPROC glad_clEnqueueCopyBufferToImage = NULL;
++PFNCLENQUEUECOPYIMAGEPROC glad_clEnqueueCopyImage = NULL;
++PFNCLENQUEUECOPYIMAGETOBUFFERPROC glad_clEnqueueCopyImageToBuffer = NULL;
++PFNCLENQUEUEMAPBUFFERPROC glad_clEnqueueMapBuffer = NULL;
++PFNCLENQUEUEMAPIMAGEPROC glad_clEnqueueMapImage = NULL;
++PFNCLENQUEUEMARKERPROC glad_clEnqueueMarker = NULL;
++PFNCLENQUEUEMIGRATEMEMOBJECTEXTPROC glad_clEnqueueMigrateMemObjectEXT = NULL;
++PFNCLENQUEUENDRANGEKERNELPROC glad_clEnqueueNDRangeKernel = NULL;
++PFNCLENQUEUENATIVEKERNELPROC glad_clEnqueueNativeKernel = NULL;
++PFNCLENQUEUEREADBUFFERPROC glad_clEnqueueReadBuffer = NULL;
++PFNCLENQUEUEREADBUFFERRECTPROC glad_clEnqueueReadBufferRect = NULL;
++PFNCLENQUEUEREADIMAGEPROC glad_clEnqueueReadImage = NULL;
++PFNCLENQUEUERELEASEGRALLOCOBJECTSIMGPROC glad_clEnqueueReleaseGrallocObjectsIMG = NULL;
++PFNCLENQUEUETASKPROC glad_clEnqueueTask = NULL;
++PFNCLENQUEUEUNMAPMEMOBJECTPROC glad_clEnqueueUnmapMemObject = NULL;
++PFNCLENQUEUEWAITFOREVENTSPROC glad_clEnqueueWaitForEvents = NULL;
++PFNCLENQUEUEWRITEBUFFERPROC glad_clEnqueueWriteBuffer = NULL;
++PFNCLENQUEUEWRITEBUFFERRECTPROC glad_clEnqueueWriteBufferRect = NULL;
++PFNCLENQUEUEWRITEIMAGEPROC glad_clEnqueueWriteImage = NULL;
++PFNCLFINISHPROC glad_clFinish = NULL;
++PFNCLFLUSHPROC glad_clFlush = NULL;
++PFNCLGETCOMMANDQUEUEINFOPROC glad_clGetCommandQueueInfo = NULL;
++PFNCLGETCONTEXTINFOPROC glad_clGetContextInfo = NULL;
++PFNCLGETDEVICEIDSPROC glad_clGetDeviceIDs = NULL;
++PFNCLGETDEVICEINFOPROC glad_clGetDeviceInfo = NULL;
++PFNCLGETEVENTINFOPROC glad_clGetEventInfo = NULL;
++PFNCLGETEVENTPROFILINGINFOPROC glad_clGetEventProfilingInfo = NULL;
++PFNCLGETEXTENSIONFUNCTIONADDRESSPROC glad_clGetExtensionFunctionAddress = NULL;
++PFNCLGETIMAGEINFOPROC glad_clGetImageInfo = NULL;
++PFNCLGETKERNELINFOPROC glad_clGetKernelInfo = NULL;
++PFNCLGETKERNELWORKGROUPINFOPROC glad_clGetKernelWorkGroupInfo = NULL;
++PFNCLGETMEMOBJECTINFOPROC glad_clGetMemObjectInfo = NULL;
++PFNCLGETPLATFORMIDSPROC glad_clGetPlatformIDs = NULL;
++PFNCLGETPLATFORMINFOPROC glad_clGetPlatformInfo = NULL;
++PFNCLGETPROGRAMBUILDINFOPROC glad_clGetProgramBuildInfo = NULL;
++PFNCLGETPROGRAMINFOPROC glad_clGetProgramInfo = NULL;
++PFNCLGETSAMPLERINFOPROC glad_clGetSamplerInfo = NULL;
++PFNCLGETSUPPORTEDIMAGEFORMATSPROC glad_clGetSupportedImageFormats = NULL;
++PFNCLRELEASECOMMANDQUEUEPROC glad_clReleaseCommandQueue = NULL;
++PFNCLRELEASECONTEXTPROC glad_clReleaseContext = NULL;
++PFNCLRELEASEEVENTPROC glad_clReleaseEvent = NULL;
++PFNCLRELEASEKERNELPROC glad_clReleaseKernel = NULL;
++PFNCLRELEASEMEMOBJECTPROC glad_clReleaseMemObject = NULL;
++PFNCLRELEASEPROGRAMPROC glad_clReleaseProgram = NULL;
++PFNCLRELEASESAMPLERPROC glad_clReleaseSampler = NULL;
++PFNCLRETAINCOMMANDQUEUEPROC glad_clRetainCommandQueue = NULL;
++PFNCLRETAINCONTEXTPROC glad_clRetainContext = NULL;
++PFNCLRETAINEVENTPROC glad_clRetainEvent = NULL;
++PFNCLRETAINKERNELPROC glad_clRetainKernel = NULL;
++PFNCLRETAINMEMOBJECTPROC glad_clRetainMemObject = NULL;
++PFNCLRETAINPROGRAMPROC glad_clRetainProgram = NULL;
++PFNCLRETAINSAMPLERPROC glad_clRetainSampler = NULL;
++PFNCLSETCOMMANDQUEUEPROPERTYPROC glad_clSetCommandQueueProperty = NULL;
++PFNCLSETEVENTCALLBACKPROC glad_clSetEventCallback = NULL;
++PFNCLSETKERNELARGPROC glad_clSetKernelArg = NULL;
++PFNCLSETMEMOBJECTDESTRUCTORCALLBACKPROC glad_clSetMemObjectDestructorCallback = NULL;
++PFNCLSETUSEREVENTSTATUSPROC glad_clSetUserEventStatus = NULL;
++PFNCLUNLOADCOMPILERPROC glad_clUnloadCompiler = NULL;
++PFNCLWAITFOREVENTSPROC glad_clWaitForEvents = NULL;
++
++
++static void glad_cl_load_CL_VERSION_1_0( GLADuserptrloadfunc load, void* userptr) {
++    if(!GLAD_CL_VERSION_1_0) return;
++    glad_clBuildProgram = (PFNCLBUILDPROGRAMPROC) load(userptr, "clBuildProgram");
++    glad_clCreateBuffer = (PFNCLCREATEBUFFERPROC) load(userptr, "clCreateBuffer");
++    glad_clCreateCommandQueue = (PFNCLCREATECOMMANDQUEUEPROC) load(userptr, "clCreateCommandQueue");
++    glad_clCreateContext = (PFNCLCREATECONTEXTPROC) load(userptr, "clCreateContext");
++    glad_clCreateContextFromType = (PFNCLCREATECONTEXTFROMTYPEPROC) load(userptr, "clCreateContextFromType");
++    glad_clCreateImage2D = (PFNCLCREATEIMAGE2DPROC) load(userptr, "clCreateImage2D");
++    glad_clCreateImage3D = (PFNCLCREATEIMAGE3DPROC) load(userptr, "clCreateImage3D");
++    glad_clCreateKernel = (PFNCLCREATEKERNELPROC) load(userptr, "clCreateKernel");
++    glad_clCreateKernelsInProgram = (PFNCLCREATEKERNELSINPROGRAMPROC) load(userptr, "clCreateKernelsInProgram");
++    glad_clCreateProgramWithBinary = (PFNCLCREATEPROGRAMWITHBINARYPROC) load(userptr, "clCreateProgramWithBinary");
++    glad_clCreateProgramWithSource = (PFNCLCREATEPROGRAMWITHSOURCEPROC) load(userptr, "clCreateProgramWithSource");
++    glad_clCreateSampler = (PFNCLCREATESAMPLERPROC) load(userptr, "clCreateSampler");
++    glad_clEnqueueBarrier = (PFNCLENQUEUEBARRIERPROC) load(userptr, "clEnqueueBarrier");
++    glad_clEnqueueCopyBuffer = (PFNCLENQUEUECOPYBUFFERPROC) load(userptr, "clEnqueueCopyBuffer");
++    glad_clEnqueueCopyBufferToImage = (PFNCLENQUEUECOPYBUFFERTOIMAGEPROC) load(userptr, "clEnqueueCopyBufferToImage");
++    glad_clEnqueueCopyImage = (PFNCLENQUEUECOPYIMAGEPROC) load(userptr, "clEnqueueCopyImage");
++    glad_clEnqueueCopyImageToBuffer = (PFNCLENQUEUECOPYIMAGETOBUFFERPROC) load(userptr, "clEnqueueCopyImageToBuffer");
++    glad_clEnqueueMapBuffer = (PFNCLENQUEUEMAPBUFFERPROC) load(userptr, "clEnqueueMapBuffer");
++    glad_clEnqueueMapImage = (PFNCLENQUEUEMAPIMAGEPROC) load(userptr, "clEnqueueMapImage");
++    glad_clEnqueueMarker = (PFNCLENQUEUEMARKERPROC) load(userptr, "clEnqueueMarker");
++    glad_clEnqueueNDRangeKernel = (PFNCLENQUEUENDRANGEKERNELPROC) load(userptr, "clEnqueueNDRangeKernel");
++    glad_clEnqueueNativeKernel = (PFNCLENQUEUENATIVEKERNELPROC) load(userptr, "clEnqueueNativeKernel");
++    glad_clEnqueueReadBuffer = (PFNCLENQUEUEREADBUFFERPROC) load(userptr, "clEnqueueReadBuffer");
++    glad_clEnqueueReadImage = (PFNCLENQUEUEREADIMAGEPROC) load(userptr, "clEnqueueReadImage");
++    glad_clEnqueueTask = (PFNCLENQUEUETASKPROC) load(userptr, "clEnqueueTask");
++    glad_clEnqueueUnmapMemObject = (PFNCLENQUEUEUNMAPMEMOBJECTPROC) load(userptr, "clEnqueueUnmapMemObject");
++    glad_clEnqueueWaitForEvents = (PFNCLENQUEUEWAITFOREVENTSPROC) load(userptr, "clEnqueueWaitForEvents");
++    glad_clEnqueueWriteBuffer = (PFNCLENQUEUEWRITEBUFFERPROC) load(userptr, "clEnqueueWriteBuffer");
++    glad_clEnqueueWriteImage = (PFNCLENQUEUEWRITEIMAGEPROC) load(userptr, "clEnqueueWriteImage");
++    glad_clFinish = (PFNCLFINISHPROC) load(userptr, "clFinish");
++    glad_clFlush = (PFNCLFLUSHPROC) load(userptr, "clFlush");
++    glad_clGetCommandQueueInfo = (PFNCLGETCOMMANDQUEUEINFOPROC) load(userptr, "clGetCommandQueueInfo");
++    glad_clGetContextInfo = (PFNCLGETCONTEXTINFOPROC) load(userptr, "clGetContextInfo");
++    glad_clGetDeviceIDs = (PFNCLGETDEVICEIDSPROC) load(userptr, "clGetDeviceIDs");
++    glad_clGetDeviceInfo = (PFNCLGETDEVICEINFOPROC) load(userptr, "clGetDeviceInfo");
++    glad_clGetEventInfo = (PFNCLGETEVENTINFOPROC) load(userptr, "clGetEventInfo");
++    glad_clGetEventProfilingInfo = (PFNCLGETEVENTPROFILINGINFOPROC) load(userptr, "clGetEventProfilingInfo");
++    glad_clGetExtensionFunctionAddress = (PFNCLGETEXTENSIONFUNCTIONADDRESSPROC) load(userptr, "clGetExtensionFunctionAddress");
++    glad_clGetImageInfo = (PFNCLGETIMAGEINFOPROC) load(userptr, "clGetImageInfo");
++    glad_clGetKernelInfo = (PFNCLGETKERNELINFOPROC) load(userptr, "clGetKernelInfo");
++    glad_clGetKernelWorkGroupInfo = (PFNCLGETKERNELWORKGROUPINFOPROC) load(userptr, "clGetKernelWorkGroupInfo");
++    glad_clGetMemObjectInfo = (PFNCLGETMEMOBJECTINFOPROC) load(userptr, "clGetMemObjectInfo");
++    glad_clGetPlatformIDs = (PFNCLGETPLATFORMIDSPROC) load(userptr, "clGetPlatformIDs");
++    glad_clGetPlatformInfo = (PFNCLGETPLATFORMINFOPROC) load(userptr, "clGetPlatformInfo");
++    glad_clGetProgramBuildInfo = (PFNCLGETPROGRAMBUILDINFOPROC) load(userptr, "clGetProgramBuildInfo");
++    glad_clGetProgramInfo = (PFNCLGETPROGRAMINFOPROC) load(userptr, "clGetProgramInfo");
++    glad_clGetSamplerInfo = (PFNCLGETSAMPLERINFOPROC) load(userptr, "clGetSamplerInfo");
++    glad_clGetSupportedImageFormats = (PFNCLGETSUPPORTEDIMAGEFORMATSPROC) load(userptr, "clGetSupportedImageFormats");
++    glad_clReleaseCommandQueue = (PFNCLRELEASECOMMANDQUEUEPROC) load(userptr, "clReleaseCommandQueue");
++    glad_clReleaseContext = (PFNCLRELEASECONTEXTPROC) load(userptr, "clReleaseContext");
++    glad_clReleaseEvent = (PFNCLRELEASEEVENTPROC) load(userptr, "clReleaseEvent");
++    glad_clReleaseKernel = (PFNCLRELEASEKERNELPROC) load(userptr, "clReleaseKernel");
++    glad_clReleaseMemObject = (PFNCLRELEASEMEMOBJECTPROC) load(userptr, "clReleaseMemObject");
++    glad_clReleaseProgram = (PFNCLRELEASEPROGRAMPROC) load(userptr, "clReleaseProgram");
++    glad_clReleaseSampler = (PFNCLRELEASESAMPLERPROC) load(userptr, "clReleaseSampler");
++    glad_clRetainCommandQueue = (PFNCLRETAINCOMMANDQUEUEPROC) load(userptr, "clRetainCommandQueue");
++    glad_clRetainContext = (PFNCLRETAINCONTEXTPROC) load(userptr, "clRetainContext");
++    glad_clRetainEvent = (PFNCLRETAINEVENTPROC) load(userptr, "clRetainEvent");
++    glad_clRetainKernel = (PFNCLRETAINKERNELPROC) load(userptr, "clRetainKernel");
++    glad_clRetainMemObject = (PFNCLRETAINMEMOBJECTPROC) load(userptr, "clRetainMemObject");
++    glad_clRetainProgram = (PFNCLRETAINPROGRAMPROC) load(userptr, "clRetainProgram");
++    glad_clRetainSampler = (PFNCLRETAINSAMPLERPROC) load(userptr, "clRetainSampler");
++    glad_clSetCommandQueueProperty = (PFNCLSETCOMMANDQUEUEPROPERTYPROC) load(userptr, "clSetCommandQueueProperty");
++    glad_clSetKernelArg = (PFNCLSETKERNELARGPROC) load(userptr, "clSetKernelArg");
++    glad_clUnloadCompiler = (PFNCLUNLOADCOMPILERPROC) load(userptr, "clUnloadCompiler");
++    glad_clWaitForEvents = (PFNCLWAITFOREVENTSPROC) load(userptr, "clWaitForEvents");
++}
++static void glad_cl_load_CL_VERSION_1_1( GLADuserptrloadfunc load, void* userptr) {
++    if(!GLAD_CL_VERSION_1_1) return;
++    glad_clCreateSubBuffer = (PFNCLCREATESUBBUFFERPROC) load(userptr, "clCreateSubBuffer");
++    glad_clCreateUserEvent = (PFNCLCREATEUSEREVENTPROC) load(userptr, "clCreateUserEvent");
++    glad_clEnqueueCopyBufferRect = (PFNCLENQUEUECOPYBUFFERRECTPROC) load(userptr, "clEnqueueCopyBufferRect");
++    glad_clEnqueueReadBufferRect = (PFNCLENQUEUEREADBUFFERRECTPROC) load(userptr, "clEnqueueReadBufferRect");
++    glad_clEnqueueWriteBufferRect = (PFNCLENQUEUEWRITEBUFFERRECTPROC) load(userptr, "clEnqueueWriteBufferRect");
++    glad_clSetEventCallback = (PFNCLSETEVENTCALLBACKPROC) load(userptr, "clSetEventCallback");
++    glad_clSetMemObjectDestructorCallback = (PFNCLSETMEMOBJECTDESTRUCTORCALLBACKPROC) load(userptr, "clSetMemObjectDestructorCallback");
++    glad_clSetUserEventStatus = (PFNCLSETUSEREVENTSTATUSPROC) load(userptr, "clSetUserEventStatus");
++}
++static void glad_cl_load_cl_ext_migrate_memobject( GLADuserptrloadfunc load, void* userptr) {
++    if(!GLAD_cl_ext_migrate_memobject) return;
++    glad_clEnqueueMigrateMemObjectEXT = (PFNCLENQUEUEMIGRATEMEMOBJECTEXTPROC) load(userptr, "clEnqueueMigrateMemObjectEXT");
++}
++static void glad_cl_load_cl_img_use_gralloc_ptr( GLADuserptrloadfunc load, void* userptr) {
++    if(!GLAD_cl_img_use_gralloc_ptr) return;
++    glad_clEnqueueAcquireGrallocObjectsIMG = (PFNCLENQUEUEACQUIREGRALLOCOBJECTSIMGPROC) load(userptr, "clEnqueueAcquireGrallocObjectsIMG");
++    glad_clEnqueueReleaseGrallocObjectsIMG = (PFNCLENQUEUERELEASEGRALLOCOBJECTSIMGPROC) load(userptr, "clEnqueueReleaseGrallocObjectsIMG");
++}
++
++
++
++static int glad_cl_get_extensions(cl_device_id device, char **extensions) {
++    size_t extensions_size;
++
++    if (device == NULL) {
++        *extensions = NULL;
++        return 1;
++    }
++
++    clGetDeviceInfo(device, CL_DEVICE_EXTENSIONS, 0, NULL, &extensions_size);
++    *extensions = (char*) malloc(extensions_size);
++    if (*extensions == NULL) {
++        return 0;
++    }
++    clGetDeviceInfo(device, CL_DEVICE_EXTENSIONS, extensions_size, *extensions, NULL);
++
++    return 1;
++}
++
++static int glad_cl_has_extension(const char *extensions, const char *ext) {
++    return extensions != NULL && strstr(extensions, ext) != NULL;
++}
++
++static int glad_cl_free_extension(char *extensions) {
++    if (extensions != NULL) {
++        free(extensions);
++    }
++}
++
++static GLADapiproc glad_cl_get_proc_from_userptr(void *userptr, const char *name) {
++    return (GLAD_GNUC_EXTENSION (GLADapiproc (*)(const char *name)) userptr)(name);
++}
++
++static int glad_cl_find_extensions_opencl(cl_device_id device) {
++    char *extensions;
++    if (!glad_cl_get_extensions(device, &extensions)) return 0;
++
++    GLAD_cl_ext_migrate_memobject = glad_cl_has_extension(extensions, "cl_ext_migrate_memobject");
++    GLAD_cl_img_cached_allocations = glad_cl_has_extension(extensions, "cl_img_cached_allocations");
++    GLAD_cl_img_generate_mipmap = glad_cl_has_extension(extensions, "cl_img_generate_mipmap");
++    GLAD_cl_img_mem_properties = glad_cl_has_extension(extensions, "cl_img_mem_properties");
++    GLAD_cl_img_use_gralloc_ptr = glad_cl_has_extension(extensions, "cl_img_use_gralloc_ptr");
++    GLAD_cl_img_yuv_image = glad_cl_has_extension(extensions, "cl_img_yuv_image");
++
++    glad_cl_free_extension(extensions);
++    return 1;
++}
++
++static int glad_cl_find_core_opencl(cl_device_id device) {
++    int major, minor;
++
++    if (device == NULL) {
++        major = 1;
++        minor = 0;
++    } else {
++        size_t version_size;
++        char *version;
++
++        clGetDeviceInfo(device, CL_DEVICE_VERSION, 0, NULL, &version_size);
++        version = (char*) malloc(version_size);
++        if (version == NULL) {
++            return 0;
++        }
++        clGetDeviceInfo(device, CL_DEVICE_VERSION, version_size, version, NULL);
++
++        GLAD_IMPL_UTIL_SSCANF(version, "%*s %d.%d", &major, &minor);
++        free(version);
++    }
++
++    GLAD_CL_VERSION_1_0 = (major == 1 && minor >= 0) || major > 1;
++    GLAD_CL_VERSION_1_1 = (major == 1 && minor >= 1) || major > 1;
++
++    return GLAD_MAKE_VERSION(major, minor);
++}
++
++int gladLoadOpenCLUserPtr(cl_device_id device, GLADuserptrloadfunc load, void* userptr) {
++    int version;
++    version = glad_cl_find_core_opencl(device);
++    if (!version) return 0;
++    glad_cl_load_CL_VERSION_1_0(load, userptr);
++    glad_cl_load_CL_VERSION_1_1(load, userptr);
++
++    if (!glad_cl_find_extensions_opencl(device)) return 0;
++    glad_cl_load_cl_ext_migrate_memobject(load, userptr);
++    glad_cl_load_cl_img_use_gralloc_ptr(load, userptr);
++
++    return version;
++}
++
++int gladLoadOpenCL(cl_device_id device, GLADloadfunc load) {
++    return gladLoadOpenCLUserPtr(device, glad_cl_get_proc_from_userptr, GLAD_GNUC_EXTENSION (void*) load);
++}
++
++ 
++
++#ifdef GLAD_OPENCL
++#ifndef GLAD_LOADER_LIBRARY_C_
++#define GLAD_LOADER_LIBRARY_C_
++
++#include <stddef.h>
++#include <stdlib.h>
++
++#if GLAD_PLATFORM_WIN32
++#include <windows.h>
++#else
++#include <dlfcn.h>
++#endif
++
++
++static void* glad_get_dlopen_handle(const char *lib_names[], int length) {
++    void *handle = NULL;
++    int i;
++
++    for (i = 0; i < length; ++i) {
++#if GLAD_PLATFORM_WIN32
++  #if GLAD_PLATFORM_UWP
++        size_t buffer_size = (strlen(lib_names[i]) + 1) * sizeof(WCHAR);
++        LPWSTR buffer = (LPWSTR) malloc(buffer_size);
++        if (buffer != NULL) {
++            int ret = MultiByteToWideChar(CP_ACP, 0, lib_names[i], -1, buffer, buffer_size);
++            if (ret != 0) {
++                handle = (void*) LoadPackagedLibrary(buffer, 0);
++            }
++            free((void*) buffer);
++        }
++  #else
++        handle = (void*) LoadLibraryA(lib_names[i]);
++  #endif
++#else
++        handle = dlopen(lib_names[i], RTLD_LAZY | RTLD_LOCAL);
++#endif
++        if (handle != NULL) {
++            return handle;
++        }
++    }
++
++    return NULL;
++}
++
++static void glad_close_dlopen_handle(void* handle) {
++    if (handle != NULL) {
++#if GLAD_PLATFORM_WIN32
++        FreeLibrary((HMODULE) handle);
++#else
++        dlclose(handle);
++#endif
++    }
++}
++
++static GLADapiproc glad_dlsym_handle(void* handle, const char *name) {
++    if (handle == NULL) {
++        return NULL;
++    }
++
++#if GLAD_PLATFORM_WIN32
++    return (GLADapiproc) GetProcAddress((HMODULE) handle, name);
++#else
++    return GLAD_GNUC_EXTENSION (GLADapiproc) dlsym(handle, name);
++#endif
++}
++
++#endif /* GLAD_LOADER_LIBRARY_C_ */
++
++struct _glad_opencl_userptr {
++    void *handle;
++};
++
++static GLADapiproc glad_opencl_get_proc(void *vuserptr, const char* name) {
++    struct _glad_opencl_userptr userptr = *(struct _glad_opencl_userptr*) vuserptr;
++    return glad_dlsym_handle(userptr.handle, name);
++}
++
++static void* _opencl_handle = NULL;
++
++static void* glad_opencl_dlopen_handle(void) {
++#if GLAD_PLATFORM_APPLE
++    static const char *NAMES[] = {
++        "../Frameworks/OpenCL.framework/OpenCL",
++        "/Library/Frameworks/OpenCL.framework/OpenCL",
++        "/System/Library/Frameworks/OpenCL.framework/OpenCL",
++        "/System/Library/Frameworks/OpenCL.framework/Versions/Current/OpenCL"
++    };
++#elif GLAD_PLATFORM_WIN32
++    static const char *NAMES[] = {"OpenCL.dll"};
++#else
++    static const char *NAMES[] = {"libOpenCL.so", "libOpenCL.so.0", "libOpenCL.so.1", "libOpenCL.so.2"};
++#endif
++    if (_opencl_handle == NULL) {
++        _opencl_handle = glad_get_dlopen_handle(NAMES, sizeof(NAMES) / sizeof(NAMES[0]));
++    }
++
++    return _opencl_handle;
++}
++
++static struct _glad_opencl_userptr glad_opencl_build_userptr(void *handle) {
++    struct _glad_opencl_userptr userptr;
++    userptr.handle = handle;
++    return userptr;
++}
++
++int gladLoaderLoadOpenCL(cl_device_id device) {
++    int version = 0;
++    void *handle = NULL;
++    int did_load = 0;
++    struct _glad_opencl_userptr userptr;
++
++    did_load = _opencl_handle == NULL;
++    handle = glad_opencl_dlopen_handle();
++    if (handle != NULL) {
++        userptr = glad_opencl_build_userptr(handle);
++        version = gladLoadOpenCLUserPtr(device, glad_opencl_get_proc, &userptr);
++
++        if (!version && did_load) {
++            gladLoaderUnloadOpenCL();
++        }
++    }
++
++    return version;
++}
++
++
++void gladLoaderUnloadOpenCL(void) {
++    if (_opencl_handle != NULL) {
++        glad_close_dlopen_handle(_opencl_handle);
++        _opencl_handle = NULL;
++    }
++}
++
++#endif /* GLAD_EGL */
++
++
++#ifdef __cplusplus
++}
++#endif
+diff --git a/Modules/Core/GPUCommon/src/itkOpenCLUtil.cxx b/Modules/Core/GPUCommon/src/itkOpenCLUtil.cxx
+index 4176449..6f206e8 100644
+--- a/Modules/Core/GPUCommon/src/itkOpenCLUtil.cxx
++++ b/Modules/Core/GPUCommon/src/itkOpenCLUtil.cxx
+@@ -22,6 +22,8 @@
+ 
+ namespace itk
+ {
++
++bool openClHasLoaded = false;
+ //
+ // Get the block size based on the desired image dimension
+ //
+@@ -94,6 +96,18 @@ cl_device_id* OpenCLGetAvailableDevices(cl_platform_id platform, cl_device_type
+   return availableDevices;
+ }
+ 
++bool LoadOpenCL()
++{
++  int version = gladLoaderLoadOpenCL(NULL);
++  openClHasLoaded = version != 0;
++  return openClHasLoaded;
++}
++
++bool IsOpenClLoaded()
++{
++  return openClHasLoaded;
++}
++
+ //
+ // Get the device that has the maximum FLOPS in the current context
+ //
+diff --git a/Modules/Core/GPUFiniteDifference/CMakeLists.txt b/Modules/Core/GPUFiniteDifference/CMakeLists.txt
+index 96b7193..4772104 100644
+--- a/Modules/Core/GPUFiniteDifference/CMakeLists.txt
++++ b/Modules/Core/GPUFiniteDifference/CMakeLists.txt
+@@ -2,8 +2,8 @@ project(ITKGPUFiniteDifference)
+ 
+ if (ITK_USE_GPU)
+   set(ITKGPUFiniteDifference_LIBRARIES ITKGPUFiniteDifference)
+-  set(ITKGPUFiniteDifference_SYSTEM_INCLUDE_DIRS ${OPENCL_INCLUDE_DIRS})
+-  set(ITKGPUFiniteDifference_SYSTEM_LIBRARY_DIRS ${OPENCL_LIBRARIES})
++#  set(ITKGPUFiniteDifference_SYSTEM_INCLUDE_DIRS ${OPENCL_INCLUDE_DIRS})
++#  set(ITKGPUFiniteDifference_SYSTEM_LIBRARY_DIRS ${OPENCL_LIBRARIES})
+ endif()
+ 
+ itk_module_impl()
+diff --git a/Modules/Core/GPUFiniteDifference/src/CMakeLists.txt b/Modules/Core/GPUFiniteDifference/src/CMakeLists.txt
+index 2812f6c..9b33f88 100644
+--- a/Modules/Core/GPUFiniteDifference/src/CMakeLists.txt
++++ b/Modules/Core/GPUFiniteDifference/src/CMakeLists.txt
+@@ -9,5 +9,5 @@ if (ITK_USE_GPU)
+   write_gpu_kernels("${ITKGPUFiniteDifference_Kernels}" ITKGPUFiniteDifference_SRCS)
+ 
+   itk_module_add_library(ITKGPUFiniteDifference ${ITKGPUFiniteDifference_SRCS})
+-  target_link_libraries(ITKGPUFiniteDifference LINK_PUBLIC ${OPENCL_LIBRARIES})
++  #target_link_libraries(ITKGPUFiniteDifference LINK_PUBLIC ${OPENCL_LIBRARIES})
+ endif()
+diff --git a/Modules/Filtering/GPUAnisotropicSmoothing/CMakeLists.txt b/Modules/Filtering/GPUAnisotropicSmoothing/CMakeLists.txt
+index 2ab5e5e..bf6d9ae 100644
+--- a/Modules/Filtering/GPUAnisotropicSmoothing/CMakeLists.txt
++++ b/Modules/Filtering/GPUAnisotropicSmoothing/CMakeLists.txt
+@@ -2,8 +2,8 @@ project(ITKGPUAnisotropicSmoothing)
+ 
+ if (ITK_USE_GPU)
+   set(ITKGPUAnisotropicSmoothing_LIBRARIES ITKGPUAnisotropicSmoothing)
+-  set(ITKGPUAnisotropicSmoothing_SYSTEM_INCLUDE_DIRS ${OPENCL_INCLUDE_DIRS})
+-  set(ITKGPUAnisotropicSmoothing_SYSTEM_LIBRARY_DIRS ${OPENCL_LIBRARIES})
++  #set(ITKGPUAnisotropicSmoothing_SYSTEM_INCLUDE_DIRS ${OPENCL_INCLUDE_DIRS})
++  #set(ITKGPUAnisotropicSmoothing_SYSTEM_LIBRARY_DIRS ${OPENCL_LIBRARIES})
+ endif()
+ 
+ itk_module_impl()
+diff --git a/Modules/Filtering/GPUAnisotropicSmoothing/src/CMakeLists.txt b/Modules/Filtering/GPUAnisotropicSmoothing/src/CMakeLists.txt
+index 558a232..d61179e 100644
+--- a/Modules/Filtering/GPUAnisotropicSmoothing/src/CMakeLists.txt
++++ b/Modules/Filtering/GPUAnisotropicSmoothing/src/CMakeLists.txt
+@@ -10,5 +10,5 @@ if (ITK_USE_GPU)
+   write_gpu_kernels("${ITKGPUAnisotropicSmoothing_Kernels}" ITKGPUAnisotropicSmoothing_SRCS)
+ 
+   itk_module_add_library(ITKGPUAnisotropicSmoothing ${ITKGPUAnisotropicSmoothing_SRCS})
+-  target_link_libraries(ITKGPUAnisotropicSmoothing LINK_PUBLIC ${OPENCL_LIBRARIES})
++  #target_link_libraries(ITKGPUAnisotropicSmoothing LINK_PUBLIC ${OPENCL_LIBRARIES})
+ endif()
+diff --git a/Modules/Filtering/GPUImageFilterBase/CMakeLists.txt b/Modules/Filtering/GPUImageFilterBase/CMakeLists.txt
+index 1550fae..5e1c113 100644
+--- a/Modules/Filtering/GPUImageFilterBase/CMakeLists.txt
++++ b/Modules/Filtering/GPUImageFilterBase/CMakeLists.txt
+@@ -2,8 +2,8 @@ project(ITKGPUImageFilterBase)
+ 
+ if (ITK_USE_GPU)
+   set(ITKGPUImageFilterBase_LIBRARIES ITKGPUImageFilterBase)
+-  set(ITKGPUImageFilterBase_SYSTEM_INCLUDE_DIRS ${OPENCL_INCLUDE_DIRS})
+-  set(ITKGPUImageFilterBase_SYSTEM_LIBRARY_DIRS ${OPENCL_LIBRARIES})
++  #set(ITKGPUImageFilterBase_SYSTEM_INCLUDE_DIRS ${OPENCL_INCLUDE_DIRS})
++  #set(ITKGPUImageFilterBase_SYSTEM_LIBRARY_DIRS ${OPENCL_LIBRARIES})
+ endif()
+ 
+ itk_module_impl()
+diff --git a/Modules/Filtering/GPUImageFilterBase/src/CMakeLists.txt b/Modules/Filtering/GPUImageFilterBase/src/CMakeLists.txt
+index c8c8b9a..6835441 100644
+--- a/Modules/Filtering/GPUImageFilterBase/src/CMakeLists.txt
++++ b/Modules/Filtering/GPUImageFilterBase/src/CMakeLists.txt
+@@ -9,5 +9,5 @@ if (ITK_USE_GPU)
+   write_gpu_kernels("${ITKGPUImageFilterBase_Kernels}" ITKGPUImageFilterBase_SRCS)
+ 
+   itk_module_add_library(ITKGPUImageFilterBase ${ITKGPUImageFilterBase_SRCS})
+-  target_link_libraries(ITKGPUImageFilterBase LINK_PUBLIC ${OPENCL_LIBRARIES})
++  #target_link_libraries(ITKGPUImageFilterBase LINK_PUBLIC ${OPENCL_LIBRARIES})
+ endif()
+diff --git a/Modules/Filtering/GPUSmoothing/CMakeLists.txt b/Modules/Filtering/GPUSmoothing/CMakeLists.txt
+index 6c6c218..426e632 100644
+--- a/Modules/Filtering/GPUSmoothing/CMakeLists.txt
++++ b/Modules/Filtering/GPUSmoothing/CMakeLists.txt
+@@ -2,8 +2,8 @@ project(ITKGPUSmoothing)
+ 
+ if (ITK_USE_GPU)
+   set(ITKGPUSmoothing_LIBRARIES ITKGPUSmoothing)
+-  set(ITKGPUSmoothing_SYSTEM_INCLUDE_DIRS ${OPENCL_INCLUDE_DIRS})
+-  set(ITKGPUSmoothing_SYSTEM_LIBRARY_DIRS ${OPENCL_LIBRARIES})
++  #set(ITKGPUSmoothing_SYSTEM_INCLUDE_DIRS ${OPENCL_INCLUDE_DIRS})
++  #set(ITKGPUSmoothing_SYSTEM_LIBRARY_DIRS ${OPENCL_LIBRARIES})
+ endif()
+ 
+ itk_module_impl()
+diff --git a/Modules/Filtering/GPUSmoothing/src/CMakeLists.txt b/Modules/Filtering/GPUSmoothing/src/CMakeLists.txt
+index d2120e8..f922438 100644
+--- a/Modules/Filtering/GPUSmoothing/src/CMakeLists.txt
++++ b/Modules/Filtering/GPUSmoothing/src/CMakeLists.txt
+@@ -9,5 +9,5 @@ if (ITK_USE_GPU)
+   write_gpu_kernels("${ITKGPUSmoothing_Kernels}" ITKGPUSmoothing_SRCS)
+ 
+   itk_module_add_library(ITKGPUSmoothing ${ITKGPUSmoothing_SRCS})
+-  target_link_libraries(ITKGPUSmoothing LINK_PUBLIC ${OPENCL_LIBRARIES})
++  #target_link_libraries(ITKGPUSmoothing LINK_PUBLIC ${OPENCL_LIBRARIES})
+ endif()
+diff --git a/Modules/Filtering/GPUThresholding/CMakeLists.txt b/Modules/Filtering/GPUThresholding/CMakeLists.txt
+index 4390785..f54f842 100644
+--- a/Modules/Filtering/GPUThresholding/CMakeLists.txt
++++ b/Modules/Filtering/GPUThresholding/CMakeLists.txt
+@@ -2,8 +2,8 @@ project(ITKGPUThresholding)
+ 
+ if (ITK_USE_GPU)
+   set(ITKGPUThresholding_LIBRARIES ITKGPUThresholding)
+-  set(ITKGPUThresholding_SYSTEM_INCLUDE_DIRS ${OPENCL_INCLUDE_DIRS})
+-  set(ITKGPUThresholding_SYSTEM_LIBRARY_DIRS ${OPENCL_LIBRARIES})
++  #set(ITKGPUThresholding_SYSTEM_INCLUDE_DIRS ${OPENCL_INCLUDE_DIRS})
++  #set(ITKGPUThresholding_SYSTEM_LIBRARY_DIRS ${OPENCL_LIBRARIES})
+ endif()
+ 
+ itk_module_impl()
+diff --git a/Modules/Filtering/GPUThresholding/src/CMakeLists.txt b/Modules/Filtering/GPUThresholding/src/CMakeLists.txt
+index 326c868..b5cd0c2 100644
+--- a/Modules/Filtering/GPUThresholding/src/CMakeLists.txt
++++ b/Modules/Filtering/GPUThresholding/src/CMakeLists.txt
+@@ -9,5 +9,5 @@ if (ITK_USE_GPU)
+   write_gpu_kernels("${ITKGPUThresholding_Kernels}" ITKGPUThresholding_SRCS)
+ 
+   itk_module_add_library(ITKGPUThresholding ${ITKGPUThresholding_SRCS})
+-  target_link_libraries(ITKGPUThresholding LINK_PUBLIC ${OPENCL_LIBRARIES})
++  #target_link_libraries(ITKGPUThresholding LINK_PUBLIC ${OPENCL_LIBRARIES})
+ endif()
+diff --git a/Modules/Registration/GPUCommon/CMakeLists.txt b/Modules/Registration/GPUCommon/CMakeLists.txt
+index 7563ae3..403b303 100644
+--- a/Modules/Registration/GPUCommon/CMakeLists.txt
++++ b/Modules/Registration/GPUCommon/CMakeLists.txt
+@@ -1,8 +1,8 @@
+ project(ITKGPURegistrationCommon)
+ 
+ if (ITK_USE_GPU)
+-  set(ITKGPURegistrationCommon_SYSTEM_INCLUDE_DIRS ${OPENCL_INCLUDE_DIRS})
+-  set(ITKGPURegistrationCommon_SYSTEM_LIBRARY_DIRS ${OPENCL_LIBRARIES})
++  #set(ITKGPURegistrationCommon_SYSTEM_INCLUDE_DIRS ${OPENCL_INCLUDE_DIRS})
++  #set(ITKGPURegistrationCommon_SYSTEM_LIBRARY_DIRS ${OPENCL_LIBRARIES})
+ endif()
+ 
+ itk_module_impl()
+diff --git a/Modules/Registration/GPUPDEDeformable/CMakeLists.txt b/Modules/Registration/GPUPDEDeformable/CMakeLists.txt
+index c8d70a4..6039709 100644
+--- a/Modules/Registration/GPUPDEDeformable/CMakeLists.txt
++++ b/Modules/Registration/GPUPDEDeformable/CMakeLists.txt
+@@ -2,8 +2,8 @@ project(ITKGPUPDEDeformableRegistration)
+ 
+ if (ITK_USE_GPU)
+   set(ITKGPUPDEDeformableRegistration_LIBRARIES ITKGPUPDEDeformableRegistration)
+-  set(ITKGPUPDEDeformableRegistration_SYSTEM_INCLUDE_DIRS ${OPENCL_INCLUDE_DIRS})
+-  set(ITKGPUPDEDeformableRegistration_SYSTEM_LIBRARY_DIRS ${OPENCL_LIBRARIES})
++  #set(ITKGPUPDEDeformableRegistration_SYSTEM_INCLUDE_DIRS ${OPENCL_INCLUDE_DIRS})
++  #set(ITKGPUPDEDeformableRegistration_SYSTEM_LIBRARY_DIRS ${OPENCL_LIBRARIES})
+ endif()
+ 
+ itk_module_impl()
+diff --git a/Modules/Registration/GPUPDEDeformable/src/CMakeLists.txt b/Modules/Registration/GPUPDEDeformable/src/CMakeLists.txt
+index 28b1d19..fd56519 100644
+--- a/Modules/Registration/GPUPDEDeformable/src/CMakeLists.txt
++++ b/Modules/Registration/GPUPDEDeformable/src/CMakeLists.txt
+@@ -10,5 +10,5 @@ if (ITK_USE_GPU)
+   write_gpu_kernels("${ITKGPUPDEDeformableRegistration_Kernels}" ITKGPUPDEDeformableRegistration_SRCS)
+ 
+   itk_module_add_library(ITKGPUPDEDeformableRegistration ${ITKGPUPDEDeformableRegistration_SRCS})
+-  target_link_libraries(ITKGPUPDEDeformableRegistration LINK_PUBLIC ${OPENCL_LIBRARIES})
++  #target_link_libraries(ITKGPUPDEDeformableRegistration LINK_PUBLIC ${OPENCL_LIBRARIES})
+ endif()

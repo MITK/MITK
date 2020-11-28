@@ -19,7 +19,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 #include <mitkServiceInterface.h>
 
-#include <mitkOpenCL.h>
+#include <itkOpenCLUtil.h>
 
 /**
  * @brief Declaration of the OpenCL Resources micro-service

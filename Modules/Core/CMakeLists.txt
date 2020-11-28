@@ -31,7 +31,6 @@ mitk_create_module(
       VTK|FiltersTexture+FiltersParallel+ImagingStencil+ImagingMath+InteractionStyle+RenderingOpenGL2+RenderingVolumeOpenGL2+RenderingFreeType+RenderingLabel+InteractionWidgets+IOGeometry+IOXML
     PRIVATE
       ITK|IOBioRad+IOBMP+IOBruker+IOCSV+IOGDCM+IOGE+IOGIPL+IOHDF5+IOIPL+IOJPEG+IOLSM+IOMesh+IOMeta+IOMINC+IOMRC+IONIFTI+IONRRD+IOPNG+IOSiemens+IOSpatialObjects+IOStimulate+IOTIFF+IOTransformBase+IOTransformHDF5+IOTransformInsightLegacy+IOTransformMatlab+IOVTK+IOXML
-      OpenGL
       tinyxml2
       ${optional_private_package_depends}
   # Do not automatically create CppMicroServices initialization code.

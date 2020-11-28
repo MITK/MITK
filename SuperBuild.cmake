@@ -123,10 +123,6 @@ if(MSVC_VERSION)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj /MP")
 endif()
 
-if(MITK_USE_Boost_LIBRARIES)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBOOST_ALL_DYN_LINK")
-endif()
-
 # This is a workaround for passing linker flags
 # actually down to the linker invocation
 set(_cmake_required_flags_orig ${CMAKE_REQUIRED_FLAGS})

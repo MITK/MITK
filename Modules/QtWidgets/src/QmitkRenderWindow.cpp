@@ -93,6 +93,16 @@ void QmitkRenderWindow::LayoutDesignListChanged(QmitkRenderWindowMenu::LayoutDes
   }
 }
 
+void QmitkRenderWindow::UpdateCrosshairVisibility(bool visible)
+{
+  m_MenuWidget->UpdateCrosshairVisibility(visible);
+}
+
+void QmitkRenderWindow::UpdateCrosshairRotationMode(int mode)
+{
+  m_MenuWidget->UpdateCrosshairRotationMode(mode);
+}
+
 void QmitkRenderWindow::ActivateMenuWidget(bool state)
 {
   if (nullptr == m_MenuWidget)

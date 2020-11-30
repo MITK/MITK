@@ -83,6 +83,10 @@ public:
   to disable and all other to enable. */
   void UpdateLayoutDesignList(LayoutDesign layoutDesign);
 
+  void UpdateCrosshairVisibility(bool visible);
+
+  void UpdateCrosshairRotationMode(int mode);
+
 /*! Move menu widget to correct position (right upper corner). E.g. it is necessary when the full-screen mode
 is activated.*/
 #ifdef QMITK_USE_EXTERNAL_RENDERWINDOW_MENU

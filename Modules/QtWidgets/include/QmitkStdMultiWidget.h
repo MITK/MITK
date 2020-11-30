@@ -118,6 +118,9 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 
+  void NotifyCrosshairVisibilityChanged(bool visible);
+  void NotifyCrosshairRotationModeChanged(int mode);
+
   void WheelMoved(QWheelEvent *);
   void Moved();
 

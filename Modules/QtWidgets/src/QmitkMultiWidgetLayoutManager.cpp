@@ -149,7 +149,7 @@ void QmitkMultiWidgetLayoutManager::SetDefaultLayout()
   auto allRenderWindows = m_MultiWidget->GetRenderWindows();
   for (auto& renderWindow : allRenderWindows)
   {
-    renderWindow->LayoutDesignListChanged(LayoutDesign::DEFAULT);
+    renderWindow->UpdateLayoutDesignList(LayoutDesign::DEFAULT);
   }
 }
 
@@ -202,7 +202,7 @@ void QmitkMultiWidgetLayoutManager::SetAll2DTop3DBottomLayout()
   auto allRenderWindows = m_MultiWidget->GetRenderWindows();
   for (auto& renderWindow : allRenderWindows)
   {
-    renderWindow->LayoutDesignListChanged(LayoutDesign::ALL_2D_TOP_3D_BOTTOM);
+    renderWindow->UpdateLayoutDesignList(LayoutDesign::ALL_2D_TOP_3D_BOTTOM);
   }
 }
 
@@ -255,7 +255,7 @@ void QmitkMultiWidgetLayoutManager::SetAll2DLeft3DRightLayout()
   auto allRenderWindows = m_MultiWidget->GetRenderWindows();
   for (auto& renderWindow : allRenderWindows)
   {
-    renderWindow->LayoutDesignListChanged(LayoutDesign::ALL_2D_LEFT_3D_RIGHT);
+    renderWindow->UpdateLayoutDesignList(LayoutDesign::ALL_2D_LEFT_3D_RIGHT);
   }
 }
 
@@ -282,7 +282,7 @@ void QmitkMultiWidgetLayoutManager::SetOneBigLayout()
   auto allRenderWindows = m_MultiWidget->GetRenderWindows();
   for (auto& renderWindow : allRenderWindows)
   {
-    renderWindow->LayoutDesignListChanged(LayoutDesign::ONE_BIG);
+    renderWindow->UpdateLayoutDesignList(LayoutDesign::ONE_BIG);
   }
 }
 
@@ -317,7 +317,7 @@ void QmitkMultiWidgetLayoutManager::SetOnly2DHorizontalLayout()
   auto allRenderWindows = m_MultiWidget->GetRenderWindows();
   for (auto& renderWindow : allRenderWindows)
   {
-    renderWindow->LayoutDesignListChanged(LayoutDesign::ONLY_2D_HORIZONTAL);
+    renderWindow->UpdateLayoutDesignList(LayoutDesign::ONLY_2D_HORIZONTAL);
   }
 }
 
@@ -352,7 +352,7 @@ void QmitkMultiWidgetLayoutManager::SetOnly2DVerticalLayout()
   auto allRenderWindows = m_MultiWidget->GetRenderWindows();
   for (auto& renderWindow : allRenderWindows)
   {
-    renderWindow->LayoutDesignListChanged(LayoutDesign::ONLY_2D_VERTICAL);
+    renderWindow->UpdateLayoutDesignList(LayoutDesign::ONLY_2D_VERTICAL);
   }
 }
 
@@ -397,7 +397,7 @@ void QmitkMultiWidgetLayoutManager::SetOneTop3DBottomLayout()
   auto allRenderWindows = m_MultiWidget->GetRenderWindows();
   for (auto& renderWindow : allRenderWindows)
   {
-    renderWindow->LayoutDesignListChanged(LayoutDesign::ONE_TOP_3D_BOTTOM);
+    renderWindow->UpdateLayoutDesignList(LayoutDesign::ONE_TOP_3D_BOTTOM);
   }
 }
 
@@ -442,7 +442,7 @@ void QmitkMultiWidgetLayoutManager::SetOneLeft3DRightLayout()
   auto allRenderWindows = m_MultiWidget->GetRenderWindows();
   for (auto& renderWindow : allRenderWindows)
   {
-    renderWindow->LayoutDesignListChanged(LayoutDesign::ONE_LEFT_3D_RIGHT);
+    renderWindow->UpdateLayoutDesignList(LayoutDesign::ONE_LEFT_3D_RIGHT);
   }
 }
 
@@ -482,7 +482,7 @@ void QmitkMultiWidgetLayoutManager::SetAllHorizontalLayout()
   auto allRenderWindows = m_MultiWidget->GetRenderWindows();
   for (auto& renderWindow : allRenderWindows)
   {
-    renderWindow->LayoutDesignListChanged(LayoutDesign::ALL_HORIZONTAL);
+    renderWindow->UpdateLayoutDesignList(LayoutDesign::ALL_HORIZONTAL);
   }
 }
 
@@ -519,7 +519,7 @@ void QmitkMultiWidgetLayoutManager::SetAllVerticalLayout()
   auto allRenderWindows = m_MultiWidget->GetRenderWindows();
   for (auto& renderWindow : allRenderWindows)
   {
-    renderWindow->LayoutDesignListChanged(LayoutDesign::ALL_VERTICAL);
+    renderWindow->UpdateLayoutDesignList(LayoutDesign::ALL_VERTICAL);
   }
 }
 
@@ -536,6 +536,6 @@ void QmitkMultiWidgetLayoutManager::RemoveOneLayout()
   auto allRenderWindows = m_MultiWidget->GetRenderWindows();
   for (auto& renderWindow : allRenderWindows)
   {
-    renderWindow->LayoutDesignListChanged(LayoutDesign::NONE);
+    renderWindow->UpdateLayoutDesignList(LayoutDesign::NONE);
   }
 }

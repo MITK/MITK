@@ -33,10 +33,9 @@ if(NOT DEFINED ${proj}_DIR)
 
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
-     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/qwt-6.1.0.tar.bz2
-     URL_MD5 aef0437b37f191067a6a9dc01c30ba64
-     PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Qwt-6.1.0.patch
-       COMMAND ${CMAKE_COMMAND} -Dproj=${proj} -Dproj_target:STRING=qwt -P ${CMAKE_CURRENT_LIST_DIR}/GenerateDefaultCMakeBuildSystem.cmake
+     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/qwt-6.1.5.tar.bz2
+     URL_MD5 d65582f99312796ed42c3be3208ed3db
+     PATCH_COMMAND ${CMAKE_COMMAND} -Dproj=${proj} -Dproj_target:STRING=qwt -P ${CMAKE_CURRENT_LIST_DIR}/GenerateDefaultCMakeBuildSystem.cmake
      CMAKE_GENERATOR ${gen}
      CMAKE_GENERATOR_PLATFORM ${gen_platform}
      CMAKE_ARGS

@@ -24,7 +24,7 @@ You need:
      clients available). We recommend using Git, but see below for a way how to
      get the current source code without using it.
   -# <a href="https://cmake.org/">CMake</a> (version \minimumCMakeVersion or higher)
-  -# <a href="https://www.qt.io/">Qt</a> 5.12 if you plan to develop Qt-based
+  -# <a href="https://www.qt.io/">Qt</a> \minimumQt5Version if you plan to develop Qt-based
      applications
   -# If you are using <b>macOS</b> you need an XCode installation and the
      Command Line Tools as it provides the neccessary compilers and SDKs

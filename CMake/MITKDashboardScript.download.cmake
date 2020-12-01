@@ -463,7 +463,7 @@ ${indent}${indent}${subject}")
 
   ctest_start(${CTEST_DASHBOARD_MODEL})
 
-  set(CTEST_UPDATE_OPTIONS "origin ${MITK_BRANCH}")
+  set(CTEST_UPDATE_OPTIONS "--tags origin ${MITK_BRANCH}")
 
   ctest_update(RETURN_VALUE return_value)
 
@@ -521,7 +521,7 @@ ${indent}Branch: ${branch}
 ${indent}Old revision: ${old_revision} (committed by ${committer})
 ${indent}${indent}${subject}")
 
-      git("fetch" "--quiet" "origin" "${branch}"
+      git("fetch" "--quiet" "--tags" "origin" "${branch}"
         WORKING_DIRECTORY "${extension_dir}")
 
       git("diff" "--quiet" "HEAD" "FETCH_HEAD"

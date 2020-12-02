@@ -64,7 +64,6 @@ namespace mitk
     void ConnectActionsAndFunctions() override;
 
     int m_PaintingPixelValue;
-    int m_CurrentLabelID;
   };
 
 } // namespace

@@ -163,15 +163,15 @@ void mitk::SetRegionTool::OnMouseReleased(StateMachineAction *, InteractionEvent
   if (projectedContour.IsNull())
     return;
 
-  auto *labelImage = dynamic_cast<LabelSetImage *>(image);
-  int activeColor = 1;
-  if (labelImage != nullptr)
+  auto *labelSetImage = dynamic_cast<LabelSetImage *>(image);
+  int activePixelValue = 1;
+  if (nullptr != labelSetImage)
   {
-    activeColor = labelImage->GetActiveLabel()->GetValue();
+    activePixelValue = labelSetImage->GetActiveLabel()->GetValue();
   }
 
   mitk::ContourModelUtils::FillContourInSlice(
-    projectedContour, timeStep, slice, image, m_PaintingPixelValue * activeColor);
+    projectedContour, timeStep, slice, image, m_PaintingPixelValue * activePixelValue);
 
   this->WriteBackSegmentationResult(positionEvent, slice);
 }

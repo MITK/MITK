@@ -28,8 +28,7 @@ found in the LICENSE file.
 
 mitk::ContourTool::ContourTool(int paintingPixelValue)
   : FeedbackContourTool("PressMoveReleaseWithCTRLInversion"),
-    m_PaintingPixelValue(paintingPixelValue),
-    m_CurrentLabelID(1)
+    m_PaintingPixelValue(paintingPixelValue)
 {
 }
 
@@ -130,18 +129,12 @@ void mitk::ContourTool::OnMouseReleased(StateMachineAction *, InteractionEvent *
   if (!image || !planeGeometry)
     return;
 
-  // Check if it is a multilabel-image
-  // If yes, get the new drawing color from it.
-  // Otherwise nothing happens.
+  // Check if it is a multilabel-image. If yes, get the new drawing color from it.
   auto *labelSetImage = dynamic_cast<LabelSetImage *>(image);
-  if (labelSetImage)
+  int activePixelValue = 1;
+  if (nullptr != labelSetImage)
   {
-    mitk::Label *label = labelSetImage->GetActiveLabel(labelSetImage->GetActiveLayer());
-    m_CurrentLabelID = label->GetValue();
-  }
-  else
-  {
-    m_CurrentLabelID = 1;
+    activePixelValue = labelSetImage->GetActiveLabel(labelSetImage->GetActiveLayer())->GetValue();
   }
 
   const auto *abstractTransformGeometry(
@@ -169,7 +162,7 @@ void mitk::ContourTool::OnMouseReleased(StateMachineAction *, InteractionEvent *
 
   // m_PaintingPixelValue only decides whether to paint or erase
   mitk::ContourModelUtils::FillContourInSlice(
-    projectedContour, timestep, slice, image, (m_PaintingPixelValue * m_CurrentLabelID));
+    projectedContour, timestep, slice, image, (m_PaintingPixelValue * activePixelValue));
 
   // this->WriteBackSegmentationResult(positionEvent, slice);
   SegTool2D::WriteBackSegmentationResult(positionEvent, slice);

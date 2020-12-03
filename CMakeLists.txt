@@ -2,15 +2,18 @@ set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.18)
 cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION})
 
 #-----------------------------------------------------------------------------
-# See https://cmake.org/cmake/help/v3.18/manual/cmake-policies.7.html for details
+# Policies
 #-----------------------------------------------------------------------------
 
-set(project_policies )
-foreach(policy ${project_policies})
-  if(POLICY ${policy})
-    cmake_policy(SET ${policy} NEW)
-  endif()
-endforeach()
+#[[ T28060
+
+    https://cmake.org/cmake/help/v3.18/policy/CMP0091.html
+    https://cmake.org/cmake/help/v3.18/variable/CMAKE_MSVC_RUNTIME_LIBRARY.html
+
+    We pass CMP0091 to all external projects as command-line argument:
+      -DCMAKE_POLICY_DEFAULT_CMP0091:STRING=OLD
+ ]]
+cmake_policy(SET CMP0091 OLD)
 
 #-----------------------------------------------------------------------------
 # Superbuild Option - Enabled by default

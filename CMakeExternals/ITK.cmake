@@ -52,9 +52,8 @@ if(NOT DEFINED ITK_DIR)
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
      UPDATE_COMMAND ""
-     # ITK 4.13 release branch snapshot
-     URL https://github.com/InsightSoftwareConsortium/ITK/archive/e53d1d94.tar.gz
-     URL_MD5 977f77cb299cf3d722d13dd5408bcde5
+     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-4.13.3.tar.gz
+     URL_MD5 d1c10c8288b47577d718a71190444815
      CMAKE_GENERATOR ${gen}
      CMAKE_GENERATOR_PLATFORM ${gen_platform}
      CMAKE_ARGS

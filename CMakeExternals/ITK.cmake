@@ -35,8 +35,8 @@ if(NOT DEFINED ITK_DIR)
   # see MITK bug #17338
   list(APPEND additional_cmake_args
     -DModule_ITKReview:BOOL=ON
-  # for 4.7, the OpenJPEG is needed by review but the variable must be set
-    -DModule_ITKOpenJPEG:BOOL=ON
+    -DModule_ITKOpenJPEG:BOOL=ON # for 4.7, the OpenJPEG is needed by review but the variable must be set
+    -DModule_IsotropicWavelets:BOOL=ON
   )
 
   if(CTEST_USE_LAUNCHERS)

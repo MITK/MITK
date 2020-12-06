@@ -85,8 +85,8 @@ namespace mitk
 
     if (other->GetIndexToWorldTransform())
     {
-      TransformType::Pointer indexToWorldTransform = other->GetIndexToWorldTransform()->Clone();
-      this->SetIndexToWorldTransform(indexToWorldTransform);
+      auto indexToWorldTransform = other->GetIndexToWorldTransform()->Clone();
+      this->SetIndexToWorldTransform(dynamic_cast<AffineTransform3D*>(indexToWorldTransform.GetPointer()));
     }
   }
 

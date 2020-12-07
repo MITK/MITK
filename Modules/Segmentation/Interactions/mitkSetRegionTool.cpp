@@ -163,12 +163,7 @@ void mitk::SetRegionTool::OnMouseReleased(StateMachineAction *, InteractionEvent
   if (projectedContour.IsNull())
     return;
 
-  auto *labelSetImage = dynamic_cast<LabelSetImage *>(image);
-  int activePixelValue = 1;
-  if (nullptr != labelSetImage)
-  {
-    activePixelValue = labelSetImage->GetActiveLabel()->GetValue();
-  }
+  int activePixelValue = ContourModelUtils::GetActivePixelValue(image);
 
   mitk::ContourModelUtils::FillContourInSlice(
     projectedContour, timeStep, slice, image, m_PaintingPixelValue * activePixelValue);

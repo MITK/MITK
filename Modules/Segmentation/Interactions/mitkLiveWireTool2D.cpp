@@ -171,13 +171,7 @@ void mitk::LiveWireTool2D::ConfirmSegmentation()
 
       auto workingSlice = this->GetAffectedImageSliceAs2DImage(workingContour.second, workingImage, workingImageTimeStep);
       auto projectedContour = ContourModelUtils::ProjectContourTo2DSlice(workingSlice, contour, true, false);
-
-      auto* labelSetImage = dynamic_cast<LabelSetImage*>(workingImage);
-      int activePixelValue = 1;
-      if (nullptr != labelSetImage)
-      {
-        activePixelValue = labelSetImage->GetActiveLabel(labelSetImage->GetActiveLayer())->GetValue();
-      }
+      int activePixelValue = ContourModelUtils::GetActivePixelValue(workingImage);
 
       ContourModelUtils::FillContourInSlice(
         projectedContour, referenceImageTimePoint, workingSlice, workingImage, activePixelValue);

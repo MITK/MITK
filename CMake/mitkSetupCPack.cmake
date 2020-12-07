@@ -8,12 +8,15 @@ if(NOT CPACK_GENERATOR)
       DOC "Where is makensis.exe located"
       )
 
-    if(NOT NSIS_MAKENSIS)
-      set(CPACK_GENERATOR ZIP)
-    else()
-      set(CPACK_GENERATOR "NSIS;ZIP")
+    set(CPACK_GENERATOR ZIP)
 
-    endif(NOT NSIS_MAKENSIS)
+    if(NSIS_MAKENSIS)
+      set(MITK_CREATE_NSIS_INSTALLER ON CACHE BOOL "Create NSIS installer in addition to ZIP archive")
+      mark_as_advanced(MITK_CREATE_NSIS_INSTALLER)
+      if(MITK_CREATE_NSIS_INSTALLER)
+        list(APPEND CPACK_GENERATOR NSIS)
+      endif()
+    endif()
   else()
     if(APPLE)
       set(CPACK_GENERATOR DragNDrop)
@@ -21,51 +24,6 @@ if(NOT CPACK_GENERATOR)
       set(CPACK_GENERATOR TGZ)
     endif()
   endif()
-endif(NOT CPACK_GENERATOR)
-
-# Set Redistributable information for windows
-if(${CMAKE_SYSTEM_NAME} MATCHES Windows)
-  include(mitkFunctionGetMSVCVersion)
-  mitkFunctionGetMSVCVersion()
-  set(CPACK_VISUAL_STUDIO_VERSION_MAJOR "${VISUAL_STUDIO_VERSION_MAJOR}")
-  set(CPACK_VISUAL_STUDIO_PRODUCT_NAME "${VISUAL_STUDIO_PRODUCT_NAME}")
-  set(CPACK_LIBRARY_ARCHITECTURE "${CMAKE_LIBRARY_ARCHITECTURE}")
-
-  # Visual Studio 2017 already comes with redistributable installers.
-  # Try to find the right one.
-
-  set(vswhere "$ENV{PROGRAMFILES\(X86\)}\\Microsoft Visual Studio\\Installer\\vswhere.exe")
-
-  if(EXISTS ${vswhere})
-    execute_process(COMMAND ${vswhere} -latest -property installationPath
-      OUTPUT_VARIABLE installationPath
-      OUTPUT_STRIP_TRAILING_WHITESPACE)
-    file(TO_CMAKE_PATH "${installationPath}" installationPath)
-    set(redistPath "${installationPath}/VC/Redist/MSVC")
-    file(GLOB redistPath "${installationPath}/VC/Redist/MSVC/*")
-    list(LENGTH redistPath length)
-    if(length EQUAL 1)
-      if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-        set(redistPath "${redistPath}/vc_redist.x64.exe")
-      else()
-        set(redistPath "${redistPath}/vc_redist.x86.exe")
-      endif()
-      if(EXISTS ${redistPath})
-        set(CMAKE_${CPACK_VISUAL_STUDIO_PRODUCT_NAME}_REDISTRIBUTABLE ${redistPath} CACHE FILEPATH "Path to the appropriate Microsoft Visual Studio Redistributable")
-      endif()
-    endif()
-  endif()
-
-  if(NOT DEFINED CMAKE_${CPACK_VISUAL_STUDIO_PRODUCT_NAME}_REDISTRIBUTABLE)
-    set(CMAKE_${CPACK_VISUAL_STUDIO_PRODUCT_NAME}_REDISTRIBUTABLE "" CACHE FILEPATH "Path to the appropriate Microsoft Visual Studio Redistributable")
-  endif()
-endif()
-
-if(EXISTS ${CMAKE_${CPACK_VISUAL_STUDIO_PRODUCT_NAME}_REDISTRIBUTABLE} )
-  install(PROGRAMS ${CMAKE_${CPACK_VISUAL_STUDIO_PRODUCT_NAME}_REDISTRIBUTABLE}
-          DESTINATION thirdpartyinstallers)
-
-  get_filename_component(CPACK_REDISTRIBUTABLE_FILE_NAME ${CMAKE_${CPACK_VISUAL_STUDIO_PRODUCT_NAME}_REDISTRIBUTABLE} NAME )
 endif()
 
 # On windows set default install directory appropriately for 32 and 64 bit
@@ -79,8 +37,8 @@ if(WIN32 AND NOT CPACK_NSIS_INSTALL_ROOT)
 endif()
 
 # By default, do not warn when built on machines using only VS Express
-if(NOT DEFINED CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS)
-  set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_NO_WARNINGS ON)
+if(MITK_USE_OpenMP)
+  set(CMAKE_INSTALL_OPENMP_LIBRARIES ON)
 endif()
 
 # include required mfc libraries
@@ -137,6 +95,3 @@ if(${CMAKE_SYSTEM_NAME} MATCHES Darwin)
 endif()
 
 set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${CPACK_PACKAGE_ARCH}")
-
-
-

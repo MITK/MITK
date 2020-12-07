@@ -315,8 +315,6 @@ void mitk::RegionGrowingTool::OnMousePressed(StateMachineAction *, InteractionEv
   if (!positionEvent)
     return;
 
-  MITK_DEBUG << "OnMousePressed";
-
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
   m_LastScreenPosition = positionEvent->GetPointerPositionOnScreen();
@@ -327,8 +325,6 @@ void mitk::RegionGrowingTool::OnMousePressed(StateMachineAction *, InteractionEv
 
   if (m_WorkingSlice.IsNotNull()) // can't do anything without a working slice (i.e. a possibly empty segmentation)
   {
-    MITK_DEBUG << "OnMousePressed: got working slice";
-
     // 2. Determine if the user clicked inside or outside of the segmentation/working slice (i.e. the whole volume)
     mitk::BaseGeometry::Pointer workingSliceGeometry;
     workingSliceGeometry = m_WorkingSlice->GetGeometry();
@@ -627,33 +623,23 @@ void mitk::RegionGrowingTool::OnMouseReleased(StateMachineAction *, InteractionE
     // If there is a projected contour, fill it
     if (projectedContour.IsNotNull())
     {
-      // Get working data to pass to following method so we don't overwrite locked labels in a LabelSetImage
       mitk::DataNode *workingNode(m_ToolManager->GetWorkingData(0));
-      mitk::LabelSetImage *labelImage = workingNode != nullptr
-        ? dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData())
-        : nullptr;
-
-      MITK_DEBUG << "Filling Segmentation";
-
-      if (labelImage != nullptr)
+      if (nullptr == workingNode)
       {
-        // m_PaintingPixelValue only decides whether to paint or not
-        // For LabelSetImages we want to paint with the active label value
-        auto activeLabel = labelImage->GetActiveLabel(labelImage->GetActiveLayer())->GetValue();
-        mitk::ContourModelUtils::FillContourInSlice(projectedContour,
-                                                    0,
-                                                    m_WorkingSlice,
-                                                    labelImage,
-                                                    m_PaintingPixelValue * activeLabel);
+        return;
       }
-      else
+
+      auto workingImage = dynamic_cast<Image*>(workingNode->GetData());
+      if (nullptr == workingImage)
       {
-        mitk::ContourModelUtils::FillContourInSlice(projectedContour,
-                                                    0,
-                                                    m_WorkingSlice,
-                                                    m_WorkingSlice,
-                                                    m_PaintingPixelValue);
+        return;
       }
+
+      // m_PaintingPixelValue only decides whether to paint or erase
+      int activePixelValue = ContourModelUtils::GetActivePixelValue(workingImage);
+      mitk::ContourModelUtils::FillContourInSlice(
+        projectedContour, 0, m_WorkingSlice, workingImage, m_PaintingPixelValue * activePixelValue);
+
       this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice);
       FeedbackContourTool::SetFeedbackContourVisible(false);
     }

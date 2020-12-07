@@ -138,18 +138,18 @@ void mitk::CorrectorTool2D::OnMouseReleased(StateMachineAction *, InteractionEve
   if (!workingNode)
     return;
 
-  auto *image = dynamic_cast<Image *>(workingNode->GetData());
+  auto *workingImage = dynamic_cast<Image *>(workingNode->GetData());
   const PlaneGeometry *planeGeometry((positionEvent->GetSender()->GetCurrentWorldPlaneGeometry()));
-  if (!image || !planeGeometry)
+  if (!workingImage || !planeGeometry)
     return;
 
   const auto *abstractTransformGeometry(
     dynamic_cast<const AbstractTransformGeometry *>(positionEvent->GetSender()->GetCurrentWorldPlaneGeometry()));
-  if (!image || abstractTransformGeometry)
+  if (!workingImage || abstractTransformGeometry)
     return;
 
   // 2. Slice is known, now we try to get it as a 2D image and project the contour into index coordinates of this slice
-  m_WorkingSlice = FeedbackContourTool::GetAffectedImageSliceAs2DImage(positionEvent, image);
+  m_WorkingSlice = FeedbackContourTool::GetAffectedImageSliceAs2DImage(positionEvent, workingImage);
 
   if (m_WorkingSlice.IsNull())
   {
@@ -173,13 +173,9 @@ void mitk::CorrectorTool2D::OnMouseReleased(StateMachineAction *, InteractionEve
   algorithm->SetInput(m_WorkingSlice);
   algorithm->SetContour(singleTimestepContour);
 
-  mitk::LabelSetImage::Pointer labelSetImage = dynamic_cast<LabelSetImage *>(workingNode->GetData());
-  int workingColorId(1);
-  if (labelSetImage.IsNotNull())
-  {
-    workingColorId = labelSetImage->GetActiveLabel()->GetValue();
-    algorithm->SetFillColor(workingColorId);
-  }
+  int activePixelValue = ContourModelUtils::GetActivePixelValue(workingImage);
+  algorithm->SetFillColor(activePixelValue);
+
   try
   {
     algorithm->UpdateLargestPossibleRegion();
@@ -192,10 +188,11 @@ void mitk::CorrectorTool2D::OnMouseReleased(StateMachineAction *, InteractionEve
   mitk::Image::Pointer resultSlice = mitk::Image::New();
   resultSlice->Initialize(algorithm->GetOutput());
 
-  if (labelSetImage.IsNotNull())
+  auto* labelSetImage = dynamic_cast<LabelSetImage*>(workingImage);
+  if (nullptr != labelSetImage)
   {
-    mitk::Image::Pointer erg1 = FeedbackContourTool::GetAffectedImageSliceAs2DImage(positionEvent, image);
-    SegTool2D::WritePreviewOnWorkingImage(erg1, algorithm->GetOutput(), image, workingColorId, 0);
+    mitk::Image::Pointer erg1 = FeedbackContourTool::GetAffectedImageSliceAs2DImage(positionEvent, workingImage);
+    SegTool2D::WritePreviewOnWorkingImage(erg1, algorithm->GetOutput(), workingImage, activePixelValue, 0);
     SegTool2D::WriteBackSegmentationResult(positionEvent, erg1);
   }
   else

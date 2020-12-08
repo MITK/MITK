@@ -327,7 +327,7 @@ void mitk::FastMarchingTool3D::UpdateCleanUp()
 
 void mitk::FastMarchingTool3D::DoUpdatePreview(const Image* inputAtTimeStep, Image* previewImage, TimeStepType timeStep)
 {
-  if (nullptr != inputAtTimeStep && nullptr != previewImage && m_SeedContainer.IsNotNull() && !m_SeedContainer->empty())
+  if (nullptr != inputAtTimeStep && nullptr != previewImage && m_SeedContainer.IsNotNull())
   {
     AccessFixedDimensionByItk_n(inputAtTimeStep, DoITKFastMarching, 3, (previewImage, timeStep));
   }

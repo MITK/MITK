@@ -651,9 +651,6 @@ Section "-Core installation"
   SetOutPath "$INSTDIR"
   @CPACK_NSIS_FULL_INSTALL@
 
-  ; Check whether redistributables need to be installed
-  Call RedistributablePage
-
   ;Store installation folder
   WriteRegStr SHCTX "Software\@CPACK_PACKAGE_VENDOR@\@CPACK_PACKAGE_INSTALL_REGISTRY_KEY@" "" $INSTDIR
 
@@ -803,75 +800,6 @@ Done:
 Pop $R2
 Pop $R1
 Exch $R0
-FunctionEnd
-
-Function RedistributablePage
-  ; Check whether the appropriate redistributable for this installer has been installed
-  StrCmp '@CPACK_LIBRARY_ARCHITECTURE@' 'x64' 0 +3
-    SetRegView 64
-    Goto done
-  StrCmp '@CPACK_LIBRARY_ARCHITECTURE@' 'x86' 0 +3
-    SetRegView 32
-    Goto done
-  ; The following line should not be reached, use for debugging
-  ; MessageBox MB_OK "Could not determine x86/x64 architecture during CPack installer configuration."
-  done:
-  ReadRegDword $1 HKLM "SOFTWARE\Microsoft\DevDiv\vc\Servicing\@CPACK_VISUAL_STUDIO_VERSION_MAJOR@.0\RuntimeMinimum" "Install"
-
-  ; If installed show installed, else offer installation
-  StrCmp $1 1 RedistInstalled
-
-  ; Offer Installation
-  ; MessageBox MB_YESNO "MITK requires the @CPACK_VISUAL_STUDIO_PRODUCT_NAME@ Redistributable to function. Do you wish to install it?" /SD IDYES IDNO endInstallationMissingRedist
-
-  ; Verify that user has admin privileges
-  ; Otherwise they are not able to install the redistributable
-  Call IsUserAdmin
-  Exch $R0
-  StrCmp $R0 "false" NoAdminRights
-  Pop $R0
-
-  SetOutPath $INSTDIR\thirdpartyinstallers
-
-  ; We need compile time information on whether the redistributable installer exists.
-  ; If it does not exist using the "File" command will lead to errors.
-  ${!defineifexist} REDIST_INSTALLER_PRESENT @CPACK_PACKAGE_FILE_NAME@\thirdpartyinstallers\@CPACK_REDISTRIBUTABLE_FILE_NAME@
-
-  !ifdef REDIST_INSTALLER_PRESENT
-    ; Check at runtime whether the redistributable installer is available
-    IfFileExists $INSTDIR\thirdpartyinstallers\@CPACK_REDISTRIBUTABLE_FILE_NAME@ InstallRedist NoRedistInstaller
-
-    InstallRedist:
-
-    ClearErrors
-    File "@CPACK_PACKAGE_FILE_NAME@\thirdpartyinstallers\@CPACK_REDISTRIBUTABLE_FILE_NAME@"
-    ExecWait '"$INSTDIR\thirdpartyinstallers\@CPACK_REDISTRIBUTABLE_FILE_NAME@" /passive /norestart'
-    IfErrors endInstallationMissingRedist
-
-    Goto RedistInstalled
-
-    endInstallationMissingRedist:
-    Abort "Installation aborted. Missing required @CPACK_VISUAL_STUDIO_PRODUCT_NAME@ @CPACK_LIBRARY_ARCHITECTURE@ Redistributable"
-  !endif
-
-  ; We are missing the redistributable installer, inform the user
-  NoRedistInstaller:
-  MessageBox MB_OK "Missing required @CPACK_VISUAL_STUDIO_PRODUCT_NAME@ @CPACK_LIBRARY_ARCHITECTURE@ Redistributable. You need to install it to use MITK."
-  Goto End
-
-  ; The user does not have the required rights to install redistributables
-  NoAdminRights:
-  MessageBox MB_OK|MB_ICONSTOP "This MITK version requires the @CPACK_VISUAL_STUDIO_PRODUCT_NAME@ @CPACK_LIBRARY_ARCHITECTURE@ Redistributable.$\r$\n\
-                    Your user account does not have administrator privileges.$\r$\n\
-                    Please ask your system administrator to install the @CPACK_VISUAL_STUDIO_PRODUCT_NAME@ @CPACK_LIBRARY_ARCHITECTURE@ Redistributable."
-  Pop $R0
-  Goto End
-
-  ; No need to do anything
-  RedistInstalled:
-  Goto End
-
-  End:
 FunctionEnd
 
 ;--------------------------------

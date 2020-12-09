@@ -14,6 +14,8 @@ See LICENSE.txt or http://www.mitk.org for details.
 
 ===================================================================*/
 
+#include <dcmsr/dsrdoc.h>
+
 #include <dcmtk/dcmdata/dctk.h>
 #include <dcmtk/dcmdata/dcrledrg.h>
 #include <dcmtk/dcmdata/dcistrmb.h>
@@ -414,7 +416,7 @@ bool DicomSeriesReader::ImageBlockDescriptor::loadStructeredReport(DcmFileFormat
   StructuredReport::Pointer report = StructuredReport::New();
 
   DcmDataset* fileData = ff.getDataset();
-  report->reportData.read(*fileData);
+  report->reportData->read(*fileData);
 
   lock.lock();
   info.m_Data = report;

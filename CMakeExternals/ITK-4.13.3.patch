@@ -28,12 +28,13 @@ diff --git a/Modules/Core/Transform/include/itkScalableAffineTransform.h b/Modul
 index 4e830476a2..b5efeb95a4 100644
 --- a/Modules/Core/Transform/include/itkScalableAffineTransform.h
 +++ b/Modules/Core/Transform/include/itkScalableAffineTransform.h
-@@ -47,7 +47,7 @@ public:
+@@ -47,7 +47,8 @@ public:
    itkTypeMacro(ScalableAffineTransform, AffineTransform);
  
    /** New macro for creation of through a Smart Pointer   */
 -  itkNewMacro(Self);
 +  itkFactorylessNewMacro(Self);
++  itkCloneMacro(Self);
  
    /** Dimension of the domain space. */
    itkStaticConstMacro(InputSpaceDimension, unsigned int, NDimensions);

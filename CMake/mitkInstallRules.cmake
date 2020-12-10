@@ -76,9 +76,11 @@ if(WIN32)
     if(MITK_USE_QT_WEBENGINE)
       MITK_INSTALL( FILES "${_qmake_path}/QtWebEngineProcess.exe")
     endif()
-    install(DIRECTORY "${_qmake_path}/../resources/"
-            DESTINATION "bin/resources/"
-            CONFIGURATIONS Release)
+    if (MITK_USE_QT_WEBENGINE)
+      install(DIRECTORY "${_qmake_path}/../resources/"
+              DESTINATION "bin/resources/"
+              CONFIGURATIONS Release)
+    endif()
     install(FILES "${_qmake_path}/../plugins/platforms/qwindowsd.dll"
             DESTINATION "bin/plugins/platforms"
             CONFIGURATIONS Debug)
@@ -88,9 +90,11 @@ if(WIN32)
     install(FILES "${_qmake_path}/../plugins/imageformats/qsvgd.dll"
             DESTINATION "bin/plugins/imageformats"
             CONFIGURATIONS Debug)
-    install(DIRECTORY "${_qmake_path}/../resources/"
-            DESTINATION "bin/resources/"
-            CONFIGURATIONS Debug)
+    if (MITK_USE_QT_WEBENGINE)
+      install(DIRECTORY "${_qmake_path}/../resources/"
+              DESTINATION "bin/resources/"
+              CONFIGURATIONS Debug)
+    endif()
   endif()
 
   #DCMTK Dlls install target (shared libs on gcc only)

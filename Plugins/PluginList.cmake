@@ -78,7 +78,7 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.imagecropper:OFF
   org.mitk.gui.qt.imagenavigator:ON
   org.mitk.gui.qt.remeshing:ON
-  org.mitk.gui.qt.imagestatistics:ON
+  org.mitk.gui.qt.imagestatistics:OFF
 
   #org.mitk.gui.qt.tofutil:OFF
   #org.mitk.gui.qt.igttracking:OFF

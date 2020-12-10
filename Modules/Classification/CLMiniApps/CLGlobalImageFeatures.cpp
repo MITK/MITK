@@ -435,9 +435,6 @@ int main(int argc, char* argv[])
     return EXIT_SUCCESS;
   }
 
-  //bool savePNGofSlices = true;
-  //std::string folderForPNGOfSlices = "E:\\tmp\\bonekamp\\fig\\";
-
   std::string version = "Version: 1.23";
   MITK_INFO << version;
 

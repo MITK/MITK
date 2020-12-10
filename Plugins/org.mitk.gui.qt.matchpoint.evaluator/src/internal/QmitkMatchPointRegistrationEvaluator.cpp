@@ -24,6 +24,7 @@ found in the LICENSE file.
 #include "mitkRegistrationHelper.h"
 #include "mitkRegEvaluationMapper2D.h"
 #include <mitkMAPAlgorithmHelper.h>
+#include "mitkProperties.h"
 
 // Qmitk
 #include "QmitkRenderWindow.h"
@@ -232,7 +233,7 @@ void QmitkMatchPointRegistrationEvaluator::OnSliceChanged()
 
     if (this->m_selectedEvalNode.IsNotNull())
     {
-      this->m_selectedEvalNode->SetProperty(mitk::nodeProp_RegEvalCurrentPosition, mitk::GenericProperty<mitk::Point3D>::New(currentSelectedPosition));
+      this->m_selectedEvalNode->SetProperty(mitk::nodeProp_RegEvalCurrentPosition, mitk::Point3dProperty::New(currentSelectedPosition));
     }
   }
 }

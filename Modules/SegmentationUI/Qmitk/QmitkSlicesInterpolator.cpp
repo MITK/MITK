@@ -604,26 +604,19 @@ void QmitkSlicesInterpolator::setEnabled( bool enable )
   QWidget::setEnabled(enable);
 
   //Set the gui elements of the different interpolation modi enabled
-  if (enable)
-  {
-    if (m_2DInterpolationEnabled)
-    {
+  this->HideAllInterpolationControls();
+  if (enable) {
+    if (m_2DInterpolationEnabled) {
       this->Show2DInterpolationControls(true);
       m_Interpolator->Activate2DInterpolation(true);
-    }
-    else if (m_3DInterpolationEnabled && !m_3DModificationEnabled)
-    {
+    } else if (m_3DInterpolationEnabled && !m_3DModificationEnabled) {
       this->Show3DInterpolationControls(true);
       this->Show3DInterpolationResult(true);
-    } else {
+    } else if (m_3DModificationEnabled) {
       this->Show3DModificationControls(true);
       this->Show3DInterpolationResult(true);
     }
-  }
-  //Set all gui elements of the interpolation disabled
-  else
-  {
-    this->HideAllInterpolationControls();
+  } else {
     this->Show3DInterpolationResult(false);
   }
 }
@@ -1594,7 +1587,7 @@ void QmitkSlicesInterpolator:: SetCurrentContourListID()
 
       if (!isInterpolationResult)
       {
-        QWidget::setEnabled( true );
+        QmitkSlicesInterpolator::setEnabled( true );
 
         // In case the time is not valid use 0 to access the time geometry of the working node
         unsigned int time_position = 0;
@@ -1642,7 +1635,7 @@ void QmitkSlicesInterpolator:: SetCurrentContourListID()
     }
     else
     {
-      QWidget::setEnabled(false);
+      QmitkSlicesInterpolator::setEnabled(false);
     }
   }
 }

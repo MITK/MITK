@@ -1,0 +1,208 @@
+From 2379287ea1e3b968e8d5658cc5e1944b201aca94 Mon Sep 17 00:00:00 2001
+From: KuznetsovAlexander <KuznetsovAlexander@rambler.ru>
+Date: Sat, 12 Dec 2020 13:57:07 +0400
+Subject: [PATCH] Fixed QString warnings in headers.
+
+Signed-off-by: KuznetsovAlexander <KuznetsovAlexander@rambler.ru>
+---
+ src/qwt_plot_barchart.h       | 2 +-
+ src/qwt_plot_curve.h          | 2 +-
+ src/qwt_plot_histogram.h      | 2 +-
+ src/qwt_plot_intervalcurve.h  | 2 +-
+ src/qwt_plot_marker.h         | 2 +-
+ src/qwt_plot_multi_barchart.h | 2 +-
+ src/qwt_plot_rasteritem.h     | 2 +-
+ src/qwt_plot_seriesitem.h     | 2 +-
+ src/qwt_plot_shapeitem.h      | 2 +-
+ src/qwt_plot_spectrocurve.h   | 2 +-
+ src/qwt_plot_spectrogram.h    | 2 +-
+ src/qwt_plot_svgitem.h        | 2 +-
+ src/qwt_plot_tradingcurve.h   | 2 +-
+ src/qwt_text.h                | 2 +-
+ 14 files changed, 14 insertions(+), 14 deletions(-)
+
+diff --git a/src/qwt_plot_barchart.h b/src/qwt_plot_barchart.h
+index d47bfb9..ae2dc65 100644
+--- a/src/qwt_plot_barchart.h
++++ b/src/qwt_plot_barchart.h
+@@ -67,7 +67,7 @@ public:
+         LegendBarTitles
+     };
+ 
+-    explicit QwtPlotBarChart( const QString &title = QString::null );
++    explicit QwtPlotBarChart( const QString &title = QString());
+     explicit QwtPlotBarChart( const QwtText &title );
+ 
+     virtual ~QwtPlotBarChart();
+diff --git a/src/qwt_plot_curve.h b/src/qwt_plot_curve.h
+index 3421abf..53825d0 100644
+--- a/src/qwt_plot_curve.h
++++ b/src/qwt_plot_curve.h
+@@ -210,7 +210,7 @@ public:
+     //! Paint attributes
+     typedef QFlags<PaintAttribute> PaintAttributes;
+ 
+-    explicit QwtPlotCurve( const QString &title = QString::null );
++    explicit QwtPlotCurve( const QString &title = QString());
+     explicit QwtPlotCurve( const QwtText &title );
+ 
+     virtual ~QwtPlotCurve();
+diff --git a/src/qwt_plot_histogram.h b/src/qwt_plot_histogram.h
+index b96bddd..ec53248 100644
+--- a/src/qwt_plot_histogram.h
++++ b/src/qwt_plot_histogram.h
+@@ -76,7 +76,7 @@ public:
+         UserStyle = 100
+     };
+ 
+-    explicit QwtPlotHistogram( const QString &title = QString::null );
++    explicit QwtPlotHistogram( const QString &title = QString());
+     explicit QwtPlotHistogram( const QwtText &title );
+     virtual ~QwtPlotHistogram();
+ 
+diff --git a/src/qwt_plot_intervalcurve.h b/src/qwt_plot_intervalcurve.h
+index 624d82f..6c1ab7f 100644
+--- a/src/qwt_plot_intervalcurve.h
++++ b/src/qwt_plot_intervalcurve.h
+@@ -76,7 +76,7 @@ public:
+     //! Paint attributes
+     typedef QFlags<PaintAttribute> PaintAttributes;
+ 
+-    explicit QwtPlotIntervalCurve( const QString &title = QString::null );
++    explicit QwtPlotIntervalCurve( const QString &title = QString());
+     explicit QwtPlotIntervalCurve( const QwtText &title );
+ 
+     virtual ~QwtPlotIntervalCurve();
+diff --git a/src/qwt_plot_marker.h b/src/qwt_plot_marker.h
+index 2c726ce..9c7351b 100644
+--- a/src/qwt_plot_marker.h
++++ b/src/qwt_plot_marker.h
+@@ -68,7 +68,7 @@ public:
+         Cross
+     };
+ 
+-    explicit QwtPlotMarker( const QString &title = QString::null );
++    explicit QwtPlotMarker( const QString &title = QString());
+     explicit QwtPlotMarker( const QwtText &title );
+ 
+     virtual ~QwtPlotMarker();
+diff --git a/src/qwt_plot_multi_barchart.h b/src/qwt_plot_multi_barchart.h
+index 03e3db5..5c0d1cf 100644
+--- a/src/qwt_plot_multi_barchart.h
++++ b/src/qwt_plot_multi_barchart.h
+@@ -61,7 +61,7 @@ public:
+         Stacked
+     };
+ 
+-    explicit QwtPlotMultiBarChart( const QString &title = QString::null );
++    explicit QwtPlotMultiBarChart( const QString &title = QString());
+     explicit QwtPlotMultiBarChart( const QwtText &title );
+ 
+     virtual ~QwtPlotMultiBarChart();
+diff --git a/src/qwt_plot_rasteritem.h b/src/qwt_plot_rasteritem.h
+index f411816..a60fe69 100644
+--- a/src/qwt_plot_rasteritem.h
++++ b/src/qwt_plot_rasteritem.h
+@@ -83,7 +83,7 @@ public:
+     //! Paint attributes
+     typedef QFlags<PaintAttribute> PaintAttributes;
+ 
+-    explicit QwtPlotRasterItem( const QString& title = QString::null );
++    explicit QwtPlotRasterItem( const QString& title = QString());
+     explicit QwtPlotRasterItem( const QwtText& title );
+     virtual ~QwtPlotRasterItem();
+ 
+diff --git a/src/qwt_plot_seriesitem.h b/src/qwt_plot_seriesitem.h
+index f58334a..52fe503 100644
+--- a/src/qwt_plot_seriesitem.h
++++ b/src/qwt_plot_seriesitem.h
+@@ -23,7 +23,7 @@ class QWT_EXPORT QwtPlotSeriesItem: public QwtPlotItem,
+     public virtual QwtAbstractSeriesStore
+ {
+ public:
+-    explicit QwtPlotSeriesItem( const QString &title = QString::null );
++    explicit QwtPlotSeriesItem( const QString &title = QString());
+     explicit QwtPlotSeriesItem( const QwtText &title );
+ 
+     virtual ~QwtPlotSeriesItem();
+diff --git a/src/qwt_plot_shapeitem.h b/src/qwt_plot_shapeitem.h
+index 76f78a1..526053c 100644
+--- a/src/qwt_plot_shapeitem.h
++++ b/src/qwt_plot_shapeitem.h
+@@ -64,7 +64,7 @@ public:
+         LegendColor
+     };
+ 
+-    explicit QwtPlotShapeItem( const QString &title = QString::null );
++    explicit QwtPlotShapeItem( const QString &title = QString());
+     explicit QwtPlotShapeItem( const QwtText &title );
+ 
+     virtual ~QwtPlotShapeItem();
+diff --git a/src/qwt_plot_spectrocurve.h b/src/qwt_plot_spectrocurve.h
+index 1972c3e..f2936af 100644
+--- a/src/qwt_plot_spectrocurve.h
++++ b/src/qwt_plot_spectrocurve.h
+@@ -35,7 +35,7 @@ public:
+     //! Paint attributes
+     typedef QFlags<PaintAttribute> PaintAttributes;
+ 
+-    explicit QwtPlotSpectroCurve( const QString &title = QString::null );
++    explicit QwtPlotSpectroCurve( const QString &title = QString());
+     explicit QwtPlotSpectroCurve( const QwtText &title );
+ 
+     virtual ~QwtPlotSpectroCurve();
+diff --git a/src/qwt_plot_spectrogram.h b/src/qwt_plot_spectrogram.h
+index 1aa6989..4c825a2 100644
+--- a/src/qwt_plot_spectrogram.h
++++ b/src/qwt_plot_spectrogram.h
+@@ -55,7 +55,7 @@ public:
+     //! Display modes
+     typedef QFlags<DisplayMode> DisplayModes;
+ 
+-    explicit QwtPlotSpectrogram( const QString &title = QString::null );
++    explicit QwtPlotSpectrogram( const QString &title = QString());
+     virtual ~QwtPlotSpectrogram();
+ 
+     void setDisplayMode( DisplayMode, bool on = true );
+diff --git a/src/qwt_plot_svgitem.h b/src/qwt_plot_svgitem.h
+index 1d98dee..272185b 100644
+--- a/src/qwt_plot_svgitem.h
++++ b/src/qwt_plot_svgitem.h
+@@ -27,7 +27,7 @@ class QByteArray;
+ class QWT_EXPORT QwtPlotSvgItem: public QwtPlotItem
+ {
+ public:
+-    explicit QwtPlotSvgItem( const QString& title = QString::null );
++    explicit QwtPlotSvgItem( const QString& title = QString());
+     explicit QwtPlotSvgItem( const QwtText& title );
+     virtual ~QwtPlotSvgItem();
+ 
+diff --git a/src/qwt_plot_tradingcurve.h b/src/qwt_plot_tradingcurve.h
+index 8a4121f..55800de 100644
+--- a/src/qwt_plot_tradingcurve.h
++++ b/src/qwt_plot_tradingcurve.h
+@@ -101,7 +101,7 @@ public:
+     //! Paint attributes
+     typedef QFlags<PaintAttribute> PaintAttributes;
+ 
+-    explicit QwtPlotTradingCurve( const QString &title = QString::null );
++    explicit QwtPlotTradingCurve( const QString &title = QString());
+     explicit QwtPlotTradingCurve( const QwtText &title );
+ 
+     virtual ~QwtPlotTradingCurve();
+diff --git a/src/qwt_text.h b/src/qwt_text.h
+index e789690..307fb51 100644
+--- a/src/qwt_text.h
++++ b/src/qwt_text.h
+@@ -139,7 +139,7 @@ public:
+     //! Layout attributes
+     typedef QFlags<LayoutAttribute> LayoutAttributes;
+ 
+-    QwtText( const QString & = QString::null,
++    QwtText( const QString & = QString(),
+              TextFormat textFormat = AutoText );
+     QwtText( const QwtText & );
+     ~QwtText();
+-- 
+2.18.0.windows.1
+

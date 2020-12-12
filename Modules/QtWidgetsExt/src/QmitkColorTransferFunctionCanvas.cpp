@@ -107,7 +107,7 @@ void QmitkColorTransferFunctionCanvas::paintEvent(QPaintEvent*)
       std::pair<int,int> point = this->FunctionToCanvas(std::make_pair(
           GetFunctionX(i), 0.0f));
       int y = height() / 2;
-      painter.drawRoundRect(point.first - handleWidth / 2,
+      painter.drawRoundedRect(point.first - handleWidth / 2,
           y - handleHeight / 2, handleWidth, handleHeight, 50, 50);
 
       if (i == m_GrabbedHandle && m_LineEditAvailable)

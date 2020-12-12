@@ -1,6 +1,13 @@
 set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.18)
 cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION})
 
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.19 AND CMAKE_VERSION VERSION_LESS 3.19.2)
+  message(FATAL_ERROR "\
+CMake v${CMAKE_VERSION} is defective [1]. \
+Please either downgrade to v3.18 or upgrade to at least v3.19.2.\n\
+[1] https://gitlab.kitware.com/cmake/cmake/-/issues/21529")
+endif()
+
 #-----------------------------------------------------------------------------
 # Policies
 #-----------------------------------------------------------------------------

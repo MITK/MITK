@@ -1546,7 +1546,7 @@ index 0000000..5c11479
 + *
 + */
 +
-+#include "itkGPUCommonExport.h"
++#include "ITKGPUCommonExport.h"
 +
 +#define CL_TARGET_OPENCL_VERSION 110
 +#define GLAD_API_CALL_EXPORT
@@ -2399,7 +2399,7 @@ index 8d30c65..f694423 100644
  
  #include "itkMacro.h"
  
-+#include "itkGPUCommonExport.h"
++#include "ITKGPUCommonExport.h"
 +
  namespace itk
  {
@@ -2439,7 +2439,7 @@ index 0b658d5..df5f1df 100644
 -#ifdef __APPLE__
 -
 -#include <OpenCL/opencl.h>
-+#include "itkGPUCommonExport.h"
++#include "ITKGPUCommonExport.h"
  
 -#else
 +#include <itkVector.h>

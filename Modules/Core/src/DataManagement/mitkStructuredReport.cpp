@@ -1,18 +1,29 @@
+#include "dcmsr/dsrdoc.h"
+
 #include "mitkStructuredReport.h"
 
 namespace mitk {
 
+StructuredReport::StructuredReport()
+{
+  reportData = std::shared_ptr<DSRDocument>();
+}
+
+StructuredReport::~StructuredReport()
+{
+}
+
 std::string StructuredReport::GetReportText()
 {
   std::ostringstream ss;
-  reportData.renderHTML(ss);
+  reportData->renderHTML(ss);
   return ss.str();
 }
 
 std::string StructuredReport::GetPatientName()
 {
   std::string res;
-  reportData.getPatientName(res);
+  reportData->getPatientName(res);
   return res;
 }
 

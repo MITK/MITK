@@ -2,10 +2,10 @@
 
 #include "MitkCoreExports.h"
 
-#include "dcmsr/dsrdoc.h"
-
 #include "mitkBaseData.h"
 #include "mitkCommon.h"
+
+class DSRDocument;
 
 namespace mitk {
 
@@ -16,7 +16,7 @@ public:
   itkFactorylessNewMacro(Self);
   itkCloneMacro(Self);
 
-  DSRDocument reportData;
+  std::shared_ptr<DSRDocument> reportData;
 
   std::string GetReportText();
   std::string GetPatientName();
@@ -41,6 +41,10 @@ public:
   void InitializeTimeGeometry(unsigned int timeSteps = 1) override;
   void ClearData() override;
   void PrintSelf(std::ostream& os, itk::Indent indent) const override;
+
+protected:
+  StructuredReport();
+  virtual ~StructuredReport();
 };
 
 };

@@ -17,7 +17,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #ifndef __mitkOclUtils_h
 #define __mitkOclUtils_h
 
-#include "mitkOpenCL.h"
+#include <itkOpenCLUtil.h>
 
 #include <string>
 #include <MitkOpenCLExports.h>

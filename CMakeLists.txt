@@ -895,10 +895,6 @@ if(MITK_USE_SimpleITK)
   link_directories(${SimpleITK_LIBRARY_DIRS})
 endif()
 
-if(MITK_USE_OpenCL)
-  find_package(OpenCL REQUIRED)
-endif()
-
 # Qt support
 if(MITK_USE_QT)
   find_package(Qt5Core ${MITK_QT5_MINIMUM_VERSION} REQUIRED) # at least Core required

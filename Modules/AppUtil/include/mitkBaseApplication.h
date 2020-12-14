@@ -182,6 +182,7 @@ public:
   static QString ARG_SPLASH_IMAGE;
   static QString ARG_AUTOPLAN_VERSION;
   static QString ARG_AUTOPLAN_LICENSE;
+  static QString ARG_AUTOPLAN_DONT_LOAD_OPENCL;
 
   static QString ARG_XARGS;
 

@@ -26,8 +26,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include <ctkPluginFrameworkLauncher.h>
 #include <ctkPluginFramework_global.h>
 
-#include <usModuleSettings.h>
+#include <itkOpenCLUtil.h>
 
+#include <usModuleSettings.h>
 #include <Poco/Util/HelpFormatter.h>
 
 #include <QPainter>
@@ -64,6 +65,7 @@ QString BaseApplication::ARG_TESTAPPLICATION = "BlueBerry.testapplication";
 QString BaseApplication::ARG_SPLASH_IMAGE = "BlueBerry.splashscreen";
 QString BaseApplication::ARG_AUTOPLAN_VERSION = "BlueBerry.autoplanversion";
 QString BaseApplication::ARG_AUTOPLAN_LICENSE = "BlueBerry.autoplanlicense";
+QString BaseApplication::ARG_AUTOPLAN_DONT_LOAD_OPENCL = "Autoplan.dontLoadOpenCL";
 
 QString BaseApplication::ARG_NO_REGISTRY_CACHE = "BlueBerry.noRegistryCache";
 QString BaseApplication::ARG_NO_LAZY_REGISTRY_CACHE_LOADING = "BlueBerry.noLazyRegistryCacheLoading";
@@ -515,6 +517,9 @@ void BaseApplication::initializeQt()
 
 void BaseApplication::initialize(Poco::Util::Application& self)
 {
+  if (!d->getProperty(ARG_AUTOPLAN_DONT_LOAD_OPENCL).toBool()) {
+    itk::LoadOpenCL();
+  }
   // 1. Call the super-class method
   Poco::Util::Application::initialize(self);
 
@@ -792,6 +797,8 @@ void BaseApplication::defineOptions(Poco::Util::OptionSet& options)
   Poco::Util::Option splashScreenOption(ARG_SPLASH_IMAGE.toStdString(), "", "optional picture to use as a splash screen");
   splashScreenOption.argument("<filename>").binding(ARG_SPLASH_IMAGE.toStdString());
   options.addOption(splashScreenOption);
+
+  options.addOption(Poco::Util::Option("dont-load-opencl", "", "flag for testing app behaviour on system without OpenCL"));
 
   options.addOption(Poco::Util::Option("exit", "", "exiting after some time"));
 

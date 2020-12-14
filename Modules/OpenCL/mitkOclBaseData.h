@@ -20,7 +20,7 @@ See LICENSE.txt or http://www.mitk.org for details.
 #include "MitkOpenCLExports.h"
 #include "mitkOclUtils.h"
 
-#include "mitkOpenCL.h"
+#include "itkOpenCLUtil.h"
 
 #include <mitkCommon.h>
 #include <itkObjectFactory.h>

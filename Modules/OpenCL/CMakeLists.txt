@@ -4,8 +4,7 @@ if(MITK_USE_OpenCL)
   MITK_CREATE_MODULE(
     DEPENDS MitkCore
     PACKAGE_DEPENDS
-      PUBLIC OpenCL
-      PRIVATE ITK|ITKThresholding
+      PRIVATE ITK|ITKThresholding+ITKGPUCommon
   )
 
   add_subdirectory(Testing)

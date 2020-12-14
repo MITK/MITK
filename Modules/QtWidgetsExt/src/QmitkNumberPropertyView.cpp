@@ -73,7 +73,7 @@ void QmitkNumberPropertyView::setDecimalPlaces(short places)
 QString QmitkNumberPropertyView::suffix() const
 {
   if (m_Suffix =="")
-    return QString::null;
+    return QString();
   else
     return m_Suffix;
 }

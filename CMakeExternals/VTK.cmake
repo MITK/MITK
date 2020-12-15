@@ -94,6 +94,7 @@ if(NOT DEFINED VTK_DIR)
       COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/VtkBorderRepresentationFix.patch
       COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/VTK-gcc-10.patch
       COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/VtkClippingJitter.patch
+      COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/VTK-Qt515.patch
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS
         ${ep_common_args}

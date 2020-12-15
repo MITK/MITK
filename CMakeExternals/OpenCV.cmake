@@ -75,6 +75,7 @@ if(MITK_USE_OpenCV)
       URL_MD5 ${opencv_url_md5}
       # Related bug: http://bugs.mitk.org/show_bug.cgi?id=5912
       PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/OpenCV.patch
+        COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/OpenCV-GCC10.patch
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
         ${ep_common_args}

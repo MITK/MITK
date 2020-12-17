@@ -222,7 +222,6 @@ namespace mitk
     */
     std::string m_EventConfig;
 
-    Tool();             // purposely hidden
     Tool(const char *, const us::Module *interactorModule = nullptr); // purposely hidden
     ~Tool() override;
 

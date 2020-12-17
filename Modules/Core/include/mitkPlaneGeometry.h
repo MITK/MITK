@@ -435,7 +435,7 @@ namespace mitk
     * \brief Returns whether the plane is on the plane
     * (bounding-box \em not considered)
     *
-    * @return true iff the normal vector of the planes point to the same or the exactly oposit direction and
+    * @return true if the normal vector of the planes point to the same or the exactly oposit direction and
     *  the distance of the planes is < eps
     *
     */

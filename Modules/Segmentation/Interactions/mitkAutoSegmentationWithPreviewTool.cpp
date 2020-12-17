@@ -30,11 +30,18 @@ found in the LICENSE file.
 #include "mitkMaskAndCutRoiImageFilter.h"
 #include "mitkPadImageFilter.h"
 #include "mitkNodePredicateGeometry.h"
+#include "mitkSegTool2D.h"
 
 mitk::AutoSegmentationWithPreviewTool::AutoSegmentationWithPreviewTool(bool lazyDynamicPreviews): m_LazyDynamicPreviews(lazyDynamicPreviews)
 {
   m_ProgressCommand = mitk::ToolCommand::New();
 }
+
+mitk::AutoSegmentationWithPreviewTool::AutoSegmentationWithPreviewTool(bool lazyDynamicPreviews, const char* interactorType, const us::Module* interactorModule) : AutoSegmentationTool(interactorType, interactorModule), m_LazyDynamicPreviews(lazyDynamicPreviews)
+{
+  m_ProgressCommand = mitk::ToolCommand::New();
+}
+
 
 mitk::AutoSegmentationWithPreviewTool::~AutoSegmentationWithPreviewTool()
 {
@@ -109,6 +116,7 @@ void mitk::AutoSegmentationWithPreviewTool::Deactivated()
 
   m_SegmentationInputNode = nullptr;
   m_ReferenceDataNode = nullptr;
+  m_WorkingPlaneGeometry = nullptr;
 
   try
   {
@@ -283,15 +291,22 @@ void mitk::AutoSegmentationWithPreviewTool::TransferImageAtTimeStep(const Image*
       mitkThrow() << "Cannot transfer images. Tool is in an invalid state, source image and destination image do not have the same geometry.";
     }
 
-    if (image3D->GetDimension() == 2)
-    {
-      AccessFixedDimensionByItk_2(
-        image3D, ITKSetVolume, 2, destinationImage, timeStep);
+    if (nullptr != this->GetWorkingPlaneGeometry())
+    { //only transfer a specific slice defined by the working plane
+
     }
     else
-    {
-      AccessFixedDimensionByItk_2(
-        image3D, ITKSetVolume, 3, destinationImage, timeStep);
+    { //take care of the full segmentation volume
+      if (image3D->GetDimension() == 2)
+      {
+        AccessFixedDimensionByItk_2(
+          image3D, ITKSetVolume, 2, destinationImage, timeStep);
+      }
+      else
+      {
+        AccessFixedDimensionByItk_2(
+          image3D, ITKSetVolume, 3, destinationImage, timeStep);
+      }
     }
   }
   catch (...)
@@ -408,6 +423,7 @@ void mitk::AutoSegmentationWithPreviewTool::UpdatePreview(bool ignoreLazyPreview
   int progress_steps = 200;
 
   this->CurrentlyBusy.Send(true);
+  m_IsUpdating = true;
 
   this->UpdatePrepare();
 
@@ -423,17 +439,35 @@ void mitk::AutoSegmentationWithPreviewTool::UpdatePreview(bool ignoreLazyPreview
       {
         for (unsigned int timeStep = 0; timeStep < inputImage->GetTimeSteps(); ++timeStep)
         {
-          auto feedBackImage3D = this->GetImageByTimeStep(inputImage, timeStep);
+          Image::ConstPointer feedBackImage;
 
-          this->DoUpdatePreview(feedBackImage3D, previewImage, timeStep);
+          if (nullptr != this->GetWorkingPlaneGeometry())
+          { //only extract a specific slice defined by the working plane as feedback image.
+            feedBackImage = SegTool2D::GetAffectedImageSliceAs2DImage(this->GetWorkingPlaneGeometry(), inputImage, timeStep);
+          }
+          else
+          { //work on the whole feedback image
+            feedBackImage = this->GetImageByTimeStep(inputImage, timeStep);
+          }
+
+          this->DoUpdatePreview(feedBackImage, previewImage, timeStep);
         }
       }
       else
       {
-        auto feedBackImage3D = this->GetImageByTimePoint(inputImage, timePoint);
+        Image::ConstPointer feedBackImage;
+        if (nullptr != this->GetWorkingPlaneGeometry())
+        {
+          feedBackImage = SegTool2D::GetAffectedImageSliceAs2DImageByTimePoint(this->GetWorkingPlaneGeometry(), inputImage, timePoint);
+        }
+        else
+        {
+          feedBackImage = this->GetImageByTimePoint(inputImage, timePoint);
+        }
+
         auto timeStep = previewImage->GetTimeGeometry()->TimePointToTimeStep(timePoint);
 
-        this->DoUpdatePreview(feedBackImage3D, previewImage, timeStep);
+        this->DoUpdatePreview(feedBackImage, previewImage, timeStep);
       }
       RenderingManager::GetInstance()->RequestUpdateAll();
     }
@@ -450,6 +484,7 @@ void mitk::AutoSegmentationWithPreviewTool::UpdatePreview(bool ignoreLazyPreview
   catch (...)
   {
     m_ProgressCommand->SetProgress(progress_steps);
+    m_IsUpdating = false;
     CurrentlyBusy.Send(false);
     throw;
   }
@@ -457,7 +492,13 @@ void mitk::AutoSegmentationWithPreviewTool::UpdatePreview(bool ignoreLazyPreview
   this->UpdateCleanUp();
   m_LastTimePointOfUpdate = timePoint;
   m_ProgressCommand->SetProgress(progress_steps);
+  m_IsUpdating = false;
   CurrentlyBusy.Send(false);
+}
+
+bool mitk::AutoSegmentationWithPreviewTool::IsUpdating() const
+{
+  return m_IsUpdating;
 }
 
 void mitk::AutoSegmentationWithPreviewTool::UpdatePrepare()

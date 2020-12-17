@@ -54,6 +54,7 @@ namespace mitk
 
   protected:
     AutoSegmentationTool(); // purposely hidden
+    AutoSegmentationTool(const char* interactorType, const us::Module* interactorModule = nullptr); // purposely hidden
     ~AutoSegmentationTool() override;
 
     const char *GetGroup() const override;

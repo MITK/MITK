@@ -19,6 +19,10 @@ mitk::AutoSegmentationTool::AutoSegmentationTool() : Tool("dummy"), m_OverwriteE
 {
 }
 
+mitk::AutoSegmentationTool::AutoSegmentationTool(const char* interactorType, const us::Module* interactorModule) : Tool(interactorType, interactorModule), m_OverwriteExistingSegmentation(false)
+{
+}
+
 mitk::AutoSegmentationTool::~AutoSegmentationTool()
 {
 }

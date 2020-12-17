@@ -6,7 +6,7 @@ namespace mitk {
 
 StructuredReport::StructuredReport()
 {
-  reportData = std::shared_ptr<DSRDocument>();
+  reportData = std::make_shared<DSRDocument>();
 }
 
 StructuredReport::~StructuredReport()

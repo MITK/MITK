@@ -54,7 +54,7 @@ namespace mitk
     DiffSliceOperation(mitk::Image *imageVolume,
                        mitk::Image *slice,
                        SlicedGeometry3D *sliceGeometry,
-                       unsigned int timestep,
+                       TimeStepType timestep,
                        BaseGeometry *currentWorldGeometry);
 
     /** \brief Check if it is a valid operation.*/
@@ -70,9 +70,9 @@ namespace mitk
     Image::Pointer GetSlice();
 
     /** \brief Get timeStep.*/
-    void SetTimeStep(unsigned int timestep) { this->m_TimeStep = timestep; }
+    void SetTimeStep(TimeStepType timestep) { this->m_TimeStep = timestep; }
     /** \brief Set timeStep*/
-    unsigned int GetTimeStep() { return this->m_TimeStep; }
+    TimeStepType GetTimeStep() { return this->m_TimeStep; }
     /** \brief Set the axis where the slice has to be applied in the volume.*/
     void SetSliceGeometry(SlicedGeometry3D *sliceGeometry) { this->m_SliceGeometry = sliceGeometry; }
     /** \brief Get the axis where the slice has to be applied in the volume.*/
@@ -95,7 +95,7 @@ namespace mitk
 
     SlicedGeometry3D::Pointer m_SliceGeometry;
 
-    unsigned int m_TimeStep;
+    TimeStepType m_TimeStep;
 
     BaseGeometry::Pointer m_WorldGeometry;
 

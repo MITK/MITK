@@ -30,7 +30,7 @@ mitk::DiffSliceOperation::DiffSliceOperation() : Operation(1)
 mitk::DiffSliceOperation::DiffSliceOperation(mitk::Image *imageVolume,
                                              Image *slice,
                                              SlicedGeometry3D *sliceGeometry,
-                                             unsigned int timestep,
+                                             TimeStepType timestep,
                                              BaseGeometry *currentWorldGeometry)
   : Operation(1)
 

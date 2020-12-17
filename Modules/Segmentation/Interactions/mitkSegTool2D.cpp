@@ -213,7 +213,21 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Inter
   return GetAffectedImageSliceAs2DImage(positionEvent->GetSender()->GetCurrentWorldPlaneGeometry(), image, timeStep, component);
 }
 
-mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const PlaneGeometry *planeGeometry, const Image *image, unsigned int timeStep, unsigned int component /*= 0*/)
+mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImageByTimePoint(const PlaneGeometry* planeGeometry, const Image* image, TimePointType timePoint, unsigned int component /*= 0*/)
+{
+  if (!image || !planeGeometry)
+  {
+    return nullptr;
+  }
+
+  if (!image->GetTimeGeometry()->IsValidTimePoint(timePoint))
+    return nullptr;
+
+  return SegTool2D::GetAffectedImageSliceAs2DImage(planeGeometry, image, image->GetTimeGeometry()->TimePointToTimeStep(timePoint), component);
+}
+
+
+mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const PlaneGeometry *planeGeometry, const Image *image, TimeStepType timeStep, unsigned int component /*= 0*/)
 {
   if (!image || !planeGeometry)
   {

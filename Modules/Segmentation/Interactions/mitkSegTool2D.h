@@ -85,6 +85,40 @@ namespace mitk
                                            const PlaneGeometry *plane,
                                            bool detectIntersection);
 
+    /**
+    * \brief Extract the slice of an image that the user just scribbles on. The given component denotes the vector component of a dwi-image.
+    *
+    * \param positionEvent Event that specifies the plane that should be used to slice
+    * \param image Image that should be sliced
+    * \param timeStep TimeStep of the image that shold be sliced
+    * \param component  The component to be extracted of a given multi-component image. -1 is the default parameter to denote an invalid component.
+    *
+    * \return 'nullptr' if SegTool2D is either unable to determine which slice was affected, or if there was some problem
+    *         getting the image data at that position.
+    */
+    static Image::Pointer GetAffectedImageSliceAs2DImage(const InteractionPositionEvent* positionEvent, const Image* image, unsigned int component = 0);
+
+    /**
+    * \brief Extract the slice of an image cut by given plane. The given component denotes the vector component of a dwi-image.
+    *
+    * \param planeGeometry Geometry defining the slice that should be cut out.
+    * \param image Image that should be sliced
+    * \param timeStep TimeStep of the image that shold be sliced
+    * \param component  The component to be extracted of a given multi-component image. -1 is the default parameter to denote an invalid component.
+    *
+    * \return 'nullptr' if SegTool2D is either unable to determine which slice was affected, or if there was some problem
+    *         getting the image data at that position.
+    */
+    static Image::Pointer GetAffectedImageSliceAs2DImage(const PlaneGeometry* planeGeometry,
+      const Image* image,
+      TimeStepType timeStep,
+      unsigned int component = 0);
+    static Image::Pointer GetAffectedImageSliceAs2DImageByTimePoint(const PlaneGeometry* planeGeometry,
+      const Image* image,
+      TimePointType timePoint,
+      unsigned int component = 0);
+
+
     void SetShowMarkerNodes(bool);
 
     /**
@@ -102,10 +136,10 @@ namespace mitk
     {
       mitk::Image::Pointer slice;
       mitk::PlaneGeometry *plane;
-      unsigned int timestep;
+      mitk::TimeStepType timestep;
 
       SliceInformation() {}
-      SliceInformation(mitk::Image *slice, mitk::PlaneGeometry *plane, unsigned int timestep)
+      SliceInformation(mitk::Image *slice, mitk::PlaneGeometry *plane, mitk::TimeStepType timestep)
       {
         this->slice = slice;
         this->plane = plane;
@@ -120,34 +154,6 @@ namespace mitk
     * not of type InteractionPositionEvent
     */
     bool FilterEvents(InteractionEvent *interactionEvent, DataNode *dataNode) override;
-
-    /**
-    * \brief Extract the slice of an image that the user just scribbles on. The given component denotes the vector component of a dwi-image.
-    *
-    * \param positionEvent
-    * \param image
-    * \param component  The component to be extracted of a given multi-component image. -1 is the default parameter to denote an invalid component.
-    *
-    * \return 'nullptr' if SegTool2D is either unable to determine which slice was affected, or if there was some problem
-    *         getting the image data at that position.
-    */
-    Image::Pointer GetAffectedImageSliceAs2DImage(const InteractionPositionEvent *positionEvent, const Image *image, unsigned int component = 0);
-
-    /**
-    * \brief Extract the slice of an image cut by given plane. The given component denotes the vector component of a dwi-image.
-    *
-    * \param planeGeometry
-    * \param image
-    * \param timeStep
-    * \param component  The component to be extracted of a given multi-component image. -1 is the default parameter to denote an invalid component.
-    *
-    * \return 'nullptr' if SegTool2D is either unable to determine which slice was affected, or if there was some problem
-    *         getting the image data at that position.
-    */
-    Image::Pointer GetAffectedImageSliceAs2DImage(const PlaneGeometry *planeGeometry,
-                                                  const Image *image,
-                                                  unsigned int timeStep,
-                                                  unsigned int component = 0);
 
     /**
       \brief Extract the slice of the currently selected working image that the user just scribbles on.

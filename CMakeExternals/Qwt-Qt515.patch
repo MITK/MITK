@@ -1,0 +1,53 @@
+diff --git a/src/qwt_null_paintdevice.h b/src/qwt_null_paintdevice.h
+index d7f03be..6a7d439 100644
+--- a/src/qwt_null_paintdevice.h
++++ b/src/qwt_null_paintdevice.h
+@@ -14,6 +14,9 @@
+ #include <qpaintdevice.h>
+ #include <qpaintengine.h>
+ 
++#include <QPainterPath>
++class QPainterPath;
++
+ /*!
+   \brief A null paint device doing nothing
+ 
+diff --git a/src/qwt_painter.h b/src/qwt_painter.h
+index 9609b69..3098363 100644
+--- a/src/qwt_painter.h
++++ b/src/qwt_painter.h
+@@ -18,6 +18,8 @@
+ #include <qline.h>
+ #include <qpalette.h>
+ 
++#include <QPainterPath>
++
+ class QPainter;
+ class QBrush;
+ class QColor;
+diff --git a/src/qwt_painter_command.h b/src/qwt_painter_command.h
+index 2da597a..18622b9 100644
+--- a/src/qwt_painter_command.h
++++ b/src/qwt_painter_command.h
+@@ -16,7 +16,7 @@
+ #include <qimage.h>
+ #include <qpolygon.h>
+ 
+-class QPainterPath;
++#include <QPainterPath>
+ 
+ /*!
+   QwtPainterCommand represents the attributes of a paint operation
+diff --git a/src/qwt_plot_glcanvas.h b/src/qwt_plot_glcanvas.h
+index 2ff1cf2..1d9a518 100644
+--- a/src/qwt_plot_glcanvas.h
++++ b/src/qwt_plot_glcanvas.h
+@@ -14,6 +14,8 @@
+ #include <qframe.h>
+ #include <qgl.h>
+ 
++#include <QPainterPath>
++
+ class QwtPlot;
+ 
+ /*!

@@ -226,7 +226,7 @@ namespace mitk
       //## Returns -1 or mitk::BaseData::m_TimeSteps if there
       //## is no data at the current time.
       //## \sa GetTimeStep, m_TimeStep
-      int GetTimeStep(const BaseData *data) const;
+      TimeStepType GetTimeStep(const BaseData *data) const;
 
     //##Documentation
     //## @brief Get the time in ms of the currently displayed content

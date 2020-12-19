@@ -132,6 +132,7 @@ namespace mitk
      * @return the active label of the specified layer
      */
     mitk::Label *GetActiveLabel(unsigned int layer = 0);
+    const mitk::Label* GetActiveLabel(unsigned int layer = 0) const;
 
     /**
      * @brief Returns the mitk::Label with the given pixelValue and for the given layer
@@ -146,6 +147,7 @@ namespace mitk
      * @return the mitk::LabelSet of the active layer or nullptr if non is present
      */
     mitk::LabelSet *GetActiveLabelSet();
+    const mitk::LabelSet* GetActiveLabelSet() const;
 
     /**
      * @brief Gets the mitk::LabelSet for the given layer

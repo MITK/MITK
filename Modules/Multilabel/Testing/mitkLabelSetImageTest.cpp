@@ -136,6 +136,9 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("Wrong layer ID was returned", layerID == 1);
     CPPUNIT_ASSERT_MESSAGE("Wrong active labelset returned", mitk::Equal(*newlayer, *activeLayer, 0.00001, true));
+
+    mitk::LabelSet::ConstPointer constActiveLayer = const_cast<const mitk::LabelSetImage*>(m_LabelSetImage.GetPointer())->GetActiveLabelSet();
+    CPPUNIT_ASSERT_MESSAGE("Wrong active labelset returned", mitk::Equal(*newlayer, *constActiveLayer, 0.00001, true));
   }
 
   void TestGetActiveLabel()
@@ -158,6 +161,10 @@ public:
     m_LabelSetImage->GetActiveLabelSet()->SetActiveLabel(value2);
     CPPUNIT_ASSERT_MESSAGE("Layer was not added correctly to image - active label is wrong",
                            m_LabelSetImage->GetActiveLabel()->GetValue() == value2);
+
+    CPPUNIT_ASSERT_MESSAGE("Active Label was not correctly retreived with const getter",
+      const_cast<const mitk::LabelSetImage*>(m_LabelSetImage.GetPointer())->GetActiveLabel()->GetValue() == value2);
+
   }
 
   void TestInitializeByLabeledImage()

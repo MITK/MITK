@@ -96,14 +96,24 @@ mitk::ContourModel::Pointer mitk::ContourModelUtils::BackProjectContourFrom2DSli
 }
 
 void mitk::ContourModelUtils::FillContourInSlice(
-  ContourModel *projectedContour, Image *sliceImage, Image::Pointer workingImage, int paintingPixelValue)
+  const ContourModel *projectedContour, Image *sliceImage, const Image* workingImage, int paintingPixelValue)
 {
   FillContourInSlice(projectedContour, 0, sliceImage, workingImage, paintingPixelValue);
 }
 
 void mitk::ContourModelUtils::FillContourInSlice(
-  ContourModel *projectedContour, unsigned int t, Image *sliceImage, Image::Pointer workingImage, int paintingPixelValue)
+  const ContourModel *projectedContour, unsigned int t, Image *sliceImage, const Image* workingImage, int paintingPixelValue)
 {
+  if (nullptr == projectedContour)
+  {
+    mitkThrow() << "Cannot fill contour in slice. Passed contour is invalid";
+  }
+
+  if (nullptr == sliceImage)
+  {
+    mitkThrow() << "Cannot fill contour in slice. Passed slice is invalid";
+  }
+
   auto contourModelFilter = mitk::ContourModelToSurfaceFilter::New();
   contourModelFilter->SetInput(projectedContour);
   contourModelFilter->Update();
@@ -154,9 +164,9 @@ void mitk::ContourModelUtils::FillContourInSlice(
 }
 
 void mitk::ContourModelUtils::FillSliceInSlice(
-  vtkSmartPointer<vtkImageData> filledImage, vtkSmartPointer<vtkImageData> resultImage, mitk::Image::Pointer image, int paintingPixelValue)
+  vtkSmartPointer<vtkImageData> filledImage, vtkSmartPointer<vtkImageData> resultImage, const Image* image, int paintingPixelValue)
 {
-  auto labelImage = dynamic_cast<LabelSetImage *>(image.GetPointer());
+  auto labelImage = dynamic_cast<const LabelSetImage *>(image);
   auto numberOfPoints = filledImage->GetNumberOfPoints();
 
   if (nullptr == labelImage)
@@ -215,9 +225,9 @@ mitk::ContourModel::Pointer mitk::ContourModelUtils::MoveZerothContourTimeStep(c
   return resultContour;
 }
 
-int mitk::ContourModelUtils::GetActivePixelValue(mitk::Image* workingImage)
+int mitk::ContourModelUtils::GetActivePixelValue(const Image* workingImage)
 {
-  auto* labelSetImage = dynamic_cast<LabelSetImage*>(workingImage);
+  auto* labelSetImage = dynamic_cast<const LabelSetImage*>(workingImage);
   int activePixelValue = 1;
   if (nullptr != labelSetImage)
   {

@@ -59,19 +59,23 @@ namespace mitk
 
     /**
     \brief Fill a contour in a 2D slice with a specified pixel value at time step 0.
+    \pre sliceImage points to a valid instance
+    \pre projectedContour points to a valid instance
     */
-    static void FillContourInSlice(ContourModel *projectedContour,
+    static void FillContourInSlice(const ContourModel *projectedContour,
                                    Image *sliceImage,
-                                   mitk::Image::Pointer workingImage,
+                                   const Image* workingImage,
                                    int paintingPixelValue = 1);
 
     /**
     \brief Fill a contour in a 2D slice with a specified pixel value at a given time step.
+    \pre sliceImage points to a valid instance
+    \pre projectedContour points to a valid instance
     */
-    static void FillContourInSlice(ContourModel *projectedContour,
+    static void FillContourInSlice(const ContourModel *projectedContour,
                                    unsigned int timeStep,
                                    Image *sliceImage,
-                                   mitk::Image::Pointer workingImage,
+                                   const Image* workingImage,
                                    int paintingPixelValue = 1);
 
     /**
@@ -79,7 +83,7 @@ namespace mitk
     */
     static void FillSliceInSlice(vtkSmartPointer<vtkImageData> filledImage,
                                  vtkSmartPointer<vtkImageData> resultImage,
-                                 mitk::Image::Pointer image,
+                                 const Image* image,
                                  int paintingPixelValue);
 
     /**
@@ -95,7 +99,7 @@ namespace mitk
 
     \param workingImage   The (labelset) image to retrieve the active pixel value of.
     */
-    static int GetActivePixelValue(mitk::Image* workingImage);
+    static int GetActivePixelValue(const Image* workingImage);
 
   protected:
     ContourModelUtils();

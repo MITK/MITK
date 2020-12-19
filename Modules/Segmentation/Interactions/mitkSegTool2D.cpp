@@ -147,58 +147,94 @@ void mitk::SegTool2D::UpdateSurfaceInterpolation(const Image *slice,
                                                  const PlaneGeometry *plane,
                                                  bool detectIntersection)
 {
+  std::vector<SliceInformation> slices = { SliceInformation(slice, plane, 0)};
+  UpdateSurfaceInterpolation(slices, workingImage, detectIntersection);
+}
+
+void  mitk::SegTool2D::RemoveContourFromInterpolator(const SliceInformation& sliceInfo)
+{
+  mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo;
+  contourInfo.contourNormal = sliceInfo.plane->GetNormal();
+  contourInfo.contourPoint = sliceInfo.plane->GetOrigin();
+  mitk::SurfaceInterpolationController::GetInstance()->RemoveContour(contourInfo);
+}
+
+void mitk::SegTool2D::UpdateSurfaceInterpolation(const std::vector<SliceInformation>& sliceInfos,
+  const Image* workingImage,
+  bool detectIntersection)
+{
   if (!m_SurfaceInterpolationEnabled)
     return;
 
-  ImageToContourFilter::Pointer contourExtractor = ImageToContourFilter::New();
-  mitk::Surface::Pointer contour;
-
-  if (detectIntersection)
-  {
-    // Test whether there is something to extract or whether the slice just contains intersections of others
-    mitk::Image::Pointer slice2 = slice->Clone();
-    mitk::MorphologicalOperations::Erode(slice2, 2, mitk::MorphologicalOperations::Ball);
-
-    contourExtractor->SetInput(slice2);
-    contourExtractor->Update();
-    contour = contourExtractor->GetOutput();
-
-    if (contour->GetVtkPolyData()->GetNumberOfPoints() == 0)
-    {
-      // Remove contour!
-      mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo;
-      contourInfo.contourNormal = plane->GetNormal();
-      contourInfo.contourPoint = plane->GetOrigin();
-      mitk::SurfaceInterpolationController::GetInstance()->RemoveContour(contourInfo);
-      return;
-    }
-  }
-
-  contourExtractor->SetInput(slice);
-  contourExtractor->Update();
-  contour = contourExtractor->GetOutput();
-
+  //Remark the ImageTimeSelector is just needed to extract a timestep/channel of
+  //of the image in order to get the image dimension (time dimension and channel dimension stripped away).
+  //Therfore it is OK to always use time step 0 and channel 0
   mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
   timeSelector->SetInput(workingImage);
   timeSelector->SetTimeNr(0);
   timeSelector->SetChannelNr(0);
   timeSelector->Update();
-  Image::Pointer dimRefImg = timeSelector->GetOutput();
+  const auto dimRefImg = timeSelector->GetOutput()->GetDimension();
 
-  if (contour->GetVtkPolyData()->GetNumberOfPoints() != 0 && dimRefImg->GetDimension() == 3)
+  if (dimRefImg != 3)
+    return;
+
+  std::vector<mitk::Surface::Pointer> contourList;
+  contourList.reserve(sliceInfos.size());
+
+  ImageToContourFilter::Pointer contourExtractor = ImageToContourFilter::New();
+
+  std::vector<SliceInformation> relevantSlices = sliceInfos;
+
+  if (detectIntersection)
   {
-    mitk::SurfaceInterpolationController::GetInstance()->AddNewContour(contour);
-    contour->DisconnectPipeline();
+    relevantSlices.clear();
+
+    for (const auto& sliceInfo : sliceInfos)
+    {
+      // Test whether there is something to extract or whether the slice just contains intersections of others
+      mitk::Image::Pointer slice2 = sliceInfo.slice->Clone();
+      mitk::MorphologicalOperations::Erode(slice2, 2, mitk::MorphologicalOperations::Ball);
+
+      contourExtractor->SetInput(slice2);
+      contourExtractor->Update();
+      mitk::Surface::Pointer contour = contourExtractor->GetOutput();
+
+      if (contour->GetVtkPolyData()->GetNumberOfPoints() == 0)
+      {
+        RemoveContourFromInterpolator(sliceInfo);
+      }
+      else
+      {
+        relevantSlices.push_back(sliceInfo);
+      }
+    }
   }
-  else
+
+  if (relevantSlices.empty())
+    return;
+
+  for (const auto& sliceInfo : relevantSlices)
   {
-    // Remove contour!
-    mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo;
-    contourInfo.contourNormal = plane->GetNormal();
-    contourInfo.contourPoint = plane->GetOrigin();
-    mitk::SurfaceInterpolationController::GetInstance()->RemoveContour(contourInfo);
+
+    contourExtractor->SetInput(sliceInfo.slice);
+    contourExtractor->Update();
+    mitk::Surface::Pointer contour = contourExtractor->GetOutput();
+
+    if (contour->GetVtkPolyData()->GetNumberOfPoints() == 0)
+    {
+      RemoveContourFromInterpolator(sliceInfo);
+    }
+    else
+    {
+      contour->DisconnectPipeline();
+      contourList.push_back(contour);
+    }
   }
+  mitk::SurfaceInterpolationController::GetInstance()->AddNewContours(contourList);
 }
+
+
 
 mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const InteractionPositionEvent *positionEvent, const Image *image, unsigned int component /*= 0*/)
 {
@@ -208,7 +244,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Inter
   }
 
   assert(positionEvent->GetSender()); // sure, right?
-  unsigned int timeStep = positionEvent->GetSender()->GetTimeStep(image); // get the timestep of the visible part (time-wise) of the image
+  const auto timeStep = positionEvent->GetSender()->GetTimeStep(image); // get the timestep of the visible part (time-wise) of the image
 
   return GetAffectedImageSliceAs2DImage(positionEvent->GetSender()->GetCurrentWorldPlaneGeometry(), image, timeStep, component);
 }
@@ -259,15 +295,15 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Plane
   return slice;
 }
 
-mitk::Image::Pointer mitk::SegTool2D::GetAffectedWorkingSlice(const InteractionPositionEvent *positionEvent)
+mitk::Image::Pointer mitk::SegTool2D::GetAffectedWorkingSlice(const InteractionPositionEvent *positionEvent) const
 {
-  DataNode *workingNode(m_ToolManager->GetWorkingData(0));
+  const auto workingNode = this->GetTargetSegmentationNode();
   if (!workingNode)
   {
     return nullptr;
   }
 
-  auto *workingImage = dynamic_cast<Image *>(workingNode->GetData());
+  const auto *workingImage = dynamic_cast<Image *>(workingNode->GetData());
   if (!workingImage)
   {
     return nullptr;
@@ -276,7 +312,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedWorkingSlice(const InteractionP
   return GetAffectedImageSliceAs2DImage(positionEvent, workingImage);
 }
 
-mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const InteractionPositionEvent *positionEvent)
+mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const InteractionPositionEvent *positionEvent) const
 {
   DataNode *referenceNode(m_ToolManager->GetReferenceData(0));
   if (!referenceNode)
@@ -302,6 +338,11 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const Interactio
   }
 }
 
+mitk::DataNode* mitk::SegTool2D::GetTargetSegmentationNode() const
+{
+  return m_ToolManager->GetWorkingData(0);
+}
+
 void mitk::SegTool2D::WriteBackSegmentationResult(const InteractionPositionEvent *positionEvent, Image *slice)
 {
   if (!positionEvent)
@@ -313,26 +354,39 @@ void mitk::SegTool2D::WriteBackSegmentationResult(const InteractionPositionEvent
 
   if (planeGeometry && slice && !abstractTransformGeometry)
   {
-    DataNode *workingNode(m_ToolManager->GetWorkingData(0));
+    const auto workingNode = this->GetTargetSegmentationNode();
     auto *image = dynamic_cast<Image *>(workingNode->GetData());
-    unsigned int timeStep = positionEvent->GetSender()->GetTimeStep(image);
+    const auto timeStep = positionEvent->GetSender()->GetTimeStep(image);
     this->WriteBackSegmentationResult(planeGeometry, slice, timeStep);
   }
 }
 
 void mitk::SegTool2D::WriteBackSegmentationResult(const PlaneGeometry *planeGeometry,
                                                   Image *slice,
-                                                  unsigned int timeStep)
+                                                  TimeStepType timeStep)
 {
   if (!planeGeometry || !slice)
     return;
 
   SliceInformation sliceInfo(slice, const_cast<mitk::PlaneGeometry *>(planeGeometry), timeStep);
-  this->WriteSliceToVolume(sliceInfo);
-  DataNode *workingNode(m_ToolManager->GetWorkingData(0));
-  auto *image = dynamic_cast<Image *>(workingNode->GetData());
+  WriteBackSegmentationResults({ sliceInfo });
+}
 
-  this->UpdateSurfaceInterpolation(slice, image, planeGeometry, false);
+void mitk::SegTool2D::WriteBackSegmentationResults(const std::vector<SegTool2D::SliceInformation> &sliceList,
+                                                  bool writeSliceToVolume)
+{
+  const auto workingNode = this->GetTargetSegmentationNode();
+  auto* image = dynamic_cast<Image*>(workingNode->GetData());
+
+  for (const auto& sliceInfo : sliceList)
+  {
+    if (writeSliceToVolume && nullptr != sliceInfo.plane && sliceInfo.slice.IsNotNull())
+    {
+      this->WriteSliceToVolume(sliceInfo);
+    }
+  }
+
+  this->UpdateSurfaceInterpolation(sliceList, image, false);
 
   if (m_SurfaceInterpolationEnabled)
     this->AddContourmarker();
@@ -340,46 +394,9 @@ void mitk::SegTool2D::WriteBackSegmentationResult(const PlaneGeometry *planeGeom
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void mitk::SegTool2D::WriteBackSegmentationResult(const std::vector<SegTool2D::SliceInformation> &sliceList,
-                                                  bool writeSliceToVolume)
-{
-  std::vector<mitk::Surface::Pointer> contourList;
-  contourList.reserve(sliceList.size());
-  ImageToContourFilter::Pointer contourExtractor = ImageToContourFilter::New();
-
-  DataNode *workingNode(m_ToolManager->GetWorkingData(0));
-  auto *image = dynamic_cast<Image *>(workingNode->GetData());
-
-  mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
-  timeSelector->SetInput(image);
-  timeSelector->SetTimeNr(0);
-  timeSelector->SetChannelNr(0);
-  timeSelector->Update();
-  Image::Pointer dimRefImg = timeSelector->GetOutput();
-
-  for (unsigned int i = 0; i < sliceList.size(); ++i)
-  {
-    SliceInformation currentSliceInfo = sliceList.at(i);
-    if (writeSliceToVolume)
-      this->WriteSliceToVolume(currentSliceInfo);
-    if (m_SurfaceInterpolationEnabled && dimRefImg->GetDimension() == 3)
-    {
-      currentSliceInfo.slice->DisconnectPipeline();
-      contourExtractor->SetInput(currentSliceInfo.slice);
-      contourExtractor->Update();
-      mitk::Surface::Pointer contour = contourExtractor->GetOutput();
-      contour->DisconnectPipeline();
-
-      contourList.push_back(contour);
-    }
-  }
-  mitk::SurfaceInterpolationController::GetInstance()->AddNewContours(contourList);
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
 void mitk::SegTool2D::WriteSliceToVolume(const mitk::SegTool2D::SliceInformation &sliceInfo)
 {
-  DataNode *workingNode(m_ToolManager->GetWorkingData(0));
+  const auto workingNode = this->GetTargetSegmentationNode();
   auto *image = dynamic_cast<Image *>(workingNode->GetData());
 
   /*============= BEGIN undo/redo feature block ========================*/
@@ -398,7 +415,12 @@ void mitk::SegTool2D::WriteSliceToVolume(const mitk::SegTool2D::SliceInformation
   vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
 
   // Set the slice as 'input'
-  reslice->SetInputSlice(sliceInfo.slice->GetVtkImageData());
+  // casting const away is needed and OK as long the OverwriteMode of
+  // mitkVTKImageOverwrite is true.
+  // Reason: because then the input slice is not touched but
+  // used to overwrite the input of the ExtractSliceFilter.
+  auto noneConstSlice = const_cast<Image*>(sliceInfo.slice.GetPointer());
+  reslice->SetInputSlice(noneConstSlice->GetVtkImageData());
 
   // set overwrite mode to true to write back to the image volume
   reslice->SetOverwriteMode(true);
@@ -456,6 +478,7 @@ void mitk::SegTool2D::SetEnable3DInterpolation(bool enabled)
   m_SurfaceInterpolationEnabled = enabled;
 }
 
+
 int mitk::SegTool2D::AddContourmarker()
 {
   if (m_LastEventSender == nullptr)
@@ -487,7 +510,7 @@ int mitk::SegTool2D::AddContourmarker()
   contourMarker->SetPlaneGeometry(const_cast<PlaneGeometry *>(plane));
 
   std::stringstream markerStream;
-  mitk::DataNode *workingNode(m_ToolManager->GetWorkingData(0));
+  auto workingNode = this->GetTargetSegmentationNode();
 
   markerStream << m_Contourmarkername;
   markerStream << " ";

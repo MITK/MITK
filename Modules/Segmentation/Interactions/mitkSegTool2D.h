@@ -132,20 +132,38 @@ namespace mitk
     SegTool2D(const char *, const us::Module *interactorModule = nullptr); // purposely hidden
     ~SegTool2D() override;
 
+    /**
+     * @brief returns the segmentation node that should be modified by the tool.
+     */
+    mitk::DataNode* GetTargetSegmentationNode() const;
+
     struct SliceInformation
     {
-      mitk::Image::Pointer slice;
-      mitk::PlaneGeometry *plane;
+      mitk::Image::ConstPointer slice;
+      const mitk::PlaneGeometry *plane;
       mitk::TimeStepType timestep;
 
       SliceInformation() {}
-      SliceInformation(mitk::Image *slice, mitk::PlaneGeometry *plane, mitk::TimeStepType timestep)
+      SliceInformation(const mitk::Image *slice, const mitk::PlaneGeometry *plane, mitk::TimeStepType timestep)
       {
         this->slice = slice;
         this->plane = plane;
         this->timestep = timestep;
       }
     };
+
+    /**
+     * @brief Updates the surface interpolation by extracting the contour form the given slice.
+     * @param sliceInfos vector of slice information instances from which the contours should be extracted
+     * @param workingImage the segmentation image
+     * @param detectIntersection if true the slice is eroded before contour extraction. If the slice is empty after the
+     * erosion it is most
+     *        likely an intersecting contour an will not be added to the SurfaceInterpolationController
+     */
+    static void UpdateSurfaceInterpolation(const std::vector<SliceInformation>& sliceInfos,
+      const Image* workingImage,
+      bool detectIntersection);
+
 
     /**
     * \brief Filters events that cannot be handle by 2D segmentation tools
@@ -161,7 +179,7 @@ namespace mitk
       getting the image data at that position,
                    or just no working image is selected.
     */
-    Image::Pointer GetAffectedWorkingSlice(const InteractionPositionEvent *);
+    Image::Pointer GetAffectedWorkingSlice(const InteractionPositionEvent *) const;
 
     /**
       \brief Extract the slice of the currently selected reference image that the user just scribbles on.
@@ -169,13 +187,13 @@ namespace mitk
       getting the image data at that position,
                    or just no reference image is selected.
     */
-    Image::Pointer GetAffectedReferenceSlice(const InteractionPositionEvent *);
+    Image::Pointer GetAffectedReferenceSlice(const InteractionPositionEvent *) const;
 
     void WriteBackSegmentationResult(const InteractionPositionEvent *, Image *);
 
-    void WriteBackSegmentationResult(const PlaneGeometry *planeGeometry, Image *, unsigned int timeStep);
+    void WriteBackSegmentationResult(const PlaneGeometry *planeGeometry, Image *, TimeStepType timeStep);
 
-    void WriteBackSegmentationResult(const std::vector<SliceInformation> &sliceList, bool writeSliceToVolume = true);
+    void WriteBackSegmentationResults(const std::vector<SliceInformation> &sliceList, bool writeSliceToVolume = true);
 
     void WritePreviewOnWorkingImage(
       Image *targetSlice, Image *sourceSlice, Image *workingImage, int paintingPixelValue, int timestep);
@@ -193,6 +211,8 @@ namespace mitk
     unsigned int m_LastEventSlice;
 
   private:
+    static void  RemoveContourFromInterpolator(const SliceInformation& sliceInfo);
+
     // The prefix of the contourmarkername. Suffix is a consecutive number
     const std::string m_Contourmarkername;
 

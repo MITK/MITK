@@ -143,8 +143,8 @@ void mitk::LiveWireTool2D::ConfirmSegmentation()
   if (nullptr == referenceNode || nullptr == workingNode)
     return;
 
-  auto referenceImage = dynamic_cast<Image *>(referenceNode->GetData());
-  auto workingImage = dynamic_cast<Image *>(workingNode->GetData());
+  auto referenceImage = dynamic_cast<const Image *>(referenceNode->GetData());
+  auto workingImage = dynamic_cast<const Image *>(workingNode->GetData());
 
   if (nullptr == referenceImage || nullptr == workingImage)
     return;
@@ -169,19 +169,30 @@ void mitk::LiveWireTool2D::ConfirmSegmentation()
       TimePointType referenceImageTimePoint = referenceImage->GetTimeGeometry()->TimeStepToTimePoint(t);
       TimeStepType workingImageTimeStep = workingImage->GetTimeGeometry()->TimePointToTimeStep(referenceImageTimePoint);
 
-      auto workingSlice = this->GetAffectedImageSliceAs2DImage(workingContour.second, workingImage, workingImageTimeStep);
+      auto sameSlicePredicate = [&workingContour, referenceImageTimePoint](const SliceInformation& si) { return workingContour.second->IsOnPlane(si.plane) && referenceImageTimePoint == si.timestep; };
+
+      auto finding = std::find_if(sliceInfos.begin(), sliceInfos.end(), sameSlicePredicate);
+      if (finding == sliceInfos.end())
+      {
+        auto workingSlice = this->GetAffectedImageSliceAs2DImage(workingContour.second, workingImage, workingImageTimeStep)->Clone();
+        sliceInfos.emplace_back(workingSlice, workingContour.second, referenceImageTimePoint);
+        finding = std::prev(sliceInfos.end());
+      }
+
+      //cast const away is OK in this case, because these are all slices created and manipulated
+      //localy in this function call. And we want to keep the high constness of SliceInformation for
+      //public interfaces.
+      auto workingSlice = const_cast<Image*>(finding->slice.GetPointer());
+
       auto projectedContour = ContourModelUtils::ProjectContourTo2DSlice(workingSlice, contour, true, false);
       int activePixelValue = ContourModelUtils::GetActivePixelValue(workingImage);
 
       ContourModelUtils::FillContourInSlice(
         projectedContour, referenceImageTimePoint, workingSlice, workingImage, activePixelValue);
-
-      sliceInfos.emplace_back(workingSlice, workingContour.second, referenceImageTimePoint);
-      this->WriteSliceToVolume(sliceInfos.back());
     }
   }
 
-  this->WriteBackSegmentationResult(sliceInfos, false);
+  this->WriteBackSegmentationResults(sliceInfos);
   this->ClearSegmentation();
 }
 
@@ -404,9 +415,6 @@ void mitk::LiveWireTool2D::OnFinish(StateMachineAction *, InteractionEvent *inte
 
   if (nullptr == positionEvent)
     return;
-
-  // Have to do that here so that the m_LastEventSender is set correctly
-  mitk::SegTool2D::AddContourmarker();
 
   auto t = static_cast<int>(positionEvent->GetSender()->GetTimeStep());
 

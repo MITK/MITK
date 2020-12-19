@@ -27,11 +27,11 @@ mitk::DiffSliceOperation::DiffSliceOperation() : Operation(1)
   m_DeleteObserverTag = 0;
 }
 
-mitk::DiffSliceOperation::DiffSliceOperation(mitk::Image *imageVolume,
-                                             Image *slice,
-                                             SlicedGeometry3D *sliceGeometry,
+mitk::DiffSliceOperation::DiffSliceOperation(Image *imageVolume,
+                                             const Image *slice,
+                                             const SlicedGeometry3D *sliceGeometry,
                                              TimeStepType timestep,
-                                             BaseGeometry *currentWorldGeometry)
+                                             const BaseGeometry *currentWorldGeometry)
   : Operation(1)
 
 {
@@ -41,7 +41,7 @@ mitk::DiffSliceOperation::DiffSliceOperation(mitk::Image *imageVolume,
   Quick fix for bug 12338.
   Guard object - fix this when clone method of PlaneGeometry is cloning the reference geometry (see bug 13392)*/
   // xxxx m_GuardReferenceGeometry = mitk::BaseGeometry::New();
-  m_GuardReferenceGeometry = dynamic_cast<mitk::PlaneGeometry *>(m_WorldGeometry.GetPointer())->GetReferenceGeometry();
+  m_GuardReferenceGeometry = dynamic_cast<const mitk::PlaneGeometry *>(m_WorldGeometry.GetPointer())->GetReferenceGeometry();
   /*---------------------------------------------------------------------------------------------------*/
 
   m_SliceGeometry = sliceGeometry->Clone();

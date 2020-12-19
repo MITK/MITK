@@ -45,7 +45,7 @@ namespace mitk
        * Will not hold any further SmartPointers to the image.
        *
        */
-      void SetImage(Image *);
+      void SetImage(const Image *);
 
     /**
      * \brief Creates a full mitk::Image from its compressed version.
@@ -54,7 +54,7 @@ namespace mitk
      * executed every time you call this method. Don't overdo it.
      *
      */
-    Image::Pointer GetImage();
+    Image::Pointer GetImage() const;
 
   protected:
     CompressedImageContainer(); // purposely hidden

@@ -127,6 +127,13 @@ namespace mitk
      */
     void SetEnable3DInterpolation(bool);
 
+    void Activated() override;
+    void Deactivated() override;
+
+    itkSetMacro(IsTimePointChangeAware, bool);
+    itkGetMacro(IsTimePointChangeAware, bool);
+    itkBooleanMacro(IsTimePointChangeAware);
+
   protected:
     SegTool2D();             // purposely hidden
     SegTool2D(const char *, const us::Module *interactorModule = nullptr); // purposely hidden
@@ -136,6 +143,11 @@ namespace mitk
      * @brief returns the segmentation node that should be modified by the tool.
      */
     mitk::DataNode* GetTargetSegmentationNode() const;
+
+    /**
+     * This function can be reimplemented by derived classes to react on changes of the current
+     * time point. Default implementation does nothing.*/
+    virtual void OnTimePointChanged();
 
     struct SliceInformation
     {
@@ -207,17 +219,27 @@ namespace mitk
 
     void InteractiveSegmentationBugMessage(const std::string &message);
 
-    BaseRenderer *m_LastEventSender;
-    unsigned int m_LastEventSlice;
+    BaseRenderer *m_LastEventSender = nullptr;
+    unsigned int m_LastEventSlice = 0;
+
 
   private:
+    /** Internal method that gets triggered as soon as the tool manager indicates a
+     * time point change. If the time point has changed since last time and tool
+     * is set to be time point change aware, OnTimePointChanged() will be called.*/
+    void OnTimePointChangedInternal();
+
     static void  RemoveContourFromInterpolator(const SliceInformation& sliceInfo);
 
     // The prefix of the contourmarkername. Suffix is a consecutive number
     const std::string m_Contourmarkername;
 
-    bool m_ShowMarkerNodes;
+    bool m_ShowMarkerNodes = false;
     static bool m_SurfaceInterpolationEnabled;
+
+    bool m_IsTimePointChangeAware = true;
+
+    TimePointType m_LastTimePointTriggered = 0.;
   };
 
 } // namespace

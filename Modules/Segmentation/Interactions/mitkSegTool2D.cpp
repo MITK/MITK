@@ -57,7 +57,7 @@ found in the LICENSE file.
 bool mitk::SegTool2D::m_SurfaceInterpolationEnabled = true;
 
 mitk::SegTool2D::SegTool2D(const char *type, const us::Module *interactorModule)
-  : Tool(type, interactorModule), m_LastEventSender(nullptr), m_LastEventSlice(0), m_Contourmarkername("Position"), m_ShowMarkerNodes(false)
+  : Tool(type, interactorModule), m_Contourmarkername("Position")
 {
   Tool::m_EventConfig = "DisplayConfigMITKNoCrosshair.xml";
 }
@@ -336,6 +336,42 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const Interactio
   {
     return GetAffectedImageSliceAs2DImage(positionEvent, referenceImage);
   }
+}
+
+void mitk::SegTool2D::Activated()
+{
+  Superclass::Activated();
+
+  m_ToolManager->SelectedTimePointChanged +=
+    mitk::MessageDelegate<mitk::SegTool2D>(this, &mitk::SegTool2D::OnTimePointChangedInternal);
+
+  m_LastTimePointTriggered = 0.;
+}
+
+void mitk::SegTool2D::Deactivated()
+{
+  m_ToolManager->SelectedTimePointChanged -=
+    mitk::MessageDelegate<mitk::SegTool2D>(this, &mitk::SegTool2D::OnTimePointChangedInternal);
+  Superclass::Deactivated();
+}
+
+void mitk::SegTool2D::OnTimePointChangedInternal()
+{
+  if (m_IsTimePointChangeAware && nullptr != this->GetTargetSegmentationNode())
+  {
+    const auto timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+
+    if (timePoint != m_LastTimePointTriggered)
+    {
+      m_LastTimePointTriggered = timePoint;
+      this->OnTimePointChanged();
+    }
+  }
+}
+
+void mitk::SegTool2D::OnTimePointChanged()
+{
+  //default implementation does nothing
 }
 
 mitk::DataNode* mitk::SegTool2D::GetTargetSegmentationNode() const

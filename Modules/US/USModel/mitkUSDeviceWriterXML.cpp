@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <mitkUSDevice.h>
 
 // Third Party
-#include <tinyxml.h>
+#include <tinyxml2.h>
 #include <itksys/SystemTools.hxx>
 #include <fstream>
 #include <iostream>
@@ -59,102 +59,98 @@ void mitk::USDeviceWriterXML::SetFilename(std::string filename)
 
 bool mitk::USDeviceWriterXML::WriteUltrasoundDeviceConfiguration(mitk::USDeviceReaderXML::USDeviceConfigData & config)
 {
-  TiXmlDocument document;
-  TiXmlDeclaration* xmlDeclaration = new TiXmlDeclaration("1.0", "", "");
-  document.LinkEndChild(xmlDeclaration);
-
+  tinyxml2::XMLDocument document;
+  document.InsertEndChild(document.NewDeclaration());
 
   //Create the xml information of the ULTRASOUNDDEVICE-Tag:
-  TiXmlElement *ultrasoundDeviceTag = new TiXmlElement(TAG_ULTRASOUNDDEVICE);
+  auto *ultrasoundDeviceTag = document.NewElement(USDeviceReaderWriterConstants::TAG_ULTRASOUNDDEVICE);
   this->CreateXmlInformationOfUltrasoundDeviceTag(document, ultrasoundDeviceTag, config);
 
 
   //Create the xml information of the GENERALSETTINGS-Tag:
-  TiXmlElement *generalSettingsTag = new TiXmlElement(TAG_GENERALSETTINGS);
+  auto *generalSettingsTag = document.NewElement(USDeviceReaderWriterConstants::TAG_GENERALSETTINGS);
   this->CreateXmlInformationOfGeneralSettingsTag(ultrasoundDeviceTag, generalSettingsTag, config);
 
   //Create the xml information of the PROBES-Tag:
   this->CreateXmlInformationOfProbesTag(ultrasoundDeviceTag, config);
 
-  return document.SaveFile(m_Filename);
+  return document.SaveFile(m_Filename.c_str()) == tinyxml2::XML_SUCCESS;
 }
 
 void mitk::USDeviceWriterXML::CreateXmlInformationOfUltrasoundDeviceTag(
-  TiXmlDocument &document, TiXmlElement * ultrasoundDeviceTag,
+  tinyxml2::XMLDocument &document, tinyxml2::XMLElement* ultrasoundDeviceTag,
   mitk::USDeviceReaderXML::USDeviceConfigData &config)
 {
-  ultrasoundDeviceTag->SetAttribute(ATTR_FILEVERS, config.fileversion);
-  ultrasoundDeviceTag->SetAttribute(ATTR_TYPE, config.deviceType);
-  ultrasoundDeviceTag->SetAttribute(ATTR_NAME, config.deviceName);
-  ultrasoundDeviceTag->SetAttribute(ATTR_MANUFACTURER, config.manufacturer);
-  ultrasoundDeviceTag->SetAttribute(ATTR_MODEL, config.model);
-  ultrasoundDeviceTag->SetAttribute(ATTR_COMMENT, config.comment);
-  ultrasoundDeviceTag->SetAttribute(ATTR_IMAGESTREAMS, config.numberOfImageStreams);
+  ultrasoundDeviceTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_FILEVERS, config.fileversion);
+  ultrasoundDeviceTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_TYPE, config.deviceType.c_str());
+  ultrasoundDeviceTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_NAME, config.deviceName.c_str());
+  ultrasoundDeviceTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_MANUFACTURER, config.manufacturer.c_str());
+  ultrasoundDeviceTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_MODEL, config.model.c_str());
+  ultrasoundDeviceTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_COMMENT, config.comment.c_str());
+  ultrasoundDeviceTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_IMAGESTREAMS, config.numberOfImageStreams);
 
   if (config.deviceType.compare("oigtl") == 0)
   {
-    ultrasoundDeviceTag->SetAttribute(ATTR_HOST, config.host);
-    ultrasoundDeviceTag->SetAttribute(ATTR_PORT, config.port);
-    std::string value = config.server ? "true" : "false";
-    ultrasoundDeviceTag->SetAttribute(ATTR_SERVER, value);
+    ultrasoundDeviceTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_HOST, config.host.c_str());
+    ultrasoundDeviceTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_PORT, config.port);
+    ultrasoundDeviceTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_SERVER, config.server);
   }
 
-  document.LinkEndChild(ultrasoundDeviceTag);
+  document.InsertEndChild(ultrasoundDeviceTag);
 }
 
-void mitk::USDeviceWriterXML::CreateXmlInformationOfGeneralSettingsTag(TiXmlElement *parentTag, TiXmlElement *generalSettingsTag, mitk::USDeviceReaderXML::USDeviceConfigData & config)
+void mitk::USDeviceWriterXML::CreateXmlInformationOfGeneralSettingsTag(tinyxml2::XMLElement *parentTag, tinyxml2::XMLElement *generalSettingsTag, mitk::USDeviceReaderXML::USDeviceConfigData & config)
 {
-  std::string value = config.useGreyscale ? "true" : "false";
-  generalSettingsTag->SetAttribute(ATTR_GREYSCALE, value);
-  value = config.useResolutionOverride ? "true" : "false";
-  generalSettingsTag->SetAttribute(ATTR_RESOLUTIONOVERRIDE, value);
-  generalSettingsTag->SetAttribute(ATTR_RESOLUTIONWIDTH, config.resolutionWidth);
-  generalSettingsTag->SetAttribute(ATTR_RESOLUTIONHEIGHT, config.resolutionHeight);
+  generalSettingsTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_GREYSCALE, config.useGreyscale);
+  generalSettingsTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_RESOLUTIONOVERRIDE, config.useResolutionOverride);
+  generalSettingsTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_RESOLUTIONWIDTH, config.resolutionWidth);
+  generalSettingsTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_RESOLUTIONHEIGHT, config.resolutionHeight);
 
-  generalSettingsTag->SetAttribute(ATTR_SOURCEID, config.sourceID);
-  generalSettingsTag->SetAttribute(ATTR_FILEPATH, config.filepathVideoSource);
-  generalSettingsTag->SetAttribute(ATTR_OPENCVPORT, config.opencvPort);
+  generalSettingsTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_SOURCEID, config.sourceID);
+  generalSettingsTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_FILEPATH, config.filepathVideoSource.c_str());
+  generalSettingsTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_OPENCVPORT, config.opencvPort);
 
-  parentTag->LinkEndChild(generalSettingsTag);
+  parentTag->InsertEndChild(generalSettingsTag);
 }
 
-void mitk::USDeviceWriterXML::CreateXmlInformationOfProbesTag(TiXmlElement * parentTag, mitk::USDeviceReaderXML::USDeviceConfigData & config)
+void mitk::USDeviceWriterXML::CreateXmlInformationOfProbesTag(tinyxml2::XMLElement *parentTag, mitk::USDeviceReaderXML::USDeviceConfigData & config)
 {
   if (config.probes.size() != 0)
   {
-    TiXmlElement *probesTag = new TiXmlElement(TAG_PROBES);
-    parentTag->LinkEndChild(probesTag);
+    auto* doc = parentTag->GetDocument();
+    auto *probesTag = doc->NewElement(USDeviceReaderWriterConstants::TAG_PROBES);
+    parentTag->InsertEndChild(probesTag);
 
     for (size_t index = 0; index < config.probes.size(); ++index)
     {
-      TiXmlElement *probeTag = new TiXmlElement(TAG_PROBE);
-      probesTag->LinkEndChild(probeTag);
+      auto *probeTag = doc->NewElement(USDeviceReaderWriterConstants::TAG_PROBE);
+      probesTag->InsertEndChild(probeTag);
 
       mitk::USProbe::Pointer probe = config.probes.at(index);
-      probeTag->SetAttribute(ATTR_NAME, probe->GetName());
+      probeTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_NAME, probe->GetName().c_str());
       std::map<int, mitk::Vector3D> depthsAndSpacing = probe->GetDepthsAndSpacing();
       if (depthsAndSpacing.size() != 0)
       {
-        TiXmlElement *depthsTag = new TiXmlElement(TAG_DEPTHS);
-        probeTag->LinkEndChild(depthsTag);
+        auto *depthsTag = doc->NewElement(USDeviceReaderWriterConstants::TAG_DEPTHS);
+        probeTag->InsertEndChild(depthsTag);
         for (std::map<int, mitk::Vector3D>::iterator it = depthsAndSpacing.begin(); it != depthsAndSpacing.end(); it++)
         {
-          TiXmlElement *depthTag = new TiXmlElement(TAG_DEPTH);
-          depthTag->SetAttribute(ATTR_DEPTH, it->first);
-          depthsTag->LinkEndChild(depthTag);
+          auto *depthTag = doc->NewElement(USDeviceReaderWriterConstants::TAG_DEPTH);
+          depthTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_DEPTH, it->first);
+          depthsTag->InsertEndChild(depthTag);
 
-          TiXmlElement *spacingTag = new TiXmlElement(TAG_SPACING);
-          spacingTag->SetDoubleAttribute(ATTR_X, it->second[0], 6);
-          spacingTag->SetDoubleAttribute(ATTR_Y, it->second[1], 6);
-          depthTag->LinkEndChild(spacingTag);
+          auto *spacingTag = doc->NewElement(USDeviceReaderWriterConstants::TAG_SPACING);
+          spacingTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_X, it->second[0]);
+          spacingTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_Y, it->second[1]);
+          depthTag->InsertEndChild(spacingTag);
         }
 
-        TiXmlElement *croppingTag = new TiXmlElement(TAG_CROPPING);
-        probeTag->LinkEndChild(croppingTag);
-        croppingTag->SetAttribute(ATTR_TOP, probe->GetProbeCropping().top);
-        croppingTag->SetAttribute(ATTR_BOTTOM, probe->GetProbeCropping().bottom);
-        croppingTag->SetAttribute(ATTR_LEFT, probe->GetProbeCropping().left);
-        croppingTag->SetAttribute(ATTR_RIGHT, probe->GetProbeCropping().right);
+        auto *croppingTag = doc->NewElement(USDeviceReaderWriterConstants::TAG_CROPPING);
+        probeTag->InsertEndChild(croppingTag);
+        croppingTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_TOP, probe->GetProbeCropping().top);
+        croppingTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_BOTTOM, probe->GetProbeCropping().bottom);
+        croppingTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_LEFT, probe->GetProbeCropping().left);
+        croppingTag->SetAttribute(USDeviceReaderWriterConstants::ATTR_RIGHT, probe->GetProbeCropping().right);
       }
     }
   }

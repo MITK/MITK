@@ -22,6 +22,8 @@ found in the LICENSE file.
 
 #include "mitkEqual.h"
 
+#include <tinyxml2.h>
+
 /**
  \brief Test for VectorPropertySerializer.
 
@@ -85,10 +87,11 @@ public:
       return nullptr;
 
     serializer->SetProperty(property);
-    TiXmlElement *serialization(nullptr);
+    tinyxml2::XMLDocument doc;
+    tinyxml2::XMLElement *serialization(nullptr);
     try
     {
-      serialization = serializer->Serialize();
+      serialization = serializer->Serialize(doc);
     }
     catch (...)
     {

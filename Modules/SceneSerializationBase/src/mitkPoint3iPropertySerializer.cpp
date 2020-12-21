@@ -15,20 +15,22 @@ found in the LICENSE file.
 
 #include "mitkBasePropertySerializer.h"
 #include "mitkProperties.h"
+#include <tinyxml2.h>
 
 namespace mitk
 {
   class Point3iPropertySerializer : public BasePropertySerializer
   {
   public:
-    mitkClassMacro(Point3iPropertySerializer, BasePropertySerializer);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(Point3iPropertySerializer, BasePropertySerializer)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
-      TiXmlElement *Serialize() override
+    tinyxml2::XMLElement* Serialize(tinyxml2::XMLDocument& doc) override
     {
       if (const Point3iProperty *prop = dynamic_cast<const Point3iProperty *>(m_Property.GetPointer()))
       {
-        auto element = new TiXmlElement("point");
+        auto *element = doc.NewElement("point");
         Point3I point = prop->GetValue();
         element->SetAttribute("x", point[0]);
         element->SetAttribute("y", point[1]);
@@ -39,17 +41,17 @@ namespace mitk
         return nullptr;
     }
 
-    BaseProperty::Pointer Deserialize(TiXmlElement *element) override
+    BaseProperty::Pointer Deserialize(const tinyxml2::XMLElement *element) override
     {
       if (!element)
         return nullptr;
 
       Point3I v;
-      if (element->QueryIntAttribute("x", &v[0]) != TIXML_SUCCESS)
+      if (element->QueryIntAttribute("x", &v[0]) != tinyxml2::XML_SUCCESS)
         return nullptr;
-      if (element->QueryIntAttribute("y", &v[1]) != TIXML_SUCCESS)
+      if (element->QueryIntAttribute("y", &v[1]) != tinyxml2::XML_SUCCESS)
         return nullptr;
-      if (element->QueryIntAttribute("z", &v[2]) != TIXML_SUCCESS)
+      if (element->QueryIntAttribute("z", &v[2]) != tinyxml2::XML_SUCCESS)
         return nullptr;
       return Point3iProperty::New(v).GetPointer();
     }

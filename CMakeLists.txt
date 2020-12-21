@@ -1,16 +1,26 @@
-set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.14.5)
+set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.18)
 cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION})
 
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.19 AND CMAKE_VERSION VERSION_LESS 3.19.2)
+  message(FATAL_ERROR "\
+CMake v${CMAKE_VERSION} is defective [1]. \
+Please either downgrade to v3.18 or upgrade to at least v3.19.2.\n\
+[1] https://gitlab.kitware.com/cmake/cmake/-/issues/21529")
+endif()
+
 #-----------------------------------------------------------------------------
-# See https://cmake.org/cmake/help/v3.14/manual/cmake-policies.7.html for details
+# Policies
 #-----------------------------------------------------------------------------
 
-set(project_policies )
-foreach(policy ${project_policies})
-  if(POLICY ${policy})
-    cmake_policy(SET ${policy} NEW)
-  endif()
-endforeach()
+#[[ T28060
+
+    https://cmake.org/cmake/help/v3.18/policy/CMP0091.html
+    https://cmake.org/cmake/help/v3.18/variable/CMAKE_MSVC_RUNTIME_LIBRARY.html
+
+    We pass CMP0091 to all external projects as command-line argument:
+      -DCMAKE_POLICY_DEFAULT_CMP0091:STRING=OLD
+ ]]
+cmake_policy(SET CMP0091 OLD)
 
 #-----------------------------------------------------------------------------
 # Superbuild Option - Enabled by default
@@ -638,10 +648,6 @@ mark_as_advanced(BLUEBERRY_DEBUG_SMARTPOINTER)
 option(MITK_SHOW_CONSOLE_WINDOW "Use this to enable or disable the console window when starting MITK GUI Applications" ON)
 mark_as_advanced(MITK_SHOW_CONSOLE_WINDOW)
 
-# TODO: check if necessary
-option(USE_ITKZLIB "Use the ITK zlib for pic compression." ON)
-mark_as_advanced(USE_ITKZLIB)
-
 if(NOT MITK_FAST_TESTING)
   if(MITK_CTEST_SCRIPT_MODE STREQUAL "Continuous" OR MITK_CTEST_SCRIPT_MODE STREQUAL "Experimental")
     set(MITK_FAST_TESTING ON)
@@ -809,7 +815,7 @@ endif()
 set(Boost_USE_MULTITHREADED 1)
 set(Boost_USE_STATIC_LIBS 0)
 set(Boost_USE_STATIC_RUNTIME 0)
-set(Boost_ADDITIONAL_VERSIONS 1.68 1.68.0)
+set(Boost_ADDITIONAL_VERSIONS 1.74 1.74.0)
 
 # We need this later for a DCMTK workaround
 set(_dcmtk_dir_orig ${DCMTK_DIR})
@@ -875,8 +881,6 @@ if(MITK_USE_DCMQI)
   set(DCMQI_DIR ${MITK_EXTERNAL_PROJECT_PREFIX})
   find_package(DCMQI REQUIRED)
 endif()
-
-link_directories(${Boost_LIBRARY_DIRS})
 
 if(MITK_USE_OpenIGTLink)
   link_directories(${OpenIGTLink_LIBRARY_DIRS})

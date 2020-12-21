@@ -19,7 +19,11 @@ found in the LICENSE file.
 #include "mitkBaseProperty.h"
 #include <itkObjectFactoryBase.h>
 
-#include <tinyxml.h>
+namespace tinyxml2
+{
+  class XMLDocument;
+  class XMLElement;
+}
 
 namespace mitk
 {
@@ -47,16 +51,16 @@ namespace mitk
 
       This should be overwritten by specific sub-classes.
     */
-    virtual TiXmlElement *Serialize();
+    virtual tinyxml2::XMLElement *Serialize(tinyxml2::XMLDocument& doc);
 
     /**
-      \brief Deserializes given TiXmlElement.
+      \brief Deserializes given XML element.
       \return The deserialized Property.
 
       This should be overwritten by specific sub-classes.
     */
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement *);
+    virtual BaseProperty::Pointer Deserialize(const tinyxml2::XMLElement*);
 
   protected:
     BasePropertySerializer();

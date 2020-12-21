@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkEndoDebugToXmlFile.h"
-#include <tinyxml.h>
+#include <tinyxml2.h>
 
 namespace mitk
 {
@@ -38,33 +38,34 @@ namespace mitk
   {
     std::string _FileName = *d->m_FileName;
 
-    TiXmlDocument doc( _FileName.c_str() );
-    TiXmlElement* root = nullptr;
-    TiXmlElement* elem = nullptr;
+    tinyxml2::XMLDocument doc;
+    tinyxml2::XMLElement* root = nullptr;
+    tinyxml2::XMLElement* elem = nullptr;
     // check if element is already available
-    if(doc.LoadFile())
+    if(tinyxml2::XML_SUCCESS == doc.LoadFile(_FileName.c_str()))
     {
       root = doc.FirstChildElement("data");
-      if(root)
+      if(nullptr != root)
       {
         elem = root->FirstChildElement( "EndoDebug" );
-        if(elem)
-          root->RemoveChild(elem);
-        elem = nullptr;
+        if (nullptr != elem)
+        {
+          root->DeleteChild(elem);
+          elem = nullptr;
+        }
       }
     }
     else
     {
       // document did not exist, create new one with declration
-      auto  decl = new TiXmlDeclaration( "1.0", "", "" );
-      doc.LinkEndChild( decl );
+      doc.InsertEndChild( doc.NewDeclaration() );
       // create root
-      root = new TiXmlElement( "data" );
-      doc.LinkEndChild( root );
+      root = doc.NewElement( "data" );
+      doc.InsertEndChild( root );
     }
 
     // create elem if not existent
-    elem = new TiXmlElement( "EndoDebug" );
+    elem = doc.NewElement( "EndoDebug" );
 
     elem->SetAttribute( "DebugEnabled",
                         (d->m_EndoDebug->GetDebugEnabled()? 1:0) );
@@ -73,7 +74,7 @@ namespace mitk
     elem->SetAttribute( "ShowImagesTimeOut",
                         (static_cast<int>(d->m_EndoDebug->GetShowImagesTimeOut())) );
     elem->SetAttribute( "DebugImagesOutputDirectory",
-                        d->m_EndoDebug->GetDebugImagesOutputDirectory() );
+                        d->m_EndoDebug->GetDebugImagesOutputDirectory().c_str() );
 
     std::set<std::string> _FilesToDebug = d->m_EndoDebug->GetFilesToDebug();
     std::string _FilesToDebugString;
@@ -85,7 +86,7 @@ namespace mitk
         _FilesToDebugString.append( *it );
         ++it;
     }
-    elem->SetAttribute( "FilesToDebug", _FilesToDebugString );
+    elem->SetAttribute( "FilesToDebug", _FilesToDebugString.c_str() );
 
     std::set<std::string> _SymbolsToDebug = d->m_EndoDebug->GetSymbolsToDebug();
     std::string _SymbolsToDebugString;
@@ -97,13 +98,13 @@ namespace mitk
         _SymbolsToDebugString.append( *it );
         ++it;
     }
-    elem->SetAttribute( "SymbolsToDebug", _SymbolsToDebugString );
+    elem->SetAttribute( "SymbolsToDebug", _SymbolsToDebugString.c_str() );
 
     endodebug("adding the EndoDebug as child element of the data node")
-    root->LinkEndChild(elem);
+    root->InsertEndChild(elem);
 
     endodebug("saving file " << _FileName)
-    if( !doc.SaveFile( _FileName ) )
+    if( tinyxml2::XML_SUCCESS != doc.SaveFile( _FileName.c_str() ) )
     {
         endodebug("File " << _FileName << " could not be written. Please check permissions.");
     }

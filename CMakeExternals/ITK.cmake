@@ -35,9 +35,7 @@ if(NOT DEFINED ITK_DIR)
   # see MITK bug #17338
   list(APPEND additional_cmake_args
     -DModule_ITKReview:BOOL=ON
-  # for 4.7, the OpenJPEG is needed by review but the variable must be set
-    -DModule_ITKOpenJPEG:BOOL=ON
-  # Added Module for Wavelets
+    -DModule_ITKOpenJPEG:BOOL=ON # for 4.7, the OpenJPEG is needed by review but the variable must be set
     -DModule_IsotropicWavelets:BOOL=ON
   )
 
@@ -52,9 +50,10 @@ if(NOT DEFINED ITK_DIR)
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
      UPDATE_COMMAND ""
-     # ITK 4.13 release branch snapshot
-     URL https://github.com/InsightSoftwareConsortium/ITK/archive/e53d1d94.tar.gz
-     URL_MD5 977f77cb299cf3d722d13dd5408bcde5
+     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-4.13.3.tar.gz
+     URL_MD5 d1c10c8288b47577d718a71190444815
+     PATCH_COMMAND
+       ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-4.13.3.patch
      CMAKE_GENERATOR ${gen}
      CMAKE_GENERATOR_PLATFORM ${gen_platform}
      CMAKE_ARGS

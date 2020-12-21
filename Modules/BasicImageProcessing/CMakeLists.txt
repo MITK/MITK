@@ -1,8 +1,6 @@
-MITK_CREATE_MODULE(
+mitk_create_module(
   DEPENDS MitkCore MitkMatchPointRegistration
-  PACKAGE_DEPENDS
-    PUBLIC
-    PRIVATE ITK|ITKIOImageBase+ITKIOGDCM
+  TARGET_DEPENDS PRIVATE IsotropicWavelets
 )
 
 add_subdirectory(MiniApps)

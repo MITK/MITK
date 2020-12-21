@@ -10,7 +10,7 @@ endif()
 
 MITK_CREATE_MODULE_TESTS()
 if(TARGET ${TESTDRIVER})
-  mitk_use_modules(TARGET ${TESTDRIVER} PACKAGES ITK|ITKThresholding+ITKTestKernel VTK|TestingRendering tinyxml)
+  mitk_use_modules(TARGET ${TESTDRIVER} PACKAGES ITK|IONRRD VTK|TestingRendering tinyxml2)
 
   mitkAddCustomModuleTest(mitkVolumeCalculatorTest_Png2D-bw mitkVolumeCalculatorTest
                           ${MITK_DATA_DIR}/Png2D-bw.png

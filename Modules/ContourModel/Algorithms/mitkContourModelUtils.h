@@ -87,6 +87,16 @@ namespace mitk
     */
     static ContourModel::Pointer MoveZerothContourTimeStep(const ContourModel *contour, unsigned int timeStep);
 
+    /**
+    \brief Retrieves the active pixel value of a (labelset) image.
+           If the image is basic image, the pixel value 1 (one) will be returned.
+           If the image is actually a labelset image, the pixel value of the active label of the active layer will be
+           returned.
+
+    \param workingImage   The (labelset) image to retrieve the active pixel value of.
+    */
+    static int GetActivePixelValue(mitk::Image* workingImage);
+
   protected:
     ContourModelUtils();
     ~ContourModelUtils() override;

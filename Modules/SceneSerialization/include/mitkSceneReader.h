@@ -12,11 +12,14 @@ found in the LICENSE file.
 
 #include <MitkSceneSerializationExports.h>
 
-#include <tinyxml.h>
-
 #include <itkObjectFactory.h>
 
 #include "mitkDataStorage.h"
+
+namespace tinyxml2
+{
+  class XMLDocument;
+}
 
 namespace mitk
 {
@@ -27,6 +30,6 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      virtual bool LoadScene(TiXmlDocument &document, const std::string &workingDirectory, DataStorage *storage);
+    virtual bool LoadScene(tinyxml2::XMLDocument &document, const std::string &workingDirectory, DataStorage *storage);
   };
 }

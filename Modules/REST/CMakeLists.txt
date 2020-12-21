@@ -1,13 +1,14 @@
-if(MITK_USE_cpprestsdk)
+set(boost_depends "Boost|date_time+regex+system")
 
-  mitk_create_module(
-    DEPENDS MitkCore
-  )
+if(UNIX)
+  set(boost_depends "${boost_depends}+atomic+chrono+filesystem+random+thread")
+endif()
 
-  if(TARGET ${MODULE_TARGET})
-    target_link_libraries(${MODULE_TARGET} PUBLIC cpprestsdk::cpprest OpenSSL::SSL)
-  endif()
+mitk_create_module(
+  DEPENDS MitkCore
+  PACKAGE_DEPENDS PUBLIC cpprestsdk OpenSSL|SSL ${boost_depends}
+)
 
+if(TARGET ${MODULE_TARGET})
   add_subdirectory(test)
-
 endif()

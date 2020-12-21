@@ -225,7 +225,7 @@ StitchImageFilter< TInputImage, TOutputImage, TInterpolatorPrecisionType, TTrans
   if (nComponents == 0)
     {
     PixelComponentType zeroComponent
-      = NumericTraits<PixelComponentType>::ZeroValue( zeroComponent );
+      = NumericTraits<PixelComponentType>::ZeroValue();
     nComponents = this->GetInput()->GetNumberOfComponentsPerPixel();
     NumericTraits<PixelType>::SetLength(m_DefaultPixelValue, nComponents );
     for (unsigned int n=0; n<nComponents; n++)

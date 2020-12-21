@@ -12,6 +12,7 @@ USModel/mitkUSVideoDevice.cpp
 USModel/mitkUSVideoDeviceCustomControls.cpp
 USModel/mitkUSProbe.cpp
 USModel/mitkUSDevicePersistence.cpp
+USModel/mitkUSDeviceReaderWriterConstants.cpp
 USModel/mitkUSDeviceReaderXML.cpp
 USModel/mitkUSDeviceWriterXML.cpp
 
@@ -26,7 +27,6 @@ USControlInterfaces/mitkUSAbstractControlInterface.cpp
 USControlInterfaces/mitkUSControlInterfaceBMode.cpp
 USControlInterfaces/mitkUSControlInterfaceProbes.cpp
 USControlInterfaces/mitkUSControlInterfaceDoppler.cpp
-USControlInterfaces/mitkUSDiPhASDeviceCustomControls.cpp
 )
 
 set(RESOURCE_FILES

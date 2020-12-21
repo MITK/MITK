@@ -12,7 +12,6 @@ found in the LICENSE file.
 
 #include "mitkUSUIActivator.h"
 #include "QmitkUSControlsCustomVideoDeviceWidget.h"
-#include "QmitkUSControlsCustomDiPhASDeviceWidget.h"
 
 mitk::USUIActivator::USUIActivator()
 {
@@ -25,7 +24,6 @@ mitk::USUIActivator::~USUIActivator()
 void mitk::USUIActivator::Load(us::ModuleContext* context)
 {
   m_USCustomWidgets.push_back(new QmitkUSControlsCustomVideoDeviceWidget());
-  m_USCustomWidgets.push_back(new QmitkUSControlsCustomDiPhASDeviceWidget());
 
   for (auto &widget : m_USCustomWidgets)
   {

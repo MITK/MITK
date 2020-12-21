@@ -15,7 +15,6 @@ The modules are shared libraries that provide functionality that can be used by 
   <li> \ref IGTTutorialOverview
   <li> \ref MitkOpenCL_Overview
   <li> \ref LegacyGLModule
-  <li> \ref PAModulePage
   <li> \ref mitkPython_Overview
   <li> \ref RESTModule
   <li> \ref GeneratingDeviceModulesPage

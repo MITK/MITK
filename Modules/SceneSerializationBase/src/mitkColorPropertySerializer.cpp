@@ -18,45 +18,52 @@ found in the LICENSE file.
 #include "mitkStringsToNumbers.h"
 #include <mitkLocaleSwitch.h>
 
+#include <array>
+
+#include <tinyxml2.h>
+
 namespace mitk
 {
   class ColorPropertySerializer : public BasePropertySerializer
   {
   public:
-    mitkClassMacro(ColorPropertySerializer, BasePropertySerializer);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(ColorPropertySerializer, BasePropertySerializer)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
-      TiXmlElement *Serialize() override
+    tinyxml2::XMLElement* Serialize(tinyxml2::XMLDocument& doc) override
     {
       if (const ColorProperty *prop = dynamic_cast<const ColorProperty *>(m_Property.GetPointer()))
       {
         LocaleSwitch localeSwitch("C");
 
-        auto element = new TiXmlElement("color");
+        auto *element = doc.NewElement("color");
         Color color = prop->GetValue();
-        element->SetAttribute("r", boost::lexical_cast<std::string>(color[0]));
-        element->SetAttribute("g", boost::lexical_cast<std::string>(color[1]));
-        element->SetAttribute("b", boost::lexical_cast<std::string>(color[2]));
+        element->SetAttribute("r", boost::lexical_cast<std::string>(color[0]).c_str());
+        element->SetAttribute("g", boost::lexical_cast<std::string>(color[1]).c_str());
+        element->SetAttribute("b", boost::lexical_cast<std::string>(color[2]).c_str());
         return element;
       }
       else
         return nullptr;
     }
 
-    BaseProperty::Pointer Deserialize(TiXmlElement *element) override
+    BaseProperty::Pointer Deserialize(const tinyxml2::XMLElement *element) override
     {
       if (!element)
         return nullptr;
 
       LocaleSwitch localeSwitch("C");
 
-      std::string c_string[3];
-      if (element->QueryStringAttribute("r", &c_string[0]) != TIXML_SUCCESS)
+      std::array<const char*, 3> c_string = {
+        element->Attribute("r"),
+        element->Attribute("g"),
+        element->Attribute("b")
+      };
+      
+      if (nullptr == c_string[0] || nullptr == c_string[1] || nullptr == c_string[2])
         return nullptr;
-      if (element->QueryStringAttribute("g", &c_string[1]) != TIXML_SUCCESS)
-        return nullptr;
-      if (element->QueryStringAttribute("b", &c_string[2]) != TIXML_SUCCESS)
-        return nullptr;
+
       Color c;
       try
       {

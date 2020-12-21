@@ -18,41 +18,46 @@ found in the LICENSE file.
 #include "mitkAnnotationProperty.h"
 #include "mitkStringsToNumbers.h"
 
+#include <array>
+
+#include <tinyxml2.h>
+
 namespace mitk
 {
   class AnnotationPropertySerializer : public BasePropertySerializer
   {
   public:
-    mitkClassMacro(AnnotationPropertySerializer, BasePropertySerializer);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(AnnotationPropertySerializer, BasePropertySerializer)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
-      TiXmlElement *Serialize() override
+    tinyxml2::XMLElement *Serialize(tinyxml2::XMLDocument& doc) override
     {
       if (const AnnotationProperty *prop = dynamic_cast<const AnnotationProperty *>(m_Property.GetPointer()))
       {
-        auto element = new TiXmlElement("annotation");
+        auto *element = doc.NewElement("annotation");
         element->SetAttribute("label", prop->GetLabel());
         Point3D point = prop->GetPosition();
-        element->SetAttribute("x", boost::lexical_cast<std::string>(point[0]));
-        element->SetAttribute("y", boost::lexical_cast<std::string>(point[1]));
-        element->SetAttribute("z", boost::lexical_cast<std::string>(point[2]));
+        element->SetAttribute("x", boost::lexical_cast<std::string>(point[0]).c_str());
+        element->SetAttribute("y", boost::lexical_cast<std::string>(point[1]).c_str());
+        element->SetAttribute("z", boost::lexical_cast<std::string>(point[2]).c_str());
         return element;
       }
       else
         return nullptr;
     }
 
-    BaseProperty::Pointer Deserialize(TiXmlElement *element) override
+    BaseProperty::Pointer Deserialize(const tinyxml2::XMLElement *element) override
     {
       if (!element)
         return nullptr;
       const char *label(element->Attribute("label"));
-      std::string p_string[3];
-      if (element->QueryStringAttribute("x", &p_string[0]) != TIXML_SUCCESS)
-        return nullptr;
-      if (element->QueryStringAttribute("y", &p_string[1]) != TIXML_SUCCESS)
-        return nullptr;
-      if (element->QueryStringAttribute("z", &p_string[2]) != TIXML_SUCCESS)
+      std::array<const char*, 3> p_string = {
+        element->Attribute("x"),
+        element->Attribute("y"),
+        element->Attribute("z")
+      };
+      if (nullptr == p_string[0] || nullptr == p_string[1] || nullptr == p_string[2])
         return nullptr;
       Point3D p;
       try

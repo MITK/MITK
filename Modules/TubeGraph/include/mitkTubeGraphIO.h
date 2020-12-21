@@ -19,8 +19,6 @@ found in the LICENSE file.
 
 #include "mitkTubeGraph.h"
 
-class TiXmlElement;
-
 namespace mitk
 {
   /**

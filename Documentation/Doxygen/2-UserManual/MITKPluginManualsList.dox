@@ -60,9 +60,7 @@ The plugins and bundles provide much of the extended functionality of MITK. Each
   <li> \ref org_mitk_gui_qt_mitkphenotyping </li>
   <li> \ref org_mitk_gui_qt_preprocessing_resampling </li>
   <li> \ref org_mitk_views_pharmacokinetics_curvedescriptor </li>
-  <li> \ref org_mitk_views_photoacoustics_imageprocessing </li>
   <li> \ref org_mitk_gui_qt_pharmacokinetics_simulation </li>
-  <li> \ref org_mitk_gui_qt_photoacoustics_spectralunmixing </li>
   <li> \ref org_surfacematerialeditor </li>
   <li> \ref org_toftutorial </li>
   <li> \ref org_blueberry_ui_qt_objectinspector </li>

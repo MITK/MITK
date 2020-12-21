@@ -21,7 +21,19 @@ found in the LICENSE file.
 // Third Party
 #include <itksys/SystemTools.hxx>
 #include <fstream>
-#include <tinyxml.h>
+#include <tinyxml2.h>
+
+namespace
+{
+  std::string ReadStringAttribute(const tinyxml2::XMLElement* elem, const char* name)
+  {
+    const char* attrib = elem->Attribute(name);
+
+    return attrib != nullptr
+      ? attrib
+      : "";
+  }
+}
 
 mitk::USDeviceReaderXML::USDeviceReaderXML() : AbstractFileReader(
   mitk::IGTMimeTypes::USDEVICEINFORMATIONXML_MIMETYPE(),
@@ -68,15 +80,15 @@ bool mitk::USDeviceReaderXML::ReadUltrasoundDeviceConfiguration()
     return false;
   }
 
-  TiXmlDocument document(m_Filename);
-  if (!document.LoadFile())
+  tinyxml2::XMLDocument document;
+  if (tinyxml2::XML_SUCCESS != document.LoadFile(m_Filename.c_str()))
   {
     MITK_ERROR << "Error when opening and reading file :" << m_Filename;
     return false;
   }
 
-  TiXmlHandle documentHandle(&document);
-  TiXmlElement* ultrasoundDeviceTag = documentHandle.FirstChildElement(TAG_ULTRASOUNDDEVICE).ToElement();
+  tinyxml2::XMLHandle documentHandle(&document);
+  auto* ultrasoundDeviceTag = documentHandle.FirstChildElement(USDeviceReaderWriterConstants::TAG_ULTRASOUNDDEVICE).ToElement();
   if (ultrasoundDeviceTag == nullptr)
   {
     MITK_ERROR << "Error parsing the file :" << m_Filename << std::endl << "Wrong xml format structure.";
@@ -86,7 +98,7 @@ bool mitk::USDeviceReaderXML::ReadUltrasoundDeviceConfiguration()
   //Extract attribute information of the ULTRASOUNDDEVICE-Tag:
   this->ExtractAttributeInformationOfUltrasoundDeviceTag(ultrasoundDeviceTag);
 
-  TiXmlElement* generalSettingsTag = documentHandle.FirstChildElement(TAG_ULTRASOUNDDEVICE).FirstChildElement(TAG_GENERALSETTINGS).ToElement();
+  auto* generalSettingsTag = documentHandle.FirstChildElement(USDeviceReaderWriterConstants::TAG_ULTRASOUNDDEVICE).FirstChildElement(USDeviceReaderWriterConstants::TAG_GENERALSETTINGS).ToElement();
   if (generalSettingsTag == nullptr)
   {
     MITK_ERROR << "Error parsing the GENERALSETTINGS-Tag in the file :" << m_Filename;
@@ -96,7 +108,7 @@ bool mitk::USDeviceReaderXML::ReadUltrasoundDeviceConfiguration()
   //Extract attribute information of the GENERALSETTINGS-Tag:
   this->ExtractAttributeInformationOfGeneralSettingsTag(generalSettingsTag);
 
-  TiXmlElement* probesTag = documentHandle.FirstChildElement(TAG_ULTRASOUNDDEVICE).FirstChildElement(TAG_PROBES).ToElement();
+  auto* probesTag = documentHandle.FirstChildElement(USDeviceReaderWriterConstants::TAG_ULTRASOUNDDEVICE).FirstChildElement(USDeviceReaderWriterConstants::TAG_PROBES).ToElement();
   if (probesTag == nullptr)
   {
     MITK_ERROR << "Error: PROBES-Tag was not found in the file :" << m_Filename << "Therefore, creating default probe.";
@@ -109,7 +121,7 @@ bool mitk::USDeviceReaderXML::ReadUltrasoundDeviceConfiguration()
   }
 
   //Extract all saved and configured probes of the USDevice:
-  for (TiXmlElement* probeTag = probesTag->FirstChildElement(TAG_PROBE);
+  for (auto* probeTag = probesTag->FirstChildElement(USDeviceReaderWriterConstants::TAG_PROBE);
     probeTag != nullptr; probeTag = probeTag->NextSiblingElement())
   {
     this->ExtractProbe(probeTag);
@@ -122,42 +134,43 @@ void mitk::USDeviceReaderXML::SetFilename(std::string filename)
   m_Filename = filename;
 }
 
-void mitk::USDeviceReaderXML::ExtractAttributeInformationOfUltrasoundDeviceTag(TiXmlElement *ultrasoundTag)
+void mitk::USDeviceReaderXML::ExtractAttributeInformationOfUltrasoundDeviceTag(const tinyxml2::XMLElement *ultrasoundTag)
 {
-  ultrasoundTag->QueryDoubleAttribute(ATTR_FILEVERS, &m_DeviceConfig.fileversion);
-  ultrasoundTag->QueryStringAttribute(ATTR_TYPE, &m_DeviceConfig.deviceType);
-  ultrasoundTag->QueryStringAttribute(ATTR_NAME, &m_DeviceConfig.deviceName);
-  ultrasoundTag->QueryStringAttribute(ATTR_MANUFACTURER, &m_DeviceConfig.manufacturer);
-  ultrasoundTag->QueryStringAttribute(ATTR_MODEL, &m_DeviceConfig.model);
-  ultrasoundTag->QueryStringAttribute(ATTR_COMMENT, &m_DeviceConfig.comment);
-  ultrasoundTag->QueryIntAttribute(ATTR_IMAGESTREAMS, &m_DeviceConfig.numberOfImageStreams);
-  ultrasoundTag->QueryStringAttribute(ATTR_HOST, &m_DeviceConfig.host);
-  ultrasoundTag->QueryIntAttribute(ATTR_PORT, &m_DeviceConfig.port);
-  ultrasoundTag->QueryBoolAttribute(ATTR_SERVER, &m_DeviceConfig.server);
+  ultrasoundTag->QueryDoubleAttribute(USDeviceReaderWriterConstants::ATTR_FILEVERS, &m_DeviceConfig.fileversion);
+  ultrasoundTag->QueryIntAttribute(USDeviceReaderWriterConstants::ATTR_IMAGESTREAMS, &m_DeviceConfig.numberOfImageStreams);
+  ultrasoundTag->QueryIntAttribute(USDeviceReaderWriterConstants::ATTR_PORT, &m_DeviceConfig.port);
+  ultrasoundTag->QueryBoolAttribute(USDeviceReaderWriterConstants::ATTR_SERVER, &m_DeviceConfig.server);
+
+  m_DeviceConfig.deviceType = ReadStringAttribute(ultrasoundTag, USDeviceReaderWriterConstants::ATTR_TYPE);
+  m_DeviceConfig.deviceName = ReadStringAttribute(ultrasoundTag, USDeviceReaderWriterConstants::ATTR_TYPE);
+  m_DeviceConfig.manufacturer = ReadStringAttribute(ultrasoundTag, USDeviceReaderWriterConstants::ATTR_TYPE);
+  m_DeviceConfig.model = ReadStringAttribute(ultrasoundTag, USDeviceReaderWriterConstants::ATTR_TYPE);
+  m_DeviceConfig.comment = ReadStringAttribute(ultrasoundTag, USDeviceReaderWriterConstants::ATTR_TYPE);
+  m_DeviceConfig.host = ReadStringAttribute(ultrasoundTag, USDeviceReaderWriterConstants::ATTR_HOST);
 }
 
-void mitk::USDeviceReaderXML::ExtractAttributeInformationOfGeneralSettingsTag(TiXmlElement *generalSettingsTag)
+void mitk::USDeviceReaderXML::ExtractAttributeInformationOfGeneralSettingsTag(const tinyxml2::XMLElement *generalSettingsTag)
 {
-  generalSettingsTag->QueryBoolAttribute(ATTR_GREYSCALE, &m_DeviceConfig.useGreyscale);
-  generalSettingsTag->QueryBoolAttribute(ATTR_RESOLUTIONOVERRIDE, &m_DeviceConfig.useResolutionOverride);
-  generalSettingsTag->QueryIntAttribute(ATTR_RESOLUTIONHEIGHT, &m_DeviceConfig.resolutionHeight);
-  generalSettingsTag->QueryIntAttribute(ATTR_RESOLUTIONWIDTH, &m_DeviceConfig.resolutionWidth);
-  generalSettingsTag->QueryIntAttribute(ATTR_SOURCEID, &m_DeviceConfig.sourceID);
-  generalSettingsTag->QueryStringAttribute(ATTR_FILEPATH, &m_DeviceConfig.filepathVideoSource);
-  generalSettingsTag->QueryIntAttribute(ATTR_OPENCVPORT, &m_DeviceConfig.opencvPort);
+  generalSettingsTag->QueryBoolAttribute(USDeviceReaderWriterConstants::ATTR_GREYSCALE, &m_DeviceConfig.useGreyscale);
+  generalSettingsTag->QueryBoolAttribute(USDeviceReaderWriterConstants::ATTR_RESOLUTIONOVERRIDE, &m_DeviceConfig.useResolutionOverride);
+  generalSettingsTag->QueryIntAttribute(USDeviceReaderWriterConstants::ATTR_RESOLUTIONHEIGHT, &m_DeviceConfig.resolutionHeight);
+  generalSettingsTag->QueryIntAttribute(USDeviceReaderWriterConstants::ATTR_RESOLUTIONWIDTH, &m_DeviceConfig.resolutionWidth);
+  generalSettingsTag->QueryIntAttribute(USDeviceReaderWriterConstants::ATTR_SOURCEID, &m_DeviceConfig.sourceID);
+  generalSettingsTag->QueryIntAttribute(USDeviceReaderWriterConstants::ATTR_OPENCVPORT, &m_DeviceConfig.opencvPort);
+
+  m_DeviceConfig.filepathVideoSource = ReadStringAttribute(generalSettingsTag, USDeviceReaderWriterConstants::ATTR_FILEPATH);
 }
 
-void mitk::USDeviceReaderXML::ExtractProbe(TiXmlElement *probeTag)
+void mitk::USDeviceReaderXML::ExtractProbe(const tinyxml2::XMLElement *probeTag)
 {
   mitk::USProbe::Pointer ultrasoundProbe = mitk::USProbe::New();
-  std::string probeName;
-  probeTag->QueryStringAttribute(ATTR_NAME, &probeName);
+  auto probeName = ReadStringAttribute(probeTag, USDeviceReaderWriterConstants::ATTR_NAME);
   ultrasoundProbe->SetName(probeName);
 
-  TiXmlElement* depthsTag = probeTag->FirstChildElement(TAG_DEPTHS);
+  auto* depthsTag = probeTag->FirstChildElement(USDeviceReaderWriterConstants::TAG_DEPTHS);
   if (depthsTag != nullptr)
   {
-    for (TiXmlElement* depthTag = depthsTag->FirstChildElement(TAG_DEPTH);
+    for (auto* depthTag = depthsTag->FirstChildElement(USDeviceReaderWriterConstants::TAG_DEPTH);
       depthTag != nullptr; depthTag = depthTag->NextSiblingElement())
     {
       int depth = 0;
@@ -166,13 +179,13 @@ void mitk::USDeviceReaderXML::ExtractProbe(TiXmlElement *probeTag)
       spacing[1] = 1;
       spacing[2] = 1;
 
-      depthTag->QueryIntAttribute(ATTR_DEPTH, &depth);
+      depthTag->QueryIntAttribute(USDeviceReaderWriterConstants::ATTR_DEPTH, &depth);
 
-      TiXmlElement* spacingTag = depthTag->FirstChildElement(TAG_SPACING);
+      auto* spacingTag = depthTag->FirstChildElement(USDeviceReaderWriterConstants::TAG_SPACING);
       if (spacingTag != nullptr)
       {
-        spacingTag->QueryDoubleAttribute(ATTR_X, &spacing[0]);
-        spacingTag->QueryDoubleAttribute(ATTR_Y, &spacing[1]);
+        spacingTag->QueryDoubleAttribute(USDeviceReaderWriterConstants::ATTR_X, &spacing[0]);
+        spacingTag->QueryDoubleAttribute(USDeviceReaderWriterConstants::ATTR_Y, &spacing[1]);
       }
 
       ultrasoundProbe->SetDepthAndSpacing(depth, spacing);
@@ -190,13 +203,13 @@ void mitk::USDeviceReaderXML::ExtractProbe(TiXmlElement *probeTag)
   unsigned int croppingLeft = 0;
   unsigned int croppingRight = 0;
 
-  TiXmlElement* croppingTag = probeTag->FirstChildElement(TAG_CROPPING);
+  auto* croppingTag = probeTag->FirstChildElement(USDeviceReaderWriterConstants::TAG_CROPPING);
   if (croppingTag != nullptr)
   {
-    croppingTag->QueryUnsignedAttribute(ATTR_TOP, &croppingTop);
-    croppingTag->QueryUnsignedAttribute(ATTR_BOTTOM, &croppingBottom);
-    croppingTag->QueryUnsignedAttribute(ATTR_LEFT, &croppingLeft);
-    croppingTag->QueryUnsignedAttribute(ATTR_RIGHT, &croppingRight);
+    croppingTag->QueryUnsignedAttribute(USDeviceReaderWriterConstants::ATTR_TOP, &croppingTop);
+    croppingTag->QueryUnsignedAttribute(USDeviceReaderWriterConstants::ATTR_BOTTOM, &croppingBottom);
+    croppingTag->QueryUnsignedAttribute(USDeviceReaderWriterConstants::ATTR_LEFT, &croppingLeft);
+    croppingTag->QueryUnsignedAttribute(USDeviceReaderWriterConstants::ATTR_RIGHT, &croppingRight);
   }
 
   ultrasoundProbe->SetProbeCropping(croppingTop, croppingBottom, croppingLeft, croppingRight);

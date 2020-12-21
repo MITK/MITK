@@ -17,16 +17,18 @@ found in the LICENSE file.
 #include "mitkProperties.h"
 #include <mitkLexicalCast.h>
 #include <mitkLocaleSwitch.h>
+#include <tinyxml2.h>
 
 namespace mitk
 {
   class FloatLookupTablePropertySerializer : public BasePropertySerializer
   {
   public:
-    mitkClassMacro(FloatLookupTablePropertySerializer, BasePropertySerializer);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(FloatLookupTablePropertySerializer, BasePropertySerializer)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
-      TiXmlElement *Serialize() override
+    tinyxml2::XMLElement *Serialize(tinyxml2::XMLDocument &doc) override
     {
       const FloatLookupTableProperty *prop = dynamic_cast<const FloatLookupTableProperty *>(m_Property.GetPointer());
       if (prop == nullptr)
@@ -39,18 +41,18 @@ namespace mitk
       //  return nullptr; // really?
       const FloatLookupTable::LookupTableType &map = lut.GetLookupTable();
 
-      auto element = new TiXmlElement("FloatLookupTableTable");
+      auto *element = doc.NewElement("FloatLookupTableTable");
       for (auto it = map.begin(); it != map.end(); ++it)
       {
-        auto tableEntry = new TiXmlElement("LUTValue");
+        auto *tableEntry = doc.NewElement("LUTValue");
         tableEntry->SetAttribute("id", it->first);
-        tableEntry->SetAttribute("value", boost::lexical_cast<std::string>(it->second));
-        element->LinkEndChild(tableEntry);
+        tableEntry->SetAttribute("value", boost::lexical_cast<std::string>(it->second).c_str());
+        element->InsertEndChild(tableEntry);
       }
       return element;
     }
 
-    BaseProperty::Pointer Deserialize(TiXmlElement *element) override
+    BaseProperty::Pointer Deserialize(const tinyxml2::XMLElement *element) override
     {
       if (!element)
         return nullptr;
@@ -58,15 +60,15 @@ namespace mitk
       LocaleSwitch localeSwitch("C");
 
       FloatLookupTable lut;
-      for (TiXmlElement *child = element->FirstChildElement("LUTValue"); child != nullptr;
+      for (auto *child = element->FirstChildElement("LUTValue"); child != nullptr;
            child = child->NextSiblingElement("LUTValue"))
       {
         int tempID;
-        if (child->QueryIntAttribute("id", &tempID) != TIXML_SUCCESS)
+        if (child->QueryIntAttribute("id", &tempID) != tinyxml2::XML_SUCCESS)
           return nullptr;
         FloatLookupTable::IdentifierType id = static_cast<FloatLookupTable::IdentifierType>(tempID);
-        std::string value_string;
-        if (child->QueryStringAttribute("value", &value_string) != TIXML_SUCCESS)
+        const char* value_string = child->Attribute("value");
+        if (nullptr == value_string)
           return nullptr;
         try
         {

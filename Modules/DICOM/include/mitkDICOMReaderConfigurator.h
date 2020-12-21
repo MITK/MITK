@@ -16,8 +16,11 @@ found in the LICENSE file.
 #include "mitkClassicDICOMSeriesReader.h"
 #include "mitkDICOMTagBasedSorter.h"
 
-// to put into private implementation
-#include "tinyxml.h"
+namespace tinyxml2
+{
+  class XMLDocument;
+  class XMLElement;
+}
 
 namespace mitk
 {
@@ -106,35 +109,35 @@ class MITKDICOM_EXPORT DICOMReaderConfigurator : public itk::LightObject
 
   private:
 
-    DICOMFileReader::Pointer CreateFromTiXmlDocument(TiXmlDocument& doc) const;
-    DICOMTag tagFromXMLElement(TiXmlElement*) const;
-    std::string requiredStringAttribute(TiXmlElement* xmlElement, const std::string& key) const;
+    DICOMFileReader::Pointer CreateFromXMLDocument(tinyxml2::XMLDocument& doc) const;
+    DICOMTag tagFromXMLElement(const tinyxml2::XMLElement*) const;
+    std::string requiredStringAttribute(const tinyxml2::XMLElement* xmlElement, const std::string& key) const;
     unsigned int hexStringToUInt(const std::string& s) const;
 
-    ThreeDnTDICOMSeriesReader::Pointer ConfigureThreeDnTDICOMSeriesReader(ThreeDnTDICOMSeriesReader::Pointer reader, TiXmlElement*) const;
-    DICOMITKSeriesGDCMReader::Pointer ConfigureDICOMITKSeriesGDCMReader(DICOMITKSeriesGDCMReader::Pointer reader, TiXmlElement*) const;
-    void ConfigureCommonPropertiesOfDICOMITKSeriesGDCMReader(DICOMITKSeriesGDCMReader::Pointer reader, TiXmlElement* element) const;
-    void ConfigureCommonPropertiesOfThreeDnTDICOMSeriesReader(ThreeDnTDICOMSeriesReader::Pointer reader, TiXmlElement* element) const;
+    ThreeDnTDICOMSeriesReader::Pointer ConfigureThreeDnTDICOMSeriesReader(ThreeDnTDICOMSeriesReader::Pointer reader, const tinyxml2::XMLElement*) const;
+    DICOMITKSeriesGDCMReader::Pointer ConfigureDICOMITKSeriesGDCMReader(DICOMITKSeriesGDCMReader::Pointer reader, const tinyxml2::XMLElement*) const;
+    void ConfigureCommonPropertiesOfDICOMITKSeriesGDCMReader(DICOMITKSeriesGDCMReader::Pointer reader, const tinyxml2::XMLElement* element) const;
+    void ConfigureCommonPropertiesOfThreeDnTDICOMSeriesReader(ThreeDnTDICOMSeriesReader::Pointer reader, const tinyxml2::XMLElement* element) const;
 
-    DICOMSortCriterion::Pointer CreateDICOMSortByTag(TiXmlElement* xmlElement, DICOMSortCriterion::Pointer secondaryCriterion) const;
-    DICOMSortCriterion::Pointer CreateSortByImagePositionPatient(TiXmlElement* xmlElement, DICOMSortCriterion::Pointer secondaryCriterion) const;
+    DICOMSortCriterion::Pointer CreateDICOMSortByTag(const tinyxml2::XMLElement* xmlElement, DICOMSortCriterion::Pointer secondaryCriterion) const;
+    DICOMSortCriterion::Pointer CreateSortByImagePositionPatient(const tinyxml2::XMLElement* xmlElement, DICOMSortCriterion::Pointer secondaryCriterion) const;
 
-    mitk::DICOMTagBasedSorter::Pointer CreateDICOMTagBasedSorter(TiXmlElement* element) const;
+    mitk::DICOMTagBasedSorter::Pointer CreateDICOMTagBasedSorter(const tinyxml2::XMLElement* element) const;
 
-    TiXmlElement* CreateConfigStringFromReader(const DICOMITKSeriesGDCMReader* reader) const;
-    TiXmlElement* CreateConfigStringFromReader(const ThreeDnTDICOMSeriesReader* reader) const;
-    TiXmlElement* CreateConfigStringFromReader(const ClassicDICOMSeriesReader* reader) const;
+    tinyxml2::XMLElement* CreateConfigStringFromReader(tinyxml2::XMLDocument& doc, const DICOMITKSeriesGDCMReader* reader) const;
+    tinyxml2::XMLElement* CreateConfigStringFromReader(tinyxml2::XMLDocument& doc, const ThreeDnTDICOMSeriesReader* reader) const;
+    tinyxml2::XMLElement* CreateConfigStringFromReader(tinyxml2::XMLDocument& doc, const ClassicDICOMSeriesReader* reader) const;
 
-    TiXmlElement* CreateConfigStringFromDICOMDatasetSorter(const DICOMTagBasedSorter* sorter) const;
+    tinyxml2::XMLElement* CreateConfigStringFromDICOMDatasetSorter(tinyxml2::XMLDocument& doc, const DICOMTagBasedSorter* sorter) const;
 
-    TiXmlElement* CreateConfigStringFromDICOMTag(const DICOMTag& tag) const;
+    tinyxml2::XMLElement* CreateConfigStringFromDICOMTag(tinyxml2::XMLDocument& doc, const DICOMTag& tag) const;
 
-    TiXmlElement* CreateDICOMFileReaderTag(const DICOMFileReader* reader) const;
-    const char* toString(bool) const;
+    tinyxml2::XMLElement* CreateDICOMFileReaderTag(tinyxml2::XMLDocument& doc, const DICOMFileReader* reader) const;
+
     std::string toHexString(unsigned int i) const;
 
     /** Helper that queries an boolean xml attribute. If the attribute does not exist, the passed default value is used.*/
-    bool QueryBooleanAttribute(const TiXmlElement* element, const char* attributeName, bool defaultValue) const;
+    bool QueryBooleanAttribute(const tinyxml2::XMLElement* element, const char* attributeName, bool defaultValue) const;
  };
 
 } // namespace

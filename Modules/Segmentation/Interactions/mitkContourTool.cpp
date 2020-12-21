@@ -19,17 +19,13 @@ found in the LICENSE file.
 
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
-//#include "mitkProperties.h"
-//#include "mitkPlanarCircle.h"
-#include "mitkLabelSetImage.h"
 
 #include "mitkInteractionEvent.h"
 #include "mitkStateMachineAction.h"
 
 mitk::ContourTool::ContourTool(int paintingPixelValue)
   : FeedbackContourTool("PressMoveReleaseWithCTRLInversion"),
-    m_PaintingPixelValue(paintingPixelValue),
-    m_CurrentLabelID(1)
+    m_PaintingPixelValue(paintingPixelValue)
 {
 }
 
@@ -125,32 +121,18 @@ void mitk::ContourTool::OnMouseReleased(StateMachineAction *, InteractionEvent *
   if (!workingNode)
     return;
 
-  auto *image = dynamic_cast<Image *>(workingNode->GetData());
+  auto workingImage = dynamic_cast<Image *>(workingNode->GetData());
   const PlaneGeometry *planeGeometry((positionEvent->GetSender()->GetCurrentWorldPlaneGeometry()));
-  if (!image || !planeGeometry)
+  if (!workingImage || !planeGeometry)
     return;
-
-  // Check if it is a multilabel-image
-  // If yes, get the new drawing color from it.
-  // Otherwise nothing happens.
-  auto *labelSetImage = dynamic_cast<LabelSetImage *>(image);
-  if (labelSetImage)
-  {
-    mitk::Label *label = labelSetImage->GetActiveLabel(labelSetImage->GetActiveLayer());
-    m_CurrentLabelID = label->GetValue();
-  }
-  else
-  {
-    m_CurrentLabelID = 1;
-  }
 
   const auto *abstractTransformGeometry(
     dynamic_cast<const AbstractTransformGeometry *>(positionEvent->GetSender()->GetCurrentWorldPlaneGeometry()));
-  if (!image || abstractTransformGeometry)
+  if (!workingImage || abstractTransformGeometry)
     return;
 
   // 2. Slice is known, now we try to get it as a 2D image and project the contour into index coordinates of this slice
-  Image::Pointer slice = SegTool2D::GetAffectedImageSliceAs2DImage(positionEvent, image);
+  Image::Pointer slice = SegTool2D::GetAffectedImageSliceAs2DImage(positionEvent, workingImage);
 
   if (slice.IsNull())
   {
@@ -166,10 +148,11 @@ void mitk::ContourTool::OnMouseReleased(StateMachineAction *, InteractionEvent *
     return;
 
   int timestep = positionEvent->GetSender()->GetTimeStep();
+  int activePixelValue = ContourModelUtils::GetActivePixelValue(workingImage);
 
   // m_PaintingPixelValue only decides whether to paint or erase
   mitk::ContourModelUtils::FillContourInSlice(
-    projectedContour, timestep, slice, image, (m_PaintingPixelValue * m_CurrentLabelID));
+    projectedContour, timestep, slice, workingImage, m_PaintingPixelValue * activePixelValue);
 
   // this->WriteBackSegmentationResult(positionEvent, slice);
   SegTool2D::WriteBackSegmentationResult(positionEvent, slice);

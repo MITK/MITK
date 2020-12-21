@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "mitkNavigationDataRecorderDeprecated.h"
 #include <fstream>
 #include <mitkIGTTimeStamp.h>
-#include <tinyxml.h>
+#include <tinyxml2.h>
 #include <itksys/SystemTools.hxx>
 
 //headers for exceptions
@@ -139,33 +139,34 @@ void mitk::NavigationDataRecorderDeprecated::Update()
       if (timestamp >= 0)
       {
         if (this->m_OutputFormat == mitk::NavigationDataRecorderDeprecated::xml)
-          {
-          auto  elem = new TiXmlElement("NavigationData");
+        {
+          tinyxml2::XMLDocument doc;
+          auto *elem = doc.NewElement("NavigationData");
 
-          elem->SetDoubleAttribute("Time", timestamp);
-          elem->SetAttribute("SystemTime", sysTimeStr); // tag for system time
-          elem->SetDoubleAttribute("Tool", index);
-          elem->SetDoubleAttribute("X", position[0]);
-          elem->SetDoubleAttribute("Y", position[1]);
-          elem->SetDoubleAttribute("Z", position[2]);
+          elem->SetAttribute("Time", timestamp);
+          elem->SetAttribute("SystemTime", sysTimeStr.c_str()); // tag for system time
+          elem->SetAttribute("Tool", index);
+          elem->SetAttribute("X", position[0]);
+          elem->SetAttribute("Y", position[1]);
+          elem->SetAttribute("Z", position[2]);
 
-          elem->SetDoubleAttribute("QX", orientation[0]);
-          elem->SetDoubleAttribute("QY", orientation[1]);
-          elem->SetDoubleAttribute("QZ", orientation[2]);
-          elem->SetDoubleAttribute("QR", orientation[3]);
+          elem->SetAttribute("QX", orientation[0]);
+          elem->SetAttribute("QY", orientation[1]);
+          elem->SetAttribute("QZ", orientation[2]);
+          elem->SetAttribute("QR", orientation[3]);
 
-          elem->SetDoubleAttribute("C00", matrix[0][0]);
-          elem->SetDoubleAttribute("C01", matrix[0][1]);
-          elem->SetDoubleAttribute("C02", matrix[0][2]);
-          elem->SetDoubleAttribute("C03", matrix[0][3]);
-          elem->SetDoubleAttribute("C04", matrix[0][4]);
-          elem->SetDoubleAttribute("C05", matrix[0][5]);
-          elem->SetDoubleAttribute("C10", matrix[1][0]);
-          elem->SetDoubleAttribute("C11", matrix[1][1]);
-          elem->SetDoubleAttribute("C12", matrix[1][2]);
-          elem->SetDoubleAttribute("C13", matrix[1][3]);
-          elem->SetDoubleAttribute("C14", matrix[1][4]);
-          elem->SetDoubleAttribute("C15", matrix[1][5]);
+          elem->SetAttribute("C00", matrix[0][0]);
+          elem->SetAttribute("C01", matrix[0][1]);
+          elem->SetAttribute("C02", matrix[0][2]);
+          elem->SetAttribute("C03", matrix[0][3]);
+          elem->SetAttribute("C04", matrix[0][4]);
+          elem->SetAttribute("C05", matrix[0][5]);
+          elem->SetAttribute("C10", matrix[1][0]);
+          elem->SetAttribute("C11", matrix[1][1]);
+          elem->SetAttribute("C12", matrix[1][2]);
+          elem->SetAttribute("C13", matrix[1][3]);
+          elem->SetAttribute("C14", matrix[1][4]);
+          elem->SetAttribute("C15", matrix[1][5]);
 
           if (dataValid)
             elem->SetAttribute("Valid",1);
@@ -187,12 +188,13 @@ void mitk::NavigationDataRecorderDeprecated::Update()
               it = m_AdditionalAttributes.find( nd );
           if( it != m_AdditionalAttributes.end() )
           {
-            elem->SetAttribute(it->second.first, it->second.second);
+            elem->SetAttribute(it->second.first.c_str(), it->second.second.c_str());
           }
 
-          *m_Stream << "        " << *elem << std::endl;
+          tinyxml2::XMLPrinter printer;
+          doc.Print(&printer);
 
-          delete elem;
+          *m_Stream << "        " << printer.CStr() << std::endl;
           }
         else if (this->m_OutputFormat == mitk::NavigationDataRecorderDeprecated::csv)
           {

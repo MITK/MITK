@@ -1,23 +1,21 @@
 project(org_mitk_gui_qt_xnat)
 
-find_package(OpenSSL)
+if(WIN32)
+  set(MITK_OPENSSL_SSL_DLL "" CACHE FILEPATH "")
+  set(MITK_OPENSSL_CRYPTO_DLL "" CACHE FILEPATH "")
 
-if( NOT OPENSSL_FOUND AND NOT SSL_EAY_RELEASE AND NOT LIB_EAY_RELEASE )
-  message( "Could not find OpenSSL, XNAT will not work for HTTPS connections. Please set the SSL_EAY_RELEASE and LIB_EAY_RELEASE CMake variables to the respective libraries." )
-endif()
+  if(MITK_OPENSSL_SSL_DLL AND EXISTS "${MITK_OPENSSL_SSL_DLL}" AND MITK_OPENSSL_CRYPTO_DLL AND EXISTS "${MITK_OPENSSL_CRYPTO_DLL}")
+    foreach(config_type ${CMAKE_CONFIGURATION_TYPES})
+      execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${MITK_BINARY_DIR}/bin/${config_type}")
+      configure_file("${MITK_OPENSSL_SSL_DLL}" "${MITK_BINARY_DIR}/bin/${config_type}/" COPYONLY)
+      configure_file("${MITK_OPENSSL_CRYPTO_DLL}" "${MITK_BINARY_DIR}/bin/${config_type}/" COPYONLY)
+    endforeach()
 
-if( WIN32 AND EXISTS "${SSL_EAY_RELEASE}" AND EXISTS "${LIB_EAY_RELEASE}" )
-  foreach(config_type ${CMAKE_CONFIGURATION_TYPES})
-    execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${MITK_BINARY_DIR}/bin/${config_type}")
-  endforeach()
-
-  configure_file( ${SSL_EAY_RELEASE} ${MITK_BINARY_DIR}/bin/Release/ COPYONLY )
-  configure_file( ${LIB_EAY_RELEASE} ${MITK_BINARY_DIR}/bin/Release/ COPYONLY )
-  configure_file( ${SSL_EAY_RELEASE} ${MITK_BINARY_DIR}/bin/Debug/ COPYONLY )
-  configure_file( ${LIB_EAY_RELEASE} ${MITK_BINARY_DIR}/bin/Debug/ COPYONLY )
-
-  MITK_INSTALL( FILES ${SSL_EAY_RELEASE})
-  MITK_INSTALL( FILES ${LIB_EAY_RELEASE})
+    MITK_INSTALL(FILES
+      "${MITK_OPENSSL_SSL_DLL}"
+      "${MITK_OPENSSL_CRYPTO_DLL}"
+    )
+  endif()
 endif()
 
 mitk_create_plugin(

@@ -22,37 +22,40 @@ found in the LICENSE file.
 
 #include <mitkLocaleSwitch.h>
 
+#include <tinyxml2.h>
+
 namespace mitk
 {
   class DoublePropertySerializer : public BasePropertySerializer
   {
   public:
-    mitkClassMacro(DoublePropertySerializer, BasePropertySerializer);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(DoublePropertySerializer, BasePropertySerializer)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
-      TiXmlElement *Serialize() override
+    tinyxml2::XMLElement *Serialize(tinyxml2::XMLDocument &doc) override
     {
       if (const DoubleProperty *prop = dynamic_cast<const DoubleProperty *>(m_Property.GetPointer()))
       {
         LocaleSwitch localeSwitch("C");
 
-        auto element = new TiXmlElement("double");
-        element->SetAttribute("value", boost::lexical_cast<std::string>(prop->GetValue()));
+        auto *element = doc.NewElement("double");
+        element->SetAttribute("value", boost::lexical_cast<std::string>(prop->GetValue()).c_str());
         return element;
       }
       else
         return nullptr;
     }
 
-    BaseProperty::Pointer Deserialize(TiXmlElement *element) override
+    BaseProperty::Pointer Deserialize(const tinyxml2::XMLElement *element) override
     {
       if (!element)
         return nullptr;
 
       LocaleSwitch localeSwitch("C");
 
-      std::string d;
-      if (element->QueryStringAttribute("value", &d) == TIXML_SUCCESS)
+      const char* d = element->Attribute("value");
+      if (nullptr != d)
       {
         try
         {

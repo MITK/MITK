@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include "mitkDICOMSortByTag.h"
 #include "mitkSortByImagePositionPatient.h"
 
+#include <tinyxml2.h>
 
 mitk::DICOMReaderConfigurator
 ::DICOMReaderConfigurator()
@@ -30,10 +31,10 @@ mitk::DICOMFileReader::Pointer
 mitk::DICOMReaderConfigurator
 ::CreateFromConfigFile(const std::string& filename) const
 {
-  TiXmlDocument doc (filename);
-  if (doc.LoadFile())
+  tinyxml2::XMLDocument doc;
+  if (tinyxml2::XML_SUCCESS == doc.LoadFile(filename.c_str()))
   {
-    return this->CreateFromTiXmlDocument( doc );
+    return this->CreateFromXMLDocument( doc );
   }
   else
   {
@@ -46,19 +47,19 @@ mitk::DICOMFileReader::Pointer
 mitk::DICOMReaderConfigurator
 ::CreateFromUTF8ConfigString(const std::string& xmlContents) const
 {
-  TiXmlDocument doc;
-  doc.Parse(xmlContents.c_str(), nullptr, TIXML_ENCODING_UTF8);
+  tinyxml2::XMLDocument doc;
+  doc.Parse(xmlContents.c_str());
 
-  return this->CreateFromTiXmlDocument( doc );
+  return this->CreateFromXMLDocument( doc );
 }
 
 mitk::DICOMFileReader::Pointer
 mitk::DICOMReaderConfigurator
-::CreateFromTiXmlDocument(TiXmlDocument& doc) const
+::CreateFromXMLDocument(tinyxml2::XMLDocument& doc) const
 {
-  TiXmlHandle root(doc.RootElement());
+  tinyxml2::XMLHandle root(doc.RootElement());
 
-  if (TiXmlElement* rootElement = root.ToElement())
+  if (auto* rootElement = root.ToElement())
   {
     if (strcmp(rootElement->Value(), "DICOMFileReader")) // :-( no std::string methods
     {
@@ -75,7 +76,7 @@ mitk::DICOMReaderConfigurator
     }
 
     int version(1);
-    if ( rootElement->QueryIntAttribute("version", &version) == TIXML_SUCCESS)
+    if ( rootElement->QueryIntAttribute("version", &version) == tinyxml2::XML_SUCCESS)
     {
       if (version == 1)
       {
@@ -103,7 +104,7 @@ mitk::DICOMReaderConfigurator
     double decimalPlacesForOrientation(mitk::DICOMITKSeriesGDCMReader::GetDefaultDecimalPlacesForOrientation());
     bool useDecimalPlacesForOrientation(false);
     useDecimalPlacesForOrientation =
-      rootElement->QueryDoubleAttribute("decimalPlacesForOrientation", &decimalPlacesForOrientation) == TIXML_SUCCESS; // attribute present and a double value
+      rootElement->QueryDoubleAttribute("decimalPlacesForOrientation", &decimalPlacesForOrientation) == tinyxml2::XML_SUCCESS; // attribute present and a double value
 
     if (classname == "ClassicDICOMSeriesReader")
     {
@@ -156,21 +157,23 @@ mitk::DICOMReaderConfigurator
 
 bool
 mitk::DICOMReaderConfigurator
-::QueryBooleanAttribute(const TiXmlElement* element, const char* attributeName, bool defaultValue) const
+::QueryBooleanAttribute(const tinyxml2::XMLElement* element, const char* attributeName, bool defaultValue) const
 {
   bool value(defaultValue);
-  const char* valueC = element->Attribute(attributeName);
-  if (valueC)
+  const auto* valueC = element->Attribute(attributeName);
+
+  if (nullptr != valueC)
   {
-    std::string valueS(valueC);
+    std::string valueS = valueC;
     value = boolStringTrue(valueS);
   }
+
   return value;
 }
 
 void
 mitk::DICOMReaderConfigurator
-::ConfigureCommonPropertiesOfThreeDnTDICOMSeriesReader(ThreeDnTDICOMSeriesReader::Pointer reader, TiXmlElement* element) const
+::ConfigureCommonPropertiesOfThreeDnTDICOMSeriesReader(ThreeDnTDICOMSeriesReader::Pointer reader, const tinyxml2::XMLElement* element) const
 {
   // add the "group3DnT" flag
   bool group3DnT = QueryBooleanAttribute(element, "group3DnT", ThreeDnTDICOMSeriesReader::GetDefaultGroup3DandT());
@@ -185,7 +188,7 @@ mitk::DICOMReaderConfigurator
 
 mitk::ThreeDnTDICOMSeriesReader::Pointer
 mitk::DICOMReaderConfigurator
-::ConfigureThreeDnTDICOMSeriesReader(ThreeDnTDICOMSeriesReader::Pointer reader, TiXmlElement* element) const
+::ConfigureThreeDnTDICOMSeriesReader(ThreeDnTDICOMSeriesReader::Pointer reader, const tinyxml2::XMLElement* element) const
 {
   assert(element);
 
@@ -201,7 +204,7 @@ mitk::DICOMReaderConfigurator
 
 void
 mitk::DICOMReaderConfigurator
-::ConfigureCommonPropertiesOfDICOMITKSeriesGDCMReader(DICOMITKSeriesGDCMReader::Pointer reader, TiXmlElement* element) const
+::ConfigureCommonPropertiesOfDICOMITKSeriesGDCMReader(DICOMITKSeriesGDCMReader::Pointer reader, const tinyxml2::XMLElement* element) const
 {
   assert(element);
 
@@ -226,7 +229,7 @@ mitk::DICOMReaderConfigurator
 
 mitk::DICOMITKSeriesGDCMReader::Pointer
 mitk::DICOMReaderConfigurator
-::ConfigureDICOMITKSeriesGDCMReader(DICOMITKSeriesGDCMReader::Pointer reader, TiXmlElement* element) const
+::ConfigureDICOMITKSeriesGDCMReader(DICOMITKSeriesGDCMReader::Pointer reader, const tinyxml2::XMLElement* element) const
 {
   assert(element);
 
@@ -241,7 +244,7 @@ mitk::DICOMReaderConfigurator
   bool toleratedOriginErrorIsAbsolute = QueryBooleanAttribute(element, "toleratedOriginErrorIsAbsolute", false);
 
   double toleratedOriginError(0.3);
-  if (element->QueryDoubleAttribute("toleratedOriginError", &toleratedOriginError) == TIXML_SUCCESS) // attribute present and a double value
+  if (element->QueryDoubleAttribute("toleratedOriginError", &toleratedOriginError) == tinyxml2::XML_SUCCESS) // attribute present and a double value
   {
     if (toleratedOriginErrorIsAbsolute)
     {
@@ -255,7 +258,7 @@ mitk::DICOMReaderConfigurator
 
   // DICOMTagBasedSorters are the only thing we create at this point
   // TODO for-loop over all child elements of type DICOMTagBasedSorter, BUT actually a single sorter of this type is enough.
-  TiXmlElement* dElement = element->FirstChildElement("DICOMDatasetSorter");
+  auto* dElement = element->FirstChildElement("DICOMDatasetSorter");
   if (dElement)
   {
     const char* classnameC = dElement->Attribute("class");
@@ -287,7 +290,7 @@ mitk::DICOMReaderConfigurator
 
 mitk::DICOMTagBasedSorter::Pointer
 mitk::DICOMReaderConfigurator
-::CreateDICOMTagBasedSorter(TiXmlElement* element) const
+::CreateDICOMTagBasedSorter(const tinyxml2::XMLElement* element) const
 {
   mitk::DICOMTagBasedSorter::Pointer tagSorter = mitk::DICOMTagBasedSorter::New();
 
@@ -299,10 +302,10 @@ mitk::DICOMReaderConfigurator
   bool expectDistanceOne = QueryBooleanAttribute(element, "expectDistanceOne", mitk::DICOMTagBasedSorter::GetDefaultExpectDistanceOne());
   tagSorter->SetExpectDistanceOne(expectDistanceOne);
 
-  TiXmlElement* dElement = element->FirstChildElement("Distinguishing");
+  auto* dElement = element->FirstChildElement("Distinguishing");
   if (dElement)
   {
-    for ( TiXmlElement* tChild = dElement->FirstChildElement();
+    for ( auto* tChild = dElement->FirstChildElement();
           tChild != nullptr;
           tChild = tChild->NextSiblingElement() )
     {
@@ -310,7 +313,7 @@ mitk::DICOMReaderConfigurator
       {
         mitk::DICOMTag tag = tagFromXMLElement(tChild);
         int i(5);
-        if (tChild->QueryIntAttribute("cutDecimalPlaces", &i) == TIXML_SUCCESS)
+        if (tChild->QueryIntAttribute("cutDecimalPlaces", &i) == tinyxml2::XML_SUCCESS)
         {
           tagSorter->AddDistinguishingTag( tag, new mitk::DICOMTagBasedSorter::CutDecimalPlaces(i) );
         }
@@ -327,17 +330,17 @@ mitk::DICOMReaderConfigurator
   }
 
   // "sorting tags"
-  TiXmlElement* sElement = element->FirstChildElement("Sorting");
+  auto* sElement = element->FirstChildElement("Sorting");
   if (sElement)
   {
     DICOMSortCriterion::Pointer previousCriterion;
     DICOMSortCriterion::Pointer currentCriterion;
 
-    for ( TiXmlNode* tChildNode = sElement->LastChild();
+    for ( auto* tChildNode = sElement->LastChild();
         tChildNode != nullptr;
         tChildNode = tChildNode->PreviousSibling() )
     {
-      TiXmlElement* tChild = tChildNode->ToElement();
+      auto* tChild = tChildNode->ToElement();
       if (!tChild) continue;
 
       if (!strcmp(tChild->Value(), "Tag"))
@@ -349,7 +352,7 @@ mitk::DICOMReaderConfigurator
         catch(...)
         {
           std::stringstream ss;
-          ss << "Could not parse <Tag> element at (input line " << tChild->Row() << ", col. " << tChild->Column() << ")!";
+          ss << "Could not parse <Tag> element at input line " << tChild->GetLineNum() << "!";
           MITK_ERROR << ss.str();
           return nullptr;
         }
@@ -364,7 +367,7 @@ mitk::DICOMReaderConfigurator
         catch(...)
         {
           std::stringstream ss;
-          ss << "Could not parse <ImagePositionPatient> element at (input line " << tChild->Row() << ", col. " << tChild->Column() << ")!";
+          ss << "Could not parse <ImagePositionPatient> element at input line " << tChild->GetLineNum() << "!";
           MITK_ERROR << ss.str();
           return nullptr;
         }
@@ -385,7 +388,7 @@ mitk::DICOMReaderConfigurator
 
 std::string
 mitk::DICOMReaderConfigurator
-::requiredStringAttribute(TiXmlElement* xmlElement, const std::string& key) const
+::requiredStringAttribute(const tinyxml2::XMLElement* xmlElement, const std::string& key) const
 {
   assert(xmlElement);
 
@@ -398,8 +401,8 @@ mitk::DICOMReaderConfigurator
   else
   {
     std::stringstream ss;
-    ss << "Expected an attribute '" << key << "' at this position "
-          "(input line " << xmlElement->Row() << ", col. " << xmlElement->Column() << ")!";
+    ss << "Expected an attribute '" << key << "' at "
+          "input line " << xmlElement->GetLineNum() << "!";
     MITK_ERROR << ss.str();
     throw std::invalid_argument( ss.str() );
   }
@@ -418,15 +421,15 @@ mitk::DICOMReaderConfigurator
 
 mitk::DICOMTag
 mitk::DICOMReaderConfigurator
-::tagFromXMLElement(TiXmlElement* xmlElement) const
+::tagFromXMLElement(const tinyxml2::XMLElement* xmlElement) const
 {
   assert(xmlElement);
 
   if (strcmp(xmlElement->Value(), "Tag")) // :-( no std::string methods
   {
     std::stringstream ss;
-    ss << "Expected a <Tag group=\"..\" element=\"..\"> tag at this position "
-          "(input line " << xmlElement->Row() << ", col. " << xmlElement->Column() << ")!";
+    ss << "Expected a <Tag group=\"..\" element=\"..\"> tag at "
+          "input line " << xmlElement->GetLineNum() << "!";
     MITK_ERROR << ss.str();
     throw std::invalid_argument( ss.str() );
   }
@@ -445,7 +448,7 @@ mitk::DICOMReaderConfigurator
   {
     std::stringstream ss;
     ss << "Expected group and element values in <Tag group=\"..\" element=\"..\"> to be hexadecimal with leading 0x, e.g. '0x0020'"
-          "(input line " << xmlElement->Row() << ", col. " << xmlElement->Column() << ")!";
+          "(input line " << xmlElement->GetLineNum() << ")!";
     MITK_ERROR << ss.str();
     throw std::invalid_argument( ss.str() );
   }
@@ -453,7 +456,7 @@ mitk::DICOMReaderConfigurator
 
 mitk::DICOMSortCriterion::Pointer
 mitk::DICOMReaderConfigurator
-::CreateDICOMSortByTag(TiXmlElement* xmlElement, DICOMSortCriterion::Pointer secondaryCriterion) const
+::CreateDICOMSortByTag(const tinyxml2::XMLElement* xmlElement, DICOMSortCriterion::Pointer secondaryCriterion) const
 {
   mitk::DICOMTag tag = tagFromXMLElement(xmlElement);
   return DICOMSortByTag::New(tag, secondaryCriterion).GetPointer();
@@ -461,7 +464,7 @@ mitk::DICOMReaderConfigurator
 
 mitk::DICOMSortCriterion::Pointer
 mitk::DICOMReaderConfigurator
-::CreateSortByImagePositionPatient(TiXmlElement*, DICOMSortCriterion::Pointer secondaryCriterion) const
+::CreateSortByImagePositionPatient(const tinyxml2::XMLElement*, DICOMSortCriterion::Pointer secondaryCriterion) const
 {
   return SortByImagePositionPatient::New(secondaryCriterion).GetPointer();
 }
@@ -474,20 +477,21 @@ mitk::DICOMReaderConfigurator
 {
   // check possible sub-classes from the most-specific one up to the most generic one
   const DICOMFileReader* cPointer = reader;
-  TiXmlElement* root;
+  tinyxml2::XMLDocument document;
+  tinyxml2::XMLElement* root = nullptr;
   if (const auto* specificReader = dynamic_cast<const ClassicDICOMSeriesReader*>(cPointer))
   {
-    root = this->CreateConfigStringFromReader(specificReader);
+    root = this->CreateConfigStringFromReader(document, specificReader);
   }
   else
   if (const auto* specificReader = dynamic_cast<const ThreeDnTDICOMSeriesReader*>(cPointer))
   {
-    root = this->CreateConfigStringFromReader(specificReader);
+    root = this->CreateConfigStringFromReader(document, specificReader);
   }
   else
   if (const auto* specificReader = dynamic_cast<const DICOMITKSeriesGDCMReader*>(cPointer))
   {
-    root = this->CreateConfigStringFromReader(specificReader);
+    root = this->CreateConfigStringFromReader(document, specificReader);
   }
   else
   {
@@ -495,15 +499,13 @@ mitk::DICOMReaderConfigurator
     return ""; // no serialization, what a pity
   }
 
-  if (root)
+  if (nullptr != root)
   {
-    TiXmlDocument document;
-    document.LinkEndChild( root );
+    document.InsertEndChild( root );
 
-    TiXmlPrinter printer;
-    printer.SetIndent( "  " );
+    tinyxml2::XMLPrinter printer;
+    document.Print(&printer);
 
-    document.Accept( &printer );
     std::string xmltext = printer.CStr();
     return xmltext;
   }
@@ -514,18 +516,18 @@ mitk::DICOMReaderConfigurator
   }
 }
 
-TiXmlElement*
+tinyxml2::XMLElement*
 mitk::DICOMReaderConfigurator
-::CreateConfigStringFromReader(const DICOMITKSeriesGDCMReader* reader) const
+::CreateConfigStringFromReader(tinyxml2::XMLDocument &doc, const DICOMITKSeriesGDCMReader* reader) const
 {
-  TiXmlElement* root = this->CreateDICOMFileReaderTag(reader);
+  auto* root = this->CreateDICOMFileReaderTag(doc, reader);
   assert(root);
 
-  root->SetAttribute("fixTiltByShearing", toString(reader->GetFixTiltByShearing()));
-  root->SetAttribute("acceptTwoSlicesGroups", toString(reader->GetAcceptTwoSlicesGroups()));
-  root->SetDoubleAttribute("toleratedOriginError", reader->GetToleratedOriginError());
-  root->SetAttribute("toleratedOriginErrorIsAbsolute", toString(reader->IsToleratedOriginOffsetAbsolute()));
-  root->SetDoubleAttribute("decimalPlacesForOrientation", reader->GetDecimalPlacesForOrientation());
+  root->SetAttribute("fixTiltByShearing", reader->GetFixTiltByShearing());
+  root->SetAttribute("acceptTwoSlicesGroups", reader->GetAcceptTwoSlicesGroups());
+  root->SetAttribute("toleratedOriginError", reader->GetToleratedOriginError());
+  root->SetAttribute("toleratedOriginErrorIsAbsolute", reader->IsToleratedOriginOffsetAbsolute());
+  root->SetAttribute("decimalPlacesForOrientation", reader->GetDecimalPlacesForOrientation());
 
   // iterate DICOMDatasetSorter objects
   DICOMITKSeriesGDCMReader::ConstSorterList sorterList = reader->GetFreelyConfiguredSortingElements();
@@ -536,8 +538,8 @@ mitk::DICOMReaderConfigurator
     const DICOMDatasetSorter* sorter = *sorterIter;
     if (const auto* specificSorter = dynamic_cast<const DICOMTagBasedSorter*>(sorter))
     {
-      TiXmlElement* sorterTag = this->CreateConfigStringFromDICOMDatasetSorter(specificSorter);
-      root->LinkEndChild(sorterTag);
+      auto* sorterTag = this->CreateConfigStringFromDICOMDatasetSorter(doc, specificSorter);
+      root->InsertEndChild(sorterTag);
     }
     else
     {
@@ -549,43 +551,43 @@ mitk::DICOMReaderConfigurator
   return root;
 }
 
-TiXmlElement*
+tinyxml2::XMLElement*
 mitk::DICOMReaderConfigurator
-::CreateConfigStringFromDICOMDatasetSorter(const DICOMTagBasedSorter* sorter) const
+::CreateConfigStringFromDICOMDatasetSorter(tinyxml2::XMLDocument &doc, const DICOMTagBasedSorter* sorter) const
 {
   assert(sorter);
 
-  auto  sorterTag = new TiXmlElement("DICOMDatasetSorter");
+  auto *sorterTag = doc.NewElement("DICOMDatasetSorter");
   sorterTag->SetAttribute("class", sorter->GetNameOfClass());
-  sorterTag->SetAttribute("strictSorting", toString(sorter->GetStrictSorting()));
-  sorterTag->SetAttribute("expectDistanceOne", toString(sorter->GetExpectDistanceOne()));
+  sorterTag->SetAttribute("strictSorting", sorter->GetStrictSorting());
+  sorterTag->SetAttribute("expectDistanceOne", sorter->GetExpectDistanceOne());
 
-  auto  distinguishingTagsElement = new TiXmlElement("Distinguishing");
-  sorterTag->LinkEndChild(distinguishingTagsElement);
+  auto *distinguishingTagsElement = doc.NewElement("Distinguishing");
+  sorterTag->InsertEndChild(distinguishingTagsElement);
   mitk::DICOMTagList distinguishingTags = sorter->GetDistinguishingTags();
   for (auto tagIter = distinguishingTags.begin();
        tagIter != distinguishingTags.end();
        ++tagIter)
   {
-    TiXmlElement* tag = this->CreateConfigStringFromDICOMTag(*tagIter);
-    distinguishingTagsElement->LinkEndChild(tag);
+    auto* tag = this->CreateConfigStringFromDICOMTag(doc, *tagIter);
+    distinguishingTagsElement->InsertEndChild(tag);
 
     const DICOMTagBasedSorter::TagValueProcessor* processor = sorter->GetTagValueProcessorForDistinguishingTag(*tagIter);
     if (const auto* specificProcessor = dynamic_cast<const DICOMTagBasedSorter::CutDecimalPlaces*>(processor))
     {
-      tag->SetDoubleAttribute("cutDecimalPlaces", specificProcessor->GetPrecision());
+      tag->SetAttribute("cutDecimalPlaces", specificProcessor->GetPrecision());
     }
   }
 
-  auto  sortingElement = new TiXmlElement("Sorting");
-  sorterTag->LinkEndChild(sortingElement);
+  auto *sortingElement = doc.NewElement("Sorting");
+  sorterTag->InsertEndChild(sortingElement);
   mitk::DICOMSortCriterion::ConstPointer sortCriterion = sorter->GetSortCriterion();
   while (sortCriterion.IsNotNull())
   {
     std::string classname = sortCriterion->GetNameOfClass();
     if (classname == "SortByImagePositionPatient")
     {
-      sortingElement->LinkEndChild( new TiXmlElement("ImagePositionPatient") ); // no parameters
+      sortingElement->InsertEndChild( doc.NewElement("ImagePositionPatient") ); // no parameters
     }
     else
     if (classname == "DICOMSortByTag")
@@ -595,9 +597,9 @@ mitk::DICOMReaderConfigurator
       {
         DICOMTag firstTag = pseudoTagList.front();
 
-        TiXmlElement* tagElement = this->CreateConfigStringFromDICOMTag(firstTag);
+        auto* tagElement = this->CreateConfigStringFromDICOMTag(doc, firstTag);
 
-        sortingElement->LinkEndChild( tagElement );
+        sortingElement->InsertEndChild( tagElement );
       }
       else
       {
@@ -617,14 +619,14 @@ mitk::DICOMReaderConfigurator
   return sorterTag;
 }
 
-TiXmlElement*
+tinyxml2::XMLElement*
 mitk::DICOMReaderConfigurator
-::CreateConfigStringFromDICOMTag(const DICOMTag& tag) const
+::CreateConfigStringFromDICOMTag(tinyxml2::XMLDocument& doc, const DICOMTag& tag) const
 {
-  auto  tagElement = new TiXmlElement("Tag"); // name group element
+  auto  tagElement = doc.NewElement("Tag"); // name group element
   tagElement->SetAttribute("name", tag.GetName().c_str());
-  tagElement->SetAttribute("group", toHexString(tag.GetGroup()));
-  tagElement->SetAttribute("element", toHexString(tag.GetElement()));
+  tagElement->SetAttribute("group", toHexString(tag.GetGroup()).c_str());
+  tagElement->SetAttribute("element", toHexString(tag.GetElement()).c_str());
   return tagElement;
 }
 
@@ -638,37 +640,30 @@ mitk::DICOMReaderConfigurator
 }
 
 
-TiXmlElement*
+tinyxml2::XMLElement*
 mitk::DICOMReaderConfigurator
-::CreateConfigStringFromReader(const ThreeDnTDICOMSeriesReader* reader) const
+::CreateConfigStringFromReader(tinyxml2::XMLDocument& doc, const ThreeDnTDICOMSeriesReader* reader) const
 {
-  TiXmlElement* root = this->CreateConfigStringFromReader(static_cast<const DICOMITKSeriesGDCMReader*>(reader));
+  auto* root = this->CreateConfigStringFromReader(doc, static_cast<const DICOMITKSeriesGDCMReader*>(reader));
   assert(root);
 
-  root->SetAttribute("group3DnT", toString(reader->GetGroup3DandT()));
+  root->SetAttribute("group3DnT", reader->GetGroup3DandT());
 
   return root;
 }
 
-const char*
+tinyxml2::XMLElement*
 mitk::DICOMReaderConfigurator
-::toString(bool b) const
+::CreateConfigStringFromReader(tinyxml2::XMLDocument& doc, const ClassicDICOMSeriesReader* reader) const
 {
-  return b ? "true" : "false";
+  return this->CreateDICOMFileReaderTag(doc, reader);
 }
 
-TiXmlElement*
+tinyxml2::XMLElement*
 mitk::DICOMReaderConfigurator
-::CreateConfigStringFromReader(const ClassicDICOMSeriesReader* reader) const
+::CreateDICOMFileReaderTag(tinyxml2::XMLDocument& doc, const DICOMFileReader* reader) const
 {
-  return this->CreateDICOMFileReaderTag(reader);
-}
-
-TiXmlElement*
-mitk::DICOMReaderConfigurator
-::CreateDICOMFileReaderTag(const DICOMFileReader* reader) const
-{
-  auto  readerTag = new TiXmlElement("DICOMFileReader");
+  auto readerTag = doc.NewElement("DICOMFileReader");
   readerTag->SetAttribute("class", reader->GetNameOfClass());
   readerTag->SetAttribute("label", reader->GetConfigurationLabel().c_str());
   readerTag->SetAttribute("description", reader->GetConfigurationDescription().c_str());

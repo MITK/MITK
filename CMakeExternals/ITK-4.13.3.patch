@@ -1,0 +1,40 @@
+diff --git a/Modules/Core/Common/include/itkBoundingBox.h b/Modules/Core/Common/include/itkBoundingBox.h
+index 36b03aaa7f..64205acfab 100644
+--- a/Modules/Core/Common/include/itkBoundingBox.h
++++ b/Modules/Core/Common/include/itkBoundingBox.h
+@@ -87,7 +87,7 @@ public:
+   itkTypeMacro(BoundingBox, Object);
+ 
+   /** Method for creation through the object factory. */
+-  itkNewMacro(Self);
++  itkFactorylessNewMacro(Self);
+ 
+   /** Hold on to the type information specified by the template parameters. */
+   typedef TPointIdentifier                       PointIdentifier;
+diff --git a/Modules/Core/Common/include/itkVectorContainer.h b/Modules/Core/Common/include/itkVectorContainer.h
+index 72293c4ce8..e6366c66b5 100644
+--- a/Modules/Core/Common/include/itkVectorContainer.h
++++ b/Modules/Core/Common/include/itkVectorContainer.h
+@@ -92,7 +92,7 @@ public:
+   typedef VectorType                     STLContainerType;
+ 
+   /** Method for creation through the object factory. */
+-  itkNewMacro(Self);
++  itkFactorylessNewMacro(Self);
+ 
+   /** Standard part of every itk Object. */
+   itkTypeMacro(VectorContainer, Object);
+diff --git a/Modules/Core/Transform/include/itkScalableAffineTransform.h b/Modules/Core/Transform/include/itkScalableAffineTransform.h
+index 4e830476a2..b5efeb95a4 100644
+--- a/Modules/Core/Transform/include/itkScalableAffineTransform.h
++++ b/Modules/Core/Transform/include/itkScalableAffineTransform.h
+@@ -47,7 +47,8 @@ public:
+   itkTypeMacro(ScalableAffineTransform, AffineTransform);
+ 
+   /** New macro for creation of through a Smart Pointer   */
+-  itkNewMacro(Self);
++  itkFactorylessNewMacro(Self);
++  itkCloneMacro(Self);
+ 
+   /** Dimension of the domain space. */
+   itkStaticConstMacro(InputSpaceDimension, unsigned int, NDimensions);

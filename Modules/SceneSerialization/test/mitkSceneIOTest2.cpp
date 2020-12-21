@@ -90,7 +90,7 @@ public:
 
     mitk::SceneIOTestScenarioProvider::ScenarioList scenarios = m_TestCaseProvider.GetAllScenarios();
     MITK_TEST_OUTPUT(<< "Executing " << scenarios.size() << " test scenarios");
-    for (auto scenario : scenarios)
+    for (const auto& scenario : scenarios)
     {
       MITK_TEST_OUTPUT(<< "\n===== Test_ReconstructionOfScenes, scenario '" << scenario.key << "' =====");
 

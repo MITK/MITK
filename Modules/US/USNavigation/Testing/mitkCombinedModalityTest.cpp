@@ -20,21 +20,9 @@ class mitkCombinedModalityTestClass
 {
 public:
 
-  /*
-  * \brief Returns a reference string for serialized calibrations.
-  */
-
-  static std::string GetSerializedReference()
-  {
-
-    return std::string("<calibrations>\n<") + mitk::USCombinedModality::DefaultProbeIdentifier + mitk::USCombinedModality::ProbeAndDepthSeperator
-                       + "0 M00=\"1.1234\" M01=\"1.2234\" M02=\"1.3234\" M10=\"1.4234\" M11=\"1.5234\" M12=\"1.6234\" M20=\"1.7234\" M21=\"1.8234\" M22=\"1.9234\" T0=\"2.1234\" T1=\"2.2234\" T2=\"2.3234\" />\n</calibrations>\n";
-  }
-
   static bool CompareDoubles (double A, double B)
   {
-    float diff = A - B;
-    return (diff < 0.0001) && (-diff < 0.0001);
+    return std::abs(A - B) < 0.0001;
   }
 
   /*
@@ -61,7 +49,7 @@ public:
 
   static void TestSerialization()
   {
-    mitk::USCombinedModality::Pointer modality = CreateModality();
+    auto modality = CreateModality();
 
     mitk::AffineTransform3D::MatrixType matrix;
     matrix[0][0] = 1.1234;
@@ -85,33 +73,41 @@ public:
 
     modality->SetCalibration(transform);
 
-    MITK_TEST_CONDITION_REQUIRED(modality->SerializeCalibration() == GetSerializedReference(), "Testing correct Serialization...");
-  }
-
-  static void TestDeserialization()
-  {
-    mitk::USCombinedModality::Pointer modality = CreateModality();
-    modality->DeserializeCalibration(GetSerializedReference());
-    mitk::AffineTransform3D::Pointer transform = modality->GetCalibration();
-
-    mitk::AffineTransform3D::MatrixType matrix = transform->GetMatrix();
-    mitk::AffineTransform3D::OffsetType offset = transform->GetOffset();;
+    const auto xmlString = modality->SerializeCalibration();
+    auto otherModality = CreateModality();
+    otherModality->DeserializeCalibration(xmlString);
+    auto calibration = otherModality->GetCalibration();
+    const auto& otherMatrix = calibration->GetMatrix();
+    const auto& otherOffset = calibration->GetOffset();
 
     bool identical = true;
 
-    if (! CompareDoubles(matrix[0][0], 1.1234)) identical = false;
-    if (! CompareDoubles(matrix[0][1], 1.2234)) identical = false;
-    if (! CompareDoubles(matrix[0][2], 1.3234)) identical = false;
-    if (! CompareDoubles(matrix[1][0], 1.4234)) identical = false;
-    if (! CompareDoubles(matrix[1][1], 1.5234)) identical = false;
-    if (! CompareDoubles(matrix[1][2], 1.6234)) identical = false;
-    if (! CompareDoubles(matrix[2][0], 1.7234)) identical = false;
-    if (! CompareDoubles(matrix[2][1], 1.8234)) identical = false;
-    if (! CompareDoubles(matrix[2][2], 1.9234)) identical = false;
+    for (size_t i = 0; i < 3; ++i)
+    {
+      for (size_t j = 0; j < 3; ++j)
+      {
+        if (!CompareDoubles(matrix[i][j], otherMatrix[i][j]))
+        {
+          identical = false;
+          break;
+        }
+      }
 
-    if (! CompareDoubles(offset[0], 2.1234)) identical = false;
-    if (! CompareDoubles(offset[1], 2.2234)) identical = false;
-    if (! CompareDoubles(offset[2], 2.3234)) identical = false;
+      if (!identical)
+        break;
+    }
+
+    if (identical)
+    {
+      for (size_t i = 0; i < 3; ++i)
+      {
+        if (!CompareDoubles(offset[i], otherOffset[i]))
+        {
+          identical = false;
+          break;
+        }
+      }
+    }
 
     MITK_TEST_CONDITION_REQUIRED(identical, "Testing if deserialized calibration is identical to serialized one...");
 
@@ -169,7 +165,6 @@ int mitkCombinedModalityTest(int /* argc */, char* /*argv*/[])
 
   mitkCombinedModalityTestClass::TestInstantiation();
   mitkCombinedModalityTestClass::TestSerialization();
-  mitkCombinedModalityTestClass::TestDeserialization();
   mitkCombinedModalityTestClass::TestFilterPipeline();
 
   MITK_TEST_END();

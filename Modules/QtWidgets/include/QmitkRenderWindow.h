@@ -69,7 +69,11 @@ public:
   QmitkRenderWindowMenu::LayoutIndex GetLayoutIndex();
 
   // MenuWidget need to update the Layout Design List when Layout had changed
-  void LayoutDesignListChanged(QmitkRenderWindowMenu::LayoutDesign layoutDesign);
+  void UpdateLayoutDesignList(QmitkRenderWindowMenu::LayoutDesign layoutDesign);
+
+  void UpdateCrosshairVisibility(bool);
+
+  void UpdateCrosshairRotationMode(int);
 
   // Activate or Deactivate MenuWidget.
   void ActivateMenuWidget(bool state);

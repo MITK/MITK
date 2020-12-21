@@ -189,6 +189,16 @@ void QmitkRenderWindowMenu::UpdateLayoutDesignList(LayoutDesign layoutDesign)
   }
 }
 
+void QmitkRenderWindowMenu::UpdateCrosshairVisibility(bool visible)
+{
+  m_CrosshairVisibility = visible;
+}
+
+void QmitkRenderWindowMenu::UpdateCrosshairRotationMode(int mode)
+{
+  m_CrosshairRotationMode = mode;
+}
+
 #ifdef QMITK_USE_EXTERNAL_RENDERWINDOW_MENU
 void QmitkRenderWindowMenu::MoveWidgetToCorrectPos(float opacity)
 #else
@@ -593,13 +603,13 @@ void QmitkRenderWindowMenu::OnCrosshairMenuAboutToShow()
 
 void QmitkRenderWindowMenu::OnCrosshairVisibilityChanged(bool visible)
 {
-  m_CrosshairVisibility = visible;
-  emit CrosshairVisibilityChanged(visible);
+  UpdateCrosshairVisibility(visible);
+  emit CrosshairVisibilityChanged(m_CrosshairVisibility);
 }
 
 void QmitkRenderWindowMenu::OnCrosshairRotationModeSelected(QAction *action)
 {
-  m_CrosshairRotationMode = action->data().toInt();
+  UpdateCrosshairRotationMode(action->data().toInt());
   emit CrosshairRotationModeChanged(m_CrosshairRotationMode);
 }
 

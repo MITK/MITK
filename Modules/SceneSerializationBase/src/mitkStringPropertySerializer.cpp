@@ -14,22 +14,23 @@ found in the LICENSE file.
 #define mitkStringPropertySerializer_h_included
 
 #include "mitkBasePropertySerializer.h"
-
 #include "mitkStringProperty.h"
+#include <tinyxml2.h>
 
 namespace mitk
 {
   class StringPropertySerializer : public BasePropertySerializer
   {
   public:
-    mitkClassMacro(StringPropertySerializer, BasePropertySerializer);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(StringPropertySerializer, BasePropertySerializer)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
-      TiXmlElement *Serialize() override
+    tinyxml2::XMLElement *Serialize(tinyxml2::XMLDocument &doc) override
     {
       if (const StringProperty *prop = dynamic_cast<const StringProperty *>(m_Property.GetPointer()))
       {
-        auto element = new TiXmlElement("string");
+        auto *element = doc.NewElement("string");
         element->SetAttribute("value", prop->GetValue());
         return element;
       }
@@ -37,7 +38,7 @@ namespace mitk
         return nullptr;
     }
 
-    BaseProperty::Pointer Deserialize(TiXmlElement *element) override
+    BaseProperty::Pointer Deserialize(const tinyxml2::XMLElement *element) override
     {
       if (!element)
         return nullptr;

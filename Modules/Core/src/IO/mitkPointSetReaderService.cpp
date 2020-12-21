@@ -15,13 +15,13 @@ found in the LICENSE file.
 #include "mitkGeometry3DToXML.h"
 #include "mitkIOMimeTypes.h"
 #include "mitkProportionalTimeGeometry.h"
+#include <mitkLocaleSwitch.h>
 
 // STL
 #include <fstream>
 #include <iostream>
-#include <mitkLocaleSwitch.h>
 
-#include <tinyxml.h>
+#include <tinyxml2.h>
 
 mitk::PointSetReaderService::PointSetReaderService()
   : AbstractFileReader(CustomMimeType(IOMimeTypes::POINTSET_MIMETYPE()), "MITK Point Set Reader")
@@ -42,13 +42,14 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::PointSetReaderService::DoRe
 
   InputStream stream(this);
 
-  TiXmlDocument doc;
-  stream >> doc;
+  std::string s(std::istreambuf_iterator<char>{stream.rdbuf()}, std::istreambuf_iterator<char>());
+  tinyxml2::XMLDocument doc;
+  doc.Parse(s.c_str(), s.size());
   if (!doc.Error())
   {
-    TiXmlHandle docHandle(&doc);
+    tinyxml2::XMLHandle docHandle(&doc);
     // unsigned int pointSetCounter(0);
-    for (TiXmlElement *currentPointSetElement =
+    for (auto *currentPointSetElement =
            docHandle.FirstChildElement("point_set_file").FirstChildElement("point_set").ToElement();
          currentPointSetElement != nullptr;
          currentPointSetElement = currentPointSetElement->NextSiblingElement())
@@ -61,17 +62,17 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::PointSetReaderService::DoRe
 
       if (currentPointSetElement->FirstChildElement("time_series") != nullptr)
       {
-        for (TiXmlElement *currentTimeSeries = currentPointSetElement->FirstChildElement("time_series")->ToElement();
+        for (auto *currentTimeSeries = currentPointSetElement->FirstChildElement("time_series")->ToElement();
              currentTimeSeries != nullptr;
              currentTimeSeries = currentTimeSeries->NextSiblingElement())
         {
           unsigned int currentTimeStep(0);
-          TiXmlElement *currentTimeSeriesID = currentTimeSeries->FirstChildElement("time_series_id");
+          auto *currentTimeSeriesID = currentTimeSeries->FirstChildElement("time_series_id");
 
           currentTimeStep = atoi(currentTimeSeriesID->GetText());
 
           timeGeometry->Expand(currentTimeStep + 1); // expand (default to identity) in any case
-          TiXmlElement *geometryElem = currentTimeSeries->FirstChildElement("Geometry3D");
+          auto *geometryElem = currentTimeSeries->FirstChildElement("Geometry3D");
           if (geometryElem)
           {
             Geometry3D::Pointer geometry = Geometry3DToXML::FromXML(geometryElem);
@@ -104,15 +105,15 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::PointSetReaderService::DoRe
   }
   else
   {
-    mitkThrow() << "Parsing error at line " << doc.ErrorRow() << ", col " << doc.ErrorCol() << ": " << doc.ErrorDesc();
+    mitkThrow() << doc.ErrorStr();
   }
 
   return result;
 }
 
-mitk::BaseGeometry::Pointer mitk::PointSetReaderService::ReadGeometry(TiXmlElement *parentElement)
+mitk::BaseGeometry::Pointer mitk::PointSetReaderService::ReadGeometry(tinyxml2::XMLElement *parentElement)
 {
-  TiXmlElement *geometryElem = parentElement->FirstChildElement("geometry3d");
+  auto *geometryElem = parentElement->FirstChildElement("geometry3d");
   if (!geometryElem)
     return nullptr;
 
@@ -126,7 +127,7 @@ mitk::BaseGeometry::Pointer mitk::PointSetReaderService::ReadGeometry(TiXmlEleme
   bool somethingMissing(false);
 
   // find data in xml structure
-  TiXmlElement *imageGeometryElem = geometryElem->FirstChildElement("image_geometry");
+  auto *imageGeometryElem = geometryElem->FirstChildElement("image_geometry");
   if (imageGeometryElem)
   {
     std::string igs = imageGeometryElem->GetText();
@@ -135,7 +136,7 @@ mitk::BaseGeometry::Pointer mitk::PointSetReaderService::ReadGeometry(TiXmlEleme
   else
     somethingMissing = true;
 
-  TiXmlElement *frameOfReferenceElem = geometryElem->FirstChildElement("frame_of_reference_id");
+  auto *frameOfReferenceElem = geometryElem->FirstChildElement("frame_of_reference_id");
   if (frameOfReferenceElem)
   {
     frameOfReferenceID = atoi(frameOfReferenceElem->GetText());
@@ -143,56 +144,56 @@ mitk::BaseGeometry::Pointer mitk::PointSetReaderService::ReadGeometry(TiXmlEleme
   else
     somethingMissing = true;
 
-  TiXmlElement *indexToWorldElem = geometryElem->FirstChildElement("index_to_world");
+  auto *indexToWorldElem = geometryElem->FirstChildElement("index_to_world");
   if (indexToWorldElem)
   {
-    TiXmlElement *matrixElem = indexToWorldElem->FirstChildElement("matrix3x3");
-    TiXmlElement *offsetElem = indexToWorldElem->FirstChildElement("offset");
+    auto *matrixElem = indexToWorldElem->FirstChildElement("matrix3x3");
+    auto *offsetElem = indexToWorldElem->FirstChildElement("offset");
     if (indexToWorldElem && offsetElem)
     {
-      TiXmlElement *col0 = matrixElem->FirstChildElement("column_0");
-      TiXmlElement *col1 = matrixElem->FirstChildElement("column_1");
-      TiXmlElement *col2 = matrixElem->FirstChildElement("column_2");
+      auto*col0 = matrixElem->FirstChildElement("column_0");
+      auto*col1 = matrixElem->FirstChildElement("column_1");
+      auto*col2 = matrixElem->FirstChildElement("column_2");
 
       if (col0 && col1 && col2)
       {
-        somethingMissing |= TIXML_SUCCESS != col0->QueryDoubleAttribute("x", &matrix[0][0]);
-        somethingMissing |= TIXML_SUCCESS != col0->QueryDoubleAttribute("y", &matrix[1][0]);
-        somethingMissing |= TIXML_SUCCESS != col0->QueryDoubleAttribute("z", &matrix[2][0]);
+        somethingMissing |= tinyxml2::XML_SUCCESS != col0->QueryDoubleAttribute("x", &matrix[0][0]);
+        somethingMissing |= tinyxml2::XML_SUCCESS != col0->QueryDoubleAttribute("y", &matrix[1][0]);
+        somethingMissing |= tinyxml2::XML_SUCCESS != col0->QueryDoubleAttribute("z", &matrix[2][0]);
 
-        somethingMissing |= TIXML_SUCCESS != col1->QueryDoubleAttribute("x", &matrix[0][1]);
-        somethingMissing |= TIXML_SUCCESS != col1->QueryDoubleAttribute("y", &matrix[1][1]);
-        somethingMissing |= TIXML_SUCCESS != col1->QueryDoubleAttribute("z", &matrix[2][1]);
+        somethingMissing |= tinyxml2::XML_SUCCESS != col1->QueryDoubleAttribute("x", &matrix[0][1]);
+        somethingMissing |= tinyxml2::XML_SUCCESS != col1->QueryDoubleAttribute("y", &matrix[1][1]);
+        somethingMissing |= tinyxml2::XML_SUCCESS != col1->QueryDoubleAttribute("z", &matrix[2][1]);
 
-        somethingMissing |= TIXML_SUCCESS != col2->QueryDoubleAttribute("x", &matrix[0][2]);
-        somethingMissing |= TIXML_SUCCESS != col2->QueryDoubleAttribute("y", &matrix[1][2]);
-        somethingMissing |= TIXML_SUCCESS != col2->QueryDoubleAttribute("z", &matrix[2][2]);
+        somethingMissing |= tinyxml2::XML_SUCCESS != col2->QueryDoubleAttribute("x", &matrix[0][2]);
+        somethingMissing |= tinyxml2::XML_SUCCESS != col2->QueryDoubleAttribute("y", &matrix[1][2]);
+        somethingMissing |= tinyxml2::XML_SUCCESS != col2->QueryDoubleAttribute("z", &matrix[2][2]);
       }
       else
         somethingMissing = true;
 
-      somethingMissing |= TIXML_SUCCESS != offsetElem->QueryDoubleAttribute("x", &offset[0]);
-      somethingMissing |= TIXML_SUCCESS != offsetElem->QueryDoubleAttribute("y", &offset[1]);
-      somethingMissing |= TIXML_SUCCESS != offsetElem->QueryDoubleAttribute("z", &offset[2]);
+      somethingMissing |= tinyxml2::XML_SUCCESS != offsetElem->QueryDoubleAttribute("x", &offset[0]);
+      somethingMissing |= tinyxml2::XML_SUCCESS != offsetElem->QueryDoubleAttribute("y", &offset[1]);
+      somethingMissing |= tinyxml2::XML_SUCCESS != offsetElem->QueryDoubleAttribute("z", &offset[2]);
     }
     else
       somethingMissing = true;
 
-    TiXmlElement *boundsElem = geometryElem->FirstChildElement("bounds");
+    auto *boundsElem = geometryElem->FirstChildElement("bounds");
     if (boundsElem)
     {
-      TiXmlElement *minBoundsElem = boundsElem->FirstChildElement("min");
-      TiXmlElement *maxBoundsElem = boundsElem->FirstChildElement("max");
+      auto *minBoundsElem = boundsElem->FirstChildElement("min");
+      auto *maxBoundsElem = boundsElem->FirstChildElement("max");
 
       if (minBoundsElem && maxBoundsElem)
       {
-        somethingMissing |= TIXML_SUCCESS != minBoundsElem->QueryDoubleAttribute("x", &bounds[0]);
-        somethingMissing |= TIXML_SUCCESS != minBoundsElem->QueryDoubleAttribute("y", &bounds[2]);
-        somethingMissing |= TIXML_SUCCESS != minBoundsElem->QueryDoubleAttribute("z", &bounds[4]);
+        somethingMissing |= tinyxml2::XML_SUCCESS != minBoundsElem->QueryDoubleAttribute("x", &bounds[0]);
+        somethingMissing |= tinyxml2::XML_SUCCESS != minBoundsElem->QueryDoubleAttribute("y", &bounds[2]);
+        somethingMissing |= tinyxml2::XML_SUCCESS != minBoundsElem->QueryDoubleAttribute("z", &bounds[4]);
 
-        somethingMissing |= TIXML_SUCCESS != maxBoundsElem->QueryDoubleAttribute("x", &bounds[1]);
-        somethingMissing |= TIXML_SUCCESS != maxBoundsElem->QueryDoubleAttribute("y", &bounds[3]);
-        somethingMissing |= TIXML_SUCCESS != maxBoundsElem->QueryDoubleAttribute("z", &bounds[5]);
+        somethingMissing |= tinyxml2::XML_SUCCESS != maxBoundsElem->QueryDoubleAttribute("x", &bounds[1]);
+        somethingMissing |= tinyxml2::XML_SUCCESS != maxBoundsElem->QueryDoubleAttribute("y", &bounds[3]);
+        somethingMissing |= tinyxml2::XML_SUCCESS != maxBoundsElem->QueryDoubleAttribute("z", &bounds[5]);
       }
       else
         somethingMissing = true;
@@ -226,12 +227,12 @@ mitk::BaseGeometry::Pointer mitk::PointSetReaderService::ReadGeometry(TiXmlEleme
 }
 
 mitk::PointSet::Pointer mitk::PointSetReaderService::ReadPoints(mitk::PointSet::Pointer newPointSet,
-                                                                TiXmlElement *currentTimeSeries,
+                                                                tinyxml2::XMLElement *currentTimeSeries,
                                                                 unsigned int currentTimeStep)
 {
   if (currentTimeSeries->FirstChildElement("point") != nullptr)
   {
-    for (TiXmlElement *currentPoint = currentTimeSeries->FirstChildElement("point")->ToElement(); currentPoint != nullptr;
+    for (auto *currentPoint = currentTimeSeries->FirstChildElement("point"); currentPoint != nullptr;
          currentPoint = currentPoint->NextSiblingElement())
     {
       unsigned int id(0);

@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "mitkEndoDebugFromXmlFile.h"
 #include <itksys/SystemTools.hxx>
-#include <tinyxml.h>
+#include <tinyxml2.h>
 #include <set>
 using namespace std;
 
@@ -82,11 +82,11 @@ namespace mitk
     }
 
     // reread
-    endodebugvar( _FileName )
-    TiXmlDocument doc( _FileName );
-    doc.LoadFile();
-    TiXmlHandle docHandle( &doc );
-    TiXmlElement* elem = docHandle.FirstChildElement().FirstChildElement( "EndoDebug" ).ToElement();
+    endodebugvar(_FileName)
+    tinyxml2::XMLDocument doc;
+    doc.LoadFile(_FileName.c_str());
+    tinyxml2::XMLHandle docHandle(&doc);
+    auto* elem = docHandle.FirstChildElement().FirstChildElement( "EndoDebug" ).ToElement();
 
     if(elem == nullptr)
     {
@@ -95,49 +95,59 @@ namespace mitk
     }
 
     int _DebugEnabled = d->m_EndoDebug->GetDebugEnabled();
-    if( elem->QueryIntAttribute("DebugEnabled",&_DebugEnabled) != TIXML_SUCCESS )
+    if( elem->QueryIntAttribute("DebugEnabled",&_DebugEnabled) != tinyxml2::XML_SUCCESS )
     {
       endodebug("DebugEnabled attribute not found");
     }
 
     int _ShowImagesInDebug = d->m_EndoDebug->GetShowImagesInDebug();
-    if( elem->QueryIntAttribute("ShowImagesInDebug",&_ShowImagesInDebug) != TIXML_SUCCESS )
+    if( elem->QueryIntAttribute("ShowImagesInDebug",&_ShowImagesInDebug) != tinyxml2::XML_SUCCESS)
     {
       endodebug("ShowImagesInDebug attribute not found");
     }
 
     int _ShowImagesTimeOut = static_cast<int>(d->m_EndoDebug->GetShowImagesTimeOut());
-    if( elem->QueryIntAttribute("ShowImagesTimeOut",&_ShowImagesTimeOut) != TIXML_SUCCESS )
+    if( elem->QueryIntAttribute("ShowImagesTimeOut",&_ShowImagesTimeOut) != tinyxml2::XML_SUCCESS)
     {
       endodebug("ShowImagesTimeOut attribute not found");
     }
 
-    std::string _DebugImagesOutputDirectory = d->m_EndoDebug->GetDebugImagesOutputDirectory();
-    if( elem->QueryStringAttribute("DebugImagesOutputDirectory",&_DebugImagesOutputDirectory) != TIXML_SUCCESS )
+    std::string _DebugImagesOutputDirectory;
+    const char* _DebugImagesOutputDirectoryC = elem->Attribute("DebugImagesOutputDirectory");
+    if(nullptr == _DebugImagesOutputDirectoryC)
     {
+      _DebugImagesOutputDirectory = d->m_EndoDebug->GetDebugImagesOutputDirectory();
       endodebug("DebugImagesOutputDirectory attribute not found");
+    }
+    else
+    {
+      _DebugImagesOutputDirectory = _DebugImagesOutputDirectoryC;
     }
 
     std::set<std::string> _FilesToDebug;
     std::string _FilesToDebugString;
-    if( elem->QueryStringAttribute("FilesToDebug",&_FilesToDebugString) != TIXML_SUCCESS )
+    const char* _FilesToDebugStringC = elem->Attribute("FilesToDebug");
+    if(nullptr == _FilesToDebugStringC)
     {
       endodebug("FilesToDebug attribute not found");
     }
     else
     {
-        StringExplode( _FilesToDebugString, ";", &_FilesToDebug );
+      _FilesToDebugString = _FilesToDebugStringC;
+      StringExplode( _FilesToDebugString, ";", &_FilesToDebug );
     }
 
     std::set<std::string> _SymbolsToDebug;
     std::string _SymbolsToDebugString;
-    if( elem->QueryStringAttribute("SymbolsToDebug",&_SymbolsToDebugString) != TIXML_SUCCESS )
+    const char* _SymbolsToDebugStringC = elem->Attribute("SymbolsToDebug");
+    if( nullptr == _SymbolsToDebugStringC )
     {
       endodebug("SymbolsToDebug attribute not found");
     }
     else
     {
-        StringExplode( _SymbolsToDebugString, ";", &_SymbolsToDebug );
+      _SymbolsToDebugString = _SymbolsToDebugStringC;
+      StringExplode( _SymbolsToDebugString, ";", &_SymbolsToDebug );
     }
 
     // save

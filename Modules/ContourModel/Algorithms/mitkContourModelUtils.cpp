@@ -214,3 +214,15 @@ mitk::ContourModel::Pointer mitk::ContourModelUtils::MoveZerothContourTimeStep(c
 
   return resultContour;
 }
+
+int mitk::ContourModelUtils::GetActivePixelValue(mitk::Image* workingImage)
+{
+  auto* labelSetImage = dynamic_cast<LabelSetImage*>(workingImage);
+  int activePixelValue = 1;
+  if (nullptr != labelSetImage)
+  {
+    activePixelValue = labelSetImage->GetActiveLabel(labelSetImage->GetActiveLayer())->GetValue();
+  }
+
+  return activePixelValue;
+}

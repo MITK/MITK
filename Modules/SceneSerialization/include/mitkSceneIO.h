@@ -20,7 +20,11 @@ found in the LICENSE file.
 
 #include <Poco/Zip/ZipLocalFileHeader.h>
 
-class TiXmlElement;
+namespace tinyxml2
+{
+  class XMLDocument;
+  class XMLElement;
+}
 
 namespace mitk
 {
@@ -117,8 +121,8 @@ namespace mitk
 
     std::string CreateEmptyTempDirectory();
 
-    TiXmlElement *SaveBaseData(BaseData *data, const std::string &filenamehint, bool &error);
-    TiXmlElement *SavePropertyList(PropertyList *propertyList, const std::string &filenamehint);
+    tinyxml2::XMLElement *SaveBaseData(tinyxml2::XMLDocument &doc, BaseData *data, const std::string &filenamehint, bool &error);
+    tinyxml2::XMLElement *SavePropertyList(tinyxml2::XMLDocument &doc, PropertyList *propertyList, const std::string &filenamehint);
 
     void OnUnzipError(const void *pSender, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string> &info);
     void OnUnzipOk(const void *pSender, std::pair<const Poco::Zip::ZipLocalFileHeader, const Poco::Path> &info);

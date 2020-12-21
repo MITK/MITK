@@ -3,6 +3,6 @@ MITK_CREATE_MODULE( NewModuleIO
     PRIVATE src/IO
   DEPENDS PUBLIC MitkNewModule MitkSceneSerialization
   PACKAGE_DEPENDS
-    PRIVATE tinyxml
+    PRIVATE tinyxml2
   AUTOLOAD_WITH MitkCore
 )

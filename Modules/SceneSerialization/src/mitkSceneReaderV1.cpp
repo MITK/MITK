@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include "mitkSerializerMacros.h"
 #include <mitkUIDManipulator.h>
 #include <mitkRenderingModeProperty.h>
+#include <tinyxml2.h>
 
 MITK_REGISTER_SERIALIZER(SceneReaderV1)
 
@@ -50,7 +51,7 @@ namespace
   }
 }
 
-bool mitk::SceneReaderV1::LoadScene(TiXmlDocument &document, const std::string &workingDirectory, DataStorage *storage)
+bool mitk::SceneReaderV1::LoadScene(tinyxml2::XMLDocument &document, const std::string &workingDirectory, DataStorage *storage)
 {
   assert(storage);
   bool error(false);
@@ -68,7 +69,7 @@ bool mitk::SceneReaderV1::LoadScene(TiXmlDocument &document, const std::string &
   typedef std::vector<mitk::DataNode::Pointer> DataNodeVector;
   DataNodeVector DataNodes;
   unsigned int listSize = 0;
-  for (TiXmlElement *element = document.FirstChildElement("node"); element != nullptr;
+  for (auto *element = document.FirstChildElement("node"); element != nullptr;
        element = element->NextSiblingElement("node"))
   {
     ++listSize;
@@ -76,7 +77,7 @@ bool mitk::SceneReaderV1::LoadScene(TiXmlDocument &document, const std::string &
 
   ProgressBar::GetInstance()->AddStepsToDo(listSize * 2);
 
-  for (TiXmlElement *element = document.FirstChildElement("node"); element != nullptr;
+  for (auto *element = document.FirstChildElement("node"); element != nullptr;
        element = element->NextSiblingElement("node"))
   {
     DataNodes.push_back(LoadBaseDataFromDataTag(element->FirstChildElement("data"), workingDirectory, error));
@@ -86,16 +87,16 @@ bool mitk::SceneReaderV1::LoadScene(TiXmlDocument &document, const std::string &
   // iterate all nodes
   // first level nodes should be <node> elements
   auto nit = DataNodes.begin();
-  for (TiXmlElement *element = document.FirstChildElement("node"); element != nullptr || nit != DataNodes.end();
+  for (auto *element = document.FirstChildElement("node"); element != nullptr || nit != DataNodes.end();
        element = element->NextSiblingElement("node"), ++nit)
   {
     mitk::DataNode::Pointer node = *nit;
     // in case dataXmlElement is valid test whether it containts the "properties" child tag
     // and process further if and only if yes
-    TiXmlElement *dataXmlElement = element->FirstChildElement("data");
+    auto *dataXmlElement = element->FirstChildElement("data");
     if (dataXmlElement && dataXmlElement->FirstChildElement("properties"))
     {
-      TiXmlElement *baseDataElement = dataXmlElement->FirstChildElement("properties");
+      auto *baseDataElement = dataXmlElement->FirstChildElement("properties");
       if (node->GetData())
       {
         DecorateBaseDataWithProperties(node->GetData(), baseDataElement, workingDirectory);
@@ -137,7 +138,7 @@ bool mitk::SceneReaderV1::LoadScene(TiXmlDocument &document, const std::string &
     m_OrderedNodePairs.push_back(std::make_pair(node, std::list<std::string>()));
 
     //   4. if there are <source> elements, remember parent objects
-    for (TiXmlElement *source = element->FirstChildElement("source"); source != nullptr;
+    for (auto *source = element->FirstChildElement("source"); source != nullptr;
          source = source->NextSiblingElement("source"))
     {
       const char *sourceUID = source->Attribute("UID");
@@ -238,7 +239,7 @@ bool mitk::SceneReaderV1::LoadScene(TiXmlDocument &document, const std::string &
   return !error;
 }
 
-mitk::DataNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag(TiXmlElement *dataElement,
+mitk::DataNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag(const tinyxml2::XMLElement *dataElement,
                                                                      const std::string &workingDirectory,
                                                                      bool &error)
 {
@@ -273,7 +274,7 @@ mitk::DataNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag(TiXmlElemen
     }
 
     const char* dataUID = dataElement->Attribute("UID");
-    if (!error && nullptr != dataUID && 0 != strlen(dataUID))
+    if (!error && dataUID != nullptr)
     {
       UIDManipulator manip(node->GetData());
       manip.SetUID(dataUID);
@@ -339,14 +340,14 @@ void mitk::SceneReaderV1::ClearNodePropertyListWithExceptions(DataNode &node, Pr
 }
 
 bool mitk::SceneReaderV1::DecorateNodeWithProperties(DataNode *node,
-                                                     TiXmlElement *nodeElement,
+                                                     const tinyxml2::XMLElement *nodeElement,
                                                      const std::string &workingDirectory)
 {
   assert(node);
   assert(nodeElement);
   bool error(false);
 
-  for (TiXmlElement *properties = nodeElement->FirstChildElement("properties"); properties != nullptr;
+  for (auto *properties = nodeElement->FirstChildElement("properties"); properties != nullptr;
        properties = properties->NextSiblingElement("properties"))
   {
     const char *propertiesfilea(properties->Attribute("file"));
@@ -383,7 +384,7 @@ bool mitk::SceneReaderV1::DecorateNodeWithProperties(DataNode *node,
 }
 
 bool mitk::SceneReaderV1::DecorateBaseDataWithProperties(BaseData::Pointer data,
-                                                         TiXmlElement *baseDataNodeElem,
+                                                         const tinyxml2::XMLElement *baseDataNodeElem,
                                                          const std::string &workingDir)
 {
   // check given variables, initialize error variable
@@ -420,7 +421,7 @@ bool mitk::SceneReaderV1::DecorateBaseDataWithProperties(BaseData::Pointer data,
   }
   else
   {
-    MITK_ERROR << "Function DecorateBaseDataWithProperties(...) called with false TiXmlElement. \n \t ->Given element "
+    MITK_ERROR << "Function DecorateBaseDataWithProperties(...) called with false XML element. \n \t ->Given element "
                   "does not contain a 'file' attribute. \n";
     error = true;
   }

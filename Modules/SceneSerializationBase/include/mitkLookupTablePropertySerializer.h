@@ -32,19 +32,19 @@ namespace mitk
   class MITKSCENESERIALIZATIONBASE_EXPORT LookupTablePropertySerializer : public BasePropertySerializer
   {
   public:
-    mitkClassMacro(LookupTablePropertySerializer, BasePropertySerializer);
-    itkFactorylessNewMacro(Self);
-    itkCloneMacro(Self);
+    mitkClassMacro(LookupTablePropertySerializer, BasePropertySerializer)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
-      /**
-        \brief Serializes given BaseData object.
-        \return the filename of the newly created file.
+    /**
+      \brief Serializes given BaseData object.
+      \return the filename of the newly created file.
 
-        This should be overwritten by specific sub-classes.
-       */
-      TiXmlElement *Serialize() override;
+      This should be overwritten by specific sub-classes.
+      */
+    tinyxml2::XMLElement *Serialize(tinyxml2::XMLDocument& doc) override;
 
-    BaseProperty::Pointer Deserialize(TiXmlElement *element) override;
+    BaseProperty::Pointer Deserialize(const tinyxml2::XMLElement *element) override;
 
   protected:
     LookupTablePropertySerializer(){};

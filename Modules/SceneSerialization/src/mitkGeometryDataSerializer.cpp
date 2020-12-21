@@ -15,8 +15,6 @@ found in the LICENSE file.
 #include "mitkGeometryData.h"
 #include "mitkIOUtil.h"
 
-#include <tinyxml.h>
-
 MITK_REGISTER_SERIALIZER(GeometryDataSerializer)
 
 mitk::GeometryDataSerializer::GeometryDataSerializer()

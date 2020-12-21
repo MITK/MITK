@@ -26,7 +26,7 @@ MITK_CREATE_MODULE(
     PUBLIC Algorithms Common DataManagement ExceptionHandling IO Rendering TrackingDevices TestingHelper
     PRIVATE ${ADDITIONAL_INCLUDE_DIRS}
   DEPENDS PUBLIC MitkImageStatistics MitkSceneSerialization MitkIGTBase MitkOpenIGTLink
-  PACKAGE_DEPENDS ITK|ITKRegistrationCommon tinyxml OpenIGTLink
+  PACKAGE_DEPENDS PRIVATE ITK|RegistrationCommon OpenIGTLink tinyxml2
   ADDITIONAL_LIBS "${ADDITIONAL_LIBS}"
 )
 
@@ -50,8 +50,6 @@ if(NOT MODULE_IS_ENABLED)
 else()
 ## create IGT config
 configure_file(mitkIGTConfig.h.in ${PROJECT_BINARY_DIR}/mitkIGTConfig.h @ONLY)
-
-# add test programm for serial communication classADD_EXECUTABLE(SerialCommunicationTest IGTTrackingDevices/mitkSerialCommunicationTest.cpp)target_link_libraries(SerialCommunicationTest mitkIGT Mitk tinyxml PocoXML)
 
 add_subdirectory(autoload/DeviceRegistry)
 

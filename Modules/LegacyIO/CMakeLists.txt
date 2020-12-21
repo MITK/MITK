@@ -3,6 +3,6 @@ mitkFunctionCheckCompilerFlags("-Wno-deprecated-declarations" CMAKE_CXX_FLAGS)
 
 MITK_CREATE_MODULE(
   DEPENDS MitkCore
-  PACKAGE_DEPENDS PRIVATE ITK|ITKIOGDCM+ITKIORAW tinyxml
+  PACKAGE_DEPENDS tinyxml2
   DEPRECATED_SINCE 2014.10
 )

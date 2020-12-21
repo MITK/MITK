@@ -14,18 +14,19 @@ found in the LICENSE file.
 #define mitkIntLookupTablePropertySerializer_h_included
 
 #include "mitkBasePropertySerializer.h"
-
 #include "mitkProperties.h"
+#include <tinyxml2.h>
 
 namespace mitk
 {
   class IntLookupTablePropertySerializer : public BasePropertySerializer
   {
   public:
-    mitkClassMacro(IntLookupTablePropertySerializer, BasePropertySerializer);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(IntLookupTablePropertySerializer, BasePropertySerializer)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
-      TiXmlElement *Serialize() override
+    tinyxml2::XMLElement *Serialize(tinyxml2::XMLDocument &doc) override
     {
       const IntLookupTableProperty *prop = dynamic_cast<const IntLookupTableProperty *>(m_Property.GetPointer());
       if (prop == nullptr)
@@ -35,31 +36,31 @@ namespace mitk
       //  return nullptr; // really?
       const IntLookupTable::LookupTableType &map = lut.GetLookupTable();
 
-      auto element = new TiXmlElement("IntLookupTableTable");
+      auto element = doc.NewElement("IntLookupTableTable");
       for (auto it = map.begin(); it != map.end(); ++it)
       {
-        auto tableEntry = new TiXmlElement("LUTValue");
+        auto tableEntry = doc.NewElement("LUTValue");
         tableEntry->SetAttribute("id", it->first);
         tableEntry->SetAttribute("value", it->second);
-        element->LinkEndChild(tableEntry);
+        element->InsertEndChild(tableEntry);
       }
       return element;
     }
 
-    BaseProperty::Pointer Deserialize(TiXmlElement *element) override
+    BaseProperty::Pointer Deserialize(const tinyxml2::XMLElement *element) override
     {
       if (!element)
         return nullptr;
 
       IntLookupTable lut;
-      for (TiXmlElement *child = element->FirstChildElement("LUTValue"); child != nullptr;
+      for (auto *child = element->FirstChildElement("LUTValue"); child != nullptr;
            child = child->NextSiblingElement("LUTValue"))
       {
         int temp;
-        if (child->QueryIntAttribute("id", &temp) == TIXML_WRONG_TYPE)
+        if (child->QueryIntAttribute("id", &temp) != tinyxml2::XML_SUCCESS)
           return nullptr; // TODO: can we do a better error handling?
         IntLookupTable::IdentifierType id = static_cast<IntLookupTable::IdentifierType>(temp);
-        if (child->QueryIntAttribute("value", &temp) == TIXML_WRONG_TYPE)
+        if (child->QueryIntAttribute("value", &temp) != tinyxml2::XML_SUCCESS)
           return nullptr; // TODO: can we do a better error handling?
         IntLookupTable::ValueType val = static_cast<IntLookupTable::ValueType>(temp);
         lut.SetTableValue(id, val);

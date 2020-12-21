@@ -17,11 +17,11 @@ found in the LICENSE file.
 
 #include "mitkGeometry3D.h"
 
-#include <tinyxml.h>
-
 #include <fstream>
 #include <iostream>
 #include <locale>
+
+#include <tinyxml2.h>
 
 //
 // Initialization of the xml tags.
@@ -58,32 +58,29 @@ void mitk::PointSetWriterService::Write()
 {
   mitk::LocaleSwitch localeC("C");
 
-  TiXmlDocument doc;
+  tinyxml2::XMLDocument doc;
+  doc.InsertEndChild(doc.NewDeclaration());
 
-  auto *decl = new TiXmlDeclaration(
-    "1.0", "UTF-8", ""); // TODO what to write here? encoding? standalone would mean that we provide a DTD somewhere...
-  doc.LinkEndChild(decl);
+  auto *rootNode = doc.NewElement(XML_POINT_SET_FILE.c_str());
+  doc.InsertEndChild(rootNode);
 
-  auto *rootNode = new TiXmlElement(XML_POINT_SET_FILE);
-  doc.LinkEndChild(rootNode);
+  auto *versionNode = doc.NewElement(XML_FILE_VERSION.c_str());
+  auto *versionText = doc.NewText(VERSION_STRING.c_str());
+  versionNode->InsertEndChild(versionText);
+  rootNode->InsertEndChild(versionNode);
 
-  auto *versionNode = new TiXmlElement(XML_FILE_VERSION);
-  auto *versionText = new TiXmlText(VERSION_STRING);
-  versionNode->LinkEndChild(versionText);
-  rootNode->LinkEndChild(versionNode);
-
-  TiXmlElement *pointSetNode = ToXML(static_cast<const PointSet *>(this->GetInput()));
+  auto *pointSetNode = ToXML(doc, static_cast<const PointSet *>(this->GetInput()));
   if (!pointSetNode)
   {
     mitkThrow() << "Serialization error during PointSet writing.";
   }
-  rootNode->LinkEndChild(pointSetNode);
+  rootNode->InsertEndChild(pointSetNode);
 
   // out << doc; // streaming of TinyXML write no new-lines,
   // rendering XML files unreadable (for humans)
 
   LocalFile f(this);
-  if (!doc.SaveFile(f.GetFileName()))
+  if (tinyxml2::XML_SUCCESS != doc.SaveFile(f.GetFileName().c_str()))
   {
     mitkThrow() << "Some error during point set writing.";
   }
@@ -94,23 +91,23 @@ mitk::PointSetWriterService *mitk::PointSetWriterService::Clone() const
   return new PointSetWriterService(*this);
 }
 
-TiXmlElement *mitk::PointSetWriterService::ToXML(const mitk::PointSet *pointSet)
+tinyxml2::XMLElement *mitk::PointSetWriterService::ToXML(tinyxml2::XMLDocument& doc, const mitk::PointSet *pointSet)
 {
   // the following is rather bloated and could be expressed in more compact XML
   // (e.g. using attributes instead of tags for x/y/z). The current format is
   // kept to be compatible with the previous writer.
-  auto *pointSetElement = new TiXmlElement(XML_POINT_SET);
+  auto *pointSetElement = doc.NewElement(XML_POINT_SET.c_str());
   unsigned int timecount = pointSet->GetTimeSteps();
 
   for (unsigned int i = 0; i < timecount; i++)
   {
-    auto *timeSeriesElement = new TiXmlElement(XML_TIME_SERIES);
-    pointSetElement->LinkEndChild(timeSeriesElement);
+    auto *timeSeriesElement = doc.NewElement(XML_TIME_SERIES.c_str());
+    pointSetElement->InsertEndChild(timeSeriesElement);
 
-    auto *timeSeriesIDElement = new TiXmlElement(XML_TIME_SERIES_ID);
-    timeSeriesElement->LinkEndChild(timeSeriesIDElement);
-    TiXmlText *timeSeriesIDText = new TiXmlText(ConvertToString(i));
-    timeSeriesIDElement->LinkEndChild(timeSeriesIDText);
+    auto *timeSeriesIDElement = doc.NewElement(XML_TIME_SERIES_ID.c_str());
+    timeSeriesElement->InsertEndChild(timeSeriesIDElement);
+    auto *timeSeriesIDText = doc.NewText(ConvertToString(i).c_str());
+    timeSeriesIDElement->InsertEndChild(timeSeriesIDText);
 
     PointSet::PointsContainer *pointsContainer = pointSet->GetPointSet(i)->GetPoints();
     PointSet::PointsContainer::Iterator it;
@@ -123,41 +120,41 @@ TiXmlElement *mitk::PointSetWriterService::ToXML(const mitk::PointSet *pointSet)
     }
     else
     {
-      TiXmlElement *geometryElement = Geometry3DToXML::ToXML(geometry);
-      timeSeriesElement->LinkEndChild(geometryElement);
+      auto *geometryElement = Geometry3DToXML::ToXML(doc, geometry);
+      timeSeriesElement->InsertEndChild(geometryElement);
     }
 
     for (it = pointsContainer->Begin(); it != pointsContainer->End(); ++it)
     {
-      auto *pointElement = new TiXmlElement(XML_POINT);
-      timeSeriesElement->LinkEndChild(pointElement);
+      auto *pointElement = doc.NewElement(XML_POINT.c_str());
+      timeSeriesElement->InsertEndChild(pointElement);
 
-      auto *pointIDElement = new TiXmlElement(XML_ID);
-      TiXmlText *pointIDText = new TiXmlText(ConvertToString(it->Index()));
-      pointIDElement->LinkEndChild(pointIDText);
-      pointElement->LinkEndChild(pointIDElement);
+      auto *pointIDElement = doc.NewElement(XML_ID.c_str());
+      auto *pointIDText = doc.NewText(ConvertToString(it->Index()).c_str());
+      pointIDElement->InsertEndChild(pointIDText);
+      pointElement->InsertEndChild(pointIDElement);
 
       mitk::PointSet::PointType point = it->Value();
 
-      auto *pointSpecElement = new TiXmlElement(XML_SPEC);
-      TiXmlText *pointSpecText = new TiXmlText(ConvertToString(pointSet->GetSpecificationTypeInfo(it->Index(), i)));
-      pointSpecElement->LinkEndChild(pointSpecText);
-      pointElement->LinkEndChild(pointSpecElement);
+      auto *pointSpecElement = doc.NewElement(XML_SPEC.c_str());
+      auto *pointSpecText = doc.NewText(ConvertToString(pointSet->GetSpecificationTypeInfo(it->Index(), i)).c_str());
+      pointSpecElement->InsertEndChild(pointSpecText);
+      pointElement->InsertEndChild(pointSpecElement);
 
-      auto *pointXElement = new TiXmlElement(XML_X);
-      TiXmlText *pointXText = new TiXmlText(ConvertToString(point[0]));
-      pointXElement->LinkEndChild(pointXText);
-      pointElement->LinkEndChild(pointXElement);
+      auto *pointXElement = doc.NewElement(XML_X.c_str());
+      auto *pointXText = doc.NewText(ConvertToString(point[0]).c_str());
+      pointXElement->InsertEndChild(pointXText);
+      pointElement->InsertEndChild(pointXElement);
 
-      auto *pointYElement = new TiXmlElement(XML_Y);
-      TiXmlText *pointYText = new TiXmlText(ConvertToString(point[1]));
-      pointYElement->LinkEndChild(pointYText);
-      pointElement->LinkEndChild(pointYElement);
+      auto *pointYElement = doc.NewElement(XML_Y.c_str());
+      auto *pointYText = doc.NewText(ConvertToString(point[1]).c_str());
+      pointYElement->InsertEndChild(pointYText);
+      pointElement->InsertEndChild(pointYElement);
 
-      auto *pointZElement = new TiXmlElement(XML_Z);
-      TiXmlText *pointZText = new TiXmlText(ConvertToString(point[2]));
-      pointZElement->LinkEndChild(pointZText);
-      pointElement->LinkEndChild(pointZElement);
+      auto *pointZElement = doc.NewElement(XML_Z.c_str());
+      auto *pointZText = doc.NewText(ConvertToString(point[2]).c_str());
+      pointZElement->InsertEndChild(pointZText);
+      pointElement->InsertEndChild(pointZElement);
     }
   }
 

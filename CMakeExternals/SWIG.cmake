@@ -8,7 +8,11 @@ if(MITK_USE_SWIG)
 
   set(SWIG_TARGET_VERSION 3.0.2)
   set(proj SWIG)
-  set(proj_DEPENDENCIES PCRE)
+  if(WIN32)
+    set(proj_DEPENDENCIES)
+  else()
+    set(proj_DEPENDENCIES PCRE)
+  endif()
   set(SWIG_DEPENDS ${proj})
 
   if(NOT SWIG_DIR)
@@ -35,9 +39,6 @@ if(MITK_USE_SWIG)
       set(SWIG_EXECUTABLE ${source_dir}/swig.exe)
 
     else()
-
-      list(APPEND SWIG_DEPENDENCIES PCRE)
-
       # swig uses bison find it by cmake and pass it down
       find_package(BISON)
       set(BISON_FLAGS "" CACHE STRING "Flags used by bison")

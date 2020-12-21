@@ -20,8 +20,12 @@ found in the LICENSE file.
 
 #include <stack>
 #include <string>
-#include <tinyxml.h>
 #include <vtkXMLParser.h>
+
+namespace tinyxml2
+{
+  class XMLElement;
+}
 
 namespace mitk
 {
@@ -42,7 +46,7 @@ namespace mitk
 
   protected:
     virtual void ReadPoints(mitk::ContourModel::Pointer newContourModel,
-                            TiXmlElement *currentTimeSeries,
+                            const tinyxml2::XMLElement *currentTimeSeries,
                             unsigned int currentTimeStep);
     std::vector<itk::SmartPointer<BaseData>> DoRead() override;
 

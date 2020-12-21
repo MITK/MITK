@@ -85,12 +85,22 @@ QmitkRenderWindowMenu::LayoutIndex QmitkRenderWindow::GetLayoutIndex()
   }
 }
 
-void QmitkRenderWindow::LayoutDesignListChanged(QmitkRenderWindowMenu::LayoutDesign layoutDesign)
+void QmitkRenderWindow::UpdateLayoutDesignList(QmitkRenderWindowMenu::LayoutDesign layoutDesign)
 {
   if (nullptr != m_MenuWidget)
   {
     m_MenuWidget->UpdateLayoutDesignList(layoutDesign);
   }
+}
+
+void QmitkRenderWindow::UpdateCrosshairVisibility(bool visible)
+{
+  m_MenuWidget->UpdateCrosshairVisibility(visible);
+}
+
+void QmitkRenderWindow::UpdateCrosshairRotationMode(int mode)
+{
+  m_MenuWidget->UpdateCrosshairRotationMode(mode);
 }
 
 void QmitkRenderWindow::ActivateMenuWidget(bool state)

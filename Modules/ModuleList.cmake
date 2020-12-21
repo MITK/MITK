@@ -45,9 +45,6 @@ set(MITK_MODULES
   ToFHardware
   ToFProcessing
   ToFUI
-  PhotoacousticsHardware
-  PhotoacousticsAlgorithms
-  PhotoacousticsLib
   US
   USUI
   DICOMUI
@@ -62,7 +59,6 @@ set(MITK_MODULES
   IOExt
   XNAT
   TubeGraph
-  BiophotonicsHardware
   BoundingShape
   RenderWindowManager
   RenderWindowManagerUI

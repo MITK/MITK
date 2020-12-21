@@ -19,7 +19,7 @@ found in the LICENSE file.
 // STL
 #include <mitkLocaleSwitch.h>
 
-#include <tinyxml.h>
+#include <tinyxml2.h>
 
 mitk::GeometryDataReaderService::GeometryDataReaderService()
   : AbstractFileReader(IOMimeTypes::GEOMETRY_DATA_MIMETYPE(), "MITK Geometry Data Reader")
@@ -40,17 +40,18 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::GeometryDataReaderService::
 
   InputStream stream(this);
 
-  TiXmlDocument doc;
-  stream >> doc;
+  std::string s(std::istreambuf_iterator<char>{stream.rdbuf()}, std::istreambuf_iterator<char>());
+  tinyxml2::XMLDocument doc;
+  doc.Parse(s.c_str(), s.size());
   if (!doc.Error())
   {
-    TiXmlHandle docHandle(&doc);
+    tinyxml2::XMLHandle docHandle(&doc);
 
-    for (TiXmlElement *geomDataElement = docHandle.FirstChildElement("GeometryData").ToElement();
+    for (auto *geomDataElement = docHandle.FirstChildElement("GeometryData").ToElement();
          geomDataElement != nullptr;
          geomDataElement = geomDataElement->NextSiblingElement())
     {
-      for (TiXmlElement *currentElement = geomDataElement->FirstChildElement(); currentElement != nullptr;
+      for (auto *currentElement = geomDataElement->FirstChildElement(); currentElement != nullptr;
            currentElement = currentElement->NextSiblingElement())
       {
         // different geometries could have been serialized from a GeometryData
@@ -90,7 +91,7 @@ std::vector<itk::SmartPointer<mitk::BaseData>> mitk::GeometryDataReaderService::
   }
   else
   {
-    mitkThrow() << "Parsing error at line " << doc.ErrorRow() << ", col " << doc.ErrorCol() << ": " << doc.ErrorDesc();
+    mitkThrow() << doc.ErrorStr();
   }
 
   if (result.empty())

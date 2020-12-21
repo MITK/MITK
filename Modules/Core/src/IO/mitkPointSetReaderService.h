@@ -17,7 +17,10 @@ found in the LICENSE file.
 #include <mitkAbstractFileReader.h>
 #include <mitkPointSet.h>
 
-class TiXmlElement;
+namespace tinyxml2
+{
+  class XMLElement;
+}
 
 namespace mitk
 {
@@ -49,10 +52,10 @@ namespace mitk
   private:
     PointSetReaderService(const PointSetReaderService &other);
 
-    mitk::BaseGeometry::Pointer ReadGeometry(TiXmlElement *parentElement);
+    mitk::BaseGeometry::Pointer ReadGeometry(tinyxml2::XMLElement *parentElement);
 
     mitk::PointSet::Pointer ReadPoints(mitk::PointSet::Pointer newPointSet,
-                                       TiXmlElement *currentTimeSeries,
+                                       tinyxml2::XMLElement *currentTimeSeries,
                                        unsigned int currentTimeStep);
 
     PointSetReaderService *Clone() const override;

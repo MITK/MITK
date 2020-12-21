@@ -88,6 +88,7 @@ public:
     bool isImageGeometry(false);
     unsigned int frameOfReferenceID(47);
     mitk::BaseGeometry::BoundsArrayType bounds;
+    bounds.Fill(1.1);
     mitk::Point3D origin;
     mitk::FillVector3D(origin, 5.1, 5.2, 5.3);
     mitk::Vector3D spacing;

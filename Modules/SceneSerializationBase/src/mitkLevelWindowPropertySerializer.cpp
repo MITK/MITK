@@ -17,48 +17,43 @@ found in the LICENSE file.
 #include "mitkLevelWindowProperty.h"
 #include <mitkLexicalCast.h>
 #include <mitkLocaleSwitch.h>
+#include <tinyxml2.h>
 
 namespace mitk
 {
   class LevelWindowPropertySerializer : public BasePropertySerializer
   {
   public:
-    mitkClassMacro(LevelWindowPropertySerializer, BasePropertySerializer);
-    itkFactorylessNewMacro(Self) itkCloneMacro(Self)
+    mitkClassMacro(LevelWindowPropertySerializer, BasePropertySerializer)
+    itkFactorylessNewMacro(Self)
+    itkCloneMacro(Self)
 
-      TiXmlElement *Serialize() override
+    tinyxml2::XMLElement *Serialize(tinyxml2::XMLDocument &doc) override
     {
       if (const LevelWindowProperty *prop = dynamic_cast<const LevelWindowProperty *>(m_Property.GetPointer()))
       {
         LocaleSwitch localeSwitch("C");
 
-        auto element = new TiXmlElement("LevelWindow");
+        auto *element = doc.NewElement("LevelWindow");
 
         LevelWindow lw = prop->GetLevelWindow();
-        std::string boolString("false");
-        if (lw.IsFixed() == true)
-          boolString = "true";
-        element->SetAttribute("fixed", boolString.c_str());
+        element->SetAttribute("fixed", lw.IsFixed());
+        element->SetAttribute("isFloatingImage", lw.IsFloatingValues());
 
-        std::string boolStringFltImage("false");
-        if (lw.IsFloatingValues() == true)
-          boolStringFltImage = "true";
-        element->SetAttribute("isFloatingImage", boolStringFltImage.c_str());
+        auto *child = doc.NewElement("CurrentSettings");
+        element->InsertEndChild(child);
+        child->SetAttribute("level", boost::lexical_cast<std::string>(lw.GetLevel()).c_str());
+        child->SetAttribute("window", boost::lexical_cast<std::string>(lw.GetWindow()).c_str());
 
-        auto child = new TiXmlElement("CurrentSettings");
-        element->LinkEndChild(child);
-        child->SetAttribute("level", boost::lexical_cast<std::string>(lw.GetLevel()));
-        child->SetAttribute("window", boost::lexical_cast<std::string>(lw.GetWindow()));
+        child = doc.NewElement("DefaultSettings");
+        element->InsertEndChild(child);
+        child->SetAttribute("level", boost::lexical_cast<std::string>(lw.GetDefaultLevel()).c_str());
+        child->SetAttribute("window", boost::lexical_cast<std::string>(lw.GetDefaultWindow()).c_str());
 
-        child = new TiXmlElement("DefaultSettings");
-        element->LinkEndChild(child);
-        child->SetAttribute("level", boost::lexical_cast<std::string>(lw.GetDefaultLevel()));
-        child->SetAttribute("window", boost::lexical_cast<std::string>(lw.GetDefaultWindow()));
-
-        child = new TiXmlElement("CurrentRange");
-        element->LinkEndChild(child);
-        child->SetAttribute("min", boost::lexical_cast<std::string>(lw.GetRangeMin()));
-        child->SetAttribute("max", boost::lexical_cast<std::string>(lw.GetRangeMax()));
+        child = doc.NewElement("CurrentRange");
+        element->InsertEndChild(child);
+        child->SetAttribute("min", boost::lexical_cast<std::string>(lw.GetRangeMin()).c_str());
+        child->SetAttribute("max", boost::lexical_cast<std::string>(lw.GetRangeMax()).c_str());
 
         return element;
       }
@@ -66,7 +61,7 @@ namespace mitk
         return nullptr;
     }
 
-    BaseProperty::Pointer Deserialize(TiXmlElement *element) override
+    BaseProperty::Pointer Deserialize(const tinyxml2::XMLElement *element) override
     {
       if (!element)
         return nullptr;
@@ -80,28 +75,22 @@ namespace mitk
       if (element->Attribute("isFloatingImage"))
         isFloatingImage = std::string(element->Attribute("isFloatingImage")) == "true";
 
-      std::string level_string;
-      std::string window_string;
-      TiXmlElement *child = element->FirstChildElement("CurrentSettings");
-      if (child->QueryStringAttribute("level", &level_string) != TIXML_SUCCESS)
-        return nullptr;
-      if (child->QueryStringAttribute("window", &window_string) != TIXML_SUCCESS)
+      auto *child = element->FirstChildElement("CurrentSettings");
+      const char* level_string = child->Attribute("level");
+      const char* window_string = child->Attribute("window");
+      if (nullptr == level_string || nullptr == window_string)
         return nullptr;
 
-      std::string defaultLevel_string;
-      std::string defaultWindow_string;
       child = element->FirstChildElement("DefaultSettings");
-      if (child->QueryStringAttribute("level", &defaultLevel_string) != TIXML_SUCCESS)
-        return nullptr;
-      if (child->QueryStringAttribute("window", &defaultWindow_string) != TIXML_SUCCESS)
+      const char* defaultLevel_string = child->Attribute("level");
+      const char* defaultWindow_string = child->Attribute("window");
+      if (nullptr == defaultLevel_string || nullptr == defaultWindow_string)
         return nullptr;
 
-      std::string minRange_string;
-      std::string maxRange_string;
       child = element->FirstChildElement("CurrentRange");
-      if (child->QueryStringAttribute("min", &minRange_string) != TIXML_SUCCESS)
-        return nullptr;
-      if (child->QueryStringAttribute("max", &maxRange_string) != TIXML_SUCCESS)
+      const char* minRange_string = child->Attribute("min");
+      const char* maxRange_string = child->Attribute("max");
+      if (nullptr == minRange_string || nullptr == maxRange_string)
         return nullptr;
 
       LevelWindow lw;

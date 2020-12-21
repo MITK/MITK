@@ -5,9 +5,6 @@ MITK_CREATE_MODULE(Pharmacokinetics
   DEPENDS
     PUBLIC MitkCore MitkModelFit
 	PRIVATE MitkMultilabel
-  PACKAGE_DEPENDS
-    PUBLIC ITK|ITKOptimizers
-    PRIVATE Boost
 )
 
 if(BUILD_TESTING)

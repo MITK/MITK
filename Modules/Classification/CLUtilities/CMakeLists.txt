@@ -1,13 +1,9 @@
 mitk_create_module(
   DEPENDS MitkCore MitkCLCore MitkCommandLine MitkDICOM
-  PACKAGE_DEPENDS PUBLIC Eigen PRIVATE tinyxml VTK|FiltersStatistics
+  PACKAGE_DEPENDS PUBLIC Eigen OpenMP PRIVATE tinyxml2 VTK|FiltersStatistics
 )
 
 if(TARGET ${MODULE_TARGET})
-  if(MITK_USE_OpenMP)
-    target_link_libraries(${MODULE_TARGET} PUBLIC OpenMP::OpenMP_CXX)
-  endif()
-
   if(BUILD_TESTING)
     add_subdirectory(test)
   endif()

@@ -6,6 +6,7 @@
 #! \param NAME (required) Name of the algorithm / cmake target
 #! \param DEPENDS (optional) Required MITK modules beyond MitkCommandLine
 #! \param PACKAGE_DEPENDS (optional) list of "packages" this command line app depends on (e.g. ITK, VTK, etc.)
+#! \param TARGET_DEPENDS (optional) list of additional CMake targets this command line app depends on
 #! \param CPP_FILES (optional) list of cpp files, if it is not given NAME.cpp is assumed
 #! \param INCLUDE_DIRS (optional): All directories that should be added as include dirs to the project
 #! \param PROFILE (optional): The profile file that should be used for the algorithm. If not set it is "./<algname>.profile".
@@ -33,6 +34,7 @@ function(mitkFunctionCreateMatchPointDeployedAlgorithm)
   set(_function_multiparams
       DEPENDS                # list of modules this command line app depends on
       PACKAGE_DEPENDS        # list of "packages" this command line app depends on (e.g. ITK, VTK, etc.)
+      TARGET_DEPENDS         # list of CMake targets this command line app depends on
       CPP_FILES              # (optional) list of cpp files, if it is not given NAME.cpp is assumed
       INCLUDE_DIRS           # include directories: [PUBLIC|PRIVATE|INTERFACE] <list>
       ADDITIONAL_LIBS        # list of addidtional private libraries linked to this module.
@@ -83,8 +85,12 @@ function(mitkFunctionCreateMatchPointDeployedAlgorithm)
 
   mitk_use_modules(TARGET ${ALG_TARGET}
                    MODULES ${ALG_DEPENDS}
-                   PACKAGES PRIVATE ITK MatchPoint ${ALG_PACKAGE_DEPENDS}
+                   PACKAGES PRIVATE MatchPoint ${ALG_PACKAGE_DEPENDS}
                    )
+
+  if(ALG_TARGET_DEPENDS)
+    target_link_libraries(${ALG_TARGET} ${ALG_TARGET_DEPENDS})
+  endif()
 
   target_include_directories(${ALG_TARGET} PRIVATE ${ALG_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR})
 

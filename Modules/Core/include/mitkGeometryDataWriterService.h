@@ -16,9 +16,6 @@ found in the LICENSE file.
 #include <mitkAbstractFileWriter.h>
 #include <mitkGeometryData.h>
 
-// forward
-class TiXmlNode;
-
 namespace mitk
 {
   // forward

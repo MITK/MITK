@@ -15,7 +15,11 @@ found in the LICENSE file.
 #include <mitkLocaleSwitch.h>
 #include <mitkLookupTableProperty.h>
 
-TiXmlElement *mitk::LookupTablePropertySerializer::Serialize()
+#include <array>
+
+#include <tinyxml2.h>
+
+tinyxml2::XMLElement *mitk::LookupTablePropertySerializer::Serialize(tinyxml2::XMLDocument& doc)
 {
   if (const auto *prop = dynamic_cast<const LookupTableProperty *>(m_Property.GetPointer()))
   {
@@ -29,56 +33,56 @@ TiXmlElement *mitk::LookupTablePropertySerializer::Serialize()
     if (!lut)
       return nullptr;
 
-    auto element = new TiXmlElement("LookupTable");
+    auto *element = doc.NewElement("LookupTable");
 
     double *range;
     double *rgba;
 
-    element->SetAttribute("NumberOfColors", lut->GetNumberOfTableValues());
+    element->SetAttribute("NumberOfColors", static_cast<int>(lut->GetNumberOfTableValues()));
     element->SetAttribute("Scale", lut->GetScale());
     element->SetAttribute("Ramp", lut->GetRamp());
 
     range = lut->GetHueRange();
-    auto child = new TiXmlElement("HueRange");
-    element->LinkEndChild(child);
-    child->SetAttribute("min", boost::lexical_cast<std::string>(range[0]));
-    child->SetAttribute("max", boost::lexical_cast<std::string>(range[1]));
+    auto *child = doc.NewElement("HueRange");
+    element->InsertEndChild(child);
+    child->SetAttribute("min", boost::lexical_cast<std::string>(range[0]).c_str());
+    child->SetAttribute("max", boost::lexical_cast<std::string>(range[1]).c_str());
 
     range = lut->GetValueRange();
-    child = new TiXmlElement("ValueRange");
-    element->LinkEndChild(child);
-    child->SetAttribute("min", boost::lexical_cast<std::string>(range[0]));
-    child->SetAttribute("max", boost::lexical_cast<std::string>(range[1]));
+    child = doc.NewElement("ValueRange");
+    element->InsertEndChild(child);
+    child->SetAttribute("min", boost::lexical_cast<std::string>(range[0]).c_str());
+    child->SetAttribute("max", boost::lexical_cast<std::string>(range[1]).c_str());
 
     range = lut->GetSaturationRange();
-    child = new TiXmlElement("SaturationRange");
-    element->LinkEndChild(child);
-    child->SetAttribute("min", boost::lexical_cast<std::string>(range[0]));
-    child->SetAttribute("max", boost::lexical_cast<std::string>(range[1]));
+    child = doc.NewElement("SaturationRange");
+    element->InsertEndChild(child);
+    child->SetAttribute("min", boost::lexical_cast<std::string>(range[0]).c_str());
+    child->SetAttribute("max", boost::lexical_cast<std::string>(range[1]).c_str());
 
     range = lut->GetAlphaRange();
-    child = new TiXmlElement("AlphaRange");
-    element->LinkEndChild(child);
-    child->SetAttribute("min", boost::lexical_cast<std::string>(range[0]));
-    child->SetAttribute("max", boost::lexical_cast<std::string>(range[1]));
+    child = doc.NewElement("AlphaRange");
+    element->InsertEndChild(child);
+    child->SetAttribute("min", boost::lexical_cast<std::string>(range[0]).c_str());
+    child->SetAttribute("max", boost::lexical_cast<std::string>(range[1]).c_str());
 
     range = lut->GetTableRange();
-    child = new TiXmlElement("TableRange");
-    element->LinkEndChild(child);
-    child->SetAttribute("min", boost::lexical_cast<std::string>(range[0]));
-    child->SetAttribute("max", boost::lexical_cast<std::string>(range[1]));
+    child = doc.NewElement("TableRange");
+    element->InsertEndChild(child);
+    child->SetAttribute("min", boost::lexical_cast<std::string>(range[0]).c_str());
+    child->SetAttribute("max", boost::lexical_cast<std::string>(range[1]).c_str());
 
-    child = new TiXmlElement("Table");
-    element->LinkEndChild(child);
+    child = doc.NewElement("Table");
+    element->InsertEndChild(child);
     for (int index = 0; index < lut->GetNumberOfTableValues(); ++index)
     {
-      auto grandChild = new TiXmlElement("RgbaColor");
+      auto grandChild = doc.NewElement("RgbaColor");
       rgba = lut->GetTableValue(index);
-      grandChild->SetAttribute("R", boost::lexical_cast<std::string>(rgba[0]));
-      grandChild->SetAttribute("G", boost::lexical_cast<std::string>(rgba[1]));
-      grandChild->SetAttribute("B", boost::lexical_cast<std::string>(rgba[2]));
-      grandChild->SetAttribute("A", boost::lexical_cast<std::string>(rgba[3]));
-      child->LinkEndChild(grandChild);
+      grandChild->SetAttribute("R", boost::lexical_cast<std::string>(rgba[0]).c_str());
+      grandChild->SetAttribute("G", boost::lexical_cast<std::string>(rgba[1]).c_str());
+      grandChild->SetAttribute("B", boost::lexical_cast<std::string>(rgba[2]).c_str());
+      grandChild->SetAttribute("A", boost::lexical_cast<std::string>(rgba[3]).c_str());
+      child->InsertEndChild(grandChild);
     }
     return element;
   }
@@ -86,7 +90,7 @@ TiXmlElement *mitk::LookupTablePropertySerializer::Serialize()
     return nullptr;
 }
 
-mitk::BaseProperty::Pointer mitk::LookupTablePropertySerializer::Deserialize(TiXmlElement *element)
+mitk::BaseProperty::Pointer mitk::LookupTablePropertySerializer::Deserialize(const tinyxml2::XMLElement *element)
 {
   if (!element)
     return nullptr;
@@ -96,26 +100,26 @@ mitk::BaseProperty::Pointer mitk::LookupTablePropertySerializer::Deserialize(TiX
   double range[2];
   double rgba[4];
 
-  std::string double_strings[4];
+  std::array<const char*, 4> double_strings;
 
   vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
 
   int numberOfColors;
   int scale;
   int ramp; // hope the int values don't change betw. vtk versions...
-  if (element->QueryIntAttribute("NumberOfColors", &numberOfColors) == TIXML_SUCCESS)
+  if (element->QueryIntAttribute("NumberOfColors", &numberOfColors) == tinyxml2::XML_SUCCESS)
   {
     lut->SetNumberOfTableValues(numberOfColors);
   }
   else
     return nullptr;
-  if (element->QueryIntAttribute("Scale", &scale) == TIXML_SUCCESS)
+  if (element->QueryIntAttribute("Scale", &scale) == tinyxml2::XML_SUCCESS)
   {
     lut->SetScale(scale);
   }
   else
     return nullptr;
-  if (element->QueryIntAttribute("Ramp", &ramp) == TIXML_SUCCESS)
+  if (element->QueryIntAttribute("Ramp", &ramp) == tinyxml2::XML_SUCCESS)
   {
     lut->SetRamp(ramp);
   }
@@ -124,13 +128,15 @@ mitk::BaseProperty::Pointer mitk::LookupTablePropertySerializer::Deserialize(TiX
 
   try
   {
-    TiXmlElement *child = element->FirstChildElement("HueRange");
+    auto *child = element->FirstChildElement("HueRange");
     if (child)
     {
-      if (child->QueryStringAttribute("min", &double_strings[0]) != TIXML_SUCCESS)
+      double_strings[0] = child->Attribute("min");
+      double_strings[1] = child->Attribute("max");
+
+      if (nullptr == double_strings[0] || nullptr == double_strings[1])
         return nullptr;
-      if (child->QueryStringAttribute("max", &double_strings[1]) != TIXML_SUCCESS)
-        return nullptr;
+
       StringsToNumbers<double>(2, double_strings, range);
       lut->SetHueRange(range);
     }
@@ -138,10 +144,12 @@ mitk::BaseProperty::Pointer mitk::LookupTablePropertySerializer::Deserialize(TiX
     child = element->FirstChildElement("ValueRange");
     if (child)
     {
-      if (child->QueryStringAttribute("min", &double_strings[0]) != TIXML_SUCCESS)
+      double_strings[0] = child->Attribute("min");
+      double_strings[1] = child->Attribute("max");
+
+      if (nullptr == double_strings[0] || nullptr == double_strings[1])
         return nullptr;
-      if (child->QueryStringAttribute("max", &double_strings[1]) != TIXML_SUCCESS)
-        return nullptr;
+
       StringsToNumbers<double>(2, double_strings, range);
       lut->SetValueRange(range);
     }
@@ -149,10 +157,12 @@ mitk::BaseProperty::Pointer mitk::LookupTablePropertySerializer::Deserialize(TiX
     child = element->FirstChildElement("SaturationRange");
     if (child)
     {
-      if (child->QueryStringAttribute("min", &double_strings[0]) != TIXML_SUCCESS)
+      double_strings[0] = child->Attribute("min");
+      double_strings[1] = child->Attribute("max");
+
+      if (nullptr == double_strings[0] || nullptr == double_strings[1])
         return nullptr;
-      if (child->QueryStringAttribute("max", &double_strings[1]) != TIXML_SUCCESS)
-        return nullptr;
+
       StringsToNumbers<double>(2, double_strings, range);
       lut->SetSaturationRange(range);
     }
@@ -160,10 +170,12 @@ mitk::BaseProperty::Pointer mitk::LookupTablePropertySerializer::Deserialize(TiX
     child = element->FirstChildElement("AlphaRange");
     if (child)
     {
-      if (child->QueryStringAttribute("min", &double_strings[0]) != TIXML_SUCCESS)
+      double_strings[0] = child->Attribute("min");
+      double_strings[1] = child->Attribute("max");
+
+      if (nullptr == double_strings[0] || nullptr == double_strings[1])
         return nullptr;
-      if (child->QueryStringAttribute("max", &double_strings[1]) != TIXML_SUCCESS)
-        return nullptr;
+
       StringsToNumbers<double>(2, double_strings, range);
       lut->SetAlphaRange(range);
     }
@@ -171,10 +183,12 @@ mitk::BaseProperty::Pointer mitk::LookupTablePropertySerializer::Deserialize(TiX
     child = element->FirstChildElement("TableRange");
     if (child)
     {
-      if (child->QueryStringAttribute("min", &double_strings[0]) != TIXML_SUCCESS)
+      double_strings[0] = child->Attribute("min");
+      double_strings[1] = child->Attribute("max");
+
+      if (nullptr == double_strings[0] || nullptr == double_strings[1])
         return nullptr;
-      if (child->QueryStringAttribute("max", &double_strings[1]) != TIXML_SUCCESS)
-        return nullptr;
+
       StringsToNumbers<double>(2, double_strings, range);
       lut->SetTableRange(range);
     }
@@ -183,17 +197,17 @@ mitk::BaseProperty::Pointer mitk::LookupTablePropertySerializer::Deserialize(TiX
     if (child)
     {
       unsigned int index(0);
-      for (TiXmlElement *grandChild = child->FirstChildElement("RgbaColor"); grandChild;
+      for (auto *grandChild = child->FirstChildElement("RgbaColor"); grandChild;
            grandChild = grandChild->NextSiblingElement("RgbaColor"))
       {
-        if (grandChild->QueryStringAttribute("R", &double_strings[0]) != TIXML_SUCCESS)
+        double_strings[0] = grandChild->Attribute("R");
+        double_strings[1] = grandChild->Attribute("G");
+        double_strings[2] = grandChild->Attribute("B");
+        double_strings[3] = grandChild->Attribute("A");
+
+        if (nullptr == double_strings[0] || nullptr == double_strings[1] || nullptr == double_strings[2] || nullptr == double_strings[3])
           return nullptr;
-        if (grandChild->QueryStringAttribute("G", &double_strings[1]) != TIXML_SUCCESS)
-          return nullptr;
-        if (grandChild->QueryStringAttribute("B", &double_strings[2]) != TIXML_SUCCESS)
-          return nullptr;
-        if (grandChild->QueryStringAttribute("A", &double_strings[3]) != TIXML_SUCCESS)
-          return nullptr;
+
         StringsToNumbers<double>(4, double_strings, rgba);
         lut->SetTableValue(index, rgba);
         ++index;

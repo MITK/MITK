@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14.5 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 
 # Change project and application name to your own
 set(MY_PROJECT_NAME $(project-name))

@@ -34,7 +34,7 @@ found in the LICENSE file.
 
 #include <mitkLocaleSwitch.h>
 
-#include <tinyxml.h>
+#include <tinyxml2.h>
 
 namespace mitk
 {
@@ -77,15 +77,14 @@ namespace mitk
 
     mitk::LocaleSwitch localeSwitch("C");
 
-    TiXmlDocument document;
-    auto decl = new TiXmlDeclaration("1.0", "", ""); // TODO what to write here? encoding? etc....
-    document.LinkEndChild(decl);
+    tinyxml2::XMLDocument document;
+    document.InsertEndChild(document.NewDeclaration());
 
-    auto version = new TiXmlElement("Version");
+    auto *version = document.NewElement("Version");
     version->SetAttribute("Writer", __FILE__);
     version->SetAttribute("CVSRevision", "$Revision: 17055 $");
     version->SetAttribute("FileVersion", 1);
-    document.LinkEndChild(version);
+    document.InsertEndChild(version);
 
     auto pf = dynamic_cast<const PlanarFigure*>(this->GetInput());
     if (pf == nullptr)
@@ -93,9 +92,9 @@ namespace mitk
       mitkThrow() << "Try to safe a BaseData instance as PlanarFigure. That is not a planar figure. This should not happen and is a violated precondition. Please check the program logic.";
     }
 
-    auto pfElement = new TiXmlElement("PlanarFigure");
+    auto *pfElement = document.NewElement("PlanarFigure");
     pfElement->SetAttribute("type", pf->GetNameOfClass());
-    document.LinkEndChild(pfElement);
+    document.InsertEndChild(pfElement);
 
     // Serialize property list of PlanarFigure
     mitk::PropertyList::Pointer propertyList = pf->GetPropertyList();
@@ -121,15 +120,15 @@ namespace mitk
         // Serializer not valid; skip this property
       }
 
-      auto keyElement = new TiXmlElement("property");
-      keyElement->SetAttribute("key", it->first);
+      auto *keyElement = document.NewElement("property");
+      keyElement->SetAttribute("key", it->first.c_str());
       keyElement->SetAttribute("type", prop->GetNameOfClass());
 
       serializer->SetProperty(prop);
-      TiXmlElement* valueElement = nullptr;
+      tinyxml2::XMLElement* valueElement = nullptr;
       try
       {
-        valueElement = serializer->Serialize();
+        valueElement = serializer->Serialize(document);
       }
       catch (...)
       {
@@ -142,24 +141,24 @@ namespace mitk
       }
 
       // Add value to property element
-      keyElement->LinkEndChild(valueElement);
+      keyElement->InsertEndChild(valueElement);
 
       // Append serialized property to property list
-      pfElement->LinkEndChild(keyElement);
+      pfElement->InsertEndChild(keyElement);
     }
 
     // Serialize control points of PlanarFigure
-    auto controlPointsElement = new TiXmlElement("ControlPoints");
-    pfElement->LinkEndChild(controlPointsElement);
+    auto *controlPointsElement = document.NewElement("ControlPoints");
+    pfElement->InsertEndChild(controlPointsElement);
     for (unsigned int i = 0; i < pf->GetNumberOfControlPoints(); i++)
     {
-      auto vElement = new TiXmlElement("Vertex");
+      auto *vElement = document.NewElement("Vertex");
       vElement->SetAttribute("id", i);
-      vElement->SetDoubleAttribute("x", pf->GetControlPoint(i)[0]);
-      vElement->SetDoubleAttribute("y", pf->GetControlPoint(i)[1]);
-      controlPointsElement->LinkEndChild(vElement);
+      vElement->SetAttribute("x", pf->GetControlPoint(i)[0]);
+      vElement->SetAttribute("y", pf->GetControlPoint(i)[1]);
+      controlPointsElement->InsertEndChild(vElement);
     }
-    auto geoElement = new TiXmlElement("Geometry");
+    auto *geoElement = document.NewElement("Geometry");
     const auto* planeGeo = dynamic_cast<const PlaneGeometry*>(pf->GetPlaneGeometry());
     if (planeGeo != nullptr)
     {
@@ -167,57 +166,59 @@ namespace mitk
       typedef mitk::Geometry3D::TransformType TransformType;
       const TransformType* affineGeometry = planeGeo->GetIndexToWorldTransform();
       const TransformType::ParametersType& parameters = affineGeometry->GetParameters();
-      auto vElement = new TiXmlElement("transformParam");
+      auto *vElement = document.NewElement("transformParam");
       for (unsigned int i = 0; i < affineGeometry->GetNumberOfParameters(); ++i)
       {
         std::stringstream paramName;
         paramName << "param" << i;
-        vElement->SetDoubleAttribute(paramName.str().c_str(), parameters.GetElement(i));
+        vElement->SetAttribute(paramName.str().c_str(), parameters.GetElement(i));
       }
-      geoElement->LinkEndChild(vElement);
+      geoElement->InsertEndChild(vElement);
 
       // Write bounds of the PlaneGeometry
       typedef mitk::Geometry3D::BoundsArrayType BoundsArrayType;
       const BoundsArrayType& bounds = planeGeo->GetBounds();
-      vElement = new TiXmlElement("boundsParam");
+      vElement = document.NewElement("boundsParam");
       for (unsigned int i = 0; i < 6; ++i)
       {
         std::stringstream boundName;
         boundName << "bound" << i;
-        vElement->SetDoubleAttribute(boundName.str().c_str(), bounds.GetElement(i));
+        vElement->SetAttribute(boundName.str().c_str(), bounds.GetElement(i));
       }
-      geoElement->LinkEndChild(vElement);
+      geoElement->InsertEndChild(vElement);
 
       // Write spacing and origin of the PlaneGeometry
       Vector3D spacing = planeGeo->GetSpacing();
       Point3D origin = planeGeo->GetOrigin();
-      geoElement->LinkEndChild(this->CreateXMLVectorElement("Spacing", spacing));
-      geoElement->LinkEndChild(this->CreateXMLVectorElement("Origin", origin));
+      geoElement->InsertEndChild(this->CreateXMLVectorElement(document, "Spacing", spacing));
+      geoElement->InsertEndChild(this->CreateXMLVectorElement(document, "Origin", origin));
 
-      pfElement->LinkEndChild(geoElement);
+      pfElement->InsertEndChild(geoElement);
     }
 
     if (this->GetOutputStream() != nullptr)
     {
-      *(this->GetOutputStream()) << document;
+      tinyxml2::XMLPrinter printer;
+      document.Print(&printer);
+      *(this->GetOutputStream()) << printer.CStr();
     }
     else
     {
-      if (document.SaveFile(this->GetOutputLocation()) == false)
+      if (document.SaveFile(this->GetOutputLocation().c_str()) != tinyxml2::XML_SUCCESS)
       {
-        MITK_ERROR << "Could not write planar figures to " << this->GetOutputLocation() << "\nTinyXML reports '" << document.ErrorDesc()
+        MITK_ERROR << "Could not write planar figures to " << this->GetOutputLocation() << "\nTinyXML reports '" << document.ErrorStr()
           << "'";
         throw std::ios_base::failure("Error during writing of planar figure xml file.");
       }
     }
   }
 
-  TiXmlElement* mitk::PlanarFigureIO::CreateXMLVectorElement(const char* name, itk::FixedArray<mitk::ScalarType, 3> v)
+  tinyxml2::XMLElement* mitk::PlanarFigureIO::CreateXMLVectorElement(tinyxml2::XMLDocument& doc, const char* name, itk::FixedArray<mitk::ScalarType, 3> v)
   {
-    auto vElement = new TiXmlElement(name);
-    vElement->SetDoubleAttribute("x", v.GetElement(0));
-    vElement->SetDoubleAttribute("y", v.GetElement(1));
-    vElement->SetDoubleAttribute("z", v.GetElement(2));
+    auto vElement = doc.NewElement(name);
+    vElement->SetAttribute("x", v.GetElement(0));
+    vElement->SetAttribute("y", v.GetElement(1));
+    vElement->SetAttribute("z", v.GetElement(2));
     return vElement;
   }
 
@@ -238,7 +239,7 @@ namespace mitk
 
     std::vector<BaseData::Pointer> results;
 
-    TiXmlDocument document;
+    tinyxml2::XMLDocument document;
 
     if (this->GetInputStream() != nullptr)
     {
@@ -251,20 +252,18 @@ namespace mitk
     }
     else
     {
-      if (!document.LoadFile(this->GetInputLocation()))
+      if (tinyxml2::XML_SUCCESS != document.LoadFile(this->GetInputLocation().c_str()))
       {
-        MITK_ERROR << "Could not open/read/parse " << this->GetInputLocation() << ". TinyXML reports: '" << document.ErrorDesc()
-          << "'. "
-          << "The error occurred in row " << document.ErrorRow() << ", column " << document.ErrorCol() << ".";
+        MITK_ERROR << "Could not open/read/parse " << this->GetInputLocation() << ". TinyXML reports: '" << document.ErrorStr() << "'.";
         return {};
       }
     }
 
     int fileVersion = 1;
-    TiXmlElement* versionObject = document.FirstChildElement("Version");
+    auto* versionObject = document.FirstChildElement("Version");
     if (versionObject != nullptr)
     {
-      if (versionObject->QueryIntAttribute("FileVersion", &fileVersion) != TIXML_SUCCESS)
+      if (versionObject->QueryIntAttribute("FileVersion", &fileVersion) != tinyxml2::XML_SUCCESS)
       {
         MITK_WARN << this->GetInputLocation() << " does not contain version information! Trying version 1 format." << std::endl;
       }
@@ -281,10 +280,13 @@ namespace mitk
     }
 
     /* file version 1 reader code */
-    for (TiXmlElement* pfElement = document.FirstChildElement("PlanarFigure"); pfElement != nullptr;
+    for (auto* pfElement = document.FirstChildElement("PlanarFigure"); pfElement != nullptr;
       pfElement = pfElement->NextSiblingElement("PlanarFigure"))
     {
-      std::string type = pfElement->Attribute("type");
+      const char* typeC = pfElement->Attribute("type");
+      std::string type = nullptr != typeC
+        ? typeC
+        : "";
 
       mitk::PlanarFigure::Pointer planarFigure = nullptr;
       if (type == "PlanarAngle")
@@ -343,7 +345,7 @@ namespace mitk
       }
 
       // Read properties of the planar figure
-      for (TiXmlElement* propertyElement = pfElement->FirstChildElement("property"); propertyElement != nullptr;
+      for (auto* propertyElement = pfElement->FirstChildElement("property"); propertyElement != nullptr;
         propertyElement = propertyElement->NextSiblingElement("property"))
       {
         const char* keya = propertyElement->Attribute("key");
@@ -402,7 +404,7 @@ namespace mitk
       }
 
       // Read geometry of containing plane
-      TiXmlElement* geoElement = pfElement->FirstChildElement("Geometry");
+      auto* geoElement = pfElement->FirstChildElement("Geometry");
       if (geoElement != nullptr)
       {
         try
@@ -456,20 +458,20 @@ namespace mitk
         {
         }
       }
-      TiXmlElement* cpElement = pfElement->FirstChildElement("ControlPoints");
+      auto* cpElement = pfElement->FirstChildElement("ControlPoints");
       bool first = true;
       if (cpElement != nullptr)
-        for (TiXmlElement* vertElement = cpElement->FirstChildElement("Vertex"); vertElement != nullptr;
+        for (auto* vertElement = cpElement->FirstChildElement("Vertex"); vertElement != nullptr;
           vertElement = vertElement->NextSiblingElement("Vertex"))
       {
         int id = 0;
         mitk::Point2D::ValueType x = 0.0;
         mitk::Point2D::ValueType y = 0.0;
-        if (vertElement->QueryIntAttribute("id", &id) == TIXML_WRONG_TYPE)
+        if (vertElement->QueryIntAttribute("id", &id) != tinyxml2::XML_SUCCESS)
           return{}; // TODO: can we do a better error handling?
-        if (vertElement->QueryDoubleAttribute("x", &x) == TIXML_WRONG_TYPE)
+        if (vertElement->QueryDoubleAttribute("x", &x) != tinyxml2::XML_SUCCESS)
           return{}; // TODO: can we do a better error handling?
-        if (vertElement->QueryDoubleAttribute("y", &y) == TIXML_WRONG_TYPE)
+        if (vertElement->QueryDoubleAttribute("y", &y) != tinyxml2::XML_SUCCESS)
           return{}; // TODO: can we do a better error handling?
         Point2D p;
         p.SetElement(0, x);
@@ -498,7 +500,7 @@ namespace mitk
   }
 
   mitk::PlanarFigureIO::DoubleList mitk::PlanarFigureIO::GetDoubleAttributeListFromXMLNode(
-    TiXmlElement* e, const char* attributeNameBase, unsigned int count)
+    const tinyxml2::XMLElement* e, const char* attributeNameBase, unsigned int count)
   {
     DoubleList list;
 
@@ -511,7 +513,7 @@ namespace mitk
       std::stringstream attributeName;
       attributeName << attributeNameBase << i;
 
-      if (e->QueryDoubleAttribute(attributeName.str().c_str(), &p) == TIXML_WRONG_TYPE)
+      if (e->QueryDoubleAttribute(attributeName.str().c_str(), &p) != tinyxml2::XML_SUCCESS)
         throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
       list.push_back(p);
     }
@@ -519,37 +521,37 @@ namespace mitk
     return list;
   }
 
-  mitk::Point3D mitk::PlanarFigureIO::GetPointFromXMLNode(TiXmlElement* e)
+  mitk::Point3D mitk::PlanarFigureIO::GetPointFromXMLNode(const tinyxml2::XMLElement* e)
   {
     if (e == nullptr)
       throw std::invalid_argument("node invalid"); // TODO: can we do a better error handling?
     mitk::Point3D point;
     mitk::ScalarType p(-1.0);
-    if (e->QueryDoubleAttribute("x", &p) == TIXML_WRONG_TYPE)
+    if (e->QueryDoubleAttribute("x", &p) != tinyxml2::XML_SUCCESS)
       throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
     point.SetElement(0, p);
-    if (e->QueryDoubleAttribute("y", &p) == TIXML_WRONG_TYPE)
+    if (e->QueryDoubleAttribute("y", &p) != tinyxml2::XML_SUCCESS)
       throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
     point.SetElement(1, p);
-    if (e->QueryDoubleAttribute("z", &p) == TIXML_WRONG_TYPE)
+    if (e->QueryDoubleAttribute("z", &p) != tinyxml2::XML_SUCCESS)
       throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
     point.SetElement(2, p);
     return point;
   }
 
-  mitk::Vector3D mitk::PlanarFigureIO::GetVectorFromXMLNode(TiXmlElement* e)
+  mitk::Vector3D mitk::PlanarFigureIO::GetVectorFromXMLNode(const tinyxml2::XMLElement* e)
   {
     if (e == nullptr)
       throw std::invalid_argument("node invalid"); // TODO: can we do a better error handling?
     mitk::Vector3D vector;
     mitk::ScalarType p(-1.0);
-    if (e->QueryDoubleAttribute("x", &p) == TIXML_WRONG_TYPE)
+    if (e->QueryDoubleAttribute("x", &p) != tinyxml2::XML_SUCCESS)
       throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
     vector.SetElement(0, p);
-    if (e->QueryDoubleAttribute("y", &p) == TIXML_WRONG_TYPE)
+    if (e->QueryDoubleAttribute("y", &p) != tinyxml2::XML_SUCCESS)
       throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
     vector.SetElement(1, p);
-    if (e->QueryDoubleAttribute("z", &p) == TIXML_WRONG_TYPE)
+    if (e->QueryDoubleAttribute("z", &p) != tinyxml2::XML_SUCCESS)
       throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
     vector.SetElement(2, p);
     return vector;

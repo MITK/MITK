@@ -41,8 +41,8 @@ if(NOT DEFINED GDCM_DIR)
 
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
-     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/gdcm-3.0.4.tar.gz
-     URL_MD5 f12dbded708356d5fa0b5ed37ccdb66e
+     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/gdcm-3.0.8.tar.gz
+     URL_MD5 29e0e60b04183e3eb9c18ad093156b2c
      CMAKE_GENERATOR ${gen}
      CMAKE_GENERATOR_PLATFORM ${gen_platform}
      CMAKE_ARGS

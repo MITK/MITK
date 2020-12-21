@@ -31,8 +31,8 @@ namespace mitk
         mitkClassMacro(ScalarListLookupTablePropertySerializer, BasePropertySerializer);
         itkNewMacro(Self);
 
-        TiXmlElement* Serialize() override;
-        BaseProperty::Pointer Deserialize(TiXmlElement* element) override;
+        tinyxml2::XMLElement* Serialize(tinyxml2::XMLDocument& doc) override;
+        BaseProperty::Pointer Deserialize(const tinyxml2::XMLElement* element) override;
 
     protected:
         ScalarListLookupTablePropertySerializer() {}

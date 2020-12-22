@@ -297,7 +297,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Plane
 
 mitk::Image::Pointer mitk::SegTool2D::GetAffectedWorkingSlice(const InteractionPositionEvent *positionEvent) const
 {
-  const auto workingNode = this->GetTargetSegmentationNode();
+  const auto workingNode = this->GetWorkingDataNode();
   if (!workingNode)
   {
     return nullptr;
@@ -314,7 +314,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedWorkingSlice(const InteractionP
 
 mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const InteractionPositionEvent *positionEvent) const
 {
-  DataNode *referenceNode(m_ToolManager->GetReferenceData(0));
+  DataNode* referenceNode = this->GetReferenceDataNode();
   if (!referenceNode)
   {
     return nullptr;
@@ -338,6 +338,32 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const Interactio
   }
 }
 
+mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const PlaneGeometry* planeGeometry, TimeStepType timeStep) const
+{
+  DataNode* referenceNode = this->GetReferenceDataNode();
+  if (!referenceNode)
+  {
+    return nullptr;
+  }
+
+  auto* referenceImage = dynamic_cast<Image*>(referenceNode->GetData());
+  if (!referenceImage)
+  {
+    return nullptr;
+  }
+
+  int displayedComponent = 0;
+  if (referenceNode->GetIntProperty("Image.Displayed Component", displayedComponent))
+  {
+    // found the displayed component
+    return GetAffectedImageSliceAs2DImage(planeGeometry, referenceImage, timeStep, displayedComponent);
+  }
+  else
+  {
+    return GetAffectedImageSliceAs2DImage(planeGeometry, referenceImage, timeStep);
+  }
+}
+
 void mitk::SegTool2D::Activated()
 {
   Superclass::Activated();
@@ -357,7 +383,7 @@ void mitk::SegTool2D::Deactivated()
 
 void mitk::SegTool2D::OnTimePointChangedInternal()
 {
-  if (m_IsTimePointChangeAware && nullptr != this->GetTargetSegmentationNode())
+  if (m_IsTimePointChangeAware && nullptr != this->GetWorkingDataNode())
   {
     const auto timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
 
@@ -374,10 +400,36 @@ void mitk::SegTool2D::OnTimePointChanged()
   //default implementation does nothing
 }
 
-mitk::DataNode* mitk::SegTool2D::GetTargetSegmentationNode() const
+mitk::DataNode* mitk::SegTool2D::GetWorkingDataNode() const
 {
   return m_ToolManager->GetWorkingData(0);
 }
+
+mitk::Image* mitk::SegTool2D::GetWorkingData() const
+{
+  auto node = this->GetWorkingDataNode();
+  if (nullptr != node)
+  {
+    return dynamic_cast<Image*>(node->GetData());
+  }
+  return nullptr;
+}
+
+mitk::DataNode* mitk::SegTool2D::GetReferenceDataNode() const
+{
+  return m_ToolManager->GetReferenceData(0);
+}
+
+mitk::Image* mitk::SegTool2D::GetReferenceData() const
+{
+  auto node = this->GetReferenceDataNode();
+  if (nullptr != node)
+  {
+    return dynamic_cast<Image*>(node->GetData());
+  }
+  return nullptr;
+}
+
 
 void mitk::SegTool2D::WriteBackSegmentationResult(const InteractionPositionEvent *positionEvent, Image *slice)
 {
@@ -390,7 +442,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult(const InteractionPositionEvent
 
   if (planeGeometry && slice && !abstractTransformGeometry)
   {
-    const auto workingNode = this->GetTargetSegmentationNode();
+    const auto workingNode = this->GetWorkingDataNode();
     auto *image = dynamic_cast<Image *>(workingNode->GetData());
     const auto timeStep = positionEvent->GetSender()->GetTimeStep(image);
     this->WriteBackSegmentationResult(planeGeometry, slice, timeStep);
@@ -411,7 +463,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult(const PlaneGeometry *planeGeom
 void mitk::SegTool2D::WriteBackSegmentationResults(const std::vector<SegTool2D::SliceInformation> &sliceList,
                                                   bool writeSliceToVolume)
 {
-  const auto workingNode = this->GetTargetSegmentationNode();
+  const auto workingNode = this->GetWorkingDataNode();
   auto* image = dynamic_cast<Image*>(workingNode->GetData());
 
   for (const auto& sliceInfo : sliceList)
@@ -432,7 +484,7 @@ void mitk::SegTool2D::WriteBackSegmentationResults(const std::vector<SegTool2D::
 
 void mitk::SegTool2D::WriteSliceToVolume(const mitk::SegTool2D::SliceInformation &sliceInfo)
 {
-  const auto workingNode = this->GetTargetSegmentationNode();
+  const auto workingNode = this->GetWorkingDataNode();
   auto *image = dynamic_cast<Image *>(workingNode->GetData());
 
   /*============= BEGIN undo/redo feature block ========================*/
@@ -546,7 +598,7 @@ int mitk::SegTool2D::AddContourmarker()
   contourMarker->SetPlaneGeometry(const_cast<PlaneGeometry *>(plane));
 
   std::stringstream markerStream;
-  auto workingNode = this->GetTargetSegmentationNode();
+  auto workingNode = this->GetWorkingDataNode();
 
   markerStream << m_Contourmarkername;
   markerStream << " ";
@@ -595,7 +647,7 @@ int mitk::SegTool2D::AddContourmarker()
   return id;
 }
 
-void mitk::SegTool2D::InteractiveSegmentationBugMessage(const std::string &message)
+void mitk::SegTool2D::InteractiveSegmentationBugMessage(const std::string &message) const
 {
   MITK_ERROR << "********************************************************************************" << std::endl
              << " " << message << std::endl

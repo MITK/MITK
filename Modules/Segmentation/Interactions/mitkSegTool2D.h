@@ -142,7 +142,11 @@ namespace mitk
     /**
      * @brief returns the segmentation node that should be modified by the tool.
      */
-    mitk::DataNode* GetTargetSegmentationNode() const;
+    mitk::DataNode* GetWorkingDataNode() const;
+    mitk::Image* GetWorkingData() const;
+
+    mitk::DataNode* GetReferenceDataNode() const;
+    mitk::Image* GetReferenceData() const;
 
     /**
      * This function can be reimplemented by derived classes to react on changes of the current
@@ -200,6 +204,8 @@ namespace mitk
                    or just no reference image is selected.
     */
     Image::Pointer GetAffectedReferenceSlice(const InteractionPositionEvent *) const;
+    /** Overload version that gets the reference slice passed on the passed plane geometry and timestep.*/
+    Image::Pointer GetAffectedReferenceSlice(const PlaneGeometry* planeGeometry, TimeStepType timeStep) const;
 
     void WriteBackSegmentationResult(const InteractionPositionEvent *, Image *);
 
@@ -217,11 +223,12 @@ namespace mitk
     */
     int AddContourmarker();
 
-    void InteractiveSegmentationBugMessage(const std::string &message);
+    void InteractiveSegmentationBugMessage(const std::string &message) const;
 
     BaseRenderer *m_LastEventSender = nullptr;
     unsigned int m_LastEventSlice = 0;
 
+    itkGetMacro(LastTimePointTriggered, TimePointType);
 
   private:
     /** Internal method that gets triggered as soon as the tool manager indicates a

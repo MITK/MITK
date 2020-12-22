@@ -53,7 +53,7 @@ void mitk::ContourModelMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *ren
 
   auto *inputContour = static_cast<mitk::ContourModel *>(GetDataNode()->GetData());
 
-  unsigned int timestep = renderer->GetTimeStep();
+  const auto timestep = this->GetTimestep();
 
   // if there's something to be rendered
   if (inputContour->GetNumberOfVertices(timestep) > 0)
@@ -123,7 +123,7 @@ void mitk::ContourModelMapper2D::Update(mitk::BaseRenderer *renderer)
 vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper2D::CreateVtkPolyDataFromContour(mitk::ContourModel *inputContour,
                                                                                       mitk::BaseRenderer *renderer)
 {
-  unsigned int timestep = this->GetTimestep();
+  const auto timestep = this->GetTimestep();
   // Create a polydata to store everything in
   vtkSmartPointer<vtkPolyData> resultingPolyData = vtkSmartPointer<vtkPolyData>::New();
 

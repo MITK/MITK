@@ -118,7 +118,7 @@ void mitk::ContourModelMapper3D::Update(mitk::BaseRenderer *renderer)
 
 vtkSmartPointer<vtkPolyData> mitk::ContourModelMapper3D::CreateVtkPolyDataFromContour(mitk::ContourModel *inputContour)
 {
-  unsigned int timestep = this->GetTimestep();
+  const auto timestep = this->GetTimestep();
 
   // the points to draw
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();

@@ -58,7 +58,8 @@ namespace mitk
                                                                bool correctionForIpSegmentation = false);
 
     /**
-    \brief Fill a contour in a 2D slice with a specified pixel value at time step 0.
+    \brief Fill a contour in a 2D slice with a specified pixel value.
+    This version always uses the contour of time step 0 and fills the image.
     \pre sliceImage points to a valid instance
     \pre projectedContour points to a valid instance
     */
@@ -68,12 +69,14 @@ namespace mitk
                                    int paintingPixelValue = 1);
 
     /**
-    \brief Fill a contour in a 2D slice with a specified pixel value at a given time step.
+    \brief Fill a contour in a 2D slice with a specified pixel value.
+    This overloaded version uses the contour at the passed contourTimeStep
+    to file the passed image slice.
     \pre sliceImage points to a valid instance
     \pre projectedContour points to a valid instance
     */
     static void FillContourInSlice(const ContourModel *projectedContour,
-                                   unsigned int timeStep,
+                                   unsigned int contourTimeStep,
                                    Image *sliceImage,
                                    const Image* workingImage,
                                    int paintingPixelValue = 1);

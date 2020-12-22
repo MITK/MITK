@@ -102,7 +102,7 @@ void mitk::ContourModelUtils::FillContourInSlice(
 }
 
 void mitk::ContourModelUtils::FillContourInSlice(
-  const ContourModel *projectedContour, unsigned int t, Image *sliceImage, const Image* workingImage, int paintingPixelValue)
+  const ContourModel *projectedContour, unsigned int contourTimeStep, Image *sliceImage, const Image* workingImage, int paintingPixelValue)
 {
   if (nullptr == projectedContour)
   {
@@ -121,15 +121,15 @@ void mitk::ContourModelUtils::FillContourInSlice(
   auto surface = mitk::Surface::New();
   surface = contourModelFilter->GetOutput();
 
-  if (nullptr == surface->GetVtkPolyData(t))
+  if (nullptr == surface->GetVtkPolyData(contourTimeStep))
   {
     MITK_WARN << "Could not create surface from contour model.";
     return;
   }
 
   auto surface2D = vtkSmartPointer<vtkPolyData>::New();
-  surface2D->SetPoints(surface->GetVtkPolyData(t)->GetPoints());
-  surface2D->SetLines(surface->GetVtkPolyData(t)->GetLines());
+  surface2D->SetPoints(surface->GetVtkPolyData(contourTimeStep)->GetPoints());
+  surface2D->SetLines(surface->GetVtkPolyData(contourTimeStep)->GetLines());
 
   auto image = vtkSmartPointer<vtkImageData>::New();
   image->DeepCopy(sliceImage->GetVtkImageData());

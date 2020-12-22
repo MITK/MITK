@@ -39,9 +39,8 @@ namespace mitk
    \note On the fly training will only be used for next update.
    The computation uses the last calculated segment to map cost according to features in the area of the segment.
 
-   For time resolved purposes use ImageLiveWireContourModelFilter::SetTimestep( unsigned int ) to create the LiveWire
-   contour
-   at a specific timestep.
+   Caution: time support currently not available. Filter will always work on the first
+   timestep in its current implementation.
 
    \ingroup ContourModelFilters
    \ingroup Process
@@ -76,11 +75,6 @@ namespace mitk
     */
     itkSetMacro(UseDynamicCostMap, bool);
     itkGetMacro(UseDynamicCostMap, bool);
-
-    /** \brief Actual time step
-    */
-    itkSetMacro(TimeStep, unsigned int);
-    itkGetMacro(TimeStep, unsigned int);
 
     /** \brief Clear all repulsive points used in the cost function
     */

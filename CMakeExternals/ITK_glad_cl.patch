@@ -2993,7 +2993,7 @@ index 0000000..d8759c9
 +}
 +#endif
 diff --git a/Modules/Core/GPUCommon/src/itkOpenCLUtil.cxx b/Modules/Core/GPUCommon/src/itkOpenCLUtil.cxx
-index 4176449..6f206e8 100644
+index 4176449..8f5c42d 100644
 --- a/Modules/Core/GPUCommon/src/itkOpenCLUtil.cxx
 +++ b/Modules/Core/GPUCommon/src/itkOpenCLUtil.cxx
 @@ -22,6 +22,8 @@
@@ -3024,6 +3024,17 @@ index 4176449..6f206e8 100644
  //
  // Get the device that has the maximum FLOPS in the current context
  //
+@@ -211,6 +225,10 @@ cl_platform_id OpenCLSelectPlatform()
+ 
+   // Get OpenCL platform count
+   cl_uint num_platforms = 0;
++  if (!clGetPlatformIDs && !LoadOpenCL()) {
++    printf("OpenCL can't be loaded!\n\n");
++    return clSelectedPlatformID;
++  }
+   auto ciErrNum = clGetPlatformIDs(0, ITK_NULLPTR, &num_platforms);
+   if (ciErrNum != CL_SUCCESS) {
+     printf(" Error %i in clGetPlatformIDs Call !!!\n\n", ciErrNum);
 diff --git a/Modules/Core/GPUFiniteDifference/CMakeLists.txt b/Modules/Core/GPUFiniteDifference/CMakeLists.txt
 index 96b7193..4772104 100644
 --- a/Modules/Core/GPUFiniteDifference/CMakeLists.txt

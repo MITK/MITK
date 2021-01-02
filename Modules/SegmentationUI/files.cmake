@@ -1,5 +1,7 @@
 set( CPP_FILES
 Qmitk/QmitkAdaptiveRegionGrowingToolGUI.cpp
+Qmitk/QmitkAutoSegmentationToolGUIBase.cpp
+Qmitk/QmitkBinaryThresholdToolGUIBase.cpp
 Qmitk/QmitkBinaryThresholdToolGUI.cpp
 Qmitk/QmitkBinaryThresholdULToolGUI.cpp
 Qmitk/QmitkCalculateGrayValueStatisticsToolGUI.cpp
@@ -33,6 +35,8 @@ Qmitk/QmitkSimpleLabelSetListWidget.cpp
 
 set(MOC_H_FILES
 Qmitk/QmitkAdaptiveRegionGrowingToolGUI.h
+Qmitk/QmitkAutoSegmentationToolGUIBase.h
+Qmitk/QmitkBinaryThresholdToolGUIBase.h
 Qmitk/QmitkBinaryThresholdToolGUI.h
 Qmitk/QmitkBinaryThresholdULToolGUI.h
 Qmitk/QmitkCalculateGrayValueStatisticsToolGUI.h

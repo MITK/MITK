@@ -49,8 +49,6 @@ protected slots:
   void OnSigmaChanged(double);
   void OnStoppingValueChanged(double);
   void OnConfirmSegmentation();
-  void Refetch();
-  void SetStepper(mitk::Stepper *);
   void OnClearSeeds();
 
 protected:
@@ -71,11 +69,6 @@ protected:
   QPushButton *m_btClearSeeds;
 
   mitk::FastMarchingTool::Pointer m_FastMarchingTool;
-
-  bool m_TimeIsConnected;
-  mitk::Stepper::Pointer m_TimeStepper;
-
-  void OnFastMarchingToolReady();
 
 private:
   void EnableWidgets(bool);

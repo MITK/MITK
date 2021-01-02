@@ -77,11 +77,12 @@ namespace mitk
     /// \brief Clear all seed points.
     void ClearSeeds();
 
-    const unsigned int TOOL_DIMENSION = 3;
 
   protected:
     FastMarchingBaseTool();
     ~FastMarchingBaseTool() override;
+
+    unsigned int TOOL_DIMENSION = 3;
 
     void ConnectActionsAndFunctions() override;
 

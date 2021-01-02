@@ -27,7 +27,7 @@ found in the LICENSE file.
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkFastMarchingToolGUI, "")
 
-QmitkFastMarchingToolGUI::QmitkFastMarchingToolGUI() : QmitkToolGUI(), m_TimeIsConnected(false)
+QmitkFastMarchingToolGUI::QmitkFastMarchingToolGUI() : QmitkToolGUI()
 {
   this->setContentsMargins(0, 0, 0, 0);
 
@@ -202,8 +202,6 @@ QmitkFastMarchingToolGUI::~QmitkFastMarchingToolGUI()
   {
     m_FastMarchingTool->CurrentlyBusy -=
       mitk::MessageDelegate1<QmitkFastMarchingToolGUI, bool>(this, &QmitkFastMarchingToolGUI::BusyStateChanged);
-    m_FastMarchingTool->RemoveReadyListener(
-      mitk::MessageDelegate<QmitkFastMarchingToolGUI>(this, &QmitkFastMarchingToolGUI::OnFastMarchingToolReady));
   }
 }
 
@@ -213,8 +211,6 @@ void QmitkFastMarchingToolGUI::OnNewToolAssociated(mitk::Tool *tool)
   {
     m_FastMarchingTool->CurrentlyBusy -=
       mitk::MessageDelegate1<QmitkFastMarchingToolGUI, bool>(this, &QmitkFastMarchingToolGUI::BusyStateChanged);
-    m_FastMarchingTool->RemoveReadyListener(
-      mitk::MessageDelegate<QmitkFastMarchingToolGUI>(this, &QmitkFastMarchingToolGUI::OnFastMarchingToolReady));
   }
 
   m_FastMarchingTool = dynamic_cast<mitk::FastMarchingTool *>(tool);
@@ -223,30 +219,31 @@ void QmitkFastMarchingToolGUI::OnNewToolAssociated(mitk::Tool *tool)
   {
     m_FastMarchingTool->CurrentlyBusy +=
       mitk::MessageDelegate1<QmitkFastMarchingToolGUI, bool>(this, &QmitkFastMarchingToolGUI::BusyStateChanged);
-    m_FastMarchingTool->AddReadyListener(
-      mitk::MessageDelegate<QmitkFastMarchingToolGUI>(this, &QmitkFastMarchingToolGUI::OnFastMarchingToolReady));
 
-    // listen to timestep change events
-    mitk::BaseRenderer::Pointer renderer;
-    renderer = mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget0"));
-    if (renderer.IsNotNull() && !m_TimeIsConnected)
-    {
-      new QmitkStepperAdapter(this, renderer->GetSliceNavigationController()->GetTime(), "stepper");
-      //  connect(m_TimeStepper, SIGNAL(Refetch()), this, SLOT(Refetch()));
-      m_TimeIsConnected = true;
-    }
+    m_FastMarchingTool->SetLowerThreshold(m_slwThreshold->minimumValue());
+    m_FastMarchingTool->SetUpperThreshold(m_slwThreshold->maximumValue());
+    m_FastMarchingTool->SetStoppingValue(m_slStoppingValue->value());
+    m_FastMarchingTool->SetSigma(m_slSigma->value());
+    m_FastMarchingTool->SetAlpha(m_slAlpha->value());
+    m_FastMarchingTool->SetBeta(m_slBeta->value());
+    m_FastMarchingTool->SetOverwriteExistingSegmentation(true);
+    m_FastMarchingTool->ClearSeeds();
+    //m_CheckProcessAll->setVisible(m_FastMarchingTool->GetTargetSegmentationNode()->GetData()->GetTimeSteps() > 1);
   }
 }
 
 void QmitkFastMarchingToolGUI::Update()
 {
-  m_FastMarchingTool->SetLowerThreshold(this->m_slwThreshold->minimumValue());
-  m_FastMarchingTool->SetUpperThreshold(this->m_slwThreshold->maximumValue());
-  m_FastMarchingTool->SetStoppingValue(this->m_slStoppingValue->value());
-  m_FastMarchingTool->SetSigma(this->m_slSigma->value());
-  m_FastMarchingTool->SetAlpha(this->m_slAlpha->value());
-  m_FastMarchingTool->SetBeta(this->m_slBeta->value());
-  m_FastMarchingTool->Update();
+  if (m_FastMarchingTool.IsNotNull())
+  {
+    m_FastMarchingTool->SetLowerThreshold(m_slwThreshold->minimumValue());
+    m_FastMarchingTool->SetUpperThreshold(m_slwThreshold->maximumValue());
+    m_FastMarchingTool->SetStoppingValue(m_slStoppingValue->value());
+    m_FastMarchingTool->SetSigma(m_slSigma->value());
+    m_FastMarchingTool->SetAlpha(m_slAlpha->value());
+    m_FastMarchingTool->SetBeta(m_slBeta->value());
+    m_FastMarchingTool->UpdatePreview();
+  }
 }
 
 void QmitkFastMarchingToolGUI::OnThresholdChanged(double lower, double upper)
@@ -299,20 +296,12 @@ void QmitkFastMarchingToolGUI::OnConfirmSegmentation()
 {
   if (m_FastMarchingTool.IsNotNull())
   {
+    m_FastMarchingTool->SetOverwriteExistingSegmentation(true);
+    m_FastMarchingTool->SetCreateAllTimeSteps(false);// m_CheckProcessAll->isChecked());
+
     m_btConfirm->setEnabled(false);
     m_FastMarchingTool->ConfirmSegmentation();
   }
-}
-
-void QmitkFastMarchingToolGUI::SetStepper(mitk::Stepper *stepper)
-{
-  this->m_TimeStepper = stepper;
-}
-
-void QmitkFastMarchingToolGUI::Refetch()
-{
-  // event from image navigator recieved - timestep has changed
-  m_FastMarchingTool->SetCurrentTimeStep(m_TimeStepper->GetPos());
 }
 
 void QmitkFastMarchingToolGUI::OnClearSeeds()
@@ -328,16 +317,15 @@ void QmitkFastMarchingToolGUI::OnClearSeeds()
 void QmitkFastMarchingToolGUI::BusyStateChanged(bool value)
 {
   if (value)
+  {
     QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
+    this->EnableWidgets(false);
+  }
   else
+  {
     QApplication::restoreOverrideCursor();
-}
-
-void QmitkFastMarchingToolGUI::OnFastMarchingToolReady()
-{
-  this->EnableWidgets(true);
-  this->m_btClearSeeds->setEnabled(true);
-  this->m_btConfirm->setEnabled(true);
+    this->EnableWidgets(true);
+  }
 }
 
 void QmitkFastMarchingToolGUI::EnableWidgets(bool enable)
@@ -347,4 +335,8 @@ void QmitkFastMarchingToolGUI::EnableWidgets(bool enable)
   m_slBeta->setEnabled(enable);
   m_slStoppingValue->setEnabled(enable);
   m_slwThreshold->setEnabled(enable);
+  m_btClearSeeds->setEnabled(enable);
+  m_btConfirm->setEnabled(enable);
+//  m_CheckCreateNew->setEnabled(enable);
+//  m_CheckProcessAll->setEnabled(enable);
 }

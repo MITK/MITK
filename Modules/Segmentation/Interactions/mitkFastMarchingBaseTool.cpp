@@ -20,6 +20,10 @@ found in the LICENSE file.
 
 #include "mitkImageAccessByItk.h"
 
+#include "mitkSegTool2D.h"
+
+#include <mitkImageCast.h>
+
 // itk filter
 #include "itkBinaryThresholdImageFilter.h"
 #include "itkCurvatureAnisotropicDiffusionImageFilter.h"
@@ -34,7 +38,7 @@ found in the LICENSE file.
 
 
 mitk::FastMarchingBaseTool::FastMarchingBaseTool()
-  : AutoSegmentationWithPreviewTool("FastMarchingTool"),
+  : AutoSegmentationWithPreviewTool(false, "FastMarchingTool"),
     m_LowerThreshold(0),
     m_UpperThreshold(200),
     m_StoppingValue(100),
@@ -136,6 +140,9 @@ void mitk::FastMarchingBaseTool::Activated()
   Superclass::Activated();
 
   m_SeedsAsPointSet = mitk::PointSet::New();
+  //ensure that the seed points are visible for all timepoints.
+  dynamic_cast<ProportionalTimeGeometry*>(m_SeedsAsPointSet->GetTimeGeometry())->SetStepDuration(std::numeric_limits<TimePointType>::max());
+
   m_SeedsAsPointSetNode = mitk::DataNode::New();
   m_SeedsAsPointSetNode->SetData(m_SeedsAsPointSet);
   m_SeedsAsPointSetNode->SetName(std::string(this->GetName()) + "_PointSet");
@@ -213,6 +220,8 @@ void mitk::FastMarchingBaseTool::ClearSeeds()
   {
     // renew pointset
     this->m_SeedsAsPointSet = mitk::PointSet::New();
+    //ensure that the seed points are visible for all timepoints.
+    dynamic_cast<ProportionalTimeGeometry*>(m_SeedsAsPointSet->GetTimeGeometry())->SetStepDuration(std::numeric_limits<TimePointType>::max());
     this->m_SeedsAsPointSetNode->SetData(this->m_SeedsAsPointSet);
   }
 }
@@ -225,7 +234,7 @@ void mitk::FastMarchingBaseTool::DoITKFastMarching(const itk::Image<TPixel, VIma
   typedef itk::Image<TPixel, VImageDimension> InputImageType;
 
   typedef float InternalPixelType;
-  typedef itk::Image<InternalPixelType, 3> InternalImageType;
+  typedef itk::Image<InternalPixelType, VImageDimension> InternalImageType;
 
   typedef mitk::Tool::DefaultSegmentationDataType OutputPixelType;
   typedef itk::Image<OutputPixelType, VImageDimension> OutputImageType;
@@ -304,8 +313,9 @@ void mitk::FastMarchingBaseTool::DoITKFastMarching(const itk::Image<TPixel, VIma
   }
   else
   {
-    //TODO -> rework SegTool2D to make it usable here
-    //this->WriteBackSegmentationResult(m_WorkingPlane, segmentationResult, workingImageTimeStep);
+    mitk::Image::Pointer sliceImage = mitk::Image::New();
+    mitk::CastToMitkImage(thresholdFilter->GetOutput(), sliceImage);
+    SegTool2D::WriteSliceToVolume(previewImage, this->GetWorkingPlaneGeometry(), sliceImage, timeStep, false);
   }
 }
 
@@ -313,6 +323,13 @@ void mitk::FastMarchingBaseTool::DoUpdatePreview(const Image* inputAtTimeStep, I
 {
   if (nullptr != inputAtTimeStep && nullptr != previewImage && m_SeedsAsPointSet.IsNotNull() && m_SeedsAsPointSet->GetSize()>0)
   {
-    AccessFixedDimensionByItk_n(inputAtTimeStep, DoITKFastMarching, 3, (previewImage, timeStep, inputAtTimeStep->GetGeometry()));
+    if (nullptr == this->GetWorkingPlaneGeometry())
+    {
+      AccessFixedDimensionByItk_n(inputAtTimeStep, DoITKFastMarching, 3, (previewImage, timeStep, inputAtTimeStep->GetGeometry()));
+    }
+    else
+    {
+      AccessFixedDimensionByItk_n(inputAtTimeStep, DoITKFastMarching, 2, (previewImage, timeStep, inputAtTimeStep->GetGeometry()));
+    }
   }
 }

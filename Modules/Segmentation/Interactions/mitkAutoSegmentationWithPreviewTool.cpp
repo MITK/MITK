@@ -277,9 +277,9 @@ void mitk::AutoSegmentationWithPreviewTool::TransferImageAtTimeStep(const Image*
 {
   try
   {
-    Image::ConstPointer image3D = this->GetImageByTimeStep(sourceImage, timeStep);
+    Image::ConstPointer sourceImageAtTimeStep = this->GetImageByTimeStep(sourceImage, timeStep);
 
-    if (image3D->GetPixelType() != destinationImage->GetPixelType())
+    if (sourceImageAtTimeStep->GetPixelType() != destinationImage->GetPixelType())
     {
       mitkThrow() << "Cannot transfer images. Tool is in an invalid state, source image and destination image do not have the same pixel type. "
         << "Source pixel type: " << sourceImage->GetPixelType().GetTypeAsString()
@@ -292,20 +292,21 @@ void mitk::AutoSegmentationWithPreviewTool::TransferImageAtTimeStep(const Image*
     }
 
     if (nullptr != this->GetWorkingPlaneGeometry())
-    { //only transfer a specific slice defined by the working plane
-
+    {
+      auto sourceSlice = SegTool2D::GetAffectedImageSliceAs2DImage(this->GetWorkingPlaneGeometry(), sourceImage, timeStep);
+      SegTool2D::WriteBackSegmentationResult(this->GetTargetSegmentationNode(), m_WorkingPlaneGeometry, sourceSlice, timeStep);
     }
     else
     { //take care of the full segmentation volume
-      if (image3D->GetDimension() == 2)
+      if (sourceImageAtTimeStep->GetDimension() == 2)
       {
         AccessFixedDimensionByItk_2(
-          image3D, ITKSetVolume, 2, destinationImage, timeStep);
+          sourceImageAtTimeStep, ITKSetVolume, 2, destinationImage, timeStep);
       }
       else
       {
         AccessFixedDimensionByItk_2(
-          image3D, ITKSetVolume, 3, destinationImage, timeStep);
+          sourceImageAtTimeStep, ITKSetVolume, 3, destinationImage, timeStep);
       }
     }
   }
@@ -342,13 +343,13 @@ void mitk::AutoSegmentationWithPreviewTool::CreateResultSegmentationFromPreview(
       {
         for (unsigned int timeStep = 0; timeStep < previewImage->GetTimeSteps(); ++timeStep)
         {
-          TransferImageAtTimeStep(previewImage, resultSegmentation, timeStep);
+          this->TransferImageAtTimeStep(previewImage, resultSegmentation, timeStep);
         }
       }
       else
       {
         const auto timeStep = resultSegmentation->GetTimeGeometry()->TimePointToTimeStep(timePoint);
-        TransferImageAtTimeStep(previewImage, resultSegmentation, timeStep);
+        this->TransferImageAtTimeStep(previewImage, resultSegmentation, timeStep);
       }
 
       // since we are maybe working on a smaller image, pad it to the size of the original image
@@ -368,6 +369,7 @@ void mitk::AutoSegmentationWithPreviewTool::CreateResultSegmentationFromPreview(
 
       m_ToolManager->SetWorkingData(resultSegmentationNode);
       m_ToolManager->GetWorkingData(0)->Modified();
+      this->EnsureTargetSegmentationNodeInDataStorage();
     }
   }
 }
@@ -437,17 +439,19 @@ void mitk::AutoSegmentationWithPreviewTool::UpdatePreview(bool ignoreLazyPreview
 
       if (previewImage->GetTimeSteps() > 1 && (ignoreLazyPreviewSetting || !m_LazyDynamicPreviews))
       {
-        for (unsigned int timeStep = 0; timeStep < inputImage->GetTimeSteps(); ++timeStep)
+        for (unsigned int timeStep = 0; timeStep < previewImage->GetTimeSteps(); ++timeStep)
         {
           Image::ConstPointer feedBackImage;
+          auto previewTimePoint = previewImage->GetTimeGeometry()->TimeStepToTimePoint(timeStep);
+          auto inputTimeStep = inputImage->GetTimeGeometry()->TimePointToTimeStep(previewTimePoint);
 
           if (nullptr != this->GetWorkingPlaneGeometry())
           { //only extract a specific slice defined by the working plane as feedback image.
-            feedBackImage = SegTool2D::GetAffectedImageSliceAs2DImage(this->GetWorkingPlaneGeometry(), inputImage, timeStep);
+            feedBackImage = SegTool2D::GetAffectedImageSliceAs2DImage(this->GetWorkingPlaneGeometry(), inputImage, inputTimeStep);
           }
           else
           { //work on the whole feedback image
-            feedBackImage = this->GetImageByTimeStep(inputImage, timeStep);
+            feedBackImage = this->GetImageByTimeStep(inputImage, inputTimeStep);
           }
 
           this->DoUpdatePreview(feedBackImage, previewImage, timeStep);

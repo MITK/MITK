@@ -119,6 +119,11 @@ namespace mitk
       unsigned int component = 0);
 
 
+    static void WriteBackSegmentationResult(const DataNode* workingNode, const PlaneGeometry* planeGeometry, const Image* segmentationResult, TimeStepType timeStep);
+
+    static void WriteSliceToVolume(Image* workingImage, const PlaneGeometry* planeGeometry, const Image* slice, TimeStepType timeStep, bool allowUndo);
+
+
     void SetShowMarkerNodes(bool);
 
     /**
@@ -207,21 +212,23 @@ namespace mitk
     /** Overload version that gets the reference slice passed on the passed plane geometry and timestep.*/
     Image::Pointer GetAffectedReferenceSlice(const PlaneGeometry* planeGeometry, TimeStepType timeStep) const;
 
-    void WriteBackSegmentationResult(const InteractionPositionEvent *, Image *);
+    void WriteBackSegmentationResult(const InteractionPositionEvent *, const Image* segmentationResult);
 
-    void WriteBackSegmentationResult(const PlaneGeometry *planeGeometry, Image *, TimeStepType timeStep);
+    void WriteBackSegmentationResult(const PlaneGeometry *planeGeometry, const Image* segmentationResult, TimeStepType timeStep);
 
     void WriteBackSegmentationResults(const std::vector<SliceInformation> &sliceList, bool writeSliceToVolume = true);
+    static void WriteBackSegmentationResults(const DataNode* workingNode, const std::vector<SliceInformation>& sliceList, bool writeSliceToVolume = true);
 
     void WritePreviewOnWorkingImage(
       Image *targetSlice, Image *sourceSlice, Image *workingImage, int paintingPixelValue, int timestep);
 
-    void WriteSliceToVolume(const SliceInformation &sliceInfo);
+    static void WriteSliceToVolume(Image* workingImage, const SliceInformation &sliceInfo, bool allowUndo);
+
     /**
       \brief Adds a new node called Contourmarker to the datastorage which holds a mitk::PlanarFigure.
-             By selecting this node the slicestack will be reoriented according to the PlanarFigure's Geometry
+             By selecting this node the slicestack will be reoriented according to passed the PlanarFigure's Geometry
     */
-    int AddContourmarker();
+    int AddContourmarker(const PlaneGeometry* planeGeometry, unsigned int sliceIndex);
 
     void InteractiveSegmentationBugMessage(const std::string &message) const;
 

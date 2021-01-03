@@ -32,6 +32,18 @@
    <string>QmitkOtsuToolWidget</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
     <layout class="QGridLayout" name="advancedSettingsLayout">
      <item row="1" column="0">
@@ -63,22 +75,6 @@
     </layout>
    </item>
    <item>
-    <widget class="QmitkSimpleLabelSetListWidget" name="m_selectionListWidget" native="true">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="MinimumExpanding">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>10000000</width>
-       <height>10000000</height>
-      </size>
-     </property>
-    </widget>
-   </item>
-   <item>
     <widget class="QPushButton" name="previewButton">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -97,57 +93,10 @@
      </property>
     </widget>
    </item>
-   <item>
-    <widget class="QPushButton" name="m_ConfSegButton">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>100000</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>Confirm Segmentation</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="m_CheckProcessAll">
-     <property name="toolTip">
-      <string>Process/overwrite all time steps of the dynamic segmentation and not just the currently visible time step.</string>
-     </property>
-     <property name="text">
-      <string>Process all time steps</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="m_CheckCreateNew">
-     <property name="toolTip">
-      <string>Add the confirmed segmentation as a new segmentation instead of overwriting the currently selected.</string>
-     </property>
-     <property name="text">
-      <string>Create as new segmentation</string>
-     </property>
-    </widget>
-   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
-  <customwidget>
-   <class>QmitkSimpleLabelSetListWidget</class>
-   <extends>QWidget</extends>
-   <header>QmitkSimpleLabelSetListWidget.h</header>
-  </customwidget>
   <customwidget>
    <class>ctkSliderWidget</class>
    <extends>QWidget</extends>

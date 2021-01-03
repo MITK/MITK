@@ -14,13 +14,14 @@ found in the LICENSE file.
 #define QmitkAutoSegmentationToolGUIBase_h_Included
 
 #include "QmitkToolGUI.h"
-#include <qcheckbox.h>
-#include <qpushbutton.h>
-#include <qboxlayout.h>
 
 #include "mitkAutoSegmentationWithPreviewTool.h"
 
 #include <MitkSegmentationUIExports.h>
+
+class QCheckBox;
+class QPushButton;
+class QBoxLayout;
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
@@ -34,6 +35,8 @@ public:
   mitkClassMacro(QmitkAutoSegmentationToolGUIBase, QmitkToolGUI);
   itkCloneMacro(Self);
 
+  itkGetConstMacro(Mode2D, bool);
+
 protected slots:
 
   void OnNewToolAssociated(mitk::Tool *);
@@ -41,7 +44,7 @@ protected slots:
   void OnAcceptPreview();
 
 protected:
-  QmitkAutoSegmentationToolGUIBase();
+  QmitkAutoSegmentationToolGUIBase(bool mode2D);
   ~QmitkAutoSegmentationToolGUIBase() override;
 
   virtual void DisconnectOldTool(mitk::AutoSegmentationWithPreviewTool* oldTool);
@@ -49,6 +52,8 @@ protected:
   virtual void InitializeUI(QBoxLayout* mainLayout);
 
   void BusyStateChanged(bool isBusy) override;
+
+  virtual void EnableWidgets(bool enabled);
 
   template <class TTool>
   TTool* GetConnectedToolAs()
@@ -61,6 +66,9 @@ private:
   QCheckBox* m_CheckCreateNew = nullptr;
   QPushButton* m_ConfirmSegBtn = nullptr;
   QBoxLayout* m_MainLayout = nullptr;
+
+  /**Indicates if the tool is in 2D or 3D mode.*/
+  bool m_Mode2D;
 
   mitk::AutoSegmentationWithPreviewTool::Pointer m_Tool;
 };

@@ -20,7 +20,7 @@ found in the LICENSE file.
 #include <qslider.h>
 #include <QApplication>
 
-QmitkBinaryThresholdToolGUIBase::QmitkBinaryThresholdToolGUIBase(bool ulMode) : QmitkAutoSegmentationToolGUIBase(), m_ULMode(ulMode)
+QmitkBinaryThresholdToolGUIBase::QmitkBinaryThresholdToolGUIBase(bool ulMode) : QmitkAutoSegmentationToolGUIBase(false), m_ULMode(ulMode)
 {
 }
 

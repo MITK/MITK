@@ -9,9 +9,9 @@ Qmitk/QmitkConfirmSegmentationDialog.cpp
 Qmitk/QmitkCopyToClipBoardDialog.cpp
 Qmitk/QmitkDrawPaintbrushToolGUI.cpp
 Qmitk/QmitkErasePaintbrushToolGUI.cpp
+Qmitk/QmitkFastMarchingToolGUIBase.cpp
 Qmitk/QmitkFastMarchingTool3DGUI.cpp
 Qmitk/QmitkFastMarchingToolGUI.cpp
-
 Qmitk/QmitkLiveWireTool2DGUI.cpp
 Qmitk/QmitkNewSegmentationDialog.cpp
 Qmitk/QmitkOtsuTool3DGUI.cpp
@@ -44,6 +44,7 @@ Qmitk/QmitkConfirmSegmentationDialog.h
 Qmitk/QmitkCopyToClipBoardDialog.h
 Qmitk/QmitkDrawPaintbrushToolGUI.h
 Qmitk/QmitkErasePaintbrushToolGUI.h
+Qmitk/QmitkFastMarchingToolGUIBase.h
 Qmitk/QmitkFastMarchingTool3DGUI.h
 Qmitk/QmitkFastMarchingToolGUI.h
 Qmitk/QmitkLiveWireTool2DGUI.h

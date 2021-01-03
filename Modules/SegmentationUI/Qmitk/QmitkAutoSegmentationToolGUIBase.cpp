@@ -18,7 +18,12 @@ found in the LICENSE file.
 #include <qlabel.h>
 #include <QApplication>
 
-QmitkAutoSegmentationToolGUIBase::QmitkAutoSegmentationToolGUIBase(bool mode2D) : QmitkToolGUI(), m_Mode2D(mode2D)
+bool DefaultEnableConfirmSegBtnFunction(bool enabled)
+{
+  return enabled;
+}
+
+QmitkAutoSegmentationToolGUIBase::QmitkAutoSegmentationToolGUIBase(bool mode2D) : QmitkToolGUI(), m_EnableConfirmSegBtnFnc(DefaultEnableConfirmSegBtnFunction), m_Mode2D(mode2D)
 {
   connect(this, SIGNAL(NewToolAssociated(mitk::Tool *)), this, SLOT(OnNewToolAssociated(mitk::Tool *)));
 }
@@ -127,7 +132,7 @@ void QmitkAutoSegmentationToolGUIBase::EnableWidgets(bool enabled)
   {
     if (nullptr != m_ConfirmSegBtn)
     {
-      m_ConfirmSegBtn->setEnabled(enabled);
+      m_ConfirmSegBtn->setEnabled(m_EnableConfirmSegBtnFnc(enabled));
     }
     if (nullptr != m_CheckProcessAll)
     {

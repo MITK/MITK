@@ -53,6 +53,9 @@ protected:
 
   void BusyStateChanged(bool isBusy) override;
 
+  using EnableConfirmSegBtnFunctionType = std::function<bool(bool)>;
+  EnableConfirmSegBtnFunctionType m_EnableConfirmSegBtnFnc;
+
   virtual void EnableWidgets(bool enabled);
 
   template <class TTool>
@@ -60,6 +63,8 @@ protected:
   {
     return dynamic_cast<TTool*>(m_Tool.GetPointer());
   };
+
+
 
 private:
   QCheckBox* m_CheckProcessAll = nullptr;

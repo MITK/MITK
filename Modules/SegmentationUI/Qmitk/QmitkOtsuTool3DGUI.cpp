@@ -11,32 +11,35 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkOtsuTool3DGUI.h"
+#include "mitkOtsuTool3D.h"
 
 #include <QMessageBox>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkOtsuTool3DGUI, "")
 
-QmitkOtsuTool3DGUI::QmitkOtsuTool3DGUI() : QmitkToolGUI(), m_NumberOfRegions(0)
+QmitkOtsuTool3DGUI::QmitkOtsuTool3DGUI() : QmitkAutoMLSegmentationToolGUIBase()
+{
+}
+
+void QmitkOtsuTool3DGUI::ConnectNewTool(mitk::AutoSegmentationWithPreviewTool* newTool)
+{
+  Superclass::ConnectNewTool(newTool);
+
+  newTool->IsTimePointChangeAwareOff();
+}
+
+void QmitkOtsuTool3DGUI::InitializeUI(QBoxLayout* mainLayout)
 {
   m_Controls.setupUi(this);
+  mainLayout->addLayout(m_Controls.verticalLayout);
 
   connect(m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnSpinboxValueAccept()));
-  connect(m_Controls.m_selectionListWidget, &QmitkSimpleLabelSetListWidget::SelectedLabelsChanged, this, &QmitkOtsuTool3DGUI::OnRegionSelectionChanged);
   connect(m_Controls.m_Spinbox, SIGNAL(valueChanged(int)), this, SLOT(OnRegionSpinboxChanged(int)));
-  connect(m_Controls.m_ConfSegButton, SIGNAL(clicked()), this, SLOT(OnSegmentationRegionAccept()));
-  connect(this, SIGNAL(NewToolAssociated(mitk::Tool *)), this, SLOT(OnNewToolAssociated(mitk::Tool *)));
   connect(m_Controls.advancedSettingsButton, SIGNAL(toggled(bool)), this, SLOT(OnAdvancedSettingsButtonToggled(bool)));
 
   this->OnAdvancedSettingsButtonToggled(false);
-}
 
-QmitkOtsuTool3DGUI::~QmitkOtsuTool3DGUI()
-{
-  if (m_OtsuTool3DTool.IsNotNull())
-  {
-    m_OtsuTool3DTool->CurrentlyBusy -=
-      mitk::MessageDelegate1<QmitkOtsuTool3DGUI, bool>(this, &QmitkOtsuTool3DGUI::BusyStateChanged);
-  }
+  Superclass::InitializeUI(mainLayout);
 }
 
 void QmitkOtsuTool3DGUI::OnRegionSpinboxChanged(int numberOfRegions)
@@ -47,79 +50,20 @@ void QmitkOtsuTool3DGUI::OnRegionSpinboxChanged(int numberOfRegions)
     m_Controls.m_BinsSpinBox->setValue(numberOfRegions);
 }
 
-void QmitkOtsuTool3DGUI::OnRegionSelectionChanged(const QmitkSimpleLabelSetListWidget::LabelVectorType& selectedLabels)
-{
-  if (m_OtsuTool3DTool.IsNotNull())
-  {
-    mitk::AutoMLSegmentationWithPreviewTool::SelectedLabelVectorType labelIDs;
-    for (const auto& label : selectedLabels)
-    {
-      labelIDs.push_back(label->GetValue());
-    }
-
-    m_OtsuTool3DTool->SetSelectedLabels(labelIDs);
-    m_OtsuTool3DTool->UpdatePreview();
-
-    m_Controls.m_ConfSegButton->setEnabled(!labelIDs.empty());
-  }
-}
-
 void QmitkOtsuTool3DGUI::OnAdvancedSettingsButtonToggled(bool toggled)
 {
   m_Controls.m_ValleyCheckbox->setVisible(toggled);
   m_Controls.binLabel->setVisible(toggled);
   m_Controls.m_BinsSpinBox->setVisible(toggled);
 
-  if (toggled)
+  auto tool = this->GetConnectedToolAs<mitk::OtsuTool3D>();
+  if (toggled && nullptr != tool)
   {
-    int max = m_OtsuTool3DTool->GetMaxNumberOfBins();
+    int max = tool->GetMaxNumberOfBins();
     if (max >= m_Controls.m_BinsSpinBox->minimum())
     {
       m_Controls.m_BinsSpinBox->setMaximum(max);
     }
-  }
-}
-
-void QmitkOtsuTool3DGUI::OnNewToolAssociated(mitk::Tool *tool)
-{
-  if (m_OtsuTool3DTool.IsNotNull())
-  {
-    m_OtsuTool3DTool->CurrentlyBusy -=
-      mitk::MessageDelegate1<QmitkOtsuTool3DGUI, bool>(this, &QmitkOtsuTool3DGUI::BusyStateChanged);
-  }
-
-  m_OtsuTool3DTool = dynamic_cast<mitk::OtsuTool3D *>(tool);
-
-  if (m_OtsuTool3DTool.IsNotNull())
-  {
-    m_OtsuTool3DTool->CurrentlyBusy +=
-      mitk::MessageDelegate1<QmitkOtsuTool3DGUI, bool>(this, &QmitkOtsuTool3DGUI::BusyStateChanged);
-
-    m_OtsuTool3DTool->SetOverwriteExistingSegmentation(true);
-    m_OtsuTool3DTool->IsTimePointChangeAwareOff();
-    m_Controls.m_CheckProcessAll->setVisible(m_OtsuTool3DTool->GetTargetSegmentationNode()->GetData()->GetTimeSteps() > 1);
-  }
-}
-
-void QmitkOtsuTool3DGUI::OnSegmentationRegionAccept()
-{
-  QString segName = QString::fromStdString(m_OtsuTool3DTool->GetCurrentSegmentationName());
-
-  if (m_OtsuTool3DTool.IsNotNull())
-  {
-    if (this->m_Controls.m_CheckCreateNew->isChecked())
-    {
-      m_OtsuTool3DTool->SetOverwriteExistingSegmentation(false);
-    }
-    else
-    {
-      m_OtsuTool3DTool->SetOverwriteExistingSegmentation(true);
-    }
-
-    m_OtsuTool3DTool->SetCreateAllTimeSteps(this->m_Controls.m_CheckProcessAll->isChecked());
-
-    this->m_Controls.m_ConfSegButton->setEnabled(false);
-    m_OtsuTool3DTool->ConfirmSegmentation();
   }
 }
 
@@ -130,7 +74,8 @@ void QmitkOtsuTool3DGUI::OnSpinboxValueAccept()
       m_NumberOfBins == m_Controls.m_BinsSpinBox->value())
     return;
 
-  if (m_OtsuTool3DTool.IsNotNull())
+  auto tool = this->GetConnectedToolAs<mitk::OtsuTool3D>();
+  if (nullptr != tool)
   {
     try
     {
@@ -150,11 +95,11 @@ void QmitkOtsuTool3DGUI::OnSpinboxValueAccept()
       m_NumberOfRegions = m_Controls.m_Spinbox->value();
       m_UseValleyEmphasis = m_Controls.m_ValleyCheckbox->isChecked();
       m_NumberOfBins = m_Controls.m_BinsSpinBox->value();
-      m_OtsuTool3DTool->SetNumberOfRegions(m_NumberOfRegions);
-      m_OtsuTool3DTool->SetUseValley(m_UseValleyEmphasis);
-      m_OtsuTool3DTool->SetNumberOfBins(m_NumberOfBins);
+      tool->SetNumberOfRegions(m_NumberOfRegions);
+      tool->SetUseValley(m_UseValleyEmphasis);
+      tool->SetNumberOfBins(m_NumberOfBins);
 
-      m_OtsuTool3DTool->UpdatePreview();
+      tool->UpdatePreview();
     }
     catch (...)
     {
@@ -168,27 +113,16 @@ void QmitkOtsuTool3DGUI::OnSpinboxValueAccept()
       return;
     }
 
-    m_Controls.m_selectionListWidget->SetLabelSetImage(m_OtsuTool3DTool->GetMLPreview());
-    m_OtsuTool3DTool->IsTimePointChangeAwareOn();
+    this->SetLabelSetPreview(tool->GetMLPreview());
+    tool->IsTimePointChangeAwareOn();
   }
 }
 
-void QmitkOtsuTool3DGUI::BusyStateChanged(bool value)
+void QmitkOtsuTool3DGUI::EnableWidgets(bool enabled)
 {
-  if (value)
-  {
-    QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
-  }
-  else
-  {
-    QApplication::restoreOverrideCursor();
-  }
-
-  m_Controls.m_ValleyCheckbox->setEnabled(!value);
-  m_Controls.binLabel->setEnabled(!value);
-  m_Controls.m_BinsSpinBox->setEnabled(!value);
-  m_Controls.m_ConfSegButton->setEnabled(!m_OtsuTool3DTool->GetSelectedLabels().empty() && !value);
-  m_Controls.m_CheckProcessAll->setEnabled(!value);
-  m_Controls.m_CheckCreateNew->setEnabled(!value);
-  m_Controls.previewButton->setEnabled(!value);
+  Superclass::EnableWidgets(enabled);
+  m_Controls.m_ValleyCheckbox->setEnabled(enabled);
+  m_Controls.binLabel->setEnabled(enabled);
+  m_Controls.m_BinsSpinBox->setEnabled(enabled);
+  m_Controls.previewButton->setEnabled(enabled);
 }

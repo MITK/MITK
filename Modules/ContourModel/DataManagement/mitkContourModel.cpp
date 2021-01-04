@@ -30,7 +30,7 @@ mitk::ContourModel::~ContourModel()
   this->m_ContourSeries.clear(); // TODO check destruction
 }
 
-void mitk::ContourModel::AddVertex(mitk::Point3D &vertex, int timestep)
+void mitk::ContourModel::AddVertex(const mitk::Point3D &vertex, int timestep)
 {
   if (!this->IsEmptyTimeStep(timestep))
   {
@@ -38,7 +38,7 @@ void mitk::ContourModel::AddVertex(mitk::Point3D &vertex, int timestep)
   }
 }
 
-void mitk::ContourModel::AddVertex(mitk::Point3D &vertex, bool isControlPoint, int timestep)
+void mitk::ContourModel::AddVertex(const mitk::Point3D &vertex, bool isControlPoint, int timestep)
 {
   if (!this->IsEmptyTimeStep(timestep))
   {
@@ -521,7 +521,7 @@ void mitk::ContourModel::Initialize()
   this->m_UpdateBoundingBox = true;
 }
 
-void mitk::ContourModel::Initialize(mitk::ContourModel &other)
+void mitk::ContourModel::Initialize(const mitk::ContourModel &other)
 {
   mitk::TimeStepType numberOfTimesteps = other.GetTimeGeometry()->CountTimeSteps();
   this->InitializeTimeGeometry(numberOfTimesteps);

@@ -29,7 +29,7 @@ mitk::ContourElement::~ContourElement()
   delete this->m_Vertices;
 }
 
-void mitk::ContourElement::AddVertex(mitk::Point3D &vertex, bool isControlPoint)
+void mitk::ContourElement::AddVertex(const mitk::Point3D &vertex, bool isControlPoint)
 {
   this->m_Vertices->push_back(new VertexType(vertex, isControlPoint));
 }
@@ -39,7 +39,7 @@ void mitk::ContourElement::AddVertex(VertexType &vertex)
   this->m_Vertices->push_back(&vertex);
 }
 
-void mitk::ContourElement::AddVertexAtFront(mitk::Point3D &vertex, bool isControlPoint)
+void mitk::ContourElement::AddVertexAtFront(const mitk::Point3D &vertex, bool isControlPoint)
 {
   this->m_Vertices->push_front(new VertexType(vertex, isControlPoint));
 }
@@ -49,7 +49,7 @@ void mitk::ContourElement::AddVertexAtFront(VertexType &vertex)
   this->m_Vertices->push_front(&vertex);
 }
 
-void mitk::ContourElement::InsertVertexAtIndex(mitk::Point3D &vertex, bool isControlPoint, int index)
+void mitk::ContourElement::InsertVertexAtIndex(const mitk::Point3D &vertex, bool isControlPoint, int index)
 {
   if (index >= 0 && this->GetSize() > index)
   {

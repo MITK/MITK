@@ -109,7 +109,7 @@ namespace mitk
     @note Adding a vertex to a timestep which exceeds the timebounds of the contour
     will not be added, the TimeGeometry will not be expanded.
     */
-    void AddVertex(mitk::Point3D &vertex, int timestep = 0);
+    void AddVertex(const mitk::Point3D &vertex, int timestep = 0);
 
     /** \brief Add a vertex to the contour at given timestep.
     The vertex is added at the end of contour.
@@ -144,7 +144,7 @@ namespace mitk
     @note Adding a vertex to a timestep which exceeds the timebounds of the contour
     will not be added, the TimeGeometry will not be expanded.
     */
-    void AddVertex(mitk::Point3D &vertex, bool isControlPoint, int timestep = 0);
+    void AddVertex(const mitk::Point3D &vertex, bool isControlPoint, int timestep = 0);
 
     /** \brief Add a vertex to the contour at given timestep AT THE FRONT of the contour.
     The vertex is added at the FRONT of contour.
@@ -349,7 +349,7 @@ namespace mitk
     /** \brief Initialize object with specs of other contour.
     Note: No data will be copied.
     */
-    void Initialize(mitk::ContourModel &other);
+    void Initialize(const mitk::ContourModel &other);
 
     /*++++++++++++++++++ method inherit from base data +++++++++++++++++++++++++++*/
     /**

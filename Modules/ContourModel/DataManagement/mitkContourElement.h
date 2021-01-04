@@ -46,7 +46,7 @@ namespace mitk
       */
       struct ContourModelVertex
     {
-      ContourModelVertex(mitk::Point3D &point, bool active = false) : IsControlPoint(active), Coordinates(point) {}
+      ContourModelVertex(const mitk::Point3D &point, bool active = false) : IsControlPoint(active), Coordinates(point) {}
       ContourModelVertex(const ContourModelVertex &other)
         : IsControlPoint(other.IsControlPoint), Coordinates(other.Coordinates)
       {
@@ -88,7 +88,7 @@ namespace mitk
     \param point - coordinates in 3D space.
     \param isControlPoint - is the vertex a special control point.
     */
-    virtual void AddVertex(mitk::Point3D &point, bool isControlPoint);
+    virtual void AddVertex(const mitk::Point3D &point, bool isControlPoint);
 
     /** \brief Add a vertex at the end of the contour
     \param vertex - a contour element vertex.
@@ -99,7 +99,7 @@ namespace mitk
     \param point - coordinates in 3D space.
     \param isControlPoint - is the vertex a control point.
     */
-    virtual void AddVertexAtFront(mitk::Point3D &point, bool isControlPoint);
+    virtual void AddVertexAtFront(const mitk::Point3D &point, bool isControlPoint);
 
     /** \brief Add a vertex at the front of the contour
     \param vertex - a contour element vertex.
@@ -111,7 +111,7 @@ namespace mitk
     \param isControlPoint - is the vertex a special control point.
     \param index - the index to be inserted at.
     */
-    virtual void InsertVertexAtIndex(mitk::Point3D &point, bool isControlPoint, int index);
+    virtual void InsertVertexAtIndex(const mitk::Point3D &point, bool isControlPoint, int index);
 
     /** \brief Set coordinates a given index.
     \param pointId Index of vertex.

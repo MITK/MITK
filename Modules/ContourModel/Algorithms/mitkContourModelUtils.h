@@ -40,8 +40,8 @@ namespace mitk
       MITK contours)
       \param constrainToInside
     */
-    static ContourModel::Pointer ProjectContourTo2DSlice(Image *slice,
-                                                         ContourModel *contourIn3D,
+    static ContourModel::Pointer ProjectContourTo2DSlice(const Image *slice,
+                                                         const ContourModel *contourIn3D,
                                                          bool correctionForIpSegmentation,
                                                          bool constrainToInside);
 
@@ -54,7 +54,7 @@ namespace mitk
       and MITK contours)
     */
     static ContourModel::Pointer BackProjectContourFrom2DSlice(const BaseGeometry *sliceGeometry,
-                                                               ContourModel *contourIn2D,
+                                                               const ContourModel *contourIn2D,
                                                                bool correctionForIpSegmentation = false);
 
     /**

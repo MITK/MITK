@@ -396,6 +396,31 @@ static void TestContourModelAPI()
   MITK_TEST_CONDITION(contour2->GetNumberOfVertices() == 1, "Add call with another contour");
 }
 
+static void TestClear()
+{
+  mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
+
+  mitk::Point3D p;
+  p[0] = p[1] = p[2] = 0;
+  contour->AddVertex(p);
+  p[0] = p[1] = p[2] = 1;
+  contour->AddVertex(p, 1);
+  p[0] = p[1] = p[2] = 2;
+  contour->AddVertex(p, 2);
+
+  contour->Clear(1);
+
+  MITK_TEST_CONDITION(contour->GetTimeSteps() == 3, "Check time step count stays 3.");
+  MITK_TEST_CONDITION(!contour->IsEmpty(0), "Check time step 0 is not empty.");
+  MITK_TEST_CONDITION(contour->IsEmpty(1), "Check time step 1 is empty.");
+  MITK_TEST_CONDITION(!contour->IsEmpty(2), "Check time step 2 is not empty.");
+  MITK_TEST_CONDITION(contour->GetVertexAt(2)->Coordinates == p, "compare if vertex at t == 2 is still the same");
+
+  contour->Clear();
+  MITK_TEST_CONDITION(contour->GetTimeSteps() == 1, "Check time step count stays 1.");
+  MITK_TEST_CONDITION(contour->IsEmpty(0), "Check time step 0 is empty.");
+}
+
 int mitkContourModelTest(int /*argc*/, char * /*argv*/ [])
 {
   MITK_TEST_BEGIN("mitkContourModelTest")
@@ -414,6 +439,7 @@ int mitkContourModelTest(int /*argc*/, char * /*argv*/ [])
   TestSetVertices();
   TestSelectVertexAtWrongPosition();
   TestContourModelAPI();
+  TestClear();
 
   MITK_TEST_END()
 }

@@ -429,7 +429,6 @@ void mitk::ContourModel::Clear(int timestep)
   {
     // clear data at timestep
     this->m_ContourSeries[timestep]->Clear();
-    this->InitializeEmpty();
     this->Modified();
     this->m_UpdateBoundingBox = true;
   }

@@ -15,8 +15,6 @@ found in the LICENSE file.
 
 #include "mitkCommon.h"
 #include "mitkFeedbackContourTool.h"
-#include "mitkPointOperation.h"
-#include "mitkPointSet.h"
 #include <MitkSegmentationExports.h>
 
 namespace mitk

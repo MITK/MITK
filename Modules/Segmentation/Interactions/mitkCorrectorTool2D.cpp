@@ -14,14 +14,10 @@ found in the LICENSE file.
 #include "mitkCorrectorAlgorithm.h"
 
 #include "mitkAbstractTransformGeometry.h"
-#include "mitkBaseRenderer.h"
 #include "mitkImageReadAccessor.h"
-#include "mitkLabelSetImage.h"
-#include "mitkRenderingManager.h"
 #include "mitkToolManager.h"
 
 #include "mitkCorrectorTool2D.xpm"
-#include "mitkLabelSetImage.h"
 
 // us
 #include <usGetModuleContext.h>
@@ -37,7 +33,6 @@ namespace mitk
 mitk::CorrectorTool2D::CorrectorTool2D(int paintingPixelValue)
   : FeedbackContourTool("PressMoveRelease"), m_PaintingPixelValue(paintingPixelValue)
 {
-  GetFeedbackContour()->SetClosed(false); // don't close the contour to a polygon
 }
 
 mitk::CorrectorTool2D::~CorrectorTool2D()
@@ -94,13 +89,9 @@ void mitk::CorrectorTool2D::OnMousePressed(StateMachineAction *, InteractionEven
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
 
-  int timestep = positionEvent->GetSender()->GetTimeStep();
-  ContourModel *contour = FeedbackContourTool::GetFeedbackContour();
-  contour->Initialize();
-  contour->Expand(timestep + 1);
-  contour->SetClosed(false, timestep);
+  this->ClearsCurrentFeedbackContour(false);
   mitk::Point3D point = positionEvent->GetPositionInWorld();
-  contour->AddVertex(point, timestep);
+  this->AddVertexToCurrentFeedbackContour(point);
 
   FeedbackContourTool::SetFeedbackContourVisible(true);
 }
@@ -111,10 +102,8 @@ void mitk::CorrectorTool2D::OnMouseMoved(StateMachineAction *, InteractionEvent 
   if (!positionEvent)
     return;
 
-  int timestep = positionEvent->GetSender()->GetTimeStep();
-  ContourModel *contour = FeedbackContourTool::GetFeedbackContour();
   mitk::Point3D point = positionEvent->GetPositionInWorld();
-  contour->AddVertex(point, timestep);
+  this->AddVertexToCurrentFeedbackContour(point);
 
   assert(positionEvent->GetSender()->GetRenderWindow());
   mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
@@ -157,11 +146,12 @@ void mitk::CorrectorTool2D::OnMouseReleased(StateMachineAction *, InteractionEve
     return;
   }
 
-  int timestep = positionEvent->GetSender()->GetTimeStep();
+  auto feedbackContour = this->GetFeedbackContour();
+  auto timestep = positionEvent->GetSender()->GetTimeStep(feedbackContour);
   mitk::ContourModel::Pointer singleTimestepContour = mitk::ContourModel::New();
 
-  auto it = FeedbackContourTool::GetFeedbackContour()->Begin(timestep);
-  auto end = FeedbackContourTool::GetFeedbackContour()->End(timestep);
+  auto it = feedbackContour->Begin(timestep);
+  auto end = feedbackContour->End(timestep);
 
   while (it != end)
   {
@@ -185,20 +175,7 @@ void mitk::CorrectorTool2D::OnMouseReleased(StateMachineAction *, InteractionEve
     MITK_ERROR << "Caught exception '" << e.what() << "'" << std::endl;
   }
 
-  mitk::Image::Pointer resultSlice = mitk::Image::New();
-  resultSlice->Initialize(algorithm->GetOutput());
-
-  auto* labelSetImage = dynamic_cast<LabelSetImage*>(workingImage);
-  if (nullptr != labelSetImage)
-  {
-    mitk::Image::Pointer erg1 = FeedbackContourTool::GetAffectedImageSliceAs2DImage(positionEvent, workingImage);
-    SegTool2D::WritePreviewOnWorkingImage(erg1, algorithm->GetOutput(), workingImage, activePixelValue, 0);
-    SegTool2D::WriteBackSegmentationResult(positionEvent, erg1);
-  }
-  else
-  {
-    mitk::ImageReadAccessor imAccess(algorithm->GetOutput());
-    resultSlice->SetVolume(imAccess.GetData());
-    this->WriteBackSegmentationResult(positionEvent, resultSlice);
-  }
+  mitk::Image::Pointer resultSlice = FeedbackContourTool::GetAffectedImageSliceAs2DImage(positionEvent, workingImage);
+  SegTool2D::WritePreviewOnWorkingImage(resultSlice, algorithm->GetOutput(), workingImage, activePixelValue);
+  SegTool2D::WriteBackSegmentationResult(positionEvent, resultSlice);
 }

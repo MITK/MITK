@@ -56,8 +56,30 @@ namespace mitk
     FeedbackContourTool(const char *); // purposely hidden
     ~FeedbackContourTool() override;
 
-    ContourModel *GetFeedbackContour();
-    void SetFeedbackContour(ContourModel::Pointer);
+    const ContourModel *GetFeedbackContour() const;
+
+    /** (Re)initialize the feesback contour by creating a new instance.
+     * It is assured that the new instance as the same time geometry than
+     * the working image.*/
+    void InitializeFeedbackContour(bool isClosed);
+
+    /** Clears the current time step of the feedback contour and resets its closed state.*/
+    void ClearsCurrentFeedbackContour(bool isClosed);
+
+    /** Updates the feedback contour of the currently selected time point. The update will be done
+     * by clearing all existings vertices at the current time point and copying the vertics of the
+     * source model at the specified source time step.*/
+    void UpdateCurrentFeedbackContour(const ContourModel* sourceModel, TimeStepType sourceTimeStep = 0);
+    /** Updates the feedback contour at the time step specified by feedbackTimeStep. The update will be done
+     * by clearing all existings vertices at feedbackTimeStep and copying the vertics of the
+     * source model at the specified source time step.*/
+    void UpdateFeedbackContour(const ContourModel* sourceModel, TimeStepType feedbackTimeStep, TimeStepType sourceTimeStep = 0);
+
+    /** Adds a vertex to the feedback contour for the current time point. */
+    void AddVertexToCurrentFeedbackContour(const Point3D& point);
+
+    /** Adds a vertex to the feedback contour for the passed time step. If time step is invalid, nothing will be added.*/
+    void AddVertexToFeedbackContour(const Point3D& point, TimeStepType feedbackTimeStep);
 
     void SetFeedbackContourVisible(bool);
 
@@ -78,8 +100,8 @@ namespace mitk
       MITK contours)
       \param constrainToInside
     */
-    ContourModel::Pointer ProjectContourTo2DSlice(Image *slice,
-                                                  ContourModel *contourIn3D,
+    ContourModel::Pointer ProjectContourTo2DSlice(const Image *slice,
+                                                  const ContourModel *contourIn3D,
                                                   bool correctionForIpSegmentation = false,
                                                   bool constrainToInside = true);
 
@@ -92,8 +114,16 @@ namespace mitk
       and MITK contours)
     */
     ContourModel::Pointer BackProjectContourFrom2DSlice(const BaseGeometry *sliceGeometry,
-                                                        ContourModel *contourIn2D,
+                                                        const ContourModel *contourIn2D,
                                                         bool correctionForIpSegmentation = false);
+
+    /** Helper methods that checks all precondition and if they are fullfilled does the following:
+     * 1. Gets the contour of the time point specified by positionEvent.
+     * 2. Gets the affacted working slice of the time point specified by positionEvent.
+     * 3. projects the contour onto the working slice and then fills it with the passed paintingPixelValue (adjusted by the current active lable value)
+     * to the slice.
+     * 4. writes the slice back into the working image using SegTool2D::WriteBackSegmentationResult().*/
+    void WriteBackFeedbackContourAsSegmentationResult(const InteractionPositionEvent* positionEvent, int paintingPixelValue, bool setInvisibleAfterSuccess = true);
 
     /**
       \brief Fill a contour in a 2D slice with a specified pixel value.
@@ -108,6 +138,7 @@ namespace mitk
                             Image *sliceImage,
                             int paintingPixelValue = 1);
 
+  private:
     ContourModel::Pointer m_FeedbackContour;
     DataNode::Pointer m_FeedbackContourNode;
     bool m_FeedbackContourVisible;

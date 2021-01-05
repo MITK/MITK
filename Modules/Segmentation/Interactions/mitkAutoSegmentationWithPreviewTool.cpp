@@ -83,7 +83,7 @@ void mitk::AutoSegmentationWithPreviewTool::Activated()
   m_ReferenceDataNode = m_ToolManager->GetReferenceData(0);
   m_SegmentationInputNode = m_ReferenceDataNode;
 
-  m_LastTimePointOfUpdate = 0;
+  m_LastTimePointOfUpdate = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
 
   if (m_PreviewSegmentationNode.IsNull())
   {

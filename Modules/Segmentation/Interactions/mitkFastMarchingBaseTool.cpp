@@ -197,7 +197,7 @@ void mitk::FastMarchingBaseTool::OnAddPoint(StateMachineAction*, InteractionEven
   }
 }
 
-void mitk::FastMarchingBaseTool::OnDelete(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::FastMarchingBaseTool::OnDelete(StateMachineAction*, InteractionEvent* /*interactionEvent*/)
 {
   if (!this->IsUpdating() && m_SeedsAsPointSet.IsNotNull())
   {
@@ -245,11 +245,11 @@ void mitk::FastMarchingBaseTool::DoITKFastMarching(const itk::Image<TPixel, VIma
   typedef itk::BinaryThresholdImageFilter<InternalImageType, OutputImageType> ThresholdingFilterType;
 
   typedef itk::FastMarchingImageFilter<InternalImageType, InternalImageType> FastMarchingFilterType;
-  typedef FastMarchingFilterType::NodeContainer NodeContainer;
-  typedef FastMarchingFilterType::NodeType NodeType;
+  typedef typename FastMarchingFilterType::NodeContainer NodeContainer;
+  typedef typename FastMarchingFilterType::NodeType NodeType;
 
   //convert point set seed into trialpoint
-  NodeContainer::Pointer trialPoints = NodeContainer::New();
+  typename NodeContainer::Pointer trialPoints = NodeContainer::New();
   trialPoints->Initialize();
 
   for (auto pos = m_SeedsAsPointSet->Begin(); pos != m_SeedsAsPointSet->End(); ++pos)

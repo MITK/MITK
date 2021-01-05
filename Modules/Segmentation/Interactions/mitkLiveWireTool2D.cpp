@@ -249,9 +249,9 @@ mitk::ContourModel::Pointer mitk::LiveWireTool2D::CreateNewContour() const
 
   auto contour = ContourModel::New();
 
+  //generate a time geometry that is always visible as the working contour should always be.
   auto contourTimeGeometry = ProportionalTimeGeometry::New();
-  contourTimeGeometry->SetFirstTimePoint(minTime);
-  contourTimeGeometry->SetStepDuration(duration);
+  contourTimeGeometry->SetStepDuration(std::numeric_limits<TimePointType>::max());
   contourTimeGeometry->SetTimeStepGeometry(contour->GetTimeGeometry()->GetGeometryForTimeStep(0)->Clone(), 0);
   contour->SetTimeGeometry(contourTimeGeometry);
 
@@ -461,7 +461,7 @@ void mitk::LiveWireTool2D::OnFinish(StateMachineAction *, InteractionEvent *inte
 
 void mitk::LiveWireTool2D::FinishTool()
 {
-  auto numberOfTimesteps = static_cast<int>(m_Contour->GetTimeGeometry()->CountTimeSteps());
+  auto numberOfTimesteps = static_cast<int>(m_Contour->GetTimeSteps());
 
   for (int i = 0; i <= numberOfTimesteps; ++i)
     m_Contour->Close(i);

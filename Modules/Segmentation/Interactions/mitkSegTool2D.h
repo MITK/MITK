@@ -118,11 +118,13 @@ namespace mitk
       TimePointType timePoint,
       unsigned int component = 0);
 
-
+    /** Convinence overloaded version that can be called for a given planeGeometry, slice image and time step.
+     * Calls static WriteBackSegmentationResults*/
     static void WriteBackSegmentationResult(const DataNode* workingNode, const PlaneGeometry* planeGeometry, const Image* segmentationResult, TimeStepType timeStep);
 
+    /** Convinence overloaded version that can be called for a given planeGeometry, slice image and time step.
+     * For more details see protected WriteSliceToVolume version.*/
     static void WriteSliceToVolume(Image* workingImage, const PlaneGeometry* planeGeometry, const Image* slice, TimeStepType timeStep, bool allowUndo);
-
 
     void SetShowMarkerNodes(bool);
 
@@ -212,16 +214,49 @@ namespace mitk
     /** Overload version that gets the reference slice passed on the passed plane geometry and timestep.*/
     Image::Pointer GetAffectedReferenceSlice(const PlaneGeometry* planeGeometry, TimeStepType timeStep) const;
 
+    /** Convinence version that can be called for a given event (which is used to deduce timepoint and plane) and a slice image.
+     * Calls non static WriteBackSegmentationResults*/
     void WriteBackSegmentationResult(const InteractionPositionEvent *, const Image* segmentationResult);
 
+    /** Convinence version that can be called for a given planeGeometry, slice image and time step.
+     * Calls non static WriteBackSegmentationResults*/
     void WriteBackSegmentationResult(const PlaneGeometry *planeGeometry, const Image* segmentationResult, TimeStepType timeStep);
 
+    /** Overloaded version that calls the static version and also adds the contour markers.*/
     void WriteBackSegmentationResults(const std::vector<SliceInformation> &sliceList, bool writeSliceToVolume = true);
+
+    /** \brief Writes all provided source slices into the data of the passed workingNode.
+     * The function does the following: 1) for every passed slice write it to workingNode (and generate and undo/redo step);
+     * 2) update the surface interpolation and 3) marke the node as modified.
+     * @param workingNode Pointer to the node that contains the working image.
+     * @param sliceList Vector of all slices that should be written into the workingNode.
+     * @param writeSliceToVolume. If set to falso the write operation (WriteSliceToVolume will be skipped)
+     * and only the surface interpolation will be updated.
+     * @pre workingNode must point to a valid instance and contain an image instance as data.*/
     static void WriteBackSegmentationResults(const DataNode* workingNode, const std::vector<SliceInformation>& sliceList, bool writeSliceToVolume = true);
 
-    void WritePreviewOnWorkingImage(
-      Image *targetSlice, Image *sourceSlice, Image *workingImage, int paintingPixelValue, int timestep);
+    /** Writes the provided source slice into the target slice with the given pixel value.
+     * If passed workingImage is a LabelSetImage the label set rules will be applied when
+     * writing all non zero source pixels into the target slice (e.g. locked lables will not be touched)
+     * with the given paintingPixelValue.
+     * @param targetSlice Pointer to the slice that should be filled with the content of the sourceSlice.
+     * @param sourceSlice Pointer to the slice that is the source/preview every pixel will be (tried to be) transfered .
+     * @param workingImage. Will be used to check if LabeSetImageRules have to be applied and the label set state.
+     * @param paintingPixelValue Value that will be used to paint onto target slice.
+     * @pre targetSlice must point to a valid instance.
+     * @pre sourceSlice must point to a valid instance.
+     * @pre workingImage must point to a valid instance.*/
+    static void WritePreviewOnWorkingImage(
+      Image *targetSlice, const Image *sourceSlice, const Image *workingImage, int paintingPixelValue);
 
+    /** Writes a provided slice into the passed working image. The content of working image that is covered
+    * by the slice, will be completly overwritten. If asked for it also generates the needed
+    * undo/redo steps.
+    * @param workingImage Pointer to the image that is the target of the write operation.
+    * @param sliceInfo SliceInfo instance that containes the slice image, the defining plane geometry and time step.
+    * @param allowUndo Indicates if undo/redo operations should be registered for the write operation.
+    * true: undo/redo will be generated.
+    * @pre workingImage must point to a valid instance.*/
     static void WriteSliceToVolume(Image* workingImage, const SliceInformation &sliceInfo, bool allowUndo);
 
     /**

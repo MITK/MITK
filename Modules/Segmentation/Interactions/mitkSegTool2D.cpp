@@ -18,14 +18,8 @@ found in the LICENSE file.
 
 #include "mitkPlaneGeometry.h"
 
-#include "mitkExtractDirectedPlaneImageFilter.h"
-#include "mitkExtractImageFilter.h"
-
 // Include of the new ImageExtractor
-#include "mitkExtractDirectedPlaneImageFilterNew.h"
 #include "mitkMorphologicalOperations.h"
-#include "mitkOverwriteDirectedPlaneImageFilter.h"
-#include "mitkOverwriteSliceImageFilter.h"
 #include "mitkPlanarCircle.h"
 
 #include "usGetModuleContext.h"
@@ -41,16 +35,14 @@ found in the LICENSE file.
 #include <vtkImageData.h>
 #include <vtkSmartPointer.h>
 
-
 #include "mitkOperationEvent.h"
 #include "mitkUndoController.h"
 #include <mitkDiffSliceOperationApplier.h>
 
 #include "mitkAbstractTransformGeometry.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkImageCast.h"
-#include "mitkImageToItk.h"
 #include "mitkLabelSetImage.h"
+
+#include "mitkContourModelUtils.h"
 
 #define ROUND(a) ((a) > 0 ? (int)((a) + 0.5) : -(int)(0.5 - (a)))
 
@@ -371,7 +363,7 @@ void mitk::SegTool2D::Activated()
   m_ToolManager->SelectedTimePointChanged +=
     mitk::MessageDelegate<mitk::SegTool2D>(this, &mitk::SegTool2D::OnTimePointChangedInternal);
 
-  m_LastTimePointTriggered = 0.;
+  m_LastTimePointTriggered = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
 }
 
 void mitk::SegTool2D::Deactivated()
@@ -402,7 +394,11 @@ void mitk::SegTool2D::OnTimePointChanged()
 
 mitk::DataNode* mitk::SegTool2D::GetWorkingDataNode() const
 {
-  return m_ToolManager->GetWorkingData(0);
+  if (nullptr != m_ToolManager)
+  {
+    return m_ToolManager->GetWorkingData(0);
+  }
+  return nullptr;
 }
 
 mitk::Image* mitk::SegTool2D::GetWorkingData() const
@@ -417,7 +413,11 @@ mitk::Image* mitk::SegTool2D::GetWorkingData() const
 
 mitk::DataNode* mitk::SegTool2D::GetReferenceDataNode() const
 {
-  return m_ToolManager->GetReferenceData(0);
+  if (nullptr != m_ToolManager)
+  {
+    return m_ToolManager->GetReferenceData(0);
+  }
+  return nullptr;
 }
 
 mitk::Image* mitk::SegTool2D::GetReferenceData() const
@@ -789,10 +789,27 @@ void InternalWritePreviewOnWorkingImage(itk::Image<TPixel, VImageDimension> *tar
 }
 
 void mitk::SegTool2D::WritePreviewOnWorkingImage(
-  Image *targetSlice, Image *sourceSlice, mitk::Image *workingImage, int paintingPixelValue, int)
+  Image *targetSlice, const Image *sourceSlice, const Image *workingImage, int paintingPixelValue)
 {
-  if ((!targetSlice) || (!sourceSlice))
-    return;
-  AccessFixedDimensionByItk_3(
-    targetSlice, InternalWritePreviewOnWorkingImage, 2, sourceSlice, workingImage, paintingPixelValue);
+  if (nullptr == targetSlice)
+  {
+    mitkThrow() << "Cannot write preview on working image. Target slice does not point to a valid instance.";
+  }
+
+  if (nullptr == sourceSlice)
+  {
+    mitkThrow() << "Cannot write preview on working image. Source slice does not point to a valid instance.";
+  }
+
+  if (nullptr == workingImage)
+  {
+    mitkThrow() << "Cannot write preview on working image. Working image does not point to a valid instance.";
+  }
+
+  auto constVtkSource = sourceSlice->GetVtkImageData();
+  /*Need to const cast because Vtk interface does not support const correctly.
+   (or I am not experienced enough to use it correctly)*/
+  auto nonConstVtkSource = const_cast<vtkImageData*>(constVtkSource);
+
+  ContourModelUtils::FillSliceInSlice(nonConstVtkSource, targetSlice->GetVtkImageData(), workingImage, paintingPixelValue);
 }

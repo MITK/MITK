@@ -44,6 +44,8 @@ found in the LICENSE file.
 
 #include "mitkContourModelUtils.h"
 
+#include "itkImageRegionIterator.h"
+
 #define ROUND(a) ((a) > 0 ? (int)((a) + 0.5) : -(int)(0.5 - (a)))
 
 bool mitk::SegTool2D::m_SurfaceInterpolationEnabled = true;
@@ -483,14 +485,10 @@ void mitk::SegTool2D::WriteBackSegmentationResults(const std::vector<SegTool2D::
       ->GetPlaneGeometry(0));
   unsigned int slicePosition = m_LastEventSender->GetSliceNavigationController()->GetSlice()->GetPos();
 
-  if (m_SurfaceInterpolationEnabled)
-  {
-    for (const auto& sliceInfo : sliceList)
-    {
-      this->AddContourmarker(plane3, slicePosition);
-    }
-  }
-
+  /* A cleaner solution would be to add a contour marker for each slice info. It currently
+   does not work as the contour markers expect that the plane is always the plane of slice 0.
+   Had not the time to do it properly no. Should be solved by T28146*/
+  this->AddContourmarker(plane3, slicePosition);
 }
 
 void mitk::SegTool2D::WriteBackSegmentationResults(const DataNode* workingNode, const std::vector<SliceInformation>& sliceList, bool writeSliceToVolume)
@@ -527,7 +525,7 @@ void mitk::SegTool2D::WriteBackSegmentationResults(const DataNode* workingNode, 
 void mitk::SegTool2D::WriteSliceToVolume(Image* workingImage, const PlaneGeometry* planeGeometry, const Image* slice, TimeStepType timeStep, bool allowUndo)
 {
   SliceInformation sliceInfo(slice, planeGeometry, timeStep);
-  WriteSliceToVolume(workingImage, sliceInfo , true);
+  WriteSliceToVolume(workingImage, sliceInfo , allowUndo);
 }
 
 void mitk::SegTool2D::WriteSliceToVolume(Image* workingImage, const SliceInformation &sliceInfo, bool allowUndo)

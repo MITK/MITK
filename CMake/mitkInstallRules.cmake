@@ -70,6 +70,9 @@ if(WIN32)
     install(FILES "${_qmake_path}/../plugins/sqldrivers/qsqlite.dll"
             DESTINATION "bin/plugins/sqldrivers"
             CONFIGURATIONS Release)
+    install(FILES "${_qmake_path}/../plugins/styles/qwindowsvistastyle.dll"
+            DESTINATION "bin/plugins/styles"
+            CONFIGURATIONS Release)
     install(FILES "${_qmake_path}/../plugins/imageformats/qsvg.dll"
             DESTINATION "bin/plugins/imageformats"
             CONFIGURATIONS Release)
@@ -86,6 +89,9 @@ if(WIN32)
             CONFIGURATIONS Debug)
     install(FILES "${_qmake_path}/../plugins/sqldrivers/qsqlited.dll"
             DESTINATION "bin/plugins/sqldrivers"
+            CONFIGURATIONS Debug)
+    install(FILES "${_qmake_path}/../plugins/styles/qwindowsvistastyled.dll"
+            DESTINATION "bin/plugins/styles"
             CONFIGURATIONS Debug)
     install(FILES "${_qmake_path}/../plugins/imageformats/qsvgd.dll"
             DESTINATION "bin/plugins/imageformats"

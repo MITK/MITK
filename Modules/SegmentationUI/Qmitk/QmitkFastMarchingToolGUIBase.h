@@ -46,7 +46,6 @@ protected:
   QmitkFastMarchingToolGUIBase(bool mode2D);
   ~QmitkFastMarchingToolGUIBase() override;
 
-  void DisconnectOldTool(mitk::AutoSegmentationWithPreviewTool* oldTool) override;
   void ConnectNewTool(mitk::AutoSegmentationWithPreviewTool* newTool) override;
   void InitializeUI(QBoxLayout* mainLayout) override;
 

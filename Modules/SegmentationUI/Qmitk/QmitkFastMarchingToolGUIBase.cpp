@@ -108,11 +108,6 @@ void QmitkFastMarchingToolGUIBase::OnClearSeeds()
   }
 }
 
-void QmitkFastMarchingToolGUIBase::DisconnectOldTool(mitk::AutoSegmentationWithPreviewTool* oldTool)
-{
-
-}
-
 void QmitkFastMarchingToolGUIBase::ConnectNewTool(mitk::AutoSegmentationWithPreviewTool* newTool)
 {
   Superclass::ConnectNewTool(newTool);

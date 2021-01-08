@@ -19,9 +19,8 @@ namespace mitk
 }
 
 mitk::FastMarchingTool::FastMarchingTool()
-  : FastMarchingBaseTool()
+  : FastMarchingBaseTool(2)
 {
-  TOOL_DIMENSION = 2;
 }
 
 mitk::FastMarchingTool::~FastMarchingTool()

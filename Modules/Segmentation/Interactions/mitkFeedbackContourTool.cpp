@@ -169,7 +169,7 @@ void mitk::FeedbackContourTool::AddVertexToFeedbackContour(const Point3D& point,
     return;
   }
 
-  m_FeedbackContour->AddVertex(point,static_cast<int>(feedbackTimeStep));
+  m_FeedbackContour->AddVertex(point, feedbackTimeStep);
 }
 
 

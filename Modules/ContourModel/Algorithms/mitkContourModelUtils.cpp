@@ -38,7 +38,7 @@ mitk::ContourModel::Pointer mitk::ContourModelUtils::ProjectContourTo2DSlice(
   projectedContour->Initialize(*contourIn3D);
 
   auto sliceGeometry = slice->GetGeometry();
-  auto numberOfTimesteps = static_cast<int>(contourIn3D->GetTimeSteps());
+  auto numberOfTimesteps = static_cast<TimeStepType>(contourIn3D->GetTimeSteps());
 
   for (decltype(numberOfTimesteps) t = 0; t < numberOfTimesteps; ++t)
   {
@@ -71,7 +71,7 @@ mitk::ContourModel::Pointer mitk::ContourModelUtils::BackProjectContourFrom2DSli
   auto worldContour = ContourModel::New();
   worldContour->Initialize(*contourIn2D);
 
-  auto numberOfTimesteps = static_cast<int>(contourIn2D->GetTimeSteps());
+  auto numberOfTimesteps = static_cast<TimeStepType>(contourIn2D->GetTimeSteps());
 
   for (decltype(numberOfTimesteps) t = 0; t < numberOfTimesteps; ++t)
   {
@@ -227,7 +227,7 @@ mitk::ContourModel::Pointer mitk::ContourModelUtils::MoveZerothContourTimeStep(c
 
 int mitk::ContourModelUtils::GetActivePixelValue(const Image* workingImage)
 {
-  auto* labelSetImage = dynamic_cast<const LabelSetImage*>(workingImage);
+  auto labelSetImage = dynamic_cast<const LabelSetImage*>(workingImage);
   int activePixelValue = 1;
   if (nullptr != labelSetImage)
   {

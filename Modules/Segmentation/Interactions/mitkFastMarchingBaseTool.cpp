@@ -37,14 +37,15 @@ found in the LICENSE file.
 #include <usModuleResource.h>
 
 
-mitk::FastMarchingBaseTool::FastMarchingBaseTool()
+mitk::FastMarchingBaseTool::FastMarchingBaseTool(unsigned int toolDim)
   : AutoSegmentationWithPreviewTool(false, "FastMarchingTool"),
     m_LowerThreshold(0),
     m_UpperThreshold(200),
     m_StoppingValue(100),
     m_Sigma(1.0),
     m_Alpha(-0.5),
-    m_Beta(3.0)
+    m_Beta(3.0),
+    m_ToolDimension(toolDim)
 {
 }
 
@@ -182,7 +183,7 @@ void mitk::FastMarchingBaseTool::OnAddPoint(StateMachineAction*, InteractionEven
       auto newWorkingPlaneGeometry = positionEvent->GetSender()->GetCurrentWorldPlaneGeometry()->Clone();
 
       // if click was on another plane and we are in 2D mode wie should reset the seeds
-      if (TOOL_DIMENSION == 2 && ( nullptr == this->GetWorkingPlaneGeometry() || !this->GetWorkingPlaneGeometry()->IsOnPlane(newWorkingPlaneGeometry.GetPointer())))
+      if (m_ToolDimension == 2 && ( nullptr == this->GetWorkingPlaneGeometry() || !this->GetWorkingPlaneGeometry()->IsOnPlane(newWorkingPlaneGeometry.GetPointer())))
       {
         this->ClearSeeds();
         this->SetWorkingPlaneGeometry(newWorkingPlaneGeometry);

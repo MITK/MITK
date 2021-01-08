@@ -71,7 +71,7 @@ namespace mitk
     /**
     \brief Fill a contour in a 2D slice with a specified pixel value.
     This overloaded version uses the contour at the passed contourTimeStep
-    to file the passed image slice.
+    to fill the passed image slice.
     \pre sliceImage points to a valid instance
     \pre projectedContour points to a valid instance
     */

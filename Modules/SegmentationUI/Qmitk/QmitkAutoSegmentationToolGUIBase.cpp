@@ -109,8 +109,9 @@ void QmitkAutoSegmentationToolGUIBase::ConnectNewTool(mitk::AutoSegmentationWith
   m_CheckProcessAll->setVisible(newTool->GetTargetSegmentationNode()->GetData()->GetTimeSteps() > 1);
 }
 
-void QmitkAutoSegmentationToolGUIBase::InitializeUI(QBoxLayout* mainLayout)
+void QmitkAutoSegmentationToolGUIBase::InitializeUI(QBoxLayout* /*mainLayout*/)
 {
+  //default implementation does nothing
 }
 
 void QmitkAutoSegmentationToolGUIBase::BusyStateChanged(bool isBusy)

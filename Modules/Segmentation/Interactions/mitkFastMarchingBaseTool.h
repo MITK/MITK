@@ -79,10 +79,8 @@ namespace mitk
 
 
   protected:
-    FastMarchingBaseTool();
+    FastMarchingBaseTool(unsigned int toolDim);
     ~FastMarchingBaseTool() override;
-
-    unsigned int TOOL_DIMENSION = 3;
 
     void ConnectActionsAndFunctions() override;
 
@@ -107,6 +105,12 @@ namespace mitk
 
     mitk::DataNode::Pointer m_SeedsAsPointSetNode; // used to visualize the seed points
     mitk::PointSet::Pointer m_SeedsAsPointSet;
+
+  private:
+    /** Indicating if the tool is used in 2D mode (just segment the current slice)
+     * or 3D mode (segment the whole current volume),*/
+    unsigned int m_ToolDimension;
+
   };
 
 } // namespace

@@ -18,9 +18,8 @@ namespace mitk
 }
 
 mitk::FastMarchingTool3D::FastMarchingTool3D()
-  : FastMarchingBaseTool()
+  : FastMarchingBaseTool(3)
 {
-  TOOL_DIMENSION = 3;
 }
 
 mitk::FastMarchingTool3D::~FastMarchingTool3D()

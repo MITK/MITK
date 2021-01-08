@@ -29,8 +29,8 @@ namespace mitk
     current time point. So the time step in which the contours will be stored as
     segmentations will be determined when the contours got confirmed. Then they
     will be transfered to the slices of the currently selected time step.
-    Changing the time point/time step will tool is active will updated the working
-    slice the life wire filter. So the behavior of the active life wire contour is
+    Changing the time point/time step while tool is active will updated the working
+    slice the live wire filter. So the behavior of the active live wire contour is
     always WYSIWYG (What you see is what you get).
 
     \sa SegTool2D
@@ -120,7 +120,7 @@ namespace mitk
     mitk::DataNode::Pointer m_EditingContourNode;
     mitk::ContourModelLiveWireInteractor::Pointer m_ContourInteractor;
 
-    /** Slice of the reference data the tool is currently activaly working on to
+    /** Slice of the reference data the tool is currently actively working on to
     define contours.*/
     mitk::Image::Pointer m_ReferenceDataSlice;
 

@@ -284,7 +284,7 @@ static void TestInvalidTimeStep()
 
   contour->AddVertex(p2);
 
-  int invalidTimeStep = 42;
+  mitk::TimeStepType invalidTimeStep = 42;
 
   MITK_TEST_CONDITION_REQUIRED(contour->IsEmptyTimeStep(invalidTimeStep), "invalid timestep required");
 
@@ -404,9 +404,9 @@ static void TestClear()
   p[0] = p[1] = p[2] = 0;
   contour->AddVertex(p);
   p[0] = p[1] = p[2] = 1;
-  contour->AddVertex(p, 1);
+  contour->AddVertex(p, mitk::TimeStepType(1));
   p[0] = p[1] = p[2] = 2;
-  contour->AddVertex(p, 2);
+  contour->AddVertex(p, mitk::TimeStepType(2));
 
   contour->Clear(1);
 

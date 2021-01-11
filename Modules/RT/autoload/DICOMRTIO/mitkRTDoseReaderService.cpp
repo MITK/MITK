@@ -26,6 +26,7 @@ found in the LICENSE file.
 #include <mitkDICOMRTMimeTypes.h>
 #include <mitkDICOMIOHelper.h>
 #include <mitkProperties.h>
+#include <mitkDICOMProperty.h>
 
 #include <dcmtk/dcmrt/drtdose.h>
 
@@ -88,6 +89,7 @@ namespace mitk
 
     mitk::DICOMFileReader::Pointer reader = selector->GetFirstReaderWithMinimumNumberOfOutputImages();
     reader->SetAdditionalTagsOfInterest(toiSrv->GetTagsOfInterest());
+    reader->SetTagLookupTableToPropertyFunctor(mitk::GetDICOMPropertyForDICOMValuesFunctor);
 
     reader->SetInputFiles({ location });
     reader->AnalyzeInputFiles();

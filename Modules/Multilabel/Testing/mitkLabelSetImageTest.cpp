@@ -16,6 +16,8 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
+#include <mitkAutoCropImageFilter.h>
+
 class mitkLabelSetImageTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkLabelSetImageTestSuite);
@@ -34,6 +36,7 @@ class mitkLabelSetImageTestSuite : public mitk::TestFixture
   MITK_TEST(TestRemoveLayer);
   MITK_TEST(TestRemoveLabels);
   MITK_TEST(TestMergeLabel);
+  MITK_TEST(TestCreateLabelMask);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -438,6 +441,27 @@ public:
     // Check if merge label has 507 + 823 = 1330 pixels
     CPPUNIT_ASSERT_MESSAGE("Labels were not correctly merged", m_LabelSetImage->GetStatistics()->GetCountOfMaxValuedVoxels() == 1330);
   }
+
+  void TestCreateLabelMask()
+  {
+    mitk::Image::Pointer image =
+      mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Multilabel/LabelSetTestInitializeImage.nrrd"));
+
+    m_LabelSetImage = nullptr;
+    m_LabelSetImage = mitk::LabelSetImage::New();
+    m_LabelSetImage->InitializeByLabeledImage(image);
+
+    auto labelMask = m_LabelSetImage->CreateLabelMask(6);
+
+    mitk::AutoCropImageFilter::Pointer cropFilter = mitk::AutoCropImageFilter::New();
+    cropFilter->SetInput(labelMask);
+    cropFilter->SetBackgroundValue(0);
+    cropFilter->SetMarginFactor(1.15);
+    cropFilter->Update();
+    auto maskImage = cropFilter->GetOutput();
+
+    // Count all pixels with value 6 = 507
+    CPPUNIT_ASSERT_MESSAGE("Label mask not correctly created", maskImage->GetStatistics()->GetCountOfMaxValuedVoxels() == 507);
   }
 };
 

@@ -14,7 +14,7 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 
 #include <mitkRTConstants.h>
-#include <mitkGenericProperty.h>
+#include <mitkProperties.h>
 #include "mitkTemporoSpatialStringProperty.h"
 #include <mitkIOUtil.h>
 
@@ -46,7 +46,7 @@ public:
   void TestProperties() {
     CheckStringProperty("DICOM.0008.0060", "RTDOSE"); //Modality
     auto prescibedDoseProperty = m_doseImage->GetProperty(mitk::RTConstants::PRESCRIBED_DOSE_PROPERTY_NAME.c_str());
-    auto prescribedDoseGenericProperty = dynamic_cast<mitk::GenericProperty<double>*>(prescibedDoseProperty.GetPointer());
+    auto prescribedDoseGenericProperty = dynamic_cast<mitk::DoubleProperty*>(prescibedDoseProperty.GetPointer());
     double actualPrescribedDose = prescribedDoseGenericProperty->GetValue();
     double expectedPrescribedDose = 65535 * 0.0010494648*0.8;
     CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE("prescribed dose property is not as expected", expectedPrescribedDose, actualPrescribedDose, 1e-5);

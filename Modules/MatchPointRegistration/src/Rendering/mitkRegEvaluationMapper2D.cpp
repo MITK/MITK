@@ -729,7 +729,7 @@ void mitk::RegEvaluationMapper2D::SetDefaultProperties(mitk::DataNode* node, mit
   node->AddProperty(mitk::nodeProp_RegEvalCheckerCount, mitk::IntProperty::New(3), renderer, overwrite);
   node->AddProperty(mitk::nodeProp_RegEvalTargetContour, mitk::BoolProperty::New(true), renderer, overwrite);
   node->AddProperty(mitk::nodeProp_RegEvalWipeStyle, mitk::RegEvalWipeStyleProperty::New(0), renderer, overwrite);
-  node->AddProperty(mitk::nodeProp_RegEvalCurrentPosition, mitk::GenericProperty<mitk::Point3D>::New(mitk::Point3D()), renderer, overwrite);
+  node->AddProperty(mitk::nodeProp_RegEvalCurrentPosition, mitk::Point3dProperty::New(mitk::Point3D()), renderer, overwrite);
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

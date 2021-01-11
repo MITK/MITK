@@ -659,7 +659,19 @@ namespace mitk
           continue;
         }
 
-        std::string value = infoList.front()->GetSerializationFunction()(property.second);
+        std::string value = mitk::BaseProperty::VALUE_CANNOT_BE_CONVERTED_TO_STRING;
+        try
+        {
+          value = infoList.front()->GetSerializationFunction()(property.second);
+        }
+        catch (const std::exception& e)
+        {
+          MITK_ERROR << "Error when serializing content of property. This often indicates the use of an out dated reader. Property will not be stored. Skipped property: " << property.first << ". Reason: " << e.what();
+        }
+        catch (...)
+        {
+          MITK_ERROR << "Unkown error when serializing content of property. This often indicates the use of an out dated reader. Property will not be stored. Skipped property: " << property.first;
+        }
 
         if (value == mitk::BaseProperty::VALUE_CANNOT_BE_CONVERTED_TO_STRING)
         {

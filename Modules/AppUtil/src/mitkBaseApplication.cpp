@@ -161,19 +161,21 @@ namespace mitk
       /* On macOS the process serial number is passed as an command line argument (-psn_<NUMBER>)
          in certain circumstances. This option causes a Poco exception. We remove it, if present. */
 
-      m_Argv_macOS.reserve(argc);
+      m_Argv_macOS.reserve(argc + 1);
 
       const char psn[] = "-psn";
 
-      for (decltype(argc) i = 0; i < argc; ++i)
+      for (int i = 0; i < argc; ++i)
       {
-        if (0 == strncmp(argv[i], psn, sizeof(psn)))
+        if (0 == strncmp(argv[i], psn, sizeof(psn) - 1))
           continue;
 
         m_Argv_macOS.push_back(argv[i]);
       }
 
-      m_Argc = static_cast<decltype(m_Argc)>(m_Argv_macOS.size());
+      m_Argv_macOS.push_back(nullptr);
+
+      m_Argc = static_cast<decltype(m_Argc)>(m_Argv_macOS.size() - 1);
       m_Argv = m_Argv_macOS.data();
 #endif
     }

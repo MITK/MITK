@@ -58,7 +58,7 @@ void QmitkMultiWidgetLayoutSelectionWidget::OnSetLayoutButtonClicked()
   if (indices.size() > 0)
   {
     // find largest row and column
-    for (const QModelIndex modelIndex : indices)
+    for (const auto& modelIndex : indices)
     {
       if (modelIndex.row() > row)
       {

@@ -1,0 +1,51 @@
+diff --git a/Rendering/FreeType/vtkFreeTypeTools.cxx b/Rendering/FreeType/vtkFreeTypeTools.cxx
+index c54289dc..03b899c4 100644
+--- a/Rendering/FreeType/vtkFreeTypeTools.cxx
++++ b/Rendering/FreeType/vtkFreeTypeTools.cxx
+@@ -378,8 +378,7 @@ FTC_CMapCache* vtkFreeTypeTools::GetCMapCache()
+ }
+ 
+ //----------------------------------------------------------------------------
+-FT_CALLBACK_DEF(FT_Error)
+-vtkFreeTypeToolsFaceRequester(
++static FT_Error vtkFreeTypeToolsFaceRequester(
+   FTC_FaceID face_id, FT_Library lib, FT_Pointer request_data, FT_Face* face)
+ {
+ #if VTK_FTFC_DEBUG_CD
+diff --git a/ThirdParty/hdf5/vtkhdf5/src/H5Fsuper.c b/ThirdParty/hdf5/vtkhdf5/src/H5Fsuper.c
+index 49995651..00a3dc55 100644
+--- a/ThirdParty/hdf5/vtkhdf5/src/H5Fsuper.c
++++ b/ThirdParty/hdf5/vtkhdf5/src/H5Fsuper.c
+@@ -54,6 +54,7 @@
+ /********************/
+ static herr_t H5F__super_ext_create(H5F_t *f, H5O_loc_t *ext_ptr);
+ static herr_t H5F__update_super_ext_driver_msg(H5F_t *f);
++herr_t H5O__fsinfo_set_version(H5F_t *f, H5O_fsinfo_t *fsinfo);
+ 
+ 
+ /*********************/
+diff --git a/ThirdParty/hdf5/vtkhdf5/src/H5Oint.c b/ThirdParty/hdf5/vtkhdf5/src/H5Oint.c
+index 543637c1..a927c0d1 100644
+--- a/ThirdParty/hdf5/vtkhdf5/src/H5Oint.c
++++ b/ThirdParty/hdf5/vtkhdf5/src/H5Oint.c
+@@ -82,6 +82,7 @@ static herr_t H5O__free_visit_visited(void *item, void *key,
+ static herr_t H5O__visit_cb(hid_t group, const char *name, const H5L_info_t *linfo,
+     void *_udata);
+ static const H5O_obj_class_t *H5O__obj_class_real(const H5O_t *oh);
++herr_t H5CX_get_ohdr_flags(uint8_t* oh_flags);
+ 
+ 
+ /*********************/
+diff --git a/ThirdParty/hdf5/vtkhdf5/src/H5Rint.c b/ThirdParty/hdf5/vtkhdf5/src/H5Rint.c
+index 159bccac..08bd8c80 100644
+--- a/ThirdParty/hdf5/vtkhdf5/src/H5Rint.c
++++ b/ThirdParty/hdf5/vtkhdf5/src/H5Rint.c
+@@ -46,6 +46,8 @@
+ /********************/
+ /* Local Prototypes */
+ /********************/
++herr_t H5CX_set_libver_bounds(H5F_t*);
++
+ 
+ /*********************/
+ /* Package Variables */

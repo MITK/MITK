@@ -100,9 +100,9 @@ static inline unsigned getTag(T& var, const gdcm::DataSet& ds)
 static std::string getTag(DcmTagKey tag, DcmItem* d1, DcmItem* d2 = nullptr)
 {
   std::string r;
-  d1->findAndGetOFStringArray(tag, r);
+  d1->findAndGetOFStringArray(tag, r, true);
   if (r.empty() && d2) {
-    d2->findAndGetOFStringArray(tag, r);
+    d2->findAndGetOFStringArray(tag, r, true);
   }
   return r;
 }

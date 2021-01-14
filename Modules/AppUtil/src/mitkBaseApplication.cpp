@@ -94,6 +94,7 @@ namespace mitk
   const QString BaseApplication::ARG_SPLASH_IMAGE = "BlueBerry.splashscreen";
   const QString BaseApplication::ARG_STORAGE_DIR = "BlueBerry.storageDir";
   const QString BaseApplication::ARG_XARGS = "xargs";
+  const QString BaseApplication::ARG_LOG_QT_MESSAGES = "Qt.logMessages";
 
   const QString BaseApplication::PROP_APPLICATION = "blueberry.application";
   const QString BaseApplication::PROP_FORCE_PLUGIN_INSTALL = BaseApplication::ARG_FORCE_PLUGIN_INSTALL;
@@ -143,6 +144,8 @@ namespace mitk
     QSplashScreen *m_Splashscreen;
     SplashCloserCallback *m_SplashscreenClosingCallback;
 
+    bool m_LogQtMessages;
+
     QStringList m_PreloadLibs;
     QString m_ProvFile;
 
@@ -155,7 +158,8 @@ namespace mitk
         m_SingleMode(false),
         m_SafeMode(true),
         m_Splashscreen(nullptr),
-        m_SplashscreenClosingCallback(nullptr)
+        m_SplashscreenClosingCallback(nullptr),
+        m_LogQtMessages(false)
     {
 #ifdef Q_OS_MAC
       /* On macOS the process serial number is passed as an command line argument (-psn_<NUMBER>)
@@ -198,6 +202,12 @@ namespace mitk
 
     void handleBooleanOption(const std::string &name, const std::string &)
     {
+      if (ARG_LOG_QT_MESSAGES.toStdString() == name)
+      {
+        m_LogQtMessages = true;
+        return;
+      }
+
       auto fwKey = QString::fromStdString(name);
 
       // Translate some keys to proper framework properties
@@ -510,7 +520,8 @@ namespace mitk
     this->setOrganizationName(orgName);
     this->setOrganizationDomain(orgDomain);
 
-    qInstallMessageHandler(outputQtMessage);
+    if (d->m_LogQtMessages)
+      qInstallMessageHandler(outputQtMessage);
 
     QWebEngineUrlScheme qtHelpScheme("qthelp");
     qtHelpScheme.setFlags(QWebEngineUrlScheme::LocalScheme | QWebEngineUrlScheme::LocalAccessAllowed);
@@ -773,6 +784,10 @@ namespace mitk
     Poco::Util::Option xargsOption(ARG_XARGS.toStdString(), "", "Extended argument list");
     xargsOption.argument("<args>").binding(ARG_XARGS.toStdString());
     options.addOption(xargsOption);
+
+    Poco::Util::Option logQtMessagesOption(ARG_LOG_QT_MESSAGES.toStdString(), "", "log Qt messages");
+    logQtMessagesOption.callback(Poco::Util::OptionCallback<Impl>(d, &Impl::handleBooleanOption));
+    options.addOption(logQtMessagesOption);
 
     Poco::Util::Application::defineOptions(options);
   }

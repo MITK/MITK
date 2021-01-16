@@ -50,7 +50,7 @@ namespace mitk
     }
 
     template <typename TPointValueType>
-    Point(const TPointValueType &v) : itk::Point<TCoordRep, NPointDimension>(v)
+    explicit Point(const TPointValueType &v) : itk::Point<TCoordRep, NPointDimension>(v)
     {
     }
 

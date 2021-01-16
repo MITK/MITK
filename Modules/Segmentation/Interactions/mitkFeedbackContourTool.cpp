@@ -135,17 +135,19 @@ void mitk::FeedbackContourTool::UpdateFeedbackContour(const ContourModel* source
   if (nullptr == sourceModel)
     return;
 
+  if (!sourceModel->GetTimeGeometry()->IsValidTimeStep(sourceTimeStep))
+  {
+    MITK_WARN << "Cannot update feedback contour. Source contour time geometry does not support passed time step. Invalid time step: " << sourceTimeStep;
+    return;
+  }
+
   if (!m_FeedbackContour->GetTimeGeometry()->IsValidTimeStep(feedbackTimeStep))
   {
     MITK_WARN << "Cannot update feedback contour. Feedback contour time geometry does not support passed time step. Invalid time step: "<<feedbackTimeStep;
     return;
   }
 
-  m_FeedbackContour->Clear(feedbackTimeStep);
-
-  std::for_each(sourceModel->Begin(sourceTimeStep), sourceModel->End(sourceTimeStep), [this, feedbackTimeStep](ContourElement::VertexType* vertex) {
-    this->m_FeedbackContour->AddVertex(vertex, feedbackTimeStep);
-  });
+  m_FeedbackContour->UpdateContour(sourceModel, feedbackTimeStep, sourceTimeStep);
 }
 
 void mitk::FeedbackContourTool::AddVertexToCurrentFeedbackContour(const Point3D& point)

@@ -427,7 +427,7 @@ void mitk::BaseGeometry::WorldToIndex(const mitk::Point3D &pt_mm, mitk::Point3D 
 
   WorldToIndex(tempIn, tempOut);
 
-  pt_units = tempOut;
+  pt_units = Point3D(tempOut);
 }
 
 void mitk::BaseGeometry::WorldToIndex(const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units) const

@@ -309,7 +309,7 @@ void mitk::RegionGrowingTool::OnMousePressed(StateMachineAction *, InteractionEv
 
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
-  m_LastScreenPosition = positionEvent->GetPointerPositionOnScreen();
+  m_LastScreenPosition = Point2I(positionEvent->GetPointerPositionOnScreen());
 
   // ReferenceSlice is from the underlying image, WorkingSlice from the active segmentation (can be empty)
   m_ReferenceSlice = FeedbackContourTool::GetAffectedReferenceSlice(positionEvent);
@@ -508,7 +508,7 @@ void mitk::RegionGrowingTool::OnMouseMoved(StateMachineAction *, InteractionEven
 
     m_ScreenYDifference += positionEvent->GetPointerPositionOnScreen()[1] - m_LastScreenPosition[1];
     m_ScreenXDifference += positionEvent->GetPointerPositionOnScreen()[0] - m_LastScreenPosition[0];
-    m_LastScreenPosition = positionEvent->GetPointerPositionOnScreen();
+    m_LastScreenPosition = Point2I(positionEvent->GetPointerPositionOnScreen());
 
     // Moving the mouse up and down adjusts the width of the threshold window,
     // moving it left and right shifts the threshold window

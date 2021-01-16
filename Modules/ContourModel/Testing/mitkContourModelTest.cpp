@@ -22,7 +22,17 @@ static void TestAddVertex()
 
   contour->AddVertex(p);
 
-  MITK_TEST_CONDITION(contour->GetNumberOfVertices() > 0, "Add a Vertex, size increased");
+  MITK_TEST_CONDITION(contour->GetNumberOfVertices() == 1, "Add a Vertex, size increased");
+  MITK_TEST_CONDITION(contour->GetVertexAt(0)->Coordinates == p, "Added vertex has the correct value.");
+
+  mitk::Point3D outOfTimeBoundPoint;
+  outOfTimeBoundPoint[0] = outOfTimeBoundPoint[1] = outOfTimeBoundPoint[2] = 1;
+
+  contour->AddVertex(outOfTimeBoundPoint, mitk::TimeStepType(1));
+
+  MITK_TEST_CONDITION(contour->GetTimeSteps() == 1, "Add a vertex to an unsupported time step has not changed geometry.");
+  MITK_TEST_CONDITION(contour->IsEmptyTimeStep(1), "Add a vertex to an unsupported time step has not added an contour element.");
+  MITK_TEST_CONDITION(contour->GetNumberOfVertices(1) == -1, "Add a vertex to an unsupported time step has not added an contour element.");
 }
 
 // Select a vertex by index. successful if the selected vertex member of the contour is no longer set to null
@@ -268,6 +278,15 @@ static void TestInsertVertex()
   MITK_TEST_CONDITION(contour->GetNumberOfVertices() == 3, "test insert vertex");
 
   MITK_TEST_CONDITION(contour->GetVertexAt(1)->Coordinates == pointToInsert, "compare inserted vertex");
+
+  mitk::Point3D outOfTimeBoundPoint;
+  outOfTimeBoundPoint[0] = outOfTimeBoundPoint[1] = outOfTimeBoundPoint[2] = 1;
+
+  contour->InsertVertexAtIndex(outOfTimeBoundPoint, 4, false, mitk::TimeStepType(1));
+
+  MITK_TEST_CONDITION(contour->GetTimeSteps() == 1, "Insert a vertex to an unsupported time step has not changed geometry.");
+  MITK_TEST_CONDITION(contour->IsEmptyTimeStep(1), "Insert a vertex to an unsupported time step has not added an contour element.");
+  MITK_TEST_CONDITION(contour->GetNumberOfVertices(1) == -1, "Insert a vertex to an unsupported time step has not added an contour element.");
 }
 
 // try to access an invalid timestep
@@ -352,8 +371,7 @@ static void TestSetVertices()
   contour2->AddVertex(p4);
 
   contour->AddVertex(p);
-
-  contour->SetVertexAt(1, contour2->GetVertexAt(1));
+  contour->SetVertexAt(1, contour2->GetVertexAt(1), 0);
 
   MITK_TEST_CONDITION(
     mitk::Equal(contour->GetVertexAt(1)->Coordinates, contour2->GetVertexAt(1)->Coordinates), "Use setter and getter combination");
@@ -391,7 +409,7 @@ static void TestContourModelAPI()
 
   mitk::ContourModel::Pointer contour2 = mitk::ContourModel::New();
 
-  contour2->AddVertex(contour1->GetVertexAt(0));
+  contour2->AddVertex(*(contour1->GetVertexAt(0)));
 
   MITK_TEST_CONDITION(contour2->GetNumberOfVertices() == 1, "Add call with another contour");
 }
@@ -399,6 +417,7 @@ static void TestContourModelAPI()
 static void TestClear()
 {
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
+  contour->Expand(3);
 
   mitk::Point3D p;
   p[0] = p[1] = p[2] = 0;
@@ -414,7 +433,7 @@ static void TestClear()
   MITK_TEST_CONDITION(!contour->IsEmpty(0), "Check time step 0 is not empty.");
   MITK_TEST_CONDITION(contour->IsEmpty(1), "Check time step 1 is empty.");
   MITK_TEST_CONDITION(!contour->IsEmpty(2), "Check time step 2 is not empty.");
-  MITK_TEST_CONDITION(contour->GetVertexAt(2)->Coordinates == p, "compare if vertex at t == 2 is still the same");
+  MITK_TEST_CONDITION(contour->GetVertexAt(0,2)->Coordinates == p, "compare if vertex at t == 2 is still the same");
 
   contour->Clear();
   MITK_TEST_CONDITION(contour->GetTimeSteps() == 1, "Check time step count stays 1.");

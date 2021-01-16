@@ -112,39 +112,32 @@ namespace mitk
     void AddVertex(const Point3D &vertex, TimeStepType timestep = 0);
 
     /** \brief Add a vertex to the contour at given timestep.
-    The vertex is added at the end of contour.
-
+    A copy of the passed vertex is added at the end of contour.
     \param vertex - coordinate representation of a control point
     \param timestep - the timestep at which the vertex will be add ( default 0)
-
     @note Adding a vertex to a timestep which exceeds the timebounds of the contour
     will not be added, the TimeGeometry will not be expanded.
     */
-    void AddVertex(VertexType &vertex, TimeStepType timestep = 0);
-
-    /** \brief Add a vertex to the contour at given timestep.
-    The vertex is added at the end of contour.
-
-    \param vertex - coordinate representation of a control point
-    \param timestep - the timestep at which the vertex will be add ( default 0)
-
-    @note Adding a vertex to a timestep which exceeds the timebounds of the contour
-    will not be added, the TimeSlicedGeometry will not be expanded.
-    */
-    void AddVertex(const VertexType *vertex, TimeStepType timestep = 0);
+    void AddVertex(const VertexType &vertex, TimeStepType timestep = 0);
 
     /** \brief Add a vertex to the contour.
-
     \param vertex - coordinate representation of a control point
     \param timestep - the timestep at which the vertex will be add ( default 0)
     \param isControlPoint - specifies the vertex to be handled in a special way (e.g. control points
     will be rendered).
-
-
     @note Adding a vertex to a timestep which exceeds the timebounds of the contour
     will not be added, the TimeGeometry will not be expanded.
     */
-    void AddVertex(const Point3D &vertex, bool isControlPoint, TimeStepType timestep = 0);
+    void AddVertex(const Point3D& vertex, bool isControlPoint, TimeStepType timestep = 0);
+
+    /** Clears the contour of destinationTimeStep and copies
+        the contour of the passed source model at the sourceTimeStep.
+     @pre soureModel must point to a valid instance
+     @pre sourceTimePoint must be valid
+     @note Updateing a vertex to a timestep which exceeds the timebounds of the contour
+      will not be added, the TimeGeometry will not be expanded.
+    */
+    void UpdateContour(const ContourModel* sourceModel, TimeStepType destinationTimeStep, TimeStepType sourceTimeStep);
 
     /** \brief Add a vertex to the contour at given timestep AT THE FRONT of the contour.
     The vertex is added at the FRONT of contour.
@@ -155,7 +148,7 @@ namespace mitk
     @note Adding a vertex to a timestep which exceeds the timebounds of the contour
     will not be added, the TimeGeometry will not be expanded.
     */
-    void AddVertexAtFront(Point3D &vertex, TimeStepType timestep = 0);
+    void AddVertexAtFront(const Point3D &vertex, TimeStepType timestep = 0);
 
     /** \brief Add a vertex to the contour at given timestep AT THE FRONT of the contour.
     The vertex is added at the FRONT of contour.
@@ -166,7 +159,7 @@ namespace mitk
     @note Adding a vertex to a timestep which exceeds the timebounds of the contour
     will not be added, the TimeGeometry will not be expanded.
     */
-    void AddVertexAtFront(VertexType &vertex, TimeStepType timestep = 0);
+    void AddVertexAtFront(const VertexType &vertex, TimeStepType timestep = 0);
 
     /** \brief Add a vertex to the contour at given timestep AT THE FRONT of the contour.
 
@@ -179,17 +172,17 @@ namespace mitk
     @note Adding a vertex to a timestep which exceeds the timebounds of the contour
     will not be added, the TimeGeometry will not be expanded.
     */
-    void AddVertexAtFront(Point3D &vertex, bool isControlPoint, TimeStepType timestep = 0);
+    void AddVertexAtFront(const Point3D &vertex, bool isControlPoint, TimeStepType timestep = 0);
 
     /** \brief Insert a vertex at given index.
     */
-    void InsertVertexAtIndex(Point3D &vertex, int index, bool isControlPoint = false, TimeStepType timestep = 0);
+    void InsertVertexAtIndex(const Point3D &vertex, int index, bool isControlPoint = false, TimeStepType timestep = 0);
 
     /** \brief Set a coordinates for point at given index.
     */
     bool SetVertexAt(int pointId, const Point3D &point, TimeStepType timestep = 0);
 
-    /** \brief Set a coordinates for point at given index.
+    /** \brief Set a coordinates and control state for point at given index.
     */
     bool SetVertexAt(int pointId, const VertexType *vertex, TimeStepType timestep = 0);
 
@@ -373,7 +366,7 @@ namespace mitk
     void SetRequestedRegion(const itk::DataObject *data) override;
 
     /**
-    \brief Expand the timebounds of the TimeGeometry to given number of timesteps.
+    \brief Expand the contour model and its TimeGeometry to given number of timesteps.
     */
     void Expand(unsigned int timeSteps) override;
 
@@ -417,7 +410,7 @@ namespace mitk
     void InitializeEmpty() override;
 
     // Shift a vertex
-    void ShiftVertex(VertexType *vertex, Vector3D &vector);
+    static void ShiftVertex(VertexType *vertex, Vector3D &vector);
 
     // Storage with time resolved support.
     ContourModelSeries m_ContourSeries;

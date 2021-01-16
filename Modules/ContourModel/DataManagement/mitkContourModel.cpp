@@ -49,26 +49,12 @@ void mitk::ContourModel::AddVertex(const Point3D &vertex, bool isControlPoint, T
   }
 }
 
-void mitk::ContourModel::AddVertex(VertexType &vertex, TimeStepType timestep)
+void mitk::ContourModel::AddVertex(const VertexType &vertex, TimeStepType timestep)
 {
-  if (!this->IsEmptyTimeStep(timestep))
-  {
-    this->m_ContourSeries[timestep]->AddVertex(vertex);
-    this->InvokeEvent(ContourModelSizeChangeEvent());
-    this->Modified();
-    this->m_UpdateBoundingBox = true;
-  }
+  this->AddVertex(vertex.Coordinates, vertex.IsControlPoint);
 }
 
-void mitk::ContourModel::AddVertex(const VertexType *vertex, TimeStepType timestep)
-{
-  if (vertex != nullptr)
-  {
-    this->m_ContourSeries[timestep]->AddVertex(*const_cast<VertexType *>(vertex));
-  }
-}
-
-void mitk::ContourModel::AddVertexAtFront(Point3D &vertex, TimeStepType timestep)
+void mitk::ContourModel::AddVertexAtFront(const Point3D &vertex, TimeStepType timestep)
 {
   if (!this->IsEmptyTimeStep(timestep))
   {
@@ -76,7 +62,7 @@ void mitk::ContourModel::AddVertexAtFront(Point3D &vertex, TimeStepType timestep
   }
 }
 
-void mitk::ContourModel::AddVertexAtFront(Point3D &vertex, bool isControlPoint, TimeStepType timestep)
+void mitk::ContourModel::AddVertexAtFront(const Point3D &vertex, bool isControlPoint, TimeStepType timestep)
 {
   if (!this->IsEmptyTimeStep(timestep))
   {
@@ -87,15 +73,9 @@ void mitk::ContourModel::AddVertexAtFront(Point3D &vertex, bool isControlPoint, 
   }
 }
 
-void mitk::ContourModel::AddVertexAtFront(VertexType &vertex, TimeStepType timestep)
+void mitk::ContourModel::AddVertexAtFront(const VertexType &vertex, TimeStepType timestep)
 {
-  if (!this->IsEmptyTimeStep(timestep))
-  {
-    this->m_ContourSeries[timestep]->AddVertexAtFront(vertex);
-    this->InvokeEvent(ContourModelSizeChangeEvent());
-    this->Modified();
-    this->m_UpdateBoundingBox = true;
-  }
+  this->AddVertexAtFront(vertex.Coordinates, vertex.IsControlPoint, timestep);
 }
 
 bool mitk::ContourModel::SetVertexAt(int pointId, const Point3D &point, TimeStepType timestep)
@@ -133,7 +113,7 @@ bool mitk::ContourModel::SetVertexAt(int pointId, const VertexType *vertex, Time
   return false;
 }
 
-void mitk::ContourModel::InsertVertexAtIndex(Point3D &vertex, int index, bool isControlPoint, TimeStepType timestep)
+void mitk::ContourModel::InsertVertexAtIndex(const Point3D &vertex, int index, bool isControlPoint, TimeStepType timestep)
 {
   if (!this->IsEmptyTimeStep(timestep))
   {
@@ -145,6 +125,35 @@ void mitk::ContourModel::InsertVertexAtIndex(Point3D &vertex, int index, bool is
       this->m_UpdateBoundingBox = true;
     }
   }
+}
+
+void mitk::ContourModel::UpdateContour(const ContourModel* sourceModel, TimeStepType destinationTimeStep, TimeStepType sourceTimeStep)
+{
+  if (nullptr == sourceModel)
+  {
+    mitkThrow() << "Cannot update contour. Passed source model is invalid.";
+  }
+
+  if (!sourceModel->GetTimeGeometry()->IsValidTimeStep(sourceTimeStep))
+  {
+    mitkThrow() << "Cannot update contour. Source contour time geometry does not support passed time step. Invalid time step: " << sourceTimeStep;
+  }
+
+  if (!this->GetTimeGeometry()->IsValidTimeStep(destinationTimeStep))
+  {
+    MITK_WARN << "Cannot update contour. Contour time geometry does not support passed time step. Invalid time step: " << destinationTimeStep;
+    return;
+  }
+
+  this->Clear(destinationTimeStep);
+
+  std::for_each(sourceModel->Begin(sourceTimeStep), sourceModel->End(sourceTimeStep), [this, destinationTimeStep](ContourElement::VertexType* vertex) {
+    this->m_ContourSeries[destinationTimeStep]->AddVertex(vertex->Coordinates, vertex->IsControlPoint);
+  });
+
+  this->InvokeEvent(ContourModelSizeChangeEvent());
+  this->Modified();
+  this->m_UpdateBoundingBox = true;
 }
 
 bool mitk::ContourModel::IsEmpty(TimeStepType timestep) const
@@ -399,15 +408,10 @@ void mitk::ContourModel::ShiftContour(Vector3D &translate, TimeStepType timestep
 {
   if (!this->IsEmptyTimeStep(timestep))
   {
-    VertexListType *vList = this->m_ContourSeries[timestep]->GetVertexList();
-    auto it = vList->begin();
-    auto end = vList->end();
-
     // shift all vertices
-    while (it != end)
+    for (auto vertex : *(this->m_ContourSeries[timestep]))
     {
-      this->ShiftVertex((*it), translate);
-      it++;
+      this->ShiftVertex(vertex, translate);
     }
 
     this->Modified();

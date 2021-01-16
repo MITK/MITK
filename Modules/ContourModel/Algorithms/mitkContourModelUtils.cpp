@@ -219,7 +219,7 @@ mitk::ContourModel::Pointer mitk::ContourModelUtils::MoveZerothContourTimeStep(c
   resultContour->Expand(t + 1);
 
   std::for_each(contour->Begin(), contour->End(), [&resultContour, t](ContourElement::VertexType *vertex) {
-    resultContour->AddVertex(vertex, t);
+    resultContour->AddVertex(*vertex, t);
   });
 
   return resultContour;

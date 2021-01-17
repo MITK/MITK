@@ -74,9 +74,9 @@ void QmitkOtsuTool3DGUI::OnSpinboxValueAccept()
   if (nullptr != tool)
   {
     if (m_FirstAccept ||
-      (tool->GetNumberOfRegions() == m_Controls.m_Spinbox->value() &&
+      (tool->GetNumberOfRegions() == static_cast<unsigned int>(m_Controls.m_Spinbox->value()) &&
       tool->GetUseValley() == m_Controls.m_ValleyCheckbox->isChecked() &&
-      tool->GetNumberOfBins() == m_Controls.m_BinsSpinBox->value()))
+      tool->GetNumberOfBins() == static_cast<unsigned int>(m_Controls.m_BinsSpinBox->value())))
       return;
 
     m_FirstAccept = false;
@@ -96,9 +96,9 @@ void QmitkOtsuTool3DGUI::OnSpinboxValueAccept()
           return;
       }
 
-      tool->SetNumberOfRegions(m_Controls.m_Spinbox->value());
+      tool->SetNumberOfRegions(static_cast<unsigned int>(m_Controls.m_Spinbox->value()));
       tool->SetUseValley(m_Controls.m_ValleyCheckbox->isChecked());
-      tool->SetNumberOfBins(m_Controls.m_BinsSpinBox->value());
+      tool->SetNumberOfBins(static_cast<unsigned int>(m_Controls.m_BinsSpinBox->value()));
 
       tool->UpdatePreview();
     }

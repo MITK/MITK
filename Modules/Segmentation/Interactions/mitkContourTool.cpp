@@ -90,9 +90,6 @@ void mitk::ContourTool::OnMouseReleased(StateMachineAction *, InteractionEvent *
   mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
 
   this->WriteBackFeedbackContourAsSegmentationResult(positionEvent, m_PaintingPixelValue);
-
-  // 4. Make sure the result is drawn again --> is visible then.
-  assert(positionEvent->GetSender()->GetRenderWindow());
 }
 
 /**

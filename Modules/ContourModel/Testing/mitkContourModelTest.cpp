@@ -419,6 +419,7 @@ static void TestClear()
   mitk::ContourModel::Pointer contour = mitk::ContourModel::New();
   contour->Expand(3);
 
+  contour->Expand(3);
   mitk::Point3D p;
   p[0] = p[1] = p[2] = 0;
   contour->AddVertex(p);
@@ -433,7 +434,7 @@ static void TestClear()
   MITK_TEST_CONDITION(!contour->IsEmpty(0), "Check time step 0 is not empty.");
   MITK_TEST_CONDITION(contour->IsEmpty(1), "Check time step 1 is empty.");
   MITK_TEST_CONDITION(!contour->IsEmpty(2), "Check time step 2 is not empty.");
-  MITK_TEST_CONDITION(contour->GetVertexAt(0,2)->Coordinates == p, "compare if vertex at t == 2 is still the same");
+  MITK_TEST_CONDITION(contour->GetVertexAt(0, 2)->Coordinates == p, "compare if vertex at t == 2 is still the same");
 
   contour->Clear();
   MITK_TEST_CONDITION(contour->GetTimeSteps() == 1, "Check time step count stays 1.");

@@ -94,7 +94,7 @@ namespace mitk
 
     template <typename TPixel, unsigned int VImageDimension>
     void DoITKFastMarching(const itk::Image<TPixel, VImageDimension>* inputImage,
-      mitk::Image* segmentation, unsigned int timeStep, const mitk::BaseGeometry* inputGeometry);
+      Image* segmentation, unsigned int timeStep, const BaseGeometry* inputGeometry);
 
     float m_LowerThreshold; // used in Threshold filter
     float m_UpperThreshold; // used in Threshold filter
@@ -103,8 +103,8 @@ namespace mitk
     float m_Alpha;          // used in Sigmoid filter
     float m_Beta;           // used in Sigmoid filter
 
-    mitk::DataNode::Pointer m_SeedsAsPointSetNode; // used to visualize the seed points
-    mitk::PointSet::Pointer m_SeedsAsPointSet;
+    DataNode::Pointer m_SeedsAsPointSetNode; // used to visualize the seed points
+    PointSet::Pointer m_SeedsAsPointSet;
 
   private:
     /** Indicating if the tool is used in 2D mode (just segment the current slice)

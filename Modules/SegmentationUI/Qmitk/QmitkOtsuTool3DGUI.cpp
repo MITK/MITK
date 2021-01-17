@@ -26,6 +26,7 @@ void QmitkOtsuTool3DGUI::ConnectNewTool(mitk::AutoSegmentationWithPreviewTool* n
   Superclass::ConnectNewTool(newTool);
 
   newTool->IsTimePointChangeAwareOff();
+  m_FirstAccept = true;
 }
 
 void QmitkOtsuTool3DGUI::InitializeUI(QBoxLayout* mainLayout)
@@ -69,14 +70,17 @@ void QmitkOtsuTool3DGUI::OnAdvancedSettingsButtonToggled(bool toggled)
 
 void QmitkOtsuTool3DGUI::OnSpinboxValueAccept()
 {
-  if (m_NumberOfRegions == m_Controls.m_Spinbox->value() &&
-      m_UseValleyEmphasis == m_Controls.m_ValleyCheckbox->isChecked() &&
-      m_NumberOfBins == m_Controls.m_BinsSpinBox->value())
-    return;
-
   auto tool = this->GetConnectedToolAs<mitk::OtsuTool3D>();
   if (nullptr != tool)
   {
+    if (m_FirstAccept ||
+      (tool->GetNumberOfRegions() == m_Controls.m_Spinbox->value() &&
+      tool->GetUseValley() == m_Controls.m_ValleyCheckbox->isChecked() &&
+      tool->GetNumberOfBins() == m_Controls.m_BinsSpinBox->value()))
+      return;
+
+    m_FirstAccept = false;
+
     try
     {
       int proceed;
@@ -92,12 +96,9 @@ void QmitkOtsuTool3DGUI::OnSpinboxValueAccept()
           return;
       }
 
-      m_NumberOfRegions = m_Controls.m_Spinbox->value();
-      m_UseValleyEmphasis = m_Controls.m_ValleyCheckbox->isChecked();
-      m_NumberOfBins = m_Controls.m_BinsSpinBox->value();
-      tool->SetNumberOfRegions(m_NumberOfRegions);
-      tool->SetUseValley(m_UseValleyEmphasis);
-      tool->SetNumberOfBins(m_NumberOfBins);
+      tool->SetNumberOfRegions(m_Controls.m_Spinbox->value());
+      tool->SetUseValley(m_Controls.m_ValleyCheckbox->isChecked());
+      tool->SetNumberOfBins(m_Controls.m_BinsSpinBox->value());
 
       tool->UpdatePreview();
     }

@@ -54,13 +54,19 @@ void QmitkAutoSegmentationToolGUIBase::OnNewToolAssociated(mitk::Tool *tool)
 
     m_CheckProcessAll = new QCheckBox("Process all time steps", this);
     m_CheckProcessAll->setChecked(false);
-    m_CheckProcessAll->setToolTip("Process/overwrite all time steps of the dynamic segmentation and not just the currently visible time step.");
+    m_CheckProcessAll->setToolTip("Process all time steps of the dynamic segmentation and not just the currently visible time step.");
     m_CheckProcessAll->setVisible(!m_Mode2D);
+    //remark: keept m_CheckProcessAll deactivated in 2D because in this refactoring
+    //it should be kept to the status quo and it was not clear how interpolation
+    //would behave.
 
     m_CheckCreateNew = new QCheckBox("Create as new segmentation", this);
     m_CheckCreateNew->setChecked(false);
     m_CheckCreateNew->setToolTip("Add the confirmed segmentation as a new segmentation instead of overwriting the currently selected.");
     m_CheckCreateNew->setVisible(!m_Mode2D);
+    //remark: keept m_CheckCreateNew deactivated in 2D because in this refactoring
+    //it should be kept to the status quo and it was not clear how interpolation
+    //would behave.
 
     this->InitializeUI(m_MainLayout);
 

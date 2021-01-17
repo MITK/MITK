@@ -180,13 +180,13 @@ void mitk::FastMarchingBaseTool::OnAddPoint(StateMachineAction*, InteractionEven
 
     if (positionEvent != nullptr)
     {
-      auto newWorkingPlaneGeometry = positionEvent->GetSender()->GetCurrentWorldPlaneGeometry()->Clone();
+      auto workingPlaneGeometry = positionEvent->GetSender()->GetCurrentWorldPlaneGeometry();
 
-      // if click was on another plane and we are in 2D mode wie should reset the seeds
-      if (m_ToolDimension == 2 && ( nullptr == this->GetWorkingPlaneGeometry() || !this->GetWorkingPlaneGeometry()->IsOnPlane(newWorkingPlaneGeometry.GetPointer())))
+      // if click was on another plane and we are in 2D mode we should reset the seeds
+      if (m_ToolDimension == 2 && ( nullptr == this->GetWorkingPlaneGeometry() || !this->GetWorkingPlaneGeometry()->IsOnPlane(workingPlaneGeometry)))
       {
         this->ClearSeeds();
-        this->SetWorkingPlaneGeometry(newWorkingPlaneGeometry);
+        this->SetWorkingPlaneGeometry(workingPlaneGeometry->Clone());
       }
 
       m_SeedsAsPointSet->InsertPoint(m_SeedsAsPointSet->GetSize(), positionEvent->GetPositionInWorld());
@@ -205,8 +205,7 @@ void mitk::FastMarchingBaseTool::OnDelete(StateMachineAction*, InteractionEvent*
     // delete last seed point
     if (this->m_SeedsAsPointSet->GetSize() > 0)
     {
-      // delete last point in pointset - somehow ugly
-      m_SeedsAsPointSet->GetPointSet()->GetPoints()->DeleteIndex(m_SeedsAsPointSet->GetSize() - 1);
+      m_SeedsAsPointSet->RemovePointAtEnd(0);
 
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
@@ -229,7 +228,7 @@ void mitk::FastMarchingBaseTool::ClearSeeds()
 
 template <typename TPixel, unsigned int VImageDimension>
 void mitk::FastMarchingBaseTool::DoITKFastMarching(const itk::Image<TPixel, VImageDimension>* inputImage,
-  mitk::Image* previewImage, unsigned int timeStep, const mitk::BaseGeometry* inputGeometry)
+  Image* previewImage, unsigned int timeStep, const BaseGeometry* inputGeometry)
 {
   // typedefs for itk pipeline
   typedef itk::Image<TPixel, VImageDimension> InputImageType;

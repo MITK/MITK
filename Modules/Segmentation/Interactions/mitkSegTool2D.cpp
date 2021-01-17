@@ -160,9 +160,9 @@ void mitk::SegTool2D::UpdateSurfaceInterpolation(const std::vector<SliceInformat
   if (!m_SurfaceInterpolationEnabled)
     return;
 
-  //Remark the ImageTimeSelector is just needed to extract a timestep/channel of
-  //of the image in order to get the image dimension (time dimension and channel dimension stripped away).
-  //Therfore it is OK to always use time step 0 and channel 0
+  //Remark: the ImageTimeSelector is just needed to extract a timestep/channel of
+  //the image in order to get the image dimension (time dimension and channel dimension
+  //stripped away). Therfore it is OK to always use time step 0 and channel 0
   mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
   timeSelector->SetInput(workingImage);
   timeSelector->SetTimeNr(0);

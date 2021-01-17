@@ -102,7 +102,7 @@ void mitk::ContourModelUtils::FillContourInSlice(
 }
 
 void mitk::ContourModelUtils::FillContourInSlice(
-  const ContourModel *projectedContour, unsigned int contourTimeStep, Image *sliceImage, const Image* workingImage, int paintingPixelValue)
+  const ContourModel *projectedContour, TimeStepType contourTimeStep, Image *sliceImage, const Image* workingImage, int paintingPixelValue)
 {
   if (nullptr == projectedContour)
   {
@@ -210,7 +210,7 @@ void mitk::ContourModelUtils::FillSliceInSlice(
   }
 }
 
-mitk::ContourModel::Pointer mitk::ContourModelUtils::MoveZerothContourTimeStep(const ContourModel *contour, unsigned int t)
+mitk::ContourModel::Pointer mitk::ContourModelUtils::MoveZerothContourTimeStep(const ContourModel *contour, TimeStepType t)
 {
   if (nullptr == contour)
     return nullptr;

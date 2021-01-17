@@ -58,9 +58,7 @@ protected:
 
   Ui_QmitkOtsuToolWidgetControls m_Controls;
 
-  int m_NumberOfRegions = 0;
-  bool m_UseValleyEmphasis = false;
-  int m_NumberOfBins = 128;
+  bool m_FirstAccept = true;
 };
 
 #endif

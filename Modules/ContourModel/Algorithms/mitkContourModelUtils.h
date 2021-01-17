@@ -76,7 +76,7 @@ namespace mitk
     \pre projectedContour points to a valid instance
     */
     static void FillContourInSlice(const ContourModel *projectedContour,
-                                   unsigned int contourTimeStep,
+                                   TimeStepType contourTimeStep,
                                    Image *sliceImage,
                                    const Image* workingImage,
                                    int paintingPixelValue = 1);
@@ -92,7 +92,7 @@ namespace mitk
     /**
     \brief Move the contour in time step 0 to to a new contour model at the given time step.
     */
-    static ContourModel::Pointer MoveZerothContourTimeStep(const ContourModel *contour, unsigned int timeStep);
+    static ContourModel::Pointer MoveZerothContourTimeStep(const ContourModel *contour, TimeStepType timeStep);
 
     /**
     \brief Retrieves the active pixel value of a (labelset) image.

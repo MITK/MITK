@@ -73,7 +73,10 @@ namespace mitk
     mitk::ScalarType m_CheckPrecision;
   };
 
-  constexpr double NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION = 1e-6;
+  /* Changed NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION from 1e-6 due to
+     T28127. If https://github.com/QIICR/dcmqi/issues/414 is clarified we could
+     change it back*/
+  constexpr double NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION = 5e-5;
 
 } // namespace mitk
 

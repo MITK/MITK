@@ -33,7 +33,7 @@ std::vector<std::string> mitk::PropertyList::GetPropertyKeys(const std::string &
 
   if (contextName.empty() || includeDefaultContext)
   {
-    for (auto property : this->m_Properties)
+    for (const auto &property : this->m_Properties)
       propertyKeys.push_back(property.first);
   }
 

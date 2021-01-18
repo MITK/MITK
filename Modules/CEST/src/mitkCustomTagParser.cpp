@@ -350,7 +350,7 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
     mitkThrow() << "Could not parse json file. Error was:\n" << e.what();
   }
 
-  for (auto it : root)
+  for (const auto &it : root)
   {
     if (it.second.empty())
     {

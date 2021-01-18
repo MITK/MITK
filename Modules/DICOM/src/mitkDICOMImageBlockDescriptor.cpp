@@ -463,7 +463,7 @@ mitk::Image::Pointer mitk::DICOMImageBlockDescriptor::DescribeImageWithPropertie
 
   // get all found additional tags of interest
 
-  for (auto tag : m_FoundAdditionalTags)
+  for (const auto &tag : m_FoundAdditionalTags)
   {
     BaseProperty* prop = this->GetProperty(tag);
     if (prop)
@@ -876,7 +876,7 @@ mitk::DICOMImageBlockDescriptor::GetPropertyForDICOMValues(const DICOMCachedValu
   }
 
   StringLookupTable stringTable;
-  for (auto element : lookupTable)
+  for (const auto &element : lookupTable)
   {
     stringTable.SetTableValue(element.first, element.second.Value);
   }

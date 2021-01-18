@@ -67,7 +67,7 @@ QString SwitchToWindowMenu::CalcText(int number, IWorkbenchWindow* window)
   }
   else
   {
-    sb.append(suffix.left(MAX_TEXT_LENGTH));
+    sb.append(suffix.leftRef(MAX_TEXT_LENGTH));
     sb.append("...");
   }
   return sb;
@@ -87,7 +87,7 @@ void SwitchToWindowMenu::Fill(QMenu* menu, QAction* before)
   // Get workbench windows.
   IWorkbench* workbench = workbenchWindow->GetWorkbench();
   windows.clear();
-  for (auto window : workbench->GetWorkbenchWindows())
+  for (const auto &window : workbench->GetWorkbenchWindows())
   {
     windows.push_back(window.GetPointer());
   }
@@ -120,7 +120,7 @@ void SwitchToWindowMenu::Fill(QMenu* menu, QAction* before)
   auto   signalMapper = new QSignalMapper(menu);
   connect(signalMapper, SIGNAL(mapped(int)), SLOT(MenuItemTriggered(int)));
   int count = 0;
-  for (auto window : windows)
+  for (auto window : qAsConst(windows))
   {
     // can encounter disposed shells if this update is in response to a shell closing
     //if (!window->GetShell()->IsDisposed())

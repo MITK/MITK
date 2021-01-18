@@ -38,7 +38,7 @@ QHash<QString, QString> PreferencePageParameterValues::GetParameterValues() cons
       QList<IConfigurationElement::Pointer> configElements =
           registry->GetConfigurationElementsFor(PlatformUI::PLUGIN_ID(),
                                                 WorkbenchRegistryConstants::PL_PREFERENCES);
-      for (auto configElement : configElements)
+      for (const auto &configElement : qAsConst(configElements))
       {
         if(configElement->GetName() == "page")
         {

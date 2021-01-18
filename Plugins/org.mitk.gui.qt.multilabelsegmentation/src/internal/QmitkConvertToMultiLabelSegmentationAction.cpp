@@ -27,7 +27,7 @@ QmitkConvertToMultiLabelSegmentationAction::~QmitkConvertToMultiLabelSegmentatio
 
 void QmitkConvertToMultiLabelSegmentationAction::Run( const QList<mitk::DataNode::Pointer> &selectedNodes )
 {
-  for (auto referenceNode : selectedNodes)
+  for (const auto &referenceNode : selectedNodes)
   {
     if (referenceNode.IsNotNull())
     {

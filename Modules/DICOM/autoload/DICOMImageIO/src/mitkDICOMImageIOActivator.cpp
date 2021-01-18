@@ -68,7 +68,7 @@ namespace mitk {
     context->RegisterService<mitk::IDICOMTagsOfInterest>(m_DICOMTagsOfInterestService.get());
 
     DICOMTagPathMapType tagmap = GetDefaultDICOMTagsOfInterest();
-    for (auto tag : tagmap)
+    for (const auto &tag : tagmap)
     {
       m_DICOMTagsOfInterestService->AddTagOfInterest(tag.first);
     }

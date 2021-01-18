@@ -25,7 +25,7 @@ void QmitkLoadMultiLabelPresetAction::Run(const QList<mitk::DataNode::Pointer> &
   if (filename.empty())
     return;
 
-  for (auto node : selectedNodes)
+  for (const auto &node : selectedNodes)
   {
     if (node.IsNull())
       continue;

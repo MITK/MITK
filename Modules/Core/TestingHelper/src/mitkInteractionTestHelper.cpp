@@ -373,7 +373,7 @@ void mitk::InteractionTestHelper::Set3dCameraSettings()
       {
         RenderWindow *namedRenderer = nullptr;
 
-        for (auto it : m_RenderWindowList)
+        for (const auto &it : m_RenderWindowList)
         {
           if (strcmp(it->GetRenderer()->GetName(), rendererName) == 0)
           {

@@ -148,7 +148,7 @@ mitk::ProportionalTimeGeometry::Pointer mitk::ProportionalTimeGeometryToXML::Fro
   newTimeGeometry->ReserveSpaceForGeometries(allReadGeometries.size());
 
   TimeStepType t(0);
-  for (auto entry : allReadGeometries)
+  for (const auto &entry : allReadGeometries)
   {
     // We add items with newly assigned time steps.
     // This avoids great confusion when a file contains

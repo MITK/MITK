@@ -190,7 +190,7 @@ QModelIndex QmitkPropertyItemModel::FindProperty(const mitk::BaseProperty *prope
     QModelIndexList items =
       this->match(index(0, 0), Qt::DisplayRole, names.last(), -1, Qt::MatchRecursive | Qt::MatchExactly);
 
-    for (auto item : items)
+    for (auto item : qAsConst(items))
     {
       QModelIndex candidate = item;
 

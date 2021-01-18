@@ -363,7 +363,7 @@ void mitk::SourceImageRelationRule::Disconnect_datalayer(IPropertyOwner * source
     auto refs = GetReferenceSequenceIndices(source);
     std::sort(refs.begin(), refs.end());
 
-    for (auto refIndex : refs)
+    for (const auto &refIndex : refs)
     {
       if (refIndex.first >= deletedImageRefSequenceIndex)
       {

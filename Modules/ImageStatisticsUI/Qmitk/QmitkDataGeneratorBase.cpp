@@ -94,7 +94,7 @@ void QmitkDataGeneratorBase::OnFinalResultsAvailable(JobResultMapType results, c
 {
   auto resultnodes = mitk::DataStorage::SetOfObjects::New();
 
-  for (auto pos : results)
+  for (const auto &pos : results)
   {
     resultnodes->push_back(this->PrepareResultForStorage(pos.first, pos.second, job));
   }

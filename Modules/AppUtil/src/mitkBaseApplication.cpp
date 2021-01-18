@@ -315,7 +315,7 @@ namespace mitk
 
           auto pluginUrlsToStart = provInfo.getPluginsToStart();
 
-          for (const auto& url : pluginUrlsToStart)
+          for (const auto& url : qAsConst(pluginUrlsToStart))
             pluginsToStart.push_back(url.toString());
         }
       }
@@ -696,7 +696,7 @@ namespace mitk
     // Walk one directory up and add bin and lib sub-dirs; this might be redundant
     appDir.cdUp();
 
-    for (const auto& suffix : suffixes)
+    for (const auto& suffix : qAsConst(suffixes))
       ctkPluginFrameworkLauncher::addSearchPath(appDir.absoluteFilePath(suffix));
   }
 

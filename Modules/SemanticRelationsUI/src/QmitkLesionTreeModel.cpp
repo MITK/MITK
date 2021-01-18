@@ -242,7 +242,7 @@ void QmitkLesionTreeModel::AddLesion(const mitk::SemanticTypes::Lesion& lesion)
 void QmitkLesionTreeModel::SetSelectedDataNodesPresence()
 {
   m_DataNodePresence.clear();
-  for (const auto& dataNode : m_SelectedDataNodes)
+  for (const auto& dataNode : qAsConst(m_SelectedDataNodes))
   {
     if (!mitk::SemanticRelationsInference::InstanceExists(dataNode))
     {

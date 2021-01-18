@@ -126,7 +126,7 @@ void ChangeToPerspectiveMenu::FillMenu(IMenuManager* manager)
    * Convert the perspective descriptors to command parameters, and filter
    * using the activity/capability mechanism.
    */
-  for (IPerspectiveDescriptor::Pointer descriptor : persps)
+  for (const IPerspectiveDescriptor::Pointer &descriptor : qAsConst(persps))
   {
     CommandContributionItemParameter::Pointer ccip = GetItem(descriptor);
 

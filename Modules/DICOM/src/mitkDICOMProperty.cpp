@@ -19,7 +19,7 @@ mitk::GetDICOMPropertyForDICOMValuesFunctor(const mitk::DICOMCachedValueLookupTa
   const auto& lookupTable = cacheLookupTable.GetLookupTable();
   mitk::DICOMProperty::Pointer prop = mitk::DICOMProperty::New();
 
-  for (auto element : lookupTable)
+  for (const auto &element : lookupTable)
   {
     prop->SetValue(element.second.TimePoint, element.second.SliceInTimePoint, element.second.Value);
   }

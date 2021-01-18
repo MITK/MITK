@@ -228,7 +228,7 @@ void QtShowViewDialog::RestoreState()
       rootIndices[id] = sourceIndex;
     }
   }
-  for (IMemento::Pointer categoryChild : memento->GetChildren(TAG_CATEGORY))
+  for (const IMemento::Pointer &categoryChild : memento->GetChildren(TAG_CATEGORY))
   {
     QString id = categoryChild->GetID();
     if (!id.isEmpty())
@@ -242,7 +242,7 @@ void QtShowViewDialog::RestoreState()
   this->RestoreExpandedState();
 
   QItemSelection itemSelection;
-  for (IMemento::Pointer selectionChild : memento->GetChildren(TAG_SELECTION))
+  for (const IMemento::Pointer &selectionChild : memento->GetChildren(TAG_SELECTION))
   {
     QString id = selectionChild->GetID();
     if (!id.isEmpty())
@@ -271,7 +271,7 @@ void QtShowViewDialog::SaveState()
   geomChild->PutTextData(geom.toBase64().constData());
 
   // expanded categories
-  for (QPersistentModelIndex index : m_ExpandedCategories)
+  for (const QPersistentModelIndex &index : qAsConst(m_ExpandedCategories))
   {
     if (index.isValid())
     {
@@ -315,7 +315,7 @@ QtShowViewDialog::GetSelection() const
   QList<QString> selected;
 
   QModelIndexList indices = m_UserInterface.m_TreeView->selectionModel()->selectedIndexes();
-  for(QModelIndex index : indices)
+  for(QModelIndex index : qAsConst(indices))
   {
     QString id = m_FilterModel->data(index, ViewTreeModel::Id).toString();
     selected.push_back(id);

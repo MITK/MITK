@@ -43,7 +43,7 @@ mitk::DICOMFilePathList mitk::FilterForDICOMFiles(const DICOMFilePathList& fileL
   mitk::DICOMFilePathList result;
 
   itk::GDCMImageIO::Pointer io = itk::GDCMImageIO::New();
-  for (auto aFile : fileList)
+  for (const auto &aFile : fileList)
   {
     if (io->CanReadFile(aFile.c_str()))
     {

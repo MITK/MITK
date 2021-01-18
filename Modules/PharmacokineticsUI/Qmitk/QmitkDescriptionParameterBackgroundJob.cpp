@@ -76,7 +76,7 @@ mitk::modelFit::ModelFitResultNodeVectorType DescriptionParameterBackgroundJob::
 {
   mitk::modelFit::ModelFitResultNodeVectorType results;
 
-  for (auto image : paramimages)
+  for (const auto &image : paramimages)
   {
     if (image.second.IsNull())
     {

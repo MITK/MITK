@@ -55,7 +55,7 @@ KeywordRegistry*KeywordRegistry::GetInstance()
 
 void KeywordRegistry::AddExtension(IExtensionTracker* tracker, const SmartPointer<IExtension>& extension)
 {
-  for (auto element : extension->GetConfigurationElements())
+  for (const auto &element : extension->GetConfigurationElements())
   {
     if (element->GetName() == TAG_KEYWORD)
     {
@@ -76,7 +76,7 @@ QString KeywordRegistry::GetKeywordLabel(const QString& id)
 
 void KeywordRegistry::RemoveExtension(const SmartPointer<IExtension>& /*extension*/, const QList<SmartPointer<Object> >& objects)
 {
-  for (auto object : objects)
+  for (const auto &object : objects)
   {
     if (ObjectString::Pointer objString = object.Cast<ObjectString>())
     {

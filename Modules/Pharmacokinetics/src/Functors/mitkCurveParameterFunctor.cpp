@@ -92,14 +92,14 @@ mitk::CurveParameterFunctor::GetDescriptionParameterNames() const
 {
   ParameterNamesType result;
 
-  for (auto descriptor : m_DescriptorMap)
+  for (const auto &descriptor : m_DescriptorMap)
   {
     CurveDescriptionParameterBase::DescriptionParameterNamesType fctResults =
       descriptor.second->GetDescriptionParameterName();
 
     if (fctResults.size() > 1)
     {
-      for (auto fctName : fctResults)
+      for (const auto &fctName : fctResults)
       {
         result.push_back(descriptor.first + "_" + fctName);
       }

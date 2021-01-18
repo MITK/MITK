@@ -75,19 +75,19 @@ MITKMODELFIT_EXPORT void mitk::storeModelFitGeneratorResults(const std::string& 
 {
   if (generator)
   {
-    for (auto imageIterator : generator->GetParameterImages())
+    for (const auto &imageIterator : generator->GetParameterImages())
     {
       storeModelFitResultImage(outputPathTemplate, imageIterator.first, imageIterator.second, mitk::modelFit::Parameter::ParameterType, fitSession);
     }
-    for (auto imageIterator : generator->GetDerivedParameterImages())
+    for (const auto &imageIterator : generator->GetDerivedParameterImages())
     {
       storeModelFitResultImage(outputPathTemplate, imageIterator.first, imageIterator.second, mitk::modelFit::Parameter::DerivedType, fitSession);
     }
-    for (auto imageIterator : generator->GetCriterionImages())
+    for (const auto &imageIterator : generator->GetCriterionImages())
     {
       storeModelFitResultImage(outputPathTemplate, imageIterator.first, imageIterator.second, mitk::modelFit::Parameter::CriterionType, fitSession);
     }
-    for (auto imageIterator : generator->GetEvaluationParameterImages())
+    for (const auto &imageIterator : generator->GetEvaluationParameterImages())
     {
       storeModelFitResultImage(outputPathTemplate, imageIterator.first, imageIterator.second, mitk::modelFit::Parameter::EvaluationType, fitSession);
     }
@@ -99,19 +99,19 @@ MITKMODELFIT_EXPORT void mitk::previewModelFitGeneratorResults(const std::string
 {
   if (generator)
   {
-    for (auto aName : generator->GetParameterNames())
+    for (const auto &aName : generator->GetParameterNames())
     {
       std::cout << "Store result " << convertParameterTypeToStr(modelFit::Parameter::ParameterType) << ": " << aName << " -> " << generateModelFitResultImagePath(outputPathTemplate, aName) << std::endl;
     }
-    for (auto aName : generator->GetDerivedParameterNames())
+    for (const auto &aName : generator->GetDerivedParameterNames())
     {
       std::cout << "Store result " << convertParameterTypeToStr(modelFit::Parameter::DerivedType) << ": " << aName << " -> " << generateModelFitResultImagePath(outputPathTemplate, aName) << std::endl;
     }
-    for (auto aName : generator->GetCriterionNames())
+    for (const auto &aName : generator->GetCriterionNames())
     {
       std::cout << "Store result " << convertParameterTypeToStr(modelFit::Parameter::CriterionType) << ": " << aName << " -> " << generateModelFitResultImagePath(outputPathTemplate, aName) << std::endl;
     }
-    for (auto aName : generator->GetEvaluationParameterNames())
+    for (const auto &aName : generator->GetEvaluationParameterNames())
     {
       std::cout << "Store result " << convertParameterTypeToStr(modelFit::Parameter::EvaluationType) << ": " << aName << " -> " << generateModelFitResultImagePath(outputPathTemplate, aName) << std::endl;
     }

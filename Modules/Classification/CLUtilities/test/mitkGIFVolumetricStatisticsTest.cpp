@@ -48,7 +48,7 @@ public:
     auto featureList = featureCalculator->CalculateFeatures(m_IBSI_Phantom_Image_Large, m_IBSI_Phantom_Mask_Large);
 
     std::map<std::string, double> results;
-    for (auto valuePair : featureList)
+    for (const auto &valuePair : featureList)
     {
       MITK_INFO << mitk::AbstractGlobalImageFeature::GenerateLegacyFeatureNameWOEncoding(valuePair.first) << " : " << valuePair.second;
       results[mitk::AbstractGlobalImageFeature::GenerateLegacyFeatureNameWOEncoding(valuePair.first)] = valuePair.second;

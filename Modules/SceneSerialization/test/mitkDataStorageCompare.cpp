@@ -137,7 +137,7 @@ std::string mitk::DataStorageCompare::GenerateHierarchyDescriptor(mitk::DataNode
   // construct descriptors for parents
   std::vector<std::string> parentDescriptors;
 
-  for (auto parent : *parents)
+  for (const auto &parent : *parents)
     parentDescriptors.push_back(GenerateHierarchyDescriptor(parent, storage));
 
   // sort descriptors (we don't want to rely on potentially random order of parents)
@@ -147,7 +147,7 @@ std::string mitk::DataStorageCompare::GenerateHierarchyDescriptor(mitk::DataNode
   if (!parentDescriptors.empty())
   {
     thisNodesDescriptor += " <(";
-    for (auto descriptor : parentDescriptors)
+    for (const auto &descriptor : parentDescriptors)
     {
       if (descriptor != parentDescriptors.front()) // join by '+'
       {
@@ -170,7 +170,7 @@ bool mitk::DataStorageCompare::CompareHierarchy(bool verbose)
   // an identical hierarchy descriptor.
   // Compare just counts because there might be
   // multiple nodes that have the same name / type / etc.
-  for (auto entry : m_RefNodesByHierarchy)
+  for (const auto &entry : m_RefNodesByHierarchy)
   {
     const std::string &key = entry.first;
     const mitk::DataNode::Pointer &node = entry.second;
@@ -192,7 +192,7 @@ bool mitk::DataStorageCompare::CompareHierarchy(bool verbose)
   }
 
   // test also keys that are _only_ in test!
-  for (auto entry : m_TestNodesByHierarchy)
+  for (const auto &entry : m_TestNodesByHierarchy)
   {
     const std::string &key = entry.first;
     const mitk::DataNode::Pointer &node = entry.second;
@@ -223,7 +223,7 @@ bool mitk::DataStorageCompare::CompareHierarchy(bool verbose)
   if (verbose && numberOfMisMatches > 0)
   {
     MITK_WARN << "Dumping test storage because there were errors:";
-    for (auto entry : m_TestNodesByHierarchy)
+    for (const auto &entry : m_TestNodesByHierarchy)
     {
       const std::string &key = entry.first;
       const mitk::DataNode::Pointer &node = entry.second;
@@ -343,7 +343,7 @@ bool mitk::DataStorageCompare::ArePropertyListsEqual(const mitk::DataNode &refer
   bool error = false;
   if (refListNames.size() != testListNames.size())
   {
-    for (auto name : refListNames)
+    for (const auto &name : refListNames)
       if (std::find(testListNames.begin(), testListNames.end(), name) == testListNames.end())
       {
         MITK_WARN << "Propertylist '" << name << "' from reference node (" << reference.GetName()
@@ -351,7 +351,7 @@ bool mitk::DataStorageCompare::ArePropertyListsEqual(const mitk::DataNode &refer
         error = true;
       }
 
-    for (auto name : testListNames)
+    for (const auto &name : testListNames)
       if (std::find(refListNames.begin(), refListNames.end(), name) == refListNames.end())
       {
         MITK_WARN << "Propertylist '" << name << "' did not exist in reference node (" << reference.GetName()
@@ -364,7 +364,7 @@ bool mitk::DataStorageCompare::ArePropertyListsEqual(const mitk::DataNode &refer
   }
 
   // compare each list
-  for (auto name : refListNames)
+  for (const auto &name : refListNames)
   {
     if (!ArePropertyListsEqual(*(reference.GetPropertyList(name)), *(test.GetPropertyList(name)), verbose))
     {
@@ -384,7 +384,7 @@ bool mitk::DataStorageCompare::ArePropertyListsEqual(const mitk::PropertyList &r
 
   bool error = false;
 
-  for (auto refEntry : *refMap)
+  for (const auto &refEntry : *refMap)
   {
     std::string propertyKey = refEntry.first;
     BaseProperty::Pointer refProperty = refEntry.second;
@@ -499,7 +499,7 @@ bool mitk::DataStorageCompare::CompareDataNodes(bool verbose)
 {
   int numberOfMisMatches = 0;
 
-  for (auto entry : m_RefNodesByHierarchy)
+  for (const auto &entry : m_RefNodesByHierarchy)
   {
     const std::string &key = entry.first;
     const mitk::DataNode::Pointer &refNode = entry.second;

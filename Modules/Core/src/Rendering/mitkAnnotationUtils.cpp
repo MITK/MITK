@@ -115,7 +115,7 @@ namespace mitk
     std::vector<us::ServiceReferenceU> serviceReferences =
       context->GetServiceReferences(AbstractAnnotationRenderer::US_INTERFACE_NAME, filter);
     std::vector<AbstractAnnotationRenderer *> arList;
-    for (us::ServiceReferenceU service : serviceReferences)
+    for (const us::ServiceReferenceU &service : serviceReferences)
     {
       arList.push_back(context->GetService<AbstractAnnotationRenderer>(service));
     }

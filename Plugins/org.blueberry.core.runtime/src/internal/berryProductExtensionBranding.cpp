@@ -77,7 +77,7 @@ void ProductExtensionBranding::LoadProperties(const SmartPointer<IConfigurationE
 {
   QList<IConfigurationElement::Pointer> children = element->GetChildren();
   properties.clear();
-  for (auto child : children)
+  for (const auto &child : qAsConst(children))
   {
     QString key = child->GetAttribute(ATTR_NAME);
     QString value = child->GetAttribute(ATTR_VALUE);

@@ -291,7 +291,7 @@ bool DebugUtil::PrintObjectSummary(bool details)
 {
   QSet<QString> names;
 
-  for (auto object : m_TraceIdToObjectMap)
+  for (auto object : qAsConst(m_TraceIdToObjectMap))
     names.insert(object->GetClassName());
 
   if (!names.isEmpty())

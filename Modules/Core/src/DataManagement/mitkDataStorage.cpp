@@ -523,7 +523,7 @@ mitk::DataNode::Pointer mitk::FindTopmostVisibleNode(const DataStorage::SetOfObj
   mitk::DataNode::Pointer topLayerNode = nullptr;
   int maxLayer = std::numeric_limits<int>::min();
 
-  for (auto node : *nodes)
+  for (const auto &node : *nodes)
   {
     if (node.IsNull())
     {

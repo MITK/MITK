@@ -202,7 +202,7 @@ ViewTreeModel::ViewTreeModel(const IWorkbenchWindow* window, QObject* parent)
   QList<CategoryTreeItem*> categoryItems;
 
   QList<IViewCategory::Pointer> categories = d->viewRegistry.GetCategories();
-  for (auto category : categories)
+  for (const auto &category : qAsConst(categories))
   {
     if (category->GetViews().isEmpty()) continue;
     CategoryTreeItem* categoryItem = new CategoryTreeItem(this, category);
@@ -221,7 +221,7 @@ ViewTreeModel::ViewTreeModel(const IWorkbenchWindow* window, QObject* parent)
   if (categoryItems.size() == 1)
   {
     QList<ViewTreeItem*> items = categoryItems.front()->takeChildren();
-    for (auto item : items)
+    for (auto item : qAsConst(items))
     {
       d->rootItem->appendChild(item);
     }
@@ -229,7 +229,7 @@ ViewTreeModel::ViewTreeModel(const IWorkbenchWindow* window, QObject* parent)
   }
   else
   {
-    for (auto category : categoryItems)
+    for (auto category : qAsConst(categoryItems))
     {
       d->rootItem->appendChild(category);
     }
@@ -379,10 +379,10 @@ QSet<QString> DescriptorTreeItem::keywordLabels() const
   QStringList ids = m_descriptor->GetKeywordReferences();
   QSet<QString> keywords;
   keywords.insert(m_descriptor->GetLabel());
-  for(auto id : ids)
+  for(const auto &id : qAsConst(ids))
   {
     QString label = registry->GetKeywordLabel(id);
-    for (auto keyword : label.split(' ', QString::SkipEmptyParts))
+    for (const auto &keyword : label.split(' ', QString::SkipEmptyParts))
     {
       keywords.insert(keyword);
     }
@@ -427,7 +427,7 @@ QSet<QString> CategoryTreeItem::keywordLabels() const
   QSet<QString> keywords;
   for(auto child : this->m_children)
   {
-    for (auto keyword : child->data(ViewTreeModel::Keywords).toStringList())
+    for (const auto &keyword : child->data(ViewTreeModel::Keywords).toStringList())
     {
       keywords.insert(keyword);
     }
@@ -439,7 +439,7 @@ void CategoryTreeItem::CreateChildren()
 {
   auto viewDescriptors = m_category->GetViews();
   RemoveIntroView(viewDescriptors);
-  for(auto viewDescriptor : viewDescriptors)
+  for(const auto &viewDescriptor : qAsConst(viewDescriptors))
   {
     new DescriptorTreeItem(this->m_model, viewDescriptor, this);
   }

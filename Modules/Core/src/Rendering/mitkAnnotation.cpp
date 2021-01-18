@@ -49,7 +49,7 @@ void mitk::Annotation::SetUSProperty(const std::string &propertyKey, us::Any val
     us::ServiceProperties props;
     std::vector<std::string> propertyKeys;
     m_ServiceRegistration.GetReference().GetPropertyKeys(propertyKeys);
-    for (std::string key : propertyKeys)
+    for (const std::string &key : propertyKeys)
     {
       props[key] = m_ServiceRegistration.GetReference().GetProperty(key);
     }

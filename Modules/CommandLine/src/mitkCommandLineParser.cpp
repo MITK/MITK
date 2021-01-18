@@ -471,7 +471,7 @@ map<string, us::Any> mitkCommandLineParser::parseArguments(const StringContainer
 
     // Skip if argument has already been parsed ...
     bool alreadyProcessed = false;
-    for (auto alreadyHandledArgument : Internal->ProcessedArguments)
+    for (const auto &alreadyHandledArgument : Internal->ProcessedArguments)
       if (argument.compare(alreadyHandledArgument) == 0)
       {
         alreadyProcessed = true;

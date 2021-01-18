@@ -211,7 +211,7 @@ void QmitkViewCoordinator::WindowClosed(const berry::IWorkbenchWindow::Pointer& 
 
 void QmitkViewCoordinator::RenderWindowPartActivated(mitk::IRenderWindowPart* renderPart)
 {
-  for (auto& listener : m_RenderWindowListeners)
+  for (auto& listener : qAsConst(m_RenderWindowListeners))
   {
     listener->RenderWindowPartActivated(renderPart);
   }
@@ -219,7 +219,7 @@ void QmitkViewCoordinator::RenderWindowPartActivated(mitk::IRenderWindowPart* re
 
 void QmitkViewCoordinator::RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderPart)
 {
-  for (auto& listener : m_RenderWindowListeners)
+  for (auto& listener : qAsConst(m_RenderWindowListeners))
   {
     listener->RenderWindowPartDeactivated(renderPart);
   }
@@ -227,7 +227,7 @@ void QmitkViewCoordinator::RenderWindowPartDeactivated(mitk::IRenderWindowPart* 
 
 void QmitkViewCoordinator::RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderPart)
 {
-  for (auto& listener : m_RenderWindowListeners)
+  for (auto& listener : qAsConst(m_RenderWindowListeners))
   {
     listener->RenderWindowPartInputChanged(renderPart);
   }

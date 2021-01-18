@@ -135,7 +135,7 @@ IBranding* ApplicationContainer::GetBranding() const
     return branding.data();
   }
   QList<IConfigurationElement::Pointer> elements = extensionRegistry->GetConfigurationElementsFor(PI_RUNTIME, PT_PRODUCTS);
-  for (auto element : elements)
+  for (const auto &element : qAsConst(elements))
   {
     if (element->GetName().compare("provider", Qt::CaseInsensitive) == 0)
     {
@@ -143,7 +143,7 @@ IBranding* ApplicationContainer::GetBranding() const
       {
         IProductProvider* provider = element->CreateExecutableExtension<IProductProvider>("run");
         QList<IProduct::Pointer> products = provider->GetProducts();
-        for (auto product : products)
+        for (const auto &product : qAsConst(products))
         {
           if (productId.compare(product->GetId(), Qt::CaseInsensitive) == 0)
           {
@@ -375,7 +375,7 @@ QString ApplicationContainer::GetAvailableAppsMsg() const
   if (!availableApps.isEmpty())
   {
     availableAppsMsg = availableApps.front()->GetUniqueIdentifier();
-    for (auto availableApp : availableApps)
+    for (const auto &availableApp : qAsConst(availableApps))
     {
       availableAppsMsg = availableAppsMsg + ", " + availableApp->GetUniqueIdentifier();
     }
@@ -484,7 +484,7 @@ void ApplicationContainer::StopAllApps()
 {
   // get a stapshot of running applications
   QList<ctkServiceReference> runningRefs = context->getServiceReferences<ctkApplicationHandle>("(!(application.state=STOPPING))");
-  for (auto runningRef : runningRefs)
+  for (const auto &runningRef : qAsConst(runningRefs))
   {
     ctkApplicationHandle* handle = context->getService<ctkApplicationHandle>(runningRef);
     try
@@ -680,7 +680,7 @@ void ApplicationContainer::removedService(const ctkServiceReference& /*reference
 
 void ApplicationContainer::Added(const QList<SmartPointer<IExtension> >& extensions)
 {
-  for (IExtension::Pointer extension : extensions)
+  for (const IExtension::Pointer &extension : extensions)
   {
     CreateAppDescriptor(extension);
   }
@@ -693,7 +693,7 @@ void ApplicationContainer::Added(const QList<SmartPointer<IExtensionPoint> >& /*
 
 void ApplicationContainer::Removed(const QList<SmartPointer<IExtension> >& extensions)
 {
-  for (IExtension::Pointer extension : extensions)
+  for (const IExtension::Pointer &extension : extensions)
   {
     RemoveAppDescriptor(extension->GetUniqueIdentifier());
   }

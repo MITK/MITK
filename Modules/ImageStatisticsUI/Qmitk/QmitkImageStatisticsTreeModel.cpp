@@ -301,7 +301,7 @@ void QmitkImageStatisticsTreeModel::BuildHierarchicalModel()
 
   std::map<mitk::DataNode::ConstPointer, QmitkImageStatisticsTreeItem *> dataNodeToTreeItem;
 
-  for (auto statistic : m_Statistics)
+  for (const auto &statistic : m_Statistics)
   {
     bool isWIP = statistic->GetProperty(mitk::STATS_GENERATION_STATUS_PROPERTY_NAME.c_str()).IsNotNull();
     // get the connected image data node/mask data node

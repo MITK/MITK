@@ -41,7 +41,7 @@ mitk::DataStorageInspectorGenerator::ProviderMapType mitk::DataStorageInspectorG
 
   ProviderMapType result;
 
-  for (auto regs : providerRegisters)
+  for (const auto &regs : providerRegisters)
   {
     auto provider = us::GetModuleContext()->GetService<mitk::IDataStorageInspectorProvider>(regs);
     result.insert(std::make_pair(provider->GetInspectorID(), provider));

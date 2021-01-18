@@ -139,7 +139,7 @@ namespace mitk
       StringLookupTable filesLut = filesProp->GetValue();
       const StringLookupTable::LookupTableType &lookUpTableMap = filesLut.GetLookupTable();
 
-      for (auto it : lookUpTableMap)
+      for (const auto &it : lookUpTableMap)
       {
         const char *fileName = (it.second).c_str();
         if (readFileFormat->loadFile(fileName, EXS_Unknown).good())

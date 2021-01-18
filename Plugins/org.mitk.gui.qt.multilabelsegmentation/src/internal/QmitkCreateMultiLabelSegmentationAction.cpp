@@ -41,7 +41,7 @@ void QmitkCreateMultiLabelSegmentationAction::Run( const QList<mitk::DataNode::P
     return;
   }
 
-  for ( auto referenceNode : selectedNodes )
+  for ( const auto &referenceNode : selectedNodes )
   {
     if (referenceNode.IsNotNull())
     {

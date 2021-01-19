@@ -51,7 +51,7 @@ void mitk::ContourModel::AddVertex(const Point3D &vertex, bool isControlPoint, T
 
 void mitk::ContourModel::AddVertex(const VertexType &vertex, TimeStepType timestep)
 {
-  this->AddVertex(vertex.Coordinates, vertex.IsControlPoint);
+  this->AddVertex(vertex.Coordinates, vertex.IsControlPoint, timestep);
 }
 
 void mitk::ContourModel::AddVertexAtFront(const Point3D &vertex, TimeStepType timestep)
@@ -82,7 +82,7 @@ bool mitk::ContourModel::SetVertexAt(int pointId, const Point3D &point, TimeStep
 {
   if (!this->IsEmptyTimeStep(timestep))
   {
-    if (pointId >= 0 && this->m_ContourSeries[timestep]->GetSize() > pointId)
+    if (pointId >= 0 && this->m_ContourSeries[timestep]->GetSize() > ContourElement::VertexSizeType(pointId))
     {
       this->m_ContourSeries[timestep]->SetVertexAt(pointId, point);
       this->Modified();
@@ -101,7 +101,7 @@ bool mitk::ContourModel::SetVertexAt(int pointId, const VertexType *vertex, Time
 
   if (!this->IsEmptyTimeStep(timestep))
   {
-    if (pointId >= 0 && this->m_ContourSeries[timestep]->GetSize() > pointId)
+    if (pointId >= 0 && this->m_ContourSeries[timestep]->GetSize() > ContourElement::VertexSizeType(pointId))
     {
       this->m_ContourSeries[timestep]->SetVertexAt(pointId, vertex);
       this->Modified();
@@ -117,7 +117,7 @@ void mitk::ContourModel::InsertVertexAtIndex(const Point3D &vertex, int index, b
 {
   if (!this->IsEmptyTimeStep(timestep))
   {
-    if (index >= 0 && this->m_ContourSeries[timestep]->GetSize() > index)
+    if (index >= 0 && this->m_ContourSeries[timestep]->GetSize() > ContourElement::VertexSizeType(index))
     {
       this->m_ContourSeries[timestep]->InsertVertexAtIndex(vertex, isControlPoint, index);
       this->InvokeEvent(ContourModelSizeChangeEvent());
@@ -181,7 +181,7 @@ int mitk::ContourModel::GetNumberOfVertices(TimeStepType timestep) const
 
 const mitk::ContourModel::VertexType *mitk::ContourModel::GetVertexAt(int index, TimeStepType timestep) const
 {
-  if (!this->IsEmptyTimeStep(timestep))
+  if (!this->IsEmptyTimeStep(timestep) && this->m_ContourSeries[timestep]->GetSize()>mitk::ContourElement::VertexSizeType(index))
   {
     return this->m_ContourSeries[timestep]->GetVertexAt(index);
   }

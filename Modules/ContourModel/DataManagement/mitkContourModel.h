@@ -250,6 +250,7 @@ namespace mitk
     bool IsEmpty() const override;
 
     /** \brief Returns the vertex at the index position within the container.
+    * If the index or timestep is invalid a nullptr will be returned.
     */
     virtual const VertexType *GetVertexAt(int index, TimeStepType timestep = 0) const;
 

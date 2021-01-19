@@ -33,6 +33,21 @@ static void TestAddVertex()
   MITK_TEST_CONDITION(contour->GetTimeSteps() == 1, "Add a vertex to an unsupported time step has not changed geometry.");
   MITK_TEST_CONDITION(contour->IsEmptyTimeStep(1), "Add a vertex to an unsupported time step has not added an contour element.");
   MITK_TEST_CONDITION(contour->GetNumberOfVertices(1) == -1, "Add a vertex to an unsupported time step has not added an contour element.");
+
+  contour->Expand(3);
+
+  mitk::Point3D p2;
+  p2[0] = p2[1] = p2[2] = 2;
+  mitk::Point3D p3;
+  p3[0] = p3[1] = p3[2] = 3;
+
+  contour->AddVertex(p2, mitk::TimeStepType(1));
+  contour->AddVertex(mitk::ContourModel::VertexType(p3), mitk::TimeStepType(1));
+
+  MITK_TEST_CONDITION(!contour->IsEmptyTimeStep(1), "Add a vertex to an unsupported time step has not added an contour element.");
+  MITK_TEST_CONDITION(contour->GetVertexAt(0,1)->Coordinates == p2, "Add a vertex to the 2nd time step (as Point).");
+  MITK_TEST_CONDITION(contour->GetVertexAt(1,1)->Coordinates == p3, "Add a vertex to the 2nd time step via overload (as vertex type).");
+  MITK_TEST_CONDITION(contour->GetNumberOfVertices(1) == 2, "Add a vertex to an unsupported time step has not added an contour element.");
 }
 
 // Select a vertex by index. successful if the selected vertex member of the contour is no longer set to null
@@ -326,6 +341,9 @@ static void TestInvalidTimeStep()
   MITK_TEST_CONDITION(contour->SelectVertexAt(0, invalidTimeStep) == false, "test select vertex at invalid timestep");
 
   MITK_TEST_CONDITION(contour->RemoveVertexAt(0, invalidTimeStep) == false, "test remove vertex at invalid timestep");
+
+  MITK_TEST_CONDITION(contour->GetVertexAt(0, 5) == nullptr, "Access a vertex on an invalid time step.");
+  MITK_TEST_CONDITION(contour->GetVertexAt(10, 0) == nullptr, "Access a vertex on an invalid index.");
 }
 
 static void TestEmptyContour()

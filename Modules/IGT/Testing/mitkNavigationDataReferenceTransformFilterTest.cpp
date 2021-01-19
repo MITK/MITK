@@ -198,9 +198,9 @@ int mitkNavigationDataReferenceTransformFilterTest(int /* argc */, char* /*argv*
 
   // now subtract them from the filter landmarks and compare them to the source pos
 
-  pointA = myFilter->GetSourceLandmarks()->GetPoint(0)-pointA;
-  pointB = myFilter->GetSourceLandmarks()->GetPoint(1)-pointB;
-  pointC = myFilter->GetSourceLandmarks()->GetPoint(2)-pointC;
+  pointA = mitk::Point3D(myFilter->GetSourceLandmarks()->GetPoint(0)-pointA);
+  pointB = mitk::Point3D(myFilter->GetSourceLandmarks()->GetPoint(1)-pointB);
+  pointC = mitk::Point3D(myFilter->GetSourceLandmarks()->GetPoint(2)-pointC);
 
   MITK_TEST_CONDITION_REQUIRED(mitk::Equal(sourcePos1,pointA,mitk::eps,true), "Testing if point generation of first point is correct");
   MITK_TEST_CONDITION_REQUIRED(mitk::Equal(sourcePos1,pointB,mitk::eps,true), "Testing if point generation of second point is correct");

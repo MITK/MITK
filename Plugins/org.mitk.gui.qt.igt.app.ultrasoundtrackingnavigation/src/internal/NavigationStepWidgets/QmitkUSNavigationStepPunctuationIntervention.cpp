@@ -260,7 +260,7 @@ void QmitkUSNavigationStepPunctuationIntervention::UpdateCriticalStructures(mitk
     float radius = -1;
     mitk::Point3D center;
     currentNode->GetFloatProperty("zone.size", radius);
-    center = currentNode->GetData()->GetGeometry()->GetIndexToWorldTransform()->GetTranslation();
+    center = mitk::Point3D(currentNode->GetData()->GetGeometry()->GetIndexToWorldTransform()->GetTranslation());
     mitk::Point3D point0 = path->GetPoint(0);
     mitk::Point3D point1 = path->GetPoint(1);
     if (CheckSphereLineIntersection(center,radius,point0,point1))

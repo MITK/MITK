@@ -521,7 +521,7 @@ void QmitkIGTNavigationToolCalibration::OnCalibrateToolAxis()
   m_CalibratedToolAxis.Normalize();
   MITK_DEBUG << "Tool Axis: " << m_CalibratedToolAxis;
 
-  m_ToolToCalibrate->SetToolAxis(m_CalibratedToolAxis);
+  m_ToolToCalibrate->SetToolAxis(mitk::Point3D(m_CalibratedToolAxis));
 
   // Update TrackingTool
   m_ComputedToolTipTransformation->SetPosition(m_ToolToCalibrate->GetToolTipPosition());
@@ -546,7 +546,7 @@ void QmitkIGTNavigationToolCalibration::OnToolAxisSpinboxChanged()
   m_CalibratedToolAxis.SetElement(0, m_Controls.m_ToolAxis_X->value());
   m_CalibratedToolAxis.SetElement(1, m_Controls.m_ToolAxis_Y->value());
   m_CalibratedToolAxis.SetElement(2, m_Controls.m_ToolAxis_Z->value());
-  m_ToolToCalibrate->SetToolAxis(m_CalibratedToolAxis);
+  m_ToolToCalibrate->SetToolAxis(mitk::Point3D(m_CalibratedToolAxis));
   // Update TrackingTool
   if (m_ComputedToolTipTransformation.IsNull())
   {

@@ -1157,7 +1157,7 @@ void QmitkUSNavigationStepCtUsRegistration::NumerateFiducialMarks()
 
   for (unsigned int counter = 1; counter <= m_FiducialMarkerCentroids.size(); ++counter)
   {
-    m_MarkerFloatingImageCoordinateSystemPointSet->InsertPoint(counter - 1, m_FiducialMarkerCentroids.at(counter));
+    m_MarkerFloatingImageCoordinateSystemPointSet->InsertPoint(counter - 1, mitk::Point3D(m_FiducialMarkerCentroids.at(counter)));
   }
   if( !m_PerformingGroundTruthProtocolEvaluation )
   {

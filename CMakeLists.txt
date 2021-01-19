@@ -860,9 +860,6 @@ set(CMAKE_MODULE_PATH
   )
 
 if(MITK_USE_DCMTK)
-  # Due to the preferred CONFIG mode in find_package calls above,
-  # the DCMTKConfig.cmake file is read, which does not provide useful
-  # package information. We explictly need MODULE mode to find DCMTK.
   if(${_dcmtk_dir_orig} MATCHES "${MITK_EXTERNAL_PROJECT_PREFIX}.*")
     # Help our FindDCMTK.cmake script find our super-build DCMTK
     set(DCMTK_DIR ${MITK_EXTERNAL_PROJECT_PREFIX})
@@ -870,7 +867,6 @@ if(MITK_USE_DCMTK)
     # Use the original value
     set(DCMTK_DIR ${_dcmtk_dir_orig})
   endif()
-  find_package(DCMTK REQUIRED MODULE)
 endif()
 
 if(MITK_USE_DCMQI)

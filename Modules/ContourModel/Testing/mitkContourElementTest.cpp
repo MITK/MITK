@@ -82,7 +82,7 @@ public:
 
   void Iterator()
   {
-    mitk::ContourElement::ConstPointer constcontour = m_Contour5to6;
+    mitk::ContourElement::ConstPointer constcontour = m_Contour5to6.GetPointer();
     CPPUNIT_ASSERT_MESSAGE("Begin does not point to correct element", m_Contour1to4->IteratorBegin().operator*()->Coordinates == m_p1);
     CPPUNIT_ASSERT_MESSAGE("Begin does not point to correct element", m_Contour1to4->ConstIteratorBegin().operator*()->Coordinates == m_p1);
     CPPUNIT_ASSERT_MESSAGE("Begin does not point to correct element", m_Contour5to6->begin().operator*()->Coordinates == m_p5);
@@ -142,7 +142,7 @@ public:
 
   void GetSetVertexAt()
   {
-    mitk::ContourElement::ConstPointer constcontour = m_Contour1to4;
+    mitk::ContourElement::ConstPointer constcontour = m_Contour1to4.GetPointer();
 
     auto v0 = m_Contour1to4->GetVertexAt(0);
     auto v1 = m_Contour1to4->GetVertexAt(1);

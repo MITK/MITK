@@ -337,6 +337,11 @@ public:
     CPPUNIT_ASSERT(m_Contour_empty->GetSize() == 0);
     CPPUNIT_ASSERT(!m_Contour1to4->IsEmpty());
     CPPUNIT_ASSERT(m_Contour_empty->IsEmpty());
+
+    mitk::ContourElement::Pointer copyConstructed = m_Contour5to6->Clone();
+    CPPUNIT_ASSERT(*(m_Contour5to6->GetVertexAt(0)) == *(copyConstructed->GetVertexAt(0)));
+    CPPUNIT_ASSERT(*(m_Contour5to6->GetVertexAt(1)) == *(copyConstructed->GetVertexAt(1)));
+    CPPUNIT_ASSERT(m_Contour5to6->GetSize() == copyConstructed->GetSize());
   }
 
 };

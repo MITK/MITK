@@ -56,10 +56,35 @@ mitk::ContourElement::VertexIterator mitk::ContourElement::end()
 mitk::ContourElement::ContourElement(const mitk::ContourElement &other)
   : itk::LightObject(), m_IsClosed(other.m_IsClosed)
 {
-  for (const auto& v : m_Vertices)
+  for (const auto& v : other.m_Vertices)
   {
     m_Vertices.push_back(new ContourModelVertex(*v));
   }
+}
+
+mitk::ContourElement& mitk::ContourElement::operator = (const ContourElement& other)
+{
+  if (this != &other)
+  {
+    this->Clear();
+    for (const auto& v : other.m_Vertices)
+    {
+      m_Vertices.push_back(new ContourModelVertex(*v));
+    }
+  }
+
+  this->m_IsClosed = other.m_IsClosed;
+  return *this;
+}
+
+mitk::ContourElement::~ContourElement()
+{
+  this->Clear();
+}
+
+mitk::ContourElement::VertexSizeType mitk::ContourElement::GetSize() const
+{
+  return this->m_Vertices.size();
 }
 
 void mitk::ContourElement::AddVertex(const mitk::Point3D &vertex, bool isControlPoint)
@@ -86,7 +111,7 @@ void mitk::ContourElement::SetVertexAt(VertexSizeType pointId, const Point3D &po
 {
   if (pointId >= 0 && this->GetSize() > pointId)
   {
-    this->m_Vertices.at(pointId)->Coordinates = point;
+    this->m_Vertices[pointId]->Coordinates = point;
   }
 }
 
@@ -99,8 +124,8 @@ void mitk::ContourElement::SetVertexAt(VertexSizeType pointId, const VertexType 
 
   if (pointId >= 0 && this->GetSize() > pointId)
   {
-    this->m_Vertices.at(pointId)->Coordinates = vertex->Coordinates;
-    this->m_Vertices.at(pointId)->IsControlPoint = vertex->IsControlPoint;
+    this->m_Vertices[pointId]->Coordinates = vertex->Coordinates;
+    this->m_Vertices[pointId]->IsControlPoint = vertex->IsControlPoint;
   }
 }
 

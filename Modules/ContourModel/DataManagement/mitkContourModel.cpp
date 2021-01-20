@@ -181,7 +181,7 @@ int mitk::ContourModel::GetNumberOfVertices(TimeStepType timestep) const
 
 const mitk::ContourModel::VertexType *mitk::ContourModel::GetVertexAt(int index, TimeStepType timestep) const
 {
-  if (!this->IsEmptyTimeStep(timestep) && this->m_ContourSeries[timestep]->GetSize()>mitk::ContourElement::VertexSizeType(index))
+  if (!this->IsEmptyTimeStep(timestep) && this->m_ContourSeries[timestep]->GetSize() > mitk::ContourElement::VertexSizeType(index))
   {
     return this->m_ContourSeries[timestep]->GetVertexAt(index);
   }

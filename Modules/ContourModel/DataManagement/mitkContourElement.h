@@ -57,6 +57,11 @@ namespace mitk
 
       /** \brief Coordinates in 3D space. */
       mitk::Point3D Coordinates;
+
+      bool operator ==(const ContourModelVertex& other)
+      {
+        return this->Coordinates == other.Coordinates && this->IsControlPoint == other.IsControlPoint;
+      };
     };
 
     using VertexType = ContourModelVertex;
@@ -65,7 +70,8 @@ namespace mitk
     using ConstVertexIterator = VertexListType::const_iterator;
     using VertexSizeType = VertexListType::size_type;
 
-    /**Indicates an invalid index.*/
+    /**Indicates an invalid index.
+     * It is always the maximum of the unsigned int type.*/
     static const VertexSizeType NPOS = -1;
 
     /** \brief Return a const iterator a the front.
@@ -100,7 +106,7 @@ namespace mitk
 
     /** \brief Returns the number of contained vertices.
     */
-    VertexSizeType GetSize() const { return this->m_Vertices.size(); }
+    VertexSizeType GetSize() const;
 
     /** \brief Add a vertex at the end of the contour
     \param point - coordinates in 3D space.
@@ -149,7 +155,7 @@ namespace mitk
 
     /** \brief Returns the index of the given vertex within the contour.
     \param vertex - the vertex to be searched.
-    \return index of vertex. Returns NPOS (==-1) if not found.
+    \return index of vertex. Returns ContourElement::NPOS if not found.
     */
     VertexSizeType GetIndex(const VertexType *vertex) const;
 
@@ -219,6 +225,13 @@ namespace mitk
     */
     VertexType *BruteForceGetVertexAt(const mitk::Point3D &point, double eps);
 
+    /** Returns a list pointing to all vertices that are indicated to be control
+     points.
+     \remark It is important to note, that the vertex pointers in the returned
+     list directly point to the vertices stored interanlly. So they are still
+     owned by the ContourElement instance that returns the list. If one wants
+     to take over ownership, one has to clone the vertex instances.
+     */
     VertexListType GetControlVertices() const;
 
     /** \brief Uniformly redistribute control points with a given period (in number of vertices)
@@ -232,7 +245,9 @@ namespace mitk
 
     ContourElement() = default;
     ContourElement(const mitk::ContourElement &other);
-    ~ContourElement() = default;
+    ~ContourElement();
+
+    ContourElement& operator = (const ContourElement & other);
 
     /** Internal helper function to correctly remove the element indicated by the iterator
     from the list. After the call the iterator is invalid.

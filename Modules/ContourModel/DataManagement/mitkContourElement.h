@@ -58,10 +58,7 @@ namespace mitk
       /** \brief Coordinates in 3D space. */
       mitk::Point3D Coordinates;
 
-      bool operator ==(const ContourModelVertex& other)
-      {
-        return this->Coordinates == other.Coordinates && this->IsControlPoint == other.IsControlPoint;
-      };
+      bool operator ==(const ContourModelVertex& other) const;
     };
 
     using VertexType = ContourModelVertex;

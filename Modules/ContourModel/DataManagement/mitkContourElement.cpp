@@ -13,6 +13,11 @@ found in the LICENSE file.
 #include <mitkContourElement.h>
 #include <vtkMath.h>
 
+bool mitk::ContourElement::ContourModelVertex::operator ==(const ContourModelVertex& other) const
+{
+  return this->Coordinates == other.Coordinates && this->IsControlPoint == other.IsControlPoint;
+}
+
 mitk::ContourElement::ConstVertexIterator mitk::ContourElement::ConstIteratorBegin() const
 {
   return this->begin();

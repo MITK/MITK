@@ -44,7 +44,7 @@ namespace mitk
 
     /** \brief Represents a single vertex of a contour.
     */
-    struct ContourModelVertex
+    struct MITKCONTOURMODEL_EXPORT ContourModelVertex
     {
       ContourModelVertex(const mitk::Point3D& point, bool active = false) : IsControlPoint(active), Coordinates(point) {};
       ContourModelVertex(const ContourModelVertex& other)

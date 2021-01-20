@@ -26,7 +26,7 @@ void QmitkOtsuTool3DGUI::ConnectNewTool(mitk::AutoSegmentationWithPreviewTool* n
   Superclass::ConnectNewTool(newTool);
 
   newTool->IsTimePointChangeAwareOff();
-  m_FirstAccept = true;
+  m_FirstPreviewComputation = true;
 }
 
 void QmitkOtsuTool3DGUI::InitializeUI(QBoxLayout* mainLayout)
@@ -34,7 +34,7 @@ void QmitkOtsuTool3DGUI::InitializeUI(QBoxLayout* mainLayout)
   m_Controls.setupUi(this);
   mainLayout->addLayout(m_Controls.verticalLayout);
 
-  connect(m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnSpinboxValueAccept()));
+  connect(m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnPreviewBtnClicked()));
   connect(m_Controls.m_Spinbox, SIGNAL(valueChanged(int)), this, SLOT(OnRegionSpinboxChanged(int)));
   connect(m_Controls.advancedSettingsButton, SIGNAL(toggled(bool)), this, SLOT(OnAdvancedSettingsButtonToggled(bool)));
 
@@ -68,18 +68,18 @@ void QmitkOtsuTool3DGUI::OnAdvancedSettingsButtonToggled(bool toggled)
   }
 }
 
-void QmitkOtsuTool3DGUI::OnSpinboxValueAccept()
+void QmitkOtsuTool3DGUI::OnPreviewBtnClicked()
 {
   auto tool = this->GetConnectedToolAs<mitk::OtsuTool3D>();
   if (nullptr != tool)
   {
-    if (m_FirstAccept ||
+    if (!m_FirstPreviewComputation ||
       (tool->GetNumberOfRegions() == static_cast<unsigned int>(m_Controls.m_Spinbox->value()) &&
       tool->GetUseValley() == m_Controls.m_ValleyCheckbox->isChecked() &&
       tool->GetNumberOfBins() == static_cast<unsigned int>(m_Controls.m_BinsSpinBox->value())))
       return;
 
-    m_FirstAccept = false;
+    m_FirstPreviewComputation = false;
 
     try
     {

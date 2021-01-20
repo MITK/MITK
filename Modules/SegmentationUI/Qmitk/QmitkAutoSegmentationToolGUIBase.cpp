@@ -58,7 +58,8 @@ void QmitkAutoSegmentationToolGUIBase::OnNewToolAssociated(mitk::Tool *tool)
     m_CheckProcessAll->setVisible(!m_Mode2D);
     //remark: keept m_CheckProcessAll deactivated in 2D because in this refactoring
     //it should be kept to the status quo and it was not clear how interpolation
-    //would behave.
+    //would behave. As soon as it is sorted out we can remove that "feature switch"
+    //or the comment.
 
     m_CheckCreateNew = new QCheckBox("Create as new segmentation", this);
     m_CheckCreateNew->setChecked(false);
@@ -66,7 +67,8 @@ void QmitkAutoSegmentationToolGUIBase::OnNewToolAssociated(mitk::Tool *tool)
     m_CheckCreateNew->setVisible(!m_Mode2D);
     //remark: keept m_CheckCreateNew deactivated in 2D because in this refactoring
     //it should be kept to the status quo and it was not clear how interpolation
-    //would behave.
+    //would behave. As soon as it is sorted out we can remove that "feature switch"
+    //or the comment.
 
     this->InitializeUI(m_MainLayout);
 

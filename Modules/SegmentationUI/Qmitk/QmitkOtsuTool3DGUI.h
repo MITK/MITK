@@ -39,7 +39,7 @@ public:
 
 protected slots :
 
-  void OnSpinboxValueAccept();
+  void OnPreviewBtnClicked();
 
   void OnRegionSpinboxChanged(int);
 
@@ -58,7 +58,7 @@ protected:
 
   Ui_QmitkOtsuToolWidgetControls m_Controls;
 
-  bool m_FirstAccept = true;
+  bool m_FirstPreviewComputation = true;
 };
 
 #endif

@@ -208,12 +208,6 @@ namespace mitk
     */
     VertexType *BruteForceGetVertexAt(const mitk::Point3D &point, float eps);
 
-    /** \brief Returns the approximate nearest vertex a given posoition in 3D space
-    \param point - query position in 3D space.
-    \param eps - the error bound for search algorithm.
-    */
-    // VertexType* OptimizedGetVertexAt(const mitk::Point3D &point, float eps);
-
     VertexListType *GetControlVertices();
 
     /** \brief Uniformly redistribute control points with a given period (in number of vertices)

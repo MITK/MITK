@@ -50,7 +50,6 @@ namespace mitk
     bool SetDistanceOffset( float offset );
     /*!
     \brief returns the currently applied distance offset in m
-    \param offset offset in m
     */
     float GetDistanceOffset();
     /*!

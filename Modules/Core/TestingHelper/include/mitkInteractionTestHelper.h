@@ -127,7 +127,6 @@ namespace mitk
 
     /**
      * @brief LoadInteraction loads events from xml file.
-     * @param interactionXmlPath path to xml file with interaction events.
      */
     void LoadInteraction();
 

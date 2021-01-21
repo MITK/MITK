@@ -110,29 +110,6 @@ public:
             QWidget* parent, IStackPresentationSite::Pointer site, bool showTitle) = 0;
 
     /**
-     * Creates the status line manager for the window.
-     * Subclasses may override.
-     *
-     * @return the window's status line manager
-     */
-//    public IStatusLineManager createStatusLineManager() {
-//        return new StatusLineManager();
-//    }
-
-    /**
-     * Creates the control for the window's status line.
-     * Subclasses may override.
-     *
-     * @param statusLine the window's status line manager
-     * @param parent the parent composite
-     * @return the window's status line control
-     */
-//    public Control createStatusLineControl(IStatusLineManager statusLine,
-//            Composite parent) {
-//        return ((StatusLineManager) statusLine).createControl(parent, SWT.NONE);
-//    }
-
-    /**
      * Returns a globally unique identifier for this type of presentation factory. This is used
      * to ensure that one presentation is not restored from mementos saved by a different
      * presentation.

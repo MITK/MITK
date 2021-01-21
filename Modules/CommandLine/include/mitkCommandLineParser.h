@@ -277,7 +277,6 @@ public:
  * provided by calls to <code>addArgument()</code>. The arguments can be grouped by
  * using <code>beginGroup()</code> and <code>endGroup()</code>.
  *
- * @param charPad The padding character.
  * @return The formatted help text.
  */
   std::string helpText() const;

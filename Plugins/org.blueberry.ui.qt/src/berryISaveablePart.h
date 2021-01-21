@@ -55,8 +55,6 @@ struct BERRY_UI_QT ISaveablePart : public virtual Object
      * This method is long-running; progress and cancellation are provided
      * by the given progress monitor.
      * </p>
-     *
-     * @param monitor the progress monitor
      */
     virtual void DoSave(/*IProgressMonitor monitor*/) = 0;
 

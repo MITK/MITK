@@ -8,7 +8,7 @@ ModuleContext object, which is specific to each module.
 ### Creating a ModuleContext
 
 To create a ModuleContext object for a specific library, you have two options. If your project uses
-CMake as the build system, use the supplied `#usFunctionGenerateModuleInit` CMake function to automatically
+CMake as the build system, use the supplied `usFunctionGenerateModuleInit` CMake function to automatically
 create a source file and add it to your module's sources:
 
 ~~~{.cpp}
@@ -30,9 +30,9 @@ files of your module:
 ### Getting a ModuleContext
 
 To retrieve the module specific ModuleContext object from anywhere in your module, use the
-`#GetModuleContext` function:
+`GetModuleContext` function:
 
 \snippet uServices-modulecontext/main.cpp GetModuleContext
 
-Please note that trying to use `#GetModuleContext` without proper initialization code
+Please note that trying to use `GetModuleContext` without proper initialization code
 in the using shared library while either lead to compile or rumtime errors.

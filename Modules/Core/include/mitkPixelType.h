@@ -122,7 +122,7 @@ namespace mitk
     friend PixelType MakePixelType(const itk::ImageIOBase *imageIO);
 
     template <typename ComponentT, typename PixelT>
-    friend PixelType MakePixelType(std::size_t numberOfComponents);
+    friend PixelType MakePixelType(std::size_t numOfComponents);
 
     template <typename ItkImageType>
     friend PixelType MakePixelType();
@@ -133,7 +133,7 @@ namespace mitk
     PixelType(const int componentType,
               const ItkIOPixelType pixelType,
               std::size_t bytesPerComponent,
-              std::size_t numberOfComponents,
+              std::size_t numOfComponents,
               const std::string &componentTypeName,
               const std::string &pixelTypeName);
 

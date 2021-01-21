@@ -128,8 +128,6 @@ protected:
 
   /**
     * @brief Compile the program source
-    *
-    * @param preambel e.g. defines for the shader code
     */
   void CompileSource();
 

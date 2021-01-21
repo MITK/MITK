@@ -16,7 +16,7 @@ usage scenarios:
 
 See the [MITK homepage][mitk] for details.
 
-Supported Platforms
+Supported platforms
 -------------------
 
 MITK is a cross-platform C++ toolkit and officially supports:
@@ -26,6 +26,15 @@ MITK is a cross-platform C++ toolkit and officially supports:
  - macOS
 
 For details, please read the [Supported Platforms][platforms] page.
+
+### Build status of develop branch
+
+[![Windows][windows-build-status]][cdash]
+[![Ubuntu 18.04][ubuntu-18.04-build-status]][cdash]
+[![Ubuntu 20.04][ubuntu-20.04-build-status]][cdash]
+[![macOS 10.14 Mojave][macos-10.14-build-status]][cdash]
+
+We highly recommend to use the stable **master** branch instead. It is updated 1-2 times per month accompanied by curated [changelogs][changelog] and [snapshot installers][snapshot-installers].
 
 License
 -------
@@ -43,15 +52,14 @@ The official MITK source code is available in the [MITK Git repository][phab_rep
 
     git clone https://phabricator.mitk.org/source/mitk.git MITK
 
-Active development takes place in the MITK master branch and its usage is advised for advanced users only.
+Active development takes place in the MITK develop branch and its usage is advised for advanced users only.
 
-How to Contribute
+How to contribute
 -----------------
 
 Contributions of all kind are happily accepted. However, to make the contribution process as smooth as possible, please read the [How to contribute to MITK][contribute] page if you plan to contribute to MITK.
 
-
-Build Instructions
+Build instructions
 ------------------
 
 MITK uses [CMake][cmake] to configure a build tree. The following is a crash course about cloning, configuring, and building MITK on a Linux/Unix system:
@@ -64,7 +72,7 @@ MITK uses [CMake][cmake] to configure a build tree. The following is a crash cou
 
 Read the comprehensive [build instructions][build] page for details.
 
-Useful Links
+Useful links
 ------------
 
  - [Homepage][mitk]
@@ -91,3 +99,10 @@ Useful Links
 [build]: http://docs.mitk.org/nightly/BuildInstructionsPage.html
 [mailinglist]: http://mitk.org/Mailinglist
 [bugs]: https://phabricator.mitk.org/maniphest/
+[cdash]: https://cdash.mitk.org/index.php?project=MITK
+[changelog]: https://phabricator.mitk.org/w/mitk/changelog/
+[snapshot-installers]: https://www.mitk.org/download/ci/snapshots/
+[windows-build-status]: https://ci.mitk.org/buildStatus/icon?job=MITK%2FContinuous%2FWindows&subject=Windows
+[ubuntu-18.04-build-status]: https://ci.mitk.org/buildStatus/icon?job=MITK%2FContinuous%2FUbuntu+18.04&subject=Ubuntu+18.04
+[ubuntu-20.04-build-status]: https://ci.mitk.org/buildStatus/icon?job=MITK%2FContinuous%2FUbuntu+20.04&subject=Ubuntu+20.04
+[macOS-10.14-build-status]: https://ci.mitk.org/buildStatus/icon?job=MITK%2FContinuous%2FmacOS+Mojave&subject=macOS+10.14+Mojave

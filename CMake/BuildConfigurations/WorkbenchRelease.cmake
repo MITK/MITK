@@ -16,6 +16,10 @@ set(MITK_CONFIG_PLUGINS ${MITK_CONFIG_PLUGINS}
   org.mitk.gui.qt.matchpoint.manipulator
 )
 
+if(NOT MITK_USE_SUPERBUILD)
+  set(BUILD_CoreCmdApps ON CACHE BOOL "" FORCE)
+endif()
+
 set(MITK_VTK_DEBUG_LEAKS OFF CACHE BOOL "Enable VTK Debug Leaks" FORCE)
 
 find_package(Doxygen REQUIRED)

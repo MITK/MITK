@@ -101,6 +101,8 @@
 #include <stdlib.h>
 #ifdef WIN32
 #include <io.h>
+#else
+#include <unistd.h>
 #endif
 
 #include "mitkIpPic.h"

@@ -12,11 +12,8 @@ found in the LICENSE file.
 
 #include "mitkPaintbrushTool.h"
 
-#include "ipSegmentation.h"
 #include "mitkAbstractTransformGeometry.h"
 #include "mitkBaseRenderer.h"
-#include "mitkImageDataItem.h"
-#include "mitkOverwriteSliceImageFilter.h"
 #include "mitkToolManager.h"
 
 #include "mitkContourModelUtils.h"
@@ -360,8 +357,6 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent *interactionEvent, 
     return;
   }
 
-  int t = positionEvent->GetSender()->GetTimeStep();
-
   auto contour = ContourModel::New();
   contour->SetClosed(true);
 
@@ -456,28 +451,12 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent *interactionEvent, 
   m_LastPosition = indexCoordinates;
 
   // visualize contour
-  ContourModel::Pointer displayContour = FeedbackContourTool::GetFeedbackContour();
-  displayContour->Clear();
-
   ContourModel::Pointer tmp =
     FeedbackContourTool::BackProjectContourFrom2DSlice(m_WorkingSlice->GetGeometry(), contour);
 
-  // copy transformed contour into display contour
-  it = tmp->Begin();
-  end = tmp->End();
-
-  while (it != end)
-  {
-    Point3D point = (*it)->Coordinates;
-
-    displayContour->AddVertex(point, t);
-    it++;
-  }
-
-  m_FeedbackContourNode->GetData()->Modified();
+  this->UpdateCurrentFeedbackContour(tmp);
 
   assert(positionEvent->GetSender()->GetRenderWindow());
-
   RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
 }
 

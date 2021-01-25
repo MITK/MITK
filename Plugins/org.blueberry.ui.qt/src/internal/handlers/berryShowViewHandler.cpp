@@ -81,7 +81,7 @@ void ShowViewHandler::OpenOther(IWorkbenchWindow::Pointer window)
   }
 
   const QList<QString> descriptors = dialog.GetSelection();
-  for (QString id : descriptors)
+  for (const QString &id : descriptors)
   {
     try
     {

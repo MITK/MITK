@@ -190,7 +190,7 @@ public:
   {
     mitk::IOUtil::LoadInfo info(m_ImagePath);
 
-    for (auto reader : info.m_ReaderSelector.Get())
+    for (const auto &reader : info.m_ReaderSelector.Get())
     {
       black.push_back(reader.GetDescription());
     }

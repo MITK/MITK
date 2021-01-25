@@ -86,7 +86,7 @@ void QmitkModelViewSelectionConnector::SetCurrentSelection(QList<mitk::DataNode:
 
   // create new selection by retrieving the corresponding indices of the (filtered) nodes
   QItemSelection newCurrentSelection;
-  for (const auto& node : filteredNodes)
+  for (const auto& node : qAsConst(filteredNodes))
   {
     QModelIndexList matched = m_Model->match(m_Model->index(0, 0), QmitkDataNodeRole, QVariant::fromValue<mitk::DataNode::Pointer>(node), 1, Qt::MatchRecursive);
     if (!matched.empty())
@@ -130,7 +130,7 @@ QList<mitk::DataNode::Pointer> QmitkModelViewSelectionConnector::GetInternalSele
 
   QList<mitk::DataNode::Pointer> nodes;
   QModelIndexList selectedIndexes = m_View->selectionModel()->selectedIndexes();
-  for (const auto& index : selectedIndexes)
+  for (const auto& index : qAsConst(selectedIndexes))
   {
     QVariant qvariantDataNode = m_Model->data(index, QmitkDataNodeRole);
     if (qvariantDataNode.canConvert<mitk::DataNode::Pointer>())

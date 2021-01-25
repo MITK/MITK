@@ -220,7 +220,7 @@ namespace mitk
 
     std::set<std::string> customKeys;
 
-    for (auto container : containers)
+    for (const auto &container : containers)
     {
       for (unsigned int i = 0; i < container->GetTimeSteps(); i++)
       {

@@ -167,7 +167,7 @@ void QmitkAbstractNodeSelectionWidget::SetCurrentSelection(NodeList selectedNode
 
     auto dataStorage = m_DataStorage.Lock();
     NodeList newInternalSelection;
-    for (auto node : selectedNodes)
+    for (const auto &node : qAsConst(selectedNodes))
     {
       if (dataStorage.IsNotNull() && dataStorage->Exists(node) && (m_NodePredicate.IsNull() || m_NodePredicate->CheckNode(node)))
       {
@@ -343,7 +343,7 @@ QmitkAbstractNodeSelectionWidget::NodeList QmitkAbstractNodeSelectionWidget::Com
 
   if (!m_SelectOnlyVisibleNodes)
   {
-    for (auto node : m_CurrentExternalSelection)
+    for (const auto &node : m_CurrentExternalSelection)
     {
       if (!result.contains(node) && m_NodePredicate.IsNotNull() && !m_NodePredicate->CheckNode(node))
       {

@@ -67,9 +67,9 @@ void mitk::ContourModelSubDivisionFilter::GenerateData()
 
   mitk::ContourModel::Pointer contour(input);
 
-  auto timestep = static_cast<int>(input->GetTimeSteps());
+  auto timestep = static_cast<TimeStepType>(input->GetTimeSteps());
 
-  for (int currentTimestep = 0; currentTimestep < timestep; currentTimestep++)
+  for (decltype(timestep) currentTimestep = 0; currentTimestep < timestep; currentTimestep++)
   {
     if (input->GetNumberOfVertices(currentTimestep) >= 4)
     {

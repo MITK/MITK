@@ -48,7 +48,7 @@ void QmitkDataStorageFavoriteNodesInspector::SetNodePredicate(const mitk::NodePr
 void QmitkDataStorageFavoriteNodesInspector::OnFavoriteNodesButtonClicked()
 {
   auto selectedNodes = GetSelectedNodes();
-  for (auto node : selectedNodes)
+  for (auto node : qAsConst(selectedNodes))
   {
     node->SetBoolProperty("org.mitk.selection.favorite", false);
   }

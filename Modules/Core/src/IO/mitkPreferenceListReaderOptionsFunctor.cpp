@@ -45,7 +45,7 @@ bool mitk::PreferenceListReaderOptionsFunctor::operator()(IOUtil::LoadInfo &load
     selectedID = -1;
   }
 
-  for (auto reader : readerItems)
+  for (const auto &reader : readerItems)
   {
     finding = std::find(m_BlackList.begin(), m_BlackList.end(), reader.GetDescription());
 

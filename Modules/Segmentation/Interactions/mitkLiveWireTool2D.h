@@ -25,6 +25,14 @@ namespace mitk
     computed by searching the shortest path according to specific features of
     the image. The contour thus tends to snap to the boundary of objects.
 
+    The tool always assumes that unconfirmed contours are always defined for the
+    current time point. So the time step in which the contours will be stored as
+    segmentations will be determined when the contours got confirmed. Then they
+    will be transfered to the slices of the currently selected time step.
+    Changing the time point/time step while tool is active will updated the working
+    slice the live wire filter. So the behavior of the active live wire contour is
+    always WYSIWYG (What you see is what you get).
+
     \sa SegTool2D
     \sa ImageLiveWireContourModelFilter
 
@@ -57,6 +65,8 @@ namespace mitk
     void ConnectActionsAndFunctions() override;
     void Activated() override;
     void Deactivated() override;
+    void UpdateLiveWireContour();
+    void OnTimePointChanged() override;
 
   private:
     /// \brief Initialize tool.
@@ -98,6 +108,8 @@ namespace mitk
                                            itk::Index<3> &index,
                                            itk::Index<3> &returnIndex);
 
+    ContourModel::Pointer CreateNewContour() const;
+
     mitk::ContourModel::Pointer m_Contour;
     mitk::DataNode::Pointer m_ContourNode;
 
@@ -108,7 +120,9 @@ namespace mitk
     mitk::DataNode::Pointer m_EditingContourNode;
     mitk::ContourModelLiveWireInteractor::Pointer m_ContourInteractor;
 
-    mitk::Image::Pointer m_WorkingSlice;
+    /** Slice of the reference data the tool is currently actively working on to
+    define contours.*/
+    mitk::Image::Pointer m_ReferenceDataSlice;
 
     mitk::ImageLiveWireContourModelFilter::Pointer m_LiveWireFilter;
 

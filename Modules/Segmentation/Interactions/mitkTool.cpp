@@ -212,7 +212,7 @@ mitk::NodePredicateBase::ConstPointer mitk::Tool::GetWorkingDataPreference() con
 
 mitk::DataNode::Pointer mitk::Tool::CreateEmptySegmentationNode(const Image *original,
                                                                 const std::string &organName,
-                                                                const mitk::Color &color)
+                                                                const mitk::Color &color) const
 {
   // we NEED a reference image for size etc.
   if (!original)
@@ -285,7 +285,7 @@ mitk::DataNode::Pointer mitk::Tool::CreateEmptySegmentationNode(const Image *ori
 
 mitk::DataNode::Pointer mitk::Tool::CreateSegmentationNode(Image *image,
                                                            const std::string &organName,
-                                                           const mitk::Color &color)
+                                                           const mitk::Color &color) const
 {
   if (!image)
     return nullptr;

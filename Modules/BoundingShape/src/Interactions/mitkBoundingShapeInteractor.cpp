@@ -454,7 +454,7 @@ void mitk::BoundingShapeInteractor::ScaleObject(StateMachineAction *, Interactio
   // calculate cornerpoints from geometry plus visualization offset
   std::vector<Point3D> cornerPoints = GetCornerPoints(geometry, true);
   unsigned int num = 0;
-  for (auto point : cornerPoints)
+  for (const auto &point : cornerPoints)
   {
     pointscontainer->InsertElement(num++, point);
   }
@@ -471,7 +471,7 @@ void mitk::BoundingShapeInteractor::ScaleObject(StateMachineAction *, Interactio
   // calculate cornerpoints from geometry without visualization offset to update actual geometry
   cornerPoints = GetCornerPoints(geometry, false);
   num = 0;
-  for (auto point : cornerPoints)
+  for (const auto &point : cornerPoints)
   {
     pointscontainer->InsertElement(num++, point);
   }

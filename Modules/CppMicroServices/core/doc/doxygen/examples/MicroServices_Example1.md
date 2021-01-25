@@ -46,7 +46,7 @@ and the CMakeLists.txt file in the eventlistener subdirectory is:
 
 \include eventlistener/CMakeLists.txt
 
-The call to `#usFunctionGenerateModuleInit` is necessary to integrate the shared
+The call to `usFunctionGenerateModuleInit` is necessary to integrate the shared
 library as a module within the C++ Micro Service library. If you are not using
 CMake, you have to place a macro call to `#US_INITIALIZE_MODULE` yourself into the
 module's source code, e.g. in `Activator.cpp`. Have a look at the

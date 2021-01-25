@@ -25,6 +25,8 @@ found in the LICENSE file.
 #include <mitkDICOMDCMTKTagScanner.h>
 #include <mitkDICOMRTMimeTypes.h>
 #include <mitkDICOMIOHelper.h>
+#include <mitkProperties.h>
+#include <mitkDICOMProperty.h>
 
 #include <dcmtk/dcmrt/drtdose.h>
 
@@ -87,6 +89,7 @@ namespace mitk
 
     mitk::DICOMFileReader::Pointer reader = selector->GetFirstReaderWithMinimumNumberOfOutputImages();
     reader->SetAdditionalTagsOfInterest(toiSrv->GetTagsOfInterest());
+    reader->SetTagLookupTableToPropertyFunctor(mitk::GetDICOMPropertyForDICOMValuesFunctor);
 
     reader->SetInputFiles({ location });
     reader->AnalyzeInputFiles();
@@ -153,7 +156,7 @@ namespace mitk
     double maxDose = statistics->GetScalarValueMax();
 
     this->scaledDoseImage->SetPropertyList(originalImage->GetPropertyList());
-    this->scaledDoseImage->SetProperty(mitk::RTConstants::PRESCRIBED_DOSE_PROPERTY_NAME.c_str(), mitk::GenericProperty<double>::New(0.8*maxDose));
+    this->scaledDoseImage->SetProperty(mitk::RTConstants::PRESCRIBED_DOSE_PROPERTY_NAME.c_str(), mitk::DoubleProperty::New(0.8*maxDose));
     auto findings = ExtractPathsOfInterest(tagsOfInterestList, frames);
     SetProperties(this->scaledDoseImage, findings);
 

@@ -151,7 +151,7 @@ void mitk::ContourModelSetMapper3D::Update(mitk::BaseRenderer *renderer)
 vtkSmartPointer<vtkPolyData> mitk::ContourModelSetMapper3D::CreateVtkPolyDataFromContour(
   mitk::ContourModel *inputContour, mitk::BaseRenderer *renderer)
 {
-  unsigned int timestep = this->GetTimestep();
+  const auto timestep = this->GetTimestep();
 
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 

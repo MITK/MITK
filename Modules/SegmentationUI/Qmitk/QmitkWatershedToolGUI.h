@@ -13,8 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkWatershedToolGUI_h_Included
 #define QmitkWatershedToolGUI_h_Included
 
-#include "QmitkToolGUI.h"
-#include "mitkWatershedTool.h"
+#include "QmitkAutoMLSegmentationToolGUIBase.h"
 
 #include "ui_QmitkWatershedToolGUIControls.h"
 
@@ -29,33 +28,30 @@ found in the LICENSE file.
   button.
 
 */
-class MITKSEGMENTATIONUI_EXPORT QmitkWatershedToolGUI : public QmitkToolGUI
+class MITKSEGMENTATIONUI_EXPORT QmitkWatershedToolGUI : public QmitkAutoMLSegmentationToolGUIBase
 {
   Q_OBJECT
 
 public:
-  mitkClassMacro(QmitkWatershedToolGUI, QmitkToolGUI);
+  mitkClassMacro(QmitkWatershedToolGUI, QmitkAutoMLSegmentationToolGUIBase);
   itkFactorylessNewMacro(Self);
   itkCloneMacro(Self);
 
 protected slots :
 
-  void OnNewToolAssociated(mitk::Tool *);
-
   void OnSettingsAccept();
-
-  void OnSegmentationRegionAccept();
-
-  void OnRegionSelectionChanged(const QmitkSimpleLabelSetListWidget::LabelVectorType& selectedLabels);
 
   void OnLevelChanged(double value);
   void OnThresholdChanged(double value);
 
 protected:
   QmitkWatershedToolGUI();
-  ~QmitkWatershedToolGUI() override;
+  ~QmitkWatershedToolGUI() = default;
 
-  void BusyStateChanged(bool value) override;
+  void ConnectNewTool(mitk::AutoSegmentationWithPreviewTool* newTool) override;
+  void InitializeUI(QBoxLayout* mainLayout) override;
+
+  void EnableWidgets(bool enabled) override;
 
   //Recommendation from ITK is to have a threshold:level ration around 1:100
   //we set Level a bit higher. This provokes more oversegmentation,
@@ -65,7 +61,6 @@ protected:
   double m_Threshold = 0.004;
 
   Ui_QmitkWatershedToolGUIControls m_Controls;
-  mitk::WatershedTool::Pointer m_WatershedTool;
 };
 
 #endif

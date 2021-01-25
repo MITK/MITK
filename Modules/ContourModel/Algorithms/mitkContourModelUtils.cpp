@@ -29,7 +29,7 @@ mitk::ContourModelUtils::~ContourModelUtils()
 }
 
 mitk::ContourModel::Pointer mitk::ContourModelUtils::ProjectContourTo2DSlice(
-  Image *slice, ContourModel *contourIn3D, bool, bool)
+  const Image *slice, const ContourModel *contourIn3D, bool, bool)
 {
   if (nullptr == slice || nullptr == contourIn3D)
     return nullptr;
@@ -38,7 +38,7 @@ mitk::ContourModel::Pointer mitk::ContourModelUtils::ProjectContourTo2DSlice(
   projectedContour->Initialize(*contourIn3D);
 
   auto sliceGeometry = slice->GetGeometry();
-  auto numberOfTimesteps = static_cast<int>(contourIn3D->GetTimeSteps());
+  auto numberOfTimesteps = static_cast<TimeStepType>(contourIn3D->GetTimeSteps());
 
   for (decltype(numberOfTimesteps) t = 0; t < numberOfTimesteps; ++t)
   {
@@ -63,7 +63,7 @@ mitk::ContourModel::Pointer mitk::ContourModelUtils::ProjectContourTo2DSlice(
 }
 
 mitk::ContourModel::Pointer mitk::ContourModelUtils::BackProjectContourFrom2DSlice(
-  const BaseGeometry *sliceGeometry, ContourModel *contourIn2D, bool)
+  const BaseGeometry *sliceGeometry, const ContourModel *contourIn2D, bool)
 {
   if (nullptr == sliceGeometry || nullptr == contourIn2D)
     return nullptr;
@@ -71,7 +71,7 @@ mitk::ContourModel::Pointer mitk::ContourModelUtils::BackProjectContourFrom2DSli
   auto worldContour = ContourModel::New();
   worldContour->Initialize(*contourIn2D);
 
-  auto numberOfTimesteps = static_cast<int>(contourIn2D->GetTimeSteps());
+  auto numberOfTimesteps = static_cast<TimeStepType>(contourIn2D->GetTimeSteps());
 
   for (decltype(numberOfTimesteps) t = 0; t < numberOfTimesteps; ++t)
   {
@@ -96,14 +96,24 @@ mitk::ContourModel::Pointer mitk::ContourModelUtils::BackProjectContourFrom2DSli
 }
 
 void mitk::ContourModelUtils::FillContourInSlice(
-  ContourModel *projectedContour, Image *sliceImage, Image::Pointer workingImage, int paintingPixelValue)
+  const ContourModel *projectedContour, Image *sliceImage, const Image* workingImage, int paintingPixelValue)
 {
   FillContourInSlice(projectedContour, 0, sliceImage, workingImage, paintingPixelValue);
 }
 
 void mitk::ContourModelUtils::FillContourInSlice(
-  ContourModel *projectedContour, unsigned int t, Image *sliceImage, Image::Pointer workingImage, int paintingPixelValue)
+  const ContourModel *projectedContour, TimeStepType contourTimeStep, Image *sliceImage, const Image* workingImage, int paintingPixelValue)
 {
+  if (nullptr == projectedContour)
+  {
+    mitkThrow() << "Cannot fill contour in slice. Passed contour is invalid";
+  }
+
+  if (nullptr == sliceImage)
+  {
+    mitkThrow() << "Cannot fill contour in slice. Passed slice is invalid";
+  }
+
   auto contourModelFilter = mitk::ContourModelToSurfaceFilter::New();
   contourModelFilter->SetInput(projectedContour);
   contourModelFilter->Update();
@@ -111,15 +121,15 @@ void mitk::ContourModelUtils::FillContourInSlice(
   auto surface = mitk::Surface::New();
   surface = contourModelFilter->GetOutput();
 
-  if (nullptr == surface->GetVtkPolyData(t))
+  if (nullptr == surface->GetVtkPolyData(contourTimeStep))
   {
     MITK_WARN << "Could not create surface from contour model.";
     return;
   }
 
   auto surface2D = vtkSmartPointer<vtkPolyData>::New();
-  surface2D->SetPoints(surface->GetVtkPolyData(t)->GetPoints());
-  surface2D->SetLines(surface->GetVtkPolyData(t)->GetLines());
+  surface2D->SetPoints(surface->GetVtkPolyData(contourTimeStep)->GetPoints());
+  surface2D->SetLines(surface->GetVtkPolyData(contourTimeStep)->GetLines());
 
   auto image = vtkSmartPointer<vtkImageData>::New();
   image->DeepCopy(sliceImage->GetVtkImageData());
@@ -154,9 +164,9 @@ void mitk::ContourModelUtils::FillContourInSlice(
 }
 
 void mitk::ContourModelUtils::FillSliceInSlice(
-  vtkSmartPointer<vtkImageData> filledImage, vtkSmartPointer<vtkImageData> resultImage, mitk::Image::Pointer image, int paintingPixelValue)
+  vtkSmartPointer<vtkImageData> filledImage, vtkSmartPointer<vtkImageData> resultImage, const Image* image, int paintingPixelValue)
 {
-  auto labelImage = dynamic_cast<LabelSetImage *>(image.GetPointer());
+  auto labelImage = dynamic_cast<const LabelSetImage *>(image);
   auto numberOfPoints = filledImage->GetNumberOfPoints();
 
   if (nullptr == labelImage)
@@ -200,7 +210,7 @@ void mitk::ContourModelUtils::FillSliceInSlice(
   }
 }
 
-mitk::ContourModel::Pointer mitk::ContourModelUtils::MoveZerothContourTimeStep(const ContourModel *contour, unsigned int t)
+mitk::ContourModel::Pointer mitk::ContourModelUtils::MoveZerothContourTimeStep(const ContourModel *contour, TimeStepType t)
 {
   if (nullptr == contour)
     return nullptr;
@@ -209,15 +219,15 @@ mitk::ContourModel::Pointer mitk::ContourModelUtils::MoveZerothContourTimeStep(c
   resultContour->Expand(t + 1);
 
   std::for_each(contour->Begin(), contour->End(), [&resultContour, t](ContourElement::VertexType *vertex) {
-    resultContour->AddVertex(vertex, t);
+    resultContour->AddVertex(*vertex, t);
   });
 
   return resultContour;
 }
 
-int mitk::ContourModelUtils::GetActivePixelValue(mitk::Image* workingImage)
+int mitk::ContourModelUtils::GetActivePixelValue(const Image* workingImage)
 {
-  auto* labelSetImage = dynamic_cast<LabelSetImage*>(workingImage);
+  auto labelSetImage = dynamic_cast<const LabelSetImage*>(workingImage);
   int activePixelValue = 1;
   if (nullptr != labelSetImage)
   {

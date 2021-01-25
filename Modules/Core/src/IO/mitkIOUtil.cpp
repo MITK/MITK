@@ -533,7 +533,7 @@ namespace mitk
   {
     DataStorage::SetOfObjects::Pointer nodeResult = DataStorage::SetOfObjects::New();
     std::vector<LoadInfo> loadInfos;
-    for (auto loadInfo : paths)
+    for (const auto &loadInfo : paths)
     {
       loadInfos.push_back(loadInfo);
     }
@@ -549,7 +549,7 @@ namespace mitk
   {
     std::vector<BaseData::Pointer> result;
     std::vector<LoadInfo> loadInfos;
-    for (auto loadInfo : paths)
+    for (const auto &loadInfo : paths)
     {
       loadInfos.push_back(loadInfo);
     }

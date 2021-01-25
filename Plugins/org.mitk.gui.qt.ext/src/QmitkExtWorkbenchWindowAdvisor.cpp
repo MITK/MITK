@@ -712,7 +712,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
     if (showViewMenuItem)
     {
-      for (auto viewAction : viewActions)
+      for (auto viewAction : qAsConst(viewActions))
       {
         viewMenu->addAction(viewAction);
       }
@@ -851,7 +851,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
     QMultiMap<QString, berry::IViewDescriptor::Pointer> categoryViewDescriptorMap;
 
-    for (auto labelViewDescriptorPair : VDMap)
+    for (const auto &labelViewDescriptorPair : VDMap)
     {
       auto viewDescriptor = labelViewDescriptorPair.second;
       auto category = !viewDescriptor->GetCategoryPath().isEmpty()
@@ -863,7 +863,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
     // Create a separate toolbar for each category
 
-    for (auto category : categoryViewDescriptorMap.uniqueKeys())
+    for (const auto &category : categoryViewDescriptorMap.uniqueKeys())
     {
       auto viewDescriptorsInCurrentCategory = categoryViewDescriptorMap.values(category);
 
@@ -896,7 +896,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
           });
         }
 
-        for (auto viewDescriptor : viewDescriptorsInCurrentCategory)
+        for (const auto &viewDescriptor : qAsConst(viewDescriptorsInCurrentCategory))
         {
           auto viewAction = new berry::QtShowViewAction(window, viewDescriptor);
           toolbar->addAction(viewAction);

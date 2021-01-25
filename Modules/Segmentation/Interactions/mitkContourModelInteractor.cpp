@@ -46,7 +46,7 @@ bool mitk::ContourModelInteractor::OnCheckPointClick(const InteractionEvent *int
   if (!positionEvent)
     return false;
 
-  int timestep = positionEvent->GetSender()->GetTimeStep();
+  const auto timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
 
   auto *contour = dynamic_cast<mitk::ContourModel *>(this->GetDataNode()->GetData());
 
@@ -54,13 +54,13 @@ bool mitk::ContourModelInteractor::OnCheckPointClick(const InteractionEvent *int
 
   mitk::Point3D click = positionEvent->GetPositionInWorld();
 
-  if (contour->SelectVertexAt(click, 1.5, timestep))
+  if (contour->SelectVertexAt(click, 1.5, timeStep))
   {
     contour->SetSelectedVertexAsControlPoint();
     mitk::RenderingManager::GetInstance()->RequestUpdate(interactionEvent->GetSender()->GetRenderWindow());
     m_lastMousePosition = click;
 
-    auto *contourGeometry = dynamic_cast<Geometry3D *>(contour->GetGeometry(timestep));
+    auto *contourGeometry = dynamic_cast<Geometry3D *>(contour->GetGeometry(timeStep));
 
     if (contourGeometry->IsInside(click))
     {
@@ -89,7 +89,7 @@ bool mitk::ContourModelInteractor::IsHovering(const InteractionEvent *interactio
   if (!positionEvent)
     return false;
 
-  int timestep = positionEvent->GetSender()->GetTimeStep();
+  const auto timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
 
   auto *contour = dynamic_cast<mitk::ContourModel *>(this->GetDataNode()->GetData());
 
@@ -97,7 +97,7 @@ bool mitk::ContourModelInteractor::IsHovering(const InteractionEvent *interactio
 
   bool isHover = false;
   this->GetDataNode()->GetBoolProperty("contour.hovering", isHover, positionEvent->GetSender());
-  if (contour->IsNearContour(currentPosition, 1.5, timestep))
+  if (contour->IsNearContour(currentPosition, 1.5, timeStep))
   {
     if (isHover == false)
     {
@@ -141,7 +141,7 @@ void mitk::ContourModelInteractor::OnMoveContour(StateMachineAction *, Interacti
   if (!positionEvent)
     return;
 
-  int timestep = positionEvent->GetSender()->GetTimeStep();
+  const auto timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
 
   auto *contour = dynamic_cast<mitk::ContourModel *>(this->GetDataNode()->GetData());
   mitk::Vector3D translation;
@@ -149,7 +149,7 @@ void mitk::ContourModelInteractor::OnMoveContour(StateMachineAction *, Interacti
   translation[0] = currentPosition[0] - this->m_lastMousePosition[0];
   translation[1] = currentPosition[1] - this->m_lastMousePosition[1];
   translation[2] = currentPosition[2] - this->m_lastMousePosition[2];
-  contour->ShiftContour(translation, timestep);
+  contour->ShiftContour(translation, timeStep);
 
   this->m_lastMousePosition = positionEvent->GetPositionInWorld();
 

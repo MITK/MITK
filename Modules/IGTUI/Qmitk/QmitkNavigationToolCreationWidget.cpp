@@ -333,7 +333,7 @@ void QmitkNavigationToolCreationWidget::OnEditToolTipFinished(mitk::AffineTransf
   //if user pressed cancle, nullptr is returned. Do nothing. Else, set values.
   if (toolTip)
   {
-    m_ToolToBeEdited->SetToolTipPosition(toolTip->GetOffset());
+    m_ToolToBeEdited->SetToolTipPosition(mitk::Point3D(toolTip->GetOffset()));
     mitk::NavigationData::Pointer tempND = mitk::NavigationData::New(toolTip);//Convert to Navigation data for simple transversion to quaternion
     m_ToolToBeEdited->SetToolAxisOrientation(tempND->GetOrientation());
 

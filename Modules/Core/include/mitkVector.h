@@ -40,6 +40,13 @@ namespace mitk
     {
     }
 
+    /** Pass-through assignment operator for the Vector base class. */
+    Vector<TCoordRep, NVectorDimension> & operator=(const Vector<TCoordRep, NVectorDimension> & r)
+    {
+      itk::Vector<TCoordRep, NVectorDimension>::operator=(r);
+      return *this;
+    }
+
     /**
      * @brief Constructor to convert from itk::Vector to mitk::Vector.
      */

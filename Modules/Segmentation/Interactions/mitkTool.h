@@ -186,8 +186,8 @@ namespace mitk
 
     DataNode::Pointer CreateEmptySegmentationNode(const Image *original,
                                                   const std::string &organName,
-                                                  const mitk::Color &color);
-    DataNode::Pointer CreateSegmentationNode(Image *image, const std::string &organName, const mitk::Color &color);
+                                                  const mitk::Color &color) const;
+    DataNode::Pointer CreateSegmentationNode(Image *image, const std::string &organName, const mitk::Color &color) const;
 
     /** Function used to check if a tool can handle the referenceData and (if specified) the working data.
      @pre referenceData must be a valid pointer
@@ -222,7 +222,6 @@ namespace mitk
     */
     std::string m_EventConfig;
 
-    Tool();             // purposely hidden
     Tool(const char *, const us::Module *interactorModule = nullptr); // purposely hidden
     ~Tool() override;
 

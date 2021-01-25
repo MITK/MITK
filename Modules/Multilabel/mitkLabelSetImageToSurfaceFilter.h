@@ -79,7 +79,7 @@ namespace mitk
     /**
      * Returns the label you want to extract. This method only has an effect,
      * if GenerateAllLabels() is set to false
-     * @returns _arg the label to extract, by default 1
+     * @return the label to extract, by default 1
      */
     itkGetMacro(RequestedLabel, int);
 
@@ -91,7 +91,7 @@ namespace mitk
 
     /**
      * Gets the label value of the background. No surface will be generated for this label.
-     * @param _arg the label of the background, by default 0
+     * @return the label of the background, by default 0
      */
     itkGetMacro(BackgroundLabel, int);
 

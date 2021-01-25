@@ -197,7 +197,7 @@ void QmitkDataNodeContextMenu::InitExtensionPointActions()
   DescriptorActionListType descriptorActionList;
   m_ConfigElements.clear();
 
-  for (const auto& customMenuConfig : customMenuConfigs)
+  for (const auto& customMenuConfig : qAsConst(customMenuConfigs))
   {
     auto descriptorName = customMenuConfig->GetAttribute("nodeDescriptorName");
     auto actionLabel = customMenuConfig->GetAttribute("label");

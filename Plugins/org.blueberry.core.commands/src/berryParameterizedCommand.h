@@ -167,9 +167,9 @@ public:
    * </p>
    *
    * <blockquote>
-   * <code>serialization = <u>commandId</u> [ '(' parameters ')' ]</code><br>
+   * <code>serialization = commandId [ '(' parameters ')' ]</code><br>
    * <code>parameters = parameter [ ',' parameters ]</code><br>
-   * <code>parameter = <u>parameterId</u> [ '=' <u>parameterValue</u> ]</code>
+   * <code>parameter = parameterId [ '=' parameterValue ]</code>
    * </blockquote>
    *
    * <p>
@@ -178,9 +178,9 @@ public:
    * <code>,</code> and <code>=</code>) indicate literal characters.
    * </p>
    * <p>
-   * <code><u>commandId</u></code> represents the command id encoded with
-   * separator characters escaped. <code><u>parameterId</u></code> and
-   * <code><u>parameterValue</u></code> represent the parameter ids and
+   * <code>commandId</code> represents the command id encoded with
+   * separator characters escaped. <code>parameterId</code> and
+   * <code>parameterValue</code> represent the parameter ids and
    * values encoded with separator characters escaped. The separator
    * characters <code>(</code>, <code>)</code>, <code>,</code> and
    * <code>=</code> are escaped by prepending a <code>%</code>. This
@@ -189,7 +189,7 @@ public:
    * </p>
    * <p>
    * The order of the parameters is not defined (and not important). A missing
-   * <code><u>parameterValue</u></code> indicates that the value of the
+   * <code>parameterValue</code> indicates that the value of the
    * parameter is <code>null</code>.
    * </p>
    * <p>

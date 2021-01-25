@@ -94,6 +94,7 @@ namespace mitk
   const QString BaseApplication::ARG_SPLASH_IMAGE = "BlueBerry.splashscreen";
   const QString BaseApplication::ARG_STORAGE_DIR = "BlueBerry.storageDir";
   const QString BaseApplication::ARG_XARGS = "xargs";
+  const QString BaseApplication::ARG_LOG_QT_MESSAGES = "Qt.logMessages";
 
   const QString BaseApplication::PROP_APPLICATION = "blueberry.application";
   const QString BaseApplication::PROP_FORCE_PLUGIN_INSTALL = BaseApplication::ARG_FORCE_PLUGIN_INSTALL;
@@ -143,6 +144,8 @@ namespace mitk
     QSplashScreen *m_Splashscreen;
     SplashCloserCallback *m_SplashscreenClosingCallback;
 
+    bool m_LogQtMessages;
+
     QStringList m_PreloadLibs;
     QString m_ProvFile;
 
@@ -155,25 +158,28 @@ namespace mitk
         m_SingleMode(false),
         m_SafeMode(true),
         m_Splashscreen(nullptr),
-        m_SplashscreenClosingCallback(nullptr)
+        m_SplashscreenClosingCallback(nullptr),
+        m_LogQtMessages(false)
     {
 #ifdef Q_OS_MAC
       /* On macOS the process serial number is passed as an command line argument (-psn_<NUMBER>)
          in certain circumstances. This option causes a Poco exception. We remove it, if present. */
 
-      m_Argv_macOS.reserve(argc);
+      m_Argv_macOS.reserve(argc + 1);
 
       const char psn[] = "-psn";
 
-      for (decltype(argc) i = 0; i < argc; ++i)
+      for (int i = 0; i < argc; ++i)
       {
-        if (0 == strncmp(argv[i], psn, sizeof(psn)))
+        if (0 == strncmp(argv[i], psn, sizeof(psn) - 1))
           continue;
 
         m_Argv_macOS.push_back(argv[i]);
       }
 
-      m_Argc = static_cast<decltype(m_Argc)>(m_Argv_macOS.size());
+      m_Argv_macOS.push_back(nullptr);
+
+      m_Argc = static_cast<decltype(m_Argc)>(m_Argv_macOS.size() - 1);
       m_Argv = m_Argv_macOS.data();
 #endif
     }
@@ -196,6 +202,12 @@ namespace mitk
 
     void handleBooleanOption(const std::string &name, const std::string &)
     {
+      if (ARG_LOG_QT_MESSAGES.toStdString() == name)
+      {
+        m_LogQtMessages = true;
+        return;
+      }
+
       auto fwKey = QString::fromStdString(name);
 
       // Translate some keys to proper framework properties
@@ -303,7 +315,7 @@ namespace mitk
 
           auto pluginUrlsToStart = provInfo.getPluginsToStart();
 
-          for (const auto& url : pluginUrlsToStart)
+          for (const auto& url : qAsConst(pluginUrlsToStart))
             pluginsToStart.push_back(url.toString());
         }
       }
@@ -508,7 +520,8 @@ namespace mitk
     this->setOrganizationName(orgName);
     this->setOrganizationDomain(orgDomain);
 
-    qInstallMessageHandler(outputQtMessage);
+    if (d->m_LogQtMessages)
+      qInstallMessageHandler(outputQtMessage);
 
     QWebEngineUrlScheme qtHelpScheme("qthelp");
     qtHelpScheme.setFlags(QWebEngineUrlScheme::LocalScheme | QWebEngineUrlScheme::LocalAccessAllowed);
@@ -683,7 +696,7 @@ namespace mitk
     // Walk one directory up and add bin and lib sub-dirs; this might be redundant
     appDir.cdUp();
 
-    for (const auto& suffix : suffixes)
+    for (const auto& suffix : qAsConst(suffixes))
       ctkPluginFrameworkLauncher::addSearchPath(appDir.absoluteFilePath(suffix));
   }
 
@@ -771,6 +784,10 @@ namespace mitk
     Poco::Util::Option xargsOption(ARG_XARGS.toStdString(), "", "Extended argument list");
     xargsOption.argument("<args>").binding(ARG_XARGS.toStdString());
     options.addOption(xargsOption);
+
+    Poco::Util::Option logQtMessagesOption(ARG_LOG_QT_MESSAGES.toStdString(), "", "log Qt messages");
+    logQtMessagesOption.callback(Poco::Util::OptionCallback<Impl>(d, &Impl::handleBooleanOption));
+    options.addOption(logQtMessagesOption);
 
     Poco::Util::Application::defineOptions(options);
   }

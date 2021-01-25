@@ -1,4 +1,5 @@
 set(MODULE_TESTS
+  mitkContourElementTest.cpp
   mitkContourModelTest.cpp
   mitkContourModelIOTest.cpp
   mitkContourModelSetTest.cpp

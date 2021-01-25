@@ -195,7 +195,7 @@ void QmitkDataManagerView::NodeSelectionChanged(const QItemSelection& /*selected
   auto selectedNodes = GetCurrentSelection();
   auto nodeSet = m_NodeTreeModel->GetNodeSet();
 
-  for (auto node : nodeSet)
+  for (auto node : qAsConst(nodeSet))
   {
     if (node.IsNotNull())
     {

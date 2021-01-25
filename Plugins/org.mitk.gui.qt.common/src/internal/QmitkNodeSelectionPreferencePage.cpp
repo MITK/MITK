@@ -109,7 +109,7 @@ void QmitkNodeSelectionPreferencePage::Update()
   int index = 0;
   int currentIndex = 0;
   m_Controls->comboPreferred->clear();
-  for (auto iter : m_Providers)
+  for (const auto &iter : m_Providers)
   {
     m_Controls->comboPreferred->addItem(QString::fromStdString(iter.second->GetInspectorDisplayName()), QVariant::fromValue(QString::fromStdString(iter.first)));
     if (iter.first == preferredInspectorID)

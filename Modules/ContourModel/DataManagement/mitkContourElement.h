@@ -16,8 +16,6 @@ found in the LICENSE file.
 #include <MitkContourModelExports.h>
 #include <mitkNumericTypes.h>
 
-//#include <ANN/ANN.h>
-
 #include <deque>
 
 namespace mitk
@@ -28,8 +26,12 @@ namespace mitk
   end of the contour and to iterate in both directions.
   To mark a vertex as a special one it can be set as a control point.
 
-  \note It is highly not recommend to use this class directly as no secure mechanism is used here.
-  Use mitk::ContourModel instead providing some additional features.
+  \note This class assumes that it manages its vertices. So if a vertex instance is added to this
+  class the ownership of the vertex is transfered to the ContourElement instance.
+  The ContourElement instance takes care of deleting vertex instances if needed.
+  It is highly not recommend to use this class directly as it is designed as a internal class of
+  ContourModel. Therefore it is adviced to use ContourModel if contour representations are needed in
+  MITK.
   */
   class MITKCONTOURMODEL_EXPORT ContourElement : public itk::LightObject
   {
@@ -40,181 +42,194 @@ namespace mitk
 
     itkCloneMacro(Self);
 
-      // Data container representing vertices
-
-      /** \brief Represents a single vertex of contour.
-      */
-      struct ContourModelVertex
+    /** \brief Represents a single vertex of a contour.
+    */
+    struct MITKCONTOURMODEL_EXPORT ContourModelVertex
     {
-      ContourModelVertex(mitk::Point3D &point, bool active = false) : IsControlPoint(active), Coordinates(point) {}
-      ContourModelVertex(const ContourModelVertex &other)
+      ContourModelVertex(const mitk::Point3D& point, bool active = false) : IsControlPoint(active), Coordinates(point) {};
+      ContourModelVertex(const ContourModelVertex& other)
         : IsControlPoint(other.IsControlPoint), Coordinates(other.Coordinates)
       {
-      }
+      };
 
       /** \brief Treat point special. */
       bool IsControlPoint;
 
       /** \brief Coordinates in 3D space. */
       mitk::Point3D Coordinates;
+
+      bool operator ==(const ContourModelVertex& other) const;
     };
-    // END Data container representing vertices
 
-    typedef ContourModelVertex VertexType;
-    typedef std::deque<VertexType *> VertexListType;
-    typedef VertexListType::iterator VertexIterator;
-    typedef VertexListType::const_iterator ConstVertexIterator;
+    using VertexType = ContourModelVertex;
+    using VertexListType = std::deque<VertexType*>;
+    using VertexIterator = VertexListType::iterator;
+    using ConstVertexIterator = VertexListType::const_iterator;
+    using VertexSizeType = VertexListType::size_type;
 
-    //  start of inline methods
+    /**Indicates an invalid index.
+     * It is always the maximum of the unsigned int type.*/
+    static const VertexSizeType NPOS = -1;
 
     /** \brief Return a const iterator a the front.
     */
-    virtual ConstVertexIterator ConstIteratorBegin() { return this->m_Vertices->begin(); }
+    ConstVertexIterator ConstIteratorBegin() const;
     /** \brief Return a const iterator a the end.
     */
-    virtual ConstVertexIterator ConstIteratorEnd() { return this->m_Vertices->end(); }
+    ConstVertexIterator ConstIteratorEnd() const;
     /** \brief Return an iterator a the front.
     */
-    virtual VertexIterator IteratorBegin() { return this->m_Vertices->begin(); }
+    VertexIterator IteratorBegin();
     /** \brief Return an iterator a the end.
     */
-    virtual VertexIterator IteratorEnd() { return this->m_Vertices->end(); }
+    VertexIterator IteratorEnd();
+
+    /** \brief Return a const iterator a the front.
+    * For easier support of stl functionality.
+    */
+    ConstVertexIterator begin() const;
+    /** \brief Return a const iterator a the end.
+    * For easier support of stl functionality.
+    */
+    ConstVertexIterator end() const;
+    /** \brief Return an iterator a the front.
+    * For easier support of stl functionality.
+    */
+    VertexIterator begin();
+    /** \brief Return an iterator a the end.
+    * For easier support of stl functionality.
+    */
+    VertexIterator end();
+
     /** \brief Returns the number of contained vertices.
     */
-    virtual int GetSize() { return this->m_Vertices->size(); }
-    //   end of inline methods
+    VertexSizeType GetSize() const;
 
     /** \brief Add a vertex at the end of the contour
     \param point - coordinates in 3D space.
     \param isControlPoint - is the vertex a special control point.
     */
-    virtual void AddVertex(mitk::Point3D &point, bool isControlPoint);
-
-    /** \brief Add a vertex at the end of the contour
-    \param vertex - a contour element vertex.
-    */
-    virtual void AddVertex(VertexType &vertex);
+    void AddVertex(const mitk::Point3D &point, bool isControlPoint);
 
     /** \brief Add a vertex at the front of the contour
     \param point - coordinates in 3D space.
     \param isControlPoint - is the vertex a control point.
     */
-    virtual void AddVertexAtFront(mitk::Point3D &point, bool isControlPoint);
-
-    /** \brief Add a vertex at the front of the contour
-    \param vertex - a contour element vertex.
-    */
-    virtual void AddVertexAtFront(VertexType &vertex);
+    void AddVertexAtFront(const mitk::Point3D &point, bool isControlPoint);
 
     /** \brief Add a vertex at a given index of the contour
     \param point - coordinates in 3D space.
     \param isControlPoint - is the vertex a special control point.
     \param index - the index to be inserted at.
     */
-    virtual void InsertVertexAtIndex(mitk::Point3D &point, bool isControlPoint, int index);
+    void InsertVertexAtIndex(const mitk::Point3D &point, bool isControlPoint, VertexSizeType index);
 
     /** \brief Set coordinates a given index.
     \param pointId Index of vertex.
     \param point Coordinates.
     */
-    virtual void SetVertexAt(int pointId, const mitk::Point3D &point);
+    void SetVertexAt(VertexSizeType pointId, const mitk::Point3D &point);
 
-    /** \brief Set vertex a given index.
+    /** \brief Set vertex a given index (by copying the values).
     \param pointId Index of vertex.
     \param vertex Vertex.
+    \pre Passed vertex is a valid instance
     */
-    virtual void SetVertexAt(int pointId, const VertexType *vertex);
+    void SetVertexAt(VertexSizeType pointId, const VertexType* vertex);
 
     /** \brief Returns the vertex a given index
     \param index
+    \pre index must be valid.
     */
-    virtual VertexType *GetVertexAt(int index);
+    VertexType* GetVertexAt(VertexSizeType index);
+    const VertexType* GetVertexAt(VertexSizeType index) const;
 
     /** \brief Returns the approximate nearest vertex a given posoition in 3D space
     \param point - query position in 3D space.
     \param eps - the error bound for search algorithm.
     */
-    virtual VertexType *GetVertexAt(const mitk::Point3D &point, float eps);
+    VertexType *GetVertexAt(const mitk::Point3D &point, float eps);
 
     /** \brief Returns the index of the given vertex within the contour.
     \param vertex - the vertex to be searched.
-    \return index of vertex. -1 if not found.
+    \return index of vertex. Returns ContourElement::NPOS if not found.
     */
-    virtual int GetIndex(const VertexType *vertex);
+    VertexSizeType GetIndex(const VertexType *vertex) const;
 
     /** \brief Returns the container of the vertices.
     */
-    VertexListType *GetVertexList();
+    const VertexListType *GetVertexList() const;
 
     /** \brief Returns whether the contour element is empty.
     */
-    bool IsEmpty();
+    bool IsEmpty() const;
 
     /** \brief Returns if the conour is closed or not.
     */
-    virtual bool IsClosed();
+    bool IsClosed() const;
 
     /** \brief Returns whether a given point is near a contour, according to eps.
     \param point - query position in 3D space.
     \param eps - the error bound for search algorithm.
     */
-    virtual bool IsNearContour(const mitk::Point3D &point, float eps);
+    bool IsNearContour(const mitk::Point3D &point, float eps) const;
 
     /** \brief Close the contour.
     Connect first with last element.
     */
-    virtual void Close();
+    void Close();
 
     /** \brief Open the contour.
     Disconnect first and last element.
     */
-    virtual void Open();
+    void Open();
 
     /** \brief Set the contours IsClosed property.
     \param isClosed - true = closed; false = open;
     */
-    virtual void SetClosed(bool isClosed);
+    void SetClosed(bool isClosed);
 
     /** \brief Concatenate the contuor with a another contour.
-    All vertices of the other contour will be added after last vertex.
+    All vertices of the other contour will be cloned and added after last vertex.
     \param other - the other contour
-    \param check - set it true to avoid intersections
+    \param check - set it true to avoid adding of vertices that are already in the source contour
     */
-    void Concatenate(mitk::ContourElement *other, bool check);
+    void Concatenate(const mitk::ContourElement *other, bool check);
 
     /** \brief Remove the given vertex from the container if exists.
     \param vertex - the vertex to be removed.
     */
-    virtual bool RemoveVertex(const VertexType *vertex);
+    bool RemoveVertex(const VertexType *vertex);
 
     /** \brief Remove a vertex at given index within the container if exists.
     \param index - the index where the vertex should be removed.
     */
-    virtual bool RemoveVertexAt(int index);
+    bool RemoveVertexAt(VertexSizeType index);
 
     /** \brief Remove the approximate nearest vertex at given position in 3D space if one exists.
     \param point - query point in 3D space.
     \param eps - error bound for search algorithm.
     */
-    virtual bool RemoveVertexAt(mitk::Point3D &point, float eps);
+    bool RemoveVertexAt(const mitk::Point3D &point, double eps);
 
     /** \brief Clear the storage container.
     */
-    virtual void Clear();
+    void Clear();
 
     /** \brief Returns the approximate nearest vertex a given posoition in 3D space
     \param point - query position in 3D space.
     \param eps - the error bound for search algorithm.
     */
-    VertexType *BruteForceGetVertexAt(const mitk::Point3D &point, float eps);
+    VertexType *BruteForceGetVertexAt(const mitk::Point3D &point, double eps);
 
-    /** \brief Returns the approximate nearest vertex a given posoition in 3D space
-    \param point - query position in 3D space.
-    \param eps - the error bound for search algorithm.
-    */
-    // VertexType* OptimizedGetVertexAt(const mitk::Point3D &point, float eps);
-
-    VertexListType *GetControlVertices();
+    /** Returns a list pointing to all vertices that are indicated to be control
+     points.
+     \remark It is important to note, that the vertex pointers in the returned
+     list directly point to the vertices stored interanlly. So they are still
+     owned by the ContourElement instance that returns the list. If one wants
+     to take over ownership, one has to clone the vertex instances.
+     */
+    VertexListType GetControlVertices() const;
 
     /** \brief Uniformly redistribute control points with a given period (in number of vertices)
     \param vertex - the vertex around which the redistribution is done.
@@ -225,12 +240,20 @@ namespace mitk
   protected:
     mitkCloneMacro(Self);
 
-    ContourElement();
+    ContourElement() = default;
     ContourElement(const mitk::ContourElement &other);
-    ~ContourElement() override;
+    ~ContourElement();
 
-    VertexListType *m_Vertices; // double ended queue with vertices
-    bool m_IsClosed;
+    ContourElement& operator = (const ContourElement & other);
+
+    /** Internal helper function to correctly remove the element indicated by the iterator
+    from the list. After the call the iterator is invalid.
+    Caller of the function must ensure that the iterator is valid!.
+    \result Indicates if the element indicated by the iterator was removed. If iterator points to end it returns false.*/
+    bool RemoveVertexByIterator(VertexListType::iterator& iter);
+
+    VertexListType m_Vertices; // double ended queue with vertices
+    bool m_IsClosed = false;
   };
 } // namespace mitk
 

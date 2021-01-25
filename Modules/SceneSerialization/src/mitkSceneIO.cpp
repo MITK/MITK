@@ -376,7 +376,7 @@ bool mitk::SceneIO::SaveScene(DataStorage::SetOfObjects::ConstPointer sceneNodes
 
           // store all renderwindow specific propertylists
           mitk::DataNode::PropertyListKeyNames propertyListKeys = node->GetPropertyListNames();
-          for (auto renderWindowName : propertyListKeys)
+          for (const auto &renderWindowName : propertyListKeys)
           {
             PropertyList *propertyList = node->GetPropertyList(renderWindowName);
             if (propertyList && !propertyList->IsEmpty())

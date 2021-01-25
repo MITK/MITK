@@ -179,7 +179,7 @@ mitk::DataNode::PropertyListKeyNames mitk::DataNode::GetPropertyListNames() cons
 {
   PropertyListKeyNames result;
 
-  for (auto entries : m_MapOfPropertyLists)
+  for (const auto &entries : m_MapOfPropertyLists)
     result.push_back(entries.first);
 
   return result;
@@ -698,7 +698,7 @@ std::vector<std::string> mitk::DataNode::GetPropertyKeys(const std::string &cont
 
   if (contextName.empty())
   {
-    for (auto property : *m_PropertyList->GetMap())
+    for (const auto &property : *m_PropertyList->GetMap())
       propertyKeys.push_back(property.first);
 
     return propertyKeys;
@@ -708,13 +708,13 @@ std::vector<std::string> mitk::DataNode::GetPropertyKeys(const std::string &cont
 
   if (m_MapOfPropertyLists.end() != propertyListIter)
   {
-    for (auto property : *propertyListIter->second->GetMap())
+    for (const auto &property : *propertyListIter->second->GetMap())
       propertyKeys.push_back(property.first);
   }
 
   if (includeDefaultContext)
   {
-    for (auto property : *m_PropertyList->GetMap())
+    for (const auto &property : *m_PropertyList->GetMap())
     {
       auto propertyKeyIter = std::find(propertyKeys.begin(), propertyKeys.end(), property.first);
 

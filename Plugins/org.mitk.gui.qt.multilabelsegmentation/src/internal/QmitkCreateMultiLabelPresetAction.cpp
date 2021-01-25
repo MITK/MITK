@@ -20,7 +20,7 @@ found in the LICENSE file.
 
 void QmitkCreateMultiLabelPresetAction::Run(const QList<mitk::DataNode::Pointer> &selectedNodes)
 {
-  for (auto node : selectedNodes)
+  for (const auto &node : selectedNodes)
   {
     if (node.IsNull())
       continue;

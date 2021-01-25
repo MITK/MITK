@@ -69,6 +69,9 @@ namespace mitk
      * reimplement UpdatePrepare() or UpdateCleanUp().*/
     void UpdatePreview(bool ignoreLazyPreviewSetting = false);
 
+    /** Indicate if currently UpdatePreview is triggered (true) or not (false).*/
+    bool IsUpdating() const;
+
   protected:
     mitk::ToolCommand::Pointer m_ProgressCommand;
 
@@ -88,7 +91,9 @@ namespace mitk
      */
     virtual void DoUpdatePreview(const Image* inputAtTimeStep, Image* previewImage, TimeStepType timeStep) = 0;
 
-    AutoSegmentationWithPreviewTool(bool lazyDynamicPreviews = false);
+    AutoSegmentationWithPreviewTool(bool lazyDynamicPreviews = false); // purposely hidden
+    AutoSegmentationWithPreviewTool(bool lazyDynamicPreviews, const char* interactorType, const us::Module* interactorModule = nullptr); // purposely hidden
+
     ~AutoSegmentationWithPreviewTool() override;
 
     /** Returns the image that contains the preview of the current segmentation.
@@ -111,6 +116,9 @@ namespace mitk
     void ResetPreviewNode();
 
     TimePointType GetLastTimePointOfUpdate() const;
+
+    itkSetObjectMacro(WorkingPlaneGeometry, PlaneGeometry);
+    itkGetConstObjectMacro(WorkingPlaneGeometry, PlaneGeometry);
 
   private:
     void TransferImageAtTimeStep(const Image* sourceImage, Image* destinationImage, const TimeStepType timeStep);
@@ -145,6 +153,15 @@ namespace mitk
     bool m_IsTimePointChangeAware = true;
 
     TimePointType m_LastTimePointOfUpdate = 0.;
+
+    bool m_IsUpdating = false;
+
+    /** This variable indicates if for the tool a working plane geometry is defined.
+     * If a working plane is defined the tool will only work an the slice of the input
+     * and the segmentation. Thus only the relevant input slice will be passed to
+     * DoUpdatePreview(...) and only the relevant slice of the preview will be transfered when
+     * ConfirmSegmentation() is called.*/
+    PlaneGeometry::Pointer m_WorkingPlaneGeometry;
   };
 
 } // namespace

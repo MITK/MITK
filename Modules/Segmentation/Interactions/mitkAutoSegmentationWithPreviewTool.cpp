@@ -30,11 +30,18 @@ found in the LICENSE file.
 #include "mitkMaskAndCutRoiImageFilter.h"
 #include "mitkPadImageFilter.h"
 #include "mitkNodePredicateGeometry.h"
+#include "mitkSegTool2D.h"
 
 mitk::AutoSegmentationWithPreviewTool::AutoSegmentationWithPreviewTool(bool lazyDynamicPreviews): m_LazyDynamicPreviews(lazyDynamicPreviews)
 {
   m_ProgressCommand = mitk::ToolCommand::New();
 }
+
+mitk::AutoSegmentationWithPreviewTool::AutoSegmentationWithPreviewTool(bool lazyDynamicPreviews, const char* interactorType, const us::Module* interactorModule) : AutoSegmentationTool(interactorType, interactorModule), m_LazyDynamicPreviews(lazyDynamicPreviews)
+{
+  m_ProgressCommand = mitk::ToolCommand::New();
+}
+
 
 mitk::AutoSegmentationWithPreviewTool::~AutoSegmentationWithPreviewTool()
 {
@@ -76,7 +83,7 @@ void mitk::AutoSegmentationWithPreviewTool::Activated()
   m_ReferenceDataNode = m_ToolManager->GetReferenceData(0);
   m_SegmentationInputNode = m_ReferenceDataNode;
 
-  m_LastTimePointOfUpdate = 0;
+  m_LastTimePointOfUpdate = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
 
   if (m_PreviewSegmentationNode.IsNull())
   {
@@ -109,6 +116,7 @@ void mitk::AutoSegmentationWithPreviewTool::Deactivated()
 
   m_SegmentationInputNode = nullptr;
   m_ReferenceDataNode = nullptr;
+  m_WorkingPlaneGeometry = nullptr;
 
   try
   {
@@ -269,9 +277,9 @@ void mitk::AutoSegmentationWithPreviewTool::TransferImageAtTimeStep(const Image*
 {
   try
   {
-    Image::ConstPointer image3D = this->GetImageByTimeStep(sourceImage, timeStep);
+    Image::ConstPointer sourceImageAtTimeStep = this->GetImageByTimeStep(sourceImage, timeStep);
 
-    if (image3D->GetPixelType() != destinationImage->GetPixelType())
+    if (sourceImageAtTimeStep->GetPixelType() != destinationImage->GetPixelType())
     {
       mitkThrow() << "Cannot transfer images. Tool is in an invalid state, source image and destination image do not have the same pixel type. "
         << "Source pixel type: " << sourceImage->GetPixelType().GetTypeAsString()
@@ -283,15 +291,23 @@ void mitk::AutoSegmentationWithPreviewTool::TransferImageAtTimeStep(const Image*
       mitkThrow() << "Cannot transfer images. Tool is in an invalid state, source image and destination image do not have the same geometry.";
     }
 
-    if (image3D->GetDimension() == 2)
+    if (nullptr != this->GetWorkingPlaneGeometry())
     {
-      AccessFixedDimensionByItk_2(
-        image3D, ITKSetVolume, 2, destinationImage, timeStep);
+      auto sourceSlice = SegTool2D::GetAffectedImageSliceAs2DImage(this->GetWorkingPlaneGeometry(), sourceImage, timeStep);
+      SegTool2D::WriteBackSegmentationResult(this->GetTargetSegmentationNode(), m_WorkingPlaneGeometry, sourceSlice, timeStep);
     }
     else
-    {
-      AccessFixedDimensionByItk_2(
-        image3D, ITKSetVolume, 3, destinationImage, timeStep);
+    { //take care of the full segmentation volume
+      if (sourceImageAtTimeStep->GetDimension() == 2)
+      {
+        AccessFixedDimensionByItk_2(
+          sourceImageAtTimeStep, ITKSetVolume, 2, destinationImage, timeStep);
+      }
+      else
+      {
+        AccessFixedDimensionByItk_2(
+          sourceImageAtTimeStep, ITKSetVolume, 3, destinationImage, timeStep);
+      }
     }
   }
   catch (...)
@@ -327,13 +343,13 @@ void mitk::AutoSegmentationWithPreviewTool::CreateResultSegmentationFromPreview(
       {
         for (unsigned int timeStep = 0; timeStep < previewImage->GetTimeSteps(); ++timeStep)
         {
-          TransferImageAtTimeStep(previewImage, resultSegmentation, timeStep);
+          this->TransferImageAtTimeStep(previewImage, resultSegmentation, timeStep);
         }
       }
       else
       {
         const auto timeStep = resultSegmentation->GetTimeGeometry()->TimePointToTimeStep(timePoint);
-        TransferImageAtTimeStep(previewImage, resultSegmentation, timeStep);
+        this->TransferImageAtTimeStep(previewImage, resultSegmentation, timeStep);
       }
 
       // since we are maybe working on a smaller image, pad it to the size of the original image
@@ -353,6 +369,7 @@ void mitk::AutoSegmentationWithPreviewTool::CreateResultSegmentationFromPreview(
 
       m_ToolManager->SetWorkingData(resultSegmentationNode);
       m_ToolManager->GetWorkingData(0)->Modified();
+      this->EnsureTargetSegmentationNodeInDataStorage();
     }
   }
 }
@@ -408,6 +425,7 @@ void mitk::AutoSegmentationWithPreviewTool::UpdatePreview(bool ignoreLazyPreview
   int progress_steps = 200;
 
   this->CurrentlyBusy.Send(true);
+  m_IsUpdating = true;
 
   this->UpdatePrepare();
 
@@ -421,19 +439,39 @@ void mitk::AutoSegmentationWithPreviewTool::UpdatePreview(bool ignoreLazyPreview
 
       if (previewImage->GetTimeSteps() > 1 && (ignoreLazyPreviewSetting || !m_LazyDynamicPreviews))
       {
-        for (unsigned int timeStep = 0; timeStep < inputImage->GetTimeSteps(); ++timeStep)
+        for (unsigned int timeStep = 0; timeStep < previewImage->GetTimeSteps(); ++timeStep)
         {
-          auto feedBackImage3D = this->GetImageByTimeStep(inputImage, timeStep);
+          Image::ConstPointer feedBackImage;
+          auto previewTimePoint = previewImage->GetTimeGeometry()->TimeStepToTimePoint(timeStep);
+          auto inputTimeStep = inputImage->GetTimeGeometry()->TimePointToTimeStep(previewTimePoint);
 
-          this->DoUpdatePreview(feedBackImage3D, previewImage, timeStep);
+          if (nullptr != this->GetWorkingPlaneGeometry())
+          { //only extract a specific slice defined by the working plane as feedback image.
+            feedBackImage = SegTool2D::GetAffectedImageSliceAs2DImage(this->GetWorkingPlaneGeometry(), inputImage, inputTimeStep);
+          }
+          else
+          { //work on the whole feedback image
+            feedBackImage = this->GetImageByTimeStep(inputImage, inputTimeStep);
+          }
+
+          this->DoUpdatePreview(feedBackImage, previewImage, timeStep);
         }
       }
       else
       {
-        auto feedBackImage3D = this->GetImageByTimePoint(inputImage, timePoint);
+        Image::ConstPointer feedBackImage;
+        if (nullptr != this->GetWorkingPlaneGeometry())
+        {
+          feedBackImage = SegTool2D::GetAffectedImageSliceAs2DImageByTimePoint(this->GetWorkingPlaneGeometry(), inputImage, timePoint);
+        }
+        else
+        {
+          feedBackImage = this->GetImageByTimePoint(inputImage, timePoint);
+        }
+
         auto timeStep = previewImage->GetTimeGeometry()->TimePointToTimeStep(timePoint);
 
-        this->DoUpdatePreview(feedBackImage3D, previewImage, timeStep);
+        this->DoUpdatePreview(feedBackImage, previewImage, timeStep);
       }
       RenderingManager::GetInstance()->RequestUpdateAll();
     }
@@ -450,6 +488,7 @@ void mitk::AutoSegmentationWithPreviewTool::UpdatePreview(bool ignoreLazyPreview
   catch (...)
   {
     m_ProgressCommand->SetProgress(progress_steps);
+    m_IsUpdating = false;
     CurrentlyBusy.Send(false);
     throw;
   }
@@ -457,7 +496,13 @@ void mitk::AutoSegmentationWithPreviewTool::UpdatePreview(bool ignoreLazyPreview
   this->UpdateCleanUp();
   m_LastTimePointOfUpdate = timePoint;
   m_ProgressCommand->SetProgress(progress_steps);
+  m_IsUpdating = false;
   CurrentlyBusy.Send(false);
+}
+
+bool mitk::AutoSegmentationWithPreviewTool::IsUpdating() const
+{
+  return m_IsUpdating;
 }
 
 void mitk::AutoSegmentationWithPreviewTool::UpdatePrepare()

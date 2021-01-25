@@ -55,29 +55,26 @@ function(mitkFunctionCreateMatchPointDeployedAlgorithm)
     message(FATAL_ERROR "NAME argument cannot be empty.")
   endif()
 
-  SET(ALG_TARGET "MDRA_${ALG_NAME}")
+  set(ALG_TARGET "MDRA_${ALG_NAME}")
 
   if(NOT ALG_CPP_FILES)
     set(ALG_CPP_FILES "${ALG_NAME}.cpp")
   endif()
 
-  IF(NOT ALG_PROFILE)
+  if(NOT ALG_PROFILE)
     set(ALG_PROFILE "${ALG_NAME}.profile")
-  ENDIF(NOT ALG_PROFILE)
+  endif()
 
-  IF(NOT ALG_NO_PROFILE_GEN)
-      MESSAGE(STATUS "... generate MDRA profile for ${ALG_NAME} (from ${ALG_PROFILE})...")
+  if(NOT ALG_NO_PROFILE_GEN)
+    message(STATUS "Generate MDRA profile for ${ALG_NAME} (from ${ALG_PROFILE})")
+    include(${MatchPoint_SOURCE_DIR}/CMake/mapFunctionCreateAlgorithmProfile.cmake)
+    CREATE_ALGORITHM_PROFILE(${ALG_NAME} ${ALG_PROFILE})
+  endif()
 
-      include(${MatchPoint_SOURCE_DIR}/CMake/mapFunctionCreateAlgorithmProfile.cmake)
-      CREATE_ALGORITHM_PROFILE(${ALG_NAME} ${ALG_PROFILE})
-
-      MESSAGE(STATUS "... algorithm UID: ${ALGORITHM_PROFILE_UID}")
-  ENDIF(NOT ALG_NO_PROFILE_GEN)
-
-  MESSAGE(STATUS "... deploy MDRA algorithm ${ALG_NAME}...")
+  message(STATUS "Deploy MDRA algorithm ${ALG_NAME}")
   ADD_LIBRARY(${ALG_TARGET} SHARED ${ALG_CPP_FILES} ${ALGORITHM_PROFILE_FILE})
 
-  SET_TARGET_PROPERTIES(${ALG_TARGET} PROPERTIES
+  set_target_properties(${ALG_TARGET} PROPERTIES
     OUTPUT_NAME "mdra-${MatchPoint_VERSION_MAJOR}-${MatchPoint_VERSION_MINOR}_${ALG_NAME}"
     OUTPUT_NAME_DEBUG "mdra-D-${MatchPoint_VERSION_MAJOR}-${MatchPoint_VERSION_MINOR}_${ALG_NAME}"
     PREFIX ""

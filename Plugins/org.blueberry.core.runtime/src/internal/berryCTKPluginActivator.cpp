@@ -187,7 +187,7 @@ QSharedPointer<ctkPlugin> org_blueberry_core_runtime_Activator::GetPlugin(const 
   auto plugins = context->getPlugins();
 
   //Return the first plugin that is not installed or uninstalled
-  for (auto plugin : plugins)
+  for (auto plugin : qAsConst(plugins))
   {
     if (!(plugin->getState() == ctkPlugin::INSTALLED ||
           plugin->getState() == ctkPlugin::UNINSTALLED))

@@ -375,7 +375,7 @@ void QmitkToolSelectionBox::UpdateButtonsEnabledState()
     workingData = workingDataNode->GetData();
   }
 
-  for (const auto& button : buttons)
+  for (const auto& button : qAsConst(buttons))
   {
     const auto buttonID = m_ToolButtonGroup->id(button);
     const auto toolID = m_ToolIDForButtonID[buttonID];

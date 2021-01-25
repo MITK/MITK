@@ -105,14 +105,15 @@ endif()
 #-----------------------------------------------------------------------------
 # Check miminum macOS version
 #-----------------------------------------------------------------------------
-# The minimum supported macOS version is 10.13. If you use a version less than 10.13, there is no guarantee that the build still works.
+# The minimum supported macOS version is 10.14. If you use a version less than
+# 10.14, there is no guarantee that the build still works.
 if(APPLE)
   exec_program(sw_vers ARGS -productVersion OUTPUT_VARIABLE macos_version)
-  if (macos_version VERSION_LESS "10.13")
-    message(WARNING "Detected macOS version \"${macos_version}\" is not supported anymore. Minimum required macOS version is at least 10.13.")
+  if (macos_version VERSION_LESS "10.14")
+    message(WARNING "Detected macOS version \"${macos_version}\" is not supported anymore. Minimum required macOS version is at least 10.14.")
   endif()
-  if (CMAKE_OSX_DEPLOYMENT_TARGET AND CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS 10.13)
-    message(WARNING "Detected macOS deployment target \"${CMAKE_OSX_DEPLOYMENT_TARGET}\" is not supported anymore. Minimum required macOS version is at least 10.13.")
+  if (CMAKE_OSX_DEPLOYMENT_TARGET AND CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS 10.14)
+    message(WARNING "Detected macOS deployment target \"${CMAKE_OSX_DEPLOYMENT_TARGET}\" is not supported anymore. Minimum required macOS version is at least 10.14.")
   endif()
 endif()
 
@@ -860,9 +861,6 @@ set(CMAKE_MODULE_PATH
   )
 
 if(MITK_USE_DCMTK)
-  # Due to the preferred CONFIG mode in find_package calls above,
-  # the DCMTKConfig.cmake file is read, which does not provide useful
-  # package information. We explictly need MODULE mode to find DCMTK.
   if(${_dcmtk_dir_orig} MATCHES "${MITK_EXTERNAL_PROJECT_PREFIX}.*")
     # Help our FindDCMTK.cmake script find our super-build DCMTK
     set(DCMTK_DIR ${MITK_EXTERNAL_PROJECT_PREFIX})
@@ -870,7 +868,6 @@ if(MITK_USE_DCMTK)
     # Use the original value
     set(DCMTK_DIR ${_dcmtk_dir_orig})
   endif()
-  find_package(DCMTK REQUIRED MODULE)
 endif()
 
 if(MITK_USE_DCMQI)

@@ -579,7 +579,7 @@ void RTDoseVisualizer::UpdateBySelectedNode()
       m_PrescribedDose_Data = 0.0;
 
       auto prescibedDoseProperty = m_selectedNode->GetData()->GetProperty(mitk::RTConstants::PRESCRIBED_DOSE_PROPERTY_NAME.c_str());
-      auto prescribedDoseGenericProperty = dynamic_cast<mitk::GenericProperty<double>*>(prescibedDoseProperty.GetPointer());
+      auto prescribedDoseGenericProperty = dynamic_cast<mitk::DoubleProperty*>(prescibedDoseProperty.GetPointer());
       m_PrescribedDose_Data = prescribedDoseGenericProperty->GetValue();
 
       m_Controls.prescribedDoseSpecific->setText(QString::number(m_PrescribedDose_Data));

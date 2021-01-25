@@ -68,15 +68,6 @@ namespace mitk {
     */
     NavigationData::Pointer GetNavigationDataForIndex( unsigned int index, unsigned int toolIndex ) const;
 
-    ///**
-    //* \brief Get last mitk::Navigation object for given tool whose timestamp is less than the given timestamp.
-    //* @param toolIndex Index of the tool from which mitk::NavigationData should be returned.
-    //* @param timestamp Timestamp for selecting last object before.
-    //* @return Last mitk::NavigationData with timestamp less than given timestamp, 0 if there is no adequate object.
-    //*/
-    // Method not yet supported!
-    //NavigationData::Pointer GetNavigationDataBeforeTimestamp( mitk::NavigationData::TimeStampType timestamp , unsigned int toolIndex ) const;
-
     /**
     * \brief Returns a vector that contains all tracking data for a given tool.
     *

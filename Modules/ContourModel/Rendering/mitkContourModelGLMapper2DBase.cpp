@@ -99,7 +99,7 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel *r
 
   renderingContour->UpdateOutputInformation();
 
-  unsigned int timestep = renderer->GetTimeStep();
+  const auto timestep = this->GetTimestep();
 
   if (!renderingContour->IsEmptyTimeStep(timestep))
   {

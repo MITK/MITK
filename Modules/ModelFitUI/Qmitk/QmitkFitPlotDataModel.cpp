@@ -72,7 +72,7 @@ std::pair<bool, mitk::ModelFitPlotData::PositionalCollectionMap::value_type> Qmi
 {
   for (auto collection : this->m_PlotData.positionalPlots)
   {
-    for (auto aCurve : collection.second.second->CastToSTLContainer())
+    for (const auto &aCurve : collection.second.second->CastToSTLContainer())
     {
       if (curve == aCurve.second.GetPointer())
       {
@@ -155,7 +155,7 @@ GetCurveByColumn(int col) const
   }
   col -= actualCount;
 
-  for (auto collection : this->m_PlotData.positionalPlots)
+  for (const auto &collection : this->m_PlotData.positionalPlots)
   {
     if (GetCurveFromCollection(collection.second.second.GetPointer(), col, finding, actualCount))
     {

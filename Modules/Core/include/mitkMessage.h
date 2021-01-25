@@ -455,7 +455,7 @@ namespace mitk
     typedef MessageBase<MessageAbstractDelegate<A>> Super;
     typedef typename Super::ListenerList ListenerList;
 
-    void Send()
+    void Send() const
     {
       ListenerList listeners;
 
@@ -472,7 +472,7 @@ namespace mitk
       }
     }
 
-    void operator()() { this->Send(); }
+    void operator()() const { this->Send(); }
   };
 
   // message with 1 parameter and return type
@@ -483,7 +483,7 @@ namespace mitk
     typedef MessageBase<MessageAbstractDelegate1<T, A>> Super;
     typedef typename Super::ListenerList ListenerList;
 
-    void Send(T t)
+    void Send(T t) const
     {
       ListenerList listeners;
 
@@ -500,7 +500,7 @@ namespace mitk
       }
     }
 
-    void operator()(T t) { this->Send(t); }
+    void operator() (T t) const { this->Send(t); }
   };
 
   // message with 2 parameters and return type
@@ -511,7 +511,7 @@ namespace mitk
     typedef MessageBase<MessageAbstractDelegate2<T, U, A>> Super;
     typedef typename Super::ListenerList ListenerList;
 
-    void Send(T t, U u)
+    void Send(T t, U u) const
     {
       ListenerList listeners;
 
@@ -528,7 +528,7 @@ namespace mitk
       }
     }
 
-    void operator()(T t, U u) { this->Send(t, u); }
+    void operator()(T t, U u) const { this->Send(t, u); }
   };
 
   // message with 3 parameters and return type
@@ -539,7 +539,7 @@ namespace mitk
     typedef MessageBase<MessageAbstractDelegate3<T, U, V, A>> Super;
     typedef typename Super::ListenerList ListenerList;
 
-    void Send(T t, U u, V v)
+    void Send(T t, U u, V v) const
     {
       ListenerList listeners;
 
@@ -556,7 +556,7 @@ namespace mitk
       }
     }
 
-    void operator()(T t, U u, V v) { this->Send(t, u, v); }
+    void operator()(T t, U u, V v) const { this->Send(t, u, v); }
   };
 
   // message with 4 parameters and return type
@@ -567,7 +567,7 @@ namespace mitk
     typedef MessageBase<MessageAbstractDelegate4<T, U, V, W, A>> Super;
     typedef typename Super::ListenerList ListenerList;
 
-    void Send(T t, U u, V v, W w)
+    void Send(T t, U u, V v, W w) const
     {
       ListenerList listeners;
 
@@ -584,7 +584,7 @@ namespace mitk
       }
     }
 
-    void operator()(T t, U u, V v, W w) { this->Send(t, u, v, w); }
+    void operator()(T t, U u, V v, W w) const { this->Send(t, u, v, w); }
   };
 
 /* Here is an example how to use the macros and templates:

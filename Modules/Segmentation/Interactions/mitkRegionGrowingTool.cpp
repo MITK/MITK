@@ -11,18 +11,11 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkRegionGrowingTool.h"
-#include "mitkApplicationCursor.h"
 #include "mitkBaseRenderer.h"
-#include "mitkImageDataItem.h"
 #include "mitkImageToContourModelFilter.h"
-#include "mitkOverwriteSliceImageFilter.h"
 #include "mitkRegionGrowingTool.xpm"
 #include "mitkRenderingManager.h"
 #include "mitkToolManager.h"
-
-#include "mitkExtractDirectedPlaneImageFilterNew.h"
-#include "mitkLabelSetImage.h"
-#include "mitkOverwriteDirectedPlaneImageFilter.h"
 
 // us
 #include <usGetModuleContext.h>
@@ -35,7 +28,6 @@ found in the LICENSE file.
 #include "mitkImageAccessByItk.h"
 #include <itkConnectedComponentImageFilter.h>
 #include <itkConnectedThresholdImageFilter.h>
-#include <itkImageRegionIteratorWithIndex.h>
 #include <itkNeighborhoodIterator.h>
 
 #include <itkImageDuplicator.h>
@@ -317,7 +309,7 @@ void mitk::RegionGrowingTool::OnMousePressed(StateMachineAction *, InteractionEv
 
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
-  m_LastScreenPosition = positionEvent->GetPointerPositionOnScreen();
+  m_LastScreenPosition = Point2I(positionEvent->GetPointerPositionOnScreen());
 
   // ReferenceSlice is from the underlying image, WorkingSlice from the active segmentation (can be empty)
   m_ReferenceSlice = FeedbackContourTool::GetAffectedReferenceSlice(positionEvent);
@@ -485,12 +477,7 @@ void mitk::RegionGrowingTool::OnMousePressedOutside(StateMachineAction *, Intera
         ContourModel::Pointer resultContourWorld = FeedbackContourTool::BackProjectContourFrom2DSlice(
           workingSliceGeometry, FeedbackContourTool::ProjectContourTo2DSlice(m_WorkingSlice, resultContour));
 
-        // this is not a beautiful solution, just one that works, check T22412 for details
-        auto t = positionEvent->GetSender()->GetTimeStep();
-
-        FeedbackContourTool::SetFeedbackContour(0 != t
-          ? ContourModelUtils::MoveZerothContourTimeStep(resultContourWorld, t)
-          : resultContourWorld);
+        FeedbackContourTool::UpdateCurrentFeedbackContour(resultContourWorld);
 
         FeedbackContourTool::SetFeedbackContourVisible(true);
         mitk::RenderingManager::GetInstance()->RequestUpdate(m_LastEventSender->GetRenderWindow());
@@ -521,7 +508,7 @@ void mitk::RegionGrowingTool::OnMouseMoved(StateMachineAction *, InteractionEven
 
     m_ScreenYDifference += positionEvent->GetPointerPositionOnScreen()[1] - m_LastScreenPosition[1];
     m_ScreenXDifference += positionEvent->GetPointerPositionOnScreen()[0] - m_LastScreenPosition[0];
-    m_LastScreenPosition = positionEvent->GetPointerPositionOnScreen();
+    m_LastScreenPosition = Point2I(positionEvent->GetPointerPositionOnScreen());
 
     // Moving the mouse up and down adjusts the width of the threshold window,
     // moving it left and right shifts the threshold window
@@ -556,23 +543,7 @@ void mitk::RegionGrowingTool::OnMouseMoved(StateMachineAction *, InteractionEven
         ContourModel::Pointer resultContourWorld = FeedbackContourTool::BackProjectContourFrom2DSlice(
           workingSliceGeometry, FeedbackContourTool::ProjectContourTo2DSlice(m_WorkingSlice, resultContour));
 
-        // this is not a beautiful solution, just one that works, check T22412 for details
-        int timestep = positionEvent->GetSender()->GetTimeStep();
-        if (0 != timestep)
-        {
-          int size = resultContourWorld->GetNumberOfVertices(0);
-          auto resultContourTimeWorld = mitk::ContourModel::New();
-          resultContourTimeWorld->Expand(timestep + 1);
-          for (int loop = 0; loop < size; ++loop)
-          {
-            resultContourTimeWorld->AddVertex(resultContourWorld->GetVertexAt(loop, 0), timestep);
-          }
-          FeedbackContourTool::SetFeedbackContour(resultContourTimeWorld);
-        }
-        else
-        {
-          FeedbackContourTool::SetFeedbackContour(resultContourWorld);
-        }
+        FeedbackContourTool::UpdateCurrentFeedbackContour(resultContourWorld);
 
         FeedbackContourTool::SetFeedbackContourVisible(true);
         mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(positionEvent->GetSender()->GetRenderWindow());
@@ -594,55 +565,7 @@ void mitk::RegionGrowingTool::OnMouseReleased(StateMachineAction *, InteractionE
 
   if (m_WorkingSlice.IsNotNull() && m_FillFeedbackContour && positionEvent)
   {
-    // Project contour into working slice
-    ContourModel *feedbackContour(FeedbackContourTool::GetFeedbackContour());
-
-    ContourModel::Pointer projectedContour;
-
-    // this is not a beautiful solution, just one that works, check T22412 for details
-    int timestep = positionEvent->GetSender()->GetTimeStep();
-    if (0 != timestep)
-    {
-      int size = feedbackContour->GetNumberOfVertices(timestep);
-      auto feedbackContourTime = mitk::ContourModel::New();
-      feedbackContourTime->Expand(timestep + 1);
-      for (int loop = 0; loop < size; ++loop)
-      {
-        feedbackContourTime->AddVertex(feedbackContour->GetVertexAt(loop, timestep), 0);
-      }
-
-      projectedContour =
-        FeedbackContourTool::ProjectContourTo2DSlice(m_WorkingSlice, feedbackContourTime, false, false);
-    }
-    else
-    {
-      projectedContour =
-        FeedbackContourTool::ProjectContourTo2DSlice(m_WorkingSlice, feedbackContour, false, false);
-    }
-
-    // If there is a projected contour, fill it
-    if (projectedContour.IsNotNull())
-    {
-      mitk::DataNode *workingNode(m_ToolManager->GetWorkingData(0));
-      if (nullptr == workingNode)
-      {
-        return;
-      }
-
-      auto workingImage = dynamic_cast<Image*>(workingNode->GetData());
-      if (nullptr == workingImage)
-      {
-        return;
-      }
-
-      // m_PaintingPixelValue only decides whether to paint or erase
-      int activePixelValue = ContourModelUtils::GetActivePixelValue(workingImage);
-      mitk::ContourModelUtils::FillContourInSlice(
-        projectedContour, 0, m_WorkingSlice, workingImage, m_PaintingPixelValue * activePixelValue);
-
-      this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice);
-      FeedbackContourTool::SetFeedbackContourVisible(false);
-    }
+    this->WriteBackFeedbackContourAsSegmentationResult(positionEvent, m_PaintingPixelValue);
 
     m_ScreenYDifference = 0;
     m_ScreenXDifference = 0;

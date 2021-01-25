@@ -38,7 +38,7 @@ QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString titl
   {
     MITK_DEBUG << "No presets for visible node selection inspectors available. Use fallback (show all available inspectors)";
     unsigned int order = 0;
-    for (auto proIter : providers)
+    for (const auto &proIter : providers)
     {
       visibleProviders.insert(std::make_pair(order, proIter.first));
       ++order;
@@ -47,7 +47,7 @@ QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString titl
 
   int preferredIndex = 0;
   bool preferredFound = false;
-  for (auto proIter : visibleProviders)
+  for (const auto &proIter : visibleProviders)
   {
     auto finding = providers.find(proIter.second);
     if (finding != providers.end())
@@ -224,7 +224,7 @@ void QmitkNodeSelectionDialog::OnSelectionChanged(NodeList selectedNodes)
 
 void QmitkNodeSelectionDialog::OnFavoriteNodesButtonClicked()
 {
-  for (auto node : m_SelectedNodes)
+  for (auto node : qAsConst(m_SelectedNodes))
   {
     node->SetBoolProperty("org.mitk.selection.favorite", true);
   }
@@ -232,7 +232,7 @@ void QmitkNodeSelectionDialog::OnFavoriteNodesButtonClicked()
 
 void QmitkNodeSelectionDialog::OnOK()
 {
-  for (auto node : m_SelectedNodes)
+  for (const auto &node : qAsConst(m_SelectedNodes))
   {
     QmitkDataStorageSelectionHistoryInspector::AddNodeToHistory(node);
   }

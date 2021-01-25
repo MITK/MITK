@@ -99,8 +99,6 @@ public:
    * the given progress monitor.
    * </p>
    *
-   * @param monitor
-   *            the progress monitor
    * @throws CoreException
    *             if the save fails; it is the caller's responsibility to
    *             report the failure to the user

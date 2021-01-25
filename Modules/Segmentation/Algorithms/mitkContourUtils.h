@@ -50,7 +50,9 @@ namespace mitk
     /**
       \brief Projects a slice index coordinates of a contour back into world coordinates.
 
-            \param correctionForIpSegmentation subtracts 0.5 to x and y index coordinates (difference between
+      \param sliceGeometry
+      \param contourIn2D
+      \param correctionForIpSegmentation subtracts 0.5 to x and y index coordinates (difference between
       ipSegmentation and MITK contours)
     */
     ContourModel::Pointer BackProjectContourFrom2DSlice(const BaseGeometry *sliceGeometry,

@@ -531,7 +531,7 @@ bool mitk::PointSetDataInteractor::CheckSelection(const mitk::InteractionEvent *
   const auto *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
   if (positionEvent != nullptr)
   {
-    int timeStep = positionEvent->GetSender()->GetTimeStep();
+    const auto timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
     Point3D point = positionEvent->GetPositionInWorld();
     // iterate over point set and check if it contains a point close enough to the pointer to be selected
     int index = GetPointIndexByPosition(point, timeStep);

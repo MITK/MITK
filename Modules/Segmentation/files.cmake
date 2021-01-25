@@ -48,6 +48,7 @@ set(CPP_FILES
   Interactions/mitkDrawPaintbrushTool.cpp
   Interactions/mitkErasePaintbrushTool.cpp
   Interactions/mitkEraseRegionTool.cpp
+  Interactions/mitkFastMarchingBaseTool.cpp
   Interactions/mitkFastMarchingTool.cpp
   Interactions/mitkFastMarchingTool3D.cpp
   Interactions/mitkFeedbackContourTool.cpp

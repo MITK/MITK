@@ -50,6 +50,11 @@ found in the LICENSE file.
 
 bool mitk::SegTool2D::m_SurfaceInterpolationEnabled = true;
 
+mitk::SegTool2D::SliceInformation::SliceInformation(const mitk::Image* aSlice, const mitk::PlaneGeometry* aPlane, mitk::TimeStepType aTimestep) :
+  slice(aSlice), plane(aPlane), timestep(aTimestep)
+{
+}
+
 mitk::SegTool2D::SegTool2D(const char *type, const us::Module *interactorModule)
   : Tool(type, interactorModule), m_Contourmarkername("Position")
 {
@@ -142,7 +147,7 @@ void mitk::SegTool2D::UpdateSurfaceInterpolation(const Image *slice,
                                                  bool detectIntersection)
 {
   std::vector<SliceInformation> slices = { SliceInformation(slice, plane, 0)};
-  UpdateSurfaceInterpolation(slices, workingImage, detectIntersection);
+  Self::UpdateSurfaceInterpolation(slices, workingImage, detectIntersection);
 }
 
 void  mitk::SegTool2D::RemoveContourFromInterpolator(const SliceInformation& sliceInfo)
@@ -196,7 +201,7 @@ void mitk::SegTool2D::UpdateSurfaceInterpolation(const std::vector<SliceInformat
 
       if (contour->GetVtkPolyData()->GetNumberOfPoints() == 0)
       {
-        RemoveContourFromInterpolator(sliceInfo);
+        Self::RemoveContourFromInterpolator(sliceInfo);
       }
       else
       {
@@ -217,7 +222,7 @@ void mitk::SegTool2D::UpdateSurfaceInterpolation(const std::vector<SliceInformat
 
     if (contour->GetVtkPolyData()->GetNumberOfPoints() == 0)
     {
-      RemoveContourFromInterpolator(sliceInfo);
+      Self::RemoveContourFromInterpolator(sliceInfo);
     }
     else
     {
@@ -457,7 +462,7 @@ void mitk::SegTool2D::WriteBackSegmentationResult(const DataNode* workingNode, c
     return;
 
   SliceInformation sliceInfo(segmentationResult, const_cast<mitk::PlaneGeometry*>(planeGeometry), timeStep);
-  WriteBackSegmentationResults(workingNode, { sliceInfo }, true);
+  Self::WriteBackSegmentationResults(workingNode, { sliceInfo }, true);
 }
 
 void mitk::SegTool2D::WriteBackSegmentationResult(const PlaneGeometry *planeGeometry,

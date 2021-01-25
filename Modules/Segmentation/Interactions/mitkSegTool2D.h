@@ -163,16 +163,11 @@ namespace mitk
     struct SliceInformation
     {
       mitk::Image::ConstPointer slice;
-      const mitk::PlaneGeometry *plane;
-      mitk::TimeStepType timestep;
+      const mitk::PlaneGeometry *plane = nullptr;
+      mitk::TimeStepType timestep = 0;
 
-      SliceInformation() {}
-      SliceInformation(const mitk::Image *slice, const mitk::PlaneGeometry *plane, mitk::TimeStepType timestep)
-      {
-        this->slice = slice;
-        this->plane = plane;
-        this->timestep = timestep;
-      }
+      SliceInformation() = default;
+      SliceInformation(const mitk::Image* aSlice, const mitk::PlaneGeometry* aPlane, mitk::TimeStepType aTimestep);
     };
 
     /**

@@ -105,14 +105,15 @@ endif()
 #-----------------------------------------------------------------------------
 # Check miminum macOS version
 #-----------------------------------------------------------------------------
-# The minimum supported macOS version is 10.13. If you use a version less than 10.13, there is no guarantee that the build still works.
+# The minimum supported macOS version is 10.14. If you use a version less than
+# 10.14, there is no guarantee that the build still works.
 if(APPLE)
   exec_program(sw_vers ARGS -productVersion OUTPUT_VARIABLE macos_version)
-  if (macos_version VERSION_LESS "10.13")
-    message(WARNING "Detected macOS version \"${macos_version}\" is not supported anymore. Minimum required macOS version is at least 10.13.")
+  if (macos_version VERSION_LESS "10.14")
+    message(WARNING "Detected macOS version \"${macos_version}\" is not supported anymore. Minimum required macOS version is at least 10.14.")
   endif()
-  if (CMAKE_OSX_DEPLOYMENT_TARGET AND CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS 10.13)
-    message(WARNING "Detected macOS deployment target \"${CMAKE_OSX_DEPLOYMENT_TARGET}\" is not supported anymore. Minimum required macOS version is at least 10.13.")
+  if (CMAKE_OSX_DEPLOYMENT_TARGET AND CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS 10.14)
+    message(WARNING "Detected macOS deployment target \"${CMAKE_OSX_DEPLOYMENT_TARGET}\" is not supported anymore. Minimum required macOS version is at least 10.14.")
   endif()
 endif()
 

@@ -138,8 +138,8 @@ void PCAExample::showEigenvectors(std::vector<mitk::Vector3D> eigenVectors, std:
 	m_Axis1Node = mitk::DataNode::New();
 	m_Axis1Node->SetName("Eigenvector 1");
 	mitk::PointSet::Pointer axis1 = mitk::PointSet::New();
-	axis1->InsertPoint(0, center);
-	axis1->InsertPoint(1, (center + eigenVectors.at(0)*eigenValues.at(0)));
+	axis1->InsertPoint(0, mitk::Point3D(center));
+	axis1->InsertPoint(1, mitk::Point3D(center + eigenVectors.at(0)*eigenValues.at(0)));
 	m_Axis1Node->SetData(axis1);
 	m_Axis1Node->SetBoolProperty("show contour", true);
 	m_Axis1Node->SetColor(1, 0, 0);
@@ -148,8 +148,8 @@ void PCAExample::showEigenvectors(std::vector<mitk::Vector3D> eigenVectors, std:
 	m_Axis2Node = mitk::DataNode::New();
 	m_Axis2Node->SetName("Eigenvector 2");
 	mitk::PointSet::Pointer axis2 = mitk::PointSet::New();
-	axis2->InsertPoint(0, center);
-	axis2->InsertPoint(1, (center + eigenVectors.at(1)*eigenValues.at(1)));
+	axis2->InsertPoint(0, mitk::Point3D(center));
+	axis2->InsertPoint(1, mitk::Point3D(center + eigenVectors.at(1)*eigenValues.at(1)));
 	m_Axis2Node->SetData(axis2);
 	m_Axis2Node->SetBoolProperty("show contour", true);
 	m_Axis2Node->SetColor(1, 0, 0);
@@ -158,8 +158,8 @@ void PCAExample::showEigenvectors(std::vector<mitk::Vector3D> eigenVectors, std:
 	m_Axis3Node = mitk::DataNode::New();
 	m_Axis3Node->SetName("Eigenvector 3");
 	mitk::PointSet::Pointer axis3 = mitk::PointSet::New();
-	axis3->InsertPoint(0, center);
-	axis3->InsertPoint(1, (center + eigenVectors.at(2)*eigenValues.at(2)));
+	axis3->InsertPoint(0, mitk::Point3D(center));
+	axis3->InsertPoint(1, mitk::Point3D(center + eigenVectors.at(2)*eigenValues.at(2)));
 	m_Axis3Node->SetData(axis3);
 	m_Axis3Node->SetBoolProperty("show contour", true);
 	m_Axis3Node->SetColor(1, 0, 0);

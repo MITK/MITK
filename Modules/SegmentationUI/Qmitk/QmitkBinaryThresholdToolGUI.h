@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkBinaryThresholdToolGUI_h_Included
 #define QmitkBinaryThresholdToolGUI_h_Included
 
-#include "QmitkToolGUI.h"
+#include "QmitkBinaryThresholdToolGUIBase.h"
 #include "mitkBinaryThresholdTool.h"
 #include <MitkSegmentationUIExports.h>
 
@@ -33,48 +33,18 @@ found in the LICENSE file.
 
   Last contributor: $Author$
 */
-class MITKSEGMENTATIONUI_EXPORT QmitkBinaryThresholdToolGUI : public QmitkToolGUI
+class MITKSEGMENTATIONUI_EXPORT QmitkBinaryThresholdToolGUI : public QmitkBinaryThresholdToolGUIBase
 {
   Q_OBJECT
 
 public:
-  mitkClassMacro(QmitkBinaryThresholdToolGUI, QmitkToolGUI);
+  mitkClassMacro(QmitkBinaryThresholdToolGUI, QmitkBinaryThresholdToolGUIBase);
   itkFactorylessNewMacro(Self);
   itkCloneMacro(Self);
-
-  void OnThresholdingIntervalBordersChanged(double lower, double upper, bool isFloat);
-  void OnThresholdingValuesChanged(mitk::ScalarType lower, mitk::ScalarType upper);
-
-signals:
-
-  /// \brief Emitted when threshold Accepted
-  void thresholdAccepted();
-
-  /// \brief Emitted when threshold Canceled
-  void thresholdCanceled();
-
-public slots:
-
-protected slots:
-
-  void OnNewToolAssociated(mitk::Tool *);
-  void OnAcceptThresholdPreview();
-
-  void OnSliderValueChanged(double value);
 
 protected:
   QmitkBinaryThresholdToolGUI();
   ~QmitkBinaryThresholdToolGUI() override;
-
-  void BusyStateChanged(bool) override;
-
-  ctkSliderWidget* m_ThresholdSlider = nullptr;
-  QCheckBox* m_CheckProcessAll = nullptr;
-  QCheckBox* m_CheckCreateNew = nullptr;
-
-  bool m_InternalUpdate = false;
-
-  mitk::BinaryThresholdTool::Pointer m_BinaryThresholdTool;
 };
 
 #endif

@@ -27,6 +27,7 @@ namespace mitk
 
 mitk::DrawPaintbrushTool::DrawPaintbrushTool() : PaintbrushTool(1)
 {
+  FeedbackContourTool::SetFeedbackContourColorDefault();
 }
 
 mitk::DrawPaintbrushTool::~DrawPaintbrushTool()

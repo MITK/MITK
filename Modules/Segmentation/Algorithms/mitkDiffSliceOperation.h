@@ -52,35 +52,27 @@ namespace mitk
 
     /** \brief */
     DiffSliceOperation(mitk::Image *imageVolume,
-                       mitk::Image *slice,
-                       SlicedGeometry3D *sliceGeometry,
-                       unsigned int timestep,
-                       BaseGeometry *currentWorldGeometry);
+                       const mitk::Image *slice,
+                       const SlicedGeometry3D *sliceGeometry,
+                       const TimeStepType timestep,
+                       const BaseGeometry *currentWorldGeometry);
 
     /** \brief Check if it is a valid operation.*/
     bool IsValid();
 
-    /** \brief Set the image volume.*/
-    void SetImage(mitk::Image *image) { this->m_Image = image; }
     /** \brief Get th image volume.*/
     mitk::Image *GetImage() { return this->m_Image; }
-    /** \brief Set thee slice to be applied.*/
-    void SetImage(vtkImageData *slice) { this->m_Slice = slice; }
+    const mitk::Image* GetImage() const { return this->m_Image; }
+
     /** \brief Get the slice that is applied in the operation.*/
     Image::Pointer GetSlice();
 
-    /** \brief Get timeStep.*/
-    void SetTimeStep(unsigned int timestep) { this->m_TimeStep = timestep; }
     /** \brief Set timeStep*/
-    unsigned int GetTimeStep() { return this->m_TimeStep; }
-    /** \brief Set the axis where the slice has to be applied in the volume.*/
-    void SetSliceGeometry(SlicedGeometry3D *sliceGeometry) { this->m_SliceGeometry = sliceGeometry; }
+    TimeStepType GetTimeStep() const { return this->m_TimeStep; }
     /** \brief Get the axis where the slice has to be applied in the volume.*/
-    SlicedGeometry3D *GetSliceGeometry() { return this->m_SliceGeometry; }
-    /** \brief Set the axis where the slice has to be applied in the volume.*/
-    void SetCurrentWorldGeometry(BaseGeometry *worldGeometry) { this->m_WorldGeometry = worldGeometry; }
+    const SlicedGeometry3D *GetSliceGeometry() const { return this->m_SliceGeometry; }
     /** \brief Get the axis where the slice has to be applied in the volume.*/
-    BaseGeometry *GetWorldGeometry() { return this->m_WorldGeometry; }
+    const BaseGeometry *GetWorldGeometry() const { return this->m_WorldGeometry; }
   protected:
     ~DiffSliceOperation() override;
 
@@ -93,11 +85,11 @@ namespace mitk
 
     vtkSmartPointer<vtkImageData> m_Slice;
 
-    SlicedGeometry3D::Pointer m_SliceGeometry;
+    SlicedGeometry3D::ConstPointer m_SliceGeometry;
 
-    unsigned int m_TimeStep;
+    TimeStepType m_TimeStep;
 
-    BaseGeometry::Pointer m_WorldGeometry;
+    BaseGeometry::ConstPointer m_WorldGeometry;
 
     bool m_ImageIsValid;
 

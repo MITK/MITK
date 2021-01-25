@@ -31,7 +31,7 @@ mitk::CompressedImageContainer::~CompressedImageContainer()
   delete m_PixelType;
 }
 
-void mitk::CompressedImageContainer::SetImage(Image *image)
+void mitk::CompressedImageContainer::SetImage(const Image *image)
 {
   for (auto iter = m_ByteBuffers.begin(); iter != m_ByteBuffers.end(); ++iter)
   {
@@ -121,7 +121,7 @@ void mitk::CompressedImageContainer::SetImage(Image *image)
   }
 }
 
-mitk::Image::Pointer mitk::CompressedImageContainer::GetImage()
+mitk::Image::Pointer mitk::CompressedImageContainer::GetImage() const
 {
   if (m_ByteBuffers.empty())
     return nullptr;

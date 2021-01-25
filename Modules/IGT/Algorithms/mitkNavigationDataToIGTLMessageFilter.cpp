@@ -196,7 +196,7 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendTransMsg()
 
     //get the navigation data components
     mitk::AffineTransform3D::Pointer transform = input->GetAffineTransform3D();
-    mitk::NavigationData::PositionType position = transform->GetOffset();
+    mitk::NavigationData::PositionType position = Point3D(transform->GetOffset());
 
     //convert the transform into a igtl type
     igtl::Matrix4x4 igtlTransform;
@@ -278,7 +278,7 @@ void mitk::NavigationDataToIGTLMessageFilter::GenerateDataModeSendTDataMsg()
 
     //get the navigation data components
     mitk::AffineTransform3D::Pointer transform = input->GetAffineTransform3D();
-    mitk::NavigationData::PositionType position = transform->GetOffset();
+    mitk::NavigationData::PositionType position = Point3D(transform->GetOffset());
 
     //convert the transform into a igtl type
     igtl::Matrix4x4 igtlTransform;

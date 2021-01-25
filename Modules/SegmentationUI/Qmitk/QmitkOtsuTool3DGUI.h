@@ -13,13 +13,11 @@ found in the LICENSE file.
 #ifndef QmitkOtsuTool3DGUI_h_Included
 #define QmitkOtsuTool3DGUI_h_Included
 
-#include "QmitkToolGUI.h"
-#include "mitkOtsuTool3D.h"
+#include "QmitkAutoMLSegmentationToolGUIBase.h"
 
 #include "ui_QmitkOtsuToolWidgetControls.h"
 
 #include <MitkSegmentationUIExports.h>
-#include <QPushButton>
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
@@ -30,24 +28,18 @@ found in the LICENSE file.
 
   Last contributor: $Author$
 */
-class MITKSEGMENTATIONUI_EXPORT QmitkOtsuTool3DGUI : public QmitkToolGUI
+class MITKSEGMENTATIONUI_EXPORT QmitkOtsuTool3DGUI : public QmitkAutoMLSegmentationToolGUIBase
 {
   Q_OBJECT
 
 public:
-  mitkClassMacro(QmitkOtsuTool3DGUI, QmitkToolGUI);
+  mitkClassMacro(QmitkOtsuTool3DGUI, QmitkAutoMLSegmentationToolGUIBase);
   itkFactorylessNewMacro(Self);
   itkCloneMacro(Self);
 
 protected slots :
 
-  void OnNewToolAssociated(mitk::Tool *);
-
-  void OnSpinboxValueAccept();
-
-  void OnSegmentationRegionAccept();
-
-  void OnRegionSelectionChanged(const QmitkSimpleLabelSetListWidget::LabelVectorType& selectedLabels);
+  void OnPreviewBtnClicked();
 
   void OnRegionSpinboxChanged(int);
 
@@ -57,19 +49,16 @@ private slots:
 
 protected:
   QmitkOtsuTool3DGUI();
-  ~QmitkOtsuTool3DGUI() override;
+  ~QmitkOtsuTool3DGUI() = default;
 
-  void BusyStateChanged(bool value) override;
+  void ConnectNewTool(mitk::AutoSegmentationWithPreviewTool* newTool) override;
+  void InitializeUI(QBoxLayout* mainLayout) override;
 
-  mitk::OtsuTool3D::Pointer m_OtsuTool3DTool;
+  void EnableWidgets(bool enabled) override;
 
   Ui_QmitkOtsuToolWidgetControls m_Controls;
 
-  int m_NumberOfRegions;
-
-  bool m_UseValleyEmphasis;
-
-  int m_NumberOfBins;
+  bool m_FirstPreviewComputation = true;
 };
 
 #endif

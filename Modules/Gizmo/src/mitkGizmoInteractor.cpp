@@ -298,10 +298,10 @@ void mitk::GizmoInteractor::ApplyTranslationToManipulatedObject(const Vector3D &
   assert(m_ManipulatedObjectGeometry.IsNotNull());
 
   auto manipulatedGeometry = m_InitialManipulatedObjectGeometry->Clone();
-  m_FinalDoOperation.reset(new PointOperation(OpMOVE, translation));
+  m_FinalDoOperation.reset(new PointOperation(OpMOVE, Point3D(translation)));
   if (m_UndoEnabled)
   {
-    m_FinalUndoOperation.reset(new PointOperation(OpMOVE, -translation));
+    m_FinalUndoOperation.reset(new PointOperation(OpMOVE, Point3D(-translation)));
   }
 
   manipulatedGeometry->ExecuteOperation(m_FinalDoOperation.get());

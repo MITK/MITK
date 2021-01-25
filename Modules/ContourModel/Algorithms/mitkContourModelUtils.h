@@ -40,8 +40,8 @@ namespace mitk
       MITK contours)
       \param constrainToInside
     */
-    static ContourModel::Pointer ProjectContourTo2DSlice(Image *slice,
-                                                         ContourModel *contourIn3D,
+    static ContourModel::Pointer ProjectContourTo2DSlice(const Image *slice,
+                                                         const ContourModel *contourIn3D,
                                                          bool correctionForIpSegmentation,
                                                          bool constrainToInside);
 
@@ -54,24 +54,31 @@ namespace mitk
       and MITK contours)
     */
     static ContourModel::Pointer BackProjectContourFrom2DSlice(const BaseGeometry *sliceGeometry,
-                                                               ContourModel *contourIn2D,
+                                                               const ContourModel *contourIn2D,
                                                                bool correctionForIpSegmentation = false);
 
     /**
-    \brief Fill a contour in a 2D slice with a specified pixel value at time step 0.
+    \brief Fill a contour in a 2D slice with a specified pixel value.
+    This version always uses the contour of time step 0 and fills the image.
+    \pre sliceImage points to a valid instance
+    \pre projectedContour points to a valid instance
     */
-    static void FillContourInSlice(ContourModel *projectedContour,
+    static void FillContourInSlice(const ContourModel *projectedContour,
                                    Image *sliceImage,
-                                   mitk::Image::Pointer workingImage,
+                                   const Image* workingImage,
                                    int paintingPixelValue = 1);
 
     /**
-    \brief Fill a contour in a 2D slice with a specified pixel value at a given time step.
+    \brief Fill a contour in a 2D slice with a specified pixel value.
+    This overloaded version uses the contour at the passed contourTimeStep
+    to fill the passed image slice.
+    \pre sliceImage points to a valid instance
+    \pre projectedContour points to a valid instance
     */
-    static void FillContourInSlice(ContourModel *projectedContour,
-                                   unsigned int timeStep,
+    static void FillContourInSlice(const ContourModel *projectedContour,
+                                   TimeStepType contourTimeStep,
                                    Image *sliceImage,
-                                   mitk::Image::Pointer workingImage,
+                                   const Image* workingImage,
                                    int paintingPixelValue = 1);
 
     /**
@@ -79,13 +86,13 @@ namespace mitk
     */
     static void FillSliceInSlice(vtkSmartPointer<vtkImageData> filledImage,
                                  vtkSmartPointer<vtkImageData> resultImage,
-                                 mitk::Image::Pointer image,
+                                 const Image* image,
                                  int paintingPixelValue);
 
     /**
     \brief Move the contour in time step 0 to to a new contour model at the given time step.
     */
-    static ContourModel::Pointer MoveZerothContourTimeStep(const ContourModel *contour, unsigned int timeStep);
+    static ContourModel::Pointer MoveZerothContourTimeStep(const ContourModel *contour, TimeStepType timeStep);
 
     /**
     \brief Retrieves the active pixel value of a (labelset) image.
@@ -95,7 +102,7 @@ namespace mitk
 
     \param workingImage   The (labelset) image to retrieve the active pixel value of.
     */
-    static int GetActivePixelValue(mitk::Image* workingImage);
+    static int GetActivePixelValue(const Image* workingImage);
 
   protected:
     ContourModelUtils();

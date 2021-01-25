@@ -15,11 +15,8 @@ found in the LICENSE file.
 #include "mitkToolManager.h"
 
 #include "mitkBaseRenderer.h"
-#include "mitkImageDataItem.h"
-#include "mitkLabelSetImage.h"
 
 #include <mitkITKImageImport.h>
-#include <mitkImagePixelReadAccessor.h>
 #include <mitkImageToContourModelFilter.h>
 
 #include <itkBinaryFillholeImageFilter.h>
@@ -115,11 +112,8 @@ void mitk::SetRegionTool::OnMousePressed(StateMachineAction *, InteractionEvent 
   contourextractor->Update();
 
   mitk::ContourModel::Pointer awesomeContour = contourextractor->GetOutput();
-  auto t = positionEvent->GetSender()->GetTimeStep();
 
-  FeedbackContourTool::SetFeedbackContour(0 != t
-    ? ContourModelUtils::MoveZerothContourTimeStep(awesomeContour, t)
-    : awesomeContour);
+  this->UpdateCurrentFeedbackContour(awesomeContour);
 
   FeedbackContourTool::SetFeedbackContourVisible(true);
   mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
@@ -134,41 +128,9 @@ void mitk::SetRegionTool::OnMouseReleased(StateMachineAction *, InteractionEvent
   assert(positionEvent->GetSender()->GetRenderWindow());
   // 1. Hide the feedback contour, find out which slice the user clicked, find out which slice of the toolmanager's
   // working image corresponds to that
-  FeedbackContourTool::SetFeedbackContourVisible(false);
   mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
 
-  int timeStep = positionEvent->GetSender()->GetTimeStep();
-
-  DataNode *workingNode(m_ToolManager->GetWorkingData(0));
-  if (!workingNode)
-    return;
-
-  auto *image = dynamic_cast<Image *>(workingNode->GetData());
-  const PlaneGeometry *planeGeometry((positionEvent->GetSender()->GetCurrentWorldPlaneGeometry()));
-  if (!image || !planeGeometry)
-    return;
-
-  Image::Pointer slice = FeedbackContourTool::GetAffectedImageSliceAs2DImage(positionEvent, image);
-
-  if (slice.IsNull())
-  {
-    MITK_ERROR << "Unable to extract slice." << std::endl;
-    return;
-  }
-
-  ContourModel *feedbackContour(FeedbackContourTool::GetFeedbackContour());
-  ContourModel::Pointer projectedContour = FeedbackContourTool::ProjectContourTo2DSlice(
-    slice, feedbackContour, false, false); // false: don't add 0.5 (done by FillContourInSlice)
-  // false: don't constrain the contour to the image's inside
-  if (projectedContour.IsNull())
-    return;
-
-  int activePixelValue = ContourModelUtils::GetActivePixelValue(image);
-
-  mitk::ContourModelUtils::FillContourInSlice(
-    projectedContour, timeStep, slice, image, m_PaintingPixelValue * activePixelValue);
-
-  this->WriteBackSegmentationResult(positionEvent, slice);
+  this->WriteBackFeedbackContourAsSegmentationResult(positionEvent, m_PaintingPixelValue);
 }
 
 void mitk::SetRegionTool::OnMouseMoved(mitk::StateMachineAction *, mitk::InteractionEvent *)

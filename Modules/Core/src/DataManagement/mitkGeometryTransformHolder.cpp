@@ -112,7 +112,7 @@ namespace mitk
   //## @brief Get the origin, e.g. the upper-left corner of the plane
   const Point3D GeometryTransformHolder::GetOrigin() const
   {
-    mitk::Point3D origin = this->GetIndexToWorldTransform()->GetOffset();
+    Point3D origin = Point3D(this->GetIndexToWorldTransform()->GetOffset());
     return origin;
   }
 

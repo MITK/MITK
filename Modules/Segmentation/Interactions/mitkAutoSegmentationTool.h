@@ -31,6 +31,9 @@ namespace mitk
   public:
     mitkClassMacro(AutoSegmentationTool, Tool);
 
+    void Activated() override;
+    void Deactivated() override;
+
     /** This function controls wether a confirmed segmentation should replace the old
     * segmentation/working node (true) or if it should be stored as new and additional
     * node (false).
@@ -45,15 +48,18 @@ namespace mitk
     std::string GetCurrentSegmentationName();
 
     /**
-     * @brief Depending on the selected mode either returns the currently selected segmentation
-     *        or creates a new one from the selected reference data and adds the new segmentation
-     *        to the datastorage
+     * @brief Depending on the selected mode either returns the currently selected segmentation node
+     *        or (if overwrite mode is false) creates a new one from the selected reference data.
+     * @remark Please keep in mind that new created nodes are not automatically added to the data storage.
+     * Derived tools can call EnsureTargetSegmentationNodeInDataStorage to ensure it as soon as it is clear
+     * that the target segmentation node will be/is confirmed.
      * @return a mitk::DataNode which contains a segmentation image
      */
-    virtual mitk::DataNode *GetTargetSegmentationNode();
+    virtual DataNode *GetTargetSegmentationNode() const;
 
   protected:
     AutoSegmentationTool(); // purposely hidden
+    AutoSegmentationTool(const char* interactorType, const us::Module* interactorModule = nullptr); // purposely hidden
     ~AutoSegmentationTool() override;
 
     const char *GetGroup() const override;
@@ -63,7 +69,14 @@ namespace mitk
     /** Helper that extracts the image for the passed time point, if the image has multiple time steps.*/
     static Image::ConstPointer GetImageByTimePoint(const Image* image, TimePointType timePoint);
 
+    void EnsureTargetSegmentationNodeInDataStorage() const;
+
     bool m_OverwriteExistingSegmentation;
+
+  private:
+    /**Contains the node returned by GetTargetSementationNode if m_OverwriteExistingSegmentation == false. Then
+    * GetTargetSegmentation generates a new target segmentation node.*/
+    mutable DataNode::Pointer m_NoneOverwriteTargetSegmentationNode;
   };
 
 } // namespace

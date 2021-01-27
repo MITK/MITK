@@ -216,7 +216,7 @@ if(NOT _APP_NO_INSTALL)
   if(UNIX AND NOT APPLE)
     install(PROGRAMS "${MITK_SOURCE_DIR}/CMake/RunInstalledApp.sh" DESTINATION "." RENAME "${_APP_NAME}.sh")
   elseif(WIN32)
-    install(PROGRAMS "${MITK_SOURCE_DIR}/CMake/RunInstalledApp.bat" DESTINATION "." RENAME "${_APP_NAME}.bat")
+    install(PROGRAMS "${MITK_SOURCE_DIR}/CMake/RunInstalledWin32App.bat" DESTINATION "." RENAME "${_APP_NAME}.bat")
   endif()
 
   # Tell cpack the executables that you want in the start menu as links

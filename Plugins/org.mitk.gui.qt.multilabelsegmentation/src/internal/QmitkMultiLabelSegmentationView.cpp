@@ -171,7 +171,7 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget *parent)
 
   m_Controls.m_gbInterpolation->hide(); // See T27436
 
-  QString segTools2D = tr("Add Subtract Fill Erase Paint Wipe 'Region Growing' FastMarching2D Correction 'Live Wire'");
+  QString segTools2D = tr("Add Subtract Fill Erase Paint Wipe 'Region Growing' FastMarching2D 'Live Wire'");
   QString segTools3D = tr("Threshold 'Two Thresholds' 'Auto Threshold' 'Multiple Otsu'");
 
   std::regex extSegTool2DRegEx("SegTool2D$");

@@ -730,83 +730,6 @@ void mitk::SegTool2D::InteractiveSegmentationBugMessage(const std::string &messa
              << "  - What happened (not)? What did you expect?" << std::endl;
 }
 
-template <typename TPixel, unsigned int VImageDimension>
-void InternalWritePreviewOnWorkingImage(itk::Image<TPixel, VImageDimension> *targetSlice,
-                                        const mitk::Image *sourceSlice,
-                                        mitk::Image *originalImage,
-                                        int overwritevalue)
-{
-  typedef itk::Image<TPixel, VImageDimension> SliceType;
-
-  typename SliceType::Pointer sourceSliceITK;
-  CastToItkImage(sourceSlice, sourceSliceITK);
-
-  // now the original slice and the ipSegmentation-painted slice are in the same format, and we can just copy all pixels
-  // that are non-zero
-  typedef itk::ImageRegionIterator<SliceType> OutputIteratorType;
-  typedef itk::ImageRegionConstIterator<SliceType> InputIteratorType;
-
-  InputIteratorType inputIterator(sourceSliceITK, sourceSliceITK->GetLargestPossibleRegion());
-  OutputIteratorType outputIterator(targetSlice, targetSlice->GetLargestPossibleRegion());
-
-  outputIterator.GoToBegin();
-  inputIterator.GoToBegin();
-
-  auto *workingImage = dynamic_cast<mitk::LabelSetImage *>(originalImage);
-  assert(workingImage);
-
-  int activePixelValue = workingImage->GetActiveLabel()->GetValue();
-
-  if (activePixelValue == 0) // if exterior is the active label
-  {
-    while (!outputIterator.IsAtEnd())
-    {
-      if (inputIterator.Get() != 0)
-      {
-        outputIterator.Set(overwritevalue);
-      }
-      ++outputIterator;
-      ++inputIterator;
-    }
-  }
-  else if (overwritevalue != 0) // if we are not erasing
-  {
-    while (!outputIterator.IsAtEnd())
-    {
-      auto targetValue = static_cast<int>(outputIterator.Get());
-      if (inputIterator.Get() != 0)
-      {
-        if (!workingImage->GetLabel(targetValue)->GetLocked())
-        {
-          outputIterator.Set(overwritevalue);
-        }
-      }
-      if (targetValue == overwritevalue)
-      {
-        outputIterator.Set(inputIterator.Get());
-      }
-
-      ++outputIterator;
-      ++inputIterator;
-    }
-  }
-  else // if we are erasing
-  {
-    while (!outputIterator.IsAtEnd())
-    {
-      const int targetValue = outputIterator.Get();
-      if (inputIterator.Get() != 0)
-      {
-        if (targetValue == activePixelValue)
-          outputIterator.Set(overwritevalue);
-      }
-
-      ++outputIterator;
-      ++inputIterator;
-    }
-  }
-}
-
 void mitk::SegTool2D::WritePreviewOnWorkingImage(
   Image *targetSlice, const Image *sourceSlice, const Image *workingImage, int paintingPixelValue)
 {
@@ -830,5 +753,5 @@ void mitk::SegTool2D::WritePreviewOnWorkingImage(
    (or I am not experienced enough to use it correctly)*/
   auto nonConstVtkSource = const_cast<vtkImageData*>(constVtkSource);
 
-  ContourModelUtils::FillSliceInSlice(nonConstVtkSource, targetSlice->GetVtkImageData(), workingImage, paintingPixelValue);
+  ContourModelUtils::FillSliceInSlice(nonConstVtkSource, targetSlice->GetVtkImageData(), workingImage, paintingPixelValue, 1.0);
 }

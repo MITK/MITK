@@ -478,7 +478,7 @@ void QmitkMultiLabelSegmentationView::OnNewSegmentationSession()
   auto segTemplateImage = referenceImage;
   if (referenceImage->GetDimension() > 3)
   {
-    auto result = QMessageBox::question(m_Parent, tr("Generate a static mask?"), tr("The selected image has multiple time steps. You can either generate a simple/static masks resembling the geometry of the first timestep of the image. Or you can generate a dynamic mask that equals the selected image in geometry and number of timesteps; thus a dynamic mask can change over time (e.g. according to the image)."), tr("Yes, generate a static mask"), tr("No, generate a dynamic mask"), QString(), 0, 0);
+    auto result = QMessageBox::question(m_Parent, tr("Create a static or dynamic segmentation?"), tr("The patient image has multiple time steps.\n\nDo you want to create a static segmentation that is identical for all time steps or do you want to create a dynamic segmentation to segment individual time steps?"), tr("Create static segmentation"), tr("Create dynamic segmentation"), QString(), 0, 0);
     if (result == 0)
     {
       auto selector = mitk::ImageTimeSelector::New();

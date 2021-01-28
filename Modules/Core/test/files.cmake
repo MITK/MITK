@@ -111,7 +111,6 @@ set(MODULE_TESTS
   mitkLineTest.cpp
   mitkArbitraryTimeGeometryTest.cpp
   mitkItkImageIOTest.cpp
-  mitkLevelWindowManagerCppUnitTest.cpp
   mitkVectorPropertyTest.cpp
   mitkTemporoSpatialStringPropertyTest.cpp
   mitkPropertyNameHelperTest.cpp

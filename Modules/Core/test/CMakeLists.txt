@@ -50,10 +50,6 @@ if(TARGET ${TESTDRIVER})
                           ${MITK_DATA_DIR}/brain.mhd
   )
 
-  mitkAddCustomModuleTest(mitkLevelWindowManagerTest mitkLevelWindowManagerTest
-                          ${MITK_DATA_DIR}/Pic3D.nrrd
-  )
-
   mitkAddCustomModuleTest(mitkMultiComponentImageDataComparisonFilterTest mitkMultiComponentImageDataComparisonFilterTest
                           ${MITK_DATA_DIR}/NrrdWritingTestImage.jpg
   )

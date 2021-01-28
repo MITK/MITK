@@ -55,10 +55,12 @@ void QmitkPointSetInteractionView::CreateQtPartControl(QWidget *parent)
   connect(m_Controls->addPointSetPushButton, &QPushButton::clicked,
     this, &QmitkPointSetInteractionView::OnAddPointSetClicked);
 
-  if (mitk::IRenderWindowPart* renderWindowPart = GetRenderWindowPart())
-  {
-    RenderWindowPartActivated(renderWindowPart);
-  }
+  auto renderWindowPart = this->GetRenderWindowPart();
+
+  if (nullptr != renderWindowPart)
+    this->RenderWindowPartActivated(renderWindowPart);
+
+  this->OnCurrentSelectionChanged(m_Controls->selectedPointSetWidget->GetSelectedNodes());
 }
 
 void QmitkPointSetInteractionView::SetFocus()

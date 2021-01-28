@@ -91,6 +91,9 @@ void QmitkImageCropperView::CreateQtPartControl(QWidget *parent)
   SetDefaultGUI();
 
   m_ParentWidget = parent;
+
+  this->OnImageSelectionChanged(m_Controls.imageSelectionWidget->GetSelectedNodes());
+  this->OnBoundingBoxSelectionChanged(m_Controls.boundingBoxSelectionWidget->GetSelectedNodes());
 }
 
 void QmitkImageCropperView::OnImageSelectionChanged(QList<mitk::DataNode::Pointer>)

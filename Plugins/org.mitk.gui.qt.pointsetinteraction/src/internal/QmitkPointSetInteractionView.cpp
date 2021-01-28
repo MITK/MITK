@@ -13,11 +13,11 @@ found in the LICENSE file.
 #include "QmitkPointSetInteractionView.h"
 
 #include <QInputDialog>
-#include <QLineEdit>
 
-#include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateOr.h>
 #include <mitkNodePredicateProperty.h>
 
 #include <QmitkPointListWidget.h>
@@ -42,7 +42,9 @@ void QmitkPointSetInteractionView::CreateQtPartControl(QWidget *parent)
   m_Controls->selectedPointSetWidget->SetDataStorage(GetDataStorage());
   m_Controls->selectedPointSetWidget->SetNodePredicate(mitk::NodePredicateAnd::New(
     mitk::TNodePredicateDataType<mitk::PointSet>::New(),
-    mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))));
+    mitk::NodePredicateNot::New(mitk::NodePredicateOr::New(
+      mitk::NodePredicateProperty::New("helper object"),
+      mitk::NodePredicateProperty::New("hidden object")))));
 
   m_Controls->selectedPointSetWidget->SetSelectionIsOptional(true);
   m_Controls->selectedPointSetWidget->SetAutoSelectNewNodes(true);

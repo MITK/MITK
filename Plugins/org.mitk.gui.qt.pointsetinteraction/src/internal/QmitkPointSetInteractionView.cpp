@@ -70,7 +70,7 @@ void QmitkPointSetInteractionView::SetFocus()
   m_Controls->addPointSetPushButton->setFocus();
 }
 
-void QmitkPointSetInteractionView::OnCurrentSelectionChanged(QmitkSingleNodeSelectionWidget::NodeList nodes)
+void QmitkPointSetInteractionView::OnCurrentSelectionChanged(QmitkSingleNodeSelectionWidget::NodeList /*nodes*/)
 {
   m_Controls->poinSetListWidget->SetPointSetNode(m_Controls->selectedPointSetWidget->GetSelectedNode());
 }

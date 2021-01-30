@@ -284,7 +284,8 @@ void QmitkNodeSelectionDialog::AddPanel(const mitk::IDataStorageInspectorProvide
 
 void QmitkNodeSelectionDialog::OnDoubleClicked(const QModelIndex& /*index*/)
 {
-  if (!m_SelectedNodes.empty())
+  const auto isOK = m_Controls.buttonBox->button(QDialogButtonBox::Ok)->isEnabled();
+  if (!m_SelectedNodes.empty() && isOK)
   {
     this->OnOK();
   }

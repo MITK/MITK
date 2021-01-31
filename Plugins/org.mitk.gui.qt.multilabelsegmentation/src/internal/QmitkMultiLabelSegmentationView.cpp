@@ -68,6 +68,7 @@ QmitkMultiLabelSegmentationView::QmitkMultiLabelSegmentationView()
   m_SegmentationPredicate = mitk::NodePredicateAnd::New();
   m_SegmentationPredicate->AddPredicate(mitk::TNodePredicateDataType<mitk::LabelSetImage>::New());
   m_SegmentationPredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
+  m_SegmentationPredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
 
   mitk::TNodePredicateDataType<mitk::Image>::Pointer isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
   mitk::NodePredicateProperty::Pointer isBinary =
@@ -90,6 +91,7 @@ QmitkMultiLabelSegmentationView::QmitkMultiLabelSegmentationView()
   m_ReferencePredicate->AddPredicate(mitk::NodePredicateNot::New(m_SegmentationPredicate));
   m_ReferencePredicate->AddPredicate(mitk::NodePredicateNot::New(isMask));
   m_ReferencePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
+  m_ReferencePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
 }
 
 QmitkMultiLabelSegmentationView::~QmitkMultiLabelSegmentationView()
@@ -778,50 +780,42 @@ void QmitkMultiLabelSegmentationView::OnInterpolationSelectionChanged(int index)
 /************************************************************************/
 void QmitkMultiLabelSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
 {
-  if (m_Parent && m_WorkingNode.IsNotNull())
+  m_AutoSelectionEnabled = prefs->GetBool("auto selection", false);
+
+  mitk::BoolProperty::Pointer drawOutline = mitk::BoolProperty::New(prefs->GetBool("draw outline", true));
+  mitk::LabelSetImage* labelSetImage;
+  mitk::DataNode* segmentation;
+
+  // iterate all segmentations (binary (single label) and LabelSetImages)
+  mitk::NodePredicateProperty::Pointer isBinaryPredicate = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
+  mitk::NodePredicateOr::Pointer allSegmentationsPredicate = mitk::NodePredicateOr::New(isBinaryPredicate, m_SegmentationPredicate);
+  mitk::DataStorage::SetOfObjects::ConstPointer allSegmentations = GetDataStorage()->GetSubset(allSegmentationsPredicate);
+
+  for (mitk::DataStorage::SetOfObjects::const_iterator it = allSegmentations->begin(); it != allSegmentations->end(); ++it)
   {
-    m_AutoSelectionEnabled = prefs->GetBool("auto selection", false);
-
-    mitk::BoolProperty::Pointer drawOutline = mitk::BoolProperty::New(prefs->GetBool("draw outline", true));
-    mitk::LabelSetImage* labelSetImage;
-    mitk::DataNode* segmentation;
-
-    // iterate all segmentations (binary (single label) and LabelSetImages)
-    mitk::NodePredicateProperty::Pointer isBinaryPredicate = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
-    mitk::NodePredicateOr::Pointer allSegmentationsPredicate = mitk::NodePredicateOr::New(isBinaryPredicate, m_SegmentationPredicate);
-    mitk::DataStorage::SetOfObjects::ConstPointer allSegmentations = GetDataStorage()->GetSubset(allSegmentationsPredicate);
-
-    for (mitk::DataStorage::SetOfObjects::const_iterator it = allSegmentations->begin(); it != allSegmentations->end(); ++it)
+    segmentation = *it;
+    labelSetImage = dynamic_cast<mitk::LabelSetImage*>(segmentation->GetData());
+    if (nullptr != labelSetImage)
     {
-      segmentation = *it;
-      labelSetImage = dynamic_cast<mitk::LabelSetImage*>(segmentation->GetData());
-      if (nullptr != labelSetImage)
+      // segmentation node is a multi label segmentation
+      segmentation->SetProperty("labelset.contour.active", drawOutline);
+      //segmentation->SetProperty("opacity", mitk::FloatProperty::New(drawOutline->GetValue() ? 1.0f : 0.3f));
+      // force render window update to show outline
+      segmentation->GetData()->Modified();
+    }
+    else if (nullptr != segmentation->GetData())
+    {
+      // node is actually a 'single label' segmentation,
+      // but its outline property can be set in the 'multi label' segmentation preference page as well
+      bool isBinary = false;
+      segmentation->GetBoolProperty("binary", isBinary);
+      if (isBinary)
       {
-        // segmentation node is a multi label segmentation
-        segmentation->SetProperty("labelset.contour.active", drawOutline);
+        segmentation->SetProperty("outline binary", drawOutline);
+        segmentation->SetProperty("outline width", mitk::FloatProperty::New(2.0));
         //segmentation->SetProperty("opacity", mitk::FloatProperty::New(drawOutline->GetValue() ? 1.0f : 0.3f));
         // force render window update to show outline
         segmentation->GetData()->Modified();
-      }
-      else if (nullptr != segmentation->GetData())
-      {
-        // node is actually a 'single label' segmentation,
-        // but its outline property can be set in the 'multi label' segmentation preference page as well
-        bool isBinary = false;
-        segmentation->GetBoolProperty("binary", isBinary);
-        if (isBinary)
-        {
-          segmentation->SetProperty("outline binary", drawOutline);
-          segmentation->SetProperty("outline width", mitk::FloatProperty::New(2.0));
-          //segmentation->SetProperty("opacity", mitk::FloatProperty::New(drawOutline->GetValue() ? 1.0f : 0.3f));
-          // force render window update to show outline
-          segmentation->GetData()->Modified();
-        }
-      }
-      else
-      {
-        // "interpolation feedback" data nodes have binary flag but don't have a data set. So skip them for now.
-        MITK_INFO << "DataNode " << segmentation->GetName() << " doesn't contain a base data.";
       }
     }
   }

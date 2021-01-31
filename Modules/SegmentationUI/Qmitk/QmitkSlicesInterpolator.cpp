@@ -101,8 +101,9 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget *parent, const char * /
   m_BtnApply3D = new QPushButton("Confirm", m_GroupBoxEnableExclusiveInterpolationMode);
   vboxLayout->addWidget(m_BtnApply3D);
 
-  m_BtnSuggestPlane = new QPushButton("Suggest a plane", m_GroupBoxEnableExclusiveInterpolationMode);
-  vboxLayout->addWidget(m_BtnSuggestPlane);
+  // T28261
+  // m_BtnSuggestPlane = new QPushButton("Suggest a plane", m_GroupBoxEnableExclusiveInterpolationMode);
+  // vboxLayout->addWidget(m_BtnSuggestPlane);
 
   m_BtnReinit3DInterpolation = new QPushButton("Reinit Interpolation", m_GroupBoxEnableExclusiveInterpolationMode);
   vboxLayout->addWidget(m_BtnReinit3DInterpolation);
@@ -117,7 +118,8 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget *parent, const char * /
   connect(m_BtnApplyForAllSlices2D, SIGNAL(clicked()), this, SLOT(OnAcceptAllInterpolationsClicked()));
   connect(m_BtnApply3D, SIGNAL(clicked()), this, SLOT(OnAccept3DInterpolationClicked()));
 
-  connect(m_BtnSuggestPlane, SIGNAL(clicked()), this, SLOT(OnSuggestPlaneClicked()));
+  // T28261
+  // connect(m_BtnSuggestPlane, SIGNAL(clicked()), this, SLOT(OnSuggestPlaneClicked()));
 
   connect(m_BtnReinit3DInterpolation, SIGNAL(clicked()), this, SLOT(OnReinit3DInterpolation()));
   connect(m_ChkShowPositionNodes, SIGNAL(toggled(bool)), this, SLOT(OnShowMarkers(bool)));
@@ -402,7 +404,10 @@ void QmitkSlicesInterpolator::Show2DInterpolationControls(bool show)
 void QmitkSlicesInterpolator::Show3DInterpolationControls(bool show)
 {
   m_BtnApply3D->setVisible(show);
-  m_BtnSuggestPlane->setVisible(show);
+
+  // T28261
+  // m_BtnSuggestPlane->setVisible(show);
+
   m_ChkShowPositionNodes->setVisible(show);
   m_BtnReinit3DInterpolation->setVisible(show);
 }
@@ -605,7 +610,10 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
         mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2"))))
   {
     m_BtnApply3D->setEnabled(true);
-    m_BtnSuggestPlane->setEnabled(true);
+
+    // T28261
+    // m_BtnSuggestPlane->setEnabled(true);
+
     m_InterpolatedSurfaceNode->SetData(interpolatedSurface);
     m_3DContourNode->SetData(m_SurfaceInterpolator->GetContoursAsSurface());
 
@@ -623,7 +631,9 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
   else if (interpolatedSurface.IsNull())
   {
     m_BtnApply3D->setEnabled(false);
-    m_BtnSuggestPlane->setEnabled(false);
+
+    // T28261
+    // m_BtnSuggestPlane->setEnabled(false);
 
     if (m_DataStorage->Exists(m_InterpolatedSurfaceNode))
     {
@@ -1191,7 +1201,9 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
         {
           this->Show3DInterpolationResult(false);
           m_BtnApply3D->setEnabled(m_3DInterpolationEnabled);
-          m_BtnSuggestPlane->setEnabled(m_3DInterpolationEnabled);
+
+          // T28261
+          // m_BtnSuggestPlane->setEnabled(m_3DInterpolationEnabled);
         }
       }
       else
@@ -1204,7 +1216,9 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
     {
       this->Show3DInterpolationResult(false);
       m_BtnApply3D->setEnabled(m_3DInterpolationEnabled);
-      m_BtnSuggestPlane->setEnabled(m_3DInterpolationEnabled);
+
+      // T28261
+      // m_BtnSuggestPlane->setEnabled(m_3DInterpolationEnabled);
     }
   }
   catch (...)

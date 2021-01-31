@@ -273,7 +273,7 @@ void QmitkImageStatisticsView::OnGenerationFinished()
   this->UpdateHistogramWidget();
 }
 
-void QmitkImageStatisticsView::OnSelectedTimePointChanged(mitk::TimePointType /*newTimePoint*/)
+void QmitkImageStatisticsView::OnSelectedTimePointChanged(const mitk::TimePointType& /*newTimePoint*/)
 {
   this->UpdateHistogramWidget();
 }

@@ -76,7 +76,7 @@ protected:
   void OnButtonSelectionPressed();
   void OnImageSelectionChanged(QmitkAbstractNodeSelectionWidget::NodeList nodes);
   void OnROISelectionChanged(QmitkAbstractNodeSelectionWidget::NodeList nodes);
-  void OnSelectedTimePointChanged(mitk::TimePointType newTimePoint);
+  void OnSelectedTimePointChanged(const mitk::TimePointType& newTimePoint);
 
   // member variable
   Ui::QmitkImageStatisticsViewControls m_Controls;

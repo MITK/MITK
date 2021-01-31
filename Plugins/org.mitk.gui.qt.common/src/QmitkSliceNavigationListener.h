@@ -38,7 +38,7 @@ namespace mitk
 /** @brief Helper class to allow QmitkAbstractView and derived classes to react on changes of the slice/time navigation.
  Purpose of the class to be used in view and to give the respective view class (by composition) the posibility to react
  on changes of the currently selected timepoint or position in the world geometry.\n
- It also offers the convinient signals that are only trigger if the selected timepoint or the selected possition of the 
+ It also offers convinient signals that are only triggered when the selected timepoint or the selected possition of the 
  active render window have realy changed.\n
  In order to setup this class properly the following things must be regarded:
  - View class must also derive public from mitk::IRenderWindowPartListener
@@ -78,10 +78,10 @@ class MITK_QT_COMMON QmitkSliceNavigationListener : public QObject
     void SliceChanged();
     /** Convinience signal that can be used if you are only interested in changes of the current selected time point.
      Changes in spatial position will be ignored.*/
-    void SelectedTimePointChanged(mitk::TimePointType newTimePoint);
+    void SelectedTimePointChanged(const mitk::TimePointType& newTimePoint);
     /** Convinience signal that can be used if you are only interested in changes of the current selected position.
      Changes in time will be ignored.*/
-    void SelectedPositionChanged(mitk::Point3D newPoint);
+    void SelectedPositionChanged(const mitk::Point3D& newPoint);
 
   public slots:
     void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart);

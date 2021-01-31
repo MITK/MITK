@@ -25,10 +25,17 @@ found in the LICENSE file.
 #include <berryPlatform.h>
 
 QmitkSegmentationPreferencePage::QmitkSegmentationPreferencePage()
-: m_MainControl(nullptr)
-, m_Initializing(false)
+  : m_MainControl(nullptr),
+    m_SlimViewCheckBox(nullptr),
+    m_RadioOutline(nullptr),
+    m_RadioOverlay(nullptr),
+    m_SmoothingCheckBox(nullptr),
+    m_SmoothingSpinBox(nullptr),
+    m_DecimationSpinBox(nullptr),
+    m_ClosingSpinBox(nullptr),
+    m_SelectionModeCheckBox(nullptr),
+    m_Initializing(false)
 {
-
 }
 
 QmitkSegmentationPreferencePage::~QmitkSegmentationPreferencePage()
@@ -95,7 +102,7 @@ void QmitkSegmentationPreferencePage::CreateQtControl(QWidget* parent)
   surfaceLayout->addRow("Closing Ratio", m_ClosingSpinBox);
 
   m_SelectionModeCheckBox = new QCheckBox("Enable auto-selection mode", m_MainControl);
-  m_SelectionModeCheckBox->setToolTip("If checked the segmentation plugin ensures that only one segmentation and the according greyvalue image are visible at one time.");
+  m_SelectionModeCheckBox->setToolTip("Automatically select a patient image and a segmentation if available");
   formLayout->addRow("Data node selection mode",m_SelectionModeCheckBox);
 
   formLayout->addRow("Smoothed surface creation", surfaceLayout);

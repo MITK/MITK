@@ -637,7 +637,6 @@ void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataNode* node)
   }
 
   mitk::BoolProperty::Pointer drawOutline = mitk::BoolProperty::New(GetPreferences()->GetBool("draw outline", true));
-  mitk::BoolProperty::Pointer volumeRendering = mitk::BoolProperty::New(GetPreferences()->GetBool("volume rendering", false));
   mitk::LabelSetImage* labelSetImage = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
   if (nullptr != labelSetImage)
   {
@@ -645,7 +644,6 @@ void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataNode* node)
     // but its outline property can be set in the 'single label' segmentation preference page as well
     node->SetProperty("labelset.contour.active", drawOutline);
     //node->SetProperty("opacity", mitk::FloatProperty::New(drawOutline->GetValue() ? 1.0f : 0.3f));
-    node->SetProperty("volumerendering", volumeRendering);
     // force render window update to show outline
     node->GetData()->Modified();
   }
@@ -659,7 +657,6 @@ void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataNode* node)
       node->SetProperty("outline binary", drawOutline);
       node->SetProperty("outline width", mitk::FloatProperty::New(2.0));
       //node->SetProperty("opacity", mitk::FloatProperty::New(drawOutline->GetValue() ? 1.0f : 0.3f));
-      node->SetProperty("volumerendering", volumeRendering);
       // force render window update to show outline
       node->GetData()->Modified();
     }

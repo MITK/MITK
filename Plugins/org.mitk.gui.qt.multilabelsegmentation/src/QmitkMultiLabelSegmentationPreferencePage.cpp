@@ -25,8 +25,13 @@ found in the LICENSE file.
 #include <berryPlatform.h>
 
 QmitkMultiLabelSegmentationPreferencePage::QmitkMultiLabelSegmentationPreferencePage()
-: m_MainControl(nullptr)
-, m_Initializing(false)
+  : m_MainControl(nullptr),
+    m_RadioOutline(nullptr),
+    m_RadioOverlay(nullptr),
+    m_SmoothingSpinBox(nullptr),
+    m_DecimationSpinBox(nullptr),
+    m_SelectionModeCheckBox(nullptr),
+    m_Initializing(false)
 {
 
 }
@@ -61,10 +66,6 @@ void QmitkMultiLabelSegmentationPreferencePage::CreateQtControl(QWidget* parent)
   formLayout->setHorizontalSpacing(8);
   formLayout->setVerticalSpacing(24);
   formLayout->addRow( "2D display", displayOptionsLayout );
-
-  m_VolumeRenderingCheckBox = new QCheckBox( "Show as volume rendering", m_MainControl );
-  formLayout->addRow( "3D display", m_VolumeRenderingCheckBox );
-  connect( m_VolumeRenderingCheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnVolumeRenderingCheckboxChecked(int)) );
 
   QFormLayout* surfaceLayout = new QFormLayout;
   surfaceLayout->setSpacing(8);
@@ -103,7 +104,6 @@ QWidget* QmitkMultiLabelSegmentationPreferencePage::GetQtControl() const
 bool QmitkMultiLabelSegmentationPreferencePage::PerformOk()
 {
   m_SegmentationPreferencesNode->PutBool("draw outline", m_RadioOutline->isChecked());
-  m_SegmentationPreferencesNode->PutBool("volume rendering", m_VolumeRenderingCheckBox->isChecked());
   m_SegmentationPreferencesNode->PutDouble("smoothing value", m_SmoothingSpinBox->value());
   m_SegmentationPreferencesNode->PutDouble("decimation rate", m_DecimationSpinBox->value());
   m_SegmentationPreferencesNode->PutBool("auto selection", m_SelectionModeCheckBox->isChecked());
@@ -127,8 +127,6 @@ void QmitkMultiLabelSegmentationPreferencePage::Update()
     m_RadioOverlay->setChecked( true );
   }
 
-  m_VolumeRenderingCheckBox->setChecked( m_SegmentationPreferencesNode->GetBool("volume rendering", false) );
-
   if (m_SegmentationPreferencesNode->GetBool("smoothing hint", true))
   {
     m_SmoothingSpinBox->setDisabled(true);
@@ -142,19 +140,6 @@ void QmitkMultiLabelSegmentationPreferencePage::Update()
 
   m_SmoothingSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("smoothing value", 0.1));
   m_DecimationSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("decimation rate", 0.5));
-}
-
-void QmitkMultiLabelSegmentationPreferencePage::OnVolumeRenderingCheckboxChecked(int state)
-{
-  if (m_Initializing) return;
-
-  if ( state != Qt::Unchecked )
-  {
-    QMessageBox::information(nullptr,
-                             "Memory warning",
-                             "Turning on volume rendering of segmentations will make the application more memory intensive (and potentially prone to crashes).\n\n"
-                             "If you encounter out-of-memory problems, try turning off volume rendering again.");
-  }
 }
 
 void QmitkMultiLabelSegmentationPreferencePage::OnSmoothingCheckboxChecked(int state)

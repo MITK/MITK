@@ -783,7 +783,6 @@ void QmitkMultiLabelSegmentationView::OnPreferencesChanged(const berry::IBerryPr
     m_AutoSelectionEnabled = prefs->GetBool("auto selection", false);
 
     mitk::BoolProperty::Pointer drawOutline = mitk::BoolProperty::New(prefs->GetBool("draw outline", true));
-    mitk::BoolProperty::Pointer volumeRendering = mitk::BoolProperty::New(prefs->GetBool("volume rendering", false));
     mitk::LabelSetImage* labelSetImage;
     mitk::DataNode* segmentation;
 
@@ -801,7 +800,6 @@ void QmitkMultiLabelSegmentationView::OnPreferencesChanged(const berry::IBerryPr
         // segmentation node is a multi label segmentation
         segmentation->SetProperty("labelset.contour.active", drawOutline);
         //segmentation->SetProperty("opacity", mitk::FloatProperty::New(drawOutline->GetValue() ? 1.0f : 0.3f));
-        segmentation->SetProperty("volumerendering", volumeRendering);
         // force render window update to show outline
         segmentation->GetData()->Modified();
       }
@@ -816,7 +814,6 @@ void QmitkMultiLabelSegmentationView::OnPreferencesChanged(const berry::IBerryPr
           segmentation->SetProperty("outline binary", drawOutline);
           segmentation->SetProperty("outline width", mitk::FloatProperty::New(2.0));
           //segmentation->SetProperty("opacity", mitk::FloatProperty::New(drawOutline->GetValue() ? 1.0f : 0.3f));
-          segmentation->SetProperty("volumerendering", volumeRendering);
           // force render window update to show outline
           segmentation->GetData()->Modified();
         }

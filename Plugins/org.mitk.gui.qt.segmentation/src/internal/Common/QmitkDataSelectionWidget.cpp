@@ -40,7 +40,9 @@ static mitk::NodePredicateBase::Pointer CreatePredicate(QmitkDataSelectionWidget
   auto contourModelType = mitk::TNodePredicateDataType<mitk::ContourModel>::New();
   auto contourModelSetType = mitk::TNodePredicateDataType<mitk::ContourModelSet>::New();
   auto nonLabelSetImageType = mitk::NodePredicateAnd::New(imageType, mitk::NodePredicateNot::New(labelSetImageType));
-  auto nonHelperObject = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"));
+  auto nonHelperObject = mitk::NodePredicateNot::New(mitk::NodePredicateOr::New(
+    mitk::NodePredicateProperty::New("helper object"),
+    mitk::NodePredicateProperty::New("hidden object")));
   auto isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
   auto isSegmentation = mitk::NodePredicateProperty::New("segmentation", mitk::BoolProperty::New(true));
   auto isBinaryOrSegmentation = mitk::NodePredicateOr::New(isBinary, isSegmentation);

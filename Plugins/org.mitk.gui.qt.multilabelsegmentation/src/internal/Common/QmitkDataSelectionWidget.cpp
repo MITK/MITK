@@ -119,32 +119,35 @@ QmitkDataSelectionWidget::~QmitkDataSelectionWidget()
 unsigned int QmitkDataSelectionWidget::AddDataSelection(QmitkDataSelectionWidget::PredicateType predicate)
 {
   QString hint = "Select node";
-  QString popupTitel = "Select node";
 
   switch (predicate)
   {
   case QmitkDataSelectionWidget::ImagePredicate:
     hint = "Select an image";
-    popupTitel = "Select an image";
     break;
 
   case QmitkDataSelectionWidget::MaskPredicate:
     hint = "Select a binary mask";
-    popupTitel = "Select a binary mask";
     break;
 
   case QmitkDataSelectionWidget::SegmentationPredicate:
     hint = "Select an ML segmentation";
-    popupTitel = "Select an ML segmentation";
     break;
 
   case QmitkDataSelectionWidget::SurfacePredicate:
     hint = "Select a surface";
-    popupTitel = "Select a surface";
+    break;
+
+  case QmitkDataSelectionWidget::ImageAndSegmentationPredicate:
+    hint = "Select an image or segmentation";
+    break;
+
+  case QmitkDataSelectionWidget::ContourModelPredicate:
+    hint = "Select a contour model";
     break;
   }
 
-  return this->AddDataSelection("", hint, popupTitel, "", predicate);
+  return this->AddDataSelection("", hint, hint, "", predicate);
 }
 
 unsigned int QmitkDataSelectionWidget::AddDataSelection(mitk::NodePredicateBase* predicate)

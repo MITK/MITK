@@ -26,11 +26,9 @@ if(MITK_USE_DCMQI)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      GIT_REPOSITORY https://github.com/qiicr/dcmqi.git
-      GIT_TAG v1.2.3
+      GIT_REPOSITORY https://github.com/kislinsk/dcmqi.git # T28127
+      GIT_TAG v1.2.3-hotfix
       UPDATE_COMMAND ""
-      PATCH_COMMAND
-        ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/DCMQI-1.2.3.patch
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}
       CMAKE_GENERATOR_PLATFORM ${gen_platform}

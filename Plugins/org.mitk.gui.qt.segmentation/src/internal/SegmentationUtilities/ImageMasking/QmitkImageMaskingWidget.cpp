@@ -275,10 +275,17 @@ mitk::Image::Pointer QmitkImageMaskingWidget::ConvertSurfaceToImage( mitk::Image
 
 void QmitkImageMaskingWidget::AddToDataStorage(mitk::DataStorage::Pointer dataStorage, mitk::Image::Pointer segmentation, const std::string& name, mitk::DataNode::Pointer parent )
 {
-  mitk::DataNode::Pointer dataNode = mitk::DataNode::New();
+  auto dataNode = mitk::DataNode::New();
 
   dataNode->SetName(name);
   dataNode->SetData(segmentation);
+
+  if (parent.IsNotNull())
+  {
+    mitk::LevelWindow levelWindow;
+    parent->GetLevelWindow(levelWindow);
+    dataNode->SetLevelWindow(levelWindow);
+  }
 
   dataStorage->Add(dataNode, parent);
 }

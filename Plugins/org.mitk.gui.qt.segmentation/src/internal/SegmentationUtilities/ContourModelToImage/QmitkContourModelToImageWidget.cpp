@@ -16,6 +16,7 @@ found in the LICENSE file.
 
 #include <mitkContourModelSet.h>
 #include <mitkContourModelSetToImageFilter.h>
+#include <mitkLabelSetImage.h>
 #include <mitkSliceNavigationController.h>
 
 #include <QtConcurrentRun>
@@ -38,10 +39,10 @@ public:
   void EnableButtons(bool enable = true);
 
   /** @brief Does the actual contour filling */
-  mitk::Image::Pointer FillContourModelSetIntoImage(mitk::Image *image, mitk::ContourModelSet *contourSet, mitk::TimePointType timePoint);
+  mitk::LabelSetImage::Pointer FillContourModelSetIntoImage(mitk::Image *image, mitk::ContourModelSet *contourSet, mitk::TimePointType timePoint);
 
   Ui::QmitkContourModelToImageWidgetControls m_Controls;
-  QFutureWatcher<mitk::Image::Pointer> m_Watcher;
+  QFutureWatcher<mitk::LabelSetImage::Pointer> m_Watcher;
 };
 
 QmitkContourModelToImageWidgetPrivate::QmitkContourModelToImageWidgetPrivate()
@@ -66,7 +67,7 @@ void QmitkContourModelToImageWidgetPrivate::SelectionControl(unsigned int index,
   this->EnableButtons();
 }
 
-mitk::Image::Pointer QmitkContourModelToImageWidgetPrivate::FillContourModelSetIntoImage(mitk::Image* image, mitk::ContourModelSet* contourSet, mitk::TimePointType timePoint)
+mitk::LabelSetImage::Pointer QmitkContourModelToImageWidgetPrivate::FillContourModelSetIntoImage(mitk::Image* image, mitk::ContourModelSet* contourSet, mitk::TimePointType timePoint)
 {
   // Use mitk::ContourModelSetToImageFilter to fill the ContourModelSet into the image
   mitk::ContourModelSetToImageFilter::Pointer contourFiller = mitk::ContourModelSetToImageFilter::New();
@@ -75,12 +76,10 @@ mitk::Image::Pointer QmitkContourModelToImageWidgetPrivate::FillContourModelSetI
   contourFiller->SetImage(image);
   contourFiller->SetInput(contourSet);
   contourFiller->MakeOutputBinaryOn();
-  mitk::Image::Pointer result = nullptr;
 
   try
   {
     contourFiller->Update();
-    result = contourFiller->GetOutput();
   }
   catch (const std::exception & e)
   {
@@ -91,12 +90,14 @@ mitk::Image::Pointer QmitkContourModelToImageWidgetPrivate::FillContourModelSetI
     MITK_ERROR << "Unknown error while converting contour model.";
   }
 
-  if (result.IsNull())
+  if (nullptr == contourFiller->GetOutput())
   {
     MITK_ERROR<<"Could not write the selected contours into the image!";
   }
 
-  result->DisconnectPipeline();
+  auto result = mitk::LabelSetImage::New();
+  result->InitializeByLabeledImage(contourFiller->GetOutput());
+
   return result;
 }
 
@@ -210,7 +211,7 @@ void QmitkContourModelToImageWidget::OnProcessPressed()
   d->EnableButtons(false);
 
   // Start the computation in a background thread
-  QFuture< mitk::Image::Pointer > future = QtConcurrent::run(d, &QmitkContourModelToImageWidgetPrivate::FillContourModelSetIntoImage, image, contourSet, timePoint);
+  QFuture< mitk::LabelSetImage::Pointer > future = QtConcurrent::run(d, &QmitkContourModelToImageWidgetPrivate::FillContourModelSetIntoImage, image, contourSet, timePoint);
   d->m_Watcher.setFuture(future);
 }
 

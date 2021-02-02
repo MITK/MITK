@@ -29,6 +29,8 @@ if(MITK_USE_DCMQI)
       GIT_REPOSITORY https://github.com/qiicr/dcmqi.git
       GIT_TAG v1.2.3
       UPDATE_COMMAND ""
+      PATCH_COMMAND
+        ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/DCMQI-1.2.3.patch
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}
       CMAKE_GENERATOR_PLATFORM ${gen_platform}

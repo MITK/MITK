@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 // #define ENABLE_CTK_WIDGETS_WIDGET
 
+#include <QmitkStyleManager.h>
 #include "QmitkMultiLabelSegmentationUtilitiesView.h"
 #include "BooleanOperations/QmitkBooleanOperationsWidget.h"
 #include "MorphologicalOperations/QmitkMorphologicalOperationsWidget.h"
@@ -60,7 +61,7 @@ void QmitkMultiLabelSegmentationUtilitiesView::CreateQtPartControl(QWidget* pare
 
   this->AddUtilityWidget(m_ImageMaskingWidget, QIcon(":/MultiLabelSegmentationUtilities/ImageMasking_48x48.png"), "Image Masking");
 
-  this->AddUtilityWidget(m_ConvertToMlWidget, QIcon(":/MultiLabelSegmentationUtilities/multilabelsegmentation.svg"), "Convert To MultiLabel");
+  this->AddUtilityWidget(m_ConvertToMlWidget, QmitkStyleManager::ThemeIcon(QStringLiteral(":/MultiLabelSegmentationUtilities/multilabelsegmentation.svg")), "Convert To MultiLabel");
 }
 
 void QmitkMultiLabelSegmentationUtilitiesView::AddUtilityWidget(QWidget* widget, const QIcon& icon, const QString& text)

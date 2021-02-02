@@ -127,7 +127,7 @@ void QmitkContourModelToImageWidget::OnProcessingFinished()
   Q_D(QmitkContourModelToImageWidget);
 
   // Adding the result to the data storage
-  mitk::Image::Pointer result = d->m_Watcher.result();
+  auto result = d->m_Watcher.result();
   if (result.IsNotNull())
   {
     QmitkDataSelectionWidget* dataSelectionWidget = d->m_Controls.dataSelectionWidget;

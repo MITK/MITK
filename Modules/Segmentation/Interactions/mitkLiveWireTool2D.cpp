@@ -240,14 +240,6 @@ mitk::ContourModel::Pointer mitk::LiveWireTool2D::CreateNewContour() const
     mitkThrow() << "Cannot create new contour. No valid working data is set. Application is in invalid state.";
   }
 
-  const auto minTime = workingData->GetTimeGeometry()->GetMinimumTimePoint();
-  auto duration = workingData->GetTimeGeometry()->GetMaximumTimePoint() - minTime;
-
-  if (duration <= 0)
-  {
-    duration = 1.;
-  };
-
   auto contour = ContourModel::New();
 
   //generate a time geometry that is always visible as the working contour should always be.

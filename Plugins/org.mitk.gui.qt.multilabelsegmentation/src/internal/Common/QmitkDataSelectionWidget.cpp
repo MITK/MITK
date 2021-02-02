@@ -14,6 +14,9 @@ found in the LICENSE file.
 #include "internal/mitkPluginActivator.h"
 
 #include <berryPlatform.h>
+
+#include <mitkContourModel.h>
+#include <mitkContourModelSet.h>
 #include <mitkIDataStorageService.h>
 #include <mitkImage.h>
 #include <mitkLabelSetImage.h>
@@ -34,8 +37,11 @@ found in the LICENSE file.
 
 static mitk::NodePredicateBase::Pointer CreatePredicate(QmitkDataSelectionWidget::PredicateType predicateType)
 {
+  auto imageType = mitk::TNodePredicateDataType<mitk::Image>::New();
+  auto contourModelType = mitk::TNodePredicateDataType<mitk::ContourModel>::New();
+  auto contourModelSetType = mitk::TNodePredicateDataType<mitk::ContourModelSet>::New();
 
-  mitk::NodePredicateAnd::Pointer  segmentationPredicate = mitk::NodePredicateAnd::New();
+  mitk::NodePredicateAnd::Pointer segmentationPredicate = mitk::NodePredicateAnd::New();
   segmentationPredicate->AddPredicate(mitk::TNodePredicateDataType<mitk::LabelSetImage>::New());
   segmentationPredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
 
@@ -69,14 +75,24 @@ static mitk::NodePredicateBase::Pointer CreatePredicate(QmitkDataSelectionWidget
     case QmitkDataSelectionWidget::ImagePredicate:
       return imagePredicate.GetPointer();
 
-    case QmitkDataSelectionWidget::MaskPredicate:
-      return maskPredicate.GetPointer();
-
     case QmitkDataSelectionWidget::SegmentationPredicate:
       return segmentationPredicate.GetPointer();
 
     case QmitkDataSelectionWidget::SurfacePredicate:
       return surfacePredicate.GetPointer();
+
+    case QmitkDataSelectionWidget::ImageAndSegmentationPredicate:
+      return imageType.GetPointer();
+      break;
+
+    case QmitkDataSelectionWidget::ContourModelPredicate:
+      return mitk::NodePredicateOr::New(
+        contourModelSetType,
+        contourModelSetType).GetPointer();
+      break;
+
+    case QmitkDataSelectionWidget::MaskPredicate:
+      return maskPredicate.GetPointer();
 
     default:
       assert(false && "Unknown predefined predicate!");

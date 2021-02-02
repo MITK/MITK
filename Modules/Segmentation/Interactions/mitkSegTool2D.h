@@ -90,7 +90,6 @@ namespace mitk
     *
     * \param positionEvent Event that specifies the plane that should be used to slice
     * \param image Image that should be sliced
-    * \param timeStep TimeStep of the image that shold be sliced
     * \param component  The component to be extracted of a given multi-component image. -1 is the default parameter to denote an invalid component.
     *
     * \return 'nullptr' if SegTool2D is either unable to determine which slice was affected, or if there was some problem

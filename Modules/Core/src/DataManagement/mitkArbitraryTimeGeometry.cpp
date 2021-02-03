@@ -54,7 +54,7 @@ mitk::TimePointType mitk::ArbitraryTimeGeometry::GetMaximumTimePoint() const
   // This workarround should be removed as soon as T28262 is solved!
   if (this->HasCollapsedFinalTimeStep())
   {
-    result = m_MinimumTimePoints.back() + 1.;
+    result = m_MinimumTimePoints.back() + 1;
   }
   // End of workarround for T27883
   //////////////////////////////////////
@@ -64,13 +64,7 @@ mitk::TimePointType mitk::ArbitraryTimeGeometry::GetMaximumTimePoint() const
 
 mitk::TimePointType mitk::ArbitraryTimeGeometry::GetMinimumTimePoint( TimeStepType step ) const
 {
-  TimePointType result = 0;
-  if (step < m_MinimumTimePoints.size())
-  {
-    result = m_MinimumTimePoints[step];
-  }
-
-  return result;
+  return step < m_MinimumTimePoints.size() ? m_MinimumTimePoints[step] : 0.0f;
 };
 
 mitk::TimePointType mitk::ArbitraryTimeGeometry::GetMaximumTimePoint( TimeStepType step ) const
@@ -86,7 +80,7 @@ mitk::TimePointType mitk::ArbitraryTimeGeometry::GetMaximumTimePoint( TimeStepTy
   // This workarround should be removed as soon as T28262 is solved!
   if (step + 1 == m_MaximumTimePoints.size() && this->HasCollapsedFinalTimeStep())
   {
-    result = m_MinimumTimePoints[step] + 1.;
+    result = m_MinimumTimePoints[step] + 1;
   }
   // End of workarround for T27883
   //////////////////////////////////////
@@ -146,7 +140,7 @@ mitk::TimeStepType mitk::ArbitraryTimeGeometry::TimePointToTimeStep(TimePointTyp
       // The part ("+1.") inline marked as workarround should be removed as soon as T28262 is solved!
       if (timePoint < *pos
           || (pos == std::prev(m_MaximumTimePoints.cend())
-              && timePoint <= *pos +1.//<- +1. is the workarround
+              && timePoint <= *pos +1//<- +1 is the workarround
               && this->HasCollapsedFinalTimeStep()))
       {
         break;
@@ -328,10 +322,10 @@ void mitk::ArbitraryTimeGeometry::PrintSelf(std::ostream &os, itk::Indent indent
   // This workarround should be removed as soon as T28262 is solved!
   if (this->HasCollapsedFinalTimeStep())
   {
-    os << "Caution: This time geometry has a collapsed finale time step." << std::endl;
-    os << "         Most likely reason is that no duration could be deduced from the original data" << std::endl;
-    os << "         (e.g.DICOM dynamic series stored as single frame images)." << std::endl;
-    os << "         Currently we expand it by 1 ms (see T27883 for more details)." << std::endl;
+    os << indent << "Caution: This time geometry has a collapsed finale time step." << std::endl;
+    os << indent << "         Most likely reason is that no duration could be deduced from the original data" << std::endl;
+    os << indent << "         (e.g. DICOM dynamic series stored as single frame images)." << std::endl;
+    os << indent << "         Currently we expand it by 1 ms (see T27883 for more details)." << std::endl;
   }
   // End of workarround for T27883
   //////////////////////////////////////

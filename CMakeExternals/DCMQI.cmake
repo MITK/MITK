@@ -27,7 +27,7 @@ if(MITK_USE_DCMQI)
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       GIT_REPOSITORY https://github.com/kislinsk/dcmqi.git # T28127
-      GIT_TAG v1.2.3-hotfix
+      GIT_TAG v1.2.3-hotfix-v2
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}

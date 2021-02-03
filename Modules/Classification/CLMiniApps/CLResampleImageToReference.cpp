@@ -95,9 +95,9 @@ int main(int argc, char* argv[])
   mitkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
   // required params
-  parser.addArgument("fix", "f", mitkCommandLineParser::Image, "Input Image", "Path to the input VTK polydata", us::Any(), false, false, false, mitkCommandLineParser::Input);
-  parser.addArgument("moving", "m", mitkCommandLineParser::File, "Output text file", "Target file. The output statistic is appended to this file.", us::Any(), false, false, false, mitkCommandLineParser::Output);
-  parser.addArgument("output", "o", mitkCommandLineParser::File, "Extension", "File extension. Default is .nii.gz", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("fix", "f", mitkCommandLineParser::Image, "Fixed Image", "fixed image file", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("moving", "m", mitkCommandLineParser::File, "Moving Image", "moving image file", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("output", "o", mitkCommandLineParser::File, "Output Image", "output image", us::Any(), false, false, false, mitkCommandLineParser::Output);
   parser.addArgument("interpolator", "", mitkCommandLineParser::Int, "Interpolator:", "interpolator type: 0=linear (default), 1=nearest neighbor, 2=sinc", 0);
 
   // Miniapp Infos
@@ -121,9 +121,9 @@ int main(int argc, char* argv[])
   mitk::Image::Pointer moving = mitk::IOUtil::Load<mitk::Image>(parsedArgs["moving"].ToString());
   mitk::Image::Pointer erg = mitk::Image::New();
   
-  unsigned int interpolator = 0;
+  int interpolator = 0;
   if (parsedArgs.count("interpolator"))
-    interpolator = static_cast<unsigned int>(us::any_cast<int>(parsedArgs["interpolator"]));
+    interpolator = us::any_cast<int>(parsedArgs["interpolator"]);
 	
   AccessByItk_3(fix, ResampleImageToReferenceFunction, moving, parsedArgs["output"].ToString(), interpolator);
 

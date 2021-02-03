@@ -30,7 +30,7 @@ found in the LICENSE file.
 
 template<typename TPixel, unsigned int VImageDimension>
 void
-ResampleImageToReferenceFunction(itk::Image<TPixel, VImageDimension>* itkReference, mitk::Image::Pointer moving, std::string ergPath)
+ResampleImageToReferenceFunction(itk::Image<TPixel, VImageDimension>* itkReference, mitk::Image::Pointer moving, std::string ergPath, int interp=0)
 {
   typedef itk::Image<TPixel, VImageDimension> InputImageType;
 
@@ -57,10 +57,27 @@ ResampleImageToReferenceFunction(itk::Image<TPixel, VImageDimension>* itkReferen
   resampler->SetReferenceImage( itkReference );
   resampler->UseReferenceImageOn();
   resampler->SetTransform(_pTransform);
-  //if ( sincInterpol)
-  //  resampler->SetInterpolator(sinc_interpolator);
-  //else
+  
+  switch(interp)
+  {
+  case 0:
+  {
+	resampler->SetInterpolator(lin_interpolator);
+	break;
+  }
+  case 1:
+  {
+	resampler->SetInterpolator(nn_interpolator);
+	break;
+  }
+  case 2:
+  {
+	resampler->SetInterpolator(sinc_interpolator);
+	break;
+  }
+  default:
     resampler->SetInterpolator(lin_interpolator);
+  }
 
   resampler->Update();
 
@@ -78,9 +95,10 @@ int main(int argc, char* argv[])
   mitkCommandLineParser parser;
   parser.setArgumentPrefix("--", "-");
   // required params
-  parser.addArgument("fix", "f", mitkCommandLineParser::Image, "Input Image", "Path to the input VTK polydata", us::Any(), false, false, false, mitkCommandLineParser::Input);
-  parser.addArgument("moving", "m", mitkCommandLineParser::File, "Output text file", "Target file. The output statistic is appended to this file.", us::Any(), false, false, false, mitkCommandLineParser::Output);
-  parser.addArgument("output", "o", mitkCommandLineParser::File, "Extension", "File extension. Default is .nii.gz", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("fix", "f", mitkCommandLineParser::Image, "Fixed Image", "fixed image file", us::Any(), false, false, false, mitkCommandLineParser::Input);
+  parser.addArgument("moving", "m", mitkCommandLineParser::File, "Moving Image", "moving image file", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("output", "o", mitkCommandLineParser::File, "Output Image", "output image", us::Any(), false, false, false, mitkCommandLineParser::Output);
+  parser.addArgument("interpolator", "", mitkCommandLineParser::Int, "Interpolator:", "interpolator type: 0=linear (default), 1=nearest neighbor, 2=sinc", 0);
 
   // Miniapp Infos
   parser.setCategory("Classification Tools");
@@ -102,8 +120,12 @@ int main(int argc, char* argv[])
   mitk::Image::Pointer fix = mitk::IOUtil::Load<mitk::Image>(parsedArgs["fix"].ToString());
   mitk::Image::Pointer moving = mitk::IOUtil::Load<mitk::Image>(parsedArgs["moving"].ToString());
   mitk::Image::Pointer erg = mitk::Image::New();
-
-  AccessByItk_2(fix, ResampleImageToReferenceFunction, moving, parsedArgs["output"].ToString());
+  
+  int interpolator = 0;
+  if (parsedArgs.count("interpolator"))
+    interpolator = us::any_cast<int>(parsedArgs["interpolator"]);
+	
+  AccessByItk_3(fix, ResampleImageToReferenceFunction, moving, parsedArgs["output"].ToString(), interpolator);
 
 }
 

@@ -125,7 +125,7 @@ public:
   void TestCheckRotationMatrix()
   {
     auto image = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("NotQuiteARotationMatrix.nrrd"));
-    bool is_rotation = mitk::PlaneGeometry::CheckRotationMatrix(image->GetGeometry()->GetIndexToWorldTransform());
+    bool is_rotation = mitk::PlaneGeometry::CheckRotationMatrix(image->GetGeometry()->GetIndexToWorldTransform(), 1e-8);
     CPPUNIT_ASSERT_MESSAGE("Since the test data matrix is not quite a rotation matrix, this should be detected.", !is_rotation);
   }
 

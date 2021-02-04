@@ -34,13 +34,15 @@ namespace mitk
         value
 
     Changes on Level/Window can be set with SetLevelWindow() and will affect either the topmost layer image,
-    if isAutoTopMost() returns true, or an image which is set by SetLevelWindowProperty(LevelWindowProperty::Pointer
+    if IsAutoTopMost() returns true, or an image which is set by SetLevelWindowProperty(LevelWindowProperty::Pointer
     levelWindowProperty).
+    Additionally the changes on Level/Window will affect one or multiple selected images, if IsSelectedImages() returns true.
+    Only one of the two different modes can be enabled at the same time.
 
     Changes to Level/Window, when another image gets active or by SetLevelWindow(const LevelWindow& levelWindow),
     will be sent to all listeners by Modified().
 
-    DataStorageChanged() listens to the DataStorage for new or removed images. Depending on how m_AutoTopMost is set,
+    DataStorageChanged() listens to the DataStorage for new or removed images. Depending on the currently enabled mode,
     the new image becomes active or not. If an image is removed from the DataStorage and m_AutoTopMost is false,
     there is a check to proof, if the active image is still available. If not, then m_AutoTopMost becomes true.
 

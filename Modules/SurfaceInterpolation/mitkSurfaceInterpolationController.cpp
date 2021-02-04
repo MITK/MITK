@@ -317,6 +317,7 @@ void mitk::SurfaceInterpolationController::Interpolate()
   imageToSurfaceFilter->Update();
 
   mitk::Surface::Pointer interpolationResult = mitk::Surface::New();
+  interpolationResult->Expand(m_SelectedSegmentation->GetTimeSteps());
   interpolationResult->SetVtkPolyData(imageToSurfaceFilter->GetOutput()->GetVtkPolyData(), currentTimeStep);
   m_InterpolationResult = interpolationResult;
 

@@ -861,16 +861,17 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
 {
   auto referenceImage = GetData<mitk::Image>(m_ToolManager->GetReferenceData(0));
 
-  auto segmentationDataNode = m_ToolManager->GetWorkingData(0);
+  auto* segmentationDataNode = m_ToolManager->GetWorkingData(0);
   auto segmentation = GetData<mitk::Image>(segmentationDataNode);
 
   if (referenceImage.IsNull() || segmentation.IsNull())
     return;
 
+  const auto* segmentationGeometry = segmentation->GetTimeGeometry();
   const auto timePoint = m_LastSNC->GetSelectedTimePoint();
 
   if (!referenceImage->GetTimeGeometry()->IsValidTimePoint(timePoint) ||
-      !segmentation->GetTimeGeometry()->IsValidTimePoint(timePoint))
+      !segmentationGeometry->IsValidTimePoint(timePoint))
   {
     MITK_WARN << "Cannot accept interpolation. Current time point is not within the time bounds of the patient image and segmentation.";
     return;
@@ -898,11 +899,36 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
   if (nullptr == dataPointer)
     return;
 
-  timeStep = segmentation->GetTimeGeometry()->TimePointToTimeStep(timePoint);
+  timeStep = segmentationGeometry->TimePointToTimeStep(timePoint);
   segmentation->SetVolume(dataPointer, timeStep, 0);
 
   m_CmbInterpolation->setCurrentIndex(0);
   this->Show3DInterpolationResult(false);
+
+  if (1 < interpolatedSurface->GetTimeSteps())
+  {
+    auto* polyData = vtkPolyData::New();
+    polyData->DeepCopy(interpolatedSurface->GetVtkPolyData(timeStep));
+
+    auto surface = mitk::Surface::New();
+    surface->SetVtkPolyData(polyData);
+
+    auto timeBounds = segmentationGeometry->GetTimeBounds(timeStep);
+    auto* surfaceGeometry = static_cast<mitk::ProportionalTimeGeometry*>(surface->GetTimeGeometry());
+
+    surfaceGeometry->SetFirstTimePoint(timeBounds[0]);
+    surfaceGeometry->SetStepDuration(timeBounds[1] - timeBounds[0]);
+
+    interpolatedSurface = surface;
+  }
+  else
+  {
+    auto timeBounds = segmentationGeometry->GetTimeBounds(0);
+    auto* surfaceGeometry = static_cast<mitk::ProportionalTimeGeometry*>(interpolatedSurface->GetTimeGeometry());
+
+    surfaceGeometry->SetFirstTimePoint(timeBounds[0]);
+    surfaceGeometry->SetStepDuration(timeBounds[1] - timeBounds[0]);
+  }
 
   auto interpolatedSurfaceDataNode = mitk::DataNode::New();
 

@@ -905,35 +905,35 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
   m_CmbInterpolation->setCurrentIndex(0);
   this->Show3DInterpolationResult(false);
 
+  std::string name = segmentationDataNode->GetName() + "_3D-interpolation";
+  mitk::TimeBounds timeBounds;
+
   if (1 < interpolatedSurface->GetTimeSteps())
   {
+    name += "_t" + std::to_string(timeStep);
+
     auto* polyData = vtkPolyData::New();
     polyData->DeepCopy(interpolatedSurface->GetVtkPolyData(timeStep));
 
     auto surface = mitk::Surface::New();
     surface->SetVtkPolyData(polyData);
 
-    auto timeBounds = segmentationGeometry->GetTimeBounds(timeStep);
-    auto* surfaceGeometry = static_cast<mitk::ProportionalTimeGeometry*>(surface->GetTimeGeometry());
-
-    surfaceGeometry->SetFirstTimePoint(timeBounds[0]);
-    surfaceGeometry->SetStepDuration(timeBounds[1] - timeBounds[0]);
-
     interpolatedSurface = surface;
+    timeBounds = segmentationGeometry->GetTimeBounds(timeStep);
   }
   else
   {
-    auto timeBounds = segmentationGeometry->GetTimeBounds(0);
-    auto* surfaceGeometry = static_cast<mitk::ProportionalTimeGeometry*>(interpolatedSurface->GetTimeGeometry());
-
-    surfaceGeometry->SetFirstTimePoint(timeBounds[0]);
-    surfaceGeometry->SetStepDuration(timeBounds[1] - timeBounds[0]);
+    timeBounds = segmentationGeometry->GetTimeBounds(0);
   }
+
+  auto* surfaceGeometry = static_cast<mitk::ProportionalTimeGeometry*>(interpolatedSurface->GetTimeGeometry());
+  surfaceGeometry->SetFirstTimePoint(timeBounds[0]);
+  surfaceGeometry->SetStepDuration(timeBounds[1] - timeBounds[0]);
 
   auto interpolatedSurfaceDataNode = mitk::DataNode::New();
 
   interpolatedSurfaceDataNode->SetData(interpolatedSurface);
-  interpolatedSurfaceDataNode->SetName(segmentationDataNode->GetName() + "_3D-interpolation");
+  interpolatedSurfaceDataNode->SetName(name);
   interpolatedSurfaceDataNode->SetOpacity(0.7f);
 
   std::array<float, 3> rgb;

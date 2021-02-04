@@ -318,7 +318,13 @@ void mitk::SurfaceInterpolationController::Interpolate()
 
   mitk::Surface::Pointer interpolationResult = mitk::Surface::New();
   interpolationResult->Expand(m_SelectedSegmentation->GetTimeSteps());
+
+  auto geometry = m_SelectedSegmentation->GetTimeGeometry()->Clone();
+  geometry->ReplaceTimeStepGeometries(mitk::Geometry3D::New());
+  interpolationResult->SetTimeGeometry(geometry);
+
   interpolationResult->SetVtkPolyData(imageToSurfaceFilter->GetOutput()->GetVtkPolyData(), currentTimeStep);
+
   m_InterpolationResult = interpolationResult;
 
   m_DistanceImageSpacing = m_InterpolateSurfaceFilter->GetDistanceImageSpacing();

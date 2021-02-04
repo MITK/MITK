@@ -338,6 +338,11 @@ void mitk::SurfaceInterpolationController::Interpolate()
   polyDataAppender->Update();
   m_Contours->SetVtkPolyData(polyDataAppender->GetOutput());
 
+  auto* contoursGeometry = static_cast<mitk::ProportionalTimeGeometry*>(m_Contours->GetTimeGeometry());
+  auto timeBounds = geometry->GetTimeBounds(currentTimeStep);
+  contoursGeometry->SetFirstTimePoint(timeBounds[0]);
+  contoursGeometry->SetStepDuration(timeBounds[1] - timeBounds[0]);
+
   // Last progress step
   mitk::ProgressBar::GetInstance()->Progress(20);
 

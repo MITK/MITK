@@ -54,6 +54,8 @@ namespace mitk
     void Activated() override;
     void Deactivated() override;
 
+    bool CanHandle(const BaseData* referenceData, const BaseData* workingData) const override;
+
     virtual DataNode::Pointer GetPointSetNode();
 
     mitk::DataNode *GetReferenceData();

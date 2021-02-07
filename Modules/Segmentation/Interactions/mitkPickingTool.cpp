@@ -64,6 +64,22 @@ mitk::PickingTool::~PickingTool()
   m_PointSet->RemoveObserver(m_PointSetAddObserverTag);
 }
 
+bool mitk::PickingTool::CanHandle(const BaseData* referenceData, const BaseData* workingData) const
+{
+  if (!Superclass::CanHandle(referenceData,workingData))
+    return false;
+
+  auto* image = dynamic_cast<const Image*>(referenceData);
+
+  if (image == nullptr)
+    return false;
+
+  if (image->GetTimeSteps() > 1) //release quickfix for T28248
+    return false;
+
+  return true;
+}
+
 const char **mitk::PickingTool::GetXPM() const
 {
   return nullptr;

@@ -38,6 +38,45 @@ found in the LICENSE file.
 #include <cerrno>
 #include <cstdlib>
 
+#ifdef US_PLATFORM_WINDOWS
+
+#include <Windows.h>
+
+namespace
+{
+  std::wstring MultiByteToWideChar(const std::string& mbString, UINT codePage)
+  {
+    auto numChars = ::MultiByteToWideChar(codePage, 0, mbString.data(), mbString.size(), nullptr, 0);
+
+    if (0 >= numChars)
+      mitkThrow() << "Failure to convert multi-byte character string to wide character string";
+
+    std::wstring wString;
+    wString.resize(numChars);
+
+    ::MultiByteToWideChar(codePage, 0, mbString.data(), mbString.size(), &wString[0], static_cast<int>(wString.size()));
+
+    return wString;
+  }
+
+  std::string WideCharToMultiByte(const std::wstring& wString, UINT codePage)
+  {
+    auto numChars = ::WideCharToMultiByte(codePage, 0, wString.data(), wString.size(), nullptr, 0, nullptr, nullptr);
+
+    if (0 >= numChars)
+      mitkThrow() << "Failure to convert wide character string to multi-byte character string";
+
+    std::string mbString;
+    mbString.resize(numChars);
+
+    ::WideCharToMultiByte(codePage, 0, wString.data(), wString.size(), &mbString[0], static_cast<int>(mbString.size()), nullptr, nullptr);
+
+    return mbString;
+  }
+}
+
+#endif
+
 static std::string GetLastErrorStr()
 {
 #ifdef US_PLATFORM_POSIX
@@ -312,8 +351,6 @@ namespace mitk
     };
 
     static BaseData::Pointer LoadBaseDataFromFile(const std::string &path, const ReaderOptionsFunctorBase* optionsCallback = nullptr);
-
-    static void SetDefaultDataNodeProperties(mitk::DataNode *node, const std::string &filePath = std::string());
   };
 
   BaseData::Pointer IOUtil::Impl::LoadBaseDataFromFile(const std::string &path,
@@ -324,6 +361,38 @@ namespace mitk
     // The Load(path) call above should throw an exception if nothing could be loaded
     assert(!baseDataList.empty());
     return baseDataList.front();
+  }
+
+  std::string IOUtil::Local8BitToUtf8(const std::string& local8BitStr)
+  {
+#ifdef US_PLATFORM_WINDOWS
+    try
+    {
+      return WideCharToMultiByte(MultiByteToWideChar(local8BitStr, CP_ACP), CP_UTF8);
+    }
+    catch (const mitk::Exception&)
+    {
+      MITK_WARN << "String conversion from current code page to UTF-8 failed. Input string is returned unmodified.";
+    }
+#endif
+
+    return local8BitStr;
+  }
+
+  std::string IOUtil::Utf8ToLocal8Bit(const std::string& utf8Str)
+  {
+#ifdef US_PLATFORM_WINDOWS
+    try
+    {
+      return WideCharToMultiByte(MultiByteToWideChar(utf8Str, CP_UTF8), CP_ACP);
+    }
+    catch (const mitk::Exception&)
+    {
+      MITK_WARN << "String conversion from UTF-8 to current code page failed. Input string is returned unmodified.";
+    }
+#endif
+
+    return utf8Str;
   }
 
 #ifdef US_PLATFORM_WINDOWS
@@ -709,7 +778,8 @@ namespace mitk
             continue;
           }
 
-          mitk::StringProperty::Pointer pathProp = mitk::StringProperty::New(loadInfo.m_Path);
+          auto path = Local8BitToUtf8(loadInfo.m_Path);
+          auto pathProp = mitk::StringProperty::New(path);
           data->SetProperty("path", pathProp);
 
           loadInfo.m_Output.push_back(data);
@@ -947,7 +1017,7 @@ namespace mitk
       }
 
       if (setPathProperty)
-        saveInfo.m_BaseData->GetPropertyList()->SetStringProperty("path", saveInfo.m_Path.c_str());
+        saveInfo.m_BaseData->GetPropertyList()->SetStringProperty("path", Local8BitToUtf8(saveInfo.m_Path).c_str());
 
       mitk::ProgressBar::GetInstance()->Progress(2);
       --filesToWrite;
@@ -961,41 +1031,6 @@ namespace mitk
     mitk::ProgressBar::GetInstance()->Progress(2 * filesToWrite);
 
     return errMsg;
-  }
-
-  // This method can be removed after the deprecated LoadDataNode() method was removed
-  void IOUtil::Impl::SetDefaultDataNodeProperties(DataNode *node, const std::string &filePath)
-  {
-    // path
-    mitk::StringProperty::Pointer pathProp = mitk::StringProperty::New(itksys::SystemTools::GetFilenamePath(filePath));
-    node->SetProperty(StringProperty::PATH, pathProp);
-
-    // name already defined?
-    mitk::StringProperty::Pointer nameProp = dynamic_cast<mitk::StringProperty *>(node->GetProperty("name"));
-    if (nameProp.IsNull() || nameProp->GetValue() == DataNode::NO_NAME_VALUE())
-    {
-      // name already defined in BaseData
-      mitk::StringProperty::Pointer baseDataNameProp =
-        dynamic_cast<mitk::StringProperty *>(node->GetData()->GetProperty("name").GetPointer());
-      if (baseDataNameProp.IsNull() || baseDataNameProp->GetValue() == DataNode::NO_NAME_VALUE())
-      {
-        // name neither defined in node, nor in BaseData -> name = filename
-        nameProp = mitk::StringProperty::New(itksys::SystemTools::GetFilenameWithoutExtension(filePath));
-        node->SetProperty("name", nameProp);
-      }
-      else
-      {
-        // name defined in BaseData!
-        nameProp = mitk::StringProperty::New(baseDataNameProp->GetValue());
-        node->SetProperty("name", nameProp);
-      }
-    }
-
-    // visibility
-    if (!node->GetProperty("visible"))
-    {
-      node->SetVisibility(true);
-    }
   }
 
   IOUtil::SaveInfo::SaveInfo(const BaseData *baseData, const MimeType &mimeType, const std::string &path)

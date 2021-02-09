@@ -36,6 +36,7 @@ class mitkIOUtilTestSuite : public mitk::TestFixture
   MITK_TEST(TestTempMethodsForUniqueFilenames);
   MITK_TEST(TestTempMethodsForUniqueFilenames);
   MITK_TEST(TestIOMetaInformation);
+  MITK_TEST(TestUtf8);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -286,6 +287,23 @@ public:
 
     // delete the files after the test is done
     std::remove(imagePath.c_str());
+  }
+
+  void TestUtf8()
+  {
+    const std::string utf8Path = u8"UTF-8/\u00c4.nrrd"; // LATIN CAPITAL LETTER A WITH DIAERESIS (U+00C4)
+    const std::string local8BitPath = mitk::IOUtil::Utf8ToLocal8Bit(utf8Path);
+
+    CPPUNIT_ASSERT(utf8Path == mitk::IOUtil::Local8BitToUtf8(local8BitPath));
+
+    const std::string path = GetTestDataFilePath(local8BitPath);
+
+    std::fstream file;
+    file.open(path);
+    CPPUNIT_ASSERT(file.is_open());
+
+    auto image = mitk::IOUtil::Load<mitk::Image>(path);
+    CPPUNIT_ASSERT(image.IsNotNull());
   }
 
 };

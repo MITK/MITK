@@ -51,6 +51,9 @@ bool mitk::AdaptiveRegionGrowingTool::CanHandle(const BaseData* referenceData, c
   if (image->GetDimension() < 3)
     return false;
 
+  if (image->GetTimeSteps() > 1) //release quickfix for T28275
+    return false;
+
   return true;
 }
 

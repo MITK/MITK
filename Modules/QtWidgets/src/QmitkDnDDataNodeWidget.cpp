@@ -17,6 +17,9 @@ found in the LICENSE file.
 
 // qt
 #include <QMimeData>
+#include <QDragEnterEvent>
+#include <QDragMoveEvent>
+#include <QDropEvent>
 
 QmitkDnDDataNodeWidget::QmitkDnDDataNodeWidget(QWidget* parent /*= nullptr*/)
   : QFrame(parent)

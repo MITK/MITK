@@ -163,6 +163,10 @@ QmitkChartWidget::Impl::Impl(QWidget *parent)
 
   m_WebEngineView->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
 
+  //This is added as a workarround for T28252 (https://phabricator.mitk.org/T28252)
+  //can be removed if task is properly fixed.
+  m_WebEngineView->settings()->setAttribute(QWebEngineSettings::ShowScrollBars, false);
+
   connect(m_WebEngineView, SIGNAL(loadFinished(bool)), parent, SLOT(OnLoadFinished(bool)));
   auto layout = new QGridLayout(parent);
   layout->setMargin(0);

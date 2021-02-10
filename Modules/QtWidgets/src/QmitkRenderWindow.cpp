@@ -156,7 +156,6 @@ bool QmitkRenderWindow::event(QEvent* e)
     case QEvent::MouseMove:
     {
       auto me = static_cast<QMouseEvent *>(e);
-      this->AdjustRenderWindowMenuVisibility(me->pos());
       mitkEvent = mitk::MouseMoveEvent::New(m_Renderer, GetMousePosition(me), GetButtonState(me), GetModifiers(me));
       break;
     }
@@ -190,6 +189,11 @@ bool QmitkRenderWindow::event(QEvent* e)
       mitkEvent = mitk::InteractionKeyEvent::New(m_Renderer, GetKeyLetter(ke), GetModifiers(ke));
       break;
     }
+    case QEvent::Resize:
+    {
+      if (nullptr != m_MenuWidget)
+        m_MenuWidget->MoveWidgetToCorrectPos();
+    }
     default:
     {
       break;
@@ -210,6 +214,9 @@ void QmitkRenderWindow::enterEvent(QEvent *e)
 {
   // TODO implement new event
   QVTKOpenGLNativeWidget::enterEvent(e);
+
+  if (nullptr != m_MenuWidget)
+    m_MenuWidget->ShowMenu();
 }
 
 void QmitkRenderWindow::leaveEvent(QEvent *e)
@@ -219,9 +226,7 @@ void QmitkRenderWindow::leaveEvent(QEvent *e)
   this->HandleEvent(internalEvent.GetPointer());
 
   if (nullptr != m_MenuWidget)
-  {
-    m_MenuWidget->smoothHide();
-  }
+    m_MenuWidget->HideMenu();
 
   QVTKOpenGLNativeWidget::leaveEvent(e);
 }
@@ -246,15 +251,6 @@ void QmitkRenderWindow::dropEvent(QDropEvent *event)
   if (!dataNodeList.empty())
   {
     emit NodesDropped(this, dataNodeList.toVector().toStdVector());
-  }
-}
-
-void QmitkRenderWindow::AdjustRenderWindowMenuVisibility(const QPoint & /*pos*/)
-{
-  if (nullptr != m_MenuWidget)
-  {
-    m_MenuWidget->ShowMenu();
-    m_MenuWidget->MoveWidgetToCorrectPos(1.0f);
   }
 }
 

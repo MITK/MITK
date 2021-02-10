@@ -18,34 +18,37 @@ found in the LICENSE file.
 
 static const char* const HelpText = "Select two different masks above";
 
-std::string GetPrefix(mitk::BooleanOperation::Type type)
+namespace
 {
-  switch (type)
+  std::string GetPrefix(mitk::BooleanOperation::Type type)
   {
-    case mitk::BooleanOperation::Difference:
-      return "DifferenceFrom_";
+    switch (type)
+    {
+      case mitk::BooleanOperation::Difference:
+        return "DifferenceFrom_";
 
-    case mitk::BooleanOperation::Intersection:
-      return "IntersectionWith_";
+      case mitk::BooleanOperation::Intersection:
+        return "IntersectionWith_";
 
-    case mitk::BooleanOperation::Union:
-      return "UnionWith_";
+      case mitk::BooleanOperation::Union:
+        return "UnionWith_";
 
-    default:
-      assert(false && "Unknown boolean operation type");
-      return "UNKNOWN_BOOLEAN_OPERATION_WITH_";
+      default:
+        assert(false && "Unknown boolean operation type");
+        return "UNKNOWN_BOOLEAN_OPERATION_WITH_";
+    }
   }
-}
 
-void AddToDataStorage(mitk::DataStorage::Pointer dataStorage, mitk::Image::Pointer segmentation, const std::string& name, mitk::DataNode::Pointer parent = nullptr)
-{
-  mitk::DataNode::Pointer dataNode = mitk::DataNode::New();
+  void AddToDataStorage(mitk::DataStorage::Pointer dataStorage, mitk::Image::Pointer segmentation, const std::string& name, mitk::DataNode::Pointer parent = nullptr)
+  {
+    mitk::DataNode::Pointer dataNode = mitk::DataNode::New();
 
-  dataNode->SetBoolProperty("binary", true);
-  dataNode->SetName(name);
-  dataNode->SetData(segmentation);
+    dataNode->SetBoolProperty("binary", true);
+    dataNode->SetName(name);
+    dataNode->SetData(segmentation);
 
-  dataStorage->Add(dataNode, parent);
+    dataStorage->Add(dataNode, parent);
+  }
 }
 
 QmitkBooleanOperationsWidget::QmitkBooleanOperationsWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent)

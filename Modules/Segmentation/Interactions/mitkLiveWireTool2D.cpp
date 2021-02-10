@@ -170,45 +170,46 @@ void mitk::LiveWireTool2D::ConfirmSegmentation()
   auto referenceImage = this->GetReferenceData();
   auto workingImage = this->GetWorkingData();
 
-  if (nullptr == referenceImage || nullptr == workingImage)
-    return;
-
-  std::vector<SliceInformation> sliceInfos;
-  sliceInfos.reserve(m_WorkingContours.size());
-
-  const auto currentTimePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
-  TimeStepType workingImageTimeStep = workingImage->GetTimeGeometry()->TimePointToTimeStep(currentTimePoint);
-
-  for (const auto &workingContour : m_WorkingContours)
+  if (nullptr != referenceImage && nullptr != workingImage)
   {
-    auto contour = dynamic_cast<ContourModel *>(workingContour.first->GetData());
+    std::vector<SliceInformation> sliceInfos;
+    sliceInfos.reserve(m_WorkingContours.size());
 
-    if (nullptr == contour || contour->IsEmpty())
-      continue;
+    const auto currentTimePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+    TimeStepType workingImageTimeStep = workingImage->GetTimeGeometry()->TimePointToTimeStep(currentTimePoint);
 
-    auto sameSlicePredicate = [&workingContour, workingImageTimeStep](const SliceInformation& si) { return workingContour.second->IsOnPlane(si.plane) && workingImageTimeStep == si.timestep; };
-
-    auto finding = std::find_if(sliceInfos.begin(), sliceInfos.end(), sameSlicePredicate);
-    if (finding == sliceInfos.end())
+    for (const auto &workingContour : m_WorkingContours)
     {
-      auto workingSlice = this->GetAffectedImageSliceAs2DImage(workingContour.second, workingImage, workingImageTimeStep)->Clone();
-      sliceInfos.emplace_back(workingSlice, workingContour.second, workingImageTimeStep);
-      finding = std::prev(sliceInfos.end());
+      auto contour = dynamic_cast<ContourModel *>(workingContour.first->GetData());
+
+      if (nullptr == contour || contour->IsEmpty())
+        continue;
+
+      auto sameSlicePredicate = [&workingContour, workingImageTimeStep](const SliceInformation& si) { return workingContour.second->IsOnPlane(si.plane) && workingImageTimeStep == si.timestep; };
+
+      auto finding = std::find_if(sliceInfos.begin(), sliceInfos.end(), sameSlicePredicate);
+      if (finding == sliceInfos.end())
+      {
+        auto workingSlice = this->GetAffectedImageSliceAs2DImage(workingContour.second, workingImage, workingImageTimeStep)->Clone();
+        sliceInfos.emplace_back(workingSlice, workingContour.second, workingImageTimeStep);
+        finding = std::prev(sliceInfos.end());
+      }
+
+      //cast const away is OK in this case, because these are all slices created and manipulated
+      //localy in this function call. And we want to keep the high constness of SliceInformation for
+      //public interfaces.
+      auto workingSlice = const_cast<Image*>(finding->slice.GetPointer());
+
+      auto projectedContour = ContourModelUtils::ProjectContourTo2DSlice(workingSlice, contour, true, false);
+      int activePixelValue = ContourModelUtils::GetActivePixelValue(workingImage);
+
+      ContourModelUtils::FillContourInSlice(
+        projectedContour, workingSlice, workingImage, activePixelValue);
     }
 
-    //cast const away is OK in this case, because these are all slices created and manipulated
-    //localy in this function call. And we want to keep the high constness of SliceInformation for
-    //public interfaces.
-    auto workingSlice = const_cast<Image*>(finding->slice.GetPointer());
-
-    auto projectedContour = ContourModelUtils::ProjectContourTo2DSlice(workingSlice, contour, true, false);
-    int activePixelValue = ContourModelUtils::GetActivePixelValue(workingImage);
-
-    ContourModelUtils::FillContourInSlice(
-      projectedContour, workingSlice, workingImage, activePixelValue);
+    this->WriteBackSegmentationResults(sliceInfos);
   }
 
-  this->WriteBackSegmentationResults(sliceInfos);
   this->ClearSegmentation();
 }
 
@@ -238,14 +239,6 @@ mitk::ContourModel::Pointer mitk::LiveWireTool2D::CreateNewContour() const
     this->InteractiveSegmentationBugMessage("Cannot create new contour. No valid working data is set. Application is in invalid state.");
     mitkThrow() << "Cannot create new contour. No valid working data is set. Application is in invalid state.";
   }
-
-  const auto minTime = workingData->GetTimeGeometry()->GetMinimumTimePoint();
-  auto duration = workingData->GetTimeGeometry()->GetMaximumTimePoint() - minTime;
-
-  if (duration <= 0)
-  {
-    duration = 1.;
-  };
 
   auto contour = ContourModel::New();
 

@@ -256,7 +256,8 @@ private:
   QPushButton *m_BtnApplyForAllSlices2D;
   QPushButton *m_BtnApply3D;
 
-  QPushButton *m_BtnSuggestPlane;
+  // T28261
+  // QPushButton *m_BtnSuggestPlane;
 
   QCheckBox *m_ChkShowPositionNodes;
   QPushButton *m_BtnReinit3DInterpolation;

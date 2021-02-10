@@ -213,7 +213,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
          auto segTemplateImage = referenceImage;
          if (referenceImage->GetDimension() > 3)
          {
-           auto result = QMessageBox::question(m_Parent, tr("Generate a static mask?"),tr("The selected image has multiple time steps. You can either generate a simple/static masks resembling the geometry of the first timestep of the image. Or you can generate a dynamic mask that equals the selected image in geometry and number of timesteps; thus a dynamic mask can change over time (e.g. according to the image)."), tr("Yes, generate a static mask"), tr("No, generate a dynamic mask"), QString(), 0,0);
+           auto result = QMessageBox::question(m_Parent, tr("Create a static or dynamic segmentation?"), tr("The patient image has multiple time steps.\n\nDo you want to create a static segmentation that is identical for all time steps or do you want to create a dynamic segmentation to segment individual time steps?"), tr("Create static segmentation"), tr("Create dynamic segmentation"), QString(), 0,0);
            if (result == 0)
            {
              auto selector = mitk::ImageTimeSelector::New();
@@ -637,7 +637,6 @@ void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataNode* node)
   }
 
   mitk::BoolProperty::Pointer drawOutline = mitk::BoolProperty::New(GetPreferences()->GetBool("draw outline", true));
-  mitk::BoolProperty::Pointer volumeRendering = mitk::BoolProperty::New(GetPreferences()->GetBool("volume rendering", false));
   mitk::LabelSetImage* labelSetImage = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
   if (nullptr != labelSetImage)
   {
@@ -645,7 +644,6 @@ void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataNode* node)
     // but its outline property can be set in the 'single label' segmentation preference page as well
     node->SetProperty("labelset.contour.active", drawOutline);
     //node->SetProperty("opacity", mitk::FloatProperty::New(drawOutline->GetValue() ? 1.0f : 0.3f));
-    node->SetProperty("volumerendering", volumeRendering);
     // force render window update to show outline
     node->GetData()->Modified();
   }
@@ -659,7 +657,6 @@ void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataNode* node)
       node->SetProperty("outline binary", drawOutline);
       node->SetProperty("outline width", mitk::FloatProperty::New(2.0));
       //node->SetProperty("opacity", mitk::FloatProperty::New(drawOutline->GetValue() ? 1.0f : 0.3f));
-      node->SetProperty("volumerendering", volumeRendering);
       // force render window update to show outline
       node->GetData()->Modified();
     }
@@ -764,7 +761,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    toolManager->SetDataStorage(*(GetDataStorage()));
    toolManager->InitializeTools();
 
-   QString segTools2D = tr("Add Subtract Correction Paint Wipe 'Region Growing' Fill Erase 'Live Wire' '2D Fast Marching'");
+   QString segTools2D = tr("Add Subtract Paint Wipe 'Region Growing' Fill Erase 'Live Wire' '2D Fast Marching'");
    QString segTools3D = tr("Threshold 'UL Threshold' Otsu 'Fast Marching 3D' 'Region Growing 3D' Watershed Picking");
 
    std::regex extSegTool2DRegEx("SegTool2D$");

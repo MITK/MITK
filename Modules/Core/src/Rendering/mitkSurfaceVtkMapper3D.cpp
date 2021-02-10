@@ -69,6 +69,16 @@ void mitk::SurfaceVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *rende
   // set the input-object at time t for the mapper
   //
   mitk::Surface::ConstPointer input = this->GetInput();
+
+  const auto* worldGeometry = renderer->GetWorldTimeGeometry();
+  const auto timeBounds = worldGeometry->GetTimeBounds(renderer->GetTimeStep());
+
+  if (!input->GetTimeGeometry()->IsValidTimePoint(timeBounds[0]))
+  {
+    ls->m_Actor->VisibilityOff();
+    return;
+  }
+
   vtkSmartPointer<vtkPolyData> polydata = input->GetVtkPolyData(this->GetTimestep());
   if (polydata == nullptr)
   {

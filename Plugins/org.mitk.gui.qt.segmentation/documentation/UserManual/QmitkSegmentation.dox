@@ -114,7 +114,6 @@ The tool will select more or less pixels, corresponding to the changing gray val
 
 
 
-
 \if THISISNOTIMPLEMENTEDATTHEMOMENT
 A common issue with region growing is the so called "leakage" which happens when the structure of interest is connected to other pixels, of similar gray values, through a narrow "bridge" at the border of the structure.
 The Region Growing tool comes with a "leakage detection/removal" feature. If leakage happens, you can left-click into the leakage region and the tool will try to automatically remove this region (see illustration below).
@@ -123,19 +122,6 @@ The Region Growing tool comes with a "leakage detection/removal" feature. If lea
 \endif
 
 
-\subsection org_mitk_views_segmentationUserManualCorrectionTool Correction Tool
-<br>
-\imageMacro{QmitkSegmentation_IMGIconCorrection.png,"Correction Tool",3.77}
-
-You do not have to draw a closed contour to use the Correction tool and do not need to switch between the Add and Substract tool to perform
-small corrective changes. The following figure shows the usage of this tool:
-<ul>
-<li> a) If the user draws a line which %starts and ends outside the segmenation a part of it is cut off.
-<li> b) If the line is drawn fully inside the segmentation the marked region is added to the segmentation.
-</ul>
-
-\imageMacro{QmitkSegmentation_IMGCorrectionActions.png,"Usage of the Correction tool.",13.50}
-<br>
 
 \subsection org_mitk_views_segmentationUserManualFillTool Fill Tool
 \imageMacro{QmitkSegmentation_IMGIconFill.png,"Fill Tool",3.81}

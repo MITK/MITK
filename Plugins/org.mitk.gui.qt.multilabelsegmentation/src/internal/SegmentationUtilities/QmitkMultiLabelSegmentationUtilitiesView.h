@@ -18,9 +18,9 @@ found in the LICENSE file.
 #include <QmitkAbstractView.h>
 
 class QmitkBooleanOperationsWidget;
+class QmitkContourModelToImageWidget;
 class QmitkSurfaceToImageWidget;
 class QmitkImageMaskingWidget;
-class QmitkMorphologicalOperationsWidget;
 class QmitkMorphologicalOperationsWidget;
 class QmitkConvertToMlWidget;
 
@@ -42,6 +42,8 @@ private:
   void AddUtilityWidget(QWidget* widget, const QIcon& icon, const QString& text);
 
   QmitkBooleanOperationsWidget* m_BooleanOperationsWidget;
+
+  QmitkContourModelToImageWidget* m_ContourModelToImageWidget;
 
   QmitkMorphologicalOperationsWidget* m_MorphologicalOperationsWidget;
 

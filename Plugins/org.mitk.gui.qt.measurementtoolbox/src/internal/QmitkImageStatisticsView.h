@@ -18,8 +18,11 @@ found in the LICENSE file.
 #include <QmitkAbstractView.h>
 #include <mitkImageStatisticsContainer.h>
 #include <QmitkNodeSelectionDialog.h>
+#include <QmitkSliceNavigationListener.h>
 
 #include <mitkPropertyRelations.h>
+
+#include <mitkIRenderWindowPartListener.h>
 
 class QmitkImageStatisticsDataGenerator;
 class QmitkDataGenerationJobBase;
@@ -32,7 +35,7 @@ gui accessible during calculation.
 
 \ingroup Plugins/org.mitk.gui.qt.measurementtoolbox
 */
-class QmitkImageStatisticsView : public QmitkAbstractView
+class QmitkImageStatisticsView : public QmitkAbstractView, public mitk::IRenderWindowPartListener
 {
   Q_OBJECT
 
@@ -43,11 +46,14 @@ public:
   /*!
   \brief default destructor */
   ~QmitkImageStatisticsView() override;
-  /*!
-  \brief Creates the widget containing the application controls, like sliders, buttons etc.*/
-  void CreateQtPartControl(QWidget *parent) override;
 
 protected:
+  /*!
+  \brief Creates the widget containing the application controls, like sliders, buttons etc.*/
+  void CreateQtPartControl(QWidget* parent) override;
+
+  void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
 
   using HistogramType = mitk::ImageStatisticsContainer::HistogramType;
 
@@ -70,6 +76,7 @@ protected:
   void OnButtonSelectionPressed();
   void OnImageSelectionChanged(QmitkAbstractNodeSelectionWidget::NodeList nodes);
   void OnROISelectionChanged(QmitkAbstractNodeSelectionWidget::NodeList nodes);
+  void OnSelectedTimePointChanged(const mitk::TimePointType& newTimePoint);
 
   // member variable
   Ui::QmitkImageStatisticsViewControls m_Controls;
@@ -80,6 +87,9 @@ private:
 
   std::vector<mitk::ImageStatisticsContainer::ConstPointer> m_StatisticsForSelection;
   QmitkImageStatisticsDataGenerator* m_DataGenerator = nullptr;
+
+  QmitkSliceNavigationListener m_TimePointChangeListener;
+
 };
 
 #endif // QMITKIMAGESTATISTICSVIEW_H

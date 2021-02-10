@@ -40,19 +40,10 @@ found in the LICENSE file.
 
 unsigned int QmitkRenderWindowMenu::m_DefaultThickMode(1);
 
-#ifdef QMITK_USE_EXTERNAL_RENDERWINDOW_MENU
-QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget* parent,
-                                             Qt::WindowFlags,
-                                             mitk::BaseRenderer* baseRenderer)
-  : QWidget(nullptr, Qt::Tool | Qt::FramelessWindowHint)
-
-#else
 QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget* parent,
                                              Qt::WindowFlags flags,
                                              mitk::BaseRenderer* baseRenderer)
   : QWidget(parent, flags)
-#endif
-
   , m_LayoutActionsMenu(nullptr)
   , m_CrosshairMenu(nullptr)
   , m_FullScreenMode(false)
@@ -69,25 +60,12 @@ QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget* parent,
   setMaximumWidth(61);
   setAutoFillBackground(true);
 
-// Else part fixes the render window menu issue on Linux bug but caused bugs on macOS and Windows
-// for macOS see bug 3192
-// for Windows see bug 12130
-//... so macOS and Windows must be treated differently:
-#if defined(Q_OS_MAC)
-  this->show();
-  this->setWindowOpacity(0.0f);
-#else
-  this->setVisible(false);
-#endif
+  this->hide();
 
   m_AutoRotationTimer = new QTimer(this);
   m_AutoRotationTimer->setInterval(75);
 
-  m_HideTimer = new QTimer(this);
-  m_HideTimer->setSingleShot(true);
-
   connect(m_AutoRotationTimer, &QTimer::timeout, this, &QmitkRenderWindowMenu::AutoRotateNextStep);
-  connect(m_HideTimer, &QTimer::timeout, this, &QmitkRenderWindowMenu::DeferredHideMenu);
   connect(m_Parent, &QObject::destroyed, this, &QmitkRenderWindowMenu::deleteLater);
 }
 
@@ -199,43 +177,35 @@ void QmitkRenderWindowMenu::UpdateCrosshairRotationMode(int mode)
   m_CrosshairRotationMode = mode;
 }
 
-#ifdef QMITK_USE_EXTERNAL_RENDERWINDOW_MENU
-void QmitkRenderWindowMenu::MoveWidgetToCorrectPos(float opacity)
-#else
-void QmitkRenderWindowMenu::MoveWidgetToCorrectPos(float /*opacity*/)
-#endif
+void QmitkRenderWindowMenu::MoveWidgetToCorrectPos()
 {
-#ifdef QMITK_USE_EXTERNAL_RENDERWINDOW_MENU
-  int X = floor(double(this->m_Parent->width() - this->width() - 8.0));
-  int Y = 7;
-
-  QPoint pos = this->m_Parent->mapToGlobal(QPoint(0, 0));
-
-  this->move(X + pos.x(), Y + pos.y());
-
-  if (opacity < 0)
-    opacity = 0;
-  else if (opacity > 1)
-    opacity = 1;
-
-  this->setWindowOpacity(opacity);
-#else
-  int moveX = floor(double(this->m_Parent->width() - this->width() - 4.0));
+  int moveX = floor(static_cast<double>(this->m_Parent->width()) - static_cast<double>(this->width()) - 4.0);
   this->move(moveX, 3);
-  this->show();
-#endif
+
+  auto cursorPos = this->mapFromGlobal(QCursor::pos());
+
+  if (cursorPos.x() < 0 || cursorPos.x() >= this->width() ||
+      cursorPos.y() < 0 || cursorPos.y() >= this->height())
+  {
+    this->HideMenu();
+  }
+  else
+  {
+    this->ShowMenu();
+  }
 }
 
 void QmitkRenderWindowMenu::ShowMenu()
 {
   MITK_DEBUG << "menu showMenu";
-  DeferredShowMenu();
+  this->show();
+  this->raise();
 }
 
 void QmitkRenderWindowMenu::HideMenu()
 {
   MITK_DEBUG << "menu hideEvent";
-  DeferredHideMenu();
+  this->hide();
 }
 
 void QmitkRenderWindowMenu::paintEvent(QPaintEvent * /*e*/)
@@ -352,55 +322,6 @@ void QmitkRenderWindowMenu::CreateSettingsWidget()
 void QmitkRenderWindowMenu::ChangeFullScreenIcon()
 {
   m_FullScreenButton->setIcon(m_FullScreenMode ? QPixmap(iconLeaveFullScreen_xpm) : QPixmap(iconFullScreen_xpm));
-}
-
-void QmitkRenderWindowMenu::DeferredShowMenu()
-{
-  MITK_DEBUG << "deferred show menu";
-  m_HideTimer->stop();
-
-  // Else part fixes the render window menu issue on Linux bug but caused bugs on macOS and Windows
-  // for macOS see bug 3192
-  // for Windows see bug 12130
-  //... so macOS and Windows must be treated differently:
-#if defined(Q_OS_MAC)
-  this->setWindowOpacity(1.0f);
-#else
-  this->setVisible(true);
-  this->raise();
-#endif
-}
-
-void QmitkRenderWindowMenu::DeferredHideMenu()
-{
-  MITK_DEBUG << "menu deferredhidemenu";
-  // Else part fixes the render window menu issue on Linux bug but caused bugs on macOS and Windows
-  // for macOS see bug 3192
-  // for Windows see bug 12130
-  //... so macOS and Windows must be treated differently:
-#if defined(Q_OS_MAC)
-  this->setWindowOpacity(0.0f);
-#else
-  this->setVisible(false);
-#endif
-}
-
-void QmitkRenderWindowMenu::smoothHide()
-{
-  MITK_DEBUG << "menu leaveEvent";
-  m_HideTimer->start(10);
-}
-
-void QmitkRenderWindowMenu::enterEvent(QEvent * /*e*/)
-{
-  MITK_DEBUG << "menu enterEvent";
-  DeferredShowMenu();
-}
-
-void QmitkRenderWindowMenu::leaveEvent(QEvent * /*e*/)
-{
-  MITK_DEBUG << "menu leaveEvent";
-  smoothHide();
 }
 
 void QmitkRenderWindowMenu::AutoRotateNextStep()
@@ -628,10 +549,9 @@ void QmitkRenderWindowMenu::OnFullScreenButton(bool /*checked*/)
     emit LayoutDesignChanged(m_OldLayoutDesign);
   }
 
-  MoveWidgetToCorrectPos(1.0f);
+  MoveWidgetToCorrectPos();
   ChangeFullScreenIcon();
-
-  DeferredShowMenu();
+  ShowMenu();
 }
 
 void QmitkRenderWindowMenu::OnLayoutDesignButton(bool /*checked*/)
@@ -654,5 +574,5 @@ void QmitkRenderWindowMenu::OnSetLayout(LayoutDesign layoutDesign)
   m_LayoutDesign = layoutDesign;
   emit LayoutDesignChanged(m_LayoutDesign);
 
-  DeferredShowMenu();
+  ShowMenu();
 }

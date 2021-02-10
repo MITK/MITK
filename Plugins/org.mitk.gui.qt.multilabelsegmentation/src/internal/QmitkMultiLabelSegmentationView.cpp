@@ -68,6 +68,7 @@ QmitkMultiLabelSegmentationView::QmitkMultiLabelSegmentationView()
   m_SegmentationPredicate = mitk::NodePredicateAnd::New();
   m_SegmentationPredicate->AddPredicate(mitk::TNodePredicateDataType<mitk::LabelSetImage>::New());
   m_SegmentationPredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
+  m_SegmentationPredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
 
   mitk::TNodePredicateDataType<mitk::Image>::Pointer isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
   mitk::NodePredicateProperty::Pointer isBinary =
@@ -90,6 +91,7 @@ QmitkMultiLabelSegmentationView::QmitkMultiLabelSegmentationView()
   m_ReferencePredicate->AddPredicate(mitk::NodePredicateNot::New(m_SegmentationPredicate));
   m_ReferencePredicate->AddPredicate(mitk::NodePredicateNot::New(isMask));
   m_ReferencePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
+  m_ReferencePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
 }
 
 QmitkMultiLabelSegmentationView::~QmitkMultiLabelSegmentationView()
@@ -171,7 +173,7 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget *parent)
 
   m_Controls.m_gbInterpolation->hide(); // See T27436
 
-  QString segTools2D = tr("Add Subtract Fill Erase Paint Wipe 'Region Growing' FastMarching2D Correction 'Live Wire'");
+  QString segTools2D = tr("Add Subtract Fill Erase Paint Wipe 'Region Growing' FastMarching2D 'Live Wire'");
   QString segTools3D = tr("Threshold 'Two Thresholds' 'Auto Threshold' 'Multiple Otsu'");
 
   std::regex extSegTool2DRegEx("SegTool2D$");
@@ -478,7 +480,7 @@ void QmitkMultiLabelSegmentationView::OnNewSegmentationSession()
   auto segTemplateImage = referenceImage;
   if (referenceImage->GetDimension() > 3)
   {
-    auto result = QMessageBox::question(m_Parent, tr("Generate a static mask?"), tr("The selected image has multiple time steps. You can either generate a simple/static masks resembling the geometry of the first timestep of the image. Or you can generate a dynamic mask that equals the selected image in geometry and number of timesteps; thus a dynamic mask can change over time (e.g. according to the image)."), tr("Yes, generate a static mask"), tr("No, generate a dynamic mask"), QString(), 0, 0);
+    auto result = QMessageBox::question(m_Parent, tr("Create a static or dynamic segmentation?"), tr("The patient image has multiple time steps.\n\nDo you want to create a static segmentation that is identical for all time steps or do you want to create a dynamic segmentation to segment individual time steps?"), tr("Create static segmentation"), tr("Create dynamic segmentation"), QString(), 0, 0);
     if (result == 0)
     {
       auto selector = mitk::ImageTimeSelector::New();
@@ -778,53 +780,42 @@ void QmitkMultiLabelSegmentationView::OnInterpolationSelectionChanged(int index)
 /************************************************************************/
 void QmitkMultiLabelSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
 {
-  if (m_Parent && m_WorkingNode.IsNotNull())
+  m_AutoSelectionEnabled = prefs->GetBool("auto selection", false);
+
+  mitk::BoolProperty::Pointer drawOutline = mitk::BoolProperty::New(prefs->GetBool("draw outline", true));
+  mitk::LabelSetImage* labelSetImage;
+  mitk::DataNode* segmentation;
+
+  // iterate all segmentations (binary (single label) and LabelSetImages)
+  mitk::NodePredicateProperty::Pointer isBinaryPredicate = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
+  mitk::NodePredicateOr::Pointer allSegmentationsPredicate = mitk::NodePredicateOr::New(isBinaryPredicate, m_SegmentationPredicate);
+  mitk::DataStorage::SetOfObjects::ConstPointer allSegmentations = GetDataStorage()->GetSubset(allSegmentationsPredicate);
+
+  for (mitk::DataStorage::SetOfObjects::const_iterator it = allSegmentations->begin(); it != allSegmentations->end(); ++it)
   {
-    m_AutoSelectionEnabled = prefs->GetBool("auto selection", false);
-
-    mitk::BoolProperty::Pointer drawOutline = mitk::BoolProperty::New(prefs->GetBool("draw outline", true));
-    mitk::BoolProperty::Pointer volumeRendering = mitk::BoolProperty::New(prefs->GetBool("volume rendering", false));
-    mitk::LabelSetImage* labelSetImage;
-    mitk::DataNode* segmentation;
-
-    // iterate all segmentations (binary (single label) and LabelSetImages)
-    mitk::NodePredicateProperty::Pointer isBinaryPredicate = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
-    mitk::NodePredicateOr::Pointer allSegmentationsPredicate = mitk::NodePredicateOr::New(isBinaryPredicate, m_SegmentationPredicate);
-    mitk::DataStorage::SetOfObjects::ConstPointer allSegmentations = GetDataStorage()->GetSubset(allSegmentationsPredicate);
-
-    for (mitk::DataStorage::SetOfObjects::const_iterator it = allSegmentations->begin(); it != allSegmentations->end(); ++it)
+    segmentation = *it;
+    labelSetImage = dynamic_cast<mitk::LabelSetImage*>(segmentation->GetData());
+    if (nullptr != labelSetImage)
     {
-      segmentation = *it;
-      labelSetImage = dynamic_cast<mitk::LabelSetImage*>(segmentation->GetData());
-      if (nullptr != labelSetImage)
+      // segmentation node is a multi label segmentation
+      segmentation->SetProperty("labelset.contour.active", drawOutline);
+      //segmentation->SetProperty("opacity", mitk::FloatProperty::New(drawOutline->GetValue() ? 1.0f : 0.3f));
+      // force render window update to show outline
+      segmentation->GetData()->Modified();
+    }
+    else if (nullptr != segmentation->GetData())
+    {
+      // node is actually a 'single label' segmentation,
+      // but its outline property can be set in the 'multi label' segmentation preference page as well
+      bool isBinary = false;
+      segmentation->GetBoolProperty("binary", isBinary);
+      if (isBinary)
       {
-        // segmentation node is a multi label segmentation
-        segmentation->SetProperty("labelset.contour.active", drawOutline);
+        segmentation->SetProperty("outline binary", drawOutline);
+        segmentation->SetProperty("outline width", mitk::FloatProperty::New(2.0));
         //segmentation->SetProperty("opacity", mitk::FloatProperty::New(drawOutline->GetValue() ? 1.0f : 0.3f));
-        segmentation->SetProperty("volumerendering", volumeRendering);
         // force render window update to show outline
         segmentation->GetData()->Modified();
-      }
-      else if (nullptr != segmentation->GetData())
-      {
-        // node is actually a 'single label' segmentation,
-        // but its outline property can be set in the 'multi label' segmentation preference page as well
-        bool isBinary = false;
-        segmentation->GetBoolProperty("binary", isBinary);
-        if (isBinary)
-        {
-          segmentation->SetProperty("outline binary", drawOutline);
-          segmentation->SetProperty("outline width", mitk::FloatProperty::New(2.0));
-          //segmentation->SetProperty("opacity", mitk::FloatProperty::New(drawOutline->GetValue() ? 1.0f : 0.3f));
-          segmentation->SetProperty("volumerendering", volumeRendering);
-          // force render window update to show outline
-          segmentation->GetData()->Modified();
-        }
-      }
-      else
-      {
-        // "interpolation feedback" data nodes have binary flag but don't have a data set. So skip them for now.
-        MITK_INFO << "DataNode " << segmentation->GetName() << " doesn't contain a base data.";
       }
     }
   }

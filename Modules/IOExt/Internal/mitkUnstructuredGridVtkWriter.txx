@@ -73,7 +73,7 @@ namespace mitk
         geometry = input->GetGeometry(t);
         if (input->GetTimeGeometry()->IsValidTimeStep(t))
         {
-          const mitk::TimeBounds &timebounds = input->GetTimeGeometry()->GetTimeBounds(t);
+          const mitk::TimeBounds timebounds = input->GetTimeGeometry()->GetTimeBounds(t);
           filename << m_FileName.c_str() << "_S" << std::setprecision(0) << timebounds[0] << "_E"
                    << std::setprecision(0) << timebounds[1] << "_T" << t << GetDefaultExtension();
         }

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QmitkImageMaskingWidgetControls</class>
- <widget class="QWidget" name="QmitkImageMaskingWidgetControls">
+ <class>QmitkContourModelToImageWidgetControls</class>
+ <widget class="QWidget" name="QmitkContourModelToImageWidgetControls">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>147</width>
-    <height>155</height>
+    <width>98</width>
+    <height>62</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -22,9 +22,9 @@
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="btnMaskImage">
+    <widget class="QPushButton" name="btnProcess">
      <property name="text">
-      <string>Mask</string>
+      <string>Process</string>
      </property>
     </widget>
    </item>

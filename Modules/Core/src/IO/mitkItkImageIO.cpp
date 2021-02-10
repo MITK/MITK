@@ -244,7 +244,19 @@ namespace mitk
     const auto maxTimePoints = timeGeometry->CountTimeSteps();
     for (TimeStepType pos = 0; pos < maxTimePoints; ++pos)
     {
-      stream << " " << timeGeometry->GetTimeBounds(pos)[1];
+      auto timeBounds = timeGeometry->GetTimeBounds(pos);
+
+      ///////////////////////////////////////
+      // Workarround T27883. See https://phabricator.mitk.org/T27883#219473 for more details.
+      // This workarround should be removed as soon as T28262 is solved!
+      if (pos + 1 == maxTimePoints && timeBounds[0]==timeBounds[1])
+      {
+        timeBounds[1] = timeBounds[0] + 1.;
+      }
+      // End of workarround for T27883
+      //////////////////////////////////////
+
+      stream << " " << timeBounds[1];
     }
     auto result = itk::MetaDataObject<std::string>::New();
     result->SetMetaDataObjectValue(stream.str());

@@ -557,6 +557,10 @@ set(options
 # "-D" "SUPERBUILD_EXCLUDE_MITKBUILD_TARGET:BOOL=TRUE"
 )
 
+if(NOT WIN32)
+  list(APPEND options "-D" "CMAKE_BUILD_TYPE:STRING=${CTEST_BUILD_CONFIGURATION}")
+endif()
+
 if(extension_dirs)
   string (REPLACE ";" "\\\;" extension_dirs "${extension_dirs}")
   list(APPEND options "-D" "MITK_EXTENSION_DIRS:STRING=${extension_dirs}")

@@ -49,7 +49,7 @@ The created segmentation image will have the same geometrical properties like th
 \section org_mitk_views_segmentationUtilitiesImageMasking Image masking
 
 Image masking allows to mask an image with either an existing segmentation or a surface.
-The operation requires an image and a binary image mask or a surface.
+The operation requires an image and a segmentation or a surface.
 The result will be an image containing only the pixels that are covered by the respective mask.
 
 \imageMacro{QmitkSegmentationUtilities_ImageMasking.png,"Image masking",6.00}

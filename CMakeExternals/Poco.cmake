@@ -24,6 +24,26 @@ if(MITK_USE_Poco)
 
     mitk_query_custom_ep_vars()
 
+    set(ssl_args
+      -DENABLE_CRYPTO:BOOL=OFF
+      -DENABLE_NETSSL:BOOL=OFF
+      -DENABLE_NETSSL_WIN:BOOL=OFF
+    )
+
+    if(OpenSSL_FOUND)
+      set(ssl_args
+        -DENABLE_CRYPTO:BOOL=ON
+        -DENABLE_NETSSL:BOOL=ON
+        -DFORCE_OPENSSL:BOOL=ON
+      )
+
+      if(OPENSSL_ROOT_DIR)
+        list(APPEND ssl_args
+          "-DOPENSSL_ROOT_DIR:PATH=${OPENSSL_ROOT_DIR}"
+        )
+      endif()
+    endif()
+
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/poco-1.9.0.tar.gz
@@ -33,15 +53,13 @@ if(MITK_USE_Poco)
       CMAKE_ARGS
         ${ep_common_args}
         ${additional_cmake_args}
+        ${ssl_args}
         -DENABLE_XML:BOOL=ON
         -DENABLE_JSON:BOOL=ON
         -DENABLE_MONGODB:BOOL=OFF
         -DENABLE_PDF:BOOL=OFF
         -DENABLE_UTIL:BOOL=ON
         -DENABLE_NET:BOOL=ON
-        -DENABLE_NETSSL:BOOL=OFF
-        -DENABLE_NETSSL_WIN:BOOL=OFF
-        -DENABLE_CRYPTO:BOOL=OFF
         -DENABLE_DATA:BOOL=OFF
         -DENABLE_DATA_SQLITE:BOOL=OFF
         -DENABLE_DATA_MYSQL:BOOL=OFF

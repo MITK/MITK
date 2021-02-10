@@ -33,9 +33,11 @@ public:
   enum PredicateType
   {
     ImagePredicate,
-    MaskPredicate,
     SegmentationPredicate,
-    SurfacePredicate
+    SurfacePredicate,
+    ImageAndSegmentationPredicate,
+    ContourModelPredicate,
+    MaskPredicate
   };
 
   explicit QmitkDataSelectionWidget(QWidget* parent = nullptr);

@@ -535,11 +535,13 @@ namespace mitk
               // do not use a VTK lookup table (we do that ourselves in m_LevelWindowFilter)
               texture->SetColorModeToDirectScalars();
 
+              auto* property3d = imageActor->GetProperty();
+              property3d->LightingOff();
+
               // re-use properties from the 2D image mapper
-              auto property = vtkSmartPointer<vtkProperty>::New();
-              localStorage->m_ImageActor->GetProperty()->DeepCopy(property);
-              property->LightingOff();
-              imageActor->SetProperty(property);
+              auto* property2d = localStorage->m_ImageActor->GetProperty();
+              property3d->SetColor(property2d->GetColor());
+              property3d->SetOpacity(property2d->GetOpacity());
 
               // Set texture interpolation on/off
               bool textureInterpolation = node->IsOn("texture interpolation", renderer);

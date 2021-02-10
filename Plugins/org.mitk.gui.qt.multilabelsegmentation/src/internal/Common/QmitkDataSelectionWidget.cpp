@@ -14,6 +14,9 @@ found in the LICENSE file.
 #include "internal/mitkPluginActivator.h"
 
 #include <berryPlatform.h>
+
+#include <mitkContourModel.h>
+#include <mitkContourModelSet.h>
 #include <mitkIDataStorageService.h>
 #include <mitkImage.h>
 #include <mitkLabelSetImage.h>
@@ -34,54 +37,72 @@ found in the LICENSE file.
 
 static mitk::NodePredicateBase::Pointer CreatePredicate(QmitkDataSelectionWidget::PredicateType predicateType)
 {
+  auto nonHelperObject = mitk::NodePredicateNot::New(mitk::NodePredicateOr::New(
+    mitk::NodePredicateProperty::New("helper object"),
+    mitk::NodePredicateProperty::New("hidden object")));
 
-  mitk::NodePredicateAnd::Pointer  segmentationPredicate = mitk::NodePredicateAnd::New();
-  segmentationPredicate->AddPredicate(mitk::TNodePredicateDataType<mitk::LabelSetImage>::New());
-  segmentationPredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
+  auto imageType = mitk::TNodePredicateDataType<mitk::Image>::New();
+  auto contourModelType = mitk::TNodePredicateDataType<mitk::ContourModel>::New();
+  auto contourModelSetType = mitk::TNodePredicateDataType<mitk::ContourModelSet>::New();
 
-  mitk::NodePredicateAnd::Pointer maskPredicate = mitk::NodePredicateAnd::New();
-  maskPredicate->AddPredicate(mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true)));
-  maskPredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true))));
+  auto segmentationPredicate = mitk::TNodePredicateDataType<mitk::LabelSetImage>::New();
 
-  mitk::NodePredicateDataType::Pointer isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
-  mitk::NodePredicateDataType::Pointer isDti = mitk::NodePredicateDataType::New("TensorImage");
-  mitk::NodePredicateDataType::Pointer isOdf = mitk::NodePredicateDataType::New("OdfImage");
-  mitk::TNodePredicateDataType<mitk::Image>::Pointer isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
+  auto maskPredicate = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
 
-  mitk::NodePredicateOr::Pointer validImages = mitk::NodePredicateOr::New();
+  auto isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
+  auto isDti = mitk::NodePredicateDataType::New("TensorImage");
+  auto isOdf = mitk::NodePredicateDataType::New("OdfImage");
+  auto isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
+
+  auto validImages = mitk::NodePredicateOr::New();
   validImages->AddPredicate(isImage);
   validImages->AddPredicate(isDwi);
   validImages->AddPredicate(isDti);
   validImages->AddPredicate(isOdf);
 
-  mitk::NodePredicateAnd::Pointer imagePredicate = mitk::NodePredicateAnd::New();
+  auto imagePredicate = mitk::NodePredicateAnd::New();
   imagePredicate->AddPredicate(validImages);
   imagePredicate->AddPredicate(mitk::NodePredicateNot::New(segmentationPredicate));
   imagePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true))));
-  imagePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true))));
 
-  mitk::NodePredicateAnd::Pointer surfacePredicate = mitk::NodePredicateAnd::New();
-  surfacePredicate->AddPredicate(mitk::TNodePredicateDataType<mitk::Surface>::New());
-  surfacePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true))));
+  auto surfacePredicate = mitk::TNodePredicateDataType<mitk::Surface>::New();
+
+  mitk::NodePredicateBase::Pointer result;
 
   switch(predicateType)
   {
     case QmitkDataSelectionWidget::ImagePredicate:
-      return imagePredicate.GetPointer();
-
-    case QmitkDataSelectionWidget::MaskPredicate:
-      return maskPredicate.GetPointer();
+      result = imagePredicate.GetPointer();
+      break;
 
     case QmitkDataSelectionWidget::SegmentationPredicate:
-      return segmentationPredicate.GetPointer();
+      result = segmentationPredicate.GetPointer();
+      break;
 
     case QmitkDataSelectionWidget::SurfacePredicate:
-      return surfacePredicate.GetPointer();
+      result = surfacePredicate.GetPointer();
+      break;
+
+    case QmitkDataSelectionWidget::ImageAndSegmentationPredicate:
+      result = imageType.GetPointer();
+      break;
+
+    case QmitkDataSelectionWidget::ContourModelPredicate:
+      result = mitk::NodePredicateOr::New(
+        contourModelSetType,
+        contourModelSetType).GetPointer();
+      break;
+
+    case QmitkDataSelectionWidget::MaskPredicate:
+      result = maskPredicate.GetPointer();
+      break;
 
     default:
       assert(false && "Unknown predefined predicate!");
       return nullptr;
   }
+
+  return mitk::NodePredicateAnd::New(result, nonHelperObject).GetPointer();
 }
 
 QmitkDataSelectionWidget::QmitkDataSelectionWidget(QWidget* parent)
@@ -98,32 +119,35 @@ QmitkDataSelectionWidget::~QmitkDataSelectionWidget()
 unsigned int QmitkDataSelectionWidget::AddDataSelection(QmitkDataSelectionWidget::PredicateType predicate)
 {
   QString hint = "Select node";
-  QString popupTitel = "Select node";
 
   switch (predicate)
   {
   case QmitkDataSelectionWidget::ImagePredicate:
     hint = "Select an image";
-    popupTitel = "Select an image";
     break;
 
   case QmitkDataSelectionWidget::MaskPredicate:
     hint = "Select a binary mask";
-    popupTitel = "Select a binary mask";
     break;
 
   case QmitkDataSelectionWidget::SegmentationPredicate:
     hint = "Select an ML segmentation";
-    popupTitel = "Select an ML segmentation";
     break;
 
   case QmitkDataSelectionWidget::SurfacePredicate:
     hint = "Select a surface";
-    popupTitel = "Select a surface";
+    break;
+
+  case QmitkDataSelectionWidget::ImageAndSegmentationPredicate:
+    hint = "Select an image or segmentation";
+    break;
+
+  case QmitkDataSelectionWidget::ContourModelPredicate:
+    hint = "Select a contour model";
     break;
   }
 
-  return this->AddDataSelection("", hint, popupTitel, "", predicate);
+  return this->AddDataSelection("", hint, hint, "", predicate);
 }
 
 unsigned int QmitkDataSelectionWidget::AddDataSelection(mitk::NodePredicateBase* predicate)

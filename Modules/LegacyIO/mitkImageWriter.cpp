@@ -293,7 +293,7 @@ void mitk::ImageWriter::GenerateData()
         timeSelector->Update();
         if (input->GetTimeGeometry()->IsValidTimeStep(t))
         {
-          const mitk::TimeBounds &timebounds = input->GetTimeGeometry()->GetTimeBounds(t);
+          const mitk::TimeBounds timebounds = input->GetTimeGeometry()->GetTimeBounds(t);
           filename << m_FileNameWithoutExtension << "_S" << std::setprecision(0) << timebounds[0] << "_E"
                    << std::setprecision(0) << timebounds[1] << "_T" << t << m_Extension;
         }

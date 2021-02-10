@@ -22,9 +22,10 @@ found in the LICENSE file.
 
 
 ///**********************************************
-QmitkSliceNavigationListener::QmitkSliceNavigationListener(): m_renderWindowPart(nullptr),
+QmitkSliceNavigationListener::QmitkSliceNavigationListener() : m_renderWindowPart(nullptr),
 m_PendingSliceChangedEvent(false),
-m_internalUpdateFlag(false)
+m_CurrentSelectedPosition(std::numeric_limits<mitk::Point3D::ValueType>::lowest()),
+m_CurrentSelectedTimePoint(std::numeric_limits<mitk::TimePointType>::lowest())
 {
 }
 
@@ -33,10 +34,39 @@ QmitkSliceNavigationListener::~QmitkSliceNavigationListener()
   this->RemoveAllObservers();
 };
 
+mitk::TimePointType QmitkSliceNavigationListener::GetCurrentSelectedTimePoint() const
+{
+  return m_CurrentSelectedTimePoint;
+}
+
+mitk::Point3D QmitkSliceNavigationListener::GetCurrentSelectedPosition() const
+{
+  return m_CurrentSelectedPosition;
+}
+
 void QmitkSliceNavigationListener::OnSliceChangedDelayed()
 {
   m_PendingSliceChangedEvent = false;
+
   emit SliceChanged();
+
+  if (nullptr != m_renderWindowPart)
+  {
+    const auto newSelectedPosition = m_renderWindowPart->GetSelectedPosition();
+    const auto newSelectedTimePoint = m_renderWindowPart->GetSelectedTimePoint();
+
+    if (newSelectedPosition != m_CurrentSelectedPosition)
+    {
+      m_CurrentSelectedPosition = newSelectedPosition;
+      emit SelectedPositionChanged(newSelectedPosition);
+    }
+
+    if (newSelectedTimePoint != m_CurrentSelectedTimePoint)
+    {
+      m_CurrentSelectedTimePoint = newSelectedTimePoint;
+      emit SelectedTimePointChanged(newSelectedTimePoint);
+    }
+  }
 };
 
 void
@@ -74,6 +104,9 @@ void QmitkSliceNavigationListener::RenderWindowPartActivated(mitk::IRenderWindow
         "plot will not be triggered on changing the crosshair, " \
         "position or time step.");
     }
+
+    m_CurrentSelectedPosition = m_renderWindowPart->GetSelectedPosition();
+    m_CurrentSelectedTimePoint = m_renderWindowPart->GetSelectedTimePoint();
   }
 };
 

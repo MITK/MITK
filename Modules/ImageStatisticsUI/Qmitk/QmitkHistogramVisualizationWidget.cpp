@@ -23,6 +23,7 @@ QmitkHistogramVisualizationWidget::QmitkHistogramVisualizationWidget(QWidget* pa
   m_Controls.spinBoxNBins->setMaximum(m_MaxNBins);
   m_Controls.chartWidget->SetXAxisLabel("Gray value");
   m_Controls.chartWidget->SetYAxisLabel("Frequency");
+  m_Controls.chartWidget->SetShowLegend(false);
 
   SetGUIElementsEnabled(false);
   CreateConnections();

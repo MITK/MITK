@@ -24,7 +24,21 @@ found in the LICENSE file.
 
 #include <QMessageBox>
 
-static const char* const HelpText = "Select a regular image and a binary image";
+namespace
+{
+  bool IsSurface(const mitk::DataNode* dataNode)
+  {
+    if (nullptr != dataNode)
+    {
+      if (nullptr != dynamic_cast<const mitk::Surface*>(dataNode->GetData()))
+        return true;
+    }
+
+    return false;
+  }
+}
+
+static const char* const HelpText = "Select an image and a segmentation or surface";
 
 QmitkImageMaskingWidget::QmitkImageMaskingWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent)
   : QmitkSegmentationUtilityWidget(timeNavigationController, parent)
@@ -32,13 +46,11 @@ QmitkImageMaskingWidget::QmitkImageMaskingWidget(mitk::SliceNavigationController
   m_Controls.setupUi(this);
 
   m_Controls.dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::ImagePredicate);
-  m_Controls.dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::SegmentationPredicate);
+  m_Controls.dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::SegmentationOrSurfacePredicate);
   m_Controls.dataSelectionWidget->SetHelpText(HelpText);
 
   this->EnableButtons(false);
 
-  connect (m_Controls.rbMaskImage, SIGNAL(toggled(bool)), this, SLOT(OnImageMaskingToggled(bool)));
-  connect (m_Controls.rbMaskSurface, SIGNAL(toggled(bool)), this, SLOT(OnSurfaceMaskingToggled(bool)));
   connect (m_Controls.btnMaskImage, SIGNAL(clicked()), this, SLOT(OnMaskImagePressed()));
 
   connect(m_Controls.dataSelectionWidget, SIGNAL(SelectionChanged(unsigned int, const mitk::DataNode*)),
@@ -63,14 +75,7 @@ void QmitkImageMaskingWidget::OnSelectionChanged(unsigned int index, const mitk:
 
   if (node0.IsNull() || node1.IsNull() )
   {
-    if( m_Controls.rbMaskImage->isChecked() )
-    {
-      dataSelectionWidget->SetHelpText(HelpText);
-    }
-    else
-    {
-      dataSelectionWidget->SetHelpText("Select a regular image and a surface");
-    }
+    dataSelectionWidget->SetHelpText(HelpText);
     this->EnableButtons(false);
   }
   else
@@ -85,7 +90,7 @@ void QmitkImageMaskingWidget::SelectionControl(unsigned int index, const mitk::D
   mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(index);
 
   //if Image-Masking is enabled, check if image-dimension of reference and binary image is identical
-  if( m_Controls.rbMaskImage->isChecked() )
+  if( !IsSurface(dataSelectionWidget->GetSelection(1)) )
   {
     if( dataSelectionWidget->GetSelection(0) == dataSelectionWidget->GetSelection(1) )
     {
@@ -123,25 +128,6 @@ void QmitkImageMaskingWidget::EnableButtons(bool enable)
   m_Controls.btnMaskImage->setEnabled(enable);
 }
 
-void QmitkImageMaskingWidget::OnImageMaskingToggled(bool status)
-{
-  if (status)
-  {
-    m_Controls.dataSelectionWidget->SetHelpText("Select a regular image and a binary image");
-    m_Controls.dataSelectionWidget->SetPredicate(1, QmitkDataSelectionWidget::SegmentationPredicate);
-  }
-}
-
-void QmitkImageMaskingWidget::OnSurfaceMaskingToggled(bool status)
-{
-  if (status)
-  {
-    m_Controls.dataSelectionWidget->SetHelpText("Select a regular image and a surface");
-    m_Controls.dataSelectionWidget->SetPredicate(1, QmitkDataSelectionWidget::SurfacePredicate);
-  }
-}
-
-
 void QmitkImageMaskingWidget::OnMaskImagePressed()
 {
   //Disable Buttons during calculation and initialize Progressbar
@@ -165,7 +151,7 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
   }
 
   //Do Image-Masking
-  if (m_Controls.rbMaskImage->isChecked())
+  if (!IsSurface(maskingNode))
   {
     mitk::ProgressBar::GetInstance()->Progress();
 
@@ -173,8 +159,8 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
 
     if(maskImage.IsNull() )
     {
-      MITK_ERROR << "Selection does not contain a binary image";
-      QMessageBox::information( this, "Image and Surface Masking", "Selection does not contain a binary image", QMessageBox::Ok );
+      MITK_ERROR << "Selection does not contain a segmentation";
+      QMessageBox::information( this, "Image and Surface Masking", "Selection does not contain a segmentation", QMessageBox::Ok );
       this->EnableButtons();
       return;
     }
@@ -289,10 +275,17 @@ mitk::Image::Pointer QmitkImageMaskingWidget::ConvertSurfaceToImage( mitk::Image
 
 void QmitkImageMaskingWidget::AddToDataStorage(mitk::DataStorage::Pointer dataStorage, mitk::Image::Pointer segmentation, const std::string& name, mitk::DataNode::Pointer parent )
 {
-  mitk::DataNode::Pointer dataNode = mitk::DataNode::New();
+  auto dataNode = mitk::DataNode::New();
 
   dataNode->SetName(name);
   dataNode->SetData(segmentation);
+
+  if (parent.IsNotNull())
+  {
+    mitk::LevelWindow levelWindow;
+    parent->GetLevelWindow(levelWindow);
+    dataNode->SetLevelWindow(levelWindow);
+  }
 
   dataStorage->Add(dataNode, parent);
 }

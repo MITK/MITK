@@ -47,7 +47,6 @@ QmitkImageStatisticsView::~QmitkImageStatisticsView()
 void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
 {
   m_Controls.setupUi(parent);
-  m_Controls.widget_histogram->SetTheme(GetColorTheme());
   m_Controls.widget_intensityProfile->SetTheme(GetColorTheme());
   m_Controls.groupBox_histogram->setVisible(true);
   m_Controls.groupBox_intensityProfile->setVisible(false);
@@ -64,7 +63,6 @@ void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
   m_DataGenerator->SetDataStorage(this->GetDataStorage());
   m_DataGenerator->SetAutoUpdate(true);
   m_Controls.widget_statistics->SetDataStorage(this->GetDataStorage());
-  m_Controls.widget_histogram->SetTheme(GetColorTheme());
 
   m_Controls.imageNodesSelector->SetDataStorage(this->GetDataStorage());
   m_Controls.imageNodesSelector->SetNodePredicate(mitk::GetImageStatisticsImagePredicate());
@@ -81,8 +79,20 @@ void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
   m_Controls.roiNodesSelector->SetPopUpTitel(QStringLiteral("Select ROIs for statistics computation"));
   m_Controls.roiNodesSelector->SetPopUpHint(QStringLiteral("You may select ROIs (e.g. planar figures, segmentations) that should be used for the statistics computation. The statistics will only computed for the image parts defined by the ROIs."));
 
-
   CreateConnections();
+
+  this->m_TimePointChangeListener.RenderWindowPartActivated(this->GetRenderWindowPart());
+  connect(&m_TimePointChangeListener, &QmitkSliceNavigationListener::SelectedTimePointChanged, this, & QmitkImageStatisticsView::OnSelectedTimePointChanged);
+}
+
+void QmitkImageStatisticsView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
+{
+  this->m_TimePointChangeListener.RenderWindowPartActivated(renderWindowPart);
+}
+
+void QmitkImageStatisticsView::RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart)
+{
+  this->m_TimePointChangeListener.RenderWindowPartDeactivated(renderWindowPart);
 }
 
 void QmitkImageStatisticsView::CreateConnections()
@@ -160,7 +170,7 @@ void QmitkImageStatisticsView::UpdateIntensityProfile()
 
 void QmitkImageStatisticsView::UpdateHistogramWidget()
 {
-  m_Controls.groupBox_histogram->setVisible(false);
+  bool visibility = false;
 
   const auto selectedImageNodes = m_Controls.imageNodesSelector->GetSelectedNodes();
   const auto selectedMaskNodes = m_Controls.roiNodesSelector->GetSelectedNodes();
@@ -176,7 +186,8 @@ void QmitkImageStatisticsView::UpdateHistogramWidget()
       planarFigure = dynamic_cast<const mitk::PlanarFigure*>(roiNode->GetData());
     }
 
-    if (planarFigure == nullptr || planarFigure->IsClosed())
+    if ((planarFigure == nullptr || planarFigure->IsClosed())
+        && imageNode->GetData()->GetTimeGeometry()->IsValidTimePoint(m_TimePointChangeListener.GetCurrentSelectedTimePoint()))
     { //if a planar figure is not closed, we show the intensity profile instead of the histogram.
       auto statisticsNode = m_DataGenerator->GetLatestResult(imageNode, roiNode, true);
 
@@ -186,11 +197,13 @@ void QmitkImageStatisticsView::UpdateHistogramWidget()
 
         if (statistics)
         {
+          const auto timeStep = imageNode->GetData()->GetTimeGeometry()->TimePointToTimeStep(m_TimePointChangeListener.GetCurrentSelectedTimePoint());
+
           std::stringstream label;
-          label << "Histogram " << imageNode->GetName();
+          label << imageNode->GetName();
           if (imageNode->GetData()->GetTimeSteps() > 1)
           {
-            label << "[0]";
+            label << "["<< timeStep <<"]";
           }
 
           if (roiNode)
@@ -198,12 +211,23 @@ void QmitkImageStatisticsView::UpdateHistogramWidget()
             label << " with " << roiNode->GetName();
           }
 
-          m_Controls.widget_histogram->SetHistogram(statistics->GetHistogramForTimeStep(0), label.str());
+          //Hardcoded labels are currently needed because the current histogram widget (and ChartWidget)
+          //do not allow correct removal or sound update/insertion of serveral charts.
+          //only thing that works for now is always to update/overwrite the same data label
+          //This is a quick fix for T28223 and T28221
+          m_Controls.widget_histogram->SetHistogram(statistics->GetHistogramForTimeStep(timeStep), "histogram");
+
+          visibility = true;
         }
-        m_Controls.groupBox_histogram->setVisible(statisticsNode.IsNotNull());
       }
     }
   }
+
+  if (visibility != m_Controls.groupBox_histogram->isVisible())
+  {
+    m_Controls.groupBox_histogram->setVisible(visibility);
+  }
+
 }
 
 QmitkChartWidget::ColorTheme QmitkImageStatisticsView::GetColorTheme() const
@@ -246,6 +270,11 @@ void QmitkImageStatisticsView::OnGenerationFinished()
   mitk::StatusBar::GetInstance()->Clear();
 
   this->UpdateIntensityProfile();
+  this->UpdateHistogramWidget();
+}
+
+void QmitkImageStatisticsView::OnSelectedTimePointChanged(const mitk::TimePointType& /*newTimePoint*/)
+{
   this->UpdateHistogramWidget();
 }
 

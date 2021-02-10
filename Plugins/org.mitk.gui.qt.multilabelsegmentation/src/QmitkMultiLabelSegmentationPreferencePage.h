@@ -56,7 +56,6 @@ public:
 
 protected slots:
 
-  void OnVolumeRenderingCheckboxChecked(int);
   void OnSmoothingCheckboxChecked(int);
 
 protected:
@@ -64,7 +63,6 @@ protected:
   QWidget* m_MainControl;
   QRadioButton* m_RadioOutline;
   QRadioButton* m_RadioOverlay;
-  QCheckBox* m_VolumeRenderingCheckBox;
   QDoubleSpinBox* m_SmoothingSpinBox;
   QDoubleSpinBox* m_DecimationSpinBox;
   QCheckBox* m_SelectionModeCheckBox;

@@ -73,7 +73,7 @@ void QmitkOtsuTool3DGUI::OnPreviewBtnClicked()
   auto tool = this->GetConnectedToolAs<mitk::OtsuTool3D>();
   if (nullptr != tool)
   {
-    if (!m_FirstPreviewComputation ||
+    if (!m_FirstPreviewComputation &&
       (tool->GetNumberOfRegions() == static_cast<unsigned int>(m_Controls.m_Spinbox->value()) &&
       tool->GetUseValley() == m_Controls.m_ValleyCheckbox->isChecked() &&
       tool->GetNumberOfBins() == static_cast<unsigned int>(m_Controls.m_BinsSpinBox->value())))

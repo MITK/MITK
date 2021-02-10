@@ -51,7 +51,18 @@ found in the LICENSE file.
 #include <vtkPolyVertex.h>
 #include <vtkUnstructuredGrid.h>
 
-//#define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
+#include <array>
+
+namespace
+{
+  template <typename T = mitk::BaseData>
+  itk::SmartPointer<T> GetData(const mitk::DataNode* dataNode)
+  {
+    return nullptr != dataNode
+      ? dynamic_cast<T*>(dataNode->GetData())
+      : nullptr;
+  }
+}
 
 float SURFACE_COLOR_RGB[3] = {0.49f, 1.0f, 0.16f};
 
@@ -101,8 +112,9 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget *parent, const char * /
   m_BtnApply3D = new QPushButton("Confirm", m_GroupBoxEnableExclusiveInterpolationMode);
   vboxLayout->addWidget(m_BtnApply3D);
 
-  m_BtnSuggestPlane = new QPushButton("Suggest a plane", m_GroupBoxEnableExclusiveInterpolationMode);
-  vboxLayout->addWidget(m_BtnSuggestPlane);
+  // T28261
+  // m_BtnSuggestPlane = new QPushButton("Suggest a plane", m_GroupBoxEnableExclusiveInterpolationMode);
+  // vboxLayout->addWidget(m_BtnSuggestPlane);
 
   m_BtnReinit3DInterpolation = new QPushButton("Reinit Interpolation", m_GroupBoxEnableExclusiveInterpolationMode);
   vboxLayout->addWidget(m_BtnReinit3DInterpolation);
@@ -117,7 +129,8 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget *parent, const char * /
   connect(m_BtnApplyForAllSlices2D, SIGNAL(clicked()), this, SLOT(OnAcceptAllInterpolationsClicked()));
   connect(m_BtnApply3D, SIGNAL(clicked()), this, SLOT(OnAccept3DInterpolationClicked()));
 
-  connect(m_BtnSuggestPlane, SIGNAL(clicked()), this, SLOT(OnSuggestPlaneClicked()));
+  // T28261
+  // connect(m_BtnSuggestPlane, SIGNAL(clicked()), this, SLOT(OnSuggestPlaneClicked()));
 
   connect(m_BtnReinit3DInterpolation, SIGNAL(clicked()), this, SLOT(OnReinit3DInterpolation()));
   connect(m_ChkShowPositionNodes, SIGNAL(toggled(bool)), this, SLOT(OnShowMarkers(bool)));
@@ -402,7 +415,10 @@ void QmitkSlicesInterpolator::Show2DInterpolationControls(bool show)
 void QmitkSlicesInterpolator::Show3DInterpolationControls(bool show)
 {
   m_BtnApply3D->setVisible(show);
-  m_BtnSuggestPlane->setVisible(show);
+
+  // T28261
+  // m_BtnSuggestPlane->setVisible(show);
+
   m_ChkShowPositionNodes->setVisible(show);
   m_BtnReinit3DInterpolation->setVisible(show);
 }
@@ -605,7 +621,10 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
         mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2"))))
   {
     m_BtnApply3D->setEnabled(true);
-    m_BtnSuggestPlane->setEnabled(true);
+
+    // T28261
+    // m_BtnSuggestPlane->setEnabled(true);
+
     m_InterpolatedSurfaceNode->SetData(interpolatedSurface);
     m_3DContourNode->SetData(m_SurfaceInterpolator->GetContoursAsSurface());
 
@@ -623,7 +642,9 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
   else if (interpolatedSurface.IsNull())
   {
     m_BtnApply3D->setEnabled(false);
-    m_BtnSuggestPlane->setEnabled(false);
+
+    // T28261
+    // m_BtnSuggestPlane->setEnabled(false);
 
     if (m_DataStorage->Exists(m_InterpolatedSurfaceNode))
     {
@@ -838,68 +859,94 @@ void QmitkSlicesInterpolator::OnAcceptAllInterpolationsClicked()
 
 void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
 {
-  if (m_InterpolatedSurfaceNode.IsNotNull() && m_InterpolatedSurfaceNode->GetData())
+  auto referenceImage = GetData<mitk::Image>(m_ToolManager->GetReferenceData(0));
+
+  auto* segmentationDataNode = m_ToolManager->GetWorkingData(0);
+  auto segmentation = GetData<mitk::Image>(segmentationDataNode);
+
+  if (referenceImage.IsNull() || segmentation.IsNull())
+    return;
+
+  const auto* segmentationGeometry = segmentation->GetTimeGeometry();
+  const auto timePoint = m_LastSNC->GetSelectedTimePoint();
+
+  if (!referenceImage->GetTimeGeometry()->IsValidTimePoint(timePoint) ||
+      !segmentationGeometry->IsValidTimePoint(timePoint))
   {
-    mitk::DataNode *segmentationNode = m_ToolManager->GetWorkingData(0);
-    mitk::Image *currSeg = dynamic_cast<mitk::Image *>(segmentationNode->GetData());
-
-    mitk::SurfaceToImageFilter::Pointer s2iFilter = mitk::SurfaceToImageFilter::New();
-    s2iFilter->MakeOutputBinaryOn();
-    if (currSeg->GetPixelType().GetComponentType() == itk::ImageIOBase::USHORT)
-      s2iFilter->SetUShortBinaryPixelType(true);
-    s2iFilter->SetInput(dynamic_cast<mitk::Surface *>(m_InterpolatedSurfaceNode->GetData()));
-
-    // check if ToolManager holds valid ReferenceData
-    if (m_ToolManager->GetReferenceData(0) == nullptr || m_ToolManager->GetWorkingData(0) == nullptr)
-    {
-      return;
-    }
-    s2iFilter->SetImage(dynamic_cast<mitk::Image *>(m_ToolManager->GetReferenceData(0)->GetData()));
-    s2iFilter->Update();
-
-    mitk::Image::Pointer newSeg = s2iFilter->GetOutput();
-
-    const auto timePoint = m_LastSNC->GetSelectedTimePoint();
-    if (!m_ToolManager->GetReferenceData(0)->GetData()->GetTimeGeometry()->IsValidTimePoint(timePoint) ||
-        !m_ToolManager->GetWorkingData(0)->GetData()->GetTimeGeometry()->IsValidTimePoint(timePoint))
-    {
-      MITK_WARN << "Cannot accept interpolation. Time point selected by SliceNavigationController is not within the time bounds of reference or working image. Time point: " << timePoint;
-      return;
-    }
-
-    const auto newTimeStep = newSeg->GetTimeGeometry()->TimePointToTimeStep(timePoint);
-    mitk::ImageReadAccessor readAccess(newSeg, newSeg->GetVolumeData(newTimeStep));
-    const void *cPointer = readAccess.GetData();
-
-    if (currSeg && cPointer)
-    {
-      const auto curTimeStep = currSeg->GetTimeGeometry()->TimePointToTimeStep(timePoint);
-      currSeg->SetVolume(cPointer, curTimeStep, 0);
-    }
-    else
-    {
-      return;
-    }
-
-    m_CmbInterpolation->setCurrentIndex(0);
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    mitk::DataNode::Pointer segSurface = mitk::DataNode::New();
-    float rgb[3];
-    segmentationNode->GetColor(rgb);
-    segSurface->SetColor(rgb);
-    segSurface->SetData(m_InterpolatedSurfaceNode->GetData());
-    std::stringstream stream;
-    stream << segmentationNode->GetName();
-    stream << "_";
-    stream << "3D-interpolation";
-    segSurface->SetName(stream.str());
-    segSurface->SetProperty("opacity", mitk::FloatProperty::New(0.7));
-    segSurface->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(true));
-    segSurface->SetProperty("3DInterpolationResult", mitk::BoolProperty::New(true));
-    segSurface->SetVisibility(false);
-    m_DataStorage->Add(segSurface, segmentationNode);
-    this->Show3DInterpolationResult(false);
+    MITK_WARN << "Cannot accept interpolation. Current time point is not within the time bounds of the patient image and segmentation.";
+    return;
   }
+
+  auto interpolatedSurface = GetData<mitk::Surface>(m_InterpolatedSurfaceNode);
+
+  if (interpolatedSurface.IsNull())
+    return;
+
+  auto surfaceToImageFilter = mitk::SurfaceToImageFilter::New();
+
+  surfaceToImageFilter->SetImage(referenceImage);
+  surfaceToImageFilter->SetMakeOutputBinary(true);
+  surfaceToImageFilter->SetUShortBinaryPixelType(itk::ImageIOBase::USHORT == segmentation->GetPixelType().GetComponentType());
+  surfaceToImageFilter->SetInput(interpolatedSurface);
+  surfaceToImageFilter->Update();
+
+  mitk::Image::Pointer interpolatedSegmentation = surfaceToImageFilter->GetOutput();
+
+  auto timeStep = interpolatedSegmentation->GetTimeGeometry()->TimePointToTimeStep(timePoint);
+  mitk::ImageReadAccessor readAccessor(interpolatedSegmentation, interpolatedSegmentation->GetVolumeData(timeStep));
+  const auto* dataPointer = readAccessor.GetData();
+
+  if (nullptr == dataPointer)
+    return;
+
+  timeStep = segmentationGeometry->TimePointToTimeStep(timePoint);
+  segmentation->SetVolume(dataPointer, timeStep, 0);
+
+  m_CmbInterpolation->setCurrentIndex(0);
+  this->Show3DInterpolationResult(false);
+
+  std::string name = segmentationDataNode->GetName() + "_3D-interpolation";
+  mitk::TimeBounds timeBounds;
+
+  if (1 < interpolatedSurface->GetTimeSteps())
+  {
+    name += "_t" + std::to_string(timeStep);
+
+    auto* polyData = vtkPolyData::New();
+    polyData->DeepCopy(interpolatedSurface->GetVtkPolyData(timeStep));
+
+    auto surface = mitk::Surface::New();
+    surface->SetVtkPolyData(polyData);
+
+    interpolatedSurface = surface;
+    timeBounds = segmentationGeometry->GetTimeBounds(timeStep);
+  }
+  else
+  {
+    timeBounds = segmentationGeometry->GetTimeBounds(0);
+  }
+
+  auto* surfaceGeometry = static_cast<mitk::ProportionalTimeGeometry*>(interpolatedSurface->GetTimeGeometry());
+  surfaceGeometry->SetFirstTimePoint(timeBounds[0]);
+  surfaceGeometry->SetStepDuration(timeBounds[1] - timeBounds[0]);
+
+  // Typical file formats for surfaces do not save any time-related information. As a workaround at least for MITK scene files, we have the
+  // possibility to seralize this information as properties.
+
+  interpolatedSurface->SetProperty("ProportionalTimeGeometry.FirstTimePoint", mitk::FloatProperty::New(surfaceGeometry->GetFirstTimePoint()));
+  interpolatedSurface->SetProperty("ProportionalTimeGeometry.StepDuration", mitk::FloatProperty::New(surfaceGeometry->GetStepDuration()));
+
+  auto interpolatedSurfaceDataNode = mitk::DataNode::New();
+
+  interpolatedSurfaceDataNode->SetData(interpolatedSurface);
+  interpolatedSurfaceDataNode->SetName(name);
+  interpolatedSurfaceDataNode->SetOpacity(0.7f);
+
+  std::array<float, 3> rgb;
+  segmentationDataNode->GetColor(rgb.data());
+  interpolatedSurfaceDataNode->SetColor(rgb.data());
+
+  m_DataStorage->Add(interpolatedSurfaceDataNode, segmentationDataNode);
 }
 
 void ::QmitkSlicesInterpolator::OnSuggestPlaneClicked()
@@ -1144,24 +1191,7 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
 
       if (workingNode)
       {
-        bool isInterpolationResult(false);
-        workingNode->GetBoolProperty("3DInterpolationResult", isInterpolationResult);
-        mitk::NodePredicateAnd::Pointer pred = mitk::NodePredicateAnd::New(
-          mitk::NodePredicateProperty::New("3DInterpolationResult", mitk::BoolProperty::New(true)),
-          mitk::NodePredicateDataType::New("Surface"));
-        mitk::DataStorage::SetOfObjects::ConstPointer interpolationResults =
-          m_DataStorage->GetDerivations(workingNode, pred);
-
-        for (unsigned int i = 0; i < interpolationResults->Size(); ++i)
-        {
-          mitk::DataNode::Pointer currNode = interpolationResults->at(i);
-          if (currNode.IsNotNull())
-            m_DataStorage->Remove(currNode);
-        }
-
-        if ((workingNode->IsVisible(
-              mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2")))) &&
-            !isInterpolationResult && m_3DInterpolationEnabled)
+        if ((workingNode->IsVisible(mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2")))))
         {
           int ret = QMessageBox::Yes;
 
@@ -1187,12 +1217,6 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
             m_CmbInterpolation->setCurrentIndex(0);
           }
         }
-        else if (!m_3DInterpolationEnabled)
-        {
-          this->Show3DInterpolationResult(false);
-          m_BtnApply3D->setEnabled(m_3DInterpolationEnabled);
-          m_BtnSuggestPlane->setEnabled(m_3DInterpolationEnabled);
-        }
       }
       else
       {
@@ -1204,7 +1228,9 @@ void QmitkSlicesInterpolator::On3DInterpolationActivated(bool on)
     {
       this->Show3DInterpolationResult(false);
       m_BtnApply3D->setEnabled(m_3DInterpolationEnabled);
-      m_BtnSuggestPlane->setEnabled(m_3DInterpolationEnabled);
+
+      // T28261
+      // m_BtnSuggestPlane->setEnabled(m_3DInterpolationEnabled);
     }
   }
   catch (...)
@@ -1261,54 +1287,48 @@ void QmitkSlicesInterpolator::SetCurrentContourListID()
 
     if (workingNode)
     {
-      bool isInterpolationResult(false);
-      workingNode->GetBoolProperty("3DInterpolationResult", isInterpolationResult);
+      QWidget::setEnabled(true);
 
-      if (!isInterpolationResult)
+      const auto timePoint = m_LastSNC->GetSelectedTimePoint();
+      // In case the time is not valid use 0 to access the time geometry of the working node
+      unsigned int time_position = 0;
+      if (!workingNode->GetData()->GetTimeGeometry()->IsValidTimePoint(timePoint))
       {
-        QWidget::setEnabled(true);
+        MITK_WARN << "Cannot accept interpolation. Time point selected by SliceNavigationController is not within the time bounds of WorkingImage. Time point: " << timePoint;
+        return;
+      }
+      time_position = workingNode->GetData()->GetTimeGeometry()->TimePointToTimeStep(timePoint);
 
-        const auto timePoint = m_LastSNC->GetSelectedTimePoint();
-        // In case the time is not valid use 0 to access the time geometry of the working node
-        unsigned int time_position = 0;
-        if (!workingNode->GetData()->GetTimeGeometry()->IsValidTimePoint(timePoint))
+      mitk::Vector3D spacing = workingNode->GetData()->GetGeometry(time_position)->GetSpacing();
+      double minSpacing(100);
+      double maxSpacing(0);
+      for (int i = 0; i < 3; i++)
+      {
+        if (spacing[i] < minSpacing)
         {
-          MITK_WARN << "Cannot accept interpolation. Time point selected by SliceNavigationController is not within the time bounds of WorkingImage. Time point: " << timePoint;
-          return;
+          minSpacing = spacing[i];
         }
-        time_position = workingNode->GetData()->GetTimeGeometry()->TimePointToTimeStep(timePoint);
-
-        mitk::Vector3D spacing = workingNode->GetData()->GetGeometry(time_position)->GetSpacing();
-        double minSpacing(100);
-        double maxSpacing(0);
-        for (int i = 0; i < 3; i++)
+        if (spacing[i] > maxSpacing)
         {
-          if (spacing[i] < minSpacing)
-          {
-            minSpacing = spacing[i];
-          }
-          if (spacing[i] > maxSpacing)
-          {
-            maxSpacing = spacing[i];
-          }
+          maxSpacing = spacing[i];
         }
+      }
 
-        m_SurfaceInterpolator->SetMaxSpacing(maxSpacing);
-        m_SurfaceInterpolator->SetMinSpacing(minSpacing);
-        m_SurfaceInterpolator->SetDistanceImageVolume(50000);
+      m_SurfaceInterpolator->SetMaxSpacing(maxSpacing);
+      m_SurfaceInterpolator->SetMinSpacing(minSpacing);
+      m_SurfaceInterpolator->SetDistanceImageVolume(50000);
 
-        mitk::Image *segmentationImage = dynamic_cast<mitk::Image *>(workingNode->GetData());
+      mitk::Image *segmentationImage = dynamic_cast<mitk::Image *>(workingNode->GetData());
 
-        m_SurfaceInterpolator->SetCurrentInterpolationSession(segmentationImage);
-        m_SurfaceInterpolator->SetCurrentTimePoint(timePoint);
+      m_SurfaceInterpolator->SetCurrentInterpolationSession(segmentationImage);
+      m_SurfaceInterpolator->SetCurrentTimePoint(timePoint);
 
-        if (m_3DInterpolationEnabled)
-        {
-          if (m_Watcher.isRunning())
-            m_Watcher.waitForFinished();
-          m_Future = QtConcurrent::run(this, &QmitkSlicesInterpolator::Run3DInterpolation);
-          m_Watcher.setFuture(m_Future);
-        }
+      if (m_3DInterpolationEnabled)
+      {
+        if (m_Watcher.isRunning())
+          m_Watcher.waitForFinished();
+        m_Future = QtConcurrent::run(this, &QmitkSlicesInterpolator::Run3DInterpolation);
+        m_Watcher.setFuture(m_Future);
       }
     }
     else

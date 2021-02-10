@@ -293,7 +293,7 @@ namespace mitk
     * - R*R^T is ID?
     * Output warning otherwise.
     */
-    static bool CheckRotationMatrix(AffineTransform3D *transform, double epsilon=mitk::eps);
+    static bool CheckRotationMatrix(AffineTransform3D *transform, double epsilon=1e-6);
 
     /**
     * \brief Normal of the plane

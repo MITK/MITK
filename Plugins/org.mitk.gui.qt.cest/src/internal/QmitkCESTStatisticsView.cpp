@@ -764,7 +764,7 @@ void QmitkCESTStatisticsView::OnSliceChanged()
   mitk::Point3D currentSelectedPosition = this->GetRenderWindowPart()->GetSelectedPosition(nullptr);
   mitk::TimePointType currentSelectedTimePoint = this->GetRenderWindowPart()->GetSelectedTimePoint();
 
-  if (m_currentSelectedPosition != currentSelectedPosition || currentSelectedTimePoint != currentSelectedTimePoint)
+  if (m_currentSelectedPosition != currentSelectedPosition || m_currentSelectedTimePoint != currentSelectedTimePoint)
   //|| m_selectedNodeTime > m_currentPositionTime)
   {
     // the current position has been changed or the selected node has been changed since the last position validation ->

@@ -13,10 +13,6 @@ found in the LICENSE file.
 #ifndef QMITKRENDERWINDOWMENU_H
 #define QMITKRENDERWINDOWMENU_H
 
-#if defined(_WIN32) || defined(__APPLE__)
-#define QMITK_USE_EXTERNAL_RENDERWINDOW_MENU
-#endif
-
 // mitk qtwidgets module
 #include "MitkQtWidgetsExports.h"
 #include "QmitkMultiWidgetLayoutManager.h"
@@ -89,11 +85,7 @@ public:
 
 /*! Move menu widget to correct position (right upper corner). E.g. it is necessary when the full-screen mode
 is activated.*/
-#ifdef QMITK_USE_EXTERNAL_RENDERWINDOW_MENU
-  void MoveWidgetToCorrectPos(float opacity);
-#else
-  void MoveWidgetToCorrectPos(float /*opacity*/);
-#endif
+  void MoveWidgetToCorrectPos();
 
   void ShowMenu();
   void HideMenu();
@@ -123,18 +115,7 @@ Q_SIGNALS:
   /*! emit signal, when layout design changed by the setting menu.*/
   void LayoutDesignChanged(LayoutDesign layoutDesign);
 
-public Q_SLOTS:
-
-  void DeferredShowMenu();
-  void DeferredHideMenu();
-  /*! This method is responsible for non fluttering of
-  the renderWindowMenu when mouse cursor moves along the renderWindowMenu*/
-  void smoothHide();
-
 protected Q_SLOTS:
-
-  void enterEvent(QEvent * /*e*/) override;
-  void leaveEvent(QEvent * /*e*/) override;
 
   /// this function is continuously called by a timer
   /// to do the auto rotation
@@ -195,7 +176,6 @@ private:
   mitk::BaseRenderer::Pointer m_Renderer;
 
   QTimer* m_AutoRotationTimer;
-  QTimer* m_HideTimer;
 
   QWidget *m_Parent;
 

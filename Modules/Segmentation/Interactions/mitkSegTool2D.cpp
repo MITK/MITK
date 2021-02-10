@@ -479,6 +479,17 @@ void mitk::SegTool2D::WriteBackSegmentationResult(const PlaneGeometry *planeGeom
 void mitk::SegTool2D::WriteBackSegmentationResults(const std::vector<SegTool2D::SliceInformation> &sliceList,
                                                   bool writeSliceToVolume)
 {
+  if (sliceList.empty())
+  {
+    return;
+  }
+
+  if (nullptr == m_LastEventSender)
+  {
+    MITK_WARN << "Cannot write tool results. Tool seems to be in an invalid state, as no interaction event was recieved but is expected.";
+    return;
+  }
+
   const auto workingNode = this->GetWorkingDataNode();
 
   mitk::SegTool2D::WriteBackSegmentationResults(workingNode, sliceList, writeSliceToVolume);
@@ -498,6 +509,11 @@ void mitk::SegTool2D::WriteBackSegmentationResults(const std::vector<SegTool2D::
 
 void mitk::SegTool2D::WriteBackSegmentationResults(const DataNode* workingNode, const std::vector<SliceInformation>& sliceList, bool writeSliceToVolume)
 {
+  if (sliceList.empty())
+  {
+    return;
+  }
+
   if (nullptr == workingNode)
   {
     mitkThrow() << "Cannot write slice to working node. Working node is invalid.";

@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include "mitkTestDICOMLoading.h"
 #include "mitkDICOMIOMetaInformationPropertyConstants.h"
 #include "mitkDICOMProperty.h"
+#include "mitkArbitraryTimeGeometry.h"
 
 #include <stack>
 
@@ -254,11 +255,23 @@ mitk::TestDICOMLoading::DumpImageInformation( const Image* image )
       result << "\n";
 
       result << "  " << "TimeBounds: ";
-      const TimeBounds timeBounds = timeGeometry->GetTimeBounds();
+      ///////////////////////////////////////
+      // Workarround T27883. See https://phabricator.mitk.org/T27883#219473 for more details.
+      // This workarround should be removed as soon as T28262 is solved!
+      TimeBounds timeBounds = timeGeometry->GetTimeBounds();
+      auto atg = dynamic_cast<const mitk::ArbitraryTimeGeometry*>(timeGeometry);
+      if (atg && atg->HasCollapsedFinalTimeStep())
+      {
+        timeBounds[1] = timeBounds[1] - 1.;
+      }
+      //Original code:
+      //const TimeBounds timeBounds = timeGeometry->GetTimeBounds();
+      //
+      // End of workarround for T27883
+      //////////////////////////////////////
       for (unsigned int i = 0; i < 2; ++i)
-          result << timeBounds[i] << " ";
+        result << timeBounds[i] << " ";
       result << "\n";
-
 
     }
   }

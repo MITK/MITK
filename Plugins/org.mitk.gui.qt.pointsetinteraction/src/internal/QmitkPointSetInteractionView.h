@@ -15,20 +15,12 @@ found in the LICENSE file.
 
 #include "ui_QmitkPointSetInteractionViewControls.h"
 
-// mitk core
 #include <mitkDataNode.h>
-
-// org mitk gui common plugin
 #include <mitkIRenderWindowPartListener.h>
 
-// org mitk gui qt common plugin
 #include <QmitkAbstractView.h>
+#include <QmitkSingleNodeSelectionWidget.h>
 
-/**
-* @brief
-*
-*
-*/
 class QmitkPointSetInteractionView : public QmitkAbstractView, public mitk::IRenderWindowPartListener
 {
   Q_OBJECT
@@ -47,7 +39,7 @@ public:
 
 private Q_SLOT:
 
-  void OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
+  void OnCurrentSelectionChanged(QmitkSingleNodeSelectionWidget::NodeList nodes);
   void OnAddPointSetClicked();
 
 private:
@@ -58,4 +50,4 @@ private:
 
 };
 
-#endif // QMITKPOINTSETINTERACTIONVIEW_H
+#endif

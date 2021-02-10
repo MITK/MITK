@@ -360,19 +360,21 @@ endif()
 # -----------------------------------------
 # Custom dependency logic
 
+if(WIN32 AND Qt5_DIR)
+  set(_dir_candidate "${Qt5_DIR}/../../../../../Tools/OpenSSL/Win_x64")
+  get_filename_component(_dir_candidate ${_dir_candidate} ABSOLUTE)
+  if(EXISTS "${_dir_candidate}")
+    set(OPENSSL_ROOT_DIR "${_dir_candidate}")
+  endif()
+endif()
+
+find_package(OpenSSL)
+
 option(MITK_USE_SYSTEM_Boost "Use the system Boost" OFF)
 
 set(MITK_USE_Boost_LIBRARIES "" CACHE STRING "A semi-colon separated list of required Boost libraries")
 
 if(MITK_USE_cpprestsdk)
-  if(WIN32 AND Qt5_DIR)
-    set(_dir_candidate "${Qt5_DIR}/../../../../../Tools/OpenSSL/Win_x64")
-    get_filename_component(_dir_candidate ${_dir_candidate} ABSOLUTE)
-    if(EXISTS "${_dir_candidate}")
-      set(OPENSSL_ROOT_DIR "${_dir_candidate}")
-    endif()
-  endif()
-  find_package(OpenSSL QUIET)
   if(NOT OpenSSL_FOUND)
     set(openssl_message "Could not find OpenSSL (dependency of C++ REST SDK).\n")
     if(UNIX)
@@ -638,6 +640,24 @@ endforeach()
 #-----------------------------------------------------------------------------
 # Set MITK specific options and variables (NOT available during superbuild)
 #-----------------------------------------------------------------------------
+
+if(OpenSSL_FOUND AND WIN32)
+  set(MITK_OPENSSL_SSL_DLL "" CACHE FILEPATH "")
+  set(MITK_OPENSSL_CRYPTO_DLL "" CACHE FILEPATH "")
+
+  if(MITK_OPENSSL_SSL_DLL AND EXISTS "${MITK_OPENSSL_SSL_DLL}" AND MITK_OPENSSL_CRYPTO_DLL AND EXISTS "${MITK_OPENSSL_CRYPTO_DLL}")
+    foreach(config_type ${CMAKE_CONFIGURATION_TYPES})
+      execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${MITK_BINARY_DIR}/bin/${config_type}")
+      configure_file("${MITK_OPENSSL_SSL_DLL}" "${MITK_BINARY_DIR}/bin/${config_type}/" COPYONLY)
+      configure_file("${MITK_OPENSSL_CRYPTO_DLL}" "${MITK_BINARY_DIR}/bin/${config_type}/" COPYONLY)
+    endforeach()
+
+    MITK_INSTALL(FILES
+      "${MITK_OPENSSL_SSL_DLL}"
+      "${MITK_OPENSSL_CRYPTO_DLL}"
+    )
+  endif()
+endif()
 
 # Look for optional Doxygen package
 find_package(Doxygen)

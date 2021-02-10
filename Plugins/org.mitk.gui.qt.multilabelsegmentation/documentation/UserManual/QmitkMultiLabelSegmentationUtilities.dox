@@ -13,9 +13,10 @@ The <b>Multilabel Segmentation Utilities Plugin</b> allows to postprocess existi
 
 <ul>
 	<li> \ref org_mitk_views_multilabelSegmentationUtilitiesBooleanOperations
+	<li> \ref org_mitk_views_multilabelSegmentationUtilitiesContourToImage
+	<li> \ref org_mitk_views_multilabelSegmentationUtilitiesImageMasking
 	<li> \ref org_mitk_views_multilabelSegmentationUtilitiesMorphologicalOperations
 	<li> \ref org_mitk_views_multilabelSegmentationUtilitiesSurfaceToImage
-	<li> \ref org_mitk_views_multilabelSegmentationUtilitiesImageMasking
 	<li> \ref org_mitk_views_multilabelSegmentationUtilitiesConvertToMultiLabel
 </ul>
 
@@ -37,6 +38,24 @@ The selected segmentations must have the same geometry (size, spacing, ...) in o
 The result will be stored in a new data node as a child node of the first selected segmentation.
 
 \imageMacro{QmitkMultiLabelSegmentationUtilities_BooleanOperations.png,"Boolean operations",6.00}
+
+\section org_mitk_views_multilabelSegmentationUtilitiesContourToImage Contour to image
+
+Contour to image allows to create a segmentation out of a given contour-model.
+The operation requires a contour model set and a reference image.
+The created segmentation image will have the same geometrical properties like the reference image (dimension, size and Geometry3D).
+
+\imageMacro{QmitkMultiLabelSegmentationUtilities_ContourToImage.png,"Contour to image",6.00}
+
+\section org_mitk_views_multilabelSegmentationUtilitiesImageMasking Image masking
+
+Image masking allows to mask an image with either an existing segmentation or a surface.
+The operation requires an image and a binary image mask or a surface.
+The result will be an image containing only the pixels that are covered by the respective mask.
+Depending on the selected mode ("make output binary" or "overwrite foreground" / "overwrite background")
+the result will be a simple image or a binary image.
+
+\imageMacro{QmitkMultiLabelSegmentationUtilities_ImageMasking.png,"Image masking",6.00}
 
 \section org_mitk_views_multilabelSegmentationUtilitiesMorphologicalOperations Morphological operations
 
@@ -62,16 +81,6 @@ Depending on the selected mode ("make output binary" or "overwrite background")
 the result will be a simple image or a binary image.
 
 \imageMacro{QmitkMultiLabelSegmentationUtilities_SurfaceToImage.png,"Surface to image",6.00}
-
-\section org_mitk_views_multilabelSegmentationUtilitiesImageMasking Image masking
-
-Image masking allows to mask an image with either an existing segmentation or a surface.
-The operation requires an image and a binary image mask or a surface.
-The result will be an image containing only the pixels that are covered by the respective mask.
-Depending on the selected mode ("make output binary" or "overwrite foreground" / "overwrite background")
-the result will be a simple image or a binary image.
-
-\imageMacro{QmitkMultiLabelSegmentationUtilities_ImageMasking.png,"Image masking",6.00}
 
 \section org_mitk_views_multilabelSegmentationUtilitiesConvertToMultiLabel Convert to Multilabel
 

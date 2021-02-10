@@ -13,11 +13,11 @@ found in the LICENSE file.
 #include "QmitkPointSetInteractionView.h"
 
 #include <QInputDialog>
-#include <QLineEdit>
 
-#include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateOr.h>
 #include <mitkNodePredicateProperty.h>
 
 #include <QmitkPointListWidget.h>
@@ -42,7 +42,9 @@ void QmitkPointSetInteractionView::CreateQtPartControl(QWidget *parent)
   m_Controls->selectedPointSetWidget->SetDataStorage(GetDataStorage());
   m_Controls->selectedPointSetWidget->SetNodePredicate(mitk::NodePredicateAnd::New(
     mitk::TNodePredicateDataType<mitk::PointSet>::New(),
-    mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))));
+    mitk::NodePredicateNot::New(mitk::NodePredicateOr::New(
+      mitk::NodePredicateProperty::New("helper object"),
+      mitk::NodePredicateProperty::New("hidden object")))));
 
   m_Controls->selectedPointSetWidget->SetSelectionIsOptional(true);
   m_Controls->selectedPointSetWidget->SetAutoSelectNewNodes(true);
@@ -55,10 +57,12 @@ void QmitkPointSetInteractionView::CreateQtPartControl(QWidget *parent)
   connect(m_Controls->addPointSetPushButton, &QPushButton::clicked,
     this, &QmitkPointSetInteractionView::OnAddPointSetClicked);
 
-  if (mitk::IRenderWindowPart* renderWindowPart = GetRenderWindowPart())
-  {
-    RenderWindowPartActivated(renderWindowPart);
-  }
+  auto renderWindowPart = this->GetRenderWindowPart();
+
+  if (nullptr != renderWindowPart)
+    this->RenderWindowPartActivated(renderWindowPart);
+
+  this->OnCurrentSelectionChanged(m_Controls->selectedPointSetWidget->GetSelectedNodes());
 }
 
 void QmitkPointSetInteractionView::SetFocus()
@@ -66,22 +70,9 @@ void QmitkPointSetInteractionView::SetFocus()
   m_Controls->addPointSetPushButton->setFocus();
 }
 
-void QmitkPointSetInteractionView::OnCurrentSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
+void QmitkPointSetInteractionView::OnCurrentSelectionChanged(QmitkSingleNodeSelectionWidget::NodeList /*nodes*/)
 {
-  if (nodes.empty() || nodes.front().IsNull())
-  {
-    m_Controls->poinSetListWidget->SetPointSetNode(nullptr);
-    return;
-  }
-
-  auto selectedPointSet = dynamic_cast<mitk::PointSet*>(nodes.front()->GetData());
-  if (nullptr == selectedPointSet)
-  {
-    m_Controls->poinSetListWidget->SetPointSetNode(nullptr);
-    return;
-  }
-
-  m_Controls->poinSetListWidget->SetPointSetNode(nodes.front());
+  m_Controls->poinSetListWidget->SetPointSetNode(m_Controls->selectedPointSetWidget->GetSelectedNode());
 }
 
 void QmitkPointSetInteractionView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)

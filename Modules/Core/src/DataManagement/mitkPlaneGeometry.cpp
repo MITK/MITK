@@ -59,7 +59,7 @@ namespace mitk
 
   void PlaneGeometry::CheckIndexToWorldTransform(mitk::AffineTransform3D *transform)
   {
-    CheckRotationMatrix(transform);
+    this->CheckRotationMatrix(transform);
   }
 
   void PlaneGeometry::CheckBounds(const BoundingBox::BoundsArrayType &bounds)

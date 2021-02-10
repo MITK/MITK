@@ -91,6 +91,9 @@ void QmitkImageCropperView::CreateQtPartControl(QWidget *parent)
   SetDefaultGUI();
 
   m_ParentWidget = parent;
+
+  this->OnImageSelectionChanged(m_Controls.imageSelectionWidget->GetSelectedNodes());
+  this->OnBoundingBoxSelectionChanged(m_Controls.boundingBoxSelectionWidget->GetSelectedNodes());
 }
 
 void QmitkImageCropperView::OnImageSelectionChanged(QList<mitk::DataNode::Pointer>)
@@ -439,16 +442,23 @@ void QmitkImageCropperView::ProcessImage(bool mask)
         croppedImageNode->SetData(cutter->GetOutput());
         croppedImageNode->SetProperty("name", mitk::StringProperty::New(imageName.toStdString()));
         croppedImageNode->SetProperty("color", mitk::ColorProperty::New(1.0, 1.0, 1.0));
-        croppedImageNode->SetProperty("layer", mitk::IntProperty::New(99)); // arbitrary, copied from segmentation functionality
+
+        mitk::LevelWindow levelWindow;
+        imageNode->GetLevelWindow(levelWindow);
+        croppedImageNode->SetLevelWindow(levelWindow);
+
         if (!this->GetDataStorage()->Exists(croppedImageNode))
         {
           this->GetDataStorage()->Add(croppedImageNode, imageNode);
+          imageNode->SetVisibility(mask); // Give the user a visual clue that something happened when image was cropped
         }
       }
       else // original image will be overwritten by the result image and the bounding box of the result is adjusted
       {
+        mitk::LevelWindow levelWindow;
+        imageNode->GetLevelWindow(levelWindow);
         imageNode->SetData(cutter->GetOutput());
-        imageNode->Modified();
+        imageNode->SetLevelWindow(levelWindow);
         // Adjust coordinate system by doing a reinit on
         auto tempDataStorage = mitk::DataStorage::SetOfObjects::New();
         tempDataStorage->InsertElement(0, imageNode);

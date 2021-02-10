@@ -55,6 +55,50 @@ found in the LICENSE file.
 #include <itkRGBAPixel.h>
 #include <mitkRenderingModeProperty.h>
 
+namespace
+{
+  bool IsBinaryImage(mitk::Image* image)
+  {
+    if (nullptr != image && image->IsInitialized())
+    {
+      bool isBinary = true;
+      auto statistics = image->GetStatistics();
+
+      const auto numTimeSteps = image->GetTimeSteps();
+
+      for (std::remove_const_t<decltype(numTimeSteps)> t = 0; t < numTimeSteps; ++t)
+      {
+        const auto numChannels = image->GetNumberOfChannels();
+
+        for (std::remove_const_t<decltype(numChannels)> c = 0; c < numChannels; ++c)
+        {
+          auto minValue = statistics->GetScalarValueMin(t, c);
+          auto maxValue = statistics->GetScalarValueMax(t, c);
+
+          if (std::abs(maxValue - minValue) < mitk::eps)
+            continue;
+
+          auto min2ndValue = statistics->GetScalarValue2ndMin(t, c);
+          auto max2ndValue = statistics->GetScalarValue2ndMax(t, c);
+
+          if (std::abs(maxValue - min2ndValue) < mitk::eps && std::abs(max2ndValue - minValue) < mitk::eps)
+            continue;
+
+          isBinary = false;
+          break;
+        }
+
+        if (!isBinary)
+          break;
+      }
+
+      return isBinary;
+    }
+
+    return false;
+  }
+}
+
 mitk::ImageVtkMapper2D::ImageVtkMapper2D()
 {
 }
@@ -727,10 +771,6 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode *node, mitk::Ba
     // ok, property is not set, use heuristic to determine if this
     // is a binary image
     mitk::Image::Pointer centralSliceImage;
-    ScalarType minValue = 0.0;
-    ScalarType maxValue = 0.0;
-    ScalarType min2ndValue = 0.0;
-    ScalarType max2ndValue = 0.0;
     mitk::ImageSliceSelector::Pointer sliceSelector = mitk::ImageSliceSelector::New();
 
     sliceSelector->SetInput(image);
@@ -739,22 +779,11 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode *node, mitk::Ba
     sliceSelector->SetChannelNr(image->GetDimension(4) / 2);
     sliceSelector->Update();
     centralSliceImage = sliceSelector->GetOutput();
-    if (centralSliceImage.IsNotNull() && centralSliceImage->IsInitialized())
-    {
-      minValue = centralSliceImage->GetStatistics()->GetScalarValueMin();
-      maxValue = centralSliceImage->GetStatistics()->GetScalarValueMax();
-      min2ndValue = centralSliceImage->GetStatistics()->GetScalarValue2ndMin();
-      max2ndValue = centralSliceImage->GetStatistics()->GetScalarValue2ndMax();
-    }
-    if ((maxValue == min2ndValue && minValue == max2ndValue) || minValue == maxValue)
-    {
-      // centralSlice is strange, lets look at all data
-      minValue = image->GetStatistics()->GetScalarValueMin();
-      maxValue = image->GetStatistics()->GetScalarValueMaxNoRecompute();
-      min2ndValue = image->GetStatistics()->GetScalarValue2ndMinNoRecompute();
-      max2ndValue = image->GetStatistics()->GetScalarValue2ndMaxNoRecompute();
-    }
-    isBinaryImage = (maxValue == min2ndValue && minValue == max2ndValue);
+
+    isBinaryImage = IsBinaryImage(centralSliceImage);
+
+    if (isBinaryImage) // Potential binary image. Now take a close look.
+      isBinaryImage = IsBinaryImage(image);
   }
 
   std::string className = image->GetNameOfClass();

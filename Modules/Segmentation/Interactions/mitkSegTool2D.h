@@ -90,7 +90,6 @@ namespace mitk
     *
     * \param positionEvent Event that specifies the plane that should be used to slice
     * \param image Image that should be sliced
-    * \param timeStep TimeStep of the image that shold be sliced
     * \param component  The component to be extracted of a given multi-component image. -1 is the default parameter to denote an invalid component.
     *
     * \return 'nullptr' if SegTool2D is either unable to determine which slice was affected, or if there was some problem
@@ -217,14 +216,16 @@ namespace mitk
      * Calls non static WriteBackSegmentationResults*/
     void WriteBackSegmentationResult(const PlaneGeometry *planeGeometry, const Image* segmentationResult, TimeStepType timeStep);
 
-    /** Overloaded version that calls the static version and also adds the contour markers.*/
+    /** Overloaded version that calls the static version and also adds the contour markers.
+     * @remark If the sliceList is empty, this function does nothing.*/
     void WriteBackSegmentationResults(const std::vector<SliceInformation> &sliceList, bool writeSliceToVolume = true);
 
     /** \brief Writes all provided source slices into the data of the passed workingNode.
      * The function does the following: 1) for every passed slice write it to workingNode (and generate and undo/redo step);
      * 2) update the surface interpolation and 3) marke the node as modified.
      * @param workingNode Pointer to the node that contains the working image.
-     * @param sliceList Vector of all slices that should be written into the workingNode.
+     * @param sliceList Vector of all slices that should be written into the workingNode. If the list is
+     * empty, the function call does nothing.
      * @param writeSliceToVolume If set to false the write operation (WriteSliceToVolume will be skipped)
      * and only the surface interpolation will be updated.
      * @pre workingNode must point to a valid instance and contain an image instance as data.*/

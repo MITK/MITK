@@ -108,8 +108,6 @@ protected:
   /// pointers and emitting the NodesDropped signal.
   void dropEvent(QDropEvent *event) override;
 
-  void AdjustRenderWindowMenuVisibility(const QPoint &pos);
-
 Q_SIGNALS:
 
   void LayoutDesignChanged(QmitkRenderWindowMenu::LayoutDesign);

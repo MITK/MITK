@@ -91,11 +91,22 @@ found in the LICENSE file.
   {
     auto newTimeGeometry = mitk::ArbitraryTimeGeometry::New();
     newTimeGeometry->ClearAllGeometries();
-    for (unsigned int timestep = startTimestep; timestep < endTimestep; timestep++) {
+    for (unsigned int timestep = startTimestep; timestep < endTimestep; timestep++)
+    {
       auto geometryForTimePoint = sourceGeometry->GetGeometryForTimeStep(timestep);
-      newTimeGeometry->AppendNewTimeStep(geometryForTimePoint,
-                                         sourceGeometry->GetMinimumTimePoint(timestep),
-                                         sourceGeometry->GetMaximumTimePoint(timestep));
+      auto minTP = sourceGeometry->GetMinimumTimePoint(timestep);
+      auto maxTP = sourceGeometry->GetMaximumTimePoint(timestep);
+      ///////////////////////////////////////
+      // Workarround T27883. See https://phabricator.mitk.org/T27883#219473 for more details.
+      // This workarround should be removed as soon as T28262 is solved!
+      if (timestep + 1 == sourceGeometry->CountTimeSteps() && minTP == maxTP)
+      {
+        maxTP = minTP + 1.;
+      }
+      // End of workarround for T27883
+      //////////////////////////////////////
+
+      newTimeGeometry->AppendNewTimeStepClone(geometryForTimePoint, minTP, maxTP);
     }
     return newTimeGeometry.GetPointer();
   }

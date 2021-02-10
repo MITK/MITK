@@ -49,6 +49,32 @@ namespace
     // question clearly
     return left.first.GetPointer() < right.first.GetPointer();
   }
+
+  // This is a workaround until we are able to save time-related information in an
+  // actual file format of surfaces.
+  void ApplyProportionalTimeGeometryProperties(mitk::BaseData* data)
+  {
+    if (nullptr == data)
+      return;
+
+    auto properties = data->GetPropertyList();
+
+    if (properties.IsNull())
+      return;
+
+    auto* geometry = dynamic_cast<mitk::ProportionalTimeGeometry*>(data->GetTimeGeometry());
+
+    if (nullptr == geometry)
+      return;
+
+    float value = 0.0f;
+
+    if (properties->GetFloatProperty("ProportionalTimeGeometry.FirstTimePoint", value))
+      geometry->SetFirstTimePoint(value);
+
+    if (properties->GetFloatProperty("ProportionalTimeGeometry.StepDuration", value))
+      geometry->SetStepDuration(value);
+  }
 }
 
 bool mitk::SceneReaderV1::LoadScene(tinyxml2::XMLDocument &document, const std::string &workingDirectory, DataStorage *storage)
@@ -100,6 +126,7 @@ bool mitk::SceneReaderV1::LoadScene(tinyxml2::XMLDocument &document, const std::
       if (node->GetData())
       {
         DecorateBaseDataWithProperties(node->GetData(), baseDataElement, workingDirectory);
+        ApplyProportionalTimeGeometryProperties(node->GetData());
       }
       else
       {

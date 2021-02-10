@@ -56,7 +56,8 @@ QmitkPointListView::QmitkPointListView(QWidget *parent)
           this,
           SLOT(OnListViewSelectionChanged(const QItemSelection &, const QItemSelection &)));
 
-  connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(ctxMenu(const QPoint &)));
+  // T28213: Every single action in the context menu is either not implemented or working. Implement/fix or remove in future.
+  // connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(ctxMenu(const QPoint &)));
 }
 
 QmitkPointListView::~QmitkPointListView()

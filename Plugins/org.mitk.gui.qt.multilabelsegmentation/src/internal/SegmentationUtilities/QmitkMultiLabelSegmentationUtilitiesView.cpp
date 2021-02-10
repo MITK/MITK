@@ -12,8 +12,10 @@ found in the LICENSE file.
 
 // #define ENABLE_CTK_WIDGETS_WIDGET
 
+#include <QmitkStyleManager.h>
 #include "QmitkMultiLabelSegmentationUtilitiesView.h"
 #include "BooleanOperations/QmitkBooleanOperationsWidget.h"
+#include "ContourModelToImage/QmitkContourModelToImageWidget.h"
 #include "MorphologicalOperations/QmitkMorphologicalOperationsWidget.h"
 #include "SurfaceToImage/QmitkSurfaceToImageWidget.h"
 #include "ImageMasking/QmitkImageMaskingWidget.h"
@@ -21,6 +23,7 @@ found in the LICENSE file.
 
 QmitkMultiLabelSegmentationUtilitiesView::QmitkMultiLabelSegmentationUtilitiesView() :
   m_BooleanOperationsWidget(nullptr),
+  m_ContourModelToImageWidget(nullptr),
   m_MorphologicalOperationsWidget(nullptr),
   m_SurfaceToImageWidget(nullptr),
   m_ImageMaskingWidget(nullptr),
@@ -43,24 +46,18 @@ void QmitkMultiLabelSegmentationUtilitiesView::CreateQtPartControl(QWidget* pare
     : nullptr;
 
   m_BooleanOperationsWidget = new QmitkBooleanOperationsWidget(timeNavigationController, parent);
-
+  m_ContourModelToImageWidget = new QmitkContourModelToImageWidget(timeNavigationController, parent);
   m_MorphologicalOperationsWidget = new QmitkMorphologicalOperationsWidget(timeNavigationController, parent);
-
   m_SurfaceToImageWidget = new QmitkSurfaceToImageWidget(timeNavigationController, parent);
-
   m_ImageMaskingWidget = new QmitkImageMaskingWidget(timeNavigationController, parent);
-
   m_ConvertToMlWidget = new QmitkConvertToMlWidget(timeNavigationController, parent);
 
   this->AddUtilityWidget(m_BooleanOperationsWidget, QIcon(":/MultiLabelSegmentationUtilities/BooleanOperations_48x48.png"), "Boolean Operations");
-
-  this->AddUtilityWidget(m_MorphologicalOperationsWidget, QIcon(":/MultiLabelSegmentationUtilities/MorphologicalOperations_48x48.png"), "Morphological Operations");
-
-  this->AddUtilityWidget(m_SurfaceToImageWidget, QIcon(":/MultiLabelSegmentationUtilities/SurfaceToImage_48x48.png"), "Surface To Image");
-
+  this->AddUtilityWidget(m_ContourModelToImageWidget, QIcon(":/MultiLabelSegmentationUtilities/ContourModelSetToImage_48x48.png"), "Contour to Image");
   this->AddUtilityWidget(m_ImageMaskingWidget, QIcon(":/MultiLabelSegmentationUtilities/ImageMasking_48x48.png"), "Image Masking");
-
-  this->AddUtilityWidget(m_ConvertToMlWidget, QIcon(":/MultiLabelSegmentationUtilities/multilabelsegmentation.svg"), "Convert To MultiLabel");
+  this->AddUtilityWidget(m_MorphologicalOperationsWidget, QIcon(":/MultiLabelSegmentationUtilities/MorphologicalOperations_48x48.png"), "Morphological Operations");
+  this->AddUtilityWidget(m_SurfaceToImageWidget, QIcon(":/MultiLabelSegmentationUtilities/SurfaceToImage_48x48.png"), "Surface To Image");
+  this->AddUtilityWidget(m_ConvertToMlWidget, QmitkStyleManager::ThemeIcon(QStringLiteral(":/MultiLabelSegmentationUtilities/multilabelsegmentation.svg")), "Convert to MultiLabel");
 }
 
 void QmitkMultiLabelSegmentationUtilitiesView::AddUtilityWidget(QWidget* widget, const QIcon& icon, const QString& text)
@@ -78,17 +75,19 @@ void QmitkMultiLabelSegmentationUtilitiesView::RenderWindowPartActivated(mitk::I
   mitk::SliceNavigationController* timeNavigationController = renderWindowPart->GetTimeNavigationController();
 
   m_BooleanOperationsWidget->SetTimeNavigationController(timeNavigationController);
+  m_ContourModelToImageWidget->SetTimeNavigationController(timeNavigationController);
+  m_ImageMaskingWidget->SetTimeNavigationController(timeNavigationController);
   m_MorphologicalOperationsWidget->SetTimeNavigationController(timeNavigationController);
   m_SurfaceToImageWidget->SetTimeNavigationController(timeNavigationController);
-  m_ImageMaskingWidget->SetTimeNavigationController(timeNavigationController);
   m_ConvertToMlWidget->SetTimeNavigationController(timeNavigationController);
 }
 
 void QmitkMultiLabelSegmentationUtilitiesView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*)
 {
   m_BooleanOperationsWidget->SetTimeNavigationController(nullptr);
+  m_ContourModelToImageWidget->SetTimeNavigationController(nullptr);
+  m_ImageMaskingWidget->SetTimeNavigationController(nullptr);
   m_MorphologicalOperationsWidget->SetTimeNavigationController(nullptr);
   m_SurfaceToImageWidget->SetTimeNavigationController(nullptr);
-  m_ImageMaskingWidget->SetTimeNavigationController(nullptr);
   m_ConvertToMlWidget->SetTimeNavigationController(nullptr);
 }

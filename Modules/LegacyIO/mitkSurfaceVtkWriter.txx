@@ -86,7 +86,7 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
     {
       if (input->GetTimeGeometry()->IsValidTimeStep(t))
       {
-        const TimeBounds &timebounds = input->GetTimeGeometry()->GetTimeBounds(t);
+        const TimeBounds timebounds = input->GetTimeGeometry()->GetTimeBounds(t);
         filename << m_FileName.c_str() << "_S" << std::setprecision(0) << timebounds[0] << "_E" << std::setprecision(0)
                  << timebounds[1] << "_T" << t << m_Extension;
       }

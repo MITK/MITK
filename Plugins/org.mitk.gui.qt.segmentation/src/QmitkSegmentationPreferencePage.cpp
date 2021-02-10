@@ -25,10 +25,17 @@ found in the LICENSE file.
 #include <berryPlatform.h>
 
 QmitkSegmentationPreferencePage::QmitkSegmentationPreferencePage()
-: m_MainControl(nullptr)
-, m_Initializing(false)
+  : m_MainControl(nullptr),
+    m_SlimViewCheckBox(nullptr),
+    m_RadioOutline(nullptr),
+    m_RadioOverlay(nullptr),
+    m_SmoothingCheckBox(nullptr),
+    m_SmoothingSpinBox(nullptr),
+    m_DecimationSpinBox(nullptr),
+    m_ClosingSpinBox(nullptr),
+    m_SelectionModeCheckBox(nullptr),
+    m_Initializing(false)
 {
-
 }
 
 QmitkSegmentationPreferencePage::~QmitkSegmentationPreferencePage()
@@ -64,10 +71,6 @@ void QmitkSegmentationPreferencePage::CreateQtControl(QWidget* parent)
   displayOptionsLayout->addWidget( m_RadioOverlay );
   formLayout->addRow( "2D display", displayOptionsLayout );
 
-  m_VolumeRenderingCheckBox = new QCheckBox( "Show as volume rendering", m_MainControl );
-  formLayout->addRow( "3D display", m_VolumeRenderingCheckBox );
-  connect( m_VolumeRenderingCheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnVolumeRenderingCheckboxChecked(int)) );
-
   auto   surfaceLayout = new QFormLayout;
   surfaceLayout->setSpacing(8);
 
@@ -99,7 +102,7 @@ void QmitkSegmentationPreferencePage::CreateQtControl(QWidget* parent)
   surfaceLayout->addRow("Closing Ratio", m_ClosingSpinBox);
 
   m_SelectionModeCheckBox = new QCheckBox("Enable auto-selection mode", m_MainControl);
-  m_SelectionModeCheckBox->setToolTip("If checked the segmentation plugin ensures that only one segmentation and the according greyvalue image are visible at one time.");
+  m_SelectionModeCheckBox->setToolTip("Automatically select a patient image and a segmentation if available");
   formLayout->addRow("Data node selection mode",m_SelectionModeCheckBox);
 
   formLayout->addRow("Smoothed surface creation", surfaceLayout);
@@ -118,7 +121,6 @@ bool QmitkSegmentationPreferencePage::PerformOk()
 {
   m_SegmentationPreferencesNode->PutBool("slim view", m_SlimViewCheckBox->isChecked());
   m_SegmentationPreferencesNode->PutBool("draw outline", m_RadioOutline->isChecked());
-  m_SegmentationPreferencesNode->PutBool("volume rendering", m_VolumeRenderingCheckBox->isChecked());
   m_SegmentationPreferencesNode->PutBool("smoothing hint", m_SmoothingCheckBox->isChecked());
   m_SegmentationPreferencesNode->PutDouble("smoothing value", m_SmoothingSpinBox->value());
   m_SegmentationPreferencesNode->PutDouble("decimation rate", m_DecimationSpinBox->value());
@@ -147,8 +149,6 @@ void QmitkSegmentationPreferencePage::Update()
     m_RadioOverlay->setChecked( true );
   }
 
-  m_VolumeRenderingCheckBox->setChecked( m_SegmentationPreferencesNode->GetBool("volume rendering", false) );
-
   if (m_SegmentationPreferencesNode->GetBool("smoothing hint", true))
   {
     m_SmoothingCheckBox->setChecked(true);
@@ -165,19 +165,6 @@ void QmitkSegmentationPreferencePage::Update()
   m_SmoothingSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("smoothing value", 1.0));
   m_DecimationSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("decimation rate", 0.5));
   m_ClosingSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("closing ratio", 0.0));
-}
-
-void QmitkSegmentationPreferencePage::OnVolumeRenderingCheckboxChecked(int state)
-{
-  if (m_Initializing) return;
-
-  if ( state != Qt::Unchecked )
-  {
-    QMessageBox::information(nullptr,
-                             "Memory warning",
-                             "Turning on volume rendering of segmentations will make the application more memory intensive (and potentially prone to crashes).\n\n"
-                             "If you encounter out-of-memory problems, try turning off volume rendering again.");
-  }
 }
 
 void QmitkSegmentationPreferencePage::OnSmoothingCheckboxChecked(int state)

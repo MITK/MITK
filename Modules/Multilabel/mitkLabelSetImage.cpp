@@ -466,9 +466,16 @@ void mitk::LabelSetImage::EraseLabel(PixelType pixelValue, unsigned int layer)
 {
   try
   {
-    AccessByItk_2(this, EraseLabelProcessing, pixelValue, layer);
+    if (4 == this->GetDimension())
+    {
+      AccessFixedDimensionByItk_2(this, EraseLabelProcessing, 4, pixelValue, layer);
+    }
+    else
+    {
+      AccessByItk_2(this, EraseLabelProcessing, pixelValue, layer);
+    }
   }
-  catch (itk::ExceptionObject &e)
+  catch (const itk::ExceptionObject &e)
   {
     mitkThrow() << e.GetDescription();
   }

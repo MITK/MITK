@@ -1,1 +1,1 @@
-%~dp0bin\%~n0.exe %*
+"%~dp0bin\%~n0.exe" %*

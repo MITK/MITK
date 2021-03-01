@@ -38,10 +38,14 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget *parent)
   verticalLayout->addWidget(lblPrompt);
 
   // to choose a color
+  m_Color.setRed(255);
+  m_Color.setGreen(0);
+  m_Color.setBlue(0);
+
   btnColor = new QPushButton("", this);
   btnColor->setFixedWidth(25);
   btnColor->setAutoFillBackground(true);
-  btnColor->setStyleSheet("background-color:rgb(255,0,0)");
+  btnColor->setStyleSheet(QString("background-color:rgb(%1, %2, %3)").arg(m_Color.red()).arg(m_Color.green()).arg(m_Color.blue()));
 
   connect(btnColor, SIGNAL(clicked()), this, SLOT(onColorBtnClicked()));
 

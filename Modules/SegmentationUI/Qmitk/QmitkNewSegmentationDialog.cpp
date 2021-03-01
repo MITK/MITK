@@ -38,10 +38,14 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget *parent)
   verticalLayout->addWidget(lblPrompt);
 
   // to choose a color
+  m_Color.setRed(255);
+  m_Color.setGreen(0);
+  m_Color.setBlue(0);
+
   btnColor = new QPushButton("", this);
   btnColor->setFixedWidth(25);
   btnColor->setAutoFillBackground(true);
-  btnColor->setStyleSheet("background-color:rgb(255,0,0)");
+  btnColor->setStyleSheet(QString("background-color:rgb(%1, %2, %3)").arg(m_Color.red()).arg(m_Color.green()).arg(m_Color.blue()));
 
   connect(btnColor, SIGNAL(clicked()), this, SLOT(onColorBtnClicked()));
 
@@ -89,17 +93,17 @@ const QString QmitkNewSegmentationDialog::GetSegmentationName()
 mitk::Color QmitkNewSegmentationDialog::GetColor()
 {
   mitk::Color colorProperty;
-  if (m_Color.spec() == 0)
-  {
-    colorProperty.SetRed(1);
-    colorProperty.SetGreen(0);
-    colorProperty.SetBlue(0);
-  }
-  else
+  if (m_Color.isValid())
   {
     colorProperty.SetRed(m_Color.redF());
     colorProperty.SetGreen(m_Color.greenF());
     colorProperty.SetBlue(m_Color.blueF());
+  }
+  else
+  {
+    colorProperty.SetRed(1);
+    colorProperty.SetGreen(0);
+    colorProperty.SetBlue(0);
   }
   return colorProperty;
 }
@@ -165,14 +169,12 @@ void QmitkNewSegmentationDialog::onNewOrganNameChanged(const QString &newText)
 
 void QmitkNewSegmentationDialog::onColorBtnClicked()
 {
-  m_Color = QColorDialog::getColor();
-  if (m_Color.spec() == 0)
+  auto selectedColor = QColorDialog::getColor(m_Color);
+  if (selectedColor.isValid())
   {
-    m_Color.setRed(255);
-    m_Color.setGreen(0);
-    m_Color.setBlue(0);
+    m_Color = selectedColor;
+    btnColor->setStyleSheet(QString("background-color:rgb(%1, %2, %3)").arg(m_Color.red()).arg(m_Color.green()).arg(m_Color.blue()));
   }
-  btnColor->setStyleSheet(QString("background-color:rgb(%1, %2, %3)").arg(m_Color.red()).arg(m_Color.green()).arg(m_Color.blue()));
 }
 
 void QmitkNewSegmentationDialog::onColorChange(const QString &completedWord)

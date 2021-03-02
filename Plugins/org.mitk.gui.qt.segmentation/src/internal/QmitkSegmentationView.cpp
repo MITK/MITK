@@ -469,10 +469,11 @@ void QmitkSegmentationView::OnShowMarkerNodes (bool state)
 void QmitkSegmentationView::OnContourMarkerSelected(const mitk::DataNode *node)
 {
    QmitkRenderWindow* selectedRenderWindow = nullptr;
-   QmitkRenderWindow* axialRenderWindow = GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetQmitkRenderWindow("axial");
-   QmitkRenderWindow* sagittalRenderWindow = GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetQmitkRenderWindow("sagittal");
-   QmitkRenderWindow* coronalRenderWindow = GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetQmitkRenderWindow("coronal");
-   QmitkRenderWindow* _3DRenderWindow = GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetQmitkRenderWindow("3d");
+   auto* renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN);
+   auto* axialRenderWindow = renderWindowPart->GetQmitkRenderWindow("axial");
+   auto* sagittalRenderWindow = renderWindowPart->GetQmitkRenderWindow("sagittal");
+   auto* coronalRenderWindow = renderWindowPart->GetQmitkRenderWindow("coronal");
+   auto* _3DRenderWindow = renderWindowPart->GetQmitkRenderWindow("3d");
    bool PlanarFigureInitializedWindow = false;
 
    // find initialized renderwindow
@@ -690,13 +691,13 @@ void QmitkSegmentationView::CheckRenderingState()
    * For further information see Bug 16063
    */
 
-   const mitk::BaseGeometry* worldGeo = this->GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetSliceNavigationController()->GetCurrentGeometry3D();
+   const mitk::BaseGeometry* worldGeo = renderWindowPart->GetQmitkRenderWindow("3d")->GetSliceNavigationController()->GetCurrentGeometry3D();
 
    if (workingNode && worldGeo)
    {
 
       const mitk::BaseGeometry* workingNodeGeo = workingNode->GetData()->GetGeometry();
-      const mitk::BaseGeometry* worldGeo = this->GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetSliceNavigationController()->GetCurrentGeometry3D();
+      const mitk::BaseGeometry* worldGeo = renderWindowPart->GetQmitkRenderWindow("3d")->GetSliceNavigationController()->GetCurrentGeometry3D();
 
       if (mitk::Equal(*workingNodeGeo->GetBoundingBox(), *worldGeo->GetBoundingBox(), mitk::eps, true))
       {
@@ -831,11 +832,10 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
    SetToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), m_Controls->segImageSelector->GetSelectedNode());
 
-   m_RenderWindowPart = GetRenderWindowPart();
-   if (m_RenderWindowPart)
-   {
-     RenderWindowPartActivated(m_RenderWindowPart);
-   }
+   m_RenderWindowPart = this->GetRenderWindowPart();
+
+   if (nullptr != m_RenderWindowPart)
+     this->RenderWindowPartActivated(m_RenderWindowPart);
 
    //Should be done last, if everything else is configured because it triggers the autoselection of data.
    m_Controls->patImageSelector->SetAutoSelectNewNodes(true);

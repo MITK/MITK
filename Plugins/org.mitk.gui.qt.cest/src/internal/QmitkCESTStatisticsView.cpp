@@ -761,8 +761,9 @@ void QmitkCESTStatisticsView::Clear()
 
 void QmitkCESTStatisticsView::OnSliceChanged()
 {
-  mitk::Point3D currentSelectedPosition = this->GetRenderWindowPart()->GetSelectedPosition(nullptr);
-  mitk::TimePointType currentSelectedTimePoint = this->GetRenderWindowPart()->GetSelectedTimePoint();
+  auto* renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN);
+  auto currentSelectedPosition = renderWindowPart->GetSelectedPosition(nullptr);
+  auto currentSelectedTimePoint = renderWindowPart->GetSelectedTimePoint();
 
   if (m_currentSelectedPosition != currentSelectedPosition || m_currentSelectedTimePoint != currentSelectedTimePoint)
   //|| m_selectedNodeTime > m_currentPositionTime)

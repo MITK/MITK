@@ -54,7 +54,7 @@ void QmitkSimpleExampleView::CreateQtPartControl(QWidget *parent)
     m_Controls->setupUi(parent);
     this->CreateConnections();
 
-    this->RenderWindowPartActivated(this->GetRenderWindowPart());
+    this->RenderWindowPartActivated(this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN));
   }
 }
 
@@ -272,7 +272,7 @@ void QmitkSimpleExampleView::StereoSelectionChanged(int id)
   Dresden mode is yet another stereoscopic interleaving.
   */
 
-  mitk::IRenderWindowPart *renderWindowPart = this->GetRenderWindowPart();
+  auto *renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN);
   vtkRenderWindow *vtkrenderwindow = renderWindowPart->GetQmitkRenderWindow("3d")->GetVtkRenderWindow();
 
   // note: foreground vtkRenderers (at least the department logo renderer) produce errors in stereoscopic visualization.
@@ -307,7 +307,7 @@ QmitkRenderWindow *QmitkSimpleExampleView::GetSelectedRenderWindow() const
   }
   else
   {
-    return this->GetRenderWindowPart()->GetQmitkRenderWindow(id);
+    return this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetQmitkRenderWindow(id);
   }
 }
 
@@ -393,7 +393,7 @@ void QmitkSimpleExampleView::TakeScreenshot(vtkRenderer *renderer,
   renderer->GetBackground(oldBackground);
   double white[] = {1.0, 1.0, 1.0};
   renderer->SetBackground(white);
-  mitk::IRenderWindowPart *renderWindowPart = this->GetRenderWindowPart();
+  mitk::IRenderWindowPart* renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN);
   renderWindowPart->EnableDecorations(false);
 
   fileWriter->Write();
@@ -412,7 +412,7 @@ void QmitkSimpleExampleView::RenderWindowSelected(const QString &id)
   {
     m_SliceStepper.reset(new QmitkStepperAdapter(
       m_Controls->sliceNavigator,
-      this->GetRenderWindowPart()->GetQmitkRenderWindow(id)->GetSliceNavigationController()->GetSlice(),
+      this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetQmitkRenderWindow(id)->GetSliceNavigationController()->GetSlice(),
       "sliceNavigatorFromSimpleExample"));
   }
 }

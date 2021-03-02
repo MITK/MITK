@@ -131,12 +131,7 @@ void USNavigation::OnSelectDevices(){
 
   // Setting up the Camera Visualization Filter
 
-  /* Second 3D Renderwindow currently not functional, see Bug 13465
-  mitk::BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(this->GetRenderWindowPart()->GetQmitkRenderWindow("sagittal")->GetRenderWindow());
-  renderer->SetMapperID(mitk::BaseRenderer::Standard3D);
-  */
-
-  mitk::BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(this->GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderWindow());
+  mitk::BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetQmitkRenderWindow("3d")->GetRenderWindow());
 
   m_CameraVis->SetInput(0, m_NeedleProjectionFilter->GetOutput(0));
   m_CameraVis->SetRenderer( renderer );

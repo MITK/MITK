@@ -77,7 +77,7 @@ void QmitkOverlayManagerView::CreateQtPartControl(QWidget *parent)
   m_Controls.setupUi(parent);
   m_Controls.m_OverlayList->clear();
 
-  mitk::IRenderWindowPart *renderWindowPart = this->GetRenderWindowPart();
+  auto* renderWindowPart = this->GetRenderWindowPart();
 
   if (renderWindowPart != nullptr)
   {
@@ -135,7 +135,7 @@ void QmitkOverlayManagerView::OnFocusChanged(itk::Object * /*caller*/, const itk
   const mitk::FocusChangedEvent *focusEvent = dynamic_cast<const mitk::FocusChangedEvent *>(&event);
   if (focusEvent)
   {
-    QHash<QString, QmitkRenderWindow *> renderWindows = this->GetRenderWindowPart()->GetQmitkRenderWindows();
+    QHash<QString, QmitkRenderWindow *> renderWindows = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetQmitkRenderWindows();
     m_Controls.m_RendererCB->clear();
     Q_FOREACH (QString renderWindow, renderWindows.keys())
     {
@@ -314,7 +314,7 @@ void QmitkOverlayManagerView::OnPropertyListChanged(int index)
 
   QString renderer = m_Controls.m_RendererCB->itemText(index);
 
-  QmitkRenderWindow *renwin = this->GetRenderWindowPart()->GetQmitkRenderWindow(renderer);
+  auto *renwin = this->GetRenderWindowPart()->GetQmitkRenderWindow(renderer);
   m_Renderer = renwin ? renwin->GetRenderer() : nullptr;
 
   this->OnOverlaySelectionChanged(m_Controls.m_OverlayList->currentItem(), nullptr);
@@ -464,7 +464,7 @@ void QmitkOverlayManagerView::OnAddOverlay()
       overlay = CreateLogoOverlay();
 
     mitk::BaseRenderer *renderer =
-      this->GetRenderWindowPart()->GetQmitkRenderWindow(m_Controls.m_RendererCB->currentText())->GetRenderer();
+      this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetQmitkRenderWindow(m_Controls.m_RendererCB->currentText())->GetRenderer();
     mitk::LayoutAnnotationRenderer::AddAnnotation(overlay, renderer);
     m_OverlayMap[overlay->GetMicroserviceID()] = overlay;
   }
@@ -508,11 +508,11 @@ mitk::Annotation::Pointer QmitkOverlayManagerView::CreateLogoOverlay()
   return to.GetPointer();
 }
 
-void QmitkOverlayManagerView::RenderWindowPartActivated(mitk::IRenderWindowPart * /*renderWindowPart*/)
+void QmitkOverlayManagerView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
 {
   if (m_Controls.m_RendererCB->count() == 0)
   {
-    QHash<QString, QmitkRenderWindow *> renderWindows = this->GetRenderWindowPart()->GetQmitkRenderWindows();
+    QHash<QString, QmitkRenderWindow *> renderWindows = renderWindowPart->GetQmitkRenderWindows();
 
     Q_FOREACH (QString renderWindow, renderWindows.keys())
     {

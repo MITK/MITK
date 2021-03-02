@@ -123,7 +123,7 @@ void QmitkMatchPointRegistrationManipulator::CreateQtPartControl(QWidget* parent
   connect(m_Controls.movingNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointRegistrationManipulator::OnNodeSelectionChanged);
   connect(m_Controls.targetNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointRegistrationManipulator::OnNodeSelectionChanged);
 
-  this->m_SliceChangeListener.RenderWindowPartActivated(this->GetRenderWindowPart());
+  this->m_SliceChangeListener.RenderWindowPartActivated(this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN));
   connect(&m_SliceChangeListener, SIGNAL(SliceChanged()), this, SLOT(OnSliceChanged()));
 
   m_Controls.radioNewReg->setChecked(true);
@@ -344,13 +344,18 @@ void QmitkMatchPointRegistrationManipulator::OnRegistrationChanged()
   {
     this->m_CurrentRegistrationWrapper->Modified();
   }
-  this->GetRenderWindowPart()->RequestUpdate();
+
+  auto* renderWindowPart = this->GetRenderWindowPart();
+
+  if (nullptr != renderWindowPart)
+    renderWindowPart->RequestUpdate();
 }
 
 void QmitkMatchPointRegistrationManipulator::OnSliceChanged()
 {
-  mitk::Point3D currentSelectedPosition = GetRenderWindowPart()->GetSelectedPosition(nullptr);
-  auto currentTimePoint = GetRenderWindowPart()->GetSelectedTimePoint();
+  auto* renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN);
+  auto currentSelectedPosition = renderWindowPart->GetSelectedPosition(nullptr);
+  auto currentTimePoint = renderWindowPart->GetSelectedTimePoint();
 
   if (m_currentSelectedPosition != currentSelectedPosition
     || m_currentSelectedTimePoint != currentTimePoint
@@ -375,7 +380,10 @@ void QmitkMatchPointRegistrationManipulator::OnSliceChanged()
 
 void QmitkMatchPointRegistrationManipulator::OnSettingsChanged(mitk::DataNode*)
 {
-	this->GetRenderWindowPart()->RequestUpdate();
+  auto* renderWindowPart = this->GetRenderWindowPart();
+
+  if (nullptr != renderWindowPart)
+    renderWindowPart->RequestUpdate();
 }
 
 void QmitkMatchPointRegistrationManipulator::OnStartBtnPushed()
@@ -383,7 +391,10 @@ void QmitkMatchPointRegistrationManipulator::OnStartBtnPushed()
   this->InitSession();
   this->OnSliceChanged();
 
-  this->GetRenderWindowPart()->RequestUpdate();
+  auto* renderWindowPart = this->GetRenderWindowPart();
+
+  if (nullptr != renderWindowPart)
+    renderWindowPart->RequestUpdate();
 
   this->CheckInputs();
   this->ConfigureControls();
@@ -445,7 +456,11 @@ void QmitkMatchPointRegistrationManipulator::OnStoreBtnPushed()
 
   this->CheckInputs();
   this->ConfigureControls();
-  this->GetRenderWindowPart()->RequestUpdate();
+
+  auto* renderWindowPart = this->GetRenderWindowPart();
+
+  if (nullptr != renderWindowPart)
+    renderWindowPart->RequestUpdate();
 }
 
 void QmitkMatchPointRegistrationManipulator::OnMapResultIsAvailable(mitk::BaseData::Pointer spMappedData,
@@ -455,7 +470,11 @@ void QmitkMatchPointRegistrationManipulator::OnMapResultIsAvailable(mitk::BaseDa
     spMappedData, job->GetRegistration()->getRegistrationUID(), job->m_InputDataUID,
     job->m_doGeometryRefinement, job->m_InterpolatorLabel);
   this->GetDataStorage()->Add(spMappedNode);
-  this->GetRenderWindowPart()->RequestUpdate();
+
+  auto* renderWindowPart = this->GetRenderWindowPart();
+
+  if (nullptr != renderWindowPart)
+    renderWindowPart->RequestUpdate();
 }
 
 void QmitkMatchPointRegistrationManipulator::OnCenterTypeChanged(int index)
@@ -470,7 +489,11 @@ void QmitkMatchPointRegistrationManipulator::OnCenterTypeChanged(int index)
   {
     this->m_CurrentRegistrationWrapper->Modified();
   }
-  this->GetRenderWindowPart()->RequestUpdate();
+
+  auto* renderWindowPart = this->GetRenderWindowPart();
+
+  if (nullptr != renderWindowPart)
+    renderWindowPart->RequestUpdate();
 }
 
 void QmitkMatchPointRegistrationManipulator::ConfigureTransformCenter(int centerType)

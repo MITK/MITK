@@ -104,7 +104,7 @@ void QmitkMatchPointRegistrationEvaluator::CreateQtPartControl(QWidget* parent)
   connect(m_Controls.movingNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointRegistrationEvaluator::OnNodeSelectionChanged);
   connect(m_Controls.targetNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkMatchPointRegistrationEvaluator::OnNodeSelectionChanged);
 
-  this->m_SliceChangeListener.RenderWindowPartActivated(this->GetRenderWindowPart());
+  this->m_SliceChangeListener.RenderWindowPartActivated(this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN));
   connect(&m_SliceChangeListener, SIGNAL(SliceChanged()), this, SLOT(OnSliceChanged()));
 
   m_selectedEvalNode = this->GetDataStorage()->GetNamedNode(HelperNodeName);
@@ -219,8 +219,9 @@ void QmitkMatchPointRegistrationEvaluator::ConfigureControls()
 
 void QmitkMatchPointRegistrationEvaluator::OnSliceChanged()
 {
-  mitk::Point3D currentSelectedPosition = GetRenderWindowPart()->GetSelectedPosition(nullptr);
-  auto currentTimePoint = GetRenderWindowPart()->GetSelectedTimePoint();
+  auto* renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN);
+  auto currentSelectedPosition = renderWindowPart->GetSelectedPosition(nullptr);
+  auto currentTimePoint = renderWindowPart->GetSelectedTimePoint();
 
   if (m_currentSelectedPosition != currentSelectedPosition
     || m_currentSelectedTimePoint != currentTimePoint
@@ -240,7 +241,10 @@ void QmitkMatchPointRegistrationEvaluator::OnSliceChanged()
 
 void QmitkMatchPointRegistrationEvaluator::OnSettingsChanged(mitk::DataNode*)
 {
-	this->GetRenderWindowPart()->RequestUpdate();
+  auto* renderWindowPart = this->GetRenderWindowPart();
+
+  if (nullptr != renderWindowPart)
+    renderWindowPart->RequestUpdate();
 }
 
 void QmitkMatchPointRegistrationEvaluator::OnEvalBtnPushed()
@@ -282,7 +286,10 @@ void QmitkMatchPointRegistrationEvaluator::OnEvalBtnPushed()
   this->m_Controls.evalSettings->SetNode(this->m_selectedEvalNode);
   this->OnSliceChanged();
 
-  this->GetRenderWindowPart()->RequestUpdate();
+  auto* renderWindowPart = this->GetRenderWindowPart();
+
+  if (nullptr != renderWindowPart)
+    renderWindowPart->RequestUpdate();
 
   this->m_activeEvaluation = true;
   this->CheckInputs();

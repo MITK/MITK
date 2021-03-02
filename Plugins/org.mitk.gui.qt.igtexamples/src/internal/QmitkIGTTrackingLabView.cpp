@@ -310,7 +310,7 @@ void QmitkIGTTrackingLabView::InitializeRegistration()
 
   // let the registration widget know about the slice navigation controllers
   // in the active render window part (crosshair updates)
-  foreach(QmitkRenderWindow* renderWindow, this->GetRenderWindowPart()->GetQmitkRenderWindows().values())
+  foreach(QmitkRenderWindow* renderWindow, this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetQmitkRenderWindows().values())
   {
     m_Controls.m_RegistrationWidget->AddSliceNavigationController(renderWindow->GetSliceNavigationController());
   }
@@ -520,9 +520,9 @@ if(on)
   if (m_Controls.m_NeedleUpInvert->isChecked()) viewUpVector *= -1;
   m_VirtualView->SetViewUpInToolCoordinates(viewUpVector);
 
-  m_VirtualView->SetRenderer(this->GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderer());
+  m_VirtualView->SetRenderer(this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetQmitkRenderWindow("3d")->GetRenderer());
   //next line: better code when this plugin is migrated to mitk::abstractview
-  //m_VirtualView->SetRenderer(mitk::BaseRenderer::GetInstance(this->GetRenderWindowPart()->GetRenderWindow("3d")->GetRenderWindow()));
+  //m_VirtualView->SetRenderer(mitk::BaseRenderer::GetInstance(this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetRenderWindow("3d")->GetRenderWindow()));
   m_CameraView = true;
 
   //make pointer itself invisible

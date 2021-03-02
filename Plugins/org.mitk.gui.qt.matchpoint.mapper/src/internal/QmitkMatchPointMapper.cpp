@@ -559,7 +559,11 @@ void QmitkMatchPointMapper::OnMapResultIsAvailable(mitk::BaseData::Pointer spMap
         spMappedData, job->GetRegistration()->getRegistrationUID(), job->m_InputDataUID,
         job->m_doGeometryRefinement, job->m_InterpolatorLabel);
     this->GetDataStorage()->Add(spMappedNode);
-    this->GetRenderWindowPart()->RequestUpdate();
+
+    auto* renderWindowPart = this->GetRenderWindowPart();
+
+    if (nullptr != renderWindowPart)
+      renderWindowPart->RequestUpdate();
 
     this->CheckInputs();
     this->ConfigureMappingControls();

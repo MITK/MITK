@@ -546,25 +546,25 @@ void QmitkUltrasoundSupport::SetTimerIntervals(int intervalPipeline, int interva
 /* Spacing methods */
 void QmitkUltrasoundSupport::SetXPoint1()
 {
-  m_Xpoint1 = this->GetRenderWindowPart()->GetSelectedPosition();
+  m_Xpoint1 = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetSelectedPosition();
   m_XSpacing = ComputeSpacing(m_Xpoint1, m_Xpoint2, m_Controls->m_XDistance->value());
   m_Controls->m_XSpacing->setText(QString("X Spacing: ") + QString::number(m_XSpacing) + " mm");
 }
 void QmitkUltrasoundSupport::SetXPoint2()
 {
-  m_Xpoint2 = this->GetRenderWindowPart()->GetSelectedPosition();
+  m_Xpoint2 = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetSelectedPosition();
   m_XSpacing = ComputeSpacing(m_Xpoint1, m_Xpoint2, m_Controls->m_XDistance->value());
   m_Controls->m_XSpacing->setText(QString("X Spacing: ") + QString::number(m_XSpacing) + " mm");
 }
 void QmitkUltrasoundSupport::SetYPoint1()
 {
-  m_Ypoint1 = this->GetRenderWindowPart()->GetSelectedPosition();
+  m_Ypoint1 = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetSelectedPosition();
   m_YSpacing = ComputeSpacing(m_Ypoint1, m_Ypoint2, m_Controls->m_YDistance->value());
   m_Controls->m_YSpacing->setText(QString("Y Spacing: ") + QString::number(m_YSpacing) + " mm");
 }
 void QmitkUltrasoundSupport::SetYPoint2()
 {
-  m_Ypoint2 = this->GetRenderWindowPart()->GetSelectedPosition();
+  m_Ypoint2 = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetSelectedPosition();
   m_YSpacing = ComputeSpacing(m_Ypoint1, m_Ypoint2, m_Controls->m_YDistance->value());
   m_Controls->m_YSpacing->setText(QString("Y Spacing: ") + QString::number(m_YSpacing) + " mm");
 }

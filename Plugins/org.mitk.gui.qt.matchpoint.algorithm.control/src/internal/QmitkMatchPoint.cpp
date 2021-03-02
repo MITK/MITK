@@ -725,7 +725,10 @@ void QmitkMatchPoint::OnRegJobFinished()
 {
   this->m_Working = false;
 
-  this->GetRenderWindowPart()->RequestUpdate();
+  auto* renderWindowPart = this->GetRenderWindowPart();
+
+  if (nullptr != renderWindowPart)
+    renderWindowPart->RequestUpdate();
 
   this->CheckInputs();
   this->ConfigureRegistrationControls();
@@ -746,7 +749,11 @@ void QmitkMatchPoint::OnRegResultIsAvailable(mitk::MAPRegistrationWrapper::Point
       QStringLiteral("<b><font color='blue'> Storing registration object in data manager ... </font></b>"));
 
     this->GetDataStorage()->Add(spResultRegistrationNode);
-    this->GetRenderWindowPart()->RequestUpdate();
+
+    auto* renderWindowPart = this->GetRenderWindowPart();
+
+    if (nullptr != renderWindowPart)
+      renderWindowPart->RequestUpdate();
   }
 
   if (m_Controls.m_checkMapEntity->checkState() == Qt::Checked)
@@ -798,10 +805,10 @@ void QmitkMatchPoint::OnMapResultIsAvailable(mitk::BaseData::Pointer spMappedDat
                                          job->m_doGeometryRefinement, job->m_InterpolatorLabel);
   this->GetDataStorage()->Add(spMappedNode);
 
-  if (nullptr != this->GetRenderWindowPart())
-  {
-    this->GetRenderWindowPart()->RequestUpdate();
-  }
+  auto* renderWindowPart = this->GetRenderWindowPart();
+
+  if (nullptr != renderWindowPart)
+    renderWindowPart->RequestUpdate();
 }
 
 void QmitkMatchPoint::OnAlgorithmIterated(QString info, bool hasIterationCount,

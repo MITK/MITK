@@ -717,7 +717,7 @@ void QmitkUltrasoundCalibration::OnDeviceServiceEvent(const ctkServiceEvent even
 
 void QmitkUltrasoundCalibration::OnAddCalibPoint()
 {
-  mitk::Point3D world = this->GetRenderWindowPart()->GetSelectedPosition();
+  auto world = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetSelectedPosition();
 
   this->m_CalibPointsImage->InsertPoint(m_CalibPointsCount, world);
   this->m_CalibPointsTool->InsertPoint(m_CalibPointsCount, this->m_FreezePoint);
@@ -1032,7 +1032,7 @@ void QmitkUltrasoundCalibration::OnPhantomBasedCalibration()
 
 void QmitkUltrasoundCalibration::OnAddEvalTargetPoint()
 {
-  mitk::Point3D world = this->GetRenderWindowPart()->GetSelectedPosition();
+  auto world = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetSelectedPosition();
 
   this->m_EvalPointsImage->InsertPoint(m_EvalPointsImage->GetSize(), world);
   this->m_EvalPointsTool->InsertPoint(m_EvalPointsTool->GetSize(), this->m_FreezePoint);
@@ -1346,7 +1346,7 @@ void QmitkUltrasoundCalibration::OnFreezeClicked()
 
 void QmitkUltrasoundCalibration::OnAddSpacingPoint()
 {
-  mitk::Point3D point = this->GetRenderWindowPart()->GetSelectedPosition();
+  auto point = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetSelectedPosition();
 
   this->m_SpacingPoints->InsertPoint(m_SpacingPointsCount, point);
 

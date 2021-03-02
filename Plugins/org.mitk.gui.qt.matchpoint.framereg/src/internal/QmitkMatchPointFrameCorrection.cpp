@@ -603,7 +603,10 @@ void QmitkMatchPointFrameCorrection::OnRegJobFinished()
 {
   this->m_Working = false;
 
-  this->GetRenderWindowPart()->RequestUpdate();
+  auto* renderWindowPart = this->GetRenderWindowPart();
+
+  if (nullptr != renderWindowPart)
+    renderWindowPart->RequestUpdate();
 
   this->CheckInputs();
   this->ConfigureRegistrationControls();
@@ -621,7 +624,11 @@ void QmitkMatchPointFrameCorrection::OnMapResultIsAvailable(mitk::Image::Pointer
                                          spMappedData.GetPointer(), "", job->m_TargetDataUID, false, job->m_InterpolatorLabel);
 
   this->GetDataStorage()->Add(spResultNode, this->m_spSelectedTargetNode);
-  this->GetRenderWindowPart()->RequestUpdate();
+
+  auto* renderWindowPart = this->GetRenderWindowPart();
+
+  if (nullptr != renderWindowPart)
+    renderWindowPart->RequestUpdate();
 };
 
 void QmitkMatchPointFrameCorrection::OnMapJobError(QString err)

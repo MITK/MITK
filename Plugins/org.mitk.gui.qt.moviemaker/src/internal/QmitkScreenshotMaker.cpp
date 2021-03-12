@@ -326,6 +326,11 @@ void QmitkScreenshotMaker::GenerateMultiplanar3DHighresScreenshot()
   GetCam()->Roll( -2.5 );
   GenerateHR3DAtlasScreenshots(filePath+fileName);
 
+  GetCam()->Roll( 2.5 );
+  // not negative because direction of elevation has flipped
+  GetCam()->Elevation( 94 );
+  GetCam()->Azimuth( -82.5 );
+
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 

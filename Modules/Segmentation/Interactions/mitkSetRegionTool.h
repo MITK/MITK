@@ -56,7 +56,6 @@ namespace mitk
     virtual void OnMousePressed(StateMachineAction *, InteractionEvent *);
     virtual void OnMouseReleased(StateMachineAction *, InteractionEvent *);
     virtual void OnMouseMoved(StateMachineAction *, InteractionEvent *);
-
     int m_PaintingPixelValue;
   };
 

@@ -83,11 +83,15 @@ namespace mitk
 
     /**
     \brief Fills a image (filledImage) into another image (resultImage) by incorporating the rules of LabelSet-Images
+    \param paintingPixelValue the pixelvalue/label that should be used in the result image when filling.
+    \param fillForegroundThreshold The threshold value that decides if a pixel in the filled image counts
+    as foreground (>=fillForegroundThreshold) or not.
     */
     static void FillSliceInSlice(vtkSmartPointer<vtkImageData> filledImage,
                                  vtkSmartPointer<vtkImageData> resultImage,
                                  const Image* image,
-                                 int paintingPixelValue);
+                                 int paintingPixelValue,
+                                 double fillForegroundThreshold = 1.0);
 
     /**
     \brief Move the contour in time step 0 to to a new contour model at the given time step.

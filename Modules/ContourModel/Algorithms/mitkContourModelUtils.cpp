@@ -38,9 +38,9 @@ mitk::ContourModel::Pointer mitk::ContourModelUtils::ProjectContourTo2DSlice(
   projectedContour->Initialize(*contourIn3D);
 
   auto sliceGeometry = slice->GetGeometry();
-  auto numberOfTimesteps = static_cast<TimeStepType>(contourIn3D->GetTimeSteps());
+  const auto numberOfTimesteps = static_cast<TimeStepType>(contourIn3D->GetTimeSteps());
 
-  for (decltype(numberOfTimesteps) t = 0; t < numberOfTimesteps; ++t)
+  for (std::remove_const_t<decltype(numberOfTimesteps)> t = 0; t < numberOfTimesteps; ++t)
   {
     auto iter = contourIn3D->Begin(t);
     auto end = contourIn3D->End(t);
@@ -71,9 +71,9 @@ mitk::ContourModel::Pointer mitk::ContourModelUtils::BackProjectContourFrom2DSli
   auto worldContour = ContourModel::New();
   worldContour->Initialize(*contourIn2D);
 
-  auto numberOfTimesteps = static_cast<TimeStepType>(contourIn2D->GetTimeSteps());
+  const auto numberOfTimesteps = static_cast<TimeStepType>(contourIn2D->GetTimeSteps());
 
-  for (decltype(numberOfTimesteps) t = 0; t < numberOfTimesteps; ++t)
+  for (std::remove_const_t<decltype(numberOfTimesteps)> t = 0; t < numberOfTimesteps; ++t)
   {
     auto iter = contourIn2D->Begin(t);
     auto end = contourIn2D->End(t);
@@ -137,8 +137,8 @@ void mitk::ContourModelUtils::FillContourInSlice(
   const double FOREGROUND_VALUE = 255.0;
   const double BACKGROUND_VALUE = 0.0;
 
-  vtkIdType count = image->GetNumberOfPoints();
-  for (decltype(count) i = 0; i < count; ++i)
+  const vtkIdType count = image->GetNumberOfPoints();
+  for (std::remove_const_t<decltype(count)> i = 0; i < count; ++i)
     image->GetPointData()->GetScalars()->SetTuple1(i, FOREGROUND_VALUE);
 
   auto polyDataToImageStencil = vtkSmartPointer<vtkPolyDataToImageStencil>::New();
@@ -171,7 +171,7 @@ void mitk::ContourModelUtils::FillSliceInSlice(
 
   if (nullptr == labelImage)
   {
-    for (auto i = decltype(numberOfPoints){0}; i < numberOfPoints; ++i)
+    for (std::remove_const_t<decltype(numberOfPoints)> i = 0; i < numberOfPoints; ++i)
     {
       if (fillForegroundThreshold <= filledImage->GetPointData()->GetScalars()->GetTuple1(i))
         resultImage->GetPointData()->GetScalars()->SetTuple1(i, paintingPixelValue);
@@ -183,7 +183,7 @@ void mitk::ContourModelUtils::FillSliceInSlice(
 
     if (paintingPixelValue != backgroundValue)
     {
-      for (auto i = decltype(numberOfPoints){0}; i < numberOfPoints; ++i)
+      for (std::remove_const_t<decltype(numberOfPoints)> i = 0; i < numberOfPoints; ++i)
       {
         const auto filledValue = filledImage->GetPointData()->GetScalars()->GetTuple1(i);
         if (fillForegroundThreshold <= filledValue)
@@ -198,7 +198,7 @@ void mitk::ContourModelUtils::FillSliceInSlice(
     else
     {
       const auto activePixelValue = labelImage->GetActiveLabel(labelImage->GetActiveLayer())->GetValue();
-      for (auto i = decltype(numberOfPoints){0}; i < numberOfPoints; ++i)
+      for (std::remove_const_t<decltype(numberOfPoints)> i = 0; i < numberOfPoints; ++i)
       {
         if (fillForegroundThreshold <= filledImage->GetPointData()->GetScalars()->GetTuple1(i))
         {

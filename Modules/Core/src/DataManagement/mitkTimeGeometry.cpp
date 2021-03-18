@@ -189,51 +189,57 @@ itk::LightObject::Pointer mitk::TimeGeometry::InternalClone() const
   return parent;
 }
 
-bool mitk::Equal(const TimeGeometry &leftHandSide, const TimeGeometry &rightHandSide, ScalarType eps, bool verbose)
+bool mitk::Equal(const TimeGeometry& leftHandSide, const TimeGeometry& rightHandSide, ScalarType eps, bool verbose)
+{
+  return mitk::Equal(leftHandSide, rightHandSide, eps, eps, verbose);
+}
+
+bool mitk::Equal(const TimeGeometry &leftHandSide, const TimeGeometry &rightHandSide, ScalarType coordinateEps,
+    ScalarType directionEps, bool verbose)
 {
   bool result = true;
 
   // Compare BoundingBoxInWorld
-  if (!mitk::Equal(*(leftHandSide.GetBoundingBoxInWorld()), *(rightHandSide.GetBoundingBoxInWorld()), eps, verbose))
+  if (!mitk::Equal(*(leftHandSide.GetBoundingBoxInWorld()), *(rightHandSide.GetBoundingBoxInWorld()), coordinateEps, verbose))
   {
     if (verbose)
     {
       MITK_INFO << "[( TimeGeometry )] BoundingBoxInWorld differs.";
       MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.GetBoundingBoxInWorld()
-                << " : leftHandSide is " << leftHandSide.GetBoundsInWorld() << " and tolerance is " << eps;
+                << " : leftHandSide is " << leftHandSide.GetBoundsInWorld() << " and tolerance is " << coordinateEps;
     }
     result = false;
   }
 
-  if (!mitk::Equal(leftHandSide.CountTimeSteps(), rightHandSide.CountTimeSteps(), eps, verbose))
+  if (!mitk::Equal(leftHandSide.CountTimeSteps(), rightHandSide.CountTimeSteps(), coordinateEps, verbose))
   {
     if (verbose)
     {
       MITK_INFO << "[( TimeGeometry )] CountTimeSteps differs.";
       MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.CountTimeSteps() << " : leftHandSide is "
-                << leftHandSide.CountTimeSteps() << " and tolerance is " << eps;
+                << leftHandSide.CountTimeSteps() << " and tolerance is " << coordinateEps;
     }
     result = false;
   }
 
-  if (!mitk::Equal(leftHandSide.GetMinimumTimePoint(), rightHandSide.GetMinimumTimePoint(), eps, verbose))
+  if (!mitk::Equal(leftHandSide.GetMinimumTimePoint(), rightHandSide.GetMinimumTimePoint(), coordinateEps, verbose))
   {
     if (verbose)
     {
       MITK_INFO << "[( TimeGeometry )] MinimumTimePoint differs.";
       MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.GetMinimumTimePoint()
-                << " : leftHandSide is " << leftHandSide.GetMinimumTimePoint() << " and tolerance is " << eps;
+                << " : leftHandSide is " << leftHandSide.GetMinimumTimePoint() << " and tolerance is " << coordinateEps;
     }
     result = false;
   }
 
-  if (!mitk::Equal(leftHandSide.GetMaximumTimePoint(), rightHandSide.GetMaximumTimePoint(), eps, verbose))
+  if (!mitk::Equal(leftHandSide.GetMaximumTimePoint(), rightHandSide.GetMaximumTimePoint(), coordinateEps, verbose))
   {
     if (verbose)
     {
       MITK_INFO << "[( TimeGeometry )] MaximumTimePoint differs.";
       MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.GetMaximumTimePoint()
-                << " : leftHandSide is " << leftHandSide.GetMaximumTimePoint() << " and tolerance is " << eps;
+                << " : leftHandSide is " << leftHandSide.GetMaximumTimePoint() << " and tolerance is " << coordinateEps;
     }
     result = false;
   }
@@ -243,13 +249,13 @@ bool mitk::Equal(const TimeGeometry &leftHandSide, const TimeGeometry &rightHand
 
   for (mitk::TimeStepType t = 0; t < leftHandSide.CountTimeSteps(); ++t)
   {
-    if (!mitk::Equal(leftHandSide.TimeStepToTimePoint(t), rightHandSide.TimeStepToTimePoint(t), eps, verbose))
+    if (!mitk::Equal(leftHandSide.TimeStepToTimePoint(t), rightHandSide.TimeStepToTimePoint(t), coordinateEps, verbose))
     {
       if (verbose)
       {
         MITK_INFO << "[( TimeGeometry )] TimeStepToTimePoint(" << t << ") differs.";
         MITK_INFO << "rightHandSide is " << setprecision(12) << rightHandSide.TimeStepToTimePoint(t)
-                  << " : leftHandSide is " << leftHandSide.TimeStepToTimePoint(t) << " and tolerance is " << eps;
+                  << " : leftHandSide is " << leftHandSide.TimeStepToTimePoint(t) << " and tolerance is " << coordinateEps;
       }
       result = false;
     }
@@ -281,7 +287,7 @@ bool mitk::Equal(const TimeGeometry &leftHandSide, const TimeGeometry &rightHand
       continue; // next geometry
     }
 
-    if (!mitk::Equal(*leftGeometry, *rightGeometry, eps, verbose))
+    if (!mitk::Equal(*leftGeometry, *rightGeometry, coordinateEps, directionEps, verbose))
     {
       if (verbose)
       {

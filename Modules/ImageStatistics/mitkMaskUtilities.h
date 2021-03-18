@@ -74,10 +74,10 @@ class MaskUtilities: public itk::Object
 
 /** Tolerance used to check if the mask and input image are compatible for
  * coordinate aspects (orgin, size, grid alignment).*/
-constexpr double MASK_SUITABILITY_TOLERANCE_COORDINATE = NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION;
+constexpr double MASK_SUITABILITY_TOLERANCE_COORDINATE = NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION;
 /** Tolerance used to check if the mask and input image are compatible for
  * direction aspects (orientation of mask and image).*/
-constexpr double MASK_SUITABILITY_TOLERANCE_DIRECTION = NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION;
+constexpr double MASK_SUITABILITY_TOLERANCE_DIRECTION = NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION;
 
 }
 

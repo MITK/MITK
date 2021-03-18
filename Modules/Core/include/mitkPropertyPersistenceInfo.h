@@ -32,6 +32,8 @@ namespace mitk
   class MITKCORE_EXPORT PropertyPersistenceInfo : public itk::LightObject
   {
   public:
+    /** Signature specification for functions that can be provided for deserialization of the property.
+     @post The function returns a valid instance derived from mitk::BaseProperty.*/
     using DeserializationFunctionType = std::function<mitk::BaseProperty::Pointer(const std::string &)>;
     using SerializationFunctionType = std::function<std::string(const mitk::BaseProperty *)>;
     using MimeTypeNameType = std::string;

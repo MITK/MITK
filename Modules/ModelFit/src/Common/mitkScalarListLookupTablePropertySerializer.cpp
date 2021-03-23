@@ -121,6 +121,11 @@ MITK_REGISTER_SERIALIZER(ScalarListLookupTablePropertySerializer);
 mitk::BaseProperty::Pointer mitk::PropertyPersistenceDeserialization::deserializeXMLToScalarListLookupTableProperty(
   const std::string &value)
 {
+  if (value.empty())
+  {
+    return mitk::ScalarListLookupTableProperty::New().GetPointer();
+  }
+
   mitk::ScalarListLookupTablePropertySerializer::Pointer lutSerializer = mitk::ScalarListLookupTablePropertySerializer::New();
 
   tinyxml2::XMLDocument doc;

@@ -488,7 +488,7 @@ namespace mitk
 
         if (loadedProp.IsNull())
         {
-          MITK_ERROR << "Property cannot be correctly deserialze and is skipped. Check if data format is valid. Problematic property value string: \"" << value << "\"; Property info used to deserialized: " << info;
+          MITK_ERROR << "Property cannot be correctly deserialized and is skipped. Check if data format is valid. Problematic property value string: \"" << value << "\"; Property info used to deserialized: " << info;
           break;
         }
 

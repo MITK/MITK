@@ -535,6 +535,8 @@ void QmitkLabelSetWidget::OnVisibleButtonClicked()
       ->SetVisible(!GetWorkingImage()->GetLabel(pixelValue, GetWorkingImage()->GetActiveLayer())->GetVisible());
     GetWorkingImage()->GetActiveLabelSet()->UpdateLookupTable(pixelValue);
   }
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkLabelSetWidget::OnColorButtonClicked()

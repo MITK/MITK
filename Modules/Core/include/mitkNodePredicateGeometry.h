@@ -34,18 +34,18 @@ namespace mitk
    the first timestep.
    Evaluates to "false" for unsupported or undefined data objects/geometries.
 
-   On can specify the tolerance/precision of the check via SetCheckPrecision(),
-   SetCheckCoordinatePrecision() or SetCheckDirectionPrecision.
-   @remark The default tolerance for is coordinate checks is defined by
+   One can specify the tolerance/precision of the check via SetCheckPrecision(),
+   SetCheckCoordinatePrecision() or SetCheckDirectionPrecision().
+   @remark The default tolerance for coordinate checks is defined by
    NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION. The default tolerance
-   for is direction checks is defined by
+   for direction checks is defined by
    NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION.
    Both are not as strict as mitk::eps. The reason is,
    that, for the typical use of the node predicate, mitk::eps would be to pedantic, as we
    encounter often rounding differences/errors in real world data sets. For more details,
    see the documentation of the aforementioned constants.
-   We have introduced two different precision values because, difference of the same value are less
-   impactfull for cooardinates than for direction values. Therefore we can relax coordinate checks
+   We have introduced two different precision values because differences are less
+   impactful for coordinates than for direction values. Therefore we can relax coordinate checks
    more then direction checks.
    @ingroup DataStorage */
   class MITKCORE_EXPORT NodePredicateGeometry : public NodePredicateBase

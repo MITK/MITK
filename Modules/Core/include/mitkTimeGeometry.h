@@ -320,7 +320,7 @@ namespace mitk
                              bool verbose);
 
   /**
-  * @brief Equal A function comparing two instances of TimeGeometry for being identical.
+  * @brief Compare two instances of TimeGeometry
   *
   * @ingroup MITKTestingAPI
   *
@@ -330,14 +330,14 @@ namespace mitk
   * If you want to use different tolerance values for different parts of the geometry, feel free to use
   * the other comparison methods and write your own implementation of Equal.
   *
-  * @param rightHandSide Compare this against leftHandSide.
   * @param leftHandSide Compare this against rightHandSide.
+  * @param rightHandSide Compare this against leftHandSide.
   * @param coordinateEps Tolerance for comparison of all spatial and temporal aspects (spacing, origin and grid alignment, time points).
   * You can use mitk::eps in most cases.
   * @param directionEps Tolerance for comparison of all directional aspects (axis). You can use mitk::eps in most cases.
   * @param verbose Flag indicating if the user wants detailed console output or not.
   *
-  * @return True, if all comparison are true. False in any other case.
+  * @return True, if all comparisons are true. False in any other case.
   */
   MITKCORE_EXPORT bool Equal(const mitk::TimeGeometry& leftHandSide,
     const mitk::TimeGeometry& rightHandSide,

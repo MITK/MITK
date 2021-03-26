@@ -53,6 +53,9 @@ if(NOT DEFINED ITK_DIR)
      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-4.13.3.tar.gz
      URL_MD5 d1c10c8288b47577d718a71190444815
      PATCH_COMMAND
+       # 2021/03/26: Only the patch file changed since the last snapshot.
+       # The only purpose of this comment is to change this .cmake file
+       # to make our build system aware of a change.
        ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-4.13.3.patch
      CMAKE_GENERATOR ${gen}
      CMAKE_GENERATOR_PLATFORM ${gen_platform}

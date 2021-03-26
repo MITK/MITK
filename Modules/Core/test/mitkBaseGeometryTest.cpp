@@ -1551,9 +1551,9 @@ public:
     auto newBounds = aDummyGeometryOblique->GetBounds();
     aDummyGeometryOblique->SetImageGeometry(isImage);
 
-    //REMARK: used NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION to compensate rounding errors that
+    //REMARK: used NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION to compensate rounding errors that
     //are interoduced when transforming points/indeces due to the oblique geometry.
-    CPPUNIT_ASSERT(mitk::IsSubGeometry(*aDummyGeometryOblique, *aDummyGeometryOblique, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION, true));
+    CPPUNIT_ASSERT(mitk::IsSubGeometry(*aDummyGeometryOblique, *aDummyGeometryOblique, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION, true));
 
     for (unsigned int i = 0; i < 6; ++i)
     {
@@ -1569,7 +1569,7 @@ public:
       auto legalGeometry = aDummyGeometryOblique->Clone();
       legalGeometry->SetBounds(legalBounds);
 
-      CPPUNIT_ASSERT(mitk::IsSubGeometry(*legalGeometry, *aDummyGeometryOblique, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION, true));
+      CPPUNIT_ASSERT(mitk::IsSubGeometry(*legalGeometry, *aDummyGeometryOblique, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION, true));
     }
 
     for (unsigned int i = 0; i < 6; ++i)
@@ -1586,7 +1586,7 @@ public:
       auto wrongGeometry = aDummyGeometryOblique->Clone();
       wrongGeometry->SetBounds(wrongBounds);
 
-      CPPUNIT_ASSERT(!mitk::IsSubGeometry(*wrongGeometry, *aDummyGeometryOblique, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION, true));
+      CPPUNIT_ASSERT(!mitk::IsSubGeometry(*wrongGeometry, *aDummyGeometryOblique, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION, true));
     }
   }
 
@@ -1621,7 +1621,7 @@ public:
     newBounds[5] = 10;
     smallerGeometry->SetBounds(newBounds);
 
-    //REMARK: used NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION in the following checks
+    //REMARK: used NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION in the following checks
     //to compensate rounding errors that are interoduced when transforming points/indeces
     //due to the oblique geometry.
 
@@ -1636,7 +1636,7 @@ public:
       auto legalGeometry = smallerGeometry->Clone();
       legalGeometry->SetOrigin(legalOrigin);
 
-      CPPUNIT_ASSERT(mitk::IsSubGeometry(*legalGeometry, *aDummyGeometryOblique, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION, true));
+      CPPUNIT_ASSERT(mitk::IsSubGeometry(*legalGeometry, *aDummyGeometryOblique, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION, true));
     }
 
     //legal positive shift
@@ -1650,29 +1650,29 @@ public:
       auto legalGeometry = smallerGeometry->Clone();
       legalGeometry->SetOrigin(legalOrigin);
 
-      CPPUNIT_ASSERT(mitk::IsSubGeometry(*legalGeometry, *aDummyGeometryOblique, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION, true));
+      CPPUNIT_ASSERT(mitk::IsSubGeometry(*legalGeometry, *aDummyGeometryOblique, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION, true));
     }
 
     //wrong negative shift
     for (unsigned int i = 0; i < 3; ++i)
     {
       auto wrongOrigin = smallerGeometry->GetOrigin();
-      wrongOrigin[i] -= 2 * mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION;
+      wrongOrigin[i] -= 2 * mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION;
       auto wrongGeometry = smallerGeometry->Clone();
       wrongGeometry->SetOrigin(wrongOrigin);
 
-      CPPUNIT_ASSERT(!mitk::IsSubGeometry(*wrongGeometry, *aDummyGeometryOblique, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION, true));
+      CPPUNIT_ASSERT(!mitk::IsSubGeometry(*wrongGeometry, *aDummyGeometryOblique, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION, true));
     }
 
     //wrong positive shift
     for (unsigned int i = 0; i < 3; ++i)
     {
       auto wrongOrigin = smallerGeometry->GetOrigin();
-      wrongOrigin[i] += 2 * mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION;
+      wrongOrigin[i] += 2 * mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION;
       auto wrongGeometry = smallerGeometry->Clone();
       wrongGeometry->SetOrigin(wrongOrigin);
 
-      CPPUNIT_ASSERT(!mitk::IsSubGeometry(*wrongGeometry, *aDummyGeometryOblique, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION, true));
+      CPPUNIT_ASSERT(!mitk::IsSubGeometry(*wrongGeometry, *aDummyGeometryOblique, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION, true));
     }
   }
 

@@ -486,6 +486,12 @@ namespace mitk
 
         mitk::BaseProperty::Pointer loadedProp = info->GetDeserializationFunction()(value);
 
+        if (loadedProp.IsNull())
+        {
+          MITK_ERROR << "Property cannot be correctly deserialized and is skipped. Check if data format is valid. Problematic property value string: \"" << value << "\"; Property info used to deserialized: " << info;
+          break;
+        }
+
         image->SetProperty(assumedPropertyName.c_str(), loadedProp);
 
         // Read properties should be persisted unless they are default properties

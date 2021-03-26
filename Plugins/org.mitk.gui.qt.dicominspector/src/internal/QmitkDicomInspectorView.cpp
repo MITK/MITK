@@ -215,8 +215,9 @@ void QmitkDicomInspectorView::OnSliceNavigationControllerDeleted(const itk::Obje
 
 void QmitkDicomInspectorView::ValidateAndSetCurrentPosition()
 {
-  mitk::Point3D currentSelectedPosition = GetRenderWindowPart()->GetSelectedPosition(nullptr);
-  const auto currentSelectedTimePoint = GetRenderWindowPart()->GetSelectedTimePoint();
+  auto* renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN);
+  auto currentSelectedPosition = renderWindowPart->GetSelectedPosition(nullptr);
+  const auto currentSelectedTimePoint = renderWindowPart->GetSelectedTimePoint();
 
   if (m_SelectedPosition != currentSelectedPosition
     || m_SelectedTimePoint != currentSelectedTimePoint

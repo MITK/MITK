@@ -224,7 +224,7 @@ void QmitkUSNavigationMarkerPlacement::ReInitializeSettingsNodesAndImageStream()
 
 void QmitkUSNavigationMarkerPlacement::OnGetCursorPosition()
 {
-  mitk::Point3D centroid = this->GetRenderWindowPart()->GetSelectedPosition();
+  auto centroid = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetSelectedPosition();
   ui->m_CtToUsRegistrationWidget->OnCalculateTRE(centroid);
 }
 

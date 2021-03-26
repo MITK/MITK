@@ -83,7 +83,7 @@ public:
     for (unsigned int i = 0; i < 3; ++i)
     {
       mitk::Vector3D wrongSpacing = m_RefGeometry->GetSpacing();
-      wrongSpacing[i] += mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION * 2;
+      wrongSpacing[i] += mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION * 2;
       auto wrongGeometry = m_RefGeometry->Clone();
       wrongGeometry->SetSpacing(wrongSpacing);
       m_Node->GetData()->SetGeometry(wrongGeometry);
@@ -93,7 +93,7 @@ public:
     for (unsigned int i = 0; i < 3; ++i)
     {
       mitk::Vector3D wrongSpacing = m_RefGeometry->GetSpacing();
-      wrongSpacing[i] -= mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION * 2;
+      wrongSpacing[i] -= mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION * 2;
       auto wrongGeometry = m_RefGeometry->Clone();
       wrongGeometry->SetSpacing(wrongSpacing);
       m_Node->GetData()->SetGeometry(wrongGeometry);
@@ -111,7 +111,7 @@ public:
       for (unsigned int j = 0; j < 3; ++j)
       {
         itk::Matrix<mitk::ScalarType, 3, 3> wrongMatrix = m_RefGeometry->GetIndexToWorldTransform()->GetMatrix();
-        wrongMatrix[i][j] += mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION * 2;
+        wrongMatrix[i][j] += mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION * 2;
         auto wrongGeometry = m_RefGeometry->Clone();
         wrongGeometry->GetIndexToWorldTransform()->SetMatrix(wrongMatrix);
         m_Node->GetData()->SetGeometry(wrongGeometry);
@@ -219,7 +219,7 @@ public:
     for (unsigned int i = 0; i < 3; ++i)
     {
       auto wrongOrigin = smallerGeometry->GetOrigin();
-      wrongOrigin[i] -= 2 * mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION;
+      wrongOrigin[i] -= 2 * mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION;
       auto wrongGeometry = smallerGeometry->Clone();
       wrongGeometry->SetOrigin(wrongOrigin);
       m_Node->GetData()->SetGeometry(wrongGeometry);
@@ -231,7 +231,7 @@ public:
     for (unsigned int i = 0; i < 3; ++i)
     {
       auto wrongOrigin = smallerGeometry->GetOrigin();
-      wrongOrigin[i] += 2 * mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION;
+      wrongOrigin[i] += 2 * mitk::NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION;
       auto wrongGeometry = smallerGeometry->Clone();
       wrongGeometry->SetOrigin(wrongOrigin);
       m_Node->GetData()->SetGeometry(wrongGeometry);

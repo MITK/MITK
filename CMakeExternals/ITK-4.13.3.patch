@@ -38,3 +38,16 @@ index 4e830476a2..b5efeb95a4 100644
  
    /** Dimension of the domain space. */
    itkStaticConstMacro(InputSpaceDimension, unsigned int, NDimensions);
+diff --git a/Modules/ThirdParty/OpenJPEG/src/openjpeg/opj_includes.h b/Modules/ThirdParty/OpenJPEG/src/openjpeg/opj_includes.h
+index e75a220d4d..90d5bf1218 100644
+--- a/Modules/ThirdParty/OpenJPEG/src/openjpeg/opj_includes.h
++++ b/Modules/ThirdParty/OpenJPEG/src/openjpeg/opj_includes.h
+@@ -88,7 +88,7 @@ Most compilers implement their own version of this keyword ...
+ #endif
+ 
+ /* MSVC and Borland C do not have lrintf */
+-#if defined(_MSC_VER) || defined(__BORLANDC__)
++#if (defined(_MSC_VER) && _MSC_VER < 1928) || defined(__BORLANDC__)
+ 
+ /* MSVC 64bits doesn't support _asm */
+ #if !defined(_WIN64)

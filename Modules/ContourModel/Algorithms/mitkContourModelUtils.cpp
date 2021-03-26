@@ -38,9 +38,9 @@ mitk::ContourModel::Pointer mitk::ContourModelUtils::ProjectContourTo2DSlice(
   projectedContour->Initialize(*contourIn3D);
 
   auto sliceGeometry = slice->GetGeometry();
-  auto numberOfTimesteps = static_cast<TimeStepType>(contourIn3D->GetTimeSteps());
+  const auto numberOfTimesteps = static_cast<TimeStepType>(contourIn3D->GetTimeSteps());
 
-  for (decltype(numberOfTimesteps) t = 0; t < numberOfTimesteps; ++t)
+  for (std::remove_const_t<decltype(numberOfTimesteps)> t = 0; t < numberOfTimesteps; ++t)
   {
     auto iter = contourIn3D->Begin(t);
     auto end = contourIn3D->End(t);
@@ -71,9 +71,9 @@ mitk::ContourModel::Pointer mitk::ContourModelUtils::BackProjectContourFrom2DSli
   auto worldContour = ContourModel::New();
   worldContour->Initialize(*contourIn2D);
 
-  auto numberOfTimesteps = static_cast<TimeStepType>(contourIn2D->GetTimeSteps());
+  const auto numberOfTimesteps = static_cast<TimeStepType>(contourIn2D->GetTimeSteps());
 
-  for (decltype(numberOfTimesteps) t = 0; t < numberOfTimesteps; ++t)
+  for (std::remove_const_t<decltype(numberOfTimesteps)> t = 0; t < numberOfTimesteps; ++t)
   {
     auto iter = contourIn2D->Begin(t);
     auto end = contourIn2D->End(t);
@@ -137,8 +137,8 @@ void mitk::ContourModelUtils::FillContourInSlice(
   const double FOREGROUND_VALUE = 255.0;
   const double BACKGROUND_VALUE = 0.0;
 
-  vtkIdType count = image->GetNumberOfPoints();
-  for (decltype(count) i = 0; i < count; ++i)
+  const vtkIdType count = image->GetNumberOfPoints();
+  for (std::remove_const_t<decltype(count)> i = 0; i < count; ++i)
     image->GetPointData()->GetScalars()->SetTuple1(i, FOREGROUND_VALUE);
 
   auto polyDataToImageStencil = vtkSmartPointer<vtkPolyDataToImageStencil>::New();
@@ -164,30 +164,31 @@ void mitk::ContourModelUtils::FillContourInSlice(
 }
 
 void mitk::ContourModelUtils::FillSliceInSlice(
-  vtkSmartPointer<vtkImageData> filledImage, vtkSmartPointer<vtkImageData> resultImage, const Image* image, int paintingPixelValue)
+  vtkSmartPointer<vtkImageData> filledImage, vtkSmartPointer<vtkImageData> resultImage, const Image* image, int paintingPixelValue, double fillForegroundThreshold)
 {
   auto labelImage = dynamic_cast<const LabelSetImage *>(image);
-  auto numberOfPoints = filledImage->GetNumberOfPoints();
+  const auto numberOfPoints = filledImage->GetNumberOfPoints();
 
   if (nullptr == labelImage)
   {
-    for (decltype(numberOfPoints) i = 0; i < numberOfPoints; ++i)
+    for (std::remove_const_t<decltype(numberOfPoints)> i = 0; i < numberOfPoints; ++i)
     {
-      if (1 < filledImage->GetPointData()->GetScalars()->GetTuple1(i))
+      if (fillForegroundThreshold <= filledImage->GetPointData()->GetScalars()->GetTuple1(i))
         resultImage->GetPointData()->GetScalars()->SetTuple1(i, paintingPixelValue);
     }
   }
   else
   {
-    auto backgroundValue = labelImage->GetExteriorLabel()->GetValue();
+    const auto backgroundValue = labelImage->GetExteriorLabel()->GetValue();
 
     if (paintingPixelValue != backgroundValue)
     {
-      for (decltype(numberOfPoints) i = 0; i < numberOfPoints; ++i)
+      for (std::remove_const_t<decltype(numberOfPoints)> i = 0; i < numberOfPoints; ++i)
       {
-        if (1 < filledImage->GetPointData()->GetScalars()->GetTuple1(i))
+        const auto filledValue = filledImage->GetPointData()->GetScalars()->GetTuple1(i);
+        if (fillForegroundThreshold <= filledValue)
         {
-          auto existingValue = resultImage->GetPointData()->GetScalars()->GetTuple1(i);
+          const auto existingValue = resultImage->GetPointData()->GetScalars()->GetTuple1(i);
 
           if (!labelImage->GetLabel(existingValue, labelImage->GetActiveLayer())->GetLocked())
             resultImage->GetPointData()->GetScalars()->SetTuple1(i, paintingPixelValue);
@@ -196,11 +197,10 @@ void mitk::ContourModelUtils::FillSliceInSlice(
     }
     else
     {
-      auto activePixelValue = labelImage->GetActiveLabel(labelImage->GetActiveLayer())->GetValue();
-
-      for (decltype(numberOfPoints) i = 0; i < numberOfPoints; ++i)
+      const auto activePixelValue = labelImage->GetActiveLabel(labelImage->GetActiveLayer())->GetValue();
+      for (std::remove_const_t<decltype(numberOfPoints)> i = 0; i < numberOfPoints; ++i)
       {
-        if (1 < filledImage->GetPointData()->GetScalars()->GetTuple1(i))
+        if (fillForegroundThreshold <= filledImage->GetPointData()->GetScalars()->GetTuple1(i))
         {
           if (resultImage->GetPointData()->GetScalars()->GetTuple1(i) == activePixelValue)
             resultImage->GetPointData()->GetScalars()->SetTuple1(i, paintingPixelValue);

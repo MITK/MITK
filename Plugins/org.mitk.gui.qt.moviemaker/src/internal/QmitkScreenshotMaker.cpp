@@ -147,9 +147,9 @@ void QmitkScreenshotMaker::GenerateScreenshot()
   if (fileName.size()>0)
     m_LastFile = fileName;
 
-  auto renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::IRenderWindowPartStrategy::OPEN);
+  auto* renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN);
 
-  auto renderer = renderWindowPart->GetQmitkRenderWindow(m_Controls->m_DirectionBox->currentText())->GetRenderer();
+  auto* renderer = renderWindowPart->GetQmitkRenderWindow(m_Controls->m_DirectionBox->currentText())->GetRenderer();
   if (renderer == nullptr)
     return;
 
@@ -173,7 +173,7 @@ void QmitkScreenshotMaker::GenerateMultiplanarScreenshots()
   }
 
   //emit StartBlockControls();
-  auto renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::IRenderWindowPartStrategy::OPEN);
+  auto* renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN);
   renderWindowPart->EnableDecorations(false, QStringList{mitk::IRenderWindowPart::DECORATION_CORNER_ANNOTATION});
 
   QString fileName = "/axial.png";
@@ -326,25 +326,31 @@ void QmitkScreenshotMaker::GenerateMultiplanar3DHighresScreenshot()
   GetCam()->Roll( -2.5 );
   GenerateHR3DAtlasScreenshots(filePath+fileName);
 
+  GetCam()->Roll( 2.5 );
+  // not negative because direction of elevation has flipped
+  GetCam()->Elevation( 94 );
+  GetCam()->Azimuth( -82.5 );
+
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkScreenshotMaker::GenerateHR3DAtlasScreenshots(QString fileName, QString filter)
 {
   // only works correctly for 3D RenderWindow
-  auto renderer = this->GetRenderWindowPart()->GetQmitkRenderWindow("3d")->GetRenderer()->GetVtkRenderer();
+  auto* renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN);
+  auto* renderer = renderWindowPart->GetQmitkRenderWindow("3d")->GetRenderer()->GetVtkRenderer();
 
   if (nullptr != renderer)
   {
-    this->GetRenderWindowPart()->EnableDecorations(false);
+    renderWindowPart->EnableDecorations(false);
     this->TakeScreenshot(renderer, this->m_Controls->m_MagFactor->text().toFloat(), fileName, filter);
-    this->GetRenderWindowPart()->EnableDecorations(true);
+    renderWindowPart->EnableDecorations(true);
   }
 }
 
 vtkCamera* QmitkScreenshotMaker::GetCam()
 {
-  mitk::BaseRenderer* renderer = this->GetRenderWindowPart(mitk::WorkbenchUtil::IRenderWindowPartStrategy::OPEN)->GetQmitkRenderWindow("3d")->GetRenderer();
+  auto* renderer = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetQmitkRenderWindow("3d")->GetRenderer();
   vtkCamera* cam = nullptr;
   const mitk::VtkPropRenderer *propRenderer = dynamic_cast<const mitk::VtkPropRenderer * >( renderer );
   if (propRenderer)
@@ -461,7 +467,7 @@ void QmitkScreenshotMaker::TakeScreenshot(vtkRenderer* renderer, unsigned int ma
   double bgcolor[] = {m_BackgroundColor.red()/255.0, m_BackgroundColor.green()/255.0, m_BackgroundColor.blue()/255.0};
   renderer->SetBackground(bgcolor);
 
-  mitk::IRenderWindowPart* renderWindowPart = this->GetRenderWindowPart();
+  mitk::IRenderWindowPart* renderWindowPart = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN);
 
   renderWindowPart->EnableDecorations(false);
 

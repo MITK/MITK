@@ -1009,6 +1009,7 @@ bool mitk::IsSubGeometry(const mitk::BaseGeometry& testGeo,
     result = false;
   }
 
+  //check if the geometry is within or equal to the bounds of reference geomentry.
   for (int i = 0; i<8; ++i)
   {
     auto testCorner = testGeo.GetCornerPoint(i);
@@ -1017,34 +1018,34 @@ bool mitk::IsSubGeometry(const mitk::BaseGeometry& testGeo,
     referenceGeo.WorldToIndex(testCorner, testCornerIndex);
 
     std::bitset<sizeof(int)> bs(i);
-    //To regard the directionEps, we substract or add it to the index elments
+    //To regard the coordinateEps, we substract or add it to the index elements
     //depending on wether it was constructed by a lower or an upper bound value
     //(see implementation of BaseGeometry::GetCorner()).
     if (bs.test(0))
     {
-      testCornerIndex[2] -= directionEps;
+      testCornerIndex[2] -= coordinateEps;
     }
     else
     {
-      testCornerIndex[2] += directionEps;
+      testCornerIndex[2] += coordinateEps;
     }
 
     if (bs.test(1))
     {
-      testCornerIndex[1] -= directionEps;
+      testCornerIndex[1] -= coordinateEps;
     }
     else
     {
-      testCornerIndex[1] += directionEps;
+      testCornerIndex[1] += coordinateEps;
     }
 
     if (bs.test(2))
     {
-      testCornerIndex[0] -= directionEps;
+      testCornerIndex[0] -= coordinateEps;
     }
     else
     {
-      testCornerIndex[0] += directionEps;
+      testCornerIndex[0] += coordinateEps;
     }
 
     isInside = referenceGeo.IsIndexInside(testCornerIndex);

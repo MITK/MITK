@@ -35,11 +35,19 @@ namespace mitk
    the first timestep.
    Evaluates to "false" for unsupported or undefined data objects/geometries.
 
-   On can specify the tolerance/precision of the check via SetCheckPrecision().
-   @remark The default tolerance is the same as for NodePredicateGeometry and therefore not as strict as mitk::eps. The reason is,
-   that, for the typical use of the node predicate, mitk::eps would be to pedantic. We
-   often encounter floating point differences and practically it makes no difference e.g.
-   if two images differ something like 0.000001 mm in size or spacing.
+   One can specify the tolerance/precision of the check via SetCheckPrecision(),
+   SetCheckCoordinatePrecision() or SetCheckDirectionPrecision().
+   @remark The default tolerance for coordinate checks is defined by
+   NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION. The default tolerance
+   for direction checks is defined by
+   NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION.
+   Both are not as strict as mitk::eps. The reason is,
+   that, for the typical use of the node predicate, mitk::eps would be to pedantic, as we
+   encounter often rounding differences/errors in real world data sets. For more details,
+   see the documentation of the aforementioned constants.
+   We have introduced two different precision values because differences are less
+   impactful for coordinates than for direction values. Therefore we can relax coordinate checks
+   more then direction checks.
    @ingroup DataStorage */
   class MITKCORE_EXPORT NodePredicateSubGeometry : public NodePredicateBase
   {
@@ -48,8 +56,14 @@ namespace mitk
     mitkNewMacro1Param(NodePredicateSubGeometry, const BaseGeometry*);
     mitkNewMacro2Param(NodePredicateSubGeometry, const BaseGeometry*, TimePointType);
 
-    itkSetMacro(CheckPrecision, mitk::ScalarType);
-    itkGetMacro(CheckPrecision, mitk::ScalarType);
+    /** Sets CheckCoordinatePrecision and CheckDirectionPrecision to the passed value.*/
+    void SetCheckPrecision(mitk::ScalarType precision);
+
+    itkSetMacro(CheckCoordinatePrecision, mitk::ScalarType);
+    itkGetMacro(CheckCoordinatePrecision, mitk::ScalarType);
+
+    itkSetMacro(CheckDirectionPrecision, mitk::ScalarType);
+    itkGetMacro(CheckDirectionPrecision, mitk::ScalarType);
 
     ~NodePredicateSubGeometry() override;
 
@@ -66,8 +80,10 @@ namespace mitk
     TimePointType m_TimePoint;
     /**Indicates if m_TimePoint should be regarded or always the first timestep should be used.*/
     bool m_UseTimePoint;
-    /**Precision that should be used for the equal checks.*/
-    mitk::ScalarType m_CheckPrecision;
+    /**Precision that should be used for the equal coordinate checks.*/
+    mitk::ScalarType m_CheckCoordinatePrecision;
+    /**Precision that should be used for the equal direction checks.*/
+    mitk::ScalarType m_CheckDirectionPrecision;
   };
 } // namespace mitk
 

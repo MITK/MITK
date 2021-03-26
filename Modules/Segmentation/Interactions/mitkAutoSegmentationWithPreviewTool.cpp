@@ -286,7 +286,7 @@ void mitk::AutoSegmentationWithPreviewTool::TransferImageAtTimeStep(const Image*
         << "; destination pixel type: " << destinationImage->GetPixelType().GetTypeAsString();
     }
 
-    if (!Equal(*(sourceImage->GetGeometry(timeStep)), *(destinationImage->GetGeometry(timeStep)), NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_PRECISION, false))
+    if (!Equal(*(sourceImage->GetGeometry(timeStep)), *(destinationImage->GetGeometry(timeStep)), NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_COORDINATE_PRECISION, NODE_PREDICATE_GEOMETRY_DEFAULT_CHECK_DIRECTION_PRECISION, false))
     {
       mitkThrow() << "Cannot transfer images. Tool is in an invalid state, source image and destination image do not have the same geometry.";
     }

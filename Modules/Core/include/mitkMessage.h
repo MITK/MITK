@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define mitkMessageHIncluded
 
 #include <functional>
-#include <itkSimpleFastMutexLock.h>
+#include <mutex>
 #include <vector>
 
 /**
@@ -375,35 +375,35 @@ namespace mitk
     {
       AbstractDelegate *msgCmd = delegate.Clone();
 
-      m_Mutex.Lock();
+      m_Mutex.lock();
       for (auto iter = m_Listeners.begin(); iter != m_Listeners.end(); ++iter)
       {
         if ((*iter)->operator==(msgCmd))
         {
           delete msgCmd;
-          m_Mutex.Unlock();
+          m_Mutex.unlock();
           return;
         }
       }
       m_Listeners.push_back(msgCmd);
-      m_Mutex.Unlock();
+      m_Mutex.unlock();
     }
 
     void operator+=(const AbstractDelegate &delegate) const { this->AddListener(delegate); }
     void RemoveListener(const AbstractDelegate &delegate) const
     {
-      m_Mutex.Lock();
+      m_Mutex.lock();
       for (auto iter = m_Listeners.begin(); iter != m_Listeners.end(); ++iter)
       {
         if ((*iter)->operator==(&delegate))
         {
           delete *iter;
           m_Listeners.erase(iter);
-          m_Mutex.Unlock();
+          m_Mutex.unlock();
           return;
         }
       }
-      m_Mutex.Unlock();
+      m_Mutex.unlock();
     }
 
     void operator-=(const AbstractDelegate &delegate) const { this->RemoveListener(delegate); }
@@ -421,7 +421,7 @@ namespace mitk
      *  mutable so that AddListener and RemoveListener can modify it regardless of the object's constness.
      */
     mutable ListenerList m_Listeners;
-    mutable itk::SimpleFastMutexLock m_Mutex;
+    mutable std::mutex m_Mutex;
   };
 
   /**
@@ -460,9 +460,9 @@ namespace mitk
       ListenerList listeners;
 
       {
-        this->m_Mutex.Lock();
+        this->m_Mutex.lock();
         listeners.assign(this->m_Listeners.begin(), this->m_Listeners.end());
-        this->m_Mutex.Unlock();
+        this->m_Mutex.unlock();
       }
 
       for (auto iter = listeners.begin(); iter != listeners.end(); ++iter)
@@ -488,9 +488,9 @@ namespace mitk
       ListenerList listeners;
 
       {
-        this->m_Mutex.Lock();
+        this->m_Mutex.lock();
         listeners.assign(this->m_Listeners.begin(), this->m_Listeners.end());
-        this->m_Mutex.Unlock();
+        this->m_Mutex.unlock();
       }
 
       for (auto iter = listeners.begin(); iter != listeners.end(); ++iter)
@@ -516,9 +516,9 @@ namespace mitk
       ListenerList listeners;
 
       {
-        this->m_Mutex.Lock();
+        this->m_Mutex.lock();
         listeners.assign(this->m_Listeners.begin(), this->m_Listeners.end());
-        this->m_Mutex.Unlock();
+        this->m_Mutex.unlock();
       }
 
       for (auto iter = listeners.begin(); iter != listeners.end(); ++iter)
@@ -544,9 +544,9 @@ namespace mitk
       ListenerList listeners;
 
       {
-        this->m_Mutex.Lock();
+        this->m_Mutex.lock();
         listeners.assign(this->m_Listeners.begin(), this->m_Listeners.end());
-        this->m_Mutex.Unlock();
+        this->m_Mutex.unlock();
       }
 
       for (typename ListenerList::iterator iter = listeners.begin(); iter != listeners.end(); ++iter)
@@ -572,9 +572,9 @@ namespace mitk
       ListenerList listeners;
 
       {
-        this->m_Mutex.Lock();
+        this->m_Mutex.lock();
         listeners.assign(this->m_Listeners.begin(), this->m_Listeners.end());
-        this->m_Mutex.Unlock();
+        this->m_Mutex.unlock();
       }
 
       for (typename ListenerList::iterator iter = listeners.begin(); iter != listeners.end(); ++iter)

@@ -605,9 +605,9 @@ namespace mitk
       // Set the necessary information for imageIO
       m_ImageIO->SetNumberOfDimensions(dimension);
       m_ImageIO->SetPixelType(pixelType.GetPixelType());
-      m_ImageIO->SetComponentType(pixelType.GetComponentType() < PixelComponentUserType ?
-                                    static_cast<itk::ImageIOBase::IOComponentType>(pixelType.GetComponentType()) :
-                                    itk::ImageIOBase::UNKNOWNCOMPONENTTYPE);
+      m_ImageIO->SetComponentType(static_cast<int>(pixelType.GetComponentType()) < PixelComponentUserType
+                                    ? pixelType.GetComponentType()
+                                    : itk::IOComponentEnum::UNKNOWNCOMPONENTTYPE);
       m_ImageIO->SetNumberOfComponents(pixelType.GetNumberOfComponents());
 
       itk::ImageIORegion ioRegion(dimension);

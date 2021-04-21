@@ -22,9 +22,6 @@ found in the LICENSE file.
 // VTK
 #include <vtkImageData.h>
 
-// ITK
-#include <itkMutexLockHolder.h>
-
 // Other
 #include <cmath>
 

@@ -47,8 +47,8 @@ namespace itk
 
 namespace mitk
 {
-  static const int PixelUserType = itk::ImageIOBase::MATRIX + 1;
-  static const int PixelComponentUserType = itk::ImageIOBase::DOUBLE + 1;
+  static const int PixelUserType = static_cast<int>(itk::IOPixelEnum::MATRIX) + 1;
+  static const int PixelComponentUserType = static_cast<int>(itk::IOComponentEnum::DOUBLE) + 1;
 
   /**
    * Maps pixel component types (primitive types like int, short, double, etc. and custom
@@ -58,7 +58,7 @@ namespace mitk
   template <typename T>
   struct MapPixelComponentType
   {
-    static const int value = itk::ImageIOBase::MapPixelType<T>::CType;
+    static const itk::IOComponentEnum value = itk::ImageIOBase::MapPixelType<T>::CType;
   };
 
   /**
@@ -171,7 +171,8 @@ namespace mitk
     static const size_t Size = T::ValueType::Length;
   };
 
-  typedef itk::ImageIOBase::IOPixelType itkIOPixelType;
+  typedef itk::IOPixelEnum itkIOPixelType;
+  typedef itk::IOComponentEnum itkIOComponentType;
 
   /** \brief Object for compile-time translation of a composite pixel type into an itk::ImageIOBase::IOPixelType
    * information
@@ -184,7 +185,7 @@ namespace mitk
   template <class T>
   struct MapCompositePixelType
   {
-    static const itkIOPixelType IOCompositeType = itk::ImageIOBase::UNKNOWNPIXELTYPE;
+    static const itkIOPixelType IOCompositeType = itkIOPixelType::UNKNOWNPIXELTYPE;
   };
 
   //------------------------
@@ -194,25 +195,25 @@ namespace mitk
   template <class C>
   struct MapCompositePixelType<itk::RGBPixel<C>>
   {
-    static const itkIOPixelType IOCompositeType = itk::ImageIOBase::RGB;
+    static const itkIOPixelType IOCompositeType = itkIOPixelType::RGB;
   };
 
   template <class C>
   struct MapCompositePixelType<itk::RGBAPixel<C>>
   {
-    static const itkIOPixelType IOCompositeType = itk::ImageIOBase::RGBA;
+    static const itkIOPixelType IOCompositeType = itkIOPixelType::RGBA;
   };
 
   template <class C>
   struct MapCompositePixelType<itk::DiffusionTensor3D<C>>
   {
-    static const itkIOPixelType IOCompositeType = itk::ImageIOBase::DIFFUSIONTENSOR3D;
+    static const itkIOPixelType IOCompositeType = itkIOPixelType::DIFFUSIONTENSOR3D;
   };
 
   template <class C>
   struct MapCompositePixelType<itk::VariableLengthVector<C>>
   {
-    static const itkIOPixelType IOCompositeType = itk::ImageIOBase::VECTOR;
+    static const itkIOPixelType IOCompositeType = itkIOPixelType::VECTOR;
   };
 
   //------------------------
@@ -221,25 +222,25 @@ namespace mitk
   template <class C, unsigned int N>
   struct MapCompositePixelType<itk::Vector<C, N>>
   {
-    static const itkIOPixelType IOCompositeType = itk::ImageIOBase::VECTOR;
+    static const itkIOPixelType IOCompositeType = itkIOPixelType::VECTOR;
   };
 
   template <class C, unsigned int N>
   struct MapCompositePixelType<itk::FixedArray<C, N>>
   {
-    static const itkIOPixelType IOCompositeType = itk::ImageIOBase::COVARIANTVECTOR;
+    static const itkIOPixelType IOCompositeType = itkIOPixelType::COVARIANTVECTOR;
   };
 
   template <class C, unsigned int N>
   struct MapCompositePixelType<itk::CovariantVector<C, N>>
   {
-    static const itkIOPixelType IOCompositeType = itk::ImageIOBase::COVARIANTVECTOR;
+    static const itkIOPixelType IOCompositeType = itkIOPixelType::COVARIANTVECTOR;
   };
 
   template <class C, unsigned int N>
   struct MapCompositePixelType<itk::Matrix<C, N>>
   {
-    static const itkIOPixelType IOCompositeType = itk::ImageIOBase::MATRIX;
+    static const itkIOPixelType IOCompositeType = itkIOPixelType::MATRIX;
   };
 
   /** \brief Object for compile-time translation of a pixel type into an itk::ImageIOBase::IOPixelType information
@@ -255,15 +256,15 @@ namespace mitk
   struct MapPixelType
   {
     static const itkIOPixelType IOPixelType = MapCompositePixelType<T>::IOCompositeType;
-    static const int IOComponentType = MapPixelComponentType<typename GetComponentType<T>::ComponentType>::value;
+    static const itkIOComponentType IOComponentType = MapPixelComponentType<typename GetComponentType<T>::ComponentType>::value;
   };
 
   /** \brief Partial specialization for setting the IOPixelType for primitive types to SCALAR */
   template <class T>
   struct MapPixelType<T, true>
   {
-    static const itkIOPixelType IOPixelType = itk::ImageIOBase::SCALAR;
-    static const int IOComponentType = MapPixelComponentType<T>::value;
+    static const itkIOPixelType IOPixelType = itkIOPixelType::SCALAR;
+    static const itkIOComponentType IOComponentType = MapPixelComponentType<T>::value;
   };
 
 } // end namespace mitk

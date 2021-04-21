@@ -759,15 +759,19 @@ void mitk::BaseGeometry::PrintSelf(std::ostream &os, itk::Indent indent) const
     os << indent << "Center: " << this->GetIndexToWorldTransform()->GetCenter() << std::endl;
     os << indent << "Translation: " << this->GetIndexToWorldTransform()->GetTranslation() << std::endl;
 
-    os << indent << "Inverse: " << std::endl;
-    for (i = 0; i < 3; i++)
+    auto inverse = mitk::AffineTransform3D::New();
+    if (this->GetIndexToWorldTransform()->GetInverse(inverse))
     {
-      os << indent.GetNextIndent();
-      for (j = 0; j < 3; j++)
+      os << indent << "Inverse: " << std::endl;
+      for (i = 0; i < 3; i++)
       {
-        os << this->GetIndexToWorldTransform()->GetInverseMatrix()[i][j] << " ";
+        os << indent.GetNextIndent();
+        for (j = 0; j < 3; j++)
+        {
+          os << inverse->GetMatrix()[i][j] << " ";
+        }
+        os << std::endl;
       }
-      os << std::endl;
     }
 
     // from itk::ScalableAffineTransform

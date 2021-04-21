@@ -489,9 +489,9 @@ vtkLinearTransform *mitk::DataNode::GetVtkTransform(int t) const
   return geometry->GetVtkTransform();
 }
 
-unsigned long mitk::DataNode::GetMTime() const
+itk::ModifiedTimeType mitk::DataNode::GetMTime() const
 {
-  unsigned long time = Superclass::GetMTime();
+  auto time = Superclass::GetMTime();
   if (m_Data.IsNotNull())
   {
     if ((time < m_Data->GetMTime()) || ((m_Data->GetSource().IsNotNull()) && (time < m_Data->GetSource()->GetMTime())))

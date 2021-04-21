@@ -24,7 +24,6 @@ found in the LICENSE file.
 #include <vtkRendererCollection.h>
 
 #include "mitkNumericTypes.h"
-#include <itkAffineGeometryFrame.h>
 #include <itkCommand.h>
 #include <itkScalableAffineTransform.h>
 #include <mitkVtkPropRenderer.h>

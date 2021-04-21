@@ -258,8 +258,8 @@ void Assert_ItkVectorImageImportAndCast_ReturnsTrue()
 
   mitk::Image::Pointer mitkImage = mitk::ImportItkImage(itkImage);
   mitk::PixelType pixelType = mitkImage->GetPixelType();
-  MITK_TEST_CONDITION(pixelType.GetPixelType() == itk::ImageIOBase::VECTOR, "Vector image pixel type")
-  MITK_TEST_CONDITION(pixelType.GetComponentType() == itk::ImageIOBase::SHORT, "Vector image component type")
+  MITK_TEST_CONDITION(pixelType.GetPixelType() == itk::IOPixelEnum::VECTOR, "Vector image pixel type")
+  MITK_TEST_CONDITION(pixelType.GetComponentType() == itk::IOComponentEnum::SHORT, "Vector image component type")
 
   mitk::Image::Pointer mitkImage2;
   mitk::CastToMitkImage(itkImage, mitkImage2);

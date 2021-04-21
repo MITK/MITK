@@ -675,7 +675,7 @@ namespace mitk
     double c2 = (d2 - d1 * N1dN2) / determinant;
 
     Vector3D p = normal * c1 + planeNormal * c2;
-    crossline.GetPoint().GetVnlVector() = p.GetVnlVector();
+    crossline.SetPoint(p);
 
     return true;
   }

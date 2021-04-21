@@ -159,7 +159,7 @@ mitk::PropertyList::~PropertyList()
 /**
  * Consider the list as changed when any of the properties has changed recently.
  */
-unsigned long mitk::PropertyList::GetMTime() const
+itk::ModifiedTimeType mitk::PropertyList::GetMTime() const
 {
   for (auto it = m_Properties.cbegin(); it != m_Properties.cend(); ++it)
   {

@@ -30,7 +30,8 @@ The correct way to create a new plugin is described in \ref NewPluginOnly. Do no
       For eg. `org.mitk.core.ext`. (Refer the `MITK/Plugins` directory)
  <li> *Configure*, again
  <li> *Generate*
- <li> Rebuild the `MITK-build` target using your development environment.
+ <li> Rebuild the `MITK-build` target using your development environment. For eg.  
+      `make -j6`
 </ol>
 
 \subsection CMAKE_FAQ_Question_HowDoIActivateModule I want to use a module, how do I activate it?

@@ -22,12 +22,15 @@ The correct way to create a new plugin is described in \ref NewPluginOnly. Do no
 
 \subsection CMAKE_FAQ_Question_HowDoIActivatePlugin I want to use a plugin, how do I activate it?
 <ol>
- <li> Start %CMake
- <li> Configure
- <li> Set the variable MITK_BUILD_\<Your-plugin-id-here\> to TRUE
- <li> Configure again
- <li> Generate
- <li> Start a build using your development environment
+ <li> Start %CMake in your `/MITK-superbuild/MITK-build`  folder level. For eg.  
+     `cd ~/MITK-superbuild/MITK-build`  
+     `ccmake .` or `cmake-gui .`
+ <li> Optional: *Configure* to see all %CMake variables.
+ <li> Find the variable `MITK_BUILD_<plugin-id>` and activate it. The `<plugin-id>` is the package name of the plugin.  
+      For eg. `org.mitk.core.ext`. (Refer the `MITK/Plugins` directory)
+ <li> *Configure*, again
+ <li> *Generate*
+ <li> Rebuild the `MITK-build` target using your development environment.
 </ol>
 
 \subsection CMAKE_FAQ_Question_HowDoIActivateModule I want to use a module, how do I activate it?

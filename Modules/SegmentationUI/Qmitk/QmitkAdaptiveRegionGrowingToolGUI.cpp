@@ -479,7 +479,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(const itk::Image<TPix
   mitk::ScalarType maxPixelValue = m_Controls.m_ThresholdSlider->maximum();
   mitk::ScalarType minPixelValue = m_Controls.m_ThresholdSlider->minimum();
 
-  if ((m_LOWERTHRESHOLD - 1) > minPixelValue)
+  if ((m_LOWERTHRESHOLD - minPixelValue) >= 1)
   {
     regionGrower->SetLower(m_LOWERTHRESHOLD - 1);
   }
@@ -488,7 +488,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(const itk::Image<TPix
     regionGrower->SetLower(m_LOWERTHRESHOLD);
   }
 
-  if ((m_UPPERTHRESHOLD + 1) < maxPixelValue)
+  if ((maxPixelValue - m_UPPERTHRESHOLD) >= 1)
   {
     regionGrower->SetUpper(m_UPPERTHRESHOLD + 1);
   }

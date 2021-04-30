@@ -21,8 +21,11 @@ found in the LICENSE file.
 #include <mitkProgressBar.h>
 #include <mitkSliceNavigationController.h>
 #include <mitkSurfaceToImageFilter.h>
+#include <mitkImageAccessByItk.h>
 
 #include <QMessageBox>
+
+#include <limits>
 
 namespace
 {
@@ -51,8 +54,8 @@ QmitkImageMaskingWidget::QmitkImageMaskingWidget(mitk::SliceNavigationController
 
   this->EnableButtons(false);
 
-  connect (m_Controls.btnMaskImage, SIGNAL(clicked()), this, SLOT(OnMaskImagePressed()));
-
+  connect(m_Controls.btnMaskImage, SIGNAL(clicked()), this, SLOT(OnMaskImagePressed()));
+  connect(m_Controls.rbnCustom, SIGNAL(toggled(bool)), this, SLOT(OnCustomValueButtonToggled(bool)));
   connect(m_Controls.dataSelectionWidget, SIGNAL(SelectionChanged(unsigned int, const mitk::DataNode*)),
     this, SLOT(OnSelectionChanged(unsigned int, const mitk::DataNode*)));
 
@@ -125,7 +128,20 @@ void QmitkImageMaskingWidget::SelectionControl(unsigned int index, const mitk::D
 
 void QmitkImageMaskingWidget::EnableButtons(bool enable)
 {
+  m_Controls.grpBackgroundValue->setEnabled(enable);
   m_Controls.btnMaskImage->setEnabled(enable);
+}
+
+template<typename TPixel, unsigned int VImageDimension>
+void GetRange(const itk::Image<TPixel, VImageDimension>*, double& bottom, double& top)
+{
+  bottom = std::numeric_limits<TPixel>::lowest();
+  top = std::numeric_limits<TPixel>::max();
+}
+
+void QmitkImageMaskingWidget::OnCustomValueButtonToggled(bool checked)
+{
+  m_Controls.txtCustom->setEnabled(checked);
 }
 
 void QmitkImageMaskingWidget::OnMaskImagePressed()
@@ -169,7 +185,6 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
     {
       resultImage = this->MaskImage( referenceImage, maskImage );
     }
-
   }
 
   //Do Surface-Masking
@@ -225,26 +240,76 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
 
 mitk::Image::Pointer QmitkImageMaskingWidget::MaskImage(mitk::Image::Pointer referenceImage, mitk::Image::Pointer maskImage )
 {
-  mitk::Image::Pointer resultImage(nullptr);
+  mitk::ScalarType backgroundValue = 0.0;
 
-  mitk::MaskImageFilter::Pointer maskFilter = mitk::MaskImageFilter::New();
-  maskFilter->SetInput( referenceImage );
-  maskFilter->SetMask( maskImage );
+  if (m_Controls.rbnMinimum->isChecked())
+  {
+    backgroundValue = referenceImage->GetStatistics()->GetScalarValueMin();
+  }
+  else if (m_Controls.rbnCustom->isChecked())
+  {
+    auto warningTitle = QStringLiteral("Invalid custom pixel value");
+
+    bool ok = false;
+    auto originalBackgroundValue = m_Controls.txtCustom->text().toDouble(&ok);
+
+    if (!ok)
+    {
+      // Input is not even a number
+      QMessageBox::warning(nullptr, warningTitle, "Please enter a valid number as custom pixel value.");
+      return nullptr;
+    }
+    else
+    {
+      // Clamp to the numerical limits of the pixel/component type
+      double bottom, top;
+      AccessByItk_n(referenceImage, GetRange, (bottom, top));
+      backgroundValue = std::max(bottom, std::min(originalBackgroundValue, top));
+
+      // Get rid of decimals for integral numbers
+      auto type = referenceImage->GetPixelType().GetComponentType();
+      if (type != itk::ImageIOBase::FLOAT && type != itk::ImageIOBase::DOUBLE)
+        backgroundValue = std::round(backgroundValue);
+    }
+
+    // Ask the user for permission before correcting their input
+    if (std::abs(originalBackgroundValue - backgroundValue) > 1e-4)
+    {
+      auto warningText = QString(
+        "<p>The custom pixel value <b>%1</b> lies not within the range of valid pixel values for the selected image.</p>"
+        "<p>Apply the closest valid pixel value <b>%2</b> instead?</p>").arg(originalBackgroundValue).arg(backgroundValue);
+
+      auto ret = QMessageBox::warning(
+        nullptr,
+        warningTitle,
+        warningText,
+        QMessageBox::StandardButton::Apply | QMessageBox::StandardButton::Cancel,
+        QMessageBox::StandardButton::Apply);
+
+      if (QMessageBox::StandardButton::Apply != ret)
+        return nullptr;
+
+      m_Controls.txtCustom->setText(QString("%1").arg(backgroundValue));
+    }
+  }
+
+  auto maskFilter = mitk::MaskImageFilter::New();
+  maskFilter->SetInput(referenceImage);
+  maskFilter->SetMask(maskImage);
   maskFilter->OverrideOutsideValueOn();
-  maskFilter->SetOutsideValue( referenceImage->GetStatistics()->GetScalarValueMin() );
+  maskFilter->SetOutsideValue(backgroundValue);
+
   try
   {
     maskFilter->Update();
   }
-  catch(itk::ExceptionObject& excpt)
+  catch(const itk::ExceptionObject& e)
   {
-    MITK_ERROR << excpt.GetDescription();
+    MITK_ERROR << e.GetDescription();
     return nullptr;
   }
 
-  resultImage = maskFilter->GetOutput();
-
-  return resultImage;
+  return maskFilter->GetOutput();
 }
 
 mitk::Image::Pointer QmitkImageMaskingWidget::ConvertSurfaceToImage( mitk::Image::Pointer image, mitk::Surface::Pointer surface )

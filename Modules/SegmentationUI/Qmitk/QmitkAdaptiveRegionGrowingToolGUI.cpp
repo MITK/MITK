@@ -476,8 +476,27 @@ void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(const itk::Image<TPix
   regionGrower->AddSeed(seedIndex);
   // In some cases we have to subtract 1 for the lower threshold and add 1 to the upper.
   // Otherwise no region growing is done. Maybe a bug in the ConnectiveAdaptiveThresholdFilter
-  regionGrower->SetLower(m_LOWERTHRESHOLD - 1);
-  regionGrower->SetUpper(m_UPPERTHRESHOLD + 1);
+  mitk::ScalarType maxPixelValue = m_Controls.m_ThresholdSlider->maximum();
+  mitk::ScalarType minPixelValue = m_Controls.m_ThresholdSlider->minimum();
+
+  if ((m_LOWERTHRESHOLD - minPixelValue) >= 1)
+  {
+    regionGrower->SetLower(m_LOWERTHRESHOLD - 1);
+  }
+  else
+  {
+    regionGrower->SetLower(m_LOWERTHRESHOLD);
+  }
+
+  if ((maxPixelValue - m_UPPERTHRESHOLD) >= 1)
+  {
+    regionGrower->SetUpper(m_UPPERTHRESHOLD + 1);
+  }
+  else
+  {
+    regionGrower->SetUpper(m_UPPERTHRESHOLD);
+  }
+
 
   try
   {

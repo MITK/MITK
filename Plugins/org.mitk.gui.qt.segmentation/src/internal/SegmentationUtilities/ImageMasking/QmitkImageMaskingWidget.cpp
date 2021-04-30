@@ -248,29 +248,49 @@ mitk::Image::Pointer QmitkImageMaskingWidget::MaskImage(mitk::Image::Pointer ref
   }
   else if (m_Controls.rbnCustom->isChecked())
   {
+    auto warningTitle = QStringLiteral("Invalid custom pixel value");
+
     bool ok = false;
-    backgroundValue = m_Controls.txtCustom->text().toDouble(&ok);
+    auto originalBackgroundValue = m_Controls.txtCustom->text().toDouble(&ok);
 
     if (!ok)
     {
-      // Use zero as default if input is invalid
-      backgroundValue = 0.0;
+      // Input is not even a number
+      QMessageBox::warning(nullptr, warningTitle, "Please enter a valid number as custom pixel value.");
+      return nullptr;
     }
     else
     {
       // Clamp to the numerical limits of the pixel/component type
       double bottom, top;
       AccessByItk_n(referenceImage, GetRange, (bottom, top));
-      backgroundValue = std::max(bottom, std::min(backgroundValue, top));
+      backgroundValue = std::max(bottom, std::min(originalBackgroundValue, top));
 
       // Get rid of decimals for integral numbers
       auto type = referenceImage->GetPixelType().GetComponentType();
       if (type != itk::ImageIOBase::FLOAT && type != itk::ImageIOBase::DOUBLE)
-        backgroundValue = std::floor(backgroundValue);
+        backgroundValue = std::round(backgroundValue);
     }
 
-    // Sync potential changes of the custom value
-    m_Controls.txtCustom->setText(QString("%1").arg(backgroundValue));
+    // Ask the user for permission before correcting their input
+    if (std::abs(originalBackgroundValue - backgroundValue) > 1e-4)
+    {
+      auto warningText = QString(
+        "<p>The custom pixel value <b>%1</b> lies not within the range of valid pixel values for the selected image.</p>"
+        "<p>Apply the closest valid pixel value <b>%2</b> instead?</p>").arg(originalBackgroundValue).arg(backgroundValue);
+
+      auto ret = QMessageBox::warning(
+        nullptr,
+        warningTitle,
+        warningText,
+        QMessageBox::StandardButton::Apply | QMessageBox::StandardButton::Cancel,
+        QMessageBox::StandardButton::Apply);
+
+      if (QMessageBox::StandardButton::Apply != ret)
+        return nullptr;
+
+      m_Controls.txtCustom->setText(QString("%1").arg(backgroundValue));
+    }
   }
 
   auto maskFilter = mitk::MaskImageFilter::New();

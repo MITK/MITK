@@ -54,8 +54,7 @@ The result will be an image containing only the pixels that are covered by the r
 
 The default background pixel value is zero.
 It can be changed to the minimum existing pixel value of the image or to a custom pixel value.
-If the custom pixel value is invalid, it will be replaced with zero.
-If the custom pixel value is out of the valid bounds of the pixel type, it is clamped accordingly.
+If the custom pixel value is out of the valid bounds of the pixel type, it is optionally clamped accordingly.
 
 \imageMacro{QmitkSegmentationUtilities_ImageMasking.png,"Image masking",6.00}
 

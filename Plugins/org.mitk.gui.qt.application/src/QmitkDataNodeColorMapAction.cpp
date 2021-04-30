@@ -126,14 +126,11 @@ void QmitkDataNodeColorMapAction::OnActionTriggered(bool /*checked*/)
     renderWindowSpecificLuT->SetType(activatedItem);
     dataNode->SetProperty("LookupTable", mitk::LookupTableProperty::New(renderWindowSpecificLuT), baseRenderer);
 
-    if (mitk::LookupTable::LookupTableType::MULTILABEL == lookupTable->GetActiveType())
-    {
-      // special case: multilabel => set the level window to include the whole pixel range
-      UseWholePixelRange(dataNode);
-    }
-
     mitk::RenderingModeProperty::Pointer renderingMode = dynamic_cast<mitk::RenderingModeProperty*>(dataNode->GetProperty("Image Rendering.Mode", baseRenderer));
-    renderingMode->SetValue(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR);
+
+    renderingMode->SetValue(mitk::LookupTable::LookupTableType::MULTILABEL != renderWindowSpecificLuT->GetActiveType()
+      ? mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR
+      : mitk::RenderingModeProperty::LOOKUPTABLE_COLOR);
 
     if (nullptr == baseRenderer)
     {
@@ -143,16 +140,5 @@ void QmitkDataNodeColorMapAction::OnActionTriggered(bool /*checked*/)
     {
       mitk::RenderingManager::GetInstance()->RequestUpdate(baseRenderer->GetRenderWindow());
     }
-  }
-}
-
-void QmitkDataNodeColorMapAction::UseWholePixelRange(mitk::DataNode* node)
-{
-  auto image = dynamic_cast<mitk::Image*>(node->GetData());
-  if (nullptr != image)
-  {
-    mitk::LevelWindow levelWindow;
-    levelWindow.SetToImageRange(image);
-    node->SetLevelWindow(levelWindow);
   }
 }

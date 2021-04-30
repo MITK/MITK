@@ -53,7 +53,6 @@ mitk::LevelWindowManager::~LevelWindowManager()
     m_IsPropertyModifiedTagSet = false;
   }
 
-  // clear both observer maps
   this->ClearPropObserverLists();
 }
 
@@ -62,7 +61,7 @@ void mitk::LevelWindowManager::SetDataStorage(DataStorage *ds)
   if (ds == nullptr)
     return;
 
-  /* remove listeners of old DataStorage */
+  // remove listeners of old DataStorage
   if (m_DataStorage.IsNotNull())
   {
     m_DataStorage->AddNodeEvent.RemoveListener(
@@ -71,14 +70,14 @@ void mitk::LevelWindowManager::SetDataStorage(DataStorage *ds)
       MessageDelegate1<LevelWindowManager, const DataNode *>(this, &LevelWindowManager::DataStorageRemovedNode));
   }
 
-  /* register listener for new DataStorage */
-  m_DataStorage = ds; // register
+  // register listener for new DataStorage
+  m_DataStorage = ds;
   m_DataStorage->AddNodeEvent.AddListener(
     MessageDelegate1<LevelWindowManager, const DataNode *>(this, &LevelWindowManager::DataStorageAddedNode));
   m_DataStorage->RemoveNodeEvent.AddListener(
     MessageDelegate1<LevelWindowManager, const DataNode *>(this, &LevelWindowManager::DataStorageRemovedNode));
 
-  this->DataStorageAddedNode(); // update us with new DataStorage
+  this->DataStorageAddedNode();
 }
 
 mitk::DataStorage *mitk::LevelWindowManager::GetDataStorage()
@@ -123,6 +122,7 @@ void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost, const DataN
       continue;
     }
 
+    // reset the "imageForLevelWindow" of each node
     m_LevelWindowMutex = true;
     node->SetBoolProperty("imageForLevelWindow", false);
     m_LevelWindowMutex = false;
@@ -195,6 +195,7 @@ void mitk::LevelWindowManager::SetSelectedImages(bool selectedImagesMode, const 
       continue;
     }
 
+    // reset the "imageForLevelWindow" of each node
     m_LevelWindowMutex = true;
     node->SetBoolProperty("imageForLevelWindow", false);
     m_LevelWindowMutex = false;
@@ -467,7 +468,7 @@ void mitk::LevelWindowManager::DataStorageAddedNode(const DataNode *)
   // update observers with new data storage
   this->UpdateObservers();
 
-  // Initialize LevelWindowsManager to new image
+  // initialize LevelWindowManager to new image
   this->SetAutoTopMostImage(true);
 
   // check if everything is still ok
@@ -579,8 +580,8 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::LevelWindowManager::GetRelev
 
 void mitk::LevelWindowManager::UpdateObservers()
 {
-  this->ClearPropObserverLists();  // remove old observers
-  this->CreatePropObserverLists(); // create new observer lists
+  this->ClearPropObserverLists();
+  this->CreatePropObserverLists();
 }
 
 void mitk::LevelWindowManager::ClearPropObserverLists()
@@ -630,12 +631,12 @@ void mitk::LevelWindowManager::ClearPropObserverLists()
 
 void mitk::LevelWindowManager::CreatePropObserverLists()
 {
-  if (m_DataStorage.IsNull()) // check if data storage is set
+  if (m_DataStorage.IsNull())
   {
     mitkThrow() << "DataStorage not set";
   }
 
-  /* add observers for all relevant nodes */
+  // add observers for all relevant nodes
   DataStorage::SetOfObjects::ConstPointer all = this->GetRelevantNodes();
   for (DataStorage::SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
   {
@@ -644,21 +645,18 @@ void mitk::LevelWindowManager::CreatePropObserverLists()
       continue;
     }
 
-    /* register listener for changes in visible property */
     itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command =
       itk::ReceptorMemberCommand<LevelWindowManager>::New();
     command->SetCallbackFunction(this, &LevelWindowManager::Update);
     unsigned long visIdx = it->Value()->GetProperty("visible")->AddObserver(itk::ModifiedEvent(), command);
     m_ObserverToVisibleProperty[PropDataPair(visIdx, it->Value())] = it->Value()->GetProperty("visible");
 
-    /* register listener for changes in layer property */
     itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command2 =
       itk::ReceptorMemberCommand<LevelWindowManager>::New();
     command2->SetCallbackFunction(this, &LevelWindowManager::Update);
     unsigned long layerIdx = it->Value()->GetProperty("layer")->AddObserver(itk::ModifiedEvent(), command2);
     m_ObserverToLayerProperty[PropDataPair(layerIdx, it->Value())] = it->Value()->GetProperty("layer");
 
-    /* register listener for changes in layer property */
     itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command3 =
       itk::ReceptorMemberCommand<LevelWindowManager>::New();
     command3->SetCallbackFunction(this, &LevelWindowManager::Update);

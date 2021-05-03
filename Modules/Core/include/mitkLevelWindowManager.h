@@ -203,7 +203,7 @@ namespace mitk
     bool m_SelectedImagesMode;
     unsigned long m_PropertyModifiedTag;
     Image *m_CurrentImage;
-    std::vector<DataNode::Pointer> m_RelevantDataNodes;
+    std::vector<DataNode::Pointer> m_DataNodesForLevelWindow;
     bool m_IsPropertyModifiedTagSet;
     bool m_LevelWindowMutex;
   };

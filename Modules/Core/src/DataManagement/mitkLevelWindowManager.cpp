@@ -212,7 +212,7 @@ void mitk::LevelWindowManager::SetSelectedImages(bool selectedImagesMode, const 
     }
 
     m_LevelWindowProperty = dynamic_cast<LevelWindowProperty*>(node->GetProperty("levelwindow"));
-    m_RelevantDataNodes.push_back(node);
+    m_DataNodesForLevelWindow.push_back(node);
     lastSelectedNode = node;
   }
 
@@ -265,7 +265,7 @@ void mitk::LevelWindowManager::Update(const itk::EventObject &)
     return;
   }
 
-  m_RelevantDataNodes.clear();
+  m_DataNodesForLevelWindow.clear();
   if (m_AutoTopMost)
   {
     this->SetAutoTopMostImage(true);
@@ -361,7 +361,7 @@ void mitk::LevelWindowManager::UpdateSelected(const itk::EventObject &)
     return;
   }
 
-  m_RelevantDataNodes.clear();
+  m_DataNodesForLevelWindow.clear();
   if (m_SelectedImagesMode)
   {
     this->SetSelectedImages(true);
@@ -429,7 +429,7 @@ void mitk::LevelWindowManager::SetLevelWindow(const LevelWindow &levelWindow)
   }
 
   m_LevelWindowProperty->SetLevelWindow(levelWindow);
-  for (const auto &dataNode : m_RelevantDataNodes)
+  for (const auto &dataNode : m_DataNodesForLevelWindow)
   {
     auto levelWindowProperty = dynamic_cast<LevelWindowProperty *>(dataNode->GetProperty("levelwindow"));
     if (nullptr == levelWindowProperty)

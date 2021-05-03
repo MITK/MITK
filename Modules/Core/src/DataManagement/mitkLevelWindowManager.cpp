@@ -407,8 +407,7 @@ void mitk::LevelWindowManager::SetLevelWindowProperty(LevelWindowProperty::Point
 
   m_LevelWindowProperty = levelWindowProperty;
 
-  itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command =
-    itk::ReceptorMemberCommand<LevelWindowManager>::New(); // register listener for new property
+  auto command = itk::ReceptorMemberCommand<LevelWindowManager>::New(); // register listener for new property
   command->SetCallbackFunction(this, &LevelWindowManager::OnPropertyModified);
   m_PropertyModifiedTag = m_LevelWindowProperty->AddObserver(itk::ModifiedEvent(), command);
   m_IsPropertyModifiedTagSet = true;
@@ -516,7 +515,7 @@ void mitk::LevelWindowManager::DataStorageRemovedNode(const DataNode *removedNod
   }
   else
   {
-    NodePredicateProperty::Pointer property = NodePredicateProperty::New("levelwindow", m_LevelWindowProperty);
+    auto property = NodePredicateProperty::New("levelwindow", m_LevelWindowProperty);
     DataNode *n = m_DataStorage->GetNode(property);
     if (n == nullptr || m_AutoTopMost) // if node was deleted, change our behavior to AutoTopMost, if AutoTopMost is
                                        // true change level window to topmost node
@@ -558,15 +557,15 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::LevelWindowManager::GetRelev
     return DataStorage::SetOfObjects::ConstPointer(DataStorage::SetOfObjects::New());
   }
 
-  NodePredicateProperty::Pointer notBinary = NodePredicateProperty::New("binary", BoolProperty::New(false));
-  NodePredicateProperty::Pointer hasLevelWindow = NodePredicateProperty::New("levelwindow", nullptr);
+  auto notBinary = NodePredicateProperty::New("binary", BoolProperty::New(false));
+  auto hasLevelWindow = NodePredicateProperty::New("levelwindow", nullptr);
 
-  NodePredicateDataType::Pointer isImage = NodePredicateDataType::New("Image");
-  NodePredicateDataType::Pointer isDImage = NodePredicateDataType::New("DiffusionImage");
-  NodePredicateDataType::Pointer isTImage = NodePredicateDataType::New("TensorImage");
-  NodePredicateDataType::Pointer isOdfImage = NodePredicateDataType::New("OdfImage");
-  NodePredicateDataType::Pointer isShImage = NodePredicateDataType::New("ShImage");
-  NodePredicateOr::Pointer predicateTypes = NodePredicateOr::New();
+  auto isImage = NodePredicateDataType::New("Image");
+  auto isDImage = NodePredicateDataType::New("DiffusionImage");
+  auto isTImage = NodePredicateDataType::New("TensorImage");
+  auto isOdfImage = NodePredicateDataType::New("OdfImage");
+  auto isShImage = NodePredicateDataType::New("ShImage");
+  auto predicateTypes = NodePredicateOr::New();
   predicateTypes->AddPredicate(isImage);
   predicateTypes->AddPredicate(isDImage);
   predicateTypes->AddPredicate(isTImage);
@@ -651,20 +650,17 @@ void mitk::LevelWindowManager::CreatePropertyObserverMaps()
       continue;
     }
 
-    itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command =
-      itk::ReceptorMemberCommand<LevelWindowManager>::New();
+    auto command = itk::ReceptorMemberCommand<LevelWindowManager>::New();
     command->SetCallbackFunction(this, &LevelWindowManager::Update);
     unsigned long visIdx = node->GetProperty("visible")->AddObserver(itk::ModifiedEvent(), command);
     m_ObserverToVisibleProperty[PropDataPair(visIdx, node)] = node->GetProperty("visible");
 
-    itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command2 =
-      itk::ReceptorMemberCommand<LevelWindowManager>::New();
+    auto command2 = itk::ReceptorMemberCommand<LevelWindowManager>::New();
     command2->SetCallbackFunction(this, &LevelWindowManager::Update);
     unsigned long layerIdx = node->GetProperty("layer")->AddObserver(itk::ModifiedEvent(), command2);
     m_ObserverToLayerProperty[PropDataPair(layerIdx, node)] = node->GetProperty("layer");
 
-    itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command3 =
-      itk::ReceptorMemberCommand<LevelWindowManager>::New();
+   auto command3 = itk::ReceptorMemberCommand<LevelWindowManager>::New();
     command3->SetCallbackFunction(this, &LevelWindowManager::Update);
     BaseProperty::Pointer imageRenderingMode = node->GetProperty("Image Rendering.Mode");
     if (imageRenderingMode.IsNotNull())
@@ -673,8 +669,7 @@ void mitk::LevelWindowManager::CreatePropertyObserverMaps()
       m_ObserverToRenderingModeProperty[PropDataPair(rendIdx, node)] = imageRenderingMode.GetPointer();
     }
 
-    itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command4 =
-      itk::ReceptorMemberCommand<LevelWindowManager>::New();
+    auto command4 = itk::ReceptorMemberCommand<LevelWindowManager>::New();
     command4->SetCallbackFunction(this, &LevelWindowManager::RecalculateLevelWindowForSelectedComponent);
     BaseProperty::Pointer displayedImageComponent = node->GetProperty("Image.Displayed Component");
     if (displayedImageComponent.IsNotNull())
@@ -683,8 +678,7 @@ void mitk::LevelWindowManager::CreatePropertyObserverMaps()
       m_ObserverToDisplayedComponentProperty[PropDataPair(dispIdx, node)] = displayedImageComponent.GetPointer();
     }
 
-    itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command5 =
-      itk::ReceptorMemberCommand<LevelWindowManager>::New();
+    auto command5 = itk::ReceptorMemberCommand<LevelWindowManager>::New();
     command5->SetCallbackFunction(this, &LevelWindowManager::Update);
     BaseProperty::Pointer imgForLvlWin = node->GetProperty("imageForLevelWindow");
     if (imgForLvlWin.IsNull())
@@ -695,8 +689,7 @@ void mitk::LevelWindowManager::CreatePropertyObserverMaps()
     unsigned long lvlWinIdx = imgForLvlWin->AddObserver(itk::ModifiedEvent(), command5);
     m_ObserverToLevelWindowImageProperty[PropDataPair(lvlWinIdx, node)] = node->GetProperty("imageForLevelWindow");
 
-    itk::ReceptorMemberCommand<LevelWindowManager>::Pointer command6 =
-      itk::ReceptorMemberCommand<LevelWindowManager>::New();
+    auto command6 = itk::ReceptorMemberCommand<LevelWindowManager>::New();
     command6->SetCallbackFunction(this, &LevelWindowManager::UpdateSelected);
     BaseProperty::Pointer selectedDataNode = node->GetProperty("selected");
     if (selectedDataNode.IsNull())

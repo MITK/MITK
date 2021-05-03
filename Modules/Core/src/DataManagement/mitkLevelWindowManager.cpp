@@ -423,20 +423,23 @@ void mitk::LevelWindowManager::SetLevelWindowProperty(LevelWindowProperty::Point
 
 void mitk::LevelWindowManager::SetLevelWindow(const LevelWindow &levelWindow)
 {
-  if (m_LevelWindowProperty.IsNotNull())
+  if (m_LevelWindowProperty.IsNull())
   {
-    m_LevelWindowProperty->SetLevelWindow(levelWindow);
-    for (const auto &dataNode : m_RelevantDataNodes)
-    {
-      auto levelWindowProperty = dynamic_cast<LevelWindowProperty *>(dataNode->GetProperty("levelwindow"));
-      if (nullptr == levelWindowProperty)
-      {
-        continue;
-      }
-
-      levelWindowProperty->SetLevelWindow(levelWindow);
-    }
+    return;
   }
+
+  m_LevelWindowProperty->SetLevelWindow(levelWindow);
+  for (const auto &dataNode : m_RelevantDataNodes)
+  {
+    auto levelWindowProperty = dynamic_cast<LevelWindowProperty *>(dataNode->GetProperty("levelwindow"));
+    if (nullptr == levelWindowProperty)
+    {
+      continue;
+    }
+
+    levelWindowProperty->SetLevelWindow(levelWindow);
+  }
+
   this->Modified();
 }
 

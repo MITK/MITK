@@ -201,8 +201,6 @@ namespace mitk
 
     bool m_AutoTopMost;
     bool m_SelectedImagesMode;
-    unsigned long m_ObserverTag;
-    bool m_IsObserverTagSet;
     unsigned long m_PropertyModifiedTag;
     Image *m_CurrentImage;
     std::vector<DataNode::Pointer> m_RelevantDataNodes;

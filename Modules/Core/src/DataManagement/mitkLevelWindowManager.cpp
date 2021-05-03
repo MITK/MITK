@@ -53,12 +53,12 @@ mitk::LevelWindowManager::~LevelWindowManager()
     m_IsPropertyModifiedTagSet = false;
   }
 
-  this->ClearPropObserverLists();
+  this->ClearPropertyObserverMaps();
 }
 
-void mitk::LevelWindowManager::SetDataStorage(DataStorage *ds)
+void mitk::LevelWindowManager::SetDataStorage(DataStorage *dataStorage)
 {
-  if (ds == nullptr)
+  if (nullptr == dataStorage)
     return;
 
   // remove listeners of old DataStorage
@@ -71,7 +71,7 @@ void mitk::LevelWindowManager::SetDataStorage(DataStorage *ds)
   }
 
   // register listener for new DataStorage
-  m_DataStorage = ds;
+  m_DataStorage = dataStorage;
   m_DataStorage->AddNodeEvent.AddListener(
     MessageDelegate1<LevelWindowManager, const DataNode *>(this, &LevelWindowManager::DataStorageAddedNode));
   m_DataStorage->RemoveNodeEvent.AddListener(
@@ -580,11 +580,11 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::LevelWindowManager::GetRelev
 
 void mitk::LevelWindowManager::UpdateObservers()
 {
-  this->ClearPropObserverLists();
-  this->CreatePropObserverLists();
+  this->ClearPropertyObserverMaps();
+  this->CreatePropertyObserverMaps();
 }
 
-void mitk::LevelWindowManager::ClearPropObserverLists()
+void mitk::LevelWindowManager::ClearPropertyObserverMaps()
 {
   for (auto iter = m_ObserverToVisibleProperty.begin(); iter != m_ObserverToVisibleProperty.end(); ++iter)
   {
@@ -629,7 +629,7 @@ void mitk::LevelWindowManager::ClearPropObserverLists()
   m_ObserverToSelectedProperty.clear();
 }
 
-void mitk::LevelWindowManager::CreatePropObserverLists()
+void mitk::LevelWindowManager::CreatePropertyObserverMaps()
 {
   if (m_DataStorage.IsNull())
   {

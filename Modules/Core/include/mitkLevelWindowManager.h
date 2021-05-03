@@ -54,7 +54,7 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-    void SetDataStorage(DataStorage *ds);
+    void SetDataStorage(DataStorage* dataStorage);
     DataStorage *GetDataStorage();
 
     /**
@@ -129,18 +129,18 @@ namespace mitk
      * @throw mitk::Exception Throws an exception if something is wrong, e.g. if the number of observers differs from
      *        the number of nodes.
      */
-    void DataStorageAddedNode(const DataNode *n = nullptr);
+    void DataStorageAddedNode(const DataNode *dataNode = nullptr);
     /**
      * @brief This method is called when a node is removed from the data storage.
      *        A listener on the data storage is used to call this method automatically before a node will be removed.
      * @throw mitk::Exception Throws an exception if something is wrong, e.g. if the number of observers differs from
      *        the number of nodes.
      */
-    void DataStorageRemovedNode(const DataNode *removedNode = nullptr);
+    void DataStorageRemovedNode(const DataNode *dataNode = nullptr);
     /**
     * @brief Change notifications from mitkLevelWindowProperty.
     */
-    void OnPropertyModified(const itk::EventObject &e);
+    void OnPropertyModified(const itk::EventObject&);
     /**
     * @brief Return the currently active image.
     *
@@ -190,9 +190,9 @@ namespace mitk
     // Ignores nodes which are marked as to be deleted.
     void UpdateObservers();
     // Internal help method to clear observer maps.
-    void ClearPropObserverLists();
+    void ClearPropertyObserverMaps();
     // Internal help method to create observer maps.
-    void CreatePropObserverLists();
+    void CreatePropertyObserverMaps();
 
     bool IgnoreNode(const DataNode* dataNode);
 

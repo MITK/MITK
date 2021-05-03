@@ -711,13 +711,6 @@ void mitk::LevelWindowManager::CreatePropertyObserverMaps()
 
 bool mitk::LevelWindowManager::HasLevelWindowRenderingMode(DataNode *dataNode)
 {
-  LevelWindowProperty::Pointer levelWindowProperty =
-    dynamic_cast<LevelWindowProperty*>(dataNode->GetProperty("levelwindow"));
-  if (levelWindowProperty.IsNull())
-  {
-    return false;
-  }
-
   RenderingModeProperty::Pointer mode =
     dynamic_cast<RenderingModeProperty*>(dataNode->GetProperty("Image Rendering.Mode"));
 

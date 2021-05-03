@@ -194,7 +194,7 @@ namespace mitk
     // Internal help method to create observer maps.
     void CreatePropertyObserverMaps();
 
-    bool IgnoreNode(const DataNode* dataNode);
+    bool HasLevelWindowRenderingMode(DataNode *dataNode);
 
     // This variable holds a data node which will be deleted from the datastorage immediately.
     const DataNode *m_NodeMarkedToDelete;

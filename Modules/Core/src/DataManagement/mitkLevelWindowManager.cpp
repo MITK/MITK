@@ -131,15 +131,15 @@ void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost, const DataN
       continue;
     }
 
-    int layer = -1;
-    node->GetIntProperty("layer", layer);
-    if (layer < maxVisibleLayer)
+    bool validRenderingMode = HasLevelWindowRenderingMode(node);
+    if (false == validRenderingMode)
     {
       continue;
     }
 
-    bool ignore = this->IgnoreNode(node);
-    if (ignore)
+    int layer = -1;
+    node->GetIntProperty("layer", layer);
+    if (layer < maxVisibleLayer)
     {
       continue;
     }
@@ -204,8 +204,9 @@ void mitk::LevelWindowManager::SetSelectedImages(bool selectedImagesMode, const 
       continue;
     }
 
-    bool ignore = this->IgnoreNode(node);
-    if (ignore)
+
+    bool validRenderingMode = HasLevelWindowRenderingMode(node);
+    if (false == validRenderingMode)
     {
       continue;
     }
@@ -285,13 +286,18 @@ void mitk::LevelWindowManager::Update(const itk::EventObject &)
   for (DataStorage::SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
   {
     DataNode::Pointer node = it->Value();
-
     if (node.IsNull())
     {
       continue;
     }
 
-    if (node->IsVisible(nullptr) == false)
+    if (false == node->IsVisible(nullptr))
+    {
+      continue;
+    }
+
+    bool validRenderingMode = HasLevelWindowRenderingMode(node);
+    if (false == validRenderingMode)
     {
       continue;
     }
@@ -703,17 +709,14 @@ void mitk::LevelWindowManager::CreatePropertyObserverMaps()
   }
 }
 
-bool mitk::LevelWindowManager::IgnoreNode(const DataNode* dataNode)
+bool mitk::LevelWindowManager::HasLevelWindowRenderingMode(DataNode *dataNode)
 {
   LevelWindowProperty::Pointer levelWindowProperty =
     dynamic_cast<LevelWindowProperty*>(dataNode->GetProperty("levelwindow"));
   if (levelWindowProperty.IsNull())
   {
-    return true;
+    return false;
   }
-
-  int nonLvlWinMode1 = RenderingModeProperty::LOOKUPTABLE_COLOR;
-  int nonLvlWinMode2 = RenderingModeProperty::COLORTRANSFERFUNCTION_COLOR;
 
   RenderingModeProperty::Pointer mode =
     dynamic_cast<RenderingModeProperty*>(dataNode->GetProperty("Image Rendering.Mode"));
@@ -721,14 +724,11 @@ bool mitk::LevelWindowManager::IgnoreNode(const DataNode* dataNode)
   if (mode.IsNotNull())
   {
     int currMode = mode->GetRenderingMode();
-    if (currMode == nonLvlWinMode1 || currMode == nonLvlWinMode2)
+    if (currMode == RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR ||
+        currMode == RenderingModeProperty::COLORTRANSFERFUNCTION_LEVELWINDOW_COLOR)
     {
       return true;
     }
-  }
-  else
-  {
-    return true;
   }
 
   return false;

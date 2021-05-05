@@ -51,7 +51,7 @@ namespace mitk
     ~AutoMLSegmentationWithPreviewTool() = default;
 
     void UpdateCleanUp() override;
-    void DoUpdatePreview(const Image* inputAtTimeStep, Image* previewImage, TimeStepType timeStep) override;
+    void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, Image* previewImage, TimeStepType timeStep) override;
 
     /** Function to generate the new multi lable preview for a given time step input image.
      * The function must be implemented by derived tools.

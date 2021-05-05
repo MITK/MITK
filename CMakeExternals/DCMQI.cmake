@@ -27,7 +27,7 @@ if(MITK_USE_DCMQI)
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       GIT_REPOSITORY https://github.com/QIICR/dcmqi.git
-      GIT_TAG 83f498e9
+      GIT_TAG v1.2.4
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}

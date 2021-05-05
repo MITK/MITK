@@ -121,8 +121,6 @@ void mitk::PickingTool::OnAddPoint(StateMachineAction*, InteractionEvent* intera
 
     if (positionEvent != nullptr)
     {
-      auto workingPlaneGeometry = positionEvent->GetSender()->GetCurrentWorldPlaneGeometry();
-
       m_PointSet->InsertPoint(m_PointSet->GetSize(), positionEvent->GetPositionInWorld());
 
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();

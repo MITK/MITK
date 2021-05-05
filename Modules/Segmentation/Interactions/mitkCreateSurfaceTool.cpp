@@ -76,7 +76,7 @@ bool mitk::CreateSurfaceTool::ProcessOneWorkingData(DataNode *node)
       surfaceFilter->SetPointerParameter("Group node", nodepointer);
       surfaceFilter->SetParameter("Show result", true);
       surfaceFilter->SetParameter("Sync visibility", false);
-      surfaceFilter->SetDataStorage(*m_ToolManager->GetDataStorage());
+      surfaceFilter->SetDataStorage(*this->GetToolManager()->GetDataStorage());
 
       ProgressBar::GetInstance()->AddStepsToDo(1);
       StatusBar::GetInstance()->DisplayText("Surface creation started in background...");
@@ -94,5 +94,5 @@ bool mitk::CreateSurfaceTool::ProcessOneWorkingData(DataNode *node)
 void mitk::CreateSurfaceTool::OnSurfaceCalculationDone()
 {
   ProgressBar::GetInstance()->Progress();
-  m_ToolManager->NewNodesGenerated();
+  this->GetToolManager()->NewNodesGenerated();
 }

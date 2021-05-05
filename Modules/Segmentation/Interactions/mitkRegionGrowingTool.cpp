@@ -276,7 +276,7 @@ template <typename TPixel, unsigned int imageDimension>
 void mitk::RegionGrowingTool::CalculateInitialThresholds(const itk::Image<TPixel, imageDimension>*)
 {
   LevelWindow levelWindow;
-  m_ToolManager->GetReferenceData(0)->GetLevelWindow(levelWindow);
+  this->GetToolManager()->GetReferenceData(0)->GetLevelWindow(levelWindow);
 
   m_ThresholdExtrema[0] = static_cast<ScalarType>(std::numeric_limits<TPixel>::lowest());
   m_ThresholdExtrema[1] = static_cast<ScalarType>(std::numeric_limits<TPixel>::max());

@@ -366,9 +366,12 @@ void mitk::AutoSegmentationWithPreviewTool::CreateResultSegmentationFromPreview(
 
         resultSegmentationNode->SetData(padFilter->GetOutput());
       }
-
-      this->GetToolManager()->SetWorkingData(resultSegmentationNode);
-      this->GetToolManager()->GetWorkingData(0)->Modified();
+      if (m_OverwriteExistingSegmentation)
+      { //if we overwrite the segmentation (an not just store it as a new result
+        //in the data storage) we actualize als the tool manager state.
+        this->GetToolManager()->SetWorkingData(resultSegmentationNode);
+        this->GetToolManager()->GetWorkingData(0)->Modified();
+      }
       this->EnsureTargetSegmentationNodeInDataStorage();
     }
   }

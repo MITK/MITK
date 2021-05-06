@@ -58,6 +58,10 @@ namespace mitk
     itkGetMacro(IsTimePointChangeAware, bool);
     itkBooleanMacro(IsTimePointChangeAware);
 
+    itkSetMacro(ResetsToEmptyPreview, bool);
+    itkGetMacro(ResetsToEmptyPreview, bool);
+    itkBooleanMacro(ResetsToEmptyPreview);
+
     bool CanHandle(const BaseData* referenceData, const BaseData* workingData) const override;
 
     /** Triggers the actualization of the preview
@@ -160,6 +164,10 @@ namespace mitk
     bool m_LazyDynamicPreviews = false;
 
     bool m_IsTimePointChangeAware = true;
+
+    /** Controls if ResetPreviewNode generates an empty content (true) or clones the current
+    segmentation (false).*/
+    bool m_ResetsToEmptyPreview = false;
 
     TimePointType m_LastTimePointOfUpdate = 0.;
 

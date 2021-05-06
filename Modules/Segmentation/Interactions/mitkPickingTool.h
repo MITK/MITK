@@ -56,6 +56,8 @@ namespace mitk
     /**Clears all picks and updates the preview.*/
     void ClearPicks();
 
+    bool HasPicks() const;
+
   protected:
     PickingTool(); // purposely hidden
     ~PickingTool() override;

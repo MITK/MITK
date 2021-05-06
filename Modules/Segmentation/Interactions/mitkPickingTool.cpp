@@ -40,6 +40,7 @@ namespace mitk
 
 mitk::PickingTool::PickingTool() : AutoSegmentationWithPreviewTool(false, "PressMoveReleaseAndPointSetting")
 {
+  this->ResetsToEmptyPreviewOn();
 }
 
 mitk::PickingTool::~PickingTool()
@@ -153,6 +154,11 @@ void mitk::PickingTool::ClearPicks()
   this->UpdatePreview();
 }
 
+bool mitk::PickingTool::HasPicks() const
+{
+  return this->m_PointSet.IsNotNull() && this->m_PointSet->GetSize()>0;
+}
+
 void mitk::PickingTool::ClearSeeds()
 {
   if (this->m_PointSet.IsNotNull())
@@ -187,11 +193,8 @@ void DoITKRegionGrowing(const itk::Image<TPixel, VImageDimension>* oldSegImage,
   // perform region growing in desired segmented region
   regionGrower->SetInput(oldSegImage);
 
-  // TODO: conversion added to silence warning and
-  // maintain existing behaviour, should be fixed
-  // since it's not correct e.g. for signed char
   regionGrower->SetLower(static_cast<typename InputImageType::PixelType>(1));
-  regionGrower->SetUpper(static_cast<typename InputImageType::PixelType>(255));
+  regionGrower->SetUpper(std::numeric_limits<typename InputImageType::PixelType>::max());
 
   try
   {

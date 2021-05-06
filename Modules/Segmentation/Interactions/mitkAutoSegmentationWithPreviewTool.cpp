@@ -214,6 +214,11 @@ void mitk::AutoSegmentationWithPreviewTool::ResetPreviewNode()
     if (workingImage.IsNotNull())
     {
       auto newPreviewImage = workingImage->Clone();
+      if (this->GetResetsToEmptyPreview())
+      {
+        newPreviewImage->ClearBuffer();
+      }
+
       if (newPreviewImage.IsNull())
       {
         MITK_ERROR << "Cannot create preview helper objects. Unable to clone working image";
@@ -231,14 +236,22 @@ void mitk::AutoSegmentationWithPreviewTool::ResetPreviewNode()
       mitk::Image::ConstPointer workingImageBin = dynamic_cast<const mitk::Image*>(this->GetToolManager()->GetWorkingData(0)->GetData());
       if (workingImageBin.IsNotNull())
       {
-        auto newPreviewImage = workingImageBin->Clone();
+        mitk::Image::Pointer newPreviewImage;
+        if (this->GetResetsToEmptyPreview())
+        {
+          newPreviewImage = mitk::Image::New();
+          newPreviewImage->Initialize(workingImageBin);
+        }
+        else
+        {
+          auto newPreviewImage = workingImageBin->Clone();
+        }
         if (newPreviewImage.IsNull())
         {
           MITK_ERROR << "Cannot create preview helper objects. Unable to clone working image";
           return;
         }
-
-        m_PreviewSegmentationNode->SetData(newPreviewImage->Clone());
+        m_PreviewSegmentationNode->SetData(newPreviewImage);
       }
       else
       {

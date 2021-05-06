@@ -17,7 +17,7 @@ found in the LICENSE file.
 
 QmitkAutoMLSegmentationToolGUIBase::QmitkAutoMLSegmentationToolGUIBase() : QmitkAutoSegmentationToolGUIBase(false)
 {
-  auto enableOtsuDelegate = [this](bool enabled)
+  auto enableMLSelectedDelegate = [this](bool enabled)
   {
     bool result = enabled;
     auto tool = this->GetConnectedToolAs<mitk::AutoMLSegmentationWithPreviewTool>();
@@ -33,13 +33,7 @@ QmitkAutoMLSegmentationToolGUIBase::QmitkAutoMLSegmentationToolGUIBase() : Qmitk
     return result;
   };
 
-  m_EnableConfirmSegBtnFnc = enableOtsuDelegate;
-}
-
-void QmitkAutoMLSegmentationToolGUIBase::ConnectNewTool(mitk::AutoSegmentationWithPreviewTool* newTool)
-{
-  Superclass::ConnectNewTool(newTool);
-  this->EnableWidgets(true);
+  m_EnableConfirmSegBtnFnc = enableMLSelectedDelegate;
 }
 
 void QmitkAutoMLSegmentationToolGUIBase::InitializeUI(QBoxLayout* mainLayout)

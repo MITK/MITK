@@ -21,6 +21,19 @@ MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkPickingToolGUI, "")
 
 QmitkPickingToolGUI::QmitkPickingToolGUI() : QmitkAutoSegmentationToolGUIBase(false)
 {
+  auto enablePickingDelegate = [this](bool enabled)
+  {
+    bool result = false;
+    auto tool = this->GetConnectedToolAs<mitk::PickingTool>();
+    if (nullptr != tool)
+    {
+      result = enabled && tool->HasPicks();
+    }
+
+    return result;
+  };
+
+  m_EnableConfirmSegBtnFnc = enablePickingDelegate;
 }
 
 QmitkPickingToolGUI::~QmitkPickingToolGUI()

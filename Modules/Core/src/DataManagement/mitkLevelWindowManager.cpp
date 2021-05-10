@@ -139,7 +139,7 @@ void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost, const DataN
 
     int layer = -1;
     node->GetIntProperty("layer", layer);
-    if (layer < maxVisibleLayer)
+    if (layer <= maxVisibleLayer)
     {
       continue;
     }
@@ -203,7 +203,6 @@ void mitk::LevelWindowManager::SetSelectedImages(bool selectedImagesMode, const 
     {
       continue;
     }
-
 
     bool validRenderingMode = HasLevelWindowRenderingMode(node);
     if (false == validRenderingMode)
@@ -312,13 +311,15 @@ void mitk::LevelWindowManager::Update(const itk::EventObject &)
 
     int layer = -1;
     node->GetIntProperty("layer", layer);
-    if (layer > maxVisibleLayer)
+    if (layer <= maxVisibleLayer)
     {
-      // top level node is backup node, if no node with
-      // "imageForLevelWindow" property with value "true" is found
-      topLevelNode = node;
-      maxVisibleLayer = layer;
+      continue;
     }
+
+    // top level node is backup node, if no node with
+    // "imageForLevelWindow" property with value "true" is found
+    topLevelNode = node;
+    maxVisibleLayer = layer;
   }
 
   int nodesForLevelWindowSize = nodesForLevelWindow.size();

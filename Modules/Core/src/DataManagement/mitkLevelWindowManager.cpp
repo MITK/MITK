@@ -444,12 +444,12 @@ void mitk::LevelWindowManager::SetLevelWindow(const LevelWindow &levelWindow)
   this->Modified();
 }
 
-mitk::LevelWindowProperty::Pointer mitk::LevelWindowManager::GetLevelWindowProperty()
+mitk::LevelWindowProperty::Pointer mitk::LevelWindowManager::GetLevelWindowProperty() const
 {
   return m_LevelWindowProperty;
 }
 
-const mitk::LevelWindow &mitk::LevelWindowManager::GetLevelWindow()
+const mitk::LevelWindow &mitk::LevelWindowManager::GetLevelWindow() const
 {
   if (m_LevelWindowProperty.IsNotNull())
   {
@@ -461,12 +461,12 @@ const mitk::LevelWindow &mitk::LevelWindowManager::GetLevelWindow()
   }
 }
 
-bool mitk::LevelWindowManager::IsAutoTopMost()
+bool mitk::LevelWindowManager::IsAutoTopMost() const
 {
   return m_AutoTopMost;
 }
 
-bool mitk::LevelWindowManager::IsSelectedImages()
+bool mitk::LevelWindowManager::IsSelectedImages() const
 {
   return m_SelectedImagesMode;
 }
@@ -544,17 +544,17 @@ void mitk::LevelWindowManager::OnPropertyModified(const itk::EventObject &)
   this->Modified();
 }
 
-mitk::Image *mitk::LevelWindowManager::GetCurrentImage()
+mitk::Image *mitk::LevelWindowManager::GetCurrentImage() const
 {
   return m_CurrentImage;
 }
 
-int mitk::LevelWindowManager::GetNumberOfObservers()
+int mitk::LevelWindowManager::GetNumberOfObservers() const
 {
   return m_ObserverToVisibleProperty.size();
 }
 
-mitk::DataStorage::SetOfObjects::ConstPointer mitk::LevelWindowManager::GetRelevantNodes()
+mitk::DataStorage::SetOfObjects::ConstPointer mitk::LevelWindowManager::GetRelevantNodes() const
 {
   if (m_DataStorage.IsNull())
   {
@@ -706,7 +706,7 @@ void mitk::LevelWindowManager::CreatePropertyObserverMaps()
   }
 }
 
-bool mitk::LevelWindowManager::HasLevelWindowRenderingMode(DataNode *dataNode)
+bool mitk::LevelWindowManager::HasLevelWindowRenderingMode(DataNode *dataNode) const
 {
   RenderingModeProperty::Pointer mode =
     dynamic_cast<RenderingModeProperty*>(dataNode->GetProperty("Image Rendering.Mode"));

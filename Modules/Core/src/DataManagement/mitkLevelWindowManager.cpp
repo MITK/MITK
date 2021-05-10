@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkLevelWindowManager.h"
-#include "mitkDataStorage.h"
+
 #include "mitkImage.h"
 #include "mitkMessage.h"
 #include "mitkNodePredicateAnd.h"
@@ -212,7 +212,7 @@ void mitk::LevelWindowManager::SetSelectedImages(bool selectedImagesMode, const 
     }
 
     m_LevelWindowProperty = dynamic_cast<LevelWindowProperty*>(node->GetProperty("levelwindow"));
-    m_DataNodesForLevelWindow.push_back(node);
+    m_DataNodesForLevelWindow.push_back(node); // nodes are used inside "SetLevelWindow" if the level window is changed
     lastSelectedNode = node;
   }
 
@@ -377,7 +377,7 @@ void mitk::LevelWindowManager::SetLevelWindowProperty(LevelWindowProperty::Point
 
   // find data node that belongs to the property
   DataStorage::SetOfObjects::ConstPointer all = m_DataStorage->GetAll();
-  mitk::DataNode::Pointer propNode = nullptr;
+  DataNode::Pointer propNode = nullptr;
   for (DataStorage::SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
   {
     DataNode::Pointer node = it.Value();

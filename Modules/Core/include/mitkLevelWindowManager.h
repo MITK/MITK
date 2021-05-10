@@ -112,13 +112,13 @@ namespace mitk
     */
     const LevelWindow &GetLevelWindow();
     /**
-    * @brief Return true, if the changes on slider or line-edits will affect the topmost layer image.
+    * @brief Return true, if level window changes will affect the topmost layer image.
     *
     * @return Return the member value that denotes the auto-topmost mode.
     */
     bool IsAutoTopMost();
     /**
-    * @brief Return true, if changes on slider or line-edits will affect the currently selected images.
+    * @brief Return true, if level window changes will affect the currently selected images.
     *
     * @return Return the member value that denotes the selected-images mode.
     */

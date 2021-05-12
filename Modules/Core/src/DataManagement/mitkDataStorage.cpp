@@ -222,7 +222,7 @@ void mitk::DataStorage::AddListeners(const DataNode *_Node)
       itk::MemberCommand<DataStorage>::New();
     interactorChangedCommand->SetCallbackFunction(this, &DataStorage::OnNodeInteractorChanged);
     m_NodeInteractorChangedObserverTags[NonConstNode] =
-      NonConstNode->AddObserver(DataNode::InteractorChangedEvent(), interactorChangedCommand);
+      NonConstNode->AddObserver(InteractorChangedEvent(), interactorChangedCommand);
 
     // add itk delete listener on datastorage
     itk::MemberCommand<DataStorage>::Pointer deleteCommand = itk::MemberCommand<DataStorage>::New();

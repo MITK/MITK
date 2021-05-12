@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define mitkDICOMTagScanner_h
 
 #include <stack>
-#include "itkMutexLock.h"
+#include <mutex>
 
 #include "mitkDICOMEnums.h"
 #include "mitkDICOMTagPath.h"
@@ -106,7 +106,7 @@ namespace mitk
 
     private:
 
-      static itk::MutexLock::Pointer s_LocaleMutex;
+      static std::mutex s_LocaleMutex;
 
       mutable std::stack<std::string> m_ReplacedCLocales;
       mutable std::stack<std::locale> m_ReplacedCinLocales;

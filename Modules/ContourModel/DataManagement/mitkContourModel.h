@@ -456,12 +456,12 @@ namespace mitk
     bool m_UpdateBoundingBox;
   };
 
-  itkEventMacro(ContourModelEvent, itk::AnyEvent);
-  itkEventMacro(ContourModelShiftEvent, ContourModelEvent);
-  itkEventMacro(ContourModelSizeChangeEvent, ContourModelEvent);
-  itkEventMacro(ContourModelAddEvent, ContourModelSizeChangeEvent);
-  itkEventMacro(ContourModelRemoveEvent, ContourModelSizeChangeEvent);
-  itkEventMacro(ContourModelExpandTimeBoundsEvent, ContourModelEvent);
-  itkEventMacro(ContourModelClosedEvent, ContourModelEvent);
+  itkEventMacroDeclaration(ContourModelEvent, itk::AnyEvent);
+  itkEventMacroDeclaration(ContourModelShiftEvent, ContourModelEvent);
+  itkEventMacroDeclaration(ContourModelSizeChangeEvent, ContourModelEvent);
+  itkEventMacroDeclaration(ContourModelAddEvent, ContourModelSizeChangeEvent);
+  itkEventMacroDeclaration(ContourModelRemoveEvent, ContourModelSizeChangeEvent);
+  itkEventMacroDeclaration(ContourModelExpandTimeBoundsEvent, ContourModelEvent);
+  itkEventMacroDeclaration(ContourModelClosedEvent, ContourModelEvent);
 }
 #endif

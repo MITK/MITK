@@ -663,7 +663,7 @@ namespace mitk
 
       if (readers.empty())
       {
-        if (!itksys::SystemTools::FileExists(loadInfo.m_Path.c_str()))
+        if (!itksys::SystemTools::FileExists(Local8BitToUtf8(loadInfo.m_Path).c_str()))
         {
           errMsg += "File '" + loadInfo.m_Path + "' does not exist\n";
         }

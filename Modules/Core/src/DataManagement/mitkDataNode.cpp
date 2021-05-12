@@ -27,6 +27,11 @@ found in the LICENSE file.
 #include "mitkLevelWindowProperty.h"
 #include "mitkRenderingManager.h"
 
+namespace mitk
+{
+  itkEventMacroDefinition(InteractorChangedEvent, itk::AnyEvent);
+}
+
 mitk::Mapper *mitk::DataNode::GetMapper(MapperSlotId id) const
 {
   if ((id >= m_Mappers.size()) || (m_Mappers[id].IsNull()))
@@ -566,7 +571,7 @@ void mitk::DataNode::SetDataInteractor(const DataInteractor::Pointer interactor)
   m_DataInteractor = interactor;
   this->Modified();
 
-  mitk::DataNode::InteractorChangedEvent changedEvent;
+  InteractorChangedEvent changedEvent;
   this->InvokeEvent(changedEvent);
 }
 

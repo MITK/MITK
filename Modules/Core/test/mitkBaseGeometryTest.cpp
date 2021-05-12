@@ -19,7 +19,6 @@ found in the LICENSE file.
 #include <mitkCommon.h>
 #include <mitkOperationActor.h>
 
-#include <itkAffineGeometryFrame.h>
 #include <itkBoundingBox.h>
 #include <itkIndex.h>
 #include <itkQuaternionRigidTransform.h>

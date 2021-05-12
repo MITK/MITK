@@ -39,6 +39,11 @@ found in the LICENSE file.
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 
+namespace mitk
+{
+  itkEventMacroDefinition(RendererResetEvent, itk::AnyEvent);
+}
+
 mitk::BaseRenderer::BaseRendererMapType mitk::BaseRenderer::baseRendererMap;
 
 mitk::BaseRenderer *mitk::BaseRenderer::GetInstance(vtkRenderWindow *renWin)
@@ -232,7 +237,7 @@ void mitk::BaseRenderer::SetMapperID(MapperSlotId id)
 
 void mitk::BaseRenderer::RemoveAllLocalStorages()
 {
-  this->InvokeEvent(mitk::BaseRenderer::RendererResetEvent());
+  this->InvokeEvent(RendererResetEvent());
 
   std::list<mitk::BaseLocalStorageHandler *>::iterator it;
   for (it = m_RegisteredLocalStorageHandlers.begin(); it != m_RegisteredLocalStorageHandlers.end(); ++it)

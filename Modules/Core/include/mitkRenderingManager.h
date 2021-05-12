@@ -374,8 +374,8 @@ namespace mitk
 
 #pragma GCC visibility push(default)
 
-  itkEventMacro(RenderingManagerEvent, itk::AnyEvent);
-  itkEventMacro(RenderingManagerViewsInitializedEvent, RenderingManagerEvent);
+  itkEventMacroDeclaration(RenderingManagerEvent, itk::AnyEvent);
+  itkEventMacroDeclaration(RenderingManagerViewsInitializedEvent, RenderingManagerEvent);
 
 #pragma GCC visibility pop
 

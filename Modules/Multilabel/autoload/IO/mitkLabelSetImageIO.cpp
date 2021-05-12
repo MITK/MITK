@@ -134,9 +134,9 @@ namespace mitk
       // Set the necessary information for imageIO
       nrrdImageIo->SetNumberOfDimensions(dimension);
       nrrdImageIo->SetPixelType(pixelType.GetPixelType());
-      nrrdImageIo->SetComponentType(pixelType.GetComponentType() < PixelComponentUserType ?
-                                      static_cast<itk::ImageIOBase::IOComponentType>(pixelType.GetComponentType()) :
-                                      itk::ImageIOBase::UNKNOWNCOMPONENTTYPE);
+      nrrdImageIo->SetComponentType(static_cast<int>(pixelType.GetComponentType()) < PixelComponentUserType
+                                      ? pixelType.GetComponentType()
+                                      : itk::IOComponentEnum::UNKNOWNCOMPONENTTYPE);
       nrrdImageIo->SetNumberOfComponents(pixelType.GetNumberOfComponents());
 
       itk::ImageIORegion ioRegion(dimension);

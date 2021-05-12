@@ -89,9 +89,9 @@ int mitkPlaneGeometryDataMapper2DTest(int argc, char *argv[])
                       "CompareRenderWindowAgainstReference test result positive?");
 
   // use this to generate a reference screenshot or save the file:
-  if (false)
+  if (true)
   {
-    renderingHelper.SaveReferenceScreenShot("output.png");
+    renderingHelper.SaveReferenceScreenShot("C:/Users/Stefan/Desktop/output.png");
   }
 
   MITK_TEST_END();

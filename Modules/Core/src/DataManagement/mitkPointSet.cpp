@@ -17,6 +17,16 @@ found in the LICENSE file.
 #include <iomanip>
 #include <mitkNumericTypes.h>
 
+namespace mitk
+{
+  itkEventMacroDefinition(PointSetEvent, itk::AnyEvent);
+  itkEventMacroDefinition(PointSetMoveEvent, PointSetEvent);
+  itkEventMacroDefinition(PointSetSizeChangeEvent, PointSetEvent);
+  itkEventMacroDefinition(PointSetAddEvent, PointSetSizeChangeEvent);
+  itkEventMacroDefinition(PointSetRemoveEvent, PointSetSizeChangeEvent);
+  itkEventMacroDefinition(PointSetExtendTimeRangeEvent, PointSetEvent);
+}
+
 mitk::PointSet::PointSet() : m_CalculateBoundingBox(true)
 {
   this->InitializeEmpty();

@@ -172,7 +172,7 @@ void mitk::ImageWriter::WriteByITK(mitk::Image *image, const std::string &fileNa
   origin4D[3] = 0; // There is no support for a 4D origin. However, we should have an valid value here
 
   itk::ImageIOBase::Pointer imageIO =
-    itk::ImageIOFactory::CreateImageIO(fileName.c_str(), itk::ImageIOFactory::WriteMode);
+    itk::ImageIOFactory::CreateImageIO(fileName.c_str(), itk::IOFileModeEnum::WriteMode);
 
   if (imageIO.IsNull())
   {
@@ -182,9 +182,9 @@ void mitk::ImageWriter::WriteByITK(mitk::Image *image, const std::string &fileNa
   // Set the necessary information for imageIO
   imageIO->SetNumberOfDimensions(dimension);
   imageIO->SetPixelType(pixelType.GetPixelType());
-  imageIO->SetComponentType(pixelType.GetComponentType() < PixelComponentUserType ?
-                              static_cast<itk::ImageIOBase::IOComponentType>(pixelType.GetComponentType()) :
-                              itk::ImageIOBase::UNKNOWNCOMPONENTTYPE);
+  imageIO->SetComponentType(static_cast<int>(pixelType.GetComponentType()) < PixelComponentUserType
+                              ? pixelType.GetComponentType()
+                              : itk::IOComponentEnum::UNKNOWNCOMPONENTTYPE);
   imageIO->SetNumberOfComponents(pixelType.GetNumberOfComponents());
 
   itk::ImageIORegion ioRegion(dimension);

@@ -22,6 +22,8 @@ found in the LICENSE file.
 
 #include "MitkModelFitExports.h"
 
+#include <mutex>
+
 namespace mitk
 {
 
@@ -128,7 +130,7 @@ namespace mitk
     typedef std::map<std::string, SVModelFitCostFunction::Pointer> CostFunctionMapType;
     CostFunctionMapType m_CostFunctionMap;
     bool m_DebugParameterMaps;
-    ::itk::SimpleFastMutexLock m_Mutex;
+    mutable std::mutex m_Mutex;
   };
 
 }

@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "mitkTimeGridHelper.h"
 
-#include "itkExceptionObject.h"
+#include "itkMacro.h"
 
 bool mitk::TimeGridIsMonotonIncreasing(const mitk::ModelBase::TimeGridType timeGrid)
 {

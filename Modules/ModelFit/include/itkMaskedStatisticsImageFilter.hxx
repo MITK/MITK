@@ -224,7 +224,7 @@ namespace itk
     MaskedStatisticsImageFilter< TInputImage, TMaskImage >
     ::BeforeThreadedGenerateData()
   {
-    ThreadIdType numberOfThreads = this->GetNumberOfThreads();
+    ThreadIdType numberOfThreads = this->GetNumberOfWorkUnits();
 
     // Resize the thread temporaries
     m_Count.SetSize(numberOfThreads);
@@ -250,7 +250,7 @@ namespace itk
     SizeValueType   count;
     RealType        sumOfSquares;
 
-    ThreadIdType numberOfThreads = this->GetNumberOfThreads();
+    ThreadIdType numberOfThreads = this->GetNumberOfWorkUnits();
 
     PixelType minimum;
     PixelType maximum;

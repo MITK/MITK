@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef mitkDICOMITKSeriesGDCMReader_h
 #define mitkDICOMITKSeriesGDCMReader_h
 
+#include <mutex>
 #include <stack>
-#include "itkMutexLock.h"
 #include "mitkDICOMFileReader.h"
 #include "mitkDICOMDatasetSorter.h"
 #include "mitkDICOMGDCMImageFrameInfo.h"
@@ -361,7 +361,7 @@ class MITKDICOM_EXPORT DICOMITKSeriesGDCMReader : public DICOMFileReader
 
   private:
 
-    static itk::MutexLock::Pointer s_LocaleMutex;
+    static std::mutex s_LocaleMutex;
 
     mutable std::stack<std::string> m_ReplacedCLocales;
     mutable std::stack<std::locale> m_ReplacedCinLocales;

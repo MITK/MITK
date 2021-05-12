@@ -14,6 +14,13 @@ found in the LICENSE file.
 #include "mitkDataNode.h"
 #include "mitkStateMachineState.h"
 
+namespace mitk
+{
+  itkEventMacroDefinition(DataInteractorEvent, itk::AnyEvent);
+  itkEventMacroDefinition(StartInteraction, DataInteractorEvent);
+  itkEventMacroDefinition(ResultReady, DataInteractorEvent);
+}
+
 // Predefined internal events/signals
 const std::string mitk::DataInteractor::IntDeactivateMe = "DeactivateMe";
 const std::string mitk::DataInteractor::IntLeaveWidget = "LeaveWidget";

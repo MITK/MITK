@@ -26,7 +26,6 @@ found in the LICENSE file.
 #include "usModuleContext.h"
 #include "usServiceReference.h"
 #include "vnl/vnl_vector.h"
-#include <itkAffineGeometryFrame.h>
 
 std::vector<mitk::PlaneGeometry::Pointer> m_Geometries;
 std::vector<unsigned int> m_SliceIndices;

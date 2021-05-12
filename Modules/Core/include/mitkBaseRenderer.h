@@ -40,6 +40,10 @@ namespace mitk
   class BaseLocalStorageHandler;
   class KeyEvent;
 
+#pragma GCC visibility push(default)
+  itkEventMacroDeclaration(RendererResetEvent, itk::AnyEvent);
+#pragma GCC visibility pop
+
   //##Documentation
   //## @brief Organizes the rendering process
   //##
@@ -71,10 +75,6 @@ namespace mitk
 
     static BaseRenderer *GetByName(const std::string &name);
     static vtkRenderWindow *GetRenderWindowByName(const std::string &name);
-
-#pragma GCC visibility push(default)
-    itkEventMacro(RendererResetEvent, itk::AnyEvent);
-#pragma GCC visibility pop
 
     /** Standard class typedefs. */
     mitkClassMacroItkParent(BaseRenderer, itk::Object);

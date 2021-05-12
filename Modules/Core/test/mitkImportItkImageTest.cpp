@@ -33,7 +33,7 @@ typename itk::Image<TPixel, VDimension>::Pointer CreateTestImageRandom(short int
   regionSize.Fill(size);
 
   typename itk::RandomImageSource<ImageType>::Pointer randomImageSource = itk::RandomImageSource<ImageType>::New();
-  randomImageSource->SetNumberOfThreads(1); // to produce non-random results
+  randomImageSource->SetNumberOfWorkUnits(1); // to produce non-random results
   randomImageSource->SetSize(regionSize);
   randomImageSource->Update();
 

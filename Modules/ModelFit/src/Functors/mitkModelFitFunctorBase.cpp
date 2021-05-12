@@ -115,30 +115,30 @@ mitk::ModelFitFunctorBase::GetNumberOfOutputs(const ModelBase* model) const
 void
 mitk::ModelFitFunctorBase::ResetEvaluationParameters()
 {
-  m_Mutex.Lock();
+  m_Mutex.lock();
 
   m_CostFunctionMap.clear();
 
-  m_Mutex.Unlock();
+  m_Mutex.unlock();
 };
 
 void
 mitk::ModelFitFunctorBase::RegisterEvaluationParameter(const std::string& parameterName,
     SVModelFitCostFunction* evaluationCostFunction)
 {
-  m_Mutex.Lock();
+  m_Mutex.lock();
 
   SVModelFitCostFunction::Pointer costFunctPtr = evaluationCostFunction;
 
   m_CostFunctionMap.insert(std::make_pair(parameterName, costFunctPtr));
 
-  m_Mutex.Unlock();
+  m_Mutex.unlock();
 };
 
 mitk::ModelFitFunctorBase::ParameterNamesType
 mitk::ModelFitFunctorBase::GetEvaluationParameterNames() const
 {
-  m_Mutex.Lock();
+  m_Mutex.lock();
 
   ParameterNamesType result;
 
@@ -148,7 +148,7 @@ mitk::ModelFitFunctorBase::GetEvaluationParameterNames() const
     result.push_back(pos->first);
   }
 
-  m_Mutex.Unlock();
+  m_Mutex.unlock();
 
   return result;
 };
@@ -159,7 +159,7 @@ const
 {
   const SVModelFitCostFunction* result = nullptr;
 
-  m_Mutex.Lock();
+  m_Mutex.lock();
 
   CostFunctionMapType::const_iterator pos = m_CostFunctionMap.find(parameterName);
 
@@ -168,7 +168,7 @@ const
     result = (pos->second).GetPointer();
   }
 
-  m_Mutex.Unlock();
+  m_Mutex.unlock();
 
   return result;
 };
@@ -215,7 +215,7 @@ mitk::ModelFitFunctorBase::OutputPixelArrayType
 mitk::ModelFitFunctorBase::GetEvaluationParameters(const ModelBase* model,
     const ParametersType& parameters, const SignalType& sample) const
 {
-  m_Mutex.Lock();
+  m_Mutex.lock();
 
   OutputPixelArrayType result(m_CostFunctionMap.size());
 
@@ -235,7 +235,7 @@ mitk::ModelFitFunctorBase::GetEvaluationParameters(const ModelBase* model,
     result[i] = costFct->GetValue(parameters);
   }
 
-  m_Mutex.Unlock();
+  m_Mutex.unlock();
 
   return result;
 };

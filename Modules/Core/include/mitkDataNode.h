@@ -40,6 +40,12 @@ namespace mitk
   class Mapper;
 
   /**
+   * \brief Definition of an itk::Event that is invoked when
+   * a DataInteractor is set on this DataNode.
+   */
+  itkEventMacroDeclaration(InteractorChangedEvent, itk::AnyEvent);
+
+  /**
    * \brief Class for nodes of the DataTree
    *
    * Contains the data (instance of BaseData), a list of mappers, which can
@@ -63,11 +69,6 @@ namespace mitk
     typedef std::vector<MapOfPropertyLists::key_type> PropertyListKeyNames;
     typedef std::set<std::string> GroupTagList;
 
-    /**
-     * \brief Definition of an itk::Event that is invoked when
-     * a DataInteractor is set on this DataNode.
-     */
-    itkEventMacro(InteractorChangedEvent, itk::AnyEvent)
     mitkClassMacroItkParent(DataNode, itk::DataObject);
     itkFactorylessNewMacro(Self);
 

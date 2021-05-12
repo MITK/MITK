@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include <mitkCoreServices.h>
 #include <mitkFileReaderRegistry.h>
 #include <mitkIMimeTypeProvider.h>
+#include <mitkUtf8Util.h>
 
 #include <usAny.h>
 #include <usServiceProperties.h>
@@ -48,7 +49,7 @@ namespace mitk
   FileReaderSelector::FileReaderSelector(const FileReaderSelector &other) : m_Data(other.m_Data) {}
   FileReaderSelector::FileReaderSelector(const std::string &path) : m_Data(new Impl)
   {
-    if (!itksys::SystemTools::FileExists(path.c_str()))
+    if (!itksys::SystemTools::FileExists(Utf8Util::Local8BitToUtf8(path).c_str()))
     {
       return;
     }

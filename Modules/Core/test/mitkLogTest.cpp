@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkNumericTypes.h>
 #include <mitkStandardFileLocations.h>
 #include <thread>
+#include <mitkUtf8Util.h>
 
 /** Documentation
  *
@@ -182,7 +183,7 @@ public:
       if (toFile)
       {
         std::string filename = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + "/testthreadlog.log";
-        itksys::SystemTools::RemoveFile(filename.c_str()); // remove old file, we do not want to append to large files
+        itksys::SystemTools::RemoveFile(mitk::Utf8Util::Local8BitToUtf8(filename).c_str()); // remove old file, we do not want to append to large files
         mitk::LoggingBackend::SetLogFile(filename.c_str());
       }
 
@@ -238,7 +239,7 @@ public:
     std::string filename = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + "/testlog.log";
     mitk::LoggingBackend::SetLogFile(filename.c_str());
     MITK_INFO << "Test logging to default filename: " << mitk::LoggingBackend::GetLogFile();
-    MITK_TEST_CONDITION_REQUIRED(itksys::SystemTools::FileExists(filename.c_str()), "Testing if log file exists.");
+    MITK_TEST_CONDITION_REQUIRED(itksys::SystemTools::FileExists(mitk::Utf8Util::Local8BitToUtf8(filename).c_str()), "Testing if log file exists.");
     // TODO delete log file?
   }
 

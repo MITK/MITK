@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkTestingMacros.h>
 
 #include "mitkIOUtil.h"
+#include <mitkUtf8Util.h>
 #include "mitkITKImageImport.h"
 #include <mitkExtractSliceFilter.h>
 
@@ -250,10 +251,10 @@ public:
       CPPUNIT_ASSERT_MESSAGE("Image stored in MHD format was succesfully loaded again! ", compareImage.IsNotNull());
 
       CPPUNIT_ASSERT_MESSAGE(".mhd file exists",
-                             itksys::SystemTools::FileExists((tmpFilePathWithoutExt + ".mhd").c_str()));
+                             itksys::SystemTools::FileExists(mitk::Utf8Util::Local8BitToUtf8(tmpFilePathWithoutExt + ".mhd").c_str()));
       CPPUNIT_ASSERT_MESSAGE(".raw or .zraw exists",
-                             itksys::SystemTools::FileExists((tmpFilePathWithoutExt + ".raw").c_str()) ||
-                               itksys::SystemTools::FileExists((tmpFilePathWithoutExt + ".zraw").c_str()));
+                             itksys::SystemTools::FileExists(mitk::Utf8Util::Local8BitToUtf8(tmpFilePathWithoutExt + ".raw").c_str()) ||
+                               itksys::SystemTools::FileExists(mitk::Utf8Util::Local8BitToUtf8(tmpFilePathWithoutExt + ".zraw").c_str()));
 
       /*It would make sence to check the images as well (see commented cppunit assert),
       but currently there seems to be a problem (exception) with most of the test images
@@ -290,7 +291,7 @@ public:
     sourcefile = GetTestDataFilePath(sourcefile);
 
     // load image
-    CPPUNIT_ASSERT_MESSAGE("Checking whether source image exists", itksys::SystemTools::FileExists(sourcefile.c_str()));
+    CPPUNIT_ASSERT_MESSAGE("Checking whether source image exists", itksys::SystemTools::FileExists(mitk::Utf8Util::Local8BitToUtf8(sourcefile).c_str()));
 
     mitk::Image::Pointer image = nullptr;
 

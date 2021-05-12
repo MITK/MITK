@@ -52,7 +52,7 @@ namespace mitk
     itkGetMacro(SensibleMaximumThresholdValue, ScalarType);
 
     void InitiateToolByInput() override;
-    void DoUpdatePreview(const Image* inputAtTimeStep, Image* previewImage, TimeStepType timeStep) override;
+    void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, Image* previewImage, TimeStepType timeStep) override;
 
   private:
     ScalarType m_SensibleMinimumThresholdValue;

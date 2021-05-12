@@ -29,6 +29,7 @@ found in the LICENSE file.
 #include "itkCurvatureAnisotropicDiffusionImageFilter.h"
 #include "itkGradientMagnitudeRecursiveGaussianImageFilter.h"
 #include "itkSigmoidImageFilter.h"
+#include "itkFastMarchingImageFilter.h"
 
 // us
 #include <usGetModuleContext.h>
@@ -151,14 +152,14 @@ void mitk::FastMarchingBaseTool::Activated()
   m_SeedsAsPointSetNode->SetColor(0.0, 1.0, 0.0);
   m_SeedsAsPointSetNode->SetVisibility(true);
 
-  m_ToolManager->GetDataStorage()->Add(m_SeedsAsPointSetNode, m_ToolManager->GetWorkingData(0));
+  this->GetDataStorage()->Add(m_SeedsAsPointSetNode, this->GetToolManager()->GetWorkingData(0));
 }
 
 void mitk::FastMarchingBaseTool::Deactivated()
 {
   this->ClearSeeds();
 
-  m_ToolManager->GetDataStorage()->Remove(m_SeedsAsPointSetNode);
+  this->GetDataStorage()->Remove(m_SeedsAsPointSetNode);
   m_SeedsAsPointSetNode = nullptr;
   m_SeedsAsPointSet = nullptr;
 
@@ -190,9 +191,6 @@ void mitk::FastMarchingBaseTool::OnAddPoint(StateMachineAction*, InteractionEven
       }
 
       m_SeedsAsPointSet->InsertPoint(m_SeedsAsPointSet->GetSize(), positionEvent->GetPositionInWorld());
-
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
       this->UpdatePreview();
     }
   }
@@ -206,9 +204,6 @@ void mitk::FastMarchingBaseTool::OnDelete(StateMachineAction*, InteractionEvent*
     if (this->m_SeedsAsPointSet->GetSize() > 0)
     {
       m_SeedsAsPointSet->RemovePointAtEnd(0);
-
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
       this->UpdatePreview();
     }
   }
@@ -319,7 +314,7 @@ void mitk::FastMarchingBaseTool::DoITKFastMarching(const itk::Image<TPixel, VIma
   }
 }
 
-void mitk::FastMarchingBaseTool::DoUpdatePreview(const Image* inputAtTimeStep, Image* previewImage, TimeStepType timeStep)
+void mitk::FastMarchingBaseTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image* /*oldSegAtTimeStep*/, Image* previewImage, TimeStepType timeStep)
 {
   if (nullptr != inputAtTimeStep && nullptr != previewImage && m_SeedsAsPointSet.IsNotNull() && m_SeedsAsPointSet->GetSize()>0)
   {

@@ -86,20 +86,20 @@ void mitk::AutoSegmentationTool::SetOverwriteExistingSegmentation(bool overwrite
 
 std::string mitk::AutoSegmentationTool::GetCurrentSegmentationName()
 {
-  if (m_ToolManager->GetWorkingData(0))
-    return m_ToolManager->GetWorkingData(0)->GetName();
+  if (this->GetToolManager()->GetWorkingData(0))
+    return this->GetToolManager()->GetWorkingData(0)->GetName();
   else
     return "";
 }
 
 mitk::DataNode *mitk::AutoSegmentationTool::GetTargetSegmentationNode() const
 {
-  mitk::DataNode::Pointer segmentationNode = m_ToolManager->GetWorkingData(0);
+  mitk::DataNode::Pointer segmentationNode = this->GetToolManager()->GetWorkingData(0);
   if (!m_OverwriteExistingSegmentation)
   {
     if (m_NoneOverwriteTargetSegmentationNode.IsNull())
     {
-      mitk::DataNode::Pointer refNode = m_ToolManager->GetReferenceData(0);
+      mitk::DataNode::Pointer refNode = this->GetToolManager()->GetReferenceData(0);
       if (refNode.IsNull())
       {
         // TODO create and use segmentation exceptions instead!!
@@ -123,8 +123,8 @@ mitk::DataNode *mitk::AutoSegmentationTool::GetTargetSegmentationNode() const
 void mitk::AutoSegmentationTool::EnsureTargetSegmentationNodeInDataStorage() const
 {
   auto targetNode = this->GetTargetSegmentationNode();
-  if (!m_ToolManager->GetDataStorage()->Exists(targetNode))
+  if (!this->GetToolManager()->GetDataStorage()->Exists(targetNode))
   {
-    m_ToolManager->GetDataStorage()->Add(targetNode, m_ToolManager->GetReferenceData(0));
+    this->GetToolManager()->GetDataStorage()->Add(targetNode, this->GetToolManager()->GetReferenceData(0));
   }
 }

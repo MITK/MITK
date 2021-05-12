@@ -58,6 +58,10 @@ namespace mitk
     itkGetMacro(IsTimePointChangeAware, bool);
     itkBooleanMacro(IsTimePointChangeAware);
 
+    itkSetMacro(ResetsToEmptyPreview, bool);
+    itkGetMacro(ResetsToEmptyPreview, bool);
+    itkBooleanMacro(ResetsToEmptyPreview);
+
     bool CanHandle(const BaseData* referenceData, const BaseData* workingData) const override;
 
     /** Triggers the actualization of the preview
@@ -82,14 +86,23 @@ namespace mitk
      */
     virtual void InitiateToolByInput();
 
+    /** This member function offers derived classes the possibility to alter what should
+    happen directly before the update of the preview is performed. It is called by
+    UpdatePreview. Default implementation does nothing.*/
     virtual void UpdatePrepare();
+
+    /** This member function offers derived classes the possibility to alter what should
+    happen directly after the update of the preview is performed. It is called by
+    UpdatePreview. Default implementation does nothing.*/
     virtual void UpdateCleanUp();
 
     /** This function does the real work. Here the preview for a given
      * input image should be computed and stored in the also passed
      * preview image at the passed time step.
+     * It also provides the current/old segmentation at the time point,
+     * which can be used, if the preview depends on the the segmenation so far.
      */
-    virtual void DoUpdatePreview(const Image* inputAtTimeStep, Image* previewImage, TimeStepType timeStep) = 0;
+    virtual void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, Image* previewImage, TimeStepType timeStep) = 0;
 
     AutoSegmentationWithPreviewTool(bool lazyDynamicPreviews = false); // purposely hidden
     AutoSegmentationWithPreviewTool(bool lazyDynamicPreviews, const char* interactorType, const us::Module* interactorModule = nullptr); // purposely hidden
@@ -151,6 +164,10 @@ namespace mitk
     bool m_LazyDynamicPreviews = false;
 
     bool m_IsTimePointChangeAware = true;
+
+    /** Controls if ResetPreviewNode generates an empty content (true) or clones the current
+    segmentation (false).*/
+    bool m_ResetsToEmptyPreview = false;
 
     TimePointType m_LastTimePointOfUpdate = 0.;
 

@@ -32,7 +32,7 @@ void mitk::SegmentationsProcessingTool::Activated()
   Superclass::Activated();
 
   ProcessAllObjects();
-  m_ToolManager->ActivateTool(-1);
+  this->GetToolManager()->ActivateTool(-1);
 }
 
 void mitk::SegmentationsProcessingTool::Deactivated()
@@ -45,7 +45,7 @@ void mitk::SegmentationsProcessingTool::ProcessAllObjects()
   m_FailedNodes.clear();
   StartProcessingAllData();
 
-  ToolManager::DataVectorType nodes = m_ToolManager->GetWorkingData();
+  ToolManager::DataVectorType nodes = this->GetToolManager()->GetWorkingData();
   ProgressBar::GetInstance()->AddStepsToDo(nodes.size() + 2);
 
   // for all selected nodes

@@ -54,18 +54,18 @@ void mitk::PaintbrushTool::Activated()
 
   FeedbackContourTool::SetFeedbackContourVisible(true);
   SizeChanged.Send(m_Size);
-  m_ToolManager->WorkingDataChanged +=
+  this->GetToolManager()->WorkingDataChanged +=
     mitk::MessageDelegate<mitk::PaintbrushTool>(this, &mitk::PaintbrushTool::OnToolManagerWorkingDataModified);
 }
 
 void mitk::PaintbrushTool::Deactivated()
 {
   FeedbackContourTool::SetFeedbackContourVisible(false);
-  if (m_ToolManager->GetDataStorage()->Exists(m_WorkingNode))
-    m_ToolManager->GetDataStorage()->Remove(m_WorkingNode);
+  if (this->GetToolManager()->GetDataStorage()->Exists(m_WorkingNode))
+    this->GetToolManager()->GetDataStorage()->Remove(m_WorkingNode);
   m_WorkingSlice = nullptr;
   m_CurrentPlane = nullptr;
-  m_ToolManager->WorkingDataChanged -=
+  this->GetToolManager()->WorkingDataChanged -=
     mitk::MessageDelegate<mitk::PaintbrushTool>(this, &mitk::PaintbrushTool::OnToolManagerWorkingDataModified);
 
   Superclass::Deactivated();
@@ -286,8 +286,8 @@ void mitk::PaintbrushTool::OnMousePressed(StateMachineAction *, InteractionEvent
   // create new working node
   // a fresh node is needed to only display the actual drawing process for
   // the undo function
-  if (m_ToolManager->GetDataStorage()->Exists(m_WorkingNode))
-    m_ToolManager->GetDataStorage()->Remove(m_WorkingNode);
+  if (this->GetToolManager()->GetDataStorage()->Exists(m_WorkingNode))
+    this->GetToolManager()->GetDataStorage()->Remove(m_WorkingNode);
   m_WorkingSlice = nullptr;
   m_CurrentPlane = nullptr;
 
@@ -378,7 +378,7 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent *interactionEvent, 
     const double dist = indexCoordinates.EuclideanDistanceTo(m_LastPosition);
     const double radius = static_cast<double>(m_Size) / 2.0;
 
-    DataNode *workingNode(m_ToolManager->GetWorkingData(0));
+    DataNode *workingNode(this->GetToolManager()->GetWorkingData(0));
     auto workingImage = dynamic_cast<Image*>(workingNode->GetData());
     int activePixelValue = ContourModelUtils::GetActivePixelValue(workingImage);
 
@@ -499,7 +499,7 @@ void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositi
   const PlaneGeometry *planeGeometry((event->GetSender()->GetCurrentWorldPlaneGeometry()));
   const auto *abstractTransformGeometry(
     dynamic_cast<const AbstractTransformGeometry *>(event->GetSender()->GetCurrentWorldPlaneGeometry()));
-  DataNode *workingNode(m_ToolManager->GetWorkingData(0));
+  DataNode *workingNode(this->GetToolManager()->GetWorkingData(0));
 
   if (!workingNode)
     return;
@@ -525,7 +525,7 @@ void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositi
                               m_CurrentPlane->GetIndexToWorldTransform()->GetOffset());
     if (!isSameSlice)
     {
-      m_ToolManager->GetDataStorage()->Remove(m_WorkingNode);
+      this->GetToolManager()->GetDataStorage()->Remove(m_WorkingNode);
       m_CurrentPlane = nullptr;
       m_WorkingSlice = nullptr;
       m_WorkingNode = nullptr;
@@ -543,7 +543,7 @@ void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositi
     }
   }
 
-  if (!m_ToolManager->GetDataStorage()->Exists(m_WorkingNode))
+  if (!this->GetToolManager()->GetDataStorage()->Exists(m_WorkingNode))
   {
     m_WorkingNode->SetProperty("outline binary", mitk::BoolProperty::New(true));
     m_WorkingNode->SetProperty("color", workingNode->GetProperty("color"));
@@ -554,7 +554,7 @@ void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositi
     m_WorkingNode->SetVisibility(
       false, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")));
 
-    m_ToolManager->GetDataStorage()->Add(m_WorkingNode);
+    this->GetToolManager()->GetDataStorage()->Add(m_WorkingNode);
   }
 }
 

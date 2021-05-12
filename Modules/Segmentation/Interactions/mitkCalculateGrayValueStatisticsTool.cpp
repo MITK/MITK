@@ -67,7 +67,7 @@ bool mitk::CalculateGrayValueStatisticsTool::ProcessOneWorkingData(DataNode *nod
     if (image.IsNull())
       return false;
 
-    DataNode *referencenode = m_ToolManager->GetReferenceData(0);
+    DataNode *referencenode = this->GetToolManager()->GetReferenceData(0);
     if (!referencenode)
       return false;
 

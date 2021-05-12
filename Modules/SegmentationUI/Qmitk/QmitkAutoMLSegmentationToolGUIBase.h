@@ -41,7 +41,6 @@ protected:
   ~QmitkAutoMLSegmentationToolGUIBase() = default;
 
   void InitializeUI(QBoxLayout* mainLayout) override;
-  void ConnectNewTool(mitk::AutoSegmentationWithPreviewTool* newTool) override;
 
   void EnableWidgets(bool enabled) override;
   void SetLabelSetPreview(const mitk::LabelSetImage* preview);

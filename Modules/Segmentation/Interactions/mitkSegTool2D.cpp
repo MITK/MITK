@@ -367,7 +367,7 @@ void mitk::SegTool2D::Activated()
 {
   Superclass::Activated();
 
-  m_ToolManager->SelectedTimePointChanged +=
+  this->GetToolManager()->SelectedTimePointChanged +=
     mitk::MessageDelegate<mitk::SegTool2D>(this, &mitk::SegTool2D::OnTimePointChangedInternal);
 
   m_LastTimePointTriggered = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
@@ -375,7 +375,7 @@ void mitk::SegTool2D::Activated()
 
 void mitk::SegTool2D::Deactivated()
 {
-  m_ToolManager->SelectedTimePointChanged -=
+  this->GetToolManager()->SelectedTimePointChanged -=
     mitk::MessageDelegate<mitk::SegTool2D>(this, &mitk::SegTool2D::OnTimePointChangedInternal);
   Superclass::Deactivated();
 }
@@ -401,9 +401,9 @@ void mitk::SegTool2D::OnTimePointChanged()
 
 mitk::DataNode* mitk::SegTool2D::GetWorkingDataNode() const
 {
-  if (nullptr != m_ToolManager)
+  if (nullptr != this->GetToolManager())
   {
-    return m_ToolManager->GetWorkingData(0);
+    return this->GetToolManager()->GetWorkingData(0);
   }
   return nullptr;
 }
@@ -420,9 +420,9 @@ mitk::Image* mitk::SegTool2D::GetWorkingData() const
 
 mitk::DataNode* mitk::SegTool2D::GetReferenceDataNode() const
 {
-  if (nullptr != m_ToolManager)
+  if (nullptr != this->GetToolManager())
   {
-    return m_ToolManager->GetReferenceData(0);
+    return this->GetToolManager()->GetReferenceData(0);
   }
   return nullptr;
 }
@@ -684,7 +684,7 @@ int mitk::SegTool2D::AddContourmarker(const PlaneGeometry* planeGeometry, unsign
   {
     if (id == size)
     {
-      m_ToolManager->GetDataStorage()->Add(rotatedContourNode, workingNode);
+      this->GetToolManager()->GetDataStorage()->Add(rotatedContourNode, workingNode);
     }
     else
     {
@@ -692,7 +692,7 @@ int mitk::SegTool2D::AddContourmarker(const PlaneGeometry* planeGeometry, unsign
         mitk::NodePredicateProperty::New("isContourMarker", mitk::BoolProperty::New(true));
 
       mitk::DataStorage::SetOfObjects::ConstPointer markers =
-        m_ToolManager->GetDataStorage()->GetDerivations(workingNode, isMarker);
+        this->GetToolManager()->GetDataStorage()->GetDerivations(workingNode, isMarker);
 
       for (auto iter = markers->begin(); iter != markers->end(); ++iter)
       {
@@ -704,7 +704,7 @@ int mitk::SegTool2D::AddContourmarker(const PlaneGeometry* planeGeometry, unsign
           return id;
         }
       }
-      m_ToolManager->GetDataStorage()->Add(rotatedContourNode, workingNode);
+      this->GetToolManager()->GetDataStorage()->Add(rotatedContourNode, workingNode);
     }
   }
   return id;

@@ -82,5 +82,5 @@ bool mitk::CalculateVolumetryTool::ProcessOneWorkingData(DataNode *node)
 void mitk::CalculateVolumetryTool::FinishProcessingAllData()
 {
   Superclass::FinishProcessingAllData();
-  m_ToolManager->NodePropertiesChanged();
+  this->GetToolManager()->NodePropertiesChanged();
 }

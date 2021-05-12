@@ -191,9 +191,6 @@ void mitk::FastMarchingBaseTool::OnAddPoint(StateMachineAction*, InteractionEven
       }
 
       m_SeedsAsPointSet->InsertPoint(m_SeedsAsPointSet->GetSize(), positionEvent->GetPositionInWorld());
-
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
       this->UpdatePreview();
     }
   }
@@ -207,9 +204,6 @@ void mitk::FastMarchingBaseTool::OnDelete(StateMachineAction*, InteractionEvent*
     if (this->m_SeedsAsPointSet->GetSize() > 0)
     {
       m_SeedsAsPointSet->RemovePointAtEnd(0);
-
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
       this->UpdatePreview();
     }
   }

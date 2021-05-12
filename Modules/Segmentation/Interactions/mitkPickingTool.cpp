@@ -123,9 +123,6 @@ void mitk::PickingTool::OnAddPoint(StateMachineAction*, InteractionEvent* intera
     if (positionEvent != nullptr)
     {
       m_PointSet->InsertPoint(m_PointSet->GetSize(), positionEvent->GetPositionInWorld());
-
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
       this->UpdatePreview();
     }
   }
@@ -140,8 +137,6 @@ void mitk::PickingTool::OnDelete(StateMachineAction*, InteractionEvent* /*intera
     {
       m_PointSet->RemovePointAtEnd(0);
 
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
       this->UpdatePreview();
     }
   }
@@ -150,7 +145,6 @@ void mitk::PickingTool::OnDelete(StateMachineAction*, InteractionEvent* /*intera
 void mitk::PickingTool::ClearPicks()
 {
   this->ClearSeeds();
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   this->UpdatePreview();
 }
 

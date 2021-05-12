@@ -204,7 +204,7 @@ namespace mitk
     ToolManager* GetToolManager() const;
 
     /** Returns the data storage provided by the toolmanager. May be null (e.g. if
-     Toolmanager is not set).*/
+     ToolManager is not set).*/
     mitk::DataStorage* GetDataStorage() const;
 
     void ConnectActionsAndFunctions() override;

@@ -243,10 +243,28 @@ int main(int argc, char* argv[])
     mitkCommandLineParser parser;
     setupParser(parser);
     const std::map<std::string, us::Any>& parsedArgs = parser.parseArguments(argc, argv);
-    if (!configureApplicationSettings(parsedArgs))
+    try
     {
+      if (!configureApplicationSettings(parsedArgs))
+      {
         return EXIT_FAILURE;
-    };
+      }
+    }
+    catch (const itk::ExceptionObject& e)
+    {
+      MITK_ERROR << e.what();
+      return EXIT_FAILURE;
+    }
+    catch (const std::exception& e)
+    {
+      MITK_ERROR << e.what();
+      return EXIT_FAILURE;
+    }
+    catch (...)
+    {
+      MITK_ERROR << "Unexpected error encountered when parsing the CLI arguments.";
+      return EXIT_FAILURE;
+    }
 
     mitk::PreferenceListReaderOptionsFunctor readerFilterFunctor = mitk::PreferenceListReaderOptionsFunctor({ "MITK DICOM Reader v2 (autoselect)" }, { "" });
 

@@ -173,8 +173,6 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
                       mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")));
                   structNode->SetVisibility(false, mitk::BaseRenderer::GetInstance(
                       mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2")));
-                  structNode->SetVisibility(true, mitk::BaseRenderer::GetInstance(
-                      mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")));
 
                   dataStorage->Add(structNode);
               }

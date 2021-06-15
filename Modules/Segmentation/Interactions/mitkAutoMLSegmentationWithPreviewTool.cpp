@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <mitkLookupTableProperty.h>
 #include <mitkRenderingModeProperty.h>
 #include <mitkSliceNavigationController.h>
+#include <mitkImageStatisticsHolder.h>
 
 // ITK
 #include <itkBinaryThresholdImageFilter.h>
@@ -136,7 +137,7 @@ void mitk::AutoMLSegmentationWithPreviewTool::DoUpdatePreview(const Image* input
       this->m_MLPreviewNode->SetProperty("LookupTable", prop);
       mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
       mitk::LevelWindow levelwindow;
-      levelwindow.SetRangeMinMax(0, newMLPreview->GetScalarValueMax());
+      levelwindow.SetRangeMinMax(0, newMLPreview->GetStatistics()->GetScalarValueMax());
       levWinProp->SetLevelWindow(levelwindow);
       this->m_MLPreviewNode->SetProperty("levelwindow", levWinProp);
     }

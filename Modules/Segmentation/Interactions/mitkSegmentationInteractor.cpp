@@ -47,9 +47,12 @@ bool mitk::SegmentationInteractor::ChangeActiveLabel(StateMachineAction *, Inter
     assert(workingImage);
 
     const auto timestep = positionEvent->GetSender()->GetTimeStep(workingImage);
-    int pixelValue = static_cast<int>(workingImage->GetPixelValueByWorldCoordinate(positionEvent->GetPositionInWorld(), timestep));
 
-    workingImage->GetActiveLabelSet()->SetActiveLabel(pixelValue); // can be the background
+    //TODO
+    throw "TODO. Was forgot to refactor in context of T28524. The new class will has a dedicated function for that";
+    //int pixelValue = static_cast<int>(workingImage->GetPixelValueByWorldCoordinate(positionEvent->GetPositionInWorld(), timestep));
+    //workingImage->GetActiveLabelSet()->SetActiveLabel(pixelValue); // can be the background
+    //TODO END Refactor with T28524
 
     // Call Events
     // workingImage->ActiveLabelEvent.Send(pixelValue);

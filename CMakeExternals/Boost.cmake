@@ -197,13 +197,17 @@ $<$<CONFIG:RelWithDebInfo>:variant=release>")
 
             using gcc : : /usr/bin/gcc-7.3 ;
 
-          We use the stream editor sed for the replacement but as macOS is
+          We use the stream editor sed for the replacement but since macOS is
           based on BSD Unix, we use the limited but portable BSD syntax
           instead of the more powerful GNU syntax. We also use | instead of
           the more commonly used / separator for sed because the replacement
-          contains slashes. ]]
+          contains slashes.
 
-      if(toolset)
+          2021/06/15: The custom project-config.jam does not work well with
+          SDK paths on macOS anymore, so we use a custom project-config.jam
+          only on Linux for now. ]]
+
+      if(toolset AND NOT APPLE)
         set(configure_cmd sed -i.backup "\
 s|\
 using[[:space:]][[:space:]]*${toolset}[[:space:]]*$<SEMICOLON>|\

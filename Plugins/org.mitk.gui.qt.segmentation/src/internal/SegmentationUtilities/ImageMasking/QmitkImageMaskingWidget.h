@@ -50,6 +50,9 @@ private slots:
   /** @brief This slot is called if user activates the button to mask an image. */
   void OnMaskImagePressed();
 
+  /** @brief This slot is called if the user toggles the "Custom" radio button. */
+  void OnCustomValueButtonToggled(bool checked);
+
 private:
 
   /** @brief Check if selections is valid. */

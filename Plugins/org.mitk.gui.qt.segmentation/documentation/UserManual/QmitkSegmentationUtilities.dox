@@ -52,6 +52,10 @@ Image masking allows to mask an image with either an existing segmentation or a 
 The operation requires an image and a segmentation or a surface.
 The result will be an image containing only the pixels that are covered by the respective mask.
 
+The default background pixel value is zero.
+It can be changed to the minimum existing pixel value of the image or to a custom pixel value.
+If the custom pixel value is out of the valid bounds of the pixel type, it is optionally clamped accordingly.
+
 \imageMacro{QmitkSegmentationUtilities_ImageMasking.png,"Image masking",6.00}
 
 \section org_mitk_views_segmentationUtilitiesMorphologicalOperations Morphological operations

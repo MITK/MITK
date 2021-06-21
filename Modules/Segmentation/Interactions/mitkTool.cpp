@@ -22,6 +22,7 @@ found in the LICENSE file.
 #include "mitkProperties.h"
 #include "mitkVtkResliceInterpolationProperty.h"
 #include <mitkDICOMSegmentationPropertyHelper.cpp>
+#include <mitkToolManager.h>
 
 // us
 #include <usGetModuleContext.h>
@@ -116,6 +117,20 @@ const char *mitk::Tool::GetGroup() const
 void mitk::Tool::SetToolManager(ToolManager *manager)
 {
   m_ToolManager = manager;
+}
+
+mitk::ToolManager* mitk::Tool::GetToolManager() const
+{
+  return m_ToolManager;
+}
+
+mitk::DataStorage* mitk::Tool::GetDataStorage() const
+{
+  if (nullptr != m_ToolManager)
+  {
+    return m_ToolManager->GetDataStorage();
+  }
+  return nullptr;
 }
 
 void mitk::Tool::Activated()

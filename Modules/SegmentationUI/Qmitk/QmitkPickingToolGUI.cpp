@@ -12,40 +12,63 @@ found in the LICENSE file.
 
 #include "QmitkPickingToolGUI.h"
 
-#include "QmitkNewSegmentationDialog.h"
-
-#include "mitkBaseRenderer.h"
-#include "mitkStepper.h"
+#include <mitkPickingTool.h>
 #include <qlabel.h>
-#include <qlayout.h>
-#include <qpainter.h>
 #include <qpushbutton.h>
-#include <qslider.h>
+#include <qboxlayout.h>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkPickingToolGUI, "")
 
-QmitkPickingToolGUI::QmitkPickingToolGUI() : QmitkToolGUI()
+QmitkPickingToolGUI::QmitkPickingToolGUI() : QmitkAutoSegmentationToolGUIBase(false)
 {
-  m_Controls.setupUi(this);
+  auto enablePickingDelegate = [this](bool enabled)
+  {
+    bool result = false;
+    auto tool = this->GetConnectedToolAs<mitk::PickingTool>();
+    if (nullptr != tool)
+    {
+      result = enabled && tool->HasPicks();
+    }
 
-  connect(m_Controls.m_ConfirmButton, SIGNAL(clicked()), this, SLOT(OnConfirmSegmentation()));
+    return result;
+  };
 
-  connect(this, SIGNAL(NewToolAssociated(mitk::Tool *)), this, SLOT(OnNewToolAssociated(mitk::Tool *)));
+  m_EnableConfirmSegBtnFnc = enablePickingDelegate;
 }
 
 QmitkPickingToolGUI::~QmitkPickingToolGUI()
 {
 }
 
-void QmitkPickingToolGUI::OnNewToolAssociated(mitk::Tool *tool)
+void QmitkPickingToolGUI::OnResetPicksClicked()
 {
-  m_PickingTool = dynamic_cast<mitk::PickingTool *>(tool);
-}
-
-void QmitkPickingToolGUI::OnConfirmSegmentation()
-{
-  if (m_PickingTool.IsNotNull())
+  auto tool = this->GetConnectedToolAs<mitk::PickingTool>();
+  if (nullptr != tool)
   {
-    m_PickingTool->ConfirmSegmentation();
+    tool->ClearPicks();
   }
 }
+
+void QmitkPickingToolGUI::InitializeUI(QBoxLayout* mainLayout)
+{
+  QLabel* label = new QLabel("Press SHIFT and click to pick region(s).\nPress DEL to remove last pick.", this);
+  mainLayout->addWidget(label);
+
+  auto clearButton = new QPushButton("Reset picks",this);
+  connect(clearButton, &QPushButton::clicked, this, &QmitkPickingToolGUI::OnResetPicksClicked);
+  mainLayout->addWidget(clearButton);
+  m_ClearPicksBtn = clearButton;
+
+  Superclass::InitializeUI(mainLayout);
+}
+
+void QmitkPickingToolGUI::EnableWidgets(bool enabled)
+{
+  Superclass::EnableWidgets(enabled);
+
+  if (nullptr != m_ClearPicksBtn)
+  {
+    m_ClearPicksBtn->setEnabled(enabled);
+  }
+}
+

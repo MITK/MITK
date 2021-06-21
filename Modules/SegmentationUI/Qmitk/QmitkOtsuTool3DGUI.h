@@ -21,7 +21,7 @@ found in the LICENSE file.
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
-  \brief GUI for mitk::.
+  \brief GUI for mitk::OtsuTool3D.
   \sa mitk::
 
   This GUI shows ...

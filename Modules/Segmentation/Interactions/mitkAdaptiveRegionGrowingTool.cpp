@@ -96,22 +96,22 @@ void mitk::AdaptiveRegionGrowingTool::Deactivated()
 
 void mitk::AdaptiveRegionGrowingTool::ConfirmSegmentation()
 {
-  m_ToolManager->ActivateTool(-1);
+  this->GetToolManager()->ActivateTool(-1);
 }
 
 mitk::DataNode *mitk::AdaptiveRegionGrowingTool::GetReferenceData()
 {
-  return this->m_ToolManager->GetReferenceData(0);
+  return this->GetToolManager()->GetReferenceData(0);
 }
 
 mitk::DataStorage *mitk::AdaptiveRegionGrowingTool::GetDataStorage()
 {
-  return this->m_ToolManager->GetDataStorage();
+  return this->GetToolManager()->GetDataStorage();
 }
 
 mitk::DataNode *mitk::AdaptiveRegionGrowingTool::GetWorkingData()
 {
-  return this->m_ToolManager->GetWorkingData(0);
+  return this->GetToolManager()->GetWorkingData(0);
 }
 
 mitk::DataNode::Pointer mitk::AdaptiveRegionGrowingTool::GetPointSetNode()

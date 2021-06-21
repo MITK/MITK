@@ -57,7 +57,7 @@ void mitk::FeedbackContourTool::SetFeedbackContourColorDefault()
 void mitk::FeedbackContourTool::Deactivated()
 {
   Superclass::Deactivated();
-  DataStorage *storage = m_ToolManager->GetDataStorage();
+  DataStorage *storage = this->GetToolManager()->GetDataStorage();
   if (storage && m_FeedbackContourNode.IsNotNull())
   {
     storage->Remove(m_FeedbackContourNode);
@@ -180,7 +180,7 @@ void mitk::FeedbackContourTool::SetFeedbackContourVisible(bool visible)
   if (m_FeedbackContourVisible == visible)
     return; // nothing changed
 
-  if (DataStorage *storage = m_ToolManager->GetDataStorage())
+  if (DataStorage *storage = this->GetToolManager()->GetDataStorage())
   {
     if (visible)
     {

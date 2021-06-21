@@ -49,6 +49,13 @@ protected:
 
   virtual void DisconnectOldTool(mitk::AutoSegmentationWithPreviewTool* oldTool);
   virtual void ConnectNewTool(mitk::AutoSegmentationWithPreviewTool* newTool);
+
+  /**This method is called by OnNewToolAssociated if the UI is initialized the
+   first time to allow derived classes to introduce own UI code. Overwrite to change.
+   The implementation should ensure that alle widgets needed for the tool UI are
+   properly allocated. If one needs to eecute time (e.g. to connect events between the tool
+   and the UI) each time the tool changes, override the functions ConnectNewTool() and
+   DisconnectOldTool().*/
   virtual void InitializeUI(QBoxLayout* mainLayout);
 
   void BusyStateChanged(bool isBusy) override;
@@ -56,6 +63,11 @@ protected:
   using EnableConfirmSegBtnFunctionType = std::function<bool(bool)>;
   EnableConfirmSegBtnFunctionType m_EnableConfirmSegBtnFnc;
 
+  /**This method is used to control/set the enabled state of the tool UI
+    widgets. It is e.g. used if the busy state is changed (see BusyStateChanged).
+    Override the default implmentation, e.g. if a tool adds his own UI elements
+    (normally by overriding InitializeUI()) and wants to control how the widgets
+    are enabled/disabled.*/
   virtual void EnableWidgets(bool enabled);
 
   template <class TTool>

@@ -37,7 +37,7 @@ mitk::LiveWireTool2D::~LiveWireTool2D()
 
 void mitk::LiveWireTool2D::RemoveHelperObjects()
 {
-  auto dataStorage = m_ToolManager->GetDataStorage();
+  auto dataStorage = this->GetToolManager()->GetDataStorage();
 
   if (nullptr == dataStorage)
     return;
@@ -301,7 +301,7 @@ void mitk::LiveWireTool2D::OnInitLiveWire(StateMachineAction *, InteractionEvent
   m_EditingContourNode->AddProperty("contour.points.color", ColorProperty::New(0.0f, 0.0f, 1.0f), nullptr, true);
   m_EditingContourNode->AddProperty("contour.width", mitk::FloatProperty::New(4.0f), nullptr, true);
 
-  auto dataStorage = m_ToolManager->GetDataStorage();
+  auto dataStorage = this->GetToolManager()->GetDataStorage();
   dataStorage->Add(m_ContourNode, workingDataNode);
   dataStorage->Add(m_LiveWireContourNode, workingDataNode);
   dataStorage->Add(m_EditingContourNode, workingDataNode);
@@ -459,7 +459,7 @@ void mitk::LiveWireTool2D::FinishTool()
   for (int i = 0; i <= numberOfTimesteps; ++i)
     m_Contour->Close(i);
 
-  m_ToolManager->GetDataStorage()->Remove(m_LiveWireContourNode);
+  this->GetToolManager()->GetDataStorage()->Remove(m_LiveWireContourNode);
 
   m_LiveWireContourNode = nullptr;
   m_LiveWireContour = nullptr;
@@ -481,7 +481,7 @@ void mitk::LiveWireTool2D::OnLastSegmentDelete(StateMachineAction *, Interaction
   // If last point of current contour will be removed go to start state and remove nodes
   if (m_Contour->GetNumberOfVertices() <= 1)
   {
-    auto dataStorage = m_ToolManager->GetDataStorage();
+    auto dataStorage = this->GetToolManager()->GetDataStorage();
 
     dataStorage->Remove(m_LiveWireContourNode);
     dataStorage->Remove(m_ContourNode);

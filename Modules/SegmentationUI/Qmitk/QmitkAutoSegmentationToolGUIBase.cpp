@@ -115,6 +115,8 @@ void QmitkAutoSegmentationToolGUIBase::ConnectNewTool(mitk::AutoSegmentationWith
 
   newTool->SetOverwriteExistingSegmentation(true);
   m_CheckProcessAll->setVisible(newTool->GetTargetSegmentationNode()->GetData()->GetTimeSteps() > 1);
+
+  this->EnableWidgets(true);
 }
 
 void QmitkAutoSegmentationToolGUIBase::InitializeUI(QBoxLayout* /*mainLayout*/)

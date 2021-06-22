@@ -34,13 +34,15 @@ namespace mitk
         value
 
     Changes on Level/Window can be set with SetLevelWindow() and will affect either the topmost layer image,
-    if isAutoTopMost() returns true, or an image which is set by SetLevelWindowProperty(LevelWindowProperty::Pointer
+    if IsAutoTopMost() returns true, or an image which is set by SetLevelWindowProperty(LevelWindowProperty::Pointer
     levelWindowProperty).
+    Additionally the changes on Level/Window will affect one or multiple selected images, if IsSelectedImages() returns true.
+    Only one of the two different modes can be enabled at the same time.
 
     Changes to Level/Window, when another image gets active or by SetLevelWindow(const LevelWindow& levelWindow),
     will be sent to all listeners by Modified().
 
-    DataStorageChanged() listens to the DataStorage for new or removed images. Depending on how m_AutoTopMost is set,
+    DataStorageChanged() listens to the DataStorage for new or removed images. Depending on the currently enabled mode,
     the new image becomes active or not. If an image is removed from the DataStorage and m_AutoTopMost is false,
     there is a check to proof, if the active image is still available. If not, then m_AutoTopMost becomes true.
 
@@ -104,25 +106,25 @@ namespace mitk
      *
      * @return The current LevelWindowProperty
      */
-    LevelWindowProperty::Pointer GetLevelWindowProperty();
+    LevelWindowProperty::Pointer GetLevelWindowProperty() const;
     /**
     * @brief Return Level/Window values for the current image
     *
     * @return The LevelWindow value for the current image.
     */
-    const LevelWindow &GetLevelWindow();
+    const LevelWindow &GetLevelWindow() const;
     /**
-    * @brief Return true, if the changes on slider or line-edits will affect the topmost layer image.
+    * @brief Return true, if level window changes will affect the topmost layer image.
     *
     * @return Return the member value that denotes the auto-topmost mode.
     */
-    bool IsAutoTopMost();
+    bool IsAutoTopMost() const;
     /**
-    * @brief Return true, if changes on slider or line-edits will affect the currently selected images.
+    * @brief Return true, if level window changes will affect the currently selected images.
     *
     * @return Return the member value that denotes the selected-images mode.
     */
-    bool IsSelectedImages();
+    bool IsSelectedImages() const;
     /**
      * @brief This method is called when a node is added to the data storage.
      *        A listener on the data storage is used to call this method automatically after a node was added.
@@ -146,14 +148,14 @@ namespace mitk
     *
     * @return The member variable holding the currently active image.
     */
-    Image *GetCurrentImage();
+    Image *GetCurrentImage() const;
     /**
      * @brief Return the number of observers for data node's "visible" property.
      *        This basically returns the number of relevant nodes to observe.
      *
      * @return The current number of observers which are registered in this object.
      */
-    int GetNumberOfObservers();
+    int GetNumberOfObservers() const;
     /**
     * @brief Return all nodes in the data storage that have the following properties:
     *   - "binary" == false
@@ -162,7 +164,7 @@ namespace mitk
     *
     @ return The filtered list of relevant nodes in the data storage
     */
-    DataStorage::SetOfObjects::ConstPointer GetRelevantNodes();
+    DataStorage::SetOfObjects::ConstPointer GetRelevantNodes() const;
 
   private:
     LevelWindowManager();
@@ -185,7 +187,7 @@ namespace mitk
     void ClearPropertyObserverMaps();
     void CreatePropertyObserverMaps();
 
-    bool HasLevelWindowRenderingMode(DataNode *dataNode);
+    bool HasLevelWindowRenderingMode(DataNode *dataNode) const;
 
     // This variable holds a data node which will be deleted from the datastorage immediately.
     const DataNode *m_NodeMarkedToDelete;

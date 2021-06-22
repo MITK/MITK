@@ -136,6 +136,7 @@ struct QmitkMeasurementViewData
   bool m_ScrollEnabled;
 
   QWidget* m_Parent;
+  QLabel* m_SelectedImageLabel;
   QmitkSingleNodeSelectionWidget* m_SingleNodeSelectionWidget;
   QAction* m_DrawLine;
   QAction* m_DrawPath;
@@ -278,8 +279,10 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
   // copy to clipboard button
   d->m_CopyToClipboard = new QPushButton(tr("Copy to Clipboard"));
 
+  d->m_SelectedImageLabel = new QLabel("Selected Image");
   d->m_Layout = new QGridLayout;
-  d->m_Layout->addWidget(d->m_SingleNodeSelectionWidget, 0, 0, 1, 2);
+  d->m_Layout->addWidget(d->m_SelectedImageLabel, 0, 0);
+  d->m_Layout->addWidget(d->m_SingleNodeSelectionWidget, 0, 1, 1, 1);
   d->m_Layout->addWidget(d->m_DrawActionsToolBar, 1, 0, 1, 2);
   d->m_Layout->addWidget(d->m_FixedParameterBox, 2, 0, 1, 2);
   d->m_Layout->addWidget(d->m_SelectedPlanarFiguresText, 3, 0, 1, 2);

@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkLevelWindowManager.h"
-#include "mitkDataStorage.h"
+
 #include "mitkImage.h"
 #include "mitkMessage.h"
 #include "mitkNodePredicateAnd.h"
@@ -139,7 +139,7 @@ void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost, const DataN
 
     int layer = -1;
     node->GetIntProperty("layer", layer);
-    if (layer < maxVisibleLayer)
+    if (layer <= maxVisibleLayer)
     {
       continue;
     }
@@ -181,7 +181,6 @@ void mitk::LevelWindowManager::SetSelectedImages(bool selectedImagesMode, const 
     mitkThrow() << "DataStorage not set";
   }
 
-  DataNode::Pointer lastSelectedNode;
   m_LevelWindowProperty = nullptr;
   m_CurrentImage = nullptr;
 
@@ -204,7 +203,6 @@ void mitk::LevelWindowManager::SetSelectedImages(bool selectedImagesMode, const 
       continue;
     }
 
-
     bool validRenderingMode = HasLevelWindowRenderingMode(node);
     if (false == validRenderingMode)
     {
@@ -212,8 +210,7 @@ void mitk::LevelWindowManager::SetSelectedImages(bool selectedImagesMode, const 
     }
 
     m_LevelWindowProperty = dynamic_cast<LevelWindowProperty*>(node->GetProperty("levelwindow"));
-    m_DataNodesForLevelWindow.push_back(node);
-    lastSelectedNode = node;
+    m_DataNodesForLevelWindow.push_back(node); // nodes are used inside "SetLevelWindow" if the level window is changed
   }
 
   // this will set the "imageForLevelWindow" property and the 'm_CurrentImage' and call 'Modified()'
@@ -312,13 +309,15 @@ void mitk::LevelWindowManager::Update(const itk::EventObject &)
 
     int layer = -1;
     node->GetIntProperty("layer", layer);
-    if (layer > maxVisibleLayer)
+    if (layer <= maxVisibleLayer)
     {
-      // top level node is backup node, if no node with
-      // "imageForLevelWindow" property with value "true" is found
-      topLevelNode = node;
-      maxVisibleLayer = layer;
+      continue;
     }
+
+    // top level node is backup node, if no node with
+    // "imageForLevelWindow" property with value "true" is found
+    topLevelNode = node;
+    maxVisibleLayer = layer;
   }
 
   int nodesForLevelWindowSize = nodesForLevelWindow.size();
@@ -377,7 +376,7 @@ void mitk::LevelWindowManager::SetLevelWindowProperty(LevelWindowProperty::Point
 
   // find data node that belongs to the property
   DataStorage::SetOfObjects::ConstPointer all = m_DataStorage->GetAll();
-  mitk::DataNode::Pointer propNode = nullptr;
+  DataNode::Pointer propNode = nullptr;
   for (DataStorage::SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
   {
     DataNode::Pointer node = it.Value();
@@ -443,12 +442,12 @@ void mitk::LevelWindowManager::SetLevelWindow(const LevelWindow &levelWindow)
   this->Modified();
 }
 
-mitk::LevelWindowProperty::Pointer mitk::LevelWindowManager::GetLevelWindowProperty()
+mitk::LevelWindowProperty::Pointer mitk::LevelWindowManager::GetLevelWindowProperty() const
 {
   return m_LevelWindowProperty;
 }
 
-const mitk::LevelWindow &mitk::LevelWindowManager::GetLevelWindow()
+const mitk::LevelWindow &mitk::LevelWindowManager::GetLevelWindow() const
 {
   if (m_LevelWindowProperty.IsNotNull())
   {
@@ -460,12 +459,12 @@ const mitk::LevelWindow &mitk::LevelWindowManager::GetLevelWindow()
   }
 }
 
-bool mitk::LevelWindowManager::IsAutoTopMost()
+bool mitk::LevelWindowManager::IsAutoTopMost() const
 {
   return m_AutoTopMost;
 }
 
-bool mitk::LevelWindowManager::IsSelectedImages()
+bool mitk::LevelWindowManager::IsSelectedImages() const
 {
   return m_SelectedImagesMode;
 }
@@ -543,17 +542,17 @@ void mitk::LevelWindowManager::OnPropertyModified(const itk::EventObject &)
   this->Modified();
 }
 
-mitk::Image *mitk::LevelWindowManager::GetCurrentImage()
+mitk::Image *mitk::LevelWindowManager::GetCurrentImage() const
 {
   return m_CurrentImage;
 }
 
-int mitk::LevelWindowManager::GetNumberOfObservers()
+int mitk::LevelWindowManager::GetNumberOfObservers() const
 {
   return m_ObserverToVisibleProperty.size();
 }
 
-mitk::DataStorage::SetOfObjects::ConstPointer mitk::LevelWindowManager::GetRelevantNodes()
+mitk::DataStorage::SetOfObjects::ConstPointer mitk::LevelWindowManager::GetRelevantNodes() const
 {
   if (m_DataStorage.IsNull())
   {
@@ -705,7 +704,7 @@ void mitk::LevelWindowManager::CreatePropertyObserverMaps()
   }
 }
 
-bool mitk::LevelWindowManager::HasLevelWindowRenderingMode(DataNode *dataNode)
+bool mitk::LevelWindowManager::HasLevelWindowRenderingMode(DataNode *dataNode) const
 {
   RenderingModeProperty::Pointer mode =
     dynamic_cast<RenderingModeProperty*>(dataNode->GetProperty("Image Rendering.Mode"));

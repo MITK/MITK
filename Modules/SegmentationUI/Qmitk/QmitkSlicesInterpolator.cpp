@@ -597,7 +597,7 @@ void QmitkSlicesInterpolator::Interpolate(mitk::PlaneGeometry *plane,
         int clickedSliceDimension(-1);
         int clickedSliceIndex(-1);
 
-        // calculate real slice position, i.e. slice of the image and not slice of the TimeSlicedGeometry
+        // calculate real slice position, i.e. slice of the image
         mitk::SegTool2D::DetermineAffectedImageSlice(m_Segmentation, plane, clickedSliceDimension, clickedSliceIndex);
 
         mitk::Image::Pointer interpolation =

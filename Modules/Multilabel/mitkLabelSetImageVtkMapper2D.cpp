@@ -24,7 +24,6 @@ found in the LICENSE file.
 #include <mitkPlaneGeometry.h>
 #include <mitkProperties.h>
 #include <mitkResliceMethodProperty.h>
-#include <mitkTimeSlicedGeometry.h>
 #include <mitkTransferFunctionProperty.h>
 #include <mitkVtkResliceInterpolationProperty.h>
 

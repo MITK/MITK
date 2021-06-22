@@ -115,25 +115,6 @@ unsigned int mitk::Image::GetDimension(int i) const
   return 1;
 }
 
-void *mitk::Image::GetData()
-{
-  if (m_Initialized == false)
-  {
-    if (GetSource().IsNull())
-      return nullptr;
-    if (GetSource()->Updating() == false)
-      GetSource()->UpdateOutputInformation();
-  }
-  m_CompleteData = GetChannelData();
-
-  // update channel's data
-  // if data was not available at creation point, the m_Data of channel descriptor is nullptr
-  // if data present, it won't be overwritten
-  m_ImageDescriptor->GetChannelDescriptor(0).SetData(m_CompleteData->GetData());
-
-  return m_CompleteData->GetData();
-}
-
 template <class T>
 void AccessPixel(const mitk::PixelType ptype, void *data, const unsigned int offset, double &value)
 {
@@ -154,64 +135,6 @@ void AccessPixel(const mitk::PixelType ptype, void *data, const unsigned int off
     returnvalue += (((T *)data)[rgboffset + 2]);
     value = returnvalue;
   }
-}
-
-double mitk::Image::GetPixelValueByIndex(const itk::Index<3> &position, unsigned int timestep, unsigned int component)
-{
-  double value = 0;
-  if (this->GetTimeSteps() < timestep)
-  {
-    timestep = this->GetTimeSteps();
-  }
-
-  value = 0.0;
-
-  const unsigned int *imageDims = this->m_ImageDescriptor->GetDimensions();
-  const mitk::PixelType ptype = this->m_ImageDescriptor->GetChannelTypeById(0);
-
-  // Comparison ?>=0 not needed since all position[i] and timestep are unsigned int
-  // (position[0]>=0 && position[1] >=0 && position[2]>=0 && timestep>=0)
-  // bug-11978 : we still need to catch index with negative values
-  if (position[0] < 0 || position[1] < 0 || position[2] < 0)
-  {
-    MITK_WARN << "Given position (" << position << ") is out of image range, returning 0.";
-  }
-  // check if the given position is inside the index range of the image, the 3rd dimension needs to be compared only if
-  // the dimension is not 0
-  else if ((unsigned int)position[0] >= imageDims[0] || (unsigned int)position[1] >= imageDims[1] ||
-           (imageDims[2] && (unsigned int)position[2] >= imageDims[2]))
-  {
-    MITK_WARN << "Given position (" << position << ") is out of image range, returning 0.";
-  }
-  else
-  {
-    const unsigned int offset = component +
-                                ptype.GetNumberOfComponents() * (position[0] + position[1] * imageDims[0] +
-                                                                 position[2] * imageDims[0] * imageDims[1] +
-                                                                 timestep * imageDims[0] * imageDims[1] * imageDims[2]);
-
-    mitkPixelTypeMultiplex3(AccessPixel, ptype, this->GetData(), offset, value);
-  }
-
-  return value;
-}
-
-double mitk::Image::GetPixelValueByWorldCoordinate(const mitk::Point3D &position,
-                                                   unsigned int timestep,
-                                                   unsigned int component)
-{
-  double value = 0.0;
-  if (this->GetTimeSteps() < timestep)
-  {
-    timestep = this->GetTimeSteps();
-  }
-
-  itk::Index<3> itkIndex;
-  this->GetGeometry()->WorldToIndex(position, itkIndex);
-
-  value = this->GetPixelValueByIndex(itkIndex, timestep, component);
-
-  return value;
 }
 
 vtkImageData *mitk::Image::GetVtkImageData(int t, int n)
@@ -976,35 +899,6 @@ void mitk::Image::Initialize(const mitk::PixelType &type,
 
     Superclass::SetGeometry(cloned);
   }
-  /* //Old //TODO_GOETZ Really necessary?
-    mitk::BoundingBox::BoundsArrayType bounds = geometry.GetBoundingBoxInWorld()->GetBounds();
-    if( (bounds[0] != 0.0) || (bounds[2] != 0.0) || (bounds[4] != 0.0) )
-    {
-      SlicedGeometry3D* slicedGeometry = GetSlicedGeometry(0);
-
-      mitk::Point3D origin; origin.Fill(0.0);
-      slicedGeometry->IndexToWorld(origin, origin);
-
-      bounds[1]-=bounds[0]; bounds[3]-=bounds[2]; bounds[5]-=bounds[4];
-      bounds[0] = 0.0;      bounds[2] = 0.0;      bounds[4] = 0.0;
-      this->m_ImageDescriptor->Initialize( this->m_Dimensions, this->m_Dimension );
-      slicedGeometry->SetBounds(bounds);
-      slicedGeometry->GetIndexToWorldTransform()->SetOffset(origin.GetVnlVector().data_block());
-
-      ProportionalTimeGeometry::Pointer timeGeometry = ProportionalTimeGeometry::New();
-      timeGeometry->Initialize(slicedGeometry, m_Dimensions[3]);
-      SetTimeGeometry(timeGeometry);
-    }*/
-}
-
-void mitk::Image::Initialize(const mitk::PixelType &,
-                             int,
-                             const mitk::PlaneGeometry &,
-                             bool,
-                             unsigned int,
-                             int)
-{
-  mitkThrow() << "Use this method without the flipped parameter (direction is specified by the handedness of the PlaneGeometry instead).";
 }
 
 void mitk::Image::Initialize(const mitk::PixelType &type,
@@ -1392,78 +1286,6 @@ bool mitk::Image::IsRotated() const
   return ret;
 }
 
-mitk::ScalarType mitk::Image::GetScalarValueMin(int t) const
-{
-  return m_ImageStatistics->GetScalarValueMin(t);
-}
-
-//## \brief Get the maximum for scalar images
-mitk::ScalarType mitk::Image::GetScalarValueMax(int t) const
-{
-  return m_ImageStatistics->GetScalarValueMax(t);
-}
-
-//## \brief Get the second smallest value for scalar images
-mitk::ScalarType mitk::Image::GetScalarValue2ndMin(int t) const
-{
-  return m_ImageStatistics->GetScalarValue2ndMin(t);
-}
-
-mitk::ScalarType mitk::Image::GetScalarValueMinNoRecompute(unsigned int t) const
-{
-  return m_ImageStatistics->GetScalarValueMinNoRecompute(t);
-}
-
-mitk::ScalarType mitk::Image::GetScalarValue2ndMinNoRecompute(unsigned int t) const
-{
-  return m_ImageStatistics->GetScalarValue2ndMinNoRecompute(t);
-}
-
-mitk::ScalarType mitk::Image::GetScalarValue2ndMax(int t) const
-{
-  return m_ImageStatistics->GetScalarValue2ndMax(t);
-}
-
-mitk::ScalarType mitk::Image::GetScalarValueMaxNoRecompute(unsigned int t) const
-{
-  return m_ImageStatistics->GetScalarValueMaxNoRecompute(t);
-}
-
-mitk::ScalarType mitk::Image::GetScalarValue2ndMaxNoRecompute(unsigned int t) const
-{
-  return m_ImageStatistics->GetScalarValue2ndMaxNoRecompute(t);
-}
-
-mitk::ScalarType mitk::Image::GetCountOfMinValuedVoxels(int t) const
-{
-  return m_ImageStatistics->GetCountOfMinValuedVoxels(t);
-}
-
-mitk::ScalarType mitk::Image::GetCountOfMaxValuedVoxels(int t) const
-{
-  return m_ImageStatistics->GetCountOfMaxValuedVoxels(t);
-}
-
-unsigned int mitk::Image::GetCountOfMaxValuedVoxelsNoRecompute(unsigned int t) const
-{
-  return m_ImageStatistics->GetCountOfMaxValuedVoxelsNoRecompute(t);
-}
-
-unsigned int mitk::Image::GetCountOfMinValuedVoxelsNoRecompute(unsigned int t) const
-{
-  return m_ImageStatistics->GetCountOfMinValuedVoxelsNoRecompute(t);
-}
-
-bool mitk::Equal(const mitk::Image *leftHandSide, const mitk::Image *rightHandSide, ScalarType eps, bool verbose)
-{
-  if ((leftHandSide == nullptr) || (rightHandSide == nullptr))
-  {
-    MITK_ERROR << "mitk::Equal(const mitk::Image* leftHandSide, const mitk::Image* rightHandSide, ScalarType eps, bool "
-                  "verbose) does not work with nullptr pointer input.";
-    return false;
-  }
-  return mitk::Equal(*leftHandSide, *rightHandSide, eps, verbose);
-}
 
 bool mitk::Equal(const mitk::Image &leftHandSide, const mitk::Image &rightHandSide, ScalarType eps, bool verbose)
 {

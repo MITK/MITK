@@ -29,9 +29,6 @@ found in the LICENSE file.
 #include <map>
 #include <set>
 
-// DEPRECATED
-#include <mitkTimeSlicedGeometry.h>
-
 namespace mitk
 {
   class NavigationController;
@@ -168,12 +165,6 @@ namespace mitk
     //## \sa m_CurrentWorldPlaneGeometry
     virtual void SetWorldGeometry3D(const BaseGeometry *geometry);
     virtual void SetWorldTimeGeometry(const mitk::TimeGeometry *geometry);
-
-    /**
-    * \deprecatedSince{2013_09} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see
-    * http://www.mitk.org/Development/Refactoring%20of%20the%20Geometry%20Classes%20-%20Part%201
-    */
-    DEPRECATED(void SetWorldGeometry3D(TimeSlicedGeometry *geometry));
 
     itkGetConstObjectMacro(WorldTimeGeometry, TimeGeometry);
 

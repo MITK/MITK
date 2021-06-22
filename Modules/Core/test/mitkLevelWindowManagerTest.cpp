@@ -36,7 +36,6 @@ class mitkLevelWindowManagerTestSuite : public mitk::TestFixture
   MITK_TEST(TestSelectedPropertyChanged);
   MITK_TEST(TestRemoveDataNodes);
   MITK_TEST(TestCombinedPropertiesChanged);
-  //MITK_TEST(TestMultiComponentRescaling);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -409,13 +408,10 @@ public:
     bool isImageForLevelWindow1, isImageForLevelWindow2;
     m_DataNode1->GetBoolProperty("imageForLevelWindow", isImageForLevelWindow1);
     m_DataNode2->GetBoolProperty("imageForLevelWindow", isImageForLevelWindow2);
-    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set",
-                           !isImageForLevelWindow1 && isImageForLevelWindow2);
+    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", !isImageForLevelWindow1 && isImageForLevelWindow2);
 
-    auto levelWindowProperty1 =
-      dynamic_cast<mitk::LevelWindowProperty *>(m_DataNode1->GetProperty("levelwindow"));
-    auto levelWindowProperty2 =
-      dynamic_cast<mitk::LevelWindowProperty *>(m_DataNode2->GetProperty("levelwindow"));
+    auto levelWindowProperty1 = dynamic_cast<mitk::LevelWindowProperty *>(m_DataNode1->GetProperty("levelwindow"));
+    auto levelWindowProperty2 = dynamic_cast<mitk::LevelWindowProperty *>(m_DataNode2->GetProperty("levelwindow"));
     auto managerLevelWindowProperty = m_LevelWindowManager->GetLevelWindowProperty();
     CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set",
       (false == (managerLevelWindowProperty == levelWindowProperty1)) &&
@@ -428,11 +424,9 @@ public:
     m_DataNode1->GetBoolProperty("imageForLevelWindow", isImageForLevelWindow1);
     CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", isImageForLevelWindow1);
 
-    levelWindowProperty1 =
-      dynamic_cast<mitk::LevelWindowProperty *>(m_DataNode1->GetProperty("levelwindow"));
+    levelWindowProperty1 = dynamic_cast<mitk::LevelWindowProperty *>(m_DataNode1->GetProperty("levelwindow"));
     managerLevelWindowProperty = m_LevelWindowManager->GetLevelWindowProperty();
-    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set",
-      true == (managerLevelWindowProperty == levelWindowProperty1));
+    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", true == (managerLevelWindowProperty == levelWindowProperty1));
 
     m_DataManager->Remove(m_DataNode1);
     CPPUNIT_ASSERT_MESSAGE("Node not correctly removed", m_LevelWindowManager->GetRelevantNodes()->size() == 0);

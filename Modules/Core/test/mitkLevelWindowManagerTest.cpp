@@ -284,13 +284,43 @@ public:
     CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(true, false, false));
     CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(true, false, false));
 
+    // Second node will be selected (node 1 and node 2 selected).
+    // It is not specified which data node will be used for the "imageForLevelWindow" / "levelwindow" property,
+    // since the data storage access to the nodes is non-deterministic.
+    // At least check for any valid level window property.
     m_DataNode2->SetSelected(true);
-    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, true, false));
-    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, true, false));
+    CPPUNIT_ASSERT_MESSAGE("LevelWindowProperty is null", m_LevelWindowManager->GetLevelWindowProperty());
 
+    // Third node will be selected (node 1, node 2 and node 3 selected)
+    // It is not specified which data node will be used for the "imageForLevelWindow" / "levelwindow" property,
+    // since the data storage access to the nodes is non-deterministic.
+    // At least check for any valid level window property.
     m_DataNode3->SetSelected(true);
-    CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, false, true));
-    CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, false, true));
+    auto usedLevelWindowProperty = m_LevelWindowManager->GetLevelWindowProperty();
+    CPPUNIT_ASSERT_MESSAGE("LevelWindowProperty is null", usedLevelWindowProperty);
+
+    // All three nodes are selected: Check if only one node has the "imageForLevelWindow" property set and this node's
+    // "levelwindow" property is used by the level window manager.
+    auto levelWindowProperty1 = dynamic_cast<mitk::LevelWindowProperty*>(m_DataNode1->GetProperty("imageForLevelWindow"));
+    if (usedLevelWindowProperty == levelWindowProperty1)
+    {
+      CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(true, false, false));
+      CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(true, false, false));
+    }
+
+    auto levelWindowProperty2 = dynamic_cast<mitk::LevelWindowProperty*>(m_DataNode2->GetProperty("imageForLevelWindow"));
+    if (usedLevelWindowProperty == levelWindowProperty2)
+    {
+      CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, true, false));
+      CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, true, false));
+    }
+
+    auto levelWindowProperty3 = dynamic_cast<mitk::LevelWindowProperty*>(m_DataNode3->GetProperty("imageForLevelWindow"));
+    if (usedLevelWindowProperty == levelWindowProperty3)
+    {
+      CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, false, true));
+      CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, false, true));
+    }
 
     m_DataNode1->SetSelected(false);
     m_DataNode2->SetSelected(false);

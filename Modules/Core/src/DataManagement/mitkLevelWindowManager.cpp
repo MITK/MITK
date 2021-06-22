@@ -181,7 +181,6 @@ void mitk::LevelWindowManager::SetSelectedImages(bool selectedImagesMode, const 
     mitkThrow() << "DataStorage not set";
   }
 
-  DataNode::Pointer lastSelectedNode;
   m_LevelWindowProperty = nullptr;
   m_CurrentImage = nullptr;
 
@@ -212,7 +211,6 @@ void mitk::LevelWindowManager::SetSelectedImages(bool selectedImagesMode, const 
 
     m_LevelWindowProperty = dynamic_cast<LevelWindowProperty*>(node->GetProperty("levelwindow"));
     m_DataNodesForLevelWindow.push_back(node); // nodes are used inside "SetLevelWindow" if the level window is changed
-    lastSelectedNode = node;
   }
 
   // this will set the "imageForLevelWindow" property and the 'm_CurrentImage' and call 'Modified()'

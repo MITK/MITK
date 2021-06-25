@@ -150,16 +150,20 @@ tinyxml2::XMLElement *mitk::LabelSetIOHelper::GetLabelAsXMLElement(tinyxml2::XML
 {
   auto *labelElem = doc.NewElement("Label");
 
-  // add XML contents
-  const PropertyList::PropertyMap *propmap = label->GetMap();
-  for (auto iter = propmap->begin(); iter != propmap->end(); ++iter)
+  if (nullptr != label)
   {
-    std::string key = iter->first;
-    const BaseProperty *property = iter->second;
-    auto *element = PropertyToXMLElement(doc, key, property);
-    if (element)
-      labelElem->InsertEndChild(element);
+    // add XML contents
+    const PropertyList::PropertyMap* propmap = label->GetMap();
+    for (auto iter = propmap->begin(); iter != propmap->end(); ++iter)
+    {
+      std::string key = iter->first;
+      const BaseProperty* property = iter->second;
+      auto* element = PropertyToXMLElement(doc, key, property);
+      if (element)
+        labelElem->InsertEndChild(element);
+    }
   }
+
   return labelElem;
 }
 

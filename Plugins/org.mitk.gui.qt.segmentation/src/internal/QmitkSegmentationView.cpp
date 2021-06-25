@@ -182,113 +182,124 @@ void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences*
 
 void QmitkSegmentationView::CreateNewSegmentation()
 {
-   mitk::DataNode::Pointer node = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetReferenceData(0);
-   if (node.IsNotNull())
+  mitk::DataNode::Pointer node = mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetReferenceData(0);
+  if (node.IsNull())
+  {
+    MITK_ERROR << "'Create new segmentation' button should never be clickable unless a reference image is selected.";
+    return;
+  }
+
+  mitk::Image::ConstPointer referenceImage = dynamic_cast<mitk::Image *>(node->GetData());
+  if (referenceImage.IsNull())
+  {
+    MITK_ERROR << "Reference data needs to be an image in order to create a new segmentation.";
+    return;
+  }
+
+  if (referenceImage->GetDimension() <= 1)
+  {
+    QMessageBox::information(nullptr, tr("Segmentation"), tr("Segmentation is currently not supported for 2D images"));
+    return;
+  }
+
+  // ask about the name and organ type of the new segmentation
+  auto dialog = new QmitkNewSegmentationDialog(m_Parent); // needs a QWidget as parent, "this" is not QWidget
+  QStringList organColors = mitk::OrganNamesHandling::GetDefaultOrganColorString();
+  dialog->SetSuggestionList(organColors);
+
+  int dialogReturnValue = dialog->exec();
+  if (dialogReturnValue == QDialog::Rejected)
+  {
+    // user clicked Cancel or pressed Esc or something similar
+    return;
+  }
+
+  const auto currentTimePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+  unsigned int imageTimeStep = 0;
+  if (referenceImage->GetTimeGeometry()->IsValidTimePoint(currentTimePoint))
+  {
+    imageTimeStep = referenceImage->GetTimeGeometry()->TimePointToTimeStep(currentTimePoint);
+  }
+
+  auto segTemplateImage = referenceImage;
+  if (referenceImage->GetDimension() > 3)
+  {
+    auto result = QMessageBox::question(m_Parent,
+      tr("Create a static or dynamic segmentation?"),
+      tr("The patient image has multiple time steps.\n\nDo you want to create a static "
+        "segmentation that is identical for all time steps or do you want to create a "
+        "dynamic segmentation to segment individual time steps?"),
+      tr("Create static segmentation"),
+      tr("Create dynamic segmentation"),
+      QString(), 0, 0);
+    if (result == 0)
+    {
+      auto selector = mitk::ImageTimeSelector::New();
+      selector->SetInput(referenceImage);
+      selector->SetTimeNr(0);
+      selector->Update();
+
+      const auto refTimeGeometry = referenceImage->GetTimeGeometry();
+      auto newTimeGeometry = mitk::ProportionalTimeGeometry::New();
+      newTimeGeometry->SetFirstTimePoint(refTimeGeometry->GetMinimumTimePoint());
+      newTimeGeometry->SetStepDuration(refTimeGeometry->GetMaximumTimePoint() - refTimeGeometry->GetMinimumTimePoint());
+
+      mitk::Image::Pointer newImage = selector->GetOutput();
+      newTimeGeometry->SetTimeStepGeometry(referenceImage->GetGeometry(imageTimeStep), 0);
+      newImage->SetTimeGeometry(newTimeGeometry);
+      segTemplateImage = newImage;
+    }
+  }
+
+  // create a new image of the same dimensions and smallest possible pixel type
+  auto toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  auto firstTool = toolManager->GetToolById(0);
+  if (nullptr == firstTool)
+  {
+    return;
+  }
+
+   try
    {
-     mitk::Image::ConstPointer referenceImage = dynamic_cast<mitk::Image*>(node->GetData());
-     if (referenceImage.IsNotNull())
+     std::string newNodeName = dialog->GetSegmentationName().toStdString();
+     if (newNodeName.empty())
      {
-       if (referenceImage->GetDimension() > 1)
-       {
-         // ask about the name and organ type of the new segmentation
-         QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog(m_Parent); // needs a QWidget as parent, "this" is not QWidget
-         QStringList organColors = mitk::OrganNamesHandling::GetDefaultOrganColorString();;
-
-         dialog->SetSuggestionList(organColors);
-
-         int dialogReturnValue = dialog->exec();
-         if (dialogReturnValue == QDialog::Rejected)
-         {
-           // user clicked cancel or pressed Esc or something similar
-           return;
-         }
-
-         const auto currentTimePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
-         unsigned int imageTimeStep = 0;
-         if (referenceImage->GetTimeGeometry()->IsValidTimePoint(currentTimePoint))
-         {
-           imageTimeStep = referenceImage->GetTimeGeometry()->TimePointToTimeStep(currentTimePoint);
-         }
-
-         auto segTemplateImage = referenceImage;
-         if (referenceImage->GetDimension() > 3)
-         {
-           auto result = QMessageBox::question(m_Parent, tr("Create a static or dynamic segmentation?"), tr("The patient image has multiple time steps.\n\nDo you want to create a static segmentation that is identical for all time steps or do you want to create a dynamic segmentation to segment individual time steps?"), tr("Create static segmentation"), tr("Create dynamic segmentation"), QString(), 0,0);
-           if (result == 0)
-           {
-             auto selector = mitk::ImageTimeSelector::New();
-             selector->SetInput(referenceImage);
-             selector->SetTimeNr(0);
-             selector->Update();
-
-             const auto refTimeGeometry = referenceImage->GetTimeGeometry();
-             auto newTimeGeometry = mitk::ProportionalTimeGeometry::New();
-             newTimeGeometry->SetFirstTimePoint(refTimeGeometry->GetMinimumTimePoint());
-             newTimeGeometry->SetStepDuration(refTimeGeometry->GetMaximumTimePoint() - refTimeGeometry->GetMinimumTimePoint());
-
-             mitk::Image::Pointer newImage = selector->GetOutput();
-             newTimeGeometry->SetTimeStepGeometry(referenceImage->GetGeometry(imageTimeStep), 0);
-             newImage->SetTimeGeometry(newTimeGeometry);
-             segTemplateImage = newImage;
-           }
-         }
-
-         // ask the user about an organ type and name, add this information to the image's (!) propertylist
-         // create a new image of the same dimensions and smallest possible pixel type
-         mitk::ToolManager* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-         mitk::Tool* firstTool = toolManager->GetToolById(0);
-         if (firstTool)
-         {
-           try
-           {
-             std::string newNodeName = dialog->GetSegmentationName().toStdString();
-             if (newNodeName.empty())
-             {
-               newNodeName = "no_name";
-             }
-
-             mitk::DataNode::Pointer emptySegmentation = firstTool->CreateEmptySegmentationNode(segTemplateImage, newNodeName, dialog->GetColor());
-             // initialize showVolume to false to prevent recalculating the volume while working on the segmentation
-             emptySegmentation->SetProperty("showVolume", mitk::BoolProperty::New(false));
-             if (!emptySegmentation)
-             {
-               return; // could be aborted by user
-             }
-
-             mitk::OrganNamesHandling::UpdateOrganList(organColors, dialog->GetSegmentationName(), dialog->GetColor());
-
-             // escape ';' here (replace by '\;'), see longer comment above
-             QString stringForStorage = organColors.replaceInStrings(";", "\\;").join(";");
-             MITK_DEBUG << "Will store: " << stringForStorage;
-             this->GetPreferences()->Put("Organ-Color-List", stringForStorage);
-             this->GetPreferences()->Flush();
-
-             if (mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0))
-             {
-               mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0)->SetSelected(false);
-             }
-             emptySegmentation->SetSelected(true);
-             this->GetDataStorage()->Add(emptySegmentation, node); // add as a child, because the segmentation "derives" from the original
-
-             m_Controls->segImageSelector->SetCurrentSelectedNode(emptySegmentation);
-             mitk::RenderingManager::GetInstance()->InitializeViews(referenceImage->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
-             mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->SetPos(imageTimeStep);
-           }
-           catch (const std::bad_alloc&)
-           {
-             QMessageBox::warning(nullptr, tr("Create new segmentation"), tr("Could not allocate memory for new segmentation"));
-           }
-         }
-       }
-       else
-       {
-         QMessageBox::information(nullptr, tr("Segmentation"), tr("Segmentation is currently not supported for 2D images"));
-       }
+       newNodeName = "no_name";
      }
+
+     mitk::DataNode::Pointer emptySegmentation =
+       firstTool->CreateEmptySegmentationNode(segTemplateImage, newNodeName, dialog->GetColor());
+     // initialize showVolume to false to prevent recalculating the volume while working on the segmentation
+     emptySegmentation->SetProperty("showVolume", mitk::BoolProperty::New(false));
+     if (!emptySegmentation)
+     {
+       return; // could be aborted by user
+     }
+
+     mitk::OrganNamesHandling::UpdateOrganList(organColors, dialog->GetSegmentationName(), dialog->GetColor());
+
+     // escape ';' here (replace by '\;'), see longer comment above
+     QString stringForStorage = organColors.replaceInStrings(";", "\\;").join(";");
+     MITK_DEBUG << "Will store: " << stringForStorage;
+     this->GetPreferences()->Put("Organ-Color-List", stringForStorage);
+     this->GetPreferences()->Flush();
+
+     this->GetDataStorage()->Add(emptySegmentation, node);
+
+     if (mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0))
+     {
+       mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0)->SetSelected(false);
+     }
+     emptySegmentation->SetSelected(true);
+     m_Controls->segImageSelector->SetCurrentSelectedNode(emptySegmentation);
+
+     mitk::RenderingManager::GetInstance()->InitializeViews(
+       referenceImage->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+     mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->SetPos(imageTimeStep);
    }
-   else
+   catch (const std::bad_alloc &)
    {
-     MITK_ERROR << "'Create new segmentation' button should never be clickable unless a patient image is selected...";
+     QMessageBox::warning(nullptr, tr("Create new segmentation"), tr("Could not allocate memory for new segmentation"));
    }
 }
 
@@ -677,7 +688,6 @@ void QmitkSegmentationView::CheckRenderingState()
   }
 
   bool selectedNodeIsVisible = renderWindowPart && workingNode->IsVisible(renderWindowPart->GetQmitkRenderWindow("axial")->GetRenderer());
-
   if (!selectedNodeIsVisible)
   {
     this->SetToolSelectionBoxesEnabled(false);
@@ -690,27 +700,22 @@ void QmitkSegmentationView::CheckRenderingState()
    * At the moment it is not supported to use a geometry different from the selected image for reslicing.
    * For further information see Bug 16063
    */
+  const mitk::BaseGeometry *workingNodeGeo = workingNode->GetData()->GetGeometry();
+  const mitk::BaseGeometry* worldGeo = renderWindowPart->GetQmitkRenderWindow("3d")->GetSliceNavigationController()->GetCurrentGeometry3D();
+  if (nullptr != workingNodeGeo && nullptr != worldGeo)
+  {
+    if (mitk::Equal(*workingNodeGeo->GetBoundingBox(), *worldGeo->GetBoundingBox(), mitk::eps, true))
+    {
+      this->SetToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), workingNode);
+      this->SetToolSelectionBoxesEnabled(true);
+      this->UpdateWarningLabel("");
+      return;
+    }
+  }
 
-   const mitk::BaseGeometry* worldGeo = renderWindowPart->GetQmitkRenderWindow("3d")->GetSliceNavigationController()->GetCurrentGeometry3D();
-
-   if (workingNode && worldGeo)
-   {
-
-      const mitk::BaseGeometry* workingNodeGeo = workingNode->GetData()->GetGeometry();
-      const mitk::BaseGeometry* worldGeo = renderWindowPart->GetQmitkRenderWindow("3d")->GetSliceNavigationController()->GetCurrentGeometry3D();
-
-      if (mitk::Equal(*workingNodeGeo->GetBoundingBox(), *worldGeo->GetBoundingBox(), mitk::eps, true))
-      {
-         this->SetToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), workingNode);
-         this->SetToolSelectionBoxesEnabled(true);
-         this->UpdateWarningLabel("");
-         return;
-      }
-   }
-
-   this->SetToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), nullptr);
-   this->SetToolSelectionBoxesEnabled(false);
-   this->UpdateWarningLabel(tr("Please perform a reinit on the segmentation image!"));
+  this->SetToolManagerSelection(m_Controls->patImageSelector->GetSelectedNode(), nullptr);
+  this->SetToolSelectionBoxesEnabled(false);
+  this->UpdateWarningLabel(tr("Please perform a reinit on the segmentation image!"));
 }
 
 void QmitkSegmentationView::UpdateWarningLabel(QString text)

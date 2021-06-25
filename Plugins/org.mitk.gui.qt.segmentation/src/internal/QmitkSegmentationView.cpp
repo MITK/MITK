@@ -259,48 +259,50 @@ void QmitkSegmentationView::CreateNewSegmentation()
     return;
   }
 
-   try
-   {
-     std::string newNodeName = dialog->GetSegmentationName().toStdString();
-     if (newNodeName.empty())
-     {
-       newNodeName = "no_name";
-     }
+  std::string newNodeName = dialog->GetSegmentationName().toStdString();
+  if (newNodeName.empty())
+  {
+    newNodeName = "no_name";
+  }
 
-     mitk::DataNode::Pointer emptySegmentation =
-       firstTool->CreateEmptySegmentationNode(segTemplateImage, newNodeName, dialog->GetColor());
-     // initialize showVolume to false to prevent recalculating the volume while working on the segmentation
-     emptySegmentation->SetProperty("showVolume", mitk::BoolProperty::New(false));
-     if (!emptySegmentation)
-     {
-       return; // could be aborted by user
-     }
+  mitk::DataNode::Pointer emptySegmentation = nullptr;
+  try
+  {
+    emptySegmentation = firstTool->CreateEmptySegmentationNode(segTemplateImage, newNodeName, dialog->GetColor());
+  }
+  catch (const std::bad_alloc &)
+  {
+    QMessageBox::warning(nullptr, tr("Create new segmentation"), tr("Could not allocate memory for new segmentation"));
+  }
 
-     mitk::OrganNamesHandling::UpdateOrganList(organColors, dialog->GetSegmentationName(), dialog->GetColor());
+  if (nullptr == emptySegmentation)
+  {
+    return; // could have been aborted by user
+  }
 
-     // escape ';' here (replace by '\;'), see longer comment above
-     QString stringForStorage = organColors.replaceInStrings(";", "\\;").join(";");
-     MITK_DEBUG << "Will store: " << stringForStorage;
-     this->GetPreferences()->Put("Organ-Color-List", stringForStorage);
-     this->GetPreferences()->Flush();
+  // initialize "showVolume"-property to false to prevent recalculating the volume while working on the segmentation
+  emptySegmentation->SetProperty("showVolume", mitk::BoolProperty::New(false));
 
-     this->GetDataStorage()->Add(emptySegmentation, node);
+  mitk::OrganNamesHandling::UpdateOrganList(organColors, dialog->GetSegmentationName(), dialog->GetColor());
 
-     if (mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0))
-     {
-       mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0)->SetSelected(false);
-     }
-     emptySegmentation->SetSelected(true);
-     m_Controls->segImageSelector->SetCurrentSelectedNode(emptySegmentation);
+  // escape ';' here (replace by '\;')
+  QString stringForStorage = organColors.replaceInStrings(";", "\\;").join(";");
+  MITK_DEBUG << "Will store: " << stringForStorage;
+  this->GetPreferences()->Put("Organ-Color-List", stringForStorage);
+  this->GetPreferences()->Flush();
 
-     mitk::RenderingManager::GetInstance()->InitializeViews(
-       referenceImage->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
-     mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->SetPos(imageTimeStep);
-   }
-   catch (const std::bad_alloc &)
-   {
-     QMessageBox::warning(nullptr, tr("Create new segmentation"), tr("Could not allocate memory for new segmentation"));
-   }
+  this->GetDataStorage()->Add(emptySegmentation, node);
+
+  if (mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0))
+  {
+    mitk::ToolManagerProvider::GetInstance()->GetToolManager()->GetWorkingData(0)->SetSelected(false);
+  }
+  emptySegmentation->SetSelected(true);
+  m_Controls->segImageSelector->SetCurrentSelectedNode(emptySegmentation);
+
+  mitk::RenderingManager::GetInstance()->InitializeViews(
+    referenceImage->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+  mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->SetPos(imageTimeStep);
 }
 
 void QmitkSegmentationView::OnVisiblePropertyChanged()

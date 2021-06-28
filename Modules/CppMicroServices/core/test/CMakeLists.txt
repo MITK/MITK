@@ -21,32 +21,34 @@ add_subdirectory(modules)
 #-----------------------------------------------------------------------------
 
 set(_tests
-  usAnyTest.cpp
-  usLDAPFilterTest.cpp
-  usLogTest.cpp
-  usModuleHooksTest.cpp
-  usModuleManifestTest.cpp
-  usModuleTest.cpp
-  usModuleResourceTest.cpp
-  usServiceFactoryTest.cpp
-  usServiceHooksTest.cpp
-  usServiceRegistryPerformanceTest.cpp
-  usServiceRegistryTest.cpp
-  usServiceTemplateTest.cpp
-  usServiceTrackerTest.cpp
-  usStaticModuleResourceTest.cpp
-  usStaticModuleTest.cpp
+  usAnyTest
+  usLDAPFilterTest
+  usLogTest
+  usModuleHooksTest
+  usModuleManifestTest
+  usModuleTest
+  usModuleResourceTest
+  usServiceFactoryTest
+  usServiceHooksTest
+  usServiceRegistryPerformanceTest
+  usServiceRegistryTest
+  usServiceTemplateTest
+  usServiceTrackerTest
+  usStaticModuleResourceTest
+  usStaticModuleTest
 )
 
 if(US_BUILD_SHARED_LIBS)
   list(APPEND _tests
-       usServiceListenerTest.cpp
-       usSharedLibraryTest.cpp
+       usServiceListenerTest
+       usSharedLibraryTest
       )
   if(US_ENABLE_AUTOLOADING_SUPPORT)
-    list(APPEND _tests usModuleAutoLoadTest.cpp)
+    list(APPEND _tests usModuleAutoLoadTest)
   endif()
 endif()
+
+list(TRANSFORM _tests APPEND ".cpp" OUTPUT_VARIABLE _test_files)
 
 set(_additional_srcs
   usTestDriverActivator.cpp
@@ -56,7 +58,7 @@ set(_additional_srcs
 
 set(_test_driver us${PROJECT_NAME}TestDriver)
 set(_test_sourcelist_extra_args )
-create_test_sourcelist(_srcs ${_test_driver}.cpp ${_tests} ${_test_sourcelist_extra_args})
+create_test_sourcelist(_srcs ${_test_driver}.cpp ${_test_files} ${_test_sourcelist_extra_args})
 
 # Generate a custom "module init" file for the test driver executable
 usFunctionGenerateModuleInit(_srcs)

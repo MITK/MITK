@@ -647,7 +647,7 @@ namespace mitk
       return SignedDistanceFromPlane(pt3d_mm) > 0;
   }
 
-  bool PlaneGeometry::IntersectionLine(const PlaneGeometry *plane, Line3D &crossline) const
+  bool PlaneGeometry::IntersectionLine(const PlaneGeometry* plane, Line3D& crossline) const
   {
     Vector3D normal = this->GetNormal();
     normal.Normalize();
@@ -675,7 +675,9 @@ namespace mitk
     double c2 = (d2 - d1 * N1dN2) / determinant;
 
     Vector3D p = normal * c1 + planeNormal * c2;
-    crossline.SetPoint(p);
+    crossline.GetPoint()[0] = p.GetVnlVector()[0];
+    crossline.GetPoint()[1] = p.GetVnlVector()[1];
+    crossline.GetPoint()[2] = p.GetVnlVector()[2];
 
     return true;
   }

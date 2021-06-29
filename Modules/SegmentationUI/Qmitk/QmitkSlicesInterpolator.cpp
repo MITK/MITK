@@ -38,6 +38,7 @@ found in the LICENSE file.
 #include <mitkPlaneProposer.h>
 #include <mitkUnstructuredGridClusteringFilter.h>
 #include <mitkVtkImageOverwrite.h>
+#include <mitkShapeBasedInterpolationAlgorithm.h>
 
 #include <itkCommand.h>
 
@@ -767,6 +768,9 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
     auto origin = planeGeometry->GetOrigin();
     unsigned int totalChangedSlices = 0;
 
+    // Reuse interpolation algorithm instance for each slice to cache boundary calculations
+    auto algorithm = mitk::ShapeBasedInterpolationAlgorithm::New();
+
     for (std::remove_const_t<decltype(numSlices)> sliceIndex = 0; sliceIndex < numSlices; ++sliceIndex)
     {
       // Transforming the current origin of the reslice plane so that it matches the one of the next slice
@@ -776,7 +780,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
       planeGeometry->SetOrigin(origin);
 
       // Set the slice as 'input'
-      auto interpolation = m_Interpolator->Interpolate(sliceDimension, sliceIndex, planeGeometry, timeStep);
+      auto interpolation = m_Interpolator->Interpolate(sliceDimension, sliceIndex, planeGeometry, timeStep, algorithm);
 
       if (interpolation.IsNotNull()) // We don't check if interpolation is necessary, but m_Interpolator does
       {

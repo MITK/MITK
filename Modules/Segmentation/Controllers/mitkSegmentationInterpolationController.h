@@ -26,6 +26,7 @@ found in the LICENSE file.
 namespace mitk
 {
   class Image;
+  class ShapeBasedInterpolationAlgorithm;
 
   /**
     \brief Generates interpolations of 2D slices.
@@ -133,11 +134,14 @@ namespace mitk
       \param currentPlane
 
       \param timeStep Which time step to use
+
+      \param algorithm Optional algorithm instance to potentially benefit from caching for repeated interpolation
     */
     Image::Pointer Interpolate(unsigned int sliceDimension,
                                unsigned int sliceIndex,
                                const mitk::PlaneGeometry *currentPlane,
-                               unsigned int timeStep);
+                               unsigned int timeStep,
+                               itk::SmartPointer<ShapeBasedInterpolationAlgorithm> algorithm = nullptr);
 
     void OnImageModified(const itk::EventObject &);
 

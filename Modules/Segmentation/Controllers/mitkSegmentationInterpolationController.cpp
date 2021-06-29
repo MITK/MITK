@@ -432,7 +432,8 @@ void mitk::SegmentationInterpolationController::PrintStatus()
 mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate(unsigned int sliceDimension,
                                                                             unsigned int sliceIndex,
                                                                             const mitk::PlaneGeometry *currentPlane,
-                                                                            unsigned int timeStep)
+                                                                            unsigned int timeStep,
+                                                                            ShapeBasedInterpolationAlgorithm::Pointer algorithm)
 {
   if (m_Segmentation.IsNull() || nullptr == currentPlane)
     return nullptr;
@@ -565,7 +566,8 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate(unsi
   // The interpolation algorithm can use e.g. itk::ImageSliceConstIteratorWithIndex to
   // inspect the reference image at appropriate positions.
 
-  auto algorithm = mitk::ShapeBasedInterpolationAlgorithm::New();
+  if (algorithm.IsNull())
+    algorithm = mitk::ShapeBasedInterpolationAlgorithm::New();
 
   return algorithm->Interpolate(
     lowerSlice.GetPointer(),

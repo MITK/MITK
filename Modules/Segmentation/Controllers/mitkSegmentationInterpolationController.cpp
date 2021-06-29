@@ -25,6 +25,8 @@ found in the LICENSE file.
 #include <itkImage.h>
 #include <itkImageSliceConstIteratorWithIndex.h>
 
+#include <thread>
+
 mitk::SegmentationInterpolationController::InterpolatorMapType
   mitk::SegmentationInterpolationController::s_InterpolatorForImage; // static member initialization
 
@@ -43,7 +45,7 @@ mitk::SegmentationInterpolationController *mitk::SegmentationInterpolationContro
 }
 
 mitk::SegmentationInterpolationController::SegmentationInterpolationController()
-  : m_BlockModified(false), m_2DInterpolationActivated(false)
+  : m_BlockModified(false), m_2DInterpolationActivated(false), m_EnableSliceImageCache(false)
 {
 }
 
@@ -497,16 +499,7 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate(unsi
   try
   {
     // Extract current slice
-    auto extractor = ExtractSliceFilter::New();
-    extractor->SetInput(m_Segmentation);
-    extractor->SetTimeStep(timeStep);
-    extractor->SetResliceTransformByGeometry(m_Segmentation->GetTimeGeometry()->GetGeometryForTimeStep(timeStep));
-    extractor->SetVtkOutputRequest(false);
-    extractor->SetWorldGeometry(currentPlane);
-    extractor->Modified();
-    extractor->Update();
-    resultImage = extractor->GetOutput();
-    resultImage->DisconnectPipeline();
+    resultImage = this->ExtractSlice(currentPlane, sliceIndex, timeStep);
 
     // Creating PlaneGeometry for lower slice
     auto reslicePlane = currentPlane->Clone();
@@ -519,16 +512,10 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate(unsi
     reslicePlane->SetOrigin(origin);
 
     // Extract lower slice
-    extractor = ExtractSliceFilter::New();
-    extractor->SetInput(m_Segmentation);
-    extractor->SetTimeStep(timeStep);
-    extractor->SetResliceTransformByGeometry(m_Segmentation->GetTimeGeometry()->GetGeometryForTimeStep(timeStep));
-    extractor->SetVtkOutputRequest(false);
-    extractor->SetWorldGeometry(reslicePlane);
-    extractor->Modified();
-    extractor->Update();
-    lowerSlice = extractor->GetOutput();
-    lowerSlice->DisconnectPipeline();
+    lowerSlice = this->ExtractSlice(reslicePlane, lowerBound, timeStep, true);
+
+    if (lowerSlice.IsNull())
+      return nullptr;
 
     // Transforming the current origin so that it matches the upper slice
     m_Segmentation->GetSlicedGeometry(timeStep)->WorldToIndex(origin, origin);
@@ -537,18 +524,9 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate(unsi
     reslicePlane->SetOrigin(origin);
 
     // Extract the upper slice
-    extractor = ExtractSliceFilter::New();
-    extractor->SetInput(m_Segmentation);
-    extractor->SetTimeStep(timeStep);
-    extractor->SetResliceTransformByGeometry(m_Segmentation->GetTimeGeometry()->GetGeometryForTimeStep(timeStep));
-    extractor->SetVtkOutputRequest(false);
-    extractor->SetWorldGeometry(reslicePlane);
-    extractor->Modified();
-    extractor->Update();
-    upperSlice = extractor->GetOutput();
-    upperSlice->DisconnectPipeline();
+    upperSlice = this->ExtractSlice(reslicePlane, upperBound, timeStep, true);
 
-    if (lowerSlice.IsNull() || upperSlice.IsNull())
+    if (upperSlice.IsNull())
       return nullptr;
   }
   catch (const std::exception &e)
@@ -579,4 +557,43 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate(unsi
     resultImage,
     timeStep,
     m_ReferenceImage);
+}
+
+mitk::Image::Pointer mitk::SegmentationInterpolationController::ExtractSlice(const PlaneGeometry* planeGeometry, unsigned int sliceIndex, unsigned int timeStep, bool cache)
+{
+  static const auto MAX_CACHE_SIZE = 2 * std::thread::hardware_concurrency();
+  const auto key = std::make_pair(sliceIndex, timeStep);
+
+  if (cache && m_EnableSliceImageCache)
+  {
+    if (0 != m_SliceImageCache.count(key))
+      return m_SliceImageCache[key];
+
+    if (MAX_CACHE_SIZE < m_SliceImageCache.size())
+      m_SliceImageCache.clear();
+  }
+
+  auto extractor = ExtractSliceFilter::New();
+  extractor->SetInput(m_Segmentation);
+  extractor->SetTimeStep(timeStep);
+  extractor->SetResliceTransformByGeometry(m_Segmentation->GetTimeGeometry()->GetGeometryForTimeStep(timeStep));
+  extractor->SetVtkOutputRequest(false);
+  extractor->SetWorldGeometry(planeGeometry);
+  extractor->Update();
+
+  if (cache && m_EnableSliceImageCache)
+    m_SliceImageCache[key] = extractor->GetOutput();
+
+  return extractor->GetOutput();
+}
+
+void mitk::SegmentationInterpolationController::EnableSliceImageCache()
+{
+  m_EnableSliceImageCache = true;
+}
+
+void mitk::SegmentationInterpolationController::DisableSliceImageCache()
+{
+  m_EnableSliceImageCache = false;
+  m_SliceImageCache.clear();
 }

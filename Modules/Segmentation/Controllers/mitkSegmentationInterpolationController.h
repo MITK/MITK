@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include <itkObjectFactory.h>
 
 #include <map>
+#include <utility>
 #include <vector>
 
 namespace mitk
@@ -151,6 +152,16 @@ namespace mitk
     void Activate2DInterpolation(bool);
 
     /**
+     * Enable slice extraction cache for upper and lower slices.
+    */
+    void EnableSliceImageCache();
+
+    /**
+     * Disable slice extraction cache for upper and lower slices.
+    */
+    void DisableSliceImageCache();
+
+    /**
       \brief Get existing instance or create a new one
     */
     static SegmentationInterpolationController *GetInstance();
@@ -198,6 +209,11 @@ namespace mitk
     void PrintStatus();
 
     /**
+     * Extract a slice and optionally use a caching mechanism if enabled.
+    */
+    mitk::Image::Pointer ExtractSlice(const PlaneGeometry* planeGeometry, unsigned int sliceIndex, unsigned int timeStep, bool cache = false);
+
+    /**
       An array of flags. One for each dimension of the image. A flag is set, when a slice in a certain dimension
       has at least one pixel that is not 0 (which would mean that it has to be considered by the interpolation
       algorithm).
@@ -214,6 +230,9 @@ namespace mitk
     Image::ConstPointer m_ReferenceImage;
     bool m_BlockModified;
     bool m_2DInterpolationActivated;
+
+    bool m_EnableSliceImageCache;
+    std::map<std::pair<unsigned int, unsigned int>, Image::Pointer> m_SliceImageCache;
   };
 
 } // namespace

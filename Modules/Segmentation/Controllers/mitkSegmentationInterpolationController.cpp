@@ -434,32 +434,31 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate(unsi
                                                                             const mitk::PlaneGeometry *currentPlane,
                                                                             unsigned int timeStep)
 {
-  if (m_Segmentation.IsNull())
+  if (m_Segmentation.IsNull() || nullptr == currentPlane)
     return nullptr;
-
-  if (!currentPlane)
-  {
-    return nullptr;
-  }
 
   if (timeStep >= m_SegmentationCountInSlice.size())
     return nullptr;
+
   if (sliceDimension > 2)
     return nullptr;
-  unsigned int upperLimit = m_SegmentationCountInSlice[timeStep][sliceDimension].size();
-  if (sliceIndex >= upperLimit - 1)
-    return nullptr; // can't interpolate first and last slice
-  if (sliceIndex < 1)
-    return nullptr;
+
+  if (0 == sliceIndex)
+    return nullptr; // First slice, nothing to interpolate
+
+  const unsigned int lastSliceIndex = m_SegmentationCountInSlice[timeStep][sliceDimension].size() - 1;
+
+  if (lastSliceIndex <= sliceIndex)
+    return nullptr; // Last slice, nothing to interpolate
 
   if (m_SegmentationCountInSlice[timeStep][sliceDimension][sliceIndex] > 0)
-    return nullptr; // slice contains a segmentation, won't interpolate anything then
+    return nullptr; // Slice contains segmentation, nothing to interopolate
 
-  unsigned int lowerBound(0);
-  unsigned int upperBound(0);
-  bool bounds(false);
+  unsigned int lowerBound = 0;
+  unsigned int upperBound = 0;
+  bool bounds = false;
 
-  for (lowerBound = sliceIndex - 1; /*lowerBound >= 0*/; --lowerBound)
+  for (lowerBound = sliceIndex - 1; ; --lowerBound)
   {
     if (m_SegmentationCountInSlice[timeStep][sliceDimension][lowerBound] > 0)
     {
@@ -467,15 +466,16 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate(unsi
       break;
     }
 
-    if (lowerBound == 0)
-      break; // otherwise overflow and start at something like 4294967295
+    if (0 == lowerBound)
+      break;
   }
 
   if (!bounds)
     return nullptr;
 
   bounds = false;
-  for (upperBound = sliceIndex + 1; upperBound < upperLimit; ++upperBound)
+
+  for (upperBound = sliceIndex + 1; upperBound <= lastSliceIndex; ++upperBound)
   {
     if (m_SegmentationCountInSlice[timeStep][sliceDimension][upperBound] > 0)
     {
@@ -487,25 +487,20 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate(unsi
   if (!bounds)
     return nullptr;
 
-  // ok, we have found two neighboring slices with segmentations (and we made sure that the current slice does NOT
-  // contain anything
-  // MITK_INFO << "Interpolate in timestep " << timeStep << ", dimension " << sliceDimension << ": estimate slice " <<
-  // sliceIndex << " from slices " << lowerBound << " and " << upperBound << std::endl;
+  // We have found two neighboring slices with segmentations and made sure that the current slice does not contain anything
 
-  mitk::Image::Pointer lowerMITKSlice;
-  mitk::Image::Pointer upperMITKSlice;
+  mitk::Image::Pointer lowerSlice;
+  mitk::Image::Pointer upperSlice;
   mitk::Image::Pointer resultImage;
 
   try
   {
-    // Setting up the ExtractSliceFilter
-    mitk::ExtractSliceFilter::Pointer extractor = ExtractSliceFilter::New();
+    // Extract current slice
+    auto extractor = ExtractSliceFilter::New();
     extractor->SetInput(m_Segmentation);
     extractor->SetTimeStep(timeStep);
     extractor->SetResliceTransformByGeometry(m_Segmentation->GetTimeGeometry()->GetGeometryForTimeStep(timeStep));
     extractor->SetVtkOutputRequest(false);
-
-    // Reslicing the current plane
     extractor->SetWorldGeometry(currentPlane);
     extractor->Modified();
     extractor->Update();
@@ -513,27 +508,26 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate(unsi
     resultImage->DisconnectPipeline();
 
     // Creating PlaneGeometry for lower slice
-    mitk::PlaneGeometry::Pointer reslicePlane = currentPlane->Clone();
+    auto reslicePlane = currentPlane->Clone();
 
     // Transforming the current origin so that it matches the lower slice
-    mitk::Point3D origin = currentPlane->GetOrigin();
+    auto origin = currentPlane->GetOrigin();
     m_Segmentation->GetSlicedGeometry(timeStep)->WorldToIndex(origin, origin);
     origin[sliceDimension] = lowerBound;
     m_Segmentation->GetSlicedGeometry(timeStep)->IndexToWorld(origin, origin);
     reslicePlane->SetOrigin(origin);
 
-    // Extract the lower slice
+    // Extract lower slice
     extractor = ExtractSliceFilter::New();
     extractor->SetInput(m_Segmentation);
     extractor->SetTimeStep(timeStep);
     extractor->SetResliceTransformByGeometry(m_Segmentation->GetTimeGeometry()->GetGeometryForTimeStep(timeStep));
     extractor->SetVtkOutputRequest(false);
-
     extractor->SetWorldGeometry(reslicePlane);
     extractor->Modified();
     extractor->Update();
-    lowerMITKSlice = extractor->GetOutput();
-    lowerMITKSlice->DisconnectPipeline();
+    lowerSlice = extractor->GetOutput();
+    lowerSlice->DisconnectPipeline();
 
     // Transforming the current origin so that it matches the upper slice
     m_Segmentation->GetSlicedGeometry(timeStep)->WorldToIndex(origin, origin);
@@ -547,14 +541,13 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate(unsi
     extractor->SetTimeStep(timeStep);
     extractor->SetResliceTransformByGeometry(m_Segmentation->GetTimeGeometry()->GetGeometryForTimeStep(timeStep));
     extractor->SetVtkOutputRequest(false);
-
     extractor->SetWorldGeometry(reslicePlane);
     extractor->Modified();
     extractor->Update();
-    upperMITKSlice = extractor->GetOutput();
-    upperMITKSlice->DisconnectPipeline();
+    upperSlice = extractor->GetOutput();
+    upperSlice->DisconnectPipeline();
 
-    if (lowerMITKSlice.IsNull() || upperMITKSlice.IsNull())
+    if (lowerSlice.IsNull() || upperSlice.IsNull())
       return nullptr;
   }
   catch (const std::exception &e)
@@ -563,24 +556,25 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate(unsi
     return nullptr;
   }
 
-  // interpolation algorithm gets some inputs
-  //   two segmentations (guaranteed to be of the same data type, but no special data type guaranteed)
-  //   orientation (sliceDimension) of the segmentations
-  //   position of the two slices (sliceIndices)
-  //   one volume image (original patient image)
+  // Interpolation algorithm inputs:
+  //   - Two segmentations (guaranteed to be of the same data type)
+  //   - Orientation of the segmentations (sliceDimension)
+  //   - Position of the two slices (sliceIndices)
+  //   - Reference image
   //
-  // interpolation algorithm can use e.g. itk::ImageSliceConstIteratorWithIndex to
-  //   inspect the original patient image at appropriate positions
+  // The interpolation algorithm can use e.g. itk::ImageSliceConstIteratorWithIndex to
+  // inspect the reference image at appropriate positions.
 
-  mitk::SegmentationInterpolationAlgorithm::Pointer algorithm =
-    mitk::ShapeBasedInterpolationAlgorithm::New().GetPointer();
-  return algorithm->Interpolate(lowerMITKSlice.GetPointer(),
-                                lowerBound,
-                                upperMITKSlice.GetPointer(),
-                                upperBound,
-                                sliceIndex,
-                                sliceDimension,
-                                resultImage,
-                                timeStep,
-                                m_ReferenceImage);
+  auto algorithm = mitk::ShapeBasedInterpolationAlgorithm::New();
+
+  return algorithm->Interpolate(
+    lowerSlice.GetPointer(),
+    lowerBound,
+    upperSlice.GetPointer(),
+    upperBound,
+    sliceIndex,
+    sliceDimension,
+    resultImage,
+    timeStep,
+    m_ReferenceImage);
 }

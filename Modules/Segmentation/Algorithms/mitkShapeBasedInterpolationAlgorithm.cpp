@@ -20,6 +20,8 @@ found in the LICENSE file.
 #include <itkIsoContourDistanceImageFilter.h>
 #include <itkSubtractImageFilter.h>
 
+#include <thread>
+
 mitk::Image::Pointer mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
   Image::ConstPointer lowerSlice,
   unsigned int lowerSliceIndex,
@@ -43,10 +45,12 @@ mitk::Image::Pointer mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
 
 mitk::Image::Pointer mitk::ShapeBasedInterpolationAlgorithm::ComputeDistanceMap(unsigned int sliceIndex, Image::ConstPointer slice)
 {
+  static const auto MAX_CACHE_SIZE = 2 * std::thread::hardware_concurrency();
+
   if (0 != m_DistanceImageCache.count(sliceIndex))
     return m_DistanceImageCache[sliceIndex];
 
-  if (2 < m_DistanceImageCache.size())
+  if (MAX_CACHE_SIZE < m_DistanceImageCache.size())
     m_DistanceImageCache.clear();
 
   auto distanceImage = mitk::Image::New();

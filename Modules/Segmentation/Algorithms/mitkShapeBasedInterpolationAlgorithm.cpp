@@ -31,18 +31,30 @@ mitk::Image::Pointer mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
   unsigned int /*timeStep*/,
   Image::ConstPointer /*referenceImage*/)
 {
-  mitk::Image::Pointer lowerDistanceImage = mitk::Image::New();
-  AccessFixedDimensionByItk_1(lowerSlice, ComputeDistanceMap, 2, lowerDistanceImage);
-
-  mitk::Image::Pointer upperDistanceImage = mitk::Image::New();
-  AccessFixedDimensionByItk_1(upperSlice, ComputeDistanceMap, 2, upperDistanceImage);
+  auto lowerDistanceImage = this->ComputeDistanceMap(lowerSliceIndex, lowerSlice);
+  auto upperDistanceImage = this->ComputeDistanceMap(upperSliceIndex, upperSlice);
 
   // calculate where the current slice is in comparison to the lower and upper neighboring slices
   float ratio = (float)(requestedIndex - lowerSliceIndex) / (float)(upperSliceIndex - lowerSliceIndex);
-  AccessFixedDimensionByItk_3(
-    resultImage, InterpolateIntermediateSlice, 2, upperDistanceImage, lowerDistanceImage, ratio);
+  AccessFixedDimensionByItk_3(resultImage, InterpolateIntermediateSlice, 2, upperDistanceImage, lowerDistanceImage, ratio);
 
   return resultImage;
+}
+
+mitk::Image::Pointer mitk::ShapeBasedInterpolationAlgorithm::ComputeDistanceMap(unsigned int sliceIndex, Image::ConstPointer slice)
+{
+  if (0 != m_DistanceImageCache.count(sliceIndex))
+    return m_DistanceImageCache[sliceIndex];
+
+  if (2 < m_DistanceImageCache.size())
+    m_DistanceImageCache.clear();
+
+  auto distanceImage = mitk::Image::New();
+  AccessFixedDimensionByItk_1(slice, ComputeDistanceMap, 2, distanceImage);
+
+  m_DistanceImageCache[sliceIndex] = distanceImage;
+
+  return distanceImage;
 }
 
 template <typename TPixel, unsigned int VImageDimension>

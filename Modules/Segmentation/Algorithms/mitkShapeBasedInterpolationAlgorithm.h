@@ -16,6 +16,8 @@ found in the LICENSE file.
 #include "mitkSegmentationInterpolationAlgorithm.h"
 #include <MitkSegmentationExports.h>
 
+#include <map>
+
 namespace mitk
 {
   /**
@@ -53,11 +55,15 @@ namespace mitk
     template <typename TPixel, unsigned int VImageDimension>
     void ComputeDistanceMap(const itk::Image<TPixel, VImageDimension> *, mitk::Image::Pointer &result);
 
+    Image::Pointer ComputeDistanceMap(unsigned int sliceIndex, Image::ConstPointer slice);
+
     template <typename TPixel, unsigned int VImageDimension>
     void InterpolateIntermediateSlice(itk::Image<TPixel, VImageDimension> *result,
                                       const mitk::Image::Pointer &lowerDistanceImage,
                                       const mitk::Image::Pointer &upperDistanceImage,
                                       float ratio);
+
+    std::map<unsigned int, Image::Pointer> m_DistanceImageCache;
   };
 
 } // namespace

@@ -771,6 +771,8 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
     // Reuse interpolation algorithm instance for each slice to cache boundary calculations
     auto algorithm = mitk::ShapeBasedInterpolationAlgorithm::New();
 
+    m_Interpolator->EnableSliceImageCache();
+
     for (std::remove_const_t<decltype(numSlices)> sliceIndex = 0; sliceIndex < numSlices; ++sliceIndex)
     {
       // Transforming the current origin of the reslice plane so that it matches the one of the next slice
@@ -807,6 +809,8 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
 
       mitk::ProgressBar::GetInstance()->Progress();
     }
+
+    m_Interpolator->DisableSliceImageCache();
 
     if (totalChangedSlices > 0)
     {

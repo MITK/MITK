@@ -38,6 +38,7 @@ found in the LICENSE file.
 #include <mitkPlaneProposer.h>
 #include <mitkUnstructuredGridClusteringFilter.h>
 #include <mitkVtkImageOverwrite.h>
+#include <mitkShapeBasedInterpolationAlgorithm.h>
 
 #include <itkCommand.h>
 
@@ -52,6 +53,9 @@ found in the LICENSE file.
 #include <vtkUnstructuredGrid.h>
 
 #include <array>
+#include <atomic>
+#include <thread>
+#include <vector>
 
 namespace
 {
@@ -712,127 +716,150 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
    */
   if (m_Segmentation)
   {
-    mitk::Image::Pointer image3D = m_Segmentation;
-    unsigned int timeStep(0);
+    mitk::Image::Pointer segmentation3D = m_Segmentation;
+    unsigned int timeStep = 0;
     const auto timePoint = slicer->GetSelectedTimePoint();
-    if (m_Segmentation->GetDimension() == 4)
+
+    if (4 == m_Segmentation->GetDimension())
     {
-      if (!m_Segmentation->GetTimeGeometry()->IsValidTimePoint(timePoint))
+      const auto* geometry = m_Segmentation->GetTimeGeometry();
+
+      if (!geometry->IsValidTimePoint(timePoint))
       {
         MITK_WARN << "Cannot accept all interpolations. Time point selected by passed SliceNavigationController is not within the time bounds of segmentation. Time point: " << timePoint;
         return;
       }
 
-      timeStep = m_Segmentation->GetTimeGeometry()->TimePointToTimeStep(timePoint);
-      mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
+      timeStep = geometry->TimePointToTimeStep(timePoint);
+
+      auto timeSelector = mitk::ImageTimeSelector::New();
       timeSelector->SetInput(m_Segmentation);
       timeSelector->SetTimeNr(timeStep);
       timeSelector->Update();
-      image3D = timeSelector->GetOutput();
-    }
-    // create a empty diff image for the undo operation
-    mitk::Image::Pointer diffImage = mitk::Image::New();
-    diffImage->Initialize(image3D);
 
-    // Create scope for ImageWriteAccessor so that the accessor is destroyed
-    // after the image is initialized. Otherwise later image access will lead to an error
+      segmentation3D = timeSelector->GetOutput();
+    }
+
+    // Create an empty diff image for the undo operation
+    auto diffImage = mitk::Image::New();
+    diffImage->Initialize(segmentation3D);
+
+    // Create scope for ImageWriteAccessor so that the accessor is destroyed right after use
     {
-      mitk::ImageWriteAccessor imAccess(diffImage);
+      mitk::ImageWriteAccessor accessor(diffImage);
 
       // Set all pixels to zero
-      mitk::PixelType pixelType(mitk::MakeScalarPixelType<mitk::Tool::DefaultSegmentationDataType>());
+      auto pixelType = mitk::MakeScalarPixelType<mitk::Tool::DefaultSegmentationDataType>();
 
       // For legacy purpose support former pixel type of segmentations (before multilabel)
-      if (m_Segmentation->GetImageDescriptor()->GetChannelDescriptor().GetPixelType().GetComponentType() ==
-          itk::ImageIOBase::UCHAR)
-      {
+      if (itk::ImageIOBase::UCHAR == m_Segmentation->GetImageDescriptor()->GetChannelDescriptor().GetPixelType().GetComponentType())
         pixelType = mitk::MakeScalarPixelType<unsigned char>();
-      }
 
-      memset(imAccess.GetData(),
-             0,
-             (pixelType.GetBpe() >> 3) * diffImage->GetDimension(0) * diffImage->GetDimension(1) *
-               diffImage->GetDimension(2));
+      memset(accessor.GetData(), 0, pixelType.GetSize() * diffImage->GetDimension(0) * diffImage->GetDimension(1) * diffImage->GetDimension(2));
     }
 
     // Since we need to shift the plane it must be clone so that the original plane isn't altered
-    mitk::PlaneGeometry::Pointer reslicePlane = slicer->GetCurrentPlaneGeometry()->Clone();
+    auto slicedGeometry = m_Segmentation->GetSlicedGeometry();
+    auto planeGeometry = slicer->GetCurrentPlaneGeometry()->Clone();
+    int sliceDimension = -1;
+    int sliceIndex = -1;
 
-    int sliceDimension(-1);
-    int sliceIndex(-1);
-    mitk::SegTool2D::DetermineAffectedImageSlice(m_Segmentation, reslicePlane, sliceDimension, sliceIndex);
+    mitk::SegTool2D::DetermineAffectedImageSlice(m_Segmentation, planeGeometry, sliceDimension, sliceIndex);
 
-    unsigned int zslices = m_Segmentation->GetDimension(sliceDimension);
-    mitk::ProgressBar::GetInstance()->AddStepsToDo(zslices);
+    const auto numSlices = m_Segmentation->GetDimension(sliceDimension);
+    mitk::ProgressBar::GetInstance()->AddStepsToDo(numSlices);
 
-    mitk::Point3D origin = reslicePlane->GetOrigin();
-    unsigned int totalChangedSlices(0);
+    std::atomic_uint totalChangedSlices;
 
-    for (unsigned int sliceIndex = 0; sliceIndex < zslices; ++sliceIndex)
+    // Reuse interpolation algorithm instance for each slice to cache boundary calculations
+    auto algorithm = mitk::ShapeBasedInterpolationAlgorithm::New();
+
+    // Distribute slice interpolations to multiple threads
+    const auto numThreads = std::min(std::thread::hardware_concurrency(), numSlices);
+    std::vector<std::vector<unsigned int>> sliceIndices(numThreads);
+
+    for (std::remove_const_t<decltype(numSlices)> sliceIndex = 0; sliceIndex < numSlices; ++sliceIndex)
+      sliceIndices[sliceIndex % numThreads].push_back(sliceIndex);
+
+    std::vector<std::thread> threads;
+    threads.reserve(numThreads);
+
+    // This lambda will be executed by the threads
+    auto interpolate = [=, &interpolator = m_Interpolator, &totalChangedSlices](unsigned int threadIndex)
     {
-      // Transforming the current origin of the reslice plane
-      // so that it matches the one of the next slice
-      m_Segmentation->GetSlicedGeometry()->WorldToIndex(origin, origin);
-      origin[sliceDimension] = sliceIndex;
-      m_Segmentation->GetSlicedGeometry()->IndexToWorld(origin, origin);
-      reslicePlane->SetOrigin(origin);
-      // Set the slice as 'input'
-      mitk::Image::Pointer interpolation =
-        m_Interpolator->Interpolate(sliceDimension, sliceIndex, reslicePlane, timeStep);
+      auto clonedPlaneGeometry = planeGeometry->Clone();
+      auto origin = clonedPlaneGeometry->GetOrigin();
 
-      if (interpolation.IsNotNull()) // we don't check if interpolation is necessary/sensible - but m_Interpolator does
+      for (auto sliceIndex : sliceIndices[threadIndex])
       {
-        // Setting up the reslicing pipeline which allows us to write the interpolation results back into
-        // the image volume
-        vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
+        slicedGeometry->WorldToIndex(origin, origin);
+        origin[sliceDimension] = sliceIndex;
+        slicedGeometry->IndexToWorld(origin, origin);
+        clonedPlaneGeometry->SetOrigin(origin);
 
-        // set overwrite mode to true to write back to the image volume
-        reslice->SetInputSlice(interpolation->GetSliceData()->GetVtkImageAccessor(interpolation)->GetVtkImageData());
-        reslice->SetOverwriteMode(true);
-        reslice->Modified();
+        auto interpolation = interpolator->Interpolate(sliceDimension, sliceIndex, clonedPlaneGeometry, timeStep, algorithm);
 
-        mitk::ExtractSliceFilter::Pointer diffslicewriter = mitk::ExtractSliceFilter::New(reslice);
-        diffslicewriter->SetInput(diffImage);
-        diffslicewriter->SetTimeStep(0);
-        diffslicewriter->SetWorldGeometry(reslicePlane);
-        diffslicewriter->SetVtkOutputRequest(true);
-        diffslicewriter->SetResliceTransformByGeometry(diffImage->GetTimeGeometry()->GetGeometryForTimeStep(0));
+        if (interpolation.IsNotNull())
+        {
+          // Setting up the reslicing pipeline which allows us to write the interpolation results back into the image volume
+          auto reslicer = vtkSmartPointer<mitkVtkImageOverwrite>::New();
 
-        diffslicewriter->Modified();
-        diffslicewriter->Update();
-        ++totalChangedSlices;
+          // Set overwrite mode to true to write back to the image volume
+          reslicer->SetInputSlice(interpolation->GetSliceData()->GetVtkImageAccessor(interpolation)->GetVtkImageData());
+          reslicer->SetOverwriteMode(true);
+          reslicer->Modified();
+
+          auto diffSliceWriter = mitk::ExtractSliceFilter::New(reslicer);
+
+          diffSliceWriter->SetInput(diffImage);
+          diffSliceWriter->SetTimeStep(0);
+          diffSliceWriter->SetWorldGeometry(clonedPlaneGeometry);
+          diffSliceWriter->SetVtkOutputRequest(true);
+          diffSliceWriter->SetResliceTransformByGeometry(diffImage->GetTimeGeometry()->GetGeometryForTimeStep(0));
+          diffSliceWriter->Modified();
+          diffSliceWriter->Update();
+
+          ++totalChangedSlices;
+        }
+
+        mitk::ProgressBar::GetInstance()->Progress();
       }
-      mitk::ProgressBar::GetInstance()->Progress();
-    }
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    };
+
+    m_Interpolator->EnableSliceImageCache();
+
+    for (std::remove_const_t<decltype(numThreads)> threadIndex = 0; threadIndex < numThreads; ++threadIndex)
+      threads.emplace_back(interpolate, threadIndex); // Run the interpolation
+
+    for (auto& thread : threads)
+      thread.join();
+
+    m_Interpolator->DisableSliceImageCache();
 
     if (totalChangedSlices > 0)
     {
-      // store undo stack items
-      if (true)
-      {
-        // create do/undo operations
-        mitk::ApplyDiffImageOperation *doOp =
-          new mitk::ApplyDiffImageOperation(mitk::OpTEST, m_Segmentation, diffImage, timeStep);
-        mitk::ApplyDiffImageOperation *undoOp =
-          new mitk::ApplyDiffImageOperation(mitk::OpTEST, m_Segmentation, diffImage, timeStep);
-        undoOp->SetFactor(-1.0);
-        std::stringstream comment;
-        comment << "Confirm all interpolations (" << totalChangedSlices << ")";
-        mitk::OperationEvent *undoStackItem =
-          new mitk::OperationEvent(mitk::DiffImageApplier::GetInstanceForUndo(), doOp, undoOp, comment.str());
-        mitk::OperationEvent::IncCurrGroupEventId();
-        mitk::OperationEvent::IncCurrObjectEventId();
-        mitk::UndoController::GetCurrentUndoModel()->SetOperationEvent(undoStackItem);
+      // Create do/undo operations
+      auto* doOp = new mitk::ApplyDiffImageOperation(mitk::OpTEST, m_Segmentation, diffImage, timeStep);
 
-        // acutally apply the changes here to the original image
-        mitk::DiffImageApplier::GetInstanceForUndo()->ExecuteOperation(doOp);
-      }
+      auto* undoOp = new mitk::ApplyDiffImageOperation(mitk::OpTEST, m_Segmentation, diffImage, timeStep);
+      undoOp->SetFactor(-1.0);
+
+      auto comment = "Confirm all interpolations (" + std::to_string(totalChangedSlices) + ")";
+
+      auto* undoStackItem = new mitk::OperationEvent(mitk::DiffImageApplier::GetInstanceForUndo(), doOp, undoOp, comment);
+
+      mitk::OperationEvent::IncCurrGroupEventId();
+      mitk::OperationEvent::IncCurrObjectEventId();
+      mitk::UndoController::GetCurrentUndoModel()->SetOperationEvent(undoStackItem);
+
+      // Apply the changes to the original image
+      mitk::DiffImageApplier::GetInstanceForUndo()->ExecuteOperation(doOp);
     }
 
     m_FeedbackNode->SetData(nullptr);
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkSlicesInterpolator::FinishInterpolation(mitk::SliceNavigationController *slicer)

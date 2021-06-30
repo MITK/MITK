@@ -53,6 +53,9 @@ found in the LICENSE file.
 #include <vtkUnstructuredGrid.h>
 
 #include <array>
+#include <atomic>
+#include <thread>
+#include <vector>
 
 namespace
 {
@@ -756,6 +759,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
     }
 
     // Since we need to shift the plane it must be clone so that the original plane isn't altered
+    auto slicedGeometry = m_Segmentation->GetSlicedGeometry();
     auto planeGeometry = slicer->GetCurrentPlaneGeometry()->Clone();
     int sliceDimension = -1;
     int sliceIndex = -1;
@@ -766,49 +770,70 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
     mitk::ProgressBar::GetInstance()->AddStepsToDo(numSlices);
 
     auto origin = planeGeometry->GetOrigin();
-    unsigned int totalChangedSlices = 0;
+    std::atomic<unsigned int> totalChangedSlices = 0;
 
     // Reuse interpolation algorithm instance for each slice to cache boundary calculations
     auto algorithm = mitk::ShapeBasedInterpolationAlgorithm::New();
 
-    m_Interpolator->EnableSliceImageCache();
+    // Distribute slice interpolations to multiple threads
+    const auto numThreads = std::min(std::thread::hardware_concurrency(), numSlices);
+    std::vector<std::vector<unsigned int>> sliceIndices(numThreads);
 
     for (std::remove_const_t<decltype(numSlices)> sliceIndex = 0; sliceIndex < numSlices; ++sliceIndex)
+      sliceIndices[sliceIndex % numThreads].push_back(sliceIndex);
+
+    std::vector<std::thread> threads;
+    threads.reserve(numThreads);
+
+    // This lambda will be executed by the threads
+    auto interpolate = [=, &interpolator = m_Interpolator, &totalChangedSlices](unsigned int threadIndex)
     {
-      // Transforming the current origin of the reslice plane so that it matches the one of the next slice
-      m_Segmentation->GetSlicedGeometry()->WorldToIndex(origin, origin);
-      origin[sliceDimension] = sliceIndex;
-      m_Segmentation->GetSlicedGeometry()->IndexToWorld(origin, origin);
-      planeGeometry->SetOrigin(origin);
+      auto clonedPlaneGeometry = planeGeometry->Clone();
+      auto origin = clonedPlaneGeometry->GetOrigin();
 
-      // Set the slice as 'input'
-      auto interpolation = m_Interpolator->Interpolate(sliceDimension, sliceIndex, planeGeometry, timeStep, algorithm);
-
-      if (interpolation.IsNotNull()) // We don't check if interpolation is necessary, but m_Interpolator does
+      for (auto sliceIndex : sliceIndices[threadIndex])
       {
-        // Setting up the reslicing pipeline which allows us to write the interpolation results back into the image volume
-        auto reslicer = vtkSmartPointer<mitkVtkImageOverwrite>::New();
+        slicedGeometry->WorldToIndex(origin, origin);
+        origin[sliceDimension] = sliceIndex;
+        slicedGeometry->IndexToWorld(origin, origin);
+        clonedPlaneGeometry->SetOrigin(origin);
 
-        // Set overwrite mode to true to write back to the image volume
-        reslicer->SetInputSlice(interpolation->GetSliceData()->GetVtkImageAccessor(interpolation)->GetVtkImageData());
-        reslicer->SetOverwriteMode(true);
-        reslicer->Modified();
+        auto interpolation = interpolator->Interpolate(sliceDimension, sliceIndex, clonedPlaneGeometry, timeStep, algorithm);
 
-        auto diffSliceWriter = mitk::ExtractSliceFilter::New(reslicer);
+        if (interpolation.IsNotNull())
+        {
+          // Setting up the reslicing pipeline which allows us to write the interpolation results back into the image volume
+          auto reslicer = vtkSmartPointer<mitkVtkImageOverwrite>::New();
 
-        diffSliceWriter->SetInput(diffImage);
-        diffSliceWriter->SetTimeStep(0);
-        diffSliceWriter->SetWorldGeometry(planeGeometry);
-        diffSliceWriter->SetVtkOutputRequest(true);
-        diffSliceWriter->SetResliceTransformByGeometry(diffImage->GetTimeGeometry()->GetGeometryForTimeStep(0));
-        diffSliceWriter->Modified();
-        diffSliceWriter->Update();
+          // Set overwrite mode to true to write back to the image volume
+          reslicer->SetInputSlice(interpolation->GetSliceData()->GetVtkImageAccessor(interpolation)->GetVtkImageData());
+          reslicer->SetOverwriteMode(true);
+          reslicer->Modified();
 
-        ++totalChangedSlices;
+          auto diffSliceWriter = mitk::ExtractSliceFilter::New(reslicer);
+
+          diffSliceWriter->SetInput(diffImage);
+          diffSliceWriter->SetTimeStep(0);
+          diffSliceWriter->SetWorldGeometry(clonedPlaneGeometry);
+          diffSliceWriter->SetVtkOutputRequest(true);
+          diffSliceWriter->SetResliceTransformByGeometry(diffImage->GetTimeGeometry()->GetGeometryForTimeStep(0));
+          diffSliceWriter->Modified();
+          diffSliceWriter->Update();
+
+          ++totalChangedSlices;
+        }
+
+        mitk::ProgressBar::GetInstance()->Progress();
       }
+    };
 
-      mitk::ProgressBar::GetInstance()->Progress();
-    }
+    m_Interpolator->EnableSliceImageCache();
+
+    for (std::remove_const_t<decltype(numThreads)> threadIndex = 0; threadIndex < numThreads; ++threadIndex)
+      threads.emplace_back(interpolate, threadIndex); // Run the interpolation
+
+    for (auto& thread : threads)
+      thread.join();
 
     m_Interpolator->DisableSliceImageCache();
 

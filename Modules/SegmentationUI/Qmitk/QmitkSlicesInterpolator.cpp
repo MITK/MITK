@@ -770,7 +770,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
     mitk::ProgressBar::GetInstance()->AddStepsToDo(numSlices);
 
     auto origin = planeGeometry->GetOrigin();
-    std::atomic<unsigned int> totalChangedSlices = 0;
+    std::atomic_uint totalChangedSlices;
 
     // Reuse interpolation algorithm instance for each slice to cache boundary calculations
     auto algorithm = mitk::ShapeBasedInterpolationAlgorithm::New();

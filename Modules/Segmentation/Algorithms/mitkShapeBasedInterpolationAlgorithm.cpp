@@ -57,7 +57,7 @@ mitk::Image::Pointer mitk::ShapeBasedInterpolationAlgorithm::ComputeDistanceMap(
       m_DistanceImageCache.clear();
   }
 
-  auto distanceImage = mitk::Image::New();
+  mitk::Image::Pointer distanceImage;
   AccessFixedDimensionByItk_1(slice, ComputeDistanceMap, 2, distanceImage);
 
   std::lock_guard<std::mutex> lock(m_DistanceImageCacheMutex);

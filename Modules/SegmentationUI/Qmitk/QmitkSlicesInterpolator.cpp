@@ -722,7 +722,7 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationContr
 
     if (4 == m_Segmentation->GetDimension())
     {
-      auto* geometry = m_Segmentation->GetTimeGeometry();
+      const auto* geometry = m_Segmentation->GetTimeGeometry();
 
       if (!geometry->IsValidTimePoint(timePoint))
       {

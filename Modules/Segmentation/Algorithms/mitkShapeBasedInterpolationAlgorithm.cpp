@@ -47,14 +47,20 @@ mitk::Image::Pointer mitk::ShapeBasedInterpolationAlgorithm::ComputeDistanceMap(
 {
   static const auto MAX_CACHE_SIZE = 2 * std::thread::hardware_concurrency();
 
-  if (0 != m_DistanceImageCache.count(sliceIndex))
-    return m_DistanceImageCache[sliceIndex];
+  {
+    std::lock_guard<std::mutex> lock(m_DistanceImageCacheMutex);
 
-  if (MAX_CACHE_SIZE < m_DistanceImageCache.size())
-    m_DistanceImageCache.clear();
+    if (0 != m_DistanceImageCache.count(sliceIndex))
+      return m_DistanceImageCache[sliceIndex];
+
+    if (MAX_CACHE_SIZE < m_DistanceImageCache.size())
+      m_DistanceImageCache.clear();
+  }
 
   auto distanceImage = mitk::Image::New();
   AccessFixedDimensionByItk_1(slice, ComputeDistanceMap, 2, distanceImage);
+
+  std::lock_guard<std::mutex> lock(m_DistanceImageCacheMutex);
 
   m_DistanceImageCache[sliceIndex] = distanceImage;
 

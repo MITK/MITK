@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <MitkSegmentationExports.h>
 
 #include <map>
+#include <mutex>
 
 namespace mitk
 {
@@ -64,6 +65,7 @@ namespace mitk
                                       float ratio);
 
     std::map<unsigned int, Image::Pointer> m_DistanceImageCache;
+    std::mutex m_DistanceImageCacheMutex;
   };
 
 } // namespace

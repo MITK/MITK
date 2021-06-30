@@ -566,6 +566,8 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::ExtractSlice(con
 
   if (cache && m_EnableSliceImageCache)
   {
+    std::lock_guard<std::mutex> lock(m_SliceImageCacheMutex);
+
     if (0 != m_SliceImageCache.count(key))
       return m_SliceImageCache[key];
 
@@ -582,7 +584,10 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::ExtractSlice(con
   extractor->Update();
 
   if (cache && m_EnableSliceImageCache)
+  {
+    std::lock_guard<std::mutex> lock(m_SliceImageCacheMutex);
     m_SliceImageCache[key] = extractor->GetOutput();
+  }
 
   return extractor->GetOutput();
 }

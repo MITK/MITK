@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include <itkObjectFactory.h>
 
 #include <map>
+#include <mutex>
 #include <utility>
 #include <vector>
 
@@ -233,6 +234,7 @@ namespace mitk
 
     bool m_EnableSliceImageCache;
     std::map<std::pair<unsigned int, unsigned int>, Image::Pointer> m_SliceImageCache;
+    std::mutex m_SliceImageCacheMutex;
   };
 
 } // namespace

@@ -19,8 +19,6 @@ found in the LICENSE file.
 #include <mitkImageAccessByItk.h>
 //#include <mitkPlaneGeometry.h>
 
-#include "mitkShapeBasedInterpolationAlgorithm.h"
-
 #include <itkCommand.h>
 #include <itkImage.h>
 #include <itkImageSliceConstIteratorWithIndex.h>

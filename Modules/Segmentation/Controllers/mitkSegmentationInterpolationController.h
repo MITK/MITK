@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include "mitkCommon.h"
 #include "mitkImage.h"
 #include <MitkSegmentationExports.h>
+#include <mitkShapeBasedInterpolationAlgorithm.h>
 
 #include <itkImage.h>
 #include <itkObjectFactory.h>
@@ -28,7 +29,6 @@ found in the LICENSE file.
 namespace mitk
 {
   class Image;
-  class ShapeBasedInterpolationAlgorithm;
 
   /**
     \brief Generates interpolations of 2D slices.
@@ -143,7 +143,7 @@ namespace mitk
                                unsigned int sliceIndex,
                                const mitk::PlaneGeometry *currentPlane,
                                unsigned int timeStep,
-                               itk::SmartPointer<ShapeBasedInterpolationAlgorithm> algorithm = nullptr);
+                               mitk::ShapeBasedInterpolationAlgorithm::Pointer algorithm = nullptr);
 
     void OnImageModified(const itk::EventObject &);
 

@@ -167,14 +167,6 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
                   structNode->SetProperty("color", aStruct->GetProperty("contour.color"));
                   structNode->SetProperty("contour.color", aStruct->GetProperty("contour.color"));
                   structNode->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
-                  structNode->SetVisibility(true, mitk::BaseRenderer::GetInstance(
-                      mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget0")));
-                  structNode->SetVisibility(false, mitk::BaseRenderer::GetInstance(
-                      mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget1")));
-                  structNode->SetVisibility(false, mitk::BaseRenderer::GetInstance(
-                      mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2")));
-                  structNode->SetVisibility(true, mitk::BaseRenderer::GetInstance(
-                      mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")));
 
                   dataStorage->Add(structNode);
               }

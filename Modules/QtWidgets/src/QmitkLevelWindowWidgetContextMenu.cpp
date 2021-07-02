@@ -156,6 +156,7 @@ void QmitkLevelWindowWidgetContextMenu::OnSetImage(QAction *imageAction)
     if (m_Manager->IsAutoTopMost() == false)
     {
       m_Manager->SetAutoTopMostImage(true);
+      m_SelectedImagesAction->setChecked(false);
     }
     else
     {
@@ -167,6 +168,7 @@ void QmitkLevelWindowWidgetContextMenu::OnSetImage(QAction *imageAction)
     if (m_Manager->IsSelectedImages() == false)
     {
       m_Manager->SetSelectedImages(true);
+      m_AutoTopmostAction->setChecked(false);
     }
     else
     {
@@ -175,6 +177,8 @@ void QmitkLevelWindowWidgetContextMenu::OnSetImage(QAction *imageAction)
   }
   else
   {
+    m_AutoTopmostAction->setChecked(false);
+    m_SelectedImagesAction->setChecked(false);
     m_Manager->SetLevelWindowProperty(m_Images.at(imageAction));
   }
 }
@@ -230,7 +234,6 @@ void QmitkLevelWindowWidgetContextMenu::GetContextMenu(QMenu *contextMenu)
     }
 
     // add action for "selected images" action
-    m_ImageSubmenu->addSeparator();
     m_SelectedImagesAction = m_ImageSubmenu->addAction(tr("Use selected images"));
     m_SelectedImagesAction->setCheckable(true);
     if (m_Manager->IsSelectedImages())

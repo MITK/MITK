@@ -24,9 +24,6 @@ found in the LICENSE file.
 #include <MitkCoreExports.h>
 #include <mitkProportionalTimeGeometry.h>
 
-// DEPRECATED
-#include <mitkTimeSlicedGeometry.h>
-
 #ifndef __itkHistogram_h
 #include <itkHistogram.h>
 #endif
@@ -128,33 +125,7 @@ namespace mitk
       */
     unsigned int GetDimension(int i) const;
 
-    /** @brief Get the data vector of the complete image, i.e., of all channels linked together.
-
-    If you only want to access a slice, volume at a specific time or single channel
-    use one of the SubImageSelector classes.
-     \deprecatedSince{2012_09} Please use image accessors instead: See Doxygen/Related-Pages/Concepts/Image. This method
-    can be replaced by ImageWriteAccessor::GetData() or ImageReadAccessor::GetData() */
-    DEPRECATED(virtual void *GetData());
-
   public:
-    /** @brief Get the pixel value at one specific index position.
-
-    The pixel type is always being converted to double.
-     \deprecatedSince{2012_09} Please use image accessors instead: See Doxygen/Related-Pages/Concepts/Image. This method
-    can be replaced by a method from ImagePixelWriteAccessor or ImagePixelReadAccessor */
-    DEPRECATED(double GetPixelValueByIndex(const itk::Index<3> &position,
-                                           unsigned int timestep = 0,
-                                           unsigned int component = 0));
-
-    /** @brief Get the pixel value at one specific world position.
-
-    The pixel type is always being converted to double.
-    Please consider using image accessors instead: See Doxygen/Related-Pages/Concepts/Image. This method
-    can be replaced by a templated method from ImagePixelWriteAccessor or ImagePixelReadAccessor */
-    double GetPixelValueByWorldCoordinate(const mitk::Point3D &position,
-                                                     unsigned int timestep = 0,
-                                                     unsigned int component = 0);
-
     /**
       * @brief Get a volume at a specific time @a t of channel @a n as a vtkImageData.
       */
@@ -282,19 +253,6 @@ namespace mitk
                             int tDim = 1);
 
     /**
-    * initialize new (or re-initialize) image information by a TimeGeometry
-    *
-    * \deprecatedSince{2013_09} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see
-    * http://www.mitk.org/Development/Refactoring%20of%20the%20Geometry%20Classes%20-%20Part%201
-    */
-    DEPRECATED(virtual void Initialize(const mitk::PixelType & /*type*/,
-                                       const mitk::TimeSlicedGeometry * /*geometry*/,
-                                       unsigned int /*channels = 1*/,
-                                       int /*tDim=1*/))
-    {
-    }
-
-    /**
     * \brief Initialize new (or re-initialize) image information by a TimeGeometry
     *
     * \param type
@@ -314,16 +272,7 @@ namespace mitk
       * PlaneGeometry and @a sDim via SlicedGeometry3D::InitializeEvenlySpaced.
       * The spacing is calculated from the PlaneGeometry.
       * \sa SlicedGeometry3D::InitializeEvenlySpaced
-      * \deprecatedSince{2016_11} Use a left-handed or right-handed PlaneGeometry to define the
-      * direction of the image stack instead of the flipped parameter
       */
-    DEPRECATED(virtual void Initialize(const mitk::PixelType &type,
-                            int sDim,
-                            const mitk::PlaneGeometry &geometry2d,
-                            bool flipped,
-                            unsigned int channels = 1,
-                            int tDim = 1));
-
     virtual void Initialize(const mitk::PixelType &type,
                             int sDim,
                             const mitk::PlaneGeometry &geometry2d,
@@ -563,94 +512,13 @@ namespace mitk
                                                 ImportMemoryManagementType importMemoryManagement = CopyMemory) const;
 
     /**
-    \brief (DEPRECATED) Get the minimum for scalar images
-    */
-    DEPRECATED(ScalarType GetScalarValueMin(int t = 0) const);
-
-    /**
-    \brief (DEPRECATED) Get the maximum for scalar images
-
-    \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
-    */
-    DEPRECATED(ScalarType GetScalarValueMax(int t = 0) const);
-
-    /**
-    \brief (DEPRECATED) Get the second smallest value for scalar images
-
-    \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
-    */
-    DEPRECATED(ScalarType GetScalarValue2ndMin(int t = 0) const);
-
-    /**
-    \brief (DEPRECATED) Get the smallest value for scalar images, but do not recompute it first
-
-    \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
-    */
-    DEPRECATED(ScalarType GetScalarValueMinNoRecompute(unsigned int t = 0) const);
-
-    /**
-    \brief (DEPRECATED) Get the second smallest value for scalar images, but do not recompute it first
-
-    \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
-    */
-    DEPRECATED(ScalarType GetScalarValue2ndMinNoRecompute(unsigned int t = 0) const);
-
-    /**
-    \brief (DEPRECATED) Get the second largest value for scalar images
-
-    \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
-    */
-    DEPRECATED(ScalarType GetScalarValue2ndMax(int t = 0) const);
-
-    /**
-    \brief (DEPRECATED) Get the largest value for scalar images, but do not recompute it first
-
-    \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
-    */
-    DEPRECATED(ScalarType GetScalarValueMaxNoRecompute(unsigned int t = 0) const);
-
-    /**
-    \brief (DEPRECATED) Get the second largest value for scalar images, but do not recompute it first
-
-    \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
-    */
-    DEPRECATED(ScalarType GetScalarValue2ndMaxNoRecompute(unsigned int t = 0) const);
-
-    /**
-    \brief (DEPRECATED) Get the count of voxels with the smallest scalar value in the dataset
-
-    \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
-    */
-    DEPRECATED(ScalarType GetCountOfMinValuedVoxels(int t = 0) const);
-
-    /**
-    \brief (DEPRECATED) Get the count of voxels with the largest scalar value in the dataset
-
-    \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
-    */
-    DEPRECATED(ScalarType GetCountOfMaxValuedVoxels(int t = 0) const);
-
-    /**
-    \brief (DEPRECATED) Get the count of voxels with the largest scalar value in the dataset
-
-    \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
-    */
-    DEPRECATED(unsigned int GetCountOfMaxValuedVoxelsNoRecompute(unsigned int t = 0) const);
-
-    /**
-    \brief (DEPRECATED) Get the count of voxels with the smallest scalar value in the dataset
-
-    \warning This method is deprecated and will not be available in the future. Use the \a GetStatistics instead
-    */
-    DEPRECATED(unsigned int GetCountOfMinValuedVoxelsNoRecompute(unsigned int t = 0) const);
-
-    /**
       \brief Returns a pointer to the ImageStatisticsHolder object that holds all statistics information for the image.
 
       All Get-methods for statistics properties formerly accessible directly from an Image object are now moved to the
       new \a ImageStatisticsHolder object.
       */
     StatisticsHolderPointer GetStatistics() const { return m_ImageStatistics; }
+
   protected:
     mitkCloneMacro(Self);
 
@@ -747,29 +615,6 @@ namespace mitk
     /** A mutex, which needs to be locked to manage m_VtkReaders */
     itk::SimpleFastMutexLock m_VtkReadersLock;
   };
-
-  /**
-  * @brief Equal A function comparing two images for beeing equal in meta- and imagedata
-  * @warning This method is deprecated and will not be available in the future. Use the \a bool mitk::Equal(const
-  * mitk::Image& i1, const mitk::Image& i2) instead.
-  *
-  * @ingroup MITKTestingAPI
-  *
-  * Following aspects are tested for equality:
-  *  - dimension of the images
-  *  - size of the images
-  *  - pixel type
-  *  - pixel values : pixel values are expected to be identical at each position ( for other options see
-  * mitk::CompareImageFilter )
-  *
-  * @param rightHandSide An image to be compared
-  * @param leftHandSide An image to be compared
-  * @param eps Tolarence for comparison. You can use mitk::eps in most cases.
-  * @param verbose Flag indicating if the user wants detailed console output or not.
-  * @return true, if all subsequent comparisons are true, false otherwise
-  */
-  DEPRECATED(MITKCORE_EXPORT bool Equal(
-    const mitk::Image *leftHandSide, const mitk::Image *rightHandSide, ScalarType eps, bool verbose));
 
   /**
   * @brief Equal A function comparing two images for beeing equal in meta- and imagedata

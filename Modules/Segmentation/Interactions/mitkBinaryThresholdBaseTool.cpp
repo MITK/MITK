@@ -115,7 +115,7 @@ static void ITKThresholding(const itk::Image<TPixel, VImageDimension> *originalI
   segmentation->SetVolume((void *)(filter->GetOutput()->GetPixelContainer()->GetBufferPointer()), timeStep);
 }
 
-void mitk::BinaryThresholdBaseTool::DoUpdatePreview(const Image* inputAtTimeStep, Image* previewImage, TimeStepType timeStep)
+void mitk::BinaryThresholdBaseTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image* /*oldSegAtTimeStep*/, Image* previewImage, TimeStepType timeStep)
 {
   if (nullptr != inputAtTimeStep && nullptr != previewImage)
   {

@@ -88,10 +88,6 @@ namespace mitk
 
     ImageDataItem(const ImageDataItem &other);
 
-    /**
-    \deprecatedSince{2012_09} Please use image accessors instead: See Doxygen/Related-Pages/Concepts/Image. This method
-    can be replaced by ImageWriteAccessor::GetData() or ImageReadAccessor::GetData() */
-    DEPRECATED(void *GetData() const) { return m_Data; }
     bool IsComplete() const { return m_IsComplete; }
     void SetComplete(bool complete) { m_IsComplete = complete; }
     int GetOffset() const { return m_Offset; }
@@ -131,6 +127,13 @@ namespace mitk
     virtual void Modified() const;
 
   protected:
+
+    /**Helper function to allow friend classes to access m_Data without changing their code.
+    * Moved to protected visibility because only friends are allowed to access m_Data directly.
+    * Other classes should used ImageWriteAccessor::GetData() or ImageReadAccessor::GetData()
+    * to get access.*/
+    void* GetData() const { return m_Data; }
+
     unsigned char *m_Data;
 
     PixelType *m_PixelType;

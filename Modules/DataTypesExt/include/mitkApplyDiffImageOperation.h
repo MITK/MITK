@@ -31,7 +31,7 @@ namespace mitk
    used to keep the image alive -- the purpose of this class is undo and the undo
    stack should not keep things alive forever.
 
-   To save memory, zlib compression is used via CompressedImageContainer.
+   To save memory, compression is used via CompressedImageContainer.
 
    @ingroup Undo
    @ingroup ToolManagerEtAl
@@ -50,7 +50,7 @@ namespace mitk
 
     unsigned long m_DeleteTag;
 
-    CompressedImageContainer::Pointer zlibContainer;
+    CompressedImageContainer m_CompressedImageContainer;
 
   public:
     /**

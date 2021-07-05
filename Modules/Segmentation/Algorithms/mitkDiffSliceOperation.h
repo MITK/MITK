@@ -79,7 +79,7 @@ namespace mitk
     /** \brief Callback for image observer.*/
     void OnImageDeleted();
 
-    CompressedImageContainer::Pointer m_zlibSliceContainer;
+    CompressedImageContainer m_CompressedImageContainer;
 
     mitk::Image *m_Image;
 

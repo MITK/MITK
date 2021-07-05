@@ -21,8 +21,8 @@ class mitkCompressedImageContainerTestClass
 public:
   static void Test(mitk::CompressedImageContainer *container, mitk::Image *image, unsigned int &numberFailed)
   {
-    container->SetImage(image);                                     // compress
-    mitk::Image::Pointer uncompressedImage = container->GetImage(); // uncompress
+    container->CompressImage(image);
+    mitk::Image::Pointer uncompressedImage = container->DecompressImage();
 
     // check dimensions
     if (image->GetDimension() != uncompressedImage->GetDimension())
@@ -144,28 +144,15 @@ int mitkCompressedImageContainerTest(int argc, char *argv[])
   }
 
   std::cout << "  (II) Could load image." << std::endl;
-  std::cout << "Testing instantiation" << std::endl;
 
-  // instantiation
-  mitk::CompressedImageContainer::Pointer container = mitk::CompressedImageContainer::New();
-  if (container.IsNotNull())
   {
-    std::cout << "  (II) Instantiation works." << std::endl;
+    mitk::CompressedImageContainer container;
+
+    // some real work
+    mitkCompressedImageContainerTestClass::Test(&container, image, numberFailed);
+
+    std::cout << "Testing destruction" << std::endl;
   }
-  else
-  {
-    ++numberFailed;
-    std::cout << "Test failed, and it's the ugliest one!" << std::endl;
-    return EXIT_FAILURE;
-  }
-
-  // some real work
-  mitkCompressedImageContainerTestClass::Test(container, image, numberFailed);
-
-  std::cout << "Testing destruction" << std::endl;
-
-  // freeing
-  container = nullptr;
 
   std::cout << "  (II) Freeing works." << std::endl;
 

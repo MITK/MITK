@@ -228,6 +228,7 @@ namespace mitk
     static InterpolatorMapType s_InterpolatorForImage;
 
     Image::ConstPointer m_Segmentation;
+    std::pair<unsigned long, bool> m_SegmentationModifiedObserverTag; // first: actual tag, second: tag assigned / valid?
     Image::ConstPointer m_ReferenceImage;
     bool m_BlockModified;
     bool m_2DInterpolationActivated;

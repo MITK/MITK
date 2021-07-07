@@ -29,6 +29,7 @@ if(MITK_USE_HDF5)
     ExternalProject_Add(${proj}
        URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/hdf5-1.8.17.tar.gz
        URL_MD5 7d572f8f3b798a628b8245af0391a0ca
+       PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/HDF5.patch
        CMAKE_GENERATOR ${gen}
        CMAKE_GENERATOR_PLATFORM ${gen_platform}
        CMAKE_ARGS

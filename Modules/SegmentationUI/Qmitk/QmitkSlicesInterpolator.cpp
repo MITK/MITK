@@ -154,6 +154,10 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget *parent, const char * /
   command2->SetCallbackFunction(this, &QmitkSlicesInterpolator::OnSurfaceInterpolationInfoChanged);
   SurfaceInterpolationInfoChangedObserverTag = m_SurfaceInterpolator->AddObserver(itk::ModifiedEvent(), command2);
 
+  auto command3 = itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::New();
+  command3->SetCallbackFunction(this, &QmitkSlicesInterpolator::OnInterpolationAborted);
+  InterpolationAbortedObserverTag = m_Interpolator->AddObserver(itk::AbortEvent(), command3);
+
   // feedback node and its visualization properties
   m_FeedbackNode = mitk::DataNode::New();
   mitk::CoreObjectFactory::GetInstance()->SetDefaultProperties(m_FeedbackNode);
@@ -348,6 +352,7 @@ QmitkSlicesInterpolator::~QmitkSlicesInterpolator()
   }
 
   // remove observer
+  m_Interpolator->RemoveObserver(InterpolationAbortedObserverTag);
   m_Interpolator->RemoveObserver(InterpolationInfoChangedObserverTag);
   m_SurfaceInterpolator->RemoveObserver(SurfaceInterpolationInfoChangedObserverTag);
 
@@ -1290,6 +1295,11 @@ void QmitkSlicesInterpolator::OnInterpolationInfoChanged(const itk::EventObject 
 {
   // something (e.g. undo) changed the interpolation info, we should refresh our display
   UpdateVisibleSuggestion();
+}
+
+void QmitkSlicesInterpolator::OnInterpolationAborted(const itk::EventObject& /*e*/)
+{
+  m_CmbInterpolation->setCurrentIndex(0);
 }
 
 void QmitkSlicesInterpolator::OnSurfaceInterpolationInfoChanged(const itk::EventObject & /*e*/)

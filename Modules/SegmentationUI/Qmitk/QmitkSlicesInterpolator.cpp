@@ -1300,6 +1300,7 @@ void QmitkSlicesInterpolator::OnInterpolationInfoChanged(const itk::EventObject 
 void QmitkSlicesInterpolator::OnInterpolationAborted(const itk::EventObject& /*e*/)
 {
   m_CmbInterpolation->setCurrentIndex(0);
+  m_FeedbackNode->SetData(nullptr);
 }
 
 void QmitkSlicesInterpolator::OnSurfaceInterpolationInfoChanged(const itk::EventObject & /*e*/)

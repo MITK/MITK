@@ -34,11 +34,6 @@ protected slots :
   void OnSettingsAccept();
   void OnDirectoryChanged(const QString &);
 
-  
-/*private slots:
-  void OnProcessError(QProcess::ProcessError error);
-  void OnProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);
-*/
 protected:
   QmitknnUNetToolGUI();
   ~QmitknnUNetToolGUI() = default;
@@ -51,7 +46,6 @@ protected:
   std::string m_Model;
   std::string m_Task;
 
-  std::string m_Mode;
   std::string m_nnUNetDirectory;
   std::string m_ModelDirectory;
   std::string m_OutputDirectory;

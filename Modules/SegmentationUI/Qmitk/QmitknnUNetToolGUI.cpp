@@ -35,11 +35,11 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   /*m_Controls.modelBox->addItem("3D Full Res");
   m_Controls.modelBox->addItem("3D Low Res");
   m_Controls.modelBox->addItem("3D Cascade Full Res");
-  m_Controls.modelBox->addItem("2D");*/
+  m_Controls.modelBox->addItem("2D");
 
   m_Controls.taskBox->addItem("Heart");
   m_Controls.taskBox->addItem("Brain Tumour");
-  m_Controls.taskBox->addItem("Prostate");
+  m_Controls.taskBox->addItem("Prostate");*/
 
   connect(m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnSettingsAccept()));
   connect(m_Controls.modeldirectoryBox, SIGNAL(directoryChanged(const QString &)), this, SLOT(OnDirectoryChanged(const QString &)));
@@ -59,13 +59,11 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       // comboboxes
       m_Model = m_Controls.modelBox->itemText(m_Controls.modelBox->currentIndex()).toUtf8().constData();
       m_Task = m_Controls.taskBox->itemText(m_Controls.taskBox->currentIndex()).toUtf8().constData();
-      //m_Mode = m_Controls.modeBox->itemText(m_Controls.modeBox->currentIndex()).toUtf8().constData();
       m_nnUNetDirectory = m_Controls.codedirectoryBox->directory().toUtf8().constData();
       m_ModelDirectory = m_Controls.modeldirectoryBox->directory().toUtf8().constData();
       m_OutputDirectory = m_Controls.outdirBox->directory().toUtf8().constData();
       tool->SetModel(m_Model);
       tool->SetTask(m_Task);
-      tool->SetMode(m_Mode);
       tool->SetnnUNetDirectory(m_nnUNetDirectory);
       tool->SetOutputDirectory(m_OutputDirectory);
       tool->SetModelDirectory(m_ModelDirectory);
@@ -88,7 +86,6 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       this->setCursor(Qt::ArrowCursor);
       std::stringstream stream;
       stream << "Error while generation nnUNet segmentation. Reason: " << e.what();
-
       QMessageBox *messageBox = new QMessageBox(QMessageBox::Critical, nullptr, stream.str().c_str());
       messageBox->exec();
       delete messageBox;
@@ -100,7 +97,6 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       this->setCursor(Qt::ArrowCursor);
       std::stringstream stream;
       stream << "Unkown error occured while generation nnUNet segmentation.";
-
       QMessageBox *messageBox = new QMessageBox(QMessageBox::Critical, nullptr, stream.str().c_str());
       messageBox->exec();
       delete messageBox;
@@ -121,16 +117,17 @@ void QmitknnUNetToolGUI::EnableWidgets(bool enabled)
 
 void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &dir )
 {
-  std::cout<<"dire changed "<<dir.toUtf8().constData()<<std::endl;
-  //QString filePath;
+  QStringList splitPath = dir.split(QDir::separator(), Qt::SkipEmptyParts); // Should work for all OS but not tested on Windows
+  QString task = splitPath.last();
+  m_Controls.taskBox->addItem(task);
+  //std::vector<QString> models;
   QDirIterator it(dir , QDir::AllDirs , QDirIterator::NoIteratorFlags);
   while (it.hasNext()) {
     it.next();
     QString filePath = it.fileName();
-    std::string model = filePath.toUtf8().constData();
-    std::cout<<"dir "<<model<<std::endl;
-    if (model.rfind('.', 0)!=0)
+    //models.push_back(filePath);
+    if (!filePath.startsWith('.')){ //Filter out irrelevent hidden folders, if any.
       m_Controls.modelBox->addItem(filePath);
-
+    } 
   }
 }

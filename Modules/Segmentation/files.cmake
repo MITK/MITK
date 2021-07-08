@@ -64,6 +64,7 @@ set(CPP_FILES
   Interactions/mitkToolCommand.cpp
   Interactions/mitkWatershedTool.cpp
   Interactions/mitkPickingTool.cpp
+  Interactions/mitknnUnetTool.cpp
   Interactions/mitkSegmentationInteractor.cpp #SO
   Rendering/mitkContourMapper2D.cpp
   Rendering/mitkContourSetMapper2D.cpp

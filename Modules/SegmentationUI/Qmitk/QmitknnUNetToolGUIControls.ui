@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+  <class>QmitknnUNetToolGUIControls</class>
+  <widget class="QWidget" name="QmitknnUNetToolGUIControls">
+    <property name="geometry">
+      <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>192</width>
+        <height>352</height>
+      </rect>
+    </property>
+    <property name="sizePolicy">
+      <sizepolicy hsizetype="Ignored" vsizetype="Minimum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+      </sizepolicy>
+    </property>
+    <property name="minimumSize">
+      <size>
+        <width>100</width>
+        <height>0</height>
+      </size>
+    </property>
+    <property name="maximumSize">
+      <size>
+        <width>100000</width>
+        <height>100000</height>
+      </size>
+    </property>
+    <property name="windowTitle">
+      <string>QmitknnUNetToolWidget</string>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="leftMargin">
+        <number>0</number>
+      </property>
+      <property name="topMargin">
+        <number>0</number>
+      </property>
+      <property name="rightMargin">
+        <number>0</number>
+      </property>
+      <property name="bottomMargin">
+        <number>0</number>
+      </property>
+      <item>
+        <layout class="QGridLayout" name="advancedSettingsLayout">
+          <item row="0" column="0">
+            <widget class="QLabel" name="nnUnetdirLabel">
+              <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                </sizepolicy>
+              </property>
+              <property name="text">
+                <string>nnUNet Path:</string>
+              </property>
+            </widget>
+          </item>
+          <item row="0" column="1" colspan="3">
+            <widget class="ctkDirectoryButton" name="codedirectoryBox" native="true" />
+          </item>
+
+          <item row="1" column="0">
+            <widget class="QLabel" name="pretraineddirLabel">
+              <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                </sizepolicy>
+              </property>
+              <property name="text">
+                <string>Pretrained Model Path:</string>
+              </property>
+            </widget>
+          </item>
+          <item row="1" column="1" colspan="3">
+            <widget class="ctkDirectoryButton" name="modeldirectoryBox" native="true" />
+          </item>
+
+
+          <!-- </item> -->
+          <item row="2" column="0">
+            <widget class="QLabel" name="modelLabel">
+              <property name="text">
+                <string>Model:</string>
+              </property>
+            </widget>
+          </item>
+          <item row="2" column="1">
+            <widget class="ctkComboBox" name="modelBox" native="true" />
+          </item>
+
+          <item row="2" column="2">
+            <widget class="QLabel" name="taskLabel">
+              <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                </sizepolicy>
+              </property>
+              <property name="text">
+                <string>Task:</string>
+              </property>
+            </widget>
+          </item>
+          <item row="2" column="3">
+            <widget class="ctkComboBox" name="taskBox" native="true" />
+          </item>
+
+          <!-- </item> -->
+          <item row="3" column="0">
+            <widget class="QLabel" name="foldLabel">
+              <property name="text">
+                <string>Fold:</string>
+              </property>
+            </widget>
+          </item>
+          <item row="3" column="1">
+            <widget class="ctkComboBox" name="foldBox" native="true" />
+          </item>
+
+          <item row="3" column="2">
+            <widget class="QLabel" name="trainerLabel">
+              <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                </sizepolicy>
+              </property>
+              <property name="text">
+                <string>Trainer:</string>
+              </property>
+            </widget>
+          </item>
+          <item row="3" column="3">
+            <widget class="ctkComboBox" name="trainerBox" native="true" />
+          </item>
+
+          <!-- </item> -->
+          <item row="4" column="0">
+            <widget class="QLabel" name="mirrorLabel">
+              <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                </sizepolicy>
+              </property>
+              <property name="text">
+                <string>Enable Mirroring</string>
+              </property>
+            </widget>
+          </item>
+          <item row="4" column="1">
+            <widget class="ctkCheckBox" name="mirrorBox" native="true">
+              <property name="checked">
+                <bool>true</bool>
+              </property>
+            </widget>
+          </item>
+
+          <item row="4" column="2">
+            <widget class="QLabel" name="gpuLabel">
+              <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                </sizepolicy>
+              </property>
+              <property name="text">
+                <string>Use GPU:</string>
+              </property>
+            </widget>
+          </item>
+          <item row="4" column="3">
+            <widget class="ctkCheckBox" name="gpuBox" native="true" />
+          </item>
+          <!-- </item> -->
+        </layout>
+      </item>
+
+      <!-- start advanced-->
+      <item>
+        <widget class="ctkCollapsibleGroupBox" name="inputGroupBox" native="true">
+          <property name="minimumSize">
+            <size>
+              <width>0</width>
+              <height>0</height>
+            </size>
+          </property>
+          <property name="collapsedHeight">
+            <number>5</number>
+          </property>
+          <property name="title">
+            <string>Advanced</string>
+          </property>
+          <property name="collapsed">
+            <bool>true</bool>
+          </property>
+          <property name="flat">
+            <bool>true</bool>
+          </property>
+          <property name="alignment">
+            <set>Qt::AlignRight</set>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+            <!--  <property name="leftMargin">
+              <number>0</number>
+              </property>
+              <property name="topMargin">
+                <number>0</number>
+              </property>
+              <property name="rightMargin">
+                <number>0</number>
+              </property>
+              <property name="bottomMargin">
+                <number>0</number>
+              </property>-->
+            <item>
+              <layout class="QGridLayout" name="_2">
+                <property name="spacing">
+                  <number>6</number>
+                </property>
+                <property name="margin">
+                  <number>0</number>
+                </property>
+
+                <item row="0" column="0">
+                  <widget class="QLabel" name="exportLabel">
+                    <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                      </sizepolicy>
+                    </property>
+                    <property name="text">
+                      <string>Export</string>
+                    </property>
+                  </widget>
+                </item>
+                <item row="0" column="1">
+                  <widget class="ctkCheckBox" name="exportBox" native="true" />
+                </item>
+                <item row="0" column="2">
+                  <widget class="QLabel" name="mixedPrecisionLabel">
+                    <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                      </sizepolicy>
+                    </property>
+                    <property name="text">
+                      <string>Mixed Precision</string>
+                    </property>
+                  </widget>
+                </item>
+                <item row="0" column="3">
+                  <widget class="QCheckBox" name="mixedPrecisionBox" native="true">
+                    <property name="checked">
+                      <bool>true</bool>
+                    </property>
+                  </widget>
+                </item>
+                <!-- </item> -->
+                <item row="1" column="0">
+                  <widget class="QLabel" name="threadsLabel">
+                    <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                      </sizepolicy>
+                    </property>
+                    <property name="text">
+                      <string>Preprocessing Threads:</string>
+                    </property>
+                  </widget>
+                </item>
+                <item row="1" column="1">
+                  <widget class="QSpinBox" name="threadsBox" native="true">
+                    <property name="minimum">
+                      <number>1</number>
+                    </property>
+                    <property name="maximum">
+                      <number>100</number>
+                    </property>
+                  </widget>
+                </item>
+                <!--
+                <item row="1" column="2">
+                  <widget class="QLabel" name="lowresLabel">
+                    <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                      </sizepolicy>
+                    </property>
+                    <property name="text">
+                      <string>Low Res:</string>
+                    </property>
+                  </widget>
+                </item>
+                <item row="1" column="3">
+                  <widget class="ctkCheckBox" name="lowresBox" native="true" />
+                </item>-->
+                <!-- </item> -->
+                <item row="2" column="2">
+                  <widget class="QLabel" name="allInGpuLabel">
+                    <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                      </sizepolicy>
+                    </property>
+                    <property name="text">
+                      <string>Preprocess in GPU</string>
+                    </property>
+                  </widget>
+                </item>
+                <item row="2" column="3">
+                  <widget class="ctkCheckBox" name="allInGpuBox" native="true" />
+                </item>
+
+                <item row="3" column="0">
+                  <widget class="QLabel" name="outputdirLabel">
+                    <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                      </sizepolicy>
+                    </property>
+                    <property name="text">
+                      <string>Output Directory:</string>
+                    </property>
+                  </widget>
+                </item>
+                <item row="3" column="1" colspan="3">
+                  <widget class="ctkDirectoryButton" name="outdirBox" native="true" />
+                </item>
+
+              </layout>
+            </item>
+          </layout>
+        </widget>
+      </item>
+      <!-- end advanced-->
+
+      <item>
+        <widget class="QPushButton" name="previewButton">
+          <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+            </sizepolicy>
+          </property>
+          <property name="maximumSize">
+            <size>
+              <width>100000</width>
+              <height>16777215</height>
+            </size>
+          </property>
+          <property name="text">
+            <string>Preview</string>
+          </property>
+        </widget>
+      </item>
+    </layout>
+  </widget>
+  <!--
+  <layoutdefault spacing="6" margin="11" />
+  <customwidgets>
+    <customwidget>
+      <class>ctkSliderWidget</class>
+      <extends>QWidget</extends>
+      <header location="global">ctkSliderWidget.h</header>
+      <container>1</container>
+    </customwidget>
+  </customwidgets>
+  <resources />
+  <connections />
+  -->
+</ui>

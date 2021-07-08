@@ -1,0 +1,61 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
+#ifndef QmitknnUNetToolGUI_h_Included
+#define QmitknnUNetToolGUI_h_Included
+
+#include "QmitkAutoMLSegmentationToolGUIBase.h"
+#include "ui_QmitknnUNetToolGUIControls.h"
+#include <MitkSegmentationUIExports.h>
+#include <QProcess>
+
+
+
+class MITKSEGMENTATIONUI_EXPORT QmitknnUNetToolGUI : public QmitkAutoMLSegmentationToolGUIBase
+{
+  Q_OBJECT
+
+public:
+  mitkClassMacro(QmitknnUNetToolGUI, QmitkAutoMLSegmentationToolGUIBase);
+  itkFactorylessNewMacro(Self);
+  itkCloneMacro(Self);
+
+protected slots :
+
+  void OnSettingsAccept();
+  void OnDirectoryChanged(const QString &);
+
+  
+/*private slots:
+  void OnProcessError(QProcess::ProcessError error);
+  void OnProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);
+*/
+protected:
+  QmitknnUNetToolGUI();
+  ~QmitknnUNetToolGUI() = default;
+
+  void ConnectNewTool(mitk::AutoSegmentationWithPreviewTool* newTool) override;
+  void InitializeUI(QBoxLayout* mainLayout) override;
+  void EnableWidgets(bool enabled) override;
+
+  //Declaring variables for strings and int only.
+  std::string m_Model;
+  std::string m_Task;
+
+  std::string m_Mode;
+  std::string m_nnUNetDirectory;
+  std::string m_ModelDirectory;
+  std::string m_OutputDirectory;
+  Ui_QmitknnUNetToolGUIControls m_Controls;
+};
+
+#endif

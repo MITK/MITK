@@ -24,6 +24,7 @@ Qmitk/QmitkToolGUI.cpp
 Qmitk/QmitkToolGUIArea.cpp
 Qmitk/QmitkToolSelectionBox.cpp
 Qmitk/QmitkWatershedToolGUI.cpp
+Qmitk/QmitknnUNetToolGUI.cpp
 #Added from ML
 Qmitk/QmitkLabelSetWidget.cpp
 Qmitk/QmitkSurfaceStampWidget.cpp
@@ -60,6 +61,7 @@ Qmitk/QmitkToolGUI.h
 Qmitk/QmitkToolGUIArea.h
 Qmitk/QmitkToolSelectionBox.h
 Qmitk/QmitkWatershedToolGUI.h
+Qmitk/QmitknnUNetToolGUI.h
 #Added from ML
 Qmitk/QmitkLabelSetWidget.h
 Qmitk/QmitkSurfaceStampWidget.h
@@ -83,6 +85,7 @@ Qmitk/QmitkMaskStampWidgetGUIControls.ui
 Qmitk/QmitkSliceBasedInterpolatorWidgetGUIControls.ui
 Qmitk/QmitkSurfaceBasedInterpolatorWidgetGUIControls.ui
 Qmitk/QmitkSearchLabelDialogGUI.ui
+Qmitk/QmitknnUNetToolGUIControls.ui
 )
 
 set(QRC_FILES

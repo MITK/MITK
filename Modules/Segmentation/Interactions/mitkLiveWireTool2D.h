@@ -116,6 +116,9 @@ namespace mitk
     mitk::ContourModel::Pointer m_LiveWireContour;
     mitk::DataNode::Pointer m_LiveWireContourNode;
 
+    mitk::ContourModel::Pointer m_LiveWireContourToEnd;
+    mitk::DataNode::Pointer m_LiveWireContourToEndNode;
+
     mitk::ContourModel::Pointer m_EditingContour;
     mitk::DataNode::Pointer m_EditingContourNode;
     mitk::ContourModelLiveWireInteractor::Pointer m_ContourInteractor;

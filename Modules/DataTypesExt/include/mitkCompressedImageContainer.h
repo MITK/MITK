@@ -45,6 +45,7 @@ namespace mitk
     std::unique_ptr<PixelType> m_PixelType;
     TimeGeometry::Pointer m_TimeGeometry;
     std::array<unsigned int, 2> m_SliceDimensions;
+    unsigned int m_Dimension;
   };
 }
 

@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <algorithm>
 
 mitk::CompressedImageContainer::CompressedImageContainer()
+  : m_Dimension(0)
 {
 }
 
@@ -42,6 +43,7 @@ void mitk::CompressedImageContainer::ClearCompressedImageData()
   m_TimeGeometry = nullptr;
   m_SliceDimensions[0] = 0;
   m_SliceDimensions[1] = 0;
+  m_Dimension = 0;
 }
 
 void mitk::CompressedImageContainer::CompressImage(const Image* image)
@@ -55,6 +57,7 @@ void mitk::CompressedImageContainer::CompressImage(const Image* image)
   m_TimeGeometry = image->GetTimeGeometry()->Clone();
   m_SliceDimensions[0] = image->GetDimension(0);
   m_SliceDimensions[1] = image->GetDimension(1);
+  m_Dimension = image->GetDimension();
 
   const auto numTimeSteps = m_TimeGeometry->CountTimeSteps();
   const auto numSlices = image->GetDimension(2);
@@ -110,7 +113,7 @@ mitk::Image::Pointer mitk::CompressedImageContainer::DecompressImage() const
   dimensions[3] = numTimeSteps;
 
   auto image = Image::New();
-  image->Initialize(*m_PixelType, numTimeSteps > 1 ? 4 : 3, dimensions.data());
+  image->Initialize(*m_PixelType, m_Dimension, dimensions.data());
 
   for (std::remove_const_t<decltype(numTimeSteps)> t = 0; t < numTimeSteps; ++t)
   {

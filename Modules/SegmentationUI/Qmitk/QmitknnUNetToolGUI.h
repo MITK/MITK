@@ -33,6 +33,8 @@ protected slots :
 
   void OnSettingsAccept();
   void OnDirectoryChanged(const QString &);
+  void OnModelChanged(const QString&);
+  void OnTrainerChanged(const QString&);
 
 protected:
   QmitknnUNetToolGUI();
@@ -47,7 +49,9 @@ protected:
   std::string m_Task;
 
   std::string m_nnUNetDirectory;
-  std::string m_ModelDirectory;
+  //std::string m_ModelDirectory;
+  QString m_ModelDirectory; //Change datatype to QDir?
+  QString m_DatasetName;
   std::string m_OutputDirectory;
   Ui_QmitknnUNetToolGUIControls m_Controls;
 };

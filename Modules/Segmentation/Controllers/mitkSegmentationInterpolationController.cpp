@@ -123,13 +123,14 @@ void mitk::SegmentationInterpolationController::SetSegmentationVolume(const Imag
 
   if (nullptr == segmentation || !segmentation->IsInitialized())
   {
+    m_Segmentation = nullptr;
     this->InvokeEvent(itk::AbortEvent());
     return;
   }
 
   if (segmentation->GetDimension() > 4 || segmentation->GetDimension() < 3)
   {
-    itkExceptionMacro("SegmentationInterpolationController needs a 3D-segmentation or 3D+t, not 2D.");
+    itkExceptionMacro("SegmentationInterpolationController needs a 3D-segmentation or 3D+t.");
   }
 
   m_Segmentation = segmentation;

@@ -36,6 +36,29 @@ found in the LICENSE file.
 
 #include <cstdlib>
 
+namespace
+{
+  double GetScreenResolution(const mitk::BaseRenderer* renderer)
+  {
+    if (nullptr == renderer)
+      return 1.0;
+
+    mitk::Point2D pD1, pD2;
+    pD1[0] = 0.0;
+    pD1[1] = 0.0;
+    pD2[0] = 0.0;
+    pD2[1] = 1.0;
+
+    // Calculate world coordinates of in-plane screen pixels (0, 0) and (0, 1).
+    mitk::Point3D pW1, pW2;
+    renderer->DisplayToWorld(pD1, pW1);
+    renderer->DisplayToWorld(pD2, pW2);
+
+    // For 2D renderers, the distance between these points is the screen resolution.
+    return pW1.EuclideanDistanceTo(pW2);
+  }
+}
+
 // constructor LocalStorage
 mitk::PointSetVtkMapper2D::LocalStorage::LocalStorage()
 {
@@ -269,7 +292,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer *rende
   mitk::Point2D preLastPt2d = pt2d; // projected_p in display coordinates before lastPt2
 
   const mitk::PlaneGeometry *geo2D = renderer->GetCurrentWorldPlaneGeometry();
-  double resolution = this->GetScreenResolution(renderer);
+  double resolution = GetScreenResolution(renderer);
 
   vtkLinearTransform *dataNodeTransform = input->GetGeometry()->GetVtkTransform();
 
@@ -536,10 +559,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer *rende
   // apply transform of current plane to glyphs
   ls->m_UnselectedGlyph3D->SetSourceConnection(transformFilterU->GetOutputPort());
   ls->m_UnselectedGlyph3D->SetInputData(ls->m_VtkUnselectedPointListPolyData);
-  if (m_FixedSizeOnScreen)
-  {
-    ls->m_UnselectedGlyph3D->SetScaleFactor(resolution);
-  }
+  ls->m_UnselectedGlyph3D->SetScaleFactor(m_FixedSizeOnScreen ? resolution : 1.0);
   ls->m_UnselectedGlyph3D->SetScaleModeToScaleByVector();
   ls->m_UnselectedGlyph3D->SetVectorModeToUseVector();
 
@@ -758,24 +778,7 @@ void mitk::PointSetVtkMapper2D::SetDefaultProperties(mitk::DataNode *node, mitk:
                     mitk::FloatProperty::New(4.0f),
                     renderer,
                     overwrite); // show the point at a certain distance above/below the 2D imaging plane.
+  node->AddProperty("Pointset.2D.fixed size on screen", mitk::BoolProperty::New(false), renderer, overwrite);
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
-}
-
-double mitk::PointSetVtkMapper2D::GetScreenResolution(
-    const mitk::BaseRenderer *renderer) const
-{
-  Point2D pD1, pD2;
-  pD1[0] = 0;
-  pD1[1] = 0;
-  pD2[0] = 0;
-  pD2[1] = 1;
-
-  // Calculate world coordinates of in-plane screen pixels (0, 0) and (0, 1).
-  Point3D pW1, pW2;
-  renderer->DisplayToWorld(pD1, pW1);
-  renderer->DisplayToWorld(pD2, pW2);
-
-  // For 2D renderers, the distance between these points is the screen resolution.
-  return pW1.EuclideanDistanceTo(pW2);
 }

@@ -40,8 +40,7 @@ mitk::ApplyDiffImageOperation::ApplyDiffImageOperation(OperationType operationTy
     m_DeleteTag = image->AddObserver(itk::DeleteEvent(), command);
 
     // keep a compressed version of the image
-    zlibContainer = CompressedImageContainer::New();
-    zlibContainer->SetImage(diffImage);
+    m_CompressedImageContainer.CompressImage(diffImage);
   }
 }
 
@@ -61,7 +60,5 @@ void mitk::ApplyDiffImageOperation::OnImageDeleted()
 mitk::Image::Pointer mitk::ApplyDiffImageOperation::GetDiffImage()
 {
   // uncompress image to create a valid mitk::Image
-  Image::Pointer image = zlibContainer->GetImage().GetPointer();
-
-  return image;
+  return m_CompressedImageContainer.DecompressImage();
 }

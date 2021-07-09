@@ -25,6 +25,17 @@ found in the LICENSE file.
 
 #include <thread>
 
+namespace
+{
+  // itk::Object provides a const version of AddObserver() (which uses const_cast internally)
+  // but not a const version of RemoveObserver().
+  void RemoveObserverFromConstObject(const itk::Object* constObject, unsigned long observerTag)
+  {
+    auto* object = const_cast<itk::Object*>(constObject);
+    object->RemoveObserver(observerTag);
+  }
+}
+
 mitk::SegmentationInterpolationController::InterpolatorMapType
   mitk::SegmentationInterpolationController::s_InterpolatorForImage; // static member initialization
 
@@ -43,7 +54,10 @@ mitk::SegmentationInterpolationController *mitk::SegmentationInterpolationContro
 }
 
 mitk::SegmentationInterpolationController::SegmentationInterpolationController()
-  : m_BlockModified(false), m_2DInterpolationActivated(false), m_EnableSliceImageCache(false)
+  : m_SegmentationModifiedObserverTag(std::make_pair(0UL, false)),
+    m_BlockModified(false),
+    m_2DInterpolationActivated(false),
+    m_EnableSliceImageCache(false)
 {
 }
 
@@ -101,23 +115,30 @@ void mitk::SegmentationInterpolationController::SetSegmentationVolume(const Imag
     s_InterpolatorForImage.erase(iter);
   }
 
-  if (!segmentation)
-    return;
-  if (segmentation->GetDimension() > 4 || segmentation->GetDimension() < 3)
+  if (m_SegmentationModifiedObserverTag.second)
   {
-    itkExceptionMacro("SegmentationInterpolationController needs a 3D-segmentation or 3D+t, not 2D.");
+    RemoveObserverFromConstObject(m_Segmentation, m_SegmentationModifiedObserverTag.first);
+    m_SegmentationModifiedObserverTag.second = false;
   }
 
-  if (m_Segmentation != segmentation)
+  if (nullptr == segmentation || !segmentation->IsInitialized())
   {
-    // observe Modified() event of image
-    itk::ReceptorMemberCommand<SegmentationInterpolationController>::Pointer command =
-      itk::ReceptorMemberCommand<SegmentationInterpolationController>::New();
-    command->SetCallbackFunction(this, &SegmentationInterpolationController::OnImageModified);
-    segmentation->AddObserver(itk::ModifiedEvent(), command);
+    m_Segmentation = nullptr;
+    this->InvokeEvent(itk::AbortEvent());
+    return;
+  }
+
+  if (segmentation->GetDimension() > 4 || segmentation->GetDimension() < 3)
+  {
+    itkExceptionMacro("SegmentationInterpolationController needs a 3D-segmentation or 3D+t.");
   }
 
   m_Segmentation = segmentation;
+
+  auto command = itk::ReceptorMemberCommand<SegmentationInterpolationController>::New();
+  command->SetCallbackFunction(this, &SegmentationInterpolationController::OnImageModified);
+  m_SegmentationModifiedObserverTag.first = segmentation->AddObserver(itk::ModifiedEvent(), command);
+  m_SegmentationModifiedObserverTag.second = true;
 
   m_SegmentationCountInSlice.resize(m_Segmentation->GetTimeSteps());
   for (unsigned int timeStep = 0; timeStep < m_Segmentation->GetTimeSteps(); ++timeStep)

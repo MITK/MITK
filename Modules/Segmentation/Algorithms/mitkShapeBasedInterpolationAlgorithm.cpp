@@ -15,7 +15,10 @@ found in the LICENSE file.
 #include "mitkImageCast.h"
 #include <mitkITKImageImport.h>
 
-#include <itkApproximateSignedDistanceMapImageFilter.h>
+#include <itkFastChamferDistanceImageFilter.h>
+#include <itkInvertIntensityImageFilter.h>
+#include <itkIsoContourDistanceImageFilter.h>
+#include <itkSubtractImageFilter.h>
 
 #include <thread>
 
@@ -68,17 +71,48 @@ template <typename TPixel, unsigned int VImageDimension>
 void mitk::ShapeBasedInterpolationAlgorithm::ComputeDistanceMap(const itk::Image<TPixel, VImageDimension> *binaryImage,
                                                                 mitk::Image::Pointer &result)
 {
-  using DistanceFilterInputImageType = itk::Image<TPixel, VImageDimension>;
-  using DistanceFilterType = itk::ApproximateSignedDistanceMapImageFilter<DistanceFilterInputImageType, DistanceFilterImageType>;
+  typedef itk::Image<TPixel, VImageDimension> DistanceFilterInputImageType;
 
-  auto distanceFilter = DistanceFilterType::New();
-  distanceFilter->SetInsideValue(1);
-  distanceFilter->SetOutsideValue(0);
-  distanceFilter->SetInput(binaryImage);
+  typedef itk::FastChamferDistanceImageFilter<DistanceFilterImageType, DistanceFilterImageType> DistanceFilterType;
+  typedef itk::IsoContourDistanceImageFilter<DistanceFilterInputImageType, DistanceFilterImageType> IsoContourType;
+  typedef itk::InvertIntensityImageFilter<DistanceFilterInputImageType> InvertIntensityImageFilterType;
+  typedef itk::SubtractImageFilter<DistanceFilterImageType, DistanceFilterImageType> SubtractImageFilterType;
 
-  distanceFilter->Update();
+  typename DistanceFilterType::Pointer distanceFilter = DistanceFilterType::New();
+  typename DistanceFilterType::Pointer distanceFilterInverted = DistanceFilterType::New();
+  typename IsoContourType::Pointer isoContourFilter = IsoContourType::New();
+  typename IsoContourType::Pointer isoContourFilterInverted = IsoContourType::New();
+  typename InvertIntensityImageFilterType::Pointer invertFilter = InvertIntensityImageFilterType::New();
+  typename SubtractImageFilterType::Pointer subtractImageFilter = SubtractImageFilterType::New();
 
-  result = mitk::GrabItkImageMemory(distanceFilter->GetOutput());
+  // arbitrary maximum distance
+  int maximumDistance = 100;
+
+  // this assumes the image contains only 1 and 0
+  invertFilter->SetInput(binaryImage);
+  invertFilter->SetMaximum(1);
+
+  // do the processing on the image and the inverted image to get inside and outside distance
+  isoContourFilter->SetInput(binaryImage);
+  isoContourFilter->SetFarValue(maximumDistance + 1);
+  isoContourFilter->SetLevelSetValue(0);
+
+  isoContourFilterInverted->SetInput(invertFilter->GetOutput());
+  isoContourFilterInverted->SetFarValue(maximumDistance + 1);
+  isoContourFilterInverted->SetLevelSetValue(0);
+
+  distanceFilter->SetInput(isoContourFilter->GetOutput());
+  distanceFilter->SetMaximumDistance(maximumDistance);
+
+  distanceFilterInverted->SetInput(isoContourFilterInverted->GetOutput());
+  distanceFilterInverted->SetMaximumDistance(maximumDistance);
+
+  // inside distance should be negative, outside distance positive
+  subtractImageFilter->SetInput2(distanceFilter->GetOutput());
+  subtractImageFilter->SetInput1(distanceFilterInverted->GetOutput());
+  subtractImageFilter->Update();
+
+  result = mitk::GrabItkImageMemory(subtractImageFilter->GetOutput());
 }
 
 template <typename TPixel, unsigned int VImageDimension>

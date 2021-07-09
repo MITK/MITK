@@ -31,8 +31,11 @@ namespace
   // but not a const version of RemoveObserver().
   void RemoveObserverFromConstObject(const itk::Object* constObject, unsigned long observerTag)
   {
-    auto* object = const_cast<itk::Object*>(constObject);
-    object->RemoveObserver(observerTag);
+    if (nullptr != constObject)
+    {
+      auto* object = const_cast<itk::Object*>(constObject);
+      object->RemoveObserver(observerTag);
+    }
   }
 }
 

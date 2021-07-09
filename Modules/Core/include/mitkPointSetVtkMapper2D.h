@@ -205,6 +205,9 @@ namespace mitk
     * displayed e.g. toggle visiblity of the propassembly */
     void ResetMapper(BaseRenderer *renderer) override;
 
+    /** \brief Determine a renderer's resolution in mm per screen pixel. */
+    double GetScreenResolution(const mitk::BaseRenderer *renderer) const;
+
     /* \brief Fills the vtk objects, thus it is only called when the point set has been changed.
    * This function iterates over the input point set and determines the glyphs which lie in a specific
    * range around the current slice. Those glyphs are rendered using a specific shape defined in vtk glyph source
@@ -231,6 +234,7 @@ namespace mitk
     int m_IDShapeProperty;        // ID for mitkPointSetShape Enumeration Property "Pointset.2D.shape"
     bool m_FillShape;             // "Pointset.2D.fill shape" property
     float m_DistanceToPlane;      // "Pointset.2D.distance to plane" property
+    bool m_FixedSizeOnScreen;     // "Pointset.2D.fixed size on screen" property
   };
 
 } // namespace mitk

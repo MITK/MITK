@@ -54,8 +54,8 @@ void mitk::LiveWireTool2D::RemoveHelperObjects()
   if (m_LiveWireContourNode.IsNotNull())
     dataStorage->Remove(m_LiveWireContourNode);
 
-  if (m_LiveWireContourToEndNode.IsNotNull())
-    dataStorage->Remove(m_LiveWireContourToEndNode);
+  if (m_ClosureContourNode.IsNotNull())
+    dataStorage->Remove(m_ClosureContourNode);
 
   if (m_ContourNode.IsNotNull())
     dataStorage->Remove(m_ContourNode);
@@ -76,8 +76,8 @@ void mitk::LiveWireTool2D::ReleaseHelperObjects()
   m_LiveWireContourNode = nullptr;
   m_LiveWireContour = nullptr;
 
-  m_LiveWireContourToEndNode = nullptr;
-  m_LiveWireContourToEnd = nullptr;
+  m_ClosureContourNode = nullptr;
+  m_ClosureContour = nullptr;
 
   m_ContourNode = nullptr;
   m_Contour = nullptr;
@@ -296,15 +296,15 @@ void mitk::LiveWireTool2D::OnInitLiveWire(StateMachineAction *, InteractionEvent
   m_LiveWireContourNode->AddProperty("contour.color", ColorProperty::New(0.1f, 1.0f, 0.1f), nullptr, true);
   m_LiveWireContourNode->AddProperty("contour.width", mitk::FloatProperty::New(4.0f), nullptr, true);
 
-  m_LiveWireContourToEnd = this->CreateNewContour();
-  m_LiveWireContourToEndNode = mitk::DataNode::New();
-  m_LiveWireContourToEndNode->SetData(m_LiveWireContourToEnd);
-  m_LiveWireContourToEndNode->SetName("active livewire node");
-  m_LiveWireContourToEndNode->SetProperty("layer", IntProperty::New(101));
-  m_LiveWireContourToEndNode->AddProperty("fixedLayer", BoolProperty::New(true));
-  m_LiveWireContourToEndNode->SetProperty("helper object", mitk::BoolProperty::New(true));
-  m_LiveWireContourToEndNode->AddProperty("contour.color", ColorProperty::New(0.0f, 1.0f, 0.1f), nullptr, true);
-  m_LiveWireContourToEndNode->AddProperty("contour.width", mitk::FloatProperty::New(2.0f), nullptr, true);
+  m_ClosureContour = this->CreateNewContour();
+  m_ClosureContourNode = mitk::DataNode::New();
+  m_ClosureContourNode->SetData(m_ClosureContour);
+  m_ClosureContourNode->SetName("active closure node");
+  m_ClosureContourNode->SetProperty("layer", IntProperty::New(101));
+  m_ClosureContourNode->AddProperty("fixedLayer", BoolProperty::New(true));
+  m_ClosureContourNode->SetProperty("helper object", mitk::BoolProperty::New(true));
+  m_ClosureContourNode->AddProperty("contour.color", ColorProperty::New(0.0f, 1.0f, 0.1f), nullptr, true);
+  m_ClosureContourNode->AddProperty("contour.width", mitk::FloatProperty::New(2.0f), nullptr, true);
 
   m_EditingContour = this->CreateNewContour();
   m_EditingContourNode = mitk::DataNode::New();
@@ -320,7 +320,7 @@ void mitk::LiveWireTool2D::OnInitLiveWire(StateMachineAction *, InteractionEvent
   auto dataStorage = this->GetToolManager()->GetDataStorage();
   dataStorage->Add(m_ContourNode, workingDataNode);
   dataStorage->Add(m_LiveWireContourNode, workingDataNode);
-  dataStorage->Add(m_LiveWireContourToEndNode, workingDataNode);
+  dataStorage->Add(m_ClosureContourNode, workingDataNode);
   dataStorage->Add(m_EditingContourNode, workingDataNode);
 
   // Set current slice as input for ImageToLiveWireContourFilter
@@ -418,10 +418,15 @@ void mitk::LiveWireTool2D::OnMouseMoved(StateMachineAction *, InteractionEvent *
   if (nullptr == positionEvent)
     return;
 
-  m_LiveWireContourToEnd = this->CreateNewContour();
-  m_LiveWireContourToEndNode->SetData(m_LiveWireContourToEnd);
-  m_LiveWireContourToEnd->AddVertex(m_Contour->GetVertexAt(0)->Coordinates);
-  m_LiveWireContourToEnd->AddVertex(positionEvent->GetPositionInWorld());
+  if (m_ClosureContour->IsEmpty())
+  {
+      m_ClosureContour->AddVertex(m_Contour->GetVertexAt(0)->Coordinates);
+      m_ClosureContour->AddVertex(positionEvent->GetPositionInWorld());
+  }
+  else
+  {
+      m_ClosureContour->SetVertexAt(1, positionEvent->GetPositionInWorld());
+  }
 
   m_LiveWireFilter->SetEndPoint(positionEvent->GetPositionInWorld());
   m_LiveWireFilter->Update();
@@ -462,13 +467,12 @@ void mitk::LiveWireTool2D::OnFinish(StateMachineAction *, InteractionEvent *inte
   if (nullptr == positionEvent)
     return;
 
-  // Remove last control point added by double click
+  // Remove last control point added by double click, if double click was performed on first point
   if (OnCheckPoint(interactionEvent))
       m_Contour->RemoveVertexAt(m_Contour->GetNumberOfVertices() - 1);
 
   // remove green connection between mouse position and start point
-  m_LiveWireContourToEnd = this->CreateNewContour();
-  m_LiveWireContourToEndNode->SetData(m_LiveWireContourToEnd);
+  m_ClosureContour->Clear();
 
   // Save contour and corresponding plane geometry to list
   this->m_WorkingContours.emplace_back(std::make_pair(m_ContourNode, positionEvent->GetSender()->GetCurrentWorldPlaneGeometry()->Clone()));

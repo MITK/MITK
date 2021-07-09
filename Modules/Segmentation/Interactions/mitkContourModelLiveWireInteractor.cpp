@@ -66,7 +66,7 @@ bool mitk::ContourModelLiveWireInteractor::OnCheckPointClick(const InteractionEv
   // Transition YES if click close to a vertex
   mitk::Point3D click = positionEvent->GetPositionInWorld();
 
-  if (contour->SelectVertexAt(click, 1.5, timeStep))
+  if (contour->SelectVertexAt(click, 3.0, timeStep))
   {
     contour->SetSelectedVertexAsControlPoint(false);
     m_ContourLeft = mitk::ContourModel::New();

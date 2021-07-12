@@ -418,6 +418,13 @@ void mitk::LiveWireTool2D::OnMouseMoved(StateMachineAction *, InteractionEvent *
   if (nullptr == positionEvent)
     return;
 
+  if (m_PlaneGeometry.IsNotNull())
+  {
+    // Check if the point is in the correct slice
+    if (m_PlaneGeometry->DistanceFromPlane(positionEvent->GetPositionInWorld()) > mitk::sqrteps)
+      return;
+  }
+
   if (m_ClosureContour->IsEmpty())
   {
       m_ClosureContour->AddVertex(m_Contour->GetVertexAt(0)->Coordinates);

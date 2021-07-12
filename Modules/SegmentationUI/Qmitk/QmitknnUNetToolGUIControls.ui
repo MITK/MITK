@@ -280,7 +280,7 @@
                 <item row="1" column="1">
                   <widget class="QSpinBox" name="threadsBox" native="true">
                     <property name="minimum">
-                      <number>1</number>
+                      <number>6</number>
                     </property>
                     <property name="maximum">
                       <number>100</number>

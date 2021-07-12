@@ -58,16 +58,19 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
     try
     {
       // comboboxes
-      /*m_Model = m_Controls.modelBox->itemText(m_Controls.modelBox->currentIndex()).toUtf8().constData();
+      m_Model = m_Controls.modelBox->itemText(m_Controls.modelBox->currentIndex()).toUtf8().constData();
       m_Task = m_Controls.taskBox->itemText(m_Controls.taskBox->currentIndex()).toUtf8().constData();
       m_nnUNetDirectory = m_Controls.codedirectoryBox->directory().toUtf8().constData();
-      m_ModelDirectory = m_Controls.modeldirectoryBox->directory().toUtf8().constData();
-      m_OutputDirectory = m_Controls.outdirBox->directory().toUtf8().constData();*/
-      /*tool->SetModel(m_Model);
+      std::string modelDirectory = m_ModelDirectory.toUtf8().constData();
+      m_OutputDirectory = m_Controls.outdirBox->directory().toUtf8().constData();
+      std::string fold = m_Controls.foldBox->itemText(m_Controls.foldBox->currentIndex()).toUtf8().constData();
+
+      tool->SetModel(m_Model);
       tool->SetTask(m_Task);
       tool->SetnnUNetDirectory(m_nnUNetDirectory);
       tool->SetOutputDirectory(m_OutputDirectory);
-      tool->SetModelDirectory(m_ModelDirectory);*/
+      tool->SetModelDirectory(modelDirectory);
+      tool->SetFold(fold);
 
       // checkboxes
       tool->SetUseGPU(m_Controls.gpuBox->isChecked());

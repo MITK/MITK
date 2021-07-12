@@ -85,23 +85,29 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image* inp
   mitk::Image::Pointer _inputAtTimeStep = inputAtTimeStep->Clone();
   std::cout<< "In process call" << "\n";
   std::ofstream tmpStream;
-  std::string imagePath = mitk::IOUtil::CreateTemporaryFile(tmpStream, "diffpic3d-XXXXXX.nii.gz");
+  std::string inputImagePath = mitk::IOUtil::CreateTemporaryFile(tmpStream, "in-mono-pic3d-XXXXXX.nii.gz");
+  std::string outputImagePath = mitk::IOUtil::CreateTemporaryFile(tmpStream, "out-seg-pic3d-XXXXXX.nii.gz");
   tmpStream.close();
-  mitk::IOUtil::Save(_inputAtTimeStep.GetPointer(), imagePath);
-  std::cout<< "saved image path:" <<imagePath << "\n";
+  mitk::IOUtil::Save(_inputAtTimeStep.GetPointer(), inputImagePath);
+  std::cout<< "saved image path:" <<inputImagePath << "\n";
 
   // Code calls external process
-  std::string callingPath = "/home/AD/a178n/environments/nnunet/bin";
+  std::string callingPath = "/Users/ashis/opt/anaconda3/envs/nnunet_c/bin";
+  std::string scriptPath = this->GetnnUNetDirectory()+ "/test_mitk_process.py";
+  std::cout<< scriptPath<<std::endl;
   map::utilities::ProcessExecutor::Pointer spExec = map::utilities::ProcessExecutor::New();
   itk::CStyleCommand::Pointer spCommand = itk::CStyleCommand::New();
   spCommand->SetCallback(&onRegistrationEvent);
   spExec->AddObserver(map::events::ExternalProcessOutputEvent(), spCommand);
   map::utilities::ProcessExecutor::ArgumentListType args;
   args.clear();
-  args.push_back("/home/AD/a178n/DKFZ/nnUNet_T28068/nnunet/test_mitk_process.py");
+  args.push_back(scriptPath);
 
   args.push_back("-i");
-  args.push_back(imagePath);
+  args.push_back(inputImagePath);
+
+  args.push_back("-to");
+  args.push_back(outputImagePath);
 
   args.push_back("-o");
   args.push_back(this->GetOutputDirectory());
@@ -133,11 +139,16 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image* inp
   args.push_back("-tta");
   args.push_back(this->GetMirror()? std::string("True") : std::string("False"));
 
+  args.push_back("--fold");
+  args.push_back(this->GetFold());
+
   spExec->execute(callingPath, "python3", args);
-  mitk::Image::Pointer outputImage = mitk::IOUtil::Load<mitk::Image>(this->GetOutputDirectory()+"/la_000_0000.nii.gz");
+  mitk::Image::Pointer outputImage = mitk::IOUtil::Load<mitk::Image>(outputImagePath);
   mitk::LabelSetImage::Pointer resultImage = mitk::LabelSetImage::New();
   resultImage->InitializeByLabeledImage(outputImage);
   resultImage->SetGeometry(inputAtTimeStep->GetGeometry());
+  // itksys::SystemTools::RemoveFile(imagePath);
+  // itksys::SystemTools::RemoveFile(output);
   return resultImage;
 
 }

@@ -52,8 +52,11 @@ namespace mitk
     itkSetMacro(Task, std::string);
     itkGetConstMacro(Task, std::string);
 
-    itkSetMacro(Mode, std::string);
-    itkGetConstMacro(Mode, std::string);
+    itkSetMacro(Fold, std::string);
+    itkGetConstMacro(Fold, std::string);
+
+    itkSetMacro(Trainer, std::string);
+    itkGetConstMacro(Trainer, std::string);
 
     itkSetMacro(nnUNetDirectory, std::string);
     itkGetConstMacro(nnUNetDirectory, std::string);
@@ -100,13 +103,14 @@ namespace mitk
 
   private:
     std::string m_Model;
-    std::string m_Mode;
+    std::string m_Fold;
+    std::string m_Trainer;
     std::string m_Task;
     std::string m_nnUNetDirectory;
     std::string m_ModelDirectory;
     std::string m_OutputDirectory;
     bool m_UseGPU;
-    bool m_LowRes;
+    bool m_LowRes; // remove?
     bool m_AllInGPU;
     bool m_MixedPrecision;
     bool m_ExportSegmentation;

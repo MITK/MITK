@@ -73,7 +73,7 @@ void MinMaxLabelImageFilterWithIndex< TInputImage, TLabelImage >::ThreadedGenera
 template< typename TInputImage, typename TLabelImage >
 void MinMaxLabelImageFilterWithIndex< TInputImage, TLabelImage >::BeforeThreadedGenerateData()
 {
-  ThreadIdType numberOfThreads = this->GetNumberOfThreads();
+  ThreadIdType numberOfThreads = this->GetNumberOfWorkUnits();
   m_ThreadExtrema.resize(numberOfThreads);
 
   for (unsigned int i =0; i < numberOfThreads; i++)
@@ -85,7 +85,7 @@ void MinMaxLabelImageFilterWithIndex< TInputImage, TLabelImage >::BeforeThreaded
 template< typename TInputImage, typename TLabelImage >
 void MinMaxLabelImageFilterWithIndex< TInputImage, TLabelImage >::AfterThreadedGenerateData()
 {
-  ThreadIdType numberOfThreads = this->GetNumberOfThreads();
+  ThreadIdType numberOfThreads = this->GetNumberOfWorkUnits();
 
   m_GlobalMin = std::numeric_limits<PixelType>::max();
   m_GlobalMax = std::numeric_limits<PixelType>::min();

@@ -163,6 +163,11 @@ public:
     }
 
 protected:
+    MinMaxLabelImageFilterWithIndex()
+    {
+      this->DynamicMultiThreadingOff();
+    }
+
     void AllocateOutputs() override;
 
     void ThreadedGenerateData(const RegionType &

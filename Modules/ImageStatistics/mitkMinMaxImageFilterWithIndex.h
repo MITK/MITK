@@ -67,6 +67,11 @@ public:
     }
 
 protected:
+    MinMaxImageFilterWithIndex()
+    {
+      this->DynamicMultiThreadingOff();
+    }
+
     void AllocateOutputs() override;
 
     void ThreadedGenerateData(const RegionType &

@@ -48,7 +48,8 @@ class MyTool : public Tool
 */
 
 #pragma GCC visibility push(default)
-  itkEventMacro(ToolEvent, itk::ModifiedEvent);
+  itkEventMacroDeclaration(ToolEvent, itk::ModifiedEvent);
+  itkEventMacroDefinition(ToolEvent, itk::ModifiedEvent);
 #pragma GCC visibility pop
 
   /**

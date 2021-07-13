@@ -81,9 +81,9 @@ void mitk::BinaryThresholdBaseTool::InitiateToolByInput()
     }
 
     bool isFloatImage = false;
-    if ((referenceImage->GetPixelType().GetPixelType() == itk::ImageIOBase::SCALAR) &&
-        (referenceImage->GetPixelType().GetComponentType() == itk::ImageIOBase::FLOAT ||
-          referenceImage->GetPixelType().GetComponentType() == itk::ImageIOBase::DOUBLE))
+    if ((referenceImage->GetPixelType().GetPixelType() == itk::IOPixelEnum::SCALAR) &&
+        (referenceImage->GetPixelType().GetComponentType() == itk::IOComponentEnum::FLOAT ||
+          referenceImage->GetPixelType().GetComponentType() == itk::IOComponentEnum::DOUBLE))
     {
       isFloatImage = true;
     }

@@ -23,7 +23,7 @@ This file is based heavily on a corresponding ITK filter.
 #include "itkConstShapedNeighborhoodIterator.h"
 #include "itkContourExtractor2DImageFilter.h"
 #include "itkProgressReporter.h"
-#include "vcl_cmath.h"
+#include <cmath>
 
 namespace itk
 {

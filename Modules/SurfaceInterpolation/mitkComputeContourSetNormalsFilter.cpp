@@ -156,7 +156,7 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
             if (m_SegmentationBinaryImage->GetImageDescriptor()
                   ->GetChannelDescriptor()
                   .GetPixelType()
-                  .GetComponentType() == itk::ImageIOBase::UCHAR)
+                  .GetComponentType() == itk::IOComponentEnum::UCHAR)
             {
               mitk::ImagePixelReadAccessor<unsigned char> readAccess(m_SegmentationBinaryImage);
               val = readAccess.GetPixelByIndexSafe(idx);
@@ -164,7 +164,7 @@ void mitk::ComputeContourSetNormalsFilter::GenerateData()
             else if (m_SegmentationBinaryImage->GetImageDescriptor()
                        ->GetChannelDescriptor()
                        .GetPixelType()
-                       .GetComponentType() == itk::ImageIOBase::USHORT)
+                       .GetComponentType() == itk::IOComponentEnum::USHORT)
             {
               mitk::ImagePixelReadAccessor<unsigned short> readAccess(m_SegmentationBinaryImage);
               val = readAccess.GetPixelByIndexSafe(idx);

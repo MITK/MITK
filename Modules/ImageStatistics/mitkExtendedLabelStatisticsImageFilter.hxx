@@ -392,7 +392,7 @@ namespace itk
   template< typename TInputImage, typename TLabelImage >
   void
   ExtendedLabelStatisticsImageFilter< TInputImage, TLabelImage >
-  ::BeforeThreadedGenerateData()
+  ::BeforeStreamedGenerateData()
   {
     ThreadIdType numberOfThreads = this->GetNumberOfThreads();
 
@@ -425,11 +425,8 @@ namespace itk
     return relevantLabels;
   }
 
-  template< typename TInputImage, typename TLabelImage >
-  void
-  ExtendedLabelStatisticsImageFilter< TInputImage, TLabelImage >
-  ::ThreadedGenerateData(const typename TInputImage::RegionType & outputRegionForThread,
-                         ThreadIdType threadId)
+  template <typename TInputImage, typename TLabelImage>
+  void ExtendedLabelStatisticsImageFilter<TInputImage, TLabelImage>::ThreadedStreamedGenerateData(const RegionType& region)
   {
 
     typename HistogramType::IndexType histogramIndex(1);
@@ -577,7 +574,7 @@ namespace itk
 
   template< class TInputImage, class TLabelImage >
   void ExtendedLabelStatisticsImageFilter< TInputImage, TLabelImage >::
-    AfterThreadedGenerateData()
+    AfterStreamedGenerateData()
   {
     StatisticsMapIterator      mapIt;
     StatisticsMapConstIterator threadIt;

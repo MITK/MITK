@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "mitkImageStatisticsCalculator.h"
 #include <mitkExtendedLabelStatisticsImageFilter.h>
-#include <mitkExtendedStatisticsImageFilter.h>
+#include <mitkStatisticsImageFilter.h>
 #include <mitkImage.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
@@ -172,7 +172,7 @@ namespace mitk
     typename itk::Image<TPixel, VImageDimension> *image, const TimeGeometry *timeGeometry, TimeStepType timeStep)
   {
     typedef typename itk::Image<TPixel, VImageDimension> ImageType;
-    typedef typename itk::ExtendedStatisticsImageFilter<ImageType> ImageStatisticsFilterType;
+    typedef typename StatisticsImageFilter<ImageType> ImageStatisticsFilterType;
     typedef typename itk::MinMaxImageFilterWithIndex<ImageType> MinMaxFilterType;
 
     // reset statistics container if exists

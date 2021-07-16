@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "mitkTestingMacros.h"
 #include "itkImage.h"
 #include "mitkExtendedLabelStatisticsImageFilter.h"
-#include "mitkExtendedStatisticsImageFilter.h"
+#include "mitkStatisticsImageFilter.h"
 #include "mitkNumericConstants.h"
 
 /**
@@ -45,7 +45,7 @@ public:
   typedef itk::ExtendedLabelStatisticsImageFilter< ImageType, ImageType > LabelStatisticsFilterType;
   typedef LabelStatisticsFilterType::Pointer labelStatisticsFilterPointer;
 
-  typedef itk::ExtendedStatisticsImageFilter< ImageType > StatisticsFilterType;
+  typedef mitk::StatisticsImageFilter< ImageType > StatisticsFilterType;
   typedef StatisticsFilterType::Pointer StatisticsFilterPointer;
 
 

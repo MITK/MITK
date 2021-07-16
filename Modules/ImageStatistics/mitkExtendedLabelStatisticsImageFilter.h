@@ -228,10 +228,10 @@ namespace itk
     };
 
     /** Type of the map used to store data per label */
-    typedef itksys::hash_map< LabelPixelType, LabelStatistics >                          MapType;
-    typedef typename itksys::hash_map< LabelPixelType, LabelStatistics >::const_iterator StatisticsMapConstIterator;
-    typedef typename itksys::hash_map< LabelPixelType, LabelStatistics >::iterator       StatisticsMapIterator;
-    typedef IdentifierType                                                               MapSizeType;
+    typedef std::unordered_map< LabelPixelType, LabelStatistics >                          MapType;
+    typedef typename std::unordered_map< LabelPixelType, LabelStatistics >::const_iterator StatisticsMapConstIterator;
+    typedef typename std::unordered_map< LabelPixelType, LabelStatistics >::iterator       StatisticsMapIterator;
+    typedef IdentifierType                                                                 MapSizeType;
 
     /** Type of the container used to store valid label values */
     typedef std::vector<LabelPixelType> ValidLabelValuesContainerType;
@@ -300,15 +300,13 @@ namespace itk
 
     ~ExtendedLabelStatisticsImageFilter() override{}
 
-    void AfterThreadedGenerateData() override;
+    void AfterStreamedGenerateData() override;
 
     /** Initialize some accumulators before the threads run. */
-    void BeforeThreadedGenerateData() override;
+    void BeforeStreamedGenerateData() override;
 
     /** Multi-thread version GenerateData. */
-    void  ThreadedGenerateData(const typename TInputImage::RegionType &
-                               outputRegionForThread,
-                               ThreadIdType threadId) override;
+    void ThreadedStreamedGenerateData(const RegionType& region) override;
 
     /** Does the specified label exist? Can only be called after a call
      * a call to Update(). */

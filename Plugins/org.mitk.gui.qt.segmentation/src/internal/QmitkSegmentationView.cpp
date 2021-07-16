@@ -307,7 +307,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
   }
 
   mitk::RenderingManager::GetInstance()->InitializeViews(
-    referenceImage->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+    referenceImage->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, false);
 
   if (nullptr != m_RenderWindowPart)
   {

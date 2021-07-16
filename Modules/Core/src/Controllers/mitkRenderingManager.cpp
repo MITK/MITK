@@ -18,7 +18,9 @@ found in the LICENSE file.
 #include "mitkProportionalTimeGeometry.h"
 #include "mitkRenderingManagerFactory.h"
 
+#include <vtkCamera.h>
 #include <vtkRenderWindow.h>
+#include <vtkRenderer.h>
 #include <vtkRendererCollection.h>
 
 #include "mitkNumericTypes.h"
@@ -297,16 +299,16 @@ namespace mitk
   // Remove old function, so only this one is working.
   bool RenderingManager::InitializeViews(const BaseGeometry *dataGeometry,
                                          RequestType type,
-                                         bool preserveRoughOrientationInWorldSpace)
+                                         bool resetCamera)
   {
     ProportionalTimeGeometry::Pointer propTimeGeometry = ProportionalTimeGeometry::New();
     propTimeGeometry->Initialize(dynamic_cast<BaseGeometry *>(dataGeometry->Clone().GetPointer()), 1);
-    return InitializeViews(propTimeGeometry, type, preserveRoughOrientationInWorldSpace);
+    return InitializeViews(propTimeGeometry, type, resetCamera);
   }
 
   bool RenderingManager::InitializeViews(const TimeGeometry *dataGeometry,
                                          RequestType type,
-                                         bool /*preserveRoughOrientationInWorldSpace*/)
+                                         bool resetCamera)
   {
     MITK_DEBUG << "initializing views";
 
@@ -367,7 +369,7 @@ namespace mitk
       if (((type == REQUEST_UPDATE_ALL) || ((type == REQUEST_UPDATE_2DWINDOWS) && (id == 1)) ||
            ((type == REQUEST_UPDATE_3DWINDOWS) && (id == 2))))
       {
-        this->InternalViewInitialization(baseRenderer, timeGeometry, boundingBoxInitialized, id);
+        this->InternalViewInitialization(baseRenderer, timeGeometry, boundingBoxInitialized, id, resetCamera);
       }
     }
 
@@ -416,16 +418,18 @@ namespace mitk
 
   bool RenderingManager::InitializeView(vtkRenderWindow *renderWindow,
                                         const BaseGeometry *geometry,
-                                        bool initializeGlobalTimeSNC)
+                                        bool initializeGlobalTimeSNC,
+                                        bool resetCamera)
   {
     ProportionalTimeGeometry::Pointer propTimeGeometry = ProportionalTimeGeometry::New();
     propTimeGeometry->Initialize(dynamic_cast<BaseGeometry *>(geometry->Clone().GetPointer()), 1);
-    return InitializeView(renderWindow, propTimeGeometry, initializeGlobalTimeSNC);
+    return InitializeView(renderWindow, propTimeGeometry, initializeGlobalTimeSNC, resetCamera);
   }
 
   bool RenderingManager::InitializeView(vtkRenderWindow *renderWindow,
                                         const TimeGeometry *geometry,
-                                        bool initializeGlobalTimeSNC)
+                                        bool initializeGlobalTimeSNC,
+                                        bool resetCamera)
   {
     bool boundingBoxInitialized = false;
 
@@ -442,7 +446,7 @@ namespace mitk
 
     int id = baseRenderer->GetMapperID();
 
-    this->InternalViewInitialization(baseRenderer, geometry, boundingBoxInitialized, id);
+    this->InternalViewInitialization(baseRenderer, geometry, boundingBoxInitialized, id, resetCamera);
 
     if (boundingBoxInitialized && initializeGlobalTimeSNC)
     {
@@ -477,7 +481,8 @@ namespace mitk
   void RenderingManager::InternalViewInitialization(mitk::BaseRenderer *baseRenderer,
                                                     const mitk::TimeGeometry *geometry,
                                                     bool boundingBoxInitialized,
-                                                    int mapperID)
+                                                    int mapperID,
+                                                    bool resetCamera)
   {
     mitk::SliceNavigationController *nc = baseRenderer->GetSliceNavigationController();
 
@@ -490,15 +495,19 @@ namespace mitk
       nc->SetInputWorldTimeGeometry(geometry);
       nc->Update();
 
-      if (mapperID == BaseRenderer::Standard2D)
+      if (resetCamera)
       {
-        // For 2D SNCs, steppers are set so that the cross is centered
-        // in the image
-        nc->GetSlice()->SetPos(nc->GetSlice()->GetSteps() / 2);
+        if (mapperID == BaseRenderer::Standard2D)
+        {
+          // For 2D SNCs, steppers are set so that the cross is centered in the image
+          nc->GetSlice()->SetPos(nc->GetSlice()->GetSteps() / 2);
+          baseRenderer->GetCameraController()->Fit();
+        }
+        else if (mapperID == BaseRenderer::Standard3D)
+        {
+          baseRenderer->GetCameraController()->SetViewToAnterior();
+        }
       }
-
-      baseRenderer->GetCameraController()->SetViewToAnterior();
-      baseRenderer->GetCameraController()->Fit();
     }
     else
     {

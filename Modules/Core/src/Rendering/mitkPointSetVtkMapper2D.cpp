@@ -586,10 +586,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer *rende
   // apply transform of current plane to glyphs
   ls->m_SelectedGlyph3D->SetSourceConnection(transformFilterS->GetOutputPort());
   ls->m_SelectedGlyph3D->SetInputData(ls->m_VtkSelectedPointListPolyData);
-  if (m_FixedSizeOnScreen)
-  {
-    ls->m_SelectedGlyph3D->SetScaleFactor(resolution);
-  }
+  ls->m_SelectedGlyph3D->SetScaleFactor(m_FixedSizeOnScreen ? resolution : 1.0);
   ls->m_SelectedGlyph3D->SetScaleModeToScaleByVector();
   ls->m_SelectedGlyph3D->SetVectorModeToUseVector();
 

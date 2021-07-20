@@ -161,12 +161,12 @@ unsigned int QmitkDataSelectionWidget::AddDataSelection(const QString &labelText
   QmitkSingleNodeSelectionWidget* nodeSelection = new QmitkSingleNodeSelectionWidget(m_Controls.dataSelectionWidget);
   
   nodeSelection->SetSelectionIsOptional(false);
-  nodeSelection->SetAutoSelectNewNodes(false);
   nodeSelection->SetInvalidInfo(info);
   nodeSelection->SetPopUpTitel(popupTitel);
   nodeSelection->SetPopUpHint(popupHint);
   nodeSelection->SetDataStorage(this->GetDataStorage());
   nodeSelection->SetNodePredicate(predicate);
+  nodeSelection->SetAutoSelectNewNodes(true);
   nodeSelection->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
   nodeSelection->setMinimumSize(0, 40);
 

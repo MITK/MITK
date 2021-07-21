@@ -117,10 +117,10 @@ namespace mitk
     bool m_Mirror; //rename
     unsigned int m_PreprocessingThreads;
     
-    const std::string m_PythonProjectPath;
+    /*const std::string m_PythonProjectPath;
     const std::string m_PythonFileName;
     const std::string m_InputImageVarName;
-    const std::string m_OutputImageVarName;
+    const std::string m_OutputImageVarName;*/
   };
 } // namespace
 #endif

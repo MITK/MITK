@@ -12,28 +12,22 @@ found in the LICENSE file.
 
 #include "mitknnUnetTool.h"
 
+#include "mitkIOUtil.h"
 #include "mitkImage.h"
 #include "mitkLabelSetImage.h"
-#include "mitkIOUtil.h"
+#include <itksys/SystemTools.hxx>
+#include <mapProcessExecutor.h>
 #include <usGetModuleContext.h>
 #include <usModule.h>
 #include <usModuleContext.h>
 #include <usModuleResource.h>
-#include <itksys/SystemTools.hxx>
-#include <mapProcessExecutor.h>
 
 namespace mitk
 {
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, nnUNetTool, "nnUNet tool");
 }
 
-mitk::nnUNetTool::nnUNetTool()
-  : m_PythonProjectPath{"Modules/Segmentation/nnUNet/"},
-    m_PythonFileName{"test_mitk.py"},
-    m_InputImageVarName{"mitkimage"},
-    m_OutputImageVarName{"output_image"}
-{
-}
+mitk::nnUNetTool::nnUNetTool() {}
 
 void mitk::nnUNetTool::Activated()
 {
@@ -57,44 +51,68 @@ const char *mitk::nnUNetTool::GetName() const
   return "nnUNet";
 }
 
-
-void onRegistrationEvent(itk::Object* /*pCaller*/, const itk::EventObject& e, void*)
+void onRegistrationEvent(itk::Object * /*pCaller*/, const itk::EventObject &e, void *)
 {
-      		map::core::String testCOUT;
-		map::core::String testCERR;
-			const map::events::ExternalProcessStdOutEvent* pEvent =
-				dynamic_cast<const map::events::ExternalProcessStdOutEvent*>(&e);
+  std::string testCOUT;
+  std::string testCERR;
+  const map::events::ExternalProcessStdOutEvent *pEvent =
+    dynamic_cast<const map::events::ExternalProcessStdOutEvent *>(&e);
 
-			if (pEvent)
-			{
-				testCOUT = testCOUT + pEvent->getComment();
-        std::cout<< testCOUT << "\n";
-			}
+  if (pEvent)
+  {
+    testCOUT = testCOUT + pEvent->getComment();
+    std::cout << testCOUT << "\n";
+  }
 
-			const map::events::ExternalProcessStdErrEvent* pErrEvent =
-				dynamic_cast<const map::events::ExternalProcessStdErrEvent*>(&e);
+  const map::events::ExternalProcessStdErrEvent *pErrEvent =
+    dynamic_cast<const map::events::ExternalProcessStdErrEvent *>(&e);
 
-			if (pErrEvent)
-			{
-				testCERR = testCERR + pErrEvent->getComment();
-			}
+  if (pErrEvent)
+  {
+    testCERR = testCERR + pErrEvent->getComment();
+  }
 }
 
-mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image* inputAtTimeStep, TimeStepType /*timeStep*/)
+mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inputAtTimeStep, TimeStepType /*timeStep*/)
 {
   mitk::Image::Pointer _inputAtTimeStep = inputAtTimeStep->Clone();
-  std::cout<< "In process call" << "\n";
-  std::ofstream tmpStream;
-  std::string inputImagePath = mitk::IOUtil::CreateTemporaryFile(tmpStream, "in-mono-pic3d-XXXXXX.nii.gz");
-  std::string outputImagePath = mitk::IOUtil::CreateTemporaryFile(tmpStream, "out-seg-pic3d-XXXXXX.nii.gz");
-  tmpStream.close();
-  mitk::IOUtil::Save(_inputAtTimeStep.GetPointer(), inputImagePath);
-  std::cout<< "saved image path:" <<inputImagePath << "\n";
-
+  std::string inputImagePath;
+  std::string outputImagePath;
+  std::string mitkTempDir;
+  try
+  {
+    std::string templateFilename = "XXXXXX_000_0000.nii.gz";
+    mitkTempDir = mitk::IOUtil::CreateTemporaryDirectory("mitk-XXXXXX");
+    std::string inDir = mitk::IOUtil::CreateTemporaryDirectory("nnunet-in-XXXXXX", mitkTempDir);
+    std::string outDir = mitk::IOUtil::CreateTemporaryDirectory("nnunet-out-XXXXXX", mitkTempDir);
+    std::ofstream tmpStream;
+    inputImagePath =
+      mitk::IOUtil::CreateTemporaryFile(tmpStream, templateFilename, inDir + mitk::IOUtil::GetDirectorySeparator());
+    tmpStream.close();
+    std::size_t found = inputImagePath.find_last_of(mitk::IOUtil::GetDirectorySeparator());
+    std::string fileName = inputImagePath.substr(found + 1);
+    std::string token = fileName.substr(0, fileName.find("_"));
+    std::string outputImagePath = outDir + mitk::IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";
+  }
+  catch (const mitk::Exception &e)
+  {
+    MITK_ERROR << e.GetDescription();
+    mitkThrow() << "Error creating temporary directories or files on disk.";
+    return nullptr;
+  }
+  try
+  {
+    mitk::IOUtil::Save(_inputAtTimeStep.GetPointer(), inputImagePath);
+  }
+  catch (const mitk::Exception &e)
+  {
+    MITK_ERROR << e.GetDescription();
+    mitkThrow() << "Error creating temporary files on the disk.";
+    return nullptr;
+  }
   // Code calls external process
   std::string callingPath = "/Users/ashis/opt/anaconda3/envs/nnunet_c/bin";
-  std::string scriptPath = this->GetnnUNetDirectory()+ "/test_mitk_process.py";
-  std::cout<< scriptPath<<std::endl;
+  std::string scriptPath = this->GetnnUNetDirectory() + "/test_mitk_process.py";
   map::utilities::ProcessExecutor::Pointer spExec = map::utilities::ProcessExecutor::New();
   itk::CStyleCommand::Pointer spCommand = itk::CStyleCommand::New();
   spCommand->SetCallback(&onRegistrationEvent);
@@ -106,49 +124,51 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image* inp
   args.push_back("-i");
   args.push_back(inputImagePath);
 
-  args.push_back("-to");
+  args.push_back("-o");
   args.push_back(outputImagePath);
 
-  args.push_back("-o");
-  args.push_back(this->GetOutputDirectory());
-
   args.push_back("-m");
-  args.push_back(this->GetModel());
-  
-  args.push_back("-mp");
-  args.push_back(this->GetModelDirectory());
+  args.push_back(this->GetModelDirectory() + mitk::IOUtil::GetDirectorySeparator() + this->GetModel() +
+                 mitk::IOUtil::GetDirectorySeparator() + this->GetTask() + mitk::IOUtil::GetDirectorySeparator() +
+                 this->GetTrainer());
 
-  args.push_back("-t");
-  args.push_back(this->GetTask());
+  // args.push_back("--all_in_gpu");
+  // args.push_back(this->GetAllInGPU() ? std::string("True") : std::string("False"));
 
-  args.push_back("--use_gpu");
-  args.push_back((this->GetUseGPU() ? std::string("True") : std::string("False")));
-  
-  args.push_back("--all_in_gpu");
-  args.push_back(this->GetAllInGPU() ? std::string("True") : std::string("False"));
-
-  //args.push_back("-z");
-  //args.push_back(this->GetExportSegmentation()? std::string("True") : std::string("False"));
+  // args.push_back("-z");
+  // args.push_back(this->GetExportSegmentation()? std::string("True") : std::string("False"));
 
   args.push_back("--num_threads_preprocessing");
   args.push_back(std::to_string(this->GetPreprocessingThreads()));
 
-  args.push_back("--mixed_precision");
-  args.push_back(this->GetMixedPrecision()? std::string("True") : std::string("False"));
-
   args.push_back("-tta");
-  args.push_back(this->GetMirror()? std::string("True") : std::string("False"));
+  args.push_back(this->GetMirror() ? std::string("1") : std::string("0"));
 
-  args.push_back("--fold");
+  args.push_back("-f");
   args.push_back(this->GetFold());
 
-  spExec->execute(callingPath, "python3", args);
+  if (!this->GetMixedPrecision())
+  {
+    args.push_back("--disable_mixed_precision");
+  }
+
+  try
+  {
+    spExec->execute(callingPath, "python3", args);
+  }
+  catch (const mitk::Exception &e)
+  {
+    MITK_ERROR << e.GetDescription();
+    mitkThrow() << "An error occured while calling nnUNet.";
+    return nullptr;
+  }
+
   mitk::Image::Pointer outputImage = mitk::IOUtil::Load<mitk::Image>(outputImagePath);
   mitk::LabelSetImage::Pointer resultImage = mitk::LabelSetImage::New();
   resultImage->InitializeByLabeledImage(outputImage);
   resultImage->SetGeometry(inputAtTimeStep->GetGeometry());
-  // itksys::SystemTools::RemoveFile(imagePath);
-  // itksys::SystemTools::RemoveFile(output);
+  itksys::SystemTools::RemoveFile(inputImagePath);  // redundant
+  itksys::SystemTools::RemoveFile(outputImagePath); // redundant
+  itksys::SystemTools::RemoveADirectory(mitkTempDir);
   return resultImage;
-
 }

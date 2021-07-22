@@ -76,15 +76,13 @@ void onRegistrationEvent(itk::Object * /*pCaller*/, const itk::EventObject &e, v
 mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inputAtTimeStep, TimeStepType /*timeStep*/)
 {
   mitk::Image::Pointer _inputAtTimeStep = inputAtTimeStep->Clone();
-  std::string inputImagePath;
-  std::string outputImagePath;
-  std::string mitkTempDir;
+  std::string mitkTempDir, inDir, outDir, inputImagePath, outputImagePath;
   try
   {
     std::string templateFilename = "XXXXXX_000_0000.nii.gz";
     mitkTempDir = mitk::IOUtil::CreateTemporaryDirectory("mitk-XXXXXX");
-    std::string inDir = mitk::IOUtil::CreateTemporaryDirectory("nnunet-in-XXXXXX", mitkTempDir);
-    std::string outDir = mitk::IOUtil::CreateTemporaryDirectory("nnunet-out-XXXXXX", mitkTempDir);
+    inDir = mitk::IOUtil::CreateTemporaryDirectory("nnunet-in-XXXXXX", mitkTempDir);
+    outDir = mitk::IOUtil::CreateTemporaryDirectory("nnunet-out-XXXXXX", mitkTempDir);
     std::ofstream tmpStream;
     inputImagePath =
       mitk::IOUtil::CreateTemporaryFile(tmpStream, templateFilename, inDir + mitk::IOUtil::GetDirectorySeparator());
@@ -92,7 +90,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     std::size_t found = inputImagePath.find_last_of(mitk::IOUtil::GetDirectorySeparator());
     std::string fileName = inputImagePath.substr(found + 1);
     std::string token = fileName.substr(0, fileName.find("_"));
-    std::string outputImagePath = outDir + mitk::IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";
+    outputImagePath = outDir + mitk::IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";
   }
   catch (const mitk::Exception &e)
   {
@@ -107,12 +105,12 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   catch (const mitk::Exception &e)
   {
     MITK_ERROR << e.GetDescription();
-    mitkThrow() << "Error creating temporary files on the disk.";
+    mitkThrow() << "Error writing 3D image to disk.";
     return nullptr;
   }
   // Code calls external process
   std::string callingPath = "/Users/ashis/opt/anaconda3/envs/nnunet_c/bin";
-  std::string scriptPath = this->GetnnUNetDirectory() + "/test_mitk_process.py";
+  std::string scriptPath = this->GetnnUNetDirectory() + "/test_process.py";
   map::utilities::ProcessExecutor::Pointer spExec = map::utilities::ProcessExecutor::New();
   itk::CStyleCommand::Pointer spCommand = itk::CStyleCommand::New();
   spCommand->SetCallback(&onRegistrationEvent);
@@ -121,16 +119,16 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   args.clear();
   args.push_back(scriptPath);
 
-  args.push_back("-i");
-  args.push_back(inputImagePath);
+  args.push_back("-i"); // add empty checks since the parameter is 'required'
+  args.push_back(inDir);
 
-  args.push_back("-o");
-  args.push_back(outputImagePath);
+  args.push_back("-o"); // add empty checks since the parameter is 'required'
+  args.push_back(outDir);
 
-  args.push_back("-m");
-  args.push_back(this->GetModelDirectory() + mitk::IOUtil::GetDirectorySeparator() + this->GetModel() +
-                 mitk::IOUtil::GetDirectorySeparator() + this->GetTask() + mitk::IOUtil::GetDirectorySeparator() +
-                 this->GetTrainer());
+  args.push_back("-m");                      // add empty checks since the parameter is 'required'
+  args.push_back(this->GetModelDirectory() + mitk::IOUtil::GetDirectorySeparator() + this->GetModel()
+                                           + mitk::IOUtil::GetDirectorySeparator() + this->GetTask()
+                                           + mitk::IOUtil::GetDirectorySeparator() + this->GetTrainer());
 
   // args.push_back("--all_in_gpu");
   // args.push_back(this->GetAllInGPU() ? std::string("True") : std::string("False"));
@@ -141,7 +139,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   args.push_back("--num_threads_preprocessing");
   args.push_back(std::to_string(this->GetPreprocessingThreads()));
 
-  args.push_back("-tta");
+  args.push_back("--tta");
   args.push_back(this->GetMirror() ? std::string("1") : std::string("0"));
 
   args.push_back("-f");
@@ -167,8 +165,6 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   mitk::LabelSetImage::Pointer resultImage = mitk::LabelSetImage::New();
   resultImage->InitializeByLabeledImage(outputImage);
   resultImage->SetGeometry(inputAtTimeStep->GetGeometry());
-  itksys::SystemTools::RemoveFile(inputImagePath);  // redundant
-  itksys::SystemTools::RemoveFile(outputImagePath); // redundant
   itksys::SystemTools::RemoveADirectory(mitkTempDir);
   return resultImage;
 }

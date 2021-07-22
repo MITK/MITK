@@ -161,7 +161,7 @@
             </widget>
           </item>
 
-          <item row="4" column="2">
+       <!--     <item row="4" column="2">
             <widget class="QLabel" name="gpuLabel">
               <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -176,7 +176,7 @@
           </item>
           <item row="4" column="3">
             <widget class="ctkCheckBox" name="gpuBox" native="true" />
-          </item>
+          </item> -->
           <!-- </item> -->
         </layout>
       </item>
@@ -331,12 +331,12 @@
                       </sizepolicy>
                     </property>
                     <property name="text">
-                      <string>Output Directory:</string>
+                      <string>Python Virtual Env.:</string>
                     </property>
                   </widget>
                 </item>
                 <item row="3" column="1" colspan="3">
-                  <widget class="ctkDirectoryButton" name="outdirBox" native="true" />
+                  <widget class="ctkDirectoryButton" name="pythonEnvDirBox" native="true" />
                 </item>
 
               </layout>

@@ -105,12 +105,12 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   catch (const mitk::Exception &e)
   {
     MITK_ERROR << e.GetDescription();
-    mitkThrow() << "Error writing 3D image to disk.";
+    mitkThrow() << "Error writing 3D stack on to disk.";
     return nullptr;
   }
   // Code calls external process
-  std::string callingPath = "/Users/ashis/opt/anaconda3/envs/nnunet_c/bin";
-  std::string scriptPath = this->GetnnUNetDirectory() + "/test_process.py";
+  std::string callingPath = "/home/AD/a178n/environments/nnunet/bin";
+  std::string scriptPath = this->GetnnUNetDirectory() + "/nnunet/inference/predict.py";
   map::utilities::ProcessExecutor::Pointer spExec = map::utilities::ProcessExecutor::New();
   itk::CStyleCommand::Pointer spCommand = itk::CStyleCommand::New();
   spCommand->SetCallback(&onRegistrationEvent);

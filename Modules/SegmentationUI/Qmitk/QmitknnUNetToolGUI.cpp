@@ -31,15 +31,6 @@ void QmitknnUNetToolGUI::ConnectNewTool(mitk::AutoSegmentationWithPreviewTool *n
 void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
 {
   m_Controls.setupUi(this);
-  /*m_Controls.modelBox->addItem("3D Full Res");
-  m_Controls.modelBox->addItem("3D Low Res");
-  m_Controls.modelBox->addItem("3D Cascade Full Res");
-  m_Controls.modelBox->addItem("2D");
-
-  m_Controls.taskBox->addItem("Heart");
-  m_Controls.taskBox->addItem("Brain Tumour");
-  m_Controls.taskBox->addItem("Prostate");*/
-
   connect(m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnSettingsAccept()));
   connect(m_Controls.modeldirectoryBox,
           SIGNAL(directoryChanged(const QString &)),
@@ -66,24 +57,26 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       m_Task = m_Controls.taskBox->itemText(m_Controls.taskBox->currentIndex()).toUtf8().constData();
       m_nnUNetDirectory = m_Controls.codedirectoryBox->directory().toUtf8().constData();
       std::string modelDirectory = m_ModelDirectory.toUtf8().constData();
-      m_OutputDirectory = m_Controls.outdirBox->directory().toUtf8().constData();
+      //m_OutputDirectory = m_Controls.outdirBox->directory().toUtf8().constData();
       std::string fold = m_Controls.foldBox->itemText(m_Controls.foldBox->currentIndex()).toUtf8().constData();
-
+      std::string trainer = m_Controls.trainerBox->itemText(m_Controls.trainerBox->currentIndex()).toUtf8().constData();
+      fold = fold.substr(fold.find("_")+1);
       tool->SetModel(m_Model);
       tool->SetTask(m_Task);
       tool->SetnnUNetDirectory(m_nnUNetDirectory);
-      tool->SetOutputDirectory(m_OutputDirectory);
+      //tool->SetOutputDirectory(m_OutputDirectory);
       tool->SetModelDirectory(modelDirectory);
       tool->SetFold(fold);
+      tool->SetTrainer(trainer);
 
       // checkboxes
-      tool->SetUseGPU(m_Controls.gpuBox->isChecked());
+      //tool->SetUseGPU(m_Controls.gpuBox->isChecked());
       // tool->SetLowRes(m_Controls.lowresBox->isChecked());
       tool->SetAllInGPU(m_Controls.allInGpuBox->isChecked());
       tool->SetExportSegmentation(m_Controls.exportBox->isChecked());
       tool->SetMirror(m_Controls.mirrorBox->isChecked());
       tool->SetMixedPrecision(m_Controls.mixedPrecisionBox->isChecked());
-
+      
       // Spinboxes
       tool->SetPreprocessingThreads(static_cast<unsigned int>(m_Controls.threadsBox->value()));
 

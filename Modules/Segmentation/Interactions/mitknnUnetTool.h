@@ -64,8 +64,8 @@ namespace mitk
     itkSetMacro(ModelDirectory, std::string);
     itkGetConstMacro(ModelDirectory, std::string);
     
-    itkSetMacro(OutputDirectory, std::string);
-    itkGetConstMacro(OutputDirectory, std::string);
+    itkSetMacro(PythonPath, std::string);
+    itkGetConstMacro(PythonPath, std::string);
 
     itkSetMacro(UseGPU, bool);
     itkGetConstMacro(UseGPU, bool);
@@ -108,7 +108,7 @@ namespace mitk
     std::string m_Task;
     std::string m_nnUNetDirectory;
     std::string m_ModelDirectory;
-    std::string m_OutputDirectory;
+    std::string m_PythonPath;
     bool m_UseGPU;
     bool m_LowRes; // remove?
     bool m_AllInGPU;

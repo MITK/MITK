@@ -109,8 +109,9 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     return nullptr;
   }
   // Code calls external process
-  std::string callingPath = "/home/AD/a178n/environments/nnunet/bin";
-  std::string scriptPath = this->GetnnUNetDirectory() + "/nnunet/inference/predict.py";
+  std::string scriptPath = this->GetnnUNetDirectory() + mitk::IOUtil::GetDirectorySeparator() + "nnunet" +
+                           mitk::IOUtil::GetDirectorySeparator() + "inference" + mitk::IOUtil::GetDirectorySeparator() +
+                           "predict.py";
   map::utilities::ProcessExecutor::Pointer spExec = map::utilities::ProcessExecutor::New();
   itk::CStyleCommand::Pointer spCommand = itk::CStyleCommand::New();
   spCommand->SetCallback(&onRegistrationEvent);
@@ -125,10 +126,10 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   args.push_back("-o"); // add empty checks since the parameter is 'required'
   args.push_back(outDir);
 
-  args.push_back("-m");                      // add empty checks since the parameter is 'required'
-  args.push_back(this->GetModelDirectory() + mitk::IOUtil::GetDirectorySeparator() + this->GetModel()
-                                           + mitk::IOUtil::GetDirectorySeparator() + this->GetTask()
-                                           + mitk::IOUtil::GetDirectorySeparator() + this->GetTrainer());
+  args.push_back("-m"); // add empty checks since the parameter is 'required'
+  args.push_back(this->GetModelDirectory() + mitk::IOUtil::GetDirectorySeparator() + this->GetModel() +
+                 mitk::IOUtil::GetDirectorySeparator() + this->GetTask() + mitk::IOUtil::GetDirectorySeparator() +
+                 this->GetTrainer());
 
   // args.push_back("--all_in_gpu");
   // args.push_back(this->GetAllInGPU() ? std::string("True") : std::string("False"));
@@ -152,7 +153,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
 
   try
   {
-    spExec->execute(callingPath, "python3", args);
+    spExec->execute(this->GetPythonPath(), "python3", args);
   }
   catch (const mitk::Exception &e)
   {

@@ -31,6 +31,11 @@ void QmitknnUNetToolGUI::ConnectNewTool(mitk::AutoSegmentationWithPreviewTool *n
 void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
 {
   m_Controls.setupUi(this);
+#if defined(__APPLE__) || defined(MACOSX)
+  m_Controls.pythonEnvComboBox->addItem("/usr/bin");
+#endif
+  m_Controls.pythonEnvComboBox->addItem("Select");
+  AutoParsePythonPaths();
   connect(m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnSettingsAccept()));
   connect(m_Controls.modeldirectoryBox,
           SIGNAL(directoryChanged(const QString &)),
@@ -40,8 +45,11 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
     m_Controls.modelBox, SIGNAL(currentTextChanged(const QString &)), this, SLOT(OnModelChanged(const QString &)));
   connect(
     m_Controls.trainerBox, SIGNAL(currentTextChanged(const QString &)), this, SLOT(OnTrainerChanged(const QString &)));
-  mainLayout->addLayout(m_Controls.verticalLayout);
-
+  connect(m_Controls.pythonEnvComboBox,
+          SIGNAL(textActivated(const QString &)),
+          this,
+          SLOT(OnPythonChanged(const QString &))),
+    mainLayout->addLayout(m_Controls.verticalLayout);
   Superclass::InitializeUI(mainLayout);
 }
 
@@ -57,26 +65,31 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       m_Task = m_Controls.taskBox->itemText(m_Controls.taskBox->currentIndex()).toUtf8().constData();
       m_nnUNetDirectory = m_Controls.codedirectoryBox->directory().toUtf8().constData();
       std::string modelDirectory = m_ModelDirectory.toUtf8().constData();
-      //m_OutputDirectory = m_Controls.outdirBox->directory().toUtf8().constData();
+      QString pythonPath = m_Controls.pythonEnvDirBox->directory();
+      if (!(pythonPath.endsWith("bin", Qt::CaseInsensitive) || pythonPath.endsWith("bin/", Qt::CaseInsensitive)))
+      {
+        pythonPath += QDir::separator() + QString("bin");
+      }
       std::string fold = m_Controls.foldBox->itemText(m_Controls.foldBox->currentIndex()).toUtf8().constData();
       std::string trainer = m_Controls.trainerBox->itemText(m_Controls.trainerBox->currentIndex()).toUtf8().constData();
-      fold = fold.substr(fold.find("_")+1);
+      fold = fold.substr(fold.find("_") + 1);
+
       tool->SetModel(m_Model);
       tool->SetTask(m_Task);
       tool->SetnnUNetDirectory(m_nnUNetDirectory);
-      //tool->SetOutputDirectory(m_OutputDirectory);
+      tool->SetPythonPath(pythonPath.toUtf8().constData());
       tool->SetModelDirectory(modelDirectory);
       tool->SetFold(fold);
       tool->SetTrainer(trainer);
 
       // checkboxes
-      //tool->SetUseGPU(m_Controls.gpuBox->isChecked());
+      // tool->SetUseGPU(m_Controls.gpuBox->isChecked());
       // tool->SetLowRes(m_Controls.lowresBox->isChecked());
-      tool->SetAllInGPU(m_Controls.allInGpuBox->isChecked());
+      // tool->SetAllInGPU(m_Controls.allInGpuBox->isChecked());
       tool->SetExportSegmentation(m_Controls.exportBox->isChecked());
       tool->SetMirror(m_Controls.mirrorBox->isChecked());
       tool->SetMixedPrecision(m_Controls.mixedPrecisionBox->isChecked());
-      
+
       // Spinboxes
       tool->SetPreprocessingThreads(static_cast<unsigned int>(m_Controls.threadsBox->value()));
 
@@ -138,10 +151,8 @@ void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &dir)
 
 void QmitknnUNetToolGUI::OnModelChanged(const QString &text)
 {
-  std::cout << "IN OnModelChanged" << std::endl;
   m_ModelDirectory = m_Controls.modeldirectoryBox->directory(); // check syntax
   QString updatedPath(QDir::cleanPath(m_ModelDirectory + QDir::separator() + text));
-  std::cout << "updatedPath " << updatedPath.toUtf8().constData() << std::endl;
   // QString dataset_name;
   for (QDirIterator it(updatedPath, QDir::AllDirs, QDirIterator::NoIteratorFlags); it.hasNext();)
   {
@@ -149,21 +160,17 @@ void QmitknnUNetToolGUI::OnModelChanged(const QString &text)
     if (!it.fileName().startsWith('.'))
     {
       m_DatasetName = it.fileName();
-      std::cout << "dataset_name " << m_DatasetName.toUtf8().constData() << std::endl;
     }
   }
   updatedPath = QDir::cleanPath(updatedPath + QDir::separator() + m_DatasetName);
-  std::cout << "new updatedPath " << updatedPath.toUtf8().constData() << std::endl;
   // std::vector<QString> trainers;
   m_Controls.trainerBox->clear();
   for (QDirIterator it(updatedPath, QDir::AllDirs, QDirIterator::NoIteratorFlags); it.hasNext();)
   {
     it.next();
     QString trainer = it.fileName();
-    if (!trainer.startsWith('.'))
-    { // Filter out irrelevent hidden folders, if any.
-      // trainers.push_back(trainer);
-      std::cout << "trainer " << trainer.toUtf8().constData() << std::endl;
+    if (!trainer.startsWith('.')) // Filter out irrelevent hidden folders, if any.
+    {                             // trainers.push_back(trainer);
       m_Controls.trainerBox->addItem(trainer);
     }
   }
@@ -171,22 +178,65 @@ void QmitknnUNetToolGUI::OnModelChanged(const QString &text)
 
 void QmitknnUNetToolGUI::OnTrainerChanged(const QString &trainerSelected)
 {
-  std::cout << "IN trainer Changed" << std::endl;
   m_ModelDirectory = m_Controls.modeldirectoryBox->directory(); // check syntax
   QString updatedPath(QDir::cleanPath(m_ModelDirectory + QDir::separator() + m_Controls.modelBox->currentText() +
                                       QDir::separator() + m_DatasetName + QDir::separator() + trainerSelected));
-  std::cout << "updatedPath " << updatedPath.toUtf8().constData() << std::endl;
   // std::vector<QString> folds;
   m_Controls.foldBox->clear();
   for (QDirIterator it(updatedPath, QDir::AllDirs, QDirIterator::NoIteratorFlags); it.hasNext();)
   {
     it.next();
     QString fold = it.fileName();
-    if (!fold.startsWith('.'))
-    { // Filter out irrelevent hidden folders, if any.
-      // folds.push_back(fold);
-      std::cout << "fold " << fold.toUtf8().constData() << std::endl;
+    if (!fold.startsWith('.')) // Filter out irrelevent hidden folders, if any.
+    {                          // folds.push_back(fold);
       m_Controls.foldBox->addItem(fold);
     }
   }
+}
+
+void QmitknnUNetToolGUI::OnPythonChanged(const QString &pyEnv)
+{
+  if (pyEnv == QString("Select"))
+  {
+    QString path =
+      QFileDialog::getExistingDirectory(m_Controls.pythonEnvComboBox->parentWidget(), "Python Path", "dir");
+    if (!path.isEmpty())
+    {
+      std::cout << "selected " << path.toUtf8().constData() << std::endl;
+      m_Controls.pythonEnvComboBox->insertItem(0, path);
+      m_Controls.pythonEnvComboBox->setCurrentIndex(0);
+    }
+  }
+}
+
+void QmitknnUNetToolGUI::AutoParsePythonPaths()
+{
+  QString homeDir = QDir::homePath();
+  std::vector<QString> searchDirs;
+#if defined(__APPLE__) || defined(MACOSX) //Add search locations for possible standard python paths here
+  searchDirs.push_back(homeDir + QDir::separator() + "environments");
+  searchDirs.push_back(homeDir + QDir::separator() + "anaconda3");
+  searchDirs.push_back(homeDir + QDir::separator() + "opt" + QDir::separator() + "anaconda3");
+#endif
+  for (QString searchDir : searchDirs)
+  {
+    if (searchDir.endsWith("anaconda3", Qt::CaseInsensitive))
+    {
+      if (QDir(searchDir).exists())
+      {
+        m_Controls.pythonEnvComboBox->insertItem(0, "(base): " + searchDir);
+        searchDir.append((QDir::separator() + QString("envs")));
+      }
+    }
+    for (QDirIterator subIt(searchDir, QDir::AllDirs, QDirIterator::NoIteratorFlags); subIt.hasNext();)
+    {
+      subIt.next();
+      QString envName = subIt.fileName();
+      if (!envName.startsWith('.')) // Filter out irrelevent hidden folders, if any.
+      {                             // folds.push_back(fold);
+        m_Controls.pythonEnvComboBox->insertItem(0, "(" + envName + "): " + subIt.filePath());
+      }
+    }
+  }
+  m_Controls.pythonEnvComboBox->setCurrentIndex(-1);
 }

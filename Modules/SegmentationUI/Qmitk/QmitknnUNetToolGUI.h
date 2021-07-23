@@ -35,6 +35,7 @@ protected slots :
   void OnDirectoryChanged(const QString &);
   void OnModelChanged(const QString&);
   void OnTrainerChanged(const QString&);
+  void OnPythonChanged(const QString&);
 
 protected:
   QmitknnUNetToolGUI();
@@ -44,6 +45,9 @@ protected:
   void InitializeUI(QBoxLayout* mainLayout) override;
   void EnableWidgets(bool enabled) override;
 
+private:
+  void AutoParsePythonPaths();
+
   //Declaring variables for strings and int only.
   std::string m_Model;
   std::string m_Task;
@@ -52,7 +56,6 @@ protected:
   //std::string m_ModelDirectory;
   QString m_ModelDirectory; //Change datatype to QDir?
   QString m_DatasetName;
-  std::string m_OutputDirectory;
   Ui_QmitknnUNetToolGUIControls m_Controls;
 };
 

@@ -31,7 +31,7 @@ void QmitknnUNetToolGUI::ConnectNewTool(mitk::AutoSegmentationWithPreviewTool *n
 void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
 {
   m_Controls.setupUi(this);
-#if defined(__APPLE__) || defined(MACOSX)
+#if defined(__APPLE__) || defined(MACOSX) || defined(linux) || defined(__linux__) 
   m_Controls.pythonEnvComboBox->addItem("/usr/bin");
 #endif
   m_Controls.pythonEnvComboBox->addItem("Select");
@@ -213,10 +213,14 @@ void QmitknnUNetToolGUI::AutoParsePythonPaths()
 {
   QString homeDir = QDir::homePath();
   std::vector<QString> searchDirs;
-#if defined(__APPLE__) || defined(MACOSX) //Add search locations for possible standard python paths here
+#if defined(__APPLE__) || defined(MACOSX) || defined(linux) || defined(__linux__)  //Add search locations for possible standard python paths here
   searchDirs.push_back(homeDir + QDir::separator() + "environments");
   searchDirs.push_back(homeDir + QDir::separator() + "anaconda3");
+  searchDirs.push_back(homeDir + QDir::separator() + "miniconda3");
+  searchDirs.push_back(homeDir + QDir::separator() + "opt" + QDir::separator() + "miniconda3");
   searchDirs.push_back(homeDir + QDir::separator() + "opt" + QDir::separator() + "anaconda3");
+#elif defined(_WIN32) || defined(_WIN64)
+  searchDirs.push_back("C:" + QDir::separator() + "anaconda3" );
 #endif
   for (QString searchDir : searchDirs)
   {

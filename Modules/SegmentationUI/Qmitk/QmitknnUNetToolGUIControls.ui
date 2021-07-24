@@ -120,7 +120,7 @@
                 </sizepolicy>
               </property>
               <property name="text">
-                <string>Trainer:</string>
+                <string>Trainer Plan:</string>
               </property>
             </widget>
           </item>
@@ -333,7 +333,7 @@
                       </sizepolicy>
                     </property>
                     <property name="text">
-                      <string>Python Virtual Env.:</string>
+                      <string>Python Path:</string>
                     </property>
                   </widget>
                 </item>

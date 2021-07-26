@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include <usModule.h>
 #include <usModuleContext.h>
 #include <usModuleResource.h>
+#include <cstdlib>
 
 namespace mitk
 {
@@ -98,7 +99,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     mitkThrow() << "Error creating temporary directories or files on disk.";
     return nullptr;
   }
-  try
+  /*try
   {
     mitk::IOUtil::Save(_inputAtTimeStep.GetPointer(), inputImagePath);
   }
@@ -107,11 +108,13 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     MITK_ERROR << e.GetDescription();
     mitkThrow() << "Error writing 3D stack on to disk.";
     return nullptr;
-  }
+  }*/
   // Code calls external process
-  std::string scriptPath = this->GetnnUNetDirectory() + mitk::IOUtil::GetDirectorySeparator() + "nnunet" +
+  /*std::string scriptPath = this->GetnnUNetDirectory() + mitk::IOUtil::GetDirectorySeparator() + "nnunet" +
                            mitk::IOUtil::GetDirectorySeparator() + "inference" + mitk::IOUtil::GetDirectorySeparator() +
-                           "predict.py";
+                           "predict.py";*/
+  std::string scriptPath = this->GetnnUNetDirectory() + mitk::IOUtil::GetDirectorySeparator() + "test_process.py";
+
   map::utilities::ProcessExecutor::Pointer spExec = map::utilities::ProcessExecutor::New();
   itk::CStyleCommand::Pointer spCommand = itk::CStyleCommand::New();
   spCommand->SetCallback(&onRegistrationEvent);
@@ -153,7 +156,9 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
 
   try
   {
+    setenv("RESULTS_FOLDER",this->GetModelDirectory().c_str(), true);
     spExec->execute(this->GetPythonPath(), "python3", args);
+
   }
   catch (const mitk::Exception &e)
   {

@@ -31,7 +31,7 @@ void QmitknnUNetToolGUI::ConnectNewTool(mitk::AutoSegmentationWithPreviewTool *n
 void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
 {
   m_Controls.setupUi(this);
-#if defined(__APPLE__) || defined(MACOSX) || defined(linux) || defined(__linux__) 
+#if defined(__APPLE__) || defined(MACOSX) || defined(linux) || defined(__linux__)
   m_Controls.pythonEnvComboBox->addItem("/usr/bin");
 #endif
   m_Controls.pythonEnvComboBox->addItem("Select");
@@ -45,10 +45,8 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
     m_Controls.modelBox, SIGNAL(currentTextChanged(const QString &)), this, SLOT(OnModelChanged(const QString &)));
   connect(
     m_Controls.trainerBox, SIGNAL(currentTextChanged(const QString &)), this, SLOT(OnTrainerChanged(const QString &)));
-  connect(m_Controls.pythonEnvComboBox,
-          SIGNAL(textActivated(const QString &)),
-          this,
-          SLOT(OnPythonChanged(const QString &))),
+  connect(
+    m_Controls.pythonEnvComboBox, SIGNAL(textActivated(const QString &)), this, SLOT(OnPythonChanged(const QString &))),
     mainLayout->addLayout(m_Controls.verticalLayout);
   Superclass::InitializeUI(mainLayout);
 }
@@ -65,7 +63,8 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       m_Task = m_Controls.taskBox->itemText(m_Controls.taskBox->currentIndex()).toUtf8().constData();
       m_nnUNetDirectory = m_Controls.codedirectoryBox->directory().toUtf8().constData();
       std::string modelDirectory = m_ModelDirectory.toUtf8().constData();
-      QString pythonPath = m_Controls.pythonEnvDirBox->directory();
+      QString pythonPathTextItem = m_Controls.pythonEnvComboBox->itemText(m_Controls.pythonEnvComboBox->currentIndex());
+      QString pythonPath = pythonPathTextItem.mid(pythonPathTextItem.indexOf(" ")+1);
       if (!(pythonPath.endsWith("bin", Qt::CaseInsensitive) || pythonPath.endsWith("bin/", Qt::CaseInsensitive)))
       {
         pythonPath += QDir::separator() + QString("bin");
@@ -99,7 +98,7 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
     {
       this->setCursor(Qt::ArrowCursor);
       std::stringstream stream;
-      stream << "Error while generation nnUNet segmentation. Reason: " << e.what();
+      stream << "Error while processing parameters for nnUNet segmentation. Reason: " << e.what();
       QMessageBox *messageBox = new QMessageBox(QMessageBox::Critical, nullptr, stream.str().c_str());
       messageBox->exec();
       delete messageBox;
@@ -213,14 +212,15 @@ void QmitknnUNetToolGUI::AutoParsePythonPaths()
 {
   QString homeDir = QDir::homePath();
   std::vector<QString> searchDirs;
-#if defined(__APPLE__) || defined(MACOSX) || defined(linux) || defined(__linux__)  //Add search locations for possible standard python paths here
+#if defined(__APPLE__) || defined(MACOSX) || defined(linux) || defined(__linux__)
+  // Add search locations for possible standard python paths here
   searchDirs.push_back(homeDir + QDir::separator() + "environments");
   searchDirs.push_back(homeDir + QDir::separator() + "anaconda3");
   searchDirs.push_back(homeDir + QDir::separator() + "miniconda3");
   searchDirs.push_back(homeDir + QDir::separator() + "opt" + QDir::separator() + "miniconda3");
   searchDirs.push_back(homeDir + QDir::separator() + "opt" + QDir::separator() + "anaconda3");
 #elif defined(_WIN32) || defined(_WIN64)
-  searchDirs.push_back("C:" + QDir::separator() + "anaconda3" );
+  searchDirs.push_back("C:" + QDir::separator() + "anaconda3");
 #endif
   for (QString searchDir : searchDirs)
   {

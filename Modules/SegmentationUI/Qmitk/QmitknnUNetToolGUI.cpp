@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <QDirIterator>
 #include <QMessageBox>
 #include <QProcess>
+#include <QtGlobal>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitknnUNetToolGUI, "")
 
@@ -31,9 +32,11 @@ void QmitknnUNetToolGUI::ConnectNewTool(mitk::AutoSegmentationWithPreviewTool *n
 void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
 {
   m_Controls.setupUi(this);
+
 #if defined(__APPLE__) || defined(MACOSX) || defined(linux) || defined(__linux__)
   m_Controls.pythonEnvComboBox->addItem("/usr/bin");
 #endif
+
   m_Controls.pythonEnvComboBox->addItem("Select");
   AutoParsePythonPaths();
   connect(m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnSettingsAccept()));
@@ -45,9 +48,15 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
     m_Controls.modelBox, SIGNAL(currentTextChanged(const QString &)), this, SLOT(OnModelChanged(const QString &)));
   connect(
     m_Controls.trainerBox, SIGNAL(currentTextChanged(const QString &)), this, SLOT(OnTrainerChanged(const QString &)));
-  connect(
-    m_Controls.pythonEnvComboBox, SIGNAL(activated(const QString &)), this, SLOT(OnPythonChanged(const QString &))),
-    mainLayout->addLayout(m_Controls.verticalLayout);
+  connect(m_Controls.pythonEnvComboBox,
+#if QT_VERSION >= 0x050F00 // 5.15
+          SIGNAL(textActivated(const QString &)),
+#elif QT_VERSION >= 0x050C00 // 5.12
+          SIGNAL(activated(const QString &)),
+#endif
+          this,
+          SLOT(OnPythonChanged(const QString &)));
+  mainLayout->addLayout(m_Controls.verticalLayout);
   Superclass::InitializeUI(mainLayout);
 }
 
@@ -71,7 +80,8 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       std::string fold = m_Controls.foldBox->itemText(m_Controls.foldBox->currentIndex()).toUtf8().constData();
       fold = fold.substr(fold.find("_") + 1);
 
-      QString trainerPlanner = m_Controls.trainerBox->itemText(m_Controls.trainerBox->currentIndex()); //.toUtf8().constData();
+      QString trainerPlanner =
+        m_Controls.trainerBox->itemText(m_Controls.trainerBox->currentIndex()); //.toUtf8().constData();
       QStringList splitParts = trainerPlanner.split("__", QString::SplitBehavior::SkipEmptyParts);
       QString trainer = splitParts.first();
       QString planId = splitParts.last();

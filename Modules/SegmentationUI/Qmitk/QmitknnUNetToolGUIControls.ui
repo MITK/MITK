@@ -188,7 +188,7 @@
                 </property>
 
                 <item row="0" column="0">
-                  <widget class="QLabel" name="exportLabel">
+                  <widget class="QLabel" name="nopipLabel">
                     <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                         <horstretch>0</horstretch>
@@ -196,12 +196,12 @@
                       </sizepolicy>
                     </property>
                     <property name="text">
-                      <string>Export</string>
+                      <string>No Pip</string>
                     </property>
                   </widget>
                 </item>
                 <item row="0" column="1">
-                  <widget class="ctkCheckBox" name="exportBox" native="true" />
+                  <widget class="ctkCheckBox" name="nopipBox" native="true" />
                 </item>
                 <item row="0" column="2">
                   <widget class="QLabel" name="mixedPrecisionLabel">
@@ -233,7 +233,7 @@
                       </sizepolicy>
                     </property>
                     <property name="text">
-                      <string>Preprocessing Threads:</string>
+                      <string>Threads:</string>
                     </property>
                   </widget>
                 </item>

@@ -57,6 +57,9 @@ namespace mitk
 
     itkSetMacro(Trainer, std::string);
     itkGetConstMacro(Trainer, std::string);
+    
+    itkSetMacro(PlanId, std::string);
+    itkGetConstMacro(PlanId, std::string);
 
     itkSetMacro(nnUNetDirectory, std::string);
     itkGetConstMacro(nnUNetDirectory, std::string);
@@ -91,6 +94,10 @@ namespace mitk
     itkGetConstMacro(Mirror, bool);
     itkBooleanMacro(Mirror);
 
+    itkSetMacro(NoPip, bool);
+    itkGetConstMacro(NoPip, bool);
+    itkBooleanMacro(NoPip)
+
     itkSetMacro(PreprocessingThreads, unsigned int);
     itkGetConstMacro(PreprocessingThreads, unsigned int);
 
@@ -105,6 +112,7 @@ namespace mitk
     std::string m_Model;
     std::string m_Fold;
     std::string m_Trainer;
+    std::string m_PlanId;
     std::string m_Task;
     std::string m_nnUNetDirectory;
     std::string m_ModelDirectory;
@@ -113,8 +121,9 @@ namespace mitk
     bool m_LowRes; // remove?
     bool m_AllInGPU;
     bool m_MixedPrecision;
-    bool m_ExportSegmentation;
+    bool m_ExportSegmentation; //remove?
     bool m_Mirror; //rename
+    bool m_NoPip;
     unsigned int m_PreprocessingThreads;
     
     /*const std::string m_PythonProjectPath;

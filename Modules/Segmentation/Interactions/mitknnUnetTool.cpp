@@ -15,13 +15,13 @@ found in the LICENSE file.
 #include "mitkIOUtil.h"
 #include "mitkImage.h"
 #include "mitkLabelSetImage.h"
+#include <cstdlib>
 #include <itksys/SystemTools.hxx>
 #include <mapProcessExecutor.h>
 #include <usGetModuleContext.h>
 #include <usModule.h>
 #include <usModuleContext.h>
 #include <usModuleResource.h>
-#include <cstdlib>
 
 namespace mitk
 {
@@ -99,7 +99,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     mitkThrow() << "Error creating temporary directories or files on disk.";
     return nullptr;
   }
-  /*try
+  try
   {
     mitk::IOUtil::Save(_inputAtTimeStep.GetPointer(), inputImagePath);
   }
@@ -108,31 +108,48 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     MITK_ERROR << e.GetDescription();
     mitkThrow() << "Error writing 3D stack on to disk.";
     return nullptr;
-  }*/
+  }
   // Code calls external process
-  /*std::string scriptPath = this->GetnnUNetDirectory() + mitk::IOUtil::GetDirectorySeparator() + "nnunet" +
-                           mitk::IOUtil::GetDirectorySeparator() + "inference" + mitk::IOUtil::GetDirectorySeparator() +
-                           "predict.py";*/
-  std::string scriptPath = this->GetnnUNetDirectory() + mitk::IOUtil::GetDirectorySeparator() + "test_process.py";
-
+  std::string command = "nnUNet_predict";
+  if (this->GetNoPip())
+  {
+    command = "python3";
+  }
   map::utilities::ProcessExecutor::Pointer spExec = map::utilities::ProcessExecutor::New();
   itk::CStyleCommand::Pointer spCommand = itk::CStyleCommand::New();
   spCommand->SetCallback(&onRegistrationEvent);
   spExec->AddObserver(map::events::ExternalProcessOutputEvent(), spCommand);
   map::utilities::ProcessExecutor::ArgumentListType args;
   args.clear();
-  args.push_back(scriptPath);
-
+  if (this->GetNoPip())
+  {
+    std::string scriptPath = this->GetnnUNetDirectory() + mitk::IOUtil::GetDirectorySeparator() + "nnunet" +
+                             mitk::IOUtil::GetDirectorySeparator() + "inference" +
+                             mitk::IOUtil::GetDirectorySeparator() + "predict_simple.py";
+    // std::string scriptPath = this->GetnnUNetDirectory() + mitk::IOUtil::GetDirectorySeparator() + "test_process.py";
+    args.push_back(scriptPath);
+  }
   args.push_back("-i"); // add empty checks since the parameter is 'required'
   args.push_back(inDir);
 
   args.push_back("-o"); // add empty checks since the parameter is 'required'
   args.push_back(outDir);
 
-  args.push_back("-m"); // add empty checks since the parameter is 'required'
-  args.push_back(this->GetModelDirectory() + mitk::IOUtil::GetDirectorySeparator() + this->GetModel() +
-                 mitk::IOUtil::GetDirectorySeparator() + this->GetTask() + mitk::IOUtil::GetDirectorySeparator() +
-                 this->GetTrainer());
+  args.push_back("-t");
+  args.push_back(this->GetTask());
+
+  args.push_back("-tr");
+  args.push_back(this->GetTrainer());
+
+  args.push_back("-m");
+  args.push_back(this->GetModel());
+  setenv("RESULTS_FOLDER", this->GetModelDirectory().c_str(), true);
+
+  args.push_back("-p");
+  args.push_back(this->GetPlanId());
+
+  args.push_back("-f");
+  args.push_back(this->GetFold());
 
   // args.push_back("--all_in_gpu");
   // args.push_back(this->GetAllInGPU() ? std::string("True") : std::string("False"));
@@ -143,11 +160,13 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   args.push_back("--num_threads_preprocessing");
   args.push_back(std::to_string(this->GetPreprocessingThreads()));
 
-  args.push_back("--tta");
-  args.push_back(this->GetMirror() ? std::string("1") : std::string("0"));
+  args.push_back("--num_threads_nifti_save");
+  args.push_back("1"); // fixing to 1
 
-  args.push_back("-f");
-  args.push_back(this->GetFold());
+  if (!this->GetMirror())
+  {
+    args.push_back("--disable_tta");
+  }
 
   if (!this->GetMixedPrecision())
   {
@@ -156,14 +175,17 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
 
   try
   {
-    setenv("RESULTS_FOLDER",this->GetModelDirectory().c_str(), true);
-    spExec->execute(this->GetPythonPath(), "python3", args);
-
+    for (auto arg : args)
+    {
+      std::cout << arg << std::endl;
+    }
+    std::cout << "command " << command << std::endl;
+    spExec->execute(this->GetPythonPath(), command, args);
   }
   catch (const mitk::Exception &e)
   {
     MITK_ERROR << e.GetDescription();
-    mitkThrow() << "An error occured while calling nnUNet.";
+    mitkThrow() << "An error occured while calling nnUNet process.";
     return nullptr;
   }
 

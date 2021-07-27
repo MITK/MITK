@@ -46,7 +46,7 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   connect(
     m_Controls.trainerBox, SIGNAL(currentTextChanged(const QString &)), this, SLOT(OnTrainerChanged(const QString &)));
   connect(
-    m_Controls.pythonEnvComboBox, SIGNAL(textActivated(const QString &)), this, SLOT(OnPythonChanged(const QString &))),
+    m_Controls.pythonEnvComboBox, SIGNAL(activated(const QString &)), this, SLOT(OnPythonChanged(const QString &))),
     mainLayout->addLayout(m_Controls.verticalLayout);
   Superclass::InitializeUI(mainLayout);
 }
@@ -62,32 +62,37 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       m_Model = m_Controls.modelBox->itemText(m_Controls.modelBox->currentIndex()).toUtf8().constData();
       m_Task = m_Controls.taskBox->itemText(m_Controls.taskBox->currentIndex()).toUtf8().constData();
       m_nnUNetDirectory = m_Controls.codedirectoryBox->directory().toUtf8().constData();
-      std::string modelDirectory = m_ModelDirectory.toUtf8().constData();
       QString pythonPathTextItem = m_Controls.pythonEnvComboBox->itemText(m_Controls.pythonEnvComboBox->currentIndex());
-      QString pythonPath = pythonPathTextItem.mid(pythonPathTextItem.indexOf(" ")+1);
+      QString pythonPath = pythonPathTextItem.mid(pythonPathTextItem.indexOf(" ") + 1);
       if (!(pythonPath.endsWith("bin", Qt::CaseInsensitive) || pythonPath.endsWith("bin/", Qt::CaseInsensitive)))
       {
         pythonPath += QDir::separator() + QString("bin");
       }
       std::string fold = m_Controls.foldBox->itemText(m_Controls.foldBox->currentIndex()).toUtf8().constData();
-      std::string trainer = m_Controls.trainerBox->itemText(m_Controls.trainerBox->currentIndex()).toUtf8().constData();
       fold = fold.substr(fold.find("_") + 1);
+
+      QString trainerPlanner = m_Controls.trainerBox->itemText(m_Controls.trainerBox->currentIndex()); //.toUtf8().constData();
+      QStringList splitParts = trainerPlanner.split("__", QString::SplitBehavior::SkipEmptyParts);
+      QString trainer = splitParts.first();
+      QString planId = splitParts.last();
 
       tool->SetModel(m_Model);
       tool->SetTask(m_Task);
       tool->SetnnUNetDirectory(m_nnUNetDirectory);
       tool->SetPythonPath(pythonPath.toUtf8().constData());
-      tool->SetModelDirectory(modelDirectory);
+      tool->SetModelDirectory(m_ModelDirectory.toUtf8().constData());
       tool->SetFold(fold);
-      tool->SetTrainer(trainer);
+      tool->SetTrainer(trainer.toUtf8().constData());
+      tool->SetPlanId(planId.toUtf8().constData());
 
       // checkboxes
       // tool->SetUseGPU(m_Controls.gpuBox->isChecked());
       // tool->SetLowRes(m_Controls.lowresBox->isChecked());
       // tool->SetAllInGPU(m_Controls.allInGpuBox->isChecked());
-      tool->SetExportSegmentation(m_Controls.exportBox->isChecked());
+      // tool->SetExportSegmentation(m_Controls.exportBox->isChecked());
       tool->SetMirror(m_Controls.mirrorBox->isChecked());
       tool->SetMixedPrecision(m_Controls.mixedPrecisionBox->isChecked());
+      tool->SetNoPip(m_Controls.nopipBox->isChecked());
 
       // Spinboxes
       tool->SetPreprocessingThreads(static_cast<unsigned int>(m_Controls.threadsBox->value()));
@@ -220,13 +225,13 @@ void QmitknnUNetToolGUI::AutoParsePythonPaths()
   searchDirs.push_back(homeDir + QDir::separator() + "opt" + QDir::separator() + "miniconda3");
   searchDirs.push_back(homeDir + QDir::separator() + "opt" + QDir::separator() + "anaconda3");
 #elif defined(_WIN32) || defined(_WIN64)
-  searchDirs.push_back("C:" + QDir::separator() + "anaconda3");
+  searchDirs.push_back("C:" + QDir::separator() + "Anaconda3");
 #endif
   for (QString searchDir : searchDirs)
   {
     if (searchDir.endsWith("anaconda3", Qt::CaseInsensitive))
     {
-      if (QDir(searchDir).exists())
+      if (QDir(searchDir).exists()) // Do case insensitive search
       {
         m_Controls.pythonEnvComboBox->insertItem(0, "(base): " + searchDir);
         searchDir.append((QDir::separator() + QString("envs")));

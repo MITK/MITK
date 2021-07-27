@@ -51,7 +51,7 @@ private:
   //Declaring variables for strings and int only.
   std::string m_Model;
   std::string m_Task;
-
+  
   std::string m_nnUNetDirectory;
   //std::string m_ModelDirectory;
   QString m_ModelDirectory; //Change datatype to QDir?

@@ -63,6 +63,7 @@ namespace mitk
                                        bool fromSelectedUpwards,
                                        int timestep);
 
+    const float eps = 3.0;
     mitk::ImageLiveWireContourModelFilter::Pointer m_LiveWireFilter;
     mitk::Image::Pointer m_WorkingSlice;
 

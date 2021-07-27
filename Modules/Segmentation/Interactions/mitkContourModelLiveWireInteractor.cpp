@@ -66,7 +66,7 @@ bool mitk::ContourModelLiveWireInteractor::OnCheckPointClick(const InteractionEv
   // Transition YES if click close to a vertex
   mitk::Point3D click = positionEvent->GetPositionInWorld();
 
-  if (contour->SelectVertexAt(click, 3.0, timeStep))
+  if (contour->SelectVertexAt(click, mitk::ContourModelLiveWireInteractor::eps, timeStep))
   {
     contour->SetSelectedVertexAsControlPoint(false);
     m_ContourLeft = mitk::ContourModel::New();
@@ -325,7 +325,7 @@ bool mitk::ContourModelLiveWireInteractor::IsHovering(const InteractionEvent *in
 
   bool isHover = false;
   this->GetDataNode()->GetBoolProperty("contour.hovering", isHover, positionEvent->GetSender());
-  if (contour->IsNearContour(currentPosition, 1.5, timeStep))
+  if (contour->IsNearContour(currentPosition, mitk::ContourModelLiveWireInteractor::eps, timeStep))
   {
     if (isHover == false)
     {

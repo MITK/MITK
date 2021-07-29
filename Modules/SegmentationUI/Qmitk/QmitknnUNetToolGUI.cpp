@@ -48,6 +48,7 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
     m_Controls.modelBox, SIGNAL(currentTextChanged(const QString &)), this, SLOT(OnModelChanged(const QString &)));
   connect(
     m_Controls.trainerBox, SIGNAL(currentTextChanged(const QString &)), this, SLOT(OnTrainerChanged(const QString &)));
+  connect(m_Controls.nopipBox, SIGNAL(stateChanged(int)), this, SLOT(OnCheckBoxChanged(int)));
   connect(m_Controls.pythonEnvComboBox,
 #if QT_VERSION >= 0x050F00 // 5.15
           SIGNAL(textActivated(const QString &)),
@@ -56,6 +57,8 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
 #endif
           this,
           SLOT(OnPythonChanged(const QString &)));
+  m_Controls.codedirectoryBox->setVisible(false);
+  m_Controls.nnUnetdirLabel->setVisible(false);
   mainLayout->addLayout(m_Controls.verticalLayout);
   Superclass::InitializeUI(mainLayout);
 }
@@ -156,7 +159,7 @@ void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &dir)
     it.next();
     QString filePath = it.fileName();
     // models.push_back(filePath);
-    if (!filePath.startsWith('.'))
+    if (!filePath.startsWith('.') && !!filePath.startsWith("ensemble"))
     { // Filter out irrelevent hidden folders, if any.
       m_Controls.modelBox->addItem(filePath);
     }
@@ -216,9 +219,27 @@ void QmitknnUNetToolGUI::OnPythonChanged(const QString &pyEnv)
       QFileDialog::getExistingDirectory(m_Controls.pythonEnvComboBox->parentWidget(), "Python Path", "dir");
     if (!path.isEmpty())
     {
-      std::cout << "selected " << path.toUtf8().constData() << std::endl;
       m_Controls.pythonEnvComboBox->insertItem(0, path);
       m_Controls.pythonEnvComboBox->setCurrentIndex(0);
+    }
+  }
+}
+
+void QmitknnUNetToolGUI::OnCheckBoxChanged(int state)
+{
+  bool visiblity = false;
+  if (state == Qt::Checked)
+  {
+    visiblity = true;
+  }
+  ctkCheckBox *box = qobject_cast<ctkCheckBox *>(sender());
+  if (box != nullptr)
+  {
+    if (box->objectName() == QString("nopipBox"))
+    {
+      m_Controls.codedirectoryBox->setVisible(visiblity);
+      m_Controls.nnUnetdirLabel->setVisible(visiblity);
+
     }
   }
 }

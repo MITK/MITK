@@ -27,7 +27,6 @@ namespace mitk
 
     \sa FeedbackContourTool
     \sa ExtractImageFilter
-    \sa OverwriteSliceImageFilter
 
     \ingroup Interaction
     \ingroup ToolManagerEtAl

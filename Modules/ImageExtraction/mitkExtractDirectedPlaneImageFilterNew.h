@@ -29,7 +29,6 @@ namespace mitk
     \sa ContourTool
     \sa SegTool2D
     \sa ExtractImageFilter
-    \sa OverwriteSliceImageFilter
     \sa OverwriteDirectedPlaneImageFilter
 
     \ingroup Process

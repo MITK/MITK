@@ -49,6 +49,7 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   connect(
     m_Controls.trainerBox, SIGNAL(currentTextChanged(const QString &)), this, SLOT(OnTrainerChanged(const QString &)));
   connect(m_Controls.nopipBox, SIGNAL(stateChanged(int)), this, SLOT(OnCheckBoxChanged(int)));
+  connect(m_Controls.multiModalBox, SIGNAL(stateChanged(int)), this, SLOT(OnCheckBoxChanged(int)));
   connect(m_Controls.pythonEnvComboBox,
 #if QT_VERSION >= 0x050F00 // 5.15
           SIGNAL(textActivated(const QString &)),
@@ -59,6 +60,7 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
           SLOT(OnPythonChanged(const QString &)));
   m_Controls.codedirectoryBox->setVisible(false);
   m_Controls.nnUnetdirLabel->setVisible(false);
+  m_Controls.multiModalPath->setVisible(false);
   mainLayout->addLayout(m_Controls.verticalLayout);
   Superclass::InitializeUI(mainLayout);
 }
@@ -73,7 +75,10 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       // comboboxes
       m_Model = m_Controls.modelBox->itemText(m_Controls.modelBox->currentIndex()).toUtf8().constData();
       m_Task = m_Controls.taskBox->itemText(m_Controls.taskBox->currentIndex()).toUtf8().constData();
-      m_nnUNetDirectory = m_Controls.codedirectoryBox->directory().toUtf8().constData();
+      std::string nnUNetDirectory = "";
+      if (m_Controls.multiModalBox->isChecked()){
+      nnUNetDirectory = m_Controls.codedirectoryBox->directory().toUtf8().constData();
+      }
       QString pythonPathTextItem = m_Controls.pythonEnvComboBox->itemText(m_Controls.pythonEnvComboBox->currentIndex());
       QString pythonPath = pythonPathTextItem.mid(pythonPathTextItem.indexOf(" ") + 1);
       if (!(pythonPath.endsWith("bin", Qt::CaseInsensitive) || pythonPath.endsWith("bin/", Qt::CaseInsensitive)))
@@ -91,7 +96,7 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
 
       tool->SetModel(m_Model);
       tool->SetTask(m_Task);
-      tool->SetnnUNetDirectory(m_nnUNetDirectory);
+      tool->SetnnUNetDirectory(nnUNetDirectory);
       tool->SetPythonPath(pythonPath.toUtf8().constData());
       tool->SetModelDirectory(m_ModelDirectory.toUtf8().constData());
       tool->SetFold(fold);
@@ -106,6 +111,7 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       tool->SetMirror(m_Controls.mirrorBox->isChecked());
       tool->SetMixedPrecision(m_Controls.mixedPrecisionBox->isChecked());
       tool->SetNoPip(m_Controls.nopipBox->isChecked());
+      tool->SetMultiModal(m_Controls.multiModalBox->isChecked());
 
       // Spinboxes
       tool->SetPreprocessingThreads(static_cast<unsigned int>(m_Controls.threadsBox->value()));
@@ -146,12 +152,20 @@ void QmitknnUNetToolGUI::EnableWidgets(bool enabled)
   m_Controls.previewButton->setEnabled(enabled);
 }
 
+void QmitknnUNetToolGUI::ClearAllComboBoxes()
+{
+  m_Controls.modelBox->clear();
+  m_Controls.taskBox->clear();
+  m_Controls.foldBox->clear();
+  m_Controls.trainerBox->clear();
+}
 void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &dir)
 {
-  QStringList splitPath = dir.split(
+  this->ClearAllComboBoxes();
+  /* QStringList splitPath = dir.split(
     QDir::separator(), QString::SplitBehavior::SkipEmptyParts); // Should work for all OS but not tested on Windows
   QString task = splitPath.last();
-  m_Controls.taskBox->addItem(task);
+  m_Controls.taskBox->addItem(task); */
   // std::vector<QString> models;
   QDirIterator it(dir, QDir::AllDirs, QDirIterator::NoIteratorFlags);
   while (it.hasNext())
@@ -159,7 +173,7 @@ void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &dir)
     it.next();
     QString filePath = it.fileName();
     // models.push_back(filePath);
-    if (!filePath.startsWith('.') && !!filePath.startsWith("ensemble"))
+    if (!filePath.startsWith('.') && !filePath.startsWith("ensemble"))
     { // Filter out irrelevent hidden folders, if any.
       m_Controls.modelBox->addItem(filePath);
     }
@@ -168,7 +182,7 @@ void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &dir)
 
 void QmitknnUNetToolGUI::OnModelChanged(const QString &text)
 {
-  m_ModelDirectory = m_Controls.modeldirectoryBox->directory(); // check syntax
+  m_ModelDirectory = m_Controls.modeldirectoryBox->directory();
   QString updatedPath(QDir::cleanPath(m_ModelDirectory + QDir::separator() + text));
   // QString dataset_name;
   for (QDirIterator it(updatedPath, QDir::AllDirs, QDirIterator::NoIteratorFlags); it.hasNext();)
@@ -177,6 +191,7 @@ void QmitknnUNetToolGUI::OnModelChanged(const QString &text)
     if (!it.fileName().startsWith('.'))
     {
       m_DatasetName = it.fileName();
+      m_Controls.taskBox->addItem(m_DatasetName);
     }
   }
   updatedPath = QDir::cleanPath(updatedPath + QDir::separator() + m_DatasetName);
@@ -227,19 +242,23 @@ void QmitknnUNetToolGUI::OnPythonChanged(const QString &pyEnv)
 
 void QmitknnUNetToolGUI::OnCheckBoxChanged(int state)
 {
-  bool visiblity = false;
+  bool visibility = false;
   if (state == Qt::Checked)
   {
-    visiblity = true;
+    visibility = true;
   }
   ctkCheckBox *box = qobject_cast<ctkCheckBox *>(sender());
   if (box != nullptr)
   {
     if (box->objectName() == QString("nopipBox"))
     {
-      m_Controls.codedirectoryBox->setVisible(visiblity);
-      m_Controls.nnUnetdirLabel->setVisible(visiblity);
-
+      m_Controls.codedirectoryBox->setVisible(visibility);
+      m_Controls.nnUnetdirLabel->setVisible(visibility);
+    }
+    else if (box->objectName() == QString("multiModalBox"))
+    {
+      m_Controls.multiModalPath->setVisible(visibility);
+      m_Controls.multiModalPathLabel->setVisible(visibility);
     }
   }
 }
@@ -256,7 +275,7 @@ void QmitknnUNetToolGUI::AutoParsePythonPaths()
   searchDirs.push_back(homeDir + QDir::separator() + "opt" + QDir::separator() + "miniconda3");
   searchDirs.push_back(homeDir + QDir::separator() + "opt" + QDir::separator() + "anaconda3");
 #elif defined(_WIN32) || defined(_WIN64)
-  searchDirs.push_back("C:" + QDir::separator() + "Anaconda3");
+  searchDirs.push_back("C:" + QDir::separator() + "anaconda3");
 #endif
   for (QString searchDir : searchDirs)
   {

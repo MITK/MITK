@@ -19,7 +19,6 @@ found in the LICENSE file.
 #include <QProcess>
 
 
-
 class MITKSEGMENTATIONUI_EXPORT QmitknnUNetToolGUI : public QmitkAutoMLSegmentationToolGUIBase
 {
   Q_OBJECT
@@ -48,16 +47,18 @@ protected:
 
 private:
   void AutoParsePythonPaths();
+  void ClearAllComboBoxes();
 
   //Declaring variables for strings and int only.
   std::string m_Model;
   std::string m_Task;
   
-  std::string m_nnUNetDirectory;
+  //std::string m_nnUNetDirectory;
   //std::string m_ModelDirectory;
   QString m_ModelDirectory; //Change datatype to QDir?
   QString m_DatasetName;
   Ui_QmitknnUNetToolGUIControls m_Controls;
+
 };
 
 #endif

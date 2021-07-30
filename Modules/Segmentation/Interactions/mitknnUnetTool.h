@@ -40,8 +40,8 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-    const char** GetXPM() const override;
-    const char* GetName() const override;
+    const char **GetXPM() const override;
+    const char *GetName() const override;
     us::ModuleResource GetIconResource() const override;
 
     void Activated() override;
@@ -57,7 +57,7 @@ namespace mitk
 
     itkSetMacro(Trainer, std::string);
     itkGetConstMacro(Trainer, std::string);
-    
+
     itkSetMacro(PlanId, std::string);
     itkGetConstMacro(PlanId, std::string);
 
@@ -66,7 +66,7 @@ namespace mitk
 
     itkSetMacro(ModelDirectory, std::string);
     itkGetConstMacro(ModelDirectory, std::string);
-    
+
     itkSetMacro(PythonPath, std::string);
     itkGetConstMacro(PythonPath, std::string);
 
@@ -94,19 +94,22 @@ namespace mitk
     itkGetConstMacro(Mirror, bool);
     itkBooleanMacro(Mirror);
 
+    itkSetMacro(MultiModal, bool);
+    itkGetConstMacro(MultiModal, bool);
+    itkBooleanMacro(MultiModal);
+
     itkSetMacro(NoPip, bool);
     itkGetConstMacro(NoPip, bool);
     itkBooleanMacro(NoPip)
 
-    itkSetMacro(PreprocessingThreads, unsigned int);
+      itkSetMacro(PreprocessingThreads, unsigned int);
     itkGetConstMacro(PreprocessingThreads, unsigned int);
-
 
   protected:
     nnUNetTool();
     ~nnUNetTool() = default;
 
-    LabelSetImage::Pointer ComputeMLPreview(const Image* inputAtTimeStep, TimeStepType timeStep) override;
+    LabelSetImage::Pointer ComputeMLPreview(const Image *inputAtTimeStep, TimeStepType timeStep) override;
 
   private:
     std::string m_Model;
@@ -121,15 +124,17 @@ namespace mitk
     bool m_LowRes; // remove?
     bool m_AllInGPU;
     bool m_MixedPrecision;
-    bool m_ExportSegmentation; //remove?
-    bool m_Mirror; //rename
+    bool m_ExportSegmentation; // remove?
+    bool m_Mirror;             // rename
     bool m_NoPip;
+    bool m_MultiModal;
     unsigned int m_PreprocessingThreads;
-    
+
     /*const std::string m_PythonProjectPath;
     const std::string m_PythonFileName;
     const std::string m_InputImageVarName;
     const std::string m_OutputImageVarName;*/
   };
-} // namespace
+} // namespace mitk
+
 #endif

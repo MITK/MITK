@@ -102,6 +102,10 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   try
   {
     mitk::IOUtil::Save(_inputAtTimeStep.GetPointer(), inputImagePath);
+    if (this->GetMultiModal())
+    {
+      /*copy & rename file */
+    }
   }
   catch (const mitk::Exception &e)
   {
@@ -138,9 +142,16 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   args.push_back("-t");
   args.push_back(this->GetTask());
 
-  args.push_back("-tr");
-  args.push_back(this->GetTrainer());
-
+  if (this->GetModel().find("cascade") != std::string::npos)
+  {
+    args.push_back("-ctr");
+    args.push_back(this->GetTrainer());
+  }
+  else
+  {
+    args.push_back("-tr");
+    args.push_back(this->GetTrainer());
+  }
   args.push_back("-m");
   args.push_back(this->GetModel());
   setenv("RESULTS_FOLDER", this->GetModelDirectory().c_str(), true);

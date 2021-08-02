@@ -86,6 +86,7 @@ TODO Std move to abort interaction of scroll/pan/zoom
         <action name="updateStatusbar"/>
       </transition>
       <transition event_class="InteractionPositionEvent" event_variant="EndSwivel" target="start"/>
+      <transition event_class="InteractionEvent" event_variant="ResetState" target="start"/>
     </state>
     <state name="move">
       <transition event_class="InteractionPositionEvent" event_variant="Moving" target="move">
@@ -93,6 +94,7 @@ TODO Std move to abort interaction of scroll/pan/zoom
         <action name="move"/>
       </transition>
       <transition event_class="InteractionPositionEvent" event_variant="EndMoving" target="start"/>
+      <transition event_class="InteractionEvent" event_variant="ResetState" target="start"/>
     </state>
     <state name="zoom">
       <transition event_class="InteractionPositionEvent" event_variant="Zooming" target="zoom">
@@ -100,6 +102,7 @@ TODO Std move to abort interaction of scroll/pan/zoom
         <action name="zoom"/>
       </transition>
       <transition event_class="InteractionPositionEvent" event_variant="EndZooming" target="start"/>
+      <transition event_class="InteractionEvent" event_variant="ResetState" target="start"/>
     </state>
     <state name="scroll">
       <transition event_class="InteractionPositionEvent" event_variant="Scrolling" target="scroll">
@@ -109,6 +112,7 @@ TODO Std move to abort interaction of scroll/pan/zoom
       </transition>
       <transition event_class="InteractionPositionEvent" event_variant="EndScrolling" target="start"/>
       <transition event_class="InteractionPositionEvent" event_variant="EndScrollingVar" target="start"/>
+      <transition event_class="InteractionEvent" event_variant="ResetState" target="start"/>
     </state>
     <state name="adjustlevelwindow">
       <transition event_class="InteractionPositionEvent" event_variant="adjustlevelwindow" target="adjustlevelwindow">
@@ -116,6 +120,7 @@ TODO Std move to abort interaction of scroll/pan/zoom
         <action name="levelWindow"/>
       </transition>
       <transition event_class="InteractionPositionEvent" event_variant="EndLevelWindow" target="start"/>
+      <transition event_class="InteractionEvent" event_variant="ResetState" target="start"/>
     </state>
     <state name="rotationPossible">
       <transition event_class="InteractionPositionEvent" event_variant="StartRotate" target="rotation">
@@ -144,6 +149,7 @@ TODO Std move to abort interaction of scroll/pan/zoom
         <condition name="check_position_event"/>
         <action name="init"/>
       </transition>
+      <transition event_class="InteractionEvent" event_variant="ResetState" target="start"/>
     </state>
     <state name="rotation">
       <transition event_class="InteractionPositionEvent" event_variant="Rotate" target="rotation">
@@ -152,12 +158,14 @@ TODO Std move to abort interaction of scroll/pan/zoom
       <transition event_class="InteractionPositionEvent" event_variant="EndRotate" target="start">
         <action name="endRotation"/>
       </transition>
+      <transition event_class="InteractionEvent" event_variant="ResetState" target="start"/>
     </state>
     <state name="swivel">
       <transition event_class="InteractionPositionEvent" event_variant="Swivel" target="swivel">
         <action name="swivel"/>
       </transition>
       <transition event_class="InteractionPositionEvent" event_variant="EndSwivel" target="start"/>
+      <transition event_class="InteractionEvent" event_variant="ResetState" target="start"/>
     </state>
 
 </statemachine>

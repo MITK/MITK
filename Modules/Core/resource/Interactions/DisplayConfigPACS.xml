@@ -67,4 +67,6 @@
   <event_variant class="MouseMoveEvent" name="adjustlevelwindow">
     <attribute name="ButtonState" value="RightMouseButton"/>
   </event_variant>
+  <!-- General -->
+  <event_variant class="MouseMoveEvent" name="ResetState"/>
 </config>

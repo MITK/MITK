@@ -159,8 +159,10 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   args.push_back("-p");
   args.push_back(this->GetPlanId());
 
-  args.push_back("-f");
-  args.push_back(this->GetFold());
+  if (!this->GetFold().empty()){
+    args.push_back("-f");
+    args.push_back(this->GetFold());
+  }
 
   // args.push_back("--all_in_gpu");
   // args.push_back(this->GetAllInGPU() ? std::string("True") : std::string("False"));

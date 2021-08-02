@@ -117,7 +117,7 @@
             </widget>
           </item>
           <item row="2" column="3">
-            <widget class="ctkComboBox" name="foldBox" native="true" />
+            <widget class="ctkCheckableComboBox" name="foldBox" native="true" />
           </item>
 
           <!-- </item> -->

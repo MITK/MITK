@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <QDirIterator>
 #include <QMessageBox>
 #include <QProcess>
+#include <QStringListModel>
 #include <QtGlobal>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitknnUNetToolGUI, "")
@@ -61,6 +62,7 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   m_Controls.codedirectoryBox->setVisible(false);
   m_Controls.nnUnetdirLabel->setVisible(false);
   m_Controls.multiModalPath->setVisible(false);
+
   mainLayout->addLayout(m_Controls.verticalLayout);
   Superclass::InitializeUI(mainLayout);
 }
@@ -76,8 +78,9 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       m_Model = m_Controls.modelBox->itemText(m_Controls.modelBox->currentIndex()).toUtf8().constData();
       m_Task = m_Controls.taskBox->itemText(m_Controls.taskBox->currentIndex()).toUtf8().constData();
       std::string nnUNetDirectory = "";
-      if (m_Controls.multiModalBox->isChecked()){
-      nnUNetDirectory = m_Controls.codedirectoryBox->directory().toUtf8().constData();
+      if (m_Controls.multiModalBox->isChecked())
+      {
+        nnUNetDirectory = m_Controls.codedirectoryBox->directory().toUtf8().constData();
       }
       QString pythonPathTextItem = m_Controls.pythonEnvComboBox->itemText(m_Controls.pythonEnvComboBox->currentIndex());
       QString pythonPath = pythonPathTextItem.mid(pythonPathTextItem.indexOf(" ") + 1);
@@ -85,11 +88,19 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       {
         pythonPath += QDir::separator() + QString("bin");
       }
-      std::string fold = m_Controls.foldBox->itemText(m_Controls.foldBox->currentIndex()).toUtf8().constData();
-      fold = fold.substr(fold.find("_") + 1);
-
-      QString trainerPlanner =
-        m_Controls.trainerBox->itemText(m_Controls.trainerBox->currentIndex()); //.toUtf8().constData();
+      std::string fold = "";
+      if (!(m_Controls.foldBox->allChecked() || m_Controls.foldBox->noneChecked()))
+      {
+        QModelIndexList foldList = m_Controls.foldBox->checkedIndexes();
+        QStringList checkStringList;
+        foreach (QModelIndex index, foldList)
+        {
+          checkStringList
+            << m_Controls.foldBox->itemText(index.row()).split("_", QString::SplitBehavior::SkipEmptyParts).last();
+        }
+        fold = checkStringList.join(",").toUtf8().constData();
+      }
+      QString trainerPlanner = m_Controls.trainerBox->itemText(m_Controls.trainerBox->currentIndex());
       QStringList splitParts = trainerPlanner.split("__", QString::SplitBehavior::SkipEmptyParts);
       QString trainer = splitParts.first();
       QString planId = splitParts.last();
@@ -162,10 +173,6 @@ void QmitknnUNetToolGUI::ClearAllComboBoxes()
 void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &dir)
 {
   this->ClearAllComboBoxes();
-  /* QStringList splitPath = dir.split(
-    QDir::separator(), QString::SplitBehavior::SkipEmptyParts); // Should work for all OS but not tested on Windows
-  QString task = splitPath.last();
-  m_Controls.taskBox->addItem(task); */
   // std::vector<QString> models;
   QDirIterator it(dir, QDir::AllDirs, QDirIterator::NoIteratorFlags);
   while (it.hasNext())

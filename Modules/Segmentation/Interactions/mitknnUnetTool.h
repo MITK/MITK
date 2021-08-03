@@ -52,8 +52,8 @@ namespace mitk
     itkSetMacro(Task, std::string);
     itkGetConstMacro(Task, std::string);
 
-    itkSetMacro(Fold, std::string);
-    itkGetConstMacro(Fold, std::string);
+    //itkSetMacro(Folds, std::vector); -- can't call macro for std::vector
+    //itkGetConstMacro(Folds, std::vector<std::string>);
 
     itkSetMacro(Trainer, std::string);
     itkGetConstMacro(Trainer, std::string);
@@ -100,9 +100,11 @@ namespace mitk
 
     itkSetMacro(NoPip, bool);
     itkGetConstMacro(NoPip, bool);
-    itkBooleanMacro(NoPip)
+    itkBooleanMacro(NoPip);
 
-      itkSetMacro(PreprocessingThreads, unsigned int);
+    std::vector<std::string> m_Folds;
+
+    itkSetMacro(PreprocessingThreads, unsigned int);
     itkGetConstMacro(PreprocessingThreads, unsigned int);
 
   protected:
@@ -113,7 +115,6 @@ namespace mitk
 
   private:
     std::string m_Model;
-    std::string m_Fold;
     std::string m_Trainer;
     std::string m_PlanId;
     std::string m_Task;

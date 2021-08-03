@@ -62,6 +62,7 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   m_Controls.codedirectoryBox->setVisible(false);
   m_Controls.nnUnetdirLabel->setVisible(false);
   m_Controls.multiModalPath->setVisible(false);
+  m_Controls.multiModalPathLabel->setVisible(false);
 
   mainLayout->addLayout(m_Controls.verticalLayout);
   Superclass::InitializeUI(mainLayout);
@@ -88,17 +89,16 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       {
         pythonPath += QDir::separator() + QString("bin");
       }
-      std::string fold = "";
+      std::vector<std::string> folds;
       if (!(m_Controls.foldBox->allChecked() || m_Controls.foldBox->noneChecked()))
       {
         QModelIndexList foldList = m_Controls.foldBox->checkedIndexes();
-        QStringList checkStringList;
         foreach (QModelIndex index, foldList)
         {
-          checkStringList
-            << m_Controls.foldBox->itemText(index.row()).split("_", QString::SplitBehavior::SkipEmptyParts).last();
+          QString foldQString =
+            m_Controls.foldBox->itemText(index.row()).split("_", QString::SplitBehavior::SkipEmptyParts).last();
+          folds.push_back(foldQString.toUtf8().constData());
         }
-        fold = checkStringList.join(",").toUtf8().constData();
       }
       QString trainerPlanner = m_Controls.trainerBox->itemText(m_Controls.trainerBox->currentIndex());
       QStringList splitParts = trainerPlanner.split("__", QString::SplitBehavior::SkipEmptyParts);
@@ -110,7 +110,7 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       tool->SetnnUNetDirectory(nnUNetDirectory);
       tool->SetPythonPath(pythonPath.toUtf8().constData());
       tool->SetModelDirectory(m_ModelDirectory.toUtf8().constData());
-      tool->SetFold(fold);
+      tool->m_Folds = folds;
       tool->SetTrainer(trainer.toUtf8().constData());
       tool->SetPlanId(planId.toUtf8().constData());
 

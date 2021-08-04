@@ -74,7 +74,7 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
   if (nullptr != tool)
   {
     try
-    {
+    {  mitk::ModelParams modelObject;
       // comboboxes
       m_Model = m_Controls.modelBox->itemText(m_Controls.modelBox->currentIndex()).toUtf8().constData();
       m_Task = m_Controls.taskBox->itemText(m_Controls.taskBox->currentIndex()).toUtf8().constData();
@@ -106,13 +106,20 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       QString planId = splitParts.last();
 
       tool->SetModel(m_Model);
+      modelObject.m_Model = m_Model;
       tool->SetTask(m_Task);
+      modelObject.m_Task = m_Task;
       tool->SetnnUNetDirectory(nnUNetDirectory);
       tool->SetPythonPath(pythonPath.toUtf8().constData());
       tool->SetModelDirectory(m_ModelDirectory.toUtf8().constData());
       tool->m_Folds = folds;
+      modelObject.m_Folds = folds;
       tool->SetTrainer(trainer.toUtf8().constData());
+      modelObject.m_Trainer = trainer.toUtf8().constData();
       tool->SetPlanId(planId.toUtf8().constData());
+      modelObject.m_PlanId = planId.toUtf8().constData();
+
+      tool->params.push_back(modelObject);
 
       // checkboxes
       // tool->SetUseGPU(m_Controls.gpuBox->isChecked());

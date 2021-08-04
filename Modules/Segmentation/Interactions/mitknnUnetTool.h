@@ -25,6 +25,17 @@ namespace us
 
 namespace mitk
 {
+  class MITKSEGMENTATION_EXPORT ModelParams
+  {
+    public:
+    std::string m_Task;
+    std::vector<std::string> m_Folds;
+    std::string m_Model;
+    std::string m_Trainer;
+    std::string m_PlanId;
+    std::string m_OutputPath;
+    mitk::Image::Pointer outputImage;
+  };
   /**
     \brief nnUNet segmentation tool.
 
@@ -52,7 +63,7 @@ namespace mitk
     itkSetMacro(Task, std::string);
     itkGetConstMacro(Task, std::string);
 
-    //itkSetMacro(Folds, std::vector); -- can't call macro for std::vector
+    //itkSetMacro(Folds, std::vector); //-- can't call macro for std::vector
     //itkGetConstMacro(Folds, std::vector<std::string>);
 
     itkSetMacro(Trainer, std::string);
@@ -102,8 +113,12 @@ namespace mitk
     itkGetConstMacro(NoPip, bool);
     itkBooleanMacro(NoPip);
 
-    std::vector<std::string> m_Folds;
+    itkSetMacro(Ensemble, bool);
+    itkGetConstMacro(Ensemble, bool);
+    itkBooleanMacro(Ensemble);
 
+    std::vector<std::string> m_Folds;
+    std::vector<mitk::ModelParams> params;
     itkSetMacro(PreprocessingThreads, unsigned int);
     itkGetConstMacro(PreprocessingThreads, unsigned int);
 
@@ -129,6 +144,7 @@ namespace mitk
     bool m_Mirror;             // rename
     bool m_NoPip;
     bool m_MultiModal;
+    bool m_Ensemble;
     unsigned int m_PreprocessingThreads;
 
     /*const std::string m_PythonProjectPath;

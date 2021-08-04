@@ -28,6 +28,8 @@ namespace mitk
   class MITKSEGMENTATION_EXPORT ModelParams
   {
     public:
+    mitkClassMacroNoParent(ModelParams);
+
     std::string m_Task;
     std::vector<std::string> m_Folds;
     std::string m_Model;
@@ -35,6 +37,7 @@ namespace mitk
     std::string m_PlanId;
     std::string m_OutputPath;
     mitk::Image::Pointer outputImage;
+
   };
   /**
     \brief nnUNet segmentation tool.
@@ -57,20 +60,20 @@ namespace mitk
 
     void Activated() override;
 
-    itkSetMacro(Model, std::string);
-    itkGetConstMacro(Model, std::string);
+    // itkSetMacro(Model, std::string);
+    // itkGetConstMacro(Model, std::string);
 
-    itkSetMacro(Task, std::string);
-    itkGetConstMacro(Task, std::string);
+    // itkSetMacro(Task, std::string);
+    // itkGetConstMacro(Task, std::string);
 
     //itkSetMacro(Folds, std::vector); //-- can't call macro for std::vector
     //itkGetConstMacro(Folds, std::vector<std::string>);
 
-    itkSetMacro(Trainer, std::string);
-    itkGetConstMacro(Trainer, std::string);
+    // itkSetMacro(Trainer, std::string);
+    // itkGetConstMacro(Trainer, std::string);
 
-    itkSetMacro(PlanId, std::string);
-    itkGetConstMacro(PlanId, std::string);
+    // itkSetMacro(PlanId, std::string);
+    // itkGetConstMacro(PlanId, std::string);
 
     itkSetMacro(nnUNetDirectory, std::string);
     itkGetConstMacro(nnUNetDirectory, std::string);
@@ -117,8 +120,9 @@ namespace mitk
     itkGetConstMacro(Ensemble, bool);
     itkBooleanMacro(Ensemble);
 
-    std::vector<std::string> m_Folds;
+    //std::vector<std::string> m_Folds;
     std::vector<mitk::ModelParams> params;
+
     itkSetMacro(PreprocessingThreads, unsigned int);
     itkGetConstMacro(PreprocessingThreads, unsigned int);
 
@@ -129,10 +133,10 @@ namespace mitk
     LabelSetImage::Pointer ComputeMLPreview(const Image *inputAtTimeStep, TimeStepType timeStep) override;
 
   private:
-    std::string m_Model;
-    std::string m_Trainer;
-    std::string m_PlanId;
-    std::string m_Task;
+    //std::string m_Model;
+    //std::string m_Trainer;
+    //std::string m_PlanId;
+    //std::string m_Task;
     std::string m_nnUNetDirectory;
     std::string m_ModelDirectory;
     std::string m_PythonPath;

@@ -105,20 +105,20 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       QString trainer = splitParts.first();
       QString planId = splitParts.last();
 
-      tool->SetModel(m_Model);
+      //tool->SetModel(m_Model);
       modelObject.m_Model = m_Model;
-      tool->SetTask(m_Task);
+      //tool->SetTask(m_Task);
       modelObject.m_Task = m_Task;
       tool->SetnnUNetDirectory(nnUNetDirectory);
       tool->SetPythonPath(pythonPath.toUtf8().constData());
       tool->SetModelDirectory(m_ModelDirectory.toUtf8().constData());
-      tool->m_Folds = folds;
+      //tool->m_Folds = folds;
       modelObject.m_Folds = folds;
-      tool->SetTrainer(trainer.toUtf8().constData());
+      //tool->SetTrainer(trainer.toUtf8().constData());
       modelObject.m_Trainer = trainer.toUtf8().constData();
-      tool->SetPlanId(planId.toUtf8().constData());
+      //tool->SetPlanId(planId.toUtf8().constData());
       modelObject.m_PlanId = planId.toUtf8().constData();
-
+      tool->params.clear();
       tool->params.push_back(modelObject);
 
       // checkboxes

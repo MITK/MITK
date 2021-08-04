@@ -79,10 +79,12 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   mitk::Image::Pointer _inputAtTimeStep = inputAtTimeStep->Clone();
   std::string mitkTempDir, inDir, outDir, inputImagePath, outputImagePath, scriptPath;
   std::string templateFilename = "XXXXXX_000_0000.nii.gz";
+
   map::utilities::ProcessExecutor::Pointer spExec = map::utilities::ProcessExecutor::New();
   itk::CStyleCommand::Pointer spCommand = itk::CStyleCommand::New();
   spCommand->SetCallback(&onRegistrationEvent);
   spExec->AddObserver(map::events::ExternalProcessOutputEvent(), spCommand);
+  map::utilities::ProcessExecutor::ArgumentListType args;
 
   mitkTempDir = mitk::IOUtil::CreateTemporaryDirectory("mitk-XXXXXX");
   inDir = mitk::IOUtil::CreateTemporaryDirectory("nnunet-in-XXXXXX", mitkTempDir);
@@ -129,7 +131,6 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     outDir = mitk::IOUtil::CreateTemporaryDirectory("nnunet-out-XXXXXX", mitkTempDir);
     outputImagePath = outDir + mitk::IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";
     modelparam.m_OutputPath = outDir;
-    map::utilities::ProcessExecutor::ArgumentListType args;
     args.clear();
     if (this->GetNoPip())
     {
@@ -142,29 +143,29 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     args.push_back(outDir);
 
     args.push_back("-t");
-    args.push_back(this->GetTask());
+    args.push_back(modelparam.m_Task);
 
-    if (this->GetModel().find("cascade") != std::string::npos)
+    if (modelparam.m_Model.find("cascade") != std::string::npos)
     {
       args.push_back("-ctr");
-      args.push_back(this->GetTrainer());
     }
     else
     {
       args.push_back("-tr");
-      args.push_back(this->GetTrainer());
     }
+    args.push_back(modelparam.m_Trainer);
+
     args.push_back("-m");
-    args.push_back(this->GetModel());
+    args.push_back(modelparam.m_Model);
     setenv("RESULTS_FOLDER", this->GetModelDirectory().c_str(), true);
 
     args.push_back("-p");
-    args.push_back(this->GetPlanId());
+    args.push_back(modelparam.m_PlanId);
 
-    if (!this->m_Folds.empty())
+    if (!modelparam.m_Folds.empty())
     {
       args.push_back("-f");
-      for (auto fold : this->m_Folds)
+      for (auto fold : modelparam.m_Folds)
       {
         args.push_back(fold);
       }
@@ -173,10 +174,10 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     // args.push_back("--all_in_gpu");
     // args.push_back(this->GetAllInGPU() ? std::string("True") : std::string("False"));
 
-    if (this->GetEnsemble())
-    {
-      args.push_back("--save_npz");
-    }
+    // if (this->GetEnsemble())
+    // {
+    //  args.push_back("--save_npz");
+    // }
     args.push_back("--num_threads_preprocessing");
     args.push_back(std::to_string(this->GetPreprocessingThreads()));
 
@@ -200,7 +201,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
         std::cout << arg << std::endl;
       }
       std::cout << "command " << command << std::endl;
-      // spExec->execute(this->GetPythonPath(), command, args);
+      spExec->execute(this->GetPythonPath(), command, args);
     }
     catch (const mitk::Exception &e)
     {
@@ -208,7 +209,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
       mitkThrow() << "An error occured while calling nnUNet process.";
       return nullptr;
     }
-    modelparam.outputImage = mitk::IOUtil::Load<mitk::Image>(outputImagePath);
+    //modelparam.outputImage = mitk::IOUtil::Load<mitk::Image>(outputImagePath);
   }
 
   mitk::Image::Pointer outputImage = mitk::IOUtil::Load<mitk::Image>(outputImagePath);

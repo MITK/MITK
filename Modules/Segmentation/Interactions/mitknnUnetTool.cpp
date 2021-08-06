@@ -52,7 +52,7 @@ const char *mitk::nnUNetTool::GetName() const
   return "nnUNet";
 }
 
-void onRegistrationEvent(itk::Object * /*pCaller*/, const itk::EventObject &e, void *)
+void onPythonProcessEvent(itk::Object * /*pCaller*/, const itk::EventObject &e, void *)
 {
   std::string testCOUT;
   std::string testCERR;
@@ -82,7 +82,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
 
   map::utilities::ProcessExecutor::Pointer spExec = map::utilities::ProcessExecutor::New();
   itk::CStyleCommand::Pointer spCommand = itk::CStyleCommand::New();
-  spCommand->SetCallback(&onRegistrationEvent);
+  spCommand->SetCallback(&onPythonProcessEvent);
   spExec->AddObserver(map::events::ExternalProcessOutputEvent(), spCommand);
   map::utilities::ProcessExecutor::ArgumentListType args;
 
@@ -123,7 +123,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     command = "python3";
   }
 
-  for (mitk::ModelParams modelparam : params)
+  for (mitk::ModelParams modelparam : m_Params)
   {
     std::size_t found = inputImagePath.find_last_of(mitk::IOUtil::GetDirectorySeparator());
     std::string fileName = inputImagePath.substr(found + 1);
@@ -209,7 +209,6 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
       mitkThrow() << "An error occured while calling nnUNet process.";
       return nullptr;
     }
-    //modelparam.outputImage = mitk::IOUtil::Load<mitk::Image>(outputImagePath);
   }
 
   mitk::Image::Pointer outputImage = mitk::IOUtil::Load<mitk::Image>(outputImagePath);

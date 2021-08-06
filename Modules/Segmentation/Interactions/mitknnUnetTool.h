@@ -28,7 +28,7 @@ namespace mitk
   class MITKSEGMENTATION_EXPORT ModelParams
   {
     public:
-    mitkClassMacroNoParent(ModelParams);
+    //mitkClassMacroNoParent(ModelParams);
 
     std::string m_Task;
     std::vector<std::string> m_Folds;
@@ -36,8 +36,6 @@ namespace mitk
     std::string m_Trainer;
     std::string m_PlanId;
     std::string m_OutputPath;
-    mitk::Image::Pointer outputImage;
-
   };
   /**
     \brief nnUNet segmentation tool.
@@ -121,7 +119,7 @@ namespace mitk
     itkBooleanMacro(Ensemble);
 
     //std::vector<std::string> m_Folds;
-    std::vector<mitk::ModelParams> params;
+    std::vector<mitk::ModelParams> m_Params;
 
     itkSetMacro(PreprocessingThreads, unsigned int);
     itkGetConstMacro(PreprocessingThreads, unsigned int);

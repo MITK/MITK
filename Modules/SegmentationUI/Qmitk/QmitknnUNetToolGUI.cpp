@@ -118,8 +118,8 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       modelObject.m_Trainer = trainer.toUtf8().constData();
       //tool->SetPlanId(planId.toUtf8().constData());
       modelObject.m_PlanId = planId.toUtf8().constData();
-      tool->params.clear();
-      tool->params.push_back(modelObject);
+      tool->m_Params.clear();
+      tool->m_Params.push_back(modelObject);
 
       // checkboxes
       // tool->SetUseGPU(m_Controls.gpuBox->isChecked());
@@ -187,7 +187,7 @@ void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &dir)
     it.next();
     QString filePath = it.fileName();
     // models.push_back(filePath);
-    if (!filePath.startsWith('.') && !filePath.startsWith("ensemble"))
+    if (!filePath.startsWith('.')) //&& !filePath.startsWith("ensemble"))
     { // Filter out irrelevent hidden folders, if any.
       m_Controls.modelBox->addItem(filePath);
     }

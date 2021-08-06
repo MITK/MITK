@@ -52,7 +52,7 @@ private:
   void ClearAllComboBoxes();
 
   //Declaring variables for strings and int only.
-  std::string m_Model;
+  QString m_Model;
   std::string m_Task;
   //std::string m_nnUNetDirectory;
   //std::string m_ModelDirectory;

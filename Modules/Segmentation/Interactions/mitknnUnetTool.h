@@ -82,6 +82,9 @@ namespace mitk
     itkSetMacro(PythonPath, std::string);
     itkGetConstMacro(PythonPath, std::string);
 
+    itkSetMacro(PostProcessingJsonDirectory, std::string);
+    itkGetConstMacro(PostProcessingJsonDirectory, std::string);
+
     itkSetMacro(UseGPU, bool);
     itkGetConstMacro(UseGPU, bool);
     itkBooleanMacro(UseGPU);
@@ -138,6 +141,7 @@ namespace mitk
     std::string m_nnUNetDirectory;
     std::string m_ModelDirectory;
     std::string m_PythonPath;
+    std::string m_PostProcessingJsonDirectory;
     bool m_UseGPU;
     bool m_LowRes; // remove?
     bool m_AllInGPU;

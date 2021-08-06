@@ -54,7 +54,7 @@ namespace mitk
       for (unsigned long idx = 0; idx<input.GetNumberOfFiles(); idx++)
       {
         auto filename = input.GetFile(idx);
-        if (!itksys::SystemTools::FileIsDirectory(filename) && this->MatchesExtension(filename ))
+        if (!itksys::SystemTools::FileIsDirectory(filename) && this->MatchesExtension(filename))
         {
           std::string fullpath = path + "/" + std::string(input.GetFile(idx));
           files.push_back(fullpath.c_str());

@@ -75,17 +75,17 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
   {
     try
     {
-      mitk::ModelParams modelObject;
       tool->m_Params.clear();
       // comboboxes
-      m_Model = m_Controls.modelBox->itemText(m_Controls.modelBox->currentIndex());//.toUtf8().constData();
-      m_Task = m_Controls.taskBox->itemText(m_Controls.taskBox->currentIndex()).toUtf8().constData();
+      // m_Model = m_Controls.modelBox->itemText(m_Controls.modelBox->currentIndex()); //.toUtf8().constData();
+      m_Model = m_Controls.modelBox->currentText(); //.toUtf8().constData();
+      m_Task = m_Controls.taskBox->currentText().toUtf8().constData();
       std::string nnUNetDirectory = "";
       if (m_Controls.multiModalBox->isChecked())
       {
         nnUNetDirectory = m_Controls.codedirectoryBox->directory().toUtf8().constData();
       }
-      QString pythonPathTextItem = m_Controls.pythonEnvComboBox->itemText(m_Controls.pythonEnvComboBox->currentIndex());
+      QString pythonPathTextItem = m_Controls.pythonEnvComboBox->currentText();
       QString pythonPath = pythonPathTextItem.mid(pythonPathTextItem.indexOf(" ") + 1);
       if (!(pythonPath.endsWith("bin", Qt::CaseInsensitive) || pythonPath.endsWith("bin/", Qt::CaseInsensitive)))
       {
@@ -93,55 +93,57 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       }
       std::vector<std::string> folds;
 
-     
-        if (!(m_Controls.foldBox->allChecked() || m_Controls.foldBox->noneChecked()))
-        {
-          QModelIndexList foldList = m_Controls.foldBox->checkedIndexes();
-          foreach (QModelIndex index, foldList)
-          {
-            QString foldQString =
-              m_Controls.foldBox->itemText(index.row()).split("_", QString::SplitBehavior::SkipEmptyParts).last();
-            folds.push_back(foldQString.toUtf8().constData());
-          }
-        }
-      
-      QString trainerPlanner = m_Controls.trainerBox->itemText(m_Controls.trainerBox->currentIndex());
-       if (m_Model.startsWith("ensemble"), Qt::CaseInsensitive)
+      if (!(m_Controls.foldBox->allChecked() || m_Controls.foldBox->noneChecked()))
       {
+        QModelIndexList foldList = m_Controls.foldBox->checkedIndexes();
+        foreach (QModelIndex index, foldList)
+        {
+          QString foldQString =
+            m_Controls.foldBox->itemText(index.row()).split("_", QString::SplitBehavior::SkipEmptyParts).last();
+          folds.push_back(foldQString.toUtf8().constData());
+        }
+      }
+
+      QString trainerPlanner = m_Controls.trainerBox->currentText();//itemText(m_Controls.trainerBox->currentIndex());
+      if (m_Model.startsWith("ensemble", Qt::CaseInsensitive))
+      {
+        std::cout << m_Model.toUtf8().constData() << std::endl;
         tool->EnsembleOn();
         QStringList models = trainerPlanner.split("--", QString::SplitBehavior::SkipEmptyParts);
-        foreach(QString model, models){
-            model.remove("ensemble_",Qt::CaseInsensitive);
-            mitk::ModelParams modelObject;
-            QStringList splitParts = model.split("__", QString::SplitBehavior::SkipEmptyParts);
-            QString modelName = splitParts.first();
-            QString trainer = splitParts.at(1);
-            QString planId = splitParts.at(2);
-            
-            modelObject.m_Model = modelName.toUtf8().constData();
-            modelObject.m_Trainer = trainer.toUtf8().constData();
-            modelObject.m_PlanId = planId.toUtf8().constData();
-            tool->m_Params.push_back(modelObject);
+        foreach (QString model, models)
+        {
+          model.remove("ensemble_", Qt::CaseInsensitive);
+          mitk::ModelParams modelObject;
+          QStringList splitParts = model.split("__", QString::SplitBehavior::SkipEmptyParts);
+          QString modelName = splitParts.first();
+          QString trainer = splitParts.at(1);
+          QString planId = splitParts.at(2);
+
+          modelObject.m_Model = modelName.toUtf8().constData();
+          modelObject.m_Trainer = trainer.toUtf8().constData();
+          modelObject.m_PlanId = planId.toUtf8().constData();
+          tool->m_Params.push_back(modelObject);
         }
-        
-      }else
+      }
+      else
       {
-      QStringList splitParts = trainerPlanner.split("__", QString::SplitBehavior::SkipEmptyParts);
-      QString trainer = splitParts.first();
-      QString planId = splitParts.last();
-      
-      // tool->SetModel(m_Model);
-      modelObject.m_Model = m_Model.toUtf8().constData();
-      // tool->SetTask(m_Task);
-      modelObject.m_Task = m_Task;
-      // tool->m_Folds = folds;
-      modelObject.m_Folds = folds;
-      // tool->SetTrainer(trainer.toUtf8().constData());
-      modelObject.m_Trainer = trainer.toUtf8().constData();
-      // tool->SetPlanId(planId.toUtf8().constData());
-      modelObject.m_PlanId = planId.toUtf8().constData();
-      tool->m_Params.clear();
-      tool->m_Params.push_back(modelObject);
+        mitk::ModelParams modelObject;
+        QStringList splitParts = trainerPlanner.split("__", QString::SplitBehavior::SkipEmptyParts);
+        QString trainer = splitParts.first();
+        QString planId = splitParts.last();
+
+        // tool->SetModel(m_Model);
+        modelObject.m_Model = m_Model.toUtf8().constData();
+        // tool->SetTask(m_Task);
+        modelObject.m_Task = m_Task;
+        // tool->m_Folds = folds;
+        modelObject.m_Folds = folds;
+        // tool->SetTrainer(trainer.toUtf8().constData());
+        modelObject.m_Trainer = trainer.toUtf8().constData();
+        // tool->SetPlanId(planId.toUtf8().constData());
+        modelObject.m_PlanId = planId.toUtf8().constData();
+        tool->m_Params.clear();
+        tool->m_Params.push_back(modelObject);
       }
 
       tool->SetnnUNetDirectory(nnUNetDirectory);
@@ -203,6 +205,7 @@ void QmitknnUNetToolGUI::ClearAllComboBoxes()
   m_Controls.foldBox->clear();
   m_Controls.trainerBox->clear();
 }
+
 void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &dir)
 {
   this->ClearAllComboBoxes();
@@ -261,7 +264,7 @@ void QmitknnUNetToolGUI::OnModelChanged(const QString &text)
 
 void QmitknnUNetToolGUI::OnTrainerChanged(const QString &trainerSelected)
 {
-  if (m_Controls.modelBox->currentText() != "ensemble")
+  if (m_Controls.modelBox->currentText() != "ensembles")
   {
     m_ModelDirectory = m_Controls.modeldirectoryBox->directory(); // check syntax
     QString updatedPath(QDir::cleanPath(m_ModelDirectory + QDir::separator() + m_Controls.modelBox->currentText() +
@@ -277,6 +280,10 @@ void QmitknnUNetToolGUI::OnTrainerChanged(const QString &trainerSelected)
         m_Controls.foldBox->addItem(fold);
       }
     }
+  }
+  else
+  {
+    m_Controls.foldBox->clear();
   }
 }
 

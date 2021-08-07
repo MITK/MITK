@@ -92,6 +92,9 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   inputImagePath =
     mitk::IOUtil::CreateTemporaryFile(tmpStream, templateFilename, inDir + mitk::IOUtil::GetDirectorySeparator());
   tmpStream.close();
+  std::size_t found = inputImagePath.find_last_of(mitk::IOUtil::GetDirectorySeparator());
+  std::string fileName = inputImagePath.substr(found + 1);
+  std::string token = fileName.substr(0, fileName.find("_"));
 
   if (this->GetNoPip())
   {
@@ -125,9 +128,6 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
 
   for (mitk::ModelParams modelparam : m_Params)
   {
-    std::size_t found = inputImagePath.find_last_of(mitk::IOUtil::GetDirectorySeparator());
-    std::string fileName = inputImagePath.substr(found + 1);
-    std::string token = fileName.substr(0, fileName.find("_"));
     outDir = mitk::IOUtil::CreateTemporaryDirectory("nnunet-out-XXXXXX", mitkTempDir);
     outputImagePath = outDir + mitk::IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";
     modelparam.m_OutputPath = outDir;
@@ -174,10 +174,6 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     // args.push_back("--all_in_gpu");
     // args.push_back(this->GetAllInGPU() ? std::string("True") : std::string("False"));
 
-    // if (this->GetEnsemble())
-    // {
-    //  args.push_back("--save_npz");
-    // }
     args.push_back("--num_threads_preprocessing");
     args.push_back(std::to_string(this->GetPreprocessingThreads()));
 
@@ -194,6 +190,11 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
       args.push_back("--disable_mixed_precision");
     }
 
+    if (this->GetEnsemble())
+    {
+      args.push_back("--save_npz");
+    }
+
     try
     {
       for (auto arg : args)
@@ -201,7 +202,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
         std::cout << arg << std::endl;
       }
       std::cout << "command " << command << std::endl;
-      spExec->execute(this->GetPythonPath(), command, args);
+      // spExec->execute(this->GetPythonPath(), command, args);
     }
     catch (const mitk::Exception &e)
     {
@@ -209,6 +210,24 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
       mitkThrow() << "An error occured while calling nnUNet process.";
       return nullptr;
     }
+  }
+  if (this->GetEnsemble())
+  {
+    args.clear();
+    command = "nnUNet_ensemble";
+    outDir = mitk::IOUtil::CreateTemporaryDirectory("nnunet-ensemble-out-XXXXXX", mitkTempDir);
+    outputImagePath = outDir + mitk::IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";
+
+    args.push_back("-f");
+    for (mitk::ModelParams modelparam : m_Params)
+    {
+      args.push_back(modelparam.m_OutputPath);
+    }
+
+    args.push_back("-pp");
+    args.push_back(this->GetPostProcessingJsonDirectory());
+
+    // spExec->execute(this->GetPythonPath(), command, args);
   }
 
   mitk::Image::Pointer outputImage = mitk::IOUtil::Load<mitk::Image>(outputImagePath);

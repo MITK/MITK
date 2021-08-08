@@ -28,7 +28,15 @@ namespace mitk
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, nnUNetTool, "nnUNet tool");
 }
 
-mitk::nnUNetTool::nnUNetTool() {}
+mitk::nnUNetTool::nnUNetTool() {
+  std::cout<< "in mitk nnUnet constructor"<< std::endl;
+  this->SetMitkTempDir(mitk::IOUtil::CreateTemporaryDirectory("mitk-XXXXXX"));
+}
+
+mitk::nnUNetTool::~nnUNetTool() {
+  std::cout<< "in mitk nnUnet destructor"<< std::endl;
+  itksys::SystemTools::RemoveADirectory(this->GetMitkTempDir());
+}
 
 void mitk::nnUNetTool::Activated()
 {
@@ -77,7 +85,7 @@ void onPythonProcessEvent(itk::Object * /*pCaller*/, const itk::EventObject &e, 
 mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inputAtTimeStep, TimeStepType /*timeStep*/)
 {
   mitk::Image::Pointer _inputAtTimeStep = inputAtTimeStep->Clone();
-  std::string mitkTempDir, inDir, outDir, inputImagePath, outputImagePath, scriptPath;
+  std::string inDir, outDir, inputImagePath, outputImagePath, scriptPath;
   std::string templateFilename = "XXXXXX_000_0000.nii.gz";
 
   map::utilities::ProcessExecutor::Pointer spExec = map::utilities::ProcessExecutor::New();
@@ -86,8 +94,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   spExec->AddObserver(map::events::ExternalProcessOutputEvent(), spCommand);
   map::utilities::ProcessExecutor::ArgumentListType args;
 
-  mitkTempDir = mitk::IOUtil::CreateTemporaryDirectory("mitk-XXXXXX");
-  inDir = mitk::IOUtil::CreateTemporaryDirectory("nnunet-in-XXXXXX", mitkTempDir);
+  inDir = mitk::IOUtil::CreateTemporaryDirectory("nnunet-in-XXXXXX", this->GetMitkTempDir());
   std::ofstream tmpStream;
   inputImagePath =
     mitk::IOUtil::CreateTemporaryFile(tmpStream, templateFilename, inDir + mitk::IOUtil::GetDirectorySeparator());
@@ -128,7 +135,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
 
   for (mitk::ModelParams modelparam : m_Params)
   {
-    outDir = mitk::IOUtil::CreateTemporaryDirectory("nnunet-out-XXXXXX", mitkTempDir);
+    outDir = mitk::IOUtil::CreateTemporaryDirectory("nnunet-out-XXXXXX", this->GetMitkTempDir());
     outputImagePath = outDir + mitk::IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";
     modelparam.m_OutputPath = outDir;
     args.clear();
@@ -190,7 +197,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
       args.push_back("--disable_mixed_precision");
     }
 
-    if (this->GetEnsemble())
+    if (this->GetEnsemble() && !this->GetPostProcessingJsonDirectory().empty())
     {
       args.push_back("--save_npz");
     }
@@ -211,11 +218,11 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
       return nullptr;
     }
   }
-  if (this->GetEnsemble())
+  if (this->GetEnsemble() && !this->GetPostProcessingJsonDirectory().empty())
   {
     args.clear();
     command = "nnUNet_ensemble";
-    outDir = mitk::IOUtil::CreateTemporaryDirectory("nnunet-ensemble-out-XXXXXX", mitkTempDir);
+    outDir = mitk::IOUtil::CreateTemporaryDirectory("nnunet-ensemble-out-XXXXXX", this->GetMitkTempDir());
     outputImagePath = outDir + mitk::IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";
 
     args.push_back("-f");
@@ -234,7 +241,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   mitk::LabelSetImage::Pointer resultImage = mitk::LabelSetImage::New();
   resultImage->InitializeByLabeledImage(outputImage);
   resultImage->SetGeometry(inputAtTimeStep->GetGeometry());
-  itksys::SystemTools::RemoveADirectory(mitkTempDir); // move to destuctor
+  //itksys::SystemTools::RemoveADirectory(mitkTempDir); // move to destuctor
   return resultImage;
 }
 

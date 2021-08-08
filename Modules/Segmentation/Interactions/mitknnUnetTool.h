@@ -82,6 +82,9 @@ namespace mitk
     itkSetMacro(PythonPath, std::string);
     itkGetConstMacro(PythonPath, std::string);
 
+    itkSetMacro(MitkTempDir, std::string);
+    itkGetConstMacro(MitkTempDir, std::string);
+
     itkSetMacro(PostProcessingJsonDirectory, std::string);
     itkGetConstMacro(PostProcessingJsonDirectory, std::string);
 
@@ -129,7 +132,8 @@ namespace mitk
 
   protected:
     nnUNetTool();
-    ~nnUNetTool() = default;
+    ~nnUNetTool() override; // why to override eventhough AutoMLSegmentationWithPreviewTool has no virtual destructor
+    //~nnUNetTool() = default; Are there any consequences of not using default?
 
     LabelSetImage::Pointer ComputeMLPreview(const Image *inputAtTimeStep, TimeStepType timeStep) override;
 
@@ -138,6 +142,7 @@ namespace mitk
     //std::string m_Trainer;
     //std::string m_PlanId;
     //std::string m_Task;
+    std::string m_MitkTempDir;
     std::string m_nnUNetDirectory;
     std::string m_ModelDirectory;
     std::string m_PythonPath;

@@ -104,25 +104,37 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
         }
       }
 
-      QString trainerPlanner = m_Controls.trainerBox->currentText();//itemText(m_Controls.trainerBox->currentIndex());
+      QString trainerPlanner = m_Controls.trainerBox->currentText(); // itemText(m_Controls.trainerBox->currentIndex());
       if (m_Model.startsWith("ensemble", Qt::CaseInsensitive))
       {
         std::cout << m_Model.toUtf8().constData() << std::endl;
-        tool->EnsembleOn();
-        QStringList models = trainerPlanner.split("--", QString::SplitBehavior::SkipEmptyParts);
-        foreach (QString model, models)
+        QString ppJsonFile =
+          QDir::cleanPath(m_ModelDirectory + QDir::separator() + m_Model + QDir::separator() + m_DatasetName +
+                          QDir::separator() + trainerPlanner + QDir::separator() + "postprocessing.json");
+        if (QDir(ppJsonFile).exists())
         {
-          model.remove("ensemble_", Qt::CaseInsensitive);
-          mitk::ModelParams modelObject;
-          QStringList splitParts = model.split("__", QString::SplitBehavior::SkipEmptyParts);
-          QString modelName = splitParts.first();
-          QString trainer = splitParts.at(1);
-          QString planId = splitParts.at(2);
+          tool->EnsembleOn();
+          QStringList models = trainerPlanner.split("--", QString::SplitBehavior::SkipEmptyParts);
+          foreach (QString model, models)
+          {
+            model.remove("ensemble_", Qt::CaseInsensitive);
+            mitk::ModelParams modelObject;
+            QStringList splitParts = model.split("__", QString::SplitBehavior::SkipEmptyParts);
+            QString modelName = splitParts.first();
+            QString trainer = splitParts.at(1);
+            QString planId = splitParts.at(2);
 
-          modelObject.m_Model = modelName.toUtf8().constData();
-          modelObject.m_Trainer = trainer.toUtf8().constData();
-          modelObject.m_PlanId = planId.toUtf8().constData();
-          tool->m_Params.push_back(modelObject);
+            modelObject.m_Model = modelName.toUtf8().constData();
+            modelObject.m_Trainer = trainer.toUtf8().constData();
+            modelObject.m_PlanId = planId.toUtf8().constData();
+            tool->m_Params.push_back(modelObject);
+          }
+          tool->SetPostProcessingJsonDirectory(ppJsonFile.toStdString());
+        }
+        else
+        {
+          std::cout << "post proc file not found" << std::endl;
+          // throw exception with message
         }
       }
       else

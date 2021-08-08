@@ -50,7 +50,6 @@ protected:
 private:
   void AutoParsePythonPaths();
   void ClearAllComboBoxes();
-
   //Declaring variables for strings and int only.
   QString m_Model;
   std::string m_Task;

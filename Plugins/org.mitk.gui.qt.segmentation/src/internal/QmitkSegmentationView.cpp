@@ -300,21 +300,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
   emptySegmentation->SetSelected(true);
   m_Controls->segImageSelector->SetCurrentSelectedNode(emptySegmentation);
 
-  mitk::Point3D currentPosition = mitk::Point3D();
-  if (nullptr != m_RenderWindowPart)
-  {
-    currentPosition = m_RenderWindowPart->GetSelectedPosition();
-  }
-
-  mitk::RenderingManager::GetInstance()->InitializeViews(
-    referenceImage->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, false);
-
-  if (nullptr != m_RenderWindowPart)
-  {
-    m_RenderWindowPart->SetSelectedPosition(currentPosition);
-  }
-
-  mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->SetPos(imageTimeStep);
+  this->InitializeRenderWindows(referenceImage->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, false);
 }
 
 void QmitkSegmentationView::OnVisiblePropertyChanged()

@@ -12,8 +12,6 @@ found in the LICENSE file.
 
 #include "QmitkFastMarchingToolGUI.h"
 
-#include "QmitkNewSegmentationDialog.h"
-
 #include "mitkBaseRenderer.h"
 #include "mitkStepper.h"
 #include <QApplication>

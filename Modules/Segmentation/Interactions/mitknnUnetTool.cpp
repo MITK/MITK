@@ -28,13 +28,15 @@ namespace mitk
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, nnUNetTool, "nnUNet tool");
 }
 
-mitk::nnUNetTool::nnUNetTool() {
-  std::cout<< "in mitk nnUnet constructor"<< std::endl;
+mitk::nnUNetTool::nnUNetTool()
+{
+  std::cout << "in mitk nnUnet constructor" << std::endl;
   this->SetMitkTempDir(mitk::IOUtil::CreateTemporaryDirectory("mitk-XXXXXX"));
 }
 
-mitk::nnUNetTool::~nnUNetTool() {
-  std::cout<< "in mitk nnUnet destructor"<< std::endl;
+mitk::nnUNetTool::~nnUNetTool()
+{
+  std::cout << "in mitk nnUnet destructor" << std::endl;
   itksys::SystemTools::RemoveADirectory(this->GetMitkTempDir());
 }
 
@@ -133,7 +135,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     command = "python3";
   }
 
-  for (mitk::ModelParams modelparam : m_Params)
+  for (mitk::ModelParams& modelparam : m_Params)
   {
     outDir = mitk::IOUtil::CreateTemporaryDirectory("nnunet-out-XXXXXX", this->GetMitkTempDir());
     outputImagePath = outDir + mitk::IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";
@@ -209,7 +211,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
         std::cout << arg << std::endl;
       }
       std::cout << "command " << command << std::endl;
-      // spExec->execute(this->GetPythonPath(), command, args);
+      spExec->execute(this->GetPythonPath(), command, args);
     }
     catch (const mitk::Exception &e)
     {
@@ -226,22 +228,25 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     outputImagePath = outDir + mitk::IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";
 
     args.push_back("-f");
-    for (mitk::ModelParams modelparam : m_Params)
+    for (mitk::ModelParams& modelparam : m_Params)
     {
       args.push_back(modelparam.m_OutputPath);
     }
 
+    args.push_back("-o");
+    args.push_back(outDir);
+
     args.push_back("-pp");
     args.push_back(this->GetPostProcessingJsonDirectory());
 
-    // spExec->execute(this->GetPythonPath(), command, args);
+    spExec->execute(this->GetPythonPath(), command, args);
   }
 
   mitk::Image::Pointer outputImage = mitk::IOUtil::Load<mitk::Image>(outputImagePath);
   mitk::LabelSetImage::Pointer resultImage = mitk::LabelSetImage::New();
   resultImage->InitializeByLabeledImage(outputImage);
   resultImage->SetGeometry(inputAtTimeStep->GetGeometry());
-  //itksys::SystemTools::RemoveADirectory(mitkTempDir); // move to destuctor
+  // itksys::SystemTools::RemoveADirectory(mitkTempDir); // move to destuctor
   return resultImage;
 }
 

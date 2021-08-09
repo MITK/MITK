@@ -91,27 +91,14 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       {
         pythonPath += QDir::separator() + QString("bin");
       }
-      std::vector<std::string> folds;
-
-      if (!(m_Controls.foldBox->allChecked() || m_Controls.foldBox->noneChecked()))
-      {
-        QModelIndexList foldList = m_Controls.foldBox->checkedIndexes();
-        foreach (QModelIndex index, foldList)
-        {
-          QString foldQString =
-            m_Controls.foldBox->itemText(index.row()).split("_", QString::SplitBehavior::SkipEmptyParts).last();
-          folds.push_back(foldQString.toUtf8().constData());
-        }
-      }
 
       QString trainerPlanner = m_Controls.trainerBox->currentText(); // itemText(m_Controls.trainerBox->currentIndex());
       if (m_Model.startsWith("ensemble", Qt::CaseInsensitive))
       {
-        std::cout << m_Model.toUtf8().constData() << std::endl;
         QString ppJsonFile =
           QDir::cleanPath(m_ModelDirectory + QDir::separator() + m_Model + QDir::separator() + m_DatasetName +
                           QDir::separator() + trainerPlanner + QDir::separator() + "postprocessing.json");
-        if (QDir(ppJsonFile).exists())
+        if (QFile(ppJsonFile).exists())
         {
           tool->EnsembleOn();
           QStringList models = trainerPlanner.split("--", QString::SplitBehavior::SkipEmptyParts);
@@ -127,6 +114,8 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
             modelObject.m_Model = modelName.toUtf8().constData();
             modelObject.m_Trainer = trainer.toUtf8().constData();
             modelObject.m_PlanId = planId.toUtf8().constData();
+            modelObject.m_Task = m_Task;
+            modelObject.m_Folds = std::vector<std::string>(1,"1");//only for testing
             tool->m_Params.push_back(modelObject);
           }
           tool->SetPostProcessingJsonDirectory(ppJsonFile.toStdString());
@@ -149,7 +138,7 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
         // tool->SetTask(m_Task);
         modelObject.m_Task = m_Task;
         // tool->m_Folds = folds;
-        modelObject.m_Folds = folds;
+        modelObject.m_Folds = FetchFoldsFromUI();
         // tool->SetTrainer(trainer.toUtf8().constData());
         modelObject.m_Trainer = trainer.toUtf8().constData();
         // tool->SetPlanId(planId.toUtf8().constData());
@@ -371,4 +360,20 @@ void QmitknnUNetToolGUI::AutoParsePythonPaths()
     }
   }
   m_Controls.pythonEnvComboBox->setCurrentIndex(-1);
+}
+
+std::vector<std::string> QmitknnUNetToolGUI::FetchFoldsFromUI()
+{
+  std::vector<std::string> folds;
+  if (!(m_Controls.foldBox->allChecked() || m_Controls.foldBox->noneChecked()))
+  {
+    QModelIndexList foldList = m_Controls.foldBox->checkedIndexes();
+    foreach (QModelIndex index, foldList)
+    {
+      QString foldQString =
+        m_Controls.foldBox->itemText(index.row()).split("_", QString::SplitBehavior::SkipEmptyParts).last();
+      folds.push_back(foldQString.toUtf8().constData());
+    }
+  }
+  return folds;
 }

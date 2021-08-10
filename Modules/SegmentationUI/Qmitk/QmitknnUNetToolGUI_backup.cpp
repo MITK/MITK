@@ -70,7 +70,6 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
 
 void QmitknnUNetToolGUI::OnSettingsAccept()
 {
-  bool doSeg = true;
   auto tool = this->GetConnectedToolAs<mitk::nnUNetTool>();
   if (nullptr != tool)
   {
@@ -78,9 +77,9 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
     {
       tool->m_Params.clear();
       // comboboxes
-      m_Model = m_Controls.modelBox->currentText();
+      m_Model = m_Controls.modelBox->currentText(); 
       m_Task = m_Controls.taskBox->currentText().toUtf8().constData();
-      std::string nnUNetDirectory = "";
+      std::string nnUNetDirectory;
       if (m_Controls.multiModalBox->isChecked())
       {
         nnUNetDirectory = m_Controls.codedirectoryBox->directory().toUtf8().constData();
@@ -92,7 +91,7 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
         pythonPath += QDir::separator() + QString("bin");
       }
 
-      QString trainerPlanner = m_Controls.trainerBox->currentText();
+      QString trainerPlanner = m_Controls.trainerBox->currentText(); // itemText(m_Controls.trainerBox->currentIndex());
       if (m_Model.startsWith("ensemble", Qt::CaseInsensitive))
       {
         QString ppJsonFile =
@@ -143,16 +142,6 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
         modelObject.m_Trainer = trainer.toUtf8().constData();
         // tool->SetPlanId(planId.toUtf8().constData());
         modelObject.m_PlanId = planId.toUtf8().constData();
-
-        QList<int> keyList = this->cache.keys();
-        foreach (int key, keyList)
-        {
-          nnUNetModel *value = this->cache[key];
-          if (value->request.m_Model == modelObject.m_Model)
-          {
-            doSeg = false;
-          }
-        }
         tool->m_Params.clear();
         tool->m_Params.push_back(modelObject);
       }
@@ -172,19 +161,8 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
 
       // Spinboxes
       tool->SetPreprocessingThreads(static_cast<unsigned int>(m_Controls.threadsBox->value()));
-      if (doSeg)
-      {
-        tool->UpdatePreview();
 
-        nnUNetModel *modelRequest = new nnUNetModel;
-        modelRequest->request = tool->m_Params[0];
-        this->cache.insert(0, modelRequest);
-        this->SetLabelSetPreview(tool->GetMLPreview());
-        tool->IsTimePointChangeAwareOn();
-      }
-      else{
-        std::cout<<"won't do segmentation" << std::endl;
-      }
+      tool->UpdatePreview();
     }
     catch (const std::exception &e)
     {
@@ -209,8 +187,8 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       return;
     }
 
-    //this->SetLabelSetPreview(tool->GetMLPreview());
-    //tool->IsTimePointChangeAwareOn();
+    this->SetLabelSetPreview(tool->GetMLPreview());
+    tool->IsTimePointChangeAwareOn();
   }
 }
 
@@ -228,9 +206,24 @@ void QmitknnUNetToolGUI::ClearAllComboBoxes()
   m_Controls.trainerBox->clear();
 }
 
+std::vector<QString> QmitknnUNetToolGUI::FetchFoldersFromDir(QString &path)
+{
+  std::vector<QString> folders;
+  for (QDirIterator it(path, QDir::AllDirs, QDirIterator::NoIteratorFlags); it.hasNext();)
+  {
+    it.next();
+    if (!it.fileName().startsWith('.'))
+    {
+      folders.push_back(it.fileName());
+    }
+  }
+  return folders;
+}
+
 void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &dir)
 {
   this->ClearAllComboBoxes();
+  this->models.empty();
   // std::vector<QString> models;
   QDirIterator it(dir, QDir::AllDirs, QDirIterator::NoIteratorFlags);
   while (it.hasNext())
@@ -238,15 +231,41 @@ void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &dir)
     it.next();
     QString filePath = it.fileName();
     // models.push_back(filePath);
-    if (!filePath.startsWith('.')) //&& !filePath.startsWith("ensemble"))
-    {                              // Filter out irrelevent hidden folders, if any.
-      m_Controls.modelBox->addItem(filePath);
+    if (!filePath.startsWith('.') && !filePath.startsWith("ensemble"))
+    { // Filter out irrelevent hidden folders, if any.
+      nnUNetModel model;
+      model.m_Name = filePath;
+      QString updatedPath(QDir::cleanPath(dir + QDir::separator() + filePath));
+      std::vector<QString> taskName = FetchFoldersFromDir(updatedPath);
+      model.m_Dataset = taskName[0]; //expecting only one value in the list
+      updatedPath = QDir::cleanPath(updatedPath + QDir::separator() + taskName[0]);
+      std::vector<QString> trainerPlanners = FetchFoldersFromDir(updatedPath);
+      model.m_TrainerPlanner = trainerPlanners[0]; //expecting only one value in the list
+      updatedPath = QDir::cleanPath(updatedPath + QDir::separator() + trainerPlanners[0]);
+      std::vector<QString> folds = FetchFoldersFromDir(updatedPath);
+      model.folds = folds;
+      this->models.push_back(model);
+            m_Controls.modelBox->addItem(filePath);
+
     }
   }
 }
 
 void QmitknnUNetToolGUI::OnModelChanged(const QString &text)
 {
+  m_Controls.trainerBox->clear();
+  m_Controls.taskBox->clear();
+  for (nnUNetModel model : this->models)
+  {
+    if (model.m_Name == text)
+    {
+      m_Controls.taskBox->addItem(model.m_Dataset);
+      m_Controls.trainerBox->addItem(model.m_TrainerPlanner);
+      break;
+    }
+  }
+
+  /*
   m_ModelDirectory = m_Controls.modeldirectoryBox->directory();
   QString updatedPath(QDir::cleanPath(m_ModelDirectory + QDir::separator() + text));
   // QString dataset_name;
@@ -281,11 +300,24 @@ void QmitknnUNetToolGUI::OnModelChanged(const QString &text)
       // }
       m_Controls.trainerBox->addItem(trainer);
     }
-  }
+  }*/
 }
 
 void QmitknnUNetToolGUI::OnTrainerChanged(const QString &trainerSelected)
 {
+  m_Controls.foldBox->clear();
+  for (nnUNetModel model : this->models)
+  {
+    if (model.m_TrainerPlanner == trainerSelected)
+    {
+      for (QString fold : model.folds)
+      {
+        m_Controls.foldBox->addItem(fold);
+      }
+      break;
+    }
+  }
+  /*
   if (m_Controls.modelBox->currentText() != "ensembles")
   {
     m_ModelDirectory = m_Controls.modeldirectoryBox->directory(); // check syntax
@@ -306,7 +338,7 @@ void QmitknnUNetToolGUI::OnTrainerChanged(const QString &trainerSelected)
   else
   {
     m_Controls.foldBox->clear();
-  }
+  }*/
 }
 
 void QmitknnUNetToolGUI::OnPythonChanged(const QString &pyEnv)

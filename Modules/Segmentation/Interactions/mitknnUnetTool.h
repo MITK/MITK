@@ -36,6 +36,7 @@ namespace mitk
     std::string m_Trainer;
     std::string m_PlanId;
     std::string m_OutputPath;
+    std::string m_OutputDir;
   };
   /**
     \brief nnUNet segmentation tool.

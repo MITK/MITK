@@ -139,7 +139,8 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   {
     outDir = mitk::IOUtil::CreateTemporaryDirectory("nnunet-out-XXXXXX", this->GetMitkTempDir());
     outputImagePath = outDir + mitk::IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";
-    modelparam.m_OutputPath = outDir;
+    modelparam.m_OutputDir = outDir;
+    modelparam.m_OutputPath = outputImagePath;
     args.clear();
     if (this->GetNoPip())
     {
@@ -211,7 +212,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
         std::cout << arg << std::endl;
       }
       std::cout << "command " << command << std::endl;
-      spExec->execute(this->GetPythonPath(), command, args);
+      //spExec->execute(this->GetPythonPath(), command, args);
     }
     catch (const mitk::Exception &e)
     {
@@ -246,7 +247,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   mitk::LabelSetImage::Pointer resultImage = mitk::LabelSetImage::New();
   resultImage->InitializeByLabeledImage(outputImage);
   resultImage->SetGeometry(inputAtTimeStep->GetGeometry());
-  // itksys::SystemTools::RemoveADirectory(mitkTempDir); // move to destuctor
+  // itksys::SystemTools::RemoveADirectory(mitkTempDir); // moved to destuctor
   return resultImage;
 }
 

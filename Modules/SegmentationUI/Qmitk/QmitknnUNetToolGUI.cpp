@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <QDirIterator>
 #include <QMessageBox>
 #include <QProcess>
+#include <QRandomGenerator>
 #include <QStringListModel>
 #include <QtGlobal>
 
@@ -62,6 +63,8 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   m_Controls.codedirectoryBox->setVisible(false);
   m_Controls.nnUnetdirLabel->setVisible(false);
   m_Controls.multiModalPath->setVisible(false);
+  m_Controls.multiModalLabel->setVisible(false);
+  m_Controls.multiModalBox->setVisible(false);
   m_Controls.multiModalPathLabel->setVisible(false);
 
   mainLayout->addLayout(m_Controls.verticalLayout);
@@ -71,6 +74,8 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
 void QmitknnUNetToolGUI::OnSettingsAccept()
 {
   bool doSeg = true;
+  quint32 keyFound(0);
+  quint32 requestId = QRandomGenerator::global()->generate();
   auto tool = this->GetConnectedToolAs<mitk::nnUNetTool>();
   if (nullptr != tool)
   {
@@ -143,14 +148,17 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
         modelObject.m_Trainer = trainer.toUtf8().constData();
         // tool->SetPlanId(planId.toUtf8().constData());
         modelObject.m_PlanId = planId.toUtf8().constData();
-
-        QList<int> keyList = this->cache.keys();
-        foreach (int key, keyList)
+        
+        QList<quint32> keyList = this->cache.keys();
+        foreach (quint32 key, keyList)
         {
           nnUNetModel *value = this->cache[key];
-          if (value->request.m_Model == modelObject.m_Model)
+          //if (value->request.m_Model == modelObject.m_Model)
+          if (value->request == modelObject)                  
           {
             doSeg = false;
+            keyFound = key;
+            break;
           }
         }
         tool->m_Params.clear();
@@ -175,15 +183,19 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       if (doSeg)
       {
         tool->UpdatePreview();
-
+        //Adding params and output Labelset image to Cache
         nnUNetModel *modelRequest = new nnUNetModel;
         modelRequest->request = tool->m_Params[0];
-        this->cache.insert(0, modelRequest);
+        modelRequest->outputImage = tool->GetMLPreview();
+        this->cache.insert(requestId, modelRequest);
         this->SetLabelSetPreview(tool->GetMLPreview());
-        tool->IsTimePointChangeAwareOn();
       }
-      else{
-        std::cout<<"won't do segmentation" << std::endl;
+      else if(keyFound != 0)
+      {
+        std::cout << "won't do segmentation" << std::endl;
+        nnUNetModel *value = this->cache.take(keyFound);
+        std::cout << "fetched value" << std::endl;
+        this->SetLabelSetPreview(value->outputImage);
       }
     }
     catch (const std::exception &e)
@@ -209,8 +221,8 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       return;
     }
 
-    //this->SetLabelSetPreview(tool->GetMLPreview());
-    //tool->IsTimePointChangeAwareOn();
+    // this->SetLabelSetPreview(tool->GetMLPreview());
+    tool->IsTimePointChangeAwareOn();
   }
 }
 
@@ -249,7 +261,7 @@ void QmitknnUNetToolGUI::OnModelChanged(const QString &text)
 {
   m_ModelDirectory = m_Controls.modeldirectoryBox->directory();
   QString updatedPath(QDir::cleanPath(m_ModelDirectory + QDir::separator() + text));
-  // QString dataset_name;
+  m_Controls.taskBox->clear();
   for (QDirIterator it(updatedPath, QDir::AllDirs, QDirIterator::NoIteratorFlags); it.hasNext();)
   {
     it.next();
@@ -267,18 +279,7 @@ void QmitknnUNetToolGUI::OnModelChanged(const QString &text)
     it.next();
     QString trainer = it.fileName();
     if (!trainer.startsWith('.')) // Filter out irrelevent hidden folders, if any.
-    {                             // trainers.push_back(trainer);+
-
-      // if (trainer.startsWith("ensemble"))
-      // {
-      //   trainer = trainer.remove("ensemble_");
-      //   QStringList splitParts = trainer.split("__", QString::SplitBehavior::SkipEmptyParts);
-      //   splitParts = splitParts.join("--").split("--", QString::SplitBehavior::SkipEmptyParts);
-      //   QStringList result;
-      //   result += splitParts.filter("2d", Qt::CaseInsensitive);
-      //   result += splitParts.filter("3d", Qt::CaseInsensitive);
-      //   trainer = result.join("--");
-      // }
+    {                             // trainers.push_back(trainer);
       m_Controls.trainerBox->addItem(trainer);
     }
   }

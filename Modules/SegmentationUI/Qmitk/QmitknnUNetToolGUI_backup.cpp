@@ -77,7 +77,7 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
     {
       tool->m_Params.clear();
       // comboboxes
-      m_Model = m_Controls.modelBox->currentText(); 
+      m_Model = m_Controls.modelBox->currentText();
       m_Task = m_Controls.taskBox->currentText().toUtf8().constData();
       std::string nnUNetDirectory;
       if (m_Controls.multiModalBox->isChecked())
@@ -223,9 +223,20 @@ std::vector<QString> QmitknnUNetToolGUI::FetchFoldersFromDir(QString &path)
 void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &dir)
 {
   this->ClearAllComboBoxes();
-  this->models.empty();
   // std::vector<QString> models;
   QDirIterator it(dir, QDir::AllDirs, QDirIterator::NoIteratorFlags);
+  while (it.hasNext())
+  {
+    it.next();
+    QString filePath = it.fileName();
+    // models.push_back(filePath);
+    if (!filePath.startsWith('.')) //&& !filePath.startsWith("ensemble"))
+    {                              // Filter out irrelevent hidden folders, if any.
+      m_Controls.modelBox->addItem(filePath);
+    }
+  }
+  /*
+  this->models.empty();
   while (it.hasNext())
   {
     it.next();
@@ -245,30 +256,32 @@ void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &dir)
       std::vector<QString> folds = FetchFoldersFromDir(updatedPath);
       model.folds = folds;
       this->models.push_back(model);
-            m_Controls.modelBox->addItem(filePath);
+      m_Controls.modelBox->addItem(filePath);
 
     }
   }
+  */
 }
 
 void QmitknnUNetToolGUI::OnModelChanged(const QString &text)
 {
-  m_Controls.trainerBox->clear();
-  m_Controls.taskBox->clear();
-  for (nnUNetModel model : this->models)
-  {
-    if (model.m_Name == text)
-    {
-      m_Controls.taskBox->addItem(model.m_Dataset);
-      m_Controls.trainerBox->addItem(model.m_TrainerPlanner);
-      break;
-    }
-  }
+  /* m_Controls.trainerBox->clear();
+   m_Controls.taskBox->clear();
+   for (nnUNetModel model : this->models)
+   {
+     if (model.m_Name == text)
+     {
+       m_Controls.taskBox->addItem(model.m_Dataset);
+       m_Controls.trainerBox->addItem(model.m_TrainerPlanner);
+       break;
+     }
+   }
+ */
 
-  /*
   m_ModelDirectory = m_Controls.modeldirectoryBox->directory();
   QString updatedPath(QDir::cleanPath(m_ModelDirectory + QDir::separator() + text));
   // QString dataset_name;
+  m_Controls.taskBox->clear();
   for (QDirIterator it(updatedPath, QDir::AllDirs, QDirIterator::NoIteratorFlags); it.hasNext();)
   {
     it.next();
@@ -287,37 +300,26 @@ void QmitknnUNetToolGUI::OnModelChanged(const QString &text)
     QString trainer = it.fileName();
     if (!trainer.startsWith('.')) // Filter out irrelevent hidden folders, if any.
     {                             // trainers.push_back(trainer);+
-
-      // if (trainer.startsWith("ensemble"))
-      // {
-      //   trainer = trainer.remove("ensemble_");
-      //   QStringList splitParts = trainer.split("__", QString::SplitBehavior::SkipEmptyParts);
-      //   splitParts = splitParts.join("--").split("--", QString::SplitBehavior::SkipEmptyParts);
-      //   QStringList result;
-      //   result += splitParts.filter("2d", Qt::CaseInsensitive);
-      //   result += splitParts.filter("3d", Qt::CaseInsensitive);
-      //   trainer = result.join("--");
-      // }
       m_Controls.trainerBox->addItem(trainer);
     }
-  }*/
+  }
 }
 
 void QmitknnUNetToolGUI::OnTrainerChanged(const QString &trainerSelected)
 {
-  m_Controls.foldBox->clear();
-  for (nnUNetModel model : this->models)
-  {
-    if (model.m_TrainerPlanner == trainerSelected)
-    {
-      for (QString fold : model.folds)
-      {
-        m_Controls.foldBox->addItem(fold);
-      }
-      break;
-    }
-  }
-  /*
+  /* m_Controls.foldBox->clear();
+   for (nnUNetModel model : this->models)
+   {
+     if (model.m_TrainerPlanner == trainerSelected)
+     {
+       for (QString fold : model.folds)
+       {
+         m_Controls.foldBox->addItem(fold);
+       }
+       break;
+     }
+   }*/
+
   if (m_Controls.modelBox->currentText() != "ensembles")
   {
     m_ModelDirectory = m_Controls.modeldirectoryBox->directory(); // check syntax
@@ -338,7 +340,7 @@ void QmitknnUNetToolGUI::OnTrainerChanged(const QString &trainerSelected)
   else
   {
     m_Controls.foldBox->clear();
-  }*/
+  }
 }
 
 void QmitknnUNetToolGUI::OnPythonChanged(const QString &pyEnv)

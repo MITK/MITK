@@ -24,17 +24,17 @@ class MITKSEGMENTATIONUI_EXPORT nnUNetModel
 {
 public:
   mitk::ModelParams request;
-  mitk::Image::Pointer outputImage;
+  const mitk::LabelSetImage* outputImage;
   friend class nnUNetEnsemble; // not really necessary?
 };
 
-class MITKSEGMENTATIONUI_EXPORT nnUNetEnsemble
+/*class MITKSEGMENTATIONUI_EXPORT nnUNetEnsemble
 {
 public:
   nnUNetModel model1;
   nnUNetModel model2;
   std::string ppJsonDir;
-};
+};*/
 
 class MITKSEGMENTATIONUI_EXPORT QmitknnUNetToolGUI : public QmitkAutoMLSegmentationToolGUIBase
 {
@@ -45,9 +45,9 @@ public:
   itkFactorylessNewMacro(Self);
   itkCloneMacro(Self);
 
-  std::vector<nnUNetModel> models;
+  //std::vector<nnUNetModel> models;
   //std::vector<nnUNetEnsemble> ensembles;
-  QCache<int, nnUNetModel> cache;
+  QCache<quint32, nnUNetModel> cache;
 
 
 protected slots:

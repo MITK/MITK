@@ -37,6 +37,11 @@ namespace mitk
     std::string m_PlanId;
     std::string m_OutputPath;
     std::string m_OutputDir;
+
+    bool operator==(const ModelParams &other) const {
+      return ((this->m_Task == other.m_Task)
+          && (this->m_Model == other.m_Model));
+  }
   };
   /**
     \brief nnUNet segmentation tool.

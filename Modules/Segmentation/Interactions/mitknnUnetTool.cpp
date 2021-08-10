@@ -212,7 +212,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
         std::cout << arg << std::endl;
       }
       std::cout << "command " << command << std::endl;
-      //spExec->execute(this->GetPythonPath(), command, args);
+      spExec->execute(this->GetPythonPath(), command, args);
     }
     catch (const mitk::Exception &e)
     {

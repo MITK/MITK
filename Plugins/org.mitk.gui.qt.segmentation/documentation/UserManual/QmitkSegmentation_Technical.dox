@@ -84,7 +84,11 @@ class also performs this interpolation for single slices on demand.
 Again, we have a second class responsible for the GUI:
 QmitkSlicesInterpolator enables/disables interpolation and offers to
 accept interpolations for one or all slices.
-<li> <b>Undo</b>: Undo functionality is implemented in
+<li> <b>Undo</b>: Undo functionality is implemented using mitk::DiffSliceOperation.
+mitk::SegTool2D::WriteSliceToVolume stores the original image and the modified slice to the undo stack as an
+mitk::DiffSliceOperation. When the user requests undo, this mitk::DiffSliceOperation will be executed by a singleton
+class DiffSliceOperationApplier. The operation itself observes the image, which it refers to, for itk::DeleteEvent,
+so no undo operation will be executed on/for images that have already been destroyed.
 <li> <b>GUI</b>: The top-level GUI is the view
 QmitkSegmentation, which is very thin in comparison to ERIS. There are
 separate widgets for image and tool selection, for interpolation. Additionaly,

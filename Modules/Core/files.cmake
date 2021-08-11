@@ -316,6 +316,7 @@ Interactions/DisplayConfigMITKRotation.xml
 Interactions/DisplayConfigMITKRotationUnCoupled.xml
 Interactions/DisplayConfigMITKSwivel.xml
 Interactions/DisplayConfigMITKLimited.xml
+Interactions/DisplayConfigBlockLMB.xml
 Interactions/PointSet.xml
 Interactions/Legacy/StateMachine.xml
 Interactions/Legacy/DisplayConfigMITKTools.xml

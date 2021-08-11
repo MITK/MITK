@@ -27,8 +27,8 @@ namespace mitk
 {
   class MITKSEGMENTATION_EXPORT ModelParams
   {
-    public:
-    //mitkClassMacroNoParent(ModelParams);
+  public:
+    // mitkClassMacroNoParent(ModelParams);
 
     std::string m_Task;
     std::vector<std::string> m_Folds;
@@ -38,10 +38,10 @@ namespace mitk
     std::string m_OutputPath;
     std::string m_OutputDir;
 
-    bool operator==(const ModelParams &other) const {
-      return ((this->m_Task == other.m_Task)
-          && (this->m_Model == other.m_Model));
-  }
+    bool operator==(const ModelParams &other) const
+    {
+      return ((this->m_Task == other.m_Task) && (this->m_Model == other.m_Model));
+    }
   };
   /**
     \brief nnUNet segmentation tool.
@@ -70,8 +70,8 @@ namespace mitk
     // itkSetMacro(Task, std::string);
     // itkGetConstMacro(Task, std::string);
 
-    //itkSetMacro(Folds, std::vector); //-- can't call macro for std::vector
-    //itkGetConstMacro(Folds, std::vector<std::string>);
+    // itkSetMacro(Folds, std::vector); //-- can't call macro for std::vector
+    // itkGetConstMacro(Folds, std::vector<std::string>);
 
     // itkSetMacro(Trainer, std::string);
     // itkGetConstMacro(Trainer, std::string);
@@ -130,7 +130,7 @@ namespace mitk
     itkGetConstMacro(Ensemble, bool);
     itkBooleanMacro(Ensemble);
 
-    //std::vector<std::string> m_Folds;
+    // std::vector<std::string> m_Folds;
     std::vector<mitk::ModelParams> m_Params;
 
     itkSetMacro(PreprocessingThreads, unsigned int);
@@ -144,10 +144,10 @@ namespace mitk
     LabelSetImage::Pointer ComputeMLPreview(const Image *inputAtTimeStep, TimeStepType timeStep) override;
 
   private:
-    //std::string m_Model;
-    //std::string m_Trainer;
-    //std::string m_PlanId;
-    //std::string m_Task;
+    // std::string m_Model;
+    // std::string m_Trainer;
+    // std::string m_PlanId;
+    // std::string m_Task;
     std::string m_MitkTempDir;
     std::string m_nnUNetDirectory;
     std::string m_ModelDirectory;

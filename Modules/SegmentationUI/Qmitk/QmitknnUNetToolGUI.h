@@ -25,7 +25,9 @@ class MITKSEGMENTATIONUI_EXPORT nnUNetModel
 public:
   mitk::ModelParams request;
   const mitk::LabelSetImage* outputImage;
-  friend class nnUNetEnsemble; // not really necessary?
+  nnUNetModel(const mitk::LabelSetImage* image):outputImage(image){
+  }
+  //friend class nnUNetEnsemble; // not really necessary?
 };
 
 /*class MITKSEGMENTATIONUI_EXPORT nnUNetEnsemble

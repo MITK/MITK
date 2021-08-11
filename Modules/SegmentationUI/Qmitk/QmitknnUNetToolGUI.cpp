@@ -74,6 +74,7 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
 void QmitknnUNetToolGUI::OnSettingsAccept()
 {
   bool doSeg = true;
+  std::cout << "clicked" << std::endl;
   quint32 keyFound(0);
   quint32 requestId = QRandomGenerator::global()->generate();
   auto tool = this->GetConnectedToolAs<mitk::nnUNetTool>();
@@ -148,21 +149,25 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
         modelObject.m_Trainer = trainer.toUtf8().constData();
         // tool->SetPlanId(planId.toUtf8().constData());
         modelObject.m_PlanId = planId.toUtf8().constData();
-        
+
         QList<quint32> keyList = this->cache.keys();
         foreach (quint32 key, keyList)
         {
           nnUNetModel *value = this->cache[key];
-          //if (value->request.m_Model == modelObject.m_Model)
-          if (value->request == modelObject)                  
+          // if (value->request.m_Model == modelObject.m_Model)
+          if (value->request == modelObject)
           {
             doSeg = false;
             keyFound = key;
+            std::cout << "Key found: " << QString::number(key).toStdString() << std::endl;
             break;
           }
         }
-        tool->m_Params.clear();
-        tool->m_Params.push_back(modelObject);
+        if (doSeg)
+        {
+          tool->m_Params.clear();
+          tool->m_Params.push_back(modelObject);
+        }
       }
 
       tool->SetnnUNetDirectory(nnUNetDirectory);
@@ -183,19 +188,26 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       if (doSeg)
       {
         tool->UpdatePreview();
-        //Adding params and output Labelset image to Cache
-        nnUNetModel *modelRequest = new nnUNetModel;
-        modelRequest->request = tool->m_Params[0];
-        modelRequest->outputImage = tool->GetMLPreview();
-        this->cache.insert(requestId, modelRequest);
         this->SetLabelSetPreview(tool->GetMLPreview());
+        std::cout << "New pointer: " << tool->GetMLPreview() << std::endl;
+        std::cout << "New request: " << QString::number(requestId).toStdString() << std::endl;
+        // Adding params and output Labelset image to Cache
+        nnUNetModel *modelRequest = new nnUNetModel(tool->GetMLPreview());
+        modelRequest->request = tool->m_Params[0];
+        std::cout << "New model " << modelRequest->request.m_Model << std::endl;
+        this->cache.insert(requestId, modelRequest);
       }
-      else if(keyFound != 0)
+      else if (keyFound != 0)
       {
-        std::cout << "won't do segmentation" << std::endl;
-        nnUNetModel *value = this->cache.take(keyFound);
-        std::cout << "fetched value" << std::endl;
-        this->SetLabelSetPreview(value->outputImage);
+        std::cout << "won't do segmentation. Key found: " << QString::number(keyFound).toStdString() << std::endl;
+        if (this->cache.contains(keyFound))
+        {
+          nnUNetModel *_model = this->cache[keyFound];
+          std::cout << "fetched pointer " << _model->outputImage << std::endl;
+          std::cout << "fetched model " << _model->request.m_Model << std::endl;
+
+          this->SetLabelSetPreview(_model->outputImage);
+        }
       }
     }
     catch (const std::exception &e)

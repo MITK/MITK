@@ -17,7 +17,6 @@ found in the LICENSE file.
 #include <QDirIterator>
 #include <QMessageBox>
 #include <QProcess>
-#include <QRandomGenerator>
 #include <QStringListModel>
 #include <QtGlobal>
 
@@ -75,8 +74,8 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
 {
   bool doSeg = true;
   std::cout << "clicked" << std::endl;
-  quint32 keyFound(0);
-  quint32 requestId = QRandomGenerator::global()->generate();
+  size_t keyFound(0);
+  //quint32 requestId = QRandomGenerator::global()->generate();
   auto tool = this->GetConnectedToolAs<mitk::nnUNetTool>();
   if (nullptr != tool)
   {
@@ -150,6 +149,13 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
         // tool->SetPlanId(planId.toUtf8().constData());
         modelObject.m_PlanId = planId.toUtf8().constData();
 
+        size_t hashVal = modelObject.generateHash();
+        if (this->cache.contains(hashVal)){
+          doSeg = false;
+          keyFound = hashVal;
+          std::cout << "Key found: " << keyFound << std::endl;
+        }
+        /*
         QList<quint32> keyList = this->cache.keys();
         foreach (quint32 key, keyList)
         {
@@ -162,7 +168,7 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
             std::cout << "Key found: " << QString::number(key).toStdString() << std::endl;
             break;
           }
-        }
+        }*/
         if (doSeg)
         {
           tool->m_Params.clear();
@@ -190,12 +196,13 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
         tool->UpdatePreview();
         this->SetLabelSetPreview(tool->GetMLPreview());
         std::cout << "New pointer: " << tool->GetMLPreview() << std::endl;
-        std::cout << "New request: " << QString::number(requestId).toStdString() << std::endl;
         // Adding params and output Labelset image to Cache
         nnUNetModel *modelRequest = new nnUNetModel(tool->GetMLPreview());
         modelRequest->request = tool->m_Params[0];
         std::cout << "New model " << modelRequest->request.m_Model << std::endl;
-        this->cache.insert(requestId, modelRequest);
+        size_t hashkey = modelRequest->request.generateHash();
+        std::cout << "New hash: " << hashkey << std::endl;
+        this->cache.insert(hashkey, modelRequest);
       }
       else if (keyFound != 0)
       {

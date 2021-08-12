@@ -49,7 +49,7 @@ public:
 
   //std::vector<nnUNetModel> models;
   //std::vector<nnUNetEnsemble> ensembles;
-  QCache<quint32, nnUNetModel> cache;
+  QCache<size_t, nnUNetModel> cache;
 
 
 protected slots:

@@ -25,10 +25,10 @@ namespace us
 
 namespace mitk
 {
-  class MITKSEGMENTATION_EXPORT ModelParams //change to struct
+  class MITKSEGMENTATION_EXPORT ModelParams // change to struct
   {
   public:
-    std::string m_Task; // remove m_ 
+    std::string m_Task; // remove m_
     std::vector<std::string> m_Folds;
     std::string m_Model;
     std::string m_Trainer;
@@ -39,6 +39,13 @@ namespace mitk
     bool operator==(const ModelParams &other) const
     {
       return ((this->m_Task == other.m_Task) && (this->m_Model == other.m_Model));
+    }
+
+    size_t generateHash() const
+    {
+      std::hash<std::string> str_hash;
+      std::string toHash = this->m_Task + this->m_Model;
+      return str_hash(toHash);
     }
   };
   /**

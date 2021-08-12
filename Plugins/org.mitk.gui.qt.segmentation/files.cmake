@@ -5,9 +5,7 @@ set(SRC_CPP_FILES
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
   QmitkSegmentationView.cpp
-  QmitkThresholdAction.cpp
   QmitkCreatePolygonModelAction.cpp
-  #QmitkStatisticsAction.cpp
   QmitkAutocropAction.cpp
   QmitkAutocropLabelSetImageAction.cpp
   Common/QmitkDataSelectionWidget.cpp
@@ -35,9 +33,7 @@ set(MOC_H_FILES
   src/QmitkSegmentationPreferencePage.h
   src/internal/mitkPluginActivator.h
   src/internal/QmitkSegmentationView.h
-  src/internal/QmitkThresholdAction.h
   src/internal/QmitkCreatePolygonModelAction.h
-  #src/internal/QmitkStatisticsAction.h
   src/internal/QmitkAutocropAction.h
   src/internal/QmitkAutocropLabelSetImageAction.h
   src/internal/Common/QmitkDataSelectionWidget.h

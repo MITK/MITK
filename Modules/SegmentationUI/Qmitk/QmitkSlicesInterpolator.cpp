@@ -22,7 +22,6 @@ found in the LICENSE file.
 #include "mitkInteractionConst.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkOperationEvent.h"
-#include "mitkOverwriteSliceImageFilter.h"
 #include "mitkProgressBar.h"
 #include "mitkProperties.h"
 #include "mitkRenderingManager.h"

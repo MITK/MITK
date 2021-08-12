@@ -23,7 +23,7 @@ namespace mitk
    @brief Operation, that holds information about some image difference
 
    This class stores undo information for DiffImageApplier.
-   Instances of this class are created e.g. by OverwriteSliceImageFilter.
+   Instances of this class are created e.g. by QmitkSlicesInterpolator.
    This works only for images with 1 channel (gray scale images, no color images).
 
    ApplyDiffImageOperation of course refers to an image (a segmentation usually).

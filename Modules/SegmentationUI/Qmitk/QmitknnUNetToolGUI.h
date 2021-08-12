@@ -24,7 +24,7 @@ class MITKSEGMENTATIONUI_EXPORT nnUNetModel
 {
 public:
   mitk::ModelParams request;
-  const mitk::LabelSetImage* outputImage;
+  mitk::LabelSetImage::ConstPointer outputImage;
   nnUNetModel(const mitk::LabelSetImage* image):outputImage(image){
   }
   //friend class nnUNetEnsemble; // not really necessary?

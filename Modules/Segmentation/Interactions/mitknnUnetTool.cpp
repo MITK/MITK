@@ -15,9 +15,9 @@ found in the LICENSE file.
 #include "mitkIOUtil.h"
 #include "mitkImage.h"
 #include "mitkLabelSetImage.h"
+#include "mitkProcessExecutor.h"
 #include <cstdlib>
 #include <itksys/SystemTools.hxx>
-#include <mapProcessExecutor.h>
 #include <usGetModuleContext.h>
 #include <usModule.h>
 #include <usModuleContext.h>
@@ -62,27 +62,30 @@ const char *mitk::nnUNetTool::GetName() const
   return "nnUNet";
 }
 
-void onPythonProcessEvent(itk::Object * /*pCaller*/, const itk::EventObject &e, void *)
+namespace
 {
-  std::string testCOUT;
-  std::string testCERR;
-  const map::events::ExternalProcessStdOutEvent *pEvent =
-    dynamic_cast<const map::events::ExternalProcessStdOutEvent *>(&e);
-
-  if (pEvent)
+  void onPythonProcessEvent(itk::Object * /*pCaller*/, const itk::EventObject &e, void *)
   {
-    testCOUT = testCOUT + pEvent->getComment();
-    std::cout << testCOUT << "\n";
-  }
+    std::string testCOUT;
+    std::string testCERR;
+    const auto *pEvent = dynamic_cast<const mitk::ExternalProcessStdOutEvent *>(&e);
 
-  const map::events::ExternalProcessStdErrEvent *pErrEvent =
-    dynamic_cast<const map::events::ExternalProcessStdErrEvent *>(&e);
+    if (pEvent)
+    {
+      testCOUT = testCOUT + pEvent->GetOutput();
+      MITK_INFO << testCOUT;
+    }
 
-  if (pErrEvent)
-  {
-    testCERR = testCERR + pErrEvent->getComment();
+    const auto *pErrEvent =
+      dynamic_cast<const mitk::ExternalProcessStdErrEvent *>(&e);
+
+    if (pErrEvent)
+    {
+      testCERR = testCERR + pErrEvent->GetOutput();
+      MITK_ERROR << testCERR;
+    }
   }
-}
+} // namespace
 
 mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inputAtTimeStep, TimeStepType /*timeStep*/)
 {
@@ -90,11 +93,11 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   std::string inDir, outDir, inputImagePath, outputImagePath, scriptPath;
   std::string templateFilename = "XXXXXX_000_0000.nii.gz";
 
-  map::utilities::ProcessExecutor::Pointer spExec = map::utilities::ProcessExecutor::New();
+  mitk::ProcessExecutor::Pointer spExec = mitk::ProcessExecutor::New();
   itk::CStyleCommand::Pointer spCommand = itk::CStyleCommand::New();
   spCommand->SetCallback(&onPythonProcessEvent);
-  spExec->AddObserver(map::events::ExternalProcessOutputEvent(), spCommand);
-  map::utilities::ProcessExecutor::ArgumentListType args;
+  spExec->AddObserver(mitk::ExternalProcessOutputEvent(), spCommand);
+  mitk::ProcessExecutor::ArgumentListType args;
 
   inDir = mitk::IOUtil::CreateTemporaryDirectory("nnunet-in-XXXXXX", this->GetMitkTempDir());
   std::ofstream tmpStream;
@@ -135,7 +138,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     command = "python3";
   }
 
-  for (mitk::ModelParams& modelparam : m_Params)
+  for (mitk::ModelParams &modelparam : m_Params)
   {
     outDir = mitk::IOUtil::CreateTemporaryDirectory("nnunet-out-XXXXXX", this->GetMitkTempDir());
     outputImagePath = outDir + mitk::IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";
@@ -229,7 +232,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     outputImagePath = outDir + mitk::IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";
 
     args.push_back("-f");
-    for (mitk::ModelParams& modelparam : m_Params)
+    for (mitk::ModelParams &modelparam : m_Params)
     {
       args.push_back(modelparam.m_OutputPath);
     }

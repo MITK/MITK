@@ -25,12 +25,10 @@ namespace us
 
 namespace mitk
 {
-  class MITKSEGMENTATION_EXPORT ModelParams
+  class MITKSEGMENTATION_EXPORT ModelParams //change to struct
   {
   public:
-    // mitkClassMacroNoParent(ModelParams);
-
-    std::string m_Task;
+    std::string m_Task; // remove m_ 
     std::vector<std::string> m_Folds;
     std::string m_Model;
     std::string m_Trainer;

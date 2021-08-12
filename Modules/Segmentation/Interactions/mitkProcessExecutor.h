@@ -1,131 +1,104 @@
-// -----------------------------------------------------------------------
-// MatchPoint - DKFZ translational registration framework
-//
-// Copyright (c) German Cancer Research Center (DKFZ),
-// Software development for Integrated Diagnostics and Therapy (SIDT).
-// ALL RIGHTS RESERVED.
-// See mapCopyright.txt or
-// http://www.dkfz.de/en/sidt/projects/MatchPoint/copyright.html
-//
-// This software is distributed WITHOUT ANY WARRANTY; without even
-// the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-// PURPOSE.  See the above copyright notices for more information.
-//
-//------------------------------------------------------------------------
-/*!
-// @file
-// @version $Revision$ (last changed revision)
-// @date    $Date$ (last change date)
-// @author  $Author$ (last changed by)
-// Subversion HeadURL: $HeadURL$
-*/
+/*============================================================================
 
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
+// Class is adapted from MatchPoint ProcessExecutor
 
 #ifndef __MITK_PROCESS_EXECUTOR_H
 #define __MITK_PROCESS_EXECUTOR_H
 
-
-#include <vector>
-
 #include <itkObject.h>
-
-//#include "mapString.h"
-
-//#include "mapMacros.h"
-#include "mitkEvents.h"
-//#include "mapClassMacros.h"
-//#include "mapMAPUtilitiesExports.h"
-#include <MitkSegmentationExports.h>
-
-/** Set built-in type.  Creates member set"name"() (e.g., setVisibility()); */
-#define maSetMacro(name,type) \
-	virtual void set##name (const type& value) \
-	{ \
-		if (this->_##name != value) \
-		{ \
-			this->_##name = value; \
-			this->Modified(); \
-		} \
-	}
-
-#define maGetConstMacro(name,type) \
-	virtual type get##name () const \
-	{ \
-		return this->_##name; \
-	}
+#include <vector>
 
 namespace mitk
 {
-	namespace events
-	{
-		/*!@class TaskBatchEvent1
-		 * @brief Base event indicating an output of an external process (e.g. by ProcessExecutor). The output is stored in the comment.
-		 * @ingroup Events
-		 */
-		maEventMacro(ExternalProcessOutputEvent, AnyMatchPointEvent, MITKSEGMENTATION_EXPORT);
+  class ExternalProcessOutputEvent : public itk::AnyEvent
+  {
+  public:
+    typedef ExternalProcessOutputEvent Self;
+    typedef itk::AnyEvent Superclass;
 
-		/*!@class TaskBatchEvent
-		 * @brief Event indicating an standard output (STDOUT) of an external process (e.g. by ProcessExecutor). The output is stored in the comment.
-		 * @ingroup Events
-		 */
-		maEventMacro(ExternalProcessStdOutEvent, ExternalProcessOutputEvent, MITKSEGMENTATION_EXPORT);
-		/*!@class TaskBatchEvent
-		* @brief Event indicating an error output of an external process (e.g. by ProcessExecutor). The output is stored in the comment.
-		* @ingroup Events
-		*/
-		maEventMacro(ExternalProcessStdErrEvent, ExternalProcessOutputEvent, MITKSEGMENTATION_EXPORT);
-	}  // namespace events
+    explicit ExternalProcessOutputEvent(const std::string &output = "") : m_Output(output) {}
+    ~ExternalProcessOutputEvent() override {}
 
-	namespace utilities
-	{
+    const char *GetEventName() const override { return "ExternalProcessOutputEvent"; }
+    bool CheckEvent(const ::itk::EventObject *e) const override { return dynamic_cast<const Self *>(e); }
+    itk::EventObject *MakeObject() const override { return new Self(m_Output); }
+    std::string GetOutput() const { return m_Output; }
 
-		/*! Helper class that allows to execute an application with arguments.
-		 * You may register an observer for an ExternalProcessOutputEvent, ExternalProcessStdOutEvent or ExternalProcessStdErrEvent
-		 * in order to get notified of any output.
-		 * @remark The events will only be invoked if the pipes are NOT(!) shared. By default the pipes are not shared.
-		 */
-		class MITKSEGMENTATION_EXPORT ProcessExecutor : public itk::Object
-		{
-		public:
-			using Self = ProcessExecutor;
-			using Superclass = ::itk::Object;
-			using Pointer = ::itk::SmartPointer<Self>;
-			using ConstPointer = ::itk::SmartPointer<const Self>;
+  private:
+    std::string m_Output;
+  };
 
-			itkTypeMacro(ProcessExecutor, ::itk::Object);
-			itkFactorylessNewMacro(Self);
+#define mitkProcessExecutorEventMacro(classname)                                                                       \
+  class classname : public ExternalProcessOutputEvent                                                                  \
+  {                                                                                                                    \
+  public:                                                                                                              \
+    typedef classname Self;                                                                                            \
+    typedef ExternalProcessOutputEvent Superclass;                                                                     \
+                                                                                                                       \
+    explicit classname(const std::string &output) : Superclass(output) {}                                              \
+    ~classname() override {}                                                                                           \
+                                                                                                                       \
+    virtual const char *GetEventName() const { return #classname; }                                                    \
+    virtual bool CheckEvent(const ::itk::EventObject *e) const { return dynamic_cast<const Self *>(e); }               \
+    virtual ::itk::EventObject *MakeObject() const { return new Self(this->GetOutput()); }                             \
+  };
 
-			maSetMacro(SharedOutputPipes, bool);
-			maGetConstMacro(SharedOutputPipes, bool);
+  mitkProcessExecutorEventMacro(ExternalProcessStdOutEvent);
+  mitkProcessExecutorEventMacro(ExternalProcessStdErrEvent);
 
-			using ArgumentListType = std::vector<std::string>;
+  /*! Helper class that allows to execute an application with arguments.
+   * You may register an observer for an ExternalProcessOutputEvent, ExternalProcessStdOutEvent or
+   * ExternalProcessStdErrEvent in order to get notified of any output.
+   * @remark The events will only be invoked if the pipes are NOT(!) shared. By default the pipes are not shared.
+   */
+  class /*MITKSEGMENTATION_EXPORT*/ ProcessExecutor : public itk::Object
+  {
+  public:
+    using Self = ProcessExecutor;
+    using Superclass = ::itk::Object;
+    using Pointer = ::itk::SmartPointer<Self>;
+    using ConstPointer = ::itk::SmartPointer<const Self>;
 
-			bool execute(const std::string& executionPath, const std::string& executableName,
-						 ArgumentListType argumentList);
+    itkTypeMacro(ProcessExecutor, ::itk::Object);
+    itkFactorylessNewMacro(Self);
 
-			/**Executes the process. This version assumes that the executable name is the first argument in the argument list
-			* and has already been converted to its OS dependent name via the static convert function of this class.*/
-			bool execute(const std::string& executionPath, const ArgumentListType& argumentList);
+    itkSetMacro(SharedOutputPipes, bool);
+    itkGetConstMacro(SharedOutputPipes, bool);
 
-			int getExitValue();
+    using ArgumentListType = std::vector<std::string>;
 
-			//static std::string getOSDependendExecutableName(const core::String& name);
+    bool execute(const std::string &executionPath, const std::string &executableName, ArgumentListType argumentList);
 
-		protected:
-			ProcessExecutor();
-			~ProcessExecutor() override;
+    /**Executes the process. This version assumes that the executable name is the first argument in the argument list
+     * and has already been converted to its OS dependent name via the static convert function of this class.*/
+    bool execute(const std::string &executionPath, const ArgumentListType &argumentList);
 
-			int _exitValue;
+    int getExitValue();
+    static std::string ensureCorrectOSPathSeparator(const std::string &);
 
-			/*! specifies if the child process should share the output pipes (true) or not (false).
-			 * If pipes are not shared the output will be passed by invoking ExternalProcessOutputEvents
-			 * @remark The events will only be invoked if the pipes are NOT(!) shared.*/
-			bool _SharedOutputPipes;
-		private:
-			ProcessExecutor(const Self& source) = delete;
-			void operator=(const Self&) = delete;  //purposely not implemented
-		};
+    static std::string getOSDependendExecutableName(const std::string &name);
 
-	}  // namespace utilities
-}  // namespace map
+  protected:
+    ProcessExecutor();
+    ~ProcessExecutor() override;
+
+    int _exitValue;
+
+    /*! specifies if the child process should share the output pipes (true) or not (false).
+     * If pipes are not shared the output will be passed by invoking ExternalProcessOutputEvents
+     * @remark The events will only be invoked if the pipes are NOT(!) shared.*/
+    bool m_SharedOutputPipes;
+  };
+
+} // namespace mitk
 #endif

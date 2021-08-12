@@ -1,169 +1,158 @@
-// -----------------------------------------------------------------------
-// MatchPoint - DKFZ translational registration framework
-//
-// Copyright (c) German Cancer Research Center (DKFZ),
-// Software development for Integrated Diagnostics and Therapy (SIDT).
-// ALL RIGHTS RESERVED.
-// See mapCopyright.txt or
-// http://www.dkfz.de/en/sidt/projects/MatchPoint/copyright.html
-//
-// This software is distributed WITHOUT ANY WARRANTY; without even
-// the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-// PURPOSE.  See the above copyright notices for more information.
-//
-//------------------------------------------------------------------------
-/*!
-// @file
-// @version $Revision$ (last changed revision)
-// @date    $Date$ (last change date)
-// @author  $Author$ (last changed by)
-// Subversion HeadURL: $HeadURL$
-*/
+/*============================================================================
 
+The Medical Imaging Interaction Toolkit (MITK)
 
-#include <iostream>
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
+#include "mitkProcessExecutor.h"
+
 #include <fstream>
-
+#include <iostream>
 #include <itksys/Process.h>
 #include <itksys/SystemTools.hxx>
 
-#include "mitkProcessExecutor.h"
-//#include "mapFileDispatch.h"
-
 namespace mitk
 {
-	namespace utilities
-	{
-
-		/*std::string
-		ProcessExecutor::
-		getOSDependendExecutableName(const core::String& name)
-		{
+  std::string ProcessExecutor::getOSDependendExecutableName(const std::string &name)
+  {
 #if defined(_WIN32)
 
-			if (::map::core::FileDispatch::getExtension(name).empty())
-			{
-				return name + ".exe";
-			}
-			
-			
-				return name;
-			
+    if (itksys::SystemTools::GetFilenameLastExtension(name).empty())
+    {
+      return name + ".exe";
+    }
+
+    return name;
 
 #else
-
-			if (::map::core::FileDispatch::getPath(name).empty())
-			{
-				return "./" + name;
-			}
-			else
-			{
-				return name;
-			}
+    auto result = itksys::SystemTools::GetFilenamePath(name);
+    if (ensureCorrectOSPathSeparator(result).empty())
+    {
+      return "./" + name;
+    }
+    else
+    {
+      return name;
+    }
 
 #endif
-		};*/
+  };
 
-		int
-		ProcessExecutor::
-		getExitValue()
-		{
-			return this->_exitValue;
-		};
+  std::string ProcessExecutor::ensureCorrectOSPathSeparator(const std::string &path)
+  {
+    std::string ret = path;
 
-		bool
-		ProcessExecutor::
-		execute(const std::string& executionPath, const ArgumentListType& argumentList)
-		{
-			//convert to char* array with terminating null element;
-			const char** pArguments = new const char*[argumentList.size() + 1];
-			pArguments[argumentList.size()] = nullptr;
+#ifdef _WIN32
+    const std::string curSep = "\\";
+    const char wrongSep = '/';
+#else
+    const std::string curSep = "/";
+    const char wrongSep = '\\';
+#endif
 
-			for (ArgumentListType::size_type index = 0; index < argumentList.size(); ++index)
-			{
-				pArguments[index] = argumentList[index].c_str();
-			}
+    std::string::size_type pos = ret.find_first_of(wrongSep);
 
-			bool normalExit = false;
+    while (pos != std::string::npos)
+    {
+      ret.replace(pos, 1, curSep);
 
-			try
-			{
-				itksysProcess* processID = itksysProcess_New();
-				itksysProcess_SetCommand(processID, pArguments);
+      pos = ret.find_first_of(wrongSep);
+    }
 
-				itksysProcess_SetWorkingDirectory(processID, executionPath.c_str());
+    return ret;
+  };
 
-				if (this->_SharedOutputPipes)
-				{
-					itksysProcess_SetPipeShared(processID, itksysProcess_Pipe_STDOUT, 1);
-					itksysProcess_SetPipeShared(processID, itksysProcess_Pipe_STDERR, 1);
-				}
+  int ProcessExecutor::getExitValue() { return this->_exitValue; };
 
-				itksysProcess_Execute(processID);
+  bool ProcessExecutor::execute(const std::string &executionPath, const ArgumentListType &argumentList)
+  {
+    // convert to char* array with terminating null element;
+    const char **pArguments = new const char *[argumentList.size() + 1];
+    pArguments[argumentList.size()] = nullptr;
 
-				char* rawOutput = nullptr;
-				int outputLength = 0;
-				std::cout<< "in mitk executor" << std::endl;
-				while (true)
-				{
-					int dataStatus = itksysProcess_WaitForData(processID, &rawOutput, &outputLength, nullptr);
+    for (ArgumentListType::size_type index = 0; index < argumentList.size(); ++index)
+    {
+      pArguments[index] = argumentList[index].c_str();
+    }
 
-					if (dataStatus == itksysProcess_Pipe_STDOUT)
-					{
-						std::string data(rawOutput, outputLength);
-						this->InvokeEvent(mitk::events::ExternalProcessStdOutEvent(nullptr, data));
-					}
-					else if (dataStatus == itksysProcess_Pipe_STDERR)
-					{
-						std::string data(rawOutput, outputLength);
-						this->InvokeEvent(mitk::events::ExternalProcessStdErrEvent(nullptr, data));
-					}
-					else
-					{
-						break;
-					}
-				}
+    bool normalExit = false;
 
-				itksysProcess_WaitForExit(processID, nullptr);
+    try
+    {
+      itksysProcess *processID = itksysProcess_New();
+      itksysProcess_SetCommand(processID, pArguments);
 
-				auto state = static_cast<itksysProcess_State_e>(itksysProcess_GetState(processID));
+      itksysProcess_SetWorkingDirectory(processID, executionPath.c_str());
 
-				normalExit = (state == itksysProcess_State_Exited);
-				this->_exitValue = itksysProcess_GetExitValue(processID);
-			}
-			catch (...)
-			{
-				delete[] pArguments;
-				throw;
-			}
+      if (this->m_SharedOutputPipes)
+      {
+        itksysProcess_SetPipeShared(processID, itksysProcess_Pipe_STDOUT, 1);
+        itksysProcess_SetPipeShared(processID, itksysProcess_Pipe_STDERR, 1);
+      }
 
-			delete[] pArguments;
+      itksysProcess_Execute(processID);
 
-			return normalExit;
-		};
+      char *rawOutput = nullptr;
+      int outputLength = 0;
+      while (true)
+      {
+        int dataStatus = itksysProcess_WaitForData(processID, &rawOutput, &outputLength, nullptr);
 
-		/*bool
-		ProcessExecutor::
-		execute(const std::string& executionPath, const std::string& executableName,
-				ArgumentListType argumentList)
-		{
-			::map::core::String executableName_OS = getOSDependendExecutableName(executableName);
+        if (dataStatus == itksysProcess_Pipe_STDOUT)
+        {
+          std::string data(rawOutput, outputLength);
+          this->InvokeEvent(ExternalProcessStdOutEvent(data));
+        }
+        else if (dataStatus == itksysProcess_Pipe_STDERR)
+        {
+          std::string data(rawOutput, outputLength);
+          this->InvokeEvent(ExternalProcessStdErrEvent(data));
+        }
+        else
+        {
+          break;
+        }
+      }
 
-			argumentList.insert(argumentList.begin(), executableName_OS);
+      itksysProcess_WaitForExit(processID, nullptr);
 
-			return execute(executionPath, argumentList);
-		};*/
+      auto state = static_cast<itksysProcess_State_e>(itksysProcess_GetState(processID));
 
-		ProcessExecutor::
-		ProcessExecutor()
-		{
-			this->_exitValue = 0;
-			this->_SharedOutputPipes = false;
-		};
+      normalExit = (state == itksysProcess_State_Exited);
+      this->_exitValue = itksysProcess_GetExitValue(processID);
+    }
+    catch (...)
+    {
+      delete[] pArguments;
+      throw;
+    }
 
-		ProcessExecutor::
-		~ProcessExecutor()
-		= default;
+    delete[] pArguments;
 
-	}  // namespace utilities
-}  // namespace map
+    return normalExit;
+  };
+
+  bool ProcessExecutor::execute(const std::string &executionPath,
+                                const std::string &executableName,
+                                ArgumentListType argumentList)
+  {
+    std::string executableName_OS = getOSDependendExecutableName(executableName);
+    argumentList.insert(argumentList.begin(), executableName_OS);
+
+    return execute(executionPath, argumentList);
+  };
+
+  ProcessExecutor::ProcessExecutor()
+  {
+    this->_exitValue = 0;
+    this->m_SharedOutputPipes = false;
+  };
+
+  ProcessExecutor::~ProcessExecutor() = default;
+} // namespace mitk

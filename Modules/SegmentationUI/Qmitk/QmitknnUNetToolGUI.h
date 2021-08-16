@@ -23,10 +23,19 @@ found in the LICENSE file.
 class MITKSEGMENTATIONUI_EXPORT nnUNetModel
 {
 public:
-  mitk::ModelParams request;
+  std::vector<mitk::ModelParams> requestQ;
   mitk::LabelSetImage::ConstPointer outputImage;
   nnUNetModel(const mitk::LabelSetImage *image) : outputImage(image) {}
-  // friend class nnUNetEnsemble; // not really necessary?
+
+  size_t getUniqueHash() const
+  {
+    size_t returnHash = 0;
+    for (mitk::ModelParams request : requestQ)
+    {
+      returnHash += request.generateHash();
+    }
+    return returnHash;
+  }
 };
 
 /*class MITKSEGMENTATIONUI_EXPORT nnUNetEnsemble
@@ -70,7 +79,7 @@ protected:
 private:
   void AutoParsePythonPaths();
   void ClearAllComboBoxes();
-  mitk::ModelParams mapToRequest(QString&, QString&, QString&, QString&, std::vector<std::string>&);
+  mitk::ModelParams mapToRequest(QString &, QString &, QString &, QString &, std::vector<std::string> &);
   std::vector<std::string> FetchSelectedFoldsFromUI();
   static std::vector<QString> FetchFoldersFromDir(const QString &);
   // Declaring variables for strings and int only.

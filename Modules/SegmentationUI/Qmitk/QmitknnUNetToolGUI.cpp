@@ -237,9 +237,9 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
         std::cout << "New pointer: " << tool->GetMLPreview() << std::endl;
         // Adding params and output Labelset image to Cache
         nnUNetModel *modelRequest = new nnUNetModel(tool->GetMLPreview());
-        modelRequest->request = tool->m_ParamQ[0];
-        std::cout << "New model " << modelRequest->request.model << std::endl;
-        size_t hashkey = modelRequest->request.generateHash();
+        modelRequest->requestQ.push_back(tool->m_ParamQ[0]);
+        //std::cout << "New model " << modelRequest->request.model << std::endl;
+        size_t hashkey = modelRequest->getUniqueHash();
         std::cout << "New hash: " << hashkey << std::endl;
         this->cache.insert(hashkey, modelRequest);
       }
@@ -249,9 +249,8 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
         if (this->cache.contains(keyFound))
         {
           nnUNetModel *_model = this->cache[keyFound];
-          std::cout << "fetched pointer " << _model->outputImage << std::endl;
-          std::cout << "fetched model " << _model->request.model << std::endl;
-
+          //std::cout << "fetched pointer " << _model->outputImage << std::endl;
+          //std::cout << "fetched model " << _model->request.model << std::endl;
           this->SetLabelSetPreview(_model->outputImage);
         }
       }

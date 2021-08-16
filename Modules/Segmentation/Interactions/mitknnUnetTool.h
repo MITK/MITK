@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <MitkSegmentationExports.h>
 #include <mitkStandardFileLocations.h>
 
-namespace us
+namespace us //remove?
 {
   class ModuleResource;
 }

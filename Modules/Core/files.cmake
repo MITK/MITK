@@ -306,6 +306,7 @@ Interactions/globalConfig.xml
 Interactions/DisplayInteraction.xml
 Interactions/DisplayConfig.xml
 Interactions/DisplayConfigPACS.xml
+Interactions/DisplayConfigPACSCrosshair.xml
 Interactions/DisplayConfigPACSPan.xml
 Interactions/DisplayConfigPACSScroll.xml
 Interactions/DisplayConfigPACSZoom.xml

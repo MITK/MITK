@@ -25,26 +25,25 @@ namespace us
 
 namespace mitk
 {
-  class MITKSEGMENTATION_EXPORT ModelParams // change to struct
+  struct ModelParams
   {
-  public:
-    std::string m_Task; // remove m_
-    std::vector<std::string> m_Folds;
-    std::string m_Model;
-    std::string m_Trainer;
-    std::string m_PlanId;
-    std::string m_OutputPath;
-    std::string m_OutputDir;
+    std::string task; 
+    std::vector<std::string> folds;
+    std::string model;
+    std::string trainer;
+    std::string planId;
+    std::string outputPath;
+    std::string outputDir;
 
     bool operator==(const ModelParams &other) const
     {
-      return ((this->m_Task == other.m_Task) && (this->m_Model == other.m_Model));
+      return ((this->task == other.task) && (this->model == other.model));
     }
 
     size_t generateHash() const
     {
       std::hash<std::string> str_hash;
-      std::string toHash = this->m_Task + this->m_Model;
+      std::string toHash = this->task + this->model;
       return str_hash(toHash);
     }
   };
@@ -136,7 +135,7 @@ namespace mitk
     itkBooleanMacro(Ensemble);
 
     // std::vector<std::string> m_Folds;
-    std::vector<mitk::ModelParams> m_Params;
+    std::vector<mitk::ModelParams> m_ParamQ;
 
     itkSetMacro(PreprocessingThreads, unsigned int);
     itkGetConstMacro(PreprocessingThreads, unsigned int);

@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <QProcess>
 #include <QStringListModel>
 #include <QtGlobal>
+#include <algorithm>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitknnUNetToolGUI, "")
 
@@ -70,25 +71,36 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   Superclass::InitializeUI(mainLayout);
 }
 
+mitk::ModelParams QmitknnUNetToolGUI::mapToRequest(
+  QString &modelName, QString &taskName, QString &trainer, QString &planId, std::vector<std::string> &folds)
+{
+  mitk::ModelParams requestObject;
+  requestObject.model = modelName.toStdString();
+  requestObject.trainer = trainer.toStdString();
+  requestObject.planId = planId.toStdString();
+  requestObject.task = taskName.toStdString();
+  requestObject.folds = folds;
+  return requestObject;
+}
+
 void QmitknnUNetToolGUI::OnSettingsAccept()
 {
   bool doSeg = true;
   std::cout << "clicked" << std::endl;
   size_t keyFound(0);
-  //quint32 requestId = QRandomGenerator::global()->generate();
   auto tool = this->GetConnectedToolAs<mitk::nnUNetTool>();
   if (nullptr != tool)
   {
     try
     {
-      tool->m_Params.clear();
+      tool->m_ParamQ.clear();
       // comboboxes
       m_Model = m_Controls.modelBox->currentText();
-      m_Task = m_Controls.taskBox->currentText().toUtf8().constData();
+      m_Task = m_Controls.taskBox->currentText();
       std::string nnUNetDirectory = "";
       if (m_Controls.multiModalBox->isChecked())
       {
-        nnUNetDirectory = m_Controls.codedirectoryBox->directory().toUtf8().constData();
+        nnUNetDirectory = m_Controls.codedirectoryBox->directory().toStdString();
       }
       QString pythonPathTextItem = m_Controls.pythonEnvComboBox->currentText();
       QString pythonPath = pythonPathTextItem.mid(pythonPathTextItem.indexOf(" ") + 1);
@@ -98,6 +110,44 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       }
 
       QString trainerPlanner = m_Controls.trainerBox->currentText();
+      QString splitterString = "__";
+
+      if (m_Model.startsWith("ensemble", Qt::CaseInsensitive))
+      {
+        QString ppJsonFile =
+          QDir::cleanPath(m_ModelDirectory + QDir::separator() + m_Model + QDir::separator() + m_DatasetName +
+                          QDir::separator() + trainerPlanner + QDir::separator() + "postprocessing.json");
+        if (QFile(ppJsonFile).exists())
+        {
+          tool->EnsembleOn();
+          tool->SetPostProcessingJsonDirectory(ppJsonFile.toStdString());
+          splitterString = "--";
+        }
+      }
+      QStringList trainerSplitParts = trainerPlanner.split(splitterString, QString::SplitBehavior::SkipEmptyParts);
+      if (tool->GetEnsemble())
+      {
+        foreach (QString modelSet, trainerSplitParts)
+        {
+          modelSet.remove("ensemble_", Qt::CaseInsensitive);
+          QStringList splitParts = modelSet.split("__", QString::SplitBehavior::SkipEmptyParts);
+          QString modelName = splitParts.first();
+          QString trainer = splitParts.at(1);
+          QString planId = splitParts.at(2);
+          auto testfold = std::vector<std::string>(1, "1");
+          mitk::ModelParams modelObject = mapToRequest(modelName, m_Task, trainer, planId, testfold);
+          tool->m_ParamQ.push_back(modelObject);
+        }
+      }
+      else
+      {
+        QString trainer = trainerSplitParts.first();
+        QString planId = trainerSplitParts.last();
+        std::vector<std::string> fetchedFolds = FetchSelectedFoldsFromUI();
+        mitk::ModelParams modelObject = mapToRequest(m_Model, m_Task, trainer, planId, fetchedFolds);
+        tool->m_ParamQ.push_back(modelObject);
+      }
+      /*
       if (m_Model.startsWith("ensemble", Qt::CaseInsensitive))
       {
         QString ppJsonFile =
@@ -116,12 +166,12 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
             QString trainer = splitParts.at(1);
             QString planId = splitParts.at(2);
 
-            modelObject.m_Model = modelName.toUtf8().constData();
-            modelObject.m_Trainer = trainer.toUtf8().constData();
-            modelObject.m_PlanId = planId.toUtf8().constData();
-            modelObject.m_Task = m_Task;
-            modelObject.m_Folds = std::vector<std::string>(1, "1"); // only for testing
-            tool->m_Params.push_back(modelObject);
+            modelObject.model = modelName.toStdString();
+            modelObject.trainer = trainer.toStdString();
+            modelObject.planId = planId.toStdString();
+            modelObject.task = m_Task.toStdString();
+            modelObject.folds = std::vector<std::string>(1, "1"); // only for testing
+            tool->m_ParamQ.push_back(modelObject);
           }
           tool->SetPostProcessingJsonDirectory(ppJsonFile.toStdString());
         }
@@ -138,52 +188,30 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
         QString trainer = splitParts.first();
         QString planId = splitParts.last();
 
-        // tool->SetModel(m_Model);
-        modelObject.m_Model = m_Model.toUtf8().constData();
-        // tool->SetTask(m_Task);
-        modelObject.m_Task = m_Task;
-        // tool->m_Folds = folds;
-        modelObject.m_Folds = FetchFoldsFromUI();
-        // tool->SetTrainer(trainer.toUtf8().constData());
-        modelObject.m_Trainer = trainer.toUtf8().constData();
-        // tool->SetPlanId(planId.toUtf8().constData());
-        modelObject.m_PlanId = planId.toUtf8().constData();
+        modelObject.model = m_Model.toStdString();
+        modelObject.task = m_Task.toStdString();
+        modelObject.folds = FetchSelectedFoldsFromUI();
+        modelObject.trainer = trainer.toStdString();
+        modelObject.planId = planId.toStdString();
 
         size_t hashVal = modelObject.generateHash();
-        if (this->cache.contains(hashVal)){
+        if (this->cache.contains(hashVal))
+        {
           doSeg = false;
           keyFound = hashVal;
           std::cout << "Key found: " << keyFound << std::endl;
         }
-        /*
-        QList<quint32> keyList = this->cache.keys();
-        foreach (quint32 key, keyList)
-        {
-          nnUNetModel *value = this->cache[key];
-          // if (value->request.m_Model == modelObject.m_Model)
-          if (value->request == modelObject)
-          {
-            doSeg = false;
-            keyFound = key;
-            std::cout << "Key found: " << QString::number(key).toStdString() << std::endl;
-            break;
-          }
-        }*/
         if (doSeg)
         {
-          tool->m_Params.clear();
-          tool->m_Params.push_back(modelObject);
+          tool->m_ParamQ.clear();
+          tool->m_ParamQ.push_back(modelObject);
         }
       }
-
+      */
       tool->SetnnUNetDirectory(nnUNetDirectory);
-      tool->SetPythonPath(pythonPath.toUtf8().constData());
-      tool->SetModelDirectory(m_ModelDirectory.toUtf8().constData());
+      tool->SetPythonPath(pythonPath.toStdString());
+      tool->SetModelDirectory(m_ModelDirectory.toStdString());
       // checkboxes
-      // tool->SetUseGPU(m_Controls.gpuBox->isChecked());
-      // tool->SetLowRes(m_Controls.lowresBox->isChecked());
-      // tool->SetAllInGPU(m_Controls.allInGpuBox->isChecked());
-      // tool->SetExportSegmentation(m_Controls.exportBox->isChecked());
       tool->SetMirror(m_Controls.mirrorBox->isChecked());
       tool->SetMixedPrecision(m_Controls.mixedPrecisionBox->isChecked());
       tool->SetNoPip(m_Controls.nopipBox->isChecked());
@@ -198,8 +226,8 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
         std::cout << "New pointer: " << tool->GetMLPreview() << std::endl;
         // Adding params and output Labelset image to Cache
         nnUNetModel *modelRequest = new nnUNetModel(tool->GetMLPreview());
-        modelRequest->request = tool->m_Params[0];
-        std::cout << "New model " << modelRequest->request.m_Model << std::endl;
+        modelRequest->request = tool->m_ParamQ[0];
+        std::cout << "New model " << modelRequest->request.model << std::endl;
         size_t hashkey = modelRequest->request.generateHash();
         std::cout << "New hash: " << hashkey << std::endl;
         this->cache.insert(hashkey, modelRequest);
@@ -211,7 +239,7 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
         {
           nnUNetModel *_model = this->cache[keyFound];
           std::cout << "fetched pointer " << _model->outputImage << std::endl;
-          std::cout << "fetched model " << _model->request.m_Model << std::endl;
+          std::cout << "fetched model " << _model->request.model << std::endl;
 
           this->SetLabelSetPreview(_model->outputImage);
         }
@@ -239,7 +267,6 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       MITK_ERROR << stream.str();
       return;
     }
-
     // this->SetLabelSetPreview(tool->GetMLPreview());
     tool->IsTimePointChangeAwareOn();
   }
@@ -259,21 +286,25 @@ void QmitknnUNetToolGUI::ClearAllComboBoxes()
   m_Controls.trainerBox->clear();
 }
 
+std::vector<QString> QmitknnUNetToolGUI::FetchFoldersFromDir(const QString &path)
+{
+  std::vector<QString> folders;
+  for (QDirIterator it(path, QDir::AllDirs, QDirIterator::NoIteratorFlags); it.hasNext();)
+  {
+    it.next();
+    if (!it.fileName().startsWith('.'))
+    {
+      folders.push_back(it.fileName());
+    }
+  }
+  return folders;
+}
+
 void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &dir)
 {
   this->ClearAllComboBoxes();
-  // std::vector<QString> models;
-  QDirIterator it(dir, QDir::AllDirs, QDirIterator::NoIteratorFlags);
-  while (it.hasNext())
-  {
-    it.next();
-    QString filePath = it.fileName();
-    // models.push_back(filePath);
-    if (!filePath.startsWith('.')) //&& !filePath.startsWith("ensemble"))
-    {                              // Filter out irrelevent hidden folders, if any.
-      m_Controls.modelBox->addItem(filePath);
-    }
-  }
+  std::vector<QString> models = FetchFoldersFromDir(dir);
+  std::for_each(models.begin(), models.end(), [this](QString model) { m_Controls.modelBox->addItem(model); });
 }
 
 void QmitknnUNetToolGUI::OnModelChanged(const QString &text)
@@ -281,51 +312,25 @@ void QmitknnUNetToolGUI::OnModelChanged(const QString &text)
   m_ModelDirectory = m_Controls.modeldirectoryBox->directory();
   QString updatedPath(QDir::cleanPath(m_ModelDirectory + QDir::separator() + text));
   m_Controls.taskBox->clear();
-  for (QDirIterator it(updatedPath, QDir::AllDirs, QDirIterator::NoIteratorFlags); it.hasNext();)
-  {
-    it.next();
-    if (!it.fileName().startsWith('.'))
-    {
-      m_DatasetName = it.fileName();
-      m_Controls.taskBox->addItem(m_DatasetName);
-    }
-  }
-  updatedPath = QDir::cleanPath(updatedPath + QDir::separator() + m_DatasetName);
-  // std::vector<QString> trainers;
+  std::vector<QString> datasets = FetchFoldersFromDir(updatedPath);
+  std::for_each(datasets.begin(), datasets.end(), [this](QString dataset) { m_Controls.taskBox->addItem(dataset); });
+  m_DatasetName = datasets[0];
+  updatedPath = QDir::cleanPath(updatedPath + QDir::separator() + datasets[0]);
   m_Controls.trainerBox->clear();
-  for (QDirIterator it(updatedPath, QDir::AllDirs, QDirIterator::NoIteratorFlags); it.hasNext();)
-  {
-    it.next();
-    QString trainer = it.fileName();
-    if (!trainer.startsWith('.')) // Filter out irrelevent hidden folders, if any.
-    {                             // trainers.push_back(trainer);
-      m_Controls.trainerBox->addItem(trainer);
-    }
-  }
+  std::vector<QString> trainers = FetchFoldersFromDir(updatedPath);
+  std::for_each(trainers.begin(), trainers.end(), [this](QString trainer) { m_Controls.trainerBox->addItem(trainer); });
 }
 
 void QmitknnUNetToolGUI::OnTrainerChanged(const QString &trainerSelected)
 {
+  m_Controls.foldBox->clear();
   if (m_Controls.modelBox->currentText() != "ensembles")
   {
     m_ModelDirectory = m_Controls.modeldirectoryBox->directory(); // check syntax
     QString updatedPath(QDir::cleanPath(m_ModelDirectory + QDir::separator() + m_Controls.modelBox->currentText() +
                                         QDir::separator() + m_DatasetName + QDir::separator() + trainerSelected));
-    // std::vector<QString> folds;
-    m_Controls.foldBox->clear();
-    for (QDirIterator it(updatedPath, QDir::AllDirs, QDirIterator::NoIteratorFlags); it.hasNext();)
-    {
-      it.next();
-      QString fold = it.fileName();
-      if (!fold.startsWith('.')) // Filter out irrelevent hidden folders, if any.
-      {                          // folds.push_back(fold);
-        m_Controls.foldBox->addItem(fold);
-      }
-    }
-  }
-  else
-  {
-    m_Controls.foldBox->clear();
+    std::vector<QString> folds = FetchFoldersFromDir(updatedPath);
+    std::for_each(folds.begin(), folds.end(), [this](QString fold) { m_Controls.foldBox->addItem(fold); });
   }
 }
 
@@ -403,7 +408,7 @@ void QmitknnUNetToolGUI::AutoParsePythonPaths()
   m_Controls.pythonEnvComboBox->setCurrentIndex(-1);
 }
 
-std::vector<std::string> QmitknnUNetToolGUI::FetchFoldsFromUI()
+std::vector<std::string> QmitknnUNetToolGUI::FetchSelectedFoldsFromUI()
 {
   std::vector<std::string> folds;
   if (!(m_Controls.foldBox->allChecked() || m_Controls.foldBox->noneChecked()))
@@ -413,7 +418,7 @@ std::vector<std::string> QmitknnUNetToolGUI::FetchFoldsFromUI()
     {
       QString foldQString =
         m_Controls.foldBox->itemText(index.row()).split("_", QString::SplitBehavior::SkipEmptyParts).last();
-      folds.push_back(foldQString.toUtf8().constData());
+      folds.push_back(foldQString.toStdString());
     }
   }
   return folds;

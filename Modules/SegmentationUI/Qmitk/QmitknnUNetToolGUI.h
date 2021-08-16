@@ -25,26 +25,21 @@ class MITKSEGMENTATIONUI_EXPORT nnUNetModel
 public:
   std::vector<mitk::ModelParams> requestQ;
   mitk::LabelSetImage::ConstPointer outputImage;
-  nnUNetModel(const mitk::LabelSetImage *image) : outputImage(image) {}
+  size_t hashCode = 0;
 
-  size_t getUniqueHash() const
+  size_t GetUniqueHash()
   {
-    size_t returnHash = 0;
-    for (mitk::ModelParams request : requestQ)
+    if (hashCode == 0)
     {
-      returnHash += request.generateHash();
+      for (mitk::ModelParams request : requestQ)
+      {
+        // sum of individual hash is the final hash
+        hashCode += request.generateHash();
+      }
     }
-    return returnHash;
+    return hashCode;
   }
 };
-
-/*class MITKSEGMENTATIONUI_EXPORT nnUNetEnsemble
-{
-public:
-  nnUNetModel model1;
-  nnUNetModel model2;
-  std::string ppJsonDir;
-};*/
 
 class MITKSEGMENTATIONUI_EXPORT QmitknnUNetToolGUI : public QmitkAutoMLSegmentationToolGUIBase
 {
@@ -55,8 +50,6 @@ public:
   itkFactorylessNewMacro(Self);
   itkCloneMacro(Self);
 
-  // std::vector<nnUNetModel> models;
-  // std::vector<nnUNetEnsemble> ensembles;
   QCache<size_t, nnUNetModel> cache;
 
 protected slots:
@@ -79,14 +72,12 @@ protected:
 private:
   void AutoParsePythonPaths();
   void ClearAllComboBoxes();
-  mitk::ModelParams mapToRequest(QString &, QString &, QString &, QString &, std::vector<std::string> &);
+  mitk::ModelParams MapToRequest(QString &, QString &, QString &, QString &, std::vector<std::string> &);
   std::vector<std::string> FetchSelectedFoldsFromUI();
   static std::vector<QString> FetchFoldersFromDir(const QString &);
   // Declaring variables for strings and int only.
   QString m_Model;
   QString m_Task;
-  // std::string m_nnUNetDirectory;
-  // std::string m_ModelDirectory;
   QString m_ModelDirectory; // Change datatype to QDir?
   QString m_DatasetName;
   Ui_QmitknnUNetToolGUIControls m_Controls;

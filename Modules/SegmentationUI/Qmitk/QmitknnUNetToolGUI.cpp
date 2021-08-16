@@ -71,29 +71,16 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   Superclass::InitializeUI(mainLayout);
 }
 
-mitk::ModelParams QmitknnUNetToolGUI::mapToRequest(
-  QString &modelName, QString &taskName, QString &trainer, QString &planId, std::vector<std::string> &folds)
-{
-  mitk::ModelParams requestObject;
-  requestObject.model = modelName.toStdString();
-  requestObject.trainer = trainer.toStdString();
-  requestObject.planId = planId.toStdString();
-  requestObject.task = taskName.toStdString();
-  requestObject.folds = folds;
-  return requestObject;
-}
-
 void QmitknnUNetToolGUI::OnSettingsAccept()
 {
   bool doSeg = true;
   std::cout << "clicked" << std::endl;
-  size_t keyFound(0);
+  size_t hashKey(0);
   auto tool = this->GetConnectedToolAs<mitk::nnUNetTool>();
   if (nullptr != tool)
   {
     try
     {
-      tool->m_ParamQ.clear();
       // comboboxes
       m_Model = m_Controls.modelBox->currentText();
       m_Task = m_Controls.taskBox->currentText();
@@ -125,6 +112,7 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
         }
       }
       QStringList trainerSplitParts = trainerPlanner.split(splitterString, QString::SplitBehavior::SkipEmptyParts);
+      nnUNetModel *modelRequest = new nnUNetModel();
       if (tool->GetEnsemble())
       {
         foreach (QString modelSet, trainerSplitParts)
@@ -135,90 +123,30 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
           QString trainer = splitParts.at(1);
           QString planId = splitParts.at(2);
           auto testfold = std::vector<std::string>(1, "1");
-          mitk::ModelParams modelObject = mapToRequest(modelName, m_Task, trainer, planId, testfold);
-          tool->m_ParamQ.push_back(modelObject);
+          mitk::ModelParams modelObject = MapToRequest(modelName, m_Task, trainer, planId, testfold);
+          modelRequest->requestQ.push_back(modelObject);
         }
       }
       else
-      { 
+      {
         QString trainer = trainerSplitParts.first();
         QString planId = trainerSplitParts.last();
         std::vector<std::string> fetchedFolds = FetchSelectedFoldsFromUI();
-        mitk::ModelParams modelObject = mapToRequest(m_Model, m_Task, trainer, planId, fetchedFolds);
-        size_t hashVal = modelObject.generateHash();
-        if (this->cache.contains(hashVal))
-        {
-          doSeg = false;
-          keyFound = hashVal;
-          std::cout << "Key found: " << keyFound << std::endl;
-        }
-        if (doSeg)
-        {
-          tool->m_ParamQ.clear();
-          tool->m_ParamQ.push_back(modelObject);
-        }
+        mitk::ModelParams modelObject = MapToRequest(m_Model, m_Task, trainer, planId, fetchedFolds);
+        modelRequest->requestQ.push_back(modelObject);
       }
-      /*
-      if (m_Model.startsWith("ensemble", Qt::CaseInsensitive))
+      hashKey = modelRequest->GetUniqueHash();
+      if (this->cache.contains(hashKey))
       {
-        QString ppJsonFile =
-          QDir::cleanPath(m_ModelDirectory + QDir::separator() + m_Model + QDir::separator() + m_DatasetName +
-                          QDir::separator() + trainerPlanner + QDir::separator() + "postprocessing.json");
-        if (QFile(ppJsonFile).exists())
-        {
-          tool->EnsembleOn();
-          QStringList models = trainerPlanner.split("--", QString::SplitBehavior::SkipEmptyParts);
-          foreach (QString model, models)
-          {
-            model.remove("ensemble_", Qt::CaseInsensitive);
-            mitk::ModelParams modelObject;
-            QStringList splitParts = model.split("__", QString::SplitBehavior::SkipEmptyParts);
-            QString modelName = splitParts.first();
-            QString trainer = splitParts.at(1);
-            QString planId = splitParts.at(2);
-
-            modelObject.model = modelName.toStdString();
-            modelObject.trainer = trainer.toStdString();
-            modelObject.planId = planId.toStdString();
-            modelObject.task = m_Task.toStdString();
-            modelObject.folds = std::vector<std::string>(1, "1"); // only for testing
-            tool->m_ParamQ.push_back(modelObject);
-          }
-          tool->SetPostProcessingJsonDirectory(ppJsonFile.toStdString());
-        }
-        else
-        {
-          std::cout << "post proc file not found" << std::endl;
-          // throw exception with message
-        }
+        doSeg = false;
+        std::cout << "Key found: " << hashKey << std::endl;
       }
-      else
+      if (doSeg)
       {
-        mitk::ModelParams modelObject;
-        QStringList splitParts = trainerPlanner.split("__", QString::SplitBehavior::SkipEmptyParts);
-        QString trainer = splitParts.first();
-        QString planId = splitParts.last();
-
-        modelObject.model = m_Model.toStdString();
-        modelObject.task = m_Task.toStdString();
-        modelObject.folds = FetchSelectedFoldsFromUI();
-        modelObject.trainer = trainer.toStdString();
-        modelObject.planId = planId.toStdString();
-
-        size_t hashVal = modelObject.generateHash();
-        if (this->cache.contains(hashVal))
-        {
-          doSeg = false;
-          keyFound = hashVal;
-          std::cout << "Key found: " << keyFound << std::endl;
-        }
-        if (doSeg)
-        {
-          tool->m_ParamQ.clear();
-          tool->m_ParamQ.push_back(modelObject);
-        }
+        tool->m_ParamQ.clear();
+        tool->m_ParamQ = modelRequest->requestQ;
       }
-      */
+
       tool->SetnnUNetDirectory(nnUNetDirectory);
       tool->SetPythonPath(pythonPath.toStdString());
       tool->SetModelDirectory(m_ModelDirectory.toStdString());
@@ -235,22 +163,19 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
         tool->UpdatePreview();
         this->SetLabelSetPreview(tool->GetMLPreview());
         std::cout << "New pointer: " << tool->GetMLPreview() << std::endl;
+        modelRequest->outputImage = tool->GetMLPreview();
         // Adding params and output Labelset image to Cache
-        nnUNetModel *modelRequest = new nnUNetModel(tool->GetMLPreview());
-        modelRequest->requestQ.push_back(tool->m_ParamQ[0]);
-        //std::cout << "New model " << modelRequest->request.model << std::endl;
-        size_t hashkey = modelRequest->getUniqueHash();
+        size_t hashkey = modelRequest->GetUniqueHash();
         std::cout << "New hash: " << hashkey << std::endl;
         this->cache.insert(hashkey, modelRequest);
       }
-      else if (keyFound != 0)
+      else
       {
-        std::cout << "won't do segmentation. Key found: " << QString::number(keyFound).toStdString() << std::endl;
-        if (this->cache.contains(keyFound))
+        std::cout << "won't do segmentation. Key found: " << QString::number(hashKey).toStdString() << std::endl;
+        if (this->cache.contains(hashKey))
         {
-          nnUNetModel *_model = this->cache[keyFound];
-          //std::cout << "fetched pointer " << _model->outputImage << std::endl;
-          //std::cout << "fetched model " << _model->request.model << std::endl;
+          nnUNetModel *_model = this->cache[hashKey];
+          std::cout << "fetched pointer " << _model->outputImage << std::endl;
           this->SetLabelSetPreview(_model->outputImage);
         }
       }
@@ -431,4 +356,16 @@ std::vector<std::string> QmitknnUNetToolGUI::FetchSelectedFoldsFromUI()
     }
   }
   return folds;
+}
+
+mitk::ModelParams QmitknnUNetToolGUI::MapToRequest(
+  QString &modelName, QString &taskName, QString &trainer, QString &planId, std::vector<std::string> &folds)
+{
+  mitk::ModelParams requestObject;
+  requestObject.model = modelName.toStdString();
+  requestObject.trainer = trainer.toStdString();
+  requestObject.planId = planId.toStdString();
+  requestObject.task = taskName.toStdString();
+  requestObject.folds = folds;
+  return requestObject;
 }

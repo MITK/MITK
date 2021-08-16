@@ -140,12 +140,23 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
         }
       }
       else
-      {
+      { 
         QString trainer = trainerSplitParts.first();
         QString planId = trainerSplitParts.last();
         std::vector<std::string> fetchedFolds = FetchSelectedFoldsFromUI();
         mitk::ModelParams modelObject = mapToRequest(m_Model, m_Task, trainer, planId, fetchedFolds);
-        tool->m_ParamQ.push_back(modelObject);
+        size_t hashVal = modelObject.generateHash();
+        if (this->cache.contains(hashVal))
+        {
+          doSeg = false;
+          keyFound = hashVal;
+          std::cout << "Key found: " << keyFound << std::endl;
+        }
+        if (doSeg)
+        {
+          tool->m_ParamQ.clear();
+          tool->m_ParamQ.push_back(modelObject);
+        }
       }
       /*
       if (m_Model.startsWith("ensemble", Qt::CaseInsensitive))
@@ -267,7 +278,6 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       MITK_ERROR << stream.str();
       return;
     }
-    // this->SetLabelSetPreview(tool->GetMLPreview());
     tool->IsTimePointChangeAwareOn();
   }
 }

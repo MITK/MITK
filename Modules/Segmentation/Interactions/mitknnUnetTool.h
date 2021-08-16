@@ -27,7 +27,7 @@ namespace mitk
 {
   struct ModelParams
   {
-    std::string task; 
+    std::string task;
     std::vector<std::string> folds;
     std::string model;
     std::string trainer;
@@ -68,21 +68,6 @@ namespace mitk
 
     void Activated() override;
 
-    // itkSetMacro(Model, std::string);
-    // itkGetConstMacro(Model, std::string);
-
-    // itkSetMacro(Task, std::string);
-    // itkGetConstMacro(Task, std::string);
-
-    // itkSetMacro(Folds, std::vector); //-- can't call macro for std::vector
-    // itkGetConstMacro(Folds, std::vector<std::string>);
-
-    // itkSetMacro(Trainer, std::string);
-    // itkGetConstMacro(Trainer, std::string);
-
-    // itkSetMacro(PlanId, std::string);
-    // itkGetConstMacro(PlanId, std::string);
-
     itkSetMacro(nnUNetDirectory, std::string);
     itkGetConstMacro(nnUNetDirectory, std::string);
 
@@ -102,10 +87,6 @@ namespace mitk
     itkGetConstMacro(UseGPU, bool);
     itkBooleanMacro(UseGPU);
 
-    itkSetMacro(LowRes, bool);
-    itkGetConstMacro(LowRes, bool);
-    itkBooleanMacro(LowRes);
-
     itkSetMacro(AllInGPU, bool);
     itkGetConstMacro(AllInGPU, bool);
     itkBooleanMacro(AllInGPU);
@@ -113,10 +94,6 @@ namespace mitk
     itkSetMacro(MixedPrecision, bool);
     itkGetConstMacro(MixedPrecision, bool);
     itkBooleanMacro(MixedPrecision);
-
-    itkSetMacro(ExportSegmentation, bool);
-    itkGetConstMacro(ExportSegmentation, bool);
-    itkBooleanMacro(ExportSegmentation);
 
     itkSetMacro(Mirror, bool);
     itkGetConstMacro(Mirror, bool);
@@ -134,7 +111,6 @@ namespace mitk
     itkGetConstMacro(Ensemble, bool);
     itkBooleanMacro(Ensemble);
 
-    // std::vector<std::string> m_Folds;
     std::vector<mitk::ModelParams> m_ParamQ;
 
     itkSetMacro(PreprocessingThreads, unsigned int);
@@ -148,30 +124,19 @@ namespace mitk
     LabelSetImage::Pointer ComputeMLPreview(const Image *inputAtTimeStep, TimeStepType timeStep) override;
 
   private:
-    // std::string m_Model;
-    // std::string m_Trainer;
-    // std::string m_PlanId;
-    // std::string m_Task;
     std::string m_MitkTempDir;
     std::string m_nnUNetDirectory;
     std::string m_ModelDirectory;
     std::string m_PythonPath;
     std::string m_PostProcessingJsonDirectory;
     bool m_UseGPU;
-    bool m_LowRes; // remove?
     bool m_AllInGPU;
     bool m_MixedPrecision;
-    bool m_ExportSegmentation; // remove?
-    bool m_Mirror;             // rename
+    bool m_Mirror; // rename
     bool m_NoPip;
     bool m_MultiModal;
-    bool m_Ensemble;
+    bool m_Ensemble = false;
     unsigned int m_PreprocessingThreads;
-
-    /*const std::string m_PythonProjectPath;
-    const std::string m_PythonFileName;
-    const std::string m_InputImageVarName;
-    const std::string m_OutputImageVarName;*/
   };
 } // namespace mitk
 

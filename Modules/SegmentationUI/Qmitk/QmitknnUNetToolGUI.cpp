@@ -85,7 +85,7 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       m_Model = m_Controls.modelBox->currentText();
       m_Task = m_Controls.taskBox->currentText();
       std::string nnUNetDirectory = "";
-      if (m_Controls.multiModalBox->isChecked())
+      if (m_Controls.nopipBox->isChecked())
       {
         nnUNetDirectory = m_Controls.codedirectoryBox->directory().toStdString();
       }
@@ -97,10 +97,13 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       }
 
       QString trainerPlanner = m_Controls.trainerBox->currentText();
+      std::cout << "trainerPlanner: " << trainerPlanner.toStdString() << std::endl;
       QString splitterString = "__";
+      tool->EnsembleOff();
 
       if (m_Model.startsWith("ensemble", Qt::CaseInsensitive))
       {
+        std::cout << "model ensemble" << std::endl;
         QString ppJsonFile =
           QDir::cleanPath(m_ModelDirectory + QDir::separator() + m_Model + QDir::separator() + m_DatasetName +
                           QDir::separator() + trainerPlanner + QDir::separator() + "postprocessing.json");
@@ -115,6 +118,7 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       nnUNetModel *modelRequest = new nnUNetModel();
       if (tool->GetEnsemble())
       {
+        std::cout << "in ensemble" << std::endl;
         foreach (QString modelSet, trainerSplitParts)
         {
           modelSet.remove("ensemble_", Qt::CaseInsensitive);
@@ -160,6 +164,7 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       tool->SetPreprocessingThreads(static_cast<unsigned int>(m_Controls.threadsBox->value()));
       if (doSeg)
       {
+        std::cout << "do segmentation" << std::endl;
         tool->UpdatePreview();
         this->SetLabelSetPreview(tool->GetMLPreview());
         std::cout << "New pointer: " << tool->GetMLPreview() << std::endl;
@@ -175,7 +180,7 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
         if (this->cache.contains(hashKey))
         {
           nnUNetModel *_model = this->cache[hashKey];
-          std::cout << "fetched pointer " << _model->outputImage << std::endl;
+          // std::cout << "fetched pointer " << _model->outputImage << std::endl;
           this->SetLabelSetPreview(_model->outputImage);
         }
       }

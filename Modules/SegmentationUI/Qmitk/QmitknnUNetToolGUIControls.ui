@@ -55,7 +55,7 @@
                 </sizepolicy>
               </property>
               <property name="text">
-                <string>Pretrained Model Path:</string>
+                <string>nnUNet Results Folder:</string>
               </property>
             </widget>
           </item>

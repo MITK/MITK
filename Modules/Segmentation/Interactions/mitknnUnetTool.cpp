@@ -75,8 +75,7 @@ namespace
       MITK_INFO << testCOUT;
     }
 
-    const auto *pErrEvent =
-      dynamic_cast<const mitk::ExternalProcessStdErrEvent *>(&e);
+    const auto *pErrEvent = dynamic_cast<const mitk::ExternalProcessStdErrEvent *>(&e);
 
     if (pErrEvent)
     {
@@ -118,6 +117,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
 
   try
   {
+    //std::cout << "saving............ "  << std::endl;
     mitk::IOUtil::Save(_inputAtTimeStep.GetPointer(), inputImagePath);
     if (this->GetMultiModal())
     {
@@ -213,8 +213,9 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
       {
         std::cout << arg << std::endl;
       }*/
-      std::cout << "command " << command << std::endl;
+      std::cout << "command at " << command << std::endl;
       spExec->execute(this->GetPythonPath(), command, args);
+      //outputImagePath = "/tmp/mitk-32uGaS/nnunet-out-E211EZ/yFw1zN_000.nii.gz";
     }
     catch (const mitk::Exception &e)
     {
@@ -233,7 +234,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     args.push_back("-f");
     for (mitk::ModelParams &modelparam : m_ParamQ)
     {
-      args.push_back(modelparam.outputPath);
+      args.push_back(modelparam.outputDir);
     }
 
     args.push_back("-o");
@@ -242,7 +243,13 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     args.push_back("-pp");
     args.push_back(this->GetPostProcessingJsonDirectory());
 
+    for (auto arg : args)
+    {
+      std::cout << arg << std::endl;
+    }
+
     spExec->execute(this->GetPythonPath(), command, args);
+    //outputImagePath = "/tmp/mitk-32uGaS/nnunet-ensemble-out-cJ9sjG/yFw1zN_000.nii.gz";
   }
 
   mitk::Image::Pointer outputImage = mitk::IOUtil::Load<mitk::Image>(outputImagePath);

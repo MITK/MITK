@@ -57,6 +57,7 @@ protected slots:
   void OnSettingsAccept();
   void OnDirectoryChanged(const QString &);
   void OnModelChanged(const QString &);
+  void OnTaskChanged(const QString &);
   void OnTrainerChanged(const QString &);
   void OnPythonChanged(const QString &);
   void OnCheckBoxChanged(int);
@@ -73,8 +74,8 @@ private:
   void AutoParsePythonPaths();
   void ClearAllComboBoxes();
   mitk::ModelParams MapToRequest(QString &, QString &, QString &, QString &, std::vector<std::string> &);
-  std::vector<std::string> FetchSelectedFoldsFromUI();
-  static std::vector<QString> FetchFoldersFromDir(const QString &);
+  std::vector<std::string> FetchSelectedFoldsFromUI();  
+  template<typename T> static T FetchFoldersFromDir(const QString &);
   // Declaring variables for strings and int only.
   QString m_Model;
   QString m_Task;

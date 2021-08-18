@@ -32,7 +32,6 @@ namespace mitk
     std::string model;
     std::string trainer;
     std::string planId;
-    std::string outputPath;
     std::string outputDir;
 
     bool operator==(const ModelParams &other) const

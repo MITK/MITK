@@ -25,6 +25,7 @@ Qmitk/QmitkToolGUIArea.cpp
 Qmitk/QmitkToolSelectionBox.cpp
 Qmitk/QmitkWatershedToolGUI.cpp
 Qmitk/QmitknnUNetToolGUI.cpp
+Qmitk/QmitknnUNetToolSlots.cpp
 #Added from ML
 Qmitk/QmitkLabelSetWidget.cpp
 Qmitk/QmitkSurfaceStampWidget.cpp

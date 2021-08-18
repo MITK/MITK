@@ -117,8 +117,8 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
 
   try
   {
-    //std::cout << "saving............ "  << std::endl;
-    mitk::IOUtil::Save(_inputAtTimeStep.GetPointer(), inputImagePath);
+    std::cout << "saving............ "  << std::endl;
+    //mitk::IOUtil::Save(_inputAtTimeStep.GetPointer(), inputImagePath);
     if (this->GetMultiModal())
     {
       /*copy & rename file */
@@ -142,7 +142,6 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     outDir = mitk::IOUtil::CreateTemporaryDirectory("nnunet-out-XXXXXX", this->GetMitkTempDir());
     outputImagePath = outDir + mitk::IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";
     modelparam.outputDir = outDir;
-    modelparam.outputPath = outputImagePath;
     args.clear();
     if (this->GetNoPip())
     {
@@ -214,8 +213,8 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
         std::cout << arg << std::endl;
       }*/
       std::cout << "command at " << command << std::endl;
-      spExec->execute(this->GetPythonPath(), command, args);
-      //outputImagePath = "/tmp/mitk-32uGaS/nnunet-out-E211EZ/yFw1zN_000.nii.gz";
+      //spExec->execute(this->GetPythonPath(), command, args);
+      outputImagePath = "/Users/ashis/DKFZ/nnUNet/mitk-32uGaS/nnunet-out-E211EZ/yFw1zN_000.nii.gz";
     }
     catch (const mitk::Exception &e)
     {
@@ -248,14 +247,15 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
       std::cout << arg << std::endl;
     }
 
-    spExec->execute(this->GetPythonPath(), command, args);
-    //outputImagePath = "/tmp/mitk-32uGaS/nnunet-ensemble-out-cJ9sjG/yFw1zN_000.nii.gz";
+    //spExec->execute(this->GetPythonPath(), command, args);
+
+    outputImagePath = "/Users/ashis/DKFZ/nnUNet/mitk-32uGaS/nnunet-ensemble-out-cJ9sjG/yFw1zN_000.nii.gz";
   }
 
   mitk::Image::Pointer outputImage = mitk::IOUtil::Load<mitk::Image>(outputImagePath);
   mitk::LabelSetImage::Pointer resultImage = mitk::LabelSetImage::New();
   resultImage->InitializeByLabeledImage(outputImage);
-  resultImage->SetGeometry(inputAtTimeStep->GetGeometry());
+  resultImage->SetGeometry(_inputAtTimeStep->GetGeometry());
   // itksys::SystemTools::RemoveADirectory(mitkTempDir); // moved to destuctor
   return resultImage;
 }

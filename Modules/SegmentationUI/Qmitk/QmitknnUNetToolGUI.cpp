@@ -17,9 +17,7 @@ found in the LICENSE file.
 #include <QDirIterator>
 #include <QMessageBox>
 #include <QProcess>
-#include <QStringListModel>
 #include <QtGlobal>
-#include <algorithm>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitknnUNetToolGUI, "")
 
@@ -53,6 +51,7 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
     m_Controls.trainerBox, SIGNAL(currentTextChanged(const QString &)), this, SLOT(OnTrainerChanged(const QString &)));
   connect(m_Controls.nopipBox, SIGNAL(stateChanged(int)), this, SLOT(OnCheckBoxChanged(int)));
   connect(m_Controls.multiModalBox, SIGNAL(stateChanged(int)), this, SLOT(OnCheckBoxChanged(int)));
+  connect(m_Controls.multiModalSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnModalitiesNumberChanged(int)));
   connect(m_Controls.pythonEnvComboBox,
 #if QT_VERSION >= 0x050F00 // 5.15
           SIGNAL(textActivated(const QString &)),
@@ -63,11 +62,8 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
           SLOT(OnPythonChanged(const QString &)));
   m_Controls.codedirectoryBox->setVisible(false);
   m_Controls.nnUnetdirLabel->setVisible(false);
-  m_Controls.multiModalPath->setVisible(false);
-  m_Controls.multiModalLabel->setVisible(false);
-  m_Controls.multiModalBox->setVisible(false);
-  m_Controls.multiModalPathLabel->setVisible(false);
-
+  m_Controls.multiModalSpinBox->setVisible(false);
+  m_Controls.multiModalSpinLabel->setVisible(false);
   mainLayout->addLayout(m_Controls.verticalLayout);
   Superclass::InitializeUI(mainLayout);
 }

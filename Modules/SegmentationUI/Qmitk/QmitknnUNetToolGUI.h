@@ -61,6 +61,7 @@ protected slots:
   void OnTrainerChanged(const QString &);
   void OnPythonChanged(const QString &);
   void OnCheckBoxChanged(int);
+  void OnModalitiesNumberChanged(int);
 
 protected:
   QmitknnUNetToolGUI();
@@ -74,8 +75,9 @@ private:
   void AutoParsePythonPaths();
   void ClearAllComboBoxes();
   mitk::ModelParams MapToRequest(QString &, QString &, QString &, QString &, std::vector<std::string> &);
-  std::vector<std::string> FetchSelectedFoldsFromUI();  
-  template<typename T> static T FetchFoldersFromDir(const QString &);
+  std::vector<std::string> FetchSelectedFoldsFromUI();
+  template <typename T>
+  static T FetchFoldersFromDir(const QString &);
   // Declaring variables for strings and int only.
   QString m_Model;
   QString m_Task;

@@ -6,6 +6,7 @@
 #include <QStringListModel>
 #include <QtGlobal>
 #include <algorithm>
+#include <ctkPathLineEdit.h>
 
 void QmitknnUNetToolGUI::EnableWidgets(bool enabled)
 {
@@ -48,7 +49,7 @@ void QmitknnUNetToolGUI::OnModelChanged(const QString &text)
   m_ModelDirectory = m_Controls.modeldirectoryBox->directory();
   QString updatedPath(QDir::cleanPath(m_ModelDirectory + QDir::separator() + text));
   m_Controls.taskBox->clear();
-  std::vector<QString> datasets = FetchFoldersFromDir<std::vector<QString>>(updatedPath);
+  auto datasets = FetchFoldersFromDir<QStringList>(updatedPath);
   std::for_each(datasets.begin(), datasets.end(), [this](QString dataset) { m_Controls.taskBox->addItem(dataset); });
 }
 
@@ -59,7 +60,7 @@ void QmitknnUNetToolGUI::OnTaskChanged(const QString &text)
   QString updatedPath = QDir::cleanPath(m_ModelDirectory + QDir::separator() + m_Controls.modelBox->currentText() +
                                         QDir::separator() + text);
   m_Controls.trainerBox->clear();
-  std::vector<QString> trainers = FetchFoldersFromDir<std::vector<QString>>(updatedPath);
+  auto trainers = FetchFoldersFromDir<QStringList>(updatedPath);
   std::for_each(trainers.begin(), trainers.end(), [this](QString trainer) { m_Controls.trainerBox->addItem(trainer); });
 }
 
@@ -72,7 +73,7 @@ void QmitknnUNetToolGUI::OnTrainerChanged(const QString &trainerSelected)
     QString updatedPath(QDir::cleanPath(m_ModelDirectory + QDir::separator() + m_Controls.modelBox->currentText() +
                                         QDir::separator() + m_Controls.taskBox->currentText() + QDir::separator() +
                                         trainerSelected));
-    std::vector<QString> folds = FetchFoldersFromDir<std::vector<QString>>(updatedPath);
+    auto folds = FetchFoldersFromDir<QStringList>(updatedPath);
     std::for_each(folds.begin(), folds.end(), [this](QString fold) { m_Controls.foldBox->addItem(fold); });
   }
 }
@@ -108,9 +109,21 @@ void QmitknnUNetToolGUI::OnCheckBoxChanged(int state)
     }
     else if (box->objectName() == QString("multiModalBox"))
     {
-      m_Controls.multiModalPath->setVisible(visibility);
-      m_Controls.multiModalPathLabel->setVisible(visibility);
+      m_Controls.multiModalSpinLabel->setVisible(visibility);
+      m_Controls.multiModalSpinBox->setVisible(visibility);
+   
     }
+  }
+}
+
+void QmitknnUNetToolGUI::OnModalitiesNumberChanged(int num)
+{ int rowOffset = 4;
+  std::cout<< "Modality num "<<num<< std::endl;
+  for (int i = 0; i < num; ++i)
+  {
+    ctkPathLineEdit *multiModalPath = new ctkPathLineEdit(this);
+    multiModalPath->setObjectName(QString("multiModalPath" + QString::number(i)));
+    m_Controls.advancedSettingsLayout->addWidget(multiModalPath, rowOffset+i, 1, 1, 3);
   }
 }
 

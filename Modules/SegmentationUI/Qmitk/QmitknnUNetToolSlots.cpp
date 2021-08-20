@@ -111,21 +111,43 @@ void QmitknnUNetToolGUI::OnCheckBoxChanged(int state)
     {
       m_Controls.multiModalSpinLabel->setVisible(visibility);
       m_Controls.multiModalSpinBox->setVisible(visibility);
-   
+
+      // adding multimodal path
+      ctkPathLineEdit *multiModalPath = new ctkPathLineEdit(this);
+      multiModalPath->setObjectName(QString("multiModalPath"));
+      m_Controls.advancedSettingsLayout->addWidget(multiModalPath, 5, 1, 1, 3);
     }
   }
 }
 
-void QmitknnUNetToolGUI::OnModalitiesNumberChanged(int num)
-{ int rowOffset = 4;
-  std::cout<< "Modality num "<<num<< std::endl;
-  for (int i = 0; i < num; ++i)
-  {
-    ctkPathLineEdit *multiModalPath = new ctkPathLineEdit(this);
-    multiModalPath->setObjectName(QString("multiModalPath" + QString::number(i)));
-    m_Controls.advancedSettingsLayout->addWidget(multiModalPath, rowOffset+i, 1, 1, 3);
-  }
-}
+// void QmitknnUNetToolGUI::OnModalitiesNumberChanged(int num) // 2
+// {
+//   int rowOffset = 4;
+//   int rowCount = m_Controls.advancedSettingsLayout->rowCount(); // 6
+//   std::cout << "Start Row count " << rowCount << std::endl;     // 6
+
+//   QLayoutItem *child;
+//   while ((child = m_Controls.advancedSettingsLayout->takeAt(0)) != nullptr)
+//   {
+//     delete child->widget(); // delete the widget
+//     delete child;               // delete the layout item
+//      m_Controls.advancedSettingsLayout->update();
+//     rowCount = m_Controls.advancedSettingsLayout->rowCount();
+//       std::cout << "current Row count " << rowCount << std::endl;     // 6
+
+//   }
+//   rowCount = m_Controls.advancedSettingsLayout->rowCount(); // 4
+//   std::cout << "New Rows " << rowCount << std::endl;        // 4
+
+//   for (int i = rowCount + 1 /*5,*/; i /*5,6,7*/ < rowCount + num + 1 /*7-t,t,f*/; ++i)
+//   {
+//     std::cout << "i is  " << i << std::endl;
+//     ctkPathLineEdit *multiModalPath = new ctkPathLineEdit(this);
+//     multiModalPath->setObjectName(QString("multiModalPath" + QString::number(i)));
+//     m_Controls.advancedSettingsLayout->addWidget(multiModalPath, i, 1, 1, 3);
+//   }
+//   m_Controls.advancedSettingsLayout->update();
+// }
 
 void QmitknnUNetToolGUI::AutoParsePythonPaths()
 {

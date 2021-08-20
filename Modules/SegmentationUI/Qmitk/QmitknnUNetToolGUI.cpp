@@ -51,7 +51,7 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
     m_Controls.trainerBox, SIGNAL(currentTextChanged(const QString &)), this, SLOT(OnTrainerChanged(const QString &)));
   connect(m_Controls.nopipBox, SIGNAL(stateChanged(int)), this, SLOT(OnCheckBoxChanged(int)));
   connect(m_Controls.multiModalBox, SIGNAL(stateChanged(int)), this, SLOT(OnCheckBoxChanged(int)));
-  connect(m_Controls.multiModalSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnModalitiesNumberChanged(int)));
+  //connect(m_Controls.multiModalSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnModalitiesNumberChanged(int)));
   connect(m_Controls.pythonEnvComboBox,
 #if QT_VERSION >= 0x050F00 // 5.15
           SIGNAL(textActivated(const QString &)),

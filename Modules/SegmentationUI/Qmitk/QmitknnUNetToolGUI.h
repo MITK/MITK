@@ -61,7 +61,7 @@ protected slots:
   void OnTrainerChanged(const QString &);
   void OnPythonChanged(const QString &);
   void OnCheckBoxChanged(int);
-  void OnModalitiesNumberChanged(int);
+  //void OnModalitiesNumberChanged(int);
 
 protected:
   QmitknnUNetToolGUI();

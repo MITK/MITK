@@ -111,6 +111,7 @@ namespace mitk
     itkBooleanMacro(Ensemble);
 
     std::vector<mitk::ModelParams> m_ParamQ;
+    std::vector<std::string> otherModalPaths;
 
     itkSetMacro(PreprocessingThreads, unsigned int);
     itkGetConstMacro(PreprocessingThreads, unsigned int);

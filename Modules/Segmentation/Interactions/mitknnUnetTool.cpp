@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include "mitkLabelSetImage.h"
 #include "mitkProcessExecutor.h"
 #include <cstdlib>
+#include <fstream>
 #include <itksys/SystemTools.hxx>
 #include <usGetModuleContext.h>
 #include <usModule.h>
@@ -101,7 +102,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   std::ofstream tmpStream;
   inputImagePath =
     mitk::IOUtil::CreateTemporaryFile(tmpStream, templateFilename, inDir + mitk::IOUtil::GetDirectorySeparator());
-  tmpStream.close();
+  tmpStream.close(); //required ?
   std::size_t found = inputImagePath.find_last_of(mitk::IOUtil::GetDirectorySeparator());
   std::string fileName = inputImagePath.substr(found + 1);
   std::string token = fileName.substr(0, fileName.find("_"));
@@ -117,13 +118,22 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
 
   try
   {
-    std::cout << "saving............ "  << std::endl;
-    //mitk::IOUtil::Save(_inputAtTimeStep.GetPointer(), inputImagePath);
+    std::cout << "saving............ " << std::endl;
+    // mitk::IOUtil::Save(_inputAtTimeStep.GetPointer(), inputImagePath);
     if (this->GetMultiModal())
     {
-      /*copy & rename file */
+      for (int i = 0; this->otherModalPaths.size(); ++i)
+      {
+        std::string inModalFile = this->otherModalPaths[i];
+        std::string outModalFile =
+          inDir + mitk::IOUtil::GetDirectorySeparator() + token + "_000_000" + std::to_string(i) + ".nii.gz";
+        std::ifstream src(inModalFile, std::ios::binary);
+        std::ofstream dst(outModalFile, std::ios::binary);
+        dst << src.rdbuf();
+      }
     }
   }
+
   catch (const mitk::Exception &e)
   {
     MITK_ERROR << e.GetDescription();
@@ -213,7 +223,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
         std::cout << arg << std::endl;
       }*/
       std::cout << "command at " << command << std::endl;
-      //spExec->execute(this->GetPythonPath(), command, args);
+      // spExec->execute(this->GetPythonPath(), command, args);
       outputImagePath = "/Users/ashis/DKFZ/nnUNet/mitk-32uGaS/nnunet-out-E211EZ/yFw1zN_000.nii.gz";
     }
     catch (const mitk::Exception &e)
@@ -247,7 +257,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
       std::cout << arg << std::endl;
     }
 
-    //spExec->execute(this->GetPythonPath(), command, args);
+    // spExec->execute(this->GetPythonPath(), command, args);
 
     outputImagePath = "/Users/ashis/DKFZ/nnUNet/mitk-32uGaS/nnunet-ensemble-out-cJ9sjG/yFw1zN_000.nii.gz";
   }

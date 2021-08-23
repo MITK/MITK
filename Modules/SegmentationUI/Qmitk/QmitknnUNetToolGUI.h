@@ -76,6 +76,7 @@ private:
   void ClearAllComboBoxes();
   mitk::ModelParams MapToRequest(QString &, QString &, QString &, QString &, std::vector<std::string> &);
   std::vector<std::string> FetchSelectedFoldsFromUI();
+  std::vector<std::string> FetchMultiModalPathsFromUI();
   template <typename T>
   static T FetchFoldersFromDir(const QString &);
   // Declaring variables for strings and int only.

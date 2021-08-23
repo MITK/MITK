@@ -51,7 +51,7 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
     m_Controls.trainerBox, SIGNAL(currentTextChanged(const QString &)), this, SLOT(OnTrainerChanged(const QString &)));
   connect(m_Controls.nopipBox, SIGNAL(stateChanged(int)), this, SLOT(OnCheckBoxChanged(int)));
   connect(m_Controls.multiModalBox, SIGNAL(stateChanged(int)), this, SLOT(OnCheckBoxChanged(int)));
-  //connect(m_Controls.multiModalSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnModalitiesNumberChanged(int)));
+  // connect(m_Controls.multiModalSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnModalitiesNumberChanged(int)));
   connect(m_Controls.pythonEnvComboBox,
 #if QT_VERSION >= 0x050F00 // 5.15
           SIGNAL(textActivated(const QString &)),
@@ -136,6 +136,7 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
         mitk::ModelParams modelObject = MapToRequest(m_Model, m_Task, trainer, planId, fetchedFolds);
         modelRequest->requestQ.push_back(modelObject);
       }
+
       hashKey = modelRequest->GetUniqueHash();
       if (this->cache.contains(hashKey))
       {
@@ -159,6 +160,16 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
 
       // Spinboxes
       tool->SetPreprocessingThreads(static_cast<unsigned int>(m_Controls.threadsBox->value()));
+
+      // Multi-Modal
+      tool->MultiModalOff();
+      if (m_Controls.multiModalBox->isChecked())
+      {
+        tool->otherModalPaths.clear();
+        tool->otherModalPaths = FetchMultiModalPathsFromUI();
+        tool->MultiModalOn();
+      }
+
       if (doSeg)
       {
         std::cout << "do segmentation" << std::endl;
@@ -173,6 +184,7 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       }
       else
       {
+        delete modelRequest;
         std::cout << "won't do segmentation. Key found: " << QString::number(hashKey).toStdString() << std::endl;
         if (this->cache.contains(hashKey))
         {
@@ -221,3 +233,12 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
   }
   return folders;
 }*/
+std::vector<std::string> QmitknnUNetToolGUI::FetchMultiModalPathsFromUI()
+{
+  std::vector<std::string> paths;
+  if (m_Controls.multiModalBox->isChecked())
+  {
+    paths.push_back(m_Controls.multiModalPath->currentPath().toStdString());
+  }
+  return paths;
+}

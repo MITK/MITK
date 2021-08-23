@@ -113,9 +113,9 @@ void QmitknnUNetToolGUI::OnCheckBoxChanged(int state)
       m_Controls.multiModalSpinBox->setVisible(visibility);
 
       // adding multimodal path
-      ctkPathLineEdit *multiModalPath = new ctkPathLineEdit(this);
-      multiModalPath->setObjectName(QString("multiModalPath"));
-      m_Controls.advancedSettingsLayout->addWidget(multiModalPath, 5, 1, 1, 3);
+      // ctkPathLineEdit *multiModalPath = new ctkPathLineEdit(this);
+      // multiModalPath->setObjectName(QString("multiModalPath"));
+      // m_Controls.advancedSettingsLayout->addWidget(multiModalPath, 5, 1, 1, 3);
     }
   }
 }

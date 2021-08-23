@@ -79,7 +79,10 @@ protected:
   void EditSelection();
   void UpdateInfo() override;
 
+  void OnDataStorageChanged() override;
   void OnNodeAddedToStorage(const mitk::DataNode* node) override;
+
+  void AutoSelectNewNodes();
 
   /** Helper function that gets a suitable auto selected node from the datastorage that fits to the predicate settings.
    @param ignoreNodes You may pass a list of nodes that must not be choosen as auto selected node. */

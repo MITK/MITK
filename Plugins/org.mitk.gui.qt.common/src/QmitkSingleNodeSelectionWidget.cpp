@@ -163,6 +163,50 @@ void QmitkSingleNodeSelectionWidget::UpdateInfo()
   m_Controls.btnSelect->SetSelectedNode(this->GetSelectedNode());
 }
 
+void QmitkSingleNodeSelectionWidget::SetCurrentSelectedNode(mitk::DataNode* selectedNode)
+{
+  NodeList selection;
+  if (selectedNode)
+  {
+    selection.append(selectedNode);
+  }
+  this->SetCurrentSelection(selection);
+}
+
+void QmitkSingleNodeSelectionWidget::OnDataStorageChanged()
+{
+  this->AutoSelectNewNodes();
+}
+
+void QmitkSingleNodeSelectionWidget::OnNodeAddedToStorage(const mitk::DataNode* /*node*/)
+{
+  this->AutoSelectNewNodes();
+}
+
+bool QmitkSingleNodeSelectionWidget::GetAutoSelectNewNodes() const
+{
+  return m_AutoSelectNewNodes;
+}
+
+void QmitkSingleNodeSelectionWidget::SetAutoSelectNewNodes(bool autoSelect)
+{
+  m_AutoSelectNewNodes = autoSelect;
+  this->AutoSelectNewNodes();
+}
+
+void QmitkSingleNodeSelectionWidget::AutoSelectNewNodes()
+{
+  if (this->GetSelectedNode().IsNull() && m_AutoSelectNewNodes)
+  {
+    auto autoNode = this->DetermineAutoSelectNode();
+
+    if (autoNode.IsNotNull())
+    {
+      this->HandleChangeOfInternalSelection({ autoNode });
+    }
+  }
+}
+
 mitk::DataNode::Pointer QmitkSingleNodeSelectionWidget::DetermineAutoSelectNode(const NodeList& ignoreNodes)
 {
   mitk::DataNode::Pointer result;
@@ -194,38 +238,4 @@ mitk::DataNode::Pointer QmitkSingleNodeSelectionWidget::DetermineAutoSelectNode(
     result = storage->GetNode(predicate);
   }
   return result;
-}
-
-void QmitkSingleNodeSelectionWidget::SetCurrentSelectedNode(mitk::DataNode* selectedNode)
-{
-  NodeList selection;
-  if (selectedNode)
-  {
-    selection.append(selectedNode);
-  }
-  this->SetCurrentSelection(selection);
-}
-
-void QmitkSingleNodeSelectionWidget::OnNodeAddedToStorage(const mitk::DataNode* /*node*/)
-{
-  if (this->GetSelectedNode().IsNull() && m_AutoSelectNewNodes)
-  {
-    auto autoNode = this->DetermineAutoSelectNode();
-
-    if (autoNode.IsNotNull())
-    {
-      this->HandleChangeOfInternalSelection({ autoNode });
-    }
-  }
-}
-
-bool QmitkSingleNodeSelectionWidget::GetAutoSelectNewNodes() const
-{
-  return m_AutoSelectNewNodes;
-}
-
-void QmitkSingleNodeSelectionWidget::SetAutoSelectNewNodes(bool autoSelect)
-{
-  m_AutoSelectNewNodes = autoSelect;
-  this->OnNodeAddedToStorage(nullptr);
 }

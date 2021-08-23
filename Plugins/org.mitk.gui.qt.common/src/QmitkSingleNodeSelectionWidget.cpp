@@ -24,7 +24,7 @@ found in the LICENSE file.
 
 QmitkSingleNodeSelectionWidget::QmitkSingleNodeSelectionWidget(QWidget* parent)
   : QmitkAbstractNodeSelectionWidget(parent)
-  , m_AutoSelectNewNodes(false)
+  , m_AutoSelectNodes(false)
 {
   m_Controls.setupUi(this);
 
@@ -43,7 +43,7 @@ void QmitkSingleNodeSelectionWidget::ReviseSelectionChanged(const NodeList& oldI
 {
   if (newInternalSelection.empty())
   {
-    if (m_AutoSelectNewNodes)
+    if (m_AutoSelectNodes)
     {
       auto autoSelectedNode = this->DetermineAutoSelectNode(oldInternalSelection);
 
@@ -175,28 +175,28 @@ void QmitkSingleNodeSelectionWidget::SetCurrentSelectedNode(mitk::DataNode* sele
 
 void QmitkSingleNodeSelectionWidget::OnDataStorageChanged()
 {
-  this->AutoSelectNewNodes();
+  this->AutoSelectNodes();
 }
 
 void QmitkSingleNodeSelectionWidget::OnNodeAddedToStorage(const mitk::DataNode* /*node*/)
 {
-  this->AutoSelectNewNodes();
+  this->AutoSelectNodes();
 }
 
 bool QmitkSingleNodeSelectionWidget::GetAutoSelectNewNodes() const
 {
-  return m_AutoSelectNewNodes;
+  return m_AutoSelectNodes;
 }
 
 void QmitkSingleNodeSelectionWidget::SetAutoSelectNewNodes(bool autoSelect)
 {
-  m_AutoSelectNewNodes = autoSelect;
-  this->AutoSelectNewNodes();
+  m_AutoSelectNodes = autoSelect;
+  this->AutoSelectNodes();
 }
 
-void QmitkSingleNodeSelectionWidget::AutoSelectNewNodes()
+void QmitkSingleNodeSelectionWidget::AutoSelectNodes()
 {
-  if (this->GetSelectedNode().IsNull() && m_AutoSelectNewNodes)
+  if (this->GetSelectedNode().IsNull() && m_AutoSelectNodes)
   {
     auto autoNode = this->DetermineAutoSelectNode();
 

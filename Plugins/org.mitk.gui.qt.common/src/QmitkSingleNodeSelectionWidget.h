@@ -82,14 +82,14 @@ protected:
   void OnDataStorageChanged() override;
   void OnNodeAddedToStorage(const mitk::DataNode* node) override;
 
-  void AutoSelectNewNodes();
+  void AutoSelectNodes();
 
   /** Helper function that gets a suitable auto selected node from the datastorage that fits to the predicate settings.
    @param ignoreNodes You may pass a list of nodes that must not be choosen as auto selected node. */
   mitk::DataNode::Pointer DetermineAutoSelectNode(const NodeList& ignoreNodes = {});
 
   /** See documentation of SetAutoSelectNewNodes for details*/
-  bool m_AutoSelectNewNodes;
+  bool m_AutoSelectNodes;
 
   Ui_QmitkSingleNodeSelectionWidget m_Controls;
 };

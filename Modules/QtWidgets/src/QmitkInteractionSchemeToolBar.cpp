@@ -22,6 +22,7 @@ QmitkInteractionSchemeToolBar::QmitkInteractionSchemeToolBar(QWidget* parent/* =
 {
   QToolBar::setOrientation(Qt::Vertical);
   QToolBar::setIconSize(QSize(17, 17));
+  QToolBar::setFixedWidth(33);
   m_ActionGroup->setExclusive(false); // allow having no action selected
 
   AddButton(InteractionScheme::PACSStandard, tr("Pointer"), QIcon(":/Qmitk/mm_pointer.png"), true);

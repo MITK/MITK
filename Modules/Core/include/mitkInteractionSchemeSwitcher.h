@@ -78,6 +78,7 @@ namespace mitk
       MITKRotationUncoupled,
       MITKRotationCoupled,
       MITKSwivel,
+      PACSBase,
       PACSStandard,
       PACSLevelWindow,
       PACSPan,

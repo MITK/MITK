@@ -62,9 +62,15 @@ void mitk::InteractionSchemeSwitcher::SetInteractionScheme(mitk::InteractionEven
       break;
     }
     // PACS MODE
+    case PACSBase:
+    {
+      interactionEventHandler->SetEventConfig("DisplayConfigPACS.xml");
+      break;
+    }
     case PACSStandard:
     {
       interactionEventHandler->SetEventConfig("DisplayConfigPACS.xml");
+      interactionEventHandler->AddEventConfig("DisplayConfigPACSCrosshair.xml");
       break;
     }
     case PACSLevelWindow:

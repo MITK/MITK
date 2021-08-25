@@ -22,7 +22,8 @@ QmitkInteractionSchemeToolBar::QmitkInteractionSchemeToolBar(QWidget* parent/* =
 {
   QToolBar::setOrientation(Qt::Vertical);
   QToolBar::setIconSize(QSize(17, 17));
-  m_ActionGroup->setExclusive(true); // only one selectable action
+  QToolBar::setFixedWidth(33);
+  m_ActionGroup->setExclusive(false); // allow having no action selected
 
   AddButton(InteractionScheme::PACSStandard, tr("Pointer"), QIcon(":/Qmitk/mm_pointer.png"), true);
   AddButton(InteractionScheme::PACSLevelWindow, tr("Level/Window"), QIcon(":/Qmitk/mm_contrast.png"));
@@ -72,7 +73,20 @@ void QmitkInteractionSchemeToolBar::OnInteractionSchemeChanged()
   QAction* action = dynamic_cast<QAction*>(sender());
   if (action)
   {
+    for (auto actionIter : m_ActionGroup->actions())
+    {
+      if (actionIter != action)
+      {
+        actionIter->setChecked(false);
+      }
+    }
+
     InteractionScheme interactionScheme = static_cast<InteractionScheme>(action->data().toInt());
+    // If the selected option is unchecked, use the base interaction with no primary tool
+    if (!action->isChecked())
+    {
+      interactionScheme = InteractionScheme::PACSBase;
+    }
 
     try
     {

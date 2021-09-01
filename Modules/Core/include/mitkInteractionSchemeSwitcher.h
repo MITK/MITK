@@ -24,7 +24,7 @@ namespace mitk
   /***********************************************************************
   *
   * \brief Class that offers a convenient way to switch between different
-  * interaction schemes and their different modes.
+  * interaction schemes.
   *
   * This class offers the possibility to switch between the different
   * interaction schemes that are available:
@@ -32,18 +32,23 @@ namespace mitk
   * - MITKStandard : The original MITK interaction scheme
   * - MITKRotationUncoupled : A modified MITK interaction scheme with rotation
   * - MITKRotationCoupled : A modified MTIK interaction scheme with coupled rotation
+  * - MITKSwivel : A modified MITK interaction scheme with plane swiveling
   *
   * - PACS : An alternative interaction scheme that behaves more like a
   *          PACS workstation
   *   - left mouse button   : behavior depends on current PACS scheme
+  *   Always enabled:
   *   - middle mouse button : fast scrolling
   *   - right mouse button  : level-window
   *   - ctrl + right button : zooming
   *   - shift+ right button : panning
   *
-  *   There are 5 different PACS schemes that are available in the PACS scheme.
+  *   There are 6 different PACS schemes.
   *   Each scheme defines the interaction that is performed on a left
   *   mouse button click:
+  *   - PACSBase : No interaction on a left mouse button click
+        - This scheme serves as a base for other PACS schemes and defines the right
+          and middle mouse button clicks, which are available in every PACS scheme.
   *   - PACSStandard : Sets the cross position for the MPR
   *   - PACSLevelWindow : Sets the level window
   *   - PACSPan : Moves the slice

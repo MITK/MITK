@@ -16,19 +16,12 @@ found in the LICENSE file.
 #include <QDir>
 #include <QDirIterator>
 #include <QMessageBox>
-#include <QOpenGLWidget>
 #include <QProcess>
 #include <QtGlobal>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitknnUNetToolGUI, "")
 
-QmitknnUNetToolGUI::QmitknnUNetToolGUI() : QmitkAutoMLSegmentationToolGUIBase()
-{
-  // create a new worker thread to execute some functions in a seperate thread
-  m_SegmentationThread = new QThread;
-  m_Worker = new nnUNetSegmentationWorker;
-  m_Worker->moveToThread(m_SegmentationThread);
-}
+QmitknnUNetToolGUI::QmitknnUNetToolGUI() : QmitkAutoMLSegmentationToolGUIBase() {}
 
 void QmitknnUNetToolGUI::ConnectNewTool(mitk::AutoSegmentationWithPreviewTool *newTool)
 {
@@ -58,7 +51,7 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
     m_Controls.trainerBox, SIGNAL(currentTextChanged(const QString &)), this, SLOT(OnTrainerChanged(const QString &)));
   connect(m_Controls.nopipBox, SIGNAL(stateChanged(int)), this, SLOT(OnCheckBoxChanged(int)));
   connect(m_Controls.multiModalBox, SIGNAL(stateChanged(int)), this, SLOT(OnCheckBoxChanged(int)));
-  connect(m_Controls.multiModalSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnModalitiesNumberChanged(int)));
+  // connect(m_Controls.multiModalSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnModalitiesNumberChanged(int)));
   connect(m_Controls.pythonEnvComboBox,
 #if QT_VERSION >= 0x050F00 // 5.15
           SIGNAL(textActivated(const QString &)),
@@ -67,19 +60,12 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
 #endif
           this,
           SLOT(OnPythonChanged(const QString &)));
-
-  qRegisterMetaType<QVector<int>>("QVector");
-
-  connect(this, &QmitknnUNetToolGUI::Operate, m_Worker, &nnUNetSegmentationWorker::DoWork);
-  connect(m_Worker, &nnUNetSegmentationWorker::Finished, this, &QmitknnUNetToolGUI::SetSegmentation);
-
   m_Controls.codedirectoryBox->setVisible(false);
   m_Controls.nnUnetdirLabel->setVisible(false);
   m_Controls.multiModalSpinBox->setVisible(false);
   m_Controls.multiModalSpinLabel->setVisible(false);
   mainLayout->addLayout(m_Controls.verticalLayout);
   Superclass::InitializeUI(mainLayout);
-  m_UI_ROWS = m_Controls.advancedSettingsLayout->rowCount();
 }
 
 void QmitknnUNetToolGUI::OnSettingsAccept()
@@ -187,18 +173,6 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       if (doSeg)
       {
         std::cout << "do segmentation" << std::endl;
-        // if (!m_SegmentationThread->isRunning())
-        // {
-
-        //   std::cout << "starting thread..." << std::endl;
-
-        //   auto openglcontxt = dynamic_cast<QOpenGLWidget*>(this);
-        //   openglcontxt->doneCurrent();
-        //   m_SegmentationThread->start();
-        // }
-        // // start segmentation in worker thread
-        // emit Operate(tool);
-
         tool->UpdatePreview();
         this->SetLabelSetPreview(tool->GetMLPreview());
         std::cout << "New pointer: " << tool->GetMLPreview() << std::endl;
@@ -246,15 +220,25 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
   }
 }
 
+/*std::vector<QString> QmitknnUNetToolGUI::FetchFoldersFromDir(const QString &path)
+{
+  std::vector<QString> folders;
+  for (QDirIterator it(path, QDir::AllDirs, QDirIterator::NoIteratorFlags); it.hasNext();)
+  {
+    it.next();
+    if (!it.fileName().startsWith('.'))
+    {
+      folders.push_back(it.fileName());
+    }
+  }
+  return folders;
+}*/
 std::vector<std::string> QmitknnUNetToolGUI::FetchMultiModalPathsFromUI()
 {
   std::vector<std::string> paths;
-  if (m_Controls.multiModalBox->isChecked() && !m_ModalPaths.empty())
+  if (m_Controls.multiModalBox->isChecked())
   {
-    for (auto modality : m_ModalPaths)
-    {
-      paths.push_back(modality->currentPath().toStdString());
-    }
+    paths.push_back(m_Controls.multiModalPath->currentPath().toStdString());
   }
   return paths;
 }

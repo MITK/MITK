@@ -6,7 +6,6 @@
 #include <QStringListModel>
 #include <QtGlobal>
 #include <algorithm>
-#include <ctkPathLineEdit.h>
 
 void QmitknnUNetToolGUI::EnableWidgets(bool enabled)
 {
@@ -111,43 +110,51 @@ void QmitknnUNetToolGUI::OnCheckBoxChanged(int state)
     {
       m_Controls.multiModalSpinLabel->setVisible(visibility);
       m_Controls.multiModalSpinBox->setVisible(visibility);
-
-      // adding multimodal path
-      // ctkPathLineEdit *multiModalPath = new ctkPathLineEdit(this);
-      // multiModalPath->setObjectName(QString("multiModalPath"));
-      // m_Controls.advancedSettingsLayout->addWidget(multiModalPath, 5, 1, 1, 3);
     }
   }
 }
 
-// void QmitknnUNetToolGUI::OnModalitiesNumberChanged(int num) // 2
-// {
-//   int rowOffset = 4;
-//   int rowCount = m_Controls.advancedSettingsLayout->rowCount(); // 6
-//   std::cout << "Start Row count " << rowCount << std::endl;     // 6
+void QmitknnUNetToolGUI::OnModalitiesNumberChanged(int num)
+{
+  if (num > (int)this->m_ModalPaths.size())
+  {
+    ctkPathLineEdit *multiModalPath = new ctkPathLineEdit(this);
+    multiModalPath->setObjectName(QString("multiModalPath" + QString::number(m_ModalPaths.size() + 1)));
+    m_Controls.advancedSettingsLayout->addWidget(multiModalPath, this->m_UI_ROWS + m_ModalPaths.size() + 1, 1, 1, 3);
+    m_ModalPaths.push_back(multiModalPath);
+  }
+  else if (num < (int)this->m_ModalPaths.size() && !m_ModalPaths.empty())
+  {
+    ctkPathLineEdit *child = m_ModalPaths.back();
+    delete child; // delete the layout item
+    m_ModalPaths.pop_back();
+  }
 
-//   QLayoutItem *child;
-//   while ((child = m_Controls.advancedSettingsLayout->takeAt(0)) != nullptr)
-//   {
-//     delete child->widget(); // delete the widget
-//     delete child;               // delete the layout item
-//      m_Controls.advancedSettingsLayout->update();
-//     rowCount = m_Controls.advancedSettingsLayout->rowCount();
-//       std::cout << "current Row count " << rowCount << std::endl;     // 6
+  // int rowCount = m_Controls.advancedSettingsLayout->rowCount(); // 6
+  // std::cout << "Start Row count " << rowCount << std::endl;     // 6
 
-//   }
-//   rowCount = m_Controls.advancedSettingsLayout->rowCount(); // 4
-//   std::cout << "New Rows " << rowCount << std::endl;        // 4
+  // QLayoutItem *child;
+  // while ((child = m_Controls.advancedSettingsLayout->takeAt(0)) != nullptr)
+  // {
+  //   delete child->widget(); // delete the widget
+  //   delete child;               // delete the layout item
+  //    m_Controls.advancedSettingsLayout->update();
+  //   rowCount = m_Controls.advancedSettingsLayout->rowCount();
+  //     std::cout << "current Row count " << rowCount << std::endl;     // 6
 
-//   for (int i = rowCount + 1 /*5,*/; i /*5,6,7*/ < rowCount + num + 1 /*7-t,t,f*/; ++i)
-//   {
-//     std::cout << "i is  " << i << std::endl;
-//     ctkPathLineEdit *multiModalPath = new ctkPathLineEdit(this);
-//     multiModalPath->setObjectName(QString("multiModalPath" + QString::number(i)));
-//     m_Controls.advancedSettingsLayout->addWidget(multiModalPath, i, 1, 1, 3);
-//   }
-//   m_Controls.advancedSettingsLayout->update();
-// }
+  // }
+  // rowCount = m_Controls.advancedSettingsLayout->rowCount(); // 4
+  // std::cout << "New Rows " << rowCount << std::endl;        // 4
+
+  // for (int i = rowCount + 1 /*5,*/; i /*5,6,7*/ < rowCount + num + 1 /*7-t,t,f*/; ++i)
+  // {
+  //   std::cout << "i is  " << i << std::endl;
+  //   ctkPathLineEdit *multiModalPath = new ctkPathLineEdit(this);
+  //   multiModalPath->setObjectName(QString("multiModalPath" + QString::number(i)));
+  //   m_Controls.advancedSettingsLayout->addWidget(multiModalPath, i, 1, 1, 3);
+  // }
+  m_Controls.advancedSettingsLayout->update();
+}
 
 void QmitknnUNetToolGUI::AutoParsePythonPaths()
 {
@@ -212,4 +219,18 @@ mitk::ModelParams QmitknnUNetToolGUI::MapToRequest(
   requestObject.task = taskName.toStdString();
   requestObject.folds = folds;
   return requestObject;
+}
+
+void QmitknnUNetToolGUI::SegmentationProcessFailed()
+{
+  QMessageBox::warning(nullptr,
+                       "Error in segmentation",
+                       "There was an error in the segmentation process. No resulting segmentation can be loaded.");
+}
+
+void QmitknnUNetToolGUI::SetSegmentation(const mitk::LabelSetImage *output)
+{
+  MITK_INFO << "Finshed slot";
+  std::cout << "New pointer in slot: " << output << std::endl;
+  // this->SetLabelSetPreview(output);
 }

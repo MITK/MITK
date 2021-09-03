@@ -6,7 +6,7 @@ Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
 Use of this source code is governed by a 3-clause BSD license that can be
-found in the LICENSE file.
+found in the LICENSE file.s
 
 ============================================================================*/
 
@@ -14,11 +14,14 @@ found in the LICENSE file.
 #define QmitknnUNetToolGUI_h_Included
 
 #include "QmitkAutoMLSegmentationToolGUIBase.h"
+#include "QmitknnUNetWorker.h"
 #include "mitknnUnetTool.h"
 #include "ui_QmitknnUNetToolGUIControls.h"
 #include <MitkSegmentationUIExports.h>
 #include <QCache>
-#include <QProcess>
+#include <QThread>
+#include <ctkPathLineEdit.h>
+
 
 class MITKSEGMENTATIONUI_EXPORT nnUNetModel
 {
@@ -61,7 +64,23 @@ protected slots:
   void OnTrainerChanged(const QString &);
   void OnPythonChanged(const QString &);
   void OnCheckBoxChanged(int);
-  //void OnModalitiesNumberChanged(int);
+  void SegmentationProcessFailed();
+  void SetSegmentation(const mitk::LabelSetImage*);
+  void OnModalitiesNumberChanged(int);
+
+signals:
+
+  /**
+   * @brief signal for starting the segmentation which is caught by a worker thread.
+   */
+  void Operate(mitk::nnUNetTool *tool);
+  /**
+   * @brief if a segmentation is executed when the tool is started, emit a signal for waiting in the worker thread.
+   *
+   * @param tool the Segmentation Tool to check in worker, if the segmentation is still running.
+   */
+  // void Wait(mitk::nnUNetTool *tool);
+  
 
 protected:
   QmitknnUNetToolGUI();
@@ -85,6 +104,10 @@ private:
   QString m_ModelDirectory; // Change datatype to QDir?
   QString m_DatasetName;
   Ui_QmitknnUNetToolGUIControls m_Controls;
+  QThread *m_SegmentationThread;
+  nnUNetSegmentationWorker *m_Worker;
+  std::vector<ctkPathLineEdit*> m_ModalPaths;
+  int m_UI_ROWS;
 };
 
 #endif

@@ -68,7 +68,7 @@ public:
 
   void tearDown() override
   {
-    m_testmodel = nullptr;
+    //m_testmodel = nullptr;
   }
 
   void GetModelDisplayNameTest()
@@ -80,49 +80,54 @@ public:
 
   void GetModelTypeTest()
   {
-    //CPPUNIT_ASSERT_MESSAGE("Checking model type.", m_testmodel->GetModelType() == "Generic");
+    //CPPUNIT_ASSERT_MESSAGE("Checking model type.", m_testmodel->GetModelType() == "Perfusion.MR");
   }
 
 
   void GetParameterNamesTest()
   {
     //mitk::TwoStepLinearModel::ParameterNamesType parameterNames;
-    //parameterNames.push_back("BaseValue");
-    //parameterNames.push_back("Change_Point");
-    //parameterNames.push_back("Slope_1");
-    //parameterNames.push_back("Slope_2");
+    //parameterNames.push_back("KTrans");
+    //parameterNames.push_back("ve");
     //CPPUNIT_ASSERT_MESSAGE("Checking parameter names.", m_testmodel->GetParameterNames() == parameterNames);
   }
 
   void GetNumberOfParametersTest()
   {
-    //CPPUNIT_ASSERT_MESSAGE("Checking number of parameters in model.", m_testmodel->GetNumberOfParameters() == 4);
+    //CPPUNIT_ASSERT_MESSAGE("Checking number of parameters in model.", m_testmodel->GetNumberOfParameters() == 2);
   }
 
 
   void GetParameterUnitsTest()
   {
+    //mitk::StandardToftsModel::ParamterUnitMapType parameterUnits;
+    //parameterUnits.insert(std::make_pair("KTrans", "ml/min/100ml"));
+    //parameterUnits.insert(std::make_pair("ve", "ml/ml"));
+
+    //CPPUNIT_ASSERT_MESSAGE("Checking parameter units.", m_testmodel->GetParameterUnits() == parameterUnits);
 
   }
 
   void GetDerivedParameterNamesTest()
   {
-    //mitk::TwoStepLinearModel::ParameterNamesType derivedParameterNames;
-    //derivedParameterNames.push_back("AUC");
-    //derivedParameterNames.push_back("FinalUptake");
-    //derivedParameterNames.push_back("Smax");
-    //derivedParameterNames.push_back("y-intercept2");
+    //mitk::StandardToftsModel::ParameterNamesType derivedParameterNames;
+
+    //derivedParameterNames.push_back("kep");
+
     //CPPUNIT_ASSERT_MESSAGE("Checking derived parameter names.", m_testmodel->GetDerivedParameterNames() == derivedParameterNames);
   }
 
   void GetNumberOfDerivedParametersTest()
   {
-    //CPPUNIT_ASSERT_MESSAGE("Checking number of parameters in model.", m_testmodel->GetNumberOfDerivedParameters() == 4);
+    //CPPUNIT_ASSERT_MESSAGE("Checking number of parameters in model.", m_testmodel->GetNumberOfDerivedParameters() == 1);
   }
 
   void GetDerivedParameterUnitsTest()
   {
-    //CPPUNIT_ASSERT_MESSAGE("Checking number of parameters in model.", m_testmodel->GetNumberOfDerivedParameters() == 4);
+    //mitk::StandardToftsModel::ParamterUnitMapType derivedParameterUnits;
+    //derivedParameterUnits.insert(std::make_pair("kep", "1/min"));
+
+    //CPPUNIT_ASSERT_MESSAGE("Checking parameter units.", m_testmodel->GetDerivedParameterUnits() == derivedParameterUnits);
   }
 
   void ComputeModelfunctionTest()

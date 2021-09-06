@@ -137,6 +137,7 @@ namespace mitk
     bool m_MultiModal;
     bool m_Ensemble = false;
     unsigned int m_PreprocessingThreads;
+    bool test;
   };
 } // namespace mitk
 

@@ -39,13 +39,14 @@ T QmitknnUNetToolGUI::FetchFoldersFromDir(const QString &path)
 void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &dir)
 {
   this->ClearAllComboBoxes();
-  auto models = FetchFoldersFromDir<QStringList>(dir);
+  m_ModelDirectory =  dir + QDir::separator() + "nnUNet";
+  auto models = FetchFoldersFromDir<QStringList>(m_ModelDirectory);
   std::for_each(models.begin(), models.end(), [this](QString model) { m_Controls.modelBox->addItem(model); });
 }
 
 void QmitknnUNetToolGUI::OnModelChanged(const QString &text)
 {
-  m_ModelDirectory = m_Controls.modeldirectoryBox->directory();
+  //m_ModelDirectory = m_Controls.modeldirectoryBox->directory();
   QString updatedPath(QDir::cleanPath(m_ModelDirectory + QDir::separator() + text));
   m_Controls.taskBox->clear();
   auto datasets = FetchFoldersFromDir<QStringList>(updatedPath);
@@ -54,8 +55,7 @@ void QmitknnUNetToolGUI::OnModelChanged(const QString &text)
 
 void QmitknnUNetToolGUI::OnTaskChanged(const QString &text)
 {
-  m_ModelDirectory = m_Controls.modeldirectoryBox->directory();
-
+  //m_ModelDirectory = m_Controls.modeldirectoryBox->directory();
   QString updatedPath = QDir::cleanPath(m_ModelDirectory + QDir::separator() + m_Controls.modelBox->currentText() +
                                         QDir::separator() + text);
   m_Controls.trainerBox->clear();
@@ -68,7 +68,7 @@ void QmitknnUNetToolGUI::OnTrainerChanged(const QString &trainerSelected)
   m_Controls.foldBox->clear();
   if (m_Controls.modelBox->currentText() != "ensembles")
   {
-    m_ModelDirectory = m_Controls.modeldirectoryBox->directory(); // check syntax
+    //m_ModelDirectory = m_Controls.modeldirectoryBox->directory(); // check syntax
     QString updatedPath(QDir::cleanPath(m_ModelDirectory + QDir::separator() + m_Controls.modelBox->currentText() +
                                         QDir::separator() + m_Controls.taskBox->currentText() + QDir::separator() +
                                         trainerSelected));
@@ -232,5 +232,5 @@ void QmitknnUNetToolGUI::SetSegmentation(const mitk::LabelSetImage *output)
 {
   MITK_INFO << "Finshed slot";
   std::cout << "New pointer in slot: " << output << std::endl;
-  // this->SetLabelSetPreview(output);
+  this->SetLabelSetPreview(output);
 }

@@ -146,7 +146,7 @@
                 </sizepolicy>
               </property>
               <property name="text">
-                <string>No. of Modalities:</string>
+                <string>No. of Extra Modalities:</string>
               </property>
             </widget>
           </item>

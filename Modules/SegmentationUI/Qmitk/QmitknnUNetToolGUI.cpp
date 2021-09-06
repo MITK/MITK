@@ -165,7 +165,7 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
 
       tool->SetnnUNetDirectory(nnUNetDirectory);
       tool->SetPythonPath(pythonPath.toStdString());
-      tool->SetModelDirectory(m_ModelDirectory.toStdString());
+      tool->SetModelDirectory(m_ModelDirectory.left(m_ModelDirectory.lastIndexOf(QDir::separator())).toStdString());
       // checkboxes
       tool->SetMirror(m_Controls.mirrorBox->isChecked());
       tool->SetMixedPrecision(m_Controls.mixedPrecisionBox->isChecked());

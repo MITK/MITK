@@ -101,7 +101,7 @@ private:
   // Declaring variables for strings and int only.
   QString m_Model;
   QString m_Task;
-  QString m_ModelDirectory; // Change datatype to QDir?
+  QString m_ModelDirectory;
   QString m_DatasetName;
   Ui_QmitknnUNetToolGUIControls m_Controls;
   QThread *m_SegmentationThread;

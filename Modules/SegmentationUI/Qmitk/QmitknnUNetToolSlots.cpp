@@ -39,14 +39,14 @@ T QmitknnUNetToolGUI::FetchFoldersFromDir(const QString &path)
 void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &dir)
 {
   this->ClearAllComboBoxes();
-  m_ModelDirectory =  dir + QDir::separator() + "nnUNet";
+  m_ModelDirectory = dir + QDir::separator() + "nnUNet";
   auto models = FetchFoldersFromDir<QStringList>(m_ModelDirectory);
   std::for_each(models.begin(), models.end(), [this](QString model) { m_Controls.modelBox->addItem(model); });
 }
 
 void QmitknnUNetToolGUI::OnModelChanged(const QString &text)
 {
-  //m_ModelDirectory = m_Controls.modeldirectoryBox->directory();
+  // m_ModelDirectory = m_Controls.modeldirectoryBox->directory();
   QString updatedPath(QDir::cleanPath(m_ModelDirectory + QDir::separator() + text));
   m_Controls.taskBox->clear();
   auto datasets = FetchFoldersFromDir<QStringList>(updatedPath);
@@ -55,7 +55,7 @@ void QmitknnUNetToolGUI::OnModelChanged(const QString &text)
 
 void QmitknnUNetToolGUI::OnTaskChanged(const QString &text)
 {
-  //m_ModelDirectory = m_Controls.modeldirectoryBox->directory();
+  // m_ModelDirectory = m_Controls.modeldirectoryBox->directory();
   QString updatedPath = QDir::cleanPath(m_ModelDirectory + QDir::separator() + m_Controls.modelBox->currentText() +
                                         QDir::separator() + text);
   m_Controls.trainerBox->clear();
@@ -68,7 +68,7 @@ void QmitknnUNetToolGUI::OnTrainerChanged(const QString &trainerSelected)
   m_Controls.foldBox->clear();
   if (m_Controls.modelBox->currentText() != "ensembles")
   {
-    //m_ModelDirectory = m_Controls.modeldirectoryBox->directory(); // check syntax
+    // m_ModelDirectory = m_Controls.modeldirectoryBox->directory(); // check syntax
     QString updatedPath(QDir::cleanPath(m_ModelDirectory + QDir::separator() + m_Controls.modelBox->currentText() +
                                         QDir::separator() + m_Controls.taskBox->currentText() + QDir::separator() +
                                         trainerSelected));
@@ -228,9 +228,15 @@ void QmitknnUNetToolGUI::SegmentationProcessFailed()
                        "There was an error in the segmentation process. No resulting segmentation can be loaded.");
 }
 
-void QmitknnUNetToolGUI::SetSegmentation(const mitk::LabelSetImage *output)
+void QmitknnUNetToolGUI::SetSegmentation(mitk::nnUNetTool *tool, nnUNetModel *modelRequest)
 {
-  MITK_INFO << "Finshed slot";
-  std::cout << "New pointer in slot: " << output << std::endl;
-  this->SetLabelSetPreview(output);
+  MITK_INFO << "Finished slot";
+  tool->SetSegmentation();
+  this->SetLabelSetPreview(tool->GetMLPreview());
+  std::cout << "New pointer: " << tool->GetMLPreview() << std::endl;
+  modelRequest->outputImage = tool->GetMLPreview();
+  // Adding params and output Labelset image to Cache
+  size_t hashkey = modelRequest->GetUniqueHash();
+  std::cout << "New hash: " << hashkey << std::endl;
+  this->cache.insert(hashkey, modelRequest);
 }

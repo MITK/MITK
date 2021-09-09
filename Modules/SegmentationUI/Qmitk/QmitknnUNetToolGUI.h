@@ -22,27 +22,26 @@ found in the LICENSE file.s
 #include <QThread>
 #include <ctkPathLineEdit.h>
 
+// class MITKSEGMENTATIONUI_EXPORT nnUNetModel
+// {
+// public:
+//   std::vector<mitk::ModelParams> requestQ;
+//   mitk::LabelSetImage::ConstPointer outputImage;
+//   size_t hashCode = 0;
 
-class MITKSEGMENTATIONUI_EXPORT nnUNetModel
-{
-public:
-  std::vector<mitk::ModelParams> requestQ;
-  mitk::LabelSetImage::ConstPointer outputImage;
-  size_t hashCode = 0;
-
-  size_t GetUniqueHash()
-  {
-    if (hashCode == 0)
-    {
-      for (mitk::ModelParams request : requestQ)
-      {
-        // sum of individual hash is the final hash
-        hashCode += request.generateHash();
-      }
-    }
-    return hashCode;
-  }
-};
+//   size_t GetUniqueHash()
+//   {
+//     if (hashCode == 0)
+//     {
+//       for (mitk::ModelParams request : requestQ)
+//       {
+//         // sum of individual hash is the final hash
+//         hashCode += request.generateHash();
+//       }
+//     }
+//     return hashCode;
+//   }
+// };
 
 class MITKSEGMENTATIONUI_EXPORT QmitknnUNetToolGUI : public QmitkAutoMLSegmentationToolGUIBase
 {
@@ -65,7 +64,7 @@ protected slots:
   void OnPythonChanged(const QString &);
   void OnCheckBoxChanged(int);
   void SegmentationProcessFailed();
-  void SetSegmentation(const mitk::LabelSetImage*);
+  void SetSegmentation(mitk::nnUNetTool *, nnUNetModel *);
   void OnModalitiesNumberChanged(int);
 
 signals:
@@ -73,14 +72,13 @@ signals:
   /**
    * @brief signal for starting the segmentation which is caught by a worker thread.
    */
-  void Operate(mitk::nnUNetTool *tool);
+  void Operate(mitk::nnUNetTool *, nnUNetModel *);
   /**
    * @brief if a segmentation is executed when the tool is started, emit a signal for waiting in the worker thread.
    *
    * @param tool the Segmentation Tool to check in worker, if the segmentation is still running.
    */
   // void Wait(mitk::nnUNetTool *tool);
-  
 
 protected:
   QmitknnUNetToolGUI();
@@ -102,11 +100,10 @@ private:
   QString m_Model;
   QString m_Task;
   QString m_ModelDirectory;
-  QString m_DatasetName;
   Ui_QmitknnUNetToolGUIControls m_Controls;
   QThread *m_SegmentationThread;
   nnUNetSegmentationWorker *m_Worker;
-  std::vector<ctkPathLineEdit*> m_ModalPaths;
+  std::vector<ctkPathLineEdit *> m_ModalPaths;
   int m_UI_ROWS;
 };
 

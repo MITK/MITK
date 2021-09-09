@@ -13,14 +13,34 @@ found in the LICENSE file.s
 #ifndef QmitknnUNetWorker_h
 #define QmitknnUNetWorker_h
 
+#include <QMutex>
 #include <QObject>
 #include <mitknnUnetTool.h>
-#include <MitkSegmentationUIExports.h>
-
 
 // Q_DECLARE_METATYPE(mitk::DeepLearningSegmentationTool*)
-//Q_DECLARE_METATYPE(mitk::LabelSetImage*)
+// Q_DECLARE_METATYPE(mitk::LabelSetImage*)
 // Q_DECLARE_METATYPE(std::vector<mitk::LabelSetImage::Pointer>)
+
+class nnUNetModel
+{
+public:
+  std::vector<mitk::ModelParams> requestQ;
+  mitk::LabelSetImage::ConstPointer outputImage;
+  size_t hashCode = 0;
+
+  size_t GetUniqueHash()
+  {
+    if (hashCode == 0)
+    {
+      for (mitk::ModelParams request : requestQ)
+      {
+        // sum of individual hash is the final hash
+        hashCode += request.generateHash();
+      }
+    }
+    return hashCode;
+  }
+};
 
 /**
  * @class SegmentationWorker
@@ -38,14 +58,14 @@ public slots:
    * @param resultSetter the SegmentationResultHandler which sets the result in the GUI after the segmentation
    * @param networkPath the path to the trained network which is needed for the segmentation
    */
-  void DoWork(mitk::nnUNetTool*);
+  void DoWork(mitk::nnUNetTool *, nnUNetModel*);
   /**
-   * @brief if a segmentation is executed when the tool is started, 
+   * @brief if a segmentation is executed when the tool is started,
    *        wait for the segmentation to finish and emit a signal (PreviouesSegmentationFinished) afterwards.
    *
    * @param tool the Segmentation Tool to check, if the segmentation is still running.
    */
-  //void WaitForSegmentationToFinish(mitk::nnUNetTool *segTool);   
+  // void WaitForSegmentationToFinish(mitk::nnUNetTool *segTool);
 
 signals:
   /**
@@ -54,14 +74,15 @@ signals:
    * @param result the resulting segmentation
    * @param segTool the Segmentation Tool for running the segmentation
    */
-  void Finished(const mitk::LabelSetImage*);
+  void Finished(mitk::nnUNetTool *, nnUNetModel*);
   /**
    * @brief the signal emitted when a multilabel segmentation process finished successful
    *
    * @param result the resulting segmentation
    * @param segTool the Segmentation Tool for running the segmentation
    */
-  //void FinishedMultilabel(std::vector<mitk::LabelSetImage::Pointer> result, mitk::DeepLearningSegmentationTool *segTool);
+  // void FinishedMultilabel(std::vector<mitk::LabelSetImage::Pointer> result, mitk::DeepLearningSegmentationTool
+  // *segTool);
   /**
    * @brief the signal emitted when a segmentation process failed
    */
@@ -69,7 +90,10 @@ signals:
   /**
    * @brief the signal emitted when a segmentation, which ran when the tool was started, finished
    */
-  //void PreviousSegmentationFinished();
+  // void PreviousSegmentationFinished();
+
+private:
+  QMutex mutex;
 };
 
 #endif

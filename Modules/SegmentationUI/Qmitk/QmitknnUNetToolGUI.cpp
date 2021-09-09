@@ -116,7 +116,7 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       {
         std::cout << "model ensemble" << std::endl;
         QString ppJsonFile =
-          QDir::cleanPath(m_ModelDirectory + QDir::separator() + m_Model + QDir::separator() + m_DatasetName +
+          QDir::cleanPath(m_ModelDirectory + QDir::separator() + m_Model + QDir::separator() + m_Task +
                           QDir::separator() + trainerPlanner + QDir::separator() + "postprocessing.json");
         if (QFile(ppJsonFile).exists())
         {
@@ -171,10 +171,8 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       tool->SetMixedPrecision(m_Controls.mixedPrecisionBox->isChecked());
       tool->SetNoPip(m_Controls.nopipBox->isChecked());
       tool->SetMultiModal(m_Controls.multiModalBox->isChecked());
-
       // Spinboxes
       tool->SetPreprocessingThreads(static_cast<unsigned int>(m_Controls.threadsBox->value()));
-
       // Multi-Modal
       tool->MultiModalOff();
       if (m_Controls.multiModalBox->isChecked())
@@ -187,26 +185,12 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       if (doSeg)
       {
         std::cout << "do segmentation" << std::endl;
-        // if (!m_SegmentationThread->isRunning())
-        // {
-
-        //   std::cout << "starting thread..." << std::endl;
-
-        //   auto openglcontxt = dynamic_cast<QOpenGLWidget*>(this);
-        //   openglcontxt->doneCurrent();
-        //   m_SegmentationThread->start();
-        // }
-        // // start segmentation in worker thread
-        // emit Operate(tool);
-
-        tool->UpdatePreview();
-        this->SetLabelSetPreview(tool->GetMLPreview());
-        std::cout << "New pointer: " << tool->GetMLPreview() << std::endl;
-        modelRequest->outputImage = tool->GetMLPreview();
-        // Adding params and output Labelset image to Cache
-        size_t hashkey = modelRequest->GetUniqueHash();
-        std::cout << "New hash: " << hashkey << std::endl;
-        this->cache.insert(hashkey, modelRequest);
+        if (!m_SegmentationThread->isRunning())
+        {
+          std::cout << "starting thread..." << std::endl;
+          m_SegmentationThread->start();
+        }
+        emit Operate(tool, modelRequest); // start segmentation in worker thread
       }
       else
       {

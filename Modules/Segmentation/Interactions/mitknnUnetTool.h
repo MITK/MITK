@@ -116,12 +116,17 @@ namespace mitk
     itkSetMacro(PreprocessingThreads, unsigned int);
     itkGetConstMacro(PreprocessingThreads, unsigned int);
 
+    void SetSegmentation();
+
+
   protected:
     nnUNetTool();
     ~nnUNetTool() override; // why to override eventhough AutoMLSegmentationWithPreviewTool has no virtual destructor
     //~nnUNetTool() = default; Are there any consequences of not using default?
 
     LabelSetImage::Pointer ComputeMLPreview(const Image *inputAtTimeStep, TimeStepType timeStep) override;
+    void UpdateCleanUp() override;
+
 
   private:
     std::string m_MitkTempDir;

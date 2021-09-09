@@ -1,6 +1,8 @@
 #include "QmitknnUNetWorker.h"
+#include "mitkRenderingManager.h"
 
-void nnUNetSegmentationWorker::DoWork(mitk::nnUNetTool *tool)
+
+void nnUNetSegmentationWorker::DoWork(mitk::nnUNetTool *tool, nnUNetModel* request)
 {
   // connect signals/slots with the result setter which sets the result in the main thread afterwards
   // connect(this, &SegmentationWorker::Finished, resultSetter, &SegmentationResultHandler::SetResult);
@@ -10,10 +12,12 @@ void nnUNetSegmentationWorker::DoWork(mitk::nnUNetTool *tool)
   std::cout << "in do work" << std::endl;
   try
   {
+    mutex.lock();
     tool->UpdatePreview();
+    mutex.unlock();
     MITK_INFO << "Back in Worker";
     // emit Failed();
-    emit Finished(tool->GetMLPreview());
+    emit Finished(tool, request);
 
     // disconnect from result setter. Otherwise, the result is set twice after second execution,
     // three times after third execution,...

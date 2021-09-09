@@ -32,18 +32,47 @@ namespace mitk
 mitk::nnUNetTool::nnUNetTool()
 {
   this->SetMitkTempDir(mitk::IOUtil::CreateTemporaryDirectory("mitk-XXXXXX"));
-  this->test = false;
+  this->test = true;
 }
 
 mitk::nnUNetTool::~nnUNetTool()
 {
-  std::cout << "in mitk nnUnet destructor" << std::endl;
   itksys::SystemTools::RemoveADirectory(this->GetMitkTempDir());
 }
 
 void mitk::nnUNetTool::Activated()
 {
   Superclass::Activated();
+}
+void mitk::nnUNetTool::UpdateCleanUp()
+{
+  MITK_INFO << "In update cleanup ashis: Does nothing here";
+
+}
+
+void mitk::nnUNetTool::SetSegmentation()
+{
+  try
+  {
+    if (this->GetSelectedLabels().empty())
+    {
+       this->ResetPreviewNode();
+    }
+    /*
+    //create new data node with the segmentation output as data
+    mitk::DataNode::Pointer outputNode = mitk::DataNode::New();
+    outputNode->SetName(this->GetName());
+    outputNode->SetData(resultSegmentation);
+    //add data node to data storage and update GUI
+    segTool->GetDataStorage()->Add(outputNode, segTool->GetReferenceData());
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    */
+  }
+  catch (const mitk::Exception &e)
+  {
+    MITK_INFO << e.GetDescription();
+  }
+
 }
 
 us::ModuleResource mitk::nnUNetTool::GetIconResource() const
@@ -227,7 +256,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
       }
       std::cout << "command at " << command << std::endl;
       if (this->test)
-        outputImagePath = "/home/user1/DKFZ/nnUNet_work/mitk-32uGaS/nnunet-out-E211EZ/yFw1zN_000.nii.gz";
+        outputImagePath = "/Users/ashis/DKFZ/nnUNet/mitk-32uGaS/nnunet-out-E211EZ/yFw1zN_000.nii.gz";
       else
         spExec->execute(this->GetPythonPath(), command, args);
     }
@@ -263,7 +292,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     }
 
     if (this->test)
-      outputImagePath = "/home/user1/DKFZ/nnUNet_work/mitk-32uGaS/nnunet-ensemble-out-cJ9sjG/yFw1zN_000.nii.gz";
+      outputImagePath = "/Users/ashis/DKFZ/nnUNet/mitk-32uGaS/nnunet-ensemble-out-cJ9sjG/yFw1zN_000.nii.gz";
     else
       spExec->execute(this->GetPythonPath(), command, args);
   }

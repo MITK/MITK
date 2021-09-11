@@ -93,6 +93,34 @@ void mitk::AutoMLSegmentationWithPreviewTool::UpdateCleanUp()
   }
 }
 
+void mitk::AutoMLSegmentationWithPreviewTool::SetNodeProperties(mitk::LabelSetImage::Pointer newMLPreview)
+{   MITK_INFO <<  "ashis in real SetNodeProperties";
+  if (newMLPreview.IsNotNull())
+    {
+      this->m_MLPreviewNode->SetData(newMLPreview);
+      this->m_MLPreviewNode->SetProperty("binary", mitk::BoolProperty::New(false));
+      mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
+      renderingMode->SetValue(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR);
+      this->m_MLPreviewNode->SetProperty("Image Rendering.Mode", renderingMode);
+      mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
+      mitk::LookupTableProperty::Pointer prop = mitk::LookupTableProperty::New(lut);
+      vtkSmartPointer<vtkLookupTable> lookupTable = vtkSmartPointer<vtkLookupTable>::New();
+      lookupTable->SetHueRange(1.0, 0.0);
+      lookupTable->SetSaturationRange(1.0, 1.0);
+      lookupTable->SetValueRange(1.0, 1.0);
+      lookupTable->SetTableRange(-1.0, 1.0);
+      lookupTable->Build();
+      lut->SetVtkLookupTable(lookupTable);
+      prop->SetLookupTable(lut);
+      this->m_MLPreviewNode->SetProperty("LookupTable", prop);
+      mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
+      mitk::LevelWindow levelwindow;
+      levelwindow.SetRangeMinMax(0, newMLPreview->GetStatistics()->GetScalarValueMax());
+      levWinProp->SetLevelWindow(levelwindow);
+      this->m_MLPreviewNode->SetProperty("levelwindow", levWinProp);
+    }
+}
+
 void mitk::AutoMLSegmentationWithPreviewTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image* /*oldSegAtTimeStep*/, Image* previewImage, TimeStepType timeStep)
 {
   const auto timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
@@ -117,30 +145,31 @@ void mitk::AutoMLSegmentationWithPreviewTool::DoUpdatePreview(const Image* input
 
     auto newMLPreview = ComputeMLPreview(inputAtTimeStep, timeStep);
 
-    if (newMLPreview.IsNotNull())
-    {
-      this->m_MLPreviewNode->SetData(newMLPreview);
-      this->m_MLPreviewNode->SetProperty("binary", mitk::BoolProperty::New(false));
-      mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
-      renderingMode->SetValue(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR);
-      this->m_MLPreviewNode->SetProperty("Image Rendering.Mode", renderingMode);
-      mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
-      mitk::LookupTableProperty::Pointer prop = mitk::LookupTableProperty::New(lut);
-      vtkSmartPointer<vtkLookupTable> lookupTable = vtkSmartPointer<vtkLookupTable>::New();
-      lookupTable->SetHueRange(1.0, 0.0);
-      lookupTable->SetSaturationRange(1.0, 1.0);
-      lookupTable->SetValueRange(1.0, 1.0);
-      lookupTable->SetTableRange(-1.0, 1.0);
-      lookupTable->Build();
-      lut->SetVtkLookupTable(lookupTable);
-      prop->SetLookupTable(lut);
-      this->m_MLPreviewNode->SetProperty("LookupTable", prop);
-      mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
-      mitk::LevelWindow levelwindow;
-      levelwindow.SetRangeMinMax(0, newMLPreview->GetStatistics()->GetScalarValueMax());
-      levWinProp->SetLevelWindow(levelwindow);
-      this->m_MLPreviewNode->SetProperty("levelwindow", levWinProp);
-    }
+    // if (newMLPreview.IsNotNull())
+    // {
+    //   this->m_MLPreviewNode->SetData(newMLPreview);
+    //   this->m_MLPreviewNode->SetProperty("binary", mitk::BoolProperty::New(false));
+    //   mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
+    //   renderingMode->SetValue(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR);
+    //   this->m_MLPreviewNode->SetProperty("Image Rendering.Mode", renderingMode);
+    //   mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
+    //   mitk::LookupTableProperty::Pointer prop = mitk::LookupTableProperty::New(lut);
+    //   vtkSmartPointer<vtkLookupTable> lookupTable = vtkSmartPointer<vtkLookupTable>::New();
+    //   lookupTable->SetHueRange(1.0, 0.0);
+    //   lookupTable->SetSaturationRange(1.0, 1.0);
+    //   lookupTable->SetValueRange(1.0, 1.0);
+    //   lookupTable->SetTableRange(-1.0, 1.0);
+    //   lookupTable->Build();
+    //   lut->SetVtkLookupTable(lookupTable);
+    //   prop->SetLookupTable(lut);
+    //   this->m_MLPreviewNode->SetProperty("LookupTable", prop);
+    //   mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
+    //   mitk::LevelWindow levelwindow;
+    //   levelwindow.SetRangeMinMax(0, newMLPreview->GetStatistics()->GetScalarValueMax());
+    //   levWinProp->SetLevelWindow(levelwindow);
+    //   this->m_MLPreviewNode->SetProperty("levelwindow", levWinProp);
+    // }
+    this->SetNodeProperties(newMLPreview);
   }
 
   if (!m_SelectedLabels.empty())

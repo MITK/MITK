@@ -24,7 +24,16 @@ MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitknnUNetToolGUI, "")
 
 QmitknnUNetToolGUI::QmitknnUNetToolGUI() : QmitkAutoMLSegmentationToolGUIBase()
 {
-  // create a new worker thread to execute some functions in a seperate thread
+  if (GetGPUCount() != 0)
+  {
+    std::stringstream stream;
+    stream << "No GPUs were detected on your machine. The nnUNet plugin might not work.";
+    QMessageBox *messageBox = new QMessageBox(QMessageBox::Critical, nullptr, stream.str().c_str());
+    messageBox->exec();
+    delete messageBox;
+    MITK_WARN << stream.str();
+  }
+
   m_SegmentationThread = new QThread;
   m_Worker = new nnUNetSegmentationWorker;
   m_Worker->moveToThread(m_SegmentationThread);
@@ -77,6 +86,11 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   m_Controls.nnUnetdirLabel->setVisible(false);
   m_Controls.multiModalSpinBox->setVisible(false);
   m_Controls.multiModalSpinLabel->setVisible(false);
+
+  if (GetGPUCount() != 0)
+  {
+    m_Controls.gpuSpinBox->setMaximum(GetGPUCount()-1);
+  }
   mainLayout->addLayout(m_Controls.verticalLayout);
   Superclass::InitializeUI(mainLayout);
   m_UI_ROWS = m_Controls.advancedSettingsLayout->rowCount();
@@ -173,6 +187,7 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       tool->SetMultiModal(m_Controls.multiModalBox->isChecked());
       // Spinboxes
       tool->SetPreprocessingThreads(static_cast<unsigned int>(m_Controls.threadsBox->value()));
+      tool->SetGpuId(static_cast<unsigned int>(m_Controls.gpuSpinBox->value()));
       // Multi-Modal
       tool->MultiModalOff();
       if (m_Controls.multiModalBox->isChecked())
@@ -226,7 +241,7 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       MITK_ERROR << stream.str();
       return;
     }
-    tool->IsTimePointChangeAwareOn();
+    // tool->IsTimePointChangeAwareOn();
   }
 }
 
@@ -241,4 +256,16 @@ std::vector<std::string> QmitknnUNetToolGUI::FetchMultiModalPathsFromUI()
     }
   }
   return paths;
+}
+
+int QmitknnUNetToolGUI::GetGPUCount()
+{
+  QProcess process1, process2;
+  process1.setStandardOutputProcess(&process2);
+  process1.start("nvidia-smi -L");
+  process2.start("wc -l");
+  process1.waitForFinished(-1);
+  process2.waitForFinished(-1);
+  QString nGpus = process2.readAll();
+  return nGpus.toInt();
 }

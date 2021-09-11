@@ -239,4 +239,5 @@ void QmitknnUNetToolGUI::SetSegmentation(mitk::nnUNetTool *tool, nnUNetModel *mo
   size_t hashkey = modelRequest->GetUniqueHash();
   std::cout << "New hash: " << hashkey << std::endl;
   this->cache.insert(hashkey, modelRequest);
+  tool->IsTimePointChangeAwareOn();
 }

@@ -22,27 +22,6 @@ found in the LICENSE file.s
 #include <QThread>
 #include <ctkPathLineEdit.h>
 
-// class MITKSEGMENTATIONUI_EXPORT nnUNetModel
-// {
-// public:
-//   std::vector<mitk::ModelParams> requestQ;
-//   mitk::LabelSetImage::ConstPointer outputImage;
-//   size_t hashCode = 0;
-
-//   size_t GetUniqueHash()
-//   {
-//     if (hashCode == 0)
-//     {
-//       for (mitk::ModelParams request : requestQ)
-//       {
-//         // sum of individual hash is the final hash
-//         hashCode += request.generateHash();
-//       }
-//     }
-//     return hashCode;
-//   }
-// };
-
 class MITKSEGMENTATIONUI_EXPORT QmitknnUNetToolGUI : public QmitkAutoMLSegmentationToolGUIBase
 {
   Q_OBJECT
@@ -91,6 +70,7 @@ protected:
 private:
   void AutoParsePythonPaths();
   void ClearAllComboBoxes();
+  int GetGPUCount();
   mitk::ModelParams MapToRequest(QString &, QString &, QString &, QString &, std::vector<std::string> &);
   std::vector<std::string> FetchSelectedFoldsFromUI();
   std::vector<std::string> FetchMultiModalPathsFromUI();

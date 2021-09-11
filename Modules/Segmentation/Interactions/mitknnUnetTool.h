@@ -116,6 +116,9 @@ namespace mitk
     itkSetMacro(PreprocessingThreads, unsigned int);
     itkGetConstMacro(PreprocessingThreads, unsigned int);
 
+    itkSetMacro(GpuId, unsigned int);
+    itkGetConstMacro(GpuId, unsigned int);
+
     void SetSegmentation();
 
 
@@ -126,6 +129,7 @@ namespace mitk
 
     LabelSetImage::Pointer ComputeMLPreview(const Image *inputAtTimeStep, TimeStepType timeStep) override;
     void UpdateCleanUp() override;
+    void SetNodeProperties(mitk::LabelSetImage::Pointer) override;
 
 
   private:
@@ -142,7 +146,9 @@ namespace mitk
     bool m_MultiModal;
     bool m_Ensemble = false;
     unsigned int m_PreprocessingThreads;
-    bool test;
+    bool test; //remove
+    mitk::LabelSetImage::Pointer temp;
+    unsigned int m_GpuId;
   };
 } // namespace mitk
 

@@ -47,32 +47,32 @@ void mitk::nnUNetTool::Activated()
 void mitk::nnUNetTool::UpdateCleanUp()
 {
   MITK_INFO << "In update cleanup ashis: Does nothing here";
-
 }
 
 void mitk::nnUNetTool::SetSegmentation()
 {
+  Superclass::SetNodeProperties(this->temp);
   try
   {
+    if (nullptr != this->GetPreviewSegmentationNode())
+    {
+    this->GetPreviewSegmentationNode()->SetVisibility(!this->GetSelectedLabels().empty());
+    }
     if (this->GetSelectedLabels().empty())
     {
-       this->ResetPreviewNode();
+      this->ResetPreviewNode();
     }
-    /*
-    //create new data node with the segmentation output as data
-    mitk::DataNode::Pointer outputNode = mitk::DataNode::New();
-    outputNode->SetName(this->GetName());
-    outputNode->SetData(resultSegmentation);
-    //add data node to data storage and update GUI
-    segTool->GetDataStorage()->Add(outputNode, segTool->GetReferenceData());
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    */
   }
   catch (const mitk::Exception &e)
   {
     MITK_INFO << e.GetDescription();
   }
+}
 
+void mitk::nnUNetTool::SetNodeProperties(mitk::LabelSetImage::Pointer _temp)
+{
+    MITK_INFO << "In SetNodeProperties ashis: Does nothing here";
+    this->temp = _temp;
 }
 
 us::ModuleResource mitk::nnUNetTool::GetIconResource() const
@@ -255,10 +255,13 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
         std::cout << arg << std::endl;
       }
       std::cout << "command at " << command << std::endl;
-      if (this->test)
-        outputImagePath = "/Users/ashis/DKFZ/nnUNet/mitk-32uGaS/nnunet-out-E211EZ/yFw1zN_000.nii.gz";
-      else
+      if (this->test){
+        outputImagePath = "/home/user1/DKFZ/nnUNet_work/mitk-32uGaS/nnunet-out-E211EZ/yFw1zN_000.nii.gz";
+      }else{
+        setenv("RESULTS_FOLDER", this->GetModelDirectory().c_str(), true);
+        setenv("CUDA_VISIBLE_DEVICES", std::to_string(this->GetGpuId()).c_str(), true);
         spExec->execute(this->GetPythonPath(), command, args);
+      }
     }
     catch (const mitk::Exception &e)
     {
@@ -292,7 +295,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     }
 
     if (this->test)
-      outputImagePath = "/Users/ashis/DKFZ/nnUNet/mitk-32uGaS/nnunet-ensemble-out-cJ9sjG/yFw1zN_000.nii.gz";
+      outputImagePath = "/home/user1/DKFZ/nnUNet_work/mitk-32uGaS/nnunet-ensemble-out-cJ9sjG/yFw1zN_000.nii.gz";
     else
       spExec->execute(this->GetPythonPath(), command, args);
   }

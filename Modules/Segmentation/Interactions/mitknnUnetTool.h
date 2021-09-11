@@ -119,7 +119,7 @@ namespace mitk
     itkSetMacro(GpuId, unsigned int);
     itkGetConstMacro(GpuId, unsigned int);
 
-    void SetSegmentation();
+    void RenderSegmentation();
 
 
   protected:

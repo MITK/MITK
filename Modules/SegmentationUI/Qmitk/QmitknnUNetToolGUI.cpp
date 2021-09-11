@@ -24,10 +24,10 @@ MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitknnUNetToolGUI, "")
 
 QmitknnUNetToolGUI::QmitknnUNetToolGUI() : QmitkAutoMLSegmentationToolGUIBase()
 {
-  if (GetGPUCount() != 0)
+  if (GetGPUCount() == 0)
   {
     std::stringstream stream;
-    stream << "No GPUs were detected on your machine. The nnUNet plugin might not work.";
+    stream << "WARNING: No GPUs were detected on your machine. The nnUNet plugin might not work.";
     QMessageBox *messageBox = new QMessageBox(QMessageBox::Critical, nullptr, stream.str().c_str());
     messageBox->exec();
     delete messageBox;
@@ -80,7 +80,7 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   qRegisterMetaType<QVector<int>>("QVector");
 
   connect(this, &QmitknnUNetToolGUI::Operate, m_Worker, &nnUNetSegmentationWorker::DoWork);
-  connect(m_Worker, &nnUNetSegmentationWorker::Finished, this, &QmitknnUNetToolGUI::SetSegmentation);
+  connect(m_Worker, &nnUNetSegmentationWorker::Finished, this, &QmitknnUNetToolGUI::SegmentationResultHandler);
 
   m_Controls.codedirectoryBox->setVisible(false);
   m_Controls.nnUnetdirLabel->setVisible(false);
@@ -244,6 +244,21 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
     // tool->IsTimePointChangeAwareOn();
   }
 }
+
+void QmitknnUNetToolGUI::SegmentationResultHandler(mitk::nnUNetTool *tool, nnUNetModel *modelRequest)
+{
+  MITK_INFO << "Finished slot";
+  tool->RenderSegmentation();
+  this->SetLabelSetPreview(tool->GetMLPreview());
+  std::cout << "New pointer: " << tool->GetMLPreview() << std::endl;
+  modelRequest->outputImage = tool->GetMLPreview();
+  // Adding params and output Labelset image to Cache
+  size_t hashkey = modelRequest->GetUniqueHash();
+  std::cout << "New hash: " << hashkey << std::endl;
+  this->cache.insert(hashkey, modelRequest);
+  tool->IsTimePointChangeAwareOn();
+}
+
 
 std::vector<std::string> QmitknnUNetToolGUI::FetchMultiModalPathsFromUI()
 {

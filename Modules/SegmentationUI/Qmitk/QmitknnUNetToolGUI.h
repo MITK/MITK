@@ -43,7 +43,7 @@ protected slots:
   void OnPythonChanged(const QString &);
   void OnCheckBoxChanged(int);
   void SegmentationProcessFailed();
-  void SetSegmentation(mitk::nnUNetTool *, nnUNetModel *);
+  void SegmentationResultHandler(mitk::nnUNetTool *, nnUNetModel *);
   void OnModalitiesNumberChanged(int);
 
 signals:

@@ -36,12 +36,24 @@ T QmitknnUNetToolGUI::FetchFoldersFromDir(const QString &path)
   return folders;
 }
 
-void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &dir)
+void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &resultsFolder)
 {
   this->ClearAllComboBoxes();
-  m_ModelDirectory = dir + QDir::separator() + "nnUNet";
+  m_ModelDirectory = resultsFolder + QDir::separator() + "nnUNet";
   auto models = FetchFoldersFromDir<QStringList>(m_ModelDirectory);
-  std::for_each(models.begin(), models.end(), [this](QString model) { m_Controls.modelBox->addItem(model); });
+  QStringList list;
+  list << "2d"
+       << "3d_lowres"
+       << "3d_fullres"
+       << "3d_cascade_fullres"
+       << "ensembles";
+  std::for_each(models.begin(),
+                models.end(),
+                [this, list](QString model)
+                {
+                  if (list.contains(model, Qt::CaseInsensitive))
+                    m_Controls.modelBox->addItem(model);
+                });
 }
 
 void QmitknnUNetToolGUI::OnModelChanged(const QString &text)
@@ -223,21 +235,11 @@ mitk::ModelParams QmitknnUNetToolGUI::MapToRequest(
 
 void QmitknnUNetToolGUI::SegmentationProcessFailed()
 {
-  QMessageBox::warning(nullptr,
-                       "Error in segmentation",
-                       "There was an error in the segmentation process. No resulting segmentation can be loaded.");
-}
-
-void QmitknnUNetToolGUI::SetSegmentation(mitk::nnUNetTool *tool, nnUNetModel *modelRequest)
-{
-  MITK_INFO << "Finished slot";
-  tool->SetSegmentation();
-  this->SetLabelSetPreview(tool->GetMLPreview());
-  std::cout << "New pointer: " << tool->GetMLPreview() << std::endl;
-  modelRequest->outputImage = tool->GetMLPreview();
-  // Adding params and output Labelset image to Cache
-  size_t hashkey = modelRequest->GetUniqueHash();
-  std::cout << "New hash: " << hashkey << std::endl;
-  this->cache.insert(hashkey, modelRequest);
-  tool->IsTimePointChangeAwareOn();
+  this->setCursor(Qt::ArrowCursor);
+  std::stringstream stream;
+  stream << "Error in the segmentation process. No resulting segmentation can be loaded.";
+  QMessageBox *messageBox = new QMessageBox(QMessageBox::Critical, nullptr, stream.str().c_str());
+  messageBox->exec();
+  delete messageBox;
+  MITK_ERROR << stream.str();
 }

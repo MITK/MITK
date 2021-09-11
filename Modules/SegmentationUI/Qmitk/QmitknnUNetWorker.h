@@ -17,10 +17,6 @@ found in the LICENSE file.s
 #include <QObject>
 #include <mitknnUnetTool.h>
 
-// Q_DECLARE_METATYPE(mitk::DeepLearningSegmentationTool*)
-// Q_DECLARE_METATYPE(mitk::LabelSetImage*)
-// Q_DECLARE_METATYPE(std::vector<mitk::LabelSetImage::Pointer>)
-
 class nnUNetModel
 {
 public:

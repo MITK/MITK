@@ -49,7 +49,7 @@ void mitk::nnUNetTool::UpdateCleanUp()
   MITK_INFO << "In update cleanup ashis: Does nothing here";
 }
 
-void mitk::nnUNetTool::SetSegmentation()
+void mitk::nnUNetTool::RenderSegmentation()
 {
   Superclass::SetNodeProperties(this->temp);
   try

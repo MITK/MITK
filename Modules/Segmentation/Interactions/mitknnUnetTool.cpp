@@ -44,6 +44,7 @@ void mitk::nnUNetTool::Activated()
 {
   Superclass::Activated();
 }
+
 void mitk::nnUNetTool::UpdateCleanUp()
 {
   MITK_INFO << "In update cleanup ashis: Does nothing here";
@@ -56,7 +57,7 @@ void mitk::nnUNetTool::RenderSegmentation()
   {
     if (nullptr != this->GetPreviewSegmentationNode())
     {
-    this->GetPreviewSegmentationNode()->SetVisibility(!this->GetSelectedLabels().empty());
+      this->GetPreviewSegmentationNode()->SetVisibility(!this->GetSelectedLabels().empty());
     }
     if (this->GetSelectedLabels().empty())
     {
@@ -71,8 +72,8 @@ void mitk::nnUNetTool::RenderSegmentation()
 
 void mitk::nnUNetTool::SetNodeProperties(mitk::LabelSetImage::Pointer _temp)
 {
-    MITK_INFO << "In SetNodeProperties ashis: Does nothing here";
-    this->temp = _temp;
+  MITK_INFO << "In SetNodeProperties ashis: Does nothing here";
+  this->temp = _temp;
 }
 
 us::ModuleResource mitk::nnUNetTool::GetIconResource() const
@@ -250,16 +251,19 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
 
     try
     {
+      setenv("RESULTS_FOLDER", this->GetModelDirectory().c_str(), true);
+      setenv("CUDA_VISIBLE_DEVICES", std::to_string(this->GetGpuId()).c_str(), true);
       for (auto arg : args)
       {
         std::cout << arg << std::endl;
       }
       std::cout << "command at " << command << std::endl;
-      if (this->test){
-        outputImagePath = "/home/user1/DKFZ/nnUNet_work/mitk-32uGaS/nnunet-out-E211EZ/yFw1zN_000.nii.gz";
-      }else{
-        setenv("RESULTS_FOLDER", this->GetModelDirectory().c_str(), true);
-        setenv("CUDA_VISIBLE_DEVICES", std::to_string(this->GetGpuId()).c_str(), true);
+      if (this->test)
+      {
+        outputImagePath = "/Users/ashis/DKFZ/nnUNet/mitk-32uGaS/nnunet-out-E211EZ/yFw1zN_000.nii.gz";
+      }
+      else
+      {
         spExec->execute(this->GetPythonPath(), command, args);
       }
     }
@@ -295,7 +299,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     }
 
     if (this->test)
-      outputImagePath = "/home/user1/DKFZ/nnUNet_work/mitk-32uGaS/nnunet-ensemble-out-cJ9sjG/yFw1zN_000.nii.gz";
+      outputImagePath = "/Users/ashis/DKFZ/nnUNet/mitk-32uGaS/nnunet-ensemble-out-cJ9sjG/yFw1zN_000.nii.gz";
     else
       spExec->execute(this->GetPythonPath(), command, args);
   }

@@ -89,17 +89,17 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
 
   if (GetGPUCount() != 0)
   {
-    m_Controls.gpuSpinBox->setMaximum(GetGPUCount()-1);
+    m_Controls.gpuSpinBox->setMaximum(GetGPUCount() - 1);
   }
   mainLayout->addLayout(m_Controls.verticalLayout);
   Superclass::InitializeUI(mainLayout);
-  m_UI_ROWS = m_Controls.advancedSettingsLayout->rowCount();
+  m_UI_ROWS = m_Controls.advancedSettingsLayout->rowCount(); // Must do. Row count is correct only here.
 }
 
 void QmitknnUNetToolGUI::OnSettingsAccept()
 {
   bool doSeg = true;
-  std::cout << "clicked" << std::endl;
+  std::cout << "clicked OnSettingsAccept" << std::endl;
   size_t hashKey(0);
   auto tool = this->GetConnectedToolAs<mitk::nnUNetTool>();
   if (nullptr != tool)
@@ -165,11 +165,14 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
         modelRequest->requestQ.push_back(modelObject);
       }
 
-      hashKey = modelRequest->GetUniqueHash();
-      if (this->cache.contains(hashKey))
+      if (m_DoCache)
       {
-        doSeg = false;
-        std::cout << "Key found: " << hashKey << std::endl;
+        hashKey = modelRequest->GetUniqueHash();
+        if (this->cache.contains(hashKey))
+        {
+          doSeg = false;
+          std::cout << "Key found: " << hashKey << std::endl;
+        }
       }
       if (doSeg)
       {
@@ -251,14 +254,16 @@ void QmitknnUNetToolGUI::SegmentationResultHandler(mitk::nnUNetTool *tool, nnUNe
   tool->RenderSegmentation();
   this->SetLabelSetPreview(tool->GetMLPreview());
   std::cout << "New pointer: " << tool->GetMLPreview() << std::endl;
-  modelRequest->outputImage = tool->GetMLPreview();
-  // Adding params and output Labelset image to Cache
-  size_t hashkey = modelRequest->GetUniqueHash();
-  std::cout << "New hash: " << hashkey << std::endl;
-  this->cache.insert(hashkey, modelRequest);
+  if (m_DoCache)
+  {
+    modelRequest->outputImage = tool->GetMLPreview();
+    // Adding params and output Labelset image to Cache
+    size_t hashkey = modelRequest->GetUniqueHash();
+    std::cout << "New hash: " << hashkey << std::endl;
+    this->cache.insert(hashkey, modelRequest);
+  }
   tool->IsTimePointChangeAwareOn();
 }
-
 
 std::vector<std::string> QmitknnUNetToolGUI::FetchMultiModalPathsFromUI()
 {
@@ -275,6 +280,7 @@ std::vector<std::string> QmitknnUNetToolGUI::FetchMultiModalPathsFromUI()
 
 int QmitknnUNetToolGUI::GetGPUCount()
 {
+#if defined(__APPLE__) || defined(MACOSX) || defined(linux) || defined(__linux__)
   QProcess process1, process2;
   process1.setStandardOutputProcess(&process2);
   process1.start("nvidia-smi -L");
@@ -282,5 +288,8 @@ int QmitknnUNetToolGUI::GetGPUCount()
   process1.waitForFinished(-1);
   process2.waitForFinished(-1);
   QString nGpus = process2.readAll();
+#elif defined(_WIN32) || defined(_WIN64)
+  QString nGpus = "0";
+#endif
   return nGpus.toInt();
 }

@@ -85,6 +85,7 @@ private:
   nnUNetSegmentationWorker *m_Worker;
   std::vector<ctkPathLineEdit *> m_ModalPaths;
   int m_UI_ROWS;
+  bool m_DoCache=false;
 };
 
 #endif

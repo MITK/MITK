@@ -25,7 +25,7 @@ found in the LICENSE file.
 mitk::ContourModelLiveWireInteractor::ContourModelLiveWireInteractor() : ContourModelInteractor()
 {
   m_LiveWireFilter = mitk::ImageLiveWireContourModelFilter::New();
-
+  m_LiveWireFilter->SetUseCostFunction(true);
   m_NextActiveVertexDown.Fill(0);
   m_NextActiveVertexUp.Fill(0);
 }
@@ -66,7 +66,28 @@ bool mitk::ContourModelLiveWireInteractor::OnCheckPointClick(const InteractionEv
   // Transition YES if click close to a vertex
   mitk::Point3D click = positionEvent->GetPositionInWorld();
 
-  if (contour->SelectVertexAt(click, mitk::ContourModelLiveWireInteractor::eps, timeStep))
+  bool isVertexSelected = false;
+  // is close to control vertex
+    // do stuff
+  isVertexSelected = contour->SelectControlVertexAt(click, mitk::ContourModelLiveWireInteractor::eps, timeStep);
+
+  // Is not close to control vertex. but hovering
+    // is close to non control vertex
+      // set as control vertex
+      // do stuff
+  if (isVertexSelected == false)
+    isVertexSelected = contour->SelectVertexAt(click, mitk::ContourModelLiveWireInteractor::eps, timeStep);
+
+   // is not close to non-control vertex
+     // create vertex at position
+     // do stuff
+  if (isVertexSelected == false)
+  {
+    contour->AddVertex(click, timeStep);
+    isVertexSelected = contour->SelectVertexAt(click, mitk::ContourModelLiveWireInteractor::eps, timeStep);
+  }
+
+  if (isVertexSelected)
   {
     contour->SetSelectedVertexAsControlPoint(false);
     m_ContourLeft = mitk::ContourModel::New();
@@ -105,6 +126,10 @@ bool mitk::ContourModelLiveWireInteractor::OnCheckPointClick(const InteractionEv
       this->m_WorkingSlice->GetGeometry()->WorldToIndex((*iter)->Coordinates, idx);
       this->m_LiveWireFilter->AddRepulsivePoint(idx);
     }
+
+    //itk::Index<2> idx;
+    //this->m_WorkingSlice->GetGeometry()->WorldToIndex((*contour->IteratorBegin(timeStep))->Coordinates, idx);
+    //this->m_LiveWireFilter->RemoveRepulsivePoint(idx);
 
     // clear container with void points between neighboring control points
     m_ContourBeingModified.clear();

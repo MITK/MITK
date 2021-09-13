@@ -268,13 +268,24 @@ namespace mitk
     */
     virtual bool IsNearContour(Point3D &point, float eps, TimeStepType timestep);
 
+
     /** \brief Mark a vertex at an index in the container as selected.
-    */
+     */
     bool SelectVertexAt(int index, TimeStepType timestep = 0);
 
     /** \brief Mark a vertex at an index in the container as control point.
     */
     bool SetControlVertexAt(int index, TimeStepType timestep = 0);
+
+    /** \brief Mark a control vertex at a given position in 3D space.
+
+    \param point - query point in 3D space
+    \param eps - radius for nearest neighbour search (error bound).
+    \param timestep - search at this timestep
+
+    @return true = vertex found;  false = no vertex found
+    */
+    bool SelectControlVertexAt(Point3D &point, float eps, TimeStepType timestep = 0);
 
     /** \brief Mark a vertex at a given position in 3D space.
 
@@ -285,6 +296,7 @@ namespace mitk
     @return true = vertex found;  false = no vertex found
     */
     bool SelectVertexAt(Point3D &point, float eps, TimeStepType timestep = 0);
+
     /*
         \pararm point - query point in 3D space
         \pararm eps - radius for nearest neighbour search (error bound).

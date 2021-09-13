@@ -303,6 +303,15 @@ bool mitk::ContourModel::IsClosed(int timestep) const
   return false;
 }
 
+bool mitk::ContourModel::SelectControlVertexAt(Point3D &point, float eps, TimeStepType timestep)
+{
+  if (!this->IsEmptyTimeStep(timestep))
+  {
+    this->m_SelectedVertex = this->m_ContourSeries[timestep]->GetControlVertexAt(point, eps);
+  }
+  return this->m_SelectedVertex != nullptr;
+}
+
 bool mitk::ContourModel::SelectVertexAt(Point3D &point, float eps, TimeStepType timestep)
 {
   if (!this->IsEmptyTimeStep(timestep))

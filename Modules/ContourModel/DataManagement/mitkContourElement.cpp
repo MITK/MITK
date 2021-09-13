@@ -149,6 +149,18 @@ bool mitk::ContourElement::IsEmpty() const
   return this->m_Vertices.empty();
 }
 
+mitk::ContourElement::VertexType *mitk::ContourElement::GetControlVertexAt(const mitk::Point3D &point, float eps)
+{
+  /* current version iterates over the whole deque - should some kind of an octree with spatial query*/
+
+  if (eps > 0)
+  {
+    // currently no method with better performance is available
+    return BruteForceGetVertexAt(point, eps, true);
+  } // if eps < 0
+  return nullptr;
+}
+
 mitk::ContourElement::VertexType *mitk::ContourElement::GetVertexAt(const mitk::Point3D &point, float eps)
 {
   /* current version iterates over the whole deque - should some kind of an octree with spatial query*/
@@ -161,7 +173,7 @@ mitk::ContourElement::VertexType *mitk::ContourElement::GetVertexAt(const mitk::
   return nullptr;
 }
 
-mitk::ContourElement::VertexType *mitk::ContourElement::BruteForceGetVertexAt(const mitk::Point3D &point, double eps)
+mitk::ContourElement::VertexType *mitk::ContourElement::BruteForceGetVertexAt(const mitk::Point3D &point, double eps, bool isControlPoint)
 {
   if (eps > 0)
   {
@@ -209,7 +221,8 @@ mitk::ContourElement::VertexType *mitk::ContourElement::BruteForceGetVertexAt(co
       /*---------------------------------------------------------------------------------------*/
 
       // return closest point
-      return nearestlist.front().second;
+      if (isControlPoint == false)
+        return nearestlist.front().second;
     }
   }
   return nullptr;

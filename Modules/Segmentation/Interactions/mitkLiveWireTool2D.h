@@ -128,6 +128,7 @@ namespace mitk
     mitk::Image::Pointer m_ReferenceDataSlice;
 
     mitk::ImageLiveWireContourModelFilter::Pointer m_LiveWireFilter;
+    mitk::ImageLiveWireContourModelFilter::Pointer m_LiveWireFilterClosure;
 
     bool m_CreateAndUseDynamicCosts;
 

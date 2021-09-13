@@ -763,7 +763,10 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    toolManager->InitializeTools();
 
    QString segTools2D = tr("Add Subtract Paint Wipe 'Region Growing' Fill Erase 'Live Wire' '2D Fast Marching'");
-   QString segTools3D = tr("Threshold 'UL Threshold' Otsu 'Fast Marching 3D' 'Region Growing 3D' Watershed Picking nnUNet");
+   QString segTools3D = tr("Threshold 'UL Threshold' Otsu 'Fast Marching 3D' 'Region Growing 3D' Watershed Picking");
+   //#if defined(_WIN32) || defined(_WIN64) || defined(linux) || defined(__linux__)
+   segTools3D.append(tr(" nnUNet"));
+   //#endif
 
    std::regex extSegTool2DRegEx("SegTool2D$");
    std::regex extSegTool3DRegEx("SegTool3D$");

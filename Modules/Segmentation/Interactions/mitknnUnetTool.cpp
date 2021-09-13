@@ -47,7 +47,7 @@ void mitk::nnUNetTool::Activated()
 
 void mitk::nnUNetTool::UpdateCleanUp()
 {
-   // This overriden method is intentionally left out for setting later upon demand
+  // This overriden method is intentionally left out for setting later upon demand
   // in the `RenderSegmentation` method.
 }
 
@@ -175,7 +175,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   catch (const mitk::Exception &e)
   {
     MITK_ERROR << e.GetDescription();
-    mitkThrow() << "Error writing 3D stack on to disk.";
+    //mitkThrow() << "Error writing 3D stack on to disk.";
     return nullptr;
   }
   // Code calls external process
@@ -216,7 +216,6 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
 
     args.push_back("-m");
     args.push_back(modelparam.model);
-    setenv("RESULTS_FOLDER", this->GetModelDirectory().c_str(), true);
 
     args.push_back("-p");
     args.push_back(modelparam.planId);
@@ -275,7 +274,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     catch (const mitk::Exception &e)
     {
       MITK_ERROR << e.GetDescription();
-      mitkThrow() << "An error occured while calling nnUNet process.";
+      //mitkThrow() << "An error occured while calling nnUNet process.";
       return nullptr;
     }
   }
@@ -308,11 +307,17 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     else
       spExec->execute(this->GetPythonPath(), command, args);
   }
-
-  mitk::Image::Pointer outputImage = mitk::IOUtil::Load<mitk::Image>(outputImagePath);
   mitk::LabelSetImage::Pointer resultImage = mitk::LabelSetImage::New();
-  resultImage->InitializeByLabeledImage(outputImage);
-  resultImage->SetGeometry(_inputAtTimeStep->GetGeometry());
-  // itksys::SystemTools::RemoveADirectory(mitkTempDir); // moved to destuctor
+  try
+  {
+    mitk::Image::Pointer outputImage = mitk::IOUtil::Load<mitk::Image>(outputImagePath);
+    resultImage->InitializeByLabeledImage(outputImage);
+    resultImage->SetGeometry(_inputAtTimeStep->GetGeometry());
+  }
+  catch (const mitk::Exception &e)
+  {
+    MITK_ERROR << e.GetDescription();
+    return nullptr;
+  }
   return resultImage;
 }

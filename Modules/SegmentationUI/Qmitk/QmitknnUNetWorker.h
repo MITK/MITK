@@ -38,6 +38,7 @@ public:
   }
 };
 
+Q_DECLARE_METATYPE(mitk::nnUNetTool*)
 /**
  * @class SegmentationWorker
  * @brief Class to execute some functions (mainly segmentation) from the Segmentation Plugin in a seperate thread

@@ -34,7 +34,7 @@ QmitknnUNetToolGUI::QmitknnUNetToolGUI() : QmitkAutoMLSegmentationToolGUIBase()
     MITK_WARN << stream.str();
   }
 
-  m_SegmentationThread = new QThread;
+  m_SegmentationThread = new QThread(this);
   m_Worker = new nnUNetSegmentationWorker;
   m_Worker->moveToThread(m_SegmentationThread);
 }
@@ -81,11 +81,16 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
 
   connect(this, &QmitknnUNetToolGUI::Operate, m_Worker, &nnUNetSegmentationWorker::DoWork);
   connect(m_Worker, &nnUNetSegmentationWorker::Finished, this, &QmitknnUNetToolGUI::SegmentationResultHandler);
+  connect(m_Worker, &nnUNetSegmentationWorker::Failed, this, &QmitknnUNetToolGUI::SegmentationProcessFailed);
+
 
   m_Controls.codedirectoryBox->setVisible(false);
   m_Controls.nnUnetdirLabel->setVisible(false);
   m_Controls.multiModalSpinBox->setVisible(false);
   m_Controls.multiModalSpinLabel->setVisible(false);
+
+  m_Controls.statusLabel->setTextFormat(Qt::RichText);
+  m_Controls.statusLabel->setText("<b>STATUS: </b><i>No Tasks Running.</i>");
 
   if (GetGPUCount() != 0)
   {
@@ -107,8 +112,8 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
     try
     {
       // comboboxes
-      m_Model = m_Controls.modelBox->currentText();
-      m_Task = m_Controls.taskBox->currentText();
+      QString m_Model = m_Controls.modelBox->currentText();
+      QString m_Task = m_Controls.taskBox->currentText();
       std::string nnUNetDirectory = "";
       if (m_Controls.nopipBox->isChecked())
       {
@@ -208,6 +213,7 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
           std::cout << "starting thread..." << std::endl;
           m_SegmentationThread->start();
         }
+        m_Controls.statusLabel->setText("<b>STATUS: </b><i>Startting Segmentation task... This might take a while.</i>");
         emit Operate(tool, modelRequest); // start segmentation in worker thread
       }
       else
@@ -248,22 +254,7 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
   }
 }
 
-void QmitknnUNetToolGUI::SegmentationResultHandler(mitk::nnUNetTool *tool, nnUNetModel *modelRequest)
-{
-  MITK_INFO << "Finished slot";
-  tool->RenderSegmentation();
-  this->SetLabelSetPreview(tool->GetMLPreview());
-  std::cout << "New pointer: " << tool->GetMLPreview() << std::endl;
-  if (m_DoCache)
-  {
-    modelRequest->outputImage = tool->GetMLPreview();
-    // Adding params and output Labelset image to Cache
-    size_t hashkey = modelRequest->GetUniqueHash();
-    std::cout << "New hash: " << hashkey << std::endl;
-    this->cache.insert(hashkey, modelRequest);
-  }
-  tool->IsTimePointChangeAwareOn();
-}
+
 
 std::vector<std::string> QmitknnUNetToolGUI::FetchMultiModalPathsFromUI()
 {

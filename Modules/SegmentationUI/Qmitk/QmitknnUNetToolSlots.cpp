@@ -235,6 +235,7 @@ mitk::ModelParams QmitknnUNetToolGUI::MapToRequest(
 
 void QmitknnUNetToolGUI::SegmentationProcessFailed()
 {
+  m_Controls.statusLabel->setText("<b>STATUS: </b><i>Error in the segmentation process. No resulting segmentation can be loaded.</i>");
   this->setCursor(Qt::ArrowCursor);
   std::stringstream stream;
   stream << "Error in the segmentation process. No resulting segmentation can be loaded.";
@@ -242,4 +243,30 @@ void QmitknnUNetToolGUI::SegmentationProcessFailed()
   messageBox->exec();
   delete messageBox;
   MITK_ERROR << stream.str();
+}
+
+// void QmitknnUNetToolGUI::OnSegmentationRunning() 
+// {
+//   m_Controls.statusLabel->setText("<b>STATUS: </b><i>Segmentation task running... This might take a while.</i>");
+//   //m_Ui->labelWarning->setVisible(true);
+//   //m_Ui->buttonLoadTrainedNetwork->setEnabled(false);
+//   //m_Ui->buttonPerformImageProcessing->setEnabled(false);
+// }
+
+void QmitknnUNetToolGUI::SegmentationResultHandler(mitk::nnUNetTool *tool, nnUNetModel *modelRequest)
+{
+  MITK_INFO << "Finished slot";
+  tool->RenderSegmentation();
+  this->SetLabelSetPreview(tool->GetMLPreview());
+  std::cout << "New pointer: " << tool->GetMLPreview() << std::endl;
+  if (m_DoCache)
+  {
+    modelRequest->outputImage = tool->GetMLPreview();
+    // Adding params and output Labelset image to Cache
+    size_t hashkey = modelRequest->GetUniqueHash();
+    std::cout << "New hash: " << hashkey << std::endl;
+    this->cache.insert(hashkey, modelRequest);
+  }
+  tool->IsTimePointChangeAwareOn();
+  m_Controls.statusLabel->setText("<b>STATUS: </b><i>Segmentation task finished.</i>");
 }

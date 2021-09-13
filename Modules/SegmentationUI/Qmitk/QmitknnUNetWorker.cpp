@@ -1,5 +1,6 @@
 #include "QmitknnUNetWorker.h"
 #include "mitkRenderingManager.h"
+#include <QMutexLocker>
 
 
 void nnUNetSegmentationWorker::DoWork(mitk::nnUNetTool *tool, nnUNetModel* request)
@@ -12,24 +13,15 @@ void nnUNetSegmentationWorker::DoWork(mitk::nnUNetTool *tool, nnUNetModel* reque
   std::cout << "in do work" << std::endl;
   try
   {
-    mutex.lock();
+    QMutexLocker locker(&mutex);
     tool->UpdatePreview();
-    mutex.unlock();
-    MITK_INFO << "Back in Worker";
-    // emit Failed();
+    MITK_INFO << "in Worker";
     emit Finished(tool, request);
-
-    // disconnect from result setter. Otherwise, the result is set twice after second execution,
-    // three times after third execution,...
-    // disconnect(this, &SegmentationWorker::Finished, resultSetter, &SegmentationResultHandler::SetResult);
-    // disconnect(this, &SegmentationWorker::FinishedMultilabel, resultSetter,
-    // &SegmentationResultHandler::SetMultilabelResult); disconnect(this, &SegmentationWorker::Failed, resultSetter,
-    // &SegmentationResultHandler::SegmentationProcessFailed);
   }
   catch (const mitk::Exception &e)
   {
     MITK_ERROR << e.GetDescription();
-    // emit Failed();
+    emit Failed();
     // disconnect from result setter. Otherwise, the result is set twice after second execution,
     // three times after third execution,...
     // disconnect(this, &SegmentationWorker::Finished, resultSetter, &SegmentationResultHandler::SetResult);

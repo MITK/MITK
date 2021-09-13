@@ -52,9 +52,8 @@ public slots:
    *
    * @param segTool the Segmentation Tool for running the segmentation
    * @param resultSetter the SegmentationResultHandler which sets the result in the GUI after the segmentation
-   * @param networkPath the path to the trained network which is needed for the segmentation
    */
-  void DoWork(mitk::nnUNetTool *, nnUNetModel*);
+  void DoWork(mitk::nnUNetTool *, nnUNetModel *);
   /**
    * @brief if a segmentation is executed when the tool is started,
    *        wait for the segmentation to finish and emit a signal (PreviouesSegmentationFinished) afterwards.
@@ -70,23 +69,11 @@ signals:
    * @param result the resulting segmentation
    * @param segTool the Segmentation Tool for running the segmentation
    */
-  void Finished(mitk::nnUNetTool *, nnUNetModel*);
-  /**
-   * @brief the signal emitted when a multilabel segmentation process finished successful
-   *
-   * @param result the resulting segmentation
-   * @param segTool the Segmentation Tool for running the segmentation
-   */
-  // void FinishedMultilabel(std::vector<mitk::LabelSetImage::Pointer> result, mitk::DeepLearningSegmentationTool
-  // *segTool);
+  void Finished(mitk::nnUNetTool *, nnUNetModel *);
   /**
    * @brief the signal emitted when a segmentation process failed
    */
-  // void Failed();
-  /**
-   * @brief the signal emitted when a segmentation, which ran when the tool was started, finished
-   */
-  // void PreviousSegmentationFinished();
+  void Failed();
 
 private:
   QMutex mutex;

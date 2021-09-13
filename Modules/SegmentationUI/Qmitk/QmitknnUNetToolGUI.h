@@ -34,7 +34,6 @@ public:
   QCache<size_t, nnUNetModel> cache;
 
 protected slots:
-
   void OnSettingsAccept();
   void OnDirectoryChanged(const QString &);
   void OnModelChanged(const QString &);
@@ -45,19 +44,13 @@ protected slots:
   void SegmentationProcessFailed();
   void SegmentationResultHandler(mitk::nnUNetTool *, nnUNetModel *);
   void OnModalitiesNumberChanged(int);
+  //void OnSegmentationRunning(); 
 
 signals:
-
   /**
    * @brief signal for starting the segmentation which is caught by a worker thread.
    */
   void Operate(mitk::nnUNetTool *, nnUNetModel *);
-  /**
-   * @brief if a segmentation is executed when the tool is started, emit a signal for waiting in the worker thread.
-   *
-   * @param tool the Segmentation Tool to check in worker, if the segmentation is still running.
-   */
-  // void Wait(mitk::nnUNetTool *tool);
 
 protected:
   QmitknnUNetToolGUI();
@@ -77,8 +70,8 @@ private:
   template <typename T>
   static T FetchFoldersFromDir(const QString &);
   // Declaring variables for strings and int only.
-  QString m_Model;
-  QString m_Task;
+  //QString m_Model;
+  //QString m_Task;
   QString m_ModelDirectory;
   Ui_QmitknnUNetToolGUIControls m_Controls;
   QThread *m_SegmentationThread;

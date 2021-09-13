@@ -50,7 +50,7 @@ void mitk::nnUNetTool::UpdateCleanUp()
   MITK_INFO << "In update cleanup ashis: Does nothing here";
 }
 
-void mitk::nnUNetTool::RenderSegmentation()
+void mitk::nnUNetTool::RenderSegmentation() // add LabelSetImage::Pointer argument here
 {
   Superclass::SetNodeProperties(this->temp);
   try
@@ -73,7 +73,7 @@ void mitk::nnUNetTool::RenderSegmentation()
 void mitk::nnUNetTool::SetNodeProperties(mitk::LabelSetImage::Pointer _temp)
 {
   MITK_INFO << "In SetNodeProperties ashis: Does nothing here";
-  this->temp = _temp;
+  this->temp = _temp; //remove
 }
 
 us::ModuleResource mitk::nnUNetTool::GetIconResource() const

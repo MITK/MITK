@@ -268,5 +268,5 @@ void QmitknnUNetToolGUI::SegmentationResultHandler(mitk::nnUNetTool *tool, nnUNe
     this->cache.insert(hashkey, modelRequest);
   }
   tool->IsTimePointChangeAwareOn();
-  m_Controls.statusLabel->setText("<b>STATUS: </b><i>Segmentation task finished.</i>");
+  m_Controls.statusLabel->setText("<b>STATUS: </b><i>Segmentation task finished successfully.</i>");
 }

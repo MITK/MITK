@@ -147,7 +147,7 @@ namespace mitk
     bool m_Ensemble = false;
     unsigned int m_PreprocessingThreads;
     bool test; //remove
-    mitk::LabelSetImage::Pointer temp;
+    mitk::LabelSetImage::Pointer outputSegmentation;
     unsigned int m_GpuId;
   };
 } // namespace mitk

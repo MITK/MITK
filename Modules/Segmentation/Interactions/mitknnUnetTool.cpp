@@ -47,33 +47,38 @@ void mitk::nnUNetTool::Activated()
 
 void mitk::nnUNetTool::UpdateCleanUp()
 {
-  MITK_INFO << "In update cleanup ashis: Does nothing here";
+   // This overriden method is intentionally left out for setting later upon demand
+  // in the `RenderSegmentation` method.
 }
 
-void mitk::nnUNetTool::RenderSegmentation() // add LabelSetImage::Pointer argument here
+void mitk::nnUNetTool::RenderSegmentation()
 {
-  Superclass::SetNodeProperties(this->temp);
-  try
+  if (this->outputSegmentation != nullptr)
   {
-    if (nullptr != this->GetPreviewSegmentationNode())
+    Superclass::SetNodeProperties(this->outputSegmentation);
+    try
     {
-      this->GetPreviewSegmentationNode()->SetVisibility(!this->GetSelectedLabels().empty());
+      if (nullptr != this->GetPreviewSegmentationNode())
+      {
+        this->GetPreviewSegmentationNode()->SetVisibility(!this->GetSelectedLabels().empty());
+      }
+      if (this->GetSelectedLabels().empty())
+      {
+        this->ResetPreviewNode();
+      }
     }
-    if (this->GetSelectedLabels().empty())
+    catch (const mitk::Exception &e)
     {
-      this->ResetPreviewNode();
+      MITK_INFO << e.GetDescription();
     }
-  }
-  catch (const mitk::Exception &e)
-  {
-    MITK_INFO << e.GetDescription();
   }
 }
 
-void mitk::nnUNetTool::SetNodeProperties(mitk::LabelSetImage::Pointer _temp)
+void mitk::nnUNetTool::SetNodeProperties(mitk::LabelSetImage::Pointer segmentation)
 {
-  MITK_INFO << "In SetNodeProperties ashis: Does nothing here";
-  this->temp = _temp; //remove
+  // This overriden method doesn't set node properties. Intentionally left out for setting later upon demand
+  // in the `RenderSegmentation` method.
+  this->outputSegmentation = segmentation;
 }
 
 us::ModuleResource mitk::nnUNetTool::GetIconResource() const

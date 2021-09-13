@@ -54,7 +54,7 @@ signals:
 
 protected:
   QmitknnUNetToolGUI();
-  ~QmitknnUNetToolGUI() = default;
+  ~QmitknnUNetToolGUI();
 
   void ConnectNewTool(mitk::AutoSegmentationWithPreviewTool *newTool) override;
   void InitializeUI(QBoxLayout *mainLayout) override;
@@ -69,9 +69,6 @@ private:
   std::vector<std::string> FetchMultiModalPathsFromUI();
   template <typename T>
   static T FetchFoldersFromDir(const QString &);
-  // Declaring variables for strings and int only.
-  //QString m_Model;
-  //QString m_Task;
   QString m_ModelDirectory;
   Ui_QmitknnUNetToolGUIControls m_Controls;
   QThread *m_SegmentationThread;

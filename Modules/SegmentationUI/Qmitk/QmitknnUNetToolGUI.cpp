@@ -33,10 +33,15 @@ QmitknnUNetToolGUI::QmitknnUNetToolGUI() : QmitkAutoMLSegmentationToolGUIBase()
     delete messageBox;
     MITK_WARN << stream.str();
   }
-
   m_SegmentationThread = new QThread(this);
   m_Worker = new nnUNetSegmentationWorker;
   m_Worker->moveToThread(m_SegmentationThread);
+}
+
+QmitknnUNetToolGUI::~QmitknnUNetToolGUI()
+{
+  this->m_SegmentationThread->quit();
+  this->m_SegmentationThread->wait();
 }
 
 void QmitknnUNetToolGUI::ConnectNewTool(mitk::AutoSegmentationWithPreviewTool *newTool)
@@ -77,12 +82,11 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
           this,
           SLOT(OnPythonChanged(const QString &)));
 
-  qRegisterMetaType<QVector<int>>("QVector");
-
+  // qRegisterMetaType<QVector<int>>("QVector");
   connect(this, &QmitknnUNetToolGUI::Operate, m_Worker, &nnUNetSegmentationWorker::DoWork);
   connect(m_Worker, &nnUNetSegmentationWorker::Finished, this, &QmitknnUNetToolGUI::SegmentationResultHandler);
   connect(m_Worker, &nnUNetSegmentationWorker::Failed, this, &QmitknnUNetToolGUI::SegmentationProcessFailed);
-
+  connect(m_SegmentationThread, &QThread::finished, m_Worker, &QObject::deleteLater);
 
   m_Controls.codedirectoryBox->setVisible(false);
   m_Controls.nnUnetdirLabel->setVisible(false);
@@ -112,8 +116,8 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
     try
     {
       // comboboxes
-      QString m_Model = m_Controls.modelBox->currentText();
-      QString m_Task = m_Controls.taskBox->currentText();
+      QString modelName = m_Controls.modelBox->currentText();
+      QString taskName = m_Controls.taskBox->currentText();
       std::string nnUNetDirectory = "";
       if (m_Controls.nopipBox->isChecked())
       {
@@ -131,11 +135,11 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       QString splitterString = "__";
       tool->EnsembleOff();
 
-      if (m_Model.startsWith("ensemble", Qt::CaseInsensitive))
+      if (modelName.startsWith("ensemble", Qt::CaseInsensitive))
       {
         std::cout << "model ensemble" << std::endl;
         QString ppJsonFile =
-          QDir::cleanPath(m_ModelDirectory + QDir::separator() + m_Model + QDir::separator() + m_Task +
+          QDir::cleanPath(m_ModelDirectory + QDir::separator() + modelName + QDir::separator() + taskName +
                           QDir::separator() + trainerPlanner + QDir::separator() + "postprocessing.json");
         if (QFile(ppJsonFile).exists())
         {
@@ -157,7 +161,7 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
           QString trainer = splitParts.at(1);
           QString planId = splitParts.at(2);
           auto testfold = std::vector<std::string>(1, "1");
-          mitk::ModelParams modelObject = MapToRequest(modelName, m_Task, trainer, planId, testfold);
+          mitk::ModelParams modelObject = MapToRequest(modelName, taskName, trainer, planId, testfold);
           modelRequest->requestQ.push_back(modelObject);
         }
       }
@@ -166,7 +170,7 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
         QString trainer = trainerSplitParts.first();
         QString planId = trainerSplitParts.last();
         std::vector<std::string> fetchedFolds = FetchSelectedFoldsFromUI();
-        mitk::ModelParams modelObject = MapToRequest(m_Model, m_Task, trainer, planId, fetchedFolds);
+        mitk::ModelParams modelObject = MapToRequest(modelName, taskName, trainer, planId, fetchedFolds);
         modelRequest->requestQ.push_back(modelObject);
       }
 
@@ -213,7 +217,8 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
           std::cout << "starting thread..." << std::endl;
           m_SegmentationThread->start();
         }
-        m_Controls.statusLabel->setText("<b>STATUS: </b><i>Startting Segmentation task... This might take a while.</i>");
+        m_Controls.statusLabel->setText(
+          "<b>STATUS: </b><i>Startting Segmentation task... This might take a while.</i>");
         emit Operate(tool, modelRequest); // start segmentation in worker thread
       }
       else
@@ -253,8 +258,6 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
     // tool->IsTimePointChangeAwareOn();
   }
 }
-
-
 
 std::vector<std::string> QmitknnUNetToolGUI::FetchMultiModalPathsFromUI()
 {

@@ -34,7 +34,8 @@ namespace itk
       m_CalcAllDistances(false),
       multipleEndPoints(false),
       m_ActivateTimeOut(false),
-      m_Initialized(false)
+      m_Initialized(false),
+      m_useCostFunction(true)
   {
     m_endPoints.clear();
     m_endPointsClosed.clear();
@@ -811,6 +812,12 @@ namespace itk
   void ShortestPathImageFilter<TInputImageType, TOutputImageType>::MakeShortestPathVector()
   {
     // MITK_INFO << "Make ShortestPath Vec";
+    if (m_useCostFunction == false)
+    {
+      m_VectorPath.push_back(NodeToCoord(m_Graph_StartNode));
+      m_VectorPath.push_back(NodeToCoord(m_Graph_EndNode));
+      return;
+    }
 
     // single end point
     if (!multipleEndPoints)

@@ -91,8 +91,6 @@ void mitk::LiveWireTool2D::ReleaseInteractors()
 
 void mitk::LiveWireTool2D::ConnectActionsAndFunctions()
 {
-  CONNECT_CONDITION("CheckContourClosed", OnCheckPoint);
-
   CONNECT_FUNCTION("InitObject", OnInitLiveWire);
   CONNECT_FUNCTION("AddPoint", OnAddPoint);
   CONNECT_FUNCTION("CtrlAddPoint", OnAddPoint);
@@ -501,6 +499,13 @@ void mitk::LiveWireTool2D::OnFinish(StateMachineAction *, InteractionEvent *inte
 
   if (nullptr == positionEvent)
     return;
+
+  if (m_PlaneGeometry.IsNotNull())
+  {
+    // Check if the point is in the correct slice
+    if (m_PlaneGeometry->DistanceFromPlane(positionEvent->GetPositionInWorld()) > mitk::sqrteps)
+      return;
+  }
 
   //m_Contour->AddVertex(m_Contour->GetVertexAt(0)->Coordinates, false);
   // Remove last control point added by double click, if double click was performed on first point

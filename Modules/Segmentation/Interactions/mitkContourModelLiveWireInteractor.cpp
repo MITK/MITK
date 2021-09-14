@@ -78,8 +78,16 @@ bool mitk::ContourModelLiveWireInteractor::OnCheckPointClick(const InteractionEv
    //  If the position is not close to control or non-control vertex. but hovering the contour line, we create a vertex at the position.
   if (isVertexSelected == false)
   {
-    contour->AddVertex(click, timeStep);
-    isVertexSelected = contour->SelectVertexAt(click, mitk::ContourModelLiveWireInteractor::eps, timeStep);
+    bool isHover = false;
+    if (this->GetDataNode()->GetBoolProperty("contour.hovering", isHover, positionEvent->GetSender()) == false)
+    {
+      MITK_WARN << "Unknown property contour.hovering";
+    }
+    if (isHover)
+    {
+      contour->AddVertex(click, timeStep);
+      isVertexSelected = contour->SelectVertexAt(click, mitk::ContourModelLiveWireInteractor::eps, timeStep);
+    }
   }
 
   if (isVertexSelected)
@@ -352,6 +360,7 @@ bool mitk::ContourModelLiveWireInteractor::IsHovering(const InteractionEvent *in
       this->GetDataNode()->SetBoolProperty("contour.hovering", true);
       mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
     }
+    return true;
   }
   else
   {

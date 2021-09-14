@@ -163,8 +163,12 @@ namespace mitk
     VertexSizeType GetIndex(const VertexType *vertex) const;
 
     /** \brief Returns the container of the vertices.
-    */
+     */
     const VertexListType *GetVertexList() const;
+
+    /** \brief Returns the container of the vertices.
+     */
+    const VertexListType GetControlVertexList() const;
 
     /** \brief Returns whether the contour element is empty.
     */
@@ -222,7 +226,8 @@ namespace mitk
     */
     void Clear();
 
-    /** \brief Returns the approximate nearest vertex a given posoition in 3D space
+    /** \brief Returns the approximate nearest vertex a given position in 3D space. With the parameter 'isControlPoint', 
+    one can decide if any vertex should be returned, ot just control vertices.
     \param point - query position in 3D space.
     \param eps - the error bound for search algorithm.
     */

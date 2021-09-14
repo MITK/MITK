@@ -53,9 +53,10 @@ void mitk::nnUNetTool::UpdateCleanUp()
 
 void mitk::nnUNetTool::RenderSegmentation()
 {
-  if (this->outputSegmentation != nullptr)
+  if (this->outputBuffer != nullptr)
   {
-    Superclass::SetNodeProperties(this->outputSegmentation);
+    Superclass::SetNodeProperties(this->outputBuffer);
+    this->ClearOutputBuffer();
     try
     {
       if (nullptr != this->GetPreviewSegmentationNode())
@@ -78,7 +79,17 @@ void mitk::nnUNetTool::SetNodeProperties(mitk::LabelSetImage::Pointer segmentati
 {
   // This overriden method doesn't set node properties. Intentionally left out for setting later upon demand
   // in the `RenderSegmentation` method.
-  this->outputSegmentation = segmentation;
+  this->outputBuffer = segmentation;
+}
+
+mitk::LabelSetImage::Pointer mitk::nnUNetTool::GetOutputBuffer()
+{
+  return this->outputBuffer;
+}
+
+void mitk::nnUNetTool::ClearOutputBuffer()
+{
+  this->outputBuffer = nullptr;
 }
 
 us::ModuleResource mitk::nnUNetTool::GetIconResource() const
@@ -175,7 +186,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   catch (const mitk::Exception &e)
   {
     MITK_ERROR << e.GetDescription();
-    //mitkThrow() << "Error writing 3D stack on to disk.";
+    // mitkThrow() << "Error writing 3D stack on to disk.";
     return nullptr;
   }
   // Code calls external process
@@ -274,7 +285,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     catch (const mitk::Exception &e)
     {
       MITK_ERROR << e.GetDescription();
-      //mitkThrow() << "An error occured while calling nnUNet process.";
+      // mitkThrow() << "An error occured while calling nnUNet process.";
       return nullptr;
     }
   }
@@ -303,21 +314,21 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     }
 
     if (this->test)
-      outputImagePath = "/Users/ashis/DKFZ/nnUNet/mitk-32uGaS/nnunet-ensemble-out-cJ9sjG/yFw1zN_000.nii.gz";
+      outputImagePath = "/Users/ashis/DKFZ/nnUNet/mitk-32uGaS/nnunet-ensemble-out-cJ9sjG/yFw1zN_000_.nii.gz";
     else
       spExec->execute(this->GetPythonPath(), command, args);
   }
-  mitk::LabelSetImage::Pointer resultImage = mitk::LabelSetImage::New();
   try
   {
+    mitk::LabelSetImage::Pointer resultImage = mitk::LabelSetImage::New();
     mitk::Image::Pointer outputImage = mitk::IOUtil::Load<mitk::Image>(outputImagePath);
     resultImage->InitializeByLabeledImage(outputImage);
     resultImage->SetGeometry(_inputAtTimeStep->GetGeometry());
+    return resultImage;
   }
   catch (const mitk::Exception &e)
   {
     MITK_ERROR << e.GetDescription();
     return nullptr;
   }
-  return resultImage;
 }

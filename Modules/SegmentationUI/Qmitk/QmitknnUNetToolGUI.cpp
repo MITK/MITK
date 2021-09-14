@@ -218,7 +218,7 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
           m_SegmentationThread->start();
         }
         m_Controls.statusLabel->setText(
-          "<b>STATUS: </b><i>Startting Segmentation task... This might take a while.</i>");
+          "<b>STATUS: </b><i>Starting Segmentation task... This might take a while.</i>");
         emit Operate(tool, modelRequest); // start segmentation in worker thread
       }
       else

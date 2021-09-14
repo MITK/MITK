@@ -121,6 +121,8 @@ namespace mitk
 
     void RenderSegmentation();
 
+    mitk::LabelSetImage::Pointer GetOutputBuffer();
+    void ClearOutputBuffer();
 
   protected:
     nnUNetTool();
@@ -147,7 +149,7 @@ namespace mitk
     bool m_Ensemble = false;
     unsigned int m_PreprocessingThreads;
     bool test; //remove
-    mitk::LabelSetImage::Pointer outputSegmentation;
+    mitk::LabelSetImage::Pointer outputBuffer;
     unsigned int m_GpuId;
   };
 } // namespace mitk

@@ -67,20 +67,15 @@ bool mitk::ContourModelLiveWireInteractor::OnCheckPointClick(const InteractionEv
   mitk::Point3D click = positionEvent->GetPositionInWorld();
 
   bool isVertexSelected = false;
-  // is close to control vertex
-    // do stuff
+  // Check, if clicked position is close to control vertex and if so, select closest control vertex.
   isVertexSelected = contour->SelectControlVertexAt(click, mitk::ContourModelLiveWireInteractor::eps, timeStep);
 
-  // Is not close to control vertex. but hovering
-    // is close to non control vertex
-      // set as control vertex
-      // do stuff
+  // If the position is not close to control vertex. but hovering the contour line, we check, if it is close to non-control vertex.
+  // The closest vertex will be set as a control vertex.
   if (isVertexSelected == false)
     isVertexSelected = contour->SelectVertexAt(click, mitk::ContourModelLiveWireInteractor::eps, timeStep);
 
-   // is not close to non-control vertex
-     // create vertex at position
-     // do stuff
+   //  If the position is not close to control or non-control vertex. but hovering the contour line, we create a vertex at the position.
   if (isVertexSelected == false)
   {
     contour->AddVertex(click, timeStep);

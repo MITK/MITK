@@ -32,19 +32,7 @@ namespace mitk
     std::string model;
     std::string trainer;
     std::string planId;
-    std::string outputDir;
-
-    bool operator==(const ModelParams &other) const
-    {
-      return ((this->task == other.task) && (this->model == other.model));
-    }
-
-    size_t generateHash() const
-    {
-      std::hash<std::string> str_hash;
-      std::string toHash = this->task + this->model;
-      return str_hash(toHash);
-    }
+    std::string outputDir; 
   };
   /**
     \brief nnUNet segmentation tool.
@@ -138,8 +126,8 @@ namespace mitk
     std::string m_ModelDirectory;
     std::string m_PythonPath;
     std::string m_PostProcessingJsonDirectory;
-    //bool m_UseGPU;
-    //bool m_AllInGPU;
+    //bool m_UseGPU; kept for future
+    //bool m_AllInGPU; 
     bool m_MixedPrecision;
     bool m_Mirror;
     bool m_NoPip;

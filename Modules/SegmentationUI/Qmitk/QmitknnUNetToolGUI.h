@@ -31,8 +31,6 @@ public:
   itkFactorylessNewMacro(Self);
   itkCloneMacro(Self);
 
-  QCache<size_t, nnUNetModel> cache;
-
 protected slots:
   void OnSettingsAccept();
   void OnDirectoryChanged(const QString &);
@@ -42,14 +40,14 @@ protected slots:
   void OnPythonChanged(const QString &);
   void OnCheckBoxChanged(int);
   void SegmentationProcessFailed();
-  void SegmentationResultHandler(mitk::nnUNetTool *, nnUNetModel *);
+  void SegmentationResultHandler(mitk::nnUNetTool *);
   void OnModalitiesNumberChanged(int);
 
 signals:
   /**
    * @brief signal for starting the segmentation which is caught by a worker thread.
    */
-  void Operate(mitk::nnUNetTool *, nnUNetModel *);
+  void Operate(mitk::nnUNetTool *);
 
 protected:
   QmitknnUNetToolGUI();
@@ -74,7 +72,6 @@ private:
   nnUNetSegmentationWorker *m_Worker;
   std::vector<ctkPathLineEdit *> m_ModalPaths;
   int m_UI_ROWS;
-  bool m_DoCache=false;
 };
 
 #endif

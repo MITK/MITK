@@ -3,7 +3,7 @@
 #include "mitkRenderingManager.h"
 #include <QMutexLocker>
 
-void nnUNetSegmentationWorker::DoWork(mitk::nnUNetTool *tool, nnUNetModel *request)
+void nnUNetSegmentationWorker::DoWork(mitk::nnUNetTool *tool)
 {
   MITK_INFO << "in nnUNet Worker";
   try
@@ -14,7 +14,7 @@ void nnUNetSegmentationWorker::DoWork(mitk::nnUNetTool *tool, nnUNetModel *reque
     {
       mitkThrow() << "An error occured while calling nnUNet process.";
     }
-    emit Finished(tool, request);
+    emit Finished(tool);
   }
   catch (const mitk::Exception &e)
   {

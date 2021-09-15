@@ -17,28 +17,6 @@ found in the LICENSE file.s
 #include <QObject>
 #include <mitknnUnetTool.h>
 
-class nnUNetModel
-{
-public:
-  std::vector<mitk::ModelParams> requestQ;
-  mitk::LabelSetImage::ConstPointer outputImage;
-  size_t hashCode = 0;
-
-  size_t GetUniqueHash()
-  {
-    if (hashCode == 0)
-    {
-      for (mitk::ModelParams request : requestQ)
-      {
-        // sum of individual hash is the final hash
-        hashCode += request.generateHash();
-      }
-    }
-    return hashCode;
-  }
-};
-
-Q_DECLARE_METATYPE(mitk::nnUNetTool*)
 /**
  * @class SegmentationWorker
  * @brief Class to execute some functions (mainly segmentation) from the Segmentation Plugin in a seperate thread
@@ -54,15 +32,7 @@ public slots:
    * @param segTool the Segmentation Tool for running the segmentation
    * @param resultSetter the SegmentationResultHandler which sets the result in the GUI after the segmentation
    */
-  void DoWork(mitk::nnUNetTool *, nnUNetModel *);
-  /**
-   * @brief if a segmentation is executed when the tool is started,
-   *        wait for the segmentation to finish and emit a signal (PreviouesSegmentationFinished) afterwards.
-   *
-   * @param tool the Segmentation Tool to check, if the segmentation is still running.
-   */
-  // void WaitForSegmentationToFinish(mitk::nnUNetTool *segTool);
-
+  void DoWork(mitk::nnUNetTool *);
 signals:
   /**
    * @brief the signal emitted when a segmentation process finished successful
@@ -70,7 +40,7 @@ signals:
    * @param result the resulting segmentation
    * @param segTool the Segmentation Tool for running the segmentation
    */
-  void Finished(mitk::nnUNetTool *, nnUNetModel *);
+  void Finished(mitk::nnUNetTool *);
   /**
    * @brief the signal emitted when a segmentation process failed
    */

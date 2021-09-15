@@ -106,8 +106,6 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
 
 void QmitknnUNetToolGUI::OnSettingsAccept()
 {
-  bool doSeg = true;
-  size_t hashKey(0);
   auto tool = this->GetConnectedToolAs<mitk::nnUNetTool>();
   if (nullptr != tool)
   {
@@ -147,7 +145,7 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
         }
       }
       QStringList trainerSplitParts = trainerPlanner.split(splitterString, QString::SplitBehavior::SkipEmptyParts);
-      nnUNetModel *modelRequest = new nnUNetModel();
+      std::vector<mitk::ModelParams> requestQ;
       if (tool->GetEnsemble())
       {
         std::cout << "in ensemble" << std::endl;
@@ -160,7 +158,7 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
           QString planId = splitParts.at(2);
           auto testfold = std::vector<std::string>(1, "1");
           mitk::ModelParams modelObject = MapToRequest(modelName, taskName, trainer, planId, testfold);
-          modelRequest->requestQ.push_back(modelObject);
+          requestQ.push_back(modelObject);
         }
       }
       else
@@ -169,24 +167,12 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
         QString planId = trainerSplitParts.last();
         std::vector<std::string> fetchedFolds = FetchSelectedFoldsFromUI();
         mitk::ModelParams modelObject = MapToRequest(modelName, taskName, trainer, planId, fetchedFolds);
-        modelRequest->requestQ.push_back(modelObject);
+        requestQ.push_back(modelObject);
       }
 
-      if (m_DoCache)
-      {
-        hashKey = modelRequest->GetUniqueHash();
-        if (this->cache.contains(hashKey))
-        {
-          doSeg = false;
-          std::cout << "Key found: " << hashKey << std::endl;
-        }
-      }
-      if (doSeg)
-      {
-        tool->m_ParamQ.clear();
-        tool->m_ParamQ = modelRequest->requestQ;
-      }
-
+      tool->m_ParamQ.clear();
+      tool->m_ParamQ = requestQ;
+      
       tool->SetnnUNetDirectory(nnUNetDirectory);
       tool->SetPythonPath(pythonPath.toStdString());
       tool->SetModelDirectory(m_ModelDirectory.left(m_ModelDirectory.lastIndexOf(QDir::separator())).toStdString());
@@ -207,27 +193,13 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
         tool->MultiModalOn();
       }
 
-      if (doSeg)
+      if (!m_SegmentationThread->isRunning())
       {
-        if (!m_SegmentationThread->isRunning())
-        {
-          MITK_ERROR << "Starting thread...";
-          m_SegmentationThread->start();
-        }
-        m_Controls.statusLabel->setText("<b>STATUS: </b><i>Starting Segmentation task... This might take a while.</i>");
-        emit Operate(tool, modelRequest); // start segmentation in worker thread
+        MITK_ERROR << "Starting thread...";
+        m_SegmentationThread->start();
       }
-      else
-      {
-        delete modelRequest;
-        std::cout << "won't do segmentation. Key found: " << QString::number(hashKey).toStdString() << std::endl;
-        if (this->cache.contains(hashKey))
-        {
-          nnUNetModel *_model = this->cache[hashKey];
-          // std::cout << "fetched pointer " << _model->outputImage << std::endl;
-          this->SetLabelSetPreview(_model->outputImage);
-        }
-      }
+      m_Controls.statusLabel->setText("<b>STATUS: </b><i>Starting Segmentation task... This might take a while.</i>");
+      emit Operate(tool);
     }
     catch (const std::exception &e)
     {

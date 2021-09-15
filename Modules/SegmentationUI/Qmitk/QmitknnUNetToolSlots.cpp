@@ -219,20 +219,11 @@ void QmitknnUNetToolGUI::SegmentationProcessFailed()
   MITK_ERROR << stream.str();
 }
 
-void QmitknnUNetToolGUI::SegmentationResultHandler(mitk::nnUNetTool *tool, nnUNetModel *modelRequest)
+void QmitknnUNetToolGUI::SegmentationResultHandler(mitk::nnUNetTool *tool)
 {
   MITK_INFO << "Finished slot";
   tool->RenderOutputBuffer();
   this->SetLabelSetPreview(tool->GetMLPreview());
-  std::cout << "New pointer: " << tool->GetMLPreview() << std::endl;
-  if (m_DoCache)
-  {
-    modelRequest->outputImage = tool->GetMLPreview();
-    // Adding params and output Labelset image to Cache
-    size_t hashkey = modelRequest->GetUniqueHash();
-    std::cout << "New hash: " << hashkey << std::endl;
-    this->cache.insert(hashkey, modelRequest);
-  }
   tool->IsTimePointChangeAwareOn();
   m_Controls.statusLabel->setText("<b>STATUS: </b><i>Segmentation task finished successfully.</i>");
 }

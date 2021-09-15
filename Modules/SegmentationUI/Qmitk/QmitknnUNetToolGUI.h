@@ -44,7 +44,6 @@ protected slots:
   void SegmentationProcessFailed();
   void SegmentationResultHandler(mitk::nnUNetTool *, nnUNetModel *);
   void OnModalitiesNumberChanged(int);
-  //void OnSegmentationRunning(); 
 
 signals:
   /**

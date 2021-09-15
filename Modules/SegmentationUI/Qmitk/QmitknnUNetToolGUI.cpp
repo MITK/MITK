@@ -82,7 +82,6 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
           this,
           SLOT(OnPythonChanged(const QString &)));
 
-  // qRegisterMetaType<QVector<int>>("QVector");
   connect(this, &QmitknnUNetToolGUI::Operate, m_Worker, &nnUNetSegmentationWorker::DoWork);
   connect(m_Worker, &nnUNetSegmentationWorker::Finished, this, &QmitknnUNetToolGUI::SegmentationResultHandler);
   connect(m_Worker, &nnUNetSegmentationWorker::Failed, this, &QmitknnUNetToolGUI::SegmentationProcessFailed);
@@ -108,7 +107,6 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
 void QmitknnUNetToolGUI::OnSettingsAccept()
 {
   bool doSeg = true;
-  std::cout << "clicked OnSettingsAccept" << std::endl;
   size_t hashKey(0);
   auto tool = this->GetConnectedToolAs<mitk::nnUNetTool>();
   if (nullptr != tool)
@@ -211,14 +209,12 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
 
       if (doSeg)
       {
-        std::cout << "do segmentation" << std::endl;
         if (!m_SegmentationThread->isRunning())
         {
-          std::cout << "starting thread..." << std::endl;
+          MITK_ERROR << "Starting thread...";
           m_SegmentationThread->start();
         }
-        m_Controls.statusLabel->setText(
-          "<b>STATUS: </b><i>Starting Segmentation task... This might take a while.</i>");
+        m_Controls.statusLabel->setText("<b>STATUS: </b><i>Starting Segmentation task... This might take a while.</i>");
         emit Operate(tool, modelRequest); // start segmentation in worker thread
       }
       else
@@ -255,7 +251,6 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       MITK_ERROR << stream.str();
       return;
     }
-    // tool->IsTimePointChangeAwareOn();
   }
 }
 

@@ -58,7 +58,6 @@ void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &resultsFolder)
 
 void QmitknnUNetToolGUI::OnModelChanged(const QString &text)
 {
-  // m_ModelDirectory = m_Controls.modeldirectoryBox->directory();
   QString updatedPath(QDir::cleanPath(m_ModelDirectory + QDir::separator() + text));
   m_Controls.taskBox->clear();
   auto datasets = FetchFoldersFromDir<QStringList>(updatedPath);
@@ -67,7 +66,6 @@ void QmitknnUNetToolGUI::OnModelChanged(const QString &text)
 
 void QmitknnUNetToolGUI::OnTaskChanged(const QString &text)
 {
-  // m_ModelDirectory = m_Controls.modeldirectoryBox->directory();
   QString updatedPath = QDir::cleanPath(m_ModelDirectory + QDir::separator() + m_Controls.modelBox->currentText() +
                                         QDir::separator() + text);
   m_Controls.trainerBox->clear();
@@ -80,7 +78,6 @@ void QmitknnUNetToolGUI::OnTrainerChanged(const QString &trainerSelected)
   m_Controls.foldBox->clear();
   if (m_Controls.modelBox->currentText() != "ensembles")
   {
-    // m_ModelDirectory = m_Controls.modeldirectoryBox->directory(); // check syntax
     QString updatedPath(QDir::cleanPath(m_ModelDirectory + QDir::separator() + m_Controls.modelBox->currentText() +
                                         QDir::separator() + m_Controls.taskBox->currentText() + QDir::separator() +
                                         trainerSelected));
@@ -141,30 +138,6 @@ void QmitknnUNetToolGUI::OnModalitiesNumberChanged(int num)
     delete child; // delete the layout item
     m_ModalPaths.pop_back();
   }
-
-  // int rowCount = m_Controls.advancedSettingsLayout->rowCount(); // 6
-  // std::cout << "Start Row count " << rowCount << std::endl;     // 6
-
-  // QLayoutItem *child;
-  // while ((child = m_Controls.advancedSettingsLayout->takeAt(0)) != nullptr)
-  // {
-  //   delete child->widget(); // delete the widget
-  //   delete child;               // delete the layout item
-  //    m_Controls.advancedSettingsLayout->update();
-  //   rowCount = m_Controls.advancedSettingsLayout->rowCount();
-  //     std::cout << "current Row count " << rowCount << std::endl;     // 6
-
-  // }
-  // rowCount = m_Controls.advancedSettingsLayout->rowCount(); // 4
-  // std::cout << "New Rows " << rowCount << std::endl;        // 4
-
-  // for (int i = rowCount + 1 /*5,*/; i /*5,6,7*/ < rowCount + num + 1 /*7-t,t,f*/; ++i)
-  // {
-  //   std::cout << "i is  " << i << std::endl;
-  //   ctkPathLineEdit *multiModalPath = new ctkPathLineEdit(this);
-  //   multiModalPath->setObjectName(QString("multiModalPath" + QString::number(i)));
-  //   m_Controls.advancedSettingsLayout->addWidget(multiModalPath, i, 1, 1, 3);
-  // }
   m_Controls.advancedSettingsLayout->update();
 }
 
@@ -180,13 +153,13 @@ void QmitknnUNetToolGUI::AutoParsePythonPaths()
   searchDirs.push_back(homeDir + QDir::separator() + "opt" + QDir::separator() + "miniconda3");
   searchDirs.push_back(homeDir + QDir::separator() + "opt" + QDir::separator() + "anaconda3");
 #elif defined(_WIN32) || defined(_WIN64)
-  searchDirs.push_back("C:" + QDir::separator() + "anaconda3");
+  searchDirs.push_back("C:" + QDir::separator() + "ProgramData" + QDir::separator() + "anaconda3");
 #endif
   for (QString searchDir : searchDirs)
   {
     if (searchDir.endsWith("anaconda3", Qt::CaseInsensitive))
     {
-      if (QDir(searchDir).exists()) // Do case insensitive search
+      if (QDir(searchDir).exists())
       {
         m_Controls.pythonEnvComboBox->insertItem(0, "(base): " + searchDir);
         searchDir.append((QDir::separator() + QString("envs")));
@@ -197,7 +170,7 @@ void QmitknnUNetToolGUI::AutoParsePythonPaths()
       subIt.next();
       QString envName = subIt.fileName();
       if (!envName.startsWith('.')) // Filter out irrelevent hidden folders, if any.
-      {                             // folds.push_back(fold);
+      {
         m_Controls.pythonEnvComboBox->insertItem(0, "(" + envName + "): " + subIt.filePath());
       }
     }
@@ -235,7 +208,8 @@ mitk::ModelParams QmitknnUNetToolGUI::MapToRequest(
 
 void QmitknnUNetToolGUI::SegmentationProcessFailed()
 {
-  m_Controls.statusLabel->setText("<b>STATUS: </b><i>Error in the segmentation process. No resulting segmentation can be loaded.</i>");
+  m_Controls.statusLabel->setText(
+    "<b>STATUS: </b><i>Error in the segmentation process. No resulting segmentation can be loaded.</i>");
   this->setCursor(Qt::ArrowCursor);
   std::stringstream stream;
   stream << "Error in the segmentation process. No resulting segmentation can be loaded.";
@@ -245,18 +219,10 @@ void QmitknnUNetToolGUI::SegmentationProcessFailed()
   MITK_ERROR << stream.str();
 }
 
-// void QmitknnUNetToolGUI::OnSegmentationRunning() 
-// {
-//   m_Controls.statusLabel->setText("<b>STATUS: </b><i>Segmentation task running... This might take a while.</i>");
-//   //m_Ui->labelWarning->setVisible(true);
-//   //m_Ui->buttonLoadTrainedNetwork->setEnabled(false);
-//   //m_Ui->buttonPerformImageProcessing->setEnabled(false);
-// }
-
 void QmitknnUNetToolGUI::SegmentationResultHandler(mitk::nnUNetTool *tool, nnUNetModel *modelRequest)
 {
   MITK_INFO << "Finished slot";
-  tool->RenderSegmentation();
+  tool->RenderOutputBuffer();
   this->SetLabelSetPreview(tool->GetMLPreview());
   std::cout << "New pointer: " << tool->GetMLPreview() << std::endl;
   if (m_DoCache)

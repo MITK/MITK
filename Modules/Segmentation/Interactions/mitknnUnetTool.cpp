@@ -48,10 +48,10 @@ void mitk::nnUNetTool::Activated()
 void mitk::nnUNetTool::UpdateCleanUp()
 {
   // This overriden method is intentionally left out for setting later upon demand
-  // in the `RenderSegmentation` method.
+  // in the `RenderOutputBuffer` method.
 }
 
-void mitk::nnUNetTool::RenderSegmentation()
+void mitk::nnUNetTool::RenderOutputBuffer()
 {
   if (this->outputBuffer != nullptr)
   {
@@ -78,7 +78,7 @@ void mitk::nnUNetTool::RenderSegmentation()
 void mitk::nnUNetTool::SetNodeProperties(mitk::LabelSetImage::Pointer segmentation)
 {
   // This overriden method doesn't set node properties. Intentionally left out for setting later upon demand
-  // in the `RenderSegmentation` method.
+  // in the `RenderOutputBuffer` method.
   this->outputBuffer = segmentation;
 }
 
@@ -149,7 +149,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   std::ofstream tmpStream;
   inputImagePath =
     mitk::IOUtil::CreateTemporaryFile(tmpStream, templateFilename, inDir + mitk::IOUtil::GetDirectorySeparator());
-  tmpStream.close(); // required ?
+  tmpStream.close();
   std::size_t found = inputImagePath.find_last_of(mitk::IOUtil::GetDirectorySeparator());
   std::string fileName = inputImagePath.substr(found + 1);
   std::string token = fileName.substr(0, fileName.find("_"));
@@ -159,13 +159,10 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     scriptPath = this->GetnnUNetDirectory() + mitk::IOUtil::GetDirectorySeparator() + "nnunet" +
                  mitk::IOUtil::GetDirectorySeparator() + "inference" + mitk::IOUtil::GetDirectorySeparator() +
                  "predict_simple.py";
-    // std::string scriptPath = this->GetnnUNetDirectory() + mitk::IOUtil::GetDirectorySeparator() +
-    // "test_process.py";
   }
 
   try
   {
-    std::cout << "saving............ " << std::endl;
     if (!this->test)
       mitk::IOUtil::Save(_inputAtTimeStep.GetPointer(), inputImagePath);
     if (this->GetMultiModal())
@@ -185,8 +182,10 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   }
   catch (const mitk::Exception &e)
   {
+    /*
+    Can't throw mitk exception to the caller. Refer: T28691
+    */
     MITK_ERROR << e.GetDescription();
-    // mitkThrow() << "Error writing 3D stack on to disk.";
     return nullptr;
   }
   // Code calls external process
@@ -284,8 +283,10 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     }
     catch (const mitk::Exception &e)
     {
+      /*
+      Can't throw mitk exception to the caller. Refer: T28691
+      */
       MITK_ERROR << e.GetDescription();
-      // mitkThrow() << "An error occured while calling nnUNet process.";
       return nullptr;
     }
   }
@@ -328,6 +329,9 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   }
   catch (const mitk::Exception &e)
   {
+    /*
+    Can't throw mitk exception to the caller. Refer: T28691
+    */
     MITK_ERROR << e.GetDescription();
     return nullptr;
   }

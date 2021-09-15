@@ -81,7 +81,7 @@ namespace mitk
 
     itkSetMacro(PostProcessingJsonDirectory, std::string);
     itkGetConstMacro(PostProcessingJsonDirectory, std::string);
-
+    /*
     itkSetMacro(UseGPU, bool);
     itkGetConstMacro(UseGPU, bool);
     itkBooleanMacro(UseGPU);
@@ -89,7 +89,7 @@ namespace mitk
     itkSetMacro(AllInGPU, bool);
     itkGetConstMacro(AllInGPU, bool);
     itkBooleanMacro(AllInGPU);
-
+    */
     itkSetMacro(MixedPrecision, bool);
     itkGetConstMacro(MixedPrecision, bool);
     itkBooleanMacro(MixedPrecision);
@@ -119,15 +119,13 @@ namespace mitk
     itkSetMacro(GpuId, unsigned int);
     itkGetConstMacro(GpuId, unsigned int);
 
-    void RenderSegmentation();
-
+    void RenderOutputBuffer();
     mitk::LabelSetImage::Pointer GetOutputBuffer();
     void ClearOutputBuffer();
 
   protected:
     nnUNetTool();
-    ~nnUNetTool() override; // why to override eventhough AutoMLSegmentationWithPreviewTool has no virtual destructor
-    //~nnUNetTool() = default; Are there any consequences of not using default?
+    ~nnUNetTool();
 
     LabelSetImage::Pointer ComputeMLPreview(const Image *inputAtTimeStep, TimeStepType timeStep) override;
     void UpdateCleanUp() override;
@@ -140,10 +138,10 @@ namespace mitk
     std::string m_ModelDirectory;
     std::string m_PythonPath;
     std::string m_PostProcessingJsonDirectory;
-    bool m_UseGPU;
-    bool m_AllInGPU;
+    //bool m_UseGPU;
+    //bool m_AllInGPU;
     bool m_MixedPrecision;
-    bool m_Mirror; // rename
+    bool m_Mirror;
     bool m_NoPip;
     bool m_MultiModal;
     bool m_Ensemble = false;

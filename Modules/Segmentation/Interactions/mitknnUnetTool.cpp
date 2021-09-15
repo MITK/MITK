@@ -265,8 +265,12 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
 
     try
     {
-      setenv("RESULTS_FOLDER", this->GetModelDirectory().c_str(), true);
-      setenv("CUDA_VISIBLE_DEVICES", std::to_string(this->GetGpuId()).c_str(), true);
+      std::string resultsFolderEnv = "RESULTS_FOLDER="+this->GetModelDirectory();
+      itksys::SystemTools::PutEnv(resultsFolderEnv.c_str());
+      std::string cudaEnv = "CUDA_VISIBLE_DEVICES="+std::to_string(this->GetGpuId());
+      itksys::SystemTools::PutEnv(cudaEnv.c_str());
+      //setenv("RESULTS_FOLDER", this->GetModelDirectory().c_str(), true);
+      //setenv("CUDA_VISIBLE_DEVICES", std::to_string(this->GetGpuId()).c_str(), true);
       for (auto arg : args)
       {
         std::cout << arg << std::endl;

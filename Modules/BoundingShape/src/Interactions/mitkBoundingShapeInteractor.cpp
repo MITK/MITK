@@ -569,7 +569,6 @@ void mitk::BoundingShapeInteractor::EnableCrosshairNavigation()
       {
         // here the regular configuration is loaded again
         displayInteractor->SetEventConfig(it->second);
-        //    MITK_INFO << "restore config";
       }
 
       mitk::DisplayActionEventBroadcast *displayActionEventBroadcast = static_cast<mitk::DisplayActionEventBroadcast *>(
@@ -578,7 +577,6 @@ void mitk::BoundingShapeInteractor::EnableCrosshairNavigation()
       {
         // here the regular configuration is loaded again
         displayActionEventBroadcast->SetEventConfig(it->second);
-        //    MITK_INFO << "restore config";
       }
     }
   }
@@ -611,7 +609,6 @@ void mitk::BoundingShapeInteractor::DisableCrosshairNavigation()
       m_Impl->DisplayInteractorConfigs.insert(std::make_pair(*it, displayInteractor->GetEventConfig()));
       // here the alternative configuration is loaded
       displayInteractor->AddEventConfig("DisplayConfigBlockLMB.xml");
-      //     MITK_INFO << "change config";
     }
 
     auto *displayActionEventBroadcast =

@@ -24,6 +24,8 @@ MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitknnUNetToolGUI, "")
 
 QmitknnUNetToolGUI::QmitknnUNetToolGUI() : QmitkAutoMLSegmentationToolGUIBase()
 {
+  // Nvidia-smi command returning zero doesn't alway mean lack of GPUs. 
+  // Pytorch uses its own libraries to communicate to the GPUs. Hence, only a warning can be given.
   if (GetGPUCount() == 0)
   {
     std::stringstream stream;

@@ -18,8 +18,8 @@ found in the LICENSE file.s
 #include <mitknnUnetTool.h>
 
 /**
- * @class SegmentationWorker
- * @brief Class to execute some functions (mainly segmentation) from the Segmentation Plugin in a seperate thread
+ * @class nnUNetSegmentationWorker
+ * @brief Class to execute some functions (mainly segmentation) from the nnUNet Tool in a seperate thread
  */
 class nnUNetSegmentationWorker : public QObject
 {
@@ -28,17 +28,11 @@ class nnUNetSegmentationWorker : public QObject
 public slots:
   /**
    * @brief execute segmentation with the correct segmentation tool
-   *
-   * @param segTool the Segmentation Tool for running the segmentation
-   * @param resultSetter the SegmentationResultHandler which sets the result in the GUI after the segmentation
    */
   void DoWork(mitk::nnUNetTool *);
 signals:
   /**
    * @brief the signal emitted when a segmentation process finished successful
-   *
-   * @param result the resulting segmentation
-   * @param segTool the Segmentation Tool for running the segmentation
    */
   void Finished(mitk::nnUNetTool *);
   /**

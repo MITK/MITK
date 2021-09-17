@@ -42,7 +42,7 @@ void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &resultsFolder)
   this->ClearAllComboBoxes();
   m_ModelDirectory = resultsFolder + QDir::separator() + "nnUNet";
   auto models = FetchFoldersFromDir<QStringList>(m_ModelDirectory);
-  QStringList validlist;
+  QStringList validlist; // valid list of models supported by nnUNet
   validlist << "2d"
             << "3d_lowres"
             << "3d_fullres"
@@ -59,7 +59,6 @@ void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &resultsFolder)
 
 void QmitknnUNetToolGUI::OnModelChanged(const QString &text)
 {
-  //m_Controls.previewButton->setEnabled(false);
   QString updatedPath(QDir::cleanPath(m_ModelDirectory + QDir::separator() + text));
   m_Controls.taskBox->clear();
   auto datasets = FetchFoldersFromDir<QStringList>(updatedPath);
@@ -68,7 +67,6 @@ void QmitknnUNetToolGUI::OnModelChanged(const QString &text)
 
 void QmitknnUNetToolGUI::OnTaskChanged(const QString &text)
 {
-  //m_Controls.previewButton->setEnabled(false);
   QString updatedPath = QDir::cleanPath(m_ModelDirectory + QDir::separator() + m_Controls.modelBox->currentText() +
                                         QDir::separator() + text);
   m_Controls.trainerBox->clear();
@@ -89,7 +87,7 @@ void QmitknnUNetToolGUI::OnTrainerChanged(const QString &trainerSelected)
                   folds.end(),
                   [this](QString fold)
                   {
-                    if (fold.startsWith("fold_", Qt::CaseInsensitive))
+                    if (fold.startsWith("fold_", Qt::CaseInsensitive)) // imposed by nnUNet
                       m_Controls.foldBox->addItem(fold);
                   });
     if (m_Controls.foldBox->count()!=0)

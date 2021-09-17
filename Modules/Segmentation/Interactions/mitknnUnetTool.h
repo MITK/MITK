@@ -25,6 +25,10 @@ namespace us //remove?
 
 namespace mitk
 {
+  /**
+   * @brief nnUNet parameter request object holding all model parameters for input.
+   * Also holds output temporary directory path.
+   */
   struct ModelParams
   {
     std::string task;
@@ -34,6 +38,7 @@ namespace mitk
     std::string planId;
     std::string outputDir; 
   };
+
   /**
     \brief nnUNet segmentation tool.
 
@@ -98,20 +103,69 @@ namespace mitk
     itkGetConstMacro(Ensemble, bool);
     itkBooleanMacro(Ensemble);
 
-    std::vector<mitk::ModelParams> m_ParamQ;
-    std::vector<std::string> otherModalPaths;
-
     itkSetMacro(GpuId, unsigned int);
     itkGetConstMacro(GpuId, unsigned int);
 
+    /**
+     * @brief vector of ModelParams.
+     * Size > 1 only for ensemble prediction.
+     */
+    std::vector<mitk::ModelParams> m_ParamQ;
+
+    /**
+     * @brief Holds paths to other input image modalities.
+     * 
+     */
+    std::vector<std::string> otherModalPaths;
+
+
+    /**
+     * @brief Renders the output LabelSetImage.
+     * To called in the main thread.
+     */
     void RenderOutputBuffer();
+
+    /**
+     * @brief Get the Output Buffer object
+     * 
+     * @return mitk::LabelSetImage::Pointer 
+     */
     mitk::LabelSetImage::Pointer GetOutputBuffer();
+
+    /**
+     * @brief Sets the outputBuffer to nullptr
+     * 
+     */
     void ClearOutputBuffer();
 
   protected:
+  
+    /**
+     * @brief Construct a new nnUNet Tool object and temp directory.
+     * 
+     */
     nnUNetTool();
+
+    /**
+     * @brief Destroy the nnUNet Tool object and deletes the temp directory.
+     * 
+     */
     ~nnUNetTool();
 
+    /**
+     * @brief Overriden method from the tool manager to execute the segmentation
+     * Implementation:
+     * 1. Saves the inputAtTimeStep in a temporary directory.
+     * 2. Copies other modalities, renames and saves in the temporary directory, if required.
+     * 3. Sets RESULTS_FOLDER and CUDA_VISIBLE_DEVICES variables in the environment.
+     * 3. Iterates through the parameter queue (m_ParamQ) and executes "nnUNet_predict" command with the parameters
+     * 4. Expects an output image to be saved in the temporary directory by the python proces. Loads it as
+     *    LabelSetImage and returns.
+     * 
+     * @param inputAtTimeStep 
+     * @param timeStep 
+     * @return LabelSetImage::Pointer 
+     */
     LabelSetImage::Pointer ComputeMLPreview(const Image *inputAtTimeStep, TimeStepType timeStep) override;
     void UpdateCleanUp() override;
     void SetNodeProperties(mitk::LabelSetImage::Pointer) override;

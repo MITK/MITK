@@ -47,17 +47,6 @@ void QmitkInteractionSchemeToolBar::SetInteractionEventHandler(mitk::Interaction
   }
 
   m_InteractionEventHandler = interactionEventHandler;
-  if (nullptr != m_InteractionSchemeSwitcher)
-  {
-    try
-    {
-      m_InteractionSchemeSwitcher->SetInteractionScheme(m_InteractionEventHandler, InteractionScheme::PACSStandard);
-    }
-    catch (const mitk::Exception&)
-    {
-      return;
-    }
-  }
 }
 
 void QmitkInteractionSchemeToolBar::AddButton(InteractionScheme interactionScheme, const QString& toolName, const QIcon& icon, bool on)

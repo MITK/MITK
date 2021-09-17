@@ -10,7 +10,7 @@
 void QmitknnUNetToolGUI::EnableWidgets(bool enabled)
 {
   Superclass::EnableWidgets(enabled);
-  m_Controls.previewButton->setEnabled(enabled);
+  m_Controls.previewButton->setEnabled(false);
 }
 
 void QmitknnUNetToolGUI::ClearAllComboBoxes()
@@ -38,26 +38,28 @@ T QmitknnUNetToolGUI::FetchFoldersFromDir(const QString &path)
 
 void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &resultsFolder)
 {
+  m_Controls.previewButton->setEnabled(false);
   this->ClearAllComboBoxes();
   m_ModelDirectory = resultsFolder + QDir::separator() + "nnUNet";
   auto models = FetchFoldersFromDir<QStringList>(m_ModelDirectory);
-  QStringList list;
-  list << "2d"
-       << "3d_lowres"
-       << "3d_fullres"
-       << "3d_cascade_fullres"
-       << "ensembles";
+  QStringList validlist;
+  validlist << "2d"
+            << "3d_lowres"
+            << "3d_fullres"
+            << "3d_cascade_fullres"
+            << "ensembles";
   std::for_each(models.begin(),
                 models.end(),
-                [this, list](QString model)
+                [this, validlist](QString model)
                 {
-                  if (list.contains(model, Qt::CaseInsensitive))
+                  if (validlist.contains(model, Qt::CaseInsensitive))
                     m_Controls.modelBox->addItem(model);
                 });
 }
 
 void QmitknnUNetToolGUI::OnModelChanged(const QString &text)
 {
+  //m_Controls.previewButton->setEnabled(false);
   QString updatedPath(QDir::cleanPath(m_ModelDirectory + QDir::separator() + text));
   m_Controls.taskBox->clear();
   auto datasets = FetchFoldersFromDir<QStringList>(updatedPath);
@@ -66,6 +68,7 @@ void QmitknnUNetToolGUI::OnModelChanged(const QString &text)
 
 void QmitknnUNetToolGUI::OnTaskChanged(const QString &text)
 {
+  //m_Controls.previewButton->setEnabled(false);
   QString updatedPath = QDir::cleanPath(m_ModelDirectory + QDir::separator() + m_Controls.modelBox->currentText() +
                                         QDir::separator() + text);
   m_Controls.trainerBox->clear();
@@ -82,7 +85,17 @@ void QmitknnUNetToolGUI::OnTrainerChanged(const QString &trainerSelected)
                                         QDir::separator() + m_Controls.taskBox->currentText() + QDir::separator() +
                                         trainerSelected));
     auto folds = FetchFoldersFromDir<QStringList>(updatedPath);
-    std::for_each(folds.begin(), folds.end(), [this](QString fold) { m_Controls.foldBox->addItem(fold); });
+    std::for_each(folds.begin(),
+                  folds.end(),
+                  [this](QString fold)
+                  {
+                    if (fold.startsWith("fold_", Qt::CaseInsensitive))
+                      m_Controls.foldBox->addItem(fold);
+                  });
+    if (m_Controls.foldBox->count()!=0)
+    {
+      m_Controls.previewButton->setEnabled(true);
+    }
   }
 }
 
@@ -153,7 +166,8 @@ void QmitknnUNetToolGUI::AutoParsePythonPaths()
   searchDirs.push_back(homeDir + QDir::separator() + "opt" + QDir::separator() + "miniconda3");
   searchDirs.push_back(homeDir + QDir::separator() + "opt" + QDir::separator() + "anaconda3");
 #elif defined(_WIN32) || defined(_WIN64)
-  searchDirs.push_back("C:" + QDir::separator() + "ProgramData" + QDir::separator() + "anaconda3");
+  searchDirs.push_back(QString("C:") + QDir::separator() + QString("ProgramData") + QDir::separator() +
+                       QString("anaconda3"));
 #endif
   for (QString searchDir : searchDirs)
   {

@@ -32,7 +32,6 @@ namespace mitk
 mitk::nnUNetTool::nnUNetTool()
 {
   this->SetMitkTempDir(mitk::IOUtil::CreateTemporaryDirectory("mitk-XXXXXX"));
-  this->test = true;
 }
 
 mitk::nnUNetTool::~nnUNetTool()
@@ -163,8 +162,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
 
   try
   {
-    if (!this->test)
-      mitk::IOUtil::Save(_inputAtTimeStep.GetPointer(), inputImagePath);
+    mitk::IOUtil::Save(_inputAtTimeStep.GetPointer(), inputImagePath);
     if (this->GetMultiModal())
     {
       for (size_t i = 0; i < this->otherModalPaths.size(); ++i)
@@ -192,7 +190,11 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   std::string command = "nnUNet_predict";
   if (this->GetNoPip())
   {
+#if defined(__APPLE__) || defined(MACOSX) || defined(linux) || defined(__linux__)
     command = "python3";
+#elif defined(_WIN32)
+    command = "python";
+#endif
   }
 
   for (mitk::ModelParams &modelparam : m_ParamQ)
@@ -242,8 +244,8 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     // args.push_back("--all_in_gpu");
     // args.push_back(this->GetAllInGPU() ? std::string("True") : std::string("False"));
 
-    args.push_back("--num_threads_preprocessing");
-    args.push_back(std::to_string(this->GetPreprocessingThreads()));
+    // args.push_back("--num_threads_preprocessing");
+    // args.push_back(std::to_string(this->GetPreprocessingThreads()));
 
     args.push_back("--num_threads_nifti_save");
     args.push_back("1"); // fixing to 1
@@ -269,21 +271,8 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
       itksys::SystemTools::PutEnv(resultsFolderEnv.c_str());
       std::string cudaEnv = "CUDA_VISIBLE_DEVICES="+std::to_string(this->GetGpuId());
       itksys::SystemTools::PutEnv(cudaEnv.c_str());
-      //setenv("RESULTS_FOLDER", this->GetModelDirectory().c_str(), true);
-      //setenv("CUDA_VISIBLE_DEVICES", std::to_string(this->GetGpuId()).c_str(), true);
-      for (auto arg : args)
-      {
-        std::cout << arg << std::endl;
-      }
-      std::cout << "command at " << command << std::endl;
-      if (this->test)
-      {
-        outputImagePath = "/Users/ashis/DKFZ/nnUNet/mitk-32uGaS/nnunet-out-E211EZ/yFw1zN_000.nii.gz";
-      }
-      else
-      {
-        spExec->execute(this->GetPythonPath(), command, args);
-      }
+
+      spExec->execute(this->GetPythonPath(), command, args);
     }
     catch (const mitk::Exception &e)
     {
@@ -313,15 +302,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     args.push_back("-pp");
     args.push_back(this->GetPostProcessingJsonDirectory());
 
-    for (auto arg : args)
-    {
-      std::cout << arg << std::endl;
-    }
-
-    if (this->test)
-      outputImagePath = "/Users/ashis/DKFZ/nnUNet/mitk-32uGaS/nnunet-ensemble-out-cJ9sjG/yFw1zN_000_.nii.gz";
-    else
-      spExec->execute(this->GetPythonPath(), command, args);
+    spExec->execute(this->GetPythonPath(), command, args);
   }
   try
   {

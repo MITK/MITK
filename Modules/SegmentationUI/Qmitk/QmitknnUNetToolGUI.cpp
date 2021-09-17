@@ -57,7 +57,6 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
 #if defined(__APPLE__) || defined(MACOSX) || defined(linux) || defined(__linux__)
   m_Controls.pythonEnvComboBox->addItem("/usr/bin");
 #endif
-
   m_Controls.pythonEnvComboBox->addItem("Select");
   AutoParsePythonPaths();
   connect(m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnSettingsAccept()));
@@ -111,29 +110,34 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
   {
     try
     {
-      // comboboxes
       QString modelName = m_Controls.modelBox->currentText();
       QString taskName = m_Controls.taskBox->currentText();
+      bool isNoPip =  m_Controls.nopipBox->isChecked();
       std::string nnUNetDirectory = "";
-      if (m_Controls.nopipBox->isChecked())
+      if (isNoPip)
       {
         nnUNetDirectory = m_Controls.codedirectoryBox->directory().toStdString();
       }
       QString pythonPathTextItem = m_Controls.pythonEnvComboBox->currentText();
       QString pythonPath = pythonPathTextItem.mid(pythonPathTextItem.indexOf(" ") + 1);
+#if defined(__APPLE__) || defined(MACOSX) || defined(linux) || defined(__linux__)
       if (!(pythonPath.endsWith("bin", Qt::CaseInsensitive) || pythonPath.endsWith("bin/", Qt::CaseInsensitive)))
       {
         pythonPath += QDir::separator() + QString("bin");
       }
-
+#elif defined(_WIN32)
+      if (!isNoPip && !(pythonPath.endsWith("Scripts", Qt::CaseInsensitive) ||
+                    pythonPath.endsWith("Scripts/", Qt::CaseInsensitive)))
+      {
+        pythonPath += QDir::separator() + QString("Scripts");
+      }
+#endif
       QString trainerPlanner = m_Controls.trainerBox->currentText();
-      std::cout << "trainerPlanner: " << trainerPlanner.toStdString() << std::endl;
       QString splitterString = "__";
       tool->EnsembleOff();
 
       if (modelName.startsWith("ensemble", Qt::CaseInsensitive))
       {
-        std::cout << "model ensemble" << std::endl;
         QString ppJsonFile =
           QDir::cleanPath(m_ModelDirectory + QDir::separator() + modelName + QDir::separator() + taskName +
                           QDir::separator() + trainerPlanner + QDir::separator() + "postprocessing.json");
@@ -148,7 +152,6 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       std::vector<mitk::ModelParams> requestQ;
       if (tool->GetEnsemble())
       {
-        std::cout << "in ensemble" << std::endl;
         foreach (QString modelSet, trainerSplitParts)
         {
           modelSet.remove("ensemble_", Qt::CaseInsensitive);
@@ -172,17 +175,16 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
 
       tool->m_ParamQ.clear();
       tool->m_ParamQ = requestQ;
-      
+
       tool->SetnnUNetDirectory(nnUNetDirectory);
       tool->SetPythonPath(pythonPath.toStdString());
       tool->SetModelDirectory(m_ModelDirectory.left(m_ModelDirectory.lastIndexOf(QDir::separator())).toStdString());
       // checkboxes
       tool->SetMirror(m_Controls.mirrorBox->isChecked());
       tool->SetMixedPrecision(m_Controls.mixedPrecisionBox->isChecked());
-      tool->SetNoPip(m_Controls.nopipBox->isChecked());
+      tool->SetNoPip(isNoPip);
       tool->SetMultiModal(m_Controls.multiModalBox->isChecked());
       // Spinboxes
-      tool->SetPreprocessingThreads(static_cast<unsigned int>(m_Controls.threadsBox->value()));
       tool->SetGpuId(static_cast<unsigned int>(m_Controls.gpuSpinBox->value()));
       // Multi-Modal
       tool->MultiModalOff();
@@ -195,7 +197,7 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
 
       if (!m_SegmentationThread->isRunning())
       {
-        MITK_ERROR << "Starting thread...";
+        MITK_INFO << "Starting thread...";
         m_SegmentationThread->start();
       }
       m_Controls.statusLabel->setText("<b>STATUS: </b><i>Starting Segmentation task... This might take a while.</i>");
@@ -249,8 +251,19 @@ int QmitknnUNetToolGUI::GetGPUCount()
   process1.waitForFinished(-1);
   process2.waitForFinished(-1);
   QString nGpus = process2.readAll();
-#elif defined(_WIN32) || defined(_WIN64)
-  QString nGpus = "0";
-#endif
   return nGpus.toInt();
+#elif defined(_WIN32)
+  QProcess process;
+  QStringList nGpus;
+  process.setReadChannel(QProcess::StandardOutput);
+  process.start("cmd",
+                 QStringList() << "/c"
+                               << "nvidia-smi -L");
+  process.waitForFinished(-1);
+  while (process.canReadLine())
+  {
+    nGpus << QString(process.readLine());
+  }
+  return nGpus.size();
+#endif
 }

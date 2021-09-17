@@ -101,9 +101,6 @@ namespace mitk
     std::vector<mitk::ModelParams> m_ParamQ;
     std::vector<std::string> otherModalPaths;
 
-    itkSetMacro(PreprocessingThreads, unsigned int);
-    itkGetConstMacro(PreprocessingThreads, unsigned int);
-
     itkSetMacro(GpuId, unsigned int);
     itkGetConstMacro(GpuId, unsigned int);
 
@@ -133,8 +130,6 @@ namespace mitk
     bool m_NoPip;
     bool m_MultiModal;
     bool m_Ensemble = false;
-    unsigned int m_PreprocessingThreads;
-    bool test; //remove
     mitk::LabelSetImage::Pointer outputBuffer;
     unsigned int m_GpuId;
   };

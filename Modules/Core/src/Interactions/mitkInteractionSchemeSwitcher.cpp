@@ -12,16 +12,11 @@ found in the LICENSE file.
 
 #include "mitkInteractionSchemeSwitcher.h"
 
-// us
-#include <usGetModuleContext.h>
-#include <usModuleContext.h>
-
 // mitk core
 #include <mitkInteractionEventObserver.h>
 #include <mitkExceptionMacro.h>
 
 mitk::InteractionSchemeSwitcher::InteractionSchemeSwitcher()
-  : m_InteractionScheme(MITKStandard)
 {
   // nothing here
 }
@@ -31,7 +26,7 @@ mitk::InteractionSchemeSwitcher::~InteractionSchemeSwitcher()
   // nothing here
 }
 
-void mitk::InteractionSchemeSwitcher::SetInteractionScheme(mitk::InteractionEventHandler* interactionEventHandler, InteractionScheme interactionScheme)
+void mitk::InteractionSchemeSwitcher::SetInteractionScheme(InteractionEventHandler* interactionEventHandler, InteractionScheme interactionScheme)
 {
   if (nullptr == interactionEventHandler)
   {
@@ -103,6 +98,5 @@ void mitk::InteractionSchemeSwitcher::SetInteractionScheme(mitk::InteractionEven
     }
   }
 
-  m_InteractionScheme = interactionScheme;
   InvokeEvent(InteractionSchemeChangedEvent());
 }

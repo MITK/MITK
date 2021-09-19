@@ -59,6 +59,7 @@ namespace mitk
   * interaction .xml-files for a given interaction event handler.
   *
   ***********************************************************************/
+
   class MITKCORE_EXPORT InteractionSchemeSwitcher : public itk::Object
   {
   public:
@@ -71,7 +72,6 @@ namespace mitk
 
     mitkClassMacroItkParent(InteractionSchemeSwitcher, itk::Object);
     itkFactorylessNewMacro(Self);
-    itkCloneMacro(Self);
 
     // enum of the different interaction schemes that are available
     enum InteractionScheme
@@ -104,21 +104,12 @@ namespace mitk
     * @param interactionScheme        The interaction scheme that should be used for the currently active interaction event handler.
     */
     void SetInteractionScheme(mitk::InteractionEventHandler* interactionEventHandler, InteractionScheme interactionScheme);
-    /**
-    * @brief Return the current interaction scheme
-    *
-    * @return The currently set InteractionScheme
-    */
-    InteractionScheme GetInteractionScheme() const { return m_InteractionScheme; };
 
   protected:
 
     InteractionSchemeSwitcher();
     ~InteractionSchemeSwitcher() override;
 
-  private:
-
-    InteractionScheme m_InteractionScheme;
   };
 } // namespace mitk
 

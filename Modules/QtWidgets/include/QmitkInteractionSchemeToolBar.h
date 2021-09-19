@@ -48,7 +48,6 @@ private:
 
   QActionGroup* m_ActionGroup;
 
-  mitk::InteractionSchemeSwitcher::Pointer m_InteractionSchemeSwitcher;
   mitk::InteractionEventHandler::Pointer m_InteractionEventHandler;
 
 };

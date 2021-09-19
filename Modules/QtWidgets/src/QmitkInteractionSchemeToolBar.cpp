@@ -17,7 +17,6 @@ found in the LICENSE file.
 QmitkInteractionSchemeToolBar::QmitkInteractionSchemeToolBar(QWidget* parent/* = nullptr*/)
   : QToolBar(parent)
   , m_ActionGroup(new QActionGroup(this))
-  , m_InteractionSchemeSwitcher(nullptr)
   , m_InteractionEventHandler(nullptr)
 {
   QToolBar::setOrientation(Qt::Vertical);
@@ -30,8 +29,6 @@ QmitkInteractionSchemeToolBar::QmitkInteractionSchemeToolBar(QWidget* parent/* =
   AddButton(InteractionScheme::PACSPan, tr("Pan"), QIcon(":/Qmitk/mm_pan.png"));
   AddButton(InteractionScheme::PACSScroll, tr("Scroll"), QIcon(":/Qmitk/mm_scroll.png"));
   AddButton(InteractionScheme::PACSZoom, tr("Zoom"), QIcon(":/Qmitk/mm_zoom.png"));
-
-  m_InteractionSchemeSwitcher = mitk::InteractionSchemeSwitcher::New();
 }
 
 QmitkInteractionSchemeToolBar::~QmitkInteractionSchemeToolBar()
@@ -80,16 +77,14 @@ void QmitkInteractionSchemeToolBar::OnInteractionSchemeChanged()
       interactionScheme = InteractionScheme::PACSBase;
     }
 
-    if (nullptr != m_InteractionSchemeSwitcher)
+    auto interactionSchemeSwitcher = mitk::InteractionSchemeSwitcher::New();
+    try
     {
-      try
-      {
-        m_InteractionSchemeSwitcher->SetInteractionScheme(m_InteractionEventHandler, interactionScheme);
-      }
-      catch (const mitk::Exception&)
-      {
-        return;
-      }
+      interactionSchemeSwitcher->SetInteractionScheme(m_InteractionEventHandler, interactionScheme);
+    }
+    catch (const mitk::Exception &)
+    {
+      return;
     }
   }
 }

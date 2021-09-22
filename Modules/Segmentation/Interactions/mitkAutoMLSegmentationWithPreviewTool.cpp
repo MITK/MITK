@@ -94,7 +94,7 @@ void mitk::AutoMLSegmentationWithPreviewTool::UpdateCleanUp()
 }
 
 void mitk::AutoMLSegmentationWithPreviewTool::SetNodeProperties(mitk::LabelSetImage::Pointer newMLPreview)
-{   MITK_INFO <<  "ashis in real SetNodeProperties";
+{
   if (newMLPreview.IsNotNull())
     {
       this->m_MLPreviewNode->SetData(newMLPreview);

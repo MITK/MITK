@@ -258,22 +258,22 @@
                   </widget>
                 </item>
                 <!-- </item> -->
-				  <item row="1" column="0">
-					  <widget class="QLabel" name="gpuSpinLabel">
-						  <property name="sizePolicy">
-							  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-								  <horstretch>0</horstretch>
-								  <verstretch>0</verstretch>
-							  </sizepolicy>
-						  </property>
-						  <property name="text">
-							  <string>GPU Id:</string>
-						  </property>
-					  </widget>
-				  </item>
-				  <item row="1" column="1">
-					  <widget class="QSpinBox" name="gpuSpinBox" native="true" />
-				  </item>
+                <item row="1" column="0">
+                  <widget class="QLabel" name="gpuSpinLabel">
+                    <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                      </sizepolicy>
+                    </property>
+                    <property name="text">
+                      <string>GPU Id:</string>
+                    </property>
+                  </widget>
+                </item>
+                <item row="1" column="1">
+                  <widget class="QSpinBox" name="gpuSpinBox" native="true" />
+                </item>
 
                 <item row="1" column="2">
                   <widget class="QLabel" name="mirrorLabel">
@@ -316,7 +316,7 @@
                     </property>
                   </widget>
                 </item>
-              <!-- </item> -->
+                <!-- </item> -->
                 <item row="3" column="0">
                   <widget class="QLabel" name="nnUnetdirLabel">
                     <property name="sizePolicy">
@@ -333,9 +333,9 @@
                 <item row="3" column="1" colspan="3">
                   <widget class="ctkDirectoryButton" name="codedirectoryBox" native="true" />
                 </item>
-              <!-- </item> -->
-                            
-            
+                <!-- </item> -->
+
+
               </layout>
             </item>
           </layout>
@@ -373,20 +373,42 @@
         </widget>
       </item>
 
-
     </layout>
   </widget>
-  <!--
-  <layoutdefault spacing="6" margin="11" />
+
   <customwidgets>
     <customwidget>
-      <class>ctkSliderWidget</class>
+      <class>ctkDirectoryButton</class>
       <extends>QWidget</extends>
-      <header location="global">ctkSliderWidget.h</header>
+      <header location="global">ctkDirectoryButton.h</header>
+      <container>1</container>
+    </customwidget>
+    <customwidget>
+      <class>ctkComboBox</class>
+      <extends>QComboBox</extends>
+      <header location="global">ctkComboBox.h</header>
+      <container>1</container>
+    </customwidget>
+    <customwidget>
+      <class>ctkCheckableComboBox</class>
+      <extends>QComboBox</extends>
+      <header location="global">ctkCheckableComboBox.h</header>
+      <container>1</container>
+    </customwidget>
+    <customwidget>
+      <class>ctkCheckBox</class>
+      <extends>QCheckBox</extends>
+      <header location="global">ctkCheckBox.h</header>
+      <container>1</container>
+    </customwidget>
+    <customwidget>
+      <class>ctkCollapsibleGroupBox</class>
+      <extends>QGroupBox</extends>
+      <header location="global">ctkCollapsibleGroupBox.h</header>
       <container>1</container>
     </customwidget>
   </customwidgets>
   <resources />
   <connections />
-  -->
+
 </ui>

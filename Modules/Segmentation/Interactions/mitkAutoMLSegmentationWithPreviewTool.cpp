@@ -93,7 +93,7 @@ void mitk::AutoMLSegmentationWithPreviewTool::UpdateCleanUp()
   }
 }
 
-void mitk::AutoMLSegmentationWithPreviewTool::SetNodeProperties(mitk::LabelSetImage::Pointer newMLPreview)
+void mitk::AutoMLSegmentationWithPreviewTool::SetNodeProperties(LabelSetImage::Pointer newMLPreview)
 {
   if (newMLPreview.IsNotNull())
     {

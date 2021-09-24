@@ -278,17 +278,5 @@ int QmitknnUNetToolGUI::GetGPUCount()
 
 bool QmitknnUNetToolGUI::IsNNUNetInstalled(const QString &text)
 {
-  bool installed = true;
-  #if defined(__APPLE__) || defined(MACOSX) || defined(linux) || defined(__linux__)
-  QProcess process1, process2;
-  MITK_INFO << "ashis  text " << text.toStdString();
-  process1.setWorkingDirectory(text);
-  process1.setStandardOutputProcess(&process2);
-  process1.start("command -v nnUNet_predict");
-  process2.start("wc -l");
-  process1.waitForFinished(-1);
-  process2.waitForFinished(-1);
-  installed =  QString(process2.readAll()).toInt(); //implicit conversion of basic type
-  #endif
-  return installed;
+  return QFile::exists(text + QDir::separator() + QString("nnUNet_predict"));
 }

@@ -24,7 +24,7 @@ MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitknnUNetToolGUI, "")
 
 QmitknnUNetToolGUI::QmitknnUNetToolGUI() : QmitkAutoMLSegmentationToolGUIBase()
 {
-  // Nvidia-smi command returning zero doesn't alway mean lack of GPUs. 
+  // Nvidia-smi command returning zero doesn't alway mean lack of GPUs.
   // Pytorch uses its own libraries to communicate to the GPUs. Hence, only a warning can be given.
   if (GetGPUCount() == 0)
   {
@@ -114,12 +114,8 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
     {
       QString modelName = m_Controls.modelBox->currentText();
       QString taskName = m_Controls.taskBox->currentText();
-      bool isNoPip =  m_Controls.nopipBox->isChecked();
-      std::string nnUNetDirectory = "";
-      if (isNoPip)
-      {
-        nnUNetDirectory = m_Controls.codedirectoryBox->directory().toStdString();
-      }
+      bool isNoPip = m_Controls.nopipBox->isChecked();
+
       QString pythonPathTextItem = m_Controls.pythonEnvComboBox->currentText();
       QString pythonPath = pythonPathTextItem.mid(pythonPathTextItem.indexOf(" ") + 1);
 #if defined(__APPLE__) || defined(MACOSX) || defined(linux) || defined(__linux__)
@@ -129,11 +125,21 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       }
 #elif defined(_WIN32)
       if (!isNoPip && !(pythonPath.endsWith("Scripts", Qt::CaseInsensitive) ||
-                    pythonPath.endsWith("Scripts/", Qt::CaseInsensitive)))
+                        pythonPath.endsWith("Scripts/", Qt::CaseInsensitive)))
       {
         pythonPath += QDir::separator() + QString("Scripts");
       }
 #endif
+      std::string nnUNetDirectory;
+      if (isNoPip)
+      {
+        nnUNetDirectory = m_Controls.codedirectoryBox->directory().toStdString();
+      }
+      else if (!IsNNUNetInstalled(pythonPath))
+      {
+        throw std::runtime_error("nnUNet is not detected in the selected python environment. Please select a valid "
+                                 "python environment or install nnUNet.");
+      }
       QString trainerPlanner = m_Controls.trainerBox->currentText();
       QString splitterString = "__";
       tool->EnsembleOff();
@@ -259,8 +265,8 @@ int QmitknnUNetToolGUI::GetGPUCount()
   QStringList nGpus;
   process.setReadChannel(QProcess::StandardOutput);
   process.start("cmd",
-                 QStringList() << "/c"
-                               << "nvidia-smi -L");
+                QStringList() << "/c"
+                              << "nvidia-smi -L");
   process.waitForFinished(-1);
   while (process.canReadLine())
   {
@@ -268,4 +274,21 @@ int QmitknnUNetToolGUI::GetGPUCount()
   }
   return nGpus.size();
 #endif
+}
+
+bool QmitknnUNetToolGUI::IsNNUNetInstalled(const QString &text)
+{
+  bool installed = true;
+  #if defined(__APPLE__) || defined(MACOSX) || defined(linux) || defined(__linux__)
+  QProcess process1, process2;
+  MITK_INFO << "ashis  text " << text.toStdString();
+  process1.setWorkingDirectory(text);
+  process1.setStandardOutputProcess(&process2);
+  process1.start("command -v nnUNet_predict");
+  process2.start("wc -l");
+  process1.waitForFinished(-1);
+  process2.waitForFinished(-1);
+  installed =  QString(process2.readAll()).toInt(); //implicit conversion of basic type
+  #endif
+  return installed;
 }

@@ -86,7 +86,13 @@ protected slots:
    * Further, renders the LabelSet image
    */
   void SegmentationResultHandler(mitk::nnUNetTool *);
+
+  /**
+   * @brief Qt Slot
+   * 
+   */
   void OnModalitiesNumberChanged(int);
+
 
 signals:
   /**
@@ -124,6 +130,14 @@ private:
    * @return int 
    */
   int GetGPUCount();
+
+  /**
+   * @brief Checks if nnUNet_predict command is valid in the selected python virtual environment.
+   * 
+   * @return bool 
+   */
+  bool IsNNUNetInstalled(const QString&);
+
 
   /**
    * @brief Mapper function to map QString entries from UI to ModelParam attributes.

@@ -90,10 +90,14 @@ void QmitknnUNetToolGUI::OnTrainerChanged(const QString &trainerSelected)
                     if (fold.startsWith("fold_", Qt::CaseInsensitive)) // imposed by nnUNet
                       m_Controls.foldBox->addItem(fold);
                   });
-    if (m_Controls.foldBox->count()!=0)
+    if (m_Controls.foldBox->count() != 0)
     {
       m_Controls.previewButton->setEnabled(true);
     }
+  }
+  else
+  {
+    m_Controls.previewButton->setEnabled(true);
   }
 }
 

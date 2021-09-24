@@ -254,6 +254,10 @@ namespace mitk
     */
     virtual const VertexType *GetVertexAt(int index, TimeStepType timestep = 0) const;
 
+    virtual const VertexType *GetNextVertexAt(mitk::Point3D &point, float eps, TimeStepType timestep) const;
+
+    virtual const VertexType *GetPreviousVertexAt(mitk::Point3D &point, float eps, TimeStepType timestep) const;
+
     /** \brief Remove a vertex at given timestep within the container.
 
     \return index of vertex. -1 if not found.
@@ -408,6 +412,9 @@ namespace mitk
     \param timestep - at this timestep all lines will be rebuilt.
     */
     virtual void RedistributeControlVertices(int period, TimeStepType timestep);
+
+    VertexListType GetControlVertexList(TimeStepType timestep);
+    VertexListType GetVertexList(TimeStepType timestep);
 
   protected:
     mitkCloneMacro(Self);

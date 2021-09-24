@@ -150,6 +150,10 @@ namespace mitk
     */
     VertexType *GetVertexAt(const mitk::Point3D &point, float eps);
 
+    VertexType *GetNextVertexAt(const mitk::Point3D &point, float eps);
+
+    VertexType *GetPreviousVertexAt(const mitk::Point3D &point, float eps);
+
     /** \brief Returns the approximate nearest control vertex a given posoition in 3D space, if the clicked position is within a specific range.
       \param point - query position in 3D space.
       \param eps - the error bound for search algorithm.
@@ -232,6 +236,13 @@ namespace mitk
     \param eps - the error bound for search algorithm.
     */
     VertexType *BruteForceGetVertexAt(const mitk::Point3D &point, double eps, bool isControlPoint = false);
+    VertexType *BruteForceGetNextVertexAt(const mitk::Point3D &point, double eps, bool isControlPoint = false);
+    VertexType *BruteForceGetPreviousVertexAt(const mitk::Point3D &point, double eps, bool isControlPoint = false);
+
+    int BruteForceGetVertexIndexAt(const mitk::Point3D &point,
+                                                      double eps,
+                                                      VertexListType verticesList,
+                                                      bool isControlPoint = false);
 
     /** Returns a list pointing to all vertices that are indicated to be control
      points.

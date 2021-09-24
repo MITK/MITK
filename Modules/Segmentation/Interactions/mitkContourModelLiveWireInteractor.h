@@ -63,6 +63,11 @@ namespace mitk
                                        bool fromSelectedUpwards,
                                        int timestep);
 
+    void SplitContourFromSelectedVertex(mitk::ContourModel *srcContour,
+                                        const mitk::ContourModel::VertexType *nextPoint,
+                                        const mitk::ContourModel::VertexType *previousPoint,
+                                        int timestep);
+
     const float eps = 3.0;
     mitk::ImageLiveWireContourModelFilter::Pointer m_LiveWireFilter;
     mitk::Image::Pointer m_WorkingSlice;

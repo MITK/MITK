@@ -50,7 +50,6 @@ struct QmitkAbstractMultiWidget::Impl final
   {
     m_DisplayActionEventBroadcast = mitk::DisplayActionEventBroadcast::New();
     m_DisplayActionEventBroadcast->LoadStateMachine("DisplayInteraction.xml");
-    m_DisplayActionEventBroadcast->SetEventConfig("DisplayConfigPACS.xml");
   }
 
   mitk::DataStorage::Pointer m_DataStorage;

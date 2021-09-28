@@ -38,22 +38,27 @@ void mitk::InteractionSchemeSwitcher::SetInteractionScheme(InteractionEventHandl
     // MITK MODE
     case MITKStandard:
     {
-      interactionEventHandler->SetEventConfig("DisplayConfigMITK.xml");
+      interactionEventHandler->SetEventConfig("DisplayConfigMITKBase.xml");
+      interactionEventHandler->AddEventConfig("DisplayConfigCrosshair.xml");
       break;
     }
     case MITKRotationUncoupled:
     {
-      interactionEventHandler->SetEventConfig("DisplayConfigMITKRotationUnCoupled.xml");
+      interactionEventHandler->SetEventConfig("DisplayConfigMITKBase.xml");
+      interactionEventHandler->AddEventConfig("DisplayConfigRotation.xml");
       break;
     }
     case MITKRotationCoupled:
     {
-      interactionEventHandler->SetEventConfig("DisplayConfigMITKRotation.xml");
+      interactionEventHandler->SetEventConfig("DisplayConfigMITKBase.xml");
+      interactionEventHandler->AddEventConfig("DisplayConfigRotation.xml");
+      interactionEventHandler->AddEventConfig("DisplayConfigActivateCoupling.xml");
       break;
     }
     case MITKSwivel:
     {
-      interactionEventHandler->SetEventConfig("DisplayConfigMITKSwivel.xml");
+      interactionEventHandler->SetEventConfig("DisplayConfigMITKBase.xml");
+      interactionEventHandler->AddEventConfig("DisplayConfigSwivel.xml");
       break;
     }
     // PACS MODE
@@ -65,7 +70,7 @@ void mitk::InteractionSchemeSwitcher::SetInteractionScheme(InteractionEventHandl
     case PACSStandard:
     {
       interactionEventHandler->SetEventConfig("DisplayConfigPACS.xml");
-      interactionEventHandler->AddEventConfig("DisplayConfigPACSCrosshair.xml");
+      interactionEventHandler->AddEventConfig("DisplayConfigCrosshair.xml");
       break;
     }
     case PACSLevelWindow:
@@ -94,7 +99,8 @@ void mitk::InteractionSchemeSwitcher::SetInteractionScheme(InteractionEventHandl
     }
     default:
     {
-      interactionEventHandler->SetEventConfig("DisplayConfigMITK.xml");
+      interactionEventHandler->SetEventConfig("DisplayConfigMITKBase.xml");
+      interactionEventHandler->AddEventConfig("DisplayConfigCrosshair.xml");
     }
   }
 

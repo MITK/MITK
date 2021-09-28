@@ -178,7 +178,8 @@ void mitk::InteractionTestHelper::InitializeDisplayActionEventHandling()
 {
   m_DisplayActionEventBroadcast = mitk::DisplayActionEventBroadcast::New();
   m_DisplayActionEventBroadcast->LoadStateMachine("DisplayInteraction.xml");
-  m_DisplayActionEventBroadcast->SetEventConfig("DisplayConfigMITK.xml");
+  m_DisplayActionEventBroadcast->SetEventConfig("DisplayConfigMITKBase.xml");
+  m_DisplayActionEventBroadcast->AddEventConfig("DisplayConfigCrosshair.xml");
 }
 
 mitk::InteractionTestHelper::~InteractionTestHelper()

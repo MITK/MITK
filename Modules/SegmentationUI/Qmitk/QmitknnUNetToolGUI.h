@@ -15,6 +15,7 @@ found in the LICENSE file.s
 
 #include "QmitkAutoMLSegmentationToolGUIBase.h"
 #include "QmitknnUNetWorker.h"
+#include "QmitknnUNetGPU.h"
 #include "mitknnUnetTool.h"
 #include "ui_QmitknnUNetToolGUIControls.h"
 #include <MitkSegmentationUIExports.h>
@@ -129,7 +130,7 @@ private:
    * (Windows) `nvidia-smi -L` and counts the output and returns an integer.
    * @return int 
    */
-  int GetGPUCount();
+  //int GetGPUCount();
 
   /**
    * @brief Checks if nnUNet_predict command is valid in the selected python virtual environment.
@@ -178,6 +179,7 @@ private:
   Ui_QmitknnUNetToolGUIControls m_Controls;
   QThread *m_SegmentationThread;
   nnUNetSegmentationWorker *m_Worker;
+  QmitkGPULoader gpuLoader;
 
   /**
    * @brief Stores all dynamically added ctk-path-line-edit UI elements.

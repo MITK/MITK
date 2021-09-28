@@ -27,6 +27,7 @@ Qmitk/QmitkWatershedToolGUI.cpp
 Qmitk/QmitknnUNetToolGUI.cpp
 Qmitk/QmitknnUNetToolSlots.cpp
 Qmitk/QmitknnUNetWorker.cpp
+Qmitk/QmitknnUNetGPU.cpp
 #Added from ML
 Qmitk/QmitkLabelSetWidget.cpp
 Qmitk/QmitkSurfaceStampWidget.cpp
@@ -65,6 +66,7 @@ Qmitk/QmitkToolSelectionBox.h
 Qmitk/QmitkWatershedToolGUI.h
 Qmitk/QmitknnUNetToolGUI.h
 Qmitk/QmitknnUNetWorker.h
+Qmitk/QmitknnUNetGPU.h
 #Added from ML
 Qmitk/QmitkLabelSetWidget.h
 Qmitk/QmitkSurfaceStampWidget.h

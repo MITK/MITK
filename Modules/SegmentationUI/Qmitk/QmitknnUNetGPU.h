@@ -1,0 +1,41 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.s
+
+============================================================================*/
+
+#ifndef QmitknnUNetToolGPU_h_Included
+#define QmitknnUNetToolGPU_h_Included
+
+#include <QProcess>
+#include <string>
+#include <vector>
+
+struct QmitkGPUSpec
+{
+  QString name;
+  int memoryFree;
+  unsigned int id;
+};
+
+class QmitkGPULoader : public QObject
+{
+  Q_OBJECT
+
+private:
+  std::vector<QmitkGPUSpec> gpus;
+  int GetTotalGPUs();
+
+public:
+  QmitkGPULoader();
+  ~QmitkGPULoader() = default;
+  int GetGPUCount();
+};
+
+#endif

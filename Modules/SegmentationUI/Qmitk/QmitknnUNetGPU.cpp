@@ -46,30 +46,3 @@ int QmitkGPULoader::GetGPUCount()
 {
   return static_cast<int>(gpus.size());
 }
-
-int QmitkGPULoader::GetTotalGPUs()
-{
-#if defined(__APPLE__) || defined(MACOSX) || defined(linux) || defined(__linux__)
-  QProcess process1, process2;
-  process1.setStandardOutputProcess(&process2);
-  process1.start("nvidia-smi -L");
-  process2.start("wc -l");
-  process1.waitForFinished(-1);
-  process2.waitForFinished(-1);
-  QString nGpus = process2.readAll();
-  return nGpus.toInt();
-#elif defined(_WIN32)
-  QProcess process;
-  QStringList nGpus;
-  process.setReadChannel(QProcess::StandardOutput);
-  process.start("cmd",
-                QStringList() << "/c"
-                              << "nvidia-smi -L");
-  process.waitForFinished(-1);
-  while (process.canReadLine())
-  {
-    nGpus << QString(process.readLine());
-  }
-  return nGpus.size();
-#endif
-}

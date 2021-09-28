@@ -26,7 +26,7 @@ QmitknnUNetToolGUI::QmitknnUNetToolGUI() : QmitkAutoMLSegmentationToolGUIBase()
 {
   // Nvidia-smi command returning zero doesn't alway mean lack of GPUs.
   // Pytorch uses its own libraries to communicate to the GPUs. Hence, only a warning can be given.
-  if (gpuLoader.GetGPUCount() == 0)
+  if (m_GpuLoader.GetGPUCount() == 0)
   {
     std::stringstream stream;
     stream << "WARNING: No GPUs were detected on your machine. The nnUNet plugin might not work.";
@@ -94,12 +94,12 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   m_Controls.multiModalSpinLabel->setVisible(false);
 
   m_Controls.statusLabel->setTextFormat(Qt::RichText);
-  m_Controls.statusLabel->setText("<b>STATUS: </b><i>No Tasks Running. " + QString::number(gpuLoader.GetGPUCount()) +
+  m_Controls.statusLabel->setText("<b>STATUS: </b><i>No Tasks Running. " + QString::number(m_GpuLoader.GetGPUCount()) +
                                   " GPUs were detected.</i>");
 
-  if (gpuLoader.GetGPUCount() != 0)
+  if (m_GpuLoader.GetGPUCount() != 0)
   {
-    m_Controls.gpuSpinBox->setMaximum(gpuLoader.GetGPUCount() - 1);
+    m_Controls.gpuSpinBox->setMaximum(m_GpuLoader.GetGPUCount() - 1);
   }
   mainLayout->addLayout(m_Controls.verticalLayout);
   Superclass::InitializeUI(mainLayout);

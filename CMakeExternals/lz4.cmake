@@ -16,6 +16,10 @@ if(MITK_USE_lz4)
 
     set(additional_args )
 
+    if(NOT CMAKE_DEBUG_POSTFIX)
+      list(APPEND additional_args "-DCMAKE_DEBUG_POSTFIX:STRING=d")
+    endif()
+
     if(CTEST_USE_LAUNCHERS)
       list(APPEND additional_args
         "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"

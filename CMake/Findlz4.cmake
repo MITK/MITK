@@ -8,14 +8,14 @@ mark_as_advanced(lz4_INCLUDE_DIR)
 
 find_library(lz4_LIBRARY_RELEASE lz4
   PATHS ${MITK_EXTERNAL_PROJECT_PREFIX}
-  PATH_SUFFIXES lib
+  PATH_SUFFIXES lib lib64
   NO_DEFAULT_PATH)
 mark_as_advanced(lz4_LIBRARY_RELEASE)
 
 
 find_library(lz4_LIBRARY_DEBUG lz4d
   PATHS ${MITK_EXTERNAL_PROJECT_PREFIX}
-  PATH_SUFFIXES lib
+  PATH_SUFFIXES lib lib64
   NO_DEFAULT_PATH)
 mark_as_advanced(lz4_LIBRARY_DEBUG)
 

@@ -477,6 +477,23 @@ void mitk::ContourModelLiveWireInteractor::SplitContourFromSelectedVertex(mitk::
   bool upperPart = false;
   bool lowerPart = true;
 
+  // edge cases when point right before first control vertex is selected or first control vertex is selected
+  if (nextPoint == (*it) || srcContour->GetSelectedVertex() == (*it))
+  {
+    upperPart = true;
+    lowerPart = false;
+    m_ContourLeft->AddVertex(previousPoint->Coordinates, previousPoint->IsControlPoint, timeStep);
+  }
+  // if first control vertex is selected, move to next point before adding vertices to m_ContourRight
+  // otherwise, second line appears when moving the vertex
+  if (srcContour->GetSelectedVertex() == (*it))
+  {
+    while (*it != nextPoint)
+    {
+      it++;
+    }
+  }
+
   // clear previous void positions
   this->m_LiveWireFilter->ClearRepulsivePoints();
 

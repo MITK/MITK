@@ -180,7 +180,7 @@ mitk::ContourElement::VertexType *mitk::ContourElement::GetNextVertexAt(const mi
   if (eps > 0)
   {
     // currently no method with better performance is available
-    return BruteForceGetNextVertexAt(point, eps, true);
+    return BruteForceGetVertexAt(point, eps, true, 1);
   } // if eps < 0
   return nullptr;
 }
@@ -192,14 +192,15 @@ mitk::ContourElement::VertexType *mitk::ContourElement::GetPreviousVertexAt(cons
   if (eps > 0)
   {
     // currently no method with better performance is available
-    return BruteForceGetPreviousVertexAt(point, eps, true);
+    return BruteForceGetVertexAt(point, eps, true, -1);
   } // if eps < 0
   return nullptr;
 }
 
 mitk::ContourElement::VertexType *mitk::ContourElement::BruteForceGetVertexAt(const mitk::Point3D &point,
                                                                               double eps,
-                                                                              bool isControlPoint)
+                                                                              bool isControlPoint,
+                                                                              int offset)
 {
   VertexListType verticesList;
 
@@ -216,56 +217,19 @@ mitk::ContourElement::VertexType *mitk::ContourElement::BruteForceGetVertexAt(co
 
   if (vertexIndex!=-1)
   {
-    return verticesList[vertexIndex];
-  }
-  return nullptr;
-}
+    vertexIndex += offset;
+    auto size = (int) verticesList.size();
 
-mitk::ContourElement::VertexType *mitk::ContourElement::BruteForceGetNextVertexAt(const mitk::Point3D &point,
-                                                                              double eps,
-                                                                              bool isControlPoint)
-{
-  VertexListType verticesList;
+    if (vertexIndex < 0)
+    {
+      // for negative offset
+      vertexIndex = verticesList.size() + offset;
+    }
+    else if (vertexIndex >= verticesList.size())
+    {
+      vertexIndex = vertexIndex - verticesList.size();
+    }
 
-  if (isControlPoint)
-  {
-    verticesList = this->GetControlVertexList();
-  }
-  else
-  {
-    verticesList = *this->GetVertexList();
-  }
-
-  int vertexIndex = BruteForceGetVertexIndexAt(point, eps, verticesList, isControlPoint);
-
-  if (vertexIndex != -1)
-  {
-    vertexIndex++;
-    return verticesList[vertexIndex];
-  }
-  return nullptr;
-}
-
-mitk::ContourElement::VertexType *mitk::ContourElement::BruteForceGetPreviousVertexAt(const mitk::Point3D &point,
-                                                                                  double eps,
-                                                                                  bool isControlPoint)
-{
-  VertexListType verticesList;
-
-  if (isControlPoint)
-  {
-    verticesList = this->GetControlVertexList();
-  }
-  else
-  {
-    verticesList = *this->GetVertexList();
-  }
-
-  int vertexIndex = BruteForceGetVertexIndexAt(point, eps, verticesList, isControlPoint);
-
-  if (vertexIndex != -1)
-  {
-    vertexIndex--;
     return verticesList[vertexIndex];
   }
   return nullptr;

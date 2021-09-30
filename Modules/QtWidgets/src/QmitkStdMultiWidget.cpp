@@ -56,10 +56,11 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget *parent,
 
 QmitkStdMultiWidget::~QmitkStdMultiWidget()
 {
-  m_TimeNavigationController->Disconnect(GetRenderWindow1()->GetSliceNavigationController());
-  m_TimeNavigationController->Disconnect(GetRenderWindow2()->GetSliceNavigationController());
-  m_TimeNavigationController->Disconnect(GetRenderWindow3()->GetSliceNavigationController());
-  m_TimeNavigationController->Disconnect(GetRenderWindow4()->GetSliceNavigationController());
+  auto allRenderWindows = this->GetRenderWindows();
+  for (auto& renderWindow : allRenderWindows)
+  {
+    m_TimeNavigationController->Disconnect(renderWindow->GetSliceNavigationController());
+  }
 }
 
 void QmitkStdMultiWidget::InitializeMultiWidget()

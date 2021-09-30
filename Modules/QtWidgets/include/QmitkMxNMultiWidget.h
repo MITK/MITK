@@ -33,7 +33,7 @@ public:
                       Qt::WindowFlags f = 0,
                       const QString& multiWidgetName = "mxnmulti");
 
-  ~QmitkMxNMultiWidget() = default;
+  ~QmitkMxNMultiWidget();
 
   void InitializeMultiWidget() override;
   void MultiWidgetOpened() override;
@@ -56,6 +56,8 @@ public:
 
   void SetWidgetPlaneMode(int userMode) override;
 
+  mitk::SliceNavigationController* GetTimeNavigationController();
+
 public Q_SLOTS:
 
   // mouse events
@@ -74,6 +76,8 @@ private:
   void SetInteractionSchemeImpl() override { }
 
   void CreateRenderWindowWidget();
+
+  mitk::SliceNavigationController* m_TimeNavigationController;
 
   bool m_CrosshairVisibility;
 

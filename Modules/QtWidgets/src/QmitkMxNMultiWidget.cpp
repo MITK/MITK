@@ -25,10 +25,21 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
                                          Qt::WindowFlags f/* = 0*/,
                                          const QString& multiWidgetName/* = "mxnmulti"*/)
   : QmitkAbstractMultiWidget(parent, f, multiWidgetName)
+  , m_TimeNavigationController(nullptr)
   , m_CrosshairVisibility(false)
 {
-  // nothing here
+  m_TimeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
 }
+
+QmitkMxNMultiWidget::~QmitkMxNMultiWidget()
+{
+  auto allRenderWindows = this->GetRenderWindows();
+  for (auto& renderWindow : allRenderWindows)
+  {
+    m_TimeNavigationController->Disconnect(renderWindow->GetSliceNavigationController());
+  }
+}
+
 
 void QmitkMxNMultiWidget::InitializeMultiWidget()
 {
@@ -186,6 +197,11 @@ void QmitkMxNMultiWidget::SetWidgetPlaneMode(int userMode)
   }
 }
 
+mitk::SliceNavigationController* QmitkMxNMultiWidget::GetTimeNavigationController()
+{
+  return m_TimeNavigationController;
+}
+
 //////////////////////////////////////////////////////////////////////////
 // PUBLIC SLOTS
 // MOUSE EVENTS
@@ -270,4 +286,9 @@ void QmitkMxNMultiWidget::CreateRenderWindowWidget()
   connect(renderWindow, &QmitkRenderWindow::ResetView, this, &QmitkMxNMultiWidget::ResetCrosshair);
   connect(renderWindow, &QmitkRenderWindow::CrosshairVisibilityChanged, this, &QmitkMxNMultiWidget::SetCrosshairVisibility);
   connect(renderWindow, &QmitkRenderWindow::CrosshairRotationModeChanged, this, &QmitkMxNMultiWidget::SetWidgetPlaneMode);
+
+  // connect time navigation controller to react on geometry time events with the render window's slice naviation controller
+  m_TimeNavigationController->ConnectGeometryTimeEvent(renderWindow->GetSliceNavigationController(), false);
+  // reverse connection between the render window's slice navigation ontroller and the time navigation controller
+  renderWindow->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
 }

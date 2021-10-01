@@ -112,6 +112,11 @@ public:
   /**
     Just public because it is called by itk::Commands. You should not need to call this.
   */
+  void OnInterpolationAborted(const itk::EventObject &);
+
+  /**
+    Just public because it is called by itk::Commands. You should not need to call this.
+  */
   void OnSurfaceInterpolationInfoChanged(const itk::EventObject &);
 
   /**
@@ -249,6 +254,7 @@ private:
 
   unsigned int InterpolationInfoChangedObserverTag;
   unsigned int SurfaceInterpolationInfoChangedObserverTag;
+  unsigned int InterpolationAbortedObserverTag;
 
   QGroupBox *m_GroupBoxEnableExclusiveInterpolationMode;
   QComboBox *m_CmbInterpolation;

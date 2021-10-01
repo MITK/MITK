@@ -58,7 +58,7 @@ mitk::SegTool2D::SliceInformation::SliceInformation(const mitk::Image* aSlice, c
 mitk::SegTool2D::SegTool2D(const char *type, const us::Module *interactorModule)
   : Tool(type, interactorModule), m_Contourmarkername("Position")
 {
-  Tool::m_EventConfig = "DisplayConfigMITKNoCrosshair.xml";
+  Tool::m_EventConfig = "DisplayConfigBlockLMB.xml";
 }
 
 mitk::SegTool2D::~SegTool2D()

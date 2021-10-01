@@ -36,6 +36,29 @@ found in the LICENSE file.
 
 #include <cstdlib>
 
+namespace
+{
+  double GetScreenResolution(const mitk::BaseRenderer* renderer)
+  {
+    if (nullptr == renderer)
+      return 1.0;
+
+    mitk::Point2D pD1, pD2;
+    pD1[0] = 0.0;
+    pD1[1] = 0.0;
+    pD2[0] = 0.0;
+    pD2[1] = 1.0;
+
+    // Calculate world coordinates of in-plane screen pixels (0, 0) and (0, 1).
+    mitk::Point3D pW1, pW2;
+    renderer->DisplayToWorld(pD1, pW1);
+    renderer->DisplayToWorld(pD2, pW2);
+
+    // For 2D renderers, the distance between these points is the screen resolution.
+    return pW1.EuclideanDistanceTo(pW2);
+  }
+}
+
 // constructor LocalStorage
 mitk::PointSetVtkMapper2D::LocalStorage::LocalStorage()
 {
@@ -105,7 +128,8 @@ mitk::PointSetVtkMapper2D::PointSetVtkMapper2D()
     m_Point2DSize(6),
     m_IDShapeProperty(mitk::PointSetShapeProperty::CROSS),
     m_FillShape(false),
-    m_DistanceToPlane(4.0f)
+    m_DistanceToPlane(4.0f),
+    m_FixedSizeOnScreen(false)
 {
 }
 
@@ -268,6 +292,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer *rende
   mitk::Point2D preLastPt2d = pt2d; // projected_p in display coordinates before lastPt2
 
   const mitk::PlaneGeometry *geo2D = renderer->GetCurrentWorldPlaneGeometry();
+  double resolution = GetScreenResolution(renderer);
 
   vtkLinearTransform *dataNodeTransform = input->GetGeometry()->GetVtkTransform();
 
@@ -302,6 +327,11 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer *rende
 
     // compute distance to current plane
     float dist = geo2D->Distance(point);
+    // measure distance in screen pixel units if requested
+    if (m_FixedSizeOnScreen)
+    {
+      dist /= resolution;
+    }
 
     // draw markers on slices a certain distance away from the points
     // location according to the tolerance threshold (m_DistanceToPlane)
@@ -312,13 +342,15 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer *rende
       {
         ls->m_SelectedPoints->InsertNextPoint(point[0], point[1], point[2]);
         // point is scaled according to its distance to the plane
-        ls->m_SelectedScales->InsertNextTuple3(std::max(0.0f, m_Point2DSize - (2 * dist)), 0, 0);
+        ls->m_SelectedScales->InsertNextTuple3(
+            std::max(0.0f, m_Point2DSize - (2 * dist)), 0, 0);
       }
       else
       {
         ls->m_UnselectedPoints->InsertNextPoint(point[0], point[1], point[2]);
         // point is scaled according to its distance to the plane
-        ls->m_UnselectedScales->InsertNextTuple3(std::max(0.0f, m_Point2DSize - (2 * dist)), 0, 0);
+        ls->m_UnselectedScales->InsertNextTuple3(
+            std::max(0.0f, m_Point2DSize - (2 * dist)), 0, 0);
       }
 
       //---- LABEL -----//
@@ -527,6 +559,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer *rende
   // apply transform of current plane to glyphs
   ls->m_UnselectedGlyph3D->SetSourceConnection(transformFilterU->GetOutputPort());
   ls->m_UnselectedGlyph3D->SetInputData(ls->m_VtkUnselectedPointListPolyData);
+  ls->m_UnselectedGlyph3D->SetScaleFactor(m_FixedSizeOnScreen ? resolution : 1.0);
   ls->m_UnselectedGlyph3D->SetScaleModeToScaleByVector();
   ls->m_UnselectedGlyph3D->SetVectorModeToUseVector();
 
@@ -553,6 +586,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer *rende
   // apply transform of current plane to glyphs
   ls->m_SelectedGlyph3D->SetSourceConnection(transformFilterS->GetOutputPort());
   ls->m_SelectedGlyph3D->SetInputData(ls->m_VtkSelectedPointListPolyData);
+  ls->m_SelectedGlyph3D->SetScaleFactor(m_FixedSizeOnScreen ? resolution : 1.0);
   ls->m_SelectedGlyph3D->SetScaleModeToScaleByVector();
   ls->m_SelectedGlyph3D->SetVectorModeToUseVector();
 
@@ -610,6 +644,7 @@ void mitk::PointSetVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rend
   }
   node->GetBoolProperty("Pointset.2D.fill shape", m_FillShape, renderer);
   node->GetFloatProperty("Pointset.2D.distance to plane", m_DistanceToPlane, renderer);
+  node->GetBoolProperty("Pointset.2D.fixed size on screen", m_FixedSizeOnScreen, renderer);
 
   mitk::PointSetShapeProperty::Pointer shape =
     dynamic_cast<mitk::PointSetShapeProperty *>(this->GetDataNode()->GetProperty("Pointset.2D.shape", renderer));
@@ -740,6 +775,7 @@ void mitk::PointSetVtkMapper2D::SetDefaultProperties(mitk::DataNode *node, mitk:
                     mitk::FloatProperty::New(4.0f),
                     renderer,
                     overwrite); // show the point at a certain distance above/below the 2D imaging plane.
+  node->AddProperty("Pointset.2D.fixed size on screen", mitk::BoolProperty::New(false), renderer, overwrite);
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

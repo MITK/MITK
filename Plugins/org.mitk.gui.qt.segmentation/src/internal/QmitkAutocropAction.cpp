@@ -102,9 +102,7 @@ void QmitkAutocropAction::Run( const QList<mitk::DataNode::Pointer> &selectedNod
           }
           // Reinit node
           mitk::RenderingManager::GetInstance()->InitializeViews(
-            node->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
-          mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
+            node->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
         }
       }
       catch(...)

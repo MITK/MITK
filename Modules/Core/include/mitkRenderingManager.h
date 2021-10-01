@@ -148,10 +148,10 @@ namespace mitk
      * double precision range. */
     virtual bool InitializeViews(const BaseGeometry *geometry,
                                  RequestType type = REQUEST_UPDATE_ALL,
-                                 bool preserveRoughOrientationInWorldSpace = false);
+                                 bool resetCamera = true);
     virtual bool InitializeViews(const TimeGeometry *geometry,
                                  RequestType type = REQUEST_UPDATE_ALL,
-                                 bool preserveRoughOrientationInWorldSpace = false);
+                                 bool resetCamera = true);
 
     /** Initializes the windows to the default viewing direction
      * (geomtry information is NOT changed). PLATFORM SPECIFIC. */
@@ -168,10 +168,12 @@ namespace mitk
      * global TimeGeometry. PLATFORM SPECIFIC. */
     virtual bool InitializeView(vtkRenderWindow *renderWindow,
                                 const BaseGeometry *geometry,
-                                bool initializeGlobalTimeSNC = false);
+                                bool initializeGlobalTimeSNC = false,
+                                bool resetCamera = true);
     virtual bool InitializeView(vtkRenderWindow *renderWindow,
                                 const TimeGeometry *geometry,
-                                bool initializeGlobalTimeSNC = false);
+                                bool initializeGlobalTimeSNC = false,
+                                bool resetCamera = true);
 
     /** Initializes the specified window to the default viewing direction
      * (geomtry information is NOT changed). PLATFORM SPECIFIC. */
@@ -363,7 +365,8 @@ namespace mitk
     void InternalViewInitialization(mitk::BaseRenderer *baseRenderer,
                                     const mitk::TimeGeometry *geometry,
                                     bool boundingBoxInitialized,
-                                    int mapperID);
+                                    int mapperID,
+                                    bool resetCamera);
 
     vtkRenderWindow *m_FocusedRenderWindow;
     AntiAliasing m_AntiAliasing;

@@ -28,7 +28,6 @@ namespace mitk
     \brief Extracts a 2D slice from a 3D image.
 
     \sa SegTool2D
-    \sa OverwriteSliceImageFilter
 
     \ingroup Process
     \ingroup ToolManagerEtAl

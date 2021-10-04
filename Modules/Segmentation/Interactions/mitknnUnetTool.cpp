@@ -309,7 +309,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     resultImage->SetGeometry(_inputAtTimeStep->GetGeometry());
     return resultImage;
   }
-  catch (const Exception &e)
+  catch (const mitk::Exception &e)
   {
     /*
     Can't throw mitk exception to the caller. Refer: T28691

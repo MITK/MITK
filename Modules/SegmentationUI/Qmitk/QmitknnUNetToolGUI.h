@@ -37,7 +37,7 @@ protected slots:
    * @brief Qt slot
    *
    */
-  void OnSettingsAccept();
+  void OnSettingsAccepted();
 
   /**
    * @brief Qt slot
@@ -76,7 +76,7 @@ protected slots:
   void OnCheckBoxChanged(int);
 
   /**
-   * @brief Qthread slot to captured failures from thread worker and
+   * @brief Qthread slot to capture failures from thread worker and
    * shows error message
    *
    */
@@ -134,7 +134,8 @@ private:
    *
    * @return mitk::ModelParams
    */
-  mitk::ModelParams MapToRequest(QString &, QString &, QString &, QString &, std::vector<std::string> &);
+  mitk::ModelParams MapToRequest(
+    const QString &, const QString &, const QString &, const QString &, const std::vector<std::string> &);
 
   /**
    * @brief Returns checked fold names from the ctk-Checkable-ComboBox.

@@ -56,12 +56,12 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
 {
   m_Controls.setupUi(this);
 
-#if defined(__APPLE__) || defined(MACOSX) || defined(linux) || defined(__linux__)
+#ifndef _WIN32
   m_Controls.pythonEnvComboBox->addItem("/usr/bin");
 #endif
   m_Controls.pythonEnvComboBox->addItem("Select");
   AutoParsePythonPaths();
-  connect(m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnSettingsAccept()));
+  connect(m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnSettingsAccepted()));
   connect(m_Controls.modeldirectoryBox,
           SIGNAL(directoryChanged(const QString &)),
           this,
@@ -106,7 +106,7 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   m_UI_ROWS = m_Controls.advancedSettingsLayout->rowCount(); // Must do. Row count is correct only here.
 }
 
-void QmitknnUNetToolGUI::OnSettingsAccept()
+void QmitknnUNetToolGUI::OnSettingsAccepted()
 {
   auto tool = this->GetConnectedToolAs<mitk::nnUNetTool>();
   if (nullptr != tool)
@@ -119,16 +119,16 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
 
       QString pythonPathTextItem = m_Controls.pythonEnvComboBox->currentText();
       QString pythonPath = pythonPathTextItem.mid(pythonPathTextItem.indexOf(" ") + 1);
-#if defined(__APPLE__) || defined(MACOSX) || defined(linux) || defined(__linux__)
-      if (!(pythonPath.endsWith("bin", Qt::CaseInsensitive) || pythonPath.endsWith("bin/", Qt::CaseInsensitive)))
-      {
-        pythonPath += QDir::separator() + QString("bin");
-      }
-#elif defined(_WIN32)
+#ifdef _WIN32
       if (!isNoPip && !(pythonPath.endsWith("Scripts", Qt::CaseInsensitive) ||
                         pythonPath.endsWith("Scripts/", Qt::CaseInsensitive)))
       {
         pythonPath += QDir::separator() + QString("Scripts");
+      }
+#else
+      if (!(pythonPath.endsWith("bin", Qt::CaseInsensitive) || pythonPath.endsWith("bin/", Qt::CaseInsensitive)))
+      {
+        pythonPath += QDir::separator() + QString("bin");
       }
 #endif
       std::string nnUNetDirectory;
@@ -199,14 +199,14 @@ void QmitknnUNetToolGUI::OnSettingsAccept()
       tool->MultiModalOff();
       if (m_Controls.multiModalBox->isChecked())
       {
-        tool->otherModalPaths.clear();
-        tool->otherModalPaths = FetchMultiModalPathsFromUI();
+        tool->m_OtherModalPaths.clear();
+        tool->m_OtherModalPaths = FetchMultiModalPathsFromUI();
         tool->MultiModalOn();
       }
 
       if (!m_SegmentationThread->isRunning())
       {
-        MITK_INFO << "Starting thread...";
+        MITK_DEBUG << "Starting thread...";
         m_SegmentationThread->start();
       }
       m_Controls.statusLabel->setText("<b>STATUS: </b><i>Starting Segmentation task... This might take a while.</i>");

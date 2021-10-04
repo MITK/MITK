@@ -5,7 +5,7 @@
 
 void nnUNetSegmentationWorker::DoWork(mitk::nnUNetTool *tool)
 {
-  MITK_INFO << "in nnUNet Worker";
+  MITK_DEBUG << "in nnUNet Worker";
   try
   {
     QMutexLocker locker(&mutex);

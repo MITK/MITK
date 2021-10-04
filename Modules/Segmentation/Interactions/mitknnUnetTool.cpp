@@ -13,8 +13,6 @@ found in the LICENSE file.
 #include "mitknnUnetTool.h"
 
 #include "mitkIOUtil.h"
-#include "mitkImage.h"
-#include "mitkLabelSetImage.h"
 #include "mitkProcessExecutor.h"
 #include <cstdlib>
 #include <fstream>
@@ -31,7 +29,7 @@ namespace mitk
 
 mitk::nnUNetTool::nnUNetTool()
 {
-  this->SetMitkTempDir(mitk::IOUtil::CreateTemporaryDirectory("mitk-XXXXXX"));
+  this->SetMitkTempDir(IOUtil::CreateTemporaryDirectory("mitk-XXXXXX"));
 }
 
 mitk::nnUNetTool::~nnUNetTool()
@@ -52,9 +50,9 @@ void mitk::nnUNetTool::UpdateCleanUp()
 
 void mitk::nnUNetTool::RenderOutputBuffer()
 {
-  if (this->outputBuffer != nullptr)
+  if (this->m_OutputBuffer != nullptr)
   {
-    Superclass::SetNodeProperties(this->outputBuffer);
+    Superclass::SetNodeProperties(this->m_OutputBuffer);
     this->ClearOutputBuffer();
     try
     {
@@ -74,21 +72,21 @@ void mitk::nnUNetTool::RenderOutputBuffer()
   }
 }
 
-void mitk::nnUNetTool::SetNodeProperties(mitk::LabelSetImage::Pointer segmentation)
+void mitk::nnUNetTool::SetNodeProperties(LabelSetImage::Pointer segmentation)
 {
   // This overriden method doesn't set node properties. Intentionally left out for setting later upon demand
   // in the `RenderOutputBuffer` method.
-  this->outputBuffer = segmentation;
+  this->m_OutputBuffer = segmentation;
 }
 
 mitk::LabelSetImage::Pointer mitk::nnUNetTool::GetOutputBuffer()
 {
-  return this->outputBuffer;
+  return this->m_OutputBuffer;
 }
 
 void mitk::nnUNetTool::ClearOutputBuffer()
 {
-  this->outputBuffer = nullptr;
+  this->m_OutputBuffer = nullptr;
 }
 
 us::ModuleResource mitk::nnUNetTool::GetIconResource() const
@@ -134,42 +132,42 @@ namespace
 
 mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inputAtTimeStep, TimeStepType /*timeStep*/)
 {
-  mitk::Image::Pointer _inputAtTimeStep = inputAtTimeStep->Clone();
+  Image::Pointer _inputAtTimeStep = inputAtTimeStep->Clone();
   std::string inDir, outDir, inputImagePath, outputImagePath, scriptPath;
   std::string templateFilename = "XXXXXX_000_0000.nii.gz";
 
-  mitk::ProcessExecutor::Pointer spExec = mitk::ProcessExecutor::New();
+  ProcessExecutor::Pointer spExec = ProcessExecutor::New();
   itk::CStyleCommand::Pointer spCommand = itk::CStyleCommand::New();
   spCommand->SetCallback(&onPythonProcessEvent);
-  spExec->AddObserver(mitk::ExternalProcessOutputEvent(), spCommand);
-  mitk::ProcessExecutor::ArgumentListType args;
+  spExec->AddObserver(ExternalProcessOutputEvent(), spCommand);
+  ProcessExecutor::ArgumentListType args;
 
-  inDir = mitk::IOUtil::CreateTemporaryDirectory("nnunet-in-XXXXXX", this->GetMitkTempDir());
+  inDir = IOUtil::CreateTemporaryDirectory("nnunet-in-XXXXXX", this->GetMitkTempDir());
   std::ofstream tmpStream;
   inputImagePath =
-    mitk::IOUtil::CreateTemporaryFile(tmpStream, templateFilename, inDir + mitk::IOUtil::GetDirectorySeparator());
+    IOUtil::CreateTemporaryFile(tmpStream, templateFilename, inDir + IOUtil::GetDirectorySeparator());
   tmpStream.close();
-  std::size_t found = inputImagePath.find_last_of(mitk::IOUtil::GetDirectorySeparator());
+  std::size_t found = inputImagePath.find_last_of(IOUtil::GetDirectorySeparator());
   std::string fileName = inputImagePath.substr(found + 1);
   std::string token = fileName.substr(0, fileName.find("_"));
 
   if (this->GetNoPip())
   {
-    scriptPath = this->GetnnUNetDirectory() + mitk::IOUtil::GetDirectorySeparator() + "nnunet" +
-                 mitk::IOUtil::GetDirectorySeparator() + "inference" + mitk::IOUtil::GetDirectorySeparator() +
+    scriptPath = this->GetnnUNetDirectory() + IOUtil::GetDirectorySeparator() + "nnunet" +
+                 IOUtil::GetDirectorySeparator() + "inference" + IOUtil::GetDirectorySeparator() +
                  "predict_simple.py";
   }
 
   try
   {
-    mitk::IOUtil::Save(_inputAtTimeStep.GetPointer(), inputImagePath);
+    IOUtil::Save(_inputAtTimeStep.GetPointer(), inputImagePath);
     if (this->GetMultiModal())
     {
-      for (size_t i = 0; i < this->otherModalPaths.size(); ++i)
+      for (size_t i = 0; i < this->m_OtherModalPaths.size(); ++i)
       {
-        std::string inModalFile = this->otherModalPaths[i];
+        std::string inModalFile = this->m_OtherModalPaths[i];
         std::string outModalFile =
-          inDir + mitk::IOUtil::GetDirectorySeparator() + token + "_000_000" + std::to_string(i + 1) + ".nii.gz";
+          inDir + IOUtil::GetDirectorySeparator() + token + "_000_000" + std::to_string(i + 1) + ".nii.gz";
         std::ifstream src(inModalFile, std::ios::binary);
         std::ofstream dst(outModalFile, std::ios::binary);
         dst << src.rdbuf();
@@ -190,17 +188,16 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   std::string command = "nnUNet_predict";
   if (this->GetNoPip())
   {
-#if defined(__APPLE__) || defined(MACOSX) || defined(linux) || defined(__linux__)
-    command = "python3";
-#elif defined(_WIN32)
+#ifdef _WIN32
     command = "python";
+#else
+    command = "python3";
 #endif
   }
-
-  for (mitk::ModelParams &modelparam : m_ParamQ)
+  for (ModelParams &modelparam : m_ParamQ)
   {
-    outDir = mitk::IOUtil::CreateTemporaryDirectory("nnunet-out-XXXXXX", this->GetMitkTempDir());
-    outputImagePath = outDir + mitk::IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";
+    outDir = IOUtil::CreateTemporaryDirectory("nnunet-out-XXXXXX", this->GetMitkTempDir());
+    outputImagePath = outDir + IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";
     modelparam.outputDir = outDir;
     args.clear();
     if (this->GetNoPip())
@@ -267,12 +264,12 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
 
     try
     {
-      std::string resultsFolderEnv = "RESULTS_FOLDER="+this->GetModelDirectory();
+      std::string resultsFolderEnv = "RESULTS_FOLDER=" + this->GetModelDirectory();
       itksys::SystemTools::PutEnv(resultsFolderEnv.c_str());
-      std::string cudaEnv = "CUDA_VISIBLE_DEVICES="+std::to_string(this->GetGpuId());
+      std::string cudaEnv = "CUDA_VISIBLE_DEVICES=" + std::to_string(this->GetGpuId());
       itksys::SystemTools::PutEnv(cudaEnv.c_str());
 
-      spExec->execute(this->GetPythonPath(), command, args);
+      spExec->Execute(this->GetPythonPath(), command, args);
     }
     catch (const mitk::Exception &e)
     {
@@ -287,11 +284,11 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   {
     args.clear();
     command = "nnUNet_ensemble";
-    outDir = mitk::IOUtil::CreateTemporaryDirectory("nnunet-ensemble-out-XXXXXX", this->GetMitkTempDir());
-    outputImagePath = outDir + mitk::IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";
+    outDir = IOUtil::CreateTemporaryDirectory("nnunet-ensemble-out-XXXXXX", this->GetMitkTempDir());
+    outputImagePath = outDir + IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";
 
     args.push_back("-f");
-    for (mitk::ModelParams &modelparam : m_ParamQ)
+    for (ModelParams &modelparam : m_ParamQ)
     {
       args.push_back(modelparam.outputDir);
     }
@@ -302,17 +299,17 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     args.push_back("-pp");
     args.push_back(this->GetPostProcessingJsonDirectory());
 
-    spExec->execute(this->GetPythonPath(), command, args);
+    spExec->Execute(this->GetPythonPath(), command, args);
   }
   try
   {
-    mitk::LabelSetImage::Pointer resultImage = mitk::LabelSetImage::New();
-    mitk::Image::Pointer outputImage = mitk::IOUtil::Load<mitk::Image>(outputImagePath);
+    LabelSetImage::Pointer resultImage = LabelSetImage::New();
+    Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
     resultImage->InitializeByLabeledImage(outputImage);
     resultImage->SetGeometry(_inputAtTimeStep->GetGeometry());
     return resultImage;
   }
-  catch (const mitk::Exception &e)
+  catch (const Exception &e)
   {
     /*
     Can't throw mitk exception to the caller. Refer: T28691

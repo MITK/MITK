@@ -13,13 +13,13 @@ found in the LICENSE file.s
 #ifndef QmitknnUNetToolGPU_h_Included
 #define QmitknnUNetToolGPU_h_Included
 
-#include <QProcess>
-#include <string>
+#include <QObject>
+#include <QString>
 #include <vector>
 
 /**
  * @brief Struct to store GPU info.
- * 
+ *
  */
 struct QmitkGPUSpec
 {
@@ -30,14 +30,14 @@ struct QmitkGPUSpec
 
 /**
  * @brief Class to load and save GPU information
- * for further validation 
+ * for further validation
  */
 class QmitkGPULoader : public QObject
 {
   Q_OBJECT
 
 private:
-  std::vector<QmitkGPUSpec> gpus;
+  std::vector<QmitkGPUSpec> m_Gpus;
 
 public:
   /**
@@ -49,8 +49,8 @@ public:
 
   /**
    * @brief Returns the number of GPUs parsed and saved as QmitkGPUSpec objects.
-   * 
-   * @return int 
+   *
+   * @return int
    */
   int GetGPUCount();
 };

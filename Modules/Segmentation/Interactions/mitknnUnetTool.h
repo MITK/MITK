@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <MitkSegmentationExports.h>
 #include <mitkStandardFileLocations.h>
 
-namespace us //remove?
+namespace us
 {
   class ModuleResource;
 }
@@ -110,13 +110,13 @@ namespace mitk
      * @brief vector of ModelParams.
      * Size > 1 only for ensemble prediction.
      */
-    std::vector<mitk::ModelParams> m_ParamQ;
+    std::vector<ModelParams> m_ParamQ;
 
     /**
      * @brief Holds paths to other input image modalities.
      * 
      */
-    std::vector<std::string> otherModalPaths;
+    std::vector<std::string> m_OtherModalPaths;
 
 
     /**
@@ -128,9 +128,9 @@ namespace mitk
     /**
      * @brief Get the Output Buffer object
      * 
-     * @return mitk::LabelSetImage::Pointer 
+     * @return LabelSetImage::Pointer 
      */
-    mitk::LabelSetImage::Pointer GetOutputBuffer();
+    LabelSetImage::Pointer GetOutputBuffer();
 
     /**
      * @brief Sets the outputBuffer to nullptr
@@ -168,7 +168,7 @@ namespace mitk
      */
     LabelSetImage::Pointer ComputeMLPreview(const Image *inputAtTimeStep, TimeStepType timeStep) override;
     void UpdateCleanUp() override;
-    void SetNodeProperties(mitk::LabelSetImage::Pointer) override;
+    void SetNodeProperties(LabelSetImage::Pointer) override;
 
 
   private:
@@ -184,9 +184,8 @@ namespace mitk
     bool m_NoPip;
     bool m_MultiModal;
     bool m_Ensemble = false;
-    mitk::LabelSetImage::Pointer outputBuffer;
+    LabelSetImage::Pointer m_OutputBuffer;
     unsigned int m_GpuId;
   };
 } // namespace mitk
-
 #endif

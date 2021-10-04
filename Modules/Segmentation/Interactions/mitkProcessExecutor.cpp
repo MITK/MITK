@@ -19,7 +19,7 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  std::string ProcessExecutor::getOSDependendExecutableName(const std::string &name)
+  std::string ProcessExecutor::GetOSDependendExecutableName(const std::string &name)
   {
 #if defined(_WIN32)
 
@@ -32,7 +32,7 @@ namespace mitk
 
 #else
     auto result = itksys::SystemTools::GetFilenamePath(name);
-    if (ensureCorrectOSPathSeparator(result).empty())
+    if (EnsureCorrectOSPathSeparator(result).empty())
     {
       return "./" + name;
     }
@@ -42,9 +42,9 @@ namespace mitk
     }
 
 #endif
-  };
+  }
 
-  std::string ProcessExecutor::ensureCorrectOSPathSeparator(const std::string &path)
+  std::string ProcessExecutor::EnsureCorrectOSPathSeparator(const std::string &path)
   {
     std::string ret = path;
 
@@ -66,27 +66,26 @@ namespace mitk
     }
 
     return ret;
-  };
+  }
 
-  int ProcessExecutor::getExitValue() { return this->_exitValue; };
+  int ProcessExecutor::GetExitValue() { return this->m_ExitValue; };
 
-  bool ProcessExecutor::execute(const std::string &executionPath, const ArgumentListType &argumentList)
+  bool ProcessExecutor::Execute(const std::string &executionPath, const ArgumentListType &argumentList)
   {
-    // convert to char* array with terminating null element;
-    const char **pArguments = new const char *[argumentList.size() + 1];
-    pArguments[argumentList.size()] = nullptr;
+    std::vector<const char*> pArguments_(argumentList.size() + 1);
 
     for (ArgumentListType::size_type index = 0; index < argumentList.size(); ++index)
     {
-      pArguments[index] = argumentList[index].c_str();
+      pArguments_[index] = argumentList[index].c_str();
     }
+    pArguments_.push_back(nullptr); //terminating null element as required by ITK
 
     bool normalExit = false;
 
     try
     {
       itksysProcess *processID = itksysProcess_New();
-      itksysProcess_SetCommand(processID, pArguments);
+      itksysProcess_SetCommand(processID, pArguments_.data());
 
       itksysProcess_SetWorkingDirectory(processID, executionPath.c_str());
 
@@ -125,34 +124,30 @@ namespace mitk
       auto state = static_cast<itksysProcess_State_e>(itksysProcess_GetState(processID));
 
       normalExit = (state == itksysProcess_State_Exited);
-      this->_exitValue = itksysProcess_GetExitValue(processID);
+      this->m_ExitValue = itksysProcess_GetExitValue(processID);
     }
     catch (...)
     {
-      delete[] pArguments;
       throw;
     }
-
-    delete[] pArguments;
-
     return normalExit;
   };
 
-  bool ProcessExecutor::execute(const std::string &executionPath,
+  bool ProcessExecutor::Execute(const std::string &executionPath,
                                 const std::string &executableName,
                                 ArgumentListType argumentList)
   {
-    std::string executableName_OS = getOSDependendExecutableName(executableName);
+    std::string executableName_OS = GetOSDependendExecutableName(executableName);
     argumentList.insert(argumentList.begin(), executableName_OS);
 
-    return execute(executionPath, argumentList);
-  };
+    return Execute(executionPath, argumentList);
+  }
 
   ProcessExecutor::ProcessExecutor()
   {
-    this->_exitValue = 0;
+    this->m_ExitValue = 0;
     this->m_SharedOutputPipes = false;
-  };
+  }
 
   ProcessExecutor::~ProcessExecutor() = default;
 } // namespace mitk

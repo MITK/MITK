@@ -15,6 +15,7 @@ found in the LICENSE file.
 #ifndef __MITK_PROCESS_EXECUTOR_H
 #define __MITK_PROCESS_EXECUTOR_H
 
+#include <MitkSegmentationExports.h>
 #include <itkObject.h>
 #include <vector>
 
@@ -56,12 +57,13 @@ namespace mitk
   mitkProcessExecutorEventMacro(ExternalProcessStdOutEvent);
   mitkProcessExecutorEventMacro(ExternalProcessStdErrEvent);
 
-  /*! Helper class that allows to execute an application with arguments.
-   * You may register an observer for an ExternalProcessOutputEvent, ExternalProcessStdOutEvent or
+  /**
+   * @brief You may register an observer for an ExternalProcessOutputEvent, ExternalProcessStdOutEvent or
    * ExternalProcessStdErrEvent in order to get notified of any output.
    * @remark The events will only be invoked if the pipes are NOT(!) shared. By default the pipes are not shared.
+   *
    */
-  class /*MITKSEGMENTATION_EXPORT*/ ProcessExecutor : public itk::Object
+  class MITKSEGMENTATION_EXPORT ProcessExecutor : public itk::Object
   {
   public:
     using Self = ProcessExecutor;
@@ -77,26 +79,30 @@ namespace mitk
 
     using ArgumentListType = std::vector<std::string>;
 
-    bool execute(const std::string &executionPath, const std::string &executableName, ArgumentListType argumentList);
+    bool Execute(const std::string &executionPath, const std::string &executableName, ArgumentListType argumentList);
 
-    /**Executes the process. This version assumes that the executable name is the first argument in the argument list
-     * and has already been converted to its OS dependent name via the static convert function of this class.*/
-    bool execute(const std::string &executionPath, const ArgumentListType &argumentList);
+    /**
+     * @brief Executes the process. This version assumes that the executable name is the first argument in the argument
+     * list and has already been converted to its OS dependent name via the static convert function of this class.
+     */
+    bool Execute(const std::string &executionPath, const ArgumentListType &argumentList);
 
-    int getExitValue();
-    static std::string ensureCorrectOSPathSeparator(const std::string &);
+    int GetExitValue();
+    static std::string EnsureCorrectOSPathSeparator(const std::string &);
 
-    static std::string getOSDependendExecutableName(const std::string &name);
+    static std::string GetOSDependendExecutableName(const std::string &name);
 
   protected:
     ProcessExecutor();
     ~ProcessExecutor() override;
 
-    int _exitValue;
+    int m_ExitValue;
 
-    /*! specifies if the child process should share the output pipes (true) or not (false).
+    /**
+     * @brief Specifies if the child process should share the output pipes (true) or not (false).
      * If pipes are not shared the output will be passed by invoking ExternalProcessOutputEvents
-     * @remark The events will only be invoked if the pipes are NOT(!) shared.*/
+     * @remark The events will only be invoked if the pipes are NOT(!) shared.
+     */
     bool m_SharedOutputPipes;
   };
 

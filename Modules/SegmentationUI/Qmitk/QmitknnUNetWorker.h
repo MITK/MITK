@@ -43,5 +43,4 @@ signals:
 private:
   QMutex mutex;
 };
-
 #endif

@@ -134,20 +134,25 @@ void QmitknnUNetToolGUI::OnCheckBoxChanged(int state)
     {
       m_Controls.multiModalSpinLabel->setVisible(visibility);
       m_Controls.multiModalSpinBox->setVisible(visibility);
+      if (!visibility)
+      {
+       OnModalitiesNumberChanged(0);
+       m_Controls.multiModalSpinBox->setValue(0);
+      }
     }
   }
 }
 
 void QmitknnUNetToolGUI::OnModalitiesNumberChanged(int num)
 {
-  if (num > (int)this->m_ModalPaths.size())
+  while (num > static_cast<int>(this->m_ModalPaths.size()))
   {
     ctkPathLineEdit *multiModalPath = new ctkPathLineEdit(this);
     multiModalPath->setObjectName(QString("multiModalPath" + QString::number(m_ModalPaths.size() + 1)));
     m_Controls.advancedSettingsLayout->addWidget(multiModalPath, this->m_UI_ROWS + m_ModalPaths.size() + 1, 1, 1, 3);
     m_ModalPaths.push_back(multiModalPath);
   }
-  else if (num < (int)this->m_ModalPaths.size() && !m_ModalPaths.empty())
+  while (num < static_cast<int>(this->m_ModalPaths.size()) && !m_ModalPaths.empty())
   {
     ctkPathLineEdit *child = m_ModalPaths.back();
     delete child; // delete the layout item
@@ -160,16 +165,16 @@ void QmitknnUNetToolGUI::AutoParsePythonPaths()
 {
   QString homeDir = QDir::homePath();
   std::vector<QString> searchDirs;
-#if defined(__APPLE__) || defined(MACOSX) || defined(linux) || defined(__linux__)
+#ifdef _WIN32
+  searchDirs.push_back(QString("C:") + QDir::separator() + QString("ProgramData") + QDir::separator() +
+                       QString("anaconda3"));
+#else
   // Add search locations for possible standard python paths here
   searchDirs.push_back(homeDir + QDir::separator() + "environments");
   searchDirs.push_back(homeDir + QDir::separator() + "anaconda3");
   searchDirs.push_back(homeDir + QDir::separator() + "miniconda3");
   searchDirs.push_back(homeDir + QDir::separator() + "opt" + QDir::separator() + "miniconda3");
   searchDirs.push_back(homeDir + QDir::separator() + "opt" + QDir::separator() + "anaconda3");
-#elif defined(_WIN32) || defined(_WIN64)
-  searchDirs.push_back(QString("C:") + QDir::separator() + QString("ProgramData") + QDir::separator() +
-                       QString("anaconda3"));
 #endif
   for (QString searchDir : searchDirs)
   {
@@ -210,8 +215,11 @@ std::vector<std::string> QmitknnUNetToolGUI::FetchSelectedFoldsFromUI()
   return folds;
 }
 
-mitk::ModelParams QmitknnUNetToolGUI::MapToRequest(
-  QString &modelName, QString &taskName, QString &trainer, QString &planId, std::vector<std::string> &folds)
+mitk::ModelParams QmitknnUNetToolGUI::MapToRequest(const QString &modelName,
+                                                   const QString &taskName,
+                                                   const QString &trainer,
+                                                   const QString &planId,
+                                                   const std::vector<std::string> &folds)
 {
   mitk::ModelParams requestObject;
   requestObject.model = modelName.toStdString();

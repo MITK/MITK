@@ -207,10 +207,22 @@ protected:
   /**
    * Request an update of all render windows of the currently active IRenderWindowPart.
    *
-   * \param requestType Specifies the type of render windows for which an update
-   *        will be requested.
+   * \param requestType Specifies the type of render windows for which an update will be requested.
    */
   void RequestRenderWindowUpdate(mitk::RenderingManager::RequestType requestType = mitk::RenderingManager::REQUEST_UPDATE_ALL);
+
+  /**
+   * Initialize the specified render windows to the given reference geometry.
+   *
+   * \param referenceGeometry   The reference geometry which is used for updating the current world geometry
+   * \param requestType         Specifies the type of render windows for which an update will be requested
+   * \param resetCamera         If true, the camera and crosshair will be reset to the default view (centered, no zoom).
+   *                            If false, the current crosshair position will be stored and reset after the views have been
+   *                            initialized. The camera zoom will be kept after the view initialization.
+   */
+  void InitializeRenderWindows(const mitk::TimeGeometry *referenceGeometry,
+                       mitk::RenderingManager::RequestType requestType,
+                       bool resetCamera);
 
   /**
    * Outputs an error message to the console and displays a message box containing

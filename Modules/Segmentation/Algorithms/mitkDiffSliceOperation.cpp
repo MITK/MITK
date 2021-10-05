@@ -19,7 +19,6 @@ found in the LICENSE file.
 mitk::DiffSliceOperation::DiffSliceOperation() : Operation(1)
 {
   m_TimeStep = 0;
-  m_zlibSliceContainer = nullptr;
   m_Image = nullptr;
   m_WorldGeometry = nullptr;
   m_SliceGeometry = nullptr;
@@ -48,8 +47,7 @@ mitk::DiffSliceOperation::DiffSliceOperation(Image *imageVolume,
 
   m_TimeStep = timestep;
 
-  m_zlibSliceContainer = CompressedImageContainer::New();
-  m_zlibSliceContainer->SetImage(slice);
+  m_CompressedImageContainer.CompressImage(slice);
 
   m_Image = imageVolume;
   m_DeleteObserverTag = 0;
@@ -72,7 +70,6 @@ mitk::DiffSliceOperation::DiffSliceOperation(Image *imageVolume,
 mitk::DiffSliceOperation::~DiffSliceOperation()
 {
   m_WorldGeometry = nullptr;
-  m_zlibSliceContainer = nullptr;
 
   if (m_ImageIsValid)
   {
@@ -84,13 +81,12 @@ mitk::DiffSliceOperation::~DiffSliceOperation()
 
 mitk::Image::Pointer mitk::DiffSliceOperation::GetSlice()
 {
-  Image::Pointer image = m_zlibSliceContainer->GetImage();
-  return image;
+  return m_CompressedImageContainer.DecompressImage();
 }
 
 bool mitk::DiffSliceOperation::IsValid()
 {
-  return m_ImageIsValid && m_zlibSliceContainer.IsNotNull() && (m_WorldGeometry.IsNotNull()); // TODO improve
+  return m_ImageIsValid && m_WorldGeometry.IsNotNull(); // TODO improve
 }
 
 void mitk::DiffSliceOperation::OnImageDeleted()

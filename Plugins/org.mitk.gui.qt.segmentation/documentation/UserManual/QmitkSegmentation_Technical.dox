@@ -70,13 +70,11 @@ also one factory for each tool (e.g. mitk::AddContourToolFactory). For the GUI r
 identification, consisting of a name and an icon (XPM). The actual drawing
 methods are mainly implemented in mitk::SegTool2D (helper methods) and its
 sub-classes for region growing, freehand drawing, etc.
-<li> <b>Slice manipulation</b>: There are two filters for manipulation of slices
+<li> <b>Slice manipulation</b>: There are two ways to manipulate slices
 inside a 3D image volume. mitk::ExtractImageFilter retrieves a single 2D slice
-from a 3D volume. mitk::OverwriteSliceImageFilter replaces a slice inside a 3D
-volume with a second slice which is a parameter to the filter. These classes are
-used extensively by most of the tools to fulfill their task.
-mitk::OverwriteSliceImageFilter cooperates with the interpolation classes to
-inform them of single slice modifications.
+from a 3D volume. mitkVtkImageOverwrite replaces a slice inside a 3D
+volume with a second slice. These classes are used extensively by most of the tools
+to fulfill their task.
 <li> <b>Interpolation of unsegmented slices</b>: There are two classes involved
 in interpolation: mitk::SegmentationInterpolationController knows a mitk::Image (the
 segmentation) and scans its contents for slices with non-zero pixels. It keeps
@@ -86,11 +84,11 @@ class also performs this interpolation for single slices on demand.
 Again, we have a second class responsible for the GUI:
 QmitkSlicesInterpolator enables/disables interpolation and offers to
 accept interpolations for one or all slices.
-<li> <b>Undo</b>: Undo functionality is implemented in mitk::OverwriteSliceImageFilter,
-since this is the central place where all image modifications are made. The filter stores a binary difference image
-to the undo stack as a mitk::ApplyDiffImageOperation. When the user requests undo, this ApplyDiffImageOperation
-will be executed by a singleton class DiffImageApplier. The operation itself observes the image, which it refers to,
-for itk::DeleteEvent, so no undo operation will be executed on/for images that have already been destroyed.
+<li> <b>Undo</b>: Undo functionality is implemented using mitk::DiffSliceOperation.
+mitk::SegTool2D::WriteSliceToVolume stores the original image and the modified slice to the undo stack as an
+mitk::DiffSliceOperation. When the user requests undo, this mitk::DiffSliceOperation will be executed by a singleton
+class DiffSliceOperationApplier. The operation itself observes the image, which it refers to, for itk::DeleteEvent,
+so no undo operation will be executed on/for images that have already been destroyed.
 <li> <b>GUI</b>: The top-level GUI is the view
 QmitkSegmentation, which is very thin in comparison to ERIS. There are
 separate widgets for image and tool selection, for interpolation. Additionaly,

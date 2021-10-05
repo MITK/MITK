@@ -68,6 +68,7 @@ The second column <i>Type</i> defines whether the constraint defines an upper or
 Most models require contrast agent concentration values as input rather than raw signal intensities (i.e. all compartment models).
 The DCE MR Perfusion DataFit View offers a variety of tools for the conversion from signal to concentration:
 by means of relative and absolute signal enhancement, via a T1-map calculated by the variable flip angle method, as well as a special conversion for turbo flash sequences.
+A more detailed description of these conversion methods, for example the exact formulas used for the absolute and relative signal enhancement calculations, can be found here: \ref org_mitk_views_pharmacokinetics_concentration_mri.
 For the conversion methods, a baseline image prior to contrast agent arrival is required.
 In many data sets, multiple baseline images are available. The <i>Baseline Range Selection</i> allows for selection of a range of time frames, from which the average image (along the time dimension) is calculated and set as baseline input image.
 Remark: The number of the first time frame is 0.

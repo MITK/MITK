@@ -10,169 +10,127 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkCompressedImageContainer.h"
-#include "mitkImageReadAccessor.h"
+#include <mitkCompressedImageContainer.h>
 
-#include "itk_zlib.h"
+#include <mitkImageReadAccessor.h>
+#include <mitkImageWriteAccessor.h>
 
-#include <cstdlib>
+#include <lz4.h>
 
-mitk::CompressedImageContainer::CompressedImageContainer() : m_PixelType(nullptr), m_ImageGeometry(nullptr)
+#include <algorithm>
+
+mitk::CompressedImageContainer::CompressedImageContainer()
+  : m_Dimension(0)
 {
 }
 
 mitk::CompressedImageContainer::~CompressedImageContainer()
 {
-  for (auto iter = m_ByteBuffers.begin(); iter != m_ByteBuffers.end(); ++iter)
-  {
-    free(iter->first);
-  }
-
-  delete m_PixelType;
+  this->ClearCompressedImageData();
 }
 
-void mitk::CompressedImageContainer::SetImage(const Image *image)
+void mitk::CompressedImageContainer::ClearCompressedImageData()
 {
-  for (auto iter = m_ByteBuffers.begin(); iter != m_ByteBuffers.end(); ++iter)
+  for (const auto& image : m_CompressedImageData)
   {
-    free(iter->first);
+    for (auto slice : image)
+      delete[] slice.second;
   }
 
-  m_ByteBuffers.clear();
+  m_CompressedImageData.clear();
 
-  // Compress diff image using zlib (will be restored on demand)
-  // determine memory size occupied by voxel data
-  m_ImageDimension = image->GetDimension();
-  m_ImageDimensions.clear();
+  m_PixelType = nullptr;
+  m_TimeGeometry = nullptr;
+  m_SliceDimensions[0] = 0;
+  m_SliceDimensions[1] = 0;
+  m_Dimension = 0;
+}
 
-  m_PixelType = new mitk::PixelType(image->GetPixelType());
+void mitk::CompressedImageContainer::CompressImage(const Image* image)
+{
+  this->ClearCompressedImageData();
 
-  m_OneTimeStepImageSizeInBytes = m_PixelType->GetSize(); // bits per element divided by 8
-  for (unsigned int i = 0; i < m_ImageDimension; ++i)
+  if (nullptr == image)
+    return;
+
+  m_PixelType = std::make_unique<PixelType>(image->GetPixelType());
+  m_TimeGeometry = image->GetTimeGeometry()->Clone();
+  m_SliceDimensions[0] = image->GetDimension(0);
+  m_SliceDimensions[1] = image->GetDimension(1);
+  m_Dimension = image->GetDimension();
+
+  const auto numTimeSteps = m_TimeGeometry->CountTimeSteps();
+  const auto numSlices = image->GetDimension(2);
+  const auto numSliceBytes = image->GetPixelType().GetSize() * image->GetDimension(0) * image->GetDimension(1);
+
+  m_CompressedImageData.reserve(numTimeSteps);
+
+  for (std::remove_const_t<decltype(numTimeSteps)> t = 0; t < numTimeSteps; ++t)
   {
-    unsigned int currentImageDimension = image->GetDimension(i);
-    m_ImageDimensions.push_back(currentImageDimension);
-    if (i < 3)
+    CompressedTimeStepData slices;
+    slices.reserve(numSlices);
+
+    ImageReadAccessor accessor(image, image->GetVolumeData(t));
+
+    for (std::remove_const_t<decltype(numSlices)> s = 0; s < numSlices; ++s)
     {
-      m_OneTimeStepImageSizeInBytes *= currentImageDimension; // only the 3D memory size
-    }
-  }
+      const auto* src = reinterpret_cast<const char*>(accessor.GetData()) + numSliceBytes * s;
+      char* dest = new char[numSliceBytes];
+      const auto destSize = LZ4_compress_default(src, dest, static_cast<int>(numSliceBytes), static_cast<int>(numSliceBytes));
 
-  m_ImageGeometry = image->GetGeometry();
-
-  m_NumberOfTimeSteps = 1;
-  if (m_ImageDimension > 3)
-  {
-    m_NumberOfTimeSteps = image->GetDimension(3);
-  }
-
-  for (unsigned int timestep = 0; timestep < m_NumberOfTimeSteps; ++timestep)
-  {
-    // allocate a buffer as specified by zlib
-    unsigned long bufferSize =
-      m_OneTimeStepImageSizeInBytes + static_cast<unsigned long>(m_OneTimeStepImageSizeInBytes * 0.2) + 12;
-    auto *byteBuffer = (unsigned char *)malloc(bufferSize);
-
-    if (itk::Object::GetDebug())
-    {
-      // compress image here into a buffer
-      MITK_INFO << "Using ZLib version: '" << zlibVersion() << "'" << std::endl
-                << "Attempting to compress " << m_OneTimeStepImageSizeInBytes << " image bytes into a buffer of size "
-                << bufferSize << std::endl;
-    }
-
-    ImageReadAccessor imgAcc(image, image->GetVolumeData(timestep));
-    ::Bytef *dest(byteBuffer);
-    ::uLongf destLen(bufferSize);
-    auto *source((unsigned char *)imgAcc.GetData());
-    ::uLongf sourceLen(m_OneTimeStepImageSizeInBytes);
-    int zlibRetVal = ::compress(dest, &destLen, source, sourceLen);
-    if (itk::Object::GetDebug())
-    {
-      if (zlibRetVal == Z_OK)
+      if (0 == destSize)
       {
-        MITK_INFO << "Success, using " << destLen << " bytes of the buffer (ratio "
-                  << ((double)destLen / (double)sourceLen) << ")" << std::endl;
+        MITK_ERROR << "LZ4 compression failed!";
+        delete[] dest;
+        slices.emplace_back(0, nullptr);
       }
       else
       {
-        switch (zlibRetVal)
-        {
-          case Z_MEM_ERROR:
-            MITK_ERROR << "not enough memory" << std::endl;
-            break;
-          case Z_BUF_ERROR:
-            MITK_ERROR << "output buffer too small" << std::endl;
-            break;
-          default:
-            MITK_ERROR << "other, unspecified error" << std::endl;
-            break;
-        }
+        char* shrinkedDest = new char[destSize];
+        std::copy(dest, dest + destSize, shrinkedDest);
+        delete[] dest;
+        slices.emplace_back(destSize, shrinkedDest);
       }
     }
 
-    // only use the neccessary amount of memory, realloc the buffer!
-    byteBuffer = (unsigned char *)realloc(byteBuffer, destLen);
-    bufferSize = destLen;
-    // MITK_INFO << "Using " << bufferSize << " bytes to store compressed image (" << destLen << " needed)" <<
-    // std::endl;
-
-    m_ByteBuffers.push_back(std::pair<unsigned char *, unsigned long>(byteBuffer, bufferSize));
+    m_CompressedImageData.push_back(slices);
   }
 }
 
-mitk::Image::Pointer mitk::CompressedImageContainer::GetImage() const
+mitk::Image::Pointer mitk::CompressedImageContainer::DecompressImage() const
 {
-  if (m_ByteBuffers.empty())
+  if (m_CompressedImageData.empty())
     return nullptr;
 
-  // uncompress image data, create an Image
-  Image::Pointer image = Image::New();
-  unsigned int dims[20]; // more than 20 dimensions and bang
-  for (unsigned int dim = 0; dim < m_ImageDimension; ++dim)
-    dims[dim] = m_ImageDimensions[dim];
+  const auto numSlices = static_cast<unsigned int>(m_CompressedImageData[0].size());
+  const auto numTimeSteps = static_cast<unsigned int>(m_CompressedImageData.size());
+  const auto numSliceBytes = m_PixelType->GetSize() * m_SliceDimensions[0] * m_SliceDimensions[1];
 
-  image->Initialize(*m_PixelType, m_ImageDimension, dims); // this IS needed, right ?? But it does allocate memory ->
-                                                           // does create one big lump of memory (also in windows)
+  std::array<unsigned int, 4> dimensions;
+  dimensions[0] = m_SliceDimensions[0];
+  dimensions[1] = m_SliceDimensions[1];
+  dimensions[2] = numSlices;
+  dimensions[3] = numTimeSteps;
 
-  unsigned int timeStep(0);
-  for (auto iter = m_ByteBuffers.begin(); iter != m_ByteBuffers.end(); ++iter, ++timeStep)
+  auto image = Image::New();
+  image->Initialize(*m_PixelType, m_Dimension, dimensions.data());
+
+  for (std::remove_const_t<decltype(numTimeSteps)> t = 0; t < numTimeSteps; ++t)
   {
-    ImageReadAccessor imgAcc(image, image->GetVolumeData(timeStep));
-    auto *dest((unsigned char *)imgAcc.GetData());
-    ::uLongf destLen(m_OneTimeStepImageSizeInBytes);
-    ::Bytef *source(iter->first);
-    ::uLongf sourceLen(iter->second);
-    int zlibRetVal = ::uncompress(dest, &destLen, source, sourceLen);
-    if (itk::Object::GetDebug())
+    ImageWriteAccessor accessor(image, image->GetVolumeData(static_cast<int>(t)));
+
+    for (std::remove_const_t<decltype(numSlices)> s = 0; s < numSlices; ++s)
     {
-      if (zlibRetVal == Z_OK)
-      {
-        MITK_INFO << "Success, destLen now " << destLen << " bytes" << std::endl;
-      }
-      else
-      {
-        switch (zlibRetVal)
-        {
-          case Z_DATA_ERROR:
-            MITK_ERROR << "compressed data corrupted" << std::endl;
-            break;
-          case Z_MEM_ERROR:
-            MITK_ERROR << "not enough memory" << std::endl;
-            break;
-          case Z_BUF_ERROR:
-            MITK_ERROR << "output buffer too small" << std::endl;
-            break;
-          default:
-            MITK_ERROR << "other, unspecified error" << std::endl;
-            break;
-        }
-      }
+      auto* dest = reinterpret_cast<char*>(accessor.GetData()) + numSliceBytes * s;
+      const auto& slice = m_CompressedImageData[t][s];
+      const auto destSize = LZ4_decompress_safe(slice.second, dest, slice.first, static_cast<int>(numSliceBytes));
+
+      if (0 > destSize)
+        MITK_ERROR << "LZ4 decompression failed!";
     }
   }
 
-  image->SetGeometry(m_ImageGeometry);
-  image->Modified();
+  image->SetTimeGeometry(m_TimeGeometry->Clone());
 
   return image;
 }

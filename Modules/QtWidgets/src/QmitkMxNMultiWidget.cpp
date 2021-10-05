@@ -100,13 +100,14 @@ void QmitkMxNMultiWidget::SetActiveRenderWindowWidget(RenderWindowWidgetPointer 
   {
     auto decorationColor = currentActiveRenderWindowWidget->GetDecorationColor();
     QColor hexColor(decorationColor[0] * 255, decorationColor[1] * 255, decorationColor[2] * 255);
-    currentActiveRenderWindowWidget->setStyleSheet("border: 2px solid " + hexColor.name(QColor::HexRgb));
+    currentActiveRenderWindowWidget->setStyleSheet("QmitkRenderWindowWidget { border: 2px solid " +
+                                                   hexColor.name(QColor::HexRgb) + "; }");
   }
 
   // set the new decoration color of the currently active render window widget
   if (nullptr != activeRenderWindowWidget)
   {
-    activeRenderWindowWidget->setStyleSheet("border: 2px solid #FF6464");
+    activeRenderWindowWidget->setStyleSheet("QmitkRenderWindowWidget { border: 2px solid #FF6464; }");
   }
 
   QmitkAbstractMultiWidget::SetActiveRenderWindowWidget(activeRenderWindowWidget);

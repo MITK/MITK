@@ -231,6 +231,7 @@ namespace mitk
     int m_IDShapeProperty;        // ID for mitkPointSetShape Enumeration Property "Pointset.2D.shape"
     bool m_FillShape;             // "Pointset.2D.fill shape" property
     float m_DistanceToPlane;      // "Pointset.2D.distance to plane" property
+    bool m_FixedSizeOnScreen;     // "Pointset.2D.fixed size on screen" property
   };
 
 } // namespace mitk

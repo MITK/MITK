@@ -10,71 +10,43 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkCompressedImageContainer_h_Included
-#define mitkCompressedImageContainer_h_Included
+#ifndef mitkCompressedImageContainer_h
+#define mitkCompressedImageContainer_h
 
-#include "MitkDataTypesExtExports.h"
-#include "mitkCommon.h"
-#include "mitkGeometry3D.h"
-#include "mitkImage.h"
-#include "mitkImageDataItem.h"
-
-#include <itkObject.h>
-
-#include <vector>
+#include <MitkDataTypesExtExports.h>
+#include <mitkImage.h>
+#include <array>
+#include <memory>
+#include <utility>
 
 namespace mitk
 {
-  /**
-    \brief Holds one (compressed) mitk::Image
-
-    Uses zlib to compress the data of an mitk::Image.
-
-    $Author$
-  */
-  class MITKDATATYPESEXT_EXPORT CompressedImageContainer : public itk::Object
+  class MITKDATATYPESEXT_EXPORT CompressedImageContainer
   {
   public:
-    mitkClassMacroItkParent(CompressedImageContainer, itk::Object);
-    itkFactorylessNewMacro(Self);
-    itkCloneMacro(Self);
+    CompressedImageContainer();
+    ~CompressedImageContainer();
 
-      /**
-       * \brief Creates a compressed version of the image.
-       *
-       * Will not hold any further SmartPointers to the image.
-       *
-       */
-      void SetImage(const Image *);
+    CompressedImageContainer(const CompressedImageContainer&) = delete;
+    CompressedImageContainer& operator=(const CompressedImageContainer&) = delete;
 
-    /**
-     * \brief Creates a full mitk::Image from its compressed version.
-     *
-     * This Method hold no buffer, so the uncompression algorithm will be
-     * executed every time you call this method. Don't overdo it.
-     *
-     */
-    Image::Pointer GetImage() const;
+    void CompressImage(const Image* image);
+    Image::Pointer DecompressImage() const;
 
-  protected:
-    CompressedImageContainer(); // purposely hidden
-    ~CompressedImageContainer() override;
+  private:
+    using CompressedSliceData = std::pair<int, char*>;
+    using CompressedTimeStepData = std::vector<CompressedSliceData>;
+    using CompressedImageData = std::vector<CompressedTimeStepData>;
 
-    PixelType *m_PixelType;
+    void ClearCompressedImageData();
 
-    unsigned int m_ImageDimension;
-    std::vector<unsigned int> m_ImageDimensions;
+    CompressedImageData m_CompressedImageData;
 
-    unsigned long m_OneTimeStepImageSizeInBytes;
-
-    unsigned int m_NumberOfTimeSteps;
-
-    /// one for each timestep. first = pointer to compressed data; second = size of buffer in bytes
-    std::vector<std::pair<unsigned char *, unsigned long>> m_ByteBuffers;
-
-    BaseGeometry::Pointer m_ImageGeometry;
+    std::unique_ptr<PixelType> m_PixelType;
+    TimeGeometry::Pointer m_TimeGeometry;
+    std::array<unsigned int, 2> m_SliceDimensions;
+    unsigned int m_Dimension;
   };
-
-} // namespace
+}
 
 #endif

@@ -209,7 +209,6 @@ set(CPP_FILES
   Interactions/mitkInteractionSchemeSwitcher.cpp
   Interactions/mitkInternalEvent.cpp
   Interactions/mitkMouseDoubleClickEvent.cpp
-  Interactions/mitkMouseModeSwitcher.cpp
   Interactions/mitkMouseMoveEvent.cpp
   Interactions/mitkMousePressEvent.cpp
   Interactions/mitkMouseReleaseEvent.cpp
@@ -306,6 +305,7 @@ Interactions/globalConfig.xml
 Interactions/DisplayInteraction.xml
 Interactions/DisplayConfig.xml
 Interactions/DisplayConfigPACS.xml
+Interactions/DisplayConfigPACSCrosshair.xml
 Interactions/DisplayConfigPACSPan.xml
 Interactions/DisplayConfigPACSScroll.xml
 Interactions/DisplayConfigPACSZoom.xml
@@ -316,6 +316,7 @@ Interactions/DisplayConfigMITKRotation.xml
 Interactions/DisplayConfigMITKRotationUnCoupled.xml
 Interactions/DisplayConfigMITKSwivel.xml
 Interactions/DisplayConfigMITKLimited.xml
+Interactions/DisplayConfigBlockLMB.xml
 Interactions/PointSet.xml
 Interactions/Legacy/StateMachine.xml
 Interactions/Legacy/DisplayConfigMITKTools.xml

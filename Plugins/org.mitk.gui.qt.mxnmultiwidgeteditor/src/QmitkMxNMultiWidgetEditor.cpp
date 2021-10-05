@@ -124,10 +124,6 @@ void QmitkMxNMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     }
     m_Impl->m_InteractionSchemeToolBar->SetInteractionEventHandler(multiWidget->GetInteractionEventHandler());
 
-    // show / hide PACS mouse mode interaction scheme toolbar
-    bool PACSInteractionScheme = preferences->GetBool("PACS like mouse interaction", false);
-    m_Impl->m_InteractionSchemeToolBar->setVisible(PACSInteractionScheme);
-
     multiWidget->SetDataStorage(GetDataStorage());
     multiWidget->InitializeMultiWidget();
     SetMultiWidget(multiWidget);
@@ -174,6 +170,5 @@ void QmitkMxNMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
     mitk::InteractionSchemeSwitcher::PACSStandard :
     mitk::InteractionSchemeSwitcher::MITKStandard);
 
-  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(GetDataStorage());
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

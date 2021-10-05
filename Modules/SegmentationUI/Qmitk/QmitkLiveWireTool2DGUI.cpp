@@ -12,8 +12,6 @@ found in the LICENSE file.
 
 #include "QmitkLiveWireTool2DGUI.h"
 
-#include "QmitkNewSegmentationDialog.h"
-
 #include "mitkBaseRenderer.h"
 #include "mitkStepper.h"
 #include <qlabel.h>

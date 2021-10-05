@@ -70,8 +70,23 @@ void QmitknnUNetToolGUI::OnTaskChanged(const QString &text)
   QString updatedPath = QDir::cleanPath(m_ModelDirectory + QDir::separator() + m_Controls.modelBox->currentText() +
                                         QDir::separator() + text);
   m_Controls.trainerBox->clear();
-  auto trainers = FetchFoldersFromDir<QStringList>(updatedPath);
-  std::for_each(trainers.begin(), trainers.end(), [this](QString trainer) { m_Controls.trainerBox->addItem(trainer); });
+  auto trainerPlanners = FetchFoldersFromDir<QStringList>(updatedPath);
+  QStringList trainers, planners;
+  foreach (QString trainerPlanner, trainerPlanners)
+  {
+    trainers << trainerPlanner.split("__", QString::SplitBehavior::SkipEmptyParts).first();
+    planners << trainerPlanner.split("__", QString::SplitBehavior::SkipEmptyParts).last();
+  }
+
+  trainers.removeDuplicates();
+  planners.removeDuplicates();
+
+  std::for_each(trainers.begin(),
+                trainers.end(),
+                [this](QString trainer) { m_Controls.trainerBox->addItem(trainer); });
+  std::for_each(planners.begin(),
+                planners.end(),
+                [this](QString planner) { m_Controls.plannerBox->addItem(planner); });
 }
 
 void QmitknnUNetToolGUI::OnTrainerChanged(const QString &trainerSelected)
@@ -81,6 +96,7 @@ void QmitknnUNetToolGUI::OnTrainerChanged(const QString &trainerSelected)
   {
     QString updatedPath(QDir::cleanPath(m_ModelDirectory + QDir::separator() + m_Controls.modelBox->currentText() +
                                         QDir::separator() + m_Controls.taskBox->currentText() + QDir::separator() +
+                                        m_Controls.trainerBox->currentText() + "__" +
                                         trainerSelected));
     auto folds = FetchFoldersFromDir<QStringList>(updatedPath);
     std::for_each(folds.begin(),

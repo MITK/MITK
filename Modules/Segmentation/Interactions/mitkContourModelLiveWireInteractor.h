@@ -58,11 +58,6 @@ namespace mitk
     void OnDeletePoint(StateMachineAction *, InteractionEvent *interactionEvent) override;
     void OnFinishEditing(StateMachineAction *, InteractionEvent *interactionEvent) override;
 
-    int SplitContourFromSelectedVertex(mitk::ContourModel *srcContour,
-                                       mitk::ContourModel *destContour,
-                                       bool fromSelectedUpwards,
-                                       int timestep);
-
     void SplitContourFromSelectedVertex(mitk::ContourModel *srcContour,
                                         const mitk::ContourModel::VertexType *nextPoint,
                                         const mitk::ContourModel::VertexType *previousPoint,

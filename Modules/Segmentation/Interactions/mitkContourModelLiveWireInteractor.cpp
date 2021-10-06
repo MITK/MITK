@@ -336,135 +336,6 @@ bool mitk::ContourModelLiveWireInteractor::IsHovering(const InteractionEvent *in
   return false;
 }
 
-int mitk::ContourModelLiveWireInteractor::SplitContourFromSelectedVertex(mitk::ContourModel *srcContour,
-                                                                         mitk::ContourModel *destContour,
-                                                                         bool fromSelectedUpwards,
-                                                                         int timestep)
-{
-  auto end = srcContour->IteratorEnd();
-  auto begin = srcContour->IteratorBegin();
-
-  // search next active control point to left and rigth and set as start and end point for filter
-  auto itSelected = begin;
-
-  // move iterator to position
-  while ((*itSelected) != srcContour->GetSelectedVertex())
-  {
-    itSelected++;
-  }
-
-  // CASE search upwards for next control point
-  if (fromSelectedUpwards)
-  {
-    auto itUp = itSelected;
-
-    if (itUp != end)
-    {
-      itUp++; // step once up otherwise the loop breaks immediately
-    }
-
-    while (itUp != end && !((*itUp)->IsControlPoint))
-    {
-      itUp++;
-    }
-
-    auto it = itUp;
-
-    if (itSelected != begin)
-    {
-      // copy the rest of the original contour
-      while (it != end)
-      {
-        destContour->AddVertex((*it)->Coordinates, (*it)->IsControlPoint, timestep);
-        it++;
-      }
-    }
-    // else do not copy the contour
-
-    // return the offset of iterator at one before next-vertex-upwards
-    if (itUp != begin)
-    {
-      return std::distance(begin, itUp) - 1;
-    }
-    else
-    {
-      return std::distance(begin, itUp);
-    }
-  }
-  else // CASE search downwards for next control point
-  {
-    auto itDown = itSelected;
-    auto it = srcContour->IteratorBegin();
-
-    if (itSelected != begin)
-    {
-      if (itDown != begin)
-      {
-        itDown--; // step once down otherwise the the loop breaks immediately
-      }
-
-      while (itDown != begin && !((*itDown)->IsControlPoint))
-      {
-        itDown--;
-      }
-
-      if (it != end) // if not empty
-      {
-        // always add the first vertex
-        destContour->AddVertex((*it)->Coordinates, (*it)->IsControlPoint, timestep);
-        it++;
-      }
-      // copy from begin to itDown
-      while (it <= itDown)
-      {
-        destContour->AddVertex((*it)->Coordinates, (*it)->IsControlPoint, timestep);
-        it++;
-      }
-    }
-    else
-    {
-      // if selected vertex is the first element search from end of contour downwards
-      itDown = end;
-      itDown--;
-      while (!((*itDown)->IsControlPoint) && itDown != begin)
-      {
-        itDown--;
-      }
-
-      // move one forward as we don't want the first control point
-      it++;
-      // move iterator to second control point
-      while ((it != end) && !((*it)->IsControlPoint))
-      {
-        it++;
-      }
-      // copy from begin to itDown
-      while (it <= itDown)
-      {
-        // copy the contour from second control point to itDown
-        destContour->AddVertex((*it)->Coordinates, (*it)->IsControlPoint, timestep);
-        it++;
-      }
-    }
-    /*
-        //add vertex at itDown - it's not considered during while loop
-        if( it != begin && it != end)
-        {
-          //destContour->AddVertex( (*it)->Coordinates, (*it)->IsControlPoint, timestep);
-        }
-    */
-    // return the offset of iterator at one after next-vertex-downwards
-    if (itDown != end)
-    {
-      return std::distance(begin, itDown); // + 1;//index of next vertex
-    }
-    else
-    {
-      return std::distance(begin, itDown) - 1;
-    }
-  }
-}
-
 void mitk::ContourModelLiveWireInteractor::SplitContourFromSelectedVertex(mitk::ContourModel *srcContour,
                                                                           const mitk::ContourModel::VertexType *nextPoint,
                                                                           const mitk::ContourModel::VertexType *previousPoint,
@@ -474,7 +345,9 @@ void mitk::ContourModelLiveWireInteractor::SplitContourFromSelectedVertex(mitk::
   m_ContourRight = mitk::ContourModel::New();
 
   auto it = srcContour->IteratorBegin();
+  // part between nextPoint and end of Countour
   bool upperPart = false;
+  // part between start of countour and previousPoint
   bool lowerPart = true;
 
   // edge cases when point right before first control vertex is selected or first control vertex is selected
@@ -499,27 +372,28 @@ void mitk::ContourModelLiveWireInteractor::SplitContourFromSelectedVertex(mitk::
 
   for (; it != srcContour->IteratorEnd(timeStep); it++)
   {
+    // everything in lower part should be added to m_CountoutLeft
     if (lowerPart)
     {
       m_ContourLeft->AddVertex((*it)->Coordinates, (*it)->IsControlPoint, timeStep);
     }
-
+    // start of "restricted area" where no vertex should be added to m_CountoutLeft or m_CountoutRight
     if (*it == previousPoint)
     {
       lowerPart = false;
       upperPart = false;
     }
-
+    // start of upperPart
     if (*it == nextPoint)
     {
       upperPart = true;
     }
-
+    // everything in upper part should be added to m_CountoutRight
     if (upperPart)
     {
       m_ContourRight->AddVertex((*it)->Coordinates, (*it)->IsControlPoint, timeStep);
     }
-
+    // all points in lower and upper part should be marked as repulsive points to not be changed
     if ((lowerPart && *it != previousPoint) || (upperPart && *it != nextPoint))
     {
       itk::Index<2> idx;

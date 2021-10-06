@@ -223,10 +223,12 @@ mitk::ContourElement::VertexType *mitk::ContourElement::BruteForceGetVertexAt(co
     if (vertexIndex < 0)
     {
       // for negative offset
+      // if the offset exceeds the first vertex, we start from the end of the vertex list backwards
       vertexIndex = verticesList.size() + offset;
     }
     else if (vertexIndex >= verticesList.size())
     {
+      // if the offset exceeds the last vertex, we start from the beginning of the vertex list
       vertexIndex = vertexIndex - verticesList.size();
     }
 

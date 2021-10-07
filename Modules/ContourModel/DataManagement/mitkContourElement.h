@@ -240,8 +240,7 @@ namespace mitk
 
     int BruteForceGetVertexIndexAt(const mitk::Point3D &point,
                                                       double eps,
-                                                      VertexListType verticesList,
-                                                      bool isControlPoint = false);
+                                                      VertexListType verticesList);
 
     /** Returns a list pointing to all vertices that are indicated to be control
      points.

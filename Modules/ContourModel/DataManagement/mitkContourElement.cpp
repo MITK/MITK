@@ -213,12 +213,11 @@ mitk::ContourElement::VertexType *mitk::ContourElement::BruteForceGetVertexAt(co
     verticesList = *this->GetVertexList();
   }
 
-  int vertexIndex = BruteForceGetVertexIndexAt(point, eps, verticesList, isControlPoint);
+  int vertexIndex = BruteForceGetVertexIndexAt(point, eps, verticesList);
 
   if (vertexIndex!=-1)
   {
     vertexIndex += offset;
-    auto size = (int) verticesList.size();
 
     if (vertexIndex < 0)
     {
@@ -226,7 +225,7 @@ mitk::ContourElement::VertexType *mitk::ContourElement::BruteForceGetVertexAt(co
       // if the offset exceeds the first vertex, we start from the end of the vertex list backwards
       vertexIndex = verticesList.size() + offset;
     }
-    else if (vertexIndex >= verticesList.size())
+    else if (vertexIndex >= (int) verticesList.size())
     {
       // if the offset exceeds the last vertex, we start from the beginning of the vertex list
       vertexIndex = vertexIndex - verticesList.size();
@@ -239,8 +238,7 @@ mitk::ContourElement::VertexType *mitk::ContourElement::BruteForceGetVertexAt(co
 
 int mitk::ContourElement::BruteForceGetVertexIndexAt(const mitk::Point3D &point,
                                                      double eps,
-                                                     VertexListType verticesList,
-                                                     bool isControlPoint)
+                                                     VertexListType verticesList)
 {
   if (eps < 0)
   {

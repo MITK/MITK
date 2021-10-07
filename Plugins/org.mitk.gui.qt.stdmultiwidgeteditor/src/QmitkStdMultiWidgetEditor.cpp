@@ -296,7 +296,6 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
   bool showLevelWindowWidget = preferences->GetBool("Show level/window widget", true);
   ShowLevelWindowWidget(showLevelWindowWidget);
 
-  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(GetDataStorage());
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 

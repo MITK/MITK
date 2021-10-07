@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include "../DataManagement/mitkBoundingShapeUtil.h"
 #include <mitkBoundingShapeInteractor.h>
 #include <mitkDisplayInteractor.h>
+#include <mitkDisplayActionEventBroadcast.h>
 #include <mitkInteractionConst.h>
 #include <mitkInteractionEventObserver.h>
 #include <mitkInteractionKeyEvent.h>
@@ -568,7 +569,14 @@ void mitk::BoundingShapeInteractor::EnableCrosshairNavigation()
       {
         // here the regular configuration is loaded again
         displayInteractor->SetEventConfig(it->second);
-        //    MITK_INFO << "restore config";
+      }
+
+      mitk::DisplayActionEventBroadcast *displayActionEventBroadcast = static_cast<mitk::DisplayActionEventBroadcast *>(
+        us::GetModuleContext()->GetService<mitk::InteractionEventObserver>(it->first));
+      if (displayActionEventBroadcast != nullptr)
+      {
+        // here the regular configuration is loaded again
+        displayActionEventBroadcast->SetEventConfig(it->second);
       }
     }
   }
@@ -600,8 +608,17 @@ void mitk::BoundingShapeInteractor::DisableCrosshairNavigation()
       // remember the original configuration
       m_Impl->DisplayInteractorConfigs.insert(std::make_pair(*it, displayInteractor->GetEventConfig()));
       // here the alternative configuration is loaded
-      displayInteractor->SetEventConfig("DisplayConfigMITKNoCrosshair.xml");
-      //     MITK_INFO << "change config";
+      displayInteractor->AddEventConfig("DisplayConfigBlockLMB.xml");
+    }
+
+    auto *displayActionEventBroadcast =
+      dynamic_cast<mitk::DisplayActionEventBroadcast *>(us::GetModuleContext()->GetService<mitk::InteractionEventObserver>(*it));
+    if (displayActionEventBroadcast != nullptr)
+    {
+      // remember the original configuration
+      m_Impl->DisplayInteractorConfigs.insert(std::make_pair(*it, displayActionEventBroadcast->GetEventConfig()));
+      // here the alternative configuration is loaded
+      displayActionEventBroadcast->AddEventConfig("DisplayConfigBlockLMB.xml");
     }
   }
 

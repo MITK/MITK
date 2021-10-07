@@ -53,13 +53,17 @@ namespace mitk
       std::vector<std::string> files;
       for (unsigned long idx = 0; idx<input.GetNumberOfFiles(); idx++)
       {
-        if (!itksys::SystemTools::FileIsDirectory(input.GetFile(idx)))
+        auto filename = input.GetFile(idx);
+        if (!itksys::SystemTools::FileIsDirectory(filename) && this->MatchesExtension(filename))
         {
           std::string fullpath = path + "/" + std::string(input.GetFile(idx));
           files.push_back(fullpath.c_str());
         }
       }
-      filepath = files.front();
+      if (!files.empty())
+      {
+        filepath = files.front();
+      }
     }
 
     // Ask the GDCM ImageIO class directly

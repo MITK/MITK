@@ -382,10 +382,11 @@ void QmitkMultiLabelSegmentationView::OnNewLabel()
     return;
   }
 
-  if (nullptr == m_ReferenceNode->GetData())
+  mitk::Image::ConstPointer referenceImage = dynamic_cast<mitk::Image *>(m_ReferenceNode->GetData());
+  if (referenceImage.IsNull())
   {
     QMessageBox::information(
-      m_Parent, "New Segmentation Session", "Please load and select a patient image before starting some action.");
+      m_Parent, "New Segmentation Session", "Reference data needs to be an image in order to create a new segmentation.");
     return;
   }
 
@@ -425,7 +426,7 @@ void QmitkMultiLabelSegmentationView::OnNewLabel()
   UpdateControls();
   m_Controls.m_LabelSetWidget->ResetAllTableWidgetItems();
 
-  this->ReinitializeViews();
+  this->InitializeRenderWindows(referenceImage->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, false);
 }
 
 void QmitkMultiLabelSegmentationView::OnSavePreset()
@@ -723,6 +724,21 @@ void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(QList<mitk:
 {
   m_ToolManager->ActivateTool(-1);
 
+  if (m_ReferenceNode.IsNull())
+  {
+    QMessageBox::information(
+      m_Parent, "Selected segmentation changed", "Please load and select a patient image before starting some action.");
+    return;
+  }
+
+  mitk::Image::ConstPointer referenceImage = dynamic_cast<mitk::Image *>(m_ReferenceNode->GetData());
+  if (referenceImage.IsNull())
+  {
+    QMessageBox::information(
+      m_Parent, "Selected segmentation changed", "Reference data needs to be an image in order to create a new segmentation.");
+    return;
+  }
+
   if (m_WorkingNode.IsNotNull())
     OnLooseLabelSetConnection();
 
@@ -748,7 +764,7 @@ void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(QList<mitk:
   if (m_WorkingNode.IsNotNull())
   {
     m_Controls.m_LabelSetWidget->ResetAllTableWidgetItems();
-    this->ReinitializeViews();
+    this->InitializeRenderWindows(referenceImage->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, false);
   }
 }
 
@@ -1073,21 +1089,5 @@ void QmitkMultiLabelSegmentationView::InitializeListeners()
     props["name"] = std::string("SegmentationInteraction");
     m_ServiceRegistration =
       us::GetModuleContext()->RegisterService<mitk::InteractionEventObserver>(m_Interactor.GetPointer(), props);
-  }
-}
-
-void QmitkMultiLabelSegmentationView::ReinitializeViews() const
-{
-  if (m_ReferenceNode.IsNotNull() && nullptr != m_ReferenceNode->GetData())
-  {
-    const auto currentTimePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
-    unsigned int imageTimeStep = 0;
-    if (m_ReferenceNode->GetData()->GetTimeGeometry()->IsValidTimePoint(currentTimePoint))
-    {
-      imageTimeStep = m_ReferenceNode->GetData()->GetTimeGeometry()->TimePointToTimeStep(currentTimePoint);
-    }
-
-    mitk::RenderingManager::GetInstance()->InitializeViews(m_ReferenceNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
-    mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->SetPos(imageTimeStep);
   }
 }

@@ -26,10 +26,10 @@ namespace mitk
   /**
     \brief Applies difference images to 3D images.
 
-    This class is supposed to execute ApplyDiffImageOperations, which contain information about pixel changes within one
-    image slice.
-    Class should be called from the undo stack. At the moment, ApplyDiffImageOperations are only created by
-    OverwriteSliceImageFilter.
+    This class is supposed to execute ApplyDiffImageOperations, which contain information about
+    pixel changes within one image slice.
+    Class should be called from the undo stack.
+    At the moment, ApplyDiffImageOperations are only created by QmitkSlicesInterpolator.
 
     $Author: maleike $
   */

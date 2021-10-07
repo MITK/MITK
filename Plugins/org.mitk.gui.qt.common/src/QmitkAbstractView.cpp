@@ -326,7 +326,8 @@ mitk::IRenderWindowPart* QmitkAbstractView::GetRenderWindowPart(mitk::WorkbenchU
 void QmitkAbstractView::RequestRenderWindowUpdate(mitk::RenderingManager::RequestType requestType)
 {
   mitk::IRenderWindowPart* renderPart = this->GetRenderWindowPart();
-  if (renderPart == nullptr) return;
+  if (renderPart == nullptr)
+    return;
 
   if (mitk::IRenderingManager* renderingManager = renderPart->GetRenderingManager())
   {
@@ -335,6 +336,47 @@ void QmitkAbstractView::RequestRenderWindowUpdate(mitk::RenderingManager::Reques
   else
   {
     renderPart->RequestUpdate(requestType);
+  }
+}
+
+void QmitkAbstractView::InitializeRenderWindows(const mitk::TimeGeometry *referenceGeometry,
+                                        mitk::RenderingManager::RequestType requestType,
+                                        bool resetCamera)
+{
+  mitk::IRenderWindowPart* renderWindowPart = this->GetRenderWindowPart();
+  if (nullptr == renderWindowPart)
+  {
+    return;
+  }
+
+  mitk::IRenderingManager* renderingManager = renderWindowPart->GetRenderingManager();
+  if (nullptr == renderingManager)
+  {
+    return;
+  }
+
+  mitk::Point3D currentPosition = mitk::Point3D();
+  unsigned int imageTimeStep = 0;
+  if (!resetCamera)
+  {
+    // store the current position to set it again later, if the camera should not be reset
+    currentPosition = renderWindowPart->GetSelectedPosition();
+
+    // store the current time step to set it again later, if the camera should not be reset
+    const auto currentTimePoint = renderingManager->GetTimeNavigationController()->GetSelectedTimePoint();
+    if (referenceGeometry->IsValidTimePoint(currentTimePoint))
+    {
+      imageTimeStep = referenceGeometry->TimePointToTimeStep(currentTimePoint);
+    }
+  }
+
+  // initialize render windows
+  renderingManager->InitializeViews(referenceGeometry, requestType, resetCamera);
+
+  if (!resetCamera)
+  {
+    renderWindowPart->SetSelectedPosition(currentPosition);
+    renderingManager->GetTimeNavigationController()->GetTime()->SetPos(imageTimeStep);
   }
 }
 
@@ -386,8 +428,7 @@ berry::IPreferences::Pointer QmitkAbstractView::GetPreferences() const
   return prefService ? prefService->GetSystemPreferences()->Node(id): berry::IPreferences::Pointer(nullptr);
 }
 
-mitk::DataStorage::Pointer
-QmitkAbstractView::GetDataStorage() const
+mitk::DataStorage::Pointer QmitkAbstractView::GetDataStorage() const
 {
   mitk::IDataStorageService* dsService = d->m_DataStorageServiceTracker.getService();
 

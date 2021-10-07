@@ -229,22 +229,19 @@ void QmitkRenderWindowWidget::InitializeDecorations()
   float black[3] = { 0.0f, 0.0f, 0.0f };
   SetGradientBackgroundColors(black, black);
 
-  // initialize decoration color, rectangle and annotation text
-  float white[3] = { 1.0f, 1.0f, 1.0f };
-  m_DecorationColor = white;
-
+  // initialize annotation text and decoration color
   setFrameStyle(QFrame::Box | QFrame::Plain);
-  QColor hexColor(m_DecorationColor[0] * 255, m_DecorationColor[1] * 255, m_DecorationColor[2] * 255);
-  setStyleSheet("border: 2px solid " + hexColor.name(QColor::HexRgb));
 
   m_CornerAnnotation = vtkSmartPointer<vtkCornerAnnotation>::New();
   m_CornerAnnotation->SetText(0, "Sagittal");
   m_CornerAnnotation->SetMaximumFontSize(12);
-  m_CornerAnnotation->GetTextProperty()->SetColor(m_DecorationColor[0], m_DecorationColor[1], m_DecorationColor[2]);
   if (0 == vtkRenderer->HasViewProp(m_CornerAnnotation))
   {
     vtkRenderer->AddViewProp(m_CornerAnnotation);
   }
+
+  float white[3] = { 1.0f, 1.0f, 1.0f };
+  SetDecorationColor(mitk::Color(white));
 }
 
 void QmitkRenderWindowWidget::SetCrosshair(mitk::Point3D selectedPoint)

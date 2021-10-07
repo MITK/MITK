@@ -14,8 +14,6 @@ set(CPP_FILES
   Algorithms/mitkImageToLiveWireContourFilter.cpp
   Algorithms/mitkManualSegmentationToSurfaceFilter.cpp
   Algorithms/mitkOtsuSegmentationFilter.cpp
-  Algorithms/mitkOverwriteDirectedPlaneImageFilter.cpp
-  Algorithms/mitkOverwriteSliceImageFilter.cpp
   Algorithms/mitkSegmentationObjectFactory.cpp
   Algorithms/mitkShapeBasedInterpolationAlgorithm.cpp
   Algorithms/mitkShowSegmentationAsSmoothedSurface.cpp

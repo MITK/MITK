@@ -14,9 +14,6 @@ set(MODULE_TESTS
   mitkToolInteractionTest.cpp
 )
 
-set(MODULE_IMAGE_TESTS
-  mitkOverwriteSliceImageFilterTest.cpp #only runs on images
-)
 set(MODULE_CUSTOM_TESTS
 )
 

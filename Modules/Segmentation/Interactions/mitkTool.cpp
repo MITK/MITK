@@ -32,7 +32,7 @@ found in the LICENSE file.
 #include <itkObjectFactory.h>
 
 mitk::Tool::Tool(const char *type, const us::Module *interactorModule)
-  : m_EventConfig("DisplayConfigMITK.xml"),
+  : m_EventConfig(""),
     m_ToolManager(nullptr),
     m_PredicateImages(NodePredicateDataType::New("Image")), // for reference images
     m_PredicateDim3(NodePredicateDimension::New(3, 1)),
@@ -150,7 +150,7 @@ void mitk::Tool::Activated()
       // remember the original configuration
       m_DisplayInteractorConfigs.insert(std::make_pair(*it, displayInteractor->GetEventConfig()));
       // here the alternative configuration is loaded
-      displayInteractor->SetEventConfig(m_EventConfig.c_str());
+      displayInteractor->AddEventConfig(m_EventConfig.c_str());
     }
 
     auto displayActionEventBroadcast = dynamic_cast<DisplayActionEventBroadcast*>(us::GetModuleContext()->GetService<InteractionEventObserver>(*it));
@@ -159,7 +159,7 @@ void mitk::Tool::Activated()
       // remember the original configuration
       m_DisplayInteractorConfigs.insert(std::make_pair(*it, displayActionEventBroadcast->GetEventConfig()));
       // here the alternative configuration is loaded
-      displayActionEventBroadcast->SetEventConfig(m_EventConfig.c_str());
+      displayActionEventBroadcast->AddEventConfig(m_EventConfig.c_str());
     }
   }
 }

@@ -71,7 +71,7 @@ namespace ReinitAction
       {
         if (nullptr == baseRenderer)
         {
-          mitk::RenderingManager::GetInstance()->InitializeViews(image->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+          mitk::RenderingManager::GetInstance()->InitializeViews(image->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL);
         }
         else
         {

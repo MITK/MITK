@@ -28,14 +28,14 @@ namespace itk
     : m_Nodes(nullptr),
       m_Graph_NumberOfNodes(0),
       m_Graph_fullNeighbors(false),
+      m_useCostFunction(true),
       m_FullNeighborsMode(false),
       m_MakeOutputImage(true),
       m_StoreVectorOrder(false),
       m_CalcAllDistances(false),
       multipleEndPoints(false),
       m_ActivateTimeOut(false),
-      m_Initialized(false),
-      m_useCostFunction(true)
+      m_Initialized(false)
   {
     m_endPoints.clear();
     m_endPointsClosed.clear();

@@ -156,7 +156,7 @@ namespace itk
     itkGetObjectMacro(CostFunction, CostFunctionType);
 
     void SetUseCostFunction(bool doUseCostFunction) { m_useCostFunction = doUseCostFunction; };
-    bool GetUseCostFunction(){return m_useCostFunction};
+    bool GetUseCostFunction() { return m_useCostFunction; };
 
   protected:
     std::vector<IndexType>

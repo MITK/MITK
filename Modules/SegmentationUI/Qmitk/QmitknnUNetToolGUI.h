@@ -67,12 +67,6 @@ protected slots:
    * @brief Qt slot
    *
    */
-  void OnPythonChanged(const QString &);
-
-  /**
-   * @brief Qt slot
-   *
-   */
   void OnCheckBoxChanged(int);
 
   /**
@@ -94,6 +88,12 @@ protected slots:
    */
   void OnModalitiesNumberChanged(int);
 
+  /**
+   * @brief Qt Slot
+   *
+   */
+  void OnPythonPathChanged(const QString &);
+
 signals:
   /**
    * @brief signal for starting the segmentation which is caught by a worker thread.
@@ -109,6 +109,11 @@ protected:
   void EnableWidgets(bool enabled) override;
 
 private:
+  /**
+   * @brief Creates a QMessage object and shows on screen.
+   */
+  void ShowErrorMessage(std::string &);
+
   /**
    * @brief Searches and parses paths of python virtual enviroments
    * from predefined lookout locations
@@ -176,6 +181,8 @@ private:
    *
    */
   std::vector<ctkPathLineEdit *> m_ModalPaths;
+
+  std::vector<QSpinBox *> m_ModalOrder;
 
   /**
    * @brief Stores row count of the "advancedSettingsLayout" layout element. This value helps dynamically add

@@ -28,12 +28,7 @@ QmitknnUNetToolGUI::QmitknnUNetToolGUI() : QmitkAutoMLSegmentationToolGUIBase()
   // Pytorch uses its own libraries to communicate to the GPUs. Hence, only a warning can be given.
   if (m_GpuLoader.GetGPUCount() == 0)
   {
-    std::stringstream stream;
-    stream << "WARNING: No GPUs were detected on your machine. The nnUNet plugin might not work.";
-    QMessageBox *messageBox = new QMessageBox(QMessageBox::Critical, nullptr, stream.str().c_str());
-    messageBox->exec();
-    delete messageBox;
-    MITK_WARN << stream.str();
+    ShowErrorMessage(std::string("WARNING: No GPUs were detected on your machine. The nnUNet tool might not work."));
   }
   m_SegmentationThread = new QThread(this);
   m_Worker = new nnUNetSegmentationWorker;
@@ -55,7 +50,6 @@ void QmitknnUNetToolGUI::ConnectNewTool(mitk::AutoSegmentationWithPreviewTool *n
 void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
 {
   m_Controls.setupUi(this);
-
 #ifndef _WIN32
   m_Controls.pythonEnvComboBox->addItem("/usr/bin");
 #endif
@@ -81,7 +75,7 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
           SIGNAL(activated(const QString &)),
 #endif
           this,
-          SLOT(OnPythonChanged(const QString &)));
+          SLOT(OnPythonPathChanged(const QString &)));
 
   connect(this, &QmitknnUNetToolGUI::Operate, m_Worker, &nnUNetSegmentationWorker::DoWork);
   connect(m_Worker, &nnUNetSegmentationWorker::Finished, this, &QmitknnUNetToolGUI::SegmentationResultHandler);
@@ -94,7 +88,7 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   m_Controls.multiModalSpinLabel->setVisible(false);
 
   m_Controls.statusLabel->setTextFormat(Qt::RichText);
-  m_Controls.statusLabel->setText("<b>STATUS: </b><i>No Tasks Running. " + QString::number(m_GpuLoader.GetGPUCount()) +
+  m_Controls.statusLabel->setText("<b>STATUS: </b><i>Welcome to nnUNet. " + QString::number(m_GpuLoader.GetGPUCount()) +
                                   " GPUs were detected.</i>");
 
   if (m_GpuLoader.GetGPUCount() != 0)
@@ -250,7 +244,28 @@ std::vector<std::string> QmitknnUNetToolGUI::FetchMultiModalPathsFromUI()
   return paths;
 }
 
-bool QmitknnUNetToolGUI::IsNNUNetInstalled(const QString &text)
+bool QmitknnUNetToolGUI::IsNNUNetInstalled(const QString &pythonPath)
 {
-  return QFile::exists(text + QDir::separator() + QString("nnUNet_predict"));
+  QString fullPath = pythonPath;
+#ifdef _WIN32
+  if (!(fullPath.endsWith("Scripts", Qt::CaseInsensitive) || fullPath.endsWith("Scripts/", Qt::CaseInsensitive)))
+  {
+    fullPath += QDir::separator() + QString("Scripts");
+  }
+#else
+  if (!(fullPath.endsWith("bin", Qt::CaseInsensitive) || fullPath.endsWith("bin/", Qt::CaseInsensitive)))
+  {
+    fullPath += QDir::separator() + QString("bin");
+  }
+#endif
+  return QFile::exists(fullPath + QDir::separator() + QString("nnUNet_predict"));
+}
+
+void QmitknnUNetToolGUI::ShowErrorMessage(std::string &message)
+{
+  this->setCursor(Qt::ArrowCursor);
+  QMessageBox *messageBox = new QMessageBox(QMessageBox::Critical, nullptr, message.c_str());
+  messageBox->exec();
+  delete messageBox;
+  MITK_WARN << message;
 }

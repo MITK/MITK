@@ -6,6 +6,9 @@
 #include <QStringListModel>
 #include <QtGlobal>
 #include <algorithm>
+#include <QTextStream>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 void QmitknnUNetToolGUI::EnableWidgets(bool enabled)
 {
@@ -77,16 +80,10 @@ void QmitknnUNetToolGUI::OnTaskChanged(const QString &text)
     trainers << trainerPlanner.split("__", QString::SplitBehavior::SkipEmptyParts).first();
     planners << trainerPlanner.split("__", QString::SplitBehavior::SkipEmptyParts).last();
   }
-
   trainers.removeDuplicates();
   planners.removeDuplicates();
-
-  std::for_each(trainers.begin(),
-                trainers.end(),
-                [this](QString trainer) { m_Controls.trainerBox->addItem(trainer); });
-  std::for_each(planners.begin(),
-                planners.end(),
-                [this](QString planner) { m_Controls.plannerBox->addItem(planner); });
+  std::for_each(trainers.begin(), trainers.end(), [this](QString trainer) { m_Controls.trainerBox->addItem(trainer); });
+  std::for_each(planners.begin(), planners.end(), [this](QString planner) { m_Controls.plannerBox->addItem(planner); });
 }
 
 void QmitknnUNetToolGUI::OnTrainerChanged(const QString &trainerSelected)
@@ -96,8 +93,7 @@ void QmitknnUNetToolGUI::OnTrainerChanged(const QString &trainerSelected)
   {
     QString updatedPath(QDir::cleanPath(m_ModelDirectory + QDir::separator() + m_Controls.modelBox->currentText() +
                                         QDir::separator() + m_Controls.taskBox->currentText() + QDir::separator() +
-                                        m_Controls.trainerBox->currentText() + "__" +
-                                        trainerSelected));
+                                        m_Controls.trainerBox->currentText() + "__" + trainerSelected));
     auto folds = FetchFoldersFromDir<QStringList>(updatedPath);
     std::for_each(folds.begin(),
                   folds.end(),
@@ -117,7 +113,7 @@ void QmitknnUNetToolGUI::OnTrainerChanged(const QString &trainerSelected)
   }
 }
 
-void QmitknnUNetToolGUI::OnPythonChanged(const QString &pyEnv)
+void QmitknnUNetToolGUI::OnPythonPathChanged(const QString &pyEnv)
 {
   if (pyEnv == QString("Select"))
   {
@@ -127,6 +123,39 @@ void QmitknnUNetToolGUI::OnPythonChanged(const QString &pyEnv)
     {
       m_Controls.pythonEnvComboBox->insertItem(0, path);
       m_Controls.pythonEnvComboBox->setCurrentIndex(0);
+    }
+  }
+  else
+  {
+     if (!IsNNUNetInstalled(pyEnv))
+    {
+    //QString nnUNetPath =
+    //  "C://DKFZ//nnUNet_work//nnUNet//nnunet//inference//pretrained_models//download_pretrained_model.py";
+    //QFile file(nnUNetPath);
+    //if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    //  return;
+    //QTextStream in(&file);
+    //QString lines = in.readAll();
+    //int startPos = lines.indexOf("available_models =") + 18;
+    //int endPos = lines.indexOf("return available_models");
+    //int length = endPos - startPos;
+    //QString pyFn = lines.mid(startPos,length);
+    //MITK_INFO << pyFn.toStdString();
+    //QStringList pyFnLines =  pyFn.split(QRegExp("[\r\n]"), QString::SkipEmptyParts);
+    //for (i = pyFnLines.begin(); i != pyFnLines.end(); ++i)
+    //{
+
+    //}
+    //  
+    //std::for_each(keys.begin(), keys.end(), [this](QString planner) { m_Controls.taskComboBox->addItem(planner); });
+
+    //  
+    //}
+    //else
+    //{
+      ShowErrorMessage(
+        std::string("WARNING: nnUNet is not detected on the Python environment you selected. Please select another "
+                    "environment or create one. For more info refer https://github.com/MIC-DKFZ/nnUNet"));
     }
   }
 }
@@ -152,8 +181,22 @@ void QmitknnUNetToolGUI::OnCheckBoxChanged(int state)
       m_Controls.multiModalSpinBox->setVisible(visibility);
       if (!visibility)
       {
-       OnModalitiesNumberChanged(0);
-       m_Controls.multiModalSpinBox->setValue(0);
+        OnModalitiesNumberChanged(0);
+        m_Controls.multiModalSpinBox->setValue(0);
+      }
+      else
+      {
+        ctkPathLineEdit *multiModalPath = new ctkPathLineEdit(this);
+        QSpinBox *multiModalOrderBox = new QSpinBox(this);
+        multiModalPath->setObjectName(QString("multiModalPath" + QString::number(0)));
+        multiModalPath->setCurrentPath("default_loaded_image");
+        multiModalPath->setDisabled(true);
+        m_Controls.advancedSettingsLayout->addWidget(
+          multiModalPath, this->m_UI_ROWS + m_ModalPaths.size() + 1, 1, 1, 3);
+        m_Controls.advancedSettingsLayout->addWidget(multiModalOrderBox, this->m_UI_ROWS + m_ModalPaths.size() + 1, 0);
+        m_ModalPaths.push_back(multiModalPath);
+        m_ModalOrder.push_back(multiModalOrderBox);
+        m_UI_ROWS += 1;
       }
     }
   }
@@ -164,15 +207,21 @@ void QmitknnUNetToolGUI::OnModalitiesNumberChanged(int num)
   while (num > static_cast<int>(this->m_ModalPaths.size()))
   {
     ctkPathLineEdit *multiModalPath = new ctkPathLineEdit(this);
+    QSpinBox *multiModalOrderBox = new QSpinBox(this);
     multiModalPath->setObjectName(QString("multiModalPath" + QString::number(m_ModalPaths.size() + 1)));
     m_Controls.advancedSettingsLayout->addWidget(multiModalPath, this->m_UI_ROWS + m_ModalPaths.size() + 1, 1, 1, 3);
+    m_Controls.advancedSettingsLayout->addWidget(multiModalOrderBox, this->m_UI_ROWS + m_ModalPaths.size() + 1, 0);
     m_ModalPaths.push_back(multiModalPath);
+    m_ModalOrder.push_back(multiModalOrderBox);
   }
-  while (num < static_cast<int>(this->m_ModalPaths.size()) && !m_ModalPaths.empty())
+  while (num < static_cast<int>(this->m_ModalPaths.size() - 1) && !m_ModalPaths.empty())
   {
     ctkPathLineEdit *child = m_ModalPaths.back();
     delete child; // delete the layout item
     m_ModalPaths.pop_back();
+    auto *_child = m_ModalOrder.back();
+    delete _child; // delete the layout item
+    m_ModalOrder.pop_back();
   }
   m_Controls.advancedSettingsLayout->update();
 }

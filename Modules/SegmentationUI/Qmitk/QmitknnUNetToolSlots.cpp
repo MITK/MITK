@@ -2,13 +2,7 @@
 #include <QDir>
 #include <QDirIterator>
 #include <QMessageBox>
-#include <QProcess>
-#include <QStringListModel>
-#include <QtGlobal>
 #include <algorithm>
-#include <QTextStream>
-#include <QJsonDocument>
-#include <QJsonObject>
 
 void QmitknnUNetToolGUI::EnableWidgets(bool enabled)
 {
@@ -125,38 +119,12 @@ void QmitknnUNetToolGUI::OnPythonPathChanged(const QString &pyEnv)
       m_Controls.pythonEnvComboBox->setCurrentIndex(0);
     }
   }
-  else
+  else if (!IsNNUNetInstalled(pyEnv))
   {
-     if (!IsNNUNetInstalled(pyEnv))
-    {
-    //QString nnUNetPath =
-    //  "C://DKFZ//nnUNet_work//nnUNet//nnunet//inference//pretrained_models//download_pretrained_model.py";
-    //QFile file(nnUNetPath);
-    //if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-    //  return;
-    //QTextStream in(&file);
-    //QString lines = in.readAll();
-    //int startPos = lines.indexOf("available_models =") + 18;
-    //int endPos = lines.indexOf("return available_models");
-    //int length = endPos - startPos;
-    //QString pyFn = lines.mid(startPos,length);
-    //MITK_INFO << pyFn.toStdString();
-    //QStringList pyFnLines =  pyFn.split(QRegExp("[\r\n]"), QString::SkipEmptyParts);
-    //for (i = pyFnLines.begin(); i != pyFnLines.end(); ++i)
-    //{
-
-    //}
-    //  
-    //std::for_each(keys.begin(), keys.end(), [this](QString planner) { m_Controls.taskComboBox->addItem(planner); });
-
-    //  
-    //}
-    //else
-    //{
-      ShowErrorMessage(
-        std::string("WARNING: nnUNet is not detected on the Python environment you selected. Please select another "
-                    "environment or create one. For more info refer https://github.com/MIC-DKFZ/nnUNet"));
-    }
+    std::string warning =
+      "WARNING: nnUNet is not detected on the Python environment you selected. Please select another "
+      "environment or create one. For more info refer https://github.com/MIC-DKFZ/nnUNet";
+    ShowErrorMessage(warning);
   }
 }
 

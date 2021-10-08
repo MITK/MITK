@@ -14,10 +14,7 @@ found in the LICENSE file.
 
 #include "mitknnUnetTool.h"
 #include <QDir>
-#include <QDirIterator>
 #include <QMessageBox>
-#include <QOpenGLWidget>
-#include <QProcess>
 #include <QtGlobal>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitknnUNetToolGUI, "")
@@ -28,7 +25,8 @@ QmitknnUNetToolGUI::QmitknnUNetToolGUI() : QmitkAutoMLSegmentationToolGUIBase()
   // Pytorch uses its own libraries to communicate to the GPUs. Hence, only a warning can be given.
   if (m_GpuLoader.GetGPUCount() == 0)
   {
-    ShowErrorMessage(std::string("WARNING: No GPUs were detected on your machine. The nnUNet tool might not work."));
+    std::string warning= "WARNING: No GPUs were detected on your machine. The nnUNet tool might not work.";
+    ShowErrorMessage(warning);
   }
   m_SegmentationThread = new QThread(this);
   m_Worker = new nnUNetSegmentationWorker;

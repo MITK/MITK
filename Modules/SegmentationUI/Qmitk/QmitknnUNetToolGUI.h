@@ -21,7 +21,9 @@ found in the LICENSE file.s
 #include <MitkSegmentationUIExports.h>
 #include <QCache>
 #include <QThread>
+#include <QMessageBox>
 #include <ctkPathLineEdit.h>
+#include <QmitkDataStorageComboBox.h>
 
 class MITKSEGMENTATIONUI_EXPORT QmitknnUNetToolGUI : public QmitkAutoMLSegmentationToolGUIBase
 {
@@ -94,6 +96,12 @@ protected slots:
    */
   void OnPythonPathChanged(const QString &);
 
+  /**
+   * @brief Qt Slot
+   *
+   */
+  void OnModalPositionChanged(int);
+
 signals:
   /**
    * @brief signal for starting the segmentation which is caught by a worker thread.
@@ -112,7 +120,7 @@ private:
   /**
    * @brief Creates a QMessage object and shows on screen.
    */
-  void ShowErrorMessage(std::string &);
+  void ShowErrorMessage(std::string &, QMessageBox::Icon = QMessageBox::Critical);
 
   /**
    * @brief Searches and parses paths of python virtual enviroments
@@ -180,9 +188,9 @@ private:
    * @brief Stores all dynamically added ctk-path-line-edit UI elements.
    *
    */
-  std::vector<ctkPathLineEdit *> m_ModalPaths;
+  std::vector<QmitkDataStorageComboBox *> m_Modalities;
 
-  std::vector<QSpinBox *> m_ModalOrder;
+  mitk::NodePredicateBase::Pointer m_MultiModalPredicate;
 
   /**
    * @brief Stores row count of the "advancedSettingsLayout" layout element. This value helps dynamically add

@@ -147,24 +147,26 @@ void QmitknnUNetToolGUI::OnCheckBoxChanged(int state)
     {
       m_Controls.multiModalSpinLabel->setVisible(visibility);
       m_Controls.multiModalSpinBox->setVisible(visibility);
+      m_Controls.posSpinBoxLabel->setVisible(visibility);
+      m_Controls.posSpinBox->setVisible(visibility);
       if (!visibility)
       {
         OnModalitiesNumberChanged(0);
         m_Controls.multiModalSpinBox->setValue(0);
+        m_Controls.posSpinBox->setMaximum(0);
       }
       else
       {
-        ctkPathLineEdit *multiModalPath = new ctkPathLineEdit(this);
-        QSpinBox *multiModalOrderBox = new QSpinBox(this);
-        multiModalPath->setObjectName(QString("multiModalPath" + QString::number(0)));
-        multiModalPath->setCurrentPath("default_loaded_image");
-        multiModalPath->setDisabled(true);
-        m_Controls.advancedSettingsLayout->addWidget(
-          multiModalPath, this->m_UI_ROWS + m_ModalPaths.size() + 1, 1, 1, 3);
-        m_Controls.advancedSettingsLayout->addWidget(multiModalOrderBox, this->m_UI_ROWS + m_ModalPaths.size() + 1, 0);
-        m_ModalPaths.push_back(multiModalPath);
-        m_ModalOrder.push_back(multiModalOrderBox);
-        m_UI_ROWS += 1;
+        QmitkDataStorageComboBox *defaultImage = new QmitkDataStorageComboBox(this, true);
+        defaultImage->setObjectName(QString("multiModal_" + QString::number(0)));
+        mitk::nnUNetTool::Pointer tool = this->GetConnectedToolAs<mitk::nnUNetTool>();
+        defaultImage->SetDataStorage(tool->GetDataStorage());
+        defaultImage->SetSelectedNode(tool->GetDataStorage()->GetNode());
+        defaultImage->setDisabled(true);
+        m_Controls.advancedSettingsLayout->addWidget(defaultImage, this->m_UI_ROWS + m_Modalities.size() + 1, 1, 1, 3);
+        m_Modalities.push_back(defaultImage);
+        m_Controls.posSpinBox->setMaximum(this->m_Modalities.size() - 1);
+        m_UI_ROWS++;
       }
     }
   }
@@ -172,26 +174,62 @@ void QmitknnUNetToolGUI::OnCheckBoxChanged(int state)
 
 void QmitknnUNetToolGUI::OnModalitiesNumberChanged(int num)
 {
-  while (num > static_cast<int>(this->m_ModalPaths.size()))
+  while (num > static_cast<int>(this->m_Modalities.size()-1))
   {
-    ctkPathLineEdit *multiModalPath = new ctkPathLineEdit(this);
-    QSpinBox *multiModalOrderBox = new QSpinBox(this);
-    multiModalPath->setObjectName(QString("multiModalPath" + QString::number(m_ModalPaths.size() + 1)));
-    m_Controls.advancedSettingsLayout->addWidget(multiModalPath, this->m_UI_ROWS + m_ModalPaths.size() + 1, 1, 1, 3);
-    m_Controls.advancedSettingsLayout->addWidget(multiModalOrderBox, this->m_UI_ROWS + m_ModalPaths.size() + 1, 0);
-    m_ModalPaths.push_back(multiModalPath);
-    m_ModalOrder.push_back(multiModalOrderBox);
+    QmitkDataStorageComboBox *multiModalBox = new QmitkDataStorageComboBox(this, true);
+    mitk::nnUNetTool::Pointer tool = this->GetConnectedToolAs<mitk::nnUNetTool>();
+    multiModalBox->SetDataStorage(tool->GetDataStorage());
+    multiModalBox->SetPredicate(this->m_MultiModalPredicate);
+    multiModalBox->setObjectName(QString("multiModal_" + QString::number(m_Modalities.size() + 1)));
+    m_Controls.advancedSettingsLayout->addWidget(multiModalBox, this->m_UI_ROWS + m_Modalities.size() + 1, 1, 1, 3);
+    m_Modalities.push_back(multiModalBox);
   }
-  while (num < static_cast<int>(this->m_ModalPaths.size() - 1) && !m_ModalPaths.empty())
+  while (num < static_cast<int>(this->m_Modalities.size()-1) && !m_Modalities.empty())
   {
-    ctkPathLineEdit *child = m_ModalPaths.back();
+    QmitkDataStorageComboBox *child = m_Modalities.back();
+    if (child->objectName() == "multiModal_0")
+    {
+      std::iter_swap(this->m_Modalities.end() - 2, this->m_Modalities.end()-1);
+      child = m_Modalities.back();
+    }
     delete child; // delete the layout item
-    m_ModalPaths.pop_back();
-    auto *_child = m_ModalOrder.back();
-    delete _child; // delete the layout item
-    m_ModalOrder.pop_back();
+    m_Modalities.pop_back();
   }
+  m_Controls.posSpinBox->setMaximum(this->m_Modalities.size()-1);
   m_Controls.advancedSettingsLayout->update();
+}
+
+
+void QmitknnUNetToolGUI::OnModalPositionChanged(int posIdx)
+{
+  if (posIdx < static_cast<int>(this->m_Modalities.size()))
+  {
+    int currPos = 0;
+    bool stopCheck = false;
+    // for-loop clears all widgets from the QGridLayout and also, finds the position of loaded-image widget.
+    for (QmitkDataStorageComboBox *multiModalBox : this->m_Modalities) 
+    {
+      m_Controls.advancedSettingsLayout->removeWidget(multiModalBox);
+      multiModalBox->setParent(nullptr);
+      if (multiModalBox->objectName() != "multiModal_0" && !stopCheck)
+      {
+        currPos++;
+      }
+      else
+      {
+        stopCheck = true;
+      }
+    }
+    // moving the loaded-image widget to the required position
+    std::iter_swap(this->m_Modalities.begin() + currPos, this->m_Modalities.begin() + posIdx); 
+    // re-adding all widgets in the order
+    for (int i = 0; i < static_cast<int>(this->m_Modalities.size()); ++i)
+    {
+      QmitkDataStorageComboBox *multiModalBox = this->m_Modalities[i];
+      m_Controls.advancedSettingsLayout->addWidget(multiModalBox, this->m_UI_ROWS + i + 1, 1, 1, 3);
+    }
+    m_Controls.advancedSettingsLayout->update();
+  }
 }
 
 void QmitknnUNetToolGUI::AutoParsePythonPaths()

@@ -106,6 +106,11 @@ const char *mitk::nnUNetTool::GetName() const
   return "nnUNet";
 }
 
+mitk::DataStorage *mitk::nnUNetTool::GetDataStorage()
+{
+  return this->GetToolManager()->GetDataStorage();
+}
+
 namespace
 {
   void onPythonProcessEvent(itk::Object * /*pCaller*/, const itk::EventObject &e, void *)

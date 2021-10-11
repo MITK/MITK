@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include "mitkAutoMLSegmentationWithPreviewTool.h"
 #include "mitkCommon.h"
+#include "mitkToolManager.h"
 #include <MitkSegmentationExports.h>
 #include <mitkStandardFileLocations.h>
 
@@ -137,6 +138,11 @@ namespace mitk
      * 
      */
     void ClearOutputBuffer();
+
+    /**
+    *  @brief Returns the DataStorage from the ToolManager
+    */
+    mitk::DataStorage *GetDataStorage();
 
   protected:
   

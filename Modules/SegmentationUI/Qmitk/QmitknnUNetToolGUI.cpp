@@ -14,7 +14,6 @@ found in the LICENSE file.
 
 #include "mitknnUnetTool.h"
 #include <QDir>
-#include <QMessageBox>
 #include <QtGlobal>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitknnUNetToolGUI, "")
@@ -25,12 +24,17 @@ QmitknnUNetToolGUI::QmitknnUNetToolGUI() : QmitkAutoMLSegmentationToolGUIBase()
   // Pytorch uses its own libraries to communicate to the GPUs. Hence, only a warning can be given.
   if (m_GpuLoader.GetGPUCount() == 0)
   {
-    std::string warning= "WARNING: No GPUs were detected on your machine. The nnUNet tool might not work.";
+    std::string warning = "WARNING: No GPUs were detected on your machine. The nnUNet tool might not work.";
     ShowErrorMessage(warning);
   }
   m_SegmentationThread = new QThread(this);
   m_Worker = new nnUNetSegmentationWorker;
   m_Worker->moveToThread(m_SegmentationThread);
+
+  // define predicates for multi modal data selection combobox
+  auto imageType = mitk::TNodePredicateDataType<mitk::Image>::New();
+  auto labelSetImageType = mitk::NodePredicateNot::New(mitk::TNodePredicateDataType<mitk::LabelSetImage>::New());
+  this->m_MultiModalPredicate = mitk::NodePredicateAnd::New(imageType, labelSetImageType).GetPointer();
 }
 
 QmitknnUNetToolGUI::~QmitknnUNetToolGUI()
@@ -66,6 +70,7 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   connect(m_Controls.nopipBox, SIGNAL(stateChanged(int)), this, SLOT(OnCheckBoxChanged(int)));
   connect(m_Controls.multiModalBox, SIGNAL(stateChanged(int)), this, SLOT(OnCheckBoxChanged(int)));
   connect(m_Controls.multiModalSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnModalitiesNumberChanged(int)));
+  connect(m_Controls.posSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnModalPositionChanged(int)));
   connect(m_Controls.pythonEnvComboBox,
 #if QT_VERSION >= 0x050F00 // 5.15
           SIGNAL(textActivated(const QString &)),
@@ -84,6 +89,8 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   m_Controls.nnUnetdirLabel->setVisible(false);
   m_Controls.multiModalSpinBox->setVisible(false);
   m_Controls.multiModalSpinLabel->setVisible(false);
+  m_Controls.posSpinBoxLabel->setVisible(false);
+  m_Controls.posSpinBox->setVisible(false);
 
   m_Controls.statusLabel->setTextFormat(Qt::RichText);
   m_Controls.statusLabel->setText("<b>STATUS: </b><i>Welcome to nnUNet. " + QString::number(m_GpuLoader.GetGPUCount()) +
@@ -100,7 +107,7 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
 
 void QmitknnUNetToolGUI::OnSettingsAccepted()
 {
-  auto tool = this->GetConnectedToolAs<mitk::nnUNetTool>();
+  mitk::nnUNetTool::Pointer tool = this->GetConnectedToolAs<mitk::nnUNetTool>();
   if (nullptr != tool)
   {
     try
@@ -206,39 +213,31 @@ void QmitknnUNetToolGUI::OnSettingsAccepted()
     }
     catch (const std::exception &e)
     {
-      this->setCursor(Qt::ArrowCursor);
-      std::stringstream stream;
-      stream << "Error while processing parameters for nnUNet segmentation. Reason: " << e.what();
-      QMessageBox *messageBox = new QMessageBox(QMessageBox::Critical, nullptr, stream.str().c_str());
-      messageBox->exec();
-      delete messageBox;
-      MITK_ERROR << stream.str();
+      std::stringstream errorMsg;
+      errorMsg << "Error while processing parameters for nnUNet segmentation. Reason: " << e.what();
+      ShowErrorMessage(errorMsg.str());
       return;
     }
     catch (...)
     {
-      this->setCursor(Qt::ArrowCursor);
-      std::stringstream stream;
-      stream << "Unkown error occured while generation nnUNet segmentation.";
-      QMessageBox *messageBox = new QMessageBox(QMessageBox::Critical, nullptr, stream.str().c_str());
-      messageBox->exec();
-      delete messageBox;
-      MITK_ERROR << stream.str();
+      std::string errorMsg = "Unkown error occured while generation nnUNet segmentation.";
+      ShowErrorMessage(errorMsg);
       return;
     }
   }
 }
 
-std::vector<std::string> QmitknnUNetToolGUI::FetchMultiModalPathsFromUI()
+
+std::vector<std::string> QmitknnUNetToolGUI::FetchMultiModalPathsFromUI() //Needs to REWRITE
 {
   std::vector<std::string> paths;
-  if (m_Controls.multiModalBox->isChecked() && !m_ModalPaths.empty())
+  /* if (m_Controls.multiModalBox->isChecked() && !m_Modalities.empty())
   {
-    for (auto modality : m_ModalPaths)
+    for (auto modality : m_Modalities)
     {
       paths.push_back(modality->currentPath().toStdString());
     }
-  }
+  }*/
   return paths;
 }
 
@@ -259,10 +258,10 @@ bool QmitknnUNetToolGUI::IsNNUNetInstalled(const QString &pythonPath)
   return QFile::exists(fullPath + QDir::separator() + QString("nnUNet_predict"));
 }
 
-void QmitknnUNetToolGUI::ShowErrorMessage(std::string &message)
+void QmitknnUNetToolGUI::ShowErrorMessage(std::string &message, QMessageBox::Icon icon)
 {
   this->setCursor(Qt::ArrowCursor);
-  QMessageBox *messageBox = new QMessageBox(QMessageBox::Critical, nullptr, message.c_str());
+  QMessageBox *messageBox = new QMessageBox(icon, nullptr, message.c_str());
   messageBox->exec();
   delete messageBox;
   MITK_WARN << message;

@@ -137,23 +137,6 @@
             <widget class="ctkCheckableComboBox" name="foldBox" native="true" />
           </item>
 
-          <item row="4" column="0">
-            <widget class="QLabel" name="multiModalLabel">
-              <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                </sizepolicy>
-              </property>
-              <property name="text">
-                <string>Multi-Modal:</string>
-              </property>
-            </widget>
-          </item>
-          <item row="4" column="1">
-            <widget class="ctkCheckBox" name="multiModalBox" native="true" />
-          </item>
-
           <item row="3" column="2">
             <widget class="QLabel" name="multiModalSpinLabel">
               <property name="sizePolicy">
@@ -171,9 +154,26 @@
             <widget class="QSpinBox" name="multiModalSpinBox" native="true" />
           </item>
 
+		  <item row="4" column="0">
+			<widget class="QLabel" name="multiModalLabel">
+			    <property name="sizePolicy">
+					 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+						 <horstretch>0</horstretch>
+						 <verstretch>0</verstretch>
+					    </sizepolicy>
+				    </property>
+				    <property name="text">
+					    <string>Multi-Modal:</string>
+				    </property>
+			    </widget>
+		    </item>
+		    <item row="4" column="1">
+			    <widget class="ctkCheckBox" name="multiModalBox" native="true" />
+		    </item>
+
           <!-- </item> -->
-          <!--     <item row="4" column="2">
-            <widget class="QLabel" name="gpuLabel">
+          <item row="4" column="2">
+            <widget class="QLabel" name="posSpinBoxLabel">
               <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                   <horstretch>0</horstretch>
@@ -181,13 +181,13 @@
                 </sizepolicy>
               </property>
               <property name="text">
-                <string>Use GPU:</string>
+                <string>Loaded Image Position</string>
               </property>
             </widget>
           </item>
           <item row="4" column="3">
-            <widget class="ctkCheckBox" name="gpuBox" native="true" />
-          </item> -->
+            <widget class="QSpinBox" name="posSpinBox" native="true" />
+          </item> 
           <!-- </item> -->
         </layout>
       </item>
@@ -333,25 +333,7 @@
                     </property>
                   </widget>
                 </item>
-                <!-- </item> -->
-				<item row="3" column="0">
-					<widget class="QLabel" name="outputdirLabel">
-						<property name="sizePolicy">
-							<sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-								<horstretch>0</horstretch>
-								<verstretch>0</verstretch>
-							</sizepolicy>
-						</property>
-						<property name="text">
-							<string>Available Tasks:</string>
-						</property>
-					</widget>
-				</item>
-				<item row="3" column="1" colspan="3">
-					<widget class="ctkComboBox" name="taskComboBox" native="true"/>
-				</item>
-				  <!-- </item> -->
-				  
+				<!-- </item> -->  
                 <item row="4" column="0">
                   <widget class="QLabel" name="nnUnetdirLabel">
                     <property name="sizePolicy">

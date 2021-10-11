@@ -126,6 +126,11 @@ mitk::ExtendedToftsModel::ModelResultType mitk::ExtendedToftsModel::ComputeModel
   double     vp = parameters[POSITION_PARAMETER_vp];
 
 
+  if (ve == 0.0)
+  {
+    itkExceptionMacro("ve is 0! Cannot calculate signal");
+  }
+
   double lambda =  ktrans / ve;
 
   mitk::ModelBase::ModelResultType convolution = mitk::convoluteAIFWithExponential(this->m_TimeGrid,

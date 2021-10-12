@@ -174,8 +174,8 @@ void QmitknnUNetToolGUI::OnSettingsAccepted()
       }
       else
       {
-        QString trainer = trainerSplitParts.first();
-        QString planId = trainerSplitParts.last();
+        QString trainer = m_Controls.trainerBox->currentText();//trainerSplitParts.first();
+        QString planId = m_Controls.plannerBox->currentText(); //trainerSplitParts.last();
         std::vector<std::string> fetchedFolds = FetchSelectedFoldsFromUI();
         mitk::ModelParams modelObject = MapToRequest(modelName, taskName, trainer, planId, fetchedFolds);
         requestQ.push_back(modelObject);
@@ -228,14 +228,17 @@ void QmitknnUNetToolGUI::OnSettingsAccepted()
 }
 
 
-std::vector<mitk::Image::ConstPointer> QmitknnUNetToolGUI::FetchMultiModalImagesFromUI() // Check if works?
+std::vector<mitk::Image::ConstPointer> QmitknnUNetToolGUI::FetchMultiModalImagesFromUI()
 {
   std::vector<mitk::Image::ConstPointer> paths;
   if (m_Controls.multiModalBox->isChecked() && !m_Modalities.empty())
   {
     for (QmitkDataStorageComboBox *modality : m_Modalities)
     {
-      paths.push_back(dynamic_cast<const mitk::Image*>(modality->GetSelectedNode()->GetData()));
+      if (modality->objectName() != "multiModal_0")
+      {
+        paths.push_back(dynamic_cast<const mitk::Image*>(modality->GetSelectedNode()->GetData()));
+      }
     }
   }
   return paths;
@@ -255,6 +258,7 @@ bool QmitknnUNetToolGUI::IsNNUNetInstalled(const QString &pythonPath)
     fullPath += QDir::separator() + QString("bin");
   }
 #endif
+  fullPath = fullPath.mid(fullPath.indexOf(" ") + 1);
   return QFile::exists(fullPath + QDir::separator() + QString("nnUNet_predict"));
 }
 

@@ -157,7 +157,7 @@ void QmitknnUNetToolGUI::OnCheckBoxChanged(int state)
         mitk::nnUNetTool::Pointer tool = this->GetConnectedToolAs<mitk::nnUNetTool>();
         defaultImage->SetDataStorage(tool->GetDataStorage());
         defaultImage->SetSelectedNode(tool->GetDataStorage()->GetNode());
-        defaultImage->setDisabled(true);
+        //defaultImage->setDisabled(true);
         m_Controls.advancedSettingsLayout->addWidget(defaultImage, this->m_UI_ROWS + m_Modalities.size() + 1, 1, 1, 3);
         m_Modalities.push_back(defaultImage);
         m_Controls.posSpinBox->setMaximum(this->m_Modalities.size() - 1);
@@ -168,6 +168,8 @@ void QmitknnUNetToolGUI::OnCheckBoxChanged(int state)
         OnModalitiesNumberChanged(0);
         m_Controls.multiModalSpinBox->setValue(0);
         m_Controls.posSpinBox->setMaximum(0);
+        delete this->m_Modalities[0];
+        m_Modalities.pop_back();
       }
     }
   }

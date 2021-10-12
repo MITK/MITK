@@ -137,7 +137,7 @@ namespace
 
 mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inputAtTimeStep, TimeStepType /*timeStep*/)
 {
-  Image::Pointer _inputAtTimeStep = inputAtTimeStep->Clone();
+  //Image::Pointer _inputAtTimeStep = inputAtTimeStep->Clone();
   std::string inDir, outDir, inputImagePath, outputImagePath, scriptPath;
   std::string templateFilename = "XXXXXX_000_0000.nii.gz";
 
@@ -165,19 +165,21 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
 
   try
   {
-    IOUtil::Save(_inputAtTimeStep.GetPointer(), inputImagePath);
+    IOUtil::Save(inputAtTimeStep, inputImagePath);
+
     if (this->GetMultiModal())
     {
       for (size_t i = 0; i < this->m_OtherModalPaths.size(); ++i)
       {
-        std::string inModalFile = this->m_OtherModalPaths[i];
+        mitk::Image::ConstPointer modalImage = this->m_OtherModalPaths[i];
         std::string outModalFile =
           inDir + IOUtil::GetDirectorySeparator() + token + "_000_000" + std::to_string(i + 1) + ".nii.gz";
-        std::ifstream src(inModalFile, std::ios::binary);
+        IOUtil::Save(modalImage.GetPointer(), outModalFile);
+        /* std::ifstream src(inModalFile, std::ios::binary);
         std::ofstream dst(outModalFile, std::ios::binary);
         dst << src.rdbuf();
         dst.close();
-        src.close();
+        src.close();*/
       }
     }
   }
@@ -311,7 +313,8 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     LabelSetImage::Pointer resultImage = LabelSetImage::New();
     Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
     resultImage->InitializeByLabeledImage(outputImage);
-    resultImage->SetGeometry(_inputAtTimeStep->GetGeometry());
+    resultImage->SetGeometry(inputAtTimeStep->GetGeometry());
+
     return resultImage;
   }
   catch (const mitk::Exception &e)

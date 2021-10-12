@@ -67,6 +67,7 @@ void QmitknnUNetToolGUI::OnTaskChanged(const QString &text)
   QString updatedPath = QDir::cleanPath(m_ModelDirectory + QDir::separator() + m_Controls.modelBox->currentText() +
                                         QDir::separator() + text);
   m_Controls.trainerBox->clear();
+  m_Controls.plannerBox->clear();
   auto trainerPlanners = FetchFoldersFromDir<QStringList>(updatedPath);
   QStringList trainers, planners;
   foreach (QString trainerPlanner, trainerPlanners)
@@ -149,13 +150,7 @@ void QmitknnUNetToolGUI::OnCheckBoxChanged(int state)
       m_Controls.multiModalSpinBox->setVisible(visibility);
       m_Controls.posSpinBoxLabel->setVisible(visibility);
       m_Controls.posSpinBox->setVisible(visibility);
-      if (!visibility)
-      {
-        OnModalitiesNumberChanged(0);
-        m_Controls.multiModalSpinBox->setValue(0);
-        m_Controls.posSpinBox->setMaximum(0);
-      }
-      else
+      if (visibility)
       {
         QmitkDataStorageComboBox *defaultImage = new QmitkDataStorageComboBox(this, true);
         defaultImage->setObjectName(QString("multiModal_" + QString::number(0)));
@@ -167,6 +162,12 @@ void QmitknnUNetToolGUI::OnCheckBoxChanged(int state)
         m_Modalities.push_back(defaultImage);
         m_Controls.posSpinBox->setMaximum(this->m_Modalities.size() - 1);
         m_UI_ROWS++;
+      }
+      else
+      {
+        OnModalitiesNumberChanged(0);
+        m_Controls.multiModalSpinBox->setValue(0);
+        m_Controls.posSpinBox->setMaximum(0);
       }
     }
   }

@@ -117,7 +117,7 @@ namespace mitk
      * @brief Holds paths to other input image modalities.
      * 
      */
-    std::vector<std::string> m_OtherModalPaths;
+    std::vector<mitk::Image::ConstPointer> m_OtherModalPaths;
 
 
     /**

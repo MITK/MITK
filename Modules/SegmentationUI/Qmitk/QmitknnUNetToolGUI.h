@@ -162,7 +162,7 @@ private:
    *
    * @return std::vector<std::string>
    */
-  std::vector<std::string> FetchMultiModalPathsFromUI();
+  std::vector<mitk::Image::ConstPointer> FetchMultiModalImagesFromUI();
 
   /**
    * @brief Template function to fetch all folders inside a given path.

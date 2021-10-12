@@ -199,7 +199,7 @@ void QmitknnUNetToolGUI::OnSettingsAccepted()
       if (m_Controls.multiModalBox->isChecked())
       {
         tool->m_OtherModalPaths.clear();
-        tool->m_OtherModalPaths = FetchMultiModalPathsFromUI();
+        tool->m_OtherModalPaths = FetchMultiModalImagesFromUI();
         tool->MultiModalOn();
       }
 
@@ -228,16 +228,16 @@ void QmitknnUNetToolGUI::OnSettingsAccepted()
 }
 
 
-std::vector<std::string> QmitknnUNetToolGUI::FetchMultiModalPathsFromUI() //Needs to REWRITE
+std::vector<mitk::Image::ConstPointer> QmitknnUNetToolGUI::FetchMultiModalImagesFromUI() // Check if works?
 {
-  std::vector<std::string> paths;
-  /* if (m_Controls.multiModalBox->isChecked() && !m_Modalities.empty())
+  std::vector<mitk::Image::ConstPointer> paths;
+  if (m_Controls.multiModalBox->isChecked() && !m_Modalities.empty())
   {
-    for (auto modality : m_Modalities)
+    for (QmitkDataStorageComboBox *modality : m_Modalities)
     {
-      paths.push_back(modality->currentPath().toStdString());
+      paths.push_back(dynamic_cast<const mitk::Image*>(modality->GetSelectedNode()->GetData()));
     }
-  }*/
+  }
   return paths;
 }
 

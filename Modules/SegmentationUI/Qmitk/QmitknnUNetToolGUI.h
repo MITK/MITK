@@ -120,7 +120,7 @@ private:
   /**
    * @brief Creates a QMessage object and shows on screen.
    */
-  void ShowErrorMessage(std::string &, QMessageBox::Icon = QMessageBox::Critical);
+  void ShowErrorMessage(const std::string &, QMessageBox::Icon = QMessageBox::Critical);
 
   /**
    * @brief Searches and parses paths of python virtual enviroments

@@ -258,7 +258,7 @@ bool QmitknnUNetToolGUI::IsNNUNetInstalled(const QString &pythonPath)
   return QFile::exists(fullPath + QDir::separator() + QString("nnUNet_predict"));
 }
 
-void QmitknnUNetToolGUI::ShowErrorMessage(std::string &message, QMessageBox::Icon icon)
+void QmitknnUNetToolGUI::ShowErrorMessage(const std::string &message, QMessageBox::Icon icon)
 {
   this->setCursor(Qt::ArrowCursor);
   QMessageBox *messageBox = new QMessageBox(icon, nullptr, message.c_str());

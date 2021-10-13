@@ -144,6 +144,7 @@ namespace mitk
     */
     mitk::DataStorage *GetDataStorage();
 
+    mitk::DataNode *GetRefNode();
   protected:
   
     /**

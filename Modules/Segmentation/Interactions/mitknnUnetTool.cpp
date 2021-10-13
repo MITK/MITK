@@ -111,6 +111,11 @@ mitk::DataStorage *mitk::nnUNetTool::GetDataStorage()
   return this->GetToolManager()->GetDataStorage();
 }
 
+mitk::DataNode *mitk::nnUNetTool::GetRefNode()
+{
+  return this->GetToolManager()->GetReferenceData(0);
+}
+
 namespace
 {
   void onPythonProcessEvent(itk::Object * /*pCaller*/, const itk::EventObject &e, void *)

@@ -156,8 +156,9 @@ void QmitknnUNetToolGUI::OnCheckBoxChanged(int state)
         defaultImage->setObjectName(QString("multiModal_" + QString::number(0)));
         mitk::nnUNetTool::Pointer tool = this->GetConnectedToolAs<mitk::nnUNetTool>();
         defaultImage->SetDataStorage(tool->GetDataStorage());
-        defaultImage->SetSelectedNode(tool->GetDataStorage()->GetNode());
-        //defaultImage->setDisabled(true);
+        defaultImage->SetPredicate(this->m_MultiModalPredicate);
+        defaultImage->SetSelectedNode(tool->GetRefNode());
+        defaultImage->setDisabled(true);
         m_Controls.advancedSettingsLayout->addWidget(defaultImage, this->m_UI_ROWS + m_Modalities.size() + 1, 1, 1, 3);
         m_Modalities.push_back(defaultImage);
         m_Controls.posSpinBox->setMaximum(this->m_Modalities.size() - 1);

@@ -160,7 +160,7 @@ bool mitk::CorrectorAlgorithm::ImprovedHeimannCorrectionAlgorithm(
   */
 
   ContourModel::Pointer projectedContour =
-    mitk::ContourModelUtils::ProjectContourTo2DSlice(m_WorkingImage, m_Contour, true, false);
+    mitk::ContourModelUtils::ProjectContourTo2DSlice(m_WorkingImage, m_Contour);
 
   if (projectedContour.IsNull() || projectedContour->GetNumberOfVertices() < 2)
     return false;

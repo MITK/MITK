@@ -27,7 +27,7 @@ found in the LICENSE file.
 ///
 int main(int /*argc*/, char **argv)
 {
-  // MITK: Read a .pic.gz file, e.g. Core/Code/Testing/Data/Pic3D.pic.gz from
+  // MITK: Read a .nrrd file, e.g. Core/Code/Testing/Data/Pic3D.nrrd from
   // disk
   const char *filename = argv[1];
 

@@ -14,7 +14,6 @@ found in the LICENSE file.
 
 // mitk includes
 #include "mitkIOUtil.h"
-#include <mitkIpPic.h>
 #include "mitkImageReadAccessor.h"
 
 namespace mitk

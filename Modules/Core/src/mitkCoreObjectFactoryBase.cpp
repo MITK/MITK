@@ -51,7 +51,7 @@ void mitk::CoreObjectFactoryBase::CreateFileExtensions(MultimapType fileExtensio
   fileExtensions.append(");;all (*);;");
 
   // build the entry for each extension-group
-  // e.g. "Sets of 2D slices (*.pic *.pic.gz *.bmp *.png *.dcm *.gdcm *.ima *.tiff);;"
+  // e.g. "Sets of 2D slices (*.bmp *.png *.dcm *.gdcm *.ima *.tiff);;"
   for (auto it = aMap.begin(); it != aMap.end(); ++it)
   {
     // cout << "  [" << (*it).first << ", " << (*it).second << "]" << endl;

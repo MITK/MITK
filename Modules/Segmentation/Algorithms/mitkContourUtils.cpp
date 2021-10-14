@@ -22,9 +22,7 @@ mitk::ContourUtils::~ContourUtils()
 }
 
 mitk::ContourModel::Pointer mitk::ContourUtils::ProjectContourTo2DSlice(Image *slice,
-                                                                        Contour *contourIn3D,
-                                                                        bool itkNotUsed(correctionForIpSegmentation),
-                                                                        bool constrainToInside)
+                                                                        Contour *contourIn3D)
 {
   mitk::Contour::PointsContainerIterator it = contourIn3D->GetPoints()->Begin();
   mitk::Contour::PointsContainerIterator end = contourIn3D->GetPoints()->End();
@@ -36,11 +34,11 @@ mitk::ContourModel::Pointer mitk::ContourUtils::ProjectContourTo2DSlice(Image *s
     contour->AddVertex(it.Value());
     it++;
   }
-  return mitk::ContourModelUtils::ProjectContourTo2DSlice(slice, contour, false /*not used*/, constrainToInside);
+  return mitk::ContourModelUtils::ProjectContourTo2DSlice(slice, contour);
 }
 
 mitk::ContourModel::Pointer mitk::ContourUtils::BackProjectContourFrom2DSlice(
-  const BaseGeometry *sliceGeometry, Contour *contourIn2D, bool itkNotUsed(correctionForIpSegmentation))
+  const BaseGeometry *sliceGeometry, Contour *contourIn2D)
 {
   mitk::Contour::PointsContainerIterator it = contourIn2D->GetPoints()->Begin();
   mitk::Contour::PointsContainerIterator end = contourIn2D->GetPoints()->End();
@@ -52,7 +50,7 @@ mitk::ContourModel::Pointer mitk::ContourUtils::BackProjectContourFrom2DSlice(
     contour->AddVertex(it.Value());
     it++;
   }
-  return mitk::ContourModelUtils::BackProjectContourFrom2DSlice(sliceGeometry, contour, false /*not used*/);
+  return mitk::ContourModelUtils::BackProjectContourFrom2DSlice(sliceGeometry, contour);
 }
 
 void mitk::ContourUtils::FillContourInSlice(Contour *projectedContour, Image *sliceImage, int paintingPixelValue)

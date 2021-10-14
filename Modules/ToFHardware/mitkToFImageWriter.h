@@ -24,8 +24,8 @@ namespace mitk
   /**
   * @brief Writer class for ToF images
   *
-  * This writer class allows streaming of ToF data into a file. The .pic file format is used for writing the data.
-  * Image information is included in the header of the pic file.
+  * This writer class allows streaming of ToF data into a file.
+  * Image information is included in the header of the nrrd file.
   * Writer can simultaneously save "distance", "intensity" and "amplitude" image.
   * Images can be written as 3D volume (ToFImageType::ToFImageType3D) or temporal image stack (ToFImageType::ToFImageType2DPlusT)
   *
@@ -89,7 +89,7 @@ namespace mitk
     */
     virtual void Open(){};
     /*!
-    \brief Close file(s) add .pic header and write
+    \brief Close file(s) add header and write
     */
     virtual void Close(){};
     /*!

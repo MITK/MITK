@@ -212,13 +212,11 @@ option(MITK_XVFB_TESTING "Execute test drivers through xvfb-run" OFF)
 
 option(MITK_BUILD_ALL_APPS "Build all MITK applications" OFF)
 option(MITK_BUILD_EXAMPLES "Build the MITK Examples" OFF)
-option(MITK_ENABLE_PIC_READER "Enable support for reading the DKFZ pic file format." ON)
 
 mark_as_advanced(
   MITK_XVFB_TESTING
   MITK_FAST_TESTING
   MITK_BUILD_ALL_APPS
-  MITK_ENABLE_PIC_READER
 )
 
 #-----------------------------------------------------------------------------

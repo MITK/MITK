@@ -180,7 +180,7 @@ void QmitkToFRecorderWidget::OnStartRecorder()
     mitk::ToFImageWriter::ToFImageType tofImageType;
     tmpFileName = QmitkToFRecorderWidget::getSaveFileName(tofImageType,
       distanceImageSelected, amplitudeImageSelected, intensityImageSelected, rgbImageSelected, rawDataSelected,
-      nullptr, "Save Image To...", imageFileName, "NRRD Images (*.nrrd);;PIC Images - deprecated (*.pic);;Text (*.csv)", &selectedFilter);
+      nullptr, "Save Image To...", imageFileName, "NRRD Images (*.nrrd);;Text (*.csv)", &selectedFilter);
 
     if (tmpFileName.isEmpty())
     {
@@ -229,14 +229,6 @@ void QmitkToFRecorderWidget::OnStartRecorder()
       if (selectedFilter.compare("Text (*.csv)") == 0)
       {
         this->m_ToFImageRecorder->SetFileFormat(".csv");
-      }
-      else if (selectedFilter.compare("PIC Images - deprecated (*.pic)") == 0)
-      {
-        //default
-        this->m_ToFImageRecorder->SetFileFormat(".pic");
-
-        QMessageBox::warning(nullptr, "Deprecated File Format!",
-          "Please note that *.pic file format is deprecated and not longer supported! The suggested file format for images is *.nrrd!");
       }
       else if (selectedFilter.compare("NRRD Images (*.nrrd)") == 0)
       {

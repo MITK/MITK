@@ -39,21 +39,21 @@ These messages are only displayed if you turn the CMake-Variable MBILOG_ENABLE_D
 
 Example:
 \code
-MITK_INFO << "The picture test.pic has been loaded successfully."
+MITK_INFO << "The picture test.nrrd has been loaded successfully."
 \endcode
 
 <b>Warning (MITK_WARN)</b>: Warning messages should inform about unexpected or potentially problematic states in the program flow that do not lead directly to an error. Thus, after a warning the program should be able continue without errors and in a clear state.
 
 Example:
 \code
-MITK_WARN << "The picture test.pic was not loaded because access was denied."
+MITK_WARN << "The picture test.nrrd was not loaded because access was denied."
 \endcode
 
 <b>Error (MITK_ERROR)</b>: Error messages notify the user about corrupt states in the program flow. Such states may occur after unexpected behavior of source code.
 
 Example:
 \code
-MITK_ERROR << "Error while adding test.pic to the data storage, aborting."
+MITK_ERROR << "Error while adding test.nrrd to the data storage, aborting."
 \endcode
 
 <b>Fatal (MITK_FATAL)</b>: Fatal messages report corrupt states in the program flow that lead directly to a crash of the program.

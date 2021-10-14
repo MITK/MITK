@@ -25,8 +25,6 @@ set(enabled_modules
   SegmentationUI
   PlanarFigure
   Annotation
-  IpSegmentation
-  IpFunc
   SurfaceInterpolation
   GraphAlgorithms
   ImageExtraction

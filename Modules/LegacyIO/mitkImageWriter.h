@@ -23,7 +23,7 @@ namespace mitk
    * @brief Writer for mitk::Image
    *
    * Uses the given extension (SetExtension) to decide the format to write
-   * (.mhd is default, .pic, .tif, .png, .jpg supported yet).
+   * (.mhd is default, .tif, .png, .jpg supported yet).
    * @ingroup MitkLegacyIOModule
    * @deprecatedSince{2014_10} Use mitk::IOUtils or mitk::FileWriterRegistry instead.
    */

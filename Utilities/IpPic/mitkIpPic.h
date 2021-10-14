@@ -890,7 +890,3 @@ extern const char *mitkIpPicTypeName( mitkIpUInt4_t type );
 
 
 #endif  /* _mitkIpPic_h */
-
-#ifdef MITK_UNMANGLE_IPPIC
-#include "mitkIpPicUnmangle.h"
-#endif

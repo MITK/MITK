@@ -89,7 +89,7 @@ int mitkToFImageRecorderFilterTest(int /* argc */, char* /*argv*/[])
   mitk::ToFImageRecorderFilter::Pointer tofImageRecorderFilter = mitk::ToFImageRecorderFilter::New();
   std::string dirName = MITK_TOF_DATA_DIR;
   MITK_TEST_OUTPUT(<< "Test SetFileName()");
-  std::string testFileName = dirName + "test.pic";
+  std::string testFileName = dirName + "test.nrrd";
   MITK_TEST_FOR_EXCEPTION_BEGIN(std::logic_error);
   tofImageRecorderFilter->SetFileName(testFileName);
   MITK_TEST_FOR_EXCEPTION_END(std::logic_error);

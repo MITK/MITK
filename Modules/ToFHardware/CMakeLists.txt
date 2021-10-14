@@ -2,7 +2,7 @@
 mitkMacroGetPMDPlatformString(_PLATFORM_STRING)
 
 MITK_CREATE_MODULE(
-  DEPENDS MitkOpenCVVideoSupport MitkIGTBase MitkCameraCalibration MitkIpPic
+  DEPENDS MitkOpenCVVideoSupport MitkIGTBase MitkCameraCalibration
   PACKAGE_DEPENDS PRIVATE ITK|IONRRD
   ADDITIONAL_LIBS ${ADDITIONAL_LIBS}
 )

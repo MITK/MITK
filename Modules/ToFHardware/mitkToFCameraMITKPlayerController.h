@@ -24,7 +24,7 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-  * @brief Controller for playing ToF images saved in MITK (.pic) format
+  * @brief Controller for playing ToF images saved in NRRD format
   *
   * @ingroup ToFHardware
   */

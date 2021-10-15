@@ -45,7 +45,7 @@ public:
 
 protected:
 
-  void SetFocus() override;
+  void SetFocus() override {}
 
   void CreateQtPartControl(QWidget* parent) override;
 

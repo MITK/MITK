@@ -194,8 +194,6 @@ void QmitkRenderWindowWidget::InitializeGUI()
   m_RenderWindow->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
   m_RenderWindow->GetSliceNavigationController()->SetCrosshairEvent.AddListener(mitk::MessageDelegate1<QmitkRenderWindowWidget, mitk::Point3D>(this, &QmitkRenderWindowWidget::SetCrosshair));
 
-  connect(m_RenderWindow, &QmitkRenderWindow::mouseEvent, this, &QmitkRenderWindowWidget::MouseEvent);
-
   mitk::TimeGeometry::ConstPointer timeGeometry = m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll());
   mitk::RenderingManager::GetInstance()->InitializeViews(timeGeometry);
   m_Layout->addWidget(m_RenderWindow);

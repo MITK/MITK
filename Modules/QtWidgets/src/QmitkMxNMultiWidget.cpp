@@ -211,21 +211,9 @@ void QmitkMxNMultiWidget::wheelEvent(QWheelEvent* e)
   emit WheelMoved(e);
 }
 
-void QmitkMxNMultiWidget::mousePressEvent(QMouseEvent* e)
+void QmitkMxNMultiWidget::mousePressEvent(QMouseEvent*)
 {
-  if (QEvent::MouseButtonPress != e->type())
-  {
-    return;
-  }
-
-  auto renderWindowWidget = dynamic_cast<QmitkRenderWindowWidget*>(this->sender());
-  if (nullptr == renderWindowWidget)
-  {
-    return;
-  }
-
-  auto renderWindowWidgetPointer = GetRenderWindowWidget(renderWindowWidget->GetWidgetName());
-  SetActiveRenderWindowWidget(renderWindowWidgetPointer);
+  // nothing here, but necessary for mouse interactions (.xml-configuration files)
 }
 
 void QmitkMxNMultiWidget::moveEvent(QMoveEvent* e)
@@ -275,9 +263,6 @@ void QmitkMxNMultiWidget::CreateRenderWindowWidget()
   QString renderWindowWidgetName = GetNameFromIndex(GetNumberOfRenderWindowWidgets());
   RenderWindowWidgetPointer renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage());
   renderWindowWidget->SetCornerAnnotationText(renderWindowWidgetName.toStdString());
-
-  connect(renderWindowWidget.get(), &QmitkRenderWindowWidget::MouseEvent, this, &QmitkMxNMultiWidget::mousePressEvent);
-
   AddRenderWindowWidget(renderWindowWidgetName, renderWindowWidget);
 
   auto renderWindow = renderWindowWidget->GetRenderWindow();

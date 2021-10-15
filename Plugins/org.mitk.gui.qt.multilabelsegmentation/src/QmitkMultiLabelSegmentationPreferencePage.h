@@ -39,19 +39,10 @@ public:
 
   QWidget* GetQtControl() const override;
 
-  ///
-  /// \see IPreferencePage::PerformOk()
-  ///
   bool PerformOk() override;
 
-  ///
-  /// \see IPreferencePage::PerformCancel()
-  ///
   void PerformCancel() override;
 
-  ///
-  /// \see IPreferencePage::Update()
-  ///
   void Update() override;
 
 protected slots:
@@ -61,11 +52,12 @@ protected slots:
 protected:
 
   QWidget* m_MainControl;
+  QCheckBox* m_SlimViewCheckBox;
   QRadioButton* m_RadioOutline;
   QRadioButton* m_RadioOverlay;
+  QCheckBox* m_SelectionModeCheckBox;
   QDoubleSpinBox* m_SmoothingSpinBox;
   QDoubleSpinBox* m_DecimationSpinBox;
-  QCheckBox* m_SelectionModeCheckBox;
 
   bool m_Initializing;
 

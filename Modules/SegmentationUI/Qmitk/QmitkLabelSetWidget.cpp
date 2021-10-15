@@ -831,9 +831,12 @@ void QmitkLabelSetWidget::ResetAllTableWidgetItems()
     tableWidget->removeRow(0);
   }
 
-  mitk::LabelSetImage *workingImage = GetWorkingImage();
-  if (!workingImage)
+  mitk::DataNode * workingNode = GetWorkingNode();
+  auto workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+  if (nullptr == workingImage)
+  {
     return;
+  }
 
   // add all labels
   m_LabelStringList.clear();

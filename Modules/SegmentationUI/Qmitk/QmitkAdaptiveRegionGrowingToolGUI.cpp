@@ -574,7 +574,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::StartRegionGrowing(const itk::Image<TPix
   }
   else
   {
-    thresholdFilter->SetLowerThreshold(itk::NumericTraits<TPixel>::min());
+    thresholdFilter->SetLowerThreshold(itk::NumericTraits<TPixel>::NonpositiveMin());
     thresholdFilter->SetUpperThreshold(sliderVal);
   }
   thresholdFilter->SetInPlace(false);

@@ -10,54 +10,55 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkMultiLabelSegmentationView_h
-#define QmitkMultiLabelSegmentationView_h
-
-#include <QmitkAbstractView.h>
-
-#include "mitkSegmentationInteractor.h"
-#include <mitkILifecycleAwarePart.h>
+#ifndef QMITKMULTILABELSEGMENTATIONVIEW_H
+#define QMITKMULTILABELSEGMENTATIONVIEW_H
 
 #include "ui_QmitkMultiLabelSegmentationControls.h"
 
-// berry
+#include <QmitkAbstractView.h>
+#include <mitkIRenderWindowPartListener.h>
+
 #include <berryIBerryPreferences.h>
 
-class QmitkRenderWindow;
-
 /**
- * \ingroup ToolManagerEtAl
- * \ingroup org_mitk_gui_qt_multilabelsegmentation_internal
- */
-class QmitkMultiLabelSegmentationView : public QmitkAbstractView, public mitk::ILifecycleAwarePart
+* @brief The multilabel segmentation view provides a set of tool to use different segmentation
+*        algorithms.
+*        It provides two selection widgets to load an image node and a segmentation node
+*        on which to perform the segmentation. Creating new segmentation nodes is also possible.
+*        The available segmentation tools are grouped into "2D"- and "3D"-tools.
+*
+*        Most segmentation tools / algorithms need some kind of user interaction, where the
+*        user is asked to draw something in the image display or set some seed points / start values.
+*        The tools also often provide additional propeties so that a user can modify the
+*        algorithm's behavior.
+*
+*        In contrast to the basic QmitkSegmentationView this class additionally provides options to
+*        work with different layers (create new layers, switch between layers).
+*        Moreover, a multilabel widget displays all the existing labels of a multilabel segmentation
+*        for the currently active layer.
+*        The multilabel widget allows to control the labels by creatin new one, removing existing ones,
+*        showing / hiding single labels, merging labels, (re-)naming them etc.
+*
+*        Interpolation for multilabel segmentations is currently not implemented.
+*/
+class QmitkMultiLabelSegmentationView : public QmitkAbstractView, public mitk::IRenderWindowPartListener
 {
   Q_OBJECT
 
 public:
+
   static const std::string VIEW_ID;
 
   QmitkMultiLabelSegmentationView();
   ~QmitkMultiLabelSegmentationView() override;
 
-  typedef std::map<mitk::DataNode *, unsigned long> NodeTagMapType;
+private Q_SLOTS:
 
-  // GUI setup
-  void CreateQtPartControl(QWidget *parent) override;
+  // reaction to the selection of a new reference image in the selection widget
+  void OnReferenceSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 
-  // ILifecycleAwarePart interface
-public:
-  void Activated() override;
-  void Deactivated() override;
-  void Visible() override;
-  void Hidden() override;
-
-  virtual int GetSizeFlags(bool width);
-  virtual int ComputePreferredSize(bool width,
-                                   int /*availableParallel*/,
-                                   int /*availablePerpendicular*/,
-                                   int preferredResult);
-
-protected slots:
+  // reaction to the selection of a new segmentation image in the selection widget
+  void OnSegmentationSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 
   // reaction to the shortcut for toggling the visibility of the working node
   void OnVisibilityShortcutActivated();
@@ -103,59 +104,61 @@ protected slots:
   // reaction to the combobox change "Change Layer"
   void OnChangeLayer(int);
 
-  // reaction to the button "Deactive Active Tool"
-  void OnDeactivateActiveTool();
-
   // reaction to the button "Lock exterior"
   void OnLockExteriorToggled(bool);
-
-  // reaction to the selection of a new patient (reference) image in the DataStorage combobox
-  void OnReferenceSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
-
-  // reaction to the selection of a new Segmentation (working) image in the DataStorage combobox
-  void OnSegmentationSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 
   // reaction to ...
   void OnInterpolationSelectionChanged(int);
 
-protected:
+private:
 
-  // reimplemented from QmitkAbstractView
+  void CreateQtPartControl(QWidget *parent) override;
+
+  void SetFocus() override {}
+
+  void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
+
   void OnPreferencesChanged(const berry::IBerryPreferences* prefs) override;
 
-  // reimplemented from QmitkAbstractView
+  void NodeAdded(const mitk::DataNode *node) override;
+
   void NodeRemoved(const mitk::DataNode* node) override;
+
+  // make sure all images / segmentations look according to the user preference settings
+  void ApplyDisplayOptions();
+
+  // decorates a DataNode according to the user preference settings
+  void ApplyDisplayOptions(mitk::DataNode* node);
 
   void OnEstablishLabelSetConnection();
 
   void OnLooseLabelSetConnection();
 
-  void SetFocus() override;
-
-  void UpdateControls();
-
-  void RenderWindowPartActivated(mitk::IRenderWindowPart *renderWindowPart);
-
-  void RenderWindowPartDeactivated(mitk::IRenderWindowPart *renderWindowPart);
-
   void ResetMouseCursor();
 
-  void SetMouseCursor(const us::ModuleResource, int hotspotX, int hotspotY);
+  void SetMouseCursor(const us::ModuleResource&, int hotspotX, int hotspotY);
 
-  void InitializeListeners();
+  void UpdateGUI();
 
-  /// \brief the Qt parent of our GUI (NOT of this object)
+  void ValidateSelectionInput();
+
+  void UpdateWarningLabel(QString text);
+
   QWidget *m_Parent;
 
-  /// \brief Qt GUI file
   Ui::QmitkMultiLabelSegmentationControls m_Controls;
 
-  mitk::IRenderWindowPart *m_IRenderWindowPart;
+  mitk::IRenderWindowPart *m_RenderWindowPart;
 
   mitk::ToolManager *m_ToolManager;
 
   mitk::DataNode::Pointer m_ReferenceNode;
   mitk::DataNode::Pointer m_WorkingNode;
+
+  typedef std::map<mitk::DataNode *, unsigned long> NodeTagMapType;
+  NodeTagMapType m_WorkingDataObserverTags;
+  unsigned int m_RenderingManagerObserverTag;
 
   mitk::NodePredicateAnd::Pointer m_ReferencePredicate;
   mitk::NodePredicateAnd::Pointer m_SegmentationPredicate;
@@ -163,13 +166,6 @@ protected:
   bool m_AutoSelectionEnabled;
   bool m_MouseCursorSet;
 
-  mitk::SegmentationInteractor::Pointer m_Interactor;
-
-  /**
-   * Reference to the service registration of the observer,
-   * it is needed to unregister the observer on unload.
-   */
-  us::ServiceRegistration<mitk::InteractionEventObserver> m_ServiceRegistration;
 };
 
-#endif // QmitkMultiLabelSegmentationView_h
+#endif // QMITKMULTILABELSEGMENTATIONVIEW_H

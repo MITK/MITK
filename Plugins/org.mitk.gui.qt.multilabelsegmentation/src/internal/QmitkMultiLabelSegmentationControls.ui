@@ -22,19 +22,8 @@
     <height>0</height>
    </size>
   </property>
-  <property name="font">
-   <font>
-    <family>MS Shell Dlg 2</family>
-    <pointsize>8</pointsize>
-    <weight>50</weight>
-    <italic>false</italic>
-    <bold>false</bold>
-    <underline>false</underline>
-    <strikeout>false</strikeout>
-   </font>
-  </property>
   <property name="windowTitle">
-   <string>QmitkSegmentation</string>
+   <string>QmitkMultiLabelSegmentation</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_5">
    <item>
@@ -107,6 +96,19 @@
           <height>40</height>
          </size>
         </property>
+       </widget>
+      </item>
+	  <item row="2" column="0" colspan="3">
+	   <widget class="QLabel" name="lblSegmentationWarnings">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+		<property name="wordWrap">
+	     <bool>true</bool>
+	    </property>
        </widget>
       </item>
      </layout>
@@ -458,12 +460,6 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <property name="usesScrollButtons">
-      <bool>true</bool>
-     </property>
-     <property name="documentMode">
-      <bool>false</bool>
-     </property>
      <widget class="QWidget" name="m_tb2DTools">
       <attribute name="title">
        <string>2D Tools</string>
@@ -502,7 +498,7 @@
         </widget>
        </item>
        <item>
-        <spacer name="verticalSpacer_2">
+        <spacer name="verticalSpacer_1">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
@@ -554,7 +550,7 @@
         </widget>
        </item>
        <item>
-        <spacer name="verticalSpacer_5">
+        <spacer name="verticalSpacer_2">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
@@ -673,17 +669,6 @@
               <height>0</height>
              </size>
             </property>
-            <property name="font">
-             <font>
-              <family>MS Shell Dlg 2</family>
-              <pointsize>8</pointsize>
-              <weight>50</weight>
-              <italic>false</italic>
-              <bold>false</bold>
-              <underline>false</underline>
-              <strikeout>false</strikeout>
-             </font>
-            </property>
            </widget>
           </item>
          </layout>
@@ -696,21 +681,6 @@
           </sizepolicy>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">
-          <property name="sizeConstraint">
-           <enum>QLayout::SetMinimumSize</enum>
-          </property>
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
           <item>
            <widget class="QmitkSurfaceBasedInterpolatorWidget" name="m_SurfaceBasedInterpolatorWidget" native="true">
             <property name="sizePolicy">
@@ -724,17 +694,6 @@
               <width>0</width>
               <height>50</height>
              </size>
-            </property>
-            <property name="font">
-             <font>
-              <family>MS Shell Dlg 2</family>
-              <pointsize>8</pointsize>
-              <weight>50</weight>
-              <italic>false</italic>
-              <bold>false</bold>
-              <underline>false</underline>
-              <strikeout>false</strikeout>
-             </font>
             </property>
            </widget>
           </item>

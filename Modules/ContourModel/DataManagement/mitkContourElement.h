@@ -144,11 +144,29 @@ namespace mitk
     VertexType* GetVertexAt(VertexSizeType index);
     const VertexType* GetVertexAt(VertexSizeType index) const;
 
-    /** \brief Returns the approximate nearest vertex a given posoition in 3D space
+    /** \brief Returns the approximate nearest vertex a given position in 3D space
     \param point - query position in 3D space.
     \param eps - the error bound for search algorithm.
     */
     VertexType *GetVertexAt(const mitk::Point3D &point, float eps);
+
+    /** \brief Returns the next vertex to the approximate nearest vertex of a given position in 3D space
+    \param point - query position in 3D space.
+    \param eps - the error bound for search algorithm.
+    */
+    VertexType *GetNextControlVertexAt(const mitk::Point3D &point, float eps);
+
+    /** \brief Returns the previous vertex to the approximate nearest vertex of a given position in 3D space
+    \param point - query position in 3D space.
+    \param eps - the error bound for search algorithm.
+    */
+    VertexType *GetPreviousControlVertexAt(const mitk::Point3D &point, float eps);
+
+    /** \brief Returns the approximate nearest control vertex a given posoition in 3D space, if the clicked position is within a specific range.
+      \param point - query position in 3D space.
+      \param eps - the error bound for search algorithm.
+      */
+    VertexType *GetControlVertexAt(const mitk::Point3D &point, float eps);
 
     /** \brief Returns the index of the given vertex within the contour.
     \param vertex - the vertex to be searched.
@@ -157,7 +175,7 @@ namespace mitk
     VertexSizeType GetIndex(const VertexType *vertex) const;
 
     /** \brief Returns the container of the vertices.
-    */
+     */
     const VertexListType *GetVertexList() const;
 
     /** \brief Returns whether the contour element is empty.
@@ -216,11 +234,22 @@ namespace mitk
     */
     void Clear();
 
-    /** \brief Returns the approximate nearest vertex a given posoition in 3D space
+    /** \brief Returns the approximate nearest vertex a given position in 3D space. With the parameter 'isControlPoint', 
+    one can decide if any vertex should be returned, or just control vertices.
     \param point - query position in 3D space.
-    \param eps - the error bound for search algorithm.
+    \param eps - the error bound for search algorithm. It is an open boundary.
+    \param offset - a offset to the vertex, e.g. 1 if the next vertex should be returned or -1 for the previous vertex
     */
-    VertexType *BruteForceGetVertexAt(const mitk::Point3D &point, double eps);
+    VertexType *BruteForceGetVertexAt(const mitk::Point3D &point, double eps, bool isControlPoint = false, int offset = 0);
+
+    /** \brief Returns the index of the approximate nearest vertex of a given position in 3D space.
+    \param point - query position in 3D space.
+    \param eps - the error bound for search algorithm. It is an open boundary.
+    \param verticesList - the vertex list to search the index in, either only control vertices or all vertices
+    */
+    int BruteForceGetVertexIndexAt(const mitk::Point3D &point,
+                                                      double eps,
+                                                      VertexListType verticesList);
 
     /** Returns a list pointing to all vertices that are indicated to be control
      points.

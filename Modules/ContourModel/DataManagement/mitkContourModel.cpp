@@ -188,6 +188,28 @@ const mitk::ContourModel::VertexType *mitk::ContourModel::GetVertexAt(int index,
   return nullptr;
 }
 
+const mitk::ContourModel::VertexType *mitk::ContourModel::GetNextControlVertexAt(mitk::Point3D &point,
+                                                                          float eps,
+                                                                          TimeStepType timestep) const
+{
+  if (!this->IsEmptyTimeStep(timestep))
+  {
+    return this->m_ContourSeries[timestep]->GetNextControlVertexAt(point, eps);
+  }
+  return nullptr;
+}
+
+const mitk::ContourModel::VertexType *mitk::ContourModel::GetPreviousControlVertexAt(mitk::Point3D &point,
+                                                                          float eps,
+                                                                          TimeStepType timestep) const
+{
+  if (!this->IsEmptyTimeStep(timestep))
+  {
+    return this->m_ContourSeries[timestep]->GetPreviousControlVertexAt(point, eps);
+  }
+  return nullptr;
+}
+
 int mitk::ContourModel::GetIndex(const VertexType *vertex, TimeStepType timestep)
 {
   if (!this->IsEmptyTimeStep(timestep))
@@ -301,6 +323,15 @@ bool mitk::ContourModel::IsClosed(int timestep) const
     return this->m_ContourSeries[timestep]->IsClosed();
   }
   return false;
+}
+
+bool mitk::ContourModel::SelectControlVertexAt(Point3D &point, float eps, TimeStepType timestep)
+{
+  if (!this->IsEmptyTimeStep(timestep))
+  {
+    this->m_SelectedVertex = this->m_ContourSeries[timestep]->GetControlVertexAt(point, eps);
+  }
+  return this->m_SelectedVertex != nullptr;
 }
 
 bool mitk::ContourModel::SelectVertexAt(Point3D &point, float eps, TimeStepType timestep)
@@ -496,6 +527,26 @@ void mitk::ContourModel::RedistributeControlVertices(int period, TimeStepType ti
     this->Modified();
     this->m_UpdateBoundingBox = true;
   }
+}
+
+mitk::ContourModel::VertexListType mitk::ContourModel::GetControlVertices(TimeStepType timestep)
+{
+  VertexListType controlVertices;
+  if (!this->IsEmptyTimeStep(timestep))
+  {
+    controlVertices = this->m_ContourSeries[timestep]->GetControlVertices();
+  }
+  return controlVertices;
+}
+
+mitk::ContourModel::VertexListType mitk::ContourModel::GetVertexList(TimeStepType timestep)
+{
+  VertexListType controlVertices;
+  if (!this->IsEmptyTimeStep(timestep))
+  {
+    controlVertices = *this->m_ContourSeries[timestep]->GetVertexList();
+  }
+  return controlVertices;
 }
 
 void mitk::ContourModel::ClearData()

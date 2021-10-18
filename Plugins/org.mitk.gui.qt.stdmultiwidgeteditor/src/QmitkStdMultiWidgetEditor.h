@@ -71,7 +71,7 @@ public:
   */
   virtual void PartVisible(const berry::IWorkbenchPartReference::Pointer& partRef) override;
 
-  void OnInteractionSchemeChanged(mitk::InteractionSchemeSwitcher::InteractionScheme scheme);
+  void OnInteractionSchemeChanged(mitk::InteractionSchemeSwitcher::InteractionScheme scheme) override;
 
   void ShowLevelWindowWidget(bool show);
 

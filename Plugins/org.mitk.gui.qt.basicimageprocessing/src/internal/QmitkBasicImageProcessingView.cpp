@@ -1035,9 +1035,9 @@ void QmitkBasicImageProcessing::StartButtonClicked()
 
   // compose new image name
   std::string name = selectedNode->GetName();
-  if (name.find(".pic.gz") == name.size() -7 )
+  if (name.find(".nrrd") == name.size() -5 )
   {
-    name = name.substr(0,name.size() -7);
+    name = name.substr(0,name.size() -5);
   }
   name.append( nameAddition.str() );
 
@@ -1304,9 +1304,9 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
   auto levWinProp = mitk::LevelWindowProperty::New();
   levWinProp->SetLevelWindow( levelwindow );
   std::string name = selectedNode->GetName();
-  if (name.find(".pic.gz") == name.size() -7 )
+  if (name.find(".nrrd") == name.size() -5 )
   {
-    name = name.substr(0,name.size() -7);
+    name = name.substr(0,name.size() -5);
   }
 
   // create final result MITK data storage node

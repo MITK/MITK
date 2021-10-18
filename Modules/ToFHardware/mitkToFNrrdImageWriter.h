@@ -40,7 +40,7 @@ namespace mitk
     */
     void Open() override;
     /*!
-    \brief Close file(s) add .pic header and write
+    \brief Close file(s) add header and write
     */
     void Close() override;
     /*!

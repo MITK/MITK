@@ -123,8 +123,6 @@ Q_SIGNALS:
   /// \brief Emits a signal to say that this window has had the following nodes dropped on it.
   void NodesDropped(QmitkRenderWindow *thisWindow, std::vector<mitk::DataNode *> nodes);
 
-  void mouseEvent(QMouseEvent *);
-
 private Q_SLOTS:
 
   void DeferredHideMenu();

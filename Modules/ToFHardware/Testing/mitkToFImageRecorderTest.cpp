@@ -73,9 +73,9 @@ public:
     m_ToFImageRecorder->SetRecordMode(mitk::ToFImageRecorder::PerFrames);
 
     std::string dirName = MITK_TOF_DATA_DIR;
-    std::string distanceFileName = dirName + "/PMDCamCube2_MF0_IT0_20Images_DistanceImage.pic";
-    std::string amplitudeFileName = dirName + "/PMDCamCube2_MF0_IT0_20Images_AmplitudeImage.pic";
-    std::string intensityFileName = dirName + "/PMDCamCube2_MF0_IT0_20Images_IntensityImage.pic";
+    std::string distanceFileName = dirName + "/PMDCamCube2_MF0_IT0_20Images_DistanceImage.nrrd";
+    std::string amplitudeFileName = dirName + "/PMDCamCube2_MF0_IT0_20Images_AmplitudeImage.nrrd";
+    std::string intensityFileName = dirName + "/PMDCamCube2_MF0_IT0_20Images_IntensityImage.nrrd";
 
     m_PlayerDevice->SetProperty("DistanceImageFileName",mitk::StringProperty::New(distanceFileName));
     m_PlayerDevice->SetProperty("AmplitudeImageFileName",mitk::StringProperty::New(amplitudeFileName));

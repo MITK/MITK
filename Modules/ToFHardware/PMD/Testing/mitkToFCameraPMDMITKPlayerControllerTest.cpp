@@ -36,7 +36,7 @@ int mitkToFCameraPMDMITKPlayerControllerTest(int /* argc */, char* /*argv*/[])
   //      functionality is not working therefor the test cases are excluded!!
 
   //std::string filePath = MITK_TOF_DATA_DIR;
-  //testFile = "/aa_raw.pic";
+  //testFile = "/aa_raw.nrrd";
   //filePath.append(testFile);
   //testObject->SetInputFileName(filePath);
   //MITK_TEST_CONDITION_REQUIRED( testObject->OpenCameraConnection(),"Testing open camera with valid data");

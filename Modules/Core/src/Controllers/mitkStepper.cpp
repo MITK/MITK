@@ -167,11 +167,18 @@ void mitk::Stepper::Previous()
 
 void mitk::Stepper::MoveSlice(int sliceDelta)
 {
-  int newPosition = this->GetPos() + sliceDelta;
-  // if auto repeat is on, increasing continues at the first slice if the last slice was reached and vice versa
   int maxSlices = this->GetSteps();
+  if (0 == maxSlices)
+  {
+    // cannot move slice if no slices available (no image loaded)
+    return;
+  }
+
+  int newPosition = this->GetPos() + sliceDelta;
+
   if (m_AutoRepeat)
   {
+    // if auto repeat is on, increasing continues at the first slice if the last slice was reached and vice versa
     while (newPosition < 0)
     {
       newPosition += maxSlices;

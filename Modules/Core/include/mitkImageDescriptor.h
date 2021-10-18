@@ -21,7 +21,7 @@ found in the LICENSE file.
 #include "mitkChannelDescriptor.h"
 #include "mitkCommon.h"
 
-/// Defines the maximum of 8 dimensions per image channel taken from ipPicDescriptor
+/// Defines the maximum of 8 dimensions per image channel
 #define MAX_IMAGE_DIMENSIONS 8
 
 namespace mitk

@@ -200,7 +200,7 @@ void mitk::LiveWireTool2D::ConfirmSegmentation()
       //public interfaces.
       auto workingSlice = const_cast<Image*>(finding->slice.GetPointer());
 
-      auto projectedContour = ContourModelUtils::ProjectContourTo2DSlice(workingSlice, contour, true, false);
+      auto projectedContour = ContourModelUtils::ProjectContourTo2DSlice(workingSlice, contour);
       int activePixelValue = ContourModelUtils::GetActivePixelValue(workingImage);
 
       ContourModelUtils::FillContourInSlice(

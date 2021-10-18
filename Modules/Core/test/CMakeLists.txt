@@ -166,7 +166,7 @@ if(TARGET ${TESTDRIVER})
   #)
 
   #mitkAddCustomModuleRenderingTest(mitkNodeDependentPointSetInteractorTest mitkNodeDependentPointSetInteractorTest
-  #                        ${MITK_DATA_DIR}/Pic3D.pic.gz ${MITK_DATA_DIR}/BallBinary30x30x30.pic.gz
+  #                        ${MITK_DATA_DIR}/Pic3D.nrrd ${MITK_DATA_DIR}/BallBinary30x30x30.nrrd
   #)
 
   mitkAddCustomModuleRenderingTest(mitkPlaneGeometryDataMapper2DTest mitkPlaneGeometryDataMapper2DTest

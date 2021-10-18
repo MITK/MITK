@@ -75,7 +75,3 @@ set(MITK_MODULES
   RESTService
   DICOMweb
 )
-
-if(MITK_ENABLE_PIC_READER)
-  list(APPEND MITK_MODULES IpPicSupportIO)
-endif()

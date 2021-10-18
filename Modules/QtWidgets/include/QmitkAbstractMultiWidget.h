@@ -126,9 +126,13 @@ public:
 
   QmitkMultiWidgetLayoutManager* GetMultiWidgetLayoutManager() const;
 
-Q_SIGNALS:
+signals:
 
   void ActiveRenderWindowChanged();
+
+private slots:
+
+  void OnFocusChanged(itk::Object*, const itk::EventObject& event);
 
 protected:
 

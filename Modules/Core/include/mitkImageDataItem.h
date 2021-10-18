@@ -15,10 +15,7 @@ found in the LICENSE file.
 
 #include "mitkCommon.h"
 #include <MitkCoreExports.h>
-//#include <mitkIpPic.h>
-//#include "mitkPixelType.h"
 #include "mitkImageDescriptor.h"
-//#include "mitkImageVtkAccessor.h"
 
 class vtkImageData;
 
@@ -35,9 +32,8 @@ namespace mitk
   //##
   //## ImageDataItem is a container for image data which is used internal in
   //## mitk::Image to handle the communication between the different data types for images
-  //## used in MITK (ipPicDescriptor, mitk::Image, vtkImageData). Common for these image data
+  //## used in MITK (mitk::Image, vtkImageData). Common for these image data
   //## types is the actual image data, but they differ in representation of pixel type etc.
-  //## The class is also used to convert ipPic images to vtkImageData.
   //##
   //## The class is mainly used to extract sub-images inside of mitk::Image, like single slices etc.
   //## It should not be used outside of this.

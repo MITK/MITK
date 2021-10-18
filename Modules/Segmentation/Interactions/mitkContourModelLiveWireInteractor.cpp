@@ -93,12 +93,18 @@ bool mitk::ContourModelLiveWireInteractor::OnCheckPointClick(const InteractionEv
   if (isVertexSelected)
   {
     contour->SetSelectedVertexAsControlPoint(true);
-    auto controlVertices = contour->GetControlVertexList(timeStep);
-    const mitk::ContourModel::VertexType *nextPoint = contour->GetNextVertexAt(click, mitk::ContourModelLiveWireInteractor::eps, timeStep);
-    const mitk::ContourModel::VertexType *previousPoint = contour->GetPreviousVertexAt(click, mitk::ContourModelLiveWireInteractor::eps, timeStep);
+    auto controlVertices = contour->GetControlVertices(timeStep);
+    const mitk::ContourModel::VertexType *nextPoint = contour->GetNextControlVertexAt(click, mitk::ContourModelLiveWireInteractor::eps, timeStep);
+    const mitk::ContourModel::VertexType *previousPoint = contour->GetPreviousControlVertexAt(click, mitk::ContourModelLiveWireInteractor::eps, timeStep);
     this->SplitContourFromSelectedVertex(contour, nextPoint, previousPoint, timeStep);
     m_NextActiveVertexUp = nextPoint->Coordinates;
     m_NextActiveVertexDown = previousPoint->Coordinates;
+
+    // clear previous void positions
+    this->m_LiveWireFilter->ClearRepulsivePoints();
+    // all points in lower and upper part should be marked as repulsive points to not be changed
+    this->SetRepulsivePoints(previousPoint, m_ContourLeft, timeStep);
+    this->SetRepulsivePoints(nextPoint, m_ContourRight, timeStep);
 
     // clear container with void points between neighboring control points
     m_ContourBeingModified.clear();
@@ -155,7 +161,6 @@ void mitk::ContourModelLiveWireInteractor::OnDeletePoint(StateMachineAction *, I
     // recompute contour between neighbored two active control points
     this->m_LiveWireFilter->SetStartPoint(this->m_NextActiveVertexDown);
     this->m_LiveWireFilter->SetEndPoint(this->m_NextActiveVertexUp);
-    // this->m_LiveWireFilter->ClearRepulsivePoints();
     this->m_LiveWireFilter->Update();
 
     mitk::ContourModel *liveWireContour = this->m_LiveWireFilter->GetOutput();
@@ -367,9 +372,6 @@ void mitk::ContourModelLiveWireInteractor::SplitContourFromSelectedVertex(mitk::
     }
   }
 
-  // clear previous void positions
-  this->m_LiveWireFilter->ClearRepulsivePoints();
-
   for (; it != srcContour->IteratorEnd(timeStep); it++)
   {
     // everything in lower part should be added to m_CountoutLeft
@@ -393,8 +395,17 @@ void mitk::ContourModelLiveWireInteractor::SplitContourFromSelectedVertex(mitk::
     {
       m_ContourRight->AddVertex((*it)->Coordinates, (*it)->IsControlPoint, timeStep);
     }
-    // all points in lower and upper part should be marked as repulsive points to not be changed
-    if ((lowerPart && *it != previousPoint) || (upperPart && *it != nextPoint))
+  }
+}
+
+void mitk::ContourModelLiveWireInteractor::SetRepulsivePoints(const mitk::ContourModel::VertexType *pointToExclude,
+                                                              mitk::ContourModel *contour,
+                                                              int timeStep)
+{
+  auto it = contour->IteratorBegin();
+  for (; it != contour->IteratorEnd(timeStep); it++)
+  {
+    if (*it != pointToExclude)
     {
       itk::Index<2> idx;
       this->m_WorkingSlice->GetGeometry()->WorldToIndex((*it)->Coordinates, idx);

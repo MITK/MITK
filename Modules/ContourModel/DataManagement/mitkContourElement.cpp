@@ -173,7 +173,7 @@ mitk::ContourElement::VertexType *mitk::ContourElement::GetVertexAt(const mitk::
   return nullptr;
 }
 
-mitk::ContourElement::VertexType *mitk::ContourElement::GetNextVertexAt(const mitk::Point3D &point, float eps)
+mitk::ContourElement::VertexType *mitk::ContourElement::GetNextControlVertexAt(const mitk::Point3D &point, float eps)
 {
   /* current version iterates over the whole deque - should some kind of an octree with spatial query*/
 
@@ -185,7 +185,7 @@ mitk::ContourElement::VertexType *mitk::ContourElement::GetNextVertexAt(const mi
   return nullptr;
 }
 
-mitk::ContourElement::VertexType *mitk::ContourElement::GetPreviousVertexAt(const mitk::Point3D &point, float eps)
+mitk::ContourElement::VertexType *mitk::ContourElement::GetPreviousControlVertexAt(const mitk::Point3D &point, float eps)
 {
   /* current version iterates over the whole deque - should some kind of an octree with spatial query*/
 
@@ -206,7 +206,7 @@ mitk::ContourElement::VertexType *mitk::ContourElement::BruteForceGetVertexAt(co
 
   if (isControlPoint)
   {
-    verticesList = this->GetControlVertexList();
+    verticesList = this->GetControlVertices();
   }
   else
   {
@@ -247,6 +247,7 @@ int mitk::ContourElement::BruteForceGetVertexIndexAt(const mitk::Point3D &point,
 
   ConstVertexIterator nearestPointIterator;
   bool nearestPointIsInitialized = false;
+  double nearestPointDistance = std::numeric_limits<double>::max();
 
   ConstVertexIterator it = verticesList.begin();
   ConstVertexIterator end = verticesList.end();
@@ -258,10 +259,11 @@ int mitk::ContourElement::BruteForceGetVertexIndexAt(const mitk::Point3D &point,
     double distance = currentPoint.EuclideanDistanceTo(point);
     if (distance < eps)
     {
-      if (!nearestPointIsInitialized || distance < (*nearestPointIterator)->Coordinates.EuclideanDistanceTo(point))
+      if (distance < nearestPointDistance)
       {
         nearestPointIterator = it;
         nearestPointIsInitialized = true;
+        nearestPointDistance = distance;
       }
     } // if distance > eps
 
@@ -278,21 +280,6 @@ int mitk::ContourElement::BruteForceGetVertexIndexAt(const mitk::Point3D &point,
 const mitk::ContourElement::VertexListType *mitk::ContourElement::GetVertexList() const
 {
   return &(this->m_Vertices);
-}
-
-const mitk::ContourElement::VertexListType mitk::ContourElement::GetControlVertexList() const
-{
-  VertexListType allList = (this->m_Vertices);
-  VertexListType out;
-
-  ConstVertexIterator begin = allList.begin();
-
-  ConstVertexIterator end = allList.end();
-
-  std::copy_if(begin, end, std::back_inserter(out), [](VertexType *i) { return i->IsControlPoint; });
-  // std::copy(begin, end, std::back_inserter(out));
-  return out;
-  // return &(this->m_Vertices);
 }
 
 bool mitk::ContourElement::IsClosed() const

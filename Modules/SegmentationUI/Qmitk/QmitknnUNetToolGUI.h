@@ -22,8 +22,9 @@ found in the LICENSE file.s
 #include <QCache>
 #include <QThread>
 #include <QMessageBox>
-#include <ctkPathLineEdit.h>
+#include <QmitknnUNetEnsembleLayout.h>
 #include <QmitkDataStorageComboBox.h>
+#include <memory>
 
 class MITKSEGMENTATIONUI_EXPORT QmitknnUNetToolGUI : public QmitkAutoMLSegmentationToolGUIBase
 {
@@ -117,6 +118,12 @@ protected:
   void EnableWidgets(bool enabled) override;
 
 private:
+
+  /**
+  * @brief Creates and renders QmitknnUNetTaskParamsUITemplate layout for ensemble input.
+  */
+  void ShowEnsembleLayout(bool visible = true);
+
   /**
    * @brief Creates a QMessage object and shows on screen.
    */
@@ -188,7 +195,9 @@ private:
    * @brief Stores all dynamically added ctk-path-line-edit UI elements.
    *
    */
-  std::vector<QmitkDataStorageComboBox *> m_Modalities;
+  std::vector<QmitkDataStorageComboBox *> m_Modalities; // TODO: fix memory leak
+
+  std::vector<std::unique_ptr<QmitknnUNetTaskParamsUITemplate>> m_EnsembleParams;
 
   mitk::NodePredicateBase::Pointer m_MultiModalPredicate;
 

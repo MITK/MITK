@@ -67,6 +67,7 @@ Qmitk/QmitkWatershedToolGUI.h
 Qmitk/QmitknnUNetToolGUI.h
 Qmitk/QmitknnUNetWorker.h
 Qmitk/QmitknnUNetGPU.h
+Qmitk/QmitknnUNetEnsembleLayout.h
 #Added from ML
 Qmitk/QmitkLabelSetWidget.h
 Qmitk/QmitkSurfaceStampWidget.h

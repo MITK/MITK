@@ -9,7 +9,7 @@ void nnUNetSegmentationWorker::DoWork(mitk::nnUNetTool *tool)
   try
   {
     QMutexLocker locker(&mutex);
-    tool->UpdatePreview();
+    tool->UpdatePreview(true);
     if (tool->GetOutputBuffer() == nullptr)
     {
       mitkThrow() << "An error occured while calling nnUNet process.";

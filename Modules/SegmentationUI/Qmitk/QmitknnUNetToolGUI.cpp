@@ -137,8 +137,8 @@ void QmitknnUNetToolGUI::OnSettingsAccepted()
       }
       else if (!IsNNUNetInstalled(pythonPath))
       {
-        throw std::runtime_error("nnUNet is not detected in the selected python environment. Please select a valid "
-                                 "python environment or install nnUNet.");
+        //throw std::runtime_error("nnUNet is not detected in the selected python environment. Please select a valid "
+        //                         "python environment or install nnUNet.");
       }
       QString trainerPlanner = m_Controls.trainerBox->currentText();
       QString splitterString = "__";

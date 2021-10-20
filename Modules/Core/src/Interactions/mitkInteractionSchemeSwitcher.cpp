@@ -38,63 +38,69 @@ void mitk::InteractionSchemeSwitcher::SetInteractionScheme(InteractionEventHandl
     // MITK MODE
     case MITKStandard:
     {
-      interactionEventHandler->SetEventConfig("DisplayConfigMITK.xml");
+      interactionEventHandler->SetEventConfig("DisplayConfigMITKBase.xml");
+      interactionEventHandler->AddEventConfig("DisplayConfigCrosshair.xml");
       break;
     }
     case MITKRotationUncoupled:
     {
-      interactionEventHandler->SetEventConfig("DisplayConfigMITKRotationUnCoupled.xml");
+      interactionEventHandler->SetEventConfig("DisplayConfigMITKBase.xml");
+      interactionEventHandler->AddEventConfig("DisplayConfigRotation.xml");
       break;
     }
     case MITKRotationCoupled:
     {
-      interactionEventHandler->SetEventConfig("DisplayConfigMITKRotation.xml");
+      interactionEventHandler->SetEventConfig("DisplayConfigMITKBase.xml");
+      interactionEventHandler->AddEventConfig("DisplayConfigRotation.xml");
+      interactionEventHandler->AddEventConfig("DisplayConfigActivateCoupling.xml");
       break;
     }
     case MITKSwivel:
     {
-      interactionEventHandler->SetEventConfig("DisplayConfigMITKSwivel.xml");
+      interactionEventHandler->SetEventConfig("DisplayConfigMITKBase.xml");
+      interactionEventHandler->AddEventConfig("DisplayConfigSwivel.xml");
       break;
     }
     // PACS MODE
     case PACSBase:
     {
-      interactionEventHandler->SetEventConfig("DisplayConfigPACS.xml");
+      interactionEventHandler->SetEventConfig("DisplayConfigPACSBase.xml");
       break;
     }
     case PACSStandard:
     {
-      interactionEventHandler->SetEventConfig("DisplayConfigPACS.xml");
-      interactionEventHandler->AddEventConfig("DisplayConfigPACSCrosshair.xml");
+      interactionEventHandler->SetEventConfig("DisplayConfigPACSBase.xml");
+      interactionEventHandler->AddEventConfig("DisplayConfigCrosshair.xml");
       break;
     }
     case PACSLevelWindow:
     {
-      interactionEventHandler->SetEventConfig("DisplayConfigPACS.xml");
+      interactionEventHandler->SetEventConfig("DisplayConfigPACSBase.xml");
       interactionEventHandler->AddEventConfig("DisplayConfigPACSLevelWindow.xml");
       break;
     }
     case PACSPan:
     {
-      interactionEventHandler->SetEventConfig("DisplayConfigPACS.xml");
+      interactionEventHandler->SetEventConfig("DisplayConfigPACSBase.xml");
       interactionEventHandler->AddEventConfig("DisplayConfigPACSPan.xml");
       break;
     }
     case PACSScroll:
     {
-      interactionEventHandler->SetEventConfig("DisplayConfigPACS.xml");
+      interactionEventHandler->SetEventConfig("DisplayConfigPACSBase.xml");
       interactionEventHandler->AddEventConfig("DisplayConfigPACSScroll.xml");
       break;
     }
     case PACSZoom:
     {
-      interactionEventHandler->SetEventConfig("DisplayConfigPACS.xml");
+      interactionEventHandler->SetEventConfig("DisplayConfigPACSBase.xml");
       interactionEventHandler->AddEventConfig("DisplayConfigPACSZoom.xml");
       break;
     }
     default:
     {
-      interactionEventHandler->SetEventConfig("DisplayConfigMITK.xml");
+      interactionEventHandler->SetEventConfig("DisplayConfigMITKBase.xml");
+      interactionEventHandler->AddEventConfig("DisplayConfigCrosshair.xml");
     }
   }
 

@@ -305,7 +305,7 @@ Interactions/globalConfig.xml
 Interactions/DisplayInteraction.xml
 Interactions/DisplayConfig.xml
 Interactions/DisplayConfigMITKBase.xml
-Interactions/DisplayConfigPACS.xml
+Interactions/DisplayConfigPACSBase.xml
 Interactions/DisplayConfigCrosshair.xml
 Interactions/DisplayConfigRotation.xml
 Interactions/DisplayConfigActivateCoupling.xml

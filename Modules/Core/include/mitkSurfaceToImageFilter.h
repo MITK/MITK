@@ -33,7 +33,7 @@ namespace mitk
    * binary image by setting MakeBinaryOutputOn (default is \a false). If
    * set to \a true all voxels inside the surface are set to one and all
    * outside voxel are set to zero.
-
+   *
    * The user can decide if he wants to keep the original values 
    * inside or outside the surface by setting ReverseStencil true (default is \a false). 
    * If set to \a true all voxels inside the surface are set to backGroundValue and all

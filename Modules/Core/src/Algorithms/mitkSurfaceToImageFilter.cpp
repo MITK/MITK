@@ -26,7 +26,7 @@ found in the LICENSE file.
 #include <vtkTransformPolyDataFilter.h>
 
 mitk::SurfaceToImageFilter::SurfaceToImageFilter()
-  : m_MakeOutputBinary(false), m_UShortBinaryPixelType(false), m_BackgroundValue(-10000), m_Tolerance(0.0)
+  : m_MakeOutputBinary(false), m_UShortBinaryPixelType(false), m_BackgroundValue(-10000), m_Tolerance(0.0)，m_ReverseStencil（false）
 {
 }
 
@@ -179,18 +179,13 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
     vtkImageData *image = m_MakeOutputBinary ? binaryImage->GetVtkImageData() :
                                                const_cast<mitk::Image *>(this->GetImage())->GetVtkImageData(time);
 
-    // fill the image with foreground voxels:
-    unsigned char inval = 1;
-    vtkIdType count = image->GetNumberOfPoints();
-    for (vtkIdType i = 0; i < count; ++i)
-    {
-      image->GetPointData()->GetScalars()->SetTuple1(i, inval);
-    }
-
     // Create stencil and use numerical minimum of pixel type as background value
     vtkSmartPointer<vtkImageStencil> stencil = vtkSmartPointer<vtkImageStencil>::New();
     stencil->SetInputData(image);
-    stencil->ReverseStencilOff();
+    if (m_ReverseStencil)
+    {
+        stencil->ReverseStencilOn();
+    }
     stencil->ReleaseDataFlagOn();
     stencil->SetStencilConnection(surfaceConverter->GetOutputPort());
 

@@ -48,6 +48,7 @@ mitk::GantryTiltInformation::GantryTiltInformation(
 : m_ShiftUp(0.0)
 , m_ShiftRight(0.0)
 , m_ShiftNormal(0.0)
+, m_ITKAssumedSliceSpacing(0.0)
 , m_NumberOfSlicesApart(numberOfSlicesApart)
 {
   assert(numberOfSlicesApart);

@@ -386,7 +386,17 @@ void mitk::LabelSetImage::ClearBuffer()
 {
   try
   {
-    AccessByItk(this, ClearBufferProcessing);
+    if (this->GetDimension() == 4)
+    { //remark: this extra branch was added, because LabelSetImage instances can be
+      //dynamic (4D), but AccessByItk by support only supports 2D and 3D.
+      //The option to change the CMake default dimensions for AccessByItk was
+      //dropped (for details see discussion in T28756)
+      AccessFixedDimensionByItk(this, ClearBufferProcessing,4);
+    }
+    else
+    {
+      AccessByItk(this, ClearBufferProcessing);
+    }
     this->Modified();
   }
   catch (itk::ExceptionObject &e)

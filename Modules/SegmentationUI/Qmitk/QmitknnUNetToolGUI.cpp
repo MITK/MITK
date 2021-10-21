@@ -57,7 +57,7 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
 #endif
   m_Controls.pythonEnvComboBox->addItem("Select");
   AutoParsePythonPaths();
-  connect(m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnSettingsAccepted()));
+  connect(m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnPreviewRequested()));
   connect(m_Controls.modeldirectoryBox,
           SIGNAL(directoryChanged(const QString &)),
           this,
@@ -105,6 +105,93 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   m_UI_ROWS = m_Controls.advancedSettingsLayout->rowCount(); // Must do. Row count is correct only here.
 }
 
+
+void QmitknnUNetToolGUI::OnPreviewRequested() 
+{
+  mitk::nnUNetTool::Pointer tool = this->GetConnectedToolAs<mitk::nnUNetTool>();
+  if (nullptr != tool)
+  {
+    try
+    {
+      QString modelName = m_Controls.modelBox->currentText();
+      if (modelName.startsWith("ensemble", Qt::CaseInsensitive))
+      {
+        ProcessEnsembleModelsParams(tool);
+      }
+      else
+      {
+        ProcessModelParams(tool);
+      }
+      QString pythonPathTextItem = m_Controls.pythonEnvComboBox->currentText();
+      QString pythonPath = pythonPathTextItem.mid(pythonPathTextItem.indexOf(" ") + 1);
+      bool isNoPip = m_Controls.nopipBox->isChecked();
+#ifdef _WIN32
+      if (!isNoPip && !(pythonPath.endsWith("Scripts", Qt::CaseInsensitive) ||
+                        pythonPath.endsWith("Scripts/", Qt::CaseInsensitive)))
+      {
+        pythonPath += QDir::separator() + QString("Scripts");
+      }
+#else
+      if (!(pythonPath.endsWith("bin", Qt::CaseInsensitive) || pythonPath.endsWith("bin/", Qt::CaseInsensitive)))
+      {
+        pythonPath += QDir::separator() + QString("bin");
+      }
+#endif
+      std::string nnUNetDirectory;
+      if (isNoPip)
+      {
+        nnUNetDirectory = m_Controls.codedirectoryBox->directory().toStdString();
+      }
+      else if (!IsNNUNetInstalled(pythonPath))
+      {
+        // throw std::runtime_error("nnUNet is not detected in the selected python environment. Please select a valid "
+        //                         "python environment or install nnUNet.");
+      }
+
+      tool->SetnnUNetDirectory(nnUNetDirectory);
+      tool->SetPythonPath(pythonPath.toStdString());
+      tool->SetModelDirectory(m_ModelDirectory.left(m_ModelDirectory.lastIndexOf(QDir::separator())).toStdString());
+      // checkboxes
+      tool->SetMirror(m_Controls.mirrorBox->isChecked());
+      tool->SetMixedPrecision(m_Controls.mixedPrecisionBox->isChecked());
+      tool->SetNoPip(isNoPip);
+      tool->SetMultiModal(m_Controls.multiModalBox->isChecked());
+      // Spinboxes
+      tool->SetGpuId(static_cast<unsigned int>(m_Controls.gpuSpinBox->value()));
+      // Multi-Modal
+      tool->MultiModalOff();
+      if (m_Controls.multiModalBox->isChecked())
+      {
+        tool->m_OtherModalPaths.clear();
+        tool->m_OtherModalPaths = FetchMultiModalImagesFromUI();
+        tool->MultiModalOn();
+      }
+      if (!m_SegmentationThread->isRunning())
+      {
+        MITK_DEBUG << "Starting thread...";
+        m_SegmentationThread->start();
+      }
+      m_Controls.statusLabel->setText("<b>STATUS: </b><i>Starting Segmentation task... This might take a while.</i>");
+      emit Operate(tool);
+    }
+    catch (const std::exception &e)
+    {
+      std::stringstream errorMsg;
+      errorMsg << "Error while processing parameters for nnUNet segmentation. Reason: " << e.what();
+      ShowErrorMessage(errorMsg.str());
+      return;
+    }
+    catch (...)
+    {
+      std::string errorMsg = "Unkown error occured while generation nnUNet segmentation.";
+      ShowErrorMessage(errorMsg);
+      return;
+    }
+  }
+}
+
+
+/*
 void QmitknnUNetToolGUI::OnSettingsAccepted()
 {
   mitk::nnUNetTool::Pointer tool = this->GetConnectedToolAs<mitk::nnUNetTool>();
@@ -225,7 +312,7 @@ void QmitknnUNetToolGUI::OnSettingsAccepted()
       return;
     }
   }
-}
+}*/
 
 
 std::vector<mitk::Image::ConstPointer> QmitknnUNetToolGUI::FetchMultiModalImagesFromUI()
@@ -269,4 +356,63 @@ void QmitknnUNetToolGUI::ShowErrorMessage(const std::string &message, QMessageBo
   messageBox->exec();
   delete messageBox;
   MITK_WARN << message;
+}
+
+void QmitknnUNetToolGUI::ProcessEnsembleModelsParams(mitk::nnUNetTool::Pointer tool)
+{
+  QString taskName = m_Controls.taskBox->currentText();
+  std::vector<mitk::ModelParams> requestQ;
+  QStringList ppDirFolderName;
+  ppDirFolderName << "ensemble_";
+  if (m_EnsembleParams[0]->modelBox->currentText() == m_EnsembleParams[1]->modelBox->currentText())
+  {
+    for (std::unique_ptr<QmitknnUNetTaskParamsUITemplate> &layout : m_EnsembleParams)
+    {
+      QString modelName = layout->modelBox->currentText();
+      ppDirFolderName << modelName;
+      ppDirFolderName << "__";
+      QString trainer = layout->trainerBox->currentText();
+      ppDirFolderName << trainer;
+      ppDirFolderName << "__";
+      QString planId = layout->plannerBox->currentText();
+      ppDirFolderName << planId;
+      ppDirFolderName << "--";
+      auto testfold = std::vector<std::string>(1, "1");
+      mitk::ModelParams modelObject = MapToRequest(modelName, taskName, trainer, planId, testfold);
+      requestQ.push_back(modelObject);
+    }
+    tool->EnsembleOn();
+    QString ppJsonFile = QDir::cleanPath(m_ModelDirectory + QDir::separator() + "ensembles" + QDir::separator() +
+                                         taskName + QDir::separator() + ppDirFolderName.join(QString("")) +
+                                         QDir::separator() + "postprocessing.json");
+    if (QFile(ppJsonFile).exists())
+    {
+      tool->SetPostProcessingJsonDirectory(ppJsonFile.toStdString());
+    }
+    else
+    {
+      // warning message
+    }
+    tool->m_ParamQ.clear();
+    tool->m_ParamQ = requestQ;
+  }
+  else
+  {
+    throw std::runtime_error("Both models you have selected for ensembling are the same.");
+  }
+}
+
+void QmitknnUNetToolGUI::ProcessModelParams(mitk::nnUNetTool::Pointer tool) 
+{
+  tool->EnsembleOff();
+  std::vector<mitk::ModelParams> requestQ;
+  QString modelName = m_Controls.modelBox->currentText();
+  QString taskName = m_Controls.taskBox->currentText();
+  QString trainer = m_Controls.trainerBox->currentText();
+  QString planId = m_Controls.plannerBox->currentText();
+  std::vector<std::string> fetchedFolds = FetchSelectedFoldsFromUI();
+  mitk::ModelParams modelObject = MapToRequest(modelName, taskName, trainer, planId, fetchedFolds);
+  requestQ.push_back(modelObject);
+  tool->m_ParamQ.clear();
+  tool->m_ParamQ = requestQ;
 }

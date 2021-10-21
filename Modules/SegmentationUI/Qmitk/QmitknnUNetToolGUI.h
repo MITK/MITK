@@ -36,11 +36,12 @@ public:
   itkCloneMacro(Self);
 
 protected slots:
+
   /**
    * @brief Qt slot
    *
    */
-  void OnSettingsAccepted();
+  void OnPreviewRequested();
 
   /**
    * @brief Qt slot
@@ -118,6 +119,10 @@ protected:
   void EnableWidgets(bool enabled) override;
 
 private:
+
+  void ProcessEnsembleModelsParams(mitk::nnUNetTool::Pointer);
+
+  void ProcessModelParams(mitk::nnUNetTool::Pointer);
 
   /**
   * @brief Creates and renders QmitknnUNetTaskParamsUITemplate layout for ensemble input.

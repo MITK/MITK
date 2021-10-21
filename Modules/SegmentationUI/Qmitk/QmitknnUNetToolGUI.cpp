@@ -105,8 +105,7 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   m_UI_ROWS = m_Controls.advancedSettingsLayout->rowCount(); // Must do. Row count is correct only here.
 }
 
-
-void QmitknnUNetToolGUI::OnPreviewRequested() 
+void QmitknnUNetToolGUI::OnPreviewRequested()
 {
   mitk::nnUNetTool::Pointer tool = this->GetConnectedToolAs<mitk::nnUNetTool>();
   if (nullptr != tool)
@@ -189,7 +188,6 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
     }
   }
 }
-
 
 /*
 void QmitknnUNetToolGUI::OnSettingsAccepted()
@@ -314,7 +312,6 @@ void QmitknnUNetToolGUI::OnSettingsAccepted()
   }
 }*/
 
-
 std::vector<mitk::Image::ConstPointer> QmitknnUNetToolGUI::FetchMultiModalImagesFromUI()
 {
   std::vector<mitk::Image::ConstPointer> paths;
@@ -324,7 +321,7 @@ std::vector<mitk::Image::ConstPointer> QmitknnUNetToolGUI::FetchMultiModalImages
     {
       if (modality->objectName() != "multiModal_0")
       {
-        paths.push_back(dynamic_cast<const mitk::Image*>(modality->GetSelectedNode()->GetData()));
+        paths.push_back(dynamic_cast<const mitk::Image *>(modality->GetSelectedNode()->GetData()));
       }
     }
   }
@@ -364,45 +361,42 @@ void QmitknnUNetToolGUI::ProcessEnsembleModelsParams(mitk::nnUNetTool::Pointer t
   std::vector<mitk::ModelParams> requestQ;
   QStringList ppDirFolderName;
   ppDirFolderName << "ensemble_";
-  if (m_EnsembleParams[0]->modelBox->currentText() == m_EnsembleParams[1]->modelBox->currentText())
-  {
-    for (std::unique_ptr<QmitknnUNetTaskParamsUITemplate> &layout : m_EnsembleParams)
-    {
-      QString modelName = layout->modelBox->currentText();
-      ppDirFolderName << modelName;
-      ppDirFolderName << "__";
-      QString trainer = layout->trainerBox->currentText();
-      ppDirFolderName << trainer;
-      ppDirFolderName << "__";
-      QString planId = layout->plannerBox->currentText();
-      ppDirFolderName << planId;
-      ppDirFolderName << "--";
-      auto testfold = std::vector<std::string>(1, "1");
-      mitk::ModelParams modelObject = MapToRequest(modelName, taskName, trainer, planId, testfold);
-      requestQ.push_back(modelObject);
-    }
-    tool->EnsembleOn();
-    QString ppJsonFile = QDir::cleanPath(m_ModelDirectory + QDir::separator() + "ensembles" + QDir::separator() +
-                                         taskName + QDir::separator() + ppDirFolderName.join(QString("")) +
-                                         QDir::separator() + "postprocessing.json");
-    if (QFile(ppJsonFile).exists())
-    {
-      tool->SetPostProcessingJsonDirectory(ppJsonFile.toStdString());
-    }
-    else
-    {
-      // warning message
-    }
-    tool->m_ParamQ.clear();
-    tool->m_ParamQ = requestQ;
-  }
-  else
+  if (m_EnsembleParams[0]->modelBox->currentText() != m_EnsembleParams[1]->modelBox->currentText())
   {
     throw std::runtime_error("Both models you have selected for ensembling are the same.");
   }
+  for (std::unique_ptr<QmitknnUNetTaskParamsUITemplate> &layout : m_EnsembleParams)
+  {
+    QString modelName = layout->modelBox->currentText();
+    ppDirFolderName << modelName;
+    ppDirFolderName << "__";
+    QString trainer = layout->trainerBox->currentText();
+    ppDirFolderName << trainer;
+    ppDirFolderName << "__";
+    QString planId = layout->plannerBox->currentText();
+    ppDirFolderName << planId;
+    ppDirFolderName << "--";
+    auto testfold = std::vector<std::string>(1, "1");
+    mitk::ModelParams modelObject = MapToRequest(modelName, taskName, trainer, planId, testfold);
+    requestQ.push_back(modelObject);
+  }
+  tool->EnsembleOn();
+  QString ppJsonFile =
+    QDir::cleanPath(m_ModelDirectory + QDir::separator() + "ensembles" + QDir::separator() + taskName +
+                    QDir::separator() + ppDirFolderName.join(QString("")) + QDir::separator() + "postprocessing.json");
+  if (QFile(ppJsonFile).exists())
+  {
+    tool->SetPostProcessingJsonDirectory(ppJsonFile.toStdString());
+  }
+  else
+  {
+    // warning message
+  }
+  tool->m_ParamQ.clear();
+  tool->m_ParamQ = requestQ;
 }
 
-void QmitknnUNetToolGUI::ProcessModelParams(mitk::nnUNetTool::Pointer tool) 
+void QmitknnUNetToolGUI::ProcessModelParams(mitk::nnUNetTool::Pointer tool)
 {
   tool->EnsembleOff();
   std::vector<mitk::ModelParams> requestQ;

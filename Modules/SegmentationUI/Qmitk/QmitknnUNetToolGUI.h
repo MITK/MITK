@@ -20,11 +20,10 @@ found in the LICENSE file.s
 #include "ui_QmitknnUNetToolGUIControls.h"
 #include <MitkSegmentationUIExports.h>
 #include <QCache>
-#include <QThread>
 #include <QMessageBox>
-#include <QmitknnUNetEnsembleLayout.h>
+#include <QThread>
 #include <QmitkDataStorageComboBox.h>
-#include <memory>
+#include <QmitknnUNetEnsembleLayout.h>
 
 class MITKSEGMENTATIONUI_EXPORT QmitknnUNetToolGUI : public QmitkAutoMLSegmentationToolGUIBase
 {
@@ -119,14 +118,21 @@ protected:
   void EnableWidgets(bool enabled) override;
 
 private:
-
+  /**
+   * @brief Parses the ensemble UI elements and sets to nnUNetTool object pointer.
+   *
+   */
   void ProcessEnsembleModelsParams(mitk::nnUNetTool::Pointer);
 
+  /**
+   * @brief Parses the UI elements and sets to nnUNetTool object pointer.
+   *
+   */
   void ProcessModelParams(mitk::nnUNetTool::Pointer);
 
   /**
-  * @brief Creates and renders QmitknnUNetTaskParamsUITemplate layout for ensemble input.
-  */
+   * @brief Creates and renders QmitknnUNetTaskParamsUITemplate layout for ensemble input.
+   */
   void ShowEnsembleLayout(bool visible = true);
 
   /**

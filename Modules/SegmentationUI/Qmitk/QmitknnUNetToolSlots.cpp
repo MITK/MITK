@@ -2,10 +2,9 @@
 #include <QDir>
 #include <QDirIterator>
 #include <QMessageBox>
+#include <QmitknnUNetEnsembleLayout.h>
 #include <algorithm>
 #include <ctkCollapsibleGroupBox.h>
-#include <QmitknnUNetEnsembleLayout.h>
-#include <utility>
 
 void QmitknnUNetToolGUI::EnableWidgets(bool enabled)
 {
@@ -57,8 +56,7 @@ void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &resultsFolder)
                 });
 }
 
-
-void QmitknnUNetToolGUI::ShowEnsembleLayout(bool visible) 
+void QmitknnUNetToolGUI::ShowEnsembleLayout(bool visible)
 {
   if (m_EnsembleParams.empty())
   {
@@ -86,7 +84,7 @@ void QmitknnUNetToolGUI::ShowEnsembleLayout(bool visible)
     groupBoxModel2->setAlignment(Qt::AlignLeft);
     m_Controls.advancedSettingsLayout->addWidget(groupBoxModel2, 2, 2, 1, 2);
   }
-  for (std::unique_ptr<QmitknnUNetTaskParamsUITemplate>& layout: m_EnsembleParams)
+  for (std::unique_ptr<QmitknnUNetTaskParamsUITemplate> &layout : m_EnsembleParams)
   {
     layout->parent->setVisible(visible);
   }
@@ -108,7 +106,6 @@ void QmitknnUNetToolGUI::OnTaskChanged(const QString &text)
   }
   QString updatedPath = QDir::cleanPath(m_ModelDirectory + QDir::separator() + m_Controls.modelBox->currentText() +
                                         QDir::separator() + text);
-  MITK_INFO << "updated path ashis " << updatedPath.toStdString();
   m_Controls.trainerBox->clear();
   m_Controls.plannerBox->clear();
   auto trainerPlanners = FetchFoldersFromDir<QStringList>(updatedPath);
@@ -152,6 +149,7 @@ void QmitknnUNetToolGUI::OnTaskChanged(const QString &text)
       std::for_each(
         planners.begin(), planners.end(), [&layout](QString planner) { layout->plannerBox->addItem(planner); });
     }
+    m_Controls.previewButton->setEnabled(true);
   }
   else
   {
@@ -161,6 +159,7 @@ void QmitknnUNetToolGUI::OnTaskChanged(const QString &text)
     m_Controls.plannerLabel->setVisible(true);
     m_Controls.foldBox->setVisible(true);
     m_Controls.foldLabel->setVisible(true);
+    m_Controls.previewButton->setEnabled(false);
     ShowEnsembleLayout(false);
     QStringList trainers, planners;
     foreach (QString trainerPlanner, trainerPlanners)
@@ -170,8 +169,10 @@ void QmitknnUNetToolGUI::OnTaskChanged(const QString &text)
     }
     trainers.removeDuplicates();
     planners.removeDuplicates();
-    std::for_each(trainers.begin(), trainers.end(), [this](QString trainer) { m_Controls.trainerBox->addItem(trainer); });
-    std::for_each(planners.begin(), planners.end(), [this](QString planner) { m_Controls.plannerBox->addItem(planner); });
+    std::for_each(
+      trainers.begin(), trainers.end(), [this](QString trainer) { m_Controls.trainerBox->addItem(trainer); });
+    std::for_each(
+      planners.begin(), planners.end(), [this](QString planner) { m_Controls.plannerBox->addItem(planner); });
   }
 }
 
@@ -275,7 +276,7 @@ void QmitknnUNetToolGUI::OnCheckBoxChanged(int state)
 
 void QmitknnUNetToolGUI::OnModalitiesNumberChanged(int num)
 {
-  while (num > static_cast<int>(this->m_Modalities.size()-1))
+  while (num > static_cast<int>(this->m_Modalities.size() - 1))
   {
     QmitkDataStorageComboBox *multiModalBox = new QmitkDataStorageComboBox(this, true);
     mitk::nnUNetTool::Pointer tool = this->GetConnectedToolAs<mitk::nnUNetTool>();
@@ -285,21 +286,20 @@ void QmitknnUNetToolGUI::OnModalitiesNumberChanged(int num)
     m_Controls.advancedSettingsLayout->addWidget(multiModalBox, this->m_UI_ROWS + m_Modalities.size() + 1, 1, 1, 3);
     m_Modalities.push_back(multiModalBox);
   }
-  while (num < static_cast<int>(this->m_Modalities.size()-1) && !m_Modalities.empty())
+  while (num < static_cast<int>(this->m_Modalities.size() - 1) && !m_Modalities.empty())
   {
     QmitkDataStorageComboBox *child = m_Modalities.back();
     if (child->objectName() == "multiModal_0")
     {
-      std::iter_swap(this->m_Modalities.end() - 2, this->m_Modalities.end()-1);
+      std::iter_swap(this->m_Modalities.end() - 2, this->m_Modalities.end() - 1);
       child = m_Modalities.back();
     }
     delete child; // delete the layout item
     m_Modalities.pop_back();
   }
-  m_Controls.posSpinBox->setMaximum(this->m_Modalities.size()-1);
+  m_Controls.posSpinBox->setMaximum(this->m_Modalities.size() - 1);
   m_Controls.advancedSettingsLayout->update();
 }
-
 
 void QmitknnUNetToolGUI::OnModalPositionChanged(int posIdx)
 {
@@ -308,7 +308,7 @@ void QmitknnUNetToolGUI::OnModalPositionChanged(int posIdx)
     int currPos = 0;
     bool stopCheck = false;
     // for-loop clears all widgets from the QGridLayout and also, finds the position of loaded-image widget.
-    for (QmitkDataStorageComboBox *multiModalBox : this->m_Modalities) 
+    for (QmitkDataStorageComboBox *multiModalBox : this->m_Modalities)
     {
       m_Controls.advancedSettingsLayout->removeWidget(multiModalBox);
       multiModalBox->setParent(nullptr);
@@ -322,7 +322,7 @@ void QmitknnUNetToolGUI::OnModalPositionChanged(int posIdx)
       }
     }
     // moving the loaded-image widget to the required position
-    std::iter_swap(this->m_Modalities.begin() + currPos, this->m_Modalities.begin() + posIdx); 
+    std::iter_swap(this->m_Modalities.begin() + currPos, this->m_Modalities.begin() + posIdx);
     // re-adding all widgets in the order
     for (int i = 0; i < static_cast<int>(this->m_Modalities.size()); ++i)
     {

@@ -154,22 +154,22 @@
             <widget class="QSpinBox" name="multiModalSpinBox" native="true" />
           </item>
 
-		  <item row="4" column="0">
-			<widget class="QLabel" name="multiModalLabel">
-			    <property name="sizePolicy">
-					 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-						 <horstretch>0</horstretch>
-						 <verstretch>0</verstretch>
-					    </sizepolicy>
-				    </property>
-				    <property name="text">
-					    <string>Multi-Modal:</string>
-				    </property>
-			    </widget>
-		    </item>
-		    <item row="4" column="1">
-			    <widget class="ctkCheckBox" name="multiModalBox" native="true" />
-		    </item>
+          <item row="4" column="0">
+            <widget class="QLabel" name="multiModalLabel">
+              <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                </sizepolicy>
+              </property>
+              <property name="text">
+                <string>Multi-Modal:</string>
+              </property>
+            </widget>
+          </item>
+          <item row="4" column="1">
+            <widget class="ctkCheckBox" name="multiModalBox" native="true" />
+          </item>
 
           <!-- </item> -->
           <item row="4" column="2">
@@ -187,7 +187,7 @@
           </item>
           <item row="4" column="3">
             <widget class="QSpinBox" name="posSpinBox" native="true" />
-          </item> 
+          </item>
           <!-- </item> -->
         </layout>
       </item>
@@ -327,9 +327,9 @@
                   </widget>
                 </item>
                 <item row="2" column="1" colspan="3">
-                  <widget class="ctkComboBox" name="pythonEnvComboBox" native="true"/>
+                  <widget class="ctkComboBox" name="pythonEnvComboBox" native="true" />
                 </item>
-				<!-- </item> -->  
+                <!-- </item> -->
                 <item row="3" column="0">
                   <widget class="QLabel" name="nnUnetdirLabel">
                     <property name="sizePolicy">

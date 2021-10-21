@@ -361,7 +361,7 @@ void QmitknnUNetToolGUI::ProcessEnsembleModelsParams(mitk::nnUNetTool::Pointer t
   std::vector<mitk::ModelParams> requestQ;
   QStringList ppDirFolderName;
   ppDirFolderName << "ensemble_";
-  if (m_EnsembleParams[0]->modelBox->currentText() != m_EnsembleParams[1]->modelBox->currentText())
+  if (m_EnsembleParams[0]->modelBox->currentText() == m_EnsembleParams[1]->modelBox->currentText())
   {
     throw std::runtime_error("Both models you have selected for ensembling are the same.");
   }

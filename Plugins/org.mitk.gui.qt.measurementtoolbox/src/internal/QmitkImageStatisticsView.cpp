@@ -199,25 +199,28 @@ void QmitkImageStatisticsView::UpdateHistogramWidget()
         {
           const auto timeStep = imageNode->GetData()->GetTimeGeometry()->TimePointToTimeStep(m_TimePointChangeListener.GetCurrentSelectedTimePoint());
 
-          std::stringstream label;
-          label << imageNode->GetName();
-          if (imageNode->GetData()->GetTimeSteps() > 1)
+          if (statistics->TimeStepExists(timeStep))
           {
-            label << "["<< timeStep <<"]";
+            std::stringstream label;
+            label << imageNode->GetName();
+            if (imageNode->GetData()->GetTimeSteps() > 1)
+            {
+              label << "[" << timeStep << "]";
+            }
+
+            if (roiNode)
+            {
+              label << " with " << roiNode->GetName();
+            }
+
+            //Hardcoded labels are currently needed because the current histogram widget (and ChartWidget)
+            //do not allow correct removal or sound update/insertion of serveral charts.
+            //only thing that works for now is always to update/overwrite the same data label
+            //This is a quick fix for T28223 and T28221
+            m_Controls.widget_histogram->SetHistogram(statistics->GetHistogramForTimeStep(timeStep), "histogram");
+
+            visibility = true;
           }
-
-          if (roiNode)
-          {
-            label << " with " << roiNode->GetName();
-          }
-
-          //Hardcoded labels are currently needed because the current histogram widget (and ChartWidget)
-          //do not allow correct removal or sound update/insertion of serveral charts.
-          //only thing that works for now is always to update/overwrite the same data label
-          //This is a quick fix for T28223 and T28221
-          m_Controls.widget_histogram->SetHistogram(statistics->GetHistogramForTimeStep(timeStep), "histogram");
-
-          visibility = true;
         }
       }
     }

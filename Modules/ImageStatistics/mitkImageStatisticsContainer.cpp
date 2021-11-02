@@ -150,13 +150,21 @@ namespace mitk
     Superclass::PrintSelf(os, indent);
     for (unsigned int i = 0; i < this->GetTimeSteps(); i++)
     {
-      auto statisticsValues = GetStatisticsForTimeStep(i);
       os << std::endl << indent << "Statistics instance for timeStep " << i << ":";
-      auto statisticKeys = statisticsValues.GetExistingStatisticNames();
-      os << std::endl << indent << "Number of entries: " << statisticKeys.size();
-      for (const auto &aKey : statisticKeys)
+      if (this->TimeStepExists(i))
       {
-        os << std::endl << indent.GetNextIndent() << aKey << ": " << statisticsValues.GetValueNonConverted(aKey);
+        auto statisticsValues = GetStatisticsForTimeStep(i);
+
+        auto statisticKeys = statisticsValues.GetExistingStatisticNames();
+        os << std::endl << indent << "Number of entries: " << statisticKeys.size();
+        for (const auto& aKey : statisticKeys)
+        {
+          os << std::endl << indent.GetNextIndent() << aKey << ": " << statisticsValues.GetValueNonConverted(aKey);
+        }
+      }
+      else
+      {
+        os << std::endl << indent << "N/A";
       }
     }
   }

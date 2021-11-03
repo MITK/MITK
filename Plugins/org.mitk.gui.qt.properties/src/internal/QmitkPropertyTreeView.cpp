@@ -253,11 +253,7 @@ void QmitkPropertyTreeView::OnCurrentSelectionChanged(QList<mitk::DataNode::Poin
   m_Delegate->SetPropertyList(propertyList);
 
   m_Controls.newButton->setEnabled(true);
-
-  if (!m_ProxyModel->filterRegExp().isEmpty())
-  {
-    m_Controls.treeView->expandAll();
-  }
+  m_Controls.treeView->expandAll();
 }
 
 void QmitkPropertyTreeView::HideAllIcons()
@@ -388,15 +384,12 @@ void QmitkPropertyTreeView::OnAddNewProperty()
 void QmitkPropertyTreeView::OnFilterTextChanged(const QString& filter)
 {
   m_ProxyModel->setFilterWildcard(filter);
-
-  if (filter.isEmpty())
-    m_Controls.treeView->collapseAll();
-  else
-    m_Controls.treeView->expandAll();
+  m_Controls.treeView->expandAll();
 }
 
 void QmitkPropertyTreeView::OnModelReset()
 {
+  m_Controls.treeView->expandAll();
   m_Controls.descriptionLabel->hide();
   this->HideAllIcons();
 }

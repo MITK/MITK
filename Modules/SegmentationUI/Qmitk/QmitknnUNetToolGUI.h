@@ -24,6 +24,7 @@ found in the LICENSE file.s
 #include <QThread>
 #include <QmitkDataStorageComboBox.h>
 #include <QmitknnUNetEnsembleLayout.h>
+#include "QmitknnUNetFolderParser.h"
 
 class MITKSEGMENTATIONUI_EXPORT QmitknnUNetToolGUI : public QmitkAutoMLSegmentationToolGUIBase
 {
@@ -118,6 +119,7 @@ protected:
   void EnableWidgets(bool enabled) override;
 
 private:
+
   /**
    * @brief Parses the ensemble UI elements and sets to nnUNetTool object pointer.
    *
@@ -219,6 +221,8 @@ private:
    *
    */
   int m_UI_ROWS;
+
+  QmitknnUNetFolderParser *m_ParentFolder;
 };
 
 #endif

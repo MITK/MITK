@@ -357,16 +357,17 @@ void QmitknnUNetToolGUI::ShowErrorMessage(const std::string &message, QMessageBo
 
 void QmitknnUNetToolGUI::ProcessEnsembleModelsParams(mitk::nnUNetTool::Pointer tool)
 {
-  QString taskName = m_Controls.taskBox->currentText();
-  std::vector<mitk::ModelParams> requestQ;
-  QStringList ppDirFolderName;
-  ppDirFolderName << "ensemble_";
   if (m_EnsembleParams[0]->modelBox->currentText() == m_EnsembleParams[1]->modelBox->currentText())
   {
     throw std::runtime_error("Both models you have selected for ensembling are the same.");
   }
+  QString taskName = m_Controls.taskBox->currentText();
+  std::vector<mitk::ModelParams> requestQ;
+  QString ppDirFolderNamePart1 = "ensemble_";
+  QStringList ppDirFolderNameParts;
   for (std::unique_ptr<QmitknnUNetTaskParamsUITemplate> &layout : m_EnsembleParams)
   {
+    QStringList ppDirFolderName;
     QString modelName = layout->modelBox->currentText();
     ppDirFolderName << modelName;
     ppDirFolderName << "__";
@@ -375,18 +376,27 @@ void QmitknnUNetToolGUI::ProcessEnsembleModelsParams(mitk::nnUNetTool::Pointer t
     ppDirFolderName << "__";
     QString planId = layout->plannerBox->currentText();
     ppDirFolderName << planId;
-    ppDirFolderName << "--";
-    auto testfold = std::vector<std::string>(1, "1");
+    auto testfold = std::vector<std::string>(1, "1"); // only for test
     mitk::ModelParams modelObject = MapToRequest(modelName, taskName, trainer, planId, testfold);
     requestQ.push_back(modelObject);
+    ppDirFolderNameParts << ppDirFolderName.join(QString(""));
   }
   tool->EnsembleOn();
-  QString ppJsonFile =
-    QDir::cleanPath(m_ModelDirectory + QDir::separator() + "ensembles" + QDir::separator() + taskName +
-                    QDir::separator() + ppDirFolderName.join(QString("")) + QDir::separator() + "postprocessing.json");
-  if (QFile(ppJsonFile).exists())
+
+  QString ppJsonFilePossibility1 =
+    QDir::cleanPath(m_ModelDirectory + QDir::separator() + "ensembles" + QDir::separator() + taskName + QDir::separator() + ppDirFolderNamePart1 + ppDirFolderNameParts.first() + "--" +
+                    ppDirFolderNameParts.last()+ QDir::separator() + "postprocessing.json");
+  QString ppJsonFilePossibility2 =
+    QDir::cleanPath(m_ModelDirectory + QDir::separator() + "ensembles" + QDir::separator() + taskName + QDir::separator() + ppDirFolderNamePart1 + ppDirFolderNameParts.last() +  "--" +
+                    ppDirFolderNameParts.first() + QDir::separator() + "postprocessing.json");
+
+  if (QFile(ppJsonFilePossibility1).exists())
   {
-    tool->SetPostProcessingJsonDirectory(ppJsonFile.toStdString());
+    tool->SetPostProcessingJsonDirectory(ppJsonFilePossibility1.toStdString());
+  }
+  else if (QFile(ppJsonFilePossibility2).exists())
+  {
+    tool->SetPostProcessingJsonDirectory(ppJsonFilePossibility2.toStdString());
   }
   else
   {

@@ -68,6 +68,7 @@ Qmitk/QmitknnUNetToolGUI.h
 Qmitk/QmitknnUNetWorker.h
 Qmitk/QmitknnUNetGPU.h
 Qmitk/QmitknnUNetEnsembleLayout.h
+Qmitk/QmitknnUNetFolderParser.h
 #Added from ML
 Qmitk/QmitkLabelSetWidget.h
 Qmitk/QmitkSurfaceStampWidget.h

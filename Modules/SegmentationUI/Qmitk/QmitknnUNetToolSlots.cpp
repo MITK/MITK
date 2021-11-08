@@ -1,7 +1,6 @@
 #include "QmitknnUNetToolGUI.h"
 #include <QDir>
 #include <QDirIterator>
-#include <QMessageBox>
 #include <QmitknnUNetEnsembleLayout.h>
 #include <algorithm>
 #include <ctkCollapsibleGroupBox.h>
@@ -35,12 +34,14 @@ T QmitknnUNetToolGUI::FetchFoldersFromDir(const QString &path)
   return folders;
 }
 
+
 void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &resultsFolder)
 {
   m_Controls.previewButton->setEnabled(false);
   this->ClearAllComboBoxes();
-  m_ModelDirectory = resultsFolder + QDir::separator() + "nnUNet";
-  auto models = FetchFoldersFromDir<QStringList>(m_ModelDirectory);
+  MITK_INFO << resultsFolder.toStdString();
+  m_ParentFolder = new QmitknnUNetFolderParser(resultsFolder);
+  auto models = m_ParentFolder->getModelNames();
   QStringList validlist; // valid list of models supported by nnUNet
   validlist << "2d"
             << "3d_lowres"
@@ -54,47 +55,13 @@ void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &resultsFolder)
                   if (validlist.contains(model, Qt::CaseInsensitive))
                     m_Controls.modelBox->addItem(model);
                 });
-}
 
-void QmitknnUNetToolGUI::ShowEnsembleLayout(bool visible)
-{
-  if (m_EnsembleParams.empty())
-  {
-    ctkCollapsibleGroupBox *groupBoxModel1 = new ctkCollapsibleGroupBox(this);
-    auto lay1 = std::make_unique<QmitknnUNetTaskParamsUITemplate>(groupBoxModel1);
-    m_EnsembleParams.push_back(std::move(lay1));
-    groupBoxModel1->setObjectName(QString::fromUtf8("model_1_Box"));
-    groupBoxModel1->setTitle(QString::fromUtf8("Model 1"));
-    groupBoxModel1->setMinimumSize(QSize(0, 0));
-    groupBoxModel1->setCollapsedHeight(5);
-    groupBoxModel1->setCollapsed(false);
-    groupBoxModel1->setFlat(true);
-    groupBoxModel1->setAlignment(Qt::AlignRight);
-    m_Controls.advancedSettingsLayout->addWidget(groupBoxModel1, 2, 0, 1, 2);
-
-    ctkCollapsibleGroupBox *groupBoxModel2 = new ctkCollapsibleGroupBox(this);
-    auto lay2 = std::make_unique<QmitknnUNetTaskParamsUITemplate>(groupBoxModel2);
-    m_EnsembleParams.push_back(std::move(lay2));
-    groupBoxModel2->setObjectName(QString::fromUtf8("model_2_Box"));
-    groupBoxModel2->setTitle(QString::fromUtf8("Model 2"));
-    groupBoxModel2->setMinimumSize(QSize(0, 0));
-    groupBoxModel2->setCollapsedHeight(5);
-    groupBoxModel2->setCollapsed(false);
-    groupBoxModel2->setFlat(true);
-    groupBoxModel2->setAlignment(Qt::AlignLeft);
-    m_Controls.advancedSettingsLayout->addWidget(groupBoxModel2, 2, 2, 1, 2);
-  }
-  for (std::unique_ptr<QmitknnUNetTaskParamsUITemplate> &layout : m_EnsembleParams)
-  {
-    layout->parent->setVisible(visible);
-  }
 }
 
 void QmitknnUNetToolGUI::OnModelChanged(const QString &text)
 {
-  QString updatedPath(QDir::cleanPath(m_ModelDirectory + QDir::separator() + text));
   m_Controls.taskBox->clear();
-  auto tasks = FetchFoldersFromDir<QStringList>(updatedPath);
+  auto tasks = m_ParentFolder->getTasksForModel(text);
   std::for_each(tasks.begin(), tasks.end(), [this](QString task) { m_Controls.taskBox->addItem(task); });
 }
 
@@ -104,11 +71,9 @@ void QmitknnUNetToolGUI::OnTaskChanged(const QString &text)
   {
     return;
   }
-  QString updatedPath = QDir::cleanPath(m_ModelDirectory + QDir::separator() + m_Controls.modelBox->currentText() +
-                                        QDir::separator() + text);
   m_Controls.trainerBox->clear();
   m_Controls.plannerBox->clear();
-  auto trainerPlanners = FetchFoldersFromDir<QStringList>(updatedPath);
+  auto trainerPlanners = m_ParentFolder->getTrainerPlannersForTask(text, m_Controls.modelBox->currentText());
   if (m_Controls.modelBox->currentText() == "ensembles")
   {
     m_Controls.trainerBox->setVisible(false);
@@ -176,15 +141,20 @@ void QmitknnUNetToolGUI::OnTaskChanged(const QString &text)
   }
 }
 
-void QmitknnUNetToolGUI::OnTrainerChanged(const QString &trainerSelected)
+void QmitknnUNetToolGUI::OnTrainerChanged(const QString &plannerSelected)
 {
+  if (plannerSelected.isEmpty())
+  {
+    return;
+  }
   m_Controls.foldBox->clear();
   if (m_Controls.modelBox->currentText() != "ensembles")
   {
-    QString updatedPath(QDir::cleanPath(m_ModelDirectory + QDir::separator() + m_Controls.modelBox->currentText() +
-                                        QDir::separator() + m_Controls.taskBox->currentText() + QDir::separator() +
-                                        m_Controls.trainerBox->currentText() + "__" + trainerSelected));
-    auto folds = FetchFoldersFromDir<QStringList>(updatedPath);
+    auto selectedTrainer = m_Controls.trainerBox->currentText();
+    auto selectedTask = m_Controls.taskBox->currentText();
+    auto selectedModel = m_Controls.modelBox->currentText();
+    auto folds =
+      m_ParentFolder->getFoldsForTrainerPlanner(selectedTrainer, plannerSelected, selectedTask, selectedModel);
     std::for_each(folds.begin(),
                   folds.end(),
                   [this](QString fold)
@@ -422,4 +392,38 @@ void QmitknnUNetToolGUI::SegmentationResultHandler(mitk::nnUNetTool *tool)
   this->SetLabelSetPreview(tool->GetMLPreview());
   tool->IsTimePointChangeAwareOn();
   m_Controls.statusLabel->setText("<b>STATUS: </b><i>Segmentation task finished successfully.</i>");
+}
+
+void QmitknnUNetToolGUI::ShowEnsembleLayout(bool visible)
+{
+  if (m_EnsembleParams.empty())
+  {
+    ctkCollapsibleGroupBox *groupBoxModel1 = new ctkCollapsibleGroupBox(this);
+    auto lay1 = std::make_unique<QmitknnUNetTaskParamsUITemplate>(groupBoxModel1);
+    m_EnsembleParams.push_back(std::move(lay1));
+    groupBoxModel1->setObjectName(QString::fromUtf8("model_1_Box"));
+    groupBoxModel1->setTitle(QString::fromUtf8("Model 1"));
+    groupBoxModel1->setMinimumSize(QSize(0, 0));
+    groupBoxModel1->setCollapsedHeight(5);
+    groupBoxModel1->setCollapsed(false);
+    groupBoxModel1->setFlat(true);
+    groupBoxModel1->setAlignment(Qt::AlignRight);
+    m_Controls.advancedSettingsLayout->addWidget(groupBoxModel1, 2, 0, 1, 2);
+
+    ctkCollapsibleGroupBox *groupBoxModel2 = new ctkCollapsibleGroupBox(this);
+    auto lay2 = std::make_unique<QmitknnUNetTaskParamsUITemplate>(groupBoxModel2);
+    m_EnsembleParams.push_back(std::move(lay2));
+    groupBoxModel2->setObjectName(QString::fromUtf8("model_2_Box"));
+    groupBoxModel2->setTitle(QString::fromUtf8("Model 2"));
+    groupBoxModel2->setMinimumSize(QSize(0, 0));
+    groupBoxModel2->setCollapsedHeight(5);
+    groupBoxModel2->setCollapsed(false);
+    groupBoxModel2->setFlat(true);
+    groupBoxModel2->setAlignment(Qt::AlignLeft);
+    m_Controls.advancedSettingsLayout->addWidget(groupBoxModel2, 2, 2, 1, 2);
+  }
+  for (std::unique_ptr<QmitknnUNetTaskParamsUITemplate> &layout : m_EnsembleParams)
+  {
+    layout->parent->setVisible(visible);
+  }
 }

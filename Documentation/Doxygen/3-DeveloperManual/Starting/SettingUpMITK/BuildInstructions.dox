@@ -175,7 +175,7 @@ cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
 
 project(MyProject)
 
-find_package(MITK 2021.02 REQUIRED)
+find_package(MITK 2021.10 REQUIRED)
 
 add_executable(MyApp main.cpp)
 

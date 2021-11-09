@@ -9,12 +9,13 @@
       icon="resources/multilabelsegmentation.svg"
       class="QmitkMultiLabelSegmentationView" />
 
+    <!-- Disabled for MITK v2021.10
     <view id="org.mitk.views.multilabelsegmentationutilities"
       name="MultiLabel Segmentation Utilities"
       category="Segmentation"
       class="QmitkMultiLabelSegmentationUtilitiesView"
       icon="resources/multilabelsegmentation_utilities.svg" />
-
+    -->
   </extension>
 
   <extension point="org.blueberry.ui.preferencePages">

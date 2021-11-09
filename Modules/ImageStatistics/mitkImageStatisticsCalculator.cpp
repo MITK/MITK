@@ -471,7 +471,7 @@ namespace mitk
 
       auto voxelVolume = GetVoxelVolume<TPixel, VImageDimension>(image);
       auto numberOfVoxels =
-        static_cast<unsigned long>(imageStatisticsFilter->GetSum(*it) / (double)imageStatisticsFilter->GetMean(*it));
+        static_cast<unsigned long>(imageStatisticsFilter->GetCount(*it));
       auto volume = static_cast<double>(numberOfVoxels) * voxelVolume;
       auto rms = std::sqrt(std::pow(imageStatisticsFilter->GetMean(*it), 2.) +
                            imageStatisticsFilter->GetVariance(*it)); // variance = sigma^2

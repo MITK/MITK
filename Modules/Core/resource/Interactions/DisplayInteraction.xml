@@ -25,7 +25,7 @@ TODO Std move to abort interaction of scroll/pan/zoom
           <condition name="check_position_event"/>
           <action name="init"/>
         </transition>
-        <!-- mitkDispplayInteractor.cpp implements this for all events -->
+        <!-- mitkDisplayInteractor.cpp implements this for all events -->
         <transition event_class="InteractionEvent" event_variant="PlaneUP" target="start">
             <action name="ScrollOneUp"/>
             <action name="updateStatusbar"/>
@@ -51,6 +51,8 @@ TODO Std move to abort interaction of scroll/pan/zoom
         <!-- Case when we do crosshair instead of rotation) -->
         <transition event_class="InteractionPositionEvent"  event_variant="StartRotate" target="crosshair">
             <condition name="check_can_rotate" inverted="true" />
+            <action name="setCrosshair"/>
+            <action name="updateStatusbar"/>
         </transition>
 
         <transition event_class="InteractionPositionEvent"  event_variant="StartSwivel" target="swivel">
@@ -59,6 +61,8 @@ TODO Std move to abort interaction of scroll/pan/zoom
         <!-- Case when we do crosshair instead of swivel) -->
         <transition event_class="InteractionPositionEvent"  event_variant="StartSwivel" target="crosshair">
             <condition name="check_can_swivel" inverted="true"/>
+            <action name="setCrosshair"/>
+            <action name="updateStatusbar"/>
         </transition>
          <!-- Change TimeSteps by clicking left or right Arrow-->
         <transition event_class="InteractionEvent" event_variant="IncreaseTimeStep" target="start">
@@ -126,9 +130,9 @@ TODO Std move to abort interaction of scroll/pan/zoom
       <transition event_class="InteractionPositionEvent" event_variant="StartRotate" target="rotation">
         <action name="rotate"/>
       </transition>
-	  <transition event_class="InternalEvent" event_variant="LeaveRenderWindow" target="start">
-		 <action name="endRotation"/>
-	  </transition>
+      <transition event_class="InternalEvent" event_variant="LeaveRenderWindow" target="start">
+       <action name="endRotation"/>
+      </transition>
       <transition event_class="InteractionPositionEvent" event_variant="Move" target="start">
         <condition name="check_can_rotate" inverted="true" />
         <action name="endRotation"/>

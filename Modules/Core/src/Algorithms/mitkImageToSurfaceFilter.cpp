@@ -61,7 +61,7 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time,
   polydata = skinExtractor->GetOutput();
   polydata->Register(nullptr); // RC++
 
-  if (m_Smooth)
+  if (m_Smooth && polydata->GetNumberOfPoints() > 0 && polydata->GetNumberOfCells() > 0)
   {
     vtkSmoothPolyDataFilter *smoother = vtkSmoothPolyDataFilter::New();
     // read poly1 (poly1 can be the original polygon, or the decimated polygon)

@@ -228,8 +228,10 @@ void mitk::AutoSegmentationWithPreviewTool::ResetPreviewNode()
       m_PreviewSegmentationNode->SetData(newPreviewImage);
 
       // Let's paint the feedback node green...
-      newPreviewImage->GetActiveLabel()->SetColor(previewColor);
-      newPreviewImage->GetActiveLabelSet()->UpdateLookupTable(newPreviewImage->GetActiveLabel()->GetValue());
+      auto* activeLayer = newPreviewImage->GetActiveLabelSet();
+      auto* activeLabel = activeLayer->GetActiveLabel();
+      activeLabel->SetColor(previewColor);
+      activeLayer->UpdateLookupTable(activeLabel->GetValue());
     }
     else
     {

@@ -51,7 +51,8 @@ public:
   mitk::DataStorage::Pointer GetDataStorage() const;
   mitk::DataNode::Pointer GetSelection(unsigned int index);
   void SetPredicate(unsigned int index, Predicate predicate);
-  void SetPredicate(unsigned int index, mitk::NodePredicateBase* predicate);
+  void SetPredicate(unsigned int index, const mitk::NodePredicateBase* predicate);
+  const mitk::NodePredicateBase *GetPredicate(unsigned int index) const;
   void SetHelpText(const QString& text);
 
 signals:

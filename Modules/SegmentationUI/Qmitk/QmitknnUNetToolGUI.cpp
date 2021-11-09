@@ -41,6 +41,7 @@ QmitknnUNetToolGUI::~QmitknnUNetToolGUI()
 {
   this->m_SegmentationThread->quit();
   this->m_SegmentationThread->wait();
+  //delete m_ParentFolder;
 }
 
 void QmitknnUNetToolGUI::ConnectNewTool(mitk::AutoSegmentationWithPreviewTool *newTool)
@@ -79,6 +80,8 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
 #endif
           this,
           SLOT(OnPythonPathChanged(const QString &)));
+  connect(m_Controls.stopButton, SIGNAL(clicked()), this, SLOT(OnStopPressed()));
+  connect(m_Controls.refreshdirectoryBox, SIGNAL(clicked()), this, SLOT(OnRefreshDirectory()));
 
   connect(this, &QmitknnUNetToolGUI::Operate, m_Worker, &nnUNetSegmentationWorker::DoWork);
   connect(m_Worker, &nnUNetSegmentationWorker::Finished, this, &QmitknnUNetToolGUI::SegmentationResultHandler);
@@ -91,6 +94,8 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   m_Controls.multiModalSpinLabel->setVisible(false);
   m_Controls.posSpinBoxLabel->setVisible(false);
   m_Controls.posSpinBox->setVisible(false);
+  m_Controls.stopButton->setEnabled(false);
+
 
   m_Controls.statusLabel->setTextFormat(Qt::RichText);
   m_Controls.statusLabel->setText("<b>STATUS: </b><i>Welcome to nnUNet. " + QString::number(m_GpuLoader.GetGPUCount()) +
@@ -172,6 +177,7 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
       }
       m_Controls.statusLabel->setText("<b>STATUS: </b><i>Starting Segmentation task... This might take a while.</i>");
       emit Operate(tool);
+      m_Controls.stopButton->setEnabled(true);
     }
     catch (const std::exception &e)
     {
@@ -384,10 +390,12 @@ void QmitknnUNetToolGUI::ProcessEnsembleModelsParams(mitk::nnUNetTool::Pointer t
   tool->EnsembleOn();
 
   QString ppJsonFilePossibility1 =
-    QDir::cleanPath(m_ModelDirectory + QDir::separator() + "ensembles" + QDir::separator() + taskName + QDir::separator() + ppDirFolderNamePart1 + ppDirFolderNameParts.first() + "--" +
-                    ppDirFolderNameParts.last()+ QDir::separator() + "postprocessing.json");
+    QDir::cleanPath(m_ModelDirectory + QDir::separator() + "ensembles" + QDir::separator() + taskName +
+                    QDir::separator() + ppDirFolderNamePart1 + ppDirFolderNameParts.first() + "--" +
+                    ppDirFolderNameParts.last() + QDir::separator() + "postprocessing.json");
   QString ppJsonFilePossibility2 =
-    QDir::cleanPath(m_ModelDirectory + QDir::separator() + "ensembles" + QDir::separator() + taskName + QDir::separator() + ppDirFolderNamePart1 + ppDirFolderNameParts.last() +  "--" +
+    QDir::cleanPath(m_ModelDirectory + QDir::separator() + "ensembles" + QDir::separator() + taskName +
+                    QDir::separator() + ppDirFolderNamePart1 + ppDirFolderNameParts.last() + "--" +
                     ppDirFolderNameParts.first() + QDir::separator() + "postprocessing.json");
 
   if (QFile(ppJsonFilePossibility1).exists())

@@ -34,13 +34,28 @@ T QmitknnUNetToolGUI::FetchFoldersFromDir(const QString &path)
   return folders;
 }
 
+void QmitknnUNetToolGUI::OnRefreshDirectory()
+{
+  const QString resultsFolder = m_Controls.modeldirectoryBox->directory();
+  if (m_ParentFolder)
+  {
+    m_ParentFolder->RefreshHierarchy(resultsFolder);
+  }
+  else
+  {
+    m_ParentFolder = new QmitknnUNetFolderParser(resultsFolder);
+  }
+  OnDirectoryChanged(resultsFolder);
+}
 
 void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &resultsFolder)
 {
   m_Controls.previewButton->setEnabled(false);
   this->ClearAllComboBoxes();
-  MITK_INFO << resultsFolder.toStdString();
-  m_ParentFolder = new QmitknnUNetFolderParser(resultsFolder);
+  if (m_ParentFolder == nullptr)
+  {
+    m_ParentFolder = new QmitknnUNetFolderParser(resultsFolder);
+  }
   auto models = m_ParentFolder->getModelNames();
   QStringList validlist; // valid list of models supported by nnUNet
   validlist << "2d"
@@ -55,7 +70,6 @@ void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &resultsFolder)
                   if (validlist.contains(model, Qt::CaseInsensitive))
                     m_Controls.modelBox->addItem(model);
                 });
-
 }
 
 void QmitknnUNetToolGUI::OnModelChanged(const QString &text)
@@ -65,15 +79,15 @@ void QmitknnUNetToolGUI::OnModelChanged(const QString &text)
   std::for_each(tasks.begin(), tasks.end(), [this](QString task) { m_Controls.taskBox->addItem(task); });
 }
 
-void QmitknnUNetToolGUI::OnTaskChanged(const QString &text)
+void QmitknnUNetToolGUI::OnTaskChanged(const QString &task)
 {
-  if (text.isEmpty())
+  if (task.isEmpty())
   {
     return;
   }
   m_Controls.trainerBox->clear();
   m_Controls.plannerBox->clear();
-  auto trainerPlanners = m_ParentFolder->getTrainerPlannersForTask(text, m_Controls.modelBox->currentText());
+  auto trainerPlanners = m_ParentFolder->getTrainerPlannersForTask(task, m_Controls.modelBox->currentText());
   if (m_Controls.modelBox->currentText() == "ensembles")
   {
     m_Controls.trainerBox->setVisible(false);
@@ -103,6 +117,7 @@ void QmitknnUNetToolGUI::OnTaskChanged(const QString &text)
     trainers.removeDuplicates();
     planners.removeDuplicates();
     models.removeDuplicates();
+
     for (std::unique_ptr<QmitknnUNetTaskParamsUITemplate> &layout : m_EnsembleParams)
     {
       layout->modelBox->clear();
@@ -126,11 +141,12 @@ void QmitknnUNetToolGUI::OnTaskChanged(const QString &text)
     m_Controls.foldLabel->setVisible(true);
     m_Controls.previewButton->setEnabled(false);
     ShowEnsembleLayout(false);
+    QString splitterString = "__";
     QStringList trainers, planners;
     foreach (QString trainerPlanner, trainerPlanners)
     {
-      trainers << trainerPlanner.split("__", QString::SplitBehavior::SkipEmptyParts).first();
-      planners << trainerPlanner.split("__", QString::SplitBehavior::SkipEmptyParts).last();
+      trainers << trainerPlanner.split(splitterString, QString::SplitBehavior::SkipEmptyParts).first();
+      planners << trainerPlanner.split(splitterString, QString::SplitBehavior::SkipEmptyParts).last();
     }
     trainers.removeDuplicates();
     planners.removeDuplicates();
@@ -426,4 +442,15 @@ void QmitknnUNetToolGUI::ShowEnsembleLayout(bool visible)
   {
     layout->parent->setVisible(visible);
   }
+}
+
+void QmitknnUNetToolGUI::OnStopPressed()
+{
+  if (m_SegmentationThread->isRunning())
+  {
+    MITK_DEBUG << "Stopping thread...";
+    m_SegmentationThread->terminate();
+  }
+  m_Controls.previewButton->setEnabled(true);
+  m_Controls.stopButton->setEnabled(false);
 }

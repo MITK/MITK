@@ -104,6 +104,18 @@ protected slots:
    */
   void OnModalPositionChanged(int);
 
+  /**
+   * @brief 
+   * 
+   */
+  void OnRefreshDirectory();
+
+  /**
+   * @brief 
+   * 
+   */
+  void OnStopPressed();
+
 signals:
   /**
    * @brief signal for starting the segmentation which is caught by a worker thread.
@@ -222,7 +234,7 @@ private:
    */
   int m_UI_ROWS;
 
-  QmitknnUNetFolderParser *m_ParentFolder;
+  QmitknnUNetFolderParser *m_ParentFolder =nullptr;  // TODO: fix memory leak
 };
 
 #endif

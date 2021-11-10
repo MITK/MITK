@@ -95,6 +95,7 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   m_Controls.posSpinBoxLabel->setVisible(false);
   m_Controls.posSpinBox->setVisible(false);
   m_Controls.stopButton->setEnabled(false);
+  m_Controls.previewButton->setEnabled(false);
 
 
   m_Controls.statusLabel->setTextFormat(Qt::RichText);

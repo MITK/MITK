@@ -8,7 +8,6 @@
 void QmitknnUNetToolGUI::EnableWidgets(bool enabled)
 {
   Superclass::EnableWidgets(enabled);
-  m_Controls.previewButton->setEnabled(false);
 }
 
 void QmitknnUNetToolGUI::ClearAllComboBoxes()
@@ -446,11 +445,11 @@ void QmitknnUNetToolGUI::ShowEnsembleLayout(bool visible)
 
 void QmitknnUNetToolGUI::OnStopPressed()
 {
+  m_Controls.previewButton->setEnabled(true);
+  m_Controls.stopButton->setEnabled(false);
   if (m_SegmentationThread->isRunning())
   {
     MITK_DEBUG << "Stopping thread...";
-    m_SegmentationThread->terminate();
+    m_SegmentationThread->requestInterruption();
   }
-  m_Controls.previewButton->setEnabled(true);
-  m_Controls.stopButton->setEnabled(false);
 }

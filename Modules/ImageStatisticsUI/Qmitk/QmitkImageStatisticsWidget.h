@@ -48,6 +48,7 @@ public:
   /*! /brief Get bin size for histogram resolution.*/
   unsigned int GetHistogramNBins() const;
 
+
 private:
   void CreateConnections();
   void OnDataAvailable();
@@ -59,5 +60,8 @@ private:
   Ui::QmitkImageStatisticsControls m_Controls;
   QmitkImageStatisticsTreeModel *m_imageStatisticsModel;
   QSortFilterProxyModel *m_ProxyModel;
+
+signals:
+	void IgnoreZeroVoxelChanged(int status);
 };
 #endif // QmitkImageStatisticsWidget_H__INCLUDED

@@ -59,6 +59,8 @@ void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
   m_Controls.sliderWidget_intensityProfile->setVisible(false);
   ResetGUI();
 
+
+
   m_DataGenerator = new QmitkImageStatisticsDataGenerator(parent);
   m_DataGenerator->SetDataStorage(this->GetDataStorage());
   m_DataGenerator->SetAutoUpdate(true);
@@ -97,7 +99,7 @@ void QmitkImageStatisticsView::RenderWindowPartDeactivated(mitk::IRenderWindowPa
 
 void QmitkImageStatisticsView::CreateConnections()
 {
-  connect(m_Controls.checkBox_ignoreZero, &QCheckBox::stateChanged,
+  connect(m_Controls.widget_statistics, &QmitkImageStatisticsWidget::IgnoreZeroVoxelChanged,
     this, &QmitkImageStatisticsView::OnCheckBoxIgnoreZeroStateChanged);
   connect(m_Controls.buttonSelection, &QAbstractButton::clicked,
     this, &QmitkImageStatisticsView::OnButtonSelectionPressed);

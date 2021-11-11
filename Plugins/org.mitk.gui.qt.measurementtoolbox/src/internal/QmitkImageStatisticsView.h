@@ -24,6 +24,8 @@ found in the LICENSE file.
 
 #include <mitkIRenderWindowPartListener.h>
 
+
+
 class QmitkImageStatisticsDataGenerator;
 class QmitkDataGenerationJobBase;
 

@@ -398,6 +398,7 @@ void QmitknnUNetToolGUI::SegmentationProcessFailed()
   messageBox->exec();
   delete messageBox;
   MITK_ERROR << stream.str();
+  m_Controls.stopButton->setEnabled(false);
 }
 
 void QmitknnUNetToolGUI::SegmentationResultHandler(mitk::nnUNetTool *tool)
@@ -407,6 +408,7 @@ void QmitknnUNetToolGUI::SegmentationResultHandler(mitk::nnUNetTool *tool)
   this->SetLabelSetPreview(tool->GetMLPreview());
   tool->IsTimePointChangeAwareOn();
   m_Controls.statusLabel->setText("<b>STATUS: </b><i>Segmentation task finished successfully.</i>");
+  m_Controls.stopButton->setEnabled(false);
 }
 
 void QmitknnUNetToolGUI::ShowEnsembleLayout(bool visible)

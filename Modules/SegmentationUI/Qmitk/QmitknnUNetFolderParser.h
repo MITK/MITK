@@ -1,18 +1,17 @@
 #ifndef QmitknnUNetFolderParser_h_Included
 #define QmitknnUNetFolderParser_h_Included
 
+#include "QmitknnUNetToolGUI.h"
+#include <QDirIterator>
 #include <QString>
 #include <vector>
-#include <QDirIterator>
-#include "QmitknnUNetToolGUI.h"
-
 
 class FolderNode
 {
 public:
   QString name;
-  QString path; //parent
-  std::vector<FolderNode*> subFolders;
+  QString path; // parent
+  std::vector<FolderNode *> subFolders;
 };
 
 class MITKSEGMENTATIONUI_EXPORT QmitknnUNetFolderParser
@@ -33,14 +32,14 @@ public:
     InitDirs(m_RootNode, 0);
   }
 
-  void InitDirs(FolderNode* parent, int level)
+  void InitDirs(FolderNode *parent, int level)
   {
     QString searchFolder = parent->path + QDir::separator() + parent->name;
     auto subFolders = FetchFoldersFromDir<QStringList>(searchFolder);
     level++;
-    foreach(QString folder, subFolders)
+    foreach (QString folder, subFolders)
     {
-      FolderNode* fp = new FolderNode;
+      FolderNode *fp = new FolderNode;
       fp->path = searchFolder;
       fp->name = folder;
       if (level < this->LEVEL)
@@ -52,7 +51,7 @@ public:
   }
 
   template <typename T>
-  T FetchFoldersFromDir(const QString& path)
+  T FetchFoldersFromDir(const QString &path)
   {
     T folders;
     for (QDirIterator it(path, QDir::AllDirs, QDirIterator::NoIteratorFlags); it.hasNext();)
@@ -66,24 +65,26 @@ public:
     return folders;
   }
 
+  QString getResultsFolder() { return m_RootNode->path; }
+
   QStringList getModelNames()
   {
     QStringList models = GetSubFolderNamesFromNode<QStringList>(m_RootNode);
     return models;
   }
 
-  QStringList getTasksForModel(const QString& modelName)
+  QStringList getTasksForModel(const QString &modelName)
   {
-    FolderNode* modelNode = GetSubNodeMatchingNameCrietria(modelName, m_RootNode);
+    FolderNode *modelNode = GetSubNodeMatchingNameCrietria(modelName, m_RootNode);
     QStringList tasks = GetSubFolderNamesFromNode<QStringList>(modelNode);
     return tasks;
   }
 
-  FolderNode* GetSubNodeMatchingNameCrietria(const QString& queryName, FolderNode* parentNode)
+  FolderNode *GetSubNodeMatchingNameCrietria(const QString &queryName, FolderNode *parentNode)
   {
-    FolderNode* retNode;
-    std::vector<FolderNode*> subNodes = parentNode->subFolders;
-    for (FolderNode* node : subNodes)
+    FolderNode *retNode;
+    std::vector<FolderNode *> subNodes = parentNode->subFolders;
+    for (FolderNode *node : subNodes)
     {
       if (node->name == queryName)
       {
@@ -95,41 +96,42 @@ public:
   }
 
   template <typename T>
-  T GetSubFolderNamesFromNode(const FolderNode* parent)
+  T GetSubFolderNamesFromNode(const FolderNode *parent)
   {
     T folders;
-    std::vector<FolderNode*> subNodes = parent->subFolders;
-    for (FolderNode* folder : subNodes)
+    std::vector<FolderNode *> subNodes = parent->subFolders;
+    for (FolderNode *folder : subNodes)
     {
       folders.push_back(folder->name);
     }
     return folders;
   }
 
-  QStringList getTrainerPlannersForTask(const QString& taskName, const QString& modelName)
+  QStringList getTrainerPlannersForTask(const QString &taskName, const QString &modelName)
   {
     QStringList tps;
-    FolderNode* modelNode = GetSubNodeMatchingNameCrietria(modelName, m_RootNode);
-    FolderNode* taskNode = GetSubNodeMatchingNameCrietria(taskName, modelNode);
+    FolderNode *modelNode = GetSubNodeMatchingNameCrietria(modelName, m_RootNode);
+    FolderNode *taskNode = GetSubNodeMatchingNameCrietria(taskName, modelNode);
     tps = GetSubFolderNamesFromNode<QStringList>(taskNode);
     return tps;
   }
 
-  QStringList getFoldsForTrainerPlanner(const QString& trainer, const QString& planner, const QString& taskName, const QString& modelName)
+  QStringList getFoldsForTrainerPlanner(const QString &trainer,
+                                        const QString &planner,
+                                        const QString &taskName,
+                                        const QString &modelName)
   {
     QStringList folds;
-    FolderNode* modelNode = GetSubNodeMatchingNameCrietria(modelName, m_RootNode);
-    FolderNode* taskNode = GetSubNodeMatchingNameCrietria(taskName, modelNode);
+    FolderNode *modelNode = GetSubNodeMatchingNameCrietria(modelName, m_RootNode);
+    FolderNode *taskNode = GetSubNodeMatchingNameCrietria(taskName, modelNode);
     QString trainerPlanner = trainer + QString("__") + planner;
-    FolderNode* tpNode = GetSubNodeMatchingNameCrietria(trainerPlanner, taskNode);
+    FolderNode *tpNode = GetSubNodeMatchingNameCrietria(trainerPlanner, taskNode);
     folds = GetSubFolderNamesFromNode<QStringList>(tpNode);
     return folds;
   }
 
 private:
   const int LEVEL = 4;
-  FolderNode* m_RootNode;
+  FolderNode *m_RootNode;
 };
 #endif
-
-

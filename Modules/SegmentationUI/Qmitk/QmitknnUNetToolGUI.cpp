@@ -166,7 +166,7 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
 
       tool->SetnnUNetDirectory(nnUNetDirectory);
       tool->SetPythonPath(pythonPath.toStdString());
-      tool->SetModelDirectory(m_ModelDirectory.left(m_ModelDirectory.lastIndexOf(QDir::separator())).toStdString());
+      tool->SetModelDirectory(m_ParentFolder->getResultsFolder().toStdString());
       // checkboxes
       tool->SetMirror(m_Controls.mirrorBox->isChecked());
       tool->SetMixedPrecision(m_Controls.mixedPrecisionBox->isChecked());
@@ -401,14 +401,14 @@ void QmitknnUNetToolGUI::ProcessEnsembleModelsParams(mitk::nnUNetTool::Pointer t
   }
   tool->EnsembleOn();
 
-  QString ppJsonFilePossibility1 =
-    QDir::cleanPath(m_ModelDirectory + QDir::separator() + "ensembles" + QDir::separator() + taskName +
-                    QDir::separator() + ppDirFolderNamePart1 + ppDirFolderNameParts.first() + "--" +
-                    ppDirFolderNameParts.last() + QDir::separator() + "postprocessing.json");
-  QString ppJsonFilePossibility2 =
-    QDir::cleanPath(m_ModelDirectory + QDir::separator() + "ensembles" + QDir::separator() + taskName +
-                    QDir::separator() + ppDirFolderNamePart1 + ppDirFolderNameParts.last() + "--" +
-                    ppDirFolderNameParts.first() + QDir::separator() + "postprocessing.json");
+  QString ppJsonFilePossibility1 = QDir::cleanPath(
+    m_ParentFolder->getResultsFolder() + QDir::separator() + "nnUNet" + QDir::separator() + "ensembles" +
+    QDir::separator() + taskName + QDir::separator() + ppDirFolderNamePart1 + ppDirFolderNameParts.first() + "--" +
+    ppDirFolderNameParts.last() + QDir::separator() + "postprocessing.json");
+  QString ppJsonFilePossibility2 = QDir::cleanPath(
+    m_ParentFolder->getResultsFolder() + QDir::separator() + "nnUNet" + QDir::separator() + "ensembles" +
+    QDir::separator() + taskName + QDir::separator() + ppDirFolderNamePart1 + ppDirFolderNameParts.last() + "--" +
+    ppDirFolderNameParts.first() + QDir::separator() + "postprocessing.json");
 
   if (QFile(ppJsonFilePossibility1).exists())
   {

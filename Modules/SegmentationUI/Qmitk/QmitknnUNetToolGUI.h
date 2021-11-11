@@ -14,6 +14,7 @@ found in the LICENSE file.s
 #define QmitknnUNetToolGUI_h_Included
 
 #include "QmitkAutoMLSegmentationToolGUIBase.h"
+#include "QmitknnUNetFolderParser.h"
 #include "QmitknnUNetGPU.h"
 #include "QmitknnUNetWorker.h"
 #include "mitknnUnetTool.h"
@@ -24,7 +25,6 @@ found in the LICENSE file.s
 #include <QThread>
 #include <QmitkDataStorageComboBox.h>
 #include <QmitknnUNetEnsembleLayout.h>
-#include "QmitknnUNetFolderParser.h"
 
 class MITKSEGMENTATIONUI_EXPORT QmitknnUNetToolGUI : public QmitkAutoMLSegmentationToolGUIBase
 {
@@ -105,14 +105,14 @@ protected slots:
   void OnModalPositionChanged(int);
 
   /**
-   * @brief 
-   * 
+   * @brief
+   *
    */
   void OnRefreshDirectory();
 
   /**
-   * @brief 
-   * 
+   * @brief
+   *
    */
   void OnStopPressed();
 
@@ -131,7 +131,6 @@ protected:
   void EnableWidgets(bool enabled) override;
 
 private:
-
   /**
    * @brief Parses the ensemble UI elements and sets to nnUNetTool object pointer.
    *
@@ -206,11 +205,6 @@ private:
   template <typename T>
   static T FetchFoldersFromDir(const QString &);
 
-  /**
-   * @brief Stores path of the model director (RESULTS_FOLDER appended by "nnUNet").
-   *
-   */
-  QString m_ModelDirectory;
   Ui_QmitknnUNetToolGUIControls m_Controls;
   QThread *m_SegmentationThread;
   nnUNetSegmentationWorker *m_Worker;
@@ -234,7 +228,11 @@ private:
    */
   int m_UI_ROWS;
 
-  QmitknnUNetFolderParser *m_ParentFolder =nullptr;  // TODO: fix memory leak
+  /**
+   * @brief Stores path of the model director (RESULTS_FOLDER appended by "nnUNet").
+   *
+   */
+  QmitknnUNetFolderParser *m_ParentFolder = nullptr; // TODO: fix memory leak
 };
 
 #endif

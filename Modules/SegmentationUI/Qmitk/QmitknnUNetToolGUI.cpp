@@ -14,6 +14,7 @@ found in the LICENSE file.
 
 #include "mitknnUnetTool.h"
 #include <QDir>
+#include <QIcon>
 #include <QtGlobal>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitknnUNetToolGUI, "")
@@ -41,7 +42,7 @@ QmitknnUNetToolGUI::~QmitknnUNetToolGUI()
 {
   this->m_SegmentationThread->quit();
   this->m_SegmentationThread->wait();
-  //delete m_ParentFolder;
+  // delete m_ParentFolder;
 }
 
 void QmitknnUNetToolGUI::ConnectNewTool(mitk::AutoSegmentationWithPreviewTool *newTool)
@@ -94,9 +95,19 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   m_Controls.multiModalSpinLabel->setVisible(false);
   m_Controls.posSpinBoxLabel->setVisible(false);
   m_Controls.posSpinBox->setVisible(false);
-  m_Controls.stopButton->setEnabled(false);
   m_Controls.previewButton->setEnabled(false);
 
+  QSize sz(16, 16);
+
+  QIcon stopIcon;
+  stopIcon.addPixmap(style()->standardIcon(QStyle::SP_BrowserStop).pixmap(sz), QIcon::Normal, QIcon::Off);
+  m_Controls.stopButton->setIcon(stopIcon);
+  m_Controls.stopButton->setEnabled(false);
+
+  QIcon refreshIcon;
+  refreshIcon.addPixmap(style()->standardIcon(QStyle::SP_BrowserReload).pixmap(sz), QIcon::Normal, QIcon::Off);
+  m_Controls.refreshdirectoryBox->setIcon(refreshIcon);
+  m_Controls.refreshdirectoryBox->setEnabled(false);
 
   m_Controls.statusLabel->setTextFormat(Qt::RichText);
   m_Controls.statusLabel->setText("<b>STATUS: </b><i>Welcome to nnUNet. " + QString::number(m_GpuLoader.GetGPUCount()) +

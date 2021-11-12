@@ -225,12 +225,7 @@ void QmitkImageStatisticsView::UpdateHistogramWidget()
       }
     }
   }
-
-  if (visibility != m_Controls.groupBox_histogram->isVisible())
-  {
-    m_Controls.groupBox_histogram->setVisible(visibility);
-  }
-
+  m_Controls.groupBox_histogram->setVisible(visibility);
 }
 
 QmitkChartWidget::ColorTheme QmitkImageStatisticsView::GetColorTheme() const

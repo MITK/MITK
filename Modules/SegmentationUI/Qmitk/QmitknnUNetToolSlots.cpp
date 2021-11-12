@@ -38,7 +38,7 @@ void QmitknnUNetToolGUI::OnRefreshDirectory()
   const QString resultsFolder = m_Controls.modeldirectoryBox->directory();
   if (m_ParentFolder)
   {
-    m_ParentFolder->RefreshHierarchy(resultsFolder);
+    m_ParentFolder->RefreshHierarchy();
   }
   else
   {
@@ -51,10 +51,11 @@ void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &resultsFolder)
 {
   m_Controls.previewButton->setEnabled(false);
   this->ClearAllComboBoxes();
-  if (m_ParentFolder == nullptr)
+  if (m_ParentFolder)
   {
-    m_ParentFolder = new QmitknnUNetFolderParser(resultsFolder);
+    delete m_ParentFolder;
   }
+  m_ParentFolder = new QmitknnUNetFolderParser(resultsFolder);
   auto models = m_ParentFolder->getModelNames();
   QStringList validlist; // valid list of models supported by nnUNet
   validlist << "2d"
@@ -71,10 +72,14 @@ void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &resultsFolder)
                 });
 }
 
-void QmitknnUNetToolGUI::OnModelChanged(const QString &text)
+void QmitknnUNetToolGUI::OnModelChanged(const QString &model)
 {
+  if (model.isEmpty())
+  {
+    return;
+  }
   m_Controls.taskBox->clear();
-  auto tasks = m_ParentFolder->getTasksForModel(text);
+  auto tasks = m_ParentFolder->getTasksForModel(model);
   std::for_each(tasks.begin(), tasks.end(), [this](QString task) { m_Controls.taskBox->addItem(task); });
 }
 

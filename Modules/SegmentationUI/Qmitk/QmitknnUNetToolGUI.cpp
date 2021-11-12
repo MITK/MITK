@@ -42,7 +42,7 @@ QmitknnUNetToolGUI::~QmitknnUNetToolGUI()
 {
   this->m_SegmentationThread->quit();
   this->m_SegmentationThread->wait();
-  // delete m_ParentFolder;
+  delete m_ParentFolder;
 }
 
 void QmitknnUNetToolGUI::ConnectNewTool(mitk::AutoSegmentationWithPreviewTool *newTool)

@@ -227,6 +227,9 @@ namespace mitk
       return;
     }
 
+    mitk::BaseRenderer *baseRenderer = mitk::BaseRenderer::GetInstance(renderWindow);
+    baseRenderer->SetConstrainZoomingAndPanning(m_ConstrainedPanningZooming);
+
     // Erase potentially pending requests for this window
     m_RenderWindowList[renderWindow] = RENDERING_INACTIVE;
 

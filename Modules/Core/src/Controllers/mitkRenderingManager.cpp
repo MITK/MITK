@@ -243,7 +243,7 @@ namespace mitk
       // prepare the camera etc. before rendering
       // Note: this is a very important step which should be called before the VTK render!
       // If you modify the camera anywhere else or after the render call, the scene cannot be seen.
-      auto *vPR = dynamic_cast<mitk::VtkPropRenderer *>(mitk::BaseRenderer::GetInstance(renderWindow));
+      auto *vPR = dynamic_cast<mitk::VtkPropRenderer *>(baseRenderer);
       if (vPR)
         vPR->PrepareRender();
       // Execute rendering

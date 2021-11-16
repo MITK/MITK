@@ -59,8 +59,6 @@ void QmitkImageStatisticsView::CreateQtPartControl(QWidget *parent)
   m_Controls.sliderWidget_intensityProfile->setVisible(false);
   ResetGUI();
 
-
-
   m_DataGenerator = new QmitkImageStatisticsDataGenerator(parent);
   m_DataGenerator->SetDataStorage(this->GetDataStorage());
   m_DataGenerator->SetAutoUpdate(true);
@@ -99,8 +97,8 @@ void QmitkImageStatisticsView::RenderWindowPartDeactivated(mitk::IRenderWindowPa
 
 void QmitkImageStatisticsView::CreateConnections()
 {
-  connect(m_Controls.widget_statistics, &QmitkImageStatisticsWidget::IgnoreZeroVoxelChanged,
-    this, &QmitkImageStatisticsView::OnCheckBoxIgnoreZeroStateChanged);
+  connect(m_Controls.widget_statistics, &QmitkImageStatisticsWidget::IgnoreZeroValuedVoxelStateChanged,
+    this, &QmitkImageStatisticsView::OnIgnoreZeroValuedVoxelStateChanged);
   connect(m_Controls.buttonSelection, &QAbstractButton::clicked,
     this, &QmitkImageStatisticsView::OnButtonSelectionPressed);
 
@@ -297,7 +295,7 @@ void QmitkImageStatisticsView::OnRequestHistogramUpdate(unsigned int nbins)
   this->UpdateHistogramWidget();
 }
 
-void QmitkImageStatisticsView::OnCheckBoxIgnoreZeroStateChanged(int state)
+void QmitkImageStatisticsView::OnIgnoreZeroValuedVoxelStateChanged(int state)
 {
   auto ignoreZeroValueVoxel = (state == Qt::Unchecked) ? false : true;
   m_Controls.widget_statistics->SetIgnoreZeroValueVoxel(ignoreZeroValueVoxel);

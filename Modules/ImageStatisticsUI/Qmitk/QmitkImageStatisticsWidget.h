@@ -48,6 +48,8 @@ public:
   /*! /brief Get bin size for histogram resolution.*/
   unsigned int GetHistogramNBins() const;
 
+signals:
+  void IgnoreZeroValuedVoxelStateChanged(int status);
 
 private:
   void CreateConnections();
@@ -56,12 +58,8 @@ private:
   /** \brief  Saves the image statistics to the clipboard */
   void OnClipboardButtonClicked();
 
-private:
   Ui::QmitkImageStatisticsControls m_Controls;
   QmitkImageStatisticsTreeModel *m_imageStatisticsModel;
   QSortFilterProxyModel *m_ProxyModel;
-
-signals:
-	void IgnoreZeroVoxelChanged(int status);
 };
 #endif // QmitkImageStatisticsWidget_H__INCLUDED

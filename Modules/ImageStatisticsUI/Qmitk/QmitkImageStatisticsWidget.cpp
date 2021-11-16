@@ -32,8 +32,8 @@ QmitkImageStatisticsWidget::QmitkImageStatisticsWidget(QWidget* parent) : QWidge
           &QmitkImageStatisticsTreeModel::modelChanged,
           m_Controls.treeViewStatistics,
           &QTreeView::expandAll);
-  connect(m_Controls.checkBox_ignoreZero, &QCheckBox::stateChanged,
-      this, &QmitkImageStatisticsWidget::IgnoreZeroVoxelChanged);
+  connect(m_Controls.checkBoxIgnoreZeroValuedVoxel, &QCheckBox::stateChanged,
+      this, &QmitkImageStatisticsWidget::IgnoreZeroValuedVoxelStateChanged);
 }
 
 void QmitkImageStatisticsWidget::SetDataStorage(mitk::DataStorage* newDataStorage)
@@ -56,7 +56,7 @@ void QmitkImageStatisticsWidget::Reset()
   m_imageStatisticsModel->Clear();
   m_Controls.treeViewStatistics->setEnabled(false);
   m_Controls.buttonCopyImageStatisticsToClipboard->setEnabled(false);
-  m_Controls.checkBox_ignoreZero->setEnabled(false);
+  m_Controls.checkBoxIgnoreZeroValuedVoxel->setEnabled(false);
 }
 
 
@@ -89,7 +89,7 @@ void QmitkImageStatisticsWidget::OnDataAvailable()
 {
   m_Controls.buttonCopyImageStatisticsToClipboard->setEnabled(true);
   m_Controls.treeViewStatistics->setEnabled(true);
-  m_Controls.checkBox_ignoreZero->setEnabled(true);
+  m_Controls.checkBoxIgnoreZeroValuedVoxel->setEnabled(true);
 }
 
 void QmitkImageStatisticsWidget::OnClipboardButtonClicked()

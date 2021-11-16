@@ -24,8 +24,6 @@ found in the LICENSE file.
 
 #include <mitkIRenderWindowPartListener.h>
 
-
-
 class QmitkImageStatisticsDataGenerator;
 class QmitkDataGenerationJobBase;
 
@@ -74,7 +72,7 @@ protected:
   void OnGenerationFinished();
   void OnJobError(QString error, const QmitkDataGenerationJobBase* failedJob);
   void OnRequestHistogramUpdate(unsigned int);
-  void OnCheckBoxIgnoreZeroStateChanged(int state);
+  void OnIgnoreZeroValuedVoxelStateChanged(int state);
   void OnButtonSelectionPressed();
   void OnImageSelectionChanged(QmitkAbstractNodeSelectionWidget::NodeList nodes);
   void OnROISelectionChanged(QmitkAbstractNodeSelectionWidget::NodeList nodes);

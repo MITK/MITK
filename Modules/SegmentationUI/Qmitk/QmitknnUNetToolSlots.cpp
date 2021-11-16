@@ -412,7 +412,7 @@ void QmitknnUNetToolGUI::SegmentationResultHandler(mitk::nnUNetTool *tool)
   tool->RenderOutputBuffer();
   this->SetLabelSetPreview(tool->GetMLPreview());
   tool->IsTimePointChangeAwareOn();
-  m_Controls.statusLabel->setText("<b>STATUS: </b><i>Segmentation task finished successfully.</i>");
+  m_Controls.statusLabel->setText("<b>STATUS: </b><i>Segmentation task finished successfully. Please Confirm the segmentation else will result in data loss</i>");
   m_Controls.stopButton->setEnabled(false);
 }
 

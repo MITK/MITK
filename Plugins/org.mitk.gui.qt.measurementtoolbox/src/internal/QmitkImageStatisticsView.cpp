@@ -170,7 +170,7 @@ void QmitkImageStatisticsView::UpdateIntensityProfile()
 
 void QmitkImageStatisticsView::UpdateHistogramWidget()
 {
-  bool visibility = false;
+  m_Controls.groupBox_histogram->setVisible(false);
 
   const auto selectedImageNodes = m_Controls.imageNodesSelector->GetSelectedNodes();
   const auto selectedMaskNodes = m_Controls.roiNodesSelector->GetSelectedNodes();
@@ -218,19 +218,12 @@ void QmitkImageStatisticsView::UpdateHistogramWidget()
             //only thing that works for now is always to update/overwrite the same data label
             //This is a quick fix for T28223 and T28221
             m_Controls.widget_histogram->SetHistogram(statistics->GetHistogramForTimeStep(timeStep), "histogram");
-
-            visibility = true;
+            m_Controls.groupBox_histogram->setVisible(true);
           }
         }
       }
     }
   }
-
-  if (visibility != m_Controls.groupBox_histogram->isVisible())
-  {
-    m_Controls.groupBox_histogram->setVisible(visibility);
-  }
-
 }
 
 QmitkChartWidget::ColorTheme QmitkImageStatisticsView::GetColorTheme() const

@@ -107,7 +107,7 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   QIcon refreshIcon;
   refreshIcon.addPixmap(style()->standardIcon(QStyle::SP_BrowserReload).pixmap(sz), QIcon::Normal, QIcon::Off);
   m_Controls.refreshdirectoryBox->setIcon(refreshIcon);
-  m_Controls.refreshdirectoryBox->setEnabled(false);
+  m_Controls.refreshdirectoryBox->setEnabled(true);
 
   m_Controls.statusLabel->setTextFormat(Qt::RichText);
   m_Controls.statusLabel->setText("<b>STATUS: </b><i>Welcome to nnUNet. " + QString::number(m_GpuLoader.GetGPUCount()) +

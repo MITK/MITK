@@ -57,17 +57,11 @@ void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &resultsFolder)
   }
   m_ParentFolder = new QmitknnUNetFolderParser(resultsFolder);
   auto models = m_ParentFolder->getModelNames();
-  QStringList validlist; // valid list of models supported by nnUNet
-  validlist << "2d"
-            << "3d_lowres"
-            << "3d_fullres"
-            << "3d_cascade_fullres"
-            << "ensembles";
   std::for_each(models.begin(),
                 models.end(),
-                [this, validlist](QString model)
+                [this](QString model)
                 {
-                  if (validlist.contains(model, Qt::CaseInsensitive))
+                  if (m_VALID_MODELS.contains(model, Qt::CaseInsensitive))
                     m_Controls.modelBox->addItem(model);
                 });
 }
@@ -127,7 +121,13 @@ void QmitknnUNetToolGUI::OnTaskChanged(const QString &task)
       layout->modelBox->clear();
       layout->trainerBox->clear();
       layout->plannerBox->clear();
-      std::for_each(models.begin(), models.end(), [&layout](QString model) { layout->modelBox->addItem(model); });
+      std::for_each(models.begin(),
+                    models.end(),
+                    [&layout, this](QString model)
+                    {
+                      if (m_VALID_MODELS.contains(model, Qt::CaseInsensitive))
+                        layout->modelBox->addItem(model);
+                    });
       std::for_each(
         trainers.begin(), trainers.end(), [&layout](QString trainer) { layout->trainerBox->addItem(trainer); });
       std::for_each(
@@ -293,12 +293,12 @@ void QmitknnUNetToolGUI::OnModalitiesNumberChanged(int num)
 
 void QmitknnUNetToolGUI::OnModalPositionChanged(int posIdx)
 {
-  if (posIdx < static_cast<int>(this->m_Modalities.size()))
+  if (posIdx < static_cast<int>(m_Modalities.size()))
   {
     int currPos = 0;
     bool stopCheck = false;
     // for-loop clears all widgets from the QGridLayout and also, finds the position of loaded-image widget.
-    for (QmitkDataStorageComboBox *multiModalBox : this->m_Modalities)
+    for (QmitkDataStorageComboBox *multiModalBox : m_Modalities)
     {
       m_Controls.advancedSettingsLayout->removeWidget(multiModalBox);
       multiModalBox->setParent(nullptr);
@@ -312,12 +312,12 @@ void QmitknnUNetToolGUI::OnModalPositionChanged(int posIdx)
       }
     }
     // moving the loaded-image widget to the required position
-    std::iter_swap(this->m_Modalities.begin() + currPos, this->m_Modalities.begin() + posIdx);
+    std::iter_swap(this->m_Modalities.begin() + currPos, m_Modalities.begin() + posIdx);
     // re-adding all widgets in the order
-    for (int i = 0; i < static_cast<int>(this->m_Modalities.size()); ++i)
+    for (int i = 0; i < static_cast<int>(m_Modalities.size()); ++i)
     {
-      QmitkDataStorageComboBox *multiModalBox = this->m_Modalities[i];
-      m_Controls.advancedSettingsLayout->addWidget(multiModalBox, this->m_UI_ROWS + i + 1, 1, 1, 3);
+      QmitkDataStorageComboBox *multiModalBox = m_Modalities[i];
+      m_Controls.advancedSettingsLayout->addWidget(multiModalBox, m_UI_ROWS + i + 1, 1, 1, 3);
     }
     m_Controls.advancedSettingsLayout->update();
   }
@@ -412,7 +412,8 @@ void QmitknnUNetToolGUI::SegmentationResultHandler(mitk::nnUNetTool *tool)
   tool->RenderOutputBuffer();
   this->SetLabelSetPreview(tool->GetMLPreview());
   tool->IsTimePointChangeAwareOn();
-  m_Controls.statusLabel->setText("<b>STATUS: </b><i>Segmentation task finished successfully. Please Confirm the segmentation else will result in data loss</i>");
+  m_Controls.statusLabel->setText("<b>STATUS: </b><i>Segmentation task finished successfully. Please Confirm the "
+                                  "segmentation else will result in data loss</i>");
   m_Controls.stopButton->setEnabled(false);
 }
 

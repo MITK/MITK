@@ -233,6 +233,11 @@ private:
    *
    */
   QmitknnUNetFolderParser *m_ParentFolder = nullptr; // TODO: fix memory leak
-};
 
+  /**
+   * @brief Valid list of models supported by nnUNet
+   *
+   */
+  const QStringList m_VALID_MODELS = {"2d", "3d_lowres", "3d_fullres", "3d_cascade_fullres", "ensembles"};
+};
 #endif

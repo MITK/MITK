@@ -366,8 +366,6 @@ namespace mitk
     {
       mitk::BaseRenderer *baseRenderer = mitk::BaseRenderer::GetInstance(it->first);
 
-      baseRenderer->SetConstrainZoomingAndPanning(m_ConstrainedPanningZooming);
-
       int id = baseRenderer->GetMapperID();
       if (((type == REQUEST_UPDATE_ALL) || ((type == REQUEST_UPDATE_2DWINDOWS) && (id == 1)) ||
            ((type == REQUEST_UPDATE_3DWINDOWS) && (id == 2))))

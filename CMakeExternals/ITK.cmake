@@ -55,8 +55,8 @@ if(NOT DEFINED ITK_DIR)
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
      UPDATE_COMMAND ""
-     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-5.2.0.tar.gz
-     URL_MD5 1875faa569df68d2878564b7072854ee
+     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-5.2.1.tar.gz
+     URL_MD5 48c1fe49f75fdaa91b31bbf9dda01a42
      CMAKE_GENERATOR ${gen}
      CMAKE_GENERATOR_PLATFORM ${gen_platform}
      CMAKE_ARGS

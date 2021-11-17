@@ -56,7 +56,7 @@ void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &resultsFolder)
     delete m_ParentFolder;
   }
   m_ParentFolder = new QmitknnUNetFolderParser(resultsFolder);
-  auto models = m_ParentFolder->getModelNames();
+  auto models = m_ParentFolder->getModelNames<QStringList>();
   std::for_each(models.begin(),
                 models.end(),
                 [this](QString model)
@@ -73,7 +73,7 @@ void QmitknnUNetToolGUI::OnModelChanged(const QString &model)
     return;
   }
   m_Controls.taskBox->clear();
-  auto tasks = m_ParentFolder->getTasksForModel(model);
+  auto tasks = m_ParentFolder->getTasksForModel<QStringList>(model);
   std::for_each(tasks.begin(), tasks.end(), [this](QString task) { m_Controls.taskBox->addItem(task); });
 }
 
@@ -85,7 +85,8 @@ void QmitknnUNetToolGUI::OnTaskChanged(const QString &task)
   }
   m_Controls.trainerBox->clear();
   m_Controls.plannerBox->clear();
-  auto trainerPlanners = m_ParentFolder->getTrainerPlannersForTask(task, m_Controls.modelBox->currentText());
+  QStringList trainerPlanners =
+    m_ParentFolder->getTrainerPlannersForTask<QStringList>(task, m_Controls.modelBox->currentText());
   if (m_Controls.modelBox->currentText() == "ensembles")
   {
     m_Controls.trainerBox->setVisible(false);
@@ -173,8 +174,8 @@ void QmitknnUNetToolGUI::OnTrainerChanged(const QString &plannerSelected)
     auto selectedTrainer = m_Controls.trainerBox->currentText();
     auto selectedTask = m_Controls.taskBox->currentText();
     auto selectedModel = m_Controls.modelBox->currentText();
-    auto folds =
-      m_ParentFolder->getFoldsForTrainerPlanner(selectedTrainer, plannerSelected, selectedTask, selectedModel);
+    auto folds = m_ParentFolder->getFoldsForTrainerPlanner<QStringList>(
+      selectedTrainer, plannerSelected, selectedTask, selectedModel);
     std::for_each(folds.begin(),
                   folds.end(),
                   [this](QString fold)

@@ -323,8 +323,10 @@ if(MITK_USE_Qt5)
       endif()
 
       if(_compilers MATCHES "[0-9]+")
-        if (CMAKE_MATCH_0 EQUAL 2019)
-          list(APPEND _compilers "msvc2017") # Binary compatible to 2019
+        if (CMAKE_MATCH_0 EQUAL 2022)
+          list(APPEND _compilers "msvc2019" "msvc2017") # Binary compatible
+        elseif (CMAKE_MATCH_0 EQUAL 2019)
+          list(APPEND _compilers "msvc2017") # Binary compatible
         endif()
       endif()
     else()

@@ -97,8 +97,8 @@ void QmitkImageStatisticsView::RenderWindowPartDeactivated(mitk::IRenderWindowPa
 
 void QmitkImageStatisticsView::CreateConnections()
 {
-  connect(m_Controls.checkBox_ignoreZero, &QCheckBox::stateChanged,
-    this, &QmitkImageStatisticsView::OnCheckBoxIgnoreZeroStateChanged);
+  connect(m_Controls.widget_statistics, &QmitkImageStatisticsWidget::IgnoreZeroValuedVoxelStateChanged,
+    this, &QmitkImageStatisticsView::OnIgnoreZeroValuedVoxelStateChanged);
   connect(m_Controls.buttonSelection, &QAbstractButton::clicked,
     this, &QmitkImageStatisticsView::OnButtonSelectionPressed);
 
@@ -288,7 +288,7 @@ void QmitkImageStatisticsView::OnRequestHistogramUpdate(unsigned int nbins)
   this->UpdateHistogramWidget();
 }
 
-void QmitkImageStatisticsView::OnCheckBoxIgnoreZeroStateChanged(int state)
+void QmitkImageStatisticsView::OnIgnoreZeroValuedVoxelStateChanged(int state)
 {
   auto ignoreZeroValueVoxel = (state == Qt::Unchecked) ? false : true;
   m_Controls.widget_statistics->SetIgnoreZeroValueVoxel(ignoreZeroValueVoxel);

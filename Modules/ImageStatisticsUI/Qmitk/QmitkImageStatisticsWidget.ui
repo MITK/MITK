@@ -37,7 +37,7 @@
    </item>
    <item>
     <widget class="QWidget" name="widgetClipboard" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0">
       <property name="spacing">
        <number>0</number>
       </property>
@@ -70,7 +70,7 @@
        </widget>
       </item>
       <item>
-       <spacer name="horizontalSpacer_2">
+       <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -81,6 +81,13 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBoxIgnoreZeroValuedVoxel">
+        <property name="text">
+         <string>Ignore zero-valued voxels</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

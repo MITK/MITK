@@ -62,8 +62,8 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
           or use another option in the future, we do not forget to remove our
           copy of the FindBoost module again. ]]
 
-  set(url "${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_1_74_0.tar.gz")
-  set(md5 3c8fb92ce08b9ad5a5f0b35731ac2c8e)
+  set(url "${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_1_78_0_b1.tar.gz")
+  set(md5 bbaa634603e3789d7dd0c21d0bdf4f09)
 
   if(MITK_USE_Boost_LIBRARIES)
 
@@ -93,6 +93,11 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
 
         #[[ Assume Visual Studio 2019. ]]
         set(bootstrap_args vc${VISUAL_STUDIO_VERSION_MAJOR}2)
+
+      elseif(VISUAL_STUDIO_VERSION_MAJOR EQUAL 14 AND VISUAL_STUDIO_VERSION_MINOR LESS 40)
+
+        #[[ Assume Visual Studio 2022. ]]
+        set(bootstrap_args vc${VISUAL_STUDIO_VERSION_MAJOR}3)
 
       else()
 

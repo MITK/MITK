@@ -1,3 +1,7 @@
+#[[ When increasing the minimum required version, check if Boost_ADDITIONAL_VERSIONS
+    in CMake/PackageDepends/MITK_Boost_Config.cmake can be removed. See the first
+    long comment in CMakeExternals/Boost.cmake for details. ]]
+
 set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.18)
 cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION})
 

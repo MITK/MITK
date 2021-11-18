@@ -18,6 +18,8 @@ we divide platform support into two test categories: Tier 1 and Tier 2.
 Although MITK may be built on a broader range of platform-compiler combinations, only a subset of these are actively
 supported by the MITK development team.
 
+In general, only 64-bit builds are supported.
+
 Tier 1 Platforms
 ----------------
 
@@ -26,9 +28,9 @@ Errors or bugs discovered in these platforms are prioritized and corrected as so
 
 | Platform                            | Compilers
 | ----------------------------------- | --------------------------------------------------
-| Microsoft Windows 10 (x64)          | Visual Studio 2019 (latest update)
-| Linux Ubuntu 20.04 (x64)            | Default GCC version
-| Linux Ubuntu 18.04 (x64)            | Default GCC version
+| Microsoft Windows 10                | Visual Studio 2019 (latest update)
+| Linux Ubuntu 20.04                  | Default GCC version
+| Linux Ubuntu 18.04                  | Default GCC version
 
 Tier 2 Platforms
 ----------------
@@ -40,6 +42,7 @@ as well as in the current master branch.
 
 | Platform                            | Compilers
 | ----------------------------------- | --------------------------------------------------
+| Microsoft Windows 10                | Visual Studio 2022 (latest update)
 | Apple macOS 11 "Big Sur"            | Default Apple Clang version
 | Apple macOS 10.15 "Catalina"        | Default Apple Clang version
 

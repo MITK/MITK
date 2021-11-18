@@ -25,7 +25,11 @@ public:
     m_RootNode->subFolders.clear();
     RefreshHierarchy();
   }
-  ~QmitknnUNetFolderParser() = default;
+  ~QmitknnUNetFolderParser()
+  {
+    DeleteDirs(m_RootNode, LEVEL);
+    delete m_RootNode;
+  }
 
   void RefreshHierarchy() { InitDirs(m_RootNode, 0); }
 
@@ -51,7 +55,7 @@ public:
   {
     QStringList modelsForTask;
     QStringList models = GetSubFolderNamesFromNode<T>(m_RootNode);
-    foreach(QString model, models)
+    foreach (QString model, models)
     {
       QStringList taskList = getTasksForModel<QStringList>(model);
       if (taskList.contains(taskName, Qt::CaseInsensitive))
@@ -61,7 +65,6 @@ public:
     }
     return modelsForTask;
   }
-
 
   template <typename T>
   T getTrainerPlannersForTask(const QString &taskName, const QString &modelName)
@@ -75,9 +78,9 @@ public:
 
   template <typename T>
   T getFoldsForTrainerPlanner(const QString &trainer,
-                                        const QString &planner,
-                                        const QString &taskName,
-                                        const QString &modelName)
+                              const QString &planner,
+                              const QString &taskName,
+                              const QString &modelName)
   {
     QStringList folds;
     FolderNode *modelNode = GetSubNodeMatchingNameCrietria(modelName, m_RootNode);
@@ -134,6 +137,23 @@ private:
         InitDirs(fp, level);
       }
       parent->subFolders.push_back(fp);
+    }
+  }
+
+  void DeleteDirs(FolderNode *parent, int level)
+  {
+    level++;
+    for (FolderNode *subFolder : parent->subFolders)
+    {
+      if (level < LEVEL)
+      {
+        DeleteDirs(subFolder, level);
+      }
+      for (FolderNode *leafNode : parent->subFolders)
+      {
+        delete leafNode;
+      }
+      parent->subFolders.clear();
     }
   }
 

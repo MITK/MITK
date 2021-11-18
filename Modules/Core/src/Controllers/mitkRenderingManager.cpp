@@ -227,9 +227,6 @@ namespace mitk
       return;
     }
 
-    mitk::BaseRenderer *baseRenderer = mitk::BaseRenderer::GetInstance(renderWindow);
-    baseRenderer->SetConstrainZoomingAndPanning(m_ConstrainedPanningZooming);
-
     // Erase potentially pending requests for this window
     m_RenderWindowList[renderWindow] = RENDERING_INACTIVE;
 
@@ -243,7 +240,7 @@ namespace mitk
       // prepare the camera etc. before rendering
       // Note: this is a very important step which should be called before the VTK render!
       // If you modify the camera anywhere else or after the render call, the scene cannot be seen.
-      auto *vPR = dynamic_cast<mitk::VtkPropRenderer *>(baseRenderer);
+      auto *vPR = dynamic_cast<mitk::VtkPropRenderer *>(mitk::BaseRenderer::GetInstance(renderWindow));
       if (vPR)
         vPR->PrepareRender();
       // Execute rendering
@@ -365,6 +362,8 @@ namespace mitk
     for (it = m_RenderWindowList.cbegin(); it != m_RenderWindowList.cend(); ++it)
     {
       mitk::BaseRenderer *baseRenderer = mitk::BaseRenderer::GetInstance(it->first);
+
+      baseRenderer->SetConstrainZoomingAndPanning(m_ConstrainedPanningZooming);
 
       int id = baseRenderer->GetMapperID();
       if (((type == REQUEST_UPDATE_ALL) || ((type == REQUEST_UPDATE_2DWINDOWS) && (id == 1)) ||

@@ -16,6 +16,12 @@ void QmitknnUNetToolGUI::ClearAllComboBoxes()
   m_Controls.taskBox->clear();
   m_Controls.foldBox->clear();
   m_Controls.trainerBox->clear();
+  for (std::unique_ptr<QmitknnUNetTaskParamsUITemplate> &layout : m_EnsembleParams)
+  {
+    layout->modelBox->clear();
+    layout->trainerBox->clear();
+    layout->plannerBox->clear();
+  }
 }
 
 template <typename T>
@@ -42,7 +48,7 @@ void QmitknnUNetToolGUI::OnRefreshDirectory()
   }
   else
   {
-    m_ParentFolder = new QmitknnUNetFolderParser(resultsFolder);
+    m_ParentFolder = std::make_shared<QmitknnUNetFolderParser>(resultsFolder);
   }
   OnDirectoryChanged(resultsFolder);
 }
@@ -51,11 +57,7 @@ void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &resultsFolder)
 {
   m_Controls.previewButton->setEnabled(false);
   this->ClearAllComboBoxes();
-  if (m_ParentFolder)
-  {
-    delete m_ParentFolder;
-  }
-  m_ParentFolder = new QmitknnUNetFolderParser(resultsFolder);
+  m_ParentFolder = std::make_shared<QmitknnUNetFolderParser>(resultsFolder);
   auto models = m_ParentFolder->getModelNames<QStringList>();
   std::for_each(models.begin(),
                 models.end(),
@@ -412,7 +414,6 @@ void QmitknnUNetToolGUI::SegmentationResultHandler(mitk::nnUNetTool *tool)
   MITK_INFO << "Finished slot";
   tool->RenderOutputBuffer();
   this->SetLabelSetPreview(tool->GetMLPreview());
-  tool->IsTimePointChangeAwareOn();
   m_Controls.statusLabel->setText("<b>STATUS: </b><i>Segmentation task finished successfully. Please Confirm the "
                                   "segmentation else will result in data loss</i>");
   m_Controls.stopButton->setEnabled(false);

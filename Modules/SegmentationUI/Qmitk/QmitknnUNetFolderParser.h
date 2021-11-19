@@ -11,7 +11,7 @@ class FolderNode
 public:
   QString name;
   QString path; // parent
-  std::vector<FolderNode *> subFolders;
+  std::vector<std::shared_ptr<FolderNode>> subFolders;
 };
 
 class MITKSEGMENTATIONUI_EXPORT QmitknnUNetFolderParser
@@ -19,17 +19,13 @@ class MITKSEGMENTATIONUI_EXPORT QmitknnUNetFolderParser
 public:
   QmitknnUNetFolderParser(const QString parentFolder)
   {
-    m_RootNode = new FolderNode;
+    m_RootNode = std::make_shared<FolderNode>();
     m_RootNode->path = parentFolder;
     m_RootNode->name = QString("nnUNet");
     m_RootNode->subFolders.clear();
     RefreshHierarchy();
   }
-  ~QmitknnUNetFolderParser()
-  {
-    DeleteDirs(m_RootNode, LEVEL);
-    delete m_RootNode;
-  }
+  ~QmitknnUNetFolderParser() { DeleteDirs(m_RootNode, LEVEL); }
 
   void RefreshHierarchy() { InitDirs(m_RootNode, 0); }
 
@@ -45,7 +41,7 @@ public:
   template <typename T>
   T getTasksForModel(const QString &modelName)
   {
-    FolderNode *modelNode = GetSubNodeMatchingNameCrietria(modelName, m_RootNode);
+    std::shared_ptr<FolderNode> modelNode = GetSubNodeMatchingNameCrietria(modelName, m_RootNode);
     QStringList tasks = GetSubFolderNamesFromNode<T>(modelNode);
     return tasks;
   }
@@ -70,8 +66,8 @@ public:
   T getTrainerPlannersForTask(const QString &taskName, const QString &modelName)
   {
     QStringList tps;
-    FolderNode *modelNode = GetSubNodeMatchingNameCrietria(modelName, m_RootNode);
-    FolderNode *taskNode = GetSubNodeMatchingNameCrietria(taskName, modelNode);
+    std::shared_ptr<FolderNode> modelNode = GetSubNodeMatchingNameCrietria(modelName, m_RootNode);
+    std::shared_ptr<FolderNode> taskNode = GetSubNodeMatchingNameCrietria(taskName, modelNode);
     tps = GetSubFolderNamesFromNode<T>(taskNode);
     return tps;
   }
@@ -83,23 +79,24 @@ public:
                               const QString &modelName)
   {
     QStringList folds;
-    FolderNode *modelNode = GetSubNodeMatchingNameCrietria(modelName, m_RootNode);
-    FolderNode *taskNode = GetSubNodeMatchingNameCrietria(taskName, modelNode);
+    std::shared_ptr<FolderNode> modelNode = GetSubNodeMatchingNameCrietria(modelName, m_RootNode);
+    std::shared_ptr<FolderNode> taskNode = GetSubNodeMatchingNameCrietria(taskName, modelNode);
     QString trainerPlanner = trainer + QString("__") + planner;
-    FolderNode *tpNode = GetSubNodeMatchingNameCrietria(trainerPlanner, taskNode);
+    std::shared_ptr<FolderNode> tpNode = GetSubNodeMatchingNameCrietria(trainerPlanner, taskNode);
     folds = GetSubFolderNamesFromNode<T>(tpNode);
     return folds;
   }
 
 private:
   const int LEVEL = 4;
-  FolderNode *m_RootNode;
+  std::shared_ptr<FolderNode> m_RootNode;
 
-  FolderNode *GetSubNodeMatchingNameCrietria(const QString &queryName, FolderNode *parentNode)
+  std::shared_ptr<FolderNode> GetSubNodeMatchingNameCrietria(const QString &queryName,
+                                                             std::shared_ptr<FolderNode> parentNode)
   {
-    FolderNode *retNode;
-    std::vector<FolderNode *> subNodes = parentNode->subFolders;
-    for (FolderNode *node : subNodes)
+    std::shared_ptr<FolderNode> retNode;
+    std::vector<std::shared_ptr<FolderNode>> subNodes = parentNode->subFolders;
+    for (std::shared_ptr<FolderNode> node : subNodes)
     {
       if (node->name == queryName)
       {
@@ -111,25 +108,25 @@ private:
   }
 
   template <typename T>
-  T GetSubFolderNamesFromNode(const FolderNode *parent)
+  T GetSubFolderNamesFromNode(const std::shared_ptr<FolderNode> parent)
   {
     T folders;
-    std::vector<FolderNode *> subNodes = parent->subFolders;
-    for (FolderNode *folder : subNodes)
+    std::vector<std::shared_ptr<FolderNode>> subNodes = parent->subFolders;
+    for (std::shared_ptr<FolderNode> folder : subNodes)
     {
       folders.push_back(folder->name);
     }
     return folders;
   }
 
-  void InitDirs(FolderNode *parent, int level)
+  void InitDirs(std::shared_ptr<FolderNode> parent, int level)
   {
     QString searchFolder = parent->path + QDir::separator() + parent->name;
     auto subFolders = FetchFoldersFromDir<QStringList>(searchFolder);
     level++;
     foreach (QString folder, subFolders)
     {
-      FolderNode *fp = new FolderNode;
+      std::shared_ptr<FolderNode> fp = std::make_shared<FolderNode>();
       fp->path = searchFolder;
       fp->name = folder;
       if (level < this->LEVEL)
@@ -140,18 +137,14 @@ private:
     }
   }
 
-  void DeleteDirs(FolderNode *parent, int level)
+  void DeleteDirs(std::shared_ptr<FolderNode> parent, int level)
   {
     level++;
-    for (FolderNode *subFolder : parent->subFolders)
+    for (std::shared_ptr<FolderNode> subFolder : parent->subFolders)
     {
       if (level < LEVEL)
       {
         DeleteDirs(subFolder, level);
-      }
-      for (FolderNode *leafNode : parent->subFolders)
-      {
-        delete leafNode;
       }
       parent->subFolders.clear();
     }

@@ -232,7 +232,7 @@ private:
    * @brief Stores path of the model director (RESULTS_FOLDER appended by "nnUNet").
    *
    */
-  QmitknnUNetFolderParser *m_ParentFolder = nullptr; // TODO: fix memory leak
+  std::shared_ptr<QmitknnUNetFolderParser> m_ParentFolder = nullptr;
 
   /**
    * @brief Valid list of models supported by nnUNet

@@ -38,7 +38,7 @@ namespace mitk
     std::string model;
     std::string trainer;
     std::string planId;
-    std::string outputDir; 
+    std::string outputDir;
   };
 
   /**
@@ -105,6 +105,10 @@ namespace mitk
     itkGetConstMacro(Ensemble, bool);
     itkBooleanMacro(Ensemble);
 
+    itkSetMacro(Predict, bool);
+    itkGetConstMacro(Predict, bool);
+    itkBooleanMacro(Predict);
+
     itkSetMacro(GpuId, unsigned int);
     itkGetConstMacro(GpuId, unsigned int);
 
@@ -116,7 +120,7 @@ namespace mitk
 
     /**
      * @brief Holds paths to other input image modalities.
-     * 
+     *
      */
     std::vector<mitk::Image::ConstPointer> m_OtherModalPaths;
 
@@ -130,34 +134,34 @@ namespace mitk
 
     /**
      * @brief Get the Output Buffer object
-     * 
-     * @return LabelSetImage::Pointer 
+     *
+     * @return LabelSetImage::Pointer
      */
     LabelSetImage::Pointer GetOutputBuffer();
 
     /**
      * @brief Sets the outputBuffer to nullptr
-     * 
+     *
      */
     void ClearOutputBuffer();
 
     /**
-    *  @brief Returns the DataStorage from the ToolManager
-    */
+     *  @brief Returns the DataStorage from the ToolManager
+     */
     mitk::DataStorage *GetDataStorage();
 
     mitk::DataNode *GetRefNode();
+
   protected:
-  
     /**
      * @brief Construct a new nnUNet Tool object and temp directory.
-     * 
+     *
      */
     nnUNetTool();
 
     /**
      * @brief Destroy the nnUNet Tool object and deletes the temp directory.
-     * 
+     *
      */
     ~nnUNetTool();
 
@@ -170,15 +174,14 @@ namespace mitk
      * 3. Iterates through the parameter queue (m_ParamQ) and executes "nnUNet_predict" command with the parameters
      * 4. Expects an output image to be saved in the temporary directory by the python proces. Loads it as
      *    LabelSetImage and returns.
-     * 
-     * @param inputAtTimeStep 
-     * @param timeStep 
-     * @return LabelSetImage::Pointer 
+     *
+     * @param inputAtTimeStep
+     * @param timeStep
+     * @return LabelSetImage::Pointer
      */
     LabelSetImage::Pointer ComputeMLPreview(const Image *inputAtTimeStep, TimeStepType timeStep) override;
     void UpdateCleanUp() override;
     void SetNodeProperties(LabelSetImage::Pointer) override;
-
 
   private:
     std::string m_MitkTempDir;
@@ -186,13 +189,14 @@ namespace mitk
     std::string m_ModelDirectory;
     std::string m_PythonPath;
     std::string m_PostProcessingJsonDirectory;
-    //bool m_UseGPU; kept for future
-    //bool m_AllInGPU; 
+    // bool m_UseGPU; kept for future
+    // bool m_AllInGPU;
     bool m_MixedPrecision;
     bool m_Mirror;
     bool m_NoPip;
     bool m_MultiModal;
     bool m_Ensemble = false;
+    bool m_Predict;
     LabelSetImage::Pointer m_OutputBuffer;
     unsigned int m_GpuId;
   };

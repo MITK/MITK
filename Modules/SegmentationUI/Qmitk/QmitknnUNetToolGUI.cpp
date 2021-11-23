@@ -138,7 +138,7 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
     {
       m_Controls.previewButton->setEnabled(false); // To prevent misclicked back2back prediction.
       qApp->processEvents();
-      tool->IsTimePointChangeAwareOff(); // purposefully placed to make tool->GetMTime different than before.
+      tool->PredictOn(); // purposefully placed to make tool->GetMTime different than before.
       QString modelName = m_Controls.modelBox->currentText();
       if (modelName.startsWith("ensemble", Qt::CaseInsensitive))
       {
@@ -207,7 +207,7 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
         mitkThrow() << "An error occured while calling nnUNet process.";
       }
       SegmentationResultHandler(tool);
-      tool->IsTimePointChangeAwareOn();
+      tool->PredictOff(); // purposefully placed to make tool->GetMTime different than before.
       m_Controls.previewButton->setEnabled(true);
     }
     catch (const std::exception &e)
@@ -216,6 +216,7 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
       errorMsg << "Error while processing parameters for nnUNet segmentation. Reason: " << e.what();
       ShowErrorMessage(errorMsg.str());
       m_Controls.previewButton->setEnabled(true);
+      tool->PredictOff();
       return;
     }
     catch (...)
@@ -223,6 +224,7 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
       std::string errorMsg = "Unkown error occured while generation nnUNet segmentation.";
       ShowErrorMessage(errorMsg);
       m_Controls.previewButton->setEnabled(true);
+      tool->PredictOff();
       return;
     }
   }

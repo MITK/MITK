@@ -110,11 +110,9 @@ protected slots:
    */
   void OnRefreshDirectory();
 
-  /**
-   * @brief
-   *
+  /*
+   *  void OnStopPressed();
    */
-  void OnStopPressed();
 
 signals:
   /**
@@ -124,7 +122,7 @@ signals:
 
 protected:
   QmitknnUNetToolGUI();
-  ~QmitknnUNetToolGUI();
+  ~QmitknnUNetToolGUI() = default;
 
   void ConnectNewTool(mitk::AutoSegmentationWithPreviewTool *newTool) override;
   void InitializeUI(QBoxLayout *mainLayout) override;
@@ -206,7 +204,7 @@ private:
   static T FetchFoldersFromDir(const QString &);
 
   Ui_QmitknnUNetToolGUIControls m_Controls;
-  QThread *m_SegmentationThread;
+  //QThread *m_SegmentationThread;
   nnUNetSegmentationWorker *m_Worker;
   QmitkGPULoader m_GpuLoader;
 

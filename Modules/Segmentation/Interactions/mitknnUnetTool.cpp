@@ -40,6 +40,7 @@ mitk::nnUNetTool::~nnUNetTool()
 void mitk::nnUNetTool::Activated()
 {
   Superclass::Activated();
+  m_InputOutputPair = std::make_pair(nullptr, nullptr);
 }
 
 void mitk::nnUNetTool::UpdateCleanUp()
@@ -142,7 +143,10 @@ namespace
 
 mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inputAtTimeStep, TimeStepType /*timeStep*/)
 {
-  //Image::Pointer _inputAtTimeStep = inputAtTimeStep->Clone();
+  if (m_InputOutputPair.first == inputAtTimeStep)
+  {
+    return m_InputOutputPair.second;
+  }
   std::string inDir, outDir, inputImagePath, outputImagePath, scriptPath;
   std::string templateFilename = "XXXXXX_000_0000.nii.gz";
 
@@ -154,8 +158,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
 
   inDir = IOUtil::CreateTemporaryDirectory("nnunet-in-XXXXXX", this->GetMitkTempDir());
   std::ofstream tmpStream;
-  inputImagePath =
-    IOUtil::CreateTemporaryFile(tmpStream, templateFilename, inDir + IOUtil::GetDirectorySeparator());
+  inputImagePath = IOUtil::CreateTemporaryFile(tmpStream, templateFilename, inDir + IOUtil::GetDirectorySeparator());
   tmpStream.close();
   std::size_t found = inputImagePath.find_last_of(IOUtil::GetDirectorySeparator());
   std::string fileName = inputImagePath.substr(found + 1);
@@ -164,8 +167,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   if (this->GetNoPip())
   {
     scriptPath = this->GetnnUNetDirectory() + IOUtil::GetDirectorySeparator() + "nnunet" +
-                 IOUtil::GetDirectorySeparator() + "inference" + IOUtil::GetDirectorySeparator() +
-                 "predict_simple.py";
+                 IOUtil::GetDirectorySeparator() + "inference" + IOUtil::GetDirectorySeparator() + "predict_simple.py";
   }
 
   try
@@ -315,12 +317,13 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   }
   try
   {
-    //outputImagePath = "C://data//dataset//Task02_Heart//labelsTr//la_003.nii.gz";
+    // outputImagePath = "C://data//dataset//Task02_Heart//labelsTr//la_003.nii.gz";
+    // outputImagePath = "/Users/ashis/DKFZ/nnUNet/nnUNet/out_dir/heart_single/la_000.nii.gz";
     LabelSetImage::Pointer resultImage = LabelSetImage::New();
     Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
     resultImage->InitializeByLabeledImage(outputImage);
     resultImage->SetGeometry(inputAtTimeStep->GetGeometry());
-
+    m_InputOutputPair = std::make_pair(inputAtTimeStep, resultImage);
     return resultImage;
   }
   catch (const mitk::Exception &e)

@@ -411,7 +411,6 @@ void QmitknnUNetToolGUI::SegmentationProcessFailed()
 
 void QmitknnUNetToolGUI::SegmentationResultHandler(mitk::nnUNetTool *tool)
 {
-  MITK_INFO << "Finished slot";
   tool->RenderOutputBuffer();
   this->SetLabelSetPreview(tool->GetMLPreview());
   m_Controls.statusLabel->setText("<b>STATUS: </b><i>Segmentation task finished successfully. Please Confirm the "
@@ -453,13 +452,13 @@ void QmitknnUNetToolGUI::ShowEnsembleLayout(bool visible)
   }
 }
 
-void QmitknnUNetToolGUI::OnStopPressed()
-{
-  m_Controls.previewButton->setEnabled(true);
-  m_Controls.stopButton->setEnabled(false);
-  if (m_SegmentationThread->isRunning())
-  {
-    MITK_DEBUG << "Stopping thread...";
-    m_SegmentationThread->requestInterruption();
-  }
-}
+// void QmitknnUNetToolGUI::OnStopPressed()
+// {
+//   m_Controls.previewButton->setEnabled(true);
+//   m_Controls.stopButton->setEnabled(false);
+//   if (m_SegmentationThread->isRunning())
+//   {
+//     MITK_DEBUG << "Stopping thread...";
+//     m_SegmentationThread->requestInterruption();
+//   }
+// }

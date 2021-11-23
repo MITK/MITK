@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include "mitkToolManager.h"
 #include <MitkSegmentationExports.h>
 #include <mitkStandardFileLocations.h>
+#include <utility>
 
 namespace us
 {
@@ -119,6 +120,7 @@ namespace mitk
      */
     std::vector<mitk::Image::ConstPointer> m_OtherModalPaths;
 
+    std::pair<const Image *, LabelSetImage::Pointer> m_InputOutputPair;
 
     /**
      * @brief Renders the output LabelSetImage.

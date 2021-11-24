@@ -42,9 +42,9 @@ private:
 public:
   void setUp() override
   {
-    mitk::ModelBase::TimeGridType m_grid(60);
+    mitk::ModelBase::TimeGridType m_grid(22);
     mitk::ModelBase::ParametersType m_testparameters(2);
-    mitk::AIFBasedModelBase::AterialInputFunctionType m_arterialInputFunction (60);
+    mitk::AIFBasedModelBase::AterialInputFunctionType m_arterialInputFunction (22);
 
     m_testparameters[mitk::StandardToftsModel::POSITION_PARAMETER_Ktrans] = 35.0;
     m_testparameters(mitk::StandardToftsModel::POSITION_PARAMETER_ve) = 0.5;

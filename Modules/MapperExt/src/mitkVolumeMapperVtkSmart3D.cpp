@@ -23,14 +23,15 @@ void mitk::VolumeMapperVtkSmart3D::GenerateDataForRenderer(mitk::BaseRenderer *r
 {
   bool value;
   this->GetDataNode()->GetBoolProperty("volumerendering", value, renderer);
+  auto timestep = this->GetTimestep();
   if (!value)
   {
-    m_Volume->VisibilityOff();
+    m_Volume[timestep]->VisibilityOff();
     return;
   }
   else
   {
-    m_Volume->VisibilityOn();
+    m_Volume[timestep]->VisibilityOn();
   }
 
   UpdateTransferFunctions(renderer);
@@ -40,14 +41,15 @@ void mitk::VolumeMapperVtkSmart3D::GenerateDataForRenderer(mitk::BaseRenderer *r
 
 vtkProp* mitk::VolumeMapperVtkSmart3D::GetVtkProp(mitk::BaseRenderer *)
 {
-  if (!m_Volume->GetMapper())
+  auto timestep = this->GetTimestep();
+  if (!m_Volume[timestep]->GetMapper())
   {
     createMapper(GetInputImage());
     createVolume();
     createVolumeProperty();
   }
 
-  return m_Volume;
+  return m_Volume[timestep];
 }
 
 void mitk::VolumeMapperVtkSmart3D::ApplyProperties(vtkActor *, mitk::BaseRenderer *)
@@ -102,25 +104,27 @@ void mitk::VolumeMapperVtkSmart3D::createMapper(vtkImageData* imageData)
 {
   Vector3D spacing;
   FillVector3D(spacing, 1.0, 1.0, 1.0);
+  auto timestep = this->GetTimestep();
 
-  m_ImageChangeInformation->SetInputData(imageData);
-  m_ImageChangeInformation->SetOutputSpacing(spacing.GetDataPointer());
+  m_ImageChangeInformation[timestep]->SetInputData(imageData);
+  m_ImageChangeInformation[timestep]->SetOutputSpacing(spacing.GetDataPointer());
 
-  m_SmartVolumeMapper->SetBlendModeToComposite();
-  m_SmartVolumeMapper->SetInputConnection(m_ImageChangeInformation->GetOutputPort());
+  m_SmartVolumeMapper[timestep]->SetBlendModeToComposite();
+  m_SmartVolumeMapper[timestep]->SetInputConnection(m_ImageChangeInformation[timestep]->GetOutputPort());
 }
 
 void mitk::VolumeMapperVtkSmart3D::createVolume()
 {
-  m_Volume->VisibilityOff();
-  m_Volume->SetMapper(m_SmartVolumeMapper);
-  m_Volume->SetProperty(m_VolumeProperty);
+  auto timestep = this->GetTimestep();
+  m_Volume[timestep]->SetMapper(m_SmartVolumeMapper[timestep]);
+  m_Volume[timestep]->SetProperty(m_VolumeProperty[timestep]);
 }
 
 void mitk::VolumeMapperVtkSmart3D::createVolumeProperty()
 {
-  m_VolumeProperty->ShadeOn();
-  m_VolumeProperty->SetInterpolationType(VTK_LINEAR_INTERPOLATION);
+  auto timestep = this->GetTimestep();
+  m_VolumeProperty[timestep]->ShadeOn();
+  m_VolumeProperty[timestep]->SetInterpolationType(VTK_LINEAR_INTERPOLATION);
 }
 
 void mitk::VolumeMapperVtkSmart3D::UpdateTransferFunctions(mitk::BaseRenderer *renderer)
@@ -164,10 +168,10 @@ void mitk::VolumeMapperVtkSmart3D::UpdateTransferFunctions(mitk::BaseRenderer *r
       colorTransferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
     }
   }
-
-  m_VolumeProperty->SetColor(colorTransferFunction);
-  m_VolumeProperty->SetScalarOpacity(opacityTransferFunction);
-  m_VolumeProperty->SetGradientOpacity(gradientTransferFunction);
+  auto timestep = this->GetTimestep();
+  m_VolumeProperty[timestep]->SetColor(colorTransferFunction);
+  m_VolumeProperty[timestep]->SetScalarOpacity(opacityTransferFunction);
+  m_VolumeProperty[timestep]->SetGradientOpacity(gradientTransferFunction);
 }
 
 
@@ -179,54 +183,64 @@ void mitk::VolumeMapperVtkSmart3D::UpdateRenderMode(mitk::BaseRenderer *renderer
   this->GetDataNode()->GetBoolProperty("volumerendering.usegpu", usegpu);
   this->GetDataNode()->GetBoolProperty("volumerendering.useray", useray);
   this->GetDataNode()->GetBoolProperty("volumerendering.usemip", usemip);
+  auto timestep = this->GetTimestep();
 
   if (usegpu)
-    m_SmartVolumeMapper->SetRequestedRenderModeToGPU();
+    m_SmartVolumeMapper[timestep]->SetRequestedRenderModeToGPU();
   else if (useray)
-    m_SmartVolumeMapper->SetRequestedRenderModeToRayCast();
+    m_SmartVolumeMapper[timestep]->SetRequestedRenderModeToRayCast();
   else
-    m_SmartVolumeMapper->SetRequestedRenderModeToDefault();
+    m_SmartVolumeMapper[timestep]->SetRequestedRenderModeToDefault();
 
   int blendMode;
   if (this->GetDataNode()->GetIntProperty("volumerendering.blendmode", blendMode))
-    m_SmartVolumeMapper->SetBlendMode(blendMode);
+    m_SmartVolumeMapper[timestep]->SetBlendMode(blendMode);
   else if (usemip)
-    m_SmartVolumeMapper->SetBlendMode(vtkSmartVolumeMapper::MAXIMUM_INTENSITY_BLEND);
+    m_SmartVolumeMapper[timestep]->SetBlendMode(vtkSmartVolumeMapper::MAXIMUM_INTENSITY_BLEND);
 
   // shading parameter
-  if (m_SmartVolumeMapper->GetRequestedRenderMode() == vtkSmartVolumeMapper::GPURenderMode)
+  if (m_SmartVolumeMapper[timestep]->GetRequestedRenderMode() == vtkSmartVolumeMapper::GPURenderMode)
   {
     float value = 0;
     if (this->GetDataNode()->GetFloatProperty("volumerendering.gpu.ambient", value, renderer))
-      m_VolumeProperty->SetAmbient(value);
+      m_VolumeProperty[timestep]->SetAmbient(value);
     if (this->GetDataNode()->GetFloatProperty("volumerendering.gpu.diffuse", value, renderer))
-      m_VolumeProperty->SetDiffuse(value);
+      m_VolumeProperty[timestep]->SetDiffuse(value);
     if (this->GetDataNode()->GetFloatProperty("volumerendering.gpu.specular", value, renderer))
-      m_VolumeProperty->SetSpecular(value);
+      m_VolumeProperty[timestep]->SetSpecular(value);
     if (this->GetDataNode()->GetFloatProperty("volumerendering.gpu.specular.power", value, renderer))
-      m_VolumeProperty->SetSpecularPower(value);
+      m_VolumeProperty[timestep]->SetSpecularPower(value);
   }
   else
   {
     float value = 0;
     if (this->GetDataNode()->GetFloatProperty("volumerendering.cpu.ambient", value, renderer))
-      m_VolumeProperty->SetAmbient(value);
+      m_VolumeProperty[timestep]->SetAmbient(value);
     if (this->GetDataNode()->GetFloatProperty("volumerendering.cpu.diffuse", value, renderer))
-      m_VolumeProperty->SetDiffuse(value);
+      m_VolumeProperty[timestep]->SetDiffuse(value);
     if (this->GetDataNode()->GetFloatProperty("volumerendering.cpu.specular", value, renderer))
-      m_VolumeProperty->SetSpecular(value);
+      m_VolumeProperty[timestep]->SetSpecular(value);
     if (this->GetDataNode()->GetFloatProperty("volumerendering.cpu.specular.power", value, renderer))
-      m_VolumeProperty->SetSpecularPower(value);
+      m_VolumeProperty[timestep]->SetSpecularPower(value);
   }
 }
 
-mitk::VolumeMapperVtkSmart3D::VolumeMapperVtkSmart3D()
+mitk::VolumeMapperVtkSmart3D::VolumeMapperVtkSmart3D(mitk::DataNode::Pointer datanode)
 {
-  m_SmartVolumeMapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
-  m_SmartVolumeMapper->SetBlendModeToComposite();
-  m_ImageChangeInformation = vtkSmartPointer<vtkImageChangeInformation>::New();
-  m_VolumeProperty = vtkSmartPointer<vtkVolumeProperty>::New();
-  m_Volume = vtkSmartPointer<vtkVolume>::New();
+  this->SetDataNode(datanode);
+  int timesteps = this->GetDataNode()->GetData()->GetTimeSteps();
+  for (int i = 0; i < timesteps; i++)
+  {
+    auto volumeMapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+    volumeMapper->SetBlendModeToComposite();
+    m_SmartVolumeMapper.push_back(volumeMapper);
+    auto imageChangeInformation = vtkSmartPointer<vtkImageChangeInformation>::New();
+    m_ImageChangeInformation.push_back(imageChangeInformation);
+    auto volumeProperty = vtkSmartPointer<vtkVolumeProperty>::New();
+    m_VolumeProperty.push_back(volumeProperty);
+    auto volume = vtkSmartPointer<vtkVolume>::New();
+    m_Volume.push_back(volume);
+  }
 }
 
 mitk::VolumeMapperVtkSmart3D::~VolumeMapperVtkSmart3D()

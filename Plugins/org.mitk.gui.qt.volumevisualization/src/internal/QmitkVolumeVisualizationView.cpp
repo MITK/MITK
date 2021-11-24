@@ -101,6 +101,22 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
   m_Controls->transferFunctionGeneratorWidget->setEnabled(false);
 
   m_Controls->volumeSelectionWidget->SetAutoSelectNewNodes(true);
+
+  this->m_TimePointChangeListener.RenderWindowPartActivated(this->GetRenderWindowPart());
+  connect(&m_TimePointChangeListener,
+          &QmitkSliceNavigationListener::SelectedTimePointChanged,
+          this,
+          &QmitkVolumeVisualizationView::OnSelectedTimePointChanged);
+}
+
+void QmitkVolumeVisualizationView::RenderWindowPartActivated(mitk::IRenderWindowPart *renderWindowPart)
+{
+  this->m_TimePointChangeListener.RenderWindowPartActivated(renderWindowPart);
+}
+
+void QmitkVolumeVisualizationView::RenderWindowPartDeactivated(mitk::IRenderWindowPart *renderWindowPart)
+{
+  this->m_TimePointChangeListener.RenderWindowPartDeactivated(renderWindowPart);
 }
 
 void QmitkVolumeVisualizationView::OnMitkInternalPreset(int mode)
@@ -210,6 +226,11 @@ void QmitkVolumeVisualizationView::OnBlendMode(int mode)
   RequestRenderWindowUpdate();
 }
 
+void QmitkVolumeVisualizationView::OnSelectedTimePointChanged(const mitk::TimePointType & /*newTimePoint*/)
+{
+  this->UpdateInterface();
+}
+
 void QmitkVolumeVisualizationView::UpdateInterface()
 {
   if (m_SelectedNode.IsExpired())
@@ -285,9 +306,10 @@ void QmitkVolumeVisualizationView::UpdateInterface()
 
     m_Controls->renderMode->setCurrentIndex(mode);
   }
-
-  m_Controls->transferFunctionWidget->SetDataNode(selectedNode);
+  auto time = this->GetRenderWindowPart()->GetTimeNavigationController()->GetSelectedTimeStep();
+  MITK_INFO << time;
+  m_Controls->transferFunctionWidget->SetDataNode(selectedNode, time);
   m_Controls->transferFunctionWidget->setEnabled(true);
-  m_Controls->transferFunctionGeneratorWidget->SetDataNode(selectedNode);
+  m_Controls->transferFunctionGeneratorWidget->SetDataNode(selectedNode, time);
   m_Controls->transferFunctionGeneratorWidget->setEnabled(true);
 }

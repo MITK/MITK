@@ -308,7 +308,7 @@ QmitkTransferFunctionGeneratorWidget::~QmitkTransferFunctionGeneratorWidget()
 {
 }
 
-void QmitkTransferFunctionGeneratorWidget::SetDataNode(mitk::DataNode *node)
+void QmitkTransferFunctionGeneratorWidget::SetDataNode(mitk::DataNode *node, int timestep)
 {
   histoGramm = nullptr;
 
@@ -323,9 +323,23 @@ void QmitkTransferFunctionGeneratorWidget::SetDataNode(mitk::DataNode *node)
 
     if (mitk::Image *image = dynamic_cast<mitk::Image *>(node->GetData()))
     {
-      mitk::ImageStatisticsHolder *statistics = image->GetStatistics();
-      histoMinimum = statistics->GetScalarValueMin();
-      histoMaximum = statistics->GetScalarValueMax();
+      if (image->GetTimeSteps() > 1)
+      {
+        mitk::ImageTimeSelector::Pointer timeselector = mitk::ImageTimeSelector::New();
+        timeselector->SetInput(image);
+        timeselector->SetTimeNr(timestep);
+        timeselector->UpdateLargestPossibleRegion();
+        auto inputImage = timeselector->GetOutput();
+        mitk::ImageStatisticsHolder *statistics = inputImage->GetStatistics();
+        histoMinimum = statistics->GetScalarValueMin();
+        histoMaximum = statistics->GetScalarValueMax();
+      }
+      else
+      {
+        mitk::ImageStatisticsHolder *statistics = image->GetStatistics();
+        histoMinimum = statistics->GetScalarValueMin();
+        histoMaximum = statistics->GetScalarValueMax();
+      }
     }
     else if (mitk::UnstructuredGrid *grid = dynamic_cast<mitk::UnstructuredGrid *>(node->GetData()))
     {

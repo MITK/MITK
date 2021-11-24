@@ -87,8 +87,7 @@ mitk::Mapper::Pointer mitk::IOExtObjectFactory::CreateMapper(mitk::DataNode *nod
   {
     if ((dynamic_cast<Image *>(data) != nullptr) && std::string("Image").compare(node->GetData()->GetNameOfClass())==0)
     {
-      newMapper = mitk::VolumeMapperVtkSmart3D::New();
-      newMapper->SetDataNode(node);
+      newMapper = mitk::VolumeMapperVtkSmart3D::New(node);
     }
     else if ((dynamic_cast<UnstructuredGrid *>(data) != nullptr))
     {

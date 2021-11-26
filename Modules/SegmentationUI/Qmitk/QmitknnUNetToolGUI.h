@@ -20,9 +20,8 @@ found in the LICENSE file.s
 #include "mitknnUnetTool.h"
 #include "ui_QmitknnUNetToolGUIControls.h"
 #include <MitkSegmentationUIExports.h>
-#include <QCache>
 #include <QMessageBox>
-#include <QThread>
+// #include <QThread>
 #include <QmitkDataStorageComboBox.h>
 #include <QmitknnUNetEnsembleLayout.h>
 
@@ -212,7 +211,7 @@ private:
    * @brief Stores all dynamically added ctk-path-line-edit UI elements.
    *
    */
-  std::vector<QmitkDataStorageComboBox *> m_Modalities; // TODO: fix memory leak
+  std::vector<QmitkDataStorageComboBox *> m_Modalities;
 
   std::vector<std::unique_ptr<QmitknnUNetTaskParamsUITemplate>> m_EnsembleParams;
 

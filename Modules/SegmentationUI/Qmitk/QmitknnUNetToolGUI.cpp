@@ -204,7 +204,7 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
       tool->UpdatePreview();
       if (tool->GetOutputBuffer() == nullptr)
       {
-        mitkThrow() << "An error occured while calling nnUNet process.";
+        SegmentationProcessFailed();
       }
       SegmentationResultHandler(tool);
       tool->PredictOff(); // purposefully placed to make tool->GetMTime different than before.

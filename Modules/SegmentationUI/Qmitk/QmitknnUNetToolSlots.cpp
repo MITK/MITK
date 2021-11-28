@@ -402,10 +402,7 @@ void QmitknnUNetToolGUI::SegmentationProcessFailed()
   this->setCursor(Qt::ArrowCursor);
   std::stringstream stream;
   stream << "Error in the segmentation process. No resulting segmentation can be loaded.";
-  QMessageBox *messageBox = new QMessageBox(QMessageBox::Critical, nullptr, stream.str().c_str());
-  messageBox->exec();
-  delete messageBox;
-  MITK_ERROR << stream.str();
+  ShowErrorMessage(stream.str());
   m_Controls.stopButton->setEnabled(false);
 }
 

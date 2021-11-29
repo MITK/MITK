@@ -85,7 +85,7 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
           this,
           SLOT(OnPythonPathChanged(const QString &)));
   connect(m_Controls.stopButton, SIGNAL(clicked()), this, SLOT(OnStopPressed()));
-  connect(m_Controls.refreshdirectoryBox, SIGNAL(clicked()), this, SLOT(OnRefreshDirectory()));
+  connect(m_Controls.refreshdirectoryBox, SIGNAL(clicked()), this, SLOT(OnDirectoryChanged()));
 
   /* Qthreads disabled
   connect(this, &QmitknnUNetToolGUI::Operate, m_Worker, &nnUNetSegmentationWorker::DoWork);

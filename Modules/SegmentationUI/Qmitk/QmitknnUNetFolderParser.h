@@ -18,9 +18,8 @@ found in the LICENSE file.s
 #include <QString>
 #include <vector>
 
-class FolderNode
+struct FolderNode
 {
-public:
   QString name;
   QString path; // parent
   std::vector<std::shared_ptr<FolderNode>> subFolders;
@@ -37,7 +36,7 @@ public:
     m_RootNode->subFolders.clear();
     RefreshHierarchy();
   }
-  ~QmitknnUNetFolderParser() { DeleteDirs(m_RootNode, LEVEL); }
+  ~QmitknnUNetFolderParser() = default; /*{ DeleteDirs(m_RootNode, LEVEL); }*/
 
   void RefreshHierarchy() { InitDirs(m_RootNode, 0); }
 

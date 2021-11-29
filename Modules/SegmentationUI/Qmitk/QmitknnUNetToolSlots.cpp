@@ -39,20 +39,6 @@ T QmitknnUNetToolGUI::FetchFoldersFromDir(const QString &path)
   return folders;
 }
 
-void QmitknnUNetToolGUI::OnRefreshDirectory()
-{
-  const QString resultsFolder = m_Controls.modeldirectoryBox->directory();
-  if (m_ParentFolder)
-  {
-    m_ParentFolder->RefreshHierarchy();
-  }
-  else
-  {
-    m_ParentFolder = std::make_shared<QmitknnUNetFolderParser>(resultsFolder);
-  }
-  OnDirectoryChanged(resultsFolder);
-}
-
 void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &resultsFolder)
 {
   m_Controls.previewButton->setEnabled(false);

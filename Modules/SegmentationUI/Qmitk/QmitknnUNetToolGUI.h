@@ -103,16 +103,6 @@ protected slots:
    */
   void OnModalPositionChanged(int);
 
-  /**
-   * @brief
-   *
-   */
-  void OnRefreshDirectory();
-
-  /*
-   *  void OnStopPressed();
-   */
-
 signals:
   /**
    * @brief signal for starting the segmentation which is caught by a worker thread.
@@ -203,7 +193,7 @@ private:
   static T FetchFoldersFromDir(const QString &);
 
   Ui_QmitknnUNetToolGUIControls m_Controls;
-  //QThread *m_SegmentationThread;
+  // QThread *m_SegmentationThread;
   nnUNetSegmentationWorker *m_Worker;
   QmitkGPULoader m_GpuLoader;
 

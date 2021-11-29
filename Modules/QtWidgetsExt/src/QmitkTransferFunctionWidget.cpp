@@ -89,7 +89,7 @@ void QmitkTransferFunctionWidget::SetGradientOpacityFunctionEnabled(bool enable)
   m_GradientOpacityWidget->setEnabled(enable);
 }
 
-void QmitkTransferFunctionWidget::SetDataNode(mitk::DataNode *node, int timestep, const mitk::BaseRenderer *renderer)
+void QmitkTransferFunctionWidget::SetDataNode(mitk::DataNode *node, mitk::TimeStepType timestep, const mitk::BaseRenderer *renderer)
 {
   if (node)
   {
@@ -112,6 +112,10 @@ void QmitkTransferFunctionWidget::SetDataNode(mitk::DataNode *node, int timestep
       mitk::SimpleHistogram *h = nullptr;
       if (data->GetTimeSteps() > 1)
       {
+        if (!data->GetTimeGeometry()->IsValidTimeStep(timestep))
+        {
+          return;
+        }
         mitk::ImageTimeSelector::Pointer timeselector = mitk::ImageTimeSelector::New();
         timeselector->SetInput(data);
         timeselector->SetTimeNr(timestep);

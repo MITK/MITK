@@ -32,7 +32,7 @@ public:
   QmitkTransferFunctionGeneratorWidget(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
   ~QmitkTransferFunctionGeneratorWidget() override;
 
-  void SetDataNode(mitk::DataNode *node, int timestep = 0);
+  void SetDataNode(mitk::DataNode *node, mitk::TimeStepType timestep = 0);
 
   int AddPreset(const QString &presetName);
 

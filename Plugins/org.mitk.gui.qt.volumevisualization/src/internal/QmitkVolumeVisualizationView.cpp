@@ -307,7 +307,6 @@ void QmitkVolumeVisualizationView::UpdateInterface()
     m_Controls->renderMode->setCurrentIndex(mode);
   }
   auto time = this->GetRenderWindowPart()->GetTimeNavigationController()->GetSelectedTimeStep();
-  MITK_INFO << time;
   m_Controls->transferFunctionWidget->SetDataNode(selectedNode, time);
   m_Controls->transferFunctionWidget->setEnabled(true);
   m_Controls->transferFunctionGeneratorWidget->SetDataNode(selectedNode, time);

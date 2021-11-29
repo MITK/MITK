@@ -41,7 +41,7 @@ namespace mitk
   public:
     mitkClassMacro(VolumeMapperVtkSmart3D, VtkMapper);
 
-    mitkNewMacro1Param(Self, mitk::DataNode::Pointer);
+    itkFactorylessNewMacro(Self);
 
     itkCloneMacro(Self);
 
@@ -51,7 +51,7 @@ namespace mitk
     static void SetDefaultProperties(mitk::DataNode *node, mitk::BaseRenderer *renderer = nullptr, bool overwrite = false);
 
   protected:
-    VolumeMapperVtkSmart3D(mitk::DataNode::Pointer datanode);
+    VolumeMapperVtkSmart3D();
     ~VolumeMapperVtkSmart3D() override;
 
     void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
@@ -61,10 +61,10 @@ namespace mitk
     void createVolumeProperty();
     vtkImageData* GetInputImage();
 
-    std::vector<vtkSmartPointer<vtkVolume>> m_Volume;
-    std::vector<vtkSmartPointer<vtkImageChangeInformation>> m_ImageChangeInformation;
-    std::vector<vtkSmartPointer<vtkSmartVolumeMapper>> m_SmartVolumeMapper;
-    std::vector<vtkSmartPointer<vtkVolumeProperty>> m_VolumeProperty;
+    vtkSmartPointer<vtkVolume> m_Volume;
+    vtkSmartPointer<vtkImageChangeInformation> m_ImageChangeInformation;
+    vtkSmartPointer<vtkSmartVolumeMapper> m_SmartVolumeMapper;
+    vtkSmartPointer<vtkVolumeProperty> m_VolumeProperty;
 
     void UpdateTransferFunctions(mitk::BaseRenderer *renderer);
     void UpdateRenderMode(mitk::BaseRenderer *renderer);

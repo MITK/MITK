@@ -198,7 +198,7 @@
                 </sizepolicy>
               </property>
               <property name="text">
-                <string>Loaded Image Position</string>
+                <string>Reference Image Position</string>
               </property>
             </widget>
           </item>

@@ -80,10 +80,6 @@ public:
 
   void ActivateCrosshair(bool activate);
 
-Q_SIGNALS:
-
-  void MouseEvent(QMouseEvent* e);
-
 private:
 
   void InitializeGUI();

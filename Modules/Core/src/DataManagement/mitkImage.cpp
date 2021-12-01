@@ -331,18 +331,13 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetVolumeData_unlocked(
           size_t offset = ((size_t)s) * size;
           std::memcpy(static_cast<char *>(vol->GetData()) + offset, sl->GetData(), size);
 
-          // FIXME mitkIpPicDescriptor * pic = sl->GetPicDescriptor();
-
           // replace old slice with reference to volume
           sl = new ImageDataItem(
             *vol, m_ImageDescriptor, t, 2, data, importMemoryManagement == ManageMemory, ((size_t)s) * size);
           sl->SetComplete(true);
-          // mitkIpFuncCopyTags(sl->GetPicDescriptor(), pic);
           m_Slices[posSl] = sl;
         }
       }
-      // if(vol->GetPicDescriptor()->info->tags_head==nullptr)
-      //  mitkIpFuncCopyTags(vol->GetPicDescriptor(), m_Slices[GetSliceIndex(0,t,n)]->GetPicDescriptor());
     }
     return m_Volumes[pos] = vol;
   }
@@ -436,12 +431,9 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetChannelData_unlocked(
           size_t offset = ((size_t)t) * m_OffsetTable[3] * (ptypeSize);
           std::memcpy(static_cast<char *>(ch->GetData()) + offset, vol->GetData(), size);
 
-          // REVEIW FIX mitkIpPicDescriptor * pic = vol->GetPicDescriptor();
-
           // replace old volume with reference to channel
           vol = new ImageDataItem(*ch, m_ImageDescriptor, t, 3, data, importMemoryManagement == ManageMemory, offset);
           vol->SetComplete(true);
-          // mitkIpFuncCopyTags(vol->GetPicDescriptor(), pic);
 
           m_Volumes[posVol] = vol;
 
@@ -454,9 +446,6 @@ mitk::Image::ImageDataItemPointer mitk::Image::GetChannelData_unlocked(
           }
         }
       }
-      // REVIEW FIX
-      //   if(ch->GetPicDescriptor()->info->tags_head==nullptr)
-      //     mitkIpFuncCopyTags(ch->GetPicDescriptor(), m_Volumes[GetVolumeIndex(0,n)]->GetPicDescriptor());
     }
     return m_Channels[n] = ch;
   }

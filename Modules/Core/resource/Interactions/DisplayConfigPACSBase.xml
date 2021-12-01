@@ -1,0 +1,75 @@
+<!--
+* - PACS : The original interaction scheme
+*   - left mouse button   : UNUSED
+*   - middle mouse button : UNUSED
+*   - right mouse button
+*     with shift modifier : moving
+*   - right mouse button
+*     with ctrl modifier  : zooming
+*   - right mouse button  : adjust level window
+*   - wheel               : scrolling
+-->
+<config>
+  <!-- Zoom sensitivity -->
+  <param name="zoomFactor" value="5"/>
+  <!-- Zoom either by moving mouse left-right or up-down -->
+  <param name="zoomDirection" value="updown"/>
+  <!-- scrolling either by moving mouse left-right or up-down -->
+  <param name="scrollDirection" value="updown"/>
+  <!-- Sets how many pixel the mouse has to be moved for scrolling 1 slice-->
+  <param name="pixelPerSlice" value="3"/>
+  <!-- when scrolling restart at beginning of volume, when end is reached-->
+  <param name="autoRepeat" value="true"/>
+  <!-- react to an event, even though it was already processed by a DataInteractor-->
+  <param name="alwaysReact" value="true"/>
+
+  <!-- Right mouse with shift modifier: Moving -->
+   <event_variant class="MousePressEvent" name="StartMove">
+    <attribute name="EventButton" value="RightMouseButton"/>
+    <attribute name="Modifiers" value="shift"/>
+  </event_variant>
+  <event_variant class="MouseReleaseEvent" name="EndMoving">
+    <attribute name="EventButton" value="RightMouseButton"/>
+    <attribute name="Modifiers" value="shift"/>
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="Moving">
+    <attribute name="ButtonState" value="RightMouseButton"/>
+    <attribute name="Modifiers" value="shift"/>
+  </event_variant>
+
+  <!-- Right mouse with ctrl modifier: Zooming -->
+  <event_variant class="MousePressEvent" name="StartZoom">
+    <attribute name="EventButton" value="RightMouseButton"/>
+    <attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+   <event_variant class="MouseMoveEvent" name="Zooming">
+    <attribute name="ButtonState" value="RightMouseButton"/>
+    <attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+  <event_variant class="MouseReleaseEvent" name="EndZooming">
+    <attribute name="EventButton" value="RightMouseButton"/>
+    <attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
+
+  <!-- Right mouse: LevelWindow adjusting-->
+  <event_variant class="MousePressEvent" name="StartAdjustLevelWindow">
+    <attribute name="EventButton" value="RightMouseButton"/>
+  </event_variant>
+  <event_variant class="MouseReleaseEvent" name="EndLevelWindow">
+    <attribute name="EventButton" value="RightMouseButton"/>
+  </event_variant>
+  <event_variant class="MouseMoveEvent" name="adjustlevelwindow">
+    <attribute name="ButtonState" value="RightMouseButton"/>
+  </event_variant>
+
+  <!-- Mouse wheel: Scrolling through planes -->
+  <event_variant class="MouseWheelEvent" name="PlaneUP">
+    <attribute name="ScrollDirection" value="up"/>
+  </event_variant>
+  <event_variant class="MouseWheelEvent" name="PlaneDown">
+    <attribute name="ScrollDirection" value="down"/>
+  </event_variant>
+
+  <!-- General -->
+  <event_variant class="MouseMoveEvent" name="ResetState"/>
+</config>

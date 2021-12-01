@@ -116,6 +116,9 @@ namespace mitk
     mitk::ContourModel::Pointer m_LiveWireContour;
     mitk::DataNode::Pointer m_LiveWireContourNode;
 
+    mitk::ContourModel::Pointer m_ClosureContour;
+    mitk::DataNode::Pointer m_ClosureContourNode;
+
     mitk::ContourModel::Pointer m_EditingContour;
     mitk::DataNode::Pointer m_EditingContourNode;
     mitk::ContourModelLiveWireInteractor::Pointer m_ContourInteractor;
@@ -125,6 +128,7 @@ namespace mitk
     mitk::Image::Pointer m_ReferenceDataSlice;
 
     mitk::ImageLiveWireContourModelFilter::Pointer m_LiveWireFilter;
+    mitk::ImageLiveWireContourModelFilter::Pointer m_LiveWireFilterClosure;
 
     bool m_CreateAndUseDynamicCosts;
 

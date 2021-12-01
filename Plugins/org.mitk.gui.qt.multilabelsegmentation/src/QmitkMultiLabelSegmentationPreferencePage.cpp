@@ -26,11 +26,12 @@ found in the LICENSE file.
 
 QmitkMultiLabelSegmentationPreferencePage::QmitkMultiLabelSegmentationPreferencePage()
   : m_MainControl(nullptr),
+    m_SlimViewCheckBox(nullptr),
     m_RadioOutline(nullptr),
     m_RadioOverlay(nullptr),
+    m_SelectionModeCheckBox(nullptr),
     m_SmoothingSpinBox(nullptr),
     m_DecimationSpinBox(nullptr),
-    m_SelectionModeCheckBox(nullptr),
     m_Initializing(false)
 {
 
@@ -49,23 +50,29 @@ void QmitkMultiLabelSegmentationPreferencePage::Init(berry::IWorkbench::Pointer 
 void QmitkMultiLabelSegmentationPreferencePage::CreateQtControl(QWidget* parent)
 {
   m_Initializing = true;
-  berry::IPreferencesService* prefService
-    = berry::Platform::GetPreferencesService();
+  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
 
   m_SegmentationPreferencesNode = prefService->GetSystemPreferences()->Node("/org.mitk.views.multilabelsegmentation");
 
   m_MainControl = new QWidget(parent);
+
+  QFormLayout *formLayout = new QFormLayout;
+  formLayout->setHorizontalSpacing(8);
+  formLayout->setVerticalSpacing(24);
+
+  m_SlimViewCheckBox = new QCheckBox("Hide tool button texts and increase icon size", m_MainControl);
+  formLayout->addRow("Slim view", m_SlimViewCheckBox);
 
   QVBoxLayout* displayOptionsLayout = new QVBoxLayout;
   m_RadioOutline = new QRadioButton( "Draw as outline", m_MainControl);
   displayOptionsLayout->addWidget( m_RadioOutline );
   m_RadioOverlay = new QRadioButton( "Draw as transparent overlay", m_MainControl);
   displayOptionsLayout->addWidget( m_RadioOverlay );
-
-  QFormLayout *formLayout = new QFormLayout;
-  formLayout->setHorizontalSpacing(8);
-  formLayout->setVerticalSpacing(24);
   formLayout->addRow( "2D display", displayOptionsLayout );
+
+  m_SelectionModeCheckBox = new QCheckBox("Enable auto-selection mode", m_MainControl);
+  m_SelectionModeCheckBox->setToolTip("If checked the segmentation plugin ensures that only one segmentation and the according greyvalue image are visible at one time.");
+  formLayout->addRow("Data node selection mode", m_SelectionModeCheckBox);
 
   QFormLayout* surfaceLayout = new QFormLayout;
   surfaceLayout->setSpacing(8);
@@ -85,10 +92,6 @@ void QmitkMultiLabelSegmentationPreferencePage::CreateQtControl(QWidget* parent)
   m_DecimationSpinBox->setToolTip("Valid range is [0, 1). High values increase decimation, especially when very close to 1. A value of 0 disables decimation.");
   surfaceLayout->addRow("Decimation rate", m_DecimationSpinBox);
 
-  m_SelectionModeCheckBox = new QCheckBox("Enable auto-selection mode", m_MainControl);
-  m_SelectionModeCheckBox->setToolTip("If checked the segmentation plugin ensures that only one segmentation and the according greyvalue image are visible at one time.");
-  formLayout->addRow("Data node selection mode",m_SelectionModeCheckBox);
-
   formLayout->addRow("Smoothed surface creation", surfaceLayout);
 
   m_MainControl->setLayout(formLayout);
@@ -103,6 +106,7 @@ QWidget* QmitkMultiLabelSegmentationPreferencePage::GetQtControl() const
 
 bool QmitkMultiLabelSegmentationPreferencePage::PerformOk()
 {
+  m_SegmentationPreferencesNode->PutBool("slim view", m_SlimViewCheckBox->isChecked());
   m_SegmentationPreferencesNode->PutBool("draw outline", m_RadioOutline->isChecked());
   m_SegmentationPreferencesNode->PutDouble("smoothing value", m_SmoothingSpinBox->value());
   m_SegmentationPreferencesNode->PutDouble("decimation rate", m_DecimationSpinBox->value());
@@ -117,15 +121,18 @@ void QmitkMultiLabelSegmentationPreferencePage::PerformCancel()
 
 void QmitkMultiLabelSegmentationPreferencePage::Update()
 {
-  //m_EnableSingleEditing->setChecked(m_SegmentationPreferencesNode->GetBool("Single click property editing", true));
+  m_SlimViewCheckBox->setChecked(m_SegmentationPreferencesNode->GetBool("slim view", false));
+
   if (m_SegmentationPreferencesNode->GetBool("draw outline", true) )
   {
-    m_RadioOutline->setChecked( true );
+    m_RadioOutline->setChecked(true);
   }
   else
   {
-    m_RadioOverlay->setChecked( true );
+    m_RadioOverlay->setChecked(true);
   }
+
+  m_SelectionModeCheckBox->setChecked(m_SegmentationPreferencesNode->GetBool("auto selection", false));
 
   if (m_SegmentationPreferencesNode->GetBool("smoothing hint", true))
   {
@@ -135,8 +142,6 @@ void QmitkMultiLabelSegmentationPreferencePage::Update()
   {
     m_SmoothingSpinBox->setEnabled(true);
   }
-
-  m_SelectionModeCheckBox->setChecked( m_SegmentationPreferencesNode->GetBool("auto selection", false) );
 
   m_SmoothingSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("smoothing value", 0.1));
   m_DecimationSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("decimation rate", 0.5));

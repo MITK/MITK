@@ -119,6 +119,14 @@ namespace mitk
           if (labelSurface.IsNull())
             continue;
 
+          auto* polyData = labelSurface->GetVtkPolyData();
+
+          if (smooth && (polyData->GetNumberOfPoints() < 1 || polyData->GetNumberOfCells() < 1))
+          {
+            MITK_WARN << "Label \"" << labelIter->second->GetName() << "\" didn't produce any smoothed surface data (try again without smoothing).";
+            continue;
+          }
+
           auto node = DataNode::New();
           node->SetData(labelSurface);
           node->SetColor(labelIter->second->GetColor());
@@ -134,9 +142,18 @@ namespace mitk
 
       if (surface.IsNotNull())
       {
-        auto node = DataNode::New();
-        node->SetData(surface);
-        m_SurfaceNodes.push_back(node);
+        auto* polyData = surface->GetVtkPolyData();
+
+        if (smooth && (polyData->GetNumberOfPoints() < 1 || polyData->GetNumberOfCells() < 1))
+        {
+          MITK_WARN << "Could not produce smoothed surface data (try again without smoothing).";
+        }
+        else
+        {
+          auto node = DataNode::New();
+          node->SetData(surface);
+          m_SurfaceNodes.push_back(node);
+        }
       }
     }
 

@@ -32,13 +32,14 @@ void QmitkRenderWindowManagerView::RenderWindowPartActivated(mitk::IRenderWindow
   if (m_RenderWindowPart != renderWindowPart)
   {
     m_RenderWindowPart = renderWindowPart;
-    SetControlledRenderer();
+    this->SetControlledRenderer();
 
     // if the render window part is an abstract multi widget editor we can receive the abstract multi widget and listen to the signal
     auto abstractMultiWidgetEditor = dynamic_cast<QmitkAbstractMultiWidgetEditor*>(m_RenderWindowPart);
     if (nullptr != abstractMultiWidgetEditor)
     {
-      connect(abstractMultiWidgetEditor->GetMultiWidget(), &QmitkAbstractMultiWidget::ActiveRenderWindowChanged, this, &QmitkRenderWindowManagerView::RenderWindowChanged);
+      connect(abstractMultiWidgetEditor->GetMultiWidget(), &QmitkAbstractMultiWidget::ActiveRenderWindowChanged,
+              this, &QmitkRenderWindowManagerView::RenderWindowChanged);
     }
   }
 }
@@ -51,11 +52,12 @@ void QmitkRenderWindowManagerView::RenderWindowPartDeactivated(mitk::IRenderWind
     auto abstractMultiWidgetEditor = dynamic_cast<QmitkAbstractMultiWidgetEditor*>(m_RenderWindowPart);
     if (nullptr != abstractMultiWidgetEditor)
     {
-      disconnect(abstractMultiWidgetEditor->GetMultiWidget(), &QmitkAbstractMultiWidget::ActiveRenderWindowChanged, this, &QmitkRenderWindowManagerView::RenderWindowChanged);
+      disconnect(abstractMultiWidgetEditor->GetMultiWidget(), &QmitkAbstractMultiWidget::ActiveRenderWindowChanged,
+                 this, &QmitkRenderWindowManagerView::RenderWindowChanged);
     }
 
     m_RenderWindowPart = nullptr;
-    SetControlledRenderer();
+    this->SetControlledRenderer();
   }
 }
 
@@ -63,13 +65,8 @@ void QmitkRenderWindowManagerView::RenderWindowPartInputChanged(mitk::IRenderWin
 {
   if (m_RenderWindowPart == renderWindowPart)
   {
-    SetControlledRenderer();
+    this->SetControlledRenderer();
   }
-}
-
-void QmitkRenderWindowManagerView::SetFocus()
-{
-  // nothing here
 }
 
 void QmitkRenderWindowManagerView::CreateQtPartControl(QWidget* parent)
@@ -91,12 +88,19 @@ void QmitkRenderWindowManagerView::CreateQtPartControl(QWidget* parent)
   //m_DataNodeContextMenu->SetSurfaceDecimation(m_SurfaceDecimation);
 
   // connect objects
-  connect(m_Controls.comboBoxRenderWindowSelection, static_cast<void(QComboBox::*)(const QString&)>(&QComboBox::currentIndexChanged), this, &QmitkRenderWindowManagerView::OnRenderWindowSelectionChanged);
-  connect(m_InspectorView, &QAbstractItemView::customContextMenuRequested, m_DataNodeContextMenu, &QmitkDataNodeContextMenu::OnContextMenuRequested);
+  connect(m_Controls.comboBoxRenderWindowSelection, static_cast<void (QComboBox::*)(const QString &)>(&QComboBox::currentIndexChanged),
+          this, &QmitkRenderWindowManagerView::OnRenderWindowSelectionChanged);
+  connect(m_InspectorView, &QAbstractItemView::customContextMenuRequested,
+          m_DataNodeContextMenu, &QmitkDataNodeContextMenu::OnContextMenuRequested);
 
-  m_RenderWindowPart = GetRenderWindowPart();
+  auto renderWindowPart = GetRenderWindowPart();
+  if (nullptr != renderWindowPart)
+  {
+    this->RenderWindowPartActivated(renderWindowPart);
+  }
+
   // also sets the controlled renderer
-  SetControlledRenderer();
+  this->SetControlledRenderer();
 }
 
 void QmitkRenderWindowManagerView::SetControlledRenderer()

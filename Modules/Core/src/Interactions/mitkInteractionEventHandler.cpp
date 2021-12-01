@@ -54,6 +54,11 @@ mitk::EventConfig mitk::InteractionEventHandler::GetEventConfig() const
 
 bool mitk::InteractionEventHandler::AddEventConfig(const std::string &filename, const us::Module *module)
 {
+  if (filename.empty())
+  {
+    return false;
+  }
+
   if (!m_EventConfig.IsValid())
   {
     MITK_ERROR << "SetEventConfig has to be called before AddEventConfig can be used.";

@@ -28,8 +28,8 @@ found in the LICENSE file.
 
 struct QmitkAbstractMultiWidget::Impl final
 {
-  Impl(QmitkAbstractMultiWidget* multiWidget,
-       const QString& multiWidgetName);
+  Impl(QmitkAbstractMultiWidget* multiWidget, const QString& multiWidgetName);
+  ~Impl();
 
   void SetDataStorage(mitk::DataStorage* dataStorage)
   {
@@ -63,22 +63,33 @@ struct QmitkAbstractMultiWidget::Impl final
   int m_MultiWidgetColumns;
 
   // interaction
+  unsigned long m_RenderWindowFocusObserverTag;
   mitk::DisplayActionEventBroadcast::Pointer m_DisplayActionEventBroadcast;
   std::unique_ptr<mitk::DisplayActionEventHandler> m_DisplayActionEventHandler;
   QmitkMultiWidgetLayoutManager* m_LayoutManager;
 };
 
-QmitkAbstractMultiWidget::Impl::Impl(QmitkAbstractMultiWidget* multiWidget,
-                                     const QString& multiWidgetName)
+QmitkAbstractMultiWidget::Impl::Impl(QmitkAbstractMultiWidget* multiWidget, const QString& multiWidgetName)
   : m_DataStorage(nullptr)
   , m_MultiWidgetName(multiWidgetName)
   , m_MultiWidgetRows(0)
   , m_MultiWidgetColumns(0)
+  , m_RenderWindowFocusObserverTag(0)
   , m_DisplayActionEventBroadcast(nullptr)
   , m_DisplayActionEventHandler(nullptr)
   , m_LayoutManager(new QmitkMultiWidgetLayoutManager(multiWidget))
 {
+  auto command = itk::MemberCommand<QmitkAbstractMultiWidget>::New();
+  command->SetCallbackFunction(multiWidget, &QmitkAbstractMultiWidget::OnFocusChanged);
+  m_RenderWindowFocusObserverTag =
+    mitk::RenderingManager::GetInstance()->AddObserver(mitk::FocusChangedEvent(), command);
+
   InitializeDisplayActionEventHandling();
+}
+
+QmitkAbstractMultiWidget::Impl::~Impl()
+{
+  mitk::RenderingManager::GetInstance()->RemoveObserver(m_RenderWindowFocusObserverTag);
 }
 
 QmitkAbstractMultiWidget::QmitkAbstractMultiWidget(QWidget* parent,
@@ -360,6 +371,27 @@ bool QmitkAbstractMultiWidget::IsMenuWidgetEnabled() const
 QmitkMultiWidgetLayoutManager* QmitkAbstractMultiWidget::GetMultiWidgetLayoutManager() const
 {
   return m_Impl->m_LayoutManager;
+}
+
+void QmitkAbstractMultiWidget::OnFocusChanged(itk::Object*, const itk::EventObject& event)
+{
+  auto focusEvent = dynamic_cast<const mitk::FocusChangedEvent*>(&event);
+  if (nullptr == focusEvent)
+  {
+    return;
+  }
+
+  auto focusedRenderWindow = mitk::RenderingManager::GetInstance()->GetFocusedRenderWindow();
+  RenderWindowWidgetMap renderWindowWidgets = this->GetRenderWindowWidgets();
+  for (const auto& renderWindowWidget : renderWindowWidgets)
+  {
+    const auto vtkRenderWindow = renderWindowWidget.second->GetRenderWindow()->GetVtkRenderWindow();
+    if (vtkRenderWindow == focusedRenderWindow)
+    {
+      this->SetActiveRenderWindowWidget(renderWindowWidget.second);
+      break;
+    }
+  }
 }
 
 void QmitkAbstractMultiWidget::AddRenderWindowWidget(const QString& widgetName, RenderWindowWidgetPointer renderWindowWidget)

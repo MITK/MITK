@@ -201,10 +201,16 @@ void QmitkDataSelectionWidget::SetPredicate(unsigned int index, Predicate predic
   this->SetPredicate(index, CreatePredicate(predicate));
 }
 
-void QmitkDataSelectionWidget::SetPredicate(unsigned int index, mitk::NodePredicateBase* predicate)
+void QmitkDataSelectionWidget::SetPredicate(unsigned int index, const mitk::NodePredicateBase* predicate)
 {
   assert(index < m_NodeSelectionWidgets.size());
   m_NodeSelectionWidgets[index]->SetNodePredicate(predicate);
+}
+
+const mitk::NodePredicateBase *QmitkDataSelectionWidget::GetPredicate(unsigned int index) const
+{
+  assert(index < m_NodeSelectionWidgets.size());
+  return m_NodeSelectionWidgets[index]->GetNodePredicate();
 }
 
 void QmitkDataSelectionWidget::SetHelpText(const QString& text)

@@ -10,9 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include <array>
+
 #include <mitkManualSegmentationToSurfaceFilter.h>
 
 #include <vtkImageShiftScale.h>
+#include <vtkImageConstantPad.h>
 #include <vtkSmartPointer.h>
 
 #include "mitkProgressBar.h"
@@ -56,6 +59,23 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
   for (int t = tstart; t < tmax; ++t)
   {
     vtkSmartPointer<vtkImageData> vtkimage = image->GetVtkImageData(t);
+
+    // If the image has a single slice, pad it with an empty slice to explicitly make it
+    // recognizable as 3-d by VTK. Otherwise, the vtkMarchingCubes filter will
+    // complain about dimensionality and won't produce any output.
+    if (2 == vtkimage->GetDataDimension())
+    {
+      std::array<int, 6> extent;
+      vtkimage->GetExtent(extent.data());
+      extent[5] = 1;
+
+      auto padFilter = vtkSmartPointer<vtkImageConstantPad>::New();
+      padFilter->SetInputData(vtkimage);
+      padFilter->SetOutputWholeExtent(extent.data());
+      padFilter->UpdateInformation();
+      padFilter->Update();
+      vtkimage = padFilter->GetOutput();
+    }
 
     // Median -->smooth 3D
     // MITK_INFO << (m_MedianFilter3D ? "Applying median..." : "No median filtering");

@@ -386,7 +386,17 @@ void mitk::LabelSetImage::ClearBuffer()
 {
   try
   {
-    AccessByItk(this, ClearBufferProcessing);
+    if (this->GetDimension() == 4)
+    { //remark: this extra branch was added, because LabelSetImage instances can be
+      //dynamic (4D), but AccessByItk by support only supports 2D and 3D.
+      //The option to change the CMake default dimensions for AccessByItk was
+      //dropped (for details see discussion in T28756)
+      AccessFixedDimensionByItk(this, ClearBufferProcessing,4);
+    }
+    else
+    {
+      AccessByItk(this, ClearBufferProcessing);
+    }
     this->Modified();
   }
   catch (itk::ExceptionObject &e)
@@ -598,7 +608,11 @@ mitk::Image::Pointer mitk::LabelSetImage::CreateLabelMask(PixelType index, bool 
 
   try
   {
-    mask->Initialize(this);
+    // mask->Initialize(this) does not work here if this label set image has a single slice,
+    // since the mask would be automatically flattened to a 2-d image, whereas we expect the
+    // original dimension of this label set image. Hence, initialize the mask more explicitly:
+    mask->Initialize(this->GetPixelType(), this->GetDimension(), this->GetDimensions());
+    mask->SetTimeGeometry(this->GetTimeGeometry()->Clone());
 
     auto byteSize = sizeof(LabelSetImage::PixelType);
     for (unsigned int dim = 0; dim < mask->GetDimension(); ++dim)

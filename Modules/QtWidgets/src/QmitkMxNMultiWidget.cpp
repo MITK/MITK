@@ -25,10 +25,21 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
                                          Qt::WindowFlags f/* = 0*/,
                                          const QString& multiWidgetName/* = "mxnmulti"*/)
   : QmitkAbstractMultiWidget(parent, f, multiWidgetName)
+  , m_TimeNavigationController(nullptr)
   , m_CrosshairVisibility(false)
 {
-  // nothing here
+  m_TimeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
 }
+
+QmitkMxNMultiWidget::~QmitkMxNMultiWidget()
+{
+  auto allRenderWindows = this->GetRenderWindows();
+  for (auto& renderWindow : allRenderWindows)
+  {
+    m_TimeNavigationController->Disconnect(renderWindow->GetSliceNavigationController());
+  }
+}
+
 
 void QmitkMxNMultiWidget::InitializeMultiWidget()
 {
@@ -186,6 +197,11 @@ void QmitkMxNMultiWidget::SetWidgetPlaneMode(int userMode)
   }
 }
 
+mitk::SliceNavigationController* QmitkMxNMultiWidget::GetTimeNavigationController()
+{
+  return m_TimeNavigationController;
+}
+
 //////////////////////////////////////////////////////////////////////////
 // PUBLIC SLOTS
 // MOUSE EVENTS
@@ -195,21 +211,9 @@ void QmitkMxNMultiWidget::wheelEvent(QWheelEvent* e)
   emit WheelMoved(e);
 }
 
-void QmitkMxNMultiWidget::mousePressEvent(QMouseEvent* e)
+void QmitkMxNMultiWidget::mousePressEvent(QMouseEvent*)
 {
-  if (QEvent::MouseButtonPress != e->type())
-  {
-    return;
-  }
-
-  auto renderWindowWidget = dynamic_cast<QmitkRenderWindowWidget*>(this->sender());
-  if (nullptr == renderWindowWidget)
-  {
-    return;
-  }
-
-  auto renderWindowWidgetPointer = GetRenderWindowWidget(renderWindowWidget->GetWidgetName());
-  SetActiveRenderWindowWidget(renderWindowWidgetPointer);
+  // nothing here, but necessary for mouse interactions (.xml-configuration files)
 }
 
 void QmitkMxNMultiWidget::moveEvent(QMoveEvent* e)
@@ -259,9 +263,6 @@ void QmitkMxNMultiWidget::CreateRenderWindowWidget()
   QString renderWindowWidgetName = GetNameFromIndex(GetNumberOfRenderWindowWidgets());
   RenderWindowWidgetPointer renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage());
   renderWindowWidget->SetCornerAnnotationText(renderWindowWidgetName.toStdString());
-
-  connect(renderWindowWidget.get(), &QmitkRenderWindowWidget::MouseEvent, this, &QmitkMxNMultiWidget::mousePressEvent);
-
   AddRenderWindowWidget(renderWindowWidgetName, renderWindowWidget);
 
   auto renderWindow = renderWindowWidget->GetRenderWindow();
@@ -270,4 +271,9 @@ void QmitkMxNMultiWidget::CreateRenderWindowWidget()
   connect(renderWindow, &QmitkRenderWindow::ResetView, this, &QmitkMxNMultiWidget::ResetCrosshair);
   connect(renderWindow, &QmitkRenderWindow::CrosshairVisibilityChanged, this, &QmitkMxNMultiWidget::SetCrosshairVisibility);
   connect(renderWindow, &QmitkRenderWindow::CrosshairRotationModeChanged, this, &QmitkMxNMultiWidget::SetWidgetPlaneMode);
+
+  // connect time navigation controller to react on geometry time events with the render window's slice naviation controller
+  m_TimeNavigationController->ConnectGeometryTimeEvent(renderWindow->GetSliceNavigationController(), false);
+  // reverse connection between the render window's slice navigation ontroller and the time navigation controller
+  renderWindow->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
 }

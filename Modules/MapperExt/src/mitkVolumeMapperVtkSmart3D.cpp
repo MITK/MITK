@@ -30,6 +30,7 @@ void mitk::VolumeMapperVtkSmart3D::GenerateDataForRenderer(mitk::BaseRenderer *r
   }
   else
   {
+    createMapper(GetInputImage());
     m_Volume->VisibilityOn();
   }
 
@@ -112,7 +113,6 @@ void mitk::VolumeMapperVtkSmart3D::createMapper(vtkImageData* imageData)
 
 void mitk::VolumeMapperVtkSmart3D::createVolume()
 {
-  m_Volume->VisibilityOff();
   m_Volume->SetMapper(m_SmartVolumeMapper);
   m_Volume->SetProperty(m_VolumeProperty);
 }
@@ -164,7 +164,6 @@ void mitk::VolumeMapperVtkSmart3D::UpdateTransferFunctions(mitk::BaseRenderer *r
       colorTransferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
     }
   }
-
   m_VolumeProperty->SetColor(colorTransferFunction);
   m_VolumeProperty->SetScalarOpacity(opacityTransferFunction);
   m_VolumeProperty->SetGradientOpacity(gradientTransferFunction);

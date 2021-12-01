@@ -53,5 +53,5 @@ std::string mitk::ImageSerializer::Serialize()
                << e.what();
     return "";
   }
-  return Poco::Path(fullname).getFileName(); // + ".pic";
+  return Poco::Path(fullname).getFileName();
 }

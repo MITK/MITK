@@ -9,8 +9,6 @@ list(APPEND enabled_modules
   CLImportanceWeighting
   Segmentation
   DataCollection
-  IpSegmentation
-  IpFunc
   SurfaceInterpolation
   GraphAlgorithms
   ImageStatistics

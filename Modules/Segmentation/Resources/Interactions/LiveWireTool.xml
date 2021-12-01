@@ -18,11 +18,7 @@
         <action name="DeletePoint" ID="120"/>
       </transition>
       <transition event_class="MouseDoubleClickEvent" event_variant="PrimaryButtonDoubleClick" target="Start" >
-        <condition name="CheckContourClosed" />
         <action name="FinishContour" ID="44" />
-      </transition>
-      <transition event_class="MouseDoubleClickEvent" event_variant="PrimaryButtonDoubleClick" target="Active" >
-        <condition name="CheckContourClosed" inverted="true"/>
       </transition>
       <transition event_class="MouseMoveEvent" event_variant="CtrlMouseMove" target="Active" >
         <action name="CtrlMovePoint" ID="12"/>

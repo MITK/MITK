@@ -51,18 +51,29 @@ namespace mitk
     ContourModelLiveWireInteractor();
     ~ContourModelLiveWireInteractor() override;
 
+    /// \brief Select/ add and select vertex to modify contour and prepare for modification of contour.
     bool OnCheckPointClick(const InteractionEvent *interactionEvent) override;
+    /// \brief Check if mouse is hovering over contour
     bool IsHovering(const InteractionEvent *interactionEvent) override;
 
+    /// \brief Update contour when point is moved.
     void OnMovePoint(StateMachineAction *, InteractionEvent *interactionEvent) override;
+    /// \brief Delete selected vertex and recompute contour.
     void OnDeletePoint(StateMachineAction *, InteractionEvent *interactionEvent) override;
+    /// \brief Finish modification of contour.
     void OnFinishEditing(StateMachineAction *, InteractionEvent *interactionEvent) override;
 
-    int SplitContourFromSelectedVertex(mitk::ContourModel *srcContour,
-                                       mitk::ContourModel *destContour,
-                                       bool fromSelectedUpwards,
-                                       int timestep);
+    /// \brief Split contour into a part before the selected vertex and after the selected vertex
+    void SplitContourFromSelectedVertex(mitk::ContourModel *srcContour,
+                                        const mitk::ContourModel::VertexType *nextPoint,
+                                        const mitk::ContourModel::VertexType *previousPoint,
+                                        int timestep);
+    /// \brief Set repulsive points which should not be changed during editing of the contour.
+    void SetRepulsivePoints(const mitk::ContourModel::VertexType *nextPoint,
+                            mitk::ContourModel *contour,
+                            int timestep);
 
+    const float eps = 3.0;
     mitk::ImageLiveWireContourModelFilter::Pointer m_LiveWireFilter;
     mitk::Image::Pointer m_WorkingSlice;
 

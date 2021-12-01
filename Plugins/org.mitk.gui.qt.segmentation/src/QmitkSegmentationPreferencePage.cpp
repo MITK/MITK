@@ -29,13 +29,14 @@ QmitkSegmentationPreferencePage::QmitkSegmentationPreferencePage()
     m_SlimViewCheckBox(nullptr),
     m_RadioOutline(nullptr),
     m_RadioOverlay(nullptr),
+    m_SelectionModeCheckBox(nullptr),
     m_SmoothingCheckBox(nullptr),
     m_SmoothingSpinBox(nullptr),
     m_DecimationSpinBox(nullptr),
     m_ClosingSpinBox(nullptr),
-    m_SelectionModeCheckBox(nullptr),
     m_Initializing(false)
 {
+
 }
 
 QmitkSegmentationPreferencePage::~QmitkSegmentationPreferencePage()
@@ -71,6 +72,10 @@ void QmitkSegmentationPreferencePage::CreateQtControl(QWidget* parent)
   displayOptionsLayout->addWidget( m_RadioOverlay );
   formLayout->addRow( "2D display", displayOptionsLayout );
 
+  m_SelectionModeCheckBox = new QCheckBox("Enable auto-selection mode", m_MainControl);
+  m_SelectionModeCheckBox->setToolTip("Automatically select a patient image and a segmentation if available");
+  formLayout->addRow("Data node selection mode", m_SelectionModeCheckBox);
+
   auto   surfaceLayout = new QFormLayout;
   surfaceLayout->setSpacing(8);
 
@@ -100,10 +105,6 @@ void QmitkSegmentationPreferencePage::CreateQtControl(QWidget* parent)
   m_ClosingSpinBox->setValue(0.0);
   m_ClosingSpinBox->setToolTip("Valid range is [0, 1]. Higher values increase closing. A value of 0 disables closing.");
   surfaceLayout->addRow("Closing Ratio", m_ClosingSpinBox);
-
-  m_SelectionModeCheckBox = new QCheckBox("Enable auto-selection mode", m_MainControl);
-  m_SelectionModeCheckBox->setToolTip("Automatically select a patient image and a segmentation if available");
-  formLayout->addRow("Data node selection mode",m_SelectionModeCheckBox);
 
   formLayout->addRow("Smoothed surface creation", surfaceLayout);
 
@@ -136,18 +137,18 @@ void QmitkSegmentationPreferencePage::PerformCancel()
 
 void QmitkSegmentationPreferencePage::Update()
 {
-  //m_EnableSingleEditing->setChecked(m_SegmentationPreferencesNode->GetBool("Single click property editing", true));
-
   m_SlimViewCheckBox->setChecked(m_SegmentationPreferencesNode->GetBool("slim view", false));
 
   if (m_SegmentationPreferencesNode->GetBool("draw outline", true) )
   {
-    m_RadioOutline->setChecked( true );
+    m_RadioOutline->setChecked(true);
   }
   else
   {
-    m_RadioOverlay->setChecked( true );
+    m_RadioOverlay->setChecked(true);
   }
+
+  m_SelectionModeCheckBox->setChecked(m_SegmentationPreferencesNode->GetBool("auto selection", true));
 
   if (m_SegmentationPreferencesNode->GetBool("smoothing hint", true))
   {
@@ -159,8 +160,6 @@ void QmitkSegmentationPreferencePage::Update()
       m_SmoothingCheckBox->setChecked(false);
       m_SmoothingSpinBox->setEnabled(true);
   }
-
-  m_SelectionModeCheckBox->setChecked( m_SegmentationPreferencesNode->GetBool("auto selection", true) );
 
   m_SmoothingSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("smoothing value", 1.0));
   m_DecimationSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("decimation rate", 0.5));

@@ -29,7 +29,7 @@ mitk::ContourModelUtils::~ContourModelUtils()
 }
 
 mitk::ContourModel::Pointer mitk::ContourModelUtils::ProjectContourTo2DSlice(
-  const Image *slice, const ContourModel *contourIn3D, bool, bool)
+  const Image *slice, const ContourModel *contourIn3D)
 {
   if (nullptr == slice || nullptr == contourIn3D)
     return nullptr;
@@ -63,7 +63,7 @@ mitk::ContourModel::Pointer mitk::ContourModelUtils::ProjectContourTo2DSlice(
 }
 
 mitk::ContourModel::Pointer mitk::ContourModelUtils::BackProjectContourFrom2DSlice(
-  const BaseGeometry *sliceGeometry, const ContourModel *contourIn2D, bool)
+  const BaseGeometry *sliceGeometry, const ContourModel *contourIn2D)
 {
   if (nullptr == sliceGeometry || nullptr == contourIn2D)
     return nullptr;

@@ -353,71 +353,8 @@ void mitk::RegionGrowingTool::OnMousePressed(StateMachineAction *, InteractionEv
 }
 
 // Use this to implement a behaviour for when the user clicks inside a segmentation (for example remove something)
-// Old IpPic code is kept as comment for reference
 void mitk::RegionGrowingTool::OnMousePressedInside()
 {
-  //    mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent
-  //    );
-  //    //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent()); // checked in
-  //    OnMousePressed
-  //    // 3.1.1. Create a skeletonization of the segmentation and try to find a nice cut
-  //    // apply the skeletonization-and-cut algorithm
-  //    // generate contour to remove
-  //    // set m_ReferenceSlice = nullptr so nothing will happen during mouse move
-  //    // remember to fill the contour with 0 in mouserelease
-  //    mitkIpPicDescriptor* segmentationHistory = ipMITKSegmentationCreateGrowerHistory( workingPicSlice,
-  //    m_LastWorkingSeed, nullptr ); // free again
-  //    if (segmentationHistory)
-  //    {
-  //        tCutResult cutContour = ipMITKSegmentationGetCutPoints( workingPicSlice, segmentationHistory,
-  //        initialWorkingOffset ); // tCutResult is a ipSegmentation type
-  //        mitkIpPicFree( segmentationHistory );
-  //        if (cutContour.cutIt)
-  //        {
-  //            int timestep = positionEvent->GetSender()->GetTimeStep();
-  //            // 3.1.2 copy point from float* to mitk::Contour
-  //            ContourModel::Pointer contourInImageIndexCoordinates = ContourModel::New();
-  //            contourInImageIndexCoordinates->Expand(timestep + 1);
-  //            contourInImageIndexCoordinates->SetClosed(true, timestep);
-  //            Point3D newPoint;
-  //            for (int index = 0; index < cutContour.deleteSize; ++index)
-  //            {
-  //                newPoint[0] = cutContour.deleteCurve[ 2 * index + 0 ] - 0.5;//correction is needed because the
-  //                output of the algorithm is center based
-  //                newPoint[1] = cutContour.deleteCurve[ 2 * index + 1 ] - 0.5;//and we want our contour displayed
-  //                corner based.
-  //                newPoint[2] = 0.0;
-
-  //                contourInImageIndexCoordinates->AddVertex( newPoint, timestep );
-  //            }
-
-  //            free(cutContour.traceline);
-  //            free(cutContour.deleteCurve); // perhaps visualize this for fun?
-  //            free(cutContour.onGradient);
-
-  //            ContourModel::Pointer contourInWorldCoordinates = FeedbackContourTool::BackProjectContourFrom2DSlice(
-  //            m_WorkingSlice->GetGeometry(), contourInImageIndexCoordinates, true ); // true: sub 0.5 for
-  //            ipSegmentation correction
-
-  //            FeedbackContourTool::SetFeedbackContour( contourInWorldCoordinates );
-  //            FeedbackContourTool::SetFeedbackContourVisible(true);
-  //            mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
-  //            m_FillFeedbackContour = true;
-  //        }
-  //        else
-  //        {
-  //            m_FillFeedbackContour = false;
-  //        }
-
-  //    }
-  //    else
-  //    {
-  //        m_FillFeedbackContour = false;
-  //    }
-
-  //    m_ReferenceSlice = nullptr;
-
-  //    return true;
 }
 
 void mitk::RegionGrowingTool::OnMousePressedOutside(StateMachineAction *, InteractionEvent *interactionEvent)

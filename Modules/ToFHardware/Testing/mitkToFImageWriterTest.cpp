@@ -38,10 +38,10 @@ int mitkToFImageWriterTest(int /* argc */, char* /*argv*/[])
   //set member parameter and test again
   int dimX = 255;
   int dimY = 188;
-  std::string distanceImageFileName("distImg.pic");
-  std::string amplitudeImageFileName("amplImg.pic");
-  std::string intensityImageFileName("intImg.pic");
-  std::string rgbImageFileName("rgbImg.pic");
+  std::string distanceImageFileName("distImg.nrrd");
+  std::string amplitudeImageFileName("amplImg.nrrd");
+  std::string intensityImageFileName("intImg.nrrd");
+  std::string rgbImageFileName("rgbImg.nrrd");
   std::string fileExtension(".test");
   bool distanceImageSelected = false;
   bool amplitudeImageSelected = false;

@@ -13,7 +13,6 @@ found in the LICENSE file.
 #ifndef mitkCorrectorAlgorithmhIncluded
 #define mitkCorrectorAlgorithmhIncluded
 
-#include "ipSegmentation.h"
 #include "mitkContourModel.h"
 #include "mitkImageToImageFilter.h"
 #include <MitkSegmentationExports.h>

@@ -800,9 +800,7 @@ RECURSIVE              = YES
 # Note that relative paths are relative to the directory from which doxygen is
 # run.
 
-EXCLUDE                = "@MITK_SOURCE_DIR@/Utilities/IpFunc/" \
-                         "@MITK_SOURCE_DIR@/Utilities/IpSegmentation/" \
-                         "@MITK_SOURCE_DIR@/Utilities/qtsingleapplication/" \
+EXCLUDE                = "@MITK_SOURCE_DIR@/Utilities/qtsingleapplication/" \
                          "@MITK_SOURCE_DIR@/Applications/PluginGenerator/" \
                          "@MITK_SOURCE_DIR@/Modules/CppMicroServices/core/doc/snippets/" \
                          "@MITK_SOURCE_DIR@/Modules/CppMicroServices/core/doc/doxygen/standalone/" \

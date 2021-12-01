@@ -81,11 +81,11 @@ namespace itk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      // Run-time type information
-      itkTypeMacro(ShortestPathImageFilter, ImageToImageFilter);
+    // Run-time type information
+    itkTypeMacro(ShortestPathImageFilter, ImageToImageFilter);
 
-      // Display
-      void PrintSelf(std::ostream &os, Indent indent) const override;
+    // Display
+    void PrintSelf(std::ostream &os, Indent indent) const override;
 
     // Compare function for A_STAR
     struct CompareNodeStar
@@ -111,9 +111,9 @@ namespace itk
     // N8 in 2D
     itkSetMacro(Graph_fullNeighbors, bool);
 
-      // \brief (default=true), Produce output image, which shows the shortest path. But you can also get the shortest
-      // Path directly as vector with the function GetVectorPath
-      itkSetMacro(MakeOutputImage, bool);
+    // \brief (default=true), Produce output image, which shows the shortest path. But you can also get the shortest
+    // Path directly as vector with the function GetVectorPath
+    itkSetMacro(MakeOutputImage, bool);
     itkGetMacro(MakeOutputImage, bool);
 
     // \brief (default=false), Store an Vector of Order, so you can call getVectorOrderImage after update
@@ -155,6 +155,9 @@ namespace itk
                       CostFunctionType); // itkSetObjectMacro = set function that uses pointer as parameter
     itkGetObjectMacro(CostFunction, CostFunctionType);
 
+    void SetUseCostFunction(bool doUseCostFunction) { m_useCostFunction = doUseCostFunction; };
+    bool GetUseCostFunction() { return m_useCostFunction; };
+
   protected:
     std::vector<IndexType>
       m_endPoints; // if you fill this vector, the algo will not rest until all endPoints have been reached
@@ -165,6 +168,7 @@ namespace itk
     NodeNumType m_Graph_StartNode;
     NodeNumType m_Graph_EndNode;
     bool m_Graph_fullNeighbors;
+    bool m_useCostFunction;
     std::vector<ShortestPathNode *> m_Graph_DiscoveredNodeList;
     ShortestPathImageFilter(Self &); // intentionally not implemented
     void operator=(const Self &);    // intentionally not implemented

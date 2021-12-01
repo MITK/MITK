@@ -46,10 +46,9 @@ namespace mitk
   /**
     * @brief Image class for storing images
     *
-    * Can be asked for header information, the data vector,
-    * the mitkIpPicDescriptor struct or vtkImageData objects. If not the complete
-    * data is required, the appropriate SubImageSelector class should be used
-    * for access.
+    * Can be asked for header information, the data vector, or vtkImageData objects.
+    * If not the complete data is required, the appropriate SubImageSelector class
+    * should be used for access.
     * Image organizes sets of slices (s x 2D), volumes (t x 3D) and channels (n
     * x ND). Channels are for different kind of data, e.g., morphology in
     * channel 0, velocities in channel 1. All channels must have the same Geometry! In

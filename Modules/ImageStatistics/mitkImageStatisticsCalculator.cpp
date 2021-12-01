@@ -276,7 +276,7 @@ namespace mitk
     statObj.AddStatistic(mitk::ImageStatisticsConstants::MEDIAN(), statisticsFilter->GetMedian());
     statObj.AddStatistic(mitk::ImageStatisticsConstants::UNIFORMITY(), statisticsFilter->GetUniformity());
     statObj.AddStatistic(mitk::ImageStatisticsConstants::UPP(), statisticsFilter->GetUPP());
-    statObj.m_Histogram = statisticsFilter->GetHistogram().GetPointer();
+    statObj.m_Histogram = statisticsFilter->GetHistogram();
     statisticContainerForImage->SetStatisticsForTimeStep(timeStep, statObj);
   }
 

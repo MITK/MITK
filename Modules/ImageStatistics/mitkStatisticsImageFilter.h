@@ -19,6 +19,7 @@ found in the LICENSE file.
 
 #include <itkArray.h>
 #include <itkCompensatedSummation.h>
+#include <itkHistogram.h>
 #include <itkImageSink.h>
 #include <itkNumericTraits.h>
 #include <itkSimpleDataObjectDecorator.h>
@@ -31,19 +32,15 @@ namespace mitk
   class StatisticsImageFilter : public itk::ImageSink<TInputImage>
   {
   public:
-    /** Standard Self type alias */
     using Self = StatisticsImageFilter;
     using Superclass = itk::ImageSink<TInputImage>;
     using Pointer = itk::SmartPointer<Self>;
     using ConstPointer = itk::SmartPointer<const Self>;
 
-    /** Method for creation bypassing the object factory. */
     itkFactorylessNewMacro(Self);
 
-    /** Runtime information support. */
     itkTypeMacro(StatisticsImageFilter, itk::ImageSink);
 
-    /** Image related type alias. */
     using InputImagePointer = typename TInputImage::Pointer;
 
     using RegionType = typename TInputImage::RegionType;
@@ -51,19 +48,18 @@ namespace mitk
     using IndexType = typename TInputImage::IndexType;
     using PixelType = typename TInputImage::PixelType;
 
-    /** Image related type alias. */
     static constexpr unsigned int ImageDimension = TInputImage::ImageDimension;
 
-    /** Type to use for computations. */
     using RealType = typename itk::NumericTraits<PixelType>::RealType;
+
+    using HistogramType = typename itk::Statistics::Histogram<RealType>;
+    using HistogramPointer = itk::SmartPointer<HistogramType>;
     
-    /** Smart Pointer type to a DataObject. */
     using DataObjectPointer = typename itk::DataObject::Pointer;
 
     template <typename T>
     using SimpleDataObjectDecorator = itk::SimpleDataObjectDecorator<T>;
 
-    /** Type of DataObjects used for scalar outputs */
     using RealObjectType = SimpleDataObjectDecorator<RealType>;
     using PixelObjectType = SimpleDataObjectDecorator<PixelType>;
 
@@ -103,6 +99,9 @@ namespace mitk
     /** Return the computed Mean of Positive Pixels. */
     itkGetDecoratedOutputMacro(MPP, RealType);
 
+    /** Return the computed Histogram. */
+    itkGetDecoratedOutputMacro(Histogram, HistogramPointer);
+
     /** Return the computed Entropy. */
     itkGetDecoratedOutputMacro(Entropy, RealType);
 
@@ -114,6 +113,8 @@ namespace mitk
 
     /** Return the computed Median. */
     itkGetDecoratedOutputMacro(Median, RealType);
+
+    void SetHistogramParameters(unsigned int size, RealType lowerBound, RealType upperBound);
 
     using DataObjectIdentifierType = itk::ProcessObject::DataObjectIdentifierType;
     using Superclass::MakeOutput;
@@ -129,7 +130,7 @@ namespace mitk
 
   protected:
     StatisticsImageFilter();
-    ~StatisticsImageFilter() override = default;
+    ~StatisticsImageFilter();
 
     itkSetDecoratedOutputMacro(Minimum, PixelType);
     itkSetDecoratedOutputMacro(Maximum, PixelType);
@@ -143,6 +144,7 @@ namespace mitk
     itkSetDecoratedOutputMacro(Skewness, RealType);
     itkSetDecoratedOutputMacro(Kurtosis, RealType);
     itkSetDecoratedOutputMacro(MPP, RealType);
+    itkSetDecoratedOutputMacro(Histogram, HistogramPointer);
     itkSetDecoratedOutputMacro(Entropy, RealType);
     itkSetDecoratedOutputMacro(Uniformity, RealType);
     itkSetDecoratedOutputMacro(UPP, RealType);
@@ -159,7 +161,15 @@ namespace mitk
     void PrintSelf(std::ostream& os, itk::Indent indent) const override;
 
   private:
-    itk::CompensatedSummation<RealType> m_ThreadSum;
+    HistogramPointer CreateInitializedHistogram() const;
+
+    bool m_CalculateHistogram;
+    unsigned int m_HistogramSize;
+    PixelType m_HistogramLowerBound;
+    PixelType m_HistogramUpperBound;
+    HistogramPointer m_Histogram;
+
+    itk::CompensatedSummation<RealType> m_Sum;
     itk::CompensatedSummation<RealType> m_SumOfPositivePixels;
     itk::CompensatedSummation<RealType> m_SumOfSquares;
     itk::CompensatedSummation<RealType> m_SumOfCubes;
@@ -167,8 +177,8 @@ namespace mitk
 
     itk::SizeValueType m_Count;
     itk::SizeValueType m_CountOfPositivePixels;
-    PixelType m_ThreadMin;
-    PixelType m_ThreadMax;
+    PixelType m_Min;
+    PixelType m_Max;
 
     std::mutex m_Mutex;
   };

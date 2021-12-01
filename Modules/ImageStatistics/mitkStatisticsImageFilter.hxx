@@ -18,15 +18,19 @@ found in the LICENSE file.
 
 template <typename TInputImage>
 mitk::StatisticsImageFilter<TInputImage>::StatisticsImageFilter()
-  : m_ThreadSum(1),
+  : m_CalculateHistogram(false),
+    m_HistogramSize(0),
+    m_HistogramLowerBound(itk::NumericTraits<RealType>::NonpositiveMin()),
+    m_HistogramUpperBound(itk::NumericTraits<RealType>::max()),
+    m_Sum(1),
     m_SumOfPositivePixels(1),
     m_SumOfSquares(1),
     m_SumOfCubes(1),
     m_SumOfQuadruples(1),
     m_Count(1),
     m_CountOfPositivePixels(1),
-    m_ThreadMin(1),
-    m_ThreadMax(1)
+    m_Min(1),
+    m_Max(1)
 {
   this->SetNumberOfRequiredInputs(1);
 
@@ -46,6 +50,11 @@ mitk::StatisticsImageFilter<TInputImage>::StatisticsImageFilter()
   this->SetUniformity(0);
   this->SetUPP(0);
   this->SetMedian(0);
+}
+
+template <typename TInputImage>
+mitk::StatisticsImageFilter<TInputImage>::~StatisticsImageFilter()
+{
 }
 
 template <typename TInputImage>
@@ -75,7 +84,62 @@ typename mitk::StatisticsImageFilter<TInputImage>::DataObjectPointer mitk::Stati
     return RealObjectType::New();
   }
 
+  if (name == "Histogram")
+  {
+    return HistogramType::New();
+  }
+
   return Superclass::MakeOutput(name);
+}
+
+template <typename TInputImage>
+void mitk::StatisticsImageFilter<TInputImage>::SetHistogramParameters(unsigned int size, RealType lowerBound, RealType upperBound)
+{
+  bool modified = false;
+
+  if (m_HistogramSize != size)
+  {
+    m_HistogramSize = size;
+    modified = true;
+  }
+
+  if (m_HistogramLowerBound != lowerBound)
+  {
+    m_HistogramLowerBound = lowerBound;
+    modified = true;
+  }
+
+  if (m_HistogramUpperBound != upperBound)
+  {
+    m_HistogramUpperBound = upperBound;
+    modified = true;
+  }
+
+  m_CalculateHistogram = true;
+
+  if (modified)
+    this->Modified();
+}
+
+template <typename TInputImage>
+auto mitk::StatisticsImageFilter<TInputImage>::CreateInitializedHistogram() const -> HistogramPointer
+{
+  typename HistogramType::SizeType size;
+  size.SetSize(1);
+  size[0] = m_HistogramSize;
+
+  typename HistogramType::MeasurementVectorType lowerBound;
+  lowerBound.SetSize(1);
+  lowerBound[0] = m_HistogramLowerBound;
+
+  typename HistogramType::MeasurementVectorType upperBound;
+  upperBound.SetSize(1);
+  upperBound.[0] = m_HistogramUpperBound;
+
+  auto histogram = HistogramType::New();
+  histogram->Initialize(size, lowerBound, upperBound);
+
+  return histogram;
 }
 
 template <typename TInputImage>
@@ -83,15 +147,18 @@ void mitk::StatisticsImageFilter<TInputImage>::BeforeStreamedGenerateData()
 {
   Superclass::BeforeStreamedGenerateData();
 
-  m_ThreadSum = 0;
+  m_Sum = 0;
   m_SumOfPositivePixels = 0;
   m_SumOfSquares = 0;
   m_SumOfCubes = 0;
   m_SumOfQuadruples = 0;
   m_Count = 0;
   m_CountOfPositivePixels = 0;
-  m_ThreadMin = itk::NumericTraits<PixelType>::max();
-  m_ThreadMax = itk::NumericTraits<PixelType>::NonpositiveMin();
+  m_Min = itk::NumericTraits<PixelType>::max();
+  m_Max = itk::NumericTraits<PixelType>::NonpositiveMin();
+
+  if (m_CalculateHistogram)
+    m_Histogram = this->CreateInitializedHistogram();
 }
 
 template <typename TInputImage>
@@ -106,7 +173,18 @@ void mitk::StatisticsImageFilter<TInputImage>::ThreadedStreamedGenerateData(cons
   itk::SizeValueType countOfPositivePixels = 0;
   auto min = itk::NumericTraits<PixelType>::max();
   auto max = itk::NumericTraits<PixelType>::NonpositiveMin();
+  RealType realValue = 0;
   RealType squareValue = 0;
+
+  HistogramPointer histogram;
+  typename HistogramType::MeasurementVectorType histogramMeasurement;
+  typename HistogramType::IndexType histogramIndex;
+
+  if (m_CalculateHistogram) // Initialize histogram
+  {
+    histogram = this->CreateInitializedHistogram();
+    histogramMeasurement.SetSize(1);
+  }
 
   itk::ImageScanlineConstIterator<TInputImage> it(this->GetInput(), regionForThread);
 
@@ -115,7 +193,15 @@ void mitk::StatisticsImageFilter<TInputImage>::ThreadedStreamedGenerateData(cons
     while (!it.IsAtEndOfLine())
     {
       const auto& value = it.Get();
-      const auto realValue = static_cast<RealType>(value);
+      realValue = static_cast<RealType>(value);
+
+      if (m_CalculateHistogram) // Compute histogram
+      {
+        histogramMeasurement[0] = realValue;
+        histogram->GetIndex(histogramMeasurement, histogramIndex);
+        histogram->IncreaseFrequencyOfIndex(histogramIndex, 1);
+      }
+
       min = std::min(min, value);
       max = std::max(max, value);
       squareValue = realValue * realValue;
@@ -140,15 +226,28 @@ void mitk::StatisticsImageFilter<TInputImage>::ThreadedStreamedGenerateData(cons
 
   std::lock_guard<std::mutex> mutexHolder(m_Mutex);
 
-  m_ThreadSum += sum;
+  if (m_CalculateHistogram) // Merge histograms
+  {
+    typename HistogramType::ConstIterator histogramIt = histogram->Begin();
+    typename HistogramType::ConstIterator histogramEnd = histogram->End();
+
+    while (histogramIt != histogramEnd)
+    {
+      m_Histogram->GetIndex(histogramIt.GetMeasurementVector(), histogramIndex);
+      m_Histogram->IncreaseFrequencyOfIndex(histogramIndex, histogramIt.GetFrequency());
+      ++histogramIt;
+    }
+  }
+
+  m_Sum += sum;
   m_SumOfPositivePixels += sumOfPositivePixels;
   m_SumOfSquares += sumOfSquares;
   m_SumOfCubes += sumOfCubes;
   m_SumOfQuadruples += sumOfQuadruples;
   m_Count += count;
   m_CountOfPositivePixels += countOfPositivePixels;
-  m_ThreadMin = std::min(min, m_ThreadMin);
-  m_ThreadMax = std::max(max, m_ThreadMax);
+  m_Min = std::min(min, m_Min);
+  m_Max = std::max(max, m_Max);
 }
 
 template <typename TInputImage>
@@ -156,15 +255,15 @@ void mitk::StatisticsImageFilter<TInputImage>::AfterStreamedGenerateData()
 {
   Superclass::AfterStreamedGenerateData();
 
-  const RealType sum = m_ThreadSum;
-  const RealType sumOfPositivePixels = m_SumOfPositivePixels;
-  const RealType sumOfSquares = m_SumOfSquares;
-  const RealType sumOfCubes = m_SumOfCubes;
-  const RealType sumOfQuadruples = m_SumOfQuadruples;
+  const RealType sum = m_Sum.GetSum();
+  const RealType sumOfPositivePixels = m_SumOfPositivePixels.GetSum();
+  const RealType sumOfSquares = m_SumOfSquares.GetSum();
+  const RealType sumOfCubes = m_SumOfCubes.GetSum();
+  const RealType sumOfQuadruples = m_SumOfQuadruples.GetSum();
   const itk::SizeValueType count = m_Count;
   const itk::SizeValueType countOfPositivePixels = m_CountOfPositivePixels;
-  const PixelType minimum = m_ThreadMin;
-  const PixelType maximum = m_ThreadMax;
+  const PixelType minimum = m_Min;
+  const PixelType maximum = m_Max;
 
   const RealType mean = sum / static_cast<RealType>(count);
   const RealType variance = (sumOfSquares - (sum * sum / static_cast<RealType>(count))) / (static_cast<RealType>(count) - 1);
@@ -189,10 +288,20 @@ void mitk::StatisticsImageFilter<TInputImage>::AfterStreamedGenerateData()
   this->SetSkewness(skewness);
   this->SetKurtosis(kurtosis);
   this->SetMPP(meanOfPositivePixels);
-  this->SetEntropy(entropy);
-  this->SetUniformity(uniformity);
-  this->SetUPP(upp);
-  this->SetMedian(median);
+
+  if (m_CalculateHistogram)
+  {
+    this->SetHistogram(m_Histogram);
+
+    mitk::HistogramStatisticsCalculator histogramStatisticsCalculator;
+    histogramStatisticsCalculator.SetHistogram(m_Histogram);
+    histogramStatisticsCalculator.CalculateStatistics();
+
+    this->SetEntropy(histogramStatisticsCalculator.GetEntropy());
+    this->SetUniformity(histogramStatisticsCalculator.GetUniformity());
+    this->SetUPP(histogramStatisticsCalculator.GetUPP());
+    this->SetMedian(histogramStatisticsCalculator.GetMedian());
+  }
 }
 
 template <typename TInputImage>

@@ -24,21 +24,6 @@ void QmitknnUNetToolGUI::ClearAllComboBoxes()
   }
 }
 
-template <typename T>
-T QmitknnUNetToolGUI::FetchFoldersFromDir(const QString &path)
-{
-  T folders;
-  for (QDirIterator it(path, QDir::AllDirs, QDirIterator::NoIteratorFlags); it.hasNext();)
-  {
-    it.next();
-    if (!it.fileName().startsWith('.'))
-    {
-      folders.push_back(it.fileName());
-    }
-  }
-  return folders;
-}
-
 void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &resultsFolder)
 {
   m_Controls.previewButton->setEnabled(false);

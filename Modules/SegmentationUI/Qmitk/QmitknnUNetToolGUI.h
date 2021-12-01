@@ -182,16 +182,6 @@ private:
    */
   std::vector<mitk::Image::ConstPointer> FetchMultiModalImagesFromUI();
 
-  /**
-   * @brief Template function to fetch all folders inside a given path.
-   * The type can be any of stl or Qt containers which supports push_back call.
-   *
-   * @tparam T
-   * @return T
-   */
-  template <typename T>
-  static T FetchFoldersFromDir(const QString &);
-
   Ui_QmitknnUNetToolGUIControls m_Controls;
   // QThread *m_SegmentationThread;
   nnUNetSegmentationWorker *m_Worker;

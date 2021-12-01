@@ -13,10 +13,10 @@ found in the LICENSE file.
 #include "QmitknnUNetToolGUI.h"
 
 #include "mitknnUnetTool.h"
+#include <QApplication>
 #include <QDir>
 #include <QIcon>
 #include <QtGlobal>
-#include <QApplication>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitknnUNetToolGUI, "")
 
@@ -170,8 +170,8 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
       }
       else if (!IsNNUNetInstalled(pythonPath))
       {
-        // throw std::runtime_error("nnUNet is not detected in the selected python environment. Please select a valid "
-        //                         "python environment or install nnUNet.");
+        throw std::runtime_error("nnUNet is not detected in the selected python environment. Please select a valid "
+                                "python environment or install nnUNet.");
       }
 
       tool->SetnnUNetDirectory(nnUNetDirectory);
@@ -229,129 +229,6 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
     }
   }
 }
-
-/*
-void QmitknnUNetToolGUI::OnSettingsAccepted()
-{
-  mitk::nnUNetTool::Pointer tool = this->GetConnectedToolAs<mitk::nnUNetTool>();
-  if (nullptr != tool)
-  {
-    try
-    {
-      QString modelName = m_Controls.modelBox->currentText();
-      QString taskName = m_Controls.taskBox->currentText();
-      bool isNoPip = m_Controls.nopipBox->isChecked();
-
-      QString pythonPathTextItem = m_Controls.pythonEnvComboBox->currentText();
-      QString pythonPath = pythonPathTextItem.mid(pythonPathTextItem.indexOf(" ") + 1);
-#ifdef _WIN32
-      if (!isNoPip && !(pythonPath.endsWith("Scripts", Qt::CaseInsensitive) ||
-                        pythonPath.endsWith("Scripts/", Qt::CaseInsensitive)))
-      {
-        pythonPath += QDir::separator() + QString("Scripts");
-      }
-#else
-      if (!(pythonPath.endsWith("bin", Qt::CaseInsensitive) || pythonPath.endsWith("bin/", Qt::CaseInsensitive)))
-      {
-        pythonPath += QDir::separator() + QString("bin");
-      }
-#endif
-      std::string nnUNetDirectory;
-      if (isNoPip)
-      {
-        nnUNetDirectory = m_Controls.codedirectoryBox->directory().toStdString();
-      }
-      else if (!IsNNUNetInstalled(pythonPath))
-      {
-        //throw std::runtime_error("nnUNet is not detected in the selected python environment. Please select a valid "
-        //                         "python environment or install nnUNet.");
-      }
-      QString trainerPlanner = m_Controls.trainerBox->currentText();
-      QString splitterString = "__";
-      tool->EnsembleOff();
-
-      if (modelName.startsWith("ensemble", Qt::CaseInsensitive))
-      {
-        QString ppJsonFile =
-          QDir::cleanPath(m_ModelDirectory + QDir::separator() + modelName + QDir::separator() + taskName +
-                          QDir::separator() + trainerPlanner + QDir::separator() + "postprocessing.json");
-        if (QFile(ppJsonFile).exists())
-        {
-          tool->EnsembleOn();
-          tool->SetPostProcessingJsonDirectory(ppJsonFile.toStdString());
-          splitterString = "--";
-        }
-      }
-      QStringList trainerSplitParts = trainerPlanner.split(splitterString, QString::SplitBehavior::SkipEmptyParts);
-      std::vector<mitk::ModelParams> requestQ;
-      if (tool->GetEnsemble())
-      {
-        foreach (QString modelSet, trainerSplitParts)
-        {
-          modelSet.remove("ensemble_", Qt::CaseInsensitive);
-          QStringList splitParts = modelSet.split("__", QString::SplitBehavior::SkipEmptyParts);
-          QString modelName = splitParts.first();
-          QString trainer = splitParts.at(1);
-          QString planId = splitParts.at(2);
-          auto testfold = std::vector<std::string>(1, "1");
-          mitk::ModelParams modelObject = MapToRequest(modelName, taskName, trainer, planId, testfold);
-          requestQ.push_back(modelObject);
-        }
-      }
-      else
-      {
-        QString trainer = m_Controls.trainerBox->currentText();//trainerSplitParts.first();
-        QString planId = m_Controls.plannerBox->currentText(); //trainerSplitParts.last();
-        std::vector<std::string> fetchedFolds = FetchSelectedFoldsFromUI();
-        mitk::ModelParams modelObject = MapToRequest(modelName, taskName, trainer, planId, fetchedFolds);
-        requestQ.push_back(modelObject);
-      }
-
-      tool->m_ParamQ.clear();
-      tool->m_ParamQ = requestQ;
-
-      tool->SetnnUNetDirectory(nnUNetDirectory);
-      tool->SetPythonPath(pythonPath.toStdString());
-      tool->SetModelDirectory(m_ModelDirectory.left(m_ModelDirectory.lastIndexOf(QDir::separator())).toStdString());
-      // checkboxes
-      tool->SetMirror(m_Controls.mirrorBox->isChecked());
-      tool->SetMixedPrecision(m_Controls.mixedPrecisionBox->isChecked());
-      tool->SetNoPip(isNoPip);
-      tool->SetMultiModal(m_Controls.multiModalBox->isChecked());
-      // Spinboxes
-      tool->SetGpuId(static_cast<unsigned int>(m_Controls.gpuSpinBox->value()));
-      // Multi-Modal
-      tool->MultiModalOff();
-      if (m_Controls.multiModalBox->isChecked())
-      {
-        tool->m_OtherModalPaths.clear();
-        tool->m_OtherModalPaths = FetchMultiModalImagesFromUI();
-        tool->MultiModalOn();
-      }
-
-      if (!m_SegmentationThread->isRunning())
-      {
-        MITK_DEBUG << "Starting thread...";
-        m_SegmentationThread->start();
-      }
-      m_Controls.statusLabel->setText("<b>STATUS: </b><i>Starting Segmentation task... This might take a while.</i>");
-      emit Operate(tool);
-    }
-    catch (const std::exception &e)
-    {
-      std::stringstream errorMsg;
-      errorMsg << "Error while processing parameters for nnUNet segmentation. Reason: " << e.what();
-      ShowErrorMessage(errorMsg.str());
-      return;
-    }
-    catch (...)
-    {
-      std::string errorMsg = "Unkown error occured while generation nnUNet segmentation.";
-      ShowErrorMessage(errorMsg);
-      return;
-    }
-  }
-}*/
 
 std::vector<mitk::Image::ConstPointer> QmitknnUNetToolGUI::FetchMultiModalImagesFromUI()
 {
@@ -417,7 +294,7 @@ void QmitknnUNetToolGUI::ProcessEnsembleModelsParams(mitk::nnUNetTool::Pointer t
     ppDirFolderName << "__";
     QString planId = layout->plannerBox->currentText();
     ppDirFolderName << planId;
-    auto testfold = std::vector<std::string>(1, "1"); // only for test
+    std::vector<std::string> testfold; // empty vector to consider all folds for inferencing.
     mitk::ModelParams modelObject = MapToRequest(modelName, taskName, trainer, planId, testfold);
     requestQ.push_back(modelObject);
     ppDirFolderNameParts << ppDirFolderName.join(QString(""));

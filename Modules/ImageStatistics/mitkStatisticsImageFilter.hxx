@@ -14,6 +14,7 @@ found in the LICENSE file.
 #define mitkStatisticsImageFilter_hxx
 
 #include <mitkStatisticsImageFilter.h>
+#include <mitkHistogramStatisticsCalculator.h>
 #include <itkImageScanlineConstIterator.h>
 
 template <typename TInputImage>
@@ -126,17 +127,18 @@ auto mitk::StatisticsImageFilter<TInputImage>::CreateInitializedHistogram() cons
 {
   typename HistogramType::SizeType size;
   size.SetSize(1);
-  size[0] = m_HistogramSize;
+  size.Fill(m_HistogramSize);
 
   typename HistogramType::MeasurementVectorType lowerBound;
   lowerBound.SetSize(1);
-  lowerBound[0] = m_HistogramLowerBound;
+  lowerBound.Fill(m_HistogramLowerBound);
 
   typename HistogramType::MeasurementVectorType upperBound;
   upperBound.SetSize(1);
-  upperBound.[0] = m_HistogramUpperBound;
+  upperBound.Fill(m_HistogramUpperBound);
 
   auto histogram = HistogramType::New();
+  histogram->SetMeasurementVectorSize(1);
   histogram->Initialize(size, lowerBound, upperBound);
 
   return histogram;

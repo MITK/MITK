@@ -317,8 +317,6 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   }
   try
   {
-    // outputImagePath = "C://data//dataset//Task02_Heart//labelsTr//la_003.nii.gz";
-    // outputImagePath = "/Users/ashis/DKFZ/nnUNet/nnUNet/out_dir/heart_single/la_000.nii.gz";
     LabelSetImage::Pointer resultImage = LabelSetImage::New();
     Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
     resultImage->InitializeByLabeledImage(outputImage);

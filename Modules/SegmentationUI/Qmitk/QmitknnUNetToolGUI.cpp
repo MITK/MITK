@@ -30,23 +30,11 @@ QmitknnUNetToolGUI::QmitknnUNetToolGUI() : QmitkAutoMLSegmentationToolGUIBase()
     ShowErrorMessage(warning);
   }
 
-  /* Disabling QThread and workers
-  m_SegmentationThread = new QThread(this);
-  m_Worker = new nnUNetSegmentationWorker;
-  m_Worker->moveToThread(m_SegmentationThread);
-  */
-
   // define predicates for multi modal data selection combobox
   auto imageType = mitk::TNodePredicateDataType<mitk::Image>::New();
   auto labelSetImageType = mitk::NodePredicateNot::New(mitk::TNodePredicateDataType<mitk::LabelSetImage>::New());
   this->m_MultiModalPredicate = mitk::NodePredicateAnd::New(imageType, labelSetImageType).GetPointer();
 }
-
-/*QmitknnUNetToolGUI::~QmitknnUNetToolGUI()
-{
-  this->m_SegmentationThread->quit();
-  this->m_SegmentationThread->wait();
-}*/
 
 void QmitknnUNetToolGUI::ConnectNewTool(mitk::AutoSegmentationWithPreviewTool *newTool)
 {
@@ -87,12 +75,6 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   connect(m_Controls.stopButton, SIGNAL(clicked()), this, SLOT(OnStopPressed()));
   connect(m_Controls.refreshdirectoryBox, SIGNAL(clicked()), this, SLOT(OnDirectoryChanged()));
 
-  /* Qthreads disabled
-  connect(this, &QmitknnUNetToolGUI::Operate, m_Worker, &nnUNetSegmentationWorker::DoWork);
-  connect(m_Worker, &nnUNetSegmentationWorker::Finished, this, &QmitknnUNetToolGUI::SegmentationResultHandler);
-  connect(m_Worker, &nnUNetSegmentationWorker::Failed, this, &QmitknnUNetToolGUI::SegmentationProcessFailed);
-  connect(m_SegmentationThread, &QThread::finished, m_Worker, &QObject::deleteLater);
-  */
   m_Controls.codedirectoryBox->setVisible(false);
   m_Controls.nnUnetdirLabel->setVisible(false);
   m_Controls.multiModalSpinBox->setVisible(false);
@@ -102,13 +84,6 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   m_Controls.previewButton->setEnabled(false);
 
   QSize sz(16, 16);
-
-  /* STOP feature is disabled since processing now happens in the main thread itself.
-  QIcon stopIcon;
-  stopIcon.addPixmap(style()->standardIcon(QStyle::SP_BrowserStop).pixmap(sz), QIcon::Normal, QIcon::Off);
-  m_Controls.stopButton->setIcon(stopIcon);
-  m_Controls.stopButton->setEnabled(false);
-  */
   m_Controls.stopButton->setVisible(false);
 
   QIcon refreshIcon;
@@ -171,7 +146,7 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
       else if (!IsNNUNetInstalled(pythonPath))
       {
         throw std::runtime_error("nnUNet is not detected in the selected python environment. Please select a valid "
-                                "python environment or install nnUNet.");
+                                 "python environment or install nnUNet.");
       }
 
       tool->SetnnUNetDirectory(nnUNetDirectory);
@@ -193,13 +168,6 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
         tool->MultiModalOn();
       }
       tool->m_InputOutputPair = std::make_pair(nullptr, nullptr);
-      // if (!m_SegmentationThread->isRunning())
-      // {
-      //   MITK_DEBUG << "Starting thread...";
-      //   m_SegmentationThread->start();
-      // }
-      // emit Operate(tool);
-      // m_Controls.stopButton->setEnabled(true);
       m_Controls.statusLabel->setText("<b>STATUS: </b><i>Starting Segmentation task... This might take a while.</i>");
       tool->UpdatePreview();
       if (tool->GetOutputBuffer() == nullptr)

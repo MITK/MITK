@@ -16,12 +16,10 @@ found in the LICENSE file.s
 #include "QmitkAutoMLSegmentationToolGUIBase.h"
 #include "QmitknnUNetFolderParser.h"
 #include "QmitknnUNetGPU.h"
-#include "QmitknnUNetWorker.h"
 #include "mitknnUnetTool.h"
 #include "ui_QmitknnUNetToolGUIControls.h"
 #include <MitkSegmentationUIExports.h>
 #include <QMessageBox>
-// #include <QThread>
 #include <QmitkDataStorageComboBox.h>
 #include <QmitknnUNetEnsembleLayout.h>
 
@@ -183,8 +181,6 @@ private:
   std::vector<mitk::Image::ConstPointer> FetchMultiModalImagesFromUI();
 
   Ui_QmitknnUNetToolGUIControls m_Controls;
-  // QThread *m_SegmentationThread;
-  nnUNetSegmentationWorker *m_Worker;
   QmitkGPULoader m_GpuLoader;
 
   /**

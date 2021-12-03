@@ -419,14 +419,3 @@ void QmitknnUNetToolGUI::ShowEnsembleLayout(bool visible)
     layout->parent->setVisible(visible);
   }
 }
-
-// void QmitknnUNetToolGUI::OnStopPressed()
-// {
-//   m_Controls.previewButton->setEnabled(true);
-//   m_Controls.stopButton->setEnabled(false);
-//   if (m_SegmentationThread->isRunning())
-//   {
-//     MITK_DEBUG << "Stopping thread...";
-//     m_SegmentationThread->requestInterruption();
-//   }
-// }

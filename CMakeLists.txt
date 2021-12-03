@@ -1,3 +1,7 @@
+#[[ When increasing the minimum required version, check if Boost_ADDITIONAL_VERSIONS
+    in CMake/PackageDepends/MITK_Boost_Config.cmake can be removed. See the first
+    long comment in CMakeExternals/Boost.cmake for details. ]]
+
 set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.18)
 cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION})
 
@@ -33,7 +37,7 @@ if(MITK_USE_SUPERBUILD)
   set(MITK_SOURCE_DIR ${PROJECT_SOURCE_DIR})
   set(MITK_BINARY_DIR ${PROJECT_BINARY_DIR})
 else()
-  project(MITK VERSION 2021.10.00)
+  project(MITK VERSION 2021.10.99)
   include_directories(SYSTEM ${MITK_SUPERBUILD_BINARY_DIR})
 endif()
 
@@ -319,8 +323,10 @@ if(MITK_USE_Qt5)
       endif()
 
       if(_compilers MATCHES "[0-9]+")
-        if (CMAKE_MATCH_0 EQUAL 2019)
-          list(APPEND _compilers "msvc2017") # Binary compatible to 2019
+        if (CMAKE_MATCH_0 EQUAL 2022)
+          list(APPEND _compilers "msvc2019" "msvc2017") # Binary compatible
+        elseif (CMAKE_MATCH_0 EQUAL 2019)
+          list(APPEND _compilers "msvc2017") # Binary compatible
         endif()
       endif()
     else()

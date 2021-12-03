@@ -136,12 +136,6 @@ void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
   m_SelectionServiceConnector = std::make_unique<QmitkSelectionServiceConnector>();
   SetAsSelectionListener(true);
 
-  auto selection = this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection();
-  auto currentSelection = GetInitialSelection(selection);
-
-  if (!currentSelection.isEmpty())
-    m_Controls.singleSlot->SetCurrentSelection(currentSelection);
-
   m_Controls.filterLineEdit->setClearButtonEnabled(true);
 
   m_Controls.treeView->setItemDelegateForColumn(1, m_Delegate);
@@ -175,6 +169,12 @@ void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)
     this, &QmitkPropertyTreeView::OnCurrentRowChanged);
   connect(m_Model, &QmitkPropertyItemModel::modelReset,
     this, &QmitkPropertyTreeView::OnModelReset);
+
+  auto selection = this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection();
+  auto currentSelection = GetInitialSelection(selection);
+
+  if (!currentSelection.isEmpty())
+    m_Controls.singleSlot->SetCurrentSelection(currentSelection);
 }
 
 void QmitkPropertyTreeView::SetAsSelectionListener(bool checked)

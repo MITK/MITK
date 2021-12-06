@@ -101,6 +101,12 @@ protected slots:
    */
   void OnModalPositionChanged(int);
 
+  /**
+   * @brief Qt slot
+   *
+   */
+  void OnRefreshPresssed();
+
 signals:
   /**
    * @brief signal for starting the segmentation which is caught by a worker thread.

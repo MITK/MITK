@@ -24,6 +24,12 @@ void QmitknnUNetToolGUI::ClearAllComboBoxes()
   }
 }
 
+void QmitknnUNetToolGUI::OnRefreshPresssed()
+{
+  const QString resultsFolder = m_Controls.modeldirectoryBox->directory();
+  OnDirectoryChanged(resultsFolder);
+}
+
 void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &resultsFolder)
 {
   m_Controls.previewButton->setEnabled(false);
@@ -400,7 +406,7 @@ void QmitknnUNetToolGUI::ShowEnsembleLayout(bool visible)
     groupBoxModel1->setCollapsed(false);
     groupBoxModel1->setFlat(true);
     groupBoxModel1->setAlignment(Qt::AlignRight);
-    m_Controls.advancedSettingsLayout->addWidget(groupBoxModel1, 2, 0, 1, 2);
+    m_Controls.advancedSettingsLayout->addWidget(groupBoxModel1, 3, 0, 1, 2);
 
     ctkCollapsibleGroupBox *groupBoxModel2 = new ctkCollapsibleGroupBox(this);
     auto lay2 = std::make_unique<QmitknnUNetTaskParamsUITemplate>(groupBoxModel2);
@@ -412,7 +418,7 @@ void QmitknnUNetToolGUI::ShowEnsembleLayout(bool visible)
     groupBoxModel2->setCollapsed(false);
     groupBoxModel2->setFlat(true);
     groupBoxModel2->setAlignment(Qt::AlignLeft);
-    m_Controls.advancedSettingsLayout->addWidget(groupBoxModel2, 2, 2, 1, 2);
+    m_Controls.advancedSettingsLayout->addWidget(groupBoxModel2, 3, 2, 1, 2);
   }
   for (std::unique_ptr<QmitknnUNetTaskParamsUITemplate> &layout : m_EnsembleParams)
   {

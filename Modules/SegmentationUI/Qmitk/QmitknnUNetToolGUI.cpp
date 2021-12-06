@@ -72,8 +72,7 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
 #endif
           this,
           SLOT(OnPythonPathChanged(const QString &)));
-  connect(m_Controls.stopButton, SIGNAL(clicked()), this, SLOT(OnStopPressed()));
-  connect(m_Controls.refreshdirectoryBox, SIGNAL(clicked()), this, SLOT(OnDirectoryChanged()));
+  connect(m_Controls.refreshdirectoryBox, SIGNAL(clicked()), this, SLOT(OnRefreshPresssed()));
 
   m_Controls.codedirectoryBox->setVisible(false);
   m_Controls.nnUnetdirLabel->setVisible(false);

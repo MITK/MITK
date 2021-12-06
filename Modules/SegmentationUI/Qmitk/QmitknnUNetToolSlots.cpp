@@ -164,6 +164,13 @@ void QmitknnUNetToolGUI::OnTrainerChanged(const QString &plannerSelected)
                   });
     if (m_Controls.foldBox->count() != 0)
     {
+      // Now recalling all added items to check-mark it.
+      const QAbstractItemModel *qaim = m_Controls.foldBox->checkableModel();
+      for (int i = 0; i < folds.size(); ++i)
+      {
+        const QModelIndex mi = qaim->index(i, 0);
+        m_Controls.foldBox->setCheckState(mi, Qt::Checked);
+      }
       m_Controls.previewButton->setEnabled(true);
     }
   }

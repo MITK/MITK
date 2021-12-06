@@ -261,6 +261,13 @@ void QmitknnUNetToolGUI::ProcessEnsembleModelsParams(mitk::nnUNetTool::Pointer t
     ppDirFolderName << "__";
     QString planId = layout->plannerBox->currentText();
     ppDirFolderName << planId;
+
+    if (!IsModelExists(modelName, taskName, QString(trainer + "__" + planId)))
+    {
+      std::string errorMsg = "The configuration " + modelName.toStdString() +
+                             " you have selected doesn't exist. Check your Results Folder again.";
+      throw std::runtime_error(errorMsg);
+    }
     std::vector<std::string> testfold; // empty vector to consider all folds for inferencing.
     mitk::ModelParams modelObject = MapToRequest(modelName, taskName, trainer, planId, testfold);
     requestQ.push_back(modelObject);
@@ -306,4 +313,16 @@ void QmitknnUNetToolGUI::ProcessModelParams(mitk::nnUNetTool::Pointer tool)
   requestQ.push_back(modelObject);
   tool->m_ParamQ.clear();
   tool->m_ParamQ = requestQ;
+}
+
+bool QmitknnUNetToolGUI::IsModelExists(const QString &modelName, const QString &taskName, const QString &trainerPlanner)
+{
+  QString modelSearchPath =
+    QDir::cleanPath(m_ParentFolder->getResultsFolder() + QDir::separator() + "nnUNet" + QDir::separator() + modelName +
+                    QDir::separator() + taskName + QDir::separator() + trainerPlanner);
+  if (QDir(modelSearchPath).exists())
+  {
+    return true;
+  }
+  return false;
 }

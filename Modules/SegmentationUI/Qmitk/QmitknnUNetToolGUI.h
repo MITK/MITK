@@ -145,6 +145,12 @@ private:
   void AutoParsePythonPaths();
 
   /**
+   * @brief Check if pretrained model sub folder inside RESULTS FOLDER exist.
+   * 
+   */
+  bool IsModelExists(const QString&, const QString&, const QString&);
+
+  /**
    * @brief Clears all combo boxes
    * Any new combo box added in the future can be featured here for clearance.
    *

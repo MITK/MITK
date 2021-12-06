@@ -107,12 +107,6 @@ protected slots:
    */
   void OnRefreshPresssed();
 
-signals:
-  /**
-   * @brief signal for starting the segmentation which is caught by a worker thread.
-   */
-  void Operate(mitk::nnUNetTool *);
-
 protected:
   QmitknnUNetToolGUI();
   ~QmitknnUNetToolGUI() = default;

@@ -144,9 +144,6 @@ void mitk::LabelSet::AddLabel(mitk::Label *label)
 
 void mitk::LabelSet::AddLabel(const std::string &name, const mitk::Color &color)
 {
-  if (m_LabelContainer.size() > 255)
-    return;
-
   mitk::Label::Pointer newLabel = mitk::Label::New();
   newLabel->SetName(name);
   newLabel->SetColor(color);

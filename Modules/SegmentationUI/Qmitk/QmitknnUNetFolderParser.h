@@ -18,6 +18,10 @@ found in the LICENSE file.s
 #include <QString>
 #include <vector>
 
+/**
+ * @brief Struct to store each (Folder) Node of the hierarchy tree structure.
+ * 
+ */
 struct FolderNode
 {
   QString name;
@@ -25,6 +29,12 @@ struct FolderNode
   std::vector<std::shared_ptr<FolderNode>> subFolders;
 };
 
+/**
+ * @brief Class to store and retreive folder hierarchy information 
+ * of RESULTS_FOLDER. Only Root node is explicitly stored in m_RootNode.
+ * No. of sub levels in the hierachry is defined in the LEVEL constant.
+ * 
+ */
 class MITKSEGMENTATIONUI_EXPORT QmitknnUNetFolderParser
 {
 public:
@@ -61,7 +71,7 @@ public:
    * type can be any of stl or Qt containers which supports push_back call.
    * 
    * @tparam T 
-   * @return T 
+   * @return T (any of stl or Qt containers which supports push_back call)
    */
   template <typename T>
   T getModelNames()
@@ -75,7 +85,8 @@ public:
    * type can be any of stl or Qt containers which supports push_back call.
    * 
    * @tparam T 
-   * @return T 
+   * @param modelName
+   * @return T (any of stl or Qt containers which supports push_back call)
    */
   template <typename T>
   T getTasksForModel(const QString &modelName)
@@ -90,7 +101,8 @@ public:
    * type can be any of stl or Qt containers which supports push_back call.
    * 
    * @tparam T 
-   * @return T 
+   * @param taskName
+   * @return T (any of stl or Qt containers which supports push_back call)
    */
   template <typename T>
   T getModelsForTask(const QString &taskName)
@@ -113,7 +125,9 @@ public:
    * type can be any of stl or Qt containers which supports push_back call.
    * 
    * @tparam T 
-   * @return T 
+   * @param taskName
+   * @param modelName
+   * @return T (any of stl or Qt containers which supports push_back call)
    */
   template <typename T>
   T getTrainerPlannersForTask(const QString &taskName, const QString &modelName)
@@ -129,7 +143,11 @@ public:
    * type can be any of stl or Qt containers which supports push_back call.
    * 
    * @tparam T 
-   * @return T 
+   * @param trainer
+   * @param planner
+   * @param taskName
+   * @param modelName
+   * @return T (any of stl or Qt containers which supports push_back call)
    */
   template <typename T>
   T getFoldsForTrainerPlanner(const QString &trainer,
@@ -177,7 +195,8 @@ private:
    * type can be any of stl or Qt containers which supports push_back call.
    * 
    * @tparam T 
-   * @return T 
+   * @param std::shared_ptr<FolderNode>
+   * @return T (any of stl or Qt containers which supports push_back call)
    */
   template <typename T>
   T GetSubFolderNamesFromNode(const std::shared_ptr<FolderNode> parent)

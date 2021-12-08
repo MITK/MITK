@@ -14,8 +14,6 @@ found in the LICENSE file.
 
 #include "mitkIOUtil.h"
 #include "mitkProcessExecutor.h"
-#include <cstdlib>
-#include <fstream>
 #include <itksys/SystemTools.hxx>
 #include <usGetModuleContext.h>
 #include <usModule.h>
@@ -182,11 +180,6 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
         std::string outModalFile =
           inDir + IOUtil::GetDirectorySeparator() + token + "_000_000" + std::to_string(i + 1) + ".nii.gz";
         IOUtil::Save(modalImage.GetPointer(), outModalFile);
-        /* std::ifstream src(inModalFile, std::ios::binary);
-        std::ofstream dst(outModalFile, std::ios::binary);
-        dst << src.rdbuf();
-        dst.close();
-        src.close();*/
       }
     }
   }
@@ -251,12 +244,6 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
         args.push_back(fold);
       }
     }
-
-    // args.push_back("--all_in_gpu");
-    // args.push_back(this->GetAllInGPU() ? std::string("True") : std::string("False"));
-
-    // args.push_back("--num_threads_preprocessing");
-    // args.push_back(std::to_string(this->GetPreprocessingThreads()));
 
     args.push_back("--num_threads_nifti_save");
     args.push_back("1"); // fixing to 1

@@ -76,15 +76,7 @@ namespace mitk
 
     itkSetMacro(PostProcessingJsonDirectory, std::string);
     itkGetConstMacro(PostProcessingJsonDirectory, std::string);
-    /*
-    itkSetMacro(UseGPU, bool);
-    itkGetConstMacro(UseGPU, bool);
-    itkBooleanMacro(UseGPU);
 
-    itkSetMacro(AllInGPU, bool);
-    itkGetConstMacro(AllInGPU, bool);
-    itkBooleanMacro(AllInGPU);
-    */
     itkSetMacro(MixedPrecision, bool);
     itkGetConstMacro(MixedPrecision, bool);
     itkBooleanMacro(MixedPrecision);

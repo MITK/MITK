@@ -404,7 +404,9 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
    QString segTools2D = tr("Add Subtract Fill Erase Paint Wipe 'Region Growing' 'Live Wire' '2D Fast Marching'");
    QString segTools3D = tr("Threshold 'UL Threshold' Otsu 'Fast Marching 3D' 'Region Growing 3D' Watershed Picking");
-
+#ifdef __linux__
+   segTools3D.append(" nnUNet"); // plugin not enabled for MacOS / Windows
+#endif
    std::regex extSegTool2DRegEx("SegTool2D$");
    std::regex extSegTool3DRegEx("SegTool3D$");
 

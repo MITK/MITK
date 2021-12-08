@@ -59,6 +59,7 @@
     <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Annotation annote" />
     <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Labeling" />
     <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Tools" />
+    <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="nnUNet" />
 
     <keyword id="org.mitk.views.segmentationutilities.ViewKeyword"  label="Segmentation" />
     <keyword id="org.mitk.views.segmentationutilities.ViewKeyword"  label="Difference" />

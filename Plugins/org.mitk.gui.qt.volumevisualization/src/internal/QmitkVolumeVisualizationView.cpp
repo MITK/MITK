@@ -46,7 +46,6 @@ QmitkVolumeVisualizationView::QmitkVolumeVisualizationView()
 
 void QmitkVolumeVisualizationView::SetFocus()
 {
-  UpdateInterface();
 }
 
 void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)

@@ -245,6 +245,7 @@ void QmitkMeasurementView::CreateQtPartControl(QWidget* parent)
   d->m_FixedParameterBox = new QGroupBox();
   d->m_FixedParameterBox->setCheckable(true);
   d->m_FixedParameterBox->setChecked(false);
+  d->m_FixedParameterBox->setEnabled(false);
   d->m_FixedParameterBox->setTitle("Fixed sized circle/double ellipse");
   d->m_FixedParameterBox->setToolTip("If activated, circles and double ellipses (as rings) figures will always be created with the set parameters as fixed size.");
   d->m_FixedParameterBox->setAlignment(Qt::AlignLeft);
@@ -322,11 +323,13 @@ void QmitkMeasurementView::OnCurrentSelectionChanged(QList<mitk::DataNode::Point
   {
     d->m_SelectedImageNode = nullptr;
     d->m_DrawActionsToolBar->setEnabled(false);
+    d->m_FixedParameterBox->setEnabled(false);
   }
   else
   {
     d->m_SelectedImageNode = nodes.front();
     d->m_DrawActionsToolBar->setEnabled(true);
+    d->m_FixedParameterBox->setEnabled(true);
   }
 }
 

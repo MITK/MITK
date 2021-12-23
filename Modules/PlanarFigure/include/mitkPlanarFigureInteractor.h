@@ -45,6 +45,7 @@ namespace mitk
   itkEventMacro(StartHoverPlanarFigureEvent, PlanarFigureEvent);
   itkEventMacro(EndHoverPlanarFigureEvent, PlanarFigureEvent);
   itkEventMacro(ContextMenuPlanarFigureEvent, PlanarFigureEvent);
+  itkEventMacro(PointMovedPlanarFigureEvent, PlanarFigureEvent);
 
 #pragma GCC visibility pop
 

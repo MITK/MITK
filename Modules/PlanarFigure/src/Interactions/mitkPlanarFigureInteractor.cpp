@@ -142,6 +142,8 @@ void mitk::PlanarFigureInteractor::MoveCurrentPoint(StateMachineAction *, Intera
 
   // Update rendered scene
   RenderingManager::GetInstance()->RequestUpdateAll();
+
+  planarFigure->InvokeEvent(PointMovedPlanarFigureEvent());
 }
 
 void mitk::PlanarFigureInteractor::FinalizeFigure(StateMachineAction *, InteractionEvent *)

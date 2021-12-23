@@ -67,7 +67,8 @@ struct QmitkPlanarFigureData
     : m_EndPlacementObserverTag(0),
       m_SelectObserverTag(0),
       m_StartInteractionObserverTag(0),
-      m_EndInteractionObserverTag(0)
+      m_EndInteractionObserverTag(0),
+      m_DuringInteractionObserverTag(0)
   {
   }
 
@@ -76,6 +77,7 @@ struct QmitkPlanarFigureData
   unsigned int m_SelectObserverTag;
   unsigned int m_StartInteractionObserverTag;
   unsigned int m_EndInteractionObserverTag;
+  unsigned int m_DuringInteractionObserverTag;
 };
 
 struct QmitkMeasurementViewData
@@ -378,10 +380,15 @@ void QmitkMeasurementView::NodeAdded(const mitk::DataNode* node)
     startInteractionCommand->SetCallbackFunction(this, &QmitkMeasurementView::DisableCrosshairNavigation);
     data.m_StartInteractionObserverTag = planarFigure->AddObserver(mitk::StartInteractionPlanarFigureEvent(), startInteractionCommand);
 
-    // add observer for event when interaction with figure starts
+    // add observer for event when interaction with figure ends
     auto endInteractionCommand = SimpleCommandType::New();
     endInteractionCommand->SetCallbackFunction(this, &QmitkMeasurementView::EnableCrosshairNavigation);
     data.m_EndInteractionObserverTag = planarFigure->AddObserver(mitk::EndInteractionPlanarFigureEvent(), endInteractionCommand);
+
+    // add observer for event during interaction when a point is moved
+    auto duringInteractionCommand = SimpleCommandType::New();
+    duringInteractionCommand->SetCallbackFunction(this, &QmitkMeasurementView::UpdateMeasurementText);
+    data.m_DuringInteractionObserverTag = planarFigure->AddObserver(mitk::PointMovedPlanarFigureEvent(), duringInteractionCommand);
 
     // adding to the map of tracked planarfigures
     d->m_DataNodeToPlanarFigureData[nonConstNode] = data;
@@ -412,6 +419,7 @@ void QmitkMeasurementView::NodeRemoved(const mitk::DataNode* node)
     data.m_Figure->RemoveObserver(data.m_SelectObserverTag);
     data.m_Figure->RemoveObserver(data.m_StartInteractionObserverTag);
     data.m_Figure->RemoveObserver(data.m_EndInteractionObserverTag);
+    data.m_Figure->RemoveObserver(data.m_DuringInteractionObserverTag);
 
     isFigureFinished = data.m_Figure->GetPropertyList()->GetBoolProperty("initiallyplaced", isPlaced);
 

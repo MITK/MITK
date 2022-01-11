@@ -1,4 +1,4 @@
-set(qt5_depends Qt5|Widgets+WebEngine)
+set(qt5_depends Qt5|Widgets+WebEngineCore)
 
 if(UNIX AND NOT APPLE)
   set(qt5_depends "${qt5_depends}+X11Extras")

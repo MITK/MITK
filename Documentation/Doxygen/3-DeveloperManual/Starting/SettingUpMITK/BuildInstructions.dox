@@ -39,7 +39,7 @@ For the optional and experimental (!) Python integration, install NumPy and Simp
 
 \code{.unparsed}
 sudo apt install python3-numpy python3-pip
-pip3 install SimpleITK==1.*
+pip3 install SimpleITK
 \endcode
 
 \section BuildInstructions_Qt A note about Qt

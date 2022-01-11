@@ -103,8 +103,6 @@ namespace mitk
 
       if (listElement)
       {
-        MITK_DEBUG << "Deserializing " << *listElement;
-
         unsigned int index(0);
         std::string valueString;
         DATATYPE value;

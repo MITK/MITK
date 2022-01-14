@@ -250,7 +250,7 @@ void QmitkMatchPointRegistrationEvaluator::OnSettingsChanged(mitk::DataNode*)
 void QmitkMatchPointRegistrationEvaluator::OnEvalBtnPushed()
 {
   //reinit view
-  mitk::RenderingManager::GetInstance()->InitializeViews(m_spSelectedTargetNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+  mitk::RenderingManager::GetInstance()->InitializeViews(m_spSelectedTargetNode->GetData()->GetTimeGeometry());
 
   mitk::RegEvaluationObject::Pointer regEval = mitk::RegEvaluationObject::New();
 

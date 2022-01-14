@@ -506,8 +506,8 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
   // initialize images
   if (m_MitkDistanceImage.IsNotNull())
   {
-      mitk::RenderingManager::GetInstance()->InitializeViews(
-          this->m_MitkDistanceImage->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS, true);
+    mitk::RenderingManager::GetInstance()->InitializeViews(
+      this->m_MitkDistanceImage->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
   }
   if(this->m_SurfaceNode.IsNotNull())
   {
@@ -529,7 +529,8 @@ void QmitkToFUtilView::UseToFVisibilitySettings(bool useToF)
     if(RGBImageHasDifferentResolution)
     {
       //update the display geometry by using the RBG image node. Only for renderwindow coronal
-      mitk::RenderingManager::GetInstance()->InitializeView( renderWindowPart->GetQmitkRenderWindow("coronal")->renderWindow(), this->m_RGBImageNode->GetData()->GetGeometry() );
+      mitk::RenderingManager::GetInstance()->InitializeView(renderWindowPart->GetQmitkRenderWindow("coronal")->renderWindow(),
+        this->m_RGBImageNode->GetData()->GetGeometry());
     }
   }
 }

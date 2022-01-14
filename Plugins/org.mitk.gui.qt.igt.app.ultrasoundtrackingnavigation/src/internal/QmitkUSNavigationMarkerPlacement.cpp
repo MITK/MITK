@@ -723,9 +723,7 @@ void QmitkUSNavigationMarkerPlacement::ReinitOnImage()
       mitk::IRenderWindowPart *renderWindowPart = this->GetRenderWindowPart();
       if (renderWindowPart != nullptr && image->GetTimeGeometry()->IsValid())
       {
-        renderWindowPart->GetRenderingManager()->InitializeViews(
-          image->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
-        renderWindowPart->GetRenderingManager()->RequestUpdateAll();
+        renderWindowPart->GetRenderingManager()->InitializeViews(image->GetTimeGeometry());
       }
 
       this->RequestRenderWindowUpdate();

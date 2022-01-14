@@ -20,7 +20,6 @@ found in the LICENSE file.
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateOr.h>
 #include <mitkNodePredicateDataType.h>
-#include <mitkIRenderingManager.h>
 #include <mitkImageGenerator.h>
 
 // Qmitk

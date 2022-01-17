@@ -200,9 +200,7 @@ void QmitkUltrasoundSupport::UpdateImage()
         mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
         if ((renderWindow != nullptr) && (curOutput->GetTimeGeometry()->IsValid()) && (m_Controls->m_ShowImageStream->isChecked()))
         {
-          renderWindow->GetRenderingManager()->InitializeViews(
-            curOutput->GetGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
-          renderWindow->GetRenderingManager()->RequestUpdateAll();
+          renderWindow->GetRenderingManager()->InitializeViews(curOutput->GetGeometry());
         }
         m_CurrentImageWidth = curOutput->GetDimension(0);
         m_CurrentImageHeight = curOutput->GetDimension(1);

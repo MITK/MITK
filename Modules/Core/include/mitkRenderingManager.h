@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKRENDERINGMANAGER_H_HEADER_INCLUDED_C135A197
-#define MITKRENDERINGMANAGER_H_HEADER_INCLUDED_C135A197
+#ifndef MITKRENDERINGMANAGER_H
+#define MITKRENDERINGMANAGER_H
 
 #include <MitkCoreExports.h>
 
@@ -19,11 +19,10 @@ found in the LICENSE file.
 
 #include <itkObject.h>
 #include <itkObjectFactory.h>
-#include <string>
 
-#include "mitkProperties.h"
-#include "mitkPropertyList.h"
-#include "mitkTimeGeometry.h"
+#include <mitkProperties.h>
+#include <mitkPropertyList.h>
+#include <mitkTimeGeometry.h>
 #include <mitkAntiAliasing.h>
 
 class vtkRenderWindow;
@@ -31,7 +30,6 @@ class vtkObject;
 
 namespace mitk
 {
-  class RenderingManager;
   class RenderingManagerFactory;
   class BaseGeometry;
   class SliceNavigationController;
@@ -137,55 +135,123 @@ namespace mitk
      * via the parameter requestType. */
     void ForceImmediateUpdateAll(RequestType type = REQUEST_UPDATE_ALL);
 
-    /** Initializes the windows specified by requestType to the geometry of the
-     * given DataStorage. */
-    // virtual bool InitializeViews( const DataStorage *storage, const DataNode* node = nullptr,
-    //   RequestType type = REQUEST_UPDATE_ALL, bool preserveRoughOrientationInWorldSpace = false );
+    /**
+    * @brief Initialize the render windows by the aggregated geometry of all objects that are held in
+    *        the data storage.
+    *
+    * @param dataStorage       The data storage from which the bounding object can be retrieved
+    */
+    virtual void InitializeViewsByBoundingObjects(const DataStorage* dataStorage);
 
-    /** Initializes the windows specified by requestType to the given
-     * geometry. PLATFORM SPECIFIC. TODO: HOW IS THIS PLATFORM SPECIFIC?
-     * Throws an exception if bounding box has 0 extent due to exceeding
-     * double precision range. */
+    /**
+    * @brief Initialize the render windows specified by "type" to the given geometry.
+    *
+    * Throws an exception if bounding box has 0 extent due to exceeding double precision range.
+    *
+    * @param geometry              The geometry to be used to initialize / update a
+    *                              render window's time and slice navigation controller
+    * @param type                  The type of update request:
+    *                                - REQUEST_UPDATE_ALL will initialize / update the
+    *                                    time and slice navigation controller of all retrieved render windows
+    *                                - REQUEST_UPDATE_2DWINDOWS will only initialize / update the
+    *                                    time and slice navigation controller of 2D render windows
+    *                                - REQUEST_UPDATE_3DWINDOWS will only initialize / update the
+    *                                    time and slice navigation controller of 3D render windows
+    * @param resetCamera           If this parameter is set to true, the camera controller will be
+    *                              set / fit to the center of the rendered image. If set to false, only the
+    *                              the slice navigation controller is reset to the geometry without changing
+    *                              the camera view / position.
+    */
     virtual bool InitializeViews(const BaseGeometry *geometry,
                                  RequestType type = REQUEST_UPDATE_ALL,
                                  bool resetCamera = true);
+
+    /**
+    * @brief Initialize the render windows specified by "type" to the given geometry.
+    *
+    * Throws an exception if bounding box has 0 extent due to exceeding double precision range.
+    *
+    * @param geometry              The geometry to be used to initialize / update a
+    *                              render window's time- and slice navigation controller
+    * @param type                  The type of update request:
+    *                                - REQUEST_UPDATE_ALL will initialize / update the
+    *                                    time- and slice navigation controller of all retrieved render windows
+    *                                - REQUEST_UPDATE_2DWINDOWS will only initialize / update the
+    *                                    time- and slice navigation controller of 2D render windows
+    *                                - REQUEST_UPDATE_3DWINDOWS will only initialize / update the
+    *                                    time- and slice navigation controller of 3D render windows
+    * @param resetCamera           If this parameter is set to true, the camera controller will be
+    *                              set / fit to the center of the rendered image. If set to false, only the
+    *                              the slice navigation controller is reset to the geometry without changing
+    *                              the camera view / position.
+    */
     virtual bool InitializeViews(const TimeGeometry *geometry,
                                  RequestType type = REQUEST_UPDATE_ALL,
                                  bool resetCamera = true);
 
-    /** Initializes the windows to the default viewing direction
-     * (geomtry information is NOT changed). PLATFORM SPECIFIC. */
+    /**
+    * @brief Initialize the render windows specified by "type" to the default viewing direction
+    *        without updating the geometry information.
+    *
+    * @param type                  The type of update request:
+    *                                - REQUEST_UPDATE_ALL will initialize the
+    *                                    slice navigation controller of all retrieved render windows
+    *                                - REQUEST_UPDATE_2DWINDOWS will only initialize the
+    *                                    slice navigation controller of 2D render windows
+    *                                - REQUEST_UPDATE_3DWINDOWS will only initialize the
+    *                                    slice navigation controller of 3D render windows
+    */
     virtual bool InitializeViews(RequestType type = REQUEST_UPDATE_ALL);
 
-    /** Initializes the specified window to the geometry of the given
-     * DataNode. Set "initializeGlobalTimeSNC" to true in order to use this
-     * geometry as global TimeGeometry. PLATFORM SPECIFIC. */
-    // virtual bool InitializeView( vtkRenderWindow *renderWindow, const DataStorage* ds, const DataNode* node = nullptr,
-    // bool initializeGlobalTimeSNC = false );
-
-    /** Initializes the specified window to the given geometry. Set
-     * "initializeGlobalTimeSNC" to true in order to use this geometry as
-     * global TimeGeometry. PLATFORM SPECIFIC. */
+    /**
+    * @brief Initialize the specified render window to the given geometry.
+    *
+    * Throws an exception if bounding box has 0 extent due to exceeding double precision range.
+    *
+    * @param renderWindow          The specifid render window to update
+    * @param geometry              The geometry to be used to initialize / update the
+    *                              render window's time- and slice navigation controller
+    * @param initializeGlobalTime  If this parameter is set to true, the time navigation controller will be
+    *                              initialized / updated with the given geometry. If set to false, the geometry
+    *                              of the time navigation controller is not updated.
+    * @param resetCamera           If this parameter is set to true, the camera controller will be
+    *                              set / fit to the center of the rendered image. If set to false, only the
+    *                              the slice navigation controller is reset to the geometry without changing
+    *                              the camera view / position.
+    */
     virtual bool InitializeView(vtkRenderWindow *renderWindow,
                                 const BaseGeometry *geometry,
-                                bool initializeGlobalTimeSNC = false,
+                                bool initializeGlobalTime = true,
                                 bool resetCamera = true);
-    virtual bool InitializeView(vtkRenderWindow *renderWindow,
-                                const TimeGeometry *geometry,
-                                bool initializeGlobalTimeSNC = false,
-                                bool resetCamera = true);
-
-    /** Initializes the specified window to the default viewing direction
-     * (geomtry information is NOT changed). PLATFORM SPECIFIC. */
-    virtual bool InitializeView(vtkRenderWindow *renderWindow);
 
     /**
-     * @brief Initializes the renderwindows by the aggregated geometry of
-     *        all objects that are held in the data storage.
-     * This is basically a global reinit
-     * @param dataStorage The data storage from which the bounding object can be retrieved
-     */
-    virtual void InitializeViewsByBoundingObjects(const DataStorage *dataStorage);
+    * @brief Initialize the specified render window to the given geometry.
+    *
+    * Throws an exception if bounding box has 0 extent due to exceeding double precision range.
+    *
+    * @param renderWindow          The specifid render window to update
+    * @param geometry              The geometry to be used to initialize / update the
+    *                              render window's time- and slice navigation controller
+    * @param initializeGlobalTime  If this parameter is set to true, the time navigation controller will be
+    *                              initialized / updated with the given geometry. If set to false, the geometry
+    *                              of the time navigation controller is not updated.
+    * @param resetCamera           If this parameter is set to true, the camera controller will be
+    *                              set / fit to the center of the rendered image. If set to false, only the
+    *                              the slice navigation controller is reset to the geometry without changing
+    *                              the camera view / position.
+    */
+    virtual bool InitializeView(vtkRenderWindow *renderWindow,
+                                const TimeGeometry *geometry,
+                                bool initializeGlobalTime = true,
+                                bool resetCamera = true);
+
+    /**
+    * @brief Initialize the specified render window to the default viewing direction
+    *        without updating the geometry information.
+    *
+    * @param renderWindow          The specifid render window to update
+    */
+    virtual bool InitializeView(vtkRenderWindow *renderWindow);
 
     /** Gets the (global) SliceNavigationController responsible for
      * time-slicing. */
@@ -258,42 +324,38 @@ namespace mitk
     void SetProperty(const char *propertyKey, BaseProperty *propertyValue);
 
     /**
-    * \brief Setter / Getter for internal DataStorage
+    * \brief Setter for internal DataStorage
     *
-    * Sets / returns the mitk::DataStorage that is used internally. This instance holds all mitk::DataNodes that are
+    * Sets the DataStorage that is used internally. This instance holds all DataNodes that are
     * rendered by the registered BaseRenderers.
     *
     * If this DataStorage is changed at runtime by calling SetDataStorage(),
     * all currently registered BaseRenderers are automatically given the correct instance.
     * When a new BaseRenderer is added, it is automatically initialized with the currently active DataStorage.
     */
-    void SetDataStorage(mitk::DataStorage *storage);
+    void SetDataStorage(DataStorage *storage);
 
     /**
-    * \brief Setter / Getter for internal DataStorage
+    * \brief Getter for internal DataStorage
     *
-    * Sets / returns the mitk::DataStorage that is used internally. This instance holds all mitk::DataNodes that are
+    * Returns the DataStorage that is used internally. This instance holds all DataNodes that are
     * rendered by the registered BaseRenderers.
-    *
-    * If this DataStorage is changed at runtime by calling SetDataStorage(),
-    * all currently registered BaseRenderers are automatically given the correct instance.
-    * When a new BaseRenderer is added, it is automatically initialized with the currently active DataStorage.
     */
-    mitk::DataStorage *GetDataStorage();
+    itkGetMacro(DataStorage, DataStorage*);
+    itkGetConstMacro(DataStorage, DataStorage*);
 
     /**
      * @brief Sets a flag to the given renderwindow to indicated that it has the focus e.g. has been clicked recently.
      * @param focusWindow
      */
     void SetRenderWindowFocus(vtkRenderWindow *focusWindow);
-
     itkGetMacro(FocusedRenderWindow, vtkRenderWindow *);
 
     itkSetMacro(ConstrainedPanningZooming, bool);
-
-    itkGetMacro(AntiAliasing, AntiAliasing);
+    itkGetConstMacro(ConstrainedPanningZooming, bool);
 
     void SetAntiAliasing(AntiAliasing antiAliasing);
+    itkGetConstMacro(AntiAliasing, AntiAliasing);
 
   protected:
     enum
@@ -362,11 +424,39 @@ namespace mitk
     bool m_ConstrainedPanningZooming;
 
   private:
-    void InternalViewInitialization(mitk::BaseRenderer *baseRenderer,
-                                    const mitk::TimeGeometry *geometry,
+
+    /**
+    * @brief Initialize the specified renderer to the given geometry.
+    *
+    * @param baseRenderer            The specifid renderer to update
+    * @param geometry                The geometry to be used to initialize / update the
+    *                                render window's slice navigation controller
+    * @param boundingBoxInitialized  If this parameter is set to true, the slice navigation controller will be
+    *                                initialized / updated with the given geometry. If set to false, the geometry
+    *                                of the slice navigation controller is not updated.
+    * @param mapperID                The mapper ID is used to define if the given renderer is a 2D or a 3D renderer.
+    *                                In case of a 2D renderer and if "boundingBoxInitialized" is set to true (slice
+    *                                navigation controller will be updated with a new geometry), the position of the
+    *                                slice navigation controller is set to the center slice.
+    * @param resetCamera             If this parameter is set to true, the camera controller will be
+    *                                set / fit to the center of the rendered image. If set to false, only the
+    *                                the slice navigation controller is reset to the geometry without changing
+    *                                the camera view / position.
+    */
+    void InternalViewInitialization(BaseRenderer *baseRenderer,
+                                    const TimeGeometry *geometry,
                                     bool boundingBoxInitialized,
                                     int mapperID,
                                     bool resetCamera);
+
+    /**
+    * @brief Extend the bounding box of the given geometry to make sure the bounding box has an extent bigger than
+    *        zero in any direction.
+    *
+    * @param originalGeometry        The original geometry to be extended
+    * @param modifiedGeometry        The modified geometry where the new bounds (extended bounding box) are used / set
+    */
+    bool ExtendGeometryForBoundingBox(const TimeGeometry* originalGeometry, TimeGeometry::Pointer& modifiedGeometry);
 
     vtkRenderWindow *m_FocusedRenderWindow;
     AntiAliasing m_AntiAliasing;
@@ -402,4 +492,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKRenderingManager_H_HEADER_INCLUDED_C135A197 */
+#endif // MITKRENDERINGMANAGER_H

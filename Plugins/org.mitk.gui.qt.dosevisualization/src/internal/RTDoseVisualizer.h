@@ -36,7 +36,6 @@ found in the LICENSE file.
 
 #include <vtkContourFilter.h>
 
-#include <mitkIRenderingManager.h>
 #include <mitkIRenderWindowPart.h>
 
 /*forward declarations*/

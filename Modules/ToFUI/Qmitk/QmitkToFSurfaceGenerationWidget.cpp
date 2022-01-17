@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <QString>
 #include <mitkSmartPointerProperty.h>
 #include <mitkRenderingManager.h>
+
 #include <vtkCamera.h>
 
 const std::string QmitkToFSurfaceGenerationWidget::VIEW_ID = "org.mitk.views.qmitktofsurfacegenerationwidget";
@@ -246,8 +247,7 @@ void QmitkToFSurfaceGenerationWidget::OnCompute3DDataCheckboxChecked(bool checke
     this->OnRepresentationChanged(m_Controls->m_RepresentationCombobox->currentIndex());
 
     //we need to initialize (reinit) the surface, to make it fit into the renderwindow
-    mitk::RenderingManager::GetInstance()->InitializeViews(
-      this->m_Surface->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS, true);
+    mitk::RenderingManager::GetInstance()->InitializeViews(this->m_Surface->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
 
     // correctly place the vtk camera for appropriate surface rendering
     //1m distance to camera should be a nice default value for most cameras

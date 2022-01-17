@@ -722,7 +722,6 @@ namespace mitk
     }
   }
 
-  DataStorage *RenderingManager::GetDataStorage() { return m_DataStorage; }
   void RenderingManager::SetRenderWindowFocus(vtkRenderWindow *focusWindow)
   {
     if (focusWindow != m_FocusedRenderWindow)

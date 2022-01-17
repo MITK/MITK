@@ -340,27 +340,22 @@ namespace mitk
     *
     * Returns the DataStorage that is used internally. This instance holds all DataNodes that are
     * rendered by the registered BaseRenderers.
-    *
-    * If this DataStorage is changed at runtime by calling SetDataStorage(),
-    * all currently registered BaseRenderers are automatically given the correct instance.
-    * When a new BaseRenderer is added, it is automatically initialized with the currently active DataStorage.
     */
-    DataStorage *GetDataStorage();
+    itkGetMacro(DataStorage, DataStorage*);
+    itkGetConstMacro(DataStorage, DataStorage*);
 
     /**
      * @brief Sets a flag to the given renderwindow to indicated that it has the focus e.g. has been clicked recently.
      * @param focusWindow
      */
     void SetRenderWindowFocus(vtkRenderWindow *focusWindow);
-
     itkGetMacro(FocusedRenderWindow, vtkRenderWindow *);
 
     itkSetMacro(ConstrainedPanningZooming, bool);
-    itkGetMacro(ConstrainedPanningZooming, bool);
-
-    itkGetMacro(AntiAliasing, AntiAliasing);
+    itkGetConstMacro(ConstrainedPanningZooming, bool);
 
     void SetAntiAliasing(AntiAliasing antiAliasing);
+    itkGetConstMacro(AntiAliasing, AntiAliasing);
 
   protected:
     enum

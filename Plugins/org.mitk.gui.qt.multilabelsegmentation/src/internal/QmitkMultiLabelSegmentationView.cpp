@@ -1142,14 +1142,6 @@ void QmitkMultiLabelSegmentationView::ValidateSelectionInput()
   }
 
   mitk::IRenderWindowPart* renderWindowPart = this->GetRenderWindowPart();
-  auto referenceNodeIsVisible = renderWindowPart &&
-    referenceNode->IsVisible(renderWindowPart->GetQmitkRenderWindow("axial")->GetRenderer());
-  if (!referenceNodeIsVisible)
-  {
-    this->UpdateWarningLabel(tr("The selected reference image is currently not visible!"));
-    return;
-  }
-
   auto workingNodeIsVisible = renderWindowPart &&
     workingNode->IsVisible(renderWindowPart->GetQmitkRenderWindow("axial")->GetRenderer());
   if (!workingNodeIsVisible)

@@ -790,18 +790,6 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget *parent)
   connect(m_Controls.m_btLockExterior, &QToolButton::toggled, this, &QmitkMultiLabelSegmentationView::OnLockExteriorToggled);
   connect(m_Controls.m_cbActiveLayer, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &QmitkMultiLabelSegmentationView::OnChangeLayer);
 
-  m_Controls.m_btAddLayer->setEnabled(false);
-  m_Controls.m_btDeleteLayer->setEnabled(false);
-  m_Controls.m_btNextLayer->setEnabled(false);
-  m_Controls.m_btPreviousLayer->setEnabled(false);
-  m_Controls.m_cbActiveLayer->setEnabled(false);
-
-  m_Controls.m_pbNewLabel->setEnabled(false);
-  m_Controls.m_btLockExterior->setEnabled(false);
-  m_Controls.m_tbSavePreset->setEnabled(false);
-  m_Controls.m_tbLoadPreset->setEnabled(false);
-  m_Controls.m_pbShowLabelTable->setEnabled(false);
-
   auto command = itk::SimpleMemberCommand<QmitkMultiLabelSegmentationView>::New();
   command->SetCallbackFunction(this, &QmitkMultiLabelSegmentationView::ValidateSelectionInput);
   m_RenderingManagerObserverTag =
@@ -1047,22 +1035,15 @@ void QmitkMultiLabelSegmentationView::UpdateGUI()
   bool hasWorkingNode = workingNode != nullptr;
 
   m_Controls.m_pbNewSegmentationSession->setEnabled(false);
-  m_Controls.m_pbNewLabel->setEnabled(false);
   m_Controls.m_gbInterpolation->setEnabled(false);
   m_Controls.m_SliceBasedInterpolatorWidget->setEnabled(false);
   m_Controls.m_SurfaceBasedInterpolatorWidget->setEnabled(false);
-  m_Controls.m_LabelSetWidget->setEnabled(false);
-  m_Controls.m_btAddLayer->setEnabled(false);
   m_Controls.m_btDeleteLayer->setEnabled(false);
   m_Controls.m_cbActiveLayer->setEnabled(false);
   m_Controls.m_btPreviousLayer->setEnabled(false);
   m_Controls.m_btNextLayer->setEnabled(false);
   m_Controls.m_btLockExterior->setChecked(false);
-  m_Controls.m_btLockExterior->setEnabled(false);
-  m_Controls.m_tbSavePreset->setEnabled(false);
-  m_Controls.m_tbLoadPreset->setEnabled(false);
   m_Controls.m_pbShowLabelTable->setChecked(false);
-  m_Controls.m_pbShowLabelTable->setEnabled(false);
 
   if (hasReferenceNode)
   {
@@ -1071,14 +1052,6 @@ void QmitkMultiLabelSegmentationView::UpdateGUI()
 
   if (hasWorkingNode)
   {
-    m_Controls.m_pbNewLabel->setEnabled(true);
-    m_Controls.m_btLockExterior->setEnabled(true);
-    m_Controls.m_tbSavePreset->setEnabled(true);
-    m_Controls.m_tbLoadPreset->setEnabled(true);
-    m_Controls.m_pbShowLabelTable->setEnabled(true);
-    m_Controls.m_LabelSetWidget->setEnabled(true);
-    m_Controls.m_btAddLayer->setEnabled(true);
-
     m_Controls.m_cbActiveLayer->blockSignals(true);
     m_Controls.m_cbActiveLayer->clear();
 
@@ -1095,8 +1068,8 @@ void QmitkMultiLabelSegmentationView::UpdateGUI()
       m_Controls.m_cbActiveLayer->setCurrentIndex(activeLayer);
       m_Controls.m_cbActiveLayer->blockSignals(false);
 
-      m_Controls.m_cbActiveLayer->setEnabled(numberOfLayers > 1);
       m_Controls.m_btDeleteLayer->setEnabled(numberOfLayers > 1);
+      m_Controls.m_cbActiveLayer->setEnabled(numberOfLayers > 1);
       m_Controls.m_btPreviousLayer->setEnabled(activeLayer > 0);
       m_Controls.m_btNextLayer->setEnabled(activeLayer != numberOfLayers - 1);
 
@@ -1123,6 +1096,9 @@ void QmitkMultiLabelSegmentationView::ValidateSelectionInput()
 {
   this->UpdateWarningLabel("");
 
+  m_Controls.groupBox_Layer->setEnabled(false);
+  m_Controls.groupBox_Labels->setEnabled(false);
+  m_Controls.m_LabelSetWidget->setEnabled(false);
   // the argument is actually not used
   // enable status depends on the tool manager selection
   m_Controls.m_ManualToolSelectionBox2D->setEnabled(false);
@@ -1164,6 +1140,9 @@ void QmitkMultiLabelSegmentationView::ValidateSelectionInput()
     {
       m_ToolManager->SetReferenceData(referenceNode);
       m_ToolManager->SetWorkingData(workingNode);
+      m_Controls.groupBox_Layer->setEnabled(true);
+      m_Controls.groupBox_Labels->setEnabled(true);
+      m_Controls.m_LabelSetWidget->setEnabled(true);
       m_Controls.m_ManualToolSelectionBox2D->setEnabled(true);
       m_Controls.m_ManualToolSelectionBox3D->setEnabled(true);
       return;

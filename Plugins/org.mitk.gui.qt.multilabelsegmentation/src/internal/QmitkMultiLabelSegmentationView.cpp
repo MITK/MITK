@@ -157,6 +157,14 @@ void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(QList<mitk:
 {
   m_ToolManager->ActivateTool(-1);
 
+  // Remove observer if one was registered
+  auto finding = m_WorkingDataObserverTags.find(m_WorkingNode);
+  if (finding != m_WorkingDataObserverTags.end())
+  {
+    m_WorkingNode->GetProperty("visible")->RemoveObserver(m_WorkingDataObserverTags[m_WorkingNode]);
+    m_WorkingDataObserverTags.erase(m_WorkingNode);
+  }
+
   if (nodes.empty())
   {
     m_WorkingNode = nullptr;
@@ -202,6 +210,11 @@ void QmitkMultiLabelSegmentationView::OnSegmentationSelectionChanged(QList<mitk:
 
     this->OnEstablishLabelSetConnection();
     m_Controls.m_LabelSetWidget->ResetAllTableWidgetItems();
+
+    auto command = itk::SimpleMemberCommand<QmitkMultiLabelSegmentationView>::New();
+    command->SetCallbackFunction(this, &QmitkMultiLabelSegmentationView::ValidateSelectionInput);
+    m_WorkingDataObserverTags.insert(std::pair<mitk::DataNode *, unsigned long>(m_WorkingNode,
+      m_WorkingNode->GetProperty("visible")->AddObserver(itk::ModifiedEvent(), command)));
 
     this->InitializeRenderWindows(referenceImage->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, false);
   }
@@ -313,8 +326,6 @@ void QmitkMultiLabelSegmentationView::OnNewLabel()
 
   UpdateGUI();
   m_Controls.m_LabelSetWidget->ResetAllTableWidgetItems();
-
-  this->InitializeRenderWindows(referenceImage->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, false);
 }
 
 void QmitkMultiLabelSegmentationView::OnSavePreset()
@@ -791,17 +802,6 @@ void QmitkMultiLabelSegmentationView::CreateQtPartControl(QWidget *parent)
   m_Controls.m_tbLoadPreset->setEnabled(false);
   m_Controls.m_pbShowLabelTable->setEnabled(false);
 
-  // set callback function for already existing segmentation nodes
-  mitk::DataStorage::SetOfObjects::ConstPointer allSegmentations = GetDataStorage()->GetSubset(m_SegmentationPredicate);
-  for (mitk::DataStorage::SetOfObjects::const_iterator iter = allSegmentations->begin(); iter != allSegmentations->end(); ++iter)
-  {
-    mitk::DataNode* node = *iter;
-    auto command = itk::SimpleMemberCommand<QmitkMultiLabelSegmentationView>::New();
-    command->SetCallbackFunction(this, &QmitkMultiLabelSegmentationView::ValidateSelectionInput);
-    m_WorkingDataObserverTags.insert(std::pair<mitk::DataNode *, unsigned long>(
-      node, node->GetProperty("visible")->AddObserver(itk::ModifiedEvent(), command)));
-  }
-
   auto command = itk::SimpleMemberCommand<QmitkMultiLabelSegmentationView>::New();
   command->SetCallbackFunction(this, &QmitkMultiLabelSegmentationView::ValidateSelectionInput);
   m_RenderingManagerObserverTag =
@@ -863,17 +863,10 @@ void QmitkMultiLabelSegmentationView::OnPreferencesChanged(const berry::IBerryPr
 
 void QmitkMultiLabelSegmentationView::NodeAdded(const mitk::DataNode* node)
 {
-  if (!m_SegmentationPredicate->CheckNode(node))
+  if (m_SegmentationPredicate->CheckNode(node))
   {
-    return;
+    this->ApplyDisplayOptions(const_cast<mitk::DataNode*>(node));
   }
-
-  auto command = itk::SimpleMemberCommand<QmitkMultiLabelSegmentationView>::New();
-  command->SetCallbackFunction(this, &QmitkMultiLabelSegmentationView::ValidateSelectionInput);
-  m_WorkingDataObserverTags.insert(std::pair<mitk::DataNode *, unsigned long>(
-    const_cast<mitk::DataNode *>(node), node->GetProperty("visible")->AddObserver(itk::ModifiedEvent(), command)));
-
-  ApplyDisplayOptions(const_cast<mitk::DataNode*>(node));
 }
 
 void QmitkMultiLabelSegmentationView::NodeRemoved(const mitk::DataNode* node)
@@ -901,15 +894,6 @@ void QmitkMultiLabelSegmentationView::NodeRemoved(const mitk::DataNode* node)
 
     context->ungetService(ppmRef);
     service = nullptr;
-  }
-
-  mitk::DataNode* tempNode = const_cast<mitk::DataNode*>(node);
-  //Remove observer if one was registered
-  auto finding = m_WorkingDataObserverTags.find(tempNode);
-  if (finding != m_WorkingDataObserverTags.end())
-  {
-    node->GetProperty("visible")->RemoveObserver(m_WorkingDataObserverTags[tempNode]);
-    m_WorkingDataObserverTags.erase(tempNode);
   }
 }
 

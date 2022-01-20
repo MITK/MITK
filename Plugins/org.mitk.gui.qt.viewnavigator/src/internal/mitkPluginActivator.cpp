@@ -11,11 +11,11 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkPluginActivator.h"
-#include "ViewNavigatorView.h"
+#include "QmitkViewNavigatorView.h"
 
 void mitk::PluginActivator::start(ctkPluginContext* context)
 {
-  BERRY_REGISTER_EXTENSION_CLASS(ViewNavigatorView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkViewNavigatorView, context)
 }
 
 void mitk::PluginActivator::stop(ctkPluginContext* context)

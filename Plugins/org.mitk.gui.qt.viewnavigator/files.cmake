@@ -7,7 +7,7 @@ set(SRC_CPP_FILES
 
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
-  ViewNavigatorView.cpp
+  QmitkViewNavigatorView.cpp
 )
 
 set(UI_FILES
@@ -16,8 +16,7 @@ set(UI_FILES
 
 set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
-  src/internal/ViewNavigatorView.h
-
+  src/internal/QmitkViewNavigatorView.h
   src/QmitkViewNavigatorWidget.h
 )
 

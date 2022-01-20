@@ -222,7 +222,7 @@ public:
                             const berry::IPerspectiveDescriptor::Pointer&,
                             const berry::IWorkbenchPartReference::Pointer& partRef, const std::string& changeId)
     {
-        if (changeId=="viewHide" && partRef->GetId()=="org.mitk.views.viewnavigatorview")
+        if (changeId=="viewHide" && partRef->GetId()=="org.mitk.views.viewnavigator")
             berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->RemovePerspectiveListener(parentWidget->m_PerspectiveListener.data());
         else
             parentWidget->UpdateTreeList(nullptr, partRef.GetPointer(), changeId);
@@ -453,7 +453,7 @@ bool QmitkViewNavigatorWidget::FillTreeList()
     viewExcludeList.append(QString("org.blueberry.ui.internal.introview"));
     viewExcludeList.append(QString("org.mitk.views.controlvisualizationpropertiesview"));
     viewExcludeList.append(QString("org.mitk.views.modules"));
-    viewExcludeList.append(QString("org.mitk.views.viewnavigatorview"));
+    viewExcludeList.append(QString("org.mitk.views.viewnavigator"));
 
     QStandardItem* viewRootItem = new QStandardItem(QIcon(),"Views");
     viewRootItem->setFont(QFont("", 12, QFont::Normal));

@@ -10,20 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-
-#include "org_mitk_gui_qt_viewnavigator_Activator.h"
+#include "mitkPluginActivator.h"
 #include "ViewNavigatorView.h"
 
-namespace mitk {
-
-void org_mitk_gui_qt_viewnavigator_Activator::start(ctkPluginContext* context)
+void mitk::PluginActivator::start(ctkPluginContext* context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(ViewNavigatorView, context)
 }
 
-void org_mitk_gui_qt_viewnavigator_Activator::stop(ctkPluginContext* context)
+void mitk::PluginActivator::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
-}
-
 }

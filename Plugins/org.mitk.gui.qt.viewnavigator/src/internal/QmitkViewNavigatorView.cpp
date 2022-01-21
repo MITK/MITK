@@ -22,7 +22,7 @@ const std::string QmitkViewNavigatorView::VIEW_ID = "org.mitk.views.viewnavigato
 
 void QmitkViewNavigatorView::SetFocus()
 {
-  m_ViewNavigatorWidget->setFocus();
+  m_ViewNavigatorWidget->SetFocus();
 }
 
 void QmitkViewNavigatorView::CreateQtPartControl(QWidget* parent)

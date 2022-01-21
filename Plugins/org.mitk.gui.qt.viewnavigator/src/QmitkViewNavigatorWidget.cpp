@@ -10,8 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-//Qmitk headers
-#include "QmitkViewNavigatorWidget.h"
+// View navigator plugin
+#include <QmitkViewNavigatorWidget.h>
+#include <QmitkPerspectiveItem.h>
+#include <QmitkViewItem.h>
 
 // Blueberry
 #include <berryISelectionService.h>
@@ -94,7 +96,6 @@ bool ClassFilterProxyModel::filterAcceptsRow(int sourceRow,
 
 bool ClassFilterProxyModel::displayElement(const QModelIndex index) const
 {
-    bool result = false;
     QString type = sourceModel()->data(index, Qt::DisplayRole).toString();
     QStandardItem * item = dynamic_cast<QStandardItemModel*>(sourceModel())->itemFromIndex(index);
 
@@ -102,42 +103,40 @@ bool ClassFilterProxyModel::displayElement(const QModelIndex index) const
     {
         return true;
     }
+
+    QmitkViewItem* viewItem = dynamic_cast<QmitkViewItem*>(item);
+    if (nullptr != viewItem)
     {
-        mitk::QtViewItem* viewItem = dynamic_cast<mitk::QtViewItem*>(item);
-        if (viewItem)
+        for (int i = 0; i < viewItem->m_Tags.size(); ++i)
         {
-            for (int i = 0; i < viewItem->m_Tags.size(); ++i)
-            {
-                if (viewItem->m_Tags[i].contains(filterRegExp()))
-                {
-                    return true;
-                }
-            }
-            if (viewItem->m_Description.contains(filterRegExp()))
+            if (viewItem->m_Tags[i].contains(filterRegExp()))
             {
                 return true;
             }
         }
-    }
-    {
-        mitk::QtPerspectiveItem* viewItem = dynamic_cast<mitk::QtPerspectiveItem*>(item);
-        if (viewItem)
+        if (viewItem->m_Description.contains(filterRegExp()))
         {
-            for (int i = 0; i < viewItem->m_Tags.size(); ++i)
-            {
-                if (viewItem->m_Tags[i].contains(filterRegExp()))
-                {
-                    return true;
-                }
-            }
-            if (viewItem->m_Description.contains(filterRegExp()))
-            {
-                return true;
-            }
+            return true;
         }
     }
 
-    return result;
+    QmitkPerspectiveItem* perspectiveItem = dynamic_cast<QmitkPerspectiveItem*>(item);
+    if (nullptr != perspectiveItem)
+    {
+        for (int i = 0; i < perspectiveItem->m_Tags.size(); ++i)
+        {
+            if (perspectiveItem->m_Tags[i].contains(filterRegExp()))
+            {
+                return true;
+            }
+        }
+        if (perspectiveItem->m_Description.contains(filterRegExp()))
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 bool ClassFilterProxyModel::hasToBeDisplayed(const QModelIndex index) const
@@ -314,31 +313,33 @@ void QmitkViewNavigatorWidget::UpdateTreeList(QStandardItem* root, berry::IWorkb
     {
         QStandardItem* item = root->child(i);
         QFont font;
-        if (dynamic_cast<mitk::QtPerspectiveItem*>(item))
+        QmitkPerspectiveItem* perspectiveItem = dynamic_cast<QmitkPerspectiveItem*>(item);
+        if (nullptr != perspectiveItem)
         {
-            mitk::QtPerspectiveItem* pItem = dynamic_cast<mitk::QtPerspectiveItem*>(item);
             berry::IPerspectiveDescriptor::Pointer currentPersp = page->GetPerspective();
 
-            if (currentPersp.IsNotNull() && currentPersp->GetId()==pItem->m_Perspective->GetId())
+            if (currentPersp.IsNotNull() && currentPersp->GetId()==perspectiveItem->m_Perspective->GetId())
                 font.setBold(true);
-            pItem->setFont(font);
+            perspectiveItem->setFont(font);
         }
-        mitk::QtViewItem* vItem = dynamic_cast<mitk::QtViewItem*>(item);
-        if (vItem)
+
+        QmitkViewItem* viewItem = dynamic_cast<QmitkViewItem*>(item);
+        if (nullptr != viewItem)
         {
             QList<berry::IViewPart::Pointer> viewParts(page->GetViews());
             for (int i=0; i<viewParts.size(); i++)
-                if(viewParts[i]->GetPartName()==vItem->m_View->GetLabel())
+                if(viewParts[i]->GetPartName()==viewItem->m_View->GetLabel())
                 {
                     font.setBold(true);
                     break;
                 }
 
-            if( partRef!=nullptr && partRef->GetId()==vItem->m_View->GetId() && changeId=="viewHide")
+            if( partRef!=nullptr && partRef->GetId()==viewItem->m_View->GetId() && changeId=="viewHide")
                 font.setBold(false);
 
-            vItem->setFont(font);
+            viewItem->setFont(font);
         }
+
         UpdateTreeList(item, partRef, changeId);
     }
 }
@@ -394,21 +395,21 @@ bool QmitkViewNavigatorWidget::FillTreeList()
             continue;
 */
         //QIcon* pIcon = static_cast<QIcon*>(p->GetImageDescriptor()->CreateImage());
-        mitk::QtPerspectiveItem* pItem = new mitk::QtPerspectiveItem(p->GetLabel());
-        pItem->m_Perspective = p;
-        pItem->m_Description = p->GetDescription();
+        QmitkPerspectiveItem* perspectiveItem = new QmitkPerspectiveItem(p->GetLabel());
+        perspectiveItem->m_Perspective = p;
+        perspectiveItem->m_Description = p->GetDescription();
         QStringList keylist = p->GetKeywordReferences();
-        pItem->m_Tags = keywordRegistry.GetKeywords(keylist);
-        pItem->setEditable(false);
+        perspectiveItem->m_Tags = keywordRegistry.GetKeywords(keylist);
+        perspectiveItem->setEditable(false);
 
         QFont font; font.setBold(true);
         if (currentPersp.IsNotNull() && currentPersp->GetId()==p->GetId())
-            pItem->setFont(font);
+            perspectiveItem->setFont(font);
 
         QStringList catPath = p->GetCategoryPath();
         if (catPath.isEmpty())
         {
-            perspectiveRootItem->appendRow(pItem);
+            perspectiveRootItem->appendRow(perspectiveItem);
         }
         else
         {
@@ -429,7 +430,7 @@ bool QmitkViewNavigatorWidget::FillTreeList()
                 categoryItems.push_back(categoryItem);
             }
             categoryItem->setEditable(false);
-            categoryItem->appendRow(pItem);
+            categoryItem->appendRow(perspectiveItem);
             categoryItem->setFont(QFont("", 12, QFont::Normal));
         }
     }
@@ -481,25 +482,25 @@ bool QmitkViewNavigatorWidget::FillTreeList()
         QStringList catPath = v->GetCategoryPath();
 
         QIcon icon = v->GetImageDescriptor();
-        mitk::QtViewItem* vItem = new mitk::QtViewItem(icon, v->GetLabel());
-        vItem->m_View = v;
-        vItem->setToolTip(v->GetDescription());
-        vItem->m_Description = v->GetDescription();
+        QmitkViewItem* viewItem = new QmitkViewItem(icon, v->GetLabel());
+        viewItem->m_View = v;
+        viewItem->setToolTip(v->GetDescription());
+        viewItem->m_Description = v->GetDescription();
 
         QStringList keylist = v->GetKeywordReferences();
-        vItem->m_Tags = keywordRegistry.GetKeywords(keylist);
-        vItem->setEditable(false);
+        viewItem->m_Tags = keywordRegistry.GetKeywords(keylist);
+        viewItem->setEditable(false);
 
         for (int i=0; i<viewParts.size(); i++)
             if(viewParts[i]->GetPartName()==v->GetLabel())
             {
                 QFont font; font.setBold(true);
-                vItem->setFont(font);
+                viewItem->setFont(font);
                 break;
             }
 
         if (catPath.empty())
-            noCategoryItem->appendRow(vItem);
+            noCategoryItem->appendRow(viewItem);
         else
         {
             QStandardItem* categoryItem = nullptr;
@@ -517,7 +518,7 @@ bool QmitkViewNavigatorWidget::FillTreeList()
                 categoryItems.push_back(categoryItem);
             }
             categoryItem->setEditable(false);
-            categoryItem->appendRow(vItem);
+            categoryItem->appendRow(viewItem);
             categoryItem->setFont(QFont("", 12, QFont::Normal));
         }
     }
@@ -553,19 +554,24 @@ void QmitkViewNavigatorWidget::ItemClicked(const QModelIndex &index)
 {
     QStandardItem* item = m_TreeModel->itemFromIndex(m_FilterProxyModel->mapToSource(index));
 
-    if ( dynamic_cast< mitk::QtPerspectiveItem* >(item) )
+    QmitkPerspectiveItem* perspectiveItem = dynamic_cast<QmitkPerspectiveItem*>(item);
+    if (nullptr != perspectiveItem)
     {
         try
         {
-            mitk::QtPerspectiveItem* pItem = dynamic_cast< mitk::QtPerspectiveItem* >(item);
-            berry::PlatformUI::GetWorkbench()->ShowPerspective( pItem->m_Perspective->GetId(), berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow() );
+            berry::PlatformUI::GetWorkbench()->ShowPerspective(perspectiveItem->m_Perspective->GetId(),
+                                                               berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow());
         }
         catch (...)
         {
             QMessageBox::critical(nullptr, "Opening Perspective Failed", QString("The requested perspective could not be opened.\nSee the log for details."));
         }
+
+        return;
     }
-    else if ( dynamic_cast< mitk::QtViewItem* >(item) )
+
+    QmitkViewItem* viewItem = dynamic_cast<QmitkViewItem*>(item);
+    if (nullptr != viewItem)
     {
         berry::IWorkbenchPage::Pointer page = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage();
 
@@ -573,8 +579,7 @@ void QmitkViewNavigatorWidget::ItemClicked(const QModelIndex &index)
         {
             try
             {
-                mitk::QtViewItem* vItem = dynamic_cast< mitk::QtViewItem* >(item);
-                page->ShowView(vItem->m_View->GetId());
+                page->ShowView(viewItem->m_View->GetId());
             }
             catch (const berry::PartInitException& e)
             {
@@ -664,14 +669,12 @@ void QmitkViewNavigatorWidget::CustomMenuRequested(QPoint pos)
 
     m_ContextMenu->addSeparator();
 
-
-    if ( item!=nullptr && dynamic_cast< mitk::QtPerspectiveItem* >(item) )
+    QmitkPerspectiveItem* perspectiveItem = dynamic_cast<QmitkPerspectiveItem*>(item);
+    if (nullptr != perspectiveItem)
     {
-        berry::IPerspectiveDescriptor::Pointer persp = dynamic_cast< mitk::QtPerspectiveItem* >(item)->m_Perspective;
+        berry::IPerspectiveDescriptor::Pointer persp = perspectiveItem->m_Perspective;
         if (this->m_ActivePerspective.IsNotNull() && this->m_ActivePerspective == persp)
         {
-          //m_ContextMenu->addSeparator();
-
           QAction* saveAsAction = new QAction("Save As...", this);
           m_ContextMenu->addAction(saveAsAction);
           connect(saveAsAction, SIGNAL(triggered()), SLOT(SaveCurrentPerspectiveAs()));

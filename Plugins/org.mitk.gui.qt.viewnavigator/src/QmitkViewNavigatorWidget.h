@@ -27,8 +27,6 @@ found in the LICENSE file.
 #include <QStandardItemModel>
 #include <QSortFilterProxyModel>
 #include <QMenu>
-#include <mitkQtPerspectiveItem.h>
-#include <mitkQtViewItem.h>
 
 class ClassFilterProxyModel;
 

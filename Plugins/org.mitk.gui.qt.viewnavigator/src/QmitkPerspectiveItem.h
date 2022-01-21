@@ -10,36 +10,29 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _ViewItem
-#define _ViewItem
+#ifndef QMITKPERSPECTIVEITEM_H
+#define QMITKPERSPECTIVEITEM_H
 
 #include <QStandardItem>
-#include <QString>
 #include <berryPlatformUI.h>
 
-namespace mitk
-{
-
-class QtViewItem : public QStandardItem
+class QmitkPerspectiveItem : public QStandardItem
 {
 public:
-    QtViewItem(QString string) :
-      QStandardItem(string)
-    {
-    }
-    QtViewItem(const QIcon& icon, QString string) :
-      QStandardItem(icon, string)
-    {
-    }
 
-    berry::IViewDescriptor::Pointer m_View;
-    QStringList m_Tags;
-    QString m_Description;
+  QmitkPerspectiveItem(QString string)
+    : QStandardItem(string)
+  {
+  }
 
-private:
+  QmitkPerspectiveItem(const QIcon &icon, QString string)
+    : QStandardItem(icon, string)
+  {
+  }
 
+  berry::IPerspectiveDescriptor::Pointer m_Perspective;
+  QStringList m_Tags;
+  QString m_Description;
 };
 
-}
-
-#endif
+#endif // QMITKPERSPECTIVEITEM_H

@@ -1,8 +1,7 @@
 set(SRC_CPP_FILES
   QmitkViewNavigatorWidget.cpp
-
-#  mitkQtPerspectiveItem.h
-#  mitkQtViewItem.h
+  QmitkPerspectiveItem.h
+  QmitkViewItem.h
 )
 
 set(INTERNAL_CPP_FILES

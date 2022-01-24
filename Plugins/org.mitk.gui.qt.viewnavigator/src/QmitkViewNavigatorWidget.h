@@ -12,26 +12,23 @@ found in the LICENSE file.
 #ifndef QMIKVIEWNAVIGATORWIDGET_H
 #define QMIKVIEWNAVIGATORWIDGET_H
 
-//QT headers
-#include <QWidget>
-#include <QString>
-
-#include <ctkSearchBox.h>
 #include "ui_QmitkViewNavigatorWidgetControls.h"
 
-#include <berryISelectionListener.h>
-#include <berryIPerspectiveListener.h>
-#include <berryIWorkbench.h>
-#include <berryIWorkbenchPage.h>
-#include <berryIPerspectiveDescriptor.h>
+//QT headers
+#include <QWidget>
 #include <QStandardItemModel>
-#include <QSortFilterProxyModel>
 #include <QMenu>
+
+#include <berryIPartListener.h>
+#include <berryIPerspectiveListener.h>
+#include <berryIWorkbenchWindow.h>
 
 class ClassFilterProxyModel;
 
-/** @brief
-  */
+/**
+* @brief
+*
+*/
 class QmitkViewNavigatorWidget : public QWidget
 {
     Q_OBJECT
@@ -44,14 +41,6 @@ public:
     ~QmitkViewNavigatorWidget() override;
 
     void SetFocus();
-
-    bool FillTreeList();
-    void UpdateTreeList(QStandardItem* item = nullptr,
-                        berry::IWorkbenchPartReference* partRef = nullptr,
-                        const std::string& changeId = "");
-
-    QScopedPointer<berry::IPerspectiveListener>    m_PerspectiveListener;
-    QScopedPointer<berry::IWindowListener>         m_WindowListener;
 
 public Q_SLOTS:
 
@@ -68,6 +57,7 @@ public Q_SLOTS:
 protected:
 
     friend class ViewNavigatorPerspectiveListener;
+    friend class ViewNavigatorViewListener;
 
     Ui::QmitkViewNavigatorWidgetControls        m_Controls;
     QWidget*                                    m_Parent;
@@ -75,11 +65,16 @@ protected:
     ClassFilterProxyModel*                      m_FilterProxyModel;
     QMenu*                                      m_ContextMenu;
     berry::IPerspectiveDescriptor::Pointer      m_ActivePerspective;
-    bool                                        m_Generated;
 
 private:
 
     void CreateQtPartControl(QWidget* parent);
+    bool FillTreeList();
+    void UpdateTreeList(berry::IWorkbenchPart* workbenchPart = nullptr);
+
+    QScopedPointer<berry::IPerspectiveListener>    m_PerspectiveListener;
+    QScopedPointer<berry::IPartListener>           m_ViewPartListener;
+
     berry::IWorkbenchWindow::Pointer m_Window;
 };
 

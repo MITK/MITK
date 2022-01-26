@@ -91,9 +91,8 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   m_Controls.refreshdirectoryBox->setEnabled(true);
 
   m_Controls.statusLabel->setTextFormat(Qt::RichText);
-  m_Controls.statusLabel->setText("<b>STATUS: </b><i>Welcome to nnUNet. " + QString::number(m_GpuLoader.GetGPUCount()) +
-                                  " GPUs were detected.</i>");
-
+  ShowStatusMessage(QString("<b>STATUS: </b><i>Welcome to nnUNet. " + QString::number(m_GpuLoader.GetGPUCount()) +
+                            " GPUs were detected.</i>"));
   if (m_GpuLoader.GetGPUCount() != 0)
   {
     m_Controls.gpuSpinBox->setMaximum(m_GpuLoader.GetGPUCount() - 1);
@@ -167,7 +166,7 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
         tool->MultiModalOn();
       }
       tool->m_InputOutputPair = std::make_pair(nullptr, nullptr);
-      m_Controls.statusLabel->setText("<b>STATUS: </b><i>Starting Segmentation task... This might take a while.</i>");
+      ShowStatusMessage(QString("<b>STATUS: </b><i>Starting Segmentation task... This might take a while.</i>"));
       tool->UpdatePreview();
       if (tool->GetOutputBuffer() == nullptr)
       {
@@ -182,6 +181,7 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
       std::stringstream errorMsg;
       errorMsg << "Error while processing parameters for nnUNet segmentation. Reason: " << e.what();
       ShowErrorMessage(errorMsg.str());
+      ShowStatusMessage(QString::fromStdString(errorMsg.str()));
       m_Controls.previewButton->setEnabled(true);
       tool->PredictOff();
       return;
@@ -240,6 +240,11 @@ void QmitknnUNetToolGUI::ShowErrorMessage(const std::string &message, QMessageBo
   MITK_WARN << message;
 }
 
+void QmitknnUNetToolGUI::ShowStatusMessage(const QString &message)
+{
+  m_Controls.statusLabel->setText(message);
+}
+
 void QmitknnUNetToolGUI::ProcessEnsembleModelsParams(mitk::nnUNetTool::Pointer tool)
 {
   if (m_EnsembleParams[0]->modelBox->currentText() == m_EnsembleParams[1]->modelBox->currentText())
@@ -247,6 +252,7 @@ void QmitknnUNetToolGUI::ProcessEnsembleModelsParams(mitk::nnUNetTool::Pointer t
     throw std::runtime_error("Both models you have selected for ensembling are the same.");
   }
   QString taskName = m_Controls.taskBox->currentText();
+  bool isPPJson = m_Controls.postProcessingCheckBox->isChecked();
   std::vector<mitk::ModelParams> requestQ;
   QString ppDirFolderNamePart1 = "ensemble_";
   QStringList ppDirFolderNameParts;
@@ -268,33 +274,41 @@ void QmitknnUNetToolGUI::ProcessEnsembleModelsParams(mitk::nnUNetTool::Pointer t
                              " you have selected doesn't exist. Check your Results Folder again.";
       throw std::runtime_error(errorMsg);
     }
-    std::vector<std::string> testfold; // empty vector to consider all folds for inferencing.
+    std::vector<std::string> testfold = FetchSelectedFoldsFromUI(layout->foldBox);
     mitk::ModelParams modelObject = MapToRequest(modelName, taskName, trainer, planId, testfold);
     requestQ.push_back(modelObject);
     ppDirFolderNameParts << ppDirFolderName.join(QString(""));
   }
   tool->EnsembleOn();
+  if (isPPJson)
+  {
+    QString ppJsonFilePossibility1 = QDir::cleanPath(
+      m_ParentFolder->getResultsFolder() + QDir::separator() + "nnUNet" + QDir::separator() + "ensembles" +
+      QDir::separator() + taskName + QDir::separator() + ppDirFolderNamePart1 + ppDirFolderNameParts.first() + "--" +
+      ppDirFolderNameParts.last() + QDir::separator() + "postprocessing.json");
+    QString ppJsonFilePossibility2 = QDir::cleanPath(
+      m_ParentFolder->getResultsFolder() + QDir::separator() + "nnUNet" + QDir::separator() + "ensembles" +
+      QDir::separator() + taskName + QDir::separator() + ppDirFolderNamePart1 + ppDirFolderNameParts.last() + "--" +
+      ppDirFolderNameParts.first() + QDir::separator() + "postprocessing.json");
 
-  QString ppJsonFilePossibility1 = QDir::cleanPath(
-    m_ParentFolder->getResultsFolder() + QDir::separator() + "nnUNet" + QDir::separator() + "ensembles" +
-    QDir::separator() + taskName + QDir::separator() + ppDirFolderNamePart1 + ppDirFolderNameParts.first() + "--" +
-    ppDirFolderNameParts.last() + QDir::separator() + "postprocessing.json");
-  QString ppJsonFilePossibility2 = QDir::cleanPath(
-    m_ParentFolder->getResultsFolder() + QDir::separator() + "nnUNet" + QDir::separator() + "ensembles" +
-    QDir::separator() + taskName + QDir::separator() + ppDirFolderNamePart1 + ppDirFolderNameParts.last() + "--" +
-    ppDirFolderNameParts.first() + QDir::separator() + "postprocessing.json");
-
-  if (QFile(ppJsonFilePossibility1).exists())
-  {
-    tool->SetPostProcessingJsonDirectory(ppJsonFilePossibility1.toStdString());
-  }
-  else if (QFile(ppJsonFilePossibility2).exists())
-  {
-    tool->SetPostProcessingJsonDirectory(ppJsonFilePossibility2.toStdString());
-  }
-  else
-  {
-    // warning message
+    if (QFile(ppJsonFilePossibility1).exists())
+    {
+      tool->SetPostProcessingJsonDirectory(ppJsonFilePossibility1.toStdString());
+      const QString statusMsg = "<i>Post Processing JSON file found: </i>" + ppJsonFilePossibility1;
+      ShowStatusMessage(statusMsg);
+    }
+    else if (QFile(ppJsonFilePossibility2).exists())
+    {
+      tool->SetPostProcessingJsonDirectory(ppJsonFilePossibility2.toStdString());
+      const QString statusMsg = "<i>Post Processing JSON file found:</i>" + ppJsonFilePossibility2;
+      ShowStatusMessage(statusMsg);
+    }
+    else
+    {
+      std::string errorMsg =
+        "No post processing file was found for the selected ensemble combination. Continuing anyway...";
+      ShowErrorMessage(errorMsg);
+    }
   }
   tool->m_ParamQ.clear();
   tool->m_ParamQ = requestQ;
@@ -308,7 +322,7 @@ void QmitknnUNetToolGUI::ProcessModelParams(mitk::nnUNetTool::Pointer tool)
   QString taskName = m_Controls.taskBox->currentText();
   QString trainer = m_Controls.trainerBox->currentText();
   QString planId = m_Controls.plannerBox->currentText();
-  std::vector<std::string> fetchedFolds = FetchSelectedFoldsFromUI();
+  std::vector<std::string> fetchedFolds = FetchSelectedFoldsFromUI(m_Controls.foldBox);
   mitk::ModelParams modelObject = MapToRequest(modelName, taskName, trainer, planId, fetchedFolds);
   requestQ.push_back(modelObject);
   tool->m_ParamQ.clear();
@@ -325,4 +339,47 @@ bool QmitknnUNetToolGUI::IsModelExists(const QString &modelName, const QString &
     return true;
   }
   return false;
+}
+
+void QmitknnUNetToolGUI::CheckAllInCheckableComboBox(ctkCheckableComboBox *foldBox)
+{
+  // Recalling all added items to check-mark it.
+  const QAbstractItemModel *qaim = foldBox->checkableModel();
+  // for (int i = 0; i < folds.size(); ++i)
+  auto rows = qaim->rowCount();
+  for (int i = 0; i < rows; ++i)
+  {
+    const QModelIndex mi = qaim->index(i, 0);
+    foldBox->setCheckState(mi, Qt::Checked);
+  }
+}
+
+std::pair<QStringList, QStringList> QmitknnUNetToolGUI::ExtractTrainerPlannerFromString(QStringList trainerPlanners)
+{
+  QString splitterString = "__";
+  QStringList trainers, planners;
+  foreach (QString trainerPlanner, trainerPlanners)
+  {
+    trainers << trainerPlanner.split(splitterString, QString::SplitBehavior::SkipEmptyParts).first();
+    planners << trainerPlanner.split(splitterString, QString::SplitBehavior::SkipEmptyParts).last();
+  }
+  trainers.removeDuplicates();
+  planners.removeDuplicates();
+  std::pair<QStringList, QStringList> returnPair = {trainers, planners};
+  return returnPair;
+}
+
+std::vector<std::string> QmitknnUNetToolGUI::FetchSelectedFoldsFromUI(ctkCheckableComboBox *foldBox)
+{
+  std::vector<std::string> folds;
+  if (!(foldBox->allChecked() || foldBox->noneChecked()))
+  {
+    QModelIndexList foldList = foldBox->checkedIndexes();
+    foreach (QModelIndex index, foldList)
+    {
+      QString foldQString = foldBox->itemText(index.row()).split("_", QString::SplitBehavior::SkipEmptyParts).last();
+      folds.push_back(foldQString.toStdString());
+    }
+  }
+  return folds;
 }

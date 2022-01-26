@@ -117,6 +117,19 @@ protected:
 
 private:
   /**
+   * @brief Checks all the entries of the ctkCheckableComboBox ui widget.
+   * This feature is not present in ctkCheckableComboBox API.
+   */
+  void CheckAllInCheckableComboBox(ctkCheckableComboBox *);
+
+  /**
+   * @brief Parses the folder names containing trainer and planner together and,
+   * returns it as separate lists.
+   * @return std::pair<QStringList, QStringList>
+   */
+
+  std::pair<QStringList, QStringList> ExtractTrainerPlannerFromString(QStringList);
+  /**
    * @brief Parses the ensemble UI elements and sets to nnUNetTool object pointer.
    *
    */
@@ -139,6 +152,11 @@ private:
   void ShowErrorMessage(const std::string &, QMessageBox::Icon = QMessageBox::Critical);
 
   /**
+   * @brief Shows any message on the tool pane.
+   */
+  void ShowStatusMessage(const QString &);
+
+  /**
    * @brief Searches and parses paths of python virtual enviroments
    * from predefined lookout locations
    */
@@ -146,9 +164,9 @@ private:
 
   /**
    * @brief Check if pretrained model sub folder inside RESULTS FOLDER exist.
-   * 
+   *
    */
-  bool IsModelExists(const QString&, const QString&, const QString&);
+  bool IsModelExists(const QString &, const QString &, const QString &);
 
   /**
    * @brief Clears all combo boxes
@@ -177,7 +195,7 @@ private:
    *
    * @return std::vector<std::string>
    */
-  std::vector<std::string> FetchSelectedFoldsFromUI();
+  std::vector<std::string> FetchSelectedFoldsFromUI(ctkCheckableComboBox *);
 
   /**
    * @brief Returns all paths from the dynamically generated ctk-path-line-edit boxes.

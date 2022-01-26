@@ -174,12 +174,20 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
 
     if (this->GetMultiModal())
     {
+      std::string outModalFile;
+      int len = inDir.length() + token.length() + 1 + 8 + 2 + 7;
+      outModalFile.reserve(len);
       for (size_t i = 0; i < this->m_OtherModalPaths.size(); ++i)
       {
         mitk::Image::ConstPointer modalImage = this->m_OtherModalPaths[i];
-        std::string outModalFile =
-          inDir + IOUtil::GetDirectorySeparator() + token + "_000_000" + std::to_string(i + 1) + ".nii.gz";
+        outModalFile.append(inDir);
+        outModalFile.push_back(IOUtil::GetDirectorySeparator());
+        outModalFile.append(token);
+        outModalFile.append("_000_000");
+        outModalFile.append(std::to_string(i + 1));
+        outModalFile.append(".nii.gz");
         IOUtil::Save(modalImage.GetPointer(), outModalFile);
+        outModalFile.clear();
       }
     }
   }
@@ -258,13 +266,17 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
       args.push_back("--disable_mixed_precision");
     }
 
-    if (this->GetEnsemble() && !this->GetPostProcessingJsonDirectory().empty())
+    if (this->GetEnsemble())
     {
       args.push_back("--save_npz");
     }
 
     try
     {
+    for (auto arg : args)
+    {
+      MITK_INFO << arg;
+    }
       std::string resultsFolderEnv = "RESULTS_FOLDER=" + this->GetModelDirectory();
       itksys::SystemTools::PutEnv(resultsFolderEnv.c_str());
       std::string cudaEnv = "CUDA_VISIBLE_DEVICES=" + std::to_string(this->GetGpuId());
@@ -297,9 +309,15 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     args.push_back("-o");
     args.push_back(outDir);
 
-    args.push_back("-pp");
-    args.push_back(this->GetPostProcessingJsonDirectory());
-
+    if (!this->GetPostProcessingJsonDirectory().empty())
+    {
+      args.push_back("-pp");
+      args.push_back(this->GetPostProcessingJsonDirectory());
+    }
+    for (auto arg : args)
+    {
+      MITK_INFO << arg;
+    }
     spExec->Execute(this->GetPythonPath(), command, args);
   }
   try

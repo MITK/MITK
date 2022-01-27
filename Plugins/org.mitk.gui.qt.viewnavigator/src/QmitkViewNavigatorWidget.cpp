@@ -338,7 +338,7 @@ void QmitkViewNavigatorWidget::UpdateTreeList(berry::IWorkbenchPart* workbenchPa
     QmitkViewItem* viewItem = dynamic_cast<QmitkViewItem *>(item);
     if (nullptr != viewItem)
     {
-      if (nullptr != workbenchPart && workbenchPart->GetPartName() == viewItem->m_View->GetLabel())
+      if (nullptr != workbenchPart && workbenchPart->GetPartName() == viewItem->m_ItemDescriptor->GetLabel())
       {
         font.setBold(true);
       }
@@ -346,7 +346,7 @@ void QmitkViewNavigatorWidget::UpdateTreeList(berry::IWorkbenchPart* workbenchPa
       {
         for (const auto& viewPart : viewParts)
         {
-          if (viewPart->GetPartName() == viewItem->m_View->GetLabel())
+          if (viewPart->GetPartName() == viewItem->m_ItemDescriptor->GetLabel())
           {
             font.setBold(true);
             break;
@@ -362,7 +362,7 @@ void QmitkViewNavigatorWidget::UpdateTreeList(berry::IWorkbenchPart* workbenchPa
       QmitkPerspectiveItem* perspectiveItem = dynamic_cast<QmitkPerspectiveItem*>(item);
       if (nullptr != perspectiveItem)
       {
-        if (currentPerspective.IsNotNull() && currentPerspective->GetId() == perspectiveItem->m_Perspective->GetId())
+        if (currentPerspective.IsNotNull() && currentPerspective->GetId() == perspectiveItem->m_ItemDescriptor->GetId())
         {
           font.setBold(true);
         }
@@ -377,169 +377,12 @@ bool QmitkViewNavigatorWidget::FillTreeList()
 {
     // initialize tree model
     m_TreeModel->clear();
-    QStandardItem* treeRootItem = m_TreeModel->invisibleRootItem();
 
-    // get all available perspectives
-    berry::IPerspectiveRegistry* perspRegistry = berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry();
-    QList<berry::IPerspectiveDescriptor::Pointer> perspectiveDescriptors(perspRegistry->GetPerspectives());
-    qSort(perspectiveDescriptors.begin(), perspectiveDescriptors.end(), comparePerspectives);
+    // add all available perspectives
+    this->AddPerspectivesToTree();
 
-    KeywordRegistry keywordRegistry;
-    berry::IPerspectiveDescriptor::Pointer currentPersp = page->GetPerspective();
-    std::vector< QStandardItem* > categoryItems;
-    QStandardItem *perspectiveRootItem = new QStandardItem("Perspectives");
-    perspectiveRootItem->setEditable(false);
-    perspectiveRootItem->setFont(QFont("", 12, QFont::Normal));
-    treeRootItem->appendRow(perspectiveRootItem);
-
-    for (const auto& perspectiveDescriptor : perspectiveDescriptors)
-    {
-        QmitkPerspectiveItem* perspectiveItem = new QmitkPerspectiveItem(perspectiveDescriptor->GetLabel());
-        perspectiveItem->m_Perspective = perspectiveDescriptor;
-        perspectiveItem->m_Description = perspectiveDescriptor->GetDescription();
-        QStringList keylist = perspectiveDescriptor->GetKeywordReferences();
-        perspectiveItem->m_Tags = keywordRegistry.GetKeywords(keylist);
-        perspectiveItem->setEditable(false);
-
-        QFont font;
-        font.setBold(true);
-        if (currentPersp.IsNotNull() && currentPersp->GetId() == perspectiveDescriptor->GetId())
-            perspectiveItem->setFont(font);
-
-        QStringList catPath = perspectiveDescriptor->GetCategoryPath();
-        if (catPath.isEmpty())
-        {
-            perspectiveRootItem->appendRow(perspectiveItem);
-        }
-        else
-        {
-            QStandardItem* categoryItem = nullptr;
-            for (const auto& currentCategoryItem : categoryItems)
-            {
-                if (currentCategoryItem->text() == catPath.front())
-                {
-                    categoryItem = currentCategoryItem;
-                    break;
-                }
-            }
-
-            if (nullptr == categoryItem)
-            {
-                categoryItem = new QStandardItem(QIcon(), catPath.front());
-                categoryItems.push_back(categoryItem);
-            }
-            categoryItem->setEditable(false);
-            categoryItem->appendRow(perspectiveItem);
-            categoryItem->setFont(QFont("", 12, QFont::Normal));
-        }
-    }
-
-    std::sort(categoryItems.begin(), categoryItems.end(), compareQStandardItems);
-    for (const auto& categoryItem : categoryItems)
-    {
-        perspectiveRootItem->appendRow(categoryItem);
-    }
-
-    // get all available views
-    berry::IViewRegistry* viewRegistry = berry::PlatformUI::GetWorkbench()->GetViewRegistry();
-    QList<berry::IViewDescriptor::Pointer> viewDescriptors(viewRegistry->GetViews());
-    QList<berry::IViewPart::Pointer> viewParts(page->GetViews());
-    qSort(viewDescriptors.begin(), viewDescriptors.end(), compareViews);
-    auto emptyItem = new QStandardItem();
-    emptyItem->setFlags(Qt::ItemIsEnabled);
-    treeRootItem->appendRow(emptyItem);
-    //QStringList viewExcludeList = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetViewExcludeList();
-
-    // There currently is no way to get the list of excluded views at application start
-    QStringList viewExcludeList;
-    // internal view used for the intro screen, will crash when opened directly, see T22352
-    viewExcludeList.append(QString("org.blueberry.ui.internal.introview"));
-    viewExcludeList.append(QString("org.mitk.views.controlvisualizationpropertiesview"));
-    viewExcludeList.append(QString("org.mitk.views.modules"));
-    viewExcludeList.append(QString("org.mitk.views.viewnavigator"));
-
-    QStandardItem* viewRootItem = new QStandardItem(QIcon(), "Views");
-    viewRootItem->setFont(QFont("", 12, QFont::Normal));
-    viewRootItem->setEditable(false);
-    treeRootItem->appendRow(viewRootItem);
-
-    categoryItems.clear();
-    QStandardItem* noCategoryItem = new QStandardItem(QIcon(), "Miscellaneous");
-    noCategoryItem->setEditable(false);
-    noCategoryItem->setFont(QFont("", 12, QFont::Normal));
-
-    for (const auto& viewDescriptor : viewDescriptors)
-    {
-        bool skipView = false;
-        for (const auto& viewExcludeElement : viewExcludeList)
-        {
-            if(viewExcludeElement == viewDescriptor->GetId())
-            {
-                skipView = true;
-                break;
-            }
-        }
-
-        if (skipView)
-            continue;
-
-        QStringList catPath = viewDescriptor->GetCategoryPath();
-
-        QIcon icon = viewDescriptor->GetImageDescriptor();
-        QmitkViewItem* viewItem = new QmitkViewItem(icon, viewDescriptor->GetLabel());
-        viewItem->m_View = viewDescriptor;
-        viewItem->setToolTip(viewDescriptor->GetDescription());
-        viewItem->m_Description = viewDescriptor->GetDescription();
-
-        QStringList keylist = viewDescriptor->GetKeywordReferences();
-        viewItem->m_Tags = keywordRegistry.GetKeywords(keylist);
-        viewItem->setEditable(false);
-
-        for (const auto& viewPart : viewParts)
-        {
-            if (viewPart->GetPartName() == viewDescriptor->GetLabel())
-            {
-                QFont font;
-                font.setBold(true);
-                viewItem->setFont(font);
-                break;
-            }
-        }
-
-        if (catPath.empty())
-            noCategoryItem->appendRow(viewItem);
-        else
-        {
-            QStandardItem* categoryItem = nullptr;
-            for (const auto& currentCategoryItem : categoryItems)
-            {
-                if (currentCategoryItem->text() == catPath.front())
-                {
-                    categoryItem = currentCategoryItem;
-                    break;
-                }
-            }
-
-            if (nullptr == categoryItem)
-            {
-                categoryItem = new QStandardItem(QIcon(),catPath.front());
-                categoryItems.push_back(categoryItem);
-            }
-            categoryItem->setEditable(false);
-            categoryItem->appendRow(viewItem);
-            categoryItem->setFont(QFont("", 12, QFont::Normal));
-        }
-    }
-
-    std::sort(categoryItems.begin(), categoryItems.end(), compareQStandardItems);
-
-    for (const auto& categoryItem : categoryItems)
-    {
-        viewRootItem->appendRow(categoryItem);
-    }
-
-    if (noCategoryItem->hasChildren())
-        viewRootItem->appendRow(noCategoryItem);
+    // add all available views
+    this->AddViewsToTree();
 
     m_Controls.m_PluginTreeView->expandAll();
 
@@ -568,7 +411,7 @@ void QmitkViewNavigatorWidget::ItemClicked(const QModelIndex &index)
         try
         {
             berry::PlatformUI::GetWorkbench()->ShowPerspective(
-              perspectiveItem->m_Perspective->GetId(), berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow());
+              perspectiveItem->m_ItemDescriptor->GetId(), berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow());
         }
         catch (...)
         {
@@ -589,7 +432,7 @@ void QmitkViewNavigatorWidget::ItemClicked(const QModelIndex &index)
         {
             try
             {
-                page->ShowView(viewItem->m_View->GetId());
+                page->ShowView(viewItem->m_ItemDescriptor->GetId());
             }
             catch (const berry::PartInitException& e)
             {
@@ -672,7 +515,7 @@ void QmitkViewNavigatorWidget::CustomMenuRequested(QPoint pos)
     QmitkPerspectiveItem* perspectiveItem = dynamic_cast<QmitkPerspectiveItem*>(item);
     if (nullptr != perspectiveItem)
     {
-        berry::IPerspectiveDescriptor::Pointer perspectiveDescriptor = perspectiveItem->m_Perspective;
+        berry::IPerspectiveDescriptor::Pointer perspectiveDescriptor = perspectiveItem->m_ItemDescriptor;
         if (this->m_ActivePerspective.IsNotNull() && this->m_ActivePerspective == perspectiveDescriptor)
         {
           QAction* saveAsAction = new QAction("Save As...", this);
@@ -735,4 +578,122 @@ void QmitkViewNavigatorWidget::CreateQtPartControl(QWidget* parent)
 
   m_ViewPartListener.reset(new ViewNavigatorViewListener(this));
   m_Window->GetPartService()->AddPartListener(m_ViewPartListener.data());
+}
+
+void QmitkViewNavigatorWidget::AddPerspectivesToTree()
+{
+  berry::IPerspectiveRegistry* perspRegistry = berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry();
+  QList<berry::IPerspectiveDescriptor::Pointer> perspectiveDescriptors(perspRegistry->GetPerspectives());
+  qSort(perspectiveDescriptors.begin(), perspectiveDescriptors.end(), comparePerspectives);
+
+  QStandardItem* perspectiveRootItem = new QStandardItem("Perspectives");
+  perspectiveRootItem->setFont(QFont("", 12, QFont::Normal));
+  perspectiveRootItem->setEditable(false);
+  QStandardItem* treeRootItem = m_TreeModel->invisibleRootItem();
+  treeRootItem->appendRow(perspectiveRootItem);
+
+  this->AddItemsToTree<QList<berry::IPerspectiveDescriptor::Pointer>, QmitkPerspectiveItem>(
+    perspectiveDescriptors, perspectiveRootItem);
+}
+
+void QmitkViewNavigatorWidget::AddViewsToTree()
+{
+  berry::IViewRegistry* viewRegistry = berry::PlatformUI::GetWorkbench()->GetViewRegistry();
+  QList<berry::IViewDescriptor::Pointer> viewDescriptors(viewRegistry->GetViews());
+  qSort(viewDescriptors.begin(), viewDescriptors.end(), compareViews);
+
+  QStandardItem* viewRootItem = new QStandardItem("Views");
+  viewRootItem->setFont(QFont("", 12, QFont::Normal));
+  viewRootItem->setEditable(false);
+  QStandardItem* treeRootItem = m_TreeModel->invisibleRootItem();
+  treeRootItem->appendRow(viewRootItem);
+
+  QStandardItem* miscellaneousCategoryItem = new QStandardItem("Miscellaneous");
+  miscellaneousCategoryItem->setFont(QFont("", 12, QFont::Normal));
+  miscellaneousCategoryItem->setEditable(false);
+
+  QStringList viewExcludeList;
+  // internal view used for the intro screen, will crash when opened directly, see T22352
+  viewExcludeList.append(QString("org.blueberry.ui.internal.introview"));
+  viewExcludeList.append(QString("org.mitk.views.controlvisualizationpropertiesview"));
+  viewExcludeList.append(QString("org.mitk.views.modules"));
+  viewExcludeList.append(QString("org.mitk.views.viewnavigator"));
+
+  this->AddItemsToTree<QList<berry::IViewDescriptor::Pointer>, QmitkViewItem>(
+    viewDescriptors, viewRootItem, miscellaneousCategoryItem, viewExcludeList);
+}
+
+template<typename D, typename I>
+void QmitkViewNavigatorWidget::AddItemsToTree(D itemDescriptors, QStandardItem* rootItem,
+  QStandardItem* miscellaneousItem, const QStringList& itemExcludeList)
+{
+  KeywordRegistry keywordRegistry;
+  std::vector<QStandardItem*> categoryItems;
+
+  for (const auto& itemDescriptor : itemDescriptors)
+  {
+    bool excludeView = itemExcludeList.contains(itemDescriptor->GetId());
+    if (excludeView)
+    {
+      continue;
+    }
+
+    QIcon icon = itemDescriptor->GetImageDescriptor();
+    I* item = new I(icon, itemDescriptor->GetLabel());
+    item->m_ItemDescriptor = itemDescriptor;
+    item->m_Description = itemDescriptor->GetDescription();
+    item->setToolTip(itemDescriptor->GetDescription());
+
+    QStringList keylist = itemDescriptor->GetKeywordReferences();
+    item->m_Tags = keywordRegistry.GetKeywords(keylist);
+    item->setEditable(false);
+
+    QStringList categoryPath = itemDescriptor->GetCategoryPath();
+    if (categoryPath.empty())
+    {
+      // If a root item for general / non-categorized item views is given, use it.
+      // Otherwise put the non-categorized item views into the top root item.
+      if (nullptr != miscellaneousItem)
+      {
+        miscellaneousItem->appendRow(item);
+      }
+      else
+      {
+        rootItem->appendRow(item);
+      }
+    }
+    else
+    {
+      QStandardItem* categoryItem = nullptr;
+      for (const auto& currentCategoryItem : categoryItems)
+      {
+        if (currentCategoryItem->text() == categoryPath.front())
+        {
+          categoryItem = currentCategoryItem;
+          break;
+        }
+      }
+
+      if (nullptr == categoryItem)
+      {
+        categoryItem = new QStandardItem(QIcon(), categoryPath.front());
+        categoryItems.push_back(categoryItem);
+      }
+
+      categoryItem->setFont(QFont("", 12, QFont::Normal));
+      categoryItem->setEditable(false);
+      categoryItem->appendRow(item);
+    }
+  }
+
+  std::sort(categoryItems.begin(), categoryItems.end(), compareQStandardItems);
+  for (const auto& categoryItem : categoryItems)
+  {
+    rootItem->appendRow(categoryItem);
+  }
+
+  if (nullptr != miscellaneousItem && miscellaneousItem->hasChildren())
+  {
+    rootItem->appendRow(miscellaneousItem);
+  }
 }

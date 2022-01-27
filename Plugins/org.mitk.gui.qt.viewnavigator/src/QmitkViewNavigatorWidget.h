@@ -72,6 +72,12 @@ private:
     bool FillTreeList();
     void UpdateTreeList(berry::IWorkbenchPart* workbenchPart = nullptr);
 
+    void AddPerspectivesToTree();
+    void AddViewsToTree();
+    template<typename D, typename I>
+    void AddItemsToTree(D itemDescriptors, QStandardItem* rootItem,
+      QStandardItem* miscellaneousItem = nullptr, const QStringList& itemExcludeList = QStringList());
+
     QScopedPointer<berry::IPerspectiveListener>    m_PerspectiveListener;
     QScopedPointer<berry::IPartListener>           m_ViewPartListener;
 

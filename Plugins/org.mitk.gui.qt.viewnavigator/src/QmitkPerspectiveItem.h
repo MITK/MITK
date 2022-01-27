@@ -20,17 +20,17 @@ class QmitkPerspectiveItem : public QStandardItem
 {
 public:
 
-  QmitkPerspectiveItem(QString string)
+  QmitkPerspectiveItem(const QString& string)
     : QStandardItem(string)
   {
   }
 
-  QmitkPerspectiveItem(const QIcon &icon, QString string)
+  QmitkPerspectiveItem(const QIcon& icon, const QString& string)
     : QStandardItem(icon, string)
   {
   }
 
-  berry::IPerspectiveDescriptor::Pointer m_Perspective;
+  berry::IPerspectiveDescriptor::Pointer m_ItemDescriptor;
   QStringList m_Tags;
   QString m_Description;
 };

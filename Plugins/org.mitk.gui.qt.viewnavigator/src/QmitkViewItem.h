@@ -20,17 +20,17 @@ class QmitkViewItem : public QStandardItem
 {
 public:
 
-  QmitkViewItem(QString string)
+  QmitkViewItem(const QString& string)
     : QStandardItem(string)
   {
   }
 
-  QmitkViewItem(const QIcon& icon, QString string)
+  QmitkViewItem(const QIcon& icon, const QString& string)
     : QStandardItem(icon, string)
   {
   }
 
-  berry::IViewDescriptor::Pointer m_View;
+  berry::IViewDescriptor::Pointer m_ItemDescriptor;
   QStringList m_Tags;
   QString m_Description;
 };

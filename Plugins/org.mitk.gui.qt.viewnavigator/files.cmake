@@ -1,13 +1,12 @@
 set(SRC_CPP_FILES
   QmitkViewNavigatorWidget.cpp
-
-#  mitkQtPerspectiveItem.h
-#  mitkQtViewItem.h
+  QmitkPerspectiveItem.h
+  QmitkViewItem.h
 )
 
 set(INTERNAL_CPP_FILES
-  org_mitk_gui_qt_viewnavigator_Activator.cpp
-  ViewNavigatorView.cpp
+  mitkPluginActivator.cpp
+  QmitkViewNavigatorView.cpp
 )
 
 set(UI_FILES
@@ -15,9 +14,8 @@ set(UI_FILES
 )
 
 set(MOC_H_FILES
-  src/internal/org_mitk_gui_qt_viewnavigator_Activator.h
-  src/internal/ViewNavigatorView.h
-
+  src/internal/mitkPluginActivator.h
+  src/internal/QmitkViewNavigatorView.h
   src/QmitkViewNavigatorWidget.h
 )
 

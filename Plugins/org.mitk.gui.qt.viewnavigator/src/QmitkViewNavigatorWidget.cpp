@@ -30,6 +30,7 @@ found in the LICENSE file.
 
 // Qt
 #include <QHash>
+#include <QInputDialog>
 #include <QMessageBox>
 #include <QStandardItem>
 #include <QSortFilterProxyModel>
@@ -444,20 +445,25 @@ void QmitkViewNavigatorWidget::ItemClicked(const QModelIndex &index)
 
 void QmitkViewNavigatorWidget::SaveCurrentPerspectiveAs()
 {
-  berry::IHandlerService* handlerService = m_Window->GetService<berry::IHandlerService>();
-  try
+  berry::IWorkbenchPage::Pointer page = m_Window->GetActivePage();
+  berry::IPerspectiveDescriptor::Pointer currentPerspective = page->GetPerspective();
+  QString label = currentPerspective->GetLabel();
+
+  bool ok;
+  QString text = QInputDialog::getText(this, "Create new perspective",
+                                       "New perspective name:", QLineEdit::Normal,
+                                       "", &ok);
+  if (ok && !text.isEmpty())
   {
-    handlerService->ExecuteCommand(berry::IWorkbenchCommandConstants::WINDOW_SAVE_PERSPECTIVE_AS,
-                                   berry::UIElement::Pointer());
-    FillTreeList();
+    label = text;
   }
-  catch(const berry::NotHandledException&)
-  {
-  }
-  catch(const berry::CommandException& e)
-  {
-    MITK_ERROR << e.what();
-  }
+
+  berry::IPerspectiveRegistry* perspectiveRegistry = berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry();
+  berry::IPerspectiveDescriptor::Pointer newPerspective = perspectiveRegistry->CreatePerspective(label, currentPerspective);
+  page->SavePerspectiveAs(newPerspective);
+
+  this->FillTreeList();
+  this->UpdateTreeList();
 }
 
 void QmitkViewNavigatorWidget::ResetCurrentPerspective()
@@ -466,7 +472,8 @@ void QmitkViewNavigatorWidget::ResetCurrentPerspective()
                                         "Do you really want to reset the current perspective?",
                                         QMessageBox::Yes | QMessageBox::No).exec())
     {
-        berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ResetPerspective();
+        berry::IWorkbenchPage::Pointer page = m_Window->GetActivePage();
+        page->ResetPerspective();
     }
 }
 
@@ -487,7 +494,7 @@ void QmitkViewNavigatorWidget::CloseAllPerspectives()
                                         "Do you really want to close all perspectives?",
                                         QMessageBox::Yes | QMessageBox::No).exec())
     {
-        berry::IWorkbenchPage::Pointer page = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage();
+        berry::IWorkbenchPage::Pointer page = m_Window->GetActivePage();
         page->CloseAllPerspectives(true, true);
     }
 }
@@ -518,7 +525,7 @@ void QmitkViewNavigatorWidget::CustomMenuRequested(QPoint pos)
         berry::IPerspectiveDescriptor::Pointer perspectiveDescriptor = perspectiveItem->m_ItemDescriptor;
         if (this->m_ActivePerspective.IsNotNull() && this->m_ActivePerspective == perspectiveDescriptor)
         {
-          QAction* saveAsAction = new QAction("Save As...", this);
+          QAction* saveAsAction = new QAction("Save perspective as ...", this);
           m_ContextMenu->addAction(saveAsAction);
           connect(saveAsAction, SIGNAL(triggered()), SLOT(SaveCurrentPerspectiveAs()));
           m_ContextMenu->addSeparator();

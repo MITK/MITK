@@ -382,8 +382,8 @@ mitk::ModelParams QmitknnUNetToolGUI::MapToRequest(const QString &modelName,
 
 void QmitknnUNetToolGUI::SegmentationProcessFailed()
 {
-  m_Controls.statusLabel->setText(
-    "<b>STATUS: </b><i>Error in the segmentation process. No resulting segmentation can be loaded.</i>");
+  ShowStatusMessage(
+    "<b>STATUS: </b><i>Error in the segmentation process. <br>No resulting segmentation can be loaded.</i>");
   this->setCursor(Qt::ArrowCursor);
   std::stringstream stream;
   stream << "Error in the segmentation process. No resulting segmentation can be loaded.";
@@ -395,8 +395,8 @@ void QmitknnUNetToolGUI::SegmentationResultHandler(mitk::nnUNetTool *tool)
 {
   tool->RenderOutputBuffer();
   this->SetLabelSetPreview(tool->GetMLPreview());
-  m_Controls.statusLabel->setText("<b>STATUS: </b><i>Segmentation task finished successfully. Please Confirm the "
-                                  "segmentation else will result in data loss</i>");
+  ShowStatusMessage("<b>STATUS: </b><i>Segmentation task finished successfully. <br>Please Confirm the "
+                                  "segmentation else, could result in data loss</i>");
   m_Controls.stopButton->setEnabled(false);
 }
 

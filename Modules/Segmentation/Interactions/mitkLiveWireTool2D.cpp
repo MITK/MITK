@@ -143,7 +143,7 @@ void mitk::LiveWireTool2D::UpdateLiveWireContour()
                                                       // to 1 ms and the filter also resets its outputs.
     m_LiveWireContourNode->SetData(this->m_LiveWireContour);
 
-    m_ClosureContour = this->m_LiveWireFilterClosure->GetOutput();
+    //m_ClosureContour = this->m_LiveWireFilterClosure->GetOutput();
     m_ClosureContour->SetTimeGeometry(timeGeometry); // needed because the results of the filter are always from 0 ms
                                                      // to 1 ms and the filter also resets its outputs.
     m_ClosureContourNode->SetData(this->m_ClosureContour);
@@ -366,6 +366,7 @@ void mitk::LiveWireTool2D::OnInitLiveWire(StateMachineAction *, InteractionEvent
   m_LiveWireFilter->SetStartPoint(click);
   //m_LiveWireFilterClosure->SetStartPoint(click);
   m_LiveWireFilterClosure->SetEndPoint(click);
+  m_ClosureContour->AddVertex(click);
 
   // Remember PlaneGeometry to determine if events were triggered in the same plane
   m_PlaneGeometry = interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry();
@@ -445,21 +446,20 @@ void mitk::LiveWireTool2D::OnMouseMoved(StateMachineAction *, InteractionEvent *
       return;
   }
 
-  //if (m_ClosureContour->IsEmpty())
-  //{
-  //    m_ClosureContour->AddVertex(m_Contour->GetVertexAt(0)->Coordinates);
-  //    m_ClosureContour->AddVertex(positionEvent->GetPositionInWorld());
-  //}
-  //else
-  //{
-  //    m_ClosureContour->SetVertexAt(1, positionEvent->GetPositionInWorld());
-  //}
-
   m_LiveWireFilter->SetEndPoint(positionEvent->GetPositionInWorld());
   m_LiveWireFilter->Update();
 
-  m_LiveWireFilterClosure->SetStartPoint(positionEvent->GetPositionInWorld());
-  m_LiveWireFilterClosure->Update();
+  if (m_ClosureContour->GetNumberOfVertices() > 0)
+  {
+    if (m_ClosureContour->GetNumberOfVertices() > 1)
+    {
+      m_ClosureContour->RemoveVertexAt(0);
+    }
+    m_ClosureContour->AddVertexAtFront(positionEvent->GetPositionInWorld());
+  }
+
+  //m_LiveWireFilterClosure->SetStartPoint(positionEvent->GetPositionInWorld());
+  //m_LiveWireFilterClosure->Update();
 
   this->UpdateLiveWireContour();
 

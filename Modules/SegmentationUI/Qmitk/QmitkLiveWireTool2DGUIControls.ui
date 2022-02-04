@@ -29,7 +29,16 @@
    <string>Confirm all previous contour.</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="margin">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
     <number>0</number>
    </property>
    <item>
@@ -63,6 +72,13 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="m_SnapClosureCheckBox">
+       <property name="text">
+        <string>Snap Closure Contour (press space to switch)</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QCheckBox" name="m_InformationCheckBox">

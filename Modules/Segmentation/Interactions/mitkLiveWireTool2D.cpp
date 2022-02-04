@@ -26,7 +26,7 @@ namespace mitk
 }
 
 mitk::LiveWireTool2D::LiveWireTool2D()
-  : SegTool2D("LiveWireTool"), m_CreateAndUseDynamicCosts(false)
+  : SegTool2D("LiveWireTool"), m_CreateAndUseDynamicCosts(false), m_SnapClosureContour(false)
 {
 }
 
@@ -143,7 +143,11 @@ void mitk::LiveWireTool2D::UpdateLiveWireContour()
                                                       // to 1 ms and the filter also resets its outputs.
     m_LiveWireContourNode->SetData(this->m_LiveWireContour);
 
-    //m_ClosureContour = this->m_LiveWireFilterClosure->GetOutput();
+    if (m_SnapClosureContour)
+    {
+      m_ClosureContour = this->m_LiveWireFilterClosure->GetOutput();
+    }
+
     m_ClosureContour->SetTimeGeometry(timeGeometry); // needed because the results of the filter are always from 0 ms
                                                      // to 1 ms and the filter also resets its outputs.
     m_ClosureContourNode->SetData(this->m_ClosureContour);
@@ -232,6 +236,11 @@ void mitk::LiveWireTool2D::ClearSegmentation()
   this->ReleaseHelperObjects();
   this->ReleaseInteractors();
   this->ResetToStartState();
+}
+
+void mitk::LiveWireTool2D::SetSnapClosureContour(bool snap)
+{
+  m_SnapClosureContour = snap;
 }
 
 bool mitk::LiveWireTool2D::IsPositionEventInsideImageRegion(mitk::InteractionPositionEvent *positionEvent,
@@ -344,7 +353,7 @@ void mitk::LiveWireTool2D::OnInitLiveWire(StateMachineAction *, InteractionEvent
   m_LiveWireFilter->SetInput(m_ReferenceDataSlice);
 
   m_LiveWireFilterClosure = ImageLiveWireContourModelFilter::New();
-  m_LiveWireFilterClosure->SetUseCostFunction(false);
+  m_LiveWireFilterClosure->SetUseCostFunction(true);
   m_LiveWireFilterClosure->SetInput(m_ReferenceDataSlice);
 
   // Map click to pixel coordinates
@@ -366,7 +375,10 @@ void mitk::LiveWireTool2D::OnInitLiveWire(StateMachineAction *, InteractionEvent
   m_LiveWireFilter->SetStartPoint(click);
   //m_LiveWireFilterClosure->SetStartPoint(click);
   m_LiveWireFilterClosure->SetEndPoint(click);
-  m_ClosureContour->AddVertex(click);
+  if (!m_SnapClosureContour)
+  {
+    m_ClosureContour->AddVertex(click);
+  }
 
   // Remember PlaneGeometry to determine if events were triggered in the same plane
   m_PlaneGeometry = interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry();
@@ -449,17 +461,31 @@ void mitk::LiveWireTool2D::OnMouseMoved(StateMachineAction *, InteractionEvent *
   m_LiveWireFilter->SetEndPoint(positionEvent->GetPositionInWorld());
   m_LiveWireFilter->Update();
 
-  if (m_ClosureContour->GetNumberOfVertices() > 0)
+  if (m_SnapClosureContour)
   {
-    if (m_ClosureContour->GetNumberOfVertices() > 1)
+    m_LiveWireFilterClosure->SetStartPoint(positionEvent->GetPositionInWorld());
+    m_LiveWireFilterClosure->Update();
+  }
+  else
+  {
+    if (m_ClosureContour->GetNumberOfVertices() > 2)
+    {
+      m_ClosureContour = this->CreateNewContour();
+    }
+
+    if (m_ClosureContour->GetNumberOfVertices() == 0)
+    {
+      m_ClosureContour->AddVertex(m_Contour->GetVertexAt(0)->Coordinates);
+      m_ClosureContour->Update();
+    }
+
+    if (m_ClosureContour->GetNumberOfVertices() == 2)
     {
       m_ClosureContour->RemoveVertexAt(0);
     }
+
     m_ClosureContour->AddVertexAtFront(positionEvent->GetPositionInWorld());
   }
-
-  //m_LiveWireFilterClosure->SetStartPoint(positionEvent->GetPositionInWorld());
-  //m_LiveWireFilterClosure->Update();
 
   this->UpdateLiveWireContour();
 

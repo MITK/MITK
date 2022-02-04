@@ -58,6 +58,8 @@ namespace mitk
     /// \brief Delete all current contours.
     void ClearSegmentation();
 
+    void SetSnapClosureContour(bool snap);
+
   protected:
     LiveWireTool2D();
     ~LiveWireTool2D() override;
@@ -118,6 +120,7 @@ namespace mitk
 
     mitk::ContourModel::Pointer m_ClosureContour;
     mitk::DataNode::Pointer m_ClosureContourNode;
+    bool m_SnapClosureContour;
 
     mitk::ContourModel::Pointer m_EditingContour;
     mitk::DataNode::Pointer m_EditingContourNode;

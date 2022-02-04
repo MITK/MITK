@@ -311,6 +311,7 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
   }
 
   boost::replace_all(parameterListString, "\r\n", "\n");
+  boost::replace_all(parameterListString, "\t", "");
   boost::char_separator<char> newlineSeparator("\n");
   boost::tokenizer<boost::char_separator<char>> parameters(parameterListString, newlineSeparator);
   for (const auto &parameter : parameters)

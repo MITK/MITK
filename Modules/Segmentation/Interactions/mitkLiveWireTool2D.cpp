@@ -26,7 +26,7 @@ namespace mitk
 }
 
 mitk::LiveWireTool2D::LiveWireTool2D()
-  : SegTool2D("LiveWireTool"), m_CreateAndUseDynamicCosts(false), m_SnapClosureContour(false)
+  : SegTool2D("LiveWireTool"), m_SnapClosureContour(false), m_CreateAndUseDynamicCosts(false)
 {
 }
 

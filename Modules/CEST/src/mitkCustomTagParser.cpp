@@ -252,7 +252,12 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
     return results;
   }
 
-  std::map<std::string, std::string> privateParameters;
+  auto comp = [](const std::string& s1, const std::string& s2)
+  {
+    return boost::algorithm::lexicographical_compare(s1, s2, boost::algorithm::is_iless());
+  };
+
+  std::map<std::string, std::string, decltype(comp)> privateParameters(comp);
 
   // The Siemens private tag contains information like "43\52\23\34".
   // We jump over each "\" and convert the number;

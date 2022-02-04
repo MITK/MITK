@@ -287,27 +287,31 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
   std::string parameterListString;
 
   {
-    const std::string ASCCONV_BEGIN = "### ASCCONV BEGIN ###";
-    const std::string ASCCONV_END = "### ASCCONV END ###";
+    const std::string ASCCONV_MARKER = "###";
+    const std::string ASCCONV_BEGIN = "### ASCCONV BEGIN";
+    const std::string ASCCONV_END = "### ASCCONV END";
 
-    auto offset = bytes.find(ASCCONV_BEGIN);
+    auto ascconvBeginPos = bytes.find(ASCCONV_BEGIN);
+    if (std::string::npos == ascconvBeginPos)
+      return results;
+    ascconvBeginPos += ASCCONV_BEGIN.length();
 
-    if (std::string::npos == offset)
+    ascconvBeginPos = bytes.find(ASCCONV_MARKER, ascconvBeginPos);
+    if (std::string::npos == ascconvBeginPos)
+      return results;
+    ascconvBeginPos += ASCCONV_MARKER.length(); // closing "###"
+
+    auto ascconvEndPos = bytes.find(ASCCONV_END, ascconvBeginPos);
+    if (std::string::npos == ascconvEndPos)
       return results;
 
-    offset += ASCCONV_BEGIN.length();
+    auto count = ascconvEndPos - ascconvBeginPos;
 
-    auto count = bytes.find(ASCCONV_END, offset);
-
-    if (std::string::npos == count)
-      return results;
-
-    count -= offset;
-
-    parameterListString = bytes.substr(offset, count);
+    parameterListString = bytes.substr(ascconvBeginPos, count);
   }
 
   boost::replace_all(parameterListString, "\r\n", "\n");
+  boost::replace_all(parameterListString, "\t", "");
   boost::char_separator<char> newlineSeparator("\n");
   boost::tokenizer<boost::char_separator<char>> parameters(parameterListString, newlineSeparator);
   for (const auto &parameter : parameters)

@@ -9,6 +9,7 @@ set(INTERNAL_CPP_FILES
   QmitkAutocropAction.cpp
   QmitkAutocropLabelSetImageAction.cpp
   Common/QmitkDataSelectionWidget.cpp
+  Common/QmitkLayersWidget.cpp
   SegmentationUtilities/QmitkSegmentationUtilitiesView.cpp
   SegmentationUtilities/QmitkSegmentationUtilityWidget.cpp
   SegmentationUtilities/BooleanOperations/QmitkBooleanOperationsWidget.cpp
@@ -21,6 +22,7 @@ set(INTERNAL_CPP_FILES
 set(UI_FILES
   src/internal/QmitkSegmentationViewControls.ui
   src/internal/Common/QmitkDataSelectionWidgetControls.ui
+  src/internal/Common/QmitkLayersWidgetControls.ui
   src/internal/SegmentationUtilities/QmitkSegmentationUtilitiesViewControls.ui
   src/internal/SegmentationUtilities/BooleanOperations/QmitkBooleanOperationsWidgetControls.ui
   src/internal/SegmentationUtilities/ImageMasking/QmitkImageMaskingWidgetControls.ui
@@ -37,6 +39,7 @@ set(MOC_H_FILES
   src/internal/QmitkAutocropAction.h
   src/internal/QmitkAutocropLabelSetImageAction.h
   src/internal/Common/QmitkDataSelectionWidget.h
+  src/internal/Common/QmitkLayersWidget.h
   src/internal/SegmentationUtilities/QmitkSegmentationUtilitiesView.h
   src/internal/SegmentationUtilities/QmitkSegmentationUtilityWidget.h
   src/internal/SegmentationUtilities/BooleanOperations/QmitkBooleanOperationsWidget.h

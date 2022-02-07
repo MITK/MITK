@@ -67,6 +67,8 @@ private Q_SLOTS:
 
   void OnShowMarkerNodes(bool);
 
+  void OnLayersChanged();
+
 private:
 
   void CreateQtPartControl(QWidget* parent) override;

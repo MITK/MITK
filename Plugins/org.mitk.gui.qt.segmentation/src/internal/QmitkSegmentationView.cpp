@@ -378,6 +378,11 @@ void QmitkSegmentationView::OnShowMarkerNodes(bool state)
   }
 }
 
+void QmitkSegmentationView::OnLayersChanged()
+{
+  m_Controls->labelSetWidget->ResetAllTableWidgetItems();
+}
+
 /**********************************************************************/
 /* private                                                            */
 /**********************************************************************/
@@ -459,6 +464,8 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    // create signal/slot connections
    connect(m_Controls->newSegmentationButton, &QToolButton::clicked, this, &QmitkSegmentationView::OnNewSegmentation);
    connect(m_Controls->slicesInterpolator, &QmitkSlicesInterpolator::SignalShowMarkerNodes, this, &QmitkSegmentationView::OnShowMarkerNodes);
+
+   connect(m_Controls->layersWidget, &QmitkLayersWidget::LayersChanged, this, &QmitkSegmentationView::OnLayersChanged);
 
    auto command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
    command->SetCallbackFunction(this, &QmitkSegmentationView::ValidateSelectionInput);

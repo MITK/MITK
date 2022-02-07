@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QMITKSEGMENTATIONVIEW_H
 #define QMITKSEGMENTATIONVIEW_H
 
-#include "ui_QmitkSegmentationControls.h"
+#include "ui_QmitkSegmentationViewControls.h"
 
 #include <QmitkAbstractView.h>
 #include <mitkIRenderWindowPartListener.h>
@@ -105,7 +105,7 @@ private:
 
   QWidget* m_Parent;
 
-  Ui::QmitkSegmentationControls* m_Controls;
+  Ui::QmitkSegmentationViewControls* m_Controls;
 
   mitk::IRenderWindowPart* m_RenderWindowPart;
 

@@ -19,7 +19,7 @@ set(INTERNAL_CPP_FILES
 )
 
 set(UI_FILES
-  src/internal/QmitkSegmentationControls.ui
+  src/internal/QmitkSegmentationViewControls.ui
   src/internal/Common/QmitkDataSelectionWidgetControls.ui
   src/internal/SegmentationUtilities/QmitkSegmentationUtilitiesViewControls.ui
   src/internal/SegmentationUtilities/BooleanOperations/QmitkBooleanOperationsWidgetControls.ui

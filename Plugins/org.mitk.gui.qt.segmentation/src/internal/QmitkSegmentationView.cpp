@@ -124,7 +124,7 @@ void QmitkSegmentationView::OnReferenceSelectionChanged(QList<mitk::DataNode::Po
 
   if (nodes.empty())
   {
-    m_Controls->segImageSelector->SetNodePredicate(m_SegmentationPredicate);
+    m_Controls->workingNodeSelector->SetNodePredicate(m_SegmentationPredicate);
     m_ReferenceNode = nullptr;
     m_ToolManager->SetReferenceData(m_ReferenceNode);
     this->UpdateGUI();
@@ -139,7 +139,7 @@ void QmitkSegmentationView::OnReferenceSelectionChanged(QList<mitk::DataNode::Po
     auto segPredicate = mitk::NodePredicateAnd::New(m_SegmentationPredicate.GetPointer(),
       mitk::NodePredicateSubGeometry::New(m_ReferenceNode->GetData()->GetGeometry()));
 
-    m_Controls->segImageSelector->SetNodePredicate(segPredicate);
+    m_Controls->workingNodeSelector->SetNodePredicate(segPredicate);
 
     if (m_AutoSelectionEnabled)
     {
@@ -340,7 +340,7 @@ void QmitkSegmentationView::OnNewSegmentation()
     m_ToolManager->GetWorkingData(0)->SetSelected(false);
   }
   emptySegmentation->SetSelected(true);
-  m_Controls->segImageSelector->SetCurrentSelectedNode(emptySegmentation);
+  m_Controls->workingNodeSelector->SetCurrentSelectedNode(emptySegmentation);
 }
 
 void QmitkSegmentationView::OnManualTool2DSelected(int id)
@@ -385,27 +385,27 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 {
    m_Parent = parent;
 
-   m_Controls = new Ui::QmitkSegmentationControls;
+   m_Controls = new Ui::QmitkSegmentationViewControls;
    m_Controls->setupUi(parent);
 
    // *------------------------
    // * DATA SELECTION WIDGETS
    // *------------------------
-   m_Controls->patImageSelector->SetDataStorage(GetDataStorage());
-   m_Controls->patImageSelector->SetNodePredicate(m_ReferencePredicate);
-   m_Controls->patImageSelector->SetInvalidInfo("Select an image");
-   m_Controls->patImageSelector->SetPopUpTitel("Select an image");
-   m_Controls->patImageSelector->SetPopUpHint("Select an image that should be used to define the geometry and bounds of the segmentation.");
+   m_Controls->referenceNodeSelector->SetDataStorage(GetDataStorage());
+   m_Controls->referenceNodeSelector->SetNodePredicate(m_ReferencePredicate);
+   m_Controls->referenceNodeSelector->SetInvalidInfo("Select an image");
+   m_Controls->referenceNodeSelector->SetPopUpTitel("Select an image");
+   m_Controls->referenceNodeSelector->SetPopUpHint("Select an image that should be used to define the geometry and bounds of the segmentation.");
 
-   m_Controls->segImageSelector->SetDataStorage(GetDataStorage());
-   m_Controls->segImageSelector->SetNodePredicate(m_SegmentationPredicate);
-   m_Controls->segImageSelector->SetInvalidInfo("Select a segmentation");
-   m_Controls->segImageSelector->SetPopUpTitel("Select a segmentation");
-   m_Controls->segImageSelector->SetPopUpHint("Select a segmentation that should be modified. Only segmentation with the same geometry and within the bounds of the reference image are selected.");
+   m_Controls->workingNodeSelector->SetDataStorage(GetDataStorage());
+   m_Controls->workingNodeSelector->SetNodePredicate(m_SegmentationPredicate);
+   m_Controls->workingNodeSelector->SetInvalidInfo("Select a segmentation");
+   m_Controls->workingNodeSelector->SetPopUpTitel("Select a segmentation");
+   m_Controls->workingNodeSelector->SetPopUpHint("Select a segmentation that should be modified. Only segmentation with the same geometry and within the bounds of the reference image are selected.");
 
-   connect(m_Controls->patImageSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
+   connect(m_Controls->referenceNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
            this, &QmitkSegmentationView::OnReferenceSelectionChanged);
-   connect(m_Controls->segImageSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
+   connect(m_Controls->workingNodeSelector, &QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged,
            this, &QmitkSegmentationView::OnSegmentationSelectionChanged);
 
    // *------------------------
@@ -437,28 +437,28 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    }
 
    // setup 2D tools
-   m_Controls->m_ManualToolSelectionBox2D->SetToolManager(*m_ToolManager);
-   m_Controls->m_ManualToolSelectionBox2D->SetGenerateAccelerators(true);
-   m_Controls->m_ManualToolSelectionBox2D->SetToolGUIArea(m_Controls->m_ManualToolGUIContainer2D);
-   m_Controls->m_ManualToolSelectionBox2D->SetDisplayedToolGroups(segTools2D.toStdString());
-   m_Controls->m_ManualToolSelectionBox2D->SetLayoutColumns(3);
-   m_Controls->m_ManualToolSelectionBox2D->SetEnabledMode(
+   m_Controls->toolSelectionBox2D->SetToolManager(*m_ToolManager);
+   m_Controls->toolSelectionBox2D->SetGenerateAccelerators(true);
+   m_Controls->toolSelectionBox2D->SetToolGUIArea(m_Controls->toolGUIArea2D);
+   m_Controls->toolSelectionBox2D->SetDisplayedToolGroups(segTools2D.toStdString());
+   m_Controls->toolSelectionBox2D->SetLayoutColumns(3);
+   m_Controls->toolSelectionBox2D->SetEnabledMode(
      QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible);
-   connect(m_Controls->m_ManualToolSelectionBox2D, &QmitkToolSelectionBox::ToolSelected,
+   connect(m_Controls->toolSelectionBox2D, &QmitkToolSelectionBox::ToolSelected,
            this, &QmitkSegmentationView::OnManualTool2DSelected);
 
    // setup 3D Tools
-   m_Controls->m_ManualToolSelectionBox3D->SetToolManager(*m_ToolManager);
-   m_Controls->m_ManualToolSelectionBox3D->SetGenerateAccelerators(true);
-   m_Controls->m_ManualToolSelectionBox3D->SetToolGUIArea(m_Controls->m_ManualToolGUIContainer3D);
-   m_Controls->m_ManualToolSelectionBox3D->SetDisplayedToolGroups(segTools3D.toStdString());
-   m_Controls->m_ManualToolSelectionBox3D->SetLayoutColumns(3);
-   m_Controls->m_ManualToolSelectionBox3D->SetEnabledMode(
+   m_Controls->toolSelectionBox3D->SetToolManager(*m_ToolManager);
+   m_Controls->toolSelectionBox3D->SetGenerateAccelerators(true);
+   m_Controls->toolSelectionBox3D->SetToolGUIArea(m_Controls->toolGUIArea3D);
+   m_Controls->toolSelectionBox3D->SetDisplayedToolGroups(segTools3D.toStdString());
+   m_Controls->toolSelectionBox3D->SetLayoutColumns(3);
+   m_Controls->toolSelectionBox3D->SetEnabledMode(
      QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible);
 
    // create signal/slot connections
-   connect(m_Controls->btnNewSegmentation, &QToolButton::clicked, this, &QmitkSegmentationView::OnNewSegmentation);
-   connect(m_Controls->m_SlicesInterpolator, &QmitkSlicesInterpolator::SignalShowMarkerNodes, this, &QmitkSegmentationView::OnShowMarkerNodes);
+   connect(m_Controls->newSegmentationButton, &QToolButton::clicked, this, &QmitkSegmentationView::OnNewSegmentation);
+   connect(m_Controls->slicesInterpolator, &QmitkSlicesInterpolator::SignalShowMarkerNodes, this, &QmitkSegmentationView::OnShowMarkerNodes);
 
    auto command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
    command->SetCallbackFunction(this, &QmitkSegmentationView::ValidateSelectionInput);
@@ -473,8 +473,8 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
    // Make sure the GUI notices if appropriate data is already present on creation.
    // Should be done last, if everything else is configured because it triggers the autoselection of data.
-   m_Controls->patImageSelector->SetAutoSelectNewNodes(true);
-   m_Controls->segImageSelector->SetAutoSelectNewNodes(true);
+   m_Controls->referenceNodeSelector->SetAutoSelectNewNodes(true);
+   m_Controls->workingNodeSelector->SetAutoSelectNewNodes(true);
 
    this->UpdateGUI();
 }
@@ -494,12 +494,12 @@ void QmitkSegmentationView::RenderWindowPartActivated(mitk::IRenderWindowPart* r
   // tell the interpolation about tool manager, data storage and render window part
   if (nullptr != m_Controls && nullptr != m_RenderWindowPart)
   {
-    m_Controls->m_SlicesInterpolator->SetDataStorage(this->GetDataStorage());
+    m_Controls->slicesInterpolator->SetDataStorage(this->GetDataStorage());
     QList<mitk::SliceNavigationController*> controllers;
     controllers.push_back(m_RenderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController());
     controllers.push_back(m_RenderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController());
     controllers.push_back(m_RenderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController());
-    m_Controls->m_SlicesInterpolator->Initialize(m_ToolManager, controllers);
+    m_Controls->slicesInterpolator->Initialize(m_ToolManager, controllers);
   }
 }
 
@@ -517,8 +517,8 @@ void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences*
   if (nullptr != m_Controls)
   {
     bool slimView = prefs->GetBool("slim view", false);
-    m_Controls->m_ManualToolSelectionBox2D->SetShowNames(!slimView);
-    m_Controls->m_ManualToolSelectionBox3D->SetShowNames(!slimView);
+    m_Controls->toolSelectionBox2D->SetShowNames(!slimView);
+    m_Controls->toolSelectionBox3D->SetShowNames(!slimView);
   }
 
   m_AutoSelectionEnabled = prefs->GetBool("auto selection", false);
@@ -723,17 +723,17 @@ void QmitkSegmentationView::UpdateGUI()
   mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
   bool hasWorkingNode = workingNode != nullptr;
 
-  m_Controls->btnNewSegmentation->setEnabled(false);
-  m_Controls->m_SlicesInterpolator->setEnabled(false);
+  m_Controls->newSegmentationButton->setEnabled(false);
+  m_Controls->slicesInterpolator->setEnabled(false);
 
   if (hasReferenceNode)
   {
-    m_Controls->btnNewSegmentation->setEnabled(true);
+    m_Controls->newSegmentationButton->setEnabled(true);
   }
 
   if (hasWorkingNode && hasReferenceNode)
   {
-    m_Controls->m_SlicesInterpolator->setEnabled(true);
+    m_Controls->slicesInterpolator->setEnabled(true);
 
     int layer = -1;
     referenceNode->GetIntProperty("layer", layer);
@@ -749,11 +749,11 @@ void QmitkSegmentationView::ValidateSelectionInput()
 
   // the argument is actually not used
   // enable status depends on the tool manager selection
-  m_Controls->m_ManualToolSelectionBox2D->setEnabled(false);
-  m_Controls->m_ManualToolSelectionBox3D->setEnabled(false);
+  m_Controls->toolSelectionBox2D->setEnabled(false);
+  m_Controls->toolSelectionBox3D->setEnabled(false);
 
-  mitk::DataNode* referenceNode = m_Controls->patImageSelector->GetSelectedNode();
-  mitk::DataNode* workingNode = m_Controls->segImageSelector->GetSelectedNode();
+  mitk::DataNode* referenceNode = m_Controls->referenceNodeSelector->GetSelectedNode();
+  mitk::DataNode* workingNode = m_Controls->workingNodeSelector->GetSelectedNode();
 
   if (nullptr == referenceNode)
   {
@@ -788,8 +788,8 @@ void QmitkSegmentationView::ValidateSelectionInput()
     {
       m_ToolManager->SetReferenceData(referenceNode);
       m_ToolManager->SetWorkingData(workingNode);
-      m_Controls->m_ManualToolSelectionBox2D->setEnabled(true);
-      m_Controls->m_ManualToolSelectionBox3D->setEnabled(true);
+      m_Controls->toolSelectionBox2D->setEnabled(true);
+      m_Controls->toolSelectionBox3D->setEnabled(true);
       return;
     }
   }
@@ -803,11 +803,11 @@ void QmitkSegmentationView::UpdateWarningLabel(QString text)
 {
   if (text.size() == 0)
   {
-    m_Controls->lblSegmentationWarnings->hide();
+    m_Controls->selectionWarningLabel->hide();
   }
   else
   {
-    m_Controls->lblSegmentationWarnings->show();
+    m_Controls->selectionWarningLabel->show();
+    m_Controls->selectionWarningLabel->setText("<font color=\"red\">" + text + "</font>");
   }
-  m_Controls->lblSegmentationWarnings->setText("<font color=\"red\">" + text + "</font>");
 }

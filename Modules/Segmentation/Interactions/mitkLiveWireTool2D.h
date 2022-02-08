@@ -112,6 +112,8 @@ namespace mitk
 
     ContourModel::Pointer CreateNewContour() const;
 
+    void UpdateClosureContour(mitk::Point3D endpoint);
+
     mitk::ContourModel::Pointer m_Contour;
     mitk::DataNode::Pointer m_ContourNode;
 

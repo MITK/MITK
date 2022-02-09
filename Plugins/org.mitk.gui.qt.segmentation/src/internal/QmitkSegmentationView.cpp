@@ -383,6 +383,11 @@ void QmitkSegmentationView::OnLayersChanged()
   m_Controls->labelSetWidget->ResetAllTableWidgetItems();
 }
 
+void QmitkSegmentationView::OnLabelsChanged()
+{
+  m_Controls->labelSetWidget->ResetAllTableWidgetItems();
+}
+
 /**********************************************************************/
 /* private                                                            */
 /**********************************************************************/
@@ -461,11 +466,12 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_Controls->toolSelectionBox3D->SetEnabledMode(
      QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible);
 
-   // create signal/slot connections
+   // create general signal / slot connections
    connect(m_Controls->newSegmentationButton, &QToolButton::clicked, this, &QmitkSegmentationView::OnNewSegmentation);
    connect(m_Controls->slicesInterpolator, &QmitkSlicesInterpolator::SignalShowMarkerNodes, this, &QmitkSegmentationView::OnShowMarkerNodes);
 
    connect(m_Controls->layersWidget, &QmitkLayersWidget::LayersChanged, this, &QmitkSegmentationView::OnLayersChanged);
+   connect(m_Controls->labelsWidget, &QmitkLabelsWidget::LabelsChanged, this, &QmitkSegmentationView::OnLabelsChanged);
 
    auto command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
    command->SetCallbackFunction(this, &QmitkSegmentationView::ValidateSelectionInput);
@@ -746,6 +752,9 @@ void QmitkSegmentationView::UpdateGUI()
     referenceNode->GetIntProperty("layer", layer);
     workingNode->SetIntProperty("layer", layer + 1);
   }
+
+  m_Controls->layersWidget->UpdateGUI();
+  m_Controls->labelsWidget->UpdateGUI();
 
   this->ValidateSelectionInput();
 }

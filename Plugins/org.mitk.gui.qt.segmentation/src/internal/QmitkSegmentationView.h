@@ -69,6 +69,8 @@ private Q_SLOTS:
 
   void OnLayersChanged();
 
+  void OnLabelsChanged();
+
 private:
 
   void CreateQtPartControl(QWidget* parent) override;

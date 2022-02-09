@@ -103,6 +103,17 @@
     </widget>
    </item>
    <item>
+    <widget class="QmitkLabelsWidget" name="labelsWidget" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QTabWidget" name="tabWidgetSegmentationTools">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
@@ -264,6 +275,12 @@
    <class>QmitkLayersWidget</class>
    <extends>QWidget</extends>
    <header location="global">internal/Common/QmitkLayersWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkLabelsWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">internal/Common/QmitkLabelsWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

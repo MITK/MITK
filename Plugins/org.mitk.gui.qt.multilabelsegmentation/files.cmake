@@ -69,7 +69,6 @@ set(CACHED_RESOURCE_FILES
   resources/MorphologicalOperations_48x48.png
   resources/multilabelsegmentation.svg
   resources/multilabelsegmentation_utilities.svg
-  resources/NewSegmentationSession_48x48.png
   resources/Opening_48x48.png
   resources/SurfaceToImage_48x48.png
   plugin.xml

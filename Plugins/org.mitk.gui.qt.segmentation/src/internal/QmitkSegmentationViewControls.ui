@@ -69,10 +69,20 @@
          <string>Create a new segmentation</string>
         </property>
         <property name="text">
-         <string>New...</string>
+         <string>...</string>
         </property>
-        <property name="toolButtonStyle">
-         <enum>Qt::ToolButtonTextOnly</enum>
+        <property name="icon">
+         <iconset>
+          <normaloff>:/Qmitk/NewSegmentation_48x48.png</normaloff>:/Qmitk/NewSegmentation_48x48.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>28</width>
+          <height>28</height>
+         </size>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
         </property>
        </widget>
       </item>

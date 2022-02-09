@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkDataNode.h>
 #include <mitkImage.h>
 #include <mitkLabelSetImage.h>
+#include <mitkLabelSetImageHelper.h>
 #include <mitkToolManagerProvider.h>
 
 // Qmitk
@@ -115,20 +116,9 @@ void QmitkLabelsWidget::OnNewLabel()
     return;
   }
 
-
-  int numberOfLabels = workingImage->GetActiveLabelSet()->GetNumberOfLabels();
-
-  mitk::LookupTable::Pointer lookupTable = mitk::LookupTable::New();
-  lookupTable->SetType(mitk::LookupTable::LookupTableType::MULTILABEL);
-  double rgb[3];
-  lookupTable->GetColor(numberOfLabels, rgb);
-  mitk::Color labelColor;
-  labelColor.Set(static_cast<float>(rgb[0]), static_cast<float>(rgb[1]), static_cast<float>(rgb[2]));
-
-  std::string labelName = "New label " + std::to_string(numberOfLabels);
-
   this->WaitCursorOn();
-  workingImage->GetActiveLabelSet()->AddLabel(labelName, labelColor);
+  mitk::Label::Pointer newLabel = mitk::LabelSetImageHelper::CreateNewLabel(workingImage);
+  workingImage->GetActiveLabelSet()->AddLabel(newLabel);
   this->WaitCursorOff();
 
   this->UpdateGUI();

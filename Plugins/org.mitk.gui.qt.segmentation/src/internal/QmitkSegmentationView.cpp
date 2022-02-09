@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include <mitkCameraController.h>
 #include <mitkImageTimeSelector.h>
 #include <mitkLabelSetImage.h>
+#include <mitkLabelSetImageHelper.h>
 #include <mitkNodePredicateSubGeometry.h>
 #include <mitkSegmentationObjectFactory.h>
 #include <mitkSegTool2D.h>
@@ -30,7 +31,6 @@ found in the LICENSE file.
 #include <mitkWorkbenchUtil.h>
 
 // Qmitk
-#include <QmitkNewSegmentationDialog.h>
 #include <QmitkRenderWindow.h>
 #include <QmitkSegmentationOrganNamesHandling.cpp>
 
@@ -226,14 +226,13 @@ void QmitkSegmentationView::OnNewSegmentation()
 {
   m_ToolManager->ActivateTool(-1);
 
-  mitk::DataNode::Pointer referenceNode = m_ToolManager->GetReferenceData(0);
-  if (referenceNode.IsNull())
+  if (m_ReferenceNode.IsNull())
   {
     MITK_ERROR << "'Create new segmentation' button should never be clickable unless a reference image is selected.";
     return;
   }
 
-  mitk::Image::ConstPointer referenceImage = dynamic_cast<mitk::Image*>(referenceNode->GetData());
+  mitk::Image::ConstPointer referenceImage = dynamic_cast<mitk::Image*>(m_ReferenceNode->GetData());
   if (referenceImage.IsNull())
   {
     QMessageBox::information(
@@ -284,68 +283,43 @@ void QmitkSegmentationView::OnNewSegmentation()
     }
   }
 
-  QString newName = QString::fromStdString(referenceNode->GetName());
-  newName.append("-labels");
-
-  // ask about the name and organ type of the new segmentation
-  auto dialog = new QmitkNewSegmentationDialog(m_Parent);
-  QStringList organColors = mitk::OrganNamesHandling::GetDefaultOrganColorString();
-  dialog->SetSuggestionList(organColors);
-  dialog->SetSegmentationName(newName);
-
-  int dialogReturnValue = dialog->exec();
-  if (dialogReturnValue == QDialog::Rejected)
-  {
-    return;
-  }
-
-  std::string newNodeName = dialog->GetSegmentationName().toStdString();
-  if (newNodeName.empty())
-  {
-    newNodeName = "Unnamed";
-  }
-
-  // create a new image of the same dimensions and smallest possible pixel type
-  auto firstTool = m_ToolManager->GetToolById(0);
-  if (nullptr == firstTool)
-  {
-    return;
-  }
-
-  mitk::DataNode::Pointer emptySegmentation = nullptr;
+  mitk::DataNode::Pointer newSegmentationNode;
   try
   {
-    emptySegmentation = firstTool->CreateEmptySegmentationNode(segTemplateImage, newNodeName, dialog->GetColor());
+    this->WaitCursorOn();
+    newSegmentationNode = mitk::LabelSetImageHelper::CreateNewSegmentationNode(m_ReferenceNode, segTemplateImage);
+    this->WaitCursorOff();
   }
-  catch (const std::bad_alloc &)
+  catch (mitk::Exception& e)
   {
-    QMessageBox::warning(m_Parent, tr("New segmentation"), tr("Could not allocate memory for new segmentation"));
+    this->WaitCursorOff();
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    QMessageBox::warning(m_Parent, "New segmentation", "Could not create a new segmentation.");
+    return;
   }
 
-  if (nullptr == emptySegmentation)
+  auto newLabelSetImage = dynamic_cast<mitk::LabelSetImage*>(newSegmentationNode->GetData());
+  if (nullptr == newLabelSetImage)
   {
-    return; // could have been aborted by user
+    // something went wrong
+    return;
   }
 
-  // initialize "showVolume"-property to false to prevent recalculating the volume while working on the segmentation
-  emptySegmentation->SetProperty("showVolume", mitk::BoolProperty::New(false));
+  mitk::Label::Pointer newLabel = mitk::LabelSetImageHelper::CreateNewLabel(newLabelSetImage);
+  newLabelSetImage->GetActiveLabelSet()->AddLabel(newLabel);
 
-  mitk::OrganNamesHandling::UpdateOrganList(organColors, dialog->GetSegmentationName(), dialog->GetColor());
-
-  // escape ';' here (replace by '\;')
-  QString stringForStorage = organColors.replaceInStrings(";", "\\;").join(";");
-  MITK_DEBUG << "Will store: " << stringForStorage;
-  this->GetPreferences()->Put("Organ-Color-List", stringForStorage);
-  this->GetPreferences()->Flush();
-
-  this->GetDataStorage()->Add(emptySegmentation, referenceNode);
+  if (!this->GetDataStorage()->Exists(newSegmentationNode))
+  {
+    this->GetDataStorage()->Add(newSegmentationNode, m_ReferenceNode);
+  }
 
   if (m_ToolManager->GetWorkingData(0))
   {
     m_ToolManager->GetWorkingData(0)->SetSelected(false);
   }
-  emptySegmentation->SetSelected(true);
-  m_Controls->workingNodeSelector->SetCurrentSelectedNode(emptySegmentation);
+
+  newSegmentationNode->SetSelected(true);
+  m_Controls->workingNodeSelector->SetCurrentSelectedNode(newSegmentationNode);
 }
 
 void QmitkSegmentationView::OnManualTool2DSelected(int id)

@@ -4,6 +4,7 @@ set(CPP_FILES
   mitkLabelSetImage.cpp
   mitkLabelSetImageConverter.cpp
   mitkLabelSetImageSource.cpp
+  mitkLabelSetImageHelper.cpp
   mitkLabelSetImageSurfaceStampFilter.cpp
   mitkLabelSetImageToSurfaceFilter.cpp
   mitkLabelSetImageToSurfaceThreadedFilter.cpp

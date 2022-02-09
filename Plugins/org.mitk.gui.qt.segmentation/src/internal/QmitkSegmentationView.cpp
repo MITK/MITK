@@ -90,6 +90,8 @@ QmitkSegmentationView::~QmitkSegmentationView()
 {
   if (nullptr != m_Controls)
   {
+    OnLooseLabelSetConnection();
+
     // deactivate all tools
     m_ToolManager->ActivateTool(-1);
 
@@ -205,6 +207,9 @@ void QmitkSegmentationView::OnSegmentationSelectionChanged(QList<mitk::DataNode:
       }
     }
     m_WorkingNode->SetVisibility(true);
+
+    this->OnEstablishLabelSetConnection();
+    m_Controls->labelSetWidget->ResetAllTableWidgetItems();
 
     auto command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
     command->SetCallbackFunction(this, &QmitkSegmentationView::ValidateSelectionInput);
@@ -388,6 +393,27 @@ void QmitkSegmentationView::OnLabelsChanged()
   m_Controls->labelSetWidget->ResetAllTableWidgetItems();
 }
 
+void QmitkSegmentationView::OnShowLabelTable(bool value)
+{
+  m_Controls->labelSetWidget->setVisible(value);
+}
+
+void QmitkSegmentationView::OnGoToLabel(const mitk::Point3D& pos)
+{
+  if (m_RenderWindowPart)
+  {
+    m_RenderWindowPart->SetSelectedPosition(pos);
+  }
+}
+
+void QmitkSegmentationView::OnResetView()
+{
+  if (m_RenderWindowPart)
+  {
+    m_RenderWindowPart->ForceImmediateUpdate();
+  }
+}
+
 /**********************************************************************/
 /* private                                                            */
 /**********************************************************************/
@@ -472,6 +498,17 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
    connect(m_Controls->layersWidget, &QmitkLayersWidget::LayersChanged, this, &QmitkSegmentationView::OnLayersChanged);
    connect(m_Controls->labelsWidget, &QmitkLabelsWidget::LabelsChanged, this, &QmitkSegmentationView::OnLabelsChanged);
+   connect(m_Controls->labelsWidget, &QmitkLabelsWidget::ShowLabelTable, this, &QmitkSegmentationView::OnShowLabelTable);
+
+   // *------------------------
+   // * LABELSETWIDGET
+   // *------------------------
+   connect(m_Controls->labelSetWidget, &QmitkLabelSetWidget::goToLabel, this, &QmitkSegmentationView::OnGoToLabel);
+   connect(m_Controls->labelSetWidget, &QmitkLabelSetWidget::resetView, this, &QmitkSegmentationView::OnResetView);
+
+   m_Controls->labelSetWidget->SetDataStorage(this->GetDataStorage());
+   m_Controls->labelSetWidget->SetOrganColors(mitk::OrganNamesHandling::GetDefaultOrganColorString());
+   m_Controls->labelSetWidget->hide();
 
    auto command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
    command->SetCallbackFunction(this, &QmitkSegmentationView::ValidateSelectionInput);
@@ -578,6 +615,71 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
 
   mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
   mitk::SurfaceInterpolationController::GetInstance()->RemoveInterpolationSession(image);
+}
+
+void QmitkSegmentationView::OnEstablishLabelSetConnection()
+{
+  if (m_WorkingNode.IsNull())
+  {
+    return;
+  }
+
+  auto workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
+  if (nullptr == workingImage)
+  {
+    return;
+  }
+
+  workingImage->GetActiveLabelSet()->AddLabelEvent += mitk::MessageDelegate<QmitkLabelSetWidget>(
+    m_Controls->labelSetWidget, &QmitkLabelSetWidget::ResetAllTableWidgetItems);
+  workingImage->GetActiveLabelSet()->RemoveLabelEvent += mitk::MessageDelegate<QmitkLabelSetWidget>(
+    m_Controls->labelSetWidget, &QmitkLabelSetWidget::ResetAllTableWidgetItems);
+  workingImage->GetActiveLabelSet()->ModifyLabelEvent += mitk::MessageDelegate<QmitkLabelSetWidget>(
+    m_Controls->labelSetWidget, &QmitkLabelSetWidget::UpdateAllTableWidgetItems);
+  workingImage->GetActiveLabelSet()->AllLabelsModifiedEvent += mitk::MessageDelegate<QmitkLabelSetWidget>(
+    m_Controls->labelSetWidget, &QmitkLabelSetWidget::UpdateAllTableWidgetItems);
+  workingImage->GetActiveLabelSet()->ActiveLabelEvent += mitk::MessageDelegate1<QmitkLabelSetWidget,
+    mitk::Label::PixelType>(m_Controls->labelSetWidget, &QmitkLabelSetWidget::SelectLabelByPixelValue);
+
+  // Removed in T27851 to have a chance to react to AfterChangeLayerEvent. Did it brake something?
+  // workingImage->BeforeChangeLayerEvent += mitk::MessageDelegate<QmitkMultiLabelSegmentationView>(
+  //   this, &QmitkMultiLabelSegmentationView::OnLooseLabelSetConnection);
+
+  workingImage->AfterChangeLayerEvent += mitk::MessageDelegate<QmitkSegmentationView>(
+    this, &QmitkSegmentationView::UpdateGUI);
+}
+
+void QmitkSegmentationView::OnLooseLabelSetConnection()
+{
+  if (m_WorkingNode.IsNull())
+  {
+    return;
+  }
+
+  auto workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
+  if (nullptr == workingImage)
+  {
+    return;
+  }
+
+  // Reset LabelSetWidget Events
+  workingImage->GetActiveLabelSet()->AddLabelEvent -= mitk::MessageDelegate<QmitkLabelSetWidget>(
+    m_Controls->labelSetWidget, &QmitkLabelSetWidget::ResetAllTableWidgetItems);
+  workingImage->GetActiveLabelSet()->RemoveLabelEvent -= mitk::MessageDelegate<QmitkLabelSetWidget>(
+    m_Controls->labelSetWidget, &QmitkLabelSetWidget::ResetAllTableWidgetItems);
+  workingImage->GetActiveLabelSet()->ModifyLabelEvent -= mitk::MessageDelegate<QmitkLabelSetWidget>(
+    m_Controls->labelSetWidget, &QmitkLabelSetWidget::UpdateAllTableWidgetItems);
+  workingImage->GetActiveLabelSet()->AllLabelsModifiedEvent -= mitk::MessageDelegate<QmitkLabelSetWidget>(
+    m_Controls->labelSetWidget, &QmitkLabelSetWidget::UpdateAllTableWidgetItems);
+  workingImage->GetActiveLabelSet()->ActiveLabelEvent -= mitk::MessageDelegate1<QmitkLabelSetWidget,
+    mitk::Label::PixelType>(m_Controls->labelSetWidget, &QmitkLabelSetWidget::SelectLabelByPixelValue);
+
+  // Removed in T27851 to have a chance to react to AfterChangeLayerEvent. Did it brake something?
+  // workingImage->BeforeChangeLayerEvent -= mitk::MessageDelegate<QmitkMultiLabelSegmentationView>(
+  //   this, &QmitkMultiLabelSegmentationView::OnLooseLabelSetConnection);
+
+  workingImage->AfterChangeLayerEvent -= mitk::MessageDelegate<QmitkSegmentationView>(
+    this, &QmitkSegmentationView::UpdateGUI);
 }
 
 void QmitkSegmentationView::ApplyDisplayOptions()
@@ -763,6 +865,8 @@ void QmitkSegmentationView::ValidateSelectionInput()
 {
   this->UpdateWarningLabel("");
 
+  m_Controls->labelSetWidget->setEnabled(false);
+
   // the argument is actually not used
   // enable status depends on the tool manager selection
   m_Controls->toolSelectionBox2D->setEnabled(false);
@@ -804,6 +908,7 @@ void QmitkSegmentationView::ValidateSelectionInput()
     {
       m_ToolManager->SetReferenceData(referenceNode);
       m_ToolManager->SetWorkingData(workingNode);
+      m_Controls->labelSetWidget->setEnabled(true);
       m_Controls->toolSelectionBox2D->setEnabled(true);
       m_Controls->toolSelectionBox3D->setEnabled(true);
       return;

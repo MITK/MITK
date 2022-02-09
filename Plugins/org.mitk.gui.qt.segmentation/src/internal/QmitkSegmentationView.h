@@ -71,6 +71,12 @@ private Q_SLOTS:
 
   void OnLabelsChanged();
 
+  void OnShowLabelTable(bool);
+
+  void OnGoToLabel(const mitk::Point3D &pos);
+
+  void OnResetView();
+
 private:
 
   void CreateQtPartControl(QWidget* parent) override;
@@ -85,6 +91,10 @@ private:
   void NodeAdded(const mitk::DataNode* node) override;
 
   void NodeRemoved(const mitk::DataNode* node) override;
+
+  void OnEstablishLabelSetConnection();
+
+  void OnLooseLabelSetConnection();
 
   // make sure all images / segmentations look according to the user preference settings
   void ApplyDisplayOptions();

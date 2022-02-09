@@ -120,6 +120,15 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QmitkLabelSetWidget" name="labelSetWidget" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
     </widget>
    </item>
@@ -291,6 +300,12 @@
    <class>QmitkLabelsWidget</class>
    <extends>QWidget</extends>
    <header location="global">internal/Common/QmitkLabelsWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkLabelSetWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkLabelSetWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

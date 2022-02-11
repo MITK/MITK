@@ -38,7 +38,6 @@ mitk::nnUNetTool::~nnUNetTool()
 void mitk::nnUNetTool::Activated()
 {
   Superclass::Activated();
-  m_InputOutputPair = std::make_pair(nullptr, nullptr);
 }
 
 void mitk::nnUNetTool::UpdateCleanUp()
@@ -49,10 +48,10 @@ void mitk::nnUNetTool::UpdateCleanUp()
 
 void mitk::nnUNetTool::RenderOutputBuffer()
 {
+  MITK_INFO << "inn RenderOutputBuffer";
   if (this->m_OutputBuffer != nullptr)
   {
     Superclass::SetNodeProperties(this->m_OutputBuffer);
-    this->ClearOutputBuffer();
     try
     {
       if (nullptr != this->GetPreviewSegmentationNode())
@@ -76,15 +75,18 @@ void mitk::nnUNetTool::SetNodeProperties(LabelSetImage::Pointer segmentation)
   // This overriden method doesn't set node properties. Intentionally left out for setting later upon demand
   // in the `RenderOutputBuffer` method.
   this->m_OutputBuffer = segmentation;
+  MITK_INFO << "inn derived SetNodeProperties " << this->m_OutputBuffer.GetPointer();
 }
 
 mitk::LabelSetImage::Pointer mitk::nnUNetTool::GetOutputBuffer()
 {
+  MITK_INFO << "inn GetOutputBuffer " << this->m_OutputBuffer.GetPointer();
   return this->m_OutputBuffer;
 }
 
 void mitk::nnUNetTool::ClearOutputBuffer()
 {
+  MITK_INFO << "inn ClearOutputBuffer " << this->m_OutputBuffer.GetPointer();
   this->m_OutputBuffer = nullptr;
 }
 
@@ -139,14 +141,14 @@ namespace
   }
 } // namespace
 
-mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inputAtTimeStep, TimeStepType /*timeStep*/)
+mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inputAtTimeStep, TimeStepType timeStep)
 {
-  if (m_InputOutputPair.first == inputAtTimeStep)
+  MITK_INFO << "IN ComputeMLPreview " << timeStep;
+  if (m_InputBuffer == inputAtTimeStep)
   {
-    return m_InputOutputPair.second;
+    return m_OutputBuffer;
   }
   std::string inDir, outDir, inputImagePath, outputImagePath, scriptPath;
-  std::string templateFilename = "XXXXXX_000_0000.nii.gz";
 
   ProcessExecutor::Pointer spExec = ProcessExecutor::New();
   itk::CStyleCommand::Pointer spCommand = itk::CStyleCommand::New();
@@ -156,7 +158,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
 
   inDir = IOUtil::CreateTemporaryDirectory("nnunet-in-XXXXXX", this->GetMitkTempDir());
   std::ofstream tmpStream;
-  inputImagePath = IOUtil::CreateTemporaryFile(tmpStream, templateFilename, inDir + IOUtil::GetDirectorySeparator());
+  inputImagePath = IOUtil::CreateTemporaryFile(tmpStream, m_TEMPLATE_FILENAME, inDir + IOUtil::GetDirectorySeparator());
   tmpStream.close();
   std::size_t found = inputImagePath.find_last_of(IOUtil::GetDirectorySeparator());
   std::string fileName = inputImagePath.substr(found + 1);
@@ -171,21 +173,22 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   try
   {
     IOUtil::Save(inputAtTimeStep, inputImagePath);
-
     if (this->GetMultiModal())
     {
       std::string outModalFile;
       int len = inDir.length() + token.length() + 1 + 8 + 2 + 7;
       outModalFile.reserve(len);
+      const std::string fileFormat(".nii.gz");
+      const std::string fileNamePart("_000_000");
       for (size_t i = 0; i < this->m_OtherModalPaths.size(); ++i)
       {
         mitk::Image::ConstPointer modalImage = this->m_OtherModalPaths[i];
         outModalFile.append(inDir);
         outModalFile.push_back(IOUtil::GetDirectorySeparator());
         outModalFile.append(token);
-        outModalFile.append("_000_000");
+        outModalFile.append(fileNamePart);
         outModalFile.append(std::to_string(i + 1));
-        outModalFile.append(".nii.gz");
+        outModalFile.append(fileFormat);
         IOUtil::Save(modalImage.GetPointer(), outModalFile);
         outModalFile.clear();
       }
@@ -211,6 +214,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   }
   for (ModelParams &modelparam : m_ParamQ)
   {
+    MITK_INFO << "IN ComputeMLPreview Segmenting... ";
     outDir = IOUtil::CreateTemporaryDirectory("nnunet-out-XXXXXX", this->GetMitkTempDir());
     outputImagePath = outDir + IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";
     modelparam.outputDir = outDir;
@@ -273,10 +277,10 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
 
     try
     {
-    for (auto arg : args)
-    {
-      MITK_INFO << arg;
-    }
+      // for (auto arg : args)
+      // {
+      //   MITK_INFO << arg;
+      // }
       std::string resultsFolderEnv = "RESULTS_FOLDER=" + this->GetModelDirectory();
       itksys::SystemTools::PutEnv(resultsFolderEnv.c_str());
       std::string cudaEnv = "CUDA_VISIBLE_DEVICES=" + std::to_string(this->GetGpuId());
@@ -322,11 +326,12 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   }
   try
   {
+    //outputImagePath = "/Users/ashis/DKFZ/nnUNet/nnUNet/out_dir/heart_single/la_000.nii.gz";
     LabelSetImage::Pointer resultImage = LabelSetImage::New();
     Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
     resultImage->InitializeByLabeledImage(outputImage);
     resultImage->SetGeometry(inputAtTimeStep->GetGeometry());
-    m_InputOutputPair = std::make_pair(inputAtTimeStep, resultImage);
+    m_InputBuffer = inputAtTimeStep;
     return resultImage;
   }
   catch (const mitk::Exception &e)

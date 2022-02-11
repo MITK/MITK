@@ -377,6 +377,9 @@ mitk::ModelParams QmitknnUNetToolGUI::MapToRequest(const QString &modelName,
   requestObject.planId = planId.toStdString();
   requestObject.task = taskName.toStdString();
   requestObject.folds = folds;
+  mitk::nnUNetTool::Pointer tool = this->GetConnectedToolAs<mitk::nnUNetTool>();
+  requestObject.inputName = tool->GetRefNode()->GetName();
+  requestObject.timeStamp = std::to_string(mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint());
   return requestObject;
 }
 
@@ -395,6 +398,7 @@ void QmitknnUNetToolGUI::SegmentationResultHandler(mitk::nnUNetTool *tool)
 {
   tool->RenderOutputBuffer();
   this->SetLabelSetPreview(tool->GetMLPreview());
+  //this->ClearOutputBuffer();
   ShowStatusMessage("<b>STATUS: </b><i>Segmentation task finished successfully. <br>Please Confirm the "
                                   "segmentation else, could result in data loss</i>");
   m_Controls.stopButton->setEnabled(false);

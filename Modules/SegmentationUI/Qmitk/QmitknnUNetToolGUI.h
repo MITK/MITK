@@ -19,9 +19,26 @@ found in the LICENSE file.s
 #include "mitknnUnetTool.h"
 #include "ui_QmitknnUNetToolGUIControls.h"
 #include <MitkSegmentationUIExports.h>
+#include <QCache>
 #include <QMessageBox>
 #include <QmitkDataStorageComboBox.h>
 #include <QmitknnUNetEnsembleLayout.h>
+#include <boost/functional/hash.hpp>
+
+class nnUNetCache
+{
+public:
+  mitk::LabelSetImage::ConstPointer m_SegCache;
+  static size_t GetUniqueHash(std::vector<mitk::ModelParams> &requestQ)
+  {
+    size_t hashCode = 0;
+    for (mitk::ModelParams &request : requestQ)
+    {
+      boost::hash_combine(hashCode, request.generateHash());
+    }
+    return hashCode;
+  }
+};
 
 class MITKSEGMENTATIONUI_EXPORT QmitknnUNetToolGUI : public QmitkAutoMLSegmentationToolGUIBase
 {
@@ -31,6 +48,8 @@ public:
   mitkClassMacro(QmitknnUNetToolGUI, QmitkAutoMLSegmentationToolGUIBase);
   itkFactorylessNewMacro(Self);
   itkCloneMacro(Self);
+
+  QCache<size_t, nnUNetCache> m_Cache;
 
 protected slots:
 
@@ -107,6 +126,12 @@ protected slots:
    */
   void OnRefreshPresssed();
 
+  /**
+   * @brief Qt slot
+   *
+   */
+  void OnClearCachePressed();
+
 protected:
   QmitknnUNetToolGUI();
   ~QmitknnUNetToolGUI() = default;
@@ -116,6 +141,8 @@ protected:
   void EnableWidgets(bool enabled) override;
 
 private:
+
+  void addToCache(size_t&, mitk::LabelSetImage::ConstPointer);
   /**
    * @brief Checks all the entries of the ctkCheckableComboBox ui widget.
    * This feature is not present in ctkCheckableComboBox API.
@@ -204,6 +231,8 @@ private:
    */
   std::vector<mitk::Image::ConstPointer> FetchMultiModalImagesFromUI();
 
+  void UpdateCacheCountOnUI();
+
   Ui_QmitknnUNetToolGUIControls m_Controls;
   QmitkGPULoader m_GpuLoader;
 
@@ -236,5 +265,7 @@ private:
    *
    */
   const QStringList m_VALID_MODELS = {"2d", "3d_lowres", "3d_fullres", "3d_cascade_fullres", "ensembles"};
+
+  const QString m_CACHE_COUNT_BASE_LABEL = "Cached Items: ";
 };
 #endif

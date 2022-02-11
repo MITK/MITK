@@ -73,6 +73,7 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
           this,
           SLOT(OnPythonPathChanged(const QString &)));
   connect(m_Controls.refreshdirectoryBox, SIGNAL(clicked()), this, SLOT(OnRefreshPresssed()));
+  connect(m_Controls.clearCacheButton, SIGNAL(clicked()), this, SLOT(OnClearCachePressed()));
 
   m_Controls.codedirectoryBox->setVisible(false);
   m_Controls.nnUnetdirLabel->setVisible(false);
@@ -109,6 +110,7 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
   {
     try
     {
+      size_t hashKey(0);
       m_Controls.previewButton->setEnabled(false); // To prevent misclicked back2back prediction.
       qApp->processEvents();
       tool->PredictOn(); // purposefully placed to make tool->GetMTime different than before.
@@ -141,11 +143,11 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
       {
         nnUNetDirectory = m_Controls.codedirectoryBox->directory().toStdString();
       }
-      else if (!IsNNUNetInstalled(pythonPath))
-      {
-        throw std::runtime_error("nnUNet is not detected in the selected python environment. Please select a valid "
-                                 "python environment or install nnUNet.");
-      }
+      // else if (!IsNNUNetInstalled(pythonPath))
+      // {
+      //   throw std::runtime_error("nnUNet is not detected in the selected python environment. Please select a valid "
+      //                            "python environment or install nnUNet.");
+      // }
 
       tool->SetnnUNetDirectory(nnUNetDirectory);
       tool->SetPythonPath(pythonPath.toStdString());
@@ -155,6 +157,7 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
       tool->SetMixedPrecision(m_Controls.mixedPrecisionBox->isChecked());
       tool->SetNoPip(isNoPip);
       tool->SetMultiModal(m_Controls.multiModalBox->isChecked());
+      bool doCache = m_Controls.enableCachingCheckBox->isChecked();
       // Spinboxes
       tool->SetGpuId(static_cast<unsigned int>(m_Controls.gpuSpinBox->value()));
       // Multi-Modal
@@ -165,15 +168,44 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
         tool->m_OtherModalPaths = FetchMultiModalImagesFromUI();
         tool->MultiModalOn();
       }
-      tool->m_InputOutputPair = std::make_pair(nullptr, nullptr);
-      ShowStatusMessage(QString("<b>STATUS: </b><i>Starting Segmentation task... This might take a while.</i>"));
-      tool->UpdatePreview();
-      if (tool->GetOutputBuffer() == nullptr)
+      if (doCache)
       {
-        SegmentationProcessFailed();
+        hashKey = nnUNetCache::GetUniqueHash(tool->m_ParamQ);
+        if (this->m_Cache.contains(hashKey))
+        {
+          tool->PredictOff(); // purposefully placed to make tool->GetMTime different than before.
+        }
       }
-      SegmentationResultHandler(tool);
-      tool->PredictOff(); // purposefully placed to make tool->GetMTime different than before.
+      if (tool->GetPredict())
+      {
+        tool->m_InputBuffer = nullptr;
+        ShowStatusMessage(QString("<b>STATUS: </b><i>Starting Segmentation task... This might take a while.</i>"));
+        tool->UpdatePreview();
+        if (tool->GetOutputBuffer() == nullptr)
+        {
+          SegmentationProcessFailed();
+        }
+        else
+        {
+          SegmentationResultHandler(tool);
+        }
+        if (doCache)
+        {
+          addToCache(hashKey, tool->GetMLPreview());
+        }
+        tool->PredictOff(); // purposefully placed to make tool->GetMTime different than before.
+      }
+      else
+      {
+        MITK_INFO << "won't do segmentation. Key found: " << QString::number(hashKey).toStdString();
+        if (this->m_Cache.contains(hashKey))
+        {
+          nnUNetCache *cacheObject = this->m_Cache[hashKey];
+          MITK_INFO << "fetched pointer " << cacheObject->m_SegCache.GetPointer();
+          tool->SetNodeProperties(const_cast<mitk::LabelSetImage *>(cacheObject->m_SegCache.GetPointer()));
+          SegmentationResultHandler(tool);
+        }
+      }
       m_Controls.previewButton->setEnabled(true);
     }
     catch (const std::exception &e)
@@ -382,4 +414,25 @@ std::vector<std::string> QmitknnUNetToolGUI::FetchSelectedFoldsFromUI(ctkCheckab
     }
   }
   return folds;
+}
+
+void QmitknnUNetToolGUI::OnClearCachePressed()
+{
+  m_Cache.clear();
+  UpdateCacheCountOnUI();
+}
+
+void QmitknnUNetToolGUI::UpdateCacheCountOnUI()
+{
+  QString cacheText = m_CACHE_COUNT_BASE_LABEL + QString::number(m_Cache.size());
+  m_Controls.cacheCountLabel->setText(cacheText);
+}
+
+void QmitknnUNetToolGUI::addToCache(size_t &hashKey, mitk::LabelSetImage::ConstPointer mlPreview)
+{
+  nnUNetCache *newCacheObj = new nnUNetCache;
+  newCacheObj->m_SegCache = mlPreview;
+  this->m_Cache.insert(hashKey, newCacheObj);
+  MITK_INFO << "New hash: " << hashKey << " " << newCacheObj->m_SegCache.GetPointer();
+  UpdateCacheCountOnUI();
 }

@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <MitkSegmentationExports.h>
 #include <mitkStandardFileLocations.h>
 #include <utility>
+#include <numeric>
 
 namespace us
 {
@@ -39,6 +40,21 @@ namespace mitk
     std::string trainer;
     std::string planId;
     std::string outputDir;
+    std::string inputName;
+    std::string timeStamp;
+
+    size_t generateHash() const
+    { 
+      std::string toHash;
+      std::string foldsConcatenated = std::accumulate(folds.begin(), folds.end(), std::string(""));
+      toHash += this->task;
+      toHash += this->model;
+      toHash += this->inputName;
+      toHash += foldsConcatenated;
+      toHash += this->timeStamp;
+      size_t hashVal = std::hash<std::string>{}(toHash);
+      return hashVal;
+    }
   };
 
   /**
@@ -116,7 +132,7 @@ namespace mitk
      */
     std::vector<mitk::Image::ConstPointer> m_OtherModalPaths;
 
-    std::pair<const Image *, LabelSetImage::Pointer> m_InputOutputPair;
+    mitk::Image::ConstPointer m_InputBuffer;
 
     /**
      * @brief Renders the output LabelSetImage.
@@ -143,6 +159,8 @@ namespace mitk
     mitk::DataStorage *GetDataStorage();
 
     mitk::DataNode *GetRefNode();
+
+    void SetNodeProperties(LabelSetImage::Pointer) override;
 
   protected:
     /**
@@ -173,7 +191,6 @@ namespace mitk
      */
     LabelSetImage::Pointer ComputeMLPreview(const Image *inputAtTimeStep, TimeStepType timeStep) override;
     void UpdateCleanUp() override;
-    void SetNodeProperties(LabelSetImage::Pointer) override;
 
   private:
     std::string m_MitkTempDir;
@@ -191,6 +208,7 @@ namespace mitk
     bool m_Predict;
     LabelSetImage::Pointer m_OutputBuffer;
     unsigned int m_GpuId;
+    const std::string m_TEMPLATE_FILENAME = "XXXXXX_000_0000.nii.gz";
   };
 } // namespace mitk
 #endif

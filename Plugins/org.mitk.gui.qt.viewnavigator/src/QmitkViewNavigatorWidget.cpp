@@ -458,6 +458,12 @@ void QmitkViewNavigatorWidget::SaveCurrentPerspectiveAs()
 
   berry::IPerspectiveRegistry* perspectiveRegistry = berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry();
   berry::IPerspectiveDescriptor::Pointer newPerspective = perspectiveRegistry->CreatePerspective(label, currentPerspective);
+
+  if (nullptr == newPerspective)
+  {
+    return;
+  }
+
   page->SavePerspectiveAs(newPerspective);
 
   this->FillTreeList();

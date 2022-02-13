@@ -181,17 +181,15 @@ public:
     }
 
     void PerspectiveActivated(const berry::IWorkbenchPage::Pointer& /*page*/,
-                              const berry::IPerspectiveDescriptor::Pointer& perspective) override
+                              const berry::IPerspectiveDescriptor::Pointer& /*perspective*/) override
     {
-        m_ParentWidget->m_ActivePerspective = perspective;
         m_ParentWidget->UpdateTreeList();
     }
 
     void PerspectiveSavedAs(const berry::IWorkbenchPage::Pointer& /*page*/,
                             const berry::IPerspectiveDescriptor::Pointer& /*oldPerspective*/,
-                            const berry::IPerspectiveDescriptor::Pointer& newPerspective) override
+                            const berry::IPerspectiveDescriptor::Pointer& /*newPerspective*/) override
     {
-        m_ParentWidget->m_ActivePerspective = newPerspective;
         m_ParentWidget->UpdateTreeList();
     }
 
@@ -328,7 +326,7 @@ void QmitkViewNavigatorWidget::UpdateTreeList(berry::IWorkbenchPart* workbenchPa
     return;
   }
 
-  berry::IPerspectiveDescriptor::Pointer currentPerspective = page->GetPerspective();
+  m_ActivePerspective = page->GetPerspective();
   QList<berry::IViewPart::Pointer> viewParts = page->GetViews();
 
   // iterate over all tree items
@@ -363,7 +361,7 @@ void QmitkViewNavigatorWidget::UpdateTreeList(berry::IWorkbenchPart* workbenchPa
       QmitkPerspectiveItem* perspectiveItem = dynamic_cast<QmitkPerspectiveItem*>(item);
       if (nullptr != perspectiveItem)
       {
-        if (currentPerspective.IsNotNull() && currentPerspective->GetId() == perspectiveItem->m_ItemDescriptor->GetId())
+        if (m_ActivePerspective.IsNotNull() && m_ActivePerspective->GetId() == perspectiveItem->m_ItemDescriptor->GetId())
         {
           font.setBold(true);
         }

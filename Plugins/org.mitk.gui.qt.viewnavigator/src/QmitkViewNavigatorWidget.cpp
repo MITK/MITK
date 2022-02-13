@@ -569,7 +569,6 @@ void QmitkViewNavigatorWidget::CreateQtPartControl(QWidget* parent)
     return;
   }
 
-  m_Parent = parent;
   m_Controls.setupUi(parent);
   connect(m_Controls.m_PluginTreeView, SIGNAL(customContextMenuRequested(QPoint)), SLOT(CustomMenuRequested(QPoint)));
   connect(m_Controls.m_PluginTreeView, SIGNAL(doubleClicked(const QModelIndex&)), SLOT(ItemClicked(const QModelIndex&)));

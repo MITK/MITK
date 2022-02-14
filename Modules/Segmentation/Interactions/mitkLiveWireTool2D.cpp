@@ -241,6 +241,10 @@ void mitk::LiveWireTool2D::ClearSegmentation()
 void mitk::LiveWireTool2D::SetSnapClosureContour(bool snap)
 {
   m_SnapClosureContour = snap;
+  if (!m_LiveWireContour || !m_Contour)
+  {
+    return;
+  }
 
   if (m_LiveWireContour->GetNumberOfVertices() > 0)
   {

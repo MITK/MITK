@@ -76,7 +76,7 @@
      <item>
       <widget class="QCheckBox" name="m_SnapClosureCheckBox">
        <property name="text">
-        <string>Snap Closure Contour (press space to switch)</string>
+        <string>Snap closing contour</string>
        </property>
       </widget>
      </item>

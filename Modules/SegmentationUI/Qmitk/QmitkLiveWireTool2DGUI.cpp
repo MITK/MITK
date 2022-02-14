@@ -32,7 +32,6 @@ QmitkLiveWireTool2DGUI::QmitkLiveWireTool2DGUI() : QmitkToolGUI()
   connect(this, SIGNAL(NewToolAssociated(mitk::Tool *)), this, SLOT(OnNewToolAssociated(mitk::Tool *)));
   connect(m_Controls.m_SnapClosureCheckBox, SIGNAL(toggled(bool)), this, SLOT(OnSnapClosureContour(bool)));
   connect(m_Controls.m_InformationCheckBox, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)));
-  m_Controls.m_SnapClosureCheckBox->setShortcut(QString(" "));
 }
 
 QmitkLiveWireTool2DGUI::~QmitkLiveWireTool2DGUI()

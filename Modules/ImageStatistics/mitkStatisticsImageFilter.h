@@ -41,14 +41,8 @@ namespace mitk
 
     itkTypeMacro(StatisticsImageFilter, itk::ImageSink);
 
-    using InputImagePointer = typename TInputImage::Pointer;
-
     using RegionType = typename TInputImage::RegionType;
-    using SizeType = typename TInputImage::SizeType;
-    using IndexType = typename TInputImage::IndexType;
     using PixelType = typename TInputImage::PixelType;
-
-    static constexpr unsigned int ImageDimension = TInputImage::ImageDimension;
 
     using RealType = typename itk::NumericTraits<PixelType>::RealType;
 
@@ -63,55 +57,22 @@ namespace mitk
     using RealObjectType = SimpleDataObjectDecorator<RealType>;
     using PixelObjectType = SimpleDataObjectDecorator<PixelType>;
 
-    /** Return the computed Minimum. */
     itkGetDecoratedOutputMacro(Minimum, PixelType);
-
-    /** Return the computed Maximum. */
     itkGetDecoratedOutputMacro(Maximum, PixelType);
-
-    /** Return the computed Mean. */
     itkGetDecoratedOutputMacro(Mean, RealType);
-
-    /** Return the computed Standard Deviation. */
     itkGetDecoratedOutputMacro(Sigma, RealType);
-
-    /** Return the computed Variance. */
     itkGetDecoratedOutputMacro(Variance, RealType);
-
-    /** Return the computed Sum. */
     itkGetDecoratedOutputMacro(Sum, RealType);
-
-    /** Return the computed Sum of Squares. */
     itkGetDecoratedOutputMacro(SumOfSquares, RealType);
-
-    /** Return the computed Sum of Cubes. */
     itkGetDecoratedOutputMacro(SumOfCubes, RealType);
-
-    /** Return the computed Sum of Quadruples. */
     itkGetDecoratedOutputMacro(SumOfQuadruples, RealType);
-
-    /** Return the computed Skewness. */
     itkGetDecoratedOutputMacro(Skewness, RealType);
-
-    /** Return the computed Kurtosis. */
     itkGetDecoratedOutputMacro(Kurtosis, RealType);
-
-    /** Return the computed Mean of Positive Pixels. */
     itkGetDecoratedOutputMacro(MPP, RealType);
-
-    /** Return the computed Histogram. */
     itkGetDecoratedOutputMacro(Histogram, HistogramPointer);
-
-    /** Return the computed Entropy. */
     itkGetDecoratedOutputMacro(Entropy, RealType);
-
-    /** Return the computed Uniformity. */
     itkGetDecoratedOutputMacro(Uniformity, RealType);
-
-    /** Return the computed UPP. */
     itkGetDecoratedOutputMacro(UPP, RealType);
-
-    /** Return the computed Median. */
     itkGetDecoratedOutputMacro(Median, RealType);
 
     void SetHistogramParameters(unsigned int size, RealType lowerBound, RealType upperBound);
@@ -121,12 +82,6 @@ namespace mitk
     
     /** Make a DataObject of the correct type to be used as the specified output. */
     DataObjectPointer MakeOutput(const DataObjectIdentifierType& name) override;
-
-#ifdef ITK_USE_CONCEPT_CHECKING
-    // Begin concept checking
-    itkConceptMacro(InputHasNumericTraitsCheck, (itk::Concept::HasNumericTraits<PixelType>));
-    // End concept checking
-#endif
 
   protected:
     StatisticsImageFilter();
@@ -150,12 +105,8 @@ namespace mitk
     itkSetDecoratedOutputMacro(UPP, RealType);
     itkSetDecoratedOutputMacro(Median, RealType);
 
-    /** Initialize some accumulators before the threads run. */
     void BeforeStreamedGenerateData() override;
-    
     void ThreadedStreamedGenerateData(const RegionType&) override;
-    
-    /** Set outputs to computed values from all regions. */
     void AfterStreamedGenerateData() override;
 
     void PrintSelf(std::ostream& os, itk::Indent indent) const override;
@@ -163,10 +114,10 @@ namespace mitk
   private:
     HistogramPointer CreateInitializedHistogram() const;
 
-    bool m_CalculateHistogram;
+    bool m_ComputeHistogram;
     unsigned int m_HistogramSize;
-    PixelType m_HistogramLowerBound;
-    PixelType m_HistogramUpperBound;
+    RealType m_HistogramLowerBound;
+    RealType m_HistogramUpperBound;
     HistogramPointer m_Histogram;
 
     itk::CompensatedSummation<RealType> m_Sum;

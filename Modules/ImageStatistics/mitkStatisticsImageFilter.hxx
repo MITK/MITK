@@ -19,7 +19,7 @@ found in the LICENSE file.
 
 template <typename TInputImage>
 mitk::StatisticsImageFilter<TInputImage>::StatisticsImageFilter()
-  : m_CalculateHistogram(false),
+  : m_ComputeHistogram(false),
     m_HistogramSize(0),
     m_HistogramLowerBound(itk::NumericTraits<RealType>::NonpositiveMin()),
     m_HistogramUpperBound(itk::NumericTraits<RealType>::max()),
@@ -116,7 +116,7 @@ void mitk::StatisticsImageFilter<TInputImage>::SetHistogramParameters(unsigned i
     modified = true;
   }
 
-  m_CalculateHistogram = true;
+  m_ComputeHistogram = true;
 
   if (modified)
     this->Modified();
@@ -159,7 +159,7 @@ void mitk::StatisticsImageFilter<TInputImage>::BeforeStreamedGenerateData()
   m_Min = itk::NumericTraits<PixelType>::max();
   m_Max = itk::NumericTraits<PixelType>::NonpositiveMin();
 
-  if (m_CalculateHistogram)
+  if (m_ComputeHistogram)
     m_Histogram = this->CreateInitializedHistogram();
 }
 
@@ -182,7 +182,7 @@ void mitk::StatisticsImageFilter<TInputImage>::ThreadedStreamedGenerateData(cons
   typename HistogramType::MeasurementVectorType histogramMeasurement;
   typename HistogramType::IndexType histogramIndex;
 
-  if (m_CalculateHistogram) // Initialize histogram
+  if (m_ComputeHistogram) // Initialize histogram
   {
     histogram = this->CreateInitializedHistogram();
     histogramMeasurement.SetSize(1);
@@ -197,7 +197,7 @@ void mitk::StatisticsImageFilter<TInputImage>::ThreadedStreamedGenerateData(cons
       const auto& value = it.Get();
       realValue = static_cast<RealType>(value);
 
-      if (m_CalculateHistogram) // Compute histogram
+      if (m_ComputeHistogram) // Compute histogram
       {
         histogramMeasurement[0] = realValue;
         histogram->GetIndex(histogramMeasurement, histogramIndex);
@@ -228,7 +228,7 @@ void mitk::StatisticsImageFilter<TInputImage>::ThreadedStreamedGenerateData(cons
 
   std::lock_guard<std::mutex> mutexHolder(m_Mutex);
 
-  if (m_CalculateHistogram) // Merge histograms
+  if (m_ComputeHistogram) // Merge histograms
   {
     typename HistogramType::ConstIterator histogramIt = histogram->Begin();
     typename HistogramType::ConstIterator histogramEnd = histogram->End();
@@ -291,7 +291,7 @@ void mitk::StatisticsImageFilter<TInputImage>::AfterStreamedGenerateData()
   this->SetKurtosis(kurtosis);
   this->SetMPP(meanOfPositivePixels);
 
-  if (m_CalculateHistogram)
+  if (m_ComputeHistogram)
   {
     this->SetHistogram(m_Histogram);
 

@@ -254,6 +254,42 @@ your image but you are just interested in one special region.
 
 \imageMacro{QmitkSegmentation_PickingTool.png,"Picking tool",10.00}
 
+\subsection org_mitk_views_segmentationUserManualnnUNetTool nnU-Net Tool (Windows & Ubuntu only)
+
+This tool provides a GUI to the deep learning-based segmentation algorithm called the nnUNet. With this tool, you can get a segmentation mask predicted for the loaded image in MITK. Be ready with the pre-trained weights (a.k.a <b>RESULTS_FOLDER</b>)
+for your organ or task concerned, before using the tool. For a detailed explanation of the parameters and pre-trained weights folder structure etc., please refer to https://github.com/MIC-DKFZ/nnUNet. <br>
+Remark: The tool assumes that you have a Python3 environment with nnUNet (pip) installed. Your machine should be also equipped with a CUDA enabled GPU.
+\imageMacro{QmitkSegmentation_3DWatershedTool.png,"nnUNet tool",10.00}
+
+\subsubsection org_mitk_views_segmentationUserManualnnUNetToolWorkflow Workflow:
+    -# Click on the "nnUNet Results Folder" directory icon and navigate to the results folder on your hard disk. This is equivalent to setting the <b>RESULTS_FOLDER</b> environment variable. If your results folder is as 
+    per the nnUNet required folder structure, the configuration, trainers, tasks and folds are automatically parsed and correspondingly loaded in the drop-down boxes as shown below. 
+    \imageMacro{QmitkSegmentation_nnUNet_Settings.png,"nnUNet Segmentation Settings",10}
+    -# Choose your required configuration-task-trainer-fold parameters, sequentially. By default, all entries are selected inside the "Fold" dropdown (shown: "All").
+    Note that, if you uncheck all entries from the "Fold" dropdown (shown: "None"), then too,  all folds would be considered for inferencing.
+    -# For ensemble predictions, you will get the option to select parameters based on postprocessing files available in the ensembles configuration of <b>RESULTS_FOLDER</b>.
+    Note that, all folds for both configurations will be considered for ensemble inferencing.
+    \imageMacro{QmitkSegmentation_nnUNet_ensemble.png,"nnUNet Segmentation Settings",10}
+    -# If your task requires multi-modal inputs, then check the "Multi-Modal" checkbox and enter the no.of modalities in the "No. of Extra Modalities" spinbox you'd like to refer to.
+    Instantly, as much node selectors should appear below to select other image nodes from the Data Manager along with a deactivated selector with preselected with the reference node. 
+    Certain pre-trained configurations are trained in a particular modal order. Please be aware of the order beforehand & select the image nodes in the node selectors accordingly for accurate inferencing. 
+    If the reference image node for segmentation is not the first in the multi-modal order, then you may reposition it using the "Reference Image Position" spinbox.
+    \imageMacro{QmitkSegmentation_nnUNet_multimodal.png,"nnUNet Multi Modal Settings",10.00}
+    -# Click on "Advanced" to choose a Python environment. Select the "Python Path" drop-down to see if MITK has automatically detected other Python environments. 
+    Click on a fitting environment for the nnUNet inference or click "Select" in the dropdown to choose an unlisted python environment. Note that, while selecting an arbitrary environment folder, only select the base folder.
+    No need to select all the way until "../myenv/bin/python", for example.
+    -# Click on "Preview".
+    \imageMacro{QmitkSegmentation_nnUNet_Advanced.png,"nnUNet Advanced Settings",10.00}
+    -# In the "Advanced" section, you can also activate other options like "Mixed Precision" and "Enable Mirroring" (for test time data augmentation) pertaining to nnUNet.
+    -# Use "GPU Id" to change the preferred GPU for inferencing. This is equivalent to setting the <b>CUDA_VISIBLE_DEVICES</b> environment variable.
+
+\subsubsection org_mitk_views_segmentationUserManualnnUNetToolMisc Miscellaneous:
+    -# In case you want to reload/reparse the folders in the "nnUNet Results Folder", eg. after adding new tasks into it, you may do so without reselecting the folder again by clicking the "Refresh Results Folder" button.
+    -# If you have a nnUNet code-base yet to be pip-installed into any environment (eg. developer modified nnUNet forks), click checkbox "No pip". 
+    Once the checkbox is checked a new directory selector appears in the section. You may click and navigate to your nnUNet fork folder to select the code from which you want inference.
+    \imageMacro{QmitkSegmentation_nnUNet_nopip.png,"nnUNet Advanced Settings with option to select nnUNet local folder",10.00}
+
+
 \section org_mitk_views_segmentationUserManualPostprocessing Additional things you can do with segmentations
 
 Segmentations are never an end in themselves. Consequently, the segmentation view adds a couple of "post-processing" actions, accessible through the context-menu of the data manager.

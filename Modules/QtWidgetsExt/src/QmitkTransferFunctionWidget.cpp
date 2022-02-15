@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkTransferFunctionWidget.h"
+#include "mitkImageTimeSelector.h"
 
 #include <mitkTransferFunctionProperty.h>
 
@@ -88,12 +89,11 @@ void QmitkTransferFunctionWidget::SetGradientOpacityFunctionEnabled(bool enable)
   m_GradientOpacityWidget->setEnabled(enable);
 }
 
-void QmitkTransferFunctionWidget::SetDataNode(mitk::DataNode *node, const mitk::BaseRenderer *renderer)
+void QmitkTransferFunctionWidget::SetDataNode(mitk::DataNode *node, mitk::TimeStepType timestep, const mitk::BaseRenderer *renderer)
 {
   if (node)
   {
     tfpToChange = dynamic_cast<mitk::TransferFunctionProperty *>(node->GetProperty("TransferFunction", renderer));
-
     if (!tfpToChange)
     {
       if (!dynamic_cast<mitk::Image *>(node->GetData()))
@@ -107,9 +107,26 @@ void QmitkTransferFunctionWidget::SetDataNode(mitk::DataNode *node, const mitk::
 
     mitk::TransferFunction::Pointer tf = tfpToChange->GetValue();
 
-    if (mitk::BaseData *data = node->GetData())
+    if (mitk::Image *data = dynamic_cast<mitk::Image *>(node->GetData()))
     {
-      mitk::SimpleHistogram *h = histogramCache[data];
+      mitk::SimpleHistogram *h = nullptr;
+      if (data->GetTimeSteps() > 1)
+      {
+        if (!data->GetTimeGeometry()->IsValidTimeStep(timestep))
+        {
+          return;
+        }
+        mitk::ImageTimeSelector::Pointer timeselector = mitk::ImageTimeSelector::New();
+        timeselector->SetInput(data);
+        timeselector->SetTimeNr(timestep);
+        timeselector->UpdateLargestPossibleRegion();
+        auto inputImage = timeselector->GetOutput();
+        h = histogramCache[inputImage];
+      }
+      else
+      {
+        h = histogramCache[data];
+      }
 
       m_RangeSliderMin = h->GetMin();
       m_RangeSliderMax = h->GetMax();

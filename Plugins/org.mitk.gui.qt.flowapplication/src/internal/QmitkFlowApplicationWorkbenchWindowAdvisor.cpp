@@ -330,7 +330,7 @@ QmitkFlowApplicationWorkbenchWindowAdvisor::QmitkFlowApplicationWorkbenchWindowA
   , dropTargetListener(new QmitkDefaultDropTargetListener)
 {
   productName = QCoreApplication::applicationName();
-  viewExcludeList.push_back("org.mitk.views.viewnavigatorview");
+  viewExcludeList.push_back("org.mitk.views.viewnavigator");
 }
 
 QmitkFlowApplicationWorkbenchWindowAdvisor::~QmitkFlowApplicationWorkbenchWindowAdvisor()
@@ -452,7 +452,7 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
       continue;
     if ((*iter)->GetId() == "org.mitk.views.imagenavigator")
       continue;
-    if ((*iter)->GetId() == "org.mitk.views.viewnavigatorview")
+    if ((*iter)->GetId() == "org.mitk.views.viewnavigator")
       continue;
 
     std::pair<QString, berry::IViewDescriptor::Pointer> p((*iter)->GetLabel(), (*iter));

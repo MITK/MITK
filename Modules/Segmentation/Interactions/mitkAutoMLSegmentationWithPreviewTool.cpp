@@ -93,31 +93,9 @@ void mitk::AutoMLSegmentationWithPreviewTool::UpdateCleanUp()
   }
 }
 
-void mitk::AutoMLSegmentationWithPreviewTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image* /*oldSegAtTimeStep*/, Image* previewImage, TimeStepType timeStep)
+void mitk::AutoMLSegmentationWithPreviewTool::SetNodeProperties(LabelSetImage::Pointer newMLPreview)
 {
-  const auto timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
-
-  if (nullptr == m_MLPreviewNode->GetData()
-      || this->GetMTime() > m_MLPreviewNode->GetData()->GetMTime()
-      || this->m_LastMLTimeStep != timeStep //this covers the case where dynamic
-                                            //segmentations have to compute a preview
-                                            //for all time steps on confirmation
-      || this->GetLastTimePointOfUpdate() != timePoint //this ensures that static seg
-                                                       //previews work with dynamic images
-                                                       //with avoiding unnecessary other computations
-     )
-  {
-    if (nullptr == inputAtTimeStep)
-    {
-      MITK_WARN << "Cannot run segementation. Currently selected input image is not set.";
-      return;
-    }
-
-    this->m_LastMLTimeStep = timeStep;
-
-    auto newMLPreview = ComputeMLPreview(inputAtTimeStep, timeStep);
-
-    if (newMLPreview.IsNotNull())
+  if (newMLPreview.IsNotNull())
     {
       this->m_MLPreviewNode->SetData(newMLPreview);
       this->m_MLPreviewNode->SetProperty("binary", mitk::BoolProperty::New(false));
@@ -141,6 +119,32 @@ void mitk::AutoMLSegmentationWithPreviewTool::DoUpdatePreview(const Image* input
       levWinProp->SetLevelWindow(levelwindow);
       this->m_MLPreviewNode->SetProperty("levelwindow", levWinProp);
     }
+}
+
+void mitk::AutoMLSegmentationWithPreviewTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image* /*oldSegAtTimeStep*/, Image* previewImage, TimeStepType timeStep)
+{
+  const auto timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+
+  if (nullptr == m_MLPreviewNode->GetData()
+      || this->GetMTime() > m_MLPreviewNode->GetData()->GetMTime()
+      || this->m_LastMLTimeStep != timeStep //this covers the case where dynamic
+                                            //segmentations have to compute a preview
+                                            //for all time steps on confirmation
+      || this->GetLastTimePointOfUpdate() != timePoint //this ensures that static seg
+                                                       //previews work with dynamic images
+                                                       //with avoiding unnecessary other computations
+     )
+  {
+    if (nullptr == inputAtTimeStep)
+    {
+      MITK_WARN << "Cannot run segementation. Currently selected input image is not set.";
+      return;
+    }
+
+    this->m_LastMLTimeStep = timeStep;
+
+    auto newMLPreview = ComputeMLPreview(inputAtTimeStep, timeStep);
+    this->SetNodeProperties(newMLPreview);
   }
 
   if (!m_SelectedLabels.empty())

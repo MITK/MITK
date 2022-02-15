@@ -10,9 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-
-#include "ViewNavigatorView.h"
-
+#include "QmitkViewNavigatorView.h"
 #include "QmitkViewNavigatorWidget.h"
 
 // BlueBerry
@@ -20,14 +18,14 @@ found in the LICENSE file.
 
 #include <QVBoxLayout>
 
-const std::string ViewNavigatorView::VIEW_ID = "org.mitk.views.viewnavigatorview";
+const std::string QmitkViewNavigatorView::VIEW_ID = "org.mitk.views.viewnavigator";
 
-void ViewNavigatorView::SetFocus()
+void QmitkViewNavigatorView::SetFocus()
 {
-  m_ViewNavigatorWidget->setFocus();
+  m_ViewNavigatorWidget->SetFocus();
 }
 
-void ViewNavigatorView::CreateQtPartControl( QWidget *parent )
+void QmitkViewNavigatorView::CreateQtPartControl(QWidget* parent)
 {
   parent->setLayout(new QVBoxLayout);
   parent->layout()->setContentsMargins(0, 0, 0, 0);

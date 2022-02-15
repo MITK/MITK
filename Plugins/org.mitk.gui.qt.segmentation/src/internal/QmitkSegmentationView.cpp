@@ -53,6 +53,7 @@ QmitkSegmentationView::QmitkSegmentationView()
   , m_ToolManager(nullptr)
   , m_ReferenceNode(nullptr)
   , m_WorkingNode(nullptr)
+  , m_DrawOutline(true)
   , m_AutoSelectionEnabled(false)
   , m_MouseCursorSet(false)
 {
@@ -592,6 +593,7 @@ void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences*
     m_Controls->toolSelectionBox3D->SetShowNames(!slimView);
   }
 
+  m_DrawOutline = prefs->GetBool("draw outline", true);
   m_AutoSelectionEnabled = prefs->GetBool("auto selection", false);
 
   this->ApplyDisplayOptions();
@@ -731,13 +733,13 @@ void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataNode* node)
     return;
   }
 
-  auto drawOutline = mitk::BoolProperty::New(GetPreferences()->GetBool("draw outline", true));
   auto labelSetImage = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
   if (nullptr != labelSetImage)
   {
-    // node is a multi label segmentation,
+    // node is a multi label segmentation
     // its outline property can be set in the segmentation preference page
-    node->SetProperty("labelset.contour.active", drawOutline);
+    node->SetProperty("labelset.contour.active", mitk::BoolProperty::New(m_DrawOutline));
+
     // force render window update to show outline
     node->GetData()->Modified();
   }
@@ -748,7 +750,7 @@ void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataNode* node)
     node->GetBoolProperty("binary", isBinary);
     if (isBinary)
     {
-      node->SetProperty("outline binary", drawOutline);
+      node->SetProperty("outline binary", mitk::BoolProperty::New(m_DrawOutline));
       node->SetProperty("outline width", mitk::FloatProperty::New(2.0));
       // force render window update to show outline
       node->GetData()->Modified();

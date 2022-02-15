@@ -144,6 +144,7 @@ private:
   mitk::NodePredicateAnd::Pointer m_ReferencePredicate;
   mitk::NodePredicateAnd::Pointer m_SegmentationPredicate;
 
+  bool m_DrawOutline;
   bool m_AutoSelectionEnabled;
   bool m_MouseCursorSet;
 

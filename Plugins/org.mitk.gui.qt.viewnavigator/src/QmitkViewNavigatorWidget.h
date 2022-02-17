@@ -59,11 +59,6 @@ protected:
     friend class ViewNavigatorPerspectiveListener;
     friend class ViewNavigatorViewListener;
 
-    Ui::QmitkViewNavigatorWidgetControls        m_Controls;
-    QWidget*                                    m_Parent;
-    QStandardItemModel*                         m_TreeModel;
-    ClassFilterProxyModel*                      m_FilterProxyModel;
-    QMenu*                                      m_ContextMenu;
     berry::IPerspectiveDescriptor::Pointer      m_ActivePerspective;
 
 private:
@@ -77,6 +72,11 @@ private:
     template<typename D, typename I>
     void AddItemsToTree(D itemDescriptors, QStandardItem* rootItem,
       QStandardItem* miscellaneousItem = nullptr, const QStringList& itemExcludeList = QStringList());
+
+    Ui::QmitkViewNavigatorWidgetControls        m_Controls;
+    QStandardItemModel*                         m_TreeModel;
+    ClassFilterProxyModel*                      m_FilterProxyModel;
+    QMenu*                                      m_ContextMenu;
 
     QScopedPointer<berry::IPerspectiveListener>    m_PerspectiveListener;
     QScopedPointer<berry::IPartListener>           m_ViewPartListener;

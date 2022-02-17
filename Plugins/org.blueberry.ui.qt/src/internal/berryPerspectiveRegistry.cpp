@@ -169,30 +169,6 @@ void PerspectiveRegistry::AddPerspective(PerspectiveDescriptor::Pointer desc)
   this->Add(desc);
 }
 
-IPerspectiveDescriptor::Pointer PerspectiveRegistry::CreatePerspective(const QString& label,
-    IPerspectiveDescriptor::Pointer originalDescriptor)
-{
-  // Sanity check to avoid invalid or duplicate labels.
-  if (!this->ValidateLabel(label))
-  {
-    return IPerspectiveDescriptor::Pointer(nullptr);
-  }
-  if (this->FindPerspectiveWithLabel(label) != 0)
-  {
-    return IPerspectiveDescriptor::Pointer(nullptr);
-  }
-
-  // Calculate ID.
-  QString id(label);
-  id = id.replace(' ', '_').trimmed();
-
-  // Create descriptor.
-  PerspectiveDescriptor::Pointer desc(
-      new PerspectiveDescriptor(id, label, originalDescriptor.Cast<PerspectiveDescriptor>()));
-  this->Add(desc);
-  return IPerspectiveDescriptor::Pointer(static_cast<IPerspectiveDescriptor*>(desc.GetPointer()));
-}
-
 void PerspectiveRegistry::RevertPerspectives(
     const QList<PerspectiveDescriptor::Pointer>& perspToRevert)
 {
@@ -227,65 +203,6 @@ void PerspectiveRegistry::DeletePerspective(IPerspectiveDescriptor::Pointer in)
     desc->DeleteCustomDefinition();
     this->VerifyDefaultPerspective();
   }
-}
-
-IPerspectiveDescriptor::Pointer PerspectiveRegistry::FindPerspectiveWithId(const QString& id)
-{
-  for (QList<PerspectiveDescriptor::Pointer>::iterator iter = perspectives.begin();
-       iter != perspectives.end(); ++iter)
-  {
-    PerspectiveDescriptor::Pointer desc = *iter;
-    if (desc->GetId() == id)
-    {
-//      if (WorkbenchActivityHelper.restrictUseOf(desc))
-//      {
-//        return null;
-//      }
-      return desc;
-    }
-  }
-
-  return IPerspectiveDescriptor::Pointer(nullptr);
-}
-
-IPerspectiveDescriptor::Pointer PerspectiveRegistry::FindPerspectiveWithLabel(
-    const QString& label)
-{
-  for (QList<PerspectiveDescriptor::Pointer>::iterator iter = perspectives.begin();
-       iter != perspectives.end(); ++iter)
-  {
-    PerspectiveDescriptor::Pointer desc = *iter;
-    if (desc->GetLabel() == label)
-    {
-//      if (WorkbenchActivityHelper.restrictUseOf(desc))
-//      {
-//        return 0;
-//      }
-      return desc;
-    }
-  }
-  return IPerspectiveDescriptor::Pointer(nullptr);
-}
-
-QString PerspectiveRegistry::GetDefaultPerspective()
-{
-  return defaultPerspID;
-}
-
-QList<IPerspectiveDescriptor::Pointer> PerspectiveRegistry::GetPerspectives()
-{
-//  Collection descs = WorkbenchActivityHelper.restrictCollection(perspectives,
-//      new ArrayList());
-//  return (IPerspectiveDescriptor[]) descs.toArray(
-//      new IPerspectiveDescriptor[descs.size()]);
-
-  QList<IPerspectiveDescriptor::Pointer> result;
-  for (QList<PerspectiveDescriptor::Pointer>::iterator iter = perspectives.begin();
-         iter != perspectives.end(); ++iter)
-  {
-    result.push_back(iter->Cast<IPerspectiveDescriptor>());
-  }
-  return result;
 }
 
 void PerspectiveRegistry::Load()
@@ -333,6 +250,70 @@ IMemento::Pointer PerspectiveRegistry::GetCustomPersp(const QString&  id)
   return memento;
 }
 
+bool PerspectiveRegistry::ValidateLabel(const QString& label)
+{
+  return !label.trimmed().isEmpty();
+}
+
+IPerspectiveDescriptor::Pointer PerspectiveRegistry::FindPerspectiveWithId(const QString& id)
+{
+  for (QList<PerspectiveDescriptor::Pointer>::iterator iter = perspectives.begin();
+    iter != perspectives.end(); ++iter)
+  {
+    PerspectiveDescriptor::Pointer desc = *iter;
+    if (desc->GetId() == id)
+    {
+      //      if (WorkbenchActivityHelper.restrictUseOf(desc))
+      //      {
+      //        return null;
+      //      }
+      return desc;
+    }
+  }
+
+  return IPerspectiveDescriptor::Pointer(nullptr);
+}
+
+IPerspectiveDescriptor::Pointer PerspectiveRegistry::FindPerspectiveWithLabel(
+  const QString& label)
+{
+  for (QList<PerspectiveDescriptor::Pointer>::iterator iter = perspectives.begin();
+    iter != perspectives.end(); ++iter)
+  {
+    PerspectiveDescriptor::Pointer desc = *iter;
+    if (desc->GetLabel() == label)
+    {
+      //      if (WorkbenchActivityHelper.restrictUseOf(desc))
+      //      {
+      //        return 0;
+      //      }
+      return desc;
+    }
+  }
+  return IPerspectiveDescriptor::Pointer(nullptr);
+}
+
+QString PerspectiveRegistry::GetDefaultPerspective()
+{
+  return defaultPerspID;
+}
+
+QList<IPerspectiveDescriptor::Pointer> PerspectiveRegistry::GetPerspectives()
+{
+  //  Collection descs = WorkbenchActivityHelper.restrictCollection(perspectives,
+  //      new ArrayList());
+  //  return (IPerspectiveDescriptor[]) descs.toArray(
+  //      new IPerspectiveDescriptor[descs.size()]);
+
+  QList<IPerspectiveDescriptor::Pointer> result;
+  for (QList<PerspectiveDescriptor::Pointer>::iterator iter = perspectives.begin();
+    iter != perspectives.end(); ++iter)
+  {
+    result.push_back(iter->Cast<IPerspectiveDescriptor>());
+  }
+  return result;
+}
+
 void PerspectiveRegistry::SetDefaultPerspective(const QString& id)
 {
   IPerspectiveDescriptor::Pointer desc = this->FindPerspectiveWithId(id);
@@ -345,9 +326,28 @@ void PerspectiveRegistry::SetDefaultPerspective(const QString& id)
   }
 }
 
-bool PerspectiveRegistry::ValidateLabel(const QString& label)
+IPerspectiveDescriptor::Pointer PerspectiveRegistry::CreatePerspective(const QString& label,
+  IPerspectiveDescriptor::Pointer originalDescriptor)
 {
-  return !label.trimmed().isEmpty();
+  // Sanity check to avoid invalid or duplicate labels.
+  if (!this->ValidateLabel(label))
+  {
+    return IPerspectiveDescriptor::Pointer(nullptr);
+  }
+  if (this->FindPerspectiveWithLabel(label) != 0)
+  {
+    return IPerspectiveDescriptor::Pointer(nullptr);
+  }
+
+  // Calculate ID.
+  QString id(label);
+  id = id.replace(' ', '_').trimmed();
+
+  // Create descriptor.
+  PerspectiveDescriptor::Pointer desc(
+    new PerspectiveDescriptor(id, label, originalDescriptor.Cast<PerspectiveDescriptor>()));
+  this->Add(desc);
+  return IPerspectiveDescriptor::Pointer(static_cast<IPerspectiveDescriptor*>(desc.GetPointer()));
 }
 
 IPerspectiveDescriptor::Pointer PerspectiveRegistry::ClonePerspective(const QString& id,

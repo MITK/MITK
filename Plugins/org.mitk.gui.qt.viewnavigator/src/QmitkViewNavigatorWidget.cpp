@@ -445,22 +445,29 @@ void QmitkViewNavigatorWidget::SaveCurrentPerspectiveAs()
 {
   berry::IWorkbenchPage::Pointer page = m_Window->GetActivePage();
   berry::IPerspectiveDescriptor::Pointer currentPerspective = page->GetPerspective();
-  QString label = currentPerspective->GetLabel();
 
-  bool ok;
-  QString text = QInputDialog::getText(this, "Create new perspective",
-                                       "New perspective name:", QLineEdit::Normal,
-                                       "", &ok);
-  if (ok && !text.isEmpty())
+  bool ok = false;
+  QString perspectiveLabel = QInputDialog::getText(this, "Save perspective as ...",
+                                "New perspective name:", QLineEdit::Normal,
+                                "", &ok);
+
+  if (!ok)
   {
-    label = text;
+    return;
+  }
+
+  if (perspectiveLabel.isEmpty())
+  {
+    QMessageBox::information(this, "Save perspective as ...", "Please select a valid perspective name.");
+    return;
   }
 
   berry::IPerspectiveRegistry* perspectiveRegistry = berry::PlatformUI::GetWorkbench()->GetPerspectiveRegistry();
-  berry::IPerspectiveDescriptor::Pointer newPerspective = perspectiveRegistry->CreatePerspective(label, currentPerspective);
+  berry::IPerspectiveDescriptor::Pointer newPerspective = perspectiveRegistry->CreatePerspective(perspectiveLabel, currentPerspective);
 
   if (nullptr == newPerspective)
   {
+    QMessageBox::information(this, "Save perspective as ...", "The selected perspective name is already in use.");
     return;
   }
 

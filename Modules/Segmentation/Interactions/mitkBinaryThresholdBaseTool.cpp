@@ -20,10 +20,10 @@ found in the LICENSE file.
 #include <itkImageRegionIterator.h>
 
 mitk::BinaryThresholdBaseTool::BinaryThresholdBaseTool()
-  : m_SensibleMinimumThresholdValue(-100),
-    m_SensibleMaximumThresholdValue(+100),
-    m_CurrentLowerThresholdValue(1),
-    m_CurrentUpperThresholdValue(1)
+  : m_SensibleMinimumThreshold(-100),
+    m_SensibleMaximumThreshold(+100),
+    m_LowerThreshold(1),
+    m_UpperThreshold(1)
 {
 }
 
@@ -37,16 +37,16 @@ void mitk::BinaryThresholdBaseTool::SetThresholdValues(double lower, double uppe
      method will be called again with a proper value right after. The only
      known case where this happens is with an [0.0, 1.0[ image, where value
      could be an epsilon greater than the max. */
-  if (lower < m_SensibleMinimumThresholdValue
-    || lower > m_SensibleMaximumThresholdValue
-    || upper < m_SensibleMinimumThresholdValue
-    || upper > m_SensibleMaximumThresholdValue)
+  if (lower < m_SensibleMinimumThreshold
+    || lower > m_SensibleMaximumThreshold
+    || upper < m_SensibleMinimumThreshold
+    || upper > m_SensibleMaximumThreshold)
   {
     return;
   }
 
-  m_CurrentLowerThresholdValue = lower;
-  m_CurrentUpperThresholdValue = upper;
+  m_LowerThreshold = lower;
+  m_UpperThreshold = upper;
 
   if (nullptr != this->GetPreviewSegmentation())
   {
@@ -59,25 +59,25 @@ void mitk::BinaryThresholdBaseTool::InitiateToolByInput()
   const auto referenceImage = this->GetReferenceData();
   if (nullptr != referenceImage)
   {
-    m_SensibleMinimumThresholdValue = std::numeric_limits<ScalarType>::max();
-    m_SensibleMaximumThresholdValue = std::numeric_limits<ScalarType>::lowest();
+    m_SensibleMinimumThreshold = std::numeric_limits<ScalarType>::max();
+    m_SensibleMaximumThreshold = std::numeric_limits<ScalarType>::lowest();
     Image::StatisticsHolderPointer statistics = referenceImage->GetStatistics();
     for (unsigned int ts = 0; ts < referenceImage->GetTimeSteps(); ++ts)
     {
-      m_SensibleMinimumThresholdValue = std::min(m_SensibleMinimumThresholdValue, static_cast<double>(statistics->GetScalarValueMin()));
-      m_SensibleMaximumThresholdValue = std::max(m_SensibleMaximumThresholdValue, static_cast<double>(statistics->GetScalarValueMax()));
+      m_SensibleMinimumThreshold = std::min(m_SensibleMinimumThreshold, static_cast<double>(statistics->GetScalarValueMin()));
+      m_SensibleMaximumThreshold = std::max(m_SensibleMaximumThreshold, static_cast<double>(statistics->GetScalarValueMax()));
     }
 
     if (m_LockedUpperThreshold)
     {
-      m_CurrentLowerThresholdValue = (m_SensibleMaximumThresholdValue + m_SensibleMinimumThresholdValue) / 2.0;
-      m_CurrentUpperThresholdValue = m_SensibleMaximumThresholdValue;
+      m_LowerThreshold = (m_SensibleMaximumThreshold + m_SensibleMinimumThreshold) / 2.0;
+      m_UpperThreshold = m_SensibleMaximumThreshold;
     }
     else
     {
-      double range = m_SensibleMaximumThresholdValue - m_SensibleMinimumThresholdValue;
-      m_CurrentLowerThresholdValue = m_SensibleMinimumThresholdValue + range / 3.0;
-      m_CurrentUpperThresholdValue = m_SensibleMinimumThresholdValue + 2 * range / 3.0;
+      double range = m_SensibleMaximumThreshold - m_SensibleMinimumThreshold;
+      m_LowerThreshold = m_SensibleMinimumThreshold + range / 3.0;
+      m_UpperThreshold = m_SensibleMinimumThreshold + 2 * range / 3.0;
     }
 
     bool isFloatImage = false;
@@ -88,39 +88,35 @@ void mitk::BinaryThresholdBaseTool::InitiateToolByInput()
       isFloatImage = true;
     }
 
-    IntervalBordersChanged.Send(m_SensibleMinimumThresholdValue, m_SensibleMaximumThresholdValue, isFloatImage);
-    ThresholdingValuesChanged.Send(m_CurrentLowerThresholdValue, m_CurrentUpperThresholdValue);
+    IntervalBordersChanged.Send(m_SensibleMinimumThreshold, m_SensibleMaximumThreshold, isFloatImage);
+    ThresholdingValuesChanged.Send(m_LowerThreshold, m_UpperThreshold);
   }
-}
-
-template <typename TPixel, unsigned int VImageDimension>
-static void ITKThresholding(const itk::Image<TPixel, VImageDimension> *originalImage,
-                            mitk::Image *segmentation,
-                            double lower,
-                            double upper,
-                            unsigned int timeStep)
-{
-  typedef itk::Image<TPixel, VImageDimension> ImageType;
-  typedef itk::Image<mitk::Tool::DefaultSegmentationDataType, VImageDimension> SegmentationType;
-  typedef itk::BinaryThresholdImageFilter<ImageType, SegmentationType> ThresholdFilterType;
-
-  typename ThresholdFilterType::Pointer filter = ThresholdFilterType::New();
-  filter->SetInput(originalImage);
-  filter->SetLowerThreshold(lower);
-  filter->SetUpperThreshold(upper);
-  filter->SetInsideValue(1);
-  filter->SetOutsideValue(0);
-  filter->Update();
-
-  segmentation->SetVolume((void *)(filter->GetOutput()->GetPixelContainer()->GetBufferPointer()), timeStep);
 }
 
 void mitk::BinaryThresholdBaseTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image* /*oldSegAtTimeStep*/, Image* previewImage, TimeStepType timeStep)
 {
   if (nullptr != inputAtTimeStep && nullptr != previewImage)
   {
-      AccessByItk_n(inputAtTimeStep,
-        ITKThresholding,
-        (previewImage, m_CurrentLowerThresholdValue, m_CurrentUpperThresholdValue, timeStep));
+    AccessByItk_n(inputAtTimeStep, ITKThresholding, (previewImage, timeStep));
   }
+}
+
+template <typename TPixel, unsigned int VImageDimension>
+void mitk::BinaryThresholdBaseTool::ITKThresholding(const itk::Image<TPixel, VImageDimension>* inputImage,
+                                                    Image* segmentation,
+                                                    unsigned int timeStep)
+{
+  typedef itk::Image<TPixel, VImageDimension> ImageType;
+  typedef itk::Image<mitk::Tool::DefaultSegmentationDataType, VImageDimension> SegmentationType;
+  typedef itk::BinaryThresholdImageFilter<ImageType, SegmentationType> ThresholdFilterType;
+
+  typename ThresholdFilterType::Pointer filter = ThresholdFilterType::New();
+  filter->SetInput(inputImage);
+  filter->SetLowerThreshold(m_LowerThreshold);
+  filter->SetUpperThreshold(m_UpperThreshold);
+  filter->SetInsideValue(this->GetUserDefinedActiveLabel());
+  filter->SetOutsideValue(0);
+  filter->Update();
+
+  segmentation->SetVolume((void *)(filter->GetOutput()->GetPixelContainer()->GetBufferPointer()), timeStep);
 }

@@ -130,6 +130,8 @@ namespace mitk
 
     TimePointType GetLastTimePointOfUpdate() const;
 
+    itkGetConstMacro(UserDefinedActiveLabel, Label::PixelType);
+
     itkSetObjectMacro(WorkingPlaneGeometry, PlaneGeometry);
     itkGetConstObjectMacro(WorkingPlaneGeometry, PlaneGeometry);
 
@@ -172,6 +174,8 @@ namespace mitk
     TimePointType m_LastTimePointOfUpdate = 0.;
 
     bool m_IsUpdating = false;
+
+    Label::PixelType m_UserDefinedActiveLabel = 1;
 
     /** This variable indicates if for the tool a working plane geometry is defined.
      * If a working plane is defined the tool will only work an the slice of the input

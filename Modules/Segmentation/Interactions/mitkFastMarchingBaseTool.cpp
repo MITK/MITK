@@ -166,6 +166,19 @@ void mitk::FastMarchingBaseTool::Deactivated()
   Superclass::Deactivated();
 }
 
+
+void mitk::FastMarchingBaseTool::ClearSeeds()
+{
+  if (this->m_SeedsAsPointSet.IsNotNull())
+  {
+    // renew pointset
+    this->m_SeedsAsPointSet = PointSet::New();
+    //ensure that the seed points are visible for all timepoints.
+    dynamic_cast<ProportionalTimeGeometry*>(m_SeedsAsPointSet->GetTimeGeometry())->SetStepDuration(std::numeric_limits<TimePointType>::max());
+    this->m_SeedsAsPointSetNode->SetData(this->m_SeedsAsPointSet);
+  }
+}
+
 void mitk::FastMarchingBaseTool::ConnectActionsAndFunctions()
 {
   CONNECT_FUNCTION("ShiftSecondaryButtonPressed", OnAddPoint);
@@ -209,21 +222,28 @@ void mitk::FastMarchingBaseTool::OnDelete(StateMachineAction*, InteractionEvent*
   }
 }
 
-void mitk::FastMarchingBaseTool::ClearSeeds()
+void mitk::FastMarchingBaseTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image* /*oldSegAtTimeStep*/, Image* previewImage, TimeStepType timeStep)
 {
-  if (this->m_SeedsAsPointSet.IsNotNull())
+  if (nullptr != inputAtTimeStep && nullptr != previewImage && m_SeedsAsPointSet.IsNotNull() && m_SeedsAsPointSet->GetSize() > 0)
   {
-    // renew pointset
-    this->m_SeedsAsPointSet = mitk::PointSet::New();
-    //ensure that the seed points are visible for all timepoints.
-    dynamic_cast<ProportionalTimeGeometry*>(m_SeedsAsPointSet->GetTimeGeometry())->SetStepDuration(std::numeric_limits<TimePointType>::max());
-    this->m_SeedsAsPointSetNode->SetData(this->m_SeedsAsPointSet);
+    if (nullptr == this->GetWorkingPlaneGeometry())
+    {
+      AccessFixedDimensionByItk_n(inputAtTimeStep, ITKFastMarching, 3,
+        (previewImage, timeStep, inputAtTimeStep->GetGeometry()));
+    }
+    else
+    {
+      AccessFixedDimensionByItk_n(inputAtTimeStep, ITKFastMarching, 2,
+        (previewImage, timeStep, inputAtTimeStep->GetGeometry()));
+    }
   }
 }
 
 template <typename TPixel, unsigned int VImageDimension>
-void mitk::FastMarchingBaseTool::DoITKFastMarching(const itk::Image<TPixel, VImageDimension>* inputImage,
-  Image* previewImage, unsigned int timeStep, const BaseGeometry* inputGeometry)
+void mitk::FastMarchingBaseTool::ITKFastMarching(const itk::Image<TPixel, VImageDimension>* inputImage,
+                                                 Image* segmentation,
+                                                 unsigned int timeStep,
+                                                 const BaseGeometry* inputGeometry)
 {
   // typedefs for itk pipeline
   typedef itk::Image<TPixel, VImageDimension> InputImageType;
@@ -291,8 +311,8 @@ void mitk::FastMarchingBaseTool::DoITKFastMarching(const itk::Image<TPixel, VIma
   auto thresholdFilter = ThresholdingFilterType::New();
   thresholdFilter->SetLowerThreshold(m_LowerThreshold);
   thresholdFilter->SetUpperThreshold(m_UpperThreshold);
+  thresholdFilter->SetInsideValue(this->GetUserDefinedActiveLabel());
   thresholdFilter->SetOutsideValue(0);
-  thresholdFilter->SetInsideValue(1.0);
 
   // set up pipeline
   smoothFilter->SetInput(inputImage);
@@ -304,27 +324,12 @@ void mitk::FastMarchingBaseTool::DoITKFastMarching(const itk::Image<TPixel, VIma
 
   if (nullptr == this->GetWorkingPlaneGeometry())
   {
-    previewImage->SetVolume((void*)(thresholdFilter->GetOutput()->GetPixelContainer()->GetBufferPointer()), timeStep);
+    segmentation->SetVolume((void*)(thresholdFilter->GetOutput()->GetPixelContainer()->GetBufferPointer()), timeStep);
   }
   else
   {
-    mitk::Image::Pointer sliceImage = mitk::Image::New();
-    mitk::CastToMitkImage(thresholdFilter->GetOutput(), sliceImage);
-    SegTool2D::WriteSliceToVolume(previewImage, this->GetWorkingPlaneGeometry(), sliceImage, timeStep, false);
-  }
-}
-
-void mitk::FastMarchingBaseTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image* /*oldSegAtTimeStep*/, Image* previewImage, TimeStepType timeStep)
-{
-  if (nullptr != inputAtTimeStep && nullptr != previewImage && m_SeedsAsPointSet.IsNotNull() && m_SeedsAsPointSet->GetSize()>0)
-  {
-    if (nullptr == this->GetWorkingPlaneGeometry())
-    {
-      AccessFixedDimensionByItk_n(inputAtTimeStep, DoITKFastMarching, 3, (previewImage, timeStep, inputAtTimeStep->GetGeometry()));
-    }
-    else
-    {
-      AccessFixedDimensionByItk_n(inputAtTimeStep, DoITKFastMarching, 2, (previewImage, timeStep, inputAtTimeStep->GetGeometry()));
-    }
+    Image::Pointer sliceImage = Image::New();
+    CastToMitkImage(thresholdFilter->GetOutput(), sliceImage);
+    SegTool2D::WriteSliceToVolume(segmentation, this->GetWorkingPlaneGeometry(), sliceImage, timeStep, false);
   }
 }

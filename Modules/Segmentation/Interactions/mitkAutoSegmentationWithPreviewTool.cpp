@@ -443,6 +443,15 @@ void mitk::AutoSegmentationWithPreviewTool::UpdatePreview(bool ignoreLazyPreview
   int progress_steps = 200;
 
   const auto workingImage = dynamic_cast<const mitk::Image*>(this->GetToolManager()->GetWorkingData(0)->GetData());
+  if (const auto& labelSetImage = dynamic_cast<const LabelSetImage*>(workingImage))
+  {
+    // this is a fix for T28131 / T28986, which should be refactored if T28524 is being worked on
+    m_UserDefinedActiveLabel = labelSetImage->GetActiveLabel(labelSetImage->GetActiveLayer())->GetValue();
+  }
+  else
+  {
+    m_UserDefinedActiveLabel = 1;
+  }
 
   this->CurrentlyBusy.Send(true);
   m_IsUpdating = true;

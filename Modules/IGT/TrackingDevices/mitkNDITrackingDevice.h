@@ -17,8 +17,8 @@ found in the LICENSE file.
 #include "mitkTrackingDevice.h"
 
 #include <MitkIGTExports.h>
-#include <itkMultiThreader.h>
-#include "itkFastMutexLock.h"
+#include <thread>
+#include <mutex>
 #include <vector>
 
 #include "mitkNDIProtocol.h"
@@ -295,9 +295,9 @@ public:
     virtual void TrackToolsAndMarkers();
 
     /**
-    * \brief static start method for the tracking thread.
+    * \brief start method for the tracking thread.
     */
-    static ITK_THREAD_RETURN_TYPE ThreadStartTracking(void* data);
+    void ThreadStartTracking();
 
   protected:
     NDITrackingDevice();          ///< Constructor
@@ -315,15 +315,14 @@ public:
     DataTransferMode m_DataTransferMode;  ///< use TX (text) or BX (binary) (\warning currently, only TX mode is supported)
     Tool6DContainerType m_6DTools;        ///< list of 6D tools
 
-    itk::FastMutexLock::Pointer m_ToolsMutex; ///< mutex for coordinated access of tool container
+    mutable std::mutex m_ToolsMutex; ///< mutex for coordinated access of tool container
     mitk::SerialCommunication::Pointer m_SerialCommunication;    ///< serial communication interface
-    itk::FastMutexLock::Pointer m_SerialCommunicationMutex; ///< mutex for coordinated access of serial communication interface
+    std::mutex m_SerialCommunicationMutex; ///< mutex for coordinated access of serial communication interface
     NDIProtocol::Pointer m_DeviceProtocol;    ///< create and parse NDI protocol strings
 
-    itk::MultiThreader::Pointer m_MultiThreader;      ///< creates tracking thread that continuously polls serial interface for new tracking data
-    int m_ThreadID;                 ///< ID of tracking thread
+    std::thread m_Thread;                 ///< ID of tracking thread
     OperationMode m_OperationMode;  ///< tracking mode (6D tool tracking, 3D marker tracking,...)
-    itk::FastMutexLock::Pointer m_MarkerPointsMutex;  ///< mutex for marker point data container
+    std::mutex m_MarkerPointsMutex;  ///< mutex for marker point data container
     MarkerPointContainerType m_MarkerPoints;          ///< container for markers (3D point tracking mode)
   };
 } // namespace mitk

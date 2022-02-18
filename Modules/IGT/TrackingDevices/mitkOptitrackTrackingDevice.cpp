@@ -36,10 +36,6 @@ mitk::OptitrackTrackingDevice::OptitrackTrackingDevice()
     : mitk::TrackingDevice(),
       m_initialized(false)
 {
-  // Set the MultiThread and Mutex
-  this->m_MultiThreader = itk::MultiThreader::New();
-  this->m_ToolsMutex = itk::FastMutexLock::New();
-
   //Set the mitk device information
   SetData(mitk::DeviceDataNPOptitrack);
 
@@ -296,9 +292,9 @@ bool mitk::OptitrackTrackingDevice::StartTracking()
   this->SetState(mitk::TrackingDevice::Tracking);
 
   // Change the m_StopTracking Variable to false
-  this->m_StopTrackingMutex->Lock();
+  this->m_StopTrackingMutex.lock();
   this->m_StopTracking = false;
-  this->m_StopTrackingMutex->Unlock();
+  this->m_StopTrackingMutex.unlock();
 
   /******************************************************************************
   ###############################################################################
@@ -308,7 +304,7 @@ bool mitk::OptitrackTrackingDevice::StartTracking()
   mitk::IGTTimeStamp::GetInstance()->Start(this);
 
   // Launch multiThreader using the Function ThreadStartTracking that executes the TrackTools() method
-  m_ThreadID = m_MultiThreader->SpawnThread(this->ThreadStartTracking, this);    // start a new thread that executes the TrackTools() method
+  m_Thread = std::thread(&OptitrackTrackingDevice::ThreadStartTracking, this);    // start a new thread that executes the TrackTools() method
 
   // Information for the user
   if(GetToolCount() == 0) MITK_INFO << "No tools are defined";
@@ -340,13 +336,13 @@ bool mitk::OptitrackTrackingDevice::StopTracking()
   if (this->GetState() == mitk::TrackingDevice::Tracking) // Only if the object is in the correct state
   {
     //Change the StopTracking value
-    m_StopTrackingMutex->Lock();  // m_StopTracking is used by two threads, so we have to ensure correct thread handling
-    m_StopTrackingMutex->Unlock();
+    m_StopTrackingMutex.lock();  // m_StopTracking is used by two threads, so we have to ensure correct thread handling
+    m_StopTrackingMutex.unlock();
     this->SetState(mitk::TrackingDevice::Ready);
   }
   else
   {
-    m_TrackingFinishedMutex->Unlock();
+    m_TrackingFinishedMutex.unlock();
     MITK_INFO << "System is not in State Tracking -> Cannot StopTracking";
     mitkThrowException(mitk::IGTException) << "System is not in State Tracking -> Cannot StopTracking";
     return false;
@@ -359,44 +355,17 @@ bool mitk::OptitrackTrackingDevice::StopTracking()
   ******************************************************************************/
   mitk::IGTTimeStamp::GetInstance()->Stop(this);
 
-  m_TrackingFinishedMutex->Unlock();
+  m_TrackingFinishedMutex.unlock();
   return true;
 }
 
 //=======================================================
 // ThreadStartTracking
 //=======================================================
-ITK_THREAD_RETURN_TYPE mitk::OptitrackTrackingDevice::ThreadStartTracking(void* pInfoStruct)
+void mitk::OptitrackTrackingDevice::ThreadStartTracking()
 {
   MITK_DEBUG << "ThreadStartTracking";
-
-  /* extract this pointer from Thread Info structure */
-  struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
-
-  if (pInfo == nullptr)
-  {
-    return ITK_THREAD_RETURN_VALUE;
-  }
-
-  if (pInfo->UserData == nullptr)
-  {
-    return ITK_THREAD_RETURN_VALUE;
-  }
-
-  OptitrackTrackingDevice *trackingDevice = static_cast<OptitrackTrackingDevice*>(pInfo->UserData);
-
-  if (trackingDevice != nullptr)
-  {
-    // Call the TrackTools function in this thread
-    trackingDevice->TrackTools();
-  }
-  else
-  {
-    mitkThrowException(mitk::IGTException) << "In ThreadStartTracking(): trackingDevice is nullptr";
-  }
-
-  trackingDevice->m_ThreadID = -1; // reset thread ID because we end the thread here
-  return ITK_THREAD_RETURN_VALUE;
+  this->TrackTools();
 }
 
 //=======================================================
@@ -407,7 +376,7 @@ mitk::OptitrackTrackingTool* mitk::OptitrackTrackingDevice::GetOptitrackTool( un
   MITK_DEBUG << "ThreadStartTracking";
   OptitrackTrackingTool* t = nullptr;
 
-  MutexLockHolder toolsMutexLockHolder(*m_ToolsMutex); // lock and unlock the mutex
+  std::lock_guard<std::mutex> toolsMutexLockHolder(m_ToolsMutex); // lock and unlock the mutex
   if(toolNumber < m_AllTools.size())
   {
     t = m_AllTools.at(toolNumber);
@@ -426,7 +395,7 @@ mitk::OptitrackTrackingTool* mitk::OptitrackTrackingDevice::GetOptitrackTool( un
  unsigned int mitk::OptitrackTrackingDevice::GetToolCount() const
 {
   MITK_DEBUG << "GetToolCount";
-  MutexLockHolder lock(*m_ToolsMutex); // lock and unlock the mutex
+  std::lock_guard<std::mutex> lock(m_ToolsMutex); // lock and unlock the mutex
   return ( int)(this->m_AllTools.size());
 }
 
@@ -443,16 +412,16 @@ void mitk::OptitrackTrackingDevice::TrackTools()
   try
   {
     bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here
-    this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
+    this->m_StopTrackingMutex.lock();  // update the local copy of m_StopTracking
     localStopTracking = this->m_StopTracking;
 
     /* lock the TrackingFinishedMutex to signal that the execution rights are now transfered to the tracking thread */
     if (!localStopTracking)
     {
-    m_TrackingFinishedMutex->Lock();
+    m_TrackingFinishedMutex.lock();
     }
 
-  this->m_StopTrackingMutex->Unlock();
+  this->m_StopTrackingMutex.unlock();
     while ((this->GetState() == mitk::TrackingDevice::Tracking) && (localStopTracking == false))
     {
       // For each Tracked Tool update the position and orientation
@@ -472,17 +441,17 @@ void mitk::OptitrackTrackingDevice::TrackTools()
       }
 
       /* Update the local copy of m_StopTracking */
-      this->m_StopTrackingMutex->Lock();
+      this->m_StopTrackingMutex.lock();
       localStopTracking = m_StopTracking;
-      this->m_StopTrackingMutex->Unlock();
+      this->m_StopTrackingMutex.unlock();
       Sleep(OPTITRACK_FRAME_RATE);
     } // tracking ends if we pass this line
 
-    m_TrackingFinishedMutex->Unlock(); // transfer control back to main thread
+    m_TrackingFinishedMutex.unlock(); // transfer control back to main thread
   }
   catch(...)
   {
-    m_TrackingFinishedMutex->Unlock();
+    m_TrackingFinishedMutex.unlock();
     this->StopTracking();
     mitkThrowException(mitk::IGTException) << "Error while trying to track tools. Thread stopped.";
   }
@@ -704,10 +673,9 @@ bool mitk::OptitrackTrackingDevice::StopTracking()
 //=======================================================
 // ThreadStartTracking
 //=======================================================
-ITK_THREAD_RETURN_TYPE mitk::OptitrackTrackingDevice::ThreadStartTracking(void*)
+void mitk::OptitrackTrackingDevice::ThreadStartTracking()
 {
   MITK_WARN("IGT") << "Error: " << mitk::OptitrackErrorMessages::GetOptitrackErrorMessage(100);
-  return 0;
 }
 
 //=======================================================

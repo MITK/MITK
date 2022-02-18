@@ -13,9 +13,10 @@ found in the LICENSE file.
 #include "mitkIGTLDevice.h"
 //#include "mitkIGTException.h"
 //#include "mitkIGTTimeStamp.h"
-#include <itkMutexLockHolder.h>
+#include <itkMultiThreaderBase.h>
 #include <itksys/SystemTools.hxx>
 #include <cstring>
+#include <thread>
 
 #include <igtlTransformMessage.h>
 #include <mitkIGTLMessageCommon.h>
@@ -25,9 +26,17 @@ found in the LICENSE file.
 //remove later
 #include <igtlTrackingDataMessage.h>
 
+namespace mitk
+{
+  itkEventMacroDefinition(MessageSentEvent, itk::AnyEvent);
+  itkEventMacroDefinition(MessageReceivedEvent, itk::AnyEvent);
+  itkEventMacroDefinition(CommandReceivedEvent, itk::AnyEvent);
+  itkEventMacroDefinition(NewClientConnectionEvent, itk::AnyEvent);
+  itkEventMacroDefinition(LostConnectionEvent, itk::AnyEvent);
+}
+
 //TODO: Which timeout is acceptable and also needed to transmit image data? Is there a maximum data limit?
 static const int SOCKET_SEND_RECEIVE_TIMEOUT_MSEC = 100;
-typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
 mitk::IGTLDevice::IGTLDevice(bool ReadFully) :
 //  m_Data(mitk::DeviceDataUnspecified),
@@ -36,21 +45,13 @@ m_Name("Unspecified Device"),
 m_StopCommunication(false),
 m_Hostname("127.0.0.1"),
 m_PortNumber(-1),
-m_LogMessages(false),
-m_MultiThreader(nullptr), m_SendThreadID(0), m_ReceiveThreadID(0), m_ConnectThreadID(0)
+m_LogMessages(false)
 {
   m_ReadFully = ReadFully;
-  m_StopCommunicationMutex = itk::FastMutexLock::New();
-  m_StateMutex = itk::FastMutexLock::New();
-  //  m_LatestMessageMutex = itk::FastMutexLock::New();
-  m_SendingFinishedMutex = itk::FastMutexLock::New();
-  m_ReceivingFinishedMutex = itk::FastMutexLock::New();
-  m_ConnectingFinishedMutex = itk::FastMutexLock::New();
   // execution rights are owned by the application thread at the beginning
-  m_SendingFinishedMutex->Lock();
-  m_ReceivingFinishedMutex->Lock();
-  m_ConnectingFinishedMutex->Lock();
-  m_MultiThreader = itk::MultiThreader::New();
+  m_SendingFinishedMutex.lock();
+  m_ReceivingFinishedMutex.lock();
+  m_ConnectingFinishedMutex.lock();
   //  m_Data = mitk::DeviceDataUnspecified;
   //  m_LatestMessage = igtl::MessageBase::New();
 
@@ -71,27 +72,19 @@ mitk::IGTLDevice::~IGTLDevice()
     this->CloseConnection();
   }
   /* cleanup tracking thread */
-  if (m_MultiThreader.IsNotNull())
-  {
-    if ((m_SendThreadID != 0))
-    {
-      m_MultiThreader->TerminateThread(m_SendThreadID);
-    }
-    if ((m_ReceiveThreadID != 0))
-    {
-      m_MultiThreader->TerminateThread(m_ReceiveThreadID);
-    }
-    if ((m_ConnectThreadID != 0))
-    {
-      m_MultiThreader->TerminateThread(m_ConnectThreadID);
-    }
-  }
-  m_MultiThreader = nullptr;
+  if (m_SendThread.joinable())
+    m_SendThread.detach();
+
+  if (m_ReceiveThread.joinable())
+    m_ReceiveThread.detach();
+
+  if (m_ConnectThread.joinable())
+    m_ConnectThread.detach();
 }
 
 mitk::IGTLDevice::IGTLDeviceState mitk::IGTLDevice::GetState() const
 {
-  MutexLockHolder lock(*m_StateMutex);
+  std::lock_guard<std::mutex> lock(m_StateMutex);
   return m_State;
 }
 
@@ -99,16 +92,16 @@ void mitk::IGTLDevice::SetState(IGTLDeviceState state)
 {
   itkDebugMacro("setting  m_State to " << state);
 
-  m_StateMutex->Lock();
+  m_StateMutex.lock();
   //  MutexLockHolder lock(*m_StateMutex); // lock and unlock the mutex
 
   if (m_State == state)
   {
-    m_StateMutex->Unlock();
+    m_StateMutex.unlock();
     return;
   }
   m_State = state;
-  m_StateMutex->Unlock();
+  m_StateMutex.unlock();
   this->Modified();
 }
 
@@ -294,7 +287,7 @@ unsigned int mitk::IGTLDevice::SendMessagePrivate(mitk::IGTLMessage::Pointer msg
   }
 }
 
-void mitk::IGTLDevice::RunCommunication(void (IGTLDevice::*ComFunction)(void), itk::FastMutexLock* mutex)
+void mitk::IGTLDevice::RunCommunication(void (IGTLDevice::*ComFunction)(void), std::mutex& mutex)
 {
   if (this->GetState() != Running)
     return;
@@ -302,24 +295,24 @@ void mitk::IGTLDevice::RunCommunication(void (IGTLDevice::*ComFunction)(void), i
   try
   {
     // keep lock until end of scope
-    MutexLockHolder communicationFinishedLockHolder(*mutex);
+    std::lock_guard<std::mutex> communicationFinishedLockHolder(mutex);
 
     // Because m_StopCommunication is used by two threads, access has to be guarded
     // by a mutex. To minimize thread locking, a local copy is used here
     bool localStopCommunication;
 
     // update the local copy of m_StopCommunication
-    this->m_StopCommunicationMutex->Lock();
+    this->m_StopCommunicationMutex.lock();
     localStopCommunication = this->m_StopCommunication;
-    this->m_StopCommunicationMutex->Unlock();
+    this->m_StopCommunicationMutex.unlock();
     while ((this->GetState() == Running) && (localStopCommunication == false))
     {
       (this->*ComFunction)();
 
       /* Update the local copy of m_StopCommunication */
-      this->m_StopCommunicationMutex->Lock();
+      this->m_StopCommunicationMutex.lock();
       localStopCommunication = m_StopCommunication;
-      this->m_StopCommunicationMutex->Unlock();
+      this->m_StopCommunicationMutex.unlock();
 
       // time to relax, this sets the maximum ever possible framerate to 1000 Hz
       itksys::SystemTools::Delay(1);
@@ -327,7 +320,7 @@ void mitk::IGTLDevice::RunCommunication(void (IGTLDevice::*ComFunction)(void), i
   }
   catch (...)
   {
-    mutex->Unlock();
+    mutex.unlock();
     this->StopCommunication();
     MITK_ERROR("IGTLDevice::RunCommunication") << "Error while communicating. Thread stopped.";
     //mitkThrowException(mitk::IGTException) << "Error while communicating. Thread stopped.";
@@ -353,22 +346,19 @@ bool mitk::IGTLDevice::StartCommunication()
   this->m_Socket->SetTimeout(SOCKET_SEND_RECEIVE_TIMEOUT_MSEC);
 
   // update the local copy of m_StopCommunication
-  this->m_StopCommunicationMutex->Lock();
+  this->m_StopCommunicationMutex.lock();
   this->m_StopCommunication = false;
-  this->m_StopCommunicationMutex->Unlock();
+  this->m_StopCommunicationMutex.unlock();
 
   // transfer the execution rights to tracking thread
-  m_SendingFinishedMutex->Unlock();
-  m_ReceivingFinishedMutex->Unlock();
-  m_ConnectingFinishedMutex->Unlock();
+  m_SendingFinishedMutex.unlock();
+  m_ReceivingFinishedMutex.unlock();
+  m_ConnectingFinishedMutex.unlock();
 
   // start new threads that execute the communication
-  m_SendThreadID =
-    m_MultiThreader->SpawnThread(this->ThreadStartSending, this);
-  m_ReceiveThreadID =
-    m_MultiThreader->SpawnThread(this->ThreadStartReceiving, this);
-  m_ConnectThreadID =
-    m_MultiThreader->SpawnThread(this->ThreadStartConnecting, this);
+  m_SendThread = std::thread(&IGTLDevice::ThreadStartSending, this);
+  m_ReceiveThread = std::thread(&IGTLDevice::ThreadStartReceiving, this);
+  m_ConnectThread = std::thread(&IGTLDevice::ThreadStartConnecting, this);
   //  mitk::IGTTimeStamp::GetInstance()->Start(this);
   return true;
 }
@@ -379,14 +369,14 @@ bool mitk::IGTLDevice::StopCommunication()
   {
     // m_StopCommunication is used by two threads, so we have to ensure correct
     // thread handling
-    m_StopCommunicationMutex->Lock();
+    m_StopCommunicationMutex.lock();
     m_StopCommunication = true;
-    m_StopCommunicationMutex->Unlock();
+    m_StopCommunicationMutex.unlock();
     // we have to wait here that the other thread recognizes the STOP-command
     // and executes it
-    m_SendingFinishedMutex->Lock();
-    m_ReceivingFinishedMutex->Lock();
-    m_ConnectingFinishedMutex->Lock();
+    m_SendingFinishedMutex.lock();
+    m_ReceivingFinishedMutex.lock();
+    m_ConnectingFinishedMutex.lock();
     //    mitk::IGTTimeStamp::GetInstance()->Stop(this); // notify realtime clock
     // StopCommunication was called, thus the mode should be changed back
     // to Ready now that the tracking loop has ended.
@@ -490,70 +480,17 @@ void mitk::IGTLDevice::EnableNoBufferingMode(
   queue->EnableNoBufferingMode(enable);
 }
 
-ITK_THREAD_RETURN_TYPE mitk::IGTLDevice::ThreadStartSending(void* pInfoStruct)
+void mitk::IGTLDevice::ThreadStartSending()
 {
-  /* extract this pointer from Thread Info structure */
-  struct itk::MultiThreader::ThreadInfoStruct * pInfo =
-    (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
-  if (pInfo == nullptr)
-  {
-    return ITK_THREAD_RETURN_VALUE;
-  }
-  if (pInfo->UserData == nullptr)
-  {
-    return ITK_THREAD_RETURN_VALUE;
-  }
-  IGTLDevice *igtlDevice = (IGTLDevice*)pInfo->UserData;
-  if (igtlDevice != nullptr)
-  {
-    igtlDevice->RunCommunication(&mitk::IGTLDevice::Send, igtlDevice->m_SendingFinishedMutex);
-  }
-  igtlDevice->m_SendThreadID = 0;  // erase thread id because thread will end.
-  return ITK_THREAD_RETURN_VALUE;
+  this->RunCommunication(&IGTLDevice::Send, m_SendingFinishedMutex);
 }
 
-ITK_THREAD_RETURN_TYPE mitk::IGTLDevice::ThreadStartReceiving(void* pInfoStruct)
+void mitk::IGTLDevice::ThreadStartReceiving()
 {
-  /* extract this pointer from Thread Info structure */
-  struct itk::MultiThreader::ThreadInfoStruct * pInfo =
-    (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
-  if (pInfo == nullptr)
-  {
-    return ITK_THREAD_RETURN_VALUE;
-  }
-  if (pInfo->UserData == nullptr)
-  {
-    return ITK_THREAD_RETURN_VALUE;
-  }
-  IGTLDevice *igtlDevice = (IGTLDevice*)pInfo->UserData;
-  if (igtlDevice != nullptr)
-  {
-    igtlDevice->RunCommunication(&mitk::IGTLDevice::Receive,
-      igtlDevice->m_ReceivingFinishedMutex);
-  }
-  igtlDevice->m_ReceiveThreadID = 0;  // erase thread id because thread will end.
-  return ITK_THREAD_RETURN_VALUE;
+   this->RunCommunication(&IGTLDevice::Receive, m_ReceivingFinishedMutex);
 }
 
-ITK_THREAD_RETURN_TYPE mitk::IGTLDevice::ThreadStartConnecting(void* pInfoStruct)
+void mitk::IGTLDevice::ThreadStartConnecting()
 {
-  /* extract this pointer from Thread Info structure */
-  struct itk::MultiThreader::ThreadInfoStruct * pInfo =
-    (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
-  if (pInfo == nullptr)
-  {
-    return ITK_THREAD_RETURN_VALUE;
-  }
-  if (pInfo->UserData == nullptr)
-  {
-    return ITK_THREAD_RETURN_VALUE;
-  }
-  IGTLDevice *igtlDevice = (IGTLDevice*)pInfo->UserData;
-  if (igtlDevice != nullptr)
-  {
-    igtlDevice->RunCommunication(&mitk::IGTLDevice::Connect,
-      igtlDevice->m_ConnectingFinishedMutex);
-  }
-  igtlDevice->m_ConnectThreadID = 0;  // erase thread id because thread will end.
-  return ITK_THREAD_RETURN_VALUE;
+  this->RunCommunication(&IGTLDevice::Connect, m_ConnectingFinishedMutex);
 }

@@ -16,7 +16,6 @@ found in the LICENSE file.
 #include <cstdio>
 
 #include <itksys/SystemTools.hxx>
-#include <itkMutexLockHolder.h>
 
 #include <mitkUnspecifiedTrackingTypeInformation.h>
 
@@ -26,8 +25,6 @@ found in the LICENSE file.
 // vtk
 #include <vtkSphereSource.h>
 
-typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
-
 const unsigned char CR = 0xD; // == '\r' - carriage return
 const unsigned char LF = 0xA; // == '\n' - line feed
 
@@ -35,19 +32,15 @@ mitk::NDITrackingDevice::NDITrackingDevice() :
 TrackingDevice(), m_DeviceName(""), m_PortNumber(mitk::SerialCommunication::COM5), m_BaudRate(mitk::SerialCommunication::BaudRate9600),
 m_DataBits(mitk::SerialCommunication::DataBits8), m_Parity(mitk::SerialCommunication::None), m_StopBits(mitk::SerialCommunication::StopBits1),
 m_HardwareHandshake(mitk::SerialCommunication::HardwareHandshakeOff),
-m_IlluminationActivationRate(Hz20), m_DataTransferMode(TX), m_6DTools(), m_ToolsMutex(nullptr),
-m_SerialCommunication(nullptr), m_SerialCommunicationMutex(nullptr), m_DeviceProtocol(nullptr),
-m_MultiThreader(nullptr), m_ThreadID(0), m_OperationMode(ToolTracking6D), m_MarkerPointsMutex(nullptr), m_MarkerPoints()
+m_IlluminationActivationRate(Hz20), m_DataTransferMode(TX), m_6DTools(),
+m_SerialCommunication(nullptr), m_DeviceProtocol(nullptr),
+m_OperationMode(ToolTracking6D), m_MarkerPoints()
 {
   m_Data = mitk::UnspecifiedTrackingTypeInformation::GetDeviceDataUnspecified();
   m_6DTools.clear();
-  m_SerialCommunicationMutex = itk::FastMutexLock::New();
   m_DeviceProtocol = NDIProtocol::New();
   m_DeviceProtocol->SetTrackingDevice(this);
   m_DeviceProtocol->UseCRCOn();
-  m_MultiThreader = itk::MultiThreader::New();
-  m_ToolsMutex = itk::FastMutexLock::New();
-  m_MarkerPointsMutex = itk::FastMutexLock::New();
   m_MarkerPoints.reserve(50);   // a maximum of 50 marker positions can be reported by the tracking device
 }
 
@@ -101,11 +94,9 @@ mitk::NDITrackingDevice::~NDITrackingDevice()
     this->CloseConnection();
   }
   /* cleanup tracking thread */
-  if ((m_ThreadID != 0) && (m_MultiThreader.IsNotNull()))
-  {
-    m_MultiThreader->TerminateThread(m_ThreadID);
-  }
-  m_MultiThreader = nullptr;
+  if (m_Thread.joinable())
+    m_Thread.join();
+
   /* free serial communication interface */
   if (m_SerialCommunication.IsNotNull())
   {
@@ -241,7 +232,7 @@ mitk::NDIErrorCode mitk::NDITrackingDevice::Send(const std::string* input, bool 
   // Clear send buffer
   this->ClearSendBuffer();
   // Send the date to the device
-  MutexLockHolder lock(*m_SerialCommunicationMutex); // lock and unlock the mutex
+  std::lock_guard<std::mutex> lock(m_SerialCommunicationMutex);
   long returnvalue = m_SerialCommunication->Send(message);
 
   if (returnvalue == 0)
@@ -255,7 +246,7 @@ mitk::NDIErrorCode mitk::NDITrackingDevice::Receive(std::string* answer, unsigne
   if (answer == nullptr)
     return SERIALRECEIVEERROR;
 
-  MutexLockHolder lock(*m_SerialCommunicationMutex); // lock and unlock the mutex
+  std::lock_guard<std::mutex> lock(m_SerialCommunicationMutex);
   long returnvalue = m_SerialCommunication->Receive(*answer, numberOfBytes);  // never read more bytes than the device has send, the function will block until enough bytes are send...
 
   if (returnvalue == 0)
@@ -271,7 +262,7 @@ mitk::NDIErrorCode mitk::NDITrackingDevice::ReceiveByte(char* answer)
 
   std::string m;
 
-  MutexLockHolder lock(*m_SerialCommunicationMutex); // lock and unlock the mutex
+  std::lock_guard<std::mutex> lock(m_SerialCommunicationMutex);
 
   long returnvalue = m_SerialCommunication->Receive(m, 1);
 
@@ -289,7 +280,7 @@ mitk::NDIErrorCode mitk::NDITrackingDevice::ReceiveLine(std::string* answer)
 
   std::string m;
 
-  MutexLockHolder lock(*m_SerialCommunicationMutex); // lock and unlock the mutex
+  std::lock_guard<std::mutex> lock(m_SerialCommunicationMutex);
 
   do
   {
@@ -303,13 +294,13 @@ mitk::NDIErrorCode mitk::NDITrackingDevice::ReceiveLine(std::string* answer)
 
 void mitk::NDITrackingDevice::ClearSendBuffer()
 {
-  MutexLockHolder lock(*m_SerialCommunicationMutex); // lock and unlock the mutex
+  std::lock_guard<std::mutex> lock(m_SerialCommunicationMutex);
   m_SerialCommunication->ClearSendBuffer();
 }
 
 void mitk::NDITrackingDevice::ClearReceiveBuffer()
 {
-  MutexLockHolder lock(*m_SerialCommunicationMutex); // lock and unlock the mutex
+  std::lock_guard<std::mutex> lock(m_SerialCommunicationMutex);
   m_SerialCommunication->ClearReceiveBuffer();
 }
 
@@ -344,7 +335,7 @@ const std::string mitk::NDITrackingDevice::CalcCRC(const std::string* input)
 
 bool mitk::NDITrackingDevice::OpenConnection()
 {
-  //this->m_ModeMutex->Lock();
+  //this->m_ModeMutex.lock();
   if (this->GetState() != Setup)
   {
     mitkThrowException(mitk::IGTException) << "Can only try to open the connection if in setup mode";
@@ -482,7 +473,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
   * POLARIS: initialize the tools that were added manually
   **/
   {
-    MutexLockHolder toolsMutexLockHolder(*m_ToolsMutex); // lock and unlock the mutex
+    std::lock_guard<std::mutex> lock(m_ToolsMutex);
     std::string portHandle;
     auto endIt = m_6DTools.end();
     for (auto it = m_6DTools.begin(); it != endIt; ++it)
@@ -682,34 +673,18 @@ bool mitk::NDITrackingDevice::CloseConnection()
   return true;
 }
 
-ITK_THREAD_RETURN_TYPE mitk::NDITrackingDevice::ThreadStartTracking(void* pInfoStruct)
+void mitk::NDITrackingDevice::ThreadStartTracking()
 {
-  /* extract this pointer from Thread Info structure */
-  struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
-  if (pInfo == nullptr)
+  if (this->GetOperationMode() == ToolTracking6D)
+    this->TrackTools();             // call TrackTools() from the original object
+  else if (this->GetOperationMode() == MarkerTracking3D)
+    this->TrackMarkerPositions();   // call TrackMarkerPositions() from the original object
+  else if (this->GetOperationMode() == ToolTracking5D)
+    this->TrackMarkerPositions(); // call TrackMarkerPositions() from the original object
+  else if (this->GetOperationMode() == HybridTracking)
   {
-    return ITK_THREAD_RETURN_VALUE;
+    this->TrackToolsAndMarkers();
   }
-  if (pInfo->UserData == nullptr)
-  {
-    return ITK_THREAD_RETURN_VALUE;
-  }
-  NDITrackingDevice *trackingDevice = (NDITrackingDevice*)pInfo->UserData;
-  if (trackingDevice != nullptr)
-  {
-    if (trackingDevice->GetOperationMode() == ToolTracking6D)
-      trackingDevice->TrackTools();             // call TrackTools() from the original object
-    else if (trackingDevice->GetOperationMode() == MarkerTracking3D)
-      trackingDevice->TrackMarkerPositions();   // call TrackMarkerPositions() from the original object
-    else if (trackingDevice->GetOperationMode() == ToolTracking5D)
-      trackingDevice->TrackMarkerPositions(); // call TrackMarkerPositions() from the original object
-    else if (trackingDevice->GetOperationMode() == HybridTracking)
-    {
-      trackingDevice->TrackToolsAndMarkers();
-    }
-  }
-  trackingDevice->m_ThreadID = 0;  // erase thread id, now that this thread will end.
-  return ITK_THREAD_RETURN_VALUE;
 }
 
 bool mitk::NDITrackingDevice::StartTracking()
@@ -718,11 +693,11 @@ bool mitk::NDITrackingDevice::StartTracking()
     return false;
 
   this->SetState(Tracking);      // go to mode Tracking
-  this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
+  this->m_StopTrackingMutex.lock();  // update the local copy of m_StopTracking
   this->m_StopTracking = false;
-  this->m_StopTrackingMutex->Unlock();
+  this->m_StopTrackingMutex.unlock();
 
-  m_ThreadID = m_MultiThreader->SpawnThread(this->ThreadStartTracking, this);    // start a new thread that executes the TrackTools() method
+  m_Thread = std::thread(&NDITrackingDevice::ThreadStartTracking, this);    // start a new thread that executes the TrackTools() method
   mitk::IGTTimeStamp::GetInstance()->Start(this);
   return true;
 }
@@ -730,7 +705,7 @@ bool mitk::NDITrackingDevice::StartTracking()
 void mitk::NDITrackingDevice::TrackTools()
 {
   /* lock the TrackingFinishedMutex to signal that the execution rights are now transfered to the tracking thread */
-  MutexLockHolder trackingFinishedLockHolder(*m_TrackingFinishedMutex); // keep lock until end of scope
+  std::lock_guard<std::mutex> lock(m_TrackingFinishedMutex);
 
   if (this->GetState() != Tracking)
     return;
@@ -741,9 +716,9 @@ void mitk::NDITrackingDevice::TrackTools()
     return;
 
   bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here
-  this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
+  this->m_StopTrackingMutex.lock();  // update the local copy of m_StopTracking
   localStopTracking = this->m_StopTracking;
-  this->m_StopTrackingMutex->Unlock();
+  this->m_StopTrackingMutex.unlock();
   while ((this->GetState() == Tracking) && (localStopTracking == false))
   {
     if (this->m_DataTransferMode == TX)
@@ -759,9 +734,9 @@ void mitk::NDITrackingDevice::TrackTools()
         break;
     }
     /* Update the local copy of m_StopTracking */
-    this->m_StopTrackingMutex->Lock();
+    this->m_StopTrackingMutex.lock();
     localStopTracking = m_StopTracking;
-    this->m_StopTrackingMutex->Unlock();
+    this->m_StopTrackingMutex.unlock();
   }
   /* StopTracking was called, thus the mode should be changed back to Ready now that the tracking loop has ended. */
 
@@ -776,7 +751,7 @@ void mitk::NDITrackingDevice::TrackTools()
 
 void mitk::NDITrackingDevice::TrackMarkerPositions()
 {
-  MutexLockHolder trackingFinishedLockHolder(*m_TrackingFinishedMutex); // keep lock until end of scope
+  std::lock_guard<std::mutex> lock(m_TrackingFinishedMutex);
 
   if (m_OperationMode == ToolTracking6D)
     return;
@@ -791,22 +766,22 @@ void mitk::NDITrackingDevice::TrackMarkerPositions()
     return;
 
   bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here
-  this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
+  this->m_StopTrackingMutex.lock();  // update the local copy of m_StopTracking
   localStopTracking = this->m_StopTracking;
-  this->m_StopTrackingMutex->Unlock();
+  this->m_StopTrackingMutex.unlock();
   while ((this->GetState() == Tracking) && (localStopTracking == false))
   {
-    m_MarkerPointsMutex->Lock();                                    // lock points data structure
+    m_MarkerPointsMutex.lock();                                    // lock points data structure
     returnvalue = this->m_DeviceProtocol->POS3D(&m_MarkerPoints); // update points data structure with new position data from tracking device
-    m_MarkerPointsMutex->Unlock();
+    m_MarkerPointsMutex.unlock();
     if (!((returnvalue == NDIOKAY) || (returnvalue == NDICRCERROR) || (returnvalue == NDICRCDOESNOTMATCH))) // right now, do not stop on crc errors
     {
       std::cout << "Error in POS3D: could not read data. Possibly no markers present." << std::endl;
     }
     /* Update the local copy of m_StopTracking */
-    this->m_StopTrackingMutex->Lock();
+    this->m_StopTrackingMutex.lock();
     localStopTracking = m_StopTracking;
-    this->m_StopTrackingMutex->Unlock();
+    this->m_StopTrackingMutex.unlock();
 
     itksys::SystemTools::Delay(1);
   }
@@ -821,7 +796,7 @@ void mitk::NDITrackingDevice::TrackMarkerPositions()
 
 void mitk::NDITrackingDevice::TrackToolsAndMarkers()
 {
-  MutexLockHolder trackingFinishedLockHolder(*m_TrackingFinishedMutex); // keep lock until end of scope
+  std::lock_guard<std::mutex> lock(m_TrackingFinishedMutex);
   if (m_OperationMode != HybridTracking)
     return;
 
@@ -832,22 +807,22 @@ void mitk::NDITrackingDevice::TrackToolsAndMarkers()
     return;
 
   bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here
-  this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
+  this->m_StopTrackingMutex.lock();  // update the local copy of m_StopTracking
   localStopTracking = this->m_StopTracking;
-  this->m_StopTrackingMutex->Unlock();
+  this->m_StopTrackingMutex.unlock();
   while ((this->GetState() == Tracking) && (localStopTracking == false))
   {
-    m_MarkerPointsMutex->Lock();                                     // lock points data structure
+    m_MarkerPointsMutex.lock();                                     // lock points data structure
     returnvalue = this->m_DeviceProtocol->TX(true, &m_MarkerPoints); // update points data structure with new position data from tracking device
-    m_MarkerPointsMutex->Unlock();
+    m_MarkerPointsMutex.unlock();
     if (!((returnvalue == NDIOKAY) || (returnvalue == NDICRCERROR) || (returnvalue == NDICRCDOESNOTMATCH))) // right now, do not stop on crc errors
     {
       std::cout << "Error in TX: could not read data. Possibly no markers present." << std::endl;
     }
     /* Update the local copy of m_StopTracking */
-    this->m_StopTrackingMutex->Lock();
+    this->m_StopTrackingMutex.lock();
     localStopTracking = m_StopTracking;
-    this->m_StopTrackingMutex->Unlock();
+    this->m_StopTrackingMutex.unlock();
   }
   /* StopTracking was called, thus the mode should be changed back to Ready now that the tracking loop has ended. */
 
@@ -861,7 +836,7 @@ void mitk::NDITrackingDevice::TrackToolsAndMarkers()
 
 mitk::TrackingTool* mitk::NDITrackingDevice::GetTool(unsigned int toolNumber) const
 {
-  MutexLockHolder toolsMutexLockHolder(*m_ToolsMutex); // lock and unlock the mutex
+  std::lock_guard<std::mutex> lock(m_ToolsMutex);
   if (toolNumber < m_6DTools.size())
     return m_6DTools.at(toolNumber);
   return nullptr;
@@ -869,7 +844,7 @@ mitk::TrackingTool* mitk::NDITrackingDevice::GetTool(unsigned int toolNumber) co
 
 mitk::TrackingTool* mitk::NDITrackingDevice::GetToolByName(std::string name) const
 {
-  MutexLockHolder toolsMutexLockHolder(*m_ToolsMutex); // lock and unlock the mutex
+  std::lock_guard<std::mutex> lock(m_ToolsMutex);
   auto end = m_6DTools.end();
   for (auto iterator = m_6DTools.begin(); iterator != end; ++iterator)
     if (name.compare((*iterator)->GetToolName()) == 0)
@@ -879,7 +854,7 @@ mitk::TrackingTool* mitk::NDITrackingDevice::GetToolByName(std::string name) con
 
 mitk::NDIPassiveTool* mitk::NDITrackingDevice::GetInternalTool(std::string portHandle)
 {
-  MutexLockHolder toolsMutexLockHolder(*m_ToolsMutex); // lock and unlock the mutex
+  std::lock_guard<std::mutex> lock(m_ToolsMutex);
   auto end = m_6DTools.end();
   for (auto iterator = m_6DTools.begin(); iterator != end; ++iterator)
     if (portHandle.compare((*iterator)->GetPortHandle()) == 0)
@@ -889,7 +864,7 @@ mitk::NDIPassiveTool* mitk::NDITrackingDevice::GetInternalTool(std::string portH
 
 unsigned int mitk::NDITrackingDevice::GetToolCount() const
 {
-  MutexLockHolder toolsMutexLockHolder(*m_ToolsMutex); // lock and unlock the mutex
+  std::lock_guard<std::mutex> lock(m_ToolsMutex);
   return m_6DTools.size();
 }
 
@@ -957,18 +932,18 @@ bool mitk::NDITrackingDevice::InternalAddTool(mitk::NDIPassiveTool* tool)
       }
     }
     /* now that the tool is added to the device, add it to list too */
-    m_ToolsMutex->Lock();
+    m_ToolsMutex.lock();
     this->m_6DTools.push_back(p);
-    m_ToolsMutex->Unlock();
+    m_ToolsMutex.unlock();
     this->Modified();
     return true;
   }
   else if (this->GetState() == Setup)
   {
     /* In Setup mode, we only add it to the list, so that OpenConnection() can add it later */
-    m_ToolsMutex->Lock();
+    m_ToolsMutex.lock();
     this->m_6DTools.push_back(p);
-    m_ToolsMutex->Unlock();
+    m_ToolsMutex.unlock();
     this->Modified();
     return true;
   }
@@ -993,7 +968,7 @@ bool mitk::NDITrackingDevice::RemoveTool(mitk::TrackingTool* tool)
     if (returnvalue != NDIOKAY)
       return false;
     /* Now that the tool is removed from the tracking device, remove it from our tool list too */
-    MutexLockHolder toolsMutexLockHolder(*m_ToolsMutex); // lock and unlock the mutex (scope is inside the if-block
+    std::lock_guard<std::mutex> lock(m_ToolsMutex);
     auto end = m_6DTools.end();
     for (auto iterator = m_6DTools.begin(); iterator != end; ++iterator)
     {
@@ -1008,7 +983,7 @@ bool mitk::NDITrackingDevice::RemoveTool(mitk::TrackingTool* tool)
   }
   else if (this->GetState() == Setup)  // in Setup Mode, we are not connected to the tracking device, so we can just remove the tool from the tool list
   {
-    MutexLockHolder toolsMutexLockHolder(*m_ToolsMutex); // lock and unlock the mutex
+    std::lock_guard<std::mutex> lock(m_ToolsMutex);
     auto end = m_6DTools.end();
     for (auto iterator = m_6DTools.begin(); iterator != end; ++iterator)
     {
@@ -1026,7 +1001,7 @@ bool mitk::NDITrackingDevice::RemoveTool(mitk::TrackingTool* tool)
 
 void mitk::NDITrackingDevice::InvalidateAll()
 {
-  MutexLockHolder toolsMutexLockHolder(*m_ToolsMutex); // lock and unlock the mutex
+  std::lock_guard<std::mutex> lock(m_ToolsMutex);
   auto end = m_6DTools.end();
   for (auto iterator = m_6DTools.begin(); iterator != end; ++iterator)
     (*iterator)->SetDataValid(false);
@@ -1048,9 +1023,9 @@ mitk::OperationMode mitk::NDITrackingDevice::GetOperationMode()
 
 bool mitk::NDITrackingDevice::GetMarkerPositions(MarkerPointContainerType* markerpositions)
 {
-  m_MarkerPointsMutex->Lock();
+  m_MarkerPointsMutex.lock();
   *markerpositions = m_MarkerPoints;  // copy the internal vector to the one provided
-  m_MarkerPointsMutex->Unlock();
+  m_MarkerPointsMutex.unlock();
   return (markerpositions->size() != 0);
 }
 

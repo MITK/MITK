@@ -14,11 +14,11 @@ found in the LICENSE file.
 #define MITKCLARONTRACKINGDEVICE_H_HEADER_INCLUDED_
 
 
+#include <thread>
 #include <vector>
 #include <mitkIGTConfig.h>
 #include <mitkTrackingDevice.h>
 #include <mitkClaronTool.h>
-#include <itkMultiThreader.h>
 
 //only include MicronTracker if cmake Variable is on else the ClaronInterfaceStub is included
 #ifdef MITK_USE_MICRON_TRACKER
@@ -149,12 +149,11 @@ namespace mitk
     */
     ClaronInterface* GetDevice();
 
-    static ITK_THREAD_RETURN_TYPE ThreadStartTracking(void* data);
+    void ThreadStartTracking();
 
     std::vector<ClaronTool::Pointer> m_AllTools; ///< vector holding all tools
     ClaronInterface::Pointer m_Device; ///< represents the interface to the tracking hardware
-    itk::MultiThreader::Pointer m_MultiThreader;
-    int m_ThreadID;
+    std::thread m_Thread;
 
     /** \brief The directory where the camera calibration files can be found */
     std::string m_CalibrationDir;

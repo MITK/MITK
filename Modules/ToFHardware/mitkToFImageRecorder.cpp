@@ -11,7 +11,6 @@ found in the LICENSE file.
 ============================================================================*/
 #include "mitkToFImageRecorder.h"
 #include <mitkRealTimeClock.h>
-#include <itkMultiThreader.h>
 #include <itksys/SystemTools.hxx>
 #pragma GCC visibility push(default)
 #include <itkEventObject.h>
@@ -22,9 +21,6 @@ namespace mitk
 ToFImageRecorder::ToFImageRecorder()
 {
   this->m_ToFCameraDevice = nullptr;
-  this->m_MultiThreader = itk::MultiThreader::New();
-  this->m_AbortMutex = itk::FastMutexLock::New();
-  this->m_ThreadID = 0;
   this->m_NumOfFrames = 1; //lets record one frame per default
   this->m_ToFImageWriter = nullptr;
   this->m_DistanceImageSelected = true; //lets assume a device only has depth data by default
@@ -66,9 +62,9 @@ ToFImageRecorder::~ToFImageRecorder()
 void ToFImageRecorder::StopRecording()
 {
 
-  this->m_AbortMutex->Lock();
+  this->m_AbortMutex.lock();
   this->m_Abort = true;
-  this->m_AbortMutex->Unlock();
+  this->m_AbortMutex.unlock();
 
 }
 
@@ -140,94 +136,79 @@ void ToFImageRecorder::StartRecording()
   this->m_ToFImageWriter->SetRGBImageSelected(this->m_RGBImageSelected);
   this->m_ToFImageWriter->Open();
 
-  this->m_AbortMutex->Lock();
+  this->m_AbortMutex.lock();
   this->m_Abort = false;
-  this->m_AbortMutex->Unlock();
-  this->m_ThreadID = this->m_MultiThreader->SpawnThread(this->RecordData, this);
+  this->m_AbortMutex.unlock();
+  m_Thread = std::thread(&ToFImageRecorder::RecordData, this);
 }
 
 void ToFImageRecorder::WaitForThreadBeingTerminated()
 {
-  this->m_MultiThreader->TerminateThread(this->m_ThreadID);
+  if (m_Thread.joinable())
+    m_Thread.join();
 }
 
-ITK_THREAD_RETURN_TYPE ToFImageRecorder::RecordData(void* pInfoStruct)
+void ToFImageRecorder::RecordData()
 {
-  struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
-  if (pInfo == nullptr)
-  {
-    return ITK_THREAD_RETURN_VALUE;
-  }
-  if (pInfo->UserData == nullptr)
-  {
-    return ITK_THREAD_RETURN_VALUE;
-  }
-  ToFImageRecorder* toFImageRecorder = (ToFImageRecorder*)pInfo->UserData;
-  if (toFImageRecorder!=nullptr)
-  {
+  ToFCameraDevice::Pointer toFCameraDevice = this->GetCameraDevice();
 
-    ToFCameraDevice::Pointer toFCameraDevice = toFImageRecorder->GetCameraDevice();
+  mitk::RealTimeClock::Pointer realTimeClock;
+  realTimeClock = mitk::RealTimeClock::New();
+  int n = 100;
+  double t1 = 0;
+  double t2 = 0;
+  t1 = realTimeClock->GetCurrentStamp();
+  bool printStatus = false;
+  int requiredImageSequence = 0;
+  int numOfFramesRecorded = 0;
 
-    mitk::RealTimeClock::Pointer realTimeClock;
-    realTimeClock = mitk::RealTimeClock::New();
-    int n = 100;
-    double t1 = 0;
-    double t2 = 0;
-    t1 = realTimeClock->GetCurrentStamp();
-    bool printStatus = false;
-    int requiredImageSequence = 0;
-    int numOfFramesRecorded = 0;
-
-    bool abort = false;
-    toFImageRecorder->m_AbortMutex->Lock();
-    abort = toFImageRecorder->m_Abort;
-    toFImageRecorder->m_AbortMutex->Unlock();
-    while ( !abort )
+  bool abort = false;
+  m_AbortMutex.lock();
+  abort = m_Abort;
+  m_AbortMutex.unlock();
+  while ( !abort )
+  {
+    if ( ((m_RecordMode == ToFImageRecorder::PerFrames) && (numOfFramesRecorded < m_NumOfFrames)) ||
+          (m_RecordMode == ToFImageRecorder::Infinite) )
     {
-      if ( ((toFImageRecorder->m_RecordMode == ToFImageRecorder::PerFrames) && (numOfFramesRecorded < toFImageRecorder->m_NumOfFrames)) ||
-           (toFImageRecorder->m_RecordMode == ToFImageRecorder::Infinite) )
+
+      toFCameraDevice->GetAllImages(m_DistanceArray, m_AmplitudeArray,
+                                    m_IntensityArray, m_SourceDataArray, requiredImageSequence, m_ImageSequence, m_RGBArray );
+
+      if (m_ImageSequence >= requiredImageSequence)
       {
-
-        toFCameraDevice->GetAllImages(toFImageRecorder->m_DistanceArray, toFImageRecorder->m_AmplitudeArray,
-                                      toFImageRecorder->m_IntensityArray, toFImageRecorder->m_SourceDataArray, requiredImageSequence, toFImageRecorder->m_ImageSequence, toFImageRecorder->m_RGBArray );
-
-        if (toFImageRecorder->m_ImageSequence >= requiredImageSequence)
+        if (m_ImageSequence > requiredImageSequence)
         {
-          if (toFImageRecorder->m_ImageSequence > requiredImageSequence)
-          {
-            MITK_INFO << "Problem! required: " << requiredImageSequence << " captured: " << toFImageRecorder->m_ImageSequence;
-          }
-          requiredImageSequence = toFImageRecorder->m_ImageSequence + 1;
-          toFImageRecorder->m_ToFImageWriter->Add( toFImageRecorder->m_DistanceArray,
-                                                   toFImageRecorder->m_AmplitudeArray, toFImageRecorder->m_IntensityArray, toFImageRecorder->m_RGBArray );
-          numOfFramesRecorded++;
-          if (numOfFramesRecorded % n == 0)
-          {
-            printStatus = true;
-          }
-          if (printStatus)
-          {
-            t2 = realTimeClock->GetCurrentStamp() - t1;
-            MITK_INFO << " Framerate (fps): " << n / (t2/1000) << " Sequence: " << toFImageRecorder->m_ImageSequence;
-            t1 = realTimeClock->GetCurrentStamp();
-            printStatus = false;
-          }
+          MITK_INFO << "Problem! required: " << requiredImageSequence << " captured: " << m_ImageSequence;
         }
-        toFImageRecorder->m_AbortMutex->Lock();
-        abort = toFImageRecorder->m_Abort;
-        toFImageRecorder->m_AbortMutex->Unlock();
+        requiredImageSequence = m_ImageSequence + 1;
+        m_ToFImageWriter->Add(m_DistanceArray, m_AmplitudeArray, m_IntensityArray, m_RGBArray );
+        numOfFramesRecorded++;
+        if (numOfFramesRecorded % n == 0)
+        {
+          printStatus = true;
+        }
+        if (printStatus)
+        {
+          t2 = realTimeClock->GetCurrentStamp() - t1;
+          MITK_INFO << " Framerate (fps): " << n / (t2/1000) << " Sequence: " << m_ImageSequence;
+          t1 = realTimeClock->GetCurrentStamp();
+          printStatus = false;
+        }
       }
-      else
-      {
-        abort = true;
-      }
-    }  // end of while loop
+      m_AbortMutex.lock();
+      abort = m_Abort;
+      m_AbortMutex.unlock();
+    }
+    else
+    {
+      abort = true;
+    }
+  }  // end of while loop
 
-    toFImageRecorder->InvokeEvent(itk::AbortEvent());
+  this->InvokeEvent(itk::AbortEvent());
 
-    toFImageRecorder->m_ToFImageWriter->Close();
-  }
-  return ITK_THREAD_RETURN_VALUE;
+  m_ToFImageWriter->Close();
 }
 
 void ToFImageRecorder::SetCameraDevice(ToFCameraDevice* aToFCameraDevice)

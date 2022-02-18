@@ -254,6 +254,16 @@ namespace mitk
     */
     virtual const VertexType *GetVertexAt(int index, TimeStepType timestep = 0) const;
 
+    /** Returns the next control vertex to the approximate nearest vertex of a given position in 3D space
+     * If the timestep is invalid a nullptr will be returned.
+     */
+    virtual const VertexType *GetNextControlVertexAt(mitk::Point3D &point, float eps, TimeStepType timestep) const;
+
+    /** Returns the previous control vertex to the approximate nearest vertex of a given position in 3D space
+     * If the timestep is invalid a nullptr will be returned.
+     */
+    virtual const VertexType *GetPreviousControlVertexAt(mitk::Point3D &point, float eps, TimeStepType timestep) const;
+
     /** \brief Remove a vertex at given timestep within the container.
 
     \return index of vertex. -1 if not found.
@@ -268,13 +278,24 @@ namespace mitk
     */
     virtual bool IsNearContour(Point3D &point, float eps, TimeStepType timestep);
 
+
     /** \brief Mark a vertex at an index in the container as selected.
-    */
+     */
     bool SelectVertexAt(int index, TimeStepType timestep = 0);
 
     /** \brief Mark a vertex at an index in the container as control point.
     */
     bool SetControlVertexAt(int index, TimeStepType timestep = 0);
+
+    /** \brief Mark a control vertex at a given position in 3D space.
+
+    \param point - query point in 3D space
+    \param eps - radius for nearest neighbour search (error bound).
+    \param timestep - search at this timestep
+
+    @return true = vertex found;  false = no vertex found
+    */
+    bool SelectControlVertexAt(Point3D &point, float eps, TimeStepType timestep = 0);
 
     /** \brief Mark a vertex at a given position in 3D space.
 
@@ -285,6 +306,7 @@ namespace mitk
     @return true = vertex found;  false = no vertex found
     */
     bool SelectVertexAt(Point3D &point, float eps, TimeStepType timestep = 0);
+
     /*
         \pararm point - query point in 3D space
         \pararm eps - radius for nearest neighbour search (error bound).
@@ -344,6 +366,14 @@ namespace mitk
     Note: No data will be copied.
     */
     void Initialize(const ContourModel &other);
+
+    /** \brief Returns a list pointing to all vertices that are indicated to be control points.
+    */
+    VertexListType GetControlVertices(TimeStepType timestep);
+
+    /** \brief Returns the container of the vertices.
+     */
+    VertexListType GetVertexList(TimeStepType timestep);
 
     /*++++++++++++++++++ method inherit from base data +++++++++++++++++++++++++++*/
     /**

@@ -50,6 +50,8 @@ public:
 
   void OnClearSegmentation();
 
+  void OnSnapClosureContour(bool snap);
+
   void OnShowInformation(bool on);
 
 protected:

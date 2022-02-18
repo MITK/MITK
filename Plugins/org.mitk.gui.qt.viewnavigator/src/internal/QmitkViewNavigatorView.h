@@ -10,26 +10,19 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-
-#ifndef ViewNavigatorView_h
-#define ViewNavigatorView_h
+#ifndef QMITKVIEWNAVIGATORVIEW_H
+#define QMITKVIEWNAVIGATORVIEW_H
 
 #include <QmitkAbstractView.h>
 
 class QmitkViewNavigatorWidget;
 
 /**
-  \brief ViewNavigatorView
-
-  \warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
-
-  \sa QmitkAbstractView
-  \ingroup ${plugin_target}_internal
+* @brief
+*
 */
-class ViewNavigatorView : public QmitkAbstractView
+class QmitkViewNavigatorView : public QmitkAbstractView
 {
-  // this is needed for all Qt objects that should have a Qt meta-object
-  // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
 
 public:
@@ -45,6 +38,7 @@ protected:
 private:
 
   QmitkViewNavigatorWidget* m_ViewNavigatorWidget;
+
 };
 
-#endif // ViewNavigatorView_h
+#endif // QMITKVIEWNAVIGATORVIEW_H

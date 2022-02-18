@@ -41,34 +41,6 @@ void QmitkLevelWindowWidgetContextMenu::OnSetPreset(const QAction *presetAction)
   {
     double dlevel = m_LevelWindowPreset->getLevel(item.toStdString());
     double dwindow = m_LevelWindowPreset->getWindow(item.toStdString());
-    if ((dlevel + dwindow / 2) > m_LevelWindow.GetRangeMax())
-    {
-      double lowerBound = (dlevel - dwindow / 2);
-      if (!(lowerBound > m_LevelWindow.GetRangeMax()))
-      {
-        dwindow = m_LevelWindow.GetRangeMax() - lowerBound;
-        dlevel = lowerBound + dwindow / 2;
-      }
-      else
-      {
-        dlevel = m_LevelWindow.GetRangeMax() - 1;
-        dwindow = 2;
-      }
-    }
-    else if ((dlevel - dwindow / 2) < m_LevelWindow.GetRangeMin())
-    {
-      double upperBound = (dlevel + dwindow / 2);
-      if (!(upperBound < m_LevelWindow.GetRangeMin()))
-      {
-        dwindow = m_LevelWindow.GetRangeMin() + upperBound;
-        dlevel = upperBound - dwindow / 2;
-      }
-      else
-      {
-        dlevel = m_LevelWindow.GetRangeMin() + 1;
-        dwindow = 2;
-      }
-    }
     m_LevelWindow.SetLevelWindow(dlevel, dwindow);
     m_Manager->SetLevelWindow(m_LevelWindow);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();

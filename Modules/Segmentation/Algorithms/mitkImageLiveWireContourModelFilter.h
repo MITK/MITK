@@ -108,6 +108,8 @@ namespace mitk
     /** \brief Create dynamic cost tranfer map - on the fly training*/
     bool CreateDynamicCostMap(mitk::ContourModel *path = nullptr);
 
+    void SetUseCostFunction(bool doUseCostFunction) { m_ShortestPathFilter->SetUseCostFunction(doUseCostFunction); };
+
   protected:
     ImageLiveWireContourModelFilter();
 

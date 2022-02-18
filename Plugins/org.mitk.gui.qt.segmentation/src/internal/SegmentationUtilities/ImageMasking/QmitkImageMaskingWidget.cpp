@@ -22,6 +22,10 @@ found in the LICENSE file.
 #include <mitkSliceNavigationController.h>
 #include <mitkSurfaceToImageFilter.h>
 #include <mitkImageAccessByItk.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateDimension.h>
+#include <mitkNodePredicateGeometry.h>
+#include <mitkNodePredicateNot.h>
 
 #include <QMessageBox>
 
@@ -52,6 +56,11 @@ QmitkImageMaskingWidget::QmitkImageMaskingWidget(mitk::SliceNavigationController
   m_Controls.dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::SegmentationOrSurfacePredicate);
   m_Controls.dataSelectionWidget->SetHelpText(HelpText);
 
+  // T28795: Disable 2-d reference images since they do not work yet (segmentations are at least 3-d images with a single slice)
+  m_Controls.dataSelectionWidget->SetPredicate(0, mitk::NodePredicateAnd::New(
+    mitk::NodePredicateNot::New(mitk::NodePredicateDimension::New(2)),
+    m_Controls.dataSelectionWidget->GetPredicate(0)));
+
   this->EnableButtons(false);
 
   connect(m_Controls.btnMaskImage, SIGNAL(clicked()), this, SLOT(OnMaskImagePressed()));
@@ -70,13 +79,26 @@ QmitkImageMaskingWidget::~QmitkImageMaskingWidget()
 {
 }
 
-void QmitkImageMaskingWidget::OnSelectionChanged(unsigned int index, const mitk::DataNode* selection)
+void QmitkImageMaskingWidget::OnSelectionChanged(unsigned int index, const mitk::DataNode *selection)
 {
-  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
-  mitk::DataNode::Pointer node0 = dataSelectionWidget->GetSelection(0);
-  mitk::DataNode::Pointer node1 = dataSelectionWidget->GetSelection(1);
+  auto *dataSelectionWidget = m_Controls.dataSelectionWidget;
+  auto node0 = dataSelectionWidget->GetSelection(0);
 
-  if (node0.IsNull() || node1.IsNull() )
+  if (index == 0)
+  {
+    dataSelectionWidget->SetPredicate(1, QmitkDataSelectionWidget::SegmentationOrSurfacePredicate);
+
+    if (node0.IsNotNull())
+    {
+      dataSelectionWidget->SetPredicate(1, mitk::NodePredicateAnd::New(
+        mitk::NodePredicateGeometry::New(node0->GetData()->GetGeometry()),
+        dataSelectionWidget->GetPredicate(1)));
+    }
+  }
+
+  auto node1 = dataSelectionWidget->GetSelection(1);
+
+  if (node0.IsNull() || node1.IsNull())
   {
     dataSelectionWidget->SetHelpText(HelpText);
     this->EnableButtons(false);
@@ -107,7 +129,7 @@ void QmitkImageMaskingWidget::SelectionControl(unsigned int index, const mitk::D
       mitk::Image::Pointer referenceImage = dynamic_cast<mitk::Image*> ( dataSelectionWidget->GetSelection(0)->GetData() );
       mitk::Image::Pointer maskImage = dynamic_cast<mitk::Image*> ( dataSelectionWidget->GetSelection(1)->GetData() );
 
-      if( maskImage.IsNull() || referenceImage->GetLargestPossibleRegion().GetSize() != maskImage->GetLargestPossibleRegion().GetSize() )
+      if (maskImage.IsNull())
       {
         dataSelectionWidget->SetHelpText("Different image sizes cannot be masked");
         this->EnableButtons(false);
@@ -181,10 +203,7 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
       return;
     }
 
-    if( referenceImage->GetLargestPossibleRegion().GetSize() == maskImage->GetLargestPossibleRegion().GetSize() )
-    {
-      resultImage = this->MaskImage( referenceImage, maskImage );
-    }
+    resultImage = this->MaskImage(referenceImage, maskImage);
   }
 
   //Do Surface-Masking
@@ -263,7 +282,14 @@ mitk::Image::Pointer QmitkImageMaskingWidget::MaskImage(mitk::Image::Pointer ref
     {
       // Clamp to the numerical limits of the pixel/component type
       double bottom, top;
-      AccessByItk_n(referenceImage, GetRange, (bottom, top));
+      if (referenceImage->GetDimension() == 4)
+      {
+        AccessFixedDimensionByItk_n(referenceImage, GetRange, 4, (bottom, top));
+      }
+      else
+      {
+        AccessByItk_n(referenceImage, GetRange, (bottom, top));
+      }
       backgroundValue = std::max(bottom, std::min(originalBackgroundValue, top));
 
       // Get rid of decimals for integral numbers

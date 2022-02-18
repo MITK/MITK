@@ -2,9 +2,9 @@
 <plugin>
 
   <extension point="org.blueberry.ui.views">
-    <view id="org.mitk.views.viewnavigatorview"
+    <view id="org.mitk.views.viewnavigator"
           name="View Navigator"
-          class="ViewNavigatorView"
+          class="QmitkViewNavigatorView"
           icon="resources/view-manager.svg"
            />
   </extension>

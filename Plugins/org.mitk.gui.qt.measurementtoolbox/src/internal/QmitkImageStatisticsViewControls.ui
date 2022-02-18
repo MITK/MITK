@@ -113,13 +113,6 @@
               </property>
              </widget>
             </item>
-            <item>
-             <widget class="QCheckBox" name="checkBox_ignoreZero">
-              <property name="text">
-               <string>Ignore zero-valued voxels</string>
-              </property>
-             </widget>
-            </item>
            </layout>
           </item>
          </layout>

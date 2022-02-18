@@ -36,4 +36,7 @@
 \page deprecatedSince2021_02 Deprecated as of 2021.02
 \ingroup MITKDeprecatedAPI
 
+\page deprecatedSince2021_10 Deprecated as of 2021.10
+\ingroup MITKDeprecatedAPI
+
 */

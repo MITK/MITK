@@ -161,6 +161,14 @@ void QmitkSegmentationView::OnSegmentationSelectionChanged(QList<mitk::DataNode:
 {
   m_ToolManager->ActivateTool(-1);
 
+  // Remove observer if one was registered
+  auto finding = m_WorkingDataObserverTags.find(m_WorkingNode);
+  if (finding != m_WorkingDataObserverTags.end())
+  {
+    m_WorkingNode->GetProperty("visible")->RemoveObserver(m_WorkingDataObserverTags[m_WorkingNode]);
+    m_WorkingDataObserverTags.erase(m_WorkingNode);
+  }
+
   if (nodes.empty())
   {
     m_WorkingNode = nullptr;
@@ -197,6 +205,12 @@ void QmitkSegmentationView::OnSegmentationSelectionChanged(QList<mitk::DataNode:
       }
     }
     m_WorkingNode->SetVisibility(true);
+
+    auto command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
+    command->SetCallbackFunction(this, &QmitkSegmentationView::ValidateSelectionInput);
+    m_WorkingDataObserverTags.insert(std::pair<mitk::DataNode *, unsigned long>(m_WorkingNode,
+      m_WorkingNode->GetProperty("visible")->AddObserver(itk::ModifiedEvent(), command)));
+
     this->InitializeRenderWindows(referenceImage->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, false);
   }
 
@@ -326,8 +340,6 @@ void QmitkSegmentationView::CreateNewSegmentation()
   }
   emptySegmentation->SetSelected(true);
   m_Controls->segImageSelector->SetCurrentSelectedNode(emptySegmentation);
-
-  this->InitializeRenderWindows(referenceImage->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, false);
 }
 
 void QmitkSegmentationView::OnManualTool2DSelected(int id)
@@ -404,7 +416,9 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
    QString segTools2D = tr("Add Subtract Fill Erase Paint Wipe 'Region Growing' 'Live Wire' '2D Fast Marching'");
    QString segTools3D = tr("Threshold 'UL Threshold' Otsu 'Fast Marching 3D' 'Region Growing 3D' Watershed Picking");
-
+#ifdef __linux__
+   segTools3D.append(" nnUNet"); // plugin not enabled for MacOS / Windows
+#endif
    std::regex extSegTool2DRegEx("SegTool2D$");
    std::regex extSegTool3DRegEx("SegTool3D$");
 
@@ -444,17 +458,6 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    // create signal/slot connections
    connect(m_Controls->btnNewSegmentation, &QToolButton::clicked, this, &QmitkSegmentationView::CreateNewSegmentation);
    connect(m_Controls->m_SlicesInterpolator, &QmitkSlicesInterpolator::SignalShowMarkerNodes, this, &QmitkSegmentationView::OnShowMarkerNodes);
-
-   // set callback function for already existing segmentation nodes
-   mitk::DataStorage::SetOfObjects::ConstPointer allSegmentations = GetDataStorage()->GetSubset(m_SegmentationPredicate);
-   for (mitk::DataStorage::SetOfObjects::const_iterator iter = allSegmentations->begin(); iter != allSegmentations->end(); ++iter)
-   {
-     mitk::DataNode* node = *iter;
-     auto command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
-     command->SetCallbackFunction(this, &QmitkSegmentationView::ValidateSelectionInput);
-     m_WorkingDataObserverTags.insert(std::pair<mitk::DataNode *, unsigned long>(
-       node, node->GetProperty("visible")->AddObserver(itk::ModifiedEvent(), command)));
-   }
 
    auto command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
    command->SetCallbackFunction(this, &QmitkSegmentationView::ValidateSelectionInput);
@@ -524,17 +527,10 @@ void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences*
 
 void QmitkSegmentationView::NodeAdded(const mitk::DataNode* node)
 {
-  if (!m_SegmentationPredicate->CheckNode(node))
+  if (m_SegmentationPredicate->CheckNode(node))
   {
-    return;
+    this->ApplyDisplayOptions(const_cast<mitk::DataNode*>(node));
   }
-
-  auto command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
-  command->SetCallbackFunction(this, &QmitkSegmentationView::ValidateSelectionInput);
-  m_WorkingDataObserverTags.insert(std::pair<mitk::DataNode *, unsigned long>(
-    const_cast<mitk::DataNode *>(node), node->GetProperty("visible")->AddObserver(itk::ModifiedEvent(), command)));
-
-  this->ApplyDisplayOptions(const_cast<mitk::DataNode*>(node));
 }
 
 void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
@@ -565,15 +561,6 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
 
     mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
     mitk::SurfaceInterpolationController::GetInstance()->RemoveInterpolationSession(image);
-  }
-
-  mitk::DataNode* tempNode = const_cast<mitk::DataNode*>(node);
-  //Remove observer if one was registered
-  auto finding = m_WorkingDataObserverTags.find(tempNode);
-  if (finding != m_WorkingDataObserverTags.end())
-  {
-    node->GetProperty("visible")->RemoveObserver(m_WorkingDataObserverTags[tempNode]);
-    m_WorkingDataObserverTags.erase(tempNode);
   }
 }
 

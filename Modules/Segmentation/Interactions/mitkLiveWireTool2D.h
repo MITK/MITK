@@ -58,6 +58,8 @@ namespace mitk
     /// \brief Delete all current contours.
     void ClearSegmentation();
 
+    void SetSnapClosureContour(bool snap);
+
   protected:
     LiveWireTool2D();
     ~LiveWireTool2D() override;
@@ -110,11 +112,17 @@ namespace mitk
 
     ContourModel::Pointer CreateNewContour() const;
 
+    void UpdateClosureContour(mitk::Point3D endpoint);
+
     mitk::ContourModel::Pointer m_Contour;
     mitk::DataNode::Pointer m_ContourNode;
 
     mitk::ContourModel::Pointer m_LiveWireContour;
     mitk::DataNode::Pointer m_LiveWireContourNode;
+
+    mitk::ContourModel::Pointer m_ClosureContour;
+    mitk::DataNode::Pointer m_ClosureContourNode;
+    bool m_SnapClosureContour;
 
     mitk::ContourModel::Pointer m_EditingContour;
     mitk::DataNode::Pointer m_EditingContourNode;
@@ -125,6 +133,7 @@ namespace mitk
     mitk::Image::Pointer m_ReferenceDataSlice;
 
     mitk::ImageLiveWireContourModelFilter::Pointer m_LiveWireFilter;
+    mitk::ImageLiveWireContourModelFilter::Pointer m_LiveWireFilterClosure;
 
     bool m_CreateAndUseDynamicCosts;
 

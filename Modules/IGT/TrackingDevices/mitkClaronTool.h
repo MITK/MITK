@@ -15,7 +15,6 @@ found in the LICENSE file.
 
 #include <mitkClaronInterface.h>
 #include <mitkTrackingTool.h>
-#include <itkFastMutexLock.h>
 
 namespace mitk
 {

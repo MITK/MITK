@@ -14,15 +14,11 @@ found in the LICENSE file.
 #include "mitkIGTTimeStamp.h"
 #include "mitkTrackingTool.h"
 
-#include <itkMutexLockHolder.h>
-
 #include <usModuleContext.h>
 #include <usGetModuleContext.h>
 
 #include "mitkUnspecifiedTrackingTypeInformation.h"
 #include "mitkTrackingDeviceTypeCollection.h"
-
-typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
 
 mitk::TrackingDevice::TrackingDevice() :
@@ -32,9 +28,6 @@ mitk::TrackingDevice::TrackingDevice() :
   m_RotationMode(mitk::TrackingDevice::RotationStandard)
 
 {
-  m_StopTrackingMutex = itk::FastMutexLock::New();
-  m_StateMutex = itk::FastMutexLock::New();
-  m_TrackingFinishedMutex = itk::FastMutexLock::New();
 }
 
 
@@ -68,7 +61,7 @@ mitk::NavigationToolStorage::Pointer mitk::TrackingDevice::AutoDetectTools()
 
 mitk::TrackingDevice::TrackingDeviceState mitk::TrackingDevice::GetState() const
 {
-  MutexLockHolder lock(*m_StateMutex);
+  std::lock_guard<std::mutex> lock(m_StateMutex);
   return m_State;
 }
 
@@ -77,7 +70,7 @@ void mitk::TrackingDevice::SetState( TrackingDeviceState state )
 {
   itkDebugMacro("setting  m_State to " << state);
 
-  MutexLockHolder lock(*m_StateMutex); // lock and unlock the mutex
+  std::lock_guard<std::mutex> lock(m_StateMutex);
   if (m_State == state)
   {
     return;
@@ -123,16 +116,16 @@ bool mitk::TrackingDevice::StopTracking()
 {
   if (this->GetState() == Tracking) // Only if the object is in the correct state
   {
-    m_StopTrackingMutex->Lock();  // m_StopTracking is used by two threads, so we have to ensure correct thread handling
+    m_StopTrackingMutex.lock();  // m_StopTracking is used by two threads, so we have to ensure correct thread handling
     m_StopTracking = true;
-    m_StopTrackingMutex->Unlock();
+    m_StopTrackingMutex.unlock();
     //we have to wait here that the other thread recognizes the STOP-command and executes it
-    m_TrackingFinishedMutex->Lock();
+    m_TrackingFinishedMutex.lock();
     mitk::IGTTimeStamp::GetInstance()->Stop(this); // notify realtime clock
     // StopTracking was called, thus the mode should be changed back
     //   to Ready now that the tracking loop has ended.
     this->SetState(Ready);
-    m_TrackingFinishedMutex->Unlock();
+    m_TrackingFinishedMutex.unlock();
   }
   return true;
 }

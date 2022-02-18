@@ -13,9 +13,10 @@ found in the LICENSE file.
 #ifndef MITKUSImageSource_H_HEADER_INCLUDED_
 #define MITKUSImageSource_H_HEADER_INCLUDED_
 
+#include <mutex>
+
 // ITK
 #include <itkProcessObject.h>
-#include <itkFastMutexLock.h>
 
 // MITK
 #include <MitkUSExports.h>
@@ -92,7 +93,7 @@ namespace mitk {
 
     int                                        m_CurrentImageId;
 
-    itk::FastMutexLock::Pointer m_ImageFilterMutex;
+    std::mutex m_ImageFilterMutex;
   };
 } // namespace mitk
 #endif /* MITKUSImageSource_H_HEADER_INCLUDED_ */

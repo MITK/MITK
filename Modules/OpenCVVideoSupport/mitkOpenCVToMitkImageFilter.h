@@ -20,11 +20,12 @@ found in the LICENSE file.
 
 // itk includes
 #include <itkMacro.h>
-#include <itkFastMutexLock.h>
 #include <itkImage.h>
 
 // OpenCV includes
 #include <opencv2/core.hpp>
+
+#include <mutex>
 
 namespace mitk
 {
@@ -86,8 +87,8 @@ namespace mitk
     Image::Pointer m_Image;
     cv::Mat m_OpenCVMat;
 
-    itk::FastMutexLock::Pointer m_ImageMutex;
-    itk::FastMutexLock::Pointer m_OpenCVMatMutex;
+    std::mutex m_ImageMutex;
+    std::mutex m_OpenCVMatMutex;
   };
 
 } // namespace mitk

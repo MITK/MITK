@@ -82,9 +82,9 @@ namespace mitk
     Parameter * m_Parameter;
     vigra::RandomForest<int> m_RandomForest;
 
-    static ITK_THREAD_RETURN_TYPE TrainTreesCallback(void *);
-    static ITK_THREAD_RETURN_TYPE PredictCallback(void *);
-    static ITK_THREAD_RETURN_TYPE PredictWeightedCallback(void *);
+    static itk::ITK_THREAD_RETURN_TYPE TrainTreesCallback(void *);
+    static itk::ITK_THREAD_RETURN_TYPE PredictCallback(void *);
+    static itk::ITK_THREAD_RETURN_TYPE PredictWeightedCallback(void *);
     static void VigraPredictWeighted(PredictionData *data, vigra::MultiArrayView<2, double> & X, vigra::MultiArrayView<2, int> & Y, vigra::MultiArrayView<2, double> & P);
   };
 }

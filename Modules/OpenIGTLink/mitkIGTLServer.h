@@ -115,10 +115,10 @@ namespace mitk
     SocketListType m_RegisteredClients;
 
     /** mutex to control access to m_RegisteredClients */
-    itk::FastMutexLock::Pointer m_ReceiveListMutex;
+    std::mutex m_ReceiveListMutex;
 
     /** mutex to control access to m_RegisteredClients */
-    itk::FastMutexLock::Pointer m_SentListMutex;
+    std::mutex m_SentListMutex;
   };
 } // namespace mitk
 #endif /* MITKIGTLSERVER_H */

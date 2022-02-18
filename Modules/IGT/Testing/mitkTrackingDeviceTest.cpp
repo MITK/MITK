@@ -49,7 +49,7 @@ public:
 
   bool OpenConnection() override{return true;};
   bool CloseConnection() override{return true;};
-  bool StartTracking() override{this->SetState(Tracking); this->m_TrackingFinishedMutex->Unlock(); return true;};
+  bool StartTracking() override{this->SetState(Tracking); return true;};
   mitk::TrackingTool* GetTool(unsigned int /*toolNumber*/) const override {return nullptr;};
   unsigned int GetToolCount() const override {return 1;};
 };

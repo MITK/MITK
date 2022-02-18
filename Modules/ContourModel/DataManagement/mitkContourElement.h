@@ -238,6 +238,7 @@ namespace mitk
     one can decide if any vertex should be returned, or just control vertices.
     \param point - query position in 3D space.
     \param eps - the error bound for search algorithm. It is an open boundary.
+    \param isControlPoint
     \param offset - a offset to the vertex, e.g. 1 if the next vertex should be returned or -1 for the previous vertex
     */
     VertexType *BruteForceGetVertexAt(const mitk::Point3D &point, double eps, bool isControlPoint = false, int offset = 0);

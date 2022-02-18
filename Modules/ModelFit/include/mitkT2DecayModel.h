@@ -64,7 +64,7 @@ namespace mitk
 
     DerivedParameterNamesType GetDerivedParameterNames() const override;
 
-    mitk::ModelBase::DerivedParameterMapType mitk::T2DecayModel::ComputeDerivedParameters(
+    mitk::ModelBase::DerivedParameterMapType ComputeDerivedParameters(
       const mitk::ModelBase::ParametersType &parameters) const;
 
   protected:

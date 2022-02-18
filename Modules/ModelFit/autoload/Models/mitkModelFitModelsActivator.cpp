@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include "mitkGenericParamModelFactory.h"
 #include "mitkLinearModelFactory.h"
 #include "mitkT2DecayModelFactory.h"
+#include "mitkExpDecayOffsetModelFactory.h"
 
 namespace mitk
 {
@@ -45,6 +46,7 @@ public:
     RegisterProvider<mitk::ModelFitProviderBase<mitk::GenericParamModelFactory> >(context);
     RegisterProvider<mitk::ModelFitProviderBase<mitk::LinearModelFactory> >(context);
     RegisterProvider<mitk::ModelFitProviderBase<mitk::T2DecayModelFactory> >(context);
+    RegisterProvider<mitk::ModelFitProviderBase<mitk::ExpDecayOffsetModelFactory> >(context);
   }
 
   void Unload(us::ModuleContext* ) override

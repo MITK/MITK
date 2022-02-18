@@ -41,6 +41,7 @@ namespace itk
     typedef typename Superclass::InputCovariantVectorType InputCovariantVectorType;
     typedef typename Superclass::ParametersType ParametersType;
     typedef typename Superclass::JacobianType JacobianType;
+    typedef typename Superclass::JacobianPositionType JacobianPositionType;
 
     itkFactorylessNewMacro(Self);
 

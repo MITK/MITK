@@ -237,7 +237,6 @@ namespace mitk
       {
         MaskImageIteratorType maskIt(maskImage, maskImage->GetLargestPossibleRegion());
         typename ImageType::IndexType imageIndex;
-        typename ImageType::PointType worldPosition;
         typename ImageType::IndexType maskIndex;
 
         for(maskIt.GoToBegin(); !maskIt.IsAtEnd(); ++maskIt)

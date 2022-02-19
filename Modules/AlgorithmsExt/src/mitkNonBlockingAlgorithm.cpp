@@ -103,7 +103,7 @@ namespace mitk
     }
 
     // spawn a thread that calls ThreadedUpdateFunction(), and ThreadedUpdateFinished() on us
-    m_Thread.swap(std::thread(StaticNonBlockingAlgorithmThread, &m_ThreadParameters));
+    m_Thread = std::thread(StaticNonBlockingAlgorithmThread, &m_ThreadParameters);
   }
 
   void NonBlockingAlgorithm::StopAlgorithm()

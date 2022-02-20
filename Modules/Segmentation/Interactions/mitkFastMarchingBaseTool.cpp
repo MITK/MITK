@@ -141,11 +141,11 @@ void mitk::FastMarchingBaseTool::Activated()
 {
   Superclass::Activated();
 
-  m_SeedsAsPointSet = mitk::PointSet::New();
+  m_SeedsAsPointSet = PointSet::New();
   //ensure that the seed points are visible for all timepoints.
   dynamic_cast<ProportionalTimeGeometry*>(m_SeedsAsPointSet->GetTimeGeometry())->SetStepDuration(std::numeric_limits<TimePointType>::max());
 
-  m_SeedsAsPointSetNode = mitk::DataNode::New();
+  m_SeedsAsPointSetNode = DataNode::New();
   m_SeedsAsPointSetNode->SetData(m_SeedsAsPointSet);
   m_SeedsAsPointSetNode->SetName(std::string(this->GetName()) + "_PointSet");
   m_SeedsAsPointSetNode->SetBoolProperty("helper object", true);
@@ -190,7 +190,7 @@ void mitk::FastMarchingBaseTool::OnAddPoint(StateMachineAction*, InteractionEven
 {
   if (!this->IsUpdating() && m_SeedsAsPointSet.IsNotNull())
   {
-    const auto positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(interactionEvent);
+    const auto positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
 
     if (positionEvent != nullptr)
     {
@@ -251,7 +251,7 @@ void mitk::FastMarchingBaseTool::ITKFastMarching(const itk::Image<TPixel, VImage
   typedef float InternalPixelType;
   typedef itk::Image<InternalPixelType, VImageDimension> InternalImageType;
 
-  typedef mitk::Tool::DefaultSegmentationDataType OutputPixelType;
+  typedef Tool::DefaultSegmentationDataType OutputPixelType;
   typedef itk::Image<OutputPixelType, VImageDimension> OutputImageType;
 
   typedef itk::CurvatureAnisotropicDiffusionImageFilter<InputImageType, InternalImageType> SmoothingFilterType;
@@ -269,7 +269,7 @@ void mitk::FastMarchingBaseTool::ITKFastMarching(const itk::Image<TPixel, VImage
 
   for (auto pos = m_SeedsAsPointSet->Begin(); pos != m_SeedsAsPointSet->End(); ++pos)
   {
-    mitk::Point3D clickInIndex;
+    Point3D clickInIndex;
 
     inputGeometry->WorldToIndex(pos->Value(), clickInIndex);
     itk::Index<VImageDimension> seedPosition;

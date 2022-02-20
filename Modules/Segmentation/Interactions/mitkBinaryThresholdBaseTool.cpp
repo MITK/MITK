@@ -107,7 +107,7 @@ void mitk::BinaryThresholdBaseTool::ITKThresholding(const itk::Image<TPixel, VIm
                                                     unsigned int timeStep)
 {
   typedef itk::Image<TPixel, VImageDimension> ImageType;
-  typedef itk::Image<mitk::Tool::DefaultSegmentationDataType, VImageDimension> SegmentationType;
+  typedef itk::Image<Tool::DefaultSegmentationDataType, VImageDimension> SegmentationType;
   typedef itk::BinaryThresholdImageFilter<ImageType, SegmentationType> ThresholdFilterType;
 
   typename ThresholdFilterType::Pointer filter = ThresholdFilterType::New();

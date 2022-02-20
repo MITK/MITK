@@ -34,14 +34,13 @@ found in the LICENSE file.
 
 mitk::AutoSegmentationWithPreviewTool::AutoSegmentationWithPreviewTool(bool lazyDynamicPreviews): m_LazyDynamicPreviews(lazyDynamicPreviews)
 {
-  m_ProgressCommand = mitk::ToolCommand::New();
+  m_ProgressCommand = ToolCommand::New();
 }
 
 mitk::AutoSegmentationWithPreviewTool::AutoSegmentationWithPreviewTool(bool lazyDynamicPreviews, const char* interactorType, const us::Module* interactorModule) : AutoSegmentationTool(interactorType, interactorModule), m_LazyDynamicPreviews(lazyDynamicPreviews)
 {
-  m_ProgressCommand = mitk::ToolCommand::New();
+  m_ProgressCommand = ToolCommand::New();
 }
-
 
 mitk::AutoSegmentationWithPreviewTool::~AutoSegmentationWithPreviewTool()
 {
@@ -75,15 +74,15 @@ void mitk::AutoSegmentationWithPreviewTool::Activated()
   Superclass::Activated();
 
   this->GetToolManager()->RoiDataChanged +=
-    mitk::MessageDelegate<mitk::AutoSegmentationWithPreviewTool>(this, &mitk::AutoSegmentationWithPreviewTool::OnRoiDataChanged);
+    MessageDelegate<AutoSegmentationWithPreviewTool>(this, &AutoSegmentationWithPreviewTool::OnRoiDataChanged);
 
   this->GetToolManager()->SelectedTimePointChanged +=
-    mitk::MessageDelegate<mitk::AutoSegmentationWithPreviewTool>(this, &mitk::AutoSegmentationWithPreviewTool::OnTimePointChanged);
+    MessageDelegate<AutoSegmentationWithPreviewTool>(this, &AutoSegmentationWithPreviewTool::OnTimePointChanged);
 
   m_ReferenceDataNode = this->GetToolManager()->GetReferenceData(0);
   m_SegmentationInputNode = m_ReferenceDataNode;
 
-  m_LastTimePointOfUpdate = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+  m_LastTimePointOfUpdate = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
 
   if (m_PreviewSegmentationNode.IsNull())
   {
@@ -109,10 +108,10 @@ void mitk::AutoSegmentationWithPreviewTool::Activated()
 void mitk::AutoSegmentationWithPreviewTool::Deactivated()
 {
   this->GetToolManager()->RoiDataChanged -=
-    mitk::MessageDelegate<mitk::AutoSegmentationWithPreviewTool>(this, &mitk::AutoSegmentationWithPreviewTool::OnRoiDataChanged);
+    MessageDelegate<AutoSegmentationWithPreviewTool>(this, &AutoSegmentationWithPreviewTool::OnRoiDataChanged);
 
   this->GetToolManager()->SelectedTimePointChanged -=
-    mitk::MessageDelegate<mitk::AutoSegmentationWithPreviewTool>(this, &mitk::AutoSegmentationWithPreviewTool::OnTimePointChanged);
+    MessageDelegate<AutoSegmentationWithPreviewTool>(this, &AutoSegmentationWithPreviewTool::OnTimePointChanged);
 
   m_SegmentationInputNode = nullptr;
   m_ReferenceDataNode = nullptr;
@@ -208,8 +207,8 @@ void mitk::AutoSegmentationWithPreviewTool::ResetPreviewNode()
   const auto image = this->GetSegmentationInput();
   if (nullptr != image)
   {
-    mitk::LabelSetImage::ConstPointer workingImage =
-      dynamic_cast<const mitk::LabelSetImage *>(this->GetToolManager()->GetWorkingData(0)->GetData());
+    LabelSetImage::ConstPointer workingImage =
+      dynamic_cast<const LabelSetImage *>(this->GetToolManager()->GetWorkingData(0)->GetData());
 
     if (workingImage.IsNotNull())
     {
@@ -235,13 +234,13 @@ void mitk::AutoSegmentationWithPreviewTool::ResetPreviewNode()
     }
     else
     {
-      mitk::Image::ConstPointer workingImageBin = dynamic_cast<const mitk::Image*>(this->GetToolManager()->GetWorkingData(0)->GetData());
+      Image::ConstPointer workingImageBin = dynamic_cast<const Image*>(this->GetToolManager()->GetWorkingData(0)->GetData());
       if (workingImageBin.IsNotNull())
       {
-        mitk::Image::Pointer newPreviewImage;
+        Image::Pointer newPreviewImage;
         if (this->GetResetsToEmptyPreview())
         {
-          newPreviewImage = mitk::Image::New();
+          newPreviewImage = Image::New();
           newPreviewImage->Initialize(workingImageBin);
         }
         else
@@ -342,7 +341,7 @@ void mitk::AutoSegmentationWithPreviewTool::CreateResultSegmentationFromPreview(
 
     if (resultSegmentationNode.IsNotNull())
     {
-      const auto timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+      const auto timePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
       auto resultSegmentation = dynamic_cast<Image*>(resultSegmentationNode->GetData());
 
       // REMARK: the following code in this scope assumes that previewImage and resultSegmentation
@@ -370,10 +369,10 @@ void mitk::AutoSegmentationWithPreviewTool::CreateResultSegmentationFromPreview(
       // since we are maybe working on a smaller image, pad it to the size of the original image
       if (m_ReferenceDataNode.GetPointer() != m_SegmentationInputNode.GetPointer())
       {
-        mitk::PadImageFilter::Pointer padFilter = mitk::PadImageFilter::New();
+        PadImageFilter::Pointer padFilter = PadImageFilter::New();
 
         padFilter->SetInput(0, resultSegmentation);
-        padFilter->SetInput(1, dynamic_cast<mitk::Image*>(m_ReferenceDataNode->GetData()));
+        padFilter->SetInput(1, dynamic_cast<Image*>(m_ReferenceDataNode->GetData()));
         padFilter->SetBinaryFilter(true);
         padFilter->SetUpperThreshold(1);
         padFilter->SetLowerThreshold(1);
@@ -394,12 +393,12 @@ void mitk::AutoSegmentationWithPreviewTool::CreateResultSegmentationFromPreview(
 
 void mitk::AutoSegmentationWithPreviewTool::OnRoiDataChanged()
 {
-  mitk::DataNode::ConstPointer node = this->GetToolManager()->GetRoiData(0);
+  DataNode::ConstPointer node = this->GetToolManager()->GetRoiData(0);
 
   if (node.IsNotNull())
   {
-    mitk::MaskAndCutRoiImageFilter::Pointer roiFilter = mitk::MaskAndCutRoiImageFilter::New();
-    mitk::Image::Pointer image = dynamic_cast<mitk::Image *>(m_SegmentationInputNode->GetData());
+    MaskAndCutRoiImageFilter::Pointer roiFilter = MaskAndCutRoiImageFilter::New();
+    Image::Pointer image = dynamic_cast<Image *>(m_SegmentationInputNode->GetData());
 
     if (image.IsNull())
       return;
@@ -408,7 +407,7 @@ void mitk::AutoSegmentationWithPreviewTool::OnRoiDataChanged()
     roiFilter->SetRegionOfInterest(node->GetData());
     roiFilter->Update();
 
-    mitk::DataNode::Pointer tmpNode = mitk::DataNode::New();
+    DataNode::Pointer tmpNode = DataNode::New();
     tmpNode->SetData(roiFilter->GetOutput());
 
     m_SegmentationInputNode = tmpNode;
@@ -425,7 +424,7 @@ void mitk::AutoSegmentationWithPreviewTool::OnTimePointChanged()
 {
   if (m_IsTimePointChangeAware && m_PreviewSegmentationNode.IsNotNull() && m_SegmentationInputNode.IsNotNull())
   {
-    const auto timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+    const auto timePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
 
     const bool isStaticSegOnDynamicImage = m_PreviewSegmentationNode->GetData()->GetTimeSteps() == 1 && m_SegmentationInputNode->GetData()->GetTimeSteps() > 1;
     if (timePoint!=m_LastTimePointOfUpdate && (isStaticSegOnDynamicImage || m_LazyDynamicPreviews))
@@ -442,7 +441,7 @@ void mitk::AutoSegmentationWithPreviewTool::UpdatePreview(bool ignoreLazyPreview
   auto previewImage = this->GetPreviewSegmentation();
   int progress_steps = 200;
 
-  const auto workingImage = dynamic_cast<const mitk::Image*>(this->GetToolManager()->GetWorkingData(0)->GetData());
+  const auto workingImage = dynamic_cast<const Image*>(this->GetToolManager()->GetWorkingData(0)->GetData());
   if (const auto& labelSetImage = dynamic_cast<const LabelSetImage*>(workingImage))
   {
     // this is a fix for T28131 / T28986, which should be refactored if T28524 is being worked on
@@ -458,7 +457,7 @@ void mitk::AutoSegmentationWithPreviewTool::UpdatePreview(bool ignoreLazyPreview
 
   this->UpdatePrepare();
 
-  const auto timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+  const auto timePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
 
   try
   {

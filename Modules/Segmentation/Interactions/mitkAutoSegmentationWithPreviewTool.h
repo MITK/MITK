@@ -77,7 +77,7 @@ namespace mitk
     bool IsUpdating() const;
 
   protected:
-    mitk::ToolCommand::Pointer m_ProgressCommand;
+    ToolCommand::Pointer m_ProgressCommand;
 
     /** Member is always called if GetSegmentationInput() has changed
      * (e.g. because a new ROI was defined, or on activation) to give derived

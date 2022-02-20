@@ -92,9 +92,10 @@ namespace mitk
     void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, Image* previewImage, TimeStepType timeStep) override;
 
     template <typename TPixel, unsigned int VImageDimension>
-    void DoITKFastMarching(const itk::Image<TPixel, VImageDimension>* inputImage,
+    void ITKFastMarching(const itk::Image<TPixel, VImageDimension>* inputImage,
       Image* segmentation, unsigned int timeStep, const BaseGeometry* inputGeometry);
 
+  private:
     float m_LowerThreshold; // used in Threshold filter
     float m_UpperThreshold; // used in Threshold filter
     float m_StoppingValue;  // used in Fast Marching filter
@@ -105,7 +106,6 @@ namespace mitk
     DataNode::Pointer m_SeedsAsPointSetNode; // used to visualize the seed points
     PointSet::Pointer m_SeedsAsPointSet;
 
-  private:
     /** Indicating if the tool is used in 2D mode (just segment the current slice)
      * or 3D mode (segment the whole current volume),*/
     unsigned int m_ToolDimension;

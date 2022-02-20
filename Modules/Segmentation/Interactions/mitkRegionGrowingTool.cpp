@@ -373,72 +373,87 @@ void mitk::RegionGrowingTool::OnMousePressed(StateMachineAction*, InteractionEve
   }
 }
 
-void mitk::RegionGrowingTool::OnMouseMoved(StateMachineAction *, InteractionEvent *interactionEvent)
+void mitk::RegionGrowingTool::OnMouseMoved(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-
-  auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
-
-  if (m_ReferenceSlice.IsNotNull() && positionEvent)
+  auto* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(interactionEvent);
+  if (nullptr == positionEvent)
   {
-    // Get geometry and indices
-    mitk::BaseGeometry::Pointer workingSliceGeometry;
-    workingSliceGeometry = m_WorkingSlice->GetGeometry();
-    itk::Index<2> indexInWorkingSlice2D;
-    indexInWorkingSlice2D[0] = m_SeedPoint[0];
-    indexInWorkingSlice2D[1] = m_SeedPoint[1];
+    return;
+  }
 
-    m_ScreenYDifference += positionEvent->GetPointerPositionOnScreen()[1] - m_LastScreenPosition[1];
-    m_ScreenXDifference += positionEvent->GetPointerPositionOnScreen()[0] - m_LastScreenPosition[0];
-    m_LastScreenPosition = Point2I(positionEvent->GetPointerPositionOnScreen());
+  if (m_ReferenceSlice.IsNull())
+  {
+    return;
+  }
 
-    // Moving the mouse up and down adjusts the width of the threshold window,
-    // moving it left and right shifts the threshold window
-    m_Thresholds[0] = std::min(m_SeedValue, m_InitialThresholds[0] - (m_ScreenYDifference - m_ScreenXDifference) * m_MouseDistanceScaleFactor);
-    m_Thresholds[1] = std::max(m_SeedValue, m_InitialThresholds[1] + (m_ScreenYDifference + m_ScreenXDifference) * m_MouseDistanceScaleFactor);
+  // Get geometry and indices
+  mitk::BaseGeometry::Pointer workingSliceGeometry;
+  workingSliceGeometry = m_WorkingSlice->GetGeometry();
+  itk::Index<2> indexInWorkingSlice2D;
+  indexInWorkingSlice2D[0] = m_SeedPoint[0];
+  indexInWorkingSlice2D[1] = m_SeedPoint[1];
 
-    // Do not exceed the pixel type extrema of the reference slice, though
-    m_Thresholds[0] = std::max(m_ThresholdExtrema[0], m_Thresholds[0]);
-    m_Thresholds[1] = std::min(m_ThresholdExtrema[1], m_Thresholds[1]);
+  m_ScreenYDifference += positionEvent->GetPointerPositionOnScreen()[1] - m_LastScreenPosition[1];
+  m_ScreenXDifference += positionEvent->GetPointerPositionOnScreen()[0] - m_LastScreenPosition[0];
+  m_LastScreenPosition = Point2I(positionEvent->GetPointerPositionOnScreen());
 
-    // Perform region growing again and show the result
-    mitk::Image::Pointer resultImage = mitk::Image::New();
-    AccessFixedDimensionByItk_3(
-      m_ReferenceSlice, StartRegionGrowing, 2, indexInWorkingSlice2D, m_Thresholds, resultImage);
-    resultImage->SetGeometry(workingSliceGeometry);
+  // Moving the mouse up and down adjusts the width of the threshold window,
+  // moving it left and right shifts the threshold window
+  m_Thresholds[0] = std::min(
+    m_SeedValue, m_InitialThresholds[0] - (m_ScreenYDifference - m_ScreenXDifference) * m_MouseDistanceScaleFactor);
+  m_Thresholds[1] = std::max(
+    m_SeedValue, m_InitialThresholds[1] + (m_ScreenYDifference + m_ScreenXDifference) * m_MouseDistanceScaleFactor);
 
-    // Update the contour
-    if (resultImage.IsNotNull() && m_ConnectedComponentValue >= 1)
+  // Do not exceed the pixel type extrema of the reference slice, though
+  m_Thresholds[0] = std::max(m_ThresholdExtrema[0], m_Thresholds[0]);
+  m_Thresholds[1] = std::min(m_ThresholdExtrema[1], m_Thresholds[1]);
+
+  // Perform region growing again and show the result
+  mitk::Image::Pointer resultImage = mitk::Image::New();
+  AccessFixedDimensionByItk_3(
+    m_ReferenceSlice, StartRegionGrowing, 2, indexInWorkingSlice2D, m_Thresholds, resultImage);
+  resultImage->SetGeometry(workingSliceGeometry);
+
+  // Update the contour
+  if (resultImage.IsNotNull() && m_ConnectedComponentValue >= 1)
+  {
+    float isoOffset = 0.33;
+
+    mitk::ImageToContourModelFilter::Pointer contourExtractor = mitk::ImageToContourModelFilter::New();
+    contourExtractor->SetInput(resultImage);
+    contourExtractor->SetContourValue(m_ConnectedComponentValue - isoOffset);
+    contourExtractor->Update();
+    ContourModel::Pointer resultContour = ContourModel::New();
+    resultContour = contourExtractor->GetOutput();
+
+    // Show contour
+    if (resultContour.IsNotNull())
     {
-      float isoOffset = 0.33;
+      ContourModel::Pointer resultContourWorld = FeedbackContourTool::BackProjectContourFrom2DSlice(
+        workingSliceGeometry, FeedbackContourTool::ProjectContourTo2DSlice(m_WorkingSlice, resultContour));
 
-      mitk::ImageToContourModelFilter::Pointer contourExtractor = mitk::ImageToContourModelFilter::New();
-      contourExtractor->SetInput(resultImage);
-      contourExtractor->SetContourValue(m_ConnectedComponentValue - isoOffset);
-      contourExtractor->Update();
-      ContourModel::Pointer resultContour = ContourModel::New();
-      resultContour = contourExtractor->GetOutput();
+      FeedbackContourTool::UpdateCurrentFeedbackContour(resultContourWorld);
 
-      // Show contour
-      if (resultContour.IsNotNull())
-      {
-        ContourModel::Pointer resultContourWorld = FeedbackContourTool::BackProjectContourFrom2DSlice(
-          workingSliceGeometry, FeedbackContourTool::ProjectContourTo2DSlice(m_WorkingSlice, resultContour));
-
-        FeedbackContourTool::UpdateCurrentFeedbackContour(resultContourWorld);
-
-        FeedbackContourTool::SetFeedbackContourVisible(true);
-        mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(positionEvent->GetSender()->GetRenderWindow());
-      }
+      FeedbackContourTool::SetFeedbackContourVisible(true);
+      mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(positionEvent->GetSender()->GetRenderWindow());
     }
   }
 }
 
-void mitk::RegionGrowingTool::OnMouseReleased(StateMachineAction *, InteractionEvent *interactionEvent)
+void mitk::RegionGrowingTool::OnMouseReleased(StateMachineAction*, InteractionEvent* interactionEvent)
 {
+  auto* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(interactionEvent);
+  if (nullptr == positionEvent)
+  {
+    return;
+  }
 
-  auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+  if (m_WorkingSlice.IsNull() && m_FillFeedbackContour)
+  {
+    return;
+  }
 
-  if (m_WorkingSlice.IsNotNull() && m_FillFeedbackContour && positionEvent)
+  if (m_FillFeedbackContour)
   {
     this->WriteBackFeedbackContourAsSegmentationResult(positionEvent, m_PaintingPixelValue);
 

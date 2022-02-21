@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkT2DecayModel.h"
+#include "mitkNumericConstants.h"
 
 std::string mitk::T2DecayModel::GetModelDisplayName() const
 {
@@ -57,6 +58,7 @@ mitk::T2DecayModel::ComputeModelfunction(const ParametersType& parameters) const
   for (const auto& gridPos : m_TimeGrid)
   {
     *signalPos = parameters[0] * exp(-1.0 * gridPos/ parameters[1]);
+    ++signalPos;
   }
 
   return signal;
@@ -87,6 +89,27 @@ mitk::T2DecayModel::StaticParameterValuesType mitk::T2DecayModel::GetStaticParam
 
   //do nothing
 
+  return result;
+};
+
+mitk::T2DecayModel::DerivedParametersSizeType mitk::T2DecayModel::GetNumberOfDerivedParameters() const
+{
+  return 1;
+}
+
+mitk::T2DecayModel::DerivedParameterNamesType mitk::T2DecayModel::GetDerivedParameterNames() const
+{
+  ParameterNamesType result;
+  result.push_back("R2");
+  return result;
+};
+
+mitk::ModelBase::DerivedParameterMapType mitk::T2DecayModel::ComputeDerivedParameters(
+  const mitk::ModelBase::ParametersType &parameters) const
+{
+  DerivedParameterMapType result;
+  double inverse = 1.0 / (parameters[1] + mitk::eps);
+  result.insert(std::make_pair("R2", inverse));
   return result;
 };
 

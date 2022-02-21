@@ -19,7 +19,7 @@ std::string mitk::ExpDecayOffsetModel::GetModelDisplayName() const
 
 std::string mitk::ExpDecayOffsetModel::GetModelType() const
 {
-  return "MRSignal";
+  return "Generic";
 };
 
 mitk::ExpDecayOffsetModel::FunctionStringType mitk::ExpDecayOffsetModel::GetFunctionString() const

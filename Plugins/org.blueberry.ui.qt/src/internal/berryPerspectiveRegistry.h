@@ -151,7 +151,7 @@ public:
   void SetDefaultPerspective(const QString& id) override;
 
   IPerspectiveDescriptor::Pointer CreatePerspective(const QString& label,
-    IPerspectiveDescriptor::Pointer originalDescriptor);
+    IPerspectiveDescriptor::Pointer originalDescriptor) override;
 
   IPerspectiveDescriptor::Pointer ClonePerspective(const QString& id, const QString& label,
       IPerspectiveDescriptor::Pointer originalDescriptor) override;

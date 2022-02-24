@@ -3,7 +3,7 @@
 <plugin>
   <extension point="org.blueberry.ui.editors">
     <editor
-      id="org.mitk.editors.stdmultiwidget"
+      id="org.mitk.editors.stdmultiwidgeteditor"
       name="Standard Display"
       icon="resources/StdMultiWidgetEditor.svg"
       extensions="mitk"

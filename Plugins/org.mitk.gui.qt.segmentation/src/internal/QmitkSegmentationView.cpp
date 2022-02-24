@@ -54,7 +54,7 @@ QmitkSegmentationView::QmitkSegmentationView()
   , m_ReferenceNode(nullptr)
   , m_WorkingNode(nullptr)
   , m_DrawOutline(true)
-  , m_AutoSelectionEnabled(false)
+  , m_SelectionMode(false)
   , m_MouseCursorSet(false)
 {
   auto isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
@@ -145,7 +145,7 @@ void QmitkSegmentationView::OnReferenceSelectionChanged(QList<mitk::DataNode::Po
 
     m_Controls->workingNodeSelector->SetNodePredicate(segPredicate);
 
-    if (m_AutoSelectionEnabled)
+    if (m_SelectionMode)
     {
       // hide all image nodes to later show only the automatically selected ones
       mitk::DataStorage::SetOfObjects::ConstPointer imageNodes =
@@ -198,9 +198,9 @@ void QmitkSegmentationView::OnSegmentationSelectionChanged(QList<mitk::DataNode:
   m_ToolManager->SetWorkingData(m_WorkingNode);
   if (m_WorkingNode.IsNotNull())
   {
-    if (m_AutoSelectionEnabled)
+    if (m_SelectionMode)
     {
-      // hide all segmentation nodes to later show only the automatically selected ones
+      // hide all segmentation nodes to later show only the selected ones
       mitk::DataStorage::SetOfObjects::ConstPointer segmentationNodes =
         this->GetDataStorage()->GetSubset(m_SegmentationPredicate);
       for (mitk::DataStorage::SetOfObjects::const_iterator iter = segmentationNodes->begin(); iter != segmentationNodes->end(); ++iter)
@@ -594,7 +594,7 @@ void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences*
   }
 
   m_DrawOutline = prefs->GetBool("draw outline", true);
-  m_AutoSelectionEnabled = prefs->GetBool("auto selection", false);
+  m_SelectionMode = prefs->GetBool("selection mode", false);
 
   this->ApplyDisplayOptions();
 }

@@ -145,7 +145,7 @@ private:
   mitk::NodePredicateAnd::Pointer m_SegmentationPredicate;
 
   bool m_DrawOutline;
-  bool m_AutoSelectionEnabled;
+  bool m_SelectionMode;
   bool m_MouseCursorSet;
 
 };

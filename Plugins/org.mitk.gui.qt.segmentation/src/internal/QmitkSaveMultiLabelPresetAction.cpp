@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkCreateMultiLabelPresetAction.h"
+#include "QmitkSaveMultiLabelPresetAction.h"
 
 #include <mitkLabelSetImage.h>
 #include <mitkLabelSetIOHelper.h>
@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <QFileDialog>
 #include <QMessageBox>
 
-void QmitkCreateMultiLabelPresetAction::Run(const QList<mitk::DataNode::Pointer> &selectedNodes)
+void QmitkSaveMultiLabelPresetAction::Run(const QList<mitk::DataNode::Pointer> &selectedNodes)
 {
   for (const auto &node : selectedNodes)
   {
@@ -46,18 +46,18 @@ void QmitkCreateMultiLabelPresetAction::Run(const QList<mitk::DataNode::Pointer>
   }
 }
 
-void QmitkCreateMultiLabelPresetAction::SetDataStorage(mitk::DataStorage*)
+void QmitkSaveMultiLabelPresetAction::SetDataStorage(mitk::DataStorage*)
 {
 }
 
-void QmitkCreateMultiLabelPresetAction::SetFunctionality(berry::QtViewPart*)
+void QmitkSaveMultiLabelPresetAction::SetFunctionality(berry::QtViewPart*)
 {
 }
 
-void QmitkCreateMultiLabelPresetAction::SetSmoothed(bool)
+void QmitkSaveMultiLabelPresetAction::SetSmoothed(bool)
 {
 }
 
-void QmitkCreateMultiLabelPresetAction::SetDecimated(bool)
+void QmitkSaveMultiLabelPresetAction::SetDecimated(bool)
 {
 }

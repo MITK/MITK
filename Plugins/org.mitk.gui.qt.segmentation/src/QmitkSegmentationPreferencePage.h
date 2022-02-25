@@ -10,15 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-
-#ifndef QmitkSegmentationPreferencePage_h_included
-#define QmitkSegmentationPreferencePage_h_included
+#ifndef QMITKSEGMENTATIONPREFERENCEPAGE_H
+#define QMITKSEGMENTATIONPREFERENCEPAGE_H
 
 #include "org_mitk_gui_qt_segmentation_Export.h"
-#include <berryIPreferences.h>
-#include "berryIQtPreferencePage.h"
 
-class QWidget;
+#include <berryIPreferences.h>
+#include <berryIQtPreferencePage.h>
+
 class QCheckBox;
 class QRadioButton;
 class QDoubleSpinBox;
@@ -45,7 +44,7 @@ public:
 
   void Update() override;
 
-protected slots:
+protected Q_SLOTS:
 
   void OnSmoothingCheckboxChecked(int);
 
@@ -66,5 +65,4 @@ protected:
   berry::IPreferences::Pointer m_SegmentationPreferencesNode;
 };
 
-#endif /* QMITKDATAMANAGERPREFERENCEPAGE_H_ */
-
+#endif // QMITKSEGMENTATIONPREFERENCEPAGE_H

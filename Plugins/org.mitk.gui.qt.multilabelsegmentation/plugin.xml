@@ -3,28 +3,11 @@
 <plugin>
 
   <extension point="org.blueberry.ui.views">
-    <view id="org.mitk.views.multilabelsegmentation"
-      name="MultiLabel Segmentation"
-      category="Segmentation"
-      icon="resources/multilabelsegmentation.svg"
-      class="QmitkMultiLabelSegmentationView" />
-
     <view id="org.mitk.views.multilabelsegmentationutilities"
       name="MultiLabel Segmentation Utilities"
       category="Segmentation"
       class="QmitkMultiLabelSegmentationUtilitiesView"
       icon="resources/multilabelsegmentation_utilities.svg" />
-
-  </extension>
-
-  <extension point="org.blueberry.ui.preferencePages">
-    <page id="org.mitk.gui.qt.application.MultiLabelSegmentationPreferencePage" name="MultiLabel Segmentation" class="QmitkMultiLabelSegmentationPreferencePage">
-      <keywordreference id="org.mitk.gui.qt.application.MultiLabelSegmentationPreferencePageKeywords"></keywordreference>
-    </page>
-  </extension>
-
-   <extension point="org.blueberry.ui.keywords">
-    <keyword id="org.mitk.gui.qt.application.MultiLabelSegmentationPreferencePageKeywords" label="multi segmentation label multilabel multilabelsegmentation 2d display 3d outline draw transparent overlay show volume rendering data node selection mode enable auto-selection mode smoothed surface creation smoothing value decimation rate"></keyword>
   </extension>
 
   <extension point="org.mitk.gui.qt.datamanager.contextMenuActions">
@@ -32,8 +15,7 @@
     <contextMenuAction nodeDescriptorName="Surface" label="Convert to Label" icon="" class="QmitkConvertSurfaceToLabelAction" />
     <contextMenuAction nodeDescriptorName="Image" label="Create Segmentation" icon="" class="QmitkCreateMultiLabelSegmentationAction" />
     <contextMenuAction nodeDescriptorName="Image" label="Convert to Segmentation" icon="" class="QmitkConvertToMultiLabelSegmentationAction" />
-    <contextMenuAction nodeDescriptorName="LabelSetImage" label="Save LabelSet Preset" icon="" class="QmitkCreateMultiLabelPresetAction" />
-    <contextMenuAction nodeDescriptorName="LabelSetImage" label="Load LabelSet Preset" icon="" class="QmitkLoadMultiLabelPresetAction" />
   </extension>
+
 
 </plugin>

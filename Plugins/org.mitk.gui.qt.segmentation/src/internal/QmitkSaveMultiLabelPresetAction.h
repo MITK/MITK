@@ -10,19 +10,19 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkCreateMultiLabelPresetAction_h
-#define QmitkCreateMultiLabelPresetAction_h
+#ifndef QMITKSAVEMULTILABELPRESETACTION_H
+#define QMITKSAVEMULTILABELPRESETACTION_H
 
 #include <mitkIContextMenuAction.h>
 
-class QmitkCreateMultiLabelPresetAction : public QObject, public mitk::IContextMenuAction
+class QmitkSaveMultiLabelPresetAction : public QObject, public mitk::IContextMenuAction
 {
   Q_OBJECT
   Q_INTERFACES(mitk::IContextMenuAction)
 
 public:
-  QmitkCreateMultiLabelPresetAction() = default;
-  ~QmitkCreateMultiLabelPresetAction() override = default;
+  QmitkSaveMultiLabelPresetAction() = default;
+  ~QmitkSaveMultiLabelPresetAction() override = default;
 
   void Run(const QList<mitk::DataNode::Pointer>& selectedNodes) override;
   void SetDataStorage(mitk::DataStorage*) override;
@@ -31,4 +31,4 @@ public:
   void SetDecimated(bool) override;
 };
 
-#endif
+#endif // QMITKSAVEMULTILABELPRESETACTION_H

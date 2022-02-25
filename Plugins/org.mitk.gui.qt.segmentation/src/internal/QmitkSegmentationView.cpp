@@ -40,6 +40,7 @@ found in the LICENSE file.
 
 // Qt
 #include <QMessageBox>
+#include <QShortcut>
 
 #include <regex>
 
@@ -222,6 +223,41 @@ void QmitkSegmentationView::OnSegmentationSelectionChanged(QList<mitk::DataNode:
   this->UpdateGUI();
 }
 
+void QmitkSegmentationView::OnVisibilityShortcutActivated()
+{
+  if (m_WorkingNode.IsNull())
+  {
+    return;
+  }
+
+  bool isVisible = false;
+  m_WorkingNode->GetBoolProperty("visible", isVisible);
+  m_WorkingNode->SetVisibility(!isVisible);
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkSegmentationView::OnLabelToggleShortcutActivated()
+{
+  if (m_WorkingNode.IsNull())
+  {
+    return;
+  }
+
+  auto workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
+  if (nullptr == workingImage)
+  {
+    return;
+  }
+
+  this->WaitCursorOn();
+  workingImage->GetActiveLabelSet()->SetNextActiveLabel();
+  workingImage->Modified();
+  this->WaitCursorOff();
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
 void QmitkSegmentationView::OnNewSegmentation()
 {
   m_ToolManager->ActivateTool(-1);
@@ -394,6 +430,14 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
    m_Controls = new Ui::QmitkSegmentationViewControls;
    m_Controls->setupUi(parent);
+
+   // *------------------------
+   // * SHORTCUTS
+   // *------------------------
+   QShortcut* visibilityShortcut = new QShortcut(QKeySequence("CTRL+H"), parent);
+   connect(visibilityShortcut, &QShortcut::activated, this, &QmitkSegmentationView::OnVisibilityShortcutActivated);
+   QShortcut* labelToggleShortcut = new QShortcut(QKeySequence("CTRL+L"), parent);
+   connect(labelToggleShortcut, &QShortcut::activated, this, &QmitkSegmentationView::OnLabelToggleShortcutActivated);
 
    // *------------------------
    // * DATA SELECTION WIDGETS

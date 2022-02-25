@@ -61,6 +61,12 @@ private Q_SLOTS:
   // reaction to the selection of a new segmentation image in the selection widget
   void OnSegmentationSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 
+  // reaction to the shortcut ("CTRL+H") for toggling the visibility of the working node
+  void OnVisibilityShortcutActivated();
+
+  // reaction to the shortcut ("CTRL+L") for iterating over all labels
+  void OnLabelToggleShortcutActivated();
+
   // reaction to the button "New segmentation"
   void OnNewSegmentation();
 

@@ -55,7 +55,7 @@ signals:
 
   /// \brief Send a signal when it was requested to go to a label.
   void goToLabel(const mitk::Point3D &);
-  void resetView();
+  void LabelSetWidgetReset();
 
 public slots:
 

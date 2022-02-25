@@ -40,6 +40,7 @@ found in the LICENSE file.
 *
 *        Additionally the view provides an option to create "2D"- and "3D"-interpolations between
 *        neighboring segmentation masks on unsegmented slices.
+*        Interpolation for multilabel segmentations is currently not implemented.
 */
 class QmitkSegmentationView : public QmitkAbstractView, public mitk::IRenderWindowPartListener
 {
@@ -75,7 +76,7 @@ private Q_SLOTS:
 
   void OnGoToLabel(const mitk::Point3D &pos);
 
-  void OnResetView();
+  void OnLabelSetWidgetReset();
 
 private:
 
@@ -112,6 +113,8 @@ private:
   void SetMouseCursor(const us::ModuleResource&, int hotspotX, int hotspotY);
 
   void UpdateGUI();
+
+  void UpdateInterpolatorWidget();
 
   void ValidateSelectionInput();
 

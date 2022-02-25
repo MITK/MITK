@@ -380,12 +380,9 @@ void QmitkSegmentationView::OnGoToLabel(const mitk::Point3D& pos)
   }
 }
 
-void QmitkSegmentationView::OnResetView()
+void QmitkSegmentationView::OnLabelSetWidgetReset()
 {
-  if (m_RenderWindowPart)
-  {
-    m_RenderWindowPart->ForceImmediateUpdate();
-  }
+  this->UpdateInterpolatorWidget();
 }
 
 /**********************************************************************/
@@ -466,6 +463,8 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_Controls->toolSelectionBox3D->SetEnabledMode(
      QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible);
 
+   m_Controls->slicesInterpolator->SetDataStorage(this->GetDataStorage());
+
    // create general signal / slot connections
    connect(m_Controls->newSegmentationButton, &QToolButton::clicked, this, &QmitkSegmentationView::OnNewSegmentation);
    connect(m_Controls->slicesInterpolator, &QmitkSlicesInterpolator::SignalShowMarkerNodes, this, &QmitkSegmentationView::OnShowMarkerNodes);
@@ -478,7 +477,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    // * LABELSETWIDGET
    // *------------------------
    connect(m_Controls->labelSetWidget, &QmitkLabelSetWidget::goToLabel, this, &QmitkSegmentationView::OnGoToLabel);
-   connect(m_Controls->labelSetWidget, &QmitkLabelSetWidget::resetView, this, &QmitkSegmentationView::OnResetView);
+   connect(m_Controls->labelSetWidget, &QmitkLabelSetWidget::LabelSetWidgetReset, this, &QmitkSegmentationView::OnLabelSetWidgetReset);
 
    m_Controls->labelSetWidget->SetDataStorage(this->GetDataStorage());
    m_Controls->labelSetWidget->SetOrganColors(mitk::OrganNamesHandling::GetDefaultOrganColorString());
@@ -515,10 +514,14 @@ void QmitkSegmentationView::RenderWindowPartActivated(mitk::IRenderWindowPart* r
     m_Parent->setEnabled(true);
   }
 
-  // tell the interpolation about tool manager, data storage and render window part
-  if (nullptr != m_Controls && nullptr != m_RenderWindowPart)
+  if (nullptr == m_Controls)
   {
-    m_Controls->slicesInterpolator->SetDataStorage(this->GetDataStorage());
+    return;
+  }
+
+  // tell the interpolation about tool manager, data storage and render window part
+  if (nullptr != m_RenderWindowPart)
+  {
     QList<mitk::SliceNavigationController*> controllers;
     controllers.push_back(m_RenderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController());
     controllers.push_back(m_RenderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController());
@@ -813,7 +816,6 @@ void QmitkSegmentationView::UpdateGUI()
   bool hasWorkingNode = workingNode != nullptr;
 
   m_Controls->newSegmentationButton->setEnabled(false);
-  m_Controls->slicesInterpolator->setEnabled(false);
 
   if (hasReferenceNode)
   {
@@ -822,17 +824,44 @@ void QmitkSegmentationView::UpdateGUI()
 
   if (hasWorkingNode && hasReferenceNode)
   {
-    m_Controls->slicesInterpolator->setEnabled(true);
-
     int layer = -1;
     referenceNode->GetIntProperty("layer", layer);
     workingNode->SetIntProperty("layer", layer + 1);
   }
 
+  this->UpdateInterpolatorWidget();
   m_Controls->layersWidget->UpdateGUI();
   m_Controls->labelsWidget->UpdateGUI();
 
   this->ValidateSelectionInput();
+}
+
+void QmitkSegmentationView::UpdateInterpolatorWidget()
+{
+  m_Controls->slicesInterpolator->setEnabled(false);
+
+  if (m_WorkingNode.IsNull())
+  {
+    return;
+  }
+
+  auto labelSetImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
+  if (nullptr == labelSetImage)
+  {
+    return;
+  }
+
+  int numberOfLabels = labelSetImage->GetNumberOfLabels(labelSetImage->GetActiveLayer());
+  if (2 == numberOfLabels) // fix for T27319: exterior is label 0, first label is label 1
+  {
+    m_Controls->interpolatorWarningLabel->hide();
+    m_Controls->slicesInterpolator->setEnabled(true);
+  }
+  else
+  {
+    m_Controls->interpolatorWarningLabel->show();
+    m_Controls->interpolatorWarningLabel->setText("<font color=\"red\">Interpolation only works for single label segmentations.</font>");
+  }
 }
 
 void QmitkSegmentationView::ValidateSelectionInput()

@@ -12,7 +12,6 @@ found in the LICENSE file.
 
 #include "mitkPluginActivator.h"
 
-#include "QmitkMultiLabelSegmentationView.h"
 #include "QmitkThresholdAction.h"
 #include "QmitkConvertSurfaceToLabelAction.h"
 #include "QmitkConvertMaskToLabelAction.h"
@@ -30,7 +29,6 @@ US_INITIALIZE_MODULE //("MultiLabelSegmentation", "liborg_mitk_gui_qt_multilabel
 
 void mitk::PluginActivator::start(ctkPluginContext *context)
 {
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkMultiLabelSegmentationView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkThresholdAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkConvertSurfaceToLabelAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkConvertMaskToLabelAction, context)

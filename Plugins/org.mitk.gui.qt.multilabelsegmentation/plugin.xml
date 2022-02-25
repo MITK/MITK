@@ -3,18 +3,11 @@
 <plugin>
 
   <extension point="org.blueberry.ui.views">
-    <view id="org.mitk.views.multilabelsegmentation"
-      name="MultiLabel Segmentation"
-      category="Segmentation"
-      icon="resources/multilabelsegmentation.svg"
-      class="QmitkMultiLabelSegmentationView" />
-
     <view id="org.mitk.views.multilabelsegmentationutilities"
       name="MultiLabel Segmentation Utilities"
       category="Segmentation"
       class="QmitkMultiLabelSegmentationUtilitiesView"
       icon="resources/multilabelsegmentation_utilities.svg" />
-
   </extension>
 
   <extension point="org.mitk.gui.qt.datamanager.contextMenuActions">

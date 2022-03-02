@@ -62,9 +62,6 @@ In the following definitions, an <i>evaluation</i> describes the process of cost
 - <i>Stop condition</i>: Reasons for the fit termination, i.e. criterion reached, maximum number of iterations,...
 - <i>Optimization time</i>: The overall time from fitting start to termination.
 - <i>Number of iterations</i>: The number of iterations from fitting start to termination.
-- <i>Constraint penalty ratio</i>: Ratio between evaluations that were penalized and all evaluations. 0.0 means no evaluation was penalized; 1.0 all evaluations were. Evaluations that hit the failure threshold count as penalized, too.
-- <i>Constraint last failed parameter</i>: Ratio between evaluations that were beyond the failure threshold. 0.0 means no evaluation was a failure (but some may be penalized).
-- <i>Constraint failure ratio</i>: Index of the first (in terms of index position) parameter, which failed the constraints in the last evaluation.
 
 After all necessary configurations are set, the button <i>Start Modelling</i> is enabled, which starts the fitting routine.
 Progress can be seen in the message box on the bottom. Resulting parameter maps will afterwards be added to the Data Manager as sub-nodes of the analyzed 4D image.

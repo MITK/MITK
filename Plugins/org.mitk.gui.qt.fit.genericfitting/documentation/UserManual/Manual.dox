@@ -6,11 +6,65 @@
 \tableofcontents
 
 \section FIT_GENERIC_Introduction Introduction
-This plug-in offers a generic fitting component for time resolved image data.
+This views offers a generic fitting component for time resolved image data.
 
-\section FIT_GENERIC_Contact Contact information
-This plug-in is being developed by the SIDT group (Software development for Integrated Diagnostics
-and Therapy) at the German Cancer Research Center (DKFZ). If you have any questions, need support,
-find a bug or have a feature request, feel free to contact us at www.mitk.org.
+\section FIT_GENERIC__Contact Contact information
+If you have any questions, need support, find a bug or have a feature request, feel free to contact us at www.mitk.org.
+
+\subsection FIT_GENERIC__Cite Citation information
+If you use the view for your research please cite our work as reference:\n\n
+Debus C and Floca R, Ingrisch M, Kompan I, Maier-Hein K, Abdollahi A, Nolden M, <i>MITK-ModelFit: generic open-source framework for model fits and their exploration in medical imaging – design, implementation and application on the example of DCE-MRI</i>. https://doi.org/10.1186/s12859-018-2588-1 (BMC Bioinformatics 2019 20:31)
+
+
+\section FIT_GENERIC__Data_and_ROI_Selection Time series and mask selection
+\imageMacro{modelfit_generic_maskAndFittingStrategy.png, "Time series and mask selection.", 10}
+In principle, every model can be fitted on the entire image. However, for model configuration reasons and computational time cost, this is often not advisable.
+Therefore, apart from the image to be fitted (<i>Selected Time Series</i>), a ROI segmentation can be defined (<i>Selected Mask</i>), within which model fitting is performed.
+The view currently offers <i>Pixel based</i> and/or <i>ROI based</i> averaged fits of time-varying curves. The <i>ROI based</i> fitting option becomes enabled, if a mask is selected.
+
+\section FIT_GENERIC_General_models Supported models
+Currently the following models are available for fitting:
+-	<b> Linear model </b>: y = offset + slope*x
+-       <b> Generic parameter model </b>: A simple formula can be manually provided and will be parsed for fitting.
+-       <b> T2 decay model </b>: y = A*exp(-t/B)
+
+
+\section FIT_GENERIC_Settings Model settings
+
+\subsection FIT_DCE_Settings_model Model specific settings
+Selecting one of the \ref FIT_GENERIC_General_models "supported models" will open below tabs for further configuration of the model.
+- The Generic parameter model required as input a formula to be parsed and the number parameters to fit. In the following image, detailed formula information is given.
+\imageMacro{modelfit_generic_genericParamModelSettings.png, "Formula info for the generic parameter model", 10}
+
+\subsection FIT_GENERIC_Settings_start Start parameter
+In cases of noisy data it can be useful to define the initial starting values of the parameter estimates, at which optimization starts, in order to prevent optimization results in local optima.
+Each model has default scalar values (applied to every voxel) for initial values of each parameter, however these can be adjusted.
+Moreover, initial values can also be defined locally for each individual voxel via starting value images. To load a starting value image, change the <i>Type</i> from <i>scalar</i> to <i>image</i>. This can be done by double-clicking on the type cell.
+In the <i>Value</i> column, selection of a starting value image will be available.
+
+\subsection FIT_GENERIC_Settings_constraint Constraints settings
+To limit the fitting search space and to exclude unphysical/illogical results for model parameter estimates, constraints to individual parameters as well as combinations can be imposed.
+Each model has default constraints, however, new ones can be defined or removed by the + and – buttons in the table.
+The first column specifies the parameter(s) involved in the constraint (if multiple parameters are selected, their sum will be used) by selection in the drop down menu.
+The second column <i>Type</i> defines whether the constraint defines an upper or lower boundary.
+<i>Value</i> defines the actual constraint value, that should not be crossed, and <i>Width</i> allows for a certain tolerance width.
+
+
+\section FIT_GENERIC_Fitting Executing a fit
+
+In order to distinguish results from different model fits to the data, a <i>Fitting name</i> can be defined.
+As default, the name of the model and the fitting strategy (pixel/ROI) are given. This name will then be appended by the respective parameter name.\n\n
+
+For development purposes and evaluation of the fits, the option <i>Generate debug parameter images</i> is available.
+Enabling this option will result in additional parameter maps displaying the status of the optimizer at fit termination.
+In the following definitions, an <i>evaluation</i> describes the process of cost function calculation and evaluation by the optimizer for a given parameter set.
+
+- <i>Stop condition</i>: Reasons for the fit termination, i.e. criterion reached, maximum number of iterations,...
+- <i>Optimization time</i>: The overall time from fitting start to termination.
+- <i>Number of iterations</i>: The number of iterations from fitting start to termination.
+
+After all necessary configurations are set, the button <i>Start Modelling</i> is enabled, which starts the fitting routine.
+Progress can be seen in the message box on the bottom. Resulting parameter maps will afterwards be added to the Data Manager as sub-nodes of the analyzed 4D image.
+
 
 */

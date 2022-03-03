@@ -33,7 +33,7 @@ found in the LICENSE file.
 // mitk gui qt common plugin
 #include <QmitkMultiWidgetDecorationManager.h>
 
-const QString QmitkStdMultiWidgetEditor::EDITOR_ID = "org.mitk.editors.stdmultiwidgeteditor";
+const QString QmitkStdMultiWidgetEditor::EDITOR_ID = "org.mitk.editors.stdmultiwidget";
 
 struct QmitkStdMultiWidgetEditor::Impl final
 {

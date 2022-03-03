@@ -72,7 +72,7 @@ void QmitkOpenStdMultiWidgetEditorAction::Run()
     {
       mitk::IDataStorageReference::Pointer dsRef = dsService->GetDataStorage();
       berry::IEditorInput::Pointer editorInput(new mitk::DataStorageEditorInput(dsRef));
-      m_Window->GetActivePage()->OpenEditor(editorInput, "org.mitk.editors.stdmultiwidgeteditor", true, berry::IWorkbenchPage::MATCH_ID);
+      m_Window->GetActivePage()->OpenEditor(editorInput, "org.mitk.editors.stdmultiwidget", true, berry::IWorkbenchPage::MATCH_ID);
     }
   }
 }

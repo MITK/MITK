@@ -305,11 +305,11 @@ public:
       {
         windowAdvisor->openDicomEditorAction->setEnabled(true);
       }
-      if (windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.stdmultiwidgeteditor"))
+      if (windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.stdmultiwidget"))
       {
         windowAdvisor->openStdMultiWidgetEditorAction->setEnabled(true);
       }
-      if (windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.mxnmultiwidgeteditor"))
+      if (windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.mxnmultiwidget"))
       {
         windowAdvisor->openMxNMultiWidgetEditorAction->setEnabled(true);
       }
@@ -355,7 +355,7 @@ public:
       {
         windowAdvisor->openDicomEditorAction->setEnabled(false);
       }
-      if (windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.stdmultiwidgeteditor"))
+      if (windowAdvisor->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.stdmultiwidget"))
       {
         windowAdvisor->openStdMultiWidgetEditorAction->setEnabled(false);
       }
@@ -752,7 +752,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   {
     openDicomEditorAction = new QmitkOpenDicomEditorAction(berry::QtStyleManager::ThemeIcon(basePath + "dicom.svg"), window);
   }
-  if (this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.stdmultiwidgeteditor"))
+  if (this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.stdmultiwidget"))
   {
     openStdMultiWidgetEditorAction = new QmitkOpenStdMultiWidgetEditorAction(QIcon(":/org.mitk.gui.qt.ext/Editor.png"), window);
   }
@@ -810,7 +810,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   {
     mainActionsToolBar->addAction(openDicomEditorAction);
   }
-  if (this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.stdmultiwidgeteditor"))
+  if (this->GetWindowConfigurer()->GetWindow()->GetWorkbench()->GetEditorRegistry()->FindEditor("org.mitk.editors.stdmultiwidget"))
   {
     mainActionsToolBar->addAction(openStdMultiWidgetEditorAction);
   }

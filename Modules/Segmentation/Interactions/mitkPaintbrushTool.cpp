@@ -496,24 +496,30 @@ void mitk::PaintbrushTool::OnInvertLogic(StateMachineAction *, InteractionEvent 
 
 void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositionEvent *event)
 {
-  const PlaneGeometry *planeGeometry((event->GetSender()->GetCurrentWorldPlaneGeometry()));
-  const auto *abstractTransformGeometry(
+  const PlaneGeometry* planeGeometry((event->GetSender()->GetCurrentWorldPlaneGeometry()));
+  const auto* abstractTransformGeometry(
     dynamic_cast<const AbstractTransformGeometry *>(event->GetSender()->GetCurrentWorldPlaneGeometry()));
-  DataNode *workingNode(this->GetToolManager()->GetWorkingData(0));
-
-  if (!workingNode)
+  if (nullptr == planeGeometry || nullptr != abstractTransformGeometry)
+  {
     return;
+  }
+
+  DataNode* workingNode = this->GetToolManager()->GetWorkingData(0);
+  if (nullptr == workingNode)
+  {
+    return;
+  }
 
   Image::Pointer image = dynamic_cast<Image *>(workingNode->GetData());
-
-  if (!image || !planeGeometry || abstractTransformGeometry)
+  if (nullptr == image)
+  {
     return;
+  }
 
   if (m_CurrentPlane.IsNull() || m_WorkingSlice.IsNull())
   {
     m_CurrentPlane = planeGeometry;
     m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, image)->Clone();
-    m_WorkingNode->ReplaceProperty("color", workingNode->GetProperty("color"));
     m_WorkingNode->SetData(m_WorkingSlice);
   }
   else
@@ -526,9 +532,6 @@ void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositi
     if (!isSameSlice)
     {
       this->GetToolManager()->GetDataStorage()->Remove(m_WorkingNode);
-      m_CurrentPlane = nullptr;
-      m_WorkingSlice = nullptr;
-      m_WorkingNode = nullptr;
       m_CurrentPlane = planeGeometry;
       m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, image)->Clone();
 
@@ -543,10 +546,20 @@ void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositi
     }
   }
 
+  mitk::Color currentColor;
+  if (m_PaintingPixelValue == 1)
+  {
+    currentColor.Set(0.0, 1.0, 0.);
+  }
+  else
+  {
+    currentColor.Set(1.0, 0.0, 0.);
+  }
+  m_WorkingNode->SetProperty("color", mitk::ColorProperty::New(currentColor[0], currentColor[1], currentColor[2]));
+
   if (!this->GetToolManager()->GetDataStorage()->Exists(m_WorkingNode))
   {
     m_WorkingNode->SetProperty("outline binary", mitk::BoolProperty::New(true));
-    m_WorkingNode->SetProperty("color", workingNode->GetProperty("color"));
     m_WorkingNode->SetProperty("name", mitk::StringProperty::New("Paintbrush_Node"));
     m_WorkingNode->SetProperty("helper object", mitk::BoolProperty::New(true));
     m_WorkingNode->SetProperty("opacity", mitk::FloatProperty::New(0.8));

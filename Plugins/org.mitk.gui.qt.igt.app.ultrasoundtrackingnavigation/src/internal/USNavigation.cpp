@@ -198,9 +198,7 @@ void USNavigation::Update()
       mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
       if ( renderWindow != nullptr && image->GetTimeGeometry()->IsValid() )
       {
-        renderWindow->GetRenderingManager()->InitializeViews(
-          image->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
-        renderWindow->GetRenderingManager()->RequestUpdateAll();
+        renderWindow->GetRenderingManager()->InitializeViews(image->GetTimeGeometry());
       }
     }
     this->RequestRenderWindowUpdate();

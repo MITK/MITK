@@ -295,7 +295,7 @@ void QmitkMatchPointRegistrationManipulator::InitSession()
   this->OnCenterTypeChanged(0);
 
   //reinit view
-  mitk::RenderingManager::GetInstance()->InitializeViews(m_SelectedTargetNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+  mitk::RenderingManager::GetInstance()->InitializeViews(m_SelectedTargetNode->GetData()->GetTimeGeometry());
 
   //generate evaluation node
 

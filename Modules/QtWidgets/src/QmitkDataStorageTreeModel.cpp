@@ -345,8 +345,7 @@ bool QmitkDataStorageTreeModel::dropMimeData(
 
         if (basedata.IsNotNull())
         {
-          mitk::RenderingManager::GetInstance()->InitializeViews(
-            basedata->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+          mitk::RenderingManager::GetInstance()->InitializeViews(basedata->GetTimeGeometry());
 
           numberOfNodesDropped++;
         }

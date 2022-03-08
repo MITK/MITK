@@ -170,5 +170,5 @@ void QmitkMxNMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
     mitk::InteractionSchemeSwitcher::PACSStandard :
     mitk::InteractionSchemeSwitcher::MITKStandard);
 
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(GetDataStorage());
 }

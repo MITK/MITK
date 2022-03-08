@@ -51,5 +51,5 @@ const char *mitk::BinaryThresholdTool::GetName() const
 
 void mitk::BinaryThresholdTool::SetThresholdValue(double value)
 {
-  this->SetThresholdValues(value, this->GetSensibleMaximumThresholdValue());
+  this->SetThresholdValues(value, this->GetSensibleMaximumThreshold());
 }

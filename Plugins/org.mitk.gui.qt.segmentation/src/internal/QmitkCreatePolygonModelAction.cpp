@@ -18,7 +18,6 @@ found in the LICENSE file.
 #include <mitkStatusBar.h>
 
 #include <mitkIRenderWindowPart.h>
-#include <mitkIRenderingManager.h>
 
 // Blueberry
 #include <berryIPreferencesService.h>

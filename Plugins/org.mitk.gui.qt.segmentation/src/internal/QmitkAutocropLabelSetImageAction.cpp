@@ -279,7 +279,7 @@ void QmitkAutocropLabelSetImageAction::Run(const QList<mitk::DataNode::Pointer>&
 
     // If we cropped a single LabelSetImage, reinit the views to give a visible feedback to the user
     if (1 == selectedNodes.size())
-      mitk::RenderingManager::GetInstance()->InitializeViews(croppedLabelSetImage->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+      mitk::RenderingManager::GetInstance()->InitializeViews(croppedLabelSetImage->GetTimeGeometry());
   }
 }
 

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __MITK_T2_DECAY_MODEL_H_
-#define __MITK_T2_DECAY_MODEL_H_
+#ifndef __MITK_Exp_DECAY_OFFSET_MODEL_H_
+#define __MITK_Exp_DECAY_OFFSET_MODEL_H_
 
 #include "mitkModelBase.h"
 
@@ -20,16 +20,15 @@ found in the LICENSE file.
 namespace mitk
 {
 
-  /** @class T2DecayModel
-  * @brief Simple model of the MR T2 signal decay. This corresponds to an exponential decay in the form of:
-  * f(t) = M0 * exp(-t/T2) with T2 being the transverse / spin-spin relaxation time. The derived parameter R2
-  * is calculated from T2 by inversion.
-  */
-  class MITKMODELFIT_EXPORT T2DecayModel : public mitk::ModelBase
+  /** @class ExpDecayOffsetModel
+   * @brief Implementation of a general exponential decay model with offset,
+   * following the function: f(x) = a * exp(-1.0 * x * b) + c.
+   */
+  class MITKMODELFIT_EXPORT ExpDecayOffsetModel : public mitk::ModelBase
   {
 
   public:
-    typedef T2DecayModel Self;
+    typedef ExpDecayOffsetModel Self;
     typedef mitk::ModelBase Superclass;
     typedef itk::SmartPointer< Self >                            Pointer;
     typedef itk::SmartPointer< const Self >                      ConstPointer;
@@ -42,7 +41,7 @@ namespace mitk
     itkCloneMacro(Self);
 
     /** Run-time type information (and related methods). */
-    itkTypeMacro(T2DecayModel, ModelBase);
+    itkTypeMacro(ExpDecayOffsetModel, ModelBase);
 
     std::string GetModelDisplayName() const override;
 
@@ -60,16 +59,9 @@ namespace mitk
 
     ParametersSizeType GetNumberOfStaticParameters() const override;
 
-    DerivedParametersSizeType GetNumberOfDerivedParameters() const override;
-
-    DerivedParameterNamesType GetDerivedParameterNames() const override;
-
-    mitk::ModelBase::DerivedParameterMapType ComputeDerivedParameters(
-      const mitk::ModelBase::ParametersType &parameters) const;
-
   protected:
-    T2DecayModel() {};
-    ~T2DecayModel() override {};
+    ExpDecayOffsetModel() {};
+    ~ExpDecayOffsetModel() override {};
 
     /**
      * Actual implementation of the clone method. This method should be reimplemeted
@@ -86,7 +78,7 @@ namespace mitk
   private:
 
     //No copy constructor allowed
-    T2DecayModel(const Self& source);
+    ExpDecayOffsetModel(const Self& source);
     void operator=(const Self&);  //purposely not implemented
 
   };

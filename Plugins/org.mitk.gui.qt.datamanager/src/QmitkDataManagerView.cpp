@@ -57,7 +57,6 @@ found in the LICENSE file.
 // mitk gui common plugin
 #include <mitkDataNodeObject.h>
 #include <mitkDataStorageEditorInput.h>
-#include <mitkIRenderingManager.h>
 
 // mitk gui qt application plugin
 #include <QmitkDataNodeGlobalReinitAction.h>

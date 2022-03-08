@@ -5,7 +5,7 @@
 
 \section org_mitk_editors_stdmultiwidget_F1Help General remark on F1 help
 This is the help window of the standard display. To display the help windows of other plugins, press F1 when the plugin of interest is active (please make sure the tab of the plugin of interest is highlighted). 
-Alternatively, go to the <i>Help</i> tab and select <i>Open Help Perspective</i>. A help window opens from which you can select the documentation of the plugin of interest.
+Alternatively, go to the <i>Help</i> menu and select <i>Open Help Perspective</i>. A help window opens from which you can select the documentation of the plugin of interest.
 
 \section org_mitk_editors_stdmultiwidget_FourWindowView Four Window View
 
@@ -13,7 +13,7 @@ Alternatively, go to the <i>Help</i> tab and select <i>Open Help Perspective</i>
 
 The four window view is the heart of the MITK image viewing. The standard layout is three 2D windows and one 3D window, with the axial window in the top left quarter, the sagittal window in the top right quarter, the coronal window in the lower left quarter and the 3D window in the lower right quarter. The different planes form a crosshair that can be seen in the 3D window.
 
-Once you select a point within the picture, informations about it are displayed at the bottom of the screen.
+Once you select a point within the picture, information about it is displayed at the bottom of the screen.
 
 \subsection org_mitk_editors_stdmultiwidget_FourWindowView_Navigation Navigation
 
@@ -43,7 +43,7 @@ The right button allows you to choose between many different layouts of the four
 
 Once an image is loaded the levelwindow appears to the right hand side of the four window view. With this tool you can adjust the range of grey values displayed and the gradient between them. Moving the lower boundary up results in any pixels having a value lower than that boundary to be displayed as black. Lowering the upper boundary causes all pixels having a value higher than it to be displayed as white.
 
-The pixels with a value between the lower and upper boundary are displayed in different shades of grey. This way a smaller levelwindow results in higher contrasts while cutting of the information outside its range whereas a larger levelwindow displays more information with a higher detail level at the cost of contrast.
+The pixels with a value between the lower and upper boundary are displayed in different shades of grey. This way a smaller levelwindow results in higher contrasts while cutting off the information outside its range whereas a larger levelwindow displays more information with a higher detail level at the cost of contrast.
 
 You can pick the levelwindow with the mouse to move it up and down, while moving the mouse cursor to the left or right to change its size. Picking one of the boundaries with a left click allows you to change the size symmetrically. Holding CTRL and clicking a boundary adjusts only that value.
 

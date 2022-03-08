@@ -10,6 +10,7 @@ Qmitk/QmitkCopyToClipBoardDialog.cpp
 Qmitk/QmitkDrawPaintbrushToolGUI.cpp
 Qmitk/QmitkErasePaintbrushToolGUI.cpp
 Qmitk/QmitkLiveWireTool2DGUI.cpp
+Qmitk/QmitkNewAddTool2DGUI.cpp
 Qmitk/QmitkOtsuTool3DGUI.cpp
 Qmitk/QmitkPaintbrushToolGUI.cpp
 Qmitk/QmitkPickingToolGUI.cpp
@@ -40,6 +41,7 @@ Qmitk/QmitkCopyToClipBoardDialog.h
 Qmitk/QmitkDrawPaintbrushToolGUI.h
 Qmitk/QmitkErasePaintbrushToolGUI.h
 Qmitk/QmitkLiveWireTool2DGUI.h
+Qmitk/QmitkNewAddTool2DGUI.h
 Qmitk/QmitkOtsuTool3DGUI.h
 Qmitk/QmitkPaintbrushToolGUI.h
 Qmitk/QmitkPickingToolGUI.h

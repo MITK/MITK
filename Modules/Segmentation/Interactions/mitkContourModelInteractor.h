@@ -56,6 +56,7 @@ namespace mitk
     virtual void OnMoveContour(StateMachineAction *, InteractionEvent *interactionEvent);
     virtual void OnFinishEditing(StateMachineAction *, InteractionEvent *interactionEvent);
 
+    const float eps = 3.0;
     mitk::Point3D m_lastMousePosition;
   };
 

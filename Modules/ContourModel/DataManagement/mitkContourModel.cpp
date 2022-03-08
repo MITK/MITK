@@ -199,6 +199,18 @@ const mitk::ContourModel::VertexType *mitk::ContourModel::GetVertexAt(int index,
   return nullptr;
 }
 
+const mitk::ContourModel::VertexType *mitk::ContourModel::GetVertexAt(mitk::Point3D &point,
+                                                                      float eps,
+                                                                      TimeStepType timestep) const
+{
+  if (!this->IsEmptyTimeStep(timestep))
+  {
+    return this->m_ContourSeries[timestep]->GetVertexAt(point, eps);
+  }
+  return nullptr;
+}
+
+
 const mitk::ContourModel::VertexType *mitk::ContourModel::GetNextControlVertexAt(mitk::Point3D &point,
                                                                           float eps,
                                                                           TimeStepType timestep) const
@@ -273,6 +285,19 @@ bool mitk::ContourModel::IsNearContour(Point3D &point, float eps, TimeStepType t
   if (!this->IsEmptyTimeStep(timestep))
   {
     return this->m_ContourSeries[timestep]->IsNearContour(point, eps);
+  }
+  return false;
+}
+
+bool mitk::ContourModel::GetLineSegmentForPoint(Point3D &point,
+                                                float eps,
+                                                TimeStepType timestep,
+                                                mitk::ContourElement::VertexType *previousVertex,
+                                                mitk::ContourElement::VertexType *nextVertex)
+{
+  if (!this->IsEmptyTimeStep(timestep))
+  {
+    return this->m_ContourSeries[timestep]->GetLineSegmentForPoint(point, eps, previousVertex, nextVertex);
   }
   return false;
 }

@@ -192,6 +192,11 @@ namespace mitk
     */
     bool IsNearContour(const mitk::Point3D &point, float eps) const;
 
+    bool GetLineSegmentForPoint(const mitk::Point3D &point,
+                            float eps,
+                            mitk::ContourElement::VertexType *previousVertex,
+                            mitk::ContourElement::VertexType *nextVertex) const;
+
     /** \brief Close the contour.
     Connect first with last element.
     */

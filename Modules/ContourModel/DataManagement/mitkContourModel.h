@@ -254,6 +254,8 @@ namespace mitk
     */
     virtual const VertexType *GetVertexAt(int index, TimeStepType timestep = 0) const;
 
+    const VertexType *GetVertexAt(mitk::Point3D &point, float eps, TimeStepType timestep) const;
+
     /** Returns the next control vertex to the approximate nearest vertex of a given position in 3D space
      * If the timestep is invalid a nullptr will be returned.
      */
@@ -278,6 +280,11 @@ namespace mitk
     */
     virtual bool IsNearContour(Point3D &point, float eps, TimeStepType timestep);
 
+    bool GetLineSegmentForPoint(Point3D &point,
+                            float eps,
+                            TimeStepType timestep,
+                            mitk::ContourElement::VertexType *previousVertex = nullptr,
+                            mitk::ContourElement::VertexType *nextVertex = nullptr);
 
     /** \brief Mark a vertex at an index in the container as selected.
      */

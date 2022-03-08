@@ -37,7 +37,9 @@ set(CPP_FILES
   Interactions/mitkCalculateVolumetryTool.cpp
   Interactions/mitkContourModelInteractor.cpp
   Interactions/mitkContourModelLiveWireInteractor.cpp
+  Interactions/mitkEditableContourTool.cpp
   Interactions/mitkLiveWireTool2D.cpp
+  Interactions/mitkNewAddTool2D.cpp
   Interactions/mitkContourTool.cpp
   Interactions/mitkCreateSurfaceTool.cpp
   Interactions/mitkDrawPaintbrushTool.cpp
@@ -81,6 +83,8 @@ set(RESOURCE_FILES
   Fill_Cursor_32x32.png
   LiveWire_48x48.png
   LiveWire_Cursor_32x32.png
+  NewAdd_48x48.png
+  NewAdd_Cursor_32x32.png
   Otsu_48x48.png
   Paint_48x48.png
   Paint_Cursor_32x32.png

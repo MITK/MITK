@@ -30,7 +30,7 @@ void mitk::ContourModelInteractor::ConnectActionsAndFunctions()
   CONNECT_CONDITION("checkisOverPoint", OnCheckPointClick);
   CONNECT_CONDITION("mouseMove", IsHovering);
 
-  CONNECT_FUNCTION("movePoints", OnMovePoint);
+  CONNECT_FUNCTION("movePoint", OnMovePoint);
   CONNECT_FUNCTION("deletePoint", OnDeletePoint);
   CONNECT_FUNCTION("finish", OnFinishEditing);
 }
@@ -54,7 +54,30 @@ bool mitk::ContourModelInteractor::OnCheckPointClick(const InteractionEvent *int
 
   mitk::Point3D click = positionEvent->GetPositionInWorld();
 
-  if (contour->SelectVertexAt(click, 1.5, timeStep))
+  bool isVertexSelected = contour->SelectVertexAt(click, 1.5, timeStep);
+
+  if (!isVertexSelected)
+  {
+    bool isHover = false;
+    if (this->GetDataNode()->GetBoolProperty("contour.hovering", isHover, positionEvent->GetSender()) == false)
+    {
+      MITK_WARN << "Unknown property contour.hovering";
+    }
+    if (isHover)
+    {
+      auto lastVertex = *(contour->GetVertexList(timeStep).end() - 1);
+      mitk::ContourElement::VertexType *previousVertex =
+        &mitk::ContourElement::VertexType(lastVertex->Coordinates, lastVertex->IsControlPoint);
+      contour->GetLineSegmentForPoint(click, mitk::ContourModelInteractor::eps, timeStep, previousVertex);
+      auto previousVertexInList =
+        contour->GetVertexAt(previousVertex->Coordinates, mitk::ContourModelInteractor::eps, timeStep);
+      auto index = contour->GetIndex(previousVertexInList, timeStep);
+      contour->InsertVertexAtIndex(click, index + 1, true, timeStep);
+      isVertexSelected = contour->SelectVertexAt(click, mitk::ContourModelInteractor::eps, timeStep);
+    }
+  }
+
+  if (isVertexSelected)
   {
     contour->SetSelectedVertexAsControlPoint();
     mitk::RenderingManager::GetInstance()->RequestUpdate(interactionEvent->GetSender()->GetRenderWindow());
@@ -158,7 +181,4 @@ void mitk::ContourModelInteractor::OnMoveContour(StateMachineAction *, Interacti
 
 void mitk::ContourModelInteractor::OnFinishEditing(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  auto *contour = dynamic_cast<mitk::ContourModel *>(this->GetDataNode()->GetData());
-  contour->Deselect();
-  mitk::RenderingManager::GetInstance()->RequestUpdate(interactionEvent->GetSender()->GetRenderWindow());
 }

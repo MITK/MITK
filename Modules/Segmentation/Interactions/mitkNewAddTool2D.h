@@ -10,11 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkLiveWireTool2D_h
-#define mitkLiveWireTool2D_h
+#ifndef mitkNewAddTool2D_h
+#define mitkNewAddTool2D_h
 
-#include <mitkEditableContourTool.h>
-#include <mitkContourModelLiveWireInteractor.h>
+#include "mitkEditableContourTool.h"
+#include "mitkContourTool.h"
+#include "mitkContourModelInteractor.h"
 
 namespace mitk
 {
@@ -41,10 +42,10 @@ namespace mitk
 
     \warning Only to be instantiated by mitk::ToolManager.
   */
-  class MITKSEGMENTATION_EXPORT LiveWireTool2D : public EditableContourTool
+  class MITKSEGMENTATION_EXPORT NewAddTool2D : public EditableContourTool
   {
   public:
-    mitkClassMacro(LiveWireTool2D, SegTool2D);
+    mitkClassMacro(NewAddTool2D, SegTool2D);
     itkFactorylessNewMacro(Self);
 
     us::ModuleResource GetCursorIconResource() const override;
@@ -52,16 +53,11 @@ namespace mitk
     const char *GetName() const override;
     const char **GetXPM() const override;
 
-    void SetSnapClosureContour(bool snap);
-
   protected:
-    LiveWireTool2D();
-    ~LiveWireTool2D() override;
+    NewAddTool2D();
+    ~NewAddTool2D() override;
 
     void ConnectActionsAndFunctions() override;
-
-    void UpdateLiveWireContour();
-    void OnTimePointChanged() override;
 
   private:
     /// \brief Initialize tool.
@@ -70,20 +66,11 @@ namespace mitk
     /// \brief Add a control point and finish current segment.
     void OnAddPoint(StateMachineAction *, InteractionEvent *interactionEvent) override;
 
-    /// \brief Actual LiveWire computation.
+    /// \brief Actual contour computation.
     void OnMouseMoved(StateMachineAction *, InteractionEvent *interactionEvent) override;
 
-    /// \brief Check double click on first control point to finish the LiveWire tool.
-    bool OnCheckPoint(const InteractionEvent *interactionEvent) override;
-
-    /// \brief Finish LiveWire tool.
+    /// \brief Finish contour tool.
     void OnFinish(StateMachineAction *, InteractionEvent *interactionEvent) override;
-
-    /// \brief Close the contour.
-    void OnLastSegmentDelete(StateMachineAction *, InteractionEvent *interactionEvent) override;
-
-    /// \brief Don't use dynamic cost map for LiveWire calculation.
-    void OnMouseMoveNoDynamicCosts(StateMachineAction *, InteractionEvent *interactionEvent) override;
 
     /// \brief Finish contour interaction.
     void FinishTool() override;
@@ -91,24 +78,9 @@ namespace mitk
     void EnableContourInteraction(bool on) override;
 
     void ReleaseInteractors() override;
-
-    template <typename TPixel, unsigned int VImageDimension>
-    void FindHighestGradientMagnitudeByITK(itk::Image<TPixel, VImageDimension> *inputImage,
-                                           itk::Index<3> &index,
-                                           itk::Index<3> &returnIndex);
-
-    void UpdateClosureContour(mitk::Point3D endpoint) override;
-
-    bool m_SnapClosureContour;
-
-    mitk::ContourModelLiveWireInteractor::Pointer m_ContourInteractor;
-
-    mitk::ImageLiveWireContourModelFilter::Pointer m_LiveWireFilter;
-    mitk::ImageLiveWireContourModelFilter::Pointer m_LiveWireFilterClosure;
-
-    bool m_CreateAndUseDynamicCosts;
-
-    std::vector<mitk::ContourModelLiveWireInteractor::Pointer> m_LiveWireInteractors;
+  
+    mitk::ContourModelInteractor::Pointer m_ContourInteractor;
+    std::vector<mitk::ContourModelInteractor::Pointer> m_ContourInteractors;
   };
 }
 

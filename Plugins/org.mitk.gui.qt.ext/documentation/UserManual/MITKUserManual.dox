@@ -71,7 +71,7 @@ This dialog contains this help, the welcome screen and information about MITK.
 
 Once an image is loaded the levelwindow appears to the right hand side of the four window view. With this tool you can adjust the range of grey values displayed and the gradient between them. Moving the lower boundary up results in any pixels having a value lower than that boundary to be displayed as black. Lowering the upper boundary causes all pixels having a value higher than it to be displayed as white.
 
-The pixels with a value between the lower and upper boundary are displayed in different shades of grey. This way a smaller levelwindow results in higher contrasts while cutting of the information outside its range whereas a larger levelwindow displays more information at the cost of contrast and detail.
+The pixels with a value between the lower and upper boundary are displayed in different shades of grey. This way a smaller levelwindow results in higher contrasts while cutting of the information outside its range whereas a larger levelwindow displays more information with a higher detail level at the cost of contrast.
 
 You can pick the levelwindow with the mouse to move it up and down, while moving the mouse cursor to the left or right to change its size. Picking one of the boundaries with a left click allows you to change the size symmetrically. Holding CTRL and clicking a boundary adjusts only that value.
 

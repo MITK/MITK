@@ -48,7 +48,6 @@ void mitk::nnUNetTool::UpdateCleanUp()
 
 void mitk::nnUNetTool::RenderOutputBuffer()
 {
-  MITK_INFO << "inn RenderOutputBuffer";
   if (this->m_OutputBuffer != nullptr)
   {
     Superclass::SetNodeProperties(this->m_OutputBuffer);
@@ -75,18 +74,15 @@ void mitk::nnUNetTool::SetNodeProperties(LabelSetImage::Pointer segmentation)
   // This overriden method doesn't set node properties. Intentionally left out for setting later upon demand
   // in the `RenderOutputBuffer` method.
   this->m_OutputBuffer = segmentation;
-  MITK_INFO << "inn derived SetNodeProperties " << this->m_OutputBuffer.GetPointer();
 }
 
 mitk::LabelSetImage::Pointer mitk::nnUNetTool::GetOutputBuffer()
 {
-  MITK_INFO << "inn GetOutputBuffer " << this->m_OutputBuffer.GetPointer();
   return this->m_OutputBuffer;
 }
 
 void mitk::nnUNetTool::ClearOutputBuffer()
 {
-  MITK_INFO << "inn ClearOutputBuffer " << this->m_OutputBuffer.GetPointer();
   this->m_OutputBuffer = nullptr;
 }
 
@@ -143,7 +139,6 @@ namespace
 
 mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inputAtTimeStep, TimeStepType timeStep)
 {
-  MITK_INFO << "IN ComputeMLPreview " << timeStep;
   if (m_InputBuffer == inputAtTimeStep)
   {
     return m_OutputBuffer;
@@ -214,7 +209,6 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   }
   for (ModelParams &modelparam : m_ParamQ)
   {
-    MITK_INFO << "IN ComputeMLPreview Segmenting... ";
     outDir = IOUtil::CreateTemporaryDirectory("nnunet-out-XXXXXX", this->GetMitkTempDir());
     outputImagePath = outDir + IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";
     modelparam.outputDir = outDir;
@@ -277,10 +271,6 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
 
     try
     {
-      // for (auto arg : args)
-      // {
-      //   MITK_INFO << arg;
-      // }
       std::string resultsFolderEnv = "RESULTS_FOLDER=" + this->GetModelDirectory();
       itksys::SystemTools::PutEnv(resultsFolderEnv.c_str());
       std::string cudaEnv = "CUDA_VISIBLE_DEVICES=" + std::to_string(this->GetGpuId());
@@ -318,15 +308,11 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
       args.push_back("-pp");
       args.push_back(this->GetPostProcessingJsonDirectory());
     }
-    for (auto arg : args)
-    {
-      MITK_INFO << arg;
-    }
+
     spExec->Execute(this->GetPythonPath(), command, args);
   }
   try
   {
-    //outputImagePath = "/Users/ashis/DKFZ/nnUNet/nnUNet/out_dir/heart_single/la_000.nii.gz";
     LabelSetImage::Pointer resultImage = LabelSetImage::New();
     Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
     resultImage->InitializeByLabeledImage(outputImage);

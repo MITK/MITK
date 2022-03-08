@@ -142,7 +142,12 @@ protected:
 
 private:
 
+  /**
+   * @brief Inserts the hash and segmentation into cache and
+   * updates count on UI.
+   */
   void addToCache(size_t&, mitk::LabelSetImage::ConstPointer);
+  
   /**
    * @brief Checks all the entries of the ctkCheckableComboBox ui widget.
    * This feature is not present in ctkCheckableComboBox API.

@@ -143,11 +143,11 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
       {
         nnUNetDirectory = m_Controls.codedirectoryBox->directory().toStdString();
       }
-      // else if (!IsNNUNetInstalled(pythonPath))
-      // {
-      //   throw std::runtime_error("nnUNet is not detected in the selected python environment. Please select a valid "
-      //                            "python environment or install nnUNet.");
-      // }
+      else if (!IsNNUNetInstalled(pythonPath))
+      {
+        throw std::runtime_error("nnUNet is not detected in the selected python environment. Please select a valid "
+                                 "python environment or install nnUNet.");
+      }
 
       tool->SetnnUNetDirectory(nnUNetDirectory);
       tool->SetPythonPath(pythonPath.toStdString());

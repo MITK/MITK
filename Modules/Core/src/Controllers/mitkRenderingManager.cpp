@@ -295,16 +295,14 @@ namespace mitk
     this->InitializeViews(boundingGeometry);
   }
 
-  bool RenderingManager::InitializeViews(const BaseGeometry *geometry, RequestType type,
-                                         bool resetCamera)
+  bool RenderingManager::InitializeViews(const BaseGeometry* geometry, RequestType type, bool resetCamera)
   {
     ProportionalTimeGeometry::Pointer propTimeGeometry = ProportionalTimeGeometry::New();
     propTimeGeometry->Initialize(dynamic_cast<BaseGeometry *>(geometry->Clone().GetPointer()), 1);
     return this->InitializeViews(propTimeGeometry, type, resetCamera);
   }
 
-  bool RenderingManager::InitializeViews(const TimeGeometry *geometry, RequestType type,
-                                         bool resetCamera)
+  bool RenderingManager::InitializeViews(const TimeGeometry* geometry, RequestType type, bool resetCamera)
   {
     bool boundingBoxInitialized = false;
 
@@ -372,16 +370,14 @@ namespace mitk
     return true;
   }
 
-  bool RenderingManager::InitializeView(vtkRenderWindow *renderWindow, const BaseGeometry *geometry,
-                                        bool initializeGlobalTime, bool resetCamera)
+  bool RenderingManager::InitializeView(vtkRenderWindow* renderWindow, const BaseGeometry* geometry, bool resetCamera)
   {
     ProportionalTimeGeometry::Pointer propTimeGeometry = ProportionalTimeGeometry::New();
-    propTimeGeometry->Initialize(dynamic_cast<BaseGeometry *>(geometry->Clone().GetPointer()), 1);
-    return this->InitializeView(renderWindow, propTimeGeometry, initializeGlobalTime, resetCamera);
+    propTimeGeometry->Initialize(dynamic_cast<BaseGeometry*>(geometry->Clone().GetPointer()), 1);
+    return this->InitializeView(renderWindow, propTimeGeometry, resetCamera);
   }
 
-  bool RenderingManager::InitializeView(vtkRenderWindow *renderWindow, const TimeGeometry *geometry,
-                                        bool initializeGlobalTime, bool resetCamera)
+  bool RenderingManager::InitializeView(vtkRenderWindow* renderWindow, const TimeGeometry* geometry, bool resetCamera)
   {
     bool boundingBoxInitialized = false;
 
@@ -395,13 +391,13 @@ namespace mitk
       mitkReThrow(exception);
     }
 
-    BaseRenderer *baseRenderer = BaseRenderer::GetInstance(renderWindow);
+    BaseRenderer* baseRenderer = BaseRenderer::GetInstance(renderWindow);
     baseRenderer->SetConstrainZoomingAndPanning(this->GetConstrainedPanningZooming());
 
     int id = baseRenderer->GetMapperID();
     this->InternalViewInitialization(baseRenderer, modifiedGeometry, boundingBoxInitialized, id, resetCamera);
 
-    if (boundingBoxInitialized && initializeGlobalTime)
+    if (boundingBoxInitialized)
     {
       this->GetTimeNavigationController()->SetInputWorldTimeGeometry(modifiedGeometry);
     }

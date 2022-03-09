@@ -10,25 +10,21 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkRenderingManager.h"
-#include "mitkBaseRenderer.h"
-#include "mitkCameraController.h"
-#include "mitkNodePredicateNot.h"
-#include "mitkNodePredicateProperty.h"
-#include "mitkProportionalTimeGeometry.h"
-#include "mitkRenderingManagerFactory.h"
+#include <mitkRenderingManager.h>
+#include <mitkRenderingManagerFactory.h>
+#include <mitkBaseRenderer.h>
+#include <mitkCameraController.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkProportionalTimeGeometry.h>
 
 #include <vtkCamera.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
 #include <vtkRendererCollection.h>
 
-#include "mitkNumericTypes.h"
 #include <itkCommand.h>
-#include <itkScalableAffineTransform.h>
 #include <mitkVtkPropRenderer.h>
-
-#include <algorithm>
 
 namespace mitk
 {
@@ -128,7 +124,7 @@ namespace mitk
       m_AllRenderWindows.push_back(renderWindow);
 
       if (m_DataStorage.IsNotNull())
-        mitk::BaseRenderer::GetInstance(renderWindow)->SetDataStorage(m_DataStorage.GetPointer());
+        BaseRenderer::GetInstance(renderWindow)->SetDataStorage(m_DataStorage.GetPointer());
 
       // Register vtkRenderWindow instance
       renderWindow->Register(nullptr);
@@ -241,7 +237,7 @@ namespace mitk
       // prepare the camera etc. before rendering
       // Note: this is a very important step which should be called before the VTK render!
       // If you modify the camera anywhere else or after the render call, the scene cannot be seen.
-      auto *vPR = dynamic_cast<mitk::VtkPropRenderer *>(mitk::BaseRenderer::GetInstance(renderWindow));
+      auto *vPR = dynamic_cast<VtkPropRenderer *>(BaseRenderer::GetInstance(renderWindow));
       if (vPR)
         vPR->PrepareRender();
       // Execute rendering
@@ -279,213 +275,167 @@ namespace mitk
     }
   }
 
-  void RenderingManager::InitializeViewsByBoundingObjects(const DataStorage *ds)
+  void RenderingManager::InitializeViewsByBoundingObjects(const DataStorage* dataStorage)
   {
-    if (!ds)
+    if (nullptr == dataStorage)
+    {
       return;
+    }
 
     // get all nodes that have not set "includeInBoundingBox" to false
-    mitk::NodePredicateNot::Pointer pred = mitk::NodePredicateNot::New(
-      mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false)));
+    auto pred = NodePredicateNot::New(NodePredicateProperty::New("includeInBoundingBox", BoolProperty::New(false)));
+    DataStorage::SetOfObjects::ConstPointer filteredNodes = dataStorage->GetSubset(pred);
 
-    mitk::DataStorage::SetOfObjects::ConstPointer rs = ds->GetSubset(pred);
-    // calculate bounding geometry of these nodes
-    auto bounds = ds->ComputeBoundingGeometry3D(rs, "visible");
+    TimeGeometry::ConstPointer boundingGeometry;
+    if (!filteredNodes->empty())
+    {
+      // calculate bounding geometry of these nodes
+      boundingGeometry = dataStorage->ComputeBoundingGeometry3D(filteredNodes, "visible");
+    }
 
     // initialize the views to the bounding geometry
-    this->InitializeViews(bounds);
+    this->InitializeViews(boundingGeometry);
   }
 
-  // TODO_GOETZ
-  // Remove old function, so only this one is working.
-  bool RenderingManager::InitializeViews(const BaseGeometry *dataGeometry,
-                                         RequestType type,
+  bool RenderingManager::InitializeViews(const BaseGeometry *geometry, RequestType type,
                                          bool resetCamera)
   {
     ProportionalTimeGeometry::Pointer propTimeGeometry = ProportionalTimeGeometry::New();
-    propTimeGeometry->Initialize(dynamic_cast<BaseGeometry *>(dataGeometry->Clone().GetPointer()), 1);
-    return InitializeViews(propTimeGeometry, type, resetCamera);
+    propTimeGeometry->Initialize(dynamic_cast<BaseGeometry *>(geometry->Clone().GetPointer()), 1);
+    return this->InitializeViews(propTimeGeometry, type, resetCamera);
   }
 
-  bool RenderingManager::InitializeViews(const TimeGeometry *dataGeometry,
-                                         RequestType type,
+  bool RenderingManager::InitializeViews(const TimeGeometry *geometry, RequestType type,
                                          bool resetCamera)
   {
-    MITK_DEBUG << "initializing views";
-
     bool boundingBoxInitialized = false;
 
-    TimeGeometry::ConstPointer timeGeometry = dataGeometry;
     TimeGeometry::Pointer modifiedGeometry = nullptr;
-    if (dataGeometry != nullptr)
+    try
     {
-      modifiedGeometry = dataGeometry->Clone();
+      boundingBoxInitialized = this->ExtendGeometryForBoundingBox(geometry, modifiedGeometry);
+    }
+    catch (Exception& exception)
+    {
+      mitkReThrow(exception);
     }
 
-    int warningLevel = vtkObject::GetGlobalWarningDisplay();
-    vtkObject::GlobalWarningDisplayOff();
-
-    if ((timeGeometry.IsNotNull()) &&
-        (timeGeometry->GetBoundingBoxInWorld()->GetDiagonalLength2() > mitk::eps))
+    RenderWindowVector allRenderWindows = this->GetAllRegisteredRenderWindows();
+    RenderWindowVector::const_iterator it;
+    for (it = allRenderWindows.cbegin(); it != allRenderWindows.cend(); ++it)
     {
-      boundingBoxInitialized = true;
-    }
-
-    if (timeGeometry.IsNotNull())
-    { // make sure bounding box has an extent bigger than zero in any direction
-      // clone the input geometry
-      // Old Geometry3D::Pointer modifiedGeometry = dynamic_cast<Geometry3D*>( dataGeometry->Clone().GetPointer() );
-      assert(modifiedGeometry.IsNotNull());
-      for (TimeStepType step = 0; step < modifiedGeometry->CountTimeSteps(); ++step)
-      {
-        BaseGeometry::BoundsArrayType newBounds = modifiedGeometry->GetGeometryForTimeStep(step)->GetBounds();
-        for (unsigned int dimension = 0; (2 * dimension) < newBounds.Size(); dimension++)
-        {
-          // check for equality but for an epsilon
-          if (Equal(newBounds[2 * dimension], newBounds[2 * dimension + 1]))
-          {
-            newBounds[2 * dimension + 1] += 1;
-            if (Equal(
-                  newBounds[2 * dimension],
-                  newBounds[2 * dimension + 1])) // newBounds will still be equal if values are beyond double precision
-            {
-              mitkThrow() << "One dimension of object data has zero length, please make sure you're not using numbers "
-                             "beyond double precision as coordinates.";
-            }
-          }
-        }
-        modifiedGeometry->GetGeometryForTimeStep(step)->SetBounds(newBounds);
-      }
-    }
-
-    timeGeometry = modifiedGeometry;
-    RenderWindowList::const_iterator it;
-    for (it = m_RenderWindowList.cbegin(); it != m_RenderWindowList.cend(); ++it)
-    {
-      mitk::BaseRenderer *baseRenderer = mitk::BaseRenderer::GetInstance(it->first);
-
-      baseRenderer->SetConstrainZoomingAndPanning(m_ConstrainedPanningZooming);
+      BaseRenderer *baseRenderer = BaseRenderer::GetInstance(*it);
+      baseRenderer->SetConstrainZoomingAndPanning(this->GetConstrainedPanningZooming());
 
       int id = baseRenderer->GetMapperID();
-      if (((type == REQUEST_UPDATE_ALL) || ((type == REQUEST_UPDATE_2DWINDOWS) && (id == 1)) ||
-           ((type == REQUEST_UPDATE_3DWINDOWS) && (id == 2))))
+      if ((type == REQUEST_UPDATE_ALL) ||
+        ((type == REQUEST_UPDATE_2DWINDOWS) && (id == 1)) ||
+        ((type == REQUEST_UPDATE_3DWINDOWS) && (id == 2)))
       {
-        this->InternalViewInitialization(baseRenderer, timeGeometry, boundingBoxInitialized, id, resetCamera);
+        this->InternalViewInitialization(baseRenderer, modifiedGeometry, boundingBoxInitialized, id, resetCamera);
       }
     }
 
     if (boundingBoxInitialized)
     {
-      m_TimeNavigationController->SetInputWorldTimeGeometry(timeGeometry);
+      this->GetTimeNavigationController()->SetInputWorldTimeGeometry(modifiedGeometry);
     }
-    m_TimeNavigationController->Update();
+    this->GetTimeNavigationController()->Update();
 
     this->RequestUpdateAll(type);
 
-    vtkObject::SetGlobalWarningDisplay(warningLevel);
-
-    // Inform listeners that views have been initialized
-    this->InvokeEvent(mitk::RenderingManagerViewsInitializedEvent());
+    // inform listeners that views have been initialized
+    this->InvokeEvent(RenderingManagerViewsInitializedEvent());
 
     return boundingBoxInitialized;
   }
 
   bool RenderingManager::InitializeViews(RequestType type)
   {
-    RenderWindowList::const_iterator it;
-    for (it = m_RenderWindowList.cbegin(); it != m_RenderWindowList.cend(); ++it)
+    const RenderWindowVector allRenderWindows = this->GetAllRegisteredRenderWindows();
+    RenderWindowVector::const_iterator it;
+    for (it = allRenderWindows.cbegin(); it != allRenderWindows.cend(); ++it)
     {
-      mitk::BaseRenderer *baseRenderer = mitk::BaseRenderer::GetInstance(it->first);
+      BaseRenderer *baseRenderer = BaseRenderer::GetInstance(*it);
       int id = baseRenderer->GetMapperID();
-      if ((type == REQUEST_UPDATE_ALL) || ((type == REQUEST_UPDATE_2DWINDOWS) && (id == 1)) ||
-          ((type == REQUEST_UPDATE_3DWINDOWS) && (id == 2)))
+      if ((type == REQUEST_UPDATE_ALL) ||
+        ((type == REQUEST_UPDATE_2DWINDOWS) && (id == 1)) ||
+        ((type == REQUEST_UPDATE_3DWINDOWS) && (id == 2)))
       {
-        mitk::SliceNavigationController *nc =
-
-          baseRenderer->GetSliceNavigationController();
-
-        // Re-initialize view direction
-        nc->SetViewDirectionToDefault();
-
-        // Update the SNC
-        nc->Update();
+        this->InternalViewInitialization(baseRenderer, nullptr, false, id, false);
       }
     }
 
     this->RequestUpdateAll(type);
 
+    // inform listeners that views have been initialized
+    this->InvokeEvent(RenderingManagerViewsInitializedEvent());
+
     return true;
   }
 
-  bool RenderingManager::InitializeView(vtkRenderWindow *renderWindow,
-                                        const BaseGeometry *geometry,
-                                        bool initializeGlobalTimeSNC,
-                                        bool resetCamera)
+  bool RenderingManager::InitializeView(vtkRenderWindow *renderWindow, const BaseGeometry *geometry,
+                                        bool initializeGlobalTime, bool resetCamera)
   {
     ProportionalTimeGeometry::Pointer propTimeGeometry = ProportionalTimeGeometry::New();
     propTimeGeometry->Initialize(dynamic_cast<BaseGeometry *>(geometry->Clone().GetPointer()), 1);
-    return InitializeView(renderWindow, propTimeGeometry, initializeGlobalTimeSNC, resetCamera);
+    return this->InitializeView(renderWindow, propTimeGeometry, initializeGlobalTime, resetCamera);
   }
 
-  bool RenderingManager::InitializeView(vtkRenderWindow *renderWindow,
-                                        const TimeGeometry *geometry,
-                                        bool initializeGlobalTimeSNC,
-                                        bool resetCamera)
+  bool RenderingManager::InitializeView(vtkRenderWindow *renderWindow, const TimeGeometry *geometry,
+                                        bool initializeGlobalTime, bool resetCamera)
   {
     bool boundingBoxInitialized = false;
 
-    int warningLevel = vtkObject::GetGlobalWarningDisplay();
-    vtkObject::GlobalWarningDisplayOff();
-
-    if ((geometry != nullptr) &&
-        (geometry->GetBoundingBoxInWorld()->GetDiagonalLength2() > mitk::eps))
+    TimeGeometry::Pointer modifiedGeometry = nullptr;
+    try
     {
-      boundingBoxInitialized = true;
+      boundingBoxInitialized = this->ExtendGeometryForBoundingBox(geometry, modifiedGeometry);
+    }
+    catch (Exception &exception)
+    {
+      mitkReThrow(exception);
     }
 
-    mitk::BaseRenderer *baseRenderer = mitk::BaseRenderer::GetInstance(renderWindow);
+    BaseRenderer *baseRenderer = BaseRenderer::GetInstance(renderWindow);
+    baseRenderer->SetConstrainZoomingAndPanning(this->GetConstrainedPanningZooming());
 
     int id = baseRenderer->GetMapperID();
+    this->InternalViewInitialization(baseRenderer, modifiedGeometry, boundingBoxInitialized, id, resetCamera);
 
-    this->InternalViewInitialization(baseRenderer, geometry, boundingBoxInitialized, id, resetCamera);
-
-    if (boundingBoxInitialized && initializeGlobalTimeSNC)
+    if (boundingBoxInitialized && initializeGlobalTime)
     {
-      m_TimeNavigationController->SetInputWorldTimeGeometry(geometry);
+      this->GetTimeNavigationController()->SetInputWorldTimeGeometry(modifiedGeometry);
     }
-    m_TimeNavigationController->Update();
+
+    this->GetTimeNavigationController()->Update();
 
     this->RequestUpdate(renderWindow);
 
-    vtkObject::SetGlobalWarningDisplay(warningLevel);
+    // inform listeners that views have been initialized
+    this->InvokeEvent(RenderingManagerViewsInitializedEvent());
 
     return boundingBoxInitialized;
   }
 
   bool RenderingManager::InitializeView(vtkRenderWindow *renderWindow)
   {
-    mitk::BaseRenderer *baseRenderer = mitk::BaseRenderer::GetInstance(renderWindow);
-
-    mitk::SliceNavigationController *nc = baseRenderer->GetSliceNavigationController();
-
-    // Re-initialize view direction
-    nc->SetViewDirectionToDefault();
-
-    // Update the SNC
-    nc->Update();
+    BaseRenderer *baseRenderer = BaseRenderer::GetInstance(renderWindow);
+    int id = baseRenderer->GetMapperID();
+    this->InternalViewInitialization(baseRenderer, nullptr, false, id, false);
 
     this->RequestUpdate(renderWindow);
+
+    // inform listeners that views have been initialized
+    this->InvokeEvent(RenderingManagerViewsInitializedEvent());
 
     return true;
   }
 
-  void RenderingManager::InternalViewInitialization(mitk::BaseRenderer *baseRenderer,
-                                                    const mitk::TimeGeometry *geometry,
-                                                    bool boundingBoxInitialized,
-                                                    int mapperID,
-                                                    bool resetCamera)
+  void RenderingManager::InternalViewInitialization(BaseRenderer *baseRenderer, const TimeGeometry *geometry,
+                                                    bool boundingBoxInitialized, int mapperID, bool resetCamera)
   {
-    mitk::SliceNavigationController *nc = baseRenderer->GetSliceNavigationController();
+    SliceNavigationController *nc = baseRenderer->GetSliceNavigationController();
 
     // Re-initialize view direction
     nc->SetViewDirectionToDefault();
@@ -514,6 +464,52 @@ namespace mitk
     {
       nc->Update();
     }
+  }
+
+  bool RenderingManager::ExtendGeometryForBoundingBox(const TimeGeometry *geometry,
+                                                            TimeGeometry::Pointer& modifiedGeometry)
+  {
+    bool boundingBoxInitialized = false;
+
+    if (nullptr == geometry)
+    {
+      return boundingBoxInitialized;
+    }
+
+    modifiedGeometry = geometry->Clone();
+    if (modifiedGeometry.IsNull())
+    {
+      return boundingBoxInitialized;
+    }
+
+    if (modifiedGeometry->GetBoundingBoxInWorld()->GetDiagonalLength2() > eps)
+    {
+      boundingBoxInitialized = true;
+    }
+
+    // make sure bounding box has an extent bigger than zero in any direction
+    for (TimeStepType step = 0; step < modifiedGeometry->CountTimeSteps(); ++step)
+    {
+      BaseGeometry::BoundsArrayType newBounds = modifiedGeometry->GetGeometryForTimeStep(step)->GetBounds();
+      for (unsigned int dimension = 0; (2 * dimension) < newBounds.Size(); dimension++)
+      {
+        // check for equality but for an epsilon
+        if (Equal(newBounds[2 * dimension], newBounds[2 * dimension + 1]))
+        {
+          newBounds[2 * dimension + 1] += 1;
+          if (Equal(
+            newBounds[2 * dimension],
+            newBounds[2 * dimension + 1])) // newBounds will still be equal if values are beyond double precision
+          {
+            mitkThrow() << "One dimension of object data has zero length, please make sure you're not using numbers "
+              "beyond double precision as coordinates.";
+          }
+        }
+      }
+      modifiedGeometry->GetGeometryForTimeStep(step)->SetBounds(newBounds);
+    }
+
+    return boundingBoxInitialized;
   }
 
   const SliceNavigationController *RenderingManager::GetTimeNavigationController() const
@@ -574,27 +570,29 @@ namespace mitk
   void RenderingManager::RenderingEndCallback(vtkObject *caller, unsigned long, void *, void *)
   {
     auto renderWindow = dynamic_cast<vtkRenderWindow*>(caller);
-
-    if (nullptr != renderWindow)
+    if (nullptr == renderWindow)
     {
-      auto renderer = BaseRenderer::GetInstance(renderWindow);
+      return;
+    }
 
-      if (nullptr != renderer)
+    auto renderer = BaseRenderer::GetInstance(renderWindow);
+    if (nullptr == renderer)
+    {
+      return;
+    }
+
+    auto renderingManager = RenderingManager::GetInstance();
+    renderingManager->m_RenderWindowList[renderer->GetRenderWindow()] = RENDERING_INACTIVE;
+
+    if (0 < renderer->GetNumberOfVisibleLODEnabledMappers())
+    {
+      if (0 == renderingManager->m_NextLODMap[renderer])
       {
-        auto renderingManager = RenderingManager::GetInstance();
-        renderingManager->m_RenderWindowList[renderer->GetRenderWindow()] = RENDERING_INACTIVE;
-
-        if (0 < renderer->GetNumberOfVisibleLODEnabledMappers())
-        {
-          if (0 == renderingManager->m_NextLODMap[renderer])
-          {
-            renderingManager->StartOrResetTimer();
-          }
-          else
-          {
-            renderingManager->m_NextLODMap[renderer] = 0;
-          }
-        }
+        renderingManager->StartOrResetTimer();
+      }
+      else
+      {
+        renderingManager->m_NextLODMap[renderer] = 0;
       }
     }
   }
@@ -721,12 +719,11 @@ namespace mitk
       RenderingManager::RenderWindowVector::const_iterator iter;
       for (iter = m_AllRenderWindows.cbegin(); iter < m_AllRenderWindows.cend(); ++iter)
       {
-        mitk::BaseRenderer::GetInstance((*iter))->SetDataStorage(m_DataStorage.GetPointer());
+        BaseRenderer::GetInstance((*iter))->SetDataStorage(m_DataStorage.GetPointer());
       }
     }
   }
 
-  mitk::DataStorage *RenderingManager::GetDataStorage() { return m_DataStorage; }
   void RenderingManager::SetRenderWindowFocus(vtkRenderWindow *focusWindow)
   {
     if (focusWindow != m_FocusedRenderWindow)
@@ -746,7 +743,7 @@ namespace mitk
   {
     if (m_AntiAliasing != antiAliasing)
     {
-      auto renderingManager = mitk::RenderingManager::GetInstance();
+      auto renderingManager = RenderingManager::GetInstance();
       auto renderWindows = renderingManager->GetAllRegisteredRenderWindows();
 
       for (auto renderWindow : renderWindows)

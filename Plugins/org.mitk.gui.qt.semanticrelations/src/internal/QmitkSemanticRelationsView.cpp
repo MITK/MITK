@@ -254,7 +254,7 @@ void QmitkSemanticRelationsView::OpenInEditor(const mitk::DataNode* dataNode)
   auto image = dynamic_cast<mitk::Image*>(dataNode->GetData());
   if (nullptr != image)
   {
-    mitk::RenderingManager::GetInstance()->InitializeViews(image->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true);
+    mitk::RenderingManager::GetInstance()->InitializeViews(image->GetTimeGeometry());
   }
 }
 

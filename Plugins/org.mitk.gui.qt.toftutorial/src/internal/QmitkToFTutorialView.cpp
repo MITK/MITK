@@ -158,7 +158,6 @@ void QmitkToFTutorialView::OnStep2()
       this->GetDataStorage()->Add(surfaceNode);
       // adjust views to new data in DataStorage
       mitk::RenderingManager::GetInstance()->InitializeViews(surface->GetGeometry());
-      mitk::RenderingManager::GetInstance()->InitializeViews(surface->GetGeometry());
     }
     else
     {

@@ -123,7 +123,7 @@ void mitk::NewAddTool2D::OnAddPoint(StateMachineAction *, InteractionEvent *inte
   mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
 }
 
-void mitk::NewAddTool2D::OnDrawing(StateMachineAction *s, InteractionEvent *interactionEvent)
+void mitk::NewAddTool2D::OnDrawing(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
   if (!positionEvent)
@@ -137,7 +137,7 @@ void mitk::NewAddTool2D::OnDrawing(StateMachineAction *s, InteractionEvent *inte
   mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
 }
 
-void mitk::NewAddTool2D::OnEndDrawing(StateMachineAction *s, InteractionEvent *interactionEvent)
+void mitk::NewAddTool2D::OnEndDrawing(StateMachineAction *, InteractionEvent *)
 {
   if (m_CurrentRestrictedArea->GetNumberOfVertices() > 1)
   {

@@ -26,7 +26,7 @@ namespace mitk
 }
 
 mitk::LiveWireTool2D::LiveWireTool2D()
-  : EditableContourTool("LiveWireTool"), m_SnapClosureContour(false), m_CreateAndUseDynamicCosts(false)
+  : EditableContourTool(), m_SnapClosureContour(false), m_CreateAndUseDynamicCosts(false)
 {
 }
 

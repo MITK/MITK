@@ -85,7 +85,7 @@ namespace mitk
     void OnFinish(StateMachineAction *, InteractionEvent *interactionEvent) override;
 
     /// \brief Don't use dynamic cost map for LiveWire calculation.
-    void OnMouseMoveNoDynamicCosts(StateMachineAction *, InteractionEvent *interactionEvent) override;
+    void OnMouseMoveNoDynamicCosts(StateMachineAction *, InteractionEvent *interactionEvent);
 
     /// \brief Finish contour interaction.
     void FinishTool() override;

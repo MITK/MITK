@@ -99,7 +99,7 @@ set(RESOURCE_FILES
   Wipe_Cursor_32x32.png
 
   Interactions/dummy.xml
-  Interactions/LiveWireTool.xml
+  Interactions/EditableContourTool.xml
   Interactions/PickingTool.xml
   Interactions/PressMoveRelease.xml
   Interactions/PressMoveReleaseAndPointSetting.xml

@@ -67,6 +67,7 @@ set(UI_FILES
 Qmitk/QmitkConfirmSegmentationDialog.ui
 Qmitk/QmitkOtsuToolWidgetControls.ui
 Qmitk/QmitkLiveWireTool2DGUIControls.ui
+Qmitk/QmitkNewAddTool2DGUIControls.ui
 Qmitk/QmitkSurfaceStampWidgetGUIControls.ui
 Qmitk/QmitkMaskStampWidgetGUIControls.ui
 Qmitk/QmitkSliceBasedInterpolatorWidgetGUIControls.ui

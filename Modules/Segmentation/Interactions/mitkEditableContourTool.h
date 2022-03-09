@@ -30,7 +30,7 @@ namespace mitk
     virtual void ClearSegmentation();
 
   protected:
-    EditableContourTool(const char *type);
+    EditableContourTool();
     ~EditableContourTool() override;
 
     void ConnectActionsAndFunctions() override;
@@ -49,17 +49,14 @@ namespace mitk
 
     virtual void OnEndDrawing(StateMachineAction *, InteractionEvent *interactionEvent) = 0;
 
-    /// \brief Actual LiveWire computation.
+    /// \brief Computation of the preview contour.
     virtual void OnMouseMoved(StateMachineAction *, InteractionEvent *interactionEvent) = 0;
 
-    /// \brief Check double click on first control point to finish the LiveWire tool.
+    /// \brief Check double click on first control point to finish the EditableContour tool.
     virtual bool OnCheckPoint(const InteractionEvent *interactionEvent);
 
-    /// \brief Finish LiveWire tool.
+    /// \brief Finish EditableContour tool.
     virtual void OnFinish(StateMachineAction *, InteractionEvent *interactionEvent);
-
-    /// \brief Don't use dynamic cost map for LiveWire calculation.
-    virtual void OnMouseMoveNoDynamicCosts(StateMachineAction *, InteractionEvent *interactionEvent);
 
     /// \brief Finish contour interaction.
     virtual void FinishTool();

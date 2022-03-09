@@ -20,7 +20,7 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-    \brief A 2D segmentation tool based on a LiveWire approach.
+    \brief A 2D segmentation tool to draw polygon structures.
 
     The contour between the last point and the current mouse position is
     computed by searching the shortest path according to specific features of
@@ -30,12 +30,8 @@ namespace mitk
     current time point. So the time step in which the contours will be stored as
     segmentations will be determined when the contours got confirmed. Then they
     will be transfered to the slices of the currently selected time step.
-    Changing the time point/time step while tool is active will updated the working
-    slice the live wire filter. So the behavior of the active live wire contour is
-    always WYSIWYG (What you see is what you get).
 
     \sa SegTool2D
-    \sa ImageLiveWireContourModelFilter
 
     \ingroup Interaction
     \ingroup ToolManagerEtAl

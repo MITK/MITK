@@ -14,7 +14,7 @@ found in the LICENSE file.
 #include <mitkToolManager.h>
 
 
-mitk::EditableContourTool::EditableContourTool(const char *type) : FeedbackContourTool(type) {}
+mitk::EditableContourTool::EditableContourTool() : FeedbackContourTool("EditableContourTool") {}
 
 mitk::EditableContourTool::~EditableContourTool()
 {
@@ -146,7 +146,7 @@ void mitk::EditableContourTool::OnInitContour(StateMachineAction *, InteractionE
   m_PreviewContour = this->CreateNewContour();
   m_PreviewContourNode = mitk::DataNode::New();
   m_PreviewContourNode->SetData(m_PreviewContour);
-  m_PreviewContourNode->SetName("active livewire node");
+  m_PreviewContourNode->SetName("active preview node");
   m_PreviewContourNode->SetProperty("layer", IntProperty::New(101));
   m_PreviewContourNode->AddProperty("fixedLayer", BoolProperty::New(true));
   m_PreviewContourNode->SetProperty("helper object", mitk::BoolProperty::New(true));
@@ -220,8 +220,6 @@ void mitk::EditableContourTool::OnFinish(StateMachineAction *, InteractionEvent 
   this->m_WorkingContours.emplace_back(std::make_pair(m_ContourNode, positionEvent->GetSender()->GetCurrentWorldPlaneGeometry()->Clone()));
   this->m_EditingContours.emplace_back(std::make_pair(m_EditingContourNode, positionEvent->GetSender()->GetCurrentWorldPlaneGeometry()->Clone()));
 }
-
-void mitk::EditableContourTool::OnMouseMoveNoDynamicCosts(StateMachineAction *, InteractionEvent *interactionEvent) {}
 
 void mitk::EditableContourTool::FinishTool() 
 {

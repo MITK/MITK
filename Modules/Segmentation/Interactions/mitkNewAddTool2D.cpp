@@ -24,7 +24,7 @@ namespace mitk
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, NewAddTool2D, "New Add tool");
 }
 
-mitk::NewAddTool2D::NewAddTool2D() : EditableContourTool("LiveWireTool") 
+mitk::NewAddTool2D::NewAddTool2D() : EditableContourTool()
 {
 }
 

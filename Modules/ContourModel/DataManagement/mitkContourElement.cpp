@@ -378,7 +378,6 @@ bool mitk::ContourElement::GetLineSegmentForPoint(const mitk::Point3D &point,
       closestDistance = distance;
       if (previousVertex)
       {
-        auto prod = p_v1 * v2_v1;
         previousVertex->Coordinates = (*it1)->Coordinates;
         previousVertex->IsControlPoint = (*it1)->IsControlPoint;
       }

@@ -39,6 +39,11 @@ mitk::ContourModelInteractor::~ContourModelInteractor()
 {
 }
 
+void mitk::ContourModelInteractor::SetRestrictedAreas(std::vector<mitk::ContourModel::Pointer> restrictedAreas)
+{
+  m_RestrictedAreas = restrictedAreas;
+}
+
 bool mitk::ContourModelInteractor::OnCheckPointClick(const InteractionEvent *interactionEvent)
 {
   const auto *positionEvent =
@@ -74,6 +79,18 @@ bool mitk::ContourModelInteractor::OnCheckPointClick(const InteractionEvent *int
       auto index = contour->GetIndex(previousVertexInList, timeStep);
       contour->InsertVertexAtIndex(click, index + 1, true, timeStep);
       isVertexSelected = contour->SelectVertexAt(click, mitk::ContourModelInteractor::eps, timeStep);
+    }
+  }
+
+  if (isVertexSelected)
+  {
+    auto foundVertex = contour->GetSelectedVertex();
+    for (auto restrictedArea : m_RestrictedAreas)
+    {
+      if (restrictedArea->SelectVertexAt(foundVertex->Coordinates, mitk::ContourModelInteractor::eps, timeStep))
+      {
+        isVertexSelected = false;
+      }
     }
   }
 

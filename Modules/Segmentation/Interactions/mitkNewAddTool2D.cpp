@@ -112,7 +112,7 @@ void mitk::NewAddTool2D::OnAddPoint(StateMachineAction *, InteractionEvent *inte
 
   m_Contour->AddVertex(positionEvent->GetPositionInWorld(), true);
 
-  std::for_each(m_PreviewContour->IteratorBegin(), m_PreviewContour->IteratorEnd(), [this](ContourElement::VertexType* vertex) 
+  std::for_each(m_PreviewContour->IteratorBegin(), m_PreviewContour->IteratorEnd(), [this](ContourElement::VertexType* vertex)
   {
     m_PreviewContour->RemoveVertex(vertex);
   });
@@ -121,6 +121,40 @@ void mitk::NewAddTool2D::OnAddPoint(StateMachineAction *, InteractionEvent *inte
   m_PreviewContour->Update();
 
   mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
+}
+
+void mitk::NewAddTool2D::OnDrawing(StateMachineAction *s, InteractionEvent *interactionEvent)
+{
+  auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+  if (!positionEvent)
+    return;
+
+  m_PreviewContour->AddVertex(positionEvent->GetPositionInWorld(), false);
+  UpdateClosureContour(positionEvent->GetPositionInWorld());
+  m_CurrentRestrictedArea->AddVertex(positionEvent->GetPositionInWorld());
+
+  assert(positionEvent->GetSender()->GetRenderWindow());
+  mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
+}
+
+void mitk::NewAddTool2D::OnEndDrawing(StateMachineAction *s, InteractionEvent *interactionEvent)
+{
+  if (m_CurrentRestrictedArea->GetNumberOfVertices() > 1)
+  {
+    auto restrictedArea = m_CurrentRestrictedArea->Clone();
+    m_RestrictedAreas.push_back(restrictedArea);
+    // Remove duplicate first vertex, it's already contained in m_Contour
+    m_PreviewContour->RemoveVertexAt(0);
+    // Set last point as control point
+    m_PreviewContour->SetControlVertexAt(m_PreviewContour->GetNumberOfVertices() - 1);
+    // Merge contours
+    m_Contour->Concatenate(m_PreviewContour);
+    std::for_each(m_PreviewContour->IteratorBegin(), m_PreviewContour->IteratorEnd(), [this](ContourElement::VertexType *vertex)
+    {
+      m_PreviewContour->RemoveVertex(vertex);
+    });
+  }
+  m_CurrentRestrictedArea = this->CreateNewContour();
 }
 
 void mitk::NewAddTool2D::OnMouseMoved(StateMachineAction *, InteractionEvent *interactionEvent) 
@@ -163,6 +197,7 @@ void mitk::NewAddTool2D::FinishTool()
   m_ContourInteractor->SetDataNode(m_ContourNode);
   m_ContourInteractor->LoadStateMachine("ContourModelModificationInteractor.xml", us::GetModuleContext()->GetModule());
   m_ContourInteractor->SetEventConfig("ContourModelModificationConfig.xml", us::GetModuleContext()->GetModule());
+  m_ContourInteractor->SetRestrictedAreas(this->m_RestrictedAreas);
 
   m_ContourNode->SetDataInteractor(m_ContourInteractor.GetPointer());
 

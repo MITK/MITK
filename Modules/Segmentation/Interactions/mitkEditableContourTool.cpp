@@ -26,6 +26,8 @@ void mitk::EditableContourTool::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("InitObject", OnInitContour);
   CONNECT_FUNCTION("AddPoint", OnAddPoint);
   CONNECT_FUNCTION("CtrlAddPoint", OnAddPoint);
+  CONNECT_FUNCTION("Drawing", OnDrawing);
+  CONNECT_FUNCTION("EndDrawing", OnEndDrawing);
   CONNECT_FUNCTION("FinishContour", OnFinish);
   CONNECT_FUNCTION("DeletePoint", OnLastSegmentDelete);
   CONNECT_FUNCTION("CtrlMovePoint", OnMouseMoved);
@@ -173,6 +175,8 @@ void mitk::EditableContourTool::OnInitContour(StateMachineAction *, InteractionE
   m_EditingContourNode->AddProperty("contour.points.color", ColorProperty::New(0.0f, 0.0f, 1.0f), nullptr, true);
   m_EditingContourNode->AddProperty("contour.width", mitk::FloatProperty::New(4.0f), nullptr, true);
 
+  m_CurrentRestrictedArea = this->CreateNewContour();
+
   auto dataStorage = this->GetToolManager()->GetDataStorage();
   dataStorage->Add(m_ContourNode, workingDataNode);
   dataStorage->Add(m_PreviewContourNode, workingDataNode);
@@ -189,6 +193,7 @@ void mitk::EditableContourTool::OnInitContour(StateMachineAction *, InteractionE
   // Remember PlaneGeometry to determine if events were triggered in the same plane
   m_PlaneGeometry = interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry();
 }
+
 
 bool mitk::EditableContourTool::OnCheckPoint(const InteractionEvent *interactionEvent)
 {
@@ -240,6 +245,7 @@ void mitk::EditableContourTool::ReleaseHelperObjects()
 
   m_EditingContours.clear();
   m_WorkingContours.clear();
+  m_RestrictedAreas.clear();
 
   m_EditingContourNode = nullptr;
   m_EditingContour = nullptr;
@@ -252,6 +258,8 @@ void mitk::EditableContourTool::ReleaseHelperObjects()
 
   m_ContourNode = nullptr;
   m_Contour = nullptr;
+
+  m_CurrentRestrictedArea = nullptr;
 }
 
 void mitk::EditableContourTool::RemoveHelperObjects() 

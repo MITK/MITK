@@ -5,7 +5,7 @@
       </transition>
     </state>
     <state name="Active" ID="2" >
-      <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="Active" >
+      <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="Drawing" >
         <action name="AddPoint" ID="10" />
       </transition>
       <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="Active" >
@@ -25,6 +25,14 @@
       </transition>
       <transition event_class="MousePressEvent" event_variant="CtrlPrimaryButtonPressed" target="Active" >
         <action name="CtrlAddPoint" ID="10" />
+      </transition>
+    </state>
+    <state name="Drawing" ID="3">
+      <transition event_class="MouseMoveEvent" event_variant="PrimaryButtonMoved" target="Drawing" >
+        <action name="Drawing"/>
+      </transition>
+      <transition event_class="MouseReleaseEvent" event_variant="PrimaryButtonReleased" target="Active" >
+        <action name="EndDrawing"/>
       </transition>
     </state>
   </statemachine>

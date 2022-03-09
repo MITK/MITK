@@ -70,6 +70,11 @@ namespace mitk
     /// \brief Add a control point and finish current segment.
     void OnAddPoint(StateMachineAction *, InteractionEvent *interactionEvent) override;
 
+    /// \brief Draw a contour according to the mouse movement when mouse button is pressed and mouse is moved.
+    void OnDrawing(StateMachineAction *, InteractionEvent *interactionEvent) override;
+
+    void OnEndDrawing(StateMachineAction *, InteractionEvent *interactionEvent) override;
+
     /// \brief Actual LiveWire computation.
     void OnMouseMoved(StateMachineAction *, InteractionEvent *interactionEvent) override;
 

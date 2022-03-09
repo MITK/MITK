@@ -92,6 +92,18 @@ bool mitk::ContourModelLiveWireInteractor::OnCheckPointClick(const InteractionEv
 
   if (isVertexSelected)
   {
+    auto foundVertex = contour->GetSelectedVertex();
+    for (auto restrictedArea : m_RestrictedAreas)
+    {
+      if (restrictedArea->SelectVertexAt(foundVertex->Coordinates, mitk::ContourModelInteractor::eps, timeStep))
+      {
+        isVertexSelected = false;
+      }
+    }
+  }
+
+  if (isVertexSelected)
+  {
     contour->SetSelectedVertexAsControlPoint(true);
     auto controlVertices = contour->GetControlVertices(timeStep);
     const mitk::ContourModel::VertexType *nextPoint = contour->GetNextControlVertexAt(click, mitk::ContourModelLiveWireInteractor::eps, timeStep);

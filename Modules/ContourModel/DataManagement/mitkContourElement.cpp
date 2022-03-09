@@ -104,7 +104,7 @@ void mitk::ContourElement::AddVertexAtFront(const mitk::Point3D &vertex, bool is
 
 void mitk::ContourElement::InsertVertexAtIndex(const mitk::Point3D &vertex, bool isControlPoint, VertexSizeType index)
 {
-  if (this->GetSize() > index)
+  if (this->GetSize() >= index)
   {
     auto _where = this->m_Vertices.begin();
     _where += index;

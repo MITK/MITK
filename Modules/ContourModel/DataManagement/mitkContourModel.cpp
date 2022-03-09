@@ -128,7 +128,7 @@ void mitk::ContourModel::InsertVertexAtIndex(const Point3D &vertex, int index, b
 {
   if (!this->IsEmptyTimeStep(timestep))
   {
-    if (index >= 0 && this->m_ContourSeries[timestep]->GetSize() > ContourElement::VertexSizeType(index))
+    if (index >= 0 && this->m_ContourSeries[timestep]->GetSize() >= ContourElement::VertexSizeType(index))
     {
       this->m_ContourSeries[timestep]->InsertVertexAtIndex(vertex, isControlPoint, index);
       this->InvokeEvent(ContourModelSizeChangeEvent());

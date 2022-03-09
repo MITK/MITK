@@ -246,6 +246,36 @@ void mitk::LiveWireTool2D::OnAddPoint(StateMachineAction *, InteractionEvent *in
   mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
 }
 
+void mitk::LiveWireTool2D::OnDrawing(StateMachineAction *, InteractionEvent *interactionEvent)
+{
+  auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+  if (!positionEvent)
+    return;
+
+  m_PreviewContour->AddVertex(positionEvent->GetPositionInWorld());
+  m_LiveWireFilter->Update();
+
+  UpdateClosureContour(positionEvent->GetPositionInWorld());
+
+  m_CurrentRestrictedArea->AddVertex(positionEvent->GetPositionInWorld());
+
+  this->UpdateLiveWireContour();
+
+  assert(positionEvent->GetSender()->GetRenderWindow());
+  mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
+}
+
+void mitk::LiveWireTool2D::OnEndDrawing(StateMachineAction *s, InteractionEvent *interactionEvent)
+{
+  if (m_CurrentRestrictedArea->GetNumberOfVertices() > 1)
+  {
+    auto restrictedArea = m_CurrentRestrictedArea->Clone();
+    m_RestrictedAreas.push_back(restrictedArea);
+    OnAddPoint(s, interactionEvent);
+  }
+  m_CurrentRestrictedArea = this->CreateNewContour();
+}
+
 void mitk::LiveWireTool2D::OnMouseMoved(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   // Compute LiveWire segment from last control point to current mouse position
@@ -335,6 +365,7 @@ void mitk::LiveWireTool2D::FinishTool()
   m_ContourInteractor->SetEventConfig("ContourModelModificationConfig.xml", us::GetModuleContext()->GetModule());
   m_ContourInteractor->SetWorkingImage(this->m_ReferenceDataSlice);
   m_ContourInteractor->SetEditingContourModelNode(this->m_EditingContourNode);
+  m_ContourInteractor->SetRestrictedAreas(this->m_RestrictedAreas);
 
   m_ContourNode->SetDataInteractor(m_ContourInteractor.GetPointer());
 

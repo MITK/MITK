@@ -193,12 +193,6 @@ void mitk::EditableContourTool::OnInitContour(StateMachineAction *, InteractionE
   m_PlaneGeometry = interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry();
 }
 
-
-bool mitk::EditableContourTool::OnCheckPoint(const InteractionEvent *interactionEvent)
-{
-  return false;
-}
-
 void mitk::EditableContourTool::OnFinish(StateMachineAction *, InteractionEvent *interactionEvent) 
 {
   auto positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);

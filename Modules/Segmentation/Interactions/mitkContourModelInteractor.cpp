@@ -71,11 +71,11 @@ bool mitk::ContourModelInteractor::OnCheckPointClick(const InteractionEvent *int
     if (isHover)
     {
       auto lastVertex = *(contour->GetVertexList(timeStep).end() - 1);
-      mitk::ContourElement::VertexType *previousVertex =
-        &mitk::ContourElement::VertexType(lastVertex->Coordinates, lastVertex->IsControlPoint);
-      contour->GetLineSegmentForPoint(click, mitk::ContourModelInteractor::eps, timeStep, previousVertex);
+      mitk::ContourElement::VertexType previousVertex =
+        mitk::ContourElement::VertexType(lastVertex->Coordinates, lastVertex->IsControlPoint);
+      contour->GetLineSegmentForPoint(click, mitk::ContourModelInteractor::eps, timeStep, &previousVertex);
       auto previousVertexInList =
-        contour->GetVertexAt(previousVertex->Coordinates, mitk::ContourModelInteractor::eps, timeStep);
+        contour->GetVertexAt(previousVertex.Coordinates, mitk::ContourModelInteractor::eps, timeStep);
       auto index = contour->GetIndex(previousVertexInList, timeStep);
       contour->InsertVertexAtIndex(click, index + 1, true, timeStep);
       isVertexSelected = contour->SelectVertexAt(click, mitk::ContourModelInteractor::eps, timeStep);
@@ -196,6 +196,6 @@ void mitk::ContourModelInteractor::OnMoveContour(StateMachineAction *, Interacti
   mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
 }
 
-void mitk::ContourModelInteractor::OnFinishEditing(StateMachineAction *, InteractionEvent *interactionEvent)
+void mitk::ContourModelInteractor::OnFinishEditing(StateMachineAction *, InteractionEvent *)
 {
 }

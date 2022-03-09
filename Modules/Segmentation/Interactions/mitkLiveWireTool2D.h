@@ -79,7 +79,7 @@ namespace mitk
     void OnMouseMoved(StateMachineAction *, InteractionEvent *interactionEvent) override;
 
     /// \brief Check double click on first control point to finish the LiveWire tool.
-    bool OnCheckPoint(const InteractionEvent *interactionEvent) override;
+    bool OnCheckPoint(const InteractionEvent *interactionEvent);
 
     /// \brief Finish LiveWire tool.
     void OnFinish(StateMachineAction *, InteractionEvent *interactionEvent) override;

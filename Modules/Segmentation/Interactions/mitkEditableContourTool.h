@@ -52,9 +52,6 @@ namespace mitk
     /// \brief Computation of the preview contour.
     virtual void OnMouseMoved(StateMachineAction *, InteractionEvent *interactionEvent) = 0;
 
-    /// \brief Check double click on first control point to finish the EditableContour tool.
-    virtual bool OnCheckPoint(const InteractionEvent *interactionEvent);
-
     /// \brief Finish EditableContour tool.
     virtual void OnFinish(StateMachineAction *, InteractionEvent *interactionEvent);
 

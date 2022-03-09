@@ -11,12 +11,6 @@
       <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="Active" >
         <action name="MovePoint" ID="92" />
       </transition>
-      <transition event_class="InteractionKeyEvent" event_variant="KeyEscape" target="Active" >
-        <action name="DeletePoint" ID="120"/>
-      </transition>
-      <transition event_class="InteractionKeyEvent" event_variant="KeyDelete" target="Active" >
-        <action name="DeletePoint" ID="120"/>
-      </transition>
       <transition event_class="MouseDoubleClickEvent" event_variant="PrimaryButtonDoubleClick" target="Start" >
         <action name="FinishContour" ID="44" />
       </transition>

@@ -58,9 +58,6 @@ namespace mitk
     /// \brief Finish LiveWire tool.
     virtual void OnFinish(StateMachineAction *, InteractionEvent *interactionEvent);
 
-    /// \brief Close the contour.
-    virtual void OnLastSegmentDelete(StateMachineAction *, InteractionEvent *interactionEvent);
-
     /// \brief Don't use dynamic cost map for LiveWire calculation.
     virtual void OnMouseMoveNoDynamicCosts(StateMachineAction *, InteractionEvent *interactionEvent);
 

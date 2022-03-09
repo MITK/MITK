@@ -372,67 +372,6 @@ void mitk::LiveWireTool2D::FinishTool()
   this->m_LiveWireInteractors.push_back(m_ContourInteractor);
 }
 
-void mitk::LiveWireTool2D::OnLastSegmentDelete(StateMachineAction *, InteractionEvent *interactionEvent)
-{
-  // If last point of current contour will be removed go to start state and remove nodes
-  if (m_Contour->GetNumberOfVertices() <= 1)
-  {
-    auto dataStorage = this->GetToolManager()->GetDataStorage();
-
-    dataStorage->Remove(m_PreviewContourNode);
-    dataStorage->Remove(m_ContourNode);
-    dataStorage->Remove(m_EditingContourNode);
-
-    m_PreviewContour = this->CreateNewContour();
-    m_PreviewContourNode->SetData(m_PreviewContour);
-
-    m_Contour = this->CreateNewContour();
-    m_ContourNode->SetData(m_Contour);
-
-    this->ResetToStartState();
-  }
-  else // Remove last segment from contour and reset LiveWire contour
-  {
-    m_PreviewContour = this->CreateNewContour();
-    m_PreviewContourNode->SetData(m_PreviewContour);
-
-    auto newContour = this->CreateNewContour();
-
-    auto begin = m_Contour->IteratorBegin();
-
-    // Iterate from last point to next active point
-    auto newLast = m_Contour->IteratorBegin() + (m_Contour->GetNumberOfVertices() - 1);
-
-    // Go at least one down
-    if (newLast != begin)
-      --newLast;
-
-    // Search next active control point
-    while (newLast != begin && !((*newLast)->IsControlPoint))
-      --newLast;
-
-    // Set position of start point for LiveWire filter to coordinates of the new last point
-    m_LiveWireFilter->SetStartPoint((*newLast)->Coordinates);
-    //m_LiveWireFilterClosure->SetStartPoint((*newLast)->Coordinates);
-
-    auto it = m_Contour->IteratorBegin();
-
-    // Fll new Contour
-    while (it <= newLast)
-    {
-      newContour->AddVertex((*it)->Coordinates, (*it)->IsControlPoint);
-      ++it;
-    }
-
-    newContour->SetClosed(m_Contour->IsClosed());
-
-    m_ContourNode->SetData(newContour);
-    m_Contour = newContour;
-
-    mitk::RenderingManager::GetInstance()->RequestUpdate(interactionEvent->GetSender()->GetRenderWindow());
-  }
-}
-
 template <typename TPixel, unsigned int VImageDimension>
 void mitk::LiveWireTool2D::FindHighestGradientMagnitudeByITK(itk::Image<TPixel, VImageDimension> *inputImage,
                                                              itk::Index<3> &index,

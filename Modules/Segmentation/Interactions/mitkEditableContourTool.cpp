@@ -29,7 +29,6 @@ void mitk::EditableContourTool::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("Drawing", OnDrawing);
   CONNECT_FUNCTION("EndDrawing", OnEndDrawing);
   CONNECT_FUNCTION("FinishContour", OnFinish);
-  CONNECT_FUNCTION("DeletePoint", OnLastSegmentDelete);
   CONNECT_FUNCTION("CtrlMovePoint", OnMouseMoved);
 }
 
@@ -221,8 +220,6 @@ void mitk::EditableContourTool::OnFinish(StateMachineAction *, InteractionEvent 
   this->m_WorkingContours.emplace_back(std::make_pair(m_ContourNode, positionEvent->GetSender()->GetCurrentWorldPlaneGeometry()->Clone()));
   this->m_EditingContours.emplace_back(std::make_pair(m_EditingContourNode, positionEvent->GetSender()->GetCurrentWorldPlaneGeometry()->Clone()));
 }
-
-void mitk::EditableContourTool::OnLastSegmentDelete(StateMachineAction *, InteractionEvent *interactionEvent) {}
 
 void mitk::EditableContourTool::OnMouseMoveNoDynamicCosts(StateMachineAction *, InteractionEvent *interactionEvent) {}
 

@@ -137,7 +137,7 @@ namespace
   }
 } // namespace
 
-mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inputAtTimeStep, TimeStepType timeStep)
+mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inputAtTimeStep, TimeStepType /*timeStep*/)
 {
   if (m_InputBuffer == inputAtTimeStep)
   {

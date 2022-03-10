@@ -28,7 +28,7 @@ This dialogue allows you to change between the \ref MITKWorkbenchManualPage_Pers
 If you want to use certain \ref MITKWorkbenchManualPage_Views within a perspective the "Show View" menu allows to select a specific function that is opened and can be moved within the working areas according to your wishes.
 Be aware that not every view works with every perspective in a meaningful way.
 
-The Preferences dialogue allows you to adjust and save your general or and view-specific custom settings.
+The Preferences dialogue allows you to adjust and save your general and view-specific custom settings.
 
 \imageMacro{MITKUserManual_WindowDropdown.png,"Window dropdown menu",4.89}
 

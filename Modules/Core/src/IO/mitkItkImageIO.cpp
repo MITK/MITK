@@ -618,7 +618,7 @@ namespace mitk
         m_ImageIO->SetSpacing(i, spacing4D[i]);
         m_ImageIO->SetOrigin(i, origin4D[i]);
 
-        mitk::Vector3D mitkDirection;
+        mitk::Vector3D mitkDirection(0.0);
         mitkDirection.SetVnlVector(geometry->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(i).as_ref());
         itk::Vector<double, 4u> direction4D;
         direction4D[0] = mitkDirection[0];
@@ -635,7 +635,7 @@ namespace mitk
         {
           direction4D[3] = 0;
         }
-        vnl_vector<double> axisDirection(dimension, 0.0);
+        vnl_vector<double> axisDirection(dimension);
         for (unsigned int j = 0; j < dimension; j++)
         {
           axisDirection[j] = direction4D[j] / spacing4D[i];

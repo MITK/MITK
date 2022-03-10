@@ -56,6 +56,7 @@ namespace mitk
 
     using RealObjectType = SimpleDataObjectDecorator<RealType>;
     using PixelObjectType = SimpleDataObjectDecorator<PixelType>;
+    using ProcessObject = itk::ProcessObject;
 
     itkGetDecoratedOutputMacro(Minimum, PixelType);
     itkGetDecoratedOutputMacro(Maximum, PixelType);

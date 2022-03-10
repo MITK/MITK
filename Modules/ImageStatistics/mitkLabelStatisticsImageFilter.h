@@ -104,6 +104,7 @@ namespace mitk
       const std::unordered_map<LabelPixelType, RealType>& upperBounds);
 
     using LabelImageType = itk::Image<LabelPixelType, ImageDimension>;
+    using ProcessObject = itk::ProcessObject;
 
     itkSetInputMacro(LabelInput, LabelImageType);
     itkGetInputMacro(LabelInput, LabelImageType);

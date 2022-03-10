@@ -190,6 +190,10 @@ void mitk::ImageToIGTLMessageFilter::GenerateData()
       itk::ByteSwapper<double>::SwapRangeFromSystemToLittleEndian(
         (double*)out, num_scalars);
       break;
+    default:
+      MITK_ERROR << "Can not handle pixel component type "
+        << type.GetComponentType();
+      return;
     }
 
     //copy timestamp of mitk image

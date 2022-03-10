@@ -195,9 +195,9 @@ void mitk::ImageWriter::WriteByITK(mitk::Image *image, const std::string &fileNa
     imageIO->SetSpacing(i, spacing4D[i]);
     imageIO->SetOrigin(i, origin4D[i]);
 
-    mitk::Vector3D mitkDirection;
+    mitk::Vector3D mitkDirection(0.0);
     mitkDirection.SetVnlVector(
-      image->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(i));
+      image->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(i).as_ref());
     itk::Vector<double, 4u> direction4D;
     direction4D[0] = mitkDirection[0];
     direction4D[1] = mitkDirection[1];

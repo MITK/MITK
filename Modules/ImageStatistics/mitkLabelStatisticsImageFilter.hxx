@@ -15,6 +15,8 @@ found in the LICENSE file.
 
 #include "mitkLabelStatisticsImageFilter.h"
 
+#include <mitkHistogramStatisticsCalculator.h>
+
 #include <itkImageLinearConstIteratorWithIndex.h>
 #include <itkImageScanlineConstIterator.h>
 

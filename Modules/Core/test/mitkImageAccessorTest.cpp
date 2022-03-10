@@ -217,7 +217,7 @@ int mitkImageAccessorTest(int argc, char *argv[])
 
   // spawn threads
   for (size_t i = 0; i < noOfThreads; ++i)
-    threads[i].swap(std::thread(ThreadMethod, &threadData));
+    threads[i] = std::thread(ThreadMethod, &threadData);
 
   // terminate threads
   for (size_t i = 0; i < noOfThreads; ++i)

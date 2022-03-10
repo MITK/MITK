@@ -105,7 +105,7 @@ public:
   std::thread::id Start()
   {
     LoggingRunning = true;
-    Thread.swap(std::thread(this->ThreadStartTracking, this));
+    Thread = std::thread(this->ThreadStartTracking, this);
     return Thread.get_id();
   }
 

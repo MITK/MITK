@@ -172,7 +172,7 @@ namespace mitk
     typename itk::Image<TPixel, VImageDimension> *image, const TimeGeometry *timeGeometry, TimeStepType timeStep)
   {
     typedef typename itk::Image<TPixel, VImageDimension> ImageType;
-    typedef typename StatisticsImageFilter<ImageType> ImageStatisticsFilterType;
+    typedef typename mitk::StatisticsImageFilter<ImageType> ImageStatisticsFilterType;
     typedef typename itk::MinMaxImageFilterWithIndex<ImageType> MinMaxFilterType;
 
     // reset statistics container if exists
@@ -303,7 +303,6 @@ namespace mitk
     typedef LabelStatisticsImageFilter<ImageType> ImageStatisticsFilterType;
     typedef MaskUtilities<TPixel, VImageDimension> MaskUtilType;
     typedef typename itk::MinMaxLabelImageFilterWithIndex<ImageType, MaskType> MinMaxLabelFilterType;
-    typedef typename ImageType::PixelType InputImgPixelType;
 
     // workaround: if m_SecondaryMaskGenerator ist not null but m_MaskGenerator is! (this is the case if we request a
     // 'ignore zuero valued pixels' mask in the gui but do not define a primary mask)

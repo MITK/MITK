@@ -76,7 +76,6 @@ private:
 public:
   void setUp() override
   {
-    mitk::TimeBounds bounds;
     m_Geometry1 = mitk::Geometry3D::New();
     m_Geometry2 = mitk::Geometry3D::New();
     m_Geometry3 = mitk::Geometry3D::New();

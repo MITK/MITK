@@ -635,7 +635,7 @@ namespace mitk
         {
           direction4D[3] = 0;
         }
-        vnl_vector<double> axisDirection(dimension);
+        vnl_vector<double> axisDirection(dimension, 0.0);
         for (unsigned int j = 0; j < dimension; j++)
         {
           axisDirection[j] = direction4D[j] / spacing4D[i];

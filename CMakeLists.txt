@@ -797,9 +797,9 @@ if(NOT MSVC_VERSION)
     -Wstrict-null-sentinel
     #-Wold-style-cast
     #-Wsign-promo
-    -Wno-error=deprecated-copy
+    -Wno-deprecated-copy
     -Wno-array-bounds
-
+    -Wno-cast-function-type
     -fdiagnostics-show-option
     )
     mitkFunctionCheckCAndCXXCompilerFlags(${_flag} MITK_C_FLAGS MITK_CXX_FLAGS)

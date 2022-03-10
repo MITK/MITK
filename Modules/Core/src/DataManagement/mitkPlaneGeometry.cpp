@@ -317,9 +317,9 @@ namespace mitk
     if ( transform != nullptr )
     {
       origin = transform->TransformPoint( origin );
-      rightDV = transform->TransformVector( rightDV.as_ref() );
-      bottomDV = transform->TransformVector( bottomDV.as_ref() );
-      normal = transform->TransformVector( normal.as_ref() );
+      rightDV = transform->TransformVector( rightDV ).as_ref();
+      bottomDV = transform->TransformVector( bottomDV ).as_ref();
+      normal = transform->TransformVector( normal ).as_ref();
     }
 
     ScalarType bounds[6] = {0, width, 0, height, 0, 1};

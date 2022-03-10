@@ -214,7 +214,7 @@ namespace mitk
       nrrdWriter->SetOrigin(i,origin[i]);
 
       mitk::Vector3D direction;
-      direction.SetVnlVector(imageTemplate->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(i));
+      direction.SetVnlVector(imageTemplate->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(i).as_ref());
       vnl_vector< double > axisDirection(dimension);
 
       for(unsigned int j = 0; j < dimension; j++)

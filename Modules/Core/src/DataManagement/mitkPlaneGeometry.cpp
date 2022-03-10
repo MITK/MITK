@@ -317,9 +317,9 @@ namespace mitk
     if ( transform != nullptr )
     {
       origin = transform->TransformPoint( origin );
-      rightDV = transform->TransformVector( rightDV );
-      bottomDV = transform->TransformVector( bottomDV );
-      normal = transform->TransformVector( normal );
+      rightDV = transform->TransformVector( rightDV.as_ref() );
+      bottomDV = transform->TransformVector( bottomDV.as_ref() );
+      normal = transform->TransformVector( normal.as_ref() );
     }
 
     ScalarType bounds[6] = {0, width, 0, height, 0, 1};
@@ -327,9 +327,9 @@ namespace mitk
 
     AffineTransform3D::Pointer planeTransform = AffineTransform3D::New();
     Matrix3D matrix;
-    matrix.GetVnlMatrix().set_column(0, rightDV);
-    matrix.GetVnlMatrix().set_column(1, bottomDV);
-    matrix.GetVnlMatrix().set_column(2, normal);
+    matrix.GetVnlMatrix().set_column(0, rightDV.as_ref());
+    matrix.GetVnlMatrix().set_column(1, bottomDV.as_ref());
+    matrix.GetVnlMatrix().set_column(2, normal.as_ref());
     planeTransform->SetMatrix(matrix);
     planeTransform->SetOffset(this->GetIndexToWorldTransform()->GetOffset());
     this->SetIndexToWorldTransform(planeTransform);
@@ -623,14 +623,14 @@ namespace mitk
   Vector3D PlaneGeometry::GetNormal() const
   {
     Vector3D frontToBack;
-    frontToBack.SetVnlVector(this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2));
+    frontToBack.SetVnlVector(this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2).as_ref());
 
     return frontToBack;
   }
 
   VnlVector PlaneGeometry::GetNormalVnl() const
   {
-    return this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2);
+    return this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2).as_ref();
   }
 
   ScalarType PlaneGeometry::DistanceFromPlane(const Point3D &pt3d_mm) const { return fabs(SignedDistance(pt3d_mm)); }

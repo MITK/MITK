@@ -150,15 +150,15 @@ namespace mitk
       vnlmatrix = m_IndexToWorldTransform->GetMatrix().GetVnlMatrix();
 
       mitk::VnlVector col;
-      col = vnlmatrix.get_column(0);
+      col = vnlmatrix.get_column(0).as_ref();
       col.normalize();
       col *= aSpacing[0];
       vnlmatrix.set_column(0, col);
-      col = vnlmatrix.get_column(1);
+      col = vnlmatrix.get_column(1).as_ref();
       col.normalize();
       col *= aSpacing[1];
       vnlmatrix.set_column(1, col);
-      col = vnlmatrix.get_column(2);
+      col = vnlmatrix.get_column(2).as_ref();
       col.normalize();
       col *= aSpacing[2];
       vnlmatrix.set_column(2, col);

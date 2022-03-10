@@ -164,7 +164,7 @@ int testGetPlanePosition()
        !mitk::Equal(op->GetSpacing(), plane->GetSpacing()) ||
        !mitk::Equal(op->GetTransform()->GetOffset(), plane->GetIndexToWorldTransform()->GetOffset()) ||
        !mitk::Equal(op->GetDirectionVector().GetVnlVector(),
-                    plane->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2).normalize()) ||
+                    plane->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2).normalize().as_ref()) ||
        !mitk::MatrixEqualElementWise(op->GetTransform()->GetMatrix(), plane->GetIndexToWorldTransform()->GetMatrix()));
 
     if (error)
@@ -179,7 +179,7 @@ int testGetPlanePosition()
       MITK_INFO << "Op: " << op->GetDirectionVector()
                 << " plane: " << plane->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2) << "\n";
       MITK_TEST_CONDITION(mitk::Equal(op->GetDirectionVector().GetVnlVector(),
-                                      plane->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2)),
+                                      plane->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2).as_ref()),
                           "Checking for correct direction");
       MITK_TEST_CONDITION(
         mitk::MatrixEqualElementWise(op->GetTransform()->GetMatrix(), plane->GetIndexToWorldTransform()->GetMatrix()),

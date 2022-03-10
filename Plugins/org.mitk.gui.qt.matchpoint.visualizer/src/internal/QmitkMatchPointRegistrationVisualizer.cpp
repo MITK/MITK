@@ -333,9 +333,9 @@ void QmitkMatchPointRegistrationVisualizer::StoreStateInNode()
         mitk::Vector3D orientationRow1;
         mitk::Vector3D orientationRow2;
         mitk::Vector3D orientationRow3;
-        orientationRow1.SetVnlVector(m_FOVRefOrientation.GetVnlMatrix().get_row(0));
-        orientationRow2.SetVnlVector(m_FOVRefOrientation.GetVnlMatrix().get_row(1));
-        orientationRow3.SetVnlVector(m_FOVRefOrientation.GetVnlMatrix().get_row(2));
+        orientationRow1.SetVnlVector(m_FOVRefOrientation.GetVnlMatrix().get_row(0).as_ref());
+        orientationRow2.SetVnlVector(m_FOVRefOrientation.GetVnlMatrix().get_row(1).as_ref());
+        orientationRow3.SetVnlVector(m_FOVRefOrientation.GetVnlMatrix().get_row(2).as_ref());
         this->m_spSelectedRegNode->SetProperty(mitk::nodeProp_RegVisFOVOrientation1,
             mitk::Vector3DProperty::New(orientationRow1));
         this->m_spSelectedRegNode->SetProperty(mitk::nodeProp_RegVisFOVOrientation2,

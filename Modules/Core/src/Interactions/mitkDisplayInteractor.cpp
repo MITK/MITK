@@ -633,7 +633,7 @@ void mitk::DisplayInteractor::Rotate(mitk::StateMachineAction *, mitk::Interacti
   // cross product: | A x B | = |A| * |B| * sin(angle)
   Vector3D axisOfRotation;
   vnl_vector_fixed<ScalarType, 3> vnlDirection = vnl_cross_3d(toCursor.GetVnlVector(), toProjected.GetVnlVector());
-  axisOfRotation.SetVnlVector(vnlDirection);
+  axisOfRotation.SetVnlVector(vnlDirection.as_ref());
 
   // scalar product: A * B = |A| * |B| * cos(angle)
   // tan = sin / cos

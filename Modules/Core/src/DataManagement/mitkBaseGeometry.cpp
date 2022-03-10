@@ -219,7 +219,7 @@ void mitk::BaseGeometry::_SetSpacing(const mitk::Vector3D &aSpacing, bool enforc
 mitk::Vector3D mitk::BaseGeometry::GetAxisVector(unsigned int direction) const
 {
   Vector3D frontToBack;
-  frontToBack.SetVnlVector(this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(direction));
+  frontToBack.SetVnlVector(this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(direction).as_ref());
   frontToBack *= GetExtent(direction);
   return frontToBack;
 }
@@ -249,9 +249,9 @@ bool mitk::BaseGeometry::Is2DConvertable()
       break;
     }
     mitk::Vector3D col0, col1, col2;
-    col0.SetVnlVector(this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(0));
-    col1.SetVnlVector(this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(1));
-    col2.SetVnlVector(this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2));
+    col0.SetVnlVector(this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(0).as_ref());
+    col1.SetVnlVector(this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(1).as_ref());
+    col2.SetVnlVector(this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2).as_ref());
 
     if ((col0[2] != 0) || (col1[2] != 0) || (col2[0] != 0) || (col2[1] != 0) || (col2[2] != 1))
     {
@@ -614,7 +614,7 @@ void mitk::BaseGeometry::ExecuteOperation(Operation *operation)
 
 mitk::VnlVector mitk::BaseGeometry::GetMatrixColumn(unsigned int direction) const
 {
-  return this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(direction);
+  return this->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(direction).as_ref();
 }
 
 mitk::BoundingBox::Pointer mitk::BaseGeometry::CalculateBoundingBoxRelativeToTransform(

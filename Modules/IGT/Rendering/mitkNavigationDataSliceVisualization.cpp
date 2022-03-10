@@ -84,7 +84,7 @@ void mitk::NavigationDataSliceVisualization::GenerateData()
     NavigationData::OrientationType orientation = this->GetInput()->GetOrientation();
 
     Vector3D transformedTipOffset;
-    transformedTipOffset.SetVnlVector(orientation.rotate(m_TipOffset.GetVnlVector()));
+    transformedTipOffset.SetVnlVector(orientation.rotate(m_TipOffset.GetVnlVector()).as_ref());
 
     slicePosition += transformedTipOffset;
 
@@ -117,7 +117,7 @@ void mitk::NavigationDataSliceVisualization::GenerateData()
       // NavigationData has passed through a NavigationDataTransformFilter to
       // convert it into world coordinate frame)
       Vector3D slicingPlaneYAxisVector;
-      slicingPlaneYAxisVector.SetVnlVector(orientation.rotate(m_ToolTrajectory.GetVnlVector()));
+      slicingPlaneYAxisVector.SetVnlVector(orientation.rotate(m_ToolTrajectory.GetVnlVector()).as_ref());
 
       // Project the tool trajectory onto the plane normal to x-axis of this
       // oblique slicing. This defines the y-axis ("up") of the oblique slicing
@@ -160,7 +160,7 @@ void mitk::NavigationDataSliceVisualization::GenerateData()
     else if (Oblique == m_ViewDirection)
     {
       Vector3D slicingPlaneNormalVector;
-      slicingPlaneNormalVector.SetVnlVector(orientation.rotate(m_ToolTrajectory.GetVnlVector()));
+      slicingPlaneNormalVector.SetVnlVector(orientation.rotate(m_ToolTrajectory.GetVnlVector()).as_ref());
 
       // The second column of the Index-to-World matrix is the positive y-axis
       // of the current slicing plane in world coordinates.

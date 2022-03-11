@@ -29,6 +29,8 @@ namespace itk
   MaskedStatisticsImageFilter< TInputImage, TMaskImage >
     ::MaskedStatisticsImageFilter():m_ThreadSum(1), m_SumOfSquares(1), m_Count(1), m_ThreadMin(1), m_ThreadMax(1)
   {
+    this->DynamicMultiThreadingOff();
+
     // first output is a copy of the image, DataObject created by
     // superclass
     //

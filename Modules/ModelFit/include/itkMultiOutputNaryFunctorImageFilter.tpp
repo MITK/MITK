@@ -26,6 +26,8 @@ namespace itk
   MultiOutputNaryFunctorImageFilter< TInputImage, TOutputImage, TFunction, TMaskImage >
     ::MultiOutputNaryFunctorImageFilter()
   {
+    this->DynamicMultiThreadingOff();
+
     // This number will be incremented each time an image
     // is added over the two minimum required
     this->SetNumberOfRequiredInputs(1);

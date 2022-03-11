@@ -39,6 +39,7 @@ StitchImageFilter< TInputImage, TOutputImage, TInterpolatorPrecisionType, TTrans
   m_UseReferenceImage( false ),
   m_StitchStrategy(StitchStrategy::Mean)
 {
+  this->DynamicMultiThreadingOff();
 
   m_Size.Fill( 0 );
   m_OutputStartIndex.Fill( 0 );

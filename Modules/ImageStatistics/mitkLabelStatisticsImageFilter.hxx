@@ -298,10 +298,6 @@ auto mitk::LabelStatisticsImageFilter<TInputImage>::MergeMap(MapType& map1, MapT
       auto& stats1 = iter1->second;
       auto& stats2 = elem2.second;
 
-      stats1.m_Count += stats2.m_Count;
-      stats1.m_Sum += stats2.m_Sum;
-      stats1.m_SumOfSquares += stats2.m_SumOfSquares;
-
       stats1.m_Min = std::min(stats1.m_Min, stats2.m_Min);
       stats1.m_Max = std::max(stats1.m_Max, stats2.m_Max);
 

@@ -444,7 +444,7 @@ namespace mitk
 
     vnl_matrix<mitk::ScalarType> vnlInverseRotation(3,3);
     // invert rotation
-    vnlInverseRotation = vnl_matrix_inverse<mitk::ScalarType>(vnlRotation.as_ref());
+    vnlInverseRotation = vnl_matrix_inverse<mitk::ScalarType>(vnlRotation.as_ref()).as_matrix();
 
     vnl_vector<mitk::ScalarType> vnlTranslation
         = this->GetPosition().GetVnlVector();

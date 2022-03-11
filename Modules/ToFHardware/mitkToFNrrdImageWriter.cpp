@@ -213,7 +213,7 @@ namespace mitk
       nrrdWriter->SetSpacing(i,spacing[i]);
       nrrdWriter->SetOrigin(i,origin[i]);
 
-      mitk::Vector3D direction;
+      mitk::Vector3D direction(0.0);
       direction.SetVnlVector(imageTemplate->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(i).as_ref());
       vnl_vector< double > axisDirection(dimension);
 

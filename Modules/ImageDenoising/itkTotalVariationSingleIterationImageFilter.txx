@@ -43,6 +43,7 @@ namespace itk
   template <class TInputImage, class TOutputImage>
   TotalVariationSingleIterationImageFilter<TInputImage, TOutputImage>::TotalVariationSingleIterationImageFilter()
   {
+    this->DynamicMultiThreadingOff();
     m_Lambda = 1.0;
     m_LocalVariation = LocalVariationImageType::New();
   }

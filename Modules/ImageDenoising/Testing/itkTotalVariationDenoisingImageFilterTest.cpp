@@ -151,8 +151,9 @@ int itkTotalVariationDenoisingImageFilterTest(int /*argc*/, char * /*argv*/ [])
       return EXIT_FAILURE;
     }
   }
-  catch (...)
+  catch (const itk::ExceptionObject& e)
   {
+    e.Print(std::cerr);
     return EXIT_FAILURE;
   }
 
@@ -173,8 +174,9 @@ int itkTotalVariationDenoisingImageFilterTest(int /*argc*/, char * /*argv*/ [])
       return EXIT_FAILURE;
     }
   }
-  catch (...)
+  catch (const itk::ExceptionObject& e)
   {
+    e.Print(std::cerr);
     return EXIT_FAILURE;
   }
 
@@ -195,8 +197,9 @@ int itkTotalVariationDenoisingImageFilterTest(int /*argc*/, char * /*argv*/ [])
       return EXIT_FAILURE;
     }
   }
-  catch (...)
+  catch (const itk::ExceptionObject& e)
   {
+    e.Print(std::cerr);
     return EXIT_FAILURE;
   }
 
@@ -218,8 +221,9 @@ int itkTotalVariationDenoisingImageFilterTest(int /*argc*/, char * /*argv*/ [])
       return EXIT_FAILURE;
     }
   }
-  catch (...)
+  catch (const itk::ExceptionObject& e)
   {
+    e.Print(std::cerr);
     return EXIT_FAILURE;
   }
 
@@ -240,8 +244,9 @@ int itkTotalVariationDenoisingImageFilterTest(int /*argc*/, char * /*argv*/ [])
       return EXIT_FAILURE;
     }
   }
-  catch (...)
+  catch (const itk::ExceptionObject& e)
   {
+    e.Print(std::cerr);
     return EXIT_FAILURE;
   }
 
@@ -262,8 +267,9 @@ int itkTotalVariationDenoisingImageFilterTest(int /*argc*/, char * /*argv*/ [])
       return EXIT_FAILURE;
     }
   }
-  catch (...)
+  catch (const itk::ExceptionObject& e)
   {
+    e.Print(std::cerr);
     return EXIT_FAILURE;
   }
 

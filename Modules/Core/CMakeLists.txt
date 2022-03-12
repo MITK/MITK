@@ -30,7 +30,7 @@ mitk_create_module(
       #ITK|Statistics+Transform
       VTK|FiltersTexture+FiltersParallel+ImagingStencil+ImagingMath+InteractionStyle+RenderingOpenGL2+RenderingVolumeOpenGL2+RenderingFreeType+RenderingLabel+InteractionWidgets+IOGeometry+IOXML
     PRIVATE
-      ITK|IOBioRad+IOBMP+IOBruker+IOCSV+IOGDCM+IOGE+IOGIPL+IOHDF5+IOIPL+IOJPEG+IOLSM+IOMesh+IOMeta+IOMINC+IOMRC+IONIFTI+IONRRD+IOPNG+IOSiemens+IOSpatialObjects+IOStimulate+IOTIFF+IOTransformBase+IOTransformHDF5+IOTransformInsightLegacy+IOTransformMatlab+IOVTK+IOXML
+      ITK|IOBioRad+IOBMP+IOBruker+IOCSV+IOGDCM+IOGE+IOGIPL+IOHDF5+IOIPL+IOJPEG+IOJPEG2000+IOLSM+IOMesh+IOMeta+IOMINC+IOMRC+IONIFTI+IONRRD+IOPNG+IOSiemens+IOSpatialObjects+IOStimulate+IOTIFF+IOTransformBase+IOTransformHDF5+IOTransformInsightLegacy+IOTransformMatlab+IOVTK+IOXML
       tinyxml2
       ${optional_private_package_depends}
   # Do not automatically create CppMicroServices initialization code.

@@ -195,7 +195,7 @@ void mitk::USIGTLDevice::GenerateData()
     return;
   }
 
-  m_ImageMutex->Lock();
+  m_ImageMutex.lock();
   auto& image = m_ImageVector[0];
   if (image.IsNotNull() && image->IsInitialized() && m_CurrentProbe.IsNotNull())
   {
@@ -203,5 +203,5 @@ void mitk::USIGTLDevice::GenerateData()
     image->GetGeometry()->SetSpacing(m_CurrentProbe->GetSpacingForGivenDepth(m_CurrentProbe->GetCurrentDepth()));
     this->GetOutput(0)->SetGeometry(image->GetGeometry());
   }
-  m_ImageMutex->Unlock();
+  m_ImageMutex.unlock();
 }

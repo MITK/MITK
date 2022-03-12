@@ -109,7 +109,7 @@ int itkMultiOutputNaryFunctorImageFilterTest(int  /*argc*/, char*[] /*argv[]*/)
   testFilter->SetInput(1,img2);
   testFilter->SetInput(2,img3);
 
-  testFilter->SetNumberOfThreads(2);
+  testFilter->SetNumberOfWorkUnits(2);
 
   testFilter->Update();
 

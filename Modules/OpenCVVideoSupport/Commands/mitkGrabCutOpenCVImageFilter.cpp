@@ -14,11 +14,6 @@ found in the LICENSE file.
 #include "mitkGrabCutOpenCVImageFilter.h"
 #include "mitkPointSet.h"
 
-// itk headers
-#include "itkMultiThreader.h"
-#include "itkFastMutexLock.h"
-#include "itkConditionVariable.h"
-
 #include <opencv2/imgproc.hpp>
 
 // This is a magic number defined in "grabcut.cpp" of OpenCV.
@@ -33,22 +28,18 @@ mitk::GrabCutOpenCVImageFilter::GrabCutOpenCVImageFilter()
     m_CurrentProcessImageNum(0),
     m_InputImageId(AbstractOpenCVImageFilter::INVALID_IMAGE_ID),
     m_ResultImageId(AbstractOpenCVImageFilter::INVALID_IMAGE_ID),
-    m_ThreadId(-1), m_StopThread(false),
-    m_MultiThreader(itk::MultiThreader::New()),
-    m_WorkerBarrier(itk::ConditionVariable::New()),
-    m_ImageMutex(itk::FastMutexLock::New()),
-    m_ResultMutex(itk::FastMutexLock::New()),
-    m_PointSetsMutex(itk::FastMutexLock::New())
+    m_StopThread(false)
 {
-  m_ThreadId = m_MultiThreader->SpawnThread(this->SegmentationWorker, this);
+  m_Thread = std::thread(&GrabCutOpenCVImageFilter::SegmentationWorker, this);
 }
 
 mitk::GrabCutOpenCVImageFilter::~GrabCutOpenCVImageFilter()
 {
   // terminate worker thread on destruction
   m_StopThread = true;
-  m_WorkerBarrier->Broadcast();
-  if ( m_ThreadId >= 0) { m_MultiThreader->TerminateThread(m_ThreadId); }
+  m_WorkerBarrier.notify_all();
+  if (m_Thread.joinable())
+    m_Thread.detach();
 }
 
 bool mitk::GrabCutOpenCVImageFilter::OnFilterImage( cv::Mat& image )
@@ -69,46 +60,46 @@ bool mitk::GrabCutOpenCVImageFilter::OnFilterImage( cv::Mat& image )
 
   // set image as the current input image, guarded by
   // a mutex as the worker thread reads this imagr
-  m_ImageMutex->Lock();
+  m_ImageMutex.lock();
   m_InputImage = image.clone();
   m_InputImageId = this->GetCurrentImageId();
-  m_ImageMutex->Unlock();
+  m_ImageMutex.unlock();
 
   // wake up the worker thread if there was an image set
   // and foreground model points are available
-  if ( ! m_ForegroundPoints.empty()) { m_WorkerBarrier->Broadcast(); }
+  if ( ! m_ForegroundPoints.empty()) { m_WorkerBarrier.notify_all(); }
 
   return true;
 }
 
 void mitk::GrabCutOpenCVImageFilter::SetModelPoints(ModelPointsList foregroundPoints)
 {
-  m_PointSetsMutex->Lock();
+  m_PointSetsMutex.lock();
   m_ForegroundPoints = foregroundPoints;
-  m_PointSetsMutex->Unlock();
+  m_PointSetsMutex.unlock();
 }
 
 void mitk::GrabCutOpenCVImageFilter::SetModelPoints(ModelPointsList foregroundPoints, ModelPointsList backgroundPoints)
 {
-  m_PointSetsMutex->Lock();
+  m_PointSetsMutex.lock();
   m_BackgroundPoints = backgroundPoints;
   m_ForegroundPoints = foregroundPoints;
-  m_PointSetsMutex->Unlock();
+  m_PointSetsMutex.unlock();
 }
 
 void mitk::GrabCutOpenCVImageFilter::SetModelPoints(cv::Mat foregroundMask)
 {
-  m_PointSetsMutex->Lock();
+  m_PointSetsMutex.lock();
   m_ForegroundPoints = this->ConvertMaskToModelPointsList(foregroundMask);
-  m_PointSetsMutex->Unlock();
+  m_PointSetsMutex.unlock();
 }
 
 void mitk::GrabCutOpenCVImageFilter::SetModelPoints(cv::Mat foregroundMask, cv::Mat backgroundMask)
 {
-  m_PointSetsMutex->Lock();
+  m_PointSetsMutex.lock();
   m_ForegroundPoints = this->ConvertMaskToModelPointsList(foregroundMask);
   m_BackgroundPoints = this->ConvertMaskToModelPointsList(backgroundMask);
-  m_PointSetsMutex->Unlock();
+  m_PointSetsMutex.unlock();
 }
 
 void mitk::GrabCutOpenCVImageFilter::SetModelPointsDilationSize(int modelPointsDilationSize)
@@ -148,9 +139,9 @@ cv::Mat mitk::GrabCutOpenCVImageFilter::GetResultMask()
 {
   cv::Mat result;
 
-  m_ResultMutex->Lock();
+  m_ResultMutex.lock();
   result = m_ResultMask.clone();
-  m_ResultMutex->Unlock();
+  m_ResultMutex.unlock();
 
   return result;
 }
@@ -235,9 +226,9 @@ cv::Mat mitk::GrabCutOpenCVImageFilter::GetMaskFromPointSets()
   cv::Mat mask(m_InputImage.size().height, m_InputImage.size().width, CV_8UC1, cv::GC_PR_BGD);
 
   // get foreground and background points (guarded by mutex)
-  m_PointSetsMutex->Lock();
+  m_PointSetsMutex.lock();
   ModelPointsList pointsLists[2] = {ModelPointsList(m_ForegroundPoints), ModelPointsList(m_BackgroundPoints)};
-  m_PointSetsMutex->Unlock();
+  m_PointSetsMutex.unlock();
 
   // define values for foreground and background pixels
   unsigned int pixelValues[2] = {cv::GC_FGD, cv::GC_BGD};
@@ -363,50 +354,38 @@ mitk::GrabCutOpenCVImageFilter::ModelPointsList mitk::GrabCutOpenCVImageFilter::
   return pointsVector;
 }
 
-ITK_THREAD_RETURN_TYPE mitk::GrabCutOpenCVImageFilter::SegmentationWorker(void* pInfoStruct)
+void mitk::GrabCutOpenCVImageFilter::SegmentationWorker()
 {
-  // extract this pointer from thread info structure
-  struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
-  mitk::GrabCutOpenCVImageFilter* thisObject = static_cast<mitk::GrabCutOpenCVImageFilter*>(pInfo->UserData);
-
-  itk::SimpleMutexLock mutex;
-  mutex.Lock();
+  std::mutex mutex;
+  std::unique_lock<std::mutex> lock(mutex);
 
   while (true)
   {
-    if (thisObject->m_StopThread) { break; }
+    m_WorkerBarrier.wait(lock, [this] { return !m_StopThread; });
 
-    thisObject->m_WorkerBarrier->Wait(&mutex);
+    m_ImageMutex.lock();
+    cv::Mat image = m_InputImage.clone();
+    int inputImageId = m_InputImageId;
+    m_ImageMutex.unlock();
 
-    if (thisObject->m_StopThread) { break; }
-
-    thisObject->m_ImageMutex->Lock();
-    cv::Mat image = thisObject->m_InputImage.clone();
-    int inputImageId = thisObject->m_InputImageId;
-    thisObject->m_ImageMutex->Unlock();
-
-    cv::Mat mask = thisObject->GetMaskFromPointSets();
+    cv::Mat mask = this->GetMaskFromPointSets();
 
     cv::Mat result;
-    if (thisObject->m_UseOnlyRegionAroundModelPoints)
+    if (m_UseOnlyRegionAroundModelPoints)
     {
       result = cv::Mat(mask.rows, mask.cols, mask.type(), 0.0);
-      thisObject->m_BoundingBox = thisObject->GetBoundingRectFromMask(mask);
-      thisObject->RunSegmentation(image(thisObject->m_BoundingBox), mask(thisObject->m_BoundingBox)).copyTo(result(thisObject->m_BoundingBox));
+      m_BoundingBox = this->GetBoundingRectFromMask(mask);
+      RunSegmentation(image(m_BoundingBox), mask(m_BoundingBox)).copyTo(result(m_BoundingBox));
     }
     else
     {
-      result = thisObject->RunSegmentation(image, mask);
+      result = this->RunSegmentation(image, mask);
     }
 
     // save result to member attribute
-    thisObject->m_ResultMutex->Lock();
-    thisObject->m_ResultMask = result;
-    thisObject->m_ResultImageId = inputImageId;
-    thisObject->m_ResultMutex->Unlock();
+    m_ResultMutex.lock();
+    m_ResultMask = result;
+    m_ResultImageId = inputImageId;
+    m_ResultMutex.unlock();
   }
-
-  mutex.Unlock();
-
-  return ITK_THREAD_RETURN_VALUE;
 }

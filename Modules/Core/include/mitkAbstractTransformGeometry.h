@@ -54,7 +54,7 @@ namespace mitk
       //## @brief Get the vtkAbstractTransform (stored in m_VtkAbstractTransform)
       virtual vtkAbstractTransform *GetVtkAbstractTransform() const;
 
-    unsigned long GetMTime() const override;
+    itk::ModifiedTimeType GetMTime() const override;
 
     //##Documentation
     //## @brief Get the rectangular area that is used for transformation by

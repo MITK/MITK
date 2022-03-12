@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "mitkDICOMTagScanner.h"
 
-itk::MutexLock::Pointer mitk::DICOMTagScanner::s_LocaleMutex = itk::MutexLock::New();
+std::mutex mitk::DICOMTagScanner::s_LocaleMutex;
 
 mitk::DICOMTagScanner::DICOMTagScanner()
 {
@@ -25,7 +25,7 @@ mitk::DICOMTagScanner::~DICOMTagScanner()
 
 void mitk::DICOMTagScanner::PushLocale() const
 {
-  s_LocaleMutex->Lock();
+  s_LocaleMutex.lock();
 
   std::string currentCLocale = setlocale(LC_NUMERIC, nullptr);
   m_ReplacedCLocales.push(currentCLocale);
@@ -36,12 +36,12 @@ void mitk::DICOMTagScanner::PushLocale() const
   std::locale l("C");
   std::cin.imbue(l);
 
-  s_LocaleMutex->Unlock();
+  s_LocaleMutex.unlock();
 }
 
 void mitk::DICOMTagScanner::PopLocale() const
 {
-  s_LocaleMutex->Lock();
+  s_LocaleMutex.lock();
 
   if (!m_ReplacedCLocales.empty())
   {
@@ -63,7 +63,7 @@ void mitk::DICOMTagScanner::PopLocale() const
     MITK_WARN << "Mismatched PopLocale on DICOMITKSeriesGDCMReader.";
   }
 
-  s_LocaleMutex->Unlock();
+  s_LocaleMutex.unlock();
 }
 
 std::string mitk::DICOMTagScanner::GetActiveLocale()

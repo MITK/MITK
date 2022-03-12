@@ -15,8 +15,6 @@ found in the LICENSE file.
 
 #include <mitkNavigationDataPlayerBase.h>
 
-#include <itkMultiThreader.h>
-
 namespace mitk {
   /**Documentation
   * \brief This class is used to play recorded (see mitkNavigationDataRecorder class) NavigationDataSets.

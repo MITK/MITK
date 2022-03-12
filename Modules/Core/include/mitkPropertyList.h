@@ -223,7 +223,7 @@ namespace mitk
      * @brief Get the timestamp of the last change of the map or the last change of one of
      * the properties store in the list (whichever is later).
      */
-    unsigned long GetMTime() const override;
+    itk::ModifiedTimeType GetMTime() const override;
 
     /**
      * @brief Remove a property from the list/map.

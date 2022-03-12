@@ -69,7 +69,7 @@ void MinMaxImageFilterWithIndex< TInputImage >::ThreadedGenerateData(const Regio
 template< typename TInputImage >
 void MinMaxImageFilterWithIndex< TInputImage >::BeforeThreadedGenerateData()
 {
-  ThreadIdType numberOfThreads = this->GetNumberOfThreads();
+  ThreadIdType numberOfThreads = this->GetNumberOfWorkUnits();
   m_ThreadMin.resize(numberOfThreads);
   m_ThreadMax.resize(numberOfThreads);
   m_ThreadMinIndex.resize(numberOfThreads);
@@ -89,7 +89,7 @@ void MinMaxImageFilterWithIndex< TInputImage >::BeforeThreadedGenerateData()
 template< typename TInputImage >
 void MinMaxImageFilterWithIndex< TInputImage >::AfterThreadedGenerateData()
 {
-  ThreadIdType numberOfThreads = this->GetNumberOfThreads();
+  ThreadIdType numberOfThreads = this->GetNumberOfWorkUnits();
 
   for (ThreadIdType i = 0; i < numberOfThreads; i++)
   {

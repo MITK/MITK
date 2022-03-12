@@ -21,10 +21,10 @@ namespace mitk
 {
 ////create events for interactions
 #pragma GCC visibility push(default)
-  itkEventMacro(AffineInteractionEvent, itk::AnyEvent);
-  itkEventMacro(ScaleEvent, AffineInteractionEvent);
-  itkEventMacro(RotateEvent, AffineInteractionEvent);
-  itkEventMacro(TranslateEvent, AffineInteractionEvent);
+  itkEventMacroDeclaration(AffineInteractionEvent, itk::AnyEvent);
+  itkEventMacroDeclaration(ScaleEvent, AffineInteractionEvent);
+  itkEventMacroDeclaration(RotateEvent, AffineInteractionEvent);
+  itkEventMacroDeclaration(TranslateEvent, AffineInteractionEvent);
 #pragma GCC visibility pop
 
   /**

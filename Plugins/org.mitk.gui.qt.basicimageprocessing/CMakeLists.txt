@@ -4,4 +4,5 @@ mitk_create_plugin(
   EXPORT_DIRECTIVE BASICIMAGEPROCESSING_EXPORT
   EXPORTED_INCLUDE_SUFFIXES src
   MODULE_DEPENDS MitkQtWidgetsExt MitkMapperExt MitkImageDenoising
+  PACKAGE_DEPENDS ITK|MathematicalMorphology+Smoothing
 )

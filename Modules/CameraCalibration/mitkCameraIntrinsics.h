@@ -17,12 +17,13 @@ found in the LICENSE file.
 #include <mitkCommon.h>
 #include <mitkNumericTypes.h>
 #include <itkDataObject.h>
-#include <itkFastMutexLock.h>
 #include <vnl/vnl_matrix_fixed.h>
 #include "mitkXMLSerializable.h"
 #include <MitkCameraCalibrationExports.h>
 
 #include "opencv2/core.hpp"
+
+#include <mutex>
 
 int mitkCameraIntrinsicsTest(int, char* []);
 
@@ -126,7 +127,7 @@ namespace mitk
     cv::Mat m_CameraMatrix;
     cv::Mat m_DistorsionCoeffs;
     bool m_Valid;
-    itk::FastMutexLock::Pointer m_Mutex;
+    mutable std::mutex m_Mutex;
 
   private:
 

@@ -122,7 +122,7 @@ mitk::LabelSetImage::Pointer mitk::ConvertImageToLabelSetImage(Image::Pointer im
 
   if (image.IsNotNull())
   {
-    if (image->GetChannelDescriptor().GetPixelType().GetPixelType() == itk::ImageIOBase::VECTOR)
+    if (image->GetChannelDescriptor().GetPixelType().GetPixelType() == itk::IOPixelEnum::VECTOR)
     {
       if (4 == image->GetDimension())
       {

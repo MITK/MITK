@@ -14,6 +14,7 @@ template< class TInputImageType, class TOuputImageType>
 itk::LocalStatisticFilter<TInputImageType, TOuputImageType>::LocalStatisticFilter():
      m_Size(5), m_Bins(5)
 {
+  this->DynamicMultiThreadingOff();
   this->SetNumberOfRequiredOutputs(m_Bins);
   this->SetNumberOfRequiredInputs(0);
 

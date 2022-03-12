@@ -11,9 +11,6 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkVirtualTrackingTool.h"
-#include <itkMutexLockHolder.h>
-
-typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
 mitk::VirtualTrackingTool::VirtualTrackingTool()
 : TrackingTool(), m_Spline(SplineType::New()), m_SplineLength(0.0), m_Velocity(0.1)

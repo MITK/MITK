@@ -10,7 +10,6 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "itkBarrier.h"
 #include "mitkIOUtil.h"
 #include "mitkImage.h"
 #include "mitkImagePixelReadAccessor.h"
@@ -19,54 +18,53 @@ found in the LICENSE file.
 #include "mitkImageTimeSelector.h"
 #include "mitkImageWriteAccessor.h"
 #include <fstream>
-#include <itkMultiThreader.h>
 #include <itksys/SystemTools.hxx>
 #include <mitkTestingMacros.h>
 #include <cstdlib>
 #include <ctime>
+#include <mutex>
+#include <random>
 
 struct ThreadData
 {
-  itk::Barrier::Pointer m_Barrier; // holds a pointer to the used barrier
-  mitk::Image::Pointer data;       // some random data
-  int m_NoOfThreads;               // holds the number of generated threads
-  bool m_Successful;               // to check if everything worked
+  ThreadData()
+    : Successful(true),
+      RandGen(std::random_device()())
+  {
+  }
+
+  mitk::Image::Pointer Data;     // some random data
+  bool Successful;               // to check if everything worked
+  std::mt19937 RandGen;
+  std::mutex RandGenMutex;
 };
 
-itk::SimpleFastMutexLock testMutex;
+std::mutex testMutex;
 
-ITK_THREAD_RETURN_TYPE ThreadMethod(void *data)
+itk::ITK_THREAD_RETURN_TYPE ThreadMethod(ThreadData *threadData)
 {
-  /* extract data pointer from Thread Info structure */
-  auto *pInfo = (struct itk::MultiThreader::ThreadInfoStruct *)data;
+  if (nullptr == threadData)
+    return itk::ITK_THREAD_RETURN_DEFAULT_VALUE;
 
-  // some data validity checking
-  if (pInfo == nullptr)
-  {
-    return ITK_THREAD_RETURN_VALUE;
-  }
-  if (pInfo->UserData == nullptr)
-  {
-    return ITK_THREAD_RETURN_VALUE;
-  }
-
-  // obtain user data for processing
-  auto *threadData = (ThreadData *)pInfo->UserData;
-
-  srand(pInfo->ThreadID);
-
-  mitk::Image::Pointer im = threadData->data;
+  mitk::Image::Pointer im = threadData->Data;
 
   int nrSlices = im->GetDimension(2);
+
+  std::uniform_int_distribution<> distrib(1, 1000000);
 
   // Create randomly a PixelRead- or PixelWriteAccessor for a slice and access all pixels in it.
   try
   {
-    if (rand() % 2)
+    threadData->RandGenMutex.lock();
+    auto even = distrib(threadData->RandGen) % 2;
+    auto slice = distrib(threadData->RandGen) % nrSlices;
+    threadData->RandGenMutex.unlock();
+
+    if (even)
     {
-      testMutex.Lock();
-      mitk::ImageDataItem *iDi = im->GetSliceData(rand() % nrSlices);
-      testMutex.Unlock();
+      testMutex.lock();
+      mitk::ImageDataItem *iDi = im->GetSliceData(slice);
+      testMutex.unlock();
       while (!iDi->IsComplete())
       {
       }
@@ -102,9 +100,9 @@ ITK_THREAD_RETURN_TYPE ThreadMethod(void *data)
     }
     else
     {
-      testMutex.Lock();
-      mitk::ImageDataItem *iDi = im->GetSliceData(rand() % nrSlices);
-      testMutex.Unlock();
+      testMutex.lock();
+      mitk::ImageDataItem *iDi = im->GetSliceData(slice);
+      testMutex.unlock();
       while (!iDi->IsComplete())
       {
       }
@@ -125,12 +123,14 @@ ITK_THREAD_RETURN_TYPE ThreadMethod(void *data)
           {
             idx[0] = i;
             idx[1] = j;
-            short newVal = rand() % 16000;
+            threadData->RandGenMutex.lock();
+            short newVal = distrib(threadData->RandGen) % 16000;
+            threadData->RandGenMutex.unlock();
             writeAccessor.SetPixelByIndexSafe(idx, newVal);
             short val = writeAccessor.GetPixelByIndexSafe(idx);
             if (val != newVal)
             {
-              threadData->m_Successful = false;
+              threadData->Successful = false;
             }
           }
         }
@@ -146,18 +146,16 @@ ITK_THREAD_RETURN_TYPE ThreadMethod(void *data)
   }
   catch ( const mitk::MemoryIsLockedException &e )
   {
-    threadData->m_Successful = false;
+    threadData->Successful = false;
     e.Print(std::cout);
   }
   catch ( const mitk::Exception &e )
   {
-    threadData->m_Successful = false;
+    threadData->Successful = false;
     e.Print(std::cout);
   }
 
-  // data processing end!
-  threadData->m_Barrier->Wait();
-  return ITK_THREAD_RETURN_VALUE;
+  return itk::ITK_THREAD_RETURN_DEFAULT_VALUE;
 }
 
 int mitkImageAccessorTest(int argc, char *argv[])
@@ -211,35 +209,24 @@ int mitkImageAccessorTest(int argc, char *argv[])
 
   image->GetGeometry()->Initialize();
 
-  itk::MultiThreader::Pointer threader = itk::MultiThreader::New();
-  unsigned int noOfThreads = 100;
+  ThreadData threadData;
+  threadData.Data = image;
 
-  // initialize barrier
-  itk::Barrier::Pointer barrier = itk::Barrier::New();
-  barrier->Initialize(noOfThreads + 1); // add one for we stop the base thread when the worker threads are processing
-
-  auto *threadData = new ThreadData;
-  threadData->m_Barrier = barrier;
-  threadData->m_NoOfThreads = noOfThreads;
-  threadData->data = image;
-  threadData->m_Successful = true;
+  constexpr size_t noOfThreads = 100; 
+  std::array<std::thread, noOfThreads> threads;
 
   // spawn threads
-  for (unsigned int i = 0; i < noOfThreads; ++i)
-  {
-    threader->SpawnThread(ThreadMethod, threadData);
-  }
-  // stop the base thread during worker thread execution
-  barrier->Wait();
+  for (size_t i = 0; i < noOfThreads; ++i)
+    threads[i] = std::thread(ThreadMethod, &threadData);
 
   // terminate threads
-  for (unsigned int j = 0; j < noOfThreads; ++j)
+  for (size_t i = 0; i < noOfThreads; ++i)
   {
-    threader->TerminateThread(j);
+    if (threads[i].joinable())
+      threads[i].join();
   }
 
-  bool TestSuccessful = threadData->m_Successful;
-  delete threadData;
+  bool TestSuccessful = threadData.Successful;
 
   MITK_TEST_CONDITION_REQUIRED(TestSuccessful, "Testing image access from multiple threads");
 

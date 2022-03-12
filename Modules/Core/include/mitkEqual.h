@@ -20,6 +20,7 @@ found in the LICENSE file.
 #ifndef MITKEQUAL_H_
 #define MITKEQUAL_H_
 
+#include <cmath>
 #include <iomanip>
 
 #include "mitkLogMacros.h"
@@ -37,7 +38,7 @@ namespace mitk
   template <typename DifferenceType>
   inline bool DifferenceBiggerOrEqualEps(DifferenceType diff, mitk::ScalarType epsilon = mitk::eps)
   {
-    return fabs(diff) >= epsilon;
+    return std::fabs(diff) >= epsilon;
   }
 
   /**

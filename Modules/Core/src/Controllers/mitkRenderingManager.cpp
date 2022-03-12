@@ -28,6 +28,8 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  itkEventMacroDefinition(RenderingManagerEvent, itk::AnyEvent);
+  itkEventMacroDefinition(RenderingManagerViewsInitializedEvent, RenderingManagerEvent);
   itkEventMacroDefinition(FocusChangedEvent, itk::AnyEvent);
 
   RenderingManager::Pointer RenderingManager::s_Instance = nullptr;

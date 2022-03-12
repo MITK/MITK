@@ -105,7 +105,7 @@ void mitk::CorrectorAlgorithm::GenerateData()
     ImprovedHeimannCorrectionAlgorithm(correctPixelTypeImage);
 
     // this is suboptimal, needs to be kept synchronous to DefaultSegmentationDataType
-    if (inputImage->GetChannelDescriptor().GetPixelType().GetComponentType() == itk::ImageIOBase::USHORT)
+    if (inputImage->GetChannelDescriptor().GetPixelType().GetComponentType() == itk::IOComponentEnum::USHORT)
     { // the cast at the beginning did not copy the data
       CastToMitkImage(correctPixelTypeImage, temporarySlice);
     }

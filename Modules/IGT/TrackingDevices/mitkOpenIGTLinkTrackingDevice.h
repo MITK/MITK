@@ -19,7 +19,6 @@ found in the LICENSE file.
 #include <mitkIGTLClient.h>
 #include <mitkIGTLDeviceSource.h>
 #include <mitkIGTLMessageToNavigationDataFilter.h>
-#include <itkMultiThreader.h>
 #include <igtlQuaternionTrackingDataMessage.h>
 #include <igtlTrackingDataMessage.h>
 #include <igtlTransformMessage.h>

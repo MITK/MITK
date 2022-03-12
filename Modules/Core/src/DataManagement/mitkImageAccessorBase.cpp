@@ -72,12 +72,12 @@ mitk::ImageAccessorBase::ImageAccessorBase(ImageConstPointer image,
       {
         mitkThrow() << "ImageAccessor: No image source is defined";
       }
-      image->m_ReadWriteLock.Lock();
+      image->m_ReadWriteLock.lock();
       if (image->GetSource()->Updating() == false)
       {
         image->GetSource()->UpdateOutputInformation();
       }
-      image->m_ReadWriteLock.Unlock();
+      image->m_ReadWriteLock.unlock();
     }
   }
 
@@ -89,9 +89,9 @@ mitk::ImageAccessorBase::ImageAccessorBase(ImageConstPointer image,
     m_CoherentMemory = true;
 
     // Organize first image channel
-    image->m_ReadWriteLock.Lock();
+    image->m_ReadWriteLock.lock();
     imageDataItem = image->GetChannelData();
-    image->m_ReadWriteLock.Unlock();
+    image->m_ReadWriteLock.unlock();
 
     // Set memory area
     m_AddressBegin = imageDataItem->m_Data;
@@ -141,7 +141,7 @@ bool mitk::ImageAccessorBase::Overlap(const ImageAccessorBase *iAB)
   }
   else
   {
-    GetImage()->m_ReadWriteLock.Unlock();
+    GetImage()->m_ReadWriteLock.unlock();
     mitkThrow() << "ImageAccessor: incoherent memory area is not supported yet";
   }
 
@@ -151,7 +151,7 @@ bool mitk::ImageAccessorBase::Overlap(const ImageAccessorBase *iAB)
 /** \brief Uses the WaitLock to wait for another ImageAccessor*/
 void mitk::ImageAccessorBase::WaitForReleaseOf(ImageAccessorWaitLock *wL)
 {
-  wL->m_Mutex.Lock();
+  wL->m_Mutex.lock();
 
   // Decrement
   wL->m_WaiterCount -= 1;
@@ -160,12 +160,12 @@ void mitk::ImageAccessorBase::WaitForReleaseOf(ImageAccessorWaitLock *wL)
   // (Der Letzte macht das Licht aus!)
   if (wL->m_WaiterCount <= 0)
   {
-    wL->m_Mutex.Unlock();
+    wL->m_Mutex.unlock();
     delete wL;
   }
   else
   {
-    wL->m_Mutex.Unlock();
+    wL->m_Mutex.unlock();
   }
 }
 
@@ -176,7 +176,7 @@ void mitk::ImageAccessorBase::PreventRecursiveMutexLock(mitk::ImageAccessorBase 
   ThreadIDType id = CurrentThreadHandle();
   if (CompareThreadHandles(id, iAB->m_Thread))
   {
-    GetImage()->m_ReadWriteLock.Unlock();
+    GetImage()->m_ReadWriteLock.unlock();
     mitkThrow()
       << "Prohibited image access: the requested image part is already in use and cannot be requested recursively!";
   }

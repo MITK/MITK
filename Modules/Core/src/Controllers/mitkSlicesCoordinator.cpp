@@ -16,6 +16,8 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  itkEventMacroDefinition(SliceRotationEvent, itk::AnyEvent);
+
   SlicesCoordinator::SlicesCoordinator() : m_LinkPlanes(true), m_MouseCursorSet(false) {}
   SlicesCoordinator::~SlicesCoordinator() {}
   void SlicesCoordinator::AddSliceController(SliceNavigationController *snc)

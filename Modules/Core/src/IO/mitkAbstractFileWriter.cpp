@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkCustomMimeType.h>
 #include <mitkExceptionMacro.h>
 #include <mitkIOUtil.h>
+#include <mitkUtf8Util.h>
 
 #include <mitkFileReaderWriterBase.h>
 
@@ -62,7 +63,7 @@ namespace mitk
     }
     else if (d->m_TmpFileName.empty())
     {
-      std::string ext = itksys::SystemTools::GetFilenameExtension(d->m_Location);
+      std::string ext = Utf8Util::Utf8ToLocal8Bit(itksys::SystemTools::GetFilenameExtension(Utf8Util::Local8BitToUtf8(d->m_Location)));
       d->m_TmpFileName = IOUtil::CreateTemporaryFile("XXXXXX" + ext);
     }
     return d->m_TmpFileName;

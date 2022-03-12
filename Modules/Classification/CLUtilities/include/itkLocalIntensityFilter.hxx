@@ -30,6 +30,8 @@ namespace itk
   LocalIntensityFilter< TInputImage >
     ::LocalIntensityFilter() :m_ThreadLocalMaximum(1), m_ThreadLocalPeakValue(1), m_ThreadGlobalPeakValue(1)
   {
+    this->DynamicMultiThreadingOff();
+
     // first output is a copy of the image, DataObject created by
     // superclass
 
@@ -158,7 +160,7 @@ namespace itk
     LocalIntensityFilter< TInputImage >
     ::BeforeThreadedGenerateData()
   {
-    ThreadIdType numberOfThreads = this->GetNumberOfThreads();
+    ThreadIdType numberOfThreads = this->GetNumberOfWorkUnits();
 
     // Resize the thread temporaries
     m_ThreadLocalMaximum.SetSize(numberOfThreads);
@@ -178,7 +180,7 @@ namespace itk
     ::AfterThreadedGenerateData()
   {
     ThreadIdType    i;
-    ThreadIdType numberOfThreads = this->GetNumberOfThreads();
+    ThreadIdType numberOfThreads = this->GetNumberOfWorkUnits();
 
     RealType  localMaximum = std::numeric_limits< RealType >::lowest();
     RealType  localPeakValue = std::numeric_limits< RealType >::lowest();

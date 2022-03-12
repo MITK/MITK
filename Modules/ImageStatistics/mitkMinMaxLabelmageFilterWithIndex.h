@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <itkImage.h>
 #include <itkImageToImageFilter.h>
 #include <itkImageRegionConstIteratorWithIndex.h>
-#include "itksys/hash_map.hxx"
+#include <unordered_map>
 
 
 namespace itk
@@ -65,10 +65,10 @@ public:
         {}
     };
 
-    typedef typename itksys::hash_map<LabelPixelType, LabelExtrema>     ExtremaMapType;
-    typedef typename ExtremaMapType::iterator                   ExtremaMapTypeIterator;
-    typedef typename ExtremaMapType::const_iterator             ExtremaMapTypeConstIterator;
-    typedef typename ExtremaMapType::value_type MapValueType;
+    typedef typename std::unordered_map<LabelPixelType, LabelExtrema> ExtremaMapType;
+    typedef typename ExtremaMapType::iterator                         ExtremaMapTypeIterator;
+    typedef typename ExtremaMapType::const_iterator                   ExtremaMapTypeConstIterator;
+    typedef typename ExtremaMapType::value_type                       MapValueType;
 
     PixelType GetMin(LabelPixelType label) const
     {
@@ -163,6 +163,11 @@ public:
     }
 
 protected:
+    MinMaxLabelImageFilterWithIndex()
+    {
+      this->DynamicMultiThreadingOff();
+    }
+
     void AllocateOutputs() override;
 
     void ThreadedGenerateData(const RegionType &

@@ -184,8 +184,8 @@ void mitk::NavigationDataToPointSetFilter::GenerateDataMode3DMean()
             pos = input->GetPosition();  // NavigationData::PositionType must be compatible with PointSet::PointType!
 
             //calculate the summ of the old position and the current coordinate
-            mitk::Vector3D vec;
-            vec.SetVnlVector(pos.GetVnlVector());
+            mitk::Vector3D vec(0.0);
+            vec.SetVnlVector(pos.GetVnlVector().as_ref());
             mitk::PointSet::PointType oPoint = output->GetPoint(newPointId);
             oPoint += vec;//summ up
             output->SetPoint(newPointId, oPoint);

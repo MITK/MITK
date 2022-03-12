@@ -64,7 +64,7 @@ namespace mitk
     ~CropTimestepsImageFilter() override = default;
 
     void GenerateData() override;
-    void VerifyInputInformation() override;
+    void VerifyInputInformation() const override;
     void VerifyInputImage(const mitk::Image* inputImage) const;
     void GenerateOutputInformation() override;
     mitk::SlicedData::RegionType ComputeDesiredRegion() const;

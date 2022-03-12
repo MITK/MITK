@@ -64,43 +64,43 @@ namespace mitk
 
     PixelType type = validInput->GetPixelType();
 
-    if (type.GetComponentType() == itk::ImageIOBase::CHAR)
+    if (type.GetComponentType() == itk::IOComponentEnum::CHAR)
     {
       CompareMultiComponentImage<char>(testInput, validInput);
     }
-    else if (type.GetComponentType() == itk::ImageIOBase::UCHAR)
+    else if (type.GetComponentType() == itk::IOComponentEnum::UCHAR)
     {
       CompareMultiComponentImage<unsigned char>(testInput, validInput);
     }
-    else if (type.GetComponentType() == itk::ImageIOBase::INT)
+    else if (type.GetComponentType() == itk::IOComponentEnum::INT)
     {
       CompareMultiComponentImage<int>(testInput, validInput);
     }
-    else if (type.GetComponentType() == itk::ImageIOBase::UINT)
+    else if (type.GetComponentType() == itk::IOComponentEnum::UINT)
     {
       CompareMultiComponentImage<unsigned int>(testInput, validInput);
     }
-    else if (type.GetComponentType() == itk::ImageIOBase::SHORT)
+    else if (type.GetComponentType() == itk::IOComponentEnum::SHORT)
     {
       CompareMultiComponentImage<short>(testInput, validInput);
     }
-    else if (type.GetComponentType() == itk::ImageIOBase::USHORT)
+    else if (type.GetComponentType() == itk::IOComponentEnum::USHORT)
     {
       CompareMultiComponentImage<unsigned short>(testInput, validInput);
     }
-    else if (type.GetComponentType() == itk::ImageIOBase::LONG)
+    else if (type.GetComponentType() == itk::IOComponentEnum::LONG)
     {
       CompareMultiComponentImage<long>(testInput, validInput);
     }
-    else if (type.GetComponentType() == itk::ImageIOBase::ULONG)
+    else if (type.GetComponentType() == itk::IOComponentEnum::ULONG)
     {
       CompareMultiComponentImage<unsigned long>(testInput, validInput);
     }
-    else if (type.GetComponentType() == itk::ImageIOBase::FLOAT)
+    else if (type.GetComponentType() == itk::IOComponentEnum::FLOAT)
     {
       CompareMultiComponentImage<float>(testInput, validInput);
     }
-    else if (type.GetComponentType() == itk::ImageIOBase::DOUBLE)
+    else if (type.GetComponentType() == itk::IOComponentEnum::DOUBLE)
     {
       CompareMultiComponentImage<double>(testInput, validInput);
     }

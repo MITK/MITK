@@ -151,9 +151,9 @@ void mitk::BooleanOperation::ValidateSegmentation(mitk::Image::Pointer segmentat
 
   auto pixelType = segmentation->GetImageDescriptor()->GetChannelDescriptor().GetPixelType();
 
-  if (pixelType.GetPixelType() != itk::ImageIOBase::SCALAR ||
-      (pixelType.GetComponentType() != itk::ImageIOBase::UCHAR &&
-       pixelType.GetComponentType() != itk::ImageIOBase::USHORT))
+  if (pixelType.GetPixelType() != itk::IOPixelEnum::SCALAR ||
+      (pixelType.GetComponentType() != itk::IOComponentEnum::UCHAR &&
+       pixelType.GetComponentType() != itk::IOComponentEnum::USHORT))
     mitkThrow() << "Segmentation is neither of type 'unsigned char' nor type 'unsigned short'!";
 
   auto dimension = segmentation->GetDimension();

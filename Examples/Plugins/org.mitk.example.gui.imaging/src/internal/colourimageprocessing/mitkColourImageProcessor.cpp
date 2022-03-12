@@ -264,14 +264,14 @@ namespace mitk
 
     mitk::Image::Pointer mitkResult = mitk::Image::New();
 
-    if (mitkInput->GetPixelType().GetComponentType() == itk::ImageIOBase::CHAR)
+    if (mitkInput->GetPixelType().GetComponentType() == itk::IOComponentEnum::CHAR)
     {
       // cast to itkImage
       itk::Image<unsigned char, 3>::Pointer itkInput;
       mitk::CastToItkImage(mitkInput, itkInput);
       mitkResult = ScalarToRGBA<unsigned char>(itkInput, tf);
     }
-    else if (mitkInput->GetPixelType().GetComponentType() == itk::ImageIOBase::SHORT)
+    else if (mitkInput->GetPixelType().GetComponentType() == itk::IOComponentEnum::SHORT)
     {
       // cast to itkImage
       itk::Image<short, 3>::Pointer itkInput;
@@ -555,14 +555,14 @@ namespace mitk
     itk::Image<short, 3>::Pointer inputCT;
     itk::Image<unsigned char, 3>::Pointer inputBinary;
 
-    if (input1->GetPixelType().GetComponentType() == itk::ImageIOBase::UCHAR &&
-        input2->GetPixelType().GetComponentType() == itk::ImageIOBase::SHORT)
+    if (input1->GetPixelType().GetComponentType() == itk::IOComponentEnum::UCHAR &&
+        input2->GetPixelType().GetComponentType() == itk::IOComponentEnum::SHORT)
     {
       mitk::CastToItkImage(input1, inputBinary);
       mitk::CastToItkImage(input2, inputCT);
     }
-    else if (input1->GetPixelType().GetComponentType() == itk::ImageIOBase::SHORT &&
-             input2->GetPixelType().GetComponentType() == itk::ImageIOBase::UCHAR)
+    else if (input1->GetPixelType().GetComponentType() == itk::IOComponentEnum::SHORT &&
+             input2->GetPixelType().GetComponentType() == itk::IOComponentEnum::UCHAR)
     {
       mitk::CastToItkImage(input1, inputCT);
       mitk::CastToItkImage(input2, inputBinary);
@@ -856,14 +856,14 @@ namespace mitk
     itk::Image<short, 3>::Pointer inputCT;
     itk::Image<unsigned char, 3>::Pointer inputBinary;
 
-    if (input1->GetPixelType().GetComponentType() == itk::ImageIOBase::UCHAR &&
-        input2->GetPixelType().GetComponentType() == itk::ImageIOBase::SHORT)
+    if (input1->GetPixelType().GetComponentType() == itk::IOComponentEnum::UCHAR &&
+        input2->GetPixelType().GetComponentType() == itk::IOComponentEnum::SHORT)
     {
       mitk::CastToItkImage(input1, inputBinary);
       mitk::CastToItkImage(input2, inputCT);
     }
-    else if (input1->GetPixelType().GetComponentType() == itk::ImageIOBase::SHORT &&
-             input2->GetPixelType().GetComponentType() == itk::ImageIOBase::UCHAR)
+    else if (input1->GetPixelType().GetComponentType() == itk::IOComponentEnum::SHORT &&
+             input2->GetPixelType().GetComponentType() == itk::IOComponentEnum::UCHAR)
     {
       mitk::CastToItkImage(input1, inputCT);
       mitk::CastToItkImage(input2, inputBinary);

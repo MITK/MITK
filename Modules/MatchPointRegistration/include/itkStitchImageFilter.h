@@ -265,7 +265,7 @@ protected:
    *
    * \sa ProcessObject::VerifyInputInformation
    */
-  virtual void VerifyInputInformation() ITK_OVERRIDE { }
+  virtual void VerifyInputInformation() const ITK_OVERRIDE { }
 
   /** StitchImageFilter can be implemented as a multithreaded filter.
    * Therefore, this implementation provides a ThreadedGenerateData()

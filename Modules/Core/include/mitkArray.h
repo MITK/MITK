@@ -38,7 +38,6 @@ namespace mitk
   template <typename ArrayType, typename TCoordRep, unsigned int NVectorDimension>
   void FillArray(itk::FixedArray<TCoordRep, NVectorDimension> &toArray, const ArrayType &array)
   {
-    itk::FixedArray<TCoordRep, NVectorDimension> vectorOrPoint;
     for (unsigned short int var = 0; var < NVectorDimension; ++var)
     {
       toArray[var] = array[var];

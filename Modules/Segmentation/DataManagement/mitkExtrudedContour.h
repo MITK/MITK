@@ -77,7 +77,7 @@ namespace mitk
     itkGetConstObjectMacro(ClippingGeometry, mitk::BaseGeometry);
     itkSetObjectMacro(ClippingGeometry, mitk::BaseGeometry);
 
-    unsigned long GetMTime() const override;
+    itk::ModifiedTimeType GetMTime() const override;
 
   protected:
     ExtrudedContour();

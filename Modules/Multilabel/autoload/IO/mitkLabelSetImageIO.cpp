@@ -134,9 +134,9 @@ namespace mitk
       // Set the necessary information for imageIO
       nrrdImageIo->SetNumberOfDimensions(dimension);
       nrrdImageIo->SetPixelType(pixelType.GetPixelType());
-      nrrdImageIo->SetComponentType(pixelType.GetComponentType() < PixelComponentUserType ?
-                                      static_cast<itk::ImageIOBase::IOComponentType>(pixelType.GetComponentType()) :
-                                      itk::ImageIOBase::UNKNOWNCOMPONENTTYPE);
+      nrrdImageIo->SetComponentType(static_cast<int>(pixelType.GetComponentType()) < PixelComponentUserType
+                                      ? pixelType.GetComponentType()
+                                      : itk::IOComponentEnum::UNKNOWNCOMPONENTTYPE);
       nrrdImageIo->SetNumberOfComponents(pixelType.GetNumberOfComponents());
 
       itk::ImageIORegion ioRegion(dimension);
@@ -147,8 +147,8 @@ namespace mitk
         nrrdImageIo->SetSpacing(i, spacing4D[i]);
         nrrdImageIo->SetOrigin(i, origin4D[i]);
 
-        mitk::Vector3D mitkDirection;
-        mitkDirection.SetVnlVector(geometry->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(i));
+        mitk::Vector3D mitkDirection(0.0);
+        mitkDirection.SetVnlVector(geometry->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(i).as_ref());
         itk::Vector<double, 4u> direction4D;
         direction4D[0] = mitkDirection[0];
         direction4D[1] = mitkDirection[1];

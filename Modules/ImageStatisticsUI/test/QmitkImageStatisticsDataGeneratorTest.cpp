@@ -226,8 +226,9 @@ public:
   void OneImageTest()
   {
     TestQmitkImageStatisticsDataGenerator generator(m_DataStorage);
+    QmitkImageAndRoiDataGeneratorBase::ConstNodeVectorType imageNodes { m_ImageNode1 };
 
-    generator.SetImageNodes({ m_ImageNode1 });
+    generator.SetImageNodes(imageNodes);
     generator.Generate();
     m_TestApp->exec();
 
@@ -243,8 +244,9 @@ public:
   void MultiImageTest()
   {
     TestQmitkImageStatisticsDataGenerator generator(m_DataStorage);
+    QmitkImageAndRoiDataGeneratorBase::ConstNodeVectorType imageNodes { m_ImageNode1, m_ImageNode2 };
 
-    generator.SetImageNodes({ m_ImageNode1, m_ImageNode2 });
+    generator.SetImageNodes(imageNodes);
     generator.Generate();
     m_TestApp->exec();
 
@@ -261,9 +263,11 @@ public:
   void ImageAndROITest()
   {
     TestQmitkImageStatisticsDataGenerator generator(m_DataStorage);
+    QmitkImageAndRoiDataGeneratorBase::ConstNodeVectorType imageNodes { m_ImageNode1 };
+    QmitkImageAndRoiDataGeneratorBase::ConstNodeVectorType roiNodes { m_MaskImageNode };
 
-    generator.SetImageNodes({ m_ImageNode1 });
-    generator.SetROINodes({ m_MaskImageNode });
+    generator.SetImageNodes(imageNodes);
+    generator.SetROINodes(roiNodes);
     generator.Generate();
     m_TestApp->exec();
 
@@ -275,7 +279,9 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("Error: Rerun has generated new data.", generator.Generate());
 
-    generator.SetROINodes({ m_PFNode });
+    roiNodes = { m_PFNode };
+
+    generator.SetROINodes(roiNodes);
     generator.Generate();
     m_TestApp->exec();
 
@@ -291,9 +297,11 @@ public:
   void ImageAndMultiROITest()
   {
     TestQmitkImageStatisticsDataGenerator generator(m_DataStorage);
+    QmitkImageAndRoiDataGeneratorBase::ConstNodeVectorType imageNodes{ m_ImageNode1 };
+    QmitkImageAndRoiDataGeneratorBase::ConstNodeVectorType roiNodes{ m_PFNode, m_MaskImageNode, nullptr };
 
-    generator.SetImageNodes({ m_ImageNode1 });
-    generator.SetROINodes({ m_PFNode, m_MaskImageNode, nullptr });
+    generator.SetImageNodes(imageNodes);
+    generator.SetROINodes(roiNodes);
     generator.Generate();
     m_TestApp->exec();
 
@@ -311,9 +319,11 @@ public:
   void MultiMultiTest()
   {
     TestQmitkImageStatisticsDataGenerator generator(m_DataStorage);
+    QmitkImageAndRoiDataGeneratorBase::ConstNodeVectorType imageNodes{ m_ImageNode1, m_ImageNode2 };
+    QmitkImageAndRoiDataGeneratorBase::ConstNodeVectorType roiNodes{ m_PFNode, m_MaskImageNode, nullptr };
 
-    generator.SetImageNodes({ m_ImageNode1, m_ImageNode2 });
-    generator.SetROINodes({ m_PFNode, m_MaskImageNode, nullptr });
+    generator.SetImageNodes(imageNodes);
+    generator.SetROINodes(roiNodes);
     generator.Generate();
     m_TestApp->exec();
 
@@ -346,8 +356,9 @@ public:
   void InputChangedTest()
   {
     TestQmitkImageStatisticsDataGenerator generator(m_DataStorage);
+    QmitkImageAndRoiDataGeneratorBase::ConstNodeVectorType imageNodes{ m_ImageNode2 };
 
-    generator.SetImageNodes({ m_ImageNode2 });
+    generator.SetImageNodes(imageNodes);
     m_TestApp->processEvents();
 
     CPPUNIT_ASSERT_EQUAL(0, generator.m_DataGenerationStartedEmited);
@@ -355,8 +366,10 @@ public:
     CPPUNIT_ASSERT(generator.m_JobErrorEmited_error.empty());
     CPPUNIT_ASSERT(0 == generator.m_NewDataAvailable.size());
 
+    imageNodes = { m_ImageNode1 };
+
     generator.SetAutoUpdate(true);
-    generator.SetImageNodes({ m_ImageNode1 });
+    generator.SetImageNodes(imageNodes);
     m_TestApp->exec();
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update seemed not to work.", 1, generator.m_DataGenerationStartedEmited);
@@ -364,7 +377,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Error: Auto update seemed not to work.", generator.m_JobErrorEmited_error.empty());
     CPPUNIT_ASSERT_MESSAGE("Error: Auto update seemed not to work.", 1 == generator.m_NewDataAvailable.size());
 
-    generator.SetImageNodes({ m_ImageNode1 });
+    generator.SetImageNodes(imageNodes);
     m_TestApp->processEvents();
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update was triggerd, but input does not realy changed.", 1, generator.m_DataGenerationStartedEmited);
@@ -372,8 +385,10 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggerd, but input does not realy changed.", generator.m_JobErrorEmited_error.empty());
     CPPUNIT_ASSERT_MESSAGE("Error: Auto update was triggerd, but input does not realy changed.", 1 == generator.m_NewDataAvailable.size());
 
+    QmitkImageAndRoiDataGeneratorBase::ConstNodeVectorType roiNodes{ m_MaskImageNode };
+
     generator.SetAutoUpdate(true);
-    generator.SetROINodes({ m_MaskImageNode });
+    generator.SetROINodes(roiNodes);
     m_TestApp->exec();
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Error: Auto update seemed not to work.", 2, generator.m_DataGenerationStartedEmited);
@@ -385,8 +400,9 @@ public:
   void SettingsChangedTest()
   {
     TestQmitkImageStatisticsDataGenerator generator(m_DataStorage);
+    QmitkImageAndRoiDataGeneratorBase::ConstNodeVectorType imageNodes{ m_ImageNode1 };
 
-    generator.SetImageNodes({ m_ImageNode1 });
+    generator.SetImageNodes(imageNodes);
     generator.Generate();
     m_TestApp->exec();
 
@@ -456,9 +472,11 @@ public:
   void DataStorageModificationTest()
   {
     TestQmitkImageStatisticsDataGenerator generator(m_DataStorage);
+    QmitkImageAndRoiDataGeneratorBase::ConstNodeVectorType imageNodes{ m_ImageNode1 };
+    QmitkImageAndRoiDataGeneratorBase::ConstNodeVectorType roiNodes{ m_PFNode };
 
-    generator.SetImageNodes({ m_ImageNode1 });
-    generator.SetROINodes({ m_PFNode });
+    generator.SetImageNodes(imageNodes);
+    generator.SetROINodes(roiNodes);
     generator.Generate();
     m_TestApp->exec();
 

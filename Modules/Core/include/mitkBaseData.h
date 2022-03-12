@@ -339,7 +339,7 @@ namespace mitk
     //##Documentation
     //## @brief Get the modified time of the last change of the contents
     //## this data object or its geometry.
-    unsigned long GetMTime() const override;
+    itk::ModifiedTimeType GetMTime() const override;
 
     /**
      * \sa itk::ProcessObject::Graft

@@ -14,6 +14,7 @@ found in the LICENSE file.
 #define ITKLINEHISTOGRAMBASEDMASSIMAGEFILTER_CPP
 
 #include <itkLineHistogramBasedMassImageFilter.h>
+#include <itkImageRegionConstIterator.h>
 #include <itkImageRegionIteratorWithIndex.h>
 #include <itkBinaryContourImageFilter.h>
 #include <mitkImageCast.h>
@@ -120,7 +121,7 @@ vnl_vector<double> itk::LineHistogramBasedMassImageFilter<TInputImageType,TOutpu
   }
 
   mean_index /= count;
-  return mean_index;
+  return mean_index.as_ref();
 }
 
 template< class TInputImageType, class TOutputImageType, class TMaskImageType>
@@ -237,6 +238,7 @@ void itk::LineHistogramBasedMassImageFilter<TInputImageType,TOutputImageType,TMa
 template< class TInputImageType, class TOutputImageType, class TMaskImageType>
 itk::LineHistogramBasedMassImageFilter<TInputImageType,TOutputImageType,TMaskImageType>::LineHistogramBasedMassImageFilter()
 {
+  this->DynamicMultiThreadingOff();
   this->SetNumberOfIndexedOutputs(1);
   this->SetNumberOfIndexedInputs(1);
 

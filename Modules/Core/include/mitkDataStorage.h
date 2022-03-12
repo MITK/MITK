@@ -14,13 +14,13 @@ found in the LICENSE file.
 #define MITKDATASTORAGE_H
 
 #include "itkObject.h"
-#include "itkSimpleFastMutexLock.h"
 #include "itkVectorContainer.h"
 #include "mitkDataNode.h"
 #include "mitkGeometry3D.h"
 #include "mitkMessage.h"
 #include <MitkCoreExports.h>
 #include <map>
+#include <mutex>
 
 namespace mitk
 {
@@ -194,7 +194,7 @@ namespace mitk
     const DataNode::GroupTagList GetGroupTags() const;
 
     /*ITK Mutex */
-    mutable itk::SimpleFastMutexLock m_MutexOne;
+    mutable std::mutex m_MutexOne;
 
     /* Public Events */
     typedef Message1<const DataNode*> DataStorageEvent;

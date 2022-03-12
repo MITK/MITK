@@ -24,6 +24,7 @@ template< class TInputImageType, class TOuputImageType>
 itk::MultiHistogramFilter<TInputImageType, TOuputImageType>::MultiHistogramFilter():
 m_Delta(0.6), m_Offset(-3.0), m_Bins(11), m_Size(5), m_UseImageIntensityRange(false)
 {
+  this->DynamicMultiThreadingOff();
   this->SetNumberOfRequiredOutputs(m_Bins);
   this->SetNumberOfRequiredInputs(0);
 

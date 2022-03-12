@@ -238,6 +238,7 @@ void itk::LineHistogramBasedMassImageFilter<TInputImageType,TOutputImageType,TMa
 template< class TInputImageType, class TOutputImageType, class TMaskImageType>
 itk::LineHistogramBasedMassImageFilter<TInputImageType,TOutputImageType,TMaskImageType>::LineHistogramBasedMassImageFilter()
 {
+  this->DynamicMultiThreadingOff();
   this->SetNumberOfIndexedOutputs(1);
   this->SetNumberOfIndexedInputs(1);
 

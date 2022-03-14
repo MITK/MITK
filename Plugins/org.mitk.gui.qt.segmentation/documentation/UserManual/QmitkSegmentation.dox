@@ -254,7 +254,7 @@ your image but you are just interested in one special region.
 
 \imageMacro{QmitkSegmentation_PickingTool.png,"Picking tool",10.00}
 
-\subsection org_mitk_views_segmentationUserManualnnUNetTool nnU-Net Tool (Windows & Ubuntu only)
+\subsection org_mitk_views_segmentationUserManualnnUNetTool nnU-Net Tool (Ubuntu only)
 
 This tool provides a GUI to the deep learning-based segmentation algorithm called the nnUNet. With this tool, you can get a segmentation mask predicted for the loaded image in MITK. Be ready with the pre-trained weights (a.k.a <b>RESULTS_FOLDER</b>)
 for your organ or task concerned, before using the tool. For a detailed explanation of the parameters and pre-trained weights folder structure etc., please refer to https://github.com/MIC-DKFZ/nnUNet. <br>
@@ -267,8 +267,8 @@ Remark: The tool assumes that you have a Python3 environment with nnUNet (pip) i
     \imageMacro{QmitkSegmentation_nnUNet_Settings.png,"nnUNet Segmentation Settings",10}
     -# Choose your required configuration-task-trainer-fold parameters, sequentially. By default, all entries are selected inside the "Fold" dropdown (shown: "All").
     Note that, if you uncheck all entries from the "Fold" dropdown (shown: "None"), then too,  all folds would be considered for inferencing.
-    -# For ensemble predictions, you will get the option to select parameters based on postprocessing files available in the ensembles configuration of <b>RESULTS_FOLDER</b>.
-    Note that, all folds for both configurations will be considered for ensemble inferencing.
+    -# For ensemble predictions, you will get the option to select parameters irrespective on postprocessing files available in the ensembles configuration of <b>RESULTS_FOLDER</b>.
+    Note that, if a postprocessing json file exists for the selected combination then it will used for ensembling, by default. To choose not to, uncheck the "Use PostProcessing JSON" in the "Advanced" section.
     \imageMacro{QmitkSegmentation_nnUNet_ensemble.png,"nnUNet Segmentation Settings",10}
     -# If your task requires multi-modal inputs, then check the "Multi-Modal" checkbox and enter the no.of modalities in the "No. of Extra Modalities" spinbox you'd like to refer to.
     Instantly, as much node selectors should appear below to select other image nodes from the Data Manager along with a deactivated selector with preselected with the reference node. 
@@ -282,6 +282,9 @@ Remark: The tool assumes that you have a Python3 environment with nnUNet (pip) i
     \imageMacro{QmitkSegmentation_nnUNet_Advanced.png,"nnUNet Advanced Settings",10.00}
     -# In the "Advanced" section, you can also activate other options like "Mixed Precision" and "Enable Mirroring" (for test time data augmentation) pertaining to nnUNet.
     -# Use "GPU Id" to change the preferred GPU for inferencing. This is equivalent to setting the <b>CUDA_VISIBLE_DEVICES</b> environment variable.
+    -# Every inferred segmentation is cached to prevent a redundant computation. In case, a user doesn't wish to cache a Preview, uncheck the "Enable Caching" in the "Advanced" section. This will ensure that the
+    current parameters will neither be checked against the existing cache nor a segmentation be loaded from it.
+    -# You may always clear all the cached segmentations by clicking "Clear Cache" button.
 
 \subsubsection org_mitk_views_segmentationUserManualnnUNetToolMisc Miscellaneous:
     -# In case you want to reload/reparse the folders in the "nnUNet Results Folder", eg. after adding new tasks into it, you may do so without reselecting the folder again by clicking the "Refresh Results Folder" button.

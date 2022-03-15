@@ -21,6 +21,7 @@ found in the LICENSE file.s
 #include <MitkSegmentationUIExports.h>
 #include <QCache>
 #include <QMessageBox>
+#include <QSettings>
 #include <QmitkDataStorageComboBox.h>
 #include <QmitknnUNetEnsembleLayout.h>
 #include <boost/functional/hash.hpp>
@@ -272,5 +273,10 @@ private:
   const QStringList m_VALID_MODELS = {"2d", "3d_lowres", "3d_fullres", "3d_cascade_fullres", "ensembles"};
 
   const QString m_CACHE_COUNT_BASE_LABEL = "Cached Items: ";
+
+  /**
+   * @brief For storing values across sessions. Currently, RESULTS_FOLDER value is cached using this.
+   */
+  QSettings m_Settings;
 };
 #endif

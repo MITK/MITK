@@ -101,6 +101,12 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   mainLayout->addLayout(m_Controls.verticalLayout);
   Superclass::InitializeUI(mainLayout);
   m_UI_ROWS = m_Controls.advancedSettingsLayout->rowCount(); // Must do. Row count is correct only here.
+
+  if (nullptr != m_Controls.modeldirectoryBox)
+  {
+    QString setVal = m_Settings.value("nnUNet/LastRESULTS_FOLDERPath").toString();
+    m_Controls.modeldirectoryBox->setDirectory(setVal);
+  }
 }
 
 void QmitknnUNetToolGUI::OnPreviewRequested()

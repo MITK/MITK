@@ -44,6 +44,7 @@ void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &resultsFolder)
                   if (m_VALID_MODELS.contains(model, Qt::CaseInsensitive))
                     m_Controls.modelBox->addItem(model);
                 });
+  m_Settings.setValue("nnUNet/LastRESULTS_FOLDERPath",resultsFolder);
 }
 
 void QmitknnUNetToolGUI::OnModelChanged(const QString &model)

@@ -187,17 +187,17 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
         tool->m_InputBuffer = nullptr;
         ShowStatusMessage(QString("<b>STATUS: </b><i>Starting Segmentation task... This might take a while.</i>"));
         tool->UpdatePreview();
-        if (tool->GetOutputBuffer() == nullptr)
+        if (nullptr == tool->GetOutputBuffer())
         {
           SegmentationProcessFailed();
         }
         else
         {
           SegmentationResultHandler(tool);
-        }
-        if (doCache)
-        {
-          addToCache(hashKey, tool->GetMLPreview());
+          if (doCache)
+          {
+            AddToCache(hashKey, tool->GetMLPreview());
+          }
         }
         tool->PredictOff(); // purposefully placed to make tool->GetMTime different than before.
       }
@@ -434,7 +434,7 @@ void QmitknnUNetToolGUI::UpdateCacheCountOnUI()
   m_Controls.cacheCountLabel->setText(cacheText);
 }
 
-void QmitknnUNetToolGUI::addToCache(size_t &hashKey, mitk::LabelSetImage::ConstPointer mlPreview)
+void QmitknnUNetToolGUI::AddToCache(size_t &hashKey, mitk::LabelSetImage::ConstPointer mlPreview)
 {
   nnUNetCache *newCacheObj = new nnUNetCache;
   newCacheObj->m_SegCache = mlPreview;

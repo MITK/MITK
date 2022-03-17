@@ -112,8 +112,10 @@ license you like.
  */
 
 namespace Json {
+#if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunneeded-internal-declaration"
+#endif
 static inline char getDecimalPoint() {
 #ifdef JSONCPP_NO_LOCALE_SUPPORT
   return '\0';
@@ -122,7 +124,9 @@ static inline char getDecimalPoint() {
   return lc ? *(lc->decimal_point) : '\0';
 #endif
 }
+#if defined(__clang__)
 #pragma clang diagnostic pop
+#endif
 
 /// Converts a unicode code-point to UTF-8.
 static inline String codePointToUTF8(unsigned int cp) {

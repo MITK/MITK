@@ -633,7 +633,7 @@ void mitk::DisplayInteractor::Rotate(mitk::StateMachineAction *, mitk::Interacti
   // cross product: | A x B | = |A| * |B| * sin(angle)
   Vector3D axisOfRotation;
   vnl_vector_fixed<ScalarType, 3> vnlDirection = vnl_cross_3d(toCursor.GetVnlVector(), toProjected.GetVnlVector());
-  axisOfRotation.SetVnlVector(vnlDirection);
+  axisOfRotation.SetVnlVector(vnlDirection.as_ref());
 
   // scalar product: A * B = |A| * |B| * cos(angle)
   // tan = sin / cos
@@ -793,13 +793,13 @@ void mitk::DisplayInteractor::UpdateStatusbar(mitk::StateMachineAction *, mitk::
     image3D->GetGeometry()->WorldToIndex(worldposition, p);
 
     auto pixelType = image3D->GetChannelDescriptor().GetPixelType().GetPixelType();
-    if (pixelType == itk::ImageIOBase::RGB || pixelType == itk::ImageIOBase::RGBA)
+    if (pixelType == itk::IOPixelEnum::RGB || pixelType == itk::IOPixelEnum::RGBA)
     {
       std::string pixelValue = "Pixel RGB(A) value: ";
       pixelValue.append(ConvertCompositePixelValueToString(image3D, p));
       statusBar->DisplayImageInfo(worldposition, p, globalCurrentTimePoint, pixelValue.c_str());
     }
-    else if (pixelType == itk::ImageIOBase::DIFFUSIONTENSOR3D || pixelType == itk::ImageIOBase::SYMMETRICSECONDRANKTENSOR)
+    else if (pixelType == itk::IOPixelEnum::DIFFUSIONTENSOR3D || pixelType == itk::IOPixelEnum::SYMMETRICSECONDRANKTENSOR)
     {
       std::string pixelValue = "See ODF Details view. ";
       statusBar->DisplayImageInfo(worldposition, p, globalCurrentTimePoint, pixelValue.c_str());

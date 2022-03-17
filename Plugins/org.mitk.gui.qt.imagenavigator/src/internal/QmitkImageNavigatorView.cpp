@@ -215,13 +215,13 @@ void QmitkImageNavigatorView::UpdateStatusBar()
 
         auto pixelType = image3D->GetChannelDescriptor().GetPixelType().GetPixelType();
 
-        if (pixelType == itk::ImageIOBase::RGB || pixelType == itk::ImageIOBase::RGBA)
+        if (pixelType == itk::IOPixelEnum::RGB || pixelType == itk::IOPixelEnum::RGBA)
         {
           std::string pixelValue = "Pixel RGB(A) value: ";
           pixelValue.append(ConvertCompositePixelValueToString(image3D, p));
           statusBar->DisplayImageInfo(position, p, globalCurrentTimePoint, pixelValue.c_str());
         }
-        else if (pixelType == itk::ImageIOBase::DIFFUSIONTENSOR3D || pixelType == itk::ImageIOBase::SYMMETRICSECONDRANKTENSOR)
+        else if (pixelType == itk::IOPixelEnum::DIFFUSIONTENSOR3D || pixelType == itk::IOPixelEnum::SYMMETRICSECONDRANKTENSOR)
         {
           std::string pixelValue = "See ODF Details view. ";
           statusBar->DisplayImageInfo(position, p, globalCurrentTimePoint, pixelValue.c_str());

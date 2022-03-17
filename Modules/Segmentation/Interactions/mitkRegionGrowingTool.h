@@ -42,9 +42,6 @@ namespace mitk
     After releasing the button, the current result of the region growing algorithm will be written to the
     working image of this tool's ToolManager.
 
-    If the first click is <i>inside</i> a segmentation, nothing will happen (other behaviour, for example removal of a
-    region, can be implemented via OnMousePressedInside()).
-
     \warning Only to be instantiated by mitk::ToolManager.
 
     $Author$
@@ -73,20 +70,9 @@ namespace mitk
 
     /**
      * @brief OnMousePressed is called when the user clicks.
-     * Calls either OnMousePressedInside() or OnMousePressedOutside().
+     * Grows a region by calling 'GetNeighborhoodAverage' and 'StartRegionGrowing'.
      */
     virtual void OnMousePressed(StateMachineAction *, InteractionEvent *interactionEvent);
-
-    /**
-     * @brief OnMousePressedInside can be used to implement behaviour when the user clicks inside a segmentation.
-     */
-    virtual void OnMousePressedInside();
-
-    /**
-     * @brief OnMousePressedOutside is called when the user clicks outside of the segmented area.
-     * Grows a region.
-     */
-    virtual void OnMousePressedOutside(StateMachineAction *, InteractionEvent *interactionEvent);
 
     /**
      * @brief OnMouseMoved is called when the user moves the mouse with the left mouse button pressed.
@@ -112,14 +98,6 @@ namespace mitk
                                 const itk::Index<imageDimension>& index,
                                 ScalarType *result,
                                 unsigned int neighborhood = 1);
-
-    /**
-     * @brief Template to check whether index is inside already segmented area.
-     */
-    template <typename TPixel, unsigned int imageDimension>
-    void IsInsideSegmentation(const itk::Image<TPixel, imageDimension> *itkImage,
-                              const itk::Index<imageDimension>& index,
-                              bool *result);
 
     /**
      * @brief Template that calls an ITK filter to do the region growing.

@@ -44,9 +44,6 @@ namespace mitk
     mitk::BaseData::Pointer TypedRead(const std::string &path, EndianityType endianity, int *size);
 
     RawImageFileReaderService *Clone() const override;
-
-    /** Vector containing dimensions of image to be read. */
-    itk::Vector<int, 3> m_Dimensions;
   };
 
 } // namespace mitk

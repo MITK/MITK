@@ -15,13 +15,13 @@ found in the LICENSE file.
 #include <mitkLogMacros.h>
 
 #include <itkOutputWindow.h>
-#include <itkSimpleFastMutexLock.h>
 
 #include <cstdio>
 #include <fstream>
 #include <iostream>
+#include <mutex>
 
-static itk::SimpleFastMutexLock logMutex;
+static std::mutex logMutex;
 static mitk::LoggingBackend *mitkLogBackend = nullptr;
 static std::ofstream *logFile = nullptr;
 static std::string logFileName = "";
@@ -35,7 +35,7 @@ void mitk::LoggingBackend::EnableAdditionalConsoleWindow(bool enable)
 
 void mitk::LoggingBackend::ProcessMessage(const mbilog::LogMessage &l)
 {
-  logMutex.Lock();
+  logMutex.lock();
 #ifdef _WIN32
   FormatSmart(l, (int)GetCurrentThreadId());
 #else
@@ -65,7 +65,7 @@ void mitk::LoggingBackend::ProcessMessage(const mbilog::LogMessage &l)
 #endif
     itk::OutputWindow::GetInstance()->DisplayText(outputWindow->str().c_str());
   }
-  logMutex.Unlock();
+  logMutex.unlock();
 }
 
 void mitk::LoggingBackend::Register()
@@ -94,7 +94,7 @@ void mitk::LoggingBackend::SetLogFile(const char *file)
     bool closed = false;
     std::string closedFileName;
 
-    logMutex.Lock();
+    logMutex.lock();
     if (logFile)
     {
       closed = true;
@@ -104,7 +104,7 @@ void mitk::LoggingBackend::SetLogFile(const char *file)
       logFile = nullptr;
       logFileName = "";
     }
-    logMutex.Unlock();
+    logMutex.unlock();
     if (closed)
     {
       MITK_INFO << "closing logfile (" << closedFileName << ")";
@@ -114,7 +114,7 @@ void mitk::LoggingBackend::SetLogFile(const char *file)
   // opening new logfile
   if (file)
   {
-    logMutex.Lock();
+    logMutex.lock();
 
     logFileName = file;
     logFile = new std::ofstream();
@@ -123,14 +123,14 @@ void mitk::LoggingBackend::SetLogFile(const char *file)
 
     if (logFile->good())
     {
-      logMutex.Unlock();
+      logMutex.unlock();
       MITK_INFO << "Logfile: " << logFileName;
     }
     else
     {
       delete logFile;
       logFile = nullptr;
-      logMutex.Unlock();
+      logMutex.unlock();
       MITK_WARN << "opening logfile '" << file << "' for writing failed";
     }
 

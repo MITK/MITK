@@ -25,7 +25,7 @@ namespace mitk
   class StateEvent;
 
 #pragma GCC visibility push(default)
-  itkEventMacro(SliceRotationEvent, itk::AnyEvent);
+  itkEventMacroDeclaration(SliceRotationEvent, itk::AnyEvent);
 #pragma GCC visibility pop
 
   /**

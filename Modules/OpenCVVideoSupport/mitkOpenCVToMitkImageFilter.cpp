@@ -24,8 +24,6 @@ namespace mitk{
 
   OpenCVToMitkImageFilter::OpenCVToMitkImageFilter()
   {
-    m_ImageMutex = itk::FastMutexLock::New();
-    m_OpenCVMatMutex = itk::FastMutexLock::New();
   }
 
   OpenCVToMitkImageFilter::~OpenCVToMitkImageFilter()
@@ -34,9 +32,9 @@ namespace mitk{
 
   void OpenCVToMitkImageFilter::SetOpenCVMat(const cv::Mat &image)
   {
-    m_OpenCVMatMutex->Lock();
+    m_OpenCVMatMutex.lock();
     m_OpenCVMat = image;
-    m_OpenCVMatMutex->Unlock();
+    m_OpenCVMatMutex.unlock();
     this->Modified();
   }
 
@@ -51,11 +49,11 @@ namespace mitk{
     if (m_OpenCVMat.cols != 0 && m_OpenCVMat.rows != 0 && m_OpenCVMat.data)
     {
       // copy current cvMat
-      m_OpenCVMatMutex->Lock();
+      m_OpenCVMatMutex.lock();
       const cv::Mat input = m_OpenCVMat;
-      m_OpenCVMatMutex->Unlock();
+      m_OpenCVMatMutex.unlock();
       // convert cvMat to mitk::Image
-      m_ImageMutex->Lock();
+      m_ImageMutex.lock();
       // now convert rgb image
       if ((input.depth() >= 0) && ((unsigned int)input.depth() == CV_8S) && (input.channels() == 1))
       {
@@ -98,8 +96,7 @@ namespace mitk{
         MITK_WARN << "Unknown image depth and/or pixel type. Cannot convert OpenCV to MITK image.";
         return;
       }
-      //inputMutex->Unlock();
-      m_ImageMutex->Unlock();
+      m_ImageMutex.unlock();
     }
     else
     {
@@ -147,9 +144,9 @@ namespace mitk{
     mitkImage->Modified();
     mitkImage->Update();
 
-    m_ImageMutex->Lock();
+    m_ImageMutex.lock();
     m_Image = mitkImage;
-    m_ImageMutex->Unlock();
+    m_ImageMutex.unlock();
   }
 
 } // end namespace mitk

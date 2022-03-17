@@ -45,11 +45,6 @@ unsigned int mitk::USDevice::GetSizeOfImageVector()
 
 mitk::USDevice::USDevice(std::string manufacturer, std::string model)
   : mitk::ImageSource(),
-  m_FreezeBarrier(nullptr),
-  m_FreezeMutex(),
-  m_MultiThreader(itk::MultiThreader::New()),
-  m_ImageMutex(itk::FastMutexLock::New()),
-  m_ThreadID(-1),
   m_ImageVector(),
   m_Spacing(),
   m_IGTLServer(nullptr),
@@ -83,11 +78,6 @@ mitk::USDevice::USDevice(std::string manufacturer, std::string model)
 
 mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata)
   : mitk::ImageSource(),
-  m_FreezeBarrier(nullptr),
-  m_FreezeMutex(),
-  m_MultiThreader(itk::MultiThreader::New()),
-  m_ImageMutex(itk::FastMutexLock::New()),
-  m_ThreadID(-1),
   m_ImageVector(),
   m_Spacing(),
   m_IGTLServer(nullptr),
@@ -122,10 +112,8 @@ mitk::USDevice::USDevice(mitk::USImageMetadata::Pointer metadata)
 
 mitk::USDevice::~USDevice()
 {
-  if (m_ThreadID >= 0)
-  {
-    m_MultiThreader->TerminateThread(m_ThreadID);
-  }
+  if (m_Thread.joinable())
+    m_Thread.detach();
 
   // make sure that the us device is not registered at the micro service
   // anymore after it is destructed
@@ -291,7 +279,7 @@ bool mitk::USDevice::Connect()
 
 void mitk::USDevice::ConnectAsynchron()
 {
-  this->m_MultiThreader->SpawnThread(this->ConnectThread, this);
+  m_Thread = std::thread(&USDevice::ConnectThread, this);
 }
 
 bool mitk::USDevice::Disconnect()
@@ -328,13 +316,10 @@ bool mitk::USDevice::Activate()
   {
     m_DeviceState = State_Activated;
 
-    m_FreezeBarrier = itk::ConditionVariable::New();
-
     // spawn thread for aquire images if us device is active
     if (m_SpawnAcquireThread)
     {
-      this->m_ThreadID =
-        this->m_MultiThreader->SpawnThread(this->Acquire, this);
+      m_Thread = std::thread(&USDevice::Acquire, this);
     }
 
     this->UpdateServiceProperty(
@@ -434,14 +419,18 @@ void mitk::USDevice::SetIsFreezed(bool freeze)
 
   if (freeze)
   {
+    std::lock_guard<std::mutex> lock(m_FreezeMutex);
     m_IsFreezed = true;
   }
   else
   {
-    m_IsFreezed = false;
+    {
+      std::lock_guard<std::mutex> lock(m_FreezeMutex);
+      m_IsFreezed = false;
+    }
 
     // wake up the image acquisition thread
-    m_FreezeBarrier->Signal();
+    m_FreezeBarrier.notify_one();
   }
 }
 
@@ -569,9 +558,9 @@ output->Graft( graft );
 void mitk::USDevice::GrabImage()
 {
   std::vector<mitk::Image::Pointer> image = this->GetUSImageSource()->GetNextImage();
-  m_ImageMutex->Lock();
+  m_ImageMutex.lock();
   this->SetImageVector(image);
-  m_ImageMutex->Unlock();
+  m_ImageMutex.unlock();
 }
 
 //########### GETTER & SETTER ##################//
@@ -618,7 +607,7 @@ void mitk::USDevice::SetSpacing(double xSpacing, double ySpacing)
 
 void mitk::USDevice::GenerateData()
 {
-  m_ImageMutex->Lock();
+  m_ImageMutex.lock();
 
   for (unsigned int i = 0; i < m_ImageVector.size() && i < this->GetNumberOfIndexedOutputs(); ++i)
   {
@@ -647,7 +636,7 @@ void mitk::USDevice::GenerateData()
       output->SetGeometry(image->GetGeometry());
     }
   }
-  m_ImageMutex->Unlock();
+  m_ImageMutex.unlock();
 };
 
 std::string mitk::USDevice::GetServicePropertyLabel()
@@ -665,40 +654,21 @@ std::string mitk::USDevice::GetServicePropertyLabel()
   return m_Manufacturer + " " + m_Name + isActive;
 }
 
-ITK_THREAD_RETURN_TYPE mitk::USDevice::Acquire(void* pInfoStruct)
+void mitk::USDevice::Acquire()
 {
-  /* extract this pointer from Thread Info structure */
-  struct itk::MultiThreader::ThreadInfoStruct* pInfo =
-    (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
-  mitk::USDevice* device = (mitk::USDevice*)pInfo->UserData;
-  while (device->GetIsActive())
+  while (this->GetIsActive())
   {
     // lock this thread when ultrasound device is freezed
-    if (device->m_IsFreezed)
-    {
-      itk::SimpleMutexLock* mutex = &(device->m_FreezeMutex);
-      mutex->Lock();
+    std::unique_lock<std::mutex> lock(m_FreezeMutex);
+    m_FreezeBarrier.wait(lock, [this] { return !m_IsFreezed; });
 
-      if (device->m_FreezeBarrier.IsNotNull())
-      {
-        device->m_FreezeBarrier->Wait(mutex);
-      }
-    }
-    device->GrabImage();
+    this->GrabImage();
   }
-  return ITK_THREAD_RETURN_VALUE;
 }
 
-ITK_THREAD_RETURN_TYPE mitk::USDevice::ConnectThread(void* pInfoStruct)
+void mitk::USDevice::ConnectThread()
 {
-  /* extract this pointer from Thread Info structure */
-  struct itk::MultiThreader::ThreadInfoStruct* pInfo =
-    (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
-  mitk::USDevice* device = (mitk::USDevice*)pInfo->UserData;
-
-  device->Connect();
-
-  return ITK_THREAD_RETURN_VALUE;
+  this->Connect();
 }
 
 

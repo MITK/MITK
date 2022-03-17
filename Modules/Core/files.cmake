@@ -52,6 +52,7 @@ set(CPP_FILES
   Controllers/mitkUndoController.cpp
   Controllers/mitkVerboseLimitedLinearUndo.cpp
   Controllers/mitkVtkLayerController.cpp
+
   DataManagement/mitkAnatomicalStructureColorPresets.cpp
   DataManagement/mitkArbitraryTimeGeometry.cpp
   DataManagement/mitkAbstractTransformGeometry.cpp
@@ -267,6 +268,7 @@ set(CPP_FILES
   IO/mitkSurfaceVtkIO.cpp
   IO/mitkSurfaceVtkLegacyIO.cpp
   IO/mitkSurfaceVtkXmlIO.cpp
+  IO/mitkUtf8Util.cpp
   IO/mitkVtkLoggingAdapter.cpp
   IO/mitkPreferenceListReaderOptionsFunctor.cpp
   IO/mitkIOMetaInformationPropertyConstants.cpp

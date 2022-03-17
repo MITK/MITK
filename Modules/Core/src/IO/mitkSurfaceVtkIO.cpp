@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include "mitkSurfaceVtkIO.h"
 
 #include "mitkSurface.h"
+#include <mitkUtf8Util.h>
 
 #include <vtkLinearTransform.h>
 #include <vtkPolyData.h>
@@ -41,7 +42,7 @@ namespace mitk
       return vtkSmartPointer<vtkPolyData>();
 
     std::string baseName = this->GetOutputLocation();
-    std::string extension = itksys::SystemTools::GetFilenameExtension(baseName);
+    std::string extension = Utf8Util::Utf8ToLocal8Bit(itksys::SystemTools::GetFilenameExtension(Utf8Util::Local8BitToUtf8(baseName)));
     if (!extension.empty())
     {
       baseName = baseName.substr(0, baseName.size() - extension.size());

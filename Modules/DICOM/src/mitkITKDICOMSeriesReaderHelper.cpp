@@ -69,32 +69,32 @@ mitk::Image::Pointer mitk::ITKDICOMSeriesReaderHelper::Load( const StringContain
       io->SetFileName( filenames.front().c_str() );
       io->ReadImageInformation();
 
-      if ( io->GetPixelType() == itk::ImageIOBase::SCALAR )
+      if ( io->GetPixelType() == itk::IOPixelEnum::SCALAR )
       {
         switch ( io->GetComponentType() )
         {
-          switch3DCase(DcmIoType::UCHAR, unsigned char) switch3DCase(DcmIoType::CHAR, char) switch3DCase(
-            DcmIoType::USHORT, unsigned short) switch3DCase(DcmIoType::SHORT, short)
-              switch3DCase(DcmIoType::UINT, unsigned int) switch3DCase(DcmIoType::INT, int) switch3DCase(
-                DcmIoType::ULONG, long unsigned int) switch3DCase(DcmIoType::LONG, long int)
-                switch3DCase(DcmIoType::FLOAT, float) switch3DCase(DcmIoType::DOUBLE, double) default
+          switch3DCase(itk::IOComponentEnum::UCHAR, unsigned char) switch3DCase(itk::IOComponentEnum::CHAR, char) switch3DCase(
+            itk::IOComponentEnum::USHORT, unsigned short) switch3DCase(itk::IOComponentEnum::SHORT, short)
+              switch3DCase(itk::IOComponentEnum::UINT, unsigned int) switch3DCase(itk::IOComponentEnum::INT, int) switch3DCase(
+                itk::IOComponentEnum::ULONG, long unsigned int) switch3DCase(itk::IOComponentEnum::LONG, long int)
+                switch3DCase(itk::IOComponentEnum::FLOAT, float) switch3DCase(itk::IOComponentEnum::DOUBLE, double) default
             : MITK_ERROR
               << "Found unsupported DICOM scalar pixel type: (enum value) "
               << io->GetComponentType();
         }
       }
-      else if ( io->GetPixelType() == itk::ImageIOBase::RGB )
+      else if ( io->GetPixelType() == itk::IOPixelEnum::RGB )
       {
         switch ( io->GetComponentType() )
         {
-          switch3DCase(DcmIoType::UCHAR, itk::RGBPixel<unsigned char>) switch3DCase(
-            DcmIoType::CHAR, itk::RGBPixel<char>) switch3DCase(DcmIoType::USHORT,
+          switch3DCase(itk::IOComponentEnum::UCHAR, itk::RGBPixel<unsigned char>) switch3DCase(
+            itk::IOComponentEnum::CHAR, itk::RGBPixel<char>) switch3DCase(itk::IOComponentEnum::USHORT,
                                                                itk::RGBPixel<unsigned short>)
-              switch3DCase(DcmIoType::SHORT, itk::RGBPixel<short>) switch3DCase(
-                DcmIoType::UINT, itk::RGBPixel<unsigned int>) switch3DCase(DcmIoType::INT, itk::RGBPixel<int>)
-                switch3DCase(DcmIoType::ULONG, itk::RGBPixel<long unsigned int>)
-                  switch3DCase(DcmIoType::LONG, itk::RGBPixel<long int>) switch3DCase(
-                    DcmIoType::FLOAT, itk::RGBPixel<float>) switch3DCase(DcmIoType::DOUBLE,
+              switch3DCase(itk::IOComponentEnum::SHORT, itk::RGBPixel<short>) switch3DCase(
+                itk::IOComponentEnum::UINT, itk::RGBPixel<unsigned int>) switch3DCase(itk::IOComponentEnum::INT, itk::RGBPixel<int>)
+                switch3DCase(itk::IOComponentEnum::ULONG, itk::RGBPixel<long unsigned int>)
+                  switch3DCase(itk::IOComponentEnum::LONG, itk::RGBPixel<long int>) switch3DCase(
+                    itk::IOComponentEnum::FLOAT, itk::RGBPixel<float>) switch3DCase(itk::IOComponentEnum::DOUBLE,
                                                                          itk::RGBPixel<double>) default
             : MITK_ERROR
               << "Found unsupported DICOM scalar pixel type: (enum value) "
@@ -147,34 +147,34 @@ mitk::Image::Pointer mitk::ITKDICOMSeriesReaderHelper::Load3DnT( const StringCon
       io->SetFileName( filenamesLists.front().front().c_str() );
       io->ReadImageInformation();
 
-      if ( io->GetPixelType() == itk::ImageIOBase::SCALAR )
+      if ( io->GetPixelType() == itk::IOPixelEnum::SCALAR )
       {
         switch ( io->GetComponentType() )
         {
-          switch3DnTCase(DcmIoType::UCHAR, unsigned char) switch3DnTCase(DcmIoType::CHAR, char)
-              switch3DnTCase(DcmIoType::USHORT, unsigned short) switch3DnTCase(
-                DcmIoType::SHORT, short) switch3DnTCase(DcmIoType::UINT,
-                                                        unsigned int) switch3DnTCase(DcmIoType::INT, int)
-                switch3DnTCase(DcmIoType::ULONG, long unsigned int) switch3DnTCase(DcmIoType::LONG, long int)
-                  switch3DnTCase(DcmIoType::FLOAT, float) switch3DnTCase(DcmIoType::DOUBLE, double) default
+          switch3DnTCase(itk::IOComponentEnum::UCHAR, unsigned char) switch3DnTCase(itk::IOComponentEnum::CHAR, char)
+              switch3DnTCase(itk::IOComponentEnum::USHORT, unsigned short) switch3DnTCase(
+                itk::IOComponentEnum::SHORT, short) switch3DnTCase(itk::IOComponentEnum::UINT,
+                                                        unsigned int) switch3DnTCase(itk::IOComponentEnum::INT, int)
+                switch3DnTCase(itk::IOComponentEnum::ULONG, long unsigned int) switch3DnTCase(itk::IOComponentEnum::LONG, long int)
+                  switch3DnTCase(itk::IOComponentEnum::FLOAT, float) switch3DnTCase(itk::IOComponentEnum::DOUBLE, double) default
             : MITK_ERROR
               << "Found unsupported DICOM scalar pixel type: (enum value) "
               << io->GetComponentType();
         }
       }
-      else if ( io->GetPixelType() == itk::ImageIOBase::RGB )
+      else if ( io->GetPixelType() == itk::IOPixelEnum::RGB )
       {
         switch ( io->GetComponentType() )
         {
-          switch3DnTCase(DcmIoType::UCHAR, itk::RGBPixel<unsigned char>)
-              switch3DnTCase(DcmIoType::CHAR, itk::RGBPixel<char>) switch3DnTCase(
-                DcmIoType::USHORT, itk::RGBPixel<unsigned short>) switch3DnTCase(DcmIoType::SHORT,
+          switch3DnTCase(itk::IOComponentEnum::UCHAR, itk::RGBPixel<unsigned char>)
+              switch3DnTCase(itk::IOComponentEnum::CHAR, itk::RGBPixel<char>) switch3DnTCase(
+                itk::IOComponentEnum::USHORT, itk::RGBPixel<unsigned short>) switch3DnTCase(itk::IOComponentEnum::SHORT,
                                                                                  itk::RGBPixel<short>)
-                switch3DnTCase(DcmIoType::UINT, itk::RGBPixel<unsigned int>) switch3DnTCase(
-                  DcmIoType::INT, itk::RGBPixel<int>) switch3DnTCase(DcmIoType::ULONG,
+                switch3DnTCase(itk::IOComponentEnum::UINT, itk::RGBPixel<unsigned int>) switch3DnTCase(
+                  itk::IOComponentEnum::INT, itk::RGBPixel<int>) switch3DnTCase(itk::IOComponentEnum::ULONG,
                                                                      itk::RGBPixel<long unsigned int>)
-                  switch3DnTCase(DcmIoType::LONG, itk::RGBPixel<long int>) switch3DnTCase(
-                    DcmIoType::FLOAT, itk::RGBPixel<float>) switch3DnTCase(DcmIoType::DOUBLE,
+                  switch3DnTCase(itk::IOComponentEnum::LONG, itk::RGBPixel<long int>) switch3DnTCase(
+                    itk::IOComponentEnum::FLOAT, itk::RGBPixel<float>) switch3DnTCase(itk::IOComponentEnum::DOUBLE,
                                                                            itk::RGBPixel<double>) default
             : MITK_ERROR
               << "Found unsupported DICOM scalar pixel type: (enum value) "

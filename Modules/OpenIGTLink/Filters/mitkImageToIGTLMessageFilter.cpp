@@ -69,41 +69,41 @@ void mitk::ImageToIGTLMessageFilter::GenerateData()
     // Set scalar type.
     switch (type.GetComponentType())
     {
-    case itk::ImageIOBase::CHAR:
+    case itk::IOComponentEnum::CHAR:
       imgMsg->SetScalarTypeToInt8();
       break;
-    case itk::ImageIOBase::UCHAR:
+    case itk::IOComponentEnum::UCHAR:
       imgMsg->SetScalarTypeToUint8();
       break;
-    case itk::ImageIOBase::SHORT:
+    case itk::IOComponentEnum::SHORT:
       imgMsg->SetScalarTypeToInt16();
       break;
-    case itk::ImageIOBase::USHORT:
+    case itk::IOComponentEnum::USHORT:
       imgMsg->SetScalarTypeToUint16();
       break;
-    case itk::ImageIOBase::INT:
+    case itk::IOComponentEnum::INT:
       imgMsg->SetScalarTypeToInt32();
       break;
-    case itk::ImageIOBase::UINT:
+    case itk::IOComponentEnum::UINT:
       imgMsg->SetScalarTypeToUint32();
       break;
-    case itk::ImageIOBase::LONG:
+    case itk::IOComponentEnum::LONG:
       // OIGTL doesn't formally support 64bit int scalars, but if they are
       // ever added,
       // they will have the identifier 8 assigned.
       imgMsg->SetScalarType(8);
       break;
-    case itk::ImageIOBase::ULONG:
+    case itk::IOComponentEnum::ULONG:
       // OIGTL doesn't formally support 64bit uint scalars, but if they are
       // ever added,
       // they will have the identifier 9 assigned.
       imgMsg->SetScalarType(9);
       break;
-    case itk::ImageIOBase::FLOAT:
+    case itk::IOComponentEnum::FLOAT:
       // The igtl library has no method for this. Correct type is 10.
       imgMsg->SetScalarType(10);
       break;
-    case itk::ImageIOBase::DOUBLE:
+    case itk::IOComponentEnum::DOUBLE:
       // The igtl library has no method for this. Correct type is 11.
       imgMsg->SetScalarType(11);
       break;
@@ -163,33 +163,37 @@ void mitk::ImageToIGTLMessageFilter::GenerateData()
     size_t num_scalars = num_pixel * type.GetNumberOfComponents();
     switch (type.GetComponentType())
     {
-    case itk::ImageIOBase::CHAR:
-    case itk::ImageIOBase::UCHAR:
+    case itk::IOComponentEnum::CHAR:
+    case itk::IOComponentEnum::UCHAR:
       // No endian conversion necessary, because a char is exactly one byte!
       break;
-    case itk::ImageIOBase::SHORT:
-    case itk::ImageIOBase::USHORT:
+    case itk::IOComponentEnum::SHORT:
+    case itk::IOComponentEnum::USHORT:
       itk::ByteSwapper<short>::SwapRangeFromSystemToLittleEndian((short*)out,
         num_scalars);
       break;
-    case itk::ImageIOBase::INT:
-    case itk::ImageIOBase::UINT:
+    case itk::IOComponentEnum::INT:
+    case itk::IOComponentEnum::UINT:
       itk::ByteSwapper<int>::SwapRangeFromSystemToLittleEndian((int*)out,
         num_scalars);
       break;
-    case itk::ImageIOBase::LONG:
-    case itk::ImageIOBase::ULONG:
+    case itk::IOComponentEnum::LONG:
+    case itk::IOComponentEnum::ULONG:
       itk::ByteSwapper<long>::SwapRangeFromSystemToLittleEndian((long*)out,
         num_scalars);
       break;
-    case itk::ImageIOBase::FLOAT:
+    case itk::IOComponentEnum::FLOAT:
       itk::ByteSwapper<float>::SwapRangeFromSystemToLittleEndian((float*)out,
         num_scalars);
       break;
-    case itk::ImageIOBase::DOUBLE:
+    case itk::IOComponentEnum::DOUBLE:
       itk::ByteSwapper<double>::SwapRangeFromSystemToLittleEndian(
         (double*)out, num_scalars);
       break;
+    default:
+      MITK_ERROR << "Can not handle pixel component type "
+        << type.GetComponentType();
+      return;
     }
 
     //copy timestamp of mitk image

@@ -195,7 +195,7 @@ namespace itk
   }
 
   template <class TScalarType>
-  unsigned long itk::VtkAbstractTransform<TScalarType>::GetMTime() const
+  itk::ModifiedTimeType itk::VtkAbstractTransform<TScalarType>::GetMTime() const
   {
     if ((m_VtkAbstractTransform != nullptr) &&
         (m_LastVtkAbstractTransformTimeStamp < m_VtkAbstractTransform->GetMTime()))
@@ -228,7 +228,7 @@ namespace itk
 
   template <class TScalarType>
   void itk::VtkAbstractTransform<TScalarType>::ComputeJacobianWithRespectToPosition(const InputPointType &,
-                                                                                    JacobianType &) const
+                                                                                    JacobianPositionType &) const
   {
     // TODO
   }

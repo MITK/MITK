@@ -360,11 +360,11 @@ namespace itk
           {
             if (i != k)
             {
-              tempIndex.m_Index[k] = topIndex[k];
+              tempIndex[k] = topIndex[k];
             }
             else
             {
-              tempIndex.m_Index[k] = topIndex[k] + j;
+              tempIndex[k] = topIndex[k] + j;
             }
           } // end build the index of a neighbor
 

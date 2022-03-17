@@ -36,6 +36,7 @@ namespace itk
   template <class TInputImage, class TOutputImage>
   LocalVariationImageFilter<TInputImage, TOutputImage>::LocalVariationImageFilter()
   {
+    this->DynamicMultiThreadingOff();
   }
 
   template <class TInputImage, class TOutputImage>

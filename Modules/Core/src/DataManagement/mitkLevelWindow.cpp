@@ -264,8 +264,8 @@ void mitk::LevelWindow::SetAuto(const mitk::Image *image,
   if (image == nullptr || !image->IsInitialized())
     return;
 
-  if (itk::ImageIOBase::IOComponentType::FLOAT == image->GetPixelType().GetComponentType()
-  ||  itk::ImageIOBase::IOComponentType::DOUBLE == image->GetPixelType().GetComponentType())
+  if (itk::IOComponentEnum::FLOAT == image->GetPixelType().GetComponentType()
+  ||  itk::IOComponentEnum::DOUBLE == image->GetPixelType().GetComponentType())
   {
     m_IsFloatingImage = true;
   }
@@ -330,8 +330,8 @@ void mitk::LevelWindow::SetAuto(const mitk::Image *image,
   }
 
   // Fix for bug# 344 Level Window wird bei Eris Cut bildern nicht richtig gesetzt
-  if (image->GetPixelType().GetPixelType() == itk::ImageIOBase::SCALAR &&
-      image->GetPixelType().GetComponentType() == itk::ImageIOBase::INT && image->GetPixelType().GetBpe() >= 8)
+  if (image->GetPixelType().GetPixelType() == itk::IOPixelEnum::SCALAR &&
+      image->GetPixelType().GetComponentType() == itk::IOComponentEnum::INT && image->GetPixelType().GetBpe() >= 8)
   {
     // the windows compiler complains about ambiguos 'pow' call, therefore static casting to (double, int)
     if (minValue == -(pow((double)2.0, static_cast<int>(image->GetPixelType().GetBpe() / 2))))

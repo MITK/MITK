@@ -197,7 +197,7 @@ namespace mitk
     itk::NrrdImageIO::Pointer nrrdWriter = itk::NrrdImageIO::New();
     nrrdWriter->SetNumberOfDimensions(dimension);
     nrrdWriter->SetPixelType( imageTemplate->GetPixelType().GetPixelType());
-    nrrdWriter->SetComponentType( (itk::ImageIOBase::IOComponentType) imageTemplate->GetPixelType().GetComponentType());
+    nrrdWriter->SetComponentType( imageTemplate->GetPixelType().GetComponentType());
     if(imageTemplate->GetPixelType().GetNumberOfComponents() > 1)
     {
       nrrdWriter->SetNumberOfComponents(imageTemplate->GetPixelType().GetNumberOfComponents());
@@ -213,8 +213,8 @@ namespace mitk
       nrrdWriter->SetSpacing(i,spacing[i]);
       nrrdWriter->SetOrigin(i,origin[i]);
 
-      mitk::Vector3D direction;
-      direction.SetVnlVector(imageTemplate->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(i));
+      mitk::Vector3D direction(0.0);
+      direction.SetVnlVector(imageTemplate->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(i).as_ref());
       vnl_vector< double > axisDirection(dimension);
 
       for(unsigned int j = 0; j < dimension; j++)

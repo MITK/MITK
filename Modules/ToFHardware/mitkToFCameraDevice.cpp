@@ -16,7 +16,7 @@ namespace mitk
 {
   ToFCameraDevice::ToFCameraDevice():m_BufferSize(1),m_MaxBufferSize(100),m_CurrentPos(-1),m_FreePos(0),
     m_CaptureWidth(204),m_CaptureHeight(204),m_PixelNumber(41616),m_SourceDataSize(0),
-    m_ThreadID(0),m_CameraActive(false),m_CameraConnected(false),m_ImageSequence(0)
+    m_CameraActive(false),m_CameraConnected(false),m_ImageSequence(0)
   {
     this->m_AmplitudeArray = nullptr;
     this->m_IntensityArray = nullptr;
@@ -29,10 +29,6 @@ namespace mitk
     this->m_PropertyList->SetBoolProperty("HasRGBImage", false);
     this->m_PropertyList->SetBoolProperty("HasIntensityImage", false);
     this->m_PropertyList->SetBoolProperty("HasAmplitudeImage", false);
-
-    this->m_MultiThreader = itk::MultiThreader::New();
-    this->m_ImageMutex = itk::FastMutexLock::New();
-    this->m_CameraActiveMutex = itk::FastMutexLock::New();
 
     this->m_RGBImageWidth = this->m_CaptureWidth;
     this->m_RGBImageHeight = this->m_CaptureHeight;
@@ -151,23 +147,21 @@ namespace mitk
 
   void ToFCameraDevice::StopCamera()
   {
-    m_CameraActiveMutex->Lock();
+    m_CameraActiveMutex.lock();
     m_CameraActive = false;
-    m_CameraActiveMutex->Unlock();
+    m_CameraActiveMutex.unlock();
     itksys::SystemTools::Delay(100);
-    if (m_MultiThreader.IsNotNull())
-    {
-      m_MultiThreader->TerminateThread(m_ThreadID);
-    }
+    if (m_Thread.joinable())
+      m_Thread.detach();
     // wait a little to make sure that the thread is terminated
     itksys::SystemTools::Delay(100);
   }
 
   bool ToFCameraDevice::IsCameraActive()
   {
-    m_CameraActiveMutex->Lock();
+    m_CameraActiveMutex.lock();
     bool ok = m_CameraActive;
-    m_CameraActiveMutex->Unlock();
+    m_CameraActiveMutex.unlock();
     return ok;
   }
 

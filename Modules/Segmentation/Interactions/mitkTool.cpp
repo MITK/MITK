@@ -31,6 +31,11 @@ found in the LICENSE file.
 // itk
 #include <itkObjectFactory.h>
 
+namespace mitk
+{
+  itkEventMacroDefinition(ToolEvent, itk::ModifiedEvent);
+}
+
 mitk::Tool::Tool(const char *type, const us::Module *interactorModule)
   : m_EventConfig(""),
     m_ToolManager(nullptr),

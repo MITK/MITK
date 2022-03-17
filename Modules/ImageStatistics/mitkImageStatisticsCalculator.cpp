@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkImageStatisticsCalculator.h"
-#include <mitkExtendedLabelStatisticsImageFilter.h>
-#include <mitkExtendedStatisticsImageFilter.h>
+#include <mitkLabelStatisticsImageFilter.h>
+#include <mitkStatisticsImageFilter.h>
 #include <mitkImage.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkImageCast.h>
@@ -172,7 +172,7 @@ namespace mitk
     typename itk::Image<TPixel, VImageDimension> *image, const TimeGeometry *timeGeometry, TimeStepType timeStep)
   {
     typedef typename itk::Image<TPixel, VImageDimension> ImageType;
-    typedef typename itk::ExtendedStatisticsImageFilter<ImageType> ImageStatisticsFilterType;
+    typedef typename mitk::StatisticsImageFilter<ImageType> ImageStatisticsFilterType;
     typedef typename itk::MinMaxImageFilterWithIndex<ImageType> MinMaxFilterType;
 
     // reset statistics container if exists
@@ -276,7 +276,7 @@ namespace mitk
     statObj.AddStatistic(mitk::ImageStatisticsConstants::MEDIAN(), statisticsFilter->GetMedian());
     statObj.AddStatistic(mitk::ImageStatisticsConstants::UNIFORMITY(), statisticsFilter->GetUniformity());
     statObj.AddStatistic(mitk::ImageStatisticsConstants::UPP(), statisticsFilter->GetUPP());
-    statObj.m_Histogram = statisticsFilter->GetHistogram().GetPointer();
+    statObj.m_Histogram = statisticsFilter->GetHistogram();
     statisticContainerForImage->SetStatisticsForTimeStep(timeStep, statObj);
   }
 
@@ -300,10 +300,9 @@ namespace mitk
     typedef itk::Image<TPixel, VImageDimension> ImageType;
     typedef itk::Image<MaskPixelType, VImageDimension> MaskType;
     typedef typename MaskType::PixelType LabelPixelType;
-    typedef itk::ExtendedLabelStatisticsImageFilter<ImageType, MaskType> ImageStatisticsFilterType;
+    typedef LabelStatisticsImageFilter<ImageType> ImageStatisticsFilterType;
     typedef MaskUtilities<TPixel, VImageDimension> MaskUtilType;
     typedef typename itk::MinMaxLabelImageFilterWithIndex<ImageType, MaskType> MinMaxLabelFilterType;
-    typedef typename ImageType::PixelType InputImgPixelType;
 
     // workaround: if m_SecondaryMaskGenerator ist not null but m_MaskGenerator is! (this is the case if we request a
     // 'ignore zuero valued pixels' mask in the gui but do not define a primary mask)
@@ -380,18 +379,17 @@ namespace mitk
     minMaxFilter->UpdateLargestPossibleRegion();
 
     // set histogram parameters for each label individually (min/max may be different for each label)
-    typedef typename std::map<LabelPixelType, InputImgPixelType> MapType;
-    typedef typename std::pair<LabelPixelType, InputImgPixelType> PairType;
+    typedef typename std::unordered_map<LabelPixelType, ScalarType> MapType;
 
     std::vector<LabelPixelType> relevantLabels = minMaxFilter->GetRelevantLabels();
     MapType minVals;
     MapType maxVals;
-    std::map<LabelPixelType, unsigned int> nBins;
+    std::unordered_map<LabelPixelType, unsigned int> nBins;
 
     for (LabelPixelType label : relevantLabels)
     {
-      minVals.insert(PairType(label, minMaxFilter->GetMin(label)));
-      maxVals.insert(PairType(label, minMaxFilter->GetMax(label)));
+      minVals[label] = static_cast<ScalarType>(minMaxFilter->GetMin(label));
+      maxVals[label] = static_cast<ScalarType>(minMaxFilter->GetMax(label));
 
       unsigned int nBinsForHistogram;
       if (m_UseBinSizeOverNBins)
@@ -406,7 +404,7 @@ namespace mitk
         nBinsForHistogram = m_nBinsForHistogramStatistics;
       }
 
-      nBins.insert(typename std::pair<LabelPixelType, unsigned int>(label, nBinsForHistogram));
+      nBins[label] = nBinsForHistogram;
     }
 
     typename ImageStatisticsFilterType::Pointer imageStatisticsFilter = ImageStatisticsFilterType::New();
@@ -414,10 +412,10 @@ namespace mitk
     imageStatisticsFilter->SetCoordinateTolerance(0.001);
     imageStatisticsFilter->SetInput(adaptedImage);
     imageStatisticsFilter->SetLabelInput(maskImage);
-    imageStatisticsFilter->SetHistogramParametersForLabels(nBins, minVals, maxVals);
+    imageStatisticsFilter->SetHistogramParameters(nBins, minVals, maxVals);
     imageStatisticsFilter->Update();
 
-    std::list<int> labels = imageStatisticsFilter->GetRelevantLabels();
+    auto labels = imageStatisticsFilter->GetValidLabelValues();
     auto it = labels.begin();
 
     while (it != labels.end())
@@ -466,9 +464,6 @@ namespace mitk
       statObj.AddStatistic(mitk::ImageStatisticsConstants::MINIMUMPOSITION(), minIndex);
       statObj.AddStatistic(mitk::ImageStatisticsConstants::MAXIMUMPOSITION(), maxIndex);
 
-      assert(std::abs(minMaxFilter->GetMax(*it) - imageStatisticsFilter->GetMaximum(*it)) < mitk::eps);
-      assert(std::abs(minMaxFilter->GetMin(*it) - imageStatisticsFilter->GetMinimum(*it)) < mitk::eps);
-
       auto voxelVolume = GetVoxelVolume<TPixel, VImageDimension>(image);
       auto numberOfVoxels =
         static_cast<unsigned long>(imageStatisticsFilter->GetCount(*it));
@@ -480,8 +475,10 @@ namespace mitk
       statObj.AddStatistic(mitk::ImageStatisticsConstants::NUMBEROFVOXELS(), numberOfVoxels);
       statObj.AddStatistic(mitk::ImageStatisticsConstants::VOLUME(), volume);
       statObj.AddStatistic(mitk::ImageStatisticsConstants::MEAN(), imageStatisticsFilter->GetMean(*it));
-      statObj.AddStatistic(mitk::ImageStatisticsConstants::MINIMUM(), imageStatisticsFilter->GetMinimum(*it));
-      statObj.AddStatistic(mitk::ImageStatisticsConstants::MAXIMUM(), imageStatisticsFilter->GetMaximum(*it));
+      statObj.AddStatistic(mitk::ImageStatisticsConstants::MINIMUM(),
+        static_cast<ImageStatisticsContainer::RealType>(imageStatisticsFilter->GetMinimum(*it)));
+      statObj.AddStatistic(mitk::ImageStatisticsConstants::MAXIMUM(),
+        static_cast<ImageStatisticsContainer::RealType>(imageStatisticsFilter->GetMaximum(*it)));
       statObj.AddStatistic(mitk::ImageStatisticsConstants::STANDARDDEVIATION(), imageStatisticsFilter->GetSigma(*it));
       statObj.AddStatistic(mitk::ImageStatisticsConstants::VARIANCE(), variance);
       statObj.AddStatistic(mitk::ImageStatisticsConstants::SKEWNESS(), imageStatisticsFilter->GetSkewness(*it));
@@ -492,8 +489,7 @@ namespace mitk
       statObj.AddStatistic(mitk::ImageStatisticsConstants::MEDIAN(), imageStatisticsFilter->GetMedian(*it));
       statObj.AddStatistic(mitk::ImageStatisticsConstants::UNIFORMITY(), imageStatisticsFilter->GetUniformity(*it));
       statObj.AddStatistic(mitk::ImageStatisticsConstants::UPP(), imageStatisticsFilter->GetUPP(*it));
-      statObj.m_Histogram = imageStatisticsFilter->GetHistogram(*it).GetPointer();
-
+      statObj.m_Histogram = imageStatisticsFilter->GetHistogram(*it);
       statisticContainerForLabelImage->SetStatisticsForTimeStep(timeStep, statObj);
       ++it;
     }

@@ -23,30 +23,30 @@ namespace mitk
   {
     switch (io->GetComponentType())
     {
-      case DcmIoType::UCHAR:
+      case itk::IOComponentEnum::UCHAR:
         return LoadDICOMByITK<itk::RGBPixel<unsigned char>>(
           filenames, correctTilt, tiltInfo, io, command, preLoadedImageBlock);
-      case DcmIoType::CHAR:
+      case itk::IOComponentEnum::CHAR:
         return LoadDICOMByITK<itk::RGBPixel<char>>(filenames, correctTilt, tiltInfo, io, command, preLoadedImageBlock);
-      case DcmIoType::USHORT:
+      case itk::IOComponentEnum::USHORT:
         return LoadDICOMByITK<itk::RGBPixel<unsigned short>>(
           filenames, correctTilt, tiltInfo, io, command, preLoadedImageBlock);
-      case DcmIoType::SHORT:
+      case itk::IOComponentEnum::SHORT:
         return LoadDICOMByITK<itk::RGBPixel<short>>(filenames, correctTilt, tiltInfo, io, command, preLoadedImageBlock);
-      case DcmIoType::UINT:
+      case itk::IOComponentEnum::UINT:
         return LoadDICOMByITK<itk::RGBPixel<unsigned int>>(
           filenames, correctTilt, tiltInfo, io, command, preLoadedImageBlock);
-      case DcmIoType::INT:
+      case itk::IOComponentEnum::INT:
         return LoadDICOMByITK<itk::RGBPixel<int>>(filenames, correctTilt, tiltInfo, io, command, preLoadedImageBlock);
-      case DcmIoType::ULONG:
+      case itk::IOComponentEnum::ULONG:
         return LoadDICOMByITK<itk::RGBPixel<long unsigned int>>(
           filenames, correctTilt, tiltInfo, io, command, preLoadedImageBlock);
-      case DcmIoType::LONG:
+      case itk::IOComponentEnum::LONG:
         return LoadDICOMByITK<itk::RGBPixel<long int>>(
           filenames, correctTilt, tiltInfo, io, command, preLoadedImageBlock);
-      case DcmIoType::FLOAT:
+      case itk::IOComponentEnum::FLOAT:
         return LoadDICOMByITK<itk::RGBPixel<float>>(filenames, correctTilt, tiltInfo, io, command, preLoadedImageBlock);
-      case DcmIoType::DOUBLE:
+      case itk::IOComponentEnum::DOUBLE:
         return LoadDICOMByITK<itk::RGBPixel<double>>(
           filenames, correctTilt, tiltInfo, io, command, preLoadedImageBlock);
       default:

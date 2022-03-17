@@ -91,11 +91,7 @@ namespace itk
     }                                                                                                                  \
   }
 
-//#if ITK_TEMPLATE_EXPLICIT
-//# include "Templates/itkImportMitkImageContainer+-.h"
-//#endif
-
-#if ITK_TEMPLATE_TXX
+#ifndef ITK_MANUAL_INSTANTIATION
 #include "itkImportMitkImageContainer.txx"
 #endif
 

@@ -11,13 +11,12 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkCameraIntrinsics.h"
-#include <itkMutexLockHolder.h>
 #include <mitkEndoMacros.h>
 #include <mitkEndoDebug.h>
 #include <tinyxml2.h>
 
 mitk::CameraIntrinsics::CameraIntrinsics()
-  : m_Valid(false), m_Mutex(itk::FastMutexLock::New())
+  : m_Valid(false)
 {
   m_CameraMatrix = cv::Mat::zeros(3, 3, cv::DataType<double>::type);
   m_CameraMatrix.at<double>(2,2) = 1.0;
@@ -28,7 +27,6 @@ mitk::CameraIntrinsics::CameraIntrinsics(const CameraIntrinsics& other)
   : itk::Object()
   , mitk::XMLSerializable()
   , m_Valid(false)
-  , m_Mutex(itk::FastMutexLock::New())
 {
   this->Copy(&other);
 }
@@ -57,7 +55,7 @@ void mitk::CameraIntrinsics::Copy(const CameraIntrinsics* other)
 
 bool mitk::CameraIntrinsics::IsValid() const
 {
-  itk::MutexLockHolder<itk::FastMutexLock> lock(*m_Mutex);
+  std::lock_guard<std::mutex> lock(m_Mutex);
   return m_Valid;
 }
 
@@ -68,7 +66,7 @@ vnl_matrix_fixed<mitk::ScalarType, 3, 3>
   mat.set_identity();
 
   {
-    itk::MutexLockHolder<itk::FastMutexLock> lock(*m_Mutex);
+    std::lock_guard<std::mutex> lock(m_Mutex);
     mat(0,0) = m_CameraMatrix.at<double>(0,0);
     mat(1,1) = m_CameraMatrix.at<double>(1,1);
 
@@ -82,7 +80,7 @@ vnl_matrix_fixed<mitk::ScalarType, 3, 3>
 void mitk::CameraIntrinsics::SetCameraMatrix(
     const vnl_matrix_fixed<mitk::ScalarType, 3, 3>& _CameraMatrix )
 {
-  itk::MutexLockHolder<itk::FastMutexLock> lock(*m_Mutex);
+  std::lock_guard<std::mutex> lock(m_Mutex);
   m_CameraMatrix.at<double>(0,0) = _CameraMatrix(0,0);
   m_CameraMatrix.at<double>(1,1) = _CameraMatrix(1,1);
 
@@ -104,7 +102,7 @@ void mitk::CameraIntrinsics::SetIntrinsics( const cv::Mat& _CameraMatrix
                         , const cv::Mat& _DistorsionCoeffs)
 {
   {
-    itk::MutexLockHolder<itk::FastMutexLock> lock(*m_Mutex);
+    std::lock_guard<std::mutex> lock(m_Mutex);
     if( _CameraMatrix.cols != 3 || _CameraMatrix.rows != 3)
       throw std::invalid_argument("Wrong format of camera matrix. Should be 3x3"
                                   " double.");
@@ -127,7 +125,7 @@ void mitk::CameraIntrinsics::SetIntrinsics( const mitk::Point3D& focalPoint,
 
 {
   {
-    itk::MutexLockHolder<itk::FastMutexLock> lock(*m_Mutex);
+    std::lock_guard<std::mutex> lock(m_Mutex);
     m_CameraMatrix.at<double>(0,0) = focalPoint[0];
     m_CameraMatrix.at<double>(1,1) = focalPoint[1];
 
@@ -145,7 +143,7 @@ void mitk::CameraIntrinsics::SetIntrinsics( const mitk::Point3D& focalPoint,
 void mitk::CameraIntrinsics::SetFocalLength( double x, double y )
 {
   {
-    itk::MutexLockHolder<itk::FastMutexLock> lock(*m_Mutex);
+    std::lock_guard<std::mutex> lock(m_Mutex);
     m_CameraMatrix.at<double>(0,0) = x;
     m_CameraMatrix.at<double>(1,1) = y;
   }
@@ -155,7 +153,7 @@ void mitk::CameraIntrinsics::SetFocalLength( double x, double y )
 void mitk::CameraIntrinsics::SetPrincipalPoint( double x, double y )
 {
   {
-    itk::MutexLockHolder<itk::FastMutexLock> lock(*m_Mutex);
+    std::lock_guard<std::mutex> lock(m_Mutex);
     m_CameraMatrix.at<double>(0,2) = x;
     m_CameraMatrix.at<double>(1,2) = y;
   }
@@ -167,7 +165,7 @@ void mitk::CameraIntrinsics::SetDistorsionCoeffs( double k1, double k2,
 {
 
   {
-    itk::MutexLockHolder<itk::FastMutexLock> lock(*m_Mutex);
+    std::lock_guard<std::mutex> lock(m_Mutex);
 
     m_DistorsionCoeffs.at<double>(0,0) = k1;
     m_DistorsionCoeffs.at<double>(0,1) = k2;
@@ -179,13 +177,13 @@ void mitk::CameraIntrinsics::SetDistorsionCoeffs( double k1, double k2,
 
 cv::Mat mitk::CameraIntrinsics::GetCameraMatrix() const
 {
-  itk::MutexLockHolder<itk::FastMutexLock> lock(*m_Mutex);
+  std::lock_guard<std::mutex> lock(m_Mutex);
   return m_CameraMatrix.clone(); // return a copy of this small matrix
 }
 
 cv::Mat mitk::CameraIntrinsics::GetDistorsionCoeffs() const
 {
-  itk::MutexLockHolder<itk::FastMutexLock> lock(*m_Mutex);
+  std::lock_guard<std::mutex> lock(m_Mutex);
   return m_DistorsionCoeffs.clone(); // return a copy of this small matrix
 }
 
@@ -197,7 +195,7 @@ cv::Mat mitk::CameraIntrinsics::GetDistorsionCoeffs()
 
 std::string mitk::CameraIntrinsics::ToString() const
 {
-  itk::MutexLockHolder<itk::FastMutexLock> lock(*m_Mutex);
+  std::lock_guard<std::mutex> lock(m_Mutex);
   std::ostringstream s; s.precision(12);
   const cv::Mat& CameraMatrix = m_CameraMatrix;
   const cv::Mat& DistorsionCoeffs = m_DistorsionCoeffs;
@@ -219,7 +217,7 @@ std::string mitk::CameraIntrinsics::ToString() const
 
 void mitk::CameraIntrinsics::ToXML(tinyxml2::XMLElement* elem) const
 {
-  itk::MutexLockHolder<itk::FastMutexLock> lock(*m_Mutex);
+  std::lock_guard<std::mutex> lock(m_Mutex);
   elem->SetValue(this->GetNameOfClass());
   std::ostringstream s; s.precision(12);
   const cv::Mat& CameraMatrix = m_CameraMatrix;
@@ -292,7 +290,7 @@ void mitk::CameraIntrinsics::FromGMLCalibrationXML(const tinyxml2::XMLElement* e
   elem->QueryIntAttribute("Valid", &valid);
 
   {
-    itk::MutexLockHolder<itk::FastMutexLock> lock(*m_Mutex);
+    std::lock_guard<std::mutex> lock(m_Mutex);
     m_Valid = static_cast<bool>(valid);
     m_CameraMatrix = CameraMatrix;
     m_DistorsionCoeffs = DistorsionCoeffs;
@@ -389,7 +387,7 @@ void mitk::CameraIntrinsics::FromXML(const tinyxml2::XMLElement* elem)
   elem->QueryIntAttribute("Valid", &valid);
 
   {
-    itk::MutexLockHolder<itk::FastMutexLock> lock(*m_Mutex);
+    std::lock_guard<std::mutex> lock(m_Mutex);
     m_Valid = static_cast<bool>(valid);
     m_CameraMatrix = CameraMatrix;
     m_DistorsionCoeffs = DistorsionCoeffs;
@@ -400,32 +398,32 @@ void mitk::CameraIntrinsics::FromXML(const tinyxml2::XMLElement* elem)
 
 double mitk::CameraIntrinsics::GetFocalLengthX() const
 {
-  itk::MutexLockHolder<itk::FastMutexLock> lock(*m_Mutex);
+  std::lock_guard<std::mutex> lock(m_Mutex);
   double FocalLengthX = m_CameraMatrix.at<double>(0,0);
 
   return FocalLengthX;
 }
 double mitk::CameraIntrinsics::GetFocalLengthY() const
 {
-  itk::MutexLockHolder<itk::FastMutexLock> lock(*m_Mutex);
+  std::lock_guard<std::mutex> lock(m_Mutex);
   double FocalLengthY = m_CameraMatrix.at<double>(1,1);;
   return FocalLengthY;
 }
 double mitk::CameraIntrinsics::GetPrincipalPointX() const
 {
-  itk::MutexLockHolder<itk::FastMutexLock> lock(*m_Mutex);
+  std::lock_guard<std::mutex> lock(m_Mutex);
   double PrincipalPointX = m_CameraMatrix.at<double>(0,2);
   return PrincipalPointX;
 }
 double mitk::CameraIntrinsics::GetPrincipalPointY() const
 {
-  itk::MutexLockHolder<itk::FastMutexLock> lock(*m_Mutex);
+  std::lock_guard<std::mutex> lock(m_Mutex);
   double PrincipalPointY = m_CameraMatrix.at<double>(1,2);
   return PrincipalPointY;
 }
 mitk::Point4D mitk::CameraIntrinsics::GetDistorsionCoeffsAsPoint4D() const
 {
-  itk::MutexLockHolder<itk::FastMutexLock> lock(*m_Mutex);
+  std::lock_guard<std::mutex> lock(m_Mutex);
   mitk::Point4D coeffs;
 
   coeffs[0] = m_DistorsionCoeffs.at<double>(0,0);
@@ -496,7 +494,7 @@ std::string mitk::CameraIntrinsics::ToOctaveString(
 
 void mitk::CameraIntrinsics::SetValid( bool valid )
 {
-  itk::MutexLockHolder<itk::FastMutexLock> lock(*m_Mutex);
+  std::lock_guard<std::mutex> lock(m_Mutex);
   m_Valid = valid;
 }
 

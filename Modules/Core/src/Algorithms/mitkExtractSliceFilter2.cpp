@@ -272,7 +272,7 @@ void mitk::ExtractSliceFilter2::SetInterpolator(Interpolator interpolator)
   }
 }
 
-void mitk::ExtractSliceFilter2::VerifyInputInformation()
+void mitk::ExtractSliceFilter2::VerifyInputInformation() const
 {
   Superclass::VerifyInputInformation();
 

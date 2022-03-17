@@ -190,7 +190,7 @@ namespace mitk {
     unsigned int                              m_StreamingTime;
 
     /** \brief mutex for guarding m_Time */
-    itk::SmartPointer<itk::FastMutexLock>     m_StreamingTimeMutex;
+    std::mutex                                m_StreamingTimeMutex;
 
     ///** \brief mutex for guarding m_StopStreamingThread */
     //itk::SmartPointer<itk::FastMutexLock>     m_StopStreamingThreadMutex;
@@ -208,14 +208,14 @@ namespace mitk {
   * this timer call IGTLMessageProvider::Update. 4. Also listen to the StreamingStopRequiredEvent
   * and stop the timer imdediately.
   * */
-  itkEventMacro(StreamingStartRequiredEvent, itk::AnyEvent);
+  itkEventMacroDeclaration(StreamingStartRequiredEvent, itk::AnyEvent);
 
   /**
   * \brief connect to this Event to get notified when a stream shall be stopped
   *
   * \note It is necessary to connect to this event and stop the streaming timer when called.
   * */
-  itkEventMacro(StreamingStopRequiredEvent, itk::AnyEvent);
+  itkEventMacroDeclaration(StreamingStopRequiredEvent, itk::AnyEvent);
 
 } // namespace mitk
 #endif /* MITKIGTLMESSAGEPROVIDER_H_HEADER_INCLUDED_ */

@@ -12,6 +12,17 @@ found in the LICENSE file.
 #include <mitkContourModel.h>
 #include <mitkPlaneGeometry.h>
 
+namespace mitk
+{
+  itkEventMacroDefinition(ContourModelEvent, itk::AnyEvent);
+  itkEventMacroDefinition(ContourModelShiftEvent, ContourModelEvent);
+  itkEventMacroDefinition(ContourModelSizeChangeEvent, ContourModelEvent);
+  itkEventMacroDefinition(ContourModelAddEvent, ContourModelSizeChangeEvent);
+  itkEventMacroDefinition(ContourModelRemoveEvent, ContourModelSizeChangeEvent);
+  itkEventMacroDefinition(ContourModelExpandTimeBoundsEvent, ContourModelEvent);
+  itkEventMacroDefinition(ContourModelClosedEvent, ContourModelEvent);
+}
+
 mitk::ContourModel::ContourModel() : m_UpdateBoundingBox(true)
 {
   // set to initial state

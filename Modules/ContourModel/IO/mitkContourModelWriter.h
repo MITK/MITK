@@ -29,6 +29,7 @@ namespace mitk
    *
    * The xml file will look like:
    *
+   * \code{.unparsed}
    *   <?xml version="1.0" encoding="utf-8"?>
    *   <contourModel>
    *      <head>
@@ -47,6 +48,7 @@ namespace mitk
    *        </timestep>
    *      </data>
    *    </contourModel>
+   * \endcode
    *
    * @ingroup MitkContourModelModule
    */

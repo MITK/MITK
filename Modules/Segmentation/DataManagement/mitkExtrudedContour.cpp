@@ -369,13 +369,12 @@ void mitk::ExtrudedContour::BuildGeometry()
   SetTimeGeometry(timeGeometry);
 }
 
-unsigned long mitk::ExtrudedContour::GetMTime() const
+itk::ModifiedTimeType mitk::ExtrudedContour::GetMTime() const
 {
-  unsigned long latestTime = Superclass::GetMTime();
+  auto latestTime = Superclass::GetMTime();
   if (m_Contour.IsNotNull())
   {
-    unsigned long localTime;
-    localTime = m_Contour->GetMTime();
+    auto localTime = m_Contour->GetMTime();
     if (localTime > latestTime)
       latestTime = localTime;
   }

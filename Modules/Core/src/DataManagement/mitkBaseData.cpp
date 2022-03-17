@@ -201,9 +201,9 @@ void mitk::BaseData::SetOrigin(const mitk::Point3D &origin)
   }
 }
 
-unsigned long mitk::BaseData::GetMTime() const
+itk::ModifiedTimeType mitk::BaseData::GetMTime() const
 {
-  unsigned long time = Superclass::GetMTime();
+  auto time = Superclass::GetMTime();
   if (m_TimeGeometry.IsNotNull())
   {
     if ((time < m_TimeGeometry->GetMTime()))

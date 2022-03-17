@@ -97,7 +97,7 @@ void QmitkIntensityProfileVisualizationWidget::OnClipboardButtonClicked()
 	{
 		clipboard = clipboard.append("%L1 \t %L2\n")
 			.arg(QString::number(i))
-			.arg(QString::number(m_IntensityProfileList.at(i)));
+      .arg(m_IntensityProfileList.at(i),0,'f');
 	}
 	QApplication::clipboard()->setText(clipboard, QClipboard::Clipboard);
 }

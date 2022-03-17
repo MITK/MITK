@@ -39,6 +39,7 @@ StitchImageFilter< TInputImage, TOutputImage, TInterpolatorPrecisionType, TTrans
   m_UseReferenceImage( false ),
   m_StitchStrategy(StitchStrategy::Mean)
 {
+  this->DynamicMultiThreadingOff();
 
   m_Size.Fill( 0 );
   m_OutputStartIndex.Fill( 0 );
@@ -329,7 +330,6 @@ StitchImageFilter< TInputImage, TOutputImage, TInterpolatorPrecisionType, TTrans
         OutputType value = m_Interpolators[input]->EvaluateAtContinuousIndex(inputIndex);
         pixvals.emplace_back(this->CastPixelWithBoundsChecking(value, minOutputValue, maxOutputValue));
 
-        ContinuousInputIndexType indexDistance;
         const auto spacing = input->GetSpacing();
 
         double minBorderDistance = std::numeric_limits<double>::max();

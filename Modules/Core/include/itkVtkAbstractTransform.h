@@ -41,6 +41,7 @@ namespace itk
     typedef typename Superclass::InputCovariantVectorType InputCovariantVectorType;
     typedef typename Superclass::ParametersType ParametersType;
     typedef typename Superclass::JacobianType JacobianType;
+    typedef typename Superclass::JacobianPositionType JacobianPositionType;
 
     itkFactorylessNewMacro(Self);
 
@@ -73,9 +74,9 @@ namespace itk
     void SetParameters(const ParametersType &) override;
     void SetFixedParameters(const ParametersType &) override;
     void ComputeJacobianWithRespectToParameters(const InputPointType &, JacobianType &) const override;
-    void ComputeJacobianWithRespectToPosition(const InputPointType &, JacobianType &) const override;
+    void ComputeJacobianWithRespectToPosition(const InputPointType &, JacobianPositionType &) const override;
 
-    unsigned long GetMTime() const override;
+    itk::ModifiedTimeType GetMTime() const override;
 
   protected:
     VtkAbstractTransform();

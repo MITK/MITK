@@ -17,12 +17,9 @@ found in the LICENSE file.
 #include <cstdio>
 
 #include <itksys/SystemTools.hxx>
-#include <itkMutexLockHolder.h>
 
 #include <igtlClientSocket.h>
 #include <igtl_status.h>
-
-typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
 mitk::IGTLClient::IGTLClient(bool ReadFully) :
 IGTLDevice(ReadFully)
@@ -109,9 +106,9 @@ void mitk::IGTLClient::Send()
 
 void mitk::IGTLClient::StopCommunicationWithSocket(igtl::Socket* /*socket*/)
 {
-  m_StopCommunicationMutex->Lock();
+  m_StopCommunicationMutex.lock();
   m_StopCommunication = true;
-  m_StopCommunicationMutex->Unlock();
+  m_StopCommunicationMutex.unlock();
 }
 
 unsigned int mitk::IGTLClient::GetNumberOfConnections()

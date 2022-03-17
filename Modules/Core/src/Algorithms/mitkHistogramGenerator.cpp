@@ -105,7 +105,7 @@ void mitk::HistogramGenerator::ComputeHistogram()
 float mitk::HistogramGenerator::GetMaximumFrequency() const
 {
   return CalculateMaximumFrequency(this->m_Histogram);
-};
+}
 
 float mitk::HistogramGenerator::CalculateMaximumFrequency(const HistogramType *histogram)
 {
@@ -115,11 +115,8 @@ float mitk::HistogramGenerator::CalculateMaximumFrequency(const HistogramType *h
   float maxFreq = 0;
   while (itr != end)
   {
-    maxFreq = vnl_math_max(maxFreq,
-                           // get rid of ambiguity with type signature
-                           // for vnl_math_max
-                           static_cast<float>(itr.GetFrequency()));
+    maxFreq = std::max(maxFreq, static_cast<float>(itr.GetFrequency()));
     ++itr;
   }
   return maxFreq;
-};
+}

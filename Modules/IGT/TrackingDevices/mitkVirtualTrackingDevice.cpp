@@ -18,21 +18,17 @@ found in the LICENSE file.
 #include <cstdio>
 #include <ctime>
 #include <itksys/SystemTools.hxx>
-#include <itkMutexLockHolder.h>
 #include <random>
 
 #include <mitkVirtualTrackerTypeInformation.h>
 
-typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
-
 mitk::VirtualTrackingDevice::VirtualTrackingDevice() : mitk::TrackingDevice(),
-m_AllTools(), m_ToolsMutex(nullptr), m_MultiThreader(nullptr), m_ThreadID(-1), m_RefreshRate(100), m_NumberOfControlPoints(20), m_GaussianNoiseEnabled(false),
+m_AllTools(), m_RefreshRate(100), m_NumberOfControlPoints(20), m_GaussianNoiseEnabled(false),
 m_MeanDistributionParam(0.0), m_DeviationDistributionParam(1.0)
 {
   m_Data = mitk::VirtualTrackerTypeInformation::GetDeviceDataVirtualTracker();
   m_Bounds[0] = m_Bounds[2] = m_Bounds[4] = -400.0;  // initialize bounds to -400 ... +400 (mm) cube
   m_Bounds[1] = m_Bounds[3] = m_Bounds[5] = 400.0;
-  m_ToolsMutex = itk::FastMutexLock::New();
 }
 
 mitk::VirtualTrackingDevice::~VirtualTrackingDevice()
@@ -46,11 +42,9 @@ mitk::VirtualTrackingDevice::~VirtualTrackingDevice()
     this->CloseConnection();
   }
   /* cleanup tracking thread */
-  if (m_MultiThreader.IsNotNull() && (m_ThreadID != -1))
-  {
-    m_MultiThreader->TerminateThread(m_ThreadID);
-    m_MultiThreader = nullptr;
-  }
+  if (m_Thread.joinable())
+    m_Thread.join();
+
   m_AllTools.clear();
 }
 
@@ -64,7 +58,7 @@ mitk::TrackingTool* mitk::VirtualTrackingDevice::AddTool(const char* toolName)
   t->SetToolName(toolName);
   t->SetVelocity(0.1);
   this->InitializeSpline(t);
-  MutexLockHolder lock(*m_ToolsMutex); // lock and unlock the mutex
+  std::lock_guard<std::mutex> lock(m_ToolsMutex); // lock and unlock the mutex
   m_AllTools.push_back(t);
   return t;
 }
@@ -75,18 +69,16 @@ bool mitk::VirtualTrackingDevice::StartTracking()
   if (this->GetState() != Ready)
     return false;
   this->SetState(Tracking);            // go to mode Tracking
-  this->m_StopTrackingMutex->Lock();
+  this->m_StopTrackingMutex.lock();
   this->m_StopTracking = false;
-  this->m_StopTrackingMutex->Unlock();
+  this->m_StopTrackingMutex.unlock();
 
   mitk::IGTTimeStamp::GetInstance()->Start(this);
 
-  if (m_MultiThreader.IsNotNull() && (m_ThreadID != -1))
-    m_MultiThreader->TerminateThread(m_ThreadID);
-  if (m_MultiThreader.IsNull())
-    m_MultiThreader = itk::MultiThreader::New();
+  if (m_Thread.joinable())
+    m_Thread.detach();
 
-  m_ThreadID = m_MultiThreader->SpawnThread(this->ThreadStartTracking, this);    // start a new thread that executes the TrackTools() method
+  m_Thread = std::thread(&VirtualTrackingDevice::ThreadStartTracking, this); // start a new thread that executes the TrackTools() method
   return true;
 }
 
@@ -94,13 +86,13 @@ bool mitk::VirtualTrackingDevice::StopTracking()
 {
   if (this->GetState() == Tracking) // Only if the object is in the correct state
   {
-    m_StopTrackingMutex->Lock();  // m_StopTracking is used by two threads, so we have to ensure correct thread handling
+    m_StopTrackingMutex.lock();  // m_StopTracking is used by two threads, so we have to ensure correct thread handling
     m_StopTracking = true;
-    m_StopTrackingMutex->Unlock();
+    m_StopTrackingMutex.unlock();
 
-    m_TrackingFinishedMutex->Lock();
+    m_TrackingFinishedMutex.lock();
     this->SetState(Ready);
-    m_TrackingFinishedMutex->Unlock();
+    m_TrackingFinishedMutex.unlock();
   }
 
   mitk::IGTTimeStamp::GetInstance()->Stop(this);
@@ -110,13 +102,13 @@ bool mitk::VirtualTrackingDevice::StopTracking()
 
 unsigned int mitk::VirtualTrackingDevice::GetToolCount() const
 {
-  MutexLockHolder lock(*m_ToolsMutex); // lock and unlock the mutex
+  std::lock_guard<std::mutex> lock(m_ToolsMutex); // lock and unlock the mutex
   return static_cast<unsigned int>(this->m_AllTools.size());
 }
 
 mitk::TrackingTool* mitk::VirtualTrackingDevice::GetTool(unsigned int toolNumber) const
 {
-  MutexLockHolder lock(*m_ToolsMutex); // lock and unlock the mutex
+  std::lock_guard<std::mutex> lock(m_ToolsMutex); // lock and unlock the mutex
   if (toolNumber < m_AllTools.size())
     return this->m_AllTools.at(toolNumber);
   return nullptr;
@@ -201,7 +193,7 @@ void mitk::VirtualTrackingDevice::SetToolSpeed(unsigned int idx, mitk::ScalarTyp
 
 mitk::VirtualTrackingTool* mitk::VirtualTrackingDevice::GetInternalTool(unsigned int idx)
 {
-  MutexLockHolder toolsMutexLockHolder(*m_ToolsMutex); // lock and unlock the mutex
+  std::lock_guard<std::mutex> toolsMutexLockHolder(m_ToolsMutex); // lock and unlock the mutex
   if (idx < m_AllTools.size())
     return m_AllTools.at(idx);
   else
@@ -211,16 +203,16 @@ mitk::VirtualTrackingTool* mitk::VirtualTrackingDevice::GetInternalTool(unsigned
 void mitk::VirtualTrackingDevice::TrackTools()
 {
   /* lock the TrackingFinishedMutex to signal that the execution rights are now transfered to the tracking thread */
-  MutexLockHolder trackingFinishedLockHolder(*m_TrackingFinishedMutex); // keep lock until end of scope
+  std::lock_guard<std::mutex> trackingFinishedLockHolder(m_TrackingFinishedMutex); // keep lock until end of scope
 
   if (this->GetState() != Tracking)
     return;
 
   bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here
 
-  this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
+  this->m_StopTrackingMutex.lock();  // update the local copy of m_StopTracking
   localStopTracking = this->m_StopTracking;
-  this->m_StopTrackingMutex->Unlock();
+  this->m_StopTrackingMutex.unlock();
 
   mitk::ScalarType t = 0.0;
   while ((this->GetState() == Tracking) && (localStopTracking == false))
@@ -267,31 +259,15 @@ void mitk::VirtualTrackingDevice::TrackTools()
     }
     itksys::SystemTools::Delay(m_RefreshRate);
     /* Update the local copy of m_StopTracking */
-    this->m_StopTrackingMutex->Lock();
+    this->m_StopTrackingMutex.lock();
     localStopTracking = m_StopTracking;
-    this->m_StopTrackingMutex->Unlock();
+    this->m_StopTrackingMutex.unlock();
   } // tracking ends if we pass this line
 }
 
-ITK_THREAD_RETURN_TYPE mitk::VirtualTrackingDevice::ThreadStartTracking(void* pInfoStruct)
+void mitk::VirtualTrackingDevice::ThreadStartTracking()
 {
-  /* extract this pointer from Thread Info structure */
-  struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
-  if (pInfo == nullptr)
-  {
-    return ITK_THREAD_RETURN_VALUE;
-  }
-  if (pInfo->UserData == nullptr)
-  {
-    return ITK_THREAD_RETURN_VALUE;
-  }
-  VirtualTrackingDevice *trackingDevice = static_cast<VirtualTrackingDevice*>(pInfo->UserData);
-
-  if (trackingDevice != nullptr)
-    trackingDevice->TrackTools();
-
-  trackingDevice->m_ThreadID = -1; // reset thread ID because we end the thread here
-  return ITK_THREAD_RETURN_VALUE;
+  this->TrackTools();
 }
 
 mitk::VirtualTrackingDevice::ControlPointType mitk::VirtualTrackingDevice::GetRandomPoint()

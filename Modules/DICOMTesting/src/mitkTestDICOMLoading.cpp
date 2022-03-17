@@ -146,27 +146,27 @@ mitk::TestDICOMLoading
 }
 
 std::string
-mitk::TestDICOMLoading::ComponentTypeToString(int type)
+mitk::TestDICOMLoading::ComponentTypeToString(itk::IOComponentEnum type)
 {
-  if (type == itk::ImageIOBase::UCHAR)
+  if (type == itk::IOComponentEnum::UCHAR)
     return "UCHAR";
-  else if (type == itk::ImageIOBase::CHAR)
+  else if (type == itk::IOComponentEnum::CHAR)
     return "CHAR";
-  else if (type == itk::ImageIOBase::USHORT)
+  else if (type == itk::IOComponentEnum::USHORT)
     return "USHORT";
-  else if (type == itk::ImageIOBase::SHORT)
+  else if (type == itk::IOComponentEnum::SHORT)
     return "SHORT";
-  else if (type == itk::ImageIOBase::UINT)
+  else if (type == itk::IOComponentEnum::UINT)
     return "UINT";
-  else if (type == itk::ImageIOBase::INT)
+  else if (type == itk::IOComponentEnum::INT)
     return "INT";
-  else if (type == itk::ImageIOBase::ULONG)
+  else if (type == itk::IOComponentEnum::ULONG)
     return "ULONG";
-  else if (type == itk::ImageIOBase::LONG)
+  else if (type == itk::IOComponentEnum::LONG)
     return "LONG";
-  else if (type == itk::ImageIOBase::FLOAT)
+  else if (type == itk::IOComponentEnum::FLOAT)
     return "FLOAT";
-  else if (type == itk::ImageIOBase::DOUBLE)
+  else if (type == itk::IOComponentEnum::DOUBLE)
     return "DOUBLE";
   else
     return "UNKNOWN";

@@ -335,7 +335,7 @@ void mitk::WeightedPointTransform::WeightedPointRegister(vtkPoints *X,
     delta_theta[2][1] = q[0];
     delta_theta[2][2] = 1;
 
-    vnl_svd<double> svd_delta_theta(delta_theta.GetVnlMatrix());
+    vnl_svd<double> svd_delta_theta(delta_theta.GetVnlMatrix().as_ref());
 
     // convert vnl matrices to itk matrices...
     Matrix3x3 U;

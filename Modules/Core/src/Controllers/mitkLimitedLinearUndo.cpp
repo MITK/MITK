@@ -13,6 +13,17 @@ found in the LICENSE file.
 #include "mitkLimitedLinearUndo.h"
 #include <mitkRenderingManager.h>
 
+namespace mitk
+{
+  itkEventMacroDefinition(UndoStackEvent, itk::ModifiedEvent);
+  itkEventMacroDefinition(UndoEmptyEvent, UndoStackEvent);
+  itkEventMacroDefinition(RedoEmptyEvent, UndoStackEvent);
+  itkEventMacroDefinition(UndoNotEmptyEvent, UndoStackEvent);
+  itkEventMacroDefinition(RedoNotEmptyEvent, UndoStackEvent);
+  itkEventMacroDefinition(UndoFullEvent, UndoStackEvent);
+  itkEventMacroDefinition(RedoFullEvent, UndoStackEvent);
+}
+
 mitk::LimitedLinearUndo::LimitedLinearUndo()
 : m_UndoLimit(0)
 {

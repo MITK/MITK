@@ -13,7 +13,6 @@ found in the LICENSE file.
 #include "mitkDataStorage.h"
 
 #include "itkCommand.h"
-#include "itkMutexLockHolder.h"
 #include "mitkDataNode.h"
 #include "mitkGroupTagProperty.h"
 #include "mitkImage.h"
@@ -210,7 +209,7 @@ void mitk::DataStorage::OnNodeModifiedOrDeleted(const itk::Object *caller, const
 
 void mitk::DataStorage::AddListeners(const DataNode *_Node)
 {
-  itk::MutexLockHolder<itk::SimpleFastMutexLock> locked(m_MutexOne);
+  std::lock_guard<std::mutex> locked(m_MutexOne);
   // node must not be 0 and must not be yet registered
   auto *NonConstNode = const_cast<DataNode *>(_Node);
   if (_Node && m_NodeModifiedObserverTags.find(NonConstNode) == m_NodeModifiedObserverTags.end())
@@ -223,7 +222,7 @@ void mitk::DataStorage::AddListeners(const DataNode *_Node)
       itk::MemberCommand<DataStorage>::New();
     interactorChangedCommand->SetCallbackFunction(this, &DataStorage::OnNodeInteractorChanged);
     m_NodeInteractorChangedObserverTags[NonConstNode] =
-      NonConstNode->AddObserver(DataNode::InteractorChangedEvent(), interactorChangedCommand);
+      NonConstNode->AddObserver(InteractorChangedEvent(), interactorChangedCommand);
 
     // add itk delete listener on datastorage
     itk::MemberCommand<DataStorage>::Pointer deleteCommand = itk::MemberCommand<DataStorage>::New();
@@ -235,7 +234,7 @@ void mitk::DataStorage::AddListeners(const DataNode *_Node)
 
 void mitk::DataStorage::RemoveListeners(const DataNode *_Node)
 {
-  itk::MutexLockHolder<itk::SimpleFastMutexLock> locked(m_MutexOne);
+  std::lock_guard<std::mutex> locked(m_MutexOne);
   // node must not be 0 and must be registered
   auto *NonConstNode = const_cast<DataNode *>(_Node);
   if (_Node && m_NodeModifiedObserverTags.find(NonConstNode) != m_NodeModifiedObserverTags.end())

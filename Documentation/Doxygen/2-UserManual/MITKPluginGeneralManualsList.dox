@@ -27,6 +27,7 @@
   \li \subpage org_mitk_views_segmentation
   \li \subpage org_mitk_views_deformableclippingplane
   \li \subpage org_mitk_gui_qt_flow_segmentation
+  \li \subpage org_mitk_editors_stdmultiwidget
   \li \subpage org_mitk_views_viewnavigatorview
   \li \subpage org_mitk_views_volumevisualization
 */

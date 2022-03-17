@@ -54,14 +54,14 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE(
       "SurfaceToImageFilter_AnyInputImageAndModeSetToBinary_ResultIsImageWithUCHARPixelType",
-      surfaceToImageFilter->GetOutput()->GetPixelType().GetComponentType() == itk::ImageIOBase::UCHAR);
+      surfaceToImageFilter->GetOutput()->GetPixelType().GetComponentType() == itk::IOComponentEnum::UCHAR);
 
     surfaceToImageFilter->SetUShortBinaryPixelType(true);
     surfaceToImageFilter->Update();
 
     CPPUNIT_ASSERT_MESSAGE(
       "SurfaceToImageFilter_AnyInputImageAndModeSetToBinary_ResultIsImageWithUCHARPixelType",
-      surfaceToImageFilter->GetOutput()->GetPixelType().GetComponentType() == itk::ImageIOBase::USHORT);
+      surfaceToImageFilter->GetOutput()->GetPixelType().GetComponentType() == itk::IOComponentEnum::USHORT);
   }
 
   void test3DSurfaceCorrect()

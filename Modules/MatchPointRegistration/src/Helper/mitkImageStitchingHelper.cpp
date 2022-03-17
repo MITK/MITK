@@ -106,7 +106,7 @@ void doMITKStitching(const ::itk::Image<TPixelType,VImageDimension>* /*input1*/,
   size[1] = resultGeometry->GetExtent(1);
   size[2] = resultGeometry->GetExtent(2);
   stitcher->SetSize(size);
-  stitcher->SetNumberOfThreads(1);
+  stitcher->SetNumberOfWorkUnits(1);
   stitcher->SetStitchStrategy(stitchStrategy);
 
   auto inputIter = inputs.begin();

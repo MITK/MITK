@@ -23,9 +23,10 @@ found in the LICENSE file.
 #include <vigra/random_forest/rf_split.hxx>
 
 // ITK include
-#include <itkFastMutexLock.h>
-#include <itkMultiThreader.h>
+#include <itkMultiThreaderBase.h>
 #include <itkCommand.h>
+
+#include <mutex>
 
 typedef mitk::ThresholdSplit<mitk::LinearSplitting< mitk::PUImpurityLoss<> >,int,vigra::ClassificationTag> DefaultPUSplitType;
 
@@ -59,7 +60,6 @@ struct mitk::PURFClassifier::TrainingData
     m_Label(refLabel),
     m_Parameter(parameter)
   {
-    m_mutex = itk::FastMutexLock::New();
   }
   vigra::ArrayVector<vigra::RandomForest<int>::DecisionTree_t>  trees_;
 
@@ -69,7 +69,7 @@ struct mitk::PURFClassifier::TrainingData
   const DefaultPUSplitType & m_Splitter;
   const vigra::MultiArrayView<2, double> m_Feature;
   const vigra::MultiArrayView<2, int> m_Label;
-  itk::FastMutexLock::Pointer m_mutex;
+  std::mutex m_mutex;
   Parameter m_Parameter;
 };
 
@@ -189,7 +189,7 @@ void mitk::PURFClassifier::Train(const Eigen::MatrixXd & X_in, const Eigen::Matr
 
   std::unique_ptr<TrainingData> data(new TrainingData(m_Parameter->TreeCount,m_RandomForest,splitter,X,Y, *m_Parameter));
 
-  itk::MultiThreader::Pointer threader = itk::MultiThreader::New();
+  auto threader = itk::MultiThreaderBase::New();
   threader->SetSingleMethod(this->TrainTreesCallback,data.get());
   threader->SingleMethodExecute();
 
@@ -227,7 +227,7 @@ Eigen::MatrixXi mitk::PURFClassifier::Predict(const Eigen::MatrixXd &X_in)
   std::unique_ptr<PredictionData> data;
   data.reset(new PredictionData(m_RandomForest, X, Y, P, TW));
 
-  itk::MultiThreader::Pointer threader = itk::MultiThreader::New();
+  auto threader = itk::MultiThreaderBase::New();
   threader->SetSingleMethod(this->PredictCallback, data.get());
   threader->SingleMethodExecute();
 
@@ -235,20 +235,20 @@ Eigen::MatrixXi mitk::PURFClassifier::Predict(const Eigen::MatrixXd &X_in)
   return m_OutLabel;
 }
 
-ITK_THREAD_RETURN_TYPE mitk::PURFClassifier::TrainTreesCallback(void * arg)
+itk::ITK_THREAD_RETURN_TYPE mitk::PURFClassifier::TrainTreesCallback(void * arg)
 {
   // Get the ThreadInfoStruct
-  typedef itk::MultiThreader::ThreadInfoStruct  ThreadInfoType;
+  typedef itk::MultiThreaderBase::WorkUnitInfo  ThreadInfoType;
   ThreadInfoType * infoStruct = static_cast< ThreadInfoType * >( arg );
 
   TrainingData * data = (TrainingData *)(infoStruct->UserData);
   unsigned int numberOfTreesToCalculate = 0;
 
   // define the number of tress the forest have to calculate
-  numberOfTreesToCalculate = data->m_NumberOfTrees / infoStruct->NumberOfThreads;
+  numberOfTreesToCalculate = data->m_NumberOfTrees / infoStruct->NumberOfWorkUnits;
 
   // the 0th thread takes the residuals
-  if(infoStruct->ThreadID == 0) numberOfTreesToCalculate += data->m_NumberOfTrees % infoStruct->NumberOfThreads;
+  if(infoStruct->WorkUnitID == 0) numberOfTreesToCalculate += data->m_NumberOfTrees % infoStruct->NumberOfWorkUnits;
 
   if(numberOfTreesToCalculate != 0){
     // Copy the Treestructure defined in userData
@@ -271,26 +271,26 @@ ITK_THREAD_RETURN_TYPE mitk::PURFClassifier::TrainTreesCallback(void * arg)
     rf.set_options().min_split_node_size(data->m_Parameter.MinimumSplitNodeSize);
     rf.learn(data->m_Feature, data->m_Label,vigra::rf::visitors::VisitorBase(),splitter);
 
-    data->m_mutex->Lock();
+    data->m_mutex.lock();
 
     for(const auto & tree : rf.trees_)
       data->trees_.push_back(tree);
 
     data->m_ClassCount = rf.class_count();
-    data->m_mutex->Unlock();
+    data->m_mutex.unlock();
   }
 
-  return ITK_THREAD_RETURN_VALUE;
+  return ITK_THREAD_RETURN_DEFAULT_VALUE;
 
 }
 
-ITK_THREAD_RETURN_TYPE mitk::PURFClassifier::PredictCallback(void * arg)
+itk::ITK_THREAD_RETURN_TYPE mitk::PURFClassifier::PredictCallback(void * arg)
 {
   // Get the ThreadInfoStruct
-  typedef itk::MultiThreader::ThreadInfoStruct  ThreadInfoType;
+  typedef itk::MultiThreaderBase::WorkUnitInfo  ThreadInfoType;
   ThreadInfoType * infoStruct = static_cast< ThreadInfoType * >( arg );
   // assigne the thread id
-  const unsigned int threadId = infoStruct->ThreadID;
+  const unsigned int threadId = infoStruct->WorkUnitID;
 
   // Get the user defined parameters containing all
   // neccesary informations
@@ -298,14 +298,14 @@ ITK_THREAD_RETURN_TYPE mitk::PURFClassifier::PredictCallback(void * arg)
   unsigned int numberOfRowsToCalculate = 0;
 
   // Get number of rows to calculate
-  numberOfRowsToCalculate = data->m_Feature.shape()[0] / infoStruct->NumberOfThreads;
+  numberOfRowsToCalculate = data->m_Feature.shape()[0] / infoStruct->NumberOfWorkUnits;
 
   unsigned int start_index = numberOfRowsToCalculate * threadId;
   unsigned int end_index = numberOfRowsToCalculate * (threadId+1);
 
   // the last thread takes the residuals
-  if(threadId == infoStruct->NumberOfThreads-1) {
-    end_index += data->m_Feature.shape()[0] % infoStruct->NumberOfThreads;
+  if(threadId == infoStruct->NumberOfWorkUnits-1) {
+    end_index += data->m_Feature.shape()[0] % infoStruct->NumberOfWorkUnits;
   }
 
   vigra::MultiArrayView<2, double> split_features;
@@ -333,7 +333,7 @@ ITK_THREAD_RETURN_TYPE mitk::PURFClassifier::PredictCallback(void * arg)
   data->m_RandomForest.predictProbabilities(split_features, split_probability);
 
 
-  return ITK_THREAD_RETURN_VALUE;
+  return ITK_THREAD_RETURN_DEFAULT_VALUE;
 
 }
 

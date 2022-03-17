@@ -907,7 +907,7 @@ bool Perspective::RestoreState()
   // Read the layout.
 //  result.merge(pres.restoreState(memento
 //          .getChild(IWorkbenchConstants.TAG_LAYOUT)));
-
+          pres->RestoreState(memento->GetChild(WorkbenchConstants::TAG_LAYOUT));
   //StartupThreading.runWithoutExceptions(new StartupRunnable()
   //    {
 

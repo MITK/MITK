@@ -22,7 +22,10 @@ if(MITK_USE_ANN)
       )
     endif()
 
-    set(patch_cmd ${CMAKE_COMMAND} -Dproj:STRING=${proj} -Dproj_target:STRING=ann -P ${CMAKE_CURRENT_LIST_DIR}/GenerateDefaultCMakeBuildSystem.cmake)
+    set(patch_cmd
+      ${CMAKE_COMMAND} -Dproj:STRING=${proj} -Dproj_target:STRING=ann -P ${CMAKE_CURRENT_LIST_DIR}/GenerateDefaultCMakeBuildSystem.cmake
+      COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ANN.patch
+    )
 
     ExternalProject_Add(${proj}
        LIST_SEPARATOR ${sep}

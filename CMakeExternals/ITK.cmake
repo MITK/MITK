@@ -33,6 +33,7 @@ if(NOT DEFINED ITK_DIR)
     list(APPEND additional_cmake_args
          -DModule_ITKVideoBridgeOpenCV:BOOL=ON
          -DOpenCV_DIR:PATH=${OpenCV_DIR}
+         "-DCMAKE_CONFIGURATION_TYPES:STRING=Debug;Release"
         )
   endif()
 

@@ -17,9 +17,8 @@ if(MITK_USE_Eigen)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/eigen-eigen-07105f7124f9.tar.bz2
-      URL_MD5 9e3bfaaab3db18253cfd87ea697b3ab1
-      PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/Eigen.patch
+      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/eigen-3.4.0.tar.gz
+      URL_MD5 4c527a9171d71a72a9d4186e65bea559
       CMAKE_GENERATOR ${gen}
       CMAKE_GENERATOR_PLATFORM ${gen_platform}
       CMAKE_ARGS

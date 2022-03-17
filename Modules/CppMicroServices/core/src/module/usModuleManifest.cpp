@@ -78,7 +78,7 @@ namespace {
       Any anyValue = ParseJsonValue(jsonValue);
       if (!anyValue.Empty())
       {
-        anyMap.insert(std::make_pair(it.memberName(), anyValue));
+        anyMap.insert(std::make_pair(it.name(), anyValue));
       }
     }
   }

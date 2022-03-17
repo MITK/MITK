@@ -414,16 +414,66 @@ diff -urNb vigra-Version-1-10-0/src/impex/imageinfo.cxx Vigra/src/impex/imageinf
 
                  if(numEndIt != filename.rend())
                  {
-diff -urNb vigra-Version-1-10-0/include/vigra/separableconvolution.hxx Vigra/include/vigra/separableconvolution.hxx
---- vigra-Version-1-10-0/include/vigra/separableconvolution.hxx 2013-11-18 17:48:16.000000000 +0100
-+++ Vigra/include/vigra/separableconvolution.hxx        2022-03-17 21:31:37.975192300 +0100
+diff -urNb vigra-1.10.0-src/include/vigra/separableconvolution.hxx Vigra/include/vigra/separableconvolution.hxx
+--- vigra-1.10.0-src/include/vigra/separableconvolution.hxx	2013-11-18 17:48:16.000000000 +0100
++++ Vigra/include/vigra/separableconvolution.hxx	2022-03-17 23:08:05.690694437 +0100
 @@ -1409,9 +1409,6 @@
          {}
-
-         ~InitProxy()
+ 
+         ~InitProxy() 
 -#ifndef _MSC_VER
 -             throw(PreconditionViolation)
 -#endif
          {
              vigra_precondition(count_ == 1 || count_ == sum_,
                    "Kernel1D::initExplicitly(): "
+diff -urNb vigra-1.10.0-src/src/impex/gif.cxx Vigra/src/impex/gif.cxx
+--- vigra-1.10.0-src/src/impex/gif.cxx	2013-11-18 17:48:16.000000000 +0100
++++ Vigra/src/impex/gif.cxx	2022-03-17 23:17:05.896364451 +0100
+@@ -482,12 +482,12 @@
+             in_code,
+             old_code;
+ 
+-        register int
++        int
+             bits,
+             code,
+             count;
+ 
+-        register unsigned long
++        unsigned long
+         datum;
+ 
+         void_vector<Int16> prefix(MaxStackSize);
+@@ -496,8 +496,8 @@
+         void_vector<UInt8> packet(256);
+         void_vector<UInt16> indices(header.width*header.height);
+ 
+-        register UInt8 *c;
+-        register UInt16 *p = indices.begin();
++        UInt8 *c;
++        UInt16 *p = indices.begin();
+ 
+         UInt8
+         data_size,
+@@ -624,7 +624,7 @@
+ 
+             int pass, x, y;
+ 
+-            register UInt16 *q;
++            UInt16 *q;
+ 
+             static int
+               interlace_rate[4] = { 8, 8, 4, 2 },
+@@ -891,9 +891,9 @@
+         long
+           datum;
+ 
+-        register int k;
++        int k;
+ 
+-        register UInt8 *p;
++        UInt8 *p;
+ 
+         void_vector<Int16> hash_code(MaxHashTable);
+         void_vector<Int16> hash_prefix(MaxHashTable);

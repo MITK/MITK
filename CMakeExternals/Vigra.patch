@@ -390,3 +390,27 @@ diff -u -r Vigra.orig/include/vigra/imagecontainer.hxx Vigra/include/vigra/image
      {
          images_.swap(other.images_);
          std::swap(lowestLevel_, other.lowestLevel_);
+diff -urNb vigra-Version-1-10-0/include/vigra/functortraits.hxx Vigra/include/vigra/functortraits.hxx
+--- vigra-Version-1-10-0/include/vigra/functortraits.hxx        2013-11-18 17:48:16.000000000 +0100
++++ Vigra/include/vigra/functortraits.hxx       2022-03-17 15:15:01.637026200 +0100
+@@ -195,8 +195,6 @@
+ VIGRA_DEFINE_STL_FUNCTOR(std::negate, VigraTrueType, VigraFalseType)
+ VIGRA_DEFINE_STL_FUNCTOR(std::logical_not, VigraTrueType, VigraFalseType)
+ VIGRA_DEFINE_STL_FUNCTOR(std::unary_negate, VigraTrueType, VigraFalseType)
+-VIGRA_DEFINE_STL_FUNCTOR(std::binder1st, VigraTrueType, VigraFalseType)
+-VIGRA_DEFINE_STL_FUNCTOR(std::binder2nd, VigraTrueType, VigraFalseType)
+ #undef VIGRA_DEFINE_STL_FUNCTOR
+
+ template <class R>
+diff -urNb vigra-Version-1-10-0/src/impex/imageinfo.cxx Vigra/src/impex/imageinfo.cxx
+--- vigra-Version-1-10-0/src/impex/imageinfo.cxx        2013-11-18 17:48:16.000000000 +0100
++++ Vigra/src/impex/imageinfo.cxx       2022-03-17 15:22:20.975223000 +0100
+@@ -1016,7 +1016,7 @@
+             do
+             {
+                 numEndIt = std::find_if(numBeginIt, filename.rend(),(int (*)(int)) &isdigit);
+-                numBeginIt = std::find_if(numEndIt, filename.rend(), not1(std::ptr_fun((int (*)(int))&isdigit)));
++                numBeginIt = std::find_if(numEndIt, filename.rend(), std::not_fn((int (*)(int))&isdigit));
+
+                 if(numEndIt != filename.rend())
+                 {

@@ -168,7 +168,7 @@ private:
 
   };
 
-  struct CompareMatchingParts: public std::binary_function<MatchingPart, MatchingPart, bool>
+  struct CompareMatchingParts
   {
     bool operator()(const MatchingPart& m1, const MatchingPart& m2) const;
   };

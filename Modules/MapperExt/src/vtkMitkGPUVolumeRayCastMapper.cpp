@@ -240,7 +240,7 @@ int vtkMitkGPUVolumeRayCastMapper::ValidateRender(vtkRenderer *ren, vtkVolume *v
   }
 
   // Check that we have input data
-  vtkImageData *input = this->GetInput();
+  auto *input = dynamic_cast<vtkImageData*>(this->GetInput());
 
   // If we have a timestamp change or data change then create a new clone.
   if (input != this->LastInput || input->GetMTime() > this->TransformedInput->GetMTime())

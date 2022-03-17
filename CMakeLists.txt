@@ -801,6 +801,7 @@ if(NOT MSVC_VERSION)
     -Wno-array-bounds
     -Wno-cast-function-type
     -Wno-maybe-uninitialized
+    -Wno-error=stringop-overread
     -fdiagnostics-show-option
     )
     mitkFunctionCheckCAndCXXCompilerFlags(${_flag} MITK_C_FLAGS MITK_CXX_FLAGS)

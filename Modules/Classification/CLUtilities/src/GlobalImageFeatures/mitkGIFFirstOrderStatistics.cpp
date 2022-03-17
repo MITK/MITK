@@ -92,7 +92,6 @@ CalculateFirstOrderStatistics(const itk::Image<TPixel, VImageDimension>* itkImag
   double mean_absolut_deviation = 0;
   double median_absolut_deviation = 0;
   double skewness = 0;
-  double sum_prob = 0;
   double binWidth = 0;
   double p05th = 0, p10th = 0, p15th = 0, p20th = 0, p25th = 0, p30th = 0, p35th = 0, p40th = 0, p45th = 0, p50th = 0;
   double p55th = 0, p60th = 0, p65th = 0, p70th = 0, p75th = 0, p80th = 0, p85th = 0, p90th = 0, p95th = 0;
@@ -145,7 +144,6 @@ CalculateFirstOrderStatistics(const itk::Image<TPixel, VImageDimension>* itkImag
         mode_bin = voxelValue;
       }
 
-      sum_prob += prob;
       squared_sum += prob * voxelValue*voxelValue;
 
       prob /= count;

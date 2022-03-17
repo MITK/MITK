@@ -414,3 +414,16 @@ diff -urNb vigra-Version-1-10-0/src/impex/imageinfo.cxx Vigra/src/impex/imageinf
 
                  if(numEndIt != filename.rend())
                  {
+diff -urNb vigra-Version-1-10-0/include/vigra/separableconvolution.hxx Vigra/include/vigra/separableconvolution.hxx
+--- vigra-Version-1-10-0/include/vigra/separableconvolution.hxx 2013-11-18 17:48:16.000000000 +0100
++++ Vigra/include/vigra/separableconvolution.hxx        2022-03-17 21:31:37.975192300 +0100
+@@ -1409,9 +1409,6 @@
+         {}
+
+         ~InitProxy()
+-#ifndef _MSC_VER
+-             throw(PreconditionViolation)
+-#endif
+         {
+             vigra_precondition(count_ == 1 || count_ == sum_,
+                   "Kernel1D::initExplicitly(): "

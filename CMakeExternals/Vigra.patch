@@ -477,3 +477,43 @@ diff -urNb vigra-1.10.0-src/src/impex/gif.cxx Vigra/src/impex/gif.cxx
  
          void_vector<Int16> hash_code(MaxHashTable);
          void_vector<Int16> hash_prefix(MaxHashTable);
+diff -urNb vigra-1.10.0-src/include/vigra/random_forest/rf_algorithm.hxx Vigra/include/vigra/random_forest/rf_algorithm.hxx
+--- vigra-1.10.0-src/include/vigra/random_forest/rf_algorithm.hxx	2013-11-18 17:48:16.000000000 +0100
++++ Vigra/include/vigra/random_forest/rf_algorithm.hxx	2022-03-18 08:52:17.519102162 +0100
+@@ -34,6 +34,7 @@
+ /************************************************************************/
+ #define VIGRA_RF_ALGORITHM_HXX
+ 
++#include <random>
+ #include <vector>
+ #include "splices.hxx"
+ #include <queue>
+@@ -1151,7 +1152,7 @@
+             ArrayVector<Int32> indices(pr.features().shape(0));
+             for(int ii = 0; ii < pr.features().shape(0); ++ii)
+                indices.push_back(ii); 
+-            std::random_shuffle(indices.begin(), indices.end());
++            std::shuffle(indices.begin(), indices.end(), std::mt19937(std::random_device()()));
+             for(int ii = 0; ii < rf.ext_param_.row_count_; ++ii)
+             {
+                 if(!sm.is_used()[indices[ii]] && cts[pr.response()(indices[ii], 0)] < 3000)
+diff -urNb vigra-1.10.0-src/include/vigra/random_forest/rf_visitors.hxx Vigra/include/vigra/random_forest/rf_visitors.hxx
+--- vigra-1.10.0-src/include/vigra/random_forest/rf_visitors.hxx	2013-11-18 17:48:16.000000000 +0100
++++ Vigra/include/vigra/random_forest/rf_visitors.hxx	2022-03-18 08:54:14.449776895 +0100
+@@ -41,6 +41,7 @@
+ #include <vigra/windows.h>
+ #include <iostream>
+ #include <iomanip>
++#include <random>
+ 
+ #include <vigra/multi_pointoperators.hxx>
+ #include <vigra/timing.hxx>
+@@ -909,7 +910,7 @@
+         {
+             ArrayVector<int> oob_indices;
+             ArrayVector<int> cts(class_count, 0);
+-            std::random_shuffle(indices.begin(), indices.end());
++            std::shuffle(indices.begin(), indices.end(), std::mt19937(std::random_device()()));
+             for(int ii = 0; ii < rf.ext_param_.row_count_; ++ii)
+             {
+                 if(!sm.is_used()[indices[ii]] && cts[pr.response()(indices[ii], 0)] < 40000)

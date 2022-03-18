@@ -22,6 +22,10 @@ if(MITK_USE_DCMQI)
       )
     endif()
 
+    if(MITK_USE_OpenCV)
+      list(APPEND additional_cmake_args "-DCMAKE_CONFIGURATION_TYPES:STRING=Debug$<SEMICOLON>Release")
+    endif()
+
     mitk_query_custom_ep_vars()
 
     ExternalProject_Add(${proj}
@@ -42,7 +46,7 @@ if(MITK_USE_DCMQI)
         -DITK_DIR:PATH=${ITK_DIR}
         -DITK_NO_IO_FACTORY_REGISTER_MANAGER:BOOL=ON
         -DDCMQI_SUPERBUILD:BOOL=OFF
-        -DDCMQI_CMAKE_CXX_STANDARD:STRING=14
+        -DDCMQI_CMAKE_CXX_STANDARD:STRING=${MITK_CXX_STANDARD}
         ${${proj}_CUSTOM_CMAKE_ARGS}
       CMAKE_CACHE_ARGS
         ${ep_common_cache_args}

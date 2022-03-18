@@ -1,0 +1,148 @@
+diff -urNb ann_1.1.2/src/ANN.cpp ANN/src/ANN.cpp
+--- ann_1.1.2/src/ANN.cpp	2010-01-28 05:40:01.000000000 +0100
++++ ANN/src/ANN.cpp	2022-03-17 21:55:57.011720500 +0100
+@@ -48,9 +48,9 @@
+ 	ANNpoint			p,
+ 	ANNpoint			q)
+ {
+-	register int d;
+-	register ANNcoord diff;
+-	register ANNcoord dist;
++	int d;
++	ANNcoord diff;
++	ANNcoord dist;
+ 
+ 	dist = 0;
+ 	for (d = 0; d < dim; d++) {
+diff -urNb ann_1.1.2/src/kd_fix_rad_search.cpp ANN/src/kd_fix_rad_search.cpp
+--- ann_1.1.2/src/kd_fix_rad_search.cpp	2010-01-28 05:40:01.000000000 +0100
++++ ANN/src/kd_fix_rad_search.cpp	2022-03-17 21:56:09.257624400 +0100
+@@ -147,11 +147,11 @@
+ 
+ void ANNkd_leaf::ann_FR_search(ANNdist box_dist)
+ {
+-	register ANNdist dist;				// distance to data point
+-	register ANNcoord* pp;				// data coordinate pointer
+-	register ANNcoord* qq;				// query coordinate pointer
+-	register ANNcoord t;
+-	register int d;
++	ANNdist dist;				// distance to data point
++	ANNcoord* pp;				// data coordinate pointer
++	ANNcoord* qq;				// query coordinate pointer
++	ANNcoord t;
++	int d;
+ 
+ 	for (int i = 0; i < n_pts; i++) {	// check points in bucket
+ 
+diff -urNb ann_1.1.2/src/kd_pr_search.cpp ANN/src/kd_pr_search.cpp
+--- ann_1.1.2/src/kd_pr_search.cpp	2010-01-28 05:40:01.000000000 +0100
++++ ANN/src/kd_pr_search.cpp	2022-03-17 21:56:20.260622500 +0100
+@@ -180,12 +180,12 @@
+ 
+ void ANNkd_leaf::ann_pri_search(ANNdist box_dist)
+ {
+-	register ANNdist dist;				// distance to data point
+-	register ANNcoord* pp;				// data coordinate pointer
+-	register ANNcoord* qq;				// query coordinate pointer
+-	register ANNdist min_dist;			// distance to k-th closest point
+-	register ANNcoord t;
+-	register int d;
++	ANNdist dist;				// distance to data point
++	ANNcoord* pp;				// data coordinate pointer
++	ANNcoord* qq;				// query coordinate pointer
++	ANNdist min_dist;			// distance to k-th closest point
++	ANNcoord t;
++	int d;
+ 
+ 	min_dist = ANNprPointMK->max_key(); // k-th smallest distance so far
+ 
+diff -urNb ann_1.1.2/src/kd_search.cpp ANN/src/kd_search.cpp
+--- ann_1.1.2/src/kd_search.cpp	2010-01-28 05:40:01.000000000 +0100
++++ ANN/src/kd_search.cpp	2022-03-17 21:56:28.132124600 +0100
+@@ -171,12 +171,12 @@
+ 
+ void ANNkd_leaf::ann_search(ANNdist box_dist)
+ {
+-	register ANNdist dist;				// distance to data point
+-	register ANNcoord* pp;				// data coordinate pointer
+-	register ANNcoord* qq;				// query coordinate pointer
+-	register ANNdist min_dist;			// distance to k-th closest point
+-	register ANNcoord t;
+-	register int d;
++	ANNdist dist;				// distance to data point
++	ANNcoord* pp;				// data coordinate pointer
++	ANNcoord* qq;				// query coordinate pointer
++	ANNdist min_dist;			// distance to k-th closest point
++	ANNcoord t;
++	int d;
+ 
+ 	min_dist = ANNkdPointMK->max_key(); // k-th smallest distance so far
+ 
+diff -urNb ann_1.1.2/src/kd_util.cpp ANN/src/kd_util.cpp
+--- ann_1.1.2/src/kd_util.cpp	2010-01-28 05:40:01.000000000 +0100
++++ ANN/src/kd_util.cpp	2022-03-17 21:56:34.316330300 +0100
+@@ -127,10 +127,10 @@
+ 	const ANNpoint		hi,				// high point of box
+ 	int					dim)			// dimension of space
+ {
+-	register ANNdist dist = 0.0;		// sum of squared distances
+-	register ANNdist t;
++	ANNdist dist = 0.0;		// sum of squared distances
++	ANNdist t;
+ 
+-	for (register int d = 0; d < dim; d++) {
++	for (int d = 0; d < dim; d++) {
+ 		if (q[d] < lo[d]) {				// q is left of box
+ 			t = ANNdist(lo[d]) - ANNdist(q[d]);
+ 			dist = ANN_SUM(dist, ANN_POW(t));
+@@ -238,8 +238,8 @@
+ 	int l = 0;							// left end of current subarray
+ 	int r = n-1;						// right end of current subarray
+ 	while (l < r) {
+-		register int i = (r+l)/2;		// select middle as pivot
+-		register int k;
++		int i = (r+l)/2;		// select middle as pivot
++		int k;
+ 
+ 		if (PA(i,d) > PA(r,d))			// make sure last > pivot
+ 			PASWAP(i,r)
+diff -urNb ann_1.1.2/src/pr_queue.h ANN/src/pr_queue.h
+--- ann_1.1.2/src/pr_queue.h	2010-01-28 05:40:01.000000000 +0100
++++ ANN/src/pr_queue.h	2022-03-17 21:56:44.266327900 +0100
+@@ -86,9 +86,9 @@
+ 		PQinfo inf)						// item info
+ 		{
+ 			if (++n > max_size) annError("Priority queue overflow.", ANNabort);
+-			register int r = n;
++			int r = n;
+ 			while (r > 1) {				// sift up new item
+-				register int p = r/2;
++				int p = r/2;
+ 				ANN_FLOP(1)				// increment floating ops
+ 				if (pq[p].key <= kv)	// in proper order
+ 					break;
+@@ -105,9 +105,9 @@
+ 		{
+ 			kv = pq[1].key;				// key of min item
+ 			inf = pq[1].info;			// information of min item
+-			register PQkey kn = pq[n--].key;// last item in queue
+-			register int p = 1;			// p points to item out of position
+-			register int r = p<<1;		// left child of p
++			PQkey kn = pq[n--].key;// last item in queue
++			int p = 1;			// p points to item out of position
++			int r = p<<1;		// left child of p
+ 			while (r <= n) {			// while r is still within the heap
+ 				ANN_FLOP(2)				// increment floating ops
+ 										// set r to smaller child of p
+diff -urNb ann_1.1.2/src/pr_queue_k.h ANN/src/pr_queue_k.h
+--- ann_1.1.2/src/pr_queue_k.h	2010-01-28 05:40:01.000000000 +0100
++++ ANN/src/pr_queue_k.h	2022-03-17 21:56:55.450345900 +0100
+@@ -100,7 +100,7 @@
+ 		PQKkey kv,						// key value
+ 		PQKinfo inf)					// item info
+ 		{
+-			register int i;
++			int i;
+ 										// slide larger values up
+ 			for (i = n; i > 0; i--) {
+ 				if (mk[i-1].key > kv)

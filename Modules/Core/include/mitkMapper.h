@@ -23,9 +23,6 @@ found in the LICENSE file.
 #include <itkObject.h>
 #include <itkWeakPointer.h>
 
-// Just included to get VTK version
-#include <vtkConfigure.h>
-
 class vtkWindow;
 class vtkProp;
 

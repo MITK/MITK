@@ -336,7 +336,7 @@ foreach(type RUNTIME ARCHIVE LIBRARY)
 endforeach()
 
 if(MITK_USE_OpenCV)
-  list(APPEND mitk_optional_cache_args "-DCMAKE_CONFIGURATION_TYPES:STRING=Debug;Release")
+  list(APPEND mitk_optional_cache_args "-DCMAKE_CONFIGURATION_TYPES:STRING=Debug$<SEMICOLON>Release")
 endif()
 
 # Optional python variables

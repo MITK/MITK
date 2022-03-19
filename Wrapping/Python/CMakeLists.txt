@@ -1,4 +1,4 @@
-# Version 2.8.1 is the minium requirement for this script.
+# Version 2.8.1 is the minimum requirement for this script.
 # this is lower than the general minimum requirement.
 #cmake_minimum_required ( VERSION 2.8.1 FATAL_ERROR )
 

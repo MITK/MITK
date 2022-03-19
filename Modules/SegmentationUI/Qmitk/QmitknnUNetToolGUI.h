@@ -185,9 +185,14 @@ private:
   void ShowErrorMessage(const std::string &, QMessageBox::Icon = QMessageBox::Critical);
 
   /**
-   * @brief Shows any message on the tool pane.
+   * @brief Writes any message in white on the tool pane.
    */
-  void ShowStatusMessage(const QString &);
+  void WriteStatusMessage(const QString &);
+  
+  /**
+   * @brief Writes any message in red on the tool pane.
+   */
+  void WriteErrorMessage(const QString &);
 
   /**
    * @brief Searches and parses paths of python virtual enviroments

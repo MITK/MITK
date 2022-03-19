@@ -92,11 +92,16 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   m_Controls.refreshdirectoryBox->setEnabled(true);
 
   m_Controls.statusLabel->setTextFormat(Qt::RichText);
-  ShowStatusMessage(QString("<b>STATUS: </b><i>Welcome to nnUNet. " + QString::number(m_GpuLoader.GetGPUCount()) +
-                            " GPUs were detected.</i>"));
   if (m_GpuLoader.GetGPUCount() != 0)
   {
     m_Controls.gpuSpinBox->setMaximum(m_GpuLoader.GetGPUCount() - 1);
+    WriteStatusMessage(QString("<b>STATUS: </b><i>Welcome to nnUNet. " + QString::number(m_GpuLoader.GetGPUCount()) +
+                            " GPUs were detected.</i>"));
+  }
+  else
+  {
+    WriteErrorMessage(QString("<b>STATUS: </b><i>Welcome to nnUNet. " + QString::number(m_GpuLoader.GetGPUCount()) +
+                            " GPUs were detected.</i>"));
   }
   mainLayout->addLayout(m_Controls.verticalLayout);
   Superclass::InitializeUI(mainLayout);
@@ -185,7 +190,7 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
       if (tool->GetPredict())
       {
         tool->m_InputBuffer = nullptr;
-        ShowStatusMessage(QString("<b>STATUS: </b><i>Starting Segmentation task... This might take a while.</i>"));
+        WriteStatusMessage(QString("<b>STATUS: </b><i>Starting Segmentation task... This might take a while.</i>"));
         tool->UpdatePreview();
         if (nullptr == tool->GetOutputBuffer())
         {
@@ -219,7 +224,7 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
       std::stringstream errorMsg;
       errorMsg << "Error while processing parameters for nnUNet segmentation. Reason: " << e.what();
       ShowErrorMessage(errorMsg.str());
-      ShowStatusMessage(QString::fromStdString(errorMsg.str()));
+      WriteErrorMessage(QString::fromStdString(errorMsg.str()));
       m_Controls.previewButton->setEnabled(true);
       tool->PredictOff();
       return;
@@ -278,9 +283,16 @@ void QmitknnUNetToolGUI::ShowErrorMessage(const std::string &message, QMessageBo
   MITK_WARN << message;
 }
 
-void QmitknnUNetToolGUI::ShowStatusMessage(const QString &message)
+void QmitknnUNetToolGUI::WriteStatusMessage(const QString &message)
 {
   m_Controls.statusLabel->setText(message);
+  m_Controls.statusLabel->setStyleSheet("font-weight: bold; color: white");
+}
+
+void QmitknnUNetToolGUI::WriteErrorMessage(const QString &message)
+{
+  m_Controls.statusLabel->setText(message);
+  m_Controls.statusLabel->setStyleSheet("font-weight: bold; color: red");
 }
 
 void QmitknnUNetToolGUI::ProcessEnsembleModelsParams(mitk::nnUNetTool::Pointer tool)
@@ -333,13 +345,13 @@ void QmitknnUNetToolGUI::ProcessEnsembleModelsParams(mitk::nnUNetTool::Pointer t
     {
       tool->SetPostProcessingJsonDirectory(ppJsonFilePossibility1.toStdString());
       const QString statusMsg = "<i>Post Processing JSON file found: </i>" + ppJsonFilePossibility1;
-      ShowStatusMessage(statusMsg);
+      WriteStatusMessage(statusMsg);
     }
     else if (QFile(ppJsonFilePossibility2).exists())
     {
       tool->SetPostProcessingJsonDirectory(ppJsonFilePossibility2.toStdString());
       const QString statusMsg = "<i>Post Processing JSON file found:</i>" + ppJsonFilePossibility2;
-      ShowStatusMessage(statusMsg);
+      WriteStatusMessage(statusMsg);
     }
     else
     {

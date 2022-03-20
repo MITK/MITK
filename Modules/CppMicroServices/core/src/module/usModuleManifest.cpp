@@ -57,13 +57,13 @@ namespace {
     {
       return Any(jsonValue.asBool());
     }
-    else if (jsonValue.isDouble())
-    {
-      return Any(jsonValue.asDouble());
-    }
     else if (jsonValue.isIntegral())
     {
       return Any(jsonValue.asInt());
+    }
+    else if (jsonValue.isDouble())
+    {
+      return Any(jsonValue.asDouble());
     }
 
     return Any();

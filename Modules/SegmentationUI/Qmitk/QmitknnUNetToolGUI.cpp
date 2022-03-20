@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <QDir>
 #include <QIcon>
 #include <QtGlobal>
+#include <QmitkStyleManager.h>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitknnUNetToolGUI, "")
 
@@ -83,12 +84,12 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   m_Controls.posSpinBox->setVisible(false);
   m_Controls.previewButton->setEnabled(false);
 
-  QSize sz(16, 16);
-  m_Controls.stopButton->setVisible(false);
-
-  QIcon refreshIcon;
-  refreshIcon.addPixmap(style()->standardIcon(QStyle::SP_BrowserReload).pixmap(sz), QIcon::Normal, QIcon::Off);
+  m_Controls.stopButton->setVisible(false); // Hidden for future
+  
+  QIcon refreshIcon = QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/view-refresh.svg"));
   m_Controls.refreshdirectoryBox->setIcon(refreshIcon);
+  QIcon dirIcon = QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-open.svg"));
+  m_Controls.modeldirectoryBox->setIcon(dirIcon);
   m_Controls.refreshdirectoryBox->setEnabled(true);
 
   m_Controls.statusLabel->setTextFormat(Qt::RichText);

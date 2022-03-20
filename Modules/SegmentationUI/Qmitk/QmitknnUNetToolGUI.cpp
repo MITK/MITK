@@ -34,7 +34,7 @@ QmitknnUNetToolGUI::QmitknnUNetToolGUI() : QmitkAutoMLSegmentationToolGUIBase()
   // define predicates for multi modal data selection combobox
   auto imageType = mitk::TNodePredicateDataType<mitk::Image>::New();
   auto labelSetImageType = mitk::NodePredicateNot::New(mitk::TNodePredicateDataType<mitk::LabelSetImage>::New());
-  this->m_MultiModalPredicate = mitk::NodePredicateAnd::New(imageType, labelSetImageType).GetPointer();
+  m_MultiModalPredicate = mitk::NodePredicateAnd::New(imageType, labelSetImageType).GetPointer();
 }
 
 void QmitknnUNetToolGUI::ConnectNewTool(mitk::AutoSegmentationWithPreviewTool *newTool)
@@ -183,7 +183,7 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
       if (doCache)
       {
         hashKey = nnUNetCache::GetUniqueHash(tool->m_ParamQ);
-        if (this->m_Cache.contains(hashKey))
+        if (m_Cache.contains(hashKey))
         {
           tool->PredictOff(); // purposefully placed to make tool->GetMTime different than before.
         }
@@ -210,9 +210,9 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
       else
       {
         MITK_INFO << "won't do segmentation. Key found: " << QString::number(hashKey).toStdString();
-        if (this->m_Cache.contains(hashKey))
+        if (m_Cache.contains(hashKey))
         {
-          nnUNetCache *cacheObject = this->m_Cache[hashKey];
+          nnUNetCache *cacheObject = m_Cache[hashKey];
           MITK_INFO << "fetched pointer " << cacheObject->m_SegCache.GetPointer();
           tool->SetNodeProperties(const_cast<mitk::LabelSetImage *>(cacheObject->m_SegCache.GetPointer()));
           SegmentationResultHandler(tool);
@@ -307,7 +307,7 @@ void QmitknnUNetToolGUI::ProcessEnsembleModelsParams(mitk::nnUNetTool::Pointer t
   std::vector<mitk::ModelParams> requestQ;
   QString ppDirFolderNamePart1 = "ensemble_";
   QStringList ppDirFolderNameParts;
-  for (std::unique_ptr<QmitknnUNetTaskParamsUITemplate> &layout : m_EnsembleParams)
+  for (auto &layout : m_EnsembleParams)
   {
     QStringList ppDirFolderName;
     QString modelName = layout->modelBox->currentText();
@@ -396,9 +396,8 @@ void QmitknnUNetToolGUI::CheckAllInCheckableComboBox(ctkCheckableComboBox *foldB
 {
   // Recalling all added items to check-mark it.
   const QAbstractItemModel *qaim = foldBox->checkableModel();
-  // for (int i = 0; i < folds.size(); ++i)
   auto rows = qaim->rowCount();
-  for (int i = 0; i < rows; ++i)
+  for (std::remove_const_t<decltype(rows)> i = 0; i < rows; ++i)
   {
     const QModelIndex mi = qaim->index(i, 0);
     foldBox->setCheckState(mi, Qt::Checked);
@@ -416,8 +415,7 @@ std::pair<QStringList, QStringList> QmitknnUNetToolGUI::ExtractTrainerPlannerFro
   }
   trainers.removeDuplicates();
   planners.removeDuplicates();
-  std::pair<QStringList, QStringList> returnPair = {trainers, planners};
-  return returnPair;
+  return std::make_pair(trainers, planners);
 }
 
 std::vector<std::string> QmitknnUNetToolGUI::FetchSelectedFoldsFromUI(ctkCheckableComboBox *foldBox)
@@ -451,7 +449,7 @@ void QmitknnUNetToolGUI::AddToCache(size_t &hashKey, mitk::LabelSetImage::ConstP
 {
   nnUNetCache *newCacheObj = new nnUNetCache;
   newCacheObj->m_SegCache = mlPreview;
-  this->m_Cache.insert(hashKey, newCacheObj);
+  m_Cache.insert(hashKey, newCacheObj);
   MITK_INFO << "New hash: " << hashKey << " " << newCacheObj->m_SegCache.GetPointer();
   UpdateCacheCountOnUI();
 }

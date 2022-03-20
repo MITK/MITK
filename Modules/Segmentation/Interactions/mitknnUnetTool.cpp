@@ -48,9 +48,9 @@ void mitk::nnUNetTool::UpdateCleanUp()
 
 void mitk::nnUNetTool::RenderOutputBuffer()
 {
-  if (this->m_OutputBuffer != nullptr)
+  if (m_OutputBuffer != nullptr)
   {
-    Superclass::SetNodeProperties(this->m_OutputBuffer);
+    Superclass::SetNodeProperties(m_OutputBuffer);
     try
     {
       if (nullptr != this->GetPreviewSegmentationNode())
@@ -73,17 +73,17 @@ void mitk::nnUNetTool::SetNodeProperties(LabelSetImage::Pointer segmentation)
 {
   // This overriden method doesn't set node properties. Intentionally left out for setting later upon demand
   // in the `RenderOutputBuffer` method.
-  this->m_OutputBuffer = segmentation;
+  m_OutputBuffer = segmentation;
 }
 
 mitk::LabelSetImage::Pointer mitk::nnUNetTool::GetOutputBuffer()
 {
-  return this->m_OutputBuffer;
+  return m_OutputBuffer;
 }
 
 void mitk::nnUNetTool::ClearOutputBuffer()
 {
-  this->m_OutputBuffer = nullptr;
+  m_OutputBuffer = nullptr;
 }
 
 us::ModuleResource mitk::nnUNetTool::GetIconResource() const
@@ -170,14 +170,14 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     IOUtil::Save(inputAtTimeStep, inputImagePath);
     if (this->GetMultiModal())
     {
-      std::string outModalFile;
-      int len = inDir.length() + token.length() + 1 + 8 + 2 + 7;
-      outModalFile.reserve(len);
       const std::string fileFormat(".nii.gz");
       const std::string fileNamePart("_000_000");
-      for (size_t i = 0; i < this->m_OtherModalPaths.size(); ++i)
+      std::string outModalFile;
+      size_t len = inDir.length() + 1 + token.length() + fileNamePart.length() + 1 + fileFormat.length();
+      outModalFile.reserve(len); // The 1(s) indicates a directory separator char and an underscore.
+      for (size_t i = 0; i < m_OtherModalPaths.size(); ++i)
       {
-        mitk::Image::ConstPointer modalImage = this->m_OtherModalPaths[i];
+        mitk::Image::ConstPointer modalImage = m_OtherModalPaths[i];
         outModalFile.append(inDir);
         outModalFile.push_back(IOUtil::GetDirectorySeparator());
         outModalFile.append(token);

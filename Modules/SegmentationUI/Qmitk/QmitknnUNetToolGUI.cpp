@@ -16,14 +16,14 @@ found in the LICENSE file.
 #include <QApplication>
 #include <QDir>
 #include <QIcon>
-#include <QtGlobal>
 #include <QmitkStyleManager.h>
+#include <QtGlobal>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitknnUNetToolGUI, "")
 
 QmitknnUNetToolGUI::QmitknnUNetToolGUI() : QmitkAutoMLSegmentationToolGUIBase()
 {
-  // Nvidia-smi command returning zero doesn't alway mean lack of GPUs.
+  // Nvidia-smi command returning zero doesn't always imply lack of GPUs.
   // Pytorch uses its own libraries to communicate to the GPUs. Hence, only a warning can be given.
   if (m_GpuLoader.GetGPUCount() == 0)
   {
@@ -51,6 +51,7 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
 #endif
   m_Controls.pythonEnvComboBox->addItem("Select");
   AutoParsePythonPaths();
+  SetGPUInfo();
   connect(m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnPreviewRequested()));
   connect(m_Controls.modeldirectoryBox,
           SIGNAL(directoryChanged(const QString &)),
@@ -85,24 +86,25 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   m_Controls.previewButton->setEnabled(false);
 
   m_Controls.stopButton->setVisible(false); // Hidden for future
-  
-  QIcon refreshIcon = QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/view-refresh.svg"));
+
+  QIcon refreshIcon =
+    QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/view-refresh.svg"));
   m_Controls.refreshdirectoryBox->setIcon(refreshIcon);
-  QIcon dirIcon = QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-open.svg"));
+  QIcon dirIcon =
+    QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-open.svg"));
   m_Controls.modeldirectoryBox->setIcon(dirIcon);
   m_Controls.refreshdirectoryBox->setEnabled(true);
 
   m_Controls.statusLabel->setTextFormat(Qt::RichText);
   if (m_GpuLoader.GetGPUCount() != 0)
   {
-    m_Controls.gpuSpinBox->setMaximum(m_GpuLoader.GetGPUCount() - 1);
     WriteStatusMessage(QString("<b>STATUS: </b><i>Welcome to nnUNet. " + QString::number(m_GpuLoader.GetGPUCount()) +
-                            " GPUs were detected.</i>"));
+                               " GPUs were detected.</i>"));
   }
   else
   {
     WriteErrorMessage(QString("<b>STATUS: </b><i>Welcome to nnUNet. " + QString::number(m_GpuLoader.GetGPUCount()) +
-                            " GPUs were detected.</i>"));
+                              " GPUs were detected.</i>"));
   }
   mainLayout->addLayout(m_Controls.verticalLayout);
   Superclass::InitializeUI(mainLayout);
@@ -171,7 +173,7 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
       tool->SetMultiModal(m_Controls.multiModalBox->isChecked());
       bool doCache = m_Controls.enableCachingCheckBox->isChecked();
       // Spinboxes
-      tool->SetGpuId(static_cast<unsigned int>(m_Controls.gpuSpinBox->value()));
+      tool->SetGpuId(FetchSelectedGPUFromUI());
       // Multi-Modal
       tool->MultiModalOff();
       if (m_Controls.multiModalBox->isChecked())
@@ -452,4 +454,33 @@ void QmitknnUNetToolGUI::AddToCache(size_t &hashKey, mitk::LabelSetImage::ConstP
   m_Cache.insert(hashKey, newCacheObj);
   MITK_INFO << "New hash: " << hashKey << " " << newCacheObj->m_SegCache.GetPointer();
   UpdateCacheCountOnUI();
+}
+
+void QmitknnUNetToolGUI::SetGPUInfo()
+{
+  std::vector<QmitkGPUSpec> specs = m_GpuLoader.GetAllGPUSpecs();
+  for (const QmitkGPUSpec &gpuSpec : specs)
+  {
+    m_Controls.gpuComboBox->addItem(QString::number(gpuSpec.id) + ": " + gpuSpec.name + " (" + gpuSpec.memory + ")");
+  }
+  if (specs.empty())
+  {
+    m_Controls.gpuComboBox->setEditable(true);
+    m_Controls.gpuComboBox->addItem(QString::number(0));
+    m_Controls.gpuComboBox->setValidator(new QIntValidator(0, 999, this));
+  }
+}
+
+unsigned int QmitknnUNetToolGUI::FetchSelectedGPUFromUI()
+{
+  QString gpuInfo = m_Controls.gpuComboBox->currentText();
+  if (m_GpuLoader.GetGPUCount() == 0)
+  {
+    return static_cast<unsigned int>(gpuInfo.toInt());
+  }
+  else
+  {
+    QString gpuId = gpuInfo.split(":", QString::SplitBehavior::SkipEmptyParts).first();
+    return static_cast<unsigned int>(gpuId.toInt());
+  }
 }

@@ -25,7 +25,7 @@ found in the LICENSE file.s
 struct QmitkGPUSpec
 {
   QString name;
-  int memoryFree;
+  QString memory;
   unsigned int id;
 };
 
@@ -48,7 +48,7 @@ public:
   QmitkGPULoader()
   {
     QProcess process;
-    process.start("nvidia-smi --query-gpu=name,memory.free --format=csv");
+    process.start("nvidia-smi --query-gpu=name,memory.total --format=csv");
     process.waitForFinished(-1);
     QStringList infoStringList;
     while (process.canReadLine())
@@ -59,15 +59,17 @@ public:
         infoStringList << line;
       }
     }
+    unsigned int count = 0;
     foreach (QString infoString, infoStringList)
     {
       QmitkGPUSpec spec;
       QStringList gpuDetails;
       gpuDetails = infoString.split(",");
       spec.name = gpuDetails.at(0);
-      // spec.id = id;
-      spec.memoryFree = gpuDetails.at(1).split(" ")[0].toInt();
+      spec.id = count;
+      spec.memory = gpuDetails.at(1);
       this->m_Gpus.push_back(spec);
+      ++count;
     }
   }
   ~QmitkGPULoader() = default;
@@ -78,6 +80,13 @@ public:
    * @return int
    */
   int GetGPUCount() { return static_cast<int>(m_Gpus.size()); }
+
+  /**
+   * @brief Returns all the parsed GPU  information
+   * 
+   * @return std::vector<QmitkGPUSpec>
+   */
+  std::vector<QmitkGPUSpec> GetAllGPUSpecs() { return m_Gpus; }
 };
 
 #endif

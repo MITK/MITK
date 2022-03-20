@@ -142,6 +142,20 @@ protected:
   void EnableWidgets(bool enabled) override;
 
 private:
+  
+  /**
+   * @brief Returns GPU id of the selected GPU from the Combo box.
+   * 
+   * @return unsigned int 
+   */
+  unsigned int FetchSelectedGPUFromUI();
+
+  /**
+   * @brief Adds GPU information to the gpu combo box.
+   * In case, there aren't any GPUs avaialble, the combo box will be
+   * rendered editable. 
+   */
+  void SetGPUInfo();
 
   /**
    * @brief Inserts the hash and segmentation into cache and
@@ -202,7 +216,6 @@ private:
 
   /**
    * @brief Check if pretrained model sub folder inside RESULTS FOLDER exist.
-   *
    */
   bool IsModelExists(const QString &, const QString &, const QString &);
 
@@ -242,6 +255,10 @@ private:
    */
   std::vector<mitk::Image::ConstPointer> FetchMultiModalImagesFromUI();
 
+  /**
+   * @brief Updates cache count on UI.
+   * 
+   */
   void UpdateCacheCountOnUI();
 
   Ui_QmitknnUNetToolGUIControls m_Controls;

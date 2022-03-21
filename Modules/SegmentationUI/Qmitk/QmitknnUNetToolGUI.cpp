@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <QIcon>
 #include <QmitkStyleManager.h>
 #include <QtGlobal>
+#include <set>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitknnUNetToolGUI, "")
 
@@ -65,7 +66,6 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   connect(m_Controls.nopipBox, SIGNAL(stateChanged(int)), this, SLOT(OnCheckBoxChanged(int)));
   connect(m_Controls.multiModalBox, SIGNAL(stateChanged(int)), this, SLOT(OnCheckBoxChanged(int)));
   connect(m_Controls.multiModalSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnModalitiesNumberChanged(int)));
-  connect(m_Controls.posSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnModalPositionChanged(int)));
   connect(m_Controls.pythonEnvComboBox,
 #if QT_VERSION >= 0x050F00 // 5.15
           SIGNAL(textActivated(const QString &)),
@@ -81,8 +81,6 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   m_Controls.nnUnetdirLabel->setVisible(false);
   m_Controls.multiModalSpinBox->setVisible(false);
   m_Controls.multiModalSpinLabel->setVisible(false);
-  m_Controls.posSpinBoxLabel->setVisible(false);
-  m_Controls.posSpinBox->setVisible(false);
   m_Controls.previewButton->setEnabled(false);
 
   m_Controls.stopButton->setVisible(false); // Hidden for future
@@ -225,7 +223,7 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
     catch (const std::exception &e)
     {
       std::stringstream errorMsg;
-      errorMsg << "Error while processing parameters for nnUNet segmentation. Reason: " << e.what();
+      errorMsg << "<b>STATUS: </b>Error while processing parameters for nnUNet segmentation. Reason: " << e.what();
       ShowErrorMessage(errorMsg.str());
       WriteErrorMessage(QString::fromStdString(errorMsg.str()));
       m_Controls.previewButton->setEnabled(true);
@@ -245,18 +243,25 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
 
 std::vector<mitk::Image::ConstPointer> QmitknnUNetToolGUI::FetchMultiModalImagesFromUI()
 {
-  std::vector<mitk::Image::ConstPointer> paths;
+  std::vector<mitk::Image::ConstPointer> modals;
   if (m_Controls.multiModalBox->isChecked() && !m_Modalities.empty())
   {
+    std::set<std::string> nodeNames; // set container for keeping names of all nodes to check if they are added twice.
     for (QmitkDataStorageComboBox *modality : m_Modalities)
     {
-      if (modality->objectName() != "multiModal_0")
+      if (nodeNames.find(modality->GetSelectedNode()->GetName()) == nodeNames.end())
       {
-        paths.push_back(dynamic_cast<const mitk::Image *>(modality->GetSelectedNode()->GetData()));
+        modals.push_back(dynamic_cast<const mitk::Image *>(modality->GetSelectedNode()->GetData()));
+        nodeNames.insert(modality->GetSelectedNode()->GetName());
+      }
+      else
+      {
+        throw std::runtime_error("Same modality is selected more than once. Please change your selection.");
+        break;
       }
     }
   }
-  return paths;
+  return modals;
 }
 
 bool QmitknnUNetToolGUI::IsNNUNetInstalled(const QString &pythonPath)

@@ -167,7 +167,6 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
 
   try
   {
-    IOUtil::Save(inputAtTimeStep, inputImagePath);
     if (this->GetMultiModal())
     {
       const std::string fileFormat(".nii.gz");
@@ -182,11 +181,15 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
         outModalFile.push_back(IOUtil::GetDirectorySeparator());
         outModalFile.append(token);
         outModalFile.append(fileNamePart);
-        outModalFile.append(std::to_string(i + 1));
+        outModalFile.append(std::to_string(i));
         outModalFile.append(fileFormat);
         IOUtil::Save(modalImage.GetPointer(), outModalFile);
         outModalFile.clear();
       }
+    }
+    else
+    {
+      IOUtil::Save(inputAtTimeStep, inputImagePath);
     }
   }
   catch (const mitk::Exception &e)

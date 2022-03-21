@@ -46,8 +46,21 @@
    </property>
    <item>
     <layout class="QGridLayout" name="advancedSettingsLayout">
-     <item row="3" column="2">
-      <widget class="QLabel" name="taskLabel">
+     <item row="4" column="3">
+      <widget class="ctkComboBox" name="plannerBox"/>
+     </item>
+     <item row="4" column="1">
+      <widget class="ctkComboBox" name="trainerBox"/>
+     </item>
+     <item row="2" column="1" colspan="3">
+      <widget class="QPushButton" name="refreshdirectoryBox">
+       <property name="text">
+        <string>Refresh Results Folder</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="pythonEnvLabel">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -55,52 +68,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>Task:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0">
-      <widget class="QLabel" name="trainerLabel">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Trainer:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="1">
-      <widget class="ctkCheckableComboBox" name="foldBox"/>
-     </item>
-     <item row="3" column="3">
-      <widget class="ctkComboBox" name="taskBox"/>
-     </item>
-     <item row="1" column="1" colspan="3">
-      <widget class="ctkDirectoryButton" name="modeldirectoryBox" native="true"/>
-     </item>
-     <item row="7" column="3">
-      <widget class="QSpinBox" name="multiModalSpinBox"/>
-     </item>
-     <item row="5" column="3">
-      <widget class="QPushButton" name="stopButton">
-       <property name="text">
-        <string>Stop</string>
-       </property>
-      </widget>
-     </item>
-     <item row="8" column="2">
-      <widget class="QLabel" name="posSpinBoxLabel">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Reference Image Position:</string>
+        <string>Python Path:</string>
        </property>
       </widget>
      </item>
@@ -117,24 +85,55 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="modelLabel">
+     <item row="4" column="0">
+      <widget class="QLabel" name="trainerLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text">
-        <string>Configuration:</string>
+        <string>Trainer:</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="1" colspan="3">
-      <widget class="QPushButton" name="refreshdirectoryBox">
+     <item row="1" column="0">
+      <widget class="QLabel" name="pretraineddirLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text">
-        <string>Refresh Results Folder</string>
+        <string>nnUNet Results Folder:</string>
        </property>
       </widget>
      </item>
-     <item row="5" column="0">
-      <widget class="QLabel" name="foldLabel">
+     <item row="3" column="3">
+      <widget class="ctkComboBox" name="taskBox"/>
+     </item>
+     <item row="5" column="3">
+      <widget class="QPushButton" name="stopButton">
        <property name="text">
-        <string>Fold:</string>
+        <string>Stop</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="1">
+      <widget class="ctkCheckBox" name="multiModalBox"/>
+     </item>
+     <item row="7" column="0">
+      <widget class="QLabel" name="multiModalLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Multi-Modal:</string>
        </property>
       </widget>
      </item>
@@ -157,33 +156,21 @@
        </property>
       </widget>
      </item>
-     <item row="7" column="0">
-      <widget class="QLabel" name="multiModalLabel">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
+     <item row="1" column="1" colspan="3">
+      <widget class="ctkDirectoryButton" name="modeldirectoryBox" native="true"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="modelLabel">
        <property name="text">
-        <string>Multi-Modal:</string>
+        <string>Configuration:</string>
        </property>
       </widget>
      </item>
      <item row="3" column="1">
       <widget class="ctkComboBox" name="modelBox"/>
      </item>
-     <item row="8" column="3">
-      <widget class="QSpinBox" name="posSpinBox"/>
-     </item>
-     <item row="4" column="3">
-      <widget class="ctkComboBox" name="plannerBox"/>
-     </item>
-     <item row="4" column="1">
-      <widget class="ctkComboBox" name="trainerBox"/>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="pretraineddirLabel">
+     <item row="3" column="2">
+      <widget class="QLabel" name="taskLabel">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -191,12 +178,12 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>nnUNet Results Folder:</string>
+        <string>Task:</string>
        </property>
       </widget>
      </item>
-     <item row="7" column="1">
-      <widget class="ctkCheckBox" name="multiModalBox"/>
+     <item row="5" column="1">
+      <widget class="ctkCheckableComboBox" name="foldBox"/>
      </item>
      <item row="7" column="2">
       <widget class="QLabel" name="multiModalSpinLabel">
@@ -211,21 +198,18 @@
        </property>
       </widget>
      </item>
-     <item row="6" column="0">
-      <widget class="QLabel" name="pythonEnvLabel">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
+     <item row="5" column="0">
+      <widget class="QLabel" name="foldLabel">
        <property name="text">
-        <string>Python Path:</string>
+        <string>Fold:</string>
        </property>
       </widget>
      </item>
      <item row="6" column="1" colspan="3">
       <widget class="ctkComboBox" name="pythonEnvComboBox"/>
+     </item>
+     <item row="7" column="3">
+      <widget class="QSpinBox" name="multiModalSpinBox"/>
      </item>
     </layout>
    </item>
@@ -320,7 +304,7 @@
          </widget>
         </item>
         <item row="1" column="1">
-        <widget class="ctkComboBox" name="gpuComboBox"/>
+         <widget class="ctkComboBox" name="gpuComboBox"/>
         </item>
         <item row="1" column="2">
          <widget class="QLabel" name="mirrorLabel">

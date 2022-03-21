@@ -116,12 +116,6 @@ protected slots:
   void OnPythonPathChanged(const QString &);
 
   /**
-   * @brief Qt Slot
-   *
-   */
-  void OnModalPositionChanged(int);
-
-  /**
    * @brief Qt slot
    *
    */

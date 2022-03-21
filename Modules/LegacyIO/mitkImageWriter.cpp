@@ -22,6 +22,9 @@ found in the LICENSE file.
 #include <itkImageIOBase.h>
 #include <itkImageIOFactory.h>
 
+#include <vtkImageData.h>
+#include <vtkXMLImageDataWriter.h>
+
 mitk::ImageWriter::ImageWriter() : m_UseCompression(true)
 {
   this->SetNumberOfRequiredInputs(1);
@@ -100,9 +103,6 @@ void mitk::ImageWriter::SetDefaultExtension()
   this->Modified();
 }
 
-#include <vtkConfigure.h>
-#include <vtkImageData.h>
-#include <vtkXMLImageDataWriter.h>
 static void writeVti(const char *filename, mitk::Image *image, int t = 0)
 {
   vtkXMLImageDataWriter *vtkwriter = vtkXMLImageDataWriter::New();

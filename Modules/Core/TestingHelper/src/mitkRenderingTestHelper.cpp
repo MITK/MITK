@@ -100,7 +100,7 @@ void mitk::RenderingTestHelper::SetMapperIDToRender2D()
 void mitk::RenderingTestHelper::Render()
 {
   // if the datastorage is initialized and at least 1 image is loaded render it
-  if (m_DataStorage.IsNotNull() || m_DataStorage->GetAll()->Size() >= 1)
+  if (m_DataStorage.IsNotNull() && m_DataStorage->GetAll()->Size() >= 1)
   {
     // Prepare the VTK camera before rendering.
     m_RenderWindow->GetRenderer()->PrepareRender();

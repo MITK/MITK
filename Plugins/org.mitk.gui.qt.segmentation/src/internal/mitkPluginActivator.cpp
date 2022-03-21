@@ -12,11 +12,14 @@ found in the LICENSE file.
 #include "mitkPluginActivator.h"
 
 #include "QmitkSegmentationView.h"
-#include "QmitkCreatePolygonModelAction.h"
-#include "QmitkAutocropAction.h"
-#include "QmitkAutocropLabelSetImageAction.h"
 #include "QmitkSegmentationPreferencePage.h"
 #include "SegmentationUtilities/QmitkSegmentationUtilitiesView.h"
+
+#include "QmitkAutocropAction.h"
+#include "QmitkAutocropLabelSetImageAction.h"
+#include "QmitkCreatePolygonModelAction.h"
+#include "QmitkLoadMultiLabelPresetAction.h"
+#include "QmitkSaveMultiLabelPresetAction.h"
 
 using namespace mitk;
 
@@ -36,11 +39,13 @@ PluginActivator::~PluginActivator()
 void PluginActivator::start(ctkPluginContext *context)
 {
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSegmentationView, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkCreatePolygonModelAction, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkAutocropAction, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkAutocropLabelSetImageAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSegmentationPreferencePage, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkSegmentationUtilitiesView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkAutocropAction, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkAutocropLabelSetImageAction, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkCreatePolygonModelAction, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkLoadMultiLabelPresetAction, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkSaveMultiLabelPresetAction, context)
 
   this->m_context = context;
 }

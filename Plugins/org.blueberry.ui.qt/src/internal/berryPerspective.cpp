@@ -865,7 +865,6 @@ bool Perspective::RestoreState()
 //      PlatformUI.PLUGIN_ID,
 //      IStatus.OK,
 //      WorkbenchMessages.Perspective_problemsRestoringPerspective, 0);
-  bool result = true;
 
   IMemento::Pointer memento = this->memento;
   this->memento = nullptr;
@@ -908,8 +907,7 @@ bool Perspective::RestoreState()
   // Read the layout.
 //  result.merge(pres.restoreState(memento
 //          .getChild(IWorkbenchConstants.TAG_LAYOUT)));
-  result &= pres->RestoreState(memento->GetChild(WorkbenchConstants::TAG_LAYOUT));
-
+          pres->RestoreState(memento->GetChild(WorkbenchConstants::TAG_LAYOUT));
   //StartupThreading.runWithoutExceptions(new StartupRunnable()
   //    {
 

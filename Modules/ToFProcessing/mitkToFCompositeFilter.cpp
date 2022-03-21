@@ -313,7 +313,7 @@ void mitk::ToFCompositeFilter::ProcessStreamedQuickSelectMedianImageFilter(IplIm
   delete[] tmpArray;
 }
 
-#define ELEM_SWAP(a,b) { register float t=(a);(a)=(b);(b)=t; }
+#define ELEM_SWAP(a,b) { float t=(a);(a)=(b);(b)=t; }
 float mitk::ToFCompositeFilter::quick_select(float arr[], int n)
 {
   int low = 0;

@@ -237,8 +237,6 @@ ctkXnatObject *QmitkXnatTreeModel::InternalGetXnatObjectFromUrl(const QString &x
     return nullptr;
 
   start += xnatObjectType.length();
-  int length = url.indexOf("/", start);
-  length -= start;
 
   parent->fetch();
   QList<ctkXnatObject *> children = parent->children();

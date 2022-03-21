@@ -56,7 +56,7 @@ QHash<quint32, const Object*> DebugUtil::m_TraceIdToObjectMap;
 QSet<unsigned int> DebugUtil::m_TracedObjects;
 QSet<QString> DebugUtil::m_TracedClasses;
 
-class NotClassName: public std::unary_function<const Object*, bool>
+class NotClassName
 {
 
   QString name;

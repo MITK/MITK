@@ -415,7 +415,7 @@ std::pair<QStringList, QStringList> QmitknnUNetToolGUI::ExtractTrainerPlannerFro
 {
   QString splitterString = "__";
   QStringList trainers, planners;
-  foreach (QString trainerPlanner, trainerPlanners)
+  for (const auto &trainerPlanner : trainerPlanners)
   {
     trainers << trainerPlanner.split(splitterString, QString::SplitBehavior::SkipEmptyParts).first();
     planners << trainerPlanner.split(splitterString, QString::SplitBehavior::SkipEmptyParts).last();
@@ -431,7 +431,7 @@ std::vector<std::string> QmitknnUNetToolGUI::FetchSelectedFoldsFromUI(ctkCheckab
   if (!(foldBox->allChecked() || foldBox->noneChecked()))
   {
     QModelIndexList foldList = foldBox->checkedIndexes();
-    foreach (QModelIndex index, foldList)
+    for (const auto &index : foldList)
     {
       QString foldQString = foldBox->itemText(index.row()).split("_", QString::SplitBehavior::SkipEmptyParts).last();
       folds.push_back(foldQString.toStdString());

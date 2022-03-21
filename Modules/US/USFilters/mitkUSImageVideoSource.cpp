@@ -201,7 +201,7 @@ void mitk::USImageVideoSource::GetNextRawImage(std::vector<mitk::Image::Pointer>
   this->GetNextRawImage(cv_img);
 
   // convert to MITK-Image
-  IplImage ipl_img = cv_img[0];
+  IplImage ipl_img = cvIplImage(cv_img[0]);
 
   this->m_OpenCVToMitkFilter->SetOpenCVImage(&ipl_img);
   this->m_OpenCVToMitkFilter->Update();

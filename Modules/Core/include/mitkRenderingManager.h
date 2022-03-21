@@ -211,9 +211,6 @@ namespace mitk
     * @param renderWindow          The specifid render window to update
     * @param geometry              The geometry to be used to initialize / update the
     *                              render window's time- and slice navigation controller
-    * @param initializeGlobalTime  If this parameter is set to true, the time navigation controller will be
-    *                              initialized / updated with the given geometry. If set to false, the geometry
-    *                              of the time navigation controller is not updated.
     * @param resetCamera           If this parameter is set to true, the camera controller will be
     *                              set / fit to the center of the rendered image. If set to false, only the
     *                              the slice navigation controller is reset to the geometry without changing
@@ -221,7 +218,6 @@ namespace mitk
     */
     virtual bool InitializeView(vtkRenderWindow *renderWindow,
                                 const BaseGeometry *geometry,
-                                bool initializeGlobalTime = true,
                                 bool resetCamera = true);
 
     /**
@@ -232,9 +228,6 @@ namespace mitk
     * @param renderWindow          The specifid render window to update
     * @param geometry              The geometry to be used to initialize / update the
     *                              render window's time- and slice navigation controller
-    * @param initializeGlobalTime  If this parameter is set to true, the time navigation controller will be
-    *                              initialized / updated with the given geometry. If set to false, the geometry
-    *                              of the time navigation controller is not updated.
     * @param resetCamera           If this parameter is set to true, the camera controller will be
     *                              set / fit to the center of the rendered image. If set to false, only the
     *                              the slice navigation controller is reset to the geometry without changing
@@ -242,7 +235,6 @@ namespace mitk
     */
     virtual bool InitializeView(vtkRenderWindow *renderWindow,
                                 const TimeGeometry *geometry,
-                                bool initializeGlobalTime = true,
                                 bool resetCamera = true);
 
     /**

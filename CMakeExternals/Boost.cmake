@@ -154,7 +154,7 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
     set(b2_properties
       threading=multi
       runtime-link=shared
-      "cxxflags=${MITK_CXX14_FLAG} ${CMAKE_CXX_FLAGS}"
+      "cxxflags=${MITK_CXX${MITK_CXX_STANDARD}_FLAG} ${CMAKE_CXX_FLAGS}"
     )
 
     if(CMAKE_SIZEOF_VOID_P EQUAL 8)

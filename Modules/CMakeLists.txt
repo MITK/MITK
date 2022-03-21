@@ -23,6 +23,6 @@ if ("${CppMicroServices_DIR}" STREQUAL "${CppMicroServices_DIR_default}")
     set(US_BUILD_TESTING ON)
   endif()
 
-  mitkFunctionCheckCompilerFlags("-std=c++14" US_CXX_FLAGS)
+  mitkFunctionCheckCompilerFlags("-std=c++${MITK_CXX_STANDARD}" US_CXX_FLAGS)
   add_subdirectory(CppMicroServices)
 endif()

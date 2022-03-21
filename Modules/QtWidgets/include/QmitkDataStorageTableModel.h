@@ -138,10 +138,10 @@ public:
 protected:
   ///
   /// \struct DataNodeCompareFunction
-  /// \brief A struct that inherits from std::binary_function. You can use it in std::sort algorithm for sorting the
+  /// \brief A struct that you can use in std::sort algorithm for sorting the
   /// node list elements.
   ///
-  struct DataNodeCompareFunction : public std::binary_function<mitk::DataNode::Pointer, mitk::DataNode::Pointer, bool>
+  struct DataNodeCompareFunction
   {
     ///
     /// \brief Specifies field of the property with which it will be sorted.

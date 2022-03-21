@@ -109,7 +109,7 @@ struct QmitkIOUtil::Impl
   QString QmitkIOUtil::Impl::s_InvalidFilenameCharacters = "/";
 #endif
 
-struct MimeTypeComparison : public std::unary_function<mitk::MimeType, bool>
+struct MimeTypeComparison
 {
   MimeTypeComparison(const std::string &mimeTypeName) : m_Name(mimeTypeName) {}
   bool operator()(const mitk::MimeType &mimeType) const { return mimeType.GetName() == m_Name; }

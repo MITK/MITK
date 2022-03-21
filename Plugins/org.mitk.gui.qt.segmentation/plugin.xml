@@ -39,12 +39,13 @@
     <contextMenuAction nodeDescriptorName="LabelSetImage" label="Create polygon model" icon="" smoothed="false" class="QmitkCreatePolygonModelAction" />
     <contextMenuAction nodeDescriptorName="LabelSetImage" label="Create smoothed polygon model" icon="" smoothed = "true" class="QmitkCreatePolygonModelAction" />
     <contextMenuAction nodeDescriptorName="LabelSetImage" label="Autocrop" icon="" class="QmitkAutocropLabelSetImageAction" />
+    <contextMenuAction nodeDescriptorName="LabelSetImage" label="Save LabelSet Preset" icon="" class="QmitkSaveMultiLabelPresetAction" />
+    <contextMenuAction nodeDescriptorName="LabelSetImage" label="Load LabelSet Preset" icon="" class="QmitkLoadMultiLabelPresetAction" />
   </extension>
 
   <extension point="org.blueberry.ui.keywords">
     <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Segmentation" />
     <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Otsu" />
-    <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Correction" />
     <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Paint" />
     <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Wipe" />
     <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Region Growing" />

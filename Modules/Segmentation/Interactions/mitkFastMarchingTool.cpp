@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, FastMarchingTool, "FastMarching2D tool");
+  MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, FastMarchingTool, "FastMarching tool");
 }
 
 mitk::FastMarchingTool::FastMarchingTool()
@@ -29,6 +29,6 @@ mitk::FastMarchingTool::~FastMarchingTool()
 
 const char *mitk::FastMarchingTool::GetName() const
 {
-  return "2D Fast Marching";
+  return "Fast Marching";
 }
 

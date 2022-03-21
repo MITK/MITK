@@ -21,7 +21,14 @@ if(MITK_USE_Vigra)
   # Hence, we exclude them here.
   set(mac_additional_cmake_args)
   if(APPLE)
-    set(mac_additional_cmake_args -DJPEG_INCLUDE_DIR= -DJPEG_LIBRARY= -DTIFF_INCLUDE_DIR= -DTIFF_LIBRARY= -DPNG_LIBRARY_RELEASE= -DPNG_PNG_INCLUDE_DIR= )
+    set(mac_additional_cmake_args
+      -DJPEG_INCLUDE_DIR=
+      -DJPEG_LIBRARY=
+      -DTIFF_INCLUDE_DIR=
+      -DTIFF_LIBRARY=
+      -DPNG_LIBRARY_RELEASE=
+      -DPNG_PNG_INCLUDE_DIR=
+    )
   endif()
 
   if(NOT DEFINED Vigra_DIR)

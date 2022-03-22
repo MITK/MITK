@@ -13,12 +13,13 @@ found in the LICENSE file.
 #ifndef MITKIGTLDEVICE_H
 #define MITKIGTLDEVICE_H
 
+#include <mutex>
+#include <thread>
+
 #include "mitkCommon.h"
 
 //itk
 #include "itkObject.h"
-#include "itkFastMutexLock.h"
-#include "itkMultiThreader.h"
 
 //igtl
 #include "igtlSocket.h"
@@ -108,7 +109,7 @@ namespace mitk {
      * \param ComFunction function pointer that specifies the method to be executed
      * \param mutex the mutex that corresponds to the function pointer
      */
-    void RunCommunication(void (IGTLDevice::*ComFunction)(void), itk::FastMutexLock* mutex);
+    void RunCommunication(void (IGTLDevice::*ComFunction)(void), std::mutex& mutex);
 
 
     /**
@@ -194,22 +195,19 @@ namespace mitk {
     itkGetMacro(MessageFactory, mitk::IGTLMessageFactory::Pointer);
 
     /**
-    * \brief static start method for the sending thread.
-    * \param data a void pointer to the IGTLDevice object.
+    * \brief start method for the sending thread.
     */
-    static ITK_THREAD_RETURN_TYPE ThreadStartSending(void* data);
+    void ThreadStartSending();
 
     /**
-    * \brief static start method for the receiving thread.
-    * \param data a void pointer to the IGTLDevice object.
+    * \brief start method for the receiving thread.
     */
-    static ITK_THREAD_RETURN_TYPE ThreadStartReceiving(void* data);
+    void ThreadStartReceiving();
 
     /**
-    * \brief static start method for the connection thread.
-    * \param data a void pointer to the IGTLDevice object.
+    * \brief start method for the connection thread.
     */
-    static ITK_THREAD_RETURN_TYPE ThreadStartConnecting(void* data);
+    void ThreadStartConnecting();
 
     /**
      * \brief TestConnection() tries to connect to a IGTL device on the current
@@ -327,15 +325,15 @@ namespace mitk {
     /** signal used to stop the thread*/
     bool m_StopCommunication;
     /** mutex to control access to m_StopCommunication */
-    itk::FastMutexLock::Pointer m_StopCommunicationMutex;
+    std::mutex m_StopCommunicationMutex;
     /** mutex used to make sure that the send thread is just started once */
-    itk::FastMutexLock::Pointer m_SendingFinishedMutex;
+    std::mutex m_SendingFinishedMutex;
     /** mutex used to make sure that the receive thread is just started once */
-    itk::FastMutexLock::Pointer m_ReceivingFinishedMutex;
+    std::mutex m_ReceivingFinishedMutex;
     /** mutex used to make sure that the connect thread is just started once */
-    itk::FastMutexLock::Pointer m_ConnectingFinishedMutex;
+    std::mutex m_ConnectingFinishedMutex;
     /** mutex to control access to m_State */
-    itk::FastMutexLock::Pointer m_StateMutex;
+    mutable std::mutex m_StateMutex;
 
     /** the hostname or ip of the device */
     std::string m_Hostname;
@@ -354,15 +352,12 @@ namespace mitk {
 
   private:
 
-    /** creates worker thread that continuously polls interface for new
-    messages */
-    itk::MultiThreader::Pointer m_MultiThreader;
-    /** ID of sending thread */
-    int m_SendThreadID;
-    /** ID of receiving thread */
-    int m_ReceiveThreadID;
-    /** ID of connecting thread */
-    int m_ConnectThreadID;
+    /** Sending thread */
+    std::thread m_SendThread;
+    /** Receiving thread */
+    std::thread m_ReceiveThread;
+    /** Connecting thread */
+    std::thread m_ConnectThread;
     /** Always try to read the full message. */
     bool m_ReadFully;
   };
@@ -373,7 +368,7 @@ namespace mitk {
   * \note This event is invoked in the communication thread, therefore do not use it to make
   * changes in the GUI!!! Use the QT signal slot system to decouple this call from the com thread
   * */
-  itkEventMacro(MessageSentEvent, itk::AnyEvent);
+  itkEventMacroDeclaration(MessageSentEvent, itk::AnyEvent);
 
   /**
   * \brief connect to this Event to get notified when a message was received
@@ -381,7 +376,7 @@ namespace mitk {
   * \note Check if you can invoke this events like this or if you have to make
   * it thread-safe. They are not invoked in the main thread!!!
   * */
-  itkEventMacro(MessageReceivedEvent, itk::AnyEvent);
+  itkEventMacroDeclaration(MessageReceivedEvent, itk::AnyEvent);
 
   /**
   * \brief connect to this Event to get notified when a command was received
@@ -389,7 +384,7 @@ namespace mitk {
   * \note Check if you can invoke this events like this or if you have to make
   * it thread-safe. They are not invoked in the main thread!!!
   * */
-  itkEventMacro(CommandReceivedEvent, itk::AnyEvent);
+  itkEventMacroDeclaration(CommandReceivedEvent, itk::AnyEvent);
 
   /**
   * \brief connect to this Event to get notified when another igtl device
@@ -398,7 +393,7 @@ namespace mitk {
   * \note Check if you can invoke this events like this or if you have to make
   * it thread-safe. They are not invoked in the main thread!!!
   * */
-  itkEventMacro(NewClientConnectionEvent, itk::AnyEvent);
+  itkEventMacroDeclaration(NewClientConnectionEvent, itk::AnyEvent);
 
   /**
   * \brief connect to this Event to get notified when this device looses the
@@ -407,7 +402,7 @@ namespace mitk {
   * \note Check if you can invoke this events like this or if you have to make
   * it thread-safe. They are not invoked in the main thread!!!
   * */
-  itkEventMacro(LostConnectionEvent, itk::AnyEvent);
+  itkEventMacroDeclaration(LostConnectionEvent, itk::AnyEvent);
 } // namespace mitk
 
 #endif /* MITKIGTLDEVICE_H */

@@ -136,7 +136,7 @@ void mitk::SurfaceStampImageFilter::SurfaceStamp(int time)
     mitkThrow() << "Polydata retrieved from transformation is null or has no points.";
 
   MeshType::Pointer mesh = MeshType::New();
-  mesh->SetCellsAllocationMethod(MeshType::CellsAllocatedDynamicallyCellByCell);
+  mesh->SetCellsAllocationMethod(itk::MeshEnums::MeshClassCellsAllocationMethod::CellsAllocatedDynamicallyCellByCell);
   unsigned int numberOfPoints = polydata->GetNumberOfPoints();
   mesh->GetPoints()->Reserve(numberOfPoints);
 

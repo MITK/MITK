@@ -50,7 +50,7 @@ void mitk::ItkImageFileReader::GenerateData()
   }
 
   itk::ImageIOBase::Pointer imageIO =
-    itk::ImageIOFactory::CreateImageIO(m_FileName.c_str(), itk::ImageIOFactory::ReadMode);
+    itk::ImageIOFactory::CreateImageIO(m_FileName.c_str(), itk::IOFileModeEnum::ReadMode);
   if (imageIO.IsNull())
   {
     // itkWarningMacro( << "File Type not supported!" );
@@ -172,7 +172,7 @@ bool mitk::ItkImageFileReader::CanReadFile(const std::string filename,
     return false;
 
   itk::ImageIOBase::Pointer imageIO =
-    itk::ImageIOFactory::CreateImageIO(filename.c_str(), itk::ImageIOFactory::ReadMode);
+    itk::ImageIOFactory::CreateImageIO(filename.c_str(), itk::IOFileModeEnum::ReadMode);
   if (imageIO.IsNull())
     return false;
 

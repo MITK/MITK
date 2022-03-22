@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include <mitkTestingConfig.h>
 
 #include <mitkIOUtil.h>
+#include <mitkUtf8Util.h>
 #include <mitkImageGenerator.h>
 #include <mitkIOMetaInformationPropertyConstants.h>
 #include <mitkVersion.h>
@@ -103,12 +104,12 @@ public:
     std::string tmpDir = mitk::IOUtil::CreateTemporaryDirectory();
     CPPUNIT_ASSERT(tmpDir.size() > tmpPath.size());
     CPPUNIT_ASSERT(tmpDir.substr(0, tmpPath.size()) == tmpPath);
-    CPPUNIT_ASSERT(itksys::SystemTools::RemoveADirectory(tmpDir.c_str()));
+    CPPUNIT_ASSERT(itksys::SystemTools::RemoveADirectory(mitk::Utf8Util::Local8BitToUtf8(tmpDir).c_str()));
 
     std::string tmpDir2 = mitk::IOUtil::CreateTemporaryDirectory("my-XXXXXX", programPath);
     CPPUNIT_ASSERT(tmpDir2.size() > programPath.size());
     CPPUNIT_ASSERT(tmpDir2.substr(0, programPath.size()) == programPath);
-    CPPUNIT_ASSERT(itksys::SystemTools::RemoveADirectory(tmpDir2.c_str()));
+    CPPUNIT_ASSERT(itksys::SystemTools::RemoveADirectory(mitk::Utf8Util::Local8BitToUtf8(tmpDir2).c_str()));
   }
 
   void TestTempMethodsForUniqueFilenames()
@@ -292,9 +293,9 @@ public:
   void TestUtf8()
   {
     const std::string utf8Path = u8"UTF-8/\u00c4.nrrd"; // LATIN CAPITAL LETTER A WITH DIAERESIS (U+00C4)
-    const std::string local8BitPath = mitk::IOUtil::Utf8ToLocal8Bit(utf8Path);
+    const std::string local8BitPath = mitk::Utf8Util::Utf8ToLocal8Bit(utf8Path);
 
-    CPPUNIT_ASSERT(utf8Path == mitk::IOUtil::Local8BitToUtf8(local8BitPath));
+    CPPUNIT_ASSERT(utf8Path == mitk::Utf8Util::Local8BitToUtf8(local8BitPath));
 
     const std::string path = GetTestDataFilePath(local8BitPath);
 

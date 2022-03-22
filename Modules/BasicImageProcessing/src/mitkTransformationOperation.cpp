@@ -29,7 +29,7 @@ found in the LICENSE file.
 #include <itkShannonIsotropicWavelet.h>
 #include <itkForwardFFTImageFilter.h>
 #include <itkInverseFFTImageFilter.h>
-#include <itkFFTPadPositiveIndexImageFilter.h>
+#include <itkFFTPadImageFilter.h>
 #include "itkZeroFluxNeumannBoundaryCondition.h"
 #include "itkPeriodicBoundaryCondition.h"
 #include "itkConstantBoundaryCondition.h"
@@ -187,7 +187,7 @@ static void ExecuteSpecificWaveletTransformation(itk::Image<TInputPixel, VImageD
   typedef itk::Image< OutputPixelType, Dimension >  OutputImageType;
 
   typedef itk::CastImageFilter< ImageType, DoubleImageType >                                          CastFilterType;
-  typedef itk::FFTPadPositiveIndexImageFilter< DoubleImageType >                                      FFTPadType;
+  typedef itk::FFTPadImageFilter< DoubleImageType >                                                   FFTPadType;
   typedef itk::ForwardFFTImageFilter< DoubleImageType, itk::Image< std::complex<double>, Dimension> > FFTFilterType;
   typedef typename FFTFilterType::OutputImageType                                                     ComplexImageType;
 

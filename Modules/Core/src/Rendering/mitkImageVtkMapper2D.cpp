@@ -369,14 +369,14 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rendere
     if (binaryOutline) // contour rendering
     {
       // get pixel type of vtk image
-      itk::ImageIOBase::IOComponentType componentType = static_cast<itk::ImageIOBase::IOComponentType>(image->GetPixelType().GetComponentType());
+      auto componentType = image->GetPixelType().GetComponentType();
       switch (componentType)
       {
-      case itk::ImageIOBase::UCHAR:
+      case itk::IOComponentEnum::UCHAR:
         // generate contours/outlines
         localStorage->m_OutlinePolyData = CreateOutlinePolyData<unsigned char>(renderer);
         break;
-      case itk::ImageIOBase::USHORT:
+      case itk::IOComponentEnum::USHORT:
         // generate contours/outlines
         localStorage->m_OutlinePolyData = CreateOutlinePolyData<unsigned short>(renderer);
         break;
@@ -792,7 +792,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode *node, mitk::Ba
     PixelType pixelType = image->GetPixelType();
     size_t numComponents = pixelType.GetNumberOfComponents();
 
-    if ((pixelType.GetPixelType() == itk::ImageIOBase::VECTOR && numComponents > 1) || numComponents == 2 ||
+    if ((pixelType.GetPixelType() == itk::IOPixelEnum::VECTOR && numComponents > 1) || numComponents == 2 ||
         numComponents > 4)
     {
       node->AddProperty("Image.Displayed Component", mitk::IntProperty::New(0), renderer, overwrite);
@@ -871,8 +871,8 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode *node, mitk::Ba
     }
 
     if (((overwrite) || (node->GetProperty("opaclevelwindow", renderer) == nullptr)) &&
-        (image->GetPixelType().GetPixelType() == itk::ImageIOBase::RGBA) &&
-        (image->GetPixelType().GetComponentType() == itk::ImageIOBase::UCHAR))
+        (image->GetPixelType().GetPixelType() == itk::IOPixelEnum::RGBA) &&
+        (image->GetPixelType().GetComponentType() == itk::IOComponentEnum::UCHAR))
     {
       mitk::LevelWindow opaclevwin;
       opaclevwin.SetRangeMinMax(0, 255);

@@ -18,9 +18,8 @@ found in the LICENSE file.
 #include "itkObject.h"
 #include "mitkCommon.h"
 #include "mitkTrackingTypes.h"
-#include "itkFastMutexLock.h"
 #include "mitkNavigationToolStorage.h"
-
+#include <mutex>
 
 namespace mitk {
     class TrackingTool; // interface for a tool that can be tracked by the TrackingDevice
@@ -195,9 +194,9 @@ namespace mitk {
     TrackingDeviceData m_Data; ///< current device Data
 
       bool m_StopTracking;       ///< signal stop to tracking thread
-      itk::FastMutexLock::Pointer m_StopTrackingMutex; ///< mutex to control access to m_StopTracking
-      itk::FastMutexLock::Pointer m_TrackingFinishedMutex; ///< mutex to manage control flow of StopTracking()
-      itk::FastMutexLock::Pointer m_StateMutex; ///< mutex to control access to m_State
+      std::mutex m_StopTrackingMutex; ///< mutex to control access to m_StopTracking
+      std::mutex m_TrackingFinishedMutex; ///< mutex to manage control flow of StopTracking()
+      mutable std::mutex m_StateMutex; ///< mutex to control access to m_State
       RotationMode m_RotationMode; ///< defines the rotation mode Standard or Transposed, Standard is default
     };
 } // namespace mitk

@@ -35,12 +35,12 @@ mitk::PixelType &mitk::PixelType::operator=(const PixelType &other)
   return *this;
 }
 
-itk::ImageIOBase::IOPixelType mitk::PixelType::GetPixelType() const
+mitk::PixelType::ItkIOPixelType mitk::PixelType::GetPixelType() const
 {
   return m_PixelType;
 }
 
-int mitk::PixelType::GetComponentType() const
+mitk::PixelType::ItkIOComponentType mitk::PixelType::GetComponentType() const
 {
   return m_ComponentType;
 }
@@ -84,8 +84,8 @@ mitk::PixelType::~PixelType()
 {
 }
 
-mitk::PixelType::PixelType(const int componentType,
-                           const ItkIOPixelType pixelType,
+mitk::PixelType::PixelType(ItkIOComponentType componentType,
+                           ItkIOPixelType pixelType,
                            std::size_t bytesPerComponent,
                            std::size_t numberOfComponents,
                            const std::string &componentTypeName,

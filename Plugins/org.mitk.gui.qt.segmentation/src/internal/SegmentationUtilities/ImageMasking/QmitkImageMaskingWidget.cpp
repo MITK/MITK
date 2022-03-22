@@ -294,7 +294,7 @@ mitk::Image::Pointer QmitkImageMaskingWidget::MaskImage(mitk::Image::Pointer ref
 
       // Get rid of decimals for integral numbers
       auto type = referenceImage->GetPixelType().GetComponentType();
-      if (type != itk::ImageIOBase::FLOAT && type != itk::ImageIOBase::DOUBLE)
+      if (type != itk::IOComponentEnum::FLOAT && type != itk::IOComponentEnum::DOUBLE)
         backgroundValue = std::round(backgroundValue);
     }
 

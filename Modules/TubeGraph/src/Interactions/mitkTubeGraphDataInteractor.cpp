@@ -24,6 +24,11 @@ found in the LICENSE file.
 #include <vtkPolyData.h>
 #include <vtkRenderWindowInteractor.h>
 
+namespace mitk
+{
+  itkEventMacroDefinition(SelectionChangedTubeGraphEvent, itk::AnyEvent);
+}
+
 mitk::TubeGraphDataInteractor::TubeGraphDataInteractor()
   : m_LastPickedTube(TubeGraph::ErrorId),
     m_SecondLastPickedTube(TubeGraph::ErrorId),

@@ -23,20 +23,20 @@ namespace mitk
 {
   class DataNode;
 
-  itkEventMacro(DataInteractorEvent, itk::AnyEvent);
+  itkEventMacroDeclaration(DataInteractorEvent, itk::AnyEvent);
 
-    /** Triggered when interaction is started */
-    itkEventMacro(StartInteraction, DataInteractorEvent);
+  /** Triggered when interaction is started */
+  itkEventMacroDeclaration(StartInteraction, DataInteractorEvent);
 
-    /** Triggered when result is stored in mitk::DataNode */
-    itkEventMacro(ResultReady, DataInteractorEvent);
+  /** Triggered when result is stored in mitk::DataNode */
+  itkEventMacroDeclaration(ResultReady, DataInteractorEvent);
 
-      enum ProcessEventMode {
-        REGULAR = 0,
-        GRABINPUT = 1,
-        PREFERINPUT = 2,
-        CONNECTEDMOUSEACTION = 3
-      };
+    enum ProcessEventMode {
+      REGULAR = 0,
+      GRABINPUT = 1,
+      PREFERINPUT = 2,
+      CONNECTEDMOUSEACTION = 3
+    };
 
   /**
   * \brief Base class from with interactors that handle DataNodes are to be derived.

@@ -104,7 +104,7 @@ void mitk::ContourElement::AddVertexAtFront(const mitk::Point3D &vertex, bool is
 
 void mitk::ContourElement::InsertVertexAtIndex(const mitk::Point3D &vertex, bool isControlPoint, VertexSizeType index)
 {
-  if (index >= 0 && this->GetSize() > index)
+  if (this->GetSize() > index)
   {
     auto _where = this->m_Vertices.begin();
     _where += index;
@@ -114,7 +114,7 @@ void mitk::ContourElement::InsertVertexAtIndex(const mitk::Point3D &vertex, bool
 
 void mitk::ContourElement::SetVertexAt(VertexSizeType pointId, const Point3D &point)
 {
-  if (pointId >= 0 && this->GetSize() > pointId)
+  if (this->GetSize() > pointId)
   {
     this->m_Vertices[pointId]->Coordinates = point;
   }
@@ -127,7 +127,7 @@ void mitk::ContourElement::SetVertexAt(VertexSizeType pointId, const VertexType 
     mitkThrow() << "Cannot set vertex. Passed vertex instance is invalid. Index to set: " << pointId;
   }
 
-  if (pointId >= 0 && this->GetSize() > pointId)
+  if (this->GetSize() > pointId)
   {
     this->m_Vertices[pointId]->Coordinates = vertex->Coordinates;
     this->m_Vertices[pointId]->IsControlPoint = vertex->IsControlPoint;
@@ -407,7 +407,7 @@ bool mitk::ContourElement::RemoveVertex(const VertexType *vertex)
 
 bool mitk::ContourElement::RemoveVertexAt(VertexSizeType index)
 {
-  if (index >= 0 && index < this->m_Vertices.size())
+  if (index < this->m_Vertices.size())
   {
     auto delIter = this->m_Vertices.begin() + index;
     return RemoveVertexByIterator(delIter);

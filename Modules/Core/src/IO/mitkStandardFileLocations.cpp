@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <itkObject.h>
 #include <itksys/SystemTools.hxx>
 #include <mitkConfig.h>
+#include <mitkUtf8Util.h>
 
 #include <algorithm>
 
@@ -91,7 +92,7 @@ std::string mitk::StandardFileLocations::SearchDirectoriesForFile(const char *fi
       currDir.erase(currDir.size() - 1, currDir.size());
 
     // convert to OS dependent path schema
-    currDir = itksys::SystemTools::ConvertToOutputPath(currDir.c_str());
+    currDir = Utf8Util::Utf8ToLocal8Bit(itksys::SystemTools::ConvertToOutputPath(Utf8Util::Local8BitToUtf8(currDir).c_str()));
 
     // On windows systems, the ConvertToOutputPath method quotes pathes that contain empty spaces.
     // These quotes are not expected by the FileExists method and therefore removed, if existing.
@@ -101,7 +102,7 @@ std::string mitk::StandardFileLocations::SearchDirectoriesForFile(const char *fi
       currDir.erase(0, 1);
 
     // Return first found path
-    if (itksys::SystemTools::FileExists(currDir.c_str()))
+    if (itksys::SystemTools::FileExists(Utf8Util::Local8BitToUtf8(currDir).c_str()))
       return currDir;
   }
   return std::string("");
@@ -144,7 +145,7 @@ std::string mitk::StandardFileLocations::FindFile(const char *filename, const ch
   directoryPath = "";
   AddDirectoryForSearch(directoryPath.c_str());
 
-  directoryPath = itksys::SystemTools::GetCurrentWorkingDirectory();
+  directoryPath = Utf8Util::Utf8ToLocal8Bit(itksys::SystemTools::GetCurrentWorkingDirectory());
   AddDirectoryForSearch(directoryPath.c_str(), false);
 
   std::string directoryBinPath = directoryPath + "/bin";
@@ -183,20 +184,20 @@ std::string mitk::StandardFileLocations::GetOptionDirectory()
     {
       itkGenericOutputMacro(<< "Environment variables HOMEDRIVE and/or HOMEPATH not set"
                             << ". Using current working directory as home directory: "
-                            << itksys::SystemTools::GetCurrentWorkingDirectory());
-      homeDirectory = itksys::SystemTools::GetCurrentWorkingDirectory();
+                            << Utf8Util::Utf8ToLocal8Bit(itksys::SystemTools::GetCurrentWorkingDirectory()));
+      homeDirectory = Utf8Util::Utf8ToLocal8Bit(itksys::SystemTools::GetCurrentWorkingDirectory());
     }
     else
     {
       homeDirectory = homeDrive;
       homeDirectory += homePath;
     }
-    if (itksys::SystemTools::FileExists(homeDirectory.c_str()) == false)
+    if (itksys::SystemTools::FileExists(Utf8Util::Local8BitToUtf8(homeDirectory).c_str()) == false)
     {
       itkGenericOutputMacro(<< "Could not find home directory at " << homeDirectory
                             << ". Using current working directory as home directory: "
-                            << itksys::SystemTools::GetCurrentWorkingDirectory());
-      homeDirectory = itksys::SystemTools::GetCurrentWorkingDirectory();
+                            << Utf8Util::Utf8ToLocal8Bit(itksys::SystemTools::GetCurrentWorkingDirectory()));
+      homeDirectory = Utf8Util::Utf8ToLocal8Bit(itksys::SystemTools::GetCurrentWorkingDirectory());
     }
 #else
     const char *home = itksys::SystemTools::GetEnv("HOME");
@@ -222,7 +223,7 @@ std::string mitk::StandardFileLocations::GetOptionDirectory()
     optionsDirectory += "/.mitk";
   }
 
-  optionsDirectory = itksys::SystemTools::ConvertToOutputPath(optionsDirectory.c_str());
+  optionsDirectory = itksys::SystemTools::ConvertToOutputPath(Utf8Util::Local8BitToUtf8(optionsDirectory).c_str());
   if (itksys::SystemTools::CountChar(optionsDirectory.c_str(), '"') > 0)
   {
     char *unquoted = itksys::SystemTools::RemoveChars(optionsDirectory.c_str(), "\"");
@@ -232,7 +233,7 @@ std::string mitk::StandardFileLocations::GetOptionDirectory()
 
   if (itksys::SystemTools::MakeDirectory(optionsDirectory.c_str()) == false)
   {
-    itkGenericExceptionMacro(<< "Could not create .mitk directory at " << optionsDirectory);
+    itkGenericExceptionMacro(<< "Could not create .mitk directory at " << Utf8Util::Utf8ToLocal8Bit(optionsDirectory));
   }
-  return optionsDirectory;
+  return Utf8Util::Utf8ToLocal8Bit(optionsDirectory);
 }

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QMITKSEGMENTATIONVIEW_H
 #define QMITKSEGMENTATIONVIEW_H
 
-#include "ui_QmitkSegmentationControls.h"
+#include "ui_QmitkSegmentationViewControls.h"
 
 #include <QmitkAbstractView.h>
 #include <mitkIRenderWindowPartListener.h>
@@ -31,8 +31,16 @@ found in the LICENSE file.
 *        The tools also often provide additional propeties so that a user can modify the
 *        algorithm's behavior.
 *
+*        This class additionally provides options to work with different layers (create new layers,
+*        switch between layers).
+*        Moreover, a multilabel widget displays all the existing labels of a multilabel segmentation
+*        for the currently active layer.
+*        The multilabel widget allows to control the labels by creatin new one, removing existing ones,
+*        showing / hiding single labels, merging labels, (re-)naming them etc.
+*
 *        Additionally the view provides an option to create "2D"- and "3D"-interpolations between
 *        neighboring segmentation masks on unsegmented slices.
+*        Interpolation for multilabel segmentations is currently not implemented.
 */
 class QmitkSegmentationView : public QmitkAbstractView, public mitk::IRenderWindowPartListener
 {
@@ -53,12 +61,28 @@ private Q_SLOTS:
   // reaction to the selection of a new segmentation image in the selection widget
   void OnSegmentationSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 
+  // reaction to the shortcut ("CTRL+H") for toggling the visibility of the working node
+  void OnVisibilityShortcutActivated();
+
+  // reaction to the shortcut ("CTRL+L") for iterating over all labels
+  void OnLabelToggleShortcutActivated();
+
   // reaction to the button "New segmentation"
-  void CreateNewSegmentation();
+  void OnNewSegmentation();
 
   void OnManualTool2DSelected(int id);
 
   void OnShowMarkerNodes(bool);
+
+  void OnLayersChanged();
+
+  void OnLabelsChanged();
+
+  void OnShowLabelTable(bool);
+
+  void OnGoToLabel(const mitk::Point3D &pos);
+
+  void OnLabelSetWidgetReset();
 
 private:
 
@@ -71,9 +95,13 @@ private:
 
   void OnPreferencesChanged(const berry::IBerryPreferences* prefs) override;
 
-  void NodeAdded(const mitk::DataNode *node) override;
+  void NodeAdded(const mitk::DataNode* node) override;
 
   void NodeRemoved(const mitk::DataNode* node) override;
+
+  void OnEstablishLabelSetConnection();
+
+  void OnLooseLabelSetConnection();
 
   // make sure all images / segmentations look according to the user preference settings
   void ApplyDisplayOptions();
@@ -92,13 +120,15 @@ private:
 
   void UpdateGUI();
 
+  void UpdateInterpolatorWidget();
+
   void ValidateSelectionInput();
 
   void UpdateWarningLabel(QString text);
 
   QWidget* m_Parent;
 
-  Ui::QmitkSegmentationControls* m_Controls;
+  Ui::QmitkSegmentationViewControls* m_Controls;
 
   mitk::IRenderWindowPart* m_RenderWindowPart;
 
@@ -108,13 +138,14 @@ private:
   mitk::DataNode::Pointer m_WorkingNode;
 
   typedef std::map<mitk::DataNode*, unsigned long> NodeTagMapType;
-  NodeTagMapType  m_WorkingDataObserverTags;
+  NodeTagMapType m_WorkingDataObserverTags;
   unsigned int m_RenderingManagerObserverTag;
 
   mitk::NodePredicateAnd::Pointer m_ReferencePredicate;
   mitk::NodePredicateAnd::Pointer m_SegmentationPredicate;
 
-  bool m_AutoSelectionEnabled;
+  bool m_DrawOutline;
+  bool m_SelectionMode;
   bool m_MouseCursorSet;
 
 };

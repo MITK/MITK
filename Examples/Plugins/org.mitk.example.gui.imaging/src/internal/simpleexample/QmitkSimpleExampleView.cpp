@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <vtkPNGWriter.h>
 #include <vtkRenderLargeImage.h>
 #include <vtkRenderWindow.h>
-#include <vtkOpenGL.h>
+#include <vtk_glew.h>
 
 #include "QmitkRenderWindow.h"
 #include "QmitkStepperAdapter.h"

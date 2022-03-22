@@ -251,7 +251,7 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
   const mitk::Vector3D spacing = image->GetGeometry()->GetSpacing();
   const mitk::Point3D origin = image->GetGeometry()->GetOrigin();
   mitk::PixelType pixelType = image->GetPixelType();
-  itk::ImageIOBase::IOPixelType ioPixelType = image->GetPixelType().GetPixelType();
+  auto ioPixelType = image->GetPixelType().GetPixelType();
   PyObject* npyArray = nullptr;
   mitk::ImageReadAccessor racc(image);
   void* array = const_cast<void*>(racc.GetData());
@@ -299,73 +299,73 @@ bool mitk::PythonService::CopyToPythonAsSimpleItkImage(mitk::Image *image, const
   // default pixeltype: unsigned short
   NPY_TYPES npy_type  = NPY_USHORT;
   std::string sitk_type = "sitkUInt8";
-  if( ioPixelType == itk::ImageIOBase::SCALAR )
+  if( ioPixelType == itk::IOPixelEnum::SCALAR )
   {
-    if( pixelType.GetComponentType() == itk::ImageIOBase::DOUBLE ) {
+    if( pixelType.GetComponentType() == itk::IOComponentEnum::DOUBLE ) {
       npy_type = NPY_DOUBLE;
       sitk_type = "sitkFloat64";
-    } else if( pixelType.GetComponentType() == itk::ImageIOBase::FLOAT ) {
+    } else if( pixelType.GetComponentType() == itk::IOComponentEnum::FLOAT ) {
       npy_type = NPY_FLOAT;
       sitk_type = "sitkFloat32";
-    } else if( pixelType.GetComponentType() == itk::ImageIOBase::SHORT) {
+    } else if( pixelType.GetComponentType() == itk::IOComponentEnum::SHORT) {
       npy_type = NPY_SHORT;
       sitk_type = "sitkInt16";
-    } else if( pixelType.GetComponentType() == itk::ImageIOBase::CHAR ) {
+    } else if( pixelType.GetComponentType() == itk::IOComponentEnum::CHAR ) {
       npy_type = NPY_BYTE;
       sitk_type = "sitkInt8";
-    } else if( pixelType.GetComponentType() == itk::ImageIOBase::INT ) {
+    } else if( pixelType.GetComponentType() == itk::IOComponentEnum::INT ) {
       npy_type = NPY_INT;
       sitk_type = "sitkInt32";
-    } else if( pixelType.GetComponentType() == itk::ImageIOBase::LONG ) {
+    } else if( pixelType.GetComponentType() == itk::IOComponentEnum::LONG ) {
       npy_type = NPY_LONG;
       sitk_type = "sitkInt64";
-    } else if( pixelType.GetComponentType() == itk::ImageIOBase::UCHAR ) {
+    } else if( pixelType.GetComponentType() == itk::IOComponentEnum::UCHAR ) {
       npy_type = NPY_UBYTE;
       sitk_type = "sitkUInt8";
-    } else if( pixelType.GetComponentType() == itk::ImageIOBase::UINT ) {
+    } else if( pixelType.GetComponentType() == itk::IOComponentEnum::UINT ) {
       npy_type = NPY_UINT;
       sitk_type = "sitkUInt32";
-    } else if( pixelType.GetComponentType() == itk::ImageIOBase::ULONG ) {
+    } else if( pixelType.GetComponentType() == itk::IOComponentEnum::ULONG ) {
       npy_type = NPY_LONG;
       sitk_type = "sitkUInt64";
-    } else if( pixelType.GetComponentType() == itk::ImageIOBase::USHORT ) {
+    } else if( pixelType.GetComponentType() == itk::IOComponentEnum::USHORT ) {
       npy_type = NPY_USHORT;
       sitk_type = "sitkUInt16";
     }
   }
-  else if ( ioPixelType == itk::ImageIOBase::VECTOR ||
-            ioPixelType == itk::ImageIOBase::RGB ||
-            ioPixelType == itk::ImageIOBase::RGBA
+  else if ( ioPixelType == itk::IOPixelEnum::VECTOR ||
+            ioPixelType == itk::IOPixelEnum::RGB ||
+            ioPixelType == itk::IOPixelEnum::RGBA
             )
   {
-    if( pixelType.GetComponentType() == itk::ImageIOBase::DOUBLE ) {
+    if( pixelType.GetComponentType() == itk::IOComponentEnum::DOUBLE ) {
       npy_type = NPY_DOUBLE;
       sitk_type = "sitkVectorFloat64";
-    } else if( pixelType.GetComponentType() == itk::ImageIOBase::FLOAT ) {
+    } else if( pixelType.GetComponentType() == itk::IOComponentEnum::FLOAT ) {
       npy_type = NPY_FLOAT;
       sitk_type = "sitkVectorFloat32";
-    } else if( pixelType.GetComponentType() == itk::ImageIOBase::SHORT) {
+    } else if( pixelType.GetComponentType() == itk::IOComponentEnum::SHORT) {
       npy_type = NPY_SHORT;
       sitk_type = "sitkVectorInt16";
-    } else if( pixelType.GetComponentType() == itk::ImageIOBase::CHAR ) {
+    } else if( pixelType.GetComponentType() == itk::IOComponentEnum::CHAR ) {
       npy_type = NPY_BYTE;
       sitk_type = "sitkVectorInt8";
-    } else if( pixelType.GetComponentType() == itk::ImageIOBase::INT ) {
+    } else if( pixelType.GetComponentType() == itk::IOComponentEnum::INT ) {
       npy_type = NPY_INT;
       sitk_type = "sitkVectorInt32";
-    } else if( pixelType.GetComponentType() == itk::ImageIOBase::LONG ) {
+    } else if( pixelType.GetComponentType() == itk::IOComponentEnum::LONG ) {
       npy_type = NPY_LONG;
       sitk_type = "sitkVectorInt64";
-    } else if( pixelType.GetComponentType() == itk::ImageIOBase::UCHAR ) {
+    } else if( pixelType.GetComponentType() == itk::IOComponentEnum::UCHAR ) {
       npy_type = NPY_UBYTE;
       sitk_type = "sitkVectorUInt8";
-    } else if( pixelType.GetComponentType() == itk::ImageIOBase::UINT ) {
+    } else if( pixelType.GetComponentType() == itk::IOComponentEnum::UINT ) {
       npy_type = NPY_UINT;
       sitk_type = "sitkVectorUInt32";
-    } else if( pixelType.GetComponentType() == itk::ImageIOBase::ULONG ) {
+    } else if( pixelType.GetComponentType() == itk::IOComponentEnum::ULONG ) {
       npy_type = NPY_LONG;
       sitk_type = "sitkVectorUInt64";
-    } else if( pixelType.GetComponentType() == itk::ImageIOBase::USHORT ) {
+    } else if( pixelType.GetComponentType() == itk::IOComponentEnum::USHORT ) {
       npy_type = NPY_USHORT;
       sitk_type = "sitkVectorUInt16";
     }
@@ -683,25 +683,25 @@ bool mitk::PythonService::CopyToPythonAsCvImage( mitk::Image* image, const std::
 
   // default pixeltype: unsigned short
   NPY_TYPES npy_type  = NPY_USHORT;
-  if( pixelType.GetComponentType() == itk::ImageIOBase::DOUBLE ) {
+  if( pixelType.GetComponentType() == itk::IOComponentEnum::DOUBLE ) {
     npy_type = NPY_DOUBLE;
-  } else if( pixelType.GetComponentType() == itk::ImageIOBase::FLOAT ) {
+  } else if( pixelType.GetComponentType() == itk::IOComponentEnum::FLOAT ) {
     npy_type = NPY_FLOAT;
-  } else if( pixelType.GetComponentType() == itk::ImageIOBase::SHORT) {
+  } else if( pixelType.GetComponentType() == itk::IOComponentEnum::SHORT) {
     npy_type = NPY_SHORT;
-  } else if( pixelType.GetComponentType() == itk::ImageIOBase::CHAR ) {
+  } else if( pixelType.GetComponentType() == itk::IOComponentEnum::CHAR ) {
     npy_type = NPY_BYTE;
-  } else if( pixelType.GetComponentType() == itk::ImageIOBase::INT ) {
+  } else if( pixelType.GetComponentType() == itk::IOComponentEnum::INT ) {
     npy_type = NPY_INT;
-  } else if( pixelType.GetComponentType() == itk::ImageIOBase::LONG ) {
+  } else if( pixelType.GetComponentType() == itk::IOComponentEnum::LONG ) {
     npy_type = NPY_LONG;
-  } else if( pixelType.GetComponentType() == itk::ImageIOBase::UCHAR ) {
+  } else if( pixelType.GetComponentType() == itk::IOComponentEnum::UCHAR ) {
     npy_type = NPY_UBYTE;
-  } else if( pixelType.GetComponentType() == itk::ImageIOBase::UINT ) {
+  } else if( pixelType.GetComponentType() == itk::IOComponentEnum::UINT ) {
     npy_type = NPY_UINT;
-  } else if( pixelType.GetComponentType() == itk::ImageIOBase::ULONG ) {
+  } else if( pixelType.GetComponentType() == itk::IOComponentEnum::ULONG ) {
     npy_type = NPY_LONG;
-  } else if( pixelType.GetComponentType() == itk::ImageIOBase::USHORT ) {
+  } else if( pixelType.GetComponentType() == itk::IOComponentEnum::USHORT ) {
     npy_type = NPY_USHORT;
   }
   else {

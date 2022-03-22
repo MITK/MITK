@@ -10,15 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKAFFINETRANSFORM3D_H_
-#define MITKAFFINETRANSFORM3D_H_
+#ifndef mitkAffineTransform3D_h
+#define mitkAffineTransform3D_h
 
-#include <itkAffineGeometryFrame.h>
-#include <mitkVector.h>
+#include <mitkNumericConstants.h>
+#include <itkScalableAffineTransform.h>
 
 namespace mitk
 {
-  typedef itk::AffineGeometryFrame<ScalarType, 3>::TransformType AffineTransform3D;
+  using AffineTransform3D = itk::ScalableAffineTransform<ScalarType, 3>;
 }
 
-#endif /* MITKAFFINETRANSFORM3D_H_ */
+#endif

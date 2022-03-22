@@ -23,8 +23,7 @@ found in the LICENSE file.
 #include <mitkServiceInterface.h>
 #include <usServiceRegistration.h>
 
-//itk
-#include <itkFastMutexLock.h>
+#include <mutex>
 
 namespace mitk {
 
@@ -196,7 +195,7 @@ namespace mitk {
 
 
     /** mutex to control access to m_StreamingFPS */
-    itk::FastMutexLock::Pointer m_StreamingFPSMutex;
+    std::mutex m_StreamingFPSMutex;
     /** The frames per second used for streaming */
     unsigned int m_StreamingFPS;
 

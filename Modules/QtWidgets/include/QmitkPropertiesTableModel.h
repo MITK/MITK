@@ -123,10 +123,10 @@ public:
 protected:
   ///
   /// \struct PropertyDataSetCompareFunction
-  /// \brief A struct that inherits from std::binary_function. You can use it in std::sort algorithm for sorting the
+  /// \brief A struct that you can use in std::sort algorithm for sorting the
   /// property list elements.
   ///
-  struct PropertyDataSetCompareFunction : public std::binary_function<PropertyDataSet, PropertyDataSet, bool>
+  struct PropertyDataSetCompareFunction
   {
     ///
     /// \brief Specifies field of the property with which it will be sorted.
@@ -164,7 +164,7 @@ protected:
   ///
   /// An unary function for selecting Properties in a vector by a key word.
   ///
-  struct PropertyListElementFilterFunction : public std::unary_function<PropertyDataSet, bool>
+  struct PropertyListElementFilterFunction
   {
     PropertyListElementFilterFunction(const std::string &m_FilterKeyWord);
     ///

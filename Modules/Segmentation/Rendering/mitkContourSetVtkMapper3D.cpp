@@ -98,7 +98,6 @@ void mitk::ContourSetVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *re
     while (contourIt != contourVec.end())
     {
       auto *nextContour = (mitk::Contour *)(*contourIt).second;
-      Contour::InputType idx = nextContour->GetContourPath()->StartOfInput();
 
       Contour::InputType end = nextContour->GetContourPath()->EndOfInput();
       if (end > 50000)
@@ -125,7 +124,6 @@ void mitk::ContourSetVtkMapper3D::GenerateDataForRenderer(mitk::BaseRenderer *re
           ptIndex++;
         }
         pointsIt++;
-        idx += 1;
       }
 
       if (nextContour->GetClosed())

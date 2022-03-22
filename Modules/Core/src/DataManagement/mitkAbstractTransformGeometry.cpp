@@ -99,8 +99,10 @@ bool mitk::AbstractTransformGeometry::Project(const mitk::Point3D &atPt3d_mm,
                     "m_ItkVtkAbstractTransform->GetInverseVtkAbstractTransform()");
   assert(this->IsBoundingBoxNull() == false);
 
-  Vector3D vec3d_units;
-  vec3d_units = GetIndexToWorldTransform()->GetInverseMatrix() * vec3d_mm;
+  auto inverse = mitk::AffineTransform3D::New();
+  GetIndexToWorldTransform()->GetInverse(inverse);
+
+  Vector3D vec3d_units = inverse->GetMatrix() * vec3d_mm;
   vec3d_units[2] = 0;
   projectedVec3d_mm = GetIndexToWorldTransform()->TransformVector(vec3d_units);
 
@@ -116,7 +118,7 @@ bool mitk::AbstractTransformGeometry::Project(const mitk::Point3D &atPt3d_mm,
     pt3d_units[i] = 0.0;
 
     for (j = 0; j < 3; ++j)
-      pt3d_units[i] += GetIndexToWorldTransform()->GetInverseMatrix()[i][j] * temp[j];
+      pt3d_units[i] += inverse->GetMatrix()[i][j] * temp[j];
   }
 
   return this->GetBoundingBox()->IsInside(pt3d_units);
@@ -261,7 +263,7 @@ void mitk::AbstractTransformGeometry::SetFrameGeometry(const mitk::BaseGeometry 
   }
 }
 
-unsigned long mitk::AbstractTransformGeometry::GetMTime() const
+itk::ModifiedTimeType mitk::AbstractTransformGeometry::GetMTime() const
 {
   if (Superclass::GetMTime() < m_ItkVtkAbstractTransform->GetMTime())
     return m_ItkVtkAbstractTransform->GetMTime();

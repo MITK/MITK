@@ -33,7 +33,7 @@ typename itk::Image<TPixel, VDimension>::Pointer CreateTestImageRandom(short int
   regionSize.Fill(size);
 
   typename itk::RandomImageSource<ImageType>::Pointer randomImageSource = itk::RandomImageSource<ImageType>::New();
-  randomImageSource->SetNumberOfThreads(1); // to produce non-random results
+  randomImageSource->SetNumberOfWorkUnits(1); // to produce non-random results
   randomImageSource->SetSize(regionSize);
   randomImageSource->Update();
 
@@ -258,8 +258,8 @@ void Assert_ItkVectorImageImportAndCast_ReturnsTrue()
 
   mitk::Image::Pointer mitkImage = mitk::ImportItkImage(itkImage);
   mitk::PixelType pixelType = mitkImage->GetPixelType();
-  MITK_TEST_CONDITION(pixelType.GetPixelType() == itk::ImageIOBase::VECTOR, "Vector image pixel type")
-  MITK_TEST_CONDITION(pixelType.GetComponentType() == itk::ImageIOBase::SHORT, "Vector image component type")
+  MITK_TEST_CONDITION(pixelType.GetPixelType() == itk::IOPixelEnum::VECTOR, "Vector image pixel type")
+  MITK_TEST_CONDITION(pixelType.GetComponentType() == itk::IOComponentEnum::SHORT, "Vector image component type")
 
   mitk::Image::Pointer mitkImage2;
   mitk::CastToMitkImage(itkImage, mitkImage2);

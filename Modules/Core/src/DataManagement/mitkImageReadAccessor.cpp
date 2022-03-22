@@ -60,7 +60,7 @@ mitk::ImageReadAccessor::~ImageReadAccessor()
   {
     // Future work: In case of non-coherent memory, copied area needs to be deleted
 
-    m_Image->m_ReadWriteLock.Lock();
+    m_Image->m_ReadWriteLock.lock();
 
     // delete self from list of ImageReadAccessors in Image
     auto it = std::find(m_Image->m_Readers.begin(), m_Image->m_Readers.end(), this);
@@ -69,15 +69,15 @@ mitk::ImageReadAccessor::~ImageReadAccessor()
     // delete lock, if there are no waiting ImageAccessors
     if (m_WaitLock->m_WaiterCount <= 0)
     {
-      m_WaitLock->m_Mutex.Unlock();
+      m_WaitLock->m_Mutex.unlock();
       delete m_WaitLock;
     }
     else
     {
-      m_WaitLock->m_Mutex.Unlock();
+      m_WaitLock->m_Mutex.unlock();
     }
 
-    m_Image->m_ReadWriteLock.Unlock();
+    m_Image->m_ReadWriteLock.unlock();
   }
   else
   {
@@ -92,7 +92,7 @@ const mitk::Image *mitk::ImageReadAccessor::GetImage() const
 
 void mitk::ImageReadAccessor::OrganizeReadAccess()
 {
-  m_Image->m_ReadWriteLock.Lock();
+  m_Image->m_ReadWriteLock.lock();
 
   // Check, if there is any Write-Access going on
   if (m_Image->m_Writers.size() > 0)
@@ -115,7 +115,7 @@ void mitk::ImageReadAccessor::OrganizeReadAccess()
 
           // WAIT
           w->Increment();
-          m_Image->m_ReadWriteLock.Unlock();
+          m_Image->m_ReadWriteLock.unlock();
           ImageAccessorBase::WaitForReleaseOf(w->m_WaitLock);
 
           // after waiting for the WriteAccessor w, start this method again
@@ -125,7 +125,7 @@ void mitk::ImageReadAccessor::OrganizeReadAccess()
         else
         {
           // THROW EXCEPTION
-          m_Image->m_ReadWriteLock.Unlock();
+          m_Image->m_ReadWriteLock.unlock();
           mitkThrowException(mitk::MemoryIsLockedException)
             << "The image part being ordered by the ImageAccessor is already in use and locked";
           return;
@@ -136,12 +136,12 @@ void mitk::ImageReadAccessor::OrganizeReadAccess()
 
   // Now, we know, that there is no conflict with a Write-Access
   // Lock the Mutex in ImageAccessorBase, to make sure that every other ImageAccessor has to wait if it locks the mutex
-  m_WaitLock->m_Mutex.Lock();
+  m_WaitLock->m_Mutex.lock();
 
   // insert self into readers list in Image
   m_Image->m_Readers.push_back(this);
 
   // printf("ReadAccess %d %d\n",(int) m_Image->m_Readers.size(),(int) m_Image->m_Writers.size());
   // fflush(0);
-  m_Image->m_ReadWriteLock.Unlock();
+  m_Image->m_ReadWriteLock.unlock();
 }

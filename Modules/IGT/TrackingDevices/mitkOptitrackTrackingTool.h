@@ -14,8 +14,6 @@ found in the LICENSE file.
 #define OptiTrackTrackingTool_H_HEADER_INCLUDED_
 
 #include <MitkIGTExports.h>
-#include <itkMultiThreader.h>
-#include "itkFastMutexLock.h"
 #include "mitkTrackingDevice.h"
 #include "mitkTrackingTool.h"
 #include "mitkIGTTimeStamp.h"
@@ -23,11 +21,9 @@ found in the LICENSE file.
 #include <cstdio>
 #include <ctime>
 #include <itksys/SystemTools.hxx>
-#include <itkMutexLockHolder.h>
 #include "mitkCommon.h"
 #include <mitkTrackingTool.h>
 #include <mitkVector.h>
-#include <itkFastMutexLock.h>
 #include "mitkIGTException.h"
 
 

@@ -262,7 +262,7 @@ vtkIdList *CalculatePCAonPointNeighboursForNormalVector(int index,
   // variance
   mat /= (size - 1);
 
-  vnl_svd<double> svd(mat.GetVnlMatrix());
+  vnl_svd<double> svd(mat.GetVnlMatrix().as_ref());
 
   for (int i = 0; i < 3; ++i)
     for (int j = 0; j < 3; ++j)

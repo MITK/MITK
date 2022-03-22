@@ -140,7 +140,7 @@ void QmitkImageCropperView::OnImageSelectionChanged(QList<mitk::DataNode::Pointe
 
     this->CreateBoundingShapeInteractor(rotationEnabled);
 
-    if (itk::ImageIOBase::SCALAR == image->GetPixelType().GetPixelType())
+    if (itk::IOPixelEnum::SCALAR == image->GetPixelType().GetPixelType())
     {
       // Might be changed with the upcoming new image statistics plugin
       //(recomputation might be very expensive for large images ;) )

@@ -276,8 +276,8 @@ void mitk::ImageStatisticsHolder::ComputeImageStatistics(int t, unsigned int com
   mitk::BoolProperty *isSh = dynamic_cast<mitk::BoolProperty *>(m_Image->GetProperty("IsShImage").GetPointer());
   mitk::BoolProperty *isOdf = dynamic_cast<mitk::BoolProperty *>(m_Image->GetProperty("IsOdfImage").GetPointer());
   const mitk::PixelType pType = m_Image->GetPixelType(0);
-  if (pType.GetNumberOfComponents() == 1 && (pType.GetPixelType() != itk::ImageIOBase::UNKNOWNPIXELTYPE) &&
-      (pType.GetPixelType() != itk::ImageIOBase::VECTOR))
+  if (pType.GetNumberOfComponents() == 1 && (pType.GetPixelType() != itk::IOPixelEnum::UNKNOWNPIXELTYPE) &&
+      (pType.GetPixelType() != itk::IOPixelEnum::VECTOR))
   {
     // recompute
     mitk::ImageTimeSelector::Pointer timeSelector = this->GetTimeSelector();
@@ -289,7 +289,7 @@ void mitk::ImageStatisticsHolder::ComputeImageStatistics(int t, unsigned int com
       AccessByItk_2(image, _ComputeExtremaInItkImage, this, t);
     }
   }
-  else if (pType.GetPixelType() == itk::ImageIOBase::VECTOR &&
+  else if (pType.GetPixelType() == itk::IOPixelEnum::VECTOR &&
            (!isOdf || !isOdf->GetValue()) && (!isSh || !isSh->GetValue())) // we have a vector image
   {
     // recompute

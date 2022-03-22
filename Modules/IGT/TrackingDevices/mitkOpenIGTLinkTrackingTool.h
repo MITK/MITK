@@ -14,7 +14,6 @@ found in the LICENSE file.
 #define MITKOpenIGTLinkTrackingTOOL_H_HEADER_INCLUDED_
 
 #include <mitkTrackingTool.h>
-#include <itkFastMutexLock.h>
 
 namespace mitk
 {

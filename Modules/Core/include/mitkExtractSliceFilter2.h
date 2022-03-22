@@ -70,7 +70,7 @@ namespace mitk
     // void BeforeThreadedGenerateData() override;
     // void ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread, itk::ThreadIdType threadId) override;
     void GenerateData() override;
-    void VerifyInputInformation() override;
+    void VerifyInputInformation() const override;
 
     struct Impl;
     Impl* m_Impl;

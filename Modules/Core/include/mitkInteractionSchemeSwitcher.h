@@ -21,6 +21,13 @@ found in the LICENSE file.
 
 namespace mitk
 {
+#pragma GCC visibility push(default)
+  /**
+    \brief Can be observed by GUI class to update button states when type is changed programmatically.
+  */
+  itkEventMacroDeclaration(InteractionSchemeChangedEvent, itk::AnyEvent);
+#pragma GCC visibility pop
+
   /***********************************************************************
   *
   * \brief Class that offers a convenient way to switch between different
@@ -63,13 +70,6 @@ namespace mitk
   class MITKCORE_EXPORT InteractionSchemeSwitcher : public itk::Object
   {
   public:
-#pragma GCC visibility push(default)
-    /**
-      \brief Can be observed by GUI class to update button states when type is changed programmatically.
-    */
-    itkEventMacro(InteractionSchemeChangedEvent, itk::AnyEvent);
-#pragma GCC visibility pop
-
     mitkClassMacroItkParent(InteractionSchemeSwitcher, itk::Object);
     itkFactorylessNewMacro(Self);
 

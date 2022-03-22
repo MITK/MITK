@@ -14,6 +14,8 @@ found in the LICENSE file.
 
 #include "mitkMimeType.h"
 
+#include <mitkUtf8Util.h>
+
 #include <algorithm>
 
 #include <itksys/SystemTools.hxx>
@@ -122,7 +124,7 @@ namespace mitk
         if (cmp(path.substr(path.size() - iter->size())))
         {
           extension = "." + *iter;
-          std::string filenameWithExtension = itksys::SystemTools::GetFilenameName(path);
+          std::string filenameWithExtension = Utf8Util::Utf8ToLocal8Bit(itksys::SystemTools::GetFilenameName(Utf8Util::Local8BitToUtf8(path)));
           filename = filenameWithExtension.substr(0, filenameWithExtension.size() - extension.size());
           return true;
         }

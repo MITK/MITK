@@ -29,6 +29,8 @@ namespace itk
   MaskedStatisticsImageFilter< TInputImage, TMaskImage >
     ::MaskedStatisticsImageFilter():m_ThreadSum(1), m_SumOfSquares(1), m_Count(1), m_ThreadMin(1), m_ThreadMax(1)
   {
+    this->DynamicMultiThreadingOff();
+
     // first output is a copy of the image, DataObject created by
     // superclass
     //
@@ -224,7 +226,7 @@ namespace itk
     MaskedStatisticsImageFilter< TInputImage, TMaskImage >
     ::BeforeThreadedGenerateData()
   {
-    ThreadIdType numberOfThreads = this->GetNumberOfThreads();
+    ThreadIdType numberOfThreads = this->GetNumberOfWorkUnits();
 
     // Resize the thread temporaries
     m_Count.SetSize(numberOfThreads);
@@ -250,7 +252,7 @@ namespace itk
     SizeValueType   count;
     RealType        sumOfSquares;
 
-    ThreadIdType numberOfThreads = this->GetNumberOfThreads();
+    ThreadIdType numberOfThreads = this->GetNumberOfWorkUnits();
 
     PixelType minimum;
     PixelType maximum;

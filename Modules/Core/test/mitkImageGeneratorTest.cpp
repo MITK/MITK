@@ -197,90 +197,90 @@ public:
   void SetDataTypeFloat2D_Success()
   {
     CPPUNIT_ASSERT_MESSAGE("Testing if the data type for a float 3D image is set correctly.",
-                      m_Image2Da->GetPixelType().GetComponentType() == itk::ImageIOBase::FLOAT);
+                      m_Image2Da->GetPixelType().GetComponentType() == itk::IOComponentEnum::FLOAT);
   }
 
   void SetDataTypeUChar2D_Success()
   {
     CPPUNIT_ASSERT_MESSAGE("Testing if the data type for a UChar 2D image is set correctly.",
-                      m_Image2Db->GetPixelType().GetComponentType() == itk::ImageIOBase::UCHAR);
+                      m_Image2Db->GetPixelType().GetComponentType() == itk::IOComponentEnum::UCHAR);
   }
 
   void SetDataTypeInt3D_Success()
   {
     CPPUNIT_ASSERT_MESSAGE("Testing if the data type for a Int 3D image is set correctly.",
-                      m_Image3Da->GetPixelType().GetComponentType() == itk::ImageIOBase::INT);
+                      m_Image3Da->GetPixelType().GetComponentType() == itk::IOComponentEnum::INT);
   }
 
   void SetDataTypeDouble3D_Success()
   {
     CPPUNIT_ASSERT_MESSAGE("Testing if the data type for a Double 3D image is set correctly.",
-                      m_Image3Db->GetPixelType().GetComponentType() == itk::ImageIOBase::DOUBLE);
+                      m_Image3Db->GetPixelType().GetComponentType() == itk::IOComponentEnum::DOUBLE);
   }
 
   void SetDataTypeFloat4D_Success()
   {
     CPPUNIT_ASSERT_MESSAGE("Testing if the data type for a Float 4D image is set correctly.",
-                      m_Image4Da->GetPixelType().GetComponentType() == itk::ImageIOBase::FLOAT);
+                      m_Image4Da->GetPixelType().GetComponentType() == itk::IOComponentEnum::FLOAT);
   }
 
   void SetDataTypeUChar4D_Success()
   {
     CPPUNIT_ASSERT_MESSAGE("Testing if the data type for a UChar 4D image is set correctly.",
-                      m_Image4Db->GetPixelType().GetComponentType() == itk::ImageIOBase::UCHAR);
+                      m_Image4Db->GetPixelType().GetComponentType() == itk::IOComponentEnum::UCHAR);
   }
 
   void SetDataTypeUInt3D_Success()
   {
     CPPUNIT_ASSERT_MESSAGE("Testing if the data type for a UInt 3D image is set correctly.",
-                      m_Image3Dc->GetPixelType().GetComponentType() == itk::ImageIOBase::UINT);
+                      m_Image3Dc->GetPixelType().GetComponentType() == itk::IOComponentEnum::UINT);
   }
 
   void SetPixelTypeFloat2D_Success()
   {
-    itk::ImageIOBase::IOPixelType scalarType = itk::ImageIOBase::SCALAR;
+    auto scalarType = itk::IOPixelEnum::SCALAR;
     CPPUNIT_ASSERT_MESSAGE("Testing if the pixel type for a Float 2D image is set correctly.",
                                         m_Image2Da->GetPixelType().GetPixelType() == scalarType);
   }
 
   void SetPixelTypeUChar2D_Success()
   {
-    itk::ImageIOBase::IOPixelType scalarType = itk::ImageIOBase::SCALAR;
+    auto scalarType = itk::IOPixelEnum::SCALAR;
     CPPUNIT_ASSERT_MESSAGE("Testing if the pixel type for a UChar 2D image is set correctly.",
                                         m_Image2Db->GetPixelType().GetPixelType() == scalarType);
   }
 
   void SetPixelTypeInt3D_Success()
   {
-    itk::ImageIOBase::IOPixelType scalarType = itk::ImageIOBase::SCALAR;
+    auto scalarType = itk::IOPixelEnum::SCALAR;
     CPPUNIT_ASSERT_MESSAGE("Testing if the pixel type for a Int 3D image is set correctly.",
                                       m_Image3Da->GetPixelType().GetPixelType() == scalarType);
   }
 
   void SetPixelTypeDouble3D_Success()
   {
-    itk::ImageIOBase::IOPixelType scalarType = itk::ImageIOBase::SCALAR;
+    auto scalarType = itk::IOPixelEnum::SCALAR;
     CPPUNIT_ASSERT_MESSAGE("Testing if the pixel type for a Double 3D image is set correctly.",
                                          m_Image3Db->GetPixelType().GetPixelType() == scalarType);
   }
 
   void SetPixelTypeFloat4D_Success()
   {
-    itk::ImageIOBase::IOPixelType scalarType = itk::ImageIOBase::SCALAR;
+    auto scalarType = itk::IOPixelEnum::SCALAR;
     CPPUNIT_ASSERT_MESSAGE("Testing if the pixel type for a Float 4D image is set correctly.",
                                         m_Image4Da->GetPixelType().GetPixelType() == scalarType);
   }
 
   void SetPixelTypeUChar4D_Success()
   {
-    itk::ImageIOBase::IOPixelType scalarType = itk::ImageIOBase::SCALAR;
+    auto scalarType = itk::IOPixelEnum::SCALAR;
     CPPUNIT_ASSERT_MESSAGE("Testing if the pixel type for a UChar 4D image is set correctly.",
                                         m_Image4Db->GetPixelType().GetPixelType() == scalarType);
   }
 
   void SetPixelTypeUInt3D_Success()
   {
-    itk::ImageIOBase::IOPixelType scalarType = itk::ImageIOBase::SCALAR;
+    auto scalarType = itk::IOPixelEnum::SCALAR;
     CPPUNIT_ASSERT_MESSAGE("Testing if the pixel type for a UInt 3D image is set correctly.",
                                        m_Image3Dc->GetPixelType().GetPixelType() == scalarType);
   }

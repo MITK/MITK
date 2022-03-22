@@ -3,7 +3,7 @@ project(org_mitk_gui_qt_igt_app_ultrasoundtrackingnavigation)
 mitk_create_plugin(
   EXPORT_DIRECTIVE IGTAPPUSTRACKINGNAVIGATION_EXPORT
   EXPORTED_INCLUDE_SUFFIXES src
-  PACKAGE_DEPENDS PRIVATE CTK ITK|LabelMap Poco
+  PACKAGE_DEPENDS PRIVATE CTK ITK|LabelMap+Smoothing Poco
   MODULE_DEPENDS MitkUSUI MitkUSNavigation MitkIGTUI MitkSceneSerialization MitkContourModel
 )
 

@@ -17,7 +17,6 @@ found in the LICENSE file.
 #include <MitkSegmentationExports.h>
 #include <mitkContour.h>
 #include <mitkPlaneGeometry.h>
-#include <vtkConfigure.h>
 #include <vtkVersionMacros.h>
 
 class vtkLinearExtrusionFilter;
@@ -77,7 +76,7 @@ namespace mitk
     itkGetConstObjectMacro(ClippingGeometry, mitk::BaseGeometry);
     itkSetObjectMacro(ClippingGeometry, mitk::BaseGeometry);
 
-    unsigned long GetMTime() const override;
+    itk::ModifiedTimeType GetMTime() const override;
 
   protected:
     ExtrudedContour();

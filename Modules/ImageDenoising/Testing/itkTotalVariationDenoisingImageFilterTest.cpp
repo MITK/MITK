@@ -141,7 +141,7 @@ int itkTotalVariationDenoisingImageFilterTest(int /*argc*/, char * /*argv*/ [])
     typedef itk::LocalVariationImageFilter<ImageType, ImageType> LocalFilterType;
     LocalFilterType::Pointer filter = LocalFilterType::New();
     filter->SetInput(image);
-    filter->SetNumberOfThreads(1);
+    filter->SetNumberOfWorkUnits(1);
     filter->Update();
     ImageType::Pointer outImage = filter->GetOutput();
 
@@ -151,8 +151,9 @@ int itkTotalVariationDenoisingImageFilterTest(int /*argc*/, char * /*argv*/ [])
       return EXIT_FAILURE;
     }
   }
-  catch (...)
+  catch (const itk::ExceptionObject& e)
   {
+    e.Print(std::cerr);
     return EXIT_FAILURE;
   }
 
@@ -163,7 +164,7 @@ int itkTotalVariationDenoisingImageFilterTest(int /*argc*/, char * /*argv*/ [])
     sFilter->SetInput(image);
     sFilter->SetOriginalImage(GenerateTestImage());
     sFilter->SetLambda(0.5);
-    sFilter->SetNumberOfThreads(1);
+    sFilter->SetNumberOfWorkUnits(1);
     sFilter->Update();
     ImageType::Pointer outImageS = sFilter->GetOutput();
 
@@ -173,8 +174,9 @@ int itkTotalVariationDenoisingImageFilterTest(int /*argc*/, char * /*argv*/ [])
       return EXIT_FAILURE;
     }
   }
-  catch (...)
+  catch (const itk::ExceptionObject& e)
   {
+    e.Print(std::cerr);
     return EXIT_FAILURE;
   }
 
@@ -184,7 +186,7 @@ int itkTotalVariationDenoisingImageFilterTest(int /*argc*/, char * /*argv*/ [])
     TVFilterType::Pointer tvFilter = TVFilterType::New();
     tvFilter->SetInput(image);
     tvFilter->SetNumberIterations(30);
-    tvFilter->SetNumberOfThreads(1);
+    tvFilter->SetNumberOfWorkUnits(1);
     tvFilter->SetLambda(0.1);
     tvFilter->Update();
     ImageType::Pointer outImageTV = tvFilter->GetOutput();
@@ -195,8 +197,9 @@ int itkTotalVariationDenoisingImageFilterTest(int /*argc*/, char * /*argv*/ [])
       return EXIT_FAILURE;
     }
   }
-  catch (...)
+  catch (const itk::ExceptionObject& e)
   {
+    e.Print(std::cerr);
     return EXIT_FAILURE;
   }
 
@@ -208,7 +211,7 @@ int itkTotalVariationDenoisingImageFilterTest(int /*argc*/, char * /*argv*/ [])
     typedef itk::LocalVariationImageFilter<VectorImageType, ImageType> LocalVecFilterType;
     LocalVecFilterType::Pointer vecFilter = LocalVecFilterType::New();
     vecFilter->SetInput(vecImage);
-    vecFilter->SetNumberOfThreads(1);
+    vecFilter->SetNumberOfWorkUnits(1);
     vecFilter->Update();
     ImageType::Pointer outVecImage = vecFilter->GetOutput();
 
@@ -218,8 +221,9 @@ int itkTotalVariationDenoisingImageFilterTest(int /*argc*/, char * /*argv*/ [])
       return EXIT_FAILURE;
     }
   }
-  catch (...)
+  catch (const itk::ExceptionObject& e)
   {
+    e.Print(std::cerr);
     return EXIT_FAILURE;
   }
 
@@ -230,7 +234,7 @@ int itkTotalVariationDenoisingImageFilterTest(int /*argc*/, char * /*argv*/ [])
     sVecFilter->SetInput(vecImage);
     sVecFilter->SetOriginalImage(vecImage);
     sVecFilter->SetLambda(0.5);
-    sVecFilter->SetNumberOfThreads(1);
+    sVecFilter->SetNumberOfWorkUnits(1);
     sVecFilter->UpdateLargestPossibleRegion();
     VectorImageType::Pointer outVecImageS = sVecFilter->GetOutput();
 
@@ -240,8 +244,9 @@ int itkTotalVariationDenoisingImageFilterTest(int /*argc*/, char * /*argv*/ [])
       return EXIT_FAILURE;
     }
   }
-  catch (...)
+  catch (const itk::ExceptionObject& e)
   {
+    e.Print(std::cerr);
     return EXIT_FAILURE;
   }
 
@@ -251,7 +256,7 @@ int itkTotalVariationDenoisingImageFilterTest(int /*argc*/, char * /*argv*/ [])
     TVVectorFilterType::Pointer tvVecFilter = TVVectorFilterType::New();
     tvVecFilter->SetInput(vecImage);
     tvVecFilter->SetNumberIterations(30);
-    tvVecFilter->SetNumberOfThreads(1);
+    tvVecFilter->SetNumberOfWorkUnits(1);
     tvVecFilter->SetLambda(0.1);
     tvVecFilter->Update();
     VectorImageType::Pointer outVecImageTV = tvVecFilter->GetOutput();
@@ -262,8 +267,9 @@ int itkTotalVariationDenoisingImageFilterTest(int /*argc*/, char * /*argv*/ [])
       return EXIT_FAILURE;
     }
   }
-  catch (...)
+  catch (const itk::ExceptionObject& e)
   {
+    e.Print(std::cerr);
     return EXIT_FAILURE;
   }
 

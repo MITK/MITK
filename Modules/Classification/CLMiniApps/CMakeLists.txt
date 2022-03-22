@@ -51,7 +51,7 @@ if(BUILD_ClassificationMiniApps OR MITK_BUILD_ALL_APPS)
 
       mitk_create_executable(${appname}
       DEPENDS MitkCore MitkCLCore MitkCommandLine ${dependencies_list}
-      PACKAGE_DEPENDS Qt5|Core Vigra VTK|IOImage
+      PACKAGE_DEPENDS Qt5|Core Vigra VTK|IOImage ITK|Smoothing
       CPP_FILES ${appname}.cpp
       )
 

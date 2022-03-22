@@ -44,6 +44,8 @@ found in the LICENSE file.
 #include <itkStructureTensorEigenvalueImageFilter.h>
 #include <itkLineHistogramBasedMassImageFilter.h>
 
+#include <random>
+
 using namespace mitk;
 
 std::vector<mitk::Image::Pointer> m_FeatureImageVector;
@@ -249,6 +251,8 @@ int main(int argc, char* argv[])
     ++pos;
   }
 
+  std::random_device rnd;
+
   unsigned int runs = 20;
   for(unsigned int k = 0 ; k < runs; k++)
   {
@@ -259,19 +263,19 @@ int main(int argc, char* argv[])
     itk_classmask_sampled->FillBuffer(0);
 
     // initial draws
-    std::random_shuffle(CSF_vec.begin(), CSF_vec.end());
+    std::shuffle(CSF_vec.begin(), CSF_vec.end(), std::mt19937(rnd()));
     class_mask->GetGeometry()->WorldToIndex(CSF_vec.back(),index);
     iit.SetIndex(index);
     iit.Set(1);
     CSF_vec.pop_back();
 
-    std::random_shuffle(LES_vec.begin(), LES_vec.end());
+    std::shuffle(LES_vec.begin(), LES_vec.end(), std::mt19937(rnd()));
     class_mask->GetGeometry()->WorldToIndex(LES_vec.back(),index);
     iit.SetIndex(index);
     iit.Set(2);
     LES_vec.pop_back();
 
-    std::random_shuffle(BRA_vec.begin(), BRA_vec.end());
+    std::shuffle(BRA_vec.begin(), BRA_vec.end(), std::mt19937(rnd()));
     class_mask->GetGeometry()->WorldToIndex(BRA_vec.back(),index);
     iit.SetIndex(index);
     iit.Set(3);
@@ -324,7 +328,7 @@ int main(int argc, char* argv[])
 
       if(!CSF_vec.empty())
       {
-        std::random_shuffle(CSF_vec.begin(), CSF_vec.end());
+        std::shuffle(CSF_vec.begin(), CSF_vec.end(), std::mt19937(rnd()));
         class_mask->GetGeometry()->WorldToIndex(CSF_vec.back(),index);
         iit.SetIndex(index);
         iit.Set(1);
@@ -333,7 +337,7 @@ int main(int argc, char* argv[])
 
       if(!LES_vec.empty())
       {
-        std::random_shuffle(LES_vec.begin(), LES_vec.end());
+        std::shuffle(LES_vec.begin(), LES_vec.end(), std::mt19937(rnd()));
         class_mask->GetGeometry()->WorldToIndex(LES_vec.back(),index);
         iit.SetIndex(index);
         iit.Set(2);
@@ -342,7 +346,7 @@ int main(int argc, char* argv[])
 
       if(!BRA_vec.empty())
       {
-        std::random_shuffle(BRA_vec.begin(), BRA_vec.end());
+        std::shuffle(BRA_vec.begin(), BRA_vec.end(), std::mt19937(rnd()));
         class_mask->GetGeometry()->WorldToIndex(BRA_vec.back(),index);
         iit.SetIndex(index);
         iit.Set(3);

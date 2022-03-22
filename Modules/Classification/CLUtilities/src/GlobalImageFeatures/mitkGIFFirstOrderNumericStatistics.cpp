@@ -68,7 +68,6 @@ CalculateFirstOrderStatistics(const itk::Image<TPixel, VImageDimension>* itkImag
   double absoluteMaximum = std::numeric_limits<double>::lowest();
   double sum = 0;
   double sumTwo= 0;
-  double sumThree = 0;
   unsigned int numberOfVoxels = 0;
 
   itk::ImageRegionConstIterator<ImageType> imageIter(itkImage, itkImage->GetLargestPossibleRegion());
@@ -87,7 +86,6 @@ CalculateFirstOrderStatistics(const itk::Image<TPixel, VImageDimension>* itkImag
 
       sum += value;
       sumTwo += value * value;
-      sumThree += value * value*value;
 
       histogram[params.quantifier->IntensityToIndex(value)] += 1;
 
@@ -178,7 +176,6 @@ CalculateFirstOrderStatistics(const itk::Image<TPixel, VImageDimension>* itkImag
   double sumRobust = 0;
   double sumRobustSquare = 0;
   double sumRobustAbsolulteDistanceToMean = 0;
-  double sumValueMinusMean = 0;
   double sumValueMinusMeanThree = 0;
   double sumValueMinusMeanFour = 0;
   unsigned int numberOfRobustVoxel = 0;
@@ -195,7 +192,6 @@ CalculateFirstOrderStatistics(const itk::Image<TPixel, VImageDimension>* itkImag
 
       sumAbsoluteDistanceToMean += std::abs<double>(valueMinusMean);
       sumAbsoluteDistanceToMedian += std::abs<double>(value - median);
-      sumValueMinusMean += valueMinusMean;
       sumValueMinusMeanThree += valueMinusMean * valueMinusMean * valueMinusMean;
       sumValueMinusMeanFour += valueMinusMean * valueMinusMean * valueMinusMean * valueMinusMean;
 

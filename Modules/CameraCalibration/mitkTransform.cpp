@@ -354,7 +354,7 @@ namespace mitk
      const vnl_matrix_fixed<mitk::ScalarType, 4, 4>& mat)
   {
     // set translation first
-    vnl_vector<mitk::ScalarType> transl = mat.get_column(3);
+    vnl_vector<mitk::ScalarType> transl = mat.get_column(3).as_ref();
     mitk::Point3D p;
     for(unsigned int i=0; i<3; ++i)
       p[i] = transl[i];
@@ -444,7 +444,7 @@ namespace mitk
 
     vnl_matrix<mitk::ScalarType> vnlInverseRotation(3,3);
     // invert rotation
-    vnlInverseRotation = vnl_matrix_inverse<mitk::ScalarType>(vnlRotation);
+    vnlInverseRotation = vnl_matrix_inverse<mitk::ScalarType>(vnlRotation.as_ref()).as_matrix();
 
     vnl_vector<mitk::ScalarType> vnlTranslation
         = this->GetPosition().GetVnlVector();

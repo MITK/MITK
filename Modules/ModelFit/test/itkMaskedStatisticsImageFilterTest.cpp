@@ -34,7 +34,7 @@ int itkMaskedStatisticsImageFilterTest(int  /*argc*/, char*[] /*argv[]*/)
 
   testFilter->SetInput(img1);
 
-  testFilter->SetNumberOfThreads(2);
+  testFilter->SetNumberOfWorkUnits(2);
 
   testFilter->Update();
 

@@ -19,7 +19,6 @@ found in the LICENSE file.
 #include <mitkCommon.h>
 #include <mitkOperationActor.h>
 
-#include <itkAffineGeometryFrame.h>
 #include <itkBoundingBox.h>
 #include <itkIndex.h>
 #include <itkQuaternionRigidTransform.h>
@@ -391,15 +390,15 @@ public:
     vnlmatrix = anotherTransform->GetMatrix().GetVnlMatrix();
 
     mitk::VnlVector col;
-    col = vnlmatrix.get_column(0);
+    col = vnlmatrix.get_column(0).as_ref();
     col.normalize();
     col *= aSpacing[0];
     vnlmatrix.set_column(0, col);
-    col = vnlmatrix.get_column(1);
+    col = vnlmatrix.get_column(1).as_ref();
     col.normalize();
     col *= aSpacing[1];
     vnlmatrix.set_column(1, col);
-    col = vnlmatrix.get_column(2);
+    col = vnlmatrix.get_column(2).as_ref();
     col.normalize();
     col *= aSpacing[2];
     vnlmatrix.set_column(2, col);

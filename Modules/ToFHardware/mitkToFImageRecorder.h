@@ -20,8 +20,10 @@ found in the LICENSE file.
 
 #include <itkObject.h>
 #include <itkObjectFactory.h>
-#include <itkFastMutexLock.h>
 #include <itkCommand.h>
+
+#include <mutex>
+#include <thread>
 
 namespace mitk
 {
@@ -128,7 +130,7 @@ protected:
   /*!
     \brief Thread method acquiring data via the ToFCameraDevice and recording it to file via the ToFImageWriter
     */
-  static ITK_THREAD_RETURN_TYPE RecordData(void* pInfoStruct);
+  void RecordData();
 
   // data acquisition
   ToFCameraDevice::Pointer m_ToFCameraDevice; ///< ToFCameraDevice used for acquiring the images
@@ -165,9 +167,8 @@ protected:
   bool m_RGBImageSelected; ///< flag indicating if rgb image should be recorded
 
   // threading
-  itk::MultiThreader::Pointer m_MultiThreader; ///< member for thread-handling (ITK-based)
-  int m_ThreadID; ///< ID of the thread recording the data
-  itk::FastMutexLock::Pointer m_AbortMutex; ///< mutex for thread-safe data access of abort flag
+  std::thread m_Thread;
+  std::mutex m_AbortMutex; ///< mutex for thread-safe data access of abort flag
   bool m_Abort; ///< flag controlling the abort mechanism of the recording procedure. For thread-safety only use in combination with m_AbortMutex
 
 private:

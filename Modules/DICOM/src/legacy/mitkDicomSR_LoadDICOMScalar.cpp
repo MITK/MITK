@@ -23,25 +23,25 @@ namespace mitk
   {
     switch (io->GetComponentType())
     {
-      case DcmIoType::UCHAR:
+      case itk::IOComponentEnum::UCHAR:
         return LoadDICOMByITK<unsigned char>(filenames, correctTilt, tiltInfo, io, command, preLoadedImageBlock);
-      case DcmIoType::CHAR:
+      case itk::IOComponentEnum::CHAR:
         return LoadDICOMByITK<char>(filenames, correctTilt, tiltInfo, io, command, preLoadedImageBlock);
-      case DcmIoType::USHORT:
+      case itk::IOComponentEnum::USHORT:
         return LoadDICOMByITK<unsigned short>(filenames, correctTilt, tiltInfo, io, command, preLoadedImageBlock);
-      case DcmIoType::SHORT:
+      case itk::IOComponentEnum::SHORT:
         return LoadDICOMByITK<short>(filenames, correctTilt, tiltInfo, io, command, preLoadedImageBlock);
-      case DcmIoType::UINT:
+      case itk::IOComponentEnum::UINT:
         return LoadDICOMByITK<unsigned int>(filenames, correctTilt, tiltInfo, io, command, preLoadedImageBlock);
-      case DcmIoType::INT:
+      case itk::IOComponentEnum::INT:
         return LoadDICOMByITK<int>(filenames, correctTilt, tiltInfo, io, command, preLoadedImageBlock);
-      case DcmIoType::ULONG:
+      case itk::IOComponentEnum::ULONG:
         return LoadDICOMByITK<long unsigned int>(filenames, correctTilt, tiltInfo, io, command, preLoadedImageBlock);
-      case DcmIoType::LONG:
+      case itk::IOComponentEnum::LONG:
         return LoadDICOMByITK<long int>(filenames, correctTilt, tiltInfo, io, command, preLoadedImageBlock);
-      case DcmIoType::FLOAT:
+      case itk::IOComponentEnum::FLOAT:
         return LoadDICOMByITK<float>(filenames, correctTilt, tiltInfo, io, command, preLoadedImageBlock);
-      case DcmIoType::DOUBLE:
+      case itk::IOComponentEnum::DOUBLE:
         return LoadDICOMByITK<double>(filenames, correctTilt, tiltInfo, io, command, preLoadedImageBlock);
       default:
         MITK_ERROR << "Found unsupported DICOM scalar pixel type: (enum value) " << io->GetComponentType();

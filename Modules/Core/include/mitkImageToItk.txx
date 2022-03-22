@@ -103,7 +103,7 @@ void mitk::ImageToItk<TOutputImage>::GenerateData()
     noBytes = noBytes * input->GetDimension(i);
   }
   const mitk::PixelType pixelType = input->GetPixelType();
-  if (pixelType.GetPixelType() == itk::ImageIOBase::VECTOR)
+  if (pixelType.GetPixelType() == itk::IOPixelEnum::VECTOR)
   {
     noBytes *= pixelType.GetNumberOfComponents();
     SetLengthHelper<typename Superclass::OutputImageType> helper(output.GetPointer());

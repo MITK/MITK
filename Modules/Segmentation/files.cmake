@@ -79,6 +79,8 @@ set(CPP_FILES
 set(RESOURCE_FILES
   Add_48x48.png
   Add_Cursor_32x32.png
+  AI_48x48.png
+  AI_Cursor_32x32.png
   Erase_48x48.png
   Erase_Cursor_32x32.png
   FastMarching_48x48.png

@@ -313,8 +313,8 @@ void mitk::AutoCropImageFilter::ComputeNewImageBounds()
         {
           for (int i = 0; i < 3; i++)
           {
-            minima[i] = vnl_math_min((int)minima[i], (int)(inIt.GetIndex()[i]));
-            maxima[i] = vnl_math_max((int)maxima[i], (int)(inIt.GetIndex()[i]));
+            minima[i] = std::min((int)minima[i], (int)(inIt.GetIndex()[i]));
+            maxima[i] = std::max((int)maxima[i], (int)(inIt.GetIndex()[i]));
           }
         }
       }

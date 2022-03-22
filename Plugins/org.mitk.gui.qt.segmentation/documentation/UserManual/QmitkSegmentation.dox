@@ -259,7 +259,7 @@ your image but you are just interested in one special region.
 This tool provides a GUI to the deep learning-based segmentation algorithm called the nnUNet. With this tool, you can get a segmentation mask predicted for the loaded image in MITK. Be ready with the pre-trained weights (a.k.a <b>RESULTS_FOLDER</b>)
 for your organ or task concerned, before using the tool. For a detailed explanation of the parameters and pre-trained weights folder structure etc., please refer to https://github.com/MIC-DKFZ/nnUNet. <br>
 Remark: The tool assumes that you have a Python3 environment with nnUNet (pip) installed. Your machine should be also equipped with a CUDA enabled GPU.
-\imageMacro{QmitkSegmentation_3DWatershedTool.png,"nnUNet tool",10.00}
+\imageMacro{QmitkSegmentation_nnUnetTool.png,"nnUNet tool",10.00}
 
 \subsubsection org_mitk_views_segmentationUserManualnnUNetToolWorkflow Workflow:
     -# Click on the "nnUNet Results Folder" directory icon and navigate to the results folder on your hard disk. This is equivalent to setting the <b>RESULTS_FOLDER</b> environment variable. If your results folder is as 

@@ -12,8 +12,8 @@ found in the LICENSE file.
 
 #include "mitkTestingMacros.h"
 #include "itkImage.h"
-#include "mitkExtendedLabelStatisticsImageFilter.h"
-#include "mitkExtendedStatisticsImageFilter.h"
+#include "mitkLabelStatisticsImageFilter.h"
+#include "mitkStatisticsImageFilter.h"
 #include "mitkNumericConstants.h"
 
 /**
@@ -39,13 +39,13 @@ class mitkImageStatisticsTextureAnalysisTestClass
 
 public:
 
-  typedef itk::Image< int,3 >ImageType;
+  typedef itk::Image< mitk::Label::PixelType,3 >ImageType;
   typedef ImageType::Pointer PointerOfImage;
 
-  typedef itk::ExtendedLabelStatisticsImageFilter< ImageType, ImageType > LabelStatisticsFilterType;
+  typedef mitk::LabelStatisticsImageFilter< ImageType > LabelStatisticsFilterType;
   typedef LabelStatisticsFilterType::Pointer labelStatisticsFilterPointer;
 
-  typedef itk::ExtendedStatisticsImageFilter< ImageType > StatisticsFilterType;
+  typedef mitk::StatisticsImageFilter< ImageType > StatisticsFilterType;
   typedef StatisticsFilterType::Pointer StatisticsFilterPointer;
 
 
@@ -96,8 +96,17 @@ public:
     LabelStatisticsFilterType::Pointer labelStatisticsFilter;
     labelStatisticsFilter = LabelStatisticsFilterType::New();
     labelStatisticsFilter->SetInput( image );
-    labelStatisticsFilter->UseHistogramsOn();
-    labelStatisticsFilter->SetHistogramParameters( 20, -10, 10);
+
+    std::unordered_map<mitk::Label::PixelType, unsigned int> sizes;
+    sizes[1] = 20;
+
+    std::unordered_map<mitk::Label::PixelType, LabelStatisticsFilterType::RealType> lowerBounds;
+    lowerBounds[1] = -10;
+
+    std::unordered_map<mitk::Label::PixelType, LabelStatisticsFilterType::RealType> upperBounds;
+    upperBounds[1] = 10;
+
+    labelStatisticsFilter->SetHistogramParameters(sizes, lowerBounds, upperBounds);
     labelStatisticsFilter->SetLabelInput( maskImage );
     labelStatisticsFilter->Update();
 

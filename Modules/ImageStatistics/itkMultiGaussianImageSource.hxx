@@ -607,11 +607,6 @@ namespace itk
 
     m_MeanValue = 0.0;
     double meanValueTemp;
-    PointType midpoint;
-    //typename MapContainerPoints::ElementIdentifier cuboidNumber = m_Midpoints.Size();
-    // SetNormalDistributionValues();
-    //double radius;
-    //double xMin, xMax, yMin, yMax, zMin, zMax;
 
     m_WriteMPS = 1;
     PointType globalCoordinateMidpointSphere;

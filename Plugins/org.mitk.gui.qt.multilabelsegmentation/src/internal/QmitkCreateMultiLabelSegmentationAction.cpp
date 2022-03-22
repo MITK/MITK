@@ -9,19 +9,13 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
+
 #include "QmitkCreateMultiLabelSegmentationAction.h"
 
 #include "mitkLabelSetImage.h"
-#include "mitkRenderingManager.h"
+#include "mitkLabelSetImageHelper.h"
 
-#include "QInputDialog"
 #include "QMessageBox"
-
-#include "QmitkNewSegmentationDialog.h"
-#include "QmitkMultiLabelSegmentationView.h"
-#include "QmitkSegmentationOrganNamesHandling.cpp"
-//needed for qApp
-#include <qcoreapplication.h>
 
 QmitkCreateMultiLabelSegmentationAction::QmitkCreateMultiLabelSegmentationAction()
 {
@@ -31,70 +25,56 @@ QmitkCreateMultiLabelSegmentationAction::~QmitkCreateMultiLabelSegmentationActio
 {
 }
 
-void QmitkCreateMultiLabelSegmentationAction::Run( const QList<mitk::DataNode::Pointer> &selectedNodes )
+void QmitkCreateMultiLabelSegmentationAction::Run(const QList<mitk::DataNode::Pointer>& selectedNodes)
 {
   if (m_DataStorage.IsNull())
   {
     auto message = tr("Data storage not set.");
     MITK_ERROR << message;
-    QMessageBox::warning(nullptr, "New Segmentation Session", message);
+    QMessageBox::warning(nullptr, "New segmentation", message);
     return;
   }
 
   for ( const auto &referenceNode : selectedNodes )
   {
-    if (referenceNode.IsNotNull())
+    if (referenceNode.IsNull())
     {
-      mitk::Image* referenceImage = dynamic_cast<mitk::Image*>( referenceNode->GetData() );
-      if (nullptr == referenceImage)
-      {
-        MITK_WARN << "Could not create multi label segmentation for non-image node - skipping action.";
-        continue;
-      }
+      continue;
+    }
 
-      QString newName = QString::fromStdString(referenceNode->GetName());
-      newName.append("-labels");
+    mitk::Image* referenceImage = dynamic_cast<mitk::Image*>(referenceNode->GetData());
+    if (nullptr == referenceImage)
+    {
+      MITK_WARN << "Could not create multi label segmentation for non-image node.";
+      continue;
+    }
 
-      bool ok = false;
-      newName = QInputDialog::getText(nullptr, "New Segmentation Session", "New name:", QLineEdit::Normal, newName, &ok);
-      if(!ok) return;
+    mitk::DataNode::Pointer newSegmentationNode;
+    try
+    {
+      newSegmentationNode =
+        mitk::LabelSetImageHelper::CreateNewSegmentationNode(referenceNode, referenceImage);
+    }
+    catch (mitk::Exception& e)
+    {
+      MITK_ERROR << "Exception caught: " << e.GetDescription();
+      QMessageBox::warning(nullptr, "New segmentation", "Could not create a new segmentation.");
+      return;
+    }
 
-      mitk::LabelSetImage::Pointer workingImage = mitk::LabelSetImage::New();
+    auto newLabelSetImage = dynamic_cast<mitk::LabelSetImage*>(newSegmentationNode->GetData());
+    if (nullptr == newLabelSetImage)
+    {
+      // something went wrong
+      return;
+    }
 
-      try
-      {
-        workingImage->Initialize(referenceImage);
-      }
-      catch ( mitk::Exception& e )
-      {
-        MITK_ERROR << "Exception caught: " << e.GetDescription();
-        QMessageBox::warning(nullptr, "New Segmentation Session", "Could not create a new segmentation session.");
-        return;
-      }
+    mitk::Label::Pointer newLabel = mitk::LabelSetImageHelper::CreateNewLabel(newLabelSetImage);
+    newLabelSetImage->GetActiveLabelSet()->AddLabel(newLabel);
 
-      mitk::DataNode::Pointer workingNode = mitk::DataNode::New();
-      workingNode->SetData(workingImage);
-      workingNode->SetName(newName.toStdString());
-
-      // set additional image information
-      workingImage->GetExteriorLabel()->SetProperty("name.parent",mitk::StringProperty::New(referenceNode->GetName().c_str()));
-      workingImage->GetExteriorLabel()->SetProperty("name.image",mitk::StringProperty::New(newName.toStdString().c_str()));
-
-      if (!m_DataStorage->Exists(workingNode))
-        m_DataStorage->Add(workingNode, referenceNode);
-
-      QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( );
-      dialog->SetSuggestionList( mitk::OrganNamesHandling::GetDefaultOrganColorString());
-      dialog->setWindowTitle("New Label");
-
-      int dialogReturnValue = dialog->exec();
-
-      if ( dialogReturnValue == QDialog::Rejected ) return;
-
-      QString segName = dialog->GetSegmentationName();
-      if(segName.isEmpty()) segName = "Unnamed";
-      workingImage->GetActiveLabelSet()->AddLabel(segName.toStdString(), dialog->GetColor());
-
+    if (!m_DataStorage->Exists(newSegmentationNode))
+    {
+      m_DataStorage->Add(newSegmentationNode, referenceNode);
     }
   }
 }

@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkCoreServices.h>
 #include <mitkFileWriterRegistry.h>
 #include <mitkIMimeTypeProvider.h>
+#include <mitkUtf8Util.h>
 
 #include <usAny.h>
 #include <usServiceProperties.h>
@@ -76,7 +77,7 @@ namespace mitk
           }
         }
       }
-      else if (!itksys::SystemTools::GetFilenameExtension(path).empty())
+      else if (!itksys::SystemTools::GetFilenameExtension(Utf8Util::Local8BitToUtf8(path)).empty())
       {
         // If there are no suitable mime-type for the file AND an extension
         // was supplied, we stop here.

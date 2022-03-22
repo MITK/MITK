@@ -19,8 +19,7 @@ mitk::USImageSource::USImageSource()
   : m_OpenCVToMitkFilter(mitk::OpenCVToMitkImageFilter::New()),
   m_MitkToOpenCVFilter(nullptr),
   m_ImageFilter(mitk::BasicCombinationOpenCVImageFilter::New()),
-  m_CurrentImageId(0),
-  m_ImageFilterMutex(itk::FastMutexLock::New())
+  m_CurrentImageId(0)
 {
 }
 
@@ -59,9 +58,9 @@ std::vector<mitk::Image::Pointer> mitk::USImageSource::GetNextImage()
     {
       if (!imageVector[i].empty())
       {
-        m_ImageFilterMutex->Lock();
+        m_ImageFilterMutex.lock();
         m_ImageFilter->FilterImage(imageVector[i], m_CurrentImageId);
-        m_ImageFilterMutex->Unlock();
+        m_ImageFilterMutex.unlock();
 
         // convert to MITK image
         this->m_OpenCVToMitkFilter->SetOpenCVMat(imageVector[i]);

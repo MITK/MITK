@@ -21,7 +21,7 @@ found in the LICENSE file.
 #include "mitkDICOMTagBasedSorter.h"
 #include "mitkDICOMGDCMTagScanner.h"
 
-itk::MutexLock::Pointer mitk::DICOMITKSeriesGDCMReader::s_LocaleMutex = itk::MutexLock::New();
+std::mutex mitk::DICOMITKSeriesGDCMReader::s_LocaleMutex;
 
 
 mitk::DICOMITKSeriesGDCMReader::DICOMITKSeriesGDCMReader( unsigned int decimalPlacesForOrientation, bool simpleVolumeImport )
@@ -151,7 +151,7 @@ std::string mitk::DICOMITKSeriesGDCMReader::GetActiveLocale()
 
 void mitk::DICOMITKSeriesGDCMReader::PushLocale() const
 {
-  s_LocaleMutex->Lock();
+  s_LocaleMutex.lock();
 
   std::string currentCLocale = setlocale( LC_NUMERIC, nullptr );
   m_ReplacedCLocales.push( currentCLocale );
@@ -162,12 +162,12 @@ void mitk::DICOMITKSeriesGDCMReader::PushLocale() const
   std::locale l( "C" );
   std::cin.imbue( l );
 
-  s_LocaleMutex->Unlock();
+  s_LocaleMutex.unlock();
 }
 
 void mitk::DICOMITKSeriesGDCMReader::PopLocale() const
 {
-  s_LocaleMutex->Lock();
+  s_LocaleMutex.lock();
 
   if ( !m_ReplacedCLocales.empty() )
   {
@@ -189,7 +189,7 @@ void mitk::DICOMITKSeriesGDCMReader::PopLocale() const
     MITK_WARN << "Mismatched PopLocale on DICOMITKSeriesGDCMReader.";
   }
 
-  s_LocaleMutex->Unlock();
+  s_LocaleMutex.unlock();
 }
 
 mitk::DICOMITKSeriesGDCMReader::SortingBlockList

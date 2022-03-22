@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include "mitkDataStorage.h"
 #include "mitkMessage.h"
 #include <map>
+#include <mutex>
 
 namespace mitk
 {
@@ -88,8 +89,7 @@ namespace mitk
     //##
     SetOfObjects::ConstPointer GetAll() const override;
 
-    /*ITK Mutex */
-    mutable itk::SimpleFastMutexLock m_Mutex;
+    mutable std::mutex m_Mutex;
 
   protected:
     //##Documentation

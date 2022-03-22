@@ -57,13 +57,13 @@ namespace {
     {
       return Any(jsonValue.asBool());
     }
-    else if (jsonValue.isDouble())
-    {
-      return Any(jsonValue.asDouble());
-    }
     else if (jsonValue.isIntegral())
     {
       return Any(jsonValue.asInt());
+    }
+    else if (jsonValue.isDouble())
+    {
+      return Any(jsonValue.asDouble());
     }
 
     return Any();
@@ -78,7 +78,7 @@ namespace {
       Any anyValue = ParseJsonValue(jsonValue);
       if (!anyValue.Empty())
       {
-        anyMap.insert(std::make_pair(it.memberName(), anyValue));
+        anyMap.insert(std::make_pair(it.name(), anyValue));
       }
     }
   }

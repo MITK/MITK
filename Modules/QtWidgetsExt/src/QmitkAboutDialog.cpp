@@ -15,7 +15,6 @@ found in the LICENSE file.
 #include <QPushButton>
 #include <itkConfigure.h>
 #include <mitkVersion.h>
-#include <vtkConfigure.h>
 #include <vtkVersionMacros.h>
 
 QmitkAboutDialog::QmitkAboutDialog(QWidget *parent, Qt::WindowFlags f) : QDialog(parent, f)

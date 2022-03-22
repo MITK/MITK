@@ -1656,11 +1656,9 @@ static void solve_epsilon_svr(
   Solver s;
   s.Solve(2*l, SVR_Q(*prob,*param), linear_term, y,
           alpha2, C, param->eps, si, param->shrinking);
-  double sum_alpha = 0;
   for(i=0;i<l;i++)
   {
     alpha[i] = alpha2[i] - alpha2[i+l];
-    sum_alpha += fabs(alpha[i]);
   }
   //info("nu = %f\n",sum_alpha/(param->C*l));
   delete[] alpha2;

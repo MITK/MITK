@@ -15,7 +15,6 @@ found in the LICENSE file.
 
 #include <iostream>
 #include <fstream>
-#include <itkMultiThreader.h>
 #include <itksys/SystemTools.hxx>
 
 namespace mitk
@@ -73,7 +72,7 @@ void ToFCameraMITKPlayerDevice::StartCamera()
   {
     // get the first image
     this->m_Controller->UpdateCamera();
-    this->m_ImageMutex->Lock();
+    this->m_ImageMutex.lock();
     this->m_Controller->GetDistances(this->m_DistanceDataBuffer[this->m_FreePos]);
     this->m_Controller->GetAmplitudes(this->m_AmplitudeDataBuffer[this->m_FreePos]);
     this->m_Controller->GetIntensities(this->m_IntensityDataBuffer[this->m_FreePos]);
@@ -81,12 +80,12 @@ void ToFCameraMITKPlayerDevice::StartCamera()
     this->m_FreePos = (this->m_FreePos+1) % this->m_BufferSize;
     this->m_CurrentPos = (this->m_CurrentPos+1) % this->m_BufferSize;
     this->m_ImageSequence++;
-    this->m_ImageMutex->Unlock();
+    this->m_ImageMutex.unlock();
 
-    this->m_CameraActiveMutex->Lock();
+    this->m_CameraActiveMutex.lock();
     this->m_CameraActive = true;
-    this->m_CameraActiveMutex->Unlock();
-    this->m_ThreadID = this->m_MultiThreader->SpawnThread(this->Acquire, this);
+    this->m_CameraActiveMutex.unlock();
+    m_Thread = std::thread(&ToFCameraMITKPlayerDevice::Acquire, this);
     // wait a little to make sure that the thread is started
     itksys::SystemTools::Delay(10);
   }
@@ -101,120 +100,105 @@ void ToFCameraMITKPlayerDevice::UpdateCamera()
   m_Controller->UpdateCamera();
 }
 
-ITK_THREAD_RETURN_TYPE ToFCameraMITKPlayerDevice::Acquire(void* pInfoStruct)
+void ToFCameraMITKPlayerDevice::Acquire()
 {
-  /* extract this pointer from Thread Info structure */
-  struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
-  if (pInfo == nullptr)
+  mitk::RealTimeClock::Pointer realTimeClock;
+  realTimeClock = mitk::RealTimeClock::New();
+  int n = 100;
+  double t1, t2;
+  t1 = realTimeClock->GetCurrentStamp();
+  bool overflow = false;
+  bool printStatus = false;
+  while (this->IsCameraActive())
   {
-    return ITK_THREAD_RETURN_VALUE;
-  }
-  if (pInfo->UserData == nullptr)
-  {
-    return ITK_THREAD_RETURN_VALUE;
-  }
-  ToFCameraMITKPlayerDevice* toFCameraDevice = (ToFCameraMITKPlayerDevice*)pInfo->UserData;
-  if (toFCameraDevice!=nullptr)
-  {
-    mitk::RealTimeClock::Pointer realTimeClock;
-    realTimeClock = mitk::RealTimeClock::New();
-    int n = 100;
-    double t1, t2;
-    t1 = realTimeClock->GetCurrentStamp();
-    bool overflow = false;
-    bool printStatus = false;
-    while (toFCameraDevice->IsCameraActive())
+    // update the ToF camera
+    this->UpdateCamera();
+    // get image data from controller and write it to the according buffer
+    m_Controller->GetDistances(m_DistanceDataBuffer[m_FreePos]);
+    m_Controller->GetAmplitudes(m_AmplitudeDataBuffer[m_FreePos]);
+    m_Controller->GetIntensities(m_IntensityDataBuffer[m_FreePos]);
+    m_Controller->GetRgb(m_RGBDataBuffer[m_FreePos]);
+    this->Modified();
+    m_ImageMutex.lock();
+    m_FreePos = (m_FreePos+1) % m_BufferSize;
+    m_CurrentPos = (m_CurrentPos+1) % m_BufferSize;
+    m_ImageSequence++;
+    if (m_FreePos == m_CurrentPos)
     {
-      // update the ToF camera
-      toFCameraDevice->UpdateCamera();
-      // get image data from controller and write it to the according buffer
-      toFCameraDevice->m_Controller->GetDistances(toFCameraDevice->m_DistanceDataBuffer[toFCameraDevice->m_FreePos]);
-      toFCameraDevice->m_Controller->GetAmplitudes(toFCameraDevice->m_AmplitudeDataBuffer[toFCameraDevice->m_FreePos]);
-      toFCameraDevice->m_Controller->GetIntensities(toFCameraDevice->m_IntensityDataBuffer[toFCameraDevice->m_FreePos]);
-      toFCameraDevice->m_Controller->GetRgb(toFCameraDevice->m_RGBDataBuffer[toFCameraDevice->m_FreePos]);
-      toFCameraDevice->Modified();
-      toFCameraDevice->m_ImageMutex->Lock();
-      toFCameraDevice->m_FreePos = (toFCameraDevice->m_FreePos+1) % toFCameraDevice->m_BufferSize;
-      toFCameraDevice->m_CurrentPos = (toFCameraDevice->m_CurrentPos+1) % toFCameraDevice->m_BufferSize;
-      toFCameraDevice->m_ImageSequence++;
-      if (toFCameraDevice->m_FreePos == toFCameraDevice->m_CurrentPos)
-      {
-        overflow = true;
-      }
-      if (toFCameraDevice->m_ImageSequence % n == 0)
-      {
-        printStatus = true;
-      }
-      toFCameraDevice->m_ImageMutex->Unlock();
-      if (overflow)
-      {
-        overflow = false;
-      }
-      // print current framerate
-      if (printStatus)
-      {
-        t2 = realTimeClock->GetCurrentStamp() - t1;
-        MITK_INFO << " Framerate (fps): " << n / (t2/1000) << " Sequence: " << toFCameraDevice->m_ImageSequence;
-        t1 = realTimeClock->GetCurrentStamp();
-        printStatus = false;
-      }
-    }  // end of while loop
-  }
-  return ITK_THREAD_RETURN_VALUE;
+      overflow = true;
+    }
+    if (m_ImageSequence % n == 0)
+    {
+      printStatus = true;
+    }
+    m_ImageMutex.unlock();
+    if (overflow)
+    {
+      overflow = false;
+    }
+    // print current framerate
+    if (printStatus)
+    {
+      t2 = realTimeClock->GetCurrentStamp() - t1;
+      MITK_INFO << " Framerate (fps): " << n / (t2/1000) << " Sequence: " << m_ImageSequence;
+      t1 = realTimeClock->GetCurrentStamp();
+      printStatus = false;
+    }
+  }  // end of while loop
 }
 
 void ToFCameraMITKPlayerDevice::GetAmplitudes(float* amplitudeArray, int& imageSequence)
 {
-  m_ImageMutex->Lock();
+  m_ImageMutex.lock();
   // write amplitude image data to float array
   for (int i=0; i<this->m_PixelNumber; i++)
   {
     amplitudeArray[i] = this->m_AmplitudeDataBuffer[this->m_CurrentPos][i];
   }
   imageSequence = this->m_ImageSequence;
-  m_ImageMutex->Unlock();
+  m_ImageMutex.unlock();
 }
 
 void ToFCameraMITKPlayerDevice::GetIntensities(float* intensityArray, int& imageSequence)
 {
-  m_ImageMutex->Lock();
+  m_ImageMutex.lock();
   // write intensity image data to float array
   for (int i=0; i<this->m_PixelNumber; i++)
   {
     intensityArray[i] = this->m_IntensityDataBuffer[this->m_CurrentPos][i];
   }
   imageSequence = this->m_ImageSequence;
-  m_ImageMutex->Unlock();
+  m_ImageMutex.unlock();
 }
 
 void ToFCameraMITKPlayerDevice::GetDistances(float* distanceArray, int& imageSequence)
 {
-  m_ImageMutex->Lock();
+  m_ImageMutex.lock();
   // write distance image data to float array
   for (int i=0; i<this->m_PixelNumber; i++)
   {
     distanceArray[i] = this->m_DistanceDataBuffer[this->m_CurrentPos][i];
   }
   imageSequence = this->m_ImageSequence;
-  m_ImageMutex->Unlock();
+  m_ImageMutex.unlock();
 }
 
 void ToFCameraMITKPlayerDevice::GetRgb(unsigned char* rgbArray, int& imageSequence)
 {
-  m_ImageMutex->Lock();
+  m_ImageMutex.lock();
   // write intensity image data to unsigned char array
   for (int i=0; i<this->m_RGBPixelNumber*3; i++)
   {
     rgbArray[i] = this->m_RGBDataBuffer[this->m_CurrentPos][i];
   }
   imageSequence = this->m_ImageSequence;
-  m_ImageMutex->Unlock();
+  m_ImageMutex.unlock();
 }
 
 void ToFCameraMITKPlayerDevice::GetAllImages(float* distanceArray, float* amplitudeArray, float* intensityArray, char* /*sourceDataArray*/,
                                              int requiredImageSequence, int& capturedImageSequence, unsigned char* rgbDataArray)
 {
-  m_ImageMutex->Lock();
+  m_ImageMutex.lock();
 
   //check for empty buffer
   if (this->m_ImageSequence < 0)
@@ -222,7 +206,7 @@ void ToFCameraMITKPlayerDevice::GetAllImages(float* distanceArray, float* amplit
     // buffer empty
     MITK_INFO << "Buffer empty!! ";
     capturedImageSequence = this->m_ImageSequence;
-    m_ImageMutex->Unlock();
+    m_ImageMutex.unlock();
     return;
   }
   // determine position of image in buffer
@@ -251,7 +235,7 @@ void ToFCameraMITKPlayerDevice::GetAllImages(float* distanceArray, float* amplit
     memcpy(intensityArray, this->m_IntensityDataBuffer[pos], this->m_PixelNumber * sizeof(float));
     memcpy(rgbDataArray, this->m_RGBDataBuffer[pos], this->m_RGBPixelNumber * 3 * sizeof(unsigned char));
   }
-  m_ImageMutex->Unlock();
+  m_ImageMutex.unlock();
 }
 
 void ToFCameraMITKPlayerDevice::SetInputFileName(std::string inputFileName)

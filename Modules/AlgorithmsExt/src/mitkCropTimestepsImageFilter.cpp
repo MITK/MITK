@@ -150,7 +150,7 @@ void mitk::CropTimestepsImageFilter::SetInput(unsigned int index, const InputIma
   this->SetInput(image);
 }
 
-void mitk::CropTimestepsImageFilter::VerifyInputInformation()
+void mitk::CropTimestepsImageFilter::VerifyInputInformation() const
 {
   Superclass::VerifyInputInformation();
 

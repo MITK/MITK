@@ -12,15 +12,12 @@ found in the LICENSE file.
 
 #include "mitkPluginActivator.h"
 
-#include "QmitkMultiLabelSegmentationView.h"
 #include "QmitkThresholdAction.h"
 #include "QmitkConvertSurfaceToLabelAction.h"
 #include "QmitkConvertMaskToLabelAction.h"
 #include "QmitkConvertToMultiLabelSegmentationAction.h"
 #include "QmitkCreateMultiLabelSegmentationAction.h"
-#include "QmitkMultiLabelSegmentationPreferencePage.h"
-#include "QmitkLoadMultiLabelPresetAction.h"
-#include "QmitkCreateMultiLabelPresetAction.h"
+
 #include "SegmentationUtilities/QmitkMultiLabelSegmentationUtilitiesView.h"
 
 #include <usModuleInitialization.h>
@@ -32,15 +29,11 @@ US_INITIALIZE_MODULE //("MultiLabelSegmentation", "liborg_mitk_gui_qt_multilabel
 
 void mitk::PluginActivator::start(ctkPluginContext *context)
 {
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkMultiLabelSegmentationView, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkThresholdAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkConvertSurfaceToLabelAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkConvertMaskToLabelAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkConvertToMultiLabelSegmentationAction, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkCreateMultiLabelSegmentationAction, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkCreateMultiLabelPresetAction, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkLoadMultiLabelPresetAction, context)
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkMultiLabelSegmentationPreferencePage, context)
   BERRY_REGISTER_EXTENSION_CLASS(QmitkMultiLabelSegmentationUtilitiesView, context)
 
   m_Context = context;

@@ -17,7 +17,6 @@ found in the LICENSE file.
 #include <mitkTrackingTool.h>
 #include <MitkIGTExports.h>
 #include <mitkNumericTypes.h>
-#include <itkFastMutexLock.h>
 #include <mitkItkNonUniformBSpline.h>
 
 namespace mitk {

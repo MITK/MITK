@@ -23,9 +23,9 @@ This file is based heavily on a corresponding ITK filter.
 #include "itkImageToPathFilter.h"
 #include "itkNumericTraits.h"
 #include "itkPolyLineParametricPath.h"
-#include "vcl_deque.h"
-#include "vcl_list.h"
-#include <itksys/hash_map.hxx>
+#include <deque>
+#include <list>
+#include <unordered_map>
 
 namespace itk
 {
@@ -204,7 +204,7 @@ namespace itk
     // pixel traversed = first pixel in contour) would be possible by either
     // changing the merging rules, which would make the contouring operation
     // slower, or by storing additional data as to which pixel was first.
-    class ContourType : public vcl_deque<VertexType>
+    class ContourType : public std::deque<VertexType>
     {
     public:
       unsigned int m_ContourNumber;
@@ -213,7 +213,7 @@ namespace itk
     // Store all the growing contours in a list. We may need to delete contours
     // from anywhere in the sequence (when we merge them together), so we need to
     // use a list instead of a vector or similar.
-    typedef vcl_list<ContourType> ContourContainer;
+    typedef std::list<ContourType> ContourContainer;
     typedef typename ContourContainer::iterator ContourRef;
 
     // declare the hash function we are using for the hash_map.
@@ -241,8 +241,8 @@ namespace itk
           return 0;
         }
         int exponent;
-        CoordinateType mantissa = vcl_frexp(k, &exponent);
-        size_t value = static_cast<size_t>(vcl_fabs(mantissa));
+        CoordinateType mantissa = std::frexp(k, &exponent);
+        size_t value = static_cast<size_t>(std::fabs(mantissa));
         value = (2 * value - 1) * ~0U;
         return value;
       }
@@ -260,7 +260,7 @@ namespace itk
     // from our list when they have been merged into another. Thus, we store
     // an iterator pointing to the contour in the list.
 
-    typedef itksys::hash_map<VertexType, ContourRef, VertexHash> VertexToContourMap;
+    typedef std::unordered_map<VertexType, ContourRef, VertexHash> VertexToContourMap;
     typedef typename VertexToContourMap::iterator VertexMapIterator;
     typedef typename VertexToContourMap::value_type VertexContourRefPair;
 

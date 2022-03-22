@@ -16,7 +16,6 @@ found in the LICENSE file.
 #include "mitkPlaneGeometry.h"
 #include <mitkProportionalTimeGeometry.h>
 
-#include <vcl_iostream.h>
 #include <vnl/algo/vnl_svd.h>
 
 mitk::PlaneFit::PlaneFit() : m_PointSet(nullptr)

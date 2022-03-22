@@ -16,13 +16,15 @@ found in the LICENSE file.
 #include <QApplication>
 #include <QDir>
 #include <QIcon>
+#include <QmitkStyleManager.h>
 #include <QtGlobal>
+#include <set>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitknnUNetToolGUI, "")
 
 QmitknnUNetToolGUI::QmitknnUNetToolGUI() : QmitkAutoMLSegmentationToolGUIBase()
 {
-  // Nvidia-smi command returning zero doesn't alway mean lack of GPUs.
+  // Nvidia-smi command returning zero doesn't always imply lack of GPUs.
   // Pytorch uses its own libraries to communicate to the GPUs. Hence, only a warning can be given.
   if (m_GpuLoader.GetGPUCount() == 0)
   {
@@ -33,7 +35,7 @@ QmitknnUNetToolGUI::QmitknnUNetToolGUI() : QmitkAutoMLSegmentationToolGUIBase()
   // define predicates for multi modal data selection combobox
   auto imageType = mitk::TNodePredicateDataType<mitk::Image>::New();
   auto labelSetImageType = mitk::NodePredicateNot::New(mitk::TNodePredicateDataType<mitk::LabelSetImage>::New());
-  this->m_MultiModalPredicate = mitk::NodePredicateAnd::New(imageType, labelSetImageType).GetPointer();
+  m_MultiModalPredicate = mitk::NodePredicateAnd::New(imageType, labelSetImageType).GetPointer();
 }
 
 void QmitknnUNetToolGUI::ConnectNewTool(mitk::AutoSegmentationWithPreviewTool *newTool)
@@ -50,6 +52,7 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
 #endif
   m_Controls.pythonEnvComboBox->addItem("Select");
   AutoParsePythonPaths();
+  SetGPUInfo();
   connect(m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnPreviewRequested()));
   connect(m_Controls.modeldirectoryBox,
           SIGNAL(directoryChanged(const QString &)),
@@ -63,7 +66,6 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   connect(m_Controls.nopipBox, SIGNAL(stateChanged(int)), this, SLOT(OnCheckBoxChanged(int)));
   connect(m_Controls.multiModalBox, SIGNAL(stateChanged(int)), this, SLOT(OnCheckBoxChanged(int)));
   connect(m_Controls.multiModalSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnModalitiesNumberChanged(int)));
-  connect(m_Controls.posSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnModalPositionChanged(int)));
   connect(m_Controls.pythonEnvComboBox,
 #if QT_VERSION >= 0x050F00 // 5.15
           SIGNAL(textActivated(const QString &)),
@@ -73,34 +75,44 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
           this,
           SLOT(OnPythonPathChanged(const QString &)));
   connect(m_Controls.refreshdirectoryBox, SIGNAL(clicked()), this, SLOT(OnRefreshPresssed()));
+  connect(m_Controls.clearCacheButton, SIGNAL(clicked()), this, SLOT(OnClearCachePressed()));
 
   m_Controls.codedirectoryBox->setVisible(false);
   m_Controls.nnUnetdirLabel->setVisible(false);
   m_Controls.multiModalSpinBox->setVisible(false);
   m_Controls.multiModalSpinLabel->setVisible(false);
-  m_Controls.posSpinBoxLabel->setVisible(false);
-  m_Controls.posSpinBox->setVisible(false);
   m_Controls.previewButton->setEnabled(false);
 
-  QSize sz(16, 16);
-  m_Controls.stopButton->setVisible(false);
+  m_Controls.stopButton->setVisible(false); // Hidden for future
 
-  QIcon refreshIcon;
-  refreshIcon.addPixmap(style()->standardIcon(QStyle::SP_BrowserReload).pixmap(sz), QIcon::Normal, QIcon::Off);
+  QIcon refreshIcon =
+    QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/view-refresh.svg"));
   m_Controls.refreshdirectoryBox->setIcon(refreshIcon);
+  QIcon dirIcon =
+    QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-open.svg"));
+  m_Controls.modeldirectoryBox->setIcon(dirIcon);
   m_Controls.refreshdirectoryBox->setEnabled(true);
 
   m_Controls.statusLabel->setTextFormat(Qt::RichText);
-  m_Controls.statusLabel->setText("<b>STATUS: </b><i>Welcome to nnUNet. " + QString::number(m_GpuLoader.GetGPUCount()) +
-                                  " GPUs were detected.</i>");
-
   if (m_GpuLoader.GetGPUCount() != 0)
   {
-    m_Controls.gpuSpinBox->setMaximum(m_GpuLoader.GetGPUCount() - 1);
+    WriteStatusMessage(QString("<b>STATUS: </b><i>Welcome to nnUNet. " + QString::number(m_GpuLoader.GetGPUCount()) +
+                               " GPUs were detected.</i>"));
+  }
+  else
+  {
+    WriteErrorMessage(QString("<b>STATUS: </b><i>Welcome to nnUNet. " + QString::number(m_GpuLoader.GetGPUCount()) +
+                              " GPUs were detected.</i>"));
   }
   mainLayout->addLayout(m_Controls.verticalLayout);
   Superclass::InitializeUI(mainLayout);
   m_UI_ROWS = m_Controls.advancedSettingsLayout->rowCount(); // Must do. Row count is correct only here.
+
+  if (nullptr != m_Controls.modeldirectoryBox)
+  {
+    QString setVal = m_Settings.value("nnUNet/LastRESULTS_FOLDERPath").toString();
+    m_Controls.modeldirectoryBox->setDirectory(setVal);
+  }
 }
 
 void QmitknnUNetToolGUI::OnPreviewRequested()
@@ -110,6 +122,7 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
   {
     try
     {
+      size_t hashKey(0);
       m_Controls.previewButton->setEnabled(false); // To prevent misclicked back2back prediction.
       qApp->processEvents();
       tool->PredictOn(); // purposefully placed to make tool->GetMTime different than before.
@@ -155,33 +168,68 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
       tool->SetMirror(m_Controls.mirrorBox->isChecked());
       tool->SetMixedPrecision(m_Controls.mixedPrecisionBox->isChecked());
       tool->SetNoPip(isNoPip);
-      tool->SetMultiModal(m_Controls.multiModalBox->isChecked());
+      bool doCache = m_Controls.enableCachingCheckBox->isChecked();
       // Spinboxes
-      tool->SetGpuId(static_cast<unsigned int>(m_Controls.gpuSpinBox->value()));
+      tool->SetGpuId(FetchSelectedGPUFromUI());
       // Multi-Modal
       tool->MultiModalOff();
-      if (m_Controls.multiModalBox->isChecked())
+      if (m_Controls.multiModalBox->isChecked() && m_Controls.multiModalSpinBox->value() > 0)
       {
         tool->m_OtherModalPaths.clear();
         tool->m_OtherModalPaths = FetchMultiModalImagesFromUI();
         tool->MultiModalOn();
       }
-      tool->m_InputOutputPair = std::make_pair(nullptr, nullptr);
-      m_Controls.statusLabel->setText("<b>STATUS: </b><i>Starting Segmentation task... This might take a while.</i>");
-      tool->UpdatePreview();
-      if (tool->GetOutputBuffer() == nullptr)
+      else
       {
-        SegmentationProcessFailed();
+        throw std::runtime_error("Please select more than one modalities for a multi-modal task. If you "
+                                 "would like to use only one modality then uncheck the Multi-Modal option.");
       }
-      SegmentationResultHandler(tool);
-      tool->PredictOff(); // purposefully placed to make tool->GetMTime different than before.
+      if (doCache)
+      {
+        hashKey = nnUNetCache::GetUniqueHash(tool->m_ParamQ);
+        if (m_Cache.contains(hashKey))
+        {
+          tool->PredictOff(); // purposefully placed to make tool->GetMTime different than before.
+        }
+      }
+      if (tool->GetPredict())
+      {
+        tool->m_InputBuffer = nullptr;
+        WriteStatusMessage(QString("<b>STATUS: </b><i>Starting Segmentation task... This might take a while.</i>"));
+        tool->UpdatePreview();
+        if (nullptr == tool->GetOutputBuffer())
+        {
+          SegmentationProcessFailed();
+        }
+        else
+        {
+          SegmentationResultHandler(tool);
+          if (doCache)
+          {
+            AddToCache(hashKey, tool->GetMLPreview());
+          }
+        }
+        tool->PredictOff(); // purposefully placed to make tool->GetMTime different than before.
+      }
+      else
+      {
+        MITK_INFO << "won't do segmentation. Key found: " << QString::number(hashKey).toStdString();
+        if (m_Cache.contains(hashKey))
+        {
+          nnUNetCache *cacheObject = m_Cache[hashKey];
+          MITK_INFO << "fetched pointer " << cacheObject->m_SegCache.GetPointer();
+          tool->SetNodeProperties(const_cast<mitk::LabelSetImage *>(cacheObject->m_SegCache.GetPointer()));
+          SegmentationResultHandler(tool);
+        }
+      }
       m_Controls.previewButton->setEnabled(true);
     }
     catch (const std::exception &e)
     {
       std::stringstream errorMsg;
-      errorMsg << "Error while processing parameters for nnUNet segmentation. Reason: " << e.what();
+      errorMsg << "<b>STATUS: </b>Error while processing parameters for nnUNet segmentation. Reason: " << e.what();
       ShowErrorMessage(errorMsg.str());
+      WriteErrorMessage(QString::fromStdString(errorMsg.str()));
       m_Controls.previewButton->setEnabled(true);
       tool->PredictOff();
       return;
@@ -199,18 +247,25 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
 
 std::vector<mitk::Image::ConstPointer> QmitknnUNetToolGUI::FetchMultiModalImagesFromUI()
 {
-  std::vector<mitk::Image::ConstPointer> paths;
+  std::vector<mitk::Image::ConstPointer> modals;
   if (m_Controls.multiModalBox->isChecked() && !m_Modalities.empty())
   {
+    std::set<std::string> nodeNames; // set container for keeping names of all nodes to check if they are added twice.
     for (QmitkDataStorageComboBox *modality : m_Modalities)
     {
-      if (modality->objectName() != "multiModal_0")
+      if (nodeNames.find(modality->GetSelectedNode()->GetName()) == nodeNames.end())
       {
-        paths.push_back(dynamic_cast<const mitk::Image *>(modality->GetSelectedNode()->GetData()));
+        modals.push_back(dynamic_cast<const mitk::Image *>(modality->GetSelectedNode()->GetData()));
+        nodeNames.insert(modality->GetSelectedNode()->GetName());
+      }
+      else
+      {
+        throw std::runtime_error("Same modality is selected more than once. Please change your selection.");
+        break;
       }
     }
   }
-  return paths;
+  return modals;
 }
 
 bool QmitknnUNetToolGUI::IsNNUNetInstalled(const QString &pythonPath)
@@ -240,6 +295,18 @@ void QmitknnUNetToolGUI::ShowErrorMessage(const std::string &message, QMessageBo
   MITK_WARN << message;
 }
 
+void QmitknnUNetToolGUI::WriteStatusMessage(const QString &message)
+{
+  m_Controls.statusLabel->setText(message);
+  m_Controls.statusLabel->setStyleSheet("font-weight: bold; color: white");
+}
+
+void QmitknnUNetToolGUI::WriteErrorMessage(const QString &message)
+{
+  m_Controls.statusLabel->setText(message);
+  m_Controls.statusLabel->setStyleSheet("font-weight: bold; color: red");
+}
+
 void QmitknnUNetToolGUI::ProcessEnsembleModelsParams(mitk::nnUNetTool::Pointer tool)
 {
   if (m_EnsembleParams[0]->modelBox->currentText() == m_EnsembleParams[1]->modelBox->currentText())
@@ -247,10 +314,11 @@ void QmitknnUNetToolGUI::ProcessEnsembleModelsParams(mitk::nnUNetTool::Pointer t
     throw std::runtime_error("Both models you have selected for ensembling are the same.");
   }
   QString taskName = m_Controls.taskBox->currentText();
+  bool isPPJson = m_Controls.postProcessingCheckBox->isChecked();
   std::vector<mitk::ModelParams> requestQ;
   QString ppDirFolderNamePart1 = "ensemble_";
   QStringList ppDirFolderNameParts;
-  for (std::unique_ptr<QmitknnUNetTaskParamsUITemplate> &layout : m_EnsembleParams)
+  for (auto &layout : m_EnsembleParams)
   {
     QStringList ppDirFolderName;
     QString modelName = layout->modelBox->currentText();
@@ -268,33 +336,41 @@ void QmitknnUNetToolGUI::ProcessEnsembleModelsParams(mitk::nnUNetTool::Pointer t
                              " you have selected doesn't exist. Check your Results Folder again.";
       throw std::runtime_error(errorMsg);
     }
-    std::vector<std::string> testfold; // empty vector to consider all folds for inferencing.
+    std::vector<std::string> testfold = FetchSelectedFoldsFromUI(layout->foldBox);
     mitk::ModelParams modelObject = MapToRequest(modelName, taskName, trainer, planId, testfold);
     requestQ.push_back(modelObject);
     ppDirFolderNameParts << ppDirFolderName.join(QString(""));
   }
   tool->EnsembleOn();
+  if (isPPJson)
+  {
+    QString ppJsonFilePossibility1 = QDir::cleanPath(
+      m_ParentFolder->getResultsFolder() + QDir::separator() + "nnUNet" + QDir::separator() + "ensembles" +
+      QDir::separator() + taskName + QDir::separator() + ppDirFolderNamePart1 + ppDirFolderNameParts.first() + "--" +
+      ppDirFolderNameParts.last() + QDir::separator() + "postprocessing.json");
+    QString ppJsonFilePossibility2 = QDir::cleanPath(
+      m_ParentFolder->getResultsFolder() + QDir::separator() + "nnUNet" + QDir::separator() + "ensembles" +
+      QDir::separator() + taskName + QDir::separator() + ppDirFolderNamePart1 + ppDirFolderNameParts.last() + "--" +
+      ppDirFolderNameParts.first() + QDir::separator() + "postprocessing.json");
 
-  QString ppJsonFilePossibility1 = QDir::cleanPath(
-    m_ParentFolder->getResultsFolder() + QDir::separator() + "nnUNet" + QDir::separator() + "ensembles" +
-    QDir::separator() + taskName + QDir::separator() + ppDirFolderNamePart1 + ppDirFolderNameParts.first() + "--" +
-    ppDirFolderNameParts.last() + QDir::separator() + "postprocessing.json");
-  QString ppJsonFilePossibility2 = QDir::cleanPath(
-    m_ParentFolder->getResultsFolder() + QDir::separator() + "nnUNet" + QDir::separator() + "ensembles" +
-    QDir::separator() + taskName + QDir::separator() + ppDirFolderNamePart1 + ppDirFolderNameParts.last() + "--" +
-    ppDirFolderNameParts.first() + QDir::separator() + "postprocessing.json");
-
-  if (QFile(ppJsonFilePossibility1).exists())
-  {
-    tool->SetPostProcessingJsonDirectory(ppJsonFilePossibility1.toStdString());
-  }
-  else if (QFile(ppJsonFilePossibility2).exists())
-  {
-    tool->SetPostProcessingJsonDirectory(ppJsonFilePossibility2.toStdString());
-  }
-  else
-  {
-    // warning message
+    if (QFile(ppJsonFilePossibility1).exists())
+    {
+      tool->SetPostProcessingJsonDirectory(ppJsonFilePossibility1.toStdString());
+      const QString statusMsg = "<i>Post Processing JSON file found: </i>" + ppJsonFilePossibility1;
+      WriteStatusMessage(statusMsg);
+    }
+    else if (QFile(ppJsonFilePossibility2).exists())
+    {
+      tool->SetPostProcessingJsonDirectory(ppJsonFilePossibility2.toStdString());
+      const QString statusMsg = "<i>Post Processing JSON file found:</i>" + ppJsonFilePossibility2;
+      WriteStatusMessage(statusMsg);
+    }
+    else
+    {
+      std::string errorMsg =
+        "No post processing file was found for the selected ensemble combination. Continuing anyway...";
+      ShowErrorMessage(errorMsg);
+    }
   }
   tool->m_ParamQ.clear();
   tool->m_ParamQ = requestQ;
@@ -308,7 +384,7 @@ void QmitknnUNetToolGUI::ProcessModelParams(mitk::nnUNetTool::Pointer tool)
   QString taskName = m_Controls.taskBox->currentText();
   QString trainer = m_Controls.trainerBox->currentText();
   QString planId = m_Controls.plannerBox->currentText();
-  std::vector<std::string> fetchedFolds = FetchSelectedFoldsFromUI();
+  std::vector<std::string> fetchedFolds = FetchSelectedFoldsFromUI(m_Controls.foldBox);
   mitk::ModelParams modelObject = MapToRequest(modelName, taskName, trainer, planId, fetchedFolds);
   requestQ.push_back(modelObject);
   tool->m_ParamQ.clear();
@@ -325,4 +401,95 @@ bool QmitknnUNetToolGUI::IsModelExists(const QString &modelName, const QString &
     return true;
   }
   return false;
+}
+
+void QmitknnUNetToolGUI::CheckAllInCheckableComboBox(ctkCheckableComboBox *foldBox)
+{
+  // Recalling all added items to check-mark it.
+  const QAbstractItemModel *qaim = foldBox->checkableModel();
+  auto rows = qaim->rowCount();
+  for (std::remove_const_t<decltype(rows)> i = 0; i < rows; ++i)
+  {
+    const QModelIndex mi = qaim->index(i, 0);
+    foldBox->setCheckState(mi, Qt::Checked);
+  }
+}
+
+std::pair<QStringList, QStringList> QmitknnUNetToolGUI::ExtractTrainerPlannerFromString(QStringList trainerPlanners)
+{
+  QString splitterString = "__";
+  QStringList trainers, planners;
+  for (const auto &trainerPlanner : trainerPlanners)
+  {
+    trainers << trainerPlanner.split(splitterString, QString::SplitBehavior::SkipEmptyParts).first();
+    planners << trainerPlanner.split(splitterString, QString::SplitBehavior::SkipEmptyParts).last();
+  }
+  trainers.removeDuplicates();
+  planners.removeDuplicates();
+  return std::make_pair(trainers, planners);
+}
+
+std::vector<std::string> QmitknnUNetToolGUI::FetchSelectedFoldsFromUI(ctkCheckableComboBox *foldBox)
+{
+  std::vector<std::string> folds;
+  if (!(foldBox->allChecked() || foldBox->noneChecked()))
+  {
+    QModelIndexList foldList = foldBox->checkedIndexes();
+    for (const auto &index : foldList)
+    {
+      QString foldQString = foldBox->itemText(index.row()).split("_", QString::SplitBehavior::SkipEmptyParts).last();
+      folds.push_back(foldQString.toStdString());
+    }
+  }
+  return folds;
+}
+
+void QmitknnUNetToolGUI::OnClearCachePressed()
+{
+  m_Cache.clear();
+  UpdateCacheCountOnUI();
+}
+
+void QmitknnUNetToolGUI::UpdateCacheCountOnUI()
+{
+  QString cacheText = m_CACHE_COUNT_BASE_LABEL + QString::number(m_Cache.size());
+  m_Controls.cacheCountLabel->setText(cacheText);
+}
+
+void QmitknnUNetToolGUI::AddToCache(size_t &hashKey, mitk::LabelSetImage::ConstPointer mlPreview)
+{
+  nnUNetCache *newCacheObj = new nnUNetCache;
+  newCacheObj->m_SegCache = mlPreview;
+  m_Cache.insert(hashKey, newCacheObj);
+  MITK_INFO << "New hash: " << hashKey << " " << newCacheObj->m_SegCache.GetPointer();
+  UpdateCacheCountOnUI();
+}
+
+void QmitknnUNetToolGUI::SetGPUInfo()
+{
+  std::vector<QmitkGPUSpec> specs = m_GpuLoader.GetAllGPUSpecs();
+  for (const QmitkGPUSpec &gpuSpec : specs)
+  {
+    m_Controls.gpuComboBox->addItem(QString::number(gpuSpec.id) + ": " + gpuSpec.name + " (" + gpuSpec.memory + ")");
+  }
+  if (specs.empty())
+  {
+    m_Controls.gpuComboBox->setEditable(true);
+    m_Controls.gpuComboBox->addItem(QString::number(0));
+    m_Controls.gpuComboBox->setValidator(new QIntValidator(0, 999, this));
+  }
+}
+
+unsigned int QmitknnUNetToolGUI::FetchSelectedGPUFromUI()
+{
+  QString gpuInfo = m_Controls.gpuComboBox->currentText();
+  if (m_GpuLoader.GetGPUCount() == 0)
+  {
+    return static_cast<unsigned int>(gpuInfo.toInt());
+  }
+  else
+  {
+    QString gpuId = gpuInfo.split(":", QString::SplitBehavior::SkipEmptyParts).first();
+    return static_cast<unsigned int>(gpuId.toInt());
+  }
 }

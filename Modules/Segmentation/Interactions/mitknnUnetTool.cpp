@@ -38,7 +38,6 @@ mitk::nnUNetTool::~nnUNetTool()
 void mitk::nnUNetTool::Activated()
 {
   Superclass::Activated();
-  m_InputOutputPair = std::make_pair(nullptr, nullptr);
 }
 
 void mitk::nnUNetTool::UpdateCleanUp()
@@ -49,10 +48,9 @@ void mitk::nnUNetTool::UpdateCleanUp()
 
 void mitk::nnUNetTool::RenderOutputBuffer()
 {
-  if (this->m_OutputBuffer != nullptr)
+  if (m_OutputBuffer != nullptr)
   {
-    Superclass::SetNodeProperties(this->m_OutputBuffer);
-    this->ClearOutputBuffer();
+    Superclass::SetNodeProperties(m_OutputBuffer);
     try
     {
       if (nullptr != this->GetPreviewSegmentationNode())
@@ -75,17 +73,17 @@ void mitk::nnUNetTool::SetNodeProperties(LabelSetImage::Pointer segmentation)
 {
   // This overriden method doesn't set node properties. Intentionally left out for setting later upon demand
   // in the `RenderOutputBuffer` method.
-  this->m_OutputBuffer = segmentation;
+  m_OutputBuffer = segmentation;
 }
 
 mitk::LabelSetImage::Pointer mitk::nnUNetTool::GetOutputBuffer()
 {
-  return this->m_OutputBuffer;
+  return m_OutputBuffer;
 }
 
 void mitk::nnUNetTool::ClearOutputBuffer()
 {
-  this->m_OutputBuffer = nullptr;
+  m_OutputBuffer = nullptr;
 }
 
 us::ModuleResource mitk::nnUNetTool::GetIconResource() const
@@ -141,12 +139,11 @@ namespace
 
 mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inputAtTimeStep, TimeStepType /*timeStep*/)
 {
-  if (m_InputOutputPair.first == inputAtTimeStep)
+  if (m_InputBuffer == inputAtTimeStep)
   {
-    return m_InputOutputPair.second;
+    return m_OutputBuffer;
   }
   std::string inDir, outDir, inputImagePath, outputImagePath, scriptPath;
-  std::string templateFilename = "XXXXXX_000_0000.nii.gz";
 
   ProcessExecutor::Pointer spExec = ProcessExecutor::New();
   itk::CStyleCommand::Pointer spCommand = itk::CStyleCommand::New();
@@ -156,7 +153,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
 
   inDir = IOUtil::CreateTemporaryDirectory("nnunet-in-XXXXXX", this->GetMitkTempDir());
   std::ofstream tmpStream;
-  inputImagePath = IOUtil::CreateTemporaryFile(tmpStream, templateFilename, inDir + IOUtil::GetDirectorySeparator());
+  inputImagePath = IOUtil::CreateTemporaryFile(tmpStream, m_TEMPLATE_FILENAME, inDir + IOUtil::GetDirectorySeparator());
   tmpStream.close();
   std::size_t found = inputImagePath.find_last_of(IOUtil::GetDirectorySeparator());
   std::string fileName = inputImagePath.substr(found + 1);
@@ -170,17 +167,29 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
 
   try
   {
-    IOUtil::Save(inputAtTimeStep, inputImagePath);
-
     if (this->GetMultiModal())
     {
-      for (size_t i = 0; i < this->m_OtherModalPaths.size(); ++i)
+      const std::string fileFormat(".nii.gz");
+      const std::string fileNamePart("_000_000");
+      std::string outModalFile;
+      size_t len = inDir.length() + 1 + token.length() + fileNamePart.length() + 1 + fileFormat.length();
+      outModalFile.reserve(len); // The 1(s) indicates a directory separator char and an underscore.
+      for (size_t i = 0; i < m_OtherModalPaths.size(); ++i)
       {
-        mitk::Image::ConstPointer modalImage = this->m_OtherModalPaths[i];
-        std::string outModalFile =
-          inDir + IOUtil::GetDirectorySeparator() + token + "_000_000" + std::to_string(i + 1) + ".nii.gz";
+        mitk::Image::ConstPointer modalImage = m_OtherModalPaths[i];
+        outModalFile.append(inDir);
+        outModalFile.push_back(IOUtil::GetDirectorySeparator());
+        outModalFile.append(token);
+        outModalFile.append(fileNamePart);
+        outModalFile.append(std::to_string(i));
+        outModalFile.append(fileFormat);
         IOUtil::Save(modalImage.GetPointer(), outModalFile);
+        outModalFile.clear();
       }
+    }
+    else
+    {
+      IOUtil::Save(inputAtTimeStep, inputImagePath);
     }
   }
   catch (const mitk::Exception &e)
@@ -258,7 +267,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
       args.push_back("--disable_mixed_precision");
     }
 
-    if (this->GetEnsemble() && !this->GetPostProcessingJsonDirectory().empty())
+    if (this->GetEnsemble())
     {
       args.push_back("--save_npz");
     }
@@ -297,8 +306,11 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     args.push_back("-o");
     args.push_back(outDir);
 
-    args.push_back("-pp");
-    args.push_back(this->GetPostProcessingJsonDirectory());
+    if (!this->GetPostProcessingJsonDirectory().empty())
+    {
+      args.push_back("-pp");
+      args.push_back(this->GetPostProcessingJsonDirectory());
+    }
 
     spExec->Execute(this->GetPythonPath(), command, args);
   }
@@ -308,7 +320,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
     resultImage->InitializeByLabeledImage(outputImage);
     resultImage->SetGeometry(inputAtTimeStep->GetGeometry());
-    m_InputOutputPair = std::make_pair(inputAtTimeStep, resultImage);
+    m_InputBuffer = inputAtTimeStep;
     return resultImage;
   }
   catch (const mitk::Exception &e)

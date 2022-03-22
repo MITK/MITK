@@ -19,9 +19,27 @@ found in the LICENSE file.s
 #include "mitknnUnetTool.h"
 #include "ui_QmitknnUNetToolGUIControls.h"
 #include <MitkSegmentationUIExports.h>
+#include <QCache>
 #include <QMessageBox>
+#include <QSettings>
 #include <QmitkDataStorageComboBox.h>
 #include <QmitknnUNetEnsembleLayout.h>
+#include <boost/functional/hash.hpp>
+
+class nnUNetCache
+{
+public:
+  mitk::LabelSetImage::ConstPointer m_SegCache;
+  static size_t GetUniqueHash(std::vector<mitk::ModelParams> &requestQ)
+  {
+    size_t hashCode = 0;
+    for (mitk::ModelParams &request : requestQ)
+    {
+      boost::hash_combine(hashCode, request.generateHash());
+    }
+    return hashCode;
+  }
+};
 
 class MITKSEGMENTATIONUI_EXPORT QmitknnUNetToolGUI : public QmitkAutoMLSegmentationToolGUIBase
 {
@@ -31,6 +49,8 @@ public:
   mitkClassMacro(QmitknnUNetToolGUI, QmitkAutoMLSegmentationToolGUIBase);
   itkFactorylessNewMacro(Self);
   itkCloneMacro(Self);
+
+  QCache<size_t, nnUNetCache> m_Cache;
 
 protected slots:
 
@@ -96,16 +116,16 @@ protected slots:
   void OnPythonPathChanged(const QString &);
 
   /**
-   * @brief Qt Slot
+   * @brief Qt slot
    *
    */
-  void OnModalPositionChanged(int);
+  void OnRefreshPresssed();
 
   /**
    * @brief Qt slot
    *
    */
-  void OnRefreshPresssed();
+  void OnClearCachePressed();
 
 protected:
   QmitknnUNetToolGUI();
@@ -116,6 +136,40 @@ protected:
   void EnableWidgets(bool enabled) override;
 
 private:
+  
+  /**
+   * @brief Returns GPU id of the selected GPU from the Combo box.
+   * 
+   * @return unsigned int 
+   */
+  unsigned int FetchSelectedGPUFromUI();
+
+  /**
+   * @brief Adds GPU information to the gpu combo box.
+   * In case, there aren't any GPUs avaialble, the combo box will be
+   * rendered editable. 
+   */
+  void SetGPUInfo();
+
+  /**
+   * @brief Inserts the hash and segmentation into cache and
+   * updates count on UI.
+   */
+  void AddToCache(size_t&, mitk::LabelSetImage::ConstPointer);
+  
+  /**
+   * @brief Checks all the entries of the ctkCheckableComboBox ui widget.
+   * This feature is not present in ctkCheckableComboBox API.
+   */
+  void CheckAllInCheckableComboBox(ctkCheckableComboBox *);
+
+  /**
+   * @brief Parses the folder names containing trainer and planner together and,
+   * returns it as separate lists.
+   * @return std::pair<QStringList, QStringList>
+   */
+
+  std::pair<QStringList, QStringList> ExtractTrainerPlannerFromString(QStringList);
   /**
    * @brief Parses the ensemble UI elements and sets to nnUNetTool object pointer.
    *
@@ -139,6 +193,16 @@ private:
   void ShowErrorMessage(const std::string &, QMessageBox::Icon = QMessageBox::Critical);
 
   /**
+   * @brief Writes any message in white on the tool pane.
+   */
+  void WriteStatusMessage(const QString &);
+  
+  /**
+   * @brief Writes any message in red on the tool pane.
+   */
+  void WriteErrorMessage(const QString &);
+
+  /**
    * @brief Searches and parses paths of python virtual enviroments
    * from predefined lookout locations
    */
@@ -146,9 +210,8 @@ private:
 
   /**
    * @brief Check if pretrained model sub folder inside RESULTS FOLDER exist.
-   * 
    */
-  bool IsModelExists(const QString&, const QString&, const QString&);
+  bool IsModelExists(const QString &, const QString &, const QString &);
 
   /**
    * @brief Clears all combo boxes
@@ -177,7 +240,7 @@ private:
    *
    * @return std::vector<std::string>
    */
-  std::vector<std::string> FetchSelectedFoldsFromUI();
+  std::vector<std::string> FetchSelectedFoldsFromUI(ctkCheckableComboBox *);
 
   /**
    * @brief Returns all paths from the dynamically generated ctk-path-line-edit boxes.
@@ -185,6 +248,12 @@ private:
    * @return std::vector<std::string>
    */
   std::vector<mitk::Image::ConstPointer> FetchMultiModalImagesFromUI();
+
+  /**
+   * @brief Updates cache count on UI.
+   * 
+   */
+  void UpdateCacheCountOnUI();
 
   Ui_QmitknnUNetToolGUIControls m_Controls;
   QmitkGPULoader m_GpuLoader;
@@ -218,5 +287,12 @@ private:
    *
    */
   const QStringList m_VALID_MODELS = {"2d", "3d_lowres", "3d_fullres", "3d_cascade_fullres", "ensembles"};
+
+  const QString m_CACHE_COUNT_BASE_LABEL = "Cached Items: ";
+
+  /**
+   * @brief For storing values across sessions. Currently, RESULTS_FOLDER value is cached using this.
+   */
+  QSettings m_Settings;
 };
 #endif

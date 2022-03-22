@@ -79,6 +79,11 @@ public:
 
     verticalLayout_x->addLayout(g_x);
   }
+
+  void setVisible(bool visiblity)
+  {
+    this->parent->setVisible(visiblity);
+  }
 };
 QT_END_NAMESPACE
 

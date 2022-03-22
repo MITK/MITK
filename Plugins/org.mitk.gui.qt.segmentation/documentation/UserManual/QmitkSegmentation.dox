@@ -153,12 +153,6 @@ The Live Wire Tool acts as a magnetic lasso with a contour snapping to edges of 
 
 The contour will be transferred to its binary image representation by deactivating the tool.
 
-\subsection org_mitk_views_segmentationUserManual2DFastMarchingTool 2D Fast Marching Tool
-
-\imageMacro{QmitkSegmentation_IMG2DFastMarchingUsage.png,"2D Fast Marching Tool",3.01}
-
-Provides a fast marching based 2D interaction segmentation tool. You start with setting seed points in an image slice. Via several sliders you can adapt parameters and see the fast marching result instantly.
-
 \subsection org_mitk_views_segmentationUserManualManualKringeling5 2D and 3D Interpolation
 
 Creating segmentations using 2D manual contouring for large image volumes may be very time-consuming, because structures of interest may cover a large range of slices.
@@ -226,26 +220,12 @@ then be divided into different regions. The more regions you define the longer t
 
 \imageMacro{QmitkSegmentation_3DOtsuTool.png,"3D Otsu tool",10.00}
 
-\subsection org_mitk_views_segmentationUserManual3DFMTool 3D Fast Marching Tool
-
-The 3D Fast Marching tool works similar to the 2D pendant but on the whole image. Depending on your image size the calculation might take some time.
-You can interactively set the parameters of the algorithm via the GUI. The resulting segmentation will be automatically updated.
-
-\imageMacro{QmitkSegmentation_3DFMTool.png,"3D Fast Marching tool",10.00}
-
 \subsection org_mitk_views_segmentationUserManual3DRGTool 3D Region Growing Tool
 
 The 3D Region Growing tool works similar to the 2D pendant. At the beginning you have to place a seedpoint and define a threshold interval. If you press
 <i>Run Segmentation</i> a preview is calculated. By moving the <i>Adapt region growing</i> slider you can interactively adapt the segmentation result.
 
 \imageMacro{QmitkSegmentation_3DRGTool.png,"3D Region Growing tool",10.00}
-
-\subsection org_mitk_views_segmentationUserManual3DWatershedTool 3D Watershed Tool
-
-This tool provides a watershed based segmentation algorithm. For a detailed explanation of the parameters level and threshold, please be referred to https://itk.org/Doxygen/html/classitk_1_1WatershedImageFilter.html .
-Remark: The tool is (due to its implementation) faster if you use lower levels. So in doubt you should start with high levels (supposed to undersegment) and then lower the levels until you are happy.
-
-\imageMacro{QmitkSegmentation_3DWatershedTool.png,"3D Watershed tool",10.00}
 
 \subsection org_mitk_views_segmentationUserManualPickingTool Picking Tool
 
@@ -256,10 +236,11 @@ your image but you are just interested in one special region.
 
 \subsection org_mitk_views_segmentationUserManualnnUNetTool nnU-Net Tool (Ubuntu only)
 
+\imageMacro{QmitkSegmentation_nnUnetTool.png,"nnUNet tool",10.00}
+
 This tool provides a GUI to the deep learning-based segmentation algorithm called the nnUNet. With this tool, you can get a segmentation mask predicted for the loaded image in MITK. Be ready with the pre-trained weights (a.k.a <b>RESULTS_FOLDER</b>)
 for your organ or task concerned, before using the tool. For a detailed explanation of the parameters and pre-trained weights folder structure etc., please refer to https://github.com/MIC-DKFZ/nnUNet. <br>
 Remark: The tool assumes that you have a Python3 environment with nnUNet (pip) installed. Your machine should be also equipped with a CUDA enabled GPU.
-\imageMacro{QmitkSegmentation_nnUnetTool.png,"nnUNet tool",10.00}
 
 \subsubsection org_mitk_views_segmentationUserManualnnUNetToolWorkflow Workflow:
     -# Click on the "nnUNet Results Folder" directory icon and navigate to the results folder on your hard disk. This is equivalent to setting the <b>RESULTS_FOLDER</b> environment variable. If your results folder is as 

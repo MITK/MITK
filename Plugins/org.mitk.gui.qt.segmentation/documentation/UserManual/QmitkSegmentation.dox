@@ -266,7 +266,7 @@ Remark: The tool assumes that you have a Python3 environment with nnUNet (pip) i
     per the nnUNet required folder structure, the configuration, trainers, tasks and folds are automatically parsed and correspondingly loaded in the drop-down boxes as shown below. 
     \imageMacro{QmitkSegmentation_nnUNet_Settings.png,"nnUNet Segmentation Settings",10}
     -# Choose your required configuration-task-trainer-fold parameters, sequentially. By default, all entries are selected inside the "Fold" dropdown (shown: "All").
-    Note that, if you uncheck all entries from the "Fold" dropdown (shown: "None"), then too,  all folds would be considered for inferencing.
+    Note that, even if you uncheck all entries from the "Fold" dropdown (shown: "None"), then too,  all folds would be considered for inferencing.
     -# For ensemble predictions, you will get the option to select parameters irrespective on postprocessing files available in the ensembles folder of <b>RESULTS_FOLDER</b>.
     Note that, if a postprocessing json file exists for the selected combination then it will used for ensembling, by default. To choose not to, uncheck the "Use PostProcessing JSON" in the "Advanced" section.
     \imageMacro{QmitkSegmentation_nnUNet_ensemble.png,"nnUNet Segmentation Settings",10}
@@ -278,8 +278,8 @@ Remark: The tool assumes that you have a Python3 environment with nnUNet (pip) i
     Click on a fitting environment for the nnUNet inference or click "Select" in the dropdown to choose an unlisted python environment. Note that, while selecting an arbitrary environment folder, only select the base folder.
     No need to select all the way until "../myenv/bin/python", for example.
     -# Click on "Preview".
-    \imageMacro{QmitkSegmentation_nnUNet_Advanced.png,"nnUNet Advanced Settings",10.00}
     -# In the "Advanced" section, you can also activate other options like "Mixed Precision" and "Enable Mirroring" (for test time data augmentation) pertaining to nnUNet.
+    \imageMacro{QmitkSegmentation_nnUNet_Advanced.png,"nnUNet Advanced Settings",10.00}
     -# Use "GPU Id" to change the preferred GPU for inferencing. This is equivalent to setting the <b>CUDA_VISIBLE_DEVICES</b> environment variable.
     -# Every inferred segmentation is cached to prevent a redundant computation. In case, a user doesn't wish to cache a Preview, uncheck the "Enable Caching" in the "Advanced" section. This will ensure that the
     current parameters will neither be checked against the existing cache nor a segmentation be loaded from it.

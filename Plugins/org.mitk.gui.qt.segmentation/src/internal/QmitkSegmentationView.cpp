@@ -419,7 +419,7 @@ void QmitkSegmentationView::OnGoToLabel(const mitk::Point3D& pos)
 
 void QmitkSegmentationView::OnLabelSetWidgetReset()
 {
-  this->UpdateInterpolatorWidget();
+  this->ValidateSelectionInput();
 }
 
 /**********************************************************************/
@@ -875,39 +875,10 @@ void QmitkSegmentationView::UpdateGUI()
     workingNode->SetIntProperty("layer", layer + 1);
   }
 
-  this->UpdateInterpolatorWidget();
   m_Controls->layersWidget->UpdateGUI();
   m_Controls->labelsWidget->UpdateGUI();
 
   this->ValidateSelectionInput();
-}
-
-void QmitkSegmentationView::UpdateInterpolatorWidget()
-{
-  m_Controls->slicesInterpolator->setEnabled(false);
-
-  if (m_WorkingNode.IsNull())
-  {
-    return;
-  }
-
-  auto labelSetImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
-  if (nullptr == labelSetImage)
-  {
-    return;
-  }
-
-  int numberOfLabels = labelSetImage->GetNumberOfLabels(labelSetImage->GetActiveLayer());
-  if (2 == numberOfLabels) // fix for T27319: exterior is label 0, first label is label 1
-  {
-    m_Controls->interpolatorWarningLabel->hide();
-    m_Controls->slicesInterpolator->setEnabled(true);
-  }
-  else
-  {
-    m_Controls->interpolatorWarningLabel->show();
-    m_Controls->interpolatorWarningLabel->setText("<font color=\"red\">Interpolation only works for single label segmentations.</font>");
-  }
 }
 
 void QmitkSegmentationView::ValidateSelectionInput()
@@ -920,6 +891,8 @@ void QmitkSegmentationView::ValidateSelectionInput()
   // enable status depends on the tool manager selection
   m_Controls->toolSelectionBox2D->setEnabled(false);
   m_Controls->toolSelectionBox3D->setEnabled(false);
+  m_Controls->slicesInterpolator->setEnabled(false);
+  m_Controls->interpolatorWarningLabel->hide();
 
   mitk::DataNode* referenceNode = m_Controls->referenceNodeSelector->GetSelectedNode();
   mitk::DataNode* workingNode = m_Controls->workingNodeSelector->GetSelectedNode();
@@ -960,6 +933,21 @@ void QmitkSegmentationView::ValidateSelectionInput()
       m_Controls->labelSetWidget->setEnabled(true);
       m_Controls->toolSelectionBox2D->setEnabled(true);
       m_Controls->toolSelectionBox3D->setEnabled(true);
+
+      auto labelSetImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+      if (nullptr != labelSetImage)
+      {
+        int numberOfLabels = labelSetImage->GetNumberOfLabels(labelSetImage->GetActiveLayer());
+        if (2 == numberOfLabels) // fix for T27319: exterior is label 0, first label is label 1
+        {
+          m_Controls->slicesInterpolator->setEnabled(true);
+        }
+        else
+        {
+          m_Controls->interpolatorWarningLabel->show();
+          m_Controls->interpolatorWarningLabel->setText("<font color=\"red\">Interpolation only works for single label segmentations.</font>");
+        }
+      }
       return;
     }
   }

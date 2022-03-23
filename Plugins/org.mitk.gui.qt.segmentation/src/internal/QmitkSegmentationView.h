@@ -120,8 +120,6 @@ private:
 
   void UpdateGUI();
 
-  void UpdateInterpolatorWidget();
-
   void ValidateSelectionInput();
 
   void UpdateWarningLabel(QString text);

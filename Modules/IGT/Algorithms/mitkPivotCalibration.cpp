@@ -77,7 +77,7 @@ bool mitk::PivotCalibration::ComputePivotPoint()
     t = _CheckedTransforms.at(i)->GetPosition().GetVnlVector();// t = the current position of the tracked sensor
     t *= -1;
     b.update(t, currentRow); //b = combines the position for each collected transform in one column vector
-    R = _CheckedTransforms.at(i)->GetOrientation().rotation_matrix_transpose().transpose(); // R = the current rotation of the tracked sensor, *rotation_matrix_transpose().transpose() is used to obtain original matrix
+    R = _CheckedTransforms.at(i)->GetOrientation().rotation_matrix_transpose().transpose().as_ref(); // R = the current rotation of the tracked sensor, *rotation_matrix_transpose().transpose() is used to obtain original matrix
     A.update(R, currentRow, 0); //A = the matrix which stores the rotations for each collected transform and -I
     A.update(minusI, currentRow, 3);
     currentRow += 3;

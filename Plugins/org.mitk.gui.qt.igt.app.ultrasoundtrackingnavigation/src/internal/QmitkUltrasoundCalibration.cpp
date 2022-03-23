@@ -27,7 +27,6 @@ found in the LICENSE file.
 // MITK
 #include <mitkVector.h>
 #include "mitkIOUtil.h"
-#include "mitkIRenderingManager.h"
 #include <mitkBaseData.h>
 #include <mitkImageGenerator.h>
 #include <mitkNodePredicateDataType.h>

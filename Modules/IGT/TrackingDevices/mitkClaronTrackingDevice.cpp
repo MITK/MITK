@@ -17,20 +17,14 @@ found in the LICENSE file.
 #include "mitkIGTHardwareException.h"
 #include <itksys/SystemTools.hxx>
 #include <iostream>
-#include <itkMutexLockHolder.h>
 #include <mitkIOUtil.h>
 #include <mitkMicronTrackerTypeInformation.h>
-
-typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
 
 mitk::ClaronTrackingDevice::ClaronTrackingDevice(): mitk::TrackingDevice()
 {
   //set the type of this tracking device
   this->m_Data = mitk::MicronTrackerTypeInformation::GetDeviceDataMicronTrackerH40();
-
-  this->m_MultiThreader = itk::MultiThreader::New();
-  m_ThreadID = 0;
 
   m_Device = mitk::ClaronInterface::New();
   //############################# standard directories ##################################
@@ -117,9 +111,9 @@ bool mitk::ClaronTrackingDevice::StartTracking()
     itksys::SystemTools::CopyAFile(m_AllTools[i]->GetFile().c_str(), m_ToolfilesDir.c_str());
   }
   this->SetState(Tracking);            // go to mode Tracking
-  this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
+  this->m_StopTrackingMutex.lock();  // update the local copy of m_StopTracking
   this->m_StopTracking = false;
-  this->m_StopTrackingMutex->Unlock();
+  this->m_StopTrackingMutex.unlock();
 
   //restart the Microntracker, so it will load the new tool files
   m_Device->StopTracking();
@@ -128,7 +122,7 @@ bool mitk::ClaronTrackingDevice::StartTracking()
   if (m_Device->StartTracking())
   {
     mitk::IGTTimeStamp::GetInstance()->Start(this);
-    m_ThreadID = m_MultiThreader->SpawnThread(this->ThreadStartTracking, this);    // start a new thread that executes the TrackTools() method
+    m_Thread = std::thread(&ClaronTrackingDevice::ThreadStartTracking, this);    // start a new thread that executes the TrackTools() method
     return true;
   }
   else
@@ -222,12 +216,12 @@ void mitk::ClaronTrackingDevice::TrackTools()
   try
   {
     /* lock the TrackingFinishedMutex to signal that the execution rights are now transfered to the tracking thread */
-    MutexLockHolder trackingFinishedLockHolder(*m_TrackingFinishedMutex); // keep lock until end of scope
+    std::lock_guard<std::mutex> trackingFinishedLockHolder(m_TrackingFinishedMutex); // keep lock until end of scope
 
     bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here
-    this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
+    this->m_StopTrackingMutex.lock();  // update the local copy of m_StopTracking
     localStopTracking = this->m_StopTracking;
-    this->m_StopTrackingMutex->Unlock();
+    this->m_StopTrackingMutex.unlock();
 
     while ((this->GetState() == Tracking) && (localStopTracking == false))
     {
@@ -287,9 +281,9 @@ void mitk::ClaronTrackingDevice::TrackTools()
         }
       }
       /* Update the local copy of m_StopTracking */
-      this->m_StopTrackingMutex->Lock();
+      this->m_StopTrackingMutex.lock();
       localStopTracking = m_StopTracking;
-      this->m_StopTrackingMutex->Unlock();
+      this->m_StopTrackingMutex.unlock();
     }
   }
   catch(...)
@@ -306,22 +300,7 @@ bool mitk::ClaronTrackingDevice::IsMicronTrackerInstalled()
 }
 
 
-ITK_THREAD_RETURN_TYPE mitk::ClaronTrackingDevice::ThreadStartTracking(void* pInfoStruct)
+void mitk::ClaronTrackingDevice::ThreadStartTracking()
 {
-  /* extract this pointer from Thread Info structure */
-  struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
-  if (pInfo == nullptr)
-  {
-    return ITK_THREAD_RETURN_VALUE;
-  }
-  if (pInfo->UserData == nullptr)
-  {
-    return ITK_THREAD_RETURN_VALUE;
-  }
-  ClaronTrackingDevice *trackingDevice = (ClaronTrackingDevice*)pInfo->UserData;
-
-  if (trackingDevice != nullptr)
-    trackingDevice->TrackTools();
-
-  return ITK_THREAD_RETURN_VALUE;
+  this->TrackTools();
 }

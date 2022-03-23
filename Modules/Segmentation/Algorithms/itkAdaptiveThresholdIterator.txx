@@ -258,8 +258,8 @@ namespace itk
 
     seedIndex = m_StartIndices[0]; // warum noch mal? Steht doch schon in Zeile 224
 
-    if (this->m_OutputImage->GetBufferedRegion().IsInside(seedIndex) && this->m_SeedPointValue > this->m_MinTH &&
-        this->m_SeedPointValue < this->m_MaxTH)
+    if (this->m_OutputImage->GetBufferedRegion().IsInside(seedIndex) && this->m_SeedPointValue >= this->m_MinTH &&
+        this->m_SeedPointValue <= this->m_MaxTH)
     {
       // Push the seed onto the queue
       this->InsertIndexTypeIntoQueueMap(m_RegionGrowingState, seedIndex);
@@ -360,11 +360,11 @@ namespace itk
           {
             if (i != k)
             {
-              tempIndex.m_Index[k] = topIndex[k];
+              tempIndex[k] = topIndex[k];
             }
             else
             {
-              tempIndex.m_Index[k] = topIndex[k] + j;
+              tempIndex[k] = topIndex[k] + j;
             }
           } // end build the index of a neighbor
 

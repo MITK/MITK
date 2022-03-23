@@ -41,15 +41,12 @@ static void calculateLocalStatistic(vtkDataArray* scalars, const std::string& na
   double mean1 = 0;
   double mean2 = 0;
   double mean3 = 0;
-  double mean4 = 0;
   double mean1p = 0;
   double mean2p = 0;
   double mean3p = 0;
-  double mean4p = 0;
   double mean1n = 0;
   double mean2n = 0;
   double mean3n = 0;
-  double mean4n = 0;
   int countPositive = 0;
   int countNegative = 0;
 
@@ -61,13 +58,11 @@ static void calculateLocalStatistic(vtkDataArray* scalars, const std::string& na
     mean1 += actualValue;
     mean2 += actualValue*actualValue;
     mean3 += actualValue*actualValue*actualValue;
-    mean4 += actualValue*actualValue*actualValue*actualValue;
     if (actualValue > 0)
     {
       mean1p += actualValue;
       mean2p += actualValue*actualValue;
       mean3p += actualValue*actualValue*actualValue;
-      mean4p += actualValue*actualValue*actualValue*actualValue;
       countPositive++;
     }
     if (actualValue < 0)
@@ -75,7 +70,6 @@ static void calculateLocalStatistic(vtkDataArray* scalars, const std::string& na
       mean1n += actualValue;
       mean2n += actualValue*actualValue;
       mean3n += actualValue*actualValue*actualValue;
-      mean4n += actualValue*actualValue*actualValue*actualValue;
       countNegative++;
     }
   }

@@ -28,7 +28,6 @@ found in the LICENSE file.
 
 namespace mitk
 {
-
 #define mitkTimeGeometryEventMacro(classname, super)                                                                   \
   class MITKCORE_EXPORT classname : public super                                                                       \
   {                                                                                                                    \
@@ -239,10 +238,6 @@ namespace mitk
      * Called by Update().
      */
     virtual void SendTime();
-
-#pragma GCC visibility push(default)
-    itkEventMacro(UpdateEvent, itk::AnyEvent);
-#pragma GCC visibility pop
 
     class MITKCORE_EXPORT TimeGeometryEvent : public itk::AnyEvent
     {

@@ -14,8 +14,6 @@ set(CPP_FILES
   Algorithms/mitkImageToLiveWireContourFilter.cpp
   Algorithms/mitkManualSegmentationToSurfaceFilter.cpp
   Algorithms/mitkOtsuSegmentationFilter.cpp
-  Algorithms/mitkOverwriteDirectedPlaneImageFilter.cpp
-  Algorithms/mitkOverwriteSliceImageFilter.cpp
   Algorithms/mitkSegmentationObjectFactory.cpp
   Algorithms/mitkShapeBasedInterpolationAlgorithm.cpp
   Algorithms/mitkShowSegmentationAsSmoothedSurface.cpp
@@ -64,7 +62,9 @@ set(CPP_FILES
   Interactions/mitkToolCommand.cpp
   Interactions/mitkWatershedTool.cpp
   Interactions/mitkPickingTool.cpp
+  Interactions/mitknnUnetTool.cpp
   Interactions/mitkSegmentationInteractor.cpp #SO
+  Interactions/mitkProcessExecutor.cpp
   Rendering/mitkContourMapper2D.cpp
   Rendering/mitkContourSetMapper2D.cpp
   Rendering/mitkContourSetVtkMapper3D.cpp
@@ -79,6 +79,8 @@ set(CPP_FILES
 set(RESOURCE_FILES
   Add_48x48.png
   Add_Cursor_32x32.png
+  AI_48x48.png
+  AI_Cursor_32x32.png
   Erase_48x48.png
   Erase_Cursor_32x32.png
   FastMarching_48x48.png
@@ -105,6 +107,7 @@ set(RESOURCE_FILES
   Interactions/dummy.xml
   Interactions/LiveWireTool.xml
   Interactions/FastMarchingTool.xml
+  Interactions/PickingTool.xml
   Interactions/PressMoveRelease.xml
   Interactions/PressMoveReleaseAndPointSetting.xml
   Interactions/PressMoveReleaseWithCTRLInversion.xml

@@ -16,10 +16,10 @@ found in the LICENSE file.
 #include "MitkOpenIGTLinkExports.h"
 
 #include "itkObject.h"
-#include "itkFastMutexLock.h"
 #include "mitkCommon.h"
 
 #include <deque>
+#include <mutex>
 #include <mitkIGTLMessage.h>
 
 //OpenIGTLink
@@ -112,7 +112,7 @@ namespace mitk {
     /**
     * \brief Mutex to take car of the queue
     */
-    itk::FastMutexLock::Pointer m_Mutex;
+    std::mutex m_Mutex;
 
     /**
     * \brief the queue that stores pointer to the inserted messages

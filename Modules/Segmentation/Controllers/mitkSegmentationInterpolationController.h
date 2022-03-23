@@ -16,11 +16,14 @@ found in the LICENSE file.
 #include "mitkCommon.h"
 #include "mitkImage.h"
 #include <MitkSegmentationExports.h>
+#include <mitkShapeBasedInterpolationAlgorithm.h>
 
 #include <itkImage.h>
 #include <itkObjectFactory.h>
 
 #include <map>
+#include <mutex>
+#include <utility>
 #include <vector>
 
 namespace mitk
@@ -133,11 +136,14 @@ namespace mitk
       \param currentPlane
 
       \param timeStep Which time step to use
+
+      \param algorithm Optional algorithm instance to potentially benefit from caching for repeated interpolation
     */
     Image::Pointer Interpolate(unsigned int sliceDimension,
                                unsigned int sliceIndex,
                                const mitk::PlaneGeometry *currentPlane,
-                               unsigned int timeStep);
+                               unsigned int timeStep,
+                               mitk::ShapeBasedInterpolationAlgorithm::Pointer algorithm = nullptr);
 
     void OnImageModified(const itk::EventObject &);
 
@@ -145,6 +151,16 @@ namespace mitk
      * Activate/Deactivate the 2D interpolation.
     */
     void Activate2DInterpolation(bool);
+
+    /**
+     * Enable slice extraction cache for upper and lower slices.
+    */
+    void EnableSliceImageCache();
+
+    /**
+     * Disable slice extraction cache for upper and lower slices.
+    */
+    void DisableSliceImageCache();
 
     /**
       \brief Get existing instance or create a new one
@@ -194,6 +210,11 @@ namespace mitk
     void PrintStatus();
 
     /**
+     * Extract a slice and optionally use a caching mechanism if enabled.
+    */
+    mitk::Image::Pointer ExtractSlice(const PlaneGeometry* planeGeometry, unsigned int sliceIndex, unsigned int timeStep, bool cache = false);
+
+    /**
       An array of flags. One for each dimension of the image. A flag is set, when a slice in a certain dimension
       has at least one pixel that is not 0 (which would mean that it has to be considered by the interpolation
       algorithm).
@@ -207,9 +228,14 @@ namespace mitk
     static InterpolatorMapType s_InterpolatorForImage;
 
     Image::ConstPointer m_Segmentation;
+    std::pair<unsigned long, bool> m_SegmentationModifiedObserverTag; // first: actual tag, second: tag assigned / valid?
     Image::ConstPointer m_ReferenceImage;
     bool m_BlockModified;
     bool m_2DInterpolationActivated;
+
+    bool m_EnableSliceImageCache;
+    std::map<std::pair<unsigned int, unsigned int>, Image::Pointer> m_SliceImageCache;
+    std::mutex m_SliceImageCacheMutex;
   };
 
 } // namespace

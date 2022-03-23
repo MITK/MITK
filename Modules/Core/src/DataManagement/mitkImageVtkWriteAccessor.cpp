@@ -26,17 +26,17 @@ mitk::ImageVtkWriteAccessor::ImageVtkWriteAccessor(ImagePointer iP,
                                                    vtkImageData *imageDataVtk)
   : ImageAccessorBase(nullptr, iDI), m_Image(iP.GetPointer()), m_ImageDataVtk(imageDataVtk)
 {
-  m_Image->m_VtkReadersLock.Lock();
+  m_Image->m_VtkReadersLock.lock();
 
   m_Image->m_VtkReaders.push_back(this);
   // printf("m_VtkReaders.size(): %d\n", (int) m_Image->m_VtkReaders.size());
 
-  m_Image->m_VtkReadersLock.Unlock();
+  m_Image->m_VtkReadersLock.unlock();
 }
 
 mitk::ImageVtkWriteAccessor::~ImageVtkWriteAccessor()
 {
-  m_Image->m_VtkReadersLock.Lock();
+  m_Image->m_VtkReadersLock.lock();
 
   auto it = std::find(m_Image->m_VtkReaders.begin(), m_Image->m_VtkReaders.end(), this);
   if (it != m_Image->m_VtkReaders.end())
@@ -45,7 +45,7 @@ mitk::ImageVtkWriteAccessor::~ImageVtkWriteAccessor()
   }
   // printf("m_VtkReaders.size(): %d\n", (int) m_Image->m_VtkReaders.size());
 
-  m_Image->m_VtkReadersLock.Unlock();
+  m_Image->m_VtkReadersLock.unlock();
 }
 
 vtkImageData *mitk::ImageVtkWriteAccessor::GetVtkImageData() const

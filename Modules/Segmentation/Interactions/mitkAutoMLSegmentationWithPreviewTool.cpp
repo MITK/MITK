@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <mitkLookupTableProperty.h>
 #include <mitkRenderingModeProperty.h>
 #include <mitkSliceNavigationController.h>
+#include <mitkImageStatisticsHolder.h>
 
 // ITK
 #include <itkBinaryThresholdImageFilter.h>
@@ -67,12 +68,12 @@ void mitk::AutoMLSegmentationWithPreviewTool::Activated()
   m_MLPreviewNode->SetVisibility(true);
   m_MLPreviewNode->SetOpacity(1.0);
 
-  m_ToolManager->GetDataStorage()->Add(m_MLPreviewNode);
+  this->GetToolManager()->GetDataStorage()->Add(m_MLPreviewNode);
 }
 
 void mitk::AutoMLSegmentationWithPreviewTool::Deactivated()
 {
-  m_ToolManager->GetDataStorage()->Remove(m_MLPreviewNode);
+  this->GetToolManager()->GetDataStorage()->Remove(m_MLPreviewNode);
   m_MLPreviewNode = nullptr;
 
   Superclass::Deactivated();
@@ -92,7 +93,35 @@ void mitk::AutoMLSegmentationWithPreviewTool::UpdateCleanUp()
   }
 }
 
-void mitk::AutoMLSegmentationWithPreviewTool::DoUpdatePreview(const Image* inputAtTimeStep, Image* previewImage, TimeStepType timeStep)
+void mitk::AutoMLSegmentationWithPreviewTool::SetNodeProperties(LabelSetImage::Pointer newMLPreview)
+{
+  if (newMLPreview.IsNotNull())
+    {
+      this->m_MLPreviewNode->SetData(newMLPreview);
+      this->m_MLPreviewNode->SetProperty("binary", mitk::BoolProperty::New(false));
+      mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
+      renderingMode->SetValue(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR);
+      this->m_MLPreviewNode->SetProperty("Image Rendering.Mode", renderingMode);
+      mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
+      mitk::LookupTableProperty::Pointer prop = mitk::LookupTableProperty::New(lut);
+      vtkSmartPointer<vtkLookupTable> lookupTable = vtkSmartPointer<vtkLookupTable>::New();
+      lookupTable->SetHueRange(1.0, 0.0);
+      lookupTable->SetSaturationRange(1.0, 1.0);
+      lookupTable->SetValueRange(1.0, 1.0);
+      lookupTable->SetTableRange(-1.0, 1.0);
+      lookupTable->Build();
+      lut->SetVtkLookupTable(lookupTable);
+      prop->SetLookupTable(lut);
+      this->m_MLPreviewNode->SetProperty("LookupTable", prop);
+      mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
+      mitk::LevelWindow levelwindow;
+      levelwindow.SetRangeMinMax(0, newMLPreview->GetStatistics()->GetScalarValueMax());
+      levWinProp->SetLevelWindow(levelwindow);
+      this->m_MLPreviewNode->SetProperty("levelwindow", levWinProp);
+    }
+}
+
+void mitk::AutoMLSegmentationWithPreviewTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image* /*oldSegAtTimeStep*/, Image* previewImage, TimeStepType timeStep)
 {
   const auto timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
 
@@ -115,31 +144,7 @@ void mitk::AutoMLSegmentationWithPreviewTool::DoUpdatePreview(const Image* input
     this->m_LastMLTimeStep = timeStep;
 
     auto newMLPreview = ComputeMLPreview(inputAtTimeStep, timeStep);
-
-    if (newMLPreview.IsNotNull())
-    {
-      this->m_MLPreviewNode->SetData(newMLPreview);
-      this->m_MLPreviewNode->SetProperty("binary", mitk::BoolProperty::New(false));
-      mitk::RenderingModeProperty::Pointer renderingMode = mitk::RenderingModeProperty::New();
-      renderingMode->SetValue(mitk::RenderingModeProperty::LOOKUPTABLE_LEVELWINDOW_COLOR);
-      this->m_MLPreviewNode->SetProperty("Image Rendering.Mode", renderingMode);
-      mitk::LookupTable::Pointer lut = mitk::LookupTable::New();
-      mitk::LookupTableProperty::Pointer prop = mitk::LookupTableProperty::New(lut);
-      vtkSmartPointer<vtkLookupTable> lookupTable = vtkSmartPointer<vtkLookupTable>::New();
-      lookupTable->SetHueRange(1.0, 0.0);
-      lookupTable->SetSaturationRange(1.0, 1.0);
-      lookupTable->SetValueRange(1.0, 1.0);
-      lookupTable->SetTableRange(-1.0, 1.0);
-      lookupTable->Build();
-      lut->SetVtkLookupTable(lookupTable);
-      prop->SetLookupTable(lut);
-      this->m_MLPreviewNode->SetProperty("LookupTable", prop);
-      mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
-      mitk::LevelWindow levelwindow;
-      levelwindow.SetRangeMinMax(0, newMLPreview->GetScalarValueMax());
-      levWinProp->SetLevelWindow(levelwindow);
-      this->m_MLPreviewNode->SetProperty("levelwindow", levWinProp);
-    }
+    this->SetNodeProperties(newMLPreview);
   }
 
   if (!m_SelectedLabels.empty())

@@ -2,7 +2,7 @@ set(MODULE_TESTS
   mitkComputeContourSetNormalsFilterTest.cpp
   mitkCreateDistanceImageFromSurfaceFilterTest.cpp
   mitkImageToPointCloudFilterTest.cpp
-  mitkPointCloudScoringFilterTest
+  mitkPointCloudScoringFilterTest.cpp
   mitkReduceContourSetFilterTest.cpp
   mitkSurfaceInterpolationControllerTest.cpp
 )

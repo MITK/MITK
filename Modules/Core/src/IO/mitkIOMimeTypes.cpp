@@ -14,6 +14,7 @@ found in the LICENSE file.
 
 #include "mitkCustomMimeType.h"
 #include "mitkLogMacros.h"
+#include <mitkUtf8Util.h>
 
 #include "itkGDCMImageIO.h"
 #include "itkMetaDataObject.h"
@@ -41,7 +42,7 @@ namespace mitk
   {
     // check whether directory or file
     // if directory try to find first file within it instead
-    bool pathIsDirectory = itksys::SystemTools::FileIsDirectory(path);
+    bool pathIsDirectory = itksys::SystemTools::FileIsDirectory(Utf8Util::Local8BitToUtf8(path));
 
     std::string filepath = path;
 
@@ -53,13 +54,18 @@ namespace mitk
       std::vector<std::string> files;
       for (unsigned long idx = 0; idx<input.GetNumberOfFiles(); idx++)
       {
-        if (!itksys::SystemTools::FileIsDirectory(input.GetFile(idx)))
+        auto filename = Utf8Util::Local8BitToUtf8(input.GetFile(idx));
+
+        if (!itksys::SystemTools::FileIsDirectory(filename) && this->MatchesExtension(filename))
         {
           std::string fullpath = path + "/" + std::string(input.GetFile(idx));
           files.push_back(fullpath.c_str());
         }
       }
-      filepath = files.front();
+      if (!files.empty())
+      {
+        filepath = files.front();
+      }
     }
 
     // Ask the GDCM ImageIO class directly

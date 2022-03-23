@@ -24,8 +24,8 @@ set(H_FILES
   mitkImageStatisticsContainer.h
   mitkPointSetDifferenceStatisticsCalculator.h
   mitkPointSetStatisticsCalculator.h
-  mitkExtendedStatisticsImageFilter.h
-  mitkExtendedLabelStatisticsImageFilter.h
+  mitkStatisticsImageFilter.h
+  mitkLabelStatisticsImageFilter.h
   mitkHotspotMaskGenerator.h
   mitkMaskGenerator.h
   mitkPlanarFigureMaskGenerator.h

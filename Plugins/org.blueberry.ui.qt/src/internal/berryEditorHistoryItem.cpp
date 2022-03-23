@@ -97,7 +97,7 @@ bool EditorHistoryItem::Matches(const SmartPointer<IEditorInput>& input) const
   }
 
   const IPersistableElement* persistable = input->GetPersistable();
-  QString inputId = persistable ? QString::null : persistable->GetFactoryId();
+  QString inputId = persistable ? persistable->GetFactoryId() : QString::null;
   QString myId = GetFactoryId();
   return myId.isEmpty() ? inputId.isEmpty() : myId == inputId;
 }

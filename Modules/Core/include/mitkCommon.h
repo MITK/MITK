@@ -26,10 +26,6 @@ found in the LICENSE file.
 #include "mitkGetClassHierarchy.h"
 #include "mitkLogMacros.h"
 
-#ifndef MITK_UNMANGLE_IPPIC
-#define mitkIpPicDescriptor mitkIpPicDescriptor
-#endif
-
 typedef unsigned int MapperSlotId;
 
 /** From ITK 4.7 version, the TypeMacro overrides (by using the explicit attribute) the GetNameOfClass

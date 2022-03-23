@@ -9,80 +9,79 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef _QMITKViewNavigatorWidget_H_INCLUDED
-#define _QMITKViewNavigatorWidget_H_INCLUDED
+#ifndef QMIKVIEWNAVIGATORWIDGET_H
+#define QMIKVIEWNAVIGATORWIDGET_H
+
+#include "ui_QmitkViewNavigatorWidgetControls.h"
 
 //QT headers
 #include <QWidget>
-#include <QString>
-
-#include <ctkSearchBox.h>
-#include "ui_QmitkViewNavigatorWidgetControls.h"
-
-#include <berryISelectionListener.h>
-#include <berryIPerspectiveListener.h>
-#include <berryIWorkbench.h>
-#include <berryIWorkbenchPage.h>
-#include <berryIPerspectiveDescriptor.h>
 #include <QStandardItemModel>
-#include <QSortFilterProxyModel>
 #include <QMenu>
-#include <mitkQtPerspectiveItem.h>
-#include <mitkQtViewItem.h>
+
+#include <berryIPartListener.h>
+#include <berryIPerspectiveListener.h>
+#include <berryIWorkbenchWindow.h>
 
 class ClassFilterProxyModel;
 
-/** @brief
-  */
+/**
+* @brief
+*
+*/
 class QmitkViewNavigatorWidget : public QWidget
 {
-    //this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
     Q_OBJECT
 
 public:
 
-    QmitkViewNavigatorWidget (berry::IWorkbenchWindow::Pointer window,
-                              QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
+    QmitkViewNavigatorWidget(berry::IWorkbenchWindow::Pointer window,
+                             QWidget* parent = nullptr,
+                             Qt::WindowFlags f = nullptr);
     ~QmitkViewNavigatorWidget() override;
 
-    virtual void CreateQtPartControl(QWidget *parent);
-    void setFocus();
+    void SetFocus();
 
-    bool FillTreeList();
-    void UpdateTreeList(QStandardItem* item = nullptr, berry::IWorkbenchPartReference* partRef=nullptr, const std::string& changeId="");
+public Q_SLOTS:
 
-    QScopedPointer<berry::IPerspectiveListener>    m_PerspectiveListener;
-    QScopedPointer<berry::IWindowListener>         m_WindowListener;
-
-public slots:
-
-    void CustomMenuRequested(QPoint pos);
-    void ItemClicked(const QModelIndex &index);
+    void FilterChanged();
+    void ItemClicked(const QModelIndex& index);
     void SaveCurrentPerspectiveAs();
     void ResetCurrentPerspective();
-    void CloseAllPerspectives();
     void ClosePerspective();
+    void CloseAllPerspectives();
     void ExpandAll();
     void CollapseAll();
-    void FilterChanged();
+    void CustomMenuRequested(QPoint pos);
 
 protected:
 
     friend class ViewNavigatorPerspectiveListener;
+    friend class ViewNavigatorViewListener;
 
-    // member variables
+    berry::IPerspectiveDescriptor::Pointer      m_ActivePerspective;
+
+private:
+
+    void CreateQtPartControl(QWidget* parent);
+    bool FillTreeList();
+    void UpdateTreeList(berry::IWorkbenchPart* workbenchPart = nullptr);
+
+    void AddPerspectivesToTree();
+    void AddViewsToTree();
+    template<typename D, typename I>
+    void AddItemsToTree(D itemDescriptors, QStandardItem* rootItem,
+      QStandardItem* miscellaneousItem = nullptr, const QStringList& itemExcludeList = QStringList());
+
     Ui::QmitkViewNavigatorWidgetControls        m_Controls;
-    QWidget*                                    m_Parent;
     QStandardItemModel*                         m_TreeModel;
     ClassFilterProxyModel*                      m_FilterProxyModel;
     QMenu*                                      m_ContextMenu;
-    berry::IPerspectiveDescriptor::Pointer      m_ActivePerspective;
-    bool                                        m_Generated;
 
-private:
+    QScopedPointer<berry::IPerspectiveListener>    m_PerspectiveListener;
+    QScopedPointer<berry::IPartListener>           m_ViewPartListener;
 
     berry::IWorkbenchWindow::Pointer m_Window;
 };
 
-#endif // _QMITKViewNavigatorWidget_H_INCLUDED
-
+#endif // QMIKVIEWNAVIGATORWIDGET_H

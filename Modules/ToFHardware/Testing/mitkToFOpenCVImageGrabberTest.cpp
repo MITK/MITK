@@ -55,11 +55,11 @@ int mitkToFOpenCVImageGrabberTest(int /* argc */, char* /*argv*/[])
   std::string dirName = MITK_TOF_DATA_DIR;
   mitk::ToFImageGrabber::Pointer tofImageGrabber = mitk::ToFImageGrabber::New();
   tofImageGrabber->SetCameraDevice(mitk::ToFCameraMITKPlayerDevice::New());
-  std::string distanceFileName = dirName + "/PMDCamCube2_MF0_IT0_1Images_DistanceImage.pic";
+  std::string distanceFileName = dirName + "/PMDCamCube2_MF0_IT0_1Images_DistanceImage.nrrd";
   tofImageGrabber->SetProperty("DistanceImageFileName",mitk::StringProperty::New(distanceFileName));
-  std::string amplitudeFileName = dirName + "/PMDCamCube2_MF0_IT0_1Images_AmplitudeImage.pic";
+  std::string amplitudeFileName = dirName + "/PMDCamCube2_MF0_IT0_1Images_AmplitudeImage.nrrd";
   tofImageGrabber->SetProperty("AmplitudeImageFileName",mitk::StringProperty::New(amplitudeFileName));
-  std::string intensityFileName = dirName + "/PMDCamCube2_MF0_IT0_1Images_IntensityImage.pic";
+  std::string intensityFileName = dirName + "/PMDCamCube2_MF0_IT0_1Images_IntensityImage.nrrd";
   tofImageGrabber->SetProperty("IntensityImageFileName",mitk::StringProperty::New(intensityFileName));
   tofImageGrabber->Update();
 

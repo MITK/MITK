@@ -150,7 +150,7 @@ namespace itk
     void GoToBegin();
 
     /** Is the iterator at the end of the region? */
-    bool IsAtEnd() override { return this->m_IsAtEnd; };
+    bool IsAtEnd() const override { return this->m_IsAtEnd; };
     /** Walk forward one index */
     void operator++() override { this->DoExtendedFloodStep(); }
     virtual SmartPointer<FunctionType> GetFunction() const { return m_Function; }

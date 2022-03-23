@@ -85,11 +85,11 @@ int mitkImageDimensionConverterTest(int /*argc*/, char * /*argv*/ [])
   // Save original Geometry infos
   mitk::Vector3D Original_col0, Original_col1, Original_col2;
   Original_col0.SetVnlVector(
-    mitkImage2D->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(0));
+    mitkImage2D->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(0).as_ref());
   Original_col1.SetVnlVector(
-    mitkImage2D->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(1));
+    mitkImage2D->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(1).as_ref());
   Original_col2.SetVnlVector(
-    mitkImage2D->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2));
+    mitkImage2D->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2).as_ref());
   MITK_INFO << "Rotated Matrix: " << Original_col0 << " " << Original_col1 << " " << Original_col2;
 
   mitk::Point3D Original_Origin = mitkImage2D->GetGeometry()->GetOrigin();
@@ -131,11 +131,11 @@ int mitkImageDimensionConverterTest(int /*argc*/, char * /*argv*/ [])
   // Check matrix
   mitk::Vector3D Loaded2D_col0, Loaded2D_col1, Loaded2D_col2;
   Loaded2D_col0.SetVnlVector(
-    imageLoaded2D->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(0));
+    imageLoaded2D->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(0).as_ref());
   Loaded2D_col1.SetVnlVector(
-    imageLoaded2D->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(1));
+    imageLoaded2D->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(1).as_ref());
   Loaded2D_col2.SetVnlVector(
-    imageLoaded2D->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2));
+    imageLoaded2D->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2).as_ref());
 
   if ((std::fabs(1 - Loaded2D_col0[0]) > eps) || (std::fabs(0 - Loaded2D_col0[1]) > eps) ||
       (std::fabs(0 - Loaded2D_col0[2]) > eps) || (std::fabs(0 - Loaded2D_col1[0]) > eps) ||
@@ -177,11 +177,11 @@ int mitkImageDimensionConverterTest(int /*argc*/, char * /*argv*/ [])
 
   mitk::Vector3D Converted_col0, Converted_col1, Converted_col2;
   Converted_col0.SetVnlVector(
-    mitkImage3D->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(0));
+    mitkImage3D->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(0).as_ref());
   Converted_col1.SetVnlVector(
-    mitkImage3D->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(1));
+    mitkImage3D->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(1).as_ref());
   Converted_col2.SetVnlVector(
-    mitkImage3D->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2));
+    mitkImage3D->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2).as_ref());
 
   if ((std::fabs(Original_col0[0] - Converted_col0[0]) > eps) ||
       (std::fabs(Original_col0[1] - Converted_col0[1]) > eps) ||
@@ -232,11 +232,11 @@ int mitkImageDimensionConverterTest(int /*argc*/, char * /*argv*/ [])
 
   mitk::Vector3D Loaded_col0, Loaded_col1, Loaded_col2;
   Loaded_col0.SetVnlVector(
-    imageLoaded->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(0));
+    imageLoaded->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(0).as_ref());
   Loaded_col1.SetVnlVector(
-    imageLoaded->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(1));
+    imageLoaded->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(1).as_ref());
   Loaded_col2.SetVnlVector(
-    imageLoaded->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2));
+    imageLoaded->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(2).as_ref());
 
   if ((std::fabs(Original_col0[0] - Loaded_col0[0]) > eps) || (std::fabs(Original_col0[1] - Loaded_col0[1]) > eps) ||
       (std::fabs(Original_col0[2] - Loaded_col0[2]) > eps) || (std::fabs(Original_col1[0] - Loaded_col1[0]) > eps) ||

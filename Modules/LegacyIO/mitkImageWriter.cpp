@@ -22,6 +22,9 @@ found in the LICENSE file.
 #include <itkImageIOBase.h>
 #include <itkImageIOFactory.h>
 
+#include <vtkImageData.h>
+#include <vtkXMLImageDataWriter.h>
+
 mitk::ImageWriter::ImageWriter() : m_UseCompression(true)
 {
   this->SetNumberOfRequiredInputs(1);
@@ -100,9 +103,6 @@ void mitk::ImageWriter::SetDefaultExtension()
   this->Modified();
 }
 
-#include <vtkConfigure.h>
-#include <vtkImageData.h>
-#include <vtkXMLImageDataWriter.h>
 static void writeVti(const char *filename, mitk::Image *image, int t = 0)
 {
   vtkXMLImageDataWriter *vtkwriter = vtkXMLImageDataWriter::New();
@@ -172,7 +172,7 @@ void mitk::ImageWriter::WriteByITK(mitk::Image *image, const std::string &fileNa
   origin4D[3] = 0; // There is no support for a 4D origin. However, we should have an valid value here
 
   itk::ImageIOBase::Pointer imageIO =
-    itk::ImageIOFactory::CreateImageIO(fileName.c_str(), itk::ImageIOFactory::WriteMode);
+    itk::ImageIOFactory::CreateImageIO(fileName.c_str(), itk::IOFileModeEnum::WriteMode);
 
   if (imageIO.IsNull())
   {
@@ -182,9 +182,9 @@ void mitk::ImageWriter::WriteByITK(mitk::Image *image, const std::string &fileNa
   // Set the necessary information for imageIO
   imageIO->SetNumberOfDimensions(dimension);
   imageIO->SetPixelType(pixelType.GetPixelType());
-  imageIO->SetComponentType(pixelType.GetComponentType() < PixelComponentUserType ?
-                              static_cast<itk::ImageIOBase::IOComponentType>(pixelType.GetComponentType()) :
-                              itk::ImageIOBase::UNKNOWNCOMPONENTTYPE);
+  imageIO->SetComponentType(static_cast<int>(pixelType.GetComponentType()) < PixelComponentUserType
+                              ? pixelType.GetComponentType()
+                              : itk::IOComponentEnum::UNKNOWNCOMPONENTTYPE);
   imageIO->SetNumberOfComponents(pixelType.GetNumberOfComponents());
 
   itk::ImageIORegion ioRegion(dimension);
@@ -195,9 +195,9 @@ void mitk::ImageWriter::WriteByITK(mitk::Image *image, const std::string &fileNa
     imageIO->SetSpacing(i, spacing4D[i]);
     imageIO->SetOrigin(i, origin4D[i]);
 
-    mitk::Vector3D mitkDirection;
+    mitk::Vector3D mitkDirection(0.0);
     mitkDirection.SetVnlVector(
-      image->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(i));
+      image->GetGeometry()->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(i).as_ref());
     itk::Vector<double, 4u> direction4D;
     direction4D[0] = mitkDirection[0];
     direction4D[1] = mitkDirection[1];
@@ -274,9 +274,10 @@ void mitk::ImageWriter::GenerateData()
 
   bool vti = (m_Extension.find(".vti") != std::string::npos);
 
-  // If the extension is NOT .pic and NOT .nrrd and NOT .nii and NOT .nii.gz the following block is entered
-  if (m_Extension.find(".pic") == std::string::npos && m_Extension.find(".nrrd") == std::string::npos &&
-      m_Extension.find(".nii") == std::string::npos && m_Extension.find(".nii.gz") == std::string::npos)
+  // If the extension is NOT .nrrd and NOT .nii and NOT .nii.gz the following block is entered
+  if (m_Extension.find(".nrrd") == std::string::npos &&
+      m_Extension.find(".nii") == std::string::npos &&
+      m_Extension.find(".nii.gz") == std::string::npos)
   {
     if (input->GetDimension() > 3)
     {
@@ -323,33 +324,16 @@ void mitk::ImageWriter::GenerateData()
   }
   else
   {
-    // use the PicFileWriter for the .pic data type
-    if (m_Extension.find(".pic") != std::string::npos)
+    if (m_Extension.find(".nrrd") != std::string::npos ||
+        m_Extension.find(".nii") != std::string::npos ||
+        m_Extension.find(".nii.gz") != std::string::npos)
     {
-         /*    PicFileWriter::Pointer picWriter = PicFileWriter::New();
-         size_t found;
-         found = m_FileName.find( m_Extension ); // !!! HAS to be at the very end of the filename (not somewhere in the middle)
-         if( m_FileName.length() > 3 && found != m_FileName.length() - 4 )
-         {
-         //if Extension not in Filename
-         std::ostringstream filename;
-         filename <<  m_FileName.c_str() << m_Extension;
-         picWriter->SetFileName( filename.str().c_str() );
-         }
-         else
-         {
-         picWriter->SetFileName( m_FileName.c_str() );
-         }
-         picWriter->SetInputImage( input );
-         picWriter->Write();
-         */    }
-
-         // use the ITK .nrrd Image writer
-         if (m_Extension.find(".nrrd") != std::string::npos || m_Extension.find(".nii") != std::string::npos ||
-             m_Extension.find(".nii.gz") != std::string::npos)
-         {
-           WriteByITK(input, this->m_FileName);
-         }
+      WriteByITK(input, this->m_FileName);
+    }
+    else
+    {
+      itkExceptionMacro(<< "File type not writeable");
+    }
   }
   m_MimeType = "application/MITK.Pic";
 }
@@ -377,8 +361,6 @@ std::string mitk::ImageWriter::GetWritenMIMEType()
 std::vector<std::string> mitk::ImageWriter::GetPossibleFileExtensions()
 {
   std::vector<std::string> possibleFileExtensions;
-  possibleFileExtensions.push_back(".pic");
-  possibleFileExtensions.push_back(".pic.gz");
   possibleFileExtensions.push_back(".bmp");
   possibleFileExtensions.push_back(".dcm");
   possibleFileExtensions.push_back(".DCM");

@@ -67,7 +67,7 @@ void mitk::ColorBarAnnotation::UpdateVtkAnnotation(mitk::BaseRenderer *renderer)
     // manually set position so there is no overlap with mitk logo in 3d renderwindow
     if (this->GetOrientation() == 1)
     {
-      ls->m_ScalarBarActor->SetPosition(0.80, 0.15);
+      ls->m_ScalarBarActor->SetPosition(0.80, 0.10);
       ls->m_ScalarBarActor->SetWidth(0.15);
       ls->m_ScalarBarActor->SetHeight(0.85);
     }

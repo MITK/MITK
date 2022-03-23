@@ -42,26 +42,26 @@ namespace mitk
     {
       int typInt = 0;
       {
-        const int typ = source->GetPixelType().GetComponentType();
-        if (typ == itk::ImageIOBase::UCHAR)
+        auto typ = source->GetPixelType().GetComponentType();
+        if (typ == itk::IOComponentEnum::UCHAR)
           typInt = 0;
-        else if (typ == itk::ImageIOBase::CHAR)
+        else if (typ == itk::IOComponentEnum::CHAR)
           typInt = 1;
-        else if (typ == itk::ImageIOBase::USHORT)
+        else if (typ == itk::IOComponentEnum::USHORT)
           typInt = 2;
-        else if (typ == itk::ImageIOBase::SHORT)
+        else if (typ == itk::IOComponentEnum::SHORT)
           typInt = 3;
-        else if (typ == itk::ImageIOBase::INT)
+        else if (typ == itk::IOComponentEnum::INT)
           typInt = 4;
-        else if (typ == itk::ImageIOBase::UINT)
+        else if (typ == itk::IOComponentEnum::UINT)
           typInt = 5;
-        else if (typ == itk::ImageIOBase::LONG)
+        else if (typ == itk::IOComponentEnum::LONG)
           typInt = 6;
-        else if (typ == itk::ImageIOBase::ULONG)
+        else if (typ == itk::IOComponentEnum::ULONG)
           typInt = 7;
-        else if (typ == itk::ImageIOBase::FLOAT)
+        else if (typ == itk::IOComponentEnum::FLOAT)
           typInt = 8;
-        else if (typ == itk::ImageIOBase::DOUBLE)
+        else if (typ == itk::IOComponentEnum::DOUBLE)
           typInt = 9;
         else
         {

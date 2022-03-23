@@ -91,7 +91,7 @@ void mitk::MaskImageFilter::InternalComputeMask(itk::Image<TPixel, VImageDimensi
   // this should be changed once unsigned char segmentations can be converted to unsigned short
   mitk::PixelType pixelType =
     m_MaskTimeSelector->GetOutput()->GetImageDescriptor()->GetChannelDescriptor().GetPixelType();
-  if (pixelType.GetComponentType() == itk::ImageIOBase::UCHAR)
+  if (pixelType.GetComponentType() == itk::IOComponentEnum::UCHAR)
   {
     typedef itk::Image<TPixel, VImageDimension> ItkInputImageType;
     typedef itk::Image<unsigned char, VImageDimension> ItkMaskImageType;
@@ -132,8 +132,8 @@ void mitk::MaskImageFilter::InternalComputeMask(itk::Image<TPixel, VImageDimensi
       if (maskIt.Get() > itk::NumericTraits<typename ItkMaskImageType::PixelType>::Zero)
       {
         outputIt.Set(inputIt.Get());
-        m_MinValue = vnl_math_min((float)inputIt.Get(), (float)m_MinValue);
-        m_MaxValue = vnl_math_max((float)inputIt.Get(), (float)m_MaxValue);
+        m_MinValue = std::min((float)inputIt.Get(), (float)m_MinValue);
+        m_MaxValue = std::max((float)inputIt.Get(), (float)m_MaxValue);
       }
       else
       {
@@ -183,8 +183,8 @@ void mitk::MaskImageFilter::InternalComputeMask(itk::Image<TPixel, VImageDimensi
         if (maskIt.Get() > itk::NumericTraits<typename ItkMaskImageType::PixelType>::Zero)
         {
           outputIt.Set(inputIt.Get());
-          m_MinValue = vnl_math_min((float)inputIt.Get(), (float)m_MinValue);
-          m_MaxValue = vnl_math_max((float)inputIt.Get(), (float)m_MaxValue);
+          m_MinValue = std::min((float)inputIt.Get(), (float)m_MinValue);
+          m_MaxValue = std::max((float)inputIt.Get(), (float)m_MaxValue);
         }
         else
         {

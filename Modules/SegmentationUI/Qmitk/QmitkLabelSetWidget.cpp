@@ -56,7 +56,7 @@ QmitkLabelSetWidget::QmitkLabelSetWidget(QWidget *parent)
 
   m_ColorSequenceRainbow.GoToBegin();
 
-  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager(mitk::ToolManagerProvider::MULTILABEL_SEGMENTATION);
+  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
 
   m_Controls.m_LabelSearchBox->setAlwaysShowClearIcon(true);
   m_Controls.m_LabelSearchBox->setShowSearchIcon(true);
@@ -674,9 +674,6 @@ void QmitkLabelSetWidget::SelectLabelByPixelValue(mitk::Label::PixelType pixelVa
       m_Controls.m_LabelSetTableWidget->selectRow(row);
       m_Controls.m_LabelSetTableWidget->scrollToItem(m_Controls.m_LabelSetTableWidget->item(row, 0));
       m_Controls.m_LabelSetTableWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
-      // SelectTableWidgetItem(m_Controls.m_LabelSetTableWidget->item(i,0));
-      // emit resetView();
-      // GetWorkingImage()->Modified();
       return;
     }
   }
@@ -831,9 +828,12 @@ void QmitkLabelSetWidget::ResetAllTableWidgetItems()
     tableWidget->removeRow(0);
   }
 
-  mitk::LabelSetImage *workingImage = GetWorkingImage();
-  if (!workingImage)
+  mitk::DataNode * workingNode = GetWorkingNode();
+  auto workingImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+  if (nullptr == workingImage)
+  {
     return;
+  }
 
   // add all labels
   m_LabelStringList.clear();
@@ -860,6 +860,8 @@ void QmitkLabelSetWidget::ResetAllTableWidgetItems()
   m_Controls.m_lblCaption->setText(captionText.str().c_str());
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+  emit LabelSetWidgetReset();
 }
 
 int QmitkLabelSetWidget::GetPixelValueOfSelectedItem()

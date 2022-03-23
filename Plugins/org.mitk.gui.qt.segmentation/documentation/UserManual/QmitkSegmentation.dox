@@ -153,12 +153,6 @@ The Live Wire Tool acts as a magnetic lasso with a contour snapping to edges of 
 
 The contour will be transferred to its binary image representation by deactivating the tool.
 
-\subsection org_mitk_views_segmentationUserManual2DFastMarchingTool 2D Fast Marching Tool
-
-\imageMacro{QmitkSegmentation_IMG2DFastMarchingUsage.png,"2D Fast Marching Tool",3.01}
-
-Provides a fast marching based 2D interaction segmentation tool. You start with setting seed points in an image slice. Via several sliders you can adapt parameters and see the fast marching result instantly.
-
 \subsection org_mitk_views_segmentationUserManualManualKringeling5 2D and 3D Interpolation
 
 Creating segmentations using 2D manual contouring for large image volumes may be very time-consuming, because structures of interest may cover a large range of slices.
@@ -226,13 +220,6 @@ then be divided into different regions. The more regions you define the longer t
 
 \imageMacro{QmitkSegmentation_3DOtsuTool.png,"3D Otsu tool",10.00}
 
-\subsection org_mitk_views_segmentationUserManual3DFMTool 3D Fast Marching Tool
-
-The 3D Fast Marching tool works similar to the 2D pendant but on the whole image. Depending on your image size the calculation might take some time.
-You can interactively set the parameters of the algorithm via the GUI. The resulting segmentation will be automatically updated.
-
-\imageMacro{QmitkSegmentation_3DFMTool.png,"3D Fast Marching tool",10.00}
-
 \subsection org_mitk_views_segmentationUserManual3DRGTool 3D Region Growing Tool
 
 The 3D Region Growing tool works similar to the 2D pendant. At the beginning you have to place a seedpoint and define a threshold interval. If you press
@@ -240,19 +227,53 @@ The 3D Region Growing tool works similar to the 2D pendant. At the beginning you
 
 \imageMacro{QmitkSegmentation_3DRGTool.png,"3D Region Growing tool",10.00}
 
-\subsection org_mitk_views_segmentationUserManual3DWatershedTool 3D Watershed Tool
-
-This tool provides a watershed based segmentation algorithm. For a detailed explanation of the parameters level and threshold, please be referred to https://itk.org/Doxygen/html/classitk_1_1WatershedImageFilter.html .
-Remark: The tool is (due to its implementation) faster if you use lower levels. So in doubt you should start with high levels (supposed to undersegment) and then lower the levels until you are happy.
-
-\imageMacro{QmitkSegmentation_3DWatershedTool.png,"3D Watershed tool",10.00}
-
 \subsection org_mitk_views_segmentationUserManualPickingTool Picking Tool
 
 The Picking tool allows you to select islands within your segmentation. This is especially useful if e.g. a thresholding provided you with several areas within
 your image but you are just interested in one special region.
 
 \imageMacro{QmitkSegmentation_PickingTool.png,"Picking tool",10.00}
+
+\subsection org_mitk_views_segmentationUserManualnnUNetTool nnU-Net Tool (Ubuntu only)
+
+\imageMacro{QmitkSegmentation_nnUnetTool.png,"nnUNet tool",10.00}
+
+This tool provides a GUI to the deep learning-based segmentation algorithm called the nnUNet. With this tool, you can get a segmentation mask predicted for the loaded image in MITK. Be ready with the pre-trained weights (a.k.a <b>RESULTS_FOLDER</b>)
+for your organ or task concerned, before using the tool. For a detailed explanation of the parameters and pre-trained weights folder structure etc., please refer to https://github.com/MIC-DKFZ/nnUNet. <br>
+Remark: The tool assumes that you have a Python3 environment with nnUNet (pip) installed. Your machine should be also equipped with a CUDA enabled GPU.
+
+\subsubsection org_mitk_views_segmentationUserManualnnUNetToolWorkflow Workflow:
+    -# Click on the "nnUNet Results Folder" directory icon and navigate to the results folder on your hard disk. This is equivalent to setting the <b>RESULTS_FOLDER</b> environment variable. If your results folder is as 
+    per the nnUNet required folder structure, the configuration, trainers, tasks and folds are automatically parsed and correspondingly loaded in the drop-down boxes as shown below. 
+    \imageMacro{QmitkSegmentation_nnUNet_Settings.png,"nnUNet Segmentation Settings",10}
+    -# Choose your required configuration-task-trainer-fold parameters, sequentially. By default, all entries are selected inside the "Fold" dropdown (shown: "All").
+    Note that, even if you uncheck all entries from the "Fold" dropdown (shown: "None"), then too,  all folds would be considered for inferencing.
+    -# For ensemble predictions, you will get the option to select parameters irrespective on postprocessing files available in the ensembles folder of <b>RESULTS_FOLDER</b>.
+    Note that, if a postprocessing json file exists for the selected combination then it will used for ensembling, by default. To choose not to, uncheck the "Use PostProcessing JSON" in the "Advanced" section.
+    \imageMacro{QmitkSegmentation_nnUNet_ensemble.png,"nnUNet Segmentation Settings",10}
+    -# If your task requires multi-modal inputs, then check the "Multi-Modal" checkbox and enter the no.of modalities additionally required for inferencing, in the "No. of Extra Modalities" spinbox.
+    Instantly, as much node selectors should appear below to select other image nodes from the Data Manager along including a selector with preselected with the reference node. 
+    Certain pre-trained configurations are trained in a particular modal order. Please be aware of the order beforehand & select the image nodes in the node selectors accordingly for accurate inferencing.
+    \imageMacro{QmitkSegmentation_nnUNet_multimodal.png,"nnUNet Multi Modal Settings",10.00}
+    -# Select the "Python Path" drop-down to see if MITK has automatically detected other Python environments. 
+    Click on a fitting environment for the nnUNet inference or click "Select" in the dropdown to choose an unlisted python environment. Note that, while selecting an arbitrary environment folder, only select the base folder.
+    No need to select all the way until "../myenv/bin/python", for example.
+    -# Click on "Preview".
+    -# In the "Advanced" section, you can also activate other options like "Mixed Precision" and "Enable Mirroring" (for test time data augmentation) pertaining to nnUNet.
+    \imageMacro{QmitkSegmentation_nnUNet_Advanced.png,"nnUNet Advanced Settings",10.00}
+    -# Use "GPU Id" to change the preferred GPU for inferencing. This is equivalent to setting the <b>CUDA_VISIBLE_DEVICES</b> environment variable.
+    -# Every inferred segmentation is cached to prevent a redundant computation. In case, a user doesn't wish to cache a Preview, uncheck the "Enable Caching" in the "Advanced" section. This will ensure that the
+    current parameters will neither be checked against the existing cache nor a segmentation be loaded from it.
+    -# You may always clear all the cached segmentations by clicking "Clear Cache" button.
+
+\subsubsection org_mitk_views_segmentationUserManualnnUNetToolMisc Miscellaneous:
+    -# In case you want to reload/reparse the folders in the "nnUNet Results Folder", eg. after adding new tasks into it, you may do so without reselecting the folder again by clicking the "Refresh Results Folder" button.
+    -# If you have a nnUNet code-base yet to be pip-installed into any environment (eg. developer modified nnUNet forks), click checkbox "No pip". 
+    Once the checkbox is checked a new directory selector appears in the section. You may click and navigate to your nnUNet fork folder to select the code from which you want inference.
+    \imageMacro{QmitkSegmentation_nnUNet_nopip.png,"nnUNet Advanced Settings with option to select nnUNet local folder",10.00}
+    -# The "Advanced" > "GPU Id" combobox lists the Nvidia GPUs available by parsing the <tt>nvidia-smi</tt> utility output. In case your machine has Nvidia CUDA enabled GPUs but the <tt>nvidia-smi</tt> fails for some reason, the "GPU Id" combobox will show no entries.
+    In such a situation, it's still possible to execute inferencing by manually entering the preferred GPU Id, eg. 0 in the combobox.
+
 
 \section org_mitk_views_segmentationUserManualPostprocessing Additional things you can do with segmentations
 

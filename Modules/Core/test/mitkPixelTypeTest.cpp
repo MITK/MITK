@@ -82,7 +82,7 @@ public:
     MITK_INFO << "m_Ptype = mitk::MakePixelType<int, int, 5>();";
     MITK_INFO
       << "m_ItkPtype = mitk::MakePixelType<ItkImageType>();\n with  itk::Image<itk::FixedArray< int, 5>, 3> ItkImageType";
-    CPPUNIT_ASSERT_MESSAGE("GetComponentType()", ptype.GetComponentType() == itk::ImageIOBase::INT);
+    CPPUNIT_ASSERT_MESSAGE("GetComponentType()", ptype.GetComponentType() == itk::IOComponentEnum::INT);
   }
 
   void GetPixelTypeAsString_Success()
@@ -132,7 +132,7 @@ public:
   {
     mitk::PixelType ptype = mitk::MakePixelType<int, int, 5>();
     mitk::PixelType ptype2(ptype);
-    CPPUNIT_ASSERT_MESSAGE("ptype2( ptype)- GetComponentType()", ptype2.GetComponentType() == itk::ImageIOBase::INT);
+    CPPUNIT_ASSERT_MESSAGE("ptype2( ptype)- GetComponentType()", ptype2.GetComponentType() == itk::IOComponentEnum::INT);
     CPPUNIT_ASSERT_MESSAGE("ptype2( ptype)-GetPixelType(", ptype2.GetPixelType() == ptype.GetPixelType());
     CPPUNIT_ASSERT_MESSAGE("ptype2( ptype)-GetComponentType(", ptype2.GetComponentType() == ptype.GetComponentType());
     CPPUNIT_ASSERT_MESSAGE("ptype2( ptype)-GetBpe()", ptype2.GetBpe() == 8 * sizeof(int) * 5);
@@ -144,7 +144,7 @@ public:
   {
     mitk::PixelType ptype = mitk::MakePixelType<int, int, 5>();
     mitk::PixelType ptype2 = ptype;
-    CPPUNIT_ASSERT_MESSAGE("ptype2 = ptype- GetComponentType()", ptype2.GetComponentType() == itk::ImageIOBase::INT);
+    CPPUNIT_ASSERT_MESSAGE("ptype2 = ptype- GetComponentType()", ptype2.GetComponentType() == itk::IOComponentEnum::INT);
     CPPUNIT_ASSERT_MESSAGE("ptype2 = ptype- GetPixelType(", ptype2.GetPixelType() == ptype.GetPixelType());
     CPPUNIT_ASSERT_MESSAGE("ptype2( ptype)-GetComponentType(", ptype2.GetComponentType() == ptype.GetComponentType());
     CPPUNIT_ASSERT_MESSAGE("ptype2 = ptype- GetBpe()", ptype2.GetBpe() == 8 * sizeof(int) * 5);
@@ -170,7 +170,7 @@ public:
   {
     // test instantiation
     mitk::PixelType obscurePixelType = mitk::MakePixelType<MyObscureImageType>();
-    CPPUNIT_ASSERT_MESSAGE("PixelTypeId is 'UNKNOWN' ", obscurePixelType.GetPixelType() == itk::ImageIOBase::UNKNOWNPIXELTYPE);
+    CPPUNIT_ASSERT_MESSAGE("PixelTypeId is 'UNKNOWN' ", obscurePixelType.GetPixelType() == itk::IOPixelEnum::UNKNOWNPIXELTYPE);
   }
 
   void SetLengthCorrectly_Success()

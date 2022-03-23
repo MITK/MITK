@@ -103,7 +103,7 @@ void mitk::SetRegionTool::OnMousePressed(StateMachineAction *, InteractionEvent 
   mitk::Image::Pointer resultImage = mitk::GrabItkImageMemory(fillHolesFilter->GetOutput());
   resultImage->SetGeometry(workingSlice->GetGeometry());
   // Get the current working color
-  DataNode *workingNode(m_ToolManager->GetWorkingData(0));
+  DataNode *workingNode(this->GetToolManager()->GetWorkingData(0));
   if (!workingNode)
     return;
 

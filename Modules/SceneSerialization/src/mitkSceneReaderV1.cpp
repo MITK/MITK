@@ -70,7 +70,12 @@ namespace
     float value = 0.0f;
 
     if (properties->GetFloatProperty("ProportionalTimeGeometry.FirstTimePoint", value))
+    {
+      if (value == -std::numeric_limits<float>::infinity())
+        value = std::numeric_limits<float>::lowest();
+
       geometry->SetFirstTimePoint(value);
+    }
 
     if (properties->GetFloatProperty("ProportionalTimeGeometry.StepDuration", value))
       geometry->SetStepDuration(value);

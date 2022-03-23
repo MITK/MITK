@@ -34,7 +34,6 @@ mitk::IGTLMessageSource::IGTLMessageSource()
   : itk::ProcessObject(), m_Name("IGTLMessageSource (no defined type)"),
     m_Type("NONE"), m_StreamingFPS(0)
 {
-  m_StreamingFPSMutex = itk::FastMutexLock::New();
 }
 
 mitk::IGTLMessageSource::~IGTLMessageSource()
@@ -182,17 +181,17 @@ mitk::PropertyList::ConstPointer mitk::IGTLMessageSource::GetParameters() const
 
 void mitk::IGTLMessageSource::SetFPS(unsigned int fps)
 {
-  this->m_StreamingFPSMutex->Lock();
+  this->m_StreamingFPSMutex.lock();
   this->m_StreamingFPS = fps;
-  this->m_StreamingFPSMutex->Unlock();
+  this->m_StreamingFPSMutex.unlock();
 }
 
 
 unsigned int mitk::IGTLMessageSource::GetFPS()
 {
   unsigned int fps = 0;
-  this->m_StreamingFPSMutex->Lock();
+  this->m_StreamingFPSMutex.lock();
   fps = this->m_StreamingFPS;
-  this->m_StreamingFPSMutex->Unlock();
+  this->m_StreamingFPSMutex.unlock();
   return fps;
 }

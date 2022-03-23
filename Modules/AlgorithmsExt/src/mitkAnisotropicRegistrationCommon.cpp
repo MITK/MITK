@@ -20,7 +20,7 @@ mitk::AnisotropicRegistrationCommon::WeightMatrix mitk::AnisotropicRegistrationC
   WeightMatrix returnValue;
 
   WeightMatrix sum = sigma_X + sigma_Y;
-  vnl_svd<double> svd(sum.GetVnlMatrix());
+  vnl_svd<double> svd(sum.GetVnlMatrix().as_ref());
 
   WeightMatrix diag;
   diag.Fill(0.0);

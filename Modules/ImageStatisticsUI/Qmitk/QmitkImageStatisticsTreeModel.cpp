@@ -13,7 +13,6 @@ found in the LICENSE file.
 #include "QmitkImageStatisticsTreeModel.h"
 
 #include "QmitkImageStatisticsTreeItem.h"
-#include "itkMutexLockHolder.h"
 #include "mitkImageStatisticsContainerManager.h"
 #include "mitkProportionalTimeGeometry.h"
 #include "mitkStatisticsToImageRelationRule.h"
@@ -282,7 +281,7 @@ void QmitkImageStatisticsTreeModel::UpdateByDataStorage()
   }
 
   {
-    itk::MutexLockHolder<itk::SimpleFastMutexLock> locked(m_Mutex);
+    std::lock_guard<std::mutex> locked(m_Mutex);
     m_Statistics = newStatistics;
   }
 

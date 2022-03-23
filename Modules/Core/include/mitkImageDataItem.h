@@ -15,10 +15,7 @@ found in the LICENSE file.
 
 #include "mitkCommon.h"
 #include <MitkCoreExports.h>
-//#include <mitkIpPic.h>
-//#include "mitkPixelType.h"
 #include "mitkImageDescriptor.h"
-//#include "mitkImageVtkAccessor.h"
 
 class vtkImageData;
 
@@ -35,9 +32,8 @@ namespace mitk
   //##
   //## ImageDataItem is a container for image data which is used internal in
   //## mitk::Image to handle the communication between the different data types for images
-  //## used in MITK (ipPicDescriptor, mitk::Image, vtkImageData). Common for these image data
+  //## used in MITK (mitk::Image, vtkImageData). Common for these image data
   //## types is the actual image data, but they differ in representation of pixel type etc.
-  //## The class is also used to convert ipPic images to vtkImageData.
   //##
   //## The class is mainly used to extract sub-images inside of mitk::Image, like single slices etc.
   //## It should not be used outside of this.
@@ -88,10 +84,6 @@ namespace mitk
 
     ImageDataItem(const ImageDataItem &other);
 
-    /**
-    \deprecatedSince{2012_09} Please use image accessors instead: See Doxygen/Related-Pages/Concepts/Image. This method
-    can be replaced by ImageWriteAccessor::GetData() or ImageReadAccessor::GetData() */
-    DEPRECATED(void *GetData() const) { return m_Data; }
     bool IsComplete() const { return m_IsComplete; }
     void SetComplete(bool complete) { m_IsComplete = complete; }
     int GetOffset() const { return m_Offset; }
@@ -131,6 +123,13 @@ namespace mitk
     virtual void Modified() const;
 
   protected:
+
+    /**Helper function to allow friend classes to access m_Data without changing their code.
+    * Moved to protected visibility because only friends are allowed to access m_Data directly.
+    * Other classes should used ImageWriteAccessor::GetData() or ImageReadAccessor::GetData()
+    * to get access.*/
+    void* GetData() const { return m_Data; }
+
     unsigned char *m_Data;
 
     PixelType *m_PixelType;

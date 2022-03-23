@@ -25,7 +25,6 @@ set(CPP_FILES
   QmitkLevelWindowWidget.cpp
   QmitkLineEditLevelWindowWidget.cpp
   QmitkMemoryUsageIndicatorView.cpp
-  QmitkMouseModeSwitcher.cpp
   QmitkMimeTypes.cpp
   QmitkMultiWidgetConfigurationToolBar.cpp
   QmitkMultiWidgetLayoutManager.cpp
@@ -87,7 +86,6 @@ set(MOC_H_FILES
   include/QmitkLevelWindowWidget.h
   include/QmitkLineEditLevelWindowWidget.h
   include/QmitkMemoryUsageIndicatorView.h
-  include/QmitkMouseModeSwitcher.h
   include/QmitkMultiWidgetConfigurationToolBar.h
   include/QmitkMultiWidgetLayoutManager.h
   include/QmitkMultiWidgetLayoutSelectionWidget.h

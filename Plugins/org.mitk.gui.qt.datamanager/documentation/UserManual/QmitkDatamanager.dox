@@ -28,7 +28,7 @@ There are several ways of loading data into the Datamanager as so-called <em>dat
 A lot of file-formats can be loaded into MITK, for example:
 
 <ul>
-  <li> 2D-images / 3D-volumes with or without several time steps (*.dcm, *.ima, *.pic, *.nrrd, ...)
+  <li> 2D-images / 3D-volumes with or without several time steps (*.dcm, *.ima, *.nrrd, ...)
   <li> Surfaces (*.stl, *.vtk, ...)
   <li> Point sets (*.mps)
   <li> and many more

@@ -336,12 +336,12 @@ namespace mitk
                              bool verbose,
                              bool checkGeometry = true);
 
-  itkEventMacro(PointSetEvent, itk::AnyEvent);
-  itkEventMacro(PointSetMoveEvent, PointSetEvent);
-  itkEventMacro(PointSetSizeChangeEvent, PointSetEvent);
-  itkEventMacro(PointSetAddEvent, PointSetSizeChangeEvent);
-  itkEventMacro(PointSetRemoveEvent, PointSetSizeChangeEvent);
-  itkEventMacro(PointSetExtendTimeRangeEvent, PointSetEvent);
+  itkEventMacroDeclaration(PointSetEvent, itk::AnyEvent);
+  itkEventMacroDeclaration(PointSetMoveEvent, PointSetEvent);
+  itkEventMacroDeclaration(PointSetSizeChangeEvent, PointSetEvent);
+  itkEventMacroDeclaration(PointSetAddEvent, PointSetSizeChangeEvent);
+  itkEventMacroDeclaration(PointSetRemoveEvent, PointSetSizeChangeEvent);
+  itkEventMacroDeclaration(PointSetExtendTimeRangeEvent, PointSetEvent);
 
 } // namespace mitk
 

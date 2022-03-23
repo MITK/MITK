@@ -13,20 +13,34 @@ found in the LICENSE file.
 #ifndef QMITKSEGMENTATIONVIEW_H
 #define QMITKSEGMENTATIONVIEW_H
 
+#include "ui_QmitkSegmentationViewControls.h"
+
 #include <QmitkAbstractView.h>
-#include <mitkILifecycleAwarePart.h>
 #include <mitkIRenderWindowPartListener.h>
 
 #include <berryIBerryPreferences.h>
 
-#include "ui_QmitkSegmentationControls.h"
-
-class QmitkRenderWindow;
-
 /**
-* @brief
+* @brief The segmentation view provides a set of tool to use different segmentation algorithms.
+*        It provides two selection widgets to load an image node and a segmentation node
+*        on which to perform the segmentation. Creating new segmentation nodes is also possible.
+*        The available segmentation tools are grouped into "2D"- and "3D"-tools.
 *
+*        Most segmentation tools / algorithms need some kind of user interaction, where the
+*        user is asked to draw something in the image display or set some seed points / start values.
+*        The tools also often provide additional propeties so that a user can modify the
+*        algorithm's behavior.
 *
+*        This class additionally provides options to work with different layers (create new layers,
+*        switch between layers).
+*        Moreover, a multilabel widget displays all the existing labels of a multilabel segmentation
+*        for the currently active layer.
+*        The multilabel widget allows to control the labels by creatin new one, removing existing ones,
+*        showing / hiding single labels, merging labels, (re-)naming them etc.
+*
+*        Additionally the view provides an option to create "2D"- and "3D"-interpolations between
+*        neighboring segmentation masks on unsegmented slices.
+*        Interpolation for multilabel segmentations is currently not implemented.
 */
 class QmitkSegmentationView : public QmitkAbstractView, public mitk::IRenderWindowPartListener
 {
@@ -34,100 +48,106 @@ class QmitkSegmentationView : public QmitkAbstractView, public mitk::IRenderWind
 
 public:
 
-  QmitkSegmentationView();
-
-  ~QmitkSegmentationView() override;
-
-  typedef std::map<mitk::DataNode*, unsigned long> NodeTagMapType;
-
-  void NewNodeObjectsGenerated(mitk::ToolManager::DataVectorType*);
-
-  void SetFocus() override;
-
-  void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
-
-  void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
-
-  // BlueBerry's notification about preference changes (e.g. from a dialog)
-  void OnPreferencesChanged(const berry::IBerryPreferences* prefs) override;
-
-  // observer to mitk::RenderingManager's RenderingManagerViewsInitializedEvent event
-  void CheckRenderingState();
-
   static const std::string VIEW_ID;
 
-  protected slots:
+  QmitkSegmentationView();
+  ~QmitkSegmentationView() override;
 
-  void OnPatientSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
+private Q_SLOTS:
+
+  // reaction to the selection of a new reference image in the selection widget
+  void OnReferenceSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
+
+  // reaction to the selection of a new segmentation image in the selection widget
   void OnSegmentationSelectionChanged(QList<mitk::DataNode::Pointer> nodes);
 
+  // reaction to the shortcut ("CTRL+H") for toggling the visibility of the working node
+  void OnVisibilityShortcutActivated();
+
+  // reaction to the shortcut ("CTRL+L") for iterating over all labels
+  void OnLabelToggleShortcutActivated();
+
   // reaction to the button "New segmentation"
-  void CreateNewSegmentation();
+  void OnNewSegmentation();
 
   void OnManualTool2DSelected(int id);
 
-  void OnVisiblePropertyChanged();
-
   void OnShowMarkerNodes(bool);
 
-  void OnTabWidgetChanged(int);
+  void OnLayersChanged();
 
-protected:
+  void OnLabelsChanged();
 
-  // a type for handling lists of DataNodes
-  typedef std::vector<mitk::DataNode*> NodeList;
+  void OnShowLabelTable(bool);
 
-  // GUI setup
+  void OnGoToLabel(const mitk::Point3D &pos);
+
+  void OnLabelSetWidgetReset();
+
+private:
+
   void CreateQtPartControl(QWidget* parent) override;
 
-  // propagate BlueBerry selection to ToolManager for manual segmentation
-  void SetToolManagerSelection(mitk::DataNode* referenceData, mitk::DataNode* workingData);
+  void SetFocus() override {}
 
-  // make sure all images/segmentations look as selected by the users in this view's preferences
-  void ForceDisplayPreferencesUponAllImages();
+  void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
+
+  void OnPreferencesChanged(const berry::IBerryPreferences* prefs) override;
+
+  void NodeAdded(const mitk::DataNode* node) override;
+
+  void NodeRemoved(const mitk::DataNode* node) override;
+
+  void OnEstablishLabelSetConnection();
+
+  void OnLooseLabelSetConnection();
+
+  // make sure all images / segmentations look according to the user preference settings
+  void ApplyDisplayOptions();
 
   // decorates a DataNode according to the user preference settings
   void ApplyDisplayOptions(mitk::DataNode* node);
-
-  void ResetMouseCursor();
-
-  void SetMouseCursor(const us::ModuleResource&, int hotspotX, int hotspotY);
-
-  void SetToolSelectionBoxesEnabled(bool);
 
   // If a contourmarker is selected, the plane in the related widget will be reoriented according to the marker`s geometry
   void OnContourMarkerSelected(const mitk::DataNode* node);
 
   void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes) override;
 
-  void NodeRemoved(const mitk::DataNode* node) override;
+  void ResetMouseCursor();
 
-  void NodeAdded(const mitk::DataNode *node) override;
+  void SetMouseCursor(const us::ModuleResource&, int hotspotX, int hotspotY);
 
-  void UpdateWarningLabel(QString text/*, bool overwriteExistingText = true*/);
+  void UpdateGUI();
 
-  // the Qt parent of our GUI (NOT of this object)
+  void UpdateInterpolatorWidget();
+
+  void ValidateSelectionInput();
+
+  void UpdateWarningLabel(QString text);
+
   QWidget* m_Parent;
 
-  // our GUI
-  Ui::QmitkSegmentationControls* m_Controls;
+  Ui::QmitkSegmentationViewControls* m_Controls;
 
   mitk::IRenderWindowPart* m_RenderWindowPart;
 
-  unsigned long m_VisibilityChangedObserverTag;
+  mitk::ToolManager* m_ToolManager;
 
-  bool m_MouseCursorSet;
+  mitk::DataNode::Pointer m_ReferenceNode;
+  mitk::DataNode::Pointer m_WorkingNode;
 
-  bool m_DataSelectionChanged;
-
-  NodeTagMapType  m_WorkingDataObserverTags;
-
+  typedef std::map<mitk::DataNode*, unsigned long> NodeTagMapType;
+  NodeTagMapType m_WorkingDataObserverTags;
   unsigned int m_RenderingManagerObserverTag;
 
-  mitk::NodePredicateNot::Pointer m_IsNotAHelperObject;
-  mitk::NodePredicateAnd::Pointer m_IsOfTypeImagePredicate;
-  mitk::NodePredicateOr::Pointer m_IsASegmentationImagePredicate;
-  mitk::NodePredicateAnd::Pointer m_IsAPatientImagePredicate;
+  mitk::NodePredicateAnd::Pointer m_ReferencePredicate;
+  mitk::NodePredicateAnd::Pointer m_SegmentationPredicate;
+
+  bool m_DrawOutline;
+  bool m_SelectionMode;
+  bool m_MouseCursorSet;
+
 };
 
 #endif // QMITKSEGMENTATIONVIEW_H

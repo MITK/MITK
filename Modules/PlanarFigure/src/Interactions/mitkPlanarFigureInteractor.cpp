@@ -27,6 +27,20 @@ found in the LICENSE file.
 #include "mitkAbstractTransformGeometry.h"
 #include "mitkPlaneGeometry.h"
 
+namespace mitk
+{
+  itkEventMacroDefinition(PlanarFigureEvent, itk::AnyEvent);
+  itkEventMacroDefinition(StartPlacementPlanarFigureEvent, PlanarFigureEvent);
+  itkEventMacroDefinition(EndPlacementPlanarFigureEvent, PlanarFigureEvent);
+  itkEventMacroDefinition(SelectPlanarFigureEvent, PlanarFigureEvent);
+  itkEventMacroDefinition(StartInteractionPlanarFigureEvent, PlanarFigureEvent);
+  itkEventMacroDefinition(EndInteractionPlanarFigureEvent, PlanarFigureEvent);
+  itkEventMacroDefinition(StartHoverPlanarFigureEvent, PlanarFigureEvent);
+  itkEventMacroDefinition(EndHoverPlanarFigureEvent, PlanarFigureEvent);
+  itkEventMacroDefinition(ContextMenuPlanarFigureEvent, PlanarFigureEvent);
+  itkEventMacroDefinition(PointMovedPlanarFigureEvent, PlanarFigureEvent);
+}
+
 mitk::PlanarFigureInteractor::PlanarFigureInteractor()
   : DataInteractor()
   , m_Precision(6.5)
@@ -142,6 +156,8 @@ void mitk::PlanarFigureInteractor::MoveCurrentPoint(StateMachineAction *, Intera
 
   // Update rendered scene
   RenderingManager::GetInstance()->RequestUpdateAll();
+
+  planarFigure->InvokeEvent(PointMovedPlanarFigureEvent());
 }
 
 void mitk::PlanarFigureInteractor::FinalizeFigure(StateMachineAction *, InteractionEvent *)

@@ -29,33 +29,35 @@ void mitk::SegmentationInteractor::ConnectActionsAndFunctions()
 bool mitk::SegmentationInteractor::ChangeActiveLabel(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   BaseRenderer::Pointer sender = interactionEvent->GetSender();
-  auto *positionEvent = static_cast<InteractionPositionEvent *>(interactionEvent);
+  auto positionEvent = static_cast<InteractionPositionEvent*>(interactionEvent);
 
-  // MLI TODO
-  // m_LastDisplayCoordinate = m_CurrentDisplayCoordinate;
-  // m_CurrentDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
-
-  auto *toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager(
+  auto toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager(
     mitk::ToolManagerProvider::MULTILABEL_SEGMENTATION);
 
   assert(toolManager);
 
   DataNode *workingNode(toolManager->GetWorkingData(0));
-  if (workingNode)
+  if (workingNode && positionEvent)
   {
-    auto *workingImage = dynamic_cast<mitk::LabelSetImage *>(workingNode->GetData());
-    assert(workingImage);
+    //TODO T28561
+    //Code uses a deprecated method. deactivated whole code until the refactorization is done.
+    throw "TODO T28561. Was forgot to refactor in context of T28524. The new MultiLabelSegmentation class will have a dedicated function for querying the label of world position.";
 
-    const auto timestep = positionEvent->GetSender()->GetTimeStep(workingImage);
-    int pixelValue = static_cast<int>(workingImage->GetPixelValueByWorldCoordinate(positionEvent->GetPositionInWorld(), timestep));
+    //auto *workingImage = dynamic_cast<mitk::LabelSetImage *>(workingNode->GetData());
+    //assert(workingImage);
 
-    workingImage->GetActiveLabelSet()->SetActiveLabel(pixelValue); // can be the background
+    //const auto timestep = positionEvent->GetSender()->GetTimeStep(workingImage);
 
-    // Call Events
-    // workingImage->ActiveLabelEvent.Send(pixelValue);
+   //int pixelValue = static_cast<int>(workingImage->GetPixelValueByWorldCoordinate(positionEvent->GetPositionInWorld(), timestep));
+    //workingImage->GetActiveLabelSet()->SetActiveLabel(pixelValue); // can be the background
 
-    // MLI TODO
-    // toolManager->WorkingDataModified.Send();
+    // // Call Events
+    // // workingImage->ActiveLabelEvent.Send(pixelValue);
+
+    // // MLI TODO
+    // // toolManager->WorkingDataModified.Send();
+
+    //TODO END Refactor with T28524
   }
 
   RenderingManager::GetInstance()->RequestUpdateAll();

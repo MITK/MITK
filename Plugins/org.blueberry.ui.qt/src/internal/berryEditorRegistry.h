@@ -119,9 +119,7 @@ private: EditorRegistry* editorRegistry;
    public: QList<FileEditorMapping::Pointer> UserMappings();
    };
 
- struct CmpFileEditorMapping : public std::binary_function<FileEditorMapping::Pointer,
-                                                     FileEditorMapping::Pointer,
-                                                     bool>
+ struct CmpFileEditorMapping
  {
    bool operator()(const FileEditorMapping::Pointer& x, const FileEditorMapping::Pointer& y) const
    {
@@ -129,9 +127,7 @@ private: EditorRegistry* editorRegistry;
    }
  };
 
- struct CmpIEditorDescriptor : public std::binary_function<IEditorDescriptor::Pointer,
-                                                      IEditorDescriptor::Pointer,
-                                                      bool>
+ struct CmpIEditorDescriptor
   {
     bool operator()(const IEditorDescriptor::Pointer& x, const IEditorDescriptor::Pointer& y) const
     {
@@ -139,9 +135,7 @@ private: EditorRegistry* editorRegistry;
     }
   };
 
- struct CmpEditorDescriptor : public std::binary_function<EditorDescriptor::Pointer,
-                                                       EditorDescriptor::Pointer,
-                                                       bool>
+ struct CmpEditorDescriptor
    {
      bool operator()(const EditorDescriptor::Pointer& x, const EditorDescriptor::Pointer& y) const
      {

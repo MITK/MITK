@@ -26,6 +26,14 @@ found in the LICENSE file.
 #include <vtkPolyData.h>
 #include <vtkRenderWindowInteractor.h>
 
+namespace mitk
+{
+  itkEventMacroDefinition(AffineInteractionEvent, itk::AnyEvent);
+  itkEventMacroDefinition(ScaleEvent, AffineInteractionEvent);
+  itkEventMacroDefinition(RotateEvent, AffineInteractionEvent);
+  itkEventMacroDefinition(TranslateEvent, AffineInteractionEvent);
+}
+
 // Properties to allow the user to interact with the base data
 const char *translationStepSizePropertyName = "AffineBaseDataInteractor3D.Translation Step Size";
 const char *selectedColorPropertyName = "AffineBaseDataInteractor3D.Selected Color";

@@ -192,7 +192,7 @@ namespace mitk
         io->SetFileName(filenames.front().c_str());
         io->ReadImageInformation();
 
-        if (io->GetPixelType() == itk::ImageIOBase::SCALAR || io->GetPixelType() == itk::ImageIOBase::RGB)
+        if (io->GetPixelType() == itk::IOPixelEnum::SCALAR || io->GetPixelType() == itk::IOPixelEnum::RGB)
         {
           LoadDicom(filenames, node, sort, check_4d, correctTilt, callback, preLoadedImageBlock);
         }
@@ -1816,11 +1816,11 @@ namespace mitk
     io->SetFileName(filenames.front().c_str());
     io->ReadImageInformation();
 
-    if (io->GetPixelType() == itk::ImageIOBase::SCALAR)
+    if (io->GetPixelType() == itk::IOPixelEnum::SCALAR)
     {
       return MultiplexLoadDICOMByITKScalar(filenames, correctTilt, tiltInfo, io, command, preLoadedImageBlock);
     }
-    else if (io->GetPixelType() == itk::ImageIOBase::RGB)
+    else if (io->GetPixelType() == itk::IOPixelEnum::RGB)
     {
       return MultiplexLoadDICOMByITKRGBPixel(filenames, correctTilt, tiltInfo, io, command, preLoadedImageBlock);
     }
@@ -1842,12 +1842,12 @@ namespace mitk
     io->SetFileName(imageBlocks.front().front().c_str());
     io->ReadImageInformation();
 
-    if (io->GetPixelType() == itk::ImageIOBase::SCALAR)
+    if (io->GetPixelType() == itk::IOPixelEnum::SCALAR)
     {
       return MultiplexLoadDICOMByITK4DScalar(
         imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command, preLoadedImageBlock);
     }
-    else if (io->GetPixelType() == itk::ImageIOBase::RGB)
+    else if (io->GetPixelType() == itk::IOPixelEnum::RGB)
     {
       return MultiplexLoadDICOMByITK4DRGBPixel(
         imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command, preLoadedImageBlock);

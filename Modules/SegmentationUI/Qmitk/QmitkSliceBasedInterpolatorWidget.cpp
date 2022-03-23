@@ -265,7 +265,7 @@ void QmitkSliceBasedInterpolatorWidget::Interpolate(mitk::PlaneGeometry *plane,
   }
   const auto timeStep = m_WorkingImage->GetTimeGeometry()->TimePointToTimeStep(timePoint);
 
-  // calculate real slice position, i.e. slice of the image and not slice of the TimeSlicedGeometry
+  // calculate real slice position, i.e. slice of the image
   // see if timestep is needed here
   mitk::SegTool2D::DetermineAffectedImageSlice(m_WorkingImage, plane, clickedSliceDimension, clickedSliceIndex);
 

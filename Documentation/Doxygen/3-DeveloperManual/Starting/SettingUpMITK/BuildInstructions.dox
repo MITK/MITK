@@ -32,14 +32,14 @@ You need:
 To build MITK on Linux, install the following packages, e. g. with APT:
 
 \code{.unparsed}
-sudo apt install build-essential doxygen git graphviz libfreetype6-dev libglu1-mesa-dev libssl-dev libtiff5-dev libwrap0-dev libxcomposite1 libxcursor1 libxi-dev libxkbcommon-x11-0 libxt-dev mesa-common-dev
+sudo apt install build-essential doxygen git graphviz libfreetype6-dev libglu1-mesa-dev libssl-dev libtiff5-dev libwrap0-dev libxcomposite1 libxcursor1 libxdamage-dev libxi-dev libxkbcommon-x11-0 libxt-dev mesa-common-dev
 \endcode
 
 For the optional and experimental (!) Python integration, install NumPy and SimpleITK v1.x, e. g.:
 
 \code{.unparsed}
 sudo apt install python3-numpy python3-pip
-pip3 install SimpleITK==1.*
+pip3 install SimpleITK
 \endcode
 
 \section BuildInstructions_Qt A note about Qt
@@ -175,7 +175,7 @@ cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
 
 project(MyProject)
 
-find_package(MITK 2021.02 REQUIRED)
+find_package(MITK 2021.10 REQUIRED)
 
 add_executable(MyApp main.cpp)
 

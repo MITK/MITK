@@ -22,6 +22,7 @@ found in the LICENSE file.
 #include "mitkProperties.h"
 #include "mitkVtkResliceInterpolationProperty.h"
 #include <mitkDICOMSegmentationPropertyHelper.cpp>
+#include <mitkToolManager.h>
 
 // us
 #include <usGetModuleContext.h>
@@ -30,8 +31,13 @@ found in the LICENSE file.
 // itk
 #include <itkObjectFactory.h>
 
+namespace mitk
+{
+  itkEventMacroDefinition(ToolEvent, itk::ModifiedEvent);
+}
+
 mitk::Tool::Tool(const char *type, const us::Module *interactorModule)
-  : m_EventConfig("DisplayConfigMITK.xml"),
+  : m_EventConfig(""),
     m_ToolManager(nullptr),
     m_PredicateImages(NodePredicateDataType::New("Image")), // for reference images
     m_PredicateDim3(NodePredicateDimension::New(3, 1)),
@@ -118,6 +124,20 @@ void mitk::Tool::SetToolManager(ToolManager *manager)
   m_ToolManager = manager;
 }
 
+mitk::ToolManager* mitk::Tool::GetToolManager() const
+{
+  return m_ToolManager;
+}
+
+mitk::DataStorage* mitk::Tool::GetDataStorage() const
+{
+  if (nullptr != m_ToolManager)
+  {
+    return m_ToolManager->GetDataStorage();
+  }
+  return nullptr;
+}
+
 void mitk::Tool::Activated()
 {
   // As a legacy solution the display interaction of the new interaction framework is disabled here to avoid conflicts
@@ -135,7 +155,7 @@ void mitk::Tool::Activated()
       // remember the original configuration
       m_DisplayInteractorConfigs.insert(std::make_pair(*it, displayInteractor->GetEventConfig()));
       // here the alternative configuration is loaded
-      displayInteractor->SetEventConfig(m_EventConfig.c_str());
+      displayInteractor->AddEventConfig(m_EventConfig.c_str());
     }
 
     auto displayActionEventBroadcast = dynamic_cast<DisplayActionEventBroadcast*>(us::GetModuleContext()->GetService<InteractionEventObserver>(*it));
@@ -144,7 +164,7 @@ void mitk::Tool::Activated()
       // remember the original configuration
       m_DisplayInteractorConfigs.insert(std::make_pair(*it, displayActionEventBroadcast->GetEventConfig()));
       // here the alternative configuration is loaded
-      displayActionEventBroadcast->SetEventConfig(m_EventConfig.c_str());
+      displayActionEventBroadcast->AddEventConfig(m_EventConfig.c_str());
     }
   }
 }

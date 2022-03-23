@@ -36,26 +36,18 @@ namespace mitk
 
       \param slice
       \param contourIn3D
-      \param correctionForIpSegmentation adds 0.5 to x and y index coordinates (difference between ipSegmentation and
-      MITK contours)
-      \param constrainToInside
     */
     static ContourModel::Pointer ProjectContourTo2DSlice(const Image *slice,
-                                                         const ContourModel *contourIn3D,
-                                                         bool correctionForIpSegmentation,
-                                                         bool constrainToInside);
+                                                         const ContourModel *contourIn3D);
 
     /**
       \brief Projects a slice index coordinates of a contour back into world coordinates.
 
       \param sliceGeometry
       \param contourIn2D
-      \param correctionForIpSegmentation subtracts 0.5 to x and y index coordinates (difference between ipSegmentation
-      and MITK contours)
     */
     static ContourModel::Pointer BackProjectContourFrom2DSlice(const BaseGeometry *sliceGeometry,
-                                                               const ContourModel *contourIn2D,
-                                                               bool correctionForIpSegmentation = false);
+                                                               const ContourModel *contourIn2D);
 
     /**
     \brief Fill a contour in a 2D slice with a specified pixel value.
@@ -82,7 +74,14 @@ namespace mitk
                                    int paintingPixelValue = 1);
 
     /**
-    \brief Fills a image (filledImage) into another image (resultImage) by incorporating the rules of LabelSet-Images
+    \brief Fills the paintingPixelValue into every pixel of resultImage as indicated by filledImage.
+    If a LableSet image is specified it also by incorporating the rules of LabelSet images when filling the content.
+    \param filledImage Pointer to the image content that should be checked to decied of a pixel in resultImage should
+    be filled with paintingPixelValue or not.
+    \param resultImage Pointer to the image content that should be overwritten guided by the content of filledImage.
+    \param image Pointer to an mitk image that allows to define the LabelSet image which states steer the filling process.
+    If an LabelSet instance is passed its states (e.g. locked labels etc...) will be used. If nullptr or an normal image
+    is passed, then simply any pixel position indicated by filledImage will be overwritten.
     \param paintingPixelValue the pixelvalue/label that should be used in the result image when filling.
     \param fillForegroundThreshold The threshold value that decides if a pixel in the filled image counts
     as foreground (>=fillForegroundThreshold) or not.

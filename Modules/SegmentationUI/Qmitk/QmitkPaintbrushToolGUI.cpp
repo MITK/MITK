@@ -12,8 +12,6 @@ found in the LICENSE file.
 
 #include "QmitkPaintbrushToolGUI.h"
 
-#include "QmitkNewSegmentationDialog.h"
-
 #include <qlabel.h>
 #include <qlayout.h>
 #include <qpainter.h>

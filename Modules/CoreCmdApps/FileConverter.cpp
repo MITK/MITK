@@ -93,16 +93,20 @@ int main(int argc, char* argv[])
   std::string extension = itksys::SystemTools::GetFilenameExtension(outputFilename);
   std::string filename = itksys::SystemTools::GetFilenameWithoutExtension(outputFilename);
   std::string path = itksys::SystemTools::GetFilenamePath(outputFilename);
+  if (!path.empty())
+  {
+    path = path + mitk::IOUtil::GetDirectorySeparator();
+  }
 
   auto nodes = mitk::IOUtil::Load(inputFilename, &functor);
 
   unsigned count = 0;
   for (auto node : nodes)
   {
-    std::string writeName = path + "/" + filename + extension;
+    std::string writeName = path + filename + extension;
     if (count > 0)
     {
-      writeName = path + "/" + filename + "_" + std::to_string(count) + extension;
+      writeName = path + filename + "_" + std::to_string(count) + extension;
     }
     mitk::IOUtil::Save(node, writeName);
     ++count;

@@ -36,7 +36,7 @@ found in the LICENSE file.
 
 #include <vtkLookupTable.h>
 
-#include <itkExceptionObject.h>
+#include <itkMacro.h>
 #include <itkGradientMagnitudeRecursiveGaussianImageFilter.h>
 #include <itkWatershedImageFilter.h>
 

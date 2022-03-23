@@ -51,20 +51,20 @@ namespace mitk
   class MITKCORE_EXPORT PixelType
   {
   public:
-    typedef itk::ImageIOBase::IOPixelType ItkIOPixelType;
-    typedef itk::ImageIOBase::IOComponentType ItkIOComponentType;
+    typedef itk::IOPixelEnum ItkIOPixelType;
+    typedef itk::IOComponentEnum ItkIOComponentType;
 
     PixelType(const mitk::PixelType &aPixelType);
     PixelType &operator=(const PixelType &other);
 
-    itk::ImageIOBase::IOPixelType GetPixelType() const;
+    ItkIOPixelType GetPixelType() const;
 
     /**
      * \brief Get the \a component type (the scalar (!) type). Each element
      * may contain m_NumberOfComponents (more than one) of these scalars.
      *
      */
-    int GetComponentType() const;
+    ItkIOComponentType GetComponentType() const;
 
     /**
      * \brief Returns a string containing the ITK pixel type name.
@@ -130,8 +130,8 @@ namespace mitk
     template <typename ItkImageType>
     friend PixelType MakePixelType(size_t);
 
-    PixelType(const int componentType,
-              const ItkIOPixelType pixelType,
+    PixelType(ItkIOComponentType componentType,
+              ItkIOPixelType pixelType,
               std::size_t bytesPerComponent,
               std::size_t numOfComponents,
               const std::string &componentTypeName,
@@ -143,7 +143,7 @@ namespace mitk
     /** \brief the \a type_info of the scalar (!) component type. Each element
       may contain m_NumberOfComponents (more than one) of these scalars.
     */
-    int m_ComponentType;
+    ItkIOComponentType m_ComponentType;
 
     ItkIOPixelType m_PixelType;
 

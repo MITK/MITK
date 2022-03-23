@@ -56,7 +56,10 @@ set(CPP_FILES
   Models/mitkValueBasedParameterizationDelegate.cpp
   Models/mitkT2DecayModel.cpp
   Models/mitkT2DecayModelFactory.cpp
-  Models/mitkT2DecayModelParameterizer.cpp  
+  Models/mitkT2DecayModelParameterizer.cpp
+  Models/mitkExpDecayOffsetModel.cpp
+  Models/mitkExpDecayOffsetModelFactory.cpp
+  Models/mitkExpDecayOffsetModelParameterizer.cpp
   TestingHelper/mitkTestModel.cpp
   TestingHelper/mitkTestModelFactory.cpp
 )

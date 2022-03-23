@@ -24,6 +24,8 @@ Qmitk/QmitkToolGUI.cpp
 Qmitk/QmitkToolGUIArea.cpp
 Qmitk/QmitkToolSelectionBox.cpp
 Qmitk/QmitkWatershedToolGUI.cpp
+Qmitk/QmitknnUNetToolGUI.cpp
+Qmitk/QmitknnUNetToolSlots.cpp
 #Added from ML
 Qmitk/QmitkLabelSetWidget.cpp
 Qmitk/QmitkSurfaceStampWidget.cpp
@@ -60,6 +62,10 @@ Qmitk/QmitkToolGUI.h
 Qmitk/QmitkToolGUIArea.h
 Qmitk/QmitkToolSelectionBox.h
 Qmitk/QmitkWatershedToolGUI.h
+Qmitk/QmitknnUNetToolGUI.h
+Qmitk/QmitknnUNetGPU.h
+Qmitk/QmitknnUNetEnsembleLayout.h
+Qmitk/QmitknnUNetFolderParser.h
 #Added from ML
 Qmitk/QmitkLabelSetWidget.h
 Qmitk/QmitkSurfaceStampWidget.h
@@ -74,7 +80,6 @@ set(UI_FILES
 Qmitk/QmitkAdaptiveRegionGrowingToolGUIControls.ui
 Qmitk/QmitkConfirmSegmentationDialog.ui
 Qmitk/QmitkOtsuToolWidgetControls.ui
-Qmitk/QmitkPickingToolGUIControls.ui
 Qmitk/QmitkLiveWireTool2DGUIControls.ui
 Qmitk/QmitkWatershedToolGUIControls.ui
 #Added from ML
@@ -84,6 +89,7 @@ Qmitk/QmitkMaskStampWidgetGUIControls.ui
 Qmitk/QmitkSliceBasedInterpolatorWidgetGUIControls.ui
 Qmitk/QmitkSurfaceBasedInterpolatorWidgetGUIControls.ui
 Qmitk/QmitkSearchLabelDialogGUI.ui
+Qmitk/QmitknnUNetToolGUIControls.ui
 )
 
 set(QRC_FILES

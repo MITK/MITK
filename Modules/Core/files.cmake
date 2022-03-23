@@ -52,6 +52,7 @@ set(CPP_FILES
   Controllers/mitkUndoController.cpp
   Controllers/mitkVerboseLimitedLinearUndo.cpp
   Controllers/mitkVtkLayerController.cpp
+
   DataManagement/mitkAnatomicalStructureColorPresets.cpp
   DataManagement/mitkArbitraryTimeGeometry.cpp
   DataManagement/mitkAbstractTransformGeometry.cpp
@@ -209,7 +210,6 @@ set(CPP_FILES
   Interactions/mitkInteractionSchemeSwitcher.cpp
   Interactions/mitkInternalEvent.cpp
   Interactions/mitkMouseDoubleClickEvent.cpp
-  Interactions/mitkMouseModeSwitcher.cpp
   Interactions/mitkMouseMoveEvent.cpp
   Interactions/mitkMousePressEvent.cpp
   Interactions/mitkMouseReleaseEvent.cpp
@@ -268,6 +268,7 @@ set(CPP_FILES
   IO/mitkSurfaceVtkIO.cpp
   IO/mitkSurfaceVtkLegacyIO.cpp
   IO/mitkSurfaceVtkXmlIO.cpp
+  IO/mitkUtf8Util.cpp
   IO/mitkVtkLoggingAdapter.cpp
   IO/mitkPreferenceListReaderOptionsFunctor.cpp
   IO/mitkIOMetaInformationPropertyConstants.cpp
@@ -305,17 +306,18 @@ set(RESOURCE_FILES
 Interactions/globalConfig.xml
 Interactions/DisplayInteraction.xml
 Interactions/DisplayConfig.xml
-Interactions/DisplayConfigPACS.xml
+Interactions/DisplayConfigMITKBase.xml
+Interactions/DisplayConfigPACSBase.xml
+Interactions/DisplayConfigCrosshair.xml
+Interactions/DisplayConfigRotation.xml
+Interactions/DisplayConfigActivateCoupling.xml
+Interactions/DisplayConfigSwivel.xml
 Interactions/DisplayConfigPACSPan.xml
 Interactions/DisplayConfigPACSScroll.xml
 Interactions/DisplayConfigPACSZoom.xml
 Interactions/DisplayConfigPACSLevelWindow.xml
-Interactions/DisplayConfigMITK.xml
-Interactions/DisplayConfigMITKNoCrosshair.xml
-Interactions/DisplayConfigMITKRotation.xml
-Interactions/DisplayConfigMITKRotationUnCoupled.xml
-Interactions/DisplayConfigMITKSwivel.xml
 Interactions/DisplayConfigMITKLimited.xml
+Interactions/DisplayConfigBlockLMB.xml
 Interactions/PointSet.xml
 Interactions/Legacy/StateMachine.xml
 Interactions/Legacy/DisplayConfigMITKTools.xml

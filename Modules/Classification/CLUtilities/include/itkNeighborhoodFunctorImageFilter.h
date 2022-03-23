@@ -101,6 +101,7 @@ protected:
 
     NeighborhoodFunctorImageFilter()
     {
+        this->DynamicMultiThreadingOff();
         m_Size.Fill(0);
         m_MaskImage = nullptr;
         m_BoundsCondition = static_cast< ImageBoundaryConditionPointerType >( &m_DefaultBoundaryCondition );

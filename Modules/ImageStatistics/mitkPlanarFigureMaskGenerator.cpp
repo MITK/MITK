@@ -23,7 +23,7 @@ found in the LICENSE file.
 #include <itkVTKImageExport.h>
 #include <itkVTKImageImport.h>
 #include <itkImageDuplicator.h>
-#include <itkExceptionObject.h>
+#include <itkMacro.h>
 #include <itkLineIterator.h>
 
 #include <vtkPoints.h>

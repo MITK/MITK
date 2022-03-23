@@ -30,7 +30,7 @@ void mitk::DisplayActionEventHandlerDesynchronized::InitActionsImpl()
   ConnectDisplayActionEvent(DisplayZoomEvent(nullptr, 0.0, Point2D()), actionFunction);
 
   actionFunction = DisplayActionEventFunctions::ScrollSliceStepperAction();
-  ConnectDisplayActionEvent(DisplayScrollEvent(nullptr, 0), actionFunction);
+  ConnectDisplayActionEvent(DisplayScrollEvent(nullptr, 0, true), actionFunction);
 
   actionFunction = mitk::DisplayActionEventFunctions::SetLevelWindowAction();
   ConnectDisplayActionEvent(mitk::DisplaySetLevelWindowEvent(nullptr, mitk::ScalarType(), mitk::ScalarType()), actionFunction);

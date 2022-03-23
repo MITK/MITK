@@ -62,8 +62,8 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
           or use another option in the future, we do not forget to remove our
           copy of the FindBoost module again. ]]
 
-  set(url "${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_1_74_0.tar.gz")
-  set(md5 3c8fb92ce08b9ad5a5f0b35731ac2c8e)
+  set(url "${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/boost_1_78_0_b1.tar.gz")
+  set(md5 bbaa634603e3789d7dd0c21d0bdf4f09)
 
   if(MITK_USE_Boost_LIBRARIES)
 
@@ -93,6 +93,11 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
 
         #[[ Assume Visual Studio 2019. ]]
         set(bootstrap_args vc${VISUAL_STUDIO_VERSION_MAJOR}2)
+
+      elseif(VISUAL_STUDIO_VERSION_MAJOR EQUAL 14 AND VISUAL_STUDIO_VERSION_MINOR LESS 40)
+
+        #[[ Assume Visual Studio 2022. ]]
+        set(bootstrap_args vc${VISUAL_STUDIO_VERSION_MAJOR}3)
 
       else()
 
@@ -149,7 +154,7 @@ if(NOT DEFINED BOOST_ROOT AND NOT MITK_USE_SYSTEM_Boost)
     set(b2_properties
       threading=multi
       runtime-link=shared
-      "cxxflags=${MITK_CXX14_FLAG} ${CMAKE_CXX_FLAGS}"
+      "cxxflags=${MITK_CXX${MITK_CXX_STANDARD}_FLAG} ${CMAKE_CXX_FLAGS}"
     )
 
     if(CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -197,13 +202,17 @@ $<$<CONFIG:RelWithDebInfo>:variant=release>")
 
             using gcc : : /usr/bin/gcc-7.3 ;
 
-          We use the stream editor sed for the replacement but as macOS is
+          We use the stream editor sed for the replacement but since macOS is
           based on BSD Unix, we use the limited but portable BSD syntax
           instead of the more powerful GNU syntax. We also use | instead of
           the more commonly used / separator for sed because the replacement
-          contains slashes. ]]
+          contains slashes.
 
-      if(toolset)
+          2021/06/15: The custom project-config.jam does not work well with
+          SDK paths on macOS anymore, so we use a custom project-config.jam
+          only on Linux for now. ]]
+
+      if(toolset AND NOT APPLE)
         set(configure_cmd sed -i.backup "\
 s|\
 using[[:space:]][[:space:]]*${toolset}[[:space:]]*$<SEMICOLON>|\

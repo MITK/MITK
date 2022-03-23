@@ -23,7 +23,7 @@ namespace mitk
    @brief Operation, that holds information about some image difference
 
    This class stores undo information for DiffImageApplier.
-   Instances of this class are created e.g. by OverwriteSliceImageFilter.
+   Instances of this class are created e.g. by QmitkSlicesInterpolator.
    This works only for images with 1 channel (gray scale images, no color images).
 
    ApplyDiffImageOperation of course refers to an image (a segmentation usually).
@@ -31,7 +31,7 @@ namespace mitk
    used to keep the image alive -- the purpose of this class is undo and the undo
    stack should not keep things alive forever.
 
-   To save memory, zlib compression is used via CompressedImageContainer.
+   To save memory, compression is used via CompressedImageContainer.
 
    @ingroup Undo
    @ingroup ToolManagerEtAl
@@ -50,7 +50,7 @@ namespace mitk
 
     unsigned long m_DeleteTag;
 
-    CompressedImageContainer::Pointer zlibContainer;
+    CompressedImageContainer m_CompressedImageContainer;
 
   public:
     /**

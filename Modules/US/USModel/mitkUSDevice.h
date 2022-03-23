@@ -14,6 +14,9 @@ found in the LICENSE file.
 #define MITKUSDevice_H_HEADER_INCLUDED_
 
 // STL
+#include <condition_variable>
+#include <mutex>
+#include <thread>
 #include <vector>
 
 // MitkUS
@@ -34,7 +37,6 @@ found in the LICENSE file.
 
 // ITK
 #include <itkObjectFactory.h>
-#include <itkConditionVariable.h>
 
 // Microservices
 #include <mitkServiceInterface.h>
@@ -365,11 +367,10 @@ namespace mitk {
   protected:
 
     // Threading-Related
-    itk::ConditionVariable::Pointer m_FreezeBarrier;
-    itk::SimpleMutexLock        m_FreezeMutex;
-    itk::MultiThreader::Pointer m_MultiThreader; ///< itk::MultiThreader used for thread handling
-    itk::FastMutexLock::Pointer m_ImageMutex; ///< mutex for images provided by the image source
-    int m_ThreadID; ///< ID of the started thread
+    std::condition_variable m_FreezeBarrier;
+    std::mutex m_FreezeMutex;
+    std::mutex m_ImageMutex; ///< mutex for images provided by the image source
+    std::thread m_Thread;
 
     virtual void SetImageVector(std::vector<mitk::Image::Pointer> vec)
     {
@@ -380,8 +381,8 @@ namespace mitk {
       }
     }
 
-    static ITK_THREAD_RETURN_TYPE Acquire(void* pInfoStruct);
-    static ITK_THREAD_RETURN_TYPE ConnectThread(void* pInfoStruct);
+    void Acquire();
+    void ConnectThread();
 
     std::vector<mitk::Image::Pointer> m_ImageVector;
 

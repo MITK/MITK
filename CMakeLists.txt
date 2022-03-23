@@ -1,3 +1,7 @@
+#[[ When increasing the minimum required version, check if Boost_ADDITIONAL_VERSIONS
+    in CMake/PackageDepends/MITK_Boost_Config.cmake can be removed. See the first
+    long comment in CMakeExternals/Boost.cmake for details. ]]
+
 set(MITK_CMAKE_MINIMUM_REQUIRED_VERSION 3.18)
 cmake_minimum_required(VERSION ${MITK_CMAKE_MINIMUM_REQUIRED_VERSION})
 
@@ -33,7 +37,7 @@ if(MITK_USE_SUPERBUILD)
   set(MITK_SOURCE_DIR ${PROJECT_SOURCE_DIR})
   set(MITK_BINARY_DIR ${PROJECT_BINARY_DIR})
 else()
-  project(MITK VERSION 2021.02.99)
+  project(MITK VERSION 2021.10.99)
   include_directories(SYSTEM ${MITK_SUPERBUILD_BINARY_DIR})
 endif()
 
@@ -159,18 +163,18 @@ else()
   set(GCC_VERSION 0)
 endif()
 
-set(MITK_CXX_STANDARD 14)
+set(MITK_CXX_STANDARD 17)
 
 set(CMAKE_CXX_EXTENSIONS 0)
 set(CMAKE_CXX_STANDARD ${MITK_CXX_STANDARD})
 set(CMAKE_CXX_STANDARD_REQUIRED 1)
 
 # This is necessary to avoid problems with compile feature checks.
-# CMAKE_CXX_STANDARD seems to only set the -std=c++14 flag for targets.
-# However, compile flag checks also need to be done with -std=c++14.
-# The MITK_CXX14_FLAG variable is also used for external projects
+# CMAKE_CXX_STANDARD seems to only set the -std=c++<std> flag for targets.
+# However, compile flag checks also need to be done with -std=c++<std>.
+# The MITK_CXX<std>_FLAG variable is also used for external projects
 # build during the MITK super-build.
-mitkFunctionCheckCompilerFlags("-std=c++14" MITK_CXX14_FLAG)
+mitkFunctionCheckCompilerFlags("-std=c++${MITK_CXX_STANDARD}" MITK_CXX${MITK_CXX_STANDARD}_FLAG)
 
 #-----------------------------------------------------------------------------
 # Warn if source or build path is too long
@@ -212,13 +216,11 @@ option(MITK_XVFB_TESTING "Execute test drivers through xvfb-run" OFF)
 
 option(MITK_BUILD_ALL_APPS "Build all MITK applications" OFF)
 option(MITK_BUILD_EXAMPLES "Build the MITK Examples" OFF)
-option(MITK_ENABLE_PIC_READER "Enable support for reading the DKFZ pic file format." ON)
 
 mark_as_advanced(
   MITK_XVFB_TESTING
   MITK_FAST_TESTING
   MITK_BUILD_ALL_APPS
-  MITK_ENABLE_PIC_READER
 )
 
 #-----------------------------------------------------------------------------
@@ -321,8 +323,10 @@ if(MITK_USE_Qt5)
       endif()
 
       if(_compilers MATCHES "[0-9]+")
-        if (CMAKE_MATCH_0 EQUAL 2019)
-          list(APPEND _compilers "msvc2017") # Binary compatible to 2019
+        if (CMAKE_MATCH_0 EQUAL 2022)
+          list(APPEND _compilers "msvc2019" "msvc2017") # Binary compatible
+        elseif (CMAKE_MATCH_0 EQUAL 2019)
+          list(APPEND _compilers "msvc2017") # Binary compatible
         endif()
       endif()
     else()
@@ -580,30 +584,6 @@ include(mitkMacroCreateCTKPlugin)
 # Global CMake variables
 #-----------------------------------------------------------------------------
 
-# Required and enabled C++14 features for all MITK code.
-# These are added as PUBLIC compile features to all MITK modules.
-set(MITK_CXX_FEATURES
-  cxx_auto_type
-  cxx_decltype
-  cxx_enum_forward_declarations
-  cxx_extended_friend_declarations
-  cxx_extern_templates
-  cxx_final
-  cxx_lambdas
-  cxx_local_type_template_args
-  cxx_long_long_type
-  cxx_nullptr
-  cxx_override
-  cxx_range_for
-  cxx_right_angle_brackets
-  cxx_rvalue_references
-  cxx_static_assert
-  cxx_strong_enums
-  cxx_template_template_parameters
-  cxx_trailing_return_types
-  cxx_variadic_macros
-)
-
 if(NOT DEFINED CMAKE_DEBUG_POSTFIX)
   # We can't do this yet because the CTK Plugin Framework
   # cannot cope with a postfix yet.
@@ -756,7 +736,7 @@ endif()
 set(MITK_C_FLAGS "${COVERAGE_C_FLAGS}")
 set(MITK_C_FLAGS_DEBUG )
 set(MITK_C_FLAGS_RELEASE )
-set(MITK_CXX_FLAGS "${COVERAGE_CXX_FLAGS} ${MITK_CXX14_FLAG}")
+set(MITK_CXX_FLAGS "${COVERAGE_CXX_FLAGS} ${MITK_CXX${MITK_CXX_STANDARD}_FLAG}")
 set(MITK_CXX_FLAGS_DEBUG )
 set(MITK_CXX_FLAGS_RELEASE )
 
@@ -793,9 +773,11 @@ if(NOT MSVC_VERSION)
     -Wstrict-null-sentinel
     #-Wold-style-cast
     #-Wsign-promo
-    -Wno-error=deprecated-copy
+    -Wno-deprecated-copy
     -Wno-array-bounds
-
+    -Wno-cast-function-type
+    -Wno-maybe-uninitialized
+    -Wno-error=stringop-overread
     -fdiagnostics-show-option
     )
     mitkFunctionCheckCAndCXXCompilerFlags(${_flag} MITK_C_FLAGS MITK_CXX_FLAGS)

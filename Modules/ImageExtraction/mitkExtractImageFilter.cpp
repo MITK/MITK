@@ -111,21 +111,21 @@ void mitk::ExtractImageFilter::ItkImageProcessing(const itk::Image<TPixel, VImag
 
   typename ExtractImageFilterType::Pointer sliceExtractor = ExtractImageFilterType::New();
 
-  typename ExtractImageFilterType::DIRECTIONCOLLAPSESTRATEGY collapseStrategy;
+  typename ExtractImageFilterType::DirectionCollapseStrategyEnum collapseStrategy;
   switch (m_DirectionCollapseToStrategy)
   {
     case DIRECTIONCOLLAPSETOUNKOWN:
-      collapseStrategy = ExtractImageFilterType::DIRECTIONCOLLAPSETOUNKOWN;
+      collapseStrategy = ExtractImageFilterType::DirectionCollapseStrategyEnum::DIRECTIONCOLLAPSETOUNKOWN;
       break;
     case DIRECTIONCOLLAPSETOIDENTITY:
-      collapseStrategy = ExtractImageFilterType::DIRECTIONCOLLAPSETOIDENTITY;
+      collapseStrategy = ExtractImageFilterType::DirectionCollapseStrategyEnum::DIRECTIONCOLLAPSETOIDENTITY;
       break;
     case DIRECTIONCOLLAPSETOSUBMATRIX:
-      collapseStrategy = ExtractImageFilterType::DIRECTIONCOLLAPSETOSUBMATRIX;
+      collapseStrategy = ExtractImageFilterType::DirectionCollapseStrategyEnum::DIRECTIONCOLLAPSETOSUBMATRIX;
       break;
     case DIRECTIONCOLLAPSETOGUESS:
     default:
-      collapseStrategy = ExtractImageFilterType::DIRECTIONCOLLAPSETOGUESS;
+      collapseStrategy = ExtractImageFilterType::DirectionCollapseStrategyEnum::DIRECTIONCOLLAPSETOGUESS;
       break;
   }
 

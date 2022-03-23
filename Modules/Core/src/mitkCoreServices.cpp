@@ -25,14 +25,13 @@ found in the LICENSE file.
 #include <usServiceReference.h>
 #include <usServiceTracker.h>
 
-#include <itkMutexLockHolder.h>
-#include <itkSimpleFastMutexLock.h>
+#include <mutex>
 
 namespace mitk
 {
-  itk::SimpleFastMutexLock &s_ContextToServicesMapMutex()
+  std::mutex &s_ContextToServicesMapMutex()
   {
-    static itk::SimpleFastMutexLock mutex;
+    static std::mutex mutex;
     return mutex;
   }
 
@@ -57,7 +56,7 @@ namespace mitk
 
     assert(coreService && "Asserting non-nullptr MITK core service");
     {
-      itk::MutexLockHolder<itk::SimpleFastMutexLock> l(s_ContextToServicesMapMutex());
+      std::lock_guard<std::mutex> l(s_ContextToServicesMapMutex());
       s_ContextToServicesMap()[context].insert(std::make_pair(coreService, serviceRef));
     }
 
@@ -103,7 +102,7 @@ namespace mitk
   {
     bool success = false;
 
-    itk::MutexLockHolder<itk::SimpleFastMutexLock> l(s_ContextToServicesMapMutex());
+    std::lock_guard<std::mutex> l(s_ContextToServicesMapMutex());
     auto iter =
       s_ContextToServicesMap().find(context);
     if (iter != s_ContextToServicesMap().end())

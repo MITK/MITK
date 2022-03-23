@@ -34,14 +34,13 @@ found in the LICENSE file.
 
 mitk::AutoSegmentationWithPreviewTool::AutoSegmentationWithPreviewTool(bool lazyDynamicPreviews): m_LazyDynamicPreviews(lazyDynamicPreviews)
 {
-  m_ProgressCommand = mitk::ToolCommand::New();
+  m_ProgressCommand = ToolCommand::New();
 }
 
 mitk::AutoSegmentationWithPreviewTool::AutoSegmentationWithPreviewTool(bool lazyDynamicPreviews, const char* interactorType, const us::Module* interactorModule) : AutoSegmentationTool(interactorType, interactorModule), m_LazyDynamicPreviews(lazyDynamicPreviews)
 {
-  m_ProgressCommand = mitk::ToolCommand::New();
+  m_ProgressCommand = ToolCommand::New();
 }
-
 
 mitk::AutoSegmentationWithPreviewTool::~AutoSegmentationWithPreviewTool()
 {
@@ -74,16 +73,16 @@ void mitk::AutoSegmentationWithPreviewTool::Activated()
 {
   Superclass::Activated();
 
-  m_ToolManager->RoiDataChanged +=
-    mitk::MessageDelegate<mitk::AutoSegmentationWithPreviewTool>(this, &mitk::AutoSegmentationWithPreviewTool::OnRoiDataChanged);
+  this->GetToolManager()->RoiDataChanged +=
+    MessageDelegate<AutoSegmentationWithPreviewTool>(this, &AutoSegmentationWithPreviewTool::OnRoiDataChanged);
 
-  m_ToolManager->SelectedTimePointChanged +=
-    mitk::MessageDelegate<mitk::AutoSegmentationWithPreviewTool>(this, &mitk::AutoSegmentationWithPreviewTool::OnTimePointChanged);
+  this->GetToolManager()->SelectedTimePointChanged +=
+    MessageDelegate<AutoSegmentationWithPreviewTool>(this, &AutoSegmentationWithPreviewTool::OnTimePointChanged);
 
-  m_ReferenceDataNode = m_ToolManager->GetReferenceData(0);
+  m_ReferenceDataNode = this->GetToolManager()->GetReferenceData(0);
   m_SegmentationInputNode = m_ReferenceDataNode;
 
-  m_LastTimePointOfUpdate = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+  m_LastTimePointOfUpdate = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
 
   if (m_PreviewSegmentationNode.IsNull())
   {
@@ -102,17 +101,17 @@ void mitk::AutoSegmentationWithPreviewTool::Activated()
   }
   else
   {
-    m_ToolManager->ActivateTool(-1);
+    this->GetToolManager()->ActivateTool(-1);
   }
 }
 
 void mitk::AutoSegmentationWithPreviewTool::Deactivated()
 {
-  m_ToolManager->RoiDataChanged -=
-    mitk::MessageDelegate<mitk::AutoSegmentationWithPreviewTool>(this, &mitk::AutoSegmentationWithPreviewTool::OnRoiDataChanged);
+  this->GetToolManager()->RoiDataChanged -=
+    MessageDelegate<AutoSegmentationWithPreviewTool>(this, &AutoSegmentationWithPreviewTool::OnRoiDataChanged);
 
-  m_ToolManager->SelectedTimePointChanged -=
-    mitk::MessageDelegate<mitk::AutoSegmentationWithPreviewTool>(this, &mitk::AutoSegmentationWithPreviewTool::OnTimePointChanged);
+  this->GetToolManager()->SelectedTimePointChanged -=
+    MessageDelegate<AutoSegmentationWithPreviewTool>(this, &AutoSegmentationWithPreviewTool::OnTimePointChanged);
 
   m_SegmentationInputNode = nullptr;
   m_ReferenceDataNode = nullptr;
@@ -120,7 +119,7 @@ void mitk::AutoSegmentationWithPreviewTool::Deactivated()
 
   try
   {
-    if (DataStorage *storage = m_ToolManager->GetDataStorage())
+    if (DataStorage *storage = this->GetToolManager()->GetDataStorage())
     {
       storage->Remove(m_PreviewSegmentationNode);
       RenderingManager::GetInstance()->RequestUpdateAll();
@@ -153,7 +152,7 @@ void mitk::AutoSegmentationWithPreviewTool::ConfirmSegmentation()
 
   if (!m_KeepActiveAfterAccept)
   {
-    m_ToolManager->ActivateTool(-1);
+    this->GetToolManager()->ActivateTool(-1);
   }
 }
 
@@ -208,12 +207,17 @@ void mitk::AutoSegmentationWithPreviewTool::ResetPreviewNode()
   const auto image = this->GetSegmentationInput();
   if (nullptr != image)
   {
-    mitk::LabelSetImage::ConstPointer workingImage =
-      dynamic_cast<const mitk::LabelSetImage *>(m_ToolManager->GetWorkingData(0)->GetData());
+    LabelSetImage::ConstPointer workingImage =
+      dynamic_cast<const LabelSetImage *>(this->GetToolManager()->GetWorkingData(0)->GetData());
 
     if (workingImage.IsNotNull())
     {
       auto newPreviewImage = workingImage->Clone();
+      if (this->GetResetsToEmptyPreview())
+      {
+        newPreviewImage->ClearBuffer();
+      }
+
       if (newPreviewImage.IsNull())
       {
         MITK_ERROR << "Cannot create preview helper objects. Unable to clone working image";
@@ -223,22 +227,32 @@ void mitk::AutoSegmentationWithPreviewTool::ResetPreviewNode()
       m_PreviewSegmentationNode->SetData(newPreviewImage);
 
       // Let's paint the feedback node green...
-      newPreviewImage->GetActiveLabel()->SetColor(previewColor);
-      newPreviewImage->GetActiveLabelSet()->UpdateLookupTable(newPreviewImage->GetActiveLabel()->GetValue());
+      auto* activeLayer = newPreviewImage->GetActiveLabelSet();
+      auto* activeLabel = activeLayer->GetActiveLabel();
+      activeLabel->SetColor(previewColor);
+      activeLayer->UpdateLookupTable(activeLabel->GetValue());
     }
     else
     {
-      mitk::Image::ConstPointer workingImageBin = dynamic_cast<const mitk::Image*>(m_ToolManager->GetWorkingData(0)->GetData());
+      Image::ConstPointer workingImageBin = dynamic_cast<const Image*>(this->GetToolManager()->GetWorkingData(0)->GetData());
       if (workingImageBin.IsNotNull())
       {
-        auto newPreviewImage = workingImageBin->Clone();
+        Image::Pointer newPreviewImage;
+        if (this->GetResetsToEmptyPreview())
+        {
+          newPreviewImage = Image::New();
+          newPreviewImage->Initialize(workingImageBin);
+        }
+        else
+        {
+          auto newPreviewImage = workingImageBin->Clone();
+        }
         if (newPreviewImage.IsNull())
         {
           MITK_ERROR << "Cannot create preview helper objects. Unable to clone working image";
           return;
         }
-
-        m_PreviewSegmentationNode->SetData(newPreviewImage->Clone());
+        m_PreviewSegmentationNode->SetData(newPreviewImage);
       }
       else
       {
@@ -253,7 +267,7 @@ void mitk::AutoSegmentationWithPreviewTool::ResetPreviewNode()
     m_ReferenceDataNode->GetIntProperty("layer", layer);
     m_PreviewSegmentationNode->SetIntProperty("layer", layer + 1);
 
-    if (DataStorage *ds = m_ToolManager->GetDataStorage())
+    if (DataStorage *ds = this->GetToolManager()->GetDataStorage())
     {
       if (!ds->Exists(m_PreviewSegmentationNode))
         ds->Add(m_PreviewSegmentationNode, m_ReferenceDataNode);
@@ -327,7 +341,7 @@ void mitk::AutoSegmentationWithPreviewTool::CreateResultSegmentationFromPreview(
 
     if (resultSegmentationNode.IsNotNull())
     {
-      const auto timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+      const auto timePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
       auto resultSegmentation = dynamic_cast<Image*>(resultSegmentationNode->GetData());
 
       // REMARK: the following code in this scope assumes that previewImage and resultSegmentation
@@ -355,10 +369,10 @@ void mitk::AutoSegmentationWithPreviewTool::CreateResultSegmentationFromPreview(
       // since we are maybe working on a smaller image, pad it to the size of the original image
       if (m_ReferenceDataNode.GetPointer() != m_SegmentationInputNode.GetPointer())
       {
-        mitk::PadImageFilter::Pointer padFilter = mitk::PadImageFilter::New();
+        PadImageFilter::Pointer padFilter = PadImageFilter::New();
 
         padFilter->SetInput(0, resultSegmentation);
-        padFilter->SetInput(1, dynamic_cast<mitk::Image*>(m_ReferenceDataNode->GetData()));
+        padFilter->SetInput(1, dynamic_cast<Image*>(m_ReferenceDataNode->GetData()));
         padFilter->SetBinaryFilter(true);
         padFilter->SetUpperThreshold(1);
         padFilter->SetLowerThreshold(1);
@@ -366,9 +380,12 @@ void mitk::AutoSegmentationWithPreviewTool::CreateResultSegmentationFromPreview(
 
         resultSegmentationNode->SetData(padFilter->GetOutput());
       }
-
-      m_ToolManager->SetWorkingData(resultSegmentationNode);
-      m_ToolManager->GetWorkingData(0)->Modified();
+      if (m_OverwriteExistingSegmentation)
+      { //if we overwrite the segmentation (and not just store it as a new result
+        //in the data storage) we update also the tool manager state.
+        this->GetToolManager()->SetWorkingData(resultSegmentationNode);
+        this->GetToolManager()->GetWorkingData(0)->Modified();
+      }
       this->EnsureTargetSegmentationNodeInDataStorage();
     }
   }
@@ -376,12 +393,12 @@ void mitk::AutoSegmentationWithPreviewTool::CreateResultSegmentationFromPreview(
 
 void mitk::AutoSegmentationWithPreviewTool::OnRoiDataChanged()
 {
-  mitk::DataNode::ConstPointer node = m_ToolManager->GetRoiData(0);
+  DataNode::ConstPointer node = this->GetToolManager()->GetRoiData(0);
 
   if (node.IsNotNull())
   {
-    mitk::MaskAndCutRoiImageFilter::Pointer roiFilter = mitk::MaskAndCutRoiImageFilter::New();
-    mitk::Image::Pointer image = dynamic_cast<mitk::Image *>(m_SegmentationInputNode->GetData());
+    MaskAndCutRoiImageFilter::Pointer roiFilter = MaskAndCutRoiImageFilter::New();
+    Image::Pointer image = dynamic_cast<Image *>(m_SegmentationInputNode->GetData());
 
     if (image.IsNull())
       return;
@@ -390,7 +407,7 @@ void mitk::AutoSegmentationWithPreviewTool::OnRoiDataChanged()
     roiFilter->SetRegionOfInterest(node->GetData());
     roiFilter->Update();
 
-    mitk::DataNode::Pointer tmpNode = mitk::DataNode::New();
+    DataNode::Pointer tmpNode = DataNode::New();
     tmpNode->SetData(roiFilter->GetOutput());
 
     m_SegmentationInputNode = tmpNode;
@@ -407,7 +424,7 @@ void mitk::AutoSegmentationWithPreviewTool::OnTimePointChanged()
 {
   if (m_IsTimePointChangeAware && m_PreviewSegmentationNode.IsNotNull() && m_SegmentationInputNode.IsNotNull())
   {
-    const auto timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+    const auto timePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
 
     const bool isStaticSegOnDynamicImage = m_PreviewSegmentationNode->GetData()->GetTimeSteps() == 1 && m_SegmentationInputNode->GetData()->GetTimeSteps() > 1;
     if (timePoint!=m_LastTimePointOfUpdate && (isStaticSegOnDynamicImage || m_LazyDynamicPreviews))
@@ -424,12 +441,23 @@ void mitk::AutoSegmentationWithPreviewTool::UpdatePreview(bool ignoreLazyPreview
   auto previewImage = this->GetPreviewSegmentation();
   int progress_steps = 200;
 
+  const auto workingImage = dynamic_cast<const Image*>(this->GetToolManager()->GetWorkingData(0)->GetData());
+  if (const auto& labelSetImage = dynamic_cast<const LabelSetImage*>(workingImage))
+  {
+    // this is a fix for T28131 / T28986, which should be refactored if T28524 is being worked on
+    m_UserDefinedActiveLabel = labelSetImage->GetActiveLabel(labelSetImage->GetActiveLayer())->GetValue();
+  }
+  else
+  {
+    m_UserDefinedActiveLabel = 1;
+  }
+
   this->CurrentlyBusy.Send(true);
   m_IsUpdating = true;
 
   this->UpdatePrepare();
 
-  const auto timePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+  const auto timePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
 
   try
   {
@@ -442,36 +470,44 @@ void mitk::AutoSegmentationWithPreviewTool::UpdatePreview(bool ignoreLazyPreview
         for (unsigned int timeStep = 0; timeStep < previewImage->GetTimeSteps(); ++timeStep)
         {
           Image::ConstPointer feedBackImage;
+          Image::ConstPointer currentSegImage;
+
           auto previewTimePoint = previewImage->GetTimeGeometry()->TimeStepToTimePoint(timeStep);
           auto inputTimeStep = inputImage->GetTimeGeometry()->TimePointToTimeStep(previewTimePoint);
 
           if (nullptr != this->GetWorkingPlaneGeometry())
           { //only extract a specific slice defined by the working plane as feedback image.
             feedBackImage = SegTool2D::GetAffectedImageSliceAs2DImage(this->GetWorkingPlaneGeometry(), inputImage, inputTimeStep);
+            currentSegImage = SegTool2D::GetAffectedImageSliceAs2DImageByTimePoint(this->GetWorkingPlaneGeometry(), workingImage, previewTimePoint);
           }
           else
           { //work on the whole feedback image
             feedBackImage = this->GetImageByTimeStep(inputImage, inputTimeStep);
+            currentSegImage = this->GetImageByTimePoint(workingImage, previewTimePoint);
           }
 
-          this->DoUpdatePreview(feedBackImage, previewImage, timeStep);
+          this->DoUpdatePreview(feedBackImage, currentSegImage, previewImage, timeStep);
         }
       }
       else
       {
         Image::ConstPointer feedBackImage;
+        Image::ConstPointer currentSegImage;
+
         if (nullptr != this->GetWorkingPlaneGeometry())
         {
           feedBackImage = SegTool2D::GetAffectedImageSliceAs2DImageByTimePoint(this->GetWorkingPlaneGeometry(), inputImage, timePoint);
+          currentSegImage = SegTool2D::GetAffectedImageSliceAs2DImageByTimePoint(this->GetWorkingPlaneGeometry(), workingImage, timePoint);
         }
         else
         {
           feedBackImage = this->GetImageByTimePoint(inputImage, timePoint);
+          currentSegImage = this->GetImageByTimePoint(workingImage, timePoint);
         }
 
         auto timeStep = previewImage->GetTimeGeometry()->TimePointToTimeStep(timePoint);
 
-        this->DoUpdatePreview(feedBackImage, previewImage, timeStep);
+        this->DoUpdatePreview(feedBackImage, currentSegImage, previewImage, timeStep);
       }
       RenderingManager::GetInstance()->RequestUpdateAll();
     }

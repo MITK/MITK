@@ -24,34 +24,34 @@ namespace mitk
   {
     switch (io->GetComponentType())
     {
-      case DcmIoType::UCHAR:
+      case itk::IOComponentEnum::UCHAR:
         return LoadDICOMByITK4D<unsigned char>(
           imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command, preLoadedImageBlock);
-      case DcmIoType::CHAR:
+      case itk::IOComponentEnum::CHAR:
         return LoadDICOMByITK4D<char>(
           imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command, preLoadedImageBlock);
-      case DcmIoType::USHORT:
+      case itk::IOComponentEnum::USHORT:
         return LoadDICOMByITK4D<unsigned short>(
           imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command, preLoadedImageBlock);
-      case DcmIoType::SHORT:
+      case itk::IOComponentEnum::SHORT:
         return LoadDICOMByITK4D<short>(
           imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command, preLoadedImageBlock);
-      case DcmIoType::UINT:
+      case itk::IOComponentEnum::UINT:
         return LoadDICOMByITK4D<unsigned int>(
           imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command, preLoadedImageBlock);
-      case DcmIoType::INT:
+      case itk::IOComponentEnum::INT:
         return LoadDICOMByITK4D<int>(
           imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command, preLoadedImageBlock);
-      case DcmIoType::ULONG:
+      case itk::IOComponentEnum::ULONG:
         return LoadDICOMByITK4D<long unsigned int>(
           imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command, preLoadedImageBlock);
-      case DcmIoType::LONG:
+      case itk::IOComponentEnum::LONG:
         return LoadDICOMByITK4D<long int>(
           imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command, preLoadedImageBlock);
-      case DcmIoType::FLOAT:
+      case itk::IOComponentEnum::FLOAT:
         return LoadDICOMByITK4D<float>(
           imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command, preLoadedImageBlock);
-      case DcmIoType::DOUBLE:
+      case itk::IOComponentEnum::DOUBLE:
         return LoadDICOMByITK4D<double>(
           imageBlocks, imageBlockDescriptor, correctTilt, tiltInfo, io, command, preLoadedImageBlock);
       default:

@@ -608,10 +608,6 @@ function(mitk_create_module)
                       )
     endif()
 
-    if(NOT MODULE_C_MODULE)
-      target_compile_features(${MODULE_TARGET} ${_module_property_type} ${MITK_CXX_FEATURES})
-    endif()
-
     # add include directories
     if(MODULE_INTERNAL_INCLUDE_DIRS)
       target_include_directories(${MODULE_TARGET} PRIVATE ${MODULE_INTERNAL_INCLUDE_DIRS})

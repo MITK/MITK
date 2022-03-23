@@ -1369,8 +1369,7 @@ private:
   QList<IViewReference::Pointer> GetViewReferenceStack(
       IViewPart::Pointer part);
 
-  struct ActivationOrderPred : std::binary_function<IViewReference::Pointer,
-  IViewReference::Pointer, bool>
+  struct ActivationOrderPred
   {
     ActivationOrderPred(ActivationList* partList);
 

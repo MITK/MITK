@@ -20,6 +20,8 @@ found in the LICENSE file.
 #include <itkIsoContourDistanceImageFilter.h>
 #include <itkSubtractImageFilter.h>
 
+#include <thread>
+
 mitk::Image::Pointer mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
   Image::ConstPointer lowerSlice,
   unsigned int lowerSliceIndex,
@@ -31,18 +33,38 @@ mitk::Image::Pointer mitk::ShapeBasedInterpolationAlgorithm::Interpolate(
   unsigned int /*timeStep*/,
   Image::ConstPointer /*referenceImage*/)
 {
-  mitk::Image::Pointer lowerDistanceImage = mitk::Image::New();
-  AccessFixedDimensionByItk_1(lowerSlice, ComputeDistanceMap, 2, lowerDistanceImage);
-
-  mitk::Image::Pointer upperDistanceImage = mitk::Image::New();
-  AccessFixedDimensionByItk_1(upperSlice, ComputeDistanceMap, 2, upperDistanceImage);
+  auto lowerDistanceImage = this->ComputeDistanceMap(lowerSliceIndex, lowerSlice);
+  auto upperDistanceImage = this->ComputeDistanceMap(upperSliceIndex, upperSlice);
 
   // calculate where the current slice is in comparison to the lower and upper neighboring slices
   float ratio = (float)(requestedIndex - lowerSliceIndex) / (float)(upperSliceIndex - lowerSliceIndex);
-  AccessFixedDimensionByItk_3(
-    resultImage, InterpolateIntermediateSlice, 2, upperDistanceImage, lowerDistanceImage, ratio);
+  AccessFixedDimensionByItk_3(resultImage, InterpolateIntermediateSlice, 2, upperDistanceImage, lowerDistanceImage, ratio);
 
   return resultImage;
+}
+
+mitk::Image::Pointer mitk::ShapeBasedInterpolationAlgorithm::ComputeDistanceMap(unsigned int sliceIndex, Image::ConstPointer slice)
+{
+  static const auto MAX_CACHE_SIZE = 2 * std::thread::hardware_concurrency();
+
+  {
+    std::lock_guard<std::mutex> lock(m_DistanceImageCacheMutex);
+
+    if (0 != m_DistanceImageCache.count(sliceIndex))
+      return m_DistanceImageCache[sliceIndex];
+
+    if (MAX_CACHE_SIZE < m_DistanceImageCache.size())
+      m_DistanceImageCache.clear();
+  }
+
+  mitk::Image::Pointer distanceImage;
+  AccessFixedDimensionByItk_1(slice, ComputeDistanceMap, 2, distanceImage);
+
+  std::lock_guard<std::mutex> lock(m_DistanceImageCacheMutex);
+
+  m_DistanceImageCache[sliceIndex] = distanceImage;
+
+  return distanceImage;
 }
 
 template <typename TPixel, unsigned int VImageDimension>

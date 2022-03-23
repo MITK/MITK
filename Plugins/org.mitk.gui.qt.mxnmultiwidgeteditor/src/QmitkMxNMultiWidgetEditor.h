@@ -35,8 +35,8 @@ public:
 
   virtual QmitkLevelWindowWidget* GetLevelWindowWidget() const override { return nullptr; }
 
-  void OnLayoutSet(int row, int column);
-  void OnInteractionSchemeChanged(mitk::InteractionSchemeSwitcher::InteractionScheme scheme);
+  void OnLayoutSet(int row, int column) override;
+  void OnInteractionSchemeChanged(mitk::InteractionSchemeSwitcher::InteractionScheme scheme) override;
 
 private:
   /**

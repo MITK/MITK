@@ -24,7 +24,7 @@ found in the LICENSE file.
 
 QmitkSingleNodeSelectionWidget::QmitkSingleNodeSelectionWidget(QWidget* parent)
   : QmitkAbstractNodeSelectionWidget(parent)
-  , m_AutoSelectNewNodes(false)
+  , m_AutoSelectNodes(false)
 {
   m_Controls.setupUi(this);
 
@@ -43,7 +43,7 @@ void QmitkSingleNodeSelectionWidget::ReviseSelectionChanged(const NodeList& oldI
 {
   if (newInternalSelection.empty())
   {
-    if (m_AutoSelectNewNodes)
+    if (m_AutoSelectNodes)
     {
       auto autoSelectedNode = this->DetermineAutoSelectNode(oldInternalSelection);
 
@@ -163,6 +163,50 @@ void QmitkSingleNodeSelectionWidget::UpdateInfo()
   m_Controls.btnSelect->SetSelectedNode(this->GetSelectedNode());
 }
 
+void QmitkSingleNodeSelectionWidget::SetCurrentSelectedNode(mitk::DataNode* selectedNode)
+{
+  NodeList selection;
+  if (selectedNode)
+  {
+    selection.append(selectedNode);
+  }
+  this->SetCurrentSelection(selection);
+}
+
+void QmitkSingleNodeSelectionWidget::OnDataStorageChanged()
+{
+  this->AutoSelectNodes();
+}
+
+void QmitkSingleNodeSelectionWidget::OnNodeAddedToStorage(const mitk::DataNode* /*node*/)
+{
+  this->AutoSelectNodes();
+}
+
+bool QmitkSingleNodeSelectionWidget::GetAutoSelectNewNodes() const
+{
+  return m_AutoSelectNodes;
+}
+
+void QmitkSingleNodeSelectionWidget::SetAutoSelectNewNodes(bool autoSelect)
+{
+  m_AutoSelectNodes = autoSelect;
+  this->AutoSelectNodes();
+}
+
+void QmitkSingleNodeSelectionWidget::AutoSelectNodes()
+{
+  if (this->GetSelectedNode().IsNull() && m_AutoSelectNodes)
+  {
+    auto autoNode = this->DetermineAutoSelectNode();
+
+    if (autoNode.IsNotNull())
+    {
+      this->HandleChangeOfInternalSelection({ autoNode });
+    }
+  }
+}
+
 mitk::DataNode::Pointer QmitkSingleNodeSelectionWidget::DetermineAutoSelectNode(const NodeList& ignoreNodes)
 {
   mitk::DataNode::Pointer result;
@@ -194,38 +238,4 @@ mitk::DataNode::Pointer QmitkSingleNodeSelectionWidget::DetermineAutoSelectNode(
     result = storage->GetNode(predicate);
   }
   return result;
-}
-
-void QmitkSingleNodeSelectionWidget::SetCurrentSelectedNode(mitk::DataNode* selectedNode)
-{
-  NodeList selection;
-  if (selectedNode)
-  {
-    selection.append(selectedNode);
-  }
-  this->SetCurrentSelection(selection);
-}
-
-void QmitkSingleNodeSelectionWidget::OnNodeAddedToStorage(const mitk::DataNode* /*node*/)
-{
-  if (this->GetSelectedNode().IsNull() && m_AutoSelectNewNodes)
-  {
-    auto autoNode = this->DetermineAutoSelectNode();
-
-    if (autoNode.IsNotNull())
-    {
-      this->HandleChangeOfInternalSelection({ autoNode });
-    }
-  }
-}
-
-bool QmitkSingleNodeSelectionWidget::GetAutoSelectNewNodes() const
-{
-  return m_AutoSelectNewNodes;
-}
-
-void QmitkSingleNodeSelectionWidget::SetAutoSelectNewNodes(bool autoSelect)
-{
-  m_AutoSelectNewNodes = autoSelect;
-  this->OnNodeAddedToStorage(nullptr);
 }

@@ -14,7 +14,7 @@ function(get_macos_codename)
   if(EXISTS "${software_license_file}")
     file(READ "${software_license_file}" software_license)
 
-    if(software_license MATCHES "SOFTWARE LICENSE AGREEMENT FOR macOS ([^\n]+)")
+    if(software_license MATCHES "SOFTWARE LICENSE AGREEMENT FOR macOS ([^\\\n]+)")
       set(macos_codename "${CMAKE_MATCH_1}")
     endif()
   endif()

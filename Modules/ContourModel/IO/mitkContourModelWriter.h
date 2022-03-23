@@ -29,6 +29,7 @@ namespace mitk
    *
    * The xml file will look like:
    *
+   * \code{.unparsed}
    *   <?xml version="1.0" encoding="utf-8"?>
    *   <contourModel>
    *      <head>
@@ -47,11 +48,10 @@ namespace mitk
    *        </timestep>
    *      </data>
    *    </contourModel>
+   * \endcode
    *
    * @ingroup MitkContourModelModule
    */
-
-  class TimeSlicedGeometry;
 
   class ContourModelWriter : public mitk::AbstractFileWriter
   {
@@ -92,17 +92,6 @@ namespace mitk
     * @param out the stream to write to.
     */
     void WriteGeometryInformation(const mitk::TimeGeometry *geometry, std::ostream &out);
-
-    /**
-    * Writes the geometry information of the TimeGeometry to an outstream.
-    * The root tag is not included.
-    * @param geometry the TimeGeometry of the contour.
-    * @param out the stream to write to.
-    *
-    * \deprecatedSince{2013_09} Please use TimeGeometry instead of TimeSlicedGeometry. For more information see
-    * http://www.mitk.org/Development/Refactoring%20of%20the%20Geometry%20Classes%20-%20Part%201
-    */
-    DEPRECATED(void WriteGeometryInformation(const mitk::TimeSlicedGeometry *geometry, std::ostream &out));
 
     /**
      * Writes an standard xml header to the given stream.

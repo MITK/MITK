@@ -70,11 +70,11 @@ void QmitkToFTutorialView::OnStep1()
   tofImageGrabber->SetCameraDevice(mitk::ToFCameraMITKPlayerDevice::New());
   // set paths to test data
   std::string distanceFileName = MITK_TOF_DATA_DIR;
-  distanceFileName.append("/PMDCamCube2_MF0_IT0_20Images_DistanceImage.pic");
+  distanceFileName.append("/PMDCamCube2_MF0_IT0_20Images_DistanceImage.nrrd");
   std::string amplitudeFileName = MITK_TOF_DATA_DIR;
-  amplitudeFileName.append("/PMDCamCube2_MF0_IT0_20Images_AmplitudeImage.pic");
+  amplitudeFileName.append("/PMDCamCube2_MF0_IT0_20Images_AmplitudeImage.nrrd");
   std::string intensityFileName = MITK_TOF_DATA_DIR;
-  intensityFileName.append("/PMDCamCube2_MF0_IT0_20Images_IntensityImage.pic");
+  intensityFileName.append("/PMDCamCube2_MF0_IT0_20Images_IntensityImage.nrrd");
   // set file name property in image grabber. This will be propagated to the corresponding device and controller class
   tofImageGrabber->SetProperty("DistanceImageFileName",mitk::StringProperty::New(distanceFileName));
   tofImageGrabber->SetProperty("AmplitudeImageFileName",mitk::StringProperty::New(amplitudeFileName));
@@ -157,7 +157,6 @@ void QmitkToFTutorialView::OnStep2()
       surfaceNode->SetData(surface);
       this->GetDataStorage()->Add(surfaceNode);
       // adjust views to new data in DataStorage
-      mitk::RenderingManager::GetInstance()->InitializeViews(surface->GetGeometry());
       mitk::RenderingManager::GetInstance()->InitializeViews(surface->GetGeometry());
     }
     else

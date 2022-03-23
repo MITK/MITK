@@ -101,10 +101,7 @@ void QmitkAutocropAction::Run( const QList<mitk::DataNode::Pointer> &selectedNod
             node->SetData( this->IncreaseCroppedImageSize(image) ); // bug fix 3145
           }
           // Reinit node
-          mitk::RenderingManager::GetInstance()->InitializeViews(
-            node->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
-          mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
+          mitk::RenderingManager::GetInstance()->InitializeViews(node->GetData()->GetTimeGeometry());
         }
       }
       catch(...)

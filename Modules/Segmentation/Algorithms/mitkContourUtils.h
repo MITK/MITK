@@ -38,26 +38,18 @@ namespace mitk
 
         \param slice
         \param contourIn3D
-        \param correctionForIpSegmentation adds 0.5 to x and y index coordinates (difference between ipSegmentation and
-        MITK contours)
-        \param constrainToInside
       */
       ContourModel::Pointer ProjectContourTo2DSlice(Image *slice,
-                                                    Contour *contourIn3D,
-                                                    bool correctionForIpSegmentation,
-                                                    bool constrainToInside);
+                                                    Contour *contourIn3D);
 
     /**
       \brief Projects a slice index coordinates of a contour back into world coordinates.
 
       \param sliceGeometry
       \param contourIn2D
-      \param correctionForIpSegmentation subtracts 0.5 to x and y index coordinates (difference between
-      ipSegmentation and MITK contours)
     */
     ContourModel::Pointer BackProjectContourFrom2DSlice(const BaseGeometry *sliceGeometry,
-                                                        Contour *contourIn2D,
-                                                        bool correctionForIpSegmentation = false);
+                                                        Contour *contourIn2D);
 
     /**
       \brief Fill a contour in a 2D slice with a specified pixel value.

@@ -59,9 +59,9 @@ public:
 
     std::string depthImagePath = dirName + "/" + "Kinect_Lego_Phantom_DistanceImage.nrrd";
     std::string colorImagePath = dirName + "/" + "Kinect_Lego_Phantom_RGBImage.nrrd";
-    std::string distanceImageP = dirName + "/" + "PMDCamCube2_MF0_IT0_1Images_DistanceImage.pic";
-    std::string amplitudeImage = dirName + "/" + "PMDCamCube2_MF0_IT0_1Images_AmplitudeImage.pic";
-    std::string intensityImage = dirName + "/" + "PMDCamCube2_MF0_IT0_1Images_IntensityImage.pic";
+    std::string distanceImageP = dirName + "/" + "PMDCamCube2_MF0_IT0_1Images_DistanceImage.nrrd";
+    std::string amplitudeImage = dirName + "/" + "PMDCamCube2_MF0_IT0_1Images_AmplitudeImage.nrrd";
+    std::string intensityImage = dirName + "/" + "PMDCamCube2_MF0_IT0_1Images_IntensityImage.nrrd";
 
     m_KinectDepthImagePath = GetTestDataFilePath(depthImagePath);
     m_KinectColorImagePath = GetTestDataFilePath(colorImagePath);

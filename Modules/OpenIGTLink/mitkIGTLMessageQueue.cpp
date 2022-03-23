@@ -16,27 +16,27 @@ found in the LICENSE file.
 
 void mitk::IGTLMessageQueue::PushSendMessage(mitk::IGTLMessage::Pointer message)
 {
-  this->m_Mutex->Lock();
+  this->m_Mutex.lock();
   if (this->m_BufferingType == IGTLMessageQueue::NoBuffering)
     m_SendQueue.clear();
 
   m_SendQueue.push_back(message);
-  this->m_Mutex->Unlock();
+  this->m_Mutex.unlock();
 }
 
 void mitk::IGTLMessageQueue::PushCommandMessage(igtl::MessageBase::Pointer message)
 {
-  this->m_Mutex->Lock();
+  this->m_Mutex.lock();
   if (this->m_BufferingType == IGTLMessageQueue::NoBuffering)
     m_CommandQueue.clear();
 
   m_CommandQueue.push_back(message);
-  this->m_Mutex->Unlock();
+  this->m_Mutex.unlock();
 }
 
 void mitk::IGTLMessageQueue::PushMessage(igtl::MessageBase::Pointer msg)
 {
-  this->m_Mutex->Lock();
+  this->m_Mutex.lock();
 
   std::stringstream infolog;
 
@@ -107,116 +107,116 @@ void mitk::IGTLMessageQueue::PushMessage(igtl::MessageBase::Pointer msg)
 
   //MITK_INFO << infolog.str();
 
-  this->m_Mutex->Unlock();
+  this->m_Mutex.unlock();
 }
 
 mitk::IGTLMessage::Pointer mitk::IGTLMessageQueue::PullSendMessage()
 {
   mitk::IGTLMessage::Pointer ret = nullptr;
-  this->m_Mutex->Lock();
+  this->m_Mutex.lock();
   if (this->m_SendQueue.size() > 0)
   {
     ret = this->m_SendQueue.front();
     this->m_SendQueue.pop_front();
   }
-  this->m_Mutex->Unlock();
+  this->m_Mutex.unlock();
   return ret;
 }
 
 igtl::MessageBase::Pointer mitk::IGTLMessageQueue::PullMiscMessage()
 {
   igtl::MessageBase::Pointer ret = nullptr;
-  this->m_Mutex->Lock();
+  this->m_Mutex.lock();
   if (this->m_MiscQueue.size() > 0)
   {
     ret = this->m_MiscQueue.front();
     this->m_MiscQueue.pop_front();
   }
-  this->m_Mutex->Unlock();
+  this->m_Mutex.unlock();
   return ret;
 }
 
 igtl::ImageMessage::Pointer mitk::IGTLMessageQueue::PullImage2dMessage()
 {
   igtl::ImageMessage::Pointer ret = nullptr;
-  this->m_Mutex->Lock();
+  this->m_Mutex.lock();
   if (this->m_Image2dQueue.size() > 0)
   {
     ret = this->m_Image2dQueue.front();
     this->m_Image2dQueue.pop_front();
   }
-  this->m_Mutex->Unlock();
+  this->m_Mutex.unlock();
   return ret;
 }
 
 igtl::ImageMessage::Pointer mitk::IGTLMessageQueue::PullImage3dMessage()
 {
   igtl::ImageMessage::Pointer ret = nullptr;
-  this->m_Mutex->Lock();
+  this->m_Mutex.lock();
   if (this->m_Image3dQueue.size() > 0)
   {
     ret = this->m_Image3dQueue.front();
     this->m_Image3dQueue.pop_front();
   }
-  this->m_Mutex->Unlock();
+  this->m_Mutex.unlock();
   return ret;
 }
 
 igtl::TrackingDataMessage::Pointer mitk::IGTLMessageQueue::PullTrackingMessage()
 {
   igtl::TrackingDataMessage::Pointer ret = nullptr;
-  this->m_Mutex->Lock();
+  this->m_Mutex.lock();
   if (this->m_TrackingDataQueue.size() > 0)
   {
     ret = this->m_TrackingDataQueue.front();
     this->m_TrackingDataQueue.pop_front();
   }
-  this->m_Mutex->Unlock();
+  this->m_Mutex.unlock();
   return ret;
 }
 
 igtl::MessageBase::Pointer mitk::IGTLMessageQueue::PullCommandMessage()
 {
   igtl::MessageBase::Pointer ret = nullptr;
-  this->m_Mutex->Lock();
+  this->m_Mutex.lock();
   if (this->m_CommandQueue.size() > 0)
   {
     ret = this->m_CommandQueue.front();
     this->m_CommandQueue.pop_front();
   }
-  this->m_Mutex->Unlock();
+  this->m_Mutex.unlock();
   return ret;
 }
 
 igtl::StringMessage::Pointer mitk::IGTLMessageQueue::PullStringMessage()
 {
   igtl::StringMessage::Pointer ret = nullptr;
-  this->m_Mutex->Lock();
+  this->m_Mutex.lock();
   if (this->m_StringQueue.size() > 0)
   {
     ret = this->m_StringQueue.front();
     this->m_StringQueue.pop_front();
   }
-  this->m_Mutex->Unlock();
+  this->m_Mutex.unlock();
   return ret;
 }
 
 igtl::TransformMessage::Pointer mitk::IGTLMessageQueue::PullTransformMessage()
 {
   igtl::TransformMessage::Pointer ret = nullptr;
-  this->m_Mutex->Lock();
+  this->m_Mutex.lock();
   if (this->m_TransformQueue.size() > 0)
   {
     ret = this->m_TransformQueue.front();
     this->m_TransformQueue.pop_front();
   }
-  this->m_Mutex->Unlock();
+  this->m_Mutex.unlock();
   return ret;
 }
 
 std::string mitk::IGTLMessageQueue::GetNextMsgInformationString()
 {
-  this->m_Mutex->Lock();
+  this->m_Mutex.lock();
   std::stringstream s;
   if (this->m_Latest_Message != nullptr)
   {
@@ -227,13 +227,13 @@ std::string mitk::IGTLMessageQueue::GetNextMsgInformationString()
   {
     s << "No Msg";
   }
-  this->m_Mutex->Unlock();
+  this->m_Mutex.unlock();
   return s.str();
 }
 
 std::string mitk::IGTLMessageQueue::GetNextMsgDeviceType()
 {
-  this->m_Mutex->Lock();
+  this->m_Mutex.lock();
   std::stringstream s;
   if (m_Latest_Message != nullptr)
   {
@@ -243,13 +243,13 @@ std::string mitk::IGTLMessageQueue::GetNextMsgDeviceType()
   {
     s << "";
   }
-  this->m_Mutex->Unlock();
+  this->m_Mutex.unlock();
   return s.str();
 }
 
 std::string mitk::IGTLMessageQueue::GetLatestMsgInformationString()
 {
-  this->m_Mutex->Lock();
+  this->m_Mutex.lock();
   std::stringstream s;
   if (m_Latest_Message != nullptr)
   {
@@ -260,13 +260,13 @@ std::string mitk::IGTLMessageQueue::GetLatestMsgInformationString()
   {
     s << "No Msg";
   }
-  this->m_Mutex->Unlock();
+  this->m_Mutex.unlock();
   return s.str();
 }
 
 std::string mitk::IGTLMessageQueue::GetLatestMsgDeviceType()
 {
-  this->m_Mutex->Lock();
+  this->m_Mutex.lock();
   std::stringstream s;
   if (m_Latest_Message != nullptr)
   {
@@ -276,7 +276,7 @@ std::string mitk::IGTLMessageQueue::GetLatestMsgDeviceType()
   {
     s << "";
   }
-  this->m_Mutex->Unlock();
+  this->m_Mutex.unlock();
   return s.str();
 }
 
@@ -288,21 +288,20 @@ int mitk::IGTLMessageQueue::GetSize()
 
 void mitk::IGTLMessageQueue::EnableNoBufferingMode(bool enable)
 {
-  this->m_Mutex->Lock();
+  this->m_Mutex.lock();
   if (enable)
     this->m_BufferingType = IGTLMessageQueue::BufferingType::NoBuffering;
   else
     this->m_BufferingType = IGTLMessageQueue::BufferingType::Infinit;
-  this->m_Mutex->Unlock();
+  this->m_Mutex.unlock();
 }
 
 mitk::IGTLMessageQueue::IGTLMessageQueue()
 {
-  this->m_Mutex = itk::FastMutexLock::New();
   this->m_BufferingType = IGTLMessageQueue::NoBuffering;
 }
 
 mitk::IGTLMessageQueue::~IGTLMessageQueue()
 {
-  this->m_Mutex->Unlock();
+  this->m_Mutex.unlock();
 }

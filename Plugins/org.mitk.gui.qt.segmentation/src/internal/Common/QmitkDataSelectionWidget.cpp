@@ -161,12 +161,12 @@ unsigned int QmitkDataSelectionWidget::AddDataSelection(const QString &labelText
   QmitkSingleNodeSelectionWidget* nodeSelection = new QmitkSingleNodeSelectionWidget(m_Controls.dataSelectionWidget);
   
   nodeSelection->SetSelectionIsOptional(false);
-  nodeSelection->SetAutoSelectNewNodes(false);
   nodeSelection->SetInvalidInfo(info);
   nodeSelection->SetPopUpTitel(popupTitel);
   nodeSelection->SetPopUpHint(popupHint);
   nodeSelection->SetDataStorage(this->GetDataStorage());
   nodeSelection->SetNodePredicate(predicate);
+  nodeSelection->SetAutoSelectNewNodes(true);
   nodeSelection->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
   nodeSelection->setMinimumSize(0, 40);
 
@@ -201,10 +201,16 @@ void QmitkDataSelectionWidget::SetPredicate(unsigned int index, Predicate predic
   this->SetPredicate(index, CreatePredicate(predicate));
 }
 
-void QmitkDataSelectionWidget::SetPredicate(unsigned int index, mitk::NodePredicateBase* predicate)
+void QmitkDataSelectionWidget::SetPredicate(unsigned int index, const mitk::NodePredicateBase* predicate)
 {
   assert(index < m_NodeSelectionWidgets.size());
   m_NodeSelectionWidgets[index]->SetNodePredicate(predicate);
+}
+
+const mitk::NodePredicateBase *QmitkDataSelectionWidget::GetPredicate(unsigned int index) const
+{
+  assert(index < m_NodeSelectionWidgets.size());
+  return m_NodeSelectionWidgets[index]->GetNodePredicate();
 }
 
 void QmitkDataSelectionWidget::SetHelpText(const QString& text)

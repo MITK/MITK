@@ -18,7 +18,6 @@ found in the LICENSE file.
 #include "mitkTrackingTypes.h"
 #include <itksys/SystemTools.hxx>
 #include <iostream>
-#include <itkMutexLockHolder.h>
 #include <itkCommand.h>
 #include <mitkOpenIGTLinkTypeInformation.h>
 #include <vtkConeSource.h>
@@ -26,8 +25,6 @@ found in the LICENSE file.
 //sleep headers
 #include <chrono>
 #include <thread>
-
-typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
 mitk::OpenIGTLinkTrackingDevice::OpenIGTLinkTrackingDevice() : mitk::TrackingDevice(), m_UpdateRate(60)
 {

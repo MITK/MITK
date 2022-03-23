@@ -21,6 +21,7 @@ found in the LICENSE file.
 // MITK includes
 #include "mitkStringProperty.h"
 #include <mitkNumericTypes.h>
+#include <mitkUtf8Util.h>
 
 // itksys
 #include <itksys/SystemTools.hxx>
@@ -44,7 +45,7 @@ class mitkTinyXMLTestSuite : public mitk::TestFixture
   CPPUNIT_TEST_SUITE_END();
 
 private:
-  const std::string m_Filename = itksys::SystemTools::GetCurrentWorkingDirectory() + "/TinyXMLTest.txt";
+  const std::string m_Filename = mitk::Utf8Util::Utf8ToLocal8Bit(itksys::SystemTools::GetCurrentWorkingDirectory()) + "/TinyXMLTest.txt";
   const std::string m_ElementToStoreAttributeName = "DoubleTest";
   const std::string m_AttributeToStoreName = "CommaValue";
 

@@ -57,7 +57,7 @@ between tests with different inputs. In this example the test is named
 The next parameters sets test executable name (i.e. the name of the test class). Here: <em>mitkImageVtkMapper2D</em>.
 
 The next parameter(s) are used to pass the input to the test. For instance, it is possible to set
-multiple objects as input for a test (e.g. /path/to/img1.jpg /path/to/img2.pic /path/to/pointset.mps).
+multiple objects as input for a test (e.g. /path/to/img1.jpg /path/to/img2.nrrd /path/to/pointset.mps).
 All test data for core tests should be placed into the MITK-DATA repository inside the folder:
 ${MITK_DATA_DIR}/RenderingTestData/. It is possible to create other folders for different modules or bundles.
 

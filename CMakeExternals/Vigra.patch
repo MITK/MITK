@@ -390,3 +390,130 @@ diff -u -r Vigra.orig/include/vigra/imagecontainer.hxx Vigra/include/vigra/image
      {
          images_.swap(other.images_);
          std::swap(lowestLevel_, other.lowestLevel_);
+diff -urNb vigra-Version-1-10-0/include/vigra/functortraits.hxx Vigra/include/vigra/functortraits.hxx
+--- vigra-Version-1-10-0/include/vigra/functortraits.hxx        2013-11-18 17:48:16.000000000 +0100
++++ Vigra/include/vigra/functortraits.hxx       2022-03-17 15:15:01.637026200 +0100
+@@ -195,8 +195,6 @@
+ VIGRA_DEFINE_STL_FUNCTOR(std::negate, VigraTrueType, VigraFalseType)
+ VIGRA_DEFINE_STL_FUNCTOR(std::logical_not, VigraTrueType, VigraFalseType)
+ VIGRA_DEFINE_STL_FUNCTOR(std::unary_negate, VigraTrueType, VigraFalseType)
+-VIGRA_DEFINE_STL_FUNCTOR(std::binder1st, VigraTrueType, VigraFalseType)
+-VIGRA_DEFINE_STL_FUNCTOR(std::binder2nd, VigraTrueType, VigraFalseType)
+ #undef VIGRA_DEFINE_STL_FUNCTOR
+
+ template <class R>
+diff -urNb vigra-Version-1-10-0/src/impex/imageinfo.cxx Vigra/src/impex/imageinfo.cxx
+--- vigra-Version-1-10-0/src/impex/imageinfo.cxx        2013-11-18 17:48:16.000000000 +0100
++++ Vigra/src/impex/imageinfo.cxx       2022-03-17 15:22:20.975223000 +0100
+@@ -1016,7 +1016,7 @@
+             do
+             {
+                 numEndIt = std::find_if(numBeginIt, filename.rend(),(int (*)(int)) &isdigit);
+-                numBeginIt = std::find_if(numEndIt, filename.rend(), not1(std::ptr_fun((int (*)(int))&isdigit)));
++                numBeginIt = std::find_if(numEndIt, filename.rend(), std::not_fn((int (*)(int))&isdigit));
+
+                 if(numEndIt != filename.rend())
+                 {
+diff -urNb vigra-1.10.0-src/include/vigra/separableconvolution.hxx Vigra/include/vigra/separableconvolution.hxx
+--- vigra-1.10.0-src/include/vigra/separableconvolution.hxx	2013-11-18 17:48:16.000000000 +0100
++++ Vigra/include/vigra/separableconvolution.hxx	2022-03-17 23:08:05.690694437 +0100
+@@ -1409,9 +1409,6 @@
+         {}
+ 
+         ~InitProxy() 
+-#ifndef _MSC_VER
+-             throw(PreconditionViolation)
+-#endif
+         {
+             vigra_precondition(count_ == 1 || count_ == sum_,
+                   "Kernel1D::initExplicitly(): "
+diff -urNb vigra-1.10.0-src/src/impex/gif.cxx Vigra/src/impex/gif.cxx
+--- vigra-1.10.0-src/src/impex/gif.cxx	2013-11-18 17:48:16.000000000 +0100
++++ Vigra/src/impex/gif.cxx	2022-03-17 23:17:05.896364451 +0100
+@@ -482,12 +482,12 @@
+             in_code,
+             old_code;
+ 
+-        register int
++        int
+             bits,
+             code,
+             count;
+ 
+-        register unsigned long
++        unsigned long
+         datum;
+ 
+         void_vector<Int16> prefix(MaxStackSize);
+@@ -496,8 +496,8 @@
+         void_vector<UInt8> packet(256);
+         void_vector<UInt16> indices(header.width*header.height);
+ 
+-        register UInt8 *c;
+-        register UInt16 *p = indices.begin();
++        UInt8 *c;
++        UInt16 *p = indices.begin();
+ 
+         UInt8
+         data_size,
+@@ -624,7 +624,7 @@
+ 
+             int pass, x, y;
+ 
+-            register UInt16 *q;
++            UInt16 *q;
+ 
+             static int
+               interlace_rate[4] = { 8, 8, 4, 2 },
+@@ -891,9 +891,9 @@
+         long
+           datum;
+ 
+-        register int k;
++        int k;
+ 
+-        register UInt8 *p;
++        UInt8 *p;
+ 
+         void_vector<Int16> hash_code(MaxHashTable);
+         void_vector<Int16> hash_prefix(MaxHashTable);
+diff -urNb vigra-1.10.0-src/include/vigra/random_forest/rf_algorithm.hxx Vigra/include/vigra/random_forest/rf_algorithm.hxx
+--- vigra-1.10.0-src/include/vigra/random_forest/rf_algorithm.hxx	2013-11-18 17:48:16.000000000 +0100
++++ Vigra/include/vigra/random_forest/rf_algorithm.hxx	2022-03-18 08:52:17.519102162 +0100
+@@ -34,6 +34,7 @@
+ /************************************************************************/
+ #define VIGRA_RF_ALGORITHM_HXX
+ 
++#include <random>
+ #include <vector>
+ #include "splices.hxx"
+ #include <queue>
+@@ -1151,7 +1152,7 @@
+             ArrayVector<Int32> indices(pr.features().shape(0));
+             for(int ii = 0; ii < pr.features().shape(0); ++ii)
+                indices.push_back(ii); 
+-            std::random_shuffle(indices.begin(), indices.end());
++            std::shuffle(indices.begin(), indices.end(), std::mt19937(std::random_device()()));
+             for(int ii = 0; ii < rf.ext_param_.row_count_; ++ii)
+             {
+                 if(!sm.is_used()[indices[ii]] && cts[pr.response()(indices[ii], 0)] < 3000)
+diff -urNb vigra-1.10.0-src/include/vigra/random_forest/rf_visitors.hxx Vigra/include/vigra/random_forest/rf_visitors.hxx
+--- vigra-1.10.0-src/include/vigra/random_forest/rf_visitors.hxx	2013-11-18 17:48:16.000000000 +0100
++++ Vigra/include/vigra/random_forest/rf_visitors.hxx	2022-03-18 08:54:14.449776895 +0100
+@@ -41,6 +41,7 @@
+ #include <vigra/windows.h>
+ #include <iostream>
+ #include <iomanip>
++#include <random>
+ 
+ #include <vigra/multi_pointoperators.hxx>
+ #include <vigra/timing.hxx>
+@@ -909,7 +910,7 @@
+         {
+             ArrayVector<int> oob_indices;
+             ArrayVector<int> cts(class_count, 0);
+-            std::random_shuffle(indices.begin(), indices.end());
++            std::shuffle(indices.begin(), indices.end(), std::mt19937(std::random_device()()));
+             for(int ii = 0; ii < rf.ext_param_.row_count_; ++ii)
+             {
+                 if(!sm.is_used()[indices[ii]] && cts[pr.response()(indices[ii], 0)] < 40000)

@@ -24,7 +24,7 @@ found in the LICENSE file.
 namespace mitk
 {
   // Define events for TubeGraph interaction notifications
-  itkEventMacro(SelectionChangedTubeGraphEvent, itk::AnyEvent);
+  itkEventMacroDeclaration(SelectionChangedTubeGraphEvent, itk::AnyEvent);
 
   /**
   * \brief

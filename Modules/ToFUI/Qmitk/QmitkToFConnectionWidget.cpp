@@ -167,7 +167,7 @@ void QmitkToFConnectionWidget::OnConnectCamera()
         }
         else
         {
-          fileFilter.append("NRRD Images (*.nrrd);;PIC Images - deprecated (*.pic)");
+          fileFilter.append("NRRD Images (*.nrrd)");
         }
 
         //open a QFileDialog to chose the corresponding file from the disc
@@ -199,8 +199,8 @@ void QmitkToFConnectionWidget::OnConnectCamera()
             std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( tmpFileName.toStdString() );
             std::string extension = itksys::SystemTools::GetFilenameLastExtension( tmpFileName.toStdString() );
 
-            //"Incorrect format"-warning while using .nrrd or .pic files
-            if (extension != ".pic" && extension != ".nrrd")
+            //"Incorrect format"-warning while using .nrrd files
+            if (extension != ".nrrd")
             {
               msg = msg + "Invalid file format, please select a \".nrrd\"-file";
               throw std::logic_error(msg.c_str());

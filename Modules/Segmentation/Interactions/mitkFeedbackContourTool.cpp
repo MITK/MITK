@@ -51,13 +51,13 @@ void mitk::FeedbackContourTool::SetFeedbackContourColor(float r, float g, float 
 
 void mitk::FeedbackContourTool::SetFeedbackContourColorDefault()
 {
-  m_FeedbackContourNode->SetProperty("contour.color", ColorProperty::New(0.0 / 255.0, 255.0 / 255.0, 0.0 / 255.0));
+  this->SetFeedbackContourColor(0.0, 1.0, 0.0);
 }
 
 void mitk::FeedbackContourTool::Deactivated()
 {
   Superclass::Deactivated();
-  DataStorage *storage = m_ToolManager->GetDataStorage();
+  DataStorage *storage = this->GetToolManager()->GetDataStorage();
   if (storage && m_FeedbackContourNode.IsNotNull())
   {
     storage->Remove(m_FeedbackContourNode);
@@ -180,7 +180,7 @@ void mitk::FeedbackContourTool::SetFeedbackContourVisible(bool visible)
   if (m_FeedbackContourVisible == visible)
     return; // nothing changed
 
-  if (DataStorage *storage = m_ToolManager->GetDataStorage())
+  if (DataStorage *storage = this->GetToolManager()->GetDataStorage())
   {
     if (visible)
     {
@@ -198,20 +198,15 @@ void mitk::FeedbackContourTool::SetFeedbackContourVisible(bool visible)
 }
 
 mitk::ContourModel::Pointer mitk::FeedbackContourTool::ProjectContourTo2DSlice(const Image *slice,
-                                                                               const ContourModel *contourIn3D,
-                                                                               bool correctionForIpSegmentation,
-                                                                               bool constrainToInside)
+                                                                               const ContourModel *contourIn3D)
 {
-  return mitk::ContourModelUtils::ProjectContourTo2DSlice(
-    slice, contourIn3D, correctionForIpSegmentation, constrainToInside);
+  return mitk::ContourModelUtils::ProjectContourTo2DSlice(slice, contourIn3D);
 }
 
 mitk::ContourModel::Pointer mitk::FeedbackContourTool::BackProjectContourFrom2DSlice(const BaseGeometry *sliceGeometry,
-                                                                                     const ContourModel *contourIn2D,
-                                                                                     bool correctionForIpSegmentation)
+                                                                                     const ContourModel *contourIn2D)
 {
-  return mitk::ContourModelUtils::BackProjectContourFrom2DSlice(
-    sliceGeometry, contourIn2D, correctionForIpSegmentation);
+  return mitk::ContourModelUtils::BackProjectContourFrom2DSlice(sliceGeometry, contourIn2D);
 }
 
 void mitk::FeedbackContourTool::WriteBackFeedbackContourAsSegmentationResult(const InteractionPositionEvent* positionEvent, int paintingPixelValue, bool setInvisibleAfterSuccess)
@@ -242,8 +237,7 @@ void mitk::FeedbackContourTool::WriteBackFeedbackContourAsSegmentationResult(con
   auto contourTimeStep = positionEvent->GetSender()->GetTimeStep(feedbackContour);
 
   ContourModel::Pointer projectedContour = FeedbackContourTool::ProjectContourTo2DSlice(
-    slice, feedbackContour, false, false); // false: don't add 0.5 (done by FillContourInSlice)
-  // false: don't constrain the contour to the image's inside
+    slice, feedbackContour);
 
   if (projectedContour.IsNull())
     return;

@@ -38,9 +38,9 @@ void mitk::PixelManipulationTool::Activated()
 {
   Superclass::Activated();
 
-  m_ToolManager->RoiDataChanged +=
+  this->GetToolManager()->RoiDataChanged +=
     mitk::MessageDelegate<mitk::PixelManipulationTool>(this, &mitk::PixelManipulationTool::OnRoiDataChanged);
-  m_OriginalImageNode = m_ToolManager->GetReferenceData(0);
+  m_OriginalImageNode = this->GetToolManager()->GetReferenceData(0);
 
   if (m_OriginalImageNode.IsNotNull())
   {
@@ -51,12 +51,12 @@ void mitk::PixelManipulationTool::Activated()
     }
   }
   else
-    m_ToolManager->ActivateTool(-1);
+    this->GetToolManager()->ActivateTool(-1);
 }
 
 void mitk::PixelManipulationTool::Deactivated()
 {
-  m_ToolManager->RoiDataChanged -=
+  this->GetToolManager()->RoiDataChanged -=
     mitk::MessageDelegate<mitk::PixelManipulationTool>(this, &mitk::PixelManipulationTool::OnRoiDataChanged);
 
   Superclass::Deactivated();
@@ -81,7 +81,7 @@ void mitk::PixelManipulationTool::CalculateImage()
   if (m_OriginalImageNode.IsNotNull())
   {
     mitk::Image::Pointer image = dynamic_cast<mitk::Image *>(m_OriginalImageNode->GetData());
-    mitk::DataNode *maskNode = m_ToolManager->GetRoiData(0);
+    mitk::DataNode *maskNode = this->GetToolManager()->GetRoiData(0);
     mitk::Image::Pointer roi = mitk::Image::New();
 
     if (maskNode)
@@ -165,8 +165,8 @@ void mitk::PixelManipulationTool::AddImageToDataStorage(mitk::Image::Pointer ima
     node->SetProperty("binary", mitk::BoolProperty::New(false));
     node->SetData(image);
 
-    if (m_ToolManager)
-      m_ToolManager->GetDataStorage()->Add(node, m_OriginalImageNode);
+    if (nullptr != this->GetToolManager())
+      this->GetToolManager()->GetDataStorage()->Add(node, m_OriginalImageNode);
   }
 }
 

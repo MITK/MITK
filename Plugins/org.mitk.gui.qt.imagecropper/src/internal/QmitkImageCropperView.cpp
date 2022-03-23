@@ -140,7 +140,7 @@ void QmitkImageCropperView::OnImageSelectionChanged(QList<mitk::DataNode::Pointe
 
     this->CreateBoundingShapeInteractor(rotationEnabled);
 
-    if (itk::ImageIOBase::SCALAR == image->GetPixelType().GetPixelType())
+    if (itk::IOPixelEnum::SCALAR == image->GetPixelType().GetPixelType())
     {
       // Might be changed with the upcoming new image statistics plugin
       //(recomputation might be very expensive for large images ;) )
@@ -211,7 +211,6 @@ void QmitkImageCropperView::OnBoundingBoxSelectionChanged(QList<mitk::DataNode::
     m_BoundingShapeInteractor->SetDataNode(boundingBoxNode);
 
     mitk::RenderingManager::GetInstance()->InitializeViews();
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
     if (m_Controls.imageSelectionWidget->GetSelectedNode().IsNotNull())
     {
@@ -417,7 +416,6 @@ void QmitkImageCropperView::ProcessImage(bool mask)
         // initialize the views to the bounding geometry
         auto bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(tempDataStorage);
         mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
-        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       }
     }
     else
@@ -466,7 +464,6 @@ void QmitkImageCropperView::ProcessImage(bool mask)
         // initialize the views to the bounding geometry
         auto bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(tempDataStorage);
         mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
-        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       }
     }
   }

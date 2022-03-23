@@ -47,7 +47,7 @@ mitk::RegionGrowingTool::RegionGrowingTool()
     m_ScreenYDifference(0),
     m_ScreenXDifference(0),
     m_MouseDistanceScaleFactor(0.5),
-    m_PaintingPixelValue(0),
+    m_PaintingPixelValue(1),
     m_FillFeedbackContour(true),
     m_ConnectedComponentValue(1)
 {
@@ -160,22 +160,6 @@ void mitk::RegionGrowingTool::GetNeighborhoodAverage(const itk::Image<TPixel, im
   *result /= numberOfPixels;
 }
 
-// Check whether index lies inside a segmentation
-template <typename TPixel, unsigned int imageDimension>
-void mitk::RegionGrowingTool::IsInsideSegmentation(const itk::Image<TPixel, imageDimension> *itkImage,
-                                                   const itk::Index<imageDimension>& index,
-                                                   bool *result)
-{
-  if (itkImage->GetPixel(index) > 0)
-  {
-    *result = true;
-  }
-  else
-  {
-    *result = false;
-  }
-}
-
 // Do the region growing (i.e. call an ITK filter that does it)
 template <typename TPixel, unsigned int imageDimension>
 void mitk::RegionGrowingTool::StartRegionGrowing(const itk::Image<TPixel, imageDimension> *inputImage,
@@ -276,7 +260,7 @@ template <typename TPixel, unsigned int imageDimension>
 void mitk::RegionGrowingTool::CalculateInitialThresholds(const itk::Image<TPixel, imageDimension>*)
 {
   LevelWindow levelWindow;
-  m_ToolManager->GetReferenceData(0)->GetLevelWindow(levelWindow);
+  this->GetToolManager()->GetReferenceData(0)->GetLevelWindow(levelWindow);
 
   m_ThresholdExtrema[0] = static_cast<ScalarType>(std::numeric_limits<TPixel>::lowest());
   m_ThresholdExtrema[1] = static_cast<ScalarType>(std::numeric_limits<TPixel>::max());
@@ -301,11 +285,13 @@ void mitk::RegionGrowingTool::CalculateInitialThresholds(const itk::Image<TPixel
   }
 }
 
-void mitk::RegionGrowingTool::OnMousePressed(StateMachineAction *, InteractionEvent *interactionEvent)
+void mitk::RegionGrowingTool::OnMousePressed(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
-  if (!positionEvent)
+  auto* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(interactionEvent);
+  if (nullptr == positionEvent)
+  {
     return;
+  }
 
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
@@ -315,255 +301,159 @@ void mitk::RegionGrowingTool::OnMousePressed(StateMachineAction *, InteractionEv
   m_ReferenceSlice = FeedbackContourTool::GetAffectedReferenceSlice(positionEvent);
   m_WorkingSlice = FeedbackContourTool::GetAffectedWorkingSlice(positionEvent);
 
-  if (m_WorkingSlice.IsNotNull()) // can't do anything without a working slice (i.e. a possibly empty segmentation)
+  if (m_WorkingSlice.IsNull())
   {
-    // 2. Determine if the user clicked inside or outside of the segmentation/working slice (i.e. the whole volume)
-    mitk::BaseGeometry::Pointer workingSliceGeometry;
-    workingSliceGeometry = m_WorkingSlice->GetGeometry();
-    workingSliceGeometry->WorldToIndex(positionEvent->GetPositionInWorld(), m_SeedPoint);
-    itk::Index<2> indexInWorkingSlice2D;
-    indexInWorkingSlice2D[0] = m_SeedPoint[0];
-    indexInWorkingSlice2D[1] = m_SeedPoint[1];
+    // can't do anything without a working slice (i.e. a possibly empty segmentation)
+    return;
+  }
 
-    if (workingSliceGeometry->IsIndexInside(m_SeedPoint))
+  // Determine if the user clicked inside or outside of the working slice (i.e. the whole volume)
+  mitk::BaseGeometry::Pointer workingSliceGeometry;
+  workingSliceGeometry = m_WorkingSlice->GetGeometry();
+  workingSliceGeometry->WorldToIndex(positionEvent->GetPositionInWorld(), m_SeedPoint);
+  itk::Index<2> indexInWorkingSlice2D;
+  indexInWorkingSlice2D[0] = m_SeedPoint[0];
+  indexInWorkingSlice2D[1] = m_SeedPoint[1];
+
+  if (!workingSliceGeometry->IsIndexInside(m_SeedPoint))
+  {
+    MITK_DEBUG << "OnMousePressed: point " << positionEvent->GetPositionInWorld() << " (index coordinates "
+               << m_SeedPoint << ") is not inside working slice";
+    return;
+  }
+
+  mitk::BaseGeometry::Pointer referenceSliceGeometry;
+  referenceSliceGeometry = m_ReferenceSlice->GetGeometry();
+  itk::Index<3> indexInReferenceSlice;
+  itk::Index<2> indexInReferenceSlice2D;
+  referenceSliceGeometry->WorldToIndex(positionEvent->GetPositionInWorld(), indexInReferenceSlice);
+  indexInReferenceSlice2D[0] = indexInReferenceSlice[0];
+  indexInReferenceSlice2D[1] = indexInReferenceSlice[1];
+
+  // Get seed neighborhood
+  ScalarType averageValue(0);
+  AccessFixedDimensionByItk_3(m_ReferenceSlice, GetNeighborhoodAverage, 2, indexInReferenceSlice2D, &averageValue, 1);
+  m_SeedValue = averageValue;
+  MITK_DEBUG << "Seed value is " << m_SeedValue;
+
+  // Calculate initial thresholds
+  AccessFixedDimensionByItk(m_ReferenceSlice, CalculateInitialThresholds, 2);
+  m_Thresholds[0] = m_InitialThresholds[0];
+  m_Thresholds[1] = m_InitialThresholds[1];
+
+  // Perform region growing
+  mitk::Image::Pointer resultImage = mitk::Image::New();
+  AccessFixedDimensionByItk_3(
+    m_ReferenceSlice, StartRegionGrowing, 2, indexInWorkingSlice2D, m_Thresholds, resultImage);
+  resultImage->SetGeometry(workingSliceGeometry);
+
+  // Extract contour
+  if (resultImage.IsNotNull() && m_ConnectedComponentValue >= 1)
+  {
+    float isoOffset = 0.33;
+
+    mitk::ImageToContourModelFilter::Pointer contourExtractor = mitk::ImageToContourModelFilter::New();
+    contourExtractor->SetInput(resultImage);
+    contourExtractor->SetContourValue(m_ConnectedComponentValue - isoOffset);
+    contourExtractor->Update();
+    ContourModel::Pointer resultContour = ContourModel::New();
+    resultContour = contourExtractor->GetOutput();
+
+    // Show contour
+    if (resultContour.IsNotNull())
     {
-      MITK_DEBUG << "OnMousePressed: point " << positionEvent->GetPositionInWorld() << " (index coordinates "
-                 << m_SeedPoint << ") is inside working slice";
+      ContourModel::Pointer resultContourWorld = FeedbackContourTool::BackProjectContourFrom2DSlice(
+        workingSliceGeometry, FeedbackContourTool::ProjectContourTo2DSlice(m_WorkingSlice, resultContour));
 
-      // 3. determine the pixel value under the last click to determine what to do
-      bool inside(true);
-      AccessFixedDimensionByItk_2(m_WorkingSlice, IsInsideSegmentation, 2, indexInWorkingSlice2D, &inside);
-      m_PaintingPixelValue = inside ? 0 : 1;
+      FeedbackContourTool::UpdateCurrentFeedbackContour(resultContourWorld);
 
-      if (inside)
-      {
-        MITK_DEBUG << "Clicked inside segmentation";
-        // For now, we're doing nothing when the user clicks inside the segmentation. Behaviour can be implemented via
-        // OnMousePressedInside()
-        // When you do, be sure to remove the m_PaintingPixelValue check in OnMouseMoved() and OnMouseReleased()
-        return;
-      }
-      else
-      {
-        MITK_DEBUG << "Clicked outside of segmentation";
-        OnMousePressedOutside(nullptr, interactionEvent);
-      }
+      FeedbackContourTool::SetFeedbackContourVisible(true);
+      mitk::RenderingManager::GetInstance()->RequestUpdate(m_LastEventSender->GetRenderWindow());
     }
   }
 }
 
-// Use this to implement a behaviour for when the user clicks inside a segmentation (for example remove something)
-// Old IpPic code is kept as comment for reference
-void mitk::RegionGrowingTool::OnMousePressedInside()
+void mitk::RegionGrowingTool::OnMouseMoved(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  //    mitk::InteractionPositionEvent* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>( interactionEvent
-  //    );
-  //    //const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent()); // checked in
-  //    OnMousePressed
-  //    // 3.1.1. Create a skeletonization of the segmentation and try to find a nice cut
-  //    // apply the skeletonization-and-cut algorithm
-  //    // generate contour to remove
-  //    // set m_ReferenceSlice = nullptr so nothing will happen during mouse move
-  //    // remember to fill the contour with 0 in mouserelease
-  //    mitkIpPicDescriptor* segmentationHistory = ipMITKSegmentationCreateGrowerHistory( workingPicSlice,
-  //    m_LastWorkingSeed, nullptr ); // free again
-  //    if (segmentationHistory)
-  //    {
-  //        tCutResult cutContour = ipMITKSegmentationGetCutPoints( workingPicSlice, segmentationHistory,
-  //        initialWorkingOffset ); // tCutResult is a ipSegmentation type
-  //        mitkIpPicFree( segmentationHistory );
-  //        if (cutContour.cutIt)
-  //        {
-  //            int timestep = positionEvent->GetSender()->GetTimeStep();
-  //            // 3.1.2 copy point from float* to mitk::Contour
-  //            ContourModel::Pointer contourInImageIndexCoordinates = ContourModel::New();
-  //            contourInImageIndexCoordinates->Expand(timestep + 1);
-  //            contourInImageIndexCoordinates->SetClosed(true, timestep);
-  //            Point3D newPoint;
-  //            for (int index = 0; index < cutContour.deleteSize; ++index)
-  //            {
-  //                newPoint[0] = cutContour.deleteCurve[ 2 * index + 0 ] - 0.5;//correction is needed because the
-  //                output of the algorithm is center based
-  //                newPoint[1] = cutContour.deleteCurve[ 2 * index + 1 ] - 0.5;//and we want our contour displayed
-  //                corner based.
-  //                newPoint[2] = 0.0;
-
-  //                contourInImageIndexCoordinates->AddVertex( newPoint, timestep );
-  //            }
-
-  //            free(cutContour.traceline);
-  //            free(cutContour.deleteCurve); // perhaps visualize this for fun?
-  //            free(cutContour.onGradient);
-
-  //            ContourModel::Pointer contourInWorldCoordinates = FeedbackContourTool::BackProjectContourFrom2DSlice(
-  //            m_WorkingSlice->GetGeometry(), contourInImageIndexCoordinates, true ); // true: sub 0.5 for
-  //            ipSegmentation correction
-
-  //            FeedbackContourTool::SetFeedbackContour( contourInWorldCoordinates );
-  //            FeedbackContourTool::SetFeedbackContourVisible(true);
-  //            mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
-  //            m_FillFeedbackContour = true;
-  //        }
-  //        else
-  //        {
-  //            m_FillFeedbackContour = false;
-  //        }
-
-  //    }
-  //    else
-  //    {
-  //        m_FillFeedbackContour = false;
-  //    }
-
-  //    m_ReferenceSlice = nullptr;
-
-  //    return true;
-}
-
-void mitk::RegionGrowingTool::OnMousePressedOutside(StateMachineAction *, InteractionEvent *interactionEvent)
-{
-  auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
-
-  if (positionEvent)
-  {
-    // Get geometry and indices
-    mitk::BaseGeometry::Pointer workingSliceGeometry;
-    workingSliceGeometry = m_WorkingSlice->GetGeometry();
-    itk::Index<2> indexInWorkingSlice2D;
-    indexInWorkingSlice2D[0] = m_SeedPoint[0];
-    indexInWorkingSlice2D[1] = m_SeedPoint[1];
-
-    mitk::BaseGeometry::Pointer referenceSliceGeometry;
-    referenceSliceGeometry =
-      m_ReferenceSlice->GetGeometry();
-    itk::Index<3> indexInReferenceSlice;
-    itk::Index<2> indexInReferenceSlice2D;
-    referenceSliceGeometry->WorldToIndex(positionEvent->GetPositionInWorld(), indexInReferenceSlice);
-    indexInReferenceSlice2D[0] = indexInReferenceSlice[0];
-    indexInReferenceSlice2D[1] = indexInReferenceSlice[1];
-
-    // Get seed neighborhood
-    ScalarType averageValue(0);
-    AccessFixedDimensionByItk_3(m_ReferenceSlice, GetNeighborhoodAverage, 2, indexInReferenceSlice2D, &averageValue, 1);
-    m_SeedValue = averageValue;
-    MITK_DEBUG << "Seed value is " << m_SeedValue;
-
-    // Calculate initial thresholds
-    AccessFixedDimensionByItk(m_ReferenceSlice, CalculateInitialThresholds, 2);
-    m_Thresholds[0] = m_InitialThresholds[0];
-    m_Thresholds[1] = m_InitialThresholds[1];
-
-    // Perform region growing
-    mitk::Image::Pointer resultImage = mitk::Image::New();
-    AccessFixedDimensionByItk_3(
-      m_ReferenceSlice, StartRegionGrowing, 2, indexInWorkingSlice2D, m_Thresholds, resultImage);
-    resultImage->SetGeometry(workingSliceGeometry);
-
-    // Extract contour
-    if (resultImage.IsNotNull() && m_ConnectedComponentValue >= 1)
-    {
-      float isoOffset = 0.33;
-
-      mitk::ImageToContourModelFilter::Pointer contourExtractor = mitk::ImageToContourModelFilter::New();
-      contourExtractor->SetInput(resultImage);
-      contourExtractor->SetContourValue(m_ConnectedComponentValue - isoOffset);
-      contourExtractor->Update();
-      ContourModel::Pointer resultContour = ContourModel::New();
-      resultContour = contourExtractor->GetOutput();
-
-      // Show contour
-      if (resultContour.IsNotNull())
-      {
-        ContourModel::Pointer resultContourWorld = FeedbackContourTool::BackProjectContourFrom2DSlice(
-          workingSliceGeometry, FeedbackContourTool::ProjectContourTo2DSlice(m_WorkingSlice, resultContour));
-
-        FeedbackContourTool::UpdateCurrentFeedbackContour(resultContourWorld);
-
-        FeedbackContourTool::SetFeedbackContourVisible(true);
-        mitk::RenderingManager::GetInstance()->RequestUpdate(m_LastEventSender->GetRenderWindow());
-      }
-    }
-  }
-}
-
-void mitk::RegionGrowingTool::OnMouseMoved(StateMachineAction *, InteractionEvent *interactionEvent)
-{
-  // Until OnMousePressedInside() implements a behaviour, we're just returning here whenever m_PaintingPixelValue is 0,
-  // i.e. when the user clicked inside the segmentation
-  if (m_PaintingPixelValue == 0)
+  auto* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(interactionEvent);
+  if (nullptr == positionEvent)
   {
     return;
   }
 
-  auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
-
-  if (m_ReferenceSlice.IsNotNull() && positionEvent)
-  {
-    // Get geometry and indices
-    mitk::BaseGeometry::Pointer workingSliceGeometry;
-    workingSliceGeometry = m_WorkingSlice->GetGeometry();
-    itk::Index<2> indexInWorkingSlice2D;
-    indexInWorkingSlice2D[0] = m_SeedPoint[0];
-    indexInWorkingSlice2D[1] = m_SeedPoint[1];
-
-    m_ScreenYDifference += positionEvent->GetPointerPositionOnScreen()[1] - m_LastScreenPosition[1];
-    m_ScreenXDifference += positionEvent->GetPointerPositionOnScreen()[0] - m_LastScreenPosition[0];
-    m_LastScreenPosition = Point2I(positionEvent->GetPointerPositionOnScreen());
-
-    // Moving the mouse up and down adjusts the width of the threshold window,
-    // moving it left and right shifts the threshold window
-    m_Thresholds[0] = std::min(m_SeedValue, m_InitialThresholds[0] - (m_ScreenYDifference - m_ScreenXDifference) * m_MouseDistanceScaleFactor);
-    m_Thresholds[1] = std::max(m_SeedValue, m_InitialThresholds[1] + (m_ScreenYDifference + m_ScreenXDifference) * m_MouseDistanceScaleFactor);
-
-    // Do not exceed the pixel type extrema of the reference slice, though
-    m_Thresholds[0] = std::max(m_ThresholdExtrema[0], m_Thresholds[0]);
-    m_Thresholds[1] = std::min(m_ThresholdExtrema[1], m_Thresholds[1]);
-
-    // Perform region growing again and show the result
-    mitk::Image::Pointer resultImage = mitk::Image::New();
-    AccessFixedDimensionByItk_3(
-      m_ReferenceSlice, StartRegionGrowing, 2, indexInWorkingSlice2D, m_Thresholds, resultImage);
-    resultImage->SetGeometry(workingSliceGeometry);
-
-    // Update the contour
-    if (resultImage.IsNotNull() && m_ConnectedComponentValue >= 1)
-    {
-      float isoOffset = 0.33;
-
-      mitk::ImageToContourModelFilter::Pointer contourExtractor = mitk::ImageToContourModelFilter::New();
-      contourExtractor->SetInput(resultImage);
-      contourExtractor->SetContourValue(m_ConnectedComponentValue - isoOffset);
-      contourExtractor->Update();
-      ContourModel::Pointer resultContour = ContourModel::New();
-      resultContour = contourExtractor->GetOutput();
-
-      // Show contour
-      if (resultContour.IsNotNull())
-      {
-        ContourModel::Pointer resultContourWorld = FeedbackContourTool::BackProjectContourFrom2DSlice(
-          workingSliceGeometry, FeedbackContourTool::ProjectContourTo2DSlice(m_WorkingSlice, resultContour));
-
-        FeedbackContourTool::UpdateCurrentFeedbackContour(resultContourWorld);
-
-        FeedbackContourTool::SetFeedbackContourVisible(true);
-        mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(positionEvent->GetSender()->GetRenderWindow());
-      }
-    }
-  }
-}
-
-void mitk::RegionGrowingTool::OnMouseReleased(StateMachineAction *, InteractionEvent *interactionEvent)
-{
-  // Until OnMousePressedInside() implements a behaviour, we're just returning here whenever m_PaintingPixelValue is 0,
-  // i.e. when the user clicked inside the segmentation
-  if (m_PaintingPixelValue == 0)
+  if (m_ReferenceSlice.IsNull())
   {
     return;
   }
 
-  auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+  // Get geometry and indices
+  mitk::BaseGeometry::Pointer workingSliceGeometry;
+  workingSliceGeometry = m_WorkingSlice->GetGeometry();
+  itk::Index<2> indexInWorkingSlice2D;
+  indexInWorkingSlice2D[0] = m_SeedPoint[0];
+  indexInWorkingSlice2D[1] = m_SeedPoint[1];
 
-  if (m_WorkingSlice.IsNotNull() && m_FillFeedbackContour && positionEvent)
+  m_ScreenYDifference += positionEvent->GetPointerPositionOnScreen()[1] - m_LastScreenPosition[1];
+  m_ScreenXDifference += positionEvent->GetPointerPositionOnScreen()[0] - m_LastScreenPosition[0];
+  m_LastScreenPosition = Point2I(positionEvent->GetPointerPositionOnScreen());
+
+  // Moving the mouse up and down adjusts the width of the threshold window,
+  // moving it left and right shifts the threshold window
+  m_Thresholds[0] = std::min(
+    m_SeedValue, m_InitialThresholds[0] - (m_ScreenYDifference - m_ScreenXDifference) * m_MouseDistanceScaleFactor);
+  m_Thresholds[1] = std::max(
+    m_SeedValue, m_InitialThresholds[1] + (m_ScreenYDifference + m_ScreenXDifference) * m_MouseDistanceScaleFactor);
+
+  // Do not exceed the pixel type extrema of the reference slice, though
+  m_Thresholds[0] = std::max(m_ThresholdExtrema[0], m_Thresholds[0]);
+  m_Thresholds[1] = std::min(m_ThresholdExtrema[1], m_Thresholds[1]);
+
+  // Perform region growing again and show the result
+  mitk::Image::Pointer resultImage = mitk::Image::New();
+  AccessFixedDimensionByItk_3(
+    m_ReferenceSlice, StartRegionGrowing, 2, indexInWorkingSlice2D, m_Thresholds, resultImage);
+  resultImage->SetGeometry(workingSliceGeometry);
+
+  // Update the contour
+  if (resultImage.IsNotNull() && m_ConnectedComponentValue >= 1)
+  {
+    float isoOffset = 0.33;
+
+    mitk::ImageToContourModelFilter::Pointer contourExtractor = mitk::ImageToContourModelFilter::New();
+    contourExtractor->SetInput(resultImage);
+    contourExtractor->SetContourValue(m_ConnectedComponentValue - isoOffset);
+    contourExtractor->Update();
+    ContourModel::Pointer resultContour = ContourModel::New();
+    resultContour = contourExtractor->GetOutput();
+
+    // Show contour
+    if (resultContour.IsNotNull())
+    {
+      ContourModel::Pointer resultContourWorld = FeedbackContourTool::BackProjectContourFrom2DSlice(
+        workingSliceGeometry, FeedbackContourTool::ProjectContourTo2DSlice(m_WorkingSlice, resultContour));
+
+      FeedbackContourTool::UpdateCurrentFeedbackContour(resultContourWorld);
+
+      FeedbackContourTool::SetFeedbackContourVisible(true);
+      mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(positionEvent->GetSender()->GetRenderWindow());
+    }
+  }
+}
+
+void mitk::RegionGrowingTool::OnMouseReleased(StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  auto* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(interactionEvent);
+  if (nullptr == positionEvent)
+  {
+    return;
+  }
+
+  if (m_WorkingSlice.IsNull() && m_FillFeedbackContour)
+  {
+    return;
+  }
+
+  if (m_FillFeedbackContour)
   {
     this->WriteBackFeedbackContourAsSegmentationResult(positionEvent, m_PaintingPixelValue);
 

@@ -76,17 +76,6 @@ int mitkToFImageDownsamplingFilterTest(int argc , char* argv[])
     MITK_TEST_FOR_EXCEPTION_END(itk::ExceptionObject);
   }
 
-
-
-  // Mean for debugging purposes if you want to write the resutling image to a file
-  //mitk::PicFileWriter::Pointer writer = mitk::PicFileWriter::New();
-  //writer->SetInputImage( resultImage);
-  //writer->SetFileName( "tofResult1.pic" );
-
-  //writer->Update();
-
-
   // always end with this!
   MITK_TEST_END();
 }
-

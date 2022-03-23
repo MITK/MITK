@@ -12,8 +12,6 @@ found in the LICENSE file.
 
 #include "QmitkLiveWireTool2DGUI.h"
 
-#include "QmitkNewSegmentationDialog.h"
-
 #include "mitkBaseRenderer.h"
 #include "mitkStepper.h"
 #include <qlabel.h>
@@ -32,6 +30,7 @@ QmitkLiveWireTool2DGUI::QmitkLiveWireTool2DGUI() : QmitkToolGUI()
   connect(m_Controls.m_ConfirmButton, SIGNAL(clicked()), this, SLOT(OnConfirmSegmentation()));
   connect(m_Controls.m_ClearButton, SIGNAL(clicked()), this, SLOT(OnClearSegmentation()));
   connect(this, SIGNAL(NewToolAssociated(mitk::Tool *)), this, SLOT(OnNewToolAssociated(mitk::Tool *)));
+  connect(m_Controls.m_SnapClosureCheckBox, SIGNAL(toggled(bool)), this, SLOT(OnSnapClosureContour(bool)));
   connect(m_Controls.m_InformationCheckBox, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)));
 }
 
@@ -54,6 +53,11 @@ void QmitkLiveWireTool2DGUI::OnClearSegmentation()
 {
   if (m_LiveWireTool.IsNotNull())
     m_LiveWireTool->ClearSegmentation();
+}
+
+void QmitkLiveWireTool2DGUI::OnSnapClosureContour(bool snap)
+{
+  m_LiveWireTool->SetSnapClosureContour(snap);
 }
 
 void QmitkLiveWireTool2DGUI::OnShowInformation(bool on)

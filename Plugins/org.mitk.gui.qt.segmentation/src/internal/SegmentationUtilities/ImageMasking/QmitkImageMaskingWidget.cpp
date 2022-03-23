@@ -21,8 +21,15 @@ found in the LICENSE file.
 #include <mitkProgressBar.h>
 #include <mitkSliceNavigationController.h>
 #include <mitkSurfaceToImageFilter.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateDimension.h>
+#include <mitkNodePredicateGeometry.h>
+#include <mitkNodePredicateNot.h>
 
 #include <QMessageBox>
+
+#include <limits>
 
 namespace
 {
@@ -49,10 +56,15 @@ QmitkImageMaskingWidget::QmitkImageMaskingWidget(mitk::SliceNavigationController
   m_Controls.dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::SegmentationOrSurfacePredicate);
   m_Controls.dataSelectionWidget->SetHelpText(HelpText);
 
+  // T28795: Disable 2-d reference images since they do not work yet (segmentations are at least 3-d images with a single slice)
+  m_Controls.dataSelectionWidget->SetPredicate(0, mitk::NodePredicateAnd::New(
+    mitk::NodePredicateNot::New(mitk::NodePredicateDimension::New(2)),
+    m_Controls.dataSelectionWidget->GetPredicate(0)));
+
   this->EnableButtons(false);
 
-  connect (m_Controls.btnMaskImage, SIGNAL(clicked()), this, SLOT(OnMaskImagePressed()));
-
+  connect(m_Controls.btnMaskImage, SIGNAL(clicked()), this, SLOT(OnMaskImagePressed()));
+  connect(m_Controls.rbnCustom, SIGNAL(toggled(bool)), this, SLOT(OnCustomValueButtonToggled(bool)));
   connect(m_Controls.dataSelectionWidget, SIGNAL(SelectionChanged(unsigned int, const mitk::DataNode*)),
     this, SLOT(OnSelectionChanged(unsigned int, const mitk::DataNode*)));
 
@@ -67,13 +79,26 @@ QmitkImageMaskingWidget::~QmitkImageMaskingWidget()
 {
 }
 
-void QmitkImageMaskingWidget::OnSelectionChanged(unsigned int index, const mitk::DataNode* selection)
+void QmitkImageMaskingWidget::OnSelectionChanged(unsigned int index, const mitk::DataNode *selection)
 {
-  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
-  mitk::DataNode::Pointer node0 = dataSelectionWidget->GetSelection(0);
-  mitk::DataNode::Pointer node1 = dataSelectionWidget->GetSelection(1);
+  auto *dataSelectionWidget = m_Controls.dataSelectionWidget;
+  auto node0 = dataSelectionWidget->GetSelection(0);
 
-  if (node0.IsNull() || node1.IsNull() )
+  if (index == 0)
+  {
+    dataSelectionWidget->SetPredicate(1, QmitkDataSelectionWidget::SegmentationOrSurfacePredicate);
+
+    if (node0.IsNotNull())
+    {
+      dataSelectionWidget->SetPredicate(1, mitk::NodePredicateAnd::New(
+        mitk::NodePredicateGeometry::New(node0->GetData()->GetGeometry()),
+        dataSelectionWidget->GetPredicate(1)));
+    }
+  }
+
+  auto node1 = dataSelectionWidget->GetSelection(1);
+
+  if (node0.IsNull() || node1.IsNull())
   {
     dataSelectionWidget->SetHelpText(HelpText);
     this->EnableButtons(false);
@@ -104,7 +129,7 @@ void QmitkImageMaskingWidget::SelectionControl(unsigned int index, const mitk::D
       mitk::Image::Pointer referenceImage = dynamic_cast<mitk::Image*> ( dataSelectionWidget->GetSelection(0)->GetData() );
       mitk::Image::Pointer maskImage = dynamic_cast<mitk::Image*> ( dataSelectionWidget->GetSelection(1)->GetData() );
 
-      if( maskImage.IsNull() || referenceImage->GetLargestPossibleRegion().GetSize() != maskImage->GetLargestPossibleRegion().GetSize() )
+      if (maskImage.IsNull())
       {
         dataSelectionWidget->SetHelpText("Different image sizes cannot be masked");
         this->EnableButtons(false);
@@ -125,7 +150,20 @@ void QmitkImageMaskingWidget::SelectionControl(unsigned int index, const mitk::D
 
 void QmitkImageMaskingWidget::EnableButtons(bool enable)
 {
+  m_Controls.grpBackgroundValue->setEnabled(enable);
   m_Controls.btnMaskImage->setEnabled(enable);
+}
+
+template<typename TPixel, unsigned int VImageDimension>
+void GetRange(const itk::Image<TPixel, VImageDimension>*, double& bottom, double& top)
+{
+  bottom = std::numeric_limits<TPixel>::lowest();
+  top = std::numeric_limits<TPixel>::max();
+}
+
+void QmitkImageMaskingWidget::OnCustomValueButtonToggled(bool checked)
+{
+  m_Controls.txtCustom->setEnabled(checked);
 }
 
 void QmitkImageMaskingWidget::OnMaskImagePressed()
@@ -165,11 +203,7 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
       return;
     }
 
-    if( referenceImage->GetLargestPossibleRegion().GetSize() == maskImage->GetLargestPossibleRegion().GetSize() )
-    {
-      resultImage = this->MaskImage( referenceImage, maskImage );
-    }
-
+    resultImage = this->MaskImage(referenceImage, maskImage);
   }
 
   //Do Surface-Masking
@@ -225,26 +259,83 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
 
 mitk::Image::Pointer QmitkImageMaskingWidget::MaskImage(mitk::Image::Pointer referenceImage, mitk::Image::Pointer maskImage )
 {
-  mitk::Image::Pointer resultImage(nullptr);
+  mitk::ScalarType backgroundValue = 0.0;
 
-  mitk::MaskImageFilter::Pointer maskFilter = mitk::MaskImageFilter::New();
-  maskFilter->SetInput( referenceImage );
-  maskFilter->SetMask( maskImage );
+  if (m_Controls.rbnMinimum->isChecked())
+  {
+    backgroundValue = referenceImage->GetStatistics()->GetScalarValueMin();
+  }
+  else if (m_Controls.rbnCustom->isChecked())
+  {
+    auto warningTitle = QStringLiteral("Invalid custom pixel value");
+
+    bool ok = false;
+    auto originalBackgroundValue = m_Controls.txtCustom->text().toDouble(&ok);
+
+    if (!ok)
+    {
+      // Input is not even a number
+      QMessageBox::warning(nullptr, warningTitle, "Please enter a valid number as custom pixel value.");
+      return nullptr;
+    }
+    else
+    {
+      // Clamp to the numerical limits of the pixel/component type
+      double bottom, top;
+      if (referenceImage->GetDimension() == 4)
+      {
+        AccessFixedDimensionByItk_n(referenceImage, GetRange, 4, (bottom, top));
+      }
+      else
+      {
+        AccessByItk_n(referenceImage, GetRange, (bottom, top));
+      }
+      backgroundValue = std::max(bottom, std::min(originalBackgroundValue, top));
+
+      // Get rid of decimals for integral numbers
+      auto type = referenceImage->GetPixelType().GetComponentType();
+      if (type != itk::IOComponentEnum::FLOAT && type != itk::IOComponentEnum::DOUBLE)
+        backgroundValue = std::round(backgroundValue);
+    }
+
+    // Ask the user for permission before correcting their input
+    if (std::abs(originalBackgroundValue - backgroundValue) > 1e-4)
+    {
+      auto warningText = QString(
+        "<p>The custom pixel value <b>%1</b> lies not within the range of valid pixel values for the selected image.</p>"
+        "<p>Apply the closest valid pixel value <b>%2</b> instead?</p>").arg(originalBackgroundValue).arg(backgroundValue);
+
+      auto ret = QMessageBox::warning(
+        nullptr,
+        warningTitle,
+        warningText,
+        QMessageBox::StandardButton::Apply | QMessageBox::StandardButton::Cancel,
+        QMessageBox::StandardButton::Apply);
+
+      if (QMessageBox::StandardButton::Apply != ret)
+        return nullptr;
+
+      m_Controls.txtCustom->setText(QString("%1").arg(backgroundValue));
+    }
+  }
+
+  auto maskFilter = mitk::MaskImageFilter::New();
+  maskFilter->SetInput(referenceImage);
+  maskFilter->SetMask(maskImage);
   maskFilter->OverrideOutsideValueOn();
-  maskFilter->SetOutsideValue( referenceImage->GetStatistics()->GetScalarValueMin() );
+  maskFilter->SetOutsideValue(backgroundValue);
+
   try
   {
     maskFilter->Update();
   }
-  catch(itk::ExceptionObject& excpt)
+  catch(const itk::ExceptionObject& e)
   {
-    MITK_ERROR << excpt.GetDescription();
+    MITK_ERROR << e.GetDescription();
     return nullptr;
   }
 
-  resultImage = maskFilter->GetOutput();
-
-  return resultImage;
+  return maskFilter->GetOutput();
 }
 
 mitk::Image::Pointer QmitkImageMaskingWidget::ConvertSurfaceToImage( mitk::Image::Pointer image, mitk::Surface::Pointer surface )

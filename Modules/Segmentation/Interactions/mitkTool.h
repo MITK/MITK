@@ -200,6 +200,12 @@ namespace mitk
     friend class ToolManager;
 
     virtual void SetToolManager(ToolManager *);
+    /** Returns the pointer to the tool manager of the tool. May be null.*/
+    ToolManager* GetToolManager() const;
+
+    /** Returns the data storage provided by the toolmanager. May be null (e.g. if
+     ToolManager is not set).*/
+    mitk::DataStorage* GetDataStorage() const;
 
     void ConnectActionsAndFunctions() override;
 
@@ -229,9 +235,9 @@ namespace mitk
 
     bool FilterEvents(InteractionEvent *, DataNode *) override;
 
-    ToolManager *m_ToolManager;
-
   private:
+    ToolManager* m_ToolManager;
+
     // for reference data
     NodePredicateDataType::Pointer m_PredicateImages;
     NodePredicateDimension::Pointer m_PredicateDim3;

@@ -14,12 +14,10 @@ found in the LICENSE file.
 #define mitkDICOMTagsOfInterestService_h
 
 #include <string>
+#include <mutex>
 #include <vector>
 #include <set>
 #include <mitkIDICOMTagsOfInterest.h>
-
-#include <itkFastMutexLock.h>
-#include <itkMutexLockHolder.h>
 
 namespace mitk
 {
@@ -51,10 +49,10 @@ namespace mitk
   private:
 
     typedef std::set<DICOMTagPath> InternalTagSetType;
-    typedef itk::MutexLockHolder<itk::SimpleFastMutexLock> MutexHolder;
+    typedef std::lock_guard<std::mutex> MutexHolder;
 
     InternalTagSetType m_Tags;
-    mutable itk::SimpleFastMutexLock m_Lock;
+    mutable std::mutex m_Lock;
 
     DICOMTagsOfInterestService(const DICOMTagsOfInterestService&);
     DICOMTagsOfInterestService& operator=(const DICOMTagsOfInterestService&);

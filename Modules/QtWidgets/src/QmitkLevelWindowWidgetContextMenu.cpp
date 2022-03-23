@@ -41,34 +41,6 @@ void QmitkLevelWindowWidgetContextMenu::OnSetPreset(const QAction *presetAction)
   {
     double dlevel = m_LevelWindowPreset->getLevel(item.toStdString());
     double dwindow = m_LevelWindowPreset->getWindow(item.toStdString());
-    if ((dlevel + dwindow / 2) > m_LevelWindow.GetRangeMax())
-    {
-      double lowerBound = (dlevel - dwindow / 2);
-      if (!(lowerBound > m_LevelWindow.GetRangeMax()))
-      {
-        dwindow = m_LevelWindow.GetRangeMax() - lowerBound;
-        dlevel = lowerBound + dwindow / 2;
-      }
-      else
-      {
-        dlevel = m_LevelWindow.GetRangeMax() - 1;
-        dwindow = 2;
-      }
-    }
-    else if ((dlevel - dwindow / 2) < m_LevelWindow.GetRangeMin())
-    {
-      double upperBound = (dlevel + dwindow / 2);
-      if (!(upperBound < m_LevelWindow.GetRangeMin()))
-      {
-        dwindow = m_LevelWindow.GetRangeMin() + upperBound;
-        dlevel = upperBound - dwindow / 2;
-      }
-      else
-      {
-        dlevel = m_LevelWindow.GetRangeMin() + 1;
-        dwindow = 2;
-      }
-    }
     m_LevelWindow.SetLevelWindow(dlevel, dwindow);
     m_Manager->SetLevelWindow(m_LevelWindow);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -156,6 +128,7 @@ void QmitkLevelWindowWidgetContextMenu::OnSetImage(QAction *imageAction)
     if (m_Manager->IsAutoTopMost() == false)
     {
       m_Manager->SetAutoTopMostImage(true);
+      m_SelectedImagesAction->setChecked(false);
     }
     else
     {
@@ -167,6 +140,7 @@ void QmitkLevelWindowWidgetContextMenu::OnSetImage(QAction *imageAction)
     if (m_Manager->IsSelectedImages() == false)
     {
       m_Manager->SetSelectedImages(true);
+      m_AutoTopmostAction->setChecked(false);
     }
     else
     {
@@ -175,6 +149,8 @@ void QmitkLevelWindowWidgetContextMenu::OnSetImage(QAction *imageAction)
   }
   else
   {
+    m_AutoTopmostAction->setChecked(false);
+    m_SelectedImagesAction->setChecked(false);
     m_Manager->SetLevelWindowProperty(m_Images.at(imageAction));
   }
 }
@@ -230,7 +206,6 @@ void QmitkLevelWindowWidgetContextMenu::GetContextMenu(QMenu *contextMenu)
     }
 
     // add action for "selected images" action
-    m_ImageSubmenu->addSeparator();
     m_SelectedImagesAction = m_ImageSubmenu->addAction(tr("Use selected images"));
     m_SelectedImagesAction->setCheckable(true);
     if (m_Manager->IsSelectedImages())

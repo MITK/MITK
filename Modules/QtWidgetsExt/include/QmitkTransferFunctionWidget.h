@@ -41,7 +41,7 @@ public:
   QmitkTransferFunctionWidget(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
   ~QmitkTransferFunctionWidget() override;
 
-  void SetDataNode(mitk::DataNode *node, const mitk::BaseRenderer *renderer = nullptr);
+  void SetDataNode(mitk::DataNode *node, mitk::TimeStepType timestep = 0, const mitk::BaseRenderer *renderer = nullptr);
 
   void SetScalarLabel(const QString &scalarLabel);
 

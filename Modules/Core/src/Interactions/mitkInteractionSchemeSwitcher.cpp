@@ -12,16 +12,16 @@ found in the LICENSE file.
 
 #include "mitkInteractionSchemeSwitcher.h"
 
-// us
-#include <usGetModuleContext.h>
-#include <usModuleContext.h>
-
 // mitk core
 #include <mitkInteractionEventObserver.h>
 #include <mitkExceptionMacro.h>
 
+namespace mitk
+{
+  itkEventMacroDefinition(InteractionSchemeChangedEvent, itk::AnyEvent);
+}
+
 mitk::InteractionSchemeSwitcher::InteractionSchemeSwitcher()
-  : m_InteractionScheme(MITKStandard)
 {
   // nothing here
 }
@@ -31,7 +31,7 @@ mitk::InteractionSchemeSwitcher::~InteractionSchemeSwitcher()
   // nothing here
 }
 
-void mitk::InteractionSchemeSwitcher::SetInteractionScheme(mitk::InteractionEventHandler* interactionEventHandler, InteractionScheme interactionScheme)
+void mitk::InteractionSchemeSwitcher::SetInteractionScheme(InteractionEventHandler* interactionEventHandler, InteractionScheme interactionScheme)
 {
   if (nullptr == interactionEventHandler)
   {
@@ -43,60 +43,71 @@ void mitk::InteractionSchemeSwitcher::SetInteractionScheme(mitk::InteractionEven
     // MITK MODE
     case MITKStandard:
     {
-      interactionEventHandler->SetEventConfig("DisplayConfigMITK.xml");
+      interactionEventHandler->SetEventConfig("DisplayConfigMITKBase.xml");
+      interactionEventHandler->AddEventConfig("DisplayConfigCrosshair.xml");
       break;
     }
     case MITKRotationUncoupled:
     {
-      interactionEventHandler->SetEventConfig("DisplayConfigMITKRotationUnCoupled.xml");
+      interactionEventHandler->SetEventConfig("DisplayConfigMITKBase.xml");
+      interactionEventHandler->AddEventConfig("DisplayConfigRotation.xml");
       break;
     }
     case MITKRotationCoupled:
     {
-      interactionEventHandler->SetEventConfig("DisplayConfigMITKRotation.xml");
+      interactionEventHandler->SetEventConfig("DisplayConfigMITKBase.xml");
+      interactionEventHandler->AddEventConfig("DisplayConfigRotation.xml");
+      interactionEventHandler->AddEventConfig("DisplayConfigActivateCoupling.xml");
       break;
     }
     case MITKSwivel:
     {
-      interactionEventHandler->SetEventConfig("DisplayConfigMITKSwivel.xml");
+      interactionEventHandler->SetEventConfig("DisplayConfigMITKBase.xml");
+      interactionEventHandler->AddEventConfig("DisplayConfigSwivel.xml");
       break;
     }
     // PACS MODE
+    case PACSBase:
+    {
+      interactionEventHandler->SetEventConfig("DisplayConfigPACSBase.xml");
+      break;
+    }
     case PACSStandard:
     {
-      interactionEventHandler->SetEventConfig("DisplayConfigPACS.xml");
+      interactionEventHandler->SetEventConfig("DisplayConfigPACSBase.xml");
+      interactionEventHandler->AddEventConfig("DisplayConfigCrosshair.xml");
       break;
     }
     case PACSLevelWindow:
     {
-      interactionEventHandler->SetEventConfig("DisplayConfigPACS.xml");
+      interactionEventHandler->SetEventConfig("DisplayConfigPACSBase.xml");
       interactionEventHandler->AddEventConfig("DisplayConfigPACSLevelWindow.xml");
       break;
     }
     case PACSPan:
     {
-      interactionEventHandler->SetEventConfig("DisplayConfigPACS.xml");
+      interactionEventHandler->SetEventConfig("DisplayConfigPACSBase.xml");
       interactionEventHandler->AddEventConfig("DisplayConfigPACSPan.xml");
       break;
     }
     case PACSScroll:
     {
-      interactionEventHandler->SetEventConfig("DisplayConfigPACS.xml");
+      interactionEventHandler->SetEventConfig("DisplayConfigPACSBase.xml");
       interactionEventHandler->AddEventConfig("DisplayConfigPACSScroll.xml");
       break;
     }
     case PACSZoom:
     {
-      interactionEventHandler->SetEventConfig("DisplayConfigPACS.xml");
+      interactionEventHandler->SetEventConfig("DisplayConfigPACSBase.xml");
       interactionEventHandler->AddEventConfig("DisplayConfigPACSZoom.xml");
       break;
     }
     default:
     {
-      interactionEventHandler->SetEventConfig("DisplayConfigMITK.xml");
+      interactionEventHandler->SetEventConfig("DisplayConfigMITKBase.xml");
+      interactionEventHandler->AddEventConfig("DisplayConfigCrosshair.xml");
     }
   }
 
-  m_InteractionScheme = interactionScheme;
   InvokeEvent(InteractionSchemeChangedEvent());
 }

@@ -7,6 +7,5 @@
         <file>SurfaceToImage_48x48.png</file>
         <file>multilabelsegmentation_utilities.svg</file>
         <file>CTKWidgets_48x48.png</file>
-        <file>multilabelsegmentation.svg</file>
     </qresource>
 </RCC>

@@ -173,16 +173,19 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
       tool->SetGpuId(FetchSelectedGPUFromUI());
       // Multi-Modal
       tool->MultiModalOff();
-      if (m_Controls.multiModalBox->isChecked() && m_Controls.multiModalSpinBox->value() > 0)
+      if (m_Controls.multiModalBox->isChecked())
       {
-        tool->m_OtherModalPaths.clear();
-        tool->m_OtherModalPaths = FetchMultiModalImagesFromUI();
-        tool->MultiModalOn();
-      }
-      else
-      {
-        throw std::runtime_error("Please select more than one modalities for a multi-modal task. If you "
-                                 "would like to use only one modality then uncheck the Multi-Modal option.");
+        if (m_Controls.multiModalSpinBox->value() > 0)
+        {
+          tool->m_OtherModalPaths.clear();
+          tool->m_OtherModalPaths = FetchMultiModalImagesFromUI();
+          tool->MultiModalOn();
+        }
+        else
+        {
+          throw std::runtime_error("Please select more than one modalities for a multi-modal task. If you "
+                                   "would like to use only one modality then uncheck the Multi-Modal option.");
+        }
       }
       if (doCache)
       {

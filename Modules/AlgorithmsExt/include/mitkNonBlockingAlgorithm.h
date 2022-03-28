@@ -78,13 +78,6 @@ namespace mitk
   class MITKALGORITHMSEXT_EXPORT NonBlockingAlgorithm : public itk::Object
   {
   public:
-    // for threading
-    class MITKALGORITHMSEXT_EXPORT ThreadParameters
-    {
-    public:
-      itk::SmartPointer<NonBlockingAlgorithm> m_Algorithm;
-    };
-
     mitkClassMacroItkParent(NonBlockingAlgorithm, itk::Object);
 
     void SetDataStorage(DataStorage &storage);
@@ -227,7 +220,7 @@ namespace mitk
     WeakPointer<DataStorage> m_DataStorage;
 
   private:
-    static itk::ITK_THREAD_RETURN_TYPE StaticNonBlockingAlgorithmThread(ThreadParameters *param);
+    static void StaticNonBlockingAlgorithmThread(NonBlockingAlgorithm* algorithm);
 
     typedef std::map<std::string, unsigned long> MapTypeStringUInt;
 
@@ -236,7 +229,6 @@ namespace mitk
     std::mutex m_ParameterListMutex;
 
     int m_UpdateRequests;
-    ThreadParameters m_ThreadParameters;
     std::thread m_Thread;
 
     bool m_KillRequest;

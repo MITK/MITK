@@ -29,7 +29,6 @@ found in the LICENSE file.
 #include <QmitkDataStorageComboBox.h>
 #include <QmitkNewSegmentationDialog.h>
 #include <QmitkStyleManager.h>
-#include <QmitkSearchLabelDialog.h>
 
 // Qt
 #include <QColorDialog>
@@ -68,9 +67,6 @@ QmitkLabelSetWidget::QmitkLabelSetWidget(QWidget *parent)
   m_Controls.m_LabelSearchBox->setCompleter(m_Completer);
 
   connect(m_Controls.m_LabelSearchBox, SIGNAL(returnPressed()), this, SLOT(OnSearchLabel()));
-  // connect( m_Controls.m_LabelSetTableWidget, SIGNAL(labelListModified(const QStringList&)), this, SLOT(
-  // OnLabelListModified(const QStringList&)) );
-  // connect( m_Controls.m_LabelSetTableWidget, SIGNAL(mergeLabel(int)), this, SLOT( OnMergeLabel(int)) );
 
   QStringListModel *completeModel = static_cast<QStringListModel *>(m_Completer->model());
   completeModel->setStringList(GetLabelStringList());
@@ -145,11 +141,6 @@ void QmitkLabelSetWidget::OnTableViewContextMenuRequested(const QPoint & /*pos*/
     eraseAction->setEnabled(true);
     QObject::connect(eraseAction, SIGNAL(triggered(bool)), this, SLOT(OnEraseLabel(bool)));
     menu->addAction(eraseAction);
-
-    QAction *mergeAction = new QAction(QIcon(":/Qmitk/MergeLabels.png"), "Merge...", this);
-    mergeAction->setEnabled(true);
-    QObject::connect(mergeAction, SIGNAL(triggered(bool)), this, SLOT(OnMergeLabel(bool)));
-    menu->addAction(mergeAction);
 
     QAction *randomColorAction = new QAction(QIcon(":/Qmitk/RandomColor.png"), "Random color", this);
     randomColorAction->setEnabled(true);
@@ -285,34 +276,6 @@ void QmitkLabelSetWidget::OnSetOnlyActiveLabelVisible(bool /*value*/)
   {
     emit goToLabel(pos);
   }
-
-  UpdateAllTableWidgetItems();
-}
-
-void QmitkLabelSetWidget::OnMergeLabel(bool /*value*/)
-{
-  QmitkSearchLabelDialog dialog(this);
-  dialog.setWindowTitle("Select a second label..");
-  dialog.SetLabelSuggestionList(GetLabelStringList());
-  int dialogReturnValue = dialog.exec();
-  if (dialogReturnValue == QDialog::Rejected)
-    return;
-
-  int sourcePixelValue = -1;
-  for (int i = 0; i < m_Controls.m_LabelSetTableWidget->rowCount(); i++)
-  {
-    if (dialog.GetLabelSetWidgetTableCompleteWord() == QString(m_Controls.m_LabelSetTableWidget->item(i, 0)->text()))
-      sourcePixelValue = m_Controls.m_LabelSetTableWidget->item(i, 0)->data(Qt::UserRole).toInt();
-  }
-
-  if (sourcePixelValue == -1)
-  {
-    MITK_INFO << "unknown label";
-    return;
-  }
-
-  int pixelValue = GetPixelValueOfSelectedItem();
-  GetWorkingImage()->MergeLabel(pixelValue, sourcePixelValue, GetWorkingImage()->GetActiveLayer());
 
   UpdateAllTableWidgetItems();
 }

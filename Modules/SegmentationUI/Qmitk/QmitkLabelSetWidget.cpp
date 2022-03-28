@@ -106,23 +106,23 @@ void QmitkLabelSetWidget::OnTableViewContextMenuRequested(const QPoint & /*pos*/
     QObject::connect(eraseLabelsAction, SIGNAL(triggered(bool)), this, SLOT(OnEraseLabels(bool)));
     menu->addAction(eraseLabelsAction);
 
-    QAction *combineAndCreateSurfaceAction =
+    /*QAction* combineAndCreateSurfaceAction =
       new QAction(QIcon(":/Qmitk/CreateSurface.png"), "Combine and create a surface", this);
     combineAndCreateSurfaceAction->setEnabled(true);
     QObject::connect(
-      combineAndCreateSurfaceAction, SIGNAL(triggered(bool)), this, SLOT(OnCombineAndCreateSurface(bool)));
+      combineAndCreateSurfaceAction, SIGNAL(triggered(bool)), this, SLOT(OnCombineAndCreateSurface(bool)));*/
     // menu->addAction(combineAndCreateSurfaceAction); Not implemented
 
-    QAction *createMasksAction =
+    /*QAction* createMasksAction =
       new QAction(QIcon(":/Qmitk/CreateMask.png"), "Create a mask for each selected label", this);
     createMasksAction->setEnabled(true);
-    QObject::connect(createMasksAction, SIGNAL(triggered(bool)), this, SLOT(OnCreateMasks(bool)));
+    QObject::connect(createMasksAction, SIGNAL(triggered(bool)), this, SLOT(OnCreateMasks(bool)));*/
     // menu->addAction(createMasksAction); Not implemented
 
-    QAction *combineAndCreateMaskAction =
+    /*QAction* combineAndCreateMaskAction =
       new QAction(QIcon(":/Qmitk/CreateMask.png"), "Combine and create a mask", this);
     combineAndCreateMaskAction->setEnabled(true);
-    QObject::connect(combineAndCreateMaskAction, SIGNAL(triggered(bool)), this, SLOT(OnCombineAndCreateMask(bool)));
+    QObject::connect(combineAndCreateMaskAction, SIGNAL(triggered(bool)), this, SLOT(OnCombineAndCreateMask(bool)));*/
     // menu->addAction(combineAndCreateMaskAction); Not implemented
   }
   else

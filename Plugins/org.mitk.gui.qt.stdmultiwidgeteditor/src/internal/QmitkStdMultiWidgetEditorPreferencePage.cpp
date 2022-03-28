@@ -111,20 +111,20 @@ void QmitkStdMultiWidgetEditorPreferencePage::Update()
   //QmitkStdMultiWidgetEditor::InitializePreferences(). Therefore,
   //all default values here are not relevant.
   //gradient background colors
-  m_WidgetBackgroundColor1[0] = m_Preferences->Get("stdmulti.widget0 first background color", "#1d1d1c");
-  m_WidgetBackgroundColor2[0] = m_Preferences->Get("stdmulti.widget0 second background color", "#1d1d1c");
-  m_WidgetBackgroundColor1[1] = m_Preferences->Get("stdmulti.widget1 first background color", "#1d1d1c");
-  m_WidgetBackgroundColor2[1] = m_Preferences->Get("stdmulti.widget1 second background color", "#1d1d1c");
-  m_WidgetBackgroundColor1[2] = m_Preferences->Get("stdmulti.widget2 first background color", "#1d1d1c");
-  m_WidgetBackgroundColor2[2] = m_Preferences->Get("stdmulti.widget2 second background color", "#1d1d1c");
-  m_WidgetBackgroundColor1[3] = m_Preferences->Get("stdmulti.widget3 first background color", "#1d1d1c");
-  m_WidgetBackgroundColor2[3] = m_Preferences->Get("stdmulti.widget3 second background color", "#adb1b6");
+  m_WidgetBackgroundColor1[0] = m_Preferences->Get("stdmulti.widget0 first background color", "#000000");
+  m_WidgetBackgroundColor2[0] = m_Preferences->Get("stdmulti.widget0 second background color", "#000000");
+  m_WidgetBackgroundColor1[1] = m_Preferences->Get("stdmulti.widget1 first background color", "#000000");
+  m_WidgetBackgroundColor2[1] = m_Preferences->Get("stdmulti.widget1 second background color", "#000000");
+  m_WidgetBackgroundColor1[2] = m_Preferences->Get("stdmulti.widget2 first background color", "#000000");
+  m_WidgetBackgroundColor2[2] = m_Preferences->Get("stdmulti.widget2 second background color", "#000000");
+  m_WidgetBackgroundColor1[3] = m_Preferences->Get("stdmulti.widget3 first background color", "#191919");
+  m_WidgetBackgroundColor2[3] = m_Preferences->Get("stdmulti.widget3 second background color", "#7F7F7F");
 
   //decoration colors
   m_WidgetDecorationColor[0] = m_Preferences->Get("stdmulti.widget0 decoration color", "#c00000");
-  m_WidgetDecorationColor[1] = m_Preferences->Get("stdmulti.widget1 decoration color", "#0fad00");
+  m_WidgetDecorationColor[1] = m_Preferences->Get("stdmulti.widget1 decoration color", "#00b000");
   m_WidgetDecorationColor[2] = m_Preferences->Get("stdmulti.widget2 decoration color", "#0080ff");
-  m_WidgetDecorationColor[3] = m_Preferences->Get("stdmulti.widget3 decoration color", "#fec500");
+  m_WidgetDecorationColor[3] = m_Preferences->Get("stdmulti.widget3 decoration color", "#ffff00");
 
   //annotation text
   m_WidgetAnnotation[0] = m_Preferences->Get("stdmulti.widget0 corner annotation", "Axial");

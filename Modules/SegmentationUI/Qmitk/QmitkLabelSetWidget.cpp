@@ -49,7 +49,7 @@ found in the LICENSE file.
 //#include <berryIPreferencesService.h>
 
 QmitkLabelSetWidget::QmitkLabelSetWidget(QWidget *parent)
-  : QWidget(parent), m_DataStorage(nullptr), m_Completer(nullptr), m_ToolManager(nullptr)
+  : QWidget(parent), m_DataStorage(nullptr), m_Completer(nullptr), m_ToolManager(nullptr), m_ProcessingManualSelection(false)
 {
   m_Controls.setupUi(this);
 
@@ -594,8 +594,9 @@ void QmitkLabelSetWidget::OnItemClicked(QTableWidgetItem *item)
   QList<QTableWidgetSelectionRange> ranges = m_Controls.m_LabelSetTableWidget->selectedRanges();
   if (!ranges.empty() && ranges.back().rowCount() == 1)
   {
-    SelectLabelByPixelValue(pixelValue);
+    m_ProcessingManualSelection = true;
     OnActiveLabelChanged(pixelValue);
+    m_ProcessingManualSelection = false;
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
@@ -624,19 +625,16 @@ void QmitkLabelSetWidget::OnItemDoubleClicked(QTableWidgetItem *item)
 
 void QmitkLabelSetWidget::SelectLabelByPixelValue(mitk::Label::PixelType pixelValue)
 {
-  // MITK_INFO << "QmitkLabelSetWidget::SelectLabelByPixelValue " << pixelValue;
-
-  if (!GetWorkingImage()->ExistLabel(pixelValue))
+  if (m_ProcessingManualSelection || !GetWorkingImage()->ExistLabel(pixelValue))
     return;
+
   for (int row = 0; row < m_Controls.m_LabelSetTableWidget->rowCount(); row++)
   {
     if (m_Controls.m_LabelSetTableWidget->item(row, 0)->data(Qt::UserRole).toInt() == pixelValue)
     {
       m_Controls.m_LabelSetTableWidget->clearSelection();
-      m_Controls.m_LabelSetTableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
       m_Controls.m_LabelSetTableWidget->selectRow(row);
       m_Controls.m_LabelSetTableWidget->scrollToItem(m_Controls.m_LabelSetTableWidget->item(row, 0));
-      m_Controls.m_LabelSetTableWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
       return;
     }
   }
@@ -860,8 +858,6 @@ void QmitkLabelSetWidget::InitializeTableWidget()
   tableWidged->setSortingEnabled(false);
   tableWidged->verticalHeader()->hide();
   tableWidged->setEditTriggers(QAbstractItemView::NoEditTriggers);
-  tableWidged->setSelectionMode(QAbstractItemView::ExtendedSelection);
-  tableWidged->setSelectionBehavior(QAbstractItemView::SelectRows);
 
   connect(tableWidged, SIGNAL(itemClicked(QTableWidgetItem *)), this, SLOT(OnItemClicked(QTableWidgetItem *)));
   connect(
@@ -940,10 +936,8 @@ void QmitkLabelSetWidget::OnSearchLabel()
   }
 
   m_Controls.m_LabelSetTableWidget->clearSelection();
-  m_Controls.m_LabelSetTableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
   m_Controls.m_LabelSetTableWidget->selectRow(row);
   m_Controls.m_LabelSetTableWidget->scrollToItem(nameItem);
-  m_Controls.m_LabelSetTableWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
   GetWorkingImage()->GetActiveLabelSet()->SetActiveLabel(pixelValue);
 

@@ -164,6 +164,8 @@ private:
   QStringList m_OrganColors;
 
   QStringList m_LabelStringList;
+
+  bool m_ProcessingManualSelection;
 };
 
 #endif

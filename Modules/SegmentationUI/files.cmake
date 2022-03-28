@@ -32,7 +32,6 @@ Qmitk/QmitkSurfaceStampWidget.cpp
 Qmitk/QmitkMaskStampWidget.cpp
 Qmitk/QmitkSliceBasedInterpolatorWidget.cpp
 Qmitk/QmitkSurfaceBasedInterpolatorWidget.cpp
-Qmitk/QmitkSearchLabelDialog.cpp
 Qmitk/QmitkSimpleLabelSetListWidget.cpp
 )
 
@@ -72,7 +71,6 @@ Qmitk/QmitkSurfaceStampWidget.h
 Qmitk/QmitkMaskStampWidget.h
 Qmitk/QmitkSliceBasedInterpolatorWidget.h
 Qmitk/QmitkSurfaceBasedInterpolatorWidget.h
-Qmitk/QmitkSearchLabelDialog.h
 Qmitk/QmitkSimpleLabelSetListWidget.h
 )
 
@@ -88,7 +86,6 @@ Qmitk/QmitkSurfaceStampWidgetGUIControls.ui
 Qmitk/QmitkMaskStampWidgetGUIControls.ui
 Qmitk/QmitkSliceBasedInterpolatorWidgetGUIControls.ui
 Qmitk/QmitkSurfaceBasedInterpolatorWidgetGUIControls.ui
-Qmitk/QmitkSearchLabelDialogGUI.ui
 Qmitk/QmitknnUNetToolGUIControls.ui
 )
 

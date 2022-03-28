@@ -914,6 +914,8 @@ void QmitkSegmentationView::ValidateSelectionInput()
 {
   this->UpdateWarningLabel("");
 
+  m_Controls->layersWidget->setEnabled(false);
+  m_Controls->labelsWidget->setEnabled(false);
   m_Controls->labelSetWidget->setEnabled(false);
 
   // the argument is actually not used
@@ -957,6 +959,8 @@ void QmitkSegmentationView::ValidateSelectionInput()
     {
       m_ToolManager->SetReferenceData(referenceNode);
       m_ToolManager->SetWorkingData(workingNode);
+      m_Controls->layersWidget->setEnabled(true);
+      m_Controls->labelsWidget->setEnabled(true);
       m_Controls->labelSetWidget->setEnabled(true);
       m_Controls->toolSelectionBox2D->setEnabled(true);
       m_Controls->toolSelectionBox3D->setEnabled(true);

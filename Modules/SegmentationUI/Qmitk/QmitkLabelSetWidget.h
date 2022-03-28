@@ -115,8 +115,6 @@ private slots:
   void OnCombineAndCreateSurface(bool);
   void OnEraseLabel(bool);
   void OnEraseLabels(bool);
-  // reaction to signal "mergeLabel" from QmitkLabelSetTableWidget
-  void OnMergeLabel(bool);
   void OnMergeLabels(bool);
   // reaction to the button "Import Segmentation"
   void OnImportSegmentation();
@@ -166,6 +164,8 @@ private:
   QStringList m_OrganColors;
 
   QStringList m_LabelStringList;
+
+  bool m_ProcessingManualSelection;
 };
 
 #endif

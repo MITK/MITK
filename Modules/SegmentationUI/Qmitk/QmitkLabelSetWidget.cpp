@@ -841,28 +841,28 @@ QStringList &QmitkLabelSetWidget::GetLabelStringList()
 
 void QmitkLabelSetWidget::InitializeTableWidget()
 {
-  QTableWidget *tableWidged = m_Controls.m_LabelSetTableWidget;
+  QTableWidget *tableWidget = m_Controls.m_LabelSetTableWidget;
 
-  tableWidged->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
-  tableWidged->setTabKeyNavigation(false);
-  tableWidged->setAlternatingRowColors(false);
-  tableWidged->setFocusPolicy(Qt::NoFocus);
-  tableWidged->setColumnCount(4);
-  tableWidged->resizeColumnToContents(NAME_COL);
-  tableWidged->setColumnWidth(LOCKED_COL, 25);
-  tableWidged->setColumnWidth(COLOR_COL, 25);
-  tableWidged->setColumnWidth(VISIBLE_COL, 25);
-  tableWidged->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
-  tableWidged->setContextMenuPolicy(Qt::CustomContextMenu);
-  tableWidged->horizontalHeader()->hide();
-  tableWidged->setSortingEnabled(false);
-  tableWidged->verticalHeader()->hide();
-  tableWidged->setEditTriggers(QAbstractItemView::NoEditTriggers);
+  tableWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
+  tableWidget->setTabKeyNavigation(false);
+  tableWidget->setAlternatingRowColors(false);
+  tableWidget->setFocusPolicy(Qt::NoFocus);
+  tableWidget->setColumnCount(4);
+  tableWidget->resizeColumnToContents(NAME_COL);
+  tableWidget->setColumnWidth(LOCKED_COL, 25);
+  tableWidget->setColumnWidth(COLOR_COL, 25);
+  tableWidget->setColumnWidth(VISIBLE_COL, 25);
+  tableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+  tableWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+  tableWidget->horizontalHeader()->hide();
+  tableWidget->setSortingEnabled(false);
+  tableWidget->verticalHeader()->hide();
+  tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-  connect(tableWidged, SIGNAL(itemClicked(QTableWidgetItem *)), this, SLOT(OnItemClicked(QTableWidgetItem *)));
+  connect(tableWidget, SIGNAL(itemClicked(QTableWidgetItem *)), this, SLOT(OnItemClicked(QTableWidgetItem *)));
   connect(
-    tableWidged, SIGNAL(itemDoubleClicked(QTableWidgetItem *)), this, SLOT(OnItemDoubleClicked(QTableWidgetItem *)));
-  connect(tableWidged,
+    tableWidget, SIGNAL(itemDoubleClicked(QTableWidgetItem *)), this, SLOT(OnItemDoubleClicked(QTableWidgetItem *)));
+  connect(tableWidget,
           SIGNAL(customContextMenuRequested(const QPoint &)),
           this,
           SLOT(OnTableViewContextMenuRequested(const QPoint &)));

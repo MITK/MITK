@@ -25,7 +25,7 @@ namespace mitk
   NonBlockingAlgorithm::~NonBlockingAlgorithm()
   {
     if (m_Thread.joinable())
-      m_Thread.join();
+      m_Thread.detach();
   }
 
   void mitk::NonBlockingAlgorithm::SetDataStorage(DataStorage &storage) { m_DataStorage = &storage; }
@@ -94,7 +94,6 @@ namespace mitk
       return; // someone wants us to die
 
     m_ParameterListMutex.lock();
-    m_ThreadParameters.m_Algorithm = this;
     ++m_UpdateRequests;
     m_ParameterListMutex.unlock();
     if (m_Thread.joinable()) // thread already running. But something obviously wants us to recalculate the output
@@ -103,7 +102,8 @@ namespace mitk
     }
 
     // spawn a thread that calls ThreadedUpdateFunction(), and ThreadedUpdateFinished() on us
-    m_Thread = std::thread(StaticNonBlockingAlgorithmThread, &m_ThreadParameters);
+    this->Register();
+    m_Thread = std::thread(StaticNonBlockingAlgorithmThread, this);
   }
 
   void NonBlockingAlgorithm::StopAlgorithm()
@@ -112,16 +112,9 @@ namespace mitk
       m_Thread.join(); // waits for the thread to terminate on its own
   }
 
-  // a static function to call a member of NonBlockingAlgorithm from inside an ITK thread
-  itk::ITK_THREAD_RETURN_TYPE NonBlockingAlgorithm::StaticNonBlockingAlgorithmThread(ThreadParameters *param)
+  // a static function to call a member of NonBlockingAlgorithm from inside a thread
+  void NonBlockingAlgorithm::StaticNonBlockingAlgorithmThread(NonBlockingAlgorithm* algorithm)
   {
-    NonBlockingAlgorithm::Pointer algorithm = param->m_Algorithm;
-    // this UserData tells us, which BubbleTool's method to call
-    if (!algorithm)
-    {
-      return itk::ITK_THREAD_RETURN_DEFAULT_VALUE;
-    }
-
     algorithm->m_ParameterListMutex.lock();
     while (algorithm->m_UpdateRequests > 0)
     {
@@ -131,26 +124,21 @@ namespace mitk
       // actually call the methods that do the work
       if (algorithm->ThreadedUpdateFunction()) // returns a bool for success/failure
       {
-        itk::ReceptorMemberCommand<NonBlockingAlgorithm>::Pointer command =
-          itk::ReceptorMemberCommand<NonBlockingAlgorithm>::New();
+        auto command = itk::ReceptorMemberCommand<NonBlockingAlgorithm>::New();
         command->SetCallbackFunction(algorithm, &NonBlockingAlgorithm::ThreadedUpdateSuccessful);
         CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(command);
-        // algorithm->ThreadedUpdateSuccessful();
+
       }
       else
       {
-        itk::ReceptorMemberCommand<NonBlockingAlgorithm>::Pointer command =
-          itk::ReceptorMemberCommand<NonBlockingAlgorithm>::New();
+        auto command = itk::ReceptorMemberCommand<NonBlockingAlgorithm>::New();
         command->SetCallbackFunction(algorithm, &NonBlockingAlgorithm::ThreadedUpdateFailed);
         CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(command);
-        // algorithm->ThreadedUpdateFailed();
       }
 
       algorithm->m_ParameterListMutex.lock();
     }
     algorithm->m_ParameterListMutex.unlock();
-
-    return ITK_THREAD_RETURN_DEFAULT_VALUE;
   }
 
   void NonBlockingAlgorithm::TriggerParameterModified(const itk::EventObject &) { StartAlgorithm(); }
@@ -164,26 +152,26 @@ namespace mitk
   void NonBlockingAlgorithm::ThreadedUpdateSuccessful(const itk::EventObject &)
   {
     ThreadedUpdateSuccessful();
-    m_ThreadParameters.m_Algorithm = nullptr;
   }
 
   void NonBlockingAlgorithm::ThreadedUpdateSuccessful()
   {
     // notify observers that a result is ready
     InvokeEvent(ResultAvailable(this));
+    this->UnRegister();
   }
 
   // called from gui thread
   void NonBlockingAlgorithm::ThreadedUpdateFailed(const itk::EventObject &)
   {
     ThreadedUpdateFailed();
-    m_ThreadParameters.m_Algorithm = nullptr; // delete
   }
 
   void NonBlockingAlgorithm::ThreadedUpdateFailed()
   {
     // notify observers that something went wrong
     InvokeEvent(ProcessingError(this));
+    this->UnRegister();
   }
 
 } // namespace

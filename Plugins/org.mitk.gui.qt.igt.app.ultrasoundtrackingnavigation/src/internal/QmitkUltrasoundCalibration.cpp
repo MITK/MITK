@@ -94,7 +94,8 @@ QmitkUltrasoundCalibration::~QmitkUltrasoundCalibration()
     this->GetDataStorage()->Remove(node);
 
   this->GetDataStorage()->Remove(m_VerificationReferencePointsDataNode);
-
+  this->GetDataStorage()->Remove(m_SpacingNode);
+  
   delete m_Timer;
 
   // remove observer for phantom-based point adding

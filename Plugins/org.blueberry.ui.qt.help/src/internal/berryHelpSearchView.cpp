@@ -74,6 +74,7 @@ void HelpSearchView::CreateQtPartControl(QWidget* parent)
     QTextBrowser* browser = m_ResultWidget->findChild<QTextBrowser*>();
     if (browser) // Will be null if QtHelp was configured not to use CLucene.
     {
+      browser->document()->setDefaultStyleSheet(QStringLiteral("body { background-color: white; }"));
       browser->viewport()->installEventFilter(this);
       browser->setContextMenuPolicy(Qt::CustomContextMenu);
       connect(browser, SIGNAL(customContextMenuRequested(QPoint)),

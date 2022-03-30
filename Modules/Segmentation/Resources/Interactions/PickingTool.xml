@@ -1,4 +1,4 @@
-<statemachine name="FastMarchingTool">
+<statemachine name="PickingTool">
 
   <state name="neutral" ID="1" startstate="TRUE">
   

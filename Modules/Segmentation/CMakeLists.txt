@@ -3,7 +3,7 @@ mitk_create_module(
   DEPENDS MitkAlgorithmsExt MitkSurfaceInterpolation MitkGraphAlgorithms MitkContourModel MitkMultilabel
   PACKAGE_DEPENDS
     PUBLIC ITK|QuadEdgeMesh+RegionGrowing
-    PRIVATE ITK|LabelMap+Watersheds VTK|ImagingGeneral
+    PRIVATE ITK|LabelMap+MathematicalMorphology VTK|ImagingGeneral
 )
 
 add_subdirectory(Testing)

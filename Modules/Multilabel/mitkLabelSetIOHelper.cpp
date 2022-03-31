@@ -68,7 +68,7 @@ bool mitk::LabelSetIOHelper::LoadLabelSetImagePreset(const std::string &presetFi
 
   if (tinyxml2::XML_SUCCESS != xmlDocument.LoadFile(filename.c_str()))
   {
-    MITK_WARN << "LabelSet preset file \"" << filename << "\" does not exist or cannot be opened";
+    MITK_WARN << "Label set preset file \"" << filename << "\" does not exist or cannot be opened";
     return false;
   }
 
@@ -76,7 +76,7 @@ bool mitk::LabelSetIOHelper::LoadLabelSetImagePreset(const std::string &presetFi
 
   if (nullptr == rootElement)
   {
-    MITK_WARN << "Not a valid LabelSet preset";
+    MITK_WARN << "Not a valid Label set preset";
     return false;
   }
 
@@ -89,7 +89,7 @@ bool mitk::LabelSetIOHelper::LoadLabelSetImagePreset(const std::string &presetFi
 
   if (nullptr == layerElement)
   {
-    MITK_WARN << "LabelSet preset does not contain any layers";
+    MITK_WARN << "Label set preset does not contain any layers";
     return false;
   }
 

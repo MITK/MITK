@@ -18,6 +18,7 @@ found in the LICENSE file.
 
 // mitk
 #include <mitkApplicationCursor.h>
+#include <mitkBaseApplication.h>
 #include <mitkCameraController.h>
 #include <mitkImageTimeSelector.h>
 #include <mitkLabelSetImage.h>
@@ -42,6 +43,7 @@ found in the LICENSE file.
 // Qt
 #include <QMessageBox>
 #include <QShortcut>
+#include <QDir>
 
 #include <regex>
 
@@ -343,7 +345,9 @@ void QmitkSegmentationView::OnNewSegmentation()
     return;
   }
 
-  if (m_DefaultLabelsetPreset.isEmpty() || false == mitk::LabelSetIOHelper::LoadLabelSetImagePreset(m_DefaultLabelsetPreset.toStdString(), newLabelSetImage))
+  const auto labelSetPreset = this->GetDefaultLabelSetPreset();
+
+  if (labelSetPreset.empty() || !mitk::LabelSetIOHelper::LoadLabelSetImagePreset(labelSetPreset, newLabelSetImage))
   {
     mitk::Label::Pointer newLabel = mitk::LabelSetImageHelper::CreateNewLabel(newLabelSetImage);
     newLabelSetImage->GetActiveLabelSet()->AddLabel(newLabel);
@@ -361,6 +365,16 @@ void QmitkSegmentationView::OnNewSegmentation()
 
   newSegmentationNode->SetSelected(true);
   m_Controls->workingNodeSelector->SetCurrentSelectedNode(newSegmentationNode);
+}
+
+std::string QmitkSegmentationView::GetDefaultLabelSetPreset() const
+{
+  auto labelSetPreset = mitk::BaseApplication::instance().config().getString(mitk::BaseApplication::ARG_SEGMENTATION_LABELSET_PRESET.toStdString(), "");
+
+  if (labelSetPreset.empty())
+    labelSetPreset = m_LabelSetPresetPreference.toStdString();
+
+  return labelSetPreset;
 }
 
 void QmitkSegmentationView::OnManualTool2DSelected(int id)
@@ -600,7 +614,7 @@ void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences*
   m_DrawOutline = prefs->GetBool("draw outline", true);
   m_SelectionMode = prefs->GetBool("selection mode", false);
 
-  m_DefaultLabelsetPreset = prefs->Get("labelset preset", "");
+  m_LabelSetPresetPreference = prefs->Get("label set preset", "");
 
   this->ApplyDisplayOptions();
 }

@@ -38,8 +38,8 @@ QmitkSegmentationPreferencePage::QmitkSegmentationPreferencePage()
     m_SmoothingSpinBox(nullptr),
     m_DecimationSpinBox(nullptr),
     m_ClosingSpinBox(nullptr),
-    m_LabelsetPresetLineEdit(nullptr),
-    m_LabelsetPresetToolButton(nullptr),
+    m_LabelSetPresetLineEdit(nullptr),
+    m_LabelSetPresetToolButton(nullptr),
     m_Initializing(false)
 {
 
@@ -116,21 +116,21 @@ void QmitkSegmentationPreferencePage::CreateQtControl(QWidget* parent)
 
   formLayout->addRow("Smoothed surface creation", surfaceLayout);
 
-  m_LabelsetPresetLineEdit = new QLineEdit(m_MainControl);
-  m_LabelsetPresetLineEdit->setClearButtonEnabled(true);
-  m_LabelsetPresetLineEdit->setText("test");
+  m_LabelSetPresetLineEdit = new QLineEdit(m_MainControl);
+  m_LabelSetPresetLineEdit->setClearButtonEnabled(true);
+  m_LabelSetPresetLineEdit->setText("test");
 
-  m_LabelsetPresetToolButton = new QToolButton(m_MainControl);
-  m_LabelsetPresetToolButton->setText("...");
+  m_LabelSetPresetToolButton = new QToolButton(m_MainControl);
+  m_LabelSetPresetToolButton->setText("...");
 
-  connect(m_LabelsetPresetToolButton, SIGNAL(clicked()), this, SLOT(OnLabelsetPresetButtonClicked()));
+  connect(m_LabelSetPresetToolButton, SIGNAL(clicked()), this, SLOT(OnLabelSetPresetButtonClicked()));
 
-  auto labelsetPresetLayout = new QHBoxLayout;
-  labelsetPresetLayout->setSpacing(8);
-  labelsetPresetLayout->addWidget(m_LabelsetPresetLineEdit);
-  labelsetPresetLayout->addWidget(m_LabelsetPresetToolButton);
+  auto LabelSetPresetLayout = new QHBoxLayout;
+  LabelSetPresetLayout->setSpacing(8);
+  LabelSetPresetLayout->addWidget(m_LabelSetPresetLineEdit);
+  LabelSetPresetLayout->addWidget(m_LabelSetPresetToolButton);
 
-  formLayout->addRow("Default labelset preset", labelsetPresetLayout);
+  formLayout->addRow("Default label set preset", LabelSetPresetLayout);
 
   m_MainControl->setLayout(formLayout);
   this->Update();
@@ -151,7 +151,7 @@ bool QmitkSegmentationPreferencePage::PerformOk()
   m_SegmentationPreferencesNode->PutDouble("smoothing value", m_SmoothingSpinBox->value());
   m_SegmentationPreferencesNode->PutDouble("decimation rate", m_DecimationSpinBox->value());
   m_SegmentationPreferencesNode->PutDouble("closing ratio", m_ClosingSpinBox->value());
-  m_SegmentationPreferencesNode->Put("labelset preset", m_LabelsetPresetLineEdit->text());
+  m_SegmentationPreferencesNode->Put("label set preset", m_LabelSetPresetLineEdit->text());
   return true;
 }
 
@@ -189,7 +189,7 @@ void QmitkSegmentationPreferencePage::Update()
   m_DecimationSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("decimation rate", 0.5));
   m_ClosingSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("closing ratio", 0.0));
 
-  m_LabelsetPresetLineEdit->setText(m_SegmentationPreferencesNode->Get("labelset preset", ""));
+  m_LabelSetPresetLineEdit->setText(m_SegmentationPreferencesNode->Get("label set preset", ""));
 }
 
 void QmitkSegmentationPreferencePage::OnSmoothingCheckboxChecked(int state)
@@ -200,10 +200,10 @@ void QmitkSegmentationPreferencePage::OnSmoothingCheckboxChecked(int state)
     m_SmoothingSpinBox->setEnabled(true);
 }
 
-void QmitkSegmentationPreferencePage::OnLabelsetPresetButtonClicked()
+void QmitkSegmentationPreferencePage::OnLabelSetPresetButtonClicked()
 {
-  const auto filename = QFileDialog::getOpenFileName(m_MainControl, QStringLiteral("Load LabelSet Preset"), QString(), QStringLiteral("LabelSet Preset (*.lsetp)"));
+  const auto filename = QFileDialog::getOpenFileName(m_MainControl, QStringLiteral("Load Label Set Preset"), QString(), QStringLiteral("Label set preset (*.lsetp)"));
 
   if (!filename.isEmpty())
-    m_LabelsetPresetLineEdit->setText(filename);
+    m_LabelSetPresetLineEdit->setText(filename);
 }

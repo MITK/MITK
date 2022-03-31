@@ -126,6 +126,8 @@ private:
 
   void UpdateWarningLabel(QString text);
 
+  std::string GetDefaultLabelSetPreset() const;
+
   QWidget* m_Parent;
 
   Ui::QmitkSegmentationViewControls* m_Controls;
@@ -148,7 +150,7 @@ private:
   bool m_SelectionMode;
   bool m_MouseCursorSet;
 
-  QString m_DefaultLabelsetPreset;
+  QString m_LabelSetPresetPreference;
 };
 
 #endif // QMITKSEGMENTATIONVIEW_H

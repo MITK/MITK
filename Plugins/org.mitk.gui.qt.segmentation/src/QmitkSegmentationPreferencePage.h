@@ -49,7 +49,7 @@ public:
 protected Q_SLOTS:
 
   void OnSmoothingCheckboxChecked(int);
-  void OnLabelsetPresetButtonClicked();
+  void OnLabelSetPresetButtonClicked();
 
 protected:
 
@@ -62,8 +62,8 @@ protected:
   QDoubleSpinBox* m_SmoothingSpinBox;
   QDoubleSpinBox* m_DecimationSpinBox;
   QDoubleSpinBox* m_ClosingSpinBox;
-  QLineEdit* m_LabelsetPresetLineEdit;
-  QToolButton* m_LabelsetPresetToolButton;
+  QLineEdit* m_LabelSetPresetLineEdit;
+  QToolButton* m_LabelSetPresetToolButton;
 
   bool m_Initializing;
 

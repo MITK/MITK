@@ -32,7 +32,7 @@ The segmentation plugin offers a number of preferences which can be set via the 
   <li> <b>3D display:</b> Activate 3D volume rendering for your segmentation
   <li> <b>Data node selection mode:</b> If activated the segmentation image is automatically chosen from the data manager selection.
   <li> <b>Smoothed surface creation:</b> Set certain smoothing parameters for surface creation
-  <li> <b>Default labelset preset:</b> Start a new segmentation with this preset instead of a default label
+  <li> <b>Default label set preset:</b> Start a new segmentation with this preset instead of a default label
 </ul>
 
 

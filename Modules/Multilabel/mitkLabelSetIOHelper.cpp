@@ -31,7 +31,7 @@ namespace
 }
 
 bool mitk::LabelSetIOHelper::SaveLabelSetImagePreset(const std::string &presetFilename,
-                                                     mitk::LabelSetImage::Pointer &inputImage)
+                                                     const mitk::LabelSetImage *inputImage)
 {
   const auto filename = EnsureExtension(presetFilename);
 
@@ -56,25 +56,28 @@ bool mitk::LabelSetIOHelper::SaveLabelSetImagePreset(const std::string &presetFi
   return tinyxml2::XML_SUCCESS == xmlDocument.SaveFile(filename.c_str());
 }
 
-void mitk::LabelSetIOHelper::LoadLabelSetImagePreset(const std::string &presetFilename,
-                                                     mitk::LabelSetImage::Pointer &inputImage)
+bool mitk::LabelSetIOHelper::LoadLabelSetImagePreset(const std::string &presetFilename,
+                                                     mitk::LabelSetImage *inputImage)
 {
-  if (inputImage.IsNull())
-    return;
+  if (nullptr == inputImage)
+    return false;
 
   const auto filename = EnsureExtension(presetFilename);
 
   tinyxml2::XMLDocument xmlDocument;
 
-  if(tinyxml2::XML_SUCCESS != xmlDocument.LoadFile(filename.c_str()))
-    return;
+  if (tinyxml2::XML_SUCCESS != xmlDocument.LoadFile(filename.c_str()))
+  {
+    MITK_WARN << "LabelSet preset file \"" << filename << "\" does not exist or cannot be opened";
+    return false;
+  }
 
   auto *rootElement = xmlDocument.FirstChildElement("LabelSetImagePreset");
 
   if (nullptr == rootElement)
   {
     MITK_WARN << "Not a valid LabelSet preset";
-    return;
+    return false;
   }
 
   auto activeLayerBackup = inputImage->GetActiveLayer();
@@ -87,7 +90,7 @@ void mitk::LabelSetIOHelper::LoadLabelSetImagePreset(const std::string &presetFi
   if (nullptr == layerElement)
   {
     MITK_WARN << "LabelSet preset does not contain any layers";
-    return;
+    return false;
   }
 
   for (int layerIndex = 0; layerIndex < numberOfLayers; layerIndex++)
@@ -144,6 +147,8 @@ void mitk::LabelSetIOHelper::LoadLabelSetImagePreset(const std::string &presetFi
   }
 
   inputImage->SetActiveLayer(activeLayerBackup);
+
+  return true;
 }
 
 tinyxml2::XMLElement *mitk::LabelSetIOHelper::GetLabelAsXMLElement(tinyxml2::XMLDocument &doc, Label *label)

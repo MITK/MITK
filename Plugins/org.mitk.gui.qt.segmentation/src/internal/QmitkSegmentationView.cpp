@@ -22,6 +22,7 @@ found in the LICENSE file.
 #include <mitkImageTimeSelector.h>
 #include <mitkLabelSetImage.h>
 #include <mitkLabelSetImageHelper.h>
+#include <mitkLabelSetIOHelper.h>
 #include <mitkNodePredicateSubGeometry.h>
 #include <mitkSegmentationObjectFactory.h>
 #include <mitkSegTool2D.h>
@@ -342,8 +343,11 @@ void QmitkSegmentationView::OnNewSegmentation()
     return;
   }
 
-  mitk::Label::Pointer newLabel = mitk::LabelSetImageHelper::CreateNewLabel(newLabelSetImage);
-  newLabelSetImage->GetActiveLabelSet()->AddLabel(newLabel);
+  if (m_DefaultLabelsetPreset.isEmpty() || false == mitk::LabelSetIOHelper::LoadLabelSetImagePreset(m_DefaultLabelsetPreset.toStdString(), newLabelSetImage))
+  {
+    mitk::Label::Pointer newLabel = mitk::LabelSetImageHelper::CreateNewLabel(newLabelSetImage);
+    newLabelSetImage->GetActiveLabelSet()->AddLabel(newLabel);
+  }
 
   if (!this->GetDataStorage()->Exists(newSegmentationNode))
   {
@@ -595,6 +599,8 @@ void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences*
 
   m_DrawOutline = prefs->GetBool("draw outline", true);
   m_SelectionMode = prefs->GetBool("selection mode", false);
+
+  m_DefaultLabelsetPreset = prefs->Get("labelset preset", "");
 
   this->ApplyDisplayOptions();
 }

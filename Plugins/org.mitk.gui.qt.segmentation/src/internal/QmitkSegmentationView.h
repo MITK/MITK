@@ -148,6 +148,7 @@ private:
   bool m_SelectionMode;
   bool m_MouseCursorSet;
 
+  QString m_DefaultLabelsetPreset;
 };
 
 #endif // QMITKSEGMENTATIONVIEW_H

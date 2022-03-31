@@ -21,6 +21,8 @@ found in the LICENSE file.
 class QCheckBox;
 class QRadioButton;
 class QDoubleSpinBox;
+class QLineEdit;
+class QToolButton;
 
 class MITK_QT_SEGMENTATION QmitkSegmentationPreferencePage : public QObject, public berry::IQtPreferencePage
 {
@@ -47,6 +49,7 @@ public:
 protected Q_SLOTS:
 
   void OnSmoothingCheckboxChecked(int);
+  void OnLabelsetPresetButtonClicked();
 
 protected:
 
@@ -59,6 +62,8 @@ protected:
   QDoubleSpinBox* m_SmoothingSpinBox;
   QDoubleSpinBox* m_DecimationSpinBox;
   QDoubleSpinBox* m_ClosingSpinBox;
+  QLineEdit* m_LabelsetPresetLineEdit;
+  QToolButton* m_LabelsetPresetToolButton;
 
   bool m_Initializing;
 

@@ -16,6 +16,32 @@ found in the LICENSE file.
 #include <mitkExceptionMacro.h>
 #include <mitkProperties.h>
 
+#include <array>
+#include <regex>
+#include <vector>
+
+namespace
+{
+  template <typename T>
+  std::array<int, 3> QuantizeColor(const T* color)
+  {
+    return {
+      static_cast<int>(std::round(color[0] * 255)),
+      static_cast<int>(std::round(color[1] * 255)),
+      static_cast<int>(std::round(color[2] * 255)) };
+  }
+
+  mitk::Color FromLookupTableColor(const double* lookupTableColor)
+  {
+    mitk::Color color;
+    color.Set(
+      static_cast<float>(lookupTableColor[0]),
+      static_cast<float>(lookupTableColor[1]),
+      static_cast<float>(lookupTableColor[2]));
+    return color;
+  }
+}
+
 mitk::DataNode::Pointer mitk::LabelSetImageHelper::CreateNewSegmentationNode(const DataNode* referenceNode,
   const Image* initialSegmentationImage, const std::string& segmentationName)
 {
@@ -58,20 +84,66 @@ mitk::DataNode::Pointer mitk::LabelSetImageHelper::CreateNewSegmentationNode(con
 
 mitk::Label::Pointer mitk::LabelSetImageHelper::CreateNewLabel(const LabelSetImage* labelSetImage)
 {
-  int numberOfLabels = labelSetImage->GetActiveLabelSet()->GetNumberOfLabels();
+  if (nullptr == labelSetImage)
+    return nullptr;
 
-  std::string labelName = "New label " + std::to_string(numberOfLabels);
+  const std::regex genericLabelNameRegEx("New label ([1-9][0-9]*)");
+  int maxGenericLabelNumber = 0;
 
-  mitk::LookupTable::Pointer lookupTable = mitk::LookupTable::New();
+  std::vector<std::array<int, 3>> colorsInUse;
+
+  const auto numLabelSets = labelSetImage->GetNumberOfLayers();
+
+  for (std::remove_const_t<decltype(numLabelSets)> i = 0; i < numLabelSets; ++i)
+  {
+    auto labelSet = labelSetImage->GetLabelSet(i);
+    auto labelEndIter = labelSet->IteratorConstEnd();
+
+    for (auto labelIter = labelSet->IteratorConstBegin(); labelIter != labelEndIter; ++labelIter)
+    {
+      auto label = labelIter->second;
+      auto labelName = labelIter->second->GetName();
+      std::smatch match;
+
+      if (std::regex_match(labelName, match, genericLabelNameRegEx))
+        maxGenericLabelNumber = std::max(maxGenericLabelNumber, std::stoi(match[1].str()));
+
+      const auto quantizedLabelColor = QuantizeColor(label->GetColor().data());
+
+      if (std::find(colorsInUse.begin(), colorsInUse.end(), quantizedLabelColor) == std::end(colorsInUse))
+        colorsInUse.push_back(quantizedLabelColor);
+    }
+  }
+
+  auto newLabel = mitk::Label::New();
+  newLabel->SetName("New label " + std::to_string(maxGenericLabelNumber + 1));
+
+  auto lookupTable = mitk::LookupTable::New();
   lookupTable->SetType(mitk::LookupTable::LookupTableType::MULTILABEL);
-  double rgb[3];
-  lookupTable->GetColor(numberOfLabels, rgb);
-  mitk::Color labelColor;
-  labelColor.Set(static_cast<float>(rgb[0]), static_cast<float>(rgb[1]), static_cast<float>(rgb[2]));
 
-  mitk::Label::Pointer newLabel = mitk::Label::New();
-  newLabel->SetName(labelName);
-  newLabel->SetColor(labelColor);
+  std::array<double, 3> lookupTableColor;
+  const int maxTries = 25;
+  bool newColorFound = false;
+
+  for (int i = 0; i < maxTries; ++i)
+  {
+    lookupTable->GetColor(i, lookupTableColor.data());
+
+    auto quantizedLookupTableColor = QuantizeColor(lookupTableColor.data());
+
+    if (std::find(colorsInUse.begin(), colorsInUse.end(), quantizedLookupTableColor) == std::end(colorsInUse))
+    {
+      newLabel->SetColor(FromLookupTableColor(lookupTableColor.data()));
+      newColorFound = true;
+      break;
+    }
+  }
+
+  if (!newColorFound)
+  {
+    lookupTable->GetColor(labelSetImage->GetTotalNumberOfLabels(), lookupTableColor.data());
+    newLabel->SetColor(FromLookupTableColor(lookupTableColor.data()));
+  }
 
   return newLabel;
 }

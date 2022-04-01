@@ -342,14 +342,21 @@ void QmitkImageCropperView::ProcessImage(bool mask)
   auto boundingBox = dynamic_cast<mitk::GeometryData*>(boundingBoxNode->GetData());
   if (nullptr != image && nullptr != boundingBox)
   {
+    // Check if initial node name is already in box name
+    std::string imagePrefix = "";
+    if (boundingBoxNode->GetName().find(imageNode->GetName()) != 0)
+    {
+      imagePrefix = imageNode->GetName() + "_";
+    }
+
     QString imageName;
     if (mask)
     {
-      imageName = QString::fromStdString(imageNode->GetName() + "_" + boundingBoxNode->GetName() + "_masked");
+      imageName = QString::fromStdString(imagePrefix + boundingBoxNode->GetName() + "_masked");
     }
     else
     {
-      imageName = QString::fromStdString(imageNode->GetName() + "_" + boundingBoxNode->GetName() + "_cropped");
+      imageName = QString::fromStdString(imagePrefix + boundingBoxNode->GetName() + "_cropped");
     }
 
     if (m_Controls.checkBoxCropTimeStepOnly->isChecked())

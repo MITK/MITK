@@ -14,12 +14,6 @@
    <string>Form</string>
   </property>
   <layout class="QFormLayout" name="formLayout">
-   <property name="horizontalSpacing">
-    <number>8</number>
-   </property>
-   <property name="verticalSpacing">
-    <number>24</number>
-   </property>
    <item row="0" column="0">
     <widget class="QLabel" name="slimViewLabel">
      <property name="text">
@@ -174,18 +168,31 @@
     </widget>
    </item>
    <item row="4" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
       <widget class="QLineEdit" name="labelSetPresetLineEdit">
        <property name="clearButtonEnabled">
         <bool>true</bool>
        </property>
       </widget>
      </item>
-     <item>
+     <item row="0" column="1">
       <widget class="QToolButton" name="labelSetPresetToolButton">
        <property name="text">
         <string>...</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0" colspan="2">
+      <widget class="QLabel" name="labelSetPresetCmdLineArgLabel">
+       <property name="text">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;The default label set preset is currently overriden by the &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New'; color:#ff0000;&quot;&gt;Segmentation.labelSetPreset&lt;/span&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt; command-line argument.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::RichText</enum>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

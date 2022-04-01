@@ -12,21 +12,12 @@ found in the LICENSE file.
 
 #include "QmitkSegmentationPreferencePage.h"
 
-#include <QLabel>
-#include <QPushButton>
-#include <QFormLayout>
-#include <QHBoxLayout>
-#include <QCheckBox>
-#include <QGroupBox>
-#include <QRadioButton>
-#include <QMessageBox>
-#include <QDoubleSpinBox>
-#include <QLineEdit>
-#include <QToolButton>
-#include <QFileDialog>
-
 #include <berryIPreferencesService.h>
 #include <berryPlatform.h>
+
+#include <mitkBaseApplication.h>
+
+#include <QFileDialog>
 
 #include <ui_QmitkSegmentationPreferencePageControls.h>
 
@@ -114,7 +105,17 @@ void QmitkSegmentationPreferencePage::Update()
   m_Ui->decimationSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("decimation rate", 0.5));
   m_Ui->closingSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("closing ratio", 0.0));
 
-  m_Ui->labelSetPresetLineEdit->setText(m_SegmentationPreferencesNode->Get("label set preset", ""));
+  auto labelSetPreset = mitk::BaseApplication::instance().config().getString(mitk::BaseApplication::ARG_SEGMENTATION_LABELSET_PRESET.toStdString(), "");
+  bool isOverridenByCmdLineArg = !labelSetPreset.empty();
+
+  if (!isOverridenByCmdLineArg)
+    labelSetPreset = m_SegmentationPreferencesNode->Get("label set preset", "").toStdString();
+
+  m_Ui->labelSetPresetLineEdit->setDisabled(isOverridenByCmdLineArg);
+  m_Ui->labelSetPresetToolButton->setDisabled(isOverridenByCmdLineArg);
+  m_Ui->labelSetPresetCmdLineArgLabel->setVisible(isOverridenByCmdLineArg);
+
+  m_Ui->labelSetPresetLineEdit->setText(QString::fromStdString(labelSetPreset));
 }
 
 void QmitkSegmentationPreferencePage::OnSmoothingCheckboxChecked(int state)

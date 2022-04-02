@@ -44,10 +44,6 @@ found in the LICENSE file.
 // itk
 #include <itksys/SystemTools.hxx>
 
-// todo:
-// berry
-//#include <berryIPreferencesService.h>
-
 QmitkLabelSetWidget::QmitkLabelSetWidget(QWidget *parent)
   : QWidget(parent), m_DataStorage(nullptr), m_Completer(nullptr), m_ToolManager(nullptr), m_ProcessingManualSelection(false)
 {
@@ -393,7 +389,7 @@ void QmitkLabelSetWidget::OnEraseLabels(bool /*value*/)
 
 void QmitkLabelSetWidget::OnRemoveLabels(bool /*value*/)
 {
-  QString question = "Do you really want to remove selected labels?";
+  QString question = "Do you really want to remove the selected labels?";
   QMessageBox::StandardButton answerButton = QMessageBox::question(
     this, "Remove selected labels", question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
 

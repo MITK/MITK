@@ -102,7 +102,7 @@ mitk::Label::Pointer mitk::LabelSetImageHelper::CreateNewLabel(const LabelSetIma
     for (auto labelIter = labelSet->IteratorConstBegin(); labelIter != labelEndIter; ++labelIter)
     {
       auto label = labelIter->second;
-      auto labelName = labelIter->second->GetName();
+      auto labelName = label->GetName();
       std::smatch match;
 
       if (std::regex_match(labelName, match, genericLabelNameRegEx))

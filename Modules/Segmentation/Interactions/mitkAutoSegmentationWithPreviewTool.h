@@ -138,6 +138,11 @@ namespace mitk
   private:
     void TransferImageAtTimeStep(const Image* sourceImage, Image* destinationImage, const TimeStepType timeStep);
 
+    //hinweis für docu nur der active layer wird im Moment bespielt.
+    void TransferLabelContent(const LabelSetImage* sourceImage, LabelSetImage* destinationImage,
+      std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping = { {1,1} },
+      bool mergeMode = false, const TimeStepType timeStep = 0);
+
     void CreateResultSegmentationFromPreview();
 
     void OnRoiDataChanged();

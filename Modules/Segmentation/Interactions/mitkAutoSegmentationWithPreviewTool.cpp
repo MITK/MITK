@@ -32,6 +32,8 @@ found in the LICENSE file.
 #include "mitkNodePredicateGeometry.h"
 #include "mitkSegTool2D.h"
 
+#include <itkBinaryFunctorImageFilter.h>
+
 mitk::AutoSegmentationWithPreviewTool::AutoSegmentationWithPreviewTool(bool lazyDynamicPreviews): m_LazyDynamicPreviews(lazyDynamicPreviews)
 {
   m_ProgressCommand = ToolCommand::New();
@@ -275,18 +277,6 @@ void mitk::AutoSegmentationWithPreviewTool::ResetPreviewNode()
   }
 }
 
-template <typename TPixel, unsigned int VImageDimension>
-static void ITKSetVolume(const itk::Image<TPixel, VImageDimension> *originalImage,
-                         mitk::Image *segmentation,
-                         unsigned int timeStep)
-{
-  auto constPixelContainer = originalImage->GetPixelContainer();
-  //have to make a const cast because itk::PixelContainer does not provide a const correct access :(
-  auto pixelContainer = const_cast<typename itk::Image<TPixel, VImageDimension>::PixelContainer*>(constPixelContainer);
-
-  segmentation->SetVolume((void *)pixelContainer->GetBufferPointer(), timeStep);
-}
-
 void mitk::AutoSegmentationWithPreviewTool::TransferImageAtTimeStep(const Image* sourceImage, Image* destinationImage, const TimeStepType timeStep)
 {
   try
@@ -312,16 +302,10 @@ void mitk::AutoSegmentationWithPreviewTool::TransferImageAtTimeStep(const Image*
     }
     else
     { //take care of the full segmentation volume
-      if (sourceImageAtTimeStep->GetDimension() == 2)
-      {
-        AccessFixedDimensionByItk_2(
-          sourceImageAtTimeStep, ITKSetVolume, 2, destinationImage, timeStep);
-      }
-      else
-      {
-        AccessFixedDimensionByItk_2(
-          sourceImageAtTimeStep, ITKSetVolume, 3, destinationImage, timeStep);
-      }
+      auto sourceLSImage = dynamic_cast<const LabelSetImage*>(sourceImage);
+      auto destLSImage = dynamic_cast<LabelSetImage*>(destinationImage);
+
+      TransferLabelContent(sourceLSImage, destLSImage, { {this->GetUserDefinedActiveLabel(),this->GetUserDefinedActiveLabel()} }, false, timeStep);
     }
   }
   catch (...)
@@ -556,4 +540,120 @@ void mitk::AutoSegmentationWithPreviewTool::UpdateCleanUp()
 mitk::TimePointType mitk::AutoSegmentationWithPreviewTool::GetLastTimePointOfUpdate() const
 {
   return m_LastTimePointOfUpdate;
+}
+
+template <class TDestinationPixel, class TSourcePixel, class TOutputpixel>
+class LabelTransferFunctor
+{
+
+public:
+  LabelTransferFunctor(){};
+
+  LabelTransferFunctor(const mitk::LabelSet* destinationLabelSet, mitk::Label::PixelType sourceBackground, mitk::Label::PixelType destinationBackground, bool destinationBackgroundLocked,
+    mitk::Label::PixelType sourceLabel, mitk::Label::PixelType newDestinationLabel, bool mergeMode
+  ) : m_DestinationLabelSet(destinationLabelSet), m_SourceBackground(sourceBackground), m_DestinationBackground(destinationBackground), m_DestinationBackgroundLocked(destinationBackgroundLocked),
+    m_SourceLabel(sourceLabel), m_NewDestinationLabel(newDestinationLabel), m_MergeMode(mergeMode)
+  {
+  };
+
+  ~LabelTransferFunctor() {};
+
+  bool operator!=(const LabelTransferFunctor& other)const
+  {
+    return !(*this == other);
+  }
+  bool operator==(const LabelTransferFunctor& other) const
+  {
+    return (this->m_SourceBackground == other.m_SourceBackground) &&
+      (this->m_DestinationBackground == other.m_DestinationBackground)&&
+      (this->m_DestinationBackgroundLocked == other.m_DestinationBackgroundLocked)&&
+      (this->m_SourceLabel == other.m_SourceLabel)&&
+      (this->m_NewDestinationLabel == other.m_NewDestinationLabel)&&
+      (this->m_MergeMode == other.m_MergeMode)&&
+      (this->m_DestinationLabelSet == other.m_DestinationLabelSet);
+  }
+
+  LabelTransferFunctor& operator=(const LabelTransferFunctor& other)
+  {
+    this->m_SourceBackground = other.m_SourceBackground;
+    this->m_DestinationBackground = other.m_DestinationBackground;
+    this->m_SourceLabel = other.m_SourceLabel;
+    this->m_NewDestinationLabel = other.m_NewDestinationLabel;
+    this->m_MergeMode = other.m_MergeMode;
+    this->m_DestinationLabelSet = other.m_DestinationLabelSet;
+    this->m_DestinationBackgroundLocked = other.m_DestinationBackgroundLocked;
+
+    return *this;
+  }
+
+  inline TOutputpixel operator()(const TDestinationPixel& existingDestinationValue, const TSourcePixel& existingSourceValue)
+  {
+    if (existingSourceValue == this->m_SourceLabel
+      && !this->m_DestinationLabelSet->GetLabel(existingDestinationValue)->GetLocked())
+    {
+      return this->m_NewDestinationLabel;
+    }
+    else if (!this->m_MergeMode
+      && existingSourceValue == this->m_SourceBackground
+      && existingDestinationValue == this->m_NewDestinationLabel
+      && !this->m_DestinationBackgroundLocked)
+    {
+      return this->m_DestinationBackground;
+    }
+
+    return existingDestinationValue;
+  }
+
+private:
+  const mitk::LabelSet* m_DestinationLabelSet = nullptr;
+  mitk::Label::PixelType m_SourceBackground = 0;
+  mitk::Label::PixelType m_DestinationBackground = 0;
+  mitk::Label::PixelType m_SourceLabel = 1;
+  mitk::Label::PixelType m_NewDestinationLabel = 1;
+  bool m_DestinationBackgroundLocked = false;
+  bool m_MergeMode = false;
+};
+
+template<unsigned int VImageDimension>
+void TransferLabelContentHelper(const itk::Image<mitk::Label::PixelType, VImageDimension>* itkSourceImage, mitk::Image* destinationImage, const mitk::LabelSet* destinationLabelSet, mitk::Label::PixelType sourceBackground, mitk::Label::PixelType destinationBackground, bool destinationBackgroundLocked, mitk::Label::PixelType sourceLabel, mitk::Label::PixelType newDestinationLabel, bool mergeMode)
+{
+  typedef itk::Image<mitk::Label::PixelType, VImageDimension> ContentImageType;
+  typename ContentImageType::Pointer itkDestinationImage;
+  mitk::CastToItkImage(destinationImage, itkDestinationImage);
+
+  typedef LabelTransferFunctor <mitk::Label::PixelType, mitk::Label::PixelType, mitk::Label::PixelType> LabelTransferFunctorType;
+  typedef itk::BinaryFunctorImageFilter<ContentImageType, ContentImageType, ContentImageType, LabelTransferFunctorType> FilterType;
+
+  LabelTransferFunctorType transferFunctor(destinationLabelSet, sourceBackground, destinationBackground,
+    destinationBackgroundLocked, sourceLabel, newDestinationLabel, mergeMode);
+
+  auto transferFilter = FilterType::New();
+
+  transferFilter->SetFunctor(transferFunctor);
+  transferFilter->InPlaceOn();
+  transferFilter->SetInput1(itkDestinationImage);
+  transferFilter->SetInput2(itkSourceImage);
+
+  transferFilter->Update();
+}
+
+//hinweis für docu nur der active layer wird im Moment bespielt.
+void mitk::AutoSegmentationWithPreviewTool::TransferLabelContent(
+  const LabelSetImage* sourceImage, LabelSetImage* destinationImage, std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping, bool mergeMode, const TimeStepType timeStep)
+{
+  //todo precondition check 1) images valid, 2) ob labels der label map schon existiern
+
+  const auto sourceBackground = sourceImage->GetExteriorLabel()->GetValue();
+  const auto destinationBackground = destinationImage->GetExteriorLabel()->GetValue();
+  const auto destinationBackgroundLocked = destinationImage->GetExteriorLabel()->GetLocked();
+  const auto destinationLabelSet = destinationImage->GetLabelSet(destinationImage->GetActiveLayer());
+
+  Image::ConstPointer sourceImageAtTimeStep = this->GetImageByTimeStep(sourceImage, timeStep);
+  Image::Pointer destinationImageAtTimeStep = this->GetImageByTimeStep(destinationImage, timeStep);
+
+  for (const auto& [sourceLabel, newDestinationLabel] : labelMapping)
+  {
+    AccessFixedPixelTypeByItk_n(sourceImageAtTimeStep, TransferLabelContentHelper, (Label::PixelType), (destinationImageAtTimeStep, destinationLabelSet, sourceBackground, destinationBackground, destinationBackgroundLocked, sourceLabel, newDestinationLabel, mergeMode));
+  }
+  destinationImage->Modified();
 }

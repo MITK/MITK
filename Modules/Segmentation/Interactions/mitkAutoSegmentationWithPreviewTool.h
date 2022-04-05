@@ -138,7 +138,24 @@ namespace mitk
   private:
     void TransferImageAtTimeStep(const Image* sourceImage, Image* destinationImage, const TimeStepType timeStep);
 
-    //hinweis für docu nur der active layer wird im Moment bespielt.
+    /**Helper function that transfers pixels of the specified source label from source image to the destination image by using
+    a specified destination label. Function processes the whole image volume of the specified time step.
+    @remark in its current implementation the function only transfers contents of the active layer of the passed LabelSetImages.
+    @remark the function assumes that it is only called with source and destination image of same geometry.
+    @param sourceImage Pointer to the LabelSetImage which active layer should be used as source for the transfer.
+    @param destionationImage Pointer to the LabelSetImage which active layer should be used as destination for the transfer.
+    @param labelMapping Map that encodes the mappings of all label pixel transfers that should be done. First element is the
+    label in the source image. The second element is the label that transferred pixels should become in the destination image.
+    @param mergeMode indicates how the transfer should be done. If true, it is performed like a merge/union operation. So only
+    pixels of the label will be added. If false, also background is tranfered, if present in the source image where the
+    destinationImage is labeled by the destination label. Therfore in this mode segmentations can "shrink"/lose pixels to the
+    background.
+    @param timeStep indicate the time step that should be transferred.
+    @pre sourceImage must be valid
+    @pre destinationImage must be valid
+    @pre sourceImage and destinationImage must contain the indicated timeStep
+    @pre sourceImage must contain all indicated sourceLabels in its active layer.
+    @pre destinationImage must contain all indicated destinationLabels in its active layer.*/
     void TransferLabelContent(const LabelSetImage* sourceImage, LabelSetImage* destinationImage,
       std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping = { {1,1} },
       bool mergeMode = false, const TimeStepType timeStep = 0);

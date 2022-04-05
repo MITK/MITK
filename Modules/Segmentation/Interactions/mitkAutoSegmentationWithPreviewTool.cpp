@@ -637,11 +637,17 @@ void TransferLabelContentHelper(const itk::Image<mitk::Label::PixelType, VImageD
   transferFilter->Update();
 }
 
-//hinweis für docu nur der active layer wird im Moment bespielt.
 void mitk::AutoSegmentationWithPreviewTool::TransferLabelContent(
   const LabelSetImage* sourceImage, LabelSetImage* destinationImage, std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping, bool mergeMode, const TimeStepType timeStep)
 {
-  //todo precondition check 1) images valid, 2) ob labels der label map schon existiern
+  if (nullptr == sourceImage)
+  {
+    mitkThrow() << "Invalid call of TransferLabelContent; sourceImage must not be null.";
+  }
+  if (nullptr == destinationImage)
+  {
+    mitkThrow() << "Invalid call of TransferLabelContent; destinationImage must not be null.";
+  }
 
   const auto sourceBackground = sourceImage->GetExteriorLabel()->GetValue();
   const auto destinationBackground = destinationImage->GetExteriorLabel()->GetValue();
@@ -651,8 +657,27 @@ void mitk::AutoSegmentationWithPreviewTool::TransferLabelContent(
   Image::ConstPointer sourceImageAtTimeStep = this->GetImageByTimeStep(sourceImage, timeStep);
   Image::Pointer destinationImageAtTimeStep = this->GetImageByTimeStep(destinationImage, timeStep);
 
+  if (nullptr == sourceImageAtTimeStep)
+  {
+    mitkThrow() << "Invalid call of TransferLabelContent; sourceImage has not requested time step: "<<timeStep;
+  }
+  if (nullptr == destinationImageAtTimeStep)
+  {
+    mitkThrow() << "Invalid call of TransferLabelContent; destinationImage has not requested time step: " << timeStep;
+  }
+
   for (const auto& [sourceLabel, newDestinationLabel] : labelMapping)
   {
+    if (!sourceImage->ExistLabel(sourceLabel, sourceImage->GetActiveLayer()))
+    {
+      mitkThrow() << "Invalid call of TransferLabelContent. Defined source label does not exist in sourceImage. SourceLabel: "<<sourceLabel;
+    }
+    if (!destinationImage->ExistLabel(newDestinationLabel, destinationImage->GetActiveLayer()))
+    {
+      mitkThrow() << "Invalid call of TransferLabelContent. Defined destination label does not exist in destinationImage. newDestinationLabel: " << newDestinationLabel;
+    }
+
+
     AccessFixedPixelTypeByItk_n(sourceImageAtTimeStep, TransferLabelContentHelper, (Label::PixelType), (destinationImageAtTimeStep, destinationLabelSet, sourceBackground, destinationBackground, destinationBackgroundLocked, sourceLabel, newDestinationLabel, mergeMode));
   }
   destinationImage->Modified();

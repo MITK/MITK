@@ -608,9 +608,9 @@ private:
   const mitk::LabelSet* m_DestinationLabelSet = nullptr;
   mitk::Label::PixelType m_SourceBackground = 0;
   mitk::Label::PixelType m_DestinationBackground = 0;
+  bool m_DestinationBackgroundLocked = false;
   mitk::Label::PixelType m_SourceLabel = 1;
   mitk::Label::PixelType m_NewDestinationLabel = 1;
-  bool m_DestinationBackgroundLocked = false;
   bool m_MergeMode = false;
 };
 

@@ -425,7 +425,7 @@ mitk::PointSet::PointsIterator mitk::PointSet::RemovePointAtEnd(int t)
       points->DeleteIndex(id);
       pdata->DeleteIndex(id);
       PointsIterator eit2 = points->End();
-      return --eit2;
+      return points->empty()? eit2 : --eit2;
     }
     else
     {

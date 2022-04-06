@@ -365,6 +365,13 @@ std::cout<<"[PASSED]"<<std::endl;
     unsigned int pointSetSeriesSize = emptyPS->GetPointSetSeriesSize();
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Nothing added", true, size == 0 && pointSetSeriesSize == 1);
 
+    // remove max id from an point set with one point
+    mitk::PointSet::Pointer onePS = mitk::PointSet::New();
+    onePS->InsertPoint(0, point0);
+    maxIt = onePS->RemovePointAtEnd(0);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Remove max id point from non-existent time step", true, maxIt == onePS->End(0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Nothing removed", true, emptyPS->GetSize(0) == 0);
+
     // remove max id point
     maxIt = pointSet->RemovePointAtEnd(0);
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Point id 4 removed", false, pointSet->IndexExists(4));

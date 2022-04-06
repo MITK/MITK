@@ -169,7 +169,8 @@ template <typename TPixel, unsigned int VImageDimension>
 void DoITKRegionGrowing(const itk::Image<TPixel, VImageDimension>* oldSegImage,
   mitk::Image* segmentation,
   const mitk::PointSet* seedPoints,
-  unsigned int timeStep, const mitk::BaseGeometry* inputGeometry, const mitk::Label::PixelType outputValue)
+  unsigned int timeStep, const mitk::BaseGeometry* inputGeometry, const mitk::Label::PixelType outputValue,
+  const mitk::Label::PixelType backgroundValue)
 {
   typedef itk::Image<TPixel, VImageDimension> InputImageType;
   typedef itk::Image<mitk::Label::PixelType, VImageDimension> OutputImageType;
@@ -187,7 +188,10 @@ void DoITKRegionGrowing(const itk::Image<TPixel, VImageDimension>* oldSegImage,
     inputGeometry->WorldToIndex(pos->Value(), seedIndex);
     const auto selectedLabel = oldSegImage->GetPixel(seedIndex);
 
-    indexMap[selectedLabel].push_back(seedIndex);
+    if (selectedLabel != backgroundValue)
+    {
+      indexMap[selectedLabel].push_back(seedIndex);
+    }
   }
 
   typename OutputImageType::Pointer itkResultImage;
@@ -239,13 +243,36 @@ void DoITKRegionGrowing(const itk::Image<TPixel, VImageDimension>* oldSegImage,
     return;
   }
 
-  segmentation->SetVolume((void*)(itkResultImage->GetPixelContainer()->GetBufferPointer()), timeStep);
+  if (itkResultImage.IsNotNull())
+  {
+    segmentation->SetVolume((void*)(itkResultImage->GetPixelContainer()->GetBufferPointer()), timeStep);
+  }
+  else
+  {
+    mitk::CastToItkImage(segmentation, itkResultImage);
+    itkResultImage->FillBuffer(backgroundValue);
+  }
+
 }
 
 void mitk::PickingTool::DoUpdatePreview(const Image* /*inputAtTimeStep*/, const Image* oldSegAtTimeStep, Image* previewImage, TimeStepType timeStep)
 {
   if (nullptr != oldSegAtTimeStep && nullptr != previewImage && m_PointSet.IsNotNull())
   {
-    AccessFixedDimensionByItk_n(oldSegAtTimeStep, DoITKRegionGrowing, 3, (previewImage, this->m_PointSet, timeStep, oldSegAtTimeStep->GetGeometry(), this->GetUserDefinedActiveLabel()));
+    if (this->HasPicks())
+    {
+      Label::PixelType backgroundValue = 0;
+      auto labelSetImage = dynamic_cast<const LabelSetImage*>(oldSegAtTimeStep);
+      if (nullptr != labelSetImage)
+      {
+        backgroundValue = labelSetImage->GetExteriorLabel()->GetValue();
+      }
+
+      AccessFixedDimensionByItk_n(oldSegAtTimeStep, DoITKRegionGrowing, 3, (previewImage, this->m_PointSet, timeStep, oldSegAtTimeStep->GetGeometry(), this->GetUserDefinedActiveLabel(), backgroundValue));
+    }
+    else
+    {
+      this->ResetPreviewNode();
+    }
   }
 }

@@ -17,7 +17,7 @@ found in the LICENSE file.
 
 mitk::USTelemedImageSource::USTelemedImageSource()
   : m_Image(mitk::Image::New()),
-  m_ImageMutex(itk::FastMutexLock::New()),
+  m_ImageMutex(new std::mutex()),
   m_Plugin(0),
   m_PluginCallback(0),
   m_UsgDataView(0),
@@ -36,10 +36,12 @@ mitk::USTelemedImageSource::~USTelemedImageSource( )
   SAFE_RELEASE(m_Plugin);
   SAFE_RELEASE(m_ImageProperties);
   SAFE_RELEASE(m_DepthProperties);
+  delete m_ImageMutex;
 }
 
 void mitk::USTelemedImageSource::GetNextRawImage(std::vector<mitk::Image::Pointer>& imageVector)
 {
+  MITK_INFO << "Updating Telemed Image";
   if (imageVector.empty() ) { imageVector.push_back( mitk::Image::New()); }
 
   //get the actual resolution to check if it changed. We have to do this every time because the geometry takes a few frames to adapt
@@ -59,16 +61,17 @@ void mitk::USTelemedImageSource::GetNextRawImage(std::vector<mitk::Image::Pointe
   //now update image
   if ( m_Image->IsInitialized() )
   {
-    m_ImageMutex->Lock();
+    m_ImageMutex->lock();
 
     // copy contents of the given image into the member variable
     imageVector.at(0)->Initialize(m_Image->GetPixelType(), m_Image->GetDimension(), m_Image->GetDimensions());
     mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(0,0,0));
     imageVector.at(0)->SetSlice(inputReadAccessor.GetData());
     imageVector.at(0)->SetGeometry(m_Image->GetGeometry());
-
-    m_ImageMutex->Unlock();
+    MITK_INFO << "Telemed Image update in progress";
+    m_ImageMutex->unlock();
   }
+  MITK_INFO << "Telemed Image updated";
 
 }
 
@@ -83,7 +86,7 @@ void mitk::USTelemedImageSource::UpdateImageGeometry()
   spacing[1] = ((double)1 / resolutionInMeters.nXPelsPerUnit) * 1000; //conversion: meters to millimeters
   spacing[2] = 1;
 
-  m_ImageMutex->Lock();
+  m_ImageMutex->lock();
   if(m_Image.IsNotNull() && (m_Image->GetGeometry()!=nullptr))
     {
     m_Image->GetGeometry()->SetSpacing(spacing);
@@ -91,7 +94,7 @@ void mitk::USTelemedImageSource::UpdateImageGeometry()
     }
   else
     {MITK_WARN << "image or geometry was nullptr, can't adapt geometry";}
-  m_ImageMutex->Unlock();
+  m_ImageMutex->unlock();
 
   MITK_DEBUG << "UpdateImageGeometry called!";
   MITK_DEBUG << "depth: " << m_DepthProperties->GetCurrent();

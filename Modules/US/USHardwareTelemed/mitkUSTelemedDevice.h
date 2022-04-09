@@ -107,6 +107,32 @@ namespace mitk {
     USImageSource::Pointer GetUSImageSource( );
 
     /**
+    * \brief Returns all probes for this device or an empty vector it no probes were set
+    * Returns a std::vector of all probes that exist for this device if there were probes set while creating or modifying this USVideoDevice.
+    * Otherwise it returns an empty vector. Therefore always check if vector is filled, before using it!
+    */
+    std::vector<mitk::USProbe::Pointer> GetAllProbes();
+
+    /**
+    * \brief Return current active probe for this USDevice
+    * Returns a pointer to the probe that is currently in use. If there were probes set while creating or modifying this USDevice.
+    * Returns null otherwise
+    */
+    mitk::USProbe::Pointer GetCurrentProbe();
+
+     /**
+    * \brief get the probe by its name
+    * Returns a  pointer to the probe identified by the given name. If no probe of given name exists for this Device 0 is returned.
+    */
+    mitk::USProbe::Pointer GetProbeByName(std::string name);
+
+    /**
+    * \brief Grabs the next frame from the Video input.
+    * This method is called internally, whenever Update() is invoked by an Output.
+    */
+    void GenerateData() override;
+
+    /**
       * \brief Getter for main Telemed API object.
       * This method is for being called by Telemed control interfaces.
       */

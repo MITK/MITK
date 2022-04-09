@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkUSTelemedDevice.h"
-
+#include "mitkImageReadAccessor.h"
 #include "mitkUSTelemedSDKHeader.h"
 
 mitk::USTelemedDevice::USTelemedDevice(std::string manufacturer, std::string model)
@@ -22,7 +22,7 @@ m_ControlsDoppler(mitk::USTelemedDopplerControls::New(this)),
 m_ImageSource(mitk::USTelemedImageSource::New()), m_UsgMainInterface(0),
 m_Probe(0), m_UsgDataView(0), m_ProbesCollection(0)
 {
-  SetNumberOfOutputs(1);
+  SetNumberOfIndexedOutputs(1);
   SetNthOutput(0, this->MakeOutput(0));
 }
 
@@ -141,6 +141,49 @@ void mitk::USTelemedDevice::OnFreeze(bool freeze)
   }
 }
 
+void mitk::USTelemedDevice::GenerateData()
+{/*
+  mitk::Image::Pointer nextImage = GetUSImageSource()->GetNextImage().at(0);
+  mitk::Image::Pointer output = this->GetOutput(0);
+
+      if (!output->IsInitialized() ||
+        output->GetDimension(0) != nextImage->GetDimension(0) ||
+        output->GetDimension(1) != nextImage->GetDimension(1) ||
+        output->GetDimension(2) != nextImage->GetDimension(2) ||
+        output->GetPixelType() != nextImage->GetPixelType())
+      {
+        output->Initialize(nextImage->GetPixelType(), nextImage->GetDimension(),
+          nextImage->GetDimensions());
+      }
+
+      // copy contents of the given image into the member variable
+      mitk::ImageReadAccessor inputReadAccessor(nextImage);
+      output->SetImportVolume(inputReadAccessor.GetData());
+      output->SetGeometry(nextImage->GetGeometry());*/
+
+  //this->SetNthOutput(0,nextImage);
+  //m_ImageVector[0] = GetUSImageSource()->GetNextImage().at(0);
+  //Superclass::GenerateData();
+  //if( m_ImageVector.size() == 0 || this->GetNumberOfIndexedOutputs() == 0 )
+  //{
+  //  return;
+  //}
+
+  /*
+  m_ImageMutex.lock();
+  mitk::Image::Pointer nextImage = GetUSImageSource()->GetNextImage().back();
+  this->SetOutput(0,nextImage);
+  /*
+  auto& image = m_ImageVector[0];
+  if( image.IsNotNull() && image->IsInitialized() && m_CurrentProbe.IsNotNull() )
+  {
+    //MITK_INFO << "Spacing CurrentProbe: " << m_CurrentProbe->GetSpacingForGivenDepth(m_CurrentProbe->GetCurrentDepth());
+    image->GetGeometry()->SetSpacing(m_CurrentProbe->GetSpacingForGivenDepth(m_CurrentProbe->GetCurrentDepth()));
+    this->GetOutput(0)->SetGeometry(image->GetGeometry());
+  }
+  m_ImageMutex.unlock();*/
+}
+
 mitk::USImageSource::Pointer mitk::USTelemedDevice::GetUSImageSource()
 {
   return m_ImageSource.GetPointer();
@@ -172,6 +215,21 @@ void mitk::USTelemedDevice::StopScanning()
     MITK_ERROR("USDevice")("USTelemedDevice") << "Stop scanning failed (" << hr << ").";
     mitkThrow() << "Stop scanning failed (" << hr << ").";
   }
+}
+
+std::vector<mitk::USProbe::Pointer> mitk::USTelemedDevice::GetAllProbes(){
+  return m_ControlsProbes->GetProbeSet();
+}
+
+mitk::USProbe::Pointer mitk::USTelemedDevice::GetCurrentProbe(){
+  return m_ControlsProbes->GetSelectedProbe();
+}
+
+mitk::USProbe::Pointer mitk::USTelemedDevice::GetProbeByName(std::string name){
+  for (mitk::USProbe::Pointer p : m_ControlsProbes->GetProbeSet()){
+    if (p->GetName().compare(name)==0) {return p;}
+  }
+  return nullptr;
 }
 
 Usgfw2Lib::IUsgfw2* mitk::USTelemedDevice::GetUsgMainInterface()

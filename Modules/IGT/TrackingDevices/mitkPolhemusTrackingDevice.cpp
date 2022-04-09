@@ -17,19 +17,13 @@ found in the LICENSE file.
 #include "mitkIGTHardwareException.h"
 #include <itksys/SystemTools.hxx>
 #include <iostream>
-#include <itkMutexLockHolder.h>
+#include <mutex>
 #include "mitkPolhemusTrackerTypeInformation.h"
-
-typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
 mitk::PolhemusTrackingDevice::PolhemusTrackingDevice() : mitk::TrackingDevice()
 {
   //set the type of this tracking device
   this->m_Data = mitk::PolhemusTrackerTypeInformation::GetDeviceDataPolhemusTrackerLiberty();
-
-  this->m_MultiThreader = itk::MultiThreader::New();
-  m_ThreadID = 0;
-
   m_Device = mitk::PolhemusInterface::New();
 }
 
@@ -75,11 +69,11 @@ bool mitk::PolhemusTrackingDevice::StartTracking()
   {
     mitk::IGTTimeStamp::GetInstance()->Start(this);
     this->SetState(Tracking);
-    this->m_StopTrackingMutex->Lock();
+    this->m_StopTrackingMutex.lock();
     this->m_StopTracking = false;
-    this->m_StopTrackingMutex->Unlock();
-    m_ThreadID = m_MultiThreader->SpawnThread(this->ThreadStartTracking, this);    // start a new thread that executes the TrackTools() method
-    return true;
+    this->m_StopTrackingMutex.unlock();
+    if (m_Thread.joinable()) {m_Thread.detach();}
+    m_Thread = std::thread(&PolhemusTrackingDevice::ThreadStartTracking, this); // start a new thread that executes the TrackTools() methodreturn true;
   }
   else
   {
@@ -181,12 +175,12 @@ void mitk::PolhemusTrackingDevice::TrackTools()
   try
   {
     /* lock the TrackingFinishedMutex to signal that the execution rights are now transfered to the tracking thread */
-    MutexLockHolder trackingFinishedLockHolder(*m_TrackingFinishedMutex); // keep lock until end of scope
+    std::lock_guard<std::mutex> trackingFinishedLockHolder(m_TrackingFinishedMutex); // keep lock until end of scope
 
     bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here
-    this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
+    this->m_StopTrackingMutex.lock();  // update the local copy of m_StopTracking
     localStopTracking = this->m_StopTracking;
-    this->m_StopTrackingMutex->Unlock();
+    this->m_StopTrackingMutex.unlock();
     Sleep(100);//Wait a bit until the tracker is ready...
 
     while ((this->GetState() == Tracking) && (localStopTracking == false))
@@ -222,9 +216,9 @@ void mitk::PolhemusTrackingDevice::TrackTools()
         }
       }
       /* Update the local copy of m_StopTracking */
-      this->m_StopTrackingMutex->Lock();
+      this->m_StopTrackingMutex.lock();
       localStopTracking = m_StopTracking;
-      this->m_StopTrackingMutex->Unlock();
+      this->m_StopTrackingMutex.unlock();
     }
   }
   catch (...)
@@ -234,24 +228,9 @@ void mitk::PolhemusTrackingDevice::TrackTools()
   }
 }
 
-ITK_THREAD_RETURN_TYPE mitk::PolhemusTrackingDevice::ThreadStartTracking(void* pInfoStruct)
+void mitk::PolhemusTrackingDevice::ThreadStartTracking()
 {
-  /* extract this pointer from Thread Info structure */
-  struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
-  if (pInfo == nullptr)
-  {
-    return ITK_THREAD_RETURN_VALUE;
-  }
-  if (pInfo->UserData == nullptr)
-  {
-    return ITK_THREAD_RETURN_VALUE;
-  }
-  PolhemusTrackingDevice *trackingDevice = (PolhemusTrackingDevice*)pInfo->UserData;
-
-  if (trackingDevice != nullptr)
-    trackingDevice->TrackTools();
-
-  return ITK_THREAD_RETURN_VALUE;
+  this->TrackTools();
 }
 
 bool mitk::PolhemusTrackingDevice::AutoDetectToolsAvailable()

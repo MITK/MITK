@@ -542,6 +542,9 @@ mitk::TimePointType mitk::AutoSegmentationWithPreviewTool::GetLastTimePointOfUpd
   return m_LastTimePointOfUpdate;
 }
 
+/** Functor class that implements the label transfer and is used in conjunction with the itk::BinaryFunctorImageFilter.
+* For details regarding the usage of the filter and the functor patterns, please see info of itk::BinaryFunctorImageFilter.
+*/
 template <class TDestinationPixel, class TSourcePixel, class TOutputpixel>
 class LabelTransferFunctor
 {
@@ -549,9 +552,11 @@ class LabelTransferFunctor
 public:
   LabelTransferFunctor(){};
 
-  LabelTransferFunctor(const mitk::LabelSet* destinationLabelSet, mitk::Label::PixelType sourceBackground, mitk::Label::PixelType destinationBackground, bool destinationBackgroundLocked,
-    mitk::Label::PixelType sourceLabel, mitk::Label::PixelType newDestinationLabel, bool mergeMode
-  ) : m_DestinationLabelSet(destinationLabelSet), m_SourceBackground(sourceBackground), m_DestinationBackground(destinationBackground), m_DestinationBackgroundLocked(destinationBackgroundLocked),
+  LabelTransferFunctor(const mitk::LabelSet* destinationLabelSet, mitk::Label::PixelType sourceBackground,
+    mitk::Label::PixelType destinationBackground, bool destinationBackgroundLocked,
+    mitk::Label::PixelType sourceLabel, mitk::Label::PixelType newDestinationLabel, bool mergeMode) :
+    m_DestinationLabelSet(destinationLabelSet), m_SourceBackground(sourceBackground),
+    m_DestinationBackground(destinationBackground), m_DestinationBackgroundLocked(destinationBackgroundLocked),
     m_SourceLabel(sourceLabel), m_NewDestinationLabel(newDestinationLabel), m_MergeMode(mergeMode)
   {
   };
@@ -564,24 +569,24 @@ public:
   }
   bool operator==(const LabelTransferFunctor& other) const
   {
-    return (this->m_SourceBackground == other.m_SourceBackground) &&
-      (this->m_DestinationBackground == other.m_DestinationBackground)&&
-      (this->m_DestinationBackgroundLocked == other.m_DestinationBackgroundLocked)&&
-      (this->m_SourceLabel == other.m_SourceLabel)&&
-      (this->m_NewDestinationLabel == other.m_NewDestinationLabel)&&
-      (this->m_MergeMode == other.m_MergeMode)&&
-      (this->m_DestinationLabelSet == other.m_DestinationLabelSet);
+    return this->m_SourceBackground == other.m_SourceBackground &&
+      this->m_DestinationBackground == other.m_DestinationBackground &&
+      this->m_DestinationBackgroundLocked == other.m_DestinationBackgroundLocked &&
+      this->m_SourceLabel == other.m_SourceLabel &&
+      this->m_NewDestinationLabel == other.m_NewDestinationLabel &&
+      this->m_MergeMode == other.m_MergeMode &&
+      this->m_DestinationLabelSet == other.m_DestinationLabelSet;
   }
 
   LabelTransferFunctor& operator=(const LabelTransferFunctor& other)
   {
+    this->m_DestinationLabelSet = other.m_DestinationLabelSet;
     this->m_SourceBackground = other.m_SourceBackground;
     this->m_DestinationBackground = other.m_DestinationBackground;
+    this->m_DestinationBackgroundLocked = other.m_DestinationBackgroundLocked;
     this->m_SourceLabel = other.m_SourceLabel;
     this->m_NewDestinationLabel = other.m_NewDestinationLabel;
     this->m_MergeMode = other.m_MergeMode;
-    this->m_DestinationLabelSet = other.m_DestinationLabelSet;
-    this->m_DestinationBackgroundLocked = other.m_DestinationBackgroundLocked;
 
     return *this;
   }
@@ -614,6 +619,7 @@ private:
   bool m_MergeMode = false;
 };
 
+/**Helper function used be TransferLabelContent to allow the templating over different image dimensions in conjunction of AccessFixedPixelTypeByItk_n.*/
 template<unsigned int VImageDimension>
 void TransferLabelContentHelper(const itk::Image<mitk::Label::PixelType, VImageDimension>* itkSourceImage, mitk::Image* destinationImage, const mitk::LabelSet* destinationLabelSet, mitk::Label::PixelType sourceBackground, mitk::Label::PixelType destinationBackground, bool destinationBackgroundLocked, mitk::Label::PixelType sourceLabel, mitk::Label::PixelType newDestinationLabel, bool mergeMode)
 {
@@ -659,11 +665,11 @@ void mitk::AutoSegmentationWithPreviewTool::TransferLabelContent(
 
   if (nullptr == sourceImageAtTimeStep)
   {
-    mitkThrow() << "Invalid call of TransferLabelContent; sourceImage has not requested time step: "<<timeStep;
+    mitkThrow() << "Invalid call of TransferLabelContent; sourceImage does not have the requested time step: "<<timeStep;
   }
   if (nullptr == destinationImageAtTimeStep)
   {
-    mitkThrow() << "Invalid call of TransferLabelContent; destinationImage has not requested time step: " << timeStep;
+    mitkThrow() << "Invalid call of TransferLabelContent; destinationImage does has not have the requested time step: " << timeStep;
   }
 
   for (const auto& [sourceLabel, newDestinationLabel] : labelMapping)

@@ -142,11 +142,13 @@ void mitk::AutoSegmentationWithPreviewTool::Deactivated()
 
 void mitk::AutoSegmentationWithPreviewTool::ConfirmSegmentation()
 {
-  if (m_LazyDynamicPreviews && m_CreateAllTimeSteps)
+  bool labelChanged = this->EnsureUpToDateUserDefinedActiveLabel();
+  if ((m_LazyDynamicPreviews && m_CreateAllTimeSteps) || labelChanged)
   { // The tool should create all time steps but is currently in lazy mode,
     // thus ensure that a preview for all time steps is available.
     this->UpdatePreview(true);
   }
+
 
   CreateResultSegmentationFromPreview();
 
@@ -419,6 +421,26 @@ void mitk::AutoSegmentationWithPreviewTool::OnTimePointChanged()
   }
 }
 
+bool mitk::AutoSegmentationWithPreviewTool::EnsureUpToDateUserDefinedActiveLabel()
+{
+  bool labelChanged = true;
+
+  const auto workingImage = dynamic_cast<const Image*>(this->GetToolManager()->GetWorkingData(0)->GetData());
+  if (const auto& labelSetImage = dynamic_cast<const LabelSetImage*>(workingImage))
+  {
+    // this is a fix for T28131 / T28986, which should be refactored if T28524 is being worked on
+    auto newLabel = labelSetImage->GetActiveLabel(labelSetImage->GetActiveLayer())->GetValue();
+    labelChanged = newLabel != m_UserDefinedActiveLabel;
+    m_UserDefinedActiveLabel = newLabel;
+  }
+  else
+  {
+    m_UserDefinedActiveLabel = 1;
+    labelChanged = false;
+  }
+  return labelChanged;
+}
+
 void mitk::AutoSegmentationWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
 {
   const auto inputImage = this->GetSegmentationInput();
@@ -426,15 +448,7 @@ void mitk::AutoSegmentationWithPreviewTool::UpdatePreview(bool ignoreLazyPreview
   int progress_steps = 200;
 
   const auto workingImage = dynamic_cast<const Image*>(this->GetToolManager()->GetWorkingData(0)->GetData());
-  if (const auto& labelSetImage = dynamic_cast<const LabelSetImage*>(workingImage))
-  {
-    // this is a fix for T28131 / T28986, which should be refactored if T28524 is being worked on
-    m_UserDefinedActiveLabel = labelSetImage->GetActiveLabel(labelSetImage->GetActiveLayer())->GetValue();
-  }
-  else
-  {
-    m_UserDefinedActiveLabel = 1;
-  }
+  this->EnsureUpToDateUserDefinedActiveLabel();
 
   this->CurrentlyBusy.Send(true);
   m_IsUpdating = true;

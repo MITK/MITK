@@ -164,6 +164,15 @@ namespace mitk
     void OnRoiDataChanged();
     void OnTimePointChanged();
 
+    /**Internal helper that ensures that the stored active label is up to date.
+     This is a fix for T28131 / T28986. It should be refactored if T28524 is being worked on.
+     On the long run, the active label will be communicated/set by the user/toolmanager as a
+     state of the tool and the tool should react accordingly (like it does for other external
+     state changes).
+     @return indicates if the label has changed (true) or not.
+     */
+    bool EnsureUpToDateUserDefinedActiveLabel();
+
     /** Node that containes the preview data generated and managed by this class or derived ones.*/
     DataNode::Pointer m_PreviewSegmentationNode;
     /** The reference data recieved from ToolManager::GetReferenceData when tool was activated.*/

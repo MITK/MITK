@@ -199,20 +199,21 @@ void DoITKRegionGrowing(const itk::Image<TPixel, VImageDimension>* oldSegImage,
   try
   {
     bool first = true;
+    typename RegionGrowingFilterType::Pointer regionGrower = RegionGrowingFilterType::New();
+    regionGrower->SetInput(oldSegImage);
+    regionGrower->SetReplaceValue(outputValue);
+
     for (const auto& [label, indeces] : indexMap)
     {
       // perform region growing in desired segmented region
-      typename RegionGrowingFilterType::Pointer regionGrower = RegionGrowingFilterType::New();
+      regionGrower->ClearSeeds();
       for (const auto& index : indeces)
       {
         regionGrower->AddSeed(index);
       }
 
-      regionGrower->SetInput(oldSegImage);
-
       regionGrower->SetLower(label);
       regionGrower->SetUpper(label);
-      regionGrower->SetReplaceValue(outputValue);
 
       regionGrower->Update();
 

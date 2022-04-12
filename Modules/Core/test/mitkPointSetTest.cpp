@@ -367,7 +367,7 @@ std::cout<<"[PASSED]"<<std::endl;
     mitk::PointSet::Pointer onePS = mitk::PointSet::New();
     onePS->InsertPoint(0, point0);
     maxIt = onePS->RemovePointAtEnd(0);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE("Remove of last point let to invalid state of point set", true, maxIt == onePS->End(0));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE("Removal of last point let to invalid state of point set", true, maxIt == onePS->End(0));
     CPPUNIT_ASSERT_EQUAL_MESSAGE("Nothing removed", true, onePS->GetSize(0) == 0 && onePS->GetPointSetSeriesSize() == 1);
 
     // remove max id point

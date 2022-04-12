@@ -633,7 +633,7 @@ private:
   bool m_MergeMode = false;
 };
 
-/**Helper function used be TransferLabelContent to allow the templating over different image dimensions in conjunction of AccessFixedPixelTypeByItk_n.*/
+/**Helper function used by TransferLabelContent to allow the templating over different image dimensions in conjunction of AccessFixedPixelTypeByItk_n.*/
 template<unsigned int VImageDimension>
 void TransferLabelContentHelper(const itk::Image<mitk::Label::PixelType, VImageDimension>* itkSourceImage, mitk::Image* destinationImage, const mitk::LabelSet* destinationLabelSet, mitk::Label::PixelType sourceBackground, mitk::Label::PixelType destinationBackground, bool destinationBackgroundLocked, mitk::Label::PixelType sourceLabel, mitk::Label::PixelType newDestinationLabel, bool mergeMode)
 {
@@ -683,7 +683,7 @@ void mitk::AutoSegmentationWithPreviewTool::TransferLabelContent(
   }
   if (nullptr == destinationImageAtTimeStep)
   {
-    mitkThrow() << "Invalid call of TransferLabelContent; destinationImage does has not have the requested time step: " << timeStep;
+    mitkThrow() << "Invalid call of TransferLabelContent; destinationImage does not have the requested time step: " << timeStep;
   }
 
   for (const auto& [sourceLabel, newDestinationLabel] : labelMapping)

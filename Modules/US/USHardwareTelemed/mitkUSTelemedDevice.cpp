@@ -142,46 +142,10 @@ void mitk::USTelemedDevice::OnFreeze(bool freeze)
 }
 
 void mitk::USTelemedDevice::GenerateData()
-{/*
-  mitk::Image::Pointer nextImage = GetUSImageSource()->GetNextImage().at(0);
-  mitk::Image::Pointer output = this->GetOutput(0);
-
-      if (!output->IsInitialized() ||
-        output->GetDimension(0) != nextImage->GetDimension(0) ||
-        output->GetDimension(1) != nextImage->GetDimension(1) ||
-        output->GetDimension(2) != nextImage->GetDimension(2) ||
-        output->GetPixelType() != nextImage->GetPixelType())
-      {
-        output->Initialize(nextImage->GetPixelType(), nextImage->GetDimension(),
-          nextImage->GetDimensions());
-      }
-
-      // copy contents of the given image into the member variable
-      mitk::ImageReadAccessor inputReadAccessor(nextImage);
-      output->SetImportVolume(inputReadAccessor.GetData());
-      output->SetGeometry(nextImage->GetGeometry());*/
-
-  //this->SetNthOutput(0,nextImage);
-  //m_ImageVector[0] = GetUSImageSource()->GetNextImage().at(0);
-  //Superclass::GenerateData();
-  //if( m_ImageVector.size() == 0 || this->GetNumberOfIndexedOutputs() == 0 )
-  //{
-  //  return;
-  //}
-
-  /*
-  m_ImageMutex.lock();
-  mitk::Image::Pointer nextImage = GetUSImageSource()->GetNextImage().back();
-  this->SetOutput(0,nextImage);
-  /*
-  auto& image = m_ImageVector[0];
-  if( image.IsNotNull() && image->IsInitialized() && m_CurrentProbe.IsNotNull() )
-  {
-    //MITK_INFO << "Spacing CurrentProbe: " << m_CurrentProbe->GetSpacingForGivenDepth(m_CurrentProbe->GetCurrentDepth());
-    image->GetGeometry()->SetSpacing(m_CurrentProbe->GetSpacingForGivenDepth(m_CurrentProbe->GetCurrentDepth()));
-    this->GetOutput(0)->SetGeometry(image->GetGeometry());
-  }
-  m_ImageMutex.unlock();*/
+{
+  mitk::USTelemedImageSource::Pointer s = dynamic_cast<mitk::USTelemedImageSource*>(GetUSImageSource().GetPointer());
+  s->GetNextRawImage(m_ImageVector);
+  Superclass::GenerateData();
 }
 
 mitk::USImageSource::Pointer mitk::USTelemedDevice::GetUSImageSource()

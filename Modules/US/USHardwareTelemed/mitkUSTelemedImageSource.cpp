@@ -41,7 +41,6 @@ mitk::USTelemedImageSource::~USTelemedImageSource( )
 
 void mitk::USTelemedImageSource::GetNextRawImage(std::vector<mitk::Image::Pointer>& imageVector)
 {
-  MITK_INFO << "Updating Telemed Image";
   if (imageVector.empty() ) { imageVector.push_back( mitk::Image::New()); }
 
   //get the actual resolution to check if it changed. We have to do this every time because the geometry takes a few frames to adapt
@@ -68,11 +67,8 @@ void mitk::USTelemedImageSource::GetNextRawImage(std::vector<mitk::Image::Pointe
     mitk::ImageReadAccessor inputReadAccessor(m_Image, m_Image->GetSliceData(0,0,0));
     imageVector.at(0)->SetSlice(inputReadAccessor.GetData());
     imageVector.at(0)->SetGeometry(m_Image->GetGeometry());
-    MITK_INFO << "Telemed Image update in progress";
     m_ImageMutex->unlock();
   }
-  MITK_INFO << "Telemed Image updated";
-
 }
 
 void mitk::USTelemedImageSource::UpdateImageGeometry()
@@ -104,7 +100,6 @@ void mitk::USTelemedImageSource::UpdateImageGeometry()
 bool mitk::USTelemedImageSource::CreateAndConnectConverterPlugin(Usgfw2Lib::IUsgDataView* usgDataView, Usgfw2Lib::tagScanMode scanMode)
 {
   IUnknown* tmp_obj = nullptr;
-
   // create control object from Telemed API
   mitk::telemed::CreateUsgControl( usgDataView, Usgfw2Lib::IID_IUsgScanConverterPlugin, scanMode, 0, (void**)&tmp_obj );
   if ( ! tmp_obj )

@@ -59,9 +59,7 @@ STDMETHODIMP USTelemedScanConverterPlugin::InterimOutBufferCB (
   )
 {
   if ( m_OutputImage.IsNull() ) { return S_FALSE; };
-
   m_OutputImageMutex->lock();
-
   // initialize mitk::Image with given image size on the first time
   if ( ! m_OutputImage->IsInitialized() )
   {

@@ -125,8 +125,19 @@ namespace mitk
      * Returns null if the node is not set or does not contain an image.*/
     const Image* GetReferenceData() const;
 
-    /** Resets the preview node so it is empty and ready to be filled by the tool*/
+    /** Resets the preview node so it is empty and ready to be filled by the tool
+    @remark Calling this function will generate a new preview image, and the old
+    might be invalidated. Therefore this function should not be used within the
+    scope of UpdatePreview (m_IsUpdating == true).*/
     void ResetPreviewNode();
+
+    /** Resets the complete content of the preview image. The instance of the preview image and its settings
+    * stay the same.*/
+    void ResetPreviewContent();
+
+    /** Resets only the image content of the specified timeStep of the preview image. If the preview image or the specified
+    time step does not exist, nothing happens.*/
+    void ResetPreviewContentAtTimeStep(unsigned int timeStep);
 
     TimePointType GetLastTimePointOfUpdate() const;
 

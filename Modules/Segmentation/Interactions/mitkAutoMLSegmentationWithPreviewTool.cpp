@@ -89,7 +89,7 @@ void mitk::AutoMLSegmentationWithPreviewTool::UpdateCleanUp()
 
   if (m_SelectedLabels.empty())
   {
-    this->ResetPreviewNode();
+    this->ResetPreviewContent();
   }
 }
 

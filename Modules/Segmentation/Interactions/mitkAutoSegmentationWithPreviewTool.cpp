@@ -201,8 +201,40 @@ const mitk::Image* mitk::AutoSegmentationWithPreviewTool::GetReferenceData() con
   return dynamic_cast<const Image*>(m_ReferenceDataNode->GetData());
 }
 
+template <typename ImageType>
+void ClearBufferProcessing(ImageType* itkImage)
+{
+  itkImage->FillBuffer(0);
+}
+
+void mitk::AutoSegmentationWithPreviewTool::ResetPreviewContentAtTimeStep(unsigned int timeStep)
+{
+  auto previewImage = GetImageByTimeStep(this->GetPreviewSegmentation(), timeStep);
+  if (nullptr != previewImage)
+  {
+    AccessByItk(previewImage, ClearBufferProcessing);
+  }
+}
+
+void mitk::AutoSegmentationWithPreviewTool::ResetPreviewContent()
+{
+  auto previewImage = this->GetPreviewSegmentation();
+  if (nullptr != previewImage)
+  {
+    auto castedPreviewImage =
+      dynamic_cast<LabelSetImage*>(previewImage);
+    if (nullptr == castedPreviewImage) mitkThrow() << "Application is on wrong state / invalid tool implementation. Preview image should always be of type LabelSetImage now.";
+    castedPreviewImage->ClearBuffer();
+  }
+}
+
 void mitk::AutoSegmentationWithPreviewTool::ResetPreviewNode()
 {
+  if (m_IsUpdating)
+  {
+    mitkThrow() << "Used tool is implemented incorrectly. ResetPreviewNode is called while preview update is ongoing. Check implementation!";
+  }
+
   itk::RGBPixel<float> previewColor;
   previewColor[0] = 0.0f;
   previewColor[1] = 1.0f;

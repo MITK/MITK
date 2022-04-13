@@ -170,7 +170,8 @@ void DoITKRegionGrowing(const itk::Image<TPixel, VImageDimension>* oldSegImage,
   mitk::Image* segmentation,
   const mitk::PointSet* seedPoints,
   unsigned int timeStep, const mitk::BaseGeometry* inputGeometry, const mitk::Label::PixelType outputValue,
-  const mitk::Label::PixelType backgroundValue)
+  const mitk::Label::PixelType backgroundValue,
+  bool& emptyTimeStep)
 {
   typedef itk::Image<TPixel, VImageDimension> InputImageType;
   typedef itk::Image<mitk::Label::PixelType, VImageDimension> OutputImageType;
@@ -246,13 +247,9 @@ void DoITKRegionGrowing(const itk::Image<TPixel, VImageDimension>* oldSegImage,
 
   if (itkResultImage.IsNotNull())
   {
-    segmentation->SetVolume((void*)(itkResultImage->GetPixelContainer()->GetBufferPointer()), timeStep);
+    segmentation->SetVolume((void*)(itkResultImage->GetPixelContainer()->GetBufferPointer()),timeStep);
   }
-  else
-  {
-    mitk::CastToItkImage(segmentation, itkResultImage);
-    itkResultImage->FillBuffer(backgroundValue);
-  }
+  emptyTimeStep = itkResultImage.IsNull();
 
 }
 
@@ -260,6 +257,7 @@ void mitk::PickingTool::DoUpdatePreview(const Image* /*inputAtTimeStep*/, const 
 {
   if (nullptr != oldSegAtTimeStep && nullptr != previewImage && m_PointSet.IsNotNull())
   {
+    bool emptyTimeStep = true;
     if (this->HasPicks())
     {
       Label::PixelType backgroundValue = 0;
@@ -268,12 +266,11 @@ void mitk::PickingTool::DoUpdatePreview(const Image* /*inputAtTimeStep*/, const 
       {
         backgroundValue = labelSetImage->GetExteriorLabel()->GetValue();
       }
-
-      AccessFixedDimensionByItk_n(oldSegAtTimeStep, DoITKRegionGrowing, 3, (previewImage, this->m_PointSet, timeStep, oldSegAtTimeStep->GetGeometry(), this->GetUserDefinedActiveLabel(), backgroundValue));
+      AccessFixedDimensionByItk_n(oldSegAtTimeStep, DoITKRegionGrowing, 3, (previewImage, this->m_PointSet, timeStep, oldSegAtTimeStep->GetGeometry(), this->GetUserDefinedActiveLabel(), backgroundValue, emptyTimeStep));
     }
-    else
+    if (emptyTimeStep)
     {
-      this->ResetPreviewNode();
+      this->ResetPreviewContentAtTimeStep(timeStep);
     }
   }
 }

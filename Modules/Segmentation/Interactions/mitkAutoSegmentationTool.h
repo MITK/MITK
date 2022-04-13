@@ -66,6 +66,8 @@ namespace mitk
 
     /** Helper that extracts the image for the passed timestep, if the image has multiple time steps.*/
     static Image::ConstPointer GetImageByTimeStep(const Image* image, unsigned int timestep);
+    /** Helper that extracts the image for the passed timestep, if the image has multiple time steps.*/
+    static Image::Pointer GetImageByTimeStep(Image* image, unsigned int timestep);
     /** Helper that extracts the image for the passed time point, if the image has multiple time steps.*/
     static Image::ConstPointer GetImageByTimePoint(const Image* image, TimePointType timePoint);
 

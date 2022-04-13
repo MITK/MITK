@@ -125,8 +125,19 @@ namespace mitk
      * Returns null if the node is not set or does not contain an image.*/
     const Image* GetReferenceData() const;
 
-    /** Resets the preview node so it is empty and ready to be filled by the tool*/
+    /** Resets the preview node so it is empty and ready to be filled by the tool
+    @remark Calling this function will generate a new preview image, and the old
+    might be invalidated. Therefore this function should not be used within the
+    scope of UpdatePreview (m_IsUpdating == true).*/
     void ResetPreviewNode();
+
+    /** Resets the complete content of the preview image. The instance of the preview image and its settings
+    * stay the same.*/
+    void ResetPreviewContent();
+
+    /** Resets only the image content of the specified timeStep of the preview image. If the preview image or the specified
+    time step does not exist, nothing happens.*/
+    void ResetPreviewContentAtTimeStep(unsigned int timeStep);
 
     TimePointType GetLastTimePointOfUpdate() const;
 
@@ -138,10 +149,40 @@ namespace mitk
   private:
     void TransferImageAtTimeStep(const Image* sourceImage, Image* destinationImage, const TimeStepType timeStep);
 
+    /**Helper function that transfers pixels of the specified source label from source image to the destination image by using
+    a specified destination label. Function processes the whole image volume of the specified time step.
+    @remark in its current implementation the function only transfers contents of the active layer of the passed LabelSetImages.
+    @remark the function assumes that it is only called with source and destination image of same geometry.
+    @param sourceImage Pointer to the LabelSetImage which active layer should be used as source for the transfer.
+    @param destionationImage Pointer to the LabelSetImage which active layer should be used as destination for the transfer.
+    @param labelMapping Map that encodes the mappings of all label pixel transfers that should be done. First element is the
+    label in the source image. The second element is the label that transferred pixels should become in the destination image.
+    @param mergeMode indicates how the transfer should be done. If true, it is performed like a merge/union operation. So only
+    pixels of the label will be added. If false, also background is transferred, if present in the source image where the
+    destinationImage is labeled by the destination label. Therefore in this mode the label in the destinationImage can
+    "shrink"/lose pixels to the background.
+    @param timeStep indicate the time step that should be transferred.
+    @pre sourceImage and destinationImage must be valid
+    @pre sourceImage and destinationImage must contain the indicated timeStep
+    @pre sourceImage must contain all indicated sourceLabels in its active layer.
+    @pre destinationImage must contain all indicated destinationLabels in its active layer.*/
+    void TransferLabelContent(const LabelSetImage* sourceImage, LabelSetImage* destinationImage,
+      std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping = { {1,1} },
+      bool mergeMode = false, const TimeStepType timeStep = 0);
+
     void CreateResultSegmentationFromPreview();
 
     void OnRoiDataChanged();
     void OnTimePointChanged();
+
+    /**Internal helper that ensures that the stored active label is up to date.
+     This is a fix for T28131 / T28986. It should be refactored if T28524 is being worked on.
+     On the long run, the active label will be communicated/set by the user/toolmanager as a
+     state of the tool and the tool should react accordingly (like it does for other external
+     state changes).
+     @return indicates if the label has changed (true) or not.
+     */
+    bool EnsureUpToDateUserDefinedActiveLabel();
 
     /** Node that containes the preview data generated and managed by this class or derived ones.*/
     DataNode::Pointer m_PreviewSegmentationNode;

@@ -18,11 +18,12 @@ found in the LICENSE file.
 #include <usgfw2.h>
 #include <usgfw.h>
 #include <usgscanb.h>
+#include <mutex>
 
 #include "mitkUSTelemedSDKHeader.h"
 #include "mitkImage.h"
 
-#include "itkFastMutexLock.h"
+
 
 /**
   * \brief Telemed API plugin for getting images from scan lines.
@@ -57,7 +58,7 @@ public:
     * A pointer to a mutex can be set in addition. This mutex will
     * be locked on every writing to the given image.
     */
-  void SetOutputImage(mitk::Image::Pointer outputImage, itk::FastMutexLock::Pointer outputImageMutex = 0);
+  void SetOutputImage(mitk::Image::Pointer outputImage, std::mutex* outputImageMutex);
 
   // receives pointers to input and output media samples
   STDMETHOD(SampleCB) (
@@ -157,7 +158,7 @@ protected:
     * Mutex for the output image. Has to be set together with the
     * output image via SetOutputImage().
     */
-  itk::FastMutexLock::Pointer m_OutputImageMutex;
+  std::mutex* m_OutputImageMutex;
 
 private:
   long m_cRef ;

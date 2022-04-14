@@ -100,6 +100,11 @@ If a label for a certain value already exists, its properties are overridden by 
 If a label for a certain value does not yet exist, an empty label with the label properties of the preset is created.
 The actual segmentations of labels are unaffected as label set presets only store label properties.
 
+\subsubsection org_mitk_views_segmentationdefaultlabelpresets Applying label set presets by default
+
+If you work on a repetetive segmentation task, manually loading the same label set preset for each and every new segmentation can be tedious.
+To streamline your workflow, you can set a default label set preset in the Segmentation preferences (Ctrl+P). When set, this label set preset will be applied to all new segmentations instead of creating the default red "New label 1" label.
+
 \subsection org_mitk_views_segmentationlabelsearch Searching for a label
 
 It may happen that many labels (e.g. > 200) are present in a segmentation session and therefore manual searching can be time-consuming.

@@ -24,19 +24,19 @@ namespace us
 namespace mitk
 {
   /**
-    \brief Fill the inside of a contour with 1
+    \brief Erase the inside of a contour by
+           filling the inside of a contour with the background pixel value.
 
     \sa SetRegionTool
 
-    \ingroup Interaction
-    \ingroup ToolManagerEtAl
+    \ingroup Interactions
 
-    Finds the outer contour of a shape in 2D (possibly including holes) and sets all
-    the inside pixels to 0 (erasing a segmentation).
+    Finds the outer contour of a shape in 2D (possibly including single patches) and sets all
+    the pixels inside to the background pixel value (erasing a segmentation).
+    If clicked on the background, the outer contour might contain the whole image and thus
+    fill the whole image with the background pixel value.
 
     \warning Only to be instantiated by mitk::ToolManager.
-
-    $Author$
   */
   class MITKSEGMENTATION_EXPORT EraseRegionTool : public SetRegionTool
   {

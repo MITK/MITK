@@ -17,9 +17,10 @@ found in the LICENSE file.
 #include "mitkMapper.h"
 #include "mitkTextAnnotation2D.h"
 #include <MitkContourModelExports.h>
-#include "vtkNew.h"
+#include <vtkSmartPointer.h>
 
 class vtkContext2D;
+class vtkOpenGLContextDevice2D;
 class vtkPen;
 
 namespace mitk
@@ -54,17 +55,20 @@ namespace mitk
 
     virtual void InternalDrawContour(mitk::ContourModel *renderingContour, mitk::BaseRenderer *renderer);
 
-    void Initialize(mitk::BaseRenderer *renderer);
-
     TextAnnotationPointerType m_PointNumbersAnnotation;
     TextAnnotationPointerType m_ControlPointNumbersAnnotation;
 
     typedef std::vector<BaseRenderer *> RendererListType;
     RendererListType m_RendererList;
 
-    bool m_Initialized;
+  private:
+    struct LocalStorage
+    {
+      vtkSmartPointer<vtkOpenGLContextDevice2D> Device;
+      vtkSmartPointer<vtkContext2D> Context;
+    };
 
-    vtkNew<vtkContext2D> m_Context;
+    LocalStorageHandler<LocalStorage> m_LocalStorageHandler;
   };
 
 } // namespace mitk

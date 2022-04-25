@@ -414,11 +414,7 @@ void QmitkSegmentationView::OnShowMarkerNodes(bool state)
 
 void QmitkSegmentationView::OnLayersChanged()
 {
-  m_Controls->labelSetWidget->ResetAllTableWidgetItems();
-}
-
-void QmitkSegmentationView::OnLabelsChanged()
-{
+  this->OnEstablishLabelSetConnection();
   m_Controls->labelSetWidget->ResetAllTableWidgetItems();
 }
 
@@ -533,7 +529,6 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    connect(m_Controls->slicesInterpolator, &QmitkSlicesInterpolator::SignalShowMarkerNodes, this, &QmitkSegmentationView::OnShowMarkerNodes);
 
    connect(m_Controls->layersWidget, &QmitkLayersWidget::LayersChanged, this, &QmitkSegmentationView::OnLayersChanged);
-   connect(m_Controls->labelsWidget, &QmitkLabelsWidget::LabelsChanged, this, &QmitkSegmentationView::OnLabelsChanged);
    connect(m_Controls->labelsWidget, &QmitkLabelsWidget::ShowLabelTable, this, &QmitkSegmentationView::OnShowLabelTable);
 
    // *------------------------

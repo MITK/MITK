@@ -777,7 +777,7 @@ void QmitkLabelSetWidget::ResetAllTableWidgetItems()
   while (it != end)
   {
     InsertTableWidgetItem(it->second);
-    if (workingImage->GetActiveLabel() == it->second) // get active
+    if (workingImage->GetActiveLabel(workingImage->GetActiveLayer()) == it->second) // get active
       pixelValue = it->first;
     m_LabelStringList.append(QString(it->second->GetName().c_str()));
     it++;

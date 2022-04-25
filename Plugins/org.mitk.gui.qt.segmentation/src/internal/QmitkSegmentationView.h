@@ -76,8 +76,6 @@ private Q_SLOTS:
 
   void OnLayersChanged();
 
-  void OnLabelsChanged();
-
   void OnShowLabelTable(bool);
 
   void OnGoToLabel(const mitk::Point3D &pos);

@@ -7,168 +7,257 @@
 
 \tableofcontents
 
-\section org_mitk_views_segmentationUserManualOverview Overview
+\section org_mitk_views_segmentationoverview Overview
 
 Segmentation is the act of partitioning an image into subsets by either manual or automated delineation to create i.e. a distinction between foreground and background.
-The MITK <b>segmentation plugin</b> allows you to create segmentations of anatomical and pathological structures in medical images.
-The plugin consists of a number of views:
+A multilabel segmentation can contain more than one label and more than one layer.
+This allows you to create different labels for different regions of interest encapsulated in one single image.
+The difference between labels and layers is that labels on one layer cannot overlap but labels on different layers can.
+
+The MITK <b>segmentation plugin</b> allows you to create multilabel segmentations of anatomical and pathological structures in medical images.
+The plugin consists of two views:
 <ul>
   <li> <b>Segmentation View</b>: Manual and (semi-)automatic segmentation
   <li> \subpage org_mitk_views_segmentationutilities : Segmentation post-processing
 </ul>
 In this documentation, the features and usage of the segmentation view will be described.
-For an introduction to the segmentation utilities and clipping plane views, please be referred to the respective documentation pages.
+For an introduction to the segmentation utilities please be referred to the respective documentation pages.
 
 \imageMacro{QmitkSegmentationPlugin_Overview.png,"Segmentation plugin overview", 16.00}
 
-\section org_mitk_views_segmentationPreferences Preferences
+\section org_mitk_views_segmentationpreferences Preferences
 The segmentation plugin offers a number of preferences which can be set via the MITK Workbench application preferences:
 
 \imageMacro{QmitkSegmentationPreferences.png,"Segmentation preferences", 10.00}
 
 <ul>
-  <li> <b>Slim view:</b> Allows you to show or hide the tool button description of the segmentation view
+  <li> <b>Slim view:</b> Allows to show or hide the tool button description of the segmentation view
   <li> <b>2D display:</b> Specify whether the segmentation is drawn as outline or as a transparent overlay
-  <li> <b>3D display:</b> Activate 3D volume rendering for your segmentation
-  <li> <b>Data node selection mode:</b> If activated the segmentation image is automatically chosen from the data manager selection.
+  <li> <b>Show only selected nodes:</b> Enable if only the selected segmentation and the reference image should be visible
   <li> <b>Smoothed surface creation:</b> Set certain smoothing parameters for surface creation
+  <li> <b>Default label set preset:</b> Start a new segmentation with this preset instead of a default label
 </ul>
 
-
-\section org_mitk_views_segmentationUserManualTechnical Technical Issues
+\section org_mitk_views_segmentationtechnicalissues Technical issues
 
 The segmentation plugin makes a number of assumptions:
 <ul>
   <li> Images must be 2D, 3D, or 3D+t.
   <li> Images must be single-values, i.e. CT, MRI or "normal" ultrasound. Images from color doppler or photographic (RGB) images are only partially supported (please be aware that some tools might not be compatible with this image type).
-  <li> Segmentations are handled as binary images of the same extent as the original image.
+  <li> Segmentations are handled as multilabel images of the same extent as the original image.
 </ul>
 
-\section org_mitk_views_segmentationUserManualImageSelection Data Selection & Creating New Segmentations
+\section org_mitk_views_segmentationdataselection Data selection & creating new segmentations
 
-To select a reference image for the segmentation, click on the <i>Patient Image</i> selection widget and choose a suitable image from the selection available in the data manager.
-By default the auto selection mode is enabled (see \ref org_mitk_views_segmentationPreferences).\n
-Once a patient image is selected, a new segmentation can be created on this reference image by clicking the <i>New...</i> button to the right of the <i>Segmentation</i> selection widget.
-An input field will appear which allows you to set the name and display color of the segmentation. Notice that the input field suggests names once you start typing and that it also suggests colors for known organ names.
-Once generated the segmentation will be added with "binary mask" icon to the data manager as sub-node of the reference image. This item is automatically selected for you, allowing you to start editing the new segmentation right away.
+To select a reference image for the segmentation, click on the <i>Selected image</i> selection widget and choose a suitable image from the selection available in the data manager.
+Once an image is selected, a new segmentation can be created on this reference image by clicking the button to the right of the <i>Selected segmentation</i> selection widget.
+A new multilabel segmentation with an initial label is automatically generated.
+The new segmentation will be added to the data manager as sub-node of the reference image.
+This item is then automatically selected in the data selection, which allows to start editing the new segmentation right away.
 
+\imageMacro{"QmitkSegmentation_DataSelection.png","Data selection",12}
 
-\subsection org_mitk_views_segmentationUserManualManualKringeling2 Selecting Segmentations for Editing
 Alternatively to creating a new segmentation, an existing one can be edited as well.
-As you might have segmented multiple structures within a single image, the application needs to know which of them to use for editing.
-For that you click the segmentation selection widget and a selection field will open, containing all suitable segmentations for the parent dataset available in the data manager.
+If a reference image is selected for which a segmentation already exists in the data manager, the auto selection mode will automatically
+select a fitting segmentation.
+Clicking on the segmentation selection widget a drop down list will open, containing all suitable segmentations for the selected reference dataset available in the data manager.
 
+\section org_mitk_views_segmentationlayers Segmentation layers
 
-\section org_mitk_views_segmentationUserManualToolOverview Segmentation Tool Overview
+For each multilabel segmentation different layers can be added or deleted. The layers can be used independently and layers can be switched using the left and right arrows.
+A layer is a set of labels that occupy a non-overlapping anatomical space. The best way to describe them is by a real use case:
+Imagine you are working on a radiotherapy planning application. In the first layer of your segmentation session, you would like to trace the contours of the liver and neighboring organs.
+You can accommodate all these segmentations in separate labels because they all occupy different anatomical regions and do not overlap.
+Now say you would like to segment the arteries and veins inside the liver. If you don't trace them in a different layer, you will overwrite the previous ones.
+You may also need a third layer for segmenting the different irrigation territories in the liver and a fourth layer to contain the lesion you would like to treat.
+
+\imageMacro{"QmitkSegmentation_LayerSelection.png","Layer selection",12}
+
+\section org_mitk_views_segmentationlabels Segmentation labels
+
+For each layer, one or more labels can be added. Pressing the double arrow on the right, all created labels are shown in the 'Label Table'.
+The following label properties are available:
+
+<ul>
+  <li><b>Name:</b></li> the name of the label. Can be a predefined one or any other.
+  <li><b>Locked:</b></li> whether the label is locked or editable. A locked label cannot be overwritten by another.
+  <li><b>Color:</b></li> the color of the label.
+  <li><b>Visible:</b></li> whether the label is currently visible or hidden.
+</ul>
+
+\imageMacro{"QmitkSegmentation_LabelTable.png","The 'Label Table' shows all labels in the current segmentation session",12}
+
+The 'New Label' button can be used to add a new label. This will automatically add a new label with a distinct name and color to the list of available labels.\n
+In the current implementation of the plugin, the maximum number of labels is restricted to 255. If you need more, you will have to create a new segmentation session.
+
+\subsection org_mitk_views_segmentationlabelpresets Saving and loading label set presets
+
+Label set presets are useful to share a certain style or scheme between different segmentation sessions or to provide templates for new segmentation sessions.
+
+The properties of all labels in all layers like their names, colors, and visibilities are saved as a label set preset by clicking on the 'Save label set preset' button.
+Label set presets are applied to any segmentation session by clicking on the 'Load label set preset' button.
+If a label for a certain value already exists, its properties are overridden by the preset.
+If a label for a certain value does not yet exist, an empty label with the label properties of the preset is created.
+The actual segmentations of labels are unaffected as label set presets only store label properties.
+
+\subsubsection org_mitk_views_segmentationdefaultlabelpresets Applying label set presets by default
+
+If you work on a repetetive segmentation task, manually loading the same label set preset for each and every new segmentation can be tedious.
+To streamline your workflow, you can set a default label set preset in the Segmentation preferences (Ctrl+P). When set, this label set preset will be applied to all new segmentations instead of creating the default red "New label 1" label.
+
+\subsection org_mitk_views_segmentationlabelsearch Searching for a label
+
+It may happen that many labels (e.g. > 200) are present in a segmentation session and therefore manual searching can be time-consuming.
+The 'Label Search' edit box allows for quickly finding a label by providing assistance for label name completion.
+If the label is found, it will become the active one after pressing 'enter'.
+
+To start editing a label needs to be activated by clicking on the corresponding row in the 'Label Table'.
+Only one label can be active at the time. Then the segmentation tools in the toolbox can be used for mask generation.
+
+\subsection org_mitk_views_multilabelsegmentationoperationsonlabels Operations on labels
+Depending on the selection in the 'Label Table', several actions are offered:
+
+\subsubsection org_mitk_views_segmentationoperationssingleselection Operations with single label selection
+
+Right-clicking on any label opens a pop-up menu that offers the following actions to be performed on the selected label:
+
+<ul>
+  <li><b>Rename...</b></li> : change the name and / or color of the selected label.
+  <li><b>Remove...</b></li> : delete the selected label.
+  <li><b>Erase...</b></li> : only clear the contents of the selected label.
+  <li><b>Merge...</b></li> : merge two labels by selecting a second label.
+  <li><b>Random color </b></li> : assign a random color to the label.
+  <li><b>View only </b></li> : make all labels except the current selected label invisible.
+  <li><b>View/Hide all </b></li> : make all labels visible / invisible
+  <li><b>Lock/Unlock all </b></li> : lock or unlock all labels.
+  <li><b>Create surface </b></li> : generate a surface out of the selected label.
+    <li><b>Create mask </b></li> : generate a mask out of the selected label. A mask is a binary image with "1" inside and "0" outside.
+	<li><b>Create cropped mask </b></li> : generate a binary mask out of the selected label. Crop changes the extent of the resulting image to the extent of the label.
+</ul>
+
+\imageMacro{"QmitkSegmentation_OperationsSingleSelection.png","Context menu for single label selection",12}
+
+\subsubsection org_mitk_views_segmentationoperationsmultiselection Operations with multiple label selection
+
+Shift-clickink on multiple labels allows to select more than one label. If more than one label is selected, different options will appear in the menu:
+
+<ul>
+  <li><b>Merge selection on current label</b></li> : transfer the contents of the selected labels in the 'Label Table' into the current one.
+  <li><b>Remove selected labels</b></li> : delete the selected labels.
+  <li><b>Erase selected labels</b></li> : only clear the contents of the selected labels.
+</ul>
+
+\imageMacro{"QmitkSegmentation_OperationsMultiSelection.png","Context menu for multiple label selection",12}
+
+\section org_mitk_views_segmentationtooloverview Segmentation tool overview
 
 MITK offers a comprehensive set of slice-based 2D and (semi-)automated 3D segmentation tools.
-The manual 2D tools require some user interaction and can only be applied to a single image slice whereas the 3D tools operate on the whole image. The 3D tools usually only
-require a small amount of user interaction, i.e. placing seed points or setting/adjusting parameters.
+The manual 2D tools require some user interaction and can only be applied to a single image slice whereas the 3D tools operate on the whole image.
+The 3D tools usually only require a small amount of user interaction, i.e. placing seed points or setting / adjusting parameters.
 You can switch between the different toolsets by selecting the 2D or 3D tab in the segmentation view.
 
 \imageMacro{QmitkSegmentation_ToolOverview.png,"An overview of the existing 2D and 3D tools in MITK.",5.50}
 
-\section org_mitk_views_segmentationUserManualManualKringeling 2D Segmentation Tools
+\section org_mitk_views_segmentation2dsegmentation 2D segmentation tools
 
-With 2D manual contouring you define which voxels are part of the segmentation and which ones are not. This allows you to create segmentations of any structures of interest in an image.
+With 2D manual contouring you define which voxels are part of the segmentation and which are not. This allows you to create segmentations of any structures of interest in an image.
 You can also use manual contouring to correct segmentations that result from sub-optimal automatic methods.
 The drawback of manual contouring is that you might need to define contours on many 2D slices. However, this is mitigated by the interpolation feature, which will make suggestions for a segmentation.
-
-\subsection org_mitk_views_segmentationUserManualManualKringeling3 Selecting Editing Tools
 
 To start using one of the editing tools, click its button from the displayed toolbox.
 The selected editing tool will be active and its corresponding button will stay pressed until you click the button again.
 Selecting a different tool also deactivates the previous one.\n
-If you have to delineate a lot of images, shortcuts to switch between tools becomes convenient. For that, just hit the first letter of each tool to activate it (A for Add, S for Subtract, etc.).
+If you have to delineate a lot of images, shortcuts to switch between tools becomes convenient.
+For that, just hit the first letter of each tool to activate it (A for Add, S for Subtract, etc.).
 
-\subsection org_mitk_views_segmentationUserManualManualKringeling4 Using Editing Tools
+All of the editing tools work by the same principle: using the mouse (left button) to click anywhere in a 2D window (any of the orientations axial, sagittal, or coronal),
+moving the mouse while holding the mouse button and releasing the button to finish the editing action.
+Multi-step undo and redo is fully supported by all editing tools by using the application-wide undo / redo buttons in the toolbar.
 
-All of the editing tools work by the same principle: you use the mouse (left button) to click anywhere in a 2D window (any of the orientations axial, sagittal, or coronal),
-move the mouse while holding the mouse button and release to finish the editing action.
-Multi-step undo and redo is fully supported by all editing tools. Use the application-wide undo button in the toolbar to revert erroneous %actions.
+<i>Remark</i>: Clicking and moving the mouse in any of the 2D render windows will move the crosshair that defines what part of the image is displayed.
+This behavior is disabled as long as any of the manual segmentation tools are active - otherwise you might have a hard time concentrating on the contour you are drawing.
 
-<i>Remark</i>: If you are familiar with the MITK Workbench, you know that clicking and moving the mouse in any of the 2D render windows will move around the crosshair that defines what part of the image is displayed.
-This behavior is disabled whilst any of the manual segmentation tools are active- otherwise you might have a hard time concentrating on the contour you are drawing.
-
-
-\subsection org_mitk_views_segmentationUserManualAddSubtractTools Add and Subtract Tools
-\imageMacro{QmitkSegmentation_IMGIconAddSubtract.png,"Add and Subtract Tools",7.70}
+\subsection org_mitk_views_segmentationaddsubtracttools Add and subtract tools
+\imageMacro{QmitkSegmentation_IMGIconAddSubtract.png,"Add and subtract tools",7.70}
 
 Use the left mouse button to draw a closed contour. When releasing the mouse button, the contour will be added (Add tool) to or removed (Subtract tool) from the current segmentation.
 Adding and subtracting voxels can be iteratively repeated for the same segmentation. Holding CTRL / CMD while drawing will invert the current tool's behavior (i.e. instead of adding voxels, they will be subtracted).
 
-\subsection org_mitk_views_segmentationUserManualPaintWipeTools Paint and Wipe Tools
-\imageMacro{QmitkSegmentation_IMGIconPaintWipe.png,"Paint and Wipe Tools",7.68}
+\subsection org_mitk_views_segmentationpaintwipetools Paint and wipe tools
+\imageMacro{QmitkSegmentation_IMGIconPaintWipe.png,"Paint and wipe tools",7.68}
 
 Use the <i>Size</i> slider to change the radius of the round paintbrush tool. Move the mouse in any 2D window and press the left button to draw or erase pixels.
 Holding CTRL / CMD while drawing will invert the current tool's behavior (i.e. instead of painting voxels, they will be wiped).
 
-\subsection org_mitk_views_segmentationUserManualRegionGrowingTool Region Growing Tool
-\imageMacro{QmitkSegmentation_IMGIconRegionGrowing.png,"Region Growing Tool",3.81}
+\subsection org_mitk_views_segmentationregiongrowingtool Region growing tool
+\imageMacro{QmitkSegmentation_IMGIconRegionGrowing.png,"Region growing tool",3.81}
 
 Click at one point in a 2D slice widget to add an image region to the segmentation with the region growing tool.
-Region Growing selects all pixels around the mouse cursor that have a similar gray value as the pixel below the mouse cursor. This enables you to quickly create segmentations of structures that have a good contrast to surrounding tissue.
+Region Growing selects all pixels around the mouse cursor that have a similar gray value as the pixel below the mouse cursor.
+This allows to quickly create segmentations of structures that have a good contrast to surrounding tissue.
 The tool operates based on the current level window, so changing the level window to optimize the contrast for the ROI is encouraged.
-Moving the mouse up/down is different from left/right: Moving up the cursor while holding the left mouse button widens the range for the included grey values; moving it down narrows it. Moving the mouse left and right will shift the range.
+Moving the mouse up / down is different from left / right:
+Moving up the cursor while holding the left mouse button widens the range for the included grey values; moving it down narrows it.
+Moving the mouse left and right will shift the range.
 The tool will select more or less pixels, corresponding to the changing gray value range.
-
-
 
 \if THISISNOTIMPLEMENTEDATTHEMOMENT
 A common issue with region growing is the so called "leakage" which happens when the structure of interest is connected to other pixels, of similar gray values, through a narrow "bridge" at the border of the structure.
 The Region Growing tool comes with a "leakage detection/removal" feature. If leakage happens, you can left-click into the leakage region and the tool will try to automatically remove this region (see illustration below).
 
-\imageMacro{QmitkSegmentation_IMGLeakage.png,"Leakage correction feature of the Region Growing tool",11.28}
+\imageMacro{QmitkSegmentation_Leakage.png,"Leakage correction feature of the region growing tool",11.28}
 \endif
 
-
-
-\subsection org_mitk_views_segmentationUserManualFillTool Fill Tool
-\imageMacro{QmitkSegmentation_IMGIconFill.png,"Fill Tool",3.81}
+\subsection org_mitk_views_segmentationfilltool Fill tool
+\imageMacro{QmitkSegmentation_IMGIconFill.png,"Fill tool",3.81}
 
 Left-click inside a segmentation with holes to completely fill all holes. Left-click inside a hole to fill only this specific hole.
 
-\subsection org_mitk_views_segmentationUserManualEraseTool Erase Tool
+\subsection org_mitk_views_segmentationerasetool Erase tool
 
-\imageMacro{QmitkSegmentation_IMGIconErase.png,"Erase Tool",3.79}
+\imageMacro{QmitkSegmentation_IMGIconErase.png,"Erase tool",3.79}
 
-This tool removes a connected part of pixels that form a segmentation. You may use it to remove single segmentations (left-click on specific segmentation) or to clear a whole slice at once (left-click outside a segmentation).
+This tool removes a connected part of pixels that form a segmentation.
+You may use it to remove single segmentations (left-click on specific segmentation) or to clear a whole slice at once (left-click outside a segmentation).
 
-\subsection org_mitk_views_segmentationUserManualLiveWireTool Live Wire Tool
+\subsection org_mitk_views_segmentationlivewiretool Live wire tool
 
-\imageMacro{QmitkSegmentation_IMGIconLiveWire.png,"Live Wire Tool",3.01}
+\imageMacro{QmitkSegmentation_IMGIconLiveWire.png,"Live wire tool",3.01}
 
 The Live Wire Tool acts as a magnetic lasso with a contour snapping to edges of objects.
 
 \imageMacro{QmitkSegmentation_IMGLiveWireUsage.PNG,"Steps for using the Live Wire Tool",16.00}
 
 <ul>
-<li>(1) To start the tool you have to double-click near the edge of the object you want to segment. The initial anchor point will snap to the edge within a 3x3 region.
-<li>(2) Move the mouse. You don't have trace the edge of the object. The contour will automatically snap to it.
-<li>(3) To fix a segment you can set anchor points by single left mouse button click.
-<li>(4) Go on with moving the mouse and setting anchor points.
-<li>(5) To close the contour double-click on the initial anchor point.
-<li>(6) After closing, the contour can be edited by moving, inserting and deleting anchor points.
+  <li>(1) To start the tool you have to double-click near the edge of the object you want to segment. The initial anchor point will snap to the edge within a 3x3 region.
+  <li>(2) Move the mouse. You don't have trace the edge of the object. The contour will automatically snap to it.
+  <li>(3) To fix a segment you can set anchor points by single left mouse button click.
+  <li>(4) Go on with moving the mouse and setting anchor points.
+  <li>(5) To close the contour double-click on the initial anchor point.
+  <li>(6) After closing, the contour can be edited by moving, inserting and deleting anchor points.
 </ul>
 
 The contour will be transferred to its binary image representation by deactivating the tool.
 
-\subsection org_mitk_views_segmentationUserManualManualKringeling5 2D and 3D Interpolation
+\subsection org_mitk_views_segmentationinterpolation 2D and 3D Interpolation
 
 Creating segmentations using 2D manual contouring for large image volumes may be very time-consuming, because structures of interest may cover a large range of slices.
+Note: Interpolation is currently disabled for segmentations containing more than one label.
 The segmentation view offers two helpful features to mitigate this drawback:
+
 <ul>
-<li> 2D Interpolation
-<li> 3D Interpolation
+  <li> 2D Interpolation
+  <li> 3D Interpolation
 </ul>
 
 The <b>2D Interpolation</b> creates suggestions for a segmentation whenever you have a slice that
+
 <ul>
-<li> has got neighboring slices with segmentations (these do not need to be direct neighbors but could also be a couple of slices away) AND
-<li> is completely clear of a manual segmentation, i.e. there will be no suggestion if there is even only a single pixel of segmentation in the current slice.
+  <li> has got neighboring slices with segmentations (these do not need to be direct neighbors but could also be a couple of slices away) AND
+  <li> is completely clear of a manual segmentation, i.e. there will be no suggestion if there is even only a single pixel of segmentation in the current slice.
 </ul>
 
-\imageMacro{QmitkSegmentation_2DInterpolation.png,"2D Interpolation Usage",3.01}
+\imageMacro{QmitkSegmentation_2DInterpolation.png,"2D interpolation usage",3.01}
 
 Interpolated suggestions are displayed as outlines, until you confirm them as part of the segmentation.
 To confirm single slices, click the <i>Confirm for single slice</i> button below the toolbox. You may also review the interpolations visually and then accept all of them at once by selecting <i>Confirm for all slices</i>.
@@ -179,7 +268,7 @@ With each further contour the interpolation result will be improved, but the mor
 To achieve an optimal interpolation result and in this way a most accurate segmentation you should try to describe the surface with sparse contours by segmenting in arbitrary
 oriented planes. The 3D interpolation is not meant to be used for parallel slice-wise segmentation, but rather segmentations in i.e. the axial, coronal and sagittal plane.
 
-\imageMacro{QmitkSegmentation_3DInterpolationWrongRight.png,"3D Interpolation Usage",16.00}
+\imageMacro{QmitkSegmentation_3DInterpolationWrongRight.png,"3D interpolation usage",16.00}
 
 You can accept the interpolation result by clicking the <i>Confirm</i>-button below the tool buttons.
 In this case the 3D interpolation will be deactivated automatically so that the result can be post-processed without any interpolation running in the background.
@@ -188,53 +277,52 @@ Additional to the surface, black contours are shown in the 3D render window, whi
 You can navigate between the drawn contours by clicking on the corresponding <i>position</i> nodes in the data manager which are stored as sub-nodes of the selected segmentation.
 If you do not want to see these nodes just uncheck the <i>Show Position Nodes</i> checkbox and these nodes will be hidden.
 
-If you want to delete a drawn contour we recommend to use the Erase-Tool since Redo/Undo is not yet working for 3D interpolation.
+If you want to delete a drawn contour we recommend to use the Erase-Tool since undo / redo is not yet working for 3D interpolation.
 The current state of the 3D interpolation can be saved across application restart. For that, just click on save project during the interpolation is active.
 After restarting the application and load your project you can click on "Reinit Interpolation" within the 3D interpolation GUI area.
 
-
-\section org_mitk_views_segmentationUserManual3DSegmentationTools 3D Segmentation Tools
+\section org_mitk_views_segmentation3dsegmentation 3D segmentation tools
 
 The 3D tools operate on the whole image and require usually a small amount of interaction like placing seed-points or specifying certain parameters. All 3D tools provide
 an immediate segmentation feedback, which is displayed as a transparent green overlay. For accepting a preview you have to press the <i>Confirm</i> button of the selected tool.
 The following 3D tools are available:
 
-\subsection org_mitk_views_segmentationUserManual3DThresholdTool 3D Threshold Tool
+\subsection org_mitk_views_segmentation3dthresholdtool 3D Threshold tool
 
 The thresholding tool simply applies a 3D threshold to the patient image. All pixels with values equal or above the selected threshold are labeled as part of the segmentation.
 You can change the threshold by either moving the slider of setting a certain value in the spinbox.
 
 \imageMacro{QmitkSegmentation_3DThresholdTool.png,"3D Threshold tool",10.00}
 
-\subsection org_mitk_views_segmentationUserManual3DULTool 3D Upper/Lower Threshold Tool
+\subsection org_mitk_views_segmentation3dulthresholdTool 3D upper / lower threshold tool
 
 The Upper/Lower Thresholding tool works similar to the simple 3D threshold tool but allows you to define an upper and lower threshold. All pixels with
 values within this threshold interval will be labeled as part of the segmentation.
 
-\imageMacro{QmitkSegmentation_3DULThresholdTool.png,"3D Upper/Lower Threshold tool",10.00}
+\imageMacro{QmitkSegmentation_3DULThresholdTool.png,"3D upper / lower threshold tool",10.00}
 
-\subsection org_mitk_views_segmentationUserManual3DOtsuTool 3D Otsu Tool
+\subsection org_mitk_views_segmentation3dotsutool 3D Otsu tool
 
 The 3D Otsu tool provides a more sophisticated thresholding algorithm. It allows you to define a number of regions. Based on the image histogram the pixels will
 then be divided into different regions. The more regions you define the longer the calculation will take. You can select afterwards which of these regions you want to confirm as segmentation.
 
 \imageMacro{QmitkSegmentation_3DOtsuTool.png,"3D Otsu tool",10.00}
 
-\subsection org_mitk_views_segmentationUserManual3DRGTool 3D Region Growing Tool
+\subsection org_mitk_views_segmentation3drgtool 3D Region growing tool
 
 The 3D Region Growing tool works similar to the 2D pendant. At the beginning you have to place a seedpoint and define a threshold interval. If you press
 <i>Run Segmentation</i> a preview is calculated. By moving the <i>Adapt region growing</i> slider you can interactively adapt the segmentation result.
 
-\imageMacro{QmitkSegmentation_3DRGTool.png,"3D Region Growing tool",10.00}
+\imageMacro{QmitkSegmentation_3DRGTool.png,"3D Region growing tool",10.00}
 
-\subsection org_mitk_views_segmentationUserManualPickingTool Picking Tool
+\subsection org_mitk_views_segmentationpickingtool Picking Tool
 
 The Picking tool allows you to select islands within your segmentation. This is especially useful if e.g. a thresholding provided you with several areas within
 your image but you are just interested in one special region.
 
 \imageMacro{QmitkSegmentation_PickingTool.png,"Picking tool",10.00}
 
-\subsection org_mitk_views_segmentationUserManualnnUNetTool nnU-Net Tool (Ubuntu only)
+\subsection org_mitk_views_segmentationnnUNetTool nnU-Net Tool (Ubuntu only)
 
 \imageMacro{QmitkSegmentation_nnUnetTool.png,"nnUNet tool",10.00}
 
@@ -242,44 +330,43 @@ This tool provides a GUI to the deep learning-based segmentation algorithm calle
 for your organ or task concerned, before using the tool. For a detailed explanation of the parameters and pre-trained weights folder structure etc., please refer to https://github.com/MIC-DKFZ/nnUNet. <br>
 Remark: The tool assumes that you have a Python3 environment with nnUNet (pip) installed. Your machine should be also equipped with a CUDA enabled GPU.
 
-\subsubsection org_mitk_views_segmentationUserManualnnUNetToolWorkflow Workflow:
-    -# Click on the "nnUNet Results Folder" directory icon and navigate to the results folder on your hard disk. This is equivalent to setting the <b>RESULTS_FOLDER</b> environment variable. If your results folder is as 
-    per the nnUNet required folder structure, the configuration, trainers, tasks and folds are automatically parsed and correspondingly loaded in the drop-down boxes as shown below. 
+\subsubsection org_mitk_views_segmentationnnUNetToolWorkflow Workflow:
+    -# Select the "Python Path" drop-down to see if MITK has automatically detected other Python environments. 
+    Click on a fitting environment for the nnUNet inference or click "Select" in the dropdown to choose an unlisted python environment. Note that, while selecting an arbitrary environment folder, only select the base folder, e.g. "myenv".
+    No need to select all the way until "../myenv/bin/python", for example.
+    -# Click on the "nnUNet Results Folder" directory icon to navigate to the results folder on your hard disk. This is equivalent to setting the <b>RESULTS_FOLDER</b> environment variable. If your results folder is as 
+    per the nnUNet required folder structure, the configuration, trainers, tasks and folds are automatically parsed and correspondingly loaded in the drop-down boxes as shown below. Note that MITK automatically checks for the 
+    <b>RESULTS_FOLDER</b> environment variable value and, if found, auto parses that directory when the tool is started.
     \imageMacro{QmitkSegmentation_nnUNet_Settings.png,"nnUNet Segmentation Settings",10}
-    -# Choose your required configuration-task-trainer-fold parameters, sequentially. By default, all entries are selected inside the "Fold" dropdown (shown: "All").
+    -# Choose your required Task-Configuration-Trainer-Planner-Fold parameters, sequentially. By default, all entries are selected inside the "Fold" dropdown (shown: "All").
     Note that, even if you uncheck all entries from the "Fold" dropdown (shown: "None"), then too,  all folds would be considered for inferencing.
     -# For ensemble predictions, you will get the option to select parameters irrespective on postprocessing files available in the ensembles folder of <b>RESULTS_FOLDER</b>.
     Note that, if a postprocessing json file exists for the selected combination then it will used for ensembling, by default. To choose not to, uncheck the "Use PostProcessing JSON" in the "Advanced" section.
     \imageMacro{QmitkSegmentation_nnUNet_ensemble.png,"nnUNet Segmentation Settings",10}
-    -# If your task requires multi-modal inputs, then check the "Multi-Modal" checkbox and enter the no.of modalities additionally required for inferencing, in the "No. of Extra Modalities" spinbox.
-    Instantly, as much node selectors should appear below to select other image nodes from the Data Manager along including a selector with preselected with the reference node. 
-    Certain pre-trained configurations are trained in a particular modal order. Please be aware of the order beforehand & select the image nodes in the node selectors accordingly for accurate inferencing.
+    -# If your task is trained with multi-modal inputs, then "Multi-Modal" checkbox is checked and the no.of modalities are preloaded in the "No. of Extra Modalities" spinbox.
+    Instantly, as much node selectors with corresponding modality names should appear below to select the Data Manager along including a selector with preselected with the reference node. 
+    Now, select the image nodes in the node selectors accordingly for accurate inferencing.
     \imageMacro{QmitkSegmentation_nnUNet_multimodal.png,"nnUNet Multi Modal Settings",10.00}
-    -# Select the "Python Path" drop-down to see if MITK has automatically detected other Python environments. 
-    Click on a fitting environment for the nnUNet inference or click "Select" in the dropdown to choose an unlisted python environment. Note that, while selecting an arbitrary environment folder, only select the base folder.
-    No need to select all the way until "../myenv/bin/python", for example.
     -# Click on "Preview".
     -# In the "Advanced" section, you can also activate other options like "Mixed Precision" and "Enable Mirroring" (for test time data augmentation) pertaining to nnUNet.
     \imageMacro{QmitkSegmentation_nnUNet_Advanced.png,"nnUNet Advanced Settings",10.00}
-    -# Use "GPU Id" to change the preferred GPU for inferencing. This is equivalent to setting the <b>CUDA_VISIBLE_DEVICES</b> environment variable.
+    -# Use "Advanced" > "GPU Id" combobox to change the preferred GPU for inferencing. This is internally equivalent to setting the <b>CUDA_VISIBLE_DEVICES</b> environment variable.
     -# Every inferred segmentation is cached to prevent a redundant computation. In case, a user doesn't wish to cache a Preview, uncheck the "Enable Caching" in the "Advanced" section. This will ensure that the
-    current parameters will neither be checked against the existing cache nor a segmentation be loaded from it.
+    current parameters will neither be checked against the existing cache nor a segmentation be loaded from it when Preview is clicked.
     -# You may always clear all the cached segmentations by clicking "Clear Cache" button.
 
-\subsubsection org_mitk_views_segmentationUserManualnnUNetToolMisc Miscellaneous:
+\subsubsection org_mitk_views_segmentationnnUNetToolMisc Miscellaneous:
     -# In case you want to reload/reparse the folders in the "nnUNet Results Folder", eg. after adding new tasks into it, you may do so without reselecting the folder again by clicking the "Refresh Results Folder" button.
-    -# If you have a nnUNet code-base yet to be pip-installed into any environment (eg. developer modified nnUNet forks), click checkbox "No pip". 
-    Once the checkbox is checked a new directory selector appears in the section. You may click and navigate to your nnUNet fork folder to select the code from which you want inference.
-    \imageMacro{QmitkSegmentation_nnUNet_nopip.png,"nnUNet Advanced Settings with option to select nnUNet local folder",10.00}
     -# The "Advanced" > "GPU Id" combobox lists the Nvidia GPUs available by parsing the <tt>nvidia-smi</tt> utility output. In case your machine has Nvidia CUDA enabled GPUs but the <tt>nvidia-smi</tt> fails for some reason, the "GPU Id" combobox will show no entries.
     In such a situation, it's still possible to execute inferencing by manually entering the preferred GPU Id, eg. 0 in the combobox.
+    -# In the <b>RESULTS_FOLDER</b> directory, inside the trainer-planner folder of every task, MITK keeps a "mitk_export.json" file for fast loading for multi-modal information. It is recommended not to delete this file(s) for a fast responsive UI.
+    Tip: If multi-modal information shown on MITK is not correct for a given task, you may modify this JSON file and try again.
 
-
-\section org_mitk_views_segmentationUserManualPostprocessing Additional things you can do with segmentations
+\section org_mitk_views_segmentationpostprocessing Additional things you can do with segmentations
 
 Segmentations are never an end in themselves. Consequently, the segmentation view adds a couple of "post-processing" actions, accessible through the context-menu of the data manager.
 
-\imageMacro{QmitkSegmentation_IMGDataManagerContextMenu.png,"Context menu items for segmentations.",10.58}
+\imageMacro{QmitkSegmentation_IMGDataManagerContextMenu.png,"Context menu items for segmentations",10.58}
 
 <ul>
 <li> <b>Create polygon %model</b> applies the marching cubes algorithm to the segmentation. This polygon %model can be used for visualization in 3D or other applications such as stereolithography (3D printing).
@@ -287,20 +374,19 @@ Segmentations are never an end in themselves. Consequently, the segmentation vie
 <li> <b>Autocrop</b> can save memory. Manual segmentations have the same extent as the patient image, even if the segmentation comprises only a small sub-volume. This invisible and meaningless margin is removed by autocropping.
 </ul>
 
-
-\section org_mitk_views_segmentationof3DTImages Segmentation of 3D+t images
+\section org_mitk_views_segmentationof3dtimages Segmentation of 3D+t images
 
 For segmentation of 3D+t images, some tools give you the option to choose between creating dynamic and static masks.
 <ul>
-<li> Dynamic masks can be created on each time frame individually.
-<li> Static masks will be defined on one time frame and will be the same for all other time frames.
+  <li> Dynamic masks can be created on each time frame individually.
+  <li> Static masks will be defined on one time frame and will be the same for all other time frames.
 </ul>
-In general, segmentation is applied on the time frame that is selected when execution is performed. If you alter the time frame, the segmentation preview is adapted.
 
+In general, segmentation is applied on the time frame that is selected when execution is performed.
+If you alter the time frame, the segmentation preview is adapted.
 
+\section org_mitk_views_segmentationtechnicaldetail Technical information for developers
 
-\section org_mitk_views_segmentationUserManualTechnicalDetail Technical Information for Developers
-
-For technical specifications see \subpage QmitkSegmentationTechnicalPage and for information on the extensions of the tools system \subpage toolextensions .
+For technical specifications see \subpage QmitkSegmentationTechnicalPage and for information on the extensions of the tools system \subpage toolextensions.
 
 */

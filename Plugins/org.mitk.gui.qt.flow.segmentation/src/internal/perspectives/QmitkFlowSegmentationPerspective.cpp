@@ -21,9 +21,9 @@ void QmitkFlowSegmentationPerspective::CreateInitialLayout(berry::IPageLayout::P
 {
   QString editorArea = layout->GetEditorArea();
 
-  layout->AddView("org.mitk.views.multilabelsegmentation", berry::IPageLayout::LEFT, 0.3f, editorArea);
+  layout->AddView("org.mitk.views.segmentation", berry::IPageLayout::LEFT, 0.3f, editorArea);
 
-  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.multilabelsegmentation");
+  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.segmentation");
   lo->SetCloseable(false);
 
   layout->AddStandaloneView("org.mitk.views.flow.control",false, berry::IPageLayout::RIGHT, 0.6f, editorArea);

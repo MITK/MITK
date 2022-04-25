@@ -64,6 +64,24 @@ mitk::Image::ConstPointer mitk::AutoSegmentationTool::GetImageByTimeStep(const m
   return imageTimeSelector->GetOutput();
 }
 
+mitk::Image::Pointer mitk::AutoSegmentationTool::GetImageByTimeStep(mitk::Image* image, unsigned int timestep)
+{
+  if (nullptr == image)
+    return image;
+
+  if (image->GetDimension() != 4)
+    return image;
+
+  mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
+
+  imageTimeSelector->SetInput(image);
+  imageTimeSelector->SetTimeNr(static_cast<int>(timestep));
+
+  imageTimeSelector->UpdateLargestPossibleRegion();
+
+  return imageTimeSelector->GetOutput();
+}
+
 mitk::Image::ConstPointer mitk::AutoSegmentationTool::GetImageByTimePoint(const mitk::Image* image, TimePointType timePoint)
 {
   if (nullptr == image)

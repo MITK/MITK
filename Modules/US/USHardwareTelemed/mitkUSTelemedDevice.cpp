@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkUSTelemedDevice.h"
-
+#include "mitkImageReadAccessor.h"
 #include "mitkUSTelemedSDKHeader.h"
 
 mitk::USTelemedDevice::USTelemedDevice(std::string manufacturer, std::string model)
@@ -22,7 +22,7 @@ m_ControlsDoppler(mitk::USTelemedDopplerControls::New(this)),
 m_ImageSource(mitk::USTelemedImageSource::New()), m_UsgMainInterface(0),
 m_Probe(0), m_UsgDataView(0), m_ProbesCollection(0)
 {
-  SetNumberOfOutputs(1);
+  SetNumberOfIndexedOutputs(1);
   SetNthOutput(0, this->MakeOutput(0));
 }
 
@@ -141,6 +141,13 @@ void mitk::USTelemedDevice::OnFreeze(bool freeze)
   }
 }
 
+void mitk::USTelemedDevice::GenerateData()
+{
+  mitk::USTelemedImageSource::Pointer s = dynamic_cast<mitk::USTelemedImageSource*>(GetUSImageSource().GetPointer());
+  s->GetNextRawImage(m_ImageVector);
+  Superclass::GenerateData();
+}
+
 mitk::USImageSource::Pointer mitk::USTelemedDevice::GetUSImageSource()
 {
   return m_ImageSource.GetPointer();
@@ -172,6 +179,21 @@ void mitk::USTelemedDevice::StopScanning()
     MITK_ERROR("USDevice")("USTelemedDevice") << "Stop scanning failed (" << hr << ").";
     mitkThrow() << "Stop scanning failed (" << hr << ").";
   }
+}
+
+std::vector<mitk::USProbe::Pointer> mitk::USTelemedDevice::GetAllProbes(){
+  return m_ControlsProbes->GetProbeSet();
+}
+
+mitk::USProbe::Pointer mitk::USTelemedDevice::GetCurrentProbe(){
+  return m_ControlsProbes->GetSelectedProbe();
+}
+
+mitk::USProbe::Pointer mitk::USTelemedDevice::GetProbeByName(std::string name){
+  for (mitk::USProbe::Pointer p : m_ControlsProbes->GetProbeSet()){
+    if (p->GetName().compare(name)==0) {return p;}
+  }
+  return nullptr;
 }
 
 Usgfw2Lib::IUsgfw2* mitk::USTelemedDevice::GetUsgMainInterface()

@@ -31,7 +31,6 @@ found in the LICENSE file.
 #include <mitkVtkRepresentationProperty.h>
 #include <mitkVtkResliceInterpolationProperty.h>
 #include <mitkVtkScalarModeProperty.h>
-#include <mitkVtkVolumeRenderingProperty.h>
 
 #include "mitkBasePropertySerializer.h"
 #include "mitkPropertyList.h"
@@ -88,7 +87,6 @@ int mitkPropertySerializationTest(int /* argc */, char * /*argv*/ [])
   propList->SetProperty("VtkRepresentationProperty", mitk::VtkRepresentationProperty::New("Surface"));
   propList->SetProperty("VtkResliceInterpolationProperty", mitk::VtkResliceInterpolationProperty::New("Cubic"));
   propList->SetProperty("VtkScalarModeProperty", mitk::VtkScalarModeProperty::New("PointFieldData"));
-  propList->SetProperty("VtkVolumeRenderingProperty", mitk::VtkVolumeRenderingProperty::New("COMPOSITE"));
   mitk::BoolLookupTable blt;
   blt.SetTableValue(0, true);
   blt.SetTableValue(1, false);

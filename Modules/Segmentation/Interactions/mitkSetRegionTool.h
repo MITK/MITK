@@ -28,15 +28,12 @@ namespace mitk
     \sa FeedbackContourTool
     \sa ExtractImageFilter
 
-    \ingroup Interaction
-    \ingroup ToolManagerEtAl
+    \ingroup Interactions
 
-    Finds the outer contour of a shape in 2D (possibly including holes) and sets all
+    Finds the outer contour of a shape in 2D (possibly including holes or single patches) and sets all
     the inside pixels to a specified value. This might fill holes or erase segmentations.
 
     \warning Only to be instantiated by mitk::ToolManager.
-
-    $Author$
   */
   class MITKSEGMENTATION_EXPORT SetRegionTool : public FeedbackContourTool
   {

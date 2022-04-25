@@ -178,32 +178,11 @@ surface construction
 <ul>
   <li> TransferFunction - contains transfer function for use in coloring image
   <li> volumerendering -  Should the volume be rendered or not
-  <li> volumerendering configuration - Choice between Composite und MIP
-  <li> volumerendering.cpu.ambient - ambient lighting
-  <li> volumerendering.cpu.diffuse - in-/decrease light dispersion
-  <li> volumerendering.cpu.specular - in-/decrease non-scattered reflection
-  <li> volumerendering.cpu.specular.power - control percentage of non-scattered
-reflection 
-  <li> volumerendering.gpu.ambient - same as cpu with gpu
-  <li> volumerendering.gpu.diffuse - same as cpu with gpu
-  <li> volumerendering.gpu.reducesliceartifacts - Reduce slice artifacts
-  <li> volumerendering.gpu.specular - same as cpu with gpu
-  <li> volumerendering.gpu.specular.power - same as cpu with gpu
-  <li> volumerendering.gpu.usetexturecompression - use texture compression
-  <li> volumerendering.ray.ambient - same as cpu with ray
-  <li> volumerendering.ray.diffuse - same as cpu with ray
-  <li> volumerendering.ray.specular - same as cpu with ray
-  <li> volumerendering.ray.specular.power - same as cpu with ray
-  <li> volumerendering.usegpu -  Whether to use the GPU for rendering or not
-  <li> volumerendering.uselod -  Whether to use the Level Of Detail mechanism or not
-  <li> volumerendering.usemip -  Whether to utilize maximum intensity projection
-  <li> volumerendering.useray - Whether to use raycasting or not
+  <li> volumerendering.ambient - same as cpu with gpu
+  <li> volumerendering.diffuse - same as cpu with gpu
+  <li> volumerendering.specular - same as cpu with gpu
+  <li> volumerendering.specular.power - same as cpu with gpu
 </ul>
-  
-\remark
-Uselod can be active with usegpu, usemip, useray, but any of the latter can not
-be used with another one of them.
-
 
 \subsection PointSetProperties Point Set Properties
 

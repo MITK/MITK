@@ -18,9 +18,12 @@ found in the LICENSE file.
 #include <berryIPreferences.h>
 #include <berryIQtPreferencePage.h>
 
-class QCheckBox;
-class QRadioButton;
-class QDoubleSpinBox;
+class QWidget;
+
+namespace Ui
+{
+  class QmitkSegmentationPreferencePageControls;
+}
 
 class MITK_QT_SEGMENTATION QmitkSegmentationPreferencePage : public QObject, public berry::IQtPreferencePage
 {
@@ -47,18 +50,12 @@ public:
 protected Q_SLOTS:
 
   void OnSmoothingCheckboxChecked(int);
+  void OnLabelSetPresetButtonClicked();
 
 protected:
 
-  QWidget* m_MainControl;
-  QCheckBox* m_SlimViewCheckBox;
-  QRadioButton* m_RadioOutline;
-  QRadioButton* m_RadioOverlay;
-  QCheckBox* m_SelectionModeCheckBox;
-  QCheckBox* m_SmoothingCheckBox;
-  QDoubleSpinBox* m_SmoothingSpinBox;
-  QDoubleSpinBox* m_DecimationSpinBox;
-  QDoubleSpinBox* m_ClosingSpinBox;
+  Ui::QmitkSegmentationPreferencePageControls* m_Ui;
+  QWidget* m_Control;
 
   bool m_Initializing;
 

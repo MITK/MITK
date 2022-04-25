@@ -18,9 +18,7 @@ Additionally, there are controls to quickly generate commonly used transfer func
 
 \subsection QVV_LoadingImage Select an image and enable volume rendering
 
-\imageMacro{QmitkVolumeVisualization_Checkboxen.png,"",8.21}
-
-Select an image on top of the view and click on the checkbox left of 'Volumerendering'. Please be patient, while the image is prepared for rendering, which can take up to a half minute.
+Select an image on top of the view and click on the checkbox left of 'Volume rendering'.
 
 \note 
 Volume Visualization imposes following restrictions on images:
@@ -31,20 +29,12 @@ Volume Visualization imposes following restrictions on images:
 </ul>
 
 
-\subsection QVV_LODGPU Dropdown menus for the rendering and blend modes
+\subsection QVV_LODGPU Dropdown menu for the blend modes
 
-Two dropdown menus are located right next to the 'Volumerendering' checkbox. They allow you to select a rendering mode (Default, RayCast, GPU) and the blend mode (Composite, Max, Min, Avg, Add).
+Two dropdown menu is located right next to the 'Volume rendering' checkbox. It allows you to select a blend mode (Composite, Maximim intensity, Minimum intensity, Average intensity, and Additive intensity).
 
-Any rendering mode requires a lot of computing resources including processor, memory and often also graphics card.
-The 'Default' selection usually finds the best 'rendering' mode for the available hardware.
-Alternatively, it is possible to manually specify the selections 'RayCast' and 'GPU'.
-The 'RayCast' selection is based on CPU computation and therefore typically slow, but allows to render without hardware acceleration.
-The 'GPU' selection uses computing resources on the graphics card to accelerate volume rendering.
-It requires a powerful graphics card and OpenGL hardware support for shaders but achieves much higher frame rates than software-rendering.
-
-Blend modes define how the volume voxels, intersected by the rendering rays, are pooled. The 'Composite' mode specifies standard volume rendering, 
-for which each voxel contributes equally with opacity and color. Other 'blend' modes simply visualize the voxel of the maximum / 
-minimum intensity and average / add the intensities along the rendering ray.
+Blend modes define how the volume voxels, intersected by the rendering rays, are pooled. The 'Composite' mode specifies standard volume rendering,
+for which each voxel contributes equally with opacity and color. Other 'blend' modes visualize the voxel of the maximum or minimum intensity or average or add the intensities along the rendering ray.
 
 \section QVV_PresetPage Applying premade presets
 

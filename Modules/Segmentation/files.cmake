@@ -45,9 +45,6 @@ set(CPP_FILES
   Interactions/mitkDrawPaintbrushTool.cpp
   Interactions/mitkErasePaintbrushTool.cpp
   Interactions/mitkEraseRegionTool.cpp
-  Interactions/mitkFastMarchingBaseTool.cpp
-  Interactions/mitkFastMarchingTool.cpp
-  Interactions/mitkFastMarchingTool3D.cpp
   Interactions/mitkFeedbackContourTool.cpp
   Interactions/mitkFillRegionTool.cpp
   Interactions/mitkOtsuTool3D.cpp
@@ -60,7 +57,6 @@ set(CPP_FILES
   Interactions/mitkSubtractContourTool.cpp
   Interactions/mitkTool.cpp
   Interactions/mitkToolCommand.cpp
-  Interactions/mitkWatershedTool.cpp
   Interactions/mitkPickingTool.cpp
   Interactions/mitknnUnetTool.cpp
   Interactions/mitkSegmentationInteractor.cpp #SO
@@ -83,8 +79,6 @@ set(RESOURCE_FILES
   AI_Cursor_32x32.png
   Erase_48x48.png
   Erase_Cursor_32x32.png
-  FastMarching_48x48.png
-  FastMarching_Cursor_32x32.png
   Fill_48x48.png
   Fill_Cursor_32x32.png
   LiveWire_48x48.png
@@ -99,14 +93,11 @@ set(RESOURCE_FILES
   Subtract_Cursor_32x32.png
   Threshold_48x48.png
   TwoThresholds_48x48.png
-  Watershed_48x48.png
-  Watershed_Cursor_32x32.png
   Wipe_48x48.png
   Wipe_Cursor_32x32.png
 
   Interactions/dummy.xml
   Interactions/LiveWireTool.xml
-  Interactions/FastMarchingTool.xml
   Interactions/PickingTool.xml
   Interactions/PressMoveRelease.xml
   Interactions/PressMoveReleaseAndPointSetting.xml

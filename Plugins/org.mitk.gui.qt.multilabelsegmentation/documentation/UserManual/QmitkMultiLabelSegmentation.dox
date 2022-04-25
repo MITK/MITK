@@ -1,118 +1,99 @@
 /**
 \page org_mitk_views_multilabelsegmentation The Multilabel Segmentation
 
-\imageMacro{"multilabelsegmentation-dox.svg", "Icon of the MultiLabelSegmentation Plugin", 12}
+\imageMacro{multilabelsegmentation_utilities.svg, "Icon of the Multilabel Segmentation Utilities Plugin", 5.00}
 
-The difference between a binary and a multi-label segmentation is that a multi-label segmentation can not only contain more than one label but also more than one layer. This allows you to create different labels for different regions of interest encapsulated in one single image. The difference between labels and layers is that labels on one layer cannot overlap but labels on different layers can.
-<br>
-The <b>Multilabel Segmentation plugin</b> consists of two views which can be used for:
+The <b>Multilabel Segmentation plugin</b> consists of one view which can be used for:
 <ul>
-  <li> manual and (semi-)automatic segmentation of anatomical and pathological structures in medical images via <b>the Multilabel Segmentation View</b>
-  <li> multilabel segmentation postprocessing via \subpage org_mitk_views_multilabelsegmentationutilities
+  <li> multilabel segmentation postprocessing
 </ul>
 
-Hereinafter, a description is given on how multi-label segmentations can be created and modified. Please refer to \ref org_mitk_views_segmentation for a description of the general segmentation tools.
+Hereinafter, a description is given on how multilabel segmentations can be modified.
+Please refer to \ref org_mitk_views_segmentation for a description of the general segmentation tools.
 
 \tableofcontents
 
-\section org_mitk_views_multilabelsegmentationUserManualCreateOpenSaveImportAdd Data Selection
+\section org_mitk_views_multilabelsegmentationutilitiesoverview Overview
 
-In the 'MultiLabel Segmentation' view you can first select an image. Thereafter, you can either create a new segmentation session by pressing the symbol right to the selection widget or select an existing one.
-
-\imageMacro{"org_mitk_views_multilabelsegmentationIMGtoolbar.png", "Data selection",12}
-
-
-\section org_mitk_views_multilabelsegmentationUserManualLayerTable Segmentation Layers
-Once you started a segmentation session you can add or delete different layers. You can use the layers independently and switch layers by the left and right arrows.
-
-
-\imageMacro{"org_mitk_views_multilabelsegmentationIMGlayerManager.png", "Layer selection",12}
-
-\subsection org_mitk_views_multilabelsegmentationUserManualLayerCreation Creating a New Layer
-
-A layer is a set of labels that occupy a non-overlapping anatomical space. The best way to describe them is by a real use case. Imagine you are working on a radiotherapy planning application. In the first layer of your segmentation
-session, you would like to trace the contours of the liver and neighboring organs. You can accommodate all these segmentations in separate labels because they all occupy different anatomical regions and do not overlap. Now say you would like to segment the arteries and veins inside the liver. If you don't trace them in a different layer, you will overwrite the previous ones. You may also need a third layer for segmenting the different irrigation territories in the liver and a fourth layer to contain the lesion you would like to treat.
-
-\section org_mitk_views_multilabelsegmentationUserManualLabelTable Segmentation Labels
-
-For each layer, you can add one or more labels. Pressing the double arrow on the right, all created labels are shown in the 'Lable Table'. The following label properties are available:
+The <b>Multilabel Segmentation Utilities Plugin</b> allows to postprocess existing segmentations. Currently five different operations exist:
 
 <ul>
-  <li><b>Name:</b></li> the name of the label. Can be a predefined one or any other.
-  <li><b>Locked:</b></li> whether the label is locked or editable. A locked label cannot be overwritten by another.
-  <li><b>Color:</b></li> the color of the label.
-  <li><b>Visible:</b></li> whether the label is currently visible or hidden.
+  <li> \ref org_mitk_views_multilabelsegmentationutilitiesbooleanoperations
+  <li> \ref org_mitk_views_multilabelsegmentationutilitiescontourtoimage
+  <li> \ref org_mitk_views_multilabelsegmentationutilitiesimagemasking
+  <li> \ref org_mitk_views_multilabelsegmentationutilitiesmorphologicaloperations
+  <li> \ref org_mitk_views_multilabelsegmentationutilitiessurfacetoimage
+  <li> \ref org_mitk_views_multilabelsegmentationutilitiesconverttomultilabel
 </ul>
 
+\imageMacro{QmitkMultiLabelSegmentationUtilities_Overview.png, "The Multilabel Segmentation Utilities View",16.00}
 
-\imageMacro{"org_mitk_views_multilabelsegmentationIMGlabeltable.png", "The 'Label Table' shows all labels in the current segmentation session", 12}
+\section org_mitk_views_multilabelsegmentationutilitiesdataselection Data Selection
 
-\subsection org_mitk_views_multilabelsegmentationUserManualLabelCreation Creating a New Label
+All postprocessing operations provide one or more selection widgets, which allow to select the data for the operation.
 
-Click the 'New Label' button to add a new label. A dialog will show up to enter the name and color. Preset organ names and
-corresponding colors are offered while you type in, but you can set any name. The new name - if not known - will be automatically remembered and made available the next time you create a new label. In the current implementation of the plugin, the maximum number of labels is restricted to 255. If you need more, you will have to create a new segmentation session.
+\section org_mitk_views_multilabelsegmentationutilitiesbooleanoperations Boolean operations
 
-
-\subsection org_mitk_views_multilabelsegmentationUserManualLabelPresets Saving and Loading Label Set Presets
-
-Label set presets are useful to share a certain style or scheme between different segmentation sessions or to provide templates for new segmentation sessions.
-
-The properties of all labels in all layers like their names, colors, and visibilities are saved as a label set preset by clicking on the 'Save label set preset' button.
-Label set presets are applied to any segmentation session by clicking on the 'Load label set preset' button.
-If a label for a certain value already exists, its properties are overridden by the preset.
-If a label for a certain value does not yet exist, an empty label with the label properties of the preset is created.
-The actual segmentations of labels are unaffected as label set presets only store label properties.
-
-
-\subsection org_mitk_views_multilabelsegmentationUserManualLabelSearch Searching a Label
-
-It may happen that many labels (e.g. > 200) are present in a segmentation session and therefore manual searching can be time-consuming.
-The 'Label Search' edit box allows for quickly finding the label you want. Just start writing its name and you will get assistance for completing its name. If the label you were searching is found, press 'enter' and it will become the active one.
-
-
-\subsection org_mitk_views_multilabelsegmentationUserManualLabelEditing Label Editing
-
-Here the actual segmentation takes place. First of all, you have to select the active label by clicking on the corresponding row in the 'Label Table'. Note that only one label can be active at the time. Then you can select segmentation tool in the toolbox.
-
-\imageMacro{"org_mitk_views_multilabelsegmentationIMGSegmentationToolbox.png", "Segmentation toolbox", 12}
-
-
-\note Not all segmentation tools can be found here. This is because some of the semi-automatic tools can not be applied in case of multiple labels.
-
-\subsection org_mitk_views_multilabelsegmentationUserManualOperationsOnLabels Operations on Labels
-
-Depending on your selection in the 'Label Table', several actions are offered:
-
-\subsubsection org_mitk_views_multilabelsegmentationUserManualOperationsOnSingleSelection Single Label Selection
-
-If you right click on any label in the table, a pop-up menu offers the following actions to be performed on the selected label:
+Boolean operations allow to perform the following fundamental operations on two segmentations:
 
 <ul>
-<li><b>Rename...</b></li> : change the name and/or color of the selected label.
-<li><b>Remove...</b></li> : delete the selected label.
-<li><b>Erase...</b></li> : only clear the contents of the selected label.
-<li><b>Merge...</b></li> : merge two labels by selecting a second label.
-<li><b>Random color </b></li> : assign a random color to the label.
-<li><b>View only </b></li> : make all labels except the current selected label invisible.
-<li><b>View/Hide all </b></li> : make all labels visible / invisible
-<li><b>Lock/Unlock all </b></li> : lock or unlock all labels.
-<li><b>Create surface </b></li> : generate a surface out of the selected label.
-  <li><b>Create mask </b></li> : generate a mask out of the selected label. A mask is a binary image with "1" inside and "0" outside.
-  <li><b>Create cropped mask </b></li> : generate a binary mask out of the selected label. Crop changes the extent of the resulting image to the extent of the label.
+  <li> <b>Difference:</b> Subtracts the second segmentation from the first segmentation.
+  <li> <b>Intersection:</b> Extracts the overlapping areas of the two selected segmentations.
+  <li> <b>Union:</b> Combines the two existing segmentations.
 </ul>
 
-\imageMacro{"org_mitk_views_multilabelsegmentationIMGLabelTableSingleSelectionContextMenu.png", "Context menu for single label selection", 12}
+The selected segmentations must have the same geometry (size, spacing, ...) in order for the operations to work correctly.
+The result will be stored in a new data node as a child node of the first selected segmentation.
 
-\subsubsection org_mitk_views_multilabelsegmentationUserManualOperationsOnMultipleSelection Multiple Label Selection
+\imageMacro{QmitkMultiLabelSegmentationUtilities_BooleanOperations.png,"Boolean operations",6.00}
 
-You can select more than one label by shift-click on other labels. If more than one label is selected, different options will appear in the menu:
+\section org_mitk_views_multilabelsegmentationutilitiescontourtoimage Contour to image
 
-\imageMacro{"org_mitk_views_multilabelsegmentationIMGLabelTableMultipleSelectionContextMenu.png", "Context menu for multiple label selection", 12}
+Contour to image allows to create a segmentation out of a given contour-model.
+The operation requires a contour model set and a reference image.
+The created segmentation image will have the same geometrical properties like the reference image (dimension, size and Geometry3D).
+
+\imageMacro{QmitkMultiLabelSegmentationUtilities_ContourToImage.png,"Contour to image",6.00}
+
+\section org_mitk_views_multilabelsegmentationutilitiesimagemasking Image masking
+
+Image masking allows to mask an image with either an existing segmentation or a surface.
+The operation requires an image and a binary image mask or a surface.
+The result will be an image containing only the pixels that are covered by the respective mask.
+Depending on the selected mode ("make output binary" or "overwrite foreground" / "overwrite background")
+the result will be a simple image or a binary image.
+
+\imageMacro{QmitkMultiLabelSegmentationUtilities_ImageMasking.png,"Image masking",6.00}
+
+\section org_mitk_views_multilabelsegmentationutilitiesmorphologicaloperations Morphological operations
+
+Morphological operations are applied to a single segmentation image. Based on a given structuring element the underlying segmentation will be modfied.
+The plugin provides a <b>ball</b> and a <b>cross</b> as structuring elements. The follow operations are available:
 
 <ul>
-  <li><b>Merge selection on current label</b></li> : transfer the contents of the selected labels in the 'Label Table' into the current one.
-  <li><b>Remove selected labels</b></li> : delete the selected labels.
-  <li><b>Erase selected labels</b></li> : only clear the contents of the selected labels.
+  <li> <b>Dilation:</b> Each labeled pixel within the segmentation will be dilated based on the selected structuring element.
+  <li> <b>Erosion:</b> Each labeled pixel within the segmentation will be eroded based on the selected structuring element.
+  <li> <b>Opening:</b> An erosion followed by a dilation, used for filling small holes.
+  <li> <b>Closing:</b> A dilation followed by an erosion, used for smoothing edges or eliminating small objects.
+  <li> <b>Fill Holes:</b> Fills bigger holes within a segmentation.
 </ul>
 
+\imageMacro{QmitkMultiLabelSegmentationUtilities_MorphologicalOperations.png,"Morphological operations",6.00}
+
+\section org_mitk_views_multilabelsegmentationutilitiessurfacetoimage Surface to image
+
+Surface to image allows to create a segmentation out of a given surface.
+The operation requires a surface and a reference image.
+The created segmentation image will have the same geometrical properties like the reference image (dimension, size and Geometry3D).
+Depending on the selected mode ("make output binary" or "overwrite background")
+the result will be a simple image or a binary image.
+
+\imageMacro{QmitkMultiLabelSegmentationUtilities_SurfaceToImage.png,"Surface to image",6.00}
+
+\section org_mitk_views_multilabelsegmentationutilitiesconverttomultilabel Convert to Multilabel
+
+Convert to multilabel allows to interpret the pixel values of a given image as label IDs and convert the image content into the respective Multilabel image.
+The new segmentation will contain one layer with as many labels as the original image contains different pixel values.
+
+\imageMacro{QmitkMultiLabelSegmentationUtilities_ConvertToMultilabel.png,"Convert to Multilabel",6.00}
 */

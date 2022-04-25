@@ -19,8 +19,8 @@ found in the LICENSE file.
 
 void QmitkLoadMultiLabelPresetAction::Run(const QList<mitk::DataNode::Pointer> &selectedNodes)
 {
-  const auto filename = QFileDialog::getOpenFileName(nullptr, QStringLiteral("Load LabelSet Preset"),
-    QString(), QStringLiteral("LabelSet Preset (*.lsetp)")).toStdString();
+  const auto filename = QFileDialog::getOpenFileName(nullptr, QStringLiteral("Load Label Set Preset"),
+    QString(), QStringLiteral("Label set preset (*.lsetp)")).toStdString();
 
   if (filename.empty())
     return;

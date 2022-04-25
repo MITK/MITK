@@ -120,11 +120,11 @@ private:
 
   void UpdateGUI();
 
-  void UpdateInterpolatorWidget();
-
   void ValidateSelectionInput();
 
   void UpdateWarningLabel(QString text);
+
+  std::string GetDefaultLabelSetPreset() const;
 
   QWidget* m_Parent;
 
@@ -148,6 +148,7 @@ private:
   bool m_SelectionMode;
   bool m_MouseCursorSet;
 
+  QString m_LabelSetPresetPreference;
 };
 
 #endif // QMITKSEGMENTATIONVIEW_H

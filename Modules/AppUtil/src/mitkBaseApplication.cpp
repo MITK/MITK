@@ -95,6 +95,7 @@ namespace mitk
   const QString BaseApplication::ARG_STORAGE_DIR = "BlueBerry.storageDir";
   const QString BaseApplication::ARG_XARGS = "xargs";
   const QString BaseApplication::ARG_LOG_QT_MESSAGES = "Qt.logMessages";
+  const QString BaseApplication::ARG_SEGMENTATION_LABELSET_PRESET = "Segmentation.labelSetPreset";
 
   const QString BaseApplication::PROP_APPLICATION = "blueberry.application";
   const QString BaseApplication::PROP_FORCE_PLUGIN_INSTALL = BaseApplication::ARG_FORCE_PLUGIN_INSTALL;
@@ -788,6 +789,10 @@ namespace mitk
     Poco::Util::Option logQtMessagesOption(ARG_LOG_QT_MESSAGES.toStdString(), "", "log Qt messages");
     logQtMessagesOption.callback(Poco::Util::OptionCallback<Impl>(d, &Impl::handleBooleanOption));
     options.addOption(logQtMessagesOption);
+
+    Poco::Util::Option labelSetPresetOption(ARG_SEGMENTATION_LABELSET_PRESET.toStdString(), "", "use this label set preset for new segmentations");
+    labelSetPresetOption.argument("<filename>").binding(ARG_SEGMENTATION_LABELSET_PRESET.toStdString());
+    options.addOption(labelSetPresetOption);
 
     Poco::Util::Application::defineOptions(options);
   }

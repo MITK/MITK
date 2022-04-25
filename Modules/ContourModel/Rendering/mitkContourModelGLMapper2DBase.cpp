@@ -16,18 +16,17 @@ found in the LICENSE file.
 #include "mitkContourModelSet.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkProperties.h"
+#include <vtkContext2D.h>
 #include <vtkLinearTransform.h>
-#include "vtkPen.h"
-#include "vtkContext2D.h"
-#include "vtkContextDevice2D.h"
-#include "vtkOpenGLContextDevice2D.h"
+#include <vtkOpenGLContextDevice2D.h>
+#include <vtkPen.h>
 
 #include "mitkManualPlacementAnnotationRenderer.h"
 #include "mitkBaseRenderer.h"
 #include "mitkContourModel.h"
 #include "mitkTextAnnotation2D.h"
 
-mitk::ContourModelGLMapper2DBase::ContourModelGLMapper2DBase(): m_Initialized(false)
+mitk::ContourModelGLMapper2DBase::ContourModelGLMapper2DBase()
 {
   m_PointNumbersAnnotation = mitk::TextAnnotation2D::New();
   m_ControlPointNumbersAnnotation = mitk::TextAnnotation2D::New();
@@ -37,34 +36,21 @@ mitk::ContourModelGLMapper2DBase::~ContourModelGLMapper2DBase()
 {
 }
 
-void mitk::ContourModelGLMapper2DBase::Initialize(mitk::BaseRenderer *)
-{
-  vtkOpenGLContextDevice2D *device = nullptr;
-  device = vtkOpenGLContextDevice2D::New();
-  if (device)
-  {
-    this->m_Context->Begin(device);
-    device->Delete();
-    this->m_Initialized = true;
-  }
-  else
-  {
-  }
-}
-
 void mitk::ContourModelGLMapper2DBase::ApplyColorAndOpacityProperties(mitk::BaseRenderer *renderer, vtkActor * /*actor*/)
 {
+  auto* localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
+
   float rgba[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
   // check for color prop and use it for rendering if it exists
   GetDataNode()->GetColor(rgba, renderer, "color");
   // check for opacity prop and use it for rendering if it exists
   GetDataNode()->GetOpacity(rgba[3], renderer, "opacity");
 
-  if (this->m_Context->GetPen() == nullptr)
+  if (localStorage->Context->GetPen() == nullptr)
   {
     return;
   }
-  this->m_Context->GetPen()->SetColorF((double)rgba[0], (double)rgba[1], (double)rgba[2], (double)rgba[3]);
+  localStorage->Context->GetPen()->SetColorF((double)rgba[0], (double)rgba[1], (double)rgba[2], (double)rgba[3]);
 }
 
 void mitk::ContourModelGLMapper2DBase::DrawContour(mitk::ContourModel *renderingContour, mitk::BaseRenderer *renderer)
@@ -88,12 +74,14 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel *r
 {
   if (!renderingContour)
     return;
-  if (!this->m_Initialized)
-  {
-    this->Initialize(renderer);
-  }
-  vtkOpenGLContextDevice2D::SafeDownCast(
-    this->m_Context->GetDevice())->Begin(renderer->GetVtkRenderer());
+
+  auto* localStorage = m_LocalStorageHandler.GetLocalStorage(renderer);
+
+  localStorage->Device = vtkSmartPointer<vtkOpenGLContextDevice2D>::New();
+  localStorage->Context = vtkSmartPointer<vtkContext2D>::New();
+
+  localStorage->Device->Begin(renderer->GetVtkRenderer());
+  localStorage->Context->Begin(localStorage->Device);
 
   mitk::DataNode *dataNode = this->GetDataNode();
 
@@ -117,7 +105,7 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel *r
       double red = colorprop->GetColor().GetRed();
       double green = colorprop->GetColor().GetGreen();
       double blue = colorprop->GetColor().GetBlue();
-      this->m_Context->GetPen()->SetColorF(red, green, blue, opacity);
+      localStorage->Context->GetPen()->SetColorF(red, green, blue, opacity);
     }
 
     mitk::ColorProperty::Pointer selectedcolor =
@@ -209,9 +197,9 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel *r
           // lastPt2d is not valid in first step
           if (!(pointsIt == renderingContour->IteratorBegin(timestep)))
           {
-            this->m_Context->GetPen()->SetWidth(lineWidth);
-            this->m_Context->DrawLine(pt2d[0], pt2d[1], lastPt2d[0], lastPt2d[1]);
-            this->m_Context->GetPen()->SetWidth(1);
+            localStorage->Context->GetPen()->SetWidth(lineWidth);
+            localStorage->Context->DrawLine(pt2d[0], pt2d[1], lastPt2d[0], lastPt2d[1]);
+            localStorage->Context->GetPen()->SetWidth(1);
           }
         }
 
@@ -228,10 +216,10 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel *r
             vert[0] = 0;
             horz[0] = pointsize;
             vert[1] = pointsize;
-            this->m_Context->GetPen()->SetColorF(selectedcolor->GetColor().GetRed(),
+            localStorage->Context->GetPen()->SetColorF(selectedcolor->GetColor().GetRed(),
                                                  selectedcolor->GetColor().GetBlue(),
                                                  selectedcolor->GetColor().GetGreen());
-            this->m_Context->GetPen()->SetWidth(1);
+            localStorage->Context->GetPen()->SetWidth(1);
             // a rectangle around the point with the selected color
             auto* rectPts = new float[8];
             tmp = pt2d - horz;
@@ -246,11 +234,11 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel *r
             tmp = pt2d - vert;
             rectPts[6] = tmp[0];
             rectPts[7] = tmp[1];
-            this->m_Context->DrawPolygon(rectPts,4);
+            localStorage->Context->DrawPolygon(rectPts,4);
             // the actual point in the specified color to see the usual color of the point
-            this->m_Context->GetPen()->SetColorF(
+            localStorage->Context->GetPen()->SetColorF(
               colorprop->GetColor().GetRed(), colorprop->GetColor().GetGreen(), colorprop->GetColor().GetBlue());
-            this->m_Context->DrawPoint(pt2d[0], pt2d[1]);
+            localStorage->Context->DrawPoint(pt2d[0], pt2d[1]);
           }
         }
 
@@ -264,8 +252,8 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel *r
           vert[0] = 0;
           horz[0] = pointsize;
           vert[1] = pointsize;
-          this->m_Context->GetPen()->SetColorF(0.0, 0.0, 0.0);
-          this->m_Context->GetPen()->SetWidth(1);
+          localStorage->Context->GetPen()->SetColorF(0.0, 0.0, 0.0);
+          localStorage->Context->GetPen()->SetWidth(1);
           // a rectangle around the point with the selected color
           auto* rectPts = new float[8];
           tmp = pt2d - horz;
@@ -280,11 +268,11 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel *r
           tmp = pt2d - vert;
           rectPts[6] = tmp[0];
           rectPts[7] = tmp[1];
-          this->m_Context->DrawPolygon(rectPts, 4);
+          localStorage->Context->DrawPolygon(rectPts, 4);
           // the actual point in the specified color to see the usual color of the point
-          this->m_Context->GetPen()->SetColorF(
+          localStorage->Context->GetPen()->SetColorF(
             colorprop->GetColor().GetRed(), colorprop->GetColor().GetGreen(), colorprop->GetColor().GetBlue());
-          this->m_Context->DrawPoint(pt2d[0], pt2d[1]);
+          localStorage->Context->DrawPoint(pt2d[0], pt2d[1]);
         }
 
         if (showPointsNumbers)
@@ -333,9 +321,9 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel *r
       vtk2itk(vtkp, p);
       renderer->WorldToDisplay(p, pt2d);
 
-      this->m_Context->GetPen()->SetWidth(lineWidth);
-      this->m_Context->DrawLine(lastPt2d[0], lastPt2d[1], pt2d[0], pt2d[1]);
-      this->m_Context->GetPen()->SetWidth(1);
+      localStorage->Context->GetPen()->SetWidth(lineWidth);
+      localStorage->Context->DrawLine(lastPt2d[0], lastPt2d[1], pt2d[0], pt2d[1]);
+      localStorage->Context->GetPen()->SetWidth(1);
     }
 
     // draw selected vertex if exists
@@ -359,8 +347,8 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel *r
         float pointsize = 5;
         Point2D tmp;
 
-        this->m_Context->GetPen()->SetColorF(0.0, 1.0, 0.0);
-        this->m_Context->GetPen()->SetWidth(1);
+        localStorage->Context->GetPen()->SetColorF(0.0, 1.0, 0.0);
+        localStorage->Context->GetPen()->SetWidth(1);
         // a rectangle around the point with the selected color
         auto* rectPts = new float[8];
         // a diamond around the point
@@ -373,12 +361,14 @@ void mitk::ContourModelGLMapper2DBase::InternalDrawContour(mitk::ContourModel *r
         rectPts[5] = pt2d[1] - pointsize;
         rectPts[6] = pt2d[0] - pointsize;
         rectPts[7] = pt2d[1] - pointsize;
-        this->m_Context->DrawPolygon(rectPts, 4);
+        localStorage->Context->DrawPolygon(rectPts, 4);
       }
       //------------------------------------
     }
   }
-  this->m_Context->GetDevice()->End();
+
+  localStorage->Context = nullptr;
+  localStorage->Device = nullptr;
 }
 
 void mitk::ContourModelGLMapper2DBase::WriteTextWithAnnotation(TextAnnotationPointerType textAnnotation,

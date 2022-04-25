@@ -23,7 +23,6 @@ found in the LICENSE file.
 #include "mitkVtkRepresentationProperty.h"
 #include "mitkVtkResliceInterpolationProperty.h"
 #include "mitkVtkScalarModeProperty.h"
-#include "mitkVtkVolumeRenderingProperty.h"
 
 #include <tinyxml2.h>
 
@@ -62,7 +61,6 @@ MITK_REGISTER_ENUM_SUB_SERIALIZER(VtkInterpolationProperty);
 MITK_REGISTER_ENUM_SUB_SERIALIZER(VtkRepresentationProperty);
 MITK_REGISTER_ENUM_SUB_SERIALIZER(VtkResliceInterpolationProperty);
 MITK_REGISTER_ENUM_SUB_SERIALIZER(VtkScalarModeProperty);
-MITK_REGISTER_ENUM_SUB_SERIALIZER(VtkVolumeRenderingProperty);
 MITK_REGISTER_ENUM_SUB_SERIALIZER(ModalityProperty);
 MITK_REGISTER_ENUM_SUB_SERIALIZER(RenderingModeProperty);
 MITK_REGISTER_ENUM_SUB_SERIALIZER(PointSetShapeProperty);

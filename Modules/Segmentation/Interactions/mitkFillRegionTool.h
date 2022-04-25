@@ -24,18 +24,18 @@ namespace us
 namespace mitk
 {
   /**
-    \brief Fill the inside of a contour with 1
+    \brief Fill the inside of a contour with the foreground pixel value.
 
     \sa SetRegionTool
 
-    \ingroup Interaction
-    \ingroup ToolManagerEtAl
+    \ingroup Interactions
 
     Finds the outer contour of a shape in 2D (possibly including holes) and sets all
-    the inside pixels to 1, filling holes in a segmentation.
-    \warning Only to be instantiated by mitk::ToolManager.
+    the pixels inside to the foreground pixel value (filling holes in a segmentation).
+    If clicked on the background, the outer contour might contain the whole image and thus
+    fill the whole image with the foreground pixel value.
 
-    $Author$
+    \warning Only to be instantiated by mitk::ToolManager.
   */
   class MITKSEGMENTATION_EXPORT FillRegionTool : public SetRegionTool
   {

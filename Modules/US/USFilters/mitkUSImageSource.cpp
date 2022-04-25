@@ -84,7 +84,6 @@ std::vector<mitk::Image::Pointer> mitk::USImageSource::GetNextImage()
     }
     else
     {
-      //MITK_WARN("mitkUSImageSource") << "Result image " << i << " is not set.";
       result[i] = mitk::Image::New();
     }
   }

@@ -41,16 +41,15 @@ namespace mitk
       const Image* initialSegmentationImage = nullptr, const std::string& segmentationName = std::string());
 
     /**
-     * @brief This function creates and returns a new label. The label is automatically assigned a
-     *        label name, depending on the current number of labels of the active label set of the
+     * @brief This function creates and returns a new label. The label is automatically assigned an
+     *        unused generic label name, depending on existing label names in all label sets of the
      *        given label set image.
-     *        The color of the label is derived from the MULTILABEL lookup table, depending on the
-     *        number of labels.
+     *        The color of the label is selected from the MULTILABEL lookup table, following the same
+     *        rules of the naming to likely chose a unique color.
      *
-     * @param labelSetImage   The label set image from which the number of labels of the active label
-     *                        set is derived.
+     * @param labelSetImage   The label set image that the new label is added to
      *
-     * @return                The new labe as a pointer.
+     * @return                The new label.
      */
     MITKMULTILABEL_EXPORT mitk::Label::Pointer CreateNewLabel(const LabelSetImage* labelSetImage);
 

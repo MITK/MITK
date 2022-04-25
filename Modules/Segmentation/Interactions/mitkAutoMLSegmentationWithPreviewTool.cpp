@@ -89,7 +89,7 @@ void mitk::AutoMLSegmentationWithPreviewTool::UpdateCleanUp()
 
   if (m_SelectedLabels.empty())
   {
-    this->ResetPreviewNode();
+    this->ResetPreviewContent();
   }
 }
 
@@ -173,7 +173,7 @@ void mitk::AutoMLSegmentationWithPreviewTool::CalculateMergedSimplePreview(const
   filter->SetInput(itkImage);
   filter->SetLowerThreshold(m_SelectedLabels[0]);
   filter->SetUpperThreshold(m_SelectedLabels[0]);
-  filter->SetInsideValue(1);
+  filter->SetInsideValue(this->GetUserDefinedActiveLabel());
   filter->SetOutsideValue(0);
   filter->AddObserver(itk::ProgressEvent(), m_ProgressCommand);
   filter->Update();
@@ -187,7 +187,7 @@ void mitk::AutoMLSegmentationWithPreviewTool::CalculateMergedSimplePreview(const
     {
       filter->SetLowerThreshold(labelID);
       filter->SetUpperThreshold(labelID);
-      filter->SetInsideValue(1);
+      filter->SetInsideValue(this->GetUserDefinedActiveLabel());
       filter->SetOutsideValue(0);
       filter->Update();
 

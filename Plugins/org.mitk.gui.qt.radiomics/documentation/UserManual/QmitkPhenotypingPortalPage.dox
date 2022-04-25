@@ -28,9 +28,9 @@ This section contains views that are included within MITK Phenotyping, but were 
 \li \ref org_mitk_views_matchpoint_manipulator : Adapt a registration calculated using MatchPoint
 \li \ref org_mitk_views_matchpoint_mapper : Apply a MatchPoint Registration to a specific image
 \li \ref org_mitk_views_matchpoint_visualizer : Visualize a Registration obtained with MatchPoint
-\li \ref org_mitk_views_multilabelsegmentation : Create and editing of Multilabel-Segmentations.
-\li \ref org_mitk_views_segmentation : Create simple segmentations
-\li \ref org_mitk_views_segmentationutilities : Utilities for the processing of simple segmentations.
+\li \ref org_mitk_views_segmentation : Creating Multilabel Segmentations
+\li \ref org_mitk_views_segmentationutilities : Utilities for the processing of simple segmentations
+\li \ref org_mitk_views_multilabelsegmentation : Utilities for the processing of Multilabel Segmentations
 
 \section radiomics_miniapps MiniApps (Command line Tools)
 \li \subpage MiniAppExplainPage Explanation of the Command Line App concept in MITK

@@ -331,36 +331,36 @@ for your organ or task concerned, before using the tool. For a detailed explanat
 Remark: The tool assumes that you have a Python3 environment with nnUNet (pip) installed. Your machine should be also equipped with a CUDA enabled GPU.
 
 \subsubsection org_mitk_views_segmentationnnUNetToolWorkflow Workflow:
-    -# Click on the "nnUNet Results Folder" directory icon and navigate to the results folder on your hard disk. This is equivalent to setting the <b>RESULTS_FOLDER</b> environment variable. If your results folder is as 
-    per the nnUNet required folder structure, the configuration, trainers, tasks and folds are automatically parsed and correspondingly loaded in the drop-down boxes as shown below. 
+    -# Select the "Python Path" drop-down to see if MITK has automatically detected other Python environments. 
+    Click on a fitting environment for the nnUNet inference or click "Select" in the dropdown to choose an unlisted python environment. Note that, while selecting an arbitrary environment folder, only select the base folder, e.g. "myenv".
+    No need to select all the way until "../myenv/bin/python", for example.
+    -# Click on the "nnUNet Results Folder" directory icon to navigate to the results folder on your hard disk. This is equivalent to setting the <b>RESULTS_FOLDER</b> environment variable. If your results folder is as 
+    per the nnUNet required folder structure, the configuration, trainers, tasks and folds are automatically parsed and correspondingly loaded in the drop-down boxes as shown below. Note that MITK automatically checks for the 
+    <b>RESULTS_FOLDER</b> environment variable value and, if found, auto parses that directory when the tool is started.
     \imageMacro{QmitkSegmentation_nnUNet_Settings.png,"nnUNet Segmentation Settings",10}
-    -# Choose your required configuration-task-trainer-fold parameters, sequentially. By default, all entries are selected inside the "Fold" dropdown (shown: "All").
+    -# Choose your required Task-Configuration-Trainer-Planner-Fold parameters, sequentially. By default, all entries are selected inside the "Fold" dropdown (shown: "All").
     Note that, even if you uncheck all entries from the "Fold" dropdown (shown: "None"), then too,  all folds would be considered for inferencing.
     -# For ensemble predictions, you will get the option to select parameters irrespective on postprocessing files available in the ensembles folder of <b>RESULTS_FOLDER</b>.
     Note that, if a postprocessing json file exists for the selected combination then it will used for ensembling, by default. To choose not to, uncheck the "Use PostProcessing JSON" in the "Advanced" section.
     \imageMacro{QmitkSegmentation_nnUNet_ensemble.png,"nnUNet Segmentation Settings",10}
-    -# If your task requires multi-modal inputs, then check the "Multi-Modal" checkbox and enter the no.of modalities additionally required for inferencing, in the "No. of Extra Modalities" spinbox.
-    Instantly, as much node selectors should appear below to select other image nodes from the Data Manager along including a selector with preselected with the reference node. 
-    Certain pre-trained configurations are trained in a particular modal order. Please be aware of the order beforehand & select the image nodes in the node selectors accordingly for accurate inferencing.
+    -# If your task is trained with multi-modal inputs, then "Multi-Modal" checkbox is checked and the no.of modalities are preloaded in the "No. of Extra Modalities" spinbox.
+    Instantly, as much node selectors with corresponding modality names should appear below to select the Data Manager along including a selector with preselected with the reference node. 
+    Now, select the image nodes in the node selectors accordingly for accurate inferencing.
     \imageMacro{QmitkSegmentation_nnUNet_multimodal.png,"nnUNet Multi Modal Settings",10.00}
-    -# Select the "Python Path" drop-down to see if MITK has automatically detected other Python environments. 
-    Click on a fitting environment for the nnUNet inference or click "Select" in the dropdown to choose an unlisted python environment. Note that, while selecting an arbitrary environment folder, only select the base folder.
-    No need to select all the way until "../myenv/bin/python", for example.
     -# Click on "Preview".
     -# In the "Advanced" section, you can also activate other options like "Mixed Precision" and "Enable Mirroring" (for test time data augmentation) pertaining to nnUNet.
     \imageMacro{QmitkSegmentation_nnUNet_Advanced.png,"nnUNet Advanced Settings",10.00}
-    -# Use "GPU Id" to change the preferred GPU for inferencing. This is equivalent to setting the <b>CUDA_VISIBLE_DEVICES</b> environment variable.
+    -# Use "Advanced" > "GPU Id" combobox to change the preferred GPU for inferencing. This is internally equivalent to setting the <b>CUDA_VISIBLE_DEVICES</b> environment variable.
     -# Every inferred segmentation is cached to prevent a redundant computation. In case, a user doesn't wish to cache a Preview, uncheck the "Enable Caching" in the "Advanced" section. This will ensure that the
-    current parameters will neither be checked against the existing cache nor a segmentation be loaded from it.
+    current parameters will neither be checked against the existing cache nor a segmentation be loaded from it when Preview is clicked.
     -# You may always clear all the cached segmentations by clicking "Clear Cache" button.
 
 \subsubsection org_mitk_views_segmentationnnUNetToolMisc Miscellaneous:
     -# In case you want to reload/reparse the folders in the "nnUNet Results Folder", eg. after adding new tasks into it, you may do so without reselecting the folder again by clicking the "Refresh Results Folder" button.
-    -# If you have a nnUNet code-base yet to be pip-installed into any environment (eg. developer modified nnUNet forks), click checkbox "No pip". 
-    Once the checkbox is checked a new directory selector appears in the section. You may click and navigate to your nnUNet fork folder to select the code from which you want inference.
-    \imageMacro{QmitkSegmentation_nnUNet_nopip.png,"nnUNet Advanced Settings with option to select nnUNet local folder",10.00}
     -# The "Advanced" > "GPU Id" combobox lists the Nvidia GPUs available by parsing the <tt>nvidia-smi</tt> utility output. In case your machine has Nvidia CUDA enabled GPUs but the <tt>nvidia-smi</tt> fails for some reason, the "GPU Id" combobox will show no entries.
     In such a situation, it's still possible to execute inferencing by manually entering the preferred GPU Id, eg. 0 in the combobox.
+    -# In the <b>RESULTS_FOLDER</b> directory, inside the trainer-planner folder of every task, MITK keeps a "mitk_export.json" file for fast loading for multi-modal information. It is recommended not to delete this file(s) for a fast responsive UI.
+    Tip: If multi-modal information shown on MITK is not correct for a given task, you may modify this JSON file and try again.
 
 \section org_mitk_views_segmentationpostprocessing Additional things you can do with segmentations
 

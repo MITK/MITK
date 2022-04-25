@@ -414,6 +414,7 @@ void QmitkSegmentationView::OnShowMarkerNodes(bool state)
 
 void QmitkSegmentationView::OnLayersChanged()
 {
+  this->OnEstablishLabelSetConnection();
   m_Controls->labelSetWidget->ResetAllTableWidgetItems();
 }
 

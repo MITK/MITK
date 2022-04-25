@@ -23,6 +23,7 @@ set(INTERNAL_CPP_FILES
 )
 
 set(UI_FILES
+  src/QmitkSegmentationPreferencePageControls.ui
   src/internal/QmitkSegmentationViewControls.ui
   src/internal/Common/QmitkDataSelectionWidgetControls.ui
   src/internal/Common/QmitkLabelsWidgetControls.ui

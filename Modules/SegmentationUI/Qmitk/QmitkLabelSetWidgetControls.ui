@@ -40,7 +40,11 @@
     </widget>
    </item>
    <item>
-    <widget class="QTableWidget" name="m_LabelSetTableWidget"/>
+    <widget class="QTableWidget" name="m_LabelSetTableWidget">
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="ctkSearchBox" name="m_LabelSearchBox">

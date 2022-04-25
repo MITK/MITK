@@ -56,10 +56,10 @@ std::vector<mitk::USProbe::Pointer> mitk::USTelemedProbesControls::GetProbeSet()
 {
   // create a new vector of base class (USProbe) objects, because
   // interface wants a vector of this type
-  std::vector<mitk::USProbe::Pointer> usProbes(m_ProbesSet.size(), 0);
+  std::vector<mitk::USProbe::Pointer> usProbes;
   for (unsigned int n = 0; n < m_ProbesSet.size(); ++n)
   {
-    usProbes.at(n) = m_ProbesSet.at(n).GetPointer();
+    usProbes.push_back(m_ProbesSet.at(n).GetPointer());
   }
   return usProbes;
 }
@@ -199,7 +199,7 @@ void mitk::USTelemedProbesControls::CreateProbesSet()
   }
 
   // initialize probes set with new vector
-  m_ProbesSet = std::vector<mitk::USTelemedProbe::Pointer>(probes_count, 0);
+  m_ProbesSet = std::vector<mitk::USTelemedProbe::Pointer>();
 
   for (LONG n = 0; n < probes_count; ++n)
   {
@@ -236,7 +236,7 @@ void mitk::USTelemedProbesControls::CreateProbesSet()
     }
 
     // probe object can be created now from API data
-    m_ProbesSet.at(n) = mitk::USTelemedProbe::New(probe, usgDataView);
+    m_ProbesSet.push_back(mitk::USTelemedProbe::New(probe, usgDataView));
 
     SAFE_RELEASE(tmp_obj);
   }

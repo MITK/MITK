@@ -14,7 +14,7 @@ found in the LICENSE file.
 #include "mitkImageWriteAccessor.h"
 
 USTelemedScanConverterPlugin::USTelemedScanConverterPlugin( )
-  : m_Plugin(nullptr), m_OutputImage(nullptr), m_OutputImageMutex(nullptr)
+  : m_Plugin(nullptr), m_OutputImage(nullptr)
 {
 }
 
@@ -59,9 +59,7 @@ STDMETHODIMP USTelemedScanConverterPlugin::InterimOutBufferCB (
   )
 {
   if ( m_OutputImage.IsNull() ) { return S_FALSE; };
-
-  if ( m_OutputImageMutex.IsNotNull() ) { m_OutputImageMutex->Lock(); }
-
+  m_OutputImageMutex->lock();
   // initialize mitk::Image with given image size on the first time
   if ( ! m_OutputImage->IsInitialized() )
   {
@@ -73,7 +71,7 @@ STDMETHODIMP USTelemedScanConverterPlugin::InterimOutBufferCB (
   // lock the image for writing an copy the given buffer into the image then
   m_OutputImage->SetSlice(pBufferOut);
 
-  if ( m_OutputImageMutex.IsNotNull() ) { m_OutputImageMutex->Unlock(); }
+  m_OutputImageMutex->unlock();
 
   return S_OK;
 }
@@ -87,7 +85,7 @@ void USTelemedScanConverterPlugin::ReleasePlugin()
   }
 }
 
-void USTelemedScanConverterPlugin::SetOutputImage(mitk::Image::Pointer outputImage, itk::FastMutexLock::Pointer outputImageMutex)
+void USTelemedScanConverterPlugin::SetOutputImage(mitk::Image::Pointer outputImage, std::mutex* outputImageMutex)
 {
   m_OutputImage = outputImage;
   m_OutputImageMutex = outputImageMutex;

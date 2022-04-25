@@ -12,12 +12,16 @@ found in the LICENSE file.
 
 #include "QmitknnUNetToolGUI.h"
 
+#include "mitkProcessExecutor.h"
 #include "mitknnUnetTool.h"
 #include <QApplication>
 #include <QDir>
 #include <QIcon>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QmitkStyleManager.h>
 #include <QtGlobal>
+#include <itksys/SystemTools.hxx>
 #include <set>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitknnUNetToolGUI, "")
@@ -63,27 +67,23 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   connect(m_Controls.taskBox, SIGNAL(currentTextChanged(const QString &)), this, SLOT(OnTaskChanged(const QString &)));
   connect(
     m_Controls.plannerBox, SIGNAL(currentTextChanged(const QString &)), this, SLOT(OnTrainerChanged(const QString &)));
-  connect(m_Controls.nopipBox, SIGNAL(stateChanged(int)), this, SLOT(OnCheckBoxChanged(int)));
   connect(m_Controls.multiModalBox, SIGNAL(stateChanged(int)), this, SLOT(OnCheckBoxChanged(int)));
   connect(m_Controls.multiModalSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnModalitiesNumberChanged(int)));
   connect(m_Controls.pythonEnvComboBox,
 #if QT_VERSION >= 0x050F00 // 5.15
           SIGNAL(textActivated(const QString &)),
 #elif QT_VERSION >= 0x050C00 // 5.12
-          SIGNAL(activated(const QString &)),
+          SIGNAL(currentTextChanged(const QString &)),
 #endif
           this,
           SLOT(OnPythonPathChanged(const QString &)));
   connect(m_Controls.refreshdirectoryBox, SIGNAL(clicked()), this, SLOT(OnRefreshPresssed()));
   connect(m_Controls.clearCacheButton, SIGNAL(clicked()), this, SLOT(OnClearCachePressed()));
 
-  m_Controls.codedirectoryBox->setVisible(false);
-  m_Controls.nnUnetdirLabel->setVisible(false);
   m_Controls.multiModalSpinBox->setVisible(false);
+  m_Controls.multiModalSpinBox->setEnabled(false);
   m_Controls.multiModalSpinLabel->setVisible(false);
   m_Controls.previewButton->setEnabled(false);
-
-  m_Controls.stopButton->setVisible(false); // Hidden for future
 
   QIcon refreshIcon =
     QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/view-refresh.svg"));
@@ -107,12 +107,9 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   mainLayout->addLayout(m_Controls.verticalLayout);
   Superclass::InitializeUI(mainLayout);
   m_UI_ROWS = m_Controls.advancedSettingsLayout->rowCount(); // Must do. Row count is correct only here.
-
-  if (nullptr != m_Controls.modeldirectoryBox)
-  {
-    QString setVal = m_Settings.value("nnUNet/LastRESULTS_FOLDERPath").toString();
-    m_Controls.modeldirectoryBox->setDirectory(setVal);
-  }
+  DisableEverything();
+  QString lastSelectedPyEnv = m_Settings.value("nnUNet/LastPythonPath").toString();
+  m_Controls.pythonEnvComboBox->setCurrentText(lastSelectedPyEnv);
 }
 
 void QmitknnUNetToolGUI::OnPreviewRequested()
@@ -120,6 +117,7 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
   mitk::nnUNetTool::Pointer tool = this->GetConnectedToolAs<mitk::nnUNetTool>();
   if (nullptr != tool)
   {
+    QString pythonPathTextItem = "";
     try
     {
       size_t hashKey(0);
@@ -135,54 +133,37 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
       {
         ProcessModelParams(tool);
       }
-      QString pythonPathTextItem = m_Controls.pythonEnvComboBox->currentText();
-      QString pythonPath = pythonPathTextItem.mid(pythonPathTextItem.indexOf(" ") + 1);
-      bool isNoPip = m_Controls.nopipBox->isChecked();
-#ifdef _WIN32
-      if (!isNoPip && !(pythonPath.endsWith("Scripts", Qt::CaseInsensitive) ||
-                        pythonPath.endsWith("Scripts/", Qt::CaseInsensitive)))
-      {
-        pythonPath += QDir::separator() + QString("Scripts");
-      }
-#else
-      if (!(pythonPath.endsWith("bin", Qt::CaseInsensitive) || pythonPath.endsWith("bin/", Qt::CaseInsensitive)))
-      {
-        pythonPath += QDir::separator() + QString("bin");
-      }
-#endif
-      std::string nnUNetDirectory;
-      if (isNoPip)
-      {
-        nnUNetDirectory = m_Controls.codedirectoryBox->directory().toStdString();
-      }
-      else if (!IsNNUNetInstalled(pythonPath))
+      pythonPathTextItem = m_Controls.pythonEnvComboBox->currentText();
+      QString pythonPath = m_PythonPath;
+      if (!IsNNUNetInstalled(pythonPath))
       {
         throw std::runtime_error("nnUNet is not detected in the selected python environment. Please select a valid "
                                  "python environment or install nnUNet.");
       }
-
-      tool->SetnnUNetDirectory(nnUNetDirectory);
       tool->SetPythonPath(pythonPath.toStdString());
       tool->SetModelDirectory(m_ParentFolder->getResultsFolder().toStdString());
       // checkboxes
       tool->SetMirror(m_Controls.mirrorBox->isChecked());
       tool->SetMixedPrecision(m_Controls.mixedPrecisionBox->isChecked());
-      tool->SetNoPip(isNoPip);
+      tool->SetNoPip(false);
       bool doCache = m_Controls.enableCachingCheckBox->isChecked();
       // Spinboxes
       tool->SetGpuId(FetchSelectedGPUFromUI());
       // Multi-Modal
       tool->MultiModalOff();
-      if (m_Controls.multiModalBox->isChecked() && m_Controls.multiModalSpinBox->value() > 0)
+      if (m_Controls.multiModalBox->isChecked())
       {
-        tool->m_OtherModalPaths.clear();
-        tool->m_OtherModalPaths = FetchMultiModalImagesFromUI();
-        tool->MultiModalOn();
-      }
-      else
-      {
-        throw std::runtime_error("Please select more than one modalities for a multi-modal task. If you "
-                                 "would like to use only one modality then uncheck the Multi-Modal option.");
+        if (m_Controls.multiModalSpinBox->value() > 0)
+        {
+          tool->m_OtherModalPaths.clear();
+          tool->m_OtherModalPaths = FetchMultiModalImagesFromUI();
+          tool->MultiModalOn();
+        }
+        else
+        {
+          throw std::runtime_error("Please select more than one modalities for a multi-modal task. If you "
+                                   "would like to use only one modality then uncheck the Multi-Modal option.");
+        }
       }
       if (doCache)
       {
@@ -218,8 +199,8 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
         {
           nnUNetCache *cacheObject = m_Cache[hashKey];
           MITK_INFO << "fetched pointer " << cacheObject->m_SegCache.GetPointer();
-          tool->SetNodeProperties(const_cast<mitk::LabelSetImage *>(cacheObject->m_SegCache.GetPointer()));
-          SegmentationResultHandler(tool);
+          tool->SetOutputBuffer(const_cast<mitk::LabelSetImage *>(cacheObject->m_SegCache.GetPointer()));
+          SegmentationResultHandler(tool, true);
         }
       }
       m_Controls.previewButton->setEnabled(true);
@@ -241,6 +222,10 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
       m_Controls.previewButton->setEnabled(true);
       tool->PredictOff();
       return;
+    }
+    if (!pythonPathTextItem.isEmpty())
+    { // only cache if the prediction ended without errors.
+      m_Settings.setValue("nnUNet/LastPythonPath", pythonPathTextItem);
     }
   }
 }
@@ -283,7 +268,9 @@ bool QmitknnUNetToolGUI::IsNNUNetInstalled(const QString &pythonPath)
   }
 #endif
   fullPath = fullPath.mid(fullPath.indexOf(" ") + 1);
-  return QFile::exists(fullPath + QDir::separator() + QString("nnUNet_predict"));
+  bool isExists = QFile::exists(fullPath + QDir::separator() + QString("nnUNet_predict")) &&
+                  QFile::exists(fullPath + QDir::separator() + QString("python3"));
+  return isExists;
 }
 
 void QmitknnUNetToolGUI::ShowErrorMessage(const std::string &message, QMessageBox::Icon icon)
@@ -432,14 +419,15 @@ std::pair<QStringList, QStringList> QmitknnUNetToolGUI::ExtractTrainerPlannerFro
 std::vector<std::string> QmitknnUNetToolGUI::FetchSelectedFoldsFromUI(ctkCheckableComboBox *foldBox)
 {
   std::vector<std::string> folds;
-  if (!(foldBox->allChecked() || foldBox->noneChecked()))
+  if (foldBox->noneChecked())
   {
-    QModelIndexList foldList = foldBox->checkedIndexes();
-    for (const auto &index : foldList)
-    {
-      QString foldQString = foldBox->itemText(index.row()).split("_", QString::SplitBehavior::SkipEmptyParts).last();
-      folds.push_back(foldQString.toStdString());
-    }
+    CheckAllInCheckableComboBox(foldBox);
+  }
+  QModelIndexList foldList = foldBox->checkedIndexes();
+  for (const auto &index : foldList)
+  {
+    QString foldQString = foldBox->itemText(index.row()).split("_", QString::SplitBehavior::SkipEmptyParts).last();
+    folds.push_back(foldQString.toStdString());
   }
   return folds;
 }
@@ -491,5 +479,110 @@ unsigned int QmitknnUNetToolGUI::FetchSelectedGPUFromUI()
   {
     QString gpuId = gpuInfo.split(":", QString::SplitBehavior::SkipEmptyParts).first();
     return static_cast<unsigned int>(gpuId.toInt());
+  }
+}
+
+QString QmitknnUNetToolGUI::FetchResultsFolderFromEnv()
+{
+  const char *pathVal = itksys::SystemTools::GetEnv("RESULTS_FOLDER");
+  QString retVal;
+  if (pathVal)
+  {
+    retVal = QString::fromUtf8(pathVal);
+  }
+  else
+  {
+    retVal = m_Settings.value("nnUNet/LastRESULTS_FOLDERPath").toString();
+  }
+  return retVal;
+}
+
+QString QmitknnUNetToolGUI::DumpJSONfromPickle(const QString &parentPath)
+{
+  const QString picklePath = parentPath + QDir::separator() + QString("plans.pkl");
+  const QString jsonPath = parentPath + QDir::separator() + QString("mitk_export.json");
+  if (!QFile::exists(jsonPath))
+  {
+    mitk::ProcessExecutor::Pointer spExec = mitk::ProcessExecutor::New();
+    itk::CStyleCommand::Pointer spCommand = itk::CStyleCommand::New();
+    mitk::ProcessExecutor::ArgumentListType args;
+    args.push_back("-c");
+    std::string pythonCode; // python syntax to parse plans.pkl file and export as Json file.
+    pythonCode.append("import pickle;");
+    pythonCode.append("import json;");
+    pythonCode.append("loaded_pickle = pickle.load(open('");
+    pythonCode.append(picklePath.toStdString());
+    pythonCode.append("','rb'));");
+    pythonCode.append("modal_dict = {key: loaded_pickle[key] for key in loaded_pickle.keys() if key in "
+                      "['modalities','num_modalities']};");
+    pythonCode.append("json.dump(modal_dict, open('");
+    pythonCode.append(jsonPath.toStdString());
+    pythonCode.append("', 'w'))");
+
+    args.push_back(pythonCode);
+    try
+    {
+      spExec->Execute(m_PythonPath.toStdString(), "python3", args);
+    }
+    catch (const mitk::Exception &e)
+    {
+      MITK_ERROR << "Pickle parsing FAILED!" << e.GetDescription(); // SHOW ERROR
+      WriteStatusMessage(
+        "Parsing failed in backend. Multiple Modalities will now have to be manually entered by the user.");
+      return QString("");
+    }
+  }
+  return jsonPath;
+}
+
+void QmitknnUNetToolGUI::DisplayMultiModalInfoFromJSON(const QString &jsonPath)
+{
+  if (QFile::exists(jsonPath))
+  {
+    QFile file(jsonPath);
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+      QByteArray bytes = file.readAll();
+      file.close();
+
+      QJsonParseError jsonError;
+      QJsonDocument document = QJsonDocument::fromJson(bytes, &jsonError);
+      if (jsonError.error != QJsonParseError::NoError)
+      {
+        MITK_INFO << "fromJson failed: " << jsonError.errorString().toStdString() << endl;
+        return;
+      }
+      if (document.isObject())
+      {
+        QJsonObject jsonObj = document.object();
+        int num_mods = jsonObj["num_modalities"].toInt();
+        ClearAllModalLabels();
+        if (num_mods > 1)
+        {
+          m_Controls.multiModalBox->setChecked(true);
+          m_Controls.multiModalBox->setEnabled(false);
+          m_Controls.multiModalSpinBox->setValue(num_mods - 1);
+          m_Controls.advancedSettingsLayout->update();
+          QJsonObject obj = jsonObj.value("modalities").toObject();
+          QStringList keys = obj.keys();
+          int count = 0;
+          for (auto key : keys)
+          {
+            auto value = obj.take(key);
+            QLabel *label = new QLabel("<i>" + value.toString() + "</i>", this);
+            m_ModalLabels.push_back(label);
+            m_Controls.advancedSettingsLayout->addWidget(label, m_UI_ROWS + 1 + count, 0);
+            count++;
+          }
+          m_Controls.multiModalSpinBox->setMinimum(num_mods - 1);
+          m_Controls.advancedSettingsLayout->update();
+        }
+        else
+        {
+          m_Controls.multiModalSpinBox->setMinimum(0);
+          m_Controls.multiModalBox->setChecked(false);
+        }
+      }
+    }
   }
 }

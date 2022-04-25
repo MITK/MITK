@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>300</width>
+    <width>319</width>
     <height>600</height>
    </rect>
   </property>
@@ -21,7 +21,7 @@
   </property>
   <layout class="QVBoxLayout">
    <item>
-   <layout class="QGridLayout" name="gridLayout">
+    <layout class="QGridLayout" name="gridLayout">
      <item row="0" column="0">
       <widget class="QLabel" name="volumeSelectionLabel">
        <property name="text">
@@ -45,35 +45,39 @@
        </property>
       </widget>
      </item>
-	</layout>
+    </layout>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QCheckBox" name="enableRenderingCB">
-       <property name="toolTip">
-        <string>Click this checkbox to enable volumerendering in the 3D view of the selected image</string>
-       </property>
-       <property name="text">
-        <string>Volumerendering</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="renderMode">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
-         <verstretch>1</verstretch>
+         <verstretch>0</verstretch>
         </sizepolicy>
        </property>
        <property name="toolTip">
-        <string>Select render mode</string>
+        <string>Enable volume rendering of the selected image in the 3D view</string>
+       </property>
+       <property name="text">
+        <string>Volume rendering</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="blendMode"/>
+      <widget class="QLabel" name="lblBlendMode">
+       <property name="text">
+        <string>Blend mode:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="blendMode">
+       <property name="toolTip">
+        <string>Switch between different blend modes</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

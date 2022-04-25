@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <mitkIGTConfig.h>
 #include <mitkTrackingDevice.h>
 #include <mitkPolhemusTool.h>
-#include <itkMultiThreader.h>
+#include <thread>
 
 namespace mitk
 {
@@ -149,12 +149,11 @@ namespace mitk
     */
     PolhemusInterface* GetDevice();
 
-    static ITK_THREAD_RETURN_TYPE ThreadStartTracking(void* data);
+    void ThreadStartTracking();
 
     std::vector<PolhemusTool::Pointer> m_AllTools; ///< vector holding all tools
     PolhemusInterface::Pointer m_Device; ///< represents the interface to the tracking hardware
-    itk::MultiThreader::Pointer m_MultiThreader;
-    int m_ThreadID;
+    std::thread m_Thread;
     bool m_HemisphereTrackingEnabled;
   };
 }//mitk

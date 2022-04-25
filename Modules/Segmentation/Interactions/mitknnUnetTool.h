@@ -18,8 +18,8 @@ found in the LICENSE file.
 #include "mitkToolManager.h"
 #include <MitkSegmentationExports.h>
 #include <mitkStandardFileLocations.h>
-#include <utility>
 #include <numeric>
+#include <utility>
 
 namespace us
 {
@@ -44,7 +44,7 @@ namespace mitk
     std::string timeStamp;
 
     size_t generateHash() const
-    { 
+    {
       std::string toHash;
       std::string foldsConcatenated = std::accumulate(folds.begin(), folds.end(), std::string(""));
       toHash += this->task;
@@ -160,7 +160,7 @@ namespace mitk
 
     mitk::DataNode *GetRefNode();
 
-    void SetNodeProperties(LabelSetImage::Pointer) override;
+    void SetOutputBuffer(LabelSetImage::Pointer);
 
   protected:
     /**
@@ -190,7 +190,6 @@ namespace mitk
      * @return LabelSetImage::Pointer
      */
     LabelSetImage::Pointer ComputeMLPreview(const Image *inputAtTimeStep, TimeStepType timeStep) override;
-    void UpdateCleanUp() override;
 
   private:
     std::string m_MitkTempDir;

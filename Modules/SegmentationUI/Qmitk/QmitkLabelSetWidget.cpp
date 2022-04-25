@@ -29,7 +29,6 @@ found in the LICENSE file.
 #include <QmitkDataStorageComboBox.h>
 #include <QmitkNewSegmentationDialog.h>
 #include <QmitkStyleManager.h>
-#include <QmitkSearchLabelDialog.h>
 
 // Qt
 #include <QColorDialog>
@@ -45,12 +44,8 @@ found in the LICENSE file.
 // itk
 #include <itksys/SystemTools.hxx>
 
-// todo:
-// berry
-//#include <berryIPreferencesService.h>
-
 QmitkLabelSetWidget::QmitkLabelSetWidget(QWidget *parent)
-  : QWidget(parent), m_DataStorage(nullptr), m_Completer(nullptr), m_ToolManager(nullptr)
+  : QWidget(parent), m_DataStorage(nullptr), m_Completer(nullptr), m_ToolManager(nullptr), m_ProcessingManualSelection(false)
 {
   m_Controls.setupUi(this);
 
@@ -68,9 +63,6 @@ QmitkLabelSetWidget::QmitkLabelSetWidget(QWidget *parent)
   m_Controls.m_LabelSearchBox->setCompleter(m_Completer);
 
   connect(m_Controls.m_LabelSearchBox, SIGNAL(returnPressed()), this, SLOT(OnSearchLabel()));
-  // connect( m_Controls.m_LabelSetTableWidget, SIGNAL(labelListModified(const QStringList&)), this, SLOT(
-  // OnLabelListModified(const QStringList&)) );
-  // connect( m_Controls.m_LabelSetTableWidget, SIGNAL(mergeLabel(int)), this, SLOT( OnMergeLabel(int)) );
 
   QStringListModel *completeModel = static_cast<QStringListModel *>(m_Completer->model());
   completeModel->setStringList(GetLabelStringList());
@@ -110,23 +102,23 @@ void QmitkLabelSetWidget::OnTableViewContextMenuRequested(const QPoint & /*pos*/
     QObject::connect(eraseLabelsAction, SIGNAL(triggered(bool)), this, SLOT(OnEraseLabels(bool)));
     menu->addAction(eraseLabelsAction);
 
-    QAction *combineAndCreateSurfaceAction =
+    /*QAction* combineAndCreateSurfaceAction =
       new QAction(QIcon(":/Qmitk/CreateSurface.png"), "Combine and create a surface", this);
     combineAndCreateSurfaceAction->setEnabled(true);
     QObject::connect(
-      combineAndCreateSurfaceAction, SIGNAL(triggered(bool)), this, SLOT(OnCombineAndCreateSurface(bool)));
+      combineAndCreateSurfaceAction, SIGNAL(triggered(bool)), this, SLOT(OnCombineAndCreateSurface(bool)));*/
     // menu->addAction(combineAndCreateSurfaceAction); Not implemented
 
-    QAction *createMasksAction =
+    /*QAction* createMasksAction =
       new QAction(QIcon(":/Qmitk/CreateMask.png"), "Create a mask for each selected label", this);
     createMasksAction->setEnabled(true);
-    QObject::connect(createMasksAction, SIGNAL(triggered(bool)), this, SLOT(OnCreateMasks(bool)));
+    QObject::connect(createMasksAction, SIGNAL(triggered(bool)), this, SLOT(OnCreateMasks(bool)));*/
     // menu->addAction(createMasksAction); Not implemented
 
-    QAction *combineAndCreateMaskAction =
+    /*QAction* combineAndCreateMaskAction =
       new QAction(QIcon(":/Qmitk/CreateMask.png"), "Combine and create a mask", this);
     combineAndCreateMaskAction->setEnabled(true);
-    QObject::connect(combineAndCreateMaskAction, SIGNAL(triggered(bool)), this, SLOT(OnCombineAndCreateMask(bool)));
+    QObject::connect(combineAndCreateMaskAction, SIGNAL(triggered(bool)), this, SLOT(OnCombineAndCreateMask(bool)));*/
     // menu->addAction(combineAndCreateMaskAction); Not implemented
   }
   else
@@ -145,11 +137,6 @@ void QmitkLabelSetWidget::OnTableViewContextMenuRequested(const QPoint & /*pos*/
     eraseAction->setEnabled(true);
     QObject::connect(eraseAction, SIGNAL(triggered(bool)), this, SLOT(OnEraseLabel(bool)));
     menu->addAction(eraseAction);
-
-    QAction *mergeAction = new QAction(QIcon(":/Qmitk/MergeLabels.png"), "Merge...", this);
-    mergeAction->setEnabled(true);
-    QObject::connect(mergeAction, SIGNAL(triggered(bool)), this, SLOT(OnMergeLabel(bool)));
-    menu->addAction(mergeAction);
 
     QAction *randomColorAction = new QAction(QIcon(":/Qmitk/RandomColor.png"), "Random color", this);
     randomColorAction->setEnabled(true);
@@ -289,34 +276,6 @@ void QmitkLabelSetWidget::OnSetOnlyActiveLabelVisible(bool /*value*/)
   UpdateAllTableWidgetItems();
 }
 
-void QmitkLabelSetWidget::OnMergeLabel(bool /*value*/)
-{
-  QmitkSearchLabelDialog dialog(this);
-  dialog.setWindowTitle("Select a second label..");
-  dialog.SetLabelSuggestionList(GetLabelStringList());
-  int dialogReturnValue = dialog.exec();
-  if (dialogReturnValue == QDialog::Rejected)
-    return;
-
-  int sourcePixelValue = -1;
-  for (int i = 0; i < m_Controls.m_LabelSetTableWidget->rowCount(); i++)
-  {
-    if (dialog.GetLabelSetWidgetTableCompleteWord() == QString(m_Controls.m_LabelSetTableWidget->item(i, 0)->text()))
-      sourcePixelValue = m_Controls.m_LabelSetTableWidget->item(i, 0)->data(Qt::UserRole).toInt();
-  }
-
-  if (sourcePixelValue == -1)
-  {
-    MITK_INFO << "unknown label";
-    return;
-  }
-
-  int pixelValue = GetPixelValueOfSelectedItem();
-  GetWorkingImage()->MergeLabel(pixelValue, sourcePixelValue, GetWorkingImage()->GetActiveLayer());
-
-  UpdateAllTableWidgetItems();
-}
-
 void QmitkLabelSetWidget::OnEraseLabel(bool /*value*/)
 {
   int pixelValue = GetPixelValueOfSelectedItem();
@@ -430,7 +389,7 @@ void QmitkLabelSetWidget::OnEraseLabels(bool /*value*/)
 
 void QmitkLabelSetWidget::OnRemoveLabels(bool /*value*/)
 {
-  QString question = "Do you really want to remove selected labels?";
+  QString question = "Do you really want to remove the selected labels?";
   QMessageBox::StandardButton answerButton = QMessageBox::question(
     this, "Remove selected labels", question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
 
@@ -631,8 +590,9 @@ void QmitkLabelSetWidget::OnItemClicked(QTableWidgetItem *item)
   QList<QTableWidgetSelectionRange> ranges = m_Controls.m_LabelSetTableWidget->selectedRanges();
   if (!ranges.empty() && ranges.back().rowCount() == 1)
   {
-    SelectLabelByPixelValue(pixelValue);
+    m_ProcessingManualSelection = true;
     OnActiveLabelChanged(pixelValue);
+    m_ProcessingManualSelection = false;
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
@@ -661,19 +621,16 @@ void QmitkLabelSetWidget::OnItemDoubleClicked(QTableWidgetItem *item)
 
 void QmitkLabelSetWidget::SelectLabelByPixelValue(mitk::Label::PixelType pixelValue)
 {
-  // MITK_INFO << "QmitkLabelSetWidget::SelectLabelByPixelValue " << pixelValue;
-
-  if (!GetWorkingImage()->ExistLabel(pixelValue))
+  if (m_ProcessingManualSelection || !GetWorkingImage()->ExistLabel(pixelValue))
     return;
+
   for (int row = 0; row < m_Controls.m_LabelSetTableWidget->rowCount(); row++)
   {
     if (m_Controls.m_LabelSetTableWidget->item(row, 0)->data(Qt::UserRole).toInt() == pixelValue)
     {
       m_Controls.m_LabelSetTableWidget->clearSelection();
-      m_Controls.m_LabelSetTableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
       m_Controls.m_LabelSetTableWidget->selectRow(row);
       m_Controls.m_LabelSetTableWidget->scrollToItem(m_Controls.m_LabelSetTableWidget->item(row, 0));
-      m_Controls.m_LabelSetTableWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
       return;
     }
   }
@@ -880,30 +837,28 @@ QStringList &QmitkLabelSetWidget::GetLabelStringList()
 
 void QmitkLabelSetWidget::InitializeTableWidget()
 {
-  QTableWidget *tableWidged = m_Controls.m_LabelSetTableWidget;
+  QTableWidget *tableWidget = m_Controls.m_LabelSetTableWidget;
 
-  tableWidged->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
-  tableWidged->setTabKeyNavigation(false);
-  tableWidged->setAlternatingRowColors(false);
-  tableWidged->setFocusPolicy(Qt::NoFocus);
-  tableWidged->setColumnCount(4);
-  tableWidged->resizeColumnToContents(NAME_COL);
-  tableWidged->setColumnWidth(LOCKED_COL, 25);
-  tableWidged->setColumnWidth(COLOR_COL, 25);
-  tableWidged->setColumnWidth(VISIBLE_COL, 25);
-  tableWidged->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
-  tableWidged->setContextMenuPolicy(Qt::CustomContextMenu);
-  tableWidged->horizontalHeader()->hide();
-  tableWidged->setSortingEnabled(false);
-  tableWidged->verticalHeader()->hide();
-  tableWidged->setEditTriggers(QAbstractItemView::NoEditTriggers);
-  tableWidged->setSelectionMode(QAbstractItemView::ExtendedSelection);
-  tableWidged->setSelectionBehavior(QAbstractItemView::SelectRows);
+  tableWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
+  tableWidget->setTabKeyNavigation(false);
+  tableWidget->setAlternatingRowColors(false);
+  tableWidget->setFocusPolicy(Qt::NoFocus);
+  tableWidget->setColumnCount(4);
+  tableWidget->resizeColumnToContents(NAME_COL);
+  tableWidget->setColumnWidth(LOCKED_COL, 25);
+  tableWidget->setColumnWidth(COLOR_COL, 25);
+  tableWidget->setColumnWidth(VISIBLE_COL, 25);
+  tableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+  tableWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+  tableWidget->horizontalHeader()->hide();
+  tableWidget->setSortingEnabled(false);
+  tableWidget->verticalHeader()->hide();
+  tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-  connect(tableWidged, SIGNAL(itemClicked(QTableWidgetItem *)), this, SLOT(OnItemClicked(QTableWidgetItem *)));
+  connect(tableWidget, SIGNAL(itemClicked(QTableWidgetItem *)), this, SLOT(OnItemClicked(QTableWidgetItem *)));
   connect(
-    tableWidged, SIGNAL(itemDoubleClicked(QTableWidgetItem *)), this, SLOT(OnItemDoubleClicked(QTableWidgetItem *)));
-  connect(tableWidged,
+    tableWidget, SIGNAL(itemDoubleClicked(QTableWidgetItem *)), this, SLOT(OnItemDoubleClicked(QTableWidgetItem *)));
+  connect(tableWidget,
           SIGNAL(customContextMenuRequested(const QPoint &)),
           this,
           SLOT(OnTableViewContextMenuRequested(const QPoint &)));
@@ -977,10 +932,8 @@ void QmitkLabelSetWidget::OnSearchLabel()
   }
 
   m_Controls.m_LabelSetTableWidget->clearSelection();
-  m_Controls.m_LabelSetTableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
   m_Controls.m_LabelSetTableWidget->selectRow(row);
   m_Controls.m_LabelSetTableWidget->scrollToItem(nameItem);
-  m_Controls.m_LabelSetTableWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
   GetWorkingImage()->GetActiveLabelSet()->SetActiveLabel(pixelValue);
 

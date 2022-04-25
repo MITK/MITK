@@ -96,6 +96,7 @@ namespace mitk
     static const QString ARG_STORAGE_DIR;
     static const QString ARG_XARGS;
     static const QString ARG_LOG_QT_MESSAGES;
+    static const QString ARG_SEGMENTATION_LABELSET_PRESET;
 
     // BlueBerry specific plugin framework properties
 

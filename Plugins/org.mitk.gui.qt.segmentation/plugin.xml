@@ -54,9 +54,7 @@
     <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Live Wire" />
     <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Fast Marching" />
     <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Threshold" />
-    <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Watershed" />
     <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Picking" />
-    <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Watershed" />
     <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Annotation annote" />
     <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Labeling" />
     <keyword id="org.mitk.views.segmentation.ViewKeyword"  label="Tools" />

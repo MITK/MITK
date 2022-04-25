@@ -101,7 +101,7 @@ protected slots:
    * @brief Qthread to capture sucessfull nnUNet segmentation.
    * Further, renders the LabelSet image
    */
-  void SegmentationResultHandler(mitk::nnUNetTool *);
+  void SegmentationResultHandler(mitk::nnUNetTool *, bool forceRender = false);
 
   /**
    * @brief Qt Slot
@@ -136,6 +136,41 @@ protected:
   void EnableWidgets(bool enabled) override;
 
 private:
+
+  /**
+   * @brief Clears all displayed modal labels and widgets from GUI.
+   * 
+   */
+  void ClearAllModalities();
+
+  /**
+   * @brief Parses Json file containing modality info and populates
+   * labels and selection widgets accordingly on the GUI.
+   */
+  void DisplayMultiModalInfoFromJSON(const QString&);
+
+  /**
+   * @brief Clears all modality labels previously populated from GUI
+   * 
+   */
+
+  void ClearAllModalLabels();
+
+  /**
+   * @brief Runs a set of python commands to read "plans.pkl" and extract
+   * modality information required for inferencing. This information is exported
+   * as json file : "mitk_export.json".
+   *
+   * @return QString 
+   */
+  QString DumpJSONfromPickle(const QString&);
+
+  /**
+   * @brief Searches RESULTS_FOLDER environment variable. If not found,
+   * returns from the QSettings stored last used path value.
+   * @return QString 
+   */
+  QString FetchResultsFolderFromEnv();
   
   /**
    * @brief Returns GPU id of the selected GPU from the Combo box.
@@ -221,6 +256,12 @@ private:
   void ClearAllComboBoxes();
 
   /**
+   * @brief Disable/deactivates the nnUNet GUI.
+   * Clears any multi modal labels and selection widgets, as well.
+   */
+  void DisableEverything();
+
+  /**
    * @brief Checks if nnUNet_predict command is valid in the selected python virtual environment.
    *
    * @return bool
@@ -263,10 +304,13 @@ private:
    *
    */
   std::vector<QmitkDataStorageComboBox *> m_Modalities;
+  std::vector<QLabel*> m_ModalLabels;
 
   std::vector<std::unique_ptr<QmitknnUNetTaskParamsUITemplate>> m_EnsembleParams;
 
   mitk::NodePredicateBase::Pointer m_MultiModalPredicate;
+
+  QString m_PythonPath;
 
   /**
    * @brief Stores row count of the "advancedSettingsLayout" layout element. This value helps dynamically add

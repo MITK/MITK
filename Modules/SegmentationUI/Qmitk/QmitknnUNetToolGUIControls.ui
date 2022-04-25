@@ -46,20 +46,20 @@
    </property>
    <item>
     <layout class="QGridLayout" name="advancedSettingsLayout">
-     <item row="4" column="3">
+     <item row="5" column="3">
       <widget class="ctkComboBox" name="plannerBox"/>
      </item>
-     <item row="4" column="1">
+     <item row="5" column="1">
       <widget class="ctkComboBox" name="trainerBox"/>
      </item>
-     <item row="2" column="1" colspan="3">
+     <item row="3" column="1" colspan="3">
       <widget class="QPushButton" name="refreshdirectoryBox">
        <property name="text">
         <string>Refresh Results Folder</string>
        </property>
       </widget>
      </item>
-     <item row="6" column="0">
+     <item row="1" column="0">
       <widget class="QLabel" name="pythonEnvLabel">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -72,7 +72,7 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="2">
+     <item row="5" column="2">
       <widget class="QLabel" name="plannerLabel">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -85,7 +85,7 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="0">
+     <item row="5" column="0">
       <widget class="QLabel" name="trainerLabel">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -98,7 +98,7 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="0">
+     <item row="2" column="0">
       <widget class="QLabel" name="pretraineddirLabel">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -111,15 +111,8 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="3">
+     <item row="4" column="1">
       <widget class="ctkComboBox" name="taskBox"/>
-     </item>
-     <item row="5" column="3">
-      <widget class="QPushButton" name="stopButton">
-       <property name="text">
-        <string>Stop</string>
-       </property>
-      </widget>
      </item>
      <item row="7" column="1">
       <widget class="ctkCheckBox" name="multiModalBox"/>
@@ -146,7 +139,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Welcome to nnUNet in MITK. [Experimental]&lt;/p&gt;&lt;p&gt;Please note that this is only an interface to nnUNet. MITK does not ship with nnUNet. Make sure to have a working Python environment with nnUNet set up beforehand. Choose that environment in the Python Path before inferencing.&lt;/p&gt;&lt;p&gt;Refer to &lt;a href=&quot;https://github.com/MIC-DKFZ/nnUNet&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/MIC-DKFZ/nnUNet&lt;/span&gt;&lt;/a&gt; to learn everything about the nnUNet.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Welcome to nnUNet in MITK. [Experimental]&lt;/p&gt;&lt;p&gt;Please note that this is only an interface to nnUNet. MITK does not ship with nnUNet. Make sure to have a working Python environment with nnUNet set up beforehand. Choose that environment in the Python Path before inferencing. &lt;/p&gt;&lt;p&gt;Refer to &lt;a href=&quot;https://github.com/MIC-DKFZ/nnUNet&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/MIC-DKFZ/nnUNet&lt;/span&gt;&lt;/a&gt; to learn everything about the nnUNet.&lt;/p&gt;&lt;p&gt;Also, note that if multiple Preview objects are selected to Confirm, they will be merged. &lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="textFormat">
         <enum>Qt::RichText</enum>
@@ -156,20 +149,20 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="1" colspan="3">
+     <item row="2" column="1" colspan="3">
       <widget class="ctkDirectoryButton" name="modeldirectoryBox" native="true"/>
      </item>
-     <item row="3" column="0">
+     <item row="4" column="2">
       <widget class="QLabel" name="modelLabel">
        <property name="text">
         <string>Configuration:</string>
        </property>
       </widget>
      </item>
-     <item row="3" column="1">
+     <item row="4" column="3">
       <widget class="ctkComboBox" name="modelBox"/>
      </item>
-     <item row="3" column="2">
+     <item row="4" column="0">
       <widget class="QLabel" name="taskLabel">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -182,7 +175,7 @@
        </property>
       </widget>
      </item>
-     <item row="5" column="1">
+     <item row="6" column="1">
       <widget class="ctkCheckableComboBox" name="foldBox"/>
      </item>
      <item row="7" column="2">
@@ -198,14 +191,14 @@
        </property>
       </widget>
      </item>
-     <item row="5" column="0">
+     <item row="6" column="0">
       <widget class="QLabel" name="foldLabel">
        <property name="text">
         <string>Fold:</string>
        </property>
       </widget>
      </item>
-     <item row="6" column="1" colspan="3">
+     <item row="1" column="1" colspan="3">
       <widget class="ctkComboBox" name="pythonEnvComboBox"/>
      </item>
      <item row="7" column="3">
@@ -254,22 +247,6 @@
         <property name="spacing">
          <number>6</number>
         </property>
-        <item row="0" column="0">
-         <widget class="QLabel" name="nopipLabel">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>No Pip:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="ctkCheckBox" name="nopipBox"/>
-        </item>
         <item row="0" column="2">
          <widget class="QLabel" name="mixedPrecisionLabel">
           <property name="sizePolicy">
@@ -326,23 +303,7 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="nnUnetdirLabel">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>nnUNet Path:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1" colspan="3">
-         <widget class="ctkDirectoryButton" name="codedirectoryBox" native="true"/>
-        </item>
-        <item row="4" column="0">
+        <item row="0" column="0">
          <widget class="QLabel" name="postProcessingLabel">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -355,7 +316,7 @@
           </property>
          </widget>
         </item>
-        <item row="4" column="1">
+        <item row="0" column="1">
          <widget class="ctkCheckBox" name="postProcessingCheckBox">
           <property name="checked">
            <bool>true</bool>

@@ -179,7 +179,6 @@ set(CPP_FILES
   DataManagement/mitkVtkRepresentationProperty.cpp
   DataManagement/mitkVtkResliceInterpolationProperty.cpp
   DataManagement/mitkVtkScalarModeProperty.cpp
-  DataManagement/mitkVtkVolumeRenderingProperty.cpp
   DataManagement/mitkWeakPointerProperty.cpp
   DataManagement/mitkIPropertyRelations.cpp
   DataManagement/mitkPropertyRelations.cpp

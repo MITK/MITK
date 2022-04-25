@@ -73,23 +73,8 @@ mitk::Mapper::Pointer mitk::SegmentationObjectFactory::CreateMapper(mitk::DataNo
   return newMapper;
 }
 
-void mitk::SegmentationObjectFactory::SetDefaultProperties(mitk::DataNode *node)
+void mitk::SegmentationObjectFactory::SetDefaultProperties(mitk::DataNode *)
 {
-  if (node == nullptr)
-    return;
-
-  mitk::DataNode::Pointer nodePointer = node;
-
-  //  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
-  //  if(image.IsNotNull() && image->IsInitialized())
-  //  {
-  //    mitk::GPUVolumeMapper3D::SetDefaultProperties(node);
-  //  }
-  //
-  //  if (dynamic_cast<mitk::UnstructuredGrid*>(node->GetData()))
-  //  {
-  //    mitk::UnstructuredGridVtkMapper3D::SetDefaultProperties(node);
-  //  }
 }
 
 std::string mitk::SegmentationObjectFactory::GetFileExtensions()

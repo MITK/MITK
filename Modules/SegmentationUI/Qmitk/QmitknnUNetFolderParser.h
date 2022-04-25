@@ -121,6 +121,26 @@ public:
   }
 
   /**
+   * @brief Returns all the task names present in the root node with possible duplicates.
+   * Template function, type can be any of stl or Qt containers which supports push_back call.
+   * 
+   * @tparam T 
+   * @param taskName
+   * @return T (any of stl or Qt containers which supports push_back call)
+   */
+  template <typename T>
+  T getAllTasks()
+  {
+    T allTasks;
+    auto models = GetSubFolderNamesFromNode<T>(m_RootNode);
+    foreach (QString model, models)
+    {
+      allTasks << getTasksForModel<QStringList>(model);
+    }
+    return allTasks;
+  }
+
+  /**
    * @brief Returns the trainer / planner names for a given task & model. Template function, 
    * type can be any of stl or Qt containers which supports push_back call.
    * 

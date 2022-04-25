@@ -40,12 +40,6 @@ void mitk::nnUNetTool::Activated()
   Superclass::Activated();
 }
 
-void mitk::nnUNetTool::UpdateCleanUp()
-{
-  // This overriden method is intentionally left out for setting later upon demand
-  // in the `RenderOutputBuffer` method.
-}
-
 void mitk::nnUNetTool::RenderOutputBuffer()
 {
   if (m_OutputBuffer != nullptr)
@@ -69,10 +63,8 @@ void mitk::nnUNetTool::RenderOutputBuffer()
   }
 }
 
-void mitk::nnUNetTool::SetNodeProperties(LabelSetImage::Pointer segmentation)
+void mitk::nnUNetTool::SetOutputBuffer(LabelSetImage::Pointer segmentation)
 {
-  // This overriden method doesn't set node properties. Intentionally left out for setting later upon demand
-  // in the `RenderOutputBuffer` method.
   m_OutputBuffer = segmentation;
 }
 
@@ -321,6 +313,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     resultImage->InitializeByLabeledImage(outputImage);
     resultImage->SetGeometry(inputAtTimeStep->GetGeometry());
     m_InputBuffer = inputAtTimeStep;
+    m_OutputBuffer = resultImage;
     return resultImage;
   }
   catch (const mitk::Exception &e)

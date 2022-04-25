@@ -46,8 +46,7 @@ private Q_SLOTS:
 
   void OnMitkInternalPreset(int mode);
   void OnEnableRendering(bool state);
-  void OnRenderMode(int mode);
-  void OnBlendMode(int mode);
+  void OnBlendMode(int index);
   void OnSelectedTimePointChanged(const mitk::TimePointType &);
 
 protected:

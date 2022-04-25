@@ -62,7 +62,6 @@ set(CACHED_RESOURCE_FILES
   resources/Icons.svg
   resources/ImageMasking_48x48.png
   resources/MorphologicalOperations_48x48.png
-  resources/multilabelsegmentation.svg
   resources/multilabelsegmentation_utilities.svg
   resources/Opening_48x48.png
   resources/SurfaceToImage_48x48.png
@@ -70,7 +69,6 @@ set(CACHED_RESOURCE_FILES
 )
 
 set(QRC_FILES
-  resources/multilabelsegmentation.qrc
   resources/MultiLabelSegmentationUtilities.qrc
   resources/MorphologicalOperationsWidget.qrc
   resources/BooleanOperationsWidget.qrc
@@ -81,14 +79,6 @@ set(CPP_FILES)
 foreach(file ${SRC_CPP_FILES})
   set(CPP_FILES ${CPP_FILES} src/${file})
 endforeach(file ${SRC_CPP_FILES})
-
-#usFunctionEmbedResources(
-#CPP_FILES
-# LIBRARY_NAME "liborg_mitk_gui_qt_multilabelsegmentation"
-#ROOT_DIR resources
-#FILES Interactions/SegmentationInteraction.xml
-#      Interactions/ConfigSegmentation.xml
-#)
 
 foreach(file ${INTERNAL_CPP_FILES})
   set(CPP_FILES ${CPP_FILES} src/internal/${file})

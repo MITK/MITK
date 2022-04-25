@@ -1,5 +1,0 @@
-<RCC>
-  <qresource prefix="/multilabelsegmentation" >
-    <file>multilabelsegmentation.svg</file>
-  </qresource>
-</RCC>

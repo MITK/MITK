@@ -908,15 +908,7 @@ void QmitkAdaptiveRegionGrowingToolGUI::EnableVolumeRendering(bool enable)
   if (node.IsNull())
     return;
 
-  if (enable)
-  {
-    node->SetBoolProperty("volumerendering", enable);
-    node->SetBoolProperty("volumerendering.uselod", true);
-  }
-  else
-  {
-    node->SetBoolProperty("volumerendering", enable);
-  }
+  node->SetBoolProperty("volumerendering", enable);
 
   double val = this->m_Controls.m_PreviewSlider->value();
   this->ChangeLevelWindow(val);

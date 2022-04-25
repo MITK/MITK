@@ -45,15 +45,16 @@ namespace mitk
      * @return true if the serialization was successful and false otherwise
      */
     static bool SaveLabelSetImagePreset(const std::string &presetFilename,
-                                        itk::SmartPointer<mitk::LabelSetImage> &inputImage);
+                                        const mitk::LabelSetImage *inputImage);
 
     /**
      * @brief Loads an existing preset for a mitk::LabelSetImage from presetFilename and applies it to inputImage
      * @param presetFilename the filename of the preset including the filesystem path
      * @param inputImage the image to which the loaded preset will be applied
+     * @return true if the deserilization was successful and false otherwise
      */
-    static void LoadLabelSetImagePreset(const std::string &presetFilename,
-                                        itk::SmartPointer<mitk::LabelSetImage> &inputImage);
+    static bool LoadLabelSetImagePreset(const std::string &presetFilename,
+                                        mitk::LabelSetImage *inputImage);
 
     /**
      * @brief Creates a mitk::Label from an XML element

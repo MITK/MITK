@@ -30,7 +30,7 @@ found in the LICENSE file.
 
 #include <itkImage.h>
 #include <itkConnectedThresholdImageFilter.h>
-
+#include <itkOrImageFilter.h>
 #include <mitkLabelSetImage.h>
 
 namespace mitk
@@ -169,32 +169,74 @@ template <typename TPixel, unsigned int VImageDimension>
 void DoITKRegionGrowing(const itk::Image<TPixel, VImageDimension>* oldSegImage,
   mitk::Image* segmentation,
   const mitk::PointSet* seedPoints,
-  unsigned int timeStep, const mitk::BaseGeometry* inputGeometry)
+  unsigned int timeStep, const mitk::BaseGeometry* inputGeometry, const mitk::Label::PixelType outputValue,
+  const mitk::Label::PixelType backgroundValue,
+  bool& emptyTimeStep)
 {
   typedef itk::Image<TPixel, VImageDimension> InputImageType;
+  typedef itk::Image<mitk::Label::PixelType, VImageDimension> OutputImageType;
   typedef typename InputImageType::IndexType IndexType;
-  typedef itk::ConnectedThresholdImageFilter<InputImageType, InputImageType> RegionGrowingFilterType;
-  typename RegionGrowingFilterType::Pointer regionGrower = RegionGrowingFilterType::New();
+  typedef itk::ConnectedThresholdImageFilter<InputImageType, OutputImageType> RegionGrowingFilterType;
+
+  using IndexMapType = std::map < mitk::Label::PixelType, std::vector<IndexType> >;
+
+  IndexMapType indexMap;
 
   // convert world coordinates to image indices
   for (auto pos = seedPoints->Begin(); pos != seedPoints->End(); ++pos)
   {
     IndexType seedIndex;
     inputGeometry->WorldToIndex(pos->Value(), seedIndex);
-    regionGrower->AddSeed(seedIndex);
+    const auto selectedLabel = oldSegImage->GetPixel(seedIndex);
+
+    if (selectedLabel != backgroundValue)
+    {
+      indexMap[selectedLabel].push_back(seedIndex);
+    }
   }
 
-  // perform region growing in desired segmented region
-  regionGrower->SetInput(oldSegImage);
-
-  regionGrower->SetLower(static_cast<typename InputImageType::PixelType>(1));
-  regionGrower->SetUpper(std::numeric_limits<typename InputImageType::PixelType>::max());
+  typename OutputImageType::Pointer itkResultImage;
 
   try
   {
-    regionGrower->Update();
+    bool first = true;
+    typename RegionGrowingFilterType::Pointer regionGrower = RegionGrowingFilterType::New();
+    regionGrower->SetInput(oldSegImage);
+    regionGrower->SetReplaceValue(outputValue);
+
+    for (const auto& [label, indeces] : indexMap)
+    {
+      // perform region growing in desired segmented region
+      regionGrower->ClearSeeds();
+      for (const auto& index : indeces)
+      {
+        regionGrower->AddSeed(index);
+      }
+
+      regionGrower->SetLower(label);
+      regionGrower->SetUpper(label);
+
+      regionGrower->Update();
+
+      if (first)
+      {
+        itkResultImage = regionGrower->GetOutput();
+      }
+      else
+      {
+        typename itk::OrImageFilter<OutputImageType, OutputImageType>::Pointer orFilter =
+          itk::OrImageFilter<OutputImageType, OutputImageType>::New();
+        orFilter->SetInput1(regionGrower->GetOutput());
+        orFilter->SetInput2(itkResultImage);
+
+        orFilter->Update();
+        itkResultImage = orFilter->GetOutput();
+      }
+      first = false;
+      itkResultImage->DisconnectPipeline();
+    }
   }
-  catch (const itk::ExceptionObject &)
+  catch (const itk::ExceptionObject&)
   {
     return; // can't work
   }
@@ -203,13 +245,32 @@ void DoITKRegionGrowing(const itk::Image<TPixel, VImageDimension>* oldSegImage,
     return;
   }
 
-  segmentation->SetVolume((void*)(regionGrower->GetOutput()->GetPixelContainer()->GetBufferPointer()), timeStep);
+  if (itkResultImage.IsNotNull())
+  {
+    segmentation->SetVolume((void*)(itkResultImage->GetPixelContainer()->GetBufferPointer()),timeStep);
+  }
+  emptyTimeStep = itkResultImage.IsNull();
+
 }
 
 void mitk::PickingTool::DoUpdatePreview(const Image* /*inputAtTimeStep*/, const Image* oldSegAtTimeStep, Image* previewImage, TimeStepType timeStep)
 {
   if (nullptr != oldSegAtTimeStep && nullptr != previewImage && m_PointSet.IsNotNull())
   {
-    AccessFixedDimensionByItk_n(oldSegAtTimeStep, DoITKRegionGrowing, 3, (previewImage, this->m_PointSet, timeStep, oldSegAtTimeStep->GetGeometry()));
+    bool emptyTimeStep = true;
+    if (this->HasPicks())
+    {
+      Label::PixelType backgroundValue = 0;
+      auto labelSetImage = dynamic_cast<const LabelSetImage*>(oldSegAtTimeStep);
+      if (nullptr != labelSetImage)
+      {
+        backgroundValue = labelSetImage->GetExteriorLabel()->GetValue();
+      }
+      AccessFixedDimensionByItk_n(oldSegAtTimeStep, DoITKRegionGrowing, 3, (previewImage, this->m_PointSet, timeStep, oldSegAtTimeStep->GetGeometry(), this->GetUserDefinedActiveLabel(), backgroundValue, emptyTimeStep));
+    }
+    if (emptyTimeStep)
+    {
+      this->ResetPreviewContentAtTimeStep(timeStep);
+    }
   }
 }

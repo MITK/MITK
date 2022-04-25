@@ -17,8 +17,6 @@ found in the LICENSE file.
 #include "mitkUSTelemedSDKHeader.h"
 #include "mitkUSTelemedScanConverterPlugin.h"
 
-#include "itkFastMutexLock.h"
-
 namespace mitk {
 /**
   * \brief Implementation of mitk::USImageSource for Telemed API devices.
@@ -71,8 +69,8 @@ protected:
   long m_OldnYPelsPerUnit;
 
 
-  mitk::Image::Pointer                        m_Image;
-  itk::FastMutexLock::Pointer                 m_ImageMutex;
+  mitk::Image::Pointer m_Image;
+  std::mutex* m_ImageMutex;
 };
 } // namespace mitk
 

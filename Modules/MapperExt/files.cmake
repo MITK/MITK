@@ -2,7 +2,6 @@ file(GLOB_RECURSE H_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURREN
 
 set(CPP_FILES
   mitkEnhancedPointSetVtkMapper3D.cpp
-  mitkGPUVolumeMapper3D.cpp
   mitkSplineVtkMapper3D.cpp
   mitkUnstructuredGridMapper2D.cpp
   mitkUnstructuredGridVtkMapper3D.cpp
@@ -11,7 +10,6 @@ set(CPP_FILES
 
   vtkMaskedGlyph2D.cpp
   vtkMaskedGlyph3D.cpp
-  vtkMitkGPUVolumeRayCastMapper.cpp
   vtkUnstructuredGridMapper.cpp
 
   vtkPointSetSlicer.cxx

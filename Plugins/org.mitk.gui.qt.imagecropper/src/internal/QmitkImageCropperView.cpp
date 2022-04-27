@@ -99,6 +99,8 @@ void QmitkImageCropperView::CreateQtPartControl(QWidget *parent)
 void QmitkImageCropperView::OnImageSelectionChanged(QList<mitk::DataNode::Pointer>)
 {
   bool rotationEnabled = false;
+  m_Controls.labelWarningRotation->setVisible(false);
+
   auto imageNode = m_Controls.imageSelectionWidget->GetSelectedNode();
   if (imageNode.IsNull())
   {
@@ -482,7 +484,6 @@ void QmitkImageCropperView::ProcessImage(bool mask)
 
 void QmitkImageCropperView::SetDefaultGUI()
 {
-  m_Controls.labelWarningRotation->setVisible(false);
   m_Controls.buttonCreateNewBoundingBox->setEnabled(false);
   m_Controls.buttonCropping->setEnabled(false);
   m_Controls.buttonMasking->setEnabled(false);

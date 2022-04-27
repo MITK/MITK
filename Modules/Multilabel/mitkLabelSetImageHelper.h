@@ -27,18 +27,18 @@ namespace mitk
   {
     /**
      * @brief This function creates and returns a new empty segmentation data node.
-     * @remark The data is not set, and must be done "by hand" to have a proper setup node.
-     * @param segmentationName          An name for the new segmentation node.
-     * @return                          The new segmentation node as a data node pointer.
+     * @remark The data is not set. Set it manually to have a properly setup node.
+     * @param segmentationName A name for the new segmentation node.
+     * @return The new segmentation node as a data node pointer.
      */
     MITKMULTILABEL_EXPORT mitk::DataNode::Pointer CreateEmptySegmentationNode(const std::string& segmentationName = std::string());
 
     /**
      * @brief This function creates and returns a new data node with a new empty segmentation
      * data structure.
-     * The segmentation node is named according to the given reference data node, if not a name
+     * The segmentation node is named according to the given reference data node, otherwise a name
      * is passed explicitly.
-     * Some properties are set to automatically to ensure a proper setup segmentation and node
+     * Some properties are set to ensure a proper setup segmentation and node
      * (e.g. link the segmentation node with its parent node).
      *
      * @param referenceNode             The reference node from which the name of the new segmentation node

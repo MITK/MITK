@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include <mitkGeometry3D.h>
 #include <mitkImageToItk.h>
 #include <mitkImageTimeSelector.h>
+#include <mitkLabelSetImage.h>
 
 #include "mapRegistration.h"
 
@@ -218,6 +219,38 @@ void doMITKMap(const ::itk::Image<TPixelType,VImageDimension>* input, mitk::Imag
   mitk::CastToMitkImage<>(spTask->getResultImage(),result);
 }
 
+
+/**Helper function to ensure the mapping of all time steps of an image.*/
+void doMapTimesteps(const mitk::ImageMappingHelper::InputImageType* input, mitk::Image* result, const mitk::ImageMappingHelper::RegistrationType* registration, bool throwOnOutOfInputAreaError,double paddingValue, const mitk::ImageMappingHelper::ResultImageGeometryType* resultGeometry, bool throwOnMappingError, double errorValue, mitk::ImageMappingInterpolator::Type interpolatorType)
+{
+  for (unsigned int i = 0; i<input->GetTimeSteps(); ++i)
+  {
+    mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
+    imageTimeSelector->SetInput(input);
+    imageTimeSelector->SetTimeNr(i);
+    imageTimeSelector->UpdateLargestPossibleRegion();
+
+    mitk::ImageMappingHelper::InputImageType::Pointer timeStepInput = imageTimeSelector->GetOutput();
+    mitk::ImageMappingHelper::ResultImageType::Pointer timeStepResult;
+    AccessByItk_n(timeStepInput, doMITKMap, (timeStepResult, registration, throwOnOutOfInputAreaError, paddingValue, resultGeometry, throwOnMappingError, errorValue, interpolatorType));
+    mitk::ImageReadAccessor readAccess(timeStepResult);
+    result->SetVolume(readAccess.GetData(), i);
+  }
+}
+
+mitk::TimeGeometry::Pointer CreateResultTimeGeometry(const mitk::ImageMappingHelper::InputImageType* input, const mitk::ImageMappingHelper::ResultImageGeometryType* resultGeometry)
+{
+  mitk::TimeGeometry::ConstPointer timeGeometry = input->GetTimeGeometry();
+  mitk::TimeGeometry::Pointer mappedTimeGeometry = timeGeometry->Clone();
+
+  for (unsigned int i = 0; i < input->GetTimeSteps(); ++i)
+  {
+    mitk::ImageMappingHelper::ResultImageGeometryType::Pointer mappedGeometry = resultGeometry->Clone();
+    mappedTimeGeometry->SetTimeStepGeometry(mappedGeometry, i);
+  }
+  return mappedTimeGeometry;
+}
+
 mitk::ImageMappingHelper::ResultImageType::Pointer
   mitk::ImageMappingHelper::map(const InputImageType* input, const RegistrationType* registration,
   bool throwOnOutOfInputAreaError, const double& paddingValue, const ResultImageGeometryType* resultGeometry,
@@ -234,38 +267,60 @@ mitk::ImageMappingHelper::ResultImageType::Pointer
 
   ResultImageType::Pointer result;
 
-  if(input->GetTimeSteps()==1)
-  { //map the image and done
-    AccessByItk_n(input, doMITKMap, (result, registration, throwOnOutOfInputAreaError, paddingValue, resultGeometry, throwOnMappingError, errorValue, interpolatorType));
+  auto inputLabelSetImage = dynamic_cast<const LabelSetImage*>(input);
+
+  if (nullptr == inputLabelSetImage)
+  {
+    if (input->GetTimeSteps() == 1)
+    { //map the image and done
+      AccessByItk_n(input, doMITKMap, (result, registration, throwOnOutOfInputAreaError, paddingValue, resultGeometry, throwOnMappingError, errorValue, interpolatorType));
+    }
+    else
+    { //map every time step and compose
+
+      auto mappedTimeGeometry = CreateResultTimeGeometry(input, resultGeometry);
+      result = mitk::Image::New();
+      result->Initialize(input->GetPixelType(), *mappedTimeGeometry, 1, input->GetTimeSteps());
+
+      doMapTimesteps(input, result, registration, throwOnOutOfInputAreaError, paddingValue, resultGeometry, throwOnMappingError, errorValue, interpolatorType);
+    }
   }
   else
-  { //map every time step and compose
+  {
+    auto resultLabelSetImage = LabelSetImage::New();
 
-    mitk::TimeGeometry::ConstPointer timeGeometry = input->GetTimeGeometry();
-    mitk::TimeGeometry::Pointer mappedTimeGeometry = timeGeometry->Clone();
+    auto mappedTimeGeometry = CreateResultTimeGeometry(input, resultGeometry);
 
-    for (unsigned int i = 0; i<input->GetTimeSteps(); ++i)
+    auto resultTemplate = mitk::Image::New();
+    resultTemplate->Initialize(input->GetPixelType(), *mappedTimeGeometry, 1, input->GetTimeSteps());
+
+    resultLabelSetImage->Initialize(resultTemplate);
+
+    auto cloneInput = inputLabelSetImage->Clone();
+    //We need to clone the LabelSetImage due to its illposed design. It is state full
+    //and we have to iterate through all layers as active layers to ensure the content
+    //via realy stored (directly working with the layer images does not work with the
+    //active layer. The clone wastes rescources but is the easiest and safest way to
+    //ensure 1) correct mapping 2) avoid race conditions with other parts of the
+    //application because we would change the state of the input.
+    //This whole code block should be reworked as soon as T28525 is done.
+
+    for (unsigned int layerID = 0; layerID < inputLabelSetImage->GetNumberOfLayers(); ++layerID)
     {
-      ResultImageGeometryType::Pointer mappedGeometry = resultGeometry->Clone();
-      mappedTimeGeometry->SetTimeStepGeometry(mappedGeometry,i);
+      if (resultLabelSetImage->GetNumberOfLayers() <= layerID)
+      {
+        resultLabelSetImage->AddLayer();
+      }
+      resultLabelSetImage->AddLabelSetToLayer(layerID, inputLabelSetImage->GetLabelSet(layerID)->Clone());
+      cloneInput->SetActiveLayer(layerID);
+      resultLabelSetImage->SetActiveLayer(layerID);
+
+      doMapTimesteps(cloneInput, resultLabelSetImage, registration, throwOnOutOfInputAreaError, paddingValue, resultGeometry, throwOnMappingError, errorValue, mitk::ImageMappingInterpolator::Linear);
     }
 
-    result = mitk::Image::New();
-    result->Initialize(input->GetPixelType(),*mappedTimeGeometry, 1, input->GetTimeSteps());
-
-    for (unsigned int i = 0; i<input->GetTimeSteps(); ++i)
-    {
-      mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
-      imageTimeSelector->SetInput(input);
-      imageTimeSelector->SetTimeNr(i);
-      imageTimeSelector->UpdateLargestPossibleRegion();
-
-      InputImageType::Pointer timeStepInput = imageTimeSelector->GetOutput();
-      ResultImageType::Pointer timeStepResult;
-      AccessByItk_n(timeStepInput, doMITKMap, (timeStepResult, registration, throwOnOutOfInputAreaError, paddingValue, resultGeometry, throwOnMappingError, errorValue, interpolatorType));
-      mitk::ImageReadAccessor readAccess(timeStepResult);
-      result->SetVolume(readAccess.GetData(),i);
-    }
+    resultLabelSetImage->SetActiveLayer(inputLabelSetImage->GetActiveLayer());
+    resultLabelSetImage->GetLabelSet(inputLabelSetImage->GetActiveLayer())->SetActiveLabel(inputLabelSetImage->GetActiveLabel(inputLabelSetImage->GetActiveLayer())->GetValue());
+    result = resultLabelSetImage;
   }
 
   return result;

@@ -82,23 +82,23 @@ Useful links
  - [Issue tracker][bugs]
 
 [logo]: https://github.com/MITK/MITK/raw/master/mitk.png
-[mitk]: http://mitk.org
+[mitk]: https://www.mitk.org
 [itk]: https://itk.org
 [vtk]: https://vtk.org
-[mitk-overview]: http://docs.mitk.org/nightly/Overview.html
-[mitk-usermanual]: http://docs.mitk.org/nightly/UserManualPortal.html
-[mitk-devmanual]: http://docs.mitk.org/nightly/DeveloperManualPortal.html
-[mitk-apiref]: http://docs.mitk.org/nightly/usergroup0.html
-[platforms]: http://docs.mitk.org/nightly/SupportedPlatformsPage.html
+[mitk-overview]: https://docs.mitk.org/2022.04/
+[mitk-usermanual]: https://docs.mitk.org/2022.04/UserManualPortal.html
+[mitk-devmanual]: https://docs.mitk.org/2022.04/DeveloperManualPortal.html
+[mitk-apiref]: https://docs.mitk.org/2022.04/usergroup0.html
+[platforms]: https://docs.mitk.org/2022.04/SupportedPlatformsPage.html
 [dkfz]: https://www.dkfz.de
 [license]: https://github.com/MITK/MITK/blob/master/LICENSE
-[release-cycle]: http://mitk.org/MitkReleaseCycle
-[download]: http://mitk.org/Download
+[release-cycle]: https://www.mitk.org/MitkReleaseCycle
+[download]: https://www.mitk.org/Download
 [phab_repo]: https://phabricator.mitk.org/source/mitk/
-[contribute]: http://mitk.org/How_to_contribute
+[contribute]: https://www.mitk.org/How_to_contribute
 [cmake]: https://www.cmake.org
-[build]: http://docs.mitk.org/nightly/BuildInstructionsPage.html
-[mailinglist]: http://mitk.org/Mailinglist
+[build]: https://docs.mitk.org/2022.04/BuildInstructionsPage.html
+[mailinglist]: https://www.mitk.org/Mailinglist
 [bugs]: https://phabricator.mitk.org/maniphest/
 [cdash]: https://cdash.mitk.org/index.php?project=MITK
 [changelog]: https://phabricator.mitk.org/w/mitk/changelog/

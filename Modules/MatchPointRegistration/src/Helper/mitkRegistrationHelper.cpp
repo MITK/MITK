@@ -17,6 +17,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateOr.h>
 #include <mitkPointSet.h>
+#include <mitkLabelSetImage.h>
 
 //MatchPoint
 #include "mapRegistrationKernel.h"
@@ -151,15 +152,13 @@ namespace mitk
 
   NodePredicateBase::ConstPointer MITKRegistrationHelper::MaskNodePredicate()
   {
-    auto isLabelSetImage = mitk::NodePredicateDataType::New("LabelSetImage");
+    auto isLabelSetImage = mitk::TNodePredicateDataType<mitk::LabelSetImage>::New();
     auto hasBinaryProperty = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
     auto isLegacyMask = mitk::NodePredicateAnd::New(ImageNodePredicate(), hasBinaryProperty);
 
-    return isLegacyMask.GetPointer();
-    //Deactivated due to T27435. Should be reactivated as soon T27435 is fixed
-    //auto isLabelSetOrLegacyMask = mitk::NodePredicateOr::New(isLabelSetImage, isLegacyMask);
-    //
-    //return isLabelSetOrLegacyMask.GetPointer();
+    auto isLabelSetOrLegacyMask = mitk::NodePredicateOr::New(isLabelSetImage, isLegacyMask);
+
+    return isLabelSetOrLegacyMask.GetPointer();
   }
 
 }

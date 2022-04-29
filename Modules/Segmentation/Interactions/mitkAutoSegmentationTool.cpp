@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include "mitkImage.h"
 #include "mitkToolManager.h"
 #include <mitkImageTimeSelector.h>
+#include <mitkLabelSetImageHelper.h>
 
 mitk::AutoSegmentationTool::AutoSegmentationTool() : Tool("dummy"), m_OverwriteExistingSegmentation(false)
 {
@@ -124,14 +125,29 @@ mitk::DataNode *mitk::AutoSegmentationTool::GetTargetSegmentationNode() const
         MITK_ERROR << "No valid reference data!";
         return nullptr;
       }
-
       std::string nodename = refNode->GetName() + "_" + this->GetName();
-      mitk::Color color;
-      color.SetRed(1);
-      color.SetBlue(0);
-      color.SetGreen(0);
-      //create a new segmentation node based on the current segmentation as template
-      m_NoneOverwriteTargetSegmentationNode = CreateEmptySegmentationNode(dynamic_cast<mitk::Image*>(segmentationNode->GetData()), nodename, color);
+
+      const auto labelSetImage = dynamic_cast<mitk::LabelSetImage*>(segmentationNode->GetData());
+      if (nullptr == labelSetImage)
+      {
+        //TODO: this part of the if statement is old legacy code and should be removed.
+        //Keept because I didn't want to break/rework to many things before
+        //the release 2022.04. Should be removed when the seg tool classes are streamlined and the
+        //multi data structure is the only one used in seg APIs and code.
+
+        mitk::Color color;
+        color.SetRed(1);
+        color.SetBlue(0);
+        color.SetGreen(0);
+        //create a new segmentation node based on the current segmentation as template
+        m_NoneOverwriteTargetSegmentationNode = CreateEmptySegmentationNode(dynamic_cast<mitk::Image*>(segmentationNode->GetData()), nodename, color);
+      }
+      else
+      {
+        auto clonedSegmentation = labelSetImage->Clone();
+        m_NoneOverwriteTargetSegmentationNode = LabelSetImageHelper::CreateEmptySegmentationNode(nodename);
+        m_NoneOverwriteTargetSegmentationNode->SetData(clonedSegmentation);
+      }
     }
     segmentationNode = m_NoneOverwriteTargetSegmentationNode;
   }

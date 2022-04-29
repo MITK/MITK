@@ -171,11 +171,11 @@ the CMake macros <code>mitk_create_module()</code> and
 
 Here is a very basic example CMakeLists.txt including MITK as a project:
 \code
-cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 
 project(MyProject)
 
-find_package(MITK 2021.10 REQUIRED)
+find_package(MITK 2022.04 REQUIRED)
 
 add_executable(MyApp main.cpp)
 

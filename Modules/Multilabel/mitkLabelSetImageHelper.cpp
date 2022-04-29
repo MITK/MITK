@@ -42,6 +42,18 @@ namespace
   }
 }
 
+mitk::DataNode::Pointer mitk::LabelSetImageHelper::CreateEmptySegmentationNode(const std::string& segmentationName)
+{
+  auto newSegmentationNode = mitk::DataNode::New();
+  newSegmentationNode->SetName(segmentationName);
+
+  // initialize "showVolume"-property to false to prevent recalculating the volume while working on the segmentation
+  newSegmentationNode->SetProperty("showVolume", mitk::BoolProperty::New(false));
+
+  return newSegmentationNode;
+}
+
+
 mitk::DataNode::Pointer mitk::LabelSetImageHelper::CreateNewSegmentationNode(const DataNode* referenceNode,
   const Image* initialSegmentationImage, const std::string& segmentationName)
 {
@@ -68,16 +80,12 @@ mitk::DataNode::Pointer mitk::LabelSetImageHelper::CreateNewSegmentationNode(con
     return nullptr;
   }
 
-  auto newSegmentationNode = mitk::DataNode::New();
-  newSegmentationNode->SetData(newLabelSetImage);
-  newSegmentationNode->SetName(newSegmentationName);
-
   // set additional image information
   newLabelSetImage->GetExteriorLabel()->SetProperty("name.parent", mitk::StringProperty::New(referenceNode->GetName()));
   newLabelSetImage->GetExteriorLabel()->SetProperty("name.image", mitk::StringProperty::New(newSegmentationName));
 
-  // initialize "showVolume"-property to false to prevent recalculating the volume while working on the segmentation
-  newSegmentationNode->SetProperty("showVolume", mitk::BoolProperty::New(false));
+  auto newSegmentationNode = CreateEmptySegmentationNode(newSegmentationName);
+  newSegmentationNode->SetData(newLabelSetImage);
 
   return newSegmentationNode;
 }
@@ -87,7 +95,7 @@ mitk::Label::Pointer mitk::LabelSetImageHelper::CreateNewLabel(const LabelSetIma
   if (nullptr == labelSetImage)
     return nullptr;
 
-  const std::regex genericLabelNameRegEx("New label ([1-9][0-9]*)");
+  const std::regex genericLabelNameRegEx("Label ([1-9][0-9]*)");
   int maxGenericLabelNumber = 0;
 
   std::vector<std::array<int, 3>> colorsInUse;
@@ -116,7 +124,7 @@ mitk::Label::Pointer mitk::LabelSetImageHelper::CreateNewLabel(const LabelSetIma
   }
 
   auto newLabel = mitk::Label::New();
-  newLabel->SetName("New label " + std::to_string(maxGenericLabelNumber + 1));
+  newLabel->SetName("Label " + std::to_string(maxGenericLabelNumber + 1));
 
   auto lookupTable = mitk::LookupTable::New();
   lookupTable->SetType(mitk::LookupTable::LookupTableType::MULTILABEL);

@@ -2,7 +2,7 @@ mitk_create_module(
   INCLUDE_DIRS
     PUBLIC algorithms
     PRIVATE src/Helper src/Rendering
-  DEPENDS MitkCore MitkSceneSerializationBase
+  DEPENDS MitkCore MitkSceneSerializationBase MitkMultilabel
   PACKAGE_DEPENDS
    PUBLIC MatchPoint
    PRIVATE VTK|ImagingGeneral+ImagingHybrid

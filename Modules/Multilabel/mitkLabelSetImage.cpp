@@ -434,14 +434,6 @@ void mitk::LabelSetImage::RemoveLabels(std::vector<PixelType> &VectorOfLabelPixe
   }
 }
 
-void mitk::LabelSetImage::EraseLabels(std::vector<PixelType> &VectorOfLabelPixelValues)
-{
-  for (unsigned int i = 0; i < VectorOfLabelPixelValues.size(); i++)
-  {
-    this->EraseLabel(VectorOfLabelPixelValues[i]);
-  }
-}
-
 void mitk::LabelSetImage::EraseLabel(PixelType pixelValue)
 {
   try
@@ -455,11 +447,19 @@ void mitk::LabelSetImage::EraseLabel(PixelType pixelValue)
       AccessByItk_1(this, EraseLabelProcessing, pixelValue);
     }
   }
-  catch (const itk::ExceptionObject &e)
+  catch (const itk::ExceptionObject& e)
   {
     mitkThrow() << e.GetDescription();
   }
   Modified();
+}
+
+void mitk::LabelSetImage::EraseLabels(std::vector<PixelType>& VectorOfLabelPixelValues)
+{
+  for (unsigned int idx = 0; idx < VectorOfLabelPixelValues.size(); idx++)
+  {
+    this->EraseLabel(VectorOfLabelPixelValues[idx]);
+  }
 }
 
 mitk::Label *mitk::LabelSetImage::GetActiveLabel(unsigned int layer)

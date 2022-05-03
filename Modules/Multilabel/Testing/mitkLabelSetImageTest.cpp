@@ -35,6 +35,7 @@ class mitkLabelSetImageTestSuite : public mitk::TestFixture
   MITK_TEST(TestSetActiveLayer);
   MITK_TEST(TestRemoveLayer);
   MITK_TEST(TestRemoveLabels);
+  MITK_TEST(TestEraseLabels);
   MITK_TEST(TestMergeLabel);
   MITK_TEST(TestCreateLabelMask);
   CPPUNIT_TEST_SUITE_END();
@@ -413,6 +414,39 @@ public:
                            m_LabelSetImage->GetStatistics()->GetScalarValue2ndMin() == 5);
     CPPUNIT_ASSERT_MESSAGE("Label with value 7 was not removed from the image",
                            m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 6);
+  }
+
+  void TestEraseLabels()
+  {
+    mitk::Image::Pointer image =
+      mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Multilabel/LabelSetTestInitializeImage.nrrd"));
+
+    m_LabelSetImage = nullptr;
+    m_LabelSetImage = mitk::LabelSetImage::New();
+    m_LabelSetImage->InitializeByLabeledImage(image);
+
+    CPPUNIT_ASSERT_MESSAGE("Image - number of labels is not 6", m_LabelSetImage->GetNumberOfLabels() == 6);
+    // 2ndMin because of the exterior label = 0
+    CPPUNIT_ASSERT_MESSAGE("Wrong MIN value", m_LabelSetImage->GetStatistics()->GetScalarValue2ndMin() == 1);
+    CPPUNIT_ASSERT_MESSAGE("Wrong MAX value", m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 7);
+
+    CPPUNIT_ASSERT_MESSAGE("Label with ID 3 does not exist after initialization",
+      m_LabelSetImage->ExistLabel(3) == true);
+
+    m_LabelSetImage->EraseLabel(1);
+    std::vector<mitk::Label::PixelType> labelsToBeErased;
+    labelsToBeErased.push_back(3);
+    labelsToBeErased.push_back(7);
+    m_LabelSetImage->EraseLabels(labelsToBeErased);
+
+    CPPUNIT_ASSERT_MESSAGE("Wrong number of labels since none have been removed",
+      m_LabelSetImage->GetNumberOfLabels() == 6);
+    // Values within the image are 0, 1, 3, 5, 6, 7 - New Min / Max value should be 5 / 6
+    // 2ndMin because of the exterior label = 0
+    CPPUNIT_ASSERT_MESSAGE("Labels with value 1 and 3 were not erased from the image",
+      m_LabelSetImage->GetStatistics()->GetScalarValue2ndMin() == 5);
+    CPPUNIT_ASSERT_MESSAGE("Label with value 7 was not erased from the image",
+      m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 6);
   }
 
   void TestMergeLabel()

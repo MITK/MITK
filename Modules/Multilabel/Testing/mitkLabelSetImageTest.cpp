@@ -400,8 +400,8 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Label with ID 3 does not exist after initialization",
                            m_LabelSetImage->ExistLabel(3) == true);
 
+    m_LabelSetImage->RemoveLabel(1);
     std::vector<mitk::Label::PixelType> labelsToBeRemoved;
-    labelsToBeRemoved.push_back(1);
     labelsToBeRemoved.push_back(3);
     labelsToBeRemoved.push_back(7);
     m_LabelSetImage->RemoveLabels(labelsToBeRemoved);

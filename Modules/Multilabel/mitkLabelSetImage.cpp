@@ -425,12 +425,17 @@ void mitk::LabelSetImage::MergeLabels(PixelType pixelValue, std::vector<PixelTyp
   Modified();
 }
 
-void mitk::LabelSetImage::RemoveLabels(std::vector<PixelType> &VectorOfLabelPixelValues, unsigned int layer)
+void mitk::LabelSetImage::RemoveLabel(PixelType pixelValue, unsigned int layer)
+{
+  this->GetLabelSet(layer)->RemoveLabel(pixelValue);
+  this->EraseLabel(pixelValue);
+}
+
+void mitk::LabelSetImage::RemoveLabels(std::vector<PixelType>& VectorOfLabelPixelValues, unsigned int layer)
 {
   for (unsigned int idx = 0; idx < VectorOfLabelPixelValues.size(); idx++)
   {
-    GetLabelSet(layer)->RemoveLabel(VectorOfLabelPixelValues[idx]);
-    EraseLabel(VectorOfLabelPixelValues[idx]);
+    this->RemoveLabel(VectorOfLabelPixelValues[idx], layer);
   }
 }
 

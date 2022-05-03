@@ -36,7 +36,9 @@ mitk::SemanticRelationsDataStorageAccess::SemanticRelationsDataStorageAccess(Dat
 
 mitk::SemanticRelationsDataStorageAccess::DataNodeVector mitk::SemanticRelationsDataStorageAccess::GetAllSegmentationsOfCase(const SemanticTypes::CaseID& caseID) const
 {
-  if (m_DataStorage.IsExpired())
+  auto dataStorage = m_DataStorage.Lock();
+
+  if (dataStorage.IsNull())
   {
     mitkThrowException(SemanticRelationException) << "Not a valid data storage.";
   }
@@ -45,7 +47,7 @@ mitk::SemanticRelationsDataStorageAccess::DataNodeVector mitk::SemanticRelations
   DataNodeVector allSegmentationsOfCase;
   // get all segmentation nodes of the current data storage
   // only those nodes are respected, that are currently held in the data storage
-  DataStorage::SetOfObjects::ConstPointer segmentationNodes = m_DataStorage.Lock()->GetSubset(NodePredicates::GetSegmentationPredicate());
+  DataStorage::SetOfObjects::ConstPointer segmentationNodes = dataStorage->GetSubset(NodePredicates::GetSegmentationPredicate());
   for (auto it = segmentationNodes->Begin(); it != segmentationNodes->End(); ++it)
   {
     DataNode* segmentationNode = it->Value();
@@ -108,7 +110,9 @@ mitk::SemanticRelationsDataStorageAccess::DataNodeVector mitk::SemanticRelations
 
 mitk::SemanticRelationsDataStorageAccess::DataNodeVector mitk::SemanticRelationsDataStorageAccess::GetAllImagesOfCase(const SemanticTypes::CaseID& caseID) const
 {
-  if (m_DataStorage.IsExpired())
+  auto dataStorage = m_DataStorage.Lock();
+
+  if (dataStorage.IsNull())
   {
     mitkThrowException(SemanticRelationException) << "Not a valid data storage.";
   }
@@ -117,7 +121,7 @@ mitk::SemanticRelationsDataStorageAccess::DataNodeVector mitk::SemanticRelations
   DataNodeVector allImagesOfCase;
   // get all image nodes of the current data storage
   // only those nodes are respected, that are currently held in the data storage
-  DataStorage::SetOfObjects::ConstPointer imageNodes = m_DataStorage.Lock()->GetSubset(NodePredicates::GetImagePredicate());
+  DataStorage::SetOfObjects::ConstPointer imageNodes = dataStorage->GetSubset(NodePredicates::GetImagePredicate());
   for (auto it = imageNodes->Begin(); it != imageNodes->End(); ++it)
   {
     DataNode* imageNode = it->Value();
@@ -150,7 +154,9 @@ mitk::SemanticRelationsDataStorageAccess::DataNodeVector mitk::SemanticRelations
 
 mitk::SemanticRelationsDataStorageAccess::DataNodeVector mitk::SemanticRelationsDataStorageAccess::GetAllImagesByID(const SemanticTypes::IDVector& imageIDs) const
 {
-  if (m_DataStorage.IsExpired())
+  auto dataStorage = m_DataStorage.Lock();
+
+  if (dataStorage.IsNull())
   {
     mitkThrowException(SemanticRelationException) << "Not a valid data storage.";
   }
@@ -158,7 +164,7 @@ mitk::SemanticRelationsDataStorageAccess::DataNodeVector mitk::SemanticRelations
   DataNodeVector allImagesOfCase;
   // get all image nodes of the current data storage
   // only those nodes are respected, that are currently held in the data storage
-  DataStorage::SetOfObjects::ConstPointer imageNodes = m_DataStorage.Lock()->GetSubset(NodePredicates::GetImagePredicate());
+  DataStorage::SetOfObjects::ConstPointer imageNodes = dataStorage->GetSubset(NodePredicates::GetImagePredicate());
   for (auto it = imageNodes->Begin(); it != imageNodes->End(); ++it)
   {
     DataNode* imageNode = it->Value();
@@ -190,7 +196,9 @@ mitk::SemanticRelationsDataStorageAccess::DataNodeVector mitk::SemanticRelations
 
 mitk::SemanticRelationsDataStorageAccess::DataNodeVector mitk::SemanticRelationsDataStorageAccess::GetAllImagesOfLesion(const SemanticTypes::CaseID& caseID, const SemanticTypes::Lesion& lesion) const
 {
-  if (m_DataStorage.IsExpired())
+  auto dataStorage = m_DataStorage.Lock();
+
+  if (dataStorage.IsNull())
   {
     mitkThrowException(SemanticRelationException) << "Not a valid data storage.";
   }
@@ -202,7 +210,7 @@ mitk::SemanticRelationsDataStorageAccess::DataNodeVector mitk::SemanticRelations
   for (const auto& segmentationNode : allSegmentationsOfLesion)
   {
     // get parent node of the current segmentation node with the node predicate
-    DataStorage::SetOfObjects::ConstPointer parentNodes = m_DataStorage.Lock()->GetSources(segmentationNode, NodePredicates::GetImagePredicate(), false);
+    DataStorage::SetOfObjects::ConstPointer parentNodes = dataStorage->GetSources(segmentationNode, NodePredicates::GetImagePredicate(), false);
     for (auto it = parentNodes->Begin(); it != parentNodes->End(); ++it)
     {
       DataNode::Pointer dataNode = it->Value();
@@ -277,7 +285,9 @@ mitk::SemanticRelationsDataStorageAccess::DataNodeVector mitk::SemanticRelations
 
 mitk::SemanticRelationsDataStorageAccess::DataNodeVector mitk::SemanticRelationsDataStorageAccess::GetAllSpecificSegmentations(const SemanticTypes::CaseID& caseID, const SemanticTypes::ControlPoint& controlPoint, const SemanticTypes::InformationType& informationType) const
 {
-  if (m_DataStorage.IsExpired())
+  auto dataStorage = m_DataStorage.Lock();
+
+  if (dataStorage.IsNull())
   {
     mitkThrow() << "Not a valid data storage.";
   }
@@ -296,7 +306,7 @@ mitk::SemanticRelationsDataStorageAccess::DataNodeVector mitk::SemanticRelations
   DataNodeVector allSpecificSegmentations;
   for (const auto& imageNode : allSpecificImages)
   {
-    DataStorage::SetOfObjects::ConstPointer segmentationNodes = m_DataStorage.Lock()->GetDerivations(imageNode, NodePredicates::GetSegmentationPredicate(), false);
+    DataStorage::SetOfObjects::ConstPointer segmentationNodes = dataStorage->GetDerivations(imageNode, NodePredicates::GetSegmentationPredicate(), false);
     for (auto it = segmentationNodes->Begin(); it != segmentationNodes->End(); ++it)
     {
       allSpecificSegmentations.push_back(it->Value());

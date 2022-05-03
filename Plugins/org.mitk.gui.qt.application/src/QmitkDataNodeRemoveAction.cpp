@@ -99,16 +99,20 @@ void QmitkDataNodeRemoveAction::InitializeAction()
 
 void QmitkDataNodeRemoveAction::OnActionTriggered(bool /*checked*/)
 {
-  if (m_WorkbenchPartSite.Expired())
+  auto workbenchPartSite = m_WorkbenchPartSite.Lock();
+
+  if (workbenchPartSite.IsNull())
   {
     return;
   }
 
-  if (m_DataStorage.IsExpired())
+  auto dataStorage = m_DataStorage.Lock();
+
+  if (dataStorage.IsNull())
   {
     return;
   }
 
   auto selectedNodes = GetSelectedNodes();
-  RemoveAction::Run(m_WorkbenchPartSite.Lock(), m_DataStorage.Lock(), selectedNodes, m_Parent);
+  RemoveAction::Run(workbenchPartSite, dataStorage, selectedNodes, m_Parent);
 }

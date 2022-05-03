@@ -61,17 +61,20 @@ void QmitkFocusOnLesionAction::InitializeAction()
 
 void QmitkFocusOnLesionAction::OnActionTriggered(bool /*checked*/)
 {
-  if (m_WorkbenchPartSite.Expired())
-  {
-    return;
-  }
+  auto workbenchPartSite = m_WorkbenchPartSite.Lock();
 
-  if (m_DataStorage.IsExpired())
+  if (workbenchPartSite.IsNull())
   {
     return;
   }
 
   auto dataStorage = m_DataStorage.Lock();
+
+  if (dataStorage.IsNull())
+  {
+    return;
+  }
+
   auto renderWindowLayerController = std::make_unique<mitk::RenderWindowLayerController>();
   renderWindowLayerController->SetDataStorage(dataStorage);
   // check each renderer to see if it contains a segmentation represented by the currently selected lesion
@@ -99,7 +102,7 @@ void QmitkFocusOnLesionAction::OnActionTriggered(bool /*checked*/)
       if (currentLesion.UID == m_Lesion.UID)
       {
         // jump to this lesion in the specified renderer
-        LabelSetJumpToAction::Run(m_WorkbenchPartSite.Lock(), dataNode, renderer);
+        LabelSetJumpToAction::Run(workbenchPartSite, dataNode, renderer);
       }
     }
   }

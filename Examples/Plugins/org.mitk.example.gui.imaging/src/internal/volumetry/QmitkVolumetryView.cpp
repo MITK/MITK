@@ -113,9 +113,11 @@ void QmitkVolumetryView::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*par
 
 void QmitkVolumetryView::OnCalculateVolume()
 {
-  if (!m_SelectedDataNode.IsExpired())
+  auto selectedDataNode = m_SelectedDataNode.Lock();
+
+  if (selectedDataNode.IsNotNull())
   {
-    mitk::Image *image = dynamic_cast<mitk::Image *>(m_SelectedDataNode.Lock()->GetData());
+    mitk::Image *image = dynamic_cast<mitk::Image *>(selectedDataNode->GetData());
     std::cout << "Dimension:" << image->GetDimension() << std::endl;
     std::cout << "Dimension[3]:" << image->GetDimension(3) << std::endl;
     mitk::VolumeCalculator::Pointer volCalc = mitk::VolumeCalculator::New();
@@ -130,9 +132,11 @@ void QmitkVolumetryView::OnCalculateVolume()
 
 void QmitkVolumetryView::OnTimeSeriesButtonClicked()
 {
-  if (!m_SelectedDataNode.IsExpired())
+  auto selectedDataNode = m_SelectedDataNode.Lock();
+
+  if (selectedDataNode.IsNotNull())
   {
-    mitk::Image *image = dynamic_cast<mitk::Image *>(m_SelectedDataNode.Lock()->GetData());
+    mitk::Image *image = dynamic_cast<mitk::Image *>(selectedDataNode->GetData());
     mitk::VolumeCalculator::Pointer volCalc = mitk::VolumeCalculator::New();
     volCalc->SetImage(image);
     volCalc->SetThreshold(m_Controls->m_ThresholdSlider->value());
@@ -157,7 +161,9 @@ const mitk::DataNode *QmitkVolumetryView::GetImageNode() const
 
 void QmitkVolumetryView::UpdateSlider()
 {
-  if (!m_SelectedDataNode.IsExpired() && dynamic_cast<mitk::Image *>(m_SelectedDataNode.Lock()->GetData()))
+  auto selectedDataNode = m_SelectedDataNode.Lock();
+
+  if (selectedDataNode.IsNotNull() && dynamic_cast<mitk::Image *>(selectedDataNode->GetData()))
   {
     int intSliderValue = (int)m_Controls->m_ThresholdSlider->value();
     QString stringSliderValue;
@@ -186,10 +192,10 @@ void QmitkVolumetryView::OnThresholdSliderChanged(int value)
 
 void QmitkVolumetryView::CreateOverlayChild()
 {
-  if (!m_SelectedDataNode.IsExpired())
-  {
-    auto selectedDataNode = m_SelectedDataNode.Lock();
+  auto selectedDataNode = m_SelectedDataNode.Lock();
 
+  if (selectedDataNode.IsNotNull())
+  {
     m_OverlayNode = mitk::DataNode::New();
     mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New("volume threshold overlay image");
     m_OverlayNode->SetProperty("reslice interpolation", selectedDataNode->GetProperty("reslice interpolation"));

@@ -150,17 +150,13 @@ Qt::ItemFlags QmitkDataStorageDefaultListModel::flags(const QModelIndex &index) 
 void QmitkDataStorageDefaultListModel::UpdateModelData()
 {
   mitk::DataStorage::SetOfObjects::ConstPointer dataNodes;
-  if (!m_DataStorage.IsExpired())
+  auto dataStorage = m_DataStorage.Lock();
+
+  if (dataStorage.IsNotNull())
   {
-    auto dataStorage = m_DataStorage.Lock();
-    if (dataStorage.IsNotNull() && m_NodePredicate.IsNotNull())
-    {
-      dataNodes = dataStorage->GetSubset(m_NodePredicate);
-    }
-    else
-    {
-      dataNodes = dataStorage->GetAll();
-    }
+    dataNodes = m_NodePredicate.IsNotNull()
+      ? dataStorage->GetSubset(m_NodePredicate)
+      : dataStorage->GetAll();
   }
 
   // update the model, so that it will be filled with the nodes of the new data storage

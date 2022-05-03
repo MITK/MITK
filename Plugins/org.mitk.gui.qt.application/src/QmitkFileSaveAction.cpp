@@ -110,9 +110,11 @@ public:
 
   ~QmitkFileSaveActionPrivate()
   {
-    if (!m_Window.Expired())
+    auto window = m_Window.Lock();
+
+    if (window.IsNotNull())
     {
-      m_Window.Lock()->GetSelectionService()->RemoveSelectionListener(m_SelectionListener.data());
+      window->GetSelectionService()->RemoveSelectionListener(m_SelectionListener.data());
     }
   }
 

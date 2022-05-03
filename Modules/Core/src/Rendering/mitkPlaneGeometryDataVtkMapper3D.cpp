@@ -258,6 +258,7 @@ namespace mitk
       }
 
       double tubeRadius = 1.0; // Radius of tubular edge surrounding plane
+      auto dataStorage = m_DataStorage.Lock();
 
       // Clip the PlaneGeometry with the reference geometry bounds (if available)
       if (input->GetPlaneGeometry()->HasReferenceGeometry())
@@ -289,9 +290,9 @@ namespace mitk
 
       // If no reference geometry is available, clip with the current global
       // bounds
-      else if (!m_DataStorage.IsExpired())
+      else if (dataStorage.IsNotNull())
       {
-        m_SurfaceCreator->SetBoundingBox(m_DataStorage.Lock()->ComputeVisibleBoundingBox(nullptr, "includeInBoundingBox"));
+        m_SurfaceCreator->SetBoundingBox(dataStorage->ComputeVisibleBoundingBox(nullptr, "includeInBoundingBox"));
         tubeRadius = sqrt(m_SurfaceCreator->GetBoundingBox()->GetDiagonalLength2()) / 450.0;
       }
 

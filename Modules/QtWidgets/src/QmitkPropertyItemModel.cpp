@@ -166,10 +166,12 @@ QModelIndex QmitkPropertyItemModel::FindProperty(const mitk::BaseProperty *prope
   if (property == nullptr)
     return QModelIndex();
 
-  if (m_PropertyList.IsExpired())
+  auto propertyList = m_PropertyList.Lock();
+
+  if (propertyList.IsNull())
     return QModelIndex();
 
-  auto propertyMap = m_PropertyList.Lock()->GetMap();
+  auto propertyMap = propertyList->GetMap();
   auto it = std::find_if(propertyMap->begin(), propertyMap->end(), PropertyEqualTo(property));
 
   if (it == propertyMap->end())
@@ -358,14 +360,14 @@ void QmitkPropertyItemModel::SetNewPropertyList(mitk::PropertyList *newPropertyL
 
   this->beginResetModel();
 
-  if (!m_PropertyList.IsExpired())
-  {
-    auto propertyList = m_PropertyList.Lock();
+  auto propertyList = m_PropertyList.Lock();
 
+  if (propertyList.IsNotNull())
+  {
     propertyList->RemoveObserver(m_PropertyListDeletedTag);
     propertyList->RemoveObserver(m_PropertyListModifiedTag);
 
-    const PropertyMap *propertyMap = m_PropertyList.Lock()->GetMap();
+    const PropertyMap *propertyMap = propertyList->GetMap();
 
     for (PropertyMap::const_iterator propertyIt = propertyMap->begin(); propertyIt != propertyMap->end(); ++propertyIt)
     {
@@ -385,16 +387,17 @@ void QmitkPropertyItemModel::SetNewPropertyList(mitk::PropertyList *newPropertyL
   }
 
   m_PropertyList = newPropertyList;
+  propertyList = m_PropertyList.Lock();
 
-  if (!m_PropertyList.IsExpired())
+  if (propertyList.IsNotNull())
   {
     auto onPropertyListModified = itk::SimpleMemberCommand<QmitkPropertyItemModel>::New();
     onPropertyListModified->SetCallbackFunction(this, &QmitkPropertyItemModel::OnPropertyListModified);
-    m_PropertyListModifiedTag = m_PropertyList.Lock()->AddObserver(itk::ModifiedEvent(), onPropertyListModified);
+    m_PropertyListModifiedTag = propertyList->AddObserver(itk::ModifiedEvent(), onPropertyListModified);
 
     auto onPropertyListDeleted = itk::SimpleMemberCommand<QmitkPropertyItemModel>::New();
     onPropertyListDeleted->SetCallbackFunction(this, &QmitkPropertyItemModel::OnPropertyListDeleted);
-    m_PropertyListDeletedTag = m_PropertyList.Lock()->AddObserver(itk::DeleteEvent(), onPropertyListDeleted);
+    m_PropertyListDeletedTag = propertyList->AddObserver(itk::DeleteEvent(), onPropertyListDeleted);
 
     auto modifiedCommand = itk::MemberCommand<QmitkPropertyItemModel>::New();
     modifiedCommand->SetCallbackFunction(this, &QmitkPropertyItemModel::OnPropertyModified);
@@ -407,20 +410,21 @@ void QmitkPropertyItemModel::SetNewPropertyList(mitk::PropertyList *newPropertyL
   }
 
   this->CreateRootItem();
+  propertyList = m_PropertyList.Lock();
 
-  if (m_PropertyList != nullptr && !m_PropertyList.Lock()->IsEmpty())
+  if (propertyList.IsNotNull() && !propertyList->IsEmpty())
   {
     mitk::PropertyList::PropertyMap filteredProperties;
     bool filterProperties = false;
 
     if (m_PropertyFilters->HasFilter() || m_PropertyFilters->HasFilter(m_ClassName.toStdString()))
     {
-      filteredProperties = m_PropertyFilters->ApplyFilter(*m_PropertyList.Lock()->GetMap(), m_ClassName.toStdString());
+      filteredProperties = m_PropertyFilters->ApplyFilter(*propertyList->GetMap(), m_ClassName.toStdString());
       filterProperties = true;
     }
 
     const mitk::PropertyList::PropertyMap *propertyMap =
-      !filterProperties ? m_PropertyList.Lock()->GetMap() : &filteredProperties;
+      !filterProperties ? propertyList->GetMap() : &filteredProperties;
 
     mitk::PropertyList::PropertyMap::const_iterator end = propertyMap->end();
 

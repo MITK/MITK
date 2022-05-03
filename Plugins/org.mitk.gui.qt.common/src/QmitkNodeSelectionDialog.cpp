@@ -111,12 +111,13 @@ void QmitkNodeSelectionDialog::SetDataStorage(mitk::DataStorage* dataStorage)
   if (m_DataStorage != dataStorage)
   {
     m_DataStorage = dataStorage;
+    auto lockedDataStorage = m_DataStorage.Lock();
 
-    if (!m_DataStorage.IsExpired())
+    if (lockedDataStorage.IsNotNull())
     {
       for (auto panel : m_Panels)
       {
-        panel->SetDataStorage(dataStorage);
+        panel->SetDataStorage(lockedDataStorage);
       }
     }
   }

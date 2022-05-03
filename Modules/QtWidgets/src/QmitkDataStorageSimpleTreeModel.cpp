@@ -61,7 +61,9 @@ void QmitkDataStorageSimpleTreeModel::NodePredicateChanged()
 
 void QmitkDataStorageSimpleTreeModel::NodeAdded(const mitk::DataNode *node)
 {
-  if (node == nullptr || m_DataStorage.IsExpired() || !m_DataStorage.Lock()->Exists(node) ||
+  auto dataStorage = m_DataStorage.Lock();
+
+  if (node == nullptr || dataStorage.IsNull() || !dataStorage->Exists(node) ||
       m_Root->Find(node) != nullptr)
     return;
 
@@ -298,7 +300,9 @@ mitk::DataNode *QmitkDataStorageSimpleTreeModel::GetParentNode(const mitk::DataN
 
 void QmitkDataStorageSimpleTreeModel::AddNodeInternal(const mitk::DataNode *node)
 {
-  if (node == nullptr || m_DataStorage.IsExpired() || !m_DataStorage.Lock()->Exists(node) || m_Root->Find(node) != nullptr)
+  auto dataStorage = m_DataStorage.Lock();
+
+  if (node == nullptr || dataStorage.IsNull() || !dataStorage->Exists(node) || m_Root->Find(node) != nullptr)
     return;
 
   // find out if we have a root node
@@ -355,13 +359,13 @@ QModelIndex QmitkDataStorageSimpleTreeModel::IndexFromTreeItem(TreeItem *item) c
 
 void QmitkDataStorageSimpleTreeModel::UpdateModelData()
 {
-  if (!m_DataStorage.IsExpired())
+  auto dataStorage = m_DataStorage.Lock();
+
+  if (dataStorage.IsNotNull())
   {
-    auto nodeset = m_DataStorage.Lock()->GetAll();
-    if (m_NodePredicate != nullptr)
-    {
-      nodeset = m_DataStorage.Lock()->GetSubset(m_NodePredicate);
-    }
+    auto nodeset = m_NodePredicate != nullptr
+      ? dataStorage->GetSubset(m_NodePredicate)
+      : dataStorage->GetAll();
 
     for (const auto& node : *nodeset)
     {

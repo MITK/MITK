@@ -34,32 +34,23 @@ QmitkDataStorageHistoryModel::QmitkDataStorageHistoryModel(QObject *parent) : Qm
 void QmitkDataStorageHistoryModel::UpdateModelData()
 {
     std::vector<mitk::DataNode::Pointer> dataNodes;
-    if (!m_DataStorage.IsExpired())
+    auto dataStorage = m_DataStorage.Lock();
+    if (dataStorage.IsNotNull())
     {
-        auto dataStorage = m_DataStorage.Lock();
-        if (dataStorage.IsNotNull())
+      auto nodesCandidats = m_NodePredicate.IsNotNull()
+        ? dataStorage->GetSubset(m_NodePredicate)
+        : dataStorage->GetAll();
+
+      const std::lock_guard<std::mutex> lock(_historyMutex);
+
+      for (auto historyNode : _nodeHistory)
+      {
+        auto finding = std::find(nodesCandidats->begin(), nodesCandidats->end(), historyNode);
+        if (finding != nodesCandidats->end())
         {
-          mitk::DataStorage::SetOfObjects::ConstPointer nodesCandidats;
-          if (m_NodePredicate.IsNotNull())
-          {
-            nodesCandidats = dataStorage->GetSubset(m_NodePredicate);
-          }
-          else
-          {
-            nodesCandidats = dataStorage->GetAll();
-          }
-
-          const std::lock_guard<std::mutex> lock(_historyMutex);
-
-          for (auto historyNode : _nodeHistory)
-          {
-            auto finding = std::find(nodesCandidats->begin(), nodesCandidats->end(), historyNode);
-            if (finding != nodesCandidats->end())
-            {
-              dataNodes.push_back(*finding);
-            }
-          }
+          dataNodes.push_back(*finding);
         }
+      }
     }
 
     // update the model, so that it will be filled with the nodes of the new data storage

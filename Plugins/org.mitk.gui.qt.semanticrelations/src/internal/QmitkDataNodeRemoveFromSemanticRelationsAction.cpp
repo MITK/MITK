@@ -117,11 +117,13 @@ void QmitkDataNodeRemoveFromSemanticRelationsAction::InitializeAction()
 
 void QmitkDataNodeRemoveFromSemanticRelationsAction::OnActionTriggered(bool /*checked*/)
 {
-  if (m_DataStorage.IsExpired())
+  auto dataStorage = m_DataStorage.Lock();
+
+  if (dataStorage.IsNull())
   {
     return;
   }
 
   auto dataNode = GetSelectedNode();
-  RemoveFromSemanticRelationsAction::Run(m_DataStorage.Lock(),dataNode);
+  RemoveFromSemanticRelationsAction::Run(dataStorage, dataNode);
 }

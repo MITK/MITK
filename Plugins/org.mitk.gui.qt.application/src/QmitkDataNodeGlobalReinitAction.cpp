@@ -63,15 +63,19 @@ void QmitkDataNodeGlobalReinitAction::InitializeAction()
 
 void QmitkDataNodeGlobalReinitAction::OnActionTriggered(bool /*checked*/)
 {
-  if (m_WorkbenchPartSite.Expired())
+  auto workbenchPartSite = m_WorkbenchPartSite.Lock();
+
+  if (workbenchPartSite.IsNull())
   {
     return;
   }
 
-  if (m_DataStorage.IsExpired())
+  auto dataStorage = m_DataStorage.Lock();
+
+  if (dataStorage.IsNull())
   {
     return;
   }
 
-  GlobalReinitAction::Run(m_WorkbenchPartSite.Lock(), m_DataStorage.Lock());
+  GlobalReinitAction::Run(workbenchPartSite, dataStorage);
 }

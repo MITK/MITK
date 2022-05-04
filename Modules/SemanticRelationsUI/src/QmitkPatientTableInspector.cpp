@@ -82,12 +82,12 @@ QItemSelectionModel* QmitkPatientTableInspector::GetSelectionModel()
 
 void QmitkPatientTableInspector::Initialize()
 {
-  if (m_DataStorage.IsExpired())
+  auto dataStorage = m_DataStorage.Lock();
+
+  if (dataStorage.IsNull())
   {
     return;
   }
-
-  auto dataStorage = m_DataStorage.Lock();
 
   m_StorageModel->SetDataStorage(dataStorage);
   m_StorageModel->SetNodePredicate(m_NodePredicate);

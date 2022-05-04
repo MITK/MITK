@@ -81,7 +81,7 @@ public:
   void SetControlledRenderer(mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer);
 
   void SetCurrentRenderer(mitk::BaseRenderer* baseRenderer);
-  mitk::BaseRenderer* GetCurrentRenderer() const;
+  mitk::BaseRenderer::Pointer GetCurrentRenderer() const;
 
   /**
   * @brief Use the RenderWindowLayerController to insert the given data node into all controlled render windows.

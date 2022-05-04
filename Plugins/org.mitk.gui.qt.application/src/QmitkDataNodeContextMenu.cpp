@@ -253,10 +253,12 @@ void QmitkDataNodeContextMenu::InitServiceActions()
 
 void QmitkDataNodeContextMenu::OnContextMenuRequested(const QPoint& /*pos*/)
 {
-  if (m_WorkbenchPartSite.Expired())
+  auto workbenchPartSite = m_WorkbenchPartSite.Lock();
+
+  if (workbenchPartSite.IsNull())
     return;
 
-  auto selection = m_WorkbenchPartSite.Lock()->GetWorkbenchWindow()->GetSelectionService()->GetSelection()
+  auto selection = workbenchPartSite->GetWorkbenchWindow()->GetSelectionService()->GetSelection()
     .Cast<const mitk::DataNodeSelection>();
 
   if (selection.IsNull() || selection->IsEmpty())
@@ -297,9 +299,10 @@ void QmitkDataNodeContextMenu::OnExtensionPointActionTriggered(QAction* action)
 
   auto configElement = configElementIter->second;
   auto contextMenuAction = configElement->CreateExecutableExtension<mitk::IContextMenuAction>("class");
+  auto dataStorage = m_DataStorage.Lock();
 
-  if (!m_DataStorage.IsExpired())
-    contextMenuAction->SetDataStorage(m_DataStorage.Lock());
+  if (dataStorage.IsNotNull())
+    contextMenuAction->SetDataStorage(dataStorage);
 
   if ("QmitkCreatePolygonModelAction" == configElement->GetAttribute("class"))
   {

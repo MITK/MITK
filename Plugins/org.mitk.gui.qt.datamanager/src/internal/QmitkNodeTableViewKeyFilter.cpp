@@ -36,13 +36,13 @@ QmitkNodeTableViewKeyFilter::QmitkNodeTableViewKeyFilter(QObject *dataManagerVie
 
 bool QmitkNodeTableViewKeyFilter::eventFilter(QObject *obj, QEvent *event)
 {
-  if (m_DataStorage.IsExpired())
+  auto dataStorage = m_DataStorage.Lock();
+
+  if (dataStorage.IsNull())
   {
     // standard event processing
     return QObject::eventFilter(obj, event);
   }
-
-  auto dataStorage = m_DataStorage.Lock();
 
   QmitkDataManagerView *dataManagerView = qobject_cast<QmitkDataManagerView *>(this->parent());
   if (event->type() == QEvent::KeyPress && dataManagerView)

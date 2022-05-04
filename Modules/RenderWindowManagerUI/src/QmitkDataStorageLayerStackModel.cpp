@@ -195,10 +195,10 @@ bool QmitkDataStorageLayerStackModel::setData(const QModelIndex &index, const QV
     return false;
   }
 
-  if (!m_BaseRenderer.IsExpired())
-  {
-    auto baseRenderer = m_BaseRenderer.Lock();
+  auto baseRenderer = m_BaseRenderer.Lock();
 
+  if (baseRenderer.IsNotNull())
+  {
     RenderWindowLayerUtilities::LayerStack::const_iterator layerStackIt = m_TempLayerStack.begin();
     std::advance(layerStackIt, index.row());
     mitk::DataNode* dataNode = layerStackIt->second;

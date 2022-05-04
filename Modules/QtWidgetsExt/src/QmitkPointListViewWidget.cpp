@@ -43,27 +43,26 @@ QmitkPointListViewWidget::~QmitkPointListViewWidget()
 
 void QmitkPointListViewWidget::SetPointSet(mitk::PointSet *pointSet)
 {
-  if (!m_PointSet.IsExpired())
-  {
-    auto pointSet = m_PointSet.Lock();
+  auto lockedPointSet = m_PointSet.Lock();
 
-    pointSet->RemoveObserver(m_PointSetModifiedTag);
-    pointSet->RemoveObserver(m_PointSetDeletedTag);
+  if (lockedPointSet.IsNotNull())
+  {
+    lockedPointSet->RemoveObserver(m_PointSetModifiedTag);
+    lockedPointSet->RemoveObserver(m_PointSetDeletedTag);
   }
 
   m_PointSet = pointSet;
+  lockedPointSet = m_PointSet.Lock();
 
-  if (!m_PointSet.IsExpired())
+  if (lockedPointSet.IsNotNull())
   {
-    auto pointSet = m_PointSet.Lock();
-
     auto onPointSetDeleted = itk::SimpleMemberCommand<QmitkPointListViewWidget>::New();
     onPointSetDeleted->SetCallbackFunction(this, &QmitkPointListViewWidget::OnPointSetDeleted);
-    m_PointSetDeletedTag = pointSet->AddObserver(itk::DeleteEvent(), onPointSetDeleted);
+    m_PointSetDeletedTag = lockedPointSet->AddObserver(itk::DeleteEvent(), onPointSetDeleted);
 
     auto onPointSetModified = itk::SimpleMemberCommand<QmitkPointListViewWidget>::New();
     onPointSetModified->SetCallbackFunction(this, &QmitkPointListViewWidget::OnPointSetChanged);
-    m_PointSetModifiedTag = pointSet->AddObserver(itk::DeleteEvent(), onPointSetModified);
+    m_PointSetModifiedTag = lockedPointSet->AddObserver(itk::DeleteEvent(), onPointSetModified);
   }
 
   this->Update();
@@ -143,10 +142,10 @@ void QmitkPointListViewWidget::keyPressEvent(QKeyEvent *e)
 
 void QmitkPointListViewWidget::MoveSelectedPointUp()
 {
-  if (m_PointSet.IsExpired())
-    return;
-
   auto pointSet = m_PointSet.Lock();
+
+  if (pointSet.IsNull())
+    return;
 
   mitk::PointSet::PointIdentifier selectedID;
   selectedID = pointSet->SearchSelectedPoint(m_TimeStep);
@@ -158,10 +157,10 @@ void QmitkPointListViewWidget::MoveSelectedPointUp()
 
 void QmitkPointListViewWidget::MoveSelectedPointDown()
 {
-  if (m_PointSet.IsExpired())
-    return;
-
   auto pointSet = m_PointSet.Lock();
+
+  if (pointSet.IsNull())
+    return;
 
   mitk::PointSet::PointIdentifier selectedID;
   selectedID = pointSet->SearchSelectedPoint(m_TimeStep);
@@ -173,10 +172,10 @@ void QmitkPointListViewWidget::MoveSelectedPointDown()
 
 void QmitkPointListViewWidget::RemoveSelectedPoint()
 {
-  if (m_PointSet.IsExpired())
-    return;
-
   auto pointSet = m_PointSet.Lock();
+
+  if (pointSet.IsNull())
+    return;
 
   mitk::PointSet::PointIdentifier selectedID;
   selectedID = pointSet->SearchSelectedPoint(m_TimeStep);
@@ -191,13 +190,13 @@ void QmitkPointListViewWidget::Update(bool currentRowChanged)
   if (m_SelfCall)
     return;
 
-  if (m_PointSet.IsExpired())
+  auto pointSet = m_PointSet.Lock();
+
+  if (pointSet.IsNull())
   {
     this->clear();
     return;
   }
-
-  auto pointSet = m_PointSet.Lock();
 
   m_SelfCall = true;
   QString text;

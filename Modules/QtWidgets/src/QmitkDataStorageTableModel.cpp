@@ -196,11 +196,11 @@ void QmitkDataStorageTableModel::SetDataStorage(mitk::DataStorage::Pointer _Data
   // only proceed if we have a new datastorage
   if (m_DataStorage != _DataStorage)
   {
-    // if a data storage was set before remove old event listeners
-    if (!m_DataStorage.IsExpired())
-    {
-      auto dataStorage = m_DataStorage.Lock();
+    auto dataStorage = m_DataStorage.Lock();
 
+    // if a data storage was set before remove old event listeners
+    if (dataStorage.IsNotNull())
+    {
       dataStorage->AddNodeEvent.RemoveListener(
         mitk::MessageDelegate1<QmitkDataStorageTableModel, const mitk::DataNode *>(
           this, &QmitkDataStorageTableModel::AddNode));
@@ -212,12 +212,11 @@ void QmitkDataStorageTableModel::SetDataStorage(mitk::DataStorage::Pointer _Data
 
     // set new data storage
     m_DataStorage = _DataStorage;
+    dataStorage = m_DataStorage.Lock();
 
     // if new storage is not 0 subscribe for events
-    if (!m_DataStorage.IsExpired())
+    if (dataStorage.IsNotNull())
     {
-      auto dataStorage = m_DataStorage.Lock();
-
       // subscribe for node added/removed events
       dataStorage->AddNodeEvent.AddListener(
         mitk::MessageDelegate1<QmitkDataStorageTableModel, const mitk::DataNode *>(
@@ -414,20 +413,14 @@ void QmitkDataStorageTableModel::Reset()
   m_VisiblePropertyModifiedObserverTags.clear();
   m_NodeSet.clear();
 
-  // the whole reset depends on the fact if a data storage is set or not
-  if (!m_DataStorage.IsExpired())
-  {
-    auto dataStorage = m_DataStorage.Lock();
+  auto dataStorage = m_DataStorage.Lock();
 
-    if (m_Predicate.IsNotNull())
-      // get subset
-      _NodeSet = dataStorage->GetSubset(m_Predicate);
-    // if predicate is nullptr, select all nodes
-    else
-    {
-      _NodeSet = dataStorage->GetAll();
-      // remove ghost root node
-    }
+  // the whole reset depends on the fact if a data storage is set or not
+  if (dataStorage.IsNotNull())
+  {
+    _NodeSet = m_Predicate.IsNotNull()
+      ? dataStorage->GetSubset(m_Predicate)
+      : dataStorage->GetAll();
 
     // finally add all nodes to the model
     for (auto it = _NodeSet->begin(); it != _NodeSet->end(); it++)

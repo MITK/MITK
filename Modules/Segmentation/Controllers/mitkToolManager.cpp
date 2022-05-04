@@ -489,16 +489,9 @@ mitk::DataNode *mitk::ToolManager::GetRoiData(int idx)
   }
 }
 
-mitk::DataStorage *mitk::ToolManager::GetDataStorage()
+mitk::DataStorage::Pointer mitk::ToolManager::GetDataStorage() const
 {
-  if (!m_DataStorage.IsExpired())
-  {
-    return m_DataStorage.Lock();
-  }
-  else
-  {
-    return nullptr;
-  }
+  return m_DataStorage.Lock();
 }
 
 void mitk::ToolManager::SetDataStorage(DataStorage &storage)

@@ -124,8 +124,9 @@ public:
 
   void PartHidden(const berry::IWorkbenchPartReference::Pointer& ref) override
   {
-    if (!windowAdvisor->lastActiveEditor.Expired() &&
-      ref->GetPart(false) == windowAdvisor->lastActiveEditor.Lock())
+    auto lockedLastActiveEditor = windowAdvisor->lastActiveEditor.Lock();
+
+    if (lockedLastActiveEditor.IsNotNull() && ref->GetPart(false) == lockedLastActiveEditor)
     {
       windowAdvisor->UpdateTitle(true);
     }
@@ -133,8 +134,9 @@ public:
 
   void PartVisible(const berry::IWorkbenchPartReference::Pointer& ref) override
   {
-    if (!windowAdvisor->lastActiveEditor.Expired() &&
-      ref->GetPart(false) == windowAdvisor->lastActiveEditor.Lock())
+    auto lockedLastActiveEditor = windowAdvisor->lastActiveEditor.Lock();
+
+    if (lockedLastActiveEditor.IsNotNull() && ref->GetPart(false) == lockedLastActiveEditor)
     {
       windowAdvisor->UpdateTitle(false);
     }
@@ -1362,9 +1364,11 @@ void QmitkExtWorkbenchWindowAdvisor::UpdateTitle(bool editorHidden)
     return;
   }
 
-  if (!lastActiveEditor.Expired())
+  auto lockedLastActiveEditor = lastActiveEditor.Lock();
+
+  if (lockedLastActiveEditor.IsNotNull())
   {
-    lastActiveEditor.Lock()->RemovePropertyListener(editorPropertyListener.data());
+    lockedLastActiveEditor->RemovePropertyListener(editorPropertyListener.data());
   }
 
   lastActiveEditor = activeEditor;
@@ -1384,9 +1388,11 @@ void QmitkExtWorkbenchWindowAdvisor::PropertyChange(const berry::Object::Pointer
 {
   if (propId == berry::IWorkbenchPartConstants::PROP_TITLE)
   {
-    if (!lastActiveEditor.Expired())
+    auto lockedLastActiveEditor = lastActiveEditor.Lock();
+
+    if (lockedLastActiveEditor.IsNotNull())
     {
-      QString newTitle = lastActiveEditor.Lock()->GetPartName();
+      QString newTitle = lockedLastActiveEditor->GetPartName();
       if (lastEditorTitle != newTitle)
       {
         RecomputeTitle();

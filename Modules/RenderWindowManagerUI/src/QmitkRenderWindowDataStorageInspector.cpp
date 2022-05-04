@@ -68,12 +68,10 @@ QmitkRenderWindowDataStorageInspector::SelectionMode QmitkRenderWindowDataStorag
 
 void QmitkRenderWindowDataStorageInspector::Initialize()
 {
-  if (m_DataStorage.IsExpired())
-  {
-    return;
-  }
-
   auto dataStorage = m_DataStorage.Lock();
+
+  if (dataStorage.IsNull())
+    return;
 
   m_StorageModel->SetDataStorage(dataStorage);
   m_StorageModel->SetNodePredicate(m_NodePredicate);

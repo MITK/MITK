@@ -76,12 +76,7 @@ void QmitkAbstractDataNodeAction::SetBaseRenderer(mitk::BaseRenderer* baseRender
 
 mitk::BaseRenderer::Pointer QmitkAbstractDataNodeAction::GetBaseRenderer()
 {
-  mitk::BaseRenderer::Pointer baseRenderer;
-  if (!m_BaseRenderer.IsExpired())
-  {
-    baseRenderer = m_BaseRenderer.Lock();
-  }
-  return baseRenderer;
+  return m_BaseRenderer.Lock();
 }
 
 QList<mitk::DataNode::Pointer> QmitkAbstractDataNodeAction::GetSelectedNodes() const
@@ -91,14 +86,16 @@ QList<mitk::DataNode::Pointer> QmitkAbstractDataNodeAction::GetSelectedNodes() c
     return m_SelectedNodes;
   }
 
-  if (m_WorkbenchPartSite.Expired())
+  auto workbenchPartSite = m_WorkbenchPartSite.Lock();
+
+  if (workbenchPartSite.IsNull())
   {
     // return empty list of selected nodes
     return m_SelectedNodes;
   }
 
   // retrieve selection from the workbench selection service
-  return AbstractDataNodeAction::GetSelectedNodes(m_WorkbenchPartSite.Lock());
+  return AbstractDataNodeAction::GetSelectedNodes(workbenchPartSite);
 }
 
 mitk::DataNode::Pointer QmitkAbstractDataNodeAction::GetSelectedNode() const

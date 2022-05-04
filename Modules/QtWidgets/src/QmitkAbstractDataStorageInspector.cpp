@@ -30,8 +30,9 @@ void QmitkAbstractDataStorageInspector::SetDataStorage(mitk::DataStorage* dataSt
   if (m_DataStorage != dataStorage)
   {
     m_DataStorage = dataStorage;
+    auto lockedDataStorage = m_DataStorage.Lock();
 
-    if (!m_DataStorage.IsExpired())
+    if (lockedDataStorage.IsNotNull())
     {
       this->Initialize();
     }

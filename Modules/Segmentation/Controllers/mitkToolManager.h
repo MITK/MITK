@@ -208,7 +208,7 @@ namespace mitk
      */
     DataNode *GetRoiData(int idx);
 
-    DataStorage *GetDataStorage();
+    DataStorage::Pointer GetDataStorage() const;
     void SetDataStorage(DataStorage &storage);
 
     /** Get the current selected time point of the RenderManager

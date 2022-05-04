@@ -82,7 +82,7 @@ public:
   void SetControlledRenderer(mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer);
 
   void SetCurrentRenderer(mitk::BaseRenderer* baseRenderer);
-  mitk::BaseRenderer* GetCurrentRenderer() const;
+  mitk::BaseRenderer::Pointer GetCurrentRenderer() const;
 
 private:
 

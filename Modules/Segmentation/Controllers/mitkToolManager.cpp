@@ -489,7 +489,7 @@ mitk::DataNode *mitk::ToolManager::GetRoiData(int idx)
   }
 }
 
-mitk::DataStorage *mitk::ToolManager::GetDataStorage()
+mitk::DataStorage::Pointer mitk::ToolManager::GetDataStorage() const
 {
   return m_DataStorage.Lock();
 }

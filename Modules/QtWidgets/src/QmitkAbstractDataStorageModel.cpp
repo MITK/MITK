@@ -92,7 +92,7 @@ void QmitkAbstractDataStorageModel::SetDataStorage(mitk::DataStorage* dataStorag
   DataStorageChanged();
 }
 
-mitk::DataStorage* QmitkAbstractDataStorageModel::GetDataStorage() const
+mitk::DataStorage::Pointer QmitkAbstractDataStorageModel::GetDataStorage() const
 {
   return m_DataStorage.Lock();
 }

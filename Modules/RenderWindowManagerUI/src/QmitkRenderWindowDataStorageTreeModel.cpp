@@ -401,7 +401,7 @@ void QmitkRenderWindowDataStorageTreeModel::SetCurrentRenderer(mitk::BaseRendere
   UpdateModelData();
 }
 
-mitk::BaseRenderer* QmitkRenderWindowDataStorageTreeModel::GetCurrentRenderer() const
+mitk::BaseRenderer::Pointer QmitkRenderWindowDataStorageTreeModel::GetCurrentRenderer() const
 {
   return m_BaseRenderer.Lock();
 }

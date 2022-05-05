@@ -36,7 +36,7 @@ class mitkLabelSetImageTestSuite : public mitk::TestFixture
   MITK_TEST(TestRemoveLayer);
   MITK_TEST(TestRemoveLabels);
   MITK_TEST(TestEraseLabels);
-  MITK_TEST(TestMergeLabel);
+  MITK_TEST(TestMergeLabels);
   MITK_TEST(TestCreateLabelMask);
   CPPUNIT_TEST_SUITE_END();
 
@@ -449,7 +449,7 @@ public:
       m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 6);
   }
 
-  void TestMergeLabel()
+  void TestMergeLabels()
   {
     mitk::Image::Pointer image =
       mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Multilabel/LabelSetTestInitializeImage.nrrd"));
@@ -465,15 +465,32 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("Label with ID 6 does not exist after initialization",
       m_LabelSetImage->ExistLabel(6) == true);
-    m_LabelSetImage->GetActiveLabelSet()->SetActiveLabel(6);
-    // Merge label 7 with label 6. Result should be that label 7 is not present any more
+
+    // Merge label 7 with label 6. Result should be that label 7 is not present anymore.
     m_LabelSetImage->MergeLabel(6, 7);
     CPPUNIT_ASSERT_MESSAGE("Label with value 7 was not removed from the image", m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 6);
 
     // Count all pixels with value 6 = 507
     // Count all pixels with value 7 = 823
-    // Check if merge label has 507 + 823 = 1330 pixels
+    // Check if merged label has 507 + 823 = 1330 pixels
     CPPUNIT_ASSERT_MESSAGE("Labels were not correctly merged", m_LabelSetImage->GetStatistics()->GetCountOfMaxValuedVoxels() == 1330);
+
+    CPPUNIT_ASSERT_MESSAGE("Label with ID 3 does not exist after initialization",
+      m_LabelSetImage->ExistLabel(3) == true);
+    CPPUNIT_ASSERT_MESSAGE("Label with ID 5 does not exist after initialization",
+      m_LabelSetImage->ExistLabel(5) == true);
+
+    // Merge labels 5 and 6 with 3. Result should be that labels 5 and 6 are not present anymore.
+    std::vector<mitk::Label::PixelType> vectorOfSourcePixelValues{ 5, 6 };
+    m_LabelSetImage->MergeLabels(3, vectorOfSourcePixelValues);
+    // Values within the image are 0, 1, 3, 5, 6, 7 - New Max value should be 3
+    CPPUNIT_ASSERT_MESSAGE("Labels with value 5 and 6 were not removed from the image", m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 3);
+
+    // Count all pixels with value 3 = 1893
+    // Count all pixels with value 5 = 2143
+    // Count all pixels with value 6 = 1330
+    // Check if merged label has 1893 + 2143 + 1330 = 5366 pixels
+    CPPUNIT_ASSERT_MESSAGE("Labels were not correctly merged", m_LabelSetImage->GetStatistics()->GetCountOfMaxValuedVoxels() == 5366);
   }
 
   void TestCreateLabelMask()

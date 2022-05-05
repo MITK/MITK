@@ -83,10 +83,21 @@ namespace mitk
     void UpdateCenterOfMass(PixelType pixelValue, unsigned int layer = 0);
 
     /**
-     * @brief Removes labels from the mitk::LabelSet of given layer.
-     *        Calls mitk::LabelSetImage::EraseLabels() which also removes the labels from within the image.
-     * @param VectorOfLabelPixelValues a list of labels to be removed
-     * @param layer the layer in which the labels should be removed
+     * @brief Removes the label with the given value.
+     *        The label is removed from the labelset of the given layer and
+     *        the pixel values of the image below the label are reset.
+     * @param pixelValue the pixel value of the label to be removed
+     * @param layer the layer from which the label should be removed
+     */
+    void RemoveLabel(PixelType pixelValue, unsigned int layer = 0);
+
+    /**
+     * @brief Removes a list of labels with th given value.
+     *        The labels are removed from the labelset of the given layer and
+     *        the pixel values of the image below the label are reset.
+     *        Calls mitk::LabelSetImage::EraseLabels().
+     * @param VectorOfLabelPixelValues a list of pixel values of labels to be removed
+     * @param layer the layer from which the labels should be removed
      */
     void RemoveLabels(std::vector<PixelType> &VectorOfLabelPixelValues, unsigned int layer = 0);
 
@@ -94,14 +105,14 @@ namespace mitk
      * @brief Erases the label with the given value from the labelset image.
      *        The label itself will not be erased from the respective mitk::LabelSet. In order to
      *        remove the label itself use mitk::LabelSetImage::RemoveLabels()
-     * @param pixelValue the pixel value of the label that will be removed from the labelset image
+     * @param pixelValue the pixel value of the label that will be erased from the labelset image
      */
     void EraseLabel(PixelType pixelValue);
 
     /**
      * @brief Erases a list of labels with the given values from the labelset image.
      * @param VectorOfLabelPixelValues the list of pixel values of the labels
-     *                                 that will be removed from the labelset image
+     *                                 that will be erased from the labelset image
      */
     void EraseLabels(std::vector<PixelType> &VectorOfLabelPixelValues);
 

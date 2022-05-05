@@ -425,20 +425,17 @@ void mitk::LabelSetImage::MergeLabels(PixelType pixelValue, std::vector<PixelTyp
   Modified();
 }
 
-void mitk::LabelSetImage::RemoveLabels(std::vector<PixelType> &VectorOfLabelPixelValues, unsigned int layer)
+void mitk::LabelSetImage::RemoveLabel(PixelType pixelValue, unsigned int layer)
+{
+  this->GetLabelSet(layer)->RemoveLabel(pixelValue);
+  this->EraseLabel(pixelValue);
+}
+
+void mitk::LabelSetImage::RemoveLabels(std::vector<PixelType>& VectorOfLabelPixelValues, unsigned int layer)
 {
   for (unsigned int idx = 0; idx < VectorOfLabelPixelValues.size(); idx++)
   {
-    GetLabelSet(layer)->RemoveLabel(VectorOfLabelPixelValues[idx]);
-    EraseLabel(VectorOfLabelPixelValues[idx]);
-  }
-}
-
-void mitk::LabelSetImage::EraseLabels(std::vector<PixelType> &VectorOfLabelPixelValues)
-{
-  for (unsigned int i = 0; i < VectorOfLabelPixelValues.size(); i++)
-  {
-    this->EraseLabel(VectorOfLabelPixelValues[i]);
+    this->RemoveLabel(VectorOfLabelPixelValues[idx], layer);
   }
 }
 
@@ -455,11 +452,19 @@ void mitk::LabelSetImage::EraseLabel(PixelType pixelValue)
       AccessByItk_1(this, EraseLabelProcessing, pixelValue);
     }
   }
-  catch (const itk::ExceptionObject &e)
+  catch (const itk::ExceptionObject& e)
   {
     mitkThrow() << e.GetDescription();
   }
   Modified();
+}
+
+void mitk::LabelSetImage::EraseLabels(std::vector<PixelType>& VectorOfLabelPixelValues)
+{
+  for (unsigned int idx = 0; idx < VectorOfLabelPixelValues.size(); idx++)
+  {
+    this->EraseLabel(VectorOfLabelPixelValues[idx]);
+  }
 }
 
 mitk::Label *mitk::LabelSetImage::GetActiveLabel(unsigned int layer)

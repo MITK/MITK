@@ -95,3 +95,61 @@ void mitk::ImageTimeSelector::GenerateInputRequestedRegion()
 
   input->SetRequestedRegion(&requestedRegion);
 }
+
+mitk::Image::ConstPointer mitk::SelectImageByTimeStep(const mitk::Image* image, unsigned int timestep)
+{
+  if (nullptr == image)
+    return image;
+
+  if (image->GetDimension() != 4)
+    return image;
+
+  ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
+
+  imageTimeSelector->SetInput(image);
+  imageTimeSelector->SetTimeNr(static_cast<int>(timestep));
+
+  imageTimeSelector->UpdateLargestPossibleRegion();
+
+  return imageTimeSelector->GetOutput();
+}
+
+mitk::Image::Pointer mitk::SelectImageByTimeStep(mitk::Image* image, unsigned int timestep)
+{
+  if (nullptr == image)
+    return image;
+
+  if (image->GetDimension() != 4)
+    return image;
+
+  ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
+
+  imageTimeSelector->SetInput(image);
+  imageTimeSelector->SetTimeNr(static_cast<int>(timestep));
+
+  imageTimeSelector->UpdateLargestPossibleRegion();
+
+  return imageTimeSelector->GetOutput();
+}
+
+mitk::Image::ConstPointer mitk::SelectImageByTimePoint(const mitk::Image* image, TimePointType timePoint)
+{
+  if (nullptr == image)
+    return image;
+
+  if (!image->GetTimeGeometry()->IsValidTimePoint(timePoint))
+    return nullptr;
+
+  return SelectImageByTimeStep(image, image->GetTimeGeometry()->TimePointToTimeStep(timePoint));
+}
+
+mitk::Image::Pointer mitk::SelectImageByTimePoint(mitk::Image* image, TimePointType timePoint)
+{
+  if (nullptr == image)
+    return image;
+
+  if (!image->GetTimeGeometry()->IsValidTimePoint(timePoint))
+    return nullptr;
+
+  return SelectImageByTimeStep(image, image->GetTimeGeometry()->TimePointToTimeStep(timePoint));
+}

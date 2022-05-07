@@ -55,6 +55,24 @@ namespace mitk
     int m_ChannelNr;
   };
 
+
+  /** Convinience helper that makes the application of the ImageTimeSelector one function call. It extracts the
+    image for the passed timestep, if the image has multiple time steps.
+    If a nullptr is passed as image, a nullptr will be returend.
+    If an image without timesteps is passed the, the image will be returned unaltered. The behavior of invalid time definition
+    is simerlar to the ImageTimeSelector filter.*/
+  MITKCORE_EXPORT Image::ConstPointer SelectImageByTimeStep(const Image* image, unsigned int timestep);
+  /** Non const version.*/
+  MITKCORE_EXPORT Image::Pointer SelectImageByTimeStep(Image* image, unsigned int timestep);
+  /** Convinience helper that makes the application of the ImageTimeSelector one function call. It extracts the
+    image for the passed time point, if the image has multiple time steps.
+    If a nullptr is passed as image, a nullptr will be returend.
+    If an image without timesteps is passed the, the image will be returned unaltered. The behavior of invalid time definition
+    is simerlar to the ImageTimeSelector filter.*/
+  MITKCORE_EXPORT Image::ConstPointer SelectImageByTimePoint(const Image* image, TimePointType timePoint);
+  /** Non const version.*/
+  MITKCORE_EXPORT Image::Pointer SelectImageByTimePoint(Image* image, TimePointType timePoint);
+
 } // namespace mitk
 
 #endif /* IMAGETIMESELECTOR_H_HEADER_INCLUDED_C1E4861D */

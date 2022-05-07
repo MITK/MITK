@@ -49,49 +49,17 @@ const char *mitk::AutoSegmentationTool::GetGroup() const
 
 mitk::Image::ConstPointer mitk::AutoSegmentationTool::GetImageByTimeStep(const mitk::Image* image, unsigned int timestep)
 {
-  if (nullptr == image)
-    return image;
-
-  if (image->GetDimension() != 4)
-    return image;
-
-  mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
-
-  imageTimeSelector->SetInput(image);
-  imageTimeSelector->SetTimeNr(static_cast<int>(timestep));
-
-  imageTimeSelector->UpdateLargestPossibleRegion();
-
-  return imageTimeSelector->GetOutput();
+  return SelectImageByTimeStep(image, timestep);
 }
 
 mitk::Image::Pointer mitk::AutoSegmentationTool::GetImageByTimeStep(mitk::Image* image, unsigned int timestep)
 {
-  if (nullptr == image)
-    return image;
-
-  if (image->GetDimension() != 4)
-    return image;
-
-  mitk::ImageTimeSelector::Pointer imageTimeSelector = mitk::ImageTimeSelector::New();
-
-  imageTimeSelector->SetInput(image);
-  imageTimeSelector->SetTimeNr(static_cast<int>(timestep));
-
-  imageTimeSelector->UpdateLargestPossibleRegion();
-
-  return imageTimeSelector->GetOutput();
+  return SelectImageByTimeStep(image, timestep);
 }
 
 mitk::Image::ConstPointer mitk::AutoSegmentationTool::GetImageByTimePoint(const mitk::Image* image, TimePointType timePoint)
 {
-  if (nullptr == image)
-    return image;
-
-  if (!image->GetTimeGeometry()->IsValidTimePoint(timePoint))
-    return nullptr;
-
-  return AutoSegmentationTool::GetImageByTimeStep(image, image->GetTimeGeometry()->TimePointToTimeStep(timePoint));
+  return SelectImageByTimeStep(image, timePoint);
 }
 
 void mitk::AutoSegmentationTool::SetOverwriteExistingSegmentation(bool overwrite)

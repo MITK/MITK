@@ -337,6 +337,49 @@ namespace mitk
                                    ScalarType eps,
                                    bool verbose);
 
+
+  /** temporery namespace that is used until the new class MultiLabelSegmentation is
+    introduced. It allows to already introduce/use some upcoming definitions, while
+    refactoring code.*/
+  namespace MultiLabelSegmentation
+  {
+    enum class MergeStyle
+    {
+      Replace, //The old label content of a lable value will be replaced by its new label content.
+               //Therefore pixels that are labeled might become unlabeled again.
+               //(This means that a lock of the value is also ignored).
+      Merge //The union of old and new label content will be generated.
+    };
+
+    enum class OverwriteStyle
+    {
+      RegardLocks, //Locked labels in the same spatial group will not be overwritten/changed.
+      IgnoreLocks //Label locks in the same spatial group will be ignored, so these labels might be changed.
+    };
+  }
+
+  /**Helper function that transfers pixels of the specified source label from source image to the destination image by using
+  a specified destination label. Function processes the whole image volume of the specified time step.
+  @remark in its current implementation the function only transfers contents of the active layer of the passed LabelSetImages.
+  @remark the function assumes that it is only called with source and destination image of same geometry.
+  @param sourceImage Pointer to the LabelSetImage which active layer should be used as source for the transfer.
+  @param destionationImage Pointer to the LabelSetImage which active layer should be used as destination for the transfer.
+  @param labelMapping Map that encodes the mappings of all label pixel transfers that should be done. First element is the
+  label in the source image. The second element is the label that transferred pixels should become in the destination image.
+  The order in which the labels will be transfered is the same order of elements in the labelMapping.
+  @param mergeMode indicates how the transfer should be done. If true, it is performed like a merge/union operation. So only
+  pixels of the label will be added. If false, also background is transferred, if present in the source image where the
+  destinationImage is labeled by the destination label. Therefore in this mode the label in the destinationImage can
+  "shrink"/lose pixels to the background.
+  @param timeStep indicate the time step that should be transferred.
+  @pre sourceImage and destinationImage must be valid
+  @pre sourceImage and destinationImage must contain the indicated timeStep
+  @pre sourceImage must contain all indicated sourceLabels in its active layer.
+  @pre destinationImage must contain all indicated destinationLabels in its active layer.*/
+  MITKMULTILABEL_EXPORT void TransferLabelContent(const LabelSetImage* sourceImage, LabelSetImage* destinationImage,
+    std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping = { {1,1} },
+    bool mergeMode = false, const TimeStepType timeStep = 0);
+
 } // namespace mitk
 
 #endif // __mitkLabelSetImage_H_

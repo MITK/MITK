@@ -204,19 +204,19 @@ namespace mitk
     unsigned int GetNumberOfLayers() const;
 
     /**
-     * @brief Adds a new layer to the LabelSetImage. The new layer will be set as the active one
-     * @param layer a mitk::LabelSet which will be set as new layer.
-     * @return the layer ID of the new layer
+     * \brief Adds a new layer to the LabelSetImage. The new layer will be set as the active one.
+     * \param labelSet a labelset that will be added to the new layer if provided
+     * \return the layer ID of the new layer
      */
-    unsigned int AddLayer(mitk::LabelSet::Pointer layer = nullptr);
+    unsigned int AddLayer(mitk::LabelSet::Pointer labelSet = nullptr);
 
     /**
-    * \brief Add a layer based on a provided mitk::Image
+    * \brief Adds a layer based on a provided mitk::Image.
     * \param layerImage is added to the vector of label images
-    * \param lset a label set that will be added to the new layer if provided
-    *\return the layer ID of the new layer
+    * \param labelSet   a labelset that will be added to the new layer if provided
+    * \return the layer ID of the new layer
     */
-    unsigned int AddLayer(mitk::Image::Pointer layerImage, mitk::LabelSet::Pointer lset = nullptr);
+    unsigned int AddLayer(mitk::Image::Pointer layerImage, mitk::LabelSet::Pointer labelSet = nullptr);
 
     /**
     * \brief Add a LabelSet to an existing layer

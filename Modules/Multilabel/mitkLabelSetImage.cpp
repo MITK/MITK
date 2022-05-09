@@ -209,7 +209,7 @@ void mitk::LabelSetImage::RemoveLayer()
   this->Modified();
 }
 
-unsigned int mitk::LabelSetImage::AddLayer(mitk::LabelSet::Pointer lset)
+unsigned int mitk::LabelSetImage::AddLayer(mitk::LabelSet::Pointer labelSet)
 {
   mitk::Image::Pointer newImage = mitk::Image::New();
   newImage->Initialize(this->GetPixelType(),
@@ -227,20 +227,20 @@ unsigned int mitk::LabelSetImage::AddLayer(mitk::LabelSet::Pointer lset)
     AccessFixedDimensionByItk(newImage, SetToZero, 4);
   }
 
-  unsigned int newLabelSetId = this->AddLayer(newImage, lset);
+  unsigned int newLabelSetId = this->AddLayer(newImage, labelSet);
 
   return newLabelSetId;
 }
 
-unsigned int mitk::LabelSetImage::AddLayer(mitk::Image::Pointer layerImage, mitk::LabelSet::Pointer lset)
+unsigned int mitk::LabelSetImage::AddLayer(mitk::Image::Pointer layerImage, mitk::LabelSet::Pointer labelSet)
 {
   unsigned int newLabelSetId = m_LayerContainer.size();
 
   // Add labelset to layer
   mitk::LabelSet::Pointer ls;
-  if (lset.IsNotNull())
+  if (labelSet.IsNotNull())
   {
-    ls = lset;
+    ls = labelSet;
   }
   else
   {

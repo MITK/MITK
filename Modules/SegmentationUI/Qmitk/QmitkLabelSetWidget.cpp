@@ -101,25 +101,6 @@ void QmitkLabelSetWidget::OnTableViewContextMenuRequested(const QPoint & /*pos*/
     eraseLabelsAction->setEnabled(true);
     QObject::connect(eraseLabelsAction, SIGNAL(triggered(bool)), this, SLOT(OnEraseLabels(bool)));
     menu->addAction(eraseLabelsAction);
-
-    /*QAction* combineAndCreateSurfaceAction =
-      new QAction(QIcon(":/Qmitk/CreateSurface.png"), "Combine and create a surface", this);
-    combineAndCreateSurfaceAction->setEnabled(true);
-    QObject::connect(
-      combineAndCreateSurfaceAction, SIGNAL(triggered(bool)), this, SLOT(OnCombineAndCreateSurface(bool)));*/
-    // menu->addAction(combineAndCreateSurfaceAction); Not implemented
-
-    /*QAction* createMasksAction =
-      new QAction(QIcon(":/Qmitk/CreateMask.png"), "Create a mask for each selected label", this);
-    createMasksAction->setEnabled(true);
-    QObject::connect(createMasksAction, SIGNAL(triggered(bool)), this, SLOT(OnCreateMasks(bool)));*/
-    // menu->addAction(createMasksAction); Not implemented
-
-    /*QAction* combineAndCreateMaskAction =
-      new QAction(QIcon(":/Qmitk/CreateMask.png"), "Combine and create a mask", this);
-    combineAndCreateMaskAction->setEnabled(true);
-    QObject::connect(combineAndCreateMaskAction, SIGNAL(triggered(bool)), this, SLOT(OnCombineAndCreateMask(bool)));*/
-    // menu->addAction(combineAndCreateMaskAction); Not implemented
   }
   else
   {
@@ -857,24 +838,6 @@ void QmitkLabelSetWidget::InitializeTableWidget()
           SIGNAL(customContextMenuRequested(const QPoint &)),
           this,
           SLOT(OnTableViewContextMenuRequested(const QPoint &)));
-
-  // connect( m_Controls.m_LabelSetTableWidget, SIGNAL(activeLabelChanged(int)), this, SLOT(OnActiveLabelChanged(int)));
-  // connect( m_Controls.m_LabelSetTableWidget, SIGNAL(renameLabel(int, const mitk::Color&, const std::string&)), this,
-  // SLOT(OnRenameLabel(int, const mitk::Color&, const std::string&)) );
-  // connect( m_Controls.m_LabelSetTableWidget, SIGNAL(createSurface(int, bool)), this, SLOT(OnCreateSurface(int, bool))
-  // );
-  // connect( m_Controls.m_LabelSetTableWidget, SIGNAL(toggleOutline(bool)), this, SLOT(OnToggleOutline(bool)) );
-  // connect( m_Controls.m_LabelSetTableWidget, SIGNAL(goToLabel(const mitk::Point3D&)), this, SIGNAL(goToLabel(const
-  // mitk::Point3D&)) );
-  // connect( m_Controls.m_LabelSetTableWidget, SIGNAL(combineAndCreateSurface( const QList<QTableWidgetSelectionRange>&
-  // )),
-  //    this, SLOT(OnCombineAndCreateSurface( const QList<QTableWidgetSelectionRange>&)) );
-
-  // connect( m_Controls.m_LabelSetTableWidget, SIGNAL(createMask(int)), this, SLOT(OnCreateMask(int)) );
-  // connect( m_Controls.m_LabelSetTableWidget, SIGNAL(createCroppedMask(int)), this, SLOT(OnCreateCroppedMask(int)) );
-  // connect( m_Controls.m_LabelSetTableWidget, SIGNAL(combineAndCreateMask( const QList<QTableWidgetSelectionRange>&
-  // )),
-  //    this, SLOT(OnCombineAndCreateMask( const QList<QTableWidgetSelectionRange>&)) );
 }
 
 void QmitkLabelSetWidget::OnOpacityChanged(int value)

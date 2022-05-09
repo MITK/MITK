@@ -283,9 +283,6 @@ namespace mitk
     template <typename ImageType>
     void EraseLabelProcessing(ImageType *input, PixelType index, unsigned int layer);
 
-    //  template < typename ImageType >
-    //  void ReorderLabelProcessing( ImageType* input, int index, int layer);
-
     template <typename ImageType>
     void MergeLabelProcessing(ImageType *input, PixelType pixelValue, PixelType index);
 

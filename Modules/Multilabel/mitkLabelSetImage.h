@@ -58,10 +58,6 @@ namespace mitk
 
     /**
       * \brief  */
-    void Concatenate(mitk::LabelSetImage *image);
-
-    /**
-      * \brief  */
     void ClearBuffer();
 
     /**
@@ -95,20 +91,19 @@ namespace mitk
     void RemoveLabels(std::vector<PixelType> &VectorOfLabelPixelValues, unsigned int layer = 0);
 
     /**
-     * @brief Erases the label with the given value in the given layer from the underlying image.
+     * @brief Erases the label with the given value from the labelset image.
      *        The label itself will not be erased from the respective mitk::LabelSet. In order to
      *        remove the label itself use mitk::LabelSetImage::RemoveLabels()
-     * @param pixelValue the label which will be remove from the image
-     * @param layer the layer in which the label should be removed
+     * @param pixelValue the pixel value of the label that will be removed from the labelset image
      */
-    void EraseLabel(PixelType pixelValue, unsigned int layer = 0);
+    void EraseLabel(PixelType pixelValue);
 
     /**
-     * @brief Similar to mitk::LabelSetImage::EraseLabel() this funtion erase a list of labels from the image
-     * @param VectorOfLabelPixelValues the list of labels that should be remove
-     * @param layer the layer for which the labels should be removed
+     * @brief Erases a list of labels with the given values from the labelset image.
+     * @param VectorOfLabelPixelValues the list of pixel values of the labels
+     *                                 that will be removed from the labelset image
      */
-    void EraseLabels(std::vector<PixelType> &VectorOfLabelPixelValues, unsigned int layer = 0);
+    void EraseLabels(std::vector<PixelType> &VectorOfLabelPixelValues);
 
     /**
       * \brief  Returns true if the value exists in one of the labelsets*/
@@ -209,19 +204,19 @@ namespace mitk
     unsigned int GetNumberOfLayers() const;
 
     /**
-     * @brief Adds a new layer to the LabelSetImage. The new layer will be set as the active one
-     * @param layer a mitk::LabelSet which will be set as new layer.
-     * @return the layer ID of the new layer
+     * \brief Adds a new layer to the LabelSetImage. The new layer will be set as the active one.
+     * \param labelSet a labelset that will be added to the new layer if provided
+     * \return the layer ID of the new layer
      */
-    unsigned int AddLayer(mitk::LabelSet::Pointer layer = nullptr);
+    unsigned int AddLayer(mitk::LabelSet::Pointer labelSet = nullptr);
 
     /**
-    * \brief Add a layer based on a provided mitk::Image
+    * \brief Adds a layer based on a provided mitk::Image.
     * \param layerImage is added to the vector of label images
-    * \param lset a label set that will be added to the new layer if provided
-    *\return the layer ID of the new layer
+    * \param labelSet   a labelset that will be added to the new layer if provided
+    * \return the layer ID of the new layer
     */
-    unsigned int AddLayer(mitk::Image::Pointer layerImage, mitk::LabelSet::Pointer lset = nullptr);
+    unsigned int AddLayer(mitk::Image::Pointer layerImage, mitk::LabelSet::Pointer labelSet = nullptr);
 
     /**
     * \brief Add a LabelSet to an existing layer
@@ -272,9 +267,6 @@ namespace mitk
     LabelSetImage(const LabelSetImage &other);
     ~LabelSetImage() override;
 
-    template <typename ImageType1, typename ImageType2>
-    void ChangeLayerProcessing(ImageType1 *source, ImageType2 *target);
-
     template <typename TPixel, unsigned int VImageDimension>
     void LayerContainerToImageProcessing(itk::Image<TPixel, VImageDimension> *source, unsigned int layer);
 
@@ -288,16 +280,10 @@ namespace mitk
     void ClearBufferProcessing(ImageType *input);
 
     template <typename ImageType>
-    void EraseLabelProcessing(ImageType *input, PixelType index, unsigned int layer);
-
-    //  template < typename ImageType >
-    //  void ReorderLabelProcessing( ImageType* input, int index, int layer);
+    void EraseLabelProcessing(ImageType *input, PixelType index);
 
     template <typename ImageType>
     void MergeLabelProcessing(ImageType *input, PixelType pixelValue, PixelType index);
-
-    template <typename ImageType>
-    void ConcatenateProcessing(ImageType *input, mitk::LabelSetImage *other);
 
     template <typename ImageType>
     void MaskStampProcessing(ImageType *input, mitk::Image *mask, bool forceOverwrite);

@@ -91,20 +91,19 @@ namespace mitk
     void RemoveLabels(std::vector<PixelType> &VectorOfLabelPixelValues, unsigned int layer = 0);
 
     /**
-     * @brief Erases the label with the given value in the given layer from the underlying image.
+     * @brief Erases the label with the given value from the labelset image.
      *        The label itself will not be erased from the respective mitk::LabelSet. In order to
      *        remove the label itself use mitk::LabelSetImage::RemoveLabels()
-     * @param pixelValue the label which will be remove from the image
-     * @param layer the layer in which the label should be removed
+     * @param pixelValue the pixel value of the label that will be removed from the labelset image
      */
-    void EraseLabel(PixelType pixelValue, unsigned int layer = 0);
+    void EraseLabel(PixelType pixelValue);
 
     /**
-     * @brief Similar to mitk::LabelSetImage::EraseLabel() this funtion erase a list of labels from the image
-     * @param VectorOfLabelPixelValues the list of labels that should be remove
-     * @param layer the layer for which the labels should be removed
+     * @brief Erases a list of labels with the given values from the labelset image.
+     * @param VectorOfLabelPixelValues the list of pixel values of the labels
+     *                                 that will be removed from the labelset image
      */
-    void EraseLabels(std::vector<PixelType> &VectorOfLabelPixelValues, unsigned int layer = 0);
+    void EraseLabels(std::vector<PixelType> &VectorOfLabelPixelValues);
 
     /**
       * \brief  Returns true if the value exists in one of the labelsets*/
@@ -281,7 +280,7 @@ namespace mitk
     void ClearBufferProcessing(ImageType *input);
 
     template <typename ImageType>
-    void EraseLabelProcessing(ImageType *input, PixelType index, unsigned int layer);
+    void EraseLabelProcessing(ImageType *input, PixelType index);
 
     template <typename ImageType>
     void MergeLabelProcessing(ImageType *input, PixelType pixelValue, PixelType index);

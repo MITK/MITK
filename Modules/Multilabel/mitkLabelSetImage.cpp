@@ -427,29 +427,29 @@ void mitk::LabelSetImage::RemoveLabels(std::vector<PixelType> &VectorOfLabelPixe
   for (unsigned int idx = 0; idx < VectorOfLabelPixelValues.size(); idx++)
   {
     GetLabelSet(layer)->RemoveLabel(VectorOfLabelPixelValues[idx]);
-    EraseLabel(VectorOfLabelPixelValues[idx], layer);
+    EraseLabel(VectorOfLabelPixelValues[idx]);
   }
 }
 
-void mitk::LabelSetImage::EraseLabels(std::vector<PixelType> &VectorOfLabelPixelValues, unsigned int layer)
+void mitk::LabelSetImage::EraseLabels(std::vector<PixelType> &VectorOfLabelPixelValues)
 {
   for (unsigned int i = 0; i < VectorOfLabelPixelValues.size(); i++)
   {
-    this->EraseLabel(VectorOfLabelPixelValues[i], layer);
+    this->EraseLabel(VectorOfLabelPixelValues[i]);
   }
 }
 
-void mitk::LabelSetImage::EraseLabel(PixelType pixelValue, unsigned int layer)
+void mitk::LabelSetImage::EraseLabel(PixelType pixelValue)
 {
   try
   {
     if (4 == this->GetDimension())
     {
-      AccessFixedDimensionByItk_2(this, EraseLabelProcessing, 4, pixelValue, layer);
+      AccessFixedDimensionByItk_1(this, EraseLabelProcessing, 4, pixelValue);
     }
     else
     {
-      AccessByItk_2(this, EraseLabelProcessing, pixelValue, layer);
+      AccessByItk_1(this, EraseLabelProcessing, pixelValue);
     }
   }
   catch (const itk::ExceptionObject &e)
@@ -844,7 +844,7 @@ void mitk::LabelSetImage::ImageToLayerContainerProcessing(itk::Image<TPixel, VIm
 }
 
 template <typename ImageType>
-void mitk::LabelSetImage::EraseLabelProcessing(ImageType *itkImage, PixelType pixelValue, unsigned int /*layer*/)
+void mitk::LabelSetImage::EraseLabelProcessing(ImageType *itkImage, PixelType pixelValue)
 {
   typedef itk::ImageRegionIterator<ImageType> IteratorType;
 

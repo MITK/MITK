@@ -357,7 +357,7 @@ void QmitkLabelSetWidget::OnEraseLabels(bool /*value*/)
         VectorOfLablePixelValues.push_back(m_Controls.m_LabelSetTableWidget->item(i, 0)->data(Qt::UserRole).toInt());
 
     this->WaitCursorOn();
-    GetWorkingImage()->EraseLabels(VectorOfLablePixelValues, GetWorkingImage()->GetActiveLayer());
+    GetWorkingImage()->EraseLabels(VectorOfLablePixelValues);
     this->WaitCursorOff();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }

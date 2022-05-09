@@ -58,10 +58,6 @@ namespace mitk
 
     /**
       * \brief  */
-    void Concatenate(mitk::LabelSetImage *image);
-
-    /**
-      * \brief  */
     void ClearBuffer();
 
     /**
@@ -295,9 +291,6 @@ namespace mitk
 
     template <typename ImageType>
     void MergeLabelProcessing(ImageType *input, PixelType pixelValue, PixelType index);
-
-    template <typename ImageType>
-    void ConcatenateProcessing(ImageType *input, mitk::LabelSetImage *other);
 
     template <typename ImageType>
     void MaskStampProcessing(ImageType *input, mitk::Image *mask, bool forceOverwrite);

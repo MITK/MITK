@@ -349,39 +349,6 @@ void mitk::LabelSetImage::SetActiveLayer(unsigned int layer)
   this->Modified();
 }
 
-void mitk::LabelSetImage::Concatenate(mitk::LabelSetImage *other)
-{
-  const unsigned int *otherDims = other->GetDimensions();
-  const unsigned int *thisDims = this->GetDimensions();
-  if ((otherDims[0] != thisDims[0]) || (otherDims[1] != thisDims[1]) || (otherDims[2] != thisDims[2]))
-    mitkThrow() << "Dimensions do not match.";
-
-  try
-  {
-    int numberOfLayers = other->GetNumberOfLayers();
-    for (int layer = 0; layer < numberOfLayers; ++layer)
-    {
-      this->SetActiveLayer(layer);
-      AccessByItk_1(this, ConcatenateProcessing, other);
-      mitk::LabelSet *ls = other->GetLabelSet(layer);
-      auto it = ls->IteratorConstBegin();
-      auto end = ls->IteratorConstEnd();
-      it++; // skip exterior
-      while (it != end)
-      {
-        GetLabelSet()->AddLabel((it->second));
-        // AddLabelEvent.Send();
-        it++;
-      }
-    }
-  }
-  catch (itk::ExceptionObject &e)
-  {
-    mitkThrow() << e.GetDescription();
-  }
-  this->Modified();
-}
-
 void mitk::LabelSetImage::ClearBuffer()
 {
   try
@@ -823,36 +790,6 @@ template <typename ImageType>
 void mitk::LabelSetImage::ClearBufferProcessing(ImageType *itkImage)
 {
   itkImage->FillBuffer(0);
-}
-
-// todo: concatenate all layers and not just the active one
-template <typename ImageType>
-void mitk::LabelSetImage::ConcatenateProcessing(ImageType *itkTarget, mitk::LabelSetImage *other)
-{
-  typename ImageType::Pointer itkSource = ImageType::New();
-  mitk::CastToItkImage(other, itkSource);
-
-  typedef itk::ImageRegionConstIterator<ImageType> ConstIteratorType;
-  typedef itk::ImageRegionIterator<ImageType> IteratorType;
-
-  ConstIteratorType sourceIter(itkSource, itkSource->GetLargestPossibleRegion());
-  IteratorType targetIter(itkTarget, itkTarget->GetLargestPossibleRegion());
-
-  int numberOfTargetLabels = this->GetNumberOfLabels(GetActiveLayer()) - 1; // skip exterior
-  sourceIter.GoToBegin();
-  targetIter.GoToBegin();
-
-  while (!sourceIter.IsAtEnd())
-  {
-    PixelType sourceValue = sourceIter.Get();
-    PixelType targetValue = targetIter.Get();
-    if ((sourceValue != 0) && !this->GetLabel(targetValue)->GetLocked()) // skip exterior and locked labels
-    {
-      targetIter.Set(sourceValue + numberOfTargetLabels);
-    }
-    ++sourceIter;
-    ++targetIter;
-  }
 }
 
 template <typename TPixel, unsigned int VImageDimension>

@@ -32,7 +32,7 @@ QmitkMorphologicalOperationsWidget::QmitkMorphologicalOperationsWidget(mitk::Sli
   m_Controls.m_LabelSetWidget->SetDataStorage(ds);
   m_Controls.m_LabelSetWidget->setEnabled(true);
 
-  m_Controls.m_ToolSelectionBox->SetToolManager(*mitk::ToolManagerProvider::GetInstance()->GetToolManager(mitk::ToolManagerProvider::MULTILABEL_SEGMENTATION));
+  m_Controls.m_ToolSelectionBox->SetToolManager(*mitk::ToolManagerProvider::GetInstance()->GetToolManager());
   m_Controls.m_ToolSelectionBox->SetGenerateAccelerators(true);
   m_Controls.m_ToolSelectionBox->SetToolGUIArea( m_Controls.m_ToolGUIContainer );
   m_Controls.m_ToolSelectionBox->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );

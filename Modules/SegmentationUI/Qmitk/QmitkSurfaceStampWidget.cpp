@@ -25,7 +25,7 @@ QmitkSurfaceStampWidget::QmitkSurfaceStampWidget(QWidget *parent, const char * /
   m_Controls.setupUi(this);
   m_Controls.m_InformationWidget->hide();
 
-  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager(mitk::ToolManagerProvider::MULTILABEL_SEGMENTATION);
+  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
   m_ToolManager->ActivateTool(-1);
 
   mitk::NodePredicateAnd::Pointer m_SurfacePredicate = mitk::NodePredicateAnd::New();
@@ -59,7 +59,7 @@ void QmitkSurfaceStampWidget::OnStamp()
     return;
   }
 
-  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager(mitk::ToolManagerProvider::MULTILABEL_SEGMENTATION);
+  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
   assert(m_ToolManager);
   m_ToolManager->ActivateTool(-1);
 

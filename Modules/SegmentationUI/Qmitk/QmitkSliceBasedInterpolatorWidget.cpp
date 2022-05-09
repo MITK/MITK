@@ -51,7 +51,7 @@ QmitkSliceBasedInterpolatorWidget::QmitkSliceBasedInterpolatorWidget(QWidget *pa
 {
   m_Controls.setupUi(this);
 
-  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager(mitk::ToolManagerProvider::MULTILABEL_SEGMENTATION);
+  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
 
   m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<QmitkSliceBasedInterpolatorWidget>(
     this, &QmitkSliceBasedInterpolatorWidget::OnToolManagerWorkingDataModified);

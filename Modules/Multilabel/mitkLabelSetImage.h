@@ -353,10 +353,13 @@ namespace mitk
   @param labelMapping Map that encodes the mappings of all label pixel transfers that should be done. First element is the
   label in the source image. The second element is the label that transferred pixels should become in the destination image.
   The order in which the labels will be transfered is the same order of elements in the labelMapping.
-  @param mergeMode indicates how the transfer should be done. If true, it is performed like a merge/union operation. So only
-  pixels of the label will be added. If false, also background is transferred, if present in the source image where the
-  destinationImage is labeled by the destination label. Therefore in this mode the label in the destinationImage can
-  "shrink"/lose pixels to the background.
+  If you use a heterogenous label mapping (e.g. (1,2); so changing the label while transfering), keep in mind that
+  for the MergeStyle and OverwriteStyle only the destination label (second element) is relevant (e.g. what should be
+  altered with MergeStyle Replace).
+  @param mergeStyle indicates how the transfer should be done (merge or replace). For more details see documentation of
+  MultiLabelSegmentation::MergeStyle.
+  @param overwriteStlye indicates if label locks in the destination image should be regarded or not. For more details see
+  documentation of MultiLabelSegmentation::OverwriteStyle.
   @param timeStep indicate the time step that should be transferred.
   @pre sourceImage and destinationImage must be valid
   @pre sourceImage and destinationImage must contain the indicated timeStep
@@ -364,7 +367,9 @@ namespace mitk
   @pre destinationImage must contain all indicated destinationLabels in its active layer.*/
   MITKMULTILABEL_EXPORT void TransferLabelContent(const LabelSetImage* sourceImage, LabelSetImage* destinationImage,
     std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping = { {1,1} },
-    bool mergeMode = false, const TimeStepType timeStep = 0);
+    MultiLabelSegmentation::MergeStyle mergeStyle = MultiLabelSegmentation::MergeStyle::Replace,
+    MultiLabelSegmentation::OverwriteStyle overwriteStlye = MultiLabelSegmentation::OverwriteStyle::RegardLocks,
+    const TimeStepType timeStep = 0);
 
 } // namespace mitk
 

@@ -116,10 +116,6 @@ private slots:
   void OnEraseLabel(bool);
   void OnEraseLabels(bool);
   void OnMergeLabels(bool);
-  // reaction to the button "Import Segmentation"
-  void OnImportSegmentation();
-  // reaction to the button "Import Labeled Image"
-  void OnImportLabeledImage();
 
   // reaction to signal "labelListModified" from QmitkLabelSetTableWidget
   void OnLabelListModified(const QStringList &list);

@@ -190,11 +190,6 @@ void QmitkLabelSetWidget::OnTableViewContextMenuRequested(const QPoint & /*pos*/
     createCroppedMaskAction->setEnabled(true);
     QObject::connect(createCroppedMaskAction, SIGNAL(triggered(bool)), this, SLOT(OnCreateCroppedMask(bool)));
 
-    //    QAction* importAction = new QAction(QIcon(":/Qmitk/RenameLabel.png"), "Import...", this );
-    //    importAction->setEnabled(true);
-    //    QObject::connect( importAction, SIGNAL( triggered(bool) ), this, SLOT( OnImportSegmentationSession(bool) ) );
-    //    menu->addAction(importAction);
-
     menu->addAction(createCroppedMaskAction);
 
     QSlider *opacitySlider = new QSlider;
@@ -863,10 +858,7 @@ void QmitkLabelSetWidget::InitializeTableWidget()
           this,
           SLOT(OnTableViewContextMenuRequested(const QPoint &)));
 
-  // connect( m_Controls.m_LabelSetTableWidget, SIGNAL(activeLabelChanged(int)), this, SLOT(OnActiveLabelChanged(int))
-  // );
-  // connect( m_Controls.m_LabelSetTableWidget, SIGNAL(importSegmentation()), this, SLOT( OnImportSegmentation()) );
-  // connect( m_Controls.m_LabelSetTableWidget, SIGNAL(importLabeledImage()), this, SLOT( OnImportLabeledImage()) );
+  // connect( m_Controls.m_LabelSetTableWidget, SIGNAL(activeLabelChanged(int)), this, SLOT(OnActiveLabelChanged(int)));
   // connect( m_Controls.m_LabelSetTableWidget, SIGNAL(renameLabel(int, const mitk::Color&, const std::string&)), this,
   // SLOT(OnRenameLabel(int, const mitk::Color&, const std::string&)) );
   // connect( m_Controls.m_LabelSetTableWidget, SIGNAL(createSurface(int, bool)), this, SLOT(OnCreateSurface(int, bool))
@@ -1178,96 +1170,6 @@ void QmitkLabelSetWidget::OnCreateDetailedSurface(bool /*triggered*/)
                              "Create Surface",
                              "Could not create a surface mesh out of the selected label. See error log for details.\n");
   }
-}
-
-void QmitkLabelSetWidget::OnImportLabeledImage()
-{
-  /*
-    m_ToolManager->ActivateTool(-1);
-
-    mitk::DataNode* referenceNode = m_ToolManager->GetReferenceData(0);
-    assert(referenceNode);
-
-    // Ask the user for a list of files to open
-    QStringList fileNames = QFileDialog::getOpenFileNames( this, "Open Image", m_LastFileOpenPath,
-                                                          mitk::CoreObjectFactory::GetInstance()->GetFileExtensions());
-
-    if (fileNames.empty())
-      return;
-
-    try
-    {
-      this->WaitCursorOn();
-      mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>( fileNames.front().toStdString() );
-      if (image.IsNull())
-      {
-        this->WaitCursorOff();
-        QMessageBox::information(this, "Import Labeled Image", "Could not load the selected segmentation.\n");
-        return;
-      }
-
-      mitk::LabelSetImage::Pointer newImage = mitk::LabelSetImage::New();
-      newImage->InitializeByLabeledImage(image);
-      this->WaitCursorOff();
-
-      mitk::DataNode::Pointer newNode = mitk::DataNode::New();
-      std::string newName = referenceNode->GetName();
-      newName += "-labels";
-      newNode->SetName(newName);
-      newNode->SetData(newImage);
-      m_DataStorage->Add(newNode, referenceNode);
-    }
-    catch (mitk::Exception & e)
-    {
-      this->WaitCursorOff();
-      MITK_ERROR << "Exception caught: " << e.GetDescription();
-      QMessageBox::information(this, "Import Labeled Image", "Could not load the selected segmentation. See error log
-    for details.\n");
-      return;
-     }
-
-    this->UpdateControls();
-
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    */
-}
-
-void QmitkLabelSetWidget::OnImportSegmentation()
-{
-  /*
-    m_ToolManager->ActivateTool(-1);
-
-    mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-    assert(workingNode);
-
-    mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>( workingNode->GetData() );
-    assert(workingImage);
-
-    std::string fileExtensions("Segmentation files (*.lset);;");
-    QString qfileName = QFileDialog::getOpenFileName(this, "Import Segmentation", m_LastFileOpenPath,
-    fileExtensions.c_str() );
-    if (qfileName.isEmpty() ) return;
-
-    mitk::NrrdLabelSetImageReader::Pointer reader = mitk::NrrdLabelSetImageReader::New();
-    reader->SetFileName(qfileName.toLatin1());
-
-    try
-    {
-      this->WaitCursorOn();
-      reader->Update();
-      mitk::LabelSetImage::Pointer newImage = reader->GetOutput();
-      workingImage->Concatenate(newImage);
-      this->WaitCursorOff();
-    }
-    catch ( mitk::Exception& e )
-    {
-      this->WaitCursorOff();
-      MITK_ERROR << "Exception caught: " << e.GetDescription();
-      QMessageBox::information(this, "Import Segmentation", "Could not import the selected segmentation session.\n See
-    error log for details.\n");
-    }
-  */
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkLabelSetWidget::WaitCursorOn()

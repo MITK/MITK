@@ -268,9 +268,6 @@ namespace mitk
     LabelSetImage(const LabelSetImage &other);
     ~LabelSetImage() override;
 
-    template <typename ImageType1, typename ImageType2>
-    void ChangeLayerProcessing(ImageType1 *source, ImageType2 *target);
-
     template <typename TPixel, unsigned int VImageDimension>
     void LayerContainerToImageProcessing(itk::Image<TPixel, VImageDimension> *source, unsigned int layer);
 

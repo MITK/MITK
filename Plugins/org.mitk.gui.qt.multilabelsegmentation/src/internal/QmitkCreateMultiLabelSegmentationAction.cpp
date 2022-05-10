@@ -15,6 +15,8 @@ found in the LICENSE file.
 #include "mitkLabelSetImage.h"
 #include "mitkLabelSetImageHelper.h"
 
+#include <QmitkStaticDynamicSegmentationDialog.h>
+
 #include "QMessageBox"
 
 QmitkCreateMultiLabelSegmentationAction::QmitkCreateMultiLabelSegmentationAction()
@@ -35,25 +37,39 @@ void QmitkCreateMultiLabelSegmentationAction::Run(const QList<mitk::DataNode::Po
     return;
   }
 
-  for ( const auto &referenceNode : selectedNodes )
+  for (const auto& referenceNode : selectedNodes)
   {
     if (referenceNode.IsNull())
     {
       continue;
     }
 
-    mitk::Image* referenceImage = dynamic_cast<mitk::Image*>(referenceNode->GetData());
-    if (nullptr == referenceImage)
+    mitk::Image::ConstPointer  referenceImage = dynamic_cast<mitk::Image*>(referenceNode->GetData());
+    if (referenceImage.IsNull())
     {
       MITK_WARN << "Could not create multi label segmentation for non-image node.";
       continue;
     }
 
+    if (referenceImage->GetDimension() <= 1)
+    {
+      MITK_WARN << "Segmentation is currently not supported for 2D images.";
+      continue;
+    }
+
+    auto segTemplateImage = referenceImage;
+    if (referenceImage->GetDimension() > 3)
+    {
+      QmitkStaticDynamicSegmentationDialog dialog(nullptr);
+      dialog.SetReferenceImage(referenceImage.GetPointer());
+      dialog.exec();
+      segTemplateImage = dialog.GetSegmentationTemplate();
+    }
+
     mitk::DataNode::Pointer newSegmentationNode;
     try
     {
-      newSegmentationNode =
-        mitk::LabelSetImageHelper::CreateNewSegmentationNode(referenceNode, referenceImage);
+      newSegmentationNode = mitk::LabelSetImageHelper::CreateNewSegmentationNode(referenceNode, segTemplateImage);
     }
     catch (mitk::Exception& e)
     {

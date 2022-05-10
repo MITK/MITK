@@ -20,7 +20,6 @@ found in the LICENSE file.
 #include <mitkApplicationCursor.h>
 #include <mitkBaseApplication.h>
 #include <mitkCameraController.h>
-#include <mitkImageTimeSelector.h>
 #include <mitkLabelSetImage.h>
 #include <mitkLabelSetImageHelper.h>
 #include <mitkLabelSetIOHelper.h>
@@ -35,6 +34,7 @@ found in the LICENSE file.
 // Qmitk
 #include <QmitkRenderWindow.h>
 #include <QmitkSegmentationOrganNamesHandling.cpp>
+#include <QmitkStaticDynamicSegmentationDialog.h>
 
 // us
 #include <usModuleResource.h>
@@ -287,40 +287,13 @@ void QmitkSegmentationView::OnNewSegmentation()
     return;
   }
 
-  const auto currentTimePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
-  unsigned int imageTimeStep = 0;
-  if (referenceImage->GetTimeGeometry()->IsValidTimePoint(currentTimePoint))
-  {
-    imageTimeStep = referenceImage->GetTimeGeometry()->TimePointToTimeStep(currentTimePoint);
-  }
-
   auto segTemplateImage = referenceImage;
   if (referenceImage->GetDimension() > 3)
   {
-    auto result = QMessageBox::question(m_Parent,
-      tr("Create a static or dynamic segmentation?"),
-      tr("The selected image has multiple time steps.\n\nDo you want to create a static "
-        "segmentation that is identical for all time steps or do you want to create a "
-        "dynamic segmentation to segment individual time steps?"),
-      tr("Create static segmentation"), tr("Create dynamic segmentation"),
-      QString(), 0, 0);
-    if (result == 0)
-    {
-      auto selector = mitk::ImageTimeSelector::New();
-      selector->SetInput(referenceImage);
-      selector->SetTimeNr(0);
-      selector->Update();
-
-      const auto refTimeGeometry = referenceImage->GetTimeGeometry();
-      auto newTimeGeometry = mitk::ProportionalTimeGeometry::New();
-      newTimeGeometry->SetFirstTimePoint(refTimeGeometry->GetMinimumTimePoint());
-      newTimeGeometry->SetStepDuration(refTimeGeometry->GetMaximumTimePoint() - refTimeGeometry->GetMinimumTimePoint());
-
-      mitk::Image::Pointer newImage = selector->GetOutput();
-      newTimeGeometry->SetTimeStepGeometry(referenceImage->GetGeometry(imageTimeStep), 0);
-      newImage->SetTimeGeometry(newTimeGeometry);
-      segTemplateImage = newImage;
-    }
+    QmitkStaticDynamicSegmentationDialog dialog(m_Parent);
+    dialog.SetReferenceImage(referenceImage.GetPointer());
+    dialog.exec();
+    segTemplateImage = dialog.GetSegmentationTemplate();
   }
 
   mitk::DataNode::Pointer newSegmentationNode;

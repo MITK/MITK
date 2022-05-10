@@ -27,6 +27,7 @@ Qmitk/QmitkLabelSetWidget.cpp
 Qmitk/QmitkSurfaceStampWidget.cpp
 Qmitk/QmitkMaskStampWidget.cpp
 Qmitk/QmitkSliceBasedInterpolatorWidget.cpp
+Qmitk/QmitkStaticDynamicSegmentationDialog.cpp
 Qmitk/QmitkSurfaceBasedInterpolatorWidget.cpp
 Qmitk/QmitkSimpleLabelSetListWidget.cpp
 )
@@ -62,6 +63,7 @@ Qmitk/QmitkLabelSetWidget.h
 Qmitk/QmitkSurfaceStampWidget.h
 Qmitk/QmitkMaskStampWidget.h
 Qmitk/QmitkSliceBasedInterpolatorWidget.h
+Qmitk/QmitkStaticDynamicSegmentationDialog.h
 Qmitk/QmitkSurfaceBasedInterpolatorWidget.h
 Qmitk/QmitkSimpleLabelSetListWidget.h
 )

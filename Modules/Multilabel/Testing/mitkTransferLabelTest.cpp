@@ -28,10 +28,6 @@ class mitkTransferLabelTestSuite : public mitk::TestFixture
 
 private:
   mitk::LabelSetImage::Pointer m_SourceImage;
-  mitk::LabelSetImage::PixelType m_LabelLocked1 = 1;
-  mitk::LabelSetImage::PixelType m_LabelLocked2 = 2;
-  mitk::LabelSetImage::PixelType m_LabelUnLocked1 = 3;
-  mitk::LabelSetImage::PixelType m_LabelUnLocked2 = 4;
 
 public:
   void setUp() override

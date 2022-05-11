@@ -22,7 +22,6 @@ found in the LICENSE file.
 #include "mitkRenderingManager.h"
 #include "mitkDICOMSegmentationPropertyHelper.h"
 #include "mitkDICOMQIPropertyHelper.h"
-#include "mitkImageTimeSelector.h"
 
 #include <vtkCell.h>
 #include <vtkTransform.h>

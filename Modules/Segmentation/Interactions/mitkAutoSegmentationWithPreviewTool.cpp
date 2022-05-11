@@ -15,17 +15,13 @@ found in the LICENSE file.
 #include "mitkToolManager.h"
 
 #include "mitkColorProperty.h"
-#include "mitkLevelWindowProperty.h"
 #include "mitkProperties.h"
 
 #include "mitkDataStorage.h"
 #include "mitkRenderingManager.h"
-#include <mitkSliceNavigationController.h>
 
 #include "mitkImageAccessByItk.h"
 #include "mitkImageCast.h"
-#include "mitkImageStatisticsHolder.h"
-#include "mitkImageTimeSelector.h"
 #include "mitkLabelSetImage.h"
 #include "mitkMaskAndCutRoiImageFilter.h"
 #include "mitkPadImageFilter.h"

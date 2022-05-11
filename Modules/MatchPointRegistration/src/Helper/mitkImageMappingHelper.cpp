@@ -299,8 +299,8 @@ mitk::ImageMappingHelper::ResultImageType::Pointer
     auto cloneInput = inputLabelSetImage->Clone();
     //We need to clone the LabelSetImage due to its illposed design. It is state full
     //and we have to iterate through all layers as active layers to ensure the content
-    //via realy stored (directly working with the layer images does not work with the
-    //active layer. The clone wastes rescources but is the easiest and safest way to
+    //was really stored (directly working with the layer images does not work with the
+    //active layer). The clone wastes rescources but is the easiest and safest way to
     //ensure 1) correct mapping 2) avoid race conditions with other parts of the
     //application because we would change the state of the input.
     //This whole code block should be reworked as soon as T28525 is done.

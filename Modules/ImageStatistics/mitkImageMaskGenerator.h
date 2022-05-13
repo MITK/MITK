@@ -34,11 +34,11 @@ public:
     itkNewMacro(Self); /** Runtime information support. */
     itkTypeMacro(BinaryImageMaskGenerator, MaskGenerator);
 
-    mitk::Image::Pointer GetMask() override;
+    mitk::Image::ConstPointer GetMask() override;
 
     void SetTimeStep(unsigned int timeStep) override;
 
-    void SetImageMask(mitk::Image::Pointer maskImage);
+    void SetImageMask(const mitk::Image* maskImage);
 
 protected:
     ImageMaskGenerator():Superclass(){
@@ -50,7 +50,8 @@ private:
     bool IsUpdateRequired() const;
     void UpdateInternalMask();
 
-    mitk::Image::Pointer m_internalMaskImage;
+    mitk::Image::ConstPointer m_InternalMaskImage;
+    mitk::Image::ConstPointer m_InternalMask;
     unsigned long m_InternalMaskUpdateTime;
 
 };

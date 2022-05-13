@@ -43,9 +43,9 @@ namespace mitk
        * @brief GetMask Computes and returns the mask
        * @return mitk::Image::Pointer of the generated mask
        */
-      mitk::Image::Pointer GetMask() override;
+    mitk::Image::ConstPointer GetMask() override;
 
-    void SetPlanarFigure(mitk::PlanarFigure::Pointer planarFigure);
+    void SetPlanarFigure(mitk::PlanarFigure* planarFigure);
 
     mitk::Image::ConstPointer GetReferenceImage() override;
 
@@ -138,6 +138,7 @@ namespace mitk
     unsigned int m_PlanarFigureAxis;
     unsigned long m_InternalMaskUpdateTime;
     unsigned int m_PlanarFigureSlice;
+    mitk::Image::Pointer m_InternalMask;
   };
 
 } // namespace mitk

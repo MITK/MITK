@@ -36,7 +36,7 @@ void IgnorePixelMaskGenerator::SetTimeStep(unsigned int timeStep)
     }
 }
 
-mitk::Image::Pointer IgnorePixelMaskGenerator::GetMask()
+mitk::Image::ConstPointer IgnorePixelMaskGenerator::GetMask()
 {
     if (IsUpdateRequired())
     {

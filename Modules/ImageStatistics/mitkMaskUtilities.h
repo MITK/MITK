@@ -44,12 +44,12 @@ class MaskUtilities: public itk::Object
         /**
          * @brief Set image
          */
-        void SetImage(ImageType* image);
+        void SetImage(const ImageType* image);
 
         /**
          * @brief Set mask
          */
-        void SetMask(MaskType* mask);
+        void SetMask(const MaskType* mask);
 
         /**
          * @brief Checks whether mask and image are compatible for joint access (as via iterators).
@@ -60,7 +60,7 @@ class MaskUtilities: public itk::Object
         /**
          * @brief Crops the image to the LargestPossibleRegion of the mask
          */
-        typename itk::Image<TPixel, VImageDimension>::Pointer ExtractMaskImageRegion();
+        typename ImageType::ConstPointer ExtractMaskImageRegion();
 
     protected:
         MaskUtilities(): m_Image(nullptr), m_Mask(nullptr){}
@@ -68,8 +68,8 @@ class MaskUtilities: public itk::Object
         ~MaskUtilities() override{}
 
     private:
-        itk::Image<TPixel, VImageDimension>* m_Image;
-        itk::Image<unsigned short, VImageDimension>* m_Mask;
+        const ImageType* m_Image;
+        const MaskType* m_Mask;
     };
 
 /** Tolerance used to check if the mask and input image are compatible for

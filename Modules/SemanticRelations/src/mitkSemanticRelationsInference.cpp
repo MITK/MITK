@@ -164,18 +164,13 @@ mitk::SemanticTypes::LesionVector mitk::SemanticRelationsInference::GetAllSpecif
     return lesionLeft.UID < lesionRight.UID;
   };
 
-  auto equal = [](const SemanticTypes::Lesion& lesionLeft, const SemanticTypes::Lesion& lesionRight)
-  {
-    return lesionLeft.UID == lesionRight.UID;
-  };
-
   std::sort(allLesionsOfControlPoint.begin(), allLesionsOfControlPoint.end(), lessThan);
   std::sort(allLesionsOfInformationType.begin(), allLesionsOfInformationType.end(), lessThan);
   SemanticTypes::IDVector allImageIDsIntersection;
   // set_intersection removes duplicated nodes
   std::set_intersection(allLesionsOfControlPoint.begin(), allLesionsOfControlPoint.end(),
     allLesionsOfInformationType.begin(), allLesionsOfInformationType.end(),
-    std::back_inserter(allLesionsIntersection), equal);
+    std::back_inserter(allLesionsIntersection), lessThan);
 
   return allLesionsIntersection;
 }

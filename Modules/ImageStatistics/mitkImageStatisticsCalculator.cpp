@@ -325,7 +325,7 @@ namespace mitk
     catch (const itk::ExceptionObject &)
 
     {
-      MaskType::Pointer noneConstMaskImage; //needed to work arround the fact that CastToItkImage currently does not support const itk images.
+      typename MaskType::Pointer noneConstMaskImage; //needed to work arround the fact that CastToItkImage currently does not support const itk images.
       // if the pixel type of the mask is not short, then we have to make a copy of m_InternalMask (and cast the values)
       CastToItkImage(m_InternalMask, noneConstMaskImage);
       maskImage = noneConstMaskImage;

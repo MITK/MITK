@@ -30,7 +30,7 @@ typedef itk::Image< unsigned char, 3 >          MaskImageType;
 
 struct MaskParameter
 {
-  mitk::Image::Pointer mask;
+  mitk::Image::ConstPointer mask;
   unsigned int axis;
   unsigned int slice;
 };
@@ -112,7 +112,7 @@ int main(int argc, char* argv[])
     pfMaskGen->SetTimeStep(0);
     pfMaskGen->SetInputImage(image.GetPointer());
 
-    mitk::Image::Pointer mask = pfMaskGen->GetMask();
+    mitk::Image::ConstPointer mask = pfMaskGen->GetMask();
     unsigned int axis = pfMaskGen->GetPlanarFigureAxis();
     unsigned int slice = pfMaskGen->GetPlanarFigureSlice();
 
@@ -126,7 +126,7 @@ int main(int argc, char* argv[])
 
     std::string saveAs = parsedArgs["output"].ToString();
     MITK_INFO << "Save as: " << saveAs;
-    mitk::IOUtil::Save(pfMaskGen->GetMask(), saveAs);
+    mitk::IOUtil::Save(mask, saveAs);
     mitk::IOUtil::Save(fullMask, saveAs);
 
     return 0;

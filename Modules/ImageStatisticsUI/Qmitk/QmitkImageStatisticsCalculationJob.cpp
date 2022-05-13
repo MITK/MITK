@@ -122,7 +122,8 @@ void QmitkImageStatisticsCalculationJob::run()
     if(this->m_BinaryMask.IsNotNull())
     {
       mitk::ImageMaskGenerator::Pointer imgMask = mitk::ImageMaskGenerator::New();
-      imgMask->SetImageMask(m_BinaryMask->Clone());
+      imgMask->SetInputImage(m_StatisticsImage);
+      imgMask->SetImageMask(m_BinaryMask);
       calculator->SetMask(imgMask.GetPointer());
     }
     if(this->m_PlanarFigureMask.IsNotNull())

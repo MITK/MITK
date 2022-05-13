@@ -21,25 +21,6 @@ MaskGenerator::MaskGenerator():
     m_inputImage = nullptr;
 }
 
-mitk::Image::Pointer MaskGenerator::GetMask()
-{
-  return mitk::Image::New();
-}
-
-
-//typename itk::Region<3>::Pointer MaskGenerator::GetImageRegionOfMask(Image::Pointer image)
-//{
-//    if (m_InternalMask.IsNull() || m_Modified)
-//    {
-//        MITK_ERROR << "Update MaskGenerator first!";
-//    }
-
-//    mitk::BaseGeometry::Pointer imageGeometry = image->GetGeometry();
-//    mitk::BaseGeometry::Pointer maskGeometry = m_InternalMask->GetGeometry();
-
-
-//}
-
 void MaskGenerator::SetTimeStep(unsigned int timeStep)
 {
     if (timeStep != m_TimeStep)

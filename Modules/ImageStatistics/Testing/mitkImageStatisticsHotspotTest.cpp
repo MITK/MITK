@@ -511,6 +511,7 @@ struct mitkImageStatisticsHotspotTestClass
 
       mitk::CastToMitkImage(mask, mitkMaskImage);
       mitk::ImageMaskGenerator::Pointer imgMaskGen = mitk::ImageMaskGenerator::New();
+      imgMaskGen->SetInputImage(image);
       imgMaskGen->SetImageMask(mitkMaskImage);
 
       mitk::HotspotMaskGenerator::Pointer hotspotMaskGen = mitk::HotspotMaskGenerator::New();

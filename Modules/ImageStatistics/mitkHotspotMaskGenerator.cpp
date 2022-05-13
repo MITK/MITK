@@ -188,7 +188,7 @@ namespace mitk
     template <typename TPixel, unsigned int VImageDimension  >
     HotspotMaskGenerator::ImageExtrema
       HotspotMaskGenerator::CalculateExtremaWorld( const itk::Image<TPixel, VImageDimension>* inputImage,
-                                                    typename const itk::Image<unsigned short, VImageDimension>* maskImage,
+                                                    const itk::Image<unsigned short, VImageDimension>* maskImage,
                                                     double neccessaryDistanceToImageBorderInMM,
                                                     unsigned int label )
     {
@@ -502,7 +502,7 @@ namespace mitk
     template <typename TPixel, unsigned int VImageDimension>
     void
       HotspotMaskGenerator::CalculateHotspotMask(itk::Image<TPixel, VImageDimension>* inputImage,
-                                              typename const itk::Image<unsigned short, VImageDimension>* maskImage,
+                                              const itk::Image<unsigned short, VImageDimension>* maskImage,
                                               unsigned int label)
     {
         typedef itk::Image< TPixel, VImageDimension > InputImageType;
@@ -517,7 +517,7 @@ namespace mitk
           throw std::logic_error("Empty convolution image in CalculateHotspotStatistics()");
         }
 
-        MaskImageType::ConstPointer usedMask = maskImage;
+        typename MaskImageType::ConstPointer usedMask = maskImage;
         // if mask image is not defined, create an image of the same size as inputImage and fill it with 1's
         // there is maybe a better way to do this!?
         if (maskImage == nullptr)

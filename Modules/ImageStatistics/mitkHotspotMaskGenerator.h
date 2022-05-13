@@ -148,13 +148,13 @@ namespace mitk
         template <typename TPixel, unsigned int VImageDimension>
         void
           CalculateHotspotMask(itk::Image<TPixel, VImageDimension>* inputImage,
-                               typename const itk::Image<unsigned short, VImageDimension>* maskImage,
+                               const itk::Image<unsigned short, VImageDimension>* maskImage,
                                unsigned int label);
 
 
         template <typename TPixel, unsigned int VImageDimension  >
         ImageExtrema CalculateExtremaWorld( const itk::Image<TPixel, VImageDimension>* inputImage,
-                                                        typename const itk::Image<unsigned short, VImageDimension>* maskImage,
+                                                        const itk::Image<unsigned short, VImageDimension>* maskImage,
                                                         double neccessaryDistanceToImageBorderInMM,
                                                         unsigned int label);
 

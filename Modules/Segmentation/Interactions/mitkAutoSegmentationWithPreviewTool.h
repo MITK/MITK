@@ -62,6 +62,14 @@ namespace mitk
     itkGetMacro(ResetsToEmptyPreview, bool);
     itkBooleanMacro(ResetsToEmptyPreview);
 
+    /*itk macro was not used on purpose, to aviod the change of mtime.*/
+    void SetMergeStyle(MultiLabelSegmentation::MergeStyle mergeStyle);
+    itkGetMacro(MergeStyle, MultiLabelSegmentation::MergeStyle);
+
+    /*itk macro was not used on purpose, to aviod the change of mtime.*/
+    void SetOverwriteStyle(MultiLabelSegmentation::OverwriteStyle overwriteStyle);
+    itkGetMacro(OverwriteStyle, MultiLabelSegmentation::OverwriteStyle);
+
     bool CanHandle(const BaseData* referenceData, const BaseData* workingData) const override;
 
     /** Triggers the actualization of the preview
@@ -203,6 +211,13 @@ namespace mitk
      * DoUpdatePreview(...) and only the relevant slice of the preview will be transfered when
      * ConfirmSegmentation() is called.*/
     PlaneGeometry::Pointer m_WorkingPlaneGeometry;
+
+    /** This variable controles how the label pixel content of the preview should be transfered into the
+      segmentation- For more details of the behavior see documentation of MultiLabelSegmentation::MergeStyle. */
+    MultiLabelSegmentation::MergeStyle m_MergeStyle = MultiLabelSegmentation::MergeStyle::Replace;
+    /** This variable controles how the label pixel content of the preview should be transfered into the
+      segmentation- For more details of the behavior see documentation of MultiLabelSegmentation::OverwriteStyle. */
+    MultiLabelSegmentation::OverwriteStyle m_OverwriteStyle = MultiLabelSegmentation::OverwriteStyle::RegardLocks;
   };
 
 } // namespace

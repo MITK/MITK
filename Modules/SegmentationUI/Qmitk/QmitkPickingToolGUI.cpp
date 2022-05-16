@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include <mitkPickingTool.h>
 #include <qlabel.h>
 #include <qpushbutton.h>
+#include <qradiobutton.h>
 #include <qboxlayout.h>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkPickingToolGUI, "")
@@ -49,8 +50,36 @@ void QmitkPickingToolGUI::OnResetPicksClicked()
   }
 }
 
+void QmitkPickingToolGUI::OnRadioPickClicked(bool checked)
+{
+  if (checked)
+  {
+    this->SetMergeStyle(mitk::MultiLabelSegmentation::MergeStyle::Replace);
+    this->SetOverwriteStyle(mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
+  }
+  else
+  {
+    this->SetMergeStyle(mitk::MultiLabelSegmentation::MergeStyle::Merge);
+    this->SetOverwriteStyle(mitk::MultiLabelSegmentation::OverwriteStyle::IgnoreLocks);
+  }
+}
+
 void QmitkPickingToolGUI::InitializeUI(QBoxLayout* mainLayout)
 {
+  auto radioPick = new QRadioButton("Picking mode", this);
+  radioPick->setToolTip("This mode is used to pick certain parts of the label and dismiss the rest of the label content.");
+  radioPick->setChecked(true);
+  connect(radioPick, &QAbstractButton::toggled, this, &QmitkPickingToolGUI::OnRadioPickClicked);
+  mainLayout->addWidget(radioPick);
+  m_RadioPick = radioPick;
+  this->OnRadioPickClicked(true);
+
+  auto radioRelabel = new QRadioButton("Relabel mode", this);
+  radioRelabel->setToolTip("This mode is used to relabel certain parts of the segmentation to the active label.");
+  radioRelabel->setChecked(false);
+  mainLayout->addWidget(radioRelabel);
+  m_RadioRelabel = radioRelabel;
+
   QLabel* label = new QLabel("Press SHIFT and click to pick region(s).\nPress DEL to remove last pick.", this);
   mainLayout->addWidget(label);
 
@@ -69,6 +98,14 @@ void QmitkPickingToolGUI::EnableWidgets(bool enabled)
   if (nullptr != m_ClearPicksBtn)
   {
     m_ClearPicksBtn->setEnabled(enabled);
+  }
+  if (nullptr != m_RadioPick)
+  {
+    m_RadioPick->setEnabled(enabled);
+  }
+  if (nullptr != m_RadioRelabel)
+  {
+    m_RadioRelabel->setEnabled(enabled);
   }
 }
 

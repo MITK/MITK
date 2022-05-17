@@ -317,10 +317,10 @@ The 3D Region Growing tool works similar to the 2D pendant. At the beginning you
 
 \subsection org_mitk_views_segmentationpickingtool Picking Tool
 
-The Picking tool offers to modes that allow you to manipulate "islands" within your segmentation. This is especially useful if e.g. a thresholding provided you with several areas within
+The Picking tool offers two modes that allow you to manipulate "islands" within your segmentation. This is especially useful if e.g. a thresholding provided you with several areas within
 your image but you are just interested in one special region.
-- Picking mode: Allows you to select certain "islands". When the pick is confirmed, the complete content of the active label will be removed except the pick. Thus mode is ideal if you have a lot segmentation noise and want to pick the relevant parts while dismissing the rest. Hint: You can also pick from other labels, but this will only work if these labels aren't locked.
-- Relabel mode: Allows you to select certain "islands". When the pick is confirmed, it will be relabeled and added to the active label content. Hint: This mode ignores the lock of other labels. Thus you don't have to unlock them explicitly.
+- Picking mode: Allows you to select certain "islands". When the pick is confirmed, the complete content of the active label will be removed except the pick. This mode is beneficial if you have a lot segmentation noise and want to pick the relevant parts and dismiss the rest. Hint: You can also pick from other labels, but this will only work if these labels are unlocked.
+- Relabel mode: Allows you to select certain "islands". When the pick is confirmed, it will be relabeled and added to the active label content. Hint: This mode ignores the locks of other labels, hence you do not need to unlock them explicitly.
 
 \imageMacro{QmitkSegmentation_PickingTool.png,"Picking tool",10.00}
 

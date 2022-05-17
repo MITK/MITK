@@ -13,10 +13,10 @@ found in the LICENSE file.
 #include "QmitkPickingToolGUI.h"
 
 #include <mitkPickingTool.h>
-#include <qlabel.h>
-#include <qpushbutton.h>
-#include <qradiobutton.h>
-#include <qboxlayout.h>
+#include <QLabel>
+#include <QPushbutton>
+#include <QRadioButton>
+#include <QBoxLayout>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkPickingToolGUI, "")
 
@@ -67,7 +67,7 @@ void QmitkPickingToolGUI::OnRadioPickClicked(bool checked)
 void QmitkPickingToolGUI::InitializeUI(QBoxLayout* mainLayout)
 {
   auto radioPick = new QRadioButton("Picking mode", this);
-  radioPick->setToolTip("This mode is used to pick certain parts of the label and dismiss the rest of the label content.");
+  radioPick->setToolTip("Pick certain parts of the label and dismiss the rest of the label content");
   radioPick->setChecked(true);
   connect(radioPick, &QAbstractButton::toggled, this, &QmitkPickingToolGUI::OnRadioPickClicked);
   mainLayout->addWidget(radioPick);
@@ -75,7 +75,7 @@ void QmitkPickingToolGUI::InitializeUI(QBoxLayout* mainLayout)
   this->OnRadioPickClicked(true);
 
   auto radioRelabel = new QRadioButton("Relabel mode", this);
-  radioRelabel->setToolTip("This mode is used to relabel certain parts of the segmentation to the active label.");
+  radioRelabel->setToolTip("Relabel certain parts of the segmentation as active label.");
   radioRelabel->setChecked(false);
   mainLayout->addWidget(radioRelabel);
   m_RadioRelabel = radioRelabel;

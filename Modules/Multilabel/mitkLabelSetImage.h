@@ -353,7 +353,7 @@ namespace mitk
   @param labelMapping Map that encodes the mappings of all label pixel transfers that should be done. First element is the
   label in the source image. The second element is the label that transferred pixels should become in the destination image.
   The order in which the labels will be transfered is the same order of elements in the labelMapping.
-  If you use a heterogenous label mapping (e.g. (1,2); so changing the label while transfering), keep in mind that
+  If you use a heterogeneous label mapping (e.g. (1,2); so changing the label while transfering), keep in mind that
   for the MergeStyle and OverwriteStyle only the destination label (second element) is relevant (e.g. what should be
   altered with MergeStyle Replace).
   @param mergeStyle indicates how the transfer should be done (merge or replace). For more details see documentation of

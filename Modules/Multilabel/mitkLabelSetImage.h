@@ -382,6 +382,11 @@ namespace mitk
     MultiLabelSegmentation::OverwriteStyle overwriteStlye = MultiLabelSegmentation::OverwriteStyle::RegardLocks,
     const TimeStepType timeStep = 0);
 
+  MITKMULTILABEL_EXPORT void TransferLabelContent(const Image* sourceImage, LabelSetImage* destinationImage,
+    mitk::Label::PixelType sourceBackground, std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping = { {1,1} },
+    MultiLabelSegmentation::MergeStyle mergeStyle = MultiLabelSegmentation::MergeStyle::Replace,
+    MultiLabelSegmentation::OverwriteStyle overwriteStlye = MultiLabelSegmentation::OverwriteStyle::RegardLocks,
+    const TimeStepType timeStep = 0);
 } // namespace mitk
 
 #endif // __mitkLabelSetImage_H_

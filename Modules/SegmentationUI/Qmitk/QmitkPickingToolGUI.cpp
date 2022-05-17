@@ -14,7 +14,7 @@ found in the LICENSE file.
 
 #include <mitkPickingTool.h>
 #include <QLabel>
-#include <QPushbutton>
+#include <QPushButton>
 #include <QRadioButton>
 #include <QBoxLayout>
 

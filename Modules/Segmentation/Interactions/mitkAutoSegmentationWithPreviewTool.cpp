@@ -272,6 +272,7 @@ void mitk::AutoSegmentationWithPreviewTool::ResetPreviewNode()
       auto* activeLabel = activeLayer->GetActiveLabel();
       activeLabel->SetColor(previewColor);
       activeLayer->UpdateLookupTable(activeLabel->GetValue());
+      activeLabel->SetVisible(true);
     }
     else
     {

@@ -32,6 +32,7 @@ public:
 
 protected slots :
   void OnResetPicksClicked();
+  void OnRadioPickClicked(bool checked);
 
 protected:
   QmitkPickingToolGUI();
@@ -42,6 +43,8 @@ protected:
 
 private:
   QWidget* m_ClearPicksBtn = nullptr;
+  QWidget* m_RadioPick = nullptr;
+  QWidget* m_RadioRelabel = nullptr;
 };
 
 #endif

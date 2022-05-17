@@ -76,9 +76,12 @@ protected:
     return dynamic_cast<TTool*>(m_Tool.GetPointer());
   };
 
-
+  void SetMergeStyle(mitk::MultiLabelSegmentation::MergeStyle mergeStyle);
+  void SetOverwriteStyle(mitk::MultiLabelSegmentation::OverwriteStyle overwriteStyle);
 
 private:
+  QCheckBox* m_CheckIgnoreLocks = nullptr;
+  QCheckBox* m_CheckMerge = nullptr;
   QCheckBox* m_CheckProcessAll = nullptr;
   QCheckBox* m_CheckCreateNew = nullptr;
   QPushButton* m_ConfirmSegBtn = nullptr;

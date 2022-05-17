@@ -52,6 +52,14 @@ void QmitkAutoSegmentationToolGUIBase::OnNewToolAssociated(mitk::Tool *tool)
     m_ConfirmSegBtn = new QPushButton("Confirm Segmentation", this);
     connect(m_ConfirmSegBtn, SIGNAL(clicked()), this, SLOT(OnAcceptPreview()));
 
+    m_CheckIgnoreLocks = new QCheckBox("Ignore label locks", this);
+    m_CheckIgnoreLocks->setChecked(m_Tool->GetOverwriteStyle() == mitk::MultiLabelSegmentation::OverwriteStyle::IgnoreLocks);
+    m_CheckIgnoreLocks->setToolTip("If checked, the lock state of labels will be ignored when the preview segmentation is confermed. Thus also locked label pixels can be changed by the operation.");
+
+    m_CheckMerge = new QCheckBox("Merge with existing content", this);
+    m_CheckMerge->setChecked(m_Tool->GetMergeStyle()==mitk::MultiLabelSegmentation::MergeStyle::Merge);
+    m_CheckMerge->setToolTip("If checked, the preview segmantation will be merged with the existing segmantation into a union. If unchecked, the preview content will replace the old segmantation");
+
     m_CheckProcessAll = new QCheckBox("Process all time steps", this);
     m_CheckProcessAll->setChecked(false);
     m_CheckProcessAll->setToolTip("Process all time steps of the dynamic segmentation and not just the currently visible time step.");
@@ -73,6 +81,8 @@ void QmitkAutoSegmentationToolGUIBase::OnNewToolAssociated(mitk::Tool *tool)
     this->InitializeUI(m_MainLayout);
 
     m_MainLayout->addWidget(m_ConfirmSegBtn);
+    m_MainLayout->addWidget(m_CheckIgnoreLocks);
+    m_MainLayout->addWidget(m_CheckMerge);
     m_MainLayout->addWidget(m_CheckProcessAll);
     m_MainLayout->addWidget(m_CheckCreateNew);
   }
@@ -87,6 +97,24 @@ void QmitkAutoSegmentationToolGUIBase::OnAcceptPreview()
 {
   if (m_Tool.IsNotNull())
   {
+    if (m_CheckIgnoreLocks->isChecked())
+    {
+      m_Tool->SetOverwriteStyle(mitk::MultiLabelSegmentation::OverwriteStyle::IgnoreLocks);
+    }
+    else
+    {
+      m_Tool->SetOverwriteStyle(mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
+    }
+
+    if (m_CheckMerge->isChecked())
+    {
+      m_Tool->SetMergeStyle(mitk::MultiLabelSegmentation::MergeStyle::Merge);
+    }
+    else
+    {
+      m_Tool->SetMergeStyle(mitk::MultiLabelSegmentation::MergeStyle::Replace);
+    }
+
     if (m_CheckCreateNew->isChecked())
     {
       m_Tool->SetOverwriteExistingSegmentation(false);
@@ -145,6 +173,14 @@ void QmitkAutoSegmentationToolGUIBase::EnableWidgets(bool enabled)
     {
       m_ConfirmSegBtn->setEnabled(m_EnableConfirmSegBtnFnc(enabled));
     }
+    if (nullptr != m_CheckIgnoreLocks)
+    {
+      m_CheckIgnoreLocks->setEnabled(enabled);
+    }
+    if (nullptr != m_CheckMerge)
+    {
+      m_CheckMerge->setEnabled(enabled);
+    }
     if (nullptr != m_CheckProcessAll)
     {
       m_CheckProcessAll->setEnabled(enabled);
@@ -155,3 +191,20 @@ void QmitkAutoSegmentationToolGUIBase::EnableWidgets(bool enabled)
     }
   }
 }
+
+void QmitkAutoSegmentationToolGUIBase::SetMergeStyle(mitk::MultiLabelSegmentation::MergeStyle mergeStyle)
+{
+  if (nullptr != m_CheckMerge)
+  {
+    m_CheckMerge->setChecked(mergeStyle == mitk::MultiLabelSegmentation::MergeStyle::Merge);
+  }
+};
+
+void QmitkAutoSegmentationToolGUIBase::SetOverwriteStyle(mitk::MultiLabelSegmentation::OverwriteStyle overwriteStyle)
+{
+  if (nullptr != m_CheckIgnoreLocks)
+  {
+    m_CheckIgnoreLocks->setChecked(overwriteStyle == mitk::MultiLabelSegmentation::OverwriteStyle::IgnoreLocks);
+  }
+};
+

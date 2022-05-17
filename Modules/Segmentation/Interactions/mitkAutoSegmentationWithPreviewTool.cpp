@@ -42,6 +42,17 @@ mitk::AutoSegmentationWithPreviewTool::~AutoSegmentationWithPreviewTool()
 {
 }
 
+void mitk::AutoSegmentationWithPreviewTool::SetMergeStyle(MultiLabelSegmentation::MergeStyle mergeStyle)
+{
+  m_MergeStyle = mergeStyle;
+}
+
+void mitk::AutoSegmentationWithPreviewTool::SetOverwriteStyle(MultiLabelSegmentation::OverwriteStyle overwriteStyle)
+{
+  m_OverwriteStyle = overwriteStyle;
+}
+
+
 bool mitk::AutoSegmentationWithPreviewTool::CanHandle(const BaseData* referenceData, const BaseData* workingData) const
 {
   if (!Superclass::CanHandle(referenceData, workingData))
@@ -333,8 +344,8 @@ void mitk::AutoSegmentationWithPreviewTool::TransferImageAtTimeStep(const Image*
       auto sourceLSImage = dynamic_cast<const LabelSetImage*>(sourceImage);
       auto destLSImage = dynamic_cast<LabelSetImage*>(destinationImage);
 
-      TransferLabelContent(sourceLSImage, destLSImage, { {this->GetUserDefinedActiveLabel(),this->GetUserDefinedActiveLabel()} }, MultiLabelSegmentation::MergeStyle::Replace,
-        MultiLabelSegmentation::OverwriteStyle::RegardLocks, timeStep);
+      TransferLabelContent(sourceLSImage, destLSImage, { {this->GetUserDefinedActiveLabel(),this->GetUserDefinedActiveLabel()} }, m_MergeStyle,
+        m_OverwriteStyle, timeStep);
     }
   }
   catch (...)

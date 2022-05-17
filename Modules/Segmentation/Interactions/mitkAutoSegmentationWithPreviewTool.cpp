@@ -333,7 +333,8 @@ void mitk::AutoSegmentationWithPreviewTool::TransferImageAtTimeStep(const Image*
       auto sourceLSImage = dynamic_cast<const LabelSetImage*>(sourceImage);
       auto destLSImage = dynamic_cast<LabelSetImage*>(destinationImage);
 
-      TransferLabelContent(sourceLSImage, destLSImage, { {this->GetUserDefinedActiveLabel(),this->GetUserDefinedActiveLabel()} }, false, timeStep);
+      TransferLabelContent(sourceLSImage, destLSImage, { {this->GetUserDefinedActiveLabel(),this->GetUserDefinedActiveLabel()} }, MultiLabelSegmentation::MergeStyle::Replace,
+        MultiLabelSegmentation::OverwriteStyle::RegardLocks, timeStep);
     }
   }
   catch (...)

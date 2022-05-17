@@ -982,10 +982,11 @@ public:
 
   LabelTransferFunctor(const mitk::LabelSet* destinationLabelSet, mitk::Label::PixelType sourceBackground,
     mitk::Label::PixelType destinationBackground, bool destinationBackgroundLocked,
-    mitk::Label::PixelType sourceLabel, mitk::Label::PixelType newDestinationLabel, bool mergeMode) :
+    mitk::Label::PixelType sourceLabel, mitk::Label::PixelType newDestinationLabel, mitk::MultiLabelSegmentation::MergeStyle mergeStyle,
+    mitk::MultiLabelSegmentation::OverwriteStyle overwriteStyle) :
     m_DestinationLabelSet(destinationLabelSet), m_SourceBackground(sourceBackground),
     m_DestinationBackground(destinationBackground), m_DestinationBackgroundLocked(destinationBackgroundLocked),
-    m_SourceLabel(sourceLabel), m_NewDestinationLabel(newDestinationLabel), m_MergeMode(mergeMode)
+    m_SourceLabel(sourceLabel), m_NewDestinationLabel(newDestinationLabel), m_MergeStyle(mergeStyle), m_OverwriteStyle(overwriteStyle)
   {
   };
 
@@ -1002,7 +1003,8 @@ public:
       this->m_DestinationBackgroundLocked == other.m_DestinationBackgroundLocked &&
       this->m_SourceLabel == other.m_SourceLabel &&
       this->m_NewDestinationLabel == other.m_NewDestinationLabel &&
-      this->m_MergeMode == other.m_MergeMode &&
+      this->m_MergeStyle == other.m_MergeStyle &&
+      this->m_OverwriteStyle == other.m_OverwriteStyle &&
       this->m_DestinationLabelSet == other.m_DestinationLabelSet;
   }
 
@@ -1014,7 +1016,8 @@ public:
     this->m_DestinationBackgroundLocked = other.m_DestinationBackgroundLocked;
     this->m_SourceLabel = other.m_SourceLabel;
     this->m_NewDestinationLabel = other.m_NewDestinationLabel;
-    this->m_MergeMode = other.m_MergeMode;
+    this->m_MergeStyle = other.m_MergeStyle;
+    this->m_OverwriteStyle = other.m_OverwriteStyle;
 
     return *this;
   }
@@ -1022,14 +1025,16 @@ public:
   inline TOutputpixel operator()(const TDestinationPixel& existingDestinationValue, const TSourcePixel& existingSourceValue)
   {
     if (existingSourceValue == this->m_SourceLabel
-      && !this->m_DestinationLabelSet->GetLabel(existingDestinationValue)->GetLocked())
+      && (mitk::MultiLabelSegmentation::OverwriteStyle::IgnoreLocks == this->m_OverwriteStyle
+          || !this->m_DestinationLabelSet->GetLabel(existingDestinationValue)->GetLocked()))
     {
       return this->m_NewDestinationLabel;
     }
-    else if (!this->m_MergeMode
+    else if (mitk::MultiLabelSegmentation::MergeStyle::Replace == this->m_MergeStyle
       && existingSourceValue == this->m_SourceBackground
       && existingDestinationValue == this->m_NewDestinationLabel
-      && !this->m_DestinationBackgroundLocked)
+      && (mitk::MultiLabelSegmentation::OverwriteStyle::IgnoreLocks == this->m_OverwriteStyle
+          || !this->m_DestinationBackgroundLocked))
     {
       return this->m_DestinationBackground;
     }
@@ -1044,12 +1049,13 @@ private:
   bool m_DestinationBackgroundLocked = false;
   mitk::Label::PixelType m_SourceLabel = 1;
   mitk::Label::PixelType m_NewDestinationLabel = 1;
-  bool m_MergeMode = false;
+  mitk::MultiLabelSegmentation::MergeStyle m_MergeStyle = mitk::MultiLabelSegmentation::MergeStyle::Replace;
+  mitk::MultiLabelSegmentation::OverwriteStyle m_OverwriteStyle = mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks;
 };
 
 /**Helper function used by TransferLabelContent to allow the templating over different image dimensions in conjunction of AccessFixedPixelTypeByItk_n.*/
 template<unsigned int VImageDimension>
-void TransferLabelContentHelper(const itk::Image<mitk::Label::PixelType, VImageDimension>* itkSourceImage, mitk::Image* destinationImage, const mitk::LabelSet* destinationLabelSet, mitk::Label::PixelType sourceBackground, mitk::Label::PixelType destinationBackground, bool destinationBackgroundLocked, mitk::Label::PixelType sourceLabel, mitk::Label::PixelType newDestinationLabel, bool mergeMode)
+void TransferLabelContentHelper(const itk::Image<mitk::Label::PixelType, VImageDimension>* itkSourceImage, mitk::Image* destinationImage, const mitk::LabelSet* destinationLabelSet, mitk::Label::PixelType sourceBackground, mitk::Label::PixelType destinationBackground, bool destinationBackgroundLocked, mitk::Label::PixelType sourceLabel, mitk::Label::PixelType newDestinationLabel, mitk::MultiLabelSegmentation::MergeStyle mergeStyle, mitk::MultiLabelSegmentation::OverwriteStyle overwriteStyle)
 {
   typedef itk::Image<mitk::Label::PixelType, VImageDimension> ContentImageType;
   typename ContentImageType::Pointer itkDestinationImage;
@@ -1059,7 +1065,7 @@ void TransferLabelContentHelper(const itk::Image<mitk::Label::PixelType, VImageD
   typedef itk::BinaryFunctorImageFilter<ContentImageType, ContentImageType, ContentImageType, LabelTransferFunctorType> FilterType;
 
   LabelTransferFunctorType transferFunctor(destinationLabelSet, sourceBackground, destinationBackground,
-    destinationBackgroundLocked, sourceLabel, newDestinationLabel, mergeMode);
+    destinationBackgroundLocked, sourceLabel, newDestinationLabel, mergeStyle, overwriteStyle);
 
   auto transferFilter = FilterType::New();
 
@@ -1072,7 +1078,8 @@ void TransferLabelContentHelper(const itk::Image<mitk::Label::PixelType, VImageD
 }
 
 void mitk::TransferLabelContent(
-  const LabelSetImage* sourceImage, LabelSetImage* destinationImage, std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping, bool mergeMode, const TimeStepType timeStep)
+  const LabelSetImage* sourceImage, LabelSetImage* destinationImage, std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping,
+  MultiLabelSegmentation::MergeStyle mergeStyle, MultiLabelSegmentation::OverwriteStyle overwriteStlye, const TimeStepType timeStep)
 {
   if (nullptr == sourceImage)
   {
@@ -1112,7 +1119,7 @@ void mitk::TransferLabelContent(
     }
 
 
-    AccessFixedPixelTypeByItk_n(sourceImageAtTimeStep, TransferLabelContentHelper, (Label::PixelType), (destinationImageAtTimeStep, destinationLabelSet, sourceBackground, destinationBackground, destinationBackgroundLocked, sourceLabel, newDestinationLabel, mergeMode));
+    AccessFixedPixelTypeByItk_n(sourceImageAtTimeStep, TransferLabelContentHelper, (Label::PixelType), (destinationImageAtTimeStep, destinationLabelSet, sourceBackground, destinationBackground, destinationBackgroundLocked, sourceLabel, newDestinationLabel, mergeStyle, overwriteStlye));
   }
   destinationImage->Modified();
 }

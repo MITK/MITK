@@ -360,7 +360,7 @@ namespace mitk
   @remark in its current implementation the function only transfers contents of the active layer of the passed LabelSetImages.
   @remark the function assumes that it is only called with source and destination image of same geometry.
   @param sourceImage Pointer to the LabelSetImage which active layer should be used as source for the transfer.
-  @param destionationImage Pointer to the LabelSetImage which active layer should be used as destination for the transfer.
+  @param destinationImage Pointer to the LabelSetImage which active layer should be used as destination for the transfer.
   @param labelMapping Map that encodes the mappings of all label pixel transfers that should be done. First element is the
   label in the source image. The second element is the label that transferred pixels should become in the destination image.
   The order in which the labels will be transfered is the same order of elements in the labelMapping.
@@ -382,8 +382,33 @@ namespace mitk
     MultiLabelSegmentation::OverwriteStyle overwriteStlye = MultiLabelSegmentation::OverwriteStyle::RegardLocks,
     const TimeStepType timeStep = 0);
 
-  MITKMULTILABEL_EXPORT void TransferLabelContent(const Image* sourceImage, LabelSetImage* destinationImage,
-    mitk::Label::PixelType sourceBackground, std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping = { {1,1} },
+  /**Helper function that transfers pixels of the specified source label from source image to the destination image by using
+  a specified destination label. Function processes the whole image volume of the specified time step.
+  @remark the function assumes that it is only called with source and destination image of same geometry.
+  @param sourceImage Pointer to the image that should be used as source for the transfer.
+  @param destinationImage Pointer to the image that should be used as destination for the transfer.
+  @param destinationLabelSet Pointer to the label set specifying labels and lock states in the destination image. Unkown pixel
+  values in the destinationImage will be assumed to be unlocked.
+  @param sourceBackground Value indicating the background in the source image.
+  @param destinationBackground Value indicating the background in the destination image.
+  @param destinationBackgroundLocked Value indicating the lock state of the background in the destination image.
+  @param labelMapping Map that encodes the mappings of all label pixel transfers that should be done. First element is the
+  label in the source image. The second element is the label that transferred pixels should become in the destination image.
+  The order in which the labels will be transfered is the same order of elements in the labelMapping.
+  If you use a heterogeneous label mapping (e.g. (1,2); so changing the label while transfering), keep in mind that
+  for the MergeStyle and OverwriteStyle only the destination label (second element) is relevant (e.g. what should be
+  altered with MergeStyle Replace).
+  @param mergeStyle indicates how the transfer should be done (merge or replace). For more details see documentation of
+  MultiLabelSegmentation::MergeStyle.
+  @param overwriteStlye indicates if label locks in the destination image should be regarded or not. For more details see
+  documentation of MultiLabelSegmentation::OverwriteStyle.
+  @param timeStep indicate the time step that should be transferred.
+  @pre sourceImage, destinationImage and destinationLabelSet must be valid
+  @pre sourceImage and destinationImage must contain the indicated timeStep
+  @pre destinationLabelSet must contain all indicated destinationLabels for mapping.*/
+  MITKMULTILABEL_EXPORT void TransferLabelContent(const Image* sourceImage, Image* destinationImage, const mitk::LabelSet* destinationLabelSet,
+    mitk::Label::PixelType sourceBackground = 0, mitk::Label::PixelType destinationBackground = 0, bool destinationBackgroundLocked = false,
+    std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping = { {1,1} },
     MultiLabelSegmentation::MergeStyle mergeStyle = MultiLabelSegmentation::MergeStyle::Replace,
     MultiLabelSegmentation::OverwriteStyle overwriteStlye = MultiLabelSegmentation::OverwriteStyle::RegardLocks,
     const TimeStepType timeStep = 0);

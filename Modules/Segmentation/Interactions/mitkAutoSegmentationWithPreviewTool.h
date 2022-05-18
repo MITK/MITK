@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkAutoSegmentationWithPreviewTool_h_Included
 #define mitkAutoSegmentationWithPreviewTool_h_Included
 
-#include "mitkAutoSegmentationTool.h"
+#include "mitkTool.h"
 #include "mitkCommon.h"
 #include "mitkDataNode.h"
 #include "mitkToolCommand.h"
@@ -35,11 +35,11 @@ namespace mitk
   \sa mitk::Tool
   \sa QmitkInteractiveSegmentation
   */
-  class MITKSEGMENTATION_EXPORT AutoSegmentationWithPreviewTool : public AutoSegmentationTool
+  class MITKSEGMENTATION_EXPORT AutoSegmentationWithPreviewTool : public Tool
   {
   public:
 
-    mitkClassMacro(AutoSegmentationWithPreviewTool, AutoSegmentationTool);
+    mitkClassMacro(AutoSegmentationWithPreviewTool, Tool);
 
     void Activated() override;
     void Deactivated() override;
@@ -84,8 +84,37 @@ namespace mitk
     /** Indicate if currently UpdatePreview is triggered (true) or not (false).*/
     bool IsUpdating() const;
 
+    /**
+   * @brief Gets the name of the currently selected segmentation node
+   * @return the name of the segmentation node or an empty string if
+   *         none is selected
+   */
+    std::string GetCurrentSegmentationName();
+
+    /**
+     * @brief Returns the currently selected segmentation node
+     * @return a mitk::DataNode which contains a segmentation image
+     */
+    virtual DataNode* GetTargetSegmentationNode() const;
+
   protected:
     ToolCommand::Pointer m_ProgressCommand;
+
+    AutoSegmentationWithPreviewTool(bool lazyDynamicPreviews = false); // purposely hidden
+    AutoSegmentationWithPreviewTool(bool lazyDynamicPreviews, const char* interactorType, const us::Module* interactorModule = nullptr); // purposely hidden
+
+    ~AutoSegmentationWithPreviewTool() override;
+
+    const char* GetGroup() const override;
+
+    /** Helper that extracts the image for the passed timestep, if the image has multiple time steps.*/
+    static Image::ConstPointer GetImageByTimeStep(const Image* image, unsigned int timestep);
+    /** Helper that extracts the image for the passed timestep, if the image has multiple time steps.*/
+    static Image::Pointer GetImageByTimeStep(Image* image, unsigned int timestep);
+    /** Helper that extracts the image for the passed time point, if the image has multiple time steps.*/
+    static Image::ConstPointer GetImageByTimePoint(const Image* image, TimePointType timePoint);
+
+    void EnsureTargetSegmentationNodeInDataStorage() const;
 
     /** Member is always called if GetSegmentationInput() has changed
      * (e.g. because a new ROI was defined, or on activation) to give derived
@@ -111,11 +140,6 @@ namespace mitk
      * which can be used, if the preview depends on the the segmenation so far.
      */
     virtual void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, Image* previewImage, TimeStepType timeStep) = 0;
-
-    AutoSegmentationWithPreviewTool(bool lazyDynamicPreviews = false); // purposely hidden
-    AutoSegmentationWithPreviewTool(bool lazyDynamicPreviews, const char* interactorType, const us::Module* interactorModule = nullptr); // purposely hidden
-
-    ~AutoSegmentationWithPreviewTool() override;
 
     /** Returns the image that contains the preview of the current segmentation.
      * Returns null if the node is not set or does not contain an image.*/

@@ -83,7 +83,6 @@ private:
   QCheckBox* m_CheckIgnoreLocks = nullptr;
   QCheckBox* m_CheckMerge = nullptr;
   QCheckBox* m_CheckProcessAll = nullptr;
-  QCheckBox* m_CheckCreateNew = nullptr;
   QPushButton* m_ConfirmSegBtn = nullptr;
   QBoxLayout* m_MainLayout = nullptr;
 

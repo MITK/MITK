@@ -26,10 +26,8 @@ set(CPP_FILES
   DataManagement/mitkContour.cpp
   DataManagement/mitkContourSet.cpp
   DataManagement/mitkExtrudedContour.cpp
-  Interactions/mitkAdaptiveRegionGrowingTool.cpp
   Interactions/mitkAddContourTool.cpp
   Interactions/mitkAutoCropTool.cpp
-  Interactions/mitkAutoSegmentationTool.cpp
   Interactions/mitkAutoSegmentationWithPreviewTool.cpp
   Interactions/mitkAutoMLSegmentationWithPreviewTool.cpp
   Interactions/mitkBinaryThresholdBaseTool.cpp

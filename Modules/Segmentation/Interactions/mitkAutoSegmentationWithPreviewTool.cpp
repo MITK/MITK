@@ -28,12 +28,12 @@ found in the LICENSE file.
 #include "mitkNodePredicateGeometry.h"
 #include "mitkSegTool2D.h"
 
-mitk::AutoSegmentationWithPreviewTool::AutoSegmentationWithPreviewTool(bool lazyDynamicPreviews): m_LazyDynamicPreviews(lazyDynamicPreviews)
+mitk::AutoSegmentationWithPreviewTool::AutoSegmentationWithPreviewTool(bool lazyDynamicPreviews): Tool("dummy"), m_LazyDynamicPreviews(lazyDynamicPreviews)
 {
   m_ProgressCommand = ToolCommand::New();
 }
 
-mitk::AutoSegmentationWithPreviewTool::AutoSegmentationWithPreviewTool(bool lazyDynamicPreviews, const char* interactorType, const us::Module* interactorModule) : AutoSegmentationTool(interactorType, interactorModule), m_LazyDynamicPreviews(lazyDynamicPreviews)
+mitk::AutoSegmentationWithPreviewTool::AutoSegmentationWithPreviewTool(bool lazyDynamicPreviews, const char* interactorType, const us::Module* interactorModule) : Tool(interactorType, interactorModule), m_LazyDynamicPreviews(lazyDynamicPreviews)
 {
   m_ProgressCommand = ToolCommand::New();
 }
@@ -405,12 +405,6 @@ void mitk::AutoSegmentationWithPreviewTool::CreateResultSegmentationFromPreview(
 
         resultSegmentationNode->SetData(padFilter->GetOutput());
       }
-      if (m_OverwriteExistingSegmentation)
-      { //if we overwrite the segmentation (and not just store it as a new result
-        //in the data storage) we update also the tool manager state.
-        this->GetToolManager()->SetWorkingData(resultSegmentationNode);
-        this->GetToolManager()->GetWorkingData(0)->Modified();
-      }
       this->EnsureTargetSegmentationNodeInDataStorage();
     }
   }
@@ -593,4 +587,47 @@ void mitk::AutoSegmentationWithPreviewTool::UpdateCleanUp()
 mitk::TimePointType mitk::AutoSegmentationWithPreviewTool::GetLastTimePointOfUpdate() const
 {
   return m_LastTimePointOfUpdate;
+}
+
+const char* mitk::AutoSegmentationWithPreviewTool::GetGroup() const
+{
+  return "autoSegmentation";
+}
+
+mitk::Image::ConstPointer mitk::AutoSegmentationWithPreviewTool::GetImageByTimeStep(const mitk::Image* image, unsigned int timestep)
+{
+  return SelectImageByTimeStep(image, timestep);
+}
+
+mitk::Image::Pointer mitk::AutoSegmentationWithPreviewTool::GetImageByTimeStep(mitk::Image* image, unsigned int timestep)
+{
+  return SelectImageByTimeStep(image, timestep);
+}
+
+mitk::Image::ConstPointer mitk::AutoSegmentationWithPreviewTool::GetImageByTimePoint(const mitk::Image* image, TimePointType timePoint)
+{
+  return SelectImageByTimeStep(image, timePoint);
+}
+
+void mitk::AutoSegmentationWithPreviewTool::EnsureTargetSegmentationNodeInDataStorage() const
+{
+  auto targetNode = this->GetTargetSegmentationNode();
+  if (!this->GetToolManager()->GetDataStorage()->Exists(targetNode))
+  {
+    this->GetToolManager()->GetDataStorage()->Add(targetNode, this->GetToolManager()->GetReferenceData(0));
+  }
+}
+
+std::string mitk::AutoSegmentationWithPreviewTool::GetCurrentSegmentationName()
+{
+  if (this->GetToolManager()->GetWorkingData(0))
+    return this->GetToolManager()->GetWorkingData(0)->GetName();
+  else
+    return "";
+}
+
+
+mitk::DataNode* mitk::AutoSegmentationWithPreviewTool::GetTargetSegmentationNode() const
+{
+  return this->GetToolManager()->GetWorkingData(0);
 }

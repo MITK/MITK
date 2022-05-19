@@ -1,0 +1,5 @@
+function(mitk_add_manifest TARGET)
+  set(manifest_file "${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.exe.manifest")
+  configure_file("${MITK_SOURCE_DIR}/CMake/manifest.xml.in" "${manifest_file}")
+  target_sources(${TARGET} PRIVATE "${manifest_file}")
+endfunction()

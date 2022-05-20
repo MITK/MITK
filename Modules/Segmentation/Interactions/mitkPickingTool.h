@@ -73,7 +73,7 @@ namespace mitk
     /// \brief Clear all seed points.
     void ClearSeeds();
 
-    void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, Image* previewImage, TimeStepType timeStep) override;
+    void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep) override;
 
     // seed point
     PointSet::Pointer m_PointSet;

@@ -52,6 +52,15 @@ void mitk::AutoSegmentationWithPreviewTool::SetOverwriteStyle(MultiLabelSegmenta
   m_OverwriteStyle = overwriteStyle;
 }
 
+void mitk::AutoSegmentationWithPreviewTool::SetLabelTransferMode(LabelTransferMode LabelTransferMode)
+{
+  m_LabelTransferMode = LabelTransferMode;
+}
+
+void mitk::AutoSegmentationWithPreviewTool::SetSelectedLabels(const SelectedLabelVectorType& labelsToTransfer)
+{
+  m_SelectedLabels = labelsToTransfer;
+}
 
 bool mitk::AutoSegmentationWithPreviewTool::CanHandle(const BaseData* referenceData, const BaseData* workingData) const
 {
@@ -154,7 +163,6 @@ void mitk::AutoSegmentationWithPreviewTool::ConfirmSegmentation()
     this->UpdatePreview(true);
   }
 
-
   CreateResultSegmentationFromPreview();
 
   RenderingManager::GetInstance()->RequestUpdateAll();
@@ -171,14 +179,24 @@ void  mitk::AutoSegmentationWithPreviewTool::InitiateToolByInput()
   //implement in derived classes to change behavior
 }
 
-mitk::Image* mitk::AutoSegmentationWithPreviewTool::GetPreviewSegmentation()
+mitk::LabelSetImage* mitk::AutoSegmentationWithPreviewTool::GetPreviewSegmentation()
 {
   if (m_PreviewSegmentationNode.IsNull())
   {
     return nullptr;
   }
 
-  return dynamic_cast<Image*>(m_PreviewSegmentationNode->GetData());
+  return dynamic_cast<LabelSetImage*>(m_PreviewSegmentationNode->GetData());
+}
+
+const mitk::LabelSetImage* mitk::AutoSegmentationWithPreviewTool::GetPreviewSegmentation() const
+{
+  if (m_PreviewSegmentationNode.IsNull())
+  {
+    return nullptr;
+  }
+
+  return dynamic_cast<LabelSetImage*>(m_PreviewSegmentationNode->GetData());
 }
 
 mitk::DataNode* mitk::AutoSegmentationWithPreviewTool::GetPreviewSegmentationNode()
@@ -317,6 +335,30 @@ void mitk::AutoSegmentationWithPreviewTool::ResetPreviewNode()
   }
 }
 
+std::vector<std::pair<mitk::Label::PixelType, mitk::Label::PixelType> > mitk::AutoSegmentationWithPreviewTool::GetLabelMapping() const
+{
+  std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping = { { this->GetUserDefinedActiveLabel(),this->GetUserDefinedActiveLabel() } };
+  if (LabelTransferMode::SelectedLabels == this->m_LabelTransferMode)
+  {
+    labelMapping.clear();
+    for (auto label : this->m_SelectedLabels)
+    {
+      labelMapping.push_back({ label, label });
+    }
+  }
+  else if (LabelTransferMode::AllLabels == this->m_LabelTransferMode)
+  {
+    labelMapping.clear();
+    const auto labelSet = this->GetPreviewSegmentation()->GetActiveLabelSet();
+    for (auto labelIter = labelSet->IteratorConstBegin(); labelIter != labelSet->IteratorConstEnd(); ++labelIter)
+    {
+      labelMapping.push_back({ labelIter->second->GetValue(),labelIter->second->GetValue() });
+    }
+  }
+
+  return labelMapping;
+}
+
 void mitk::AutoSegmentationWithPreviewTool::TransferImageAtTimeStep(const Image* sourceImage, Image* destinationImage, const TimeStepType timeStep)
 {
   try
@@ -345,8 +387,8 @@ void mitk::AutoSegmentationWithPreviewTool::TransferImageAtTimeStep(const Image*
       auto sourceLSImage = dynamic_cast<const LabelSetImage*>(sourceImage);
       auto destLSImage = dynamic_cast<LabelSetImage*>(destinationImage);
 
-      TransferLabelContent(sourceLSImage, destLSImage, { {this->GetUserDefinedActiveLabel(),this->GetUserDefinedActiveLabel()} }, m_MergeStyle,
-        m_OverwriteStyle, timeStep);
+      auto labelMapping = this->GetLabelMapping();
+      TransferLabelContent(sourceLSImage, destLSImage, labelMapping, m_MergeStyle, m_OverwriteStyle, timeStep);
     }
   }
   catch (...)
@@ -378,6 +420,7 @@ void mitk::AutoSegmentationWithPreviewTool::CreateResultSegmentationFromPreview(
           << " Preview segmentation and segmentation result image have different time geometries.";
       }
 
+      this->TransferPrepare();
       if (m_CreateAllTimeSteps)
       {
         for (unsigned int timeStep = 0; timeStep < previewImage->GetTimeSteps(); ++timeStep)
@@ -582,6 +625,39 @@ void mitk::AutoSegmentationWithPreviewTool::UpdateCleanUp()
 {
   // default implementation does nothing
   //reimplement in derived classes for special behavior
+}
+
+void mitk::AutoSegmentationWithPreviewTool::TransferPrepare()
+{
+  auto labelMapping = this->GetLabelMapping();
+
+  DataNode::Pointer resultSegmentationNode = GetTargetSegmentationNode();
+
+  if (resultSegmentationNode.IsNotNull())
+  {
+    auto resultSegmentation = dynamic_cast<LabelSetImage*>(resultSegmentationNode->GetData());
+
+    if (nullptr == resultSegmentation)
+    {
+      mitkThrow() << "Cannot prepare segmentation for preview transfer. Tool is in invalid state as segmentation is not existing or of right type";
+    }
+
+    auto preview = this->GetPreviewSegmentation();
+    for (const auto& [previewLabel, targetLabel] : labelMapping)
+    {
+      if (!resultSegmentation->ExistLabel(targetLabel, resultSegmentation->GetActiveLayer()))
+      {
+        if (!preview->ExistLabel(previewLabel, resultSegmentation->GetActiveLayer()))
+        {
+          mitkThrow() << "Cannot prepare segmentation for preview transfer. Preview seems invalid as label is missing. Missing label: " << previewLabel;
+        }
+
+        auto clonedLabel = preview->GetLabel(previewLabel, preview->GetActiveLayer())->Clone();
+        clonedLabel->SetValue(targetLabel);
+        resultSegmentation->GetActiveLabelSet()->AddLabel(clonedLabel);
+      }
+    }
+  }
 }
 
 mitk::TimePointType mitk::AutoSegmentationWithPreviewTool::GetLastTimePointOfUpdate() const

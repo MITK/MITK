@@ -70,6 +70,22 @@ namespace mitk
     void SetOverwriteStyle(MultiLabelSegmentation::OverwriteStyle overwriteStyle);
     itkGetMacro(OverwriteStyle, MultiLabelSegmentation::OverwriteStyle);
 
+    enum class LabelTransferMode
+    {
+      ActiveLabel, //Only the active label will be transfered from preview to segmentation.
+      SelectedLabels, //The labels defined as selected labels will be transfered.
+      AllLabels //Transfer all labels of the preview
+    };
+    /*itk macro was not used on purpose, to aviod the change of mtime.*/
+    void SetLabelTransferMode(LabelTransferMode LabelTransferMode);
+    itkGetMacro(LabelTransferMode, LabelTransferMode);
+
+    using SelectedLabelVectorType = std::vector<Label::PixelType>;
+    /** Specifies the labels that should be transfered form preview to the working image,
+      if the segmentation is confirmed. The setting will be used, if LabelTransferMode is set to "SelectedLabels".*/
+    void SetSelectedLabels(const SelectedLabelVectorType& labelsToTransfer);
+    itkGetMacro(SelectedLabels, SelectedLabelVectorType);
+
     bool CanHandle(const BaseData* referenceData, const BaseData* workingData) const override;
 
     /** Triggers the actualization of the preview
@@ -96,6 +112,12 @@ namespace mitk
      * @return a mitk::DataNode which contains a segmentation image
      */
     virtual DataNode* GetTargetSegmentationNode() const;
+
+    /** Returns the image that contains the preview of the current segmentation.
+     * Returns null if the node is not set or does not contain an image.*/
+    LabelSetImage* GetPreviewSegmentation();
+    const LabelSetImage* GetPreviewSegmentation() const;
+    DataNode* GetPreviewSegmentationNode();
 
   protected:
     ToolCommand::Pointer m_ProgressCommand;
@@ -133,18 +155,21 @@ namespace mitk
     UpdatePreview. Default implementation does nothing.*/
     virtual void UpdateCleanUp();
 
+    /** This member function offers derived classes the possibility to alter what should
+    happen directly before the content of the preview is transfered to the segmentation,
+    when the segmentation is confirmed. It is called by CreateResultSegmentationFromPreview.
+    Default implementation ensure that all labels that will be transfered, exist in the
+    segmentation. If they are not existing before the transfer, the will be added by
+    cloning the label information of the preview.*/
+    virtual void TransferPrepare();
+
     /** This function does the real work. Here the preview for a given
      * input image should be computed and stored in the also passed
      * preview image at the passed time step.
      * It also provides the current/old segmentation at the time point,
      * which can be used, if the preview depends on the the segmenation so far.
      */
-    virtual void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, Image* previewImage, TimeStepType timeStep) = 0;
-
-    /** Returns the image that contains the preview of the current segmentation.
-     * Returns null if the node is not set or does not contain an image.*/
-    Image* GetPreviewSegmentation();
-    DataNode* GetPreviewSegmentationNode();
+    virtual void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep) = 0;
 
     /** Returns the input that should be used for any segmentation/preview or tool update.
      * It is either the data of ReferenceDataNode itself or a part of it defined by a ROI mask
@@ -195,6 +220,8 @@ namespace mitk
      */
     bool EnsureUpToDateUserDefinedActiveLabel();
 
+    std::vector<std::pair<Label::PixelType, Label::PixelType> > GetLabelMapping() const;
+
     /** Node that containes the preview data generated and managed by this class or derived ones.*/
     DataNode::Pointer m_PreviewSegmentationNode;
     /** The reference data recieved from ToolManager::GetReferenceData when tool was activated.*/
@@ -242,6 +269,9 @@ namespace mitk
     /** This variable controles how the label pixel content of the preview should be transfered into the
       segmentation- For more details of the behavior see documentation of MultiLabelSegmentation::OverwriteStyle. */
     MultiLabelSegmentation::OverwriteStyle m_OverwriteStyle = MultiLabelSegmentation::OverwriteStyle::RegardLocks;
+
+    LabelTransferMode m_LabelTransferMode = LabelTransferMode::ActiveLabel;
+    SelectedLabelVectorType m_SelectedLabels = {};
   };
 
 } // namespace

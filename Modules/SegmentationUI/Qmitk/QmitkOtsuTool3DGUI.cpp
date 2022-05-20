@@ -17,7 +17,7 @@ found in the LICENSE file.
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkOtsuTool3DGUI, "")
 
-QmitkOtsuTool3DGUI::QmitkOtsuTool3DGUI() : QmitkAutoMLSegmentationToolGUIBase()
+QmitkOtsuTool3DGUI::QmitkOtsuTool3DGUI() : QmitkMultiLabelSegWithPreviewToolGUIBase()
 {
   m_SuperclassEnableConfirmSegBtnFnc = m_EnableConfirmSegBtnFnc;
 
@@ -36,7 +36,7 @@ QmitkOtsuTool3DGUI::QmitkOtsuTool3DGUI() : QmitkAutoMLSegmentationToolGUIBase()
   m_EnableConfirmSegBtnFnc = enableMLSelectedDelegate;
 }
 
-void QmitkOtsuTool3DGUI::ConnectNewTool(mitk::AutoSegmentationWithPreviewTool* newTool)
+void QmitkOtsuTool3DGUI::ConnectNewTool(mitk::SegWithPreviewTool* newTool)
 {
   Superclass::ConnectNewTool(newTool);
 

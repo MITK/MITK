@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <MitkSegmentationExports.h>
 
-#include <mitkAutoSegmentationWithPreviewTool.h>
+#include <mitkSegWithPreviewTool.h>
 
 #include <mitkCommon.h>
 #include <mitkDataNode.h>
@@ -32,13 +32,13 @@ namespace mitk
   \sa mitk::Tool
   \sa QmitkInteractiveSegmentation
   */
-  class MITKSEGMENTATION_EXPORT BinaryThresholdBaseTool : public AutoSegmentationWithPreviewTool
+  class MITKSEGMENTATION_EXPORT BinaryThresholdBaseTool : public SegWithPreviewTool
   {
   public:
     Message3<double, double, bool> IntervalBordersChanged;
     Message2<ScalarType, ScalarType> ThresholdingValuesChanged;
 
-    mitkClassMacro(BinaryThresholdBaseTool, AutoSegmentationWithPreviewTool);
+    mitkClassMacro(BinaryThresholdBaseTool, SegWithPreviewTool);
 
     virtual void SetThresholdValues(double lower, double upper);
 

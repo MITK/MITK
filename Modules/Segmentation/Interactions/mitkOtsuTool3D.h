@@ -12,7 +12,7 @@ found in the LICENSE file.
 #ifndef MITKOTSUTOOL3D_H
 #define MITKOTSUTOOL3D_H
 
-#include "mitkAutoSegmentationWithPreviewTool.h"
+#include "mitkSegWithPreviewTool.h"
 #include <MitkSegmentationExports.h>
 
 namespace us
@@ -24,10 +24,10 @@ namespace mitk
 {
   class Image;
 
-  class MITKSEGMENTATION_EXPORT OtsuTool3D : public AutoSegmentationWithPreviewTool
+  class MITKSEGMENTATION_EXPORT OtsuTool3D : public SegWithPreviewTool
   {
   public:
-    mitkClassMacro(OtsuTool3D, AutoSegmentationWithPreviewTool);
+    mitkClassMacro(OtsuTool3D, SegWithPreviewTool);
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 

@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkAutoSegmentationToolGUIBase_h_Included
-#define QmitkAutoSegmentationToolGUIBase_h_Included
+#ifndef QmitkSegWithPreviewToolGUIBase_h_Included
+#define QmitkSegWithPreviewToolGUIBase_h_Included
 
 #include "QmitkToolGUI.h"
 
-#include "mitkAutoSegmentationWithPreviewTool.h"
+#include "mitkSegWithPreviewTool.h"
 
 #include <MitkSegmentationUIExports.h>
 
@@ -27,12 +27,12 @@ class QBoxLayout;
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
   \brief GUI base clase for tools derived from mitk::AutoSegmentationTool.
 */
-class MITKSEGMENTATIONUI_EXPORT QmitkAutoSegmentationToolGUIBase : public QmitkToolGUI
+class MITKSEGMENTATIONUI_EXPORT QmitkSegWithPreviewToolGUIBase : public QmitkToolGUI
 {
   Q_OBJECT
 
 public:
-  mitkClassMacro(QmitkAutoSegmentationToolGUIBase, QmitkToolGUI);
+  mitkClassMacro(QmitkSegWithPreviewToolGUIBase, QmitkToolGUI);
   itkCloneMacro(Self);
 
   itkGetConstMacro(Mode2D, bool);
@@ -44,11 +44,11 @@ protected slots:
   void OnAcceptPreview();
 
 protected:
-  QmitkAutoSegmentationToolGUIBase(bool mode2D);
-  ~QmitkAutoSegmentationToolGUIBase() override;
+  QmitkSegWithPreviewToolGUIBase(bool mode2D);
+  ~QmitkSegWithPreviewToolGUIBase() override;
 
-  virtual void DisconnectOldTool(mitk::AutoSegmentationWithPreviewTool* oldTool);
-  virtual void ConnectNewTool(mitk::AutoSegmentationWithPreviewTool* newTool);
+  virtual void DisconnectOldTool(mitk::SegWithPreviewTool* oldTool);
+  virtual void ConnectNewTool(mitk::SegWithPreviewTool* newTool);
 
   /**This method is called by OnNewToolAssociated if the UI is initialized the
    first time to allow derived classes to introduce own UI code. Overwrite to change.
@@ -89,7 +89,7 @@ private:
   /**Indicates if the tool is in 2D or 3D mode.*/
   bool m_Mode2D;
 
-  mitk::AutoSegmentationWithPreviewTool::Pointer m_Tool;
+  mitk::SegWithPreviewTool::Pointer m_Tool;
 };
 
 #endif

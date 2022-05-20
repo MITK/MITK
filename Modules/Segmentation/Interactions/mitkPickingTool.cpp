@@ -38,7 +38,7 @@ namespace mitk
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, PickingTool, "PickingTool");
 }
 
-mitk::PickingTool::PickingTool() : AutoSegmentationWithPreviewTool(false, "PressMoveReleaseAndPointSetting")
+mitk::PickingTool::PickingTool() : SegWithPreviewTool(false, "PressMoveReleaseAndPointSetting")
 {
   this->ResetsToEmptyPreviewOn();
 }

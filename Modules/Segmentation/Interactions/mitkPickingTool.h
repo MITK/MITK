@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkPickingTool_h_Included
 #define mitkPickingTool_h_Included
 
-#include "mitkAutoSegmentationWithPreviewTool.h"
+#include "mitkSegWithPreviewTool.h"
 #include "mitkPointSet.h"
 
 #include <MitkSegmentationExports.h>
@@ -37,10 +37,10 @@ namespace mitk
   \sa QmitkInteractiveSegmentation
 
   */
-  class MITKSEGMENTATION_EXPORT PickingTool : public AutoSegmentationWithPreviewTool
+  class MITKSEGMENTATION_EXPORT PickingTool : public SegWithPreviewTool
   {
   public:
-    mitkClassMacro(PickingTool, AutoSegmentationWithPreviewTool);
+    mitkClassMacro(PickingTool, SegWithPreviewTool);
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 

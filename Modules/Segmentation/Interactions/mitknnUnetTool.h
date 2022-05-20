@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitknnUnetTool_h_Included
 #define mitknnUnetTool_h_Included
 
-#include "mitkAutoSegmentationWithPreviewTool.h"
+#include "mitkSegWithPreviewTool.h"
 #include "mitkCommon.h"
 #include "mitkToolManager.h"
 #include <MitkSegmentationExports.h>
@@ -65,10 +65,10 @@ namespace mitk
 
     \warning Only to be instantiated by mitk::ToolManager.
   */
-  class MITKSEGMENTATION_EXPORT nnUNetTool : public AutoSegmentationWithPreviewTool
+  class MITKSEGMENTATION_EXPORT nnUNetTool : public SegWithPreviewTool
   {
   public:
-    mitkClassMacro(nnUNetTool, AutoSegmentationWithPreviewTool);
+    mitkClassMacro(nnUNetTool, SegWithPreviewTool);
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 

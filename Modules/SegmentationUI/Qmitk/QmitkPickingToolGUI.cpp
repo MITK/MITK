@@ -20,7 +20,7 @@ found in the LICENSE file.
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkPickingToolGUI, "")
 
-QmitkPickingToolGUI::QmitkPickingToolGUI() : QmitkAutoSegmentationToolGUIBase(false)
+QmitkPickingToolGUI::QmitkPickingToolGUI() : QmitkSegWithPreviewToolGUIBase(false)
 {
   auto enablePickingDelegate = [this](bool enabled)
   {

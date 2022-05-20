@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkAutoSegmentationWithPreviewTool_h_Included
-#define mitkAutoSegmentationWithPreviewTool_h_Included
+#ifndef mitkSegWithPreviewTool_h_Included
+#define mitkSegWithPreviewTool_h_Included
 
 #include "mitkTool.h"
 #include "mitkCommon.h"
@@ -35,11 +35,11 @@ namespace mitk
   \sa mitk::Tool
   \sa QmitkInteractiveSegmentation
   */
-  class MITKSEGMENTATION_EXPORT AutoSegmentationWithPreviewTool : public Tool
+  class MITKSEGMENTATION_EXPORT SegWithPreviewTool : public Tool
   {
   public:
 
-    mitkClassMacro(AutoSegmentationWithPreviewTool, Tool);
+    mitkClassMacro(SegWithPreviewTool, Tool);
 
     void Activated() override;
     void Deactivated() override;
@@ -122,10 +122,10 @@ namespace mitk
   protected:
     ToolCommand::Pointer m_ProgressCommand;
 
-    AutoSegmentationWithPreviewTool(bool lazyDynamicPreviews = false); // purposely hidden
-    AutoSegmentationWithPreviewTool(bool lazyDynamicPreviews, const char* interactorType, const us::Module* interactorModule = nullptr); // purposely hidden
+    SegWithPreviewTool(bool lazyDynamicPreviews = false); // purposely hidden
+    SegWithPreviewTool(bool lazyDynamicPreviews, const char* interactorType, const us::Module* interactorModule = nullptr); // purposely hidden
 
-    ~AutoSegmentationWithPreviewTool() override;
+    ~SegWithPreviewTool() override;
 
     const char* GetGroup() const override;
 

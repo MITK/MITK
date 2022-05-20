@@ -10,21 +10,21 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkAutoMLSegmentationToolGUIBase.h"
-#include "mitkAutoSegmentationWithPreviewTool.h"
+#include "QmitkMultiLabelSegWithPreviewToolGUIBase.h"
+#include "mitkSegWithPreviewTool.h"
 
 #include <QRadioButton>
 #include <QBoxLayout>
 
-QmitkAutoMLSegmentationToolGUIBase::QmitkAutoMLSegmentationToolGUIBase() : QmitkAutoSegmentationToolGUIBase(false)
+QmitkMultiLabelSegWithPreviewToolGUIBase::QmitkMultiLabelSegWithPreviewToolGUIBase() : QmitkSegWithPreviewToolGUIBase(false)
 {
   auto enableMLSelectedDelegate = [this](bool enabled)
   {
     bool result = enabled;
-    auto tool = this->GetConnectedToolAs<mitk::AutoSegmentationWithPreviewTool>();
+    auto tool = this->GetConnectedToolAs<mitk::SegWithPreviewTool>();
     if (nullptr != tool)
     {
-      result = (tool->GetLabelTransferMode()==mitk::AutoSegmentationWithPreviewTool::LabelTransferMode::AllLabels || !tool->GetSelectedLabels().empty()) && enabled;
+      result = (tool->GetLabelTransferMode()==mitk::SegWithPreviewTool::LabelTransferMode::AllLabels || !tool->GetSelectedLabels().empty()) && enabled;
     }
     else
     {
@@ -37,12 +37,12 @@ QmitkAutoMLSegmentationToolGUIBase::QmitkAutoMLSegmentationToolGUIBase() : Qmitk
   m_EnableConfirmSegBtnFnc = enableMLSelectedDelegate;
 }
 
-void QmitkAutoMLSegmentationToolGUIBase::InitializeUI(QBoxLayout* mainLayout)
+void QmitkMultiLabelSegWithPreviewToolGUIBase::InitializeUI(QBoxLayout* mainLayout)
 {
   auto radioTransferAll = new QRadioButton("Transfer all labels", this);
   radioTransferAll->setToolTip("Transfer all preview label when confirmed.");
   radioTransferAll->setChecked(true);
-  connect(radioTransferAll, &QAbstractButton::toggled, this, &QmitkAutoMLSegmentationToolGUIBase::OnRadioTransferAllClicked);
+  connect(radioTransferAll, &QAbstractButton::toggled, this, &QmitkMultiLabelSegWithPreviewToolGUIBase::OnRadioTransferAllClicked);
   mainLayout->addWidget(radioTransferAll);
   m_RadioTransferAll = radioTransferAll;
 
@@ -63,19 +63,19 @@ void QmitkAutoMLSegmentationToolGUIBase::InitializeUI(QBoxLayout* mainLayout)
   m_LabelSelectionList->setVisible(false);
 
   mainLayout->addWidget(m_LabelSelectionList);
-  connect(m_LabelSelectionList, &QmitkSimpleLabelSetListWidget::SelectedLabelsChanged, this, &QmitkAutoMLSegmentationToolGUIBase::OnLabelSelectionChanged);
+  connect(m_LabelSelectionList, &QmitkSimpleLabelSetListWidget::SelectedLabelsChanged, this, &QmitkMultiLabelSegWithPreviewToolGUIBase::OnLabelSelectionChanged);
 
   this->OnRadioTransferAllClicked(true);
 
   Superclass::InitializeUI(mainLayout);
 }
 
-void QmitkAutoMLSegmentationToolGUIBase::OnLabelSelectionChanged(const QmitkSimpleLabelSetListWidget::LabelVectorType& selectedLabels)
+void QmitkMultiLabelSegWithPreviewToolGUIBase::OnLabelSelectionChanged(const QmitkSimpleLabelSetListWidget::LabelVectorType& selectedLabels)
 {
-  auto tool = this->GetConnectedToolAs<mitk::AutoSegmentationWithPreviewTool>();
+  auto tool = this->GetConnectedToolAs<mitk::SegWithPreviewTool>();
   if (nullptr != tool)
   {
-    mitk::AutoSegmentationWithPreviewTool::SelectedLabelVectorType labelIDs;
+    mitk::SegWithPreviewTool::SelectedLabelVectorType labelIDs;
     for (const auto& label : selectedLabels)
     {
       labelIDs.push_back(label->GetValue());
@@ -87,9 +87,9 @@ void QmitkAutoMLSegmentationToolGUIBase::OnLabelSelectionChanged(const QmitkSimp
   }
 }
 
-void QmitkAutoMLSegmentationToolGUIBase::ActualizePreviewLabelVisibility()
+void QmitkMultiLabelSegWithPreviewToolGUIBase::ActualizePreviewLabelVisibility()
 {
-  auto tool = this->GetConnectedToolAs<mitk::AutoSegmentationWithPreviewTool>();
+  auto tool = this->GetConnectedToolAs<mitk::SegWithPreviewTool>();
   if (nullptr != tool)
   {
     auto preview = tool->GetPreviewSegmentation();
@@ -100,7 +100,7 @@ void QmitkAutoMLSegmentationToolGUIBase::ActualizePreviewLabelVisibility()
 
       for (auto labelIter = labelSet->IteratorBegin(); labelIter != labelSet->IteratorEnd(); ++labelIter)
       {
-        bool isVisible = tool->GetLabelTransferMode() == mitk::AutoSegmentationWithPreviewTool::LabelTransferMode::AllLabels
+        bool isVisible = tool->GetLabelTransferMode() == mitk::SegWithPreviewTool::LabelTransferMode::AllLabels
           || (std::find(selectedLabels.begin(), selectedLabels.end(), labelIter->second->GetValue()) != selectedLabels.end());
         labelIter->second->SetVisible(isVisible);
         labelSet->UpdateLookupTable(labelIter->second->GetValue());
@@ -110,26 +110,26 @@ void QmitkAutoMLSegmentationToolGUIBase::ActualizePreviewLabelVisibility()
   }
 }
 
-void QmitkAutoMLSegmentationToolGUIBase::OnRadioTransferAllClicked(bool checked)
+void QmitkMultiLabelSegWithPreviewToolGUIBase::OnRadioTransferAllClicked(bool checked)
 {
   m_LabelSelectionList->setVisible(!checked);
 
-  auto tool = this->GetConnectedToolAs<mitk::AutoSegmentationWithPreviewTool>();
+  auto tool = this->GetConnectedToolAs<mitk::SegWithPreviewTool>();
   if (nullptr != tool)
   {
     if (checked)
     {
-      tool->SetLabelTransferMode(mitk::AutoSegmentationWithPreviewTool::LabelTransferMode::AllLabels);
+      tool->SetLabelTransferMode(mitk::SegWithPreviewTool::LabelTransferMode::AllLabels);
     }
     else
     {
-      tool->SetLabelTransferMode(mitk::AutoSegmentationWithPreviewTool::LabelTransferMode::SelectedLabels);
+      tool->SetLabelTransferMode(mitk::SegWithPreviewTool::LabelTransferMode::SelectedLabels);
     }
   }
   this->ActualizePreviewLabelVisibility();
 }
 
-void QmitkAutoMLSegmentationToolGUIBase::EnableWidgets(bool enabled)
+void QmitkMultiLabelSegWithPreviewToolGUIBase::EnableWidgets(bool enabled)
 {
   Superclass::EnableWidgets(enabled);
   if (nullptr != m_LabelSelectionList)
@@ -148,7 +148,7 @@ void QmitkAutoMLSegmentationToolGUIBase::EnableWidgets(bool enabled)
   }
 }
 
-void QmitkAutoMLSegmentationToolGUIBase::SetLabelSetPreview(const mitk::LabelSetImage* preview)
+void QmitkMultiLabelSegWithPreviewToolGUIBase::SetLabelSetPreview(const mitk::LabelSetImage* preview)
 {
   if (nullptr != m_LabelSelectionList)
   {

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkBinaryThresholdToolGUIBase_h_Included
 #define QmitkBinaryThresholdToolGUIBase_h_Included
 
-#include "QmitkAutoSegmentationToolGUIBase.h"
+#include "QmitkSegWithPreviewToolGUIBase.h"
 #include "ctkRangeWidget.h"
 #include "ctkSliderWidget.h"
 
@@ -25,12 +25,12 @@ found in the LICENSE file.
 
   This GUI shows a slider to change the tool's threshold and an OK button to accept a preview for actual thresholding.
 */
-class MITKSEGMENTATIONUI_EXPORT QmitkBinaryThresholdToolGUIBase : public QmitkAutoSegmentationToolGUIBase
+class MITKSEGMENTATIONUI_EXPORT QmitkBinaryThresholdToolGUIBase : public QmitkSegWithPreviewToolGUIBase
 {
   Q_OBJECT
 
 public:
-  mitkClassMacro(QmitkBinaryThresholdToolGUIBase, QmitkAutoSegmentationToolGUIBase);
+  mitkClassMacro(QmitkBinaryThresholdToolGUIBase, QmitkSegWithPreviewToolGUIBase);
 
   void OnThresholdingIntervalBordersChanged(double lower, double upper, bool isFloat);
   void OnThresholdingValuesChanged(mitk::ScalarType lower, mitk::ScalarType upper);
@@ -44,8 +44,8 @@ protected:
   QmitkBinaryThresholdToolGUIBase(bool ulMode);
   ~QmitkBinaryThresholdToolGUIBase() override;
 
-  void DisconnectOldTool(mitk::AutoSegmentationWithPreviewTool* oldTool) override;
-  void ConnectNewTool(mitk::AutoSegmentationWithPreviewTool* newTool) override;
+  void DisconnectOldTool(mitk::SegWithPreviewTool* oldTool) override;
+  void ConnectNewTool(mitk::SegWithPreviewTool* newTool) override;
   void InitializeUI(QBoxLayout* mainLayout) override;
 
   void BusyStateChanged(bool) override;

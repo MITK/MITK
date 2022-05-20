@@ -29,7 +29,6 @@ set(CPP_FILES
   Interactions/mitkAddContourTool.cpp
   Interactions/mitkAutoCropTool.cpp
   Interactions/mitkAutoSegmentationWithPreviewTool.cpp
-  Interactions/mitkAutoMLSegmentationWithPreviewTool.cpp
   Interactions/mitkBinaryThresholdBaseTool.cpp
   Interactions/mitkBinaryThresholdTool.cpp
   Interactions/mitkBinaryThresholdULTool.cpp

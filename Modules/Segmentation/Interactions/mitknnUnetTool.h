@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitknnUnetTool_h_Included
 #define mitknnUnetTool_h_Included
 
-#include "mitkAutoMLSegmentationWithPreviewTool.h"
+#include "mitkAutoSegmentationWithPreviewTool.h"
 #include "mitkCommon.h"
 #include "mitkToolManager.h"
 #include <MitkSegmentationExports.h>
@@ -65,10 +65,10 @@ namespace mitk
 
     \warning Only to be instantiated by mitk::ToolManager.
   */
-  class MITKSEGMENTATION_EXPORT nnUNetTool : public AutoMLSegmentationWithPreviewTool
+  class MITKSEGMENTATION_EXPORT nnUNetTool : public AutoSegmentationWithPreviewTool
   {
   public:
-    mitkClassMacro(nnUNetTool, AutoMLSegmentationWithPreviewTool);
+    mitkClassMacro(nnUNetTool, AutoSegmentationWithPreviewTool);
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
@@ -189,7 +189,7 @@ namespace mitk
      * @param timeStep
      * @return LabelSetImage::Pointer
      */
-    LabelSetImage::Pointer ComputeMLPreview(const Image *inputAtTimeStep, TimeStepType timeStep) override;
+    virtual void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep);
 
   private:
     std::string m_MitkTempDir;

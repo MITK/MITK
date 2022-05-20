@@ -34,6 +34,7 @@ void mitk::OtsuTool3D::Activated()
   m_NumberOfBins = 128;
   m_NumberOfRegions = 2;
   m_UseValley = false;
+  this->SetLabelTransferMode(LabelTransferMode::AllLabels);
 }
 
 const char **mitk::OtsuTool3D::GetXPM() const
@@ -53,7 +54,7 @@ const char* mitk::OtsuTool3D::GetName() const
   return "Otsu";
 }
 
-mitk::LabelSetImage::Pointer mitk::OtsuTool3D::ComputeMLPreview(const Image* inputAtTimeStep, TimeStepType /*timeStep*/)
+void mitk::OtsuTool3D::DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep)
 {
   int numberOfThresholds = m_NumberOfRegions - 1;
 
@@ -75,7 +76,7 @@ mitk::LabelSetImage::Pointer mitk::OtsuTool3D::ComputeMLPreview(const Image* inp
 
   auto otsuResultImage = mitk::LabelSetImage::New();
   otsuResultImage->InitializeByLabeledImage(otsuFilter->GetOutput());
-  return otsuResultImage;
+  TransferLabelSetImageContent(otsuResultImage, previewImage, timeStep);
 }
 
 unsigned int mitk::OtsuTool3D::GetMaxNumberOfBins() const

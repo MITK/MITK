@@ -59,6 +59,7 @@ protected:
   Ui_QmitkOtsuToolWidgetControls m_Controls;
 
   bool m_FirstPreviewComputation = true;
+  EnableConfirmSegBtnFunctionType m_SuperclassEnableConfirmSegBtnFnc;
 };
 
 #endif

@@ -163,6 +163,13 @@ namespace mitk
     cloning the label information of the preview.*/
     virtual void TransferPrepare();
 
+    static void TransferLabelInformation(std::vector<std::pair<mitk::Label::PixelType, mitk::Label::PixelType>>& labelMapping,
+      const mitk::LabelSetImage* source, mitk::LabelSetImage* target);
+
+    /**Helper function that can be used to move the content of an LabelSetImage (the pixels of the active source layer and the labels).
+     This is e.g. helpfull if you generate an LabelSetImage content in DoUpdatePreview and you want to transfer it into the preview image.*/
+    static void TransferLabelSetImageContent(const LabelSetImage* source, LabelSetImage* target, TimeStepType timeStep);
+
     /** This function does the real work. Here the preview for a given
      * input image should be computed and stored in the also passed
      * preview image at the passed time step.

@@ -35,6 +35,7 @@ public:
 protected slots :
 
   void OnLabelSelectionChanged(const QmitkSimpleLabelSetListWidget::LabelVectorType& selectedLabels);
+  void OnRadioTransferAllClicked(bool checked);
 
 protected:
   QmitkAutoMLSegmentationToolGUIBase();
@@ -44,9 +45,12 @@ protected:
 
   void EnableWidgets(bool enabled) override;
   void SetLabelSetPreview(const mitk::LabelSetImage* preview);
+  void ActualizePreviewLabelVisibility();
 
 private:
   QmitkSimpleLabelSetListWidget* m_LabelSelectionList = nullptr;
+  QWidget* m_RadioTransferAll = nullptr;
+  QWidget* m_RadioTransferSelected = nullptr;
 };
 
 #endif

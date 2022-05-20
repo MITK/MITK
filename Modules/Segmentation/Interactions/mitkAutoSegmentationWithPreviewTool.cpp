@@ -416,7 +416,7 @@ void mitk::AutoSegmentationWithPreviewTool::CreateResultSegmentationFromPreview(
       // the same time geometry.
       if (previewImage->GetTimeSteps() != resultSegmentation->GetTimeSteps())
       {
-        mitkThrow() << "Cannot perform threshold. Internal tool state is invalid."
+        mitkThrow() << "Cannot confirm/transfer segmentation. Internal tool state is invalid."
           << " Preview segmentation and segmentation result image have different time geometries.";
       }
 
@@ -627,6 +627,25 @@ void mitk::AutoSegmentationWithPreviewTool::UpdateCleanUp()
   //reimplement in derived classes for special behavior
 }
 
+void mitk::AutoSegmentationWithPreviewTool::TransferLabelInformation(std::vector<std::pair<mitk::Label::PixelType, mitk::Label::PixelType>>& labelMapping,
+  const mitk::LabelSetImage* source, mitk::LabelSetImage* target)
+{
+  for (const auto& [sourceLabel, targetLabel] : labelMapping)
+  {
+    if (!target->ExistLabel(targetLabel, target->GetActiveLayer()))
+    {
+      if (!source->ExistLabel(sourceLabel, source->GetActiveLayer()))
+      {
+        mitkThrow() << "Cannot prepare segmentation for preview transfer. Preview seems invalid as label is missing. Missing label: " << sourceLabel;
+      }
+
+      auto clonedLabel = source->GetLabel(sourceLabel, source->GetActiveLayer())->Clone();
+      clonedLabel->SetValue(targetLabel);
+      target->GetActiveLabelSet()->AddLabel(clonedLabel);
+    }
+  }
+}
+
 void mitk::AutoSegmentationWithPreviewTool::TransferPrepare()
 {
   auto labelMapping = this->GetLabelMapping();
@@ -643,20 +662,7 @@ void mitk::AutoSegmentationWithPreviewTool::TransferPrepare()
     }
 
     auto preview = this->GetPreviewSegmentation();
-    for (const auto& [previewLabel, targetLabel] : labelMapping)
-    {
-      if (!resultSegmentation->ExistLabel(targetLabel, resultSegmentation->GetActiveLayer()))
-      {
-        if (!preview->ExistLabel(previewLabel, resultSegmentation->GetActiveLayer()))
-        {
-          mitkThrow() << "Cannot prepare segmentation for preview transfer. Preview seems invalid as label is missing. Missing label: " << previewLabel;
-        }
-
-        auto clonedLabel = preview->GetLabel(previewLabel, preview->GetActiveLayer())->Clone();
-        clonedLabel->SetValue(targetLabel);
-        resultSegmentation->GetActiveLabelSet()->AddLabel(clonedLabel);
-      }
-    }
+    TransferLabelInformation(labelMapping, preview, resultSegmentation);
   }
 }
 
@@ -706,4 +712,19 @@ std::string mitk::AutoSegmentationWithPreviewTool::GetCurrentSegmentationName()
 mitk::DataNode* mitk::AutoSegmentationWithPreviewTool::GetTargetSegmentationNode() const
 {
   return this->GetToolManager()->GetWorkingData(0);
+}
+
+void mitk::AutoSegmentationWithPreviewTool::TransferLabelSetImageContent(const LabelSetImage* source, LabelSetImage* target, TimeStepType timeStep)
+{
+  mitk::ImageReadAccessor newMitkImgAcc(source);
+
+  std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping;
+  const auto labelSet = source->GetActiveLabelSet();
+  for (auto labelIter = labelSet->IteratorConstBegin(); labelIter != labelSet->IteratorConstEnd(); ++labelIter)
+  {
+    labelMapping.push_back({ labelIter->second->GetValue(),labelIter->second->GetValue() });
+  }
+  TransferLabelInformation(labelMapping, source, target);
+
+  target->SetVolume(newMitkImgAcc.GetData(), timeStep);
 }

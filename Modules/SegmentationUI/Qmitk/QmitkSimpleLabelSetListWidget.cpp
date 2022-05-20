@@ -16,7 +16,7 @@ found in the LICENSE file.
 
 #include <qlayout.h>
 
-QmitkSimpleLabelSetListWidget::QmitkSimpleLabelSetListWidget(QWidget* parent) : QWidget(parent), m_LabelList(nullptr)
+QmitkSimpleLabelSetListWidget::QmitkSimpleLabelSetListWidget(QWidget* parent) : QWidget(parent), m_LabelList(nullptr), m_emmiting(false)
 {
   QGridLayout* layout = new QGridLayout(this);
   this->setContentsMargins(0, 0, 0, 0);
@@ -130,21 +130,38 @@ void QmitkSimpleLabelSetListWidget::OnEstablishLabelSetConnection()
 void QmitkSimpleLabelSetListWidget::OnLayerChanged()
 {
   this->OnEstablishLabelSetConnection();
-  this->ResetList();
-  emit ActiveLayerChanged();
-  emit SelectedLabelsChanged(this->SelectedLabels());
+  if (!this->m_emmiting)
+  {
+    this->ResetList();
+
+    this->m_emmiting = true;
+    emit ActiveLayerChanged();
+    emit SelectedLabelsChanged(this->SelectedLabels());
+    this->m_emmiting = false;
+  }
 }
 
 void QmitkSimpleLabelSetListWidget::OnLabelChanged()
 {
-  this->ResetList();
-  emit ActiveLayerChanged();
-  emit SelectedLabelsChanged(this->SelectedLabels());
+  if (!this->m_emmiting)
+  {
+    this->ResetList();
+
+    this->m_emmiting = true;
+    emit ActiveLayerChanged();
+    emit SelectedLabelsChanged(this->SelectedLabels());
+    this->m_emmiting = false;
+  }
 }
 
 void QmitkSimpleLabelSetListWidget::OnLabelSelectionChanged()
 {
-  emit SelectedLabelsChanged(this->SelectedLabels());
+  if (!this->m_emmiting)
+  {
+    this->m_emmiting = true;
+    emit SelectedLabelsChanged(this->SelectedLabels());
+    this->m_emmiting = false;
+  }
 }
 
 void QmitkSimpleLabelSetListWidget::ResetList()

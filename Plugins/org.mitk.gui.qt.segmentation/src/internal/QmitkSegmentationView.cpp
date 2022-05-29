@@ -33,8 +33,9 @@ found in the LICENSE file.
 
 // Qmitk
 #include <QmitkRenderWindow.h>
-#include <QmitkSegmentationOrganNamesHandling.cpp>
+#include <QmitkSegmentationOrganNamesHandling.h>
 #include <QmitkStaticDynamicSegmentationDialog.h>
+#include <QmitkNewSegmentationDialog.h>
 
 // us
 #include <usModuleResource.h>
@@ -59,6 +60,7 @@ QmitkSegmentationView::QmitkSegmentationView()
   , m_DrawOutline(true)
   , m_SelectionMode(false)
   , m_MouseCursorSet(false)
+  , m_DefaultLabelNaming(true)
 {
   auto isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
   auto isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
@@ -322,7 +324,26 @@ void QmitkSegmentationView::OnNewSegmentation()
 
   if (labelSetPreset.empty() || !mitk::LabelSetIOHelper::LoadLabelSetImagePreset(labelSetPreset, newLabelSetImage))
   {
-    mitk::Label::Pointer newLabel = mitk::LabelSetImageHelper::CreateNewLabel(newLabelSetImage);
+    auto newLabel = mitk::LabelSetImageHelper::CreateNewLabel(newLabelSetImage);
+
+    if (!m_DefaultLabelNaming)
+    {
+      QmitkNewSegmentationDialog dialog(m_Parent);
+      dialog.SetSuggestionList(mitk::OrganNamesHandling::GetDefaultOrganColorString());
+      dialog.SetSegmentationName(QString::fromStdString(newLabel->GetName()));
+      dialog.SetColor(newLabel->GetColor());
+
+      if (QDialog::Rejected == dialog.exec())
+        return;
+
+      auto name = dialog.GetSegmentationName();
+
+      if (!name.isEmpty())
+        newLabel->SetName(name.toStdString());
+
+      newLabel->SetColor(dialog.GetColor());
+    }
+
     newLabelSetImage->GetActiveLabelSet()->AddLabel(newLabel);
   }
 
@@ -572,8 +593,12 @@ void QmitkSegmentationView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*
 
 void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
 {
+  m_DefaultLabelNaming = prefs->GetBool("default label naming", true);
+
   if (nullptr != m_Controls)
   {
+    m_Controls->labelsWidget->SetDefaultLabelNaming(m_DefaultLabelNaming);
+
     bool slimView = prefs->GetBool("slim view", false);
     m_Controls->toolSelectionBox2D->SetShowNames(!slimView);
     m_Controls->toolSelectionBox3D->SetShowNames(!slimView);

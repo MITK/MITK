@@ -10,15 +10,16 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <QStringList>
+#include "QmitkSegmentationOrganNamesHandling.h"
+
 #include <mitkAnatomicalStructureColorPresets.h>
 #include <vtkSmartPointer.h>
 
 namespace mitk
 {
-  struct OrganNamesHandling
+  namespace OrganNamesHandling
   {
-    static QStringList GetDefaultOrganColorString()
+    QStringList GetDefaultOrganColorString()
     {
       QStringList organColors;
 
@@ -35,7 +36,7 @@ namespace mitk
       return organColors;
     }
 
-    static void UpdateOrganList(QStringList& organColors, const QString& organname, mitk::Color color)
+    void UpdateOrganList(QStringList& organColors, const QString& organname, mitk::Color color)
     {
       QString listElement(organname + QColor(color.GetRed() * 255, color.GetGreen() * 255, color.GetBlue() * 255).name());
 
@@ -54,9 +55,9 @@ namespace mitk
       }
     }
 
-    static void AppendToOrganList(QStringList& organColors, const QString& organname, const QColor& color)
+    void AppendToOrganList(QStringList& organColors, const QString& organname, const QColor& color)
     {
       organColors.append(organname + color.name());
     }
-  };
+  }
 }

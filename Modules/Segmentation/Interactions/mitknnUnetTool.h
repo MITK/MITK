@@ -189,7 +189,7 @@ namespace mitk
      * @param timeStep
      * @return LabelSetImage::Pointer
      */
-    virtual void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep);
+    void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep) override;
 
   private:
     std::string m_MitkTempDir;

@@ -54,7 +54,7 @@ const char* mitk::OtsuTool3D::GetName() const
   return "Otsu";
 }
 
-void mitk::OtsuTool3D::DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep)
+void mitk::OtsuTool3D::DoUpdatePreview(const Image* inputAtTimeStep, const Image* /*oldSegAtTimeStep*/, LabelSetImage* previewImage, TimeStepType timeStep)
 {
   int numberOfThresholds = m_NumberOfRegions - 1;
 

@@ -130,7 +130,7 @@ namespace
   }
 } // namespace
 
-void mitk::nnUNetTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep)
+void mitk::nnUNetTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image* /*oldSegAtTimeStep*/, LabelSetImage* previewImage, TimeStepType /*timeStep*/)
 {
   if (m_InputBuffer == inputAtTimeStep)
   {

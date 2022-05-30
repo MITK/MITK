@@ -33,7 +33,6 @@ found in the LICENSE file.
 
 // Qmitk
 #include <QmitkRenderWindow.h>
-#include <QmitkSegmentationOrganNamesHandling.h>
 #include <QmitkStaticDynamicSegmentationDialog.h>
 #include <QmitkNewSegmentationDialog.h>
 
@@ -329,7 +328,6 @@ void QmitkSegmentationView::OnNewSegmentation()
     if (!m_DefaultLabelNaming)
     {
       QmitkNewSegmentationDialog dialog(m_Parent);
-      dialog.SetSuggestionList(mitk::OrganNamesHandling::GetDefaultOrganColorString());
       dialog.SetSegmentationName(QString::fromStdString(newLabel->GetName()));
       dialog.SetColor(newLabel->GetColor());
 
@@ -532,7 +530,6 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    connect(m_Controls->labelSetWidget, &QmitkLabelSetWidget::LabelSetWidgetReset, this, &QmitkSegmentationView::OnLabelSetWidgetReset);
 
    m_Controls->labelSetWidget->SetDataStorage(this->GetDataStorage());
-   m_Controls->labelSetWidget->SetOrganColors(mitk::OrganNamesHandling::GetDefaultOrganColorString());
    m_Controls->labelSetWidget->hide();
 
    auto command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();

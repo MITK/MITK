@@ -24,7 +24,6 @@ found in the LICENSE file.
 #include <QmitkAbstractNodeSelectionWidget.h>
 #include <QmitkStyleManager.h>
 #include <QmitkNewSegmentationDialog.h>
-#include <QmitkSegmentationOrganNamesHandling.h>
 
 #include "../QmitkSaveMultiLabelPresetAction.h"
 #include "../QmitkLoadMultiLabelPresetAction.h"
@@ -129,7 +128,6 @@ void QmitkLabelsWidget::OnNewLabel()
   if (!m_DefaultLabelNaming)
   {
     QmitkNewSegmentationDialog dialog(this);
-    dialog.SetSuggestionList(mitk::OrganNamesHandling::GetDefaultOrganColorString());
     dialog.SetSegmentationName(QString::fromStdString(newLabel->GetName()));
     dialog.SetColor(newLabel->GetColor());
 

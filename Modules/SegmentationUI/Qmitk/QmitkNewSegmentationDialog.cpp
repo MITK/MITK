@@ -11,16 +11,17 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkNewSegmentationDialog.h"
+#include <QmitkSegmentationOrganNamesHandling.h>
 
 #include <itkRGBPixel.h>
 
 #include <QAbstractItemModel>
 #include <QColorDialog>
 #include <QStringListModel>
-#include <qlabel.h>
-#include <qlayout.h>
-#include <qlineedit.h>
-#include <qpushbutton.h>
+#include <QLabel>
+#include <QLayout>
+#include <QLineEdit>
+#include <QPushButton>
 
 QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget *parent)
   : QDialog(parent) // true, modal
@@ -79,6 +80,8 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget *parent)
   horizontalLayout->addWidget(btnCancel);
 
   lineEditName->setFocus();
+
+  this->SetSuggestionList(mitk::OrganNamesHandling::GetDefaultOrganColorString());
 }
 
 QmitkNewSegmentationDialog::~QmitkNewSegmentationDialog()

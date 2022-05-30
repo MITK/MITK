@@ -298,7 +298,6 @@ void QmitkLabelSetWidget::OnRenameLabel(bool /*value*/)
   int pixelValue = GetPixelValueOfSelectedItem();
   QmitkNewSegmentationDialog dialog(this);
   dialog.setWindowTitle("Rename Label");
-  dialog.SetSuggestionList(m_OrganColors);
   dialog.SetColor(GetWorkingImage()->GetActiveLabelSet()->GetLabel(pixelValue)->GetColor());
   dialog.SetSegmentationName(
     QString::fromStdString(GetWorkingImage()->GetActiveLabelSet()->GetLabel(pixelValue)->GetName()));
@@ -531,11 +530,6 @@ void QmitkLabelSetWidget::OnRandomColor(bool /*value*/)
     ->SetColor(m_ColorSequenceRainbow.GetNextColor());
   GetWorkingImage()->GetActiveLabelSet()->UpdateLookupTable(pixelValue);
   UpdateAllTableWidgetItems();
-}
-
-void QmitkLabelSetWidget::SetOrganColors(const QStringList &organColors)
-{
-  m_OrganColors = organColors;
 }
 
 void QmitkLabelSetWidget::OnActiveLabelChanged(int pixelValue)

@@ -43,8 +43,6 @@ public:
 
   void SetDataStorage(mitk::DataStorage *storage);
 
-  void SetOrganColors(const QStringList &organColors);
-
   void UpdateControls();
 
   virtual void setEnabled(bool enabled);

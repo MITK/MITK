@@ -156,7 +156,7 @@
       <bool>true</bool>
      </property>
      <property name="text">
-      <string>The selected Image has a rotated geometry, result won't be pixel-aligned</string>
+      <string>The selected image has a rotated geometry, result won't be pixel-aligned</string>
      </property>
      <property name="textFormat">
       <enum>Qt::PlainText</enum>

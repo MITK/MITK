@@ -13,81 +13,56 @@ found in the LICENSE file.
 #ifndef QmitkNewSegmentationDialog_h_Included
 #define QmitkNewSegmentationDialog_h_Included
 
-#include "mitkColorProperty.h"
-#include <MitkSegmentationUIExports.h>
-
-#include <qdialog.h>
-
-#include <QCompleter>
-
-class QLabel;
-class QLineEdit;
-class Q3ListBox;
-class QPushButton;
-
+#include <mitkColorProperty.h>
 #include <mitkCommon.h>
 
+#include <MitkSegmentationUIExports.h>
+
+#include <QDialog>
+
+namespace Ui
+{
+  class QmitkNewSegmentationDialog;
+}
+
 /**
-  \brief Dialog for QmitkInteractiveSegmentation.
-
-  \ingroup ToolManagerEtAl
-  \ingroup Widgets
-
-  This dialog is used to ask a user about the type of a newly created segmentation and a name for it.
+  \brief Dialog for naming labels.
 */
 class MITKSEGMENTATIONUI_EXPORT QmitkNewSegmentationDialog : public QDialog
 {
   Q_OBJECT
 
 public:
-  QmitkNewSegmentationDialog(QWidget *parent = nullptr);
+  enum Mode
+  {
+    NewLabel,
+    RenameLabel
+  };
 
+  explicit QmitkNewSegmentationDialog(QWidget *parent = nullptr, Mode mode = NewLabel);
   ~QmitkNewSegmentationDialog() override;
 
-  const QString GetSegmentationName();
-  mitk::Color GetColor();
-  const char *GetOrganType();
+  QString GetName() const;
+  mitk::Color GetColor() const;
 
-  void SetSegmentationName(const QString &segmentationName);
-  void SetColor(const mitk::Color &color);
-  void SetSuggestionList(QStringList organColorList);
+  void SetName(const QString& name);
+  void SetColor(const mitk::Color& color);
+  void SetSuggestionList(const QStringList& suggestionList);
 
-signals:
+private:
+  void OnAccept();
+  void OnSuggestionSelected(const QString& name);
+  void OnColorButtonClicked();
 
-public slots:
+  void UpdateColorButtonBackground();
 
-  void setPrompt(const QString &prompt);
+  Ui::QmitkNewSegmentationDialog* m_Ui;
 
-protected slots:
-
-  void onAcceptClicked();
-  void onNewOrganNameChanged(const QString &);
-  void onColorBtnClicked();
-  void onColorChange(const QString &completedWord);
-
-protected:
-
-  QLabel *lblPrompt;
-  Q3ListBox *lstOrgans;
-  QLineEdit *lineEditName;
-
-  QPushButton *btnColor;
-  QPushButton *btnOk;
-
-  QLineEdit *edtNewOrgan;
-
-  QString selectedOrgan;
-
-  bool newOrganEntry;
-
+  QString m_Name;
   QColor m_Color;
 
-  QCompleter *completer;
-
-  QString m_SegmentationName;
-
-  QStringList organList;
-  QList<QColor> colorList;
+  QStringList m_NameSuggestions;
+  QList<QColor> m_ColorSuggestions;
 };
 
 #endif

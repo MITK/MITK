@@ -296,17 +296,15 @@ void QmitkLabelSetWidget::OnRemoveLabel(bool /*value*/)
 void QmitkLabelSetWidget::OnRenameLabel(bool /*value*/)
 {
   int pixelValue = GetPixelValueOfSelectedItem();
-  QmitkNewSegmentationDialog dialog(this);
-  dialog.setWindowTitle("Rename Label");
+  QmitkNewSegmentationDialog dialog(this, QmitkNewSegmentationDialog::RenameLabel);
   dialog.SetColor(GetWorkingImage()->GetActiveLabelSet()->GetLabel(pixelValue)->GetColor());
-  dialog.SetSegmentationName(
-    QString::fromStdString(GetWorkingImage()->GetActiveLabelSet()->GetLabel(pixelValue)->GetName()));
+  dialog.SetName(QString::fromStdString(GetWorkingImage()->GetActiveLabelSet()->GetLabel(pixelValue)->GetName()));
 
   if (dialog.exec() == QDialog::Rejected)
   {
     return;
   }
-  QString segmentationName = dialog.GetSegmentationName();
+  QString segmentationName = dialog.GetName();
   if (segmentationName.isEmpty())
   {
     segmentationName = "Unnamed";

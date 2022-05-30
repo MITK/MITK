@@ -328,13 +328,13 @@ void QmitkSegmentationView::OnNewSegmentation()
     if (!m_DefaultLabelNaming)
     {
       QmitkNewSegmentationDialog dialog(m_Parent);
-      dialog.SetSegmentationName(QString::fromStdString(newLabel->GetName()));
+      dialog.SetName(QString::fromStdString(newLabel->GetName()));
       dialog.SetColor(newLabel->GetColor());
 
       if (QDialog::Rejected == dialog.exec())
         return;
 
-      auto name = dialog.GetSegmentationName();
+      auto name = dialog.GetName();
 
       if (!name.isEmpty())
         newLabel->SetName(name.toStdString());

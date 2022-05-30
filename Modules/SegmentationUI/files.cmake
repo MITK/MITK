@@ -74,6 +74,7 @@ Qmitk/QmitkAdaptiveRegionGrowingToolGUIControls.ui
 Qmitk/QmitkConfirmSegmentationDialog.ui
 Qmitk/QmitkOtsuToolWidgetControls.ui
 Qmitk/QmitkLiveWireTool2DGUIControls.ui
+Qmitk/QmitkNewSegmentationDialog.ui
 #Added from ML
 Qmitk/QmitkLabelSetWidgetControls.ui
 Qmitk/QmitkSurfaceStampWidgetGUIControls.ui

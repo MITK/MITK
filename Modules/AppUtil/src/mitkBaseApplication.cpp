@@ -96,6 +96,7 @@ namespace mitk
   const QString BaseApplication::ARG_XARGS = "xargs";
   const QString BaseApplication::ARG_LOG_QT_MESSAGES = "Qt.logMessages";
   const QString BaseApplication::ARG_SEGMENTATION_LABELSET_PRESET = "Segmentation.labelSetPreset";
+  const QString BaseApplication::ARG_SEGMENTATION_LABEL_SUGGESTIONS = "Segmentation.labelSuggestions";
 
   const QString BaseApplication::PROP_APPLICATION = "blueberry.application";
   const QString BaseApplication::PROP_FORCE_PLUGIN_INSTALL = BaseApplication::ARG_FORCE_PLUGIN_INSTALL;
@@ -793,6 +794,10 @@ namespace mitk
     Poco::Util::Option labelSetPresetOption(ARG_SEGMENTATION_LABELSET_PRESET.toStdString(), "", "use this label set preset for new segmentations");
     labelSetPresetOption.argument("<filename>").binding(ARG_SEGMENTATION_LABELSET_PRESET.toStdString());
     options.addOption(labelSetPresetOption);
+
+    Poco::Util::Option labelSuggestionsOption(ARG_SEGMENTATION_LABEL_SUGGESTIONS.toStdString(), "", "use this list of names and colors as suggestions for segmentation labels");
+    labelSetPresetOption.argument("<filename>").binding(ARG_SEGMENTATION_LABEL_SUGGESTIONS.toStdString());
+    options.addOption(labelSuggestionsOption);
 
     Poco::Util::Application::defineOptions(options);
   }

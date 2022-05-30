@@ -1024,11 +1024,20 @@ public:
 
   inline TOutputpixel operator()(const TDestinationPixel& existingDestinationValue, const TSourcePixel& existingSourceValue)
   {
-    if (existingSourceValue == this->m_SourceLabel
-      && (mitk::MultiLabelSegmentation::OverwriteStyle::IgnoreLocks == this->m_OverwriteStyle
-          || !this->m_DestinationLabelSet->GetLabel(existingDestinationValue)->GetLocked()))
+    if (existingSourceValue == this->m_SourceLabel)
     {
-      return this->m_NewDestinationLabel;
+      if (mitk::MultiLabelSegmentation::OverwriteStyle::IgnoreLocks == this->m_OverwriteStyle)
+      {
+        return this->m_NewDestinationLabel;
+      }
+      else
+      {
+        auto label = this->m_DestinationLabelSet->GetLabel(existingDestinationValue);
+        if (nullptr == label || !label->GetLocked())
+        {
+          return this->m_NewDestinationLabel;
+        }
+      }
     }
     else if (mitk::MultiLabelSegmentation::MergeStyle::Replace == this->m_MergeStyle
       && existingSourceValue == this->m_SourceBackground
@@ -1055,7 +1064,9 @@ private:
 
 /**Helper function used by TransferLabelContent to allow the templating over different image dimensions in conjunction of AccessFixedPixelTypeByItk_n.*/
 template<unsigned int VImageDimension>
-void TransferLabelContentHelper(const itk::Image<mitk::Label::PixelType, VImageDimension>* itkSourceImage, mitk::Image* destinationImage, const mitk::LabelSet* destinationLabelSet, mitk::Label::PixelType sourceBackground, mitk::Label::PixelType destinationBackground, bool destinationBackgroundLocked, mitk::Label::PixelType sourceLabel, mitk::Label::PixelType newDestinationLabel, mitk::MultiLabelSegmentation::MergeStyle mergeStyle, mitk::MultiLabelSegmentation::OverwriteStyle overwriteStyle)
+void TransferLabelContentHelper(const itk::Image<mitk::Label::PixelType, VImageDimension>* itkSourceImage, mitk::Image* destinationImage,
+  const mitk::LabelSet* destinationLabelSet, mitk::Label::PixelType sourceBackground, mitk::Label::PixelType destinationBackground,
+  bool destinationBackgroundLocked, mitk::Label::PixelType sourceLabel, mitk::Label::PixelType newDestinationLabel, mitk::MultiLabelSegmentation::MergeStyle mergeStyle, mitk::MultiLabelSegmentation::OverwriteStyle overwriteStyle)
 {
   typedef itk::Image<mitk::Label::PixelType, VImageDimension> ContentImageType;
   typename ContentImageType::Pointer itkDestinationImage;
@@ -1078,7 +1089,8 @@ void TransferLabelContentHelper(const itk::Image<mitk::Label::PixelType, VImageD
 }
 
 void mitk::TransferLabelContent(
-  const LabelSetImage* sourceImage, LabelSetImage* destinationImage, std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping,
+  const Image* sourceImage, Image* destinationImage, const mitk::LabelSet* destinationLabelSet, mitk::Label::PixelType sourceBackground,
+  mitk::Label::PixelType destinationBackground, bool destinationBackgroundLocked, std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping,
   MultiLabelSegmentation::MergeStyle mergeStyle, MultiLabelSegmentation::OverwriteStyle overwriteStlye, const TimeStepType timeStep)
 {
   if (nullptr == sourceImage)
@@ -1089,11 +1101,10 @@ void mitk::TransferLabelContent(
   {
     mitkThrow() << "Invalid call of TransferLabelContent; destinationImage must not be null.";
   }
-
-  const auto sourceBackground = sourceImage->GetExteriorLabel()->GetValue();
-  const auto destinationBackground = destinationImage->GetExteriorLabel()->GetValue();
-  const auto destinationBackgroundLocked = destinationImage->GetExteriorLabel()->GetLocked();
-  const auto destinationLabelSet = destinationImage->GetLabelSet(destinationImage->GetActiveLayer());
+  if (nullptr == destinationLabelSet)
+  {
+    mitkThrow() << "Invalid call of TransferLabelContent; destinationLabelSet must not be null";
+  }
 
   Image::ConstPointer sourceImageAtTimeStep = SelectImageByTimeStep(sourceImage, timeStep);
   Image::Pointer destinationImageAtTimeStep = SelectImageByTimeStep(destinationImage, timeStep);
@@ -1109,17 +1120,38 @@ void mitk::TransferLabelContent(
 
   for (const auto& [sourceLabel, newDestinationLabel] : labelMapping)
   {
-    if (!sourceImage->ExistLabel(sourceLabel, sourceImage->GetActiveLayer()))
-    {
-      mitkThrow() << "Invalid call of TransferLabelContent. Defined source label does not exist in sourceImage. SourceLabel: " << sourceLabel;
-    }
-    if (!destinationImage->ExistLabel(newDestinationLabel, destinationImage->GetActiveLayer()))
+    if (nullptr == destinationLabelSet->GetLabel(newDestinationLabel))
     {
       mitkThrow() << "Invalid call of TransferLabelContent. Defined destination label does not exist in destinationImage. newDestinationLabel: " << newDestinationLabel;
     }
 
-
     AccessFixedPixelTypeByItk_n(sourceImageAtTimeStep, TransferLabelContentHelper, (Label::PixelType), (destinationImageAtTimeStep, destinationLabelSet, sourceBackground, destinationBackground, destinationBackgroundLocked, sourceLabel, newDestinationLabel, mergeStyle, overwriteStlye));
   }
   destinationImage->Modified();
+}
+
+void mitk::TransferLabelContent(
+  const LabelSetImage* sourceImage, LabelSetImage* destinationImage, std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping,
+  MultiLabelSegmentation::MergeStyle mergeStyle, MultiLabelSegmentation::OverwriteStyle overwriteStlye, const TimeStepType timeStep)
+{
+  if (nullptr == sourceImage)
+  {
+    mitkThrow() << "Invalid call of TransferLabelContent; sourceImage must not be null.";
+  }
+
+  const auto sourceBackground = sourceImage->GetExteriorLabel()->GetValue();
+  const auto destinationBackground = destinationImage->GetExteriorLabel()->GetValue();
+  const auto destinationBackgroundLocked = destinationImage->GetExteriorLabel()->GetLocked();
+  const auto destinationLabelSet = destinationImage->GetLabelSet(destinationImage->GetActiveLayer());
+
+  for (const auto& mappingElement : labelMapping)
+  {
+    if (!sourceImage->ExistLabel(mappingElement.first, sourceImage->GetActiveLayer()))
+    {
+      mitkThrow() << "Invalid call of TransferLabelContent. Defined source label does not exist in sourceImage. SourceLabel: " << mappingElement.first;
+    }
+  }
+
+  TransferLabelContent(sourceImage, destinationImage, destinationLabelSet, sourceBackground, destinationBackground, destinationBackgroundLocked,
+    labelMapping, mergeStyle, overwriteStlye, timeStep);
 }

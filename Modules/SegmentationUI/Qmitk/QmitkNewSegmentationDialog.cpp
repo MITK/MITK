@@ -30,6 +30,7 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget *parent, Mode mod
   if (RenameLabel == mode)
   {
     this->setWindowTitle("Rename Label");
+    m_Ui->label->setText("New name and color of the label");
     m_Ui->buttonBox->button(QDialogButtonBox::Ok)->setText("Rename label");
   }
   else

@@ -796,7 +796,7 @@ namespace mitk
     options.addOption(labelSetPresetOption);
 
     Poco::Util::Option labelSuggestionsOption(ARG_SEGMENTATION_LABEL_SUGGESTIONS.toStdString(), "", "use this list of names and colors as suggestions for segmentation labels");
-    labelSetPresetOption.argument("<filename>").binding(ARG_SEGMENTATION_LABEL_SUGGESTIONS.toStdString());
+    labelSuggestionsOption.argument("<filename>").binding(ARG_SEGMENTATION_LABEL_SUGGESTIONS.toStdString());
     options.addOption(labelSuggestionsOption);
 
     Poco::Util::Application::defineOptions(options);

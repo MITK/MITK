@@ -104,11 +104,11 @@ namespace mitk {
     else if (elementNameString == COLOR)
     {
       std::string red = ReadXMLStringAttribute(COLOR_R, atts);
-      float r = atof(red.c_str());
+      float r = atof(red.c_str()) / 255.0f;
       std::string green = ReadXMLStringAttribute(COLOR_G, atts);
-      float g = atof(green.c_str());
+      float g = atof(green.c_str()) / 255.0f;
       std::string blue = ReadXMLStringAttribute(COLOR_B, atts);
-      float b = atof(blue.c_str());
+      float b = atof(blue.c_str()) / 255.0f;
       Color color;
       color.SetRed(r); color.SetGreen(g); color.SetBlue(b);
       m_Color[m_presetName] = color;

@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef QmitkLabelSetWidget_h
 #define QmitkLabelSetWidget_h
 
-#include "MitkSegmentationUIExports.h"
+#include <org_mitk_gui_qt_segmentation_Export.h>
 
-#include "mitkColorSequenceRainbow.h"
-#include "mitkLabel.h"
-#include "mitkNumericTypes.h"
+#include <mitkColorSequenceRainbow.h>
+#include <mitkLabel.h>
+#include <mitkNumericTypes.h>
 #include <ui_QmitkLabelSetWidgetControls.h>
 
 class QmitkDataStorageComboBox;
@@ -33,7 +33,7 @@ namespace mitk
   class DataNode;
 }
 
-class MITKSEGMENTATIONUI_EXPORT QmitkLabelSetWidget : public QWidget
+class MITK_QT_SEGMENTATION QmitkLabelSetWidget : public QWidget
 {
   Q_OBJECT
 

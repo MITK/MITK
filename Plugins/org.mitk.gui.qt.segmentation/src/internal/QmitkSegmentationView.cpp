@@ -590,7 +590,11 @@ void QmitkSegmentationView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*
 
 void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
 {
-  m_DefaultLabelNaming = prefs->GetBool("default label naming", true);
+  auto labelSuggestions = mitk::BaseApplication::instance().config().getString(mitk::BaseApplication::ARG_SEGMENTATION_LABEL_SUGGESTIONS.toStdString(), "");
+
+  m_DefaultLabelNaming = labelSuggestions.empty()
+    ? prefs->GetBool("default label naming", true)
+    : false; // No default label naming when label suggestions are enforced via command-line argument
 
   if (nullptr != m_Controls)
   {

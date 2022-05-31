@@ -137,6 +137,8 @@ void QmitkSegmentationPreferencePage::Update()
   if (!isOverriddenByCmdLineArg)
     labelSuggestions = m_SegmentationPreferencesNode->Get("label suggestions", "").toStdString();
 
+  m_Ui->defaultNameRadioButton->setDisabled(isOverriddenByCmdLineArg);
+  m_Ui->askForNameRadioButton->setDisabled(isOverriddenByCmdLineArg);
   m_Ui->suggestionsLineEdit->setDisabled(isOverriddenByCmdLineArg);
   m_Ui->suggestionsToolButton->setDisabled(isOverriddenByCmdLineArg);
   m_Ui->suggestionsCmdLineArgLabel->setVisible(isOverriddenByCmdLineArg);

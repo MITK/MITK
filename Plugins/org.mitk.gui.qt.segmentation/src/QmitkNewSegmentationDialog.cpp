@@ -15,12 +15,14 @@ found in the LICENSE file.
 
 #include <mitkAnatomicalStructureColorPresets.h>
 #include <mitkBaseApplication.h>
+#include <mitkLabelSetImage.h>
 
 #include <berryIPreferences.h>
 #include <berryIPreferencesService.h>
 #include <berryPlatform.h>
 
-#include <initializer_list>
+#include <algorithm>
+#include <iterator>
 
 #include <vtkNew.h>
 
@@ -37,9 +39,9 @@ found in the LICENSE file.
 namespace
 {
   // Get standard label name and color suggestions from embedded XML preset file for anatomical structures.
-  std::map<QString, QColor> GetStandardSuggestions()
+  QmitkNewSegmentationDialog::SuggestionsType GetStandardSuggestions()
   {
-    std::map<QString, QColor> standardSuggestions;
+    QmitkNewSegmentationDialog::SuggestionsType standardSuggestions;
 
     vtkNew<mitk::AnatomicalStructureColorPresets> presets;
     presets->LoadPreset();
@@ -58,9 +60,9 @@ namespace
   // of a "name" string and an optional "color" string. If present, the "color" string must follow the conventions
   // of QColor::setNamedColor(), i.e., #rrggbb or any SVG color keyword name like CornflowerBlue. Everything else
   // in the JSON file is simply ignored. In case of any error, an empty map is returned.
-  std::map<QString, QColor> ParseSuggestions(const QString& filename)
+  QmitkNewSegmentationDialog::SuggestionsType ParseSuggestions(const QString& filename)
   {
-    std::map<QString, QColor> parsedSuggestions;
+    QmitkNewSegmentationDialog::SuggestionsType parsedSuggestions;
     QFile file(filename);
 
     if (!file.open(QIODevice::ReadOnly))
@@ -111,6 +113,7 @@ namespace
     bool suggestOnce;
   };
 
+  // Get all relevant preferences and consider command-line arguments overrides.
   Preferences GetPreferences()
   {
     auto nodePrefs = berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.views.segmentation");
@@ -127,9 +130,47 @@ namespace
 
     return prefs;
   }
+
+  // Get names of all labels in all layers of a LabelSetImage.
+  QStringList GetExistingLabelNames(mitk::LabelSetImage* labelSetImage)
+  {
+    QStringList result;
+    result.reserve(labelSetImage->GetTotalNumberOfLabels());
+
+    const auto numLayers = labelSetImage->GetNumberOfLayers();
+    for (std::remove_const_t<decltype(numLayers)> layerIndex = 0; layerIndex < numLayers; ++layerIndex)
+    {
+      const auto* labelSet = labelSetImage->GetLabelSet(layerIndex);
+
+      for (auto labelIter = labelSet->IteratorConstBegin(); labelIter != labelSet->IteratorConstEnd(); ++labelIter)
+      {
+        if (0 == labelIter->first)
+          continue; // Ignore background label
+
+        auto name = QString::fromStdString(labelIter->second->GetName());
+
+        if (!name.isEmpty()) // Potential duplicates do not matter for our purpose
+          result.push_back(name);
+      }
+    }
+
+    return result;
+  }
+
+  // Remove blacklisted suggestions.
+  QmitkNewSegmentationDialog::SuggestionsType FilterSuggestions(const QmitkNewSegmentationDialog::SuggestionsType& suggestions, const QStringList& blacklist)
+  {
+    QmitkNewSegmentationDialog::SuggestionsType result;
+
+    std::remove_copy_if(suggestions.begin(), suggestions.end(), std::inserter(result, result.end()), [&blacklist](const auto& suggestion) {
+      return blacklist.contains(suggestion.first);
+      });
+
+    return result;
+  }
 }
 
-QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget *parent, Mode mode)
+QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget *parent, mitk::LabelSetImage* labelSetImage, Mode mode)
   : QDialog(parent),
     m_Ui(new Ui::QmitkNewSegmentationDialog),
     m_SuggestOnce(true),
@@ -172,9 +213,12 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget *parent, Mode mod
     this->SetSuggestions(GetStandardSuggestions(), true);
   }
 
-  if (prefs.suggestOnce)
+  if (nullptr != labelSetImage && prefs.suggestOnce)
   {
-    // TODO: Remove suggestions for label names that are already preset in the label set image
+    auto existingLabelNames = GetExistingLabelNames(labelSetImage);
+    m_Suggestions = FilterSuggestions(m_Suggestions, existingLabelNames);
+
+    this->UpdateCompleterModel();
   }
 }
 
@@ -221,7 +265,7 @@ void QmitkNewSegmentationDialog::SetColor(const mitk::Color& color)
   this->UpdateColorButtonBackground();
 }
 
-void QmitkNewSegmentationDialog::SetSuggestions(const std::map<QString, QColor> suggestions, bool replaceStandardSuggestions)
+void QmitkNewSegmentationDialog::SetSuggestions(const SuggestionsType& suggestions, bool replaceStandardSuggestions)
 {
   if (replaceStandardSuggestions)
   {
@@ -238,6 +282,11 @@ void QmitkNewSegmentationDialog::SetSuggestions(const std::map<QString, QColor> 
     }
   }
 
+  this->UpdateCompleterModel();
+}
+
+void QmitkNewSegmentationDialog::UpdateCompleterModel()
+{
   QStringList names;
 
   for (const auto& [name, color] : m_Suggestions)

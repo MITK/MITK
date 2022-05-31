@@ -127,7 +127,7 @@ void QmitkLabelsWidget::OnNewLabel()
 
   if (!m_DefaultLabelNaming)
   {
-    QmitkNewSegmentationDialog dialog(this);
+    QmitkNewSegmentationDialog dialog(this, workingImage);
     dialog.SetName(QString::fromStdString(newLabel->GetName()));
     dialog.SetColor(newLabel->GetColor());
 

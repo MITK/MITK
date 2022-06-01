@@ -289,8 +289,8 @@ void QmitkNewSegmentationDialog::UpdateCompleterModel()
 {
   QStringList names;
 
-  for (const auto& [name, color] : m_Suggestions)
-    names << name;
+  for (const auto& suggestion : m_Suggestions)
+    names << suggestion.first;
 
   auto* completerModel = static_cast<QStringListModel*>(m_Ui->nameLineEdit->completer()->model());
   completerModel->setStringList(names);

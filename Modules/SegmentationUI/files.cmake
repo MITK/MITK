@@ -11,7 +11,6 @@ Qmitk/QmitkCopyToClipBoardDialog.cpp
 Qmitk/QmitkDrawPaintbrushToolGUI.cpp
 Qmitk/QmitkErasePaintbrushToolGUI.cpp
 Qmitk/QmitkLiveWireTool2DGUI.cpp
-Qmitk/QmitkNewSegmentationDialog.cpp
 Qmitk/QmitkOtsuTool3DGUI.cpp
 Qmitk/QmitkPaintbrushToolGUI.cpp
 Qmitk/QmitkPickingToolGUI.cpp
@@ -22,8 +21,6 @@ Qmitk/QmitkToolGUIArea.cpp
 Qmitk/QmitkToolSelectionBox.cpp
 Qmitk/QmitknnUNetToolGUI.cpp
 Qmitk/QmitknnUNetToolSlots.cpp
-#Added from ML
-Qmitk/QmitkLabelSetWidget.cpp
 Qmitk/QmitkSurfaceStampWidget.cpp
 Qmitk/QmitkMaskStampWidget.cpp
 Qmitk/QmitkSliceBasedInterpolatorWidget.cpp
@@ -45,7 +42,6 @@ Qmitk/QmitkCopyToClipBoardDialog.h
 Qmitk/QmitkDrawPaintbrushToolGUI.h
 Qmitk/QmitkErasePaintbrushToolGUI.h
 Qmitk/QmitkLiveWireTool2DGUI.h
-Qmitk/QmitkNewSegmentationDialog.h
 Qmitk/QmitkOtsuTool3DGUI.h
 Qmitk/QmitkPaintbrushToolGUI.h
 Qmitk/QmitkPickingToolGUI.h
@@ -58,8 +54,6 @@ Qmitk/QmitknnUNetToolGUI.h
 Qmitk/QmitknnUNetGPU.h
 Qmitk/QmitknnUNetEnsembleLayout.h
 Qmitk/QmitknnUNetFolderParser.h
-#Added from ML
-Qmitk/QmitkLabelSetWidget.h
 Qmitk/QmitkSurfaceStampWidget.h
 Qmitk/QmitkMaskStampWidget.h
 Qmitk/QmitkSliceBasedInterpolatorWidget.h
@@ -73,8 +67,6 @@ Qmitk/QmitkAdaptiveRegionGrowingToolGUIControls.ui
 Qmitk/QmitkConfirmSegmentationDialog.ui
 Qmitk/QmitkOtsuToolWidgetControls.ui
 Qmitk/QmitkLiveWireTool2DGUIControls.ui
-#Added from ML
-Qmitk/QmitkLabelSetWidgetControls.ui
 Qmitk/QmitkSurfaceStampWidgetGUIControls.ui
 Qmitk/QmitkMaskStampWidgetGUIControls.ui
 Qmitk/QmitkSliceBasedInterpolatorWidgetGUIControls.ui

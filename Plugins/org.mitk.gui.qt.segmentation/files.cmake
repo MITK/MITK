@@ -1,5 +1,7 @@
 set(SRC_CPP_FILES
   QmitkSegmentationPreferencePage.cpp
+  QmitkNewSegmentationDialog.cpp
+  QmitkLabelSetWidget.cpp
 )
 
 set(INTERNAL_CPP_FILES
@@ -24,6 +26,8 @@ set(INTERNAL_CPP_FILES
 
 set(UI_FILES
   src/QmitkSegmentationPreferencePageControls.ui
+  src/QmitkNewSegmentationDialog.ui
+  src/QmitkLabelSetWidgetControls.ui
   src/internal/QmitkSegmentationViewControls.ui
   src/internal/Common/QmitkDataSelectionWidgetControls.ui
   src/internal/Common/QmitkLabelsWidgetControls.ui
@@ -38,6 +42,8 @@ set(UI_FILES
 
 set(MOC_H_FILES
   src/QmitkSegmentationPreferencePage.h
+  src/QmitkNewSegmentationDialog.h
+  src/QmitkLabelSetWidget.h
   src/internal/mitkPluginActivator.h
   src/internal/QmitkSegmentationView.h
   src/internal/QmitkAutocropAction.h

@@ -383,7 +383,7 @@
   <customwidget>
    <class>QmitkLabelSetWidget</class>
    <extends>QWidget</extends>
-   <header location="global">Qmitk/QmitkLabelSetWidget.h</header>
+   <header location="global">QmitkLabelSetWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

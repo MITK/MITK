@@ -419,7 +419,7 @@ void QmitkLesionInfoWidget::OnCreateNewSegmentation(mitk::SemanticTypes::Lesion 
     return;
   }
 
-  QString segmentatioName = segmentationDialog->GetSegmentationName();
+  QString segmentatioName = segmentationDialog->GetName();
   if (segmentatioName.isEmpty())
   {
     segmentatioName = "Unnamed";

@@ -134,8 +134,8 @@ namespace
   // Get names of all labels in all layers of a LabelSetImage.
   QStringList GetExistingLabelNames(mitk::LabelSetImage* labelSetImage)
   {
-    QStringList result;
-    result.reserve(labelSetImage->GetTotalNumberOfLabels());
+    QStringList existingLabelNames;
+    existingLabelNames.reserve(labelSetImage->GetTotalNumberOfLabels());
 
     const auto numLayers = labelSetImage->GetNumberOfLayers();
     for (std::remove_const_t<decltype(numLayers)> layerIndex = 0; layerIndex < numLayers; ++layerIndex)
@@ -150,23 +150,23 @@ namespace
         auto name = QString::fromStdString(labelIter->second->GetName());
 
         if (!name.isEmpty()) // Potential duplicates do not matter for our purpose
-          result.push_back(name);
+          existingLabelNames.push_back(name);
       }
     }
 
-    return result;
+    return existingLabelNames;
   }
 
   // Remove blacklisted suggestions.
   QmitkNewSegmentationDialog::SuggestionsType FilterSuggestions(const QmitkNewSegmentationDialog::SuggestionsType& suggestions, const QStringList& blacklist)
   {
-    QmitkNewSegmentationDialog::SuggestionsType result;
+    QmitkNewSegmentationDialog::SuggestionsType filteredSuggestions;
 
-    std::remove_copy_if(suggestions.begin(), suggestions.end(), std::inserter(result, result.end()), [&blacklist](const auto& suggestion) {
+    std::remove_copy_if(suggestions.begin(), suggestions.end(), std::inserter(filteredSuggestions, filteredSuggestions.end()), [&blacklist](const auto& suggestion) {
       return blacklist.contains(suggestion.first);
-      });
+    });
 
-    return result;
+    return filteredSuggestions;
   }
 }
 

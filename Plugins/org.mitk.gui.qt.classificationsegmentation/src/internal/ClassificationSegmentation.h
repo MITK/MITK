@@ -30,7 +30,6 @@ found in the LICENSE file.
 #include <mitkPointSet.h>
 #include <itkHistogram.h>
 #include <QFutureWatcher>
-#include "QmitkPointListViewWidget.h"
 #include <mitkPointSetDataInteractor.h>
 
 #include <mitkVigraRandomForestClassifier.h>
@@ -54,7 +53,6 @@ public:
 
   static const std::string VIEW_ID;
 
-  QmitkPointListViewWidget * m_PointListWidget;
   std::vector<mitk::DataNode::Pointer> m_PointSetList;
   bool m_CalculateFeatures;
 

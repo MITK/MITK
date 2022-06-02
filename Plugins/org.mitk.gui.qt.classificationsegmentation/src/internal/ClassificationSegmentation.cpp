@@ -65,7 +65,6 @@ void ClassificationSegmentation::SetFocus()
 
 void ClassificationSegmentation::OnButtonCSFToggle(bool checked)
 {
-  //  m_PointListWidget->SetPointSet(dynamic_cast<mitk::PointSet *>(m_PointSetList[0]->GetData()));
   if(checked)
     m_PointSetDataInteractor->SetDataNode(m_PointSetList[0]);
   else
@@ -74,7 +73,6 @@ void ClassificationSegmentation::OnButtonCSFToggle(bool checked)
 
 void ClassificationSegmentation::OnButtonLESToggle(bool checked)
 {
-  //  m_PointListWidget->SetPointSet(dynamic_cast<mitk::PointSet *>(m_PointSetList[1]->GetData()));
   if(checked)
     m_PointSetDataInteractor->SetDataNode(m_PointSetList[1]);
   else
@@ -83,7 +81,6 @@ void ClassificationSegmentation::OnButtonLESToggle(bool checked)
 
 void ClassificationSegmentation::OnButtonBRAToggle(bool checked)
 {
-  //  m_PointListWidget->SetPointSet(dynamic_cast<mitk::PointSet *>(m_PointSetList[2]->GetData()));
   if(checked)
     m_PointSetDataInteractor->SetDataNode(m_PointSetList[2]);
   else

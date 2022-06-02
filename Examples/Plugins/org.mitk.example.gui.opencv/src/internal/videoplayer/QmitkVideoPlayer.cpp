@@ -13,7 +13,6 @@ found in the LICENSE file.
 #include "QmitkVideoPlayer.h"
 #include <QVBoxLayout>
 #include <QmitkOpenCVVideoControls.h>
-#include <QmitkStdMultiWidget.h>
 #include <QmitkVideoBackground.h>
 
 QmitkVideoPlayer::QmitkVideoPlayer() : m_VideoSource(nullptr), m_VideoBackground(new QmitkVideoBackground(m_VideoSource))

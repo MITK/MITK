@@ -19,7 +19,6 @@ found in the LICENSE file.
 
 // Qmitk headers
 #include <QmitkSelectableGLWidget.h>
-#include <QmitkStdMultiWidget.h>
 
 // Qt-GUI headers
 #include <QApplication>

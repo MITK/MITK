@@ -26,7 +26,6 @@ found in the LICENSE file.
 #include <berryIWorkbenchWindow.h>
 
 // MITK includes (GUI)
-#include "QmitkStdMultiWidget.h"
 #include "QmitkDataNodeSelectionProvider.h"
 #include "mitkDataNodeObject.h"
 

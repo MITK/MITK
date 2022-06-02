@@ -28,7 +28,6 @@ set(CPP_FILES
   QmitkPlotWidget.cpp
   QmitkPointListModel.cpp
   QmitkPointListView.cpp
-  QmitkPointListViewWidget.cpp
   QmitkPointListWidget.cpp
   QmitkPrimitiveMovieNavigatorWidget.cpp
   QmitkPropertyViewFactory.cpp
@@ -72,7 +71,6 @@ set(MOC_H_FILES
   include/QmitkPlotWidget.h
   include/QmitkPointListModel.h
   include/QmitkPointListView.h
-  include/QmitkPointListViewWidget.h
   include/QmitkPointListWidget.h
   include/QmitkPrimitiveMovieNavigatorWidget.h
   include/QmitkSelectableGLWidget.h

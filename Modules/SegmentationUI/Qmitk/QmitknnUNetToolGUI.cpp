@@ -79,6 +79,7 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
           SLOT(OnPythonPathChanged(const QString &)));
   connect(m_Controls.refreshdirectoryBox, SIGNAL(clicked()), this, SLOT(OnRefreshPresssed()));
   connect(m_Controls.clearCacheButton, SIGNAL(clicked()), this, SLOT(OnClearCachePressed()));
+  connect(m_Controls.downloadModelButton, SIGNAL(clicked()), this, SLOT(OnDownloadModel()));
 
   m_Controls.multiModalSpinBox->setVisible(false);
   m_Controls.multiModalSpinBox->setEnabled(false);
@@ -497,26 +498,31 @@ QString QmitknnUNetToolGUI::FetchResultsFolderFromEnv()
   return retVal;
 }
 
-QString QmitknnUNetToolGUI::DumpJSONfromPickle(const QString &parentPath)
+void QmitknnUNetToolGUI::DumpAllJSONs(const QString &path)
 {
-  const QString picklePath = parentPath + QDir::separator() + QString("plans.pkl");
-  const QString jsonPath = parentPath + QDir::separator() + QString("mitk_export.json");
-  if (!QFile::exists(jsonPath))
+  DumpJSONfromPickle(path);
+  ExportAvailableModelsAsJSON(m_ParentFolder->getResultsFolder());
+}
+
+void QmitknnUNetToolGUI::DumpJSONfromPickle(const QString &picklePath)
+{
+  const QString pickleFile = picklePath + QDir::separator() + m_PICKLE_FILENAME;
+  const QString jsonFile = picklePath + QDir::separator() + m_MITK_EXPORT_JSON_FILENAME;
+  if (!QFile::exists(jsonFile))
   {
     mitk::ProcessExecutor::Pointer spExec = mitk::ProcessExecutor::New();
-    itk::CStyleCommand::Pointer spCommand = itk::CStyleCommand::New();
     mitk::ProcessExecutor::ArgumentListType args;
     args.push_back("-c");
     std::string pythonCode; // python syntax to parse plans.pkl file and export as Json file.
     pythonCode.append("import pickle;");
     pythonCode.append("import json;");
     pythonCode.append("loaded_pickle = pickle.load(open('");
-    pythonCode.append(picklePath.toStdString());
+    pythonCode.append(pickleFile.toStdString());
     pythonCode.append("','rb'));");
     pythonCode.append("modal_dict = {key: loaded_pickle[key] for key in loaded_pickle.keys() if key in "
                       "['modalities','num_modalities']};");
     pythonCode.append("json.dump(modal_dict, open('");
-    pythonCode.append(jsonPath.toStdString());
+    pythonCode.append(jsonFile.toStdString());
     pythonCode.append("', 'w'))");
 
     args.push_back(pythonCode);
@@ -529,10 +535,29 @@ QString QmitknnUNetToolGUI::DumpJSONfromPickle(const QString &parentPath)
       MITK_ERROR << "Pickle parsing FAILED!" << e.GetDescription(); // SHOW ERROR
       WriteStatusMessage(
         "Parsing failed in backend. Multiple Modalities will now have to be manually entered by the user.");
-      return QString("");
     }
   }
-  return jsonPath;
+}
+
+void QmitknnUNetToolGUI::ExportAvailableModelsAsJSON(const QString &resultsFolder)
+{
+  const QString jsonPath = resultsFolder + QDir::separator() + m_AVAILABLE_MODELS_JSON_FILENAME;
+  if (!QFile::exists(jsonPath))
+  {
+    mitk::ProcessExecutor::Pointer spExec = mitk::ProcessExecutor::New();
+    mitk::ProcessExecutor::ArgumentListType args;
+    args.push_back("--export");
+    args.push_back(resultsFolder.toStdString());
+    try
+    {
+      spExec->Execute(m_PythonPath.toStdString(), "nnUNet_print_available_pretrained_models", args);
+    }
+    catch (const mitk::Exception &e)
+    {
+      MITK_ERROR << "Exporting information FAILED." << e.GetDescription(); // SHOW ERROR
+      WriteStatusMessage("Exporting information FAILED.");
+    }
+  }
 }
 
 void QmitknnUNetToolGUI::DisplayMultiModalInfoFromJSON(const QString &jsonPath)
@@ -549,7 +574,7 @@ void QmitknnUNetToolGUI::DisplayMultiModalInfoFromJSON(const QString &jsonPath)
       QJsonDocument document = QJsonDocument::fromJson(bytes, &jsonError);
       if (jsonError.error != QJsonParseError::NoError)
       {
-        MITK_INFO << "fromJson failed: " << jsonError.errorString().toStdString() << endl;
+        MITK_INFO << "Json parsing failed: " << jsonError.errorString().toStdString() << endl;
         return;
       }
       if (document.isObject())
@@ -582,6 +607,32 @@ void QmitknnUNetToolGUI::DisplayMultiModalInfoFromJSON(const QString &jsonPath)
           m_Controls.multiModalSpinBox->setMinimum(0);
           m_Controls.multiModalBox->setChecked(false);
         }
+      }
+    }
+  }
+}
+
+void QmitknnUNetToolGUI::FillAvailableModelsInfoFromJSON(const QString &jsonPath)
+{
+  if (QFile::exists(jsonPath) && m_Controls.availableBox->count() < 1)
+  {
+    QFile file(jsonPath);
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+      QByteArray bytes = file.readAll();
+      file.close();
+      QJsonParseError jsonError;
+      QJsonDocument document = QJsonDocument::fromJson(bytes, &jsonError);
+      if (jsonError.error != QJsonParseError::NoError)
+      {
+        MITK_INFO << "Json parsing failed: " << jsonError.errorString().toStdString() << endl;
+        return;
+      }
+      if (document.isObject())
+      {
+        QJsonObject jsonObj = document.object();
+        QStringList keys = jsonObj.keys();
+        m_Controls.availableBox->addItems(keys);
       }
     }
   }

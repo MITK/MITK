@@ -1,9 +1,11 @@
 #include "QmitknnUNetToolGUI.h"
+#include "mitkProcessExecutor.h"
 #include <QDir>
 #include <QDirIterator>
 #include <QmitknnUNetEnsembleLayout.h>
 #include <algorithm>
 #include <ctkCollapsibleGroupBox.h>
+#include <itksys/SystemTools.hxx>
 
 void QmitknnUNetToolGUI::EnableWidgets(bool enabled)
 {
@@ -52,6 +54,7 @@ void QmitknnUNetToolGUI::ClearAllComboBoxes()
     layout->plannerBox->clear();
     layout->foldBox->clear();
   }
+  m_Controls.availableBox->clear();
 }
 
 void QmitknnUNetToolGUI::OnRefreshPresssed()
@@ -70,6 +73,7 @@ void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &resultsFolder)
   tasks.removeDuplicates();
   std::for_each(tasks.begin(), tasks.end(), [this](QString task) { m_Controls.taskBox->addItem(task); });
   m_Settings.setValue("nnUNet/LastRESULTS_FOLDERPath", resultsFolder);
+  m_IsRESULTSFOLDERvalid = false;
 }
 
 void QmitknnUNetToolGUI::OnModelChanged(const QString &model)
@@ -182,6 +186,8 @@ void QmitknnUNetToolGUI::OnTrainerChanged(const QString &plannerSelected)
   {
     return;
   }
+  m_IsRESULTSFOLDERvalid = false;
+  QString parentPath;
   auto *box = qobject_cast<ctkComboBox *>(sender());
   if (box == m_Controls.plannerBox)
   {
@@ -200,16 +206,11 @@ void QmitknnUNetToolGUI::OnTrainerChanged(const QString &plannerSelected)
                   });
     if (m_Controls.foldBox->count() != 0)
     {
+      m_IsRESULTSFOLDERvalid = true;
       CheckAllInCheckableComboBox(m_Controls.foldBox);
-      m_Controls.previewButton->setEnabled(true);
-      const QString parentPath = QDir::cleanPath(m_ParentFolder->getResultsFolder() + QDir::separator() + "nnUNet" +
-                                                 QDir::separator() + selectedModel + QDir::separator() + selectedTask +
-                                                 QDir::separator() + selectedTrainer + QString("__") + plannerSelected);
-      const QString jsonPath = this->DumpJSONfromPickle(parentPath);
-      if (!jsonPath.isEmpty())
-      {
-        this->DisplayMultiModalInfoFromJSON(jsonPath);
-      }
+      parentPath = QDir::cleanPath(m_ParentFolder->getResultsFolder() + QDir::separator() + "nnUNet" +
+                                   QDir::separator() + selectedModel + QDir::separator() + selectedTask +
+                                   QDir::separator() + selectedTrainer + QString("__") + plannerSelected);
     }
   }
   else if (!m_EnsembleParams.empty())
@@ -234,18 +235,28 @@ void QmitknnUNetToolGUI::OnTrainerChanged(const QString &plannerSelected)
         if (layout->foldBox->count() != 0)
         {
           CheckAllInCheckableComboBox(layout->foldBox);
-          m_Controls.previewButton->setEnabled(true);
-          const QString parentPath = QDir::cleanPath(
-            m_ParentFolder->getResultsFolder() + QDir::separator() + "nnUNet" + QDir::separator() + selectedModel +
-            QDir::separator() + selectedTask + QDir::separator() + selectedTrainer + QString("__") + plannerSelected);
-          const QString jsonPath = this->DumpJSONfromPickle(parentPath);
-          if (!jsonPath.isEmpty())
-          {
-            this->DisplayMultiModalInfoFromJSON(jsonPath);
-          }
+          m_IsRESULTSFOLDERvalid = true;
+          parentPath = QDir::cleanPath(m_ParentFolder->getResultsFolder() + QDir::separator() + "nnUNet" +
+                                       QDir::separator() + selectedModel + QDir::separator() + selectedTask +
+                                       QDir::separator() + selectedTrainer + QString("__") + plannerSelected);
         }
         break;
       }
+    }
+  }
+  if (m_IsRESULTSFOLDERvalid)
+  {
+    m_Controls.previewButton->setEnabled(true);
+    const QString mitkJsonFile = parentPath + QDir::separator() + m_MITK_EXPORT_JSON_FILENAME;
+    DumpAllJSONs(parentPath);
+    if (QFile::exists(mitkJsonFile))
+    {
+      DisplayMultiModalInfoFromJSON(mitkJsonFile);
+    }
+    const QString jsonPath = m_ParentFolder->getResultsFolder() + QDir::separator() + m_AVAILABLE_MODELS_JSON_FILENAME;
+    if (QFile::exists(mitkJsonFile))
+    {
+      FillAvailableModelsInfoFromJSON(jsonPath);
     }
   }
 }
@@ -432,7 +443,7 @@ void QmitknnUNetToolGUI::SegmentationResultHandler(mitk::nnUNetTool *tool, bool 
   }
   this->SetLabelSetPreview(tool->GetMLPreview());
   WriteStatusMessage("<b>STATUS: </b><i>Segmentation task finished successfully. <br> If multiple Preview objects are selected to Confirm, "
-  "they will be merged. Any unselected Preview objects will be lost.</i>");
+                     "they will be merged. Any unselected Preview objects will be lost.</i>");
 }
 
 void QmitknnUNetToolGUI::ShowEnsembleLayout(bool visible)
@@ -474,5 +485,30 @@ void QmitknnUNetToolGUI::ShowEnsembleLayout(bool visible)
   for (auto &layout : m_EnsembleParams)
   {
     layout->setVisible(visible);
+  }
+}
+
+void QmitknnUNetToolGUI::OnDownloadModel()
+{
+  if (m_IsRESULTSFOLDERvalid)
+  {
+    auto selectedTask = m_Controls.availableBox->currentText();
+    mitk::ProcessExecutor::Pointer spExec = mitk::ProcessExecutor::New();
+    mitk::ProcessExecutor::ArgumentListType args;
+    args.push_back(selectedTask.toStdString());
+    WriteStatusMessage("Downloading the requested task in to the selected Results Folder. This might take some time "
+                       "depending on your internet connection...");
+    try
+    {
+      std::string resultsFolder = m_ParentFolder->getResultsFolder().toStdString();
+      std::string resultsFolderEnv = "RESULTS_FOLDER=" + resultsFolder;
+      itksys::SystemTools::PutEnv(resultsFolderEnv.c_str());
+      spExec->Execute(m_PythonPath.toStdString(), "nnUNet_download_pretrained_model", args);
+    }
+    catch (const mitk::Exception &e)
+    {
+      MITK_ERROR << "Download FAILED!" << e.GetDescription(); // SHOW ERROR
+      WriteStatusMessage("Download failed. Check your internet connection.");
+    }
   }
 }

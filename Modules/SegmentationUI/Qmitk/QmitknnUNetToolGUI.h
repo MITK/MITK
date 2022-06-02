@@ -127,6 +127,12 @@ protected slots:
    */
   void OnClearCachePressed();
 
+  /**
+   * @brief Qt slot
+   *
+   */
+  void OnDownloadModel();
+
 protected:
   QmitknnUNetToolGUI();
   ~QmitknnUNetToolGUI() = default;
@@ -136,10 +142,27 @@ protected:
   void EnableWidgets(bool enabled) override;
 
 private:
+  /**
+   * @brief Parses the available_models.json file from RESULTS_FOLDER and loads
+   * the task names to the Download combobox in Advanced.
+   */
+  void FillAvailableModelsInfoFromJSON(const QString &);
+
+  /**
+   * @brief Calls other JSON dumping functions.
+   *
+   */
+  void DumpAllJSONs(const QString &);
+
+  /**
+   * @brief Exports available models to download from nnUNet_print_available_pretrained_models
+   * output.
+   */
+  void ExportAvailableModelsAsJSON(const QString &);
 
   /**
    * @brief Clears all displayed modal labels and widgets from GUI.
-   * 
+   *
    */
   void ClearAllModalities();
 
@@ -147,13 +170,12 @@ private:
    * @brief Parses Json file containing modality info and populates
    * labels and selection widgets accordingly on the GUI.
    */
-  void DisplayMultiModalInfoFromJSON(const QString&);
+  void DisplayMultiModalInfoFromJSON(const QString &);
 
   /**
-   * @brief Clears all modality labels previously populated from GUI
-   * 
+   * @brief Clears all modality labels previously populated from GUI.
+   *
    */
-
   void ClearAllModalLabels();
 
   /**
@@ -161,28 +183,28 @@ private:
    * modality information required for inferencing. This information is exported
    * as json file : "mitk_export.json".
    *
-   * @return QString 
+   * @return QString
    */
-  QString DumpJSONfromPickle(const QString&);
+  void DumpJSONfromPickle(const QString &);
 
   /**
    * @brief Searches RESULTS_FOLDER environment variable. If not found,
    * returns from the QSettings stored last used path value.
-   * @return QString 
+   * @return QString
    */
   QString FetchResultsFolderFromEnv();
-  
+
   /**
    * @brief Returns GPU id of the selected GPU from the Combo box.
-   * 
-   * @return unsigned int 
+   *
+   * @return unsigned int
    */
   unsigned int FetchSelectedGPUFromUI();
 
   /**
    * @brief Adds GPU information to the gpu combo box.
    * In case, there aren't any GPUs avaialble, the combo box will be
-   * rendered editable. 
+   * rendered editable.
    */
   void SetGPUInfo();
 
@@ -190,8 +212,8 @@ private:
    * @brief Inserts the hash and segmentation into cache and
    * updates count on UI.
    */
-  void AddToCache(size_t&, mitk::LabelSetImage::ConstPointer);
-  
+  void AddToCache(size_t &, mitk::LabelSetImage::ConstPointer);
+
   /**
    * @brief Checks all the entries of the ctkCheckableComboBox ui widget.
    * This feature is not present in ctkCheckableComboBox API.
@@ -231,7 +253,7 @@ private:
    * @brief Writes any message in white on the tool pane.
    */
   void WriteStatusMessage(const QString &);
-  
+
   /**
    * @brief Writes any message in red on the tool pane.
    */
@@ -292,7 +314,7 @@ private:
 
   /**
    * @brief Updates cache count on UI.
-   * 
+   *
    */
   void UpdateCacheCountOnUI();
 
@@ -304,7 +326,7 @@ private:
    *
    */
   std::vector<QmitkDataStorageComboBox *> m_Modalities;
-  std::vector<QLabel*> m_ModalLabels;
+  std::vector<QLabel *> m_ModalLabels;
 
   std::vector<std::unique_ptr<QmitknnUNetTaskParamsUITemplate>> m_EnsembleParams;
 
@@ -334,9 +356,17 @@ private:
 
   const QString m_CACHE_COUNT_BASE_LABEL = "Cached Items: ";
 
+  const QString m_MITK_EXPORT_JSON_FILENAME = "mitk_export.json";
+
+  const QString m_AVAILABLE_MODELS_JSON_FILENAME = "available_models.json";
+
+  const QString m_PICKLE_FILENAME = "plans.pkl";
+
   /**
    * @brief For storing values across sessions. Currently, RESULTS_FOLDER value is cached using this.
    */
   QSettings m_Settings;
+
+  bool m_IsRESULTSFOLDERvalid = false;
 };
 #endif

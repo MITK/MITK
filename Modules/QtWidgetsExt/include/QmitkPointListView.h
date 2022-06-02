@@ -14,7 +14,9 @@ found in the LICENSE file.
 #define QMITK_POINTLIST_VIEW_H_INCLUDED
 
 #include "MitkQtWidgetsExtExports.h"
-#include "QmitkPointListModel.h"
+
+#include <QmitkPointListModel.h>
+
 #include <QLabel>
 #include <QListView>
 #include <mitkSliceNavigationController.h>

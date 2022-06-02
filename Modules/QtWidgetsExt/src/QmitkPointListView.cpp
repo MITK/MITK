@@ -12,12 +12,12 @@ found in the LICENSE file.
 
 #include "QmitkPointListView.h"
 
-#include "QmitkEditPointDialog.h"
-#include "QmitkPointListModel.h"
-#include "QmitkRenderWindow.h"
-#include "QmitkStdMultiWidget.h"
+#include <QmitkEditPointDialog.h>
+#include <QmitkPointListModel.h>
+#include <QmitkRenderWindow.h>
+#include <QmitkStdMultiWidget.h>
 
-#include "mitkRenderingManager.h"
+#include <mitkRenderingManager.h>
 
 #include <QKeyEvent>
 #include <QMenu>

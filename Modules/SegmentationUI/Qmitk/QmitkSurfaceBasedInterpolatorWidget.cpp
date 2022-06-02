@@ -25,8 +25,6 @@ found in the LICENSE file.
 #include "mitkVtkRepresentationProperty.h"
 #include <mitkToolManagerProvider.h>
 
-#include "QmitkStdMultiWidget.h"
-
 #include <itkCommand.h>
 #include <vtkProperty.h>
 

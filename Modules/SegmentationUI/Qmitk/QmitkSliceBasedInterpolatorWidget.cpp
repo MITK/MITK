@@ -31,8 +31,6 @@ found in the LICENSE file.
 #include <mitkUndoController.h>
 #include <mitkVtkImageOverwrite.h>
 
-#include "QmitkStdMultiWidget.h"
-
 #include <itkCommand.h>
 
 #include <QApplication>

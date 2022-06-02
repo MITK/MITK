@@ -141,7 +141,7 @@ void QmitkFiducialRegistrationWidget::SetImageFiducialsNode( mitk::DataNode::Poi
   m_Controls->m_RegistrationImagePoints->SetPointSetNode(imageFiducialsNode); // pass node to pointListWidget
   if(m_MultiWidget == nullptr)
   {
-    MITK_DEBUG<< "stdMultiWidget is nullptr";
+    MITK_DEBUG<< "MultiWidget is nullptr";
     return;
   }
   m_Controls->m_RegistrationImagePoints->SetMultiWidget(m_MultiWidget); // pass multiWidget to pointListWidget
@@ -157,13 +157,13 @@ void QmitkFiducialRegistrationWidget::SetTrackerFiducialsNode( mitk::DataNode::P
   m_Controls->m_RegistrationTrackingPoints->SetPointSetNode(trackerFiducialsNode); // pass node to pointListWidget
   if(m_MultiWidget == nullptr)
   {
-    MITK_DEBUG<< "stdMultiWidget is nullptr";
+    MITK_DEBUG<< "MultiWidget is nullptr";
     return;
   }
   m_Controls->m_RegistrationTrackingPoints->SetMultiWidget(m_MultiWidget); // pass multiWidget to pointListWidget
 }
 
-void QmitkFiducialRegistrationWidget::SetMultiWidget( QmitkStdMultiWidget* multiWidget )
+void QmitkFiducialRegistrationWidget::SetMultiWidget( QmitkAbstractMultiWidget* multiWidget )
 {
   m_MultiWidget=multiWidget;
 }

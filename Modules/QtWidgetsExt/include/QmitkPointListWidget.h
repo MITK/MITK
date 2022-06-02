@@ -13,6 +13,7 @@ found in the LICENSE file.
 #define QmitkPointListWidget_H
 
 #include "MitkQtWidgetsExtExports.h"
+
 #include <QmitkPointListModel.h>
 #include <QmitkPointListView.h>
 
@@ -23,7 +24,7 @@ found in the LICENSE file.
 #include <QPushButton>
 #include <QToolButton>
 
-class QmitkStdMultiWidget;
+class QmitkAbstractMultiWidget;
 
 /*!
  * \brief Widget for regular operations on point sets
@@ -44,7 +45,7 @@ class QmitkStdMultiWidget;
  *
  * If the render window crosshair should be moved to the
  * currently selected point, the widget user has to provide
- * a QmitkStdMultiWidget object.
+ * a QmitkAbstractMultiWidget object.
  */
 
 class MITKQTWIDGETSEXT_EXPORT QmitkPointListWidget : public QWidget
@@ -83,8 +84,8 @@ public:
   void SetPointSetNode(mitk::DataNode *newNode);
   mitk::DataNode *GetPointSetNode();
 
-  /** @brief assign a QmitkStdMultiWidget for updating render window crosshair */
-  void SetMultiWidget(QmitkStdMultiWidget *multiWidget);
+  /** @brief assign a QmitkAbstractMultiWidget for updating render window crosshair */
+  void SetMultiWidget(QmitkAbstractMultiWidget*multiWidget);
 
   /** @brief itk observer for node "delete" events */
   void OnNodeDeleted(const itk::EventObject &e);

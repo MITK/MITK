@@ -18,9 +18,9 @@ found in the LICENSE file.
 #include <QMessageBox>
 #include <mitkIOUtil.h>
 
+#include <QmitkAbstractMultiWidget.h>
 #include <QmitkEditPointDialog.h>
 #include <QmitkStyleManager.h>
-#include <QmitkStdMultiWidget.h>
 
 #include <mitkPointSetDataInteractor.h>
 
@@ -284,7 +284,7 @@ mitk::DataNode *QmitkPointListWidget::GetPointSetNode()
   return m_PointSetNode;
 }
 
-void QmitkPointListWidget::SetMultiWidget(QmitkStdMultiWidget *multiWidget)
+void QmitkPointListWidget::SetMultiWidget(QmitkAbstractMultiWidget* multiWidget)
 {
   m_PointListView->SetMultiWidget(multiWidget);
 }

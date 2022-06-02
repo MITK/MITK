@@ -16,13 +16,14 @@ found in the LICENSE file.
 #include <QmitkPointListModel.h>
 #include <QmitkPointListView.h>
 
-#include <QmitkStdMultiWidget.h>
 #include <mitkDataInteractor.h>
 #include <mitkDataNode.h>
 #include <mitkPointSet.h>
 
 #include <QPushButton>
 #include <QToolButton>
+
+class QmitkStdMultiWidget;
 
 /*!
  * \brief Widget for regular operations on point sets

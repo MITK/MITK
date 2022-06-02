@@ -28,8 +28,6 @@ found in the LICENSE file.
 //mitk image
 #include <mitkImage.h>
 #include <QmitkDataStorageComboBox.h>
-//#include <ctkSliderWidget.h>
-//#include <mitkPointSet.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateOr.h>
 #include "mitkVigraRandomForestClassifier.h"
@@ -54,9 +52,7 @@ found in the LICENSE file.
 #include <itkImageRegionConstIteratorWithIndex.h>
 #include <itkImageRegionConstIterator.h>
 
-//#include <mitkRandomForestAccurecyWeighting.h>
 #include "mitkLabelSetImage.h"
-//#include <vigra\multi_array.hxx>
 
 #include <mitkLookupTable.h>
 #include <mitkLookupTableProperty.h>
@@ -64,7 +60,6 @@ found in the LICENSE file.
 #include <QFuture>
 #include <QFutureWatcher>
 #include <QtConcurrentRun>
-//#include <mitkPointSetDataInteractor.h>
 #include <QmitkIOUtil.h>
 const std::string ClassificationRegionGrow::VIEW_ID = "org.mitk.views.ClassificationRegionGrow";
 

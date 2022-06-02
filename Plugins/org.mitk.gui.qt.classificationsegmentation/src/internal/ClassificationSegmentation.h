@@ -43,8 +43,6 @@ found in the LICENSE file.
 \ingroup ${plugin_target}_internal
 */
 
-
-//class QmitkPointListWidget;
 class ctkSliderWidget;
 class ClassificationSegmentation : public QmitkAbstractView
 {

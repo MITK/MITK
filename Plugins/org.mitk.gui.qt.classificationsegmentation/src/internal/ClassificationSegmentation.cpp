@@ -49,15 +49,12 @@ found in the LICENSE file.
 #include <itkImageRegionConstIteratorWithIndex.h>
 #include <itkImageRegionConstIterator.h>
 
-//#include <mitkRandomForestAccurecyWeighting.h>
-
 #include <mitkLookupTable.h>
 #include <mitkLookupTableProperty.h>
 
 #include <QFuture>
 #include <QFutureWatcher>
 #include <QtConcurrentRun>
-#include <mitkPointSetDataInteractor.h>
 #include <QmitkIOUtil.h>
 const std::string ClassificationSegmentation::VIEW_ID = "org.mitk.views.classificationsegmentation";
 

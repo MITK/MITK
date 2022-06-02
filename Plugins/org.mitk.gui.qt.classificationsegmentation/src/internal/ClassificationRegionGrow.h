@@ -24,14 +24,8 @@ found in the LICENSE file.
 #include <itkFirstOrderStatisticsFeatureFunctor.h>
 
 #include <mitkImageCast.h>
-//#include <vigra/tensorutilities.hxx>
-//#include <vigra/convolution.hxx>
-//#include <vigra/multi_array.hxx>
-#include <mitkPointSet.h>
 #include <itkHistogram.h>
 #include <QFutureWatcher>
-#include "QmitkPointListViewWidget.h"
-#include <mitkPointSetDataInteractor.h>
 
 #include <mitkVigraRandomForestClassifier.h>
 /**
@@ -43,8 +37,6 @@ found in the LICENSE file.
 \ingroup ${plugin_target}_internal
 */
 
-
-//class QmitkPointListWidget;
 class ctkSliderWidget;
 class ClassificationRegionGrow : public QmitkAbstractView
 {

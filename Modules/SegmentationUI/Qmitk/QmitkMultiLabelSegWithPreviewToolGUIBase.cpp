@@ -20,18 +20,10 @@ QmitkMultiLabelSegWithPreviewToolGUIBase::QmitkMultiLabelSegWithPreviewToolGUIBa
 {
   auto enableMLSelectedDelegate = [this](bool enabled)
   {
-    bool result = enabled;
     auto tool = this->GetConnectedToolAs<mitk::SegWithPreviewTool>();
-    if (nullptr != tool)
-    {
-      result = (tool->GetLabelTransferMode()==mitk::SegWithPreviewTool::LabelTransferMode::AllLabels || !tool->GetSelectedLabels().empty()) && enabled;
-    }
-    else
-    {
-      result = false;
-    }
-
-    return result;
+    return nullptr != tool
+      ? (tool->GetLabelTransferMode() == mitk::SegWithPreviewTool::LabelTransferMode::AllLabels || !tool->GetSelectedLabels().empty()) && enabled
+      : false;
   };
 
   m_EnableConfirmSegBtnFnc = enableMLSelectedDelegate;

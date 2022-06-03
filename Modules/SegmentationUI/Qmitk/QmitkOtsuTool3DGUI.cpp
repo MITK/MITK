@@ -17,10 +17,8 @@ found in the LICENSE file.
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkOtsuTool3DGUI, "")
 
-QmitkOtsuTool3DGUI::QmitkOtsuTool3DGUI() : QmitkMultiLabelSegWithPreviewToolGUIBase()
+QmitkOtsuTool3DGUI::QmitkOtsuTool3DGUI() : QmitkMultiLabelSegWithPreviewToolGUIBase(), m_SuperclassEnableConfirmSegBtnFnc(m_EnableConfirmSegBtnFnc)
 {
-  m_SuperclassEnableConfirmSegBtnFnc = m_EnableConfirmSegBtnFnc;
-
   auto enableMLSelectedDelegate = [this](bool enabled)
   {
     if (this->m_FirstPreviewComputation)

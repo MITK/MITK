@@ -335,9 +335,9 @@ void mitk::SegWithPreviewTool::ResetPreviewNode()
   }
 }
 
-std::vector<std::pair<mitk::Label::PixelType, mitk::Label::PixelType> > mitk::SegWithPreviewTool::GetLabelMapping() const
+mitk::SegWithPreviewTool::LabelMappingType mitk::SegWithPreviewTool::GetLabelMapping() const
 {
-  std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping = { { this->GetUserDefinedActiveLabel(),this->GetUserDefinedActiveLabel() } };
+  LabelMappingType labelMapping = { { this->GetUserDefinedActiveLabel(),this->GetUserDefinedActiveLabel() } };
   if (LabelTransferMode::SelectedLabels == this->m_LabelTransferMode)
   {
     labelMapping.clear();
@@ -627,7 +627,7 @@ void mitk::SegWithPreviewTool::UpdateCleanUp()
   //reimplement in derived classes for special behavior
 }
 
-void mitk::SegWithPreviewTool::TransferLabelInformation(std::vector<std::pair<mitk::Label::PixelType, mitk::Label::PixelType>>& labelMapping,
+void mitk::SegWithPreviewTool::TransferLabelInformation(LabelMappingType& labelMapping,
   const mitk::LabelSetImage* source, mitk::LabelSetImage* target)
 {
   for (const auto& [sourceLabel, targetLabel] : labelMapping)
@@ -676,12 +676,12 @@ const char* mitk::SegWithPreviewTool::GetGroup() const
   return "autoSegmentation";
 }
 
-mitk::Image::ConstPointer mitk::SegWithPreviewTool::GetImageByTimeStep(const mitk::Image* image, unsigned int timestep)
+mitk::Image::ConstPointer mitk::SegWithPreviewTool::GetImageByTimeStep(const mitk::Image* image, TimeStepType timestep)
 {
   return SelectImageByTimeStep(image, timestep);
 }
 
-mitk::Image::Pointer mitk::SegWithPreviewTool::GetImageByTimeStep(mitk::Image* image, unsigned int timestep)
+mitk::Image::Pointer mitk::SegWithPreviewTool::GetImageByTimeStep(mitk::Image* image, TimeStepType timestep)
 {
   return SelectImageByTimeStep(image, timestep);
 }
@@ -694,18 +694,20 @@ mitk::Image::ConstPointer mitk::SegWithPreviewTool::GetImageByTimePoint(const mi
 void mitk::SegWithPreviewTool::EnsureTargetSegmentationNodeInDataStorage() const
 {
   auto targetNode = this->GetTargetSegmentationNode();
-  if (!this->GetToolManager()->GetDataStorage()->Exists(targetNode))
+  auto dataStorage = this->GetToolManager()->GetDataStorage();
+  if (!dataStorage->Exists(targetNode))
   {
-    this->GetToolManager()->GetDataStorage()->Add(targetNode, this->GetToolManager()->GetReferenceData(0));
+    dataStorage->Add(targetNode, this->GetToolManager()->GetReferenceData(0));
   }
 }
 
 std::string mitk::SegWithPreviewTool::GetCurrentSegmentationName()
 {
-  if (this->GetToolManager()->GetWorkingData(0))
-    return this->GetToolManager()->GetWorkingData(0)->GetName();
-  else
-    return "";
+  auto workingData = this->GetToolManager()->GetWorkingData(0);
+
+  return nullptr != workingData
+    ? workingData->GetName()
+    : "";
 }
 
 
@@ -718,7 +720,7 @@ void mitk::SegWithPreviewTool::TransferLabelSetImageContent(const LabelSetImage*
 {
   mitk::ImageReadAccessor newMitkImgAcc(source);
 
-  std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping;
+  LabelMappingType labelMapping;
   const auto labelSet = source->GetActiveLabelSet();
   for (auto labelIter = labelSet->IteratorConstBegin(); labelIter != labelSet->IteratorConstEnd(); ++labelIter)
   {

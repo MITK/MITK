@@ -130,9 +130,9 @@ namespace mitk
     const char* GetGroup() const override;
 
     /** Helper that extracts the image for the passed timestep, if the image has multiple time steps.*/
-    static Image::ConstPointer GetImageByTimeStep(const Image* image, unsigned int timestep);
+    static Image::ConstPointer GetImageByTimeStep(const Image* image, TimeStepType timestep);
     /** Helper that extracts the image for the passed timestep, if the image has multiple time steps.*/
-    static Image::Pointer GetImageByTimeStep(Image* image, unsigned int timestep);
+    static Image::Pointer GetImageByTimeStep(Image* image, TimeStepType timestep);
     /** Helper that extracts the image for the passed time point, if the image has multiple time steps.*/
     static Image::ConstPointer GetImageByTimePoint(const Image* image, TimePointType timePoint);
 
@@ -163,7 +163,8 @@ namespace mitk
     cloning the label information of the preview.*/
     virtual void TransferPrepare();
 
-    static void TransferLabelInformation(std::vector<std::pair<mitk::Label::PixelType, mitk::Label::PixelType>>& labelMapping,
+    using LabelMappingType = std::vector<std::pair<Label::PixelType, Label::PixelType> >;
+    static void TransferLabelInformation(LabelMappingType& labelMapping,
       const mitk::LabelSetImage* source, mitk::LabelSetImage* target);
 
     /**Helper function that can be used to move the content of an LabelSetImage (the pixels of the active source layer and the labels).
@@ -227,7 +228,7 @@ namespace mitk
      */
     bool EnsureUpToDateUserDefinedActiveLabel();
 
-    std::vector<std::pair<Label::PixelType, Label::PixelType> > GetLabelMapping() const;
+    LabelMappingType GetLabelMapping() const;
 
     /** Node that containes the preview data generated and managed by this class or derived ones.*/
     DataNode::Pointer m_PreviewSegmentationNode;

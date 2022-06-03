@@ -43,25 +43,24 @@ void mitk::nnUNetTool::Activated()
 
 void mitk::nnUNetTool::RenderOutputBuffer()
 {
-  //if (m_OutputBuffer != nullptr)
-  //{
-  //  Superclass::SetNodeProperties(m_OutputBuffer);
-  //  try
-  //  {
-  //    if (nullptr != this->GetPreviewSegmentationNode())
-  //    {
-  //      this->GetPreviewSegmentationNode()->SetVisibility(!this->GetSelectedLabels().empty());
-  //    }
-  //    if (this->GetSelectedLabels().empty())
-  //    {
-  //      this->ResetPreviewNode();
-  //    }
-  //  }
-  //  catch (const mitk::Exception &e)
-  //  {
-  //    MITK_INFO << e.GetDescription();
-  //  }
-  //}
+  if (m_OutputBuffer != nullptr)
+  {
+    try
+    {
+      if (nullptr != this->GetPreviewSegmentationNode())
+      {
+        this->GetPreviewSegmentationNode()->SetVisibility(!this->GetSelectedLabels().empty());
+      }
+      if (this->GetSelectedLabels().empty())
+      {
+        this->ResetPreviewNode();
+      }
+    }
+    catch (const mitk::Exception &e)
+    {
+      MITK_INFO << e.GetDescription();
+    }
+  }
 }
 
 void mitk::nnUNetTool::SetOutputBuffer(LabelSetImage::Pointer segmentation)

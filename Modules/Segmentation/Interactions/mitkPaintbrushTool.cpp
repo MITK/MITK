@@ -63,8 +63,11 @@ void mitk::PaintbrushTool::Activated()
   m_PaintingNode->SetProperty("helper object", mitk::BoolProperty::New(true));
   m_PaintingNode->SetProperty("opacity", mitk::FloatProperty::New(0.8));
   m_PaintingNode->SetProperty("includeInBoundingBox", mitk::BoolProperty::New(false));
-  m_PaintingNode->SetVisibility(
-    false, mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3")));
+  auto allRenderWindows = BaseRenderer::GetAll3DRenderWindows();
+  for (auto mapit = allRenderWindows.begin(); mapit != allRenderWindows.end(); ++mapit)
+  {
+    m_PaintingNode->SetVisibility(false, mapit->second);
+  }
 
   this->GetToolManager()->GetDataStorage()->Add(m_PaintingNode);
 }
@@ -560,6 +563,7 @@ void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositi
   {
     currentColor.Set(1.0, 0.0, 0.);
   }
+
   m_PaintingNode->SetProperty("color", mitk::ColorProperty::New(currentColor[0], currentColor[1], currentColor[2]));
 }
 

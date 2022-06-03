@@ -38,13 +38,13 @@ mitk::nnUNetTool::~nnUNetTool()
 void mitk::nnUNetTool::Activated()
 {
   Superclass::Activated();
+  this->SetLabelTransferMode(LabelTransferMode::AllLabels);
 }
 
 void mitk::nnUNetTool::RenderOutputBuffer()
 {
   if (m_OutputBuffer != nullptr)
   {
-    Superclass::SetNodeProperties(m_OutputBuffer);
     try
     {
       if (nullptr != this->GetPreviewSegmentationNode())
@@ -129,12 +129,13 @@ namespace
   }
 } // namespace
 
-mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inputAtTimeStep, TimeStepType /*timeStep*/)
+void mitk::nnUNetTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image* /*oldSegAtTimeStep*/, LabelSetImage* previewImage, TimeStepType /*timeStep*/)
 {
   if (m_InputBuffer == inputAtTimeStep)
   {
-    return m_OutputBuffer;
+    return;
   }
+
   std::string inDir, outDir, inputImagePath, outputImagePath, scriptPath;
 
   ProcessExecutor::Pointer spExec = ProcessExecutor::New();
@@ -190,7 +191,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     Can't throw mitk exception to the caller. Refer: T28691
     */
     MITK_ERROR << e.GetDescription();
-    return nullptr;
+    return;
   }
   // Code calls external process
   std::string command = "nnUNet_predict";
@@ -279,7 +280,7 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
       Can't throw mitk exception to the caller. Refer: T28691
       */
       MITK_ERROR << e.GetDescription();
-      return nullptr;
+      return;
     }
   }
   if (this->GetEnsemble() && !this->GetPostProcessingJsonDirectory().empty())
@@ -308,13 +309,10 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
   }
   try
   {
-    LabelSetImage::Pointer resultImage = LabelSetImage::New();
     Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
-    resultImage->InitializeByLabeledImage(outputImage);
-    resultImage->SetGeometry(inputAtTimeStep->GetGeometry());
+    previewImage->InitializeByLabeledImage(outputImage);
     m_InputBuffer = inputAtTimeStep;
-    m_OutputBuffer = resultImage;
-    return resultImage;
+    m_OutputBuffer = previewImage;
   }
   catch (const mitk::Exception &e)
   {
@@ -322,6 +320,6 @@ mitk::LabelSetImage::Pointer mitk::nnUNetTool::ComputeMLPreview(const Image *inp
     Can't throw mitk exception to the caller. Refer: T28691
     */
     MITK_ERROR << e.GetDescription();
-    return nullptr;
+    return;
   }
 }

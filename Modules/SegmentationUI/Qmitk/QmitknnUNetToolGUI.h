@@ -13,7 +13,7 @@ found in the LICENSE file.s
 #ifndef QmitknnUNetToolGUI_h_Included
 #define QmitknnUNetToolGUI_h_Included
 
-#include "QmitkAutoMLSegmentationToolGUIBase.h"
+#include "QmitkMultiLabelSegWithPreviewToolGUIBase.h"
 #include "QmitknnUNetFolderParser.h"
 #include "QmitknnUNetGPU.h"
 #include "mitknnUnetTool.h"
@@ -41,12 +41,12 @@ public:
   }
 };
 
-class MITKSEGMENTATIONUI_EXPORT QmitknnUNetToolGUI : public QmitkAutoMLSegmentationToolGUIBase
+class MITKSEGMENTATIONUI_EXPORT QmitknnUNetToolGUI : public QmitkMultiLabelSegWithPreviewToolGUIBase
 {
   Q_OBJECT
 
 public:
-  mitkClassMacro(QmitknnUNetToolGUI, QmitkAutoMLSegmentationToolGUIBase);
+  mitkClassMacro(QmitknnUNetToolGUI, QmitkMultiLabelSegWithPreviewToolGUIBase);
   itkFactorylessNewMacro(Self);
   itkCloneMacro(Self);
 
@@ -131,7 +131,7 @@ protected:
   QmitknnUNetToolGUI();
   ~QmitknnUNetToolGUI() = default;
 
-  void ConnectNewTool(mitk::AutoSegmentationWithPreviewTool *newTool) override;
+  void ConnectNewTool(mitk::SegWithPreviewTool *newTool) override;
   void InitializeUI(QBoxLayout *mainLayout) override;
   void EnableWidgets(bool enabled) override;
 

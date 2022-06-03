@@ -155,7 +155,10 @@ void mitk::LabelSetImage::Initialize(const mitk::Image *other)
   DICOMQIPropertyHelper::DeriveDICOMSourceProperties(other, this);
 
   // Add a inital LabelSet ans corresponding image data to the stack
-  AddLayer();
+  if (this->GetNumberOfLayers() == 0)
+  {
+    AddLayer();
+  }
 }
 
 mitk::LabelSetImage::~LabelSetImage()

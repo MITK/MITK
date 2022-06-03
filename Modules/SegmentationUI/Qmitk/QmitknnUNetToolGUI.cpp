@@ -26,7 +26,7 @@ found in the LICENSE file.
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitknnUNetToolGUI, "")
 
-QmitknnUNetToolGUI::QmitknnUNetToolGUI() : QmitkAutoMLSegmentationToolGUIBase()
+QmitknnUNetToolGUI::QmitknnUNetToolGUI() : QmitkMultiLabelSegWithPreviewToolGUIBase()
 {
   // Nvidia-smi command returning zero doesn't always imply lack of GPUs.
   // Pytorch uses its own libraries to communicate to the GPUs. Hence, only a warning can be given.
@@ -42,7 +42,7 @@ QmitknnUNetToolGUI::QmitknnUNetToolGUI() : QmitkAutoMLSegmentationToolGUIBase()
   m_MultiModalPredicate = mitk::NodePredicateAnd::New(imageType, labelSetImageType).GetPointer();
 }
 
-void QmitknnUNetToolGUI::ConnectNewTool(mitk::AutoSegmentationWithPreviewTool *newTool)
+void QmitknnUNetToolGUI::ConnectNewTool(mitk::SegWithPreviewTool *newTool)
 {
   Superclass::ConnectNewTool(newTool);
   newTool->IsTimePointChangeAwareOff();
@@ -187,7 +187,7 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
           SegmentationResultHandler(tool);
           if (doCache)
           {
-            AddToCache(hashKey, tool->GetMLPreview());
+            AddToCache(hashKey, tool->GetPreviewSegmentation());
           }
         }
         tool->PredictOff(); // purposefully placed to make tool->GetMTime different than before.

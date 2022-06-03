@@ -1,7 +1,6 @@
 set( CPP_FILES
-Qmitk/QmitkAdaptiveRegionGrowingToolGUI.cpp
-Qmitk/QmitkAutoSegmentationToolGUIBase.cpp
-Qmitk/QmitkAutoMLSegmentationToolGUIBase.cpp
+Qmitk/QmitkSegWithPreviewToolGUIBase.cpp
+Qmitk/QmitkMultiLabelSegWithPreviewToolGUIBase.cpp
 Qmitk/QmitkBinaryThresholdToolGUIBase.cpp
 Qmitk/QmitkBinaryThresholdToolGUI.cpp
 Qmitk/QmitkBinaryThresholdULToolGUI.cpp
@@ -30,9 +29,8 @@ Qmitk/QmitkSimpleLabelSetListWidget.cpp
 )
 
 set(MOC_H_FILES
-Qmitk/QmitkAdaptiveRegionGrowingToolGUI.h
-Qmitk/QmitkAutoSegmentationToolGUIBase.h
-Qmitk/QmitkAutoMLSegmentationToolGUIBase.h
+Qmitk/QmitkSegWithPreviewToolGUIBase.h
+Qmitk/QmitkMultiLabelSegWithPreviewToolGUIBase.h
 Qmitk/QmitkBinaryThresholdToolGUIBase.h
 Qmitk/QmitkBinaryThresholdToolGUI.h
 Qmitk/QmitkBinaryThresholdULToolGUI.h
@@ -63,7 +61,6 @@ Qmitk/QmitkSimpleLabelSetListWidget.h
 )
 
 set(UI_FILES
-Qmitk/QmitkAdaptiveRegionGrowingToolGUIControls.ui
 Qmitk/QmitkConfirmSegmentationDialog.ui
 Qmitk/QmitkOtsuToolWidgetControls.ui
 Qmitk/QmitkLiveWireTool2DGUIControls.ui

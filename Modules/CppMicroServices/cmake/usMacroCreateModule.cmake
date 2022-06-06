@@ -126,7 +126,7 @@ set_target_properties(${${PROJECT_NAME}_TARGET} PROPERTIES
 
 # Link additional libraries
 if(${PROJECT_NAME}_LINK_LIBRARIES OR US_LIBRARIES)
-  target_link_libraries(${${PROJECT_NAME}_TARGET} ${US_LIBRARIES} ${${PROJECT_NAME}_LINK_LIBRARIES})
+  target_link_libraries(${${PROJECT_NAME}_TARGET} PUBLIC ${US_LIBRARIES} ${${PROJECT_NAME}_LINK_LIBRARIES})
 endif()
 
 if(${PROJECT_NAME}_PRIVATE_LINK_LIBRARIES)

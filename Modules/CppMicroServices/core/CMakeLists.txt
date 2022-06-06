@@ -33,6 +33,7 @@ usMacroCreateModule(Core
   TARGET CppMicroServices
   INTERNAL_INCLUDE_DIRS src/util src/service src/module
   LINK_LIBRARIES ${_link_libraries}
+  PRIVATE_LINK_LIBRARIES nlohmann_json::nlohmann_json
   SOURCES ${_core_srcs}
   PUBLIC_HEADERS ${_core_public_headers}
   PRIVATE_HEADERS ${_core_private_headers}

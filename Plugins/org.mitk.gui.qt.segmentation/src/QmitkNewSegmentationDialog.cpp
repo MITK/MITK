@@ -26,15 +26,12 @@ found in the LICENSE file.
 
 #include <vtkNew.h>
 
-#include <QByteArray>
 #include <QColorDialog>
 #include <QCompleter>
-#include <QFile>
-#include <QJsonArray>
-#include <QJsonDocument>
-#include <QJsonObject>
 #include <QPushButton>
 #include <QStringListModel>
+
+#include <nlohmann/json.hpp>
 
 namespace
 {
@@ -60,48 +57,43 @@ namespace
   // of a "name" string and an optional "color" string. If present, the "color" string must follow the conventions
   // of QColor::setNamedColor(), i.e., #rrggbb or any SVG color keyword name like CornflowerBlue. Everything else
   // in the JSON file is simply ignored. In case of any error, an empty map is returned.
-  QmitkNewSegmentationDialog::SuggestionsType ParseSuggestions(const QString& filename)
+  QmitkNewSegmentationDialog::SuggestionsType ParseSuggestions(const std::string& filename)
   {
+    std::ifstream file(filename);
+
+    if (!file.is_open())
+    {
+      MITK_ERROR << "Could not open \"" << filename << "\"!";
+      return {};
+    }
+
+    auto json = nlohmann::json::parse(file, nullptr, false);
+
+    if (json.is_discarded() || !json.is_array())
+    {
+      MITK_ERROR << "Could not parse \"" << filename << "\" as JSON array!";
+      return {};
+    }
+
     QmitkNewSegmentationDialog::SuggestionsType parsedSuggestions;
-    QFile file(filename);
 
-    if (!file.open(QIODevice::ReadOnly))
+    for (const auto& obj : json)
     {
-      MITK_ERROR << "Could not open \"" << filename.toStdString() << "\"!";
-      return parsedSuggestions;
-    }
+      if (!obj.is_object() || !obj.contains("name"))
+        continue;
 
-    auto json = file.readAll();
-    auto doc = QJsonDocument::fromJson(json);
+      auto name = QString::fromStdString(obj["name"]);
 
-    if (doc.isNull() || !doc.isArray())
-    {
-      MITK_ERROR << "Could not parse \"" << filename.toStdString() << "\" as JSON array!";
-      return parsedSuggestions;
-    }
+      QColor color(QColor::Invalid);
 
-    auto array = doc.array();
+      if (obj.contains("color"))
+        color.setNamedColor(QString::fromStdString(obj["color"]));
 
-    for (auto valueRef : array)
-    {
-      if (valueRef.isObject())
-      {
-        auto object = valueRef.toObject();
-
-        if (object.contains("name") && object["name"].isString())
-        {
-          auto name = object["name"].toString();
-          auto color = object.contains("color") && object["color"].isString()
-            ? QColor(object["color"].toString())
-            : QColor(QColor::Invalid);
-
-          parsedSuggestions.emplace(name, color);
-        }
-      }
+      parsedSuggestions.emplace(name, color);
     }
 
     if (parsedSuggestions.empty())
-      MITK_WARN << "Could not parse any suggestions from \"" << filename.toStdString() << "\"!";
+      MITK_WARN << "Could not parse any suggestions from \"" << filename << "\"!";
 
     return parsedSuggestions;
   }
@@ -205,7 +197,7 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget *parent, mitk::La
 
   if (!prefs.labelSuggestions.isEmpty())
   {
-    auto suggestions = ParseSuggestions(prefs.labelSuggestions);
+    auto suggestions = ParseSuggestions(prefs.labelSuggestions.toStdString());
     this->SetSuggestions(suggestions, prefs.replaceStandardSuggestions && !suggestions.empty());
   }
   else

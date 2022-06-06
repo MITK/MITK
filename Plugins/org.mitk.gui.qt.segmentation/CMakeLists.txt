@@ -6,5 +6,5 @@ mitk_create_plugin(
   EXPORT_DIRECTIVE MITK_QT_SEGMENTATION
   EXPORTED_INCLUDE_SUFFIXES src
   MODULE_DEPENDS MitkAppUtil MitkQtWidgetsExt MitkSegmentationUI
-  PACKAGE_DEPENDS Qt5|OpenGL
+  PACKAGE_DEPENDS Qt5|OpenGL nlohmann_json
 )

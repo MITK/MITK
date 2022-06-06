@@ -12,12 +12,13 @@ found in the LICENSE file.
 
 #include <iterator>
 #include <set>
+#include <type_traits>
 
 #include "mitkTemporoSpatialStringProperty.h"
 
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/type_traits/make_unsigned.hpp>
+#include <nlohmann/json.hpp>
+
+using namespace nlohmann;
 
 mitk::TemporoSpatialStringProperty::TemporoSpatialStringProperty(const char *s)
 {
@@ -281,7 +282,7 @@ std::basic_string<Ch> CreateJSONEscapes(const std::basic_string<Ch> &s)
   typename std::basic_string<Ch>::const_iterator e = s.end();
   while (b != e)
   {
-    typedef typename boost::make_unsigned<Ch>::type UCh;
+    using UCh = std::make_unsigned_t<Ch>;
     UCh c(*b);
     // This assumes an ASCII superset.
     // We escape everything outside ASCII, because this code can't
@@ -469,22 +470,15 @@ mitk::BaseProperty::Pointer mitk::PropertyPersistenceDeserialization::deserializ
 
   mitk::TemporoSpatialStringProperty::Pointer prop = mitk::TemporoSpatialStringProperty::New();
 
-  boost::property_tree::ptree root;
+  auto root = json::parse(value);
 
-  std::istringstream stream(value);
-  stream.imbue(std::locale("C"));
-
-  boost::property_tree::read_json(stream, root);
-
-  for (boost::property_tree::ptree::value_type &element : root.get_child("values"))
+  for (const auto& element : root["values"])
   {
-    std::string value = element.second.get("value", "");
-    mitk::TemporoSpatialStringProperty::IndexValueType z =
-      element.second.get<mitk::TemporoSpatialStringProperty::IndexValueType>("z", 0);
-    mitk::TemporoSpatialStringProperty::IndexValueType zmax =
-      element.second.get<mitk::TemporoSpatialStringProperty::IndexValueType>("zmax", z);
-    TimeStepType t = element.second.get<TimeStepType>("t", 0);
-    TimeStepType tmax = element.second.get<TimeStepType>("tmax", t);
+    auto value = element.value("value", "");
+    auto z = element.value<TemporoSpatialStringProperty::IndexValueType>("z", 0);
+    auto zmax = element.value<TemporoSpatialStringProperty::IndexValueType>("zmax", z);
+    auto t = element.value<TimeStepType>("t", 0);
+    auto tmax = element.value<TimeStepType>("tmax", t);
 
     for (auto currentT = t; currentT <= tmax; ++currentT)
     {

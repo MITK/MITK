@@ -28,8 +28,9 @@ found in the LICENSE file.
 #include <usModuleContext.h>
 #include <usModuleResource.h>
 
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
+#include <nlohmann/json.hpp>
+
+using namespace nlohmann;
 
 namespace
 {
@@ -114,33 +115,34 @@ namespace mitk
 
   namespace
   {
-    void ExtractOptionFromPropertyTree(const std::string& key, boost::property_tree::ptree& root, std::map<std::string, us::Any>& options)
+    void ExtractOptionFromPropertyTree(const std::string& key, const json& root, std::map<std::string, us::Any>& options)
     {
-      auto finding = root.find(key);
-      if (finding != root.not_found())
+      if (root.contains(key))
       {
-        try
+        const auto& value = root[key];
+
+        if (value.is_number_float())
         {
-          options[key] = finding->second.get_value<double>();
+          options[key] = value.get<double>();
         }
-        catch (const boost::property_tree::ptree_bad_data& /*e*/)
+        else
         {
-          options[key] = finding->second.get_value<std::string>();
+          options[key] = value.get<std::string>();
         }
       }
     }
 
     IFileIO::Options ExtractOptionsFromFile(const std::string& file)
     {
-      boost::property_tree::ptree root;
+      json root;
 
       if (itksys::SystemTools::FileExists(file))
       {
         try
         {
-          boost::property_tree::read_json(file, root, std::locale("C"));
+          root = json::parse(file);
         }
-        catch (const boost::property_tree::json_parser_error & e)
+        catch (const json::exception& e)
         {
           MITK_WARN << "Could not parse CEST meta file. Fall back to default values. Error was:\n" << e.what();
         }

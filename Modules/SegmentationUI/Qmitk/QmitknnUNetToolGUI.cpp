@@ -17,12 +17,12 @@ found in the LICENSE file.
 #include <QApplication>
 #include <QDir>
 #include <QIcon>
-#include <QJsonDocument>
-#include <QJsonObject>
 #include <QmitkStyleManager.h>
 #include <QtGlobal>
 #include <itksys/SystemTools.hxx>
 #include <set>
+
+#include <nlohmann/json.hpp>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitknnUNetToolGUI, "")
 
@@ -537,52 +537,42 @@ QString QmitknnUNetToolGUI::DumpJSONfromPickle(const QString &parentPath)
 
 void QmitknnUNetToolGUI::DisplayMultiModalInfoFromJSON(const QString &jsonPath)
 {
-  if (QFile::exists(jsonPath))
-  {
-    QFile file(jsonPath);
-    if (file.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-      QByteArray bytes = file.readAll();
-      file.close();
+  std::ifstream file(jsonPath.toStdString());
 
-      QJsonParseError jsonError;
-      QJsonDocument document = QJsonDocument::fromJson(bytes, &jsonError);
-      if (jsonError.error != QJsonParseError::NoError)
+  if (file.is_open())
+  {
+    auto jsonObj = nlohmann::json::parse(file, nullptr, false);
+
+    if (jsonObj.is_discarded() || !jsonObj.is_object())
+    {
+      MITK_ERROR << "Could not parse \"" << jsonPath.toStdString() << "\" as JSON object!";
+      return;
+    }
+
+    auto num_mods = jsonObj["num_modalities"].get<int>();
+    ClearAllModalLabels();
+    if (num_mods > 1)
+    {
+      m_Controls.multiModalBox->setChecked(true);
+      m_Controls.multiModalBox->setEnabled(false);
+      m_Controls.multiModalSpinBox->setValue(num_mods - 1);
+      m_Controls.advancedSettingsLayout->update();
+      auto obj = jsonObj["modalities"];
+      int count = 0;
+      for (const auto& value : obj)
       {
-        MITK_INFO << "fromJson failed: " << jsonError.errorString().toStdString() << endl;
-        return;
+        QLabel *label = new QLabel(QString::fromStdString("<i>" + value.get<std::string>() + "</i>"), this);
+        m_ModalLabels.push_back(label);
+        m_Controls.advancedSettingsLayout->addWidget(label, m_UI_ROWS + 1 + count, 0);
+        count++;
       }
-      if (document.isObject())
-      {
-        QJsonObject jsonObj = document.object();
-        int num_mods = jsonObj["num_modalities"].toInt();
-        ClearAllModalLabels();
-        if (num_mods > 1)
-        {
-          m_Controls.multiModalBox->setChecked(true);
-          m_Controls.multiModalBox->setEnabled(false);
-          m_Controls.multiModalSpinBox->setValue(num_mods - 1);
-          m_Controls.advancedSettingsLayout->update();
-          QJsonObject obj = jsonObj.value("modalities").toObject();
-          QStringList keys = obj.keys();
-          int count = 0;
-          for (auto key : keys)
-          {
-            auto value = obj.take(key);
-            QLabel *label = new QLabel("<i>" + value.toString() + "</i>", this);
-            m_ModalLabels.push_back(label);
-            m_Controls.advancedSettingsLayout->addWidget(label, m_UI_ROWS + 1 + count, 0);
-            count++;
-          }
-          m_Controls.multiModalSpinBox->setMinimum(num_mods - 1);
-          m_Controls.advancedSettingsLayout->update();
-        }
-        else
-        {
-          m_Controls.multiModalSpinBox->setMinimum(0);
-          m_Controls.multiModalBox->setChecked(false);
-        }
-      }
+      m_Controls.multiModalSpinBox->setMinimum(num_mods - 1);
+      m_Controls.advancedSettingsLayout->update();
+    }
+    else
+    {
+      m_Controls.multiModalSpinBox->setMinimum(0);
+      m_Controls.multiModalBox->setChecked(false);
     }
   }
 }

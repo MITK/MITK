@@ -288,9 +288,6 @@ void QmitkUltrasoundSupport::RenderImage2d()
   if (!m_Controls.m_Update2DView->isChecked())
     return;
 
-  //mitk::IRenderWindowPart* renderWindow = this->GetRenderWindowPart();
-  //renderWindow->GetRenderingManager()->RequestUpdate(mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget0"))->GetRenderWindow());
-
   this->RequestRenderWindowUpdate(mitk::RenderingManager::REQUEST_UPDATE_2DWINDOWS);
 
   m_FrameCounter2d++;

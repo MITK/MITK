@@ -12,7 +12,6 @@ found in the LICENSE file.
 #ifndef QmitkDicomLocalStorageWidget_h
 #define QmitkDicomLocalStorageWidget_h
 
-// #include <QmitkFunctionality.h>
 #include "ui_QmitkDicomLocalStorageWidgetControls.h"
 #include <MitkDICOMUIExports.h>
 
@@ -34,7 +33,6 @@ class QLabel;
 /**
 * \brief QmitkDicomLocalStorageWidget is a QWidget providing functionality for dicom storage and import.
 *
-* \sa QmitkFunctionality
 * \ingroup Functionalities
 */
 class MITKDICOMUI_EXPORT QmitkDicomLocalStorageWidget : public QWidget

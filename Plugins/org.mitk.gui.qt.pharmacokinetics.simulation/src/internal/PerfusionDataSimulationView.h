@@ -23,9 +23,7 @@ found in the LICENSE file.
 #include "itkArray.h"
 #include "mitkImage.h"
 
-
 #include <mitkImage.h>
-
 
 /*!
  *	@brief Test Plugin for SUV calculations of PET images
@@ -54,7 +52,6 @@ protected slots:
 
     void UpdateDataSelection();
 
-
 protected:
     typedef std::map<std::string, mitk::Image::Pointer> ParameterMapType;
 
@@ -74,9 +71,7 @@ protected:
 	 */
 	void SetFocus() override;
 
-
-    void InitModelComboBox() const;
-
+  void InitModelComboBox() const;
 
   mitk::Image::Pointer Generate2CXModelData();
   mitk::Image::Pointer GenerateNumeric2CXModelData();
@@ -84,8 +79,6 @@ protected:
   void FillParameterMap2CXM();
   void FillParameterMapNumeric2CXM();
   void FillParameterMapETM();
-
-
 
   ///////////////////// dynamic PET Models///////////////
   mitk::Image::Pointer Generate2TCModelData();
@@ -95,13 +88,6 @@ protected:
 
 
   bool CheckModelSettings();
-
-
-  /*! \brief called by QmitkFunctionality when DataManager's selection has changed
-  */
-//  virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
-//                                  const QList<mitk::DataNode::Pointer>& selectedNodes);
-
 
 	// Variables
 
@@ -114,7 +100,6 @@ protected:
     itk::Array<double> m_TimeGrid;
 
     mitk::ModelFactoryBase::Pointer m_selectedModelFactory;
-
 
 private:
 

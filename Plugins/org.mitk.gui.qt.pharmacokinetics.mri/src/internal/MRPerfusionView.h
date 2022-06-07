@@ -28,8 +28,6 @@ found in the LICENSE file.
 #include "mitkSimpleBarrierConstraintChecker.h"
 #include "mitkAIFBasedModelBase.h"
 
-
-
 /*!
 *	@brief Test Plugin for SUV calculations of PET images
 */
@@ -117,14 +115,8 @@ protected:
 
   void InitModelComboBox() const;
 
-
-
-
   /*! Helper method that generates a node for the passed concentration image.*/
   mitk::DataNode::Pointer GenerateConcentrationNode(mitk::Image* image, const std::string& nodeName) const;
-
-    /*! \brief called by QmitkFunctionality when DataManager's selection has changed
-  */
 
   void OnNodeSelectionChanged(QList<mitk::DataNode::Pointer> /*nodes*/);
 

@@ -33,7 +33,6 @@ OpenCV image.
 A faster version of UndistortImage() is UndistortImageFast(), however, it has to be initialized once with SetUndistortImageFastInfo()
 instead of the Set... methods before use.
 
-\sa QmitkFunctionality
 \ingroup Functionalities
 */
 

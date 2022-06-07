@@ -80,8 +80,6 @@ protected:
   /** Configures the passed functor according to the selected image and parameters*/
   void ConfigureFunctor(mitk::CurveParameterFunctor* functor) const;
 
-  /*! \brief called by QmitkFunctionality when DataManager's selection has changed
-  */
   void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
     const QList<mitk::DataNode::Pointer>& nodes) override;
 
@@ -92,8 +90,6 @@ protected:
     mitk::DataNode::Pointer m_selectedNode;
 
 private:
-
-
 
     typedef std::map<ParameterNameType, mitk::CurveDescriptionParameterBase::Pointer > ParameterMapType;
 

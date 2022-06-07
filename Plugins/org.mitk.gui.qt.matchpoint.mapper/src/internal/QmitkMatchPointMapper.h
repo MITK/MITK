@@ -29,7 +29,6 @@ found in the LICENSE file.
 
   View class that implements the logic/functionality to map point sets or images based on MatchPoint registration objects.
 
-  \sa QmitkFunctionality
   \ingroup ${plugin_target}_internal
   */
 class QmitkMatchPointMapper : public QmitkAbstractView

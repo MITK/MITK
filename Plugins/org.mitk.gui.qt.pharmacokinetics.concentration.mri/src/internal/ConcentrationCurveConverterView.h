@@ -20,7 +20,6 @@ found in the LICENSE file.
 
 #include <mitkImage.h>
 
-
 /*!
  *	@brief Test Plugin for SUV calculations of PET images
  */
@@ -47,8 +46,6 @@ protected slots:
     void OnSettingChanged();
     bool CheckSettings() const;
 
-
-
 protected:
 
 	// Overridden base class functions
@@ -69,12 +66,9 @@ protected:
 
   bool CheckBaselineSelectionSettings() const;
 
-    /*! Helper method that adds an concentration image as child node to the current m_selectedNode and returns this new child node.*/
-    mitk::DataNode::Pointer AddConcentrationImage(mitk::Image* image, std::string nodeName) const;
+  /*! Helper method that adds an concentration image as child node to the current m_selectedNode and returns this new child node.*/
+  mitk::DataNode::Pointer AddConcentrationImage(mitk::Image* image, std::string nodeName) const;
 
-
-  /*! \brief called by QmitkFunctionality when DataManager's selection has changed
-  */
   void OnNodeSelectionChanged(QList<mitk::DataNode::Pointer>/*nodes*/);
 
 	// Variables

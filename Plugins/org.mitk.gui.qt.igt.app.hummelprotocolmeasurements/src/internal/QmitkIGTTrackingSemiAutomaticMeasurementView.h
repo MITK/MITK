@@ -15,8 +15,7 @@ found in the LICENSE file.
 
 #include <berryISelectionListener.h>
 
-#include <QmitkFunctionality.h>
-#include <QmitkStdMultiWidget.h>
+#include <QmitkAbstractView.h>
 
 //QT
 #include <QTimer>
@@ -35,13 +34,9 @@ found in the LICENSE file.
 
   \warning  This application module is not yet documented. Use "svn blame/praise/annotate" and ask the author to provide basic documentation.
 
-  \sa QmitkFunctionality
-  \ingroup Functionalities
   */
-class QmitkIGTTrackingSemiAutomaticMeasurementView : public QmitkFunctionality
+class QmitkIGTTrackingSemiAutomaticMeasurementView : public QmitkAbstractView
 {
-  // this is needed for all Qt objects that should have a Qt meta-object
-  // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
 
 public:
@@ -52,11 +47,9 @@ public:
   ~QmitkIGTTrackingSemiAutomaticMeasurementView() override;
 
   void CreateQtPartControl(QWidget *parent) override;
+  void SetFocus() override {}
 
-  virtual void MultiWidgetAvailable(QmitkAbstractMultiWidget &multiWidget) override;
-  virtual void MultiWidgetNotAvailable() override;
-
-  protected slots:
+protected slots:
 
   void OnLoadMeasurementStorage();
   void OnLoadReferenceStorage();
@@ -73,8 +66,6 @@ public:
 protected:
 
   Ui::QmitkIGTTrackingSemiAutomaticMeasurementViewControls* m_Controls;
-
-  QmitkStdMultiWidget* m_MultiWidget;
 
   //the tool storages
   mitk::NavigationToolStorage::Pointer m_MeasurementStorage;

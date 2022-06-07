@@ -25,13 +25,10 @@ found in the LICENSE file.
 /*!
 \brief QmitkIGTFiducialRegistration
 
-\sa QmitkFunctionality
 \ingroup ${plugin_target}_internal
 */
 class QmitkIGTFiducialRegistration : public QmitkAbstractView
 {
-  // this is needed for all Qt objects that should have a Qt meta-object
-  // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
 
   public:

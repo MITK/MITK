@@ -40,8 +40,6 @@ found in the LICENSE file.
 class ctkSliderWidget;
 class ClassificationRegionGrow : public QmitkAbstractView
 {
-  // this is needed for all Qt objects that should have a Qt meta-object
-  // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
 
 public:
@@ -90,7 +88,6 @@ protected:
   void TrainClassifier(const mitk::Image::Pointer & raw_image, const mitk::Image::Pointer & mask_image);
   void PredictSegmentation(const mitk::Image::Pointer & raw_image, const mitk::Image::Pointer & mask_image);
 
-  /// \brief called by QmitkFunctionality when DataManager's selection has changed
   void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
     const QList<mitk::DataNode::Pointer>& nodes ) override;
 

@@ -33,14 +33,6 @@ Also, some image arithmetic operations are available.
 Images can be 3D or 4D.
 In the 4D case, the filters work on the 3D image selected via the
 time slider. The result is also a 3D image.
-
-\sa QmitkFunctionality, QObject
-
-\class QmitkBasicImageProcessing
-\author Tobias Schwarz
-\version 1.0 (3M3)
-\date 2009-05-10
-\ingroup Bundles
 */
 
 class PREPROCESSING_RESAMPLING_EXPORT QmitkPreprocessingResampling : public QmitkAbstractView
@@ -113,7 +105,6 @@ private:
   */
   Ui::QmitkPreprocessingResamplingViewControls *m_Controls;
 
-  //mitk::DataNode*       m_SelectedImageNode;
   mitk::DataStorageSelection::Pointer m_SelectedImageNode;
   QmitkStepperAdapter*      m_TimeStepperAdapter;
 
@@ -126,6 +117,6 @@ private:
   } m_SelectedInterpolation;
 };
 
-#endif // !defined(QmitkBasicImageProcessing_H__INCLUDED)
+#endif
 
 

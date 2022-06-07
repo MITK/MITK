@@ -46,9 +46,7 @@ found in the LICENSE file.
 const std::string QmitkIGTTrackingDataEvaluationView::VIEW_ID = "org.mitk.views.igttrackingdataevaluation";
 
 QmitkIGTTrackingDataEvaluationView::QmitkIGTTrackingDataEvaluationView()
-  : QmitkFunctionality()
-  , m_Controls(nullptr)
-  , m_MultiWidget(nullptr)
+  : m_Controls(nullptr)
   , m_scalingfactor(1)
 {
   m_CSVtoXMLInputFilenameVector = std::vector<std::string>();
@@ -360,16 +358,6 @@ void QmitkIGTTrackingDataEvaluationView::OnOrientationCalculation_CalcOrientandW
     m_CurrentWriteFile.close();
   }
   MessageBox("Finished!");
-}
-
-void QmitkIGTTrackingDataEvaluationView::MultiWidgetAvailable(QmitkAbstractMultiWidget &multiWidget)
-{
-  m_MultiWidget = dynamic_cast<QmitkStdMultiWidget*>(&multiWidget);
-}
-
-void QmitkIGTTrackingDataEvaluationView::MultiWidgetNotAvailable()
-{
-  m_MultiWidget = nullptr;
 }
 
 void QmitkIGTTrackingDataEvaluationView::OnAddToCurrentList()

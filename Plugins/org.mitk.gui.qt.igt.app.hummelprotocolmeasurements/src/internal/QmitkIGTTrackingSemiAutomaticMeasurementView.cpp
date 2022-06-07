@@ -36,9 +36,7 @@ found in the LICENSE file.
 const std::string QmitkIGTTrackingSemiAutomaticMeasurementView::VIEW_ID = "org.mitk.views.igttrackingsemiautomaticmeasurement";
 
 QmitkIGTTrackingSemiAutomaticMeasurementView::QmitkIGTTrackingSemiAutomaticMeasurementView()
-  : QmitkFunctionality()
-  , m_Controls(nullptr)
-  , m_MultiWidget(nullptr)
+  : m_Controls(nullptr)
 {
   m_NextFile = 0;
   m_FilenameVector = std::vector<std::string>();
@@ -112,16 +110,6 @@ void QmitkIGTTrackingSemiAutomaticMeasurementView::CreateQtPartControl(QWidget *
 
   //initialize some view
   m_Controls->m_StopTracking->setEnabled(false);
-}
-
-void QmitkIGTTrackingSemiAutomaticMeasurementView::MultiWidgetAvailable(QmitkAbstractMultiWidget &multiWidget)
-{
-  m_MultiWidget = dynamic_cast<QmitkStdMultiWidget*>(&multiWidget);
-}
-
-void QmitkIGTTrackingSemiAutomaticMeasurementView::MultiWidgetNotAvailable()
-{
-  m_MultiWidget = nullptr;
 }
 
 void QmitkIGTTrackingSemiAutomaticMeasurementView::OnUseReferenceToggled(bool state)

@@ -1,12 +1,8 @@
 set(SRC_CPP_FILES
-  QmitkFunctionality.cpp
-  QmitkFunctionality2.cpp
-  QmitkFunctionalityCoordinator.cpp
 )
 
 set(INTERNAL_CPP_FILES
   QmitkCommonLegacyActivator.cpp
-  QmitkFunctionalityUtil.cpp
 )
 
 set(MOC_H_FILES

@@ -16,8 +16,6 @@ found in the LICENSE file.
 
 #include <ctkPluginActivator.h>
 
-#include "QmitkFunctionalityCoordinator.h"
-
 /**
  * \ingroup org_mitk_gui_qt_common_legacy_internal
  */
@@ -38,8 +36,6 @@ public:
   static ctkPluginContext* GetContext();
 
 private:
-
-  QmitkFunctionalityCoordinator m_FunctionalityCoordinator;
 
   static ctkPluginContext* m_Context;
 

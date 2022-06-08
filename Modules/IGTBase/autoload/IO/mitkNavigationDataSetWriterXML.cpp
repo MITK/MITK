@@ -127,6 +127,8 @@ void mitk::NavigationDataSetWriterXML::StreamData (std::ostream* stream, mitk::N
       else
         elem->SetAttribute("hP",0);
 
+      doc.InsertFirstChild(elem);
+
       tinyxml2::XMLPrinter printer;
       doc.Print(&printer);
 

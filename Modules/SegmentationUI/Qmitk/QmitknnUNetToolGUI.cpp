@@ -183,12 +183,13 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
           SegmentationProcessFailed();
         }
         else
-        {
+        { 
           SegmentationResultHandler(tool);
           if (doCache)
           {
-            AddToCache(hashKey, tool->GetPreviewSegmentation());
+            AddToCache(hashKey, tool->GetOutputBuffer());
           }
+          tool->ClearOutputBuffer();
         }
         tool->PredictOff(); // purposefully placed to make tool->GetMTime different than before.
       }

@@ -433,6 +433,7 @@ void QmitknnUNetToolGUI::SegmentationResultHandler(mitk::nnUNetTool *tool, bool 
   this->SetLabelSetPreview(tool->GetPreviewSegmentation());
   WriteStatusMessage("<b>STATUS: </b><i>Segmentation task finished successfully. <br> If multiple Preview objects are selected to Confirm, "
   "they will be merged. Any unselected Preview objects will be lost.</i>");
+  this->ActualizePreviewLabelVisibility();
 }
 
 void QmitknnUNetToolGUI::ShowEnsembleLayout(bool visible)

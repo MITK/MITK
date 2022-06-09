@@ -13,6 +13,7 @@ set(CPP_FILES
   mitkLabelSetIOHelper.cpp
   mitkDICOMSegmentationPropertyHelper.cpp
   mitkDICOMSegmentationConstants.cpp
+  mitkSegmentationTask.cpp
 )
 
 set(RESOURCE_FILES

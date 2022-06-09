@@ -156,7 +156,7 @@
       <bool>true</bool>
      </property>
      <property name="text">
-      <string>Image geometry is rotated, result won't be pixel-aligned. You can reinit your image to get a pixel-aligned result, though.</string>
+      <string>The selected image has a rotated geometry, result won't be pixel-aligned</string>
      </property>
      <property name="textFormat">
       <enum>Qt::PlainText</enum>

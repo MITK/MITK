@@ -36,6 +36,8 @@ The segmentation plugin offers a number of preferences which can be set via the 
   <li> <b>Show only selected nodes:</b> Enable if only the selected segmentation and the reference image should be visible
   <li> <b>Smoothed surface creation:</b> Set certain smoothing parameters for surface creation
   <li> <b>Default label set preset:</b> Start a new segmentation with this preset instead of a default label
+  <li> <b>Label creation:</b> Assign default names and colors to new labels or ask users for them
+  <li> <b>Label suggestions:</b> Specify custom suggestions for label names and colors
 </ul>
 
 \section org_mitk_views_segmentationtechnicalissues Technical issues
@@ -89,6 +91,13 @@ The following label properties are available:
 
 The 'New Label' button can be used to add a new label. This will automatically add a new label with a distinct name and color to the list of available labels.\n
 In the current implementation of the plugin, the maximum number of labels is restricted to 255. If you need more, you will have to create a new segmentation session.
+
+\subsection org_mitk_views_segmentationlabelsuggestions Label name and color suggestions
+
+When renaming labels or creating new labels with enforced manual naming in the Segmentation preferences, entering names is supported by auto-completion for common label names.
+The list of predefined label names and colors for the auto-completion feature can be either extented or replaced by a custom list of label name and color suggestions.
+This custom list must be specified as a JSON file, just containing an array of objects, each with a mandatory "name" string and an optional "color" string.
+The JSON file can be set in the Segmentation preferences as well as a few options on how to apply these suggestions.
 
 \subsection org_mitk_views_segmentationlabelpresets Saving and loading label set presets
 

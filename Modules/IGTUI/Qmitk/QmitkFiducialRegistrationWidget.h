@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define _QmitkFiducialRegistrationWidget_H_INCLUDED
 
 #include "ui_QmitkFiducialRegistrationWidget.h"
-#include "QmitkStdMultiWidget.h"
+#include "QmitkAbstractMultiWidget.h"
 #include "MitkIGTUIExports.h"
 #include "mitkNavigationData.h"
 /*!
@@ -68,7 +68,7 @@ public:
   */
   void SetWidgetAppearanceMode(WidgetAppearanceMode widgetMode);
 
-  void SetMultiWidget(QmitkStdMultiWidget* multiWidget); ///< (Deprecated method. Multiwidget is not required any more.) Set the default stdMultiWidget (needed for the PointListwidget)
+  void SetMultiWidget(QmitkAbstractMultiWidget* multiWidget); ///< (Deprecated method. Multiwidget is not required any more.) Set the default MultiWidget (needed for the PointListwidget)
   void AddSliceNavigationController(mitk::SliceNavigationController* snc); ///< add the slice navigation controller to be used to move the crosshair to the actual point position
   void SetImageFiducialsNode(mitk::DataNode::Pointer imageFiducialsNode); ///< specify data tree node for the image fiducials
   void SetTrackerFiducialsNode(mitk::DataNode::Pointer trackerFiducialsNode); ///< specify data tree node for the tracker fiducials
@@ -120,7 +120,7 @@ protected:
   bool CheckRegistrationInitialization();
 
   Ui::QmitkFiducialRegistrationWidget* m_Controls;  ///< gui widget
-  QmitkStdMultiWidget* m_MultiWidget;
+  QmitkAbstractMultiWidget* m_MultiWidget;
   mitk::DataNode::Pointer m_ImageFiducialsNode;
   mitk::DataNode::Pointer m_TrackerFiducialsNode;
   mitk::DataStorage::Pointer m_DataStorage;

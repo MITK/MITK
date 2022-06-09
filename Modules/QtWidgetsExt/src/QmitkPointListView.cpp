@@ -12,12 +12,12 @@ found in the LICENSE file.
 
 #include "QmitkPointListView.h"
 
-#include "QmitkEditPointDialog.h"
-#include "QmitkPointListModel.h"
-#include "QmitkRenderWindow.h"
-#include "QmitkStdMultiWidget.h"
+#include <QmitkEditPointDialog.h>
+#include <QmitkPointListModel.h>
+#include <QmitkRenderWindow.h>
+#include <QmitkAbstractMultiWidget.h>
 
-#include "mitkRenderingManager.h"
+#include <mitkRenderingManager.h>
 
 #include <QKeyEvent>
 #include <QMenu>
@@ -75,18 +75,19 @@ const mitk::PointSet *QmitkPointListView::GetPointSet() const
   return m_PointListModel->GetPointSet();
 }
 
-void QmitkPointListView::SetMultiWidget(QmitkStdMultiWidget *multiWidget)
+void QmitkPointListView::SetMultiWidget(QmitkAbstractMultiWidget* multiWidget)
 {
   m_MultiWidget = multiWidget;
   if (nullptr != m_MultiWidget)
   {
-    AddSliceNavigationController(m_MultiWidget->GetRenderWindow1()->GetSliceNavigationController());
-    AddSliceNavigationController(m_MultiWidget->GetRenderWindow2()->GetSliceNavigationController());
-    AddSliceNavigationController(m_MultiWidget->GetRenderWindow3()->GetSliceNavigationController());
+    for (const auto& renderWindow : m_MultiWidget->GetRenderWindows().values())
+    {
+      AddSliceNavigationController(renderWindow->GetSliceNavigationController());
+    }
   }
 }
 
-QmitkStdMultiWidget *QmitkPointListView::GetMultiWidget() const
+QmitkAbstractMultiWidget* QmitkPointListView::GetMultiWidget() const
 {
   return m_MultiWidget;
 }

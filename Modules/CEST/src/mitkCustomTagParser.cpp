@@ -29,8 +29,6 @@ found in the LICENSE file.
 #include <Poco/Glob.h>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
 #include <boost/tokenizer.hpp>
 
 #include <algorithm>
@@ -38,6 +36,10 @@ found in the LICENSE file.
 #include <map>
 #include <string>
 #include <vector>
+
+#include <nlohmann/json.hpp>
+
+using namespace nlohmann;
 
 namespace
 {
@@ -64,56 +66,55 @@ const std::string mitk::CustomTagParser::m_CESTPropertyPrefix = "CEST.";
 const std::string mitk::CustomTagParser::m_RevisionPropertyName = m_CESTPropertyPrefix + "Revision";
 const std::string mitk::CustomTagParser::m_JSONRevisionPropertyName = m_CESTPropertyPrefix + "revision_json";
 
-const std::string mitk::CustomTagParser::m_RevisionIndependentMapping =
-"\n"
-"  \"sProtConsistencyInfo.tSystemType\" : \"SysType\",\n"
-"  \"sProtConsistencyInfo.flNominalB0\" : \"NominalB0\",\n"
-"  \"sTXSPEC.asNucleusInfo[0].lFrequency\" : \"FREQ\",\n"
-"  \"sTXSPEC.asNucleusInfo[0].flReferenceAmplitude\" : \"RefAmp\",\n"
-"  \"alTR[0]\" : \"TR\",\n"
-"  \"alTE[0]\" : \"TE\",\n"
-"  \"lAverages\" : \"averages\",\n"
-"  \"lRepetitions\" : \"repetitions\",\n"
-"  \"adFlipAngleDegree[0]\" : \"ImageFlipAngle\",\n"
-"  \"lTotalScanTimeSec\" : \"TotalScanTime\",";
-const std::string mitk::CustomTagParser::m_DefaultJsonString =
-"{\n"
-"  \"default mapping, corresponds to revision 1416\" : \"revision_json\",\n"
-"  \"sWiPMemBlock.alFree[1]\" : \"AdvancedMode\",\n"
-"  \"sWiPMemBlock.alFree[2]\" : \"RecoveryMode\",\n"
-"  \"sWiPMemBlock.alFree[3]\" : \"DoubleIrrMode\",\n"
-"  \"sWiPMemBlock.alFree[4]\" : \"BinomMode\",\n"
-"  \"sWiPMemBlock.alFree[5]\" : \"MtMode\",\n"
-"  \"sWiPMemBlock.alFree[6]\" : \"PreparationType\",\n"
-"  \"sWiPMemBlock.alFree[7]\" : \"PulseType\",\n"
-"  \"sWiPMemBlock.alFree[8]\" : \"SamplingType\",\n"
-"  \"sWiPMemBlock.alFree[9]\" : \"SpoilingType\",\n"
-"  \"sWiPMemBlock.alFree[10]\" : \"measurements\",\n"
-"  \"sWiPMemBlock.alFree[11]\" : \"NumberOfPulses\",\n"
-"  \"sWiPMemBlock.alFree[12]\" : \"NumberOfLockingPulses\",\n"
-"  \"sWiPMemBlock.alFree[13]\" : \"PulseDuration\",\n"
-"  \"sWiPMemBlock.alFree[14]\" : \"DutyCycle\",\n"
-"  \"sWiPMemBlock.alFree[15]\" : \"RecoveryTime\",\n"
-"  \"sWiPMemBlock.alFree[16]\" : \"RecoveryTimeM0\",\n"
-"  \"sWiPMemBlock.alFree[17]\" : \"ReadoutDelay\",\n"
-"  \"sWiPMemBlock.alFree[18]\" : \"BinomDuration\",\n"
-"  \"sWiPMemBlock.alFree[19]\" : \"BinomDistance\",\n"
-"  \"sWiPMemBlock.alFree[20]\" : \"BinomNumberofPulses\",\n"
-"  \"sWiPMemBlock.alFree[21]\" : \"BinomPreRepetions\",\n"
-"  \"sWiPMemBlock.alFree[22]\" : \"BinomType\",\n"
-"  \"sWiPMemBlock.adFree[1]\" : \"Offset\",\n"
-"  \"sWiPMemBlock.adFree[2]\" : \"B1Amplitude\",\n"
-"  \"sWiPMemBlock.adFree[3]\" : \"AdiabaticPulseMu\",\n"
-"  \"sWiPMemBlock.adFree[4]\" : \"AdiabaticPulseBW\",\n"
-"  \"sWiPMemBlock.adFree[5]\" : \"AdiabaticPulseLength\",\n"
-"  \"sWiPMemBlock.adFree[6]\" : \"AdiabaticPulseAmp\",\n"
-"  \"sWiPMemBlock.adFree[7]\" : \"FermiSlope\",\n"
-"  \"sWiPMemBlock.adFree[8]\" : \"FermiFWHM\",\n"
-"  \"sWiPMemBlock.adFree[9]\" : \"DoubleIrrDuration\",\n"
-"  \"sWiPMemBlock.adFree[10]\" : \"DoubleIrrAmplitude\",\n"
-"  \"sWiPMemBlock.adFree[11]\" : \"DoubleIrrRepetitions\",\n"
-"  \"sWiPMemBlock.adFree[12]\" : \"DoubleIrrPreRepetitions\"\n"
-"}";
+const std::string mitk::CustomTagParser::m_RevisionIndependentMapping = R"(
+  "sProtConsistencyInfo.tSystemType" : "SysType",
+  "sProtConsistencyInfo.flNominalB0" : "NominalB0",
+  "sTXSPEC.asNucleusInfo[0].lFrequency" : "FREQ",
+  "sTXSPEC.asNucleusInfo[0].flReferenceAmplitude" : "RefAmp",
+  "alTR[0]" : "TR",
+  "alTE[0]" : "TE",
+  "lAverages" : "averages",
+  "lRepetitions" : "repetitions",
+  "adFlipAngleDegree[0]" : "ImageFlipAngle",
+  "lTotalScanTimeSec" : "TotalScanTime",
+)";
+const std::string mitk::CustomTagParser::m_DefaultJsonString = R"({
+  "default mapping, corresponds to revision 1416" : "revision_json",
+  "sWiPMemBlock.alFree[1]" : "AdvancedMode",
+  "sWiPMemBlock.alFree[2]" : "RecoveryMode",
+  "sWiPMemBlock.alFree[3]" : "DoubleIrrMode",
+  "sWiPMemBlock.alFree[4]" : "BinomMode",
+  "sWiPMemBlock.alFree[5]" : "MtMode",
+  "sWiPMemBlock.alFree[6]" : "PreparationType",
+  "sWiPMemBlock.alFree[7]" : "PulseType",
+  "sWiPMemBlock.alFree[8]" : "SamplingType",
+  "sWiPMemBlock.alFree[9]" : "SpoilingType",
+  "sWiPMemBlock.alFree[10]" : "measurements",
+  "sWiPMemBlock.alFree[11]" : "NumberOfPulses",
+  "sWiPMemBlock.alFree[12]" : "NumberOfLockingPulses",
+  "sWiPMemBlock.alFree[13]" : "PulseDuration",
+  "sWiPMemBlock.alFree[14]" : "DutyCycle",
+  "sWiPMemBlock.alFree[15]" : "RecoveryTime",
+  "sWiPMemBlock.alFree[16]" : "RecoveryTimeM0",
+  "sWiPMemBlock.alFree[17]" : "ReadoutDelay",
+  "sWiPMemBlock.alFree[18]" : "BinomDuration",
+  "sWiPMemBlock.alFree[19]" : "BinomDistance",
+  "sWiPMemBlock.alFree[20]" : "BinomNumberofPulses",
+  "sWiPMemBlock.alFree[21]" : "BinomPreRepetions",
+  "sWiPMemBlock.alFree[22]" : "BinomType",
+  "sWiPMemBlock.adFree[1]" : "Offset",
+  "sWiPMemBlock.adFree[2]" : "B1Amplitude",
+  "sWiPMemBlock.adFree[3]" : "AdiabaticPulseMu",
+  "sWiPMemBlock.adFree[4]" : "AdiabaticPulseBW",
+  "sWiPMemBlock.adFree[5]" : "AdiabaticPulseLength",
+  "sWiPMemBlock.adFree[6]" : "AdiabaticPulseAmp",
+  "sWiPMemBlock.adFree[7]" : "FermiSlope",
+  "sWiPMemBlock.adFree[8]" : "FermiFWHM",
+  "sWiPMemBlock.adFree[9]" : "DoubleIrrDuration",
+  "sWiPMemBlock.adFree[10]" : "DoubleIrrAmplitude",
+  "sWiPMemBlock.adFree[11]" : "DoubleIrrRepetitions",
+  "sWiPMemBlock.adFree[12]" : "DoubleIrrPreRepetitions"
+})";
 
 mitk::CustomTagParser::CustomTagParser(std::string relevantFile) : m_ClosestInternalRevision(""), m_ClosestExternalRevision("")
 {
@@ -348,29 +349,28 @@ mitk::PropertyList::Pointer mitk::CustomTagParser::ParseDicomPropertyString(std:
 
   std::string jsonString = GetRevisionAppropriateJSONString(revisionString);
 
-  boost::property_tree::ptree root;
-  std::istringstream jsonStream(jsonString);
+  json root;
   try
   {
-    boost::property_tree::read_json(jsonStream, root);
+    root = json::parse(jsonString);
   }
-  catch (const boost::property_tree::json_parser_error &e)
+  catch (const json::exception &e)
   {
     mitkThrow() << "Could not parse json file. Error was:\n" << e.what();
   }
 
-  for (const auto &it : root)
+  for (const auto &it : root.items())
   {
-    if (it.second.empty())
+    if (it.value().is_string())
     {
-      std::string propertyName = m_CESTPropertyPrefix + it.second.data();
+      auto propertyName = m_CESTPropertyPrefix + it.value().get<std::string>();
       if (m_JSONRevisionPropertyName == propertyName)
       {
-        results->SetProperty(propertyName, mitk::StringProperty::New(it.first));
+        results->SetProperty(propertyName, mitk::StringProperty::New(it.key()));
       }
       else
       {
-        results->SetProperty(propertyName, mitk::StringProperty::New(privateParameters[it.first]));
+        results->SetProperty(propertyName, mitk::StringProperty::New(privateParameters[it.key()]));
       }
     }
     else

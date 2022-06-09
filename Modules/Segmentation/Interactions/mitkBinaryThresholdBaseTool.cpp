@@ -93,7 +93,7 @@ void mitk::BinaryThresholdBaseTool::InitiateToolByInput()
   }
 }
 
-void mitk::BinaryThresholdBaseTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image* /*oldSegAtTimeStep*/, Image* previewImage, TimeStepType timeStep)
+void mitk::BinaryThresholdBaseTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image* /*oldSegAtTimeStep*/, LabelSetImage* previewImage, TimeStepType timeStep)
 {
   if (nullptr != inputAtTimeStep && nullptr != previewImage)
   {

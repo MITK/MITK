@@ -147,6 +147,7 @@ private:
   bool m_MouseCursorSet;
 
   QString m_LabelSetPresetPreference;
+  bool m_DefaultLabelNaming;
 };
 
 #endif // QMITKSEGMENTATIONVIEW_H

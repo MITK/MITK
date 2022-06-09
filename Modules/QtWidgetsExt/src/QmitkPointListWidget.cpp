@@ -9,9 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
+
 #include "QmitkPointListWidget.h"
-#include "QmitkPointListView.h"
-#include "QmitkPointListModel.h"
 
 #include <QDir>
 #include <QFileDialog>
@@ -19,13 +18,11 @@ found in the LICENSE file.
 #include <QMessageBox>
 #include <mitkIOUtil.h>
 
-
+#include <QmitkAbstractMultiWidget.h>
 #include <QmitkEditPointDialog.h>
 #include <QmitkStyleManager.h>
 
 #include <mitkPointSetDataInteractor.h>
-
-#include <mitkDataInteractor.h>
 
 QmitkPointListWidget::QmitkPointListWidget(QWidget *parent, int orientation)
   : QWidget(parent),
@@ -287,7 +284,7 @@ mitk::DataNode *QmitkPointListWidget::GetPointSetNode()
   return m_PointSetNode;
 }
 
-void QmitkPointListWidget::SetMultiWidget(QmitkStdMultiWidget *multiWidget)
+void QmitkPointListWidget::SetMultiWidget(QmitkAbstractMultiWidget* multiWidget)
 {
   m_PointListView->SetMultiWidget(multiWidget);
 }

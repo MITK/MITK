@@ -20,7 +20,7 @@ found in the LICENSE file.
 #include <qslider.h>
 #include <QApplication>
 
-QmitkBinaryThresholdToolGUIBase::QmitkBinaryThresholdToolGUIBase(bool ulMode) : QmitkAutoSegmentationToolGUIBase(false), m_ULMode(ulMode)
+QmitkBinaryThresholdToolGUIBase::QmitkBinaryThresholdToolGUIBase(bool ulMode) : QmitkSegWithPreviewToolGUIBase(false), m_ULMode(ulMode)
 {
 }
 
@@ -105,7 +105,7 @@ void QmitkBinaryThresholdToolGUIBase::OnThresholdSliderChanged(double value)
   }
 }
 
-void QmitkBinaryThresholdToolGUIBase::DisconnectOldTool(mitk::AutoSegmentationWithPreviewTool* oldTool)
+void QmitkBinaryThresholdToolGUIBase::DisconnectOldTool(mitk::SegWithPreviewTool* oldTool)
 {
   Superclass::DisconnectOldTool(oldTool);
 
@@ -122,7 +122,7 @@ void QmitkBinaryThresholdToolGUIBase::DisconnectOldTool(mitk::AutoSegmentationWi
   }
 }
 
-void QmitkBinaryThresholdToolGUIBase::ConnectNewTool(mitk::AutoSegmentationWithPreviewTool* newTool)
+void QmitkBinaryThresholdToolGUIBase::ConnectNewTool(mitk::SegWithPreviewTool* newTool)
 {
   Superclass::ConnectNewTool(newTool);
 

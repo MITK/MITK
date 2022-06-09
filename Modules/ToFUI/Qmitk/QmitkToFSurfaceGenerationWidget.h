@@ -31,8 +31,6 @@ found in the LICENSE file.
 #include <mitkCameraIntrinsics.h>
 #include <mitkSurface.h>
 
-class QmitkStdMultiWidget;
-
 /** Documentation:
   *
   * This widget provides GUI access for all basic surface generation properties and can

@@ -58,6 +58,7 @@ protected:
 
   mitk::LabelSetImage::ConstPointer m_LabelSetImage;
   QListWidget* m_LabelList;
+  bool m_Emmiting;
 };
 
 #endif

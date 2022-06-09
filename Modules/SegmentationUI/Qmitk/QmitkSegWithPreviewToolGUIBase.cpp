@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkAutoSegmentationToolGUIBase.h"
+#include "QmitkSegWithPreviewToolGUIBase.h"
 
 #include <qcheckbox.h>
 #include <qpushbutton.h>
@@ -23,27 +23,27 @@ bool DefaultEnableConfirmSegBtnFunction(bool enabled)
   return enabled;
 }
 
-QmitkAutoSegmentationToolGUIBase::QmitkAutoSegmentationToolGUIBase(bool mode2D) : QmitkToolGUI(), m_EnableConfirmSegBtnFnc(DefaultEnableConfirmSegBtnFunction), m_Mode2D(mode2D)
+QmitkSegWithPreviewToolGUIBase::QmitkSegWithPreviewToolGUIBase(bool mode2D) : QmitkToolGUI(), m_EnableConfirmSegBtnFnc(DefaultEnableConfirmSegBtnFunction), m_Mode2D(mode2D)
 {
   connect(this, SIGNAL(NewToolAssociated(mitk::Tool *)), this, SLOT(OnNewToolAssociated(mitk::Tool *)));
 }
 
-QmitkAutoSegmentationToolGUIBase::~QmitkAutoSegmentationToolGUIBase()
+QmitkSegWithPreviewToolGUIBase::~QmitkSegWithPreviewToolGUIBase()
 {
   if (m_Tool.IsNotNull())
   {
-    m_Tool->CurrentlyBusy -= mitk::MessageDelegate1<QmitkAutoSegmentationToolGUIBase, bool>(this, &QmitkAutoSegmentationToolGUIBase::BusyStateChanged);
+    m_Tool->CurrentlyBusy -= mitk::MessageDelegate1<QmitkSegWithPreviewToolGUIBase, bool>(this, &QmitkSegWithPreviewToolGUIBase::BusyStateChanged);
   }
 }
 
-void QmitkAutoSegmentationToolGUIBase::OnNewToolAssociated(mitk::Tool *tool)
+void QmitkSegWithPreviewToolGUIBase::OnNewToolAssociated(mitk::Tool *tool)
 {
   if (m_Tool.IsNotNull())
   {
     this->DisconnectOldTool(m_Tool);
   }
 
-  m_Tool = dynamic_cast<mitk::AutoSegmentationWithPreviewTool*>(tool);
+  m_Tool = dynamic_cast<mitk::SegWithPreviewTool*>(tool);
 
   if (nullptr == m_MainLayout)
   {
@@ -69,22 +69,12 @@ void QmitkAutoSegmentationToolGUIBase::OnNewToolAssociated(mitk::Tool *tool)
     //would behave. As soon as it is sorted out we can remove that "feature switch"
     //or the comment.
 
-    m_CheckCreateNew = new QCheckBox("Create as new segmentation", this);
-    m_CheckCreateNew->setChecked(false);
-    m_CheckCreateNew->setToolTip("Add the confirmed segmentation as a new segmentation instead of overwriting the currently selected.");
-    m_CheckCreateNew->setVisible(!m_Mode2D);
-    //remark: keept m_CheckCreateNew deactivated in 2D because in this refactoring
-    //it should be kept to the status quo and it was not clear how interpolation
-    //would behave. As soon as it is sorted out we can remove that "feature switch"
-    //or the comment.
-
     this->InitializeUI(m_MainLayout);
 
     m_MainLayout->addWidget(m_ConfirmSegBtn);
     m_MainLayout->addWidget(m_CheckIgnoreLocks);
     m_MainLayout->addWidget(m_CheckMerge);
     m_MainLayout->addWidget(m_CheckProcessAll);
-    m_MainLayout->addWidget(m_CheckCreateNew);
   }
 
   if (m_Tool.IsNotNull())
@@ -93,7 +83,7 @@ void QmitkAutoSegmentationToolGUIBase::OnNewToolAssociated(mitk::Tool *tool)
   }
 }
 
-void QmitkAutoSegmentationToolGUIBase::OnAcceptPreview()
+void QmitkSegWithPreviewToolGUIBase::OnAcceptPreview()
 {
   if (m_Tool.IsNotNull())
   {
@@ -115,15 +105,6 @@ void QmitkAutoSegmentationToolGUIBase::OnAcceptPreview()
       m_Tool->SetMergeStyle(mitk::MultiLabelSegmentation::MergeStyle::Replace);
     }
 
-    if (m_CheckCreateNew->isChecked())
-    {
-      m_Tool->SetOverwriteExistingSegmentation(false);
-    }
-    else
-    {
-      m_Tool->SetOverwriteExistingSegmentation(true);
-    }
-
     m_Tool->SetCreateAllTimeSteps(m_CheckProcessAll->isChecked());
 
     m_ConfirmSegBtn->setEnabled(false);
@@ -131,28 +112,27 @@ void QmitkAutoSegmentationToolGUIBase::OnAcceptPreview()
   }
 }
 
-void QmitkAutoSegmentationToolGUIBase::DisconnectOldTool(mitk::AutoSegmentationWithPreviewTool* oldTool)
+void QmitkSegWithPreviewToolGUIBase::DisconnectOldTool(mitk::SegWithPreviewTool* oldTool)
 {
-  oldTool->CurrentlyBusy -= mitk::MessageDelegate1<QmitkAutoSegmentationToolGUIBase, bool>(this, &QmitkAutoSegmentationToolGUIBase::BusyStateChanged);
+  oldTool->CurrentlyBusy -= mitk::MessageDelegate1<QmitkSegWithPreviewToolGUIBase, bool>(this, &QmitkSegWithPreviewToolGUIBase::BusyStateChanged);
 }
 
-void QmitkAutoSegmentationToolGUIBase::ConnectNewTool(mitk::AutoSegmentationWithPreviewTool* newTool)
+void QmitkSegWithPreviewToolGUIBase::ConnectNewTool(mitk::SegWithPreviewTool* newTool)
 {
   newTool->CurrentlyBusy +=
-    mitk::MessageDelegate1<QmitkAutoSegmentationToolGUIBase, bool>(this, &QmitkAutoSegmentationToolGUIBase::BusyStateChanged);
+    mitk::MessageDelegate1<QmitkSegWithPreviewToolGUIBase, bool>(this, &QmitkSegWithPreviewToolGUIBase::BusyStateChanged);
 
-  newTool->SetOverwriteExistingSegmentation(true);
   m_CheckProcessAll->setVisible(newTool->GetTargetSegmentationNode()->GetData()->GetTimeSteps() > 1);
 
   this->EnableWidgets(true);
 }
 
-void QmitkAutoSegmentationToolGUIBase::InitializeUI(QBoxLayout* /*mainLayout*/)
+void QmitkSegWithPreviewToolGUIBase::InitializeUI(QBoxLayout* /*mainLayout*/)
 {
   //default implementation does nothing
 }
 
-void QmitkAutoSegmentationToolGUIBase::BusyStateChanged(bool isBusy)
+void QmitkSegWithPreviewToolGUIBase::BusyStateChanged(bool isBusy)
 {
   if (isBusy)
   {
@@ -165,7 +145,7 @@ void QmitkAutoSegmentationToolGUIBase::BusyStateChanged(bool isBusy)
   this->EnableWidgets(!isBusy);
  }
 
-void QmitkAutoSegmentationToolGUIBase::EnableWidgets(bool enabled)
+void QmitkSegWithPreviewToolGUIBase::EnableWidgets(bool enabled)
 {
   if (nullptr != m_MainLayout)
   {
@@ -185,14 +165,10 @@ void QmitkAutoSegmentationToolGUIBase::EnableWidgets(bool enabled)
     {
       m_CheckProcessAll->setEnabled(enabled);
     }
-    if (nullptr != m_CheckCreateNew)
-    {
-      m_CheckCreateNew->setEnabled(enabled);
-    }
   }
 }
 
-void QmitkAutoSegmentationToolGUIBase::SetMergeStyle(mitk::MultiLabelSegmentation::MergeStyle mergeStyle)
+void QmitkSegWithPreviewToolGUIBase::SetMergeStyle(mitk::MultiLabelSegmentation::MergeStyle mergeStyle)
 {
   if (nullptr != m_CheckMerge)
   {
@@ -200,7 +176,7 @@ void QmitkAutoSegmentationToolGUIBase::SetMergeStyle(mitk::MultiLabelSegmentatio
   }
 };
 
-void QmitkAutoSegmentationToolGUIBase::SetOverwriteStyle(mitk::MultiLabelSegmentation::OverwriteStyle overwriteStyle)
+void QmitkSegWithPreviewToolGUIBase::SetOverwriteStyle(mitk::MultiLabelSegmentation::OverwriteStyle overwriteStyle)
 {
   if (nullptr != m_CheckIgnoreLocks)
   {

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkOtsuTool3DGUI_h_Included
 #define QmitkOtsuTool3DGUI_h_Included
 
-#include "QmitkAutoMLSegmentationToolGUIBase.h"
+#include "QmitkMultiLabelSegWithPreviewToolGUIBase.h"
 
 #include "ui_QmitkOtsuToolWidgetControls.h"
 
@@ -28,12 +28,12 @@ found in the LICENSE file.
 
   Last contributor: $Author$
 */
-class MITKSEGMENTATIONUI_EXPORT QmitkOtsuTool3DGUI : public QmitkAutoMLSegmentationToolGUIBase
+class MITKSEGMENTATIONUI_EXPORT QmitkOtsuTool3DGUI : public QmitkMultiLabelSegWithPreviewToolGUIBase
 {
   Q_OBJECT
 
 public:
-  mitkClassMacro(QmitkOtsuTool3DGUI, QmitkAutoMLSegmentationToolGUIBase);
+  mitkClassMacro(QmitkOtsuTool3DGUI, QmitkMultiLabelSegWithPreviewToolGUIBase);
   itkFactorylessNewMacro(Self);
   itkCloneMacro(Self);
 
@@ -51,7 +51,7 @@ protected:
   QmitkOtsuTool3DGUI();
   ~QmitkOtsuTool3DGUI() = default;
 
-  void ConnectNewTool(mitk::AutoSegmentationWithPreviewTool* newTool) override;
+  void ConnectNewTool(mitk::SegWithPreviewTool* newTool) override;
   void InitializeUI(QBoxLayout* mainLayout) override;
 
   void EnableWidgets(bool enabled) override;
@@ -59,6 +59,7 @@ protected:
   Ui_QmitkOtsuToolWidgetControls m_Controls;
 
   bool m_FirstPreviewComputation = true;
+  EnableConfirmSegBtnFunctionType m_SuperclassEnableConfirmSegBtnFnc;
 };
 
 #endif

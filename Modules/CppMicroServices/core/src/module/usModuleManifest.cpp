@@ -21,9 +21,11 @@
 
 #include "usModuleManifest_p.h"
 
-#include "jsoncpp.h"
+#include <nlohmann/json.hpp>
 
 #include <stdexcept>
+
+using namespace nlohmann;
 
 US_BEGIN_NAMESPACE
 
@@ -32,63 +34,59 @@ namespace {
   typedef std::map<std::string, Any> AnyMap;
   typedef std::vector<Any> AnyVector;
 
-  void ParseJsonObject(const Json::Value& jsonObject, AnyMap& anyMap);
-  void ParseJsonArray(const Json::Value& jsonArray, AnyVector& anyVector);
+  void ParseJsonObject(const json& jsonObject, AnyMap& anyMap);
+  void ParseJsonArray(const json& jsonArray, AnyVector& anyVector);
 
-  Any ParseJsonValue(const Json::Value& jsonValue)
+  Any ParseJsonValue(const json& jsonValue)
   {
-    if (jsonValue.isObject())
+    if (jsonValue.is_object())
     {
       Any any = AnyMap();
       ParseJsonObject(jsonValue, ref_any_cast<AnyMap>(any));
       return any;
     }
-    else if (jsonValue.isArray())
+    else if (jsonValue.is_array())
     {
       Any any = AnyVector();
       ParseJsonArray(jsonValue, ref_any_cast<AnyVector>(any));
       return any;
     }
-    else if (jsonValue.isString())
+    else if (jsonValue.is_string())
     {
-      return Any(jsonValue.asString());
+      return Any(jsonValue.get<std::string>());
     }
-    else if (jsonValue.isBool())
+    else if (jsonValue.is_boolean())
     {
-      return Any(jsonValue.asBool());
+      return Any(jsonValue.get<bool>());
     }
-    else if (jsonValue.isIntegral())
+    else if (jsonValue.is_number_integer())
     {
-      return Any(jsonValue.asInt());
+      return Any(jsonValue.get<int>());
     }
-    else if (jsonValue.isDouble())
+    else if (jsonValue.is_number_float())
     {
-      return Any(jsonValue.asDouble());
+      return Any(jsonValue.get<double>());
     }
 
     return Any();
   }
 
-  void ParseJsonObject(const Json::Value& jsonObject, AnyMap& anyMap)
+  void ParseJsonObject(const json& jsonObject, AnyMap& anyMap)
   {
-    for (Json::Value::const_iterator it = jsonObject.begin();
-         it != jsonObject.end(); ++it)
+    for (const auto& [key, jsonValue] : jsonObject.items())
     {
-      const Json::Value& jsonValue = *it;
       Any anyValue = ParseJsonValue(jsonValue);
       if (!anyValue.Empty())
       {
-        anyMap.insert(std::make_pair(it.name(), anyValue));
+        anyMap.insert(std::make_pair(key, anyValue));
       }
     }
   }
 
-  void ParseJsonArray(const Json::Value& jsonArray, AnyVector& anyVector)
+  void ParseJsonArray(const json& jsonArray, AnyVector& anyVector)
   {
-    for (Json::Value::const_iterator it = jsonArray.begin();
-         it != jsonArray.end(); ++it)
+    for (const auto& jsonValue : jsonArray)
     {
-      const Json::Value& jsonValue = *it;
       Any anyValue = ParseJsonValue(jsonValue);
       if (!anyValue.Empty())
       {
@@ -105,14 +103,18 @@ ModuleManifest::ModuleManifest()
 
 void ModuleManifest::Parse(std::istream& is)
 {
-  Json::Value root;
-  Json::Reader jsonReader(Json::Features::strictMode());
-  if (!jsonReader.parse(is, root, false))
+  json root;
+
+  try
   {
-    throw std::runtime_error(jsonReader.getFormattedErrorMessages());
+    root = json::parse(is);
+  }
+  catch (const json::exception& e)
+  {
+    throw std::runtime_error(e.what());
   }
 
-  if (!root.isObject())
+  if (!root.is_object())
   {
     throw std::runtime_error("The Json root element must be an object.");
   }

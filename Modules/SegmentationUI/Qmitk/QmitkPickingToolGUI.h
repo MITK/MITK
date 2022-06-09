@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QmitkPickingToolGUI_h_Included
 #define QmitkPickingToolGUI_h_Included
 
-#include "QmitkAutoSegmentationToolGUIBase.h"
+#include "QmitkSegWithPreviewToolGUIBase.h"
 #include <MitkSegmentationUIExports.h>
 
 /**
@@ -21,12 +21,12 @@ found in the LICENSE file.
 \brief GUI for mitk::PickingTool.
 \sa mitk::PickingTool
 */
-class MITKSEGMENTATIONUI_EXPORT QmitkPickingToolGUI : public QmitkAutoSegmentationToolGUIBase
+class MITKSEGMENTATIONUI_EXPORT QmitkPickingToolGUI : public QmitkSegWithPreviewToolGUIBase
 {
   Q_OBJECT
 
 public:
-  mitkClassMacro(QmitkPickingToolGUI, QmitkAutoSegmentationToolGUIBase);
+  mitkClassMacro(QmitkPickingToolGUI, QmitkSegWithPreviewToolGUIBase);
   itkFactorylessNewMacro(Self);
   itkCloneMacro(Self);
 

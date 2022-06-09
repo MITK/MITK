@@ -29,8 +29,6 @@ found in the LICENSE file.
 #include <mitkToFImageGrabber.h>
 #include <mitkToFImageRecorder.h>
 
-class QmitkStdMultiWidget;
-
 struct QFileDialogArgs;
 class QFileIconProvider;
 class QFileDialogPrivate;

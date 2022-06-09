@@ -17,11 +17,24 @@ found in the LICENSE file.
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkOtsuTool3DGUI, "")
 
-QmitkOtsuTool3DGUI::QmitkOtsuTool3DGUI() : QmitkAutoMLSegmentationToolGUIBase()
+QmitkOtsuTool3DGUI::QmitkOtsuTool3DGUI() : QmitkMultiLabelSegWithPreviewToolGUIBase(), m_SuperclassEnableConfirmSegBtnFnc(m_EnableConfirmSegBtnFnc)
 {
+  auto enableMLSelectedDelegate = [this](bool enabled)
+  {
+    if (this->m_FirstPreviewComputation)
+    {
+      return false;
+    }
+    else
+    {
+      return this->m_SuperclassEnableConfirmSegBtnFnc(enabled);
+    }
+  };
+
+  m_EnableConfirmSegBtnFnc = enableMLSelectedDelegate;
 }
 
-void QmitkOtsuTool3DGUI::ConnectNewTool(mitk::AutoSegmentationWithPreviewTool* newTool)
+void QmitkOtsuTool3DGUI::ConnectNewTool(mitk::SegWithPreviewTool* newTool)
 {
   Superclass::ConnectNewTool(newTool);
 
@@ -114,8 +127,9 @@ void QmitkOtsuTool3DGUI::OnPreviewBtnClicked()
       return;
     }
 
-    this->SetLabelSetPreview(tool->GetMLPreview());
+    this->SetLabelSetPreview(tool->GetPreviewSegmentation());
     tool->IsTimePointChangeAwareOn();
+    this->ActualizePreviewLabelVisibility();
   }
 }
 

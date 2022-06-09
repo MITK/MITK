@@ -43,6 +43,8 @@ public:
 
   void UpdateGUI();
 
+  void SetDefaultLabelNaming(bool defaultLabelNaming);
+
 Q_SIGNALS:
 
   void LabelsChanged();
@@ -76,6 +78,8 @@ private:
   Ui::QmitkLabelsWidgetControls* m_Controls;
 
   mitk::ToolManager* m_ToolManager;
+
+  bool m_DefaultLabelNaming;
 
 };
 

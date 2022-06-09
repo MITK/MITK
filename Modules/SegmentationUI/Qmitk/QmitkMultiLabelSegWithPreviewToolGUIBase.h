@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkAutoMLSegmentationToolGUIBase_h_Included
-#define QmitkAutoMLSegmentationToolGUIBase_h_Included
+#ifndef QmitkMultiLabelSegWithPreviewToolGUIBase_h_Included
+#define QmitkMultiLabelSegWithPreviewToolGUIBase_h_Included
 
-#include "QmitkAutoSegmentationToolGUIBase.h"
+#include "QmitkSegWithPreviewToolGUIBase.h"
 
 #include "QmitkSimpleLabelSetListWidget.h"
 
@@ -25,28 +25,32 @@ found in the LICENSE file.
 
   This GUI offers an additional list to select the label that should be confirmed.
 */
-class MITKSEGMENTATIONUI_EXPORT QmitkAutoMLSegmentationToolGUIBase : public QmitkAutoSegmentationToolGUIBase
+class MITKSEGMENTATIONUI_EXPORT QmitkMultiLabelSegWithPreviewToolGUIBase : public QmitkSegWithPreviewToolGUIBase
 {
   Q_OBJECT
 
 public:
-  mitkClassMacro(QmitkAutoMLSegmentationToolGUIBase, QmitkAutoSegmentationToolGUIBase);
+  mitkClassMacro(QmitkMultiLabelSegWithPreviewToolGUIBase, QmitkSegWithPreviewToolGUIBase);
 
 protected slots :
 
   void OnLabelSelectionChanged(const QmitkSimpleLabelSetListWidget::LabelVectorType& selectedLabels);
+  void OnRadioTransferAllClicked(bool checked);
 
 protected:
-  QmitkAutoMLSegmentationToolGUIBase();
-  ~QmitkAutoMLSegmentationToolGUIBase() = default;
+  QmitkMultiLabelSegWithPreviewToolGUIBase();
+  ~QmitkMultiLabelSegWithPreviewToolGUIBase() = default;
 
   void InitializeUI(QBoxLayout* mainLayout) override;
 
   void EnableWidgets(bool enabled) override;
   void SetLabelSetPreview(const mitk::LabelSetImage* preview);
+  void ActualizePreviewLabelVisibility();
 
 private:
   QmitkSimpleLabelSetListWidget* m_LabelSelectionList = nullptr;
+  QWidget* m_RadioTransferAll = nullptr;
+  QWidget* m_RadioTransferSelected = nullptr;
 };
 
 #endif

@@ -33,8 +33,8 @@ found in the LICENSE file.
 
 // Qmitk
 #include <QmitkRenderWindow.h>
-#include <QmitkSegmentationOrganNamesHandling.cpp>
 #include <QmitkStaticDynamicSegmentationDialog.h>
+#include <QmitkNewSegmentationDialog.h>
 
 // us
 #include <usModuleResource.h>
@@ -59,6 +59,7 @@ QmitkSegmentationView::QmitkSegmentationView()
   , m_DrawOutline(true)
   , m_SelectionMode(false)
   , m_MouseCursorSet(false)
+  , m_DefaultLabelNaming(true)
 {
   auto isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
   auto isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
@@ -322,7 +323,25 @@ void QmitkSegmentationView::OnNewSegmentation()
 
   if (labelSetPreset.empty() || !mitk::LabelSetIOHelper::LoadLabelSetImagePreset(labelSetPreset, newLabelSetImage))
   {
-    mitk::Label::Pointer newLabel = mitk::LabelSetImageHelper::CreateNewLabel(newLabelSetImage);
+    auto newLabel = mitk::LabelSetImageHelper::CreateNewLabel(newLabelSetImage);
+
+    if (!m_DefaultLabelNaming)
+    {
+      QmitkNewSegmentationDialog dialog(m_Parent);
+      dialog.SetName(QString::fromStdString(newLabel->GetName()));
+      dialog.SetColor(newLabel->GetColor());
+
+      if (QDialog::Rejected == dialog.exec())
+        return;
+
+      auto name = dialog.GetName();
+
+      if (!name.isEmpty())
+        newLabel->SetName(name.toStdString());
+
+      newLabel->SetColor(dialog.GetColor());
+    }
+
     newLabelSetImage->GetActiveLabelSet()->AddLabel(newLabel);
   }
 
@@ -511,7 +530,6 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    connect(m_Controls->labelSetWidget, &QmitkLabelSetWidget::LabelSetWidgetReset, this, &QmitkSegmentationView::OnLabelSetWidgetReset);
 
    m_Controls->labelSetWidget->SetDataStorage(this->GetDataStorage());
-   m_Controls->labelSetWidget->SetOrganColors(mitk::OrganNamesHandling::GetDefaultOrganColorString());
    m_Controls->labelSetWidget->hide();
 
    auto command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
@@ -572,8 +590,16 @@ void QmitkSegmentationView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*
 
 void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
 {
+  auto labelSuggestions = mitk::BaseApplication::instance().config().getString(mitk::BaseApplication::ARG_SEGMENTATION_LABEL_SUGGESTIONS.toStdString(), "");
+
+  m_DefaultLabelNaming = labelSuggestions.empty()
+    ? prefs->GetBool("default label naming", true)
+    : false; // No default label naming when label suggestions are enforced via command-line argument
+
   if (nullptr != m_Controls)
   {
+    m_Controls->labelsWidget->SetDefaultLabelNaming(m_DefaultLabelNaming);
+
     bool slimView = prefs->GetBool("slim view", false);
     m_Controls->toolSelectionBox2D->SetShowNames(!slimView);
     m_Controls->toolSelectionBox3D->SetShowNames(!slimView);

@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <MitkSegmentationExports.h>
 
-#include <mitkAutoSegmentationWithPreviewTool.h>
+#include <mitkSegWithPreviewTool.h>
 
 #include <mitkCommon.h>
 #include <mitkDataNode.h>
@@ -32,13 +32,13 @@ namespace mitk
   \sa mitk::Tool
   \sa QmitkInteractiveSegmentation
   */
-  class MITKSEGMENTATION_EXPORT BinaryThresholdBaseTool : public AutoSegmentationWithPreviewTool
+  class MITKSEGMENTATION_EXPORT BinaryThresholdBaseTool : public SegWithPreviewTool
   {
   public:
     Message3<double, double, bool> IntervalBordersChanged;
     Message2<ScalarType, ScalarType> ThresholdingValuesChanged;
 
-    mitkClassMacro(BinaryThresholdBaseTool, AutoSegmentationWithPreviewTool);
+    mitkClassMacro(BinaryThresholdBaseTool, SegWithPreviewTool);
 
     virtual void SetThresholdValues(double lower, double upper);
 
@@ -54,7 +54,7 @@ namespace mitk
     itkGetMacro(SensibleMaximumThreshold, ScalarType);
 
     void InitiateToolByInput() override;
-    void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, Image* previewImage, TimeStepType timeStep) override;
+    void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep) override;
 
     template <typename TPixel, unsigned int VImageDimension>
     void ITKThresholding(const itk::Image<TPixel, VImageDimension>* inputImage,

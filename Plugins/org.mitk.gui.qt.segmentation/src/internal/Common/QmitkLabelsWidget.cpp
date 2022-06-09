@@ -23,6 +23,7 @@ found in the LICENSE file.
 // Qmitk
 #include <QmitkAbstractNodeSelectionWidget.h>
 #include <QmitkStyleManager.h>
+#include <QmitkNewSegmentationDialog.h>
 
 #include "../QmitkSaveMultiLabelPresetAction.h"
 #include "../QmitkLoadMultiLabelPresetAction.h"
@@ -34,6 +35,7 @@ QmitkLabelsWidget::QmitkLabelsWidget(QWidget *parent)
   : QWidget(parent)
   , m_Controls(new Ui::QmitkLabelsWidgetControls)
   , m_ToolManager(nullptr)
+  , m_DefaultLabelNaming(true)
 {
   m_Controls->setupUi(this);
 
@@ -82,6 +84,11 @@ void QmitkLabelsWidget::UpdateGUI()
   m_Controls->loadPresetButton->setEnabled(true);
 }
 
+void QmitkLabelsWidget::SetDefaultLabelNaming(bool defaultLabelNaming)
+{
+  m_DefaultLabelNaming = defaultLabelNaming;
+}
+
 mitk::LabelSetImage* QmitkLabelsWidget::GetWorkingImage()
 {
   mitk::DataNode* workingNode = this->GetWorkingNode();
@@ -116,10 +123,26 @@ void QmitkLabelsWidget::OnNewLabel()
     return;
   }
 
-  this->WaitCursorOn();
   mitk::Label::Pointer newLabel = mitk::LabelSetImageHelper::CreateNewLabel(workingImage);
+
+  if (!m_DefaultLabelNaming)
+  {
+    QmitkNewSegmentationDialog dialog(this, workingImage);
+    dialog.SetName(QString::fromStdString(newLabel->GetName()));
+    dialog.SetColor(newLabel->GetColor());
+
+    if (QDialog::Rejected == dialog.exec())
+      return;
+
+    auto name = dialog.GetName();
+
+    if (!name.isEmpty())
+      newLabel->SetName(name.toStdString());
+
+    newLabel->SetColor(dialog.GetColor());
+  }
+
   workingImage->GetActiveLabelSet()->AddLabel(newLabel);
-  this->WaitCursorOff();
 
   this->UpdateGUI();
   emit LabelsChanged();

@@ -317,12 +317,6 @@ namespace mitk
         nameProp = mitk::StringProperty::New(name);
         node->SetProperty("name", nameProp);
       }
-      else
-      {
-        // name defined in BaseData!
-        nameProp = mitk::StringProperty::New(baseDataNameProp->GetValue());
-        node->SetProperty("name", nameProp);
-      }
     }
 
     // visibility

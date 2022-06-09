@@ -303,7 +303,7 @@ namespace mitk
     }
 
     // name already defined?
-    mitk::StringProperty::Pointer nameProp = dynamic_cast<mitk::StringProperty *>(node->GetProperty("name"));
+    mitk::StringProperty::Pointer nameProp = dynamic_cast<mitk::StringProperty *>(node->GetProperty("name", nullptr, false));
     if (nameProp.IsNull() || nameProp->GetValue() == DataNode::NO_NAME_VALUE())
     {
       // name already defined in BaseData

@@ -183,7 +183,7 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
           SegmentationProcessFailed();
         }
         else
-        { 
+        {
           SegmentationResultHandler(tool);
           if (doCache)
           {

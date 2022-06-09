@@ -44,7 +44,7 @@ void mitk::nnUNetTool::Activated()
 void mitk::nnUNetTool::RenderOutputBuffer()
 {
   if (m_OutputBuffer != nullptr)
-  { 
+  {
     try
     {
       if (nullptr != this->GetPreviewSegmentationNode())

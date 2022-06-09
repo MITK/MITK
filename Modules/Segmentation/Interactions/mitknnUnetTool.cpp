@@ -49,11 +49,8 @@ void mitk::nnUNetTool::RenderOutputBuffer()
     {
       if (nullptr != this->GetPreviewSegmentationNode())
       {
-        this->GetPreviewSegmentationNode()->SetVisibility(!this->GetSelectedLabels().empty());
-      }
-      if (this->GetSelectedLabels().empty())
-      {
-        this->ResetPreviewNode();
+        auto previewImage = this->GetPreviewSegmentation();
+        previewImage->InitializeByLabeledImage(m_OutputBuffer);
       }
     }
     catch (const mitk::Exception &e)
@@ -131,11 +128,6 @@ namespace
 
 void mitk::nnUNetTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image* /*oldSegAtTimeStep*/, LabelSetImage* previewImage, TimeStepType /*timeStep*/)
 {
-  if (m_InputBuffer == inputAtTimeStep)
-  {
-    return;
-  }
-
   std::string inDir, outDir, inputImagePath, outputImagePath, scriptPath;
 
   ProcessExecutor::Pointer spExec = ProcessExecutor::New();
@@ -311,8 +303,11 @@ void mitk::nnUNetTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image
   {
     Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
     previewImage->InitializeByLabeledImage(outputImage);
+    previewImage->SetGeometry(inputAtTimeStep->GetGeometry());
     m_InputBuffer = inputAtTimeStep;
-    m_OutputBuffer = previewImage;
+    m_OutputBuffer = mitk::LabelSetImage::New();
+    m_OutputBuffer->InitializeByLabeledImage(outputImage);
+    m_OutputBuffer->SetGeometry(inputAtTimeStep->GetGeometry());
   }
   catch (const mitk::Exception &e)
   {

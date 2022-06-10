@@ -37,7 +37,7 @@ Create a 2D view for slicing axially:
 \skipline view2
 \until view2.SetData
 
-Then create a 2D view for slicing sagitally.
+Then create a 2D view for slicing sagittally.
 
 \skipline view3
 \until view3.SetData

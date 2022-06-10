@@ -219,7 +219,7 @@ void mitk::MorphologicalOperations::itkClosing(
   typedef typename itk::BinaryMorphologicalClosingImageFilter<ImageType, ImageType, BallType> BallClosingFilterType;
   typedef typename itk::BinaryMorphologicalClosingImageFilter<ImageType, ImageType, CrossType> CrossClosingFilterType;
 
-  if (structuralElementFlags & (Ball_Axial | Ball_Coronal | Ball_Sagital))
+  if (structuralElementFlags & (Ball_Axial | Ball_Coronal | Ball_Sagittal))
   {
     BallType ball = CreateStructuringElement<BallType>(structuralElementFlags, factor);
 
@@ -258,7 +258,7 @@ void mitk::MorphologicalOperations::itkErode(
   typedef typename itk::BinaryErodeImageFilter<ImageType, ImageType, BallType> BallErodeFilterType;
   typedef typename itk::BinaryErodeImageFilter<ImageType, ImageType, CrossType> CrossErodeFilterType;
 
-  if (structuralElementFlags & (Ball_Axial | Ball_Coronal | Ball_Sagital))
+  if (structuralElementFlags & (Ball_Axial | Ball_Coronal | Ball_Sagittal))
   {
     BallType ball = CreateStructuringElement<BallType>(structuralElementFlags, factor);
 
@@ -297,7 +297,7 @@ void mitk::MorphologicalOperations::itkDilate(
   typedef typename itk::BinaryDilateImageFilter<ImageType, ImageType, BallType> BallDilateFilterType;
   typedef typename itk::BinaryDilateImageFilter<ImageType, ImageType, CrossType> CrossDilateFilterType;
 
-  if (structuralElementFlags & (Ball_Axial | Ball_Coronal | Ball_Sagital))
+  if (structuralElementFlags & (Ball_Axial | Ball_Coronal | Ball_Sagittal))
   {
     BallType ball = CreateStructuringElement<BallType>(structuralElementFlags, factor);
 
@@ -336,7 +336,7 @@ void mitk::MorphologicalOperations::itkOpening(
   typedef typename itk::BinaryMorphologicalOpeningImageFilter<ImageType, ImageType, BallType> BallOpeningFiltertype;
   typedef typename itk::BinaryMorphologicalOpeningImageFilter<ImageType, ImageType, CrossType> CrossOpeningFiltertype;
 
-  if (structuralElementFlags & (Ball_Axial | Ball_Coronal | Ball_Sagital))
+  if (structuralElementFlags & (Ball_Axial | Ball_Coronal | Ball_Sagittal))
   {
     BallType ball = CreateStructuringElement<BallType>(structuralElementFlags, factor);
 
@@ -397,8 +397,8 @@ TStructuringElement  mitk::MorphologicalOperations::CreateStructuringElement(Str
     size.SetElement(0, factor);
     size.SetElement(2, factor);
     break;
-  case Ball_Sagital:
-  case Cross_Sagital:
+  case Ball_Sagittal:
+  case Cross_Sagittal:
     size.SetElement(1, factor);
     size.SetElement(2, factor);
     break;

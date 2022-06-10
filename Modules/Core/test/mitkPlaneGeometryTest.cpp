@@ -694,31 +694,31 @@ public:
     newbottom.Normalize();
     newbottom *= thicknessInMM;
 
-    CPPUNIT_ASSERT_MESSAGE("Testing GetCornerPoint(0) of sagitally initialized version:",
+    CPPUNIT_ASSERT_MESSAGE("Testing GetCornerPoint(0) of sagittally initialized version:",
                            mitk::Equal(planegeometry->GetCornerPoint(0), cornerpoint0, testEps));
 
     // ok, corner was fine, so we can dare to believe the origin is ok.
     origin = planegeometry->GetOrigin();
 
-    CPPUNIT_ASSERT_MESSAGE("Testing width, height and thickness (in units) of sagitally initialized version: ",
+    CPPUNIT_ASSERT_MESSAGE("Testing width, height and thickness (in units) of sagittally initialized version: ",
                            mitk::Equal(planegeometry->GetExtent(0), height, testEps));
-    CPPUNIT_ASSERT_MESSAGE("Testing width, height and thickness (in units) of sagitally initialized version: ",
+    CPPUNIT_ASSERT_MESSAGE("Testing width, height and thickness (in units) of sagittally initialized version: ",
                            mitk::Equal(planegeometry->GetExtent(1), 1, testEps));
-    CPPUNIT_ASSERT_MESSAGE("Testing width, height and thickness (in units) of sagitally initialized version: ",
+    CPPUNIT_ASSERT_MESSAGE("Testing width, height and thickness (in units) of sagittally initialized version: ",
                            mitk::Equal(planegeometry->GetExtent(2), 1, testEps));
 
-    CPPUNIT_ASSERT_MESSAGE("Testing width, height and thickness (in mm) of sagitally initialized version: ",
+    CPPUNIT_ASSERT_MESSAGE("Testing width, height and thickness (in mm) of sagittally initialized version: ",
                            mitk::Equal(planegeometry->GetExtentInMM(0), heightInMM, testEps));
-    CPPUNIT_ASSERT_MESSAGE("Testing width, height and thickness (in mm) of sagitally initialized version: ",
+    CPPUNIT_ASSERT_MESSAGE("Testing width, height and thickness (in mm) of sagittally initialized version: ",
                            mitk::Equal(planegeometry->GetExtentInMM(1), thicknessInMM, testEps));
-    CPPUNIT_ASSERT_MESSAGE("Testing width, height and thickness (in mm) of sagitally initialized version: ",
+    CPPUNIT_ASSERT_MESSAGE("Testing width, height and thickness (in mm) of sagittally initialized version: ",
                            mitk::Equal(planegeometry->GetExtentInMM(2), newthicknessInMM, testEps));
 
-    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of sagitally initialized version: ",
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of sagittally initialized version: ",
                            mitk::Equal(planegeometry->GetAxisVector(0), newright, testEps));
-    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of sagitally initialized version: ",
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of sagittally initialized version: ",
                            mitk::Equal(planegeometry->GetAxisVector(1), newbottom, testEps));
-    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of sagitally initialized version: ",
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of sagittally initialized version: ",
                            mitk::Equal(planegeometry->GetAxisVector(2), newnormal, testEps));
 
     mappingTests2D(planegeometry, height, 1, heightInMM, thicknessInMM, origin, newright, newbottom);
@@ -737,7 +737,7 @@ public:
     mitk::Point3D backsidecornerpoint0;
     backsidecornerpoint0 =
       cornerpoint0 + clonedplanegeometry->GetAxisVector(1); //+clonedplanegeometry->GetAxisVector(2);
-    CPPUNIT_ASSERT_MESSAGE("Testing GetCornerPoint(0) of sagitally initialized version: ",
+    CPPUNIT_ASSERT_MESSAGE("Testing GetCornerPoint(0) of sagittally initialized version: ",
                            mitk::Equal(planegeometry->GetCornerPoint(0), backsidecornerpoint0, testEps));
 
     CPPUNIT_ASSERT_MESSAGE("Testing width, height and thickness (in units) of backsidedly, axially initialized version "

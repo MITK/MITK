@@ -325,7 +325,7 @@ void mitk::CLUtil::itkFitStructuringElement(TStructuringElement & se, Morphologi
   case(Axial):
     size.SetElement(2,0);
     break;
-  case(Sagital):
+  case(Sagittal):
     size.SetElement(0,0);
     break;
   case(Coronal):

@@ -34,7 +34,7 @@ public:
   ///
   enum MorphologicalDimensions
   {
-    Axial,Coronal,Sagital,All
+    Axial,Coronal,Sagittal,All
   };
 
   ///

@@ -856,39 +856,39 @@ int mitkExtractSliceFilterTest(int /*argc*/, char * /*argv*/ [])
   /* end axial plane */
 
   /* sagittal plane */
-  mitk::PlaneGeometry::Pointer geometrySagital = mitk::PlaneGeometry::New();
-  geometrySagital->InitializeStandardPlane(
+  mitk::PlaneGeometry::Pointer geometrySagittal = mitk::PlaneGeometry::New();
+  geometrySagittal->InitializeStandardPlane(
     planeSize, planeSize, spacing, mitk::PlaneGeometry::Sagittal, sphereCenter, true, false);
-  geometrySagital->ChangeImageGeometryConsideringOriginOffset(true);
+  geometrySagittal->ChangeImageGeometryConsideringOriginOffset(true);
 
-  origin = geometrySagital->GetOrigin();
-  normal = geometrySagital->GetNormal();
+  origin = geometrySagittal->GetOrigin();
+  normal = geometrySagittal->GetNormal();
 
   normal.Normalize();
 
   origin += normal * 0.5; // pixelspacing is 1, so half the spacing is 0.5
 
-  // geometrySagital->SetOrigin(origin);
+  // geometrySagittal->SetOrigin(origin);
 
-  mitkExtractSliceFilterTestClass::TestSlice(geometrySagital, "Testing sagittal plane");
+  mitkExtractSliceFilterTestClass::TestSlice(geometrySagittal, "Testing sagittal plane");
   /* sagittal plane */
 
   /* sagittal shifted plane */
-  mitk::PlaneGeometry::Pointer geometrySagitalShifted = mitk::PlaneGeometry::New();
-  geometrySagitalShifted->InitializeStandardPlane(
+  mitk::PlaneGeometry::Pointer geometrySagittalShifted = mitk::PlaneGeometry::New();
+  geometrySagittalShifted->InitializeStandardPlane(
     planeSize, planeSize, spacing, mitk::PlaneGeometry::Sagittal, (sphereCenter - 14), true, false);
-  geometrySagitalShifted->ChangeImageGeometryConsideringOriginOffset(true);
+  geometrySagittalShifted->ChangeImageGeometryConsideringOriginOffset(true);
 
-  origin = geometrySagitalShifted->GetOrigin();
-  normal = geometrySagitalShifted->GetNormal();
+  origin = geometrySagittalShifted->GetOrigin();
+  normal = geometrySagittalShifted->GetNormal();
 
   normal.Normalize();
 
   origin += normal * 0.5; // pixelspacing is 1, so half the spacing is 0.5
 
-  // geometrySagitalShifted->SetOrigin(origin);
+  // geometrySagittalShifted->SetOrigin(origin);
 
-  mitkExtractSliceFilterTestClass::TestSlice(geometrySagitalShifted, "Testing sagittal plane shifted");
+  mitkExtractSliceFilterTestClass::TestSlice(geometrySagittalShifted, "Testing sagittal plane shifted");
   /* end sagittal shifted plane */
 
   /* coronal plane */

@@ -112,11 +112,11 @@ found in the LICENSE file.
 //      },
 //      {
 //        ++testcounter,
-//        "TestSagital",
+//        "TestSagittal",
 //        "image.nrrd",
 //        "sagitalReference.nrrd",
 //        false,
-//        &TestSagital
+//        &TestSagittal
 //      },
 //      {
 //        ++testcounter,
@@ -210,7 +210,7 @@ found in the LICENSE file.
 //  }
 //
 //
-//  static mitk::Geometry2D::Pointer TestSagital()
+//  static mitk::Geometry2D::Pointer TestSagittal()
 //  {
 //
 //    return nullptr;

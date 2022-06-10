@@ -212,7 +212,7 @@ namespace mitk
    *
    * There were issues when rendering vtk glyphs in the 2D-render windows. By default, the glyphs are
    * rendered within the x-y plane in each 2D-render window, so you would only see them from the
-   * side in the saggital and coronal 2D-render window. The solution to this is to rotate the glyphs in order
+   * side in the sagittal and coronal 2D-render window. The solution to this is to rotate the glyphs in order
    * to be ortogonal to the current view vector. To achieve this, the rotation (vtktransform) of the current
    * PlaneGeometry is applied to the orienation of the glyphs. */
     virtual void CreateVTKRenderObjects(mitk::BaseRenderer *renderer);

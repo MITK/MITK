@@ -46,7 +46,7 @@ class mitkPlaneGeometryTestSuite : public mitk::TestFixture
   MITK_TEST(TestPlaneComparison);
   MITK_TEST(TestAxialInitialization);
   MITK_TEST(TestCoronalInitialization);
-  MITK_TEST(TestSaggitalInitialization);
+  MITK_TEST(TestSagittalInitialization);
   MITK_TEST(TestLefthandedCoordinateSystem);
   MITK_TEST(TestDominantAxesError);
   MITK_TEST(TestCheckRotationMatrix);
@@ -674,7 +674,7 @@ public:
     mappingTests2D(clonedplanegeometry, width, height, widthInMM, heightInMM, origin, right, bottom);
   }
 
-  void TestSaggitalInitialization()
+  void TestSagittalInitialization()
   {
     mitk::Point3D cornerpoint0 = planegeometry->GetCornerPoint(0);
     mitk::PlaneGeometry::Pointer clonedplanegeometry = planegeometry->Clone();

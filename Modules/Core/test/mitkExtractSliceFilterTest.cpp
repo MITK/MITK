@@ -1009,7 +1009,7 @@ int mitkExtractSliceFilterTest(int /*argc*/, char * /*argv*/ [])
 
   // These two points define the axes of the plane in combination with the origin.
   // Point 1 is the x-axis and point 2 the y-axis.
-  // Each plane is transformed according to the view (axial, coronal and saggital) afterwards.
+  // Each plane is transformed according to the view (axial, coronal and sagittal) afterwards.
   vtkPlane->SetPoint1(1.0, 0.0, 0.0); // P1: (xMax, yMin, depth)
   vtkPlane->SetPoint2(0.0, 1.0, 0.0); // P2: (xMin, yMax, depth)
   // these are not the correct values for all slices, only a square plane by now

@@ -549,7 +549,7 @@ void mitk::LabelSetImageVtkMapper2D::GeneratePlane(mitk::BaseRenderer *renderer,
   localStorage->m_Plane->SetOrigin(planeBounds[0], planeBounds[2], depth);
   // These two points define the axes of the plane in combination with the origin.
   // Point 1 is the x-axis and point 2 the y-axis.
-  // Each plane is transformed according to the view (axial, coronal and saggital) afterwards.
+  // Each plane is transformed according to the view (axial, coronal and sagittal) afterwards.
   localStorage->m_Plane->SetPoint1(planeBounds[1], planeBounds[2], depth); // P1: (xMax, yMin, depth)
   localStorage->m_Plane->SetPoint2(planeBounds[0], planeBounds[3], depth); // P2: (xMin, yMax, depth)
 }
@@ -576,14 +576,14 @@ float mitk::LabelSetImageVtkMapper2D::CalculateLayerDepth(mitk::BaseRenderer *re
 void mitk::LabelSetImageVtkMapper2D::TransformActor(mitk::BaseRenderer *renderer)
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
-  // get the transformation matrix of the reslicer in order to render the slice as axial, coronal or saggital
+  // get the transformation matrix of the reslicer in order to render the slice as axial, coronal or sagittal
   vtkSmartPointer<vtkTransform> trans = vtkSmartPointer<vtkTransform>::New();
   vtkSmartPointer<vtkMatrix4x4> matrix = localStorage->m_ReslicerVector[0]->GetResliceAxes(); // same for all layers
   trans->SetMatrix(matrix);
 
   for (int lidx = 0; lidx < localStorage->m_NumberOfLayers; ++lidx)
   {
-    // transform the plane/contour (the actual actor) to the corresponding view (axial, coronal or saggital)
+    // transform the plane/contour (the actual actor) to the corresponding view (axial, coronal or sagittal)
     localStorage->m_LayerActorVector[lidx]->SetUserTransform(trans);
     // transform the origin to center based coordinates, because MITK is center based.
     localStorage->m_LayerActorVector[lidx]->SetPosition(

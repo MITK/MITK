@@ -154,7 +154,7 @@ namespace mitk
     /// construct standard view.
 
     // We define at the moment "frontside" as: axial from above,
-    // coronal from front (nose), saggital from right.
+    // coronal from front (nose), sagittal from right.
     // TODO: Double check with medicals doctors or radiologists [ ].
 
     // We define the orientation in patient's view, e.g. LAI is in a axial cut

@@ -20,8 +20,6 @@ found in the LICENSE file.
 #include <QmitkStyleManager.h>
 #include <QtGlobal>
 #include <itksys/SystemTools.hxx>
-#include <set>
-
 #include <nlohmann/json.hpp>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitknnUNetToolGUI, "")
@@ -564,7 +562,6 @@ void QmitknnUNetToolGUI::ExportAvailableModelsAsJSON(const QString &resultsFolde
 void QmitknnUNetToolGUI::DisplayMultiModalInfoFromJSON(const QString &jsonPath)
 {
   std::ifstream file(jsonPath.toStdString());
-
   if (file.is_open())
   {
     auto jsonObj = nlohmann::json::parse(file, nullptr, false);
@@ -574,7 +571,6 @@ void QmitknnUNetToolGUI::DisplayMultiModalInfoFromJSON(const QString &jsonPath)
       MITK_ERROR << "Could not parse \"" << jsonPath.toStdString() << "\" as JSON object!";
       return;
     }
-
     auto num_mods = jsonObj["num_modalities"].get<int>();
     ClearAllModalLabels();
     if (num_mods > 1)
@@ -605,26 +601,18 @@ void QmitknnUNetToolGUI::DisplayMultiModalInfoFromJSON(const QString &jsonPath)
 
 void QmitknnUNetToolGUI::FillAvailableModelsInfoFromJSON(const QString &jsonPath)
 {
-  if (QFile::exists(jsonPath) && m_Controls.availableBox->count() < 1)
+  std::ifstream file(jsonPath.toStdString());
+  if (file.is_open() && m_Controls.availableBox->count() < 1)
   {
-    QFile file(jsonPath);
-    if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+    auto jsonObj = nlohmann::json::parse(file, nullptr, false);
+    if (jsonObj.is_discarded() || !jsonObj.is_object())
     {
-      QByteArray bytes = file.readAll();
-      file.close();
-      QJsonParseError jsonError;
-      QJsonDocument document = QJsonDocument::fromJson(bytes, &jsonError);
-      if (jsonError.error != QJsonParseError::NoError)
-      {
-        MITK_INFO << "Json parsing failed: " << jsonError.errorString().toStdString() << endl;
-        return;
-      }
-      if (document.isObject())
-      {
-        QJsonObject jsonObj = document.object();
-        QStringList keys = jsonObj.keys();
-        m_Controls.availableBox->addItems(keys);
-      }
+      MITK_ERROR << "Could not parse \"" << jsonPath.toStdString() << "\" as JSON object!";
+      return;
+    }
+    for (auto &[key, val] : jsonObj.items())
+    {
+      m_Controls.availableBox->addItem(QString::fromStdString(key));
     }
   }
 }

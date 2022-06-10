@@ -26,7 +26,7 @@ namespace mitk
   /**
   * The RenderWindowViewDirectionController is used to manipulate the 'sliceNavigationController' of a given base renderer.
   * The 'sliceNavigationController' is used to set the view direction / camera perspective of a base renderer.
-  * The view direction can changed to 'mitk::SliceNavigationController::Axial', 'mitk::SliceNavigationController::Frontal'
+  * The view direction can be changed to 'mitk::SliceNavigationController::Axial', 'mitk::SliceNavigationController::Coronal'
   * or 'mitk::SliceNavigationController::Sagittal'.
   *
   * Functions with 'mitk::BaseRenderer* renderer' have 'nullptr' as their default argument. Using the nullptr

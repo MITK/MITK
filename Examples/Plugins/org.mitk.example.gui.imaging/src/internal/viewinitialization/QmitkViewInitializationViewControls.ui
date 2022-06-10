@@ -71,9 +71,9 @@
        </widget>
       </item>
       <item>
-       <widget class="QRadioButton" name="rbFrontal" >
+       <widget class="QRadioButton" name="rbCoronal" >
         <property name="text" >
-         <string>frontal</string>
+         <string>coronal</string>
         </property>
        </widget>
       </item>

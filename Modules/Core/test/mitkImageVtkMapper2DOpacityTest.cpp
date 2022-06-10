@@ -38,7 +38,7 @@ int mitkImageVtkMapper2DOpacityTest(int argc, char *argv[])
   // Set the opacity for all images
   renderingHelper.SetImageProperty("opacity", mitk::FloatProperty::New(0.5f));
   // for now this test renders in coronal view direction
-  renderingHelper.SetViewDirection(mitk::SliceNavigationController::Frontal);
+  renderingHelper.SetViewDirection(mitk::SliceNavigationController::Coronal);
 
   //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
   MITK_TEST_CONDITION(renderingHelper.CompareRenderWindowAgainstReference(argc, argv) == true,

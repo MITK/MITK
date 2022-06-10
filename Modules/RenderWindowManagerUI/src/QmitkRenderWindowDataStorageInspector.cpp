@@ -124,7 +124,7 @@ void QmitkRenderWindowDataStorageInspector::SetActiveRenderWindow(const QString&
   case mitk::SliceNavigationController::Axial:
     m_Controls.radioButtonAxial->setChecked(true);
     break;
-  case mitk::SliceNavigationController::Frontal:
+  case mitk::SliceNavigationController::Coronal:
     m_Controls.radioButtonCoronal->setChecked(true);
     break;
   case mitk::SliceNavigationController::Sagittal:

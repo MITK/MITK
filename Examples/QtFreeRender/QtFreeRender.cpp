@@ -71,7 +71,7 @@ void InitializeWindows()
   // Set default view directions for SNCs
   mitkWidget1->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Axial);
   mitkWidget2->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
-  mitkWidget3->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Frontal);
+  mitkWidget3->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Coronal);
   mitkWidget4->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Original);
 
   // initialize m_TimeNavigationController: send time via sliceNavigationControllers

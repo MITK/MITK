@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
   ds->Add(view2.GetRenderer()->GetCurrentWorldPlaneGeometryNode());
 
   //*************************************************************************
-  // Part IVc: 2D view for slicing sagitally
+  // Part IVc: 2D view for slicing sagittally
   //*************************************************************************
 
   // Create QmitkSliceWidget, which is based on the class
@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
   layout.addWidget(&view3);
   view3.SetDataStorage(ds);
   // Tell the QmitkSliceWidget which (part of) the datastorage to render
-  // and to slice sagitally
+  // and to slice sagittally
   view3.SetData(rs->Begin(), mitk::SliceNavigationController::Sagittal);
   // We want to see the position of the slice in 2D and the
   // slice itself in 3D: add it to the datastorage!

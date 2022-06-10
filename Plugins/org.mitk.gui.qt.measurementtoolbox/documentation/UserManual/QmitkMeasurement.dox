@@ -13,7 +13,7 @@ The Measurement view allows you to measure distances, angles, paths and several 
 
 <h1>Usage</h1>
 
-The first step to perform measurements is to select a reference image on top of the view. All resulting measurements will be assigned as child nodes of the image in the data manager. The standard working plane is 'Axial' but the other standard view planes ('Saggital' and 'Coronal') are also valid for measurements. 
+The first step to perform measurements is to select a reference image on top of the view. All resulting measurements will be assigned as child nodes of the image in the data manager. The standard working plane is 'Axial' but the other standard view planes ('Sagittal' and 'Coronal') are also valid for measurements. 
 
 
 \imageMacro{QmitkMeasurementToolbox_MeasurementView.jpg,"Measurement View",7.60}

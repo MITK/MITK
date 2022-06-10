@@ -199,7 +199,7 @@ void Step6::SetupWidgets()
   m_DataStorage->Add(view2->GetRenderer()->GetCurrentWorldPlaneGeometryNode());
 
   //*************************************************************************
-  // Part Ic: 2D view for slicing sagitally
+  // Part Ic: 2D view for slicing sagittally
   //*************************************************************************
 
   // Create QmitkSliceWidget, which is based on the class
@@ -208,7 +208,7 @@ void Step6::SetupWidgets()
   hlayout->addWidget(view3);
 
   // Tell the QmitkSliceWidget which (part of) the tree to render
-  // and to slice sagitally
+  // and to slice sagittally
   view3->SetDataStorage(m_DataStorage);
   view3->SetData(rs->Begin(), mitk::SliceNavigationController::Sagittal);
 

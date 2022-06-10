@@ -239,12 +239,12 @@ mitk::MorphologicalOperations::StructuralElementType QmitkMorphologicalOperation
   if(ball){
    if(m_Controls.planeSelectionComboBox->currentIndex() == 0) accum_flag = mitk::MorphologicalOperations::Ball; // 3D Operation
    if(m_Controls.planeSelectionComboBox->currentIndex() == 1) accum_flag = mitk::MorphologicalOperations::Ball_Axial; // 2D Operation - Axial plane
-   if(m_Controls.planeSelectionComboBox->currentIndex() == 2) accum_flag = mitk::MorphologicalOperations::Ball_Sagital; // 2D Operation - Sagital plane
+   if(m_Controls.planeSelectionComboBox->currentIndex() == 2) accum_flag = mitk::MorphologicalOperations::Ball_Sagittal; // 2D Operation - Sagittal plane
    if(m_Controls.planeSelectionComboBox->currentIndex() == 3) accum_flag = mitk::MorphologicalOperations::Ball_Coronal; // 2D Operation - Coronal plane
   }else{
     if(m_Controls.planeSelectionComboBox->currentIndex() == 0) accum_flag = mitk::MorphologicalOperations::Cross;
     if(m_Controls.planeSelectionComboBox->currentIndex() == 1) accum_flag = mitk::MorphologicalOperations::Cross_Axial;
-    if(m_Controls.planeSelectionComboBox->currentIndex() == 2) accum_flag = mitk::MorphologicalOperations::Cross_Sagital;
+    if(m_Controls.planeSelectionComboBox->currentIndex() == 2) accum_flag = mitk::MorphologicalOperations::Cross_Sagittal;
     if(m_Controls.planeSelectionComboBox->currentIndex() == 3) accum_flag = mitk::MorphologicalOperations::Cross_Coronal;
   }
   return (mitk::MorphologicalOperations::StructuralElementType)accum_flag;

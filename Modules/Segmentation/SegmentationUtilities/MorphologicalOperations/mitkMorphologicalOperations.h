@@ -27,12 +27,12 @@ namespace mitk
     {
       Ball = 7,
       Ball_Axial = 1,
-      Ball_Sagital = 2,
+      Ball_Sagittal = 2,
       Ball_Coronal = 4,
 
       Cross = 56,
       Cross_Axial = 8,
-      Cross_Sagital = 16,
+      Cross_Sagittal = 16,
       Cross_Coronal = 32
 
     };

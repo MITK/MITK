@@ -41,7 +41,7 @@ class MITKIGT_EXPORT NavigationDataSliceVisualization : public NavigationDataToN
        */
       Axial = 0,
       Sagittal,
-      Frontal,
+      Coronal,
       /**
        * Axial plane "tilted" about the lateral vector so that it is coplanar
        * with the tool trajectory

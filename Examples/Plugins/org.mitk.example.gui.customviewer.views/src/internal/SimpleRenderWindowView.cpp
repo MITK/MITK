@@ -65,20 +65,20 @@ QmitkRenderWindow *SimpleRenderWindowView::GetActiveQmitkRenderWindow() const
 QHash<QString, QmitkRenderWindow *> SimpleRenderWindowView::GetRenderWindows() const
 {
   QHash<QString, QmitkRenderWindow *> wnds;
-  wnds.insert("transversal", m_RenderWindow);
+  wnds.insert("axial", m_RenderWindow);
   return wnds;
 }
 
 QHash<QString, QmitkRenderWindow *> SimpleRenderWindowView::GetQmitkRenderWindows() const
 {
   QHash<QString, QmitkRenderWindow *> wnds;
-  wnds.insert("transversal", m_RenderWindow);
+  wnds.insert("axial", m_RenderWindow);
   return wnds;
 }
 
 QmitkRenderWindow *SimpleRenderWindowView::GetRenderWindow(const QString &id) const
 {
-  if (id == "transversal")
+  if (id == "axial")
   {
     return m_RenderWindow;
   }
@@ -87,7 +87,7 @@ QmitkRenderWindow *SimpleRenderWindowView::GetRenderWindow(const QString &id) co
 
 QmitkRenderWindow *SimpleRenderWindowView::GetQmitkRenderWindow(const QString &id) const
 {
-  if (id == "transversal")
+  if (id == "axial")
   {
     return m_RenderWindow;
   }

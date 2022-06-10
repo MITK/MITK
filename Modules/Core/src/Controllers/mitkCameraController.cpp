@@ -274,7 +274,7 @@ void mitk::CameraController::AdjustCameraToPlane(const Point2D &PlanePoint)
       this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetViewUp(0, 1, 0); // set the view-up for the camera
       this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetPosition(_planePoint[0], _planePoint[1], 900000);
       this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->SetFocalPoint(_planePoint[0], _planePoint[1], 0);
-      // Transform the camera to the current position (transversal, coronal and sagittal plane).
+      // Transform the camera to the current position (axial, coronal and sagittal plane).
       // This is necessary, because the SetUserTransform() method does not manipulate the vtkCamera.
       //(Without not all three planes would be visible).
       vtkSmartPointer<vtkTransform> trans = vtkSmartPointer<vtkTransform>::New();
@@ -309,7 +309,7 @@ void mitk::CameraController::AdjustCameraToPlane(const Point2D &PlanePoint)
       matrix->SetElement(3, 3, 1.0);
 
       trans->SetMatrix(matrix);
-      // Transform the camera to the current position (transversal, coronal and sagittal plane).
+      // Transform the camera to the current position (axial, coronal and sagittal plane).
       this->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->ApplyTransform(trans);
     }
   }

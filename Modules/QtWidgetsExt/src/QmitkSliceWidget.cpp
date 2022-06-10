@@ -29,7 +29,7 @@ QmitkSliceWidget::QmitkSliceWidget(QWidget *parent, const char *name, Qt::Window
 
   popUp = new QMenu(this);
   popUp->addAction("Axial");
-  popUp->addAction("Frontal");
+  popUp->addAction("Coronal");
   popUp->addAction("Sagittal");
 
   QObject::connect(popUp, SIGNAL(triggered(QAction *)), this, SLOT(ChangeView(QAction *)));
@@ -127,9 +127,9 @@ void QmitkSliceWidget::InitWidget(mitk::SliceNavigationController::ViewDirection
   {
     controller->SetViewDirection(mitk::SliceNavigationController::Axial);
   }
-  else if (viewDirection == mitk::SliceNavigationController::Frontal)
+  else if (viewDirection == mitk::SliceNavigationController::Coronal)
   {
-    controller->SetViewDirection(mitk::SliceNavigationController::Frontal);
+    controller->SetViewDirection(mitk::SliceNavigationController::Coronal);
   }
   // init sagittal view
   else
@@ -205,9 +205,9 @@ void QmitkSliceWidget::ChangeView(QAction *val)
   {
     InitWidget(mitk::SliceNavigationController::Axial);
   }
-  else if (val->text() == "Frontal")
+  else if (val->text() == "Coronal")
   {
-    InitWidget(mitk::SliceNavigationController::Frontal);
+    InitWidget(mitk::SliceNavigationController::Coronal);
   }
   else if (val->text() == "Sagittal")
   {

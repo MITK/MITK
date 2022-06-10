@@ -34,7 +34,7 @@ const std::string QmitkImageNavigatorView::VIEW_ID = "org.mitk.views.imagenaviga
 QmitkImageNavigatorView::QmitkImageNavigatorView()
   : m_AxialStepper(nullptr)
   , m_SagittalStepper(nullptr)
-  , m_FrontalStepper(nullptr)
+  , m_CoronalStepper(nullptr)
   , m_TimeStepper(nullptr)
   , m_Parent(nullptr)
   , m_IRenderWindowPart(nullptr)
@@ -116,19 +116,19 @@ void QmitkImageNavigatorView::RenderWindowPartActivated(mitk::IRenderWindowPart*
     renderWindow = renderWindowPart->GetQmitkRenderWindow("coronal");
     if (renderWindow)
     {
-      if (m_FrontalStepper) m_FrontalStepper->deleteLater();
-      m_FrontalStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorFrontal,
+      if (m_CoronalStepper) m_CoronalStepper->deleteLater();
+      m_CoronalStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorCoronal,
                                                  renderWindow->GetSliceNavigationController()->GetSlice(),
-                                                 "sliceNavigatorFrontalFromSimpleExample");
-      m_Controls.m_SliceNavigatorFrontal->setEnabled(true);
+                                                 "sliceNavigatorCoronalFromSimpleExample");
+      m_Controls.m_SliceNavigatorCoronal->setEnabled(true);
       m_Controls.m_CoronalLabel->setEnabled(true);
       m_Controls.m_XWorldCoordinateSpinBox->setEnabled(true);
-      connect(m_FrontalStepper, SIGNAL(Refetch()), this, SLOT(OnRefetch()));
-      connect(m_FrontalStepper, SIGNAL(Refetch()), this, SLOT(UpdateStatusBar()));
+      connect(m_CoronalStepper, SIGNAL(Refetch()), this, SLOT(OnRefetch()));
+      connect(m_CoronalStepper, SIGNAL(Refetch()), this, SLOT(UpdateStatusBar()));
     }
     else
     {
-      m_Controls.m_SliceNavigatorFrontal->setEnabled(false);
+      m_Controls.m_SliceNavigatorCoronal->setEnabled(false);
       m_Controls.m_CoronalLabel->setEnabled(false);
       m_Controls.m_XWorldCoordinateSpinBox->setEnabled(false);
     }
@@ -586,7 +586,7 @@ void QmitkImageNavigatorView::OnRefetch()
 
             QmitkSliderNavigatorWidget* navigatorWidget =
                 worldAxis == 0 ? m_Controls.m_SliceNavigatorSagittal :
-                worldAxis == 1 ? m_Controls.m_SliceNavigatorFrontal :
+                worldAxis == 1 ? m_Controls.m_SliceNavigatorCoronal :
                                  m_Controls.m_SliceNavigatorAxial;
 
             navigatorWidget->SetInverseDirection(inverseDirection);

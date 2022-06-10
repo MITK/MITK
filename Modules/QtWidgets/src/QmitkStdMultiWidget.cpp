@@ -744,7 +744,7 @@ void QmitkStdMultiWidget::CreateRenderWindowWidgets()
   renderWindowWidgetName = GetNameFromIndex(1, 0);
   RenderWindowWidgetPointer renderWindowWidget3 = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage());
   auto renderWindow3 = renderWindowWidget3->GetRenderWindow();
-  renderWindow3->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Frontal);
+  renderWindow3->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Coronal);
   renderWindowWidget3->SetDecorationColor(GetDecorationColor(2));
   renderWindowWidget3->SetCornerAnnotationText("Coronal");
   renderWindowWidget3->GetRenderWindow()->SetLayoutIndex(ViewDirection::CORONAL);

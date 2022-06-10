@@ -63,7 +63,7 @@ void mitk::RenderWindowViewDirectionController::SetViewDirectionOfRenderer(const
     }
     else if ("coronal" == viewDirection)
     {
-      sliceNavigationController->SetDefaultViewDirection(ViewDirection::Frontal);
+      sliceNavigationController->SetDefaultViewDirection(ViewDirection::Coronal);
     }
     else if ("sagittal" == viewDirection)
     {

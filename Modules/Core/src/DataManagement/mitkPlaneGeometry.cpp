@@ -237,8 +237,7 @@ namespace mitk
         normalDirection = 2; // That is S=Superior=z=third_axis=middlefinger in righthanded LPS-system.
         break;
 
-      // Frontal is known as Coronal in mitk. Plane cuts through patient's ear-ear-heel-heel:
-      case Frontal:
+      case Coronal: // Coronal=Frontal plane; cuts through patient's ear-ear-heel-heel:
         if (frontside)
         {
           if (rotated == false) // x=[1; 0; 0], y=[0; 0; 1], z=[0; 1; 0], origin=[0,zpos,0]: LAI (r.h.)
@@ -449,7 +448,7 @@ namespace mitk
       width  = extents[0];
       height = extents[1];
       break;
-    case Frontal:
+    case Coronal:
       width  = extents[0];
       height = extents[2];
       break;
@@ -485,7 +484,7 @@ namespace mitk
     case Axial:
       worldAxis = 2;
       break;
-    case Frontal:
+    case Coronal:
       worldAxis = 1;
       break;
     case Sagittal:

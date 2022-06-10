@@ -45,7 +45,7 @@ class mitkPlaneGeometryTestSuite : public mitk::TestFixture
   MITK_TEST(TestClone);
   MITK_TEST(TestPlaneComparison);
   MITK_TEST(TestAxialInitialization);
-  MITK_TEST(TestFrontalInitialization);
+  MITK_TEST(TestCoronalInitialization);
   MITK_TEST(TestSaggitalInitialization);
   MITK_TEST(TestLefthandedCoordinateSystem);
   MITK_TEST(TestDominantAxesError);
@@ -767,7 +767,7 @@ public:
     mappingTests2D(planegeometry, width, height, widthInMM, heightInMM, backsideorigin, right, -bottom);
   }
 
-  void TestFrontalInitialization()
+  void TestCoronalInitialization()
   {
     mitk::Point3D cornerpoint0 = planegeometry->GetCornerPoint(0);
 
@@ -778,8 +778,8 @@ public:
     mitk::Vector3D newright, newbottom, newnormal;
     mitk::ScalarType newthicknessInMM;
 
-    // Testing InitializeStandardPlane(clonedplanegeometry, planeorientation = Frontal, zPosition = 0, frontside=true)
-    planegeometry->InitializeStandardPlane(clonedplanegeometry, mitk::PlaneGeometry::Frontal);
+    // Testing InitializeStandardPlane(clonedplanegeometry, planeorientation = Coronal, zPosition = 0, frontside=true)
+    planegeometry->InitializeStandardPlane(clonedplanegeometry, mitk::PlaneGeometry::Coronal);
     newright = right;
     newbottom = normal;
     newbottom.Normalize();
@@ -789,31 +789,31 @@ public:
     newnormal.Normalize();
     newnormal *= newthicknessInMM;
 
-    CPPUNIT_ASSERT_MESSAGE("Testing GetCornerPoint(0) of frontally initialized version: ",
+    CPPUNIT_ASSERT_MESSAGE("Testing GetCornerPoint(0) of coronally initialized version: ",
                            mitk::Equal(planegeometry->GetCornerPoint(0), cornerpoint0, testEps));
 
     // ok, corner was fine, so we can dare to believe the origin is ok.
     origin = planegeometry->GetOrigin();
 
-    CPPUNIT_ASSERT_MESSAGE("Testing width (in units) of frontally initialized version: ",
+    CPPUNIT_ASSERT_MESSAGE("Testing width (in units) of coronally initialized version: ",
                            mitk::Equal(planegeometry->GetExtent(0), width, testEps));
-    CPPUNIT_ASSERT_MESSAGE("Testing height (in units) of frontally initialized version: ",
+    CPPUNIT_ASSERT_MESSAGE("Testing height (in units) of coronally initialized version: ",
                            mitk::Equal(planegeometry->GetExtent(1), 1, testEps));
-    CPPUNIT_ASSERT_MESSAGE("Testing thickness (in units) of frontally initialized version: ",
+    CPPUNIT_ASSERT_MESSAGE("Testing thickness (in units) of coronally initialized version: ",
                            mitk::Equal(planegeometry->GetExtent(2), 1, testEps));
 
-    CPPUNIT_ASSERT_MESSAGE("Testing width (in mm) of frontally initialized version: ",
+    CPPUNIT_ASSERT_MESSAGE("Testing width (in mm) of coronally initialized version: ",
                            mitk::Equal(planegeometry->GetExtentInMM(0), widthInMM, testEps));
-    CPPUNIT_ASSERT_MESSAGE("Testing height (in mm) of frontally initialized version: ",
+    CPPUNIT_ASSERT_MESSAGE("Testing height (in mm) of coronally initialized version: ",
                            mitk::Equal(planegeometry->GetExtentInMM(1), thicknessInMM, testEps));
-    CPPUNIT_ASSERT_MESSAGE("Testing thickness (in mm) of frontally initialized version: ",
+    CPPUNIT_ASSERT_MESSAGE("Testing thickness (in mm) of coronally initialized version: ",
                            mitk::Equal(planegeometry->GetExtentInMM(2), newthicknessInMM, testEps));
 
-    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of frontally initialized version: ",
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of coronally initialized version: ",
                            mitk::Equal(planegeometry->GetAxisVector(0), newright, testEps));
-    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of frontally initialized version: ",
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of coronally initialized version: ",
                            mitk::Equal(planegeometry->GetAxisVector(1), newbottom, testEps));
-    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of frontally initialized version: ",
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of coronally initialized version: ",
                            mitk::Equal(planegeometry->GetAxisVector(2), -newnormal, testEps)); // T22254: Flipped sign
 
     mappingTests2D(planegeometry, width, 1, widthInMM, thicknessInMM, origin, newright, newbottom);
@@ -821,34 +821,34 @@ public:
     // Changing plane to in-plane unit spacing using SetSizeInUnits:
     planegeometry->SetSizeInUnits(planegeometry->GetExtentInMM(0), planegeometry->GetExtentInMM(1));
 
-    CPPUNIT_ASSERT_MESSAGE("Testing origin of unit spaced, frontally initialized version: ",
+    CPPUNIT_ASSERT_MESSAGE("Testing origin of unit spaced, coronally initialized version: ",
                            mitk::Equal(planegeometry->GetOrigin(), origin, testEps));
 
     CPPUNIT_ASSERT_MESSAGE(
-      "Testing width, height and thickness (in units) of unit spaced, frontally initialized version: ",
+      "Testing width, height and thickness (in units) of unit spaced, coronally initialized version: ",
       mitk::Equal(planegeometry->GetExtent(0), widthInMM, testEps));
     CPPUNIT_ASSERT_MESSAGE(
-      "Testing width, height and thickness (in units) of unit spaced, frontally initialized version: ",
+      "Testing width, height and thickness (in units) of unit spaced, coronally initialized version: ",
       mitk::Equal(planegeometry->GetExtent(1), thicknessInMM, testEps));
     CPPUNIT_ASSERT_MESSAGE(
-      "Testing width, height and thickness (in units) of unit spaced, frontally initialized version: ",
+      "Testing width, height and thickness (in units) of unit spaced, coronally initialized version: ",
       mitk::Equal(planegeometry->GetExtent(2), 1, testEps));
 
     CPPUNIT_ASSERT_MESSAGE(
-      "Testing width, height and thickness (in mm) of unit spaced, frontally initialized version: ",
+      "Testing width, height and thickness (in mm) of unit spaced, coronally initialized version: ",
       mitk::Equal(planegeometry->GetExtentInMM(0), widthInMM, testEps));
     CPPUNIT_ASSERT_MESSAGE(
-      "Testing width, height and thickness (in mm) of unit spaced, frontally initialized version: ",
+      "Testing width, height and thickness (in mm) of unit spaced, coronally initialized version: ",
       mitk::Equal(planegeometry->GetExtentInMM(1), thicknessInMM, testEps));
     CPPUNIT_ASSERT_MESSAGE(
-      "Testing width, height and thickness (in mm) of unit spaced, frontally initialized version: ",
+      "Testing width, height and thickness (in mm) of unit spaced, coronally initialized version: ",
       mitk::Equal(planegeometry->GetExtentInMM(2), newthicknessInMM, testEps));
 
-    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of unit spaced, frontally initialized version: ",
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of unit spaced, coronally initialized version: ",
                            mitk::Equal(planegeometry->GetAxisVector(0), newright, testEps));
-    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of unit spaced, frontally initialized version: ",
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of unit spaced, coronally initialized version: ",
                            mitk::Equal(planegeometry->GetAxisVector(1), newbottom, testEps));
-    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of unit spaced, frontally initialized version: ",
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of unit spaced, coronally initialized version: ",
                            mitk::Equal(planegeometry->GetAxisVector(2), -newnormal, testEps)); // T22254: Flipped sign
 
     mappingTests2D(planegeometry, widthInMM, thicknessInMM, widthInMM, thicknessInMM, origin, newright, newbottom);
@@ -857,34 +857,34 @@ public:
     planegeometry->SetExtentInMM(2, 1.0);
     newnormal.Normalize();
 
-    CPPUNIT_ASSERT_MESSAGE("Testing origin of unit spaced, frontally initialized version: ",
+    CPPUNIT_ASSERT_MESSAGE("Testing origin of unit spaced, coronally initialized version: ",
                            mitk::Equal(planegeometry->GetOrigin(), origin, testEps));
 
     CPPUNIT_ASSERT_MESSAGE(
-      "Testing width, height and thickness (in units) of unit spaced, frontally initialized version: ",
+      "Testing width, height and thickness (in units) of unit spaced, coronally initialized version: ",
       mitk::Equal(planegeometry->GetExtent(0), widthInMM, testEps));
     CPPUNIT_ASSERT_MESSAGE(
-      "Testing width, height and thickness (in units) of unit spaced, frontally initialized version: ",
+      "Testing width, height and thickness (in units) of unit spaced, coronally initialized version: ",
       mitk::Equal(planegeometry->GetExtent(1), thicknessInMM, testEps));
     CPPUNIT_ASSERT_MESSAGE(
-      "Testing width, height and thickness (in units) of unit spaced, frontally initialized version: ",
+      "Testing width, height and thickness (in units) of unit spaced, coronally initialized version: ",
       mitk::Equal(planegeometry->GetExtent(2), 1, testEps));
 
     CPPUNIT_ASSERT_MESSAGE(
-      "Testing width, height and thickness (in mm) of unit spaced, frontally initialized version: ",
+      "Testing width, height and thickness (in mm) of unit spaced, coronally initialized version: ",
       mitk::Equal(planegeometry->GetExtentInMM(0), widthInMM, testEps));
     CPPUNIT_ASSERT_MESSAGE(
-      "Testing width, height and thickness (in mm) of unit spaced, frontally initialized version: ",
+      "Testing width, height and thickness (in mm) of unit spaced, coronally initialized version: ",
       mitk::Equal(planegeometry->GetExtentInMM(1), thicknessInMM, testEps));
     CPPUNIT_ASSERT_MESSAGE(
-      "Testing width, height and thickness (in mm) of unit spaced, frontally initialized version: ",
+      "Testing width, height and thickness (in mm) of unit spaced, coronally initialized version: ",
       mitk::Equal(planegeometry->GetExtentInMM(2), 1.0, testEps));
 
-    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of unit spaced, frontally initialized version: ",
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of unit spaced, coronally initialized version: ",
                            mitk::Equal(planegeometry->GetAxisVector(0), newright, testEps));
-    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of unit spaced, frontally initialized version: ",
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of unit spaced, coronally initialized version: ",
                            mitk::Equal(planegeometry->GetAxisVector(1), newbottom, testEps));
-    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of unit spaced, frontally initialized version: ",
+    CPPUNIT_ASSERT_MESSAGE("Testing GetAxisVector() of unit spaced, coronally initialized version: ",
                            mitk::Equal(planegeometry->GetAxisVector(2), -newnormal, testEps)); // T22254: Flipped sign
     mappingTests2D(planegeometry, widthInMM, thicknessInMM, widthInMM, thicknessInMM, origin, newright, newbottom);
   }

@@ -83,7 +83,7 @@ void mitk::ExtractImageFilter::GenerateData()
       orientation = PlaneGeometry::Axial;
       break;
     case 1:
-      orientation = PlaneGeometry::Frontal;
+      orientation = PlaneGeometry::Coronal;
       break;
     case 0:
       orientation = PlaneGeometry::Sagittal;
@@ -232,7 +232,7 @@ void mitk::ExtractImageFilter::GenerateOutputInformation()
       tmpDimensions[1] = input->GetDimension(1);
       break;
     case 1:
-      // orientation = PlaneGeometry::Frontal;
+      // orientation = PlaneGeometry::Coronal;
       tmpDimensions[0] = input->GetDimension(0);
       tmpDimensions[1] = input->GetDimension(2);
       break;

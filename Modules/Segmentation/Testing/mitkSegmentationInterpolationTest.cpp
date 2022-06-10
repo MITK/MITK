@@ -29,7 +29,7 @@ class mitkSegmentationInterpolationTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkSegmentationInterpolationTestSuite);
   MITK_TEST(Equal_Axial_TestInterpolationAndReferenceInterpolation_ReturnsTrue);
-  MITK_TEST(Equal_Frontal_TestInterpolationAndReferenceInterpolation_ReturnsTrue);
+  MITK_TEST(Equal_Coronal_TestInterpolationAndReferenceInterpolation_ReturnsTrue);
   MITK_TEST(Equal_Sagittal_TestInterpolationAndReferenceInterpolation_ReturnsTrue);
   CPPUNIT_TEST_SUITE_END();
 
@@ -43,7 +43,7 @@ private:
       case (mitk::SliceNavigationController::Axial):
         dim = 2;
         break;
-      case (mitk::SliceNavigationController::Frontal):
+      case (mitk::SliceNavigationController::Coronal):
         dim = 1;
         break;
       case (mitk::SliceNavigationController::Sagittal):
@@ -188,9 +188,9 @@ public:
     testRoutine(viewDirection);
   }
 
-  void Equal_Frontal_TestInterpolationAndReferenceInterpolation_ReturnsTrue() // Coronal
+  void Equal_Coronal_TestInterpolationAndReferenceInterpolation_ReturnsTrue() // Coronal
   {
-    mitk::SliceNavigationController::ViewDirection viewDirection = mitk::SliceNavigationController::Frontal;
+    mitk::SliceNavigationController::ViewDirection viewDirection = mitk::SliceNavigationController::Coronal;
     testRoutine(viewDirection);
   }
 

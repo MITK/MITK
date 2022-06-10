@@ -83,8 +83,8 @@ void QmitkViewInitializationView::OnApply()
   if (m_Controls->rbAxial->isChecked())
     viewDirection = mitk::SliceNavigationController::Axial;
 
-  else if (m_Controls->rbFrontal->isChecked())
-    viewDirection = mitk::SliceNavigationController::Frontal;
+  else if (m_Controls->rbCoronal->isChecked())
+    viewDirection = mitk::SliceNavigationController::Coronal;
 
   else if (m_Controls->rbSagittal->isChecked())
     viewDirection = mitk::SliceNavigationController::Sagittal;

@@ -423,7 +423,7 @@ public:
     writer->SetFileName(file);
     writer->Update();*/
 
-    PixelvalueBasedTestByPlane(imageInMitk, mitk::PlaneGeometry::Frontal);
+    PixelvalueBasedTestByPlane(imageInMitk, mitk::PlaneGeometry::Coronal);
     PixelvalueBasedTestByPlane(imageInMitk, mitk::PlaneGeometry::Sagittal);
     PixelvalueBasedTestByPlane(imageInMitk, mitk::PlaneGeometry::Axial);
   }
@@ -894,7 +894,7 @@ int mitkExtractSliceFilterTest(int /*argc*/, char * /*argv*/ [])
   /* coronal plane */
   mitk::PlaneGeometry::Pointer geometryCoronal = mitk::PlaneGeometry::New();
   geometryCoronal->InitializeStandardPlane(
-    planeSize, planeSize, spacing, mitk::PlaneGeometry::Frontal, sphereCenter, true, false);
+    planeSize, planeSize, spacing, mitk::PlaneGeometry::Coronal, sphereCenter, true, false);
   geometryCoronal->ChangeImageGeometryConsideringOriginOffset(true);
 
   origin = geometryCoronal->GetOrigin();

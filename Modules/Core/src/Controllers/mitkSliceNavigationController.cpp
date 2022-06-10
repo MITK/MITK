@@ -255,7 +255,7 @@ namespace mitk
 
         case Coronal:
           slicedWorldGeometry = SlicedGeometry3D::New();
-          slicedWorldGeometry->InitializePlanes(currentGeometry, PlaneGeometry::Frontal, top, frontside, rotated);
+          slicedWorldGeometry->InitializePlanes(currentGeometry, PlaneGeometry::Coronal, top, frontside, rotated);
           slicedWorldGeometry->SetSliceNavigationController(this);
           break;
 

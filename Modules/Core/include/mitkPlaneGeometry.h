@@ -85,7 +85,7 @@ namespace mitk
       enum PlaneOrientation {
         Axial,
         Sagittal,
-        Frontal, // also known as "Coronal" in mitk.
+        Coronal,
         None     // This defines the PlaneGeometry for the 3D renderWindow which
         // curiously also needs a PlaneGeometry. This should be reconsidered some time.
       };

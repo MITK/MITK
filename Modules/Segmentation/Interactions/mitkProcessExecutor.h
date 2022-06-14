@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <MitkSegmentationExports.h>
 #include <itkObject.h>
 #include <vector>
+#include <itksys/Process.h>
 
 namespace mitk
 {
@@ -92,6 +93,8 @@ namespace mitk
 
     static std::string GetOSDependendExecutableName(const std::string &name);
 
+    void KillProcess();
+
   protected:
     ProcessExecutor();
     ~ProcessExecutor() override;
@@ -104,6 +107,9 @@ namespace mitk
      * @remark The events will only be invoked if the pipes are NOT(!) shared.
      */
     bool m_SharedOutputPipes;
+
+  private:
+    itksysProcess *m_ProcessID = nullptr;
   };
 
 } // namespace mitk

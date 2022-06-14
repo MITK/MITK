@@ -16,15 +16,19 @@ found in the LICENSE file.s
 #include "QmitkMultiLabelSegWithPreviewToolGUIBase.h"
 #include "QmitknnUNetFolderParser.h"
 #include "QmitknnUNetGPU.h"
+#include "QmitknnUNetWorker.h"
+#include "mitkProcessExecutor.h"
 #include "mitknnUnetTool.h"
 #include "ui_QmitknnUNetToolGUIControls.h"
 #include <MitkSegmentationUIExports.h>
 #include <QCache>
 #include <QMessageBox>
 #include <QSettings>
+#include <QThread>
 #include <QmitkDataStorageComboBox.h>
 #include <QmitknnUNetEnsembleLayout.h>
 #include <boost/functional/hash.hpp>
+#include <unordered_map>
 
 class nnUNetCache
 {
@@ -51,6 +55,12 @@ public:
   itkCloneMacro(Self);
 
   QCache<size_t, nnUNetCache> m_Cache;
+
+  /**
+   * @brief The hash map stores all bifurcating processes' ID.
+   *
+   */
+  std::unordered_map<std::string, mitk::ProcessExecutor::Pointer> m_Processes;
 
 protected slots:
 
@@ -133,9 +143,27 @@ protected slots:
    */
   void OnDownloadModel();
 
+  /**
+   * @brief Qt slot
+   *
+   */
+  void OnDownloadFailed(const std::string);
+
+  /**
+   * @brief Qt slot
+   *
+   */
+  void OnStopDownload();
+
+signals:
+  /**
+   * @brief signal for starting the segmentation which is caught by a worker thread.
+   */
+  void Operate(QString, QString, mitk::ProcessExecutor::Pointer, mitk::ProcessExecutor::ArgumentListType);
+
 protected:
   QmitknnUNetToolGUI();
-  ~QmitknnUNetToolGUI() = default;
+  ~QmitknnUNetToolGUI();
 
   void ConnectNewTool(mitk::SegWithPreviewTool *newTool) override;
   void InitializeUI(QBoxLayout *mainLayout) override;
@@ -368,5 +396,8 @@ private:
   QSettings m_Settings;
 
   bool m_IsRESULTSFOLDERvalid = false;
+
+  QThread *m_nnUNetThread;
+  nnUNetDownloadWorker *m_Worker;
 };
 #endif

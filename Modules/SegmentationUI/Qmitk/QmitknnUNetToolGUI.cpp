@@ -38,6 +38,16 @@ QmitknnUNetToolGUI::QmitknnUNetToolGUI() : QmitkMultiLabelSegWithPreviewToolGUIB
   auto imageType = mitk::TNodePredicateDataType<mitk::Image>::New();
   auto labelSetImageType = mitk::NodePredicateNot::New(mitk::TNodePredicateDataType<mitk::LabelSetImage>::New());
   m_MultiModalPredicate = mitk::NodePredicateAnd::New(imageType, labelSetImageType).GetPointer();
+
+  m_nnUNetThread = new QThread(this);
+  m_Worker = new nnUNetDownloadWorker;
+  m_Worker->moveToThread(m_nnUNetThread);
+}
+
+QmitknnUNetToolGUI::~QmitknnUNetToolGUI()
+{
+  this->m_nnUNetThread->quit();
+  this->m_nnUNetThread->wait();
 }
 
 void QmitknnUNetToolGUI::ConnectNewTool(mitk::SegWithPreviewTool *newTool)
@@ -77,11 +87,20 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
           SLOT(OnPythonPathChanged(const QString &)));
   connect(m_Controls.refreshdirectoryBox, SIGNAL(clicked()), this, SLOT(OnRefreshPresssed()));
   connect(m_Controls.clearCacheButton, SIGNAL(clicked()), this, SLOT(OnClearCachePressed()));
-  connect(m_Controls.downloadModelButton, SIGNAL(clicked()), this, SLOT(OnDownloadModel()));
+  connect(m_Controls.startDownloadButton, SIGNAL(clicked()), this, SLOT(OnDownloadModel()));
+  connect(m_Controls.stopDownloadButton, SIGNAL(clicked()), this, SLOT(OnStopDownload()));
+
+  //Qthreads
+  qRegisterMetaType<mitk::ProcessExecutor::Pointer>();
+  qRegisterMetaType<mitk::ProcessExecutor::ArgumentListType>();
+  connect(this, &QmitknnUNetToolGUI::Operate, m_Worker, &nnUNetDownloadWorker::DoWork);
+  connect(m_Worker, &nnUNetDownloadWorker::Failed, this, &QmitknnUNetToolGUI::OnDownloadFailed);
+  connect(m_nnUNetThread, &QThread::finished, m_Worker, &QObject::deleteLater);
 
   m_Controls.multiModalSpinBox->setVisible(false);
   m_Controls.multiModalSpinBox->setEnabled(false);
   m_Controls.multiModalSpinLabel->setVisible(false);
+  m_Controls.stopDownloadButton->setVisible(false);
   m_Controls.previewButton->setEnabled(false);
 
   QIcon refreshIcon =
@@ -91,6 +110,9 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
     QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-open.svg"));
   m_Controls.modeldirectoryBox->setIcon(dirIcon);
   m_Controls.refreshdirectoryBox->setEnabled(true);
+  QIcon stopIcon=
+    QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/status/dialog-error.svg"));
+  m_Controls.stopDownloadButton->setIcon(stopIcon);
 
   m_Controls.statusLabel->setTextFormat(Qt::RichText);
   if (m_GpuLoader.GetGPUCount() != 0)
@@ -610,9 +632,9 @@ void QmitknnUNetToolGUI::FillAvailableModelsInfoFromJSON(const QString &jsonPath
       MITK_ERROR << "Could not parse \"" << jsonPath.toStdString() << "\" as JSON object!";
       return;
     }
-    for (auto &[key, val] : jsonObj.items())
+    for (auto& obj : jsonObj.items())
     {
-      m_Controls.availableBox->addItem(QString::fromStdString(key));
+      m_Controls.availableBox->addItem(QString::fromStdString(obj.key()));
     }
   }
 }

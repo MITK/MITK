@@ -84,24 +84,24 @@ namespace mitk
 
     try
     {
-      itksysProcess *processID = itksysProcess_New();
-      itksysProcess_SetCommand(processID, pArguments_.data());
+      m_ProcessID = itksysProcess_New();
+      itksysProcess_SetCommand(m_ProcessID, pArguments_.data());
 
-      itksysProcess_SetWorkingDirectory(processID, executionPath.c_str());
+      itksysProcess_SetWorkingDirectory(m_ProcessID, executionPath.c_str());
 
       if (this->m_SharedOutputPipes)
       {
-        itksysProcess_SetPipeShared(processID, itksysProcess_Pipe_STDOUT, 1);
-        itksysProcess_SetPipeShared(processID, itksysProcess_Pipe_STDERR, 1);
+        itksysProcess_SetPipeShared(m_ProcessID, itksysProcess_Pipe_STDOUT, 1);
+        itksysProcess_SetPipeShared(m_ProcessID, itksysProcess_Pipe_STDERR, 1);
       }
 
-      itksysProcess_Execute(processID);
+      itksysProcess_Execute(m_ProcessID);
 
       char *rawOutput = nullptr;
       int outputLength = 0;
       while (true)
       {
-        int dataStatus = itksysProcess_WaitForData(processID, &rawOutput, &outputLength, nullptr);
+        int dataStatus = itksysProcess_WaitForData(m_ProcessID, &rawOutput, &outputLength, nullptr);
 
         if (dataStatus == itksysProcess_Pipe_STDOUT)
         {
@@ -119,12 +119,12 @@ namespace mitk
         }
       }
 
-      itksysProcess_WaitForExit(processID, nullptr);
+      itksysProcess_WaitForExit(m_ProcessID, nullptr);
 
-      auto state = static_cast<itksysProcess_State_e>(itksysProcess_GetState(processID));
+      auto state = static_cast<itksysProcess_State_e>(itksysProcess_GetState(m_ProcessID));
 
       normalExit = (state == itksysProcess_State_Exited);
-      this->m_ExitValue = itksysProcess_GetExitValue(processID);
+      this->m_ExitValue = itksysProcess_GetExitValue(m_ProcessID);
     }
     catch (...)
     {
@@ -141,6 +141,14 @@ namespace mitk
     argumentList.insert(argumentList.begin(), executableName_OS);
 
     return Execute(executionPath, argumentList);
+  }
+
+  void ProcessExecutor::KillProcess()
+  {
+    if (m_ProcessID != nullptr)
+    {
+      itksysProcess_Kill(m_ProcessID);
+    }
   }
 
   ProcessExecutor::ProcessExecutor()

@@ -1,11 +1,9 @@
 #include "QmitknnUNetToolGUI.h"
-#include "mitkProcessExecutor.h"
 #include <QDir>
 #include <QDirIterator>
 #include <QmitknnUNetEnsembleLayout.h>
 #include <algorithm>
 #include <ctkCollapsibleGroupBox.h>
-#include <itksys/SystemTools.hxx>
 
 void QmitknnUNetToolGUI::EnableWidgets(bool enabled)
 {
@@ -65,6 +63,7 @@ void QmitknnUNetToolGUI::OnRefreshPresssed()
 
 void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &resultsFolder)
 {
+  m_IsRESULTSFOLDERvalid = false;
   m_Controls.previewButton->setEnabled(false);
   ClearAllComboBoxes();
   ClearAllModalities();
@@ -73,7 +72,6 @@ void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &resultsFolder)
   tasks.removeDuplicates();
   std::for_each(tasks.begin(), tasks.end(), [this](QString task) { m_Controls.taskBox->addItem(task); });
   m_Settings.setValue("nnUNet/LastRESULTS_FOLDERPath", resultsFolder);
-  m_IsRESULTSFOLDERvalid = false;
 }
 
 void QmitknnUNetToolGUI::OnModelChanged(const QString &model)
@@ -498,17 +496,32 @@ void QmitknnUNetToolGUI::OnDownloadModel()
     args.push_back(selectedTask.toStdString());
     WriteStatusMessage("Downloading the requested task in to the selected Results Folder. This might take some time "
                        "depending on your internet connection...");
-    try
+    m_Processes["DOWNLOAD"] = spExec;
+    if (!m_nnUNetThread->isRunning())
     {
-      std::string resultsFolder = m_ParentFolder->getResultsFolder().toStdString();
-      std::string resultsFolderEnv = "RESULTS_FOLDER=" + resultsFolder;
-      itksys::SystemTools::PutEnv(resultsFolderEnv.c_str());
-      spExec->Execute(m_PythonPath.toStdString(), "nnUNet_download_pretrained_model", args);
+      MITK_DEBUG << "Starting thread...";
+      m_nnUNetThread->start();
     }
-    catch (const mitk::Exception &e)
-    {
-      MITK_ERROR << "Download FAILED!" << e.GetDescription(); // SHOW ERROR
-      WriteStatusMessage("Download failed. Check your internet connection.");
-    }
+    QString resultsFolder = m_ParentFolder->getResultsFolder();
+    emit Operate(resultsFolder,m_PythonPath,spExec,args);
+    m_Controls.stopDownloadButton->setVisible(true);
+    m_Controls.startDownloadButton->setVisible(false);
   }
+}
+
+void QmitknnUNetToolGUI::OnDownloadFailed(const std::string message)
+{
+  MITK_ERROR << "Download FAILED! " << message;
+  WriteStatusMessage(QString("Download failed. Check your internet connection. "+ QString::fromStdString(message)));
+  m_Controls.stopDownloadButton->setVisible(false);
+  m_Controls.startDownloadButton->setVisible(true);
+}
+
+void QmitknnUNetToolGUI::OnStopDownload()
+{
+  mitk::ProcessExecutor::Pointer spExec = m_Processes["DOWNLOAD"];
+  spExec->KillProcess();
+  WriteStatusMessage("Download Killed by the user.");
+  m_Controls.stopDownloadButton->setVisible(false);
+  m_Controls.startDownloadButton->setVisible(true);
 }

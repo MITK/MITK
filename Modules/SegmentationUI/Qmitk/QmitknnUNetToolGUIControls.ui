@@ -380,12 +380,19 @@
          <widget class="ctkComboBox" name="availableBox" native="true"/>
         </item>
         <item row="6" column="3">
-         <widget class="QPushButton" name="downloadModelButton">
+         <widget class="QPushButton" name="startDownloadButton">
           <property name="text">
            <string>Download</string>
           </property>
          </widget>
         </item>
+        <item row="6" column="3">
+          <widget class="QPushButton" name="stopDownloadButton">
+           <property name="text">
+            <string>Stop</string>
+           </property>
+          </widget>
+         </item>
        </layout>
       </item>
      </layout>

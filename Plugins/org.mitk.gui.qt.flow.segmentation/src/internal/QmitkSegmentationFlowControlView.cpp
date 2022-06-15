@@ -34,15 +34,23 @@ found in the LICENSE file.
 #include <QMessageBox>
 #include <QDir>
 
+#include <filesystem>
+
 const std::string QmitkSegmentationFlowControlView::VIEW_ID = "org.mitk.views.flow.control";
 
 QmitkSegmentationFlowControlView::QmitkSegmentationFlowControlView()
     : m_Parent(nullptr)
 {
-  auto nodePredicate = mitk::NodePredicateAnd::New();
-  nodePredicate->AddPredicate(mitk::TNodePredicateDataType<mitk::LabelSetImage>::New());
-  nodePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
-  m_SegmentationPredicate = nodePredicate;
+  auto notHelperObject = mitk::NodePredicateNot::New(
+    mitk::NodePredicateProperty::New("helper object"));
+
+  m_SegmentationPredicate = mitk::NodePredicateAnd::New(
+    mitk::TNodePredicateDataType<mitk::LabelSetImage>::New(),
+    notHelperObject);
+
+  m_SegmentationTaskPredicate = mitk::NodePredicateAnd::New(
+    mitk::TNodePredicateDataType<mitk::SegmentationTask>::New(),
+    notHelperObject);
 }
 
 void QmitkSegmentationFlowControlView::SetFocus()
@@ -57,8 +65,13 @@ void QmitkSegmentationFlowControlView::CreateQtPartControl(QWidget* parent)
 
   m_Parent = parent;
 
-  connect(m_Controls.btnStoreAndAccept, SIGNAL(clicked()), this, SLOT(OnAcceptButtonPushed()));
+  using Self = QmitkSegmentationFlowControlView;
 
+  connect(m_Controls.btnStoreAndAccept, &QPushButton::clicked, this, &Self::OnAcceptButtonPushed);
+  connect(m_Controls.segmentationTaskWidget, &QmitkSegmentationTaskWidget::ActiveSubtaskChanged, this, &Self::OnActiveSubtaskChanged);
+  connect(m_Controls.segmentationTaskWidget, &QmitkSegmentationTaskWidget::CurrentSubtaskChanged, this, &Self::OnCurrentSubtaskChanged);
+
+  m_Controls.segmentationTaskWidget->setVisible(false);
   m_Controls.labelStored->setVisible(false);
   UpdateControls();
 
@@ -70,35 +83,105 @@ void QmitkSegmentationFlowControlView::CreateQtPartControl(QWidget* parent)
 
 void QmitkSegmentationFlowControlView::OnAcceptButtonPushed()
 {
-  auto nodes = this->GetDataStorage()->GetSubset(m_SegmentationPredicate);
-
-  for (auto node : *nodes)
+  if (m_Controls.segmentationTaskWidget->isVisible())
   {
-    QString outputpath = m_OutputDir + "/" + QString::fromStdString(node->GetName()) + "." + m_FileExtension;
-    outputpath = QDir::toNativeSeparators(QDir::cleanPath(outputpath));
-    mitk::IOUtil::Save(node->GetData(), outputpath.toStdString());
-  }
+    auto* task = m_Controls.segmentationTaskWidget->GetTask();
 
-  m_Controls.labelStored->setVisible(true);
+    if (task != nullptr)
+    {
+      auto activeSubtaskIndex = m_Controls.segmentationTaskWidget->GetActiveSubtaskIndex();
+
+      if (activeSubtaskIndex.has_value())
+      {
+        auto segmentationNode = m_Controls.segmentationTaskWidget->GetSegmentationDataNode(activeSubtaskIndex.value());
+
+        if (segmentationNode != nullptr)
+        {
+          auto path = task->GetAbsolutePath(task->GetResult(activeSubtaskIndex.value()));
+
+          if (!path.empty())
+          {
+            QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
+
+            try
+            {
+              mitk::IOUtil::Save(segmentationNode->GetData(), path.string());
+              // TODO: Give temporarily displayed feedback to user
+            }
+            catch (const mitk::Exception&)
+            {
+            }
+
+            QApplication::restoreOverrideCursor();
+          }
+        }
+      }
+    }
+  }
+  else
+  {
+    auto nodes = this->GetDataStorage()->GetSubset(m_SegmentationPredicate);
+
+    for (auto node : *nodes)
+    {
+      QString outputpath = m_OutputDir + "/" + QString::fromStdString(node->GetName()) + "." + m_FileExtension;
+      outputpath = QDir::toNativeSeparators(QDir::cleanPath(outputpath));
+      mitk::IOUtil::Save(node->GetData(), outputpath.toStdString());
+    }
+
+    m_Controls.labelStored->setVisible(true);
+  }
+}
+
+void QmitkSegmentationFlowControlView::OnActiveSubtaskChanged(const std::optional<size_t>&)
+{
+  this->UpdateControls();
+}
+
+void QmitkSegmentationFlowControlView::OnCurrentSubtaskChanged(size_t)
+{
+  this->UpdateControls();
 }
 
 void QmitkSegmentationFlowControlView::UpdateControls()
 {
-  auto nodes = this->GetDataStorage()->GetSubset(m_SegmentationPredicate);
-  m_Controls.btnStoreAndAccept->setEnabled(!nodes->empty());
-};
+  auto dataStorage = this->GetDataStorage();
 
-void QmitkSegmentationFlowControlView::NodeAdded(const mitk::DataNode* /*node*/)
-{
-  UpdateControls();
-};
+  auto hasTask = !dataStorage->GetSubset(m_SegmentationTaskPredicate)->empty();
+  m_Controls.segmentationTaskWidget->setVisible(hasTask);
 
-void QmitkSegmentationFlowControlView::NodeChanged(const mitk::DataNode* /*node*/)
-{
-  UpdateControls();
-};
+  if (hasTask)
+  {
+    auto activeSubtaskIndex = m_Controls.segmentationTaskWidget->GetActiveSubtaskIndex();
+    auto hasActiveSubtask = activeSubtaskIndex.has_value();
 
-void QmitkSegmentationFlowControlView::NodeRemoved(const mitk::DataNode* /*node*/)
+    auto isCurrentSubtask = hasActiveSubtask
+      ? m_Controls.segmentationTaskWidget->GetCurrentSubtaskIndex() == activeSubtaskIndex.value()
+      : false;
+
+    m_Controls.btnStoreAndAccept->setEnabled(hasActiveSubtask && isCurrentSubtask);
+  }
+  else
+  {
+    auto hasSegmentation = !dataStorage->GetSubset(m_SegmentationPredicate)->empty();
+    m_Controls.btnStoreAndAccept->setEnabled(hasSegmentation);
+  }
+}
+
+void QmitkSegmentationFlowControlView::NodeAdded(const mitk::DataNode* node)
 {
-  UpdateControls();
-};
+  if (dynamic_cast<const mitk::LabelSetImage*>(node->GetData()) != nullptr)
+    this->UpdateControls();
+}
+
+void QmitkSegmentationFlowControlView::NodeChanged(const mitk::DataNode* node)
+{
+  if (dynamic_cast<const mitk::LabelSetImage*>(node->GetData()) != nullptr)
+    this->UpdateControls();
+}
+
+void QmitkSegmentationFlowControlView::NodeRemoved(const mitk::DataNode* node)
+{
+  if (dynamic_cast<const mitk::LabelSetImage*>(node->GetData()) != nullptr)
+    this->UpdateControls();
+}

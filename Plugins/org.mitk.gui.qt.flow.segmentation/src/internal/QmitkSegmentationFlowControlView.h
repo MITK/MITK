@@ -21,6 +21,8 @@ found in the LICENSE file.
 
 #include "ui_QmitkSegmentationFlowControlView.h"
 
+#include <optional>
+
 /*!
   \brief QmitkSegmentationFlowControlView
 
@@ -51,6 +53,8 @@ public:
 protected slots:
 
     void OnAcceptButtonPushed();
+    void OnActiveSubtaskChanged(const std::optional<size_t>& index);
+    void OnCurrentSubtaskChanged(size_t index);
 
 protected:
     void SetFocus() override;
@@ -66,6 +70,7 @@ protected:
 private:
     QWidget *m_Parent;
     mitk::NodePredicateBase::Pointer m_SegmentationPredicate;
+    mitk::NodePredicateBase::Pointer m_SegmentationTaskPredicate;
     QString m_OutputDir;
     QString m_FileExtension;
 };

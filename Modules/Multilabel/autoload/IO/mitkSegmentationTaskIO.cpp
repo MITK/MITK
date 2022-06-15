@@ -20,6 +20,58 @@ found in the LICENSE file.
 #include <filesystem>
 #include <fstream>
 
+namespace mitk
+{
+  void to_json(nlohmann::json& json, const SegmentationTask::Subtask& subtask)
+  {
+    const auto name = subtask.GetName();
+
+    if (!name.empty())
+      json["Name"] = name;
+
+    const auto description = subtask.GetDescription();
+
+    if (!description.empty())
+      json["Description"] = description;
+
+    const auto image = subtask.GetImage();
+
+    if (!image.empty())
+      json["Image"] = image;
+
+    const auto segmentation = subtask.GetSegmentation();
+
+    if (!segmentation.empty())
+      json["Segmentation"] = segmentation;
+
+    const auto labelName = subtask.GetLabelName();
+
+    if (!labelName.empty())
+      json["LabelName"] = labelName;
+
+    const auto preset = subtask.GetPreset();
+
+    if (!preset.empty())
+      json["Preset"] = preset;
+
+    const auto result = subtask.GetResult();
+
+    if (!result.empty())
+      json["Result"] = result;
+  }
+
+  void from_json(const nlohmann::json& json, SegmentationTask::Subtask& subtask)
+  {
+    subtask.SetName(json.value("Name", ""));
+    subtask.SetDescription(json.value("Description", ""));
+    subtask.SetImage(json.value("Image", ""));
+    subtask.SetSegmentation(json.value("Segmentation", ""));
+    subtask.SetLabelName(json.value("LabelName", ""));
+    subtask.SetPreset(json.value("Preset", ""));
+    subtask.SetResult(json.value("Result", ""));
+  }
+}
+
 mitk::SegmentationTaskIO::SegmentationTaskIO()
   : AbstractFileIO(SegmentationTask::GetStaticNameOfClass(), MitkMultilabelIOMimeTypes::SEGMENTATIONTASK_MIMETYPE(), "MITK Segmentation Task")
 {
@@ -46,10 +98,19 @@ std::vector<mitk::BaseData::Pointer> mitk::SegmentationTaskIO::DoRead()
     stream = &fileStream;
   }
 
-  auto json = nlohmann::json::parse(*stream, nullptr, false);
+  nlohmann::json json;
 
-  if (json.is_discarded() || !json.is_object())
-    mitkThrow() << "Could not parse JSON!";
+  try
+  {
+    json = nlohmann::json::parse(*stream);
+  }
+  catch (const nlohmann::json::exception& e)
+  {
+    mitkThrow() << e.what();
+  }
+
+  if (!json.is_object())
+    mitkThrow() << "Unknown file format (expected JSON object as root)!";
 
   if ("MITK Segmentation Task" != json.value("FileFormat", ""))
     mitkThrow() << "Unknown file format (expected \"MITK Segmentation Task\")!";
@@ -57,9 +118,47 @@ std::vector<mitk::BaseData::Pointer> mitk::SegmentationTaskIO::DoRead()
   if (1 != json.value<int>("Version", 0))
     mitkThrow() << "Unknown file format version (expected \"1\")!";
 
+  if (!json.contains("Subtasks") || !json["Subtasks"].is_array())
+    mitkThrow() << "Subtasks array not found!";
+
   auto segmentationTask = SegmentationTask::New();
 
-  // TODO
+  if (json.contains("Name"))
+    segmentationTask->SetProperty("name", StringProperty::New(json["Name"].get<std::string>()));
+
+  try
+  {
+    if (json.contains("Defaults"))
+    {
+      segmentationTask->SetDefaults(json["Defaults"].get<SegmentationTask::Subtask>());
+
+      if (!segmentationTask->GetDefaults().GetResult().empty())
+        mitkThrow() << "Defaults must not contain \"Result\"!";
+    }
+
+    for (const auto& subtask : json["Subtasks"])
+    {
+      auto i = segmentationTask->AddSubtask(subtask.get<SegmentationTask::Subtask>());
+
+      std::filesystem::path imagePath(segmentationTask->GetImage(i));
+
+      if (imagePath.empty())
+        mitkThrow() << "Subtask " << i << " must contain \"Image\"!";
+
+      if (imagePath.is_relative())
+        imagePath = std::filesystem::path(this->GetInputLocation()).remove_filename() / imagePath; // TODO: Does not work for loading from an MITK scene file since the input location is different!
+
+      if (!std::filesystem::exists(imagePath))
+        mitkThrow() << "Referenced image \"" << imagePath << "\" in subtask " << i << " does not exist!";
+
+      if (segmentationTask->GetResult(i).empty())
+        mitkThrow() << "Subtask " << i << " must contain \"Result\"!";
+    }
+  }
+  catch (const nlohmann::json::type_error& e)
+  {
+    mitkThrow() << e.what();
+  }
 
   std::vector<BaseData::Pointer> result;
   result.push_back(segmentationTask.GetPointer());
@@ -69,6 +168,14 @@ std::vector<mitk::BaseData::Pointer> mitk::SegmentationTaskIO::DoRead()
 
 void mitk::SegmentationTaskIO::Write()
 {
+  auto segmentationTask = dynamic_cast<const SegmentationTask*>(this->GetInput());
+
+  if (nullptr == segmentationTask)
+    mitkThrow() << "Invalid input for writing!";
+
+  if (segmentationTask->GetNumberOfSubtasks() == 0)
+    mitkThrow() << "No subtasks found!";
+
   auto* stream = this->GetOutputStream();
   std::ofstream fileStream;
 
@@ -90,12 +197,23 @@ void mitk::SegmentationTaskIO::Write()
   if (!stream->good())
     mitkThrow() << "Stream for writing is not good!";
 
-  nlohmann::json json = {
+  nlohmann::ordered_json json = {
     { "FileFormat", "MITK Segmentation Task" },
-    { "Version", 1 }
+    { "Version", 1 },
+    { "Name", segmentationTask->GetProperty("name")->GetValueAsString() }
   };
 
-  // TODO
+  nlohmann::json defaults = segmentationTask->GetDefaults();
+
+  if (!defaults.is_null())
+    json["Defaults"] = defaults;
+
+  nlohmann::json subtasks;
+
+  for (const auto& subtask : *segmentationTask)
+    subtasks.push_back(subtask);
+
+  json["Subtasks"] = subtasks;
 
   *stream << std::setw(2) << json << std::endl;
 }

@@ -33,6 +33,8 @@ namespace us
 
 namespace mitk
 {
+  class PropertyList;
+
   /**
    * \ingroup IO
    *
@@ -56,6 +58,8 @@ namespace mitk
 
       FileReaderSelector m_ReaderSelector;
       bool m_Cancel;
+
+      const PropertyList* m_Properties;
     };
 
     /**Struct that is the base class for option callbacks used in load operations. The callback is used by IOUtil, if
@@ -330,6 +334,8 @@ namespace mitk
     {
       return dynamic_cast<T*>(Load(usResource, mode).at(0).GetPointer());
     }
+
+    static BaseData::Pointer Load(const std::string& path, const PropertyList* properties);
 
     /**
      * @brief Save a mitk::BaseData instance.

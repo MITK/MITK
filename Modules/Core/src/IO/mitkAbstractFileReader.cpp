@@ -57,6 +57,8 @@ namespace mitk
 
     us::PrototypeServiceFactory *m_PrototypeFactory;
     us::ServiceRegistration<IFileReader> m_Reg;
+
+    const PropertyList* m_Properties;
   };
 
   AbstractFileReader::AbstractFileReader() : d(new Impl) {}
@@ -285,6 +287,16 @@ namespace mitk
   void AbstractFileReader::RemoveProgressCallback(const ProgressCallback &callback)
   {
     d->RemoveProgressCallback(callback);
+  }
+
+  void AbstractFileReader::SetProperties(const PropertyList* properties)
+  {
+    d->m_Properties = properties;
+  }
+
+  const PropertyList* AbstractFileReader::GetProperties() const
+  {
+    return d->m_Properties;
   }
 
   ////////////////// µS related Getters //////////////////

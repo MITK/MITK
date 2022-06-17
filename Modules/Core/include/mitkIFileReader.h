@@ -21,6 +21,7 @@ found in the LICENSE file.
 namespace mitk
 {
   class BaseData;
+  class PropertyList;
 }
 
 namespace itk
@@ -122,6 +123,30 @@ namespace mitk
      * @return A list of files that were loaded during the last call of Read.
      */
     virtual std::vector< std::string > GetReadFiles() = 0;
+
+    /**
+     * \brief Optionally provide base data properties as a source of meta data.
+     *
+     * The purpose of this method is not to preset the base data property list
+     * of the read data but to provide access to meta data of previous read
+     * operations that may be beneficial for the new read operation.
+     *
+     * A typical usecase may occur when reading files from an MITK scene file
+     * in which case base data properties are already provided in addition to
+     * the actual data file. If such a data file references other files
+     * relative to its original location on the filesystem, the original
+     * location can be retrieved from the base data properties. In this
+     * scenario, GetInputLocation() would return a path within a temporary
+     * directory in which the scene file has been extracted. This is not the
+     * intended base path for searching referenced external data files.
+     */
+    virtual void SetProperties(const PropertyList* properties) = 0;
+
+  protected:
+
+    /** \sa SetProperties().
+     */
+    virtual const PropertyList* GetProperties() const = 0;
   };
 
 } // namespace mitk

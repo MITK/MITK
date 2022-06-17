@@ -103,7 +103,7 @@ namespace mitk
 
     std::string location = GetInputLocation();
 
-    auto DICOMTagsOfInterestService = GetDicomTagsOfInterestService();
+    auto DICOMTagsOfInterestService = DICOMIOHelper::GetTagsOfInterestService();
     auto tagsOfInterest = DICOMTagsOfInterestService->GetTagsOfInterest();
     DICOMTagPathList tagsOfInterestList;
     for (const auto& tag : tagsOfInterest) {
@@ -121,7 +121,7 @@ namespace mitk
       return result;
     }
 
-    auto findings = ExtractPathsOfInterest(tagsOfInterestList, frames);
+    auto findings = DICOMIOHelper::ExtractPathsOfInterest(tagsOfInterestList, frames);
 
     DcmFileFormat file;
     OFCondition output = file.loadFile(location.c_str(), EXS_Unknown);
@@ -274,7 +274,7 @@ namespace mitk
       result.at(result.size() - 1)->SetProperty("name", aROI.ContourModelSet->GetProperty("name"));
       result.at(result.size() - 1)->SetProperty("color", aROI.ContourModelSet->GetProperty("contour.color"));
       result.at(result.size() - 1)->SetProperty("contour.color", aROI.ContourModelSet->GetProperty("contour.color"));
-      SetProperties(result.at(result.size() - 1).GetPointer(), findings);
+      DICOMIOHelper::SetProperties(result.at(result.size() - 1).GetPointer(), findings);
     }
 
     return result;

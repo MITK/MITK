@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkDICOMIOHelper.h"
+#include <mitkDICOMIOHelper.h>
 
 #include <mitkImage.h>
 #include <mitkTemporoSpatialStringProperty.h>
@@ -18,53 +18,52 @@ found in the LICENSE file.
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
 
-namespace mitk
+namespace mitk::DICOMIOHelper
 {
-  mitk::IDICOMTagsOfInterest *GetDicomTagsOfInterestService()
+  IDICOMTagsOfInterest* GetTagsOfInterestService()
   {
-    mitk::IDICOMTagsOfInterest *result = nullptr;
+    auto* context = us::GetModuleContext();
 
-    us::ModuleContext *context = us::GetModuleContext();
     if (context == nullptr)
     {
       MITK_WARN << "No MitkDICOM module context found.";
-      return result;
+      return nullptr;
     }
-    std::vector<us::ServiceReference<mitk::IDICOMTagsOfInterest>> toiRegisters =
-      context->GetServiceReferences<mitk::IDICOMTagsOfInterest>();
+
+    auto toiRegisters = context->GetServiceReferences<mitk::IDICOMTagsOfInterest>();
+
     if (!toiRegisters.empty())
     {
       if (toiRegisters.size() > 1)
-      {
         MITK_WARN << "Multiple DICOM tags of interest services found. Using just one.";
-      }
-      result = us::GetModuleContext()->GetService<mitk::IDICOMTagsOfInterest>(toiRegisters.front());
+
+      return us::GetModuleContext()->GetService<mitk::IDICOMTagsOfInterest>(toiRegisters.front());
     }
 
-    return result;
+    return nullptr;
   }
 
-  FindingsListVectorType ExtractPathsOfInterest(const DICOMTagPathList &pathsOfInterest,
-                                                const DICOMDatasetAccessingImageFrameList &frames)
+  FindingsListVectorType ExtractPathsOfInterest(const DICOMTagPathList& pathsOfInterest,
+                                                const DICOMDatasetAccessingImageFrameList& frames)
   {
-    std::vector<mitk::DICOMDatasetAccess::FindingsListType> findings;
-    for (const auto &entry : pathsOfInterest)
-    {
+    std::vector<DICOMDatasetAccess::FindingsListType> findings;
+
+    for (const auto& entry : pathsOfInterest)
       findings.push_back(frames.front()->GetTagValueAsString(entry));
-    }
+
     return findings;
   }
 
-  void SetProperties(BaseDataPointer image, const FindingsListVectorType &findings)
+  void SetProperties(BaseData* image, const FindingsListVectorType& findings)
   {
-    for (const auto &finding : findings)
+    for (const auto& finding : findings)
     {
-      for (const auto &entry : finding)
+      for (const auto& entry : finding)
       {
-        const std::string propertyName = mitk::DICOMTagPathToPropertyName(entry.path);
-        auto property = mitk::TemporoSpatialStringProperty::New();
+        auto property = TemporoSpatialStringProperty::New();
         property->SetValue(entry.value);
-        image->SetProperty(propertyName.c_str(), property);
+
+        image->SetProperty(DICOMTagPathToPropertyName(entry.path), property);
       }
     }
   }

@@ -73,7 +73,7 @@ namespace mitk
     std::vector<itk::SmartPointer<mitk::BaseData> > result;
 
 
-    mitk::IDICOMTagsOfInterest* toiSrv = GetDicomTagsOfInterestService();
+    mitk::IDICOMTagsOfInterest* toiSrv = DICOMIOHelper::GetTagsOfInterestService();
 
     auto tagsOfInterest = toiSrv->GetTagsOfInterest();
 
@@ -157,8 +157,8 @@ namespace mitk
 
     this->scaledDoseImage->SetPropertyList(originalImage->GetPropertyList());
     this->scaledDoseImage->SetProperty(mitk::RTConstants::PRESCRIBED_DOSE_PROPERTY_NAME.c_str(), mitk::DoubleProperty::New(0.8*maxDose));
-    auto findings = ExtractPathsOfInterest(tagsOfInterestList, frames);
-    SetProperties(this->scaledDoseImage, findings);
+    auto findings = DICOMIOHelper::ExtractPathsOfInterest(tagsOfInterestList, frames);
+    DICOMIOHelper::SetProperties(this->scaledDoseImage, findings);
 
     result.push_back(this->scaledDoseImage.GetPointer());
     return result;

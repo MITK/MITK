@@ -403,7 +403,7 @@ namespace mitk
       labelSetImage->GetLabelSet()->SetAllLabelsVisible(true);
 
       // Add some general DICOM Segmentation properties
-      mitk::IDICOMTagsOfInterest *toiSrv = GetDicomTagsOfInterestService();
+      mitk::IDICOMTagsOfInterest *toiSrv = DICOMIOHelper::GetTagsOfInterestService();
       auto tagsOfInterest = toiSrv->GetTagsOfInterest();
       DICOMTagPathList tagsOfInterestList;
       for (const auto &tag : tagsOfInterest)
@@ -423,8 +423,8 @@ namespace mitk
         return result;
       }
 
-      auto findings = ExtractPathsOfInterest(tagsOfInterestList, frames);
-      SetProperties(labelSetImage, findings);
+      auto findings = DICOMIOHelper::ExtractPathsOfInterest(tagsOfInterestList, frames);
+      DICOMIOHelper::SetProperties(labelSetImage, findings);
 
       // Set active layer to the first layer of the labelset image
       if (labelSetImage->GetNumberOfLayers() > 1 && labelSetImage->GetActiveLayer() != 0)

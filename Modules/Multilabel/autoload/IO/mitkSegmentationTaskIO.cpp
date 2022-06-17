@@ -146,7 +146,21 @@ std::vector<mitk::BaseData::Pointer> mitk::SegmentationTaskIO::DoRead()
         mitkThrow() << "Subtask " << i << " must contain \"Image\"!";
 
       if (imagePath.is_relative())
-        imagePath = std::filesystem::path(this->GetInputLocation()).remove_filename() / imagePath; // TODO: Does not work for loading from an MITK scene file since the input location is different!
+      {
+        auto inputLocation = this->GetInputLocation();
+
+        /* If we have access to properties, we are reading from an MITK scene
+         * file. In this case, paths are still relative to the original input
+         * location, which is preserved in the properties.
+         */
+
+        const auto* properties = this->GetProperties();
+
+        if (properties != nullptr)
+          properties->GetStringProperty("MITK.IO.reader.inputlocation", inputLocation);
+
+        imagePath = std::filesystem::path(inputLocation).remove_filename() / imagePath;
+      }
 
       if (!std::filesystem::exists(imagePath))
         mitkThrow() << "Referenced image \"" << imagePath << "\" in subtask " << i << " does not exist!";

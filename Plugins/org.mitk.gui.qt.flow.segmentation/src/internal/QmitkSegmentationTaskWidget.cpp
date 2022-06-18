@@ -140,6 +140,7 @@ size_t QmitkSegmentationTaskWidget::GetCurrentSubtaskIndex() const
  */
 void QmitkSegmentationTaskWidget::OnSelectionChanged(const QmitkSingleNodeSelectionWidget::NodeList& nodes)
 {
+  this->UnloadSubtasks();
   this->ResetControls();
 
   if (!nodes.empty())
@@ -154,9 +155,7 @@ void QmitkSegmentationTaskWidget::OnSelectionChanged(const QmitkSingleNodeSelect
     }
   }
 
-  this->UnloadSubtasks();
   this->SetTask(nullptr);
-
   m_TaskNode = nullptr;
 }
 
@@ -446,16 +445,19 @@ mitk::DataNode* QmitkSegmentationTaskWidget::GetSegmentationDataNode(size_t inde
  */
 void QmitkSegmentationTaskWidget::UnloadSubtasks(const mitk::DataNode* skip)
 {
-  mitk::DataStorage::Pointer dataStorage = GetDataStorage();
-
-  auto imageNodes = dataStorage->GetDerivations(m_TaskNode, mitk::TNodePredicateDataType<mitk::Image>::New());
-
-  for (auto imageNode : *imageNodes)
+  if (m_TaskNode.IsNotNull())
   {
-    dataStorage->Remove(dataStorage->GetDerivations(imageNode, nullptr, false));
+    mitk::DataStorage::Pointer dataStorage = GetDataStorage();
 
-    if (imageNode != skip)
-      dataStorage->Remove(imageNode);
+    auto imageNodes = dataStorage->GetDerivations(m_TaskNode, mitk::TNodePredicateDataType<mitk::Image>::New());
+
+    for (auto imageNode : *imageNodes)
+    {
+      dataStorage->Remove(dataStorage->GetDerivations(imageNode, nullptr, false));
+
+      if (imageNode != skip)
+        dataStorage->Remove(imageNode);
+    }
   }
 
   this->SetActiveSubtaskIndex(std::nullopt);

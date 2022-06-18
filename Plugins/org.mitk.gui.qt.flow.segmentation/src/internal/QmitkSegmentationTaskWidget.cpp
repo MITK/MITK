@@ -144,7 +144,8 @@ void QmitkSegmentationTaskWidget::OnSelectionChanged(const QmitkSingleNodeSelect
 
   if (!nodes.empty())
   {
-    auto task = dynamic_cast<mitk::SegmentationTask*>(nodes.front()->GetData());
+    m_TaskNode = nodes.front();
+    auto task = dynamic_cast<mitk::SegmentationTask*>(m_TaskNode->GetData());
 
     if (task != nullptr)
     {
@@ -153,7 +154,10 @@ void QmitkSegmentationTaskWidget::OnSelectionChanged(const QmitkSingleNodeSelect
     }
   }
 
+  this->UnloadSubtasks();
   this->SetTask(nullptr);
+
+  m_TaskNode = nullptr;
 }
 
 /* Reset all controls to a default state as a common basis for further
@@ -409,10 +413,9 @@ void QmitkSegmentationTaskWidget::OnLoadButtonClicked()
  */
 mitk::DataNode* QmitkSegmentationTaskWidget::GetImageDataNode(size_t index) const
 {
-  auto taskNode = m_Ui->selectionWidget->GetSelectedNode();
   const auto imagePath = m_Task->GetAbsolutePath(m_Task->GetImage(index));
 
-  auto imageNodes = GetDataStorage()->GetDerivations(taskNode, mitk::NodePredicateFunction::New([imagePath](const mitk::DataNode* node) {
+  auto imageNodes = GetDataStorage()->GetDerivations(m_TaskNode, mitk::NodePredicateFunction::New([imagePath](const mitk::DataNode* node) {
     return imagePath == GetInputLocation(node->GetData());
   }));
 
@@ -444,9 +447,8 @@ mitk::DataNode* QmitkSegmentationTaskWidget::GetSegmentationDataNode(size_t inde
 void QmitkSegmentationTaskWidget::UnloadSubtasks(const mitk::DataNode* skip)
 {
   mitk::DataStorage::Pointer dataStorage = GetDataStorage();
-  auto taskNode = m_Ui->selectionWidget->GetSelectedNode();
 
-  auto imageNodes = dataStorage->GetDerivations(taskNode, mitk::TNodePredicateDataType<mitk::Image>::New());
+  auto imageNodes = dataStorage->GetDerivations(m_TaskNode, mitk::TNodePredicateDataType<mitk::Image>::New());
 
   for (auto imageNode : *imageNodes)
   {
@@ -468,7 +470,6 @@ void QmitkSegmentationTaskWidget::UnloadSubtasks(const mitk::DataNode* skip)
 void QmitkSegmentationTaskWidget::LoadSubtask(mitk::DataNode::Pointer imageNode)
 {
   mitk::DataStorage::Pointer dataStorage = GetDataStorage();
-  auto taskNode = m_Ui->selectionWidget->GetSelectedNode();
 
   const auto imagePath = m_Task->GetAbsolutePath(m_Task->GetImage(m_CurrentSubtaskIndex));
   mitk::Image::Pointer image;
@@ -507,7 +508,7 @@ void QmitkSegmentationTaskWidget::LoadSubtask(mitk::DataNode::Pointer imageNode)
     imageNode = mitk::DataNode::New();
     imageNode->SetData(image);
 
-    dataStorage->Add(imageNode, taskNode);
+    dataStorage->Add(imageNode, m_TaskNode);
 
     mitk::RenderingManager::GetInstance()->InitializeViews(image->GetTimeGeometry());
   }

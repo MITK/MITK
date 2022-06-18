@@ -70,6 +70,7 @@ private:
   Ui::QmitkSegmentationTaskWidget* m_Ui;
   QFileSystemWatcher* m_FileSystemWatcher;
   mitk::SegmentationTask::Pointer m_Task;
+  mitk::DataNode::Pointer m_TaskNode;
   size_t m_CurrentSubtaskIndex;
   std::optional<size_t> m_ActiveSubtaskIndex;
 };

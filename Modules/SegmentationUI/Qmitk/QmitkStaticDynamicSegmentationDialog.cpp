@@ -12,9 +12,7 @@ found in the LICENSE file.
 
 #include "QmitkStaticDynamicSegmentationDialog.h"
 
-#include <mitkImageTimeSelector.h>
-#include <mitkRenderingManager.h>
-#include <mitkSliceNavigationController.h>
+#include <mitkSegmentationHelper.h>
 
 #include <QPushButton>
 
@@ -41,13 +39,6 @@ void QmitkStaticDynamicSegmentationDialog::SetReferenceImage(const mitk::Image* 
 {
   m_ReferenceImage = referenceImage;
   m_SegmentationTemplate = referenceImage;
-
-  const auto currentTimePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
-  m_ImageTimeStep = 0;
-  if (m_ReferenceImage->GetTimeGeometry()->IsValidTimePoint(currentTimePoint))
-  {
-    m_ImageTimeStep = m_ReferenceImage->GetTimeGeometry()->TimePointToTimeStep(currentTimePoint);
-  }
 }
 
 mitk::Image::ConstPointer QmitkStaticDynamicSegmentationDialog::GetSegmentationTemplate() const
@@ -57,19 +48,5 @@ mitk::Image::ConstPointer QmitkStaticDynamicSegmentationDialog::GetSegmentationT
 
 void QmitkStaticDynamicSegmentationDialog::OnStaticButtonClicked(bool /*checked*/)
 {
-  auto selector = mitk::ImageTimeSelector::New();
-  selector->SetInput(m_ReferenceImage);
-  selector->SetTimeNr(m_ImageTimeStep);
-  selector->Update();
-  mitk::Image::Pointer newImage = selector->GetOutput();
-
-  const auto referenceTimeGeometry = m_ReferenceImage->GetTimeGeometry();
-  auto timeGeometry = mitk::ProportionalTimeGeometry::New();
-  timeGeometry->SetFirstTimePoint(referenceTimeGeometry->GetMinimumTimePoint());
-  timeGeometry->SetStepDuration(referenceTimeGeometry->GetMaximumTimePoint() - referenceTimeGeometry->GetMinimumTimePoint());
-  timeGeometry->SetTimeStepGeometry(m_ReferenceImage->GetGeometry(m_ImageTimeStep), 0);
-
-  newImage->SetTimeGeometry(timeGeometry);
-
-  m_SegmentationTemplate = newImage;
+  m_SegmentationTemplate = mitk::SegmentationHelper::GetStaticSegmentationTemplate(m_ReferenceImage);
 }

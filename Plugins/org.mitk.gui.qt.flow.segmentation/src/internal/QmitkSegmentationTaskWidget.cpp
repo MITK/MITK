@@ -20,6 +20,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateFunction.h>
 #include <mitkRenderingManager.h>
+#include <mitkSegmentationHelper.h>
 
 #include <QmitkStaticDynamicSegmentationDialog.h>
 #include <QmitkStyleManager.h>
@@ -320,7 +321,8 @@ void QmitkSegmentationTaskWidget::OnSubtaskChanged()
  */
 void QmitkSegmentationTaskWidget::UpdateLoadButton()
 {
-  bool active = m_ActiveSubtaskIndex.has_value() && m_ActiveSubtaskIndex.value() == m_CurrentSubtaskIndex;
+  const auto i = m_CurrentSubtaskIndex;
+  bool active = m_ActiveSubtaskIndex.has_value() && m_ActiveSubtaskIndex.value() == i;
 
   auto text = !active
     ? QStringLiteral("Load subtask")
@@ -328,12 +330,10 @@ void QmitkSegmentationTaskWidget::UpdateLoadButton()
 
   if (m_Task.IsNotNull())
   {
-    text += QString(" %1/%2").arg(m_CurrentSubtaskIndex + 1).arg(m_Task->GetNumberOfSubtasks());
+    text += QString(" %1/%2").arg(i + 1).arg(m_Task->GetNumberOfSubtasks());
 
-    const auto subtaskName = m_Task->GetName(m_CurrentSubtaskIndex);
-
-    if (!subtaskName.empty())
-      text += QStringLiteral(":\n") + QString::fromStdString(subtaskName);
+    if (m_Task->HasName(i))
+      text += QStringLiteral(":\n") + QString::fromStdString(m_Task->GetName(i));
   }
 
   m_Ui->loadButton->setDisabled(active);
@@ -346,8 +346,9 @@ void QmitkSegmentationTaskWidget::UpdateLoadButton()
  */
 void QmitkSegmentationTaskWidget::UpdateDetailsLabel()
 {
-  bool active = m_ActiveSubtaskIndex.has_value() && m_ActiveSubtaskIndex.value() == m_CurrentSubtaskIndex;
-  bool isDone = m_Task->IsDone(m_CurrentSubtaskIndex);
+  const auto i = m_CurrentSubtaskIndex;
+  bool active = m_ActiveSubtaskIndex.has_value() && m_ActiveSubtaskIndex.value() == i;
+  bool isDone = m_Task->IsDone(i);
 
   auto details = QString("<p><b>Status: %1</b> / <b>").arg(active
     ? ColorString("Active", Qt::white, QColor(Qt::green).darker())
@@ -357,32 +358,25 @@ void QmitkSegmentationTaskWidget::UpdateDetailsLabel()
     ? ColorString("Done", Qt::white, QColor(Qt::green).darker())
     : ColorString("Undone", Qt::white, QColor(Qt::red).darker()));
 
-  const auto description = m_Task->GetDescription(m_CurrentSubtaskIndex);
-
-  if (!description.empty())
-    details += QString("<p><b>Description:</b> %1</p>").arg(QString::fromStdString(description));
+  if (m_Task->HasDescription(i))
+    details += QString("<p><b>Description:</b> %1</p>").arg(QString::fromStdString(m_Task->GetDescription(i)));
 
   QStringList stringList;
 
-  const auto image = m_Task->GetImage(m_CurrentSubtaskIndex);
+  if (m_Task->HasImage(i))
+    stringList << QString("<b>Image:</b> %1").arg(QString::fromStdString(m_Task->GetImage(i)));
 
-  if (!image.empty())
-    stringList << QString("<b>Image:</b> %1").arg(QString::fromStdString(image));
+  if (m_Task->HasSegmentation(i))
+    stringList << QString("<b>Segmentation:</b> %1").arg(QString::fromStdString(m_Task->GetSegmentation(i)));
 
-  const auto segmentation = m_Task->GetSegmentation(m_CurrentSubtaskIndex);
+  if (m_Task->HasLabelName(i))
+    stringList << QString("<b>Label name:</b> %1").arg(QString::fromStdString(m_Task->GetLabelName(i)));
 
-  if (!segmentation.empty())
-    stringList << QString("<b>Segmentation:</b> %1").arg(QString::fromStdString(segmentation));
+  if (m_Task->HasPreset(i))
+    stringList << QString("<b>Label set preset:</b> %1").arg(QString::fromStdString(m_Task->GetPreset(i)));
 
-  const auto labelName = m_Task->GetLabelName(m_CurrentSubtaskIndex);
-
-  if (!labelName.empty())
-    stringList << QString("<b>Label name:</b> %1").arg(QString::fromStdString(labelName));
-
-  const auto preset = m_Task->GetPreset(m_CurrentSubtaskIndex);
-
-  if (!preset.empty())
-    stringList << QString("<b>Label set preset:</b> %1").arg(QString::fromStdString(preset));
+  if (m_Task->HasDynamic(i))
+    stringList << QString("<b>Segmentation type:</b> %1").arg(m_Task->GetDynamic(i) ? "Dynamic" : "Static");
 
   if (!stringList.empty())
     details += QString("<p>%1</p>").arg(stringList.join(QStringLiteral("<br>")));
@@ -471,39 +465,38 @@ void QmitkSegmentationTaskWidget::UnloadSubtasks(const mitk::DataNode* skip)
  */
 void QmitkSegmentationTaskWidget::LoadSubtask(mitk::DataNode::Pointer imageNode)
 {
-  mitk::DataStorage::Pointer dataStorage = GetDataStorage();
+  const auto i = m_CurrentSubtaskIndex;
 
-  const auto imagePath = m_Task->GetAbsolutePath(m_Task->GetImage(m_CurrentSubtaskIndex));
   mitk::Image::Pointer image;
-
-  const auto resultPath = m_Task->GetAbsolutePath(m_Task->GetResult(m_CurrentSubtaskIndex));
-
-  const auto segmentationPath = m_Task->GetAbsolutePath(m_Task->GetSegmentation(m_CurrentSubtaskIndex));
   mitk::LabelSetImage::Pointer segmentation;
-  mitk::DataNode::Pointer segmentationNode;
-
-  const auto labelName = m_Task->GetLabelName(m_CurrentSubtaskIndex);
-
-  const auto presetPath = m_Task->GetAbsolutePath(m_Task->GetPreset(m_CurrentSubtaskIndex));
 
   try
   {
     if (imageNode.IsNull())
-      image = mitk::IOUtil::Load<mitk::Image>(imagePath.string());
-
-    if (std::filesystem::exists(resultPath))
     {
-      segmentation = mitk::IOUtil::Load<mitk::LabelSetImage>(resultPath.string());
+      const auto path = m_Task->GetAbsolutePath(m_Task->GetImage(i));
+      image = mitk::IOUtil::Load<mitk::Image>(path.string());
     }
-    else if (!segmentationPath.empty())
+
+    if (m_Task->HasResult(i))
     {
-      segmentation = mitk::IOUtil::Load<mitk::LabelSetImage>(segmentationPath.string());
+      const auto path = m_Task->GetAbsolutePath(m_Task->GetResult(i));
+
+      if (std::filesystem::exists(path))
+        segmentation = mitk::IOUtil::Load<mitk::LabelSetImage>(path.string());
+    }
+    else if (m_Task->HasSegmentation(i))
+    {
+      const auto path = m_Task->GetAbsolutePath(m_Task->GetSegmentation(i));
+      segmentation = mitk::IOUtil::Load<mitk::LabelSetImage>(path.string());
     }
   }
   catch (const mitk::Exception&)
   {
     return;
   }
+
+  auto dataStorage = GetDataStorage();
 
   if (imageNode.IsNull())
   {
@@ -519,10 +512,8 @@ void QmitkSegmentationTaskWidget::LoadSubtask(mitk::DataNode::Pointer imageNode)
     image = static_cast<mitk::Image*>(imageNode->GetData());
   }
 
-  auto imageName = "Subtask " + std::to_string(m_CurrentSubtaskIndex + 1);
-  imageNode->SetName(imageName);
-
-  auto segmentationName = imageName;
+  auto name = "Subtask " + std::to_string(i + 1);
+  imageNode->SetName(name);
 
   if (segmentation.IsNull())
   {
@@ -530,26 +521,35 @@ void QmitkSegmentationTaskWidget::LoadSubtask(mitk::DataNode::Pointer imageNode)
 
     if (templateImage->GetDimension() > 3)
     {
-      QmitkStaticDynamicSegmentationDialog dialog(this);
-      dialog.SetReferenceImage(templateImage);
-      dialog.exec();
+      if (m_Task->HasDynamic(i))
+      {
+        if (!m_Task->GetDynamic(i))
+          templateImage = mitk::SegmentationHelper::GetStaticSegmentationTemplate(image);
+      }
+      else
+      {
+        QmitkStaticDynamicSegmentationDialog dialog(this);
+        dialog.SetReferenceImage(templateImage);
+        dialog.exec();
 
-      templateImage = dialog.GetSegmentationTemplate();
+        templateImage = dialog.GetSegmentationTemplate();
+      }
     }
 
-    segmentationNode = mitk::LabelSetImageHelper::CreateNewSegmentationNode(imageNode, templateImage, segmentationName);
+    auto segmentationNode = mitk::LabelSetImageHelper::CreateNewSegmentationNode(imageNode, templateImage, name);
     segmentation = static_cast<mitk::LabelSetImage*>(segmentationNode->GetData());
 
-    if (!presetPath.empty())
+    if (m_Task->HasPreset(i))
     {
-      mitk::LabelSetIOHelper::LoadLabelSetImagePreset(presetPath.string(), segmentation);
+      const auto path = m_Task->GetAbsolutePath(m_Task->GetPreset(i));
+      mitk::LabelSetIOHelper::LoadLabelSetImagePreset(path.string(), segmentation);
     }
     else
     {
       auto label = mitk::LabelSetImageHelper::CreateNewLabel(segmentation);
 
-      if (!labelName.empty())
-        label->SetName(labelName);
+      if (m_Task->HasLabelName(i))
+        label->SetName(m_Task->GetLabelName(i));
 
       segmentation->GetActiveLabelSet()->AddLabel(label);
     }
@@ -558,14 +558,14 @@ void QmitkSegmentationTaskWidget::LoadSubtask(mitk::DataNode::Pointer imageNode)
   }
   else
   {
-    segmentationNode = mitk::DataNode::New();
-    segmentationNode->SetName(segmentationName);
+    auto segmentationNode = mitk::DataNode::New();
+    segmentationNode->SetName(name);
     segmentationNode->SetData(segmentation);
 
     dataStorage->Add(segmentationNode, imageNode);
   }
 
-  this->SetActiveSubtaskIndex(m_CurrentSubtaskIndex);
+  this->SetActiveSubtaskIndex(i);
 }
 
 void QmitkSegmentationTaskWidget::SetActiveSubtaskIndex(const std::optional<size_t>& index)

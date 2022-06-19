@@ -13,37 +13,49 @@ found in the LICENSE file.
 #ifndef mitkSegmentationTaskMacros_h
 #define mitkSegmentationTaskMacros_h
 
-#define mitkSubtaskGetMacro(x) \
-  std::string Get##x() const { \
-    if (!m_##x.empty()) return m_##x; \
-    if (m_Defaults != nullptr) return m_Defaults->Get##x(); \
-    return ""; \
+#define mitkSegmentationSubtaskHasValueMacro(name) \
+  bool Has##name() const { \
+    return m_##name.has_value(); \
   }
 
-#define mitkSubtaskSetMacro(x) \
-  void Set##x(const std::string& value) { \
-    m_##x = value; \
+#define mitkSegmentationSubtaskGetValueMacro(type, name) \
+  type Get##name() const { \
+    if (m_##name.has_value()) return m_##name.value(); \
+    if (m_Defaults != nullptr && m_Defaults->m_##name.has_value()) return m_Defaults->m_##name.value(); \
+    return type(); \
   }
 
-#define mitkSubtaskValueMacro(x) \
+#define mitkSegmentationSubtaskSetValueMacro(type, name) \
+  void Set##name(const type& value) { \
+    m_##name = value; \
+  }
+
+#define mitkSegmentationSubtaskValueMacro(type, name) \
   public: \
-    mitkSubtaskGetMacro(x) \
-    mitkSubtaskSetMacro(x) \
+    mitkSegmentationSubtaskHasValueMacro(name) \
+    mitkSegmentationSubtaskGetValueMacro(type, name) \
+    mitkSegmentationSubtaskSetValueMacro(type, name) \
   private: \
-    std::string m_##x;
+    std::optional<type> m_##name;
 
-#define mitkTaskGetMacro(x) \
-  std::string Get##x(size_t index) const { \
-    return index < m_Subtasks.size() ? m_Subtasks[index].Get##x() : ""; \
+#define mitkSegmentationTaskGetValueMacro(type, name) \
+  type Get##name(size_t index) const { \
+    return index < m_Subtasks.size() ? m_Subtasks[index].Get##name() : type(); \
   }
 
-#define mitkTaskSetDefaultMacro(x) \
-  void SetDefault##x(const std::string& value) { \
-    m_Defaults.Set##x(value); \
+#define mitkSegmentationTaskHasValueMacro(name) \
+  bool Has##name(size_t index) const { \
+    return index < m_Subtasks.size() && (m_Subtasks[index].Has##name() || m_Defaults.Has##name()); \
   }
 
-#define mitkTaskValueMacro(x) \
-  mitkTaskGetMacro(x) \
-  mitkTaskSetDefaultMacro(x)
+#define mitkSegmentationTaskSetDefaultMacro(type, name) \
+  void SetDefault##name(const type& value) { \
+    m_Defaults.Set##name(value); \
+  }
+
+#define mitkSegmentationTaskValueMacro(type, name) \
+  mitkSegmentationTaskHasValueMacro(name) \
+  mitkSegmentationTaskGetValueMacro(type, name) \
+  mitkSegmentationTaskSetDefaultMacro(type, name)
 
 #endif

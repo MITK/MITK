@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <MitkMultilabelExports.h>
 
 #include <filesystem>
+#include <optional>
 
 namespace mitk
 {
@@ -33,13 +34,14 @@ namespace mitk
 
       void SetDefaults(const Subtask* defaults);
 
-      mitkSubtaskValueMacro(Name)
-      mitkSubtaskValueMacro(Description)
-      mitkSubtaskValueMacro(Image)
-      mitkSubtaskValueMacro(Segmentation)
-      mitkSubtaskValueMacro(LabelName)
-      mitkSubtaskValueMacro(Preset)
-      mitkSubtaskValueMacro(Result)
+      mitkSegmentationSubtaskValueMacro(std::string, Name)
+      mitkSegmentationSubtaskValueMacro(std::string, Description)
+      mitkSegmentationSubtaskValueMacro(std::string, Image)
+      mitkSegmentationSubtaskValueMacro(std::string, Segmentation)
+      mitkSegmentationSubtaskValueMacro(std::string, LabelName)
+      mitkSegmentationSubtaskValueMacro(std::string, Preset)
+      mitkSegmentationSubtaskValueMacro(std::string, Result)
+      mitkSegmentationSubtaskValueMacro(bool, Dynamic)
 
     private:
       const Subtask* m_Defaults;
@@ -49,13 +51,14 @@ namespace mitk
     itkFactorylessNewMacro(Self)
     itkCloneMacro(Self)
 
-    mitkTaskValueMacro(Name)
-    mitkTaskValueMacro(Description)
-    mitkTaskValueMacro(Image)
-    mitkTaskValueMacro(Segmentation)
-    mitkTaskValueMacro(LabelName)
-    mitkTaskValueMacro(Preset)
-    mitkTaskValueMacro(Result)
+    mitkSegmentationTaskValueMacro(std::string, Name)
+    mitkSegmentationTaskValueMacro(std::string, Description)
+    mitkSegmentationTaskValueMacro(std::string, Image)
+    mitkSegmentationTaskValueMacro(std::string, Segmentation)
+    mitkSegmentationTaskValueMacro(std::string, LabelName)
+    mitkSegmentationTaskValueMacro(std::string, Preset)
+    mitkSegmentationTaskValueMacro(std::string, Result)
+    mitkSegmentationTaskValueMacro(bool, Dynamic)
 
     size_t GetNumberOfSubtasks() const;
     size_t AddSubtask(const Subtask& subtask);

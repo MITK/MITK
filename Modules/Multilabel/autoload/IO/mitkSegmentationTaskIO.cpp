@@ -24,51 +24,72 @@ namespace mitk
 {
   void to_json(nlohmann::json& json, const SegmentationTask::Subtask& subtask)
   {
-    const auto name = subtask.GetName();
+    if (subtask.HasName())
+      json["Name"] = subtask.GetName();
 
-    if (!name.empty())
-      json["Name"] = name;
+    if (subtask.HasDescription())
+      json["Description"] = subtask.GetDescription();
 
-    const auto description = subtask.GetDescription();
+    if (subtask.HasImage())
+      json["Image"] = subtask.GetImage();
 
-    if (!description.empty())
-      json["Description"] = description;
+    if (subtask.HasSegmentation())
+      json["Segmentation"] = subtask.GetSegmentation();
 
-    const auto image = subtask.GetImage();
+    if (subtask.HasLabelName())
+      json["LabelName"] = subtask.GetLabelName();
 
-    if (!image.empty())
-      json["Image"] = image;
+    if (subtask.HasPreset())
+      json["Preset"] = subtask.GetPreset();
 
-    const auto segmentation = subtask.GetSegmentation();
+    if (subtask.HasResult())
+      json["Result"] = subtask.GetResult();
 
-    if (!segmentation.empty())
-      json["Segmentation"] = segmentation;
-
-    const auto labelName = subtask.GetLabelName();
-
-    if (!labelName.empty())
-      json["LabelName"] = labelName;
-
-    const auto preset = subtask.GetPreset();
-
-    if (!preset.empty())
-      json["Preset"] = preset;
-
-    const auto result = subtask.GetResult();
-
-    if (!result.empty())
-      json["Result"] = result;
+    if (subtask.HasDynamic())
+      json["Dynamic"] = subtask.GetDynamic();
   }
 
   void from_json(const nlohmann::json& json, SegmentationTask::Subtask& subtask)
   {
-    subtask.SetName(json.value("Name", ""));
-    subtask.SetDescription(json.value("Description", ""));
-    subtask.SetImage(json.value("Image", ""));
-    subtask.SetSegmentation(json.value("Segmentation", ""));
-    subtask.SetLabelName(json.value("LabelName", ""));
-    subtask.SetPreset(json.value("Preset", ""));
-    subtask.SetResult(json.value("Result", ""));
+    auto iter = json.find("Name");
+
+    if (iter != json.end())
+      subtask.SetName(json["Name"].get<std::string>());
+
+    iter = json.find("Description");
+
+    if (iter != json.end())
+      subtask.SetDescription(json["Description"].get<std::string>());
+
+    iter = json.find("Image");
+
+    if (iter != json.end())
+      subtask.SetImage(json["Image"].get<std::string>());
+
+    iter = json.find("Segmentation");
+
+    if (iter != json.end())
+      subtask.SetSegmentation(json["Segmentation"].get<std::string>());
+
+    iter = json.find("LabelName");
+
+    if (iter != json.end())
+      subtask.SetLabelName(json["LabelName"].get<std::string>());
+
+    iter = json.find("Preset");
+
+    if (iter != json.end())
+      subtask.SetPreset(json["Preset"].get<std::string>());
+
+    iter = json.find("Result");
+
+    if (iter != json.end())
+      subtask.SetResult(json["Result"].get<std::string>());
+
+    iter = json.find("Dynamic");
+
+    if (iter != json.end())
+      subtask.SetDynamic(json["Dynamic"].get<bool>());
   }
 }
 
@@ -132,7 +153,7 @@ std::vector<mitk::BaseData::Pointer> mitk::SegmentationTaskIO::DoRead()
     {
       segmentationTask->SetDefaults(json["Defaults"].get<SegmentationTask::Subtask>());
 
-      if (!segmentationTask->GetDefaults().GetResult().empty())
+      if (segmentationTask->GetDefaults().HasResult())
         mitkThrow() << "Defaults must not contain \"Result\"!";
     }
 
@@ -140,10 +161,10 @@ std::vector<mitk::BaseData::Pointer> mitk::SegmentationTaskIO::DoRead()
     {
       auto i = segmentationTask->AddSubtask(subtask.get<SegmentationTask::Subtask>());
 
-      std::filesystem::path imagePath(segmentationTask->GetImage(i));
-
-      if (imagePath.empty())
+      if (!segmentationTask->HasImage(i))
         mitkThrow() << "Subtask " << i << " must contain \"Image\"!";
+
+      std::filesystem::path imagePath(segmentationTask->GetImage(i));
 
       if (imagePath.is_relative())
       {
@@ -165,7 +186,7 @@ std::vector<mitk::BaseData::Pointer> mitk::SegmentationTaskIO::DoRead()
       if (!std::filesystem::exists(imagePath))
         mitkThrow() << "Referenced image \"" << imagePath << "\" in subtask " << i << " does not exist!";
 
-      if (segmentationTask->GetResult(i).empty())
+      if (!segmentationTask->HasResult(i))
         mitkThrow() << "Subtask " << i << " must contain \"Result\"!";
     }
   }

@@ -183,11 +183,12 @@ namespace mitk
      * 3. Sets RESULTS_FOLDER and CUDA_VISIBLE_DEVICES variables in the environment.
      * 3. Iterates through the parameter queue (m_ParamQ) and executes "nnUNet_predict" command with the parameters
      * 4. Expects an output image to be saved in the temporary directory by the python proces. Loads it as
-     *    LabelSetImage and returns.
+     *    LabelSetImage and sets to previewImage.
      *
      * @param inputAtTimeStep
+     * @param oldSegAtTimeStep
+     * @param previewImage
      * @param timeStep
-     * @return LabelSetImage::Pointer
      */
     void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep) override;
 

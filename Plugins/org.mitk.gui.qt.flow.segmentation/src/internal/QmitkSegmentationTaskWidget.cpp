@@ -478,12 +478,11 @@ void QmitkSegmentationTaskWidget::LoadSubtask(mitk::DataNode::Pointer imageNode)
       image = mitk::IOUtil::Load<mitk::Image>(path.string());
     }
 
-    if (m_Task->HasResult(i))
-    {
-      const auto path = m_Task->GetAbsolutePath(m_Task->GetResult(i));
+    const auto path = m_Task->GetAbsolutePath(m_Task->GetResult(i));
 
-      if (std::filesystem::exists(path))
-        segmentation = mitk::IOUtil::Load<mitk::LabelSetImage>(path.string());
+    if (std::filesystem::exists(path))
+    {
+      segmentation = mitk::IOUtil::Load<mitk::LabelSetImage>(path.string());
     }
     else if (m_Task->HasSegmentation(i))
     {

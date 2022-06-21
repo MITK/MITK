@@ -94,7 +94,7 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   qRegisterMetaType<mitk::ProcessExecutor::Pointer>();
   qRegisterMetaType<mitk::ProcessExecutor::ArgumentListType>();
   connect(this, &QmitknnUNetToolGUI::Operate, m_Worker, &nnUNetDownloadWorker::DoWork);
-  connect(m_Worker, &nnUNetDownloadWorker::Failed, this, &QmitknnUNetToolGUI::OnDownloadFailed);
+  connect(m_Worker, &nnUNetDownloadWorker::Exit, this, &QmitknnUNetToolGUI::OnDownloadWorkerExit);
   connect(m_nnUNetThread, &QThread::finished, m_Worker, &QObject::deleteLater);
 
   m_Controls.multiModalSpinBox->setVisible(false);

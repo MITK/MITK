@@ -36,10 +36,14 @@ public slots:
   void DoWork(QString, QString, mitk::ProcessExecutor::Pointer, mitk::ProcessExecutor::ArgumentListType);
 
 signals:
+
   /**
-   * @brief the signal emitted when a download process failed
+   * @brief the signal emitted when a download process is finshed; success or failed
+   *
+   * @param exitCode
+   * @param message
    */
-  void Failed(std::string);
+  void Exit(bool exitCode, const QString message);
 
 private:
   QMutex mutex;

@@ -147,7 +147,7 @@ protected slots:
    * @brief Qt slot
    *
    */
-  void OnDownloadFailed(const std::string);
+  void OnDownloadWorkerExit(bool, const QString);
 
   /**
    * @brief Qt slot

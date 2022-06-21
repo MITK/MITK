@@ -503,16 +503,23 @@ void QmitknnUNetToolGUI::OnDownloadModel()
       m_nnUNetThread->start();
     }
     QString resultsFolder = m_ParentFolder->getResultsFolder();
-    emit Operate(resultsFolder,m_PythonPath,spExec,args);
+    emit Operate(resultsFolder, m_PythonPath, spExec, args);
     m_Controls.stopDownloadButton->setVisible(true);
     m_Controls.startDownloadButton->setVisible(false);
   }
 }
 
-void QmitknnUNetToolGUI::OnDownloadFailed(const std::string message)
+void QmitknnUNetToolGUI::OnDownloadWorkerExit(const bool isSuccess, const QString message)
 {
-  MITK_ERROR << "Download FAILED! " << message;
-  WriteStatusMessage(QString("Download failed. Check your internet connection. "+ QString::fromStdString(message)));
+  if (isSuccess)
+  {
+    WriteStatusMessage(message + QString(" Click Refresh Results Folder to use the new Task."));
+  }
+  else
+  {
+    MITK_ERROR << "Download FAILED! " << message.toStdString();
+    WriteStatusMessage(QString("Download failed. Check your internet connection. " + message));
+  }
   m_Controls.stopDownloadButton->setVisible(false);
   m_Controls.startDownloadButton->setVisible(true);
 }

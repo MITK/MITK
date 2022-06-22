@@ -18,15 +18,15 @@ found in the LICENSE file.
 
 #include <nlohmann/json.hpp>
 
-mitk::MitkMultilabelIOMimeTypes::MitkSegmentationTaskMimeType::MitkSegmentationTaskMimeType()
-  : CustomMimeType(SEGMENTATIONTASK_MIMETYPE_NAME())
+mitk::MitkMultilabelIOMimeTypes::MitkSegmentationTaskListMimeType::MitkSegmentationTaskListMimeType()
+  : CustomMimeType(SEGMENTATIONTASKLIST_MIMETYPE_NAME())
 {
   this->AddExtension("json");
-  this->SetCategory("MITK Segmentation Task");
-  this->SetComment("MITK Segmentation Task");
+  this->SetCategory("MITK Segmentation Task List");
+  this->SetComment("MITK Segmentation Task List");
 }
 
-bool mitk::MitkMultilabelIOMimeTypes::MitkSegmentationTaskMimeType::AppliesTo(const std::string& path) const
+bool mitk::MitkMultilabelIOMimeTypes::MitkSegmentationTaskListMimeType::AppliesTo(const std::string& path) const
 {
   bool result = CustomMimeType::AppliesTo(path);
 
@@ -43,7 +43,7 @@ bool mitk::MitkMultilabelIOMimeTypes::MitkSegmentationTaskMimeType::AppliesTo(co
   if (json.is_discarded() || !json.is_object())
     return false;
 
-  if ("MITK Segmentation Task" != json.value("FileFormat", ""))
+  if ("MITK Segmentation Task List" != json.value("FileFormat", ""))
     return false;
 
   if (1 != json.value<int>("Version", 0))
@@ -52,24 +52,24 @@ bool mitk::MitkMultilabelIOMimeTypes::MitkSegmentationTaskMimeType::AppliesTo(co
   return true;
 }
 
-mitk::MitkMultilabelIOMimeTypes::MitkSegmentationTaskMimeType* mitk::MitkMultilabelIOMimeTypes::MitkSegmentationTaskMimeType::Clone() const
+mitk::MitkMultilabelIOMimeTypes::MitkSegmentationTaskListMimeType* mitk::MitkMultilabelIOMimeTypes::MitkSegmentationTaskListMimeType::Clone() const
 {
-  return new MitkSegmentationTaskMimeType(*this);
+  return new MitkSegmentationTaskListMimeType(*this);
 }
 
-mitk::MitkMultilabelIOMimeTypes::MitkSegmentationTaskMimeType mitk::MitkMultilabelIOMimeTypes::SEGMENTATIONTASK_MIMETYPE()
+mitk::MitkMultilabelIOMimeTypes::MitkSegmentationTaskListMimeType mitk::MitkMultilabelIOMimeTypes::SEGMENTATIONTASKLIST_MIMETYPE()
 {
-  return MitkSegmentationTaskMimeType();
+  return MitkSegmentationTaskListMimeType();
 }
 
-std::string mitk::MitkMultilabelIOMimeTypes::SEGMENTATIONTASK_MIMETYPE_NAME()
+std::string mitk::MitkMultilabelIOMimeTypes::SEGMENTATIONTASKLIST_MIMETYPE_NAME()
 {
-  return IOMimeTypes::DEFAULT_BASE_NAME() + ".segmentationtask";
+  return IOMimeTypes::DEFAULT_BASE_NAME() + ".segmentationtasklist";
 }
 
 std::vector<mitk::CustomMimeType*> mitk::MitkMultilabelIOMimeTypes::Get()
 {
   std::vector<CustomMimeType*> mimeTypes;
-  mimeTypes.push_back(SEGMENTATIONTASK_MIMETYPE().Clone());
+  mimeTypes.push_back(SEGMENTATIONTASKLIST_MIMETYPE().Clone());
   return mimeTypes;
 }

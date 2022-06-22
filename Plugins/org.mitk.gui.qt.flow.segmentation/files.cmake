@@ -5,19 +5,19 @@ set(SRC_CPP_FILES
 set(INTERNAL_CPP_FILES
   org_mitk_gui_qt_flow_segmentation_Activator.cpp
   QmitkSegmentationFlowControlView.cpp
-  QmitkSegmentationTaskWidget.cpp
+  QmitkSegmentationTaskListWidget.cpp
   perspectives/QmitkFlowSegmentationPerspective.cpp
 )
 
 set(UI_FILES
   src/internal/QmitkSegmentationFlowControlView.ui
-  src/internal/QmitkSegmentationTaskWidget.ui
+  src/internal/QmitkSegmentationTaskListWidget.ui
 )
 
 set(MOC_H_FILES
   src/internal/org_mitk_gui_qt_flow_segmentation_Activator.h
   src/internal/QmitkSegmentationFlowControlView.h
-  src/internal/QmitkSegmentationTaskWidget.h
+  src/internal/QmitkSegmentationTaskListWidget.h
   src/internal/perspectives/QmitkFlowSegmentationPerspective.h
 )
 
@@ -34,7 +34,7 @@ set(CACHED_RESOURCE_FILES
 # list of Qt .qrc files which contain additional resources
 # specific to this plugin
 set(QRC_FILES
-  resources/SegmentationTask.qrc
+  resources/SegmentationTaskList.qrc
 )
 
 set(CPP_FILES )

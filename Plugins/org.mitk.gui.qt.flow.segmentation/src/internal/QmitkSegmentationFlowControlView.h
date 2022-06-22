@@ -53,8 +53,8 @@ public:
 protected slots:
 
     void OnAcceptButtonPushed();
-    void OnActiveSubtaskChanged(const std::optional<size_t>& index);
-    void OnCurrentSubtaskChanged(size_t index);
+    void OnActiveTaskChanged(const std::optional<size_t>& index);
+    void OnCurrentTaskChanged(size_t index);
 
 protected:
     void SetFocus() override;
@@ -70,7 +70,7 @@ protected:
 private:
     QWidget *m_Parent;
     mitk::NodePredicateBase::Pointer m_SegmentationPredicate;
-    mitk::NodePredicateBase::Pointer m_SegmentationTaskPredicate;
+    mitk::NodePredicateBase::Pointer m_SegmentationTaskListPredicate;
     QString m_OutputDir;
     QString m_FileExtension;
 };

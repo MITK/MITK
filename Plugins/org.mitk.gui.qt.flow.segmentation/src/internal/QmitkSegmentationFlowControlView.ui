@@ -40,7 +40,7 @@
     </spacer>
    </item>
    <item>
-    <widget class="QmitkSegmentationTaskWidget" name="segmentationTaskWidget" native="true"/>
+    <widget class="QmitkSegmentationTaskListWidget" name="segmentationTaskListWidget" native="true"/>
    </item>
    <item>
     <widget class="QPushButton" name="btnStoreAndAccept">
@@ -82,9 +82,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QmitkSegmentationTaskWidget</class>
+   <class>QmitkSegmentationTaskListWidget</class>
    <extends>QWidget</extends>
-   <header>QmitkSegmentationTaskWidget.h</header>
+   <header>QmitkSegmentationTaskListWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

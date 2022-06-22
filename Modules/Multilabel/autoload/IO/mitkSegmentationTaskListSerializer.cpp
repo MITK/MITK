@@ -10,28 +10,28 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSegmentationTaskSerializer.h"
-#include "mitkSegmentationTask.h"
+#include "mitkSegmentationTaskListSerializer.h"
+#include "mitkSegmentationTaskList.h"
 
 #include <mitkIOUtil.h>
 
-MITK_REGISTER_SERIALIZER(SegmentationTaskSerializer)
+MITK_REGISTER_SERIALIZER(SegmentationTaskListSerializer)
 
-mitk::SegmentationTaskSerializer::SegmentationTaskSerializer()
+mitk::SegmentationTaskListSerializer::SegmentationTaskListSerializer()
 {
 }
 
-mitk::SegmentationTaskSerializer::~SegmentationTaskSerializer()
+mitk::SegmentationTaskListSerializer::~SegmentationTaskListSerializer()
 {
 }
 
-std::string mitk::SegmentationTaskSerializer::Serialize()
+std::string mitk::SegmentationTaskListSerializer::Serialize()
 {
-  auto segmentationTask = dynamic_cast<const SegmentationTask*>(m_Data.GetPointer());
+  auto segmentationTaskList = dynamic_cast<const SegmentationTaskList*>(m_Data.GetPointer());
 
-  if (nullptr == segmentationTask)
+  if (nullptr == segmentationTaskList)
   {
-    MITK_ERROR << "Object at " << (const void*)this->m_Data << " is not an mitk::SegmentationTask. Cannot serialize as MITK Segmentation Task.";
+    MITK_ERROR << "Object at " << (const void*)this->m_Data << " is not an mitk::SegmentationTaskList. Cannot serialize as MITK Segmentation Task List.";
     return "";
   }
 
@@ -43,7 +43,7 @@ std::string mitk::SegmentationTaskSerializer::Serialize()
 
   try
   {
-    IOUtil::Save(segmentationTask, path);
+    IOUtil::Save(segmentationTaskList, path);
   }
   catch (std::exception& e)
   {

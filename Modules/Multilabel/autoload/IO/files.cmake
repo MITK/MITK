@@ -6,8 +6,8 @@ set(CPP_FILES
   mitkMultilabelActivator.cpp
   mitkMultilabelIOMimeTypes.cpp
   mitkMultilabelIOMimeTypes.h
-  mitkSegmentationTaskIO.cpp
-  mitkSegmentationTaskIO.h
-  mitkSegmentationTaskSerializer.cpp
-  mitkSegmentationTaskSerializer.h
+  mitkSegmentationTaskListIO.cpp
+  mitkSegmentationTaskListIO.h
+  mitkSegmentationTaskListSerializer.cpp
+  mitkSegmentationTaskListSerializer.h
 )

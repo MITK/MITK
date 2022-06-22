@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSegmentationTaskIO.h"
+#include "mitkSegmentationTaskListIO.h"
 #include "mitkMultilabelIOMimeTypes.h"
 
-#include <mitkSegmentationTask.h>
+#include <mitkSegmentationTaskList.h>
 
 #include <nlohmann/json.hpp>
 
@@ -22,84 +22,84 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  void to_json(nlohmann::json& json, const SegmentationTask::Subtask& subtask)
+  void to_json(nlohmann::json& json, const SegmentationTaskList::Task& task)
   {
-    if (subtask.HasName())
-      json["Name"] = subtask.GetName();
+    if (task.HasName())
+      json["Name"] = task.GetName();
 
-    if (subtask.HasDescription())
-      json["Description"] = subtask.GetDescription();
+    if (task.HasDescription())
+      json["Description"] = task.GetDescription();
 
-    if (subtask.HasImage())
-      json["Image"] = subtask.GetImage();
+    if (task.HasImage())
+      json["Image"] = task.GetImage();
 
-    if (subtask.HasSegmentation())
-      json["Segmentation"] = subtask.GetSegmentation();
+    if (task.HasSegmentation())
+      json["Segmentation"] = task.GetSegmentation();
 
-    if (subtask.HasLabelName())
-      json["LabelName"] = subtask.GetLabelName();
+    if (task.HasLabelName())
+      json["LabelName"] = task.GetLabelName();
 
-    if (subtask.HasPreset())
-      json["Preset"] = subtask.GetPreset();
+    if (task.HasPreset())
+      json["Preset"] = task.GetPreset();
 
-    if (subtask.HasResult())
-      json["Result"] = subtask.GetResult();
+    if (task.HasResult())
+      json["Result"] = task.GetResult();
 
-    if (subtask.HasDynamic())
-      json["Dynamic"] = subtask.GetDynamic();
+    if (task.HasDynamic())
+      json["Dynamic"] = task.GetDynamic();
   }
 
-  void from_json(const nlohmann::json& json, SegmentationTask::Subtask& subtask)
+  void from_json(const nlohmann::json& json, SegmentationTaskList::Task& task)
   {
     auto iter = json.find("Name");
 
     if (iter != json.end())
-      subtask.SetName(json["Name"].get<std::string>());
+      task.SetName(json["Name"].get<std::string>());
 
     iter = json.find("Description");
 
     if (iter != json.end())
-      subtask.SetDescription(json["Description"].get<std::string>());
+      task.SetDescription(json["Description"].get<std::string>());
 
     iter = json.find("Image");
 
     if (iter != json.end())
-      subtask.SetImage(json["Image"].get<std::string>());
+      task.SetImage(json["Image"].get<std::string>());
 
     iter = json.find("Segmentation");
 
     if (iter != json.end())
-      subtask.SetSegmentation(json["Segmentation"].get<std::string>());
+      task.SetSegmentation(json["Segmentation"].get<std::string>());
 
     iter = json.find("LabelName");
 
     if (iter != json.end())
-      subtask.SetLabelName(json["LabelName"].get<std::string>());
+      task.SetLabelName(json["LabelName"].get<std::string>());
 
     iter = json.find("Preset");
 
     if (iter != json.end())
-      subtask.SetPreset(json["Preset"].get<std::string>());
+      task.SetPreset(json["Preset"].get<std::string>());
 
     iter = json.find("Result");
 
     if (iter != json.end())
-      subtask.SetResult(json["Result"].get<std::string>());
+      task.SetResult(json["Result"].get<std::string>());
 
     iter = json.find("Dynamic");
 
     if (iter != json.end())
-      subtask.SetDynamic(json["Dynamic"].get<bool>());
+      task.SetDynamic(json["Dynamic"].get<bool>());
   }
 }
 
-mitk::SegmentationTaskIO::SegmentationTaskIO()
-  : AbstractFileIO(SegmentationTask::GetStaticNameOfClass(), MitkMultilabelIOMimeTypes::SEGMENTATIONTASK_MIMETYPE(), "MITK Segmentation Task")
+mitk::SegmentationTaskListIO::SegmentationTaskListIO()
+  : AbstractFileIO(SegmentationTaskList::GetStaticNameOfClass(), MitkMultilabelIOMimeTypes::SEGMENTATIONTASKLIST_MIMETYPE(), "MITK Segmentation Task List")
 {
   this->RegisterService();
 }
 
-std::vector<mitk::BaseData::Pointer> mitk::SegmentationTaskIO::DoRead()
+std::vector<mitk::BaseData::Pointer> mitk::SegmentationTaskListIO::DoRead()
 {
   auto* stream = this->GetInputStream();
   std::ifstream fileStream;
@@ -133,38 +133,38 @@ std::vector<mitk::BaseData::Pointer> mitk::SegmentationTaskIO::DoRead()
   if (!json.is_object())
     mitkThrow() << "Unknown file format (expected JSON object as root)!";
 
-  if ("MITK Segmentation Task" != json.value("FileFormat", ""))
-    mitkThrow() << "Unknown file format (expected \"MITK Segmentation Task\")!";
+  if ("MITK Segmentation Task List" != json.value("FileFormat", ""))
+    mitkThrow() << "Unknown file format (expected \"MITK Segmentation Task List\")!";
 
   if (1 != json.value<int>("Version", 0))
     mitkThrow() << "Unknown file format version (expected \"1\")!";
 
-  if (!json.contains("Subtasks") || !json["Subtasks"].is_array())
-    mitkThrow() << "Subtasks array not found!";
+  if (!json.contains("Tasks") || !json["Tasks"].is_array())
+    mitkThrow() << "Tasks array not found!";
 
-  auto segmentationTask = SegmentationTask::New();
+  auto segmentationTaskList = SegmentationTaskList::New();
 
   if (json.contains("Name"))
-    segmentationTask->SetProperty("name", StringProperty::New(json["Name"].get<std::string>()));
+    segmentationTaskList->SetProperty("name", StringProperty::New(json["Name"].get<std::string>()));
 
   try
   {
     if (json.contains("Defaults"))
     {
-      segmentationTask->SetDefaults(json["Defaults"].get<SegmentationTask::Subtask>());
+      segmentationTaskList->SetDefaults(json["Defaults"].get<SegmentationTaskList::Task>());
 
-      if (segmentationTask->GetDefaults().HasResult())
+      if (segmentationTaskList->GetDefaults().HasResult())
         mitkThrow() << "Defaults must not contain \"Result\"!";
     }
 
-    for (const auto& subtask : json["Subtasks"])
+    for (const auto& task : json["Tasks"])
     {
-      auto i = segmentationTask->AddSubtask(subtask.get<SegmentationTask::Subtask>());
+      auto i = segmentationTaskList->AddTask(task.get<SegmentationTaskList::Task>());
 
-      if (!segmentationTask->HasImage(i))
-        mitkThrow() << "Subtask " << i << " must contain \"Image\"!";
+      if (!segmentationTaskList->HasImage(i))
+        mitkThrow() << "Task " << i << " must contain \"Image\"!";
 
-      std::filesystem::path imagePath(segmentationTask->GetImage(i));
+      std::filesystem::path imagePath(segmentationTaskList->GetImage(i));
 
       if (imagePath.is_relative())
       {
@@ -184,10 +184,10 @@ std::vector<mitk::BaseData::Pointer> mitk::SegmentationTaskIO::DoRead()
       }
 
       if (!std::filesystem::exists(imagePath))
-        mitkThrow() << "Referenced image \"" << imagePath << "\" in subtask " << i << " does not exist!";
+        mitkThrow() << "Referenced image \"" << imagePath << "\" in task " << i << " does not exist!";
 
-      if (!segmentationTask->HasResult(i))
-        mitkThrow() << "Subtask " << i << " must contain \"Result\"!";
+      if (!segmentationTaskList->HasResult(i))
+        mitkThrow() << "Task " << i << " must contain \"Result\"!";
     }
   }
   catch (const nlohmann::json::type_error& e)
@@ -196,20 +196,20 @@ std::vector<mitk::BaseData::Pointer> mitk::SegmentationTaskIO::DoRead()
   }
 
   std::vector<BaseData::Pointer> result;
-  result.push_back(segmentationTask.GetPointer());
+  result.push_back(segmentationTaskList.GetPointer());
 
   return result;
 }
 
-void mitk::SegmentationTaskIO::Write()
+void mitk::SegmentationTaskListIO::Write()
 {
-  auto segmentationTask = dynamic_cast<const SegmentationTask*>(this->GetInput());
+  auto segmentationTaskList = dynamic_cast<const SegmentationTaskList*>(this->GetInput());
 
-  if (nullptr == segmentationTask)
+  if (nullptr == segmentationTaskList)
     mitkThrow() << "Invalid input for writing!";
 
-  if (segmentationTask->GetNumberOfSubtasks() == 0)
-    mitkThrow() << "No subtasks found!";
+  if (segmentationTaskList->GetNumberOfTasks() == 0)
+    mitkThrow() << "No tasks found!";
 
   auto* stream = this->GetOutputStream();
   std::ofstream fileStream;
@@ -233,27 +233,27 @@ void mitk::SegmentationTaskIO::Write()
     mitkThrow() << "Stream for writing is not good!";
 
   nlohmann::ordered_json json = {
-    { "FileFormat", "MITK Segmentation Task" },
+    { "FileFormat", "MITK Segmentation Task List" },
     { "Version", 1 },
-    { "Name", segmentationTask->GetProperty("name")->GetValueAsString() }
+    { "Name", segmentationTaskList->GetProperty("name")->GetValueAsString() }
   };
 
-  nlohmann::json defaults = segmentationTask->GetDefaults();
+  nlohmann::json defaults = segmentationTaskList->GetDefaults();
 
   if (!defaults.is_null())
     json["Defaults"] = defaults;
 
-  nlohmann::json subtasks;
+  nlohmann::json tasks;
 
-  for (const auto& subtask : *segmentationTask)
-    subtasks.push_back(subtask);
+  for (const auto& task : *segmentationTaskList)
+    tasks.push_back(task);
 
-  json["Subtasks"] = subtasks;
+  json["Tasks"] = tasks;
 
   *stream << std::setw(2) << json << std::endl;
 }
 
-mitk::SegmentationTaskIO* mitk::SegmentationTaskIO::IOClone() const
+mitk::SegmentationTaskListIO* mitk::SegmentationTaskListIO::IOClone() const
 {
-  return new SegmentationTaskIO(*this);
+  return new SegmentationTaskListIO(*this);
 }

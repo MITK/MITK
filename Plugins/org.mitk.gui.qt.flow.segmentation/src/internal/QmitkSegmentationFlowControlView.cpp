@@ -48,8 +48,8 @@ QmitkSegmentationFlowControlView::QmitkSegmentationFlowControlView()
     mitk::TNodePredicateDataType<mitk::LabelSetImage>::New(),
     notHelperObject);
 
-  m_SegmentationTaskPredicate = mitk::NodePredicateAnd::New(
-    mitk::TNodePredicateDataType<mitk::SegmentationTask>::New(),
+  m_SegmentationTaskListPredicate = mitk::NodePredicateAnd::New(
+    mitk::TNodePredicateDataType<mitk::SegmentationTaskList>::New(),
     notHelperObject);
 }
 
@@ -68,10 +68,10 @@ void QmitkSegmentationFlowControlView::CreateQtPartControl(QWidget* parent)
   using Self = QmitkSegmentationFlowControlView;
 
   connect(m_Controls.btnStoreAndAccept, &QPushButton::clicked, this, &Self::OnAcceptButtonPushed);
-  connect(m_Controls.segmentationTaskWidget, &QmitkSegmentationTaskWidget::ActiveSubtaskChanged, this, &Self::OnActiveSubtaskChanged);
-  connect(m_Controls.segmentationTaskWidget, &QmitkSegmentationTaskWidget::CurrentSubtaskChanged, this, &Self::OnCurrentSubtaskChanged);
+  connect(m_Controls.segmentationTaskListWidget, &QmitkSegmentationTaskListWidget::ActiveTaskChanged, this, &Self::OnActiveTaskChanged);
+  connect(m_Controls.segmentationTaskListWidget, &QmitkSegmentationTaskListWidget::CurrentTaskChanged, this, &Self::OnCurrentTaskChanged);
 
-  m_Controls.segmentationTaskWidget->setVisible(false);
+  m_Controls.segmentationTaskListWidget->setVisible(false);
   m_Controls.labelStored->setVisible(false);
   UpdateControls();
 
@@ -83,17 +83,17 @@ void QmitkSegmentationFlowControlView::CreateQtPartControl(QWidget* parent)
 
 void QmitkSegmentationFlowControlView::OnAcceptButtonPushed()
 {
-  if (m_Controls.segmentationTaskWidget->isVisible())
+  if (m_Controls.segmentationTaskListWidget->isVisible())
   {
-    auto* task = m_Controls.segmentationTaskWidget->GetTask();
+    auto* taskList = m_Controls.segmentationTaskListWidget->GetTaskList();
 
-    if (task != nullptr)
+    if (taskList != nullptr)
     {
-      auto activeSubtaskIndex = m_Controls.segmentationTaskWidget->GetActiveSubtaskIndex();
+      auto activeTaskIndex = m_Controls.segmentationTaskListWidget->GetActiveTaskIndex();
 
-      if (activeSubtaskIndex.has_value())
+      if (activeTaskIndex.has_value())
       {
-        auto segmentationNode = m_Controls.segmentationTaskWidget->GetSegmentationDataNode(activeSubtaskIndex.value());
+        auto segmentationNode = m_Controls.segmentationTaskListWidget->GetSegmentationDataNode(activeTaskIndex.value());
 
         if (segmentationNode != nullptr)
         {
@@ -101,8 +101,8 @@ void QmitkSegmentationFlowControlView::OnAcceptButtonPushed()
 
           try
           {
-            task->SaveSubtask(activeSubtaskIndex.value(), segmentationNode->GetData());
-            m_Controls.segmentationTaskWidget->OnUnsavedChangesSaved();
+            taskList->SaveTask(activeTaskIndex.value(), segmentationNode->GetData());
+            m_Controls.segmentationTaskListWidget->OnUnsavedChangesSaved();
           }
           catch (const mitk::Exception& e)
           {
@@ -129,12 +129,12 @@ void QmitkSegmentationFlowControlView::OnAcceptButtonPushed()
   }
 }
 
-void QmitkSegmentationFlowControlView::OnActiveSubtaskChanged(const std::optional<size_t>&)
+void QmitkSegmentationFlowControlView::OnActiveTaskChanged(const std::optional<size_t>&)
 {
   this->UpdateControls();
 }
 
-void QmitkSegmentationFlowControlView::OnCurrentSubtaskChanged(size_t)
+void QmitkSegmentationFlowControlView::OnCurrentTaskChanged(size_t)
 {
   this->UpdateControls();
 }
@@ -143,19 +143,19 @@ void QmitkSegmentationFlowControlView::UpdateControls()
 {
   auto dataStorage = this->GetDataStorage();
 
-  auto hasTask = !dataStorage->GetSubset(m_SegmentationTaskPredicate)->empty();
-  m_Controls.segmentationTaskWidget->setVisible(hasTask);
+  auto hasTaskList = !dataStorage->GetSubset(m_SegmentationTaskListPredicate)->empty();
+  m_Controls.segmentationTaskListWidget->setVisible(hasTaskList);
 
-  if (hasTask)
+  if (hasTaskList)
   {
-    auto activeSubtaskIndex = m_Controls.segmentationTaskWidget->GetActiveSubtaskIndex();
-    auto hasActiveSubtask = activeSubtaskIndex.has_value();
+    auto activeTaskIndex = m_Controls.segmentationTaskListWidget->GetActiveTaskIndex();
+    auto hasActiveTtask = activeTaskIndex.has_value();
 
-    auto isCurrentSubtask = hasActiveSubtask
-      ? m_Controls.segmentationTaskWidget->GetCurrentSubtaskIndex() == activeSubtaskIndex.value()
+    auto isCurrentTask = hasActiveTtask
+      ? m_Controls.segmentationTaskListWidget->GetCurrentTaskIndex() == activeTaskIndex.value()
       : false;
 
-    m_Controls.btnStoreAndAccept->setEnabled(hasActiveSubtask && isCurrentSubtask);
+    m_Controls.btnStoreAndAccept->setEnabled(hasActiveTtask && isCurrentTask);
   }
   else
   {

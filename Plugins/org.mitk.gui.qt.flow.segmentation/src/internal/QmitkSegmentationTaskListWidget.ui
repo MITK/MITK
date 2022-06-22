@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QmitkSegmentationTaskWidget</class>
- <widget class="QWidget" name="QmitkSegmentationTaskWidget">
+ <class>QmitkSegmentationTaskListWidget</class>
+ <widget class="QWidget" name="QmitkSegmentationTaskListWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="title" stdset="0">
-   <string>Segmentation Task</string>
+   <string>Segmentation Task List</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <property name="leftMargin">
@@ -29,7 +29,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Segmentation Task</string>
+      <string>Segmentation Task List</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>

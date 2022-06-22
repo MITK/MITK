@@ -10,24 +10,26 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkSegmentationTaskSerializer_h
-#define mitkSegmentationTaskSerializer_h
+#ifndef mitkSegmentationTaskListIO_h
+#define mitkSegmentationTaskListIO_h
 
-#include <mitkBaseDataSerializer.h>
+#include <mitkAbstractFileIO.h>
 
 namespace mitk
 {
-  class SegmentationTaskSerializer : public BaseDataSerializer
+  class SegmentationTaskListIO : public AbstractFileIO
   {
   public:
-    mitkClassMacro(SegmentationTaskSerializer, BaseDataSerializer)
-    itkFactorylessNewMacro(Self)
+    SegmentationTaskListIO();
 
-    std::string Serialize() override;
+    using AbstractFileReader::Read;
+    void Write() override;
 
   protected:
-    SegmentationTaskSerializer();
-    ~SegmentationTaskSerializer() override;
+    std::vector<BaseData::Pointer> DoRead() override;
+
+  private:
+    SegmentationTaskListIO* IOClone() const override;
   };
 }
 

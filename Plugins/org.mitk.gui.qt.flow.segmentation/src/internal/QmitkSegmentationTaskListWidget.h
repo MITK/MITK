@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkSegmentationTaskWidget_h
-#define QmitkSegmentationTaskWidget_h
+#ifndef QmitkSegmentationTaskListWidget_h
+#define QmitkSegmentationTaskListWidget_h
 
-#include <mitkSegmentationTask.h>
+#include <mitkSegmentationTaskList.h>
 
 #include <MitkSegmentationUIExports.h>
 
@@ -27,57 +27,57 @@ class QFileSystemWatcher;
 
 namespace Ui
 {
-  class QmitkSegmentationTaskWidget;
+  class QmitkSegmentationTaskListWidget;
 }
 
-class QmitkSegmentationTaskWidget : public QWidget
+class QmitkSegmentationTaskListWidget : public QWidget
 {
   Q_OBJECT
 
 public:
-  explicit QmitkSegmentationTaskWidget(QWidget* parent = nullptr);
-  ~QmitkSegmentationTaskWidget() override;
+  explicit QmitkSegmentationTaskListWidget(QWidget* parent = nullptr);
+  ~QmitkSegmentationTaskListWidget() override;
 
-  mitk::SegmentationTask* GetTask() const;
-  std::optional<size_t> GetActiveSubtaskIndex() const;
-  size_t GetCurrentSubtaskIndex() const;
+  mitk::SegmentationTaskList* GetTaskList() const;
+  std::optional<size_t> GetActiveTaskIndex() const;
+  size_t GetCurrentTaskIndex() const;
   mitk::DataNode* GetSegmentationDataNode(size_t index) const;
   void OnUnsavedChangesSaved();
 
 signals:
-  void ActiveSubtaskChanged(const std::optional<size_t>& index);
-  void CurrentSubtaskChanged(size_t index);
+  void ActiveTaskChanged(const std::optional<size_t>& index);
+  void CurrentTaskChanged(size_t index);
 
 private:
   void OnSelectionChanged(const QmitkSingleNodeSelectionWidget::NodeList& nodes);
   void ResetControls();
-  void SetTask(mitk::SegmentationTask* task);
+  void SetTaskList(mitk::SegmentationTaskList* task);
   void ResetFileSystemWatcher();
   void OnResultDirectoryChanged(const QString&);
   void UpdateProgressBar();
-  void OnTaskChanged(mitk::SegmentationTask* task);
+  void OnTaskListChanged(mitk::SegmentationTaskList* task);
   void OnPreviousButtonClicked();
   void OnNextButtonClicked();
-  void OnSubtaskChanged();
+  void OnTaskChanged();
   void UpdateLoadButton();
   void UpdateDetailsLabel();
   void OnLoadButtonClicked();
   mitk::DataNode* GetImageDataNode(size_t index) const;
-  void UnloadSubtasks(const mitk::DataNode* skip = nullptr);
-  void LoadSubtask(mitk::DataNode::Pointer imageNode = nullptr);
+  void UnloadTasks(const mitk::DataNode* skip = nullptr);
+  void LoadTask(mitk::DataNode::Pointer imageNode = nullptr);
   void SubscribeToActiveSegmentation();
   void UnsubscribeFromActiveSegmentation();
   void OnSegmentationModified();
-  void SetActiveSubtaskIndex(const std::optional<size_t>& index);
-  void SetCurrentSubtaskIndex(size_t index);
-  bool ActivateSubtaskIsShown() const;
+  void SetActiveTaskIndex(const std::optional<size_t>& index);
+  void SetCurrentTaskIndex(size_t index);
+  bool ActivatedTaskIsShown() const;
 
-  Ui::QmitkSegmentationTaskWidget* m_Ui;
+  Ui::QmitkSegmentationTaskListWidget* m_Ui;
   QFileSystemWatcher* m_FileSystemWatcher;
-  mitk::SegmentationTask::Pointer m_Task;
-  mitk::DataNode::Pointer m_TaskNode;
-  size_t m_CurrentSubtaskIndex;
-  std::optional<size_t> m_ActiveSubtaskIndex;
+  mitk::SegmentationTaskList::Pointer m_TaskList;
+  mitk::DataNode::Pointer m_TaskListNode;
+  size_t m_CurrentTaskIndex;
+  std::optional<size_t> m_ActiveTaskIndex;
   std::optional<unsigned long> m_SegmentationModifiedObserverTag;
   bool m_UnsavedChanges;
 };

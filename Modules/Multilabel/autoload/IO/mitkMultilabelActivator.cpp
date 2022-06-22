@@ -17,7 +17,7 @@ found in the LICENSE file.
 
 #include "mitkLabelSetImageIO.h"
 #include "mitkMultilabelIOMimeTypes.h"
-#include "mitkSegmentationTaskIO.h"
+#include "mitkSegmentationTaskListIO.h"
 
 namespace mitk
 {
@@ -40,7 +40,7 @@ namespace mitk
         context->RegisterService(mimeType, props);
 
       m_FileIOs.push_back(new LabelSetImageIO());
-      m_FileIOs.push_back(new SegmentationTaskIO);
+      m_FileIOs.push_back(new SegmentationTaskListIO);
     }
     void Unload(us::ModuleContext *) override
     {

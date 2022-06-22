@@ -75,6 +75,8 @@ namespace mitk
     std::filesystem::path GetBasePath() const;
     std::filesystem::path GetAbsolutePath(const std::filesystem::path& path) const;
 
+    void SaveSubtask(size_t index, const BaseData* segmentation);
+
     std::vector<Subtask>::const_iterator begin() const;
     std::vector<Subtask>::const_iterator end() const;
 

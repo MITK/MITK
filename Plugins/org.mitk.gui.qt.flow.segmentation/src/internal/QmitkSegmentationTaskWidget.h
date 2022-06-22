@@ -42,6 +42,7 @@ public:
   std::optional<size_t> GetActiveSubtaskIndex() const;
   size_t GetCurrentSubtaskIndex() const;
   mitk::DataNode* GetSegmentationDataNode(size_t index) const;
+  void OnUnsavedChangesSaved();
 
 signals:
   void ActiveSubtaskChanged(const std::optional<size_t>& index);
@@ -64,8 +65,12 @@ private:
   mitk::DataNode* GetImageDataNode(size_t index) const;
   void UnloadSubtasks(const mitk::DataNode* skip = nullptr);
   void LoadSubtask(mitk::DataNode::Pointer imageNode = nullptr);
+  void SubscribeToActiveSegmentation();
+  void UnsubscribeFromActiveSegmentation();
+  void OnSegmentationModified();
   void SetActiveSubtaskIndex(const std::optional<size_t>& index);
   void SetCurrentSubtaskIndex(size_t index);
+  bool ActivateSubtaskIsShown() const;
 
   Ui::QmitkSegmentationTaskWidget* m_Ui;
   QFileSystemWatcher* m_FileSystemWatcher;
@@ -73,6 +78,8 @@ private:
   mitk::DataNode::Pointer m_TaskNode;
   size_t m_CurrentSubtaskIndex;
   std::optional<size_t> m_ActiveSubtaskIndex;
+  std::optional<unsigned long> m_SegmentationModifiedObserverTag;
+  bool m_UnsavedChanges;
 };
 
 #endif

@@ -97,23 +97,19 @@ void QmitkSegmentationFlowControlView::OnAcceptButtonPushed()
 
         if (segmentationNode != nullptr)
         {
-          auto path = task->GetAbsolutePath(task->GetResult(activeSubtaskIndex.value()));
+          QApplication::setOverrideCursor(Qt::BusyCursor);
 
-          if (!path.empty())
+          try
           {
-            QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
-
-            try
-            {
-              mitk::IOUtil::Save(segmentationNode->GetData(), path.string());
-              // TODO: Give temporarily displayed feedback to user
-            }
-            catch (const mitk::Exception&)
-            {
-            }
-
-            QApplication::restoreOverrideCursor();
+            task->SaveSubtask(activeSubtaskIndex.value(), segmentationNode->GetData());
+            m_Controls.segmentationTaskWidget->OnUnsavedChangesSaved();
           }
+          catch (const mitk::Exception& e)
+          {
+            MITK_ERROR << e;
+          }
+
+          QApplication::restoreOverrideCursor();
         }
       }
     }

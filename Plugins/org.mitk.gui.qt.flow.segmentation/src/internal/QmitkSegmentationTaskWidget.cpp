@@ -28,6 +28,7 @@ found in the LICENSE file.
 #include <ui_QmitkSegmentationTaskWidget.h>
 
 #include <QFileSystemWatcher>
+#include <QMessageBox>
 
 #include <filesystem>
 
@@ -93,7 +94,8 @@ QmitkSegmentationTaskWidget::QmitkSegmentationTaskWidget(QWidget* parent)
   : QWidget(parent),
     m_Ui(new Ui::QmitkSegmentationTaskWidget),
     m_FileSystemWatcher(new QFileSystemWatcher(this)),
-    m_CurrentSubtaskIndex(0)
+    m_CurrentSubtaskIndex(0),
+    m_UnsavedChanges(false)
 {
   m_Ui->setupUi(this);
 
@@ -134,6 +136,17 @@ std::optional<size_t> QmitkSegmentationTaskWidget::GetActiveSubtaskIndex() const
 size_t QmitkSegmentationTaskWidget::GetCurrentSubtaskIndex() const
 {
   return m_CurrentSubtaskIndex;
+}
+
+void QmitkSegmentationTaskWidget::OnUnsavedChangesSaved()
+{
+  if (m_UnsavedChanges)
+  {
+    m_UnsavedChanges = false;
+
+    if (m_ActiveSubtaskIndex.value() == m_CurrentSubtaskIndex)
+      this->UpdateDetailsLabel();
+  }
 }
 
 /* Make sure that the widget transitions into a valid state whenever the
@@ -196,12 +209,10 @@ void QmitkSegmentationTaskWidget::SetTask(mitk::SegmentationTask* task)
 
 void QmitkSegmentationTaskWidget::ResetFileSystemWatcher()
 {
-  {
-    auto paths = m_FileSystemWatcher->directories();
+  auto paths = m_FileSystemWatcher->directories();
 
-    if (!paths.empty())
-      m_FileSystemWatcher->removePaths(paths);
-  }
+  if (!paths.empty())
+    m_FileSystemWatcher->removePaths(paths);
 
   if (m_Task.IsNotNull())
   {
@@ -229,6 +240,7 @@ void QmitkSegmentationTaskWidget::ResetFileSystemWatcher()
 
 void QmitkSegmentationTaskWidget::OnResultDirectoryChanged(const QString&)
 {
+  // TODO: If a segmentation was modified ("Unsaved changes"), saved ("Done"), and then the file is deleted, the status should be "Unsaved changes" instead of "Not done".
   this->UpdateProgressBar();
   this->UpdateDetailsLabel();
 }
@@ -322,9 +334,8 @@ void QmitkSegmentationTaskWidget::OnSubtaskChanged()
 void QmitkSegmentationTaskWidget::UpdateLoadButton()
 {
   const auto i = m_CurrentSubtaskIndex;
-  bool active = m_ActiveSubtaskIndex.has_value() && m_ActiveSubtaskIndex.value() == i;
 
-  auto text = !active
+  auto text = !this->ActivateSubtaskIsShown()
     ? QStringLiteral("Load subtask")
     : QStringLiteral("Subtask");
 
@@ -336,7 +347,7 @@ void QmitkSegmentationTaskWidget::UpdateLoadButton()
       text += QStringLiteral(":\n") + QString::fromStdString(m_Task->GetName(i));
   }
 
-  m_Ui->loadButton->setDisabled(active);
+  m_Ui->loadButton->setDisabled(this->ActivateSubtaskIsShown());
   m_Ui->loadButton->setText(text);
 }
 
@@ -347,16 +358,22 @@ void QmitkSegmentationTaskWidget::UpdateLoadButton()
 void QmitkSegmentationTaskWidget::UpdateDetailsLabel()
 {
   const auto i = m_CurrentSubtaskIndex;
-  bool active = m_ActiveSubtaskIndex.has_value() && m_ActiveSubtaskIndex.value() == i;
   bool isDone = m_Task->IsDone(i);
 
-  auto details = QString("<p><b>Status: %1</b> / <b>").arg(active
+  auto details = QString("<p><b>Status: %1</b> / <b>").arg(this->ActivateSubtaskIsShown()
     ? ColorString("Active", Qt::white, QColor(Qt::green).darker())
     : ColorString("Inactive", Qt::white, QColor(Qt::red).darker()));
 
-  details += QString("%1</b></p>").arg(isDone
-    ? ColorString("Done", Qt::white, QColor(Qt::green).darker())
-    : ColorString("Undone", Qt::white, QColor(Qt::red).darker()));
+  if (m_UnsavedChanges && this->ActivateSubtaskIsShown())
+  {
+    details += QString("%1</b></p>").arg(ColorString("Unsaved changes", Qt::white, QColor(Qt::red).darker()));
+  }
+  else
+  {
+    details += QString("%1</b></p>").arg(isDone
+      ? ColorString("Done", Qt::white, QColor(Qt::green).darker())
+      : ColorString("Not done", Qt::white, QColor(Qt::red).darker()));
+  }
 
   if (m_Task->HasDescription(i))
     details += QString("<p><b>Description:</b> %1</p>").arg(QString::fromStdString(m_Task->GetDescription(i)));
@@ -389,6 +406,35 @@ void QmitkSegmentationTaskWidget::UpdateDetailsLabel()
  */
 void QmitkSegmentationTaskWidget::OnLoadButtonClicked()
 {
+  if (m_UnsavedChanges)
+  {
+    const auto i = m_ActiveSubtaskIndex.value();
+
+    const auto title = QString("Load subtask %1").arg(m_CurrentSubtaskIndex + 1);
+    const auto text = QString("The currently active subtask %1 has unsaved changes.").arg(i + 1);
+    const auto reply = QMessageBox::question(this, title, text, QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, QMessageBox::Cancel);
+
+    if (reply == QMessageBox::Cancel)
+      return;
+
+    if (reply == QMessageBox::Save)
+    {
+      QApplication::setOverrideCursor(Qt::BusyCursor);
+
+      try
+      {
+        m_Task->SaveSubtask(i, this->GetSegmentationDataNode(i)->GetData());
+        this->OnUnsavedChangesSaved();
+      }
+      catch (const mitk::Exception& e)
+      {
+        MITK_ERROR << e;
+      }
+
+      QApplication::restoreOverrideCursor();
+    }
+  }
+
   m_Ui->loadButton->setEnabled(false);
   QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
 
@@ -399,10 +445,12 @@ void QmitkSegmentationTaskWidget::OnLoadButtonClicked()
 
   this->OnSubtaskChanged();
   QApplication::restoreOverrideCursor();
+
+  m_UnsavedChanges = false;
 }
 
-/* If present, return the image data node for the currently displayed subtask.
- * Otherwise, return nullptr.
+/* If present, return the image data node for the subtask with the specified
+ * index. Otherwise, return nullptr.
  */
 mitk::DataNode* QmitkSegmentationTaskWidget::GetImageDataNode(size_t index) const
 {
@@ -417,8 +465,8 @@ mitk::DataNode* QmitkSegmentationTaskWidget::GetImageDataNode(size_t index) cons
     : nullptr;
 }
 
-/* If present, return the segmentation data node for the currently displayed
- * subtask. Otherwise, return nullptr.
+/* If present, return the segmentation data node for the subtask with the
+ * specified index. Otherwise, return nullptr.
  */
 mitk::DataNode* QmitkSegmentationTaskWidget::GetSegmentationDataNode(size_t index) const
 {
@@ -439,6 +487,8 @@ mitk::DataNode* QmitkSegmentationTaskWidget::GetSegmentationDataNode(size_t inde
  */
 void QmitkSegmentationTaskWidget::UnloadSubtasks(const mitk::DataNode* skip)
 {
+  this->UnsubscribeFromActiveSegmentation();
+
   if (m_TaskNode.IsNotNull())
   {
     mitk::DataStorage::Pointer dataStorage = GetDataStorage();
@@ -564,7 +614,55 @@ void QmitkSegmentationTaskWidget::LoadSubtask(mitk::DataNode::Pointer imageNode)
     dataStorage->Add(segmentationNode, imageNode);
   }
 
+  m_UnsavedChanges = false;
+
   this->SetActiveSubtaskIndex(i);
+  this->SubscribeToActiveSegmentation();
+}
+
+void QmitkSegmentationTaskWidget::SubscribeToActiveSegmentation()
+{
+  if (m_ActiveSubtaskIndex.has_value())
+  {
+    auto segmentationNode = this->GetSegmentationDataNode(m_ActiveSubtaskIndex.value());
+
+    if (segmentationNode != nullptr)
+    {
+      auto segmentation = static_cast<mitk::LabelSetImage*>(segmentationNode->GetData());
+
+      auto command = itk::SimpleMemberCommand<QmitkSegmentationTaskWidget>::New();
+      command->SetCallbackFunction(this, &QmitkSegmentationTaskWidget::OnSegmentationModified);
+
+      m_SegmentationModifiedObserverTag = segmentation->AddObserver(itk::ModifiedEvent(), command);
+    }
+  }
+}
+
+void QmitkSegmentationTaskWidget::UnsubscribeFromActiveSegmentation()
+{
+  if (m_ActiveSubtaskIndex.has_value() && m_SegmentationModifiedObserverTag.has_value())
+  {
+    auto segmentationNode = this->GetSegmentationDataNode(m_ActiveSubtaskIndex.value());
+
+    if (segmentationNode != nullptr)
+    {
+      auto segmentation = static_cast<mitk::LabelSetImage*>(segmentationNode->GetData());
+      segmentation->RemoveObserver(m_SegmentationModifiedObserverTag.value());
+    }
+
+    m_SegmentationModifiedObserverTag.reset();
+  }
+}
+
+void QmitkSegmentationTaskWidget::OnSegmentationModified()
+{
+  if (!m_UnsavedChanges)
+  {
+    m_UnsavedChanges = true;
+
+    if (m_ActiveSubtaskIndex.value() == m_CurrentSubtaskIndex)
+      this->UpdateDetailsLabel();
+  }
 }
 
 void QmitkSegmentationTaskWidget::SetActiveSubtaskIndex(const std::optional<size_t>& index)
@@ -583,4 +681,9 @@ void QmitkSegmentationTaskWidget::SetCurrentSubtaskIndex(size_t index)
     m_CurrentSubtaskIndex = index;
     emit CurrentSubtaskChanged(m_CurrentSubtaskIndex);
   }
+}
+
+bool QmitkSegmentationTaskWidget::ActivateSubtaskIsShown() const
+{
+  return m_ActiveSubtaskIndex.has_value() && m_ActiveSubtaskIndex == m_CurrentSubtaskIndex;
 }

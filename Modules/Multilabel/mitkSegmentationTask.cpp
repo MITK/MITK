@@ -11,6 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkSegmentationTask.h"
+
+#include <mitkIOUtil.h>
 #include <mitkProperties.h>
 
 mitk::SegmentationTask::Subtask::Subtask()
@@ -122,6 +124,15 @@ std::filesystem::path mitk::SegmentationTask::GetAbsolutePath(const std::filesys
   return !normalizedPath.is_absolute()
     ? this->GetBasePath() / normalizedPath
     : normalizedPath;
+}
+
+void mitk::SegmentationTask::SaveSubtask(size_t index, const BaseData* segmentation)
+{
+  if (segmentation == nullptr)
+    return;
+
+  auto path = this->GetAbsolutePath(this->GetResult(index));
+  IOUtil::Save(segmentation, path.string());
 }
 
 std::vector<mitk::SegmentationTask::Subtask>::const_iterator mitk::SegmentationTask::begin() const

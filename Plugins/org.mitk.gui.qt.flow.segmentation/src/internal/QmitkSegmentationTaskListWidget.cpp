@@ -406,13 +406,25 @@ void QmitkSegmentationTaskListWidget::UpdateDetailsLabel()
  */
 void QmitkSegmentationTaskListWidget::OnLoadButtonClicked()
 {
+  const auto current = m_CurrentTaskIndex;
+
   if (m_UnsavedChanges)
   {
-    const auto i = m_ActiveTaskIndex.value();
+    const auto active = m_ActiveTaskIndex.value();
 
-    const auto title = QString("Load task %1").arg(m_CurrentTaskIndex + 1);
-    const auto text = QString("The currently active task %1 has unsaved changes.").arg(i + 1);
-    const auto reply = QMessageBox::question(this, title, text, QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, QMessageBox::Cancel);
+    auto title = QString("Load task %1").arg(current + 1);
+
+    if (m_TaskList->HasName(current))
+      title += ": " + QString::fromStdString(m_TaskList->GetName(current));
+
+    auto text = QString("The currently active task %1 ").arg(active + 1);
+
+    if (m_TaskList->HasName(active))
+      text += "(" + QString::fromStdString(m_TaskList->GetName(active)) + ") ";
+
+    text += "has unsaved changes.";
+
+    auto reply = QMessageBox::question(this, title, text, QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, QMessageBox::Cancel);
 
     if (reply == QMessageBox::Cancel)
       return;
@@ -423,7 +435,7 @@ void QmitkSegmentationTaskListWidget::OnLoadButtonClicked()
 
       try
       {
-        m_TaskList->SaveTask(i, this->GetSegmentationDataNode(i)->GetData());
+        m_TaskList->SaveTask(active, this->GetSegmentationDataNode(active)->GetData());
         this->OnUnsavedChangesSaved();
       }
       catch (const mitk::Exception& e)
@@ -438,7 +450,7 @@ void QmitkSegmentationTaskListWidget::OnLoadButtonClicked()
   m_Ui->loadButton->setEnabled(false);
   QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
 
-  auto* imageNode = this->GetImageDataNode(m_CurrentTaskIndex);
+  auto* imageNode = this->GetImageDataNode(current);
 
   this->UnloadTasks(imageNode);
   this->LoadTask(imageNode);

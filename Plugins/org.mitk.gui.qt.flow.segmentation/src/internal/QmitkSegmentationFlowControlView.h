@@ -54,7 +54,7 @@ protected slots:
 
     void OnAcceptButtonPushed();
     void OnActiveTaskChanged(const std::optional<size_t>& index);
-    void OnCurrentTaskChanged(size_t index);
+    void OnCurrentTaskChanged(const std::optional<size_t>& index);
 
 protected:
     void SetFocus() override;

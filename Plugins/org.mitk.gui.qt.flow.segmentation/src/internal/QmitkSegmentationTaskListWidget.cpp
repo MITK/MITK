@@ -94,7 +94,6 @@ QmitkSegmentationTaskListWidget::QmitkSegmentationTaskListWidget(QWidget* parent
   : QWidget(parent),
     m_Ui(new Ui::QmitkSegmentationTaskListWidget),
     m_FileSystemWatcher(new QFileSystemWatcher(this)),
-    m_CurrentTaskIndex(0),
     m_UnsavedChanges(false)
 {
   m_Ui->setupUi(this);
@@ -133,7 +132,7 @@ std::optional<size_t> QmitkSegmentationTaskListWidget::GetActiveTaskIndex() cons
   return m_ActiveTaskIndex;
 }
 
-size_t QmitkSegmentationTaskListWidget::GetCurrentTaskIndex() const
+std::optional<size_t> QmitkSegmentationTaskListWidget::GetCurrentTaskIndex() const
 {
   return m_CurrentTaskIndex;
 }
@@ -184,13 +183,10 @@ void QmitkSegmentationTaskListWidget::ResetControls()
   m_Ui->progressBar->setMaximum(1);
 
   m_Ui->previousButton->setEnabled(false);
-
-  m_Ui->loadButton->setEnabled(false);
-  m_Ui->loadButton->setText(QStringLiteral("Load task"));
-
   m_Ui->nextButton->setEnabled(false);
 
-  m_Ui->detailsLabel->clear();
+  this->UpdateLoadButton();
+  this->UpdateDetailsLabel();
 }
 
 /* If the segmentation task changed, reset all member variables to expected
@@ -202,7 +198,15 @@ void QmitkSegmentationTaskListWidget::SetTaskList(mitk::SegmentationTaskList* ta
   {
     m_TaskList = taskList;
 
-    this->SetCurrentTaskIndex(0);
+    if (taskList != nullptr)
+    {
+      this->SetCurrentTaskIndex(0);
+    }
+    else
+    {
+      this->SetCurrentTaskIndex(std::nullopt);
+    }
+
     this->ResetFileSystemWatcher();
   }
 }
@@ -258,7 +262,7 @@ void QmitkSegmentationTaskListWidget::UpdateProgressBar()
   m_Ui->progressBar->setValue(progress);
 }
 
-/* Provided that a valid segmentation task is currently selected and the
+/* Provided that a valid segmentation task list is currently selected and the
  * widget is in its default state, update all controls accordingly.
  */
 void QmitkSegmentationTaskListWidget::OnTaskListChanged(mitk::SegmentationTaskList* taskList)
@@ -285,14 +289,17 @@ void QmitkSegmentationTaskListWidget::OnTaskListChanged(mitk::SegmentationTaskLi
 void QmitkSegmentationTaskListWidget::OnPreviousButtonClicked()
 {
   const auto maxIndex = m_TaskList->GetNumberOfTasks() - 1;
+  auto current = m_CurrentTaskIndex.value();
 
-  if (m_CurrentTaskIndex != 0)
-    this->SetCurrentTaskIndex(m_CurrentTaskIndex - 1);
+  if (current != 0)
+    this->SetCurrentTaskIndex(current - 1);
 
-  if (m_CurrentTaskIndex == 0)
+  current = m_CurrentTaskIndex.value();
+
+  if (current == 0)
     m_Ui->previousButton->setEnabled(false);
 
-  if (m_CurrentTaskIndex < maxIndex)
+  if (current < maxIndex)
     m_Ui->nextButton->setEnabled(true);
 }
 
@@ -302,14 +309,17 @@ void QmitkSegmentationTaskListWidget::OnPreviousButtonClicked()
 void QmitkSegmentationTaskListWidget::OnNextButtonClicked()
 {
   const auto maxIndex = m_TaskList->GetNumberOfTasks() - 1;
+  auto current = m_CurrentTaskIndex.value();
 
-  if (m_CurrentTaskIndex < maxIndex)
-    this->SetCurrentTaskIndex(m_CurrentTaskIndex + 1);
+  if (current < maxIndex)
+    this->SetCurrentTaskIndex(current + 1);
 
-  if (m_CurrentTaskIndex != 0)
+  current = m_CurrentTaskIndex.value();
+
+  if (current != 0)
     m_Ui->previousButton->setEnabled(true);
 
-  if (m_CurrentTaskIndex >= maxIndex)
+  if (current >= maxIndex)
     m_Ui->nextButton->setEnabled(false);
 }
 
@@ -325,21 +335,29 @@ void QmitkSegmentationTaskListWidget::OnCurrentTaskChanged()
  */
 void QmitkSegmentationTaskListWidget::UpdateLoadButton()
 {
-  const auto current = m_CurrentTaskIndex;
-
   auto text = !this->ActiveTaskIsShown()
     ? QStringLiteral("Load task")
     : QStringLiteral("Task");
 
-  if (m_TaskList.IsNotNull())
+  if (m_CurrentTaskIndex.has_value())
   {
-    text += QString(" %1/%2").arg(current + 1).arg(m_TaskList->GetNumberOfTasks());
+    const auto current = m_CurrentTaskIndex.value();
 
-    if (m_TaskList->HasName(current))
-      text += QStringLiteral(":\n") + QString::fromStdString(m_TaskList->GetName(current));
+    if (m_TaskList.IsNotNull())
+    {
+      text += QString(" %1/%2").arg(current + 1).arg(m_TaskList->GetNumberOfTasks());
+
+      if (m_TaskList->HasName(current))
+        text += QStringLiteral(":\n") + QString::fromStdString(m_TaskList->GetName(current));
+    }
+
+    m_Ui->loadButton->setDisabled(this->ActiveTaskIsShown());
+  }
+  else
+  {
+    m_Ui->loadButton->setEnabled(false);
   }
 
-  m_Ui->loadButton->setDisabled(this->ActiveTaskIsShown());
   m_Ui->loadButton->setText(text);
 }
 
@@ -349,7 +367,13 @@ void QmitkSegmentationTaskListWidget::UpdateLoadButton()
  */
 void QmitkSegmentationTaskListWidget::UpdateDetailsLabel()
 {
-  const auto current = m_CurrentTaskIndex;
+  if (!m_CurrentTaskIndex.has_value())
+  {
+    m_Ui->detailsLabel->clear();
+    return;
+  }
+
+  const auto current = m_CurrentTaskIndex.value();
   bool isDone = m_TaskList->IsDone(current);
 
   auto details = QString("<p><b>Status: %1</b> / <b>").arg(this->ActiveTaskIsShown()
@@ -404,7 +428,7 @@ void QmitkSegmentationTaskListWidget::OnLoadButtonClicked()
   m_Ui->loadButton->setEnabled(false);
 
   QApplication::setOverrideCursor(Qt::BusyCursor);
-  this->LoadTask(this->GetImageDataNode(m_CurrentTaskIndex));
+  this->LoadTask(this->GetImageDataNode(m_CurrentTaskIndex.value()));
   QApplication::restoreOverrideCursor();
 }
 
@@ -476,7 +500,7 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
 {
   this->UnloadTasks(imageNode);
 
-  const auto current = m_CurrentTaskIndex;
+  const auto current = m_CurrentTaskIndex.value();
 
   mitk::Image::Pointer image;
   mitk::LabelSetImage::Pointer segmentation;
@@ -637,7 +661,7 @@ void QmitkSegmentationTaskListWidget::SetActiveTaskIndex(const std::optional<siz
   }
 }
 
-void QmitkSegmentationTaskListWidget::SetCurrentTaskIndex(size_t index)
+void QmitkSegmentationTaskListWidget::SetCurrentTaskIndex(const std::optional<size_t>& index)
 {
   if (m_CurrentTaskIndex != index)
   {
@@ -649,7 +673,7 @@ void QmitkSegmentationTaskListWidget::SetCurrentTaskIndex(size_t index)
 
 bool QmitkSegmentationTaskListWidget::ActiveTaskIsShown() const
 {
-  return m_ActiveTaskIndex.has_value() && m_ActiveTaskIndex == m_CurrentTaskIndex;
+  return m_ActiveTaskIndex.has_value() && m_CurrentTaskIndex.has_value() && m_ActiveTaskIndex == m_CurrentTaskIndex;
 }
 
 bool QmitkSegmentationTaskListWidget::HandleUnsavedChanges()
@@ -657,7 +681,7 @@ bool QmitkSegmentationTaskListWidget::HandleUnsavedChanges()
   if (m_UnsavedChanges)
   {
     const auto active = m_ActiveTaskIndex.value();
-    const auto current = m_CurrentTaskIndex;
+    const auto current = m_CurrentTaskIndex.value();
 
     auto title = QString("Load task %1").arg(current + 1);
 

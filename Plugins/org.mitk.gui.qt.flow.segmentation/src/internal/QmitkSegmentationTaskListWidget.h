@@ -40,13 +40,14 @@ public:
 
   mitk::SegmentationTaskList* GetTaskList() const;
   std::optional<size_t> GetActiveTaskIndex() const;
-  size_t GetCurrentTaskIndex() const;
+  std::optional<size_t> GetCurrentTaskIndex() const;
   mitk::DataNode* GetSegmentationDataNode(size_t index) const;
   void OnUnsavedChangesSaved();
+  bool ActiveTaskIsShown() const;
 
 signals:
   void ActiveTaskChanged(const std::optional<size_t>& index);
-  void CurrentTaskChanged(size_t index);
+  void CurrentTaskChanged(const std::optional<size_t>& index);
 
 private:
   void OnSelectionChanged(const QmitkSingleNodeSelectionWidget::NodeList& nodes);
@@ -69,8 +70,7 @@ private:
   void UnsubscribeFromActiveSegmentation();
   void OnSegmentationModified();
   void SetActiveTaskIndex(const std::optional<size_t>& index);
-  void SetCurrentTaskIndex(size_t index);
-  bool ActiveTaskIsShown() const;
+  void SetCurrentTaskIndex(const std::optional<size_t>& index);
   bool HandleUnsavedChanges();
   void SaveActiveTask();
 
@@ -78,7 +78,7 @@ private:
   QFileSystemWatcher* m_FileSystemWatcher;
   mitk::SegmentationTaskList::Pointer m_TaskList;
   mitk::DataNode::Pointer m_TaskListNode;
-  size_t m_CurrentTaskIndex;
+  std::optional<size_t> m_CurrentTaskIndex;
   std::optional<size_t> m_ActiveTaskIndex;
   std::optional<unsigned long> m_SegmentationModifiedObserverTag;
   bool m_UnsavedChanges;

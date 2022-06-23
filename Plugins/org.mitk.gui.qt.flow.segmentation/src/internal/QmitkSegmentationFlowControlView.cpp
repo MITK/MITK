@@ -134,7 +134,7 @@ void QmitkSegmentationFlowControlView::OnActiveTaskChanged(const std::optional<s
   this->UpdateControls();
 }
 
-void QmitkSegmentationFlowControlView::OnCurrentTaskChanged(size_t)
+void QmitkSegmentationFlowControlView::OnCurrentTaskChanged(const std::optional<size_t>&)
 {
   this->UpdateControls();
 }
@@ -148,14 +148,8 @@ void QmitkSegmentationFlowControlView::UpdateControls()
 
   if (hasTaskList)
   {
-    auto activeTaskIndex = m_Controls.segmentationTaskListWidget->GetActiveTaskIndex();
-    auto hasActiveTtask = activeTaskIndex.has_value();
-
-    auto isCurrentTask = hasActiveTtask
-      ? m_Controls.segmentationTaskListWidget->GetCurrentTaskIndex() == activeTaskIndex.value()
-      : false;
-
-    m_Controls.btnStoreAndAccept->setEnabled(hasActiveTtask && isCurrentTask);
+    auto activeTaskIsShown = m_Controls.segmentationTaskListWidget->ActiveTaskIsShown();
+    m_Controls.btnStoreAndAccept->setEnabled(activeTaskIsShown);
   }
   else
   {

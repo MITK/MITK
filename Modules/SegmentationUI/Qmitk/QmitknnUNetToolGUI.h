@@ -395,7 +395,7 @@ private:
    */
   QSettings m_Settings;
 
-  bool m_IsRESULTSFOLDERvalid = false;
+  bool m_IsResultsFolderValid = false;
 
   QThread *m_nnUNetThread;
   nnUNetDownloadWorker *m_Worker;

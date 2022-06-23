@@ -135,7 +135,7 @@ namespace mitk
 
   bool ProcessExecutor::Execute(const std::string &executionPath,
                                 const std::string &executableName,
-                                ArgumentListType argumentList)
+                                ArgumentListType &argumentList)
   {
     std::string executableName_OS = GetOSDependendExecutableName(executableName);
     argumentList.insert(argumentList.begin(), executableName_OS);

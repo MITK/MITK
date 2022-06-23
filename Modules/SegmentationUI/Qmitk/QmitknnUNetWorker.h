@@ -21,7 +21,6 @@ Q_DECLARE_METATYPE(mitk::ProcessExecutor::Pointer);
 Q_DECLARE_METATYPE(mitk::ProcessExecutor::ArgumentListType);
 
 /**
- * @class Download Worker
  * @brief Class to execute some functions from the Segmentation Plugin in a seperate thread
  */
 class nnUNetDownloadWorker : public QObject

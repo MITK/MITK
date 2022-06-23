@@ -80,7 +80,7 @@ namespace mitk
 
     using ArgumentListType = std::vector<std::string>;
 
-    bool Execute(const std::string &executionPath, const std::string &executableName, ArgumentListType argumentList);
+    bool Execute(const std::string &executionPath, const std::string &executableName, ArgumentListType &argumentList);
 
     /**
      * @brief Executes the process. This version assumes that the executable name is the first argument in the argument

@@ -58,7 +58,7 @@ private:
   void OnTaskListChanged(mitk::SegmentationTaskList* task);
   void OnPreviousButtonClicked();
   void OnNextButtonClicked();
-  void OnTaskChanged();
+  void OnCurrentTaskChanged();
   void UpdateLoadButton();
   void UpdateDetailsLabel();
   void OnLoadButtonClicked();
@@ -70,7 +70,9 @@ private:
   void OnSegmentationModified();
   void SetActiveTaskIndex(const std::optional<size_t>& index);
   void SetCurrentTaskIndex(size_t index);
-  bool ActivatedTaskIsShown() const;
+  bool ActiveTaskIsShown() const;
+  bool HandleUnsavedChanges();
+  void SaveActiveTask();
 
   Ui::QmitkSegmentationTaskListWidget* m_Ui;
   QFileSystemWatcher* m_FileSystemWatcher;

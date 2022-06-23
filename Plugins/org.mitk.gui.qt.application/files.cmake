@@ -11,6 +11,7 @@ set(SRC_CPP_FILES
   QmitkDataNodeOpenInAction.cpp
   QmitkDataNodeReinitAction.cpp
   QmitkDataNodeRemoveAction.cpp
+  QmitkDataNodeResetGeometryAction.cpp
   QmitkDataNodeShowDetailsAction.cpp
   QmitkDataNodeShowSelectedNodesAction.cpp
   QmitkDataNodeSurfaceRepresentationAction.cpp
@@ -45,6 +46,7 @@ set(MOC_H_FILES
   src/QmitkDataNodeOpenInAction.h
   src/QmitkDataNodeReinitAction.h
   src/QmitkDataNodeRemoveAction.h
+  src/QmitkDataNodeResetGeometryAction.h
   src/QmitkDataNodeShowDetailsAction.h
   src/QmitkDataNodeShowSelectedNodesAction.h
   src/QmitkDataNodeSurfaceRepresentationAction.h

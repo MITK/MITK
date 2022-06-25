@@ -406,16 +406,19 @@ void QmitkSegmentationTaskListWidget::UpdateDetailsLabel()
   QStringList stringList;
 
   if (m_TaskList->HasImage(current))
-    stringList << QString::fromStdString("<b>Image:</b> " + m_TaskList->GetImage(current));
+    stringList << QString::fromStdString("<b>Image:</b> " + m_TaskList->GetImage(current).string());
 
   if (m_TaskList->HasSegmentation(current))
-    stringList << QString::fromStdString("<b>Segmentation:</b> " + m_TaskList->GetSegmentation(current));
+    stringList << QString::fromStdString("<b>Segmentation:</b> " + m_TaskList->GetSegmentation(current).string());
 
   if (m_TaskList->HasLabelName(current))
     stringList << QString::fromStdString("<b>Label name:</b> " + m_TaskList->GetLabelName(current));
 
+  if (m_TaskList->HasLabelNameSuggestions(current))
+    stringList << QString::fromStdString("<b>Label name suggestions:</b> " + m_TaskList->GetLabelNameSuggestions(current).string());
+
   if (m_TaskList->HasPreset(current))
-    stringList << QString::fromStdString("<b>Label set preset:</b> " + m_TaskList->GetPreset(current));
+    stringList << QString::fromStdString("<b>Label set preset:</b> " + m_TaskList->GetPreset(current).string());
 
   if (m_TaskList->HasDynamic(current))
     stringList << QString("<b>Segmentation type:</b> %1").arg(m_TaskList->GetDynamic(current) ? "Dynamic" : "Static");

@@ -36,12 +36,12 @@ namespace mitk
 
       mitkSegmentationTaskValueMacro(std::string, Name)
       mitkSegmentationTaskValueMacro(std::string, Description)
-      mitkSegmentationTaskValueMacro(std::string, Image)
-      mitkSegmentationTaskValueMacro(std::string, Segmentation)
+      mitkSegmentationTaskValueMacro(std::filesystem::path, Image)
+      mitkSegmentationTaskValueMacro(std::filesystem::path, Segmentation)
       mitkSegmentationTaskValueMacro(std::string, LabelName)
-      mitkSegmentationTaskValueMacro(std::string, LabelNameSuggestions)
-      mitkSegmentationTaskValueMacro(std::string, Preset)
-      mitkSegmentationTaskValueMacro(std::string, Result)
+      mitkSegmentationTaskValueMacro(std::filesystem::path, LabelNameSuggestions)
+      mitkSegmentationTaskValueMacro(std::filesystem::path, Preset)
+      mitkSegmentationTaskValueMacro(std::filesystem::path, Result)
       mitkSegmentationTaskValueMacro(bool, Dynamic)
 
     private:
@@ -54,12 +54,12 @@ namespace mitk
 
     mitkSegmentationTaskListValueMacro(std::string, Name)
     mitkSegmentationTaskListValueMacro(std::string, Description)
-    mitkSegmentationTaskListValueMacro(std::string, Image)
-    mitkSegmentationTaskListValueMacro(std::string, Segmentation)
+    mitkSegmentationTaskListValueMacro(std::filesystem::path, Image)
+    mitkSegmentationTaskListValueMacro(std::filesystem::path, Segmentation)
     mitkSegmentationTaskListValueMacro(std::string, LabelName)
-    mitkSegmentationTaskListValueMacro(std::string, LabelNameSuggestions)
-    mitkSegmentationTaskListValueMacro(std::string, Preset)
-    mitkSegmentationTaskListValueMacro(std::string, Result)
+    mitkSegmentationTaskListValueMacro(std::filesystem::path, LabelNameSuggestions)
+    mitkSegmentationTaskListValueMacro(std::filesystem::path, Preset)
+    mitkSegmentationTaskListValueMacro(std::filesystem::path, Result)
     mitkSegmentationTaskListValueMacro(bool, Dynamic)
 
     size_t GetNumberOfTasks() const;

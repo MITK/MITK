@@ -31,22 +31,22 @@ namespace mitk
       json["Description"] = task.GetDescription();
 
     if (task.HasImage())
-      json["Image"] = task.GetImage();
+      json["Image"] = task.GetImage().string();
 
     if (task.HasSegmentation())
-      json["Segmentation"] = task.GetSegmentation();
+      json["Segmentation"] = task.GetSegmentation().string();
 
     if (task.HasLabelName())
       json["LabelName"] = task.GetLabelName();
 
     if (task.HasLabelNameSuggestions())
-      json["LabelNameSuggestions"] = task.GetLabelNameSuggestions();
+      json["LabelNameSuggestions"] = task.GetLabelNameSuggestions().string();
 
     if (task.HasPreset())
-      json["Preset"] = task.GetPreset();
+      json["Preset"] = task.GetPreset().string();
 
     if (task.HasResult())
-      json["Result"] = task.GetResult();
+      json["Result"] = task.GetResult().string();
 
     if (task.HasDynamic())
       json["Dynamic"] = task.GetDynamic();

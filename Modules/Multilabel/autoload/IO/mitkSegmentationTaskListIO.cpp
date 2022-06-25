@@ -39,6 +39,9 @@ namespace mitk
     if (task.HasLabelName())
       json["LabelName"] = task.GetLabelName();
 
+    if (task.HasLabelNameSuggestions())
+      json["LabelNameSuggestions"] = task.GetLabelNameSuggestions();
+
     if (task.HasPreset())
       json["Preset"] = task.GetPreset();
 
@@ -75,6 +78,11 @@ namespace mitk
 
     if (iter != json.end())
       task.SetLabelName(json["LabelName"].get<std::string>());
+
+    iter = json.find("LabelNameSuggestions");
+
+    if (iter != json.end())
+      task.SetLabelNameSuggestions(json["LabelNameSuggestions"].get<std::string>());
 
     iter = json.find("Preset");
 

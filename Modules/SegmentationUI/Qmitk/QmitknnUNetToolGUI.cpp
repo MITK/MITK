@@ -20,8 +20,6 @@ found in the LICENSE file.
 #include <QmitkStyleManager.h>
 #include <QtGlobal>
 #include <itksys/SystemTools.hxx>
-#include <set>
-
 #include <nlohmann/json.hpp>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitknnUNetToolGUI, "")
@@ -33,13 +31,23 @@ QmitknnUNetToolGUI::QmitknnUNetToolGUI() : QmitkMultiLabelSegWithPreviewToolGUIB
   if (m_GpuLoader.GetGPUCount() == 0)
   {
     std::string warning = "WARNING: No GPUs were detected on your machine. The nnUNet tool might not work.";
-    ShowErrorMessage(warning);
+    this->ShowErrorMessage(warning);
   }
 
   // define predicates for multi modal data selection combobox
   auto imageType = mitk::TNodePredicateDataType<mitk::Image>::New();
   auto labelSetImageType = mitk::NodePredicateNot::New(mitk::TNodePredicateDataType<mitk::LabelSetImage>::New());
   m_MultiModalPredicate = mitk::NodePredicateAnd::New(imageType, labelSetImageType).GetPointer();
+
+  m_nnUNetThread = new QThread(this);
+  m_Worker = new nnUNetDownloadWorker;
+  m_Worker->moveToThread(m_nnUNetThread);
+}
+
+QmitknnUNetToolGUI::~QmitknnUNetToolGUI()
+{
+  m_nnUNetThread->quit();
+  m_nnUNetThread->wait();
 }
 
 void QmitknnUNetToolGUI::ConnectNewTool(mitk::SegWithPreviewTool *newTool)
@@ -79,10 +87,20 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
           SLOT(OnPythonPathChanged(const QString &)));
   connect(m_Controls.refreshdirectoryBox, SIGNAL(clicked()), this, SLOT(OnRefreshPresssed()));
   connect(m_Controls.clearCacheButton, SIGNAL(clicked()), this, SLOT(OnClearCachePressed()));
+  connect(m_Controls.startDownloadButton, SIGNAL(clicked()), this, SLOT(OnDownloadModel()));
+  connect(m_Controls.stopDownloadButton, SIGNAL(clicked()), this, SLOT(OnStopDownload()));
+
+  //Qthreads
+  qRegisterMetaType<mitk::ProcessExecutor::Pointer>();
+  qRegisterMetaType<mitk::ProcessExecutor::ArgumentListType>();
+  connect(this, &QmitknnUNetToolGUI::Operate, m_Worker, &nnUNetDownloadWorker::DoWork);
+  connect(m_Worker, &nnUNetDownloadWorker::Exit, this, &QmitknnUNetToolGUI::OnDownloadWorkerExit);
+  connect(m_nnUNetThread, &QThread::finished, m_Worker, &QObject::deleteLater);
 
   m_Controls.multiModalSpinBox->setVisible(false);
   m_Controls.multiModalSpinBox->setEnabled(false);
   m_Controls.multiModalSpinLabel->setVisible(false);
+  m_Controls.stopDownloadButton->setVisible(false);
   m_Controls.previewButton->setEnabled(false);
 
   QIcon refreshIcon =
@@ -92,6 +110,9 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
     QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-open.svg"));
   m_Controls.modeldirectoryBox->setIcon(dirIcon);
   m_Controls.refreshdirectoryBox->setEnabled(true);
+  QIcon stopIcon =
+    QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/status/dialog-error.svg"));
+  m_Controls.stopDownloadButton->setIcon(stopIcon);
 
   m_Controls.statusLabel->setTextFormat(Qt::RichText);
   if (m_GpuLoader.GetGPUCount() != 0)
@@ -107,7 +128,7 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   mainLayout->addLayout(m_Controls.verticalLayout);
   Superclass::InitializeUI(mainLayout);
   m_UI_ROWS = m_Controls.advancedSettingsLayout->rowCount(); // Must do. Row count is correct only here.
-  DisableEverything();
+  this->DisableEverything();
   QString lastSelectedPyEnv = m_Settings.value("nnUNet/LastPythonPath").toString();
   m_Controls.pythonEnvComboBox->setCurrentText(lastSelectedPyEnv);
 }
@@ -127,15 +148,15 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
       QString modelName = m_Controls.modelBox->currentText();
       if (modelName.startsWith("ensemble", Qt::CaseInsensitive))
       {
-        ProcessEnsembleModelsParams(tool);
+        this->ProcessEnsembleModelsParams(tool);
       }
       else
       {
-        ProcessModelParams(tool);
+        this->ProcessModelParams(tool);
       }
       pythonPathTextItem = m_Controls.pythonEnvComboBox->currentText();
       QString pythonPath = m_PythonPath;
-      if (!IsNNUNetInstalled(pythonPath))
+      if (!this->IsNNUNetInstalled(pythonPath))
       {
         throw std::runtime_error("nnUNet is not detected in the selected python environment. Please select a valid "
                                  "python environment or install nnUNet.");
@@ -176,18 +197,18 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
       if (tool->GetPredict())
       {
         tool->m_InputBuffer = nullptr;
-        WriteStatusMessage(QString("<b>STATUS: </b><i>Starting Segmentation task... This might take a while.</i>"));
+        this->WriteStatusMessage(QString("<b>STATUS: </b><i>Starting Segmentation task... This might take a while.</i>"));
         tool->UpdatePreview();
         if (nullptr == tool->GetOutputBuffer())
         {
-          SegmentationProcessFailed();
+          this->SegmentationProcessFailed();
         }
         else
         {
-          SegmentationResultHandler(tool);
+          this->SegmentationResultHandler(tool);
           if (doCache)
           {
-            AddToCache(hashKey, tool->GetOutputBuffer());
+            this->AddToCache(hashKey, tool->GetOutputBuffer());
           }
           tool->ClearOutputBuffer();
         }
@@ -201,7 +222,7 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
           nnUNetCache *cacheObject = m_Cache[hashKey];
           MITK_INFO << "fetched pointer " << cacheObject->m_SegCache.GetPointer();
           tool->SetOutputBuffer(const_cast<mitk::LabelSetImage *>(cacheObject->m_SegCache.GetPointer()));
-          SegmentationResultHandler(tool, true);
+          this->SegmentationResultHandler(tool, true);
         }
       }
       m_Controls.previewButton->setEnabled(true);
@@ -210,8 +231,8 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
     {
       std::stringstream errorMsg;
       errorMsg << "<b>STATUS: </b>Error while processing parameters for nnUNet segmentation. Reason: " << e.what();
-      ShowErrorMessage(errorMsg.str());
-      WriteErrorMessage(QString::fromStdString(errorMsg.str()));
+      this->ShowErrorMessage(errorMsg.str());
+      this->WriteErrorMessage(QString::fromStdString(errorMsg.str()));
       m_Controls.previewButton->setEnabled(true);
       tool->PredictOff();
       return;
@@ -219,7 +240,7 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
     catch (...)
     {
       std::string errorMsg = "Unkown error occured while generation nnUNet segmentation.";
-      ShowErrorMessage(errorMsg);
+      this->ShowErrorMessage(errorMsg);
       m_Controls.previewButton->setEnabled(true);
       tool->PredictOff();
       return;
@@ -318,7 +339,7 @@ void QmitknnUNetToolGUI::ProcessEnsembleModelsParams(mitk::nnUNetTool::Pointer t
     QString planId = layout->plannerBox->currentText();
     ppDirFolderName << planId;
 
-    if (!IsModelExists(modelName, taskName, QString(trainer + "__" + planId)))
+    if (!this->IsModelExists(modelName, taskName, QString(trainer + "__" + planId)))
     {
       std::string errorMsg = "The configuration " + modelName.toStdString() +
                              " you have selected doesn't exist. Check your Results Folder again.";
@@ -345,19 +366,19 @@ void QmitknnUNetToolGUI::ProcessEnsembleModelsParams(mitk::nnUNetTool::Pointer t
     {
       tool->SetPostProcessingJsonDirectory(ppJsonFilePossibility1.toStdString());
       const QString statusMsg = "<i>Post Processing JSON file found: </i>" + ppJsonFilePossibility1;
-      WriteStatusMessage(statusMsg);
+      this->WriteStatusMessage(statusMsg);
     }
     else if (QFile(ppJsonFilePossibility2).exists())
     {
       tool->SetPostProcessingJsonDirectory(ppJsonFilePossibility2.toStdString());
       const QString statusMsg = "<i>Post Processing JSON file found:</i>" + ppJsonFilePossibility2;
-      WriteStatusMessage(statusMsg);
+      this->WriteStatusMessage(statusMsg);
     }
     else
     {
       std::string errorMsg =
         "No post processing file was found for the selected ensemble combination. Continuing anyway...";
-      ShowErrorMessage(errorMsg);
+      this->ShowErrorMessage(errorMsg);
     }
   }
   tool->m_ParamQ.clear();
@@ -372,7 +393,7 @@ void QmitknnUNetToolGUI::ProcessModelParams(mitk::nnUNetTool::Pointer tool)
   QString taskName = m_Controls.taskBox->currentText();
   QString trainer = m_Controls.trainerBox->currentText();
   QString planId = m_Controls.plannerBox->currentText();
-  std::vector<std::string> fetchedFolds = FetchSelectedFoldsFromUI(m_Controls.foldBox);
+  std::vector<std::string> fetchedFolds = this->FetchSelectedFoldsFromUI(m_Controls.foldBox);
   mitk::ModelParams modelObject = MapToRequest(modelName, taskName, trainer, planId, fetchedFolds);
   requestQ.push_back(modelObject);
   tool->m_ParamQ.clear();
@@ -422,7 +443,7 @@ std::vector<std::string> QmitknnUNetToolGUI::FetchSelectedFoldsFromUI(ctkCheckab
   std::vector<std::string> folds;
   if (foldBox->noneChecked())
   {
-    CheckAllInCheckableComboBox(foldBox);
+    this->CheckAllInCheckableComboBox(foldBox);
   }
   QModelIndexList foldList = foldBox->checkedIndexes();
   for (const auto &index : foldList)
@@ -436,7 +457,7 @@ std::vector<std::string> QmitknnUNetToolGUI::FetchSelectedFoldsFromUI(ctkCheckab
 void QmitknnUNetToolGUI::OnClearCachePressed()
 {
   m_Cache.clear();
-  UpdateCacheCountOnUI();
+  this->UpdateCacheCountOnUI();
 }
 
 void QmitknnUNetToolGUI::UpdateCacheCountOnUI()
@@ -451,7 +472,7 @@ void QmitknnUNetToolGUI::AddToCache(size_t &hashKey, mitk::LabelSetImage::ConstP
   newCacheObj->m_SegCache = mlPreview;
   m_Cache.insert(hashKey, newCacheObj);
   MITK_INFO << "New hash: " << hashKey << " " << newCacheObj->m_SegCache.GetPointer();
-  UpdateCacheCountOnUI();
+  this->UpdateCacheCountOnUI();
 }
 
 void QmitknnUNetToolGUI::SetGPUInfo()
@@ -498,26 +519,31 @@ QString QmitknnUNetToolGUI::FetchResultsFolderFromEnv()
   return retVal;
 }
 
-QString QmitknnUNetToolGUI::DumpJSONfromPickle(const QString &parentPath)
+void QmitknnUNetToolGUI::DumpAllJSONs(const QString &path)
 {
-  const QString picklePath = parentPath + QDir::separator() + QString("plans.pkl");
-  const QString jsonPath = parentPath + QDir::separator() + QString("mitk_export.json");
-  if (!QFile::exists(jsonPath))
+  this->DumpJSONfromPickle(path);
+  this->ExportAvailableModelsAsJSON(m_ParentFolder->getResultsFolder());
+}
+
+void QmitknnUNetToolGUI::DumpJSONfromPickle(const QString &picklePath)
+{
+  const QString pickleFile = picklePath + QDir::separator() + m_PICKLE_FILENAME;
+  const QString jsonFile = picklePath + QDir::separator() + m_MITK_EXPORT_JSON_FILENAME;
+  if (!QFile::exists(jsonFile))
   {
     mitk::ProcessExecutor::Pointer spExec = mitk::ProcessExecutor::New();
-    itk::CStyleCommand::Pointer spCommand = itk::CStyleCommand::New();
     mitk::ProcessExecutor::ArgumentListType args;
     args.push_back("-c");
     std::string pythonCode; // python syntax to parse plans.pkl file and export as Json file.
     pythonCode.append("import pickle;");
     pythonCode.append("import json;");
     pythonCode.append("loaded_pickle = pickle.load(open('");
-    pythonCode.append(picklePath.toStdString());
+    pythonCode.append(pickleFile.toStdString());
     pythonCode.append("','rb'));");
     pythonCode.append("modal_dict = {key: loaded_pickle[key] for key in loaded_pickle.keys() if key in "
                       "['modalities','num_modalities']};");
     pythonCode.append("json.dump(modal_dict, open('");
-    pythonCode.append(jsonPath.toStdString());
+    pythonCode.append(jsonFile.toStdString());
     pythonCode.append("', 'w'))");
 
     args.push_back(pythonCode);
@@ -527,19 +553,37 @@ QString QmitknnUNetToolGUI::DumpJSONfromPickle(const QString &parentPath)
     }
     catch (const mitk::Exception &e)
     {
-      MITK_ERROR << "Pickle parsing FAILED!" << e.GetDescription(); // SHOW ERROR
-      WriteStatusMessage(
+      MITK_ERROR << "Pickle parsing FAILED!" << e.GetDescription();
+      this->WriteStatusMessage(
         "Parsing failed in backend. Multiple Modalities will now have to be manually entered by the user.");
-      return QString("");
     }
   }
-  return jsonPath;
+}
+
+void QmitknnUNetToolGUI::ExportAvailableModelsAsJSON(const QString &resultsFolder)
+{
+  const QString jsonPath = resultsFolder + QDir::separator() + m_AVAILABLE_MODELS_JSON_FILENAME;
+  if (!QFile::exists(jsonPath))
+  {
+    auto spExec = mitk::ProcessExecutor::New();
+    mitk::ProcessExecutor::ArgumentListType args;
+    args.push_back("--export");
+    args.push_back(resultsFolder.toStdString());
+    try
+    {
+      spExec->Execute(m_PythonPath.toStdString(), "nnUNet_print_available_pretrained_models", args);
+    }
+    catch (const mitk::Exception &e)
+    {
+      MITK_ERROR << "Exporting information FAILED." << e.GetDescription();
+      this->WriteStatusMessage("Exporting information FAILED.");
+    }
+  }
 }
 
 void QmitknnUNetToolGUI::DisplayMultiModalInfoFromJSON(const QString &jsonPath)
 {
   std::ifstream file(jsonPath.toStdString());
-
   if (file.is_open())
   {
     auto jsonObj = nlohmann::json::parse(file, nullptr, false);
@@ -549,9 +593,8 @@ void QmitknnUNetToolGUI::DisplayMultiModalInfoFromJSON(const QString &jsonPath)
       MITK_ERROR << "Could not parse \"" << jsonPath.toStdString() << "\" as JSON object!";
       return;
     }
-
     auto num_mods = jsonObj["num_modalities"].get<int>();
-    ClearAllModalLabels();
+    this->ClearAllModalLabels();
     if (num_mods > 1)
     {
       m_Controls.multiModalBox->setChecked(true);
@@ -560,7 +603,7 @@ void QmitknnUNetToolGUI::DisplayMultiModalInfoFromJSON(const QString &jsonPath)
       m_Controls.advancedSettingsLayout->update();
       auto obj = jsonObj["modalities"];
       int count = 0;
-      for (const auto& value : obj)
+      for (const auto &value : obj)
       {
         QLabel *label = new QLabel(QString::fromStdString("<i>" + value.get<std::string>() + "</i>"), this);
         m_ModalLabels.push_back(label);
@@ -574,6 +617,24 @@ void QmitknnUNetToolGUI::DisplayMultiModalInfoFromJSON(const QString &jsonPath)
     {
       m_Controls.multiModalSpinBox->setMinimum(0);
       m_Controls.multiModalBox->setChecked(false);
+    }
+  }
+}
+
+void QmitknnUNetToolGUI::FillAvailableModelsInfoFromJSON(const QString &jsonPath)
+{
+  std::ifstream file(jsonPath.toStdString());
+  if (file.is_open() && m_Controls.availableBox->count() < 1)
+  {
+    auto jsonObj = nlohmann::json::parse(file, nullptr, false);
+    if (jsonObj.is_discarded() || !jsonObj.is_object())
+    {
+      MITK_ERROR << "Could not parse \"" << jsonPath.toStdString() << "\" as JSON object!";
+      return;
+    }
+    for (const auto &obj : jsonObj.items())
+    {
+      m_Controls.availableBox->addItem(QString::fromStdString(obj.key()));
     }
   }
 }

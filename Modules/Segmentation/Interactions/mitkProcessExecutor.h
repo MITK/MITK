@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <MitkSegmentationExports.h>
 #include <itkObject.h>
 #include <vector>
+#include <itksys/Process.h>
 
 namespace mitk
 {
@@ -79,7 +80,7 @@ namespace mitk
 
     using ArgumentListType = std::vector<std::string>;
 
-    bool Execute(const std::string &executionPath, const std::string &executableName, ArgumentListType argumentList);
+    bool Execute(const std::string &executionPath, const std::string &executableName, ArgumentListType &argumentList);
 
     /**
      * @brief Executes the process. This version assumes that the executable name is the first argument in the argument
@@ -91,6 +92,8 @@ namespace mitk
     static std::string EnsureCorrectOSPathSeparator(const std::string &);
 
     static std::string GetOSDependendExecutableName(const std::string &name);
+
+    void KillProcess();
 
   protected:
     ProcessExecutor();
@@ -104,6 +107,9 @@ namespace mitk
      * @remark The events will only be invoked if the pipes are NOT(!) shared.
      */
     bool m_SharedOutputPipes;
+
+  private:
+    itksysProcess *m_ProcessID = nullptr;
   };
 
 } // namespace mitk

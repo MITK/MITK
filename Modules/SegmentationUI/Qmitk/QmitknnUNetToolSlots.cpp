@@ -14,7 +14,7 @@ void QmitknnUNetToolGUI::ClearAllModalities()
 {
   m_Controls.multiModalSpinBox->setMinimum(0);
   m_Controls.multiModalBox->setChecked(false);
-  ClearAllModalLabels();
+  this->ClearAllModalLabels();
 }
 
 void QmitknnUNetToolGUI::ClearAllModalLabels()
@@ -34,8 +34,8 @@ void QmitknnUNetToolGUI::DisableEverything()
   m_Controls.previewButton->setEnabled(false);
   m_Controls.multiModalSpinBox->setVisible(false);
   m_Controls.multiModalBox->setEnabled(false);
-  ClearAllComboBoxes();
-  ClearAllModalities();
+  this->ClearAllComboBoxes();
+  this->ClearAllModalities();
 }
 
 void QmitknnUNetToolGUI::ClearAllComboBoxes()
@@ -52,19 +52,21 @@ void QmitknnUNetToolGUI::ClearAllComboBoxes()
     layout->plannerBox->clear();
     layout->foldBox->clear();
   }
+  m_Controls.availableBox->clear();
 }
 
 void QmitknnUNetToolGUI::OnRefreshPresssed()
 {
   const QString resultsFolder = m_Controls.modeldirectoryBox->directory();
-  OnDirectoryChanged(resultsFolder);
+  this->OnDirectoryChanged(resultsFolder);
 }
 
 void QmitknnUNetToolGUI::OnDirectoryChanged(const QString &resultsFolder)
 {
+  m_IsResultsFolderValid = false;
   m_Controls.previewButton->setEnabled(false);
-  ClearAllComboBoxes();
-  ClearAllModalities();
+  this->ClearAllComboBoxes();
+  this->ClearAllModalities();
   m_ParentFolder = std::make_shared<QmitknnUNetFolderParser>(resultsFolder);
   auto tasks = m_ParentFolder->getAllTasks<QStringList>();
   tasks.removeDuplicates();
@@ -78,7 +80,7 @@ void QmitknnUNetToolGUI::OnModelChanged(const QString &model)
   {
     return;
   }
-  ClearAllModalities();
+  this->ClearAllModalities();
   auto selectedTask = m_Controls.taskBox->currentText();
   ctkComboBox *box = qobject_cast<ctkComboBox *>(sender());
   if (box == m_Controls.modelBox)
@@ -91,7 +93,7 @@ void QmitknnUNetToolGUI::OnModelChanged(const QString &model)
       m_Controls.plannerLabel->setVisible(false);
       m_Controls.foldBox->setVisible(false);
       m_Controls.foldLabel->setVisible(false);
-      ShowEnsembleLayout(true);
+      this->ShowEnsembleLayout(true);
       auto models = m_ParentFolder->getModelsForTask<QStringList>(m_Controls.taskBox->currentText());
       models.removeDuplicates();
       models.removeOne(m_VALID_MODELS.last());
@@ -119,7 +121,7 @@ void QmitknnUNetToolGUI::OnModelChanged(const QString &model)
       m_Controls.foldBox->setVisible(true);
       m_Controls.foldLabel->setVisible(true);
       m_Controls.previewButton->setEnabled(false);
-      ShowEnsembleLayout(false);
+      this->ShowEnsembleLayout(false);
       auto trainerPlanners = m_ParentFolder->getTrainerPlannersForTask<QStringList>(selectedTask, model);
       QStringList trainers, planners;
       std::tie(trainers, planners) = ExtractTrainerPlannerFromString(trainerPlanners);
@@ -182,6 +184,8 @@ void QmitknnUNetToolGUI::OnTrainerChanged(const QString &plannerSelected)
   {
     return;
   }
+  m_IsResultsFolderValid = false;
+  QString parentPath;
   auto *box = qobject_cast<ctkComboBox *>(sender());
   if (box == m_Controls.plannerBox)
   {
@@ -200,16 +204,11 @@ void QmitknnUNetToolGUI::OnTrainerChanged(const QString &plannerSelected)
                   });
     if (m_Controls.foldBox->count() != 0)
     {
-      CheckAllInCheckableComboBox(m_Controls.foldBox);
-      m_Controls.previewButton->setEnabled(true);
-      const QString parentPath = QDir::cleanPath(m_ParentFolder->getResultsFolder() + QDir::separator() + "nnUNet" +
-                                                 QDir::separator() + selectedModel + QDir::separator() + selectedTask +
-                                                 QDir::separator() + selectedTrainer + QString("__") + plannerSelected);
-      const QString jsonPath = this->DumpJSONfromPickle(parentPath);
-      if (!jsonPath.isEmpty())
-      {
-        this->DisplayMultiModalInfoFromJSON(jsonPath);
-      }
+      m_IsResultsFolderValid = true;
+      this->CheckAllInCheckableComboBox(m_Controls.foldBox);
+      auto tempPath = QStringList() << m_ParentFolder->getResultsFolder() << "nnUNet" << selectedModel << selectedTask
+                                    << QString("%1__%2").arg(selectedTrainer, plannerSelected);
+      parentPath = QDir::cleanPath(tempPath.join(QDir::separator()));
     }
   }
   else if (!m_EnsembleParams.empty())
@@ -233,19 +232,29 @@ void QmitknnUNetToolGUI::OnTrainerChanged(const QString &plannerSelected)
                       });
         if (layout->foldBox->count() != 0)
         {
-          CheckAllInCheckableComboBox(layout->foldBox);
-          m_Controls.previewButton->setEnabled(true);
-          const QString parentPath = QDir::cleanPath(
-            m_ParentFolder->getResultsFolder() + QDir::separator() + "nnUNet" + QDir::separator() + selectedModel +
-            QDir::separator() + selectedTask + QDir::separator() + selectedTrainer + QString("__") + plannerSelected);
-          const QString jsonPath = this->DumpJSONfromPickle(parentPath);
-          if (!jsonPath.isEmpty())
-          {
-            this->DisplayMultiModalInfoFromJSON(jsonPath);
-          }
+          this->CheckAllInCheckableComboBox(layout->foldBox);
+          m_IsResultsFolderValid = true;
+          auto tempPath = QStringList() << m_ParentFolder->getResultsFolder() << "nnUNet" << selectedModel << selectedTask
+                                    << QString("%1__%2").arg(selectedTrainer, plannerSelected);
+          parentPath = QDir::cleanPath(tempPath.join(QDir::separator()));
         }
         break;
       }
+    }
+  }
+  if (m_IsResultsFolderValid)
+  {
+    m_Controls.previewButton->setEnabled(true);
+    const QString mitkJsonFile = parentPath + QDir::separator() + m_MITK_EXPORT_JSON_FILENAME;
+    this->DumpAllJSONs(parentPath);
+    if (QFile::exists(mitkJsonFile))
+    {
+      this->DisplayMultiModalInfoFromJSON(mitkJsonFile);
+    }
+    const QString jsonPath = m_ParentFolder->getResultsFolder() + QDir::separator() + m_AVAILABLE_MODELS_JSON_FILENAME;
+    if (QFile::exists(mitkJsonFile))
+    {
+      this->FillAvailableModelsInfoFromJSON(jsonPath);
     }
   }
 }
@@ -258,18 +267,18 @@ void QmitknnUNetToolGUI::OnPythonPathChanged(const QString &pyEnv)
       QFileDialog::getExistingDirectory(m_Controls.pythonEnvComboBox->parentWidget(), "Python Path", "dir");
     if (!path.isEmpty())
     {
-      OnPythonPathChanged(path); // recall same function for new path validation
+      this->OnPythonPathChanged(path); // recall same function for new path validation
       m_Controls.pythonEnvComboBox->insertItem(0, path);
       m_Controls.pythonEnvComboBox->setCurrentIndex(0);
     }
   }
-  else if (!IsNNUNetInstalled(pyEnv))
+  else if (!this->IsNNUNetInstalled(pyEnv))
   {
     std::string warning =
       "WARNING: nnUNet is not detected on the Python environment you selected. Please select another "
       "environment or create one. For more info refer https://github.com/MIC-DKFZ/nnUNet";
-    ShowErrorMessage(warning);
-    DisableEverything();
+    this->ShowErrorMessage(warning);
+    this->DisableEverything();
   }
   else
   {
@@ -277,12 +286,12 @@ void QmitknnUNetToolGUI::OnPythonPathChanged(const QString &pyEnv)
     m_Controls.previewButton->setEnabled(true);
     m_Controls.refreshdirectoryBox->setEnabled(true);
     m_Controls.multiModalBox->setEnabled(true);
-    QString setVal = FetchResultsFolderFromEnv();
+    QString setVal = this->FetchResultsFolderFromEnv();
     if (!setVal.isEmpty())
     {
       m_Controls.modeldirectoryBox->setDirectory(setVal);
     }
-    OnRefreshPresssed();
+    this->OnRefreshPresssed();
     m_PythonPath = pyEnv.mid(pyEnv.indexOf(" ") + 1);
     if (!(m_PythonPath.endsWith("bin", Qt::CaseInsensitive) || m_PythonPath.endsWith("bin/", Qt::CaseInsensitive)))
     {
@@ -321,11 +330,11 @@ void QmitknnUNetToolGUI::OnCheckBoxChanged(int state)
       }
       else
       {
-        OnModalitiesNumberChanged(0);
+        this->OnModalitiesNumberChanged(0);
         m_Controls.multiModalSpinBox->setValue(0);
         delete m_Modalities[0];
         m_Modalities.pop_back();
-        ClearAllModalLabels();
+        this->ClearAllModalLabels();
       }
     }
   }
@@ -416,12 +425,12 @@ mitk::ModelParams QmitknnUNetToolGUI::MapToRequest(const QString &modelName,
 
 void QmitknnUNetToolGUI::SegmentationProcessFailed()
 {
-  WriteErrorMessage(
+  this->WriteErrorMessage(
     "<b>STATUS: </b><i>Error in the segmentation process. <br>No resulting segmentation can be loaded.</i>");
   this->setCursor(Qt::ArrowCursor);
   std::stringstream stream;
   stream << "Error in the segmentation process. No resulting segmentation can be loaded.";
-  ShowErrorMessage(stream.str());
+  this->ShowErrorMessage(stream.str());
 }
 
 void QmitknnUNetToolGUI::SegmentationResultHandler(mitk::nnUNetTool *tool, bool forceRender)
@@ -431,8 +440,7 @@ void QmitknnUNetToolGUI::SegmentationResultHandler(mitk::nnUNetTool *tool, bool 
     tool->RenderOutputBuffer();
   }
   this->SetLabelSetPreview(tool->GetPreviewSegmentation());
-  WriteStatusMessage("<b>STATUS: </b><i>Segmentation task finished successfully. <br> If multiple Preview objects are selected to Confirm, "
-  "they will be merged. Any unselected Preview objects will be lost.</i>");
+  this->WriteStatusMessage("<b>STATUS: </b><i>Segmentation task finished successfully.</i>");
   this->ActualizePreviewLabelVisibility();
 }
 
@@ -476,4 +484,51 @@ void QmitknnUNetToolGUI::ShowEnsembleLayout(bool visible)
   {
     layout->setVisible(visible);
   }
+}
+
+void QmitknnUNetToolGUI::OnDownloadModel()
+{
+  if (m_IsResultsFolderValid)
+  {
+    auto selectedTask = m_Controls.availableBox->currentText();
+    auto spExec = mitk::ProcessExecutor::New();
+    mitk::ProcessExecutor::ArgumentListType args;
+    args.push_back(selectedTask.toStdString());
+    this->WriteStatusMessage("Downloading the requested task in to the selected Results Folder. This might take some time "
+                       "depending on your internet connection...");
+    m_Processes["DOWNLOAD"] = spExec;
+    if (!m_nnUNetThread->isRunning())
+    {
+      MITK_DEBUG << "Starting thread...";
+      m_nnUNetThread->start();
+    }
+    QString resultsFolder = m_ParentFolder->getResultsFolder();
+    emit Operate(resultsFolder, m_PythonPath, spExec, args);
+    m_Controls.stopDownloadButton->setVisible(true);
+    m_Controls.startDownloadButton->setVisible(false);
+  }
+}
+
+void QmitknnUNetToolGUI::OnDownloadWorkerExit(const bool isSuccess, const QString message)
+{
+  if (isSuccess)
+  {
+    this->WriteStatusMessage(message + QString(" Click Refresh Results Folder to use the new Task."));
+  }
+  else
+  {
+    MITK_ERROR << "Download FAILED! " << message.toStdString();
+    this->WriteStatusMessage(QString("Download failed. Check your internet connection. " + message));
+  }
+  m_Controls.stopDownloadButton->setVisible(false);
+  m_Controls.startDownloadButton->setVisible(true);
+}
+
+void QmitknnUNetToolGUI::OnStopDownload()
+{
+  mitk::ProcessExecutor::Pointer spExec = m_Processes["DOWNLOAD"];
+  spExec->KillProcess();
+  this->WriteStatusMessage("Download Killed by the user.");
+  m_Controls.stopDownloadButton->setVisible(false);
+  m_Controls.startDownloadButton->setVisible(true);
 }

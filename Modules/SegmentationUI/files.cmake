@@ -20,6 +20,7 @@ Qmitk/QmitkToolGUIArea.cpp
 Qmitk/QmitkToolSelectionBox.cpp
 Qmitk/QmitknnUNetToolGUI.cpp
 Qmitk/QmitknnUNetToolSlots.cpp
+Qmitk/QmitknnUNetWorker.cpp
 Qmitk/QmitkSurfaceStampWidget.cpp
 Qmitk/QmitkMaskStampWidget.cpp
 Qmitk/QmitkSliceBasedInterpolatorWidget.cpp
@@ -50,6 +51,7 @@ Qmitk/QmitkToolGUIArea.h
 Qmitk/QmitkToolSelectionBox.h
 Qmitk/QmitknnUNetToolGUI.h
 Qmitk/QmitknnUNetGPU.h
+Qmitk/QmitknnUNetWorker.h
 Qmitk/QmitknnUNetEnsembleLayout.h
 Qmitk/QmitknnUNetFolderParser.h
 Qmitk/QmitkSurfaceStampWidget.h

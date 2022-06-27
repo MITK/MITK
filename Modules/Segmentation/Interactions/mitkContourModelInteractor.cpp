@@ -98,17 +98,6 @@ bool mitk::ContourModelInteractor::OnCheckPointClick(const InteractionEvent *int
   {
     contour->SetSelectedVertexAsControlPoint();
     mitk::RenderingManager::GetInstance()->RequestUpdate(interactionEvent->GetSender()->GetRenderWindow());
-    m_lastMousePosition = click;
-
-    auto *contourGeometry = dynamic_cast<Geometry3D *>(contour->GetGeometry(timeStep));
-
-    if (contourGeometry->IsInside(click))
-    {
-      m_lastMousePosition = click;
-      return true;
-    }
-    else
-      return false;
   }
   else
   {

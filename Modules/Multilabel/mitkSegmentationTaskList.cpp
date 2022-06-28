@@ -101,12 +101,12 @@ bool mitk::SegmentationTaskList::IsDone(size_t index) const
 
 std::filesystem::path mitk::SegmentationTaskList::GetInputLocation() const
 {
-  std::string result;
-  this->GetPropertyList()->GetStringProperty("MITK.IO.reader.inputlocation", result);
+  std::string inputLocation;
+  this->GetPropertyList()->GetStringProperty("MITK.IO.reader.inputlocation", inputLocation);
 
-  return !result.empty()
-    ? std::filesystem::path(result).lexically_normal()
-    : result;
+  return !inputLocation.empty()
+    ? std::filesystem::path(inputLocation).lexically_normal()
+    : std::filesystem::path();
 }
 
 std::filesystem::path mitk::SegmentationTaskList::GetBasePath() const

@@ -41,8 +41,8 @@ found in the LICENSE file.
 const std::string QmitkSegmentationFlowControlView::VIEW_ID = "org.mitk.views.flow.control";
 
 QmitkSegmentationFlowControlView::QmitkSegmentationFlowControlView()
-    : m_Parent(nullptr),
-      m_Controls(new Ui::SegmentationFlowControlView)
+    : m_Controls(new Ui::SegmentationFlowControlView),
+      m_Parent(nullptr)
 {
   auto notHelperObject = mitk::NodePredicateNot::New(
     mitk::NodePredicateProperty::New("helper object"));

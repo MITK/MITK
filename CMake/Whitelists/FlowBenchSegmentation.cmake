@@ -44,6 +44,7 @@ org.mitk.gui.common
 org.mitk.gui.qt.application
 org.mitk.gui.qt.common
 org.mitk.gui.qt.datamanager
+org.mitk.gui.qt.ext
 org.mitk.gui.qt.flow.segmentation
 org.mitk.gui.qt.flowapplication
 org.mitk.gui.qt.imagenavigator

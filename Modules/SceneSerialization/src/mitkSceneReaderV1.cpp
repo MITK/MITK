@@ -57,19 +57,12 @@ namespace
   // actual file format of surfaces.
   void ApplyProportionalTimeGeometryProperties(mitk::BaseData* data)
   {
-    if (nullptr == data)
-      return;
-
-    auto properties = data->GetPropertyList();
-
-    if (properties.IsNull())
-      return;
-
     auto* geometry = dynamic_cast<mitk::ProportionalTimeGeometry*>(data->GetTimeGeometry());
 
     if (nullptr == geometry)
       return;
 
+    auto properties = data->GetPropertyList();
     float value = 0.0f;
 
     if (properties->GetFloatProperty("ProportionalTimeGeometry.FirstTimePoint", value))
@@ -177,7 +170,10 @@ bool mitk::SceneReaderV1::LoadScene(tinyxml2::XMLDocument &document, const std::
     auto* baseData = dataNode->GetData();
 
     if (baseData != nullptr && properties != nullptr)
+    {
       baseData->SetPropertyList(properties);
+      ApplyProportionalTimeGeometryProperties(baseData);
+    }
 
     DataNodes.push_back(dataNode);
 
@@ -191,17 +187,8 @@ bool mitk::SceneReaderV1::LoadScene(tinyxml2::XMLDocument &document, const std::
        element = element->NextSiblingElement("node"), ++nit)
   {
     mitk::DataNode::Pointer node = *nit;
-    // in case dataXmlElement is valid test whether it containts the "properties" child tag
-    // and process further if and only if yes
-    auto *dataXmlElement = element->FirstChildElement("data");
-    if (dataXmlElement && dataXmlElement->FirstChildElement("properties"))
-    {
-      auto *baseDataElement = dataXmlElement->FirstChildElement("properties");
-      if (node->GetData())
-        ApplyProportionalTimeGeometryProperties(node->GetData());
-    }
 
-    //   2. check child nodes
+    //   1. check child nodes
     const char *uida = element->Attribute("UID");
     std::string uid("");
 
@@ -217,7 +204,7 @@ bool mitk::SceneReaderV1::LoadScene(tinyxml2::XMLDocument &document, const std::
       error = true;
     }
 
-    //   3. if there are <properties> nodes,
+    //   2. if there are <properties> nodes,
     //        - instantiate the appropriate PropertyListDeSerializer
     //        - use them to construct PropertyList objects
     //        - add these properties to the node (if necessary, use renderwindow name)
@@ -231,7 +218,7 @@ bool mitk::SceneReaderV1::LoadScene(tinyxml2::XMLDocument &document, const std::
     // remember node for later adding to DataStorage
     m_OrderedNodePairs.push_back(std::make_pair(node, std::list<std::string>()));
 
-    //   4. if there are <source> elements, remember parent objects
+    //   3. if there are <source> elements, remember parent objects
     for (auto *source = element->FirstChildElement("source"); source != nullptr;
          source = source->NextSiblingElement("source"))
     {

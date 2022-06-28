@@ -30,6 +30,8 @@ found in the LICENSE file.
 // Qmitk
 #include "QmitkSegmentationFlowControlView.h"
 
+#include <ui_QmitkSegmentationFlowControlView.h>
+
 // Qt
 #include <QMessageBox>
 #include <QDir>
@@ -39,7 +41,8 @@ found in the LICENSE file.
 const std::string QmitkSegmentationFlowControlView::VIEW_ID = "org.mitk.views.flow.control";
 
 QmitkSegmentationFlowControlView::QmitkSegmentationFlowControlView()
-    : m_Parent(nullptr)
+    : m_Parent(nullptr),
+      m_Controls(new Ui::SegmentationFlowControlView)
 {
   auto notHelperObject = mitk::NodePredicateNot::New(
     mitk::NodePredicateProperty::New("helper object"));
@@ -55,24 +58,24 @@ QmitkSegmentationFlowControlView::QmitkSegmentationFlowControlView()
 
 void QmitkSegmentationFlowControlView::SetFocus()
 {
-    m_Controls.btnStoreAndAccept->setFocus();
+    m_Controls->btnStoreAndAccept->setFocus();
 }
 
 void QmitkSegmentationFlowControlView::CreateQtPartControl(QWidget* parent)
 {
   // create GUI widgets from the Qt Designer's .ui file
-  m_Controls.setupUi(parent);
+  m_Controls->setupUi(parent);
 
   m_Parent = parent;
 
   using Self = QmitkSegmentationFlowControlView;
 
-  connect(m_Controls.btnStoreAndAccept, &QPushButton::clicked, this, &Self::OnAcceptButtonPushed);
-  connect(m_Controls.segmentationTaskListWidget, &QmitkSegmentationTaskListWidget::ActiveTaskChanged, this, &Self::OnActiveTaskChanged);
-  connect(m_Controls.segmentationTaskListWidget, &QmitkSegmentationTaskListWidget::CurrentTaskChanged, this, &Self::OnCurrentTaskChanged);
+  connect(m_Controls->btnStoreAndAccept, &QPushButton::clicked, this, &Self::OnAcceptButtonPushed);
+  connect(m_Controls->segmentationTaskListWidget, &QmitkSegmentationTaskListWidget::ActiveTaskChanged, this, &Self::OnActiveTaskChanged);
+  connect(m_Controls->segmentationTaskListWidget, &QmitkSegmentationTaskListWidget::CurrentTaskChanged, this, &Self::OnCurrentTaskChanged);
 
-  m_Controls.segmentationTaskListWidget->setVisible(false);
-  m_Controls.labelStored->setVisible(false);
+  m_Controls->segmentationTaskListWidget->setVisible(false);
+  m_Controls->labelStored->setVisible(false);
   UpdateControls();
 
   m_OutputDir = QString::fromStdString(mitk::BaseApplication::instance().config().getString("flow.outputdir", itksys::SystemTools::GetCurrentWorkingDirectory()));
@@ -83,17 +86,17 @@ void QmitkSegmentationFlowControlView::CreateQtPartControl(QWidget* parent)
 
 void QmitkSegmentationFlowControlView::OnAcceptButtonPushed()
 {
-  if (m_Controls.segmentationTaskListWidget->isVisible())
+  if (m_Controls->segmentationTaskListWidget->isVisible())
   {
-    auto* taskList = m_Controls.segmentationTaskListWidget->GetTaskList();
+    auto* taskList = m_Controls->segmentationTaskListWidget->GetTaskList();
 
     if (taskList != nullptr)
     {
-      auto activeTaskIndex = m_Controls.segmentationTaskListWidget->GetActiveTaskIndex();
+      auto activeTaskIndex = m_Controls->segmentationTaskListWidget->GetActiveTaskIndex();
 
       if (activeTaskIndex.has_value())
       {
-        auto segmentationNode = m_Controls.segmentationTaskListWidget->GetSegmentationDataNode(activeTaskIndex.value());
+        auto segmentationNode = m_Controls->segmentationTaskListWidget->GetSegmentationDataNode(activeTaskIndex.value());
 
         if (segmentationNode != nullptr)
         {
@@ -102,7 +105,7 @@ void QmitkSegmentationFlowControlView::OnAcceptButtonPushed()
           try
           {
             taskList->SaveTask(activeTaskIndex.value(), segmentationNode->GetData());
-            m_Controls.segmentationTaskListWidget->OnUnsavedChangesSaved();
+            m_Controls->segmentationTaskListWidget->OnUnsavedChangesSaved();
           }
           catch (const mitk::Exception& e)
           {
@@ -125,7 +128,7 @@ void QmitkSegmentationFlowControlView::OnAcceptButtonPushed()
       mitk::IOUtil::Save(node->GetData(), outputpath.toStdString());
     }
 
-    m_Controls.labelStored->setVisible(true);
+    m_Controls->labelStored->setVisible(true);
   }
 }
 
@@ -144,17 +147,17 @@ void QmitkSegmentationFlowControlView::UpdateControls()
   auto dataStorage = this->GetDataStorage();
 
   auto hasTaskList = !dataStorage->GetSubset(m_SegmentationTaskListPredicate)->empty();
-  m_Controls.segmentationTaskListWidget->setVisible(hasTaskList);
+  m_Controls->segmentationTaskListWidget->setVisible(hasTaskList);
 
   if (hasTaskList)
   {
-    auto activeTaskIsShown = m_Controls.segmentationTaskListWidget->ActiveTaskIsShown();
-    m_Controls.btnStoreAndAccept->setEnabled(activeTaskIsShown);
+    auto activeTaskIsShown = m_Controls->segmentationTaskListWidget->ActiveTaskIsShown();
+    m_Controls->btnStoreAndAccept->setEnabled(activeTaskIsShown);
   }
   else
   {
     auto hasSegmentation = !dataStorage->GetSubset(m_SegmentationPredicate)->empty();
-    m_Controls.btnStoreAndAccept->setEnabled(hasSegmentation);
+    m_Controls->btnStoreAndAccept->setEnabled(hasSegmentation);
   }
 }
 

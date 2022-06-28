@@ -19,9 +19,12 @@ found in the LICENSE file.
 
 #include "mitkNodePredicateBase.h"
 
-#include "ui_QmitkSegmentationFlowControlView.h"
-
 #include <optional>
+
+namespace Ui
+{
+  class SegmentationFlowControlView;
+}
 
 /*!
   \brief QmitkSegmentationFlowControlView
@@ -65,7 +68,7 @@ protected:
 
     void UpdateControls();
 
-    Ui::SegmentationFlowControlView m_Controls;
+    Ui::SegmentationFlowControlView* m_Controls;
 
 private:
     QWidget *m_Parent;

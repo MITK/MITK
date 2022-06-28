@@ -1,4 +1,4 @@
-project(Workbench)
+project(FlowBench)
 
 # Create a cache entry for the provisioning file which is used to export
 # the file name in the MITKConfig.cmake file. This will keep external projects

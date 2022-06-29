@@ -23,6 +23,10 @@ found in the LICENSE file.
 
 namespace mitk
 {
+  /** \brief A list of segmentation tasks.
+   *
+   * See \ref MITKSegmentationTaskListsPage for more information.
+   */
   class MITKMULTILABEL_EXPORT SegmentationTaskList : public BaseData
   {
   public:

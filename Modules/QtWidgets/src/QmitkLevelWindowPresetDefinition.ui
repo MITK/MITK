@@ -81,12 +81,12 @@
         </widget>
        </item>
        <item row="1" column="1" >
-        <widget class="QSpinBox" name="levelSpinBox" >
+        <widget class="QDoubleSpinBox" name="levelSpinBox" >
          <property name="minimum" >
-          <number>-1024</number>
+          <number>-100000</number>
          </property>
          <property name="maximum" >
-          <number>3072</number>
+          <number>100000</number>
          </property>
         </widget>
        </item>
@@ -101,9 +101,9 @@
         </widget>
        </item>
        <item row="2" column="1" >
-        <widget class="QSpinBox" name="windowSpinBox" >
+        <widget class="QDoubleSpinBox" name="windowSpinBox" >
          <property name="maximum" >
-          <number>4096</number>
+          <number>100000</number>
          </property>
         </widget>
        </item>

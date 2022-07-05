@@ -19,7 +19,6 @@ Qmitk/QmitkToolGUI.cpp
 Qmitk/QmitkToolGUIArea.cpp
 Qmitk/QmitkToolSelectionBox.cpp
 Qmitk/QmitknnUNetToolGUI.cpp
-Qmitk/QmitknnUNetToolSlots.cpp
 Qmitk/QmitknnUNetWorker.cpp
 Qmitk/QmitkSurfaceStampWidget.cpp
 Qmitk/QmitkMaskStampWidget.cpp

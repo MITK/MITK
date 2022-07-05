@@ -54,34 +54,10 @@ namespace mitk
     ~NewAddTool2D() override;
 
     void ConnectActionsAndFunctions() override;
-
-  private:
-    /// \brief Initialize tool.
-    void OnInitContour(StateMachineAction *, InteractionEvent *interactionEvent) override;
-
-    /// \brief Add a control point and finish current segment.
-    void OnAddPoint(StateMachineAction *, InteractionEvent *interactionEvent) override;
-
-    /// \brief Draw a contour according to the mouse movement when mouse button is pressed and mouse is moved.
-    void OnDrawing(StateMachineAction *, InteractionEvent *interactionEvent) override;
-
-    void OnEndDrawing(StateMachineAction *, InteractionEvent *interactionEvent) override;
-
-    /// \brief Actual contour computation.
-    void OnMouseMoved(StateMachineAction *, InteractionEvent *interactionEvent) override;
-
-    /// \brief Finish contour tool.
-    void OnFinish(StateMachineAction *, InteractionEvent *interactionEvent) override;
-
-    /// \brief Finish contour interaction.
     void FinishTool() override;
 
-    void EnableContourInteraction(bool on) override;
-
-    void ReleaseInteractors() override;
-  
+  private:
     mitk::ContourModelInteractor::Pointer m_ContourInteractor;
-    std::vector<mitk::ContourModelInteractor::Pointer> m_ContourInteractors;
   };
 }
 

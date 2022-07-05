@@ -57,7 +57,7 @@ void QmitkLiveWireTool2DGUI::OnClearSegmentation()
 
 void QmitkLiveWireTool2DGUI::OnSnapClosureContour(bool snap)
 {
-  m_LiveWireTool->SetSnapClosureContour(snap);
+
 }
 
 void QmitkLiveWireTool2DGUI::OnShowInformation(bool on)

@@ -44,15 +44,13 @@ namespace mitk
   class MITKSEGMENTATION_EXPORT LiveWireTool2D : public EditableContourTool
   {
   public:
-    mitkClassMacro(LiveWireTool2D, SegTool2D);
+    mitkClassMacro(LiveWireTool2D, EditableContourTool);
     itkFactorylessNewMacro(Self);
 
     us::ModuleResource GetCursorIconResource() const override;
     us::ModuleResource GetIconResource() const override;
     const char *GetName() const override;
     const char **GetXPM() const override;
-
-    void SetSnapClosureContour(bool snap);
 
   protected:
     LiveWireTool2D();
@@ -63,26 +61,12 @@ namespace mitk
     void UpdateLiveWireContour();
     void OnTimePointChanged() override;
 
+    mitk::Point3D PrepareInitContour(const mitk::Point3D& clickedPoint) override;
+    virtual void FinalizePreviewContour(const Point3D& clickedPoint) override;
+    virtual void InitializePreviewContour(const Point3D& clickedPoint) override;
+    virtual void UpdatePreviewContour(const Point3D& clickedPoint) override;
+
   private:
-    /// \brief Initialize tool.
-    void OnInitContour(StateMachineAction *, InteractionEvent *interactionEvent) override;
-
-    /// \brief Add a control point and finish current segment.
-    void OnAddPoint(StateMachineAction *, InteractionEvent *interactionEvent) override;
-
-    /// \brief Draw a contour according to the mouse movement when mouse button is pressed and mouse is moved.
-    void OnDrawing(StateMachineAction *, InteractionEvent *interactionEvent) override;
-
-    void OnEndDrawing(StateMachineAction *, InteractionEvent *interactionEvent) override;
-
-    /// \brief Actual LiveWire computation.
-    void OnMouseMoved(StateMachineAction *, InteractionEvent *interactionEvent) override;
-
-    /// \brief Check double click on first control point to finish the LiveWire tool.
-    bool OnCheckPoint(const InteractionEvent *interactionEvent);
-
-    /// \brief Finish LiveWire tool.
-    void OnFinish(StateMachineAction *, InteractionEvent *interactionEvent) override;
 
     /// \brief Don't use dynamic cost map for LiveWire calculation.
     void OnMouseMoveNoDynamicCosts(StateMachineAction *, InteractionEvent *interactionEvent);
@@ -90,27 +74,16 @@ namespace mitk
     /// \brief Finish contour interaction.
     void FinishTool() override;
 
-    void EnableContourInteraction(bool on) override;
-
-    void ReleaseInteractors() override;
-
     template <typename TPixel, unsigned int VImageDimension>
     void FindHighestGradientMagnitudeByITK(itk::Image<TPixel, VImageDimension> *inputImage,
                                            itk::Index<3> &index,
                                            itk::Index<3> &returnIndex);
 
-    void UpdateClosureContour(mitk::Point3D endpoint) override;
-
-    bool m_SnapClosureContour;
-
     mitk::ContourModelLiveWireInteractor::Pointer m_ContourInteractor;
 
     mitk::ImageLiveWireContourModelFilter::Pointer m_LiveWireFilter;
-    mitk::ImageLiveWireContourModelFilter::Pointer m_LiveWireFilterClosure;
 
     bool m_CreateAndUseDynamicCosts;
-
-    std::vector<mitk::ContourModelLiveWireInteractor::Pointer> m_LiveWireInteractors;
   };
 }
 

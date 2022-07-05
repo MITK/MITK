@@ -18,6 +18,8 @@ mitk::EditableContourTool::EditableContourTool() : FeedbackContourTool("Editable
 
 mitk::EditableContourTool::~EditableContourTool()
 {
+  this->ReleaseHelperObjects();
+  this->ReleaseInteractors();
 }
 
 
@@ -45,7 +47,7 @@ void mitk::EditableContourTool::Deactivated()
   Superclass::Deactivated();
 }
 
-void mitk::EditableContourTool::ConfirmSegmentation() 
+void mitk::EditableContourTool::ConfirmSegmentation(bool resetStatMachine)
 {
   auto referenceImage = this->GetReferenceData();
   auto workingImage = this->GetWorkingData();
@@ -53,47 +55,29 @@ void mitk::EditableContourTool::ConfirmSegmentation()
   if (nullptr != referenceImage && nullptr != workingImage)
   {
     std::vector<SliceInformation> sliceInfos;
-    sliceInfos.reserve(m_WorkingContours.size());
 
     const auto currentTimePoint =
       mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
     TimeStepType workingImageTimeStep = workingImage->GetTimeGeometry()->TimePointToTimeStep(currentTimePoint);
 
-    for (const auto &workingContour : m_WorkingContours)
-    {
-      auto contour = dynamic_cast<ContourModel *>(workingContour.first->GetData());
+    if (m_Contour.IsNull() || m_Contour->IsEmpty())
+      return;
 
-      if (nullptr == contour || contour->IsEmpty())
-        continue;
+    auto workingSlice =
+      this->GetAffectedImageSliceAs2DImage(m_PlaneGeometry, workingImage, workingImageTimeStep)->Clone();
+    sliceInfos.emplace_back(workingSlice, m_PlaneGeometry, workingImageTimeStep);
 
-      auto sameSlicePredicate = [&workingContour, workingImageTimeStep](const SliceInformation &si) {
-        return workingContour.second->IsOnPlane(si.plane) && workingImageTimeStep == si.timestep;
-      };
+    auto projectedContour = ContourModelUtils::ProjectContourTo2DSlice(workingSlice, m_Contour);
+    int activePixelValue = ContourModelUtils::GetActivePixelValue(workingImage);
 
-      auto finding = std::find_if(sliceInfos.begin(), sliceInfos.end(), sameSlicePredicate);
-      if (finding == sliceInfos.end())
-      {
-        auto workingSlice =
-          this->GetAffectedImageSliceAs2DImage(workingContour.second, workingImage, workingImageTimeStep)->Clone();
-        sliceInfos.emplace_back(workingSlice, workingContour.second, workingImageTimeStep);
-        finding = std::prev(sliceInfos.end());
-      }
-
-      // cast const away is OK in this case, because these are all slices created and manipulated
-      // localy in this function call. And we want to keep the high constness of SliceInformation for
-      // public interfaces.
-      auto workingSlice = const_cast<Image *>(finding->slice.GetPointer());
-
-      auto projectedContour = ContourModelUtils::ProjectContourTo2DSlice(workingSlice, contour);
-      int activePixelValue = ContourModelUtils::GetActivePixelValue(workingImage);
-
-      ContourModelUtils::FillContourInSlice(projectedContour, workingSlice, workingImage, activePixelValue);
-    }
+    ContourModelUtils::FillContourInSlice(projectedContour, workingSlice, workingImage, activePixelValue);
 
     this->WriteBackSegmentationResults(sliceInfos);
   }
 
-  this->ClearSegmentation();
+  this->ReleaseHelperObjects();
+  this->ReleaseInteractors();
+  if (resetStatMachine) this->ResetToStartState();
 }
 
 void mitk::EditableContourTool::ClearSegmentation() 
@@ -115,6 +99,11 @@ bool mitk::EditableContourTool::IsPositionEventInsideImageRegion(mitk::Interacti
   return isPositionEventInsideImageRegion;
 }
 
+mitk::Point3D mitk::EditableContourTool::PrepareInitContour(const Point3D& clickedPoint)
+{ //default implementation does nothing
+  return clickedPoint;
+}
+
 void mitk::EditableContourTool::OnInitContour(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   auto positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
@@ -122,6 +111,11 @@ void mitk::EditableContourTool::OnInitContour(StateMachineAction *, InteractionE
     return;
 
   auto workingDataNode = this->GetWorkingDataNode();
+
+  if (m_Contour.IsNotNull())
+  {
+    this->ConfirmSegmentation(false);
+  }
 
   if (!IsPositionEventInsideImageRegion(positionEvent, workingDataNode->GetData()))
   {
@@ -152,7 +146,8 @@ void mitk::EditableContourTool::OnInitContour(StateMachineAction *, InteractionE
   m_PreviewContourNode->SetProperty("helper object", mitk::BoolProperty::New(true));
   m_PreviewContourNode->AddProperty("contour.color", ColorProperty::New(0.1f, 1.0f, 0.1f), nullptr, true);
   m_PreviewContourNode->AddProperty("contour.width", mitk::FloatProperty::New(4.0f), nullptr, true);
-  
+
+
   m_ClosureContour = this->CreateNewContour();
   m_ClosureContourNode = mitk::DataNode::New();
   m_ClosureContourNode->SetData(m_ClosureContour);
@@ -163,24 +158,12 @@ void mitk::EditableContourTool::OnInitContour(StateMachineAction *, InteractionE
   m_ClosureContourNode->AddProperty("contour.color", ColorProperty::New(0.0f, 1.0f, 0.1f), nullptr, true);
   m_ClosureContourNode->AddProperty("contour.width", mitk::FloatProperty::New(2.0f), nullptr, true);
 
-  m_EditingContour = this->CreateNewContour();
-  m_EditingContourNode = mitk::DataNode::New();
-  m_EditingContourNode->SetData(m_EditingContour);
-  m_EditingContourNode->SetName("editing node");
-  m_EditingContourNode->SetProperty("layer", IntProperty::New(102));
-  m_EditingContourNode->AddProperty("fixedLayer", BoolProperty::New(true));
-  m_EditingContourNode->SetProperty("helper object", mitk::BoolProperty::New(true));
-  m_EditingContourNode->AddProperty("contour.color", ColorProperty::New(0.1f, 1.0f, 0.1f), nullptr, true);
-  m_EditingContourNode->AddProperty("contour.points.color", ColorProperty::New(0.0f, 0.0f, 1.0f), nullptr, true);
-  m_EditingContourNode->AddProperty("contour.width", mitk::FloatProperty::New(4.0f), nullptr, true);
-
   m_CurrentRestrictedArea = this->CreateNewContour();
 
   auto dataStorage = this->GetToolManager()->GetDataStorage();
   dataStorage->Add(m_ContourNode, workingDataNode);
   dataStorage->Add(m_PreviewContourNode, workingDataNode);
   dataStorage->Add(m_ClosureContourNode, workingDataNode);
-  dataStorage->Add(m_EditingContourNode, workingDataNode);
 
   m_ReferenceDataSlice = this->GetAffectedReferenceSlice(positionEvent);
 
@@ -191,9 +174,131 @@ void mitk::EditableContourTool::OnInitContour(StateMachineAction *, InteractionE
 
   // Remember PlaneGeometry to determine if events were triggered in the same plane
   m_PlaneGeometry = interactionEvent->GetSender()->GetCurrentWorldPlaneGeometry();
+
+  // Map click to pixel coordinates
+  auto click = positionEvent->GetPositionInWorld();
+
+  click = this->PrepareInitContour(click);
+
+  this->InitializePreviewContour(click);
+  // Set initial start point
+  m_Contour->AddVertex(click, true);
+  m_PreviewContour->AddVertex(click, false);
+  m_ClosureContour->AddVertex(click);
+
+  mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
 }
 
-void mitk::EditableContourTool::OnFinish(StateMachineAction *, InteractionEvent *interactionEvent) 
+void mitk::EditableContourTool::FinalizePreviewContour(const Point3D& clickedPoint)
+{ // Remove duplicate first vertex, it's already contained in m_Contour
+  m_PreviewContour->RemoveVertexAt(0);
+
+  m_PreviewContour->SetControlVertexAt(m_PreviewContour->GetNumberOfVertices() - 1);
+}
+
+void mitk::EditableContourTool::InitializePreviewContour(const Point3D& clickedPoint)
+{ //default implementation only clears the preview and sets the start point
+  m_PreviewContour = this->CreateNewContour();
+  m_PreviewContour->AddVertex(clickedPoint);
+  m_PreviewContourNode->SetData(m_PreviewContour);
+}
+
+void mitk::EditableContourTool::UpdatePreviewContour(const Point3D& clickedPoint)
+{ //default implementation draws just a simple line to position
+  if (m_PreviewContour->GetNumberOfVertices() > 2)
+  {
+    this->InitializePreviewContour(m_Contour->GetVertexAt(m_Contour->GetNumberOfVertices() - 1)->Coordinates);
+  }
+
+  if (m_PreviewContour->GetNumberOfVertices() == 2)
+  {
+    m_PreviewContour->RemoveVertexAt(m_PreviewContour->GetNumberOfVertices()-1);
+  }
+
+  m_PreviewContour->AddVertex(clickedPoint);
+}
+
+void mitk::EditableContourTool::OnAddPoint(StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  auto positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(interactionEvent);
+
+  if (nullptr == positionEvent)
+    return;
+
+  if (m_PlaneGeometry.IsNotNull())
+  {
+    // Check if the point is in the correct slice
+    if (m_PlaneGeometry->DistanceFromPlane(positionEvent->GetPositionInWorld()) > mitk::sqrteps)
+      return;
+  }
+
+  this->FinalizePreviewContour(positionEvent->GetPositionInWorld());
+
+  // Merge contours
+  m_Contour->Concatenate(m_PreviewContour);
+
+  this->InitializePreviewContour(positionEvent->GetPositionInWorld());
+
+  mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
+}
+
+void mitk::EditableContourTool::OnDrawing(StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  auto* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(interactionEvent);
+  if (!positionEvent)
+    return;
+
+  m_PreviewContourNode->SetVisibility(false);
+
+  m_Contour->AddVertex(positionEvent->GetPositionInWorld(), false);
+  UpdateClosureContour(positionEvent->GetPositionInWorld());
+  m_CurrentRestrictedArea->AddVertex(positionEvent->GetPositionInWorld());
+
+  assert(positionEvent->GetSender()->GetRenderWindow());
+  mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
+}
+
+void mitk::EditableContourTool::OnEndDrawing(StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  auto* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(interactionEvent);
+  if (!positionEvent)
+    return;
+
+  if (m_CurrentRestrictedArea->GetNumberOfVertices() > 1)
+  {
+    auto restrictedArea = m_CurrentRestrictedArea->Clone();
+    m_RestrictedAreas.push_back(restrictedArea);
+  }
+  m_CurrentRestrictedArea = this->CreateNewContour();
+  m_PreviewContourNode->SetVisibility(true);
+  m_Contour->SetControlVertexAt(m_Contour->GetNumberOfVertices() - 1);
+
+  this->InitializePreviewContour(positionEvent->GetPositionInWorld());
+
+  mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
+}
+
+void mitk::EditableContourTool::OnMouseMoved(StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  auto positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(interactionEvent);
+
+  if (nullptr == positionEvent)
+    return;
+
+  if (m_PlaneGeometry.IsNotNull())
+  {
+    // Check if the point is in the correct slice
+    if (m_PlaneGeometry->DistanceFromPlane(positionEvent->GetPositionInWorld()) > mitk::sqrteps)
+      return;
+  }
+
+  this->UpdatePreviewContour(positionEvent->GetPositionInWorld());
+  this->UpdateClosureContour(positionEvent->GetPositionInWorld());
+
+  RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
+}
+
+void mitk::EditableContourTool::OnFinish(StateMachineAction *, InteractionEvent *interactionEvent)
 {
   auto positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
 
@@ -207,74 +312,59 @@ void mitk::EditableContourTool::OnFinish(StateMachineAction *, InteractionEvent 
       return;
   }
 
-  // remove green connection between mouse position and start point
-  m_ClosureContour->Clear();
+  this->FinalizePreviewContour(positionEvent->GetPositionInWorld());
 
-  // Save contour and corresponding plane geometry to list
-  this->m_WorkingContours.emplace_back(std::make_pair(m_ContourNode, positionEvent->GetSender()->GetCurrentWorldPlaneGeometry()->Clone()));
-  this->m_EditingContours.emplace_back(std::make_pair(m_EditingContourNode, positionEvent->GetSender()->GetCurrentWorldPlaneGeometry()->Clone()));
-}
+  this->FinishTool();
 
-void mitk::EditableContourTool::FinishTool() 
-{
+  // Merge contours
+  m_Contour->Concatenate(m_PreviewContour);
+
   auto numberOfTimesteps = static_cast<int>(m_Contour->GetTimeSteps());
 
   for (int i = 0; i <= numberOfTimesteps; ++i)
     m_Contour->Close(i);
 
-  this->GetToolManager()->GetDataStorage()->Remove(m_PreviewContourNode);
-
-  m_PreviewContourNode = nullptr;
-  m_PreviewContour = nullptr;
+  this->ReleaseHelperObjects(false);
 }
 
-void mitk::EditableContourTool::ReleaseHelperObjects() 
+void mitk::EditableContourTool::ReleaseHelperObjects(bool includeWorkingContour)
 {
-  this->RemoveHelperObjects();
+  this->RemoveHelperObjectsFromDataStorage(includeWorkingContour);
 
-  m_EditingContours.clear();
-  m_WorkingContours.clear();
-  m_RestrictedAreas.clear();
+  if (includeWorkingContour)
+  {
+    m_ContourNode = nullptr;
+    m_Contour = nullptr;
 
-  m_EditingContourNode = nullptr;
-  m_EditingContour = nullptr;
+    m_CurrentRestrictedArea = nullptr;
+    m_RestrictedAreas.clear();
+  }
 
   m_PreviewContourNode = nullptr;
   m_PreviewContour = nullptr;
 
   m_ClosureContourNode = nullptr;
   m_ClosureContour = nullptr;
-
-  m_ContourNode = nullptr;
-  m_Contour = nullptr;
-
-  m_CurrentRestrictedArea = nullptr;
 }
 
-void mitk::EditableContourTool::RemoveHelperObjects() 
+void mitk::EditableContourTool::RemoveHelperObjectsFromDataStorage(bool includeWorkingContour)
 {
   auto dataStorage = this->GetToolManager()->GetDataStorage();
 
   if (nullptr == dataStorage)
     return;
 
-  for (const auto &editingContour : m_EditingContours)
-    dataStorage->Remove(editingContour.first);
-
-  for (const auto &workingContour : m_WorkingContours)
-    dataStorage->Remove(workingContour.first);
-
-  if (m_EditingContourNode.IsNotNull())
-    dataStorage->Remove(m_EditingContourNode);
+  if (includeWorkingContour)
+  {
+    if (m_ContourNode.IsNotNull())
+      dataStorage->Remove(m_ContourNode);
+  }
 
   if (m_PreviewContourNode.IsNotNull())
     dataStorage->Remove(m_PreviewContourNode);
 
   if (m_ClosureContourNode.IsNotNull())
     dataStorage->Remove(m_ClosureContourNode);
-
-  if (m_ContourNode.IsNotNull())
-    dataStorage->Remove(m_ContourNode);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -305,6 +395,7 @@ void mitk::EditableContourTool::UpdateClosureContour(mitk::Point3D endpoint)
   if (m_ClosureContour->GetNumberOfVertices() > 2)
   {
     m_ClosureContour = this->CreateNewContour();
+    m_ClosureContourNode->SetData(m_ClosureContour);
   }
 
   if (m_ClosureContour->GetNumberOfVertices() == 0)
@@ -319,4 +410,16 @@ void mitk::EditableContourTool::UpdateClosureContour(mitk::Point3D endpoint)
   }
 
   m_ClosureContour->AddVertexAtFront(endpoint);
+}
+
+void mitk::EditableContourTool::EnableContourInteraction(bool on)
+{
+  for (const auto& interactor : m_ContourInteractors)
+    interactor->EnableInteraction(on);
+}
+
+void mitk::EditableContourTool::ReleaseInteractors()
+{
+  this->EnableContourInteraction(false);
+  m_ContourInteractors.clear();
 }

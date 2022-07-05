@@ -23,8 +23,8 @@ namespace mitk
   public:
     mitkClassMacro(EditableContourTool, FeedbackContourTool);
 
-    /// \brief Convert all current contours to binary segmentations.
-    virtual void ConfirmSegmentation();
+    /// \brief Convert current contour to binary segmentations.
+    virtual void ConfirmSegmentation(bool resetStatMachine = true);
 
     /// \brief Delete all current contours.
     virtual void ClearSegmentation();
@@ -38,33 +38,38 @@ namespace mitk
     void Activated() override;
     void Deactivated() override;
    
+    virtual Point3D PrepareInitContour(const Point3D& clickedPoint);
+    virtual void FinalizePreviewContour(const Point3D& clickedPoint);
+    virtual void InitializePreviewContour(const Point3D& clickedPoint);
+    virtual void UpdatePreviewContour(const Point3D& clickedPoint);
+
     /// \brief Initialize tool.
     virtual void OnInitContour(StateMachineAction *, InteractionEvent *interactionEvent);
 
     /// \brief Add a control point and finish current segment.
-    virtual void OnAddPoint(StateMachineAction *, InteractionEvent *interactionEvent) = 0;
+    virtual void OnAddPoint(StateMachineAction *, InteractionEvent *interactionEvent);
 
     /// \brief Draw a contour according to the mouse movement when mouse button is pressed and mouse is moved.
-    virtual void OnDrawing(StateMachineAction *, InteractionEvent *interactionEvent) = 0;
+    virtual void OnDrawing(StateMachineAction *, InteractionEvent *interactionEvent);
 
-    virtual void OnEndDrawing(StateMachineAction *, InteractionEvent *interactionEvent) = 0;
+    virtual void OnEndDrawing(StateMachineAction *, InteractionEvent *interactionEvent);
 
     /// \brief Computation of the preview contour.
-    virtual void OnMouseMoved(StateMachineAction *, InteractionEvent *interactionEvent) = 0;
+    virtual void OnMouseMoved(StateMachineAction *, InteractionEvent *interactionEvent);
 
     /// \brief Finish EditableContour tool.
     virtual void OnFinish(StateMachineAction *, InteractionEvent *interactionEvent);
 
     /// \brief Finish contour interaction.
-    virtual void FinishTool();
+    virtual void FinishTool() = 0;
 
-    virtual void EnableContourInteraction(bool on) = 0;
+    void EnableContourInteraction(bool on);
 
-    virtual void ReleaseInteractors() = 0;
+    void ReleaseInteractors();
 
-    virtual void ReleaseHelperObjects();
+    virtual void ReleaseHelperObjects(bool includeWorkingContour = true);
 
-    virtual void RemoveHelperObjects();
+    virtual void RemoveHelperObjectsFromDataStorage(bool includeWorkingContour = true);
 
     ContourModel::Pointer CreateNewContour() const;
 
@@ -81,9 +86,6 @@ namespace mitk
     mitk::ContourModel::Pointer m_ClosureContour;
     mitk::DataNode::Pointer m_ClosureContourNode;
 
-    mitk::ContourModel::Pointer m_EditingContour;
-    mitk::DataNode::Pointer m_EditingContourNode;
-
     mitk::ContourModel::Pointer m_CurrentRestrictedArea;
     std::vector<mitk::ContourModel::Pointer> m_RestrictedAreas;
 
@@ -91,10 +93,9 @@ namespace mitk
     define contours.*/
     mitk::Image::Pointer m_ReferenceDataSlice;
 
-    std::vector<std::pair<mitk::DataNode::Pointer, mitk::PlaneGeometry::Pointer>> m_WorkingContours;
-    std::vector<std::pair<mitk::DataNode::Pointer, mitk::PlaneGeometry::Pointer>> m_EditingContours;
+    PlaneGeometry::ConstPointer m_PlaneGeometry;
 
-    PlaneGeometry::ConstPointer m_PlaneGeometry;  
+    std::vector<mitk::DataInteractor::Pointer> m_ContourInteractors;
   };
 }
 

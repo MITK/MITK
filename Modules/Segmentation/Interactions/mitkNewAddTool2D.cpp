@@ -37,12 +37,6 @@ void mitk::NewAddTool2D::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("MovePoint", OnMouseMoved);
 }
 
-void mitk::NewAddTool2D::ReleaseInteractors()
-{
-  this->EnableContourInteraction(false);
-  m_ContourInteractors.clear();
-}
-
 const char **mitk::NewAddTool2D::GetXPM() const
 {
   return nullptr;
@@ -63,143 +57,15 @@ const char *mitk::NewAddTool2D::GetName() const
   return "New Add";
 }
 
-void mitk::NewAddTool2D::EnableContourInteraction(bool on)
-{
-  for (const auto &interactor : m_ContourInteractors)
-    interactor->EnableInteraction(on);
-}
-
-void mitk::NewAddTool2D::OnInitContour(StateMachineAction *s, InteractionEvent *interactionEvent) 
-{
-  mitk::EditableContourTool::OnInitContour(s, interactionEvent);
-
-  auto positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
-  if (nullptr == positionEvent)
-    return;
-
-  auto workingDataNode = this->GetWorkingDataNode();
-
-  if (!IsPositionEventInsideImageRegion(positionEvent, workingDataNode->GetData()))
-  {
-    this->ResetToStartState();
-    return;
-  }
-
-  // Map click to pixel coordinates
-  auto click = positionEvent->GetPositionInWorld();
-
-  // Set initial start point
-  m_Contour->AddVertex(click, true);
-  m_PreviewContour->AddVertex(click, false);
-  m_ClosureContour->AddVertex(click);
-
-  mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
-}
-
-void mitk::NewAddTool2D::OnAddPoint(StateMachineAction *, InteractionEvent *interactionEvent) 
-{
-  auto positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
-
-  if (nullptr == positionEvent)
-    return;
-
-  if (m_PlaneGeometry.IsNotNull())
-  {
-    // Check if the point is in the correct slice
-    if (m_PlaneGeometry->DistanceFromPlane(positionEvent->GetPositionInWorld()) > mitk::sqrteps)
-      return;
-  }
-
-  m_Contour->AddVertex(positionEvent->GetPositionInWorld(), true);
-
-  std::for_each(m_PreviewContour->IteratorBegin(), m_PreviewContour->IteratorEnd(), [this](ContourElement::VertexType* vertex)
-  {
-    m_PreviewContour->RemoveVertex(vertex);
-  });
-
-  m_PreviewContour->AddVertex(positionEvent->GetPositionInWorld());
-  m_PreviewContour->Update();
-
-  mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
-}
-
-void mitk::NewAddTool2D::OnDrawing(StateMachineAction *, InteractionEvent *interactionEvent)
-{
-  auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
-  if (!positionEvent)
-    return;
-
-  m_PreviewContour->AddVertex(positionEvent->GetPositionInWorld(), false);
-  UpdateClosureContour(positionEvent->GetPositionInWorld());
-  m_CurrentRestrictedArea->AddVertex(positionEvent->GetPositionInWorld());
-
-  assert(positionEvent->GetSender()->GetRenderWindow());
-  mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
-}
-
-void mitk::NewAddTool2D::OnEndDrawing(StateMachineAction *, InteractionEvent *)
-{
-  if (m_CurrentRestrictedArea->GetNumberOfVertices() > 1)
-  {
-    auto restrictedArea = m_CurrentRestrictedArea->Clone();
-    m_RestrictedAreas.push_back(restrictedArea);
-    // Remove duplicate first vertex, it's already contained in m_Contour
-    m_PreviewContour->RemoveVertexAt(0);
-    // Set last point as control point
-    m_PreviewContour->SetControlVertexAt(m_PreviewContour->GetNumberOfVertices() - 1);
-    // Merge contours
-    m_Contour->Concatenate(m_PreviewContour);
-    std::for_each(m_PreviewContour->IteratorBegin(), m_PreviewContour->IteratorEnd(), [this](ContourElement::VertexType *vertex)
-    {
-      m_PreviewContour->RemoveVertex(vertex);
-    });
-  }
-  m_CurrentRestrictedArea = this->CreateNewContour();
-}
-
-void mitk::NewAddTool2D::OnMouseMoved(StateMachineAction *, InteractionEvent *interactionEvent) 
-{
-  auto positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
-
-  if (nullptr == positionEvent)
-    return;
-
-  if (m_PlaneGeometry.IsNotNull())
-  {
-    // Check if the point is in the correct slice
-    if (m_PlaneGeometry->DistanceFromPlane(positionEvent->GetPositionInWorld()) > mitk::sqrteps)
-      return;
-  }
-
-  if (m_PreviewContour->GetNumberOfVertices() > 1)
-  {
-    m_PreviewContour->RemoveVertexAt(m_PreviewContour->GetNumberOfVertices() - 1);
-  }
-  m_PreviewContour->AddVertex(positionEvent->GetPositionInWorld());
-  m_PreviewContour->Update();
-
-  this->UpdateClosureContour(positionEvent->GetPositionInWorld());
-
-  RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
-}
-
-void mitk::NewAddTool2D::OnFinish(StateMachineAction *s, InteractionEvent *interactionEvent) 
-{
-  mitk::EditableContourTool::OnFinish(s, interactionEvent);
-  this->FinishTool();
-}
-
 void mitk::NewAddTool2D::FinishTool() 
 {
-  mitk::EditableContourTool::FinishTool();
+  //m_ContourInteractor = mitk::ContourModelInteractor::New();
+  //m_ContourInteractor->SetDataNode(m_ContourNode);
+  //m_ContourInteractor->LoadStateMachine("ContourModelModificationInteractor.xml", us::GetModuleContext()->GetModule());
+  //m_ContourInteractor->SetEventConfig("ContourModelModificationConfig.xml", us::GetModuleContext()->GetModule());
+  //m_ContourInteractor->SetRestrictedAreas(this->m_RestrictedAreas);
 
-  m_ContourInteractor = mitk::ContourModelInteractor::New();
-  m_ContourInteractor->SetDataNode(m_ContourNode);
-  m_ContourInteractor->LoadStateMachine("ContourModelModificationInteractor.xml", us::GetModuleContext()->GetModule());
-  m_ContourInteractor->SetEventConfig("ContourModelModificationConfig.xml", us::GetModuleContext()->GetModule());
-  m_ContourInteractor->SetRestrictedAreas(this->m_RestrictedAreas);
+  //m_ContourNode->SetDataInteractor(m_ContourInteractor.GetPointer());
 
-  m_ContourNode->SetDataInteractor(m_ContourInteractor.GetPointer());
-
-  this->m_ContourInteractors.push_back(m_ContourInteractor);
+  //this->m_ContourInteractors.push_back(m_ContourInteractor);
 }

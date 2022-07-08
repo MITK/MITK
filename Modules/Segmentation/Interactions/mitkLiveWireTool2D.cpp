@@ -165,17 +165,14 @@ void mitk::LiveWireTool2D::FinishTool()
 {
   m_LiveWireFilter->SetUseDynamicCostMap(false);
 
-  //m_ContourInteractor = mitk::ContourModelLiveWireInteractor::New();
-  //m_ContourInteractor->SetDataNode(m_ContourNode);
-  //m_ContourInteractor->LoadStateMachine("ContourModelModificationInteractor.xml", us::GetModuleContext()->GetModule());
-  //m_ContourInteractor->SetEventConfig("ContourModelModificationConfig.xml", us::GetModuleContext()->GetModule());
-  //m_ContourInteractor->SetWorkingImage(this->m_ReferenceDataSlice);
-  //m_ContourInteractor->SetEditingContourModelNode(this->m_EditingContourNode);
-  //m_ContourInteractor->SetRestrictedAreas(this->m_RestrictedAreas);
+  m_ContourInteractor = mitk::ContourModelLiveWireInteractor::New();
+  m_ContourInteractor->SetDataNode(m_ContourNode);
+  m_ContourInteractor->LoadStateMachine("ContourModelModificationInteractor.xml", us::GetModuleContext()->GetModule());
+  m_ContourInteractor->SetEventConfig("ContourModelModificationConfig.xml", us::GetModuleContext()->GetModule());
+  m_ContourInteractor->SetWorkingImage(this->m_ReferenceDataSlice);
+  m_ContourInteractor->SetRestrictedArea(this->m_CurrentRestrictedArea);
 
-  //m_ContourNode->SetDataInteractor(m_ContourInteractor.GetPointer());
-
-  //this->m_ContourInteractors.push_back(m_ContourInteractor.GetPointer());
+  m_ContourNode->SetDataInteractor(m_ContourInteractor.GetPointer());
 }
 
 template <typename TPixel, unsigned int VImageDimension>

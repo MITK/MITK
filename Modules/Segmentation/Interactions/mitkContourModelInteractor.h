@@ -44,7 +44,7 @@ namespace mitk
        */
       void ConnectActionsAndFunctions() override;
 
-      void SetRestrictedAreas(std::vector<mitk::ContourModel::Pointer> restrictedAreas);
+      void SetRestrictedArea(mitk::ContourModel* restrictedArea);
 
   protected:
     ContourModelInteractor();
@@ -60,7 +60,7 @@ namespace mitk
 
     const float eps = 3.0;
     mitk::Point3D m_lastMousePosition;
-    std::vector<mitk::ContourModel::Pointer> m_RestrictedAreas;
+    mitk::ContourModel::Pointer m_RestrictedArea;
   };
 
 } // namespace

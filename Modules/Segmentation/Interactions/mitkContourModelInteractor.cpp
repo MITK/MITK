@@ -39,9 +39,9 @@ mitk::ContourModelInteractor::~ContourModelInteractor()
 {
 }
 
-void mitk::ContourModelInteractor::SetRestrictedAreas(std::vector<mitk::ContourModel::Pointer> restrictedAreas)
+void mitk::ContourModelInteractor::SetRestrictedArea(mitk::ContourModel* restrictedArea)
 {
-  m_RestrictedAreas = restrictedAreas;
+  m_RestrictedArea = restrictedArea;
 }
 
 bool mitk::ContourModelInteractor::OnCheckPointClick(const InteractionEvent *interactionEvent)
@@ -54,56 +54,39 @@ bool mitk::ContourModelInteractor::OnCheckPointClick(const InteractionEvent *int
   const auto timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
 
   auto *contour = dynamic_cast<mitk::ContourModel *>(this->GetDataNode()->GetData());
+  if (contour == nullptr)
+  {
+    MITK_ERROR << "Invalid Contour";
+    return false;
+  }
 
   contour->Deselect();
 
   mitk::Point3D click = positionEvent->GetPositionInWorld();
 
-  bool isVertexSelected = contour->SelectVertexAt(click, 1.5, timeStep);
-
-  if (!isVertexSelected)
-  {
-    bool isHover = false;
-    if (this->GetDataNode()->GetBoolProperty("contour.hovering", isHover, positionEvent->GetSender()) == false)
-    {
-      MITK_WARN << "Unknown property contour.hovering";
-    }
-    if (isHover)
-    {
-      auto lastVertex = *(contour->GetVertexList(timeStep).end() - 1);
-      mitk::ContourElement::VertexType previousVertex =
-        mitk::ContourElement::VertexType(lastVertex->Coordinates, lastVertex->IsControlPoint);
-      contour->GetLineSegmentForPoint(click, mitk::ContourModelInteractor::eps, timeStep, &previousVertex);
-      auto previousVertexInList =
-        contour->GetVertexAt(previousVertex.Coordinates, mitk::ContourModelInteractor::eps, timeStep);
-      auto index = contour->GetIndex(previousVertexInList, timeStep);
-      contour->InsertVertexAtIndex(click, index + 1, true, timeStep);
-      isVertexSelected = contour->SelectVertexAt(click, mitk::ContourModelInteractor::eps, timeStep);
-    }
-  }
+  bool isVertexSelected = contour->SelectControlVertexAt(click, ContourModelInteractor::eps, timeStep);
 
   if (isVertexSelected)
   {
     auto foundVertex = contour->GetSelectedVertex();
-    for (auto restrictedArea : m_RestrictedAreas)
+    const auto restrictedVs = m_RestrictedArea->GetVertexList(timeStep);
+    for (auto restrictedV : restrictedVs)
     {
-      if (restrictedArea->SelectVertexAt(foundVertex->Coordinates, mitk::ContourModelInteractor::eps, timeStep))
+      if (restrictedV->Coordinates == foundVertex->Coordinates)
       {
         isVertexSelected = false;
+        contour->Deselect();
+        break;
       }
     }
   }
 
   if (isVertexSelected)
   {
-    contour->SetSelectedVertexAsControlPoint();
     mitk::RenderingManager::GetInstance()->RequestUpdate(interactionEvent->GetSender()->GetRenderWindow());
   }
-  else
-  {
-    return false;
-  }
-  return true;
+
+  return isVertexSelected;
 }
 
 void mitk::ContourModelInteractor::OnDeletePoint(StateMachineAction *, InteractionEvent *)
@@ -126,7 +109,7 @@ bool mitk::ContourModelInteractor::IsHovering(const InteractionEvent *interactio
 
   bool isHover = false;
   this->GetDataNode()->GetBoolProperty("contour.hovering", isHover, positionEvent->GetSender());
-  if (contour->IsNearContour(currentPosition, 1.5, timeStep))
+  if (contour->IsNearContour(currentPosition, ContourModelInteractor::eps, timeStep))
   {
     if (isHover == false)
     {
@@ -142,6 +125,8 @@ bool mitk::ContourModelInteractor::IsHovering(const InteractionEvent *interactio
       mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
     }
   }
+  this->m_lastMousePosition = currentPosition;
+
   return false;
 }
 

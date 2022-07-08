@@ -29,6 +29,14 @@ namespace mitk
     /// \brief Delete all current contours.
     virtual void ClearSegmentation();
 
+    itkBooleanMacro(AutoConfirm);
+    itkSetMacro(AutoConfirm, bool);
+    itkGetMacro(AutoConfirm, bool);
+
+    itkBooleanMacro(AddMode);
+    itkSetMacro(AddMode, bool);
+    itkGetMacro(AddMode, bool);
+
   protected:
     EditableContourTool();
     ~EditableContourTool() override;
@@ -87,7 +95,6 @@ namespace mitk
     mitk::DataNode::Pointer m_ClosureContourNode;
 
     mitk::ContourModel::Pointer m_CurrentRestrictedArea;
-    std::vector<mitk::ContourModel::Pointer> m_RestrictedAreas;
 
     /** Slice of the reference data the tool is currently actively working on to
     define contours.*/
@@ -95,7 +102,10 @@ namespace mitk
 
     PlaneGeometry::ConstPointer m_PlaneGeometry;
 
-    std::vector<mitk::DataInteractor::Pointer> m_ContourInteractors;
+    mitk::DataInteractor::Pointer m_ContourInteractor;
+
+    bool m_AutoConfirm;
+    bool m_AddMode;
   };
 }
 

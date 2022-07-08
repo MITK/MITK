@@ -59,13 +59,12 @@ const char *mitk::NewAddTool2D::GetName() const
 
 void mitk::NewAddTool2D::FinishTool() 
 {
-  //m_ContourInteractor = mitk::ContourModelInteractor::New();
-  //m_ContourInteractor->SetDataNode(m_ContourNode);
-  //m_ContourInteractor->LoadStateMachine("ContourModelModificationInteractor.xml", us::GetModuleContext()->GetModule());
-  //m_ContourInteractor->SetEventConfig("ContourModelModificationConfig.xml", us::GetModuleContext()->GetModule());
-  //m_ContourInteractor->SetRestrictedAreas(this->m_RestrictedAreas);
+  auto contourInteractor = mitk::ContourModelInteractor::New();
+  contourInteractor->SetDataNode(m_ContourNode);
+  contourInteractor->LoadStateMachine("ContourModelModificationInteractor.xml", us::GetModuleContext()->GetModule());
+  contourInteractor->SetEventConfig("ContourModelModificationConfig.xml", us::GetModuleContext()->GetModule());
+  contourInteractor->SetRestrictedArea(this->m_CurrentRestrictedArea);
 
-  //m_ContourNode->SetDataInteractor(m_ContourInteractor.GetPointer());
-
-  //this->m_ContourInteractors.push_back(m_ContourInteractor);
+  this->m_ContourInteractor = contourInteractor;
+  m_ContourNode->SetDataInteractor(m_ContourInteractor.GetPointer());
 }

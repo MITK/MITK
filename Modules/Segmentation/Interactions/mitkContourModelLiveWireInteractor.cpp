@@ -46,100 +46,34 @@ void mitk::ContourModelLiveWireInteractor::ConnectActionsAndFunctions()
 
 bool mitk::ContourModelLiveWireInteractor::OnCheckPointClick(const InteractionEvent *interactionEvent)
 {
-  const auto *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
-
-  if (!positionEvent)
-    return false;
-
-  const auto timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
-
-  auto *contour = dynamic_cast<mitk::ContourModel *>(this->GetDataNode()->GetData());
-  if (contour == nullptr)
-  {
-    MITK_ERROR << "Invalid Contour";
-    return false;
-  }
-
-  contour->Deselect();
-
-  // Check distance to any vertex.
-  // Transition YES if click close to a vertex
-  mitk::Point3D click = positionEvent->GetPositionInWorld();
-
-  bool isVertexSelected = false;
-  // Check, if clicked position is close to control vertex and if so, select closest control vertex.
-  isVertexSelected = contour->SelectControlVertexAt(click, mitk::ContourModelLiveWireInteractor::eps, timeStep);
-
-  // If the position is not close to control vertex. but hovering the contour line, we check, if it is close to non-control vertex.
-  // The closest vertex will be set as a control vertex.
-  if (isVertexSelected == false)
-    isVertexSelected = contour->SelectVertexAt(click, mitk::ContourModelLiveWireInteractor::eps, timeStep);
-
-   //  If the position is not close to control or non-control vertex. but hovering the contour line, we create a vertex at the position.
-  if (isVertexSelected == false)
-  {
-    bool isHover = false;
-    if (this->GetDataNode()->GetBoolProperty("contour.hovering", isHover, positionEvent->GetSender()) == false)
-    {
-      MITK_WARN << "Unknown property contour.hovering";
-    }
-    if (isHover)
-    {
-      contour->AddVertex(click, timeStep);
-      isVertexSelected = contour->SelectVertexAt(click, mitk::ContourModelLiveWireInteractor::eps, timeStep);
-    }
-  }
+  auto isVertexSelected = Superclass::OnCheckPointClick(interactionEvent);
 
   if (isVertexSelected)
   {
-    auto foundVertex = contour->GetSelectedVertex();
-    for (auto restrictedArea : m_RestrictedAreas)
-    {
-      if (restrictedArea->SelectVertexAt(foundVertex->Coordinates, mitk::ContourModelInteractor::eps, timeStep))
-      {
-        isVertexSelected = false;
-      }
-    }
-  }
+    auto* contour = dynamic_cast<mitk::ContourModel*>(this->GetDataNode()->GetData());
+    const auto* positionEvent =
+      dynamic_cast<const mitk::InteractionPositionEvent*>(interactionEvent);
+    mitk::Point3D click = positionEvent->GetPositionInWorld();
+    const auto timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
 
-  if (isVertexSelected)
-  {
-    contour->SetSelectedVertexAsControlPoint(true);
     auto controlVertices = contour->GetControlVertices(timeStep);
-    const mitk::ContourModel::VertexType *nextPoint = contour->GetNextControlVertexAt(click, mitk::ContourModelLiveWireInteractor::eps, timeStep);
-    const mitk::ContourModel::VertexType *previousPoint = contour->GetPreviousControlVertexAt(click, mitk::ContourModelLiveWireInteractor::eps, timeStep);
+    const mitk::ContourModel::VertexType* nextPoint = contour->GetNextControlVertexAt(click, mitk::ContourModelLiveWireInteractor::eps, timeStep);
+    const mitk::ContourModel::VertexType* previousPoint = contour->GetPreviousControlVertexAt(click, mitk::ContourModelLiveWireInteractor::eps, timeStep);
     this->SplitContourFromSelectedVertex(contour, nextPoint, previousPoint, timeStep);
     m_NextActiveVertexUp = nextPoint->Coordinates;
     m_NextActiveVertexDown = previousPoint->Coordinates;
 
     // clear previous void positions
     this->m_LiveWireFilter->ClearRepulsivePoints();
+
     // all points in lower and upper part should be marked as repulsive points to not be changed
     this->SetRepulsivePoints(previousPoint, m_ContourLeft, timeStep);
     this->SetRepulsivePoints(nextPoint, m_ContourRight, timeStep);
 
     // clear container with void points between neighboring control points
     m_ContourBeingModified.clear();
-
-    // finally, return true to pass this condition
-    return true;
   }
-  else
-  {
-    // do not pass condition
-    return false;
-  }
-
-  mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
-  return true;
-}
-
-void mitk::ContourModelLiveWireInteractor::SetEditingContourModelNode(mitk::DataNode *_arg)
-{
-  if (this->m_EditingContourNode != _arg)
-  {
-    this->m_EditingContourNode = _arg;
-  }
+  return isVertexSelected;
 }
 
 void mitk::ContourModelLiveWireInteractor::SetWorkingImage(mitk::Image *_arg)
@@ -220,6 +154,8 @@ void mitk::ContourModelLiveWireInteractor::OnMovePoint(StateMachineAction *, Int
     return;
   }
 
+  std::cout << currentPosition << std::endl;
+
   mitk::ContourModel::Pointer editingContour = mitk::ContourModel::New();
   editingContour->Expand(contour->GetTimeSteps());
   editingContour->SetTimeGeometry(contour->GetTimeGeometry()->Clone());
@@ -279,12 +215,6 @@ void mitk::ContourModelLiveWireInteractor::OnMovePoint(StateMachineAction *, Int
   mitk::ContourModel::Pointer rightLiveWire = this->m_LiveWireFilter->GetOutput();
   assert(rightLiveWire);
 
-  // reject strange paths
-  if (abs(rightLiveWire->GetNumberOfVertices(timeStep) - leftLiveWire->GetNumberOfVertices(timeStep)) > 50)
-  {
-    return;
-  }
-
   if (!leftLiveWire->IsEmpty(timeStep))
     leftLiveWire->SetControlVertexAt(leftLiveWire->GetNumberOfVertices() - 1, timeStep);
 
@@ -292,8 +222,6 @@ void mitk::ContourModelLiveWireInteractor::OnMovePoint(StateMachineAction *, Int
     rightLiveWire->RemoveVertexAt(0, timeStep);
 
   editingContour->Concatenate(rightLiveWire, timeStep);
-
-  m_EditingContourNode->SetData(editingContour);
 
   mitk::ContourModel::Pointer newContour = mitk::ContourModel::New();
   newContour->Expand(contour->GetTimeSteps());
@@ -319,39 +247,6 @@ void mitk::ContourModelLiveWireInteractor::OnMovePoint(StateMachineAction *, Int
   mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
 }
 
-bool mitk::ContourModelLiveWireInteractor::IsHovering(const InteractionEvent *interactionEvent)
-{
-  const auto *positionEvent = dynamic_cast<const InteractionPositionEvent *>(interactionEvent);
-  if (!positionEvent)
-    return false;
-
-  const auto timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
-
-  auto *contour = dynamic_cast<mitk::ContourModel *>(this->GetDataNode()->GetData());
-
-  mitk::Point3D currentPosition = positionEvent->GetPositionInWorld();
-
-  bool isHover = false;
-  this->GetDataNode()->GetBoolProperty("contour.hovering", isHover, positionEvent->GetSender());
-  if (contour->IsNearContour(currentPosition, mitk::ContourModelLiveWireInteractor::eps, timeStep))
-  {
-    if (isHover == false)
-    {
-      this->GetDataNode()->SetBoolProperty("contour.hovering", true);
-      mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
-    }
-    return true;
-  }
-  else
-  {
-    if (isHover == true)
-    {
-      this->GetDataNode()->SetBoolProperty("contour.hovering", false);
-      mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
-    }
-  }
-  return false;
-}
 
 void mitk::ContourModelLiveWireInteractor::SplitContourFromSelectedVertex(mitk::ContourModel *srcContour,
                                                                           const mitk::ContourModel::VertexType *nextPoint,
@@ -428,11 +323,5 @@ void mitk::ContourModelLiveWireInteractor::SetRepulsivePoints(const mitk::Contou
 
 void mitk::ContourModelLiveWireInteractor::OnFinishEditing(StateMachineAction *, InteractionEvent *interactionEvent)
 {
-  const auto timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
 
-  auto *editingContour = dynamic_cast<mitk::ContourModel *>(this->m_EditingContourNode->GetData());
-
-  editingContour->Clear(timeStep);
-
-  mitk::RenderingManager::GetInstance()->RequestUpdate(interactionEvent->GetSender()->GetRenderWindow());
 }

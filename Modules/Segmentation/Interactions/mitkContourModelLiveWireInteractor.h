@@ -41,8 +41,6 @@ namespace mitk
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-        virtual void SetEditingContourModelNode(mitk::DataNode *_arg);
-
     virtual void SetWorkingImage(mitk::Image *_arg);
 
     void ConnectActionsAndFunctions() override;
@@ -53,8 +51,6 @@ namespace mitk
 
     /// \brief Select/ add and select vertex to modify contour and prepare for modification of contour.
     bool OnCheckPointClick(const InteractionEvent *interactionEvent) override;
-    /// \brief Check if mouse is hovering over contour
-    bool IsHovering(const InteractionEvent *interactionEvent) override;
 
     /// \brief Update contour when point is moved.
     void OnMovePoint(StateMachineAction *, InteractionEvent *interactionEvent) override;
@@ -84,7 +80,6 @@ namespace mitk
 
     std::vector<itk::Index<2>> m_ContourBeingModified;
 
-    mitk::DataNode::Pointer m_EditingContourNode;
     mitk::ContourModel::Pointer m_ContourLeft;
     mitk::ContourModel::Pointer m_ContourRight;
   };

@@ -43,7 +43,7 @@ void mitk::EditableContourTool::Activated()
 
 void mitk::EditableContourTool::Deactivated()
 {
-  this->ConfirmSegmentation();
+  this->ClearSegmentation();
   Superclass::Deactivated();
 }
 
@@ -69,6 +69,10 @@ void mitk::EditableContourTool::ConfirmSegmentation(bool resetStatMachine)
 
     auto projectedContour = ContourModelUtils::ProjectContourTo2DSlice(workingSlice, m_Contour);
     int activePixelValue = ContourModelUtils::GetActivePixelValue(workingImage);
+    if (!m_AddMode)
+    {
+      activePixelValue = 0;
+    }
 
     ContourModelUtils::FillContourInSlice(projectedContour, workingSlice, workingImage, activePixelValue);
 
@@ -252,7 +256,6 @@ void mitk::EditableContourTool::OnDrawing(StateMachineAction*, InteractionEvent*
 
   m_Contour->AddVertex(positionEvent->GetPositionInWorld(), false);
   UpdateClosureContour(positionEvent->GetPositionInWorld());
-  m_CurrentRestrictedArea->AddVertex(positionEvent->GetPositionInWorld());
 
   assert(positionEvent->GetSender()->GetRenderWindow());
   mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
@@ -264,14 +267,16 @@ void mitk::EditableContourTool::OnEndDrawing(StateMachineAction*, InteractionEve
   if (!positionEvent)
     return;
 
-  if (m_CurrentRestrictedArea->GetNumberOfVertices() > 1)
-  {
-    auto restrictedArea = m_CurrentRestrictedArea->Clone();
-    m_RestrictedAreas.push_back(restrictedArea);
+  auto controlVs = m_Contour->GetControlVertices(0);
+  if (!controlVs.empty())
+  { //add the last control point (after that the draw part start)
+    m_CurrentRestrictedArea->AddVertex(controlVs.back()->Coordinates);
   }
-  m_CurrentRestrictedArea = this->CreateNewContour();
   m_PreviewContourNode->SetVisibility(true);
   m_Contour->SetControlVertexAt(m_Contour->GetNumberOfVertices() - 1);
+
+  //add the just created/set last control point (with it the draw part ends)
+  m_CurrentRestrictedArea->AddVertex(m_Contour->GetVertexAt(m_Contour->GetNumberOfVertices() - 1)->Coordinates);
 
   this->InitializePreviewContour(positionEvent->GetPositionInWorld());
 
@@ -325,6 +330,11 @@ void mitk::EditableContourTool::OnFinish(StateMachineAction *, InteractionEvent 
     m_Contour->Close(i);
 
   this->ReleaseHelperObjects(false);
+
+  if (m_AutoConfirm)
+  {
+    this->ConfirmSegmentation();
+  }
 }
 
 void mitk::EditableContourTool::ReleaseHelperObjects(bool includeWorkingContour)
@@ -337,7 +347,6 @@ void mitk::EditableContourTool::ReleaseHelperObjects(bool includeWorkingContour)
     m_Contour = nullptr;
 
     m_CurrentRestrictedArea = nullptr;
-    m_RestrictedAreas.clear();
   }
 
   m_PreviewContourNode = nullptr;
@@ -414,12 +423,14 @@ void mitk::EditableContourTool::UpdateClosureContour(mitk::Point3D endpoint)
 
 void mitk::EditableContourTool::EnableContourInteraction(bool on)
 {
-  for (const auto& interactor : m_ContourInteractors)
-    interactor->EnableInteraction(on);
+  if (m_ContourInteractor.IsNotNull())
+  {
+    m_ContourInteractor->EnableInteraction(on);
+  }
 }
 
 void mitk::EditableContourTool::ReleaseInteractors()
 {
   this->EnableContourInteraction(false);
-  m_ContourInteractors.clear();
+  m_ContourInteractor = nullptr;
 }

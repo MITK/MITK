@@ -549,6 +549,11 @@ void mitk::VtkPropRenderer::UpdatePaths()
   {
     // Create the list to hold all the paths
     m_Paths = vtkSmartPointer<vtkAssemblyPaths>::New();
+    // m_Paths is collecting a list of vtkProps of all our mappers. However it does NOT ensure that these
+    // props are kept alive via a smart pointer. This can lead to situations where a mapper
+    // (with its prop(s)) is deleted and picking happens including this deleted prop.
+    // To avoid this, m_PickingProps was introduced to ensure that all props referenced by m_Paths are kept alive.
+    m_PickingProps = vtkSmartPointer<vtkCollection>::New();
 
     DataStorage::SetOfObjects::ConstPointer objects = m_DataStorage->GetAll();
     for (auto iter = objects->begin(); iter != objects->end(); ++iter)
@@ -567,6 +572,7 @@ void mitk::VtkPropRenderer::UpdatePaths()
             // add to assembly path
             onePath->AddNode(prop, prop->GetMatrix());
             m_Paths->AddItem(onePath);
+            m_PickingProps->AddItem(prop);
           }
         }
       }

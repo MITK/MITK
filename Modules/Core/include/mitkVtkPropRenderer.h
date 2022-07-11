@@ -197,6 +197,7 @@ namespace mitk
 
   private:
     vtkSmartPointer<vtkAssemblyPaths> m_Paths;
+    vtkSmartPointer<vtkCollection> m_PickingProps;
     vtkTimeStamp m_PathTime;
 
     // prepare all mitk::mappers for rendering

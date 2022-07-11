@@ -314,8 +314,6 @@ Interactions/DisplayConfigPACSZoom.xml
 Interactions/DisplayConfigPACSLevelWindow.xml
 Interactions/DisplayConfigBlockLMB.xml
 Interactions/PointSet.xml
-Interactions/Legacy/StateMachine.xml
-Interactions/Legacy/DisplayConfigMITKTools.xml
 Interactions/PointSetConfig.xml
 
 mitkLevelWindowPresets.xml

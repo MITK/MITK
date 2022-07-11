@@ -302,7 +302,6 @@ set(CPP_FILES
 set(RESOURCE_FILES
 Interactions/globalConfig.xml
 Interactions/DisplayInteraction.xml
-Interactions/DisplayConfig.xml
 Interactions/DisplayConfigMITKBase.xml
 Interactions/DisplayConfigPACSBase.xml
 Interactions/DisplayConfigCrosshair.xml

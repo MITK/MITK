@@ -22,7 +22,7 @@ found in the LICENSE file.
 namespace mitk
 {
     template <class TPixel, unsigned int VImageDimension>
-    void MaskUtilities<TPixel, VImageDimension>::SetImage(ImageType* image)
+    void MaskUtilities<TPixel, VImageDimension>::SetImage(const ImageType* image)
     {
         if (image != m_Image)
         {
@@ -31,7 +31,7 @@ namespace mitk
     }
 
     template <class TPixel, unsigned int VImageDimension>
-    void MaskUtilities<TPixel, VImageDimension>::SetMask(MaskType* mask)
+    void MaskUtilities<TPixel, VImageDimension>::SetMask(const MaskType* mask)
     {
         if (mask != m_Mask)
         {
@@ -122,7 +122,7 @@ namespace mitk
         }
 
     template <class TPixel, unsigned int VImageDimension>
-    typename itk::Image<TPixel, VImageDimension>::Pointer MaskUtilities<TPixel, VImageDimension>::ExtractMaskImageRegion()
+    typename MaskUtilities<TPixel, VImageDimension >::ImageType::ConstPointer MaskUtilities<TPixel, VImageDimension>::ExtractMaskImageRegion()
     {
         if (m_Mask==nullptr || m_Image==nullptr)
         {
@@ -136,14 +136,12 @@ namespace mitk
             MITK_ERROR << "Mask and image are not compatible";
         }
 
-        typedef itk::Image< TPixel, VImageDimension > ImageType;
-        typedef itk::Image< unsigned short, VImageDimension > MaskType;
         typedef itk::ExtractImageFilter< ImageType, ImageType > ExtractImageFilterType;
 
         typename ImageType::SizeType imageSize = m_Image->GetBufferedRegion().GetSize();
         typename ImageType::SizeType maskSize = m_Mask->GetBufferedRegion().GetSize();
 
-        typename itk::Image<TPixel, VImageDimension>::Pointer extractedImg = itk::Image<TPixel, VImageDimension>::New();
+        typename itk::Image<TPixel, VImageDimension>::ConstPointer resultImg;
 
         bool maskSmallerImage = false;
         for ( unsigned int i = 0; i < ImageType::ImageDimension; ++i )
@@ -177,18 +175,18 @@ namespace mitk
           extractImageFilter->SetCoordinateTolerance(MASK_SUITABILITY_TOLERANCE_COORDINATE);
           extractImageFilter->SetDirectionTolerance(MASK_SUITABILITY_TOLERANCE_DIRECTION);
           extractImageFilter->Update();
-          extractedImg = extractImageFilter->GetOutput();
+          auto extractedImg = extractImageFilter->GetOutput();
           extractedImg->SetOrigin(m_Mask->GetOrigin());
           extractedImg->SetLargestPossibleRegion(m_Mask->GetLargestPossibleRegion());
           extractedImg->SetBufferedRegion(m_Mask->GetBufferedRegion());
-
+          resultImg = extractedImg;
         }
         else
         {
-          extractedImg = m_Image;
+          resultImg = m_Image;
         }
 
-        return extractedImg;
+        return resultImg;
     }
 
 }

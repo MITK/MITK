@@ -103,10 +103,10 @@ namespace mitk
         mitk::Image::ConstPointer m_InternalImageForStatistics;
 
         mitk::MaskGenerator::Pointer m_MaskGenerator;
-        mitk::Image::Pointer m_InternalMask;
+        mitk::Image::ConstPointer m_InternalMask;
 
         mitk::MaskGenerator::Pointer m_SecondaryMaskGenerator;
-        mitk::Image::Pointer m_SecondaryMask;
+        mitk::Image::ConstPointer m_SecondaryMask;
 
         unsigned int m_nBinsForHistogramStatistics;
         double m_binSizeForHistogramStatistics;

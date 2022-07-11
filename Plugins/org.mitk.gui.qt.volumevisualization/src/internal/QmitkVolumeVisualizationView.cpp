@@ -113,12 +113,13 @@ void QmitkVolumeVisualizationView::RenderWindowPartDeactivated(mitk::IRenderWind
 
 void QmitkVolumeVisualizationView::OnMitkInternalPreset(int mode)
 {
-  if (m_SelectedNode.IsExpired())
+  auto node = m_SelectedNode.Lock();
+
+  if (node.IsNull())
   {
     return;
   }
 
-  auto node = m_SelectedNode.Lock();
   mitk::TransferFunctionProperty::Pointer transferFuncProp;
   if (node->GetProperty(transferFuncProp, "TransferFunction"))
   {
@@ -156,22 +157,25 @@ void QmitkVolumeVisualizationView::OnCurrentSelectionChanged(QList<mitk::DataNod
 
 void QmitkVolumeVisualizationView::OnEnableRendering(bool state)
 {
-  if (m_SelectedNode.IsExpired())
+  auto selectedNode = m_SelectedNode.Lock();
+
+  if (selectedNode.IsNull())
   {
     return;
   }
 
-  m_SelectedNode.Lock()->SetProperty("volumerendering", mitk::BoolProperty::New(state));
+  selectedNode->SetProperty("volumerendering", mitk::BoolProperty::New(state));
   UpdateInterface();
   RequestRenderWindowUpdate();
 }
 
 void QmitkVolumeVisualizationView::OnBlendMode(int index)
 {
-  if (m_SelectedNode.IsExpired())
+  auto selectedNode = m_SelectedNode.Lock();
+
+  if (selectedNode.IsNull())
     return;
 
-  auto selectedNode = m_SelectedNode.Lock();
   int mode = m_Controls->blendMode->itemData(index).toInt();
   selectedNode->SetProperty("volumerendering.blendmode", mitk::IntProperty::New(mode));
 

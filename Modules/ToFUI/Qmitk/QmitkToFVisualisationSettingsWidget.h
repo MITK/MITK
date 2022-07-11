@@ -22,8 +22,6 @@ found in the LICENSE file.
 // vtk includes
 #include <vtkColorTransferFunction.h>
 
-class QmitkStdMultiWidget;
-
 /** Documentation:
   * Widget controlling the visualization of Time-of-Flight image data. A color transfer function can be configured for
   * a given distance, amplitude and intensity image. The pre-configured vtkColorTransferFunctions can be accessed as

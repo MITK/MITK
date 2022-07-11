@@ -59,7 +59,9 @@ std::string mitk::Utf8Util::Local8BitToUtf8(const std::string& local8BitStr)
 #ifdef US_PLATFORM_WINDOWS
   try
   {
-    return WideCharToMultiByte(MultiByteToWideChar(local8BitStr, CP_ACP), CP_UTF8);
+    return CP_UTF8 != GetOEMCP()
+      ? WideCharToMultiByte(MultiByteToWideChar(local8BitStr, CP_ACP), CP_UTF8)
+      : local8BitStr;
   }
   catch (const mitk::Exception&)
   {
@@ -75,7 +77,9 @@ std::string mitk::Utf8Util::Utf8ToLocal8Bit(const std::string& utf8Str)
 #ifdef US_PLATFORM_WINDOWS
   try
   {
-    return WideCharToMultiByte(MultiByteToWideChar(utf8Str, CP_UTF8), CP_ACP);
+    return CP_UTF8 != GetOEMCP()
+      ? WideCharToMultiByte(MultiByteToWideChar(utf8Str, CP_UTF8), CP_ACP)
+      : utf8Str;
   }
   catch (const mitk::Exception&)
   {

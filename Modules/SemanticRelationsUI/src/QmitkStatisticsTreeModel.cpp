@@ -174,9 +174,10 @@ QVariant QmitkStatisticsTreeModel::headerData(int section, Qt::Orientation orien
 
 void QmitkStatisticsTreeModel::DataStorageChanged()
 {
-  if (!m_DataStorage.IsExpired())
+  auto dataStorage = m_DataStorage.Lock();
+
+  if (dataStorage.IsNotNull())
   {
-    auto dataStorage = m_DataStorage.Lock();
     m_SemanticRelationsDataStorageAccess = std::make_unique<mitk::SemanticRelationsDataStorageAccess>(dataStorage);
     m_StatisticsCalculator->SetDataStorage(dataStorage);
     UpdateModelData();
@@ -230,12 +231,12 @@ void QmitkStatisticsTreeModel::SetLesionData()
 
 void QmitkStatisticsTreeModel::AddLesion(const mitk::SemanticTypes::Lesion& lesion)
 {
-  if (m_DataStorage.IsExpired())
+  auto dataStorage = m_DataStorage.Lock();
+
+  if (dataStorage.IsNull())
   {
     return;
   }
-
-  auto dataStorage = m_DataStorage.Lock();
 
   // create new lesion tree item data and modify it according to the control point data
   mitk::LesionData lesionData(lesion);

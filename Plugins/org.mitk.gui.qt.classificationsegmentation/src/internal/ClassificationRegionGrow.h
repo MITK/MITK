@@ -24,14 +24,8 @@ found in the LICENSE file.
 #include <itkFirstOrderStatisticsFeatureFunctor.h>
 
 #include <mitkImageCast.h>
-//#include <vigra/tensorutilities.hxx>
-//#include <vigra/convolution.hxx>
-//#include <vigra/multi_array.hxx>
-#include <mitkPointSet.h>
 #include <itkHistogram.h>
 #include <QFutureWatcher>
-#include "QmitkPointListViewWidget.h"
-#include <mitkPointSetDataInteractor.h>
 
 #include <mitkVigraRandomForestClassifier.h>
 /**
@@ -43,13 +37,9 @@ found in the LICENSE file.
 \ingroup ${plugin_target}_internal
 */
 
-
-//class QmitkPointListWidget;
 class ctkSliderWidget;
 class ClassificationRegionGrow : public QmitkAbstractView
 {
-  // this is needed for all Qt objects that should have a Qt meta-object
-  // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
 
 public:
@@ -98,7 +88,6 @@ protected:
   void TrainClassifier(const mitk::Image::Pointer & raw_image, const mitk::Image::Pointer & mask_image);
   void PredictSegmentation(const mitk::Image::Pointer & raw_image, const mitk::Image::Pointer & mask_image);
 
-  /// \brief called by QmitkFunctionality when DataManager's selection has changed
   void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
     const QList<mitk::DataNode::Pointer>& nodes ) override;
 

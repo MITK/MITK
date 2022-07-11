@@ -4,5 +4,6 @@ set(MODULE_TESTS
     mitkLabelSetImageTest.cpp
     mitkLabelSetImageIOTest.cpp
     mitkLabelSetImageSurfaceStampFilterTest.cpp
+    mitkTransferLabelTest.cpp
 )
 

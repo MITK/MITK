@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef QmitkLabelSetWidget_h
 #define QmitkLabelSetWidget_h
 
-#include "MitkSegmentationUIExports.h"
+#include <org_mitk_gui_qt_segmentation_Export.h>
 
-#include "mitkColorSequenceRainbow.h"
-#include "mitkLabel.h"
-#include "mitkNumericTypes.h"
+#include <mitkColorSequenceRainbow.h>
+#include <mitkLabel.h>
+#include <mitkNumericTypes.h>
 #include <ui_QmitkLabelSetWidgetControls.h>
 
 class QmitkDataStorageComboBox;
@@ -33,7 +33,7 @@ namespace mitk
   class DataNode;
 }
 
-class MITKSEGMENTATIONUI_EXPORT QmitkLabelSetWidget : public QWidget
+class MITK_QT_SEGMENTATION QmitkLabelSetWidget : public QWidget
 {
   Q_OBJECT
 
@@ -42,8 +42,6 @@ public:
   ~QmitkLabelSetWidget() override;
 
   void SetDataStorage(mitk::DataStorage *storage);
-
-  void SetOrganColors(const QStringList &organColors);
 
   void UpdateControls();
 
@@ -116,10 +114,6 @@ private slots:
   void OnEraseLabel(bool);
   void OnEraseLabels(bool);
   void OnMergeLabels(bool);
-  // reaction to the button "Import Segmentation"
-  void OnImportSegmentation();
-  // reaction to the button "Import Labeled Image"
-  void OnImportLabeledImage();
 
   // reaction to signal "labelListModified" from QmitkLabelSetTableWidget
   void OnLabelListModified(const QStringList &list);

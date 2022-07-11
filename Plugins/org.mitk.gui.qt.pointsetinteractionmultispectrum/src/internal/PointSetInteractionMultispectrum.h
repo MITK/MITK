@@ -10,7 +10,6 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-
 #ifndef PointSetInteractionMultispectrum_h
 #define PointSetInteractionMultispectrum_h
 
@@ -34,16 +33,10 @@ found in the LICENSE file.
   \ingroup ${plugin_target}_internal
 */
 
-
-
 class QmitkPointListWidget;
-
-
 
 class PointSetInteractionMultispectrum : public QmitkAbstractView
 {
-  // this is needed for all Qt objects that should have a Qt meta-object
-  // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
 
   public:
@@ -68,7 +61,6 @@ class PointSetInteractionMultispectrum : public QmitkAbstractView
 
     void SetFocus() override;
 
-    /// \brief called by QmitkFunctionality when DataManager's selection has changed
     void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
                                      const QList<mitk::DataNode::Pointer>& nodes ) override;
 
@@ -81,9 +73,6 @@ class PointSetInteractionMultispectrum : public QmitkAbstractView
     mitk::PointSet::Pointer m_PointSet;
     QmitkPointListWidget* m_PointListWidget;
     QwtPlot* m_Plot;
-
-
-
 
 };
 

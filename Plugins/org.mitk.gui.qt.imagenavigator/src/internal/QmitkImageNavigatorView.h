@@ -83,7 +83,7 @@ protected:
 
   QmitkStepperAdapter* m_AxialStepper;
   QmitkStepperAdapter* m_SagittalStepper;
-  QmitkStepperAdapter* m_FrontalStepper;
+  QmitkStepperAdapter* m_CoronalStepper;
   QmitkStepperAdapter* m_TimeStepper;
 
   QWidget* m_Parent;

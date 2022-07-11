@@ -30,6 +30,7 @@ include(GenerateExportHeader)
 
 # Include MITK macros
 include(MacroParseArguments)
+include(mitkFunctionAddManifest)
 include(mitkFunctionAddCustomModuleTest)
 include(mitkFunctionCheckMitkCompatibility)
 include(mitkFunctionCheckModuleDependencies)

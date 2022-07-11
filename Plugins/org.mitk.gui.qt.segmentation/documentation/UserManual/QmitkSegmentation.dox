@@ -36,6 +36,8 @@ The segmentation plugin offers a number of preferences which can be set via the 
   <li> <b>Show only selected nodes:</b> Enable if only the selected segmentation and the reference image should be visible
   <li> <b>Smoothed surface creation:</b> Set certain smoothing parameters for surface creation
   <li> <b>Default label set preset:</b> Start a new segmentation with this preset instead of a default label
+  <li> <b>Label creation:</b> Assign default names and colors to new labels or ask users for them
+  <li> <b>Label suggestions:</b> Specify custom suggestions for label names and colors
 </ul>
 
 \section org_mitk_views_segmentationtechnicalissues Technical issues
@@ -89,6 +91,13 @@ The following label properties are available:
 
 The 'New Label' button can be used to add a new label. This will automatically add a new label with a distinct name and color to the list of available labels.\n
 In the current implementation of the plugin, the maximum number of labels is restricted to 255. If you need more, you will have to create a new segmentation session.
+
+\subsection org_mitk_views_segmentationlabelsuggestions Label name and color suggestions
+
+When renaming labels or creating new labels with enforced manual naming in the Segmentation preferences, entering names is supported by auto-completion for common label names.
+The list of predefined label names and colors for the auto-completion feature can be either extented or replaced by a custom list of label name and color suggestions.
+This custom list must be specified as a JSON file, just containing an array of objects, each with a mandatory "name" string and an optional "color" string.
+The JSON file can be set in the Segmentation preferences as well as a few options on how to apply these suggestions.
 
 \subsection org_mitk_views_segmentationlabelpresets Saving and loading label set presets
 
@@ -317,8 +326,10 @@ The 3D Region Growing tool works similar to the 2D pendant. At the beginning you
 
 \subsection org_mitk_views_segmentationpickingtool Picking Tool
 
-The Picking tool allows you to select islands within your segmentation. This is especially useful if e.g. a thresholding provided you with several areas within
+The Picking tool offers two modes that allow you to manipulate "islands" within your segmentation. This is especially useful if e.g. a thresholding provided you with several areas within
 your image but you are just interested in one special region.
+- Picking mode: Allows you to select certain "islands". When the pick is confirmed, the complete content of the active label will be removed except the pick. This mode is beneficial if you have a lot segmentation noise and want to pick the relevant parts and dismiss the rest. Hint: You can also pick from other labels, but this will only work if these labels are unlocked.
+- Relabel mode: Allows you to select certain "islands". When the pick is confirmed, it will be relabeled and added to the active label content. Hint: This mode ignores the locks of other labels, hence you do not need to unlock them explicitly.
 
 \imageMacro{QmitkSegmentation_PickingTool.png,"Picking tool",10.00}
 
@@ -331,11 +342,11 @@ for your organ or task concerned, before using the tool. For a detailed explanat
 Remark: The tool assumes that you have a Python3 environment with nnUNet (pip) installed. Your machine should be also equipped with a CUDA enabled GPU.
 
 \subsubsection org_mitk_views_segmentationnnUNetToolWorkflow Workflow:
-    -# Select the "Python Path" drop-down to see if MITK has automatically detected other Python environments. 
+    -# Select the "Python Path" drop-down to see if MITK has automatically detected other Python environments.
     Click on a fitting environment for the nnUNet inference or click "Select" in the dropdown to choose an unlisted python environment. Note that, while selecting an arbitrary environment folder, only select the base folder, e.g. "myenv".
     No need to select all the way until "../myenv/bin/python", for example.
-    -# Click on the "nnUNet Results Folder" directory icon to navigate to the results folder on your hard disk. This is equivalent to setting the <b>RESULTS_FOLDER</b> environment variable. If your results folder is as 
-    per the nnUNet required folder structure, the configuration, trainers, tasks and folds are automatically parsed and correspondingly loaded in the drop-down boxes as shown below. Note that MITK automatically checks for the 
+    -# Click on the "nnUNet Results Folder" directory icon to navigate to the results folder on your hard disk. This is equivalent to setting the <b>RESULTS_FOLDER</b> environment variable. If your results folder is as
+    per the nnUNet required folder structure, the configuration, trainers, tasks and folds are automatically parsed and correspondingly loaded in the drop-down boxes as shown below. Note that MITK automatically checks for the
     <b>RESULTS_FOLDER</b> environment variable value and, if found, auto parses that directory when the tool is started.
     \imageMacro{QmitkSegmentation_nnUNet_Settings.png,"nnUNet Segmentation Settings",10}
     -# Choose your required Task-Configuration-Trainer-Planner-Fold parameters, sequentially. By default, all entries are selected inside the "Fold" dropdown (shown: "All").
@@ -344,7 +355,7 @@ Remark: The tool assumes that you have a Python3 environment with nnUNet (pip) i
     Note that, if a postprocessing json file exists for the selected combination then it will used for ensembling, by default. To choose not to, uncheck the "Use PostProcessing JSON" in the "Advanced" section.
     \imageMacro{QmitkSegmentation_nnUNet_ensemble.png,"nnUNet Segmentation Settings",10}
     -# If your task is trained with multi-modal inputs, then "Multi-Modal" checkbox is checked and the no.of modalities are preloaded in the "No. of Extra Modalities" spinbox.
-    Instantly, as much node selectors with corresponding modality names should appear below to select the Data Manager along including a selector with preselected with the reference node. 
+    Instantly, as much node selectors with corresponding modality names should appear below to select the Data Manager along including a selector with preselected with the reference node.
     Now, select the image nodes in the node selectors accordingly for accurate inferencing.
     \imageMacro{QmitkSegmentation_nnUNet_multimodal.png,"nnUNet Multi Modal Settings",10.00}
     -# Click on "Preview".
@@ -359,6 +370,8 @@ Remark: The tool assumes that you have a Python3 environment with nnUNet (pip) i
     -# In case you want to reload/reparse the folders in the "nnUNet Results Folder", eg. after adding new tasks into it, you may do so without reselecting the folder again by clicking the "Refresh Results Folder" button.
     -# The "Advanced" > "GPU Id" combobox lists the Nvidia GPUs available by parsing the <tt>nvidia-smi</tt> utility output. In case your machine has Nvidia CUDA enabled GPUs but the <tt>nvidia-smi</tt> fails for some reason, the "GPU Id" combobox will show no entries.
     In such a situation, it's still possible to execute inferencing by manually entering the preferred GPU Id, eg. 0 in the combobox.
+    -# The "Advanced" > "Available Models" lists the available pre-trained tasks for download. Make sure you have internet connection. Then, choose a Task from the dropdown and click the Download button. The pre-trained models for the selected Task
+    will be downloaded and placed to the <b>RESULTS_FOLDER</b> directory automatically.
     -# In the <b>RESULTS_FOLDER</b> directory, inside the trainer-planner folder of every task, MITK keeps a "mitk_export.json" file for fast loading for multi-modal information. It is recommended not to delete this file(s) for a fast responsive UI.
     Tip: If multi-modal information shown on MITK is not correct for a given task, you may modify this JSON file and try again.
 

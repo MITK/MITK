@@ -37,7 +37,6 @@ public:
     typedef itk::SmartPointer< const Self >     ConstPointer;
 
     /** Method for creation through the object factory. */
-    itkNewMacro(Self); /** Runtime information support. */
     itkTypeMacro(MaskGenerator, itk::Object);
 
     //~MaskGenerator();
@@ -46,7 +45,7 @@ public:
      * @brief GetMask must be overridden by derived classes.
      * @return mitk::Image::Pointer of generated mask
      */
-    virtual mitk::Image::Pointer GetMask();
+    virtual mitk::Image::ConstPointer GetMask() = 0;
 
     /**
      * @brief GetReferenceImage per default returns the inputImage (as set by SetInputImage). If no input image is set it will return a nullptr.
@@ -64,7 +63,6 @@ protected:
     MaskGenerator();
 
     unsigned int m_TimeStep;
-    mitk::Image::Pointer m_InternalMask;
     mitk::Image::ConstPointer m_inputImage;
 
 private:

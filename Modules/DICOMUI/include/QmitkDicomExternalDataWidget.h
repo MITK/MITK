@@ -34,7 +34,6 @@ class ctkFileDialog;
 /**
 * \brief QmitkDicomExternalDataWidget is a QWidget providing functionality for dicom import.
 *
-* \sa QmitkFunctionality
 * \ingroup Functionalities
 */
 class MITKDICOMUI_EXPORT QmitkDicomExternalDataWidget : public QWidget

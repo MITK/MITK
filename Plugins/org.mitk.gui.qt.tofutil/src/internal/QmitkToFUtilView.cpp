@@ -231,7 +231,7 @@ void QmitkToFUtilView::ResetGUIToDefault()
     renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController()->SliceLockedOff();
     renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
     renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController()->SliceLockedOff();
-    renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Frontal);
+    renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Coronal);
     renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController()->SliceLockedOff();
 
     this->UseToFVisibilitySettings(false);

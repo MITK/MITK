@@ -49,12 +49,12 @@ QmitkStatisticsCalculator::~QmitkStatisticsCalculator()
 
 void QmitkStatisticsCalculator::ComputeLesionVolume(mitk::LesionData& lesionData, const mitk::SemanticTypes::CaseID& caseID)
 {
-  if (m_DataStorage.IsExpired())
+  auto dataStorage = m_DataStorage.Lock();
+
+  if (dataStorage.IsNull())
   {
     return;
   }
-
-  auto dataStorage = m_DataStorage.Lock();
 
   std::vector<double> lesionVolume;
   mitk::SemanticTypes::Lesion lesion = lesionData.GetLesion();
@@ -105,13 +105,12 @@ void QmitkStatisticsCalculator::ComputeLesionVolume(mitk::LesionData& lesionData
 double QmitkStatisticsCalculator::GetSegmentationMaskVolume(mitk::DataNode::Pointer imageNode, mitk::DataNode::Pointer segmentationNode)
 {
   m_MaskVolume = 0.0;
+  auto dataStorage = m_DataStorage.Lock();
 
-  if (m_DataStorage.IsExpired())
+  if (dataStorage.IsNull())
   {
     return m_MaskVolume;
   }
-
-  auto dataStorage = m_DataStorage.Lock();
 
   if (imageNode.IsNull() || segmentationNode.IsNull())
   {
@@ -180,12 +179,12 @@ double QmitkStatisticsCalculator::GetSegmentationMaskVolume(mitk::DataNode::Poin
 void QmitkStatisticsCalculator::OnStatisticsCalculationEnds()
 {
   // taken from 'QmitkImageStatisticsView' (see measurementtoolbox plugin)
-  if (m_DataStorage.IsExpired())
+  auto dataStorage = m_DataStorage.Lock();
+
+  if (dataStorage.IsNull())
   {
     return;
   }
-
-  auto dataStorage = m_DataStorage.Lock();
 
   if (m_CalculationJob->GetStatisticsUpdateSuccessFlag())
   {

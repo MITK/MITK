@@ -294,26 +294,30 @@ mitk::PixelSpacingInterpretation mitk::DICOMImageBlockDescriptor::GetPixelSpacin
 
 std::string mitk::DICOMImageBlockDescriptor::GetPixelSpacing() const
 {
-  if ( m_ImageFrameList.empty() || m_TagCache.IsExpired() )
+  auto tagCache = m_TagCache.Lock();
+
+  if ( m_ImageFrameList.empty() || tagCache.IsNull() )
   {
     MITK_ERROR << "Invalid call to GetPixelSpacing. Need to have initialized tag-cache!";
     return std::string( "" );
   }
 
   static const DICOMTag tagPixelSpacing( 0x0028, 0x0030 );
-  return m_TagCache.Lock()->GetTagValue( m_ImageFrameList.front(), tagPixelSpacing ).value;
+  return tagCache->GetTagValue( m_ImageFrameList.front(), tagPixelSpacing ).value;
 }
 
 std::string mitk::DICOMImageBlockDescriptor::GetImagerPixelSpacing() const
 {
-  if ( m_ImageFrameList.empty() || m_TagCache.IsExpired() )
+  auto tagCache = m_TagCache.Lock();
+
+  if ( m_ImageFrameList.empty() || tagCache.IsNull() )
   {
     MITK_ERROR << "Invalid call to GetImagerPixelSpacing. Need to have initialized tag-cache!";
     return std::string( "" );
   }
 
   static const DICOMTag tagImagerPixelSpacing( 0x0018, 0x1164 );
-  return m_TagCache.Lock()->GetTagValue( m_ImageFrameList.front(), tagImagerPixelSpacing ).value;
+  return tagCache->GetTagValue( m_ImageFrameList.front(), tagImagerPixelSpacing ).value;
 }
 
 void mitk::DICOMImageBlockDescriptor::GetDesiredMITKImagePixelSpacing( ScalarType& spacingX,
@@ -558,10 +562,12 @@ mitk::ReaderImplementationLevel mitk::DICOMImageBlockDescriptor::GetReaderImplem
 
 std::string mitk::DICOMImageBlockDescriptor::GetSOPClassUID() const
 {
-  if ( !m_ImageFrameList.empty() && !m_TagCache.IsExpired() )
+  auto tagCache = m_TagCache.Lock();
+
+  if ( !m_ImageFrameList.empty() && tagCache.IsNotNull() )
   {
     static const DICOMTag tagSOPClassUID( 0x0008, 0x0016 );
-    return m_TagCache.Lock()->GetTagValue( m_ImageFrameList.front(), tagSOPClassUID ).value;
+    return tagCache->GetTagValue( m_ImageFrameList.front(), tagSOPClassUID ).value;
   }
   else
   {
@@ -731,13 +737,6 @@ void mitk::DICOMImageBlockDescriptor::UpdateImageDescribingProperties() const
 
   if ( !m_ImageFrameList.empty() )
   {
-    if ( m_TagCache.IsExpired() )
-    {
-      MITK_ERROR << "Invalid call to DICOMImageBlockDescriptor::UpdateImageDescribingProperties(). Need to "
-                    "have initialized tag-cache!";
-      return;
-    }
-
     auto tagCache = m_TagCache.Lock();
 
     if (tagCache.IsNull())

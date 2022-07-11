@@ -101,25 +101,6 @@ void QmitkLabelSetWidget::OnTableViewContextMenuRequested(const QPoint & /*pos*/
     eraseLabelsAction->setEnabled(true);
     QObject::connect(eraseLabelsAction, SIGNAL(triggered(bool)), this, SLOT(OnEraseLabels(bool)));
     menu->addAction(eraseLabelsAction);
-
-    /*QAction* combineAndCreateSurfaceAction =
-      new QAction(QIcon(":/Qmitk/CreateSurface.png"), "Combine and create a surface", this);
-    combineAndCreateSurfaceAction->setEnabled(true);
-    QObject::connect(
-      combineAndCreateSurfaceAction, SIGNAL(triggered(bool)), this, SLOT(OnCombineAndCreateSurface(bool)));*/
-    // menu->addAction(combineAndCreateSurfaceAction); Not implemented
-
-    /*QAction* createMasksAction =
-      new QAction(QIcon(":/Qmitk/CreateMask.png"), "Create a mask for each selected label", this);
-    createMasksAction->setEnabled(true);
-    QObject::connect(createMasksAction, SIGNAL(triggered(bool)), this, SLOT(OnCreateMasks(bool)));*/
-    // menu->addAction(createMasksAction); Not implemented
-
-    /*QAction* combineAndCreateMaskAction =
-      new QAction(QIcon(":/Qmitk/CreateMask.png"), "Combine and create a mask", this);
-    combineAndCreateMaskAction->setEnabled(true);
-    QObject::connect(combineAndCreateMaskAction, SIGNAL(triggered(bool)), this, SLOT(OnCombineAndCreateMask(bool)));*/
-    // menu->addAction(combineAndCreateMaskAction); Not implemented
   }
   else
   {
@@ -189,11 +170,6 @@ void QmitkLabelSetWidget::OnTableViewContextMenuRequested(const QPoint & /*pos*/
     QAction *createCroppedMaskAction = new QAction(QIcon(":/Qmitk/CreateMask.png"), "Create cropped mask", this);
     createCroppedMaskAction->setEnabled(true);
     QObject::connect(createCroppedMaskAction, SIGNAL(triggered(bool)), this, SLOT(OnCreateCroppedMask(bool)));
-
-    //    QAction* importAction = new QAction(QIcon(":/Qmitk/RenameLabel.png"), "Import...", this );
-    //    importAction->setEnabled(true);
-    //    QObject::connect( importAction, SIGNAL( triggered(bool) ), this, SLOT( OnImportSegmentationSession(bool) ) );
-    //    menu->addAction(importAction);
 
     menu->addAction(createCroppedMaskAction);
 
@@ -310,8 +286,7 @@ void QmitkLabelSetWidget::OnRemoveLabel(bool /*value*/)
   if (answerButton == QMessageBox::Yes)
   {
     this->WaitCursorOn();
-    GetWorkingImage()->GetActiveLabelSet()->RemoveLabel(pixelValue);
-    GetWorkingImage()->EraseLabel(pixelValue);
+    GetWorkingImage()->RemoveLabel(pixelValue, GetWorkingImage()->GetActiveLayer());
     this->WaitCursorOff();
   }
 
@@ -321,18 +296,15 @@ void QmitkLabelSetWidget::OnRemoveLabel(bool /*value*/)
 void QmitkLabelSetWidget::OnRenameLabel(bool /*value*/)
 {
   int pixelValue = GetPixelValueOfSelectedItem();
-  QmitkNewSegmentationDialog dialog(this);
-  dialog.setWindowTitle("Rename Label");
-  dialog.SetSuggestionList(m_OrganColors);
+  QmitkNewSegmentationDialog dialog(this, this->GetWorkingImage(), QmitkNewSegmentationDialog::RenameLabel);
   dialog.SetColor(GetWorkingImage()->GetActiveLabelSet()->GetLabel(pixelValue)->GetColor());
-  dialog.SetSegmentationName(
-    QString::fromStdString(GetWorkingImage()->GetActiveLabelSet()->GetLabel(pixelValue)->GetName()));
+  dialog.SetName(QString::fromStdString(GetWorkingImage()->GetActiveLabelSet()->GetLabel(pixelValue)->GetName()));
 
   if (dialog.exec() == QDialog::Rejected)
   {
     return;
   }
-  QString segmentationName = dialog.GetSegmentationName();
+  QString segmentationName = dialog.GetName();
   if (segmentationName.isEmpty())
   {
     segmentationName = "Unnamed";
@@ -381,7 +353,7 @@ void QmitkLabelSetWidget::OnEraseLabels(bool /*value*/)
         VectorOfLablePixelValues.push_back(m_Controls.m_LabelSetTableWidget->item(i, 0)->data(Qt::UserRole).toInt());
 
     this->WaitCursorOn();
-    GetWorkingImage()->EraseLabels(VectorOfLablePixelValues, GetWorkingImage()->GetActiveLayer());
+    GetWorkingImage()->EraseLabels(VectorOfLablePixelValues);
     this->WaitCursorOff();
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
@@ -556,11 +528,6 @@ void QmitkLabelSetWidget::OnRandomColor(bool /*value*/)
     ->SetColor(m_ColorSequenceRainbow.GetNextColor());
   GetWorkingImage()->GetActiveLabelSet()->UpdateLookupTable(pixelValue);
   UpdateAllTableWidgetItems();
-}
-
-void QmitkLabelSetWidget::SetOrganColors(const QStringList &organColors)
-{
-  m_OrganColors = organColors;
 }
 
 void QmitkLabelSetWidget::OnActiveLabelChanged(int pixelValue)
@@ -802,7 +769,7 @@ void QmitkLabelSetWidget::ResetAllTableWidgetItems()
   while (it != end)
   {
     InsertTableWidgetItem(it->second);
-    if (workingImage->GetActiveLabel() == it->second) // get active
+    if (workingImage->GetActiveLabel(workingImage->GetActiveLayer()) == it->second) // get active
       pixelValue = it->first;
     m_LabelStringList.append(QString(it->second->GetName().c_str()));
     it++;
@@ -862,27 +829,6 @@ void QmitkLabelSetWidget::InitializeTableWidget()
           SIGNAL(customContextMenuRequested(const QPoint &)),
           this,
           SLOT(OnTableViewContextMenuRequested(const QPoint &)));
-
-  // connect( m_Controls.m_LabelSetTableWidget, SIGNAL(activeLabelChanged(int)), this, SLOT(OnActiveLabelChanged(int))
-  // );
-  // connect( m_Controls.m_LabelSetTableWidget, SIGNAL(importSegmentation()), this, SLOT( OnImportSegmentation()) );
-  // connect( m_Controls.m_LabelSetTableWidget, SIGNAL(importLabeledImage()), this, SLOT( OnImportLabeledImage()) );
-  // connect( m_Controls.m_LabelSetTableWidget, SIGNAL(renameLabel(int, const mitk::Color&, const std::string&)), this,
-  // SLOT(OnRenameLabel(int, const mitk::Color&, const std::string&)) );
-  // connect( m_Controls.m_LabelSetTableWidget, SIGNAL(createSurface(int, bool)), this, SLOT(OnCreateSurface(int, bool))
-  // );
-  // connect( m_Controls.m_LabelSetTableWidget, SIGNAL(toggleOutline(bool)), this, SLOT(OnToggleOutline(bool)) );
-  // connect( m_Controls.m_LabelSetTableWidget, SIGNAL(goToLabel(const mitk::Point3D&)), this, SIGNAL(goToLabel(const
-  // mitk::Point3D&)) );
-  // connect( m_Controls.m_LabelSetTableWidget, SIGNAL(combineAndCreateSurface( const QList<QTableWidgetSelectionRange>&
-  // )),
-  //    this, SLOT(OnCombineAndCreateSurface( const QList<QTableWidgetSelectionRange>&)) );
-
-  // connect( m_Controls.m_LabelSetTableWidget, SIGNAL(createMask(int)), this, SLOT(OnCreateMask(int)) );
-  // connect( m_Controls.m_LabelSetTableWidget, SIGNAL(createCroppedMask(int)), this, SLOT(OnCreateCroppedMask(int)) );
-  // connect( m_Controls.m_LabelSetTableWidget, SIGNAL(combineAndCreateMask( const QList<QTableWidgetSelectionRange>&
-  // )),
-  //    this, SLOT(OnCombineAndCreateMask( const QList<QTableWidgetSelectionRange>&)) );
 }
 
 void QmitkLabelSetWidget::OnOpacityChanged(int value)
@@ -1178,96 +1124,6 @@ void QmitkLabelSetWidget::OnCreateDetailedSurface(bool /*triggered*/)
                              "Create Surface",
                              "Could not create a surface mesh out of the selected label. See error log for details.\n");
   }
-}
-
-void QmitkLabelSetWidget::OnImportLabeledImage()
-{
-  /*
-    m_ToolManager->ActivateTool(-1);
-
-    mitk::DataNode* referenceNode = m_ToolManager->GetReferenceData(0);
-    assert(referenceNode);
-
-    // Ask the user for a list of files to open
-    QStringList fileNames = QFileDialog::getOpenFileNames( this, "Open Image", m_LastFileOpenPath,
-                                                          mitk::CoreObjectFactory::GetInstance()->GetFileExtensions());
-
-    if (fileNames.empty())
-      return;
-
-    try
-    {
-      this->WaitCursorOn();
-      mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>( fileNames.front().toStdString() );
-      if (image.IsNull())
-      {
-        this->WaitCursorOff();
-        QMessageBox::information(this, "Import Labeled Image", "Could not load the selected segmentation.\n");
-        return;
-      }
-
-      mitk::LabelSetImage::Pointer newImage = mitk::LabelSetImage::New();
-      newImage->InitializeByLabeledImage(image);
-      this->WaitCursorOff();
-
-      mitk::DataNode::Pointer newNode = mitk::DataNode::New();
-      std::string newName = referenceNode->GetName();
-      newName += "-labels";
-      newNode->SetName(newName);
-      newNode->SetData(newImage);
-      m_DataStorage->Add(newNode, referenceNode);
-    }
-    catch (mitk::Exception & e)
-    {
-      this->WaitCursorOff();
-      MITK_ERROR << "Exception caught: " << e.GetDescription();
-      QMessageBox::information(this, "Import Labeled Image", "Could not load the selected segmentation. See error log
-    for details.\n");
-      return;
-     }
-
-    this->UpdateControls();
-
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    */
-}
-
-void QmitkLabelSetWidget::OnImportSegmentation()
-{
-  /*
-    m_ToolManager->ActivateTool(-1);
-
-    mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
-    assert(workingNode);
-
-    mitk::LabelSetImage* workingImage = dynamic_cast<mitk::LabelSetImage*>( workingNode->GetData() );
-    assert(workingImage);
-
-    std::string fileExtensions("Segmentation files (*.lset);;");
-    QString qfileName = QFileDialog::getOpenFileName(this, "Import Segmentation", m_LastFileOpenPath,
-    fileExtensions.c_str() );
-    if (qfileName.isEmpty() ) return;
-
-    mitk::NrrdLabelSetImageReader::Pointer reader = mitk::NrrdLabelSetImageReader::New();
-    reader->SetFileName(qfileName.toLatin1());
-
-    try
-    {
-      this->WaitCursorOn();
-      reader->Update();
-      mitk::LabelSetImage::Pointer newImage = reader->GetOutput();
-      workingImage->Concatenate(newImage);
-      this->WaitCursorOff();
-    }
-    catch ( mitk::Exception& e )
-    {
-      this->WaitCursorOff();
-      MITK_ERROR << "Exception caught: " << e.GetDescription();
-      QMessageBox::information(this, "Import Segmentation", "Could not import the selected segmentation session.\n See
-    error log for details.\n");
-    }
-  */
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkLabelSetWidget::WaitCursorOn()

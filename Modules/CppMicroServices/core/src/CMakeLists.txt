@@ -51,7 +51,6 @@ set(_srcs
   module/usModuleUtils.cpp
   module/usModuleVersion.cpp
 
-  ../../third_party/jsoncpp.cpp
   ../../third_party/miniz.c
 )
 

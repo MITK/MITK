@@ -191,18 +191,20 @@ void QmitkPropertiesTableModel::SetPropertyList(mitk::PropertyList *_PropertyLis
   // if propertylist really changed
   if (m_PropertyList != _PropertyList)
   {
+    auto propertyList = m_PropertyList.Lock();
     // Remove delete listener if there was a propertylist before
-    if (!m_PropertyList.IsExpired())
-      m_PropertyList.Lock()->RemoveObserver(m_PropertyListDeleteObserverTag);
+    if (propertyList.IsNotNull())
+      propertyList->RemoveObserver(m_PropertyListDeleteObserverTag);
 
     // set new list
     m_PropertyList = _PropertyList;
+    propertyList = m_PropertyList.Lock();
 
-    if (!m_PropertyList.IsExpired())
+    if (propertyList.IsNotNull())
     {
       auto command = itk::SimpleMemberCommand<QmitkPropertiesTableModel>::New();
       command->SetCallbackFunction(this, &QmitkPropertiesTableModel::PropertyListDelete);
-      m_PropertyListDeleteObserverTag = m_PropertyList.Lock()->AddObserver(itk::DeleteEvent(), command);
+      m_PropertyListDeleteObserverTag = propertyList->AddObserver(itk::DeleteEvent(), command);
     }
     this->Reset();
   }
@@ -440,10 +442,10 @@ void QmitkPropertiesTableModel::Reset()
   }
 
   std::vector<PropertyDataSet> allPredicates;
-  if (!m_PropertyList.IsExpired())
-  {
-    auto propertyList = m_PropertyList.Lock();
+  auto propertyList = m_PropertyList.Lock();
 
+  if (propertyList.IsNotNull())
+  {
     // first of all: collect all properties from the list
     for (auto it = propertyList->GetMap()->begin(); it != propertyList->GetMap()->end(); it++)
     {

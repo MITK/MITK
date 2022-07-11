@@ -41,11 +41,11 @@ QmitkDataStorageComboBox::QmitkDataStorageComboBox(mitk::DataStorage *dataStorag
 
 QmitkDataStorageComboBox::~QmitkDataStorageComboBox()
 {
-  // if there was an old storage, remove listeners
-  if (!m_DataStorage.IsExpired())
-  {
-    auto dataStorage = m_DataStorage.Lock();
+  auto dataStorage = m_DataStorage.Lock();
 
+  // if there was an old storage, remove listeners
+  if (dataStorage.IsNotNull())
+  {
     dataStorage->AddNodeEvent.RemoveListener(
       mitk::MessageDelegate1<QmitkDataStorageComboBox, const mitk::DataNode *>(this,
                                                                                &QmitkDataStorageComboBox::AddNode));
@@ -133,12 +133,11 @@ void QmitkDataStorageComboBox::SetDataStorage(mitk::DataStorage *dataStorage)
     }
     // set new storage
     m_DataStorage = dataStorage;
+    currentDataStorage = m_DataStorage.Lock();
 
     // if there is a new storage, add listeners
-    if (!m_DataStorage.IsExpired())
+    if (currentDataStorage.IsNotNull())
     {
-      currentDataStorage = m_DataStorage.Lock();
-
       currentDataStorage->AddNodeEvent.AddListener(
         mitk::MessageDelegate1<QmitkDataStorageComboBox, const mitk::DataNode *>(this,
           &QmitkDataStorageComboBox::AddNode));
@@ -385,9 +384,10 @@ void QmitkDataStorageComboBox::Reset()
   // clear combobox
   this->clear();
 
-  if (!m_DataStorage.IsExpired())
+  auto dataStorage = m_DataStorage.Lock();
+
+  if (dataStorage.IsNotNull())
   {
-    auto dataStorage = m_DataStorage.Lock();
     mitk::DataStorage::SetOfObjects::ConstPointer setOfObjects;
 
     // select all if predicate == nullptr

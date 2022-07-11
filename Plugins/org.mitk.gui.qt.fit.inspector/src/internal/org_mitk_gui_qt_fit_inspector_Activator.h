@@ -20,7 +20,7 @@ found in the LICENSE file.
     class org_mitk_gui_qt_fit_inspector_Activator : public QObject, public ctkPluginActivator
     {
     Q_OBJECT
-      Q_PLUGIN_METADATA(IID "org_mitk_guit_qt_fit_inspector")
+      Q_PLUGIN_METADATA(IID "org_mitk_gui_qt_fit_inspector")
       Q_INTERFACES(ctkPluginActivator)
     public:
 

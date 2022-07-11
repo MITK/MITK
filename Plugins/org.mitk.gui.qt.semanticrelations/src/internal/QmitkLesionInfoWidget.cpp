@@ -59,12 +59,13 @@ void QmitkLesionInfoWidget::Initialize()
   m_Controls.lesionTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
 
   m_StorageModel = new QmitkLesionTreeModel(m_Controls.lesionTreeView);
-  if (m_DataStorage.IsExpired())
+  auto dataStorage = m_DataStorage.Lock();
+
+  if (dataStorage.IsNull())
   {
     return;
   }
 
-  auto dataStorage = m_DataStorage.Lock();
   m_StorageModel->SetDataStorage(dataStorage);
   m_Controls.lesionTreeView->setModel(m_StorageModel);
 
@@ -212,9 +213,11 @@ void QmitkLesionInfoWidget::OnLesionListContextMenuRequested(const QPoint& pos)
   connect(removeLesion, &QAction::triggered, [this, selectedLesion] { OnRemoveLesion(selectedLesion); });
   menu->addAction(removeLesion);
 
-  if (!m_WorkbenchPartSite.Expired())
+  auto workbenchPartSite = m_WorkbenchPartSite.Lock();
+
+  if (workbenchPartSite.IsNotNull())
   {
-    QmitkFocusOnLesionAction* focusOnLesion = new QmitkFocusOnLesionAction(this, m_WorkbenchPartSite.Lock());
+    QmitkFocusOnLesionAction* focusOnLesion = new QmitkFocusOnLesionAction(this, workbenchPartSite);
     focusOnLesion->SetDataStorage(m_DataStorage.Lock());
     focusOnLesion->SetSelectedLesion(selectedLesion);
     menu->addAction(focusOnLesion);
@@ -225,12 +228,12 @@ void QmitkLesionInfoWidget::OnLesionListContextMenuRequested(const QPoint& pos)
 
 void QmitkLesionInfoWidget::OnLinkToSegmentation(mitk::SemanticTypes::Lesion selectedLesion)
 {
-  if (m_DataStorage.IsExpired())
+  auto dataStorage = m_DataStorage.Lock();
+
+  if (dataStorage.IsNull())
   {
     return;
   }
-
-  auto dataStorage = m_DataStorage.Lock();
 
   QmitkSemanticRelationsNodeSelectionDialog* dialog = new QmitkSemanticRelationsNodeSelectionDialog(this, "Select segmentation to link to the selected lesion.", "");
   dialog->setWindowTitle("Select segmentation node");
@@ -342,12 +345,12 @@ void QmitkLesionInfoWidget::OnSetLesionClass(mitk::SemanticTypes::Lesion selecte
 
 void QmitkLesionInfoWidget::OnCreateNewSegmentation(mitk::SemanticTypes::Lesion selectedLesion)
 {
-  if (m_DataStorage.IsExpired())
+  auto dataStorage = m_DataStorage.Lock();
+
+  if (dataStorage.IsNull())
   {
     return;
   }
-
-  auto dataStorage = m_DataStorage.Lock();
 
   QmitkSemanticRelationsNodeSelectionDialog* dialog = new QmitkSemanticRelationsNodeSelectionDialog(this, "Select image to segment lesion on.", "");
   dialog->setWindowTitle("Select image node");
@@ -416,7 +419,7 @@ void QmitkLesionInfoWidget::OnCreateNewSegmentation(mitk::SemanticTypes::Lesion 
     return;
   }
 
-  QString segmentatioName = segmentationDialog->GetSegmentationName();
+  QString segmentatioName = segmentationDialog->GetName();
   if (segmentatioName.isEmpty())
   {
     segmentatioName = "Unnamed";
@@ -450,12 +453,12 @@ void QmitkLesionInfoWidget::OnRemoveLesion(mitk::SemanticTypes::Lesion selectedL
 
 void QmitkLesionInfoWidget::LinkSegmentationToLesion(const mitk::DataNode* selectedDataNode, mitk::SemanticTypes::Lesion selectedLesion)
 {
-  if (m_DataStorage.IsExpired())
+  auto dataStorage = m_DataStorage.Lock();
+
+  if (dataStorage.IsNull())
   {
     return;
   }
-
-  auto dataStorage = m_DataStorage.Lock();
 
   // if the segmentation is not contained in the semantic relations, add it
   if (!mitk::SemanticRelationsInference::InstanceExists(selectedDataNode))

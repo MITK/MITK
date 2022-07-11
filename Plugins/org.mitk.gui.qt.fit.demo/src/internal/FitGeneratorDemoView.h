@@ -69,8 +69,6 @@ protected:
 
   void Generate();
 
-  /*! \brief called by QmitkFunctionality when DataManager's selection has changed
-  */
   void OnSelectionChanged( berry::IWorkbenchPart::Pointer source,
     const QList<mitk::DataNode::Pointer>& nodes) override;
 

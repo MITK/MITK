@@ -47,7 +47,7 @@ public:
     /**
      * @brief Computes and returns the mask
      */
-    mitk::Image::Pointer GetMask() override;
+    mitk::Image::ConstPointer GetMask() override;
 
     /**
      * @brief SetTimeStep is used to set the time step for which the mask is to be generated
@@ -72,6 +72,7 @@ protected:
 private:
     bool IsUpdateRequired() const;
 
+    mitk::Image::Pointer m_InternalMask;
     RealType m_IgnoredPixelValue;
     unsigned long m_InternalMaskUpdateTime;
 

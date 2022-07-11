@@ -223,12 +223,12 @@ void QmitkLesionTreeModel::SetLesionData()
 
 void QmitkLesionTreeModel::AddLesion(const mitk::SemanticTypes::Lesion& lesion)
 {
-  if (m_DataStorage.IsExpired())
+  auto dataStorage = m_DataStorage.Lock();
+
+  if (dataStorage.IsNull())
   {
     return;
   }
-
-  auto dataStorage = m_DataStorage.Lock();
 
   // create new lesion tree item data and modify it according to the control point data
   mitk::LesionData lesionData(lesion);

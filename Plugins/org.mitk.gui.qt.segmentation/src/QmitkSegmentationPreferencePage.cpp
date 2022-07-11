@@ -48,6 +48,7 @@ void QmitkSegmentationPreferencePage::CreateQtControl(QWidget* parent)
 
   connect(m_Ui->smoothingCheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnSmoothingCheckboxChecked(int)));
   connect(m_Ui->labelSetPresetToolButton, SIGNAL(clicked()), this, SLOT(OnLabelSetPresetButtonClicked()));
+  connect(m_Ui->suggestionsToolButton, SIGNAL(clicked()), this, SLOT(OnSuggestionsButtonClicked()));
 
   this->Update();
   m_Initializing = false;
@@ -68,6 +69,10 @@ bool QmitkSegmentationPreferencePage::PerformOk()
   m_SegmentationPreferencesNode->PutDouble("decimation rate", m_Ui->decimationSpinBox->value());
   m_SegmentationPreferencesNode->PutDouble("closing ratio", m_Ui->closingSpinBox->value());
   m_SegmentationPreferencesNode->Put("label set preset", m_Ui->labelSetPresetLineEdit->text());
+  m_SegmentationPreferencesNode->PutBool("default label naming", m_Ui->defaultNameRadioButton->isChecked());
+  m_SegmentationPreferencesNode->Put("label suggestions", m_Ui->suggestionsLineEdit->text());
+  m_SegmentationPreferencesNode->PutBool("replace standard suggestions", m_Ui->replaceStandardSuggestionsCheckBox->isChecked());
+  m_SegmentationPreferencesNode->PutBool("suggest once", m_Ui->suggestOnceCheckBox->isChecked());
   return true;
 }
 
@@ -106,16 +111,42 @@ void QmitkSegmentationPreferencePage::Update()
   m_Ui->closingSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("closing ratio", 0.0));
 
   auto labelSetPreset = mitk::BaseApplication::instance().config().getString(mitk::BaseApplication::ARG_SEGMENTATION_LABELSET_PRESET.toStdString(), "");
-  bool isOverridenByCmdLineArg = !labelSetPreset.empty();
+  bool isOverriddenByCmdLineArg = !labelSetPreset.empty();
 
-  if (!isOverridenByCmdLineArg)
+  if (!isOverriddenByCmdLineArg)
     labelSetPreset = m_SegmentationPreferencesNode->Get("label set preset", "").toStdString();
 
-  m_Ui->labelSetPresetLineEdit->setDisabled(isOverridenByCmdLineArg);
-  m_Ui->labelSetPresetToolButton->setDisabled(isOverridenByCmdLineArg);
-  m_Ui->labelSetPresetCmdLineArgLabel->setVisible(isOverridenByCmdLineArg);
+  m_Ui->labelSetPresetLineEdit->setDisabled(isOverriddenByCmdLineArg);
+  m_Ui->labelSetPresetToolButton->setDisabled(isOverriddenByCmdLineArg);
+  m_Ui->labelSetPresetCmdLineArgLabel->setVisible(isOverriddenByCmdLineArg);
 
   m_Ui->labelSetPresetLineEdit->setText(QString::fromStdString(labelSetPreset));
+
+  if (m_SegmentationPreferencesNode->GetBool("default label naming", true))
+  {
+    m_Ui->defaultNameRadioButton->setChecked(true);
+  }
+  else
+  {
+    m_Ui->askForNameRadioButton->setChecked(true);
+  }
+
+  auto labelSuggestions = mitk::BaseApplication::instance().config().getString(mitk::BaseApplication::ARG_SEGMENTATION_LABEL_SUGGESTIONS.toStdString(), "");
+  isOverriddenByCmdLineArg = !labelSuggestions.empty();
+
+  if (!isOverriddenByCmdLineArg)
+    labelSuggestions = m_SegmentationPreferencesNode->Get("label suggestions", "").toStdString();
+
+  m_Ui->defaultNameRadioButton->setDisabled(isOverriddenByCmdLineArg);
+  m_Ui->askForNameRadioButton->setDisabled(isOverriddenByCmdLineArg);
+  m_Ui->suggestionsLineEdit->setDisabled(isOverriddenByCmdLineArg);
+  m_Ui->suggestionsToolButton->setDisabled(isOverriddenByCmdLineArg);
+  m_Ui->suggestionsCmdLineArgLabel->setVisible(isOverriddenByCmdLineArg);
+
+  m_Ui->suggestionsLineEdit->setText(QString::fromStdString(labelSuggestions));
+
+  m_Ui->replaceStandardSuggestionsCheckBox->setChecked(m_SegmentationPreferencesNode->GetBool("replace standard suggestions", true));
+  m_Ui->suggestOnceCheckBox->setChecked(m_SegmentationPreferencesNode->GetBool("suggest once", true));
 }
 
 void QmitkSegmentationPreferencePage::OnSmoothingCheckboxChecked(int state)
@@ -132,4 +163,12 @@ void QmitkSegmentationPreferencePage::OnLabelSetPresetButtonClicked()
 
   if (!filename.isEmpty())
     m_Ui->labelSetPresetLineEdit->setText(filename);
+}
+
+void QmitkSegmentationPreferencePage::OnSuggestionsButtonClicked()
+{
+  const auto filename = QFileDialog::getOpenFileName(m_Control, QStringLiteral("Load Label Suggestions"), QString(), QStringLiteral("Label suggestions (*.json)"));
+
+  if (!filename.isEmpty())
+    m_Ui->suggestionsLineEdit->setText(filename);
 }

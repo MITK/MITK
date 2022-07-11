@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>640</width>
-    <height>480</height>
+    <width>656</width>
+    <height>779</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -42,6 +42,12 @@
        <property name="text">
         <string>Draw as outline</string>
        </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+       <attribute name="buttonGroup">
+        <string notr="true">displayButtonGroup</string>
+       </attribute>
       </widget>
      </item>
      <item>
@@ -49,6 +55,9 @@
        <property name="text">
         <string>Draw as transparent overlay</string>
        </property>
+       <attribute name="buttonGroup">
+        <string notr="true">displayButtonGroup</string>
+       </attribute>
       </widget>
      </item>
     </layout>
@@ -198,8 +207,117 @@
      </item>
     </layout>
    </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="labelCreationLabel">
+     <property name="text">
+      <string>Label creation</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QRadioButton" name="defaultNameRadioButton">
+       <property name="text">
+        <string>Assign default name and color</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+       <attribute name="buttonGroup">
+        <string notr="true">labelCreationButtonGroup</string>
+       </attribute>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="askForNameRadioButton">
+       <property name="text">
+        <string>Ask for name and color</string>
+       </property>
+       <attribute name="buttonGroup">
+        <string notr="true">labelCreationButtonGroup</string>
+       </attribute>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="labelSuggestions">
+     <property name="text">
+      <string>Label suggestions</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="0" column="0">
+      <widget class="QLineEdit" name="suggestionsLineEdit">
+       <property name="clearButtonEnabled">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QToolButton" name="suggestionsToolButton">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0" colspan="2">
+      <widget class="QLabel" name="suggestionsCmdLineArgLabel">
+       <property name="text">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;Suggestions are currently enforced by the &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New'; color:#ff0000;&quot;&gt;Segmentation.labelSuggestions&lt;/span&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt; command-line argument.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::RichText</enum>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="7" column="1">
+    <widget class="QCheckBox" name="replaceStandardSuggestionsCheckBox">
+     <property name="text">
+      <string>Replace standard organ suggestions</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="1">
+    <widget class="QCheckBox" name="suggestOnceCheckBox">
+     <property name="text">
+      <string>Suggest once per segmentation</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="1">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
   </layout>
  </widget>
  <resources/>
  <connections/>
+ <buttongroups>
+  <buttongroup name="displayButtonGroup"/>
+  <buttongroup name="labelCreationButtonGroup"/>
+ </buttongroups>
 </ui>

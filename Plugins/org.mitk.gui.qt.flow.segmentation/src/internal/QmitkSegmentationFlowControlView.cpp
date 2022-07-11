@@ -19,12 +19,13 @@ found in the LICENSE file.
 #include <itksys/SystemTools.hxx>
 
 //MITK
-#include "mitkLabelSetImage.h"
-#include "mitkNodePredicateAnd.h"
-#include "mitkNodePredicateNot.h"
-#include "mitkNodePredicateProperty.h"
-#include "mitkNodePredicateDataType.h"
-#include "mitkIOUtil.h"
+#include <mitkBaseApplication.h>
+#include <mitkLabelSetImage.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkNodePredicateDataType.h>
+#include <mitkIOUtil.h>
 
 // Qmitk
 #include "QmitkSegmentationFlowControlView.h"
@@ -42,9 +43,6 @@ QmitkSegmentationFlowControlView::QmitkSegmentationFlowControlView()
   nodePredicate->AddPredicate(mitk::TNodePredicateDataType<mitk::LabelSetImage>::New());
   nodePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
   m_SegmentationPredicate = nodePredicate;
-
-  m_OutputDir = QString::fromStdString(itksys::SystemTools::GetCurrentWorkingDirectory());
-  m_FileExtension = "nrrd";
 }
 
 void QmitkSegmentationFlowControlView::SetFocus()
@@ -54,40 +52,20 @@ void QmitkSegmentationFlowControlView::SetFocus()
 
 void QmitkSegmentationFlowControlView::CreateQtPartControl(QWidget* parent)
 {
-    // create GUI widgets from the Qt Designer's .ui file
-    m_Controls.setupUi(parent);
+  // create GUI widgets from the Qt Designer's .ui file
+  m_Controls.setupUi(parent);
 
-    m_Parent = parent;
+  m_Parent = parent;
 
-    connect(m_Controls.btnStoreAndAccept, SIGNAL(clicked()), this, SLOT(OnAcceptButtonPushed()));
+  connect(m_Controls.btnStoreAndAccept, SIGNAL(clicked()), this, SLOT(OnAcceptButtonPushed()));
 
-    m_Controls.labelStored->setVisible(false);
-    UpdateControls();
+  m_Controls.labelStored->setVisible(false);
+  UpdateControls();
 
-    auto arguments = QCoreApplication::arguments();
+  m_OutputDir = QString::fromStdString(mitk::BaseApplication::instance().config().getString("flow.outputdir", itksys::SystemTools::GetCurrentWorkingDirectory()));
+  m_OutputDir = QDir::fromNativeSeparators(m_OutputDir);
 
-    bool isFlagFound = false;
-    for (auto arg : arguments)
-    {
-      if (isFlagFound)
-      {
-        m_OutputDir = arg;
-        break;
-      }
-      isFlagFound = arg.startsWith("--flow.outputdir");
-    }
-    isFlagFound = false;
-    for (auto arg : arguments)
-    {
-      if (isFlagFound)
-      {
-        m_FileExtension = arg;
-        break;
-      }
-      isFlagFound = arg.startsWith("--flow.outputextension");
-    }
-
-    m_OutputDir = QDir::fromNativeSeparators(m_OutputDir);
+  m_FileExtension = QString::fromStdString(mitk::BaseApplication::instance().config().getString("flow.outputextension", "nrrd"));
 }
 
 void QmitkSegmentationFlowControlView::OnAcceptButtonPushed()

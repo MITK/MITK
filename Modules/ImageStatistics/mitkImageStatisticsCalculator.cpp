@@ -315,7 +315,7 @@ namespace mitk
     }
 
     // maskImage has to have the same dimension as image
-    typename MaskType::Pointer maskImage = MaskType::New();
+    typename MaskType::ConstPointer maskImage = MaskType::New();
     try
     {
       // try to access the pixel values directly (no copying or casting). Only works if mask pixels are of pixelType
@@ -325,8 +325,10 @@ namespace mitk
     catch (const itk::ExceptionObject &)
 
     {
+      typename MaskType::Pointer noneConstMaskImage; //needed to work arround the fact that CastToItkImage currently does not support const itk images.
       // if the pixel type of the mask is not short, then we have to make a copy of m_InternalMask (and cast the values)
-      CastToItkImage(m_InternalMask, maskImage);
+      CastToItkImage(m_InternalMask, noneConstMaskImage);
+      maskImage = noneConstMaskImage;
     }
 
     // if we have a secondary mask (say a ignoreZeroPixelMask) we need to combine the masks (corresponds to AND)
@@ -342,7 +344,7 @@ namespace mitk
         m_SecondaryMask = m_SecondaryMaskGenerator->GetMask();
         m_SecondaryMaskGenerator->SetInputImage(old_img);
       }
-      typename MaskType::Pointer secondaryMaskImage = MaskType::New();
+      typename MaskType::ConstPointer secondaryMaskImage = MaskType::New();
       secondaryMaskImage = ImageToItkImage<MaskPixelType, VImageDimension>(m_SecondaryMask);
 
       // secondary mask should be a ignore zero value pixel mask derived from image. it has to be cropped to the mask
@@ -351,7 +353,7 @@ namespace mitk
         MaskUtilities<MaskPixelType, VImageDimension>::New();
       secondaryMaskMaskUtil->SetImage(secondaryMaskImage.GetPointer());
       secondaryMaskMaskUtil->SetMask(maskImage.GetPointer());
-      typename MaskType::Pointer adaptedSecondaryMaskImage = secondaryMaskMaskUtil->ExtractMaskImageRegion();
+      typename MaskType::ConstPointer adaptedSecondaryMaskImage = secondaryMaskMaskUtil->ExtractMaskImageRegion();
 
       typename itk::MaskImageFilter2<MaskType, MaskType, MaskType>::Pointer maskFilter =
         itk::MaskImageFilter2<MaskType, MaskType, MaskType>::New();
@@ -368,7 +370,7 @@ namespace mitk
     maskUtil->SetMask(maskImage.GetPointer());
 
     // if mask is smaller than image, extract the image region where the mask is
-    typename ImageType::Pointer adaptedImage = ImageType::New();
+    typename ImageType::ConstPointer adaptedImage = ImageType::New();
 
     adaptedImage = maskUtil->ExtractMaskImageRegion(); // this also checks mask sanity
 

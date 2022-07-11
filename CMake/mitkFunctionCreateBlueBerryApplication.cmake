@@ -110,6 +110,10 @@ if(WIN32)
   target_link_libraries(${_APP_NAME} PRIVATE ${QT_QTMAIN_LIBRARY})
 endif()
 
+if(WIN32 AND MITK_UTF8)
+  mitk_add_manifest(${_APP_NAME})
+endif()
+
 # -----------------------------------------------------------------------
 # Add executable icon and bundle name (Mac)
 # -----------------------------------------------------------------------

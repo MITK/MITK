@@ -20,7 +20,6 @@ found in the LICENSE file.
 #include <mitkApplicationCursor.h>
 #include <mitkBaseApplication.h>
 #include <mitkCameraController.h>
-#include <mitkImageTimeSelector.h>
 #include <mitkLabelSetImage.h>
 #include <mitkLabelSetImageHelper.h>
 #include <mitkLabelSetIOHelper.h>
@@ -34,7 +33,8 @@ found in the LICENSE file.
 
 // Qmitk
 #include <QmitkRenderWindow.h>
-#include <QmitkSegmentationOrganNamesHandling.cpp>
+#include <QmitkStaticDynamicSegmentationDialog.h>
+#include <QmitkNewSegmentationDialog.h>
 
 // us
 #include <usModuleResource.h>
@@ -59,6 +59,7 @@ QmitkSegmentationView::QmitkSegmentationView()
   , m_DrawOutline(true)
   , m_SelectionMode(false)
   , m_MouseCursorSet(false)
+  , m_DefaultLabelNaming(true)
 {
   auto isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
   auto isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
@@ -287,40 +288,13 @@ void QmitkSegmentationView::OnNewSegmentation()
     return;
   }
 
-  const auto currentTimePoint = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
-  unsigned int imageTimeStep = 0;
-  if (referenceImage->GetTimeGeometry()->IsValidTimePoint(currentTimePoint))
-  {
-    imageTimeStep = referenceImage->GetTimeGeometry()->TimePointToTimeStep(currentTimePoint);
-  }
-
   auto segTemplateImage = referenceImage;
   if (referenceImage->GetDimension() > 3)
   {
-    auto result = QMessageBox::question(m_Parent,
-      tr("Create a static or dynamic segmentation?"),
-      tr("The selected image has multiple time steps.\n\nDo you want to create a static "
-        "segmentation that is identical for all time steps or do you want to create a "
-        "dynamic segmentation to segment individual time steps?"),
-      tr("Create static segmentation"), tr("Create dynamic segmentation"),
-      QString(), 0, 0);
-    if (result == 0)
-    {
-      auto selector = mitk::ImageTimeSelector::New();
-      selector->SetInput(referenceImage);
-      selector->SetTimeNr(0);
-      selector->Update();
-
-      const auto refTimeGeometry = referenceImage->GetTimeGeometry();
-      auto newTimeGeometry = mitk::ProportionalTimeGeometry::New();
-      newTimeGeometry->SetFirstTimePoint(refTimeGeometry->GetMinimumTimePoint());
-      newTimeGeometry->SetStepDuration(refTimeGeometry->GetMaximumTimePoint() - refTimeGeometry->GetMinimumTimePoint());
-
-      mitk::Image::Pointer newImage = selector->GetOutput();
-      newTimeGeometry->SetTimeStepGeometry(referenceImage->GetGeometry(imageTimeStep), 0);
-      newImage->SetTimeGeometry(newTimeGeometry);
-      segTemplateImage = newImage;
-    }
+    QmitkStaticDynamicSegmentationDialog dialog(m_Parent);
+    dialog.SetReferenceImage(referenceImage.GetPointer());
+    dialog.exec();
+    segTemplateImage = dialog.GetSegmentationTemplate();
   }
 
   mitk::DataNode::Pointer newSegmentationNode;
@@ -349,7 +323,25 @@ void QmitkSegmentationView::OnNewSegmentation()
 
   if (labelSetPreset.empty() || !mitk::LabelSetIOHelper::LoadLabelSetImagePreset(labelSetPreset, newLabelSetImage))
   {
-    mitk::Label::Pointer newLabel = mitk::LabelSetImageHelper::CreateNewLabel(newLabelSetImage);
+    auto newLabel = mitk::LabelSetImageHelper::CreateNewLabel(newLabelSetImage);
+
+    if (!m_DefaultLabelNaming)
+    {
+      QmitkNewSegmentationDialog dialog(m_Parent);
+      dialog.SetName(QString::fromStdString(newLabel->GetName()));
+      dialog.SetColor(newLabel->GetColor());
+
+      if (QDialog::Rejected == dialog.exec())
+        return;
+
+      auto name = dialog.GetName();
+
+      if (!name.isEmpty())
+        newLabel->SetName(name.toStdString());
+
+      newLabel->SetColor(dialog.GetColor());
+    }
+
     newLabelSetImage->GetActiveLabelSet()->AddLabel(newLabel);
   }
 
@@ -414,11 +406,7 @@ void QmitkSegmentationView::OnShowMarkerNodes(bool state)
 
 void QmitkSegmentationView::OnLayersChanged()
 {
-  m_Controls->labelSetWidget->ResetAllTableWidgetItems();
-}
-
-void QmitkSegmentationView::OnLabelsChanged()
-{
+  this->OnEstablishLabelSetConnection();
   m_Controls->labelSetWidget->ResetAllTableWidgetItems();
 }
 
@@ -533,7 +521,6 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    connect(m_Controls->slicesInterpolator, &QmitkSlicesInterpolator::SignalShowMarkerNodes, this, &QmitkSegmentationView::OnShowMarkerNodes);
 
    connect(m_Controls->layersWidget, &QmitkLayersWidget::LayersChanged, this, &QmitkSegmentationView::OnLayersChanged);
-   connect(m_Controls->labelsWidget, &QmitkLabelsWidget::LabelsChanged, this, &QmitkSegmentationView::OnLabelsChanged);
    connect(m_Controls->labelsWidget, &QmitkLabelsWidget::ShowLabelTable, this, &QmitkSegmentationView::OnShowLabelTable);
 
    // *------------------------
@@ -543,7 +530,6 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    connect(m_Controls->labelSetWidget, &QmitkLabelSetWidget::LabelSetWidgetReset, this, &QmitkSegmentationView::OnLabelSetWidgetReset);
 
    m_Controls->labelSetWidget->SetDataStorage(this->GetDataStorage());
-   m_Controls->labelSetWidget->SetOrganColors(mitk::OrganNamesHandling::GetDefaultOrganColorString());
    m_Controls->labelSetWidget->hide();
 
    auto command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
@@ -604,8 +590,16 @@ void QmitkSegmentationView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*
 
 void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
 {
+  auto labelSuggestions = mitk::BaseApplication::instance().config().getString(mitk::BaseApplication::ARG_SEGMENTATION_LABEL_SUGGESTIONS.toStdString(), "");
+
+  m_DefaultLabelNaming = labelSuggestions.empty()
+    ? prefs->GetBool("default label naming", true)
+    : false; // No default label naming when label suggestions are enforced via command-line argument
+
   if (nullptr != m_Controls)
   {
+    m_Controls->labelsWidget->SetDefaultLabelNaming(m_DefaultLabelNaming);
+
     bool slimView = prefs->GetBool("slim view", false);
     m_Controls->toolSelectionBox2D->SetShowNames(!slimView);
     m_Controls->toolSelectionBox3D->SetShowNames(!slimView);

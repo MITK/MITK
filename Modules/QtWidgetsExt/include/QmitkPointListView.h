@@ -14,12 +14,14 @@ found in the LICENSE file.
 #define QMITK_POINTLIST_VIEW_H_INCLUDED
 
 #include "MitkQtWidgetsExtExports.h"
-#include "QmitkPointListModel.h"
+
+#include <QmitkPointListModel.h>
+
 #include <QLabel>
 #include <QListView>
 #include <mitkSliceNavigationController.h>
 
-class QmitkStdMultiWidget;
+class QmitkAbstractMultiWidget;
 
 /*!
 * \brief GUI widget for handling mitk::PointSet
@@ -28,8 +30,8 @@ class QmitkStdMultiWidget;
 * Reacts automatically to changes in the PointSet's selection status.
 * Updates PointSet's selection status when this list's selection changes.
 *
-* If a QmitkStdMultiWidget is assigned via SetMultiWidget(), the
-* crosshair of the QmitkStdMultiWidget is moved to the currently selected
+* If a QmitkAbstractMultiWidget is assigned via SetMultiWidget(), the
+* crosshair of the QmitkAbstractMultiWidget is moved to the currently selected
 * point.
 *
 */
@@ -52,10 +54,12 @@ public:
   * As an alternative, if you dont have a multiwidget, you can call SetSnc1, SetSnc2, SetSnc3 to set the
   * SliceNavigationControllers directly to enable the focussing feature.
   */
-  void SetMultiWidget(QmitkStdMultiWidget *multiWidget);
+  void SetMultiWidget(QmitkAbstractMultiWidget* multiWidget);
 
-  QmitkStdMultiWidget *GetMultiWidget()
-    const; ///< return the QmitkStdMultiWidget that is used for updating render window crosshair
+  /**
+   * \brief Return the QmitkAbstractMultiWidget that is used for updating the render window crosshair.
+   */
+  QmitkAbstractMultiWidget* GetMultiWidget() const;
 
   /**
    * @brief Add a mitk::SliceNavigationController instance.
@@ -114,7 +118,7 @@ protected:
   bool m_showFading;
 
   /// used to position the planes on a selected point
-  QmitkStdMultiWidget *m_MultiWidget;
+  QmitkAbstractMultiWidget* m_MultiWidget;
 };
 
 #endif

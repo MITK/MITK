@@ -132,7 +132,7 @@ namespace mitk
         viewDirectionString = "Sagittal";
         break;
 
-      case SliceNavigationController::Frontal:
+      case SliceNavigationController::Coronal:
         viewDirectionString = "Coronal";
         break;
 
@@ -155,9 +155,9 @@ namespace mitk
       {
         this->Update(Sagittal, true, true, false);
       }
-      else if (m_ViewDirection == Frontal)
+      else if (m_ViewDirection == Coronal)
       {
-        this->Update(Frontal, false, true, false);
+        this->Update(Coronal, false, true, false);
       }
       else if (m_ViewDirection == Axial)
       {
@@ -253,9 +253,9 @@ namespace mitk
           slicedWorldGeometry->SetSliceNavigationController(this);
           break;
 
-        case Frontal:
+        case Coronal:
           slicedWorldGeometry = SlicedGeometry3D::New();
-          slicedWorldGeometry->InitializePlanes(currentGeometry, PlaneGeometry::Frontal, top, frontside, rotated);
+          slicedWorldGeometry->InitializePlanes(currentGeometry, PlaneGeometry::Coronal, top, frontside, rotated);
           slicedWorldGeometry->SetSliceNavigationController(this);
           break;
 

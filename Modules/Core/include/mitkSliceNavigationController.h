@@ -146,7 +146,7 @@ namespace mitk
     {
       Axial,
       Sagittal,
-      Frontal,
+      Coronal,
       Original
     };
 

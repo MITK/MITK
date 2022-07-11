@@ -57,11 +57,13 @@ namespace mitk
   {
     DataNode *groupNode = GetGroupNode();
 
-    if (!m_DataStorage.IsExpired())
+    auto dataStorage = m_DataStorage.Lock();
+
+    if (dataStorage.IsNotNull())
     {
       if (node)
         node->GetData()->DisconnectPipeline();
-      m_DataStorage.Lock()->Add(node, groupNode);
+      dataStorage->Add(node, groupNode);
     }
 
     RenderingManager::GetInstance()->RequestUpdateAll();
@@ -79,10 +81,11 @@ namespace mitk
   {
     DataNode::Pointer groupNode;
     GetPointerParameter("Group node", groupNode);
+    auto dataStorage = m_DataStorage.Lock();
 
-    if (groupNode.IsNotNull() && !m_DataStorage.IsExpired())
+    if (groupNode.IsNotNull() && dataStorage.IsNotNull())
     {
-      return m_DataStorage.Lock()->GetNamedDerivedNode(name, groupNode, true);
+      return dataStorage->GetNamedDerivedNode(name, groupNode, true);
     }
 
     return nullptr;

@@ -51,12 +51,12 @@ void QmitkDataNodeSetInformationTypeAction::InitializeAction()
 
 void QmitkDataNodeSetInformationTypeAction::OnActionTriggered(bool /*checked*/)
 {
-  if (m_DataStorage.IsExpired())
+  auto dataStorage = m_DataStorage.Lock();
+
+  if (dataStorage.IsNull())
   {
     return;
   }
-
-  auto dataStorage = m_DataStorage.Lock();
 
   auto dataNode = GetSelectedNode();
   if (dataNode.IsNull())

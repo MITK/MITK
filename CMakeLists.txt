@@ -37,7 +37,7 @@ if(MITK_USE_SUPERBUILD)
   set(MITK_SOURCE_DIR ${PROJECT_SOURCE_DIR})
   set(MITK_BINARY_DIR ${PROJECT_BINARY_DIR})
 else()
-  project(MITK VERSION 2022.04.00)
+  project(MITK VERSION 2022.04.99)
   include_directories(SYSTEM ${MITK_SUPERBUILD_BINARY_DIR})
 endif()
 
@@ -545,6 +545,7 @@ include(WriteBasicConfigVersionFile)
 include(CheckCXXSourceCompiles)
 include(GenerateExportHeader)
 
+include(mitkFunctionAddManifest)
 include(mitkFunctionAddCustomModuleTest)
 include(mitkFunctionCheckModuleDependencies)
 include(mitkFunctionCompileSnippets)
@@ -648,6 +649,12 @@ mark_as_advanced(BLUEBERRY_DEBUG_SMARTPOINTER)
 # Ask the user to show the console window for applications
 option(MITK_SHOW_CONSOLE_WINDOW "Use this to enable or disable the console window when starting MITK GUI Applications" ON)
 mark_as_advanced(MITK_SHOW_CONSOLE_WINDOW)
+
+# As of Windows 10 Version 1903 (May 2019 Update), applications can use the UTF-8 code page
+if(WIN32)
+  option(MITK_UTF8 "Use UTF-8 code page in MITK applications on Windows" ON)
+  mark_as_advanced(MITK_UTF8)
+endif()
 
 if(NOT MITK_FAST_TESTING)
   if(MITK_CTEST_SCRIPT_MODE STREQUAL "Continuous" OR MITK_CTEST_SCRIPT_MODE STREQUAL "Experimental")

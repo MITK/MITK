@@ -137,7 +137,7 @@ mitk::DescriptivePharmacokineticBrixModel::GetStaticParameterUnits() const
 mitk::DescriptivePharmacokineticBrixModel::ParametersSizeType
 mitk::DescriptivePharmacokineticBrixModel::GetNumberOfStaticParameters() const
 {
-  return 1;
+  return 2;
 }
 
 
@@ -155,6 +155,7 @@ const
     itkExceptionMacro("Injection time is 0! Cannot Calculate Signal");
   }
 
+
   ModelResultType signal(m_TimeGrid.GetSize());
 
   double tx        = 0;
@@ -162,6 +163,11 @@ const
   double       kel = parameters[POSITION_PARAMETER_kel];
   double       kep = parameters[POSITION_PARAMETER_kep];
   double      tlag = parameters[POSITION_PARAMETER_tlag];
+
+  if (kep == kel)
+  {
+    itkExceptionMacro("(kep-kel) is 0! Cannot Calculate Signal");
+  }
 
   TimeGridType::const_iterator timeGridEnd = m_TimeGrid.end();
   ModelResultType::iterator signalPos = signal.begin();

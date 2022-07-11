@@ -33,7 +33,6 @@ found in the LICENSE file.
 
 \warning  This class is not yet documented. Use "git blame" and ask the author to provide basic documentation.
 
-\sa QmitkFunctionality
 \ingroup ${plugin_target}_internal
 */
 class MITKMATCHPOINTREGISTRATIONUI_EXPORT QmitkRegistrationManipulationWidget : public QWidget, private Ui::QmitkRegistrationManipulationWidget

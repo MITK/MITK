@@ -85,7 +85,7 @@ namespace mitk
     }
 
 
-    mitk::Image::Pointer HotspotMaskGenerator::GetMask()
+    mitk::Image::ConstPointer HotspotMaskGenerator::GetMask()
     {
         if (IsUpdateRequired())
         {
@@ -112,17 +112,21 @@ namespace mitk
             if ( m_Mask != nullptr )
             {
                 m_Mask->SetTimeStep(m_TimeStep);
-                mitk::Image::Pointer timeSliceMask = m_Mask->GetMask();
+                mitk::Image::ConstPointer timeSliceMask = m_Mask->GetMask();
 
                 if ( m_internalImage->GetDimension() == 3 )
                 {
-                    CastToItkImage(timeSliceMask, m_internalMask3D);
-                    AccessFixedDimensionByItk_2(m_internalImage, CalculateHotspotMask, 3, m_internalMask3D, m_Label);
+                    itk::Image<unsigned short, 3>::Pointer noneConstMaskImage; //needed to work arround the fact that CastToItkImage currently does not support const itk images.
+                    CastToItkImage(timeSliceMask, noneConstMaskImage);
+                    m_internalMask3D = noneConstMaskImage;
+                    AccessFixedDimensionByItk_2(m_internalImage, CalculateHotspotMask, 3, m_internalMask3D.GetPointer(), m_Label);
                 }
                 else if ( m_internalImage->GetDimension() == 2 )
                 {
-                    CastToItkImage(timeSliceMask, m_internalMask2D);
-                    AccessFixedDimensionByItk_2(m_internalImage, CalculateHotspotMask, 2, m_internalMask2D, m_Label);
+                    itk::Image<unsigned short, 2>::Pointer noneConstMaskImage; //needed to work arround the fact that CastToItkImage currently does not support const itk images.
+                    CastToItkImage(timeSliceMask, noneConstMaskImage);
+                    m_internalMask2D = noneConstMaskImage;
+                    AccessFixedDimensionByItk_2(m_internalImage, CalculateHotspotMask, 2, m_internalMask2D.GetPointer(), m_Label);
                 }
                 else
                 {
@@ -134,11 +138,11 @@ namespace mitk
 
                 if ( m_internalImage->GetDimension() == 3 )
                 {
-                    AccessFixedDimensionByItk_2(m_internalImage, CalculateHotspotMask, 3, m_internalMask3D, m_Label);
+                    AccessFixedDimensionByItk_2(m_internalImage, CalculateHotspotMask, 3, m_internalMask3D.GetPointer(), m_Label);
                 }
                 else if ( m_internalImage->GetDimension() == 2 )
                 {
-                    AccessFixedDimensionByItk_2(m_internalImage, CalculateHotspotMask, 2, m_internalMask2D, m_Label);
+                    AccessFixedDimensionByItk_2(m_internalImage, CalculateHotspotMask, 2, m_internalMask2D.GetPointer(), m_Label);
                 }
                 else
                 {
@@ -184,7 +188,7 @@ namespace mitk
     template <typename TPixel, unsigned int VImageDimension  >
     HotspotMaskGenerator::ImageExtrema
       HotspotMaskGenerator::CalculateExtremaWorld( const itk::Image<TPixel, VImageDimension>* inputImage,
-                                                    typename itk::Image<unsigned short, VImageDimension>::Pointer maskImage,
+                                                    const itk::Image<unsigned short, VImageDimension>* maskImage,
                                                     double neccessaryDistanceToImageBorderInMM,
                                                     unsigned int label )
     {
@@ -498,7 +502,7 @@ namespace mitk
     template <typename TPixel, unsigned int VImageDimension>
     void
       HotspotMaskGenerator::CalculateHotspotMask(itk::Image<TPixel, VImageDimension>* inputImage,
-                                              typename itk::Image<unsigned short, VImageDimension>::Pointer maskImage,
+                                              const itk::Image<unsigned short, VImageDimension>* maskImage,
                                               unsigned int label)
     {
         typedef itk::Image< TPixel, VImageDimension > InputImageType;
@@ -513,29 +517,31 @@ namespace mitk
           throw std::logic_error("Empty convolution image in CalculateHotspotStatistics()");
         }
 
+        typename MaskImageType::ConstPointer usedMask = maskImage;
         // if mask image is not defined, create an image of the same size as inputImage and fill it with 1's
         // there is maybe a better way to do this!?
         if (maskImage == nullptr)
         {
-            maskImage = MaskImageType::New();
+            auto defaultMask = MaskImageType::New();
             typename MaskImageType::RegionType maskRegion = inputImage->GetLargestPossibleRegion();
             typename MaskImageType::SpacingType maskSpacing = inputImage->GetSpacing();
             typename MaskImageType::PointType maskOrigin = inputImage->GetOrigin();
             typename MaskImageType::DirectionType maskDirection = inputImage->GetDirection();
-            maskImage->SetRegions(maskRegion);
-            maskImage->Allocate();
-            maskImage->SetOrigin(maskOrigin);
-            maskImage->SetSpacing(maskSpacing);
-            maskImage->SetDirection(maskDirection);
+            defaultMask->SetRegions(maskRegion);
+            defaultMask->Allocate();
+            defaultMask->SetOrigin(maskOrigin);
+            defaultMask->SetSpacing(maskSpacing);
+            defaultMask->SetDirection(maskDirection);
 
-            maskImage->FillBuffer(1);
+            defaultMask->FillBuffer(1);
 
+            usedMask = defaultMask;
             label = 1;
         }
 
         // find maximum in convolution image, given the current mask
         double requiredDistanceToBorder = m_HotspotMustBeCompletelyInsideImage ? m_HotspotRadiusinMM : -1.0;
-        ImageExtrema convolutionImageInformation = CalculateExtremaWorld(convolutionImage.GetPointer(), maskImage, requiredDistanceToBorder, label);
+        ImageExtrema convolutionImageInformation = CalculateExtremaWorld(convolutionImage.GetPointer(), usedMask.GetPointer(), requiredDistanceToBorder, label);
 
         bool isHotspotDefined = convolutionImageInformation.Defined;
 

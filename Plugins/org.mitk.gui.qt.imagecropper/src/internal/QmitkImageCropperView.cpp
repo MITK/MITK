@@ -55,7 +55,9 @@ void QmitkImageCropperView::CreateQtPartControl(QWidget *parent)
   m_Controls.setupUi(parent);
 
   m_Controls.imageSelectionWidget->SetDataStorage(GetDataStorage());
-  m_Controls.imageSelectionWidget->SetNodePredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
+  m_Controls.imageSelectionWidget->SetNodePredicate(
+    mitk::NodePredicateAnd::New(mitk::TNodePredicateDataType<mitk::Image>::New(),
+                                mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object"))));
   m_Controls.imageSelectionWidget->SetSelectionIsOptional(true);
   m_Controls.imageSelectionWidget->SetAutoSelectNewNodes(true);
   m_Controls.imageSelectionWidget->SetEmptyInfo(QString("Please select an image node"));
@@ -99,6 +101,8 @@ void QmitkImageCropperView::CreateQtPartControl(QWidget *parent)
 void QmitkImageCropperView::OnImageSelectionChanged(QList<mitk::DataNode::Pointer>)
 {
   bool rotationEnabled = false;
+  m_Controls.labelWarningRotation->setVisible(false);
+
   auto imageNode = m_Controls.imageSelectionWidget->GetSelectedNode();
   if (imageNode.IsNull())
   {
@@ -482,7 +486,6 @@ void QmitkImageCropperView::ProcessImage(bool mask)
 
 void QmitkImageCropperView::SetDefaultGUI()
 {
-  m_Controls.labelWarningRotation->setVisible(false);
   m_Controls.buttonCreateNewBoundingBox->setEnabled(false);
   m_Controls.buttonCropping->setEnabled(false);
   m_Controls.buttonMasking->setEnabled(false);

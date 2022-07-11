@@ -103,7 +103,9 @@ void QmitkLabelSetJumpToAction::InitializeAction()
 
 void QmitkLabelSetJumpToAction::OnActionTriggered(bool /*checked*/)
 {
-  if (m_WorkbenchPartSite.Expired())
+  auto workbenchPartSite = m_WorkbenchPartSite.Lock();
+
+  if (workbenchPartSite.IsNull())
   {
     return;
   }
@@ -115,5 +117,5 @@ void QmitkLabelSetJumpToAction::OnActionTriggered(bool /*checked*/)
   }
 
   mitk::BaseRenderer::Pointer baseRenderer = GetBaseRenderer();
-  LabelSetJumpToAction::Run(m_WorkbenchPartSite.Lock(), dataNode, baseRenderer);
+  LabelSetJumpToAction::Run(workbenchPartSite, dataNode, baseRenderer);
 }

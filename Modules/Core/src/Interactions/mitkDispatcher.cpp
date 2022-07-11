@@ -73,7 +73,8 @@ void mitk::Dispatcher::RemoveDataInteractor(const DataNode *dataNode)
 {
   for (auto it = m_Interactors.begin(); it != m_Interactors.end();)
   {
-    if ((*it).IsExpired() || (*it).Lock()->GetDataNode() == nullptr || (*it).Lock()->GetDataNode() == dataNode)
+    auto interactor = it->Lock();
+    if (interactor.IsNull() || interactor->GetDataNode() == nullptr || interactor->GetDataNode() == dataNode)
     {
       it = m_Interactors.erase(it);
     }
@@ -112,6 +113,9 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent *event)
       return true;
     }
   }
+
+  auto selectedInteractor = m_SelectedInteractor.Lock();
+
   switch (m_ProcessingMode)
   {
     case CONNECTEDMOUSEACTION:
@@ -120,31 +124,33 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent *event)
       {
         m_ProcessingMode = REGULAR;
 
-        if (!m_SelectedInteractor.IsExpired())
-          eventIsHandled = m_SelectedInteractor.Lock()->HandleEvent(event, m_SelectedInteractor.Lock()->GetDataNode());
+        if (selectedInteractor.IsNotNull())
+          eventIsHandled = selectedInteractor->HandleEvent(event, selectedInteractor->GetDataNode());
 
         m_SelectedInteractor = nullptr;
       }
       // give event to selected interactor
-      if (eventIsHandled == false && !m_SelectedInteractor.IsExpired())
-        eventIsHandled = m_SelectedInteractor.Lock()->HandleEvent(event, m_SelectedInteractor.Lock()->GetDataNode());
+      selectedInteractor = m_SelectedInteractor.Lock();
+
+      if (eventIsHandled == false && selectedInteractor.IsNotNull())
+        eventIsHandled = selectedInteractor->HandleEvent(event, selectedInteractor->GetDataNode());
 
       break;
 
     case GRABINPUT:
-      if (!m_SelectedInteractor.IsExpired())
+      if (selectedInteractor.IsNotNull())
       {
-        eventIsHandled = m_SelectedInteractor.Lock()->HandleEvent(event, m_SelectedInteractor.Lock()->GetDataNode());
-        SetEventProcessingMode(m_SelectedInteractor.Lock());
+        eventIsHandled = selectedInteractor->HandleEvent(event,selectedInteractor->GetDataNode());
+        SetEventProcessingMode(selectedInteractor);
       }
 
       break;
 
     case PREFERINPUT:
-      if (!m_SelectedInteractor.IsExpired() &&
-          m_SelectedInteractor.Lock()->HandleEvent(event, m_SelectedInteractor.Lock()->GetDataNode()) == true)
+      if (selectedInteractor.IsNotNull() &&
+          selectedInteractor->HandleEvent(event, selectedInteractor->GetDataNode()) == true)
       {
-        SetEventProcessingMode(m_SelectedInteractor.Lock());
+        SetEventProcessingMode(selectedInteractor);
         eventIsHandled = true;
       }
 
@@ -167,14 +173,16 @@ bool mitk::Dispatcher::ProcessEvent(InteractionEvent *event)
     ListInteractorType::const_iterator it;
     for (it = tmpInteractorList.cbegin(); it != tmpInteractorList.cend(); ++it)
     {
-      if (!(*it).IsExpired() && (*it).Lock()->HandleEvent(event, (*it).Lock()->GetDataNode()))
+      auto interactor = it->Lock();
+      if (interactor.IsNotNull() && interactor->HandleEvent(event, interactor->GetDataNode()))
       {
         // Interactor can be deleted during HandleEvent(), so check it again
-        if (!(*it).IsExpired())
+        interactor = it->Lock();
+        if (interactor.IsNotNull())
         {
           // if an event is handled several properties are checked, in order to determine the processing mode of the
           // dispatcher
-          SetEventProcessingMode((*it).Lock());
+          SetEventProcessingMode(interactor);
         }
         if (std::strcmp(p->GetNameOfClass(), "MousePressEvent") == 0 && m_ProcessingMode == REGULAR)
         {
@@ -222,13 +230,14 @@ void mitk::Dispatcher::RemoveOrphanedInteractors()
 {
   for (auto it = m_Interactors.begin(); it != m_Interactors.end();)
   {
-    if ((*it).IsExpired())
+    auto interactor = it->Lock();
+    if (interactor.IsNull())
     {
       it = m_Interactors.erase(it);
     }
     else
     {
-      DataNode::Pointer node = (*it).Lock()->GetDataNode();
+      DataNode::Pointer node = interactor->GetDataNode();
 
       if (node.IsNull())
       {
@@ -236,7 +245,7 @@ void mitk::Dispatcher::RemoveOrphanedInteractors()
       }
       else
       {
-        DataInteractor::Pointer interactor = node->GetDataInteractor();
+        interactor = node->GetDataInteractor();
 
         if (interactor != it->Lock().GetPointer())
         {

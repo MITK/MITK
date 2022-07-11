@@ -68,12 +68,10 @@ QmitkRenderWindowDataStorageInspector::SelectionMode QmitkRenderWindowDataStorag
 
 void QmitkRenderWindowDataStorageInspector::Initialize()
 {
-  if (m_DataStorage.IsExpired())
-  {
-    return;
-  }
-
   auto dataStorage = m_DataStorage.Lock();
+
+  if (dataStorage.IsNull())
+    return;
 
   m_StorageModel->SetDataStorage(dataStorage);
   m_StorageModel->SetNodePredicate(m_NodePredicate);
@@ -126,7 +124,7 @@ void QmitkRenderWindowDataStorageInspector::SetActiveRenderWindow(const QString&
   case mitk::SliceNavigationController::Axial:
     m_Controls.radioButtonAxial->setChecked(true);
     break;
-  case mitk::SliceNavigationController::Frontal:
+  case mitk::SliceNavigationController::Coronal:
     m_Controls.radioButtonCoronal->setChecked(true);
     break;
   case mitk::SliceNavigationController::Sagittal:

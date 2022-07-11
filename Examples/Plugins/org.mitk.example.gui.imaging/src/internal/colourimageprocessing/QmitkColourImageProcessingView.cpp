@@ -127,10 +127,10 @@ void QmitkColourImageProcessingView::OnSelectionChanged(berry::IWorkbenchPart::P
 
 void QmitkColourImageProcessingView::OnConvertToRGBAImage()
 {
-  if (m_SelectedNode.IsExpired())
-    return;
-
   auto selectedNode = m_SelectedNode.Lock();
+
+  if (selectedNode.IsNull())
+    return;
 
   mitk::TransferFunctionProperty::Pointer transferFunctionProp =
     dynamic_cast<mitk::TransferFunctionProperty *>(selectedNode->GetProperty("TransferFunction"));
@@ -146,12 +146,13 @@ void QmitkColourImageProcessingView::OnConvertToRGBAImage()
   mitk::mitkColourImageProcessor CImageProcessor;
 
   mitk::Image::Pointer RGBAImageResult;
+  auto selectedNode2 = m_SelectedNode2.Lock();
 
-  if (!m_SelectedNode2.IsExpired())
+  if (selectedNode2.IsNotNull())
   {
     RGBAImageResult =
       CImageProcessor.convertWithBinaryToRGBAImage(dynamic_cast<mitk::Image *>(selectedNode->GetData()),
-                                                   dynamic_cast<mitk::Image *>(m_SelectedNode2.Lock()->GetData()),
+                                                   dynamic_cast<mitk::Image *>(selectedNode2->GetData()),
                                                    tf);
   }
   else
@@ -176,10 +177,10 @@ void QmitkColourImageProcessingView::OnConvertToRGBAImage()
 
 void QmitkColourImageProcessingView::OnConvertImageMaskColorToRGBAImage()
 {
-  if (m_SelectedNode.IsExpired())
-    return;
-
   auto selectedNode = m_SelectedNode.Lock();
+
+  if (selectedNode.IsNull())
+    return;
 
   mitk::TransferFunctionProperty::Pointer transferFunctionProp =
     dynamic_cast<mitk::TransferFunctionProperty *>(selectedNode->GetProperty("TransferFunction"));
@@ -195,12 +196,13 @@ void QmitkColourImageProcessingView::OnConvertImageMaskColorToRGBAImage()
   mitk::mitkColourImageProcessor CImageProcessor;
 
   mitk::Image::Pointer RGBAImageResult;
+  auto selectedNode2 = m_SelectedNode2.Lock();
 
-  if (!m_SelectedNode2.IsExpired())
+  if (selectedNode2.IsNotNull())
   {
     RGBAImageResult =
       CImageProcessor.convertWithBinaryAndColorToRGBAImage(dynamic_cast<mitk::Image *>(selectedNode->GetData()),
-                                                           dynamic_cast<mitk::Image *>(m_SelectedNode2.Lock()->GetData()),
+                                                           dynamic_cast<mitk::Image *>(selectedNode2->GetData()),
                                                            tf,
                                                            m_Color);
   }
@@ -243,18 +245,22 @@ void QmitkColourImageProcessingView::OnChangeColor()
 
 void QmitkColourImageProcessingView::OnCombineRGBA()
 {
-  if (m_SelectedNode.IsExpired())
+  auto selectedNode = m_SelectedNode.Lock();
+
+  if (selectedNode.IsNull())
     return;
 
-  if (m_SelectedNode2.IsExpired())
+  auto selectedNode2 = m_SelectedNode2.Lock();
+
+  if (selectedNode2.IsNull())
     return;
 
   mitk::mitkColourImageProcessor CImageProcessor;
 
   mitk::Image::Pointer RGBAImageResult;
 
-  RGBAImageResult = CImageProcessor.combineRGBAImage(dynamic_cast<mitk::Image *>(m_SelectedNode.Lock()->GetData()),
-                                                     dynamic_cast<mitk::Image *>(m_SelectedNode2.Lock()->GetData()));
+  RGBAImageResult = CImageProcessor.combineRGBAImage(dynamic_cast<mitk::Image *>(selectedNode->GetData()),
+                                                     dynamic_cast<mitk::Image *>(selectedNode2->GetData()));
   MITK_INFO << "RGBAImage Result";
   mitk::DataNode::Pointer dtn = mitk::DataNode::New();
 

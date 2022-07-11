@@ -51,9 +51,10 @@ void QmitkRenderWindowDataStorageTreeModel::NodeAdded(const mitk::DataNode* node
     mitk::RenderWindowLayerUtilities::SetRenderWindowProperties(const_cast<mitk::DataNode*>(node), renderer);
   }
 
-  if (!m_BaseRenderer.IsExpired())
+  auto baseRenderer = m_BaseRenderer.Lock();
+
+  if (baseRenderer.IsNotNull())
   {
-    auto baseRenderer = m_BaseRenderer.Lock();
     AddNodeInternal(node, baseRenderer);
   }
 }
@@ -141,12 +142,12 @@ int QmitkRenderWindowDataStorageTreeModel::columnCount(const QModelIndex&/* pare
 
 QVariant QmitkRenderWindowDataStorageTreeModel::data(const QModelIndex& index, int role) const
 {
-  if (m_BaseRenderer.IsExpired())
+  auto baseRenderer = m_BaseRenderer.Lock();
+
+  if (baseRenderer.IsNull())
   {
     return QVariant();
   }
-
-  auto baseRenderer = m_BaseRenderer.Lock();
 
   if (!index.isValid() || this != index.model())
   {
@@ -207,12 +208,12 @@ QVariant QmitkRenderWindowDataStorageTreeModel::data(const QModelIndex& index, i
 
 bool QmitkRenderWindowDataStorageTreeModel::setData(const QModelIndex& index, const QVariant& value, int role /*= Qt::EditRole*/)
 {
-  if (m_BaseRenderer.IsExpired())
+  auto baseRenderer = m_BaseRenderer.Lock();
+
+  if (baseRenderer.IsNull())
   {
     return false;
   }
-
-  auto baseRenderer = m_BaseRenderer.Lock();
 
   if (!index.isValid() || this != index.model())
   {
@@ -316,12 +317,12 @@ QMimeData* QmitkRenderWindowDataStorageTreeModel::mimeData(const QModelIndexList
 
 bool QmitkRenderWindowDataStorageTreeModel::dropMimeData(const QMimeData* data, Qt::DropAction action, int /*row*/, int /*column*/, const QModelIndex& parent)
 {
-  if (m_BaseRenderer.IsExpired())
+  auto baseRenderer = m_BaseRenderer.Lock();
+
+  if (baseRenderer.IsNull())
   {
     return false;
   }
-
-  auto baseRenderer = m_BaseRenderer.Lock();
 
   if (action == Qt::IgnoreAction)
   {
@@ -363,12 +364,12 @@ void QmitkRenderWindowDataStorageTreeModel::SetControlledRenderer(mitk::RenderWi
   m_ControlledRenderer = controlledRenderer;
 
   ResetTree();
-  if (m_DataStorage.IsExpired())
+  auto dataStorage = m_DataStorage.Lock();
+
+  if (dataStorage.IsNull())
   {
     return;
   }
-
-  auto dataStorage = m_DataStorage.Lock();
 
   for (const auto& renderer : controlledRenderer)
   {
@@ -400,14 +401,9 @@ void QmitkRenderWindowDataStorageTreeModel::SetCurrentRenderer(mitk::BaseRendere
   UpdateModelData();
 }
 
-mitk::BaseRenderer* QmitkRenderWindowDataStorageTreeModel::GetCurrentRenderer() const
+mitk::BaseRenderer::Pointer QmitkRenderWindowDataStorageTreeModel::GetCurrentRenderer() const
 {
-  if (m_BaseRenderer.IsExpired())
-  {
-    return nullptr;
-  }
-
-  return m_BaseRenderer.Lock().GetPointer();
+  return m_BaseRenderer.Lock();
 }
 
 void QmitkRenderWindowDataStorageTreeModel::ResetTree()
@@ -426,13 +422,14 @@ void QmitkRenderWindowDataStorageTreeModel::ResetTree()
 
 void QmitkRenderWindowDataStorageTreeModel::UpdateModelData()
 {
-  if (!m_DataStorage.IsExpired())
-  {
-    auto dataStorage = m_DataStorage.Lock();
-    if (!m_BaseRenderer.IsExpired())
-    {
-      auto baseRenderer = m_BaseRenderer.Lock();
+  auto dataStorage = m_DataStorage.Lock();
 
+  if (dataStorage.IsNotNull())
+  {
+    auto baseRenderer = m_BaseRenderer.Lock();
+
+    if (baseRenderer.IsNotNull())
+    {
       mitk::NodePredicateAnd::Pointer combinedNodePredicate = mitk::RenderWindowLayerUtilities::GetRenderWindowPredicate(baseRenderer);
       auto filteredDataNodes = dataStorage->GetSubset(combinedNodePredicate);
       for (const auto& dataNode : *filteredDataNodes)
@@ -445,12 +442,12 @@ void QmitkRenderWindowDataStorageTreeModel::UpdateModelData()
 
 void QmitkRenderWindowDataStorageTreeModel::AdjustLayerProperty()
 {
-  if (m_BaseRenderer.IsExpired())
+  auto baseRenderer = m_BaseRenderer.Lock();
+
+  if (baseRenderer.IsNull())
   {
     return;
   }
-
-  auto baseRenderer = m_BaseRenderer.Lock();
 
   std::vector<QmitkDataStorageTreeModelInternalItem*> treeAsVector;
   TreeToVector(m_Root, treeAsVector);
@@ -566,12 +563,14 @@ void QmitkRenderWindowDataStorageTreeModel::RemoveNodeInternal(const mitk::DataN
 mitk::DataNode* QmitkRenderWindowDataStorageTreeModel::GetParentNode(const mitk::DataNode* node) const
 {
   mitk::DataNode* dataNode = nullptr;
-  if (m_DataStorage.IsExpired())
+  auto dataStorage = m_DataStorage.Lock();
+
+  if (dataStorage.IsNull())
   {
     return dataNode;
   }
 
-  auto sources = m_DataStorage.Lock()->GetSources(node);
+  auto sources = dataStorage->GetSources(node);
   if (sources->empty())
   {
     return dataNode;

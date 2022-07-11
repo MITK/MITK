@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkPickingTool_h_Included
 #define mitkPickingTool_h_Included
 
-#include "mitkAutoSegmentationWithPreviewTool.h"
+#include "mitkSegWithPreviewTool.h"
 #include "mitkPointSet.h"
 
 #include <MitkSegmentationExports.h>
@@ -37,10 +37,10 @@ namespace mitk
   \sa QmitkInteractiveSegmentation
 
   */
-  class MITKSEGMENTATION_EXPORT PickingTool : public AutoSegmentationWithPreviewTool
+  class MITKSEGMENTATION_EXPORT PickingTool : public SegWithPreviewTool
   {
   public:
-    mitkClassMacro(PickingTool, AutoSegmentationWithPreviewTool);
+    mitkClassMacro(PickingTool, SegWithPreviewTool);
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
@@ -73,7 +73,7 @@ namespace mitk
     /// \brief Clear all seed points.
     void ClearSeeds();
 
-    void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, Image* previewImage, TimeStepType timeStep) override;
+    void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep) override;
 
     // seed point
     PointSet::Pointer m_PointSet;

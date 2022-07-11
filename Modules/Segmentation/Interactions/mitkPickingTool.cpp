@@ -38,7 +38,7 @@ namespace mitk
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, PickingTool, "PickingTool");
 }
 
-mitk::PickingTool::PickingTool() : AutoSegmentationWithPreviewTool(false, "PressMoveReleaseAndPointSetting")
+mitk::PickingTool::PickingTool() : SegWithPreviewTool(false, "PressMoveReleaseAndPointSetting")
 {
   this->ResetsToEmptyPreviewOn();
 }
@@ -253,7 +253,7 @@ void DoITKRegionGrowing(const itk::Image<TPixel, VImageDimension>* oldSegImage,
 
 }
 
-void mitk::PickingTool::DoUpdatePreview(const Image* /*inputAtTimeStep*/, const Image* oldSegAtTimeStep, Image* previewImage, TimeStepType timeStep)
+void mitk::PickingTool::DoUpdatePreview(const Image* /*inputAtTimeStep*/, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep)
 {
   if (nullptr != oldSegAtTimeStep && nullptr != previewImage && m_PointSet.IsNotNull())
   {

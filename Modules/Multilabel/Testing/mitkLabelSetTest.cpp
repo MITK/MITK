@@ -81,7 +81,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Wrong initial active label", m_LabelSet->GetActiveLabel()->GetValue() == 0);
 
     m_LabelSet->SetActiveLabel(1);
-    CPPUNIT_ASSERT_MESSAGE("Wrong layer", m_LabelSet->GetActiveLabel()->GetValue() == 1);
+    CPPUNIT_ASSERT_MESSAGE("Wrong active label", m_LabelSet->GetActiveLabel()->GetValue() == 1);
   }
 
   void TestRemoveLabel()
@@ -100,7 +100,7 @@ public:
 
     // Remove active label - now the succeeding label should be active
     m_LabelSet->RemoveLabel(2);
-    CPPUNIT_ASSERT_MESSAGE("Wrong layer", m_LabelSet->GetActiveLabel()->GetValue() == 3);
+    CPPUNIT_ASSERT_MESSAGE("Wrong active label", m_LabelSet->GetActiveLabel()->GetValue() == 3);
     CPPUNIT_ASSERT_MESSAGE("Label was not removed", m_LabelSet->ExistLabel(2) == false);
     CPPUNIT_ASSERT_MESSAGE("Wrong initial number of label", m_LabelSet->GetNumberOfLabels() == --numLabels);
   }

@@ -154,7 +154,7 @@ namespace mitk
     /// construct standard view.
 
     // We define at the moment "frontside" as: axial from above,
-    // coronal from front (nose), saggital from right.
+    // coronal from front (nose), sagittal from right.
     // TODO: Double check with medicals doctors or radiologists [ ].
 
     // We define the orientation in patient's view, e.g. LAI is in a axial cut
@@ -237,8 +237,7 @@ namespace mitk
         normalDirection = 2; // That is S=Superior=z=third_axis=middlefinger in righthanded LPS-system.
         break;
 
-      // Frontal is known as Coronal in mitk. Plane cuts through patient's ear-ear-heel-heel:
-      case Frontal:
+      case Coronal: // Coronal=Frontal plane; cuts through patient's ear-ear-heel-heel:
         if (frontside)
         {
           if (rotated == false) // x=[1; 0; 0], y=[0; 0; 1], z=[0; 1; 0], origin=[0,zpos,0]: LAI (r.h.)
@@ -449,7 +448,7 @@ namespace mitk
       width  = extents[0];
       height = extents[1];
       break;
-    case Frontal:
+    case Coronal:
       width  = extents[0];
       height = extents[2];
       break;
@@ -485,7 +484,7 @@ namespace mitk
     case Axial:
       worldAxis = 2;
       break;
-    case Frontal:
+    case Coronal:
       worldAxis = 1;
       break;
     case Sagittal:

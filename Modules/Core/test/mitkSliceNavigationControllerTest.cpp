@@ -102,7 +102,7 @@ public:
     auto sliceNavigationController = mitk::SliceNavigationController::New();
 
     sliceNavigationController->SetInputWorldGeometry3D(m_Geometry3D);
-    sliceNavigationController->SetViewDirection(mitk::SliceNavigationController::Frontal);
+    sliceNavigationController->SetViewDirection(mitk::SliceNavigationController::Coronal);
     sliceNavigationController->Update();
 
     mitk::Point3D origin;

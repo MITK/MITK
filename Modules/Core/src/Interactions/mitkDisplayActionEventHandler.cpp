@@ -14,10 +14,10 @@ found in the LICENSE file.
 
 mitk::DisplayActionEventHandler::~DisplayActionEventHandler()
 {
-  if (!m_ObservableBroadcast.IsExpired())
-  {
-    auto observableBroadcastPtr = m_ObservableBroadcast.Lock();
+  auto observableBroadcastPtr = m_ObservableBroadcast.Lock();
 
+  if (observableBroadcastPtr.IsNotNull())
+  {
     // remove current observer
     for (const auto& tag : m_ObserverTags)
     {
@@ -35,10 +35,10 @@ void mitk::DisplayActionEventHandler::SetObservableBroadcast(DisplayActionEventB
     return;
   }
 
-  if (!m_ObservableBroadcast.IsExpired())
-  {
-    auto observableBroadcastPtr = m_ObservableBroadcast.Lock();
+  auto observableBroadcastPtr = m_ObservableBroadcast.Lock();
 
+  if (observableBroadcastPtr.IsNotNull())
+  {
     // remove current observer
     for (const auto& tag : m_ObserverTags)
     {
@@ -55,12 +55,13 @@ mitk::DisplayActionEventHandler::OberserverTagType mitk::DisplayActionEventHandl
   const StdFunctionCommand::ActionFunction& actionFunction,
   const StdFunctionCommand::FilterFunction& filterFunction)
 {
-  if (m_ObservableBroadcast.IsExpired())
+  auto observableBroadcast = m_ObservableBroadcast.Lock();
+
+  if (observableBroadcast.IsNull())
   {
     mitkThrow() << "No display action event broadcast class set to observe. Use 'SetObservableBroadcast' before connecting events.";
   }
 
-  auto observableBroadcast = m_ObservableBroadcast.Lock();
   auto command = StdFunctionCommand::New();
   command->SetCommandAction(actionFunction);
   command->SetCommandFilter(filterFunction);
@@ -71,12 +72,13 @@ mitk::DisplayActionEventHandler::OberserverTagType mitk::DisplayActionEventHandl
 
 void mitk::DisplayActionEventHandler::DisconnectObserver(OberserverTagType observerTag)
 {
-  if (m_ObservableBroadcast.IsExpired())
+  auto observableBroadcast = m_ObservableBroadcast.Lock();
+
+  if (observableBroadcast.IsNull())
   {
     mitkThrow() << "No display action event broadcast class set to observe. Use 'SetObservableBroadcast' before disconnecting observer.";
   }
 
-  auto observableBroadcast = m_ObservableBroadcast.Lock();
   std::vector<OberserverTagType>::iterator observerTagPosition = std::find(m_ObserverTags.begin(), m_ObserverTags.end(), observerTag);
   if (observerTagPosition != m_ObserverTags.end())
   {
@@ -87,12 +89,13 @@ void mitk::DisplayActionEventHandler::DisconnectObserver(OberserverTagType obser
 
 void mitk::DisplayActionEventHandler::InitActions()
 {
-  if (m_ObservableBroadcast.IsExpired())
+  auto observableBroadcast = m_ObservableBroadcast.Lock();
+
+  if (observableBroadcast.IsNull())
   {
     mitkThrow() << "No display action event broadcast class set to observe. Use 'SetObservableBroadcast' before initializing actions.";
   }
 
-  auto observableBroadcast = m_ObservableBroadcast.Lock();
   // remove all current display action events as observer
   auto allObserverTags = GetAllObserverTags();
   for (const auto& tag : allObserverTags)

@@ -63,7 +63,7 @@ int mitkPlaneGeometryDataMapper2DTest(int argc, char *argv[])
 
   auto zCoord = image->GetGeometry()->GetBoundingBox()->GetCenter()[0];
   addPlaneToDataStorage(renderingHelper, image, mitk::PlaneGeometry::Sagittal, zCoord);
-  addPlaneToDataStorage(renderingHelper, image, mitk::PlaneGeometry::Frontal, zCoord);
+  addPlaneToDataStorage(renderingHelper, image, mitk::PlaneGeometry::Coronal, zCoord);
 
   auto planeNode = addPlaneToDataStorage(renderingHelper, image, mitk::PlaneGeometry::Sagittal, zCoord);
   auto planeGeometry = static_cast<mitk::PlaneGeometryData *>(planeNode->GetData())->GetPlaneGeometry();

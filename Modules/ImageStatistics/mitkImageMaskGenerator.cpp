@@ -16,11 +16,11 @@ found in the LICENSE file.
 
 namespace mitk {
 
-void ImageMaskGenerator::SetImageMask(Image::Pointer maskImage)
+void ImageMaskGenerator::SetImageMask(const Image* maskImage)
 {
-    if (m_internalMaskImage != maskImage)
+    if (m_InternalMaskImage != maskImage)
     {
-        m_internalMaskImage = maskImage;
+        m_InternalMaskImage = maskImage;
         this->Modified();
     }
 }
@@ -36,30 +36,31 @@ void ImageMaskGenerator::SetTimeStep(unsigned int timeStep)
 
 void ImageMaskGenerator::UpdateInternalMask()
 {
-    unsigned int timeStepForExtraction;
+  if (this->m_inputImage.IsNull())
+  {
+    mitkThrow() << "Cannot update internal mask. Input image is not set.";
+  }
 
-    if (m_TimeStep >= m_internalMaskImage->GetTimeSteps())
-    {
-        MITK_WARN << "Warning: time step > number of time steps in mask image, using last time step";
-        timeStepForExtraction = m_internalMaskImage->GetTimeSteps() - 1;
-    }
-    else
-    {
-        timeStepForExtraction = m_TimeStep;
-    }
-    ImageTimeSelector::Pointer imageTimeSelector = ImageTimeSelector::New();
-    imageTimeSelector->SetInput(m_internalMaskImage);
-    imageTimeSelector->SetTimeNr(timeStepForExtraction);
-    imageTimeSelector->UpdateLargestPossibleRegion();
+  const auto timeGeo = this->m_inputImage->GetTimeGeometry();
+  if (!timeGeo->IsValidTimeStep(this->m_TimeStep))
+  {
+    mitkThrow() << "Cannot update internal mask. Time step selected that is not supported by input image.";
+  }
 
-    m_InternalMask = mitk::Image::New();
-    m_InternalMask = imageTimeSelector->GetOutput();
+  auto timePoint = this->m_inputImage->GetTimeGeometry()->TimeStepToTimePoint(this->m_TimeStep);
+  m_InternalMask = SelectImageByTimePoint(m_InternalMaskImage, timePoint);
+
+  if (m_InternalMask.IsNull())
+  {
+      MITK_WARN << "Warning: time step > number of time steps in mask image, using last time step";
+      m_InternalMask = SelectImageByTimeStep(m_InternalMaskImage, m_InternalMaskImage->GetTimeSteps()-1);
+  }
 }
 
 
-mitk::Image::Pointer ImageMaskGenerator::GetMask()
+mitk::Image::ConstPointer ImageMaskGenerator::GetMask()
 {
-    if (m_internalMaskImage.IsNull())
+    if (m_InternalMaskImage.IsNull())
     {
         MITK_ERROR << "Mask Image is nullptr";
     }
@@ -74,7 +75,7 @@ mitk::Image::Pointer ImageMaskGenerator::GetMask()
 bool ImageMaskGenerator::IsUpdateRequired() const
 {
     unsigned long internalMaskTimeStamp = m_InternalMask->GetMTime();
-    unsigned long maskImageTimeStamp = m_internalMaskImage->GetMTime();
+    unsigned long maskImageTimeStamp = m_InternalMaskImage->GetMTime();
 
     if (maskImageTimeStamp > internalMaskTimeStamp) // inputs have changed
     {

@@ -100,9 +100,9 @@ void mitk::NavigationDataSliceVisualization::GenerateData()
       snc->SetViewDirection(mitk::SliceNavigationController::Sagittal);
       snc->SelectSliceByPoint(slicePosition);
     }
-    else if (Frontal == m_ViewDirection)
+    else if (Coronal == m_ViewDirection)
     {
-      snc->SetViewDirection(mitk::SliceNavigationController::Frontal);
+      snc->SetViewDirection(mitk::SliceNavigationController::Coronal);
       snc->SelectSliceByPoint(slicePosition);
     }
     else if (AxialOblique == m_ViewDirection || SagittalOblique == m_ViewDirection)

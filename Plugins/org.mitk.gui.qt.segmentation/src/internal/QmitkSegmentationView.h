@@ -76,8 +76,6 @@ private Q_SLOTS:
 
   void OnLayersChanged();
 
-  void OnLabelsChanged();
-
   void OnShowLabelTable(bool);
 
   void OnGoToLabel(const mitk::Point3D &pos);
@@ -149,6 +147,7 @@ private:
   bool m_MouseCursorSet;
 
   QString m_LabelSetPresetPreference;
+  bool m_DefaultLabelNaming;
 };
 
 #endif // QMITKSEGMENTATIONVIEW_H

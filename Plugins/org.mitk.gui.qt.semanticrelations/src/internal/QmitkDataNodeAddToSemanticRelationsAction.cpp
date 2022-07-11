@@ -237,11 +237,13 @@ void QmitkDataNodeAddToSemanticRelationsAction::InitializeAction()
 
 void QmitkDataNodeAddToSemanticRelationsAction::OnActionTriggered(bool /*checked*/)
 {
-  if (m_DataStorage.IsExpired())
+  auto dataStorage = m_DataStorage.Lock();
+
+  if (dataStorage.IsNull())
   {
     return;
   }
 
   auto dataNode = GetSelectedNode();
-  AddToSemanticRelationsAction::Run(m_DataStorage.Lock(), dataNode);
+  AddToSemanticRelationsAction::Run(dataStorage, dataNode);
 }

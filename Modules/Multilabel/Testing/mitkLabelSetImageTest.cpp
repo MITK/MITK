@@ -16,6 +16,8 @@ found in the LICENSE file.
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
+#include <mitkAutoCropImageFilter.h>
+
 class mitkLabelSetImageTestSuite : public mitk::TestFixture
 {
   CPPUNIT_TEST_SUITE(mitkLabelSetImageTestSuite);
@@ -33,7 +35,9 @@ class mitkLabelSetImageTestSuite : public mitk::TestFixture
   MITK_TEST(TestSetActiveLayer);
   MITK_TEST(TestRemoveLayer);
   MITK_TEST(TestRemoveLabels);
-  MITK_TEST(TestMergeLabel);
+  MITK_TEST(TestEraseLabels);
+  MITK_TEST(TestMergeLabels);
+  MITK_TEST(TestCreateLabelMask);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -383,59 +387,132 @@ public:
   {
     mitk::Image::Pointer image =
       mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Multilabel/LabelSetTestInitializeImage.nrrd"));
+
+    m_LabelSetImage = nullptr;
+    m_LabelSetImage = mitk::LabelSetImage::New();
     m_LabelSetImage->InitializeByLabeledImage(image);
 
     CPPUNIT_ASSERT_MESSAGE("Image - number of labels is not 6", m_LabelSetImage->GetNumberOfLabels() == 6);
     // 2ndMin because of the exterior label = 0
-    CPPUNIT_ASSERT_MESSAGE("Labels with value 1 and 3 was not remove from the image",
-                           m_LabelSetImage->GetStatistics()->GetScalarValue2ndMin() == 1);
-    CPPUNIT_ASSERT_MESSAGE("Label with value 7 was not remove from the image",
-                           m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 7);
+    CPPUNIT_ASSERT_MESSAGE("Wrong MIN value", m_LabelSetImage->GetStatistics()->GetScalarValue2ndMin() == 1);
+    CPPUNIT_ASSERT_MESSAGE("Wrong MAX value", m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 7);
 
-    CPPUNIT_ASSERT_MESSAGE("Label with ID 3 does not exists after initialization",
+    CPPUNIT_ASSERT_MESSAGE("Label with ID 3 does not exist after initialization",
                            m_LabelSetImage->ExistLabel(3) == true);
-    CPPUNIT_ASSERT_MESSAGE("Label with ID 7 does not exists after initialization",
-                           m_LabelSetImage->ExistLabel(7) == true);
 
+    m_LabelSetImage->RemoveLabel(1);
     std::vector<mitk::Label::PixelType> labelsToBeRemoved;
-    labelsToBeRemoved.push_back(1);
     labelsToBeRemoved.push_back(3);
     labelsToBeRemoved.push_back(7);
     m_LabelSetImage->RemoveLabels(labelsToBeRemoved);
 
     CPPUNIT_ASSERT_MESSAGE("Wrong number of labels after some have been removed",
                            m_LabelSetImage->GetNumberOfLabels() == 3);
-    // Values within the image are 0, 1, 3, 5, 6, 7 - New Min/Max value should be 5 / 6
+    // Values within the image are 0, 1, 3, 5, 6, 7 - New Min / Max value should be 5 / 6
     // 2ndMin because of the exterior label = 0
-    CPPUNIT_ASSERT_MESSAGE("Labels with value 1 and 3 was not remove from the image",
+    CPPUNIT_ASSERT_MESSAGE("Labels with value 1 and 3 were not removed from the image",
                            m_LabelSetImage->GetStatistics()->GetScalarValue2ndMin() == 5);
-    CPPUNIT_ASSERT_MESSAGE("Label with value 7 was not remove from the image",
+    CPPUNIT_ASSERT_MESSAGE("Label with value 7 was not removed from the image",
                            m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 6);
   }
 
-  void TestMergeLabel()
+  void TestEraseLabels()
   {
-    mitk::Image::Pointer image = mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Multilabel/LabelSetTestInitializeImage.nrrd"));
+    mitk::Image::Pointer image =
+      mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Multilabel/LabelSetTestInitializeImage.nrrd"));
+
     m_LabelSetImage = nullptr;
     m_LabelSetImage = mitk::LabelSetImage::New();
     m_LabelSetImage->InitializeByLabeledImage(image);
 
     CPPUNIT_ASSERT_MESSAGE("Image - number of labels is not 6", m_LabelSetImage->GetNumberOfLabels() == 6);
-
     // 2ndMin because of the exterior label = 0
-    CPPUNIT_ASSERT_MESSAGE("Wrong MIN value", m_LabelSetImage->GetStatistics()->GetScalarValueMin() == 0);
+    CPPUNIT_ASSERT_MESSAGE("Wrong MIN value", m_LabelSetImage->GetStatistics()->GetScalarValue2ndMin() == 1);
     CPPUNIT_ASSERT_MESSAGE("Wrong MAX value", m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 7);
 
-    m_LabelSetImage->GetActiveLabelSet()->SetActiveLabel(6);
-    // Merge label 7 with label 0. Result should be that label 7 is not present any more
-    m_LabelSetImage->MergeLabel(6, 7);
-    CPPUNIT_ASSERT_MESSAGE("Label with value 7 was not remove from the image", m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 6);
-    m_LabelSetImage->GetStatistics()->GetScalarValue2ndMax();
+    CPPUNIT_ASSERT_MESSAGE("Label with ID 3 does not exist after initialization",
+      m_LabelSetImage->ExistLabel(3) == true);
 
-    // Count all pixels with value 7 = 823
+    m_LabelSetImage->EraseLabel(1);
+    std::vector<mitk::Label::PixelType> labelsToBeErased;
+    labelsToBeErased.push_back(3);
+    labelsToBeErased.push_back(7);
+    m_LabelSetImage->EraseLabels(labelsToBeErased);
+
+    CPPUNIT_ASSERT_MESSAGE("Wrong number of labels since none have been removed",
+      m_LabelSetImage->GetNumberOfLabels() == 6);
+    // Values within the image are 0, 1, 3, 5, 6, 7 - New Min / Max value should be 5 / 6
+    // 2ndMin because of the exterior label = 0
+    CPPUNIT_ASSERT_MESSAGE("Labels with value 1 and 3 were not erased from the image",
+      m_LabelSetImage->GetStatistics()->GetScalarValue2ndMin() == 5);
+    CPPUNIT_ASSERT_MESSAGE("Label with value 7 was not erased from the image",
+      m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 6);
+  }
+
+  void TestMergeLabels()
+  {
+    mitk::Image::Pointer image =
+      mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Multilabel/LabelSetTestInitializeImage.nrrd"));
+
+    m_LabelSetImage = nullptr;
+    m_LabelSetImage = mitk::LabelSetImage::New();
+    m_LabelSetImage->InitializeByLabeledImage(image);
+
+    CPPUNIT_ASSERT_MESSAGE("Image - number of labels is not 6", m_LabelSetImage->GetNumberOfLabels() == 6);
+    // 2ndMin because of the exterior label = 0
+    CPPUNIT_ASSERT_MESSAGE("Wrong MIN value", m_LabelSetImage->GetStatistics()->GetScalarValue2ndMin() == 1);
+    CPPUNIT_ASSERT_MESSAGE("Wrong MAX value", m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 7);
+
+    CPPUNIT_ASSERT_MESSAGE("Label with ID 6 does not exist after initialization",
+      m_LabelSetImage->ExistLabel(6) == true);
+
+    // Merge label 7 with label 6. Result should be that label 7 is not present anymore.
+    m_LabelSetImage->MergeLabel(6, 7);
+    CPPUNIT_ASSERT_MESSAGE("Label with value 7 was not removed from the image", m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 6);
+
     // Count all pixels with value 6 = 507
-    // Check if merge label has 507 + 823 = 1330 pixels
-    CPPUNIT_ASSERT_MESSAGE("Label with value 7 was not remove from the image", m_LabelSetImage->GetStatistics()->GetCountOfMaxValuedVoxels() == 1330);
+    // Count all pixels with value 7 = 823
+    // Check if merged label has 507 + 823 = 1330 pixels
+    CPPUNIT_ASSERT_MESSAGE("Labels were not correctly merged", m_LabelSetImage->GetStatistics()->GetCountOfMaxValuedVoxels() == 1330);
+
+    CPPUNIT_ASSERT_MESSAGE("Label with ID 3 does not exist after initialization",
+      m_LabelSetImage->ExistLabel(3) == true);
+    CPPUNIT_ASSERT_MESSAGE("Label with ID 5 does not exist after initialization",
+      m_LabelSetImage->ExistLabel(5) == true);
+
+    // Merge labels 5 and 6 with 3. Result should be that labels 5 and 6 are not present anymore.
+    std::vector<mitk::Label::PixelType> vectorOfSourcePixelValues{ 5, 6 };
+    m_LabelSetImage->MergeLabels(3, vectorOfSourcePixelValues);
+    // Values within the image are 0, 1, 3, 5, 6, 7 - New Max value should be 3
+    CPPUNIT_ASSERT_MESSAGE("Labels with value 5 and 6 were not removed from the image", m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 3);
+
+    // Count all pixels with value 3 = 1893
+    // Count all pixels with value 5 = 2143
+    // Count all pixels with value 6 = 1330
+    // Check if merged label has 1893 + 2143 + 1330 = 5366 pixels
+    CPPUNIT_ASSERT_MESSAGE("Labels were not correctly merged", m_LabelSetImage->GetStatistics()->GetCountOfMaxValuedVoxels() == 5366);
+  }
+
+  void TestCreateLabelMask()
+  {
+    mitk::Image::Pointer image =
+      mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Multilabel/LabelSetTestInitializeImage.nrrd"));
+
+    m_LabelSetImage = nullptr;
+    m_LabelSetImage = mitk::LabelSetImage::New();
+    m_LabelSetImage->InitializeByLabeledImage(image);
+
+    auto labelMask = m_LabelSetImage->CreateLabelMask(6);
+
+    mitk::AutoCropImageFilter::Pointer cropFilter = mitk::AutoCropImageFilter::New();
+    cropFilter->SetInput(labelMask);
+    cropFilter->SetBackgroundValue(0);
+    cropFilter->SetMarginFactor(1.15);
+    cropFilter->Update();
+    auto maskImage = cropFilter->GetOutput();
+
+    // Count all pixels with value 6 = 507
+    CPPUNIT_ASSERT_MESSAGE("Label mask not correctly created", maskImage->GetStatistics()->GetCountOfMaxValuedVoxels() == 507);
   }
 };
 

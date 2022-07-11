@@ -31,8 +31,7 @@ bool mitk::SegmentationInteractor::ChangeActiveLabel(StateMachineAction *, Inter
   BaseRenderer::Pointer sender = interactionEvent->GetSender();
   auto positionEvent = static_cast<InteractionPositionEvent*>(interactionEvent);
 
-  auto toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager(
-    mitk::ToolManagerProvider::MULTILABEL_SEGMENTATION);
+  auto toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
 
   assert(toolManager);
 

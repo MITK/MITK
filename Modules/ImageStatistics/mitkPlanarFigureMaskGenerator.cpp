@@ -38,9 +38,9 @@ found in the LICENSE file.
 namespace mitk
 {
 
-void PlanarFigureMaskGenerator::SetPlanarFigure(mitk::PlanarFigure::Pointer planarFigure)
+void PlanarFigureMaskGenerator::SetPlanarFigure(mitk::PlanarFigure* planarFigure)
 {
-    if ( planarFigure.IsNull() )
+    if (nullptr == planarFigure )
     {
       throw std::runtime_error( "Error: planar figure empty!" );
     }
@@ -446,7 +446,7 @@ void PlanarFigureMaskGenerator::SetTimeStep(unsigned int timeStep)
     }
 }
 
-mitk::Image::Pointer PlanarFigureMaskGenerator::GetMask()
+mitk::Image::ConstPointer PlanarFigureMaskGenerator::GetMask()
 {
     if (IsUpdateRequired())
     {

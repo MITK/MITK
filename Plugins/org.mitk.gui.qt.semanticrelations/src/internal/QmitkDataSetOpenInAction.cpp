@@ -130,7 +130,9 @@ void QmitkDataSetOpenInAction::OnMenuAboutToShow()
 
 void QmitkDataSetOpenInAction::OnActionTriggered(bool /*checked*/)
 {
-  if (m_DataStorage.IsExpired())
+  auto dataStorage = m_DataStorage.Lock();
+
+  if (dataStorage.IsNull())
   {
     return;
   }
@@ -154,5 +156,5 @@ void QmitkDataSetOpenInAction::OnActionTriggered(bool /*checked*/)
     return;
   }
 
-  OpenInAction::Run(m_DataStorage.Lock(), dataNode, renderer);
+  OpenInAction::Run(dataStorage, dataNode, renderer);
 }

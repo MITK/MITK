@@ -38,6 +38,7 @@ class mitkSemanticRelationsTestSuite : public mitk::TestFixture
   MITK_TEST(InferenceTest);
   MITK_TEST(DataStorageAccessTest);
   MITK_TEST(RemoveAndUnlinkTest);
+  MITK_TEST(LesionAndControlPointTest);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -93,6 +94,14 @@ public:
     LesionRemoveAndUnlink();
     RemoveImagesAndSegmentation();
     MITK_INFO << "=== RemoveAndUnlinkTest end ===";
+  }
+
+  void LesionAndControlPointTest()
+  {
+    MITK_INFO << "=== LesionAndControlPointTest start ===";
+    LesionDataTest();
+    LesionOverwriteTest();
+    MITK_INFO << "=== LesionAndControlPointTest end ===";
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -164,8 +173,8 @@ public:
     controlPoint.date = boost::gregorian::date(2019, 01, 01);
     CPPUNIT_ASSERT_MESSAGE("Control point not correctly stored", controlPointOfImage.date == controlPoint.date);
 
-    auto examinationPeriod = mitk::RelationStorage::GetAllExaminationPeriodsOfCase(caseID);
-    CPPUNIT_ASSERT_MESSAGE("One examination period should be stored", examinationPeriod.size() == 1);
+    auto allExaminationPeriods = mitk::RelationStorage::GetAllExaminationPeriodsOfCase(caseID);
+    CPPUNIT_ASSERT_MESSAGE("One examination period should be stored", allExaminationPeriods.size() == 1);
 
     auto allImageIDs = mitk::RelationStorage::GetAllImageIDsOfControlPoint(caseID, controlPointOfImage);
     CPPUNIT_ASSERT_MESSAGE("Two images should reference the same control point", allImageIDs.size() == 2);
@@ -182,8 +191,8 @@ public:
     allControlPoints = mitk::RelationStorage::GetAllControlPointsOfCase(caseID);
     CPPUNIT_ASSERT_MESSAGE("Two control points should be stored", allControlPoints.size() == 2);
 
-    examinationPeriod = mitk::RelationStorage::GetAllExaminationPeriodsOfCase(caseID);
-    CPPUNIT_ASSERT_MESSAGE("One examination period should be stored", examinationPeriod.size() == 1);
+    allExaminationPeriods = mitk::RelationStorage::GetAllExaminationPeriodsOfCase(caseID);
+    CPPUNIT_ASSERT_MESSAGE("One examination period should be stored", allExaminationPeriods.size() == 1);
 
     // modify control point to create new examination period
     // current control point is 2019, 01, 31
@@ -197,8 +206,35 @@ public:
     allControlPoints = mitk::RelationStorage::GetAllControlPointsOfCase(caseID);
     CPPUNIT_ASSERT_MESSAGE("Two control points should be stored", allControlPoints.size() == 2);
 
-    examinationPeriod = mitk::RelationStorage::GetAllExaminationPeriodsOfCase(caseID);
-    CPPUNIT_ASSERT_MESSAGE("Two examination periods should be stored", examinationPeriod.size() == 2);
+    allExaminationPeriods = mitk::RelationStorage::GetAllExaminationPeriodsOfCase(caseID);
+    CPPUNIT_ASSERT_MESSAGE("Two examination periods should be stored", allExaminationPeriods.size() == 2);
+
+    auto examinationPeriod = allExaminationPeriods.front();
+    CPPUNIT_ASSERT_MESSAGE("Examination period name should be 'New examination period'", examinationPeriod.name == "New examination period");
+
+    examinationPeriod.name = "ExaminationPeriod_01";
+    semanticRelationsIntegration.RenameExaminationPeriod(caseID, examinationPeriod);
+
+    examinationPeriod = mitk::FindFittingExaminationPeriod(MRImage);
+    CPPUNIT_ASSERT_MESSAGE("Examination period name should be 'ExaminationPeriod_01'", examinationPeriod.name == "ExaminationPeriod_01");
+
+    examinationPeriod = mitk::FindFittingExaminationPeriod(CTImage);
+    CPPUNIT_ASSERT_MESSAGE("Examination period name should be 'New examination period'", examinationPeriod.name == "New examination period");
+
+    // modify control point to remove examination period and create new one before the first one
+    controlPoint.UID = mitk::UIDGeneratorBoost::GenerateUID();
+    controlPoint.date = boost::gregorian::date(2018, 01, 01);
+    semanticRelationsIntegration.UnlinkImageFromControlPoint(CTImage);
+    semanticRelationsIntegration.SetControlPointOfImage(CTImage, controlPoint);
+
+    allExaminationPeriods = mitk::RelationStorage::GetAllExaminationPeriodsOfCase(caseID);
+    CPPUNIT_ASSERT_MESSAGE("Examination period name should be 'ExaminationPeriod_01'", allExaminationPeriods.front().name == "ExaminationPeriod_01");
+    CPPUNIT_ASSERT_MESSAGE("Examination period name should be 'New examination period'", allExaminationPeriods.back().name == "New examination period");
+
+    mitk::SortAllExaminationPeriods(caseID, allExaminationPeriods);
+    CPPUNIT_ASSERT_MESSAGE("Examination period name should be 'New examination period'", allExaminationPeriods.front().name == "New examination period");
+    CPPUNIT_ASSERT_MESSAGE("Examination period name should be 'ExaminationPeriod_01'", allExaminationPeriods.back().name == "ExaminationPeriod_01");
+    CPPUNIT_ASSERT_MESSAGE("Two examination periods should be stored", allExaminationPeriods.size() == 2);
   }
 
   void SegmentationAndLesion()
@@ -253,6 +289,9 @@ public:
 
     auto allImageIDsOfCase = mitk::RelationStorage::GetAllImageIDsOfCase(caseID);
     CPPUNIT_ASSERT_MESSAGE("No image ID should be stored, given a non-existing CaseID", allControlPoints.size() == 0);
+
+    bool instanceExists = mitk::RelationStorage::InstanceExists(caseID);
+    CPPUNIT_ASSERT_MESSAGE("CaseID should not exist", !instanceExists);
 
     // TEST INVALID DATE
     mitk::DataNode::Pointer invalidDateImage = mitk::SemanticRelationsTestHelper::GetInvalidDate();
@@ -397,6 +436,10 @@ public:
       && (allControlPointsOfLesion.front().date == controlPoint.date));
 
     auto informationType = mitk::SemanticRelationsInference::GetInformationTypeOfImage(image);
+    auto allLesionsOfInformationType = mitk::SemanticRelationsInference::GetAllLesionsOfInformationType(caseID, informationType);
+    CPPUNIT_ASSERT_MESSAGE("Lesions should be the same", (allLesionsOfImage.size() == allLesionsOfInformationType.size())
+      && (allLesionsOfImage.front().UID == allLesionsOfInformationType.front().UID));
+
     auto allControlPointsOfInformationType = mitk::SemanticRelationsInference::GetAllControlPointsOfInformationType(caseID, informationType);
     CPPUNIT_ASSERT_MESSAGE("Control points should be the same", (allControlPointsOfLesion.size() == 1)
       && (allControlPointsOfLesion.front().date == controlPoint.date));
@@ -404,6 +447,10 @@ public:
     auto allInformationTypesOfControlPoint = mitk::SemanticRelationsInference::GetAllInformationTypesOfControlPoint(caseID, controlPoint);
     CPPUNIT_ASSERT_MESSAGE("Information types should be the same", (allInformationTypesOfControlPoint.size() == 1)
       && (allInformationTypesOfControlPoint.front() == informationType));
+
+    auto allSpecificLesions = mitk::SemanticRelationsInference::GetAllSpecificLesions(caseID, controlPoint, informationType);
+    CPPUNIT_ASSERT_MESSAGE("Lesions should be the same", (allLesionsOfImage.size() == allSpecificLesions.size())
+      && (allLesionsOfImage.front().UID == allSpecificLesions.front().UID));
   }
 
   void InstanceExistences()
@@ -561,6 +608,11 @@ public:
       semanticRelationsDataStorageAccess.GetAllSegmentationsOfLesion(caseID, emptyLesion),
       mitk::SemanticRelationException);
 
+    auto examinationPeriod = mitk::RelationStorage::GetAllExaminationPeriodsOfCase(caseID);
+    CPPUNIT_ASSERT_MESSAGE("One examination period should be stored", examinationPeriod.size() == 1);
+    auto allSpecificImages = semanticRelationsDataStorageAccess.GetAllSpecificImages(caseID, "CT", examinationPeriod.front());
+    CPPUNIT_ASSERT_MESSAGE("Two CT images should be stored", allSpecificImages.size() == 2);
+
     caseID = "Patient2";
     allLesions = mitk::RelationStorage::GetAllLesionsOfCase(caseID);
     CPPUNIT_ASSERT_MESSAGE("One lesion should be stored", allLesions.size() == 1);
@@ -576,7 +628,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("One control point should be stored", allControlPointsOfLesion.size() == 1);
     auto controlPoint = allControlPointsOfLesion.front();
 
-    auto allSpecificImages = semanticRelationsDataStorageAccess.GetAllSpecificImages(caseID, controlPoint, "PT");
+    allSpecificImages = semanticRelationsDataStorageAccess.GetAllSpecificImages(caseID, controlPoint, "PT");
     CPPUNIT_ASSERT_MESSAGE("One image should be stored", allSpecificImages.size() == 1);
 
     CPPUNIT_ASSERT_THROW_MESSAGE("Semantic relation exception not thrown: GetAllSpecificImages",
@@ -588,6 +640,13 @@ public:
 
     CPPUNIT_ASSERT_THROW_MESSAGE("Semantic relation exception not thrown: GetAllSpecificSegmentations",
       semanticRelationsDataStorageAccess.GetAllSpecificSegmentations(caseID, controlPoint, "MR"),
+      mitk::SemanticRelationException);
+
+    auto specificSegmentation = semanticRelationsDataStorageAccess.GetSpecificSegmentation(caseID, controlPoint, "PT", lesion);
+    CPPUNIT_ASSERT_MESSAGE("One segmentation should be stored", specificSegmentation == PETSegmentation);
+
+    CPPUNIT_ASSERT_THROW_MESSAGE("Semantic relation exception not thrown: GetAllSpecificSegmentations",
+      semanticRelationsDataStorageAccess.GetSpecificSegmentation(caseID, controlPoint, "CT", lesion),
       mitk::SemanticRelationException);
   }
 
@@ -803,6 +862,86 @@ public:
     CPPUNIT_ASSERT_MESSAGE("One lesions should be stored", allLesions.size() == 1);
   }
 
+  // LesionAndControlPointTest
+  void LesionDataTest()
+  {
+    MITK_INFO << "=== LesionDataTest";
+
+    // load data
+    mitk::SemanticRelationsIntegration semanticRelationsIntegration;
+
+    // CT image
+    auto CTImage = mitk::SemanticRelationsTestHelper::GetPatientThreeCTImage();
+    m_DataStorage->Add(CTImage);
+    CPPUNIT_ASSERT_MESSAGE("Not a valid image data node", CTImage.IsNotNull());
+    CPPUNIT_ASSERT_MESSAGE("Image data is empty", CTImage->GetData() != nullptr);
+    semanticRelationsIntegration.AddImage(CTImage);
+
+    // MR image
+    auto MRImage = mitk::SemanticRelationsTestHelper::GetPatientThreeMRImage();
+    m_DataStorage->Add(MRImage);
+    CPPUNIT_ASSERT_MESSAGE("Not a valid image data node", MRImage.IsNotNull());
+    CPPUNIT_ASSERT_MESSAGE("Image data is empty", MRImage->GetData() != nullptr);
+    semanticRelationsIntegration.AddImage(MRImage);
+
+    auto segmentation = mitk::SemanticRelationsTestHelper::GetPatientThreeMRSegmentation();
+    m_DataStorage->Add(segmentation, MRImage);
+    CPPUNIT_ASSERT_MESSAGE("Not a valid segmentation data node", segmentation.IsNotNull());
+    CPPUNIT_ASSERT_MESSAGE("Segmentation data is empty", segmentation->GetData() != nullptr);
+    semanticRelationsIntegration.AddSegmentation(segmentation, MRImage);
+
+    auto lesion = mitk::GenerateNewLesion();
+    semanticRelationsIntegration.AddLesionAndLinkSegmentation(segmentation, lesion);
+
+    auto caseID = "Patient3";
+    auto allLesions = mitk::RelationStorage::GetAllLesionsOfCase(caseID);
+    CPPUNIT_ASSERT_MESSAGE("One lesions should be stored", allLesions.size() == 1);
+
+    lesion = allLesions.front();
+    mitk::LesionData lesionData(lesion);
+    mitk::ComputeLesionPresence(lesionData, caseID);
+
+    auto lesionByUID = mitk::GetLesionByUID(caseID, lesion.UID);
+    mitk::LesionData lesionByUIDData;
+    lesionByUIDData.SetLesion(lesionByUID);
+    mitk::ComputeLesionPresence(lesionByUIDData, caseID);
+
+    CPPUNIT_ASSERT_MESSAGE("Lesions should be equal", lesion.UID == lesionByUID.UID && lesionData.GetLesionUID() == lesionByUIDData.GetLesionUID());
+    CPPUNIT_ASSERT_MESSAGE("Lesion names should be equal", lesion.name == lesionByUID.name && lesionData.GetLesionName() == lesionByUIDData.GetLesionName());
+    CPPUNIT_ASSERT_MESSAGE("Lesion classes should be equal", lesion.lesionClass.UID == lesionByUID.lesionClass.UID);
+    CPPUNIT_ASSERT_MESSAGE("Lesion presences should be equal", lesionData.GetLesionPresence() == lesionByUIDData.GetLesionPresence());
+    CPPUNIT_ASSERT_MESSAGE("Lesion presence should be 'false' and 'true'", lesionData.GetLesionPresence()[0] == false && lesionData.GetLesionPresence()[1] == true);
+  }
+
+  void LesionOverwriteTest()
+  {
+    MITK_INFO << "=== LesionOverwriteTest";
+
+    auto caseID = "Patient3";
+    auto allLesions = mitk::RelationStorage::GetAllLesionsOfCase(caseID);
+    CPPUNIT_ASSERT_MESSAGE("One lesions should be stored", allLesions.size() == 1);
+
+    auto lesion = allLesions.front();
+    CPPUNIT_ASSERT_MESSAGE("Lesion name should be 'New lesion'", lesion.name == "New lesion");
+    CPPUNIT_ASSERT_MESSAGE("Lesion class type should be empty", lesion.lesionClass.classType == "");
+
+    lesion.name = "Lesion_01";
+    lesion.lesionClass.classType = "Class_01";
+
+    mitk::SemanticRelationsIntegration semanticRelationsIntegration;
+    semanticRelationsIntegration.OverwriteLesion(caseID, lesion);
+
+    CPPUNIT_ASSERT_MESSAGE("Lesion name should be 'Lesion_01'", lesion.name == "Lesion_01");
+
+    auto foundLesionClass = mitk::FindExistingLesionClass(caseID, "Class_01");
+    CPPUNIT_ASSERT_MESSAGE("Lesion class type should be 'Class_01'", foundLesionClass.classType == "Class_01");
+
+    allLesions = mitk::RelationStorage::GetAllLesionsOfCase(caseID);
+    CPPUNIT_ASSERT_MESSAGE("One lesions should be stored", allLesions.size() == 1);
+
+    auto allLesionClasses = mitk::SemanticRelationsInference::GetAllLesionClassesOfCase(caseID);
+    CPPUNIT_ASSERT_MESSAGE("One lesion class should be stored", allLesionClasses.size() == 1);
+  }
 };
 
 MITK_TEST_SUITE_REGISTRATION(mitkSemanticRelations)

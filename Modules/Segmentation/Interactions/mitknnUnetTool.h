@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitknnUnetTool_h_Included
 #define mitknnUnetTool_h_Included
 
-#include "mitkAutoMLSegmentationWithPreviewTool.h"
+#include "mitkSegWithPreviewTool.h"
 #include "mitkCommon.h"
 #include "mitkToolManager.h"
 #include <MitkSegmentationExports.h>
@@ -65,10 +65,10 @@ namespace mitk
 
     \warning Only to be instantiated by mitk::ToolManager.
   */
-  class MITKSEGMENTATION_EXPORT nnUNetTool : public AutoMLSegmentationWithPreviewTool
+  class MITKSEGMENTATION_EXPORT nnUNetTool : public SegWithPreviewTool
   {
   public:
-    mitkClassMacro(nnUNetTool, AutoMLSegmentationWithPreviewTool);
+    mitkClassMacro(nnUNetTool, SegWithPreviewTool);
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
@@ -183,13 +183,14 @@ namespace mitk
      * 3. Sets RESULTS_FOLDER and CUDA_VISIBLE_DEVICES variables in the environment.
      * 3. Iterates through the parameter queue (m_ParamQ) and executes "nnUNet_predict" command with the parameters
      * 4. Expects an output image to be saved in the temporary directory by the python proces. Loads it as
-     *    LabelSetImage and returns.
+     *    LabelSetImage and sets to previewImage.
      *
      * @param inputAtTimeStep
+     * @param oldSegAtTimeStep
+     * @param previewImage
      * @param timeStep
-     * @return LabelSetImage::Pointer
      */
-    LabelSetImage::Pointer ComputeMLPreview(const Image *inputAtTimeStep, TimeStepType timeStep) override;
+    void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep) override;
 
   private:
     std::string m_MitkTempDir;

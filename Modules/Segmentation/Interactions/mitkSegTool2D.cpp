@@ -110,7 +110,7 @@ bool mitk::SegTool2D::DetermineAffectedImageSlice(const Image *image,
   {
     affectedDimension = 1;
   }
-  // frontal
+  // coronal
   else if (imageNormal0.GetNorm() <= eps)
   {
     affectedDimension = 0;

@@ -79,7 +79,7 @@ namespace mitk
         /**
         @brief Computes and returns the hotspot mask. The hotspot mask has the same size as the input image. The hopspot has value 1, the remaining pixels are set to 0
          */
-        mitk::Image::Pointer GetMask() override;
+        mitk::Image::ConstPointer GetMask() override;
 
         /**
         @brief Returns the image index where the hotspot is located
@@ -148,13 +148,13 @@ namespace mitk
         template <typename TPixel, unsigned int VImageDimension>
         void
           CalculateHotspotMask(itk::Image<TPixel, VImageDimension>* inputImage,
-                               typename itk::Image<unsigned short, VImageDimension>::Pointer maskImage,
+                               const itk::Image<unsigned short, VImageDimension>* maskImage,
                                unsigned int label);
 
 
         template <typename TPixel, unsigned int VImageDimension  >
         ImageExtrema CalculateExtremaWorld( const itk::Image<TPixel, VImageDimension>* inputImage,
-                                                        typename itk::Image<unsigned short, VImageDimension>::Pointer maskImage,
+                                                        const itk::Image<unsigned short, VImageDimension>* maskImage,
                                                         double neccessaryDistanceToImageBorderInMM,
                                                         unsigned int label);
 
@@ -164,9 +164,10 @@ namespace mitk
         HotspotMaskGenerator & operator=(const HotspotMaskGenerator &);
 
         MaskGenerator::Pointer m_Mask;
+        mitk::Image::Pointer m_InternalMask;
         mitk::Image::Pointer m_internalImage;
-        itk::Image<unsigned short, 2>::Pointer m_internalMask2D;
-        itk::Image<unsigned short, 3>::Pointer m_internalMask3D;
+        itk::Image<unsigned short, 2>::ConstPointer m_internalMask2D;
+        itk::Image<unsigned short, 3>::ConstPointer m_internalMask3D;
         double m_HotspotRadiusinMM;
         bool m_HotspotMustBeCompletelyInsideImage;
         unsigned short m_Label;

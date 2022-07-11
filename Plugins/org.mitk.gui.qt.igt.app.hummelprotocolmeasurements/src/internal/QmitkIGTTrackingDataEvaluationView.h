@@ -15,8 +15,7 @@ found in the LICENSE file.
 
 #include <berryISelectionListener.h>
 
-#include <QmitkFunctionality.h>
-#include <QmitkStdMultiWidget.h>
+#include <QmitkAbstractView.h>
 
 #include "ui_QmitkIGTTrackingDataEvaluationViewControls.h"
 #include "mitkHummelProtocolEvaluation.h"
@@ -24,20 +23,14 @@ found in the LICENSE file.
 #include <mitkNavigationDataEvaluationFilter.h>
 #include "mitkNavigationDataCSVSequentialPlayer.h"
 
-
-
 /*!
   \brief QmitkIGTTrackingDataEvaluationView
 
   \warning  This application module is not yet documented. Use "svn blame/praise/annotate" and ask the author to provide basic documentation.
 
-  \sa QmitkFunctionality
-  \ingroup Functionalities
 */
-class QmitkIGTTrackingDataEvaluationView : public QmitkFunctionality
+class QmitkIGTTrackingDataEvaluationView : public QmitkAbstractView
 {
-  // this is needed for all Qt objects that should have a Qt meta-object
-  // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
 
   public:
@@ -48,9 +41,7 @@ class QmitkIGTTrackingDataEvaluationView : public QmitkFunctionality
     ~QmitkIGTTrackingDataEvaluationView() override;
 
     void CreateQtPartControl(QWidget *parent) override;
-
-    virtual void MultiWidgetAvailable(QmitkAbstractMultiWidget &multiWidget) override;
-    virtual void MultiWidgetNotAvailable() override;
+    void SetFocus() override {}
 
   protected slots:
 
@@ -77,8 +68,6 @@ class QmitkIGTTrackingDataEvaluationView : public QmitkFunctionality
   protected:
 
     Ui::QmitkIGTTrackingDataEvaluationViewControls* m_Controls;
-
-    QmitkStdMultiWidget* m_MultiWidget;
 
     std::vector<std::string> m_FilenameVector;
 

@@ -25,8 +25,6 @@ found in the LICENSE file.
 #include "mitkVtkRepresentationProperty.h"
 #include <mitkToolManagerProvider.h>
 
-#include "QmitkStdMultiWidget.h"
-
 #include <itkCommand.h>
 #include <vtkProperty.h>
 
@@ -41,7 +39,7 @@ QmitkSurfaceBasedInterpolatorWidget::QmitkSurfaceBasedInterpolatorWidget(QWidget
 {
   m_Controls.setupUi(this);
 
-  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager(mitk::ToolManagerProvider::MULTILABEL_SEGMENTATION);
+  m_ToolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
 
   m_ToolManager->WorkingDataChanged += mitk::MessageDelegate<QmitkSurfaceBasedInterpolatorWidget>(
     this, &QmitkSurfaceBasedInterpolatorWidget::OnToolManagerWorkingDataModified);

@@ -227,7 +227,7 @@ void mitk::SlicedGeometry3D::InitializePlanes(const mitk::BaseGeometry *geometry
 
   int worldAxis =
       planeorientation == PlaneGeometry::Sagittal ? 0 :
-      planeorientation == PlaneGeometry::Frontal  ? 1 : 2;
+      planeorientation == PlaneGeometry::Coronal  ? 1 : 2;
 
   // Inspired by:
   // http://www.na-mic.org/Wiki/index.php/Coordinate_System_Conversion_Between_ITK_and_Slicer3

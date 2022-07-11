@@ -174,7 +174,7 @@ void mitk::ContourModelSetToImageFilter::GenerateData()
     }
     else if (mitk::Equal(vec[1], 0))
     {
-      orientation = mitk::PlaneGeometry::Frontal;
+      orientation = mitk::PlaneGeometry::Coronal;
       sliceIndex = point3D[1];
     }
     else if (mitk::Equal(vec[2], 0))
@@ -186,7 +186,7 @@ void mitk::ContourModelSetToImageFilter::GenerateData()
     {
       // TODO Maybe rotate geometry to extract slice?
       MITK_ERROR
-        << "Cannot detect correct slice number! Only axial, sagittal and frontal oriented contours are supported!";
+        << "Cannot detect correct slice number! Only axial, sagittal and coronal oriented contours are supported!";
       return;
     }
 

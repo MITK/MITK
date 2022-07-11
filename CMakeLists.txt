@@ -1191,6 +1191,14 @@ endif()
 # Documentation
 #-----------------------------------------------------------------------------
 
+set(MITK_DOXYGEN_ADDITIONAL_INPUT_DIRS)
+set(MITK_DOXYGEN_ADDITIONAL_IMAGE_PATHS)
+
+foreach(MITK_EXTENSION_DIR ${MITK_DIR_PLUS_EXTENSION_DIRS})
+  set(MITK_DOXYGEN_ADDITIONAL_INPUT_DIRS "${MITK_DOXYGEN_ADDITIONAL_INPUT_DIRS} \"${MITK_EXTENSION_DIR}\"")
+  set(MITK_DOXYGEN_ADDITIONAL_IMAGE_PATHS "${MITK_DOXYGEN_ADDITIONAL_IMAGE_PATHS} \"${MITK_EXTENSION_DIR}\"")
+endforeach()
+
 if(DOXYGEN_FOUND)
   add_subdirectory(Documentation)
 endif()

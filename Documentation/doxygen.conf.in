@@ -760,8 +760,8 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 
-INPUT                  = @MITK_SOURCE_DIR@ \
-                         @MITK_BINARY_DIR@ \
+INPUT                  = "@MITK_SOURCE_DIR@" \
+                         "@MITK_BINARY_DIR@" \
                          @MITK_DOXYGEN_ADDITIONAL_INPUT_DIRS@
 
 
@@ -901,7 +901,8 @@ EXAMPLE_RECURSIVE      = YES
 # \image command).
 
 IMAGE_PATH             = "@MITK_SOURCE_DIR@/Documentation/Doxygen/" \
-                         "@MITK_SOURCE_DIR@"
+                         "@MITK_SOURCE_DIR@" \
+                         @MITK_DOXYGEN_ADDITIONAL_IMAGE_PATHS@
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
 # invoke to filter for each input file. Doxygen will invoke the filter program

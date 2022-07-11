@@ -3,8 +3,6 @@
 
 The plugins and bundles provide much of the extended functionality of MITK. Each encapsulates a solution to a problem and associated features. This way one can easily assemble the necessary capabilites for a workflow without adding a lot of bloat, by combining plugins as needed.
 
-\subpage PluginListGeneralPage
-
 <ul>
   <li> \ref org_mitk_views_basicimageprocessing </li>
   <li> \ref org_mitk_views_datamanager </li>
@@ -34,12 +32,6 @@ The plugins and bundles provide much of the extended functionality of MITK. Each
   <li> \ref org_mitk_views_viewnavigatorview </li>
   <li> \ref org_mitk_views_volumevisualization </li>
   <li> \ref org_mitk_views_properties </li>
-
-</ul>
-
-\subpage PluginListSpecificPage
-
-<ul>
   <li> \ref org_mitk_gui_qt_flowapplication </li>
   <li> \ref org_mitk_gui_qt_aicpregistration </li>
   <li> \ref org_mitk_gui_qt_cest </li>

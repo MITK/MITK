@@ -45,7 +45,6 @@ set(CPP_FILES
   Controllers/mitkProgressBar.cpp
   Controllers/mitkRenderingManager.cpp
   Controllers/mitkSliceNavigationController.cpp
-  Controllers/mitkSlicesCoordinator.cpp
   Controllers/mitkStatusBar.cpp
   Controllers/mitkStepper.cpp
   Controllers/mitkTestManager.cpp

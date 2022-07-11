@@ -215,8 +215,7 @@ namespace mitk
      */
     void SetMouseCursor(const char *xpm[], int hotspotX, int hotspotY);
 
-    /** \brief Resets the mouse cursor (if modified by the SlicesCoordinator)
-     * to its original state.
+    /** \brief Resets the mouse cursor to its original state.
      *
      * Should be used by subclasses and from external application instead
      * of using QmitkApplicationCursor directly to avoid conflicts. */

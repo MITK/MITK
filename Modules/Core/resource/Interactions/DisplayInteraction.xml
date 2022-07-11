@@ -28,11 +28,9 @@ TODO Std move to abort interaction of scroll/pan/zoom
         <!-- mitkDisplayInteractor.cpp implements this for all events -->
         <transition event_class="InteractionEvent" event_variant="PlaneUP" target="start">
             <action name="ScrollOneUp"/>
-            <action name="updateStatusbar"/>
         </transition>
         <transition event_class="InteractionEvent" event_variant="PlaneDown" target="start">
             <action name="ScrollOneDown"/>
-            <action name="updateStatusbar"/>
         </transition>
         <transition event_class="MousePressEvent"  event_variant="StartScroll" target="scroll">
             <action name="init"/>
@@ -42,7 +40,6 @@ TODO Std move to abort interaction of scroll/pan/zoom
         </transition>
         <transition event_class="InteractionPositionEvent"  event_variant="SetCrosshair" target="crosshair">
             <action name="setCrosshair"/>
-            <action name="updateStatusbar"/>
         </transition>
         <transition event_class="InteractionPositionEvent"  event_variant="Move" target="rotationPossible">
             <condition name="check_can_rotate"/>
@@ -52,7 +49,6 @@ TODO Std move to abort interaction of scroll/pan/zoom
         <transition event_class="InteractionPositionEvent"  event_variant="StartRotate" target="crosshair">
             <condition name="check_can_rotate" inverted="true" />
             <action name="setCrosshair"/>
-            <action name="updateStatusbar"/>
         </transition>
 
         <transition event_class="InteractionPositionEvent"  event_variant="StartSwivel" target="swivel">
@@ -62,7 +58,6 @@ TODO Std move to abort interaction of scroll/pan/zoom
         <transition event_class="InteractionPositionEvent"  event_variant="StartSwivel" target="crosshair">
             <condition name="check_can_swivel" inverted="true"/>
             <action name="setCrosshair"/>
-            <action name="updateStatusbar"/>
         </transition>
          <!-- Change TimeSteps by clicking left or right Arrow-->
         <transition event_class="InteractionEvent" event_variant="IncreaseTimeStep" target="start">
@@ -75,7 +70,6 @@ TODO Std move to abort interaction of scroll/pan/zoom
     <state name="crosshair">
       <transition event_class="InteractionPositionEvent"  event_variant="MoveCrosshair" target="crosshair">
         <action name="setCrosshair"/>
-        <action name="updateStatusbar"/>
       </transition>
       <transition event_class="InteractionPositionEvent" event_variant="EndMoveCrosshair" target="start"/>
 
@@ -87,7 +81,6 @@ TODO Std move to abort interaction of scroll/pan/zoom
       <!-- Case when we do crosshair instead of swivel) -->
       <transition event_class="InteractionPositionEvent"  event_variant="Swivel" target="crosshair">
         <action name="setCrosshair"/>
-        <action name="updateStatusbar"/>
       </transition>
       <transition event_class="InteractionPositionEvent" event_variant="EndSwivel" target="start"/>
       <transition event_class="InteractionEvent" event_variant="ResetState" target="start"/>
@@ -112,7 +105,6 @@ TODO Std move to abort interaction of scroll/pan/zoom
       <transition event_class="InteractionPositionEvent" event_variant="Scrolling" target="scroll">
         <condition name="check_position_event"/>
         <action name="scroll"/>
-        <action name="updateStatusbar"/>
       </transition>
       <transition event_class="InteractionPositionEvent" event_variant="EndScrolling" target="start"/>
       <transition event_class="InteractionPositionEvent" event_variant="EndScrollingVar" target="start"/>
@@ -139,11 +131,9 @@ TODO Std move to abort interaction of scroll/pan/zoom
       </transition>
       <transition event_class="InteractionEvent" event_variant="PlaneUP" target="rotationPossible">
         <action name="ScrollOneUp"/>
-        <action name="updateStatusbar"/>
       </transition>
       <transition event_class="InteractionEvent" event_variant="PlaneDown" target="rotationPossible">
         <action name="ScrollOneDown"/>
-        <action name="updateStatusbar"/>
       </transition>
       <transition event_class="InteractionPositionEvent" event_variant="StartMove" target="move">
         <condition name="check_position_event"/>

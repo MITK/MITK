@@ -28,7 +28,7 @@ found in the LICENSE file.
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitknnUNetToolGUI, "")
 
-QmitknnUNetToolGUI::QmitknnUNetToolGUI() : QmitkMultiLabelSegWithPreviewToolGUIBase()
+QmitknnUNetToolGUI::QmitknnUNetToolGUI() : QmitkMultiLabelSegWithPreviewToolGUIBase(), m_SuperclassEnableConfirmSegBtnFnc(m_EnableConfirmSegBtnFnc)
 {
   // Nvidia-smi command returning zero doesn't always imply lack of GPUs.
   // Pytorch uses its own libraries to communicate to the GPUs. Hence, only a warning can be given.
@@ -46,6 +46,11 @@ QmitknnUNetToolGUI::QmitknnUNetToolGUI() : QmitkMultiLabelSegWithPreviewToolGUIB
   m_nnUNetThread = new QThread(this);
   m_Worker = new nnUNetDownloadWorker;
   m_Worker->moveToThread(m_nnUNetThread);
+  
+  m_EnableConfirmSegBtnFnc = [this](bool enabled)
+  {
+    return !m_FirstPreviewComputation ? m_SuperclassEnableConfirmSegBtnFnc(enabled) : false;
+  };
 }
 
 QmitknnUNetToolGUI::~QmitknnUNetToolGUI()
@@ -58,6 +63,7 @@ void QmitknnUNetToolGUI::ConnectNewTool(mitk::SegWithPreviewTool *newTool)
 {
   Superclass::ConnectNewTool(newTool);
   newTool->IsTimePointChangeAwareOff();
+  m_FirstPreviewComputation = true;
 }
 
 void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
@@ -1074,6 +1080,7 @@ void QmitknnUNetToolGUI::SegmentationResultHandler(mitk::nnUNetTool *tool, bool 
   {
     tool->RenderOutputBuffer();
   }
+  m_FirstPreviewComputation = false;
   this->SetLabelSetPreview(tool->GetPreviewSegmentation());
   this->WriteStatusMessage("<b>STATUS: </b><i>Segmentation task finished successfully.</i>");
   this->ActualizePreviewLabelVisibility();

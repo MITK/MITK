@@ -399,5 +399,8 @@ private:
 
   QThread* m_nnUNetThread;
   nnUNetDownloadWorker* m_Worker;
+  
+  bool m_FirstPreviewComputation = true;
+  EnableConfirmSegBtnFunctionType m_SuperclassEnableConfirmSegBtnFnc;
 };
 #endif

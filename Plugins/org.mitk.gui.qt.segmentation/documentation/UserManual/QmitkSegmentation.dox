@@ -186,6 +186,25 @@ Multi-step undo and redo is fully supported by all editing tools by using the ap
 <i>Remark</i>: Clicking and moving the mouse in any of the 2D render windows will move the crosshair that defines what part of the image is displayed.
 This behavior is disabled as long as any of the manual segmentation tools are active - otherwise you might have a hard time concentrating on the contour you are drawing.
 
+\subsection org_mitk_views_segmentationlassotool Lasso tool
+\imageMacro{QmitkSegmentation_Lasso.png,"Lasso tool",7.70}
+
+The tool is a more advanced version of the add/substract tool. It offers you the following features:
+<ol>
+  <li> Generating a polygon segmentation (click left mouse button to set ancor point)
+  <li> Freehand contouring (like the add tool; press left mouse button while moving the mouse)
+  <li> Move ancor points (select an ancor point, press left mouse button while moving the mouse)
+  <li> Add new ancor points (press CTRL while click left mouse to add an ancor to the contour)
+  <li> Delete an ancor point (press Del while ancor point is selected)
+  <li> Segmentation can be added to the label (Add mode) or substracted (Substract mode)
+</ol>
+To start a segmentation double left click where the first ancor point should be. To end the segmentation double left click where the last ancor point should be.
+Please note that:
+<ul>
+  <li> feature 3-6 are only available, if auto confirm is *not* activated
+  <li> feature 3-5 is not available for freehand contour segments
+</ul>
+
 \subsection org_mitk_views_segmentationaddsubtracttools Add and subtract tools
 \imageMacro{QmitkSegmentation_IMGIconAddSubtract.png,"Add and subtract tools",7.70}
 
@@ -237,16 +256,7 @@ The Live Wire Tool acts as a magnetic lasso with a contour snapping to edges of 
 
 \imageMacro{QmitkSegmentation_IMGLiveWireUsage.PNG,"Steps for using the Live Wire Tool",16.00}
 
-<ul>
-  <li>(1) To start the tool you have to double-click near the edge of the object you want to segment. The initial anchor point will snap to the edge within a 3x3 region.
-  <li>(2) Move the mouse. You don't have trace the edge of the object. The contour will automatically snap to it.
-  <li>(3) To fix a segment you can set anchor points by single left mouse button click.
-  <li>(4) Go on with moving the mouse and setting anchor points.
-  <li>(5) To close the contour double-click on the initial anchor point.
-  <li>(6) After closing, the contour can be edited by moving, inserting and deleting anchor points.
-</ul>
-
-The contour will be transferred to its binary image representation by deactivating the tool.
+The tool handling is the same like the Lasso tool (see for more info), except it generates live wire contours instead of straight lines.
 
 \subsection org_mitk_views_segmentationinterpolation 2D and 3D Interpolation
 

@@ -194,7 +194,7 @@ void mitk::EditableContourTool::OnInitContour(StateMachineAction *, InteractionE
   mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
 }
 
-void mitk::EditableContourTool::FinalizePreviewContour(const Point3D& clickedPoint)
+void mitk::EditableContourTool::FinalizePreviewContour(const Point3D& /*clickedPoint*/)
 { // Remove duplicate first vertex, it's already contained in m_ContourNode
   m_PreviewContour->RemoveVertexAt(0);
 

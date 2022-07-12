@@ -327,7 +327,7 @@ void mitk::ContourModelLiveWireInteractor::SetRepulsivePoints(const mitk::Contou
   }
 }
 
-void mitk::ContourModelLiveWireInteractor::OnFinishEditing(StateMachineAction *, InteractionEvent *interactionEvent)
+void mitk::ContourModelLiveWireInteractor::OnFinishEditing(StateMachineAction *, InteractionEvent *)
 {
 
 }

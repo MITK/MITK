@@ -10,15 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkNewAddTool2DGUI.h"
+#include "QmitkLassoToolGUI.h"
 
 
-MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkNewAddTool2DGUI, "")
+MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkLassoToolGUI, "")
 
-QmitkNewAddTool2DGUI::QmitkNewAddTool2DGUI() : QmitkEditableContourToolGUIBase()
+QmitkLassoToolGUI::QmitkLassoToolGUI() : QmitkEditableContourToolGUIBase()
 {
 }
 
-QmitkNewAddTool2DGUI::~QmitkNewAddTool2DGUI()
+QmitkLassoToolGUI::~QmitkLassoToolGUI()
 {
 }

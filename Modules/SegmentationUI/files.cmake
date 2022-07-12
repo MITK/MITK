@@ -11,7 +11,7 @@ Qmitk/QmitkDrawPaintbrushToolGUI.cpp
 Qmitk/QmitkErasePaintbrushToolGUI.cpp
 Qmitk/QmitkEditableContourToolGUIBase.cpp
 Qmitk/QmitkLiveWireTool2DGUI.cpp
-Qmitk/QmitkNewAddTool2DGUI.cpp
+Qmitk/QmitkLassoToolGUI.cpp
 Qmitk/QmitkOtsuTool3DGUI.cpp
 Qmitk/QmitkPaintbrushToolGUI.cpp
 Qmitk/QmitkPickingToolGUI.cpp
@@ -43,7 +43,7 @@ Qmitk/QmitkDrawPaintbrushToolGUI.h
 Qmitk/QmitkErasePaintbrushToolGUI.h
 Qmitk/QmitkEditableContourToolGUIBase.h
 Qmitk/QmitkLiveWireTool2DGUI.h
-Qmitk/QmitkNewAddTool2DGUI.h
+Qmitk/QmitkLassoToolGUI.h
 Qmitk/QmitkOtsuTool3DGUI.h
 Qmitk/QmitkPaintbrushToolGUI.h
 Qmitk/QmitkPickingToolGUI.h

@@ -10,30 +10,29 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkNewAddTool2DGUI_h_Included
-#define QmitkNewAddTool2DGUI_h_Included
+#ifndef QmitkLassoToolGUI_h_Included
+#define QmitkLassoToolGUI_h_Included
 
 #include "QmitkEditableContourToolGUIBase.h"
-#include "ui_QmitkNewAddTool2DGUIControls.h"
 #include <MitkSegmentationUIExports.h>
 
 /**
 \ingroup org_mitk_gui_qt_interactivesegmentation_internal
 \brief GUI for mitk::NewAddTool.
-\sa mitk::NewAddTool2D
+\sa mitk::LassoTool
 */
-class MITKSEGMENTATIONUI_EXPORT QmitkNewAddTool2DGUI : public QmitkEditableContourToolGUIBase
+class MITKSEGMENTATIONUI_EXPORT QmitkLassoToolGUI : public QmitkEditableContourToolGUIBase
 {
   Q_OBJECT
 
 public:
-  mitkClassMacro(QmitkNewAddTool2DGUI, QmitkEditableContourToolGUIBase);
+  mitkClassMacro(QmitkLassoToolGUI, QmitkEditableContourToolGUIBase);
   itkFactorylessNewMacro(Self);
   itkCloneMacro(Self);
 
 protected:
-  QmitkNewAddTool2DGUI();
-  ~QmitkNewAddTool2DGUI() override;
+  QmitkLassoToolGUI();
+  ~QmitkLassoToolGUI() override;
 };
 
 #endif

@@ -39,7 +39,7 @@ set(CPP_FILES
   Interactions/mitkContourModelLiveWireInteractor.cpp
   Interactions/mitkEditableContourTool.cpp
   Interactions/mitkLiveWireTool2D.cpp
-  Interactions/mitkNewAddTool2D.cpp
+  Interactions/mitkLassoTool.cpp
   Interactions/mitkContourTool.cpp
   Interactions/mitkCreateSurfaceTool.cpp
   Interactions/mitkDrawPaintbrushTool.cpp

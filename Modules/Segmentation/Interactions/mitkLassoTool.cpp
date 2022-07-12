@@ -11,7 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 //#include <mitkContourModelUtils.h>
-#include <mitkNewAddTool2D.h>
+#include <mitkLassoTool.h>
 #include <mitkToolManager.h>
 
 #include <usGetModuleContext.h>
@@ -21,43 +21,43 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, NewAddTool2D, "New Add tool");
+  MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, LassoTool, "Lasso tool");
 }
 
-mitk::NewAddTool2D::NewAddTool2D() : EditableContourTool()
+mitk::LassoTool::LassoTool() : EditableContourTool()
 {
 }
 
-mitk::NewAddTool2D::~NewAddTool2D()
+mitk::LassoTool::~LassoTool()
 {}
 
-void mitk::NewAddTool2D::ConnectActionsAndFunctions()
+void mitk::LassoTool::ConnectActionsAndFunctions()
 {
   mitk::EditableContourTool::ConnectActionsAndFunctions();
   CONNECT_FUNCTION("MovePoint", OnMouseMoved);
 }
 
-const char **mitk::NewAddTool2D::GetXPM() const
+const char **mitk::LassoTool::GetXPM() const
 {
   return nullptr;
 }
 
-us::ModuleResource mitk::NewAddTool2D::GetIconResource() const
+us::ModuleResource mitk::LassoTool::GetIconResource() const
 {
   return us::GetModuleContext()->GetModule()->GetResource("NewAdd_48x48.png");
 }
 
-us::ModuleResource mitk::NewAddTool2D::GetCursorIconResource() const
+us::ModuleResource mitk::LassoTool::GetCursorIconResource() const
 {
   return us::GetModuleContext()->GetModule()->GetResource("NewAdd_Cursor_32x32.png");
 }
 
-const char *mitk::NewAddTool2D::GetName() const
+const char *mitk::LassoTool::GetName() const
 {
-  return "New Add";
+  return "Lasso";
 }
 
-void mitk::NewAddTool2D::FinishTool() 
+void mitk::LassoTool::FinishTool() 
 {
   auto contourInteractor = mitk::ContourModelInteractor::New();
   contourInteractor->SetDataNode(m_ContourNode);

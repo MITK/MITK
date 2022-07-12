@@ -23,7 +23,7 @@ class QmitkEditableContourToolGUIBaseControls;
 /**
 \ingroup org_mitk_gui_qt_interactivesegmentation_internal
 \brief GUI for mitk::EditableContourTool based classes.
-\sa mitk::NewAddTool2D
+\sa mitk::LassoTool
 */
 class MITKSEGMENTATIONUI_EXPORT QmitkEditableContourToolGUIBase : public QmitkToolGUI
 {

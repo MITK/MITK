@@ -47,18 +47,10 @@ QmitknnUNetToolGUI::QmitknnUNetToolGUI() : QmitkMultiLabelSegWithPreviewToolGUIB
   m_Worker = new nnUNetDownloadWorker;
   m_Worker->moveToThread(m_nnUNetThread);
   
-  auto enableMLSelectedDelegate = [this](bool enabled)
+  m_EnableConfirmSegBtnFnc = [this](bool enabled)
   {
-    if (this->m_FirstPreviewComputation)
-    {
-      return false;
-    }
-    else
-    {
-      return this->m_SuperclassEnableConfirmSegBtnFnc(enabled);
-    }
+    return !m_FirstPreviewComputation ? m_SuperclassEnableConfirmSegBtnFnc(enabled) : false;
   };
-  m_EnableConfirmSegBtnFnc = enableMLSelectedDelegate;
 }
 
 QmitknnUNetToolGUI::~QmitknnUNetToolGUI()

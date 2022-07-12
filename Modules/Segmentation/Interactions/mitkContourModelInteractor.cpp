@@ -32,6 +32,7 @@ void mitk::ContourModelInteractor::ConnectActionsAndFunctions()
 
   CONNECT_FUNCTION("movePoint", OnMovePoint);
   CONNECT_FUNCTION("deletePoint", OnDeletePoint);
+  CONNECT_FUNCTION("addPoint", OnAddPoint);
   CONNECT_FUNCTION("finish", OnFinishEditing);
 }
 
@@ -89,10 +90,75 @@ bool mitk::ContourModelInteractor::OnCheckPointClick(const InteractionEvent *int
   return isVertexSelected;
 }
 
+void mitk::ContourModelInteractor::OnAddPoint(StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  const auto* positionEvent = dynamic_cast<const InteractionPositionEvent*>(interactionEvent);
+  if (!positionEvent)
+    return;
+
+  const auto timeStep = interactionEvent->GetSender()->GetTimeStep(GetDataNode()->GetData());
+
+  auto* contour = dynamic_cast<mitk::ContourModel*>(this->GetDataNode()->GetData());
+
+  Point3D currentPosition = positionEvent->GetPositionInWorld();
+
+  ContourElement::VertexSizeType segmentStart;
+  ContourElement::VertexSizeType segmentEnd;
+  Point3D closestContourPoint;
+  if (contour->GetLineSegmentForPoint(currentPosition, ContourModelInteractor::eps, timeStep, segmentStart, segmentEnd, closestContourPoint, true))
+  {
+    const auto vertexList = contour->GetVertexList(timeStep);
+    //check if the segment is NOT within restricted control points.
+    auto controlStartIt = vertexList.begin();
+    auto controlEndIt = vertexList.begin();
+    for (auto searchIt = vertexList.begin() + segmentStart; searchIt != vertexList.begin(); searchIt--)
+    {
+      if ((*searchIt)->IsControlPoint)
+      {
+        controlStartIt = searchIt;
+        break;
+      }
+    }
+    for (auto searchIt = vertexList.begin() + segmentEnd; searchIt != vertexList.end(); searchIt++)
+    {
+      if ((*searchIt)->IsControlPoint)
+      {
+        controlEndIt = searchIt;
+        break;
+      }
+    }
+
+    const auto restrictedVs = m_RestrictedArea->GetVertexList(timeStep);
+    bool startIsRestricted = false;
+    bool stopIsRestricted = false;
+
+    for (auto restrictedV : restrictedVs)
+    {
+      if (restrictedV->Coordinates == (*controlStartIt)->Coordinates)
+      {
+        startIsRestricted = true;
+      }
+      if (restrictedV->Coordinates == (*controlEndIt)->Coordinates)
+      {
+        stopIsRestricted = true;
+      }
+    }
+
+    if (!(startIsRestricted && stopIsRestricted))
+    {
+      //add the point
+      contour->InsertVertexAtIndex(closestContourPoint, segmentEnd, true, timeStep);
+      contour->SelectVertexAt(segmentEnd);
+      mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
+    }
+  }
+}
+
 void mitk::ContourModelInteractor::OnDeletePoint(StateMachineAction *, InteractionEvent *)
 {
   auto *contour = dynamic_cast<mitk::ContourModel *>(this->GetDataNode()->GetData());
   contour->RemoveVertex(contour->GetSelectedVertex());
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 bool mitk::ContourModelInteractor::IsHovering(const InteractionEvent *interactionEvent)
@@ -105,7 +171,7 @@ bool mitk::ContourModelInteractor::IsHovering(const InteractionEvent *interactio
 
   auto *contour = dynamic_cast<mitk::ContourModel *>(this->GetDataNode()->GetData());
 
-  mitk::Point3D currentPosition = positionEvent->GetPositionInWorld();
+  Point3D currentPosition = positionEvent->GetPositionInWorld();
 
   bool isHover = false;
   this->GetDataNode()->GetBoolProperty("contour.hovering", isHover, positionEvent->GetSender());
@@ -116,6 +182,7 @@ bool mitk::ContourModelInteractor::IsHovering(const InteractionEvent *interactio
       this->GetDataNode()->SetBoolProperty("contour.hovering", true);
       mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
     }
+    //check if it would be valid to add a point.
   }
   else
   {

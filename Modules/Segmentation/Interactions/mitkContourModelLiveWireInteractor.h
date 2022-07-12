@@ -54,6 +54,8 @@ namespace mitk
 
     /// \brief Update contour when point is moved.
     void OnMovePoint(StateMachineAction *, InteractionEvent *interactionEvent) override;
+    /// \brief Add a new control point.
+    void OnAddPoint(StateMachineAction*, InteractionEvent* interactionEvent) override;
     /// \brief Delete selected vertex and recompute contour.
     void OnDeletePoint(StateMachineAction *, InteractionEvent *interactionEvent) override;
     /// \brief Finish modification of contour.

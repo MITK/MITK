@@ -41,6 +41,7 @@ void mitk::ContourModelLiveWireInteractor::ConnectActionsAndFunctions()
 
   CONNECT_FUNCTION("movePoint", OnMovePoint);
   CONNECT_FUNCTION("deletePoint", OnDeletePoint);
+  CONNECT_FUNCTION("addPoint", OnAddPoint)
   CONNECT_FUNCTION("finish", OnFinishEditing);
 }
 
@@ -83,6 +84,11 @@ void mitk::ContourModelLiveWireInteractor::SetWorkingImage(mitk::Image *_arg)
     this->m_WorkingSlice = _arg;
     this->m_LiveWireFilter->SetInput(this->m_WorkingSlice);
   }
+}
+
+void mitk::ContourModelLiveWireInteractor::OnAddPoint(StateMachineAction* sm, InteractionEvent* interactionEvent)
+{
+  Superclass::OnAddPoint(sm, interactionEvent);
 }
 
 void mitk::ContourModelLiveWireInteractor::OnDeletePoint(StateMachineAction *, InteractionEvent *interactionEvent)

@@ -85,7 +85,8 @@ namespace mitk
 
     bool IsPositionEventInsideImageRegion(InteractionPositionEvent *positionEvent, BaseData *data);
 
-    mitk::ContourModel::Pointer m_Contour;
+    mitk::ContourModel* GetContour();
+    const mitk::ContourModel* GetContour() const;
     mitk::DataNode::Pointer m_ContourNode;
 
     mitk::ContourModel::Pointer m_PreviewContour;

@@ -53,6 +53,7 @@ namespace mitk
     virtual bool OnCheckPointClick(const InteractionEvent *interactionEvent);
     virtual bool IsHovering(const InteractionEvent *interactionEvent);
 
+    virtual void OnAddPoint(StateMachineAction*, InteractionEvent* interactionEvent);
     virtual void OnDeletePoint(StateMachineAction *, InteractionEvent *interactionEvent);
     virtual void OnMovePoint(StateMachineAction *, InteractionEvent *interactionEvent);
     virtual void OnMoveContour(StateMachineAction *, InteractionEvent *interactionEvent);

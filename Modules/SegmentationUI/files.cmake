@@ -9,6 +9,7 @@ Qmitk/QmitkConfirmSegmentationDialog.cpp
 Qmitk/QmitkCopyToClipBoardDialog.cpp
 Qmitk/QmitkDrawPaintbrushToolGUI.cpp
 Qmitk/QmitkErasePaintbrushToolGUI.cpp
+Qmitk/QmitkEditableContourToolGUIBase.cpp
 Qmitk/QmitkLiveWireTool2DGUI.cpp
 Qmitk/QmitkNewAddTool2DGUI.cpp
 Qmitk/QmitkOtsuTool3DGUI.cpp
@@ -40,6 +41,7 @@ Qmitk/QmitkConfirmSegmentationDialog.h
 Qmitk/QmitkCopyToClipBoardDialog.h
 Qmitk/QmitkDrawPaintbrushToolGUI.h
 Qmitk/QmitkErasePaintbrushToolGUI.h
+Qmitk/QmitkEditableContourToolGUIBase.h
 Qmitk/QmitkLiveWireTool2DGUI.h
 Qmitk/QmitkNewAddTool2DGUI.h
 Qmitk/QmitkOtsuTool3DGUI.h
@@ -66,13 +68,12 @@ Qmitk/QmitkSimpleLabelSetListWidget.h
 set(UI_FILES
 Qmitk/QmitkConfirmSegmentationDialog.ui
 Qmitk/QmitkOtsuToolWidgetControls.ui
-Qmitk/QmitkLiveWireTool2DGUIControls.ui
-Qmitk/QmitkNewAddTool2DGUIControls.ui
 Qmitk/QmitkSurfaceStampWidgetGUIControls.ui
 Qmitk/QmitkMaskStampWidgetGUIControls.ui
 Qmitk/QmitkSliceBasedInterpolatorWidgetGUIControls.ui
 Qmitk/QmitkSurfaceBasedInterpolatorWidgetGUIControls.ui
 Qmitk/QmitknnUNetToolGUIControls.ui
+Qmitk/QmitkEditableContourToolGUIControls.ui
 )
 
 set(QRC_FILES

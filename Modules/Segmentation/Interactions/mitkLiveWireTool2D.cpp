@@ -62,9 +62,10 @@ const char *mitk::LiveWireTool2D::GetName() const
 
 void mitk::LiveWireTool2D::UpdateLiveWireContour()
 {
-  if (m_Contour.IsNotNull())
+  auto contour = this->GetContour();
+  if (nullptr != contour)
   {
-    auto timeGeometry = m_Contour->GetTimeGeometry()->Clone();
+    auto timeGeometry = contour->GetTimeGeometry()->Clone();
     m_PreviewContour = this->m_LiveWireFilter->GetOutput();
 
     // needed because the results of the filter are always from 0 ms
@@ -72,7 +73,7 @@ void mitk::LiveWireTool2D::UpdateLiveWireContour()
     // generate a time geometry that is always visible as the working contour should always be.
     auto contourTimeGeometry = ProportionalTimeGeometry::New();
     contourTimeGeometry->SetStepDuration(std::numeric_limits<TimePointType>::max());
-    contourTimeGeometry->SetTimeStepGeometry(m_Contour->GetTimeGeometry()->GetGeometryForTimeStep(0)->Clone(), 0);
+    contourTimeGeometry->SetTimeStepGeometry(contour->GetTimeGeometry()->GetGeometryForTimeStep(0)->Clone(), 0);
     m_PreviewContour->SetTimeGeometry(contourTimeGeometry);
     m_PreviewContourNode->SetData(this->m_PreviewContour);
   }
@@ -140,8 +141,9 @@ void mitk::LiveWireTool2D::InitializePreviewContour(const Point3D& clickedPoint)
 
   if (m_CreateAndUseDynamicCosts)
   {
+    auto contour = this->GetContour();
     // Use dynamic cost map for next update
-    m_LiveWireFilter->CreateDynamicCostMap(m_Contour);
+    m_LiveWireFilter->CreateDynamicCostMap(contour);
     m_LiveWireFilter->SetUseDynamicCostMap(true);
   }
 }

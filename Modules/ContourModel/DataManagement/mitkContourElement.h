@@ -196,6 +196,14 @@ namespace mitk
                             float eps,
                             mitk::ContourElement::VertexType *previousVertex,
                             mitk::ContourElement::VertexType *nextVertex) const;
+    /** @overload
+    Overloaded version that offers additional options when searching for the line segment.
+    In contrast to the other version it returns the index of the segment start and end as well as the point
+    on the line segment closest to the passed point. Further one can decide if the function should search for
+    the first segment that is close enough (see eps) or for the segment that is really the closest (findClosest==true).
+    @remark segmentStartIndex, segmentEndIndex and closestContourPoint are only valid if return is true.*/
+    bool GetLineSegmentForPoint(const mitk::Point3D& point,
+      float eps, VertexSizeType& segmentStartIndex, VertexSizeType& segmentEndIndex, mitk::Point3D& closestContourPoint, bool findClosest = true) const;
 
     /** \brief Close the contour.
     Connect first with last element.

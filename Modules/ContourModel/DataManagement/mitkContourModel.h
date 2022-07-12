@@ -278,13 +278,22 @@ namespace mitk
 
     /** \brief Check if mouse cursor is near the contour.
     */
-    virtual bool IsNearContour(Point3D &point, float eps, TimeStepType timestep);
+    bool IsNearContour(Point3D &point, float eps, TimeStepType timestep) const;
 
     bool GetLineSegmentForPoint(Point3D &point,
                             float eps,
                             TimeStepType timestep,
                             mitk::ContourElement::VertexType *previousVertex = nullptr,
                             mitk::ContourElement::VertexType *nextVertex = nullptr);
+
+    /**@overload Overloaded version that returns additional information (start and end vertix of the line
+    closest to the passed point and the closest point on the contour).
+    @remark segmentStart, segmentStop and closestContourPoint are only valid if the function returns true.
+    */
+    bool GetLineSegmentForPoint(const mitk::Point3D& point,
+      float eps, TimeStepType timestep, ContourElement::VertexSizeType& segmentStartIndex,
+      ContourElement::VertexSizeType& segmentEndIndex, mitk::Point3D& closestContourPoint,
+      bool findClosest = true) const;
 
     /** \brief Mark a vertex at an index in the container as selected.
      */

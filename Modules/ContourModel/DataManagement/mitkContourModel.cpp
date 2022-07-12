@@ -280,11 +280,25 @@ bool mitk::ContourModel::IsEmptyTimeStep(unsigned int t) const
   return (this->m_ContourSeries.size() <= t);
 }
 
-bool mitk::ContourModel::IsNearContour(Point3D &point, float eps, TimeStepType timestep)
+bool mitk::ContourModel::IsNearContour(Point3D &point, float eps, TimeStepType timestep) const
 {
   if (!this->IsEmptyTimeStep(timestep))
   {
     return this->m_ContourSeries[timestep]->IsNearContour(point, eps);
+  }
+  return false;
+}
+
+bool mitk::ContourModel::GetLineSegmentForPoint(const mitk::Point3D& point,
+  float eps, TimeStepType timestep,
+  ContourElement::VertexSizeType& segmentStartIndex,
+  ContourElement::VertexSizeType& segmentEndIndex,
+  mitk::Point3D& closestContourPoint,
+  bool findClosest) const
+{
+  if (!this->IsEmptyTimeStep(timestep))
+  {
+    return this->m_ContourSeries[timestep]->GetLineSegmentForPoint(point, eps, segmentStartIndex, segmentEndIndex, closestContourPoint, findClosest);
   }
   return false;
 }

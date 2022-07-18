@@ -80,10 +80,10 @@ function get-platform-root
             # Solaris variant
             uname -s | tr 'A-Z' 'a-z'
         else
-            echo "unkown"
+            echo "unknown"
         fi
     else
-        echo "unkown"
+        echo "unknown"
     fi
 }
 
@@ -318,7 +318,7 @@ ARS=(
     # Why glibc is disabled (for now).
     #
     # glibc does not work on CentOS because the versions of the shared
-    # libraries we are building are not compatiable with installed
+    # libraries we are building are not compatible with installed
     # shared libraries.
     #
     # This is the run-time error: ELF file OS ABI invalid that I see

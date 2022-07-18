@@ -64,7 +64,7 @@ if (MITK_PYTHON_USE_VIRTUALENV)
   sitk_enforce_forbid_downloads( MITK_PYTHON_USE_VIRTUALENV )
 
   if (MITK_PYTHON_WHEEL AND PYTHON_VIRTUALENV_VERSION_STRING VERSION_LESS "13")
-    message(SEND_ERROR "In sufficient version of virutalenv for \
+    message(SEND_ERROR "In sufficient version of virtualenv for \
       building wheels. Require virtualenv>=13.0.")
   endif()
 
@@ -105,7 +105,7 @@ if (MITK_PYTHON_USE_VIRTUALENV)
     DEPENDS
     "${SWIG_MODULE_pyMITK_REAL_NAME}"
     "${CMAKE_CURRENT_BINARY_DIR}/PythonVirtualEnvInstall.cmake"
-    COMMENT "Creating python virtual enviroment..."
+    COMMENT "Creating python virtual environment..."
     )
 endif()
 

@@ -139,6 +139,8 @@ private:
   std::string GetKeyLetter(QKeyEvent *ke) const;
   int GetDelta(QWheelEvent *we) const;
 
+  void UpdateStatusBar(mitk::Point2D pointerPositionOnScreen);
+
   bool m_ResendQtEvents;
 
   QmitkRenderWindowMenu *m_MenuWidget;

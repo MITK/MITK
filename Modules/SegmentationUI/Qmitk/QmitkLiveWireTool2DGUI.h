@@ -14,7 +14,6 @@ found in the LICENSE file.
 #define QmitkLiveWireTool2DGUI_h_Included
 
 #include "QmitkEditableContourToolGUIBase.h"
-#include "ui_QmitkLiveWireTool2DGUIControls.h"
 #include <MitkSegmentationUIExports.h>
 
 /**

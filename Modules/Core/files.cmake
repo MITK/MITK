@@ -315,7 +315,6 @@ Interactions/DisplayConfigPACSPan.xml
 Interactions/DisplayConfigPACSScroll.xml
 Interactions/DisplayConfigPACSZoom.xml
 Interactions/DisplayConfigPACSLevelWindow.xml
-Interactions/DisplayConfigMITKLimited.xml
 Interactions/DisplayConfigBlockLMB.xml
 Interactions/PointSet.xml
 Interactions/Legacy/StateMachine.xml

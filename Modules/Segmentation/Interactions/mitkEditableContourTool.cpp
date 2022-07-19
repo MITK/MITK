@@ -14,7 +14,8 @@ found in the LICENSE file.
 #include <mitkToolManager.h>
 
 
-mitk::EditableContourTool::EditableContourTool() : FeedbackContourTool("EditableContourTool") {}
+mitk::EditableContourTool::EditableContourTool() : FeedbackContourTool("EditableContourTool"), m_AutoConfirm(true), m_AddMode(true)
+{}
 
 mitk::EditableContourTool::~EditableContourTool()
 {
@@ -91,6 +92,17 @@ void mitk::EditableContourTool::ClearSegmentation()
   this->ReleaseInteractors();
   this->ResetToStartState();
 }
+
+bool mitk::EditableContourTool::IsEditingContour() const
+{
+  return (nullptr != GetContour()) && !this->IsDrawingContour();
+};
+
+
+bool mitk::EditableContourTool::IsDrawingContour() const
+{
+  return m_PreviewContour.IsNotNull();
+};
 
 bool mitk::EditableContourTool::IsPositionEventInsideImageRegion(mitk::InteractionPositionEvent *positionEvent,
                                                             mitk::BaseData *data)

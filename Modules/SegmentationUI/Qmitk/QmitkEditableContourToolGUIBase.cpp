@@ -38,7 +38,14 @@ QmitkEditableContourToolGUIBase::~QmitkEditableContourToolGUIBase()
 void QmitkEditableContourToolGUIBase::OnNewToolAssociated(mitk::Tool *tool)
 {
   m_NewTool = dynamic_cast<mitk::EditableContourTool *>(tool);
-  m_Controls.m_AutoCheck->setChecked(m_NewTool->GetAutoConfirm());
+  if (m_NewTool.IsNull())
+  {
+    mitkThrow() << "Tool is in an invalid state. QmitkEditableContourToolGUIBase needs tools based on EditableContourTool.";
+  }
+
+  const auto autoConfirm = m_NewTool->GetAutoConfirm();
+  m_Controls.m_AutoCheck->setChecked(autoConfirm);
+  this->OnAutoConfirm(autoConfirm);
 }
 
 void QmitkEditableContourToolGUIBase::OnConfirmSegmentation()
@@ -66,7 +73,19 @@ void QmitkEditableContourToolGUIBase::OnAutoConfirm(bool on)
   m_Controls.m_ConfirmButton->setVisible(!on);
   m_Controls.m_ClearButton->setVisible(!on);
   m_Controls.m_AddMode->setVisible(!on);
+  if (on)
+  {
+    m_Controls.m_AddMode->setChecked(true);
+  }
   m_Controls.m_SubstractMode->setVisible(!on);
-  m_NewTool->SetAutoConfirm(on);
+
+  if (m_NewTool.IsNotNull())
+  {
+    if (on && m_NewTool->IsEditingContour())
+    {
+      this->OnConfirmSegmentation();
+    }
+    m_NewTool->SetAutoConfirm(on);
+  }
 }
 

@@ -43,6 +43,14 @@ namespace mitk
     itkSetMacro(AddMode, bool);
     itkGetMacro(AddMode, bool);
 
+    /* Indicated if a contour is drawn, but not confirmed yet. This the tool is in interactor mode
+     to allow users to edit the contour. This state can be reached if AutoConfirm is false, after the finalizing double
+     click before the contour is confirmed.*/
+    bool IsEditingContour() const;
+    /* Indicate if a contour is currently drawn by the user (state between the initializing double click and
+     the finalizing double click).*/
+    bool IsDrawingContour() const;
+
   protected:
     EditableContourTool();
     ~EditableContourTool() override;

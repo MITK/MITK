@@ -265,7 +265,7 @@ namespace mitk
 
     std::string m_InteractorType;
 
-    std::map<us::ServiceReferenceU, EventConfig> m_DisplayInteractorConfigs;
+    std::map<us::ServiceReferenceU, EventConfig> m_DisplayInteractionConfigs;
 
     const us::Module *m_InteractorModule;
   };

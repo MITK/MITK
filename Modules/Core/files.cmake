@@ -194,7 +194,6 @@ set(CPP_FILES
   Interactions/mitkDisplayActionEventHandlerStd.cpp
   Interactions/mitkDisplayActionEventHandlerSynchronized.cpp
   Interactions/mitkDisplayCoordinateOperation.cpp
-  Interactions/mitkDisplayInteractor.cpp
   Interactions/mitkEventConfig.cpp
   Interactions/mitkEventFactory.cpp
   Interactions/mitkEventRecorder.cpp

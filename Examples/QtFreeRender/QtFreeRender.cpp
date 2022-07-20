@@ -12,37 +12,30 @@ found in the LICENSE file.
 
 #include "mitkRenderWindow.h"
 
-#include "mitkCameraController.h"
-#include "mitkDisplayInteractor.h"
-#include "mitkDisplayInteractor.h"
-#include "mitkInteractionConst.h"
-#include "mitkLine.h"
-#include "mitkPlaneGeometryDataMapper2D.h"
-#include "mitkProperties.h"
-#include "mitkVtkLayerController.h"
+#include <mitkCameraController.h>
+#include <mitkDisplayActionEventBroadcast.h>
+#include <mitkInteractionConst.h>
+#include <mitkLine.h>
+#include <mitkPlaneGeometryDataMapper2D.h>
+#include <mitkProperties.h>
+#include <mitkVtkLayerController.h>
 #include <mitkProperties.h>
 #include <mitkRenderingManager.h>
 #include <mitkStandaloneDataStorage.h>
 #include <mitkTransferFunction.h>
 #include <mitkTransferFunctionProperty.h>
 
-#include "mitkDataStorage.h"
-#include "mitkIOUtil.h"
+#include <mitkDataStorage.h>
+#include <mitkIOUtil.h>
 
-#include "vtkAnnotatedCubeActor.h"
-#include "vtkCornerAnnotation.h"
-#include "vtkMitkRectangleProp.h"
-#include "vtkOrientationMarkerWidget.h"
-#include "vtkProperty.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderWindowInteractor.h"
-#include "vtkTextProperty.h"
-
-// us
-#include "usGetModuleContext.h"
-#include "usModuleContext.h"
-
-#include "mitkInteractionEventObserver.h"
+#include <vtkAnnotatedCubeActor.h>
+#include <vtkCornerAnnotation.h>
+#include <vtkMitkRectangleProp.h>
+#include <vtkOrientationMarkerWidget.h>
+#include <vtkProperty.h>
+#include <vtkRenderWindow.h>
+#include <vtkRenderWindowInteractor.h>
+#include <vtkTextProperty.h>
 
 //##Documentation
 //## @brief Example of a NON QT DEPENDENT MITK RENDERING APPLICATION.
@@ -52,7 +45,7 @@ mitk::RenderWindow::Pointer mitkWidget2;
 mitk::RenderWindow::Pointer mitkWidget3;
 mitk::RenderWindow::Pointer mitkWidget4;
 
-mitk::DisplayInteractor::Pointer m_DisplayInteractor;
+mitk::DisplayActionEventBroadcast::Pointer m_DisplayActionEventBroadcast;
 vtkSmartPointer<vtkMitkRectangleProp> m_RectangleRendering1;
 vtkSmartPointer<vtkMitkRectangleProp> m_RectangleRendering2;
 vtkSmartPointer<vtkMitkRectangleProp> m_RectangleRendering3;
@@ -270,15 +263,11 @@ int main(int argc, char *argv[])
   mitkWidget4->GetRenderer()->SetDataStorage(m_DataStorage);
 
   // instantiate display interactor
-  if (m_DisplayInteractor.IsNull())
+  if (m_DisplayActionEventBroadcast.IsNull())
   {
-    m_DisplayInteractor = mitk::DisplayInteractor::New();
-    m_DisplayInteractor->LoadStateMachine("DisplayInteraction.xml");
-    m_DisplayInteractor->SetEventConfig("DisplayConfigMITK.xml");
-    // Register as listener via micro services
-
-    us::ModuleContext *context = us::GetModuleContext();
-    context->RegisterService<mitk::InteractionEventObserver>(m_DisplayInteractor.GetPointer());
+    m_DisplayActionEventBroadcast = mitk::DisplayActionEventBroadcast::New();
+    m_DisplayActionEventBroadcast->LoadStateMachine("DisplayInteraction.xml");
+    m_DisplayActionEventBroadcast->SetEventConfig("DisplayConfigMITK.xml");
   }
   // Use it as a 2D View
   mitkWidget1->GetRenderer()->SetMapperID(mitk::BaseRenderer::Standard2D);

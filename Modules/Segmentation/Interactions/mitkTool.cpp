@@ -13,7 +13,6 @@ found in the LICENSE file.
 #include "mitkTool.h"
 
 #include <mitkAnatomicalStructureColorPresets.h>
-#include "mitkDisplayInteractor.h"
 #include "mitkDisplayActionEventBroadcast.h"
 #include "mitkImageReadAccessor.h"
 #include "mitkImageWriteAccessor.h"
@@ -56,7 +55,7 @@ mitk::Tool::Tool(const char *type, const us::Module *interactorModule)
     m_IsSegmentationPredicate(
       NodePredicateAnd::New(NodePredicateOr::New(m_PredicateBinary, m_PredicateSegmentation), m_PredicateNotHelper)),
     m_InteractorType(type),
-    m_DisplayInteractorConfigs(),
+    m_DisplayInteractionConfigs(),
     m_InteractorModule(interactorModule)
 {
 }
@@ -144,25 +143,16 @@ void mitk::Tool::Activated()
   // with tools
   // Note: this only affects InteractionEventObservers (formerly known as Listeners) all DataNode specific interaction
   // will still be enabled
-  m_DisplayInteractorConfigs.clear();
-  std::vector<us::ServiceReference<InteractionEventObserver>> listEventObserver =
-    us::GetModuleContext()->GetServiceReferences<InteractionEventObserver>();
-  for (auto it = listEventObserver.begin(); it != listEventObserver.end(); ++it)
+  m_DisplayInteractionConfigs.clear();
+  auto eventObservers = us::GetModuleContext()->GetServiceReferences<InteractionEventObserver>();
+  for (const auto& eventObserver : eventObservers)
   {
-    auto displayInteractor = dynamic_cast<DisplayInteractor*>(us::GetModuleContext()->GetService<InteractionEventObserver>(*it));
-    if (displayInteractor != nullptr)
+    auto displayActionEventBroadcast = dynamic_cast<DisplayActionEventBroadcast*>(
+      us::GetModuleContext()->GetService<InteractionEventObserver>(eventObserver));
+    if (nullptr != displayActionEventBroadcast)
     {
       // remember the original configuration
-      m_DisplayInteractorConfigs.insert(std::make_pair(*it, displayInteractor->GetEventConfig()));
-      // here the alternative configuration is loaded
-      displayInteractor->AddEventConfig(m_EventConfig.c_str());
-    }
-
-    auto displayActionEventBroadcast = dynamic_cast<DisplayActionEventBroadcast*>(us::GetModuleContext()->GetService<InteractionEventObserver>(*it));
-    if (displayActionEventBroadcast != nullptr)
-    {
-      // remember the original configuration
-      m_DisplayInteractorConfigs.insert(std::make_pair(*it, displayActionEventBroadcast->GetEventConfig()));
+      m_DisplayInteractionConfigs.insert(std::make_pair(eventObserver, displayActionEventBroadcast->GetEventConfig()));
       // here the alternative configuration is loaded
       displayActionEventBroadcast->AddEventConfig(m_EventConfig.c_str());
     }
@@ -173,26 +163,22 @@ void mitk::Tool::Deactivated()
 {
   // Re-enabling InteractionEventObservers that have been previously disabled for legacy handling of Tools
   // in new interaction framework
-  for (auto it = m_DisplayInteractorConfigs.begin(); it != m_DisplayInteractorConfigs.end(); ++it)
+  for (const auto& displayInteractionConfig : m_DisplayInteractionConfigs)
   {
-    if (it->first)
+    if (displayInteractionConfig.first)
     {
-      auto displayInteractor = static_cast<DisplayInteractor*>(us::GetModuleContext()->GetService<InteractionEventObserver>(it->first));
-      if (displayInteractor != nullptr)
-      {
-        // here the regular configuration is loaded again
-        displayInteractor->SetEventConfig(it->second);
-      }
+      auto displayActionEventBroadcast = static_cast<mitk::DisplayActionEventBroadcast*>(
+        us::GetModuleContext()->GetService<mitk::InteractionEventObserver>(displayInteractionConfig.first));
 
-      auto displayActionEventBroadcast = dynamic_cast<DisplayActionEventBroadcast*>(us::GetModuleContext()->GetService<InteractionEventObserver>(it->first));
-      if (displayActionEventBroadcast != nullptr)
+      if (nullptr != displayActionEventBroadcast)
       {
         // here the regular configuration is loaded again
-        displayActionEventBroadcast->SetEventConfig(it->second);
+        displayActionEventBroadcast->SetEventConfig(displayInteractionConfig.second);
       }
     }
   }
-  m_DisplayInteractorConfigs.clear();
+
+  m_DisplayInteractionConfigs.clear();
 }
 
 itk::Object::Pointer mitk::Tool::GetGUI(const std::string &toolkitPrefix, const std::string &toolkitPostfix)

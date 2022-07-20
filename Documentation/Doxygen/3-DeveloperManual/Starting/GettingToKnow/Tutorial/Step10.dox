@@ -49,10 +49,10 @@ The behavior of a mitk::DataInteractor is determined by two aspects. One, the st
 that are performed. Secondly the configuration which determines which user interaction triggers the actions.
 
 
-\subsection ModifyDisplayInteractorBehavior How to modify the display interactor behavior
+\subsection ModifyDisplayInteractionBehavior How to modify the display interaction behavior
 
-Sometimes it may be desirable to change the behaviour of the mitk::DisplayInteractor which controls zooming, panning and scrolling, e.g. when a
-Tool is activated that reacts to the same events. Changing the behavior of the DisplayInteractor (or possibly any other EventHandler) can be achieved from anywhere
+Sometimes it may be desirable to change the behaviour of the mitk::DisplayActionEventBroadcast which controls zooming, panning and scrolling, e.g. when a
+Tool is activated that reacts to the same events. Changing the behavior of the DisplayActionEventBroadcast (or possibly any other EventHandler) can be achieved from anywhere
 in the code by requesting the InteractionEventObserver and assigning an alternative configuration to it, as demonstrated in this example:
 
 \code
@@ -65,11 +65,11 @@ std::list<mitk::ServiceReference> listEventObserver = GetModuleContext()->GetSer
 
 for (std::list<mitk::ServiceReference>::iterator it = listEventObserver.begin(); it != listEventObserver.end(); ++it)
 {
-    DisplayInteractor* displayInteractor = dynamic_cast<DisplayInteractor*>(GetModuleContext()->GetService<InteractionEventObserver>(*it));
-    // filtering: only adjust the DisplayInteractor
-    if (displayInteractor != NULL)
+    auto* displayActionEventBroadcast  = dynamic_cast<DisplayActionEventBroadcast*>(GetModuleContext()->GetService<InteractionEventObserver>(*it));
+    // filtering: only adjust the displayActionEventBroadcast
+    if (nullptr != displayActionEventBroadcast)
     {
-        displayInteractor->SetEventConfig(newConfig);
+        displayActionEventBroadcast->SetEventConfig(newConfig);
     }
 }
 
@@ -488,7 +488,7 @@ The event is created and added to the Dispatchers event queue.
 <b> There are also two documented classes implementing a mitk::DataInteractor and a mitk::InteractionEventObserver which can be looked at for further
 understanding: </b>
 \see mitk::PointSetDataInteractor
-\see mitk::DisplayInteractor
+\see mitk::DisplayActionEventBroadcast
 
 
 Have fun with creating your own interaction and please think about contributing it to MITK!

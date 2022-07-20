@@ -13,7 +13,6 @@ found in the LICENSE file.
 #include "QmitkImageCropperView.h"
 
 #include <mitkBoundingShapeCropper.h>
-#include <mitkDisplayInteractor.h>
 #include <mitkImageStatisticsHolder.h>
 #include <mitkInteractionConst.h>
 #include <mitkITKImageImport.h>

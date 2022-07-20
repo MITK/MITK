@@ -65,7 +65,7 @@ To restore the old configuration, query the DisplayActionEventBroadcast again an
     if (displayInteractorConfig.first)
     {
       auto displayActionEventBroadcast = static_cast<mitk::DisplayActionEventBroadcast *>(
-      us::GetModuleContext()->GetService<mitk::InteractionEventObserver>(displayInteractorConfig.first));
+        us::GetModuleContext()->GetService<mitk::InteractionEventObserver>(displayInteractorConfig.first));
 
       if (nullptr != displayActionEventBroadcast)
       {

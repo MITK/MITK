@@ -26,7 +26,7 @@ void mitk::SegmentationInteractor::ConnectActionsAndFunctions()
   // CONNECT_FUNCTION("change_active_label", ChangeActiveLabel);
 }
 
-bool mitk::SegmentationInteractor::ChangeActiveLabel(StateMachineAction *, InteractionEvent *interactionEvent)
+void mitk::SegmentationInteractor::ChangeActiveLabel(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   BaseRenderer::Pointer sender = interactionEvent->GetSender();
   auto positionEvent = static_cast<InteractionPositionEvent*>(interactionEvent);
@@ -60,5 +60,4 @@ bool mitk::SegmentationInteractor::ChangeActiveLabel(StateMachineAction *, Inter
   }
 
   RenderingManager::GetInstance()->RequestUpdateAll();
-  return true;
 }

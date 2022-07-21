@@ -44,23 +44,12 @@ QmitkMxNMultiWidget::~QmitkMxNMultiWidget()
 void QmitkMxNMultiWidget::InitializeMultiWidget()
 {
   SetLayout(1, 1);
-  ActivateMenuWidget(true);
   SetDisplayActionEventHandler(std::make_unique<mitk::DisplayActionEventHandlerDesynchronized>());
   auto displayActionEventHandler = GetDisplayActionEventHandler();
   if (nullptr != displayActionEventHandler)
   {
     displayActionEventHandler->InitActions();
   }
-}
-
-void QmitkMxNMultiWidget::MultiWidgetOpened()
-{
-  SetCrosshairVisibility(true);
-}
-
-void QmitkMxNMultiWidget::MultiWidgetClosed()
-{
-  SetCrosshairVisibility(false);
 }
 
 void QmitkMxNMultiWidget::Synchronize(bool synchronized)

@@ -35,6 +35,27 @@ public:
 
   virtual QmitkLevelWindowWidget* GetLevelWindowWidget() const override { return nullptr; }
 
+  /**
+* @brief Overridden from berry::IPartListener
+*/
+  virtual berry::IPartListener::Events::Types GetPartEventTypes() const override;
+  /**
+  * @brief Overridden from berry::IPartListener
+  */
+  virtual void PartClosed(const berry::IWorkbenchPartReference::Pointer& partRef) override;
+  /**
+  * @brief Overridden from berry::IPartListener
+  */
+  virtual void PartOpened(const berry::IWorkbenchPartReference::Pointer& partRef) override;
+  /**
+  * @brief Overridden from berry::IPartListener
+  */
+  virtual void PartHidden(const berry::IWorkbenchPartReference::Pointer& partRef) override;
+  /**
+  * @brief Overridden from berry::IPartListener
+  */
+  virtual void PartVisible(const berry::IWorkbenchPartReference::Pointer& partRef) override;
+
   void OnLayoutSet(int row, int column) override;
   void OnInteractionSchemeChanged(mitk::InteractionSchemeSwitcher::InteractionScheme scheme) override;
 

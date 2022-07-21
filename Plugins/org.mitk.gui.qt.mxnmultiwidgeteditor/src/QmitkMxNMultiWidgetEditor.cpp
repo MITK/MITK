@@ -62,13 +62,68 @@ QmitkMxNMultiWidgetEditor::~QmitkMxNMultiWidgetEditor()
   GetSite()->GetPage()->RemovePartListener(this);
 }
 
+berry::IPartListener::Events::Types QmitkMxNMultiWidgetEditor::GetPartEventTypes() const
+{
+  return Events::CLOSED | Events::OPENED | Events::HIDDEN | Events::VISIBLE;
+}
+
+void QmitkMxNMultiWidgetEditor::PartOpened(const berry::IWorkbenchPartReference::Pointer& partRef)
+{
+  if (partRef->GetId() == QmitkMxNMultiWidgetEditor::EDITOR_ID)
+  {
+    const auto& multiWidget = dynamic_cast<QmitkMxNMultiWidget*>(GetMultiWidget());
+    if (nullptr != multiWidget)
+    {
+      multiWidget->SetCrosshairVisibility(true);
+      multiWidget->ActivateMenuWidget(true);
+    }
+  }
+}
+
+void QmitkMxNMultiWidgetEditor::PartClosed(const berry::IWorkbenchPartReference::Pointer& partRef)
+{
+  if (partRef->GetId() == QmitkMxNMultiWidgetEditor::EDITOR_ID)
+  {
+    const auto& multiWidget = dynamic_cast<QmitkMxNMultiWidget*>(GetMultiWidget());
+    if (nullptr != multiWidget)
+    {
+      multiWidget->SetCrosshairVisibility(false);
+      multiWidget->ActivateMenuWidget(false);
+    }
+  }
+}
+
+void QmitkMxNMultiWidgetEditor::PartHidden(const berry::IWorkbenchPartReference::Pointer& partRef)
+{
+  if (partRef->GetId() == QmitkMxNMultiWidgetEditor::EDITOR_ID)
+  {
+    const auto& multiWidget = dynamic_cast<QmitkMxNMultiWidget*>(GetMultiWidget());
+    if (nullptr != multiWidget)
+    {
+      multiWidget->ActivateMenuWidget(false);
+    }
+  }
+}
+
+void QmitkMxNMultiWidgetEditor::PartVisible(const berry::IWorkbenchPartReference::Pointer& partRef)
+{
+  if (partRef->GetId() == QmitkMxNMultiWidgetEditor::EDITOR_ID)
+  {
+    const auto& multiWidget = dynamic_cast<QmitkMxNMultiWidget*>(GetMultiWidget());
+    if (nullptr != multiWidget)
+    {
+      multiWidget->ActivateMenuWidget(true);
+    }
+  }
+}
+
 void QmitkMxNMultiWidgetEditor::OnLayoutSet(int row, int column)
 {
   const auto &multiWidget = dynamic_cast<QmitkMxNMultiWidget *>(GetMultiWidget());
   if (nullptr != multiWidget)
   {
-    multiWidget->SetCrosshairVisibility(true);
     QmitkAbstractMultiWidgetEditor::OnLayoutSet(row, column);
+    multiWidget->SetCrosshairVisibility(true);
   }
 }
 

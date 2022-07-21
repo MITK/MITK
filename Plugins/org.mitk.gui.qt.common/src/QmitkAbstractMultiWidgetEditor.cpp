@@ -133,35 +133,6 @@ QStringList QmitkAbstractMultiWidgetEditor::GetDecorations() const
   return m_Impl->m_MultiWidgetDecorationManager->GetDecorations();
 }
 
-berry::IPartListener::Events::Types QmitkAbstractMultiWidgetEditor::GetPartEventTypes() const
-{
-  return Events::CLOSED | Events::OPENED;
-}
-
-void QmitkAbstractMultiWidgetEditor::PartOpened(const berry::IWorkbenchPartReference::Pointer& partRef)
-{
-  if (partRef->GetId() == QmitkAbstractMultiWidgetEditor::EDITOR_ID)
-  {
-    const auto& multiWidget = GetMultiWidget();
-    if (nullptr != multiWidget)
-    {
-      multiWidget->MultiWidgetOpened();
-    }
-  }
-}
-
-void QmitkAbstractMultiWidgetEditor::PartClosed(const berry::IWorkbenchPartReference::Pointer& partRef)
-{
-  if (partRef->GetId() == QmitkAbstractMultiWidgetEditor::EDITOR_ID)
-  {
-    const auto& multiWidget = GetMultiWidget();
-    if (nullptr != multiWidget)
-    {
-      multiWidget->MultiWidgetClosed();
-    }
-  }
-}
-
 QmitkRenderWindow* QmitkAbstractMultiWidgetEditor::GetQmitkRenderWindowByIndex(int index) const
 {
   const auto& multiWidget = GetMultiWidget();

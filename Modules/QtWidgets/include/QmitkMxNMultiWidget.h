@@ -68,6 +68,10 @@ Q_SIGNALS:
   void WheelMoved(QWheelEvent *);
   void Moved();
 
+protected:
+
+  void RemoveRenderWindowWidget() override;
+
 private:
 
   void SetLayoutImpl() override;

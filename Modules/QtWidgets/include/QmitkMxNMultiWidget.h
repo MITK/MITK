@@ -36,8 +36,6 @@ public:
   ~QmitkMxNMultiWidget();
 
   void InitializeMultiWidget() override;
-  void MultiWidgetOpened() override;
-  void MultiWidgetClosed() override;
 
   void Synchronize(bool synchronized) override;
 

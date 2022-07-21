@@ -80,18 +80,6 @@ public:
   */
   virtual QStringList GetDecorations() const override;
   /**
-  * @brief Overridden from berry::IPartListener
-  */
-  virtual berry::IPartListener::Events::Types GetPartEventTypes() const override;
-  /**
-  * @brief Overridden from berry::IPartListener
-  */
-  virtual void PartOpened(const berry::IWorkbenchPartReference::Pointer& partRef) override;
-  /**
-  * @brief Overridden from berry::IPartListener
-  */
-  virtual void PartClosed(const berry::IWorkbenchPartReference::Pointer& partRef) override;
-  /**
   * @brief Retrieve a QmitkRenderWindow by its index.
   */
   virtual QmitkRenderWindow* GetQmitkRenderWindowByIndex(int index) const;

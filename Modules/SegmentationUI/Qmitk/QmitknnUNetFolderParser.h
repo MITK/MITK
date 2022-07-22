@@ -20,7 +20,7 @@ found in the LICENSE file.s
 
 /**
  * @brief Struct to store each (Folder) Node of the hierarchy tree structure.
- * 
+ *
  */
 struct FolderNode
 {
@@ -30,19 +30,18 @@ struct FolderNode
 };
 
 /**
- * @brief Class to store and retreive folder hierarchy information 
+ * @brief Class to store and retreive folder hierarchy information
  * of RESULTS_FOLDER. Only Root node is explicitly stored in m_RootNode.
  * No. of sub levels in the hierachry is defined in the LEVEL constant.
- * 
+ *
  */
 class MITKSEGMENTATIONUI_EXPORT QmitknnUNetFolderParser
 {
 public:
-
   /**
    * @brief Construct a new QmitknnUNetFolderParser object
    * Initializes root folder node object pointer calls
-   * @param parentFolder 
+   * @param parentFolder
    */
   QmitknnUNetFolderParser(const QString parentFolder)
   {
@@ -55,22 +54,22 @@ public:
 
   /**
    * @brief Destroy the QmitknnUNetFolderParser object
-   * 
+   *
    */
   ~QmitknnUNetFolderParser() = default; /*{ DeleteDirs(m_RootNode, LEVEL); }*/
 
   /**
    * @brief Returns the "Results Folder" string which is parent path of the root node.
-   * 
-   * @return QString 
+   *
+   * @return QString
    */
   QString getResultsFolder() { return m_RootNode->path; }
 
   /**
-   * @brief Returns the Model Names from root node. Template function, 
+   * @brief Returns the Model Names from root node. Template function,
    * type can be any of stl or Qt containers which supports push_back call.
-   * 
-   * @tparam T 
+   *
+   * @tparam T
    * @return T (any of stl or Qt containers which supports push_back call)
    */
   template <typename T>
@@ -79,12 +78,12 @@ public:
     auto models = GetSubFolderNamesFromNode<T>(m_RootNode);
     return models;
   }
-  
+
   /**
-   * @brief Returns the task names for a given model. Template function, 
+   * @brief Returns the task names for a given model. Template function,
    * type can be any of stl or Qt containers which supports push_back call.
-   * 
-   * @tparam T 
+   *
+   * @tparam T
    * @param modelName
    * @return T (any of stl or Qt containers which supports push_back call)
    */
@@ -97,10 +96,10 @@ public:
   }
 
   /**
-   * @brief Returns the models names for a given task. Template function, 
+   * @brief Returns the models names for a given task. Template function,
    * type can be any of stl or Qt containers which supports push_back call.
-   * 
-   * @tparam T 
+   *
+   * @tparam T
    * @param taskName
    * @return T (any of stl or Qt containers which supports push_back call)
    */
@@ -123,8 +122,8 @@ public:
   /**
    * @brief Returns all the task names present in the root node with possible duplicates.
    * Template function, type can be any of stl or Qt containers which supports push_back call.
-   * 
-   * @param T 
+   *
+   * @param T
    * @param taskName
    * @return T (any of stl or Qt containers which supports push_back call)
    */
@@ -141,10 +140,10 @@ public:
   }
 
   /**
-   * @brief Returns the trainer / planner names for a given task & model. Template function, 
+   * @brief Returns the trainer / planner names for a given task & model. Template function,
    * type can be any of stl or Qt containers which supports push_back call.
-   * 
-   * @tparam T 
+   *
+   * @tparam T
    * @param taskName
    * @param modelName
    * @return T (any of stl or Qt containers which supports push_back call)
@@ -159,10 +158,10 @@ public:
   }
 
   /**
-   * @brief Returns the Folds names for a given trainer,planner,task & model name. Template function, 
+   * @brief Returns the Folds names for a given trainer,planner,task & model name. Template function,
    * type can be any of stl or Qt containers which supports push_back call.
-   * 
-   * @tparam T 
+   *
+   * @tparam T
    * @param trainer
    * @param planner
    * @param taskName
@@ -187,12 +186,33 @@ private:
   const int m_LEVEL = 4;
   std::shared_ptr<FolderNode> m_RootNode;
 
+  std::function<bool(QString)> RuleEngine(int level)
+  {
+    if (level == m_LEVEL - 1)
+    {
+      return [](QString path)
+      {
+        return (QFile::exists(path + QDir::separator() + QString("model_final_checkpoint.model")) &&
+                QFile::exists(path + QDir::separator() + QString("model_final_checkpoint.model.pkl")) &&
+                QFile::exists(path + QDir::separator() + QString("debug.json")));
+      };
+    }
+    if (level == m_LEVEL - 2)
+    {
+      return [](QString path) { return QFile::exists(path + QDir::separator() + QString("plans.pkl")); };
+    }
+    else
+    {
+      return [](QString /*path*/) { return true; };
+    }
+  }
+
   /**
-   * @brief Iterates through the root node and returns the sub FolderNode object Matching Name Crietria 
-   * 
-   * @param queryName 
-   * @param parentNode 
-   * @return std::shared_ptr<FolderNode> 
+   * @brief Iterates through the root node and returns the sub FolderNode object Matching Name Crietria
+   *
+   * @param queryName
+   * @param parentNode
+   * @return std::shared_ptr<FolderNode>
    */
   std::shared_ptr<FolderNode> GetSubNodeMatchingNameCrietria(const QString &queryName,
                                                              std::shared_ptr<FolderNode> parentNode)
@@ -211,10 +231,10 @@ private:
   }
 
   /**
-   * @brief Returns the sub folder names for a folder node object. Template function, 
+   * @brief Returns the sub folder names for a folder node object. Template function,
    * type can be any of stl or Qt containers which supports push_back call.
-   * 
-   * @tparam T 
+   *
+   * @tparam T
    * @param std::shared_ptr<FolderNode>
    * @return T (any of stl or Qt containers which supports push_back call)
    */
@@ -233,14 +253,15 @@ private:
   /**
    * @brief Iterates through the sub folder hierarchy upto a level provided
    * and create a tree structure.
-   * 
-   * @param parent 
-   * @param level 
+   *
+   * @param parent
+   * @param level
    */
   void InitDirs(std::shared_ptr<FolderNode> parent, int level)
   {
     QString searchFolder = parent->path + QDir::separator() + parent->name;
-    auto subFolders = FetchFoldersFromDir<QStringList>(searchFolder);
+    auto rules = RuleEngine(level);
+    auto subFolders = FetchFoldersFromDir<QStringList>(searchFolder, rules);
     level++;
     foreach (QString folder, subFolders)
     {
@@ -258,9 +279,9 @@ private:
   /**
    * @brief Iterates through the sub folder hierarchy upto a level provided
    * and clears the sub folder std::vector from each node.
-   * 
-   * @param parent 
-   * @param level 
+   *
+   * @param parent
+   * @param level
    */
   void DeleteDirs(std::shared_ptr<FolderNode> parent, int level)
   {
@@ -278,19 +299,19 @@ private:
   /**
    * @brief Template function to fetch all folders inside a given path.
    * The type can be any of stl or Qt containers which supports push_back call.
-   * 
-   * @tparam T 
-   * @param path 
-   * @return T 
+   *
+   * @tparam T
+   * @param path
+   * @return T
    */
   template <typename T>
-  T FetchFoldersFromDir(const QString &path)
+  T FetchFoldersFromDir(const QString &path, std::function<bool(QString)> callback)
   {
     T folders;
     for (QDirIterator it(path, QDir::AllDirs, QDirIterator::NoIteratorFlags); it.hasNext();)
     {
       it.next();
-      if (!it.fileName().startsWith('.'))
+      if (!it.fileName().startsWith('.') && callback(it.filePath()))
       {
         folders.push_back(it.fileName());
       }

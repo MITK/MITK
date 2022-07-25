@@ -185,7 +185,13 @@ public:
 private:
   const int m_LEVEL = 4;
   std::shared_ptr<FolderNode> m_RootNode;
-
+  
+  /**
+   * @brief Returns rule function wrapper to check for specific files at given Result_Folder hierarchy level.
+   * 
+   * @param level 
+   * @return std::function<bool(QString)> 
+   */
   std::function<bool(QString)> RuleEngine(int level)
   {
     if (level == m_LEVEL - 1)

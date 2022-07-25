@@ -389,8 +389,16 @@ std::vector<std::string> QmitknnUNetToolGUI::FetchSelectedFoldsFromUI(ctkCheckab
   QModelIndexList foldList = foldBox->checkedIndexes();
   for (const auto &index : foldList)
   {
-    QString foldQString = foldBox->itemText(index.row()).split("_", QString::SplitBehavior::SkipEmptyParts).last();
+    QString foldQString = foldBox->itemText(index.row());
+    if(foldQString != "dummy_element_that_nobody_can_see")
+    {
+    foldQString = foldQString.split("_", QString::SplitBehavior::SkipEmptyParts).last();
     folds.push_back(foldQString.toStdString());
+    }
+    else
+    {
+      throw std::runtime_error("Folds are not recognized. Please check if your nnUNet results folder structure is legitimate");
+    }
   }
   return folds;
 }
@@ -593,6 +601,13 @@ mitk::ModelParams QmitknnUNetToolGUI::MapToRequest(const QString &modelName,
   return requestObject;
 }
 
+void QmitknnUNetToolGUI::SetComboBoxToNone(ctkCheckableComboBox* comboBox)
+{
+  comboBox->clear();
+  comboBox->addItem("dummy_element_that_nobody_can_see");
+  qobject_cast<QListView *>(comboBox->view())->setRowHidden(0, true); // For the cosmetic purpose of showing "None" on the combobox.
+}
+
 /* ---------------------SLOTS---------------------------------------*/
 
 void QmitknnUNetToolGUI::OnPreviewRequested()
@@ -788,9 +803,7 @@ void QmitknnUNetToolGUI::OnModelChanged(const QString &model)
       if(trainerPlanners.isEmpty())
       {
         this->ShowErrorMessage("No plans.pkl found for "+model.toStdString()+". Check your directory or download the task again.");
-        m_Controls.foldBox->clear();
-        m_Controls.foldBox->addItem("dummy_element_that_nobody_can_see");
-        qobject_cast<QListView *>(m_Controls.foldBox->view())->setRowHidden(0, true); // For the cosmetic purpose of showing "None" on the combobox.
+        this->SetComboBoxToNone(m_Controls.foldBox);
         return;
       }
       QStringList trainers, planners;
@@ -814,9 +827,7 @@ void QmitknnUNetToolGUI::OnModelChanged(const QString &model)
         if(trainerPlanners.isEmpty())
         {
           this->ShowErrorMessage("No plans.pkl found for "+model.toStdString()+". Check your directory or download the task again.");
-          layout->foldBox->clear();
-          layout->foldBox->addItem("dummy_element_that_nobody_can_see");
-          qobject_cast<QListView *>(layout->foldBox->view())->setRowHidden(0, true); // For the cosmetic purpose of showing "None" on the combobox.
+          this->SetComboBoxToNone(layout->foldBox);
           return;
         }
         QStringList trainers, planners;
@@ -875,8 +886,7 @@ void QmitknnUNetToolGUI::OnTrainerChanged(const QString &plannerSelected)
     if(folds.isEmpty())
     {
       this->ShowErrorMessage("No valid folds found. Check your directory or download the task again.");
-      m_Controls.foldBox->addItem("dummy_element_that_nobody_can_see");
-      qobject_cast<QListView *>(m_Controls.foldBox->view())->setRowHidden(0, true); // For the cosmetic purpose of showing "None" on the combobox.
+      this->SetComboBoxToNone(m_Controls.foldBox);
       return;
     }
     std::for_each(folds.begin(),
@@ -910,8 +920,7 @@ void QmitknnUNetToolGUI::OnTrainerChanged(const QString &plannerSelected)
         if(folds.isEmpty())
         {
           this->ShowErrorMessage("No valid folds found. Check your directory.");
-          layout->foldBox->addItem("dummy_element_that_nobody_can_see");
-          qobject_cast<QListView *>(layout->foldBox->view())->setRowHidden(0, true); // For the cosmetic purpose of showing "None" on the combobox.
+          this->SetComboBoxToNone(layout->foldBox);
           return;
         }
         std::for_each(folds.begin(),

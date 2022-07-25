@@ -171,6 +171,11 @@ protected:
 
 private:
   /**
+  * @brief Adds an element and hides it so that the ctkCheckableComboBox shows "None".
+  */
+  void SetComboBoxToNone(ctkCheckableComboBox*);
+
+  /**
    * @brief Parses the available_models.json file from RESULTS_FOLDER and loads
    * the task names to the Download combobox in Advanced.
    */

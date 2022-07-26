@@ -25,6 +25,7 @@ found in the LICENSE file.
 #include <ctkCollapsibleGroupBox.h>
 #include <itksys/SystemTools.hxx>
 #include <nlohmann/json.hpp>
+#include <mitkIOUtil.h>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitknnUNetToolGUI, "")
 
@@ -190,7 +191,6 @@ void QmitknnUNetToolGUI::ClearAllComboBoxes()
     layout->plannerBox->clear();
     layout->foldBox->clear();
   }
-  m_Controls.availableBox->clear();
 }
 
 std::vector<mitk::Image::ConstPointer> QmitknnUNetToolGUI::FetchMultiModalImagesFromUI()
@@ -452,12 +452,6 @@ QString QmitknnUNetToolGUI::FetchResultsFolderFromEnv()
     retVal = m_Settings.value("nnUNet/LastRESULTS_FOLDERPath").toString();
   }
   return retVal;
-}
-
-void QmitknnUNetToolGUI::DumpAllJSONs(const QString &path)
-{
-  this->DumpJSONfromPickle(path);
-  this->ExportAvailableModelsAsJSON(m_ParentFolder->getResultsFolder());
 }
 
 void QmitknnUNetToolGUI::DumpJSONfromPickle(const QString &picklePath)
@@ -906,15 +900,10 @@ void QmitknnUNetToolGUI::OnTrainerChanged(const QString &plannerSelected)
   {
     m_Controls.previewButton->setEnabled(true);
     const QString mitkJsonFile = parentPath + QDir::separator() + m_MITK_EXPORT_JSON_FILENAME;
-    this->DumpAllJSONs(parentPath);
+    this->DumpJSONfromPickle(parentPath);
     if (QFile::exists(mitkJsonFile))
     {
       this->DisplayMultiModalInfoFromJSON(mitkJsonFile);
-    }
-    const QString jsonPath = m_ParentFolder->getResultsFolder() + QDir::separator() + m_AVAILABLE_MODELS_JSON_FILENAME;
-    if (QFile::exists(mitkJsonFile))
-    {
-      this->FillAvailableModelsInfoFromJSON(jsonPath);
     }
   }
 }
@@ -939,6 +928,7 @@ void QmitknnUNetToolGUI::OnPythonPathChanged(const QString &pyEnv)
       "environment or create one. For more info refer https://github.com/MIC-DKFZ/nnUNet";
     this->ShowErrorMessage(warning);
     this->DisableEverything();
+    m_Controls.availableBox->clear();
   }
   else
   {
@@ -956,6 +946,15 @@ void QmitknnUNetToolGUI::OnPythonPathChanged(const QString &pyEnv)
     if (!(m_PythonPath.endsWith("bin", Qt::CaseInsensitive) || m_PythonPath.endsWith("bin/", Qt::CaseInsensitive)))
     {
       m_PythonPath += QDir::separator() + QString("bin");
+    }
+    
+    // Export available model info as json and fill them for Download
+    QString tempPath = QString::fromStdString(mitk::IOUtil::GetTempPath());
+    this->ExportAvailableModelsAsJSON(tempPath);
+    const QString jsonPath = tempPath + QDir::separator() + m_AVAILABLE_MODELS_JSON_FILENAME;
+    if (QFile::exists(jsonPath))
+    {
+      this->FillAvailableModelsInfoFromJSON(jsonPath);
     }
   }
 }
@@ -1130,9 +1129,9 @@ void QmitknnUNetToolGUI::ShowEnsembleLayout(bool visible)
 
 void QmitknnUNetToolGUI::OnDownloadModel()
 {
-  if (m_IsResultsFolderValid)
+  auto selectedTask = m_Controls.availableBox->currentText();
+  if(!selectedTask.isEmpty())
   {
-    auto selectedTask = m_Controls.availableBox->currentText();
     auto spExec = mitk::ProcessExecutor::New();
     mitk::ProcessExecutor::ArgumentListType args;
     args.push_back(selectedTask.toStdString());

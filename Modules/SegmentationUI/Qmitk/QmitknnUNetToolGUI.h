@@ -177,12 +177,6 @@ private:
   void FillAvailableModelsInfoFromJSON(const QString&);
 
   /**
-   * @brief Calls other JSON dumping functions.
-   *
-   */
-  void DumpAllJSONs(const QString&);
-
-  /**
    * @brief Exports available models to download from nnUNet_print_available_pretrained_models
    * output.
    */

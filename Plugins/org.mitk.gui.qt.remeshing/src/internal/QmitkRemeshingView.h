@@ -36,14 +36,14 @@ public:
 
 private slots:
   void OnSurfaceChanged(const QmitkSingleNodeSelectionWidget::NodeList& nodes);
-  void OnVertexCountChanged(int vertexCount);
-  void OnCalculateNormalsChanged(int checkState);
-  void OnDecimateButtonClicked();
+  void OnDensityChanged(int numVertices);
+  void OnRemeshButtonClicked();
 
 private:
   void EnableWidgets(bool enable);
 
   Ui::QmitkRemeshingViewControls* m_Controls;
+  int m_MaxNumberOfVertices;
 };
 
 #endif

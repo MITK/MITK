@@ -1,4 +1,6 @@
 mitk_create_module(
-  DEPENDS MitkCore
-  PACKAGE_DEPENDS OpenMesh|Tools
+  DEPENDS PUBLIC MitkCore
+  PACKAGE_DEPENDS ACVD|Surface+VolumeProcessing VTK|IOPLY+IOMINC
 )
+
+add_subdirectory(Testing)

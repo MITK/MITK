@@ -105,7 +105,7 @@ fs::path mitk::SegmentationTaskList::GetInputLocation() const
   this->GetPropertyList()->GetStringProperty("MITK.IO.reader.inputlocation", inputLocation);
 
   return !inputLocation.empty()
-    ? fs::path(inputLocation).lexically_normal()
+    ? fs::path(inputLocation)/*.lexically_normal()*/ // See T29246
     : fs::path();
 }
 
@@ -119,7 +119,7 @@ fs::path mitk::SegmentationTaskList::GetAbsolutePath(const fs::path& path) const
   if (path.empty())
     return path;
 
-  auto normalizedPath = path.lexically_normal();
+  auto normalizedPath = path/*.lexically_normal()*/; // See T29246
 
   return !normalizedPath.is_absolute()
     ? this->GetBasePath() / normalizedPath

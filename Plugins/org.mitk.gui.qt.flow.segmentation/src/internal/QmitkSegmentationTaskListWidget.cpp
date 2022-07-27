@@ -34,7 +34,7 @@ found in the LICENSE file.
 #include <QFileSystemWatcher>
 #include <QMessageBox>
 
-#include <filesystem>
+#include <mitkFileSystem.h>
 
 namespace
 {
@@ -64,7 +64,7 @@ namespace
     return nullptr;
   }
 
-  std::filesystem::path GetInputLocation(const mitk::BaseData* data)
+  fs::path GetInputLocation(const mitk::BaseData* data)
   {
     std::string result;
 
@@ -233,19 +233,19 @@ void QmitkSegmentationTaskListWidget::ResetFileSystemWatcher()
     {
       auto resultPath = m_TaskList->GetAbsolutePath(task.GetResult()).remove_filename();
 
-      if (!std::filesystem::exists(resultPath))
+      if (!fs::exists(resultPath))
       {
         try
         {
-          std::filesystem::create_directories(resultPath);
+          fs::create_directories(resultPath);
         }
-        catch (const std::filesystem::filesystem_error& e)
+        catch (const fs::filesystem_error& e)
         {
           MITK_ERROR << e.what();
         }
       }
 
-      if (std::filesystem::exists(resultPath))
+      if (fs::exists(resultPath))
         m_FileSystemWatcher->addPath(QString::fromStdString(resultPath.string()));
     }
   }
@@ -527,7 +527,7 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
 
     const auto path = m_TaskList->GetAbsolutePath(m_TaskList->GetResult(current));
 
-    if (std::filesystem::exists(path))
+    if (fs::exists(path))
     {
       segmentation = mitk::IOUtil::Load<mitk::LabelSetImage>(path.string());
     }

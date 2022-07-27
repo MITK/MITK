@@ -96,30 +96,30 @@ bool mitk::SegmentationTaskList::IsDone() const
 
 bool mitk::SegmentationTaskList::IsDone(size_t index) const
 {
-  return std::filesystem::exists(this->GetAbsolutePath(m_Tasks.at(index).GetResult()));
+  return fs::exists(this->GetAbsolutePath(m_Tasks.at(index).GetResult()));
 }
 
-std::filesystem::path mitk::SegmentationTaskList::GetInputLocation() const
+fs::path mitk::SegmentationTaskList::GetInputLocation() const
 {
   std::string inputLocation;
   this->GetPropertyList()->GetStringProperty("MITK.IO.reader.inputlocation", inputLocation);
 
   return !inputLocation.empty()
-    ? std::filesystem::path(inputLocation).lexically_normal()
-    : std::filesystem::path();
+    ? fs::path(inputLocation)/*.lexically_normal()*/ // See T29246
+    : fs::path();
 }
 
-std::filesystem::path mitk::SegmentationTaskList::GetBasePath() const
+fs::path mitk::SegmentationTaskList::GetBasePath() const
 {
   return this->GetInputLocation().remove_filename();
 }
 
-std::filesystem::path mitk::SegmentationTaskList::GetAbsolutePath(const std::filesystem::path& path) const
+fs::path mitk::SegmentationTaskList::GetAbsolutePath(const fs::path& path) const
 {
   if (path.empty())
     return path;
 
-  auto normalizedPath = path.lexically_normal();
+  auto normalizedPath = path/*.lexically_normal()*/; // See T29246
 
   return !normalizedPath.is_absolute()
     ? this->GetBasePath() / normalizedPath

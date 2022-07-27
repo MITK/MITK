@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include <mitkRemeshing.h>
 #include <mitkExceptionMacro.h>
+
 #include <vtkIdList.h>
 #include <vtkIntArray.h>
 #include <vtkIsotropicDiscreteRemeshing.h>
@@ -21,34 +22,28 @@ found in the LICENSE file.
 #include <vtkSmartPointer.h>
 #include <vtkSurface.h>
 
+#include <array>
+#include <vector>
+
 namespace
 {
-  struct ClustersQuadrics
+  struct ClustersQuadrics final
   {
-    explicit ClustersQuadrics(int size) : Elements(new double *[size]), Size(size)
+    explicit ClustersQuadrics(size_t size)
+      : Elements(size),
+        Size(size)
     {
-      for (int i = 0; i < size; ++i)
-      {
-        Elements[i] = new double[9];
-
-        for (int j = 0; j < 9; ++j)
-          Elements[i][j] = 0.0;
-      }
+      for (auto& array : Elements)
+        array.fill(0.0);
     }
 
-    ~ClustersQuadrics()
-    {
-      for (int i = 0; i < Size; ++i)
-        delete[] Elements[i];
+    ~ClustersQuadrics() = default;
 
-      delete Elements;
-    }
+    ClustersQuadrics(const ClustersQuadrics&) = delete;
+    ClustersQuadrics& operator=(const ClustersQuadrics&) = delete;
 
-    double **Elements;
-    int Size;
-
-    ClustersQuadrics(const ClustersQuadrics &) = delete;
-    ClustersQuadrics &operator=(const ClustersQuadrics &) = delete;
+    std::vector<std::array<double, 9>> Elements;
+    size_t Size;
   };
 
   void ValidateSurface(const mitk::Surface* surface, mitk::TimeStepType t)
@@ -136,12 +131,11 @@ mitk::Surface::Pointer mitk::Remesh(const Surface* surface,
           int numIds = static_cast<int>(faceList->GetNumberOfIds());
 
           for (int j = 0; j < numIds; ++j)
-            vtkQuadricTools::AddTriangleQuadric(
-              clustersQuadrics.Elements[cluster], remesherInput, faceList->GetId(j), false);
+            vtkQuadricTools::AddTriangleQuadric(clustersQuadrics.Elements[cluster].data(), remesherInput, faceList->GetId(j), false);
         }
         else
         {
-          vtkQuadricTools::AddTriangleQuadric(clustersQuadrics.Elements[cluster], remesherInput, i, false);
+          vtkQuadricTools::AddTriangleQuadric(clustersQuadrics.Elements[cluster].data(), remesherInput, i, false);
         }
       }
       else
@@ -151,7 +145,7 @@ mitk::Surface::Pointer mitk::Remesh(const Surface* surface,
     }
 
     if (numMisclassifiedItems != 0)
-      std::cout << numMisclassifiedItems << " items with wrong cluster association" << std::endl;
+      MITK_INFO << numMisclassifiedItems << " items with wrong cluster association" << std::endl;
 
     vtkSmartPointer<vtkSurface> remesherOutput = remesher->GetOutput();
     double point[3];
@@ -159,11 +153,11 @@ mitk::Surface::Pointer mitk::Remesh(const Surface* surface,
     for (int i = 0; i < numVertices; ++i)
     {
       remesherOutput->GetPoint(i, point);
-      vtkQuadricTools::ComputeRepresentativePoint(clustersQuadrics.Elements[i], point, optimizationLevel);
+      vtkQuadricTools::ComputeRepresentativePoint(clustersQuadrics.Elements[i].data(), point, optimizationLevel);
       remesherOutput->SetPointCoordinates(i, point);
     }
 
-    std::cout << "After quadrics post-processing:" << std::endl;
+    MITK_INFO << "After quadrics post-processing:" << std::endl;
     remesherOutput->DisplayMeshProperties();
   }
 

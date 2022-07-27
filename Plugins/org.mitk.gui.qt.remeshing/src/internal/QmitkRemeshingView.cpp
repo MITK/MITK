@@ -87,7 +87,7 @@ void QmitkRemeshingView::OnDensityChanged(int density)
 
 void QmitkRemeshingView::OnRemeshButtonClicked()
 {
-  mitk::DataNode::Pointer selectedNode = m_Controls->selectionWidget->GetSelectedNode();
+  auto selectedNode = m_Controls->selectionWidget->GetSelectedNode();
   mitk::Surface::ConstPointer surface = static_cast<mitk::Surface*>(selectedNode->GetData());
 
   int density = m_Controls->densitySpinBox->value();
@@ -138,7 +138,7 @@ void QmitkRemeshingView::OnRemeshButtonClicked()
 
   mitk::Surface::Pointer remeshedSurface = remesher->GetOutput();
 
-  mitk::DataNode::Pointer newNode = mitk::DataNode::New();
+  auto newNode = mitk::DataNode::New();
   newNode->SetName(QString("%1 (%2%)").arg(selectedNode->GetName().c_str()).arg(density).toStdString());
   newNode->SetProperty("material.representation", mitk::VtkRepresentationProperty::New(VTK_WIREFRAME));
   newNode->SetData(remeshedSurface);

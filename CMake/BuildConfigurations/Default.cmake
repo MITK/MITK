@@ -1,5 +1,5 @@
 set(MITK_CONFIG_PACKAGES
-  OpenMesh
+  ACVD
   Qt5
   BLUEBERRY
 )

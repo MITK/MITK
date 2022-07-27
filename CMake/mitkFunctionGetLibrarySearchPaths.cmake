@@ -131,12 +131,6 @@ function(mitkFunctionGetLibrarySearchPaths search_path intermediate_dir)
     endif()
   endif()
 
-  if(MITK_USE_OpenMesh)
-    if(WIN32)
-      list(APPEND _dir_candidates "${MITK_EXTERNAL_PROJECT_PREFIX}")
-    endif()
-  endif()
-
   if(MITK_USE_Python3)
     list(APPEND _dir_candidates "${CTK_DIR}/CMakeExternals/Install/bin")
     get_filename_component(_python_dir "${Python3_EXECUTABLE}" DIRECTORY)

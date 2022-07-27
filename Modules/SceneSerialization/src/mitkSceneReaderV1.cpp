@@ -21,6 +21,9 @@ found in the LICENSE file.
 #include <mitkRenderingModeProperty.h>
 #include <tinyxml2.h>
 
+#include <filesystem>
+#include <map>
+
 MITK_REGISTER_SERIALIZER(SceneReaderV1)
 
 namespace
@@ -54,19 +57,12 @@ namespace
   // actual file format of surfaces.
   void ApplyProportionalTimeGeometryProperties(mitk::BaseData* data)
   {
-    if (nullptr == data)
-      return;
-
-    auto properties = data->GetPropertyList();
-
-    if (properties.IsNull())
-      return;
-
     auto* geometry = dynamic_cast<mitk::ProportionalTimeGeometry*>(data->GetTimeGeometry());
 
     if (nullptr == geometry)
       return;
 
+    auto properties = data->GetPropertyList();
     float value = 0.0f;
 
     if (properties->GetFloatProperty("ProportionalTimeGeometry.FirstTimePoint", value))
@@ -79,6 +75,26 @@ namespace
 
     if (properties->GetFloatProperty("ProportionalTimeGeometry.StepDuration", value))
       geometry->SetStepDuration(value);
+  }
+
+  mitk::PropertyList::Pointer DeserializeProperties(const tinyxml2::XMLElement *propertiesElement, const std::filesystem::path& basePath)
+  {
+    if (propertiesElement == nullptr)
+      return nullptr;
+
+    std::filesystem::path path(propertiesElement->Attribute("file"));
+
+    if (path.empty())
+      return nullptr;
+
+    if (!basePath.empty())
+      path = basePath / path;
+
+    auto deserializer = mitk::PropertyListDeserializer::New();
+    deserializer->SetFilename(path.string());
+    deserializer->Deserialize();
+
+    return deserializer->GetOutput();
   }
 }
 
@@ -108,10 +124,59 @@ bool mitk::SceneReaderV1::LoadScene(tinyxml2::XMLDocument &document, const std::
 
   ProgressBar::GetInstance()->AddStepsToDo(listSize * 2);
 
+  // Deserialize base data properties before reading the actual data to be
+  // able to provide them as read-only meta data to the data reader.
+  std::map<std::string, PropertyList::Pointer> baseDataPropertyLists;
+
+  for (auto *nodeElement = document.FirstChildElement("node"); nodeElement != nullptr;
+       nodeElement = nodeElement->NextSiblingElement("node"))
+  {
+    const auto *uid = nodeElement->Attribute("UID");
+
+    if (uid == nullptr)
+      continue;
+
+    auto *dataElement = nodeElement->FirstChildElement("data");
+
+    if (dataElement != nullptr)
+    {
+      auto properties = DeserializeProperties(dataElement->FirstChildElement("properties"), workingDirectory);
+
+      if (properties.IsNotNull())
+        baseDataPropertyLists[uid] = properties;
+    }
+  }
+
   for (auto *element = document.FirstChildElement("node"); element != nullptr;
        element = element->NextSiblingElement("node"))
   {
-    DataNodes.push_back(LoadBaseDataFromDataTag(element->FirstChildElement("data"), workingDirectory, error));
+    mitk::PropertyList* properties = nullptr;
+    const auto *uid = element->Attribute("UID");
+
+    if (uid != nullptr)
+    {
+      auto iter = baseDataPropertyLists.find(uid);
+
+      if (iter != baseDataPropertyLists.end())
+        properties = iter->second;
+    }
+
+    const auto *dataElement = element->FirstChildElement("data");
+    auto dataNode = this->LoadBaseDataFromDataTag(dataElement, properties, workingDirectory, error);
+
+    if (dataNode.IsNull())
+      continue;
+
+    auto* baseData = dataNode->GetData();
+
+    if (baseData != nullptr && properties != nullptr)
+    {
+      baseData->SetPropertyList(properties);
+      ApplyProportionalTimeGeometryProperties(baseData);
+    }
+
+    DataNodes.push_back(dataNode);
+
     ProgressBar::GetInstance()->Progress();
   }
 
@@ -122,24 +187,8 @@ bool mitk::SceneReaderV1::LoadScene(tinyxml2::XMLDocument &document, const std::
        element = element->NextSiblingElement("node"), ++nit)
   {
     mitk::DataNode::Pointer node = *nit;
-    // in case dataXmlElement is valid test whether it containts the "properties" child tag
-    // and process further if and only if yes
-    auto *dataXmlElement = element->FirstChildElement("data");
-    if (dataXmlElement && dataXmlElement->FirstChildElement("properties"))
-    {
-      auto *baseDataElement = dataXmlElement->FirstChildElement("properties");
-      if (node->GetData())
-      {
-        DecorateBaseDataWithProperties(node->GetData(), baseDataElement, workingDirectory);
-        ApplyProportionalTimeGeometryProperties(node->GetData());
-      }
-      else
-      {
-        MITK_WARN << "BaseData properties stored in scene file, but BaseData could not be read" << std::endl;
-      }
-    }
 
-    //   2. check child nodes
+    //   1. check child nodes
     const char *uida = element->Attribute("UID");
     std::string uid("");
 
@@ -155,7 +204,7 @@ bool mitk::SceneReaderV1::LoadScene(tinyxml2::XMLDocument &document, const std::
       error = true;
     }
 
-    //   3. if there are <properties> nodes,
+    //   2. if there are <properties> nodes,
     //        - instantiate the appropriate PropertyListDeSerializer
     //        - use them to construct PropertyList objects
     //        - add these properties to the node (if necessary, use renderwindow name)
@@ -169,7 +218,7 @@ bool mitk::SceneReaderV1::LoadScene(tinyxml2::XMLDocument &document, const std::
     // remember node for later adding to DataStorage
     m_OrderedNodePairs.push_back(std::make_pair(node, std::list<std::string>()));
 
-    //   4. if there are <source> elements, remember parent objects
+    //   3. if there are <source> elements, remember parent objects
     for (auto *source = element->FirstChildElement("source"); source != nullptr;
          source = source->NextSiblingElement("source"))
     {
@@ -272,6 +321,7 @@ bool mitk::SceneReaderV1::LoadScene(tinyxml2::XMLDocument &document, const std::
 }
 
 mitk::DataNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag(const tinyxml2::XMLElement *dataElement,
+                                                                     const PropertyList *properties,
                                                                      const std::string &workingDirectory,
                                                                      bool &error)
 {
@@ -284,13 +334,10 @@ mitk::DataNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag(const tinyx
     {
       try
       {
-        std::vector<BaseData::Pointer> baseData = IOUtil::Load(workingDirectory + Poco::Path::separator() + filename);
-        if (baseData.size() > 1)
-        {
-          MITK_WARN << "Discarding multiple base data results from " << filename << " except the first one.";
-        }
+        auto baseData = IOUtil::Load(workingDirectory + Poco::Path::separator() + filename, properties);
+
         node = DataNode::New();
-        node->SetData(baseData.front());
+        node->SetData(baseData);
       }
       catch (std::exception &e)
       {
@@ -410,52 +457,6 @@ bool mitk::SceneReaderV1::DecorateNodeWithProperties(DataNode *node,
                     "your developer.";
       error = true;
     }
-  }
-
-  return !error;
-}
-
-bool mitk::SceneReaderV1::DecorateBaseDataWithProperties(BaseData::Pointer data,
-                                                         const tinyxml2::XMLElement *baseDataNodeElem,
-                                                         const std::string &workingDir)
-{
-  // check given variables, initialize error variable
-  assert(baseDataNodeElem);
-  bool error(false);
-
-  // get the file name stored in the <properties ...> tag
-  const char *baseDataPropertyFile(baseDataNodeElem->Attribute("file"));
-  // check if the filename was found
-  if (baseDataPropertyFile)
-  {
-    // PropertyList::Pointer dataPropList = data->GetPropertyList();
-
-    PropertyListDeserializer::Pointer propertyDeserializer = PropertyListDeserializer::New();
-
-    // initialize the property reader
-    propertyDeserializer->SetFilename(workingDir + Poco::Path::separator() + baseDataPropertyFile);
-    bool ioSuccess = propertyDeserializer->Deserialize();
-    error = !ioSuccess;
-
-    // get the output
-    PropertyList::Pointer inProperties = propertyDeserializer->GetOutput();
-
-    // store the read-in properties to the given node or throw error otherwise
-    if (inProperties.IsNotNull())
-    {
-      data->SetPropertyList(inProperties);
-    }
-    else
-    {
-      MITK_ERROR << "The property deserializer did not return a (valid) property list.";
-      error = true;
-    }
-  }
-  else
-  {
-    MITK_ERROR << "Function DecorateBaseDataWithProperties(...) called with false XML element. \n \t ->Given element "
-                  "does not contain a 'file' attribute. \n";
-    error = true;
   }
 
   return !error;

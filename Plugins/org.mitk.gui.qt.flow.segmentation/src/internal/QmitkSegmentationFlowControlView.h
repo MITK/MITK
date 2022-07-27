@@ -19,7 +19,12 @@ found in the LICENSE file.
 
 #include "mitkNodePredicateBase.h"
 
-#include "ui_QmitkSegmentationFlowControlView.h"
+#include <optional>
+
+namespace Ui
+{
+  class SegmentationFlowControlView;
+}
 
 /*!
   \brief QmitkSegmentationFlowControlView
@@ -51,6 +56,8 @@ public:
 protected slots:
 
     void OnAcceptButtonPushed();
+    void OnActiveTaskChanged(const std::optional<size_t>& index);
+    void OnCurrentTaskChanged(const std::optional<size_t>& index);
 
 protected:
     void SetFocus() override;
@@ -61,11 +68,12 @@ protected:
 
     void UpdateControls();
 
-    Ui::SegmentationFlowControlView m_Controls;
+    Ui::SegmentationFlowControlView* m_Controls;
 
 private:
     QWidget *m_Parent;
     mitk::NodePredicateBase::Pointer m_SegmentationPredicate;
+    mitk::NodePredicateBase::Pointer m_SegmentationTaskListPredicate;
     QString m_OutputDir;
     QString m_FileExtension;
 };

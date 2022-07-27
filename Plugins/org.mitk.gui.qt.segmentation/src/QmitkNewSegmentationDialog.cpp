@@ -27,9 +27,7 @@ found in the LICENSE file.
 #include <vtkNew.h>
 
 #include <QColorDialog>
-#include <QCompleter>
 #include <QPushButton>
-#include <QStringListModel>
 
 #include <nlohmann/json.hpp>
 
@@ -181,14 +179,10 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget *parent, mitk::La
     m_Ui->buttonBox->button(QDialogButtonBox::Ok)->setText("Create label");
   }
 
-  auto* completer = new QCompleter(QStringList());
-  completer->setCaseSensitivity(Qt::CaseInsensitive);
+  m_Ui->nameComboBox->setFocus();
 
-  m_Ui->nameLineEdit->setCompleter(completer);
-  m_Ui->nameLineEdit->setFocus();
-
-  connect(completer, qOverload<const QString&>(&QCompleter::activated), this, qOverload<const QString&>(&QmitkNewSegmentationDialog::OnSuggestionSelected));
   connect(m_Ui->colorButton, &QToolButton::clicked, this, &QmitkNewSegmentationDialog::OnColorButtonClicked);
+  connect(m_Ui->nameComboBox, &QComboBox::currentTextChanged, this, &QmitkNewSegmentationDialog::OnSuggestionSelected);
   connect(m_Ui->buttonBox, &QDialogButtonBox::accepted, this, &QmitkNewSegmentationDialog::OnAccept);
 
   this->UpdateColorButtonBackground();
@@ -248,7 +242,7 @@ mitk::Color QmitkNewSegmentationDialog::GetColor() const
 
 void QmitkNewSegmentationDialog::SetName(const QString& name)
 {
-  m_Ui->nameLineEdit->setText(name);
+  m_Ui->nameComboBox->setEditText(name);
 }
 
 void QmitkNewSegmentationDialog::SetColor(const mitk::Color& color)
@@ -284,13 +278,13 @@ void QmitkNewSegmentationDialog::UpdateCompleterModel()
   for (const auto& suggestion : m_Suggestions)
     names << suggestion.first;
 
-  auto* completerModel = static_cast<QStringListModel*>(m_Ui->nameLineEdit->completer()->model());
-  completerModel->setStringList(names);
+  m_Ui->nameComboBox->clear();
+  m_Ui->nameComboBox->addItems(names);
 }
 
 void QmitkNewSegmentationDialog::OnAccept()
 {
-  m_Name = m_Ui->nameLineEdit->text();
+  m_Name = m_Ui->nameComboBox->currentText();
   this->accept();
 }
 

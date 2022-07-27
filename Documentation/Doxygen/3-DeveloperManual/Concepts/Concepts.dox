@@ -13,6 +13,7 @@ The following items describe some issues about MITK on a more abstract level.
  -# \subpage DataManagementPage
  -# \subpage ReaderWriterPage
  -# \subpage MitkImagePage
+ -# \subpage MITKSegmentationTaskListsPage
  -# \subpage PropertiesPage
  -# \subpage GeometryOverviewPage
  -# \subpage PipelineingConceptPage

@@ -40,6 +40,9 @@
     </spacer>
    </item>
    <item>
+    <widget class="QmitkSegmentationTaskListWidget" name="segmentationTaskListWidget" native="true"/>
+   </item>
+   <item>
     <widget class="QPushButton" name="btnStoreAndAccept">
      <property name="minimumSize">
       <size>
@@ -77,6 +80,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkSegmentationTaskListWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">internal/QmitkSegmentationTaskListWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
  <designerdata>

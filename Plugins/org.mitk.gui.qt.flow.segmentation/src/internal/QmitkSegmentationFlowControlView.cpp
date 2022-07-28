@@ -130,7 +130,7 @@ void QmitkSegmentationFlowControlView::SaveActiveTask(bool saveAsIntermediateRes
 
       if (segmentationNode != nullptr)
       {
-        QApplication::setOverrideCursor(Qt::BusyCursor);
+        this->BusyCursorOn();
 
         try
         {
@@ -142,7 +142,7 @@ void QmitkSegmentationFlowControlView::SaveActiveTask(bool saveAsIntermediateRes
           MITK_ERROR << e;
         }
 
-        QApplication::restoreOverrideCursor();
+        this->BusyCursorOff();
       }
     }
   }

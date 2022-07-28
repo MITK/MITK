@@ -73,7 +73,7 @@ private:
   void OnSegmentationModified();
   void SetActiveTaskIndex(const std::optional<size_t>& index);
   void SetCurrentTaskIndex(const std::optional<size_t>& index);
-  bool HandleUnsavedChanges();
+  bool HandleUnsavedChanges(const QString& alternativeTitle = QString());
   void SaveActiveTask(bool saveAsIntermediateResult = false);
 
   Ui::QmitkSegmentationTaskListWidget* m_Ui;

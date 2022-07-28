@@ -729,17 +729,25 @@ bool QmitkSegmentationTaskListWidget::ActiveTaskIsShown() const
   return m_ActiveTaskIndex.has_value() && m_CurrentTaskIndex.has_value() && m_ActiveTaskIndex == m_CurrentTaskIndex;
 }
 
-bool QmitkSegmentationTaskListWidget::HandleUnsavedChanges()
+bool QmitkSegmentationTaskListWidget::HandleUnsavedChanges(const QString& alternativeTitle)
 {
   if (m_UnsavedChanges)
   {
     const auto active = m_ActiveTaskIndex.value();
     const auto current = m_CurrentTaskIndex.value();
+    QString title;
 
-    auto title = QString("Load task %1").arg(current + 1);
+    if (alternativeTitle.isEmpty())
+    {
+      title = QString("Load task %1").arg(current + 1);
 
-    if (m_TaskList->HasName(current))
-      title += ": " + QString::fromStdString(m_TaskList->GetName(current));
+      if (m_TaskList->HasName(current))
+        title += ": " + QString::fromStdString(m_TaskList->GetName(current));
+    }
+    else
+    {
+      title = alternativeTitle;
+    }
 
     auto text = QString("The currently active task %1 ").arg(active + 1);
 

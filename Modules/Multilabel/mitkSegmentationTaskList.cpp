@@ -126,10 +126,13 @@ fs::path mitk::SegmentationTaskList::GetAbsolutePath(const fs::path& path) const
     : normalizedPath;
 }
 
-fs::path mitk::SegmentationTaskList::GetIntermediatePath(const fs::path& path) const
+fs::path mitk::SegmentationTaskList::GetInterimPath(const fs::path& path) const
 {
-  auto intermediatePath = path;
-  return intermediatePath.replace_extension(".intermediate" + path.extension().string());
+  if (path.empty() || !path.has_filename())
+    return path;
+
+  auto interimPath = path;
+  return interimPath.replace_extension(".interim" + path.extension().string());
 }
 
 void mitk::SegmentationTaskList::SaveTask(size_t index, const BaseData* segmentation, bool saveAsIntermediateResult)
@@ -138,17 +141,17 @@ void mitk::SegmentationTaskList::SaveTask(size_t index, const BaseData* segmenta
     return;
 
   auto path = this->GetAbsolutePath(this->GetResult(index));
-  auto intermediatePath = this->GetIntermediatePath(path);
+  auto interimPath = this->GetInterimPath(path);
 
   if (fs::exists(path))
     saveAsIntermediateResult = false;
 
   IOUtil::Save(segmentation, saveAsIntermediateResult
-    ? intermediatePath.string()
+    ? interimPath.string()
     : path.string());
 
-  if (!saveAsIntermediateResult && fs::exists(intermediatePath))
-    fs::remove(intermediatePath, std::error_code());
+  if (!saveAsIntermediateResult && fs::exists(interimPath))
+    fs::remove(interimPath, std::error_code());
 }
 
 std::vector<mitk::SegmentationTaskList::Task>::const_iterator mitk::SegmentationTaskList::begin() const

@@ -526,15 +526,15 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
     }
 
     const auto path = m_TaskList->GetAbsolutePath(m_TaskList->GetResult(current));
-    const auto intermediatePath = m_TaskList->GetIntermediatePath(path);
+    const auto interimPath = m_TaskList->GetInterimPath(path);
 
     if (fs::exists(path))
     {
       segmentation = mitk::IOUtil::Load<mitk::LabelSetImage>(path.string());
     }
-    else if (fs::exists(intermediatePath))
+    else if (fs::exists(interimPath))
     {
-      segmentation = mitk::IOUtil::Load<mitk::LabelSetImage>(intermediatePath.string());
+      segmentation = mitk::IOUtil::Load<mitk::LabelSetImage>(interimPath.string());
     }
     else if (m_TaskList->HasSegmentation(current))
     {

@@ -80,7 +80,7 @@ namespace mitk
     fs::path GetInputLocation() const;
     fs::path GetBasePath() const;
     fs::path GetAbsolutePath(const fs::path& path) const;
-    fs::path GetIntermediatePath(const fs::path& path) const;
+    fs::path GetInterimPath(const fs::path& path) const;
 
     void SaveTask(size_t index, const BaseData* segmentation, bool saveAsIntermediateResult = false);
 

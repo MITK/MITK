@@ -282,7 +282,6 @@ void QmitkSegmentationTaskListWidget::OnTaskListChanged(mitk::SegmentationTaskLi
  */
 void QmitkSegmentationTaskListWidget::OnPreviousButtonClicked()
 {
-  const auto maxIndex = m_TaskList->GetNumberOfTasks() - 1;
   auto current = m_CurrentTaskIndex.value();
 
   if (current != 0)

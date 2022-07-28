@@ -72,7 +72,7 @@ private:
   void SetActiveTaskIndex(const std::optional<size_t>& index);
   void SetCurrentTaskIndex(const std::optional<size_t>& index);
   bool HandleUnsavedChanges();
-  void SaveActiveTask();
+  void SaveActiveTask(bool saveAsIntermediateResult = false);
 
   Ui::QmitkSegmentationTaskListWidget* m_Ui;
   QFileSystemWatcher* m_FileSystemWatcher;

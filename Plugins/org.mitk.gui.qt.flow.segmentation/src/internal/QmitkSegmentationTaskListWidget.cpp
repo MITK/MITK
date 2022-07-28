@@ -526,10 +526,15 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
     }
 
     const auto path = m_TaskList->GetAbsolutePath(m_TaskList->GetResult(current));
+    const auto intermediatePath = m_TaskList->GetIntermediatePath(path);
 
     if (fs::exists(path))
     {
       segmentation = mitk::IOUtil::Load<mitk::LabelSetImage>(path.string());
+    }
+    else if (fs::exists(intermediatePath))
+    {
+      segmentation = mitk::IOUtil::Load<mitk::LabelSetImage>(intermediatePath.string());
     }
     else if (m_TaskList->HasSegmentation(current))
     {
@@ -732,7 +737,7 @@ bool QmitkSegmentationTaskListWidget::HandleUnsavedChanges()
     switch (reply)
     {
     case QMessageBox::Save:
-      this->SaveActiveTask();
+      this->SaveActiveTask(!fs::exists(m_TaskList->GetResult(active)));
       break;
 
     case QMessageBox::Discard:
@@ -747,7 +752,7 @@ bool QmitkSegmentationTaskListWidget::HandleUnsavedChanges()
   return true;
 }
 
-void QmitkSegmentationTaskListWidget::SaveActiveTask()
+void QmitkSegmentationTaskListWidget::SaveActiveTask(bool saveAsIntermediateResult)
 {
   if (!m_ActiveTaskIndex.has_value())
     return;
@@ -757,7 +762,7 @@ void QmitkSegmentationTaskListWidget::SaveActiveTask()
   try
   {
     const auto active = m_ActiveTaskIndex.value();
-    m_TaskList->SaveTask(active, this->GetSegmentationDataNode(active)->GetData());
+    m_TaskList->SaveTask(active, this->GetSegmentationDataNode(active)->GetData(), saveAsIntermediateResult);
     this->OnUnsavedChangesSaved();
   }
   catch (const mitk::Exception& e)

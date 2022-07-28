@@ -15,6 +15,7 @@ found in the LICENSE file.
 // Blueberry
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
+#include <berryQtStyleManager.h>
 
 #include <itksys/SystemTools.hxx>
 
@@ -70,11 +71,15 @@ void QmitkSegmentationFlowControlView::CreateQtPartControl(QWidget* parent)
 
   using Self = QmitkSegmentationFlowControlView;
 
-  connect(m_Controls->btnStoreAndAccept, &QPushButton::clicked, this, &Self::OnAcceptButtonPushed);
+  connect(m_Controls->btnStore, &QPushButton::clicked, this, &Self::OnStoreButtonClicked);
+  connect(m_Controls->btnStoreAndAccept, &QPushButton::clicked, this, &Self::OnAcceptButtonClicked);
   connect(m_Controls->segmentationTaskListWidget, &QmitkSegmentationTaskListWidget::ActiveTaskChanged, this, &Self::OnActiveTaskChanged);
   connect(m_Controls->segmentationTaskListWidget, &QmitkSegmentationTaskListWidget::CurrentTaskChanged, this, &Self::OnCurrentTaskChanged);
 
+  m_Controls->btnStore->setIcon(berry::QtStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-save.svg")));
+
   m_Controls->segmentationTaskListWidget->setVisible(false);
+  m_Controls->btnStore->setVisible(false);
   m_Controls->labelStored->setVisible(false);
   UpdateControls();
 
@@ -84,38 +89,16 @@ void QmitkSegmentationFlowControlView::CreateQtPartControl(QWidget* parent)
   m_FileExtension = QString::fromStdString(mitk::BaseApplication::instance().config().getString("flow.outputextension", "nrrd"));
 }
 
-void QmitkSegmentationFlowControlView::OnAcceptButtonPushed()
+void QmitkSegmentationFlowControlView::OnStoreButtonClicked()
+{
+  this->SaveActiveTask(true);
+}
+
+void QmitkSegmentationFlowControlView::OnAcceptButtonClicked()
 {
   if (m_Controls->segmentationTaskListWidget->isVisible())
   {
-    auto* taskList = m_Controls->segmentationTaskListWidget->GetTaskList();
-
-    if (taskList != nullptr)
-    {
-      auto activeTaskIndex = m_Controls->segmentationTaskListWidget->GetActiveTaskIndex();
-
-      if (activeTaskIndex.has_value())
-      {
-        auto segmentationNode = m_Controls->segmentationTaskListWidget->GetSegmentationDataNode(activeTaskIndex.value());
-
-        if (segmentationNode != nullptr)
-        {
-          QApplication::setOverrideCursor(Qt::BusyCursor);
-
-          try
-          {
-            taskList->SaveTask(activeTaskIndex.value(), segmentationNode->GetData());
-            m_Controls->segmentationTaskListWidget->OnUnsavedChangesSaved();
-          }
-          catch (const mitk::Exception& e)
-          {
-            MITK_ERROR << e;
-          }
-
-          QApplication::restoreOverrideCursor();
-        }
-      }
-    }
+    this->SaveActiveTask();
   }
   else
   {
@@ -132,6 +115,38 @@ void QmitkSegmentationFlowControlView::OnAcceptButtonPushed()
   }
 }
 
+void QmitkSegmentationFlowControlView::SaveActiveTask(bool saveAsIntermediateResult)
+{
+  auto* taskList = m_Controls->segmentationTaskListWidget->GetTaskList();
+
+  if (taskList != nullptr)
+  {
+    auto activeTaskIndex = m_Controls->segmentationTaskListWidget->GetActiveTaskIndex();
+
+    if (activeTaskIndex.has_value())
+    {
+      auto segmentationNode = m_Controls->segmentationTaskListWidget->GetSegmentationDataNode(activeTaskIndex.value());
+
+      if (segmentationNode != nullptr)
+      {
+        QApplication::setOverrideCursor(Qt::BusyCursor);
+
+        try
+        {
+          taskList->SaveTask(activeTaskIndex.value(), segmentationNode->GetData(), saveAsIntermediateResult);
+          m_Controls->segmentationTaskListWidget->OnUnsavedChangesSaved();
+        }
+        catch (const mitk::Exception& e)
+        {
+          MITK_ERROR << e;
+        }
+
+        QApplication::restoreOverrideCursor();
+      }
+    }
+  }
+}
+
 void QmitkSegmentationFlowControlView::OnActiveTaskChanged(const std::optional<size_t>&)
 {
   this->UpdateControls();
@@ -145,18 +160,22 @@ void QmitkSegmentationFlowControlView::OnCurrentTaskChanged(const std::optional<
 void QmitkSegmentationFlowControlView::UpdateControls()
 {
   auto dataStorage = this->GetDataStorage();
-
   auto hasTaskList = !dataStorage->GetSubset(m_SegmentationTaskListPredicate)->empty();
+
   m_Controls->segmentationTaskListWidget->setVisible(hasTaskList);
 
   if (hasTaskList)
   {
     auto activeTaskIsShown = m_Controls->segmentationTaskListWidget->ActiveTaskIsShown();
+
+    m_Controls->btnStore->setVisible(activeTaskIsShown);
     m_Controls->btnStoreAndAccept->setEnabled(activeTaskIsShown);
   }
   else
   {
     auto hasSegmentation = !dataStorage->GetSubset(m_SegmentationPredicate)->empty();
+
+    m_Controls->btnStore->setVisible(false);
     m_Controls->btnStoreAndAccept->setEnabled(hasSegmentation);
   }
 }

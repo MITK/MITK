@@ -151,7 +151,10 @@ void mitk::SegmentationTaskList::SaveTask(size_t index, const BaseData* segmenta
     : path.string());
 
   if (!saveAsIntermediateResult && fs::exists(interimPath))
-    fs::remove(interimPath, std::error_code());
+  {
+    std::error_code ec;
+    fs::remove(interimPath, ec);
+  }
 }
 
 std::vector<mitk::SegmentationTaskList::Task>::const_iterator mitk::SegmentationTaskList::begin() const

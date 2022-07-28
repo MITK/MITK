@@ -99,6 +99,7 @@ void QmitkSegmentationFlowControlView::OnAcceptButtonClicked()
   if (m_Controls->segmentationTaskListWidget->isVisible())
   {
     this->SaveActiveTask();
+    m_Controls->segmentationTaskListWidget->LoadNextUnfinishedTask();
   }
   else
   {

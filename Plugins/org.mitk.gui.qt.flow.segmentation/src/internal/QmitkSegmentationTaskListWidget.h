@@ -44,6 +44,7 @@ public:
   mitk::DataNode* GetSegmentationDataNode(size_t index) const;
   void OnUnsavedChangesSaved();
   bool ActiveTaskIsShown() const;
+  void LoadNextUnfinishedTask();
 
 signals:
   void ActiveTaskChanged(const std::optional<size_t>& index);
@@ -61,6 +62,7 @@ private:
   void OnNextButtonClicked();
   void OnCurrentTaskChanged();
   void UpdateLoadButton();
+  void UpdateNavigationButtons();
   void UpdateDetailsLabel();
   void OnLoadButtonClicked();
   mitk::DataNode* GetImageDataNode(size_t index) const;

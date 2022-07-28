@@ -303,13 +303,7 @@ void QmitkSegmentationTaskListWidget::OnPreviousButtonClicked()
   if (current != 0)
     this->SetCurrentTaskIndex(current - 1);
 
-  current = m_CurrentTaskIndex.value();
-
-  if (current == 0)
-    m_Ui->previousButton->setEnabled(false);
-
-  if (current < maxIndex)
-    m_Ui->nextButton->setEnabled(true);
+  this->UpdateNavigationButtons();
 }
 
 /* If possible, change the currently displayed task to the next task.
@@ -323,13 +317,16 @@ void QmitkSegmentationTaskListWidget::OnNextButtonClicked()
   if (current < maxIndex)
     this->SetCurrentTaskIndex(current + 1);
 
-  current = m_CurrentTaskIndex.value();
+  this->UpdateNavigationButtons();
+}
 
-  if (current != 0)
-    m_Ui->previousButton->setEnabled(true);
+void QmitkSegmentationTaskListWidget::UpdateNavigationButtons()
+{
+  const auto maxIndex = m_TaskList->GetNumberOfTasks() - 1;
+  const auto current = m_CurrentTaskIndex.value();
 
-  if (current >= maxIndex)
-    m_Ui->nextButton->setEnabled(false);
+  m_Ui->previousButton->setEnabled(current != 0);
+  m_Ui->nextButton->setEnabled(current != maxIndex);
 }
 
 /* Update affected controls when the currently displayed task changed.
@@ -337,6 +334,7 @@ void QmitkSegmentationTaskListWidget::OnNextButtonClicked()
 void QmitkSegmentationTaskListWidget::OnCurrentTaskChanged()
 {
   this->UpdateLoadButton();
+  this->UpdateNavigationButtons();
   this->UpdateDetailsLabel();
 }
 
@@ -502,6 +500,24 @@ void QmitkSegmentationTaskListWidget::UnloadTasks(const mitk::DataNode* skip)
   this->SetActiveTaskIndex(std::nullopt);
 }
 
+void QmitkSegmentationTaskListWidget::LoadNextUnfinishedTask()
+{
+  const auto current = m_CurrentTaskIndex.value();
+  const auto numTasks = m_TaskList->GetNumberOfTasks();
+
+  for (size_t unboundNext = current; unboundNext < current + numTasks; ++unboundNext)
+  {
+    auto next = unboundNext % numTasks;
+
+    if (!m_TaskList->IsDone(next))
+    {
+      this->SetCurrentTaskIndex(next);
+      this->OnLoadButtonClicked();
+      break;
+    }
+  }
+}
+
 /* Load/activate the currently displayed task. The task must specify
  * an image. The segmentation is either created from scratch with an optional
  * name for the first label, possibly based on a label set preset specified by
@@ -526,10 +542,15 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
     }
 
     const auto path = m_TaskList->GetAbsolutePath(m_TaskList->GetResult(current));
+    const auto interimPath = m_TaskList->GetInterimPath(path);
 
     if (fs::exists(path))
     {
       segmentation = mitk::IOUtil::Load<mitk::LabelSetImage>(path.string());
+    }
+    else if (fs::exists(interimPath))
+    {
+      segmentation = mitk::IOUtil::Load<mitk::LabelSetImage>(interimPath.string());
     }
     else if (m_TaskList->HasSegmentation(current))
     {
@@ -708,17 +729,25 @@ bool QmitkSegmentationTaskListWidget::ActiveTaskIsShown() const
   return m_ActiveTaskIndex.has_value() && m_CurrentTaskIndex.has_value() && m_ActiveTaskIndex == m_CurrentTaskIndex;
 }
 
-bool QmitkSegmentationTaskListWidget::HandleUnsavedChanges()
+bool QmitkSegmentationTaskListWidget::HandleUnsavedChanges(const QString& alternativeTitle)
 {
   if (m_UnsavedChanges)
   {
     const auto active = m_ActiveTaskIndex.value();
     const auto current = m_CurrentTaskIndex.value();
+    QString title;
 
-    auto title = QString("Load task %1").arg(current + 1);
+    if (alternativeTitle.isEmpty())
+    {
+      title = QString("Load task %1").arg(current + 1);
 
-    if (m_TaskList->HasName(current))
-      title += ": " + QString::fromStdString(m_TaskList->GetName(current));
+      if (m_TaskList->HasName(current))
+        title += ": " + QString::fromStdString(m_TaskList->GetName(current));
+    }
+    else
+    {
+      title = alternativeTitle;
+    }
 
     auto text = QString("The currently active task %1 ").arg(active + 1);
 
@@ -732,7 +761,7 @@ bool QmitkSegmentationTaskListWidget::HandleUnsavedChanges()
     switch (reply)
     {
     case QMessageBox::Save:
-      this->SaveActiveTask();
+      this->SaveActiveTask(!fs::exists(m_TaskList->GetResult(active)));
       break;
 
     case QMessageBox::Discard:
@@ -747,7 +776,7 @@ bool QmitkSegmentationTaskListWidget::HandleUnsavedChanges()
   return true;
 }
 
-void QmitkSegmentationTaskListWidget::SaveActiveTask()
+void QmitkSegmentationTaskListWidget::SaveActiveTask(bool saveAsIntermediateResult)
 {
   if (!m_ActiveTaskIndex.has_value())
     return;
@@ -757,7 +786,7 @@ void QmitkSegmentationTaskListWidget::SaveActiveTask()
   try
   {
     const auto active = m_ActiveTaskIndex.value();
-    m_TaskList->SaveTask(active, this->GetSegmentationDataNode(active)->GetData());
+    m_TaskList->SaveTask(active, this->GetSegmentationDataNode(active)->GetData(), saveAsIntermediateResult);
     this->OnUnsavedChangesSaved();
   }
   catch (const mitk::Exception& e)

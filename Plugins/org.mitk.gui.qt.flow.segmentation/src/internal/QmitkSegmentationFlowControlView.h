@@ -55,7 +55,8 @@ public:
 
 protected slots:
 
-    void OnAcceptButtonPushed();
+    void OnStoreButtonClicked();
+    void OnAcceptButtonClicked();
     void OnActiveTaskChanged(const std::optional<size_t>& index);
     void OnCurrentTaskChanged(const std::optional<size_t>& index);
 
@@ -67,6 +68,7 @@ protected:
     void NodeRemoved(const mitk::DataNode* node) override;
 
     void UpdateControls();
+    void SaveActiveTask(bool saveAsIntermediateResult = false);
 
     Ui::SegmentationFlowControlView* m_Controls;
 

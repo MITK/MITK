@@ -44,6 +44,7 @@ public:
   mitk::DataNode* GetSegmentationDataNode(size_t index) const;
   void OnUnsavedChangesSaved();
   bool ActiveTaskIsShown() const;
+  void LoadNextUnfinishedTask();
 
 signals:
   void ActiveTaskChanged(const std::optional<size_t>& index);
@@ -61,6 +62,7 @@ private:
   void OnNextButtonClicked();
   void OnCurrentTaskChanged();
   void UpdateLoadButton();
+  void UpdateNavigationButtons();
   void UpdateDetailsLabel();
   void OnLoadButtonClicked();
   mitk::DataNode* GetImageDataNode(size_t index) const;
@@ -71,8 +73,8 @@ private:
   void OnSegmentationModified();
   void SetActiveTaskIndex(const std::optional<size_t>& index);
   void SetCurrentTaskIndex(const std::optional<size_t>& index);
-  bool HandleUnsavedChanges();
-  void SaveActiveTask();
+  bool HandleUnsavedChanges(const QString& alternativeTitle = QString());
+  void SaveActiveTask(bool saveAsIntermediateResult = false);
 
   Ui::QmitkSegmentationTaskListWidget* m_Ui;
   QFileSystemWatcher* m_FileSystemWatcher;

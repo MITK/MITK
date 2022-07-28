@@ -38,13 +38,10 @@ public:
   explicit QmitkSegmentationTaskListWidget(QWidget* parent = nullptr);
   ~QmitkSegmentationTaskListWidget() override;
 
-  mitk::SegmentationTaskList* GetTaskList() const;
-  std::optional<size_t> GetActiveTaskIndex() const;
-  std::optional<size_t> GetCurrentTaskIndex() const;
-  mitk::DataNode* GetSegmentationDataNode(size_t index) const;
-  void OnUnsavedChangesSaved();
   bool ActiveTaskIsShown() const;
   void LoadNextUnfinishedTask();
+  void SaveActiveTask(bool saveAsIntermediateResult = false);
+  bool OnPreShutdown();
 
 signals:
   void ActiveTaskChanged(const std::optional<size_t>& index);
@@ -74,7 +71,8 @@ private:
   void SetActiveTaskIndex(const std::optional<size_t>& index);
   void SetCurrentTaskIndex(const std::optional<size_t>& index);
   bool HandleUnsavedChanges(const QString& alternativeTitle = QString());
-  void SaveActiveTask(bool saveAsIntermediateResult = false);
+  mitk::DataNode* GetSegmentationDataNode(size_t index) const;
+  void OnUnsavedChangesSaved();
 
   Ui::QmitkSegmentationTaskListWidget* m_Ui;
   QFileSystemWatcher* m_FileSystemWatcher;

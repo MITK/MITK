@@ -131,21 +131,6 @@ QmitkSegmentationTaskListWidget::~QmitkSegmentationTaskListWidget()
 {
 }
 
-mitk::SegmentationTaskList* QmitkSegmentationTaskListWidget::GetTaskList() const
-{
-  return m_TaskList;
-}
-
-std::optional<size_t> QmitkSegmentationTaskListWidget::GetActiveTaskIndex() const
-{
-  return m_ActiveTaskIndex;
-}
-
-std::optional<size_t> QmitkSegmentationTaskListWidget::GetCurrentTaskIndex() const
-{
-  return m_CurrentTaskIndex;
-}
-
 void QmitkSegmentationTaskListWidget::OnUnsavedChangesSaved()
 {
   if (m_UnsavedChanges)
@@ -795,4 +780,9 @@ void QmitkSegmentationTaskListWidget::SaveActiveTask(bool saveAsIntermediateResu
   }
 
   QApplication::restoreOverrideCursor();
+}
+
+bool QmitkSegmentationTaskListWidget::OnPreShutdown()
+{
+  return this->HandleUnsavedChanges(QStringLiteral("Application shutdown"));
 }

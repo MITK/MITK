@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
 #include <berryQtStyleManager.h>
+#include <berryPlatformUI.h>
 
 #include <itksys/SystemTools.hxx>
 
@@ -55,6 +56,20 @@ QmitkSegmentationFlowControlView::QmitkSegmentationFlowControlView()
   m_SegmentationTaskListPredicate = mitk::NodePredicateAnd::New(
     mitk::TNodePredicateDataType<mitk::SegmentationTaskList>::New(),
     notHelperObject);
+
+  berry::PlatformUI::GetWorkbench()->AddWorkbenchListener(this);
+}
+
+QmitkSegmentationFlowControlView::~QmitkSegmentationFlowControlView()
+{
+  berry::PlatformUI::GetWorkbench()->RemoveWorkbenchListener(this);
+}
+
+bool QmitkSegmentationFlowControlView::PreShutdown(berry::IWorkbench*, bool)
+{
+  return m_Controls->segmentationTaskListWidget != nullptr
+    ? m_Controls->segmentationTaskListWidget->OnPreShutdown()
+    : true;
 }
 
 void QmitkSegmentationFlowControlView::SetFocus()
@@ -64,9 +79,7 @@ void QmitkSegmentationFlowControlView::SetFocus()
 
 void QmitkSegmentationFlowControlView::CreateQtPartControl(QWidget* parent)
 {
-  // create GUI widgets from the Qt Designer's .ui file
   m_Controls->setupUi(parent);
-
   m_Parent = parent;
 
   using Self = QmitkSegmentationFlowControlView;
@@ -77,11 +90,13 @@ void QmitkSegmentationFlowControlView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls->segmentationTaskListWidget, &QmitkSegmentationTaskListWidget::CurrentTaskChanged, this, &Self::OnCurrentTaskChanged);
 
   m_Controls->btnStore->setIcon(berry::QtStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-save.svg")));
+  m_Controls->btnStore->setVisible(false);
 
   m_Controls->segmentationTaskListWidget->setVisible(false);
-  m_Controls->btnStore->setVisible(false);
+
   m_Controls->labelStored->setVisible(false);
-  UpdateControls();
+
+  this->UpdateControls();
 
   m_OutputDir = QString::fromStdString(mitk::BaseApplication::instance().config().getString("flow.outputdir", itksys::SystemTools::GetCurrentWorkingDirectory()));
   m_OutputDir = QDir::fromNativeSeparators(m_OutputDir);
@@ -91,14 +106,14 @@ void QmitkSegmentationFlowControlView::CreateQtPartControl(QWidget* parent)
 
 void QmitkSegmentationFlowControlView::OnStoreButtonClicked()
 {
-  this->SaveActiveTask(true);
+  m_Controls->segmentationTaskListWidget->SaveActiveTask(true);
 }
 
 void QmitkSegmentationFlowControlView::OnAcceptButtonClicked()
 {
   if (m_Controls->segmentationTaskListWidget->isVisible())
   {
-    this->SaveActiveTask();
+    m_Controls->segmentationTaskListWidget->SaveActiveTask();
     m_Controls->segmentationTaskListWidget->LoadNextUnfinishedTask();
   }
   else
@@ -113,38 +128,6 @@ void QmitkSegmentationFlowControlView::OnAcceptButtonClicked()
     }
 
     m_Controls->labelStored->setVisible(true);
-  }
-}
-
-void QmitkSegmentationFlowControlView::SaveActiveTask(bool saveAsIntermediateResult)
-{
-  auto* taskList = m_Controls->segmentationTaskListWidget->GetTaskList();
-
-  if (taskList != nullptr)
-  {
-    auto activeTaskIndex = m_Controls->segmentationTaskListWidget->GetActiveTaskIndex();
-
-    if (activeTaskIndex.has_value())
-    {
-      auto segmentationNode = m_Controls->segmentationTaskListWidget->GetSegmentationDataNode(activeTaskIndex.value());
-
-      if (segmentationNode != nullptr)
-      {
-        this->BusyCursorOn();
-
-        try
-        {
-          taskList->SaveTask(activeTaskIndex.value(), segmentationNode->GetData(), saveAsIntermediateResult);
-          m_Controls->segmentationTaskListWidget->OnUnsavedChangesSaved();
-        }
-        catch (const mitk::Exception& e)
-        {
-          MITK_ERROR << e;
-        }
-
-        this->BusyCursorOff();
-      }
-    }
   }
 }
 

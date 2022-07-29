@@ -40,7 +40,7 @@ namespace mitk
   std::vector<itk::SmartPointer<BaseData> > RTPlanReaderService::DoRead()
   {
     std::vector<itk::SmartPointer<mitk::BaseData> > result;
-    auto DICOMTagsOfInterestService = GetDicomTagsOfInterestService();
+    auto DICOMTagsOfInterestService = DICOMIOHelper::GetTagsOfInterestService();
     auto tagsOfInterest = DICOMTagsOfInterestService->GetTagsOfInterest();
     DICOMTagPathList tagsOfInterestList;
     for (const auto& tag : tagsOfInterest) {
@@ -60,14 +60,14 @@ namespace mitk
       return result;
     }
 
-    auto findings = ExtractPathsOfInterest(tagsOfInterestList, frames);
+    auto findings = DICOMIOHelper::ExtractPathsOfInterest(tagsOfInterestList, frames);
 
     //just create empty image. No image information available in RTPLAN. But properties will be attached.
     Image::Pointer dummyImage = Image::New();
     mitk::PixelType pt = mitk::MakeScalarPixelType<int>();
     unsigned int dim[] = { 1,1};
     dummyImage->Initialize(pt, 2, dim);
-    SetProperties(dummyImage, findings);
+    DICOMIOHelper::SetProperties(dummyImage, findings);
 
     result.push_back(dummyImage.GetPointer());
 

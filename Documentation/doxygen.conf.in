@@ -2063,13 +2063,14 @@ PREDEFINED             = itkNotUsed(x)= \
                          VXL_BIG_ENDIAN=1 \
                          VXL_LITTLE_ENDIAN=0 \
                          VNL_DLL_DATA= \
-                         size_t=vcl_size_t \
                          "US_PREPEND_NAMESPACE(x)=us::x" \
                          "US_BEGIN_NAMESPACE= namespace us {" \
                          "US_END_NAMESPACE=}" \
                          "US_BASECLASS_NAME=itk::LightObject" \
                          US_EXPORT= \
                          "DEPRECATED(func)=func" \
+                         "mitkSegmentationTaskValueMacro(type, name)=bool Has##name() const; type Get##name() const; void Set##name(const type& value);" \
+                         "mitkSegmentationTaskListValueMacro(type, name)=bool Has##name(size_t index) const; type Get##name(size_t index) const; void SetDefault##name(const type& value);" \
                          @US_PLATFORM@
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this

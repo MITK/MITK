@@ -731,7 +731,7 @@ bool QmitkDataStorageTreeModel::setData(const QModelIndex &index, const QVariant
 
   if (role == Qt::EditRole && !value.toString().isEmpty())
   {
-    dataNode->SetStringProperty("name", value.toString().toStdString().c_str());
+    dataNode->SetName(value.toString().toStdString());
 
     mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(dataNode->GetData());
 

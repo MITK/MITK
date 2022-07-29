@@ -22,6 +22,10 @@ found in the LICENSE file.
 #include <mitkNodePredicateOr.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkRemeshing.h>
+#include <mitkVtkRepresentationProperty.h>
+
+#include <vtkPolyData.h>
+#include <vtkProperty.h>
 
 const std::string QmitkRemeshingView::VIEW_ID = "org.mitk.views.remeshing";
 
@@ -38,7 +42,7 @@ void QmitkRemeshingView::CreateQtPartControl(QWidget* parent)
 {
   m_Controls->setupUi(parent);
 
-  m_Controls->decimatePushButton->setIcon(berry::QtStyleManager::ThemeIcon(QStringLiteral(":/Remeshing/RemeshingIcon.svg")));
+  m_Controls->remeshPushButton->setIcon(berry::QtStyleManager::ThemeIcon(QStringLiteral(":/Remeshing/RemeshingIcon.svg")));
 
   m_Controls->selectionWidget->SetDataStorage(this->GetDataStorage());
   m_Controls->selectionWidget->SetSelectionIsOptional(true);
@@ -51,45 +55,80 @@ void QmitkRemeshingView::CreateQtPartControl(QWidget* parent)
       mitk::NodePredicateProperty::New("hidden object")))));
 
   connect(m_Controls->selectionWidget, &QmitkSingleNodeSelectionWidget::CurrentSelectionChanged, this, &QmitkRemeshingView::OnSurfaceChanged);
-  connect(m_Controls->vertexCountSlider, SIGNAL(valueChanged(int)), this, SLOT(OnVertexCountChanged(int)));
-  connect(m_Controls->vertexCountSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnVertexCountChanged(int)));
-  connect(m_Controls->calculateNormalsCheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnCalculateNormalsChanged(int)));
-  connect(m_Controls->decimatePushButton, SIGNAL(clicked()), this, SLOT(OnDecimateButtonClicked()));
+  connect(m_Controls->densitySlider, SIGNAL(valueChanged(int)), this, SLOT(OnDensityChanged(int)));
+  connect(m_Controls->densitySpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnDensityChanged(int)));
+  connect(m_Controls->remeshPushButton, SIGNAL(clicked()), this, SLOT(OnRemeshButtonClicked()));
 
   this->OnSurfaceChanged(m_Controls->selectionWidget->GetSelectedNodes());
 }
 
 void QmitkRemeshingView::OnSurfaceChanged(const QmitkSingleNodeSelectionWidget::NodeList& nodes)
 {
-  this->EnableWidgets(!nodes.empty() && nodes.front().IsNotNull());
+  if (!nodes.empty() && nodes.front().IsNotNull())
+  {
+    m_MaxNumberOfVertices = static_cast<int>(static_cast<mitk::Surface*>(nodes.front()->GetData())->GetVtkPolyData()->GetNumberOfPoints());
+    this->EnableWidgets(true);
+  }
+  else
+  {
+    m_MaxNumberOfVertices = 0;
+    this->EnableWidgets(false);
+  }
 }
 
-void QmitkRemeshingView::OnVertexCountChanged(int vertexCount)
+void QmitkRemeshingView::OnDensityChanged(int density)
 {
-  if (vertexCount != m_Controls->vertexCountSlider->value())
-    m_Controls->vertexCountSlider->setValue(vertexCount);
+  if (density != m_Controls->densitySlider->value())
+    m_Controls->densitySlider->setValue(density);
 
-  if (vertexCount != m_Controls->vertexCountSpinBox->value())
-    m_Controls->vertexCountSpinBox->setValue(vertexCount);
+  if (density != m_Controls->densitySpinBox->value())
+    m_Controls->densitySpinBox->setValue(density);
 }
 
-void QmitkRemeshingView::OnCalculateNormalsChanged(int checkState)
+void QmitkRemeshingView::OnRemeshButtonClicked()
 {
-  m_Controls->flipNormalsCheckBox->setEnabled(Qt::Unchecked != checkState);
-}
+  auto selectedNode = m_Controls->selectionWidget->GetSelectedNode();
+  mitk::Surface::ConstPointer surface = static_cast<mitk::Surface*>(selectedNode->GetData());
 
-void QmitkRemeshingView::OnDecimateButtonClicked()
-{
-  mitk::DataNode::Pointer selectedNode = m_Controls->selectionWidget->GetSelectedNode();
-  mitk::Surface::ConstPointer input = static_cast<mitk::Surface*>(selectedNode->GetData());
-  mitk::Surface::Pointer output;
+  int density = m_Controls->densitySpinBox->value();
+  int numVertices = std::max(100, static_cast<int>(m_MaxNumberOfVertices * (density * 0.01)));
+
+  double gradation = m_Controls->remeshingComboBox->currentText() == QStringLiteral("Adaptive")
+    ? 1.0
+    : 0.0;
+
+  const QString quality = m_Controls->qualityComboBox->currentText();
+  int subsampling;
+
+  if (QStringLiteral("High (slow)") == quality)
+  {
+    subsampling = 50;
+  }
+  else if (QStringLiteral("Maximum (very slow)") == quality)
+  {
+    subsampling = 500;
+  }
+  else // The default is "Medium (fast)".
+  {
+    subsampling = 10;
+  }
+
+  bool boundaryFixing = m_Controls->preserveEdgesCheckBox->isChecked();
+
+  auto remesher = mitk::RemeshFilter::New();
+  remesher->SetInput(surface);
+  remesher->SetTimeStep(0);
+  remesher->SetNumVertices(numVertices);
+  remesher->SetGradation(gradation);
+  remesher->SetSubsampling(subsampling);
+  remesher->SetEdgeSplitting(0.0);
+  remesher->SetOptimizationLevel(1.0);
+  remesher->SetForceManifold(false);
+  remesher->SetBoundaryFixing(boundaryFixing);
 
   try
   {
-    output = mitk::Remeshing::Decimate(input,
-      0.01 * m_Controls->vertexCountSpinBox->value(),
-      m_Controls->calculateNormalsCheckBox->isChecked(),
-      m_Controls->flipNormalsCheckBox->isChecked());
+    remesher->Update();
   }
   catch(const mitk::Exception& exception)
   {
@@ -97,27 +136,29 @@ void QmitkRemeshingView::OnDecimateButtonClicked()
     return;
   }
 
-  if (output.IsNull())
-    return;
+  mitk::Surface::Pointer remeshedSurface = remesher->GetOutput();
 
   auto newNode = mitk::DataNode::New();
-  newNode->SetName(QString("%1 (decimated)").arg(selectedNode->GetName().c_str()).toStdString());
-  newNode->SetData(output);
+  newNode->SetName(QString("%1 (%2%)").arg(selectedNode->GetName().c_str()).arg(density).toStdString());
+  newNode->SetProperty("material.representation", mitk::VtkRepresentationProperty::New(VTK_WIREFRAME));
+  newNode->SetData(remeshedSurface);
 
   this->GetDataStorage()->Add(newNode, selectedNode);
 }
 
 void QmitkRemeshingView::EnableWidgets(bool enable)
 {
-  m_Controls->vertexCountSlider->setEnabled(enable);
-  m_Controls->vertexCountSpinBox->setEnabled(enable);
-  m_Controls->calculateNormalsCheckBox->setEnabled(enable);
-  m_Controls->flipNormalsCheckBox->setEnabled(enable && m_Controls->calculateNormalsCheckBox->isChecked());
-  m_Controls->decimatePushButton->setEnabled(enable);
+  m_Controls->densitySlider->setEnabled(enable);
+  m_Controls->densitySpinBox->setEnabled(enable);
+  m_Controls->remeshingComboBox->setEnabled(enable);
+  m_Controls->qualityComboBox->setEnabled(enable);
+  m_Controls->preserveEdgesCheckBox->setEnabled(enable);
+  m_Controls->remeshPushButton->setEnabled(enable);
+
+  m_Controls->explanationLabel->setVisible(enable);
 }
 
 void QmitkRemeshingView::SetFocus()
 {
   m_Controls->selectionWidget->setFocus();
 }
-

@@ -1,21 +1,20 @@
 #-----------------------------------------------------------------------------
-# OpenMesh
+# ACVD
 #-----------------------------------------------------------------------------
 
-if(MITK_USE_OpenMesh)
+if(MITK_USE_ACVD)
   # Sanity checks
-  if(DEFINED OpenMesh_DIR AND NOT EXISTS "${OpenMesh_DIR}")
-    message(FATAL_ERROR "OpenMesh_DIR variable is defined but corresponds to non-existing directory")
+  if(DEFINED ACVD_DIR AND NOT EXISTS ${ACVD_DIR})
+    message(FATAL_ERROR "ACVD_DIR variable is defined but corresponds to non-existing directory")
   endif()
 
-  set(proj OpenMesh)
-  set(proj_DEPENDENCIES )
-  set(OpenMesh_DEPENDS ${proj})
+  set(proj ACVD)
+  set(proj_DEPENDENCIES VTK)
+  set(ACVD_DEPENDS ${proj})
 
-  if(NOT DEFINED OpenMesh_DIR)
+  if(NOT DEFINED ACVD_DIR)
 
     set(additional_args )
-
     if(CTEST_USE_LAUNCHERS)
       list(APPEND additional_args
         "-DCMAKE_PROJECT_${proj}_INCLUDE:FILEPATH=${CMAKE_ROOT}/Modules/CTestUseLaunchers.cmake"
@@ -24,24 +23,25 @@ if(MITK_USE_OpenMesh)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/OpenMesh-8.1.tar.gz
-      URL_MD5 9e1eb6feeca3882ab95f9fc97681a4da
+      GIT_REPOSITORY https://github.com/valette/ACVD.git
+      GIT_TAG e583e278
       CMAKE_GENERATOR ${gen}
       CMAKE_GENERATOR_PLATFORM ${gen_platform}
       CMAKE_ARGS
         ${ep_common_args}
         ${additional_args}
+        -DUSE_MULTITHREADING:BOOL=ON
+        -DBUILD_EXAMPLES:BOOL=OFF
+        -DQt5_DIR:PATH=${Qt5_DIR}
+        -DVTK_DIR:PATH=${VTK_DIR}
       CMAKE_CACHE_ARGS
         ${ep_common_cache_args}
-        -DBUILD_APPS:BOOL=OFF
-        -DOPENMESH_BUILD_SHARED:BOOL=ON
-        -DOPENMESH_DOCS:BOOL=OFF
       CMAKE_CACHE_DEFAULT_ARGS
         ${ep_common_cache_default_args}
       DEPENDS ${proj_DEPENDENCIES}
     )
 
-    set(OpenMesh_DIR "${ep_prefix}")
+    set(ACVD_DIR ${ep_prefix})
     mitkFunctionInstallExternalCMakeProject(${proj})
 
   else()

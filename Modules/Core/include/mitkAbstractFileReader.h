@@ -95,6 +95,8 @@ namespace mitk
      */
     std::vector< std::string > GetReadFiles() override;
 
+    void SetProperties(const PropertyList* properties) override;
+
   protected:
     /**
      * @brief An input stream wrapper.
@@ -222,6 +224,8 @@ namespace mitk
     std::string GetLocalFileName() const;
 
     virtual void SetDefaultDataNodeProperties(DataNode *node, const std::string &filePath);
+
+    const PropertyList* GetProperties() const override;
 
     std::vector< std::string > m_ReadFiles;
 

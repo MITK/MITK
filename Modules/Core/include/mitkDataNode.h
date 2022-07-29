@@ -399,20 +399,40 @@ namespace mitk
     /**
      * \brief Extra convenience access method to set the name of an object.
      *
-     * The name will be stored in the non-renderer-specific PropertyList in a StringProperty named "name".
+     * If the data has already a "name" property, the name will be stored in it. Otherwise, the name will be stored in
+     * the non-renderer-specific PropertyList in a StringProperty named "name".
      */
     virtual void SetName(const char *name)
     {
       if (name == nullptr)
         return;
-      this->SetProperty("name", StringProperty::New(name));
+
+      auto* data = this->GetData();
+
+      if (nullptr != data)
+      {
+        auto property = data->GetProperty("name");
+
+        if (property.IsNotNull())
+        {
+          auto* stringProperty = dynamic_cast<StringProperty*>(property.GetPointer());
+
+          if (nullptr != stringProperty)
+          {
+            stringProperty->SetValue(name);
+            return;
+          }
+        }
+      }
+
+      this->SetStringProperty("name", name);
     }
     /**
      * \brief Extra convenience access method to set the name of an object.
      *
-     * The name will be stored in the non-renderer-specific PropertyList in a StringProperty named "name".
+     * \sa SetName(const char*)
      */
-    virtual void SetName(const std::string name) { this->SetName(name.c_str()); }
+    virtual void SetName(const std::string& name) { this->SetName(name.c_str()); }
     /**
      * \brief Convenience access method for visibility properties (instances
      * of BoolProperty with property-key "visible")

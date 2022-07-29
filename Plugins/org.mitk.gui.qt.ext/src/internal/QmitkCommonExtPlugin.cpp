@@ -97,6 +97,16 @@ void QmitkCommonExtPlugin::loadDataFromDisk(const QStringList &arguments, bool g
            mitk::ProgressBar::GetInstance()->Progress(2);
            argumentsAdded++;
          }
+         else if (arguments[i].right(15) == ".mitksceneindex")
+         {
+           mitk::SceneIO::Pointer sceneIO = mitk::SceneIO::New();
+
+           bool clearDataStorageFirst(false);
+           mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
+           dataStorage = sceneIO->LoadSceneUnzipped(arguments[i].toLocal8Bit().constData(), dataStorage, clearDataStorageFirst);
+           mitk::ProgressBar::GetInstance()->Progress(2);
+           argumentsAdded++;
+         }
          else
          {
            try

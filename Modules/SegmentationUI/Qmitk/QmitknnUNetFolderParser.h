@@ -13,7 +13,6 @@ found in the LICENSE file.s
 #ifndef QmitknnUNetFolderParser_h_Included
 #define QmitknnUNetFolderParser_h_Included
 
-#include "QmitknnUNetToolGUI.h"
 #include <QDirIterator>
 #include <QString>
 #include <vector>
@@ -35,7 +34,7 @@ struct FolderNode
  * No. of sub levels in the hierachry is defined in the LEVEL constant.
  *
  */
-class MITKSEGMENTATIONUI_EXPORT QmitknnUNetFolderParser
+class QmitknnUNetFolderParser
 {
 public:
   /**
@@ -43,27 +42,18 @@ public:
    * Initializes root folder node object pointer calls
    * @param parentFolder
    */
-  QmitknnUNetFolderParser(const QString parentFolder)
-  {
-    m_RootNode = std::make_shared<FolderNode>();
-    m_RootNode->path = parentFolder;
-    m_RootNode->name = QString("nnUNet");
-    m_RootNode->subFolders.clear();
-    InitDirs(m_RootNode, 0);
-  }
-
+  QmitknnUNetFolderParser(const QString parentFolder);
   /**
    * @brief Destroy the QmitknnUNetFolderParser object
    *
    */
-  ~QmitknnUNetFolderParser() = default; /*{ DeleteDirs(m_RootNode, LEVEL); }*/
-
+  ~QmitknnUNetFolderParser() = default;
   /**
    * @brief Returns the "Results Folder" string which is parent path of the root node.
    *
    * @return QString
    */
-  QString getResultsFolder() { return m_RootNode->path; }
+  QString getResultsFolder(); 
 
   /**
    * @brief Returns the Model Names from root node. Template function,
@@ -192,26 +182,7 @@ private:
    * @param level 
    * @return std::function<bool(QString)> 
    */
-  std::function<bool(QString)> RuleEngine(int level)
-  {
-    if (level == m_LEVEL - 1)
-    {
-      return [](QString path)
-      {
-        return (QFile::exists(path + QDir::separator() + QString("model_final_checkpoint.model")) &&
-                QFile::exists(path + QDir::separator() + QString("model_final_checkpoint.model.pkl")) &&
-                QFile::exists(path + QDir::separator() + QString("debug.json")));
-      };
-    }
-    if (level == m_LEVEL - 2)
-    {
-      return [](QString path) { return QFile::exists(path + QDir::separator() + QString("plans.pkl")); };
-    }
-    else
-    {
-      return [](QString /*path*/) { return true; };
-    }
-  }
+  std::function<bool(QString)> RuleEngine(int level);
 
   /**
    * @brief Iterates through the root node and returns the sub FolderNode object Matching Name Crietria
@@ -220,21 +191,7 @@ private:
    * @param parentNode
    * @return std::shared_ptr<FolderNode>
    */
-  std::shared_ptr<FolderNode> GetSubNodeMatchingNameCrietria(const QString &queryName,
-                                                             std::shared_ptr<FolderNode> parentNode)
-  {
-    std::shared_ptr<FolderNode> retNode;
-    std::vector<std::shared_ptr<FolderNode>> subNodes = parentNode->subFolders;
-    for (std::shared_ptr<FolderNode> node : subNodes)
-    {
-      if (node->name == queryName)
-      {
-        retNode = node;
-        break;
-      }
-    }
-    return retNode;
-  }
+  std::shared_ptr<FolderNode> GetSubNodeMatchingNameCrietria(const QString &queryName, std::shared_ptr<FolderNode> parentNode);
 
   /**
    * @brief Returns the sub folder names for a folder node object. Template function,
@@ -263,24 +220,7 @@ private:
    * @param parent
    * @param level
    */
-  void InitDirs(std::shared_ptr<FolderNode> parent, int level)
-  {
-    QString searchFolder = parent->path + QDir::separator() + parent->name;
-    auto rules = RuleEngine(level);
-    auto subFolders = FetchFoldersFromDir<QStringList>(searchFolder, rules);
-    level++;
-    foreach (QString folder, subFolders)
-    {
-      std::shared_ptr<FolderNode> fp = std::make_shared<FolderNode>();
-      fp->path = searchFolder;
-      fp->name = folder;
-      if (level < this->m_LEVEL)
-      {
-        InitDirs(fp, level);
-      }
-      parent->subFolders.push_back(fp);
-    }
-  }
+  void InitDirs(std::shared_ptr<FolderNode> parent, int level);
 
   /**
    * @brief Iterates through the sub folder hierarchy upto a level provided
@@ -289,18 +229,7 @@ private:
    * @param parent
    * @param level
    */
-  void DeleteDirs(std::shared_ptr<FolderNode> parent, int level)
-  {
-    level++;
-    for (std::shared_ptr<FolderNode> subFolder : parent->subFolders)
-    {
-      if (level < m_LEVEL)
-      {
-        DeleteDirs(subFolder, level);
-      }
-      parent->subFolders.clear();
-    }
-  }
+  void DeleteDirs(std::shared_ptr<FolderNode> parent, int level);
 
   /**
    * @brief Template function to fetch all folders inside a given path.

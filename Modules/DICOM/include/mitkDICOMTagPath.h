@@ -40,7 +40,7 @@ namespace mitk
     {
       enum class NodeType
       {
-        Invalid = 0,  //*< Node is non existant or invalid.
+        Invalid = 0,  //*< Node is non existent or invalid.
         Element,  //*< Selects an specific element given the node name.
         SequenceSelection, //*< Selects an specific item in a sequence of items and has a item selector ("[n]").
         AnySelection, //*< Selects all items of a specific element ("[*]").
@@ -126,7 +126,7 @@ namespace mitk
 
     /**Checks if to DICOMTagPathes are specify the same node. Hence all wildcards will be processed.\n
     * E.G.: "item1/child1/grandChild2" == ".//item1//grandChild2" is true.
-    * \remark If you want to check if to pathes are "truely" equal and not only equal in terms of
+    * \remark If you want to check if two paths are "truly" equal and not only equal in terms of
     * pointing to the same node, use the member function Equals()*/
     bool Equals(const DICOMTagPath& path) const;
 

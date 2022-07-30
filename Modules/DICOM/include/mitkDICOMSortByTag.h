@@ -26,7 +26,7 @@ namespace mitk
    1. numerical value if possible (i.e. both datasets have a value that is numerical)
    2. alphabetical order otherwise
 
-  If the comparison results in equalness, it is refered to the secondary criterion, see
+  If the comparison results in equalness, it is referred to the secondary criterion, see
   DICOMSortByTag::NextLevelIsLeftBeforeRight().
 
 */

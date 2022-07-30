@@ -256,8 +256,8 @@ mitk::TestDICOMLoading::DumpImageInformation( const Image* image )
 
       result << "  " << "TimeBounds: ";
       ///////////////////////////////////////
-      // Workarround T27883. See https://phabricator.mitk.org/T27883#219473 for more details.
-      // This workarround should be removed as soon as T28262 is solved!
+      // Workaround T27883. See https://phabricator.mitk.org/T27883#219473 for more details.
+      // This workaround should be removed as soon as T28262 is solved!
       TimeBounds timeBounds = timeGeometry->GetTimeBounds();
       auto atg = dynamic_cast<const mitk::ArbitraryTimeGeometry*>(timeGeometry);
       if (atg && atg->HasCollapsedFinalTimeStep())
@@ -267,7 +267,7 @@ mitk::TestDICOMLoading::DumpImageInformation( const Image* image )
       //Original code:
       //const TimeBounds timeBounds = timeGeometry->GetTimeBounds();
       //
-      // End of workarround for T27883
+      // End of workaround for T27883
       //////////////////////////////////////
       for (unsigned int i = 0; i < 2; ++i)
         result << timeBounds[i] << " ";

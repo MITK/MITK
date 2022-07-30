@@ -258,7 +258,7 @@ mitk::ITKDICOMSeriesReaderHelper
 
   // if tilt positive, then we need additional pixels BELOW origin, otherwise we need pixels behind the end of the block
 
-  // in any case we need more size to accomodate shifted slices
+  // in any case we need more size to accommodate shifted slices
   typename ImageType::SizeType largerSize = resampler->GetSize(); // now the resampler already holds the input image's size.
   const double imageSizeZ = largerSize[2];
   //MITK_DEBUG <<"Calculate lager size = " << largerSize[1] << " + " << tiltInfo.GetTiltCorrectedAdditionalSize(imageSizeZ) << " / " << input->GetSpacing()[1] << "+ 2.0";

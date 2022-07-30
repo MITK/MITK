@@ -436,7 +436,7 @@ double mitk::DICOMImageBlockDescriptor::stringtodouble( const std::string& str )
   }
   else
   {
-    throw std::invalid_argument( "Argument is not a convertable number" );
+    throw std::invalid_argument( "Argument is not a convertible number" );
   }
 }
 
@@ -483,7 +483,7 @@ mitk::Image::Pointer mitk::DICOMImageBlockDescriptor::DescribeImageWithPropertie
   /////////////////////////////////////////////////////////////////////////////
 
   // first part: add some tags that describe individual slices
-  // these propeties are defined at analysis time (see UpdateImageDescribingProperties())
+  // these properties are defined at analysis time (see UpdateImageDescribingProperties())
 
   const char* propertyKeySliceLocation  = "dicom.image.0020.1041";
   const char* propertyKeyInstanceNumber = "dicom.image.0020.0013";

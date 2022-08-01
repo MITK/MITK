@@ -29,6 +29,7 @@ QmitkEditableContourToolGUIBase::QmitkEditableContourToolGUIBase() : QmitkToolGU
   connect(this, SIGNAL(NewToolAssociated(mitk::Tool *)), this, SLOT(OnNewToolAssociated(mitk::Tool *)));
   connect(m_Controls.m_InformationCheckBox, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)));
   connect(m_Controls.m_AutoCheck, SIGNAL(toggled(bool)), this, SLOT(OnAutoConfirm(bool)));
+  connect(m_Controls.m_AddMode, SIGNAL(toggled(bool)), this, SLOT(OnAddModeToogled(bool)));
 }
 
 QmitkEditableContourToolGUIBase::~QmitkEditableContourToolGUIBase()
@@ -45,6 +46,8 @@ void QmitkEditableContourToolGUIBase::OnNewToolAssociated(mitk::Tool *tool)
 
   const auto autoConfirm = m_NewTool->GetAutoConfirm();
   m_Controls.m_AutoCheck->setChecked(autoConfirm);
+  const auto addMode = m_NewTool->GetAddMode();
+  m_Controls.m_AddMode->setChecked(addMode);
   this->OnAutoConfirm(autoConfirm);
 }
 
@@ -52,7 +55,6 @@ void QmitkEditableContourToolGUIBase::OnConfirmSegmentation()
 {
   if (m_NewTool.IsNotNull())
   {
-    m_NewTool->SetAddMode(m_Controls.m_AddMode->isChecked());
     m_NewTool->ConfirmSegmentation();
   }
 }
@@ -89,3 +91,10 @@ void QmitkEditableContourToolGUIBase::OnAutoConfirm(bool on)
   }
 }
 
+void QmitkEditableContourToolGUIBase::OnAddModeToogled(bool on)
+{
+  if (m_NewTool.IsNotNull())
+  {
+    m_NewTool->SetAddMode(on);
+  }
+}

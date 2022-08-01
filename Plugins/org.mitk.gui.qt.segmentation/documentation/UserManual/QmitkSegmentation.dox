@@ -186,6 +186,12 @@ Multi-step undo and redo is fully supported by all editing tools by using the ap
 <i>Remark</i>: Clicking and moving the mouse in any of the 2D render windows will move the crosshair that defines what part of the image is displayed.
 This behavior is disabled as long as any of the manual segmentation tools are active - otherwise you might have a hard time concentrating on the contour you are drawing.
 
+\subsection org_mitk_views_segmentationaddsubtracttools Add and subtract tools
+\imageMacro{QmitkSegmentation_IMGIconAddSubtract.png,"Add and subtract tools",7.70}
+
+Use the left mouse button to draw a closed contour. When releasing the mouse button, the contour will be added (Add tool) to or removed (Subtract tool) from the current segmentation.
+Adding and subtracting voxels can be iteratively repeated for the same segmentation. Holding CTRL / CMD while drawing will invert the current tool's behavior (i.e. instead of adding voxels, they will be subtracted).
+
 \subsection org_mitk_views_segmentationlassotool Lasso tool
 \imageMacro{QmitkSegmentation_Lasso.png,"Lasso tool",7.70}
 
@@ -204,12 +210,6 @@ Please note that:
   <li> feature 3-6 are only available, if auto confirm is *not* activated
   <li> feature 3-5 is not available for freehand contour segments
 </ul>
-
-\subsection org_mitk_views_segmentationaddsubtracttools Add and subtract tools
-\imageMacro{QmitkSegmentation_IMGIconAddSubtract.png,"Add and subtract tools",7.70}
-
-Use the left mouse button to draw a closed contour. When releasing the mouse button, the contour will be added (Add tool) to or removed (Subtract tool) from the current segmentation.
-Adding and subtracting voxels can be iteratively repeated for the same segmentation. Holding CTRL / CMD while drawing will invert the current tool's behavior (i.e. instead of adding voxels, they will be subtracted).
 
 \subsection org_mitk_views_segmentationpaintwipetools Paint and wipe tools
 \imageMacro{QmitkSegmentation_IMGIconPaintWipe.png,"Paint and wipe tools",7.68}

@@ -192,12 +192,17 @@ namespace mitk
     */
     bool IsNearContour(const mitk::Point3D &point, float eps) const;
 
+    /** Function that searches for the line segment of the contour that is closest to the passed point
+    and close enough (distance between point and line segment <= eps). If such an line segment exist,
+    the starting vertex and closing vertex of the found segment are passed back.
+    @return True indicates that a line segment was found. False indicates that no segment of the contour
+    is close enough to the passed point.
+    @remark previousVertex and nextVertex are only valid if return is true.*/
     bool GetLineSegmentForPoint(const mitk::Point3D &point,
                             float eps,
                             mitk::ContourElement::VertexType *previousVertex,
                             mitk::ContourElement::VertexType *nextVertex) const;
-    /** @overload
-    Overloaded version that offers additional options when searching for the line segment.
+    /** Overloaded version that offers additional options when searching for the line segment.
     In contrast to the other version it returns the index of the segment start and end as well as the point
     on the line segment closest to the passed point. Further one can decide if the function should search for
     the first segment that is close enough (see eps) or for the segment that is really the closest (findClosest==true).

@@ -34,7 +34,7 @@ public:
   itkFactorylessNewMacro(Self);
   itkCloneMacro(Self);
 
-  protected slots :
+protected slots :
 
   void OnNewToolAssociated(mitk::Tool *);
 
@@ -43,6 +43,7 @@ public:
   void OnClearSegmentation();
 
   void OnAutoConfirm(bool on);
+  void OnAddModeToogled(bool on);
 
   void OnShowInformation(bool on);
 

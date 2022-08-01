@@ -743,7 +743,9 @@ void mitk::DisplayInteractor::UpdateStatusbar(mitk::StateMachineAction *, mitk::
   // time of initiating the interaction. However, we need to update the
   // status bar with the position after changing slice. Therefore, we
   // translate the same display position with the renderer again to
-  // get the new world position.
+  // get the new world position. A rendering update is required before this.
+
+  baseRenderer->ForceImmediateUpdate();
   Point3D worldposition;
   baseRenderer->DisplayToWorld(posEvent->GetPointerPositionOnScreen(), worldposition);
 

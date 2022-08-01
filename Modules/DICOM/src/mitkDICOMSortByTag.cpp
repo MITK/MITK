@@ -99,7 +99,7 @@ mitk::DICOMSortByTag
   DICOMDatasetFinding leftFinding = left->GetTagValueAsString(tag);
   DICOMDatasetFinding rightFinding = right->GetTagValueAsString(tag);
   //Doesn't care if findings are valid or not. If they are not valid,
-  //value is empty, thats enough.
+  //value is empty, that's enough.
   if (leftFinding.value != rightFinding.value)
   {
     return leftFinding.value.compare(rightFinding.value) < 0;
@@ -120,7 +120,7 @@ mitk::DICOMSortByTag
   const DICOMDatasetFinding leftFinding = left->GetTagValueAsString(tag);
   const DICOMDatasetFinding rightFinding = right->GetTagValueAsString(tag);
   //Doesn't care if findings are valid or not. If they are not valid,
-  //value is empty, thats enough.
+  //value is empty, that's enough.
 
   double leftDouble( 0 );
   double rightDouble( 0 );
@@ -156,7 +156,7 @@ mitk::DICOMSortByTag
   const DICOMDatasetFinding fromFinding = from->GetTagValueAsString(m_Tag);
   const DICOMDatasetFinding toFinding = to->GetTagValueAsString(m_Tag);
   //Doesn't care if findings are valid or not. If they are not valid,
-  //value is empty, thats enough.
+  //value is empty, that's enough.
 
   double fromDouble(0);
   double toDouble(0);

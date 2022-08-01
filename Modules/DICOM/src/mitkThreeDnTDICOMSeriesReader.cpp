@@ -141,8 +141,8 @@ mitk::ThreeDnTDICOMSeriesReader
       }
     }
 
-    // in any case, we now now all about the first block of our list ...
-    // ... and we wither call it 3D o 3D+t
+    // in any case, we now know all about the first block of our list ...
+    // ... and we either call it 3D o 3D+t
     if (current3DnTBlockNumberOfTimeSteps > 1)
     {
       true3DnTBlocks.push_back(current3DnTBlock);

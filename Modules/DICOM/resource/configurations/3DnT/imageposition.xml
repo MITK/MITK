@@ -3,7 +3,7 @@
   class="ThreeDnTDICOMSeriesReader"
   version="2"
   label="IPP 3D+t"
-  description="Sort by Image Position (Patient), then group as 3D+t (till 2018/03 this configuration was wrongly stored in the file classicreader.xml (verison 1))"
+  description="Sort by Image Position (Patient), then group as 3D+t (till 2018/03 this configuration was wrongly stored in the file classicreader.xml (version 1))"
   group3DnT="true"
   fixTiltByShearing="true">
 <DICOMDatasetSorter class="DICOMTagBasedSorter" strictSorting="true" expectDistanceOne="true">

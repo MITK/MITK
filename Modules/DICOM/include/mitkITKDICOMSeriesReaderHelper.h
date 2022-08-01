@@ -59,7 +59,7 @@ class ITKDICOMSeriesReaderHelper
       DateTimeBounds& bounds, TimeBounds& triggerBounds);
 
     /* Determine the time bounds in ms respective to the baselineDateTime for the passed
-    files. Additionaly it regards the trigger time tag if set and acquisition date time
+    files. Additionally it regards the trigger time tag if set and acquisition date time
     carries not enough information.*/
     static bool ExtractTimeBoundsOfTimeStep(const StringContainer& filenamesOfTimeStep,
                                                  TimeBounds& bounds,

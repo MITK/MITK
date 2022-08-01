@@ -48,7 +48,7 @@ namespace mitk
   typedef enum
   {
     SOPClassSupported,       ///< loader code and tests are established
-    SOPClassPartlySupported, ///< loader code and tests are establised for specific parts of a SOP Class
+    SOPClassPartlySupported, ///< loader code and tests are established for specific parts of a SOP Class
     SOPClassImplemented,     ///< loader code is implemented but not accompanied by tests
     SOPClassUnsupported,     ///< loader code is not known to work with this SOP Class
     SOPClassUnknown,         ///< loader did not yet inspect any images, unknown fitness

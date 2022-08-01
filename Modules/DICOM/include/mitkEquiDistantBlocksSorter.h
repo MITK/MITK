@@ -37,11 +37,11 @@ namespace mitk
 
  Slices that share a position in space are also sorted into separate blocks during this step.
  So the result of this step is a set of blocks that contain only slices with equal z spacing
- and uniqe slices at each position.
+ and unique slices at each position.
 
  During sorting, the origins (documented in tag image position patient) are compared
  against expected origins (from former origin plus moving direction). As there will
- be minor differences in numbers (from both calculations and unprecise tag values),
+ be minor differences in numbers (from both calculations and imprecise tag values),
  we must be a bit tolerant here. The default behavior is to expect that an origin is
  not further away from the expected position than 30% of the inter-slice distance.
  To support a legacy behavior of a former loader (DicomSeriesReader), this default can
@@ -128,7 +128,7 @@ class MITKDICOM_EXPORT EquiDistantBlocksSorter : public DICOMDatasetSorter
         DICOMDatasetList GetUnsortedDatasets();
 
         /**
-          \brief Wheter or not the grouped result contain a gantry tilt.
+          \brief Whether or not the grouped result contain a gantry tilt.
          */
         bool ContainsGantryTilt();
 

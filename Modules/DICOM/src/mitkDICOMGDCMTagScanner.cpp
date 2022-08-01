@@ -59,7 +59,7 @@ void mitk::DICOMGDCMTagScanner::AddTagPath(const DICOMTagPath& path)
   {
     std::stringstream errorstring;
     errorstring << "Invalid call to DICOMGDCMTagScanner::AddTagPath(). "
-      << "Scanner does only support pathes that are explicitly specify one tag. "
+      << "Scanner does only support paths that are explicitly specify one tag. "
       << "Invalid path: "<<path.ToStr();
     MITK_ERROR << errorstring.str();
     throw std::invalid_argument(errorstring.str());
@@ -75,7 +75,7 @@ void mitk::DICOMGDCMTagScanner::AddTagPaths(const DICOMTagPathList& paths)
     {
       std::stringstream errorstring;
       errorstring << "Invalid call to DICOMGDCMTagScanner::AddTagPaths(). "
-        << "Scanner does only support pathes that are explicitly specify one tag. "
+        << "Scanner does only support paths that are explicitly specify one tag. "
         << "Invalid path: " << path.ToStr();
       MITK_ERROR << errorstring.str();
       throw std::invalid_argument(errorstring.str());

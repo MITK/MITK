@@ -39,7 +39,7 @@ Important
         Solution: GetTagValue as String does a right-trim plus we check after conversion! Works.
 [x] Implement Configurator::GetBuiltIn3DReaders() (don't ignore "classic reader")
 [x] Complete MITK properties of images: level/window and color type (MONOCHROME1/2)
-[x] Check input images fo DICOMness and non-multi-frameness
+[x] Check input images for DICOMness and non-multi-frameness
 [x] Use CanHandleFile() in selection!
     - implicitly now, the reader checks itself and produces no output if it cannot handle the files
 [x] Check ToDo in mitkDICOMTag.cpp

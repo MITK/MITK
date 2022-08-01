@@ -57,7 +57,7 @@ namespace mitk
       */
       virtual void AddTagPath(const DICOMTagPath& path) = 0;
       /**
-      \brief Add a list of tag pathes to the scanning process.
+      \brief Add a list of tag paths to the scanning process.
       */
       virtual void AddTagPaths(const DICOMTagPathList& paths) = 0;
 

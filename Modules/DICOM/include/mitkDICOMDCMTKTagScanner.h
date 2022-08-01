@@ -49,7 +49,7 @@ namespace mitk
       */
       void AddTagPath(const DICOMTagPath& tag) override;
       /**
-      \brief Add a list of tag pathes to the scanning process.
+      \brief Add a list of tag paths to the scanning process.
       */
       void AddTagPaths(const DICOMTagPathList& tags) override;
 

@@ -121,7 +121,7 @@ std::vector<itk::SmartPointer<BaseData> > BaseDICOMReaderService::DoRead()
             auto finding = std::find_if(frameList.begin(), frameList.end(), [&](const DICOMImageFrameInfo::Pointer& frame) { return frame->Filename == fileName; });
 
             if (finding != frameList.end())
-            { //we have the block containing the fileName -> these are the realy relevant files.
+            { //we have the block containing the fileName -> these are the really relevant files.
               relevantFiles.resize(frameList.size());
               std::transform(frameList.begin(), frameList.end(), relevantFiles.begin(), [](const DICOMImageFrameInfo::Pointer& frame) { return frame->Filename; });
               break;

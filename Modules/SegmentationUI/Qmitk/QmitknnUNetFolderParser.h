@@ -15,6 +15,7 @@ found in the LICENSE file.s
 
 #include <QDirIterator>
 #include <memory>
+#include <functional>
 #include <QString>
 #include <vector>
 

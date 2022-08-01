@@ -29,7 +29,7 @@ namespace mitk
   described as part of DICOMITKSeriesGDCMReader::AnalyzeInputFiles()
   (see \ref DICOMITKSeriesGDCMReader_LoadingStrategy).
 
-  The prodecure is simple:
+  The procedure is simple:
    - take a list of input datasets (DICOMDatasetAccess)
    - sort them (to be defined by sub-classes, based on specific tags)
    - return the sorting result as outputs (the single input might be distributed into multiple outputs)

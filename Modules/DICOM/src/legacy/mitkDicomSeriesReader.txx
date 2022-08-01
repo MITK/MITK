@@ -260,7 +260,7 @@ namespace mitk
     // if tilt positive, then we need additional pixels BELOW origin, otherwise we need pixels behind the end of the
     // block
 
-    // in any case we need more size to accomodate shifted slices
+    // in any case we need more size to accommodate shifted slices
     typename ImageType::SizeType largerSize =
       resampler->GetSize(); // now the resampler already holds the input image's size.
     largerSize[1] += static_cast<typename ImageType::SizeType::SizeValueType>(

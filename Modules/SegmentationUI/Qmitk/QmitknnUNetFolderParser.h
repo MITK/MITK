@@ -14,6 +14,7 @@ found in the LICENSE file.s
 #define QmitknnUNetFolderParser_h_Included
 
 #include <QDirIterator>
+#include <memory>
 #include <QString>
 #include <vector>
 

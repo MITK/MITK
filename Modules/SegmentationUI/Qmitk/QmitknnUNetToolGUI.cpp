@@ -389,8 +389,16 @@ std::vector<std::string> QmitknnUNetToolGUI::FetchSelectedFoldsFromUI(ctkCheckab
   QModelIndexList foldList = foldBox->checkedIndexes();
   for (const auto &index : foldList)
   {
-    QString foldQString = foldBox->itemText(index.row()).split("_", QString::SplitBehavior::SkipEmptyParts).last();
+    QString foldQString = foldBox->itemText(index.row());
+    if(foldQString != "dummy_element_that_nobody_can_see")
+    {
+    foldQString = foldQString.split("_", QString::SplitBehavior::SkipEmptyParts).last();
     folds.push_back(foldQString.toStdString());
+    }
+    else
+    {
+      throw std::runtime_error("Folds are not recognized. Please check if your nnUNet results folder structure is legitimate");
+    }
   }
   return folds;
 }
@@ -587,6 +595,13 @@ mitk::ModelParams QmitknnUNetToolGUI::MapToRequest(const QString &modelName,
   return requestObject;
 }
 
+void QmitknnUNetToolGUI::SetComboBoxToNone(ctkCheckableComboBox* comboBox)
+{
+  comboBox->clear();
+  comboBox->addItem("dummy_element_that_nobody_can_see");
+  qobject_cast<QListView *>(comboBox->view())->setRowHidden(0, true); // For the cosmetic purpose of showing "None" on the combobox.
+}
+
 /* ---------------------SLOTS---------------------------------------*/
 
 void QmitknnUNetToolGUI::OnPreviewRequested()
@@ -747,6 +762,7 @@ void QmitknnUNetToolGUI::OnModelChanged(const QString &model)
       m_Controls.plannerLabel->setVisible(false);
       m_Controls.foldBox->setVisible(false);
       m_Controls.foldLabel->setVisible(false);
+      m_Controls.previewButton->setEnabled(false);
       this->ShowEnsembleLayout(true);
       auto models = m_ParentFolder->getModelsForTask<QStringList>(m_Controls.taskBox->currentText());
       models.removeDuplicates();
@@ -764,7 +780,6 @@ void QmitknnUNetToolGUI::OnModelChanged(const QString &model)
                           layout->modelBox->addItem(model);
                       });
       }
-      m_Controls.previewButton->setEnabled(true);
     }
     else
     {
@@ -776,11 +791,17 @@ void QmitknnUNetToolGUI::OnModelChanged(const QString &model)
       m_Controls.foldLabel->setVisible(true);
       m_Controls.previewButton->setEnabled(false);
       this->ShowEnsembleLayout(false);
-      auto trainerPlanners = m_ParentFolder->getTrainerPlannersForTask<QStringList>(selectedTask, model);
-      QStringList trainers, planners;
-      std::tie(trainers, planners) = ExtractTrainerPlannerFromString(trainerPlanners);
       m_Controls.trainerBox->clear();
       m_Controls.plannerBox->clear();
+      auto trainerPlanners = m_ParentFolder->getTrainerPlannersForTask<QStringList>(selectedTask, model);
+      if(trainerPlanners.isEmpty())
+      {
+        this->ShowErrorMessage("No plans.pkl found for "+model.toStdString()+". Check your directory or download the task again.");
+        this->SetComboBoxToNone(m_Controls.foldBox);
+        return;
+      }
+      QStringList trainers, planners;
+      std::tie(trainers, planners) = ExtractTrainerPlannerFromString(trainerPlanners);
       std::for_each(
         trainers.begin(), trainers.end(), [this](QString trainer) { m_Controls.trainerBox->addItem(trainer); });
       std::for_each(
@@ -788,7 +809,8 @@ void QmitknnUNetToolGUI::OnModelChanged(const QString &model)
     }
   }
   else if (!m_EnsembleParams.empty())
-  {
+  { 
+    m_Controls.previewButton->setEnabled(false);
     for (auto &layout : m_EnsembleParams)
     {
       if (box == layout->modelBox)
@@ -796,6 +818,12 @@ void QmitknnUNetToolGUI::OnModelChanged(const QString &model)
         layout->trainerBox->clear();
         layout->plannerBox->clear();
         auto trainerPlanners = m_ParentFolder->getTrainerPlannersForTask<QStringList>(selectedTask, model);
+        if(trainerPlanners.isEmpty())
+        {
+          this->ShowErrorMessage("No plans.pkl found for "+model.toStdString()+". Check your directory or download the task again.");
+          this->SetComboBoxToNone(layout->foldBox);
+          return;
+        }
         QStringList trainers, planners;
         std::tie(trainers, planners) = ExtractTrainerPlannerFromString(trainerPlanners);
         std::for_each(trainers.begin(),
@@ -849,6 +877,12 @@ void QmitknnUNetToolGUI::OnTrainerChanged(const QString &plannerSelected)
     auto selectedModel = m_Controls.modelBox->currentText();
     auto folds = m_ParentFolder->getFoldsForTrainerPlanner<QStringList>(
       selectedTrainer, plannerSelected, selectedTask, selectedModel);
+    if(folds.isEmpty())
+    {
+      this->ShowErrorMessage("No valid folds found. Check your directory or download the task again.");
+      this->SetComboBoxToNone(m_Controls.foldBox);
+      return;
+    }
     std::for_each(folds.begin(),
                   folds.end(),
                   [this](QString fold)
@@ -877,6 +911,12 @@ void QmitknnUNetToolGUI::OnTrainerChanged(const QString &plannerSelected)
         auto selectedModel = layout->modelBox->currentText();
         auto folds = m_ParentFolder->getFoldsForTrainerPlanner<QStringList>(
           selectedTrainer, plannerSelected, selectedTask, selectedModel);
+        if(folds.isEmpty())
+        {
+          this->ShowErrorMessage("No valid folds found. Check your directory.");
+          this->SetComboBoxToNone(layout->foldBox);
+          return;
+        }
         std::for_each(folds.begin(),
                       folds.end(),
                       [&layout](const QString &fold)
@@ -933,7 +973,6 @@ void QmitknnUNetToolGUI::OnPythonPathChanged(const QString &pyEnv)
   else
   {
     m_Controls.modeldirectoryBox->setEnabled(true);
-    m_Controls.previewButton->setEnabled(true);
     m_Controls.refreshdirectoryBox->setEnabled(true);
     m_Controls.multiModalBox->setEnabled(true);
     QString setVal = this->FetchResultsFolderFromEnv();

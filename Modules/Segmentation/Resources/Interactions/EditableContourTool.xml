@@ -1,6 +1,6 @@
   <statemachine name="LiveWireTool">
     <state name="Start" ID="1" startstate="true">
-      <transition event_class="MouseDoubleClickEvent" event_variant="PrimaryButtonDoubleClick" target="Active" >
+      <transition event_class="MouseDoubleClickEvent" event_variant="PrimaryButtonDoubleClick" target="PressedState" >
         <action name="InitObject" ID="5" />
       </transition>
     </state>

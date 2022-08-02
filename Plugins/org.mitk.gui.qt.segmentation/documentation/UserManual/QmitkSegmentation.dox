@@ -354,7 +354,7 @@ Remark: The tool assumes that you have a Python3 environment with nnUNet (pip) i
     -# For ensemble predictions, you will get the option to select parameters irrespective on postprocessing files available in the ensembles folder of <b>RESULTS_FOLDER</b>.
     Note that, if a postprocessing json file exists for the selected combination then it will used for ensembling, by default. To choose not to, uncheck the "Use PostProcessing JSON" in the "Advanced" section.
     \imageMacro{QmitkSegmentation_nnUNet_ensemble.png,"nnUNet Segmentation Settings",10}
-    -# If your task is trained with multi-modal inputs, then "Multi-Modal" checkbox is checked and the no.of modalities are preloaded in the "No. of Extra Modalities" spinbox.
+    -# If your task is trained with multi-modal inputs, then "Multi-Modal" checkbox is checked and the no.of modalities are preloaded and shown next to "Required Modalities".
     Instantly, as much node selectors with corresponding modality names should appear below to select the Data Manager along including a selector with preselected with the reference node.
     Now, select the image nodes in the node selectors accordingly for accurate inferencing.
     \imageMacro{QmitkSegmentation_nnUNet_multimodal.png,"nnUNet Multi Modal Settings",10.00}

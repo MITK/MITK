@@ -87,7 +87,6 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   connect(
     m_Controls.plannerBox, SIGNAL(currentTextChanged(const QString &)), this, SLOT(OnTrainerChanged(const QString &)));
   connect(m_Controls.multiModalBox, SIGNAL(stateChanged(int)), this, SLOT(OnCheckBoxChanged(int)));
-  connect(m_Controls.multiModalSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnModalitiesNumberChanged(int)));
   connect(m_Controls.pythonEnvComboBox,
 #if QT_VERSION >= 0x050F00 // 5.15
           SIGNAL(textActivated(const QString &)),
@@ -108,9 +107,9 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   connect(m_Worker, &nnUNetDownloadWorker::Exit, this, &QmitknnUNetToolGUI::OnDownloadWorkerExit);
   connect(m_nnUNetThread, &QThread::finished, m_Worker, &QObject::deleteLater);
 
-  m_Controls.multiModalSpinBox->setVisible(false);
-  m_Controls.multiModalSpinBox->setEnabled(false);
-  m_Controls.multiModalSpinLabel->setVisible(false);
+  m_Controls.multiModalValueLabel->setStyleSheet("font-weight: bold; color: white");
+  m_Controls.multiModalValueLabel->setVisible(false);
+  m_Controls.requiredModalitiesLabel->setVisible(false);
   m_Controls.stopDownloadButton->setVisible(false);
   m_Controls.previewButton->setEnabled(false);
 
@@ -151,7 +150,6 @@ void QmitknnUNetToolGUI::EnableWidgets(bool enabled)
 
 void QmitknnUNetToolGUI::ClearAllModalities()
 {
-  m_Controls.multiModalSpinBox->setMinimum(0);
   m_Controls.multiModalBox->setChecked(false);
   this->ClearAllModalLabels();
 }
@@ -171,7 +169,7 @@ void QmitknnUNetToolGUI::DisableEverything()
   m_Controls.modeldirectoryBox->setEnabled(false);
   m_Controls.refreshdirectoryBox->setEnabled(false);
   m_Controls.previewButton->setEnabled(false);
-  m_Controls.multiModalSpinBox->setVisible(false);
+  m_Controls.multiModalValueLabel->setVisible(false);
   m_Controls.multiModalBox->setEnabled(false);
   this->ClearAllComboBoxes();
   this->ClearAllModalities();
@@ -524,7 +522,6 @@ void QmitknnUNetToolGUI::DisplayMultiModalInfoFromJSON(const QString &jsonPath)
   if (file.is_open())
   {
     auto jsonObj = nlohmann::json::parse(file, nullptr, false);
-
     if (jsonObj.is_discarded() || !jsonObj.is_object())
     {
       MITK_ERROR << "Could not parse \"" << jsonPath.toStdString() << "\" as JSON object!";
@@ -536,7 +533,8 @@ void QmitknnUNetToolGUI::DisplayMultiModalInfoFromJSON(const QString &jsonPath)
     {
       m_Controls.multiModalBox->setChecked(true);
       m_Controls.multiModalBox->setEnabled(false);
-      m_Controls.multiModalSpinBox->setValue(num_mods - 1);
+      m_Controls.multiModalValueLabel->setText(QString::number(num_mods));
+      OnModalitiesNumberChanged(num_mods);
       m_Controls.advancedSettingsLayout->update();
       auto obj = jsonObj["modalities"];
       int count = 0;
@@ -547,12 +545,10 @@ void QmitknnUNetToolGUI::DisplayMultiModalInfoFromJSON(const QString &jsonPath)
         m_Controls.advancedSettingsLayout->addWidget(label, m_UI_ROWS + 1 + count, 0);
         count++;
       }
-      m_Controls.multiModalSpinBox->setMinimum(num_mods - 1);
       m_Controls.advancedSettingsLayout->update();
     }
     else
     {
-      m_Controls.multiModalSpinBox->setMinimum(0);
       m_Controls.multiModalBox->setChecked(false);
     }
   }
@@ -645,17 +641,9 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
       tool->MultiModalOff();
       if (m_Controls.multiModalBox->isChecked())
       {
-        if (m_Controls.multiModalSpinBox->value() > 0)
-        {
-          tool->m_OtherModalPaths.clear();
-          tool->m_OtherModalPaths = FetchMultiModalImagesFromUI();
-          tool->MultiModalOn();
-        }
-        else
-        {
-          throw std::runtime_error("Please select more than one modalities for a multi-modal task. If you "
-                                   "would like to use only one modality then uncheck the Multi-Modal option.");
-        }
+        tool->m_OtherModalPaths.clear();
+        tool->m_OtherModalPaths = FetchMultiModalImagesFromUI();
+        tool->MultiModalOn();
       }
       if (doCache)
       {
@@ -1010,28 +998,12 @@ void QmitknnUNetToolGUI::OnCheckBoxChanged(int state)
   {
     if (box->objectName() == QString("multiModalBox"))
     {
-      m_Controls.multiModalSpinLabel->setVisible(visibility);
-      m_Controls.multiModalSpinBox->setVisible(visibility);
-      if (visibility)
-      {
-        QmitkDataStorageComboBox *defaultImage = new QmitkDataStorageComboBox(this, true);
-        defaultImage->setObjectName(QString("multiModal_" + QString::number(0)));
-        defaultImage->SetPredicate(m_MultiModalPredicate);
-        mitk::nnUNetTool::Pointer tool = this->GetConnectedToolAs<mitk::nnUNetTool>();
-        if (tool != nullptr)
-        {
-          defaultImage->SetDataStorage(tool->GetDataStorage());
-          defaultImage->SetSelectedNode(tool->GetRefNode());
-        }
-        m_Controls.advancedSettingsLayout->addWidget(defaultImage, m_UI_ROWS + m_Modalities.size() + 1, 1, 1, 3);
-        m_Modalities.push_back(defaultImage);
-      }
-      else
+      m_Controls.requiredModalitiesLabel->setVisible(visibility);
+      m_Controls.multiModalValueLabel->setVisible(visibility);
+      if (!visibility)
       {
         this->OnModalitiesNumberChanged(0);
-        m_Controls.multiModalSpinBox->setValue(0);
-        delete m_Modalities[0];
-        m_Modalities.pop_back();
+        m_Controls.multiModalValueLabel->setText("0");
         this->ClearAllModalLabels();
       }
     }
@@ -1040,7 +1012,7 @@ void QmitknnUNetToolGUI::OnCheckBoxChanged(int state)
 
 void QmitknnUNetToolGUI::OnModalitiesNumberChanged(int num)
 {
-  while (num > static_cast<int>(m_Modalities.size() - 1))
+  while (num > static_cast<int>(m_Modalities.size()))
   {
     QmitkDataStorageComboBox *multiModalBox = new QmitkDataStorageComboBox(this, true);
     mitk::nnUNetTool::Pointer tool = this->GetConnectedToolAs<mitk::nnUNetTool>();
@@ -1050,14 +1022,9 @@ void QmitknnUNetToolGUI::OnModalitiesNumberChanged(int num)
     m_Controls.advancedSettingsLayout->addWidget(multiModalBox, m_UI_ROWS + m_Modalities.size() + 1, 1, 1, 3);
     m_Modalities.push_back(multiModalBox);
   }
-  while (num < static_cast<int>(m_Modalities.size() - 1) && !m_Modalities.empty())
+  while (num < static_cast<int>(m_Modalities.size()) && !m_Modalities.empty())
   {
     QmitkDataStorageComboBox *child = m_Modalities.back();
-    if (child->objectName() == "multiModal_0")
-    {
-      std::iter_swap(m_Modalities.end() - 2, m_Modalities.end() - 1);
-      child = m_Modalities.back();
-    }
     delete child; // delete the layout item
     m_Modalities.pop_back();
   }

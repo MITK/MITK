@@ -22,8 +22,10 @@ found in the LICENSE file.
 
 namespace
 {
-  QString ParseColor(const QString &subject, const QString &pattern, const QString &fallback)
+  QString ParseColor(const QString &subject, const QString &colorName, const QString &fallback)
   {
+    const QString pattern = QString("%1\\s*[=:]\\s*(#[0-9a-f]{6})").arg(colorName);
+
     QRegularExpression re(pattern, QRegularExpression::CaseInsensitiveOption);
     auto match = re.match(subject);
 
@@ -40,13 +42,8 @@ QIcon QmitkStyleManager::ThemeIcon(const QByteArray &originalSVG)
   if (styleSheet.isEmpty())
     return QPixmap::fromImage(QImage::fromData(originalSVG));
 
-  auto iconColor = ParseColor(styleSheet,
-    QStringLiteral("iconColor\\s*[=:]\\s*(#[0-9a-f]{6})"),
-    QStringLiteral("#000000"));
-
-  auto iconAccentColor = ParseColor(styleSheet,
-    QStringLiteral("iconAccentColor\\s*[=:]\\s*(#[0-9a-f]{6})"),
-    QStringLiteral("#ffffff"));
+  auto iconColor = GetIconColor();
+  auto iconAccentColor = GetIconAccentColor();
 
   auto themedSVG = QString(originalSVG).replace(QStringLiteral("#00ff00"), iconColor, Qt::CaseInsensitive);
   themedSVG = themedSVG.replace(QStringLiteral("#ff00ff"), iconAccentColor, Qt::CaseInsensitive);
@@ -66,4 +63,24 @@ QIcon QmitkStyleManager::ThemeIcon(const QString &resourcePath)
 
   MITK_WARN << "Could not read " << resourcePath.toStdString();
   return QIcon();
+}
+
+QString QmitkStyleManager::GetIconColor()
+{
+  const auto styleSheet = qApp->styleSheet();
+  const auto fallback = QStringLiteral("#000000");
+
+  return !styleSheet.isEmpty()
+    ? ParseColor(styleSheet, QStringLiteral("iconColor"), fallback)
+    : fallback;
+}
+
+QString QmitkStyleManager::GetIconAccentColor()
+{
+  const auto styleSheet = qApp->styleSheet();
+  const auto fallback = QStringLiteral("#ffffff");
+
+  return !styleSheet.isEmpty()
+    ? ParseColor(styleSheet, QStringLiteral("iconAccentColor"), fallback)
+    : fallback;
 }

@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define mitkSegmentationInteractor_h
 
 #include "MitkSegmentationExports.h"
-#include "mitkDisplayInteractor.h"
+#include <mitkDisplayActionEventBroadcast.h>
 
 namespace mitk
 {
@@ -27,13 +27,14 @@ namespace mitk
    * @ingroup Interaction
    **/
 
-  class MITKSEGMENTATION_EXPORT SegmentationInteractor : public DisplayInteractor
+  class MITKSEGMENTATION_EXPORT SegmentationInteractor : public DisplayActionEventBroadcast
   {
   public:
-    mitkClassMacro(SegmentationInteractor, DisplayInteractor);
+    mitkClassMacro(SegmentationInteractor, DisplayActionEventBroadcast);
     itkNewMacro(Self);
 
-      protected : SegmentationInteractor(){};
+  protected:
+    SegmentationInteractor(){};
     ~SegmentationInteractor() override{};
     /**
      * Derived function.
@@ -45,7 +46,7 @@ namespace mitk
     /**
     * Changes the active label.
     */
-    bool ChangeActiveLabel(StateMachineAction *, InteractionEvent *);
+    void ChangeActiveLabel(StateMachineAction*, InteractionEvent*);
   };
 }
 #endif

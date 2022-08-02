@@ -52,14 +52,14 @@ class MITKDICOM_EXPORT DICOMDatasetAccess
     virtual std::string GetFilenameIfAvailable() const = 0;
 
     /** \brief Return a DICOMDatasetFinding instance of the tag.
-    The return containes (if valid) the raw value of the tag as a string.
-    \param tag Tag which value should be retreived.
+    The return contains (if valid) the raw value of the tag as a string.
+    \param tag Tag which value should be retrieved.
     */
     virtual DICOMDatasetFinding GetTagValueAsString(const DICOMTag& tag) const = 0;
 
     /** \brief Return a list of DICOMDatasetFindings of the passed tag path.
-    The return containes (if valid) the raw value of the tag as a string.
-    \param path Tag path which value should be retreived.
+    The return contains (if valid) the raw value of the tag as a string.
+    \param path Tag path which value should be retrieved.
     */
     virtual FindingsListType GetTagValueAsString(const DICOMTagPath& path) const = 0;
 

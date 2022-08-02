@@ -27,7 +27,7 @@ namespace mitk
   Takes geometry information for two slices of a DICOM series and
   calculates whether these fit into an orthogonal block or not.
   If NOT, they can either be the result of an acquisition with
-  gantry tilt OR completly broken by some shearing transformation.
+  gantry tilt OR completely broken by some shearing transformation.
 
   Most calculations are done in the constructor, results can then
   be read via the remaining methods.
@@ -95,7 +95,7 @@ class GantryTiltInformation
 
       Gantry tilt will only produce shifts in ONE orientation, not in both.
 
-      Since the correction code currently only coveres one tilt direction
+      Since the correction code currently only covers one tilt direction
       AND we don't know of medical images with two tilt directions, the
       loading code wants to check if our assumptions are true.
      */

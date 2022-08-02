@@ -45,7 +45,6 @@ set(CPP_FILES
   Controllers/mitkProgressBar.cpp
   Controllers/mitkRenderingManager.cpp
   Controllers/mitkSliceNavigationController.cpp
-  Controllers/mitkSlicesCoordinator.cpp
   Controllers/mitkStatusBar.cpp
   Controllers/mitkStepper.cpp
   Controllers/mitkTestManager.cpp
@@ -195,7 +194,6 @@ set(CPP_FILES
   Interactions/mitkDisplayActionEventHandlerStd.cpp
   Interactions/mitkDisplayActionEventHandlerSynchronized.cpp
   Interactions/mitkDisplayCoordinateOperation.cpp
-  Interactions/mitkDisplayInteractor.cpp
   Interactions/mitkEventConfig.cpp
   Interactions/mitkEventFactory.cpp
   Interactions/mitkEventRecorder.cpp
@@ -315,7 +313,6 @@ Interactions/DisplayConfigPACSPan.xml
 Interactions/DisplayConfigPACSScroll.xml
 Interactions/DisplayConfigPACSZoom.xml
 Interactions/DisplayConfigPACSLevelWindow.xml
-Interactions/DisplayConfigMITKLimited.xml
 Interactions/DisplayConfigBlockLMB.xml
 Interactions/PointSet.xml
 Interactions/Legacy/StateMachine.xml

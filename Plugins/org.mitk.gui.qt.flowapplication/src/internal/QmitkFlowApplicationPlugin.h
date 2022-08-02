@@ -36,17 +36,6 @@ public:
   void start(ctkPluginContext*) override;
   void stop(ctkPluginContext* context) override;
 
-  QString GetQtHelpCollectionFile() const;
-
-private:
-
-  void loadDataFromDisk(const QStringList& args, bool globalReinit);
-  void startNewInstance(const QStringList& args, const QStringList &files);
-
-private Q_SLOTS:
-
-  void handleIPCMessage(const QByteArray &msg);
-
 private:
 
   static QmitkFlowApplicationPlugin* inst;

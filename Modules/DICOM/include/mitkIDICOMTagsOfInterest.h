@@ -26,7 +26,7 @@ namespace mitk
    * \brief Interface of DICOM tags of interest service.
    *
    * This service allows you to manage the tags of interest (toi).
-   * All registred toi will be extracted when loading dicom data and stored as properties in the corresponding
+   * All registered toi will be extracted when loading dicom data and stored as properties in the corresponding
    * base data object. In addition the service can (if available) use IPropertyPersistance and IPropertyAliases
    * to ensure that the tags of interests are also persisted and have a human readable alias.
    */
@@ -38,7 +38,7 @@ namespace mitk
     /** \brief Add an tag to the TOI.
       * If the tag was already added it will be overwritten with the passed values.
       * \param[in] tag Tag that should be added.
-      * \param[in] makePersistant Indicates if the tag should be made persistant if possible via the IPropertyPersistence service.
+      * \param[in] makePersistant Indicates if the tag should be made persistent if possible via the IPropertyPersistence service.
       */
     virtual void AddTagOfInterest(const DICOMTagPath& tag, bool makePersistant = true) = 0;
 

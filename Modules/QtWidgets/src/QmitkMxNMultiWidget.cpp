@@ -44,23 +44,12 @@ QmitkMxNMultiWidget::~QmitkMxNMultiWidget()
 void QmitkMxNMultiWidget::InitializeMultiWidget()
 {
   SetLayout(1, 1);
-  ActivateMenuWidget(true);
   SetDisplayActionEventHandler(std::make_unique<mitk::DisplayActionEventHandlerDesynchronized>());
   auto displayActionEventHandler = GetDisplayActionEventHandler();
   if (nullptr != displayActionEventHandler)
   {
     displayActionEventHandler->InitActions();
   }
-}
-
-void QmitkMxNMultiWidget::MultiWidgetOpened()
-{
-  SetCrosshairVisibility(true);
-}
-
-void QmitkMxNMultiWidget::MultiWidgetClosed()
-{
-  SetCrosshairVisibility(false);
 }
 
 void QmitkMxNMultiWidget::Synchronize(bool synchronized)
@@ -225,6 +214,22 @@ void QmitkMxNMultiWidget::moveEvent(QMoveEvent* e)
   emit Moved();
 }
 
+void QmitkMxNMultiWidget::RemoveRenderWindowWidget()
+{
+  auto renderWindowWidgets = this->GetRenderWindowWidgets();
+  auto iterator = renderWindowWidgets.find(this->GetNameFromIndex(this->GetNumberOfRenderWindowWidgets() - 1));
+  if (iterator == renderWindowWidgets.end())
+  {
+    return;
+  }
+
+  // disconnect each signal of this render window widget
+  RenderWindowWidgetPointer renderWindowWidgetToRemove = iterator->second;
+  m_TimeNavigationController->Disconnect(renderWindowWidgetToRemove->GetSliceNavigationController());
+
+  QmitkAbstractMultiWidget::RemoveRenderWindowWidget();
+}
+
 //////////////////////////////////////////////////////////////////////////
 // PRIVATE
 //////////////////////////////////////////////////////////////////////////
@@ -274,6 +279,6 @@ void QmitkMxNMultiWidget::CreateRenderWindowWidget()
 
   // connect time navigation controller to react on geometry time events with the render window's slice naviation controller
   m_TimeNavigationController->ConnectGeometryTimeEvent(renderWindow->GetSliceNavigationController(), false);
-  // reverse connection between the render window's slice navigation ontroller and the time navigation controller
+  // reverse connection between the render window's slice navigation controller and the time navigation controller
   renderWindow->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
 }

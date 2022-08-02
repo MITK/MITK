@@ -30,8 +30,8 @@ mitk::ClassicDICOMSeriesReader
   // a sorter...
   mitk::DICOMSortCriterion::ConstPointer sorting =
     mitk::SortByImagePositionPatient::New( // image position patient and image orientation
-      mitk::DICOMSortByTag::New( DICOMTag(0x0020, 0x0012), // aqcuisition number
-        mitk::DICOMSortByTag::New( DICOMTag(0x0008, 0x0032), // aqcuisition time
+      mitk::DICOMSortByTag::New( DICOMTag(0x0020, 0x0012), // acquisition number
+        mitk::DICOMSortByTag::New( DICOMTag(0x0008, 0x0032), // acquisition time
           mitk::DICOMSortByTag::New( DICOMTag(0x0018, 0x1060), // trigger time
             mitk::DICOMSortByTag::New( DICOMTag(0x0008, 0x0018) // SOP instance UID (last resort, not really meaningful but decides clearly)
             ).GetPointer()

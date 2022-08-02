@@ -68,7 +68,7 @@ mitk::DICOMTagsOfInterestAddHelper::~DICOMTagsOfInterestAddHelper()
 {
   if (m_Active)
   {
-    MITK_ERROR << "DICOMTagsOfInterestAddHelper was not deactivated correctly befor its destructor was called.";
+    MITK_ERROR << "DICOMTagsOfInterestAddHelper was not deactivated correctly before its destructor was called.";
     auto context = us::GetModuleContext();
     //we cannot trust m_Context at this point anymore and have no means to validate it. So try to get the own module context
     //and to remove the listener via this context.

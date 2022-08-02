@@ -40,7 +40,7 @@
 
 //
 // MITKSWIG_AUTOMATED_CASTING is a helper macro in order to
-// provide a convinience interface for up/downcasting of
+// provide a convenience interface for up/downcasting of
 // classes
 //
 %define MITKSWIG_AUTOMATED_CASTING(classname, classinclude, nspace)

@@ -18,8 +18,10 @@ Qmitk/QmitkSlicesInterpolator.cpp
 Qmitk/QmitkToolGUI.cpp
 Qmitk/QmitkToolGUIArea.cpp
 Qmitk/QmitkToolSelectionBox.cpp
+Qmitk/QmitknnUNetFolderParser.cpp
 Qmitk/QmitknnUNetToolGUI.cpp
 Qmitk/QmitknnUNetWorker.cpp
+Qmitk/QmitknnUNetGPU.cpp
 Qmitk/QmitkSurfaceStampWidget.cpp
 Qmitk/QmitkMaskStampWidget.cpp
 Qmitk/QmitkSliceBasedInterpolatorWidget.cpp
@@ -48,11 +50,11 @@ Qmitk/QmitkSlicesInterpolator.h
 Qmitk/QmitkToolGUI.h
 Qmitk/QmitkToolGUIArea.h
 Qmitk/QmitkToolSelectionBox.h
+Qmitk/QmitknnUNetFolderParser.h
 Qmitk/QmitknnUNetToolGUI.h
 Qmitk/QmitknnUNetGPU.h
 Qmitk/QmitknnUNetWorker.h
 Qmitk/QmitknnUNetEnsembleLayout.h
-Qmitk/QmitknnUNetFolderParser.h
 Qmitk/QmitkSurfaceStampWidget.h
 Qmitk/QmitkMaskStampWidget.h
 Qmitk/QmitkSliceBasedInterpolatorWidget.h

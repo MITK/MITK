@@ -46,8 +46,6 @@ private:
 
   mitk::Image::ConstPointer m_SegmentationTemplate;
   const mitk::Image* m_ReferenceImage;
-  unsigned int m_ImageTimeStep = 0;
-
 };
 
 #endif // QMITKSTATICDYNAMICSEGMENTATIONDIALOG_H

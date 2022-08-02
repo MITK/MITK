@@ -171,16 +171,15 @@ protected:
 
 private:
   /**
+  * @brief Adds an element and hides it so that the ctkCheckableComboBox shows "None".
+  */
+  void SetComboBoxToNone(ctkCheckableComboBox*);
+
+  /**
    * @brief Parses the available_models.json file from RESULTS_FOLDER and loads
    * the task names to the Download combobox in Advanced.
    */
   void FillAvailableModelsInfoFromJSON(const QString&);
-
-  /**
-   * @brief Calls other JSON dumping functions.
-   *
-   */
-  void DumpAllJSONs(const QString&);
 
   /**
    * @brief Exports available models to download from nnUNet_print_available_pretrained_models

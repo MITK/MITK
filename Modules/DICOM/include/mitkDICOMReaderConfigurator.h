@@ -78,7 +78,7 @@ namespace mitk
 
   This first version is hard coded for the current state of the implementation.
 
-  If things should evolve in a way that needs us to splitt off readers for "old" versions,
+  If things should evolve in a way that needs us to split off readers for "old" versions,
   time should be taken to refactor this class.
 
   Basically, a serializer class should accompany each of the configurable classes. Such

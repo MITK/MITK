@@ -36,8 +36,6 @@ public:
   ~QmitkMxNMultiWidget();
 
   void InitializeMultiWidget() override;
-  void MultiWidgetOpened() override;
-  void MultiWidgetClosed() override;
 
   void Synchronize(bool synchronized) override;
 
@@ -69,6 +67,10 @@ Q_SIGNALS:
 
   void WheelMoved(QWheelEvent *);
   void Moved();
+
+protected:
+
+  void RemoveRenderWindowWidget() override;
 
 private:
 

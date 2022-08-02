@@ -25,6 +25,9 @@ public:
   static QIcon ThemeIcon(const QByteArray &originalSVG);
   static QIcon ThemeIcon(const QString &resourcePath);
 
+  static QString GetIconColor();
+  static QString GetIconAccentColor();
+
   QmitkStyleManager() = delete;
   ~QmitkStyleManager() = delete;
 };

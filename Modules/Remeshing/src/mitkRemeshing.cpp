@@ -11,175 +11,206 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <mitkRemeshing.h>
+#include <mitkExceptionMacro.h>
 
-#include <OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh>
-#include <OpenMesh/Tools/Decimater/DecimaterT.hh>
-#include <OpenMesh/Tools/Decimater/ModQuadricT.hh>
-
-#include <vtkCellArray.h>
 #include <vtkIdList.h>
-#include <vtkPoints.h>
+#include <vtkIntArray.h>
+#include <vtkIsotropicDiscreteRemeshing.h>
+#include <vtkMultiThreader.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataNormals.h>
 #include <vtkSmartPointer.h>
-#include <vtkTriangleFilter.h>
+#include <vtkSurface.h>
 
-#include <algorithm>
-#include <functional>
-
-using Mesh = OpenMesh::TriMesh_ArrayKernelT<OpenMesh::DefaultTraitsDouble>;
+#include <array>
+#include <vector>
 
 namespace
 {
-  bool IsValidPolyData(vtkPolyData* polyData)
+  struct ClustersQuadrics final
   {
-    return nullptr != polyData && 0 < polyData->GetNumberOfPoints() &&
-      (0 < polyData->GetNumberOfPolys() || 0 < polyData->GetNumberOfStrips());
-  }
-
-  vtkSmartPointer<vtkPolyData> TriangulatePolyData(vtkPolyData* polyData)
-  {
-    auto triangleFilter = vtkSmartPointer<vtkTriangleFilter>::New();
-    triangleFilter->SetInputData(polyData);
-    triangleFilter->PassVertsOff();
-    triangleFilter->PassLinesOff();
-
-    triangleFilter->Update();
-
-    return triangleFilter->GetOutput();
-  }
-
-  vtkSmartPointer<vtkPolyData> CalculateNormals(vtkPolyData* polyData, bool flipNormals)
-  {
-    auto polyDataNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
-    polyDataNormals->SetInputData(polyData);
-
-    if (flipNormals)
-      polyDataNormals->FlipNormalsOn();
-
-    polyDataNormals->Update();
-
-    return polyDataNormals->GetOutput();
-  }
-
-  Mesh ConvertPolyDataToMesh(vtkPolyData* polyData)
-  {
-    Mesh mesh;
-
-    auto* points = polyData->GetPoints();
-    const auto numPoints = points->GetNumberOfPoints();
-
-    for (std::remove_const_t<decltype(numPoints)> i = 0; i < numPoints; ++i)
-      mesh.add_vertex(Mesh::Point(points->GetPoint(i)));
-
-    auto* polys = polyData->GetPolys();
-    const auto numPolys = polys->GetNumberOfCells();
-
-    auto ids = vtkSmartPointer<vtkIdList>::New();
-    std::array<Mesh::VertexHandle, 3> vertexHandles;
-
-    for (std::remove_const_t<decltype(numPolys)> i = 0; i < numPolys; ++i)
+    explicit ClustersQuadrics(size_t size)
+      : Elements(size),
+        Size(size)
     {
-      polys->GetCellAtId(i, ids);
-
-      vertexHandles[0] = Mesh::VertexHandle(static_cast<int>(ids->GetId(0)));
-      vertexHandles[1] = Mesh::VertexHandle(static_cast<int>(ids->GetId(1)));
-      vertexHandles[2] = Mesh::VertexHandle(static_cast<int>(ids->GetId(2)));
-
-      mesh.add_face(vertexHandles.data(), 3);
+      for (auto& array : Elements)
+        array.fill(0.0);
     }
 
-    return mesh;
-  }
+    ~ClustersQuadrics() = default;
 
-  vtkSmartPointer<vtkPolyData> ConvertMeshToPolyData(const Mesh& mesh)
+    ClustersQuadrics(const ClustersQuadrics&) = delete;
+    ClustersQuadrics& operator=(const ClustersQuadrics&) = delete;
+
+    std::vector<std::array<double, 9>> Elements;
+    size_t Size;
+  };
+
+  void ValidateSurface(const mitk::Surface* surface, mitk::TimeStepType t)
   {
-    auto polyData = vtkSmartPointer<vtkPolyData>::New();
+    if (surface == nullptr)
+      mitkThrow() << "Input surface is nullptr!";
 
-    const auto numVertices = mesh.n_vertices();
-    auto points = vtkSmartPointer<vtkPoints>::New();
-    points->SetNumberOfPoints(numVertices);
+    if (t >= surface->GetSizeOfPolyDataSeries())
+      mitkThrow() << "Input surface doesn't have data at time step " << t << "!";
 
-    for (std::remove_const_t<decltype(numVertices)> i = 0; i < numVertices; ++i)
-      points->SetPoint(i, mesh.point(Mesh::VertexHandle(static_cast<int>(i))).data());
+    auto* polyData = const_cast<mitk::Surface *>(surface)->GetVtkPolyData(t);
 
-    polyData->SetPoints(points);
+    if (polyData == nullptr)
+      mitkThrow() << "PolyData of input surface at time step " << t << " is nullptr!";
 
-    const auto numFaces = mesh.n_faces();
-    auto polys = vtkSmartPointer<vtkCellArray>::New();
-
-    auto ids = vtkSmartPointer<vtkIdList>::New();
-    ids->SetNumberOfIds(3);
-    Mesh::CFVIter iter;
-
-    for (std::remove_const_t<decltype(numFaces)> i = 0; i < numFaces; ++i)
-    {
-      iter = mesh.cfv_iter(Mesh::FaceHandle(static_cast<int>(i)));
-
-      ids->SetId(0, (iter++)->idx());
-      ids->SetId(1, (iter++)->idx());
-      ids->SetId(2, iter->idx());
-
-      polys->InsertNextCell(ids);
-    }
-
-    polyData->SetPolys(polys);
-
-    return polyData;
-  }
-
-  mitk::Surface::Pointer ProcessEachTimeStep(const mitk::Surface* input, bool calculateNormals, bool flipNormals, const std::function<void(Mesh&)>& ProcessMesh)
-  {
-    if (nullptr == input || !input->IsInitialized())
-      return nullptr;
-
-    auto output = mitk::Surface::New();
-    const auto numTimeSteps = input->GetTimeSteps();
-
-    for (std::remove_const_t<decltype(numTimeSteps)> t = 0; t < numTimeSteps; ++t)
-    {
-      vtkSmartPointer<vtkPolyData> polyData = input->GetVtkPolyData(t);
-
-      if (IsValidPolyData(polyData))
-      {
-        polyData = TriangulatePolyData(polyData);
-
-        if (IsValidPolyData(polyData))
-        {
-          auto mesh = ConvertPolyDataToMesh(polyData);
-          ProcessMesh(mesh);
-          polyData = ConvertMeshToPolyData(mesh);
-
-          if (calculateNormals)
-            polyData = CalculateNormals(polyData, flipNormals);
-
-          output->SetVtkPolyData(polyData, t);
-          continue;
-        }
-      }
-
-      output->SetVtkPolyData(nullptr, t);
-    }
-
-    return output;
+    if (polyData->GetNumberOfPolys() == 0)
+      mitkThrow() << "Input surface has no polygons at time step " << t << "!";
   }
 }
 
-mitk::Surface::Pointer mitk::Remeshing::Decimate(const Surface* input, double percent, bool calculateNormals, bool flipNormals)
+mitk::Surface::Pointer mitk::Remesh(const Surface* surface,
+                                    TimeStepType t,
+                                    int numVertices,
+                                    double gradation,
+                                    int subsampling,
+                                    double edgeSplitting,
+                                    int optimizationLevel,
+                                    bool forceManifold,
+                                    bool boundaryFixing)
 {
-  return ProcessEachTimeStep(input, calculateNormals, flipNormals, [percent](Mesh& mesh) {
-    using Decimater = OpenMesh::Decimater::DecimaterT<Mesh>;
-    using HModQuadric = OpenMesh::Decimater::ModQuadricT<Mesh>::Handle;
+  ValidateSurface(surface, t);
 
-    Decimater decimater(mesh);
+  MITK_INFO << "Start remeshing...";
 
-    HModQuadric hModQuadric;
-    decimater.add(hModQuadric);
-    decimater.module(hModQuadric).unset_max_err();
+  auto surfacePolyData = vtkSmartPointer<vtkPolyData>::New();
+  surfacePolyData->DeepCopy(const_cast<Surface *>(surface)->GetVtkPolyData(t));
 
-    decimater.initialize();
-    decimater.decimate_to(mesh.n_vertices() * std::max(0.0, std::min(percent, 1.0)));
+  auto mesh = vtkSmartPointer<vtkSurface>::New();
 
-    mesh.garbage_collection();
-  });
+  mesh->CreateFromPolyData(surfacePolyData);
+  mesh->GetCellData()->Initialize();
+  mesh->GetPointData()->Initialize();
+
+  mesh->DisplayMeshProperties();
+
+  if (numVertices == 0)
+    numVertices = surfacePolyData->GetNumberOfPoints();
+
+  if (edgeSplitting != 0.0)
+    mesh->SplitLongEdges(edgeSplitting);
+
+  auto remesher = vtkSmartPointer<vtkIsotropicDiscreteRemeshing>::New();
+
+  remesher->GetMetric()->SetGradation(gradation);
+  remesher->SetBoundaryFixing(boundaryFixing);
+  remesher->SetConsoleOutput(1);
+  remesher->SetForceManifold(forceManifold);
+  remesher->SetInput(mesh);
+  remesher->SetNumberOfClusters(numVertices);
+  remesher->SetSubsamplingThreshold(subsampling);
+
+  remesher->Remesh();
+
+  // Optimization: Minimize distance between input surface and remeshed surface
+  if (optimizationLevel != 0)
+  {
+    ClustersQuadrics clustersQuadrics(numVertices);
+
+    auto faceList = vtkSmartPointer<vtkIdList>::New();
+    vtkSmartPointer<vtkIntArray> clustering = remesher->GetClustering();
+    vtkSmartPointer<vtkSurface> remesherInput = remesher->GetInput();
+    int clusteringType = remesher->GetClusteringType();
+    int numItems = remesher->GetNumberOfItems();
+    int numMisclassifiedItems = 0;
+
+    for (int i = 0; i < numItems; ++i)
+    {
+      int cluster = clustering->GetValue(i);
+
+      if (cluster >= 0 && cluster < numVertices)
+      {
+        if (clusteringType != 0)
+        {
+          remesherInput->GetVertexNeighbourFaces(i, faceList);
+          int numIds = static_cast<int>(faceList->GetNumberOfIds());
+
+          for (int j = 0; j < numIds; ++j)
+            vtkQuadricTools::AddTriangleQuadric(clustersQuadrics.Elements[cluster].data(), remesherInput, faceList->GetId(j), false);
+        }
+        else
+        {
+          vtkQuadricTools::AddTriangleQuadric(clustersQuadrics.Elements[cluster].data(), remesherInput, i, false);
+        }
+      }
+      else
+      {
+        ++numMisclassifiedItems;
+      }
+    }
+
+    if (numMisclassifiedItems != 0)
+      MITK_INFO << numMisclassifiedItems << " items with wrong cluster association" << std::endl;
+
+    vtkSmartPointer<vtkSurface> remesherOutput = remesher->GetOutput();
+    double point[3];
+
+    for (int i = 0; i < numVertices; ++i)
+    {
+      remesherOutput->GetPoint(i, point);
+      vtkQuadricTools::ComputeRepresentativePoint(clustersQuadrics.Elements[i].data(), point, optimizationLevel);
+      remesherOutput->SetPointCoordinates(i, point);
+    }
+
+    MITK_INFO << "After quadrics post-processing:" << std::endl;
+    remesherOutput->DisplayMeshProperties();
+  }
+
+  auto normals = vtkSmartPointer<vtkPolyDataNormals>::New();
+
+  normals->SetInputData(remesher->GetOutput());
+  normals->AutoOrientNormalsOn();
+  normals->ComputeCellNormalsOff();
+  normals->ComputePointNormalsOn();
+  normals->ConsistencyOff();
+  normals->FlipNormalsOff();
+  normals->NonManifoldTraversalOff();
+  normals->SplittingOff();
+
+  normals->Update();
+
+  auto remeshedSurface = Surface::New();
+  remeshedSurface->SetVtkPolyData(normals->GetOutput());
+
+  MITK_INFO << "Finished remeshing";
+
+  return remeshedSurface;
+}
+
+mitk::RemeshFilter::RemeshFilter()
+  : m_TimeStep(0),
+    m_NumVertices(0),
+    m_Gradation(1.0),
+    m_Subsampling(10),
+    m_EdgeSplitting(0.0),
+    m_OptimizationLevel(1),
+    m_ForceManifold(false),
+    m_BoundaryFixing(false)
+{
+  Surface::Pointer output = Surface::New();
+  this->SetNthOutput(0, output);
+}
+
+mitk::RemeshFilter::~RemeshFilter()
+{
+}
+
+void mitk::RemeshFilter::GenerateData()
+{
+  auto output = Remesh(this->GetInput(),
+                       m_TimeStep,
+                       m_NumVertices,
+                       m_Gradation,
+                       m_Subsampling,
+                       m_EdgeSplitting,
+                       m_OptimizationLevel,
+                       m_ForceManifold,
+                       m_BoundaryFixing);
+
+  this->SetNthOutput(0, output);
 }

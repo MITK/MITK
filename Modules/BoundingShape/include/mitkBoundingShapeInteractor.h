@@ -122,12 +122,12 @@ namespace mitk
     /**
     * @brief Enables default crosshair properties
     */
-    void EnableCrosshairNavigation();
+    void EnableOriginalInteraction();
 
     /**
     * @brief Sets limited crosshair properties (disable crosshair movement)
     */
-    void DisableCrosshairNavigation();
+    void DisableOriginalInteraction();
 
     class Impl;
     Impl *m_Impl;

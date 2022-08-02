@@ -78,7 +78,7 @@ namespace mitk
    \b Assumptions
     - expected to work with certain SOP Classes (mostly CT Image Storage and MR Image Storage)
       - see ImageBlockDescriptor.GetReaderImplementationLevel() method for the details
-    - special treatment for a certain type of Philips 3D ultrasound (recogized by tag 3001,0010 set to "Philips3D")
+    - special treatment for a certain type of Philips 3D ultrasound (recognized by tag 3001,0010 set to "Philips3D")
     - loader will always attempt to read multiple single slices as a single 3D image volume (i.e. mitk::Image)
       - slices will be grouped by basic properties such as orientation, rows, columns, spacing and grouped into as large
   blocks as possible
@@ -166,7 +166,7 @@ namespace mitk
    Before slices are further analyzed, they are sorted spatially. As implemented by GdcmSortFunction(),
    slices are sorted by
      1. distance from origin (calculated using (0020,0032) Image Position Patient and (0020,0037) Image Orientation)
-     2. when distance is equal, (0020,0012) Aquisition Number, (0008,0032) Acquisition Time and (0018,1060) Trigger Time
+     2. when distance is equal, (0020,0012) Acquisition Number, (0008,0032) Acquisition Time and (0018,1060) Trigger Time
   are
         used as a backup criterions (necessary for meaningful 3D+t sorting)
 
@@ -188,7 +188,7 @@ namespace mitk
 
    Slices that share a position in space are also sorted into separate blocks during this step.
    So the result of this step is a set of blocks that contain only slices with equal z spacing
-   and uniqe slices at each position.
+   and unique slices at each position.
 
    \subsection DicomSeriesReader_sorting4 Step 4 (optional): group 3D blocks as 3D+t when possible
 
@@ -199,7 +199,7 @@ namespace mitk
    \section DicomSeriesReader_gantrytilt Handling of gantry tilt
 
    When CT gantry tilt is used, the gantry plane (= X-Ray source and detector ring) and the vertical plane do not align
-   anymore. This scanner feature is used for example to reduce metal artifacs (e.g. <i>Lee C , Evaluation of Using CT
+   anymore. This scanner feature is used for example to reduce metal artifacts (e.g. <i>Lee C , Evaluation of Using CT
    Gantry Tilt Scan on Head and Neck Cancer Patients with Dental Structure: Scans Show Less Metal Artifacts. Presented
    at: Radiological Society of North America 2011 Scientific Assembly and Annual Meeting; November 27- December 2,
    2011 Chicago IL.</i>).
@@ -299,7 +299,7 @@ namespace mitk
 
    \section DicomSeriesReader_pixelspacing Handling of pixel spacing
 
-   The reader implementes what is described in DICOM Part 3, chapter 10.7 (Basic Pixel Spacing Calibration Macro): Both
+   The reader implements what is described in DICOM Part 3, chapter 10.7 (Basic Pixel Spacing Calibration Macro): Both
   tags
     - (0028,0030) Pixel Spacing and
     - (0018,1164) Imager Pixel Spacing
@@ -321,7 +321,7 @@ namespace mitk
 
     This is a short list of ideas for enhancement:
      - Class has historically grown and should be reviewed again. There is probably too many duplicated scanning code
-     - Multi-frame images don't mix well with the curent assumption of "one file - one slice", which is assumed by our
+     - Multi-frame images don't mix well with the current assumption of "one file - one slice", which is assumed by our
   code
        - It should be checked how well GDCM and ITK support these files (some load, some don't)
      - Specializations such as the Philips 3D code should be handled in a more generic way. The current handling of
@@ -368,7 +368,7 @@ namespace mitk
     */
     typedef enum {
       ReaderImplementationLevel_Supported,       /// loader code and tests are established
-      ReaderImplementationLevel_PartlySupported, /// loader code and tests are establised for specific parts of a SOP
+      ReaderImplementationLevel_PartlySupported, /// loader code and tests are established for specific parts of a SOP
                                                  /// Class
       ReaderImplementationLevel_Implemented,     /// loader code is implemented but not accompanied by tests
       ReaderImplementationLevel_Unsupported,     /// loader code is not working with this SOP Class
@@ -618,7 +618,7 @@ namespace mitk
       StringContainer GetUnsortedFilenames();
 
       /**
-        \brief Wheter or not the grouped result contain a gantry tilt.
+        \brief Whether or not the grouped result contain a gantry tilt.
       */
       bool ContainsGantryTilt();
 
@@ -657,7 +657,7 @@ namespace mitk
       Takes geometry information for two slices of a DICOM series and
       calculates whether these fit into an orthogonal block or not.
       If NOT, they can either be the result of an acquisition with
-      gantry tilt OR completly broken by some shearing transformation.
+      gantry tilt OR completely broken by some shearing transformation.
 
       Most calculations are done in the constructor, results can then
       be read via the remaining methods.
@@ -708,7 +708,7 @@ namespace mitk
 
         Gantry tilt will only produce shifts in ONE orientation, not in both.
 
-        Since the correction code currently only coveres one tilt direction
+        Since the correction code currently only covers one tilt direction
         AND we don't know of medical images with two tilt directions, the
         loading code wants to check if our assumptions are true.
       */
@@ -816,7 +816,7 @@ namespace mitk
       \brief Sort a set of file names in an order that is meaningful for loading them into an mitk::Image.
 
       \warning This method assumes that input files are similar in basic properties such as
-               slice thicknes, image orientation, pixel spacing, rows, columns.
+               slice thickness, image orientation, pixel spacing, rows, columns.
                It should always be ok to put the result of a call to GetSeries(..) into this method.
 
       Sorting order is determined by

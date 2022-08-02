@@ -10,29 +10,29 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkLiveWireTool2DGUI_h_Included
-#define QmitkLiveWireTool2DGUI_h_Included
+#ifndef QmitkLassoToolGUI_h_Included
+#define QmitkLassoToolGUI_h_Included
 
 #include "QmitkEditableContourToolGUIBase.h"
 #include <MitkSegmentationUIExports.h>
 
 /**
 \ingroup org_mitk_gui_qt_interactivesegmentation_internal
-\brief GUI for mitk::LiveWireTool.
-\sa mitk::LiveWireTool2D
+\brief GUI for mitk::NewAddTool.
+\sa mitk::LassoTool
 */
-class MITKSEGMENTATIONUI_EXPORT QmitkLiveWireTool2DGUI : public QmitkEditableContourToolGUIBase
+class MITKSEGMENTATIONUI_EXPORT QmitkLassoToolGUI : public QmitkEditableContourToolGUIBase
 {
   Q_OBJECT
 
 public:
-  mitkClassMacro(QmitkLiveWireTool2DGUI, QmitkToolGUI);
+  mitkClassMacro(QmitkLassoToolGUI, QmitkEditableContourToolGUIBase);
   itkFactorylessNewMacro(Self);
   itkCloneMacro(Self);
 
 protected:
-  QmitkLiveWireTool2DGUI();
-  ~QmitkLiveWireTool2DGUI() override;
+  QmitkLassoToolGUI();
+  ~QmitkLassoToolGUI() override;
 };
 
 #endif

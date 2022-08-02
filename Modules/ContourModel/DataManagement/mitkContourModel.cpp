@@ -128,7 +128,7 @@ void mitk::ContourModel::InsertVertexAtIndex(const Point3D &vertex, int index, b
 {
   if (!this->IsEmptyTimeStep(timestep))
   {
-    if (index >= 0 && this->m_ContourSeries[timestep]->GetSize() > ContourElement::VertexSizeType(index))
+    if (index >= 0 && this->m_ContourSeries[timestep]->GetSize() >= ContourElement::VertexSizeType(index))
     {
       this->m_ContourSeries[timestep]->InsertVertexAtIndex(vertex, isControlPoint, index);
       this->InvokeEvent(ContourModelSizeChangeEvent());
@@ -199,6 +199,18 @@ const mitk::ContourModel::VertexType *mitk::ContourModel::GetVertexAt(int index,
   return nullptr;
 }
 
+const mitk::ContourModel::VertexType *mitk::ContourModel::GetVertexAt(mitk::Point3D &point,
+                                                                      float eps,
+                                                                      TimeStepType timestep) const
+{
+  if (!this->IsEmptyTimeStep(timestep))
+  {
+    return this->m_ContourSeries[timestep]->GetVertexAt(point, eps);
+  }
+  return nullptr;
+}
+
+
 const mitk::ContourModel::VertexType *mitk::ContourModel::GetNextControlVertexAt(mitk::Point3D &point,
                                                                           float eps,
                                                                           TimeStepType timestep) const
@@ -268,11 +280,38 @@ bool mitk::ContourModel::IsEmptyTimeStep(unsigned int t) const
   return (this->m_ContourSeries.size() <= t);
 }
 
-bool mitk::ContourModel::IsNearContour(Point3D &point, float eps, TimeStepType timestep)
+bool mitk::ContourModel::IsNearContour(Point3D &point, float eps, TimeStepType timestep) const
 {
   if (!this->IsEmptyTimeStep(timestep))
   {
     return this->m_ContourSeries[timestep]->IsNearContour(point, eps);
+  }
+  return false;
+}
+
+bool mitk::ContourModel::GetLineSegmentForPoint(const mitk::Point3D& point,
+  float eps, TimeStepType timestep,
+  ContourElement::VertexSizeType& segmentStartIndex,
+  ContourElement::VertexSizeType& segmentEndIndex,
+  mitk::Point3D& closestContourPoint,
+  bool findClosest) const
+{
+  if (!this->IsEmptyTimeStep(timestep))
+  {
+    return this->m_ContourSeries[timestep]->GetLineSegmentForPoint(point, eps, segmentStartIndex, segmentEndIndex, closestContourPoint, findClosest);
+  }
+  return false;
+}
+
+bool mitk::ContourModel::GetLineSegmentForPoint(Point3D &point,
+                                                float eps,
+                                                TimeStepType timestep,
+                                                mitk::ContourElement::VertexType *previousVertex,
+                                                mitk::ContourElement::VertexType *nextVertex)
+{
+  if (!this->IsEmptyTimeStep(timestep))
+  {
+    return this->m_ContourSeries[timestep]->GetLineSegmentForPoint(point, eps, previousVertex, nextVertex);
   }
   return false;
 }

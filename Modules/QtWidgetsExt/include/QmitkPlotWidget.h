@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include <qwt_plot_curve.h>
 #include <qwt_plot_intervalcurve.h>
 #include <qwt_symbol.h>
+#include <qwt_text.h>
 #include <tuple>
 #include <vector>
 

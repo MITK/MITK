@@ -323,8 +323,6 @@ function(mitk_create_module)
     if(MODULE_GCC_DEFAULT_VISIBILITY OR NOT CMAKE_COMPILER_IS_GNUCXX)
       # We only support hidden visibility for gcc for now. Clang still has troubles with
       # correctly marking template declarations and explicit template instantiations as exported.
-      # See http://comments.gmane.org/gmane.comp.compilers.clang.scm/50028
-      # and http://llvm.org/bugs/show_bug.cgi?id=10113
       set(CMAKE_CXX_VISIBILITY_PRESET default)
       set(CMAKE_VISIBILITY_INLINES_HIDDEN 0)
     else()
@@ -344,8 +342,7 @@ function(mitk_create_module)
         mitkFunctionCheckCAndCXXCompilerFlags(-Werror module_c_flags module_cxx_flags)
 
         # The flag "c++0x-static-nonintegral-init" has been renamed in newer Clang
-        # versions to "static-member-init", see
-        # http://clang-developers.42468.n3.nabble.com/Wc-0x-static-nonintegral-init-gone-td3999651.html
+        # versions to "static-member-init"
         #
         # Also, older Clang and seemingly all gcc versions do not warn if unknown
         # "-no-*" flags are used, so CMake will happily append any -Wno-* flag to the

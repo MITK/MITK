@@ -11,9 +11,9 @@
 #!         variable to the absolute path of the generated input filter executable
 #!         in the parent scope. If <out-file> is specified, they will be the same.
 #!
-#! This CMake function compiles the http://github.com/saschazelzer/CMakeDoxygenFilter
+#! This CMake function compiles the https://github.com/saschazelzer/CMakeDoxygenFilter
 #! project into a doxygen input filter executable. See
-#! http://github.com/saschazelzer/CMakeDoxygenFilter/blob/master/README for more details.
+#! https://github.com/saschazelzer/CMakeDoxygenFilter/blob/master/README for more details.
 #!
 function(mitkFunctionCMakeDoxygenFilterCompile)
 

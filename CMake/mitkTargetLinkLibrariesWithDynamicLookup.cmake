@@ -38,7 +38,7 @@
 #     For OSX it uses ``undefined dynamic_lookup``. This is similar to using
 #     ``-shared`` on Linux where undefined symbols are ignored.
 #
-#     For more details, see `blog <http://blog.tim-smith.us/2015/09/python-extension-modules-os-x/>`_
+#     For more details, see `blog <https://blog.tim-smith.us/2015/09/python-extension-modules-os-x/>`_
 #     from Tim D. Smith.
 #
 #

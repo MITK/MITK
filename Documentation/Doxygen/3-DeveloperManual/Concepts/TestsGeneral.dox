@@ -67,7 +67,7 @@ An example:
   }
 \endcode
 
-You also may provide a setUp() and a tearDown() function. These will be called before/after each test and should be used to make sure that each test works independently and on freshly initialized members and memory to maximize isolation. That way you avoid only testing whether a function works after another function has already been called. See <a href="http://cppunit.sourceforge.net/doc/cvs/class_test_fixture.html">CppUnit documentation</a> for more information. For an example test suite including tests see \ref GeneralTestsExample
+You also may provide a setUp() and a tearDown() function. These will be called before/after each test and should be used to make sure that each test works independently and on freshly initialized members and memory to maximize isolation. That way you avoid only testing whether a function works after another function has already been called. For an example test suite including tests see \ref GeneralTestsExample
 
 \section GeneralTestsRunning Running your test suite
 
@@ -81,7 +81,7 @@ If possible, the setUp() method of the test suite should provide all necessary i
 
 \section GeneralTestsPredefinedAssertions Predefined assertions
 
-MITK and CppUnit offer predefined assertions, i.e. helper methods which will help to compare your data against a certain reference. All basic types are covered by CppUnit assertions, such as CPPUNIT_ASSERT. For examples, please check the <a href="http://cppunit.sourceforge.net/doc/cvs/group___assertions.html">CppUnit documentation</a>. MITK further offers comparison tools for floating point numbers, vectors, images, surfaces and point sets. A complete list of assertion macros is given in \ref MITKTestingAPI.
+MITK and CppUnit offer predefined assertions, i.e. helper methods which will help to compare your data against a certain reference. All basic types are covered by CppUnit assertions, such as CPPUNIT_ASSERT. MITK further offers comparison tools for floating point numbers, vectors, images, surfaces and point sets. A complete list of assertion macros is given in \ref MITKTestingAPI.
 
 An example to compare images:
 \code

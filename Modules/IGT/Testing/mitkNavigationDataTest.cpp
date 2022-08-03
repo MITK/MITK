@@ -260,7 +260,7 @@ static void SetupNaviDataTests()
 
   // set quaternion to quaternion equivalent
   // values calculated with javascript at
-  // http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
+  // https://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
   quaternion = mitk::Quaternion(0, 0, 0.7071067811865475, 0.7071067811865476);
 
   // a more realistic quaternion from real tracking data

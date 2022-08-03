@@ -70,7 +70,7 @@ int compareVersions(const QString &v1, const QString &v2)
   out.flush();
   QNetworkAccessManager manager;
   QNetworkReply *reply =
-    manager.get(QNetworkRequest(QUrl("http://www.mitk.org/wiki/PluginGeneratorUpdate?action=raw")));
+    manager.get(QNetworkRequest(QUrl("https://www.mitk.org/wiki/PluginGeneratorUpdate?action=raw")));
 
   QEventLoop eventLoop;
   reply->connect(reply, SIGNAL(finished()), &eventLoop, SLOT(quit()));

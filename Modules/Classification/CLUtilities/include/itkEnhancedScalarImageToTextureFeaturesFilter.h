@@ -18,7 +18,7 @@ found in the LICENSE file.
 *  you may not use this file except in compliance with the License.
 *  You may obtain a copy of the License at
 *
-*         http://www.apache.org/licenses/LICENSE-2.0.txt
+*         https://www.apache.org/licenses/LICENSE-2.0.txt
 *
 *  Unless required by applicable law or agreed to in writing, software
 *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -89,7 +89,7 @@ namespace itk
     * (2) The standard deviation in the values of each feature.
     *
     * Web reference:
-    * http://www.fp.ucalgary.ca/mhallbey/tutorial.htm
+    * https://prism.ucalgary.ca/handle/1880/51900
     *
     * Print references:
     * Haralick, R.M., K. Shanmugam and I. Dinstein. 1973.  Textural Features for

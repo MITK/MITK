@@ -66,7 +66,7 @@ mitk::GantryTiltInformation::GantryTiltInformation(
      Determine if line (imagePosition2 + l * normal) contains imagePosition1.
      Done by calculating the distance of imagePosition1 from line (imagePosition2 + l *normal)
 
-     E.g. http://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html
+     E.g. https://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html
 
      squared distance = | (pointAlongNormal - origin2) x (origin2 - origin1) | ^ 2
      /
@@ -104,7 +104,7 @@ mitk::GantryTiltInformation::GantryTiltInformation(
        now also check to which side the image is shifted.
 
        Calculation e.g. from
-       http://mathworld.wolfram.com/Point-PlaneDistance.html
+       https://mathworld.wolfram.com/Point-PlaneDistance.html
     */
 
     Point3Dd  testPoint = origin1;
@@ -196,7 +196,7 @@ mitk::Point3D
 mitk::GantryTiltInformation::projectPointOnLine( Point3Dd p, Point3Dd lineOrigin, Vector3Dd lineDirection )
 {
   /**
-    See illustration at http://mo.mathematik.uni-stuttgart.de/inhalt/aussage/aussage472/
+    See illustration at https://mo.mathematik.uni-stuttgart.de/inhalt/aussage/aussage472/
 
     vector(lineOrigin,p) = normal * ( innerproduct((p - lineOrigin),normal) / squared-length(normal) )
   */

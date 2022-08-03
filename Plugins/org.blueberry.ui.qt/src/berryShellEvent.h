@@ -28,7 +28,6 @@ class Shell;
  * operations being performed on shells.
  *
  * @see ShellListener
- * @see <a href="http://www.blueberry.org/swt/">Sample code and further information</a>
  */
 
 class BERRY_UI_QT ShellEvent : public Object {

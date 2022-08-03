@@ -39,7 +39,7 @@ namespace mitk
 
   /**
   * \deprecatedSince{2015_05} ExtrudedContour is deprecated. It will be removed in the next release.
-  *  Becomes obsolete. Refer to http://docs.mitk.org/nightly/InteractionMigration.html .
+  *  Becomes obsolete. Refer to https://docs.mitk.org/nightly/InteractionMigration.html .
   */
 
   class MITKSEGMENTATION_EXPORT ExtrudedContour : public BoundingObject

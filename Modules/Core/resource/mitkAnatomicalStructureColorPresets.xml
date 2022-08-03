@@ -4,9 +4,9 @@
   Based on: https://www.slicer.org/slicerWiki/index.php/Documentation/4.5/SlicerApplication/LookupTables/GenericAnatomyColors
   Authors: Michael Halle, Florin Talos, Ron Kikinis, Steve Pieper, Nicole Aucoin, Marianna Jakab
 *Coding scheme:
-  http://dicom.nema.org/medical/dicom/current/output/html/part16.html
+  https://dicom.nema.org/medical/dicom/current/output/html/part16.html
 *Modifier
-    http://dicom.nema.org/dicom/2013/output/chtml/part16/chapter_B.html#sect_CID_2
+    https://dicom.nema.org/dicom/2013/output/chtml/part16/chapter_B.html#sect_CID_2
 -->
 <mitkAnatomicalStructureColorPresets file_version="0.1" >
   <preset name="Abdomen">

@@ -12,7 +12,7 @@ if(CPACK_GENERATOR MATCHES "NSIS")
   
   # tell cpack to create links to the doc files
   set(CPACK_NSIS_MENU_LINKS
-    "http://www.mitk.org" "MITK Web Site"
+    "https://www.mitk.org" "MITK Web Site"
     )
 
   # tell cpack the executables you want in the start menu as links

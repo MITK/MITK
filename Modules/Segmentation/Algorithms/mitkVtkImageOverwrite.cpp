@@ -17,7 +17,7 @@ found in the LICENSE file.
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+  See Copyright.txt or https://vtk.org/about/#license for details.
 
      This software is distributed WITHOUT ANY WARRANTY; without even
      the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR

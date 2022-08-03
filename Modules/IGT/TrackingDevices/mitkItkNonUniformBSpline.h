@@ -17,7 +17,7 @@ This file is based heavily on a corresponding ITK filter.
 ===================================================================*/
 
 /*********************************
-  This file was taken from ITK, CVS version 1.8 to circumvent a bug in ITK release 3.18 (see http://public.kitware.com/Bug/view.php?id=10633
+  This file was taken from ITK, CVS version 1.8 to circumvent a bug in ITK release 3.18
  *********************************/
 
 #ifndef __itkNonUniformBSpline_h

@@ -39,10 +39,6 @@ else()
   project(${MY_PROJECT_NAME})
 endif()
 
-#-----------------------------------------------------------------------------
-# See http://cmake.org/cmake/help/cmake-2-8-docs.html#section_Policies for details
-#-----------------------------------------------------------------------------
-
 set(project_policies
   CMP0001 # NEW: CMAKE_BACKWARDS_COMPATIBILITY should no longer be used.
   CMP0002 # NEW: Logical target names must be globally unique.

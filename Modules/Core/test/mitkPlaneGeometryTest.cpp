@@ -136,7 +136,7 @@ public:
      * with a left-handed coordinate orientation or indexToWorldMatrix.
      *
      * Of course this test does not use standard Parameters, which are right-handed.
-     * See also discussion of bug #11477: http://bugs.mitk.org/show_bug.cgi?id=11477
+     * See also discussion of bug #11477: https://phabricator.mitk.org/T11477
      */
     planegeometry = mitk::PlaneGeometry::New();
     width = 100;

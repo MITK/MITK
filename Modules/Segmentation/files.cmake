@@ -33,15 +33,12 @@ set(CPP_FILES
   Interactions/mitkBinaryThresholdBaseTool.cpp
   Interactions/mitkBinaryThresholdTool.cpp
   Interactions/mitkBinaryThresholdULTool.cpp
-  Interactions/mitkCalculateGrayValueStatisticsTool.cpp
-  Interactions/mitkCalculateVolumetryTool.cpp
   Interactions/mitkContourModelInteractor.cpp
   Interactions/mitkContourModelLiveWireInteractor.cpp
   Interactions/mitkEditableContourTool.cpp
   Interactions/mitkLiveWireTool2D.cpp
   Interactions/mitkLassoTool.cpp
   Interactions/mitkContourTool.cpp
-  Interactions/mitkCreateSurfaceTool.cpp
   Interactions/mitkDrawPaintbrushTool.cpp
   Interactions/mitkErasePaintbrushTool.cpp
   Interactions/mitkEraseRegionTool.cpp
@@ -49,7 +46,6 @@ set(CPP_FILES
   Interactions/mitkFillRegionTool.cpp
   Interactions/mitkOtsuTool3D.cpp
   Interactions/mitkPaintbrushTool.cpp
-  Interactions/mitkPixelManipulationTool.cpp
   Interactions/mitkRegionGrowingTool.cpp
   Interactions/mitkSegmentationsProcessingTool.cpp
   Interactions/mitkSetRegionTool.cpp

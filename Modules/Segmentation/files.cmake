@@ -39,7 +39,6 @@ set(CPP_FILES
   Interactions/mitkLiveWireTool2D.cpp
   Interactions/mitkLassoTool.cpp
   Interactions/mitkContourTool.cpp
-  Interactions/mitkCreateSurfaceTool.cpp
   Interactions/mitkDrawPaintbrushTool.cpp
   Interactions/mitkErasePaintbrushTool.cpp
   Interactions/mitkEraseRegionTool.cpp

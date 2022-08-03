@@ -49,7 +49,6 @@ set(CPP_FILES
   Interactions/mitkFillRegionTool.cpp
   Interactions/mitkOtsuTool3D.cpp
   Interactions/mitkPaintbrushTool.cpp
-  Interactions/mitkPixelManipulationTool.cpp
   Interactions/mitkRegionGrowingTool.cpp
   Interactions/mitkSegmentationsProcessingTool.cpp
   Interactions/mitkSetRegionTool.cpp

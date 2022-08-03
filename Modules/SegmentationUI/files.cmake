@@ -15,7 +15,6 @@ Qmitk/QmitkLassoToolGUI.cpp
 Qmitk/QmitkOtsuTool3DGUI.cpp
 Qmitk/QmitkPaintbrushToolGUI.cpp
 Qmitk/QmitkPickingToolGUI.cpp
-Qmitk/QmitkPixelManipulationToolGUI.cpp
 Qmitk/QmitkSlicesInterpolator.cpp
 Qmitk/QmitkToolGUI.cpp
 Qmitk/QmitkToolGUIArea.cpp
@@ -49,7 +48,6 @@ Qmitk/QmitkLassoToolGUI.h
 Qmitk/QmitkOtsuTool3DGUI.h
 Qmitk/QmitkPaintbrushToolGUI.h
 Qmitk/QmitkPickingToolGUI.h
-Qmitk/QmitkPixelManipulationToolGUI.h
 Qmitk/QmitkSlicesInterpolator.h
 Qmitk/QmitkToolGUI.h
 Qmitk/QmitkToolGUIArea.h

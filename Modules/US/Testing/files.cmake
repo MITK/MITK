@@ -6,7 +6,7 @@ SET(MODULE_TESTS
 
    # ------------------ Deavtivated Tests ----------------------------------
 
-   # see http://bugs.mitk.org/show_bug.cgi?id=18180
+   # see https://phabricator.mitk.org/T18180
    mitkUSImageLoggingFilterTest.cpp
 
    # -----------------------------------------------------------------------

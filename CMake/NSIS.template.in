@@ -48,7 +48,7 @@
 
 ;--- Component support macros: ---
 ; The code for the add/remove functionality is from:
-;   http://nsis.sourceforge.net/Add/Remove_Functionality
+;   https://nsis.sourceforge.io/Add/Remove_Functionality
 ; It has been modified slightly and extended to provide
 ; inter-component dependencies.
 Var AR_SecFlags
@@ -125,7 +125,7 @@ Var AR_RegFlags
 !macroend
 
 ; NSIS example code to only include some code if a file exists at compile time (whereas IfFileExists works at runtime)
-; See http://nsis.sourceforge.net/Check_if_a_file_exists_at_compile_time for documentation
+; See https://nsis.sourceforge.io/Check_if_a_file_exists_at_compile_time for documentation
 !macro !defineifexist _VAR_NAME _FILE_NAME
   !tempfile _TEMPFILE
   !system 'if exist "${_FILE_NAME}" echo !define ${_VAR_NAME} > "${_TEMPFILE}"'

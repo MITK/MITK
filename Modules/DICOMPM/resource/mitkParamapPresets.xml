@@ -3,14 +3,14 @@
 * Source
 
 *Coding schemes:
-  http://dicom.nema.org/medical/dicom/current/output/chtml/part16/PS3.16.html
+  https://dicom.nema.org/medical/dicom/current/output/chtml/part16/PS3.16.html
 
 -->
 
 <mitkParamapPresets file_version="0.1" >
 <!--
 Tracer Kinetic Models
-http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4101.html
+https://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4101.html
 -->
   <preset name="Standard Tofts Model">
     <type code_value="126340" coding_scheme="DCM" code_name="Standard Tofts Model"/>
@@ -35,7 +35,7 @@ http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4101.ht
   </preset>
 <!--
 Perfusion Measurement Methods
-http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4102.html
+https://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4102.html
 -->
   <preset name="Perfusion analysis by Arterial Spin Labeling MR technique">
     <type code_value="126302" coding_scheme="DCM" code_name="Perfusion analysis by Arterial Spin Labeling MR technique"/>
@@ -48,7 +48,7 @@ http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4102.ht
   </preset>
 <!--
 Arterial Input Function Measurement Methods
-http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4103.html
+https://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4103.html
 -->
   <preset name="AIF Ignored">
     <type code_value="126360" coding_scheme="DCM" code_name="AIF Ignored"/>
@@ -67,7 +67,7 @@ http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4103.ht
   </preset>
 <!--
 Bolus Arrival Time Derivation Methods
-http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4104.html
+https://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4104.html
 -->
   <preset name="Temporal Derivative Exceeds Threshold">
     <type code_value="126373" coding_scheme="DCM" code_name="Temporal Derivative Exceeds Threshold"/>
@@ -80,7 +80,7 @@ http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4104.ht
   </preset>
 <!--
 Perfusion Analysis Methods
-http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4105.html
+https://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4105.html
 -->
   <preset name="Least Mean Square (LMS) deconvolution">
     <type code_value="126310" coding_scheme="DCM" code_name="Least Mean Square (LMS) deconvolution"/>
@@ -90,14 +90,14 @@ http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4105.ht
   </preset>
 <!--
 Perfusion Analysis Methods
-http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4105.html
+https://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4105.html
 -->
   <preset name="Model-free concentration-time quantitification">
     <type code_value="126342" coding_scheme="DCM" code_name="Model-free concentration-time quantitification"/>
   </preset>
 <!--
 Tracer Kinetic Model Parameters
-http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4107.html
+https://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4107.html
 -->
   <preset name="KTrans">
     <type code_value="126312" coding_scheme="DCM" code_name="KTrans"/>
@@ -116,7 +116,7 @@ http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4107.ht
   </preset>
 <!--
 Perfusion Model Parameters
-http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4108.html
+https://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4108.html
 -->
   <preset name="Regional Cerebral Blood Flow">
     <type code_value="113055" coding_scheme="DCM" code_name="Regional Cerebral Blood Flow"/>
@@ -144,7 +144,7 @@ http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4108.ht
   </preset>
 <!--
 Model-Independent Dynamic Contrast Analysis Parameters
-http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4109.html
+https://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4109.html
 -->
   <preset name="IAUC">
     <type code_value="126320" coding_scheme="DCM" code_name="IAUC"/>
@@ -196,7 +196,7 @@ http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4109.ht
   </preset>
   <!--
 Tracer Kinetic Modeling Covariates
-http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4110.html
+https://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4110.html
 -->
   <preset name="Hematocrit">
     <type code_value="20570-8" coding_scheme="DCM" code_name="Hematocrit"/>
@@ -204,7 +204,7 @@ http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4110.ht
 
   <!--
 Contrast Characteristics
-http://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4111.html
+https://dicom.nema.org/medical/dicom/current/output/chtml/part16/sect_CID_4111.html
 -->
   <preset name="Contrast Longitudinal Relaxivity">
     <type code_value="126380" coding_scheme="DCM" code_name="Contrast Longitudinal Relaxivity"/>

@@ -28,8 +28,7 @@
  * Aug 11, 2010, Toni Ronkko
  * Added d_type and d_namlen fields to dirent structure.  The former is
  * especially useful for determining whether directory entry represents a
- * file or a directory.  For more information, see
- * http://www.delorie.com/gnu/docs/glibc/libc_270.html
+ * file or a directory.
  *
  * Aug 11, 2010, Toni Ronkko
  * Improved conformance to the standards.  For example, errno is now set

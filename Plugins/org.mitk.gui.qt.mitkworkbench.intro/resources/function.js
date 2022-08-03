@@ -7,8 +7,8 @@ var moduleNames = new Array("MITK Website",
                             "Tutorials Website");
 
 // add the MITK-link to your module
-var moduleLinks = new Array("http://www.mitk.org/",
-                            "http://mitk.org/wiki/Tutorials");
+var moduleLinks = new Array("https://www.mitk.org",
+                            "https://www.mitk.org/Tutorials");
 
 // add the filename of your icon for the module. Place the picture in subdirectory "pics".
 // The picture's width should be 136 pixel; the height 123 pixel.
@@ -216,7 +216,7 @@ function setExperimental(modPos){
 
 
 function openPage(){
-  window.open("http://www.mitk.org","_blank");
+  window.open("https://www.mitk.org","_blank");
 }
 
 // function to close PopUp-window

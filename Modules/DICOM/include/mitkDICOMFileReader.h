@@ -27,7 +27,7 @@ found in the LICENSE file.
 namespace mitk
 {
 // TODO Philips3D!
-// TODO http://bugs.mitk.org/show_bug.cgi?id=11572 ?
+// TODO https://phabricator.mitk.org/T11572 ?
 
 /**
   \ingroup DICOMModule

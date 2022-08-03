@@ -26,7 +26,6 @@ namespace GuiTk
  * controls being moved or resized.
  *
  * @see ControlListener
- * @see <a href="http://www.blueberry.org/swt/">Sample code and further information</a>
  */
 
 class BERRY_UI_QT ControlEvent: public Event

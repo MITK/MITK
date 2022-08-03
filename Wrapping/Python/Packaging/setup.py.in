@@ -128,6 +128,6 @@ setup(
         ],
     license='Apache',
     keywords = 'MITK ITK InsightToolkit segmentation registration',
-    url = r'http://mitk.org/',
+    url = r'https://www.mitk.org/',
     cmdclass={'build_ext':build_ext}
     )

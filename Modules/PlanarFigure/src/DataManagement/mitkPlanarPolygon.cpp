@@ -158,7 +158,7 @@ void mitk::PlanarPolygon::PrintSelf(std::ostream &os, itk::Indent indent) const
 }
 
 // based on
-// http://flassari.is/2008/11/line-line-intersection-in-cplusplus/
+// https://flassari.is/2008/11/line-line-intersection-in-cplusplus/
 bool mitk::PlanarPolygon::CheckForLineIntersection(const mitk::Point2D &p1,
                                                    const mitk::Point2D &p2,
                                                    const mitk::Point2D &p3,

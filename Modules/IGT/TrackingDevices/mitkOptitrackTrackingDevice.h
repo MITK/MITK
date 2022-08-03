@@ -45,7 +45,7 @@ namespace mitk
   *          device, then open the connection and start tracking. The tracking device will then
   *          continuously update the tool coordinates. Remember that it will be necessary to
   *       to have a license for using the Optitrack System.
-  *       See  http://www.naturalpoint.com/ for details.
+  *       See  https://www.naturalpoint.com/ for details.
   *   \author E. Marinetto (emarinetto@hggm.es) Instituto de Investigación Sanitaria Gregorio Marañón, Madrid, Spain. & M. Noll (matthias.noll@igd.fraunhofer.de) Cognitive Computing & Medical Imaging | Fraunhofer IGD
   *   \ingroup IGT
   */

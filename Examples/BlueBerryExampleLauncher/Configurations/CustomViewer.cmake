@@ -19,5 +19,5 @@ Spoken in BlueBerry terms, the following features are provided:
 <li> GUI Customization using Qt-Stylesheets </li>
 </ul>
 
-See the main <a href=\"http://docs.mitk.org/nightly/BlueBerryExampleCustomViewer.html\">documentation</a> for details."
+See the main <a href=\"https://docs.mitk.org/nightly/BlueBerryExampleCustomViewer.html\">documentation</a> for details."
 )

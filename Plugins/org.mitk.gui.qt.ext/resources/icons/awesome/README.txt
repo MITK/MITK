@@ -1,1 +1,1 @@
-This icon theme is based on Font Awesome by Dave Gandy - http://fontawesome.io
+This icon theme is based on Font Awesome v4 - https://fontawesome.com/v4/

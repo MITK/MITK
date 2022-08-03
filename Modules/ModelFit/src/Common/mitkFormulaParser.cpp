@@ -80,8 +80,7 @@ namespace mitk
   /*!
    *	@brief			Returns the fresnel integral sine at the given x-coordinate.
    *	@details		Code for "fresnel_s()" (fresnel.cpp and fresnel.h) taken as-is from the GNU
-   *					Scientific Library (http://www.gnu.org/software/gsl/), specifically from
-   *					http://www.network-theory.co.uk/download/gslextras/Fresnel/.
+   *					Scientific Library (https://www.gnu.org/software/gsl/).
    *	@tparam T		The scalar type that represents a value (e.g. double).
    *	@param[in] t	The x-coordinate at which the fresnel integral sine should be returned.
    *	@return			The fresnel integral sine at the given x-coordinate.
@@ -96,8 +95,7 @@ namespace mitk
   /*!
    *	@brief			Returns the fresnel integral cosine at the given x-coordinate.
    *	@details		Code for "fresnel_c()" (fresnel.cpp and fresnel.h) taken as-is from the GNU
-   *					Scientific Library (http://www.gnu.org/software/gsl/), specifically from
-   *					http://www.network-theory.co.uk/download/gslextras/Fresnel/.
+   *					Scientific Library (https://www.gnu.org/software/gsl/).
    *	@tparam T		The scalar type that represents a value (e.g. double).
    *	@param[in] t	The x-coordinate at which the fresnel integral cosine should be returned.
    *	@return			The fresnel integral cosine at the given x-coordinate.

@@ -39,8 +39,8 @@ std::vector<mitk::TubeGraph::TubeDescriptorType> mitk::TubeGraph::SearchShortest
 std::vector<mitk::TubeGraph::TubeDescriptorType> mitk::TubeGraph::SearchAllPathBetweenVertices(
   const mitk::TubeGraph::TubeDescriptorType &startTube,
   const mitk::TubeGraph::TubeDescriptorType &endTube /*, std::vector<unsigned long> barrier*/)
-{ // http://lists.boost.org/boost-users/att-9001/maze.cpp
-  // http://www.boost.org/doc/libs/1_49_0/libs/graph/example/bfs.cpp
+{ // https://lists.boost.org/boost-users/att-9001/maze.cpp
+  // https://www.boost.org/doc/libs/1_49_0/libs/graph/example/bfs.cpp
 
   typedef std::map<VertexDescriptorType, EdgeDescriptorType> EdgeMap;
   typedef boost::associative_property_map<EdgeMap> PredecessorMap;

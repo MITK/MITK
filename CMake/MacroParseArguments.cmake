@@ -1,6 +1,6 @@
 # macro(MACRO_PARSE_ARGUMENTS prefix arg_names option_names)
 #
-#   From http://www.cmake.org/Wiki/CMakeMacroParseArguments:
+#   From https://gitlab.kitware.com/cmake/community/-/wikis/contrib/macros/ParseArguments:
 #
 #   The MACRO_PARSE_ARGUMENTS macro will take the arguments of another macro and
 #   define several variables:

@@ -4,7 +4,6 @@ Qmitk/QmitkMultiLabelSegWithPreviewToolGUIBase.cpp
 Qmitk/QmitkBinaryThresholdToolGUIBase.cpp
 Qmitk/QmitkBinaryThresholdToolGUI.cpp
 Qmitk/QmitkBinaryThresholdULToolGUI.cpp
-Qmitk/QmitkCalculateGrayValueStatisticsToolGUI.cpp
 Qmitk/QmitkConfirmSegmentationDialog.cpp
 Qmitk/QmitkCopyToClipBoardDialog.cpp
 Qmitk/QmitkDrawPaintbrushToolGUI.cpp
@@ -37,7 +36,6 @@ Qmitk/QmitkMultiLabelSegWithPreviewToolGUIBase.h
 Qmitk/QmitkBinaryThresholdToolGUIBase.h
 Qmitk/QmitkBinaryThresholdToolGUI.h
 Qmitk/QmitkBinaryThresholdULToolGUI.h
-Qmitk/QmitkCalculateGrayValueStatisticsToolGUI.h
 Qmitk/QmitkConfirmSegmentationDialog.h
 Qmitk/QmitkCopyToClipBoardDialog.h
 Qmitk/QmitkDrawPaintbrushToolGUI.h

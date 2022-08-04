@@ -56,9 +56,8 @@ if(NOT DEFINED ITK_DIR)
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
      UPDATE_COMMAND ""
-     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/InsightToolkit-5.2.1.tar.gz
-     URL_MD5 48c1fe49f75fdaa91b31bbf9dda01a42
-     PATCH_COMMAND ${PATCH_COMMAND} -N -p1 -i ${CMAKE_CURRENT_LIST_DIR}/ITK-5.2.1.patch
+     GIT_REPOSITORY https://github.com/MITK/ITK.git
+     GIT_TAG v5.2.1-patched
      CMAKE_GENERATOR ${gen}
      CMAKE_GENERATOR_PLATFORM ${gen_platform}
      CMAKE_ARGS

@@ -30,8 +30,8 @@ if(MITK_USE_DCMTK)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/dcmtk-3.6.6.tar.gz
-      URL_MD5 f815879d315b916366a9da71339c7575
+      GIT_REPOSITORY https://github.com/DCMTK/dcmtk.git
+      GIT_TAG DCMTK-3.6.7
       CMAKE_GENERATOR ${gen}
       CMAKE_GENERATOR_PLATFORM ${gen_platform}
       CMAKE_ARGS

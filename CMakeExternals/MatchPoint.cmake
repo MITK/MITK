@@ -49,13 +49,11 @@ if(MITK_USE_MatchPoint)
          ${additional_cmake_args}
          -DBUILD_TESTING:BOOL=OFF
          -DITK_DIR:PATH=${ITK_DIR} #/src/ITK-build
-         -DMAP_USE_SYSTEM_GDCM:BOOL=ON
          -DMAP_USE_SYSTEM_HDF5:BOOL=ON
          -DMAP_DISABLE_ITK_IO_FACTORY_AUTO_REGISTER:BOOL=ON
          -DMAP_WRAP_Plastimatch:BOOL=ON
          -DMAP_BUILD_Ontology:BOOL=ON
          -DMAP_BUILD_Ontology_simple:BOOL=ON
-         -DGDCM_DIR:PATH=${GDCM_DIR}
          -DHDF5_DIR:PATH=${HDF5_DIR}
        CMAKE_CACHE_ARGS
          ${ep_common_cache_args}

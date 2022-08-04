@@ -8,7 +8,7 @@ if(DEFINED ITK_DIR AND NOT EXISTS ${ITK_DIR})
 endif()
 
 set(proj ITK)
-set(proj_DEPENDENCIES GDCM)
+set(proj_DEPENDENCIES )
 
 if(MITK_USE_OpenCV)
   list(APPEND proj_DEPENDENCIES OpenCV)
@@ -64,8 +64,6 @@ if(NOT DEFINED ITK_DIR)
        ${ep_common_args}
        ${additional_cmake_args}
        -DBUILD_EXAMPLES:BOOL=OFF
-       -DITK_USE_SYSTEM_GDCM:BOOL=ON
-       -DGDCM_DIR:PATH=${GDCM_DIR}
        -DITK_USE_SYSTEM_HDF5:BOOL=ON
        -DHDF5_DIR:PATH=${HDF5_DIR}
        ${${proj}_CUSTOM_CMAKE_ARGS}

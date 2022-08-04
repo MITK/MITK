@@ -15,8 +15,6 @@ if(MITK_USE_CTK)
 
   if(NOT DEFINED CTK_DIR)
 
-    set(revision_tag "7210c5bc")
-
     set(ctk_optional_cache_args )
     if(MITK_USE_Python3)
       list(APPEND ctk_optional_cache_args
@@ -51,8 +49,8 @@ if(MITK_USE_CTK)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      GIT_REPOSITORY https://github.com/commontk/CTK
-      GIT_TAG ${revision_tag}
+      GIT_REPOSITORY https://github.com/MITK/CTK.git
+      GIT_TAG ec816cbb-patched
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${gen}

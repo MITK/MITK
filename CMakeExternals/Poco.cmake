@@ -46,8 +46,8 @@ if(MITK_USE_Poco)
 
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
-      URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/poco-1.9.0.tar.gz
-      URL_MD5 1011839033f72de138f0c523c2caa121
+      GIT_REPOSITORY https://github.com/pocoproject/poco.git
+      GIT_TAG poco-1.12.1-release
       CMAKE_GENERATOR ${gen}
       CMAKE_GENERATOR_PLATFORM ${gen_platform}
       CMAKE_ARGS

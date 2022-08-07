@@ -26,6 +26,10 @@ found in the LICENSE file.
 
 #include <fstream>
 
+#if !defined(MITK_WINDOWS_NO_UNDEF) && defined(GetTempPath)
+  #undef GetTempPath
+#endif
+
 namespace us
 {
   class ModuleResource;

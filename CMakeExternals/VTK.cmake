@@ -54,8 +54,8 @@ if(NOT DEFINED VTK_DIR)
 
   ExternalProject_Add(${proj}
     LIST_SEPARATOR ${sep}
-    URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/VTK-9.1.0.tar.gz
-    URL_MD5 96508e51d7c3764cd5aba06fffd9864e
+    GIT_REPOSITORY https://github.com/Kitware/VTK.git
+    GIT_TAG v9.1.0
     CMAKE_GENERATOR ${gen}
     CMAKE_GENERATOR_PLATFORM ${gen_platform}
     CMAKE_ARGS

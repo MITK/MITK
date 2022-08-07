@@ -19,7 +19,7 @@ found in the LICENSE file.
 #include <itksys/SystemTools.hxx>
 
 #include <igtlClientSocket.h>
-#include <igtl_status.h>
+#include <mitkIGTLStatus.h>
 
 mitk::IGTLClient::IGTLClient(bool ReadFully) :
 IGTLDevice(ReadFully)

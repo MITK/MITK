@@ -21,7 +21,7 @@ found in the LICENSE file.
 #include <igtlTransformMessage.h>
 #include <mitkIGTLMessageCommon.h>
 
-#include <igtl_status.h>
+#include <mitkIGTLStatus.h>
 
 //remove later
 #include <igtlTrackingDataMessage.h>
@@ -120,8 +120,9 @@ unsigned int mitk::IGTLDevice::ReceivePrivate(igtl::Socket* socket)
   headerMsg->InitPack();
 
   // Receive generic header from the socket
+  bool timeout = false;
   int r =
-    socket->Receive(headerMsg->GetPackPointer(), headerMsg->GetPackSize(), 0);
+    socket->Receive(headerMsg->GetPackPointer(), headerMsg->GetPackSize(), timeout, 0);
 
   //MITK_INFO << "Server received r = " << r;
 

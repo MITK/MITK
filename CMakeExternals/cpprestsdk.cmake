@@ -24,7 +24,7 @@ if(MITK_USE_${proj})
 
     ExternalProject_Add(${proj}
       GIT_REPOSITORY https://github.com/microsoft/cpprestsdk.git
-      GIT_TAG v2.10.16
+      GIT_TAG v2.10.18
       SOURCE_SUBDIR Release
       CMAKE_ARGS ${ep_common_args}
       CMAKE_CACHE_ARGS ${cmake_cache_args}

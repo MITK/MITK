@@ -11,10 +11,6 @@ set(proj VTK)
 set(proj_DEPENDENCIES )
 set(VTK_DEPENDS ${proj})
 
-if(MITK_USE_HDF5)
-  list(APPEND proj_DEPENDENCIES HDF5)
-endif()
-
 if(NOT DEFINED VTK_DIR)
 
   set(additional_cmake_args )
@@ -56,6 +52,7 @@ if(NOT DEFINED VTK_DIR)
     LIST_SEPARATOR ${sep}
     GIT_REPOSITORY https://github.com/Kitware/VTK.git
     GIT_TAG v9.1.0
+    GIT_SUBMODULES ""
     CMAKE_GENERATOR ${gen}
     CMAKE_GENERATOR_PLATFORM ${gen_platform}
     CMAKE_ARGS

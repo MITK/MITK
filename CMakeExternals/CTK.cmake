@@ -47,6 +47,11 @@ if(MITK_USE_CTK)
 
     mitk_query_custom_ep_vars()
 
+    set(pythonqt_location_args
+      "-DPythonQt_GIT_REPOSITORY:STRING=https://github.com/MITK/PythonQt.git"
+      -DPythonQt_REVISION_TAG:STRING=patched-10-patched
+    )
+
     ExternalProject_Add(${proj}
       LIST_SEPARATOR ${sep}
       GIT_REPOSITORY https://github.com/MITK/CTK.git
@@ -73,9 +78,8 @@ if(MITK_USE_CTK)
         -DCTK_LIB_XNAT/Core:BOOL=ON
         -DCTK_PLUGIN_org.commontk.eventadmin:BOOL=ON
         -DCTK_PLUGIN_org.commontk.configadmin:BOOL=ON
-        -DCTK_USE_GIT_PROTOCOL:BOOL=OFF
         -DDCMTK_DIR:PATH=${DCMTK_DIR}
-        -DPythonQt_URL:STRING=${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/PythonQt_fae23012.tar.gz
+        ${pythonqt_location_args}
         ${${proj}_CUSTOM_CMAKE_ARGS}
       CMAKE_CACHE_ARGS
         ${ep_common_cache_args}

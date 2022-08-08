@@ -19,7 +19,8 @@ found in the LICENSE file.
 
 
 #include "mitkUndistortCameraImage.h"
-
+#include <opencv2/imgproc/imgproc_c.h>
+#include <opencv2/calib3d.hpp>
 
 mitk::UndistortCameraImage::UndistortCameraImage()
 {
@@ -116,7 +117,11 @@ void mitk::UndistortCameraImage::UndistortImage(IplImage *src, IplImage *dst)
   m_distortionMatrix       = cvMat(1, 4, CV_32F, m_distortionMatrixData);
 
   // undistort
-  cvUndistort2(src,dst, &m_intrinsicMatrix, &m_distortionMatrix);
+  auto srcMat = cv::cvarrToMat(src);
+  auto dstMat = cv::cvarrToMat(dst);
+  auto intrinsicMat = cv::cvarrToMat(&m_intrinsicMatrix);
+  auto distortionMat = cv::cvarrToMat(&m_distortionMatrix);
+  cv::undistort(srcMat, dstMat, intrinsicMat, distortionMat);
 }
 
 
@@ -214,8 +219,11 @@ void mitk::UndistortCameraImage::SetUndistortImageFastInfo(float in_dF1, float i
   m_mapX = cvCreateMat(ImageSizeY, ImageSizeX, CV_32FC1);
   m_mapY = cvCreateMat(ImageSizeY, ImageSizeX, CV_32FC1);
 
-  //cv::initUndistortRectifyMap(m_CameraMatrix, m_DistortionCoeffs, m_mapX, m_mapY);
-  cvInitUndistortMap(m_CameraMatrix, m_DistortionCoeffs, m_mapX, m_mapY);
+  auto cameraMat = cv::cvarrToMat(m_CameraMatrix);
+  auto distortionCoeffs = cv::cvarrToMat(m_DistortionCoeffs);
+  auto mapX = cv::cvarrToMat(m_mapX);
+  auto mapY = cv::cvarrToMat(m_mapY);
+  cv::initUndistortRectifyMap(cameraMat, distortionCoeffs, cv::Mat(), cameraMat, mapX.size(), mapX.type(), mapX, mapY);
 }
 
 

@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include "mitkImageToImageFilter.h"
 #include <MitkToFProcessingExports.h>
 #include <itkBilateralImageFilter.h>
-#include "opencv2/core.hpp"
+#include <opencv2/core/types_c.h>
 
 typedef itk::Image<float, 2> ItkImageType2D;
 typedef itk::Image<float, 3> ItkImageType3D;

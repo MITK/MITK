@@ -20,6 +20,8 @@ found in the LICENSE file.
 #include "itkObject.h"
 #include "itkObjectFactory.h"
 
+#include <opencv2/core/types_c.h>
+
 namespace mitk
 {
   /**

@@ -1,7 +1,12 @@
-list(APPEND ALL_LIBRARIES ${OpenCV_LIBS})
-list(APPEND ALL_INCLUDE_DIRECTORIES ${OpenCV_INCLUDE_DIRS})
+foreach(opencv_module ${OpenCV_REQUIRED_COMPONENTS_BY_MODULE})
+  if(NOT opencv_module MATCHES "^opencv_")
+    set(opencv_module "opencv_${opencv_module}")
+  endif()
+  list(APPEND _opencv_required_components_by_module ${opencv_module})
+endforeach()
 
-# adding option for videoinput library on windows (for directshow based frame grabbing)
-if(WIN32)
-  option(MITK_USE_videoInput "Use videoInput (DirectShow wrapper) library" OFF)
-endif(WIN32)
+find_package(OpenCV COMPONENTS ${_opencv_required_components_by_module} REQUIRED)
+
+foreach(opencv_module ${_opencv_required_components_by_module})
+  list(APPEND ALL_LIBRARIES ${opencv_module})
+endforeach()

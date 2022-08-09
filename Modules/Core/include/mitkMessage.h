@@ -628,7 +628,7 @@ namespace mitk
 *     void StopAnalysis()
 *     {
 *       // send the "stop" message with false, indicating
-*       // that no error occured
+*       // that no error occurred
 *       m_AnalysisStoppedMessage(false);
 *     }
 * };

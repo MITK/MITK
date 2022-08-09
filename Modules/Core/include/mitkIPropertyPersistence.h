@@ -25,9 +25,9 @@ namespace mitk
     * Persistent properties will be saved if the file format supports custom key value pairs like the .nrrd file
     * format.\n
     * \remark The service supports the use of regular expressions (regex; ECMAscript syntax)
-    * for property names and persistance keys to specifiy persistence rules in a generic way. The getter of the
+    * for property names and persistance keys to specify persistence rules in a generic way. The getter of the
     * interface
-    * (GetInfo and GetInfoByKey) will always ensure that the return containes no regex, thus name and key in the results
+    * (GetInfo and GetInfoByKey) will always ensure that the return contains no regex, thus name and key in the results
     * can directly be used.
     */
   class MITKCORE_EXPORT IPropertyPersistence

@@ -45,7 +45,7 @@ namespace mitk
   class MITKCORE_EXPORT IOUtil
   {
   public:
-    /**Struct that containes information regarding the current loading process. (e.g. Path that should be loaded,
+    /**Struct that contains information regarding the current loading process. (e.g. Path that should be loaded,
     all found readers for the load path,...). It is set be IOUtil and used to pass information via the option callback
     in load operations.
     */
@@ -63,7 +63,7 @@ namespace mitk
     };
 
     /**Struct that is the base class for option callbacks used in load operations. The callback is used by IOUtil, if
-    more than one suitable reader was found or the a reader containes options that can be set. The callback allows to
+    more than one suitable reader was found or the a reader contains options that can be set. The callback allows to
     change option settings and select the reader that should be used (via loadInfo).
     */
     struct MITKCORE_EXPORT ReaderOptionsFunctorBase
@@ -91,7 +91,7 @@ namespace mitk
     };
 
     /**Struct that is the base class for option callbacks used in save operations. The callback is used by IOUtil, if
-    more than one suitable writer was found or the a writer containes options that can be set. The callback allows to
+    more than one suitable writer was found or the a writer contains options that can be set. The callback allows to
     change option settings and select the writer that should be used (via saveInfo).
     */
     struct MITKCORE_EXPORT WriterOptionsFunctorBase
@@ -127,7 +127,7 @@ namespace mitk
      * and opens the file using the output stream \c tmpStream and returns the name of
      * the newly create file.
      *
-     * The \c templateName argument must contain six consective 'X' characters ("XXXXXX")
+     * The \c templateName argument must contain six consecutive 'X' characters ("XXXXXX")
      * and these are replaced with a string that makes the filename unique.
      *
      * The file is created with read and write permissions for owner only.
@@ -152,7 +152,7 @@ namespace mitk
      * mode \c mode and returns the name of the newly create file. The open mode is always
      * OR'd with <code>std::ios_base::out | std::ios_base::trunc</code>.
      *
-     * The \c templateName argument must contain six consective 'X' characters ("XXXXXX")
+     * The \c templateName argument must contain six consecutive 'X' characters ("XXXXXX")
      * and these are replaced with a string that makes the filename unique.
      *
      * The file is created with read and write permissions for owner only.

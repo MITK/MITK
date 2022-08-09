@@ -23,12 +23,12 @@ namespace mitk
 
   /**Documentation
    @brief Predicate that evaluates if the given DataNode's data object
-   has a geometry that is a sub geomety of the reference geometry.
+   has a geometry that is a sub geometry of the reference geometry.
    Sub geometry means that both geometries have the same voxel grid (same spacing, same axes,
-   orgin is on voxel grid), but the bounding box of the checked geometry is contained or equal
+   origin is on voxel grid), but the bounding box of the checked geometry is contained or equal
    to the bounding box of the reference geometry.\n
    One can either check the whole time geometry of
-   the data node by defining a referenc time geometry or check against one given2
+   the data node by defining a reference time geometry or check against one given2
    reference base geometry. If the predicate should check against a base geometry,
    you can specify the timepoint of the data's time geometry that should be checked.
    If no timepoint is defined the predicate will evaluate the data geometry in

@@ -74,7 +74,7 @@ namespace mitk
     std::vector<std::string> m_IgnoreList;
 
     /**
-     * @brief m_Active determindes if events are caught and written to file
+     * @brief m_Active determines if events are caught and written to file
      */
     bool m_Active;
     std::string m_FileName;

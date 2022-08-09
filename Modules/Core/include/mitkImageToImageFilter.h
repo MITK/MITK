@@ -64,7 +64,7 @@ namespace mitk
     * a magnify filter) will have to override this method.  In doing so, it
     * should call its superclass' implementation as its first step. Note that
     * this imaging filters operate differently than the classes to this
-    * point in the class hierachy.  Up till now, the base assumption has been
+    * point in the class hierarchy.  Up till now, the base assumption has been
     * that the largest possible region will be requested of the input.
     *
     * \sa ProcessObject::GenerateInputRequestedRegion(),

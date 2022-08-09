@@ -36,7 +36,7 @@ namespace mitk
    * They act as meta data information to allow the linking of files to reader and writer.
    * They write files to specific IFileReader instances and provide data format
    * meta-data for selecting compatible IFileWriter instances.
-   * mirk::CustomMimetype should only be used to register mime-types. All other interaction should happen trough
+   * mirk::CustomMimetype should only be used to register mime-types. All other interaction should happen through
    * mitk::MimeTypeProvider, from which registered mimetypes can be pulled. mitk::MimeType provides a safe and
    * memory-managed
    * way of interacting with Mimetypes.
@@ -83,7 +83,7 @@ namespace mitk
     virtual bool AppliesTo(const std::string &path) const;
 
     /**
-    * \brief Checks if the MimeType can handle the etension of the given path
+    * \brief Checks if the MimeType can handle the extension of the given path
     *
     * This function exclusively looks a the given string
     */

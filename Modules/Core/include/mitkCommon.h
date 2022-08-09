@@ -52,7 +52,7 @@ typedef unsigned int MapperSlotId;
   itkTypeMacro(className, SuperClassName);
 
 /** At version 4.7 provides two type macros, the normal one expects the Superclass to provide the
- *  GetNameOfClass explicitely, the NoParent deos not expect anything.
+ *  GetNameOfClass explicitly, the NoParent deos not expect anything.
  */
 #define mitkClassMacroNoParent(className)                                                                              \
   typedef className Self;                                                                                              \

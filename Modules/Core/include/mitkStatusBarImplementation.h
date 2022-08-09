@@ -18,7 +18,7 @@ found in the LICENSE file.
 namespace mitk
 {
   //##Documentation
-  //## @brief GUI indepentent Interface for all Gui depentent implementations of a StatusBar.
+  //## @brief GUI independent Interface for all Gui depentent implementations of a StatusBar.
   class MITKCORE_EXPORT StatusBarImplementation
   {
   public:

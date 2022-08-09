@@ -78,7 +78,7 @@ namespace mitk
     * be
     * used.
     * if appendchanges is true, the file will not replaced but first loaded, then overwritten and then replaced
-    * \return false if an error occured (cannot write to file), true otherwise
+    * \return false if an error occurred (cannot write to file), true otherwise
     */
     virtual bool Save(const std::string &fileName = "", bool appendChanges = false) = 0;
     /**
@@ -88,7 +88,7 @@ namespace mitk
     * *ATTENTION*: If there are PropertyLists with the same id contained in the file, existing PropertyLists will be
     * overwritten!
     * \see AddPropertyListReplacedObserver()
-    * \return false if an error occured (cannot load from file), true otherwise
+    * \return false if an error occurred (cannot load from file), true otherwise
     */
     virtual bool Load(const std::string &fileName = "", bool enforeReload = true) = 0;
     /**

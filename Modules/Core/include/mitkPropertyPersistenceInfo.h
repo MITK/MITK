@@ -51,9 +51,9 @@ namespace mitk
     bool IsRegEx() const;
 
     /** Sets the name and the key identifier as a regular expression that describes valid names and keys.
-    * @pre nameRegEx must be a valid regular expression, otherweis a regex_error esception
+    * @pre nameRegEx must be a valid regular expression, otherwise a regex_error esception
     * is thrown and the info object is not changed.
-    * @pre keyRegEx must be a valid regular expression, otherweis a regex_error esception
+    * @pre keyRegEx must be a valid regular expression, otherwise a regex_error esception
     * is thrown and the info object is not changed.*/
     void UseRegEx(const std::string &nameRegEx, const std::string &nameTemplate);
     void UseRegEx(const std::string &nameRegEx,

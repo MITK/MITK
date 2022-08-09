@@ -400,7 +400,7 @@ namespace mitk
     vtkRenderer *m_VtkRenderer;
 
     //##Documentation
-    //## @brief MapperSlotId to use. Defines which kind of mapper (e.g., 2D or 3D) shoud be used.
+    //## @brief MapperSlotId to use. Defines which kind of mapper (e.g., 2D or 3D) should be used.
     MapperSlotId m_MapperID;
 
     //##Documentation

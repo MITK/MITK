@@ -27,7 +27,7 @@ namespace mitk
    the reference geometry.
 
    One can either check the whole time geometry of
-   the date node by defining a referenc time geometry or check against one given
+   the date node by defining a reference time geometry or check against one given
    reference base geometry. If the predicate should check against a base geometry,
    you can specify the timepoint of the data's time geometry that should be checked.
    If no timepoint is defined the predicate will evaluate the data geometry in

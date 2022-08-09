@@ -27,7 +27,7 @@ namespace mitk
   // Coordinate supplier can probably also be removed then.
 
   //##Documentation
-  //## @brief Operation with informations necessary for operations of DisplayVectorInteractor
+  //## @brief Operation with information necessary for operations of DisplayVectorInteractor
   //## @ingroup Undo
   class MITKCORE_EXPORT DisplayCoordinateOperation : public Operation
   {

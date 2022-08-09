@@ -31,7 +31,7 @@ namespace mitk
     static size_t GetProcessMemoryUsage();
 
     /**
-     * Returns the total size of phyiscal memory in bytes
+     * Returns the total size of physical memory in bytes
      */
     static size_t GetTotalSizeOfPhysicalRam();
 

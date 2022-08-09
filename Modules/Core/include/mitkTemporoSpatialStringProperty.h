@@ -82,7 +82,7 @@ namespace mitk
 
     std::string GetValueAsString() const override;
 
-    /** Inidicates of all values (all time steps, all slices) are the same, or if at least one value stored
+    /** Indicates of all values (all time steps, all slices) are the same, or if at least one value stored
     in the property is different. If IsUniform==true one can i.a. use GetValueAsString() without the loss of
     information to retrieve the stored value.*/
     bool IsUniform() const;

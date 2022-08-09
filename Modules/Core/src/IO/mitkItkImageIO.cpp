@@ -247,13 +247,13 @@ namespace mitk
       auto timeBounds = timeGeometry->GetTimeBounds(pos);
 
       ///////////////////////////////////////
-      // Workarround T27883. See https://phabricator.mitk.org/T27883#219473 for more details.
-      // This workarround should be removed as soon as T28262 is solved!
+      // Workaround T27883. See https://phabricator.mitk.org/T27883#219473 for more details.
+      // This workaround should be removed as soon as T28262 is solved!
       if (pos + 1 == maxTimePoints && timeBounds[0]==timeBounds[1])
       {
         timeBounds[1] = timeBounds[0] + 1.;
       }
-      // End of workarround for T27883
+      // End of workaround for T27883
       //////////////////////////////////////
 
       stream << " " << timeBounds[1];
@@ -688,7 +688,7 @@ namespace mitk
         }
         catch (...)
         {
-          MITK_ERROR << "Unkown error when serializing content of property. This often indicates the use of an out dated reader. Property will not be stored. Skipped property: " << property.first;
+          MITK_ERROR << "Unknown error when serializing content of property. This often indicates the use of an out dated reader. Property will not be stored. Skipped property: " << property.first;
         }
 
         if (value == mitk::BaseProperty::VALUE_CANNOT_BE_CONVERTED_TO_STRING)

@@ -66,7 +66,7 @@ int vtkMitkThickSlicesFilter::RequestInformation(vtkInformation *,
   outInfo->Set(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT(), extent, 6);
 
   /*
-    // Set the number of point data componets to the number of
+    // Set the number of point data components to the number of
     // components in the gradient vector.
     vtkDataObject::SetPointDataActiveScalarInfo(outInfo, VTK_DOUBLE,
                                                 this->Dimensionality);
@@ -98,7 +98,7 @@ int vtkMitkThickSlicesFilter::RequestUpdateExtent(vtkInformation *,
   if (inUExt[4] < wholeExtent[4]) */ inUExt[4] = wholeExtent[4];
   /*if (inUExt[5] > wholeExtent[5]) */ inUExt[5] = wholeExtent[5];
 
-  // Store the update extent needed from the intput.
+  // Store the update extent needed from the input.
   inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT(), inUExt, 6);
 
   return 1;
@@ -155,7 +155,7 @@ r[2] = -0.5 / r[2];
   // Move the pointer to the correct starting position.
   inPtr += (outExt[0] - inExt[0]) * inIncs[0] + (outExt[2] - inExt[2]) * inIncs[1] + (outExt[4] - inExt[4]) * inIncs[2];
 
-  // Loop through ouput pixels
+  // Loop through output pixels
 
   int _minZ = /*-5 + outExt[4];  if( _minZ  < wholeExtent[4]) _minZ=*/wholeExtent[4];
   int _maxZ = /* 5 + outExt[4];  if( _maxZ  > wholeExtent[5]) _maxZ=*/wholeExtent[5];
@@ -374,7 +374,7 @@ void vtkMitkThickSlicesFilter::ThreadedRequestData(vtkInformation *,
   vtkImageData *input = inData[0][0];
   vtkImageData *output = outData[0];
 
-  // The ouptut scalar type must be double to store proper gradients.
+  // The output scalar type must be double to store proper gradients.
   /*
     if(output->GetScalarType() != VTK_DOUBLE)
       {

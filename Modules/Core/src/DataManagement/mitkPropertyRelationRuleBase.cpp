@@ -457,7 +457,7 @@ const mitk::Identifiable* mitk::PropertyRelationRuleBase::CastProviderAsIdentifi
 
   if (!identifiable)
   { //This check and pass through to data is needed due to solve T25711. See Task for more information.
-    //This could be removed at the point we can get rid of DataNodes or they get realy transparent.
+    //This could be removed at the point we can get rid of DataNodes or they get really transparent.
     auto node = dynamic_cast<const DataNode*>(destination);
     if (node && node->GetData())
     {
@@ -677,7 +677,7 @@ mitk::PropertyRelationRuleBase::InstanceIDType mitk::PropertyRelationRuleBase::G
 
   if (proppath.GetSize() < 3 || !(proppath.GetFirstNode() == ref.GetFirstNode()) || !(proppath.GetNode(1) == ref.GetNode(1)))
   {
-    mitkThrow() << "Property name is not for a RII property or containes no instance ID. Wrong name: " << propName;
+    mitkThrow() << "Property name is not for a RII property or contains no instance ID. Wrong name: " << propName;
   }
 
   return proppath.GetNode(2).name;

@@ -326,7 +326,7 @@ void mitk::BaseRenderer::SetSlice(unsigned int slice)
       {
         // if slice position is part of the world geometry...
         if (m_Slice >= slicedWorldGeometry->GetSlices())
-          // set the current worldplanegeomety as the selected 2D slice of the world geometry
+          // set the current worldplanegeometry as the selected 2D slice of the world geometry
           m_Slice = slicedWorldGeometry->GetSlices() - 1;
         SetCurrentWorldPlaneGeometry(slicedWorldGeometry->GetPlaneGeometry(m_Slice));
         SetCurrentWorldGeometry(slicedWorldGeometry);
@@ -605,7 +605,7 @@ void mitk::BaseRenderer::DisplayToWorld(const Point2D &displayPoint, Point3D &wo
   {
     double display[3], *world;
 
-    // For the rigth z-position in display coordinates, take the focal point, convert it to display and use it for
+    // For the right z-position in display coordinates, take the focal point, convert it to display and use it for
     // correct depth.
     double *displayCoord;
     double cameraFP[4];

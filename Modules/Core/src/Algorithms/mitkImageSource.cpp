@@ -117,7 +117,7 @@ void mitk::ImageSource::AllocateOutputs()
 
 void mitk::ImageSource::GenerateData()
 {
-  // Call a method that can be overriden by a subclass to allocate
+  // Call a method that can be overridden by a subclass to allocate
   // memory for the filter's outputs
   this->AllocateOutputs();
 

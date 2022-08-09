@@ -44,7 +44,7 @@ namespace mitk
   }
 
   /**
-   * Explicitely reset progress bar.
+   * Explicitly reset progress bar.
    */
   void ProgressBar::Reset()
   {

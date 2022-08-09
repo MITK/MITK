@@ -70,7 +70,7 @@ void mitk::CoreObjectFactory::UnRegisterExtraFactory(CoreObjectFactoryBase *fact
   }
   catch ( const std::exception &e )
   {
-    MITK_ERROR << "Caugt exception while unregistering: " << e.what();
+    MITK_ERROR << "Caught exception while unregistering: " << e.what();
   }
 }
 
@@ -336,7 +336,7 @@ std::string mitk::CoreObjectFactory::GetDescriptionForExtension(const std::strin
        ++it)
     if (it->first == extension)
       return it->second;
-  return ""; // If no matching extension was found, return emtpy string
+  return ""; // If no matching extension was found, return empty string
 }
 
 void mitk::CoreObjectFactory::RegisterLegacyReaders(mitk::CoreObjectFactoryBase *factory)

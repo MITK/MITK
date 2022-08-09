@@ -162,15 +162,15 @@ public:
     MITK_TEST_CONDITION_REQUIRED(m_initTimeGeometry->GetMinimumTimePoint(2) == 0.0,
                                  "Testing GetMinimumTimePoint(2) with m_initTimeGeometry");
     ///////////////////////////////////////
-    // Workarround T27883. See https://phabricator.mitk.org/T27883#219473 for more details.
-    // This workarround should be removed/reevaluated as soon as T28262 is solved and we know
+    // Workaround T27883. See https://phabricator.mitk.org/T27883#219473 for more details.
+    // This workaround should be removed/reevaluated as soon as T28262 is solved and we know
     // how time geometries should behave in the future!
     MITK_TEST_CONDITION_REQUIRED(m_12345TimeGeometry->GetMinimumTimePoint(2) == 3.0,
       "Testing GetMinimumTimePoint(2) with m_12345TimeGeometry");
     // Deactivated falling original test
     //   MITK_TEST_CONDITION_REQUIRED(m_12345TimeGeometry->GetMinimumTimePoint(2) == 2.9,
     //   "Testing GetMinimumTimePoint(2) with m_12345TimeGeometry");
-    // End of workarround for T27883
+    // End of workaround for T27883
     //////////////////////////////////////
   }
 
@@ -219,15 +219,15 @@ public:
     MITK_TEST_CONDITION_REQUIRED(m_initTimeGeometry->GetTimeBounds(3)[0] == 0.0,
                                  "Testing GetTimeBounds(3) lower part with m_initTimeGeometry");
     ///////////////////////////////////////
-    // Workarround T27883. See https://phabricator.mitk.org/T27883#219473 for more details.
-    // This workarround should be removed/reevaluated as soon as T28262 is solved and we know
+    // Workaround T27883. See https://phabricator.mitk.org/T27883#219473 for more details.
+    // This workaround should be removed/reevaluated as soon as T28262 is solved and we know
     // how time geometries should behave in the future!
     MITK_TEST_CONDITION_REQUIRED(m_12345TimeGeometry->GetTimeBounds(3)[0] == 4.0,
       "Testing GetTimeBounds(3) lower part with m_12345TimeGeometry");
     // Deactivated falling original test
     //   MITK_TEST_CONDITION_REQUIRED(m_12345TimeGeometry->GetTimeBounds(3)[0] == 3.9,
     //                               "Testing GetTimeBounds(3) lower part with m_12345TimeGeometry");
-    // End of workarround for T27883
+    // End of workaround for T27883
     //////////////////////////////////////
 
 
@@ -306,9 +306,9 @@ public:
 
     //checked collapsed cases
     MITK_TEST_CONDITION_REQUIRED(m_123TimeGeometryWithCollapsedInterim->IsValidTimePoint(m_123TimeGeometryWithCollapsedInterim->GetMaximumTimePoint()) == false,
-      "Testing that m_123TimeGeometryWithCollapsedInterim does not inclued the max bound in validity");
+      "Testing that m_123TimeGeometryWithCollapsedInterim does not included the max bound in validity");
     MITK_TEST_CONDITION_REQUIRED(m_123TimeGeometryWithCollapsedEnd->IsValidTimePoint(m_123TimeGeometryWithCollapsedEnd->GetMaximumTimePoint()) == true,
-      "Testing that m_123TimeGeometryWithCollapsedEnd does inclued the max bound in validity, because it has an collapsed final time step. (see also T27259)");
+      "Testing that m_123TimeGeometryWithCollapsedEnd does included the max bound in validity, because it has an collapsed final time step. (see also T27259)");
 
   }
 
@@ -370,7 +370,7 @@ public:
 
     //checked collapsed cases
     MITK_TEST_CONDITION_REQUIRED(m_123TimeGeometryWithCollapsedInterim->TimePointToTimeStep(m_123TimeGeometryWithCollapsedInterim->GetMaximumTimePoint()) == m_123TimeGeometryWithCollapsedInterim->CountTimeSteps(),
-      "Testing m_123TimeGeometryWithCollapsedInterim does not map the max time poit.");
+      "Testing m_123TimeGeometryWithCollapsedInterim does not map the max time point.");
     MITK_TEST_CONDITION_REQUIRED(m_123TimeGeometryWithCollapsedEnd->TimePointToTimeStep(m_123TimeGeometryWithCollapsedEnd->GetMaximumTimePoint()) == 2,
       "Testing that m_123TimeGeometryWithCollapsedEnd does map the max bound, because it has an collapsed final time step. (see also T27259)");
 
@@ -505,15 +505,15 @@ public:
     MITK_TEST_CONDITION_REQUIRED(m_123TimeGeometry->GetMaximumTimePoint() == 4.9,
                                  "Testing AppendNewTimeStep() with m_123TimeGeometry");
     ///////////////////////////////////////
-    // Workarround T27883. See https://phabricator.mitk.org/T27883#219473 for more details.
-    // This workarround should be removed/reevaluated as soon as T28262 is solved and we know
+    // Workaround T27883. See https://phabricator.mitk.org/T27883#219473 for more details.
+    // This workaround should be removed/reevaluated as soon as T28262 is solved and we know
     // how time geometries should behave in the future!
     MITK_TEST_CONDITION_REQUIRED(m_123TimeGeometry->GetMinimumTimePoint(3) == 4.0,
       "Testing AppendNewTimeStep() with m_123TimeGeometry");
     // Deactivated falling original test
     //   MITK_TEST_CONDITION_REQUIRED(m_123TimeGeometry->GetMinimumTimePoint(3) == 3.9,
     //                                "Testing AppendNewTimeStep() with m_123TimeGeometry");
-    // End of workarround for T27883
+    // End of workaround for T27883
     //////////////////////////////////////
   }
 

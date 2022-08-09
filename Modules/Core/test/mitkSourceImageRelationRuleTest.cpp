@@ -810,13 +810,13 @@ public:
     // check actualization of an id only connection
     rule->Connect(source_idOnly_1, dest_1);
     CPPUNIT_ASSERT(rule->HasRelation(source_idOnly_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Complete));
-    CPPUNIT_ASSERT_MESSAGE("Additional relation was defined instead of updating exting one.",
+    CPPUNIT_ASSERT_MESSAGE("Additional relation was defined instead of updating existing one.",
                            rule->GetExistingRelations(source_1).size() == 1);
 
     // check actualization of an existing connection
     rule->Connect(source_1, dest_1);
     CPPUNIT_ASSERT(rule->HasRelation(source_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Complete));
-    CPPUNIT_ASSERT_MESSAGE("Additional relation was defined instead of updating exting one.",
+    CPPUNIT_ASSERT_MESSAGE("Additional relation was defined instead of updating existing one.",
                            rule->GetExistingRelations(source_1).size() == 1);
     name = "MITK.Relations.1.destinationUID";
     prop = source_1->GetProperty(name.c_str());
@@ -839,7 +839,7 @@ public:
     // check creation of an new connection
     rule->Connect(unRelated, dest_1);
     CPPUNIT_ASSERT(rule->HasRelation(unRelated, dest_1, mitk::PropertyRelationRuleBase::RelationType::Complete));
-    CPPUNIT_ASSERT_MESSAGE("Relation was not defined instead of updating exting one.",
+    CPPUNIT_ASSERT_MESSAGE("Relation was not defined instead of updating existing one.",
       rule->GetExistingRelations(unRelated).size() == 1);
     name = "MITK.Relations.1.destinationUID";
     prop = unRelated->GetProperty(name.c_str());
@@ -855,7 +855,7 @@ public:
 
     dcmRefs = GetReferenceSequenceIndices(unRelated, dest_1);
     CPPUNIT_ASSERT_MESSAGE("Additional dicom reference was defined instead of using the existing one.", dcmRefs.size() == 1);
-    CPPUNIT_ASSERT_MESSAGE("Dicom reference squence is corrupted. Should be just an index 0.", dcmRefs[0] == "0");
+    CPPUNIT_ASSERT_MESSAGE("Dicom reference sequence is corrupted. Should be just an index 0.", dcmRefs[0] == "0");
     CPPUNIT_ASSERT_MESSAGE("Dicom reference is not correct.", IsCorrectDICOMReference(unRelated, "dest_1", "image", "Test", 0));
 
     // check creation of a 2nd connection of the same purpose

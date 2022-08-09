@@ -103,7 +103,7 @@ static void testIfPointIsTransformedAsExpected(void)
   for (int i = 0; i < 3; i++) // only first three since no homogenous coordinates
     pointCorrect &= Equal(pointTransformedByAffineTransform3D[i], expectedPointAfterTransformation[i]);
 
-  MITK_TEST_CONDITION(pointCorrect, "Point has been correctly transformed by AffineTranform3D")
+  MITK_TEST_CONDITION(pointCorrect, "Point has been correctly transformed by AffineTransform3D")
 
   TearDown();
 }

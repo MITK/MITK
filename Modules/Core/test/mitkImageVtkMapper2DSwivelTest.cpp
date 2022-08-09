@@ -54,7 +54,7 @@ int mitkImageVtkMapper2DSwivelTest(int argc, char *argv[])
   // get the center point of the image
   centerPoint = image->GetGeometry()->GetCenter();
 
-  // rotate the image arround its own center
+  // rotate the image around its own center
   renderingHelper.ReorientSlices(centerPoint, rotationVector);
 
   //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper

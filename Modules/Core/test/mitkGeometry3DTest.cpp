@@ -201,7 +201,7 @@ int testIndexAndWorldConsistencyForIndex(mitk::Geometry3D *geometry3d)
   itkIndex2[0] = itkIndex2[1] = 2;
   mitkIndex[0] = mitkIndex[1] = mitkIndex[2] = 13;
 
-  // check for constistency
+  // check for consistency
   mitk::Point3D point;
   geometry3d->IndexToWorld(itkIndex2, point);
   geometry3d->WorldToIndex(point, itkIndex2b);
@@ -357,7 +357,7 @@ int testGeometry3D(bool imageGeometry)
     return EXIT_FAILURE;
   }
 
-  // Seperate Test function for Index and World consistency
+  // Separate Test function for Index and World consistency
   testIndexAndWorldConsistency(geometry3d);
   testIndexAndWorldConsistencyForVectors(geometry3d);
   testIndexAndWorldConsistencyForIndex(geometry3d);
@@ -446,7 +446,7 @@ int testGeometryAfterCasting()
 
   mitk::Image::Pointer mitkImage;
 
-  // direction [row] [coloum]
+  // direction [row] [column]
   MITK_TEST_OUTPUT(<< "Casting a rotated 3D ITK Image to a MITK Image and check if Geometry is still same");
   for (double rotX = 0; rotX < itk::Math::pi * 2; rotX += itk::Math::pi * 0.4)
   {
@@ -526,7 +526,7 @@ int testGeometryAfterCasting()
   myDirection2D.SetIdentity();
   rotMatrix.SetIdentity();
 
-  // direction [row] [coloum]
+  // direction [row] [column]
   MITK_TEST_OUTPUT(<< "Casting a rotated 2D ITK Image to a MITK Image and check if Geometry is still same");
   for (double rotTheta = 0; rotTheta < itk::Math::pi * 2; rotTheta += itk::Math::pi * 0.2)
   {

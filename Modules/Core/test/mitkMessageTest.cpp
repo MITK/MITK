@@ -287,7 +287,7 @@ int mitkMessageTest(int /* argc */, char * /*argv*/ [])
   MITK_TEST_CONDITION(observer2.m_MachineStopped == true, "Message1 from Message Macro send to receiver 2");
   MITK_TEST_CONDITION(observer2.m_Error == true, "Message1 parameter from Message Macro send to receiver 2");
 
-  /* Message with return type tests are work in progess... */
+  /* Message with return type tests are work in progress... */
   // bool patentSuccessful = newtonMachine.PatentLaw();   // what with return types from multiple observers?
 
   // MITK_TEST_CONDITION((observer1.m_PatentReviewed == true) && (patentSuccessful == false),

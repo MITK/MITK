@@ -15,7 +15,7 @@ found in the LICENSE file.
 #include <mitkImage.h>
 
 /*
-* Reseting the Levelwindow to default values:
+* Resetting the Levelwindow to default values:
 * i.e. Range = -1000..1000, Level = 0 and Window = 500
 */
 void resetLevelWindow(mitk::LevelWindow &lw)
@@ -925,7 +925,7 @@ int mitkLevelWindowTest(int, char *[])
   std::cout << "[PASSED]" << std::endl;
 
   std::cout << "Testing range adaption of mitk::LevelWindow::SetWindowBounds()";
-  levelWindow.SetWindowBounds(-10, 90, true); // ture == force
+  levelWindow.SetWindowBounds(-10, 90, true); // true == force
   if (levelWindow.GetUpperWindowBound() != 90.0 || levelWindow.GetLowerWindowBound() != -10.0)
   {
     std::cout << "[FAILED]" << std::endl;
@@ -934,7 +934,7 @@ int mitkLevelWindowTest(int, char *[])
   std::cout << "[PASSED]" << std::endl;
 
   std::cout << "Testing range adaption of mitk::LevelWindow::SetWindowBounds()";
-  levelWindow.SetWindowBounds(-20, 110, true); // ture == force
+  levelWindow.SetWindowBounds(-20, 110, true); // true == force
   if (levelWindow.GetUpperWindowBound() != 110.0 || levelWindow.GetLowerWindowBound() != -20.0)
   {
     std::cout << "[FAILED]" << std::endl;
@@ -943,7 +943,7 @@ int mitkLevelWindowTest(int, char *[])
   std::cout << "[PASSED]" << std::endl;
 
   std::cout << "Testing range adaption of mitk::LevelWindow::SetLevelWindow()";
-  levelWindow.SetLevelWindow(50, 140, true); // ture == force
+  levelWindow.SetLevelWindow(50, 140, true); // true == force
   if (levelWindow.GetUpperWindowBound() != 120.0 || levelWindow.GetLowerWindowBound() != -20.0)
   {
     std::cout << "[FAILED]" << std::endl;

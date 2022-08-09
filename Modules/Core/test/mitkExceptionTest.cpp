@@ -106,7 +106,7 @@ public:
     throw mitk::Exception("testfile.cpp", 155, message1.c_str(), "") << message2;
   }
 
-  void throwExceptionWithThrowMacro() { mitkThrow() << "TEST EXCEPION THROWING WITH mitkThrow()"; }
+  void throwExceptionWithThrowMacro() { mitkThrow() << "TEST EXCEPTION THROWING WITH mitkThrow()"; }
   void throwExceptionWithThrowMacro(std::string message) { mitkThrow() << message.c_str(); }
   void throwSpecializedExceptionWithThrowMacro(std::string message) { mitkThrowException(mitk::Exception) << message; }
   void throwSpecializedExceptionWithThrowMacro2(std::string message)

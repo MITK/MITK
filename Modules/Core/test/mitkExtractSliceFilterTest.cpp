@@ -374,7 +374,7 @@ public:
    * random a voxel. define plane through this voxel. reslice at the plane. compare the pixel vaues of the voxel
    * in the volume with the pixel value in the resliced image.
    * there are some indice shifting problems which causes the test to fail for oblique planes. seems like the chosen
-   * worldcoordinate is not corrresponding to the index in the 2D image. and so the pixel values are not the same as
+   * worldcoordinate is not corresponding to the index in the 2D image. and so the pixel values are not the same as
    * expected.
    */
   static void PixelvalueBasedTest()
@@ -563,7 +563,7 @@ public:
     double PixelvalueByVtkOutput = vtkImageByVtkOutput->GetScalarComponentAsDouble(n1, n2, 0, 0);
 
     MITK_TEST_CONDITION(PixelvalueByMitkOutput == PixelvalueByVtkOutput,
-                        "testing convertion of image output vtk->mitk by reslicer");
+                        "testing conversion of image output vtk->mitk by reslicer");
 
 /*================ mbilog outputs ===========================*/
 #ifdef EXTRACTOR_DEBUG
@@ -760,7 +760,7 @@ private:
     CastToMitkImage(sphereImage, TestVolume);
   }
 
-  /* calculate the devation of the voxel object to the mathematical sphere object.
+  /* calculate the deviation of the voxel object to the mathematical sphere object.
    * this is use to make a statement about the accuracy of the resliced image, eg. the circle's diameter or area.
    */
   template <typename TPixel, unsigned int VImageDimension>
@@ -807,7 +807,7 @@ private:
 };
 /*================ #END class ================*/
 
-/*================#BEGIN Instanciation of members ================*/
+/*================#BEGIN Instantiation of members ================*/
 mitk::Image::Pointer mitkExtractSliceFilterTestClass::TestVolume = mitk::Image::New();
 double mitkExtractSliceFilterTestClass::TestvolumeSize = 256.0;
 mitk::PlaneGeometry::Pointer mitkExtractSliceFilterTestClass::TestPlane = mitk::PlaneGeometry::New();
@@ -816,7 +816,7 @@ unsigned char mitkExtractSliceFilterTestClass::pixelValueSet = 255;
 mitkExtractSliceFilterTestClass::SliceProperties mitkExtractSliceFilterTestClass::testResults = {
   -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0};
 double mitkExtractSliceFilterTestClass::TestFailureDeviation = 0.0;
-/*================ #END Instanciation of members ================*/
+/*================ #END Instantiation of members ================*/
 
 /*================ #BEGIN test main ================*/
 int mitkExtractSliceFilterTest(int /*argc*/, char * /*argv*/ [])

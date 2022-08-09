@@ -16,7 +16,7 @@ Care has to be taken regarding the involved coordinate systems, see \ref ItkToMi
 For limitations on ITK-type conversion see the section \ref ModuleAdaptorLimitations.
 
 VTK-based access to MITK images is straightforward: simply ask your mitk::Image for a
-\a vtkImageData by calling Image:GetVtkImageData. Similarily, to get a \a vtkPolyData
+\a vtkImageData by calling Image:GetVtkImageData. Similarly, to get a \a vtkPolyData
 from the MITK class for storing surfaces, mitk::Surface,  call Surface::GetVtkPolyData.
 
 \section MitkToItk MITK to ITK adaptors
@@ -27,8 +27,8 @@ at compile time.
 There two different situations, which are covered in the following sub-sections:
 \li Either you know the pixel type/dimension the ITK image should have at compile time for
     some reason (e.g., you always create MITK images of a specific pixel type/dimension)
-\li or the pixel type/dimension of an MITK image is really unkown and the ITK image should
-    have the same (unkown) type.
+\li or the pixel type/dimension of an MITK image is really unknown and the ITK image should
+    have the same (unknown) type.
 
 \subsection MitkToFixedItk Converting MITK images to ITK images with known type
 If you know the type (pixel type and dimension) of the MITK image you have two options:
@@ -44,13 +44,13 @@ If you know the type (pixel type and dimension) of the MITK image you have two o
 Thus, mitk::CastToItkImage is the more powerful variant: here it is sufficient that you know
 what you want to have (the ITK data type), to which the MITK image will be casted, if needed.
 
-\subsection MitkToUnkownItk Accessing an MITK image as an ITK image (type unkown)
+\subsection MitkToUnkownItk Accessing an MITK image as an ITK image (type unknown)
 If you do not know the pixel type/dimension of an MITK image in advance and the ITK image should
-have the same (unkown) type, e.g., to run a filter on the MITK image data, we cannot really convert
-to one ITK image. This is simply, because we cannot instantiate an itk::Image object with unkown
+have the same (unknown) type, e.g., to run a filter on the MITK image data, we cannot really convert
+to one ITK image. This is simply, because we cannot instantiate an itk::Image object with unknown
 pixel type/dimension.
 
-Nevertheless, MITK provides a way to access an MITK image as if it was an ITK image of unkown type.
+Nevertheless, MITK provides a way to access an MITK image as if it was an ITK image of unknown type.
 To do so, first define an access method, which is templated as an ITK image is:
 
 \code
@@ -66,7 +66,7 @@ template syntax is crucial to successfully using ITK.
 
 To call this templated method with an (untemplated) mitk::Image, you can use the #AccessByItk macro
 (or one of its variants) from mitkImageAccessByItk.h. This macro checks for the actual image type of
-the mitk::Image and does any neccessary conversions. This works for all configured pixel types (default
+the mitk::Image and does any necessary conversions. This works for all configured pixel types (default
 is char, unsigned char, short, unsigned short, int, unsigned int, float, and double) and dimensions
 (default is 2 and 3). You can change the considered default pixel types and dimensions by modifying
 the CMake variables MITK_ACCESSBYITK_*.

@@ -413,6 +413,8 @@ namespace mitk
     SliceNavigationController();
     ~SliceNavigationController() override;
 
+    void CreateWorldGeometry(bool top, bool frontside, bool rotated);
+
     TimeGeometry::ConstPointer m_InputWorldTimeGeometry;
     TimeGeometry::Pointer m_CreatedWorldGeometry;
 

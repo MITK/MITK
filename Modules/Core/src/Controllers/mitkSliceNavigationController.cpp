@@ -45,9 +45,8 @@ namespace mitk
 {
   SliceNavigationController::SliceNavigationController()
     : BaseController(),
-  m_InputWorldGeometry3D( mitk::BaseGeometry::ConstPointer() ),
-  m_InputWorldTimeGeometry( mitk::TimeGeometry::ConstPointer() ),
-  m_CreatedWorldGeometry( mitk::TimeGeometry::Pointer() ),
+      m_InputWorldTimeGeometry(mitk::TimeGeometry::ConstPointer()),
+      m_CreatedWorldGeometry(mitk::TimeGeometry::Pointer()),
       m_ViewDirection(Axial),
       m_DefaultViewDirection(Axial),
   m_RenderingManager( mitk::RenderingManager::Pointer() ),
@@ -82,23 +81,6 @@ namespace mitk
   }
 
   SliceNavigationController::~SliceNavigationController() {}
-  void SliceNavigationController::SetInputWorldGeometry3D(const BaseGeometry *geometry)
-  {
-  if ( geometry != nullptr )
-    {
-      if (geometry->GetBoundingBox()->GetDiagonalLength2() < eps)
-      {
-        itkWarningMacro("setting an empty bounding-box");
-      geometry = nullptr;
-      }
-    }
-    if (m_InputWorldGeometry3D != geometry)
-    {
-      m_InputWorldGeometry3D = geometry;
-    m_InputWorldTimeGeometry = mitk::TimeGeometry::ConstPointer();
-      this->Modified();
-    }
-  }
 
   void SliceNavigationController::SetInputWorldTimeGeometry(const TimeGeometry *geometry)
   {
@@ -113,7 +95,6 @@ namespace mitk
     if (m_InputWorldTimeGeometry != geometry)
     {
       m_InputWorldTimeGeometry = geometry;
-      m_InputWorldGeometry3D = mitk::BaseGeometry::ConstPointer();
       this->Modified();
     }
   }
@@ -175,24 +156,29 @@ namespace mitk
                                          bool frontside,
                                          bool rotated)
   {
-    TimeGeometry::ConstPointer worldTimeGeometry = m_InputWorldTimeGeometry;
+    if (m_BlockUpdate)
+    {
+      return;
+    }
 
-    if (m_BlockUpdate || (m_InputWorldTimeGeometry.IsNull() && m_InputWorldGeometry3D.IsNull()) ||
-        ((worldTimeGeometry.IsNotNull()) && (worldTimeGeometry->CountTimeSteps() == 0)))
+    if (m_InputWorldTimeGeometry.IsNull())
+    {
+      return;
+    }
+
+    if(0 == m_InputWorldTimeGeometry->CountTimeSteps())
     {
       return;
     }
 
     m_BlockUpdate = true;
 
-    if (m_InputWorldTimeGeometry.IsNotNull() && m_LastUpdateTime < m_InputWorldTimeGeometry->GetMTime())
+    if (m_LastUpdateTime < m_InputWorldTimeGeometry->GetMTime())
     {
       Modified();
     }
-    if (m_InputWorldGeometry3D.IsNotNull() && m_LastUpdateTime < m_InputWorldGeometry3D->GetMTime())
-    {
-      Modified();
-    }
+    TimeGeometry::ConstPointer worldTimeGeometry = m_InputWorldTimeGeometry;
+
     this->SetViewDirection(viewDirection);
     this->SetTop(top);
     this->SetFrontSide(frontside);
@@ -205,13 +191,10 @@ namespace mitk
       // initialize the viewplane
       SlicedGeometry3D::Pointer slicedWorldGeometry = SlicedGeometry3D::Pointer();
       BaseGeometry::ConstPointer currentGeometry = BaseGeometry::ConstPointer();
-      if (m_InputWorldTimeGeometry.IsNotNull())
-        if (m_InputWorldTimeGeometry->IsValidTimeStep(GetTime()->GetPos()))
-          currentGeometry = m_InputWorldTimeGeometry->GetGeometryForTimeStep(GetTime()->GetPos());
-        else
-          currentGeometry = m_InputWorldTimeGeometry->GetGeometryForTimeStep(0);
+      if (m_InputWorldTimeGeometry->IsValidTimeStep(GetTime()->GetPos()))
+        currentGeometry = m_InputWorldTimeGeometry->GetGeometryForTimeStep(GetTime()->GetPos());
       else
-        currentGeometry = m_InputWorldGeometry3D;
+        currentGeometry = m_InputWorldTimeGeometry->GetGeometryForTimeStep(0);
 
       m_CreatedWorldGeometry = mitk::TimeGeometry::Pointer();
       switch (viewDirection)
@@ -510,7 +493,6 @@ namespace mitk
     }
   }
 
-  mitk::TimeGeometry *SliceNavigationController::GetCreatedWorldGeometry() { return m_CreatedWorldGeometry; }
   const mitk::BaseGeometry *SliceNavigationController::GetCurrentGeometry3D()
   {
     if (m_CreatedWorldGeometry.IsNotNull())

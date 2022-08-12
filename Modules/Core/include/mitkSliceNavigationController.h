@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef SLICENAVIGATIONCONTROLLER_H_HEADER_INCLUDED_C1C55A2F
-#define SLICENAVIGATIONCONTROLLER_H_HEADER_INCLUDED_C1C55A2F
+#ifndef MITKSLICENAVIGATIONCONTROLLER_H
+#define MITKSLICENAVIGATIONCONTROLLER_H
 
 #include "mitkBaseController.h"
 #include "mitkMessage.h"
@@ -70,7 +70,7 @@ namespace mitk
    *
    * // Tell the navigator the geometry to be sliced (with geometry a
    * // BaseGeometry::ConstPointer)
-   * sliceCtrl->SetInputWorldGeometry3D(geometry.GetPointer());
+   * sliceCtrl->SetInputWorldTimeGeometry(geometry.GetPointer());
    *
    * // Tell the navigator in which direction it shall slice the data
    * sliceCtrl->SetViewDirection(mitk::SliceNavigationController::Axial);
@@ -138,9 +138,9 @@ namespace mitk
     // itkCloneMacro(Self)
 
     /**
-     * \brief Possible view directions, \a Original will uses
+     * \brief Possible view directions, \a Original will use
      * the PlaneGeometry instances in a SlicedGeometry3D provided
-     * as input world geometry (by SetInputWorldGeometry3D).
+     * as input world geometry (by SetInputWorldTimeGeometry).
      */
     enum ViewDirection
     {
@@ -157,9 +157,6 @@ namespace mitk
      * Any previous previous set input geometry (3D or Time) will
      * be ignored in future.
      */
-    void SetInputWorldGeometry3D(const mitk::BaseGeometry *geometry);
-    itkGetConstObjectMacro(InputWorldGeometry3D, mitk::BaseGeometry);
-
     void SetInputWorldTimeGeometry(const mitk::TimeGeometry *geometry);
     itkGetConstObjectMacro(InputWorldTimeGeometry, mitk::TimeGeometry);
 
@@ -167,6 +164,7 @@ namespace mitk
      * \brief Access the created geometry
      */
     itkGetConstObjectMacro(CreatedWorldGeometry, mitk::TimeGeometry);
+    itkGetObjectMacro(CreatedWorldGeometry, mitk::TimeGeometry);
 
     /**
      * \brief Set the desired view directions
@@ -356,9 +354,6 @@ namespace mitk
     /** \brief Positions the SNC according to the specified point */
     void SelectSliceByPoint(const mitk::Point3D &point);
 
-    /** \brief Returns the TimeGeometry created by the SNC. */
-    mitk::TimeGeometry *GetCreatedWorldGeometry();
-
     /** \brief Returns the BaseGeometry of the currently selected time step. */
     const mitk::BaseGeometry *GetCurrentGeometry3D();
 
@@ -426,12 +421,12 @@ namespace mitk
     TimePointType GetSelectedTimePoint() const;
 
   protected:
+
     SliceNavigationController();
     ~SliceNavigationController() override;
 
-    mitk::BaseGeometry::ConstPointer m_InputWorldGeometry3D;
-    mitk::TimeGeometry::ConstPointer m_InputWorldTimeGeometry;
 
+    mitk::TimeGeometry::ConstPointer m_InputWorldTimeGeometry;
     mitk::TimeGeometry::Pointer m_CreatedWorldGeometry;
 
     ViewDirection m_ViewDirection;
@@ -469,4 +464,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* SLICENAVIGATIONCONTROLLER_H_HEADER_INCLUDED_C1C55A2F */
+#endif // MITKSLICENAVIGATIONCONTROLLER_H

@@ -125,7 +125,7 @@ public:
 
   void InsertVertexAtIndex()
   {
-    mitk::Point3D outOfBountPoint;
+    mitk::Point3D outOfBountPoint = GeneratePoint(99);
     m_Contour1to4->InsertVertexAtIndex(m_p5, false, 0);
     m_Contour1to4->InsertVertexAtIndex(m_p7, true, 2);
     m_Contour1to4->InsertVertexAtIndex(outOfBountPoint, true, 6);
@@ -137,7 +137,9 @@ public:
     CPPUNIT_ASSERT(m_Contour1to4->GetVertexAt(2)->IsControlPoint == true);
     CPPUNIT_ASSERT(m_Contour1to4->GetVertexAt(3)->Coordinates == m_p2);
     CPPUNIT_ASSERT(m_Contour1to4->GetVertexAt(3)->IsControlPoint == false);
-    CPPUNIT_ASSERT(m_Contour1to4->GetSize() == 6);
+    CPPUNIT_ASSERT(m_Contour1to4->GetVertexAt(6)->Coordinates == outOfBountPoint);
+    CPPUNIT_ASSERT(m_Contour1to4->GetVertexAt(6)->IsControlPoint == true);
+    CPPUNIT_ASSERT(m_Contour1to4->GetSize() == 7);
   }
 
   void GetSetVertexAt()

@@ -88,11 +88,11 @@ struct IRenderingManager {
    */
   virtual bool InitializeView( vtkRenderWindow *renderWindow ) = 0;
 
-  /** Gets the SliceNavigationController responsible for time-slicing. */
-  virtual const SliceNavigationController *GetTimeNavigationController() const = 0;
+  /** Gets the TimeNavigationController responsible for time-slicing. */
+  virtual const TimeNavigationController*GetTimeNavigationController() const = 0;
 
-  /** Gets the SliceNavigationController responsible for time-slicing. */
-  virtual SliceNavigationController *GetTimeNavigationController() = 0;
+  /** Gets the TimeNavigationController responsible for time-slicing. */
+  virtual TimeNavigationController*GetTimeNavigationController() = 0;
 
   virtual bool IsRendering() const = 0;
 

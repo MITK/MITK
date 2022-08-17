@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include <mitkRenderingManagerFactory.h>
 #include <mitkBaseRenderer.h>
 #include <mitkCameraController.h>
+#include <mitkTimeNavigationController.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkProportionalTimeGeometry.h>
@@ -41,7 +42,7 @@ namespace mitk
       m_LODIncreaseBlocked(false),
       m_LODAbortMechanismEnabled(false),
       m_ClippingPlaneEnabled(false),
-      m_TimeNavigationController(SliceNavigationController::New()),
+      m_TimeNavigationController(TimeNavigationController::New()),
       m_DataStorage(nullptr),
       m_ConstrainedPanningZooming(true),
       m_FocusedRenderWindow(nullptr),
@@ -529,12 +530,12 @@ namespace mitk
     return boundingBoxInitialized;
   }
 
-  const SliceNavigationController *RenderingManager::GetTimeNavigationController() const
+  const TimeNavigationController *RenderingManager::GetTimeNavigationController() const
   {
     return m_TimeNavigationController.GetPointer();
   }
 
-  SliceNavigationController *RenderingManager::GetTimeNavigationController()
+  TimeNavigationController *RenderingManager::GetTimeNavigationController()
   {
     return m_TimeNavigationController.GetPointer();
   }

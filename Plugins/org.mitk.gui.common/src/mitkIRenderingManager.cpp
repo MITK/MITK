@@ -81,12 +81,12 @@ struct RenderingManagerInterface : public IRenderingManager
     return m_RM->InitializeView(renderWindow);
   }
 
-  const SliceNavigationController *GetTimeNavigationController() const override
+  const TimeNavigationController* GetTimeNavigationController() const override
   {
     return m_RM->GetTimeNavigationController();
   }
 
-  SliceNavigationController *GetTimeNavigationController() override
+  TimeNavigationController* GetTimeNavigationController() override
   {
     return m_RM->GetTimeNavigationController();
   }

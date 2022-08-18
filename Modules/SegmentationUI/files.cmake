@@ -24,7 +24,6 @@ Qmitk/QmitknnUNetWorker.cpp
 Qmitk/QmitknnUNetGPU.cpp
 Qmitk/QmitkSurfaceStampWidget.cpp
 Qmitk/QmitkMaskStampWidget.cpp
-Qmitk/QmitkSliceBasedInterpolatorWidget.cpp
 Qmitk/QmitkStaticDynamicSegmentationDialog.cpp
 Qmitk/QmitkSurfaceBasedInterpolatorWidget.cpp
 Qmitk/QmitkSimpleLabelSetListWidget.cpp
@@ -57,7 +56,6 @@ Qmitk/QmitknnUNetWorker.h
 Qmitk/QmitknnUNetEnsembleLayout.h
 Qmitk/QmitkSurfaceStampWidget.h
 Qmitk/QmitkMaskStampWidget.h
-Qmitk/QmitkSliceBasedInterpolatorWidget.h
 Qmitk/QmitkStaticDynamicSegmentationDialog.h
 Qmitk/QmitkSurfaceBasedInterpolatorWidget.h
 Qmitk/QmitkSimpleLabelSetListWidget.h
@@ -68,7 +66,6 @@ Qmitk/QmitkConfirmSegmentationDialog.ui
 Qmitk/QmitkOtsuToolWidgetControls.ui
 Qmitk/QmitkSurfaceStampWidgetGUIControls.ui
 Qmitk/QmitkMaskStampWidgetGUIControls.ui
-Qmitk/QmitkSliceBasedInterpolatorWidgetGUIControls.ui
 Qmitk/QmitkSurfaceBasedInterpolatorWidgetGUIControls.ui
 Qmitk/QmitknnUNetToolGUIControls.ui
 Qmitk/QmitkEditableContourToolGUIControls.ui

@@ -762,14 +762,6 @@ void mitk::BaseRenderer::SetConstrainZoomingAndPanning(bool constrain)
   }
 }
 
-mitk::Point3D mitk::BaseRenderer::Map2DRendererPositionTo3DWorldPosition(const Point2D &mousePosition) const
-{
-  // DEPRECATED: Map2DRendererPositionTo3DWorldPosition is deprecated. use DisplayToWorldInstead
-  Point3D position;
-  DisplayToWorld(mousePosition, position);
-  return position;
-}
-
 void mitk::BaseRenderer::PrintSelf(std::ostream &os, itk::Indent indent) const
 {
   os << indent << " MapperID: " << m_MapperID << std::endl;

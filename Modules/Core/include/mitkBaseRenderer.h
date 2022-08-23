@@ -165,13 +165,6 @@ namespace mitk
 
     //## @brief Get the current 2D-worldgeometry (m_CurrentWorldPlaneGeometry) used for 2D-rendering
     itkGetConstObjectMacro(CurrentWorldPlaneGeometry, PlaneGeometry)
-      /**
-      * \deprecatedSince{2014_10} Please use GetCurrentWorldPlaneGeometry
-      */
-      DEPRECATED(const PlaneGeometry *GetCurrentWorldGeometry2D())
-    {
-      return GetCurrentWorldPlaneGeometry();
-    };
 
     //## Calculates the bounds of the DataStorage (if it contains any valid data),
     //## creates a geometry from these bounds and sets it as world geometry of the renderer.
@@ -224,13 +217,6 @@ namespace mitk
     //## @brief Get a DataNode pointing to a data object containing the current 2D-worldgeometry
     // m_CurrentWorldPlaneGeometry (for 2D rendering)
     itkGetObjectMacro(CurrentWorldPlaneGeometryNode, DataNode)
-      /**
-      * \deprecatedSince{2014_10} Please use GetCurrentWorldPlaneGeometryNode
-      */
-      DEPRECATED(DataNode *GetCurrentWorldGeometry2DNode())
-    {
-      return GetCurrentWorldPlaneGeometryNode();
-    };
 
     //## @brief Sets timestamp of CurrentWorldPlaneGeometry and forces so reslicing in that renderwindow
     void SendUpdateSlice();
@@ -238,13 +224,6 @@ namespace mitk
     //## @brief Get timestamp of last call of SetCurrentWorldPlaneGeometry
     itkGetMacro(CurrentWorldPlaneGeometryUpdateTime, unsigned long);
 
-    /**
-    * \deprecatedSince{2014_10} Please use GetCurrentWorldPlaneGeometryUpdateTime
-    */
-    DEPRECATED(unsigned long GetCurrentWorldGeometry2DUpdateTime())
-    {
-      return GetCurrentWorldPlaneGeometryUpdateTime();
-    };
     //## @brief Get timestamp of last change of current TimeStep
     itkGetMacro(TimeStepUpdateTime, unsigned long);
 
@@ -343,12 +322,6 @@ namespace mitk
 
     itkGetConstMacro(ConstrainZoomingAndPanning, bool)
     virtual void SetConstrainZoomingAndPanning(bool constrain);
-    /**
-    * \brief Provides (1) world coordinates for a given mouse position and (2)
-    * translates mousePosition to Display coordinates
-    * \deprecated Map2DRendererPositionTo3DWorldPosition is deprecated. Please use DisplayToWorld instead.
-    */
-    DEPRECATED(virtual Point3D Map2DRendererPositionTo3DWorldPosition(const Point2D &mousePosition) const);
 
   protected:
 
@@ -377,10 +350,6 @@ namespace mitk
 
     //## @brief Sets m_CurrentWorldPlaneGeometry
     virtual void SetCurrentWorldPlaneGeometry(const PlaneGeometry *geometry2d);
-    /**
-    * \deprecatedSince{2014_10} Please use SetCurrentWorldPlaneGeometry
-    */
-    DEPRECATED(void SetCurrentWorldGeometry2D(PlaneGeometry *geometry2d)) { SetCurrentWorldPlaneGeometry(geometry2d); };
 
     //## @brief Sets m_CurrentWorldGeometry
     virtual void SetCurrentWorldGeometry(const BaseGeometry *geometry);

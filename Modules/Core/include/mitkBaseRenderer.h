@@ -13,12 +13,14 @@ found in the LICENSE file.
 #ifndef MITKBASERENDERER_H
 #define MITKBASERENDERER_H
 
-#include "mitkCameraRotationController.h"
 #include "mitkDataStorage.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkPlaneGeometryData.h"
-#include "mitkSliceNavigationController.h"
 #include "mitkTimeGeometry.h"
+
+#include "mitkCameraController.h"
+#include "mitkCameraRotationController.h"
+#include "mitkSliceNavigationController.h"
 
 #include "mitkBindDispatcherInteractor.h"
 #include "mitkDispatcher.h"
@@ -31,14 +33,8 @@ found in the LICENSE file.
 
 namespace mitk
 {
-  class NavigationController;
-  class SliceNavigationController;
-  class CameraRotationController;
-  class CameraController;
-  class DataStorage;
   class Mapper;
   class BaseLocalStorageHandler;
-  class KeyEvent;
 
 #pragma GCC visibility push(default)
   itkEventMacroDeclaration(RendererResetEvent, itk::AnyEvent);
@@ -119,16 +115,6 @@ namespace mitk
      * \brief Get the dispatcher, which handles events for this base renderer.
      */
     Dispatcher::Pointer GetDispatcher() const;
-
-    /**
-     * \brief Do the rendering and flush the result.
-     */
-    virtual void Paint();
-
-    /**
-     * \brief Initialize the RenderWindow. Should only be called from RenderWindow.
-     */
-    virtual void Initialize();
 
     /**
      * \brief Set a new size for the render window.
@@ -403,7 +389,7 @@ namespace mitk
     DataStorage::Pointer m_DataStorage;
     unsigned long m_LastUpdateTime;
 
-    itk::SmartPointer<CameraController> m_CameraController;
+    CameraController::Pointer m_CameraController;
     SliceNavigationController::Pointer m_SliceNavigationController;
     CameraRotationController::Pointer m_CameraRotationController;
 

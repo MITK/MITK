@@ -15,13 +15,7 @@ found in the LICENSE file.
 #include "mitkResliceMethodProperty.h"
 
 // Geometries
-#include "mitkPlaneGeometry.h"
 #include "mitkSlicedGeometry3D.h"
-
-// Controllers
-#include "mitkCameraController.h"
-#include "mitkCameraRotationController.h"
-#include "mitkSliceNavigationController.h"
 
 #include "mitkVtkLayerController.h"
 
@@ -32,8 +26,6 @@ found in the LICENSE file.
 // VTK
 #include <vtkCamera.h>
 #include <vtkLinearTransform.h>
-#include <vtkRenderWindow.h>
-#include <vtkRenderer.h>
 
 #include <vtkActor.h>
 #include <vtkPolyDataMapper.h>
@@ -98,7 +90,7 @@ mitk::BaseRenderer::BaseRenderer(const char *name,
                                  vtkRenderWindow *renWin)
   : m_RenderWindow(nullptr),
     m_VtkRenderer(nullptr),
-    m_MapperID(defaultMapper),
+    m_MapperID(StandardMapperSlot::Standard2D),
     m_DataStorage(nullptr),
     m_LastUpdateTime(0),
     m_CameraController(nullptr),
@@ -223,19 +215,6 @@ mitk::BaseRenderer::~BaseRenderer()
   }
 }
 
-void mitk::BaseRenderer::SetMapperID(MapperSlotId id)
-{
-  if (m_MapperID != id)
-  {
-    bool useDepthPeeling = Standard3D == id;
-    m_VtkRenderer->SetUseDepthPeeling(useDepthPeeling);
-    m_VtkRenderer->SetUseDepthPeelingForVolumes(useDepthPeeling);
-
-    m_MapperID = id;
-    this->Modified();
-  }
-}
-
 void mitk::BaseRenderer::RemoveAllLocalStorages()
 {
   this->InvokeEvent(RendererResetEvent());
@@ -249,11 +228,6 @@ void mitk::BaseRenderer::RemoveAllLocalStorages()
 void mitk::BaseRenderer::RegisterLocalStorageHandler(mitk::BaseLocalStorageHandler *lsh)
 {
   m_RegisteredLocalStorageHandlers.push_back(lsh);
-}
-
-mitk::Dispatcher::Pointer mitk::BaseRenderer::GetDispatcher() const
-{
-  return m_BindDispatcherInteractor->GetDispatcher();
 }
 
 void mitk::BaseRenderer::UnregisterLocalStorageHandler(mitk::BaseLocalStorageHandler *lsh)
@@ -271,19 +245,14 @@ void mitk::BaseRenderer::SetDataStorage(DataStorage *storage)
   }
 }
 
-const mitk::BaseRenderer::MapperSlotId mitk::BaseRenderer::defaultMapper = 1;
-
-void mitk::BaseRenderer::Paint()
+mitk::Dispatcher::Pointer mitk::BaseRenderer::GetDispatcher() const
 {
-}
-
-void mitk::BaseRenderer::Initialize()
-{
+  return m_BindDispatcherInteractor->GetDispatcher();
 }
 
 void mitk::BaseRenderer::Resize(int w, int h)
 {
-  this->m_RenderWindow->SetSize(w, h);
+  m_RenderWindow->SetSize(w, h);
 }
 
 void mitk::BaseRenderer::InitRenderer(vtkRenderWindow *renderwindow)
@@ -310,59 +279,47 @@ void mitk::BaseRenderer::InitRenderer(vtkRenderWindow *renderwindow)
 
 void mitk::BaseRenderer::InitSize(int w, int h)
 {
-  this->m_RenderWindow->SetSize(w, h);
+  m_RenderWindow->SetSize(w, h);
+}
+
+void mitk::BaseRenderer::SetWorldTimeGeometry(const mitk::TimeGeometry* geometry)
+{
+  if (m_WorldTimeGeometry == geometry)
+  {
+    return;
+  }
+
+  m_WorldTimeGeometry = geometry;
+
+  this->UpdateCurrentGeometries();
 }
 
 void mitk::BaseRenderer::SetSlice(unsigned int slice)
 {
-  if (m_Slice != slice)
+  if (m_Slice == slice)
   {
-    m_Slice = slice;
-    if (m_WorldTimeGeometry.IsNotNull())
-    {
-      // get world geometry which may be rotated, for the current time step
-      SlicedGeometry3D *slicedWorldGeometry =
-        dynamic_cast<SlicedGeometry3D *>(m_WorldTimeGeometry->GetGeometryForTimeStep(m_TimeStep).GetPointer());
-      if (slicedWorldGeometry != nullptr)
-      {
-        // if slice position is part of the world geometry...
-        if (m_Slice >= slicedWorldGeometry->GetSlices())
-          // set the current worldplanegeomety as the selected 2D slice of the world geometry
-          m_Slice = slicedWorldGeometry->GetSlices() - 1;
-        SetCurrentWorldPlaneGeometry(slicedWorldGeometry->GetPlaneGeometry(m_Slice));
-        SetCurrentWorldGeometry(slicedWorldGeometry);
-      }
-    }
-    else
-      Modified();
+    return;
   }
+
+  m_Slice = slice;
+
+  this->UpdateCurrentGeometries();
 }
 
 void mitk::BaseRenderer::SetTimeStep(unsigned int timeStep)
 {
-  if (m_TimeStep != timeStep)
+  if (m_TimeStep == timeStep)
   {
-    m_TimeStep = timeStep;
-    m_TimeStepUpdateTime.Modified();
-
-    if (m_WorldTimeGeometry.IsNotNull())
-    {
-      if (m_TimeStep >= m_WorldTimeGeometry->CountTimeSteps())
-        m_TimeStep = m_WorldTimeGeometry->CountTimeSteps() - 1;
-      SlicedGeometry3D *slicedWorldGeometry =
-        dynamic_cast<SlicedGeometry3D *>(m_WorldTimeGeometry->GetGeometryForTimeStep(m_TimeStep).GetPointer());
-      if (slicedWorldGeometry != nullptr)
-      {
-        SetCurrentWorldPlaneGeometry(slicedWorldGeometry->GetPlaneGeometry(m_Slice));
-        SetCurrentWorldGeometry(slicedWorldGeometry);
-      }
-    }
-    else
-      Modified();
+    return;
   }
+
+  m_TimeStep = timeStep;
+  m_TimeStepUpdateTime.Modified();
+
+  this->UpdateCurrentGeometries();
 }
 
-mitk::TimeStepType mitk::BaseRenderer::GetTimeStep(const mitk::BaseData *data) const
+mitk::TimeStepType mitk::BaseRenderer::GetTimeStep(const mitk::BaseData* data) const
 {
   if ((data == nullptr) || (data->IsInitialized() == false))
   {
@@ -387,77 +344,63 @@ mitk::ScalarType mitk::BaseRenderer::GetTime() const
   }
 }
 
-void mitk::BaseRenderer::SetWorldTimeGeometry(const mitk::TimeGeometry *geometry)
+void mitk::BaseRenderer::SetGeometry(const itk::EventObject& geometrySendEvent)
 {
-  assert(geometry != nullptr);
+  const auto* sendEvent = dynamic_cast<const SliceNavigationController::GeometrySendEvent*>(&geometrySendEvent);
 
-  itkDebugMacro("setting WorldTimeGeometry to " << geometry);
-  if (m_WorldTimeGeometry != geometry)
+  if (nullptr == sendEvent)
   {
-    if (geometry->GetBoundingBoxInWorld()->GetDiagonalLength2() == 0)
-      return;
-
-    m_WorldTimeGeometry = geometry;
-    itkDebugMacro("setting WorldTimeGeometry to " << m_WorldTimeGeometry);
-
-    if (m_TimeStep >= m_WorldTimeGeometry->CountTimeSteps())
-      m_TimeStep = m_WorldTimeGeometry->CountTimeSteps() - 1;
-
-    BaseGeometry *geometry3d;
-    geometry3d = m_WorldTimeGeometry->GetGeometryForTimeStep(m_TimeStep);
-    SetWorldGeometry3D(geometry3d);
-  }
-}
-
-void mitk::BaseRenderer::SetWorldGeometry3D(const mitk::BaseGeometry *geometry)
-{
-  itkDebugMacro("setting WorldGeometry3D to " << geometry);
-
-  if (geometry->GetBoundingBox()->GetDiagonalLength2() == 0)
     return;
-  const SlicedGeometry3D *slicedWorldGeometry;
-  slicedWorldGeometry = dynamic_cast<const SlicedGeometry3D *>(geometry);
-
-  PlaneGeometry::ConstPointer geometry2d;
-  if (slicedWorldGeometry != nullptr)
-  {
-    if (m_Slice >= slicedWorldGeometry->GetSlices() && (m_Slice != 0))
-      m_Slice = slicedWorldGeometry->GetSlices() - 1;
-    geometry2d = slicedWorldGeometry->GetPlaneGeometry(m_Slice);
-    if (geometry2d.IsNull())
-    {
-      PlaneGeometry::Pointer plane = mitk::PlaneGeometry::New();
-      plane->InitializeStandardPlane(slicedWorldGeometry);
-      geometry2d = plane;
-    }
-    SetCurrentWorldGeometry(slicedWorldGeometry);
   }
-  else
-  {
-    geometry2d = dynamic_cast<const PlaneGeometry *>(geometry);
-    if (geometry2d.IsNull())
-    {
-      PlaneGeometry::Pointer plane = PlaneGeometry::New();
-      plane->InitializeStandardPlane(geometry);
-      geometry2d = plane;
-    }
-    SetCurrentWorldGeometry(geometry);
-  }
-  SetCurrentWorldPlaneGeometry(geometry2d); // calls Modified()
 
-  if (m_CurrentWorldPlaneGeometry.IsNull())
-    itkWarningMacro("m_CurrentWorldPlaneGeometry is nullptr");
+  SetWorldTimeGeometry(sendEvent->GetTimeGeometry());
 }
 
-void mitk::BaseRenderer::SetCurrentWorldPlaneGeometry(const mitk::PlaneGeometry *geometry2d)
+void mitk::BaseRenderer::UpdateGeometry(const itk::EventObject& geometryUpdateEvent)
 {
-  if (m_CurrentWorldPlaneGeometry != geometry2d)
+  const auto* updateEvent = dynamic_cast<const SliceNavigationController::GeometryUpdateEvent*>(&geometryUpdateEvent);
+
+  if (nullptr == updateEvent)
   {
-    m_CurrentWorldPlaneGeometry = geometry2d->Clone();
-    m_CurrentWorldPlaneGeometryData->SetPlaneGeometry(m_CurrentWorldPlaneGeometry);
-    m_CurrentWorldPlaneGeometryUpdateTime.Modified();
-    Modified();
+    return;
   }
+
+  if (m_CurrentWorldGeometry.IsNull())
+  {
+    return;
+  }
+
+  const auto* slicedWorldGeometry = dynamic_cast<const SlicedGeometry3D*>(m_CurrentWorldGeometry.GetPointer());
+  if (slicedWorldGeometry)
+  {
+    PlaneGeometry* geometry2D = slicedWorldGeometry->GetPlaneGeometry(m_Slice);
+
+    SetCurrentWorldPlaneGeometry(geometry2D); // calls Modified()
+  }
+}
+
+void mitk::BaseRenderer::SetGeometrySlice(const itk::EventObject& geometrySliceEvent)
+{
+  const auto* sliceEvent = dynamic_cast<const SliceNavigationController::GeometrySliceEvent*>(&geometrySliceEvent);
+
+  if (nullptr == sliceEvent)
+  {
+    return;
+  }
+
+  this->SetSlice(sliceEvent->GetPos());
+}
+
+void mitk::BaseRenderer::SetGeometryTime(const itk::EventObject& geometryTimeEvent)
+{
+  const auto* timeEvent = dynamic_cast<const SliceNavigationController::GeometryTimeEvent *>(&geometryTimeEvent);
+
+  if (nullptr == timeEvent)
+  {
+    return;
+  }
+
+  this->SetTimeStep(timeEvent->GetPos());
 }
 
 void mitk::BaseRenderer::SendUpdateSlice()
@@ -465,110 +408,43 @@ void mitk::BaseRenderer::SendUpdateSlice()
   m_CurrentWorldPlaneGeometryUpdateTime.Modified();
 }
 
-int *mitk::BaseRenderer::GetSize() const
+void mitk::BaseRenderer::SetMapperID(MapperSlotId id)
 {
-  return this->m_RenderWindow->GetSize();
-}
-
-int *mitk::BaseRenderer::GetViewportSize() const
-{
-  return this->m_VtkRenderer->GetSize();
-}
-
-void mitk::BaseRenderer::SetCurrentWorldGeometry(const mitk::BaseGeometry *geometry)
-{
-  m_CurrentWorldGeometry = geometry;
-  if (geometry == nullptr)
+  if (m_MapperID != id)
   {
-    m_Bounds[0] = 0;
-    m_Bounds[1] = 0;
-    m_Bounds[2] = 0;
-    m_Bounds[3] = 0;
-    m_Bounds[4] = 0;
-    m_Bounds[5] = 0;
-    m_EmptyWorldGeometry = true;
-    return;
-  }
-  BoundingBox::Pointer boundingBox = m_CurrentWorldGeometry->CalculateBoundingBoxRelativeToTransform(nullptr);
-  const BoundingBox::BoundsArrayType &worldBounds = boundingBox->GetBounds();
-  m_Bounds[0] = worldBounds[0];
-  m_Bounds[1] = worldBounds[1];
-  m_Bounds[2] = worldBounds[2];
-  m_Bounds[3] = worldBounds[3];
-  m_Bounds[4] = worldBounds[4];
-  m_Bounds[5] = worldBounds[5];
-  if (boundingBox->GetDiagonalLength2() <= mitk::eps)
-    m_EmptyWorldGeometry = true;
-  else
-    m_EmptyWorldGeometry = false;
-}
+    bool useDepthPeeling = Standard3D == id;
+    m_VtkRenderer->SetUseDepthPeeling(useDepthPeeling);
+    m_VtkRenderer->SetUseDepthPeelingForVolumes(useDepthPeeling);
 
-void mitk::BaseRenderer::SetGeometry(const itk::EventObject &geometrySendEvent)
-{
-  const auto *sendEvent =
-    dynamic_cast<const SliceNavigationController::GeometrySendEvent *>(&geometrySendEvent);
-
-  assert(sendEvent != nullptr);
-  SetWorldTimeGeometry(sendEvent->GetTimeGeometry());
-}
-
-void mitk::BaseRenderer::UpdateGeometry(const itk::EventObject &geometryUpdateEvent)
-{
-  const auto *updateEvent =
-    dynamic_cast<const SliceNavigationController::GeometryUpdateEvent *>(&geometryUpdateEvent);
-
-  if (updateEvent == nullptr)
-    return;
-
-  if (m_CurrentWorldGeometry.IsNotNull())
-  {
-    auto *slicedWorldGeometry = dynamic_cast<const SlicedGeometry3D *>(m_CurrentWorldGeometry.GetPointer());
-    if (slicedWorldGeometry)
-    {
-      PlaneGeometry *geometry2D = slicedWorldGeometry->GetPlaneGeometry(m_Slice);
-
-      SetCurrentWorldPlaneGeometry(geometry2D); // calls Modified()
-    }
+    m_MapperID = id;
+    this->Modified();
   }
 }
 
-void mitk::BaseRenderer::SetGeometrySlice(const itk::EventObject &geometrySliceEvent)
+int* mitk::BaseRenderer::GetSize() const
 {
-  const auto *sliceEvent =
-    dynamic_cast<const SliceNavigationController::GeometrySliceEvent *>(&geometrySliceEvent);
-
-  assert(sliceEvent != nullptr);
-  SetSlice(sliceEvent->GetPos());
+  return m_RenderWindow->GetSize();
 }
 
-void mitk::BaseRenderer::SetGeometryTime(const itk::EventObject &geometryTimeEvent)
+int* mitk::BaseRenderer::GetViewportSize() const
 {
-  const auto *timeEvent =
-    dynamic_cast<const SliceNavigationController::GeometryTimeEvent *>(&geometryTimeEvent);
-
-  assert(timeEvent != nullptr);
-  SetTimeStep(timeEvent->GetPos());
+  return m_VtkRenderer->GetSize();
 }
 
-const double *mitk::BaseRenderer::GetBounds() const
+const double* mitk::BaseRenderer::GetBounds() const
 {
   return m_Bounds;
-}
-
-void mitk::BaseRenderer::DrawOverlayMouse(mitk::Point2D &itkNotUsed(p2d))
-{
-  MITK_INFO << "BaseRenderer::DrawOverlayMouse()- should be inconcret implementation OpenGLRenderer." << std::endl;
 }
 
 void mitk::BaseRenderer::RequestUpdate()
 {
   SetConstrainZoomingAndPanning(true);
-  RenderingManager::GetInstance()->RequestUpdate(this->m_RenderWindow);
+  RenderingManager::GetInstance()->RequestUpdate(m_RenderWindow);
 }
 
 void mitk::BaseRenderer::ForceImmediateUpdate()
 {
-  RenderingManager::GetInstance()->ForceImmediateUpdate(this->m_RenderWindow);
+  RenderingManager::GetInstance()->ForceImmediateUpdate(m_RenderWindow);
 }
 
 unsigned int mitk::BaseRenderer::GetNumberOfVisibleLODEnabledMappers() const
@@ -576,9 +452,6 @@ unsigned int mitk::BaseRenderer::GetNumberOfVisibleLODEnabledMappers() const
   return m_NumberOfVisibleLODEnabledMappers;
 }
 
-/*!
- Sets the new Navigation controller
- */
 void mitk::BaseRenderer::SetSliceNavigationController(mitk::SliceNavigationController *SlicenavigationController)
 {
   if (SlicenavigationController == nullptr)
@@ -601,15 +474,15 @@ void mitk::BaseRenderer::SetSliceNavigationController(mitk::SliceNavigationContr
   }
 }
 
-void mitk::BaseRenderer::DisplayToWorld(const Point2D &displayPoint, Point3D &worldIndex) const
+void mitk::BaseRenderer::DisplayToWorld(const Point2D& displayPoint, Point3D& worldIndex) const
 {
   if (m_MapperID == BaseRenderer::Standard2D)
   {
-    double display[3], *world;
+    double display[3], * world;
 
     // For the rigth z-position in display coordinates, take the focal point, convert it to display and use it for
     // correct depth.
-    double *displayCoord;
+    double* displayCoord;
     double cameraFP[4];
     // Get camera focal point and position. Convert to display (screen)
     // coordinates. We need a depth value for z-buffer.
@@ -635,11 +508,9 @@ void mitk::BaseRenderer::DisplayToWorld(const Point2D &displayPoint, Point3D &wo
   }
   else if (m_MapperID == BaseRenderer::Standard3D)
   {
-    PickWorldPoint(
-      displayPoint,
-      worldIndex); // Seems to be the same code as above, but subclasses may contain different implementations.
+    // Seems to be the same code as above, but subclasses may contain different implementations.
+    PickWorldPoint(displayPoint, worldIndex);
   }
-
   return;
 }
 
@@ -649,7 +520,7 @@ void mitk::BaseRenderer::DisplayToPlane(const Point2D &displayPoint, Point2D &pl
   {
     Point3D worldPoint;
     this->DisplayToWorld(displayPoint, worldPoint);
-    this->m_CurrentWorldPlaneGeometry->Map(worldPoint, planePointInMM);
+    m_CurrentWorldPlaneGeometry->Map(worldPoint, planePointInMM);
   }
   else if (m_MapperID == BaseRenderer::Standard3D)
   {
@@ -702,7 +573,7 @@ void mitk::BaseRenderer::WorldToView(const mitk::Point3D &worldIndex, mitk::Poin
 void mitk::BaseRenderer::PlaneToDisplay(const Point2D &planePointInMM, Point2D &displayPoint) const
 {
   Point3D worldPoint;
-  this->m_CurrentWorldPlaneGeometry->Map(planePointInMM, worldPoint);
+  m_CurrentWorldPlaneGeometry->Map(planePointInMM, worldPoint);
   this->WorldToDisplay(worldPoint, displayPoint);
 
   return;
@@ -711,7 +582,7 @@ void mitk::BaseRenderer::PlaneToDisplay(const Point2D &planePointInMM, Point2D &
 void mitk::BaseRenderer::PlaneToView(const Point2D &planePointInMM, Point2D &viewPoint) const
 {
   Point3D worldPoint;
-  this->m_CurrentWorldPlaneGeometry->Map(planePointInMM, worldPoint);
+  m_CurrentWorldPlaneGeometry->Map(planePointInMM, worldPoint);
   this->WorldToView(worldPoint,viewPoint);
 
   return;
@@ -761,6 +632,76 @@ void mitk::BaseRenderer::SetConstrainZoomingAndPanning(bool constrain)
   if (m_ConstrainZoomingAndPanning)
   {
     this->GetCameraController()->AdjustCameraToPlane();
+  }
+}
+
+void mitk::BaseRenderer::UpdateCurrentGeometries()
+{
+  if (m_WorldTimeGeometry.IsNull())
+  {
+    // simply mark the base renderer as modified
+    Modified();
+  }
+
+  if (m_TimeStep >= m_WorldTimeGeometry->CountTimeSteps())
+  {
+    m_TimeStep = m_WorldTimeGeometry->CountTimeSteps() - 1;
+  }
+
+  auto slicedWorldGeometry =
+    dynamic_cast<SlicedGeometry3D*>(m_WorldTimeGeometry->GetGeometryForTimeStep(m_TimeStep).GetPointer());
+  if (slicedWorldGeometry != nullptr)
+  {
+    if (m_Slice >= slicedWorldGeometry->GetSlices())
+    {
+      m_Slice = slicedWorldGeometry->GetSlices() - 1;
+    }
+
+    SetCurrentWorldGeometry(slicedWorldGeometry);
+    SetCurrentWorldPlaneGeometry(slicedWorldGeometry->GetPlaneGeometry(m_Slice));
+  }
+}
+
+void mitk::BaseRenderer::SetCurrentWorldPlaneGeometry(const mitk::PlaneGeometry* geometry2d)
+{
+  if (m_CurrentWorldPlaneGeometry != geometry2d)
+  {
+    m_CurrentWorldPlaneGeometry = geometry2d->Clone();
+    m_CurrentWorldPlaneGeometryData->SetPlaneGeometry(m_CurrentWorldPlaneGeometry);
+    m_CurrentWorldPlaneGeometryUpdateTime.Modified();
+    Modified();
+  }
+}
+
+void mitk::BaseRenderer::SetCurrentWorldGeometry(const mitk::BaseGeometry* geometry)
+{
+  m_CurrentWorldGeometry = geometry;
+  if (geometry == nullptr)
+  {
+    m_Bounds[0] = 0;
+    m_Bounds[1] = 0;
+    m_Bounds[2] = 0;
+    m_Bounds[3] = 0;
+    m_Bounds[4] = 0;
+    m_Bounds[5] = 0;
+    m_EmptyWorldGeometry = true;
+    return;
+  }
+  BoundingBox::Pointer boundingBox = m_CurrentWorldGeometry->CalculateBoundingBoxRelativeToTransform(nullptr);
+  const BoundingBox::BoundsArrayType& worldBounds = boundingBox->GetBounds();
+  m_Bounds[0] = worldBounds[0];
+  m_Bounds[1] = worldBounds[1];
+  m_Bounds[2] = worldBounds[2];
+  m_Bounds[3] = worldBounds[3];
+  m_Bounds[4] = worldBounds[4];
+  m_Bounds[5] = worldBounds[5];
+  if (boundingBox->GetDiagonalLength2() <= mitk::eps)
+  {
+    m_EmptyWorldGeometry = true;
+  }
+  else
+  {
+    m_EmptyWorldGeometry = false;
   }
 }
 

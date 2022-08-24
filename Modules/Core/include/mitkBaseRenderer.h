@@ -155,7 +155,6 @@ namespace mitk
     //## \sa m_WorldGeometry
     //## \sa m_WorldTimeGeometry
     //## \sa m_CurrentWorldPlaneGeometry
-    virtual void SetWorldGeometry3D(const BaseGeometry *geometry);
     virtual void SetWorldTimeGeometry(const mitk::TimeGeometry *geometry);
 
     itkGetConstObjectMacro(WorldTimeGeometry, TimeGeometry);
@@ -347,6 +346,8 @@ namespace mitk
     itk::SmartPointer<CameraController> m_CameraController;
     SliceNavigationController::Pointer m_SliceNavigationController;
     CameraRotationController::Pointer m_CameraRotationController;
+
+    void UpdateCurrentGeometries();
 
     //## @brief Sets m_CurrentWorldPlaneGeometry
     virtual void SetCurrentWorldPlaneGeometry(const PlaneGeometry *geometry2d);

@@ -73,11 +73,14 @@ namespace mitk
     m_Rotated = false;
   }
 
-  SliceNavigationController::~SliceNavigationController() {}
+  SliceNavigationController::~SliceNavigationController()
+  {
+    // nothing here
+  }
 
   void SliceNavigationController::SetInputWorldTimeGeometry(const TimeGeometry* geometry)
   {
-    if (geometry != nullptr)
+    if (nullptr != geometry)
     {
       if (geometry->GetBoundingBoxInWorld()->GetDiagonalLength2() < eps)
       {
@@ -85,6 +88,7 @@ namespace mitk
         geometry = nullptr;
       }
     }
+
     if (m_InputWorldTimeGeometry != geometry)
     {
       m_InputWorldTimeGeometry = geometry;
@@ -92,7 +96,11 @@ namespace mitk
     }
   }
 
-  void SliceNavigationController::SetViewDirectionToDefault() { m_ViewDirection = m_DefaultViewDirection; }
+  void SliceNavigationController::SetViewDirectionToDefault()
+  {
+    m_ViewDirection = m_DefaultViewDirection;
+  }
+
   const char* SliceNavigationController::GetViewDirectionAsString() const
   {
     const char* viewDirectionString;
@@ -319,8 +327,6 @@ namespace mitk
 
   void SliceNavigationController::SendCreatedWorldGeometry()
   {
-    // Send the geometry. Do this even if nothing was changed, because maybe
-    // Update() was only called to re-send the old geometry.
     if (!m_BlockUpdate)
     {
       this->InvokeEvent(GeometrySendEvent(m_CreatedWorldGeometry, 0));
@@ -359,7 +365,11 @@ namespace mitk
     }
   }
 
-  void SliceNavigationController::SetGeometry(const itk::EventObject&) {}
+  void SliceNavigationController::SetGeometry(const itk::EventObject&)
+  {
+    // not implemented
+  }
+
   void SliceNavigationController::SetGeometryTime(const itk::EventObject& geometryTimeEvent)
   {
     if (m_CreatedWorldGeometry.IsNull())
@@ -396,62 +406,64 @@ namespace mitk
     }
 
     //@todo add time to PositionEvent and use here!!
-    SlicedGeometry3D* slicedWorldGeometry = dynamic_cast<SlicedGeometry3D*>(
+    const auto* slicedWorldGeometry = dynamic_cast<SlicedGeometry3D*>(
       m_CreatedWorldGeometry->GetGeometryForTimeStep(this->GetTime()->GetPos()).GetPointer());
 
-    if (slicedWorldGeometry)
+    if (nullptr == slicedWorldGeometry)
     {
-      int bestSlice = -1;
-      double bestDistance = itk::NumericTraits<double>::max();
-
-      int s, slices;
-      slices = slicedWorldGeometry->GetSlices();
-      if (slicedWorldGeometry->GetEvenlySpaced())
-      {
-        PlaneGeometry* plane = slicedWorldGeometry->GetPlaneGeometry(0);
-
-        const Vector3D& direction = slicedWorldGeometry->GetDirectionVector();
-
-        Point3D projectedPoint;
-        plane->Project(point, projectedPoint);
-
-        // Check whether the point is somewhere within the slice stack volume;
-        // otherwise, the default slice (0) will be selected
-        if (direction[0] * (point[0] - projectedPoint[0]) + direction[1] * (point[1] - projectedPoint[1]) +
-              direction[2] * (point[2] - projectedPoint[2]) >=
-            0)
-        {
-          bestSlice = (int)(plane->Distance(point) / slicedWorldGeometry->GetSpacing()[2] + 0.5);
-        }
-      }
-      else
-      {
-        Point3D projectedPoint;
-        for (s = 0; s < slices; ++s)
-        {
-          slicedWorldGeometry->GetPlaneGeometry(s)->Project(point, projectedPoint);
-          const Vector3D distance = projectedPoint - point;
-          ScalarType currentDistance = distance.GetSquaredNorm();
-
-          if (currentDistance < bestDistance)
-          {
-            bestDistance = currentDistance;
-            bestSlice = s;
-          }
-        }
-      }
-      if (bestSlice >= 0)
-      {
-        this->GetSlice()->SetPos(bestSlice);
-      }
-      else
-      {
-        this->GetSlice()->SetPos(0);
-      }
-      this->SendCreatedWorldGeometryUpdate();
-      // send crosshair event
-      SetCrosshairEvent.Send(point);
+      return;
     }
+
+    int bestSlice = -1;
+    double bestDistance = itk::NumericTraits<double>::max();
+
+    if (slicedWorldGeometry->GetEvenlySpaced())
+    {
+      PlaneGeometry* plane = slicedWorldGeometry->GetPlaneGeometry(0);
+
+      const Vector3D& direction = slicedWorldGeometry->GetDirectionVector();
+
+      Point3D projectedPoint;
+      plane->Project(point, projectedPoint);
+
+      // Check whether the point is somewhere within the slice stack volume;
+      // otherwise, the default slice (0) will be selected
+      if (direction[0] * (point[0] - projectedPoint[0]) + direction[1] * (point[1] - projectedPoint[1]) +
+            direction[2] * (point[2] - projectedPoint[2]) >= 0)
+      {
+        bestSlice = static_cast<int>(plane->Distance(point) / slicedWorldGeometry->GetSpacing()[2] + 0.5);
+      }
+    }
+    else
+    {
+      int numberOfSlices = slicedWorldGeometry->GetSlices();
+      Point3D projectedPoint;
+      for (int slice = 0; slice < numberOfSlices; ++slice)
+      {
+        slicedWorldGeometry->GetPlaneGeometry(slice)->Project(point, projectedPoint);
+        const Vector3D distance = projectedPoint - point;
+        ScalarType currentDistance = distance.GetSquaredNorm();
+
+        if (currentDistance < bestDistance)
+        {
+          bestDistance = currentDistance;
+          bestSlice = slice;
+        }
+      }
+    }
+
+    if (bestSlice >= 0)
+    {
+      this->GetSlice()->SetPos(bestSlice);
+    }
+    else
+    {
+      this->GetSlice()->SetPos(0);
+    }
+
+    this->SendCreatedWorldGeometryUpdate();
+    // send crosshair event
+    SetCrosshairEvent.Send(point);
   }
 
   void SliceNavigationController::ReorientSlices(const Point3D& point, const Vector3D& normal)
@@ -462,7 +474,6 @@ namespace mitk
     }
 
     PlaneOperation op(OpORIENT, point, normal);
-
     m_CreatedWorldGeometry->ExecuteOperation(&op);
 
     this->SendCreatedWorldGeometryUpdate();
@@ -472,44 +483,39 @@ namespace mitk
                                                  const Vector3D& axisVec0,
                                                  const Vector3D& axisVec1)
   {
-    if (m_CreatedWorldGeometry)
+    if (m_CreatedWorldGeometry.IsNull())
     {
-      PlaneOperation op(OpORIENT, point, axisVec0, axisVec1);
-      m_CreatedWorldGeometry->ExecuteOperation(&op);
-
-      this->SendCreatedWorldGeometryUpdate();
+      return;
     }
+
+    PlaneOperation op(OpORIENT, point, axisVec0, axisVec1);
+    m_CreatedWorldGeometry->ExecuteOperation(&op);
+
+    this->SendCreatedWorldGeometryUpdate();
   }
 
   const BaseGeometry* SliceNavigationController::GetCurrentGeometry3D()
   {
-    if (m_CreatedWorldGeometry.IsNotNull())
-    {
-      return m_CreatedWorldGeometry->GetGeometryForTimeStep(this->GetTime()->GetPos());
-    }
-    else
+    if (m_CreatedWorldGeometry.IsNull())
     {
       return nullptr;
     }
+
+    return m_CreatedWorldGeometry->GetGeometryForTimeStep(this->GetTime()->GetPos());
   }
 
   const PlaneGeometry* SliceNavigationController::GetCurrentPlaneGeometry()
   {
     const auto* slicedGeometry = dynamic_cast<const SlicedGeometry3D*>(this->GetCurrentGeometry3D());
 
-    if (slicedGeometry)
-    {
-      const PlaneGeometry* planeGeometry = (slicedGeometry->GetPlaneGeometry(this->GetSlice()->GetPos()));
-      return planeGeometry;
-    }
-    else
+    if (nullptr == slicedGeometry)
     {
       return nullptr;
     }
+
+    return slicedGeometry->GetPlaneGeometry(this->GetSlice()->GetPos());
   }
 
-  void SliceNavigationController::SetRenderer(BaseRenderer* renderer) { m_Renderer = renderer; }
-  BaseRenderer* SliceNavigationController::GetRenderer() const { return m_Renderer; }
   void SliceNavigationController::AdjustSliceStepperRange()
   {
     const auto* slicedGeometry = dynamic_cast<const SlicedGeometry3D*>(this->GetCurrentGeometry3D());

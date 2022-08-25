@@ -134,10 +134,7 @@ namespace mitk
   public:
 
     mitkClassMacro(SliceNavigationController, BaseController);
-    // itkFactorylessNewMacro(Self)
-    // mitkNewMacro1Param(Self, const char *);
     itkNewMacro(Self);
-    // itkCloneMacro(Self)
 
     /**
      * \brief Possible view directions, \a Original will use
@@ -357,16 +354,12 @@ namespace mitk
      */
     const PlaneGeometry* GetCurrentPlaneGeometry();
 
-    /** \brief Sets the BaseRenderer associated with this SNC (if any). While
-     * the BaseRenderer is not directly used by SNC, this is a convenience
-     * method to enable BaseRenderer access via the SNC. */
-    void SetRenderer(BaseRenderer* renderer);
-
-    /** \brief Gets the BaseRenderer associated with this SNC (if any). While
-     * the BaseRenderer is not directly used by SNC, this is a convenience
-     * method to enable BaseRenderer access via the SNC. Returns nullptr if no
-     * BaseRenderer has been specified*/
-    BaseRenderer* GetRenderer() const;
+    /** \brief Sets / gets the BaseRenderer associated with this SNC (if any).
+     * While the BaseRenderer is not directly used by SNC, this is a convenience
+     * method to enable BaseRenderer access via the SNC.
+     */
+    itkSetObjectMacro(Renderer, BaseRenderer);
+    itkGetMacro(Renderer, BaseRenderer*);
 
     /** \brief Re-orients the slice stack. All slices will be oriented to the given normal vector.
          The given point (world coordinates) defines the selected slice.

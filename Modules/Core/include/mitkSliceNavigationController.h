@@ -61,7 +61,7 @@ namespace mitk
    * The SliceNavigationController holds has Steppers (one for the slice, a
    * second for the time step), which control the selection of a single
    * PlaneGeometry from the TimeGeometry. SliceNavigationController generates
-   * ITK events to tell observers, like a BaseRenderer,  when the selected slice
+   * ITK events to tell observers, like a BaseRenderer, when the selected slice
    * or timestep changes.
    *
    * Example:
@@ -158,14 +158,14 @@ namespace mitk
      * Any previous previous set input geometry (3D or Time) will
      * be ignored in future.
      */
-    void SetInputWorldTimeGeometry(const mitk::TimeGeometry *geometry);
-    itkGetConstObjectMacro(InputWorldTimeGeometry, mitk::TimeGeometry);
+    void SetInputWorldTimeGeometry(const TimeGeometry *geometry);
+    itkGetConstObjectMacro(InputWorldTimeGeometry, TimeGeometry);
 
     /**
      * \brief Access the created geometry
      */
-    itkGetConstObjectMacro(CreatedWorldGeometry, mitk::TimeGeometry);
-    itkGetObjectMacro(CreatedWorldGeometry, mitk::TimeGeometry);
+    itkGetConstObjectMacro(CreatedWorldGeometry, TimeGeometry);
+    itkGetObjectMacro(CreatedWorldGeometry, TimeGeometry);
 
     /**
      * \brief Set the desired view directions
@@ -327,7 +327,7 @@ namespace mitk
       m_ReceiverToObserverTagsMap.erase(i);
     }
 
-    Message1<mitk::Point3D> SetCrosshairEvent;
+    Message1<Point3D> SetCrosshairEvent;
 
     /**
      * \brief To connect multiple SliceNavigationController, we can
@@ -349,15 +349,15 @@ namespace mitk
     virtual void SetGeometryTime(const itk::EventObject &geometryTimeEvent);
 
     /** \brief Positions the SNC according to the specified point */
-    void SelectSliceByPoint(const mitk::Point3D &point);
+    void SelectSliceByPoint(const Point3D &point);
 
     /** \brief Returns the BaseGeometry of the currently selected time step. */
-    const mitk::BaseGeometry *GetCurrentGeometry3D();
+    const BaseGeometry *GetCurrentGeometry3D();
 
     /** \brief Returns the currently selected Plane in the current
      * BaseGeometry (if existent).
      */
-    const mitk::PlaneGeometry *GetCurrentPlaneGeometry();
+    const PlaneGeometry *GetCurrentPlaneGeometry();
 
     /** \brief Sets the BaseRenderer associated with this SNC (if any). While
      * the BaseRenderer is not directly used by SNC, this is a convenience
@@ -373,14 +373,14 @@ namespace mitk
     /** \brief Re-orients the slice stack. All slices will be oriented to the given normal vector.
          The given point (world coordinates) defines the selected slice.
          Careful: The resulting axis vectors are not clearly defined this way. If you want to define them clearly, use
-         ReorientSlices (const mitk::Point3D &point, const mitk::Vector3D &axisVec0, const mitk::Vector3D &axisVec1).
+         ReorientSlices (const Point3D &point, const Vector3D &axisVec0, const Vector3D &axisVec1).
      */
-    void ReorientSlices(const mitk::Point3D &point, const mitk::Vector3D &normal);
+    void ReorientSlices(const Point3D &point, const Vector3D &normal);
 
     /** \brief Re-orients the slice stack so that all planes are oriented according to the
     * given axis vectors. The given Point eventually defines selected slice.
     */
-    void ReorientSlices(const mitk::Point3D &point, const mitk::Vector3D &axisVec0, const mitk::Vector3D &axisVec1);
+    void ReorientSlices(const Point3D &point, const Vector3D &axisVec0, const Vector3D &axisVec1);
 
     void ExecuteOperation(Operation *operation) override;
 
@@ -422,16 +422,15 @@ namespace mitk
     SliceNavigationController();
     ~SliceNavigationController() override;
 
-
-    mitk::TimeGeometry::ConstPointer m_InputWorldTimeGeometry;
-    mitk::TimeGeometry::Pointer m_CreatedWorldGeometry;
+    TimeGeometry::ConstPointer m_InputWorldTimeGeometry;
+    TimeGeometry::Pointer m_CreatedWorldGeometry;
 
     ViewDirection m_ViewDirection;
     ViewDirection m_DefaultViewDirection;
 
-    mitk::RenderingManager::Pointer m_RenderingManager;
+    RenderingManager::Pointer m_RenderingManager;
 
-    mitk::BaseRenderer *m_Renderer;
+    BaseRenderer *m_Renderer;
 
     itkSetMacro(Top, bool);
     itkGetMacro(Top, bool);

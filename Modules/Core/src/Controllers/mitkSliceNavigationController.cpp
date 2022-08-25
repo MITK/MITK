@@ -37,20 +37,20 @@ found in the LICENSE file.
 namespace mitk
 {
   SliceNavigationController::SliceNavigationController()
-    : BaseController(),
-      m_InputWorldTimeGeometry(mitk::TimeGeometry::ConstPointer()),
-      m_CreatedWorldGeometry(mitk::TimeGeometry::Pointer()),
-      m_ViewDirection(Axial),
-      m_DefaultViewDirection(Axial),
-  m_RenderingManager( mitk::RenderingManager::Pointer() ),
-  m_Renderer( nullptr ),
-      m_Top(false),
-      m_FrontSide(false),
-      m_Rotated(false),
-      m_BlockUpdate(false),
-      m_SliceLocked(false),
-      m_SliceRotationLocked(false),
-      m_OldPos(0)
+    : BaseController()
+    , m_InputWorldTimeGeometry(TimeGeometry::ConstPointer())
+    , m_CreatedWorldGeometry(TimeGeometry::Pointer())
+    , m_ViewDirection(Axial)
+    , m_DefaultViewDirection(Axial)
+    , m_RenderingManager(RenderingManager::Pointer())
+    , m_Renderer(nullptr)
+    , m_Top(false)
+    , m_FrontSide(false)
+    , m_Rotated(false)
+    , m_BlockUpdate(false)
+    , m_SliceLocked(false)
+    , m_SliceRotationLocked(false)
+    , m_OldPos(0)
   {
     typedef itk::SimpleMemberCommand<SliceNavigationController> SNCCommandType;
     SNCCommandType::Pointer sliceStepperChangedCommand, timeStepperChangedCommand;
@@ -189,7 +189,7 @@ namespace mitk
       else
         currentGeometry = m_InputWorldTimeGeometry->GetGeometryForTimeStep(0);
 
-      m_CreatedWorldGeometry = mitk::TimeGeometry::Pointer();
+      m_CreatedWorldGeometry = TimeGeometry::Pointer();
       switch (viewDirection)
       {
         case Original:
@@ -271,7 +271,7 @@ namespace mitk
         const auto currentTemporalPosition = this->GetTime()->GetPos();
         assert( worldTimeGeometry->GetGeometryForTimeStep( currentTemporalPosition ).IsNotNull() );
 
-      if ( dynamic_cast<const mitk::ProportionalTimeGeometry*>( worldTimeGeometry.GetPointer() ) != nullptr )
+      if ( dynamic_cast<const ProportionalTimeGeometry*>( worldTimeGeometry.GetPointer() ) != nullptr )
       {
         const TimePointType minimumTimePoint =
           worldTimeGeometry->TimeStepToTimePoint( currentTemporalPosition );
@@ -288,7 +288,7 @@ namespace mitk
       }
       else
       {
-        auto createdTimeGeometry = mitk::ArbitraryTimeGeometry::New();
+        auto createdTimeGeometry = ArbitraryTimeGeometry::New();
         const TimeStepType numberOfTimeSteps = worldTimeGeometry->CountTimeSteps();
         createdTimeGeometry->ReserveSpaceForGeometries( numberOfTimeSteps );
 
@@ -413,7 +413,7 @@ namespace mitk
       slices = slicedWorldGeometry->GetSlices();
       if (slicedWorldGeometry->GetEvenlySpaced())
       {
-        mitk::PlaneGeometry *plane = slicedWorldGeometry->GetPlaneGeometry(0);
+        PlaneGeometry *plane = slicedWorldGeometry->GetPlaneGeometry(0);
 
         const Vector3D &direction = slicedWorldGeometry->GetDirectionVector();
 
@@ -473,9 +473,9 @@ namespace mitk
     this->SendCreatedWorldGeometryUpdate();
   }
 
-  void SliceNavigationController::ReorientSlices(const mitk::Point3D &point,
-                                                 const mitk::Vector3D &axisVec0,
-                                                 const mitk::Vector3D &axisVec1)
+  void SliceNavigationController::ReorientSlices(const Point3D &point,
+                                                 const Vector3D &axisVec0,
+                                                 const Vector3D &axisVec1)
   {
     if (m_CreatedWorldGeometry)
     {
@@ -486,7 +486,7 @@ namespace mitk
     }
   }
 
-  const mitk::BaseGeometry *SliceNavigationController::GetCurrentGeometry3D()
+  const BaseGeometry *SliceNavigationController::GetCurrentGeometry3D()
   {
     if (m_CreatedWorldGeometry.IsNotNull())
     {
@@ -498,14 +498,14 @@ namespace mitk
     }
   }
 
-  const mitk::PlaneGeometry *SliceNavigationController::GetCurrentPlaneGeometry()
+  const PlaneGeometry *SliceNavigationController::GetCurrentPlaneGeometry()
   {
     const auto *slicedGeometry =
-      dynamic_cast<const mitk::SlicedGeometry3D *>(this->GetCurrentGeometry3D());
+      dynamic_cast<const SlicedGeometry3D *>(this->GetCurrentGeometry3D());
 
     if (slicedGeometry)
     {
-      const mitk::PlaneGeometry *planeGeometry = (slicedGeometry->GetPlaneGeometry(this->GetSlice()->GetPos()));
+      const PlaneGeometry *planeGeometry = (slicedGeometry->GetPlaneGeometry(this->GetSlice()->GetPos()));
       return planeGeometry;
     }
     else
@@ -519,7 +519,7 @@ namespace mitk
   void SliceNavigationController::AdjustSliceStepperRange()
   {
     const auto *slicedGeometry =
-      dynamic_cast<const mitk::SlicedGeometry3D *>(this->GetCurrentGeometry3D());
+      dynamic_cast<const SlicedGeometry3D *>(this->GetCurrentGeometry3D());
 
     const Vector3D &direction = slicedGeometry->GetDirectionVector();
 

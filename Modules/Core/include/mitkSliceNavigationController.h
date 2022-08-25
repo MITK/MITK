@@ -132,6 +132,7 @@ namespace mitk
   class MITKCORE_EXPORT SliceNavigationController : public BaseController
   {
   public:
+
     mitkClassMacro(SliceNavigationController, BaseController);
     // itkFactorylessNewMacro(Self)
     // mitkNewMacro1Param(Self, const char *);
@@ -158,7 +159,7 @@ namespace mitk
      * Any previous previous set input geometry (3D or Time) will
      * be ignored in future.
      */
-    void SetInputWorldTimeGeometry(const TimeGeometry *geometry);
+    void SetInputWorldTimeGeometry(const TimeGeometry* geometry);
     itkGetConstObjectMacro(InputWorldTimeGeometry, TimeGeometry);
 
     /**
@@ -244,18 +245,19 @@ namespace mitk
       typedef TimeGeometryEvent Self;
       typedef itk::AnyEvent Superclass;
 
-      TimeGeometryEvent(TimeGeometry *aTimeGeometry, unsigned int aPos) : m_TimeGeometry(aTimeGeometry), m_Pos(aPos) {}
+      TimeGeometryEvent(TimeGeometry* aTimeGeometry, unsigned int aPos) : m_TimeGeometry(aTimeGeometry), m_Pos(aPos) {}
       ~TimeGeometryEvent() override {}
-      const char *GetEventName() const override { return "TimeGeometryEvent"; }
-      bool CheckEvent(const ::itk::EventObject *e) const override { return dynamic_cast<const Self *>(e); }
-      ::itk::EventObject *MakeObject() const override { return new Self(m_TimeGeometry, m_Pos); }
-      TimeGeometry *GetTimeGeometry() const { return m_TimeGeometry; }
+      const char* GetEventName() const override { return "TimeGeometryEvent"; }
+      bool CheckEvent(const ::itk::EventObject* e) const override { return dynamic_cast<const Self*>(e); }
+      ::itk::EventObject* MakeObject() const override { return new Self(m_TimeGeometry, m_Pos); }
+      TimeGeometry* GetTimeGeometry() const { return m_TimeGeometry; }
       unsigned int GetPos() const { return m_Pos; }
+
     private:
       TimeGeometry::Pointer m_TimeGeometry;
       unsigned int m_Pos;
       // TimeGeometryEvent(const Self&);
-      void operator=(const Self &); // just hide
+      void operator=(const Self&); // just hide
     };
 
 
@@ -265,43 +267,43 @@ namespace mitk
     mitkTimeGeometryEventMacro(GeometrySliceEvent, TimeGeometryEvent);
 
     template <typename T>
-    void ConnectGeometrySendEvent(T *receiver)
+    void ConnectGeometrySendEvent(T* receiver)
     {
       auto eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
       eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometry);
       unsigned long tag = AddObserver(GeometrySendEvent(nullptr, 0), eventReceptorCommand);
-      m_ReceiverToObserverTagsMap[static_cast<void *>(receiver)].push_back(tag);
+      m_ReceiverToObserverTagsMap[static_cast<void*>(receiver)].push_back(tag);
     }
 
     template <typename T>
-    void ConnectGeometryUpdateEvent(T *receiver)
+    void ConnectGeometryUpdateEvent(T* receiver)
     {
       auto eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
       eventReceptorCommand->SetCallbackFunction(receiver, &T::UpdateGeometry);
       unsigned long tag = AddObserver(GeometryUpdateEvent(nullptr, 0), eventReceptorCommand);
-      m_ReceiverToObserverTagsMap[static_cast<void *>(receiver)].push_back(tag);
+      m_ReceiverToObserverTagsMap[static_cast<void*>(receiver)].push_back(tag);
     }
 
     template <typename T>
-    void ConnectGeometrySliceEvent(T *receiver)
+    void ConnectGeometrySliceEvent(T* receiver)
     {
       auto eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
       eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometrySlice);
       unsigned long tag = AddObserver(GeometrySliceEvent(nullptr, 0), eventReceptorCommand);
-      m_ReceiverToObserverTagsMap[static_cast<void *>(receiver)].push_back(tag);
+      m_ReceiverToObserverTagsMap[static_cast<void*>(receiver)].push_back(tag);
     }
 
     template <typename T>
-    void ConnectGeometryTimeEvent(T *receiver)
+    void ConnectGeometryTimeEvent(T* receiver)
     {
       auto eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
       eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometryTime);
       unsigned long tag = AddObserver(GeometryTimeEvent(nullptr, 0), eventReceptorCommand);
-      m_ReceiverToObserverTagsMap[static_cast<void *>(receiver)].push_back(tag);
+      m_ReceiverToObserverTagsMap[static_cast<void*>(receiver)].push_back(tag);
     }
 
     template <typename T>
-    void ConnectGeometryEvents(T *receiver)
+    void ConnectGeometryEvents(T* receiver)
     {
       // connect sendEvent only once
       ConnectGeometrySliceEvent(receiver, false);
@@ -310,12 +312,12 @@ namespace mitk
 
     // use a templated method to get the right offset when casting to void*
     template <typename T>
-    void Disconnect(T *receiver)
+    void Disconnect(T* receiver)
     {
-      auto i = m_ReceiverToObserverTagsMap.find(static_cast<void *>(receiver));
+      auto i = m_ReceiverToObserverTagsMap.find(static_cast<void*>(receiver));
       if (i == m_ReceiverToObserverTagsMap.end())
         return;
-      const std::list<unsigned long> &tags = i->second;
+      const std::list<unsigned long>& tags = i->second;
       for (auto tagIter = tags.begin(); tagIter != tags.end(); ++tagIter)
       {
         RemoveObserver(*tagIter);
@@ -330,55 +332,55 @@ namespace mitk
      * act as an observer ourselves: implemented interface
      * \warning not implemented
      */
-    virtual void SetGeometry(const itk::EventObject &geometrySliceEvent);
+    virtual void SetGeometry(const itk::EventObject& geometrySliceEvent);
 
     /**
      * \brief To connect multiple SliceNavigationController, we can
      * act as an observer ourselves: implemented interface
      */
-    virtual void SetGeometrySlice(const itk::EventObject &geometrySliceEvent);
+    virtual void SetGeometrySlice(const itk::EventObject& geometrySliceEvent);
 
     /**
      * \brief To connect multiple SliceNavigationController, we can
      * act as an observer ourselves: implemented interface
      */
-    virtual void SetGeometryTime(const itk::EventObject &geometryTimeEvent);
+    virtual void SetGeometryTime(const itk::EventObject& geometryTimeEvent);
 
     /** \brief Positions the SNC according to the specified point */
-    void SelectSliceByPoint(const Point3D &point);
+    void SelectSliceByPoint(const Point3D& point);
 
     /** \brief Returns the BaseGeometry of the currently selected time step. */
-    const BaseGeometry *GetCurrentGeometry3D();
+    const BaseGeometry* GetCurrentGeometry3D();
 
     /** \brief Returns the currently selected Plane in the current
      * BaseGeometry (if existent).
      */
-    const PlaneGeometry *GetCurrentPlaneGeometry();
+    const PlaneGeometry* GetCurrentPlaneGeometry();
 
     /** \brief Sets the BaseRenderer associated with this SNC (if any). While
      * the BaseRenderer is not directly used by SNC, this is a convenience
      * method to enable BaseRenderer access via the SNC. */
-    void SetRenderer(BaseRenderer *renderer);
+    void SetRenderer(BaseRenderer* renderer);
 
     /** \brief Gets the BaseRenderer associated with this SNC (if any). While
      * the BaseRenderer is not directly used by SNC, this is a convenience
      * method to enable BaseRenderer access via the SNC. Returns nullptr if no
      * BaseRenderer has been specified*/
-    BaseRenderer *GetRenderer() const;
+    BaseRenderer* GetRenderer() const;
 
     /** \brief Re-orients the slice stack. All slices will be oriented to the given normal vector.
          The given point (world coordinates) defines the selected slice.
          Careful: The resulting axis vectors are not clearly defined this way. If you want to define them clearly, use
          ReorientSlices (const Point3D &point, const Vector3D &axisVec0, const Vector3D &axisVec1).
      */
-    void ReorientSlices(const Point3D &point, const Vector3D &normal);
+    void ReorientSlices(const Point3D& point, const Vector3D& normal);
 
     /** \brief Re-orients the slice stack so that all planes are oriented according to the
-    * given axis vectors. The given Point eventually defines selected slice.
-    */
-    void ReorientSlices(const Point3D &point, const Vector3D &axisVec0, const Vector3D &axisVec1);
+     * given axis vectors. The given Point eventually defines selected slice.
+     */
+    void ReorientSlices(const Point3D& point, const Vector3D& axisVec0, const Vector3D& axisVec1);
 
-    void ExecuteOperation(Operation *operation) override;
+    void ExecuteOperation(Operation* operation) override;
 
     /**
      * \brief Feature option to lock planes during mouse interaction.
@@ -426,7 +428,7 @@ namespace mitk
 
     RenderingManager::Pointer m_RenderingManager;
 
-    BaseRenderer *m_Renderer;
+    BaseRenderer* m_Renderer;
 
     itkSetMacro(Top, bool);
     itkGetMacro(Top, bool);
@@ -450,7 +452,7 @@ namespace mitk
     bool m_SliceRotationLocked;
     unsigned int m_OldPos;
 
-    typedef std::map<void *, std::list<unsigned long>> ObserverTagsMapType;
+    typedef std::map<void*, std::list<unsigned long>> ObserverTagsMapType;
     ObserverTagsMapType m_ReceiverToObserverTagsMap;
   };
 

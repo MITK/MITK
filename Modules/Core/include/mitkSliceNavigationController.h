@@ -267,8 +267,7 @@ namespace mitk
     template <typename T>
     void ConnectGeometrySendEvent(T *receiver)
     {
-      typedef typename itk::ReceptorMemberCommand<T>::Pointer ReceptorMemberCommandPointer;
-      ReceptorMemberCommandPointer eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
+      auto eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
       eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometry);
       unsigned long tag = AddObserver(GeometrySendEvent(nullptr, 0), eventReceptorCommand);
       m_ReceiverToObserverTagsMap[static_cast<void *>(receiver)].push_back(tag);
@@ -277,8 +276,7 @@ namespace mitk
     template <typename T>
     void ConnectGeometryUpdateEvent(T *receiver)
     {
-      typedef typename itk::ReceptorMemberCommand<T>::Pointer ReceptorMemberCommandPointer;
-      ReceptorMemberCommandPointer eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
+      auto eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
       eventReceptorCommand->SetCallbackFunction(receiver, &T::UpdateGeometry);
       unsigned long tag = AddObserver(GeometryUpdateEvent(nullptr, 0), eventReceptorCommand);
       m_ReceiverToObserverTagsMap[static_cast<void *>(receiver)].push_back(tag);
@@ -287,8 +285,7 @@ namespace mitk
     template <typename T>
     void ConnectGeometrySliceEvent(T *receiver)
     {
-      typedef typename itk::ReceptorMemberCommand<T>::Pointer ReceptorMemberCommandPointer;
-      ReceptorMemberCommandPointer eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
+      auto eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
       eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometrySlice);
       unsigned long tag = AddObserver(GeometrySliceEvent(nullptr, 0), eventReceptorCommand);
       m_ReceiverToObserverTagsMap[static_cast<void *>(receiver)].push_back(tag);
@@ -297,8 +294,7 @@ namespace mitk
     template <typename T>
     void ConnectGeometryTimeEvent(T *receiver)
     {
-      typedef typename itk::ReceptorMemberCommand<T>::Pointer ReceptorMemberCommandPointer;
-      ReceptorMemberCommandPointer eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
+      auto eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
       eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometryTime);
       unsigned long tag = AddObserver(GeometryTimeEvent(nullptr, 0), eventReceptorCommand);
       m_ReceiverToObserverTagsMap[static_cast<void *>(receiver)].push_back(tag);

@@ -169,9 +169,10 @@ mitk::BaseRenderer::BaseRenderer(const char *name,
 
   mitk::SliceNavigationController::Pointer sliceNavigationController = mitk::SliceNavigationController::New();
   sliceNavigationController->SetRenderer(this);
-  sliceNavigationController->ConnectGeometrySliceEvent(this);
+  sliceNavigationController->ConnectGeometrySendEvent(this);
   sliceNavigationController->ConnectGeometryUpdateEvent(this);
-  sliceNavigationController->ConnectGeometryTimeEvent(this, false);
+  sliceNavigationController->ConnectGeometrySliceEvent(this);
+  sliceNavigationController->ConnectGeometryTimeEvent(this);
   m_SliceNavigationController = sliceNavigationController;
 
   m_CameraRotationController = mitk::CameraRotationController::New();
@@ -593,9 +594,10 @@ void mitk::BaseRenderer::SetSliceNavigationController(mitk::SliceNavigationContr
 
   if (m_SliceNavigationController.IsNotNull())
   {
-    m_SliceNavigationController->ConnectGeometrySliceEvent(this);
+    m_SliceNavigationController->ConnectGeometrySendEvent(this);
     m_SliceNavigationController->ConnectGeometryUpdateEvent(this);
-    m_SliceNavigationController->ConnectGeometryTimeEvent(this, false);
+    m_SliceNavigationController->ConnectGeometrySliceEvent(this);
+    m_SliceNavigationController->ConnectGeometryTimeEvent(this);
   }
 }
 

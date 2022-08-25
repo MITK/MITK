@@ -151,8 +151,8 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
       rw->GetVtkRenderWindow()->WaitForCompletion();
 
       // connect SliceNavigationControllers to timestep changed event of TimeNavigationController
-      rw->GetSliceNavigationController()->ConnectGeometryTimeEvent(rm->GetTimeNavigationController(), false);
-      rm->GetTimeNavigationController()->ConnectGeometryTimeEvent(rw->GetSliceNavigationController(), false);
+      rw->GetSliceNavigationController()->ConnectGeometryTimeEvent(rm->GetTimeNavigationController());
+      rm->GetTimeNavigationController()->ConnectGeometryTimeEvent(rw->GetSliceNavigationController());
 
       // add to list of known render windows
       m_RenderWindowList.push_back(rw);

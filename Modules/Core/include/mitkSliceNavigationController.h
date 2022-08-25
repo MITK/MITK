@@ -284,27 +284,23 @@ namespace mitk
     }
 
     template <typename T>
-    void ConnectGeometrySliceEvent(T *receiver, bool connectSendEvent = true)
+    void ConnectGeometrySliceEvent(T *receiver)
     {
       typedef typename itk::ReceptorMemberCommand<T>::Pointer ReceptorMemberCommandPointer;
       ReceptorMemberCommandPointer eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
       eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometrySlice);
       unsigned long tag = AddObserver(GeometrySliceEvent(nullptr, 0), eventReceptorCommand);
       m_ReceiverToObserverTagsMap[static_cast<void *>(receiver)].push_back(tag);
-      if (connectSendEvent)
-        ConnectGeometrySendEvent(receiver);
     }
 
     template <typename T>
-    void ConnectGeometryTimeEvent(T *receiver, bool connectSendEvent = true)
+    void ConnectGeometryTimeEvent(T *receiver)
     {
       typedef typename itk::ReceptorMemberCommand<T>::Pointer ReceptorMemberCommandPointer;
       ReceptorMemberCommandPointer eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
       eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometryTime);
       unsigned long tag = AddObserver(GeometryTimeEvent(nullptr, 0), eventReceptorCommand);
       m_ReceiverToObserverTagsMap[static_cast<void *>(receiver)].push_back(tag);
-      if (connectSendEvent)
-        ConnectGeometrySendEvent(receiver);
     }
 
     template <typename T>

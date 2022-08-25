@@ -278,7 +278,7 @@ void QmitkMxNMultiWidget::CreateRenderWindowWidget()
   connect(renderWindow, &QmitkRenderWindow::CrosshairRotationModeChanged, this, &QmitkMxNMultiWidget::SetWidgetPlaneMode);
 
   // connect time navigation controller to react on geometry time events with the render window's slice naviation controller
-  m_TimeNavigationController->ConnectGeometryTimeEvent(renderWindow->GetSliceNavigationController(), false);
+  m_TimeNavigationController->ConnectGeometryTimeEvent(renderWindow->GetSliceNavigationController());
   // reverse connection between the render window's slice navigation controller and the time navigation controller
-  renderWindow->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
+  renderWindow->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController);
 }

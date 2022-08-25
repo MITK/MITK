@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QMITKIMAGENAVIGATORVIEW_H_INCLUDED
-#define _QMITKIMAGENAVIGATORVIEW_H_INCLUDED
+#ifndef QMITKIMAGENAVIGATORVIEW_H
+#define QMITKIMAGENAVIGATORVIEW_H
 
 #include <berryISizeProvider.h>
 
@@ -19,7 +19,6 @@ found in the LICENSE file.
 #include <mitkIRenderWindowPartListener.h>
 
 #include "ui_QmitkImageNavigatorViewControls.h"
-
 
 class QmitkStepperAdapter;
 
@@ -41,7 +40,6 @@ class QmitkImageNavigatorView :
     public berry::ISizeProvider
 {
 
-  // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
   Q_OBJECT
 
 public:
@@ -73,9 +71,6 @@ protected:
   void SetBorderColors();
   void SetBorderColor(QDoubleSpinBox *spinBox, QString colorAsStyleSheetString);
   void SetBorderColor(int axis, QString colorAsStyleSheetString);
-  void SetStepSizes();
-  void SetStepSize(int axis);
-  void SetStepSize(int axis, double stepSize);
   int  GetClosestAxisIndex(mitk::Vector3D normal);
   void SetVisibilityOfTimeSlider(std::size_t timeSteps);
 
@@ -97,4 +92,4 @@ protected:
   QString GetDecorationColorOfGeometry(QmitkRenderWindow *renderWindow);
 };
 
-#endif // _QMITKIMAGENAVIGATORVIEW_H_INCLUDED
+#endif // QMITKIMAGENAVIGATORVIEW_H

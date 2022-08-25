@@ -13,18 +13,19 @@ found in the LICENSE file.
 #ifndef MITKSLICENAVIGATIONCONTROLLER_H
 #define MITKSLICENAVIGATIONCONTROLLER_H
 
-#include "mitkBaseController.h"
-#include "mitkMessage.h"
-#include "mitkRenderingManager.h"
-#include "mitkTimeGeometry.h"
 #include <MitkCoreExports.h>
+
+#include <mitkBaseController.h>
+#include <mitkMessage.h>
+#include <mitkRenderingManager.h>
+#include <mitkRestorePlanePositionOperation.h>
+#include <mitkTimeGeometry.h>
+
 #pragma GCC visibility push(default)
 #include <itkEventObject.h>
 #pragma GCC visibility pop
-#include "mitkDataStorage.h"
-#include "mitkRestorePlanePositionOperation.h"
+
 #include <itkCommand.h>
-#include <sstream>
 
 namespace mitk
 {
@@ -60,7 +61,7 @@ namespace mitk
    * The SliceNavigationController holds has Steppers (one for the slice, a
    * second for the time step), which control the selection of a single
    * PlaneGeometry from the TimeGeometry. SliceNavigationController generates
-   * ITK events to tell observers, like a BaseRenderer,  when the selected slice
+   * ITK events to tell observers, like a BaseRenderer, when the selected slice
    * or timestep changes.
    *
    * Example:
@@ -131,11 +132,9 @@ namespace mitk
   class MITKCORE_EXPORT SliceNavigationController : public BaseController
   {
   public:
+
     mitkClassMacro(SliceNavigationController, BaseController);
-    // itkFactorylessNewMacro(Self)
-    // mitkNewMacro1Param(Self, const char *);
     itkNewMacro(Self);
-    // itkCloneMacro(Self)
 
     /**
      * \brief Possible view directions, \a Original will use
@@ -157,14 +156,14 @@ namespace mitk
      * Any previous previous set input geometry (3D or Time) will
      * be ignored in future.
      */
-    void SetInputWorldTimeGeometry(const mitk::TimeGeometry *geometry);
-    itkGetConstObjectMacro(InputWorldTimeGeometry, mitk::TimeGeometry);
+    void SetInputWorldTimeGeometry(const TimeGeometry* geometry);
+    itkGetConstObjectMacro(InputWorldTimeGeometry, TimeGeometry);
 
     /**
      * \brief Access the created geometry
      */
-    itkGetConstObjectMacro(CreatedWorldGeometry, mitk::TimeGeometry);
-    itkGetObjectMacro(CreatedWorldGeometry, mitk::TimeGeometry);
+    itkGetConstObjectMacro(CreatedWorldGeometry, TimeGeometry);
+    itkGetObjectMacro(CreatedWorldGeometry, TimeGeometry);
 
     /**
      * \brief Set the desired view directions
@@ -243,18 +242,19 @@ namespace mitk
       typedef TimeGeometryEvent Self;
       typedef itk::AnyEvent Superclass;
 
-      TimeGeometryEvent(TimeGeometry *aTimeGeometry, unsigned int aPos) : m_TimeGeometry(aTimeGeometry), m_Pos(aPos) {}
+      TimeGeometryEvent(TimeGeometry* aTimeGeometry, unsigned int aPos) : m_TimeGeometry(aTimeGeometry), m_Pos(aPos) {}
       ~TimeGeometryEvent() override {}
-      const char *GetEventName() const override { return "TimeGeometryEvent"; }
-      bool CheckEvent(const ::itk::EventObject *e) const override { return dynamic_cast<const Self *>(e); }
-      ::itk::EventObject *MakeObject() const override { return new Self(m_TimeGeometry, m_Pos); }
-      TimeGeometry *GetTimeGeometry() const { return m_TimeGeometry; }
+      const char* GetEventName() const override { return "TimeGeometryEvent"; }
+      bool CheckEvent(const ::itk::EventObject* e) const override { return dynamic_cast<const Self*>(e); }
+      ::itk::EventObject* MakeObject() const override { return new Self(m_TimeGeometry, m_Pos); }
+      TimeGeometry* GetTimeGeometry() const { return m_TimeGeometry; }
       unsigned int GetPos() const { return m_Pos; }
+
     private:
       TimeGeometry::Pointer m_TimeGeometry;
       unsigned int m_Pos;
       // TimeGeometryEvent(const Self&);
-      void operator=(const Self &); // just hide
+      void operator=(const Self&); // just hide
     };
 
 
@@ -264,51 +264,43 @@ namespace mitk
     mitkTimeGeometryEventMacro(GeometrySliceEvent, TimeGeometryEvent);
 
     template <typename T>
-    void ConnectGeometrySendEvent(T *receiver)
+    void ConnectGeometrySendEvent(T* receiver)
     {
-      typedef typename itk::ReceptorMemberCommand<T>::Pointer ReceptorMemberCommandPointer;
-      ReceptorMemberCommandPointer eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
+      auto eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
       eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometry);
       unsigned long tag = AddObserver(GeometrySendEvent(nullptr, 0), eventReceptorCommand);
-      m_ReceiverToObserverTagsMap[static_cast<void *>(receiver)].push_back(tag);
+      m_ReceiverToObserverTagsMap[static_cast<void*>(receiver)].push_back(tag);
     }
 
     template <typename T>
-    void ConnectGeometryUpdateEvent(T *receiver)
+    void ConnectGeometryUpdateEvent(T* receiver)
     {
-      typedef typename itk::ReceptorMemberCommand<T>::Pointer ReceptorMemberCommandPointer;
-      ReceptorMemberCommandPointer eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
+      auto eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
       eventReceptorCommand->SetCallbackFunction(receiver, &T::UpdateGeometry);
       unsigned long tag = AddObserver(GeometryUpdateEvent(nullptr, 0), eventReceptorCommand);
-      m_ReceiverToObserverTagsMap[static_cast<void *>(receiver)].push_back(tag);
+      m_ReceiverToObserverTagsMap[static_cast<void*>(receiver)].push_back(tag);
     }
 
     template <typename T>
-    void ConnectGeometrySliceEvent(T *receiver, bool connectSendEvent = true)
+    void ConnectGeometrySliceEvent(T* receiver)
     {
-      typedef typename itk::ReceptorMemberCommand<T>::Pointer ReceptorMemberCommandPointer;
-      ReceptorMemberCommandPointer eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
+      auto eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
       eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometrySlice);
       unsigned long tag = AddObserver(GeometrySliceEvent(nullptr, 0), eventReceptorCommand);
-      m_ReceiverToObserverTagsMap[static_cast<void *>(receiver)].push_back(tag);
-      if (connectSendEvent)
-        ConnectGeometrySendEvent(receiver);
+      m_ReceiverToObserverTagsMap[static_cast<void*>(receiver)].push_back(tag);
     }
 
     template <typename T>
-    void ConnectGeometryTimeEvent(T *receiver, bool connectSendEvent = true)
+    void ConnectGeometryTimeEvent(T* receiver)
     {
-      typedef typename itk::ReceptorMemberCommand<T>::Pointer ReceptorMemberCommandPointer;
-      ReceptorMemberCommandPointer eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
+      auto eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
       eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometryTime);
       unsigned long tag = AddObserver(GeometryTimeEvent(nullptr, 0), eventReceptorCommand);
-      m_ReceiverToObserverTagsMap[static_cast<void *>(receiver)].push_back(tag);
-      if (connectSendEvent)
-        ConnectGeometrySendEvent(receiver);
+      m_ReceiverToObserverTagsMap[static_cast<void*>(receiver)].push_back(tag);
     }
 
     template <typename T>
-    void ConnectGeometryEvents(T *receiver)
+    void ConnectGeometryEvents(T* receiver)
     {
       // connect sendEvent only once
       ConnectGeometrySliceEvent(receiver, false);
@@ -317,12 +309,12 @@ namespace mitk
 
     // use a templated method to get the right offset when casting to void*
     template <typename T>
-    void Disconnect(T *receiver)
+    void Disconnect(T* receiver)
     {
-      auto i = m_ReceiverToObserverTagsMap.find(static_cast<void *>(receiver));
+      auto i = m_ReceiverToObserverTagsMap.find(static_cast<void*>(receiver));
       if (i == m_ReceiverToObserverTagsMap.end())
         return;
-      const std::list<unsigned long> &tags = i->second;
+      const std::list<unsigned long>& tags = i->second;
       for (auto tagIter = tags.begin(); tagIter != tags.end(); ++tagIter)
       {
         RemoveObserver(*tagIter);
@@ -330,62 +322,58 @@ namespace mitk
       m_ReceiverToObserverTagsMap.erase(i);
     }
 
-    Message1<mitk::Point3D> SetCrosshairEvent;
+    Message1<Point3D> SetCrosshairEvent;
 
     /**
      * \brief To connect multiple SliceNavigationController, we can
      * act as an observer ourselves: implemented interface
      * \warning not implemented
      */
-    virtual void SetGeometry(const itk::EventObject &geometrySliceEvent);
+    virtual void SetGeometry(const itk::EventObject& geometrySliceEvent);
 
     /**
      * \brief To connect multiple SliceNavigationController, we can
      * act as an observer ourselves: implemented interface
      */
-    virtual void SetGeometrySlice(const itk::EventObject &geometrySliceEvent);
+    virtual void SetGeometrySlice(const itk::EventObject& geometrySliceEvent);
 
     /**
      * \brief To connect multiple SliceNavigationController, we can
      * act as an observer ourselves: implemented interface
      */
-    virtual void SetGeometryTime(const itk::EventObject &geometryTimeEvent);
+    virtual void SetGeometryTime(const itk::EventObject& geometryTimeEvent);
 
     /** \brief Positions the SNC according to the specified point */
-    void SelectSliceByPoint(const mitk::Point3D &point);
+    void SelectSliceByPoint(const Point3D& point);
 
     /** \brief Returns the BaseGeometry of the currently selected time step. */
-    const mitk::BaseGeometry *GetCurrentGeometry3D();
+    const BaseGeometry* GetCurrentGeometry3D();
 
     /** \brief Returns the currently selected Plane in the current
      * BaseGeometry (if existent).
      */
-    const mitk::PlaneGeometry *GetCurrentPlaneGeometry();
+    const PlaneGeometry* GetCurrentPlaneGeometry();
 
-    /** \brief Sets the BaseRenderer associated with this SNC (if any). While
-     * the BaseRenderer is not directly used by SNC, this is a convenience
-     * method to enable BaseRenderer access via the SNC. */
-    void SetRenderer(BaseRenderer *renderer);
-
-    /** \brief Gets the BaseRenderer associated with this SNC (if any). While
-     * the BaseRenderer is not directly used by SNC, this is a convenience
-     * method to enable BaseRenderer access via the SNC. Returns nullptr if no
-     * BaseRenderer has been specified*/
-    BaseRenderer *GetRenderer() const;
+    /** \brief Sets / gets the BaseRenderer associated with this SNC (if any).
+     * While the BaseRenderer is not directly used by SNC, this is a convenience
+     * method to enable BaseRenderer access via the SNC.
+     */
+    itkSetObjectMacro(Renderer, BaseRenderer);
+    itkGetMacro(Renderer, BaseRenderer*);
 
     /** \brief Re-orients the slice stack. All slices will be oriented to the given normal vector.
          The given point (world coordinates) defines the selected slice.
          Careful: The resulting axis vectors are not clearly defined this way. If you want to define them clearly, use
-         ReorientSlices (const mitk::Point3D &point, const mitk::Vector3D &axisVec0, const mitk::Vector3D &axisVec1).
+         ReorientSlices (const Point3D &point, const Vector3D &axisVec0, const Vector3D &axisVec1).
      */
-    void ReorientSlices(const mitk::Point3D &point, const mitk::Vector3D &normal);
+    void ReorientSlices(const Point3D& point, const Vector3D& normal);
 
     /** \brief Re-orients the slice stack so that all planes are oriented according to the
-    * given axis vectors. The given Point eventually defines selected slice.
-    */
-    void ReorientSlices(const mitk::Point3D &point, const mitk::Vector3D &axisVec0, const mitk::Vector3D &axisVec1);
+     * given axis vectors. The given Point eventually defines selected slice.
+     */
+    void ReorientSlices(const Point3D& point, const Vector3D& axisVec0, const Vector3D& axisVec1);
 
-    void ExecuteOperation(Operation *operation) override;
+    void ExecuteOperation(Operation* operation) override;
 
     /**
      * \brief Feature option to lock planes during mouse interaction.
@@ -425,40 +413,22 @@ namespace mitk
     SliceNavigationController();
     ~SliceNavigationController() override;
 
-
-    mitk::TimeGeometry::ConstPointer m_InputWorldTimeGeometry;
-    mitk::TimeGeometry::Pointer m_CreatedWorldGeometry;
+    TimeGeometry::ConstPointer m_InputWorldTimeGeometry;
+    TimeGeometry::Pointer m_CreatedWorldGeometry;
 
     ViewDirection m_ViewDirection;
     ViewDirection m_DefaultViewDirection;
 
-    mitk::RenderingManager::Pointer m_RenderingManager;
+    RenderingManager::Pointer m_RenderingManager;
 
-    mitk::BaseRenderer *m_Renderer;
-
-    itkSetMacro(Top, bool);
-    itkGetMacro(Top, bool);
-    itkBooleanMacro(Top);
-
-    itkSetMacro(FrontSide, bool);
-    itkGetMacro(FrontSide, bool);
-    itkBooleanMacro(FrontSide);
-
-    itkSetMacro(Rotated, bool);
-    itkGetMacro(Rotated, bool);
-    itkBooleanMacro(Rotated);
-
-    bool m_Top;
-    bool m_FrontSide;
-    bool m_Rotated;
+    BaseRenderer* m_Renderer;
 
     bool m_BlockUpdate;
 
     bool m_SliceLocked;
     bool m_SliceRotationLocked;
-    unsigned int m_OldPos;
 
-    typedef std::map<void *, std::list<unsigned long>> ObserverTagsMapType;
+    typedef std::map<void*, std::list<unsigned long>> ObserverTagsMapType;
     ObserverTagsMapType m_ReceiverToObserverTagsMap;
   };
 

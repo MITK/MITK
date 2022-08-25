@@ -44,13 +44,9 @@ namespace mitk
     , m_DefaultViewDirection(Axial)
     , m_RenderingManager(RenderingManager::Pointer())
     , m_Renderer(nullptr)
-    , m_Top(false)
-    , m_FrontSide(false)
-    , m_Rotated(false)
     , m_BlockUpdate(false)
     , m_SliceLocked(false)
     , m_SliceRotationLocked(false)
-    , m_OldPos(0)
   {
     typedef itk::SimpleMemberCommand<SliceNavigationController> SNCCommandType;
     SNCCommandType::Pointer sliceStepperChangedCommand, timeStepperChangedCommand;
@@ -67,10 +63,6 @@ namespace mitk
 
     m_Slice->SetUnitName("mm");
     m_Time->SetUnitName("ms");
-
-    m_Top = false;
-    m_FrontSide = false;
-    m_Rotated = false;
   }
 
   SliceNavigationController::~SliceNavigationController()
@@ -181,9 +173,6 @@ namespace mitk
     TimeGeometry::ConstPointer worldTimeGeometry = m_InputWorldTimeGeometry;
 
     this->SetViewDirection(viewDirection);
-    this->SetTop(top);
-    this->SetFrontSide(frontside);
-    this->SetRotated(rotated);
 
     if (m_LastUpdateTime < GetMTime())
     {

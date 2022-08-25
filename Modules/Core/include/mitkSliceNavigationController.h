@@ -423,27 +423,10 @@ namespace mitk
 
     BaseRenderer* m_Renderer;
 
-    itkSetMacro(Top, bool);
-    itkGetMacro(Top, bool);
-    itkBooleanMacro(Top);
-
-    itkSetMacro(FrontSide, bool);
-    itkGetMacro(FrontSide, bool);
-    itkBooleanMacro(FrontSide);
-
-    itkSetMacro(Rotated, bool);
-    itkGetMacro(Rotated, bool);
-    itkBooleanMacro(Rotated);
-
-    bool m_Top;
-    bool m_FrontSide;
-    bool m_Rotated;
-
     bool m_BlockUpdate;
 
     bool m_SliceLocked;
     bool m_SliceRotationLocked;
-    unsigned int m_OldPos;
 
     typedef std::map<void*, std::list<unsigned long>> ObserverTagsMapType;
     ObserverTagsMapType m_ReceiverToObserverTagsMap;

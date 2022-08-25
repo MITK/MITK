@@ -13,18 +13,19 @@ found in the LICENSE file.
 #ifndef MITKSLICENAVIGATIONCONTROLLER_H
 #define MITKSLICENAVIGATIONCONTROLLER_H
 
-#include "mitkBaseController.h"
-#include "mitkMessage.h"
-#include "mitkRenderingManager.h"
-#include "mitkTimeGeometry.h"
 #include <MitkCoreExports.h>
+
+#include <mitkBaseController.h>
+#include <mitkMessage.h>
+#include <mitkRenderingManager.h>
+#include <mitkRestorePlanePositionOperation.h>
+#include <mitkTimeGeometry.h>
+
 #pragma GCC visibility push(default)
 #include <itkEventObject.h>
 #pragma GCC visibility pop
-#include "mitkDataStorage.h"
-#include "mitkRestorePlanePositionOperation.h"
+
 #include <itkCommand.h>
-#include <sstream>
 
 namespace mitk
 {

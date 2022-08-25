@@ -11,16 +11,14 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkSliceNavigationController.h"
-#include "mitkAction.h"
+
 #include "mitkBaseRenderer.h"
 #include "mitkCrosshairPositionEvent.h"
-#include "mitkInteractionConst.h"
 #include "mitkOperation.h"
 #include "mitkOperationActor.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkProportionalTimeGeometry.h"
 #include "mitkArbitraryTimeGeometry.h"
-#include "mitkRenderingManager.h"
 #include "mitkSlicedGeometry3D.h"
 #include "mitkVtkPropRenderer.h"
 
@@ -33,13 +31,8 @@ found in the LICENSE file.
 #include "mitkPlaneOperation.h"
 #include "mitkPointOperation.h"
 #include "mitkStatusBar.h"
-#include "mitkUndoController.h"
 
 #include "mitkApplyTransformMatrixOperation.h"
-
-#include "mitkMemoryUtilities.h"
-
-#include <itkCommand.h>
 
 namespace mitk
 {

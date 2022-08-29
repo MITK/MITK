@@ -74,7 +74,6 @@ public:
 
   virtual void SetWidgetPlaneMode(int mode) override;
 
-  mitk::SliceNavigationController* GetTimeNavigationController();
 
   void AddPlanesToDataStorage();
   void RemovePlanesFromDataStorage();
@@ -147,8 +146,6 @@ private:
   virtual void SetInteractionSchemeImpl() override { }
 
   void CreateRenderWindowWidgets();
-
-  mitk::SliceNavigationController* m_TimeNavigationController;
 
   /**
   * @brief The 3 helper objects which contain the plane geometry.

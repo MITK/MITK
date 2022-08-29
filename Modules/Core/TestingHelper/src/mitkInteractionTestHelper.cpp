@@ -39,9 +39,6 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
   tinyxml2::XMLDocument document;
   if (tinyxml2::XML_SUCCESS == document.LoadFile(interactionXmlFilePath.c_str()))
   {
-    // get RenderingManager instance
-    auto rm = mitk::RenderingManager::GetInstance();
-
     // create data storage
     m_DataStorage = mitk::StandaloneDataStorage::New();
 
@@ -152,17 +149,9 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
       rw->GetVtkRenderWindow()->Render();
       rw->GetVtkRenderWindow()->WaitForCompletion();
 
-      // connect SliceNavigationControllers to timestep changed event of TimeNavigationController
-      rw->GetSliceNavigationController()->ConnectGeometryTimeEvent(rm->GetTimeNavigationController());
-      rm->GetTimeNavigationController()->ConnectGeometryTimeEvent(rw->GetSliceNavigationController());
-
       // add to list of known render windows
       m_RenderWindowList.push_back(rw);
     }
-
-    // TODO: check the following lines taken from QmitkStdMultiWidget and adapt them to be executed in our code here.
-    //    mitkWidget1->GetSliceNavigationController()
-    //      ->ConnectGeometrySendEvent(mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow()));
 
     // register interaction event obserer to handle scroll events
     InitializeDisplayActionEventHandling();
@@ -186,19 +175,16 @@ void mitk::InteractionTestHelper::InitializeDisplayActionEventHandling()
 
 mitk::InteractionTestHelper::~InteractionTestHelper()
 {
-  mitk::RenderingManager *rm = mitk::RenderingManager::GetInstance();
-
   // unregister renderers
   auto it = m_RenderWindowList.begin();
   auto end = m_RenderWindowList.end();
 
   for (; it != end; ++it)
   {
-    rm->GetTimeNavigationController()->Disconnect((*it)->GetSliceNavigationController());
-    (*it)->GetSliceNavigationController()->Disconnect(rm->GetTimeNavigationController());
     mitk::BaseRenderer::RemoveInstance((*it)->GetVtkRenderWindow());
   }
-  rm->RemoveAllObservers();
+
+  mitk::RenderingManager::GetInstance()->RemoveAllObservers();
 }
 
 mitk::DataStorage::Pointer mitk::InteractionTestHelper::GetDataStorage()

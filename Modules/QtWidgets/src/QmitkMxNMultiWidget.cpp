@@ -35,20 +35,13 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
                                          Qt::WindowFlags f/* = 0*/,
                                          const QString& multiWidgetName/* = "mxn"*/)
   : QmitkAbstractMultiWidget(parent, f, multiWidgetName)
-  , m_TimeNavigationController(nullptr)
   , m_SynchronizedWidgetConnector(std::make_unique<QmitkSynchronizedWidgetConnector>())
   , m_CrosshairVisibility(false)
 {
-  m_TimeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
 }
 
 QmitkMxNMultiWidget::~QmitkMxNMultiWidget()
 {
-  auto allRenderWindows = this->GetRenderWindows();
-  for (auto& renderWindow : allRenderWindows)
-  {
-    m_TimeNavigationController->Disconnect(renderWindow->GetSliceNavigationController());
-  }
 }
 
 void QmitkMxNMultiWidget::InitializeMultiWidget()
@@ -288,11 +281,6 @@ void QmitkMxNMultiWidget::SetWidgetPlaneMode(int userMode)
   }
 }
 
-mitk::SliceNavigationController* QmitkMxNMultiWidget::GetTimeNavigationController()
-{
-  return m_TimeNavigationController;
-}
-
 void QmitkMxNMultiWidget::EnableCrosshair()
 {
   auto renderWindowWidgets = this->GetRenderWindowWidgets();
@@ -332,22 +320,6 @@ void QmitkMxNMultiWidget::moveEvent(QMoveEvent* e)
   // it is necessary to readjust the position of the overlays as the MultiWidget has moved
   // unfortunately it's not done by QmitkRenderWindow::moveEvent -> must be done here
   emit Moved();
-}
-
-void QmitkMxNMultiWidget::RemoveRenderWindowWidget()
-{
-  auto renderWindowWidgets = this->GetRenderWindowWidgets();
-  auto iterator = renderWindowWidgets.find(this->GetNameFromIndex(this->GetNumberOfRenderWindowWidgets() - 1));
-  if (iterator == renderWindowWidgets.end())
-  {
-    return;
-  }
-
-  // disconnect each signal of this render window widget
-  RenderWindowWidgetPointer renderWindowWidgetToRemove = iterator->second;
-  m_TimeNavigationController->Disconnect(renderWindowWidgetToRemove->GetSliceNavigationController());
-
-  QmitkAbstractMultiWidget::RemoveRenderWindowWidget();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -409,11 +381,6 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
   connect(renderWindow, &QmitkRenderWindow::ResetView, this, &QmitkMxNMultiWidget::ResetCrosshair);
   connect(renderWindow, &QmitkRenderWindow::CrosshairVisibilityChanged, this, &QmitkMxNMultiWidget::SetCrosshairVisibility);
   connect(renderWindow, &QmitkRenderWindow::CrosshairRotationModeChanged, this, &QmitkMxNMultiWidget::SetWidgetPlaneMode);
-
-  // connect time navigation controller to react on referenceGeometry time events with the render window's slice naviation controller
-  m_TimeNavigationController->ConnectGeometryTimeEvent(renderWindow->GetSliceNavigationController());
-  // reverse connection between the render window's slice navigation controller and the time navigation controller
-  renderWindow->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController);
 
   return renderWindowWidget;
 }

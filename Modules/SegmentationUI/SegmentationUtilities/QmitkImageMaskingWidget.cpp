@@ -13,14 +13,12 @@ found in the LICENSE file.
 #include "QmitkImageMaskingWidget.h"
 #include <ui_QmitkImageMaskingWidgetControls.h>
 
-#include <mitkDataStorage.h>
 #include <mitkException.h>
 #include <mitkExceptionMacro.h>
 #include <mitkImage.h>
 #include <mitkImageStatisticsHolder.h>
 #include <mitkMaskImageFilter.h>
 #include <mitkProgressBar.h>
-#include <mitkSliceNavigationController.h>
 #include <mitkSurfaceToImageFilter.h>
 #include <mitkImageAccessByItk.h>
 #include <mitkNodePredicateAnd.h>
@@ -48,10 +46,8 @@ namespace
 
 static const char* const HelpText = "Select an image and a segmentation or surface";
 
-QmitkImageMaskingWidget::QmitkImageMaskingWidget(mitk::DataStorage* dataStorage,
-                                                 mitk::SliceNavigationController* timeNavigationController,
-                                                 QWidget* parent)
-  : QmitkSegmentationUtilityWidget(timeNavigationController, parent)
+QmitkImageMaskingWidget::QmitkImageMaskingWidget(mitk::DataStorage* dataStorage, QWidget* parent)
+  : QWidget(parent)
 {
   m_Controls = new Ui::QmitkImageMaskingWidgetControls;
   m_Controls->setupUi(this);

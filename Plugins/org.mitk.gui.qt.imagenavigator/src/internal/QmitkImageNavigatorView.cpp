@@ -18,6 +18,7 @@ found in the LICENSE file.
 #include <QmitkRenderWindow.h>
 
 #include <mitkTimeGeometry.h>
+#include <mitkTimeNavigationController.h>
 
 #include <berryConstants.h>
 #include <mitkPlaneGeometry.h>
@@ -52,6 +53,19 @@ void QmitkImageNavigatorView::CreateQtPartControl(QWidget *parent)
 
   mitk::IRenderWindowPart* renderPart = this->GetRenderWindowPart();
   this->RenderWindowPartActivated(renderPart);
+
+  auto* timeController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
+
+  if (m_TimeStepperAdapter)
+  {
+    m_TimeStepperAdapter->deleteLater();
+  }
+
+  m_TimeStepperAdapter = new QmitkStepperAdapter(m_Controls.m_TimeSliceNavigationWidget,
+                                                 timeController->GetStepper());
+  m_Controls.m_TimeSliceNavigationWidget->setEnabled(true);
+  m_Controls.m_TimeLabel->setEnabled(true);
+  connect(m_TimeStepperAdapter, SIGNAL(Refetch()), this, SLOT(OnRefetch()));
 }
 
 void QmitkImageNavigatorView::SetFocus ()
@@ -122,22 +136,6 @@ void QmitkImageNavigatorView::RenderWindowPartActivated(mitk::IRenderWindowPart*
       m_Controls.m_CoronalSliceNavigationWidget->setEnabled(false);
       m_Controls.m_CoronalLabel->setEnabled(false);
       m_Controls.m_XWorldCoordinateSpinBox->setEnabled(false);
-    }
-
-    mitk::SliceNavigationController* timeController = renderWindowPart->GetTimeNavigationController();
-    if (timeController)
-    {
-      if (m_TimeStepperAdapter)
-        m_TimeStepperAdapter->deleteLater();
-      m_TimeStepperAdapter = new QmitkStepperAdapter(m_Controls.m_TimeSliceNavigationWidget,
-                                                     timeController->GetStepper());
-      m_Controls.m_TimeSliceNavigationWidget->setEnabled(true);
-      m_Controls.m_TimeLabel->setEnabled(true);
-    }
-    else
-    {
-      m_Controls.m_TimeSliceNavigationWidget->setEnabled(false);
-      m_Controls.m_TimeLabel->setEnabled(false);
     }
 
     this->OnRefetch();
@@ -314,8 +312,9 @@ void QmitkImageNavigatorView::OnRefetch()
     return;
   }
 
-  SetVisibilityOfTimeSlider(timeGeometry->CountTimeSteps());
-  mitk::TimeStepType timeStep = m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetSliceNavigationController()->GetStepper()->GetPos();
+  const auto* timeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
+  this->SetVisibilityOfTimeSlider(timeNavigationController->GetStepper()->GetSteps());
+  const mitk::TimeStepType timeStep = timeNavigationController->GetSelectedTimeStep();
   mitk::BaseGeometry::Pointer geometry = timeGeometry->GetGeometryForTimeStep(timeStep);
   if (geometry.IsNotNull())
   {
@@ -448,7 +447,6 @@ void QmitkImageNavigatorView::OnRefetch()
 
   this->SetBorderColors();
 }
-
 
 void QmitkImageNavigatorView::SetVisibilityOfTimeSlider(std::size_t timeSteps)
 {

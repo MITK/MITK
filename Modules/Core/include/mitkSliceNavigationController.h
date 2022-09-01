@@ -19,7 +19,6 @@ found in the LICENSE file.
 #include <mitkMessage.h>
 #include <mitkAnatomicalPlanes.h>
 #include <mitkRenderingManager.h>
-#include <mitkRestorePlanePositionOperation.h>
 #include <mitkTimeGeometry.h>
 
 #pragma GCC visibility push(default)
@@ -53,9 +52,10 @@ namespace mitk
    * \brief Controls the selection of the slice the associated BaseRenderer
    * will display
    *
-   * A SliceNavigationController takes a BaseGeometry or a TimeGeometry as input world geometry
-   * (TODO what are the exact requirements?) and generates a TimeGeometry
-   * as output. The TimeGeometry holds a number of SlicedGeometry3Ds and
+   * A SliceNavigationController takes a TimeGeometry as input world time geometry
+   * and generates a different TimeGeometry as output, depending on the current
+   * view direction and the current time step.
+   * The TimeGeometry holds a number of SlicedGeometry3Ds and
    * these in turn hold a series of PlaneGeometries. One of these PlaneGeometries is
    * selected as world geometry for the BaseRenderers associated to 2D views.
    *
@@ -140,8 +140,8 @@ namespace mitk
      * \brief Set the input world time geometry out of which the
      * geometries for slicing will be created.
      *
-     * Any previous previous set input geometry (3D or Time) will
-     * be ignored in future.
+     * Any previous set input geometry (3D or Time) will
+     * be ignored in the future.
      */
     void SetInputWorldTimeGeometry(const TimeGeometry* geometry);
     itkGetConstObjectMacro(InputWorldTimeGeometry, TimeGeometry);
@@ -215,14 +215,6 @@ namespace mitk
      */
     virtual void SendSlice();
 
-    /**
-     * \brief Send the currently selected time to the connected
-     * observers (renderers)
-     *
-     * Called by Update().
-     */
-    virtual void SendTime();
-
     class MITKCORE_EXPORT TimeGeometryEvent : public itk::AnyEvent
     {
     public:
@@ -247,7 +239,6 @@ namespace mitk
 
     mitkTimeGeometryEventMacro(GeometrySendEvent, TimeGeometryEvent);
     mitkTimeGeometryEventMacro(GeometryUpdateEvent, TimeGeometryEvent);
-    mitkTimeGeometryEventMacro(GeometryTimeEvent, TimeGeometryEvent);
     mitkTimeGeometryEventMacro(GeometrySliceEvent, TimeGeometryEvent);
 
     template <typename T>
@@ -275,23 +266,6 @@ namespace mitk
       eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometrySlice);
       unsigned long tag = AddObserver(GeometrySliceEvent(nullptr, 0), eventReceptorCommand);
       m_ReceiverToObserverTagsMap[static_cast<void*>(receiver)].push_back(tag);
-    }
-
-    template <typename T>
-    void ConnectGeometryTimeEvent(T* receiver)
-    {
-      auto eventReceptorCommand = itk::ReceptorMemberCommand<T>::New();
-      eventReceptorCommand->SetCallbackFunction(receiver, &T::SetGeometryTime);
-      unsigned long tag = AddObserver(GeometryTimeEvent(nullptr, 0), eventReceptorCommand);
-      m_ReceiverToObserverTagsMap[static_cast<void*>(receiver)].push_back(tag);
-    }
-
-    template <typename T>
-    void ConnectGeometryEvents(T* receiver)
-    {
-      // connect sendEvent only once
-      ConnectGeometrySliceEvent(receiver, false);
-      ConnectGeometryTimeEvent(receiver);
     }
 
     // use a templated method to get the right offset when casting to void*
@@ -386,14 +360,6 @@ namespace mitk
      * the current geometry orientation of this SNC's SlicedGeometry.
      */
     void AdjustSliceStepperRange();
-
-    /** \brief Convenience method that returns the time step currently selected by the controller.*/
-    TimeStepType GetSelectedTimeStep() const;
-
-    /** \brief Convenience method that returns the time point that corresponds to the selected
-     * time step. The conversion is done using the time geometry of the SliceNavigationController.
-     * If the time geometry is not yet set, this function will always return 0.0.*/
-    TimePointType GetSelectedTimePoint() const;
 
   protected:
 

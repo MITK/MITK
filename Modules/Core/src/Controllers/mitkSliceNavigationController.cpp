@@ -10,29 +10,29 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSliceNavigationController.h"
+#include <mitkSliceNavigationController.h>
 
 #include <mitkSliceNavigationHelper.h>
-#include "mitkBaseRenderer.h"
-#include "mitkOperation.h"
-#include "mitkOperationActor.h"
+#include <mitkBaseRenderer.h>
+#include <mitkOperation.h>
+#include <mitkOperationActor.h>
+#include <mitkProportionalTimeGeometry.h>
+#include <mitkArbitraryTimeGeometry.h>
+#include <mitkSlicedGeometry3D.h>
+#include <mitkTimeNavigationController.h>
+#include <mitkVtkPropRenderer.h>
 
-#include "mitkProportionalTimeGeometry.h"
-#include "mitkArbitraryTimeGeometry.h"
-#include "mitkSlicedGeometry3D.h"
-#include "mitkVtkPropRenderer.h"
+#include <mitkImage.h>
+#include <mitkImagePixelReadAccessor.h>
+#include <mitkInteractionConst.h>
+#include <mitkNodePredicateDataType.h>
+#include <mitkOperationEvent.h>
+#include <mitkPixelTypeMultiplex.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkPlaneOperation.h>
+#include <mitkPointOperation.h>
 
-#include "mitkImage.h"
-#include "mitkImagePixelReadAccessor.h"
-#include "mitkInteractionConst.h"
-#include "mitkNodePredicateDataType.h"
-#include "mitkOperationEvent.h"
-#include "mitkPixelTypeMultiplex.h"
-#include "mitkPlaneGeometry.h"
-#include "mitkPlaneOperation.h"
-#include "mitkPointOperation.h"
-
-#include "mitkApplyTransformMatrixOperation.h"
+#include <mitkApplyTransformMatrixOperation.h>
 
 namespace mitk
 {
@@ -49,20 +49,15 @@ namespace mitk
     , m_SliceRotationLocked(false)
   {
     typedef itk::SimpleMemberCommand<SliceNavigationController> SNCCommandType;
-    SNCCommandType::Pointer sliceStepperChangedCommand, timeStepperChangedCommand;
+    SNCCommandType::Pointer sliceStepperChangedCommand;
 
     sliceStepperChangedCommand = SNCCommandType::New();
-    timeStepperChangedCommand = SNCCommandType::New();
 
     sliceStepperChangedCommand->SetCallbackFunction(this, &SliceNavigationController::SendSlice);
 
-    timeStepperChangedCommand->SetCallbackFunction(this, &SliceNavigationController::SendTime);
-
     m_Slice->AddObserver(itk::ModifiedEvent(), sliceStepperChangedCommand);
-    m_Time->AddObserver(itk::ModifiedEvent(), timeStepperChangedCommand);
 
     m_Slice->SetUnitName("mm");
-    m_Time->SetUnitName("ms");
   }
 
   SliceNavigationController::~SliceNavigationController()
@@ -188,7 +183,6 @@ namespace mitk
     // Update() was only called to re-send the old geometry and time/slice data.
     this->SendCreatedWorldGeometry();
     this->SendSlice();
-    this->SendTime();
 
     // Adjust the stepper range of slice stepper according to geometry
     this->AdjustSliceStepperRange();
@@ -222,41 +216,9 @@ namespace mitk
     }
   }
 
-  void SliceNavigationController::SendTime()
-  {
-    if (!m_BlockUpdate)
-    {
-      if (m_CreatedWorldGeometry.IsNotNull())
-      {
-        this->InvokeEvent(GeometryTimeEvent(m_CreatedWorldGeometry, m_Time->GetPos()));
-        RenderingManager::GetInstance()->RequestUpdateAll();
-      }
-    }
-  }
-
   void SliceNavigationController::SetGeometry(const itk::EventObject&)
   {
     // not implemented
-  }
-
-  void SliceNavigationController::SetGeometryTime(const itk::EventObject& geometryTimeEvent)
-  {
-    if (m_CreatedWorldGeometry.IsNull())
-    {
-      return;
-    }
-
-    const auto* timeEvent = dynamic_cast<const SliceNavigationController::GeometryTimeEvent*>(&geometryTimeEvent);
-    assert(timeEvent != nullptr);
-
-    TimeGeometry* timeGeometry = timeEvent->GetTimeGeometry();
-    assert(timeGeometry != nullptr);
-
-    auto timeStep = (int)timeEvent->GetPos();
-    ScalarType timeInMS;
-    timeInMS = timeGeometry->TimeStepToTimePoint(timeStep);
-    timeStep = m_CreatedWorldGeometry->TimePointToTimeStep(timeInMS);
-    this->GetTime()->SetPos(timeStep);
   }
 
   void SliceNavigationController::SetGeometrySlice(const itk::EventObject& geometrySliceEvent)
@@ -330,9 +292,17 @@ namespace mitk
     if (m_CreatedWorldGeometry.IsNull())
     {
       return nullptr;
+
     }
 
-    return m_CreatedWorldGeometry->GetGeometryForTimeStep(this->GetTime()->GetPos());
+    auto timeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
+    if (nullptr == timeNavigationController)
+    {
+      return nullptr;
+    }
+
+    TimeStepType selectedTimestep = timeNavigationController->GetSelectedTimeStep();
+    return m_CreatedWorldGeometry->GetGeometryForTimeStep(selectedTimestep);
   }
 
   const PlaneGeometry* SliceNavigationController::GetCurrentPlaneGeometry()
@@ -434,41 +404,23 @@ namespace mitk
     }
   }
 
-  TimeStepType SliceNavigationController::GetSelectedTimeStep() const
-  {
-    return this->GetTime()->GetPos();
-  }
-
-  TimePointType SliceNavigationController::GetSelectedTimePoint() const
-  {
-    auto timeStep = this->GetSelectedTimeStep();
-
-    if (m_CreatedWorldGeometry.IsNull())
-    {
-      return 0.0;
-    }
-
-    if (!m_CreatedWorldGeometry->IsValidTimeStep(timeStep))
-    {
-      mitkThrow() << "SliceNavigationController is in an invalid state. It has a time step"
-                  << "selected that is not covered by its time geometry. Selected time step: " << timeStep
-                  << "; TimeGeometry steps count: " << m_CreatedWorldGeometry->CountTimeSteps();
-    }
-
-    return m_CreatedWorldGeometry->TimeStepToTimePoint(timeStep);
-  }
-
   void SliceNavigationController::CreateWorldGeometry(bool top, bool frontside, bool rotated)
   {
+    auto timeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
+    if (nullptr == timeNavigationController)
+    {
+      return;
+    }
+
     // initialize the viewplane
     SlicedGeometry3D::Pointer slicedWorldGeometry;
     BaseGeometry::ConstPointer currentGeometry;
 
     // get the BaseGeometry (ArbitraryTimeGeometry or ProportionalTimeGeometry) of the current time step
-    auto currentTimeStep = this->GetTime()->GetPos();
-    if (m_InputWorldTimeGeometry->IsValidTimeStep(currentTimeStep))
+    TimeStepType selectedTimestep = timeNavigationController->GetSelectedTimeStep();
+    if (m_InputWorldTimeGeometry->IsValidTimeStep(selectedTimestep))
     {
-      currentGeometry = m_InputWorldTimeGeometry->GetGeometryForTimeStep(currentTimeStep);
+      currentGeometry = m_InputWorldTimeGeometry->GetGeometryForTimeStep(selectedTimestep);
     }
     else
     {
@@ -478,7 +430,7 @@ namespace mitk
     if (AnatomicalPlane::Original == m_ViewDirection)
     {
       slicedWorldGeometry = dynamic_cast<SlicedGeometry3D*>(
-        m_InputWorldTimeGeometry->GetGeometryForTimeStep(currentTimeStep).GetPointer());
+        m_InputWorldTimeGeometry->GetGeometryForTimeStep(selectedTimestep).GetPointer());
       if (slicedWorldGeometry.IsNull())
       {
         slicedWorldGeometry = SlicedGeometry3D::New();
@@ -498,23 +450,15 @@ namespace mitk
     m_Slice->SetPos(0);
 
     TimeStepType inputTimeSteps = m_InputWorldTimeGeometry->CountTimeSteps();
-    const TimeBounds& timeBounds = m_InputWorldTimeGeometry->GetTimeBounds();
-    m_Time->SetSteps(inputTimeSteps);
-    m_Time->SetPos(0);
-    m_Time->SetRange(timeBounds[0], timeBounds[1]);
-
-    currentTimeStep = this->GetTime()->GetPos();
-    assert(m_InputWorldTimeGeometry->GetGeometryForTimeStep(currentTimeStep).IsNotNull());
-
     // create new time geometry and initialize it according to the type of the 'm_InputWorldTimeGeometry'
     // the created world geometry will either have equidistant timesteps (ProportionalTimeGeometry)
     // or individual time bounds for each timestep (ArbitraryTimeGeometry)
     m_CreatedWorldGeometry = mitk::TimeGeometry::Pointer();
     if (nullptr != dynamic_cast<const mitk::ProportionalTimeGeometry*>(m_InputWorldTimeGeometry.GetPointer()))
     {
-      const TimePointType minimumTimePoint = m_InputWorldTimeGeometry->TimeStepToTimePoint(currentTimeStep);
+      const TimePointType minimumTimePoint = m_InputWorldTimeGeometry->TimeStepToTimePoint(0);
       const TimePointType stepDuration =
-        m_InputWorldTimeGeometry->TimeStepToTimePoint(currentTimeStep + 1) - minimumTimePoint;
+        m_InputWorldTimeGeometry->TimeStepToTimePoint(1) - minimumTimePoint;
 
       auto createdTimeGeometry = ProportionalTimeGeometry::New();
       createdTimeGeometry->Initialize(slicedWorldGeometry, inputTimeSteps);

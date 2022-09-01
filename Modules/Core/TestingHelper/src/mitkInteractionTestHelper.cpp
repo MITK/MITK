@@ -15,7 +15,9 @@ found in the LICENSE file.
 #include <mitkInteractionEventConst.h>
 #include <mitkInteractionTestHelper.h>
 #include <mitkPlaneGeometryDataMapper2D.h>
+#include <mitkRenderingManager.h>
 #include <mitkStandaloneDataStorage.h>
+#include <mitkTimeNavigationController.h>
 
 // VTK
 #include <vtkCamera.h>
@@ -263,15 +265,14 @@ void mitk::InteractionTestHelper::LoadInteraction()
 
 void mitk::InteractionTestHelper::SetTimeStep(int newTimeStep)
 {
-  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(m_DataStorage);
+  auto rm = mitk::RenderingManager::GetInstance();
+  rm->InitializeViewsByBoundingObjects(m_DataStorage);
 
-  bool timeStepIsvalid =
-    mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetCreatedWorldGeometry()->IsValidTimeStep(
-      newTimeStep);
+  bool timeStepIsvalid = rm->GetTimeNavigationController()->GetInputWorldTimeGeometry()->IsValidTimeStep(newTimeStep);
 
   if (timeStepIsvalid)
   {
-    mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetStepper()->SetPos(newTimeStep);
+    rm->GetTimeNavigationController()->GetStepper()->SetPos(newTimeStep);
   }
 }
 

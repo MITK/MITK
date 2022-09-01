@@ -134,12 +134,12 @@ protected:
 
   /**
    * Get the time navigation controller for this editor.
-   * This implementation returns the SliceNavigationController returned by the mitk::IRenderingManager::GetTimeNavigationController()
+   * This implementation returns the TimeNavigationController returned by the mitk::IRenderingManager::GetTimeNavigationController()
    * method of the interface implementation returned by GetRenderingManager().
    *
    * \see mitk::IRenderingManager::GetTimeNavigationController
    */
-  mitk::SliceNavigationController* GetTimeNavigationController() const override;
+  mitk::TimeNavigationController* GetTimeNavigationController() const override;
 
   /** \see berry::IEditorPart::DoSave */
   void DoSave() override;

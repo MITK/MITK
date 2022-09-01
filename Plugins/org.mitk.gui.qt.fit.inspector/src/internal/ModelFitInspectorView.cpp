@@ -10,6 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include "ModelFitInspectorView.h"
 
 // Blueberry
 #include <berryISelectionService.h>
@@ -24,21 +25,19 @@ found in the LICENSE file.
 #include <QFileDialog>
 #include <QTableWidget>
 #include <qwt_plot_marker.h>
-#include "QmitkPlotWidget.h"
+#include <QmitkPlotWidget.h>
 
-#include "mitkNodePredicateFunction.h"
-#include "mitkScalarListLookupTableProperty.h"
-#include "mitkModelFitConstants.h"
-#include "mitkExtractTimeGrid.h"
-#include "mitkModelGenerator.h"
-#include "mitkModelFitException.h"
-#include "mitkModelFitParameterValueExtraction.h"
-#include "mitkTimeGridHelper.h"
-#include "mitkModelFitResultRelationRule.h"
-
-#include "mitkModelFitPlotDataHelper.h"
-
-#include "ModelFitInspectorView.h"
+#include <mitkNodePredicateFunction.h>
+#include <mitkScalarListLookupTableProperty.h>
+#include <mitkModelFitConstants.h>
+#include <mitkExtractTimeGrid.h>
+#include <mitkModelGenerator.h>
+#include <mitkModelFitException.h>
+#include <mitkModelFitParameterValueExtraction.h>
+#include <mitkModelFitResultRelationRule.h>
+#include <mitkModelFitPlotDataHelper.h>
+#include <mitkTimeGridHelper.h>
+#include <mitkTimeNavigationController.h>
 
 const std::string ModelFitInspectorView::VIEW_ID = "org.mitk.views.fit.inspector";
 const unsigned int ModelFitInspectorView::INTERPOLATION_STEPS = 10;
@@ -411,7 +410,7 @@ ModelFitInspectorView::GetInputNode(mitk::DataNode::ConstPointer node)
 void ModelFitInspectorView::ValidateAndSetCurrentPosition()
 {
   const mitk::Point3D currentSelectedPosition = GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetSelectedPosition(nullptr);
-  const unsigned int currentSelectedTimestep = m_renderWindowPart->GetTimeNavigationController()->GetStepper()->GetPos();
+  const unsigned int currentSelectedTimestep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimeStep();
 
   if (m_currentSelectedPosition != currentSelectedPosition
       || m_currentSelectedTimeStep != currentSelectedTimestep

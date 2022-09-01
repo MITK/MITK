@@ -192,7 +192,9 @@ mitk::BaseRenderer::BaseRenderer(const char *name,
   m_SliceNavigationController->ConnectGeometrySendEvent(this);
   m_SliceNavigationController->ConnectGeometryUpdateEvent(this);
   m_SliceNavigationController->ConnectGeometrySliceEvent(this);
-  m_SliceNavigationController->ConnectGeometryTimeEvent(this);
+
+  auto* timeNavigationController = RenderingManager::GetInstance()->GetTimeNavigationController();
+  timeNavigationController->ConnectTimeEvent(this);
 
   m_CameraRotationController = mitk::CameraRotationController::New();
   m_CameraRotationController->SetRenderWindow(m_RenderWindow);
@@ -432,14 +434,14 @@ void mitk::BaseRenderer::SetGeometrySlice(const itk::EventObject& geometrySliceE
 
 void mitk::BaseRenderer::SetGeometryTime(const itk::EventObject& geometryTimeEvent)
 {
-  const auto* timeEvent = dynamic_cast<const SliceNavigationController::GeometryTimeEvent *>(&geometryTimeEvent);
+  const auto* timeEvent = dynamic_cast<const TimeNavigationController::TimeEvent *>(&geometryTimeEvent);
 
   if (nullptr == timeEvent)
   {
     return;
   }
 
-  this->SetTimeStep(timeEvent->GetPos());
+  this->SetTimeStep(timeEvent->GetTimeStep());
 }
 
 void mitk::BaseRenderer::SendUpdateSlice()
@@ -509,7 +511,6 @@ void mitk::BaseRenderer::SetSliceNavigationController(mitk::SliceNavigationContr
     m_SliceNavigationController->ConnectGeometrySendEvent(this);
     m_SliceNavigationController->ConnectGeometryUpdateEvent(this);
     m_SliceNavigationController->ConnectGeometrySliceEvent(this);
-    m_SliceNavigationController->ConnectGeometryTimeEvent(this);
   }
 }
 

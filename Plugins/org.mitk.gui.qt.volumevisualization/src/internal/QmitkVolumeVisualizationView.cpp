@@ -16,6 +16,8 @@ found in the LICENSE file.
 
 #include <mitkImage.h>
 
+#include <mitkTimeNavigationController.h>
+
 #include <mitkTransferFunction.h>
 #include <mitkTransferFunctionInitializer.h>
 #include <mitkTransferFunctionProperty.h>
@@ -235,9 +237,9 @@ void QmitkVolumeVisualizationView::UpdateInterface()
   if (selectedNode->GetIntProperty("volumerendering.blendmode", blendMode))
     m_Controls->blendMode->setCurrentIndex(blendMode);
 
-  auto time = this->GetRenderWindowPart()->GetTimeNavigationController()->GetSelectedTimeStep();
-  m_Controls->transferFunctionWidget->SetDataNode(selectedNode, time);
+  const auto timeStep = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimeStep();
+  m_Controls->transferFunctionWidget->SetDataNode(selectedNode, timeStep);
   m_Controls->transferFunctionWidget->setEnabled(true);
-  m_Controls->transferFunctionGeneratorWidget->SetDataNode(selectedNode, time);
+  m_Controls->transferFunctionGeneratorWidget->SetDataNode(selectedNode, timeStep);
   m_Controls->transferFunctionGeneratorWidget->setEnabled(true);
 }

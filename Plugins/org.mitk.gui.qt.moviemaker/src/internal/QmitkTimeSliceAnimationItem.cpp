@@ -11,7 +11,9 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkTimeSliceAnimationItem.h"
-#include <mitkBaseRenderer.h>
+
+#include <mitkRenderingManager.h>
+#include <mitkTimeNavigationController.h>
 
 QmitkTimeSliceAnimationItem::QmitkTimeSliceAnimationItem(int from, int to, bool reverse, double duration, double delay, bool startWithPrevious)
   : QmitkAnimationItem("Time", duration, delay, startWithPrevious)

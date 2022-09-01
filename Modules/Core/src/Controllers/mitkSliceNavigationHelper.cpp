@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <mitkPoint.h>
 #include <mitkRenderingManager.h>
 #include <mitkSlicedGeometry3D.h>
-#include <mitkSliceNavigationController.h>
+#include <mitkTimeNavigationController.h>
 
 unsigned int mitk::SliceNavigationHelper::SelectSliceByPoint(const TimeGeometry* timeGeometry,
                                                              const Point3D& point)

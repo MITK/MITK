@@ -37,6 +37,7 @@ found in the LICENSE file.
 #include "mitkVectorImageMapper2D.h"
 #include "mitkProperties.h"
 #include "mitkLevelWindowProperty.h"
+#include <mitkTimeNavigationController.h>
 
 // Includes for image casting between ITK and MITK
 #include "mitkImageCast.h"
@@ -121,14 +122,10 @@ void QmitkPreprocessingResampling::CreateConnections()
 
 void QmitkPreprocessingResampling::InternalGetTimeNavigationController()
 {
-  auto renwin_part = GetRenderWindowPart();
-  if( renwin_part != nullptr )
+  auto* timeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
+  if(nullptr != timeNavigationController)
   {
-    auto tnc = renwin_part->GetTimeNavigationController();
-    if( tnc != nullptr )
-    {
-      m_TimeStepperAdapter = new QmitkStepperAdapter(m_Controls->timeSliceNavigationWidget, tnc->GetStepper());
-    }
+    m_TimeStepperAdapter = new QmitkStepperAdapter(m_Controls->timeSliceNavigationWidget, timeNavigationController->GetStepper());
   }
 }
 

@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include <mitkLiveWireTool2D.h>
 #include <mitkLiveWireTool2D.xpm>
 #include <mitkToolManager.h>
+#include <mitkTimeNavigationController.h>
 
 #include <usGetModuleContext.h>
 #include <usModuleResource.h>

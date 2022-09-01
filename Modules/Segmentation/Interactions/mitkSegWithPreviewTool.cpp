@@ -19,6 +19,7 @@ found in the LICENSE file.
 
 #include "mitkDataStorage.h"
 #include "mitkRenderingManager.h"
+#include <mitkTimeNavigationController.h>
 
 #include "mitkImageAccessByItk.h"
 #include "mitkImageCast.h"

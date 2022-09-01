@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "QmitkTimeSliceAnimationItem.h"
 #include "QmitkTimeSliceAnimationWidget.h"
 #include <mitkRenderingManager.h>
-#include <mitkSliceNavigationController.h>
+#include <mitkTimeNavigationController.h>
 #include <mitkStepper.h>
 #include <ui_QmitkTimeSliceAnimationWidget.h>
 

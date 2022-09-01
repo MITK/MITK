@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include "mitkBaseRenderer.h"
 #include "mitkDataStorage.h"
 #include "mitkPlaneGeometry.h"
+#include <mitkTimeNavigationController.h>
 
 // Include of the new ImageExtractor
 #include "mitkMorphologicalOperations.h"

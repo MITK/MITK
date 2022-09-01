@@ -24,6 +24,7 @@ found in the LICENSE file.
 #include <mitkDataStorageEditorInput.h>
 #include <mitkDataNodeObject.h>
 #include <mitkIRenderingManager.h>
+#include <mitkTimeNavigationController.h>
 
 // berry Includes
 #include <berryIWorkbenchPage.h>

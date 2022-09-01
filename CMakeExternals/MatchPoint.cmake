@@ -16,7 +16,7 @@ if(MITK_USE_MatchPoint)
   endif()
 
   set(proj MatchPoint)
-  set(proj_DEPENDENCIES ITK)
+  set(proj_DEPENDENCIES Boost ITK)
 
   set(MatchPoint_DEPENDS ${proj})
 
@@ -49,6 +49,7 @@ if(MITK_USE_MatchPoint)
          ${additional_cmake_args}
          -DBUILD_TESTING:BOOL=OFF
          -DITK_DIR:PATH=${ITK_DIR} #/src/ITK-build
+         "-DBoost_DIR:PATH=${Boost_DIR}"
          -DMAP_USE_SYSTEM_HDF5:BOOL=ON
          -DMAP_DISABLE_ITK_IO_FACTORY_AUTO_REGISTER:BOOL=ON
          -DMAP_WRAP_Plastimatch:BOOL=ON

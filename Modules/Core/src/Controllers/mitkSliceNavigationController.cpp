@@ -214,19 +214,6 @@ namespace mitk
     }
   }
 
-  void SliceNavigationController::SetGeometry(const itk::EventObject&)
-  {
-    // not implemented
-  }
-
-  void SliceNavigationController::SetGeometrySlice(const itk::EventObject& geometrySliceEvent)
-  {
-    const auto* sliceEvent = dynamic_cast<const SliceNavigationController::GeometrySliceEvent*>(&geometrySliceEvent);
-    assert(sliceEvent != nullptr);
-
-    m_Stepper->SetPos(sliceEvent->GetPos());
-  }
-
   void SliceNavigationController::SelectSliceByPoint(const Point3D& point)
   {
     if (m_CreatedWorldGeometry.IsNull())

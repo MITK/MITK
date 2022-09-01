@@ -283,25 +283,6 @@ namespace mitk
 
     Message1<const Point3D&> SetCrosshairEvent;
 
-    /**
-     * \brief To connect multiple SliceNavigationController, we can
-     * act as an observer ourselves: implemented interface
-     * \warning not implemented
-     */
-    virtual void SetGeometry(const itk::EventObject& geometrySliceEvent);
-
-    /**
-     * \brief To connect multiple SliceNavigationController, we can
-     * act as an observer ourselves: implemented interface
-     */
-    virtual void SetGeometrySlice(const itk::EventObject& geometrySliceEvent);
-
-    /**
-     * \brief To connect multiple SliceNavigationController, we can
-     * act as an observer ourselves: implemented interface
-     */
-    virtual void SetGeometryTime(const itk::EventObject& geometryTimeEvent);
-
     /** \brief Positions the SNC according to the specified point */
     void SelectSliceByPoint(const Point3D& point);
 

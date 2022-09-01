@@ -44,6 +44,8 @@ namespace mitk
        */
       void ConnectActionsAndFunctions() override;
 
+      void SetRestrictedArea(mitk::ContourModel* restrictedArea);
+
   protected:
     ContourModelInteractor();
     ~ContourModelInteractor() override;
@@ -51,12 +53,15 @@ namespace mitk
     virtual bool OnCheckPointClick(const InteractionEvent *interactionEvent);
     virtual bool IsHovering(const InteractionEvent *interactionEvent);
 
+    virtual void OnAddPoint(StateMachineAction*, InteractionEvent* interactionEvent);
     virtual void OnDeletePoint(StateMachineAction *, InteractionEvent *interactionEvent);
     virtual void OnMovePoint(StateMachineAction *, InteractionEvent *interactionEvent);
     virtual void OnMoveContour(StateMachineAction *, InteractionEvent *interactionEvent);
     virtual void OnFinishEditing(StateMachineAction *, InteractionEvent *interactionEvent);
 
+    const float eps = 3.0;
     mitk::Point3D m_lastMousePosition;
+    mitk::ContourModel::Pointer m_RestrictedArea;
   };
 
 } // namespace

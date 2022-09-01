@@ -10,14 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkLiveWireTool2DGUI.h"
+#include "QmitkLassoToolGUI.h"
 
-MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkLiveWireTool2DGUI, "")
 
-QmitkLiveWireTool2DGUI::QmitkLiveWireTool2DGUI() : QmitkEditableContourToolGUIBase()
+MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkLassoToolGUI, "")
+
+QmitkLassoToolGUI::QmitkLassoToolGUI() : QmitkEditableContourToolGUIBase()
 {
 }
 
-QmitkLiveWireTool2DGUI::~QmitkLiveWireTool2DGUI()
+QmitkLassoToolGUI::~QmitkLassoToolGUI()
 {
 }

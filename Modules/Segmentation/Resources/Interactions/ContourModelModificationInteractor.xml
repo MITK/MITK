@@ -3,12 +3,18 @@
     <transition event_class="InteractionPositionEvent" event_variant="MouseMove" target="start">
        <condition name="mouseMove"/>
     </transition>
+    <transition event_class="InteractionPositionEvent" event_variant="MouseMoveWithCTRL" target="start">
+       <condition name="mouseMove"/>
+    </transition>
     <transition event_class="InteractionKeyEvent" event_variant="Abort" target="start">
       <action name="deletePoint"/>
       <action name="finish"/>
     </transition>
     <transition event_class="InteractionPositionEvent" event_variant="StartMove" target="move">
        <condition name="checkisOverPoint"/>
+    </transition>
+    <transition event_class="InteractionPositionEvent" event_variant="LeftWithCTRL" target="start">
+       <action name="addPoint"/>
     </transition>
   </state>
   <state name="move">

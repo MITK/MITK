@@ -1,0 +1,42 @@
+  <statemachine name="LiveWireTool">
+    <state name="Start" ID="1" startstate="true">
+      <transition event_class="MouseDoubleClickEvent" event_variant="PrimaryButtonDoubleClick" target="PressedState" >
+        <action name="InitObject" ID="5" />
+      </transition>
+    </state>
+    <state name="Active" ID="2" >
+      <transition event_class="MousePressEvent" event_variant="PrimaryButtonPressed" target="PressedState" >
+        <action name="AddPoint" ID="10" />
+      </transition>
+      <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="Active" >
+        <action name="MovePoint" ID="92" />
+      </transition>
+      <transition event_class="MouseDoubleClickEvent" event_variant="PrimaryButtonDoubleClick" target="Start" >
+        <action name="FinishContour" ID="44" />
+      </transition>
+      <transition event_class="MouseMoveEvent" event_variant="CtrlMouseMove" target="Active" >
+        <action name="CtrlMovePoint" ID="12"/>
+      </transition>
+      <transition event_class="MousePressEvent" event_variant="CtrlPrimaryButtonPressed" target="Active" >
+        <action name="CtrlAddPoint" ID="10" />
+      </transition>
+    </state>
+    <state name="PressedState" ID="3">
+      <transition event_class="MouseMoveEvent" event_variant="PrimaryButtonMoved" target="Drawing" >
+        <action name="Drawing"/>
+      </transition>
+      <transition event_class="MouseMoveEvent" event_variant="MouseMove" target="Active" >
+        <action name="MovePoint" ID="92" />
+      </transition>
+      <transition event_class="MouseReleaseEvent" event_variant="PrimaryButtonReleased" target="Active" >
+      </transition>
+    </state>
+    <state name="Drawing" ID="4">
+      <transition event_class="MouseMoveEvent" event_variant="PrimaryButtonMoved" target="Drawing" >
+        <action name="Drawing"/>
+      </transition>
+      <transition event_class="MouseReleaseEvent" event_variant="PrimaryButtonReleased" target="Active" >
+        <action name="EndDrawing"/>
+      </transition>
+    </state>
+  </statemachine>

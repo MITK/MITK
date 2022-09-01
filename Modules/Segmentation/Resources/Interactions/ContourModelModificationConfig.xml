@@ -5,7 +5,14 @@
   <event_variant class="MousePressEvent" name="StartMove">
     <attribute name="EventButton" value="LeftMouseButton"/>
   </event_variant>
+  <event_variant class="MousePressEvent" name="LeftWithCTRL">
+    <attribute name="EventButton" value="LeftMouseButton"/>
+	<attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
   <event_variant class="MouseMoveEvent" name="MouseMove"/>
+  <event_variant class="MouseMoveEvent" name="MouseMoveWithCTRL">
+	<attribute name="Modifiers" value="ctrl"/>
+  </event_variant>
   <event_variant class="MouseReleaseEvent" name="MoveEnd">
     <attribute name="EventButton" value="LeftMouseButton"/>
   </event_variant>

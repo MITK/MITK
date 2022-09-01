@@ -77,8 +77,8 @@ void SaveSliceOrImageAsPNG(std::vector<std::string> listOfOutputs, std::string p
   unsigned int numberOfSteps = 1;
   if (sliceNaviController)
   {
-    numberOfSteps = sliceNaviController->GetSlice()->GetSteps();
-    sliceNaviController->GetSlice()->SetPos(0);
+    numberOfSteps = sliceNaviController->GetStepper()->GetSteps();
+    sliceNaviController->GetStepper()->SetPos(0);
   }
 
   renderWindow.show();
@@ -88,7 +88,7 @@ void SaveSliceOrImageAsPNG(std::vector<std::string> listOfOutputs, std::string p
   {
     if (sliceNaviController)
     {
-      sliceNaviController->GetSlice()->SetPos(currentStep);
+      sliceNaviController->GetStepper()->SetPos(currentStep);
     }
 
     renderWindow.GetRenderer()->PrepareRender();

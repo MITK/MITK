@@ -24,7 +24,7 @@ namespace
 
     if (theRenderWindow != nullptr)
     {
-      mitk::Stepper* stepper = mitk::BaseRenderer::GetInstance(theRenderWindow)->GetSliceNavigationController()->GetSlice();
+      mitk::Stepper* stepper = mitk::BaseRenderer::GetInstance(theRenderWindow)->GetSliceNavigationController()->GetStepper();
 
       if (stepper != nullptr)
         return std::max(1, static_cast<int>(stepper->GetSteps()));

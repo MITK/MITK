@@ -773,7 +773,7 @@ void mitk::DisplayActionEventBroadcast::Swivel(StateMachineAction* /*stateMachin
 void mitk::DisplayActionEventBroadcast::IncreaseTimeStep(StateMachineAction*, InteractionEvent*)
 {
   auto sliceNaviController = RenderingManager::GetInstance()->GetTimeNavigationController();
-  auto stepper = sliceNaviController->GetTime();
+  auto stepper = sliceNaviController->GetStepper();
   stepper->SetAutoRepeat(true);
   stepper->Next();
 }
@@ -781,7 +781,7 @@ void mitk::DisplayActionEventBroadcast::IncreaseTimeStep(StateMachineAction*, In
 void mitk::DisplayActionEventBroadcast::DecreaseTimeStep(StateMachineAction*, InteractionEvent*)
 {
   auto sliceNaviController = RenderingManager::GetInstance()->GetTimeNavigationController();
-  auto stepper = sliceNaviController->GetTime();
+  auto stepper = sliceNaviController->GetStepper();
   stepper->SetAutoRepeat(true);
   stepper->Previous();
 }

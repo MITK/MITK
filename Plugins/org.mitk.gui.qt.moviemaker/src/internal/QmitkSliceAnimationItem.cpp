@@ -74,7 +74,7 @@ void QmitkSliceAnimationItem::Animate(double s)
   if (renderWindow == nullptr)
     return;
 
-  mitk::Stepper* stepper = mitk::BaseRenderer::GetInstance(renderWindow)->GetSliceNavigationController()->GetSlice();
+  mitk::Stepper* stepper = mitk::BaseRenderer::GetInstance(renderWindow)->GetSliceNavigationController()->GetStepper();
 
   if (stepper == nullptr)
     return;

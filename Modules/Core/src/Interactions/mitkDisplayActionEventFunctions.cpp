@@ -111,7 +111,7 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Scro
       {
         return;
       }
-      mitk::Stepper* sliceStepper = sliceNavigationController->GetSlice();
+      mitk::Stepper* sliceStepper = sliceNavigationController->GetStepper();
       if (nullptr == sliceStepper)
       {
         return;
@@ -120,7 +120,7 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Scro
       // if only a single slice image was loaded, scrolling will affect the time steps
       if (sliceStepper->GetSteps() <= 1)
       {
-        sliceStepper = sliceNavigationController->GetTime();
+        sliceStepper = sliceNavigationController->GetStepper();
       }
 
       sliceStepper->SetAutoRepeat(displayActionEvent->GetAutoRepeat());
@@ -297,7 +297,7 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Scro
           {
             return;
           }
-          mitk::Stepper* sliceStepper = sliceNavigationController->GetSlice();
+          mitk::Stepper* sliceStepper = sliceNavigationController->GetStepper();
           if (nullptr == sliceStepper)
           {
             return;
@@ -306,7 +306,7 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Scro
           // if only a single slice image was loaded, scrolling will affect the time steps
           if (sliceStepper->GetSteps() <= 1)
           {
-            sliceStepper = sliceNavigationController->GetTime();
+            sliceStepper = sliceNavigationController->GetStepper();
           }
 
           sliceStepper->SetAutoRepeat(displayActionEvent->GetAutoRepeat());

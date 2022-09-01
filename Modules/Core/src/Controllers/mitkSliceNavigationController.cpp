@@ -52,12 +52,10 @@ namespace mitk
     SNCCommandType::Pointer sliceStepperChangedCommand;
 
     sliceStepperChangedCommand = SNCCommandType::New();
-
     sliceStepperChangedCommand->SetCallbackFunction(this, &SliceNavigationController::SendSlice);
 
-    m_Slice->AddObserver(itk::ModifiedEvent(), sliceStepperChangedCommand);
-
-    m_Slice->SetUnitName("mm");
+    m_Stepper->AddObserver(itk::ModifiedEvent(), sliceStepperChangedCommand);
+    m_Stepper->SetUnitName("mm");
   }
 
   SliceNavigationController::~SliceNavigationController()
@@ -180,7 +178,7 @@ namespace mitk
     m_BlockUpdate = false;
 
     // Send the geometry. Do this even if nothing was changed, because maybe
-    // Update() was only called to re-send the old geometry and time/slice data.
+    // Update() was only called to re-send the old geometry and slice data.
     this->SendCreatedWorldGeometry();
     this->SendSlice();
 
@@ -200,7 +198,7 @@ namespace mitk
   {
     if (!m_BlockUpdate)
     {
-      this->InvokeEvent(GeometryUpdateEvent(m_CreatedWorldGeometry, m_Slice->GetPos()));
+      this->InvokeEvent(GeometryUpdateEvent(m_CreatedWorldGeometry, m_Stepper->GetPos()));
     }
   }
 
@@ -210,7 +208,7 @@ namespace mitk
     {
       if (m_CreatedWorldGeometry.IsNotNull())
       {
-        this->InvokeEvent(GeometrySliceEvent(m_CreatedWorldGeometry, m_Slice->GetPos()));
+        this->InvokeEvent(GeometrySliceEvent(m_CreatedWorldGeometry, m_Stepper->GetPos()));
         RenderingManager::GetInstance()->RequestUpdateAll();
       }
     }
@@ -226,7 +224,7 @@ namespace mitk
     const auto* sliceEvent = dynamic_cast<const SliceNavigationController::GeometrySliceEvent*>(&geometrySliceEvent);
     assert(sliceEvent != nullptr);
 
-    this->GetSlice()->SetPos(sliceEvent->GetPos());
+    m_Stepper->SetPos(sliceEvent->GetPos());
   }
 
   void SliceNavigationController::SelectSliceByPoint(const Point3D& point)
@@ -252,7 +250,7 @@ namespace mitk
       return;
     }
 
-    this->GetSlice()->SetPos(selectedSlice);
+    m_Stepper->SetPos(selectedSlice);
 
     this->SendCreatedWorldGeometryUpdate();
     // send crosshair event
@@ -314,7 +312,7 @@ namespace mitk
       return nullptr;
     }
 
-    return slicedGeometry->GetPlaneGeometry(this->GetSlice()->GetPos());
+    return slicedGeometry->GetPlaneGeometry(m_Stepper->GetPos());
   }
 
   void SliceNavigationController::AdjustSliceStepperRange()
@@ -342,11 +340,11 @@ namespace mitk
       ScalarType min = slicedGeometry->GetOrigin()[k];
       ScalarType max = min + slicedGeometry->GetExtentInMM(k);
 
-      m_Slice->SetRange(min, max);
+      m_Stepper->SetRange(min, max);
     }
     else
     {
-      m_Slice->InvalidateRange();
+      m_Stepper->InvalidateRange();
     }
   }
 
@@ -375,7 +373,7 @@ namespace mitk
           else if (po &&
                    po->GetIndex() != -1) // undo case because index != -1, index holds the old position of this slice
           {
-            this->GetSlice()->SetPos(po->GetIndex());
+            m_Stepper->SetPos(po->GetIndex());
           }
         }
         break;
@@ -446,8 +444,8 @@ namespace mitk
     }
 
     // reset the stepper
-    m_Slice->SetSteps(slicedWorldGeometry->GetSlices());
-    m_Slice->SetPos(0);
+    m_Stepper->SetSteps(slicedWorldGeometry->GetSlices());
+    m_Stepper->SetPos(0);
 
     TimeStepType inputTimeSteps = m_InputWorldTimeGeometry->CountTimeSteps();
     // create new time geometry and initialize it according to the type of the 'm_InputWorldTimeGeometry'

@@ -21,7 +21,7 @@ namespace
 {
   int GetNumberOfSlices()
   {
-    mitk::Stepper* stepper = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime();
+    mitk::Stepper* stepper = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetStepper();
 
     if (stepper != nullptr)
       return std::max(1, static_cast<int>(stepper->GetSteps()));

@@ -59,11 +59,10 @@ namespace mitk
    * these in turn hold a series of PlaneGeometries. One of these PlaneGeometries is
    * selected as world geometry for the BaseRenderers associated to 2D views.
    *
-   * The SliceNavigationController holds has Steppers (one for the slice, a
-   * second for the time step), which control the selection of a single
-   * PlaneGeometry from the TimeGeometry. SliceNavigationController generates
-   * ITK events to tell observers, like a BaseRenderer, when the selected slice
-   * or timestep changes.
+   * The SliceNavigationController holds a Stepper, which controls the
+   * slice-selection of a single PlaneGeometry from the TimeGeometry.
+   * SliceNavigationController generates ITK events to tell observers,
+   * like a BaseRenderer, when the selected slice changes.
    *
    * Example:
    * \code
@@ -79,9 +78,8 @@ namespace mitk
    *
    * // Connect one or more BaseRenderer to this navigation controller, i.e.:
    * // events sent by the navigation controller when stepping through the slices
-   * // (e.g. by sliceCtrl->GetSlice()->Next()) will be received by the BaseRenderer
-   * // (in this example only slice-changes, see also ConnectGeometryTimeEvent
-   * // and ConnectGeometryEvents.)
+   * // (e.g. by sliceCtrl->GetStepper()->Next()) will be received by the BaseRenderer
+   * // (in this example only slice-changes, see also ConnectGeometryEvents.)
    * sliceCtrl->ConnectGeometrySliceEvent(renderer.GetPointer());
    *
    * //create a world geometry and send the information to the connected renderer(s)
@@ -98,13 +96,13 @@ namespace mitk
    *   new QmitkSliceNavigationWidget(parent);
    *
    * // Connect the navigation widget to the slice-stepper of the
-   * // SliceNavigationController. For initialization (position, mininal and
+   * // SliceNavigationController. For initialization (position, minimal and
    * // maximal values) the values of the SliceNavigationController are used.
    * // Thus, accessing methods of a navigation widget is normally not necessary,
    * // since everything can be set via the (Qt-independent) SliceNavigationController.
    * // The QmitkStepperAdapter converts the Qt-signals to Qt-independent
    * // itk-events.
-   * new QmitkStepperAdapter(navigationWidget, sliceCtrl->GetSlice());
+   * new QmitkStepperAdapter(navigationWidget, sliceCtrl->GetStepper());
    * \endcode
    *
    * If you do not want that all renderwindows are updated when a new slice is

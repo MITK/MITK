@@ -25,8 +25,8 @@ found in the LICENSE file.
 
   timeStepperChangedCommand = SNCCommandType::New();
   timeStepperChangedCommand->SetCallbackFunction(this, &TimeNavigationController::SendTime);
-  m_Time->AddObserver(itk::ModifiedEvent(), timeStepperChangedCommand);
-  m_Time->SetUnitName("ms");
+  m_Stepper->AddObserver(itk::ModifiedEvent(), timeStepperChangedCommand);
+  m_Stepper->SetUnitName("ms");
 }
 
 mitk::TimeNavigationController::~TimeNavigationController() {}
@@ -78,9 +78,9 @@ void mitk::TimeNavigationController::Update()
 
     TimeStepType inputTimeSteps = m_InputWorldTimeGeometry->CountTimeSteps();
     const TimeBounds &timeBounds = m_InputWorldTimeGeometry->GetTimeBounds();
-    m_Time->SetSteps(inputTimeSteps);
-    m_Time->SetPos(0);
-    m_Time->SetRange(timeBounds[0], timeBounds[1]);
+    m_Stepper->SetSteps(inputTimeSteps);
+    m_Stepper->SetPos(0);
+    m_Stepper->SetRange(timeBounds[0], timeBounds[1]);
   }
 
   // unblock update; we may do this now, because if m_BlockUpdate was already
@@ -98,7 +98,7 @@ void mitk::TimeNavigationController::SendTime()
   {
     if (m_InputWorldTimeGeometry.IsNotNull())
     {
-      this->InvokeEvent(TimeEvent(m_Time->GetPos()));
+      this->InvokeEvent(TimeEvent(m_Stepper->GetPos()));
       RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
@@ -106,7 +106,7 @@ void mitk::TimeNavigationController::SendTime()
 
 mitk::TimeStepType mitk::TimeNavigationController::GetSelectedTimeStep() const
 {
-  return this->GetTime()->GetPos();
+  return m_Stepper->GetPos();
 }
 
 mitk::TimePointType mitk::TimeNavigationController::GetSelectedTimePoint() const

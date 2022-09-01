@@ -514,7 +514,7 @@ void mitk::SegTool2D::WriteBackSegmentationResults(const std::vector<SegTool2D::
     dynamic_cast<const PlaneGeometry*>(dynamic_cast<const mitk::SlicedGeometry3D*>(
       m_LastEventSender->GetSliceNavigationController()->GetCurrentGeometry3D())
       ->GetPlaneGeometry(0));
-  unsigned int slicePosition = m_LastEventSender->GetSliceNavigationController()->GetSlice()->GetPos();
+  unsigned int slicePosition = m_LastEventSender->GetSliceNavigationController()->GetStepper()->GetPos();
 
   mitk::SegTool2D::WriteBackSegmentationResults(workingNode, sliceList, writeSliceToVolume);
 

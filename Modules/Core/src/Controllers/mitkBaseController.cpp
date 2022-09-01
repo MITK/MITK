@@ -13,10 +13,10 @@ found in the LICENSE file.
 #include "mitkBaseController.h"
 #include "mitkBaseRenderer.h"
 
-mitk::BaseController::BaseController() : m_LastUpdateTime(0)
+mitk::BaseController::BaseController()
+  : m_LastUpdateTime(0)
 {
-  m_Slice = Stepper::New();
-  m_Time = Stepper::New();
+  m_Stepper = Stepper::New();
 }
 
 mitk::BaseController::~BaseController()
@@ -27,22 +27,13 @@ void mitk::BaseController::ExecuteOperation(mitk::Operation * /* *operation */)
 {
 }
 
-mitk::Stepper *mitk::BaseController::GetSlice()
+mitk::Stepper *mitk::BaseController::GetStepper()
 {
-  return m_Slice.GetPointer();
+  return m_Stepper.GetPointer();
 }
 
-const mitk::Stepper* mitk::BaseController::GetSlice() const
+const mitk::Stepper* mitk::BaseController::GetStepper() const
 {
-  return m_Slice.GetPointer();
+  return m_Stepper.GetPointer();
 }
 
-mitk::Stepper *mitk::BaseController::GetTime()
-{
-  return m_Time.GetPointer();
-}
-
-const mitk::Stepper* mitk::BaseController::GetTime() const
-{
-  return m_Time.GetPointer();
-}

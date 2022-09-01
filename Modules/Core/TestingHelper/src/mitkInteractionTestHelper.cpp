@@ -271,7 +271,7 @@ void mitk::InteractionTestHelper::SetTimeStep(int newTimeStep)
 
   if (timeStepIsvalid)
   {
-    mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime()->SetPos(newTimeStep);
+    mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetStepper()->SetPos(newTimeStep);
   }
 }
 

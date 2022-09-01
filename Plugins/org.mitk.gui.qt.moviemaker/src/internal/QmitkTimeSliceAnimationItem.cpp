@@ -57,7 +57,7 @@ void QmitkTimeSliceAnimationItem::SetReverse(bool reverse)
 
 void QmitkTimeSliceAnimationItem::Animate(double s)
 {
-  mitk::Stepper* stepper = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetTime();
+  mitk::Stepper* stepper = mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetStepper();
 
   if (stepper == nullptr)
     return;

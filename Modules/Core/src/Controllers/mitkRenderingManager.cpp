@@ -468,7 +468,7 @@ namespace mitk
         if (mapperID == BaseRenderer::Standard2D)
         {
           // For 2D SNCs, steppers are set so that the cross is centered in the image
-          nc->GetSlice()->SetPos(nc->GetSlice()->GetSteps() / 2);
+          nc->GetStepper()->SetPos(nc->GetStepper()->GetSteps() / 2);
           baseRenderer->GetCameraController()->Fit();
         }
         else if (mapperID == BaseRenderer::Standard3D)

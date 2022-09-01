@@ -63,7 +63,7 @@ namespace mitk
    * // since everything can be set via the (Qt-independent) TimeNavigationController.
    * // The QmitkStepperAdapter converts the Qt-signals to Qt-independent
    * // itk-events.
-   * new QmitkStepperAdapter(navigationWidget, timeCtrl->GetSlice());
+   * new QmitkStepperAdapter(navigationWidget, timeCtrl->GetStepper());
    * \endcode
    */
   class MITKCORE_EXPORT TimeNavigationController : public BaseController

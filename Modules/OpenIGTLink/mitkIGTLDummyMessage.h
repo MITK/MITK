@@ -29,11 +29,6 @@ namespace mitk
 class MITKOPENIGTLINK_EXPORT IGTLDummyMessage : public igtl::StringMessage
 {
 public:
-  typedef IGTLDummyMessage                     Self;
-  typedef StringMessage                        Superclass;
-  typedef igtl::SmartPointer<Self>             Pointer;
-  typedef igtl::SmartPointer<const Self>       ConstPointer;
-
   igtlTypeMacro(mitk::IGTLDummyMessage, igtl::StringMessage);
   igtlNewMacro(mitk::IGTLDummyMessage);
 

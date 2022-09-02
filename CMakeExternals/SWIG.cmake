@@ -46,9 +46,13 @@ if(MITK_USE_SWIG)
 
       ExternalProject_add(${proj}
         LIST_SEPARATOR ${sep}
-        GIT_REPOSITORY https://github.com/swig/swig.git
-        GIT_TAG v${SWIG_TARGET_VERSION}
-        # Custom install dir for SWIG
+        URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/swig-${SWIG_TARGET_VERSION}.tar.gz
+        URL_MD5 7c3e46cb5af2b469722cafa0d91e127b
+        # Switching to Git would require additional prerequisites:
+        #   - autotools-dev
+        #   - automake
+        # GIT_REPOSITORY https://github.com/swig/swig.git
+        # GIT_TAG v${SWIG_TARGET_VERSION}
         INSTALL_DIR ${ep_prefix}/src/${proj}-install
         CONFIGURE_COMMAND <SOURCE_DIR>/./configure
                           CC=${CMAKE_C_COMPILER}${CMAKE_C_COMPILER_ARG1}

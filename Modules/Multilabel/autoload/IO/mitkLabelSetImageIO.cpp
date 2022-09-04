@@ -648,6 +648,7 @@ namespace mitk
     this->m_DefaultMetaDataKeys.push_back("ITK.InputFilterName");
     this->m_DefaultMetaDataKeys.push_back("label.");
     this->m_DefaultMetaDataKeys.push_back("layer.");
+    this->m_DefaultMetaDataKeys.push_back("layers.");
     this->m_DefaultMetaDataKeys.push_back("org.mitk.label.");
   }
 

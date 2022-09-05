@@ -161,8 +161,6 @@ public:
     sliceNavigationController->GetTime()->SetPos(2);
     CPPUNIT_ASSERT(sliceNavigationController->GetSelectedTimeStep() == 2);
     CPPUNIT_ASSERT(sliceNavigationController->GetSelectedTimePoint() == 30.0);
-
-    auto sliceNavigationController2 = mitk::SliceNavigationController::New();
   }
 
 private:

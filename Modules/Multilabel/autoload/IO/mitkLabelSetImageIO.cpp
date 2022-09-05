@@ -47,6 +47,7 @@ namespace mitk
   LabelSetImageIO::LabelSetImageIO()
     : AbstractFileIO(LabelSetImage::GetStaticNameOfClass(), IOMimeTypes::NRRD_MIMETYPE(), "MITK Multilabel Image")
   {
+    this->InitializeDefaultMetaDataKeys();
     AbstractFileWriter::SetRanking(10);
     AbstractFileReader::SetRanking(10);
     this->RegisterService();
@@ -645,8 +646,10 @@ namespace mitk
     this->m_DefaultMetaDataKeys.push_back(PROPERTY_NAME_TIMEGEOMETRY_TYPE);
     this->m_DefaultMetaDataKeys.push_back(PROPERTY_NAME_TIMEGEOMETRY_TIMEPOINTS);
     this->m_DefaultMetaDataKeys.push_back("ITK.InputFilterName");
-    this->m_DefaultMetaDataKeys.push_back("label_");
-    this->m_DefaultMetaDataKeys.push_back("layer_");
+    this->m_DefaultMetaDataKeys.push_back("label.");
+    this->m_DefaultMetaDataKeys.push_back("layer.");
+    this->m_DefaultMetaDataKeys.push_back("layers");
+    this->m_DefaultMetaDataKeys.push_back("org.mitk.label.");
   }
 
 } // namespace

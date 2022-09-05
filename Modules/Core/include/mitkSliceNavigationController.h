@@ -150,7 +150,7 @@ namespace mitk
     };
 
     /**
-     * \brief Set the input world geometry3D out of which the
+     * \brief Set the input world time geometry out of which the
      * geometries for slicing will be created.
      *
      * Any previous previous set input geometry (3D or Time) will

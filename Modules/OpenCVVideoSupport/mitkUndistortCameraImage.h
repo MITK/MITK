@@ -19,8 +19,8 @@ found in the LICENSE file.
 
 #include "mitkPoint.h"
 
-#include "opencv2/core.hpp"
-#include "opencv2/imgproc.hpp"
+#include <opencv2/core.hpp>
+#include <opencv2/core/types_c.h>
 
 /*!
 \brief UndistortCameraImage

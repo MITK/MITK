@@ -18,7 +18,7 @@ found in the LICENSE file.
 #include <igtlServerSocket.h>
 #include <igtlTrackingDataMessage.h>
 #include <igtlImageMessage.h>
-#include <igtl_status.h>
+#include <mitkIGTLStatus.h>
 
 mitk::IGTLServer::IGTLServer(bool ReadFully) :
 IGTLDevice(ReadFully)

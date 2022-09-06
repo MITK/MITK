@@ -15,11 +15,6 @@ found in the LICENSE file.
 #include "ui_QmitkDicomLocalStorageWidgetControls.h"
 #include <MitkDICOMUIExports.h>
 
-// include ctk
-#include <ctkDICOMDatabase.h>
-#include <ctkDICOMIndexer.h>
-#include <ctkFileDialog.h>
-
 // include QT
 #include <QHash>
 #include <QString>
@@ -29,6 +24,9 @@ found in the LICENSE file.
 
 class QProgressDialog;
 class QLabel;
+
+class ctkDICOMDatabase;
+class ctkDICOMIndexer;
 
 /**
 * \brief QmitkDicomLocalStorageWidget is a QWidget providing functionality for dicom storage and import.

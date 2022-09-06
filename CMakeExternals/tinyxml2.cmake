@@ -26,8 +26,8 @@ if(NOT DEFINED tinyxml2_DIR)
 
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
-     URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/tinyxml2-8.0.0.tar.gz
-     URL_MD5 5dc535c8b34ee621fe2128f072d275b5
+     GIT_REPOSITORY https://github.com/leethomason/tinyxml2.git
+     GIT_TAG 8.0.0
      CMAKE_GENERATOR ${gen}
      CMAKE_GENERATOR_PLATFORM ${gen_platform}
      CMAKE_ARGS

@@ -16,7 +16,7 @@ found in the LICENSE file.
 
 //Other
 #include <cstdio>
-#include <highgui.h>
+#include <opencv2/videoio/legacy/constants_c.h>
 
 mitk::USImageVideoSource::USImageVideoSource()
   : m_VideoCapture(new cv::VideoCapture()),

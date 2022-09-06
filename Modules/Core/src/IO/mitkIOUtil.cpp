@@ -381,13 +381,13 @@ namespace mitk
     {
 #ifdef US_PLATFORM_WINDOWS
       char tempPathTestBuffer[1];
-      DWORD bufferLength = ::GetTempPath(1, tempPathTestBuffer);
+      DWORD bufferLength = GetTempPathA(1, tempPathTestBuffer);
       if (bufferLength == 0)
       {
         mitkThrow() << GetLastErrorStr();
       }
       std::vector<char> tempPath(bufferLength);
-      bufferLength = ::GetTempPath(bufferLength, &tempPath[0]);
+      bufferLength = GetTempPathA(bufferLength, &tempPath[0]);
       if (bufferLength == 0)
       {
         mitkThrow() << GetLastErrorStr();

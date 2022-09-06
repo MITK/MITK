@@ -14,6 +14,8 @@ found in the LICENSE file.
 #include <iostream>
 #include <algorithm>
 
+#include <opencv2/videoio/videoio_c.h>
+
 mitk::OpenCVVideoSource::OpenCVVideoSource()
 : m_VideoCapture(nullptr),
   m_CurrentImage(nullptr),

@@ -16,7 +16,7 @@ if(MITK_USE_MatchPoint)
   endif()
 
   set(proj MatchPoint)
-  set(proj_DEPENDENCIES ITK)
+  set(proj_DEPENDENCIES Boost ITK)
 
   set(MatchPoint_DEPENDS ${proj})
 
@@ -32,8 +32,8 @@ if(MITK_USE_MatchPoint)
       set(download_step SOURCE_DIR ${MatchPoint_SOURCE_DIR})
     else()
       set(download_step
-          URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/MatchPoint_rev_f7699d1e.tar.gz
-          URL_MD5 8a24fbdccd6f18f158f49a0ad4fa3faa
+          GIT_REPOSITORY https://github.com/MIC-DKFZ/MatchPoint.git
+          GIT_TAG e63dfdbb
          )
     endif()
 
@@ -49,13 +49,12 @@ if(MITK_USE_MatchPoint)
          ${additional_cmake_args}
          -DBUILD_TESTING:BOOL=OFF
          -DITK_DIR:PATH=${ITK_DIR} #/src/ITK-build
-         -DMAP_USE_SYSTEM_GDCM:BOOL=ON
+         "-DBoost_DIR:PATH=${Boost_DIR}"
          -DMAP_USE_SYSTEM_HDF5:BOOL=ON
          -DMAP_DISABLE_ITK_IO_FACTORY_AUTO_REGISTER:BOOL=ON
          -DMAP_WRAP_Plastimatch:BOOL=ON
          -DMAP_BUILD_Ontology:BOOL=ON
          -DMAP_BUILD_Ontology_simple:BOOL=ON
-         -DGDCM_DIR:PATH=${GDCM_DIR}
          -DHDF5_DIR:PATH=${HDF5_DIR}
        CMAKE_CACHE_ARGS
          ${ep_common_cache_args}

@@ -17,6 +17,8 @@ found in the LICENSE file.
 
 #include <mitkIPersistenceService.h>
 
+#include <opencv2/videoio/legacy/constants_c.h>
+
 class QmitkOpenCVVideoControlsPrivate
 {
 public:

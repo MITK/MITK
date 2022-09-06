@@ -160,7 +160,14 @@ void QmitkMxNMultiWidget::ResetCrosshair()
     return;
   }
 
-  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(dataStorage);
+  // get the specific render window that sent the signal
+  QmitkRenderWindow* renderwindow = qobject_cast<QmitkRenderWindow*>(sender());
+  if (nullptr == renderwindow)
+  {
+    return;
+  }
+
+  mitk::RenderingManager::GetInstance()->InitializeViewByBoundingObjects(renderwindow->GetRenderWindow(), dataStorage);
 
   SetWidgetPlaneMode(mitk::InteractionSchemeSwitcher::MITKStandard);
 }

@@ -297,6 +297,29 @@ namespace mitk
     this->InitializeViews(boundingGeometry);
   }
 
+  void RenderingManager::InitializeViewByBoundingObjects(vtkRenderWindow* renderWindow, const DataStorage* dataStorage, bool resetCamera)
+  {
+    if (nullptr == dataStorage)
+    {
+      return;
+    }
+
+    // get all nodes that have not set "includeInBoundingBox" to false
+    auto pred = NodePredicateNot::New(NodePredicateProperty::New("includeInBoundingBox", BoolProperty::New(false)));
+    DataStorage::SetOfObjects::ConstPointer filteredNodes = dataStorage->GetSubset(pred);
+
+    BaseRenderer* baseRenderer = BaseRenderer::GetInstance(renderWindow);
+    TimeGeometry::ConstPointer boundingGeometry;
+    if (!filteredNodes->empty())
+    {
+      // calculate bounding geometry of these nodes
+      boundingGeometry = dataStorage->ComputeBoundingGeometry3D(filteredNodes, "visible", baseRenderer);
+    }
+
+    // initialize the views to the bounding geometry
+    this->InitializeView(renderWindow, boundingGeometry, resetCamera);
+  }
+
   bool RenderingManager::InitializeViews(const BaseGeometry* geometry, RequestType type, bool resetCamera)
   {
     ProportionalTimeGeometry::Pointer propTimeGeometry = ProportionalTimeGeometry::New();

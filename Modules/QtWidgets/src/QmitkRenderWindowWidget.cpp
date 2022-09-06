@@ -195,7 +195,7 @@ void QmitkRenderWindowWidget::InitializeGUI()
   m_RenderWindow->GetSliceNavigationController()->SetCrosshairEvent.AddListener(mitk::MessageDelegate1<QmitkRenderWindowWidget, mitk::Point3D>(this, &QmitkRenderWindowWidget::SetCrosshair));
 
   mitk::TimeGeometry::ConstPointer timeGeometry = m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll());
-  mitk::RenderingManager::GetInstance()->InitializeViews(timeGeometry);
+  mitk::RenderingManager::GetInstance()->InitializeView(m_RenderWindow->GetVtkRenderWindow(), timeGeometry);
   m_Layout->addWidget(m_RenderWindow);
 
   // add point set as a crosshair

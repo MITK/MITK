@@ -38,8 +38,6 @@ found in the LICENSE file.
 #include <QMessageBox>
 #include <QDir>
 
-#include <mitkFileSystem.h>
-
 const std::string QmitkSegmentationFlowControlView::VIEW_ID = "org.mitk.views.flow.control";
 
 QmitkSegmentationFlowControlView::QmitkSegmentationFlowControlView()

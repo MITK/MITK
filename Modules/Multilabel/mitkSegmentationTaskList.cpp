@@ -96,37 +96,37 @@ bool mitk::SegmentationTaskList::IsDone() const
 
 bool mitk::SegmentationTaskList::IsDone(size_t index) const
 {
-  return fs::exists(this->GetAbsolutePath(m_Tasks.at(index).GetResult()));
+  return std::filesystem::exists(this->GetAbsolutePath(m_Tasks.at(index).GetResult()));
 }
 
-fs::path mitk::SegmentationTaskList::GetInputLocation() const
+std::filesystem::path mitk::SegmentationTaskList::GetInputLocation() const
 {
   std::string inputLocation;
   this->GetPropertyList()->GetStringProperty("MITK.IO.reader.inputlocation", inputLocation);
 
   return !inputLocation.empty()
-    ? fs::path(inputLocation)/*.lexically_normal()*/ // See T29246
-    : fs::path();
+    ? std::filesystem::path(inputLocation).lexically_normal()
+    : std::filesystem::path();
 }
 
-fs::path mitk::SegmentationTaskList::GetBasePath() const
+std::filesystem::path mitk::SegmentationTaskList::GetBasePath() const
 {
   return this->GetInputLocation().remove_filename();
 }
 
-fs::path mitk::SegmentationTaskList::GetAbsolutePath(const fs::path& path) const
+std::filesystem::path mitk::SegmentationTaskList::GetAbsolutePath(const std::filesystem::path& path) const
 {
   if (path.empty())
     return path;
 
-  auto normalizedPath = path/*.lexically_normal()*/; // See T29246
+  auto normalizedPath = path.lexically_normal();
 
   return !normalizedPath.is_absolute()
     ? this->GetBasePath() / normalizedPath
     : normalizedPath;
 }
 
-fs::path mitk::SegmentationTaskList::GetInterimPath(const fs::path& path) const
+std::filesystem::path mitk::SegmentationTaskList::GetInterimPath(const std::filesystem::path& path) const
 {
   if (path.empty() || !path.has_filename())
     return path;
@@ -143,17 +143,17 @@ void mitk::SegmentationTaskList::SaveTask(size_t index, const BaseData* segmenta
   auto path = this->GetAbsolutePath(this->GetResult(index));
   auto interimPath = this->GetInterimPath(path);
 
-  if (fs::exists(path))
+  if (std::filesystem::exists(path))
     saveAsIntermediateResult = false;
 
   IOUtil::Save(segmentation, saveAsIntermediateResult
     ? interimPath.string()
     : path.string());
 
-  if (!saveAsIntermediateResult && fs::exists(interimPath))
+  if (!saveAsIntermediateResult && std::filesystem::exists(interimPath))
   {
     std::error_code ec;
-    fs::remove(interimPath, ec);
+    std::filesystem::remove(interimPath, ec);
   }
 }
 

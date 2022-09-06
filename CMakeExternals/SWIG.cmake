@@ -11,7 +11,7 @@ if(MITK_USE_SWIG)
   if(WIN32)
     set(proj_DEPENDENCIES)
   else()
-    set(proj_DEPENDENCIES PCRE2)
+    set(proj_DEPENDENCIES PCRE)
   endif()
   set(SWIG_DEPENDS ${proj})
 
@@ -59,7 +59,7 @@ if(MITK_USE_SWIG)
                           LDFLAGS=${CMAKE_LINKER_FLAGS} ${CMAKE_LINKER_FLAGS_RELEASE}
                           CXX=${CMAKE_CXX_COMPILER}${CMAKE_CXX_COMPILER_ARG1}
                             "--prefix=<INSTALL_DIR>"
-                            "--with-pcre-prefix=${PCRE2_DIR}"
+                            "--with-pcre-prefix=${PCRE_DIR}"
                             --without-octave
                             "--with-python=${Python3_EXECUTABLE}"
         DEPENDS ${proj_DEPENDENCIES}

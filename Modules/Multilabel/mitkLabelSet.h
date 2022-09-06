@@ -19,6 +19,7 @@ found in the LICENSE file.
 
 #include <itkObject.h>
 #include <itkObjectFactory.h>
+#include <itkEventObject.h>
 
 #include <mitkLabel.h>
 
@@ -38,13 +39,15 @@ namespace mitk
 
     typedef mitk::Label::PixelType PixelType;
 
-    typedef std::map<PixelType, Label::Pointer> LabelContainerType;
+    using LabelValueType = mitk::Label::PixelType;
+    typedef std::map<LabelValueType, Label::Pointer> LabelContainerType;
     typedef LabelContainerType::const_iterator LabelContainerConstIteratorType;
     typedef LabelContainerType::iterator LabelContainerIteratorType;
 
     /**
     * \brief AddLabelEvent is emitted whenever a new label has been added to the LabelSet.
     *
+    * The registered method will be called with the label value of the added label.
     * Observers should register to this event by calling myLabelSet->AddLabelEvent.AddListener(myObject,
     * MyObject::MyMethod).
     * After registering, myObject->MyMethod() will be called every time a new label has been added to the LabelSet.
@@ -53,7 +56,7 @@ namespace mitk
     * member variable is not needed to be locked in multi-threaded scenarios since the LabelSetEvent is a typedef for
     * a Message1 object which is thread safe
     */
-    Message<> AddLabelEvent;
+    Message1<LabelValueType> AddLabelEvent;
 
     /**
     * \brief RemoveLabelEvent is emitted whenever a new label has been removed from the LabelSet.
@@ -66,7 +69,7 @@ namespace mitk
     * member variable is not needed to be locked in multi-threaded scenarios since the LabelSetEvent is a typedef for
     * a Message object which is thread safe
     */
-    Message<> RemoveLabelEvent;
+    Message1<LabelValueType> RemoveLabelEvent;
 
     /**
     * \brief ModifyLabelEvent is emitted whenever a label has been modified from the LabelSet.
@@ -79,7 +82,7 @@ namespace mitk
     * member variable is not needed to be locked in multi-threaded scenarios since the LabelSetEvent is a typedef for
     * a Message object which is thread safe
     */
-    Message<> ModifyLabelEvent;
+    Message1<LabelValueType> ModifyLabelEvent;
 
     /**
     * \brief ActiveLabelEvent is emitted whenever a label has been set as active in the LabelSet.
@@ -119,7 +122,7 @@ namespace mitk
     /** \brief
      * Recall itk::Object::Modified event from a label and send a ModifyLabelEvent
     */
-    void OnLabelModified();
+    void OnLabelModified(const Object*, const itk::EventObject&);
 
     /** \brief
     */

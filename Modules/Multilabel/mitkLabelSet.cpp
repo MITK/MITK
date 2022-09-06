@@ -38,15 +38,18 @@ mitk::LabelSet::LabelSet(const LabelSet &other)
   {
     m_LabelContainer[otherIt->first] = otherIt->second->Clone();
 
-    itk::SimpleMemberCommand<LabelSet>::Pointer command = itk::SimpleMemberCommand<LabelSet>::New();
+    itk::MemberCommand<LabelSet>::Pointer command = itk::MemberCommand<LabelSet>::New();
     command->SetCallbackFunction(this, &LabelSet::OnLabelModified);
     m_LabelContainer[otherIt->first]->AddObserver(itk::ModifiedEvent(), command);
   }
 }
 
-void mitk::LabelSet::OnLabelModified()
+void mitk::LabelSet::OnLabelModified(const Object* sender, const itk::EventObject&)
 {
-  ModifyLabelEvent.Send();
+  auto label = dynamic_cast<const Label*>(sender);
+  if (nullptr == label) mitkThrow() << "LabelSet is in wrong state. LabelModified event is not send by a label instance.";
+
+  ModifyLabelEvent.Send(label->GetValue());
   Superclass::Modified();
 }
 
@@ -132,13 +135,12 @@ void mitk::LabelSet::AddLabel(mitk::Label *label)
   // add DICOM information of the label
   DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(newLabel);
 
-  itk::SimpleMemberCommand<LabelSet>::Pointer command = itk::SimpleMemberCommand<LabelSet>::New();
+  itk::MemberCommand<LabelSet>::Pointer command = itk::MemberCommand<LabelSet>::New();
   command->SetCallbackFunction(this, &LabelSet::OnLabelModified);
   newLabel->AddObserver(itk::ModifiedEvent(), command);
-  // newLabel->AddObserver(itk::ModifiedEvent(),command);
 
   SetActiveLabel(newLabel->GetValue());
-  AddLabelEvent.Send();
+  AddLabelEvent.Send(newLabel->GetValue());
   Modified();
 }
 
@@ -194,7 +196,7 @@ void mitk::LabelSet::RemoveLabel(PixelType pixelValue)
       SetActiveLabel(m_LabelContainer.rbegin()->first);
   }
 
-  RemoveLabelEvent.Send();
+  RemoveLabelEvent.Send(pixelValue);
 
   Modified();
 }
@@ -204,8 +206,9 @@ void mitk::LabelSet::RemoveAllLabels()
   auto _it = IteratorBegin();
   for (; _it != IteratorConstEnd();)
   {
-    RemoveLabelEvent.Send();
+    auto labelValue = _it->first;
     m_LabelContainer.erase(_it++);
+    RemoveLabelEvent.Send(labelValue);
   }
   AllLabelsModifiedEvent.Send();
 }

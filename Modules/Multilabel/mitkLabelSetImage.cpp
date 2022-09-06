@@ -95,6 +95,14 @@ mitk::LabelSetImage::LabelSetImage(const mitk::LabelSetImage &other)
     itk::SimpleMemberCommand<Self>::Pointer command = itk::SimpleMemberCommand<Self>::New();
     command->SetCallbackFunction(this, &mitk::LabelSetImage::OnLabelSetModified);
     lsClone->AddObserver(itk::ModifiedEvent(), command);
+
+    lsClone->AddLabelEvent.AddListener(mitk::MessageDelegate1<LabelSetImage,LabelValueType>(
+      this, &LabelSetImage::OnLabelAdded));
+    lsClone->ModifyLabelEvent.AddListener(mitk::MessageDelegate1<LabelSetImage, LabelValueType>(
+      this, &LabelSetImage::OnLabelModified));
+    lsClone->RemoveLabelEvent.AddListener(mitk::MessageDelegate1<LabelSetImage, LabelValueType>(
+      this, &LabelSetImage::OnLabelRemoved));
+
     m_LabelSetContainer.push_back(lsClone);
 
     // clone layer Image data
@@ -104,6 +112,21 @@ mitk::LabelSetImage::LabelSetImage(const mitk::LabelSetImage &other)
 
   // Add some DICOM Tags as properties to segmentation image
   DICOMSegmentationPropertyHelper::DeriveDICOMSegmentationProperties(this);
+}
+
+void mitk::LabelSetImage::OnLabelAdded(LabelValueType labelValue)
+{
+  this->m_LabelAddedMessage.Send(labelValue);
+}
+
+void mitk::LabelSetImage::OnLabelModified(LabelValueType labelValue)
+{
+  this->m_LabelModifiedMessage.Send(labelValue);
+}
+
+void mitk::LabelSetImage::OnLabelRemoved(LabelValueType labelValue)
+{
+  this->m_LabelRemovedMessage.Send(labelValue);
 }
 
 void mitk::LabelSetImage::OnLabelSetModified()
@@ -271,9 +294,17 @@ unsigned int mitk::LabelSetImage::AddLayer(mitk::Image::Pointer layerImage, mitk
   command->SetCallbackFunction(this, &mitk::LabelSetImage::OnLabelSetModified);
   ls->AddObserver(itk::ModifiedEvent(), command);
 
+  ls->AddLabelEvent.AddListener(mitk::MessageDelegate1<LabelSetImage, LabelValueType>(
+    this, &LabelSetImage::OnLabelAdded));
+  ls->ModifyLabelEvent.AddListener(mitk::MessageDelegate1<LabelSetImage, LabelValueType>(
+    this, &LabelSetImage::OnLabelModified));
+  ls->RemoveLabelEvent.AddListener(mitk::MessageDelegate1<LabelSetImage, LabelValueType>(
+    this, &LabelSetImage::OnLabelRemoved));
+
   SetActiveLayer(newLabelSetId);
-  // MITK_INFO << GetActiveLayer();
   this->Modified();
+  this->m_GroupAddedMessage.Send(newLabelSetId);
+
   return newLabelSetId;
 }
 

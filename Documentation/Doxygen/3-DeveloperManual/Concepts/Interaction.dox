@@ -45,7 +45,8 @@ Guard States are a special kind of states. The action, that is executed after th
 Event 1 is sent to the state machine. This leads the current state from state 1 into state check. The action 1 is executed. This action checks a condition and puts the result into a new event, that is sent and handled by the same (this) state machine. E.g. is the object picked with the received mouse-coordinate? The event, that is generated, will be Yes or No. In case of event No, the state machine sets the current state back to state 1 and executes action 2. In case of event Yes, the state machine changes the state from state check into state 2 and executes action 3, which e.g. can select said object.
 
 \subsection InteractionPage_XMLDefinitionStatemachine Definition of a State machine
-Due to the separation of the definition of an interaction sequence and its implementation, the definition has to be archived somewhere, where the application can reach it during startup and build up all the objects (states, transitions and actions) that represent the sequence of a special interaction. In MITK, these informations are defined in an XML-file (usually in Core/Code/Resources/Interactions/Legacy/StateMachine.xml)
+Due to the separation of the definition of an interaction sequence and its implementation, the definition has to be archived somewhere, where the application can reach it during startup and build up all the objects (states, transitions and actions) that represent the sequence of a special interaction.
+In MITK, these informations are defined in an XML-file (i.e. DisplayInteraction.xml or BoundingShapeInteraction.xml)
 \note Please note that since this is a resource which is compiled into the executable, changes you make to this file will only be reflected in application behavior after you recompile your code.
 
 The structure is the following (from \ref InteractionPage_ExampleA) :

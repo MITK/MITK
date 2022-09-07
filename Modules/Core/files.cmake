@@ -302,7 +302,6 @@ set(CPP_FILES
 set(RESOURCE_FILES
 Interactions/globalConfig.xml
 Interactions/DisplayInteraction.xml
-Interactions/DisplayConfig.xml
 Interactions/DisplayConfigMITKBase.xml
 Interactions/DisplayConfigPACSBase.xml
 Interactions/DisplayConfigCrosshair.xml
@@ -315,8 +314,6 @@ Interactions/DisplayConfigPACSZoom.xml
 Interactions/DisplayConfigPACSLevelWindow.xml
 Interactions/DisplayConfigBlockLMB.xml
 Interactions/PointSet.xml
-Interactions/Legacy/StateMachine.xml
-Interactions/Legacy/DisplayConfigMITKTools.xml
 Interactions/PointSetConfig.xml
 
 mitkLevelWindowPresets.xml

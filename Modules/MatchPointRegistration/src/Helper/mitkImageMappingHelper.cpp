@@ -311,7 +311,7 @@ mitk::ImageMappingHelper::ResultImageType::Pointer
       {
         resultLabelSetImage->AddLayer();
       }
-      resultLabelSetImage->AddLabelSetToLayer(layerID, inputLabelSetImage->GetLabelSet(layerID)->Clone());
+      resultLabelSetImage->AddLabelSetToLayer(layerID, inputLabelSetImage->GetLabelSet(layerID));
       cloneInput->SetActiveLayer(layerID);
       resultLabelSetImage->SetActiveLayer(layerID);
 

@@ -91,17 +91,8 @@ mitk::LabelSetImage::LabelSetImage(const mitk::LabelSetImage &other)
   {
     // Clone LabelSet data
     mitk::LabelSet::Pointer lsClone = other.GetLabelSet(i)->Clone();
-    // add modified event listener to LabelSet (listen to LabelSet changes)
-    itk::SimpleMemberCommand<Self>::Pointer command = itk::SimpleMemberCommand<Self>::New();
-    command->SetCallbackFunction(this, &mitk::LabelSetImage::OnLabelSetModified);
-    lsClone->AddObserver(itk::ModifiedEvent(), command);
 
-    lsClone->AddLabelEvent.AddListener(mitk::MessageDelegate1<LabelSetImage,LabelValueType>(
-      this, &LabelSetImage::OnLabelAdded));
-    lsClone->ModifyLabelEvent.AddListener(mitk::MessageDelegate1<LabelSetImage, LabelValueType>(
-      this, &LabelSetImage::OnLabelModified));
-    lsClone->RemoveLabelEvent.AddListener(mitk::MessageDelegate1<LabelSetImage, LabelValueType>(
-      this, &LabelSetImage::OnLabelRemoved));
+    this->RegisterLabelSet(lsClone);
 
     m_LabelSetContainer.push_back(lsClone);
 
@@ -262,6 +253,33 @@ unsigned int mitk::LabelSetImage::AddLayer(mitk::LabelSet::Pointer labelSet)
   return newLabelSetId;
 }
 
+void mitk::LabelSetImage::RegisterLabelSet(mitk::LabelSet* ls)
+{
+  // add modified event listener to LabelSet (listen to LabelSet changes)
+  itk::SimpleMemberCommand<Self>::Pointer command = itk::SimpleMemberCommand<Self>::New();
+  command->SetCallbackFunction(this, &mitk::LabelSetImage::OnLabelSetModified);
+  ls->AddObserver(itk::ModifiedEvent(), command);
+
+  ls->AddLabelEvent.AddListener(mitk::MessageDelegate1<LabelSetImage, LabelValueType>(
+    this, &LabelSetImage::OnLabelAdded));
+  ls->ModifyLabelEvent.AddListener(mitk::MessageDelegate1<LabelSetImage, LabelValueType>(
+    this, &LabelSetImage::OnLabelModified));
+  ls->RemoveLabelEvent.AddListener(mitk::MessageDelegate1<LabelSetImage, LabelValueType>(
+    this, &LabelSetImage::OnLabelRemoved));
+}
+
+void mitk::LabelSetImage::ReleaseLabelSet(mitk::LabelSet* ls)
+{
+  ls->RemoveAllObservers();
+
+  ls->AddLabelEvent.RemoveListener(mitk::MessageDelegate1<LabelSetImage, LabelValueType>(
+    this, &LabelSetImage::OnLabelAdded));
+  ls->ModifyLabelEvent.RemoveListener(mitk::MessageDelegate1<LabelSetImage, LabelValueType>(
+    this, &LabelSetImage::OnLabelModified));
+  ls->RemoveLabelEvent.RemoveListener(mitk::MessageDelegate1<LabelSetImage, LabelValueType>(
+    this, &LabelSetImage::OnLabelRemoved));
+}
+
 unsigned int mitk::LabelSetImage::AddLayer(mitk::Image::Pointer layerImage, mitk::LabelSet::Pointer labelSet)
 {
   unsigned int newLabelSetId = m_LayerContainer.size();
@@ -289,17 +307,7 @@ unsigned int mitk::LabelSetImage::AddLayer(mitk::Image::Pointer layerImage, mitk
   // push a new labelset for the new layer
   m_LabelSetContainer.push_back(ls);
 
-  // add modified event listener to LabelSet (listen to LabelSet changes)
-  itk::SimpleMemberCommand<Self>::Pointer command = itk::SimpleMemberCommand<Self>::New();
-  command->SetCallbackFunction(this, &mitk::LabelSetImage::OnLabelSetModified);
-  ls->AddObserver(itk::ModifiedEvent(), command);
-
-  ls->AddLabelEvent.AddListener(mitk::MessageDelegate1<LabelSetImage, LabelValueType>(
-    this, &LabelSetImage::OnLabelAdded));
-  ls->ModifyLabelEvent.AddListener(mitk::MessageDelegate1<LabelSetImage, LabelValueType>(
-    this, &LabelSetImage::OnLabelModified));
-  ls->RemoveLabelEvent.AddListener(mitk::MessageDelegate1<LabelSetImage, LabelValueType>(
-    this, &LabelSetImage::OnLabelRemoved));
+  RegisterLabelSet(ls);
 
   SetActiveLayer(newLabelSetId);
   this->Modified();
@@ -308,16 +316,25 @@ unsigned int mitk::LabelSetImage::AddLayer(mitk::Image::Pointer layerImage, mitk
   return newLabelSetId;
 }
 
-void mitk::LabelSetImage::AddLabelSetToLayer(const unsigned int layerIdx, const mitk::LabelSet::Pointer labelSet)
+void mitk::LabelSetImage::AddLabelSetToLayer(const unsigned int layerIdx, const mitk::LabelSet* labelSet)
 {
   if (m_LayerContainer.size() <= layerIdx)
   {
     mitkThrow() << "Trying to add labelSet to non-existing layer.";
   }
 
+  auto clonedLabelSet = labelSet->Clone();
+
+  this->RegisterLabelSet(clonedLabelSet);
+
   if (layerIdx < m_LabelSetContainer.size())
   {
-    m_LabelSetContainer[layerIdx] = labelSet;
+    if (m_LabelSetContainer[layerIdx].IsNotNull())
+    {
+      this->ReleaseLabelSet(m_LabelSetContainer[layerIdx]);
+    }
+
+    m_LabelSetContainer[layerIdx] = clonedLabelSet;
   }
   else
   {
@@ -327,9 +344,10 @@ void mitk::LabelSetImage::AddLabelSetToLayer(const unsigned int layerIdx, const 
       defaultLabelSet->AddLabel(GetExteriorLabel());
       defaultLabelSet->SetActiveLabel(0 /*Exterior Label*/);
       defaultLabelSet->SetLayer(m_LabelSetContainer.size());
+      this->RegisterLabelSet(defaultLabelSet);
       m_LabelSetContainer.push_back(defaultLabelSet);
     }
-    m_LabelSetContainer.push_back(labelSet);
+    m_LabelSetContainer.push_back(clonedLabelSet);
   }
 }
 

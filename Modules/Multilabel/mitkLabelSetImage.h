@@ -358,7 +358,10 @@ namespace mitk
     unsigned int AddLayer(mitk::Image::Pointer layerImage, mitk::LabelSet::Pointer labelSet = nullptr);
 
     /**
-    * \brief Add a LabelSet to an existing layer
+    * \brief Add a cloned LabelSet to an existing layer
+    *
+    * Remark: The passed LabelSet instance will be cloned before added to ensure clear ownership
+    * of the new LabelSet addition.
     *
     * This will replace an existing labelSet if one exists. Throws an exceptions if you are trying
     * to add a labelSet to a non-existing layer.
@@ -369,7 +372,7 @@ namespace mitk
     * \param layerIdx The index of the layer the LabelSet should be added to
     * \param labelSet The LabelSet that should be added
     */
-    void AddLabelSetToLayer(const unsigned int layerIdx, const mitk::LabelSet::Pointer labelSet);
+    void AddLabelSetToLayer(const unsigned int layerIdx, const mitk::LabelSet* labelSet);
 
     /**
      * @brief Removes the active layer and the respective mitk::LabelSet and image information.
@@ -429,6 +432,10 @@ namespace mitk
 
     template <typename LabelSetImageType, typename ImageType>
     void InitializeByLabeledImageProcessing(LabelSetImageType *input, ImageType *other);
+
+    //helper function that ensures
+    void RegisterLabelSet(mitk::LabelSet* ls);
+    void ReleaseLabelSet(mitk::LabelSet* ls);
 
     std::vector<LabelSet::Pointer> m_LabelSetContainer;
     std::vector<Image::Pointer> m_LayerContainer;

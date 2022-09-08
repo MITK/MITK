@@ -73,6 +73,9 @@ private:
   bool HandleUnsavedChanges(const QString& alternativeTitle = QString());
   mitk::DataNode* GetSegmentationDataNode(size_t index) const;
   void OnUnsavedChangesSaved();
+  void OnPreviousTaskShortcutActivated();
+  void OnNextTaskShortcutActivated();
+  void OnLoadTaskShortcutActivated();
 
   Ui::QmitkSegmentationTaskListWidget* m_Ui;
   QFileSystemWatcher* m_FileSystemWatcher;

@@ -178,6 +178,10 @@ void mitk::LabelSetImage::Initialize(const mitk::Image *other)
 
 mitk::LabelSetImage::~LabelSetImage()
 {
+  for (auto ls : m_LabelSetContainer)
+  {
+    this->ReleaseLabelSet(ls);
+  }
   m_LabelSetContainer.clear();
 }
 
@@ -199,6 +203,33 @@ unsigned int mitk::LabelSetImage::GetActiveLayer() const
 unsigned int mitk::LabelSetImage::GetNumberOfLayers() const
 {
   return m_LabelSetContainer.size();
+}
+
+void mitk::LabelSetImage::RegisterLabelSet(mitk::LabelSet* ls)
+{
+  // add modified event listener to LabelSet (listen to LabelSet changes)
+  itk::SimpleMemberCommand<Self>::Pointer command = itk::SimpleMemberCommand<Self>::New();
+  command->SetCallbackFunction(this, &mitk::LabelSetImage::OnLabelSetModified);
+  ls->AddObserver(itk::ModifiedEvent(), command);
+
+  ls->AddLabelEvent.AddListener(mitk::MessageDelegate1<LabelSetImage, LabelValueType>(
+    this, &LabelSetImage::OnLabelAdded));
+  ls->ModifyLabelEvent.AddListener(mitk::MessageDelegate1<LabelSetImage, LabelValueType>(
+    this, &LabelSetImage::OnLabelModified));
+  ls->RemoveLabelEvent.AddListener(mitk::MessageDelegate1<LabelSetImage, LabelValueType>(
+    this, &LabelSetImage::OnLabelRemoved));
+}
+
+void mitk::LabelSetImage::ReleaseLabelSet(mitk::LabelSet* ls)
+{
+  ls->RemoveAllObservers();
+
+  ls->AddLabelEvent.RemoveListener(mitk::MessageDelegate1<LabelSetImage, LabelValueType>(
+    this, &LabelSetImage::OnLabelAdded));
+  ls->ModifyLabelEvent.RemoveListener(mitk::MessageDelegate1<LabelSetImage, LabelValueType>(
+    this, &LabelSetImage::OnLabelModified));
+  ls->RemoveLabelEvent.RemoveListener(mitk::MessageDelegate1<LabelSetImage, LabelValueType>(
+    this, &LabelSetImage::OnLabelRemoved));
 }
 
 void mitk::LabelSetImage::RemoveLayer()
@@ -227,6 +258,7 @@ void mitk::LabelSetImage::RemoveLayer()
     this->SetActiveLayer(layerToDelete);
   }
 
+  this->m_GroupRemovedMessage.Send(layerToDelete);
   this->Modified();
 }
 
@@ -248,36 +280,7 @@ unsigned int mitk::LabelSetImage::AddLayer(mitk::LabelSet::Pointer labelSet)
     AccessFixedDimensionByItk(newImage, SetToZero, 4);
   }
 
-  unsigned int newLabelSetId = this->AddLayer(newImage, labelSet);
-
-  return newLabelSetId;
-}
-
-void mitk::LabelSetImage::RegisterLabelSet(mitk::LabelSet* ls)
-{
-  // add modified event listener to LabelSet (listen to LabelSet changes)
-  itk::SimpleMemberCommand<Self>::Pointer command = itk::SimpleMemberCommand<Self>::New();
-  command->SetCallbackFunction(this, &mitk::LabelSetImage::OnLabelSetModified);
-  ls->AddObserver(itk::ModifiedEvent(), command);
-
-  ls->AddLabelEvent.AddListener(mitk::MessageDelegate1<LabelSetImage, LabelValueType>(
-    this, &LabelSetImage::OnLabelAdded));
-  ls->ModifyLabelEvent.AddListener(mitk::MessageDelegate1<LabelSetImage, LabelValueType>(
-    this, &LabelSetImage::OnLabelModified));
-  ls->RemoveLabelEvent.AddListener(mitk::MessageDelegate1<LabelSetImage, LabelValueType>(
-    this, &LabelSetImage::OnLabelRemoved));
-}
-
-void mitk::LabelSetImage::ReleaseLabelSet(mitk::LabelSet* ls)
-{
-  ls->RemoveAllObservers();
-
-  ls->AddLabelEvent.RemoveListener(mitk::MessageDelegate1<LabelSetImage, LabelValueType>(
-    this, &LabelSetImage::OnLabelAdded));
-  ls->ModifyLabelEvent.RemoveListener(mitk::MessageDelegate1<LabelSetImage, LabelValueType>(
-    this, &LabelSetImage::OnLabelModified));
-  ls->RemoveLabelEvent.RemoveListener(mitk::MessageDelegate1<LabelSetImage, LabelValueType>(
-    this, &LabelSetImage::OnLabelRemoved));
+  return this->AddLayer(newImage, labelSet);
 }
 
 unsigned int mitk::LabelSetImage::AddLayer(mitk::Image::Pointer layerImage, mitk::LabelSet::Pointer labelSet)
@@ -346,8 +349,10 @@ void mitk::LabelSetImage::AddLabelSetToLayer(const unsigned int layerIdx, const 
       defaultLabelSet->SetLayer(m_LabelSetContainer.size());
       this->RegisterLabelSet(defaultLabelSet);
       m_LabelSetContainer.push_back(defaultLabelSet);
+      this->m_GroupAddedMessage.Send(m_LabelSetContainer.size()-1);
     }
     m_LabelSetContainer.push_back(clonedLabelSet);
+    this->m_GroupAddedMessage.Send(layerIdx);
   }
 }
 
@@ -458,16 +463,20 @@ void mitk::LabelSetImage::MergeLabel(PixelType pixelValue, PixelType sourcePixel
     mitkThrow() << e.GetDescription();
   }
   GetLabelSet(layer)->SetActiveLabel(pixelValue);
+  this->m_LabelModifiedMessage.Send(sourcePixelValue);
+  this->m_LabelModifiedMessage.Send(pixelValue);
+  this->m_LabelsChangedMessage.Send({ sourcePixelValue, pixelValue });
   Modified();
 }
 
-void mitk::LabelSetImage::MergeLabels(PixelType pixelValue, std::vector<PixelType>& vectorOfSourcePixelValues, unsigned int layer)
+void mitk::LabelSetImage::MergeLabels(PixelType pixelValue, const std::vector<PixelType>& vectorOfSourcePixelValues, unsigned int layer)
 {
   try
   {
     for (unsigned int idx = 0; idx < vectorOfSourcePixelValues.size(); idx++)
     {
       AccessByItk_2(this, MergeLabelProcessing, pixelValue, vectorOfSourcePixelValues[idx]);
+      this->m_LabelModifiedMessage.Send(vectorOfSourcePixelValues[idx]);
     }
   }
   catch (itk::ExceptionObject &e)
@@ -475,6 +484,11 @@ void mitk::LabelSetImage::MergeLabels(PixelType pixelValue, std::vector<PixelTyp
     mitkThrow() << e.GetDescription();
   }
   GetLabelSet(layer)->SetActiveLabel(pixelValue);
+  this->m_LabelModifiedMessage.Send(pixelValue);
+  auto modifiedValues = vectorOfSourcePixelValues;
+  modifiedValues.push_back(pixelValue);
+  this->m_LabelsChangedMessage.Send(modifiedValues);
+
   Modified();
 }
 
@@ -482,14 +496,20 @@ void mitk::LabelSetImage::RemoveLabel(PixelType pixelValue, unsigned int layer)
 {
   this->GetLabelSet(layer)->RemoveLabel(pixelValue);
   this->EraseLabel(pixelValue);
+  this->m_LabelRemovedMessage.Send(pixelValue);
+  this->m_LabelsChangedMessage.Send({ pixelValue });
+  this->m_GroupModifiedMessage.Send(layer);
 }
 
-void mitk::LabelSetImage::RemoveLabels(std::vector<PixelType>& VectorOfLabelPixelValues, unsigned int layer)
+void mitk::LabelSetImage::RemoveLabels(const std::vector<PixelType>& VectorOfLabelPixelValues, unsigned int layer)
 {
   for (unsigned int idx = 0; idx < VectorOfLabelPixelValues.size(); idx++)
   {
     this->RemoveLabel(VectorOfLabelPixelValues[idx], layer);
+    this->m_LabelRemovedMessage.Send(VectorOfLabelPixelValues[idx]);
+    this->m_LabelsChangedMessage.Send({ VectorOfLabelPixelValues[idx] });
   }
+  this->m_GroupModifiedMessage.Send(layer);
 }
 
 void mitk::LabelSetImage::EraseLabel(PixelType pixelValue)
@@ -509,6 +529,9 @@ void mitk::LabelSetImage::EraseLabel(PixelType pixelValue)
   {
     mitkThrow() << e.GetDescription();
   }
+
+  this->m_LabelModifiedMessage.Send(pixelValue);
+  this->m_LabelsChangedMessage.Send({ pixelValue });
   Modified();
 }
 
@@ -1170,6 +1193,7 @@ void mitk::TransferLabelContent(
     }
 
     AccessFixedPixelTypeByItk_n(sourceImageAtTimeStep, TransferLabelContentHelper, (Label::PixelType), (destinationImageAtTimeStep, destinationLabelSet, sourceBackground, destinationBackground, destinationBackgroundLocked, sourceLabel, newDestinationLabel, mergeStyle, overwriteStlye));
+    destinationLabelSet->ModifyLabelEvent.Send(newDestinationLabel);
   }
   destinationImage->Modified();
 }

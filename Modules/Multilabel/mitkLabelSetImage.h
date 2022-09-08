@@ -165,6 +165,7 @@ namespace mitk
     mitkNewMessage1Macro(GroupRemoved, SpatialGroupIndexType);
 
     protected:
+
       void OnLabelAdded(LabelValueType labelValue);
       void OnLabelModified(LabelValueType labelValue);
       void OnLabelRemoved(LabelValueType labelValue);
@@ -204,7 +205,7 @@ namespace mitk
      * @param vectorOfSourcePixelValues   the list of label values that should be merge into the specified one
      * @param layer                       the layer in which the merge should be performed
      */
-    void MergeLabels(PixelType pixelValue, std::vector<PixelType>& vectorOfSourcePixelValues, unsigned int layer = 0);
+    void MergeLabels(PixelType pixelValue, const std::vector<PixelType>& vectorOfSourcePixelValues, unsigned int layer = 0);
 
     /**
       * \brief  */
@@ -227,7 +228,7 @@ namespace mitk
      * @param VectorOfLabelPixelValues a list of pixel values of labels to be removed
      * @param layer the layer from which the labels should be removed
      */
-    void RemoveLabels(std::vector<PixelType> &VectorOfLabelPixelValues, unsigned int layer = 0);
+    void RemoveLabels(const std::vector<PixelType> &VectorOfLabelPixelValues, unsigned int layer = 0);
 
     /**
      * @brief Erases the label with the given value from the labelset image.

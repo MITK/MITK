@@ -65,6 +65,7 @@ public slots:
   *   This functions only changes the appearance of the table widget and no render window update is necessary.
   */
   void UpdateAllTableWidgetItems();
+  void UpdateAllTableWidgetItems(mitk::Label::PixelType);
   /**
   * @brief Resets the current labels in the label set widget table. For each label a widget item is inserted into the table.
   *
@@ -73,6 +74,8 @@ public slots:
   *   As this function is typically used after one label has been removed or the reference node has been changed (e.g.) the render windows have to be updated.
   */
   void ResetAllTableWidgetItems();
+  void ResetAllTableWidgetItems(mitk::Label::PixelType);
+
   void SelectLabelByPixelValue(mitk::Label::PixelType pixelValue);
 
 private slots:

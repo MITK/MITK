@@ -28,6 +28,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkIOUtil.h>
+#include <mitkToolManagerProvider.h>
 
 // Qmitk
 #include "QmitkSegmentationFlowControlView.h"
@@ -118,8 +119,17 @@ void QmitkSegmentationFlowControlView::OnAcceptButtonClicked()
 {
   if (m_Controls->segmentationTaskListWidget->isVisible())
   {
+    auto* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+    int activeToolId = -1;
+
+    if (toolManager != nullptr)
+      activeToolId = toolManager->GetActiveToolID();
+
     m_Controls->segmentationTaskListWidget->SaveActiveTask();
     m_Controls->segmentationTaskListWidget->LoadNextUnfinishedTask();
+
+    if (toolManager != nullptr)
+      toolManager->ActivateTool(activeToolId);
   }
   else
   {

@@ -222,8 +222,11 @@ void mitk::LabelSet::SetNextActiveLabel()
       ++it;
       if (it == m_LabelContainer.end())
       {
-        // end of container; next label is first label
+        // end of container; next label is first label, but...
         it = m_LabelContainer.begin();
+
+        if (m_LabelContainer.size() > 1)
+          ++it; // ...skip background label!
       }
       break; // found the active label; finish loop
     }

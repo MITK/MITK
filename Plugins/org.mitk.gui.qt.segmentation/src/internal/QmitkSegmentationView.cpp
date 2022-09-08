@@ -441,9 +441,9 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    // *------------------------
    // * SHORTCUTS
    // *------------------------
-   QShortcut* visibilityShortcut = new QShortcut(QKeySequence("CTRL+H"), parent);
+   QShortcut* visibilityShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_H), parent);
    connect(visibilityShortcut, &QShortcut::activated, this, &QmitkSegmentationView::OnVisibilityShortcutActivated);
-   QShortcut* labelToggleShortcut = new QShortcut(QKeySequence("CTRL+L"), parent);
+   QShortcut* labelToggleShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_L, Qt::CTRL | Qt::Key::Key_I), parent);
    connect(labelToggleShortcut, &QShortcut::activated, this, &QmitkSegmentationView::OnLabelToggleShortcutActivated);
 
    // *------------------------

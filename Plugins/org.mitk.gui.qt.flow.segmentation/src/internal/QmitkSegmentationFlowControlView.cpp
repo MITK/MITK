@@ -28,6 +28,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkIOUtil.h>
+#include <mitkToolManagerProvider.h>
 
 // Qmitk
 #include "QmitkSegmentationFlowControlView.h"
@@ -37,6 +38,7 @@ found in the LICENSE file.
 // Qt
 #include <QMessageBox>
 #include <QDir>
+#include <QShortcut>
 
 const std::string QmitkSegmentationFlowControlView::VIEW_ID = "org.mitk.views.flow.control";
 
@@ -87,6 +89,12 @@ void QmitkSegmentationFlowControlView::CreateQtPartControl(QWidget* parent)
   connect(m_Controls->segmentationTaskListWidget, &QmitkSegmentationTaskListWidget::ActiveTaskChanged, this, &Self::OnActiveTaskChanged);
   connect(m_Controls->segmentationTaskListWidget, &QmitkSegmentationTaskListWidget::CurrentTaskChanged, this, &Self::OnCurrentTaskChanged);
 
+  auto* prevShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key::Key_S), parent);
+  connect(prevShortcut, &QShortcut::activated, this, &Self::OnStoreInterimResultShortcutActivated);
+
+  auto* nextShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key::Key_A), parent);
+  connect(nextShortcut, &QShortcut::activated, this, &Self::OnAcceptSegmentationShortcutActivated);
+
   m_Controls->btnStore->setIcon(berry::QtStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-save.svg")));
   m_Controls->btnStore->setVisible(false);
 
@@ -111,8 +119,17 @@ void QmitkSegmentationFlowControlView::OnAcceptButtonClicked()
 {
   if (m_Controls->segmentationTaskListWidget->isVisible())
   {
+    auto* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+    int activeToolId = -1;
+
+    if (toolManager != nullptr)
+      activeToolId = toolManager->GetActiveToolID();
+
     m_Controls->segmentationTaskListWidget->SaveActiveTask();
     m_Controls->segmentationTaskListWidget->LoadNextUnfinishedTask();
+
+    if (toolManager != nullptr)
+      toolManager->ActivateTool(activeToolId);
   }
   else
   {
@@ -178,4 +195,14 @@ void QmitkSegmentationFlowControlView::NodeRemoved(const mitk::DataNode* node)
 {
   if (dynamic_cast<const mitk::LabelSetImage*>(node->GetData()) != nullptr)
     this->UpdateControls();
+}
+
+void QmitkSegmentationFlowControlView::OnStoreInterimResultShortcutActivated()
+{
+  m_Controls->btnStore->click();
+}
+
+void QmitkSegmentationFlowControlView::OnAcceptSegmentationShortcutActivated()
+{
+  m_Controls->btnStoreAndAccept->click();
 }

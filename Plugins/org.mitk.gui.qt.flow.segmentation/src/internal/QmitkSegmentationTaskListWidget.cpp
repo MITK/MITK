@@ -33,6 +33,7 @@ found in the LICENSE file.
 
 #include <QFileSystemWatcher>
 #include <QMessageBox>
+#include <QShortcut>
 
 #include <filesystem>
 
@@ -123,6 +124,15 @@ QmitkSegmentationTaskListWidget::QmitkSegmentationTaskListWidget(QWidget* parent
   connect(m_Ui->loadButton, &QPushButton::clicked, this, &Self::OnLoadButtonClicked);
 
   connect(m_FileSystemWatcher, &QFileSystemWatcher::directoryChanged, this, &Self::OnResultDirectoryChanged);
+
+  auto* prevShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key::Key_P), this);
+  connect(prevShortcut, &QShortcut::activated, this, &Self::OnPreviousTaskShortcutActivated);
+
+  auto* nextShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key::Key_N), this);
+  connect(nextShortcut, &QShortcut::activated, this, &Self::OnNextTaskShortcutActivated);
+
+  auto* loadShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key::Key_L), this);
+  connect(loadShortcut, &QShortcut::activated, this, &Self::OnLoadTaskShortcutActivated);
 
   this->OnSelectionChanged(m_Ui->selectionWidget->GetSelectedNodes());
 }
@@ -295,6 +305,7 @@ void QmitkSegmentationTaskListWidget::OnPreviousButtonClicked()
  */
 void QmitkSegmentationTaskListWidget::OnNextButtonClicked()
 {
+  MITK_INFO << "NEXT";
   const auto maxIndex = m_TaskList->GetNumberOfTasks() - 1;
   auto current = m_CurrentTaskIndex.value();
 
@@ -784,4 +795,19 @@ void QmitkSegmentationTaskListWidget::SaveActiveTask(bool saveAsIntermediateResu
 bool QmitkSegmentationTaskListWidget::OnPreShutdown()
 {
   return this->HandleUnsavedChanges(QStringLiteral("Application shutdown"));
+}
+
+void QmitkSegmentationTaskListWidget::OnPreviousTaskShortcutActivated()
+{
+  m_Ui->previousButton->click();
+}
+
+void QmitkSegmentationTaskListWidget::OnNextTaskShortcutActivated()
+{
+  m_Ui->nextButton->click();
+}
+
+void QmitkSegmentationTaskListWidget::OnLoadTaskShortcutActivated()
+{
+  m_Ui->loadButton->click();
 }

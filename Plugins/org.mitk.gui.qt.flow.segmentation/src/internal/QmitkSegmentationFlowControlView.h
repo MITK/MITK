@@ -61,6 +61,8 @@ protected slots:
     void OnAcceptButtonClicked();
     void OnActiveTaskChanged(const std::optional<size_t>& index);
     void OnCurrentTaskChanged(const std::optional<size_t>& index);
+    void OnStoreInterimResultShortcutActivated();
+    void OnAcceptSegmentationShortcutActivated();
 
 protected:
     void SetFocus() override;

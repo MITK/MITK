@@ -212,24 +212,16 @@ void mitk::LabelSet::RemoveAllLabels()
 
 void mitk::LabelSet::SetNextActiveLabel()
 {
-  auto it = m_LabelContainer.begin();
+  auto it = m_LabelContainer.find(m_ActiveLabelValue);
 
-  for (; it != m_LabelContainer.end(); ++it)
+  if (it != m_LabelContainer.end())
+    ++it;
+
+  if (it == m_LabelContainer.end())
   {
-    if (it->first == m_ActiveLabelValue)
-    {
-      // go to next label
-      ++it;
-      if (it == m_LabelContainer.end())
-      {
-        // end of container; next label is first label, but...
-        it = m_LabelContainer.begin();
-
-        if (m_LabelContainer.size() > 1)
-          ++it; // ...skip background label!
-      }
-      break; // found the active label; finish loop
-    }
+    it = m_LabelContainer.begin();
+    if (m_LabelContainer.size() > 1)
+      ++it; // ...skip background label!
   }
 
   SetActiveLabel(it->first);

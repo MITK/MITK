@@ -60,12 +60,13 @@ public:
 
 private:
   void OnAccept();
-  void OnSuggestionSelected(const QString& name);
+  void OnSuggestionSelected();
   void OnColorButtonClicked();
+  void OnTextChanged(const QString& text);
 
   void SetSuggestions(const SuggestionsType& suggestions, bool replaceStandardSuggestions = false);
   void UpdateColorButtonBackground();
-  void UpdateCompleterModel();
+  void UpdateNameList();
 
   Ui::QmitkNewSegmentationDialog* m_Ui;
 

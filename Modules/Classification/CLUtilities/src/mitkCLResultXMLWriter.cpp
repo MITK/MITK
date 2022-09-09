@@ -194,7 +194,7 @@ void WriteDocument(std::ostream& stream, const mitk::Image* image, const mitk::I
   doc.InsertEndChild(doc.NewDeclaration());
 
   auto* rootNode = doc.NewElement("mp:measurement");
-  rootNode->SetAttribute("xmlns:mp", "http://www.mitk.org/Phenotyping");
+  rootNode->SetAttribute("xmlns:mp", "https://www.mitk.org/Phenotyping");
   doc.InsertEndChild(rootNode);
 
   auto* methodNode = doc.NewElement("mp:measurementMethod");

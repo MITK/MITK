@@ -292,7 +292,7 @@ mitk::EquiDistantBlocksSorter
 
   if (m_ToleratedOriginOffset > 0.5)
   {
-    MITK_WARN << "EquiDistantBlocksSorter is now accepting large errors, take care of measurements, they could appear at unprecise locations!";
+    MITK_WARN << "EquiDistantBlocksSorter is now accepting large errors, take care of measurements, they could appear at imprecise locations!";
   }
 }
 

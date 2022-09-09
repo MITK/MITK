@@ -484,7 +484,7 @@ namespace berry
      * Returns the <code>QByteArray</code> value represented by the <code>QString</code>
      * object associated with the specified <code>key</code> in this node. Valid
      * <code>QString</code> objects are <i>Base64 </i> encoded binary data, as
-     * defined in <a href="http://www.ietf.org/rfc/rfc2045.txt">RFC 2045 </a>,
+     * defined in <a href="https://www.ietf.org/rfc/rfc2045.txt">RFC 2045 </a>,
      * Section 6.8, with one minor change: the string must consist solely of
      * characters from the <i>Base64 Alphabet </i>; no newline characters or
      * extraneous characters are permitted. This method is intended for use in

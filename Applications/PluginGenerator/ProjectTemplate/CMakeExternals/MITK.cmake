@@ -17,7 +17,7 @@ if(NOT MITK_DIR)
   option(MITK_BUILD_EXAMPLES "Build the MITK examples" OFF)
   option(MITK_BUILD_ALL_PLUGINS "Build all MITK plugins" OFF)
   option(MITK_BUILD_TESTING "Build the MITK unit tests" OFF)
-  option(MITK_USE_OpenMesh "" OFF)
+  option(MITK_USE_ACVD "Use Approximated Centroidal Voronoi Diagrams" OFF)
   option(MITK_USE_CTK "Use CTK in MITK" ${MITK_USE_BLUEBERRY})
   option(MITK_USE_DCMTK "Use DCMTK in MITK" ON)
   option(MITK_USE_Qt5 "Use Qt 5 library in MITK" ON)
@@ -36,7 +36,6 @@ if(NOT MITK_DIR)
   endif()
 
   set(MITK_USE_CableSwig ${MITK_USE_Python3})
-  set(MITK_USE_GDCM 1)
   set(MITK_USE_ITK 1)
   set(MITK_USE_VTK 1)
 
@@ -50,7 +49,7 @@ if(NOT MITK_DIR)
     MITK_USE_BLUEBERRY
     MITK_BUILD_EXAMPLES
     MITK_BUILD_ALL_PLUGINS
-    MITK_USE_OpenMesh
+    MITK_USE_ACVD
     MITK_USE_CTK
     MITK_USE_DCMTK
     MITK_USE_Qt5
@@ -93,7 +92,7 @@ if(NOT MITK_DIR)
   # Create options to inject pre-build dependencies
   #-----------------------------------------------------------------------------
 
-  foreach(proj CTK DCMTK DCMQI GDCM VTK OpenMesh ITK OpenCV CableSwig)
+  foreach(proj CTK DCMTK DCMQI VTK ACVD ITK OpenCV CableSwig)
     if(MITK_USE_${proj})
       set(MITK_${proj}_DIR "${${proj}_DIR}" CACHE PATH "Path to ${proj} build directory")
       mark_as_advanced(MITK_${proj}_DIR)

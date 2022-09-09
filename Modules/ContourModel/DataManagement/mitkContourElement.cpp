@@ -104,7 +104,7 @@ void mitk::ContourElement::AddVertexAtFront(const mitk::Point3D &vertex, bool is
 
 void mitk::ContourElement::InsertVertexAtIndex(const mitk::Point3D &vertex, bool isControlPoint, VertexSizeType index)
 {
-  if (this->GetSize() > index)
+  if (this->GetSize() >= index)
   {
     auto _where = this->m_Vertices.begin();
     _where += index;
@@ -287,7 +287,17 @@ bool mitk::ContourElement::IsClosed() const
   return this->m_IsClosed;
 }
 
-bool mitk::ContourElement::IsNearContour(const mitk::Point3D &point, float eps) const
+bool mitk::ContourElement::IsNearContour(const mitk::Point3D& point, float eps) const
+{
+  VertexSizeType segmentStartIndex;
+  VertexSizeType segmentEndIndex;
+  mitk::Point3D closestContourPoint;
+
+  return GetLineSegmentForPoint(point, eps, segmentStartIndex, segmentEndIndex, closestContourPoint, false);
+}
+
+bool mitk::ContourElement::GetLineSegmentForPoint(const mitk::Point3D& point,
+  float eps, VertexSizeType& segmentStartIndex, VertexSizeType& segmentEndIndex, mitk::Point3D& closestContourPoint, bool findClosest) const
 {
   ConstVertexIterator it1 = this->m_Vertices.begin();
   ConstVertexIterator it2 = this->m_Vertices.begin();
@@ -295,9 +305,9 @@ bool mitk::ContourElement::IsNearContour(const mitk::Point3D &point, float eps) 
 
   ConstVertexIterator end = this->m_Vertices.end();
 
-  int counter = 0;
-
-  for (; it1 != end; it1++, it2++, counter++)
+  bool closePointFound = false;
+  double closestDistance = std::numeric_limits<double>::max();
+  for (; it1 != end; it1++, it2++)
   {
     if (it2 == end)
       it2 = this->m_Vertices.begin();
@@ -314,22 +324,64 @@ bool mitk::ContourElement::IsNearContour(const mitk::Point3D &point, float eps) 
 
     // take into account we have line segments and not (infinite) lines
     if (tc < 0.0)
+    {
       tc = 0.0;
+    }
     if (tc > 1.0)
+    {
       tc = 1.0;
+    }
 
     mitk::Point3D crossPoint = v1 + v2_v1 * tc;
 
     double distance = point.SquaredEuclideanDistanceTo(crossPoint);
 
-    if (distance < eps)
+    if (distance < eps && distance < closestDistance)
     {
-      return true;
+      closestDistance = distance;
+      closePointFound = true;
+      closestContourPoint = crossPoint;
+      segmentStartIndex = std::distance(this->m_Vertices.begin(), it1);
+      segmentEndIndex = std::distance(this->m_Vertices.begin(), it2);
+      if (!findClosest)
+      {
+        return true;
+      }
     }
   }
 
-  return false;
+  return closePointFound;
 }
+
+bool mitk::ContourElement::GetLineSegmentForPoint(const mitk::Point3D &point,
+                                                  float eps,
+                                                  mitk::ContourElement::VertexType *previousVertex,
+                                                  mitk::ContourElement::VertexType *nextVertex) const
+{
+  VertexSizeType segmentStartIndex;
+  VertexSizeType segmentEndIndex;
+  mitk::Point3D closestContourPoint;
+
+  auto result = GetLineSegmentForPoint(point, eps, segmentStartIndex, segmentEndIndex, closestContourPoint, true);
+
+  if (result)
+  {
+    ConstVertexIterator it1 = this->m_Vertices.begin() + segmentStartIndex;
+    ConstVertexIterator it2 = this->m_Vertices.begin() + segmentEndIndex;
+    if (previousVertex)
+    {
+      previousVertex->Coordinates = (*it1)->Coordinates;
+      previousVertex->IsControlPoint = (*it1)->IsControlPoint;
+    }
+    if (nextVertex)
+    {
+      nextVertex->Coordinates = (*it2)->Coordinates;
+      nextVertex->IsControlPoint = (*it2)->IsControlPoint;
+    }
+  }
+  return result;
+}
+
 
 void mitk::ContourElement::Close()
 {

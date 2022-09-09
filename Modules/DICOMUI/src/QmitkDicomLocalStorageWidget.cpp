@@ -20,6 +20,8 @@ found in the LICENSE file.
 #include <QProgressDialog>
 #include <QVariant>
 
+#include <ctkDICOMIndexer.h>
+
 const std::string QmitkDicomLocalStorageWidget::Widget_ID = "org.mitk.Widgets.QmitkDicomLocalStorageWidget";
 
 QmitkDicomLocalStorageWidget::QmitkDicomLocalStorageWidget(QWidget *parent)

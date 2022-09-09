@@ -27,7 +27,7 @@ found in the LICENSE file.
 namespace mitk
 {
 // TODO Philips3D!
-// TODO http://bugs.mitk.org/show_bug.cgi?id=11572 ?
+// TODO https://phabricator.mitk.org/T11572 ?
 
 /**
   \ingroup DICOMModule
@@ -107,7 +107,7 @@ public:
    * Empty value is default and will imply to use the found DICOMTagPath as property name.*/
   typedef DICOMImageBlockDescriptor::AdditionalTagsMapType AdditionalTagsMapType;
   /**
-  * \brief Set a list of DICOMTagPaths that specifiy all DICOM-Tags that will be copied into the property of the mitk::Image.
+  * \brief Set a list of DICOMTagPaths that specify all DICOM-Tags that will be copied into the property of the mitk::Image.
   *
   * This method can be used to specify a list of DICOM-tags that shall be available after the loading.
   * The value in the tagMap is an optional user defined name for the property key that should be used

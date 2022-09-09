@@ -12,7 +12,6 @@ found in the LICENSE file.
 
 #include "../DataManagement/mitkBoundingShapeUtil.h"
 #include <mitkBoundingShapeInteractor.h>
-#include <mitkDisplayInteractor.h>
 #include <mitkDisplayActionEventBroadcast.h>
 #include <mitkInteractionConst.h>
 #include <mitkInteractionEventObserver.h>
@@ -43,7 +42,7 @@ namespace mitk
   class BoundingShapeInteractor::Impl
   {
   public:
-    Impl() : ScrollEnabled(false), RotationEnabled(false)
+    Impl() : OriginalInteractionEnabled(false), RotationEnabled(false)
     {
       Point3D initialPoint;
       initialPoint.Fill(0.0);
@@ -53,7 +52,7 @@ namespace mitk
     }
 
     ~Impl() {}
-    bool ScrollEnabled;
+    bool OriginalInteractionEnabled;
     Point3D InitialPickedWorldPoint;
     Point3D LastPickedWorldPoint;
     Point2D InitialPickedDisplayPoint;
@@ -61,7 +60,7 @@ namespace mitk
     Handle ActiveHandle;
     Geometry3D::Pointer OriginalGeometry;
     bool RotationEnabled;
-    std::map<us::ServiceReferenceU, mitk::EventConfig> DisplayInteractorConfigs;
+    std::map<us::ServiceReferenceU, mitk::EventConfig> DisplayInteractionConfigs;
   };
 }
 
@@ -303,7 +302,7 @@ bool mitk::BoundingShapeInteractor::CheckOverHandles(const InteractionEvent *int
 
 void mitk::BoundingShapeInteractor::SelectHandle(StateMachineAction *, InteractionEvent *)
 {
-  this->DisableCrosshairNavigation();
+  this->DisableOriginalInteraction();
   DataNode::Pointer node = this->GetDataNode();
 
   if (node.IsNull())
@@ -323,7 +322,7 @@ void mitk::BoundingShapeInteractor::SelectHandle(StateMachineAction *, Interacti
 
 void mitk::BoundingShapeInteractor::DeselectHandles(StateMachineAction *, InteractionEvent *)
 {
-  this->DisableCrosshairNavigation();
+  this->DisableOriginalInteraction();
   DataNode::Pointer node = this->GetDataNode();
 
   if (node.IsNull())
@@ -339,7 +338,7 @@ void mitk::BoundingShapeInteractor::DeselectHandles(StateMachineAction *, Intera
 
 void mitk::BoundingShapeInteractor::SelectObject(StateMachineAction *, InteractionEvent *)
 {
-  this->DisableCrosshairNavigation(); // disable crosshair interaction and scolling if user is hovering over the object
+  this->DisableOriginalInteraction(); // disable crosshair interaction and scolling if user is hovering over the object
   DataNode::Pointer node = this->GetDataNode();
 
   if (node.IsNull())
@@ -359,7 +358,7 @@ void mitk::BoundingShapeInteractor::SelectObject(StateMachineAction *, Interacti
 
 void mitk::BoundingShapeInteractor::DeselectObject(StateMachineAction *, InteractionEvent *)
 {
-  this->EnableCrosshairNavigation(); // enable crosshair interaction and scolling if user is hovering over the object
+  this->EnableOriginalInteraction(); // enable crosshair interaction and scolling if user is hovering over the object
 
   DataNode::Pointer node = this->GetDataNode();
 
@@ -549,80 +548,58 @@ void mitk::BoundingShapeInteractor::RestoreNodeProperties()
   inputNode->SetProperty(boundingShapePropertyName, mitk::BoolProperty::New(false));
   inputNode->GetPropertyList()->DeleteProperty(activeHandleIdPropertyName);
 
-  EnableCrosshairNavigation();
+  EnableOriginalInteraction();
   // update rendering
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void mitk::BoundingShapeInteractor::EnableCrosshairNavigation()
+void mitk::BoundingShapeInteractor::EnableOriginalInteraction()
 {
-  // enable the crosshair navigation
   // Re-enabling InteractionEventObservers that have been previously disabled for legacy handling of Tools
   // in new interaction framework
-  for (auto it = m_Impl->DisplayInteractorConfigs.begin();
-       it != m_Impl->DisplayInteractorConfigs.end();
-       ++it)
+  for (const auto& displayInteractionConfig : m_Impl->DisplayInteractionConfigs)
   {
-    if (it->first)
+    if (displayInteractionConfig.first)
     {
-      mitk::DisplayInteractor *displayInteractor = static_cast<mitk::DisplayInteractor *>(
-        us::GetModuleContext()->GetService<mitk::InteractionEventObserver>(it->first));
-      if (displayInteractor != nullptr)
-      {
-        // here the regular configuration is loaded again
-        displayInteractor->SetEventConfig(it->second);
-      }
+      auto displayActionEventBroadcast = static_cast<mitk::DisplayActionEventBroadcast *>(
+        us::GetModuleContext()->GetService<mitk::InteractionEventObserver>(displayInteractionConfig.first));
 
-      mitk::DisplayActionEventBroadcast *displayActionEventBroadcast = static_cast<mitk::DisplayActionEventBroadcast *>(
-        us::GetModuleContext()->GetService<mitk::InteractionEventObserver>(it->first));
-      if (displayActionEventBroadcast != nullptr)
+      if (nullptr != displayActionEventBroadcast)
       {
         // here the regular configuration is loaded again
-        displayActionEventBroadcast->SetEventConfig(it->second);
+        displayActionEventBroadcast->SetEventConfig(displayInteractionConfig.second);
       }
     }
   }
-  m_Impl->DisplayInteractorConfigs.clear();
-  m_Impl->ScrollEnabled = true;
+
+  m_Impl->DisplayInteractionConfigs.clear();
+  m_Impl->OriginalInteractionEnabled = true;
 }
 
-void mitk::BoundingShapeInteractor::DisableCrosshairNavigation()
+void mitk::BoundingShapeInteractor::DisableOriginalInteraction()
 {
   // dont deactivate twice, else we will clutter the config list ...
-  if (m_Impl->ScrollEnabled == false)
+  if (false == m_Impl->OriginalInteractionEnabled)
     return;
 
-  // As a legacy solution the display interaction of the new interaction framework is disabled here  to avoid conflicts
+  // As a legacy solution the display interaction of the new interaction framework is disabled here to avoid conflicts
   // with tools
   // Note: this only affects InteractionEventObservers (formerly known as Listeners) all DataNode specific interaction
   // will still be enabled
-  m_Impl->DisplayInteractorConfigs.clear();
-  std::vector<us::ServiceReference<mitk::InteractionEventObserver>> listEventObserver =
-    us::GetModuleContext()->GetServiceReferences<mitk::InteractionEventObserver>();
-  for (auto it = listEventObserver.begin();
-       it != listEventObserver.end();
-       ++it)
+  m_Impl->DisplayInteractionConfigs.clear();
+  auto eventObservers = us::GetModuleContext()->GetServiceReferences<mitk::InteractionEventObserver>();
+  for (const auto& eventObserver : eventObservers)
   {
-    auto *displayInteractor =
-      dynamic_cast<mitk::DisplayInteractor *>(us::GetModuleContext()->GetService<mitk::InteractionEventObserver>(*it));
-    if (displayInteractor != nullptr)
+    auto *displayActionEventBroadcast = dynamic_cast<mitk::DisplayActionEventBroadcast *>(
+      us::GetModuleContext()->GetService<mitk::InteractionEventObserver>(eventObserver));
+    if (nullptr != displayActionEventBroadcast)
     {
       // remember the original configuration
-      m_Impl->DisplayInteractorConfigs.insert(std::make_pair(*it, displayInteractor->GetEventConfig()));
-      // here the alternative configuration is loaded
-      displayInteractor->AddEventConfig("DisplayConfigBlockLMB.xml");
-    }
-
-    auto *displayActionEventBroadcast =
-      dynamic_cast<mitk::DisplayActionEventBroadcast *>(us::GetModuleContext()->GetService<mitk::InteractionEventObserver>(*it));
-    if (displayActionEventBroadcast != nullptr)
-    {
-      // remember the original configuration
-      m_Impl->DisplayInteractorConfigs.insert(std::make_pair(*it, displayActionEventBroadcast->GetEventConfig()));
+      m_Impl->DisplayInteractionConfigs.insert(std::make_pair(eventObserver, displayActionEventBroadcast->GetEventConfig()));
       // here the alternative configuration is loaded
       displayActionEventBroadcast->AddEventConfig("DisplayConfigBlockLMB.xml");
     }
   }
 
-  m_Impl->ScrollEnabled = false;
+  m_Impl->OriginalInteractionEnabled = false;
 }

@@ -43,7 +43,7 @@ namespace mitk
   *   \brief An object of this class represents the a Tool tracked by Optitrack System. You can define
   *  the tool by the a definition file like in the example in ****. Remember that it will be necessary to
   *  to have a license for using the Optitrack System.
-  *  See  http://www.naturalpoint.com/ for details.
+  *  See  https://www.naturalpoint.com/ for details.
   *   \author E. Marinetto (emarinetto@hggm.es) Instituto de Investigación Sanitaria Gregorio Marañón, Madrid, Spain. & M. Noll (matthias.noll@igd.fraunhofer.de) Cognitive Computing & Medical Imaging | Fraunhofer IGD
   *   \ingroup IGT
   */

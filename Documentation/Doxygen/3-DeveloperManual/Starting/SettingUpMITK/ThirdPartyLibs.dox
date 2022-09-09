@@ -3,6 +3,10 @@
 
 The following third-party libraries can be used with MITK by default and can, in part, be automatically downloaded during superbuild.
 
+\par ACVD
+
+https://www.creatis.insa-lyon.fr/~valette/public/project/acvd/
+
 \par ANN
 
 https://www.cs.umd.edu/~mount/ANN/
@@ -29,7 +33,7 @@ https://dicom.offis.de/dcmtk
 
 \par Eigen
 
-http://eigen.tuxfamily.org/index.php?title=Main_Page
+https://eigen.tuxfamily.org/index.php?title=Main_Page
 
 \par GDCM
 
@@ -67,10 +71,6 @@ https://opencv.org/
 
 http://openigtlink.org/
 
-\par OpenMesh
-
-https://www.openmesh.org/
-
 \par PCRE
 
 https://www.pcre.org/
@@ -89,15 +89,15 @@ https://www.qt.io/
 
 \par Qwt
 
-http://qwt.sourceforge.net/
+https://qwt.sourceforge.io/
 
 \par SWIG
 
-http://www.swig.org/
+https://www.swig.org/
 
 \par TinyXML-2
 
-http://www.grinninglizard.com/tinyxml2/
+https://www.grinninglizard.com/tinyxml2/
 
 \par VIGRA
 

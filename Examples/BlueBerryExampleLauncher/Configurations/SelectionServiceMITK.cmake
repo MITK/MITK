@@ -15,5 +15,5 @@ The following features are demonstrated:
 <li> reimplementation of the selection listener method </li>
 </ul>
 
-See the main <a href=\"http://docs.mitk.org/nightly/BlueBerrySelectionServiceIntro.html\">documentation</a> for details."
+See the main <a href=\"https://docs.mitk.org/nightly/BlueBerrySelectionServiceIntro.html\">documentation</a> for details."
 )

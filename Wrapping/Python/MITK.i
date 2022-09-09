@@ -68,7 +68,7 @@ def _get_mitk_pixelid(numpy_array_type):
         raise TypeError('dtype: {0} is not supported.'.format(numpy_array_type.dtype))
 
 def _get_sitk_vector_pixelid(numpy_array_type):
-    """Returns a MITK vecotr PixelID given a numpy array."""
+    """Returns a MITK vector PixelID given a numpy array."""
 
     if not HAVE_NUMPY:
         raise ImportError('Numpy not available.')

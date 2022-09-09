@@ -52,4 +52,4 @@ When building the C++ Micro Services library, you have a few configuration optio
 The above options are mainly useful when embedding the C++ Micro Services source code in your own library and
 you want to make it look like native source code.
 
-[cmake]: http://www.cmake.org
+[cmake]: https://www.cmake.org

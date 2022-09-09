@@ -112,7 +112,7 @@ mitk::SortByImagePositionPatient
 
   //   we tolerate very small differences in image orientation, since we got to know about
   //   acquisitions where these values change across a single series (7th decimal digit)
-  //   (http://bugs.mitk.org/show_bug.cgi?id=12263)
+  //   (https://phabricator.mitk.org/T12263)
   //   still, we want to check if our assumption of 'almost equal' orientations is valid
   for (unsigned int dim = 0; dim < 3; ++dim)
   {

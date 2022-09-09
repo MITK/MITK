@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include "mitkImageToImageFilter.h"
 #include <MitkToFProcessingExports.h>
 #include <itkBilateralImageFilter.h>
-#include "opencv2/core.hpp"
+#include <opencv2/core/types_c.h>
 
 typedef itk::Image<float, 2> ItkImageType2D;
 typedef itk::Image<float, 3> ItkImageType3D;
@@ -132,17 +132,14 @@ namespace mitk
     void ProcessSegmentation(IplImage* inputIplImage);
     /*!
     \brief Applies the ITK bilateral filter to the input image
-    See http://www.itk.org/Doxygen320/html/classitk_1_1BilateralImageFilter.html for more details.
     */
     ItkImageType2D::Pointer ProcessItkBilateralFilter(ItkImageType2D::Pointer inputItkImage);
     /*!
     \brief Applies the OpenCV bilateral filter to the input image.
-    See http://opencv.willowgarage.com/documentation/c/image_filtering.html#smooth for more details
     */
     void ProcessCVBilateralFilter(IplImage* inputIplImage, IplImage* outputIplImage);
     /*!
     \brief Applies the OpenCV median filter to the input image.
-    See http://opencv.willowgarage.com/documentation/c/image_filtering.html#smooth for more details
     */
     void ProcessCVMedianFilter(IplImage* inputIplImage, IplImage* outputIplImage, int radius = 3);
     /*!

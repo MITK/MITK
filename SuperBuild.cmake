@@ -3,7 +3,7 @@
 #-----------------------------------------------------------------------------
 
 if(NOT MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL)
-  set(MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL http://mitk.org/download/thirdparty)
+  set(MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL https://www.mitk.org/download/thirdparty)
 endif()
 
 macro(downloadFile url dest)

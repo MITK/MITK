@@ -57,6 +57,8 @@ namespace mitk
 
     us::PrototypeServiceFactory *m_PrototypeFactory;
     us::ServiceRegistration<IFileReader> m_Reg;
+
+    const PropertyList* m_Properties;
   };
 
   AbstractFileReader::AbstractFileReader() : d(new Impl) {}
@@ -287,6 +289,16 @@ namespace mitk
     d->RemoveProgressCallback(callback);
   }
 
+  void AbstractFileReader::SetProperties(const PropertyList* properties)
+  {
+    d->m_Properties = properties;
+  }
+
+  const PropertyList* AbstractFileReader::GetProperties() const
+  {
+    return d->m_Properties;
+  }
+
   ////////////////// µS related Getters //////////////////
 
   const CustomMimeType *AbstractFileReader::GetMimeType() const { return d->GetMimeType(); }
@@ -303,7 +315,7 @@ namespace mitk
     }
 
     // name already defined?
-    mitk::StringProperty::Pointer nameProp = dynamic_cast<mitk::StringProperty *>(node->GetProperty("name"));
+    mitk::StringProperty::Pointer nameProp = dynamic_cast<mitk::StringProperty *>(node->GetProperty("name", nullptr, false));
     if (nameProp.IsNull() || nameProp->GetValue() == DataNode::NO_NAME_VALUE())
     {
       // name already defined in BaseData
@@ -315,12 +327,6 @@ namespace mitk
         auto name = this->GetRegisteredMimeType().GetFilenameWithoutExtension(filePath);
         name = Utf8Util::Local8BitToUtf8(name);
         nameProp = mitk::StringProperty::New(name);
-        node->SetProperty("name", nameProp);
-      }
-      else
-      {
-        // name defined in BaseData!
-        nameProp = mitk::StringProperty::New(baseDataNameProp->GetValue());
         node->SetProperty("name", nameProp);
       }
     }

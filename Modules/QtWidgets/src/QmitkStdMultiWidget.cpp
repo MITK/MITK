@@ -764,18 +764,18 @@ void QmitkStdMultiWidget::CreateRenderWindowWidgets()
   SetActiveRenderWindowWidget(renderWindowWidget1);
 
   // connect to the "time navigation controller": send time via sliceNavigationControllers
-  m_TimeNavigationController->ConnectGeometryTimeEvent(renderWindow1->GetSliceNavigationController(), false);
-  m_TimeNavigationController->ConnectGeometryTimeEvent(renderWindow2->GetSliceNavigationController(), false);
-  m_TimeNavigationController->ConnectGeometryTimeEvent(renderWindow3->GetSliceNavigationController(), false);
-  m_TimeNavigationController->ConnectGeometryTimeEvent(renderWindow4->GetSliceNavigationController(), false);
+  m_TimeNavigationController->ConnectGeometryTimeEvent(renderWindow1->GetSliceNavigationController());
+  m_TimeNavigationController->ConnectGeometryTimeEvent(renderWindow2->GetSliceNavigationController());
+  m_TimeNavigationController->ConnectGeometryTimeEvent(renderWindow3->GetSliceNavigationController());
+  m_TimeNavigationController->ConnectGeometryTimeEvent(renderWindow4->GetSliceNavigationController());
   renderWindow1->GetSliceNavigationController()->ConnectGeometrySendEvent(
     mitk::BaseRenderer::GetInstance(renderWindow4->renderWindow()));
 
   // reverse connection between sliceNavigationControllers and timeNavigationController
-  renderWindow1->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
-  renderWindow2->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
-  renderWindow3->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
-  //renderWindow4->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
+  renderWindow1->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController);
+  renderWindow2->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController);
+  renderWindow3->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController);
+  //renderWindow4->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController);
 
   auto layoutManager = GetMultiWidgetLayoutManager();
   connect(renderWindow1, &QmitkRenderWindow::ResetView, this, &QmitkStdMultiWidget::ResetCrosshair);

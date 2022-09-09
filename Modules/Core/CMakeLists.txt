@@ -4,10 +4,6 @@ set(TOOL_CPPS "")
 set_source_files_properties( src/DataManagement/mitkImage.cpp COMPILE_FLAGS -DMITK_NO_DEPRECATED_WARNINGS )
 set_source_files_properties( src/Controllers/mitkSliceNavigationController.cpp COMPILE_FLAGS -DMITK_NO_DEPRECATED_WARNINGS )
 
-#if(MSVC)
-#  set(optional_private_package_depends psapi)
-#endif()
-
 mitk_create_module(
   INCLUDE_DIRS
     PUBLIC

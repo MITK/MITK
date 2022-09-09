@@ -35,6 +35,7 @@ namespace mitk
       \brief tries to create one DataNode from a given XML \<node\> element
     */
     DataNode::Pointer LoadBaseDataFromDataTag(const tinyxml2::XMLElement *dataElement,
+                                              const PropertyList *properties,
                                               const std::string &workingDirectory,
                                               bool &error);
 
@@ -55,15 +56,6 @@ namespace mitk
       Those exceptions are documented directly in the code of the method.
     */
     void ClearNodePropertyListWithExceptions(DataNode &node, PropertyList &propertyList);
-
-    /**
-      \brief reads all properties assigned to a base data element and assigns the list to the base data object
-
-      The baseDataNodeElem is supposed to be the \c \<properties file="..."\> element.
-    */
-    bool DecorateBaseDataWithProperties(BaseData::Pointer data,
-                                        const tinyxml2::XMLElement *baseDataNodeElem,
-                                        const std::string &workingDir);
 
     typedef std::pair<DataNode::Pointer, std::list<std::string>> NodesAndParentsPair;
     typedef std::list<NodesAndParentsPair> OrderedNodesList;

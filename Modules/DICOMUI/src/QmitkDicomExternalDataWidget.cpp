@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include <mitkLogMacros.h>
 
 // CTK
+#include <ctkDICOMIndexer.h>
 #include <ctkFileDialog.h>
 
 // Qt

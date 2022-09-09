@@ -381,13 +381,13 @@ namespace mitk
     {
 #ifdef US_PLATFORM_WINDOWS
       char tempPathTestBuffer[1];
-      DWORD bufferLength = ::GetTempPath(1, tempPathTestBuffer);
+      DWORD bufferLength = GetTempPathA(1, tempPathTestBuffer);
       if (bufferLength == 0)
       {
         mitkThrow() << GetLastErrorStr();
       }
       std::vector<char> tempPath(bufferLength);
-      bufferLength = ::GetTempPath(bufferLength, &tempPath[0]);
+      bufferLength = GetTempPathA(bufferLength, &tempPath[0]);
       if (bufferLength == 0)
       {
         mitkThrow() << GetLastErrorStr();
@@ -668,6 +668,8 @@ namespace mitk
         break;
       }
 
+      reader->SetProperties(loadInfo.m_Properties);
+
       // Do the actual reading
       try
       {
@@ -767,6 +769,22 @@ namespace mitk
     data = reader->Read();
 
     return data;
+  }
+
+  BaseData::Pointer IOUtil::Load(const std::string& path, const PropertyList* properties)
+  {
+    LoadInfo loadInfo(path);
+    loadInfo.m_Properties = properties;
+
+    std::vector<LoadInfo> loadInfos;
+    loadInfos.push_back(loadInfo);
+
+    auto errMsg = Load(loadInfos, nullptr, nullptr, nullptr);
+
+    if (!errMsg.empty())
+      mitkThrow() << errMsg;
+
+    return loadInfos.front().m_Output.front();
   }
 
   void IOUtil::Save(const BaseData *data, const std::string &path, bool setPathProperty) { Save(data, path, IFileWriter::Options(), setPathProperty); }
@@ -987,5 +1005,11 @@ namespace mitk
     return r < 0;
   }
 
-  IOUtil::LoadInfo::LoadInfo(const std::string &path) : m_Path(path), m_ReaderSelector(path), m_Cancel(false) {}
+  IOUtil::LoadInfo::LoadInfo(const std::string &path)
+    : m_Path(path),
+      m_ReaderSelector(path),
+      m_Cancel(false),
+      m_Properties(nullptr)
+  {
+  }
 }

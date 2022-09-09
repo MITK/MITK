@@ -38,6 +38,7 @@ found in the LICENSE file.
 #include <QMenu>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QShortcut>
 #include <QStringListModel>
 #include <QWidgetAction>
 
@@ -63,6 +64,9 @@ QmitkLabelSetWidget::QmitkLabelSetWidget(QWidget *parent)
   m_Controls.m_LabelSearchBox->setCompleter(m_Completer);
 
   connect(m_Controls.m_LabelSearchBox, SIGNAL(returnPressed()), this, SLOT(OnSearchLabel()));
+
+  auto* renameLabelShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_L, Qt::CTRL | Qt::Key::Key_R), this);
+  connect(renameLabelShortcut, &QShortcut::activated, this, &QmitkLabelSetWidget::OnRenameLabelShortcutActivated);
 
   QStringListModel *completeModel = static_cast<QStringListModel *>(m_Completer->model());
   completeModel->setStringList(GetLabelStringList());
@@ -314,6 +318,12 @@ void QmitkLabelSetWidget::OnRenameLabel(bool /*value*/)
   GetWorkingImage()->GetActiveLabelSet()->UpdateLookupTable(pixelValue);
 
   UpdateAllTableWidgetItems();
+}
+
+void QmitkLabelSetWidget::OnRenameLabelShortcutActivated()
+{
+  if (m_Controls.m_LabelSetTableWidget->selectedItems().size() == 1)
+    this->OnRenameLabel(true);
 }
 
 void QmitkLabelSetWidget::OnCombineAndCreateMask(bool /*value*/)

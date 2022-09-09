@@ -32,15 +32,18 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="1" colspan="2">
-      <widget class="QCheckBox" name="flipNormalsCheckBox">
-       <property name="text">
-        <string>Flip normals</string>
+     <item row="0" column="1" colspan="2">
+      <widget class="QmitkSingleNodeSelectionWidget" name="selectionWidget" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>40</height>
+        </size>
        </property>
       </widget>
      </item>
      <item row="1" column="0">
-      <widget class="QLabel" name="vertexCountLabel">
+      <widget class="QLabel" name="densityLabel">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -48,12 +51,12 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>Vertex count</string>
+        <string>Density</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QSlider" name="vertexCountSlider">
+      <widget class="QSlider" name="densitySlider">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -70,25 +73,15 @@
         <number>10</number>
        </property>
        <property name="value">
-        <number>50</number>
+        <number>100</number>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
       </widget>
      </item>
-     <item row="0" column="1" colspan="2">
-      <widget class="QmitkSingleNodeSelectionWidget" name="selectionWidget" native="true">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>40</height>
-        </size>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="2">
-      <widget class="QSpinBox" name="vertexCountSpinBox">
+      <widget class="QSpinBox" name="densitySpinBox">
        <property name="suffix">
         <string>%</string>
        </property>
@@ -102,14 +95,82 @@
         <number>1</number>
        </property>
        <property name="value">
-        <number>50</number>
+        <number>100</number>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="remeshingLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Remeshing</string>
        </property>
       </widget>
      </item>
      <item row="2" column="1" colspan="2">
-      <widget class="QCheckBox" name="calculateNormalsCheckBox">
+      <widget class="QComboBox" name="remeshingComboBox">
+       <item>
+        <property name="text">
+         <string>Adaptive</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Regular</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="qualityLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text">
-        <string>Calculate normals</string>
+        <string>Quality</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1" colspan="2">
+      <widget class="QComboBox" name="qualityComboBox">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <item>
+        <property name="text">
+         <string>Medium (fast)</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>High (slow)</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Maximum (very slow)</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="4" column="1" colspan="2">
+      <widget class="QCheckBox" name="preserveEdgesCheckBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Preserve Edges</string>
        </property>
        <property name="checked">
         <bool>true</bool>
@@ -119,12 +180,12 @@
     </layout>
    </item>
    <item>
-    <widget class="QPushButton" name="decimatePushButton">
+    <widget class="QPushButton" name="remeshPushButton">
      <property name="enabled">
       <bool>true</bool>
      </property>
      <property name="text">
-      <string>Decimate</string>
+      <string>Remesh</string>
      </property>
      <property name="icon">
       <iconset resource="../../resources/Remeshing.qrc">
@@ -135,6 +196,16 @@
        <width>24</width>
        <height>24</height>
       </size>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="explanationLabel">
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Density:&lt;/span&gt; The density of the resulting surface compared to the input surface. For example, a density of 50% will effectively halve the number of vertices. It's not uncommen to choose values as low as 10% for overly dense input surfaces. The minimum number of output vertices is at least 100, though.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Remeshing:&lt;/span&gt; Adaptive remeshing results in higher density in curvy areas and less density in flat areas. This remeshing strategy can preserve fine shape details even when the overall density is heavily reduced. Regular remeshing evenly distributes the density regardless of the local shape of the surface.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Quality&lt;/span&gt;: While medium quality is sufficient for the vast majority of use cases, you can increase this setting to further optimize the mesh quality in terms of uniformly shaped triangles. However, computation time and memory consumption increase dramatically compared to very small improvements.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Preserve Edges:&lt;/span&gt; If the input surface contains holes or edges, they will be preserved very accurately by default at the cost of less uniform triangles at their direct neighborhood.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -162,8 +233,9 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>vertexCountSpinBox</tabstop>
-  <tabstop>decimatePushButton</tabstop>
+  <tabstop>densitySpinBox</tabstop>
+  <tabstop>preserveEdgesCheckBox</tabstop>
+  <tabstop>remeshPushButton</tabstop>
  </tabstops>
  <resources>
   <include location="../../resources/Remeshing.qrc"/>

@@ -7,7 +7,7 @@
 // 511 : Can't use keyword arguments with overloaded functions
 #pragma SWIG nowarn=302,362,503,509,511
 
-// Splitted the information about the addition files into sub-files:
+// Split the information about the additional files into sub-files:
 
 %naturalvar;
 

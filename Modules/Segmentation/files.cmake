@@ -14,6 +14,7 @@ set(CPP_FILES
   Algorithms/mitkImageToLiveWireContourFilter.cpp
   Algorithms/mitkManualSegmentationToSurfaceFilter.cpp
   Algorithms/mitkOtsuSegmentationFilter.cpp
+  Algorithms/mitkSegmentationHelper.cpp
   Algorithms/mitkSegmentationObjectFactory.cpp
   Algorithms/mitkShapeBasedInterpolationAlgorithm.cpp
   Algorithms/mitkShowSegmentationAsSmoothedSurface.cpp
@@ -32,13 +33,12 @@ set(CPP_FILES
   Interactions/mitkBinaryThresholdBaseTool.cpp
   Interactions/mitkBinaryThresholdTool.cpp
   Interactions/mitkBinaryThresholdULTool.cpp
-  Interactions/mitkCalculateGrayValueStatisticsTool.cpp
-  Interactions/mitkCalculateVolumetryTool.cpp
   Interactions/mitkContourModelInteractor.cpp
   Interactions/mitkContourModelLiveWireInteractor.cpp
+  Interactions/mitkEditableContourTool.cpp
   Interactions/mitkLiveWireTool2D.cpp
+  Interactions/mitkLassoTool.cpp
   Interactions/mitkContourTool.cpp
-  Interactions/mitkCreateSurfaceTool.cpp
   Interactions/mitkDrawPaintbrushTool.cpp
   Interactions/mitkErasePaintbrushTool.cpp
   Interactions/mitkEraseRegionTool.cpp
@@ -46,7 +46,6 @@ set(CPP_FILES
   Interactions/mitkFillRegionTool.cpp
   Interactions/mitkOtsuTool3D.cpp
   Interactions/mitkPaintbrushTool.cpp
-  Interactions/mitkPixelManipulationTool.cpp
   Interactions/mitkRegionGrowingTool.cpp
   Interactions/mitkSegmentationsProcessingTool.cpp
   Interactions/mitkSetRegionTool.cpp
@@ -80,6 +79,8 @@ set(RESOURCE_FILES
   Fill_Cursor_32x32.png
   LiveWire_48x48.png
   LiveWire_Cursor_32x32.png
+  NewAdd_48x48.png
+  NewAdd_Cursor_32x32.png
   Otsu_48x48.png
   Paint_48x48.png
   Paint_Cursor_32x32.png
@@ -94,7 +95,7 @@ set(RESOURCE_FILES
   Wipe_Cursor_32x32.png
 
   Interactions/dummy.xml
-  Interactions/LiveWireTool.xml
+  Interactions/EditableContourTool.xml
   Interactions/PickingTool.xml
   Interactions/PressMoveRelease.xml
   Interactions/PressMoveReleaseAndPointSetting.xml

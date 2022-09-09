@@ -1,5 +1,5 @@
 set(Plugin-Name "MITK Material Editor")
 set(Plugin-Version "0.9")
 set(Plugin-Vendor "German Cancer Research Center (DKFZ)")
-set(Plugin-ContactAddress "http://www.mitk.org")
+set(Plugin-ContactAddress "https://www.mitk.org")
 set(Require-Plugin org.mitk.gui.qt.common)

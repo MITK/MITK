@@ -401,7 +401,7 @@ void QmitkAbstractMultiWidget::AddRenderWindowWidget(const QString& widgetName, 
 
 void QmitkAbstractMultiWidget::RemoveRenderWindowWidget()
 {
-  auto iterator = m_Impl->m_RenderWindowWidgets.find(GetNameFromIndex(GetRenderWindowWidgets().size() - 1));
+  auto iterator = m_Impl->m_RenderWindowWidgets.find(this->GetNameFromIndex(this->GetNumberOfRenderWindowWidgets() - 1));
   if (iterator == m_Impl->m_RenderWindowWidgets.end())
   {
     return;

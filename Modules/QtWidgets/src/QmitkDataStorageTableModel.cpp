@@ -374,7 +374,7 @@ bool QmitkDataStorageTableModel::setData(const QModelIndex &index, const QVarian
 
     if (index.column() == 0)
     {
-      node->SetStringProperty("name", value.toString().toStdString().c_str());
+      node->SetName(value.toString().toStdString());
     }
     else if (index.column() == 2)
     {

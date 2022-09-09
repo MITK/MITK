@@ -18,6 +18,7 @@ found in the LICENSE file.
 // qt widgets module
 #include "QmitkDataNodeGlobalReinitAction.h"
 #include "QmitkDataNodeReinitAction.h"
+#include "QmitkDataNodeResetGeometryAction.h"
 #include "QmitkDataNodeRemoveAction.h"
 #include "QmitkDataNodeShowSelectedNodesAction.h"
 #include "QmitkDataNodeToggleVisibilityAction.h"
@@ -119,6 +120,7 @@ private:
   //////////////////////////////////////////////////////////////////////////
   QmitkDataNodeGlobalReinitAction* m_GlobalReinitAction;
   QmitkDataNodeReinitAction* m_ReinitAction;
+  QmitkDataNodeResetGeometryAction* m_ResetGeometryAction;
   QmitkDataNodeRemoveAction* m_RemoveAction;
   QmitkDataNodeShowSelectedNodesAction* m_ShowSelectedNodesAction;
   QmitkDataNodeToggleVisibilityAction* m_ToggleVisibilityAction;

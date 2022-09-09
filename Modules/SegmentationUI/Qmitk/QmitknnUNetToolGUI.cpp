@@ -25,10 +25,11 @@ found in the LICENSE file.
 #include <ctkCollapsibleGroupBox.h>
 #include <itksys/SystemTools.hxx>
 #include <nlohmann/json.hpp>
+#include <mitkIOUtil.h>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitknnUNetToolGUI, "")
 
-QmitknnUNetToolGUI::QmitknnUNetToolGUI() : QmitkMultiLabelSegWithPreviewToolGUIBase()
+QmitknnUNetToolGUI::QmitknnUNetToolGUI() : QmitkMultiLabelSegWithPreviewToolGUIBase(), m_SuperclassEnableConfirmSegBtnFnc(m_EnableConfirmSegBtnFnc)
 {
   // Nvidia-smi command returning zero doesn't always imply lack of GPUs.
   // Pytorch uses its own libraries to communicate to the GPUs. Hence, only a warning can be given.
@@ -46,6 +47,11 @@ QmitknnUNetToolGUI::QmitknnUNetToolGUI() : QmitkMultiLabelSegWithPreviewToolGUIB
   m_nnUNetThread = new QThread(this);
   m_Worker = new nnUNetDownloadWorker;
   m_Worker->moveToThread(m_nnUNetThread);
+  
+  m_EnableConfirmSegBtnFnc = [this](bool enabled)
+  {
+    return !m_FirstPreviewComputation ? m_SuperclassEnableConfirmSegBtnFnc(enabled) : false;
+  };
 }
 
 QmitknnUNetToolGUI::~QmitknnUNetToolGUI()
@@ -58,6 +64,7 @@ void QmitknnUNetToolGUI::ConnectNewTool(mitk::SegWithPreviewTool *newTool)
 {
   Superclass::ConnectNewTool(newTool);
   newTool->IsTimePointChangeAwareOff();
+  m_FirstPreviewComputation = true;
 }
 
 void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
@@ -80,7 +87,6 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   connect(
     m_Controls.plannerBox, SIGNAL(currentTextChanged(const QString &)), this, SLOT(OnTrainerChanged(const QString &)));
   connect(m_Controls.multiModalBox, SIGNAL(stateChanged(int)), this, SLOT(OnCheckBoxChanged(int)));
-  connect(m_Controls.multiModalSpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnModalitiesNumberChanged(int)));
   connect(m_Controls.pythonEnvComboBox,
 #if QT_VERSION >= 0x050F00 // 5.15
           SIGNAL(textActivated(const QString &)),
@@ -101,9 +107,9 @@ void QmitknnUNetToolGUI::InitializeUI(QBoxLayout *mainLayout)
   connect(m_Worker, &nnUNetDownloadWorker::Exit, this, &QmitknnUNetToolGUI::OnDownloadWorkerExit);
   connect(m_nnUNetThread, &QThread::finished, m_Worker, &QObject::deleteLater);
 
-  m_Controls.multiModalSpinBox->setVisible(false);
-  m_Controls.multiModalSpinBox->setEnabled(false);
-  m_Controls.multiModalSpinLabel->setVisible(false);
+  m_Controls.multiModalValueLabel->setStyleSheet("font-weight: bold; color: white");
+  m_Controls.multiModalValueLabel->setVisible(false);
+  m_Controls.requiredModalitiesLabel->setVisible(false);
   m_Controls.stopDownloadButton->setVisible(false);
   m_Controls.previewButton->setEnabled(false);
 
@@ -144,7 +150,6 @@ void QmitknnUNetToolGUI::EnableWidgets(bool enabled)
 
 void QmitknnUNetToolGUI::ClearAllModalities()
 {
-  m_Controls.multiModalSpinBox->setMinimum(0);
   m_Controls.multiModalBox->setChecked(false);
   this->ClearAllModalLabels();
 }
@@ -164,7 +169,7 @@ void QmitknnUNetToolGUI::DisableEverything()
   m_Controls.modeldirectoryBox->setEnabled(false);
   m_Controls.refreshdirectoryBox->setEnabled(false);
   m_Controls.previewButton->setEnabled(false);
-  m_Controls.multiModalSpinBox->setVisible(false);
+  m_Controls.multiModalValueLabel->setVisible(false);
   m_Controls.multiModalBox->setEnabled(false);
   this->ClearAllComboBoxes();
   this->ClearAllModalities();
@@ -184,7 +189,6 @@ void QmitknnUNetToolGUI::ClearAllComboBoxes()
     layout->plannerBox->clear();
     layout->foldBox->clear();
   }
-  m_Controls.availableBox->clear();
 }
 
 std::vector<mitk::Image::ConstPointer> QmitknnUNetToolGUI::FetchMultiModalImagesFromUI()
@@ -383,8 +387,16 @@ std::vector<std::string> QmitknnUNetToolGUI::FetchSelectedFoldsFromUI(ctkCheckab
   QModelIndexList foldList = foldBox->checkedIndexes();
   for (const auto &index : foldList)
   {
-    QString foldQString = foldBox->itemText(index.row()).split("_", QString::SplitBehavior::SkipEmptyParts).last();
+    QString foldQString = foldBox->itemText(index.row());
+    if(foldQString != "dummy_element_that_nobody_can_see")
+    {
+    foldQString = foldQString.split("_", QString::SplitBehavior::SkipEmptyParts).last();
     folds.push_back(foldQString.toStdString());
+    }
+    else
+    {
+      throw std::runtime_error("Folds are not recognized. Please check if your nnUNet results folder structure is legitimate");
+    }
   }
   return folds;
 }
@@ -446,12 +458,6 @@ QString QmitknnUNetToolGUI::FetchResultsFolderFromEnv()
     retVal = m_Settings.value("nnUNet/LastRESULTS_FOLDERPath").toString();
   }
   return retVal;
-}
-
-void QmitknnUNetToolGUI::DumpAllJSONs(const QString &path)
-{
-  this->DumpJSONfromPickle(path);
-  this->ExportAvailableModelsAsJSON(m_ParentFolder->getResultsFolder());
 }
 
 void QmitknnUNetToolGUI::DumpJSONfromPickle(const QString &picklePath)
@@ -516,7 +522,6 @@ void QmitknnUNetToolGUI::DisplayMultiModalInfoFromJSON(const QString &jsonPath)
   if (file.is_open())
   {
     auto jsonObj = nlohmann::json::parse(file, nullptr, false);
-
     if (jsonObj.is_discarded() || !jsonObj.is_object())
     {
       MITK_ERROR << "Could not parse \"" << jsonPath.toStdString() << "\" as JSON object!";
@@ -528,7 +533,8 @@ void QmitknnUNetToolGUI::DisplayMultiModalInfoFromJSON(const QString &jsonPath)
     {
       m_Controls.multiModalBox->setChecked(true);
       m_Controls.multiModalBox->setEnabled(false);
-      m_Controls.multiModalSpinBox->setValue(num_mods - 1);
+      m_Controls.multiModalValueLabel->setText(QString::number(num_mods));
+      OnModalitiesNumberChanged(num_mods);
       m_Controls.advancedSettingsLayout->update();
       auto obj = jsonObj["modalities"];
       int count = 0;
@@ -539,12 +545,10 @@ void QmitknnUNetToolGUI::DisplayMultiModalInfoFromJSON(const QString &jsonPath)
         m_Controls.advancedSettingsLayout->addWidget(label, m_UI_ROWS + 1 + count, 0);
         count++;
       }
-      m_Controls.multiModalSpinBox->setMinimum(num_mods - 1);
       m_Controls.advancedSettingsLayout->update();
     }
     else
     {
-      m_Controls.multiModalSpinBox->setMinimum(0);
       m_Controls.multiModalBox->setChecked(false);
     }
   }
@@ -585,6 +589,13 @@ mitk::ModelParams QmitknnUNetToolGUI::MapToRequest(const QString &modelName,
   requestObject.timeStamp =
     std::to_string(mitk::RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint());
   return requestObject;
+}
+
+void QmitknnUNetToolGUI::SetComboBoxToNone(ctkCheckableComboBox* comboBox)
+{
+  comboBox->clear();
+  comboBox->addItem("dummy_element_that_nobody_can_see");
+  qobject_cast<QListView *>(comboBox->view())->setRowHidden(0, true); // For the cosmetic purpose of showing "None" on the combobox.
 }
 
 /* ---------------------SLOTS---------------------------------------*/
@@ -630,17 +641,9 @@ void QmitknnUNetToolGUI::OnPreviewRequested()
       tool->MultiModalOff();
       if (m_Controls.multiModalBox->isChecked())
       {
-        if (m_Controls.multiModalSpinBox->value() > 0)
-        {
-          tool->m_OtherModalPaths.clear();
-          tool->m_OtherModalPaths = FetchMultiModalImagesFromUI();
-          tool->MultiModalOn();
-        }
-        else
-        {
-          throw std::runtime_error("Please select more than one modalities for a multi-modal task. If you "
-                                   "would like to use only one modality then uncheck the Multi-Modal option.");
-        }
+        tool->m_OtherModalPaths.clear();
+        tool->m_OtherModalPaths = FetchMultiModalImagesFromUI();
+        tool->MultiModalOn();
       }
       if (doCache)
       {
@@ -747,6 +750,7 @@ void QmitknnUNetToolGUI::OnModelChanged(const QString &model)
       m_Controls.plannerLabel->setVisible(false);
       m_Controls.foldBox->setVisible(false);
       m_Controls.foldLabel->setVisible(false);
+      m_Controls.previewButton->setEnabled(false);
       this->ShowEnsembleLayout(true);
       auto models = m_ParentFolder->getModelsForTask<QStringList>(m_Controls.taskBox->currentText());
       models.removeDuplicates();
@@ -764,7 +768,6 @@ void QmitknnUNetToolGUI::OnModelChanged(const QString &model)
                           layout->modelBox->addItem(model);
                       });
       }
-      m_Controls.previewButton->setEnabled(true);
     }
     else
     {
@@ -776,11 +779,17 @@ void QmitknnUNetToolGUI::OnModelChanged(const QString &model)
       m_Controls.foldLabel->setVisible(true);
       m_Controls.previewButton->setEnabled(false);
       this->ShowEnsembleLayout(false);
-      auto trainerPlanners = m_ParentFolder->getTrainerPlannersForTask<QStringList>(selectedTask, model);
-      QStringList trainers, planners;
-      std::tie(trainers, planners) = ExtractTrainerPlannerFromString(trainerPlanners);
       m_Controls.trainerBox->clear();
       m_Controls.plannerBox->clear();
+      auto trainerPlanners = m_ParentFolder->getTrainerPlannersForTask<QStringList>(selectedTask, model);
+      if(trainerPlanners.isEmpty())
+      {
+        this->ShowErrorMessage("No plans.pkl found for "+model.toStdString()+". Check your directory or download the task again.");
+        this->SetComboBoxToNone(m_Controls.foldBox);
+        return;
+      }
+      QStringList trainers, planners;
+      std::tie(trainers, planners) = ExtractTrainerPlannerFromString(trainerPlanners);
       std::for_each(
         trainers.begin(), trainers.end(), [this](QString trainer) { m_Controls.trainerBox->addItem(trainer); });
       std::for_each(
@@ -788,7 +797,8 @@ void QmitknnUNetToolGUI::OnModelChanged(const QString &model)
     }
   }
   else if (!m_EnsembleParams.empty())
-  {
+  { 
+    m_Controls.previewButton->setEnabled(false);
     for (auto &layout : m_EnsembleParams)
     {
       if (box == layout->modelBox)
@@ -796,6 +806,12 @@ void QmitknnUNetToolGUI::OnModelChanged(const QString &model)
         layout->trainerBox->clear();
         layout->plannerBox->clear();
         auto trainerPlanners = m_ParentFolder->getTrainerPlannersForTask<QStringList>(selectedTask, model);
+        if(trainerPlanners.isEmpty())
+        {
+          this->ShowErrorMessage("No plans.pkl found for "+model.toStdString()+". Check your directory or download the task again.");
+          this->SetComboBoxToNone(layout->foldBox);
+          return;
+        }
         QStringList trainers, planners;
         std::tie(trainers, planners) = ExtractTrainerPlannerFromString(trainerPlanners);
         std::for_each(trainers.begin(),
@@ -849,6 +865,12 @@ void QmitknnUNetToolGUI::OnTrainerChanged(const QString &plannerSelected)
     auto selectedModel = m_Controls.modelBox->currentText();
     auto folds = m_ParentFolder->getFoldsForTrainerPlanner<QStringList>(
       selectedTrainer, plannerSelected, selectedTask, selectedModel);
+    if(folds.isEmpty())
+    {
+      this->ShowErrorMessage("No valid folds found. Check your directory or download the task again.");
+      this->SetComboBoxToNone(m_Controls.foldBox);
+      return;
+    }
     std::for_each(folds.begin(),
                   folds.end(),
                   [this](QString fold)
@@ -877,6 +899,12 @@ void QmitknnUNetToolGUI::OnTrainerChanged(const QString &plannerSelected)
         auto selectedModel = layout->modelBox->currentText();
         auto folds = m_ParentFolder->getFoldsForTrainerPlanner<QStringList>(
           selectedTrainer, plannerSelected, selectedTask, selectedModel);
+        if(folds.isEmpty())
+        {
+          this->ShowErrorMessage("No valid folds found. Check your directory.");
+          this->SetComboBoxToNone(layout->foldBox);
+          return;
+        }
         std::for_each(folds.begin(),
                       folds.end(),
                       [&layout](const QString &fold)
@@ -900,15 +928,10 @@ void QmitknnUNetToolGUI::OnTrainerChanged(const QString &plannerSelected)
   {
     m_Controls.previewButton->setEnabled(true);
     const QString mitkJsonFile = parentPath + QDir::separator() + m_MITK_EXPORT_JSON_FILENAME;
-    this->DumpAllJSONs(parentPath);
+    this->DumpJSONfromPickle(parentPath);
     if (QFile::exists(mitkJsonFile))
     {
       this->DisplayMultiModalInfoFromJSON(mitkJsonFile);
-    }
-    const QString jsonPath = m_ParentFolder->getResultsFolder() + QDir::separator() + m_AVAILABLE_MODELS_JSON_FILENAME;
-    if (QFile::exists(mitkJsonFile))
-    {
-      this->FillAvailableModelsInfoFromJSON(jsonPath);
     }
   }
 }
@@ -933,11 +956,11 @@ void QmitknnUNetToolGUI::OnPythonPathChanged(const QString &pyEnv)
       "environment or create one. For more info refer https://github.com/MIC-DKFZ/nnUNet";
     this->ShowErrorMessage(warning);
     this->DisableEverything();
+    m_Controls.availableBox->clear();
   }
   else
   {
     m_Controls.modeldirectoryBox->setEnabled(true);
-    m_Controls.previewButton->setEnabled(true);
     m_Controls.refreshdirectoryBox->setEnabled(true);
     m_Controls.multiModalBox->setEnabled(true);
     QString setVal = this->FetchResultsFolderFromEnv();
@@ -950,6 +973,15 @@ void QmitknnUNetToolGUI::OnPythonPathChanged(const QString &pyEnv)
     if (!(m_PythonPath.endsWith("bin", Qt::CaseInsensitive) || m_PythonPath.endsWith("bin/", Qt::CaseInsensitive)))
     {
       m_PythonPath += QDir::separator() + QString("bin");
+    }
+    
+    // Export available model info as json and fill them for Download
+    QString tempPath = QString::fromStdString(mitk::IOUtil::GetTempPath());
+    this->ExportAvailableModelsAsJSON(tempPath);
+    const QString jsonPath = tempPath + QDir::separator() + m_AVAILABLE_MODELS_JSON_FILENAME;
+    if (QFile::exists(jsonPath))
+    {
+      this->FillAvailableModelsInfoFromJSON(jsonPath);
     }
   }
 }
@@ -966,28 +998,12 @@ void QmitknnUNetToolGUI::OnCheckBoxChanged(int state)
   {
     if (box->objectName() == QString("multiModalBox"))
     {
-      m_Controls.multiModalSpinLabel->setVisible(visibility);
-      m_Controls.multiModalSpinBox->setVisible(visibility);
-      if (visibility)
-      {
-        QmitkDataStorageComboBox *defaultImage = new QmitkDataStorageComboBox(this, true);
-        defaultImage->setObjectName(QString("multiModal_" + QString::number(0)));
-        defaultImage->SetPredicate(m_MultiModalPredicate);
-        mitk::nnUNetTool::Pointer tool = this->GetConnectedToolAs<mitk::nnUNetTool>();
-        if (tool != nullptr)
-        {
-          defaultImage->SetDataStorage(tool->GetDataStorage());
-          defaultImage->SetSelectedNode(tool->GetRefNode());
-        }
-        m_Controls.advancedSettingsLayout->addWidget(defaultImage, m_UI_ROWS + m_Modalities.size() + 1, 1, 1, 3);
-        m_Modalities.push_back(defaultImage);
-      }
-      else
+      m_Controls.requiredModalitiesLabel->setVisible(visibility);
+      m_Controls.multiModalValueLabel->setVisible(visibility);
+      if (!visibility)
       {
         this->OnModalitiesNumberChanged(0);
-        m_Controls.multiModalSpinBox->setValue(0);
-        delete m_Modalities[0];
-        m_Modalities.pop_back();
+        m_Controls.multiModalValueLabel->setText("0");
         this->ClearAllModalLabels();
       }
     }
@@ -996,7 +1012,7 @@ void QmitknnUNetToolGUI::OnCheckBoxChanged(int state)
 
 void QmitknnUNetToolGUI::OnModalitiesNumberChanged(int num)
 {
-  while (num > static_cast<int>(m_Modalities.size() - 1))
+  while (num > static_cast<int>(m_Modalities.size()))
   {
     QmitkDataStorageComboBox *multiModalBox = new QmitkDataStorageComboBox(this, true);
     mitk::nnUNetTool::Pointer tool = this->GetConnectedToolAs<mitk::nnUNetTool>();
@@ -1006,14 +1022,9 @@ void QmitknnUNetToolGUI::OnModalitiesNumberChanged(int num)
     m_Controls.advancedSettingsLayout->addWidget(multiModalBox, m_UI_ROWS + m_Modalities.size() + 1, 1, 1, 3);
     m_Modalities.push_back(multiModalBox);
   }
-  while (num < static_cast<int>(m_Modalities.size() - 1) && !m_Modalities.empty())
+  while (num < static_cast<int>(m_Modalities.size()) && !m_Modalities.empty())
   {
     QmitkDataStorageComboBox *child = m_Modalities.back();
-    if (child->objectName() == "multiModal_0")
-    {
-      std::iter_swap(m_Modalities.end() - 2, m_Modalities.end() - 1);
-      child = m_Modalities.back();
-    }
     delete child; // delete the layout item
     m_Modalities.pop_back();
   }
@@ -1074,6 +1085,7 @@ void QmitknnUNetToolGUI::SegmentationResultHandler(mitk::nnUNetTool *tool, bool 
   {
     tool->RenderOutputBuffer();
   }
+  m_FirstPreviewComputation = false;
   this->SetLabelSetPreview(tool->GetPreviewSegmentation());
   this->WriteStatusMessage("<b>STATUS: </b><i>Segmentation task finished successfully.</i>");
   this->ActualizePreviewLabelVisibility();
@@ -1123,9 +1135,9 @@ void QmitknnUNetToolGUI::ShowEnsembleLayout(bool visible)
 
 void QmitknnUNetToolGUI::OnDownloadModel()
 {
-  if (m_IsResultsFolderValid)
+  auto selectedTask = m_Controls.availableBox->currentText();
+  if(!selectedTask.isEmpty())
   {
-    auto selectedTask = m_Controls.availableBox->currentText();
     auto spExec = mitk::ProcessExecutor::New();
     mitk::ProcessExecutor::ArgumentListType args;
     args.push_back(selectedTask.toStdString());

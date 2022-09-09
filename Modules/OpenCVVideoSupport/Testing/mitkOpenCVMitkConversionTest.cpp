@@ -24,7 +24,6 @@ found in the LICENSE file.
 #include <itkRGBPixel.h>
 
 #include <iostream>
-#include <highgui.h>
 
 // define test pixel indexes and intensities and other values
 typedef itk::RGBPixel< unsigned char > TestUCRGBPixelType;

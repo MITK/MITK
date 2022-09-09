@@ -24,7 +24,7 @@ found in the LICENSE file.
 * @brief Widget for configuring the Structure Sensor device (Occipital, Inc.)
 *
 * @note This device is currently not available open-source, because the required WiFi
-* protocol is part of the commercial mbits source code (http://mbits.info/). If you
+* protocol is part of the commercial mbits source code (https://mbits.info/). If you
 * want to use the device please contact mitk-users@dkfz-heidelberg.de.
 *
 * @ingroup ToFUI

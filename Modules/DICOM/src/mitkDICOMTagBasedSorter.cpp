@@ -31,7 +31,7 @@ std::string
 mitk::DICOMTagBasedSorter::CutDecimalPlaces
 ::operator()(const std::string& input) const
 {
-  // be a bit tolerant for tags such as image orientation orienatation, let only the first few digits matter (http://bugs.mitk.org/show_bug.cgi?id=12263)
+  // be a bit tolerant for tags such as image orientation orientation, let only the first few digits matter (https://phabricator.mitk.org/T12263)
   // iterate all fields, convert each to a number, cut this number as configured, then return a concatenated string with all cut-off numbers
   std::ostringstream resultString;
   resultString.str(std::string());

@@ -21,7 +21,7 @@
   <!-- when scrolling restart at beginning of volume, when end is reached-->
   <param name="autoRepeat" value="true"/>
   <!-- react to an event, even though it was already processed by a DataInteractor-->
-  <param name="alwaysReact" value="true"/>
+  <param name="alwaysReact" value="false"/>
 
   <!-- Right mouse with shift modifier: Moving -->
    <event_variant class="MousePressEvent" name="StartMove">

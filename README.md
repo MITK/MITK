@@ -30,8 +30,8 @@ For details, please read the [Supported Platforms][platforms] page.
 ### Build status of develop branch
 
 [![Windows][windows-build-status]][cdash]
-[![Ubuntu 18.04][ubuntu-18.04-build-status]][cdash]
 [![Ubuntu 20.04][ubuntu-20.04-build-status]][cdash]
+[![Ubuntu 22.04][ubuntu-22.04-build-status]][cdash]
 [![macOS 10.15 Catalina][macos-10.15-build-status]][cdash]
 [![macOS 11 Big Sur][macos-11-build-status]][cdash]
 
@@ -104,7 +104,7 @@ Useful links
 [changelog]: https://phabricator.mitk.org/w/mitk/changelog/
 [snapshot-installers]: https://www.mitk.org/download/ci/snapshots/
 [windows-build-status]: https://ci.mitk.org/buildStatus/icon?job=MITK%2FContinuous%2FWindows&subject=Windows
-[ubuntu-18.04-build-status]: https://ci.mitk.org/buildStatus/icon?job=MITK%2FContinuous%2FUbuntu+18.04&subject=Ubuntu+18.04
+[ubuntu-22.04-build-status]: https://ci.mitk.org/buildStatus/icon?job=MITK%2FContinuous%2FUbuntu+22.04&subject=Ubuntu+22.04
 [ubuntu-20.04-build-status]: https://ci.mitk.org/buildStatus/icon?job=MITK%2FContinuous%2FUbuntu+20.04&subject=Ubuntu+20.04
 [macOS-10.15-build-status]: https://ci.mitk.org/buildStatus/icon?job=MITK%2FContinuous%2FmacOS+Catalina&subject=macOS+10.15+Catalina
 [macOS-11-build-status]: https://ci.mitk.org/buildStatus/icon?job=MITK%2FContinuous%2FmacOS+Big+Sur&subject=macOS+11+Big+Sur

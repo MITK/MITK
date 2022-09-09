@@ -73,12 +73,10 @@ namespace mitk
     ////## CV_CAP_PROP_FPS frame rate
     ////## CV_CAP_PROP_FOURCC 4-character code of codec
     ////## CV_CAP_PROP_FRAME_COUNT number of frames in video file
-    ////## See OpenCV Highgui documentation for more details ( http://opencvlibrary.sourceforge.net/HighGui )
     virtual double GetVideoCaptureProperty(int property_id);
     ////##Documentation
     ////## @brief sets the specified property of video capturing from HIGHGUI LIBRARY.
     ////## Notice: Some properties only can be set using a video file as input devices, others using a camera.
-    ////## See OpenCV Highgui documentation for more details ( http://opencvlibrary.sourceforge.net/HighGui )
     virtual int SetVideoCaptureProperty(int property_id, double value);
 
     virtual void GetCurrentFrameAsOpenCVImage(IplImage * image);

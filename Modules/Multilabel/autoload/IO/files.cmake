@@ -4,5 +4,10 @@ set(CPP_FILES
   mitkLabelSetImageSerializer.cpp
   mitkLabelSetImageSerializer.h
   mitkMultilabelActivator.cpp
+  mitkMultilabelIOMimeTypes.cpp
+  mitkMultilabelIOMimeTypes.h
+  mitkSegmentationTaskListIO.cpp
+  mitkSegmentationTaskListIO.h
+  mitkSegmentationTaskListSerializer.cpp
+  mitkSegmentationTaskListSerializer.h
 )
-

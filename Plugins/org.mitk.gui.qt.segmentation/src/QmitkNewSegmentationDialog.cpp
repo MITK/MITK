@@ -27,9 +27,7 @@ found in the LICENSE file.
 #include <vtkNew.h>
 
 #include <QColorDialog>
-#include <QCompleter>
 #include <QPushButton>
-#include <QStringListModel>
 
 #include <nlohmann/json.hpp>
 
@@ -181,14 +179,12 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget *parent, mitk::La
     m_Ui->buttonBox->button(QDialogButtonBox::Ok)->setText("Create label");
   }
 
-  auto* completer = new QCompleter(QStringList());
-  completer->setCaseSensitivity(Qt::CaseInsensitive);
-
-  m_Ui->nameLineEdit->setCompleter(completer);
   m_Ui->nameLineEdit->setFocus();
 
-  connect(completer, qOverload<const QString&>(&QCompleter::activated), this, qOverload<const QString&>(&QmitkNewSegmentationDialog::OnSuggestionSelected));
   connect(m_Ui->colorButton, &QToolButton::clicked, this, &QmitkNewSegmentationDialog::OnColorButtonClicked);
+  connect(m_Ui->nameLineEdit, &QLineEdit::textChanged, this, &QmitkNewSegmentationDialog::OnTextChanged);
+  connect(m_Ui->nameList, &QListWidget::itemSelectionChanged, this, &QmitkNewSegmentationDialog::OnSuggestionSelected);
+  connect(m_Ui->nameList, &QListWidget::itemDoubleClicked, this, &QmitkNewSegmentationDialog::OnAccept);
   connect(m_Ui->buttonBox, &QDialogButtonBox::accepted, this, &QmitkNewSegmentationDialog::OnAccept);
 
   this->UpdateColorButtonBackground();
@@ -210,7 +206,7 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget *parent, mitk::La
     auto existingLabelNames = GetExistingLabelNames(labelSetImage);
     m_Suggestions = FilterSuggestions(m_Suggestions, existingLabelNames);
 
-    this->UpdateCompleterModel();
+    this->UpdateNameList();
   }
 }
 
@@ -274,24 +270,32 @@ void QmitkNewSegmentationDialog::SetSuggestions(const SuggestionsType& suggestio
     }
   }
 
-  this->UpdateCompleterModel();
+  this->UpdateNameList();
 }
 
-void QmitkNewSegmentationDialog::UpdateCompleterModel()
+void QmitkNewSegmentationDialog::UpdateNameList()
 {
   QStringList names;
 
   for (const auto& suggestion : m_Suggestions)
     names << suggestion.first;
 
-  auto* completerModel = static_cast<QStringListModel*>(m_Ui->nameLineEdit->completer()->model());
-  completerModel->setStringList(names);
+  m_Ui->nameList->clear();
+  m_Ui->nameList->addItems(names);
 }
 
 void QmitkNewSegmentationDialog::OnAccept()
 {
   m_Name = m_Ui->nameLineEdit->text();
   this->accept();
+}
+
+void QmitkNewSegmentationDialog::OnTextChanged(const QString& text)
+{
+  auto finding = m_Ui->nameList->findItems(text, Qt::MatchFlag::MatchExactly);
+
+  if (!finding.isEmpty())
+    m_Ui->nameList->setCurrentItem(finding.first());
 }
 
 void QmitkNewSegmentationDialog::OnColorButtonClicked()
@@ -305,8 +309,15 @@ void QmitkNewSegmentationDialog::OnColorButtonClicked()
   }
 }
 
-void QmitkNewSegmentationDialog::OnSuggestionSelected(const QString &name)
+void QmitkNewSegmentationDialog::OnSuggestionSelected()
 {
+  const auto* currentItem = m_Ui->nameList->currentItem();
+
+  if (currentItem == nullptr)
+    return;
+
+  const auto name = currentItem->text();
+  m_Ui->nameLineEdit->setText(name);
   auto color = m_Suggestions[name];
 
   if (color.isValid())

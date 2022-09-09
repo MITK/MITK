@@ -30,9 +30,9 @@ namespace mitk
   Each time IsLeftBeforeRight() is called, the method should return whether
   the left dataset should be sorted before the right dataset.
 
-  Because there are identical tags values quite oftenly, a DICOMSortCriterion
+  Because there are identical tags values quite often, a DICOMSortCriterion
   will always hold a secondary DICOMSortCriterion. In cases of equal tag
-  values, the decision is refered to the secondary criterion.
+  values, the decision is referred to the secondary criterion.
 */
 class MITKDICOM_EXPORT DICOMSortCriterion : public itk::LightObject
 {

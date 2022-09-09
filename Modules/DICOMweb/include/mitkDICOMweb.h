@@ -27,7 +27,7 @@ found in the LICENSE file.
 
 /**
  * @brief This class represents the implementation of the RESTful DICOMweb standard
- * (http://dicom.nema.org/medical/dicom/current/output/html/part18.html). It is used to communicate DICOM data over HTTP
+ * (https://dicom.nema.org/medical/dicom/current/output/html/part18.html). It is used to communicate DICOM data over HTTP
  * to a DICOMweb enabled PACS server.
  *
  * @author Tobias Stein
@@ -50,7 +50,7 @@ namespace mitk
     * @brief Creates a DICOMweb service instance which allow basic DICOM operations on the given base URI.
     *
     * @param baseURI the uri for the PACS server: for example a dcm4chee
-    * <code>http://<ip:port>/dcm4chee-arc/aets/DCM4CHEE/</code>
+    * <code>https://<ip:port>/dcm4chee-arc/aets/DCM4CHEE/</code>
     */
    DICOMweb(utility::string_t baseURI);
 

@@ -1,5 +1,3 @@
-[![Build Status](https://secure.travis-ci.org/saschazelzer/CppMicroServices.png)](http://travis-ci.org/saschazelzer/CppMicroServices)
-
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/1329/badge.svg)](https://scan.coverity.com/projects/1329)
 
 C++ Micro Services
@@ -87,14 +85,14 @@ void RegisterSomeService(ModuleContext* context, SomeInterface* service)
 
 The OSGi service model additionally allows to annotate services with properties and using these
 properties during service look-ups. It also allows to track the life-cycle of service objects.
-Please see the [Documentation](http://cppmicroservices.org/doc_latest/index.html) for more
+Please see the [Documentation](https://cppmicroservices.org/doc_latest/index.html) for more
 examples and tutorials and the API reference. There is also a blog post about
-[OSGi Lite for C++](http://blog.cppmicroservices.org/2012/04/15/osgi-lite-for-c++).
+[OSGi Lite for C++](https://blog.cppmicroservices.org/2012/04/15/osgi-lite-for-c++).
 
 Build Instructions
 ------------------
 
 Please visit the [Build Instructions][bi_master] page online.
 
-[bi_master]: http://cppmicroservices.org/doc_latest/BuildInstructions.html
-[apache_license]: http://www.apache.org/licenses/LICENSE-2.0
+[bi_master]: https://cppmicroservices.org/doc_latest/BuildInstructions.html
+[apache_license]: https://www.apache.org/licenses/LICENSE-2.0

@@ -32,6 +32,10 @@ found in the LICENSE file.
 #include "mitkIGTLMessageQueue.h"
 #include "mitkIGTLMessage.h"
 
+#if !defined(MITK_WINDOWS_NO_UNDEF) && defined(SendMessage)
+  #undef SendMessage
+#endif
+
 namespace mitk {
   /**
   * \brief Interface for all OpenIGTLink Devices

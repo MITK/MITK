@@ -15,6 +15,7 @@ found in the LICENSE file.
 #include "mitkPointSet.h"
 
 #include <opencv2/imgproc.hpp>
+#include <opencv2/imgproc/imgproc_c.h>
 
 // This is a magic number defined in "grabcut.cpp" of OpenCV.
 // GrabCut function crashes if less than this number of model

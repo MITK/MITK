@@ -30,6 +30,7 @@ found in the LICENSE file.
 
 // Qt
 #include <QMessageBox>
+#include <QShortcut>
 
 QmitkLabelsWidget::QmitkLabelsWidget(QWidget *parent)
   : QWidget(parent)
@@ -49,6 +50,9 @@ QmitkLabelsWidget::QmitkLabelsWidget(QWidget *parent)
   connect(m_Controls->savePresetButton, &QToolButton::clicked, this, &QmitkLabelsWidget::OnSavePreset);
   connect(m_Controls->loadPresetButton, &QToolButton::clicked, this, &QmitkLabelsWidget::OnLoadPreset);
   connect(m_Controls->showLabelTableButton, &QToolButton::toggled, this, &QmitkLabelsWidget::ShowLabelTable);
+
+  auto* newLabelShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_L, Qt::CTRL | Qt::Key::Key_N), this);
+  connect(newLabelShortcut, &QShortcut::activated, this, &QmitkLabelsWidget::OnNewLabelShortcutActivated);
 
   this->UpdateGUI();
 }
@@ -146,6 +150,11 @@ void QmitkLabelsWidget::OnNewLabel()
 
   this->UpdateGUI();
   emit LabelsChanged();
+}
+
+void QmitkLabelsWidget::OnNewLabelShortcutActivated()
+{
+  m_Controls->newLabelButton->click();
 }
 
 void QmitkLabelsWidget::OnLockExterior(bool checked)

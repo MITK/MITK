@@ -74,7 +74,7 @@ namespace mitk
       /*
          Selection criteria:
          - no sequences because we cannot represent that
-         - nothing animal related (specied, breed registration number), MITK focusses on human medical image processing.
+         - nothing animal related (specified, breed registration number), MITK focuses on human medical image processing.
          - only general attributes so far
 
          When extending this, we should make use of a real dictionary (GDCM/DCMTK and lookup the tag names there)
@@ -260,7 +260,7 @@ namespace mitk
     gdcm::StringFilter sf;
     sf.SetFile(reader.GetFile());
 
-    gdcm::Attribute<0x0028, 0x0011> dimTagX; // coloumns || sagittal
+    gdcm::Attribute<0x0028, 0x0011> dimTagX;   // columns || sagittal
     gdcm::Attribute<0x3001, 0x1001, gdcm::VR::UL, gdcm::VM::VM1>
       dimTagZ;                                 // I have no idea what is VM1. // (Philips specific) // axial
     gdcm::Attribute<0x0028, 0x0010> dimTagY;   // rows || coronal
@@ -352,12 +352,12 @@ namespace mitk
 
     while (!iterator.IsAtEnd())
     {
-      unsigned long adressedPixel =
+      unsigned long addressedPixel =
         pixCount +
-        (numberOfSlices - 1 - planeCount) * planeSize // add offset to adress the first pixel of current plane
+        (numberOfSlices - 1 - planeCount) * planeSize // add offset to address the first pixel of current plane
         + timeCount * numberOfSlices * planeSize;     // add time offset
 
-      iterator.Set(new_pixels[adressedPixel]);
+      iterator.Set(new_pixels[addressedPixel]);
       pixCount++;
       ++iterator;
 
@@ -935,7 +935,7 @@ namespace mitk
             bool identicalOrigins;
             try
             {
-              // check whether this and the previous block share a comon origin
+              // check whether this and the previous block share a common origin
               // TODO should be safe, but a little try/catch or other error handling wouldn't hurt
 
               const char *origin_value = scanner.GetValue(groupsOf3DBlocks[thisBlockKey].GetFilenames().front().c_str(),
@@ -1070,8 +1070,8 @@ namespace mitk
     constructedID += CreateSeriesIdentifierPart(tagValueMap, tagSliceThickness);
     constructedID += CreateSeriesIdentifierPart(tagValueMap, tagNumberOfFrames);
 
-    // be a bit tolerant for orienatation, let only the first few digits matter
-    // (http://bugs.mitk.org/show_bug.cgi?id=12263)
+    // be a bit tolerant for orientation, let only the first few digits matter
+    // (https://phabricator.mitk.org/T12263)
     // NOT constructedID += CreateSeriesIdentifierPart( tagValueMap, tagImageOrientation );
     if (tagValueMap.find(tagImageOrientation) != tagValueMap.end())
     {
@@ -1215,7 +1215,7 @@ namespace mitk
       /*
          we tolerate very small differences in image orientation, since we got to know about
          acquisitions where these values change across a single series (7th decimal digit)
-         (http://bugs.mitk.org/show_bug.cgi?id=12263)
+         (https://phabricator.mitk.org/T12263)
 
          still, we want to check if our assumption of 'almost equal' orientations is valid
        */
@@ -1427,7 +1427,7 @@ namespace mitk
     // Copy tags for series, study, patient level (leave interpretation to application).
     // These properties will be copied to the DataNode by DicomSeriesReader.
 
-    // tags for the series (we just use the one that ITK copied to its dictionary (proably that of the last slice)
+    // tags for the series (we just use the one that ITK copied to its dictionary (probably that of the last slice)
     const itk::MetaDataDictionary &dict = io->GetMetaDataDictionary();
     const TagToPropertyMapType &propertyLookup = DicomSeriesReader::GetDICOMTagsToMITKPropertyMap();
 

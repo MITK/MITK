@@ -160,7 +160,7 @@ private:
    * \brief Takes nodeName, and makes sure that it only contains A-Z, a-z, 0-9, hyphen and underscore,
    * and does not use hyphen as the first character.
    *
-   * Inspired by <a href="http://www.boost.org/doc/libs/1_43_0/libs/filesystem/doc/portability_guide.htm">boost recommendations</a>.
+   * Inspired by <a href="https://www.boost.org/doc/libs/1_43_0/libs/filesystem/doc/portability_guide.htm">boost recommendations</a>.
    */
   QString GetValidNodeName(const QString& nodeName) const;
 

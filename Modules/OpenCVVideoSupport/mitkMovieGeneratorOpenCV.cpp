@@ -14,6 +14,7 @@ found in the LICENSE file.
 //#include <GL/gl.h>
 #include "mitkGL.h"
 #include <iostream>
+#include <opencv2/videoio/videoio_c.h>
 
 
 mitk::MovieGeneratorOpenCV::MovieGeneratorOpenCV()
@@ -72,8 +73,6 @@ bool mitk::MovieGeneratorOpenCV::InitGenerator()
   CV_FOURCC('U', '2', '6', '3') = H263 codec
   CV_FOURCC('I', '2', '6', '3') = H263I codec
   CV_FOURCC('F', 'L', 'V', '1') = FLV1 codec
-
-  List of FOURCC codes is available at http://msdn2.microsoft.com/en-us/library/ms867195.aspx
 
   Under Win32 it is possible to pass -1 in order to choose compression
   method and additional compression parameters from dialog.

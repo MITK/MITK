@@ -18,6 +18,7 @@ found in the LICENSE file.
 
 #include <qwt_plot_item.h>
 #include <qwt_series_data.h>
+#include <qwt_text.h>
 
 /**
 \brief Used to create a histogram that can be shown in a Qwt Plot.

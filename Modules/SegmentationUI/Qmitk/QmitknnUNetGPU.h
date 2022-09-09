@@ -13,10 +13,9 @@ found in the LICENSE file.s
 #ifndef QmitknnUNetToolGPU_h_Included
 #define QmitknnUNetToolGPU_h_Included
 
-#include <QObject>
-#include <QProcess>
-#include <QString>
 #include <vector>
+#include <QString>
+#include <MitkSegmentationUIExports.h>
 
 /**
  * @brief Struct to store GPU info.
@@ -33,10 +32,8 @@ struct QmitkGPUSpec
  * @brief Class to load and save GPU information
  * for further validation
  */
-class QmitkGPULoader : public QObject
+class MITKSEGMENTATIONUI_EXPORT QmitkGPULoader
 {
-  Q_OBJECT
-
 private:
   std::vector<QmitkGPUSpec> m_Gpus;
 
@@ -45,33 +42,7 @@ public:
    * @brief Construct a new Qmitk GPU Loader object.
    * Parses GPU info using `nvidia-smi` command and saves it as QmitkGPUSpec objects.
    */
-  QmitkGPULoader()
-  {
-    QProcess process;
-    process.start("nvidia-smi --query-gpu=name,memory.total --format=csv");
-    process.waitForFinished(-1);
-    QStringList infoStringList;
-    while (process.canReadLine())
-    {
-      QString line = process.readLine();
-      if (!line.startsWith("name"))
-      {
-        infoStringList << line;
-      }
-    }
-    unsigned int count = 0;
-    foreach (QString infoString, infoStringList)
-    {
-      QmitkGPUSpec spec;
-      QStringList gpuDetails;
-      gpuDetails = infoString.split(",");
-      spec.name = gpuDetails.at(0);
-      spec.id = count;
-      spec.memory = gpuDetails.at(1);
-      this->m_Gpus.push_back(spec);
-      ++count;
-    }
-  }
+  QmitkGPULoader();
   ~QmitkGPULoader() = default;
 
   /**
@@ -79,14 +50,14 @@ public:
    *
    * @return int
    */
-  int GetGPUCount() { return static_cast<int>(m_Gpus.size()); }
+  int GetGPUCount();
 
   /**
    * @brief Returns all the parsed GPU  information
    * 
    * @return std::vector<QmitkGPUSpec>
    */
-  std::vector<QmitkGPUSpec> GetAllGPUSpecs() { return m_Gpus; }
+  std::vector<QmitkGPUSpec> GetAllGPUSpecs();
 };
 
 #endif

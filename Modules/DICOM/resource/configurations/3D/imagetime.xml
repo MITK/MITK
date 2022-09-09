@@ -1,7 +1,7 @@
 <?xml version="1.0" standalone="no"?>
 <DICOMFileReader
   label="Image Time"
-  description="Sort images by Acqusition Time"
+  description="Sort images by Acquisition Time"
   class="DICOMITKSeriesGDCMReader"
   version="2"
   fixTiltByShearing="true">

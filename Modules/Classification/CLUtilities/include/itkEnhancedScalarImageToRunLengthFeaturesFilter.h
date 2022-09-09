@@ -18,7 +18,7 @@ found in the LICENSE file.
 *  you may not use this file except in compliance with the License.
 *  You may obtain a copy of the License at
 *
-*         http://www.apache.org/licenses/LICENSE-2.0.txt
+*         https://www.apache.org/licenses/LICENSE-2.0.txt
 *
 *  Unless required by applicable law or agreed to in writing, software
 *  distributed under the License is distributed on an "AS IS" BASIS,
@@ -93,7 +93,7 @@ namespace itk
     * gray-level run-length distributions. Pattern Recognition Letters, 12:490-502,
     * 1991.
     *
-    * IJ article: http://hdl.handle.net/1926/1374
+    * IJ article: https://hdl.handle.net/1926/1374
     *
     * \sa EnhancedScalarImageToRunLengthFeaturesFilter
     * \sa ScalarImageToRunLengthMatrixFilter

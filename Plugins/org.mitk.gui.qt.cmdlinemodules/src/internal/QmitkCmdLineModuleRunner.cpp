@@ -143,7 +143,7 @@ QString QmitkCmdLineModuleRunner::GetValidNodeName(const QString& nodeName) cons
   // This method is parsing a node name, and other bits of code add on a file extension .nii.
   // So, in the output string from this function, we should not allow period, so that
   // the second recommendation on this page:
-  // http://www.boost.org/doc/libs/1_43_0/libs/filesystem/doc/portability_guide.htm
+  // https://www.boost.org/doc/libs/1_43_0/libs/filesystem/doc/portability_guide.htm
   // is still true.
 
   QRegExp rx("[A-Z|a-z|0-9|-|_]{1,1}");

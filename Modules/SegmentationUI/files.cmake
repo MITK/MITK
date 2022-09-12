@@ -4,16 +4,16 @@ Qmitk/QmitkMultiLabelSegWithPreviewToolGUIBase.cpp
 Qmitk/QmitkBinaryThresholdToolGUIBase.cpp
 Qmitk/QmitkBinaryThresholdToolGUI.cpp
 Qmitk/QmitkBinaryThresholdULToolGUI.cpp
-Qmitk/QmitkCalculateGrayValueStatisticsToolGUI.cpp
 Qmitk/QmitkConfirmSegmentationDialog.cpp
 Qmitk/QmitkCopyToClipBoardDialog.cpp
 Qmitk/QmitkDrawPaintbrushToolGUI.cpp
 Qmitk/QmitkErasePaintbrushToolGUI.cpp
+Qmitk/QmitkEditableContourToolGUIBase.cpp
 Qmitk/QmitkLiveWireTool2DGUI.cpp
+Qmitk/QmitkLassoToolGUI.cpp
 Qmitk/QmitkOtsuTool3DGUI.cpp
 Qmitk/QmitkPaintbrushToolGUI.cpp
 Qmitk/QmitkPickingToolGUI.cpp
-Qmitk/QmitkPixelManipulationToolGUI.cpp
 Qmitk/QmitkSlicesInterpolator.cpp
 Qmitk/QmitkToolGUI.cpp
 Qmitk/QmitkToolGUIArea.cpp
@@ -24,7 +24,6 @@ Qmitk/QmitknnUNetWorker.cpp
 Qmitk/QmitknnUNetGPU.cpp
 Qmitk/QmitkSurfaceStampWidget.cpp
 Qmitk/QmitkMaskStampWidget.cpp
-Qmitk/QmitkSliceBasedInterpolatorWidget.cpp
 Qmitk/QmitkStaticDynamicSegmentationDialog.cpp
 Qmitk/QmitkSurfaceBasedInterpolatorWidget.cpp
 Qmitk/QmitkSimpleLabelSetListWidget.cpp
@@ -36,16 +35,16 @@ Qmitk/QmitkMultiLabelSegWithPreviewToolGUIBase.h
 Qmitk/QmitkBinaryThresholdToolGUIBase.h
 Qmitk/QmitkBinaryThresholdToolGUI.h
 Qmitk/QmitkBinaryThresholdULToolGUI.h
-Qmitk/QmitkCalculateGrayValueStatisticsToolGUI.h
 Qmitk/QmitkConfirmSegmentationDialog.h
 Qmitk/QmitkCopyToClipBoardDialog.h
 Qmitk/QmitkDrawPaintbrushToolGUI.h
 Qmitk/QmitkErasePaintbrushToolGUI.h
+Qmitk/QmitkEditableContourToolGUIBase.h
 Qmitk/QmitkLiveWireTool2DGUI.h
+Qmitk/QmitkLassoToolGUI.h
 Qmitk/QmitkOtsuTool3DGUI.h
 Qmitk/QmitkPaintbrushToolGUI.h
 Qmitk/QmitkPickingToolGUI.h
-Qmitk/QmitkPixelManipulationToolGUI.h
 Qmitk/QmitkSlicesInterpolator.h
 Qmitk/QmitkToolGUI.h
 Qmitk/QmitkToolGUIArea.h
@@ -57,7 +56,6 @@ Qmitk/QmitknnUNetWorker.h
 Qmitk/QmitknnUNetEnsembleLayout.h
 Qmitk/QmitkSurfaceStampWidget.h
 Qmitk/QmitkMaskStampWidget.h
-Qmitk/QmitkSliceBasedInterpolatorWidget.h
 Qmitk/QmitkStaticDynamicSegmentationDialog.h
 Qmitk/QmitkSurfaceBasedInterpolatorWidget.h
 Qmitk/QmitkSimpleLabelSetListWidget.h
@@ -66,12 +64,11 @@ Qmitk/QmitkSimpleLabelSetListWidget.h
 set(UI_FILES
 Qmitk/QmitkConfirmSegmentationDialog.ui
 Qmitk/QmitkOtsuToolWidgetControls.ui
-Qmitk/QmitkLiveWireTool2DGUIControls.ui
 Qmitk/QmitkSurfaceStampWidgetGUIControls.ui
 Qmitk/QmitkMaskStampWidgetGUIControls.ui
-Qmitk/QmitkSliceBasedInterpolatorWidgetGUIControls.ui
 Qmitk/QmitkSurfaceBasedInterpolatorWidgetGUIControls.ui
 Qmitk/QmitknnUNetToolGUIControls.ui
+Qmitk/QmitkEditableContourToolGUIControls.ui
 )
 
 set(QRC_FILES

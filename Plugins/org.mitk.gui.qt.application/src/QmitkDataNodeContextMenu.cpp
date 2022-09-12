@@ -117,6 +117,11 @@ void QmitkDataNodeContextMenu::InitDefaultActions()
   m_UnknownDataNodeDescriptor->AddAction(m_ReinitAction, true);
   m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, m_ReinitAction));
 
+  m_ResetGeometryAction = new QmitkDataNodeResetGeometryAction(m_Parent, workbenchPartSite);
+  m_ResetGeometryAction->setIcon(QIcon(":/org.mitk.gui.qt.datamanager/Refresh_48.png"));
+  m_UnknownDataNodeDescriptor->AddAction(m_ResetGeometryAction, true);
+  m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, m_ResetGeometryAction));
+
   QAction* saveAction = new QmitkFileSaveAction(QIcon(":/org.mitk.gui.qt.datamanager/Save_48.png"), workbenchPartSite->GetWorkbenchWindow());
   m_UnknownDataNodeDescriptor->AddAction(saveAction, true);
   m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, saveAction));

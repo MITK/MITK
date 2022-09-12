@@ -10,15 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkFileSystem_h
-#define mitkFileSystem_h
+#include "QmitkLassoToolGUI.h"
 
-#if __has_include(<filesystem>)
-  #include <filesystem>
-  namespace fs = std::filesystem;
-#elif __has_include(<experimental/filesystem>)
-  #include <experimental/filesystem>
-  namespace fs = std::experimental::filesystem;
-#endif
 
-#endif
+MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkLassoToolGUI, "")
+
+QmitkLassoToolGUI::QmitkLassoToolGUI() : QmitkEditableContourToolGUIBase()
+{
+}
+
+QmitkLassoToolGUI::~QmitkLassoToolGUI()
+{
+}

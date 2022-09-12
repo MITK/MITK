@@ -64,12 +64,12 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
       }
 
       // get mapper slot id
-      mitk::BaseRenderer::MapperSlotId mapperID = mitk::BaseRenderer::Standard2D;
+      MapperSlotId mapperID = mitk::BaseRenderer::Standard2D;
       if (element->Attribute(mitk::InteractionEventConst::xmlEventPropertyMapperID().c_str()) != nullptr)
       {
         int mapperIDNum =
           std::atoi(element->Attribute(mitk::InteractionEventConst::xmlEventPropertyMapperID().c_str()));
-        mapperID = static_cast<mitk::BaseRenderer::MapperSlotId>(mapperIDNum);
+        mapperID = static_cast<MapperSlotId>(mapperIDNum);
       }
 
       // Get Size of Render Windows
@@ -151,8 +151,8 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
       rw->GetVtkRenderWindow()->WaitForCompletion();
 
       // connect SliceNavigationControllers to timestep changed event of TimeNavigationController
-      rw->GetSliceNavigationController()->ConnectGeometryTimeEvent(rm->GetTimeNavigationController(), false);
-      rm->GetTimeNavigationController()->ConnectGeometryTimeEvent(rw->GetSliceNavigationController(), false);
+      rw->GetSliceNavigationController()->ConnectGeometryTimeEvent(rm->GetTimeNavigationController());
+      rm->GetTimeNavigationController()->ConnectGeometryTimeEvent(rw->GetSliceNavigationController());
 
       // add to list of known render windows
       m_RenderWindowList.push_back(rw);
@@ -368,12 +368,12 @@ void mitk::InteractionTestHelper::Set3dCameraSettings()
         element->Attribute(mitk::InteractionEventConst::xmlEventPropertyRendererName().c_str());
 
       // get mapper slot id
-      mitk::BaseRenderer::MapperSlotId mapperID = mitk::BaseRenderer::Standard2D;
+      MapperSlotId mapperID = mitk::BaseRenderer::Standard2D;
       if (element->Attribute(mitk::InteractionEventConst::xmlEventPropertyMapperID().c_str()) != nullptr)
       {
         int mapperIDNum =
           std::atoi(element->Attribute(mitk::InteractionEventConst::xmlEventPropertyMapperID().c_str()));
-        mapperID = static_cast<mitk::BaseRenderer::MapperSlotId>(mapperIDNum);
+        mapperID = static_cast<MapperSlotId>(mapperIDNum);
       }
 
       if (mapperID == mitk::BaseRenderer::Standard3D)

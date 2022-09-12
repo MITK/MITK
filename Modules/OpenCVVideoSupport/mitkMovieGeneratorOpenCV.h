@@ -19,8 +19,8 @@ found in the LICENSE file.
 #include <cstring>
 
 // OpenCV includes
-#include "cv.h"
-#include "highgui.h"
+#include <opencv2/core/types_c.h>
+#include <opencv2/videoio.hpp>
 
 
 namespace mitk {

@@ -69,18 +69,18 @@ void InitializeWindows()
 
   // initialize m_TimeNavigationController: send time via sliceNavigationControllers
   m_TimeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
-  m_TimeNavigationController->ConnectGeometryTimeEvent(mitkWidget1->GetSliceNavigationController(), false);
-  m_TimeNavigationController->ConnectGeometryTimeEvent(mitkWidget2->GetSliceNavigationController(), false);
-  m_TimeNavigationController->ConnectGeometryTimeEvent(mitkWidget3->GetSliceNavigationController(), false);
-  m_TimeNavigationController->ConnectGeometryTimeEvent(mitkWidget4->GetSliceNavigationController(), false);
+  m_TimeNavigationController->ConnectGeometryTimeEvent(mitkWidget1->GetSliceNavigationController());
+  m_TimeNavigationController->ConnectGeometryTimeEvent(mitkWidget2->GetSliceNavigationController());
+  m_TimeNavigationController->ConnectGeometryTimeEvent(mitkWidget3->GetSliceNavigationController());
+  m_TimeNavigationController->ConnectGeometryTimeEvent(mitkWidget4->GetSliceNavigationController());
   mitkWidget1->GetSliceNavigationController()->ConnectGeometrySendEvent(
     mitk::BaseRenderer::GetInstance(mitkWidget4->GetVtkRenderWindow()));
 
   // reverse connection between sliceNavigationControllers and m_TimeNavigationController
-  mitkWidget1->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
-  mitkWidget2->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
-  mitkWidget3->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
-  mitkWidget4->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController, false);
+  mitkWidget1->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController);
+  mitkWidget2->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController);
+  mitkWidget3->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController);
+  mitkWidget4->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController);
 
   mitkWidget4->GetRenderer()->GetVtkRenderer()->SetBackground(0.1, 0.1, 0.1);
   mitkWidget4->GetRenderer()->GetVtkRenderer()->SetBackground(0.5, 0.5, 0.5);

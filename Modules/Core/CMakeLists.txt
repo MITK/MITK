@@ -4,16 +4,6 @@ set(TOOL_CPPS "")
 set_source_files_properties( src/DataManagement/mitkImage.cpp COMPILE_FLAGS -DMITK_NO_DEPRECATED_WARNINGS )
 set_source_files_properties( src/Controllers/mitkSliceNavigationController.cpp COMPILE_FLAGS -DMITK_NO_DEPRECATED_WARNINGS )
 
-#if(MSVC)
-#  set(optional_private_package_depends psapi)
-#endif()
-
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1)
-  set(optional_public_target_depends stdc++fs)
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)
-  set(optional_public_target_depends c++fs)
-endif()
-
 mitk_create_module(
   INCLUDE_DIRS
     PUBLIC
@@ -40,9 +30,6 @@ mitk_create_module(
       nlohmann_json
       tinyxml2
       ${optional_private_package_depends}
-  TARGET_DEPENDS
-    PUBLIC
-      ${optional_public_target_depends}
   # Do not automatically create CppMicroServices initialization code.
   # Because the VTK "auto-init" functionality injects file-local static
   # initialization code in every cpp file which includes a VTK header,

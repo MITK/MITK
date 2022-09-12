@@ -13,27 +13,15 @@ found in the LICENSE file.
 #ifndef QmitkLiveWireTool2DGUI_h_Included
 #define QmitkLiveWireTool2DGUI_h_Included
 
-#include "QmitkToolGUI.h"
-#include "mitkLiveWireTool2D.h"
-#include "ui_QmitkLiveWireTool2DGUIControls.h"
+#include "QmitkEditableContourToolGUIBase.h"
 #include <MitkSegmentationUIExports.h>
-
-class QSlider;
-class QLabel;
-class QFrame;
-class QPushButton;
-#include <QCheckBox>
-
-#include "QmitkStepperAdapter.h"
-
-class QmitkLiveWireTool2DGUIControls;
 
 /**
 \ingroup org_mitk_gui_qt_interactivesegmentation_internal
 \brief GUI for mitk::LiveWireTool.
 \sa mitk::LiveWireTool2D
 */
-class MITKSEGMENTATIONUI_EXPORT QmitkLiveWireTool2DGUI : public QmitkToolGUI
+class MITKSEGMENTATIONUI_EXPORT QmitkLiveWireTool2DGUI : public QmitkEditableContourToolGUIBase
 {
   Q_OBJECT
 
@@ -42,25 +30,9 @@ public:
   itkFactorylessNewMacro(Self);
   itkCloneMacro(Self);
 
-    protected slots :
-
-    void OnNewToolAssociated(mitk::Tool *);
-
-  void OnConfirmSegmentation();
-
-  void OnClearSegmentation();
-
-  void OnSnapClosureContour(bool snap);
-
-  void OnShowInformation(bool on);
-
 protected:
   QmitkLiveWireTool2DGUI();
   ~QmitkLiveWireTool2DGUI() override;
-
-  Ui::QmitkLiveWireTool2DGUIControls m_Controls;
-
-  mitk::LiveWireTool2D::Pointer m_LiveWireTool;
 };
 
 #endif

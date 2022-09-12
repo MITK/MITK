@@ -79,7 +79,7 @@ endif()
 
 set(_app_compile_flags )
 if(WIN32)
-  set(_app_compile_flags "${_app_compile_flags} -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN")
+  set(_app_compile_flags "${_app_compile_flags} -DWIN32_LEAN_AND_MEAN")
 endif()
 
 if(MITK_SHOW_CONSOLE_WINDOW)

@@ -33,8 +33,9 @@ found in the LICENSE file.
 
 #include <QFileSystemWatcher>
 #include <QMessageBox>
+#include <QShortcut>
 
-#include <mitkFileSystem.h>
+#include <filesystem>
 
 namespace
 {
@@ -64,7 +65,7 @@ namespace
     return nullptr;
   }
 
-  fs::path GetInputLocation(const mitk::BaseData* data)
+  std::filesystem::path GetInputLocation(const mitk::BaseData* data)
   {
     std::string result;
 
@@ -123,6 +124,15 @@ QmitkSegmentationTaskListWidget::QmitkSegmentationTaskListWidget(QWidget* parent
   connect(m_Ui->loadButton, &QPushButton::clicked, this, &Self::OnLoadButtonClicked);
 
   connect(m_FileSystemWatcher, &QFileSystemWatcher::directoryChanged, this, &Self::OnResultDirectoryChanged);
+
+  auto* prevShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key::Key_P), this);
+  connect(prevShortcut, &QShortcut::activated, this, &Self::OnPreviousTaskShortcutActivated);
+
+  auto* nextShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key::Key_N), this);
+  connect(nextShortcut, &QShortcut::activated, this, &Self::OnNextTaskShortcutActivated);
+
+  auto* loadShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key::Key_L), this);
+  connect(loadShortcut, &QShortcut::activated, this, &Self::OnLoadTaskShortcutActivated);
 
   this->OnSelectionChanged(m_Ui->selectionWidget->GetSelectedNodes());
 }
@@ -218,19 +228,19 @@ void QmitkSegmentationTaskListWidget::ResetFileSystemWatcher()
     {
       auto resultPath = m_TaskList->GetAbsolutePath(task.GetResult()).remove_filename();
 
-      if (!fs::exists(resultPath))
+      if (!std::filesystem::exists(resultPath))
       {
         try
         {
-          fs::create_directories(resultPath);
+          std::filesystem::create_directories(resultPath);
         }
-        catch (const fs::filesystem_error& e)
+        catch (const std::filesystem::filesystem_error& e)
         {
           MITK_ERROR << e.what();
         }
       }
 
-      if (fs::exists(resultPath))
+      if (std::filesystem::exists(resultPath))
         m_FileSystemWatcher->addPath(QString::fromStdString(resultPath.string()));
     }
   }
@@ -295,6 +305,7 @@ void QmitkSegmentationTaskListWidget::OnPreviousButtonClicked()
  */
 void QmitkSegmentationTaskListWidget::OnNextButtonClicked()
 {
+  MITK_INFO << "NEXT";
   const auto maxIndex = m_TaskList->GetNumberOfTasks() - 1;
   auto current = m_CurrentTaskIndex.value();
 
@@ -528,11 +539,11 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
     const auto path = m_TaskList->GetAbsolutePath(m_TaskList->GetResult(current));
     const auto interimPath = m_TaskList->GetInterimPath(path);
 
-    if (fs::exists(path))
+    if (std::filesystem::exists(path))
     {
       segmentation = mitk::IOUtil::Load<mitk::LabelSetImage>(path.string());
     }
-    else if (fs::exists(interimPath))
+    else if (std::filesystem::exists(interimPath))
     {
       segmentation = mitk::IOUtil::Load<mitk::LabelSetImage>(interimPath.string());
     }
@@ -745,7 +756,7 @@ bool QmitkSegmentationTaskListWidget::HandleUnsavedChanges(const QString& altern
     switch (reply)
     {
     case QMessageBox::Save:
-      this->SaveActiveTask(!fs::exists(m_TaskList->GetResult(active)));
+      this->SaveActiveTask(!std::filesystem::exists(m_TaskList->GetResult(active)));
       break;
 
     case QMessageBox::Discard:
@@ -784,4 +795,19 @@ void QmitkSegmentationTaskListWidget::SaveActiveTask(bool saveAsIntermediateResu
 bool QmitkSegmentationTaskListWidget::OnPreShutdown()
 {
   return this->HandleUnsavedChanges(QStringLiteral("Application shutdown"));
+}
+
+void QmitkSegmentationTaskListWidget::OnPreviousTaskShortcutActivated()
+{
+  m_Ui->previousButton->click();
+}
+
+void QmitkSegmentationTaskListWidget::OnNextTaskShortcutActivated()
+{
+  m_Ui->nextButton->click();
+}
+
+void QmitkSegmentationTaskListWidget::OnLoadTaskShortcutActivated()
+{
+  m_Ui->loadButton->click();
 }

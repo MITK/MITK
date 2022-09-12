@@ -1,5 +1,4 @@
 if(BUILD_TESTING)
-if(GDCM_DIR)
 
 # clear variables from prior files.cmake
 # Else CMake would use the content of these variables and would try to create tests (which are not present in DICOMTesting).
@@ -16,7 +15,7 @@ set(CPP_FILES)
 MITK_CREATE_MODULE(
   DEPENDS MitkDICOM
   PACKAGE_DEPENDS
-    PRIVATE GDCM DCMTK ITK|IOGDCM
+    PRIVATE DCMTK|config ITK|IOGDCM
 )
 
 mitk_check_module_dependencies(MODULES MitkDICOMTesting MISSING_DEPENDENCIES_VAR _missing_deps)
@@ -39,5 +38,4 @@ else(_missing_deps)
   add_subdirectory(test)
 endif()
 
-endif()
 endif()

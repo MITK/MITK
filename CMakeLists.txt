@@ -106,57 +106,6 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
                STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
-#-----------------------------------------------------------------------------
-# Check miminum macOS version
-#-----------------------------------------------------------------------------
-# The minimum supported macOS version is 10.14. If you use a version less than
-# 10.14, there is no guarantee that the build still works.
-if(APPLE)
-  exec_program(sw_vers ARGS -productVersion OUTPUT_VARIABLE macos_version)
-  if (macos_version VERSION_LESS "10.14")
-    message(WARNING "Detected macOS version \"${macos_version}\" is not supported anymore. Minimum required macOS version is at least 10.14.")
-  endif()
-  if (CMAKE_OSX_DEPLOYMENT_TARGET AND CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS 10.14)
-    message(WARNING "Detected macOS deployment target \"${CMAKE_OSX_DEPLOYMENT_TARGET}\" is not supported anymore. Minimum required macOS version is at least 10.14.")
-  endif()
-endif()
-
-#-----------------------------------------------------------------------------
-# Check miminum compiler versions
-#-----------------------------------------------------------------------------
-
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  # require at least gcc 4.9 as provided by ppa:ubuntu-toolchain-r/test for Ubuntu 14.04
-  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 4.9)
-    message(FATAL_ERROR "GCC version must be at least 4.9
-If you are using Ubuntu 14.04, you can easily install gcc and g++ 4.9 (or any later version available) in addition to your version ${CMAKE_CXX_COMPILER_VERSION}:
-  sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-  sudo apt-get update
-  sudo apt-get install gcc-4.9 g++-4.9
-Make sure to explicitly specify these compilers when configuring MITK:
-  CMAKE_C_COMPILER:FILEPATH=/usr/bin/gcc-4.9
-  CMAKE_CXX_COMPILER:FILEPATH=/usr/bin/g++-4.9
-For more information on the proposed PPA see the Toolchain Updates section of https://wiki.ubuntu.com/ToolChain.")
-  endif()
-elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  # require at least clang 3.4
-  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.4)
-    message(FATAL_ERROR "Clang version must be at least 3.4")
-  endif()
-elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
-  # require at least clang 5.0
-  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5.0)
-    message(FATAL_ERROR "Apple Clang version must be at least 5.0")
-  endif()
-elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-  # require at least Visual Studio 2017
-  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.10)
-    message(FATAL_ERROR "Microsoft Visual Studio 2017 or newer required")
-  endif()
-else()
-  message(WARNING "You are using an unsupported compiler! Compilation has only been tested with Clang (Linux or Apple), GCC and MSVC.")
-endif()
-
 if(CMAKE_COMPILER_IS_GNUCXX)
   mitkFunctionGetGccVersion(${CMAKE_CXX_COMPILER} GCC_VERSION)
 else()
@@ -751,7 +700,7 @@ set(MITK_EXE_LINKER_FLAGS )
 set(MITK_SHARED_LINKER_FLAGS )
 
 if(WIN32)
-  set(MITK_CXX_FLAGS "${MITK_CXX_FLAGS} -DPOCO_NO_UNWINDOWS -DWIN32_LEAN_AND_MEAN -DNOMINMAX")
+  set(MITK_CXX_FLAGS "${MITK_CXX_FLAGS} -DWIN32_LEAN_AND_MEAN -DNOMINMAX")
   mitkFunctionCheckCompilerFlags("/wd4005" MITK_CXX_FLAGS) # warning C4005: macro redefinition
   mitkFunctionCheckCompilerFlags("/wd4231" MITK_CXX_FLAGS) # warning C4231: nonstandard extension used : 'extern' before template explicit instantiation
   # the following line should be removed after fixing bug 17637

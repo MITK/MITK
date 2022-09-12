@@ -59,6 +59,7 @@ private:
 
   // reaction to button "New Label"
   void OnNewLabel();
+  void OnNewLabelShortcutActivated();
 
   // reaction to the button "Lock exterior"
   void OnLockExterior(bool);

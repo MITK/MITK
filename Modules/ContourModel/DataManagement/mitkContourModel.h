@@ -254,6 +254,8 @@ namespace mitk
     */
     virtual const VertexType *GetVertexAt(int index, TimeStepType timestep = 0) const;
 
+    const VertexType *GetVertexAt(mitk::Point3D &point, float eps, TimeStepType timestep) const;
+
     /** Returns the next control vertex to the approximate nearest vertex of a given position in 3D space
      * If the timestep is invalid a nullptr will be returned.
      */
@@ -276,8 +278,28 @@ namespace mitk
 
     /** \brief Check if mouse cursor is near the contour.
     */
-    virtual bool IsNearContour(Point3D &point, float eps, TimeStepType timestep);
+    bool IsNearContour(Point3D &point, float eps, TimeStepType timestep) const;
 
+    /** Function that searches for the line segment of the contour that is closest to the passed point
+    and close enough (distance between point and line segment <= eps). If such an line segment exist,
+    the starting vertex and closing vertex of the found segment are passed back.
+    @return True indicates that a line segment was found. False indicates that no segment of the contour
+    is close enough to the passed point.
+    @remark previousVertex and nextVertex are only valid if return is true.*/
+    bool GetLineSegmentForPoint(Point3D &point,
+                            float eps,
+                            TimeStepType timestep,
+                            mitk::ContourElement::VertexType *previousVertex = nullptr,
+                            mitk::ContourElement::VertexType *nextVertex = nullptr);
+
+    /**Overloaded version that returns additional information (start and end vertix of the line
+    closest to the passed point and the closest point on the contour).
+    @remark segmentStart, segmentStop and closestContourPoint are only valid if the function returns true.
+    */
+    bool GetLineSegmentForPoint(const mitk::Point3D& point,
+      float eps, TimeStepType timestep, ContourElement::VertexSizeType& segmentStartIndex,
+      ContourElement::VertexSizeType& segmentEndIndex, mitk::Point3D& closestContourPoint,
+      bool findClosest = true) const;
 
     /** \brief Mark a vertex at an index in the container as selected.
      */

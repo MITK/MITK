@@ -20,6 +20,8 @@ found in the LICENSE file.
 #include "vtkColorTransferFunction.h"
 #include "vtkFloatArray.h"
 
+#include <opencv2/core/core_c.h>
+
 
 namespace mitk
 {

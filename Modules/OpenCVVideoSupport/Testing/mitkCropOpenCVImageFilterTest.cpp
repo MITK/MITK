@@ -14,6 +14,7 @@ found in the LICENSE file.
 #include <mitkTestingMacros.h>
 
 #include <opencv2/imgproc.hpp>
+#include <opencv2/imgproc/imgproc_c.h>
 #include <opencv2/imgcodecs.hpp>
 
 static bool ImagesAreEqualInGray(const cv::Mat& img1, const cv::Mat& img2)

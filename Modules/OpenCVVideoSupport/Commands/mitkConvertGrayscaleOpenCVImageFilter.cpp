@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include "mitkConvertGrayscaleOpenCVImageFilter.h"
 
 #include <opencv2/imgproc.hpp>
+#include <opencv2/imgproc/types_c.h>
 
 namespace mitk {
 

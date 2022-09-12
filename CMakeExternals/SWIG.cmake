@@ -6,7 +6,7 @@ if(MITK_USE_SWIG)
     message(FATAL_ERROR "SWIG_DIR variable is defined but corresponds to non-existing directory")
   endif()
 
-  set(SWIG_TARGET_VERSION 3.0.2)
+  set(SWIG_TARGET_VERSION 4.0.2)
   set(proj SWIG)
   if(WIN32)
     set(proj_DEPENDENCIES)
@@ -28,7 +28,7 @@ if(MITK_USE_SWIG)
       # swig.exe available as pre-built binary on Windows:
       ExternalProject_Add(${proj}
         URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/swigwin-${SWIG_TARGET_VERSION}.zip
-        URL_MD5 "3f18de4fc09ab9abb0d3be37c11fbc8f"
+        URL_MD5 "009926b512aee9318546bdd4c7eab6f9"
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ""
         INSTALL_COMMAND ""
@@ -47,9 +47,13 @@ if(MITK_USE_SWIG)
       ExternalProject_add(${proj}
         LIST_SEPARATOR ${sep}
         URL ${MITK_THIRDPARTY_DOWNLOAD_PREFIX_URL}/swig-${SWIG_TARGET_VERSION}.tar.gz
-        # Custom install dir for SWIG
+        URL_MD5 7c3e46cb5af2b469722cafa0d91e127b
+        # Switching to Git would require additional prerequisites:
+        #   - autotools-dev
+        #   - automake
+        # GIT_REPOSITORY https://github.com/swig/swig.git
+        # GIT_TAG v${SWIG_TARGET_VERSION}
         INSTALL_DIR ${ep_prefix}/src/${proj}-install
-        URL_MD5 "62f9b0d010cef36a13a010dc530d0d41"
         CONFIGURE_COMMAND <SOURCE_DIR>/./configure
                           CC=${CMAKE_C_COMPILER}${CMAKE_C_COMPILER_ARG1}
                           LDFLAGS=${CMAKE_LINKER_FLAGS} ${CMAKE_LINKER_FLAGS_RELEASE}

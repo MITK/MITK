@@ -66,7 +66,7 @@ int mitk::SerialCommunication::OpenConnection()
   else
     ss << "\\\\.\\" << m_DeviceName; // use m_DeviceName
 
-  m_ComPortHandle = CreateFile(ss.str().c_str(), GENERIC_READ | GENERIC_WRITE,
+  m_ComPortHandle = CreateFileA(ss.str().c_str(), GENERIC_READ | GENERIC_WRITE,
     0,             // no sharing
     0,             // no security flags
     OPEN_EXISTING, // open com port, don't create it

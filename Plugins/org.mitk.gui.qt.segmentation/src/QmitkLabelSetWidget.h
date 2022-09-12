@@ -88,6 +88,7 @@ private slots:
   void OnRemoveLabel(bool);
   void OnRemoveLabels(bool);
   void OnRenameLabel(bool);
+  void OnRenameLabelShortcutActivated();
   void OnLockedButtonClicked();
   void OnVisibleButtonClicked();
   void OnColorButtonClicked();

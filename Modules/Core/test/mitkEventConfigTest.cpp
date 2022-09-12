@@ -45,7 +45,7 @@ int mitkEventConfigTest(int argc, char *argv[])
    * each one is tested here.
    */
 
-  // Construction using compiled-in resrouces:
+  // Construction using compiled-in resources:
   us::Module *module = us::GetModuleContext()->GetModule();
   mitk::EventConfig newConfig("StatemachineConfigTest.xml", module);
 

@@ -226,7 +226,7 @@ Compute the smallest (minValue), second smallest (min2ndValue), second largest (
 largest (maxValue) data value by traversing the pixel values only once. In the
 same scan it also computes the count of minValue values and maxValue values.
 After that a basic histogram with specific information about the
-extrems is complete.
+extremes is complete.
 
 If minValue == maxValue, the center slice is uniform and the above scan is repeated for
 the complete image, not just one slice
@@ -333,7 +333,7 @@ void mitk::LevelWindow::SetAuto(const mitk::Image *image,
   if (image->GetPixelType().GetPixelType() == itk::IOPixelEnum::SCALAR &&
       image->GetPixelType().GetComponentType() == itk::IOComponentEnum::INT && image->GetPixelType().GetBpe() >= 8)
   {
-    // the windows compiler complains about ambiguos 'pow' call, therefore static casting to (double, int)
+    // the windows compiler complains about ambiguous 'pow' call, therefore static casting to (double, int)
     if (minValue == -(pow((double)2.0, static_cast<int>(image->GetPixelType().GetBpe() / 2))))
     {
       minValue = min2ndValue;

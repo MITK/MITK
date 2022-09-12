@@ -112,9 +112,9 @@ int mitkGrabItkImageMemoryTest(int /*argc*/, char * /*argv*/ [])
   MITK_TEST_BEGIN("mitkGrabItkImageMemoryTest")
 
   Assert_ItkImportWithinAccessByItkSucceded_ReturnsTrue<short>();         // "Import successful on 3D short");
-  Assert_ItkImportWithinAccessByItkSucceded_ReturnsTrue<float>();         // "Import succesfull on float");
-  Assert_ItkImportWithinAccessByItkSucceded_ReturnsTrue<unsigned char>(); // "Import succesfull on uchar");
-  Assert_ItkImportWithinAccessByItkSucceded_ReturnsTrue<int>();           // "Import succesfull on int");
+  Assert_ItkImportWithinAccessByItkSucceded_ReturnsTrue<float>();         // "Import successful on float");
+  Assert_ItkImportWithinAccessByItkSucceded_ReturnsTrue<unsigned char>(); // "Import successful on uchar");
+  Assert_ItkImportWithinAccessByItkSucceded_ReturnsTrue<int>();           // "Import successful on int");
 
   MITK_TEST_END()
 }

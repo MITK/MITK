@@ -110,11 +110,11 @@ namespace mitk
     */
     bool IsValidTimePoint(TimePointType timePoint) const override;
     /**
-    * \brief Test for the given time step if a geometry is availible
+    * \brief Test for the given time step if a geometry is available
     *
     * Returns true if a geometry is defined for the given time step.
     * Otherwise false is returned.
-    * The time step is defined as positiv number.
+    * The time step is defined as positive number.
     */
     bool IsValidTimeStep(TimeStepType timeStep) const override;
     /**
@@ -171,7 +171,7 @@ namespace mitk
     BaseGeometry::Pointer GetGeometryForTimeStep(TimeStepType timeStep) const override;
 
     /**
-    * \brief Tests if all necessary informations are set and the object is valid
+    * \brief Tests if all necessary information are set and the object is valid
     */
     bool IsValid() const override;
 
@@ -232,7 +232,7 @@ namespace mitk
 
     void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
-    /** This is a helper that indicates problematic corner cases that often occure e.g. when loading
+    /** This is a helper that indicates problematic corner cases that often occur e.g. when loading
     dynamic DICOM data. There the final time step is collapsed as min time bound and max time bound
     have the same value. For a more detailed explanation why it happens please see:
     https://phabricator.mitk.org/T24766#131411 and https://phabricator.mitk.org/T27259#203524

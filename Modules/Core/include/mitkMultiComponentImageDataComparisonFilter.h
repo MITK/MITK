@@ -60,7 +60,7 @@ namespace mitk
     * The method compares only the number of pixels with differences. It returns true if the amount
     * is under the specified threshold. To get the complete results, use the GetCompareResults method.
 
-    * Returns false also if the itk ComparisionImageFilter raises an exception during update.
+    * Returns false also if the itk ComparisonImageFilter raises an exception during update.
 
     * /param threshold Allowed percentage of pixels with differences (between 0.0...1.0) */
     bool GetResult(double threshold = 0.0f);

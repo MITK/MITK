@@ -29,7 +29,7 @@ namespace mitk
   /** \brief An object to hold all essential information about an Image object
 
     The ImageDescriptor holds an std::vector of pointers to ChannelDescriptor together with the
-    information about the image's dimensions. The general assumption ist, that each channel of an image
+    information about the image's dimensions. The general assumption is that each channel of an image
     has to have the same geometry.
 
     \sa Image, ChannelDescriptor
@@ -58,7 +58,7 @@ namespace mitk
 
     /** \brief Get the C-array of unsigned int holding the size for each dimension of the image
 
-      The C-array has allways lenght of MAX_IMAGE_DIMENSIONS
+      The C-array has always length of MAX_IMAGE_DIMENSIONS
       */
     const unsigned int *GetDimensions() const { return m_Dimensions; }
     /** \brief Get the number dimensions used (e.g. non-zero size)
@@ -95,7 +95,7 @@ namespace mitk
     /** Protected constructor */
     ImageDescriptor();
 
-    /** Protected desctructor */
+    /** Protected destructor */
     ~ImageDescriptor() override{};
 
   private:

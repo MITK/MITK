@@ -189,7 +189,7 @@ namespace mitk
 
   void RenderingManager::RequestUpdate(vtkRenderWindow *renderWindow)
   {
-    // If the renderWindow is not valid, we do not want to inadvertantly create
+    // If the renderWindow is not valid, we do not want to inadvertently create
     // an entry in the m_RenderWindowList map. It is possible if the user is
     // regularly calling AddRenderer and RemoveRenderer for a rendering update
     // to come into this method with a renderWindow pointer that is valid in the
@@ -212,7 +212,7 @@ namespace mitk
 
   void RenderingManager::ForceImmediateUpdate(vtkRenderWindow *renderWindow)
   {
-    // If the renderWindow is not valid, we do not want to inadvertantly create
+    // If the renderWindow is not valid, we do not want to inadvertently create
     // an entry in the m_RenderWindowList map. It is possible if the user is
     // regularly calling AddRenderer and RemoveRenderer for a rendering update
     // to come into this method with a renderWindow pointer that is valid in the

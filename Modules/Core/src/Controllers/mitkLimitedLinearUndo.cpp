@@ -84,7 +84,7 @@ bool mitk::LimitedLinearUndo::Undo(bool fine)
   {
     // undo one group event ID
     int oeid = FirstObjectEventIdOfCurrentGroup(
-      m_UndoList); // get the Object Event ID of the first item with a differnt Group ID (as seen from the end of stack)
+      m_UndoList); // get the Object Event ID of the first item with a different Group ID (as seen from the end of stack)
     return Undo(oeid);
   }
 }

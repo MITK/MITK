@@ -75,7 +75,7 @@ namespace mitk
 
     /**
      * @brief SetMaxPoints Sets the maximal number of points for the pointset
-     * Default ist zero, which result in infinite number of allowed points
+     * Default is zero, which result in infinite number of allowed points
      * @param maxNumber
      */
     void SetMaxPoints(unsigned int maxNumber = 0);
@@ -124,7 +124,7 @@ namespace mitk
     virtual void IsClosedContour(StateMachineAction *, InteractionEvent *);
 
     /**
-     * Moves the currently selected point to the new coodinates.
+     * Moves the currently selected point to the new coordinates.
      */
     virtual void MovePoint(StateMachineAction *, InteractionEvent *);
 

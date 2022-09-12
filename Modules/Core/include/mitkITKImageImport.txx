@@ -104,7 +104,7 @@ void mitk::ITKImageImport<TInputImage>::SetNthOutput(DataObjectPointerArraySizeT
     // we are disconnected from our output:
     // copy buffer of input to output, because we
     // cannot guarantee that the input (to which our
-    // output is refering) will stay alive.
+    // output is referring) will stay alive.
     InputImageConstPointer input = this->GetInput();
     mitk::Image::Pointer currentOutput = this->GetOutput();
     if (input.IsNotNull() && currentOutput.IsNotNull())
@@ -160,7 +160,7 @@ mitk::Image::Pointer mitk::GrabItkImageMemory(ItkOutputImageType *itkimage,
   {
     resultImage = mitkImage;
 
-    // test the pointer equality with read accessor only if mitk Image is intialized, otherwise an Exception is thrown
+    // test the pointer equality with read accessor only if mitk Image is initialized, otherwise an Exception is thrown
     // by the ReadAccessor
     if (mitkImage->IsInitialized())
     {

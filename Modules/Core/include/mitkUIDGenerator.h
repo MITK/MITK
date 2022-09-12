@@ -25,7 +25,7 @@ namespace mitk
 
     The current implementation uses the UUID specification (https://www.ietf.org/rfc/rfc4122.txt) and
     random generator.
-    One may define a prefix for the UID string. But it is not needed to guarantee uniquness. It is
+    One may define a prefix for the UID string. But it is not needed to guarantee uniqueness. It is
     just a human readable addition, e.g. to see for which purpose the UID was generated.
   */
   class MITKCORE_EXPORT UIDGenerator

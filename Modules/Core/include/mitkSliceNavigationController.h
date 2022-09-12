@@ -97,7 +97,7 @@ namespace mitk
    *   new QmitkSliderNavigator(parent, "slidernavigator");
    *
    * // Connect the navigator to the slice-stepper of the
-   * // SliceNavigationController. For initialization (position, mininal and
+   * // SliceNavigationController. For initialization (position, minimal and
    * // maximal values) the values of the SliceNavigationController are used.
    * // Thus, accessing methods of a navigator is normally not necessary, since
    * // everything can be set via the (Qt-independent) SliceNavigationController.

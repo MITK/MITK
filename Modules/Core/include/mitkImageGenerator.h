@@ -111,7 +111,7 @@ namespace mitk
         MITK_ERROR << "Write access not granted on mitk::Image.";
       }
 
-      // fill the buffer with the specifed value
+      // fill the buffer with the specified value
       for (unsigned int i = 0; i < output->GetVolumeData(0)->GetSize(); i++)
       {
         imageBuffer[i] = fill_value;
@@ -138,7 +138,7 @@ namespace mitk
       mitk::PixelType type = MakeScalarPixelType<TPixelType>();
       // type.Initialize(typeid(TPixelType));
 
-      // initialize the MITK image with given dimenion and data type
+      // initialize the MITK image with given dimension and data type
       mitk::Image::Pointer output = mitk::Image::New();
       auto dimensions = new unsigned int[4];
       unsigned int numberOfDimensions = 0;

@@ -56,7 +56,7 @@ namespace mitk
      * @brief Reads a path or stream and creates a list of BaseData objects.
      *
      * The default implementation of this method (1) calls DoRead()
-     * (Implement the specific reader operation there) and (2) it addes general
+     * (Implement the specific reader operation there) and (2) it adds general
      * meta information about the loading process.
      */
     std::vector<itk::SmartPointer<BaseData>> Read() override;

@@ -30,7 +30,7 @@ namespace mitk
 {
   ///
   /// \brief This class is just a proxy for global functions which are needed by the
-  /// python wrapping process since global functions cannnot be wrapped. Static method
+  /// python wrapping process since global functions cannot be wrapped. Static method
   /// can be wrapped though.
   ///
   class MITKCORE_EXPORT ImageCaster

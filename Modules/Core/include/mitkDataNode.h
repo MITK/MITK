@@ -515,7 +515,7 @@ namespace mitk
      * of BoolProperty)
      * \param visible If set to true, the data will be rendered. If false, the render will skip this data.
      * \param renderer Specify a renderer if the visibility shall be specific to a renderer
-     * \param propertyKey Can be used to specify a user defined name of the visibility propery.
+     * \param propertyKey Can be used to specify a user defined name of the visibility property.
      */
     void SetVisibility(bool visible, const mitk::BaseRenderer *renderer = nullptr, const char *propertyKey = "visible");
 

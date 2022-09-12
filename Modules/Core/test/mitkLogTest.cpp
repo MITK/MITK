@@ -120,7 +120,7 @@ public:
 
 /** Documentation
  *
- *  @brief This class holds static test methods to sturcture the test of the mitk logging mechanism.
+ *  @brief This class holds static test methods to structure the test of the mitk logging mechanism.
  */
 class mitkLogTestClass
 {
@@ -230,7 +230,7 @@ public:
       testSucceded = false;
     }
 
-    // if no error occured until now, everything is ok
+    // if no error occurred until now, everything is ok
     MITK_TEST_CONDITION_REQUIRED(testSucceded, "Test logging in different threads.");
   }
 
@@ -250,7 +250,7 @@ public:
     MITK_INFO << "Test logging";
     mbilog::UnregisterBackend(&myBackend);
 
-    // if no error occured until now, everything is ok
+    // if no error occurred until now, everything is ok
     MITK_TEST_CONDITION_REQUIRED(true, "Test add/remove logging backend.");
   }
 
@@ -283,7 +283,7 @@ int mitkLogTest(int /* argc */, char * /*argv*/ [])
   // always start with this!
   MITK_TEST_BEGIN("Log")
 
-  MITK_TEST_OUTPUT(<< "TESTING ALL LOGGING OUTPUTS, ERROR MESSAGES ARE ALSO TESTED AND NOT MEANING AN ERROR OCCURED!")
+  MITK_TEST_OUTPUT(<< "TESTING ALL LOGGING OUTPUTS, ERROR MESSAGES ARE ALSO TESTED AND NOT MEANING AN ERROR OCCURRED!")
 
   mitkLogTestClass::TestSimpleLog();
   mitkLogTestClass::TestObjectInfoLogging();

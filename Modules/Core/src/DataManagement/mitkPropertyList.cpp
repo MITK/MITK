@@ -89,7 +89,7 @@ void mitk::PropertyList::SetProperty(const std::string &propertyKey, BasePropert
 
     if (it->second->AssignProperty(*property))
     {
-      // The assignment was successfull
+      // The assignment was successful
       this->Modified();
     }
     else

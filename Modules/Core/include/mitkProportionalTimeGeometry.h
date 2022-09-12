@@ -65,7 +65,7 @@ namespace mitk
     /**
     * \brief Returns the last time point for which the object is valid
     *
-    * Gives the last time point for which a valid geometrie is saved in
+    * Gives the last time point for which a valid geometry is saved in
     * this time geometry. The time point is given in ms.
     */
     TimePointType GetMaximumTimePoint() const override;
@@ -102,11 +102,11 @@ namespace mitk
     */
     bool IsValidTimePoint(TimePointType timePoint) const override;
     /**
-    * \brief Test for the given time step if a geometry is availible
+    * \brief Test for the given time step if a geometry is available
     *
     * Returns true if a geometry is defined for the given time step.
     * Otherwise false is returned.
-    * The time step is defined as positiv number.
+    * The time step is defined as positive number.
     */
     bool IsValidTimeStep(TimeStepType timeStep) const override;
     /**
@@ -124,8 +124,8 @@ namespace mitk
   *
   * Converts a time point to a time step in a way that
   * the new time step indicates the same geometry as the time point.
-  * If a negativ invalid time point is given always time step 0 is
-  * returned. If an positiv invalid time step is given an invalid
+  * If a negative invalid time point is given always time step 0 is
+  * returned. If an positive invalid time step is given an invalid
   * time step will be returned.
   */
     TimeStepType TimePointToTimeStep(TimePointType timePoint) const override;
@@ -159,12 +159,12 @@ namespace mitk
     BaseGeometry::Pointer GetGeometryForTimeStep(TimeStepType timeStep) const override;
 
     /**
-    * \brief Tests if all necessary informations are set and the object is valid
+    * \brief Tests if all necessary information are set and the object is valid
     */
     bool IsValid() const override;
 
     /**
-    * \brief Initilizes a new object with one time steps which contains an empty geometry.
+    * \brief Initializes a new object with one time steps which contains an empty geometry.
     */
     void Initialize() override;
 

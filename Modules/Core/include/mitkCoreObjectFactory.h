@@ -97,7 +97,7 @@ namespace mitk
      *
      * @param fileExtensionsMap the existing map, it contains value pairs like
      *        ("*.dcm", "DICOM files"),("*.dc3", "DICOM files").
-     *        This map is extented/merged with the values from the input map.
+     *        This map is extended/merged with the values from the input map.
      * @param inputMap the input map, it contains value pairs like ("*.dcm",
      *        "DICOM files"),("*.dc3", "DICOM files") returned by the extra factories.
      * @deprecatedSince{2014_10}

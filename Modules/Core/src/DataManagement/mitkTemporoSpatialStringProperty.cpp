@@ -273,7 +273,7 @@ void mitk::TemporoSpatialStringProperty::SetValue(const ValueType &value)
 // the public interface of ptree::json_writer. :(
 // A own serialization strategy was implemented instead of using boost::ptree::json_write because
 // currently (<= boost 1.60) everything (even numbers) are converted into string representations
-// by the writer, so e.g. it becomes "t":"2" instaed of "t":2
+// by the writer, so e.g. it becomes "t":"2" instead of "t":2
 template <class Ch>
 std::basic_string<Ch> CreateJSONEscapes(const std::basic_string<Ch> &s)
 {
@@ -334,7 +334,7 @@ using CondensedTimePointsType = std::map<CondensedTimeKeyType, std::string>;
 using CondensedSliceKeyType = std::pair<mitk::TemporoSpatialStringProperty::IndexValueType, mitk::TemporoSpatialStringProperty::IndexValueType>;
 using CondensedSlicesType = std::map<CondensedSliceKeyType, CondensedTimePointsType>;
 
-/** Helper function that checks if between an ID and a successing ID is no gap.*/
+/** Helper function that checks if between an ID and a successive ID is no gap.*/
 template<typename TValue>
 bool isGap(const TValue& value, const TValue& successor)
 {
@@ -384,8 +384,8 @@ CondensedSlicesType CondenseTimePointValuesOfProperty(const mitk::TemporoSpatial
 {
   // REMARK: Implemented own serialization instead of using boost::ptree::json_write because
   // currently (<= boost 1.60) everything (even numbers) are converted into string representations
-  // by the writer, so e.g. it becomes "t":"2" instaed of "t":2
-  // If this problem is fixed with boost, we shoud switch back to json_writer (and remove the custom
+  // by the writer, so e.g. it becomes "t":"2" instead of "t":2
+  // If this problem is fixed with boost, we should switch back to json_writer (and remove the custom
   // implementation of CreateJSONEscapes (see above)).
   const auto *tsProp = dynamic_cast<const mitk::TemporoSpatialStringProperty *>(prop);
 
@@ -403,7 +403,7 @@ CondensedSlicesType CondenseTimePointValuesOfProperty(const mitk::TemporoSpatial
   //internal layout). Reason: There is more entropy in slices (looking at DICOM)
   //than across time points for one slice, so we can "compress" to a higher rate.
   //We don't wanted to change the internal structure of the property as it would
-  //introduce API inconvinience and subtle changes in behavior.
+  //introduce API inconvenience and subtle changes in behavior.
   CondensedSlicesType uncondensedSlices = CondenseTimePointValuesOfProperty(tsProp);
 
   //now condense the slices

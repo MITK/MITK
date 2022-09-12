@@ -87,7 +87,7 @@ namespace mitk
   }                                                                                                                    \
   catch (const std::exception &ex)                                                                                     \
   {                                                                                                                    \
-    MITK_TEST_OUTPUT(<< "std::exception occured " << ex.what())                                                        \
+    MITK_TEST_OUTPUT(<< "std::exception occurred " << ex.what())                                                        \
     mitk::TestManager::GetInstance()->TestFailed();                                                                    \
   }                                                                                                                    \
   if (mitk::TestManager::GetInstance()->NumberOfFailedTests() > 0)                                                     \
@@ -290,7 +290,7 @@ namespace mitk
  * Use this macro after the CPPUNIT_TEST_SUITE() macro to add test cases.
  * The macro internally just calls the CPPUNIT_TEST macro.
  *
- * @param TESTMETHOD The name of the member funtion test.
+ * @param TESTMETHOD The name of the member function test.
  */
 #define MITK_TEST(TESTMETHOD) CPPUNIT_TEST(TESTMETHOD)
 

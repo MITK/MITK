@@ -27,7 +27,7 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-  \brief ExtractSliceFilter extracts a 2D abitrary oriented slice from a 3D volume.
+  \brief ExtractSliceFilter extracts a 2D arbitrary oriented slice from a 3D volume.
 
   The filter can reslice in all orthogonal planes such as sagittal, coronal and axial,
   and is also able to reslice an arbitrary oriented oblique plane.
@@ -102,7 +102,7 @@ namespace mitk
     * Required if the outputDimension is > 2.
     */
     void SetOutputSpacingZDirection(double zSpacing) { this->m_ZSpacing = zSpacing; }
-    /** \brief Set the extent in pixel for direction z manualy.
+    /** \brief Set the extent in pixel for direction z manually.
     Required if the output dimension is > 2.
     */
     void SetOutputExtentZDirection(int zMin, int zMax)
@@ -138,7 +138,7 @@ namespace mitk
       return m_Reslicer->GetOutput();
     }
 
-    /** Set VtkOutPutRequest to suppress the convertion of the image.
+    /** Set VtkOutPutRequest to suppress the conversion of the image.
     * It is suggested to use this with GetVtkOutput().
     * Note:
     * SetVtkOutputRequest(true) has to be called at least once before

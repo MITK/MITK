@@ -405,7 +405,7 @@ int mitkImageTest(int argc, char *argv[])
   MITK_TEST_CONDITION_REQUIRED(mitk::Equal(origin2, vtkoriginAsMitkPoint), "");
 
   MITK_TEST_OUTPUT(<< " Testing if vtkOrigin is (0, 0, 0). This behaviour is due to historical development of MITK. "
-                      "Aslo see bug 5050!");
+                      "Also see bug 5050!");
   vtkImageData *vtkImage = imgMem->GetVtkImageData();
   auto vtkOrigin = vtkImage->GetOrigin();
   MITK_TEST_CONDITION_REQUIRED(mitk::Equal(vtkOrigin[0], 0), "testing vtkOrigin[0] to be 0");

@@ -480,7 +480,7 @@ void mitk::BaseRenderer::DisplayToWorld(const Point2D& displayPoint, Point3D& wo
   {
     double display[3], * world;
 
-    // For the rigth z-position in display coordinates, take the focal point, convert it to display and use it for
+    // For the right z-position in display coordinates, take the focal point, convert it to display and use it for
     // correct depth.
     double* displayCoord;
     double cameraFP[4];

@@ -20,7 +20,7 @@ namespace mitk
   StatusBar *StatusBar::m_Instance = nullptr;
 
   /**
-   * Display the text in the statusbar of the applikation
+   * Display the text in the statusbar of the application
    */
   void StatusBar::DisplayText(const char *t)
   {
@@ -29,7 +29,7 @@ namespace mitk
   }
 
   /**
-   * Display the text in the statusbar of the applikation for ms seconds
+   * Display the text in the statusbar of the application for ms seconds
    */
   void StatusBar::DisplayText(const char *t, int ms)
   {

@@ -3,7 +3,7 @@
 \defgroup MicroServices_Interfaces Micro Services Interfaces
 \ingroup Core
 
-\brief Classes (interfaces) in this category are explicitely designed for usage with the MITK Micro Services.
+\brief Classes (interfaces) in this category are explicitly designed for usage with the MITK Micro Services.
 
 All classes in this category are structs with no non-static members and only pure virtual functions
 (except for an inlined virtual destructor). Such a class will be called a \e interface.

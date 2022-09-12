@@ -227,7 +227,7 @@ void mitk::ImageToItk<TOutputImage>::GenerateOutputInformation()
   /// If the MITK image contains any other rotation, the ITK image will have no rotation at all.
   /// Spacing is of course conserved in both cases.
 
-  // the following loop devides by spacing now to normalize columns.
+  // the following loop divides by spacing now to normalize columns.
   // counterpart of InitializeByItk in mitkImage.h line 372 of revision 15092.
 
   // Check if information is lost

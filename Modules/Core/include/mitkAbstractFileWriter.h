@@ -40,8 +40,8 @@ namespace mitk
    * @brief Base class for writing mitk::BaseData objects to files or streams.
    *
    * In general, all file writers should derive from this class, this way it is
-   * made sure that the new implementation is
-   * exposed to the Microservice-Framework and that is automatically available troughout MITK.
+   * made sure that the new implementation is exposed to the
+   * Microservice-Framework and that is automatically available throughout MITK.
    * The default implementation only requires one Write()
    * method and the Clone() method to be implemented.
    *

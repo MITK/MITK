@@ -22,7 +22,7 @@ found in the LICENSE file.
 namespace mitk
 {
   //##Documentation
-  //## @brief Descibes a line
+  //## @brief Describes a line
   //## @ingroup Geometry
   template <class TCoordRep, unsigned int NPointDimension = 3>
   class Line

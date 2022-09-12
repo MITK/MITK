@@ -318,13 +318,13 @@ void mitk::ExtractSliceFilter::GenerateData()
       * Transform the origin to center based coordinates.
       * Note:
       * This is needed besause vtk's origin is center based too (!!!) ( see 'The VTK book' page 88 )
-      * and the worldGeometry surrouding the image is no imageGeometry. So the worldGeometry
+      * and the worldGeometry surrounding the image is no imageGeometry. So the worldGeometry
       * has its origin at the corner of the voxel and needs to be transformed.
       */
       origin += m_Right * (m_OutPutSpacing[0] * 0.5);
       origin += m_Bottom * (m_OutPutSpacing[1] * 0.5);
 
-      // set the tranform for reslicing.
+      // set the transform for reslicing.
       // Use inverse transform of the input geometry for reslicing the 3D image.
       // This is needed if the image volume already transformed
       if (m_ResliceTransform.IsNotNull())

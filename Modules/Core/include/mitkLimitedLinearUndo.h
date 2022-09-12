@@ -141,7 +141,7 @@ namespace mitk
 
 #pragma GCC visibility push(default)
 
-  /// Some itk events to notify listening GUI elements, when the undo or redo stack is empty (diable undo button)
+  /// Some itk events to notify listening GUI elements, when the undo or redo stack is empty (disable undo button)
   /// or when there are items in the stack (enable button)
   itkEventMacroDeclaration(UndoStackEvent, itk::ModifiedEvent);
   itkEventMacroDeclaration(UndoEmptyEvent, UndoStackEvent);

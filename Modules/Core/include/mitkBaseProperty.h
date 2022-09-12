@@ -57,7 +57,7 @@ namespace mitk
     /*! @brief Assigns property to this BaseProperty instance.
 
         This method is identical to the assignment operator, except for the return type.
-        It allows to directly check if the assignemnt was successfull.
+        It allows to directly check if the assignment was successful.
     */
     bool AssignProperty(const BaseProperty &property);
 

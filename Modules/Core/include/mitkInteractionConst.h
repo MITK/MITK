@@ -498,9 +498,9 @@ namespace mitk
     Type_TabletPress = 92,              // tablet press
     Type_TabletRelease = 93,            // tablet release
     Type_User = 1000,                   // first user event id
-    Type_SpaceNavigatorInput = 1094,    // 3D mouse input occured
-    Type_SpaceNavigatorKeyDown = 1095,  // 3D mouse input occured
-    Type_WiiMoteInput = 1096,           // WiiMote input occured
+    Type_SpaceNavigatorInput = 1094,    // 3D mouse input occurred
+    Type_SpaceNavigatorKeyDown = 1095,  // 3D mouse input occurred
+    Type_WiiMoteInput = 1096,           // WiiMote input occurred
     Type_WiiMoteButton = 1097,          // WiiMote button pressed
     Type_MaxUser = 65535
   };

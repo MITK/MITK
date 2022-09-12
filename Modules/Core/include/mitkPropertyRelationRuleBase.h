@@ -28,8 +28,8 @@ namespace mitk
 {
   /**Base class to standardize/abstract/encapsulate rules and business logic to detect and define
   (property/data based) relations in MITK.
-  Following important definitions must be regarded when using/implementing/specifing rule classes:
-  - Releations represented by rules are directed relations that point from a source IPropertyOwner (Source)
+  Following important definitions must be regarded when using/implementing/specifying rule classes:
+  - Relations represented by rules are directed relations that point from a source IPropertyOwner (Source)
   to a destination IPropertyOwner (Destination).
   - Rule can be abstract (indicated by IsAbstract()) or concrete. Abstract rules cannot be used to connect relations.
   Abstract rules can only be used to detect/indicate or disconnect relations. Therefore, in contrast to concrete rules,
@@ -59,7 +59,7 @@ namespace mitk
   possible; e.g. DICOM source images may point to several loaded mitk images). But if explicitly a relation was
   connected it should be deduceable. 2nd, checks on a UID are faster then unnecessary data deduction.
 
-  Rules use relation instance identifing (RII) properties in order to manage their relations that are stored in the
+  Rules use relation instance identifying (RII) properties in order to manage their relations that are stored in the
   Source. The RII-properties follow the following naming schema:
   "MITK.Relations.\<InstanceID\>.[relationUID|destinationUID|ruleID|\<data-layer-specific\>]"
   - \<InstanceID\>: The unique index of the relation for the Source. Used to assign/group the properties to
@@ -68,7 +68,7 @@ namespace mitk
   - destinationUID: The UID of the Destination. Set by the ID-layer (so by this class) if Destination implements
   IIdentifiable.
   - ruleID: The identifier of the concrete rule that sets the property. Is specified by the derived class and set
-  automaticaly be this base class.
+  automatically be this base class.
   - <data-layer-specific>: Information needed by the Data-layer (so derived classes) to find the relationUID
   */
   class MITKCORE_EXPORT PropertyRelationRuleBase : public itk::Object
@@ -89,8 +89,8 @@ namespace mitk
       Data = 1,  /**< Two IPropertyOwner have a relation, but it is "only" deduced from the Data-layer (so a bit
                    "weaker" as ID). Reasons for the missing ID connection could be that Destintination has not
                    IIdentifiable implemented.*/
-      ID = 2,    /**< Two IPropertyOwner have a relation and are explictly connected via the ID of IIdentifiable of the Destination.*/
-      Complete = 3    /**< Two IPropertyOwner have a relation and are fully explictly connected (via data layer and ID layer).*/
+      ID = 2,    /**< Two IPropertyOwner have a relation and are explicitly connected via the ID of IIdentifiable of the Destination.*/
+      Complete = 3    /**< Two IPropertyOwner have a relation and are fully explicitly connected (via data layer and ID layer).*/
     };
     using RelationVectorType = std::vector<RelationType>;
 
@@ -127,7 +127,7 @@ namespace mitk
     /** Returns a human readable string that can be used to describe the role of a source in context of the rule
      * instance.*/
     virtual std::string GetSourceRoleName() const = 0;
-    /** Returns a human readable string that can be used to describe the role of a destionation in context of the rule
+    /** Returns a human readable string that can be used to describe the role of a destination in context of the rule
      * instance.*/
     virtual std::string GetDestinationRoleName() const = 0;
 
@@ -194,7 +194,7 @@ namespace mitk
     @pre destination must be a pointer to a valid IPropertyOwner instance.
     @pre Source and destination have one relation; otherwise
     if no relation exists a NoPropertyRelationException is thrown; if more than one relation exists
-    a default MITK expception is thrown.*/
+    a default MITK exception is thrown.*/
     RelationUIDType GetRelationUID(const IPropertyProvider *source, const IPropertyProvider *destination) const;
 
     /**Predicate that can be used to find nodes that qualify as source for that rule (but must not be a source yet).
@@ -229,7 +229,7 @@ namespace mitk
     NodePredicateBase::ConstPointer GetDestinationDetector(const IPropertyProvider *source,
                                                            RelationUIDType relationUID) const;
 
-    /**Disconnect the passed instances by modifing source. One can specify which layer should be disconnected
+    /**Disconnect the passed instances by modifying source. One can specify which layer should be disconnected
     via the argument "layer". Default is the complete disconnection.
     All RII-properties or properties that define the connection on the data layer in the source
     for the passed destination will be removed.
@@ -240,7 +240,7 @@ namespace mitk
     @param layer Defines the way of disconnection. Data: Only the remove the connection on the data layer. ID: Only remove the connection
     on the ID layer. Complete: Remove the connection on all layers. If a connection does not exist on a selected layer, it is silently ignored.*/
     void Disconnect(IPropertyOwner *source, const IPropertyProvider *destination, RelationType layer = RelationType::Complete) const;
-    /**Disconnect the source from the passed relationUID (usefull for "zombie relations").
+    /**Disconnect the source from the passed relationUID (useful for "zombie relations").
     One can specify which layer should be disconnected
     via the argument "layer". Default is the complete disconnection.
     All RII-properties or properties that define the connection on the data layer in the source
@@ -254,13 +254,13 @@ namespace mitk
     void Disconnect(IPropertyOwner *source, RelationUIDType relationUID, RelationType layer = RelationType::Complete) const;
 
     /**Returns the list of PropertyKeyPaths of all properties that are relevant for a given relation.
-    @param source Pointer to the Source instance that containes the potential properties.
+    @param source Pointer to the Source instance that contains the potential properties.
     @param relationUID UID of the relation that is relevant for the requested properties.
     @param layer Indicates which layer is requested. ID: returns all RII properties that belong to the relation. Data: returns all properties that are relevant/belong to the data layer of the relation. Complete: returns all properties (ID+Data)
     @pre source must be a valid instance.
     @pre relationUID must identify a relation of the passed source and rule. (This must be in the return of
     this->GetExistingRelations(source). */
-    std::vector<PropertyKeyPath> GetReleationPropertyPaths(const IPropertyProvider* source,
+    std::vector<PropertyKeyPath> GetRelationPropertyPaths(const IPropertyProvider* source,
       RelationUIDType relationUID, RelationType layer = RelationType::Data) const;
 
   protected:
@@ -284,7 +284,7 @@ namespace mitk
                                                                          const IPropertyProvider *destination) const;
 
     using DataRelationUIDVectorType = std::vector< std::pair<RelationUIDType, RuleIDType> >;
-    /** Returns the ReleationUIDs of all relations that are defined by the data layer of source for
+    /** Returns the RelationUIDs of all relations that are defined by the data layer of source for
     this rule instance and, if defined, destination.
     If the passed source (and destination) instance has no relation on the data layer,
     an empty vector will be returned.
@@ -297,8 +297,8 @@ namespace mitk
     @param source
     @param destination Destination the find relations should point to. If destination is NULL any relation
     on the data layer for this rule and source are wanted.
-    @param instances_IDLayer List of releation instances that are already defined by the ID layer. The implementation of this
-    function should only cover releations that are not already resembled in the passed relarions_IDLayer.
+    @param instances_IDLayer List of relation instances that are already defined by the ID layer. The implementation of this
+    function should only cover relations that are not already resembled in the passed relarions_IDLayer.
     @pre source must be a pointer to a valid IPropertyProvider instance.*/
     virtual DataRelationUIDVectorType GetRelationUIDs_DataLayer(const IPropertyProvider * source,
       const IPropertyProvider * destination, const InstanceIDVectorType& instances_IDLayer) const = 0;
@@ -329,7 +329,7 @@ namespace mitk
     overwritten. Connect() will ensure that source and destination are valid pointers.
     @param source
     @param destination
-    @param instanceID is the ID for the relation instance that should be connected. Existance of the relation instance
+    @param instanceID is the ID for the relation instance that should be connected. Existence of the relation instance
     is ensured.
     @pre source must be a valid instance.
     @pre destination must be a valid instance.*/
@@ -359,12 +359,12 @@ namespace mitk
     If it cannot be deduced an MITK exception is thrown.*/
     static InstanceIDType GetInstanceIDByPropertyName(const std::string propName);
 
-    /**Helper function that retrives the rule ID of a relation instance of a passed source.
+    /**Helper function that retrieves the rule ID of a relation instance of a passed source.
      @pre source must be valid.
      @pre source must have a relation instance with this ID*/
     RuleIDType GetRuleIDByInstanceID(const IPropertyProvider *source,
       const InstanceIDType &instanceID) const;
-    /**Helper function that retrives the destination UID of a relation instance of a passed
+    /**Helper function that retrieves the destination UID of a relation instance of a passed
        source. If the relation has no destination UID, an empty string will be returned.
        @pre source must be valid.*/
     std::string GetDestinationUIDByInstanceID(const IPropertyProvider * source,
@@ -380,10 +380,10 @@ namespace mitk
     const Identifiable* CastProviderAsIdentifiable(const mitk::IPropertyProvider* provider) const;
 
   private:
-    /** Creats a relation UID*/
+    /** Creates a relation UID*/
     static RelationUIDType CreateRelationUID();
 
-    /**Prepares a new relation instance. Therefore an unused and valid instance ID for the passed source will be genarated
+    /**Prepares a new relation instance. Therefore an unused and valid instance ID for the passed source will be generated
     and a relationUID property with the relationUID will be set to block the instance ID. The
     instance ID will be returned.
     @remark The method is guarded by a class wide mutex to avoid racing conditions in a scenario where rules are used

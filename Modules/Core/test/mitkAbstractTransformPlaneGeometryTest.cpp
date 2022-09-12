@@ -63,7 +63,7 @@ int mitkVtkAbstractTransformPlaneGeometryTest(int argc, char *argv[])
   }
   std::cout << "[PASSED]" << std::endl;
 
-  std::cout << "Testing whether the parametic bounds of VtkAbstractTransformPlaneGeometry and the bounds of the plane "
+  std::cout << "Testing whether the parametric bounds of VtkAbstractTransformPlaneGeometry and the bounds of the plane "
                "accessed from there are equal: ";
   if ((mitk::Equal(const_cast<mitk::BoundingBox *>(abstractgeometry->GetParametricBoundingBox())->GetMinimum(),
                    const_cast<mitk::BoundingBox *>(abstractgeometry->GetPlane()->GetBoundingBox())->GetMinimum()) ==
@@ -77,7 +77,7 @@ int mitkVtkAbstractTransformPlaneGeometryTest(int argc, char *argv[])
   }
   std::cout << "[PASSED]" << std::endl;
 
-  std::cout << "Change parametic bounds of VtkAbstractTransformPlaneGeometry and test whether they are equal to the "
+  std::cout << "Change parametric bounds of VtkAbstractTransformPlaneGeometry and test whether they are equal to the "
                "bounds of the plane accessed from there: "
             << std::endl;
   height = 300;
@@ -133,7 +133,7 @@ int mitkVtkAbstractTransformPlaneGeometryTest(int argc, char *argv[])
   }
   std::cout << "[PASSED]" << std::endl;
 
-  std::cout << "Testing whether the parametic bounds of VtkAbstractTransformPlaneGeometry and the bounds of the plane "
+  std::cout << "Testing whether the parametric bounds of VtkAbstractTransformPlaneGeometry and the bounds of the plane "
                "accessed from there are equal: ";
   if ((mitk::Equal(const_cast<mitk::BoundingBox *>(abstractgeometry->GetParametricBoundingBox())->GetMinimum(),
                    const_cast<mitk::BoundingBox *>(abstractgeometry->GetPlane()->GetBoundingBox())->GetMinimum()) ==
@@ -185,7 +185,7 @@ int mitkVtkAbstractTransformPlaneGeometryTest(int argc, char *argv[])
   }
   std::cout << "[PASSED]" << std::endl;
 
-  std::cout << "Change parametic bounds of VtkAbstractTransformPlaneGeometry and test whether they are equal to the "
+  std::cout << "Change parametric bounds of VtkAbstractTransformPlaneGeometry and test whether they are equal to the "
                "bounds of the plane accessed from there: "
             << std::endl;
   height = 300;

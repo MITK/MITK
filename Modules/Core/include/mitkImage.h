@@ -389,10 +389,10 @@ namespace mitk
             (j == 2) && (m_Dimensions[2] == 1))
         {
           // Negative spacings can occur when reading single DICOM slices with ITK via GDCMIO
-          // In these cases spacing is not determind by ITK correctly (because it distinguishes correctly
+          // In these cases spacing is not determined by ITK correctly (because it distinguishes correctly
           // between slice thickness and inter slice distance -- slice distance is meaningless for
           // single slices).
-          // I experienced that ITK produced something meaningful nonetheless because is is
+          // I experienced that ITK produced something meaningful nonetheless because it is
           // evaluating the tag "(0018,0088) Spacing between slices" as a fallback. This tag is not
           // reliable (http://www.itk.org/pipermail/insight-users/2005-September/014711.html)
           // but gives at least a hint.
@@ -616,7 +616,7 @@ namespace mitk
   };
 
   /**
-  * @brief Equal A function comparing two images for beeing equal in meta- and imagedata
+  * @brief Equal A function comparing two images for being equal in meta- and imagedata
   *
   * @ingroup MITKTestingAPI
   *

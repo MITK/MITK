@@ -66,7 +66,7 @@ namespace mitk
   //## WorldToIndex, otherwise you will get a continuous index
   //## (floating point values).
   //##
-  //## An important sub-class is SlicedGeometry3D, which descibes
+  //## An important sub-class is SlicedGeometry3D, which describes
   //## data objects consisting of slices, e.g., objects of type Image.
   //## Conversions between world coordinates (in mm) and unit coordinates
   //## (e.g., pixels in the case of an Image) can be performed.
@@ -75,7 +75,7 @@ namespace mitk
   //##
   //## BaseGeometry instances referring to an Image need a slightly
   //## different definition of corners, see SetImageGeometry. This
-  //## is usualy automatically called by Image.
+  //## is usually automatically called by Image.
   //##
   //## BaseGeometry have to be initialized in the method GenerateOutputInformation()
   //## of BaseProcess (or CopyInformation/ UpdateOutputInformation of BaseData,
@@ -87,7 +87,7 @@ namespace mitk
   //## At least, it can return the bounding box of the data object.
   //##
   //## The BaseGeometry class is an abstract class. The most simple implementation
-  //## is the sublass Geometry3D.
+  //## is the subclass Geometry3D.
   //##
   //## Rule: everything is in mm (ms) if not stated otherwise.
   //## @ingroup Geometry
@@ -481,7 +481,7 @@ namespace mitk
     bool IsInside(const mitk::Point3D &p) const;
 
     //##Documentation
-    //## @brief Test whether the point \a p ((continous!)index coordinates in units) is
+    //## @brief Test whether the point \a p ((continuous!)index coordinates in units) is
     //## inside the bounding box
     bool IsIndexInside(const mitk::Point3D &index) const;
 
@@ -514,7 +514,7 @@ namespace mitk
     //## For more information, see SetImageGeometry
     itkGetConstMacro(ImageGeometry, bool)
       //##Documentation
-      //## @brief Define that this BaseGeometry is refering to an Image
+      //## @brief Define that this BaseGeometry is referring to an Image
       //##
       //## A geometry referring to an Image needs a slightly different
       //## definition of the position of the corners (see GetCornerPoint).
@@ -621,14 +621,14 @@ namespace mitk
   // Static compare functions mainly for testing
   //
   /**
-  * @brief Equal A function comparing two geometries for beeing identical.
+  * @brief Equal A function comparing two geometries for being identical.
   *
   * @ingroup MITKTestingAPI
   *
   * The function compares the spacing, origin, axisvectors, extents, the matrix of the
   * IndexToWorldTransform (elementwise), the bounding (elementwise) and the ImageGeometry flag.
   *
-  * The parameter eps is a tolarence value for all methods which are internally used for comparion.
+  * The parameter eps is a tolarence value for all methods which are internally used for comparison.
   * If you want to use different tolerance values for different parts of the geometry, feel free to use
   * the other comparison methods and write your own implementation of Equal.
   * @param rightHandSide Compare this against leftHandSide.
@@ -646,7 +646,7 @@ namespace mitk
     bool verbose = false);
 
   /**
-  * @brief Equal A function comparing two geometries for beeing identical.
+  * @brief Equal A function comparing two geometries for being identical.
   *
   * @ingroup MITKTestingAPI
   *
@@ -665,13 +665,13 @@ namespace mitk
                              bool verbose = false);
 
   /**
-  * @brief Equal A function comparing two transforms (TransformType) for beeing identical.
+  * @brief Equal A function comparing two transforms (TransformType) for being identical.
   *
   * @ingroup MITKTestingAPI
   *
   * The function compares the IndexToWorldTransform (elementwise).
   *
-  * The parameter eps is a tolarence value for all methods which are internally used for comparion.
+  * The parameter eps is a tolarence value for all methods which are internally used for comparison.
   * @param rightHandSide Compare this against leftHandSide.
   * @param leftHandSide Compare this against rightHandSide.
   * @param eps Tolarence for comparison. You can use mitk::eps in most cases.
@@ -684,13 +684,13 @@ namespace mitk
                              bool verbose);
 
   /**
-  * @brief Equal A function comparing two bounding boxes (BoundingBoxType) for beeing identical.
+  * @brief Equal A function comparing two bounding boxes (BoundingBoxType) for being identical.
   *
   * @ingroup MITKTestingAPI
   *
   * The function compares the bounds (elementwise).
   *
-  * The parameter eps is a tolarence value for all methods which are internally used for comparion.
+  * The parameter eps is a tolarence value for all methods which are internally used for comparison.
   * @param rightHandSide Compare this against leftHandSide.
   * @param leftHandSide Compare this against rightHandSide.
   * @param eps Tolarence for comparison. You can use mitk::eps in most cases.
@@ -707,7 +707,7 @@ namespace mitk
   * a given reference geometry.
   *
   * Sub geometry means that both geometries have the same voxel grid (same spacing, same axes,
-  * orgin is on voxel grid), but the bounding box of the checked geometry is contained or equal
+  * origin is on voxel grid), but the bounding box of the checked geometry is contained or equal
   * to the bounding box of the reference geometry.\n
   * By this definition equal geometries are always sub geometries of each other.
   *

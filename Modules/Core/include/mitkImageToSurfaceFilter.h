@@ -53,7 +53,7 @@ namespace mitk
     /*
   * To decide whether a reduction of polygons in the created surface shall be
   * done or not by using the vtkDecimatePro Filter. Till vtk 4.x an vtkDecimateFilter existed,
-  * but was patented. So since vtk 5.x it was replaced by the (worser?) vtkDecimateProFilter
+  * but was patented. So since vtk 5.x it was replaced by the (much worse?) vtkDecimateProFilter
   * Maybe another Filter will come soon.
   */
     enum DecimationType
@@ -81,7 +81,7 @@ namespace mitk
     void GenerateOutputInformation() override;
 
     /**
-     * Returns a const reference to the input image (e.g. the original input image that ist used to create the surface)
+     * Returns a const reference to the input image (e.g. the original input image that is used to create the surface)
      */
     const mitk::Image *GetInput(void);
 
@@ -97,7 +97,7 @@ namespace mitk
      * the
      * laplacian filter. The higher the number of iterations that stronger the smooth-result
      *
-     * @param smoothIteration As smoothIteration default in that case 50 was choosen. The VTK documentation recommends
+     * @param smoothIteration As smoothIteration default in that case 50 was chosen. The VTK documentation recommends
      * small relaxation factors and large numbers of iterations.
      */
     void SetSmoothIteration(int smoothIteration);
@@ -107,7 +107,7 @@ namespace mitk
      * smoothing. The VTK documentation recommends small relaxation factors
      * and large numbers of iterations.
      *
-     * @param smoothRelaxation As smoothRelaxation default in that case 0.1 was choosen. The VTK documentation
+     * @param smoothRelaxation As smoothRelaxation default in that case 0.1 was chosen. The VTK documentation
      * recommends
      * small relaxation factors and large numbers of iterations.
      */
@@ -145,7 +145,7 @@ namespace mitk
 
     /**
      * Get the state of decimation mode to reduce triangle in the
-     * surface represantation. Modes can only be NoDecimation or DecimatePro
+     * surface representation. Modes can only be NoDecimation or DecimatePro
    * (till vtk 4.x also Decimate)
      * */
     itkGetConstMacro(Decimate, DecimationType);

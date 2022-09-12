@@ -30,9 +30,9 @@ namespace mitk
     a decimal separator.
 
     WARNING: Please be aware that using setlocale and there for is not thread
-    safe. So use this class with care (see tast T24295 for more information.
+    safe. So use this class with care (see task T24295 for more information.
     This switch is especially use full if you have to deal with third party code
-    where you have to controll the locale via set locale
+    where you have to control the locale via set locale
     \code
     {
       mitk::LocaleSwitch localeSwitch("C");// installs C locale until the end of the function

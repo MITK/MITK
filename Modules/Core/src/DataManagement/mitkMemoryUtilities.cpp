@@ -65,7 +65,7 @@ size_t mitk::MemoryUtilities::GetProcessMemoryUsage()
 }
 
 /**
- * Returns the total size of phyiscal memory in bytes
+ * Returns the total size of physical memory in bytes
  */
 size_t mitk::MemoryUtilities::GetTotalSizeOfPhysicalRam()
 {

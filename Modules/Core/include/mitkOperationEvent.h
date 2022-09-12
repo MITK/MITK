@@ -43,7 +43,7 @@ namespace mitk
     //## @brief For combining operations in groups
     //##
     //## This ID is used in the undo mechanism.
-    //## For separation of the seperate operations
+    //## For separation of the separate operations
     //## If the GroupEventId of two OperationEvents is equal,
     //## then they share one group and will be undone in case of Undo(fine==false)
     static int GetCurrGroupEventId();
@@ -52,10 +52,10 @@ namespace mitk
     //## @brief For combining operations in Objects
     //##
     //## This ID is used in the Undo-Mechanism.
-    //## For separation of the seperate operations
+    //## For separation of the separate operations
     //## If the ObjectEventId of two OperationEvents is equal,
     //## then they share one Object and will be undone in all cases of Undo(true and false).
-    //## they shal not be seperated, because they were produced to realize one object-change.
+    //## they shal not be separated, because they were produced to realize one object-change.
     //## for example: OE_statechange and OE_addlastpoint
     static int GetCurrObjectEventId();
 
@@ -98,7 +98,7 @@ namespace mitk
 
   protected:
     //##Documentation
-    //## @brief true, if operation and undooperation have been swaped/changed
+    //## @brief true, if operation and undooperation have been swapped/changed
     bool m_Reversed;
 
   private:

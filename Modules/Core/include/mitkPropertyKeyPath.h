@@ -30,10 +30,10 @@ namespace mitk
    * - An element has a name (alphanumric, - and space; "A-Za-z0-9- ") or is wildcarded ("*")
    * - A selection is either an index (e.g. "[1]") or a wildcard ("[*]").
    *
-   * Selections are used to indicate that the preceding element has multiple occurences and which occurence is meant.
+   * Selections are used to indicate that the preceding element has multiple occurrences and which occurence is meant.
    * Example property keys would be:
    * - prop : A simple property key
-   * - prop.subprop1 : A property key consting of two nodes
+   * - prop.subprop1 : A property key consisting of two nodes
    * - prop.* : Any property key that starts with a node "prop"
    * - prop.sub.[2] : A property key that starts with a node "prop" and a has a second node that is selection and has
    * the index 2.
@@ -168,7 +168,7 @@ namespace mitk
 
     PropertyKeyPath();
     PropertyKeyPath(const PropertyKeyPath &path);
-    /** overload constructor that supports simple key pathes consisting only of elements.*/
+    /** overload constructor that supports simple key paths consisting only of elements.*/
     PropertyKeyPath(const std::initializer_list< ElementNameType >& list);
 
     ~PropertyKeyPath();

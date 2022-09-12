@@ -44,9 +44,9 @@ namespace mitk
                                 const std::string &className = "",
                                 bool overwrite = false) = 0;
 
-    /** \brief Add a description for all properties matching the property regulary expression.
+    /** \brief Add a description for all properties matching the property regular expression.
     *
-    * \param[in] propertyRegEx String of the regular expression specifing all relevant property names.
+    * \param[in] propertyRegEx String of the regular expression specifying all relevant property names.
     * \param[in] description Description of the property.
     * \param[in] className Optional data node class name to which this description is restricted.
     * \param[in] overwrite Overwrite already existing description.

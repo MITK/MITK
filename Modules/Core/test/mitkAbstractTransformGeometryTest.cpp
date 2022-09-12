@@ -60,7 +60,7 @@ int mitkAbstractTransformGeometryTest(int /*argc*/, char * /*argv*/ [])
   }
   std::cout << "[PASSED]" << std::endl;
 
-  std::cout << "Testing whether the parametic bounds of AbstractTransformGeometry and the bounds of the plane accessed "
+  std::cout << "Testing whether the parametric bounds of AbstractTransformGeometry and the bounds of the plane accessed "
                "from there are equal: ";
   if ((mitk::Equal(const_cast<mitk::BoundingBox *>(abstractgeometry->GetParametricBoundingBox())->GetMinimum(),
                    const_cast<mitk::BoundingBox *>(abstractgeometry->GetPlane()->GetBoundingBox())->GetMinimum()) ==
@@ -74,7 +74,7 @@ int mitkAbstractTransformGeometryTest(int /*argc*/, char * /*argv*/ [])
   }
   std::cout << "[PASSED]" << std::endl;
 
-  std::cout << "Change parametic bounds of AbstractTransformGeometry and test whether they are equal to the bounds of "
+  std::cout << "Change parametric bounds of AbstractTransformGeometry and test whether they are equal to the bounds of "
                "the plane accessed from there: "
             << std::endl;
   height = 300;
@@ -130,7 +130,7 @@ int mitkAbstractTransformGeometryTest(int /*argc*/, char * /*argv*/ [])
   }
   std::cout << "[PASSED]" << std::endl;
 
-  std::cout << "Testing whether the parametic bounds of AbstractTransformGeometry and the bounds of the plane accessed "
+  std::cout << "Testing whether the parametric bounds of AbstractTransformGeometry and the bounds of the plane accessed "
                "from there are equal: ";
   if ((mitk::Equal(const_cast<mitk::BoundingBox *>(abstractgeometry->GetParametricBoundingBox())->GetMinimum(),
                    const_cast<mitk::BoundingBox *>(abstractgeometry->GetPlane()->GetBoundingBox())->GetMinimum()) ==
@@ -182,7 +182,7 @@ int mitkAbstractTransformGeometryTest(int /*argc*/, char * /*argv*/ [])
   }
   std::cout << "[PASSED]" << std::endl;
 
-  std::cout << "Change parametic bounds of AbstractTransformGeometry and test whether they are equal to the bounds of "
+  std::cout << "Change parametric bounds of AbstractTransformGeometry and test whether they are equal to the bounds of "
                "the plane accessed from there: "
             << std::endl;
   height = 300;

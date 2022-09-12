@@ -69,7 +69,7 @@ static std::string GetLastErrorStr()
 #include <direct.h>
 #include <io.h>
 
-// make the posix flags point to the obsolte bsd types on windows
+// make the posix flags point to the obsolete bsd types on windows
 #define S_IRUSR S_IREAD
 #define S_IWUSR S_IWRITE
 
@@ -726,7 +726,7 @@ namespace mitk
       }
       catch (const std::exception &e)
       {
-        errMsg += "Exception occured when reading file " + loadInfo.m_Path + ":\n" + e.what() + "\n\n";
+        errMsg += "Exception occurred when reading file " + loadInfo.m_Path + ":\n" + e.what() + "\n\n";
       }
       mitk::ProgressBar::GetInstance()->Progress(2);
       --filesToRead;

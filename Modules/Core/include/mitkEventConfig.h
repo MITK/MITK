@@ -69,7 +69,7 @@ namespace mitk
     /**
      * @brief Construct an EventConfig object based on a XML configuration file.
      *
-     * Uses the specified istream refering to a file containing an XML event configuration to
+     * Uses the specified istream referring to a file containing an XML event configuration to
      * construct an EventConfig object. If the resource is invalid, the created
      * EventConfig object will also be invalid.
      *
@@ -121,7 +121,7 @@ namespace mitk
     ~EventConfig();
 
     /**
-     * @brief Checks wether this EventConfig object is valid.
+     * @brief Checks whether this EventConfig object is valid.
      * @return Returns \c true if a configuration was successfully loaded, \c false otherwise.
      */
     bool IsValid() const;

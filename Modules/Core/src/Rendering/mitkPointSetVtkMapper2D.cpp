@@ -138,7 +138,7 @@ mitk::PointSetVtkMapper2D::~PointSetVtkMapper2D()
 {
 }
 
-// reset mapper so that nothing is displayed e.g. toggle visiblity of the propassembly
+// reset mapper so that nothing is displayed e.g. toggle visibility of the propassembly
 void mitk::PointSetVtkMapper2D::ResetMapper(BaseRenderer *renderer)
 {
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
@@ -183,7 +183,7 @@ void mitk::PointSetVtkMapper2D::CreateVTKRenderObjects(mitk::BaseRenderer *rende
   unsigned i = 0;
 
   // The vtk text actors need to be removed manually from the propassembly
-  // since the same vtk text actors are not overwriten within this function,
+  // since the same vtk text actors are not overwritten within this function,
   // but new actors are added to the propassembly each time this function is executed.
   // Thus, the actors from the last call must be removed in the beginning.
   for (i = 0; i < ls->m_VtkTextLabelActors.size(); i++)

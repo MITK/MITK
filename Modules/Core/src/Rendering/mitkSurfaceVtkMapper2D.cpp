@@ -107,7 +107,7 @@ mitk::SurfaceVtkMapper2D::~SurfaceVtkMapper2D()
 {
 }
 
-// reset mapper so that nothing is displayed e.g. toggle visiblity of the propassembly
+// reset mapper so that nothing is displayed e.g. toggle visibility of the propassembly
 void mitk::SurfaceVtkMapper2D::ResetMapper(BaseRenderer *renderer)
 {
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
@@ -385,12 +385,12 @@ void mitk::SurfaceVtkMapper2D::ApplyAllProperties(mitk::BaseRenderer *renderer)
 
   // normals scaling
   float normalScaleFactor = 10.0f;
-  node->GetFloatProperty("front normal lenth (px)", normalScaleFactor, renderer);
+  node->GetFloatProperty("front normal length (px)", normalScaleFactor, renderer);
   localStorage->m_NormalGlyph->SetScaleFactor(normalScaleFactor);
 
   // inverse normals scaling
   float inverseNormalScaleFactor = 10.0f;
-  node->GetFloatProperty("back normal lenth (px)", inverseNormalScaleFactor, renderer);
+  node->GetFloatProperty("back normal length (px)", inverseNormalScaleFactor, renderer);
   localStorage->m_InverseNormalGlyph->SetScaleFactor(inverseNormalScaleFactor);
 }
 
@@ -408,10 +408,10 @@ void mitk::SurfaceVtkMapper2D::SetDefaultProperties(mitk::DataNode *node, mitk::
   aliases->AddAlias("front color", "Surface.2D.Normals.Normals Color", "Surface");
   node->AddProperty("back color", ColorProperty::New(1.0, 0.0, 0.0), renderer, overwrite);
   aliases->AddAlias("back color", "Surface.2D.Normals.Inverse Normals Color", "Surface");
-  node->AddProperty("front normal lenth (px)", FloatProperty::New(10.0), renderer, overwrite);
-  aliases->AddAlias("front normal lenth (px)", "Surface.2D.Normals.Normals Scale Factor", "Surface");
-  node->AddProperty("back normal lenth (px)", FloatProperty::New(10.0), renderer, overwrite);
-  aliases->AddAlias("back normal lenth (px)", "Surface.2D.Normals.Inverse Normals Scale Factor", "Surface");
+  node->AddProperty("front normal length (px)", FloatProperty::New(10.0), renderer, overwrite);
+  aliases->AddAlias("front normal length (px)", "Surface.2D.Normals.Normals Scale Factor", "Surface");
+  node->AddProperty("back normal length (px)", FloatProperty::New(10.0), renderer, overwrite);
+  aliases->AddAlias("back normal length (px)", "Surface.2D.Normals.Inverse Normals Scale Factor", "Surface");
   node->AddProperty("layer", IntProperty::New(100), renderer, overwrite);
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

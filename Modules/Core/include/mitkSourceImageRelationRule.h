@@ -20,7 +20,7 @@ namespace mitk
 {
   /**This rule class can be used for relations that reference an image as source for a destination entity.
   (e.g. an image that is used to generate the relation source).
-  The ID-layer is supported like for GenericIDReleations.
+  The ID-layer is supported like for GenericIDRelations.
   So it can be used for all ID based relations between PropertyProviders
   that also implement the interface identifiable.
   In addition the rule uses the data-layer to deduce/define relations.
@@ -72,7 +72,7 @@ namespace mitk
     bool IsDestinationCandidate(const IPropertyProvider *owner) const override;
 
     /** Connects to passed images.
-    @remark destination must specifiy DICOM SOP Instance UIDs (0x0008, 0x0018) and DICOM SOP Class UID (0x0008, 0x0016)
+    @remark destination must specify DICOM SOP Instance UIDs (0x0008, 0x0018) and DICOM SOP Class UID (0x0008, 0x0016)
     in order to establish a connection on the data layer.*/
     RelationUIDType Connect(Image *source, const Image *destination) const;
 
@@ -109,7 +109,7 @@ namespace mitk
     itk::LightObject::Pointer InternalClone() const override;
 
     /**Prepares a new reference to an image on the data layer. Therefore an unused and valid sequence item index
-    for the passed source will be genarated and a relationUID property with the relationUID will be set to block the instance ID. The
+    for the passed source will be generated and a relationUID property with the relationUID will be set to block the instance ID. The
     instance ID will be returned.
     @remark The method is guarded by a class wide mutex to avoid racing conditions in a scenario where rules are used
     concurrently.*/

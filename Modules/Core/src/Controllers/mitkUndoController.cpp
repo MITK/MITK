@@ -170,7 +170,7 @@ bool mitk::UndoController::RemoveUndoModel(UndoType undoType)
   // try deleting Element
   int ok = m_UndoModelList.erase(undoType);
   if (ok == 0)
-  { // delete unsucessful; Element of undoType not found
+  { // delete unsuccessful; Element of undoType not found
     return false;
   }
 

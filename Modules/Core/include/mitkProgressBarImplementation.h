@@ -17,7 +17,7 @@ found in the LICENSE file.
 namespace mitk
 {
   //##Documentation
-  //## @brief GUI indepentent Interface for all Gui depentent implementations of a ProgressBar.
+  //## @brief GUI independent Interface for all Gui depentent implementations of a ProgressBar.
   class MITKCORE_EXPORT ProgressBarImplementation
   {
   public:

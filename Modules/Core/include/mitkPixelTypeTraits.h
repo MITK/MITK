@@ -250,7 +250,7 @@ namespace mitk
    * resolved there
    * for primitive types the value is set to SCALAR.
    *
-   * To initalize the flag correctly in compile-time use the \sa isPrimitiveType<T> trait.
+   * To initialize the flag correctly in compile-time use the \sa isPrimitiveType<T> trait.
    */
   template <class T, bool Primitive>
   struct MapPixelType

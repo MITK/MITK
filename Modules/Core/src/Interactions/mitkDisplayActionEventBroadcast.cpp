@@ -98,7 +98,7 @@ void mitk::DisplayActionEventBroadcast::ConfigurationChanged()
 {
   PropertyList::Pointer properties = GetAttributes();
 
-  // allwaysReact
+  // alwaysReact
   std::string strAlwaysReact = "";
   m_AlwaysReact = false;
   if (properties->GetStringProperty("alwaysReact", strAlwaysReact))

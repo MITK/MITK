@@ -185,7 +185,7 @@ namespace mitk
     Mapper &operator=(const Mapper &);
 
   public:
-    /** \brief Base class for mapper specific rendering ressources.
+    /** \brief Base class for mapper specific rendering resources.
      */
     class MITKCORE_EXPORT BaseLocalStorage
     {

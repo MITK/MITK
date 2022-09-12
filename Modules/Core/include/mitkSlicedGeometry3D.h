@@ -29,7 +29,7 @@ namespace mitk
   * PlaneGeometry). The 2D geometries of the other slices are calculated
   * by shifting the first slice in the direction m_DirectionVector by
   * m_Spacing.z * sliceNumber. The m_Spacing member (which is only
-  * relevant in the case m_EvenlySpaced==true) descibes the size of a voxel
+  * relevant in the case m_EvenlySpaced==true) describes the size of a voxel
   * (in mm), i.e., m_Spacing.x is the voxel width in the x-direction of the
   * plane. It is derived from the reference geometry of this SlicedGeometry3D,
   * which usually would be the global geometry describing how datasets are to
@@ -304,7 +304,7 @@ namespace mitk
     */
     mutable mitk::Vector3D m_DirectionVector;
 
-    /** Number of slices this SliceGeometry3D is descibing. */
+    /** Number of slices this SliceGeometry3D is describing. */
     unsigned int m_Slices;
 
     /** Underlying BaseGeometry for this SlicedGeometry */

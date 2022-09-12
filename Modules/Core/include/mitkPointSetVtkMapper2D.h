@@ -202,7 +202,7 @@ namespace mitk
     void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
     /* \brief Called in mitk::Mapper::Update
     * If TimeGeometry or time step is not valid of point set: reset mapper so that nothing is
-    * displayed e.g. toggle visiblity of the propassembly */
+    * displayed e.g. toggle visibility of the propassembly */
     void ResetMapper(BaseRenderer *renderer) override;
 
     /* \brief Fills the vtk objects, thus it is only called when the point set has been changed.
@@ -214,7 +214,7 @@ namespace mitk
    * rendered within the x-y plane in each 2D-render window, so you would only see them from the
    * side in the sagittal and coronal 2D-render window. The solution to this is to rotate the glyphs in order
    * to be ortogonal to the current view vector. To achieve this, the rotation (vtktransform) of the current
-   * PlaneGeometry is applied to the orienation of the glyphs. */
+   * PlaneGeometry is applied to the orientation of the glyphs. */
     virtual void CreateVTKRenderObjects(mitk::BaseRenderer *renderer);
 
     // member variables holding the current value of the properties used in this mapper

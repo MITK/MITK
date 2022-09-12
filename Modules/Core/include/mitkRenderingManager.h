@@ -53,8 +53,8 @@ namespace mitk
    * well-defined point in the main event loop (this may be each time after
    * event processing is done).
    *
-   * Convinience methods for updating all RenderWindows which have been
-   * registered with the RenderingManager exist. If theses methods are not
+   * Convenience methods for updating all RenderWindows which have been
+   * registered with the RenderingManager exist. If these methods are not
    * used, it is not required to register (add) RenderWindows prior to using
    * the RenderingManager.
    *
@@ -64,7 +64,7 @@ namespace mitk
    *
    * The interface of RenderingManager is platform independent. Platform
    * specific subclasses have to be implemented, though, to supply an
-   * appropriate event issueing for controlling the update execution process.
+   * appropriate event issuing for controlling the update execution process.
    * See method documentation for a description of how this can be done.
    *
    * \sa TestingRenderingManager An "empty" RenderingManager implementation which
@@ -208,7 +208,7 @@ namespace mitk
     *
     * Throws an exception if bounding box has 0 extent due to exceeding double precision range.
     *
-    * @param renderWindow          The specifid render window to update
+    * @param renderWindow          The specific render window to update
     * @param geometry              The geometry to be used to initialize / update the
     *                              render window's time- and slice navigation controller
     * @param resetCamera           If this parameter is set to true, the camera controller will be
@@ -225,7 +225,7 @@ namespace mitk
     *
     * Throws an exception if bounding box has 0 extent due to exceeding double precision range.
     *
-    * @param renderWindow          The specifid render window to update
+    * @param renderWindow          The specific render window to update
     * @param geometry              The geometry to be used to initialize / update the
     *                              render window's time- and slice navigation controller
     * @param resetCamera           If this parameter is set to true, the camera controller will be
@@ -241,7 +241,7 @@ namespace mitk
     * @brief Initialize the specified render window to the default viewing direction
     *        without updating the geometry information.
     *
-    * @param renderWindow          The specifid render window to update
+    * @param renderWindow          The specific render window to update
     */
     virtual bool InitializeView(vtkRenderWindow *renderWindow);
 
@@ -420,7 +420,7 @@ namespace mitk
     /**
     * @brief Initialize the specified renderer to the given geometry.
     *
-    * @param baseRenderer            The specifid renderer to update
+    * @param baseRenderer            The specific renderer to update
     * @param geometry                The geometry to be used to initialize / update the
     *                                render window's slice navigation controller
     * @param boundingBoxInitialized  If this parameter is set to true, the slice navigation controller will be
@@ -464,7 +464,7 @@ namespace mitk
   itkEventMacroDeclaration(FocusChangedEvent, itk::AnyEvent);
 
   /**
-    * Generic RenderingManager implementation for "non-rendering-plattform",
+    * Generic RenderingManager implementation for "non-rendering-platform",
     * e.g. for tests. Its factory (TestingRenderingManagerFactory) is
     * automatically on start-up and is used by default if not other
     * RenderingManagerFactory is instantiated explicitly thereafter.

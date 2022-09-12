@@ -72,7 +72,7 @@ namespace mitk
     /** \brief Checks visibility and renders untransparent geometry */
     virtual void MitkRenderOpaqueGeometry(BaseRenderer *renderer);
 
-    /** \brief Checks visiblity and renders transparent geometry */
+    /** \brief Checks visibility and renders transparent geometry */
     virtual void MitkRenderTranslucentGeometry(BaseRenderer *renderer);
 
     /** \brief Checks visibility and renders volumes */

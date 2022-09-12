@@ -36,7 +36,7 @@ namespace mitk
    * look-ups in the service registry or calling the methods of this service interface.
    *
    * This service interface also allows to infer the mime type of a file on the file
-   * system. The heuristics for infering the actual mime type is implementation specific.
+   * system. The heuristics for inferring the actual mime type is implementation specific.
    *
    * @note This is a <em>core service</em>
    *

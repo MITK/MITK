@@ -179,7 +179,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Check expected element 1.", checkExistance(infos, info4));
 
     infos = service->GetInfo("unkown", false);
-    CPPUNIT_ASSERT_MESSAGE("Check size of result for unkown prop.", infos.empty());
+    CPPUNIT_ASSERT_MESSAGE("Check size of result for unknown prop.", infos.empty());
 
     infos = service->GetInfo("prop101", false);
     CPPUNIT_ASSERT(infos.empty());
@@ -203,7 +203,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Check expected element 1.", checkExistance(infos, info5));
 
     infos = service->GetInfoByKey("unkownkey", false);
-    CPPUNIT_ASSERT_MESSAGE("Check size of result for unkown key.", infos.empty());
+    CPPUNIT_ASSERT_MESSAGE("Check size of result for unknown key.", infos.empty());
 
     infos = service->GetInfoByKey("key101", false);
     CPPUNIT_ASSERT_MESSAGE("Check size of result for key101.", infos.empty());
@@ -257,7 +257,7 @@ public:
   {
     CPPUNIT_ASSERT_MESSAGE("Check HasInfos (prop1)", service->HasInfo(prop1));
     CPPUNIT_ASSERT_MESSAGE("Check HasInfos (prop4)", service->HasInfo(prop4));
-    CPPUNIT_ASSERT_MESSAGE("Check HasInfos (unkown prop)", !service->HasInfo("unkownProp"));
+    CPPUNIT_ASSERT_MESSAGE("Check HasInfos (unknown prop)", !service->HasInfo("unkownProp"));
   }
 
   void RemoveAllInfo()
@@ -301,7 +301,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Check RemoveInfos on prop 5", !service->HasInfo(prop5, false));
 
     CPPUNIT_ASSERT_NO_THROW(service->RemoveInfo("unkown_prop", "mime2"));
-    CPPUNIT_ASSERT_MESSAGE("Check RemoveInfos, if unkown property name but exting mime was used",
+    CPPUNIT_ASSERT_MESSAGE("Check RemoveInfos, if unknown property name but existing mime was used",
                            service->HasInfo(prop4, false));
   }
 };

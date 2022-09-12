@@ -24,7 +24,7 @@ found in the LICENSE file.
   if (newOperationName == nullptr)                                                                                        \
                                                                                                                        \
   {                                                                                                                    \
-    itkWarningMacro("Recieved wrong type of operation!");                                                              \
+    itkWarningMacro("Received wrong type of operation!");                                                              \
     return;                                                                                                            \
   }
 

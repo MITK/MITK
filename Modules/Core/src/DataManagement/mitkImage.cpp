@@ -1330,7 +1330,7 @@ bool mitk::Equal(const mitk::Image &leftHandSide, const mitk::Image &rightHandSi
   }
 
   // Pixel values - default mode [ 0 threshold in difference ]
-  // compare only if all previous checks were successfull, otherwise the ITK filter will throw an exception
+  // compare only if all previous checks were successful, otherwise the ITK filter will throw an exception
   if (returnValue)
   {
     mitk::CompareImageDataFilter::Pointer compareFilter = mitk::CompareImageDataFilter::New();

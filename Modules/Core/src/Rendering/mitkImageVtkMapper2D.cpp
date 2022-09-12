@@ -233,7 +233,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rendere
     localStorage->m_Reslicer->SetInterpolationMode(ExtractSliceFilter::RESLICE_NEAREST);
   }
 
-  // set the vtk output property to true, makes sure that no unneeded mitk image convertion
+  // set the vtk output property to true, makes sure that no unneeded mitk image conversion
   // is done.
   localStorage->m_Reslicer->SetVtkOutputRequest(true);
 
@@ -312,7 +312,7 @@ void mitk::ImageVtkMapper2D::GenerateDataForRenderer(mitk::BaseRenderer *rendere
   }
   else
   {
-    // this is needed when thick mode was enable bevore. These variable have to be reset to default values
+    // this is needed when thick mode was enable before. These variable have to be reset to default values
     localStorage->m_Reslicer->SetOutputDimensionality(2);
     localStorage->m_Reslicer->SetOutputSpacingZDirection(1.0);
     localStorage->m_Reslicer->SetOutputExtentZDirection(0, 0);
@@ -638,7 +638,7 @@ void mitk::ImageVtkMapper2D::ApplyLookuptable(mitk::BaseRenderer *renderer)
     //"Image Rendering.Mode was set to use a lookup table but there is no property 'LookupTable'.
     // A default (rainbow) lookup table will be used.
     // Here have to do nothing. Warning for the user has been removed, due to unwanted console output
-    // in every interation of the rendering.
+    // in every iteration of the rendering.
   }
   localStorage->m_LevelWindowFilter->SetLookupTable(usedLookupTable);
 }

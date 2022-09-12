@@ -108,7 +108,7 @@ public:
     }
     catch (const mitk::Exception &e)
     {
-      MITK_ERROR << "(CAST) Catched exception while creating accessor " << e.what();
+      MITK_ERROR << "(CAST) Caught exception while creating accessor " << e.what();
       // MITK_TEST_FAILED_MSG("Exception for ouverlay image");
     }
 
@@ -150,7 +150,7 @@ public:
         }
         catch( const mitk::Exception &e)
         {
-          MITK_ERROR << "Catched exception while creating accessor "<< e.what();
+          MITK_ERROR << "Caught exception while creating accessor "<< e.what();
           //MITK_TEST_FAILED_MSG("Exception for ouverlay image");
         }
 

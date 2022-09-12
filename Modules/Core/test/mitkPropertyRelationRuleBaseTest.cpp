@@ -895,7 +895,7 @@ public:
     CPPUNIT_ASSERT(!rule->HasRelation(source_idOnly_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Complete));
     rule->Connect(source_idOnly_1, dest_1);
     CPPUNIT_ASSERT(rule->HasRelation(source_idOnly_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Complete));
-    CPPUNIT_ASSERT_MESSAGE("Additional relation was defined instead of updating exting one.",
+    CPPUNIT_ASSERT_MESSAGE("Additional relation was defined instead of updating existing one.",
                            rule->GetExistingRelations(source_1).size() == 1);
     name = "MITK.Relations.1.dataHandle";
     prop = source_idOnly_1->GetProperty(name.c_str());
@@ -912,7 +912,7 @@ public:
     // check actualization of an existing connection
     rule->Connect(source_1, dest_1);
     CPPUNIT_ASSERT(rule->HasRelation(source_1, dest_1, mitk::PropertyRelationRuleBase::RelationType::Complete));
-    CPPUNIT_ASSERT_MESSAGE("Additional relation was defined instead of updating exting one.",
+    CPPUNIT_ASSERT_MESSAGE("Additional relation was defined instead of updating existing one.",
                            rule->GetExistingRelations(source_1).size() == 1);
 
     // check new connection

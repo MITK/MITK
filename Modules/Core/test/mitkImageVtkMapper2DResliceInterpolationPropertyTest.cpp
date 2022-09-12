@@ -41,7 +41,7 @@ int mitkImageVtkMapper2DResliceInterpolationPropertyTest(int argc, char *argv[])
 
   mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
 
-  // get resliceInterpolation from comandline arg
+  // get resliceInterpolation from commandline arg
   int resliceInterpolation = atoi(argv[argc - 4]);
 
   // Set interpolation mode for rendering
@@ -66,7 +66,7 @@ int mitkImageVtkMapper2DResliceInterpolationPropertyTest(int argc, char *argv[])
   // get the center point of the image
   centerPoint = image->GetGeometry()->GetCenter();
 
-  // rotate the image arround its own center
+  // rotate the image around its own center
   renderingHelper.ReorientSlices(centerPoint, rotationVector);
 
   // threshold for CompareRenderWindowAgainstReference

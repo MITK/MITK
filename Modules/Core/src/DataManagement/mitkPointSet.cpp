@@ -204,7 +204,7 @@ int mitk::PointSet::SearchPoint(Point3D point, ScalarType distance, int t) const
 
   this->GetGeometry(t)->WorldToIndex(point, indexPoint);
 
-  // Searching the first point in the Set, that is +- distance far away fro
+  // Searching the first point in the Set, that is +- distance far away from
   // the given point
   unsigned int i;
   PointsContainer::Iterator it, end;

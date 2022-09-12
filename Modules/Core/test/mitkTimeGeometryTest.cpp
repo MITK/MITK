@@ -334,7 +334,7 @@ public:
     mitk::TimeGeometry::Pointer geometry = image->GetTimeGeometry();
     mitk::TimePointType negativTimePoint = (-1.0 * DimT) - 1.5;
     mitk::TimeStepType timePoint = geometry->TimePointToTimeStep(negativTimePoint);
-    MITK_TEST_CONDITION(mitk::Equal(timePoint, 0), "Calculated right time step for negativ invalid time point");
+    MITK_TEST_CONDITION(mitk::Equal(timePoint, 0), "Calculated right time step for negative invalid time point");
   }
 
   void GetGeometryForTimeStep_BaseDataValidTimeStep_CorrectGeometry(mitk::BaseData *baseData,
@@ -361,7 +361,7 @@ public:
     originalPoint[2] = inputZ;
     mitk::Point3D worldPoint;
     geometry3D->IndexToWorld(originalPoint, worldPoint);
-    MITK_TEST_CONDITION(mitk::Equal(worldPoint, expectedPoint, test_eps), "Geometry transformation match expection. ");
+    MITK_TEST_CONDITION(mitk::Equal(worldPoint, expectedPoint, test_eps), "Geometry transformation matches expectation. ");
   }
 
   void GetGeometryForTimeStep_ImageInvalidTimeStep_NullPointer(
@@ -396,7 +396,7 @@ public:
     originalPoint[2] = inputZ;
     mitk::Point3D worldPoint;
     geometry3D->IndexToWorld(originalPoint, worldPoint);
-    MITK_TEST_CONDITION(mitk::Equal(worldPoint, expectedPoint, test_eps), "Geometry transformation match expection. ");
+    MITK_TEST_CONDITION(mitk::Equal(worldPoint, expectedPoint, test_eps), "Geometry transformation matches expectation. ");
   }
 
   void GetGeometryForTimePoint_4DImageInvalidTimePoint_NullPointer(unsigned int DimX,
@@ -421,7 +421,7 @@ public:
     mitk::TimeGeometry::Pointer geometry = image->GetTimeGeometry();
     mitk::TimePointType timePoint = (-1.0 * (DimT)) - 1;
     mitk::BaseGeometry::Pointer geometry3D = geometry->GetGeometryForTimePoint(timePoint);
-    MITK_TEST_CONDITION(geometry3D.IsNull(), "Null-Pointer geometry returned with invalid negativ time point");
+    MITK_TEST_CONDITION(geometry3D.IsNull(), "Null-Pointer geometry returned with invalid negative time point");
   }
 
   void GetGeometryCloneForTimeStep_BaseDataValidTimeStep_CorrectGeometry(mitk::BaseData *baseData, unsigned int DimT)
@@ -486,16 +486,16 @@ public:
     originalPoint[2] = 3;
     mitk::Point3D worldPoint;
     geometry->GetGeometryForTimeStep(DimT - 1)->IndexToWorld(originalPoint, worldPoint);
-    MITK_TEST_CONDITION(mitk::Equal(worldPoint, expectedPoint, test_eps), "Geometry transformation match expection. ");
+    MITK_TEST_CONDITION(mitk::Equal(worldPoint, expectedPoint, test_eps), "Geometry transformation matches expectation. ");
   }
 
   void Expand_BaseDataDoubleSize_SizeChanged(mitk::BaseData *baseData, unsigned int DimT)
   {
     mitk::TimeGeometry::Pointer geometry = baseData->GetTimeGeometry();
-    MITK_TEST_CONDITION(geometry->CountTimeSteps() == DimT, "Number of time Steps match expection. ");
+    MITK_TEST_CONDITION(geometry->CountTimeSteps() == DimT, "Number of time Steps matches expectation. ");
 
     geometry->Expand(DimT * 2);
-    MITK_TEST_CONDITION(geometry->CountTimeSteps() == DimT * 2, "Number of time Steps match expection. ");
+    MITK_TEST_CONDITION(geometry->CountTimeSteps() == DimT * 2, "Number of time Steps matches expectation. ");
 
     mitk::BaseGeometry::Pointer geometry3D = geometry->GetGeometryForTimeStep(DimT * 2 - 1);
     MITK_TEST_CONDITION(geometry3D.IsNotNull(), "Non-zero geometry is generated. ");

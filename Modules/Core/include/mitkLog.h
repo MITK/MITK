@@ -51,7 +51,7 @@ namespace mitk
      *
      *         Everytime this method this called, normally when MITK is started, then
      *         all log files are copied one file below (0 to 1, 1 to 2, and so on).
-     *         The oldes logfile (number 9) is always deleted. So users have access to
+     *         The oldest logfile (number 9) is always deleted. So users have access to
      *         the log files of the last 10 runs.
      *  @throws mitk::Exception Throws an exception if there is a problem with renaming the logfiles, e.g., because of
      * file access problems.
@@ -65,7 +65,7 @@ namespace mitk
      *         is renamed to myLogFile-1.log, myLogFile-1.log to myLogFile-2.log,
      *         and so on. The oldest logfile is deleted. The number of log files is
      *         defined by the parameter "numLogFiles". The first logfile name is
-     *         "free" (e.g., [prefix]-0.log) again. This name is retured.
+     *         "free" (e.g., [prefix]-0.log) again. This name is returned.
      *  @param prefixPath   Should hold the prefix of the logfile together with its path. E.g.,
      * "C:/programs/mitk/myLogFile".
      *  @param numLogFiles  Sets the number of logfiles. Default value is 10. This means logfiles from [prefix]-0.log

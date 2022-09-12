@@ -173,7 +173,7 @@ void vtkApplyLookupTableOnRGBA(vtkMitkLevelWindowFilter *self,
 
   int y = outExt[2];
 
-  // Loop through ouput pixels
+  // Loop through output pixels
   while (!outputIt.IsAtEnd())
   {
     T *inputSI = inputIt.BeginSpan();
@@ -299,7 +299,7 @@ void vtkApplyLookupTableOnScalarsFast(
   // due to later conversion to int for rounding
   bias += 0.5f;
 
-  // Loop through ouput pixels
+  // Loop through output pixels
   while (!outputIt.IsAtEnd())
   {
     unsigned char *outputSI = outputIt.BeginSpan();
@@ -340,7 +340,7 @@ void vtkApplyLookupTableOnScalars(vtkMitkLevelWindowFilter *self,
 
   int y = outExt[2];
 
-  // Loop through ouput pixels
+  // Loop through output pixels
   while (!outputIt.IsAtEnd())
   {
     unsigned char *outputSI = outputIt.BeginSpan();
@@ -408,7 +408,7 @@ void vtkApplyLookupTableOnScalarsCTF(vtkMitkLevelWindowFilter *self,
 
   int y = outExt[2];
 
-  // Loop through ouput pixels
+  // Loop through output pixels
   while (!outputIt.IsAtEnd())
   {
     unsigned char *outputSI = outputIt.BeginSpan();

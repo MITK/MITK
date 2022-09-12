@@ -24,7 +24,7 @@ namespace mitk
    * Offers an interface to query a UID for the instance. Can be inherited
    * by other classes to provide this capability.\n\n
    * What does the UID stand for/what is its scope?\n
-   * - It is unique in its creation, but it is not a content specific unique ID. Therfore:
+   * - It is unique in its creation, but it is not a content specific unique ID. Therefore:
    *  - A class instance, associated with a UID, may change its values over its lifetime,
         but still have the same UID.
       - If a class instance gets persisted and loaded multiple times, then their could

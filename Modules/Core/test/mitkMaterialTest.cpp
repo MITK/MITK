@@ -217,7 +217,7 @@ public:
     myMP->SetName(name);
     mitk::Material::Pointer myMP2 = mitk::Material::New();
     myMP2->Initialize(*myMP);
-    MITK_TEST_CONDITION(*myMP == *myMP2, "testing equality after .Intitialize")
+    MITK_TEST_CONDITION(*myMP == *myMP2, "testing equality after .Initialize")
   }
   void testOperatorequality()
   {

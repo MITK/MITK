@@ -162,7 +162,7 @@ namespace mitk
     /** \brief Actor for black plane background */
     vtkActor *m_BackgroundActor;
 
-    /** \brief Transforms the suface before applying the glyph filter */
+    /** \brief Transforms the surface before applying the glyph filter */
     vtkTransformPolyDataFilter *m_NormalsTransformer;
 
     /** \brief Mapper for normals representation (thin lines) */
@@ -183,7 +183,7 @@ namespace mitk
     /** Internal flag, if actors for normals are already added to m_Prop3DAssembly*/
     bool m_NormalsActorAdded;
 
-    /** \brief The DataStorage defines which part of the data tree is traversed for renderering. */
+    /** \brief The DataStorage defines which part of the data tree is traversed for rendering. */
     mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
 
     class MITKCORE_EXPORT ActorInfo
@@ -207,7 +207,7 @@ namespace mitk
     typedef std::map<ImageVtkMapper2D *, ActorInfo> ActorList;
     ActorList m_ImageActors;
 
-    // responsiblity to remove the observer upon its destruction
+    // responsibility to remove the observer upon its destruction
     typedef itk::MemberCommand<PlaneGeometryDataVtkMapper3D> MemberCommandType;
     MemberCommandType::Pointer m_ImageMapperDeletedCommand;
   };

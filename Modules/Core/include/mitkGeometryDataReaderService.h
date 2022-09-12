@@ -26,7 +26,7 @@ namespace mitk
    *
    * To be used via IOUtil.
    *
-   * Reader for XML files containing one or multiple XML represenations of
+   * Reader for XML files containing one or multiple XML representations of
    * mitk::GeometryData. If multiple mitk::GeometryData objects are stored in one file,
    * these are assigned to multiple BaseData objects.
    *

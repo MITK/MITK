@@ -183,7 +183,7 @@ void mitk::SlicedGeometry3D::InitializeEvenlySpaced(mitk::PlaneGeometry *geometr
   directionVector *= zSpacing;
 
   // Normally we should use the following four lines to create a copy of
-  // the transform contrained in geometry2D, because it may not be changed
+  // the transform contained in geometry2D, because it may not be changed
   // by us. But we know that SetSpacing creates a new transform without
   // changing the old (coming from geometry2D), so we can use the fifth
   // line instead. We check this at (**).
@@ -720,7 +720,7 @@ void mitk::SlicedGeometry3D::ExecuteOperation(Operation *operation)
         PlaneGeometry::Pointer planeGeometry = m_PlaneGeometries[0];
 
         // Need a PlaneGeometry, a PlaneOperation and a reference frame to
-        // carry out the re-orientation. If not all avaialble, stop here
+        // carry out the re-orientation. If not all available, stop here
         if (!m_ReferenceGeometry ||
             (!planeGeometry || dynamic_cast<AbstractTransformGeometry *>(planeGeometry.GetPointer())) || !planeOp)
         {
@@ -818,7 +818,7 @@ void mitk::SlicedGeometry3D::ExecuteOperation(Operation *operation)
             rotationAxis = newNormal;
           }
 
-          // Perfom Rotation
+          // Perform Rotation
           mitk::RotationOperation op(mitk::OpROTATE, center, rotationAxis, rotationAngle);
           planeGeometry->ExecuteOperation(&op);
 

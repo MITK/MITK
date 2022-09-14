@@ -101,12 +101,19 @@ QmitkSegmentationView::~QmitkSegmentationView()
     // deactivate all tools
     m_ToolManager->ActivateTool(-1);
 
-    // removing all observers
+    // removing all observers from working data
     for (NodeTagMapType::iterator dataIter = m_WorkingDataObserverTags.begin(); dataIter != m_WorkingDataObserverTags.end(); ++dataIter)
     {
       (*dataIter).first->GetProperty("visible")->RemoveObserver((*dataIter).second);
     }
     m_WorkingDataObserverTags.clear();
+
+    // removing all observers from reference data
+    for (NodeTagMapType::iterator dataIter = m_ReferenceDataObserverTags.begin(); dataIter != m_ReferenceDataObserverTags.end(); ++dataIter)
+    {
+      (*dataIter).first->GetProperty("visible")->RemoveObserver((*dataIter).second);
+    }
+    m_ReferenceDataObserverTags.clear();
 
     mitk::RenderingManager::GetInstance()->RemoveObserver(m_RenderingManagerObserverTag);
 
@@ -129,6 +136,14 @@ QmitkSegmentationView::~QmitkSegmentationView()
 void QmitkSegmentationView::OnReferenceSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
 {
   m_ToolManager->ActivateTool(-1);
+
+  // Remove observer if one was registered to the reference node
+  auto finding = m_ReferenceDataObserverTags.find(m_ReferenceNode);
+  if (finding != m_ReferenceDataObserverTags.end())
+  {
+    m_ReferenceNode->GetProperty("visible")->RemoveObserver(m_ReferenceDataObserverTags[m_ReferenceNode]);
+    m_ReferenceDataObserverTags.erase(m_ReferenceNode);
+  }
 
   if (nodes.empty())
   {
@@ -160,6 +175,11 @@ void QmitkSegmentationView::OnReferenceSelectionChanged(QList<mitk::DataNode::Po
       }
     }
     m_ReferenceNode->SetVisibility(true);
+
+    auto command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
+    command->SetCallbackFunction(this, &QmitkSegmentationView::ValidateSelectionInput);
+    m_ReferenceDataObserverTags[m_ReferenceNode] =
+      m_ReferenceNode->GetProperty("visible")->AddObserver(itk::ModifiedEvent(), command);
   }
 
   this->UpdateGUI();
@@ -219,8 +239,8 @@ void QmitkSegmentationView::OnSegmentationSelectionChanged(QList<mitk::DataNode:
 
     auto command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
     command->SetCallbackFunction(this, &QmitkSegmentationView::ValidateSelectionInput);
-    m_WorkingDataObserverTags.insert(std::pair<mitk::DataNode*, unsigned long>(m_WorkingNode,
-      m_WorkingNode->GetProperty("visible")->AddObserver(itk::ModifiedEvent(), command)));
+    m_WorkingDataObserverTags[m_WorkingNode] =
+      m_WorkingNode->GetProperty("visible")->AddObserver(itk::ModifiedEvent(), command);
 
     this->InitializeRenderWindows(referenceImage->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, false);
   }

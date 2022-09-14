@@ -137,6 +137,7 @@ private:
 
   typedef std::map<mitk::DataNode*, unsigned long> NodeTagMapType;
   NodeTagMapType m_WorkingDataObserverTags;
+  NodeTagMapType m_ReferenceDataObserverTags;
   unsigned int m_RenderingManagerObserverTag;
 
   mitk::NodePredicateAnd::Pointer m_ReferencePredicate;

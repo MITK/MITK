@@ -107,24 +107,20 @@ void InteractionEventRecorder::RotateView()
 {
   // Rotate the view in 3D to a predefined state which can later be used again in tests
   // this simulates a prior VTK Interaction
+  auto allRenderWindows = mitk::BaseRenderer::GetAll3DRenderWindows();
+  for (auto mapit = allRenderWindows.begin(); mapit != allRenderWindows.end(); ++mapit)
+  {
+    vtkRenderWindow* renderWindow = mapit->first;
+    if (renderWindow == nullptr)
+      continue;
 
-  vtkRenderWindow* renderWindow = mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3");
+    mitk::Stepper* stepper = mapit->second->GetCameraRotationController()->GetSlice();
+    if (stepper == nullptr)
+      return;
 
-  if (renderWindow == nullptr)
-    return;
-
-  mitk::Stepper* stepper = mitk::BaseRenderer::GetInstance(renderWindow)->GetCameraRotationController()->GetSlice();
-
-  if (stepper == nullptr)
-    return;
-
-  unsigned int newPos = 17;
-
-
-  stepper->SetPos(newPos);
-
-  auto* axialRenderWindow = this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetQmitkRenderWindow("axial");
-  axialRenderWindow->GetRenderer()->RequestUpdate();
+    unsigned int newPos = 17;
+    stepper->SetPos(newPos);
+  }
 }
 
 void InteractionEventRecorder::CreateQtPartControl( QWidget *parent )

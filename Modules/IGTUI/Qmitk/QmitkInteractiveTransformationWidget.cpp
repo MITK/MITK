@@ -84,12 +84,10 @@ void QmitkInteractiveTransformationWidget::SetToolToEdit(const mitk::NavigationT
 {
   //If there is already a tool, remove it's node first.
   if (m_ToolToEdit)
-    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))->GetDataStorage()
-    ->Remove(m_ToolToEdit->GetDataNode());
+    mitk::RenderingManager::GetInstance()->GetDataStorage()->Remove(m_ToolToEdit->GetDataNode());
 
   m_ToolToEdit = _tool->Clone();
-  mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))->GetDataStorage()
-    ->Add(m_ToolToEdit->GetDataNode());
+  mitk::RenderingManager::GetInstance()->GetDataStorage()->Add(m_ToolToEdit->GetDataNode());
   m_ToolToEdit->GetDataNode()->SetName("Tool Tip to be edited");
 
   //change color to red
@@ -272,8 +270,7 @@ void QmitkInteractiveTransformationWidget::OnRevertChanges()
 
 void QmitkInteractiveTransformationWidget::OnApplyManipulatedToolTip()
 {
-  mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))->GetDataStorage()
-    ->Remove(m_ToolToEdit->GetDataNode());
+  mitk::RenderingManager::GetInstance()->GetDataStorage()->Remove(m_ToolToEdit->GetDataNode());
 
   mitk::AffineTransform3D::Pointer toolTip = m_Geometry->GetIndexToWorldTransform();
   emit EditToolTipFinished(toolTip);
@@ -289,8 +286,7 @@ void QmitkInteractiveTransformationWidget::OnCancel()
 {
   QDialog::reject();
 
-  mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))->GetDataStorage()
-    ->Remove(m_ToolToEdit->GetDataNode());
+  mitk::RenderingManager::GetInstance()->GetDataStorage()->Remove(m_ToolToEdit->GetDataNode());
 
   emit EditToolTipFinished(nullptr);
 }

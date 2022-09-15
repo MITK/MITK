@@ -86,6 +86,30 @@ vtkRenderWindow *mitk::BaseRenderer::GetRenderWindowByName(const std::string &na
   return nullptr;
 }
 
+mitk::BaseRenderer::BaseRendererMapType mitk::BaseRenderer::GetSpecificRenderWindows(MapperSlotId mapper)
+{
+  BaseRendererMapType allRenderWindows;
+  for (auto mapit = baseRendererMap.begin(); mapit != baseRendererMap.end(); ++mapit)
+  {
+    if (mapper == mapit->second->GetMapperID())
+    {
+      allRenderWindows.insert(BaseRendererMapType::value_type(mapit->first, mapit->second));
+    }
+  }
+
+  return allRenderWindows;
+}
+
+mitk::BaseRenderer::BaseRendererMapType mitk::BaseRenderer::GetAll2DRenderWindows()
+{
+  return GetSpecificRenderWindows(BaseRenderer::Standard2D);
+}
+
+mitk::BaseRenderer::BaseRendererMapType mitk::BaseRenderer::GetAll3DRenderWindows()
+{
+  return GetSpecificRenderWindows(BaseRenderer::Standard3D);
+}
+
 mitk::BaseRenderer::BaseRenderer(const char *name,
                                  vtkRenderWindow *renWin)
   : m_RenderWindow(nullptr),

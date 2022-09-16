@@ -24,8 +24,6 @@ found in the LICENSE file.
 // qt
 #include <QWidget>
 
-class QAbstractItemVew;
-
 /**
 * @brief This abstract class is a convenient base class for easy implementation of widgets that
 * offer a specific view onto a given DataStorage instance to inspect its contents.

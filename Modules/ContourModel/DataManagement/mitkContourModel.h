@@ -22,17 +22,17 @@ namespace mitk
 {
   /**
   \brief ContourModel is a structure of linked vertices defining a contour in 3D space.
-  The vertices are stored in a mitk::ContourElement is stored for each timestep.
+  The vertices are stored in a mitk::ContourElement for each timestep.
   The contour line segments are implicitly defined by the given linked vertices.
-  By default two control points are are linked by a straight line.It is possible to add
-  vertices at front and end of the contour and to iterate in both directions.
+  By default two control points are linked by a straight line. It is possible to add
+  vertices at the front and end of the contour and to iterate in both directions.
 
   Points are specified containing coordinates and additional (data) information,
   see mitk::ContourElement.
-  For accessing a specific vertex either an index or a position in 3D Space can be used.
+  For accessing a specific vertex either an index or a position in 3D space can be used.
   The vertices are best accessed by using a VertexIterator.
   Interaction with the contour is thus available without any mitk interactor class using the
-  api of ContourModel. It is possible to shift single vertices also as shifting the whole
+  api of ContourModel. It is possible to shift single vertices as well as shifting the whole
   contour.
 
   A contour can be either open like a single curved line segment or
@@ -134,7 +134,7 @@ namespace mitk
         the contour of the passed source model at the sourceTimeStep.
      @pre soureModel must point to a valid instance
      @pre sourceTimePoint must be valid
-     @note Updateing a vertex to a timestep which exceeds the timebounds of the contour
+     @note Updating a vertex to a timestep which exceeds the timebounds of the contour
       will not be added, the TimeGeometry will not be expanded.
     */
     void UpdateContour(const ContourModel* sourceModel, TimeStepType destinationTimeStep, TimeStepType sourceTimeStep);

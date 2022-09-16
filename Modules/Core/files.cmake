@@ -39,6 +39,7 @@ set(CPP_FILES
   Controllers/mitkCallbackFromGUIThread.cpp
   Controllers/mitkCameraController.cpp
   Controllers/mitkCameraRotationController.cpp
+  Controllers/mitkCrosshairManager.cpp
   Controllers/mitkLimitedLinearUndo.cpp
   Controllers/mitkOperationEvent.cpp
   Controllers/mitkPlanePositionManager.cpp

@@ -29,6 +29,7 @@ set(CPP_FILES
   Qmitk/QmitkSimpleLabelSetListWidget.cpp
   Qmitk/QmitkSegmentationTaskListWidget.cpp
   SegmentationUtilities/QmitkBooleanOperationsWidget.cpp
+Qmitk/QmitkMultiLabelSegmentationTreeModel.cpp
   SegmentationUtilities/QmitkContourModelToImageWidget.cpp
   SegmentationUtilities/QmitkImageMaskingWidget.cpp
   SegmentationUtilities/QmitkMorphologicalOperationsWidget.cpp
@@ -68,6 +69,7 @@ set(MOC_H_FILES
   Qmitk/QmitkStaticDynamicSegmentationDialog.h
   Qmitk/QmitkSimpleLabelSetListWidget.h
   Qmitk/QmitkSegmentationTaskListWidget.h
+  Qmitk/QmitkMultiLabelSegmentationTreeModel.h
   SegmentationUtilities/QmitkBooleanOperationsWidget.h
   SegmentationUtilities/QmitkContourModelToImageWidget.h
   SegmentationUtilities/QmitkImageMaskingWidget.h

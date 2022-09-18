@@ -33,6 +33,8 @@ class MITKSEGMENTATIONUI_EXPORT QmitkMultiLabelSegmentationTreeModel : public QA
     Q_OBJECT
 
 public:
+  using LabelValueType = mitk::LabelSetImage::LabelValueType;
+  using SpatialGroupIndexType = mitk::LabelSetImage::SpatialGroupIndexType;
 
   QmitkMultiLabelSegmentationTreeModel(QObject *parent = nullptr);
   ~QmitkMultiLabelSegmentationTreeModel() override;
@@ -62,14 +64,20 @@ signals:
   void modelChanged();
 
 protected:
-  void OnModified(const itk::Object* caller, const itk::EventObject&);
-
+  void OnLabelAdded(LabelValueType labelValue);
+  void OnLabelModified(LabelValueType labelValue);
+  void OnLabelRemoved(LabelValueType labelValue);
+  void OnGroupAdded(SpatialGroupIndexType groupIndex);
+  void OnGroupModified(SpatialGroupIndexType groupIndex);
+  void OnGroupRemoved(SpatialGroupIndexType groupIndex);
 
 private:
   void AddObserver();
   void RemoveObserver();
 
-  void UpdateBySegmentation();
+  void UpdateInternalTree();
+  void GenerateInternalGroupTree(unsigned int layerID, QmitkMultiLabelSegTreeItem* layerItem);
+  QmitkMultiLabelSegTreeItem* GenerateInternalTree();
 
   /* builds a hierarchical tree model for the image statistics
   1. Level: Image
@@ -80,11 +88,10 @@ private:
   mitk::LabelSetImage::Pointer m_Segmentation;
 
   std::mutex m_Mutex;
+  std::unique_ptr<QmitkMultiLabelSegTreeItem> m_RootItem;
 
-  QmitkMultiLabelSegTreeItem* m_RootItem;
-
-  unsigned long m_ModifiedObserverTag;
   bool m_Observed;
+  bool m_ShowGroups = true;
 };
 
 #endif // mitkQmitkMultiLabelSegmentationTreeModel_h

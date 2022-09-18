@@ -19,6 +19,7 @@ mitk::LabelSet::LabelSet() : m_ActiveLabelValue(0), m_Layer(0)
 {
   m_LookupTable = mitk::LookupTable::New();
   m_LookupTable->SetType(mitk::LookupTable::MULTILABEL);
+  m_ReservedLabelValuesFunctor = []() { return std::vector<LabelValueType>({ 0 }); };
 }
 
 mitk::LabelSet::~LabelSet()
@@ -42,6 +43,7 @@ mitk::LabelSet::LabelSet(const LabelSet &other)
     command->SetCallbackFunction(this, &LabelSet::OnLabelModified);
     m_LabelContainer[otherIt->first]->AddObserver(itk::ModifiedEvent(), command);
   }
+  m_ReservedLabelValuesFunctor = other.m_ReservedLabelValuesFunctor;
 }
 
 void mitk::LabelSet::OnLabelModified(const Object* sender, const itk::EventObject&)
@@ -96,7 +98,6 @@ bool mitk::LabelSet::ExistLabel(PixelType pixelValue)
   return m_LabelContainer.count(pixelValue) > 0 ? true : false;
 }
 
-// TODO Parameter as Smartpointer
 void mitk::LabelSet::AddLabel(mitk::Label *label)
 {
   unsigned int max_size = mitk::Label::MAX_LABEL_VALUE + 1;
@@ -108,23 +109,19 @@ void mitk::LabelSet::AddLabel(mitk::Label *label)
   // TODO use layer of label parameter
   newLabel->SetLayer(m_Layer);
 
-  PixelType pixelValue;
-  if (m_LabelContainer.empty())
-  {
-    pixelValue = newLabel->GetValue();
-  }
-  else
+  PixelType pixelValue = newLabel->GetValue();
+  if (!m_LabelContainer.empty())
   {
     pixelValue = m_LabelContainer.rbegin()->first;
 
-    if (pixelValue >= newLabel->GetValue() && m_LabelContainer.find(newLabel->GetValue()) != m_LabelContainer.end())
+    auto usedValues = m_ReservedLabelValuesFunctor();
+    auto finding = std::find(usedValues.begin(), usedValues.end(), pixelValue);
+
+    if (!usedValues.empty() && usedValues.end() != finding)
     {
-      ++pixelValue;
+      pixelValue = usedValues.back()+1;
+      MITK_DEBUG << "LabelSet label collision. Tried to add a label with a value already in use. Value will be adapted. Old value: " << newLabel->GetValue() << "; new value: " << pixelValue;
       newLabel->SetValue(pixelValue);
-    }
-    else
-    {
-      pixelValue = newLabel->GetValue();
     }
   }
 

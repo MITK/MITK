@@ -105,21 +105,6 @@ mitk::LabelSetImage::LabelSetImage(const mitk::LabelSetImage &other)
   DICOMSegmentationPropertyHelper::DeriveDICOMSegmentationProperties(this);
 }
 
-void mitk::LabelSetImage::OnLabelAdded(LabelValueType labelValue)
-{
-  this->m_LabelAddedMessage.Send(labelValue);
-}
-
-void mitk::LabelSetImage::OnLabelModified(LabelValueType labelValue)
-{
-  this->m_LabelModifiedMessage.Send(labelValue);
-}
-
-void mitk::LabelSetImage::OnLabelRemoved(LabelValueType labelValue)
-{
-  this->m_LabelRemovedMessage.Send(labelValue);
-}
-
 void mitk::LabelSetImage::OnLabelSetModified()
 {
   Superclass::Modified();
@@ -258,9 +243,21 @@ void mitk::LabelSetImage::RemoveLayer()
     this->SetActiveLayer(layerToDelete);
   }
 
-  this->m_GroupRemovedMessage.Send(layerToDelete);
+  this->OnGroupRemoved(layerToDelete);
   this->Modified();
 }
+
+mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::GetUsedLabelValues() const
+{
+  LabelValueVectorType result = { 0 };
+
+  for (auto [value, label] : m_LabelMap)
+  {
+    result.emplace_back(value);
+  }
+  return result;
+}
+
 
 unsigned int mitk::LabelSetImage::AddLayer(mitk::LabelSet::Pointer labelSet)
 {
@@ -300,6 +297,7 @@ unsigned int mitk::LabelSetImage::AddLayer(mitk::Image::Pointer layerImage, mitk
     ls->SetActiveLabel(0 /*Exterior Label*/);
   }
 
+  ls->m_ReservedLabelValuesFunctor = [this]() {return this->GetUsedLabelValues(); };
   ls->SetLayer(newLabelSetId);
   // Add exterior Label to label set
   // mitk::Label::Pointer exteriorLabel = CreateExteriorLabel();
@@ -314,7 +312,7 @@ unsigned int mitk::LabelSetImage::AddLayer(mitk::Image::Pointer layerImage, mitk
 
   SetActiveLayer(newLabelSetId);
   this->Modified();
-  this->m_GroupAddedMessage.Send(newLabelSetId);
+  this->OnGroupAdded(newLabelSetId);
 
   return newLabelSetId;
 }
@@ -352,7 +350,7 @@ void mitk::LabelSetImage::AddLabelSetToLayer(const unsigned int layerIdx, const 
       this->m_GroupAddedMessage.Send(m_LabelSetContainer.size()-1);
     }
     m_LabelSetContainer.push_back(clonedLabelSet);
-    this->m_GroupAddedMessage.Send(layerIdx);
+    this->OnGroupAdded(layerIdx);
   }
 }
 
@@ -496,7 +494,7 @@ void mitk::LabelSetImage::RemoveLabel(PixelType pixelValue, unsigned int layer)
 {
   this->GetLabelSet(layer)->RemoveLabel(pixelValue);
   this->EraseLabel(pixelValue);
-  this->m_LabelRemovedMessage.Send(pixelValue);
+  // in the interim version triggered by label set events: this->m_LabelRemovedMessage.Send(pixelValue);
   this->m_LabelsChangedMessage.Send({ pixelValue });
   this->m_GroupModifiedMessage.Send(layer);
 }
@@ -506,7 +504,6 @@ void mitk::LabelSetImage::RemoveLabels(const std::vector<PixelType>& VectorOfLab
   for (unsigned int idx = 0; idx < VectorOfLabelPixelValues.size(); idx++)
   {
     this->RemoveLabel(VectorOfLabelPixelValues[idx], layer);
-    this->m_LabelRemovedMessage.Send(VectorOfLabelPixelValues[idx]);
     this->m_LabelsChangedMessage.Send({ VectorOfLabelPixelValues[idx] });
   }
   this->m_GroupModifiedMessage.Send(layer);
@@ -945,6 +942,151 @@ void mitk::LabelSetImage::MergeLabelProcessing(ImageType *itkImage, PixelType pi
     ++iter;
   }
 }
+
+
+void mitk::LabelSetImage::OnLabelAdded(LabelValueType labelValue)
+{
+  Label* label = nullptr;
+  unsigned int layerID = 0;
+  for (; layerID < this->GetNumberOfLayers(); ++layerID)
+  {
+    label = this->GetLabel(labelValue, layerID);
+    if (nullptr != label) break;
+  }
+
+  if (!label) mitkThrow() << "Wrong internal state. OnLabelAdded was triggered, but label cannot be found. Invalid label: " << labelValue;
+
+  m_LabelMap[labelValue] = label;
+  m_LabelToGroupMap[labelValue] = layerID;
+  auto groupFinding = m_GroupToLabelMap.find(layerID);
+  if (groupFinding == m_GroupToLabelMap.end())
+  {
+    m_GroupToLabelMap[layerID] = { labelValue };
+  }
+  else
+  {
+    m_GroupToLabelMap[layerID].push_back(labelValue);
+  }
+
+  this->m_LabelAddedMessage.Send(labelValue);
+}
+
+void mitk::LabelSetImage::OnLabelModified(LabelValueType labelValue)
+{
+  this->m_LabelModifiedMessage.Send(labelValue);
+}
+
+void mitk::LabelSetImage::OnLabelRemoved(LabelValueType labelValue)
+{
+  m_LabelMap.erase(labelValue);
+  auto finding = m_LabelToGroupMap.find(labelValue);
+  if (finding != m_LabelToGroupMap.end())
+  {
+    auto labelsInGroup = m_GroupToLabelMap[finding->second];
+    auto labelFinding = std::find(labelsInGroup.begin(), labelsInGroup.end(),finding->second);
+    if (labelFinding != labelsInGroup.end())
+    {
+      labelsInGroup.erase(labelFinding);
+    }
+    m_LabelToGroupMap.erase(labelValue);
+  }
+
+  this->m_LabelRemovedMessage.Send(labelValue);
+}
+
+void mitk::LabelSetImage::OnGroupAdded(SpatialGroupIndexType groupIndex)
+{
+  auto result = m_GroupToLabelMap.insert(std::make_pair(groupIndex, LabelValueVectorType()));
+  if (!result.second) mitkThrow() << "Invalid state of LabelSetImage. A GroupAdded signal was triggered for a group that alread exists. GroupIndex: " << groupIndex;
+
+  this->m_GroupAddedMessage.Send(groupIndex);
+}
+
+void mitk::LabelSetImage::OnGroupModified(SpatialGroupIndexType groupIndex)
+{
+  this->m_GroupModifiedMessage.Send(groupIndex);
+}
+
+void mitk::LabelSetImage::OnGroupRemoved(SpatialGroupIndexType groupIndex)
+{
+  m_GroupToLabelMap.erase(groupIndex);
+  this->m_GroupRemovedMessage.Send(groupIndex);
+}
+
+// future implementation for T28524
+//bool mitk::LabelSetImage::ExistLabel(LabelValueType value, SpatialGroupIndexType groupIndex) const
+//{
+//  auto finding = m_LabelToGroupMap.find(value);
+//  if (m_LabelToGroupMap.end() != finding)
+//  {
+//    return finding->second == groupIndex;
+//  }
+//  return false;
+//}
+//
+//bool mitk::LabelSetImage::ExistGroup(SpatialGroupIndexType index) const
+//{
+//  return index < m_LabelSetContainer.size();
+//}
+
+bool mitk::LabelSetImage::IsLabeInGroup(LabelValueType value) const
+{
+  SpatialGroupIndexType dummy;
+  return this->IsLabeInGroup(value, dummy);
+}
+
+bool mitk::LabelSetImage::IsLabeInGroup(LabelValueType value, SpatialGroupIndexType& groupIndex) const
+{
+  auto finding = m_LabelToGroupMap.find(value);
+  if (m_LabelToGroupMap.end() != finding)
+  {
+    groupIndex = finding->second;
+    return true;
+  }
+  return false;
+}
+
+const mitk::Label* mitk::LabelSetImage::GetLabel(LabelValueType value) const
+{
+  auto finding = m_LabelMap.find(value);
+  if (m_LabelMap.end() != finding)
+  {
+    return finding->second;
+  }
+  return nullptr;
+};
+
+mitk::Label* mitk::LabelSetImage::GetLabel(LabelValueType value)
+{
+  auto finding = m_LabelMap.find(value);
+  if (m_LabelMap.end() != finding)
+  {
+    return finding->second;
+  }
+  return nullptr;
+};
+
+const mitk::LabelSetImage::ConstLabelVectorType mitk::LabelSetImage::GetLabels() const
+{
+  ConstLabelVectorType result;
+  for (auto [value, label] : m_LabelMap)
+  {
+    result.emplace_back(label);
+  }
+  return result;
+}
+
+const mitk::LabelSetImage::LabelVectorType mitk::LabelSetImage::GetLabels()
+{
+  LabelVectorType result;
+  for (auto [value, label] : m_LabelMap)
+  {
+    result.emplace_back(label);
+  }
+  return result;
+}
+
+
 
 bool mitk::Equal(const mitk::LabelSetImage &leftHandSide,
                  const mitk::LabelSetImage &rightHandSide,

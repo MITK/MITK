@@ -198,6 +198,9 @@ namespace mitk
     */
     void UpdateLookupTable(PixelType pixelValue);
 
+    using ReservedLabelValuesFunctor = std::function<std::vector<LabelValueType>()>;
+    ReservedLabelValuesFunctor m_ReservedLabelValuesFunctor;
+
   protected:
     LabelSet();
     LabelSet(const LabelSet &);

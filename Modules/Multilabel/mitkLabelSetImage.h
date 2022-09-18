@@ -53,13 +53,48 @@ namespace mitk
     // FUTURE MultiLabelSegmentation:
     // Section that already contains declarations used in the new class.
     // So this part of the interface will stay after refactoring towards
-    // the new MultiLabelSegmentation class. This section was introduced because some
-    // of the planed features are already urgently needed.
+    // the new MultiLabelSegmentation class (see T28524). This section was introduced
+    // because some of the planed features are already urgently needed.
     ///////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////
 
     using SpatialGroupIndexType = std::size_t;
     using LabelValueType = mitk::Label::PixelType;
+    using ConstLabelVectorType = std::vector<Label::ConstPointer>;
+    using LabelVectorType = std::vector<Label::Pointer>;
+
+    //future declaration (T28524) currently conflicted with old declaration
+    ///**
+    //  * \brief  Returns true if the value exists in the MultiLabelSegmentation instance*/
+    //bool ExistLabel(LabelValueType value) const;
+
+    ///**
+    // * @brief Checks if a label belongs in a certain spatial group
+    // * @param value the label value
+    // * @param groupIndex Indexp of the spacial group which should be checked for the label
+    // * @return true if the label exists otherwise false
+    // */
+    //bool ExistLabel(LabelValueType value, SpatialGroupIndexType groupIndex) const;
+
+    /**
+      * \brief  Returns true if the spatial group exists in the MultiLabelSegmentation instance.*/
+    bool ExistGroup(SpatialGroupIndexType index) const;
+
+    bool IsLabeInGroup(LabelValueType value) const;
+    bool IsLabeInGroup(LabelValueType value, SpatialGroupIndexType& groupIndex) const;
+
+    /**
+     * @brief Returns the mitk::Label with the given value.
+     * @param value the pixel value of the label
+     * @return the mitk::Label if available otherwise nullptr
+     */
+    const mitk::Label* GetLabel(LabelValueType value) const;
+    mitk::Label* GetLabel(LabelValueType value);
+
+    /** Returns a vector with all labels currently defined in the MultiLabelSegmentation
+    instance.*/
+    const ConstLabelVectorType GetLabels() const;
+    const LabelVectorType GetLabels();
 
     ////////////////////////////////////////////////////////////////////
     //Message slots that allow to react to changes in an instance
@@ -140,7 +175,7 @@ namespace mitk
     mitkNewMessage1Macro(GroupAdded, SpatialGroupIndexType);
 
     /**
-    * \brief GroupModified is emitted whenever a label has been modified.
+    * \brief GroupModified is emitted whenever a group has been modified.
     *
     * A group is modified if the set of labels associated with it are changed or the group's meta data.
     * Observers should register to this event by calling this->AddGroupModifiedListener(myObject,
@@ -169,6 +204,20 @@ namespace mitk
       void OnLabelAdded(LabelValueType labelValue);
       void OnLabelModified(LabelValueType labelValue);
       void OnLabelRemoved(LabelValueType labelValue);
+      void OnGroupAdded(SpatialGroupIndexType groupIndex);
+      void OnGroupModified(SpatialGroupIndexType groupIndex);
+      void OnGroupRemoved(SpatialGroupIndexType groupIndex);
+
+      using LabelMapType = std::map<LabelValueType, Label::Pointer>;
+      LabelMapType m_LabelMap;
+
+      /**This type is internally used to track which label is currently
+       * associated with which layer.*/
+      using LabelValueVectorType = std::vector<LabelValueType>;
+      using GroupToLabelMapType = std::map<SpatialGroupIndexType, LabelValueVectorType>;
+      GroupToLabelMapType m_GroupToLabelMap;
+      using LabelToGroupMapType = std::map<LabelValueType, SpatialGroupIndexType>;
+      LabelToGroupMapType m_LabelToGroupMap;
 
     public:
     ///////////////////////////////////////////////////////////////////////////////////
@@ -247,6 +296,7 @@ namespace mitk
 
     /**
       * \brief  Returns true if the value exists in one of the labelsets*/
+    [[deprecated("Will be changed with T28524")]]
     bool ExistLabel(PixelType pixelValue) const;
 
     /**
@@ -255,10 +305,12 @@ namespace mitk
      * @param layer the layer in which should be searched for the label
      * @return true if the label exists otherwise false
      */
+    [[deprecated("Will be changed with T28524")]]
     bool ExistLabel(PixelType pixelValue, unsigned int layer) const;
 
     /**
       * \brief  Returns true if the labelset exists*/
+    [[deprecated("Will be removed with T28524")]]
     bool ExistLabelSet(unsigned int layer) const;
 
     /**
@@ -266,7 +318,9 @@ namespace mitk
      * @param layer the layer ID for which the active label should be returned
      * @return the active label of the specified layer
      */
+    [[deprecated("Will be removed with T28524")]]
     mitk::Label *GetActiveLabel(unsigned int layer = 0);
+    [[deprecated("Will be removed with T28524")]]
     const mitk::Label* GetActiveLabel(unsigned int layer = 0) const;
 
     /**
@@ -281,7 +335,9 @@ namespace mitk
      * @brief Returns the currently active mitk::LabelSet
      * @return the mitk::LabelSet of the active layer or nullptr if non is present
      */
+    [[deprecated ("Will be removed with T28524")]]
     mitk::LabelSet *GetActiveLabelSet();
+    [[deprecated("Will be removed with T28524")]]
     const mitk::LabelSet* GetActiveLabelSet() const;
 
     /**
@@ -433,6 +489,10 @@ namespace mitk
 
     template <typename LabelSetImageType, typename ImageType>
     void InitializeByLabeledImageProcessing(LabelSetImageType *input, ImageType *other);
+
+    /** helper needed for ensuring unique values in all layers until the refactoring is done.
+      returns a sorted list of all labels.*/
+    LabelValueVectorType GetUsedLabelValues() const;
 
     //helper function that ensures
     void RegisterLabelSet(mitk::LabelSet* ls);

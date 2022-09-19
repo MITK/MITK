@@ -812,6 +812,9 @@ void mitk::DisplayActionEventBroadcast::UpdateStatusbar(StateMachineAction* /*st
     return;
   }
 
+  // A rendering update is required before getting the pointer position.
+  // This is required when scrolling through slices of an image using the mouse wheel.
+  renderer->ForceImmediateUpdate();
   Point3D worldposition;
   renderer->DisplayToWorld(positionEvent->GetPointerPositionOnScreen(), worldposition);
   auto globalCurrentTimePoint = renderer->GetTime();

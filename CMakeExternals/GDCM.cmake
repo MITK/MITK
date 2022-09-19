@@ -42,7 +42,7 @@ if(NOT DEFINED GDCM_DIR)
   ExternalProject_Add(${proj}
      LIST_SEPARATOR ${sep}
      GIT_REPOSITORY https://github.com/malaterre/GDCM.git
-     GIT_TAG v3.0.17
+     GIT_TAG v3.0.14
      GIT_SUBMODULES ""
      CMAKE_GENERATOR ${gen}
      CMAKE_GENERATOR_PLATFORM ${gen_platform}

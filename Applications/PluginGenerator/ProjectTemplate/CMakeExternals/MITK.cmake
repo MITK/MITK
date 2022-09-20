@@ -36,6 +36,7 @@ if(NOT MITK_DIR)
   endif()
 
   set(MITK_USE_CableSwig ${MITK_USE_Python3})
+  set(MITK_USE_GDCM 1)
   set(MITK_USE_ITK 1)
   set(MITK_USE_VTK 1)
 
@@ -92,7 +93,7 @@ if(NOT MITK_DIR)
   # Create options to inject pre-build dependencies
   #-----------------------------------------------------------------------------
 
-  foreach(proj CTK DCMTK DCMQI VTK ACVD ITK OpenCV CableSwig)
+  foreach(proj CTK DCMTK DCMQI GDCM VTK ACVD ITK OpenCV CableSwig)
     if(MITK_USE_${proj})
       set(MITK_${proj}_DIR "${${proj}_DIR}" CACHE PATH "Path to ${proj} build directory")
       mark_as_advanced(MITK_${proj}_DIR)

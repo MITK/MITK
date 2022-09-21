@@ -31,7 +31,6 @@ set(CPP_FILES
   QmitkPointListWidget.cpp
   QmitkPrimitiveMovieNavigatorWidget.cpp
   QmitkPropertyViewFactory.cpp
-  QmitkSelectableGLWidget.cpp
   QmitkSliceWidget.cpp
   QmitkSliderNavigatorWidget.cpp
   QmitkStandardViews.cpp
@@ -73,7 +72,6 @@ set(MOC_H_FILES
   include/QmitkPointListView.h
   include/QmitkPointListWidget.h
   include/QmitkPrimitiveMovieNavigatorWidget.h
-  include/QmitkSelectableGLWidget.h
   include/QmitkSliceWidget.h
   include/QmitkSliderNavigatorWidget.h
   include/QmitkStandardViews.h
@@ -92,7 +90,6 @@ set(UI_FILES
   src/QmitkAboutDialogGUI.ui
   src/QmitkGnuplotWidget.ui
   src/QmitkPrimitiveMovieNavigatorWidget.ui
-  src/QmitkSelectableGLWidget.ui
   src/QmitkSliceWidget.ui
   src/QmitkSliderNavigator.ui
   src/QmitkTransferFunctionGeneratorWidget.ui

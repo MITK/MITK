@@ -197,6 +197,13 @@ bool mitk::CrosshairManager::GetCrosshairVisibility() const
   mitkThrow() << "Invalid state of plane visibility.";
 }
 
+void mitk::CrosshairManager::SetCrosshairGap(unsigned int gapSize)
+{
+  m_AxialPlaneNode->SetIntProperty("Crosshair.Gap Size", gapSize);
+  m_CoronalPlaneNode->SetIntProperty("Crosshair.Gap Size", gapSize);
+  m_SagittalPlaneNode->SetIntProperty("Crosshair.Gap Size", gapSize);
+}
+
 void mitk::CrosshairManager::AddPlanesToDataStorage()
 {
   if (nullptr == m_DataStorage)

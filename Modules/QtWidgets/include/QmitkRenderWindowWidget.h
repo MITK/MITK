@@ -81,6 +81,7 @@ public:
 
   void SetCrosshairVisibility(bool visible);
   bool GetCrosshairVisibility();
+  void SetCrosshairGap(unsigned int gapSize);
 
   void AddPlanesToDataStorage();
   void RemovePlanesFromDataStorage();

@@ -216,6 +216,9 @@ void QmitkMxNMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
   // update decoration preferences
   //m_Impl->m_MultiWidgetDecorationManager->DecorationPreferencesChanged(preferences);
 
+  int crosshairGapSize = preferences->GetInt("crosshair gap size", 32);
+  multiWidget->SetCrosshairGap(crosshairGapSize);
+
   // zooming and panning preferences
   bool constrainedZooming = preferences->GetBool("Use constrained zooming and panning", true);
   mitk::RenderingManager::GetInstance()->SetConstrainedPanningZooming(constrainedZooming);

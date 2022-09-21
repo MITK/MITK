@@ -43,6 +43,7 @@ public:
 
   virtual void SetCrosshairVisibility(bool) override;
   virtual bool GetCrosshairVisibility() const override;
+  void SetCrosshairGap(unsigned int gapSize) override;
 
   virtual void ResetCrosshair() override;
 

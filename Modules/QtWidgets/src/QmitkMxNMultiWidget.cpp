@@ -182,6 +182,15 @@ bool QmitkMxNMultiWidget::GetCrosshairVisibility() const
   return renderWindowWidget->GetCrosshairVisibility();
 }
 
+void QmitkMxNMultiWidget::SetCrosshairGap(unsigned int gapSize)
+{
+  auto renderWindowWidgets = this->GetRenderWindowWidgets();
+  for (const auto& renderWindowWidget : renderWindowWidgets)
+  {
+    renderWindowWidget.second->SetCrosshairGap(gapSize);
+  }
+}
+
 void QmitkMxNMultiWidget::ResetCrosshair()
 {
   auto dataStorage = GetDataStorage();

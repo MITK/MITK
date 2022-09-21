@@ -49,6 +49,7 @@ public:
 
   void SetCrosshairVisibility(bool visible) override;
   bool GetCrosshairVisibility() const override;
+  void SetCrosshairGap(unsigned int gapSize) override;
 
   void ResetCrosshair() override;
 

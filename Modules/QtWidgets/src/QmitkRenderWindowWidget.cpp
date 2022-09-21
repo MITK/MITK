@@ -158,6 +158,11 @@ bool QmitkRenderWindowWidget::GetCrosshairVisibility()
   return m_CrosshairManager->GetCrosshairVisibility();
 }
 
+void QmitkRenderWindowWidget::SetCrosshairGap(unsigned int gapSize)
+{
+  m_CrosshairManager->SetCrosshairGap(gapSize);
+}
+
 void QmitkRenderWindowWidget::AddPlanesToDataStorage()
 {
   m_CrosshairManager->AddPlanesToDataStorage();

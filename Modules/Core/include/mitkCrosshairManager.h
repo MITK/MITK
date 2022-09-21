@@ -58,6 +58,7 @@ namespace mitk
 
     void SetCrosshairVisibility(bool visible);
     bool GetCrosshairVisibility() const;
+    void SetCrosshairGap(unsigned int gapSize);
 
     void AddPlanesToDataStorage();
     void RemovePlanesFromDataStorage();

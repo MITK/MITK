@@ -18,8 +18,8 @@ found in the LICENSE file.
 #include "QmitkRenderWindow.h"
 
 // mitk core
+#include <mitkCrosshairManager.h>
 #include <mitkDataStorage.h>
-#include <mitkPointSet.h>
 #include <mitkRenderWindow.h>
 
 // qt
@@ -31,11 +31,12 @@ class vtkCornerAnnotation;
 
 /**
 * @brief The 'QmitkRenderWindowWidget' is a QFrame that holds a render window
-*        and some associates properties, like a crosshair (pointset) and decorations.
+*        and some associates properties, e.g. decorations.
 *        Decorations are corner annotation (text and color), frame color or background color
 *        and can be set using this class.
 *        The 'QmitkRenderWindowWidget' is used inside a 'QmitkAbstractMultiWidget', where a map contains
 *        several render window widgets to create the multi widget display.
+*        This class uses a CrosshairManager, which allows to use plane geometries as crosshair.
 */
 class MITKQTWIDGETS_EXPORT QmitkRenderWindowWidget : public QFrame
 {
@@ -78,14 +79,22 @@ public:
 
   bool IsRenderWindowMenuActivated() const;
 
-  void ActivateCrosshair(bool activate);
+  void SetCrosshairVisibility(bool visible);
+  bool GetCrosshairVisibility();
+  void SetCrosshairGap(unsigned int gapSize);
+
+  void AddPlanesToDataStorage();
+  void RemovePlanesFromDataStorage();
+
+  void SetCrosshairPosition(const mitk::Point3D& newPosition);
+  mitk::Point3D GetCrosshairPosition() const;
+
+  void SetGeometry(const itk::EventObject& event);
 
 private:
 
   void InitializeGUI();
   void InitializeDecorations();
-
-  void SetCrosshair(mitk::Point3D selectedPoint);
 
   QString m_WidgetName;
   QHBoxLayout* m_Layout;
@@ -94,8 +103,7 @@ private:
 
   QmitkRenderWindow* m_RenderWindow;
 
-  mitk::DataNode::Pointer m_PointSetNode;
-  mitk::PointSet::Pointer m_PointSet;
+  mitk::CrosshairManager::Pointer m_CrosshairManager;
 
   std::pair<mitk::Color, mitk::Color> m_GradientBackgroundColors;
   mitk::Color m_DecorationColor;

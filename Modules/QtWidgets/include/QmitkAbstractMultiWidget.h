@@ -116,6 +116,7 @@ public:
 
   virtual void SetCrosshairVisibility(bool visible) = 0;
   virtual bool GetCrosshairVisibility() const = 0;
+  virtual void SetCrosshairGap(unsigned int gapSize) = 0;
 
   virtual void ResetCrosshair() = 0;
 

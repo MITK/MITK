@@ -220,6 +220,13 @@ bool QmitkStdMultiWidget::GetCrosshairVisibility() const
   return crosshairVisibility;
 }
 
+void QmitkStdMultiWidget::SetCrosshairGap(unsigned int gapSize)
+{
+  m_PlaneNode1->SetIntProperty("Crosshair.Gap Size", gapSize);
+  m_PlaneNode2->SetIntProperty("Crosshair.Gap Size", gapSize);
+  m_PlaneNode3->SetIntProperty("Crosshair.Gap Size", gapSize);
+}
+
 void QmitkStdMultiWidget::ResetCrosshair()
 {
   auto dataStorage = GetDataStorage();

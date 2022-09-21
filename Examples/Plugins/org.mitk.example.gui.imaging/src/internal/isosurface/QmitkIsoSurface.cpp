@@ -17,9 +17,6 @@ found in the LICENSE file.
 #include <mitkNodePredicateDataType.h>
 #include <mitkSurface.h>
 
-// Qmitk headers
-#include <QmitkSelectableGLWidget.h>
-
 // Qt-GUI headers
 #include <QApplication>
 #include <QCursor>

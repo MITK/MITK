@@ -12,8 +12,6 @@ found in the LICENSE file.
 
 #include "QmitkSlicesInterpolator.h"
 
-#include "QmitkSelectableGLWidget.h"
-
 #include "mitkApplyDiffImageOperation.h"
 #include "mitkColorProperty.h"
 #include "mitkCoreObjectFactory.h"

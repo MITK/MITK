@@ -97,7 +97,7 @@ public:
   berryObjectMacro(QmitkAbstractView);
 
   /**
-   * Nothing to do in the standard ctor. <b>Initiliaze your GUI in CreateQtPartControl(QWidget*)</b>
+   * Nothing to do in the standard ctor. <b>Initialize your GUI in CreateQtPartControl(QWidget*)</b>
    * \see berry::QtViewPart::CreateQtPartControl(QWidget*)
    */
   QmitkAbstractView();
@@ -174,7 +174,7 @@ protected:
 
   /**
    * Returns the Preferences object for this View.
-   * <b>Important</b>: When refering to this preferences, e.g. in a PreferencePage: The ID
+   * <b>Important</b>: When referring to this preferences, e.g. in a PreferencePage: The ID
    * for this preferences object is "/<VIEW-ID>", e.g. "/org.mitk.views.datamanager"
    */
   mitk::IPreferences* GetPreferences() const;

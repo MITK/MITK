@@ -43,7 +43,7 @@ QmitkTubeGraphDeleteLabelGroupDialog::QmitkTubeGraphDeleteLabelGroupDialog(QWidg
   buttonLayout->addWidget(deleteButton);
   connect( deleteButton, SIGNAL(clicked()), this, SLOT(OnDeleteLabelGroupClicked()) );
 
-  cancleButton = new QPushButton("Cancle", this);
+  cancleButton = new QPushButton("Cancel", this);
   buttonLayout->addWidget(cancleButton);
   connect( cancleButton, SIGNAL(clicked()), this, SLOT(reject()) );
 

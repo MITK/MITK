@@ -24,7 +24,7 @@ namespace berry {
 
 /**
  * Abstract superclass of all property testers. Implementation classes of
- * the extension point <code>org.blueberry.core.expresssions.propertyTesters
+ * the extension point <code>org.blueberry.core.expressions.propertyTesters
  * </code> must extend <code>PropertyTester</code>.
  * <p>
  * A property tester implements the property tests enumerated in the property

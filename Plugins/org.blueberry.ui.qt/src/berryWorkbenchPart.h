@@ -205,7 +205,7 @@ public:
   /**
    * {@inheritDoc}
    * <p>
-   * It is considered bad practise to overload or extend this method.
+   * It is considered bad practice to overload or extend this method.
    * Parts should call setPartName to change their part name.
    * </p>
    */
@@ -214,7 +214,7 @@ public:
   /**
    * {@inheritDoc}
    * <p>
-   * It is considered bad practise to overload or extend this method.
+   * It is considered bad practice to overload or extend this method.
    * Parts should call setContentDescription to change their content description.
    * </p>
    */

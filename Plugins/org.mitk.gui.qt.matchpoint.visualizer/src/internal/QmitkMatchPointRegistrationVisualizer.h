@@ -145,13 +145,13 @@ private:
     void UpdateOrientationMatrixWidget();
 
     /**indicates if the gui updates is triggered internally or by user. Needed to
-     * avoid update loops by ConfigureVisualizationControlls();*/
+     * avoid update loops by ConfigureVisualizationControls();*/
     bool m_internalUpdateGuard;
 
     mitk::DataNode::Pointer m_spSelectedFOVRefNode;
     mitk::DataNode::Pointer m_spSelectedRegNode;
 
-    /**Used to store informations about the FOV reference orientation. Default is identity matrix.*/
+    /**Used to store information about the FOV reference orientation. Default is identity matrix.*/
     mitk::AffineTransform3D::MatrixType m_FOVRefOrientation;
 };
 

@@ -318,7 +318,7 @@ bool EditorSashContainer::RestoreState(IMemento::Pointer memento)
   bool result = true;
 
   // Remove the default editor workbook that is
-  // initialy created with the editor area.
+  // initially created with the editor area.
 
 //    StartupThreading.runWithoutExceptions(new StartupRunnable()
 //        {

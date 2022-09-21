@@ -40,7 +40,7 @@ public:
 
   /**
    * \brief Sets the target structure for which the occluded positions should be calculated.
-   * \param targetStructure DataNode conatining a mitk::Surface
+   * \param targetStructure DataNode containing a mitk::Surface
    */
   void SetTargetStructure(itk::SmartPointer<DataNode> targetStructure);
 

@@ -75,7 +75,7 @@ public:
   /**
    * \brief Removes target surface and tumour node from the data storage.
    * Additionally an unfreeze is done and the node displacement filter is
-   * resetted.
+   * reset.
    * \return always true
    */
   bool OnStopStep() override;
@@ -126,7 +126,7 @@ public:
 
   void SetTumorColor(mitk::Color c);
 
-  /** @return Returns the current NodeDisplacementFilter which ist used for updating the targets pose. */
+  /** @return Returns the current NodeDisplacementFilter which is used for updating the targets pose. */
   itk::SmartPointer<mitk::NodeDisplacementFilter> GetTumourNodeDisplacementFilter();
 
 protected:

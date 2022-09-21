@@ -24,10 +24,10 @@ found in the LICENSE file.
 class AICPRegistrationViewData;
 
 /**
-  * \brief Implemenation of a worker thread class.
+  * \brief Implementation of a worker thread class.
   *
   *        Worker class that runs the registration
-  *        in a seperate QThread to prevent the registration from blocking the
+  *        in a separate QThread to prevent the registration from blocking the
   *        GUI.
   */
 class UIWorker : public QObject
@@ -40,7 +40,7 @@ class UIWorker : public QObject
 
   public slots:
 
-    /** Method that runs the registration algorithm in a seperate QThread.*/
+    /** Method that runs the registration algorithm in a separate QThread.*/
     void RegistrationThreadFunc();
 
   signals:
@@ -78,7 +78,7 @@ class QmitkAICPRegistrationView : public QmitkAbstractView
 
   protected slots:
 
-    /** Starts the registration. When the method is called a seperate UIWorker
+    /** Starts the registration. When the method is called a separate UIWorker
       * thread will be run in the background to prevent blocking the GUI.
       */
     void OnStartRegistration();

@@ -214,7 +214,7 @@ void QmitkImageStatisticsView::UpdateHistogramWidget()
             }
 
             //Hardcoded labels are currently needed because the current histogram widget (and ChartWidget)
-            //do not allow correct removal or sound update/insertion of serveral charts.
+            //do not allow correct removal or sound update/insertion of several charts.
             //only thing that works for now is always to update/overwrite the same data label
             //This is a quick fix for T28223 and T28221
             m_Controls.widget_histogram->SetHistogram(statistics->GetHistogramForTimeStep(timeStep), "histogram");

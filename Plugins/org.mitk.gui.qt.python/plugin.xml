@@ -8,7 +8,7 @@
       category="General"
       icon="resources/Python.png"
       class="QmitkPythonView" >
-      <description>Allow the acces of python from MITK</description>
+      <description>Allow the access of python from MITK</description>
       <keywordReference id="org.mitk.views.python.Keyword"/>
     </view>
   </extension>

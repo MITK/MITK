@@ -30,7 +30,7 @@ namespace AddToSemanticRelationsAction
   *        already exists. If so, the user is prompted to overwrite the existing image or abort the process.
   *        If the user wants to overwrite the existing image, the image and it's corresponding segmentation nodes will be removed from the semantic relations storage.
   *        If a segmentation is added, the parent image node will also be to the semantic relations storage. If the segmentation does not contain the required DICOM information,
-  *        the DICOM information of the parent data will be transfered to the segmentation data.
+  *        the DICOM information of the parent data will be transferred to the segmentation data.
   *
   * @pre    The given dataStorage has to be valid (!nullptr).
   * @pre    The given dataNode has to be valid (!nullptr).

@@ -76,7 +76,7 @@ void QmitkToFScreenshotMaker::OnSelectCamera()
   }
   this->UpdateGUIElements(device, "no depth property available", m_Controls.m_SaveDepth, m_Controls.m_DepthFormat, extensions, ".nrrd");
   //usually you want to save depth data, but there is no "HasDepthImage" property, because every depth
-  //camera should provide a depth iamge
+  //camera should provide a depth image
   m_Controls.m_SaveDepth->setChecked(true);
   m_Controls.m_SaveDepth->setEnabled(true);
   m_Controls.m_DepthFormat->setEnabled(true);

@@ -157,7 +157,7 @@ public:
   virtual bool IsOnBorder(const QPoint& toTest);
 
   /**
-   * Set the folder to visible. This can be extended to propogate the
+   * Set the folder to visible. This can be extended to propagate the
    * visibility request to other components in the subclass.
    *
    * @param visible

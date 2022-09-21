@@ -85,8 +85,8 @@ Q_SIGNALS:
   // These signals so that container classes such as CommandLineModuleView
   // can keep track of how many modules are running simultaneously.
 
-  void started();   // emmitted when the module is started.
-  void finished();  // emmitted when the module is completely finished.
+  void started();   // emitted when the module is started.
+  void finished();  // emitted when the module is completely finished.
 
 private Q_SLOTS:
 

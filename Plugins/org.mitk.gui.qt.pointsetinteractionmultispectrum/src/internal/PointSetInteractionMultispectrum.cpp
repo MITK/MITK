@@ -185,10 +185,10 @@ void PointSetInteractionMultispectrum::DoImageProcessing()
 
 void PointSetInteractionMultispectrum::PlotReflectance(mitk::PointSet::Pointer m_PointSet, QList<mitk::DataNode::Pointer> dataManagerNodes)
 {
-  mitk::PointSet::PointsIterator PtIterator; // The point iterator in the PointSet, which gets accesss to each point.
+  mitk::PointSet::PointsIterator PtIterator; // The point iterator in the PointSet, which gets access to each point.
   mitk::Point3D Point; // The extracted point. Notice that a point has three components (x, y, z).
   itk::Index<3> index; // The 3D index, which is converted from the world coordinate
-  itk::Index<2> index2; // The truncated version of the 3D index, for which only the first two componets are extracted.
+  itk::Index<2> index2; // The truncated version of the 3D index, for which only the first two components are extracted.
   itk::VectorImage<double, 2>::Pointer itkImage; // The itk vector image. This is used since the mitk::Image could not handle multi-channel images well.
 
 

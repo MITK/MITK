@@ -51,7 +51,7 @@ signals:
 
   /**
    * \brief Signals that it is no longer possible to proceed with following steps.
-   * This signal is emmited when the result data of the step was removed or
+   * This signal is emitted when the result data of the step was removed or
    * changed, so that the old results are invalid for following steps.
    */
   void SignalNoLongerReadyForNextStep();
@@ -73,7 +73,7 @@ signals:
 
   /**
    * \brief Signals that the settings node was changed.
-   * This signal must not be emited in an OnSettingsChanged() method.
+   * This signal must not be emitted in an OnSettingsChanged() method.
    */
   void SignalSettingsNodeChanged(itk::SmartPointer<mitk::DataNode>);
 

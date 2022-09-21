@@ -126,7 +126,7 @@ protected:
    * This implementation calls mitk::IRenderingManager::ForceImmediateUpdate() on the rendering
    * manager interface returned by GetRenderingManager();
    *
-   * \param requestType The type of render windows for which an immedate update is forced.
+   * \param requestType The type of render windows for which an immediate update is forced.
    *
    * \see mitk::IRenderWindowPart::ForceImmediateUpdate
    */

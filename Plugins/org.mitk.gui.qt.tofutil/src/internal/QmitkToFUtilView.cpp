@@ -76,7 +76,7 @@ QmitkToFUtilView::~QmitkToFUtilView()
   OnToFCameraDisconnected();
 }
 
-//Createing the PartControl Signal-Slot principal
+//Creating the PartControl Signal-Slot principal
 void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
 {
   // build up qt view, unless already done
@@ -99,7 +99,7 @@ void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
 }
 }
 
-//SetFocus-Method -> actually seting Focus to the Recorder
+//SetFocus-Method -> actually setting Focus to the Recorder
 void QmitkToFUtilView::SetFocus()
 {
   m_Controls->m_ToFRecorderWidget->setFocus();
@@ -115,7 +115,7 @@ void QmitkToFUtilView::Activated()
     auto* linkedRenderWindowPart = dynamic_cast<mitk::ILinkedRenderWindowPart*>(renderWindowPart);
     if (linkedRenderWindowPart == nullptr)
     {
-      MITK_ERROR << "No linked render window part avaiable!!!";
+      MITK_ERROR << "No linked render window part available!!!";
     }
     else
     {
@@ -221,7 +221,7 @@ void QmitkToFUtilView::ResetGUIToDefault()
     auto* linkedRenderWindowPart = dynamic_cast<mitk::ILinkedRenderWindowPart*>(renderWindowPart);
     if(linkedRenderWindowPart == nullptr)
     {
-      MITK_ERROR << "No linked render window part avaiable!!!";
+      MITK_ERROR << "No linked render window part available!!!";
     }
     else
     {

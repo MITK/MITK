@@ -69,7 +69,7 @@ struct org_blueberry_core_runtime_EXPORT IStatus: public Object
     /** Status type severity (bit mask, value 4) indicating this status represents an error. */
     ERROR_TYPE = 0x04,
 
-    /** Status type severity (bit mask, value 8) indicating this status represents a cancelation. */
+    /** Status type severity (bit mask, value 8) indicating this status represents a cancellation. */
     CANCEL_TYPE = 0x08
   };
 
@@ -121,7 +121,7 @@ struct org_blueberry_core_runtime_EXPORT IStatus: public Object
    * Returns the severity. The severities are as follows (in
    * descending order):
    * <ul>
-   * <li><code>CANCEL_TYPE</code> - cancelation occurred</li>
+   * <li><code>CANCEL_TYPE</code> - cancellation occurred</li>
    * <li><code>ERROR_TYPE</code> - a serious error (most severe)</li>
    * <li><code>WARNING_TYPE</code> - a warning (less severe)</li>
    * <li><code>INFO_TYPE</code> - an informational ("fyi") message (least severe)</li>

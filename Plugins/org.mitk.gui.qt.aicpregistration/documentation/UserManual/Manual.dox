@@ -10,7 +10,7 @@
 The Surfaceregistration plugin allows the user to compute a transformation
 between two surfaces and align them in 3D space. It performs the
 registration with the anisotropic iterative closest point algorithm (A-ICP)
-presented in L. Maier-Hein et al. "Convergent Iterative Closest-Point Algorithm to Accomodate
+presented in L. Maier-Hein et al. "Convergent Iterative Closest-Point Algorithm to Accommodate
 Anisotropic and Inhomogenous Localization Error.", IEEE T Pattern Anal 34 (8),
 1520-1532, 2012. With the plugin it's also possible to compute
 the target registration error (TRE) between the two aligned surfaces with a given

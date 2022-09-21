@@ -43,7 +43,7 @@ const QString WorkbenchConstants::WORKBENCH_VISIBLE_VIEW_ID =
 const QString WorkbenchConstants::DEFAULT_CATEGORY_ID = "org.blueberry.ui";
     //PlatformUI::PLUGIN_ID;
 
-// Persistance tags.
+// Persistence tags.
 const QString WorkbenchConstants::TRUE_VAL = "true";
 
 const QString WorkbenchConstants::FALSE_VAL = "false";

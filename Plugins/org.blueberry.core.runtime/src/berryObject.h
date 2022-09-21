@@ -110,7 +110,7 @@ public:
   /**
    * Cause the object to print itself out. This is usually used to provide
    * detailed information about the object's state. It just calls the
-   * header/self/trailer virtual print methods, which can be overriden by
+   * header/self/trailer virtual print methods, which can be overridden by
    * subclasses.
    */
   QDebug Print(QDebug os, Indent Indent=0) const;

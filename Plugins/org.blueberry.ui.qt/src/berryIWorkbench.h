@@ -381,7 +381,7 @@ struct BERRY_UI_QT IWorkbench : public IServiceLocator {
   virtual bool SaveAllEditors(bool confirm) = 0;
 
   /**
-   * Returns the element factory with the given id. The calles takes
+   * Returns the element factory with the given id. The call takes
    * ownership of the returned pointer.
    *
    * @param factoryId

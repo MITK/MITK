@@ -32,7 +32,7 @@ namespace berry
  * directly invoke methods on an adapter manager to register and unregister
  * adapters. All adaptable objects (that is, objects that implement the <code>IAdaptable</code>
  * interface) tunnel <code>IAdaptable.getAdapter</code> invocations to their
- * adapter manager's <code>IAdapterManger.getAdapter</code> method. The
+ * adapter manager's <code>IAdapterManager.getAdapter</code> method. The
  * adapter manager then forwards this request unmodified to the <code>IAdapterFactory.getAdapter</code>
  * method on one of the registered adapter factories.
  * <p>

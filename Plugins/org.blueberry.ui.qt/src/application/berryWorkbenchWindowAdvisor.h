@@ -134,7 +134,7 @@ public:
   virtual void PostWindowRestore();
 
   /**
-   * Opens the introduction componenet.
+   * Opens the introduction component.
    * <p>
    * Clients must not call this method directly (although super calls are okay).
    * The default implementation opens the intro in the first window provided

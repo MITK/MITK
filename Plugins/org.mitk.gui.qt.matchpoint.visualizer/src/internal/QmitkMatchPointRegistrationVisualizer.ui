@@ -226,7 +226,7 @@
          <item>
           <widget class="QPushButton" name="m_pbStyleGrid">
            <property name="toolTip">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select to vizualize registration via grid(s).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select to visualize registration via grid(s).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="text">
             <string>Grid</string>
@@ -248,7 +248,7 @@
             <bool>true</bool>
            </property>
            <property name="toolTip">
-            <string>Select to vizualize registration via glyphs.</string>
+            <string>Select to visualize registration via glyphs.</string>
            </property>
            <property name="text">
             <string>Glyph</string>
@@ -267,7 +267,7 @@
             <bool>false</bool>
            </property>
            <property name="toolTip">
-            <string>Select to vizualize registration via a pointset selected from the data manager...</string>
+            <string>Select to visualize registration via a pointset selected from the data manager...</string>
            </property>
            <property name="text">
             <string>Points</string>

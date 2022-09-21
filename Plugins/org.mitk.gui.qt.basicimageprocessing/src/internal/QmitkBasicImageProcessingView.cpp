@@ -623,7 +623,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
   }
   catch ( std::exception &e )
   {
-  QString exceptionString = tr("An error occured during image loading:\n");
+  QString exceptionString = tr("An error occurred during image loading:\n");
   exceptionString.append( e.what() );
     QMessageBox::warning( nullptr, "Basic Image Processing", exceptionString , QMessageBox::Ok, QMessageBox::NoButton );
     this->BusyCursorOff();

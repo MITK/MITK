@@ -565,7 +565,7 @@ bool MRPerfusionView::CheckModelSettings() const
 {
   bool ok = true;
 
-  //check wether any model is set at all. Otherwise exit with false
+  //check whether any model is set at all. Otherwise exit with false
   if (m_selectedModelFactory.IsNotNull())
   {
     bool isDescBrixFactory = dynamic_cast<mitk::DescriptivePharmacokineticBrixModelFactory*>
@@ -680,7 +680,7 @@ bool MRPerfusionView::CheckModelSettings() const
       }
 
     }
-    //add other models as else if and check wether all needed static parameters are set
+    //add other models as else if and check whether all needed static parameters are set
     else
     {
       ok = false;
@@ -1359,7 +1359,7 @@ void MRPerfusionView::GetAIF(mitk::AIFBasedModelBase::AterialInputFunctionType& 
   }
   else
   {
-    mitkThrow() << "Cannot generate AIF. View is in a invalide state. No AIF mode selected.";
+    mitkThrow() << "Cannot generate AIF. View is in a invalid state. No AIF mode selected.";
   }
 }
 

@@ -76,7 +76,7 @@ SmartPointer<ParameterizedCommand> CommandService::Deserialize(const QString& se
 void CommandService::Dispose()
 {
   /*
-   * All state on all commands neeeds to be disposed. This is so that the
+   * All state on all commands needs to be disposed. This is so that the
    * state has a chance to persist any changes.
    */
   const QList<Command::Pointer> commands = commandManager->GetAllCommands();

@@ -95,7 +95,7 @@ All you have to do to use a filter is to:
 <li> Select which filter you want to use via the drop down list</li>
 <li> Press the execute button</li>
 </ul>
-A busy cursor appeares; when it vanishes, the operation is completed. Your filtered image is displayed and selected for further processing.
+A busy cursor appears; when it vanishes, the operation is completed. Your filtered image is displayed and selected for further processing.
 (If the  checkbox "Hide original image" is not selected, you will maybe not see the filter result imideately,
 because your filtered image is possibly hidden by the original.)
 

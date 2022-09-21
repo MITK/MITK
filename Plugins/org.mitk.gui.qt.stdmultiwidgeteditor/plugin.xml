@@ -20,7 +20,7 @@
   </extension>
 
   <extension point="org.blueberry.ui.keywords">
-    <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="zooming panning contraint"/>
+    <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="zooming panning constraint"/>
     <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="show level window widget"/>
     <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="pacs like mouse interaction select left mouse button action"/>
     <keyword id="org.mitk.StdMultiWidgetEditorPreferencePageKeywords" label="rendering mode fxaa anti-aliasing"/>

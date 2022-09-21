@@ -6,8 +6,8 @@
 \tableofcontents
 
 \section NavigationDataPlayerOverview
-The navigation data player plays recorded or artificial navigation data of one ore more tracking tools and visualizes their trajectory.
-It can also make the data available als a NavigationDataSource to Plugins that require a stream of tracking data, without having to create a tracking device.
+The navigation data player plays recorded or artificial navigation data of one or more tracking tools and visualizes their trajectory.
+It can also make the data available as a NavigationDataSource to Plugins that require a stream of tracking data, without having to create a tracking device.
 
 \imageMacro{QmitkIGTTracking_NavigationDataPlayer.png, "The Navigation Data Player", 7}
 

@@ -100,7 +100,7 @@ void QmitkMatchPointMapper::CreateQtPartControl(QWidget* parent)
     this->m_Controls.inputNodeSelector->SetPopUpHint("Select the input data for the mapping. (Images or point sets are supported so far).");
     this->m_Controls.referenceNodeSelector->SetInvalidInfo("Select the reference image.");
     this->m_Controls.referenceNodeSelector->SetPopUpTitel("Select the reference image.");
-    this->m_Controls.referenceNodeSelector->SetPopUpHint("Select the reference image that specifies the target geometrie the input should be mapped into.");
+    this->m_Controls.referenceNodeSelector->SetPopUpHint("Select the reference image that specifies the target geometry the input should be mapped into.");
 
     this->ConfigureRegNodePredicate();
     this->ConfigureNodePredicates();
@@ -351,7 +351,7 @@ void QmitkMatchPointMapper::ConfigureMappingControls()
         if (this->IsBinaryInput())
         {
             m_Controls.m_teLog->append(
-              QStringLiteral("<font color='gray'><i>Binary input (mask) detected. Preparing for mask mapping (default interpolation: nearest neigbour; padding value: 0)</i></font>"));
+              QStringLiteral("<font color='gray'><i>Binary input (mask) detected. Preparing for mask mapping (default interpolation: nearest neighbour; padding value: 0)</i></font>"));
 
             this->m_Controls.m_comboInterpolator->setCurrentIndex(0);
             this->m_Controls.m_sbErrorValue->setValue(0);

@@ -51,7 +51,7 @@ public:
    *
    * @param parent
    *     The parent menu service for this window. This parent must track menu
-   *     definitions and the regsitry. Must not be <code>null</code>
+   *     definitions and the registry. Must not be <code>null</code>
    */
   SlaveMenuService(InternalMenuService* parent,
                    IServiceLocator* serviceLocator,

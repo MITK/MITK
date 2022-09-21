@@ -121,7 +121,7 @@
       <item>
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>A target can be placed (or replaced) by freezing the imaging and then left clicking into the render window at the desired positon.</string>
+         <string>A target can be placed (or replaced) by freezing the imaging and then left clicking into the render window at the desired position.</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>

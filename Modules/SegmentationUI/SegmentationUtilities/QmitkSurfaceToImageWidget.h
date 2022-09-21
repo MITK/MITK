@@ -52,7 +52,7 @@ public:
                                      mitk::SliceNavigationController* timeNavigationController,
                                      QWidget* parent = nullptr);
 
-  /** @brief Defaul destructor. */
+  /** @brief Default destructor. */
   ~QmitkSurfaceToImageWidget() override;
 
 private slots:
@@ -65,7 +65,7 @@ private slots:
 
 private:
 
-  /** @brief Enable buttons if data selction is valid. */
+  /** @brief Enable buttons if data selection is valid. */
   void EnableButtons(bool enable = true);
 
   /** @brief Convert a surface into an binary image. */

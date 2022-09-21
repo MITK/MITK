@@ -193,7 +193,7 @@ private:
     SmartPointer<IWorkbenchPartReference> GetActiveReference(bool editorsOnly);
 
     /*
-     * Retuns the index of the part within the activation list. The higher
+     * Returns the index of the part within the activation list. The higher
      * the index, the more recently it was used.
      */
     PartListIter IndexOf(SmartPointer<IWorkbenchPart> part);
@@ -431,7 +431,7 @@ public:
 
   /**
    * Constructs a page. <code>restoreState(IMemento)</code> should be
-   * called to restore this page from data stored in a persistance file.
+   * called to restore this page from data stored in a persistence file.
    *
    * @param w
    *            the parent window
@@ -491,7 +491,7 @@ public:
 private:
 
   /**
-   * Activates a part. The part is given focus, the pane is hilighted.
+   * Activates a part. The part is given focus, the pane is highlighted.
    */
   void ActivatePart(const IWorkbenchPart::Pointer part);
 
@@ -699,7 +699,7 @@ private:
   void DisposePart(WorkbenchPartReference::Pointer ref);
 
   /**
-   * Deactivates a part. The pane is unhilighted.
+   * Deactivates a part. The pane is unhighlighted.
    */
   void DeactivatePart(IWorkbenchPart::Pointer part);
 
@@ -826,7 +826,7 @@ public:
 
   /**
    * Allow access to the part service for this page ... used internally to
-   * propogate certain types of events to the page part listeners.
+   * propagate certain types of events to the page part listeners.
    * @return the part service for this page.
    */
   PartService* GetPartService();
@@ -1249,7 +1249,7 @@ protected:
 
   /**
    * Checks perspectives in the order they were activiated
-   * for the specfied part.  The first sorted perspective
+   * for the specified part.  The first sorted perspective
    * that contains the specified part is returned.
    *
    * @param part specified part to search for
@@ -1305,7 +1305,7 @@ public:
   void ResizeView(IViewPart::Pointer part, int width, int height);
 
   /**
-   * Sanity-checks the objects in this page. Throws an Assertation exception
+   * Sanity-checks the objects in this page. Throws an Assertion exception
    * if an object's internal state is invalid. ONLY INTENDED FOR USE IN THE
    * UI TEST SUITES.
    */

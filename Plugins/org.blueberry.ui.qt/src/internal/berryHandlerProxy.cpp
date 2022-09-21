@@ -162,7 +162,7 @@ Object::Pointer HandlerProxy::Execute(const SmartPointer<const ExecutionEvent>& 
   }
 
   if(loadException != nullptr)
-    throw ExecutionException("Exception occured when loading the handler", *loadException);
+    throw ExecutionException("Exception occurred when loading the handler", *loadException);
 
   return Object::Pointer(nullptr);
 }

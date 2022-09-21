@@ -23,7 +23,7 @@ namespace berry {
  * \ingroup org_blueberry_ui_qt
  *
  * Implements a reference to a editor.
- * The IEditorPart will not be instanciated until
+ * The IEditorPart will not be instantiated until
  * the editor becomes visible or the API getEditor
  * is sent with true;
  * <p>

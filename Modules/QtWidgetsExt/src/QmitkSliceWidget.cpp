@@ -51,7 +51,7 @@ QmitkSliceWidget::QmitkSliceWidget(QWidget *parent, const char *name, Qt::Window
   m_Renderer = m_RenderWindow->GetRenderer();
   hlayout->addWidget(m_RenderWindow);
 
-  new QmitkStepperAdapter(m_NavigatorWidget, m_RenderWindow->GetSliceNavigationController()->GetSlice(), "navigation");
+  new QmitkStepperAdapter(sliceNavigationWidget, m_RenderWindow->GetSliceNavigationController()->GetSlice(), "navigation");
 
   SetLevelWindowEnabled(true);
 }
@@ -186,16 +186,16 @@ void QmitkSliceWidget::mousePressEvent(QMouseEvent *e)
 
 void QmitkSliceWidget::wheelEvent(QWheelEvent *e)
 {
-  int val = m_NavigatorWidget->GetPos();
+  int val = sliceNavigationWidget->GetPos();
 
   if (e->orientation() * e->delta() > 0)
   {
-    m_NavigatorWidget->SetPos(val + 1);
+    sliceNavigationWidget->SetPos(val + 1);
   }
   else
   {
     if (val > 0)
-      m_NavigatorWidget->SetPos(val - 1);
+      sliceNavigationWidget->SetPos(val - 1);
   }
 }
 
@@ -220,9 +220,9 @@ void QmitkSliceWidget::setPopUpEnabled(bool b)
   popUpEnabled = b;
 }
 
-QmitkSliderNavigatorWidget *QmitkSliceWidget::GetNavigatorWidget()
+QmitkSliceNavigationWidget* QmitkSliceWidget::GetSliceNavigationWidget()
 {
-  return m_NavigatorWidget;
+  return sliceNavigationWidget;
 }
 
 void QmitkSliceWidget::SetLevelWindowEnabled(bool enable)

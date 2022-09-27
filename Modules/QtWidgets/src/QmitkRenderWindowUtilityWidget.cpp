@@ -23,7 +23,7 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   , m_RenderWindow(renderWindow)
   , m_DataStorage(dataStorage)
   , m_RenderWindowInspector(nullptr)
-  , m_SliceNavigator(nullptr)
+  , m_SliceNavigationWidget(nullptr)
   , m_StepperAdapter(nullptr)
   , m_ViewDirectionSelector(nullptr)
 {
@@ -48,10 +48,10 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   menu->addAction(newAct);
   m_Layout->addWidget(m_MenuBar);
 
-  m_SliceNavigator = new QmitkSliderNavigatorWidget(this);
+  m_SliceNavigationWidget = new QmitkSliceNavigationWidget(this);
   m_StepperAdapter =
-    new QmitkStepperAdapter(m_SliceNavigator, sliceNavigationController->GetSlice(), "sliceNavigator");
-  m_Layout->addWidget(m_SliceNavigator);
+    new QmitkStepperAdapter(m_SliceNavigationWidget, sliceNavigationController->GetSlice(), "sliceNavigator");
+  m_Layout->addWidget(m_SliceNavigationWidget);
 
   mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer{ baseRenderer };
   m_RenderWindowViewDirectionController = std::make_unique<mitk::RenderWindowViewDirectionController>();
@@ -86,7 +86,7 @@ QmitkRenderWindowUtilityWidget::~QmitkRenderWindowUtilityWidget()
 
 void QmitkRenderWindowUtilityWidget::SetInvertedSliceNavigation(bool inverted)
 {
-  m_SliceNavigator->SetInverseDirection(inverted);
+  m_SliceNavigationWidget->SetInverseDirection(inverted);
 }
 
 void QmitkRenderWindowUtilityWidget::ChangeViewDirection(const QString& viewDirection)

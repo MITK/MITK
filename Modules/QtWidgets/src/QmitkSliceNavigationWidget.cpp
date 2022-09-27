@@ -10,9 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkSliderNavigatorWidget.h"
+#include "QmitkSliceNavigationWidget.h"
 
-QmitkSliderNavigatorWidget::QmitkSliderNavigatorWidget(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f)
+QmitkSliceNavigationWidget::QmitkSliceNavigationWidget(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f)
 {
   this->setupUi(this);
 
@@ -48,7 +48,7 @@ QmitkSliderNavigatorWidget::QmitkSliderNavigatorWidget(QWidget *parent, Qt::Wind
   m_InvertedControls = false;
 }
 
-void QmitkSliderNavigatorWidget::Refetch()
+void QmitkSliceNavigationWidget::Refetch()
 {
   if (!m_InRefetch)
   {
@@ -119,7 +119,7 @@ void QmitkSliderNavigatorWidget::Refetch()
   }
 }
 
-void QmitkSliderNavigatorWidget::SetStepper(mitk::Stepper *stepper)
+void QmitkSliceNavigationWidget::SetStepper(mitk::Stepper *stepper)
 {
   m_Stepper = stepper;
 
@@ -129,7 +129,7 @@ void QmitkSliderNavigatorWidget::SetStepper(mitk::Stepper *stepper)
 }
 
 
-void QmitkSliderNavigatorWidget::slider_valueChanged(double)
+void QmitkSliceNavigationWidget::slider_valueChanged(double)
 {
   if (!m_InRefetch)
   {
@@ -145,39 +145,39 @@ void QmitkSliderNavigatorWidget::slider_valueChanged(double)
   }
 }
 
-void QmitkSliderNavigatorWidget::ShowLabels(bool show)
+void QmitkSliceNavigationWidget::ShowLabels(bool show)
 {
   m_HasLabels = show;
 }
 
-void QmitkSliderNavigatorWidget::ShowLabelUnit(bool show)
+void QmitkSliceNavigationWidget::ShowLabelUnit(bool show)
 {
   m_HasLabelUnit = show;
 }
 
-void QmitkSliderNavigatorWidget::SetLabelValues(float min, float max)
+void QmitkSliceNavigationWidget::SetLabelValues(float min, float max)
 {
   m_MinValue = min;
   m_MaxValue = max;
 }
 
-void QmitkSliderNavigatorWidget::SetLabelValuesValid(bool minValid, bool maxValid)
+void QmitkSliceNavigationWidget::SetLabelValuesValid(bool minValid, bool maxValid)
 {
   m_MinValueValid = minValid;
   m_MaxValueValid = maxValid;
 }
 
-void QmitkSliderNavigatorWidget::SetLabelUnit(const char *unit)
+void QmitkSliceNavigationWidget::SetLabelUnit(const char *unit)
 {
   m_LabelUnit = unit;
 }
 
-QString QmitkSliderNavigatorWidget::GetLabelUnit()
+QString QmitkSliceNavigationWidget::GetLabelUnit()
 {
   return m_LabelUnit;
 }
 
-QString QmitkSliderNavigatorWidget::ClippedValueToString(float value)
+QString QmitkSliceNavigationWidget::ClippedValueToString(float value)
 {
   if (value < -10000000.0)
   {
@@ -193,7 +193,7 @@ QString QmitkSliderNavigatorWidget::ClippedValueToString(float value)
   }
 }
 
-QString QmitkSliderNavigatorWidget::GetMinValueLabel()
+QString QmitkSliceNavigationWidget::GetMinValueLabel()
 {
   if (m_MinValueValid)
   {
@@ -205,7 +205,7 @@ QString QmitkSliderNavigatorWidget::GetMinValueLabel()
   }
 }
 
-QString QmitkSliderNavigatorWidget::GetMaxValueLabel()
+QString QmitkSliceNavigationWidget::GetMaxValueLabel()
 {
   if (m_MaxValueValid)
   {
@@ -217,7 +217,7 @@ QString QmitkSliderNavigatorWidget::GetMaxValueLabel()
   }
 }
 
-void QmitkSliderNavigatorWidget::SetLabels()
+void QmitkSliceNavigationWidget::SetLabels()
 {
   QString minText = "<p align='center'><font size='2'>" + this->GetMinValueLabel();
 
@@ -246,7 +246,7 @@ void QmitkSliderNavigatorWidget::SetLabels()
   m_SliderLabelRight->setText(maxText);
 }
 
-void QmitkSliderNavigatorWidget::spinBox_valueChanged(double)
+void QmitkSliceNavigationWidget::spinBox_valueChanged(double)
 {
   if (!m_InRefetch)
   {
@@ -262,12 +262,12 @@ void QmitkSliderNavigatorWidget::spinBox_valueChanged(double)
   }
 }
 
-int QmitkSliderNavigatorWidget::GetPos()
+int QmitkSliceNavigationWidget::GetPos()
 {
   return m_Stepper->GetPos();
 }
 
-void QmitkSliderNavigatorWidget::SetPos(int val)
+void QmitkSliceNavigationWidget::SetPos(int val)
 {
   if (!m_InRefetch)
   {
@@ -275,12 +275,12 @@ void QmitkSliderNavigatorWidget::SetPos(int val)
   }
 }
 
-bool QmitkSliderNavigatorWidget::GetInverseDirection() const
+bool QmitkSliceNavigationWidget::GetInverseDirection() const
 {
   return m_InverseDirection;
 }
 
-void QmitkSliderNavigatorWidget::SetInverseDirection(bool inverseDirection)
+void QmitkSliceNavigationWidget::SetInverseDirection(bool inverseDirection)
 {
   if (inverseDirection != m_InverseDirection)
   {
@@ -289,12 +289,12 @@ void QmitkSliderNavigatorWidget::SetInverseDirection(bool inverseDirection)
   }
 }
 
-bool QmitkSliderNavigatorWidget::GetInvertedControls() const
+bool QmitkSliceNavigationWidget::GetInvertedControls() const
 {
   return m_InvertedControls;
 }
 
-void QmitkSliderNavigatorWidget::SetInvertedControls(bool invertedControls)
+void QmitkSliceNavigationWidget::SetInvertedControls(bool invertedControls)
 {
   if (invertedControls != m_InvertedControls)
   {

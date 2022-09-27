@@ -49,8 +49,8 @@ set(CPP_FILES
   mitkRenderWindowLayerUtilities.cpp
   mitkRenderWindowViewDirectionController.cpp
   QmitkServiceListWidget.cpp
+  QmitkSliceNavigationWidget.cpp
   QmitkSliderLevelWindowWidget.cpp
-  QmitkSliderNavigatorWidget.cpp
   QmitkStdMultiWidget.cpp
   QmitkStepperAdapter.cpp
   QmitkMxNMultiWidget.cpp
@@ -114,8 +114,8 @@ set(MOC_H_FILES
   include/mitkRenderWindowLayerUtilities.h
   include/mitkRenderWindowViewDirectionController.h
   include/QmitkServiceListWidget.h
+  include/QmitkSliceNavigationWidget.h
   include/QmitkSliderLevelWindowWidget.h
-  include/QmitkSliderNavigatorWidget.h
   include/QmitkStdMultiWidget.h
   include/QmitkMxNMultiWidget.h
   include/QmitkStepperAdapter.h
@@ -144,7 +144,7 @@ set(UI_FILES
   src/QmitkMultiWidgetLayoutSelectionWidget.ui
   src/QmitkRenderWindowContextDataStorageInspector.ui
   src/QmitkServiceListWidgetControls.ui
-  src/QmitkSliderNavigator.ui
+  src/QmitkSliceNavigationWidget.ui
   src/QmitkDataStorageListInspector.ui
   src/QmitkDataStorageTreeInspector.ui
   src/QmitkDataStorageSelectionHistoryInspector.ui

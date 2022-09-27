@@ -10,23 +10,23 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKSLIDERNAVIGATORWIDGET_H_
-#define QMITKSLIDERNAVIGATORWIDGET_H_
+#ifndef QMITKSLICENAVIGATIONWIDGET_H
+#define QMITKSLICENAVIGATIONWIDGET_H
 
-#include "ui_QmitkSliderNavigator.h"
 #include "MitkQtWidgetsExports.h"
+#include "ui_QmitkSliceNavigationWidget.h"
 
 #include <mitkStepper.h>
 
 #include <QString>
 #include <QWidget>
 
-class MITKQTWIDGETS_EXPORT QmitkSliderNavigatorWidget : public QWidget, public Ui::QmitkSliderNavigator
+class MITKQTWIDGETS_EXPORT QmitkSliceNavigationWidget : public QWidget, public Ui::QmitkSliceNavigationWidget
 {
   Q_OBJECT
 
 public:
-  QmitkSliderNavigatorWidget(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
+  QmitkSliceNavigationWidget(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
 
   QString GetLabelUnit();
 
@@ -54,7 +54,7 @@ public:
 public slots:
 
   /**
-   * \brief Updates the slider with the recent changes applied to the navigator.
+   * \brief Updates the slider with the recent changes applied to the navigation widget.
    *
    * Intended to be called via event mechanism, e.g. if the connected
    * mitk::Stepper is modified.
@@ -119,4 +119,4 @@ protected:
 
 };
 
-#endif
+#endif // QMITKSLICENAVIGATIONWIDGET_H

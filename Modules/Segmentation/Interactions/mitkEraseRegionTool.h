@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef mitkEraseRegionTool_h_Included
 #define mitkEraseRegionTool_h_Included
 
-#include "mitkSetRegionTool.h"
+#include "mitkFillRegionBaseTool.h"
 #include <MitkSegmentationExports.h>
 
 namespace us
@@ -38,22 +38,25 @@ namespace mitk
 
     \warning Only to be instantiated by mitk::ToolManager.
   */
-  class MITKSEGMENTATION_EXPORT EraseRegionTool : public SetRegionTool
+  class MITKSEGMENTATION_EXPORT EraseRegionTool : public FillRegionBaseTool
   {
   public:
-    mitkClassMacro(EraseRegionTool, SetRegionTool);
+    mitkClassMacro(EraseRegionTool, FillRegionBaseTool);
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-      const char **GetXPM() const override;
+    const char **GetXPM() const override;
     us::ModuleResource GetCursorIconResource() const override;
     us::ModuleResource GetIconResource() const override;
 
     const char *GetName() const override;
 
   protected:
-    EraseRegionTool(); // purposely hidden
-    ~EraseRegionTool() override;
+    EraseRegionTool() = default; // purposely hidden
+    ~EraseRegionTool() = default;
+
+    Image::Pointer GenerateFillImage(const Image* workingSlice, Point3D seedPoint) const override;
+    void PrepareFilling(const Image* workingSlice, Point3D seedPoint) override;
   };
 
 } // namespace

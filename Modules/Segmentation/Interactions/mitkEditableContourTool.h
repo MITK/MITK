@@ -97,8 +97,6 @@ namespace mitk
 
     virtual void UpdateClosureContour(mitk::Point3D endpoint);
 
-    bool IsPositionEventInsideImageRegion(InteractionPositionEvent *positionEvent, BaseData *data);
-
     mitk::ContourModel* GetContour();
     const mitk::ContourModel* GetContour() const;
     mitk::DataNode::Pointer m_ContourNode;

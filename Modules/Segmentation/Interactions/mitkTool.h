@@ -117,6 +117,7 @@ namespace mitk
     XPM is e.g. supported by The Gimp. But if you open any XPM file in your text editor, you will see that you could
     also "draw" it with an editor.
     */
+    [[deprecated]]
     virtual const char **GetXPM() const = 0;
 
     /**

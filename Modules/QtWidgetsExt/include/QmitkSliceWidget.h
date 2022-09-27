@@ -19,7 +19,7 @@ found in the LICENSE file.
 #include "QmitkRenderWindow.h"
 #include "mitkDataStorage.h"
 #include "mitkSliceNavigationController.h"
-#include "QmitkSliderNavigatorWidget.h"
+#include "QmitkSliceNavigationWidget.h"
 #include "mitkSlicedGeometry3D.h"
 #include "mitkStandaloneDataStorage.h"
 #include <QWidget>
@@ -45,7 +45,7 @@ public:
 
   mitk::StandaloneDataStorage *GetDataStorage();
 
-  QmitkSliderNavigatorWidget *GetNavigatorWidget();
+  QmitkSliceNavigationWidget* GetSliceNavigationWidget();
 
   bool IsLevelWindowEnabled();
 

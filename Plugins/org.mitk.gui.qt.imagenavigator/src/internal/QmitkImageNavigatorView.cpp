@@ -25,10 +25,10 @@ found in the LICENSE file.
 const std::string QmitkImageNavigatorView::VIEW_ID = "org.mitk.views.imagenavigator";
 
 QmitkImageNavigatorView::QmitkImageNavigatorView()
-  : m_AxialStepper(nullptr)
-  , m_SagittalStepper(nullptr)
-  , m_CoronalStepper(nullptr)
-  , m_TimeStepper(nullptr)
+  : m_AxialStepperAdapter(nullptr)
+  , m_SagittalStepperAdapter(nullptr)
+  , m_CoronalStepperAdapter(nullptr)
+  , m_TimeStepperAdapter(nullptr)
   , m_Parent(nullptr)
   , m_IRenderWindowPart(nullptr)
 {
@@ -69,18 +69,20 @@ void QmitkImageNavigatorView::RenderWindowPartActivated(mitk::IRenderWindowPart*
     QmitkRenderWindow* renderWindow = renderWindowPart->GetQmitkRenderWindow("axial");
     if (renderWindow)
     {
-      if (m_AxialStepper) m_AxialStepper->deleteLater();
-      m_AxialStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorAxial,
-                                                     renderWindow->GetSliceNavigationController()->GetSlice(),
-                                                     "sliceNavigatorAxialFromSimpleExample");
-      m_Controls.m_SliceNavigatorAxial->setEnabled(true);
+      if (m_AxialStepperAdapter)
+        m_AxialStepperAdapter->deleteLater();
+
+      m_AxialStepperAdapter = new QmitkStepperAdapter(m_Controls.m_AxialSliceNavigationWidget,
+                                                      renderWindow->GetSliceNavigationController()->GetSlice(),
+                                                      "sliceNavigatorAxialFromSimpleExample");
+      m_Controls.m_AxialSliceNavigationWidget->setEnabled(true);
       m_Controls.m_AxialLabel->setEnabled(true);
       m_Controls.m_ZWorldCoordinateSpinBox->setEnabled(true);
-      connect(m_AxialStepper, SIGNAL(Refetch()), this, SLOT(OnRefetch()));
+      connect(m_AxialStepperAdapter, SIGNAL(Refetch()), this, SLOT(OnRefetch()));
     }
     else
     {
-      m_Controls.m_SliceNavigatorAxial->setEnabled(false);
+      m_Controls.m_AxialSliceNavigationWidget->setEnabled(false);
       m_Controls.m_AxialLabel->setEnabled(false);
       m_Controls.m_ZWorldCoordinateSpinBox->setEnabled(false);
     }
@@ -88,18 +90,19 @@ void QmitkImageNavigatorView::RenderWindowPartActivated(mitk::IRenderWindowPart*
     renderWindow = renderWindowPart->GetQmitkRenderWindow("sagittal");
     if (renderWindow)
     {
-      if (m_SagittalStepper) m_SagittalStepper->deleteLater();
-      m_SagittalStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorSagittal,
-                                                  renderWindow->GetSliceNavigationController()->GetSlice(),
-                                                  "sliceNavigatorSagittalFromSimpleExample");
-      m_Controls.m_SliceNavigatorSagittal->setEnabled(true);
+      if (m_SagittalStepperAdapter)
+        m_SagittalStepperAdapter->deleteLater();
+      m_SagittalStepperAdapter = new QmitkStepperAdapter(m_Controls.m_SagittalSliceNavigationWidget,
+                                                         renderWindow->GetSliceNavigationController()->GetSlice(),
+                                                         "sliceNavigatorSagittalFromSimpleExample");
+      m_Controls.m_SagittalSliceNavigationWidget->setEnabled(true);
       m_Controls.m_SagittalLabel->setEnabled(true);
       m_Controls.m_YWorldCoordinateSpinBox->setEnabled(true);
-      connect(m_SagittalStepper, SIGNAL(Refetch()), this, SLOT(OnRefetch()));
+      connect(m_SagittalStepperAdapter, SIGNAL(Refetch()), this, SLOT(OnRefetch()));
     }
     else
     {
-      m_Controls.m_SliceNavigatorSagittal->setEnabled(false);
+      m_Controls.m_SagittalSliceNavigationWidget->setEnabled(false);
       m_Controls.m_SagittalLabel->setEnabled(false);
       m_Controls.m_YWorldCoordinateSpinBox->setEnabled(false);
     }
@@ -107,18 +110,19 @@ void QmitkImageNavigatorView::RenderWindowPartActivated(mitk::IRenderWindowPart*
     renderWindow = renderWindowPart->GetQmitkRenderWindow("coronal");
     if (renderWindow)
     {
-      if (m_CoronalStepper) m_CoronalStepper->deleteLater();
-      m_CoronalStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorCoronal,
-                                                 renderWindow->GetSliceNavigationController()->GetSlice(),
-                                                 "sliceNavigatorCoronalFromSimpleExample");
-      m_Controls.m_SliceNavigatorCoronal->setEnabled(true);
+      if (m_CoronalStepperAdapter)
+        m_CoronalStepperAdapter->deleteLater();
+      m_CoronalStepperAdapter = new QmitkStepperAdapter(m_Controls.m_CoronalSliceNavigationWidget,
+                                                        renderWindow->GetSliceNavigationController()->GetSlice(),
+                                                        "sliceNavigatorCoronalFromSimpleExample");
+      m_Controls.m_CoronalSliceNavigationWidget->setEnabled(true);
       m_Controls.m_CoronalLabel->setEnabled(true);
       m_Controls.m_XWorldCoordinateSpinBox->setEnabled(true);
-      connect(m_CoronalStepper, SIGNAL(Refetch()), this, SLOT(OnRefetch()));
+      connect(m_CoronalStepperAdapter, SIGNAL(Refetch()), this, SLOT(OnRefetch()));
     }
     else
     {
-      m_Controls.m_SliceNavigatorCoronal->setEnabled(false);
+      m_Controls.m_CoronalSliceNavigationWidget->setEnabled(false);
       m_Controls.m_CoronalLabel->setEnabled(false);
       m_Controls.m_XWorldCoordinateSpinBox->setEnabled(false);
     }
@@ -126,16 +130,17 @@ void QmitkImageNavigatorView::RenderWindowPartActivated(mitk::IRenderWindowPart*
     mitk::SliceNavigationController* timeController = renderWindowPart->GetTimeNavigationController();
     if (timeController)
     {
-      if (m_TimeStepper) m_TimeStepper->deleteLater();
-      m_TimeStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorTime,
-                                              timeController->GetTime(),
-                                              "sliceNavigatorTimeFromSimpleExample");
-      m_Controls.m_SliceNavigatorTime->setEnabled(true);
+      if (m_TimeStepperAdapter)
+        m_TimeStepperAdapter->deleteLater();
+      m_TimeStepperAdapter = new QmitkStepperAdapter(m_Controls.m_TimeSliceNavigationWidget,
+                                                     timeController->GetTime(),
+                                                     "sliceNavigatorTimeFromSimpleExample");
+      m_Controls.m_TimeSliceNavigationWidget->setEnabled(true);
       m_Controls.m_TimeLabel->setEnabled(true);
     }
     else
     {
-      m_Controls.m_SliceNavigatorTime->setEnabled(false);
+      m_Controls.m_TimeSliceNavigationWidget->setEnabled(false);
       m_Controls.m_TimeLabel->setEnabled(false);
     }
 
@@ -387,7 +392,7 @@ void QmitkImageNavigatorView::OnRefetch()
 
       if (renderWindow)
       {
-        const mitk::BaseGeometry *rendererGeometry = renderWindow->GetRenderer()->GetCurrentWorldGeometry();
+        const mitk::BaseGeometry* rendererGeometry = renderWindow->GetRenderer()->GetCurrentWorldGeometry();
 
         /// Because of some problems with the current way of event signalling,
         /// 'Modified' events are sent out from the stepper while the renderer
@@ -430,12 +435,12 @@ void QmitkImageNavigatorView::OnRefetch()
 
           bool inverseDirection = referenceGeometryAxisInverted != rendererZAxisInverted;
 
-          QmitkSliderNavigatorWidget* navigatorWidget =
-              worldAxis == 0 ? m_Controls.m_SliceNavigatorSagittal :
-              worldAxis == 1 ? m_Controls.m_SliceNavigatorCoronal :
-                               m_Controls.m_SliceNavigatorAxial;
+          QmitkSliceNavigationWidget* sliceNavigationWidget =
+            worldAxis == 0 ? m_Controls.m_SagittalSliceNavigationWidget :
+            worldAxis == 1 ? m_Controls.m_CoronalSliceNavigationWidget :
+                             m_Controls.m_AxialSliceNavigationWidget;
 
-          navigatorWidget->SetInverseDirection(inverseDirection);
+          sliceNavigationWidget->SetInverseDirection(inverseDirection);
 
           // This should be a preference (see T22254)
           // bool invertedControls = referenceGeometryAxisInverted != inverseDirection;
@@ -451,6 +456,6 @@ void QmitkImageNavigatorView::OnRefetch()
 
 void QmitkImageNavigatorView::SetVisibilityOfTimeSlider(std::size_t timeSteps)
 {
-  m_Controls.m_SliceNavigatorTime->setVisible(timeSteps > 1);
+  m_Controls.m_TimeSliceNavigationWidget->setVisible(timeSteps > 1);
   m_Controls.m_TimeLabel->setVisible(timeSteps > 1);
 }

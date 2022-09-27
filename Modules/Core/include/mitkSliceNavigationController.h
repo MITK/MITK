@@ -69,16 +69,16 @@ namespace mitk
    * // Initialization
    * sliceCtrl = mitk::SliceNavigationController::New();
    *
-   * // Tell the navigator the geometry to be sliced (with geometry a
-   * // BaseGeometry::ConstPointer)
+   * // Tell the navigation controller the geometry to be sliced
+   * // (with geometry a BaseGeometry::ConstPointer)
    * sliceCtrl->SetInputWorldTimeGeometry(geometry.GetPointer());
    *
-   * // Tell the navigator in which direction it shall slice the data
+   * // Tell the navigation controller in which direction it shall slice the data
    * sliceCtrl->SetViewDirection(mitk::SliceNavigationController::Axial);
    *
-   * // Connect one or more BaseRenderer to this navigator, i.e.: events sent
-   * // by the navigator when stepping through the slices (e.g. by
-   * // sliceCtrl->GetSlice()->Next()) will be received by the BaseRenderer
+   * // Connect one or more BaseRenderer to this navigation controller, i.e.:
+   * // events sent by the navigation controller when stepping through the slices
+   * // (e.g. by sliceCtrl->GetSlice()->Next()) will be received by the BaseRenderer
    * // (in this example only slice-changes, see also ConnectGeometryTimeEvent
    * // and ConnectGeometryEvents.)
    * sliceCtrl->ConnectGeometrySliceEvent(renderer.GetPointer());
@@ -88,29 +88,28 @@ namespace mitk
    * \endcode
    *
    *
-   * You can connect visible navigators to a SliceNavigationController, e.g., a
-   * QmitkSliderNavigator (for Qt):
+   * You can connect visible navigation widgets to a SliceNavigationController, e.g., a
+   * QmitkSliceNavigationWidget (for Qt):
    *
    * \code
-   * // Create the visible navigator (a slider with a spin-box)
-   * QmitkSliderNavigator* navigator =
-   *   new QmitkSliderNavigator(parent, "slidernavigator");
+   * // Create the visible navigation widget (a slider with a spin-box)
+   * QmitkSliceNavigationWidget* navigationWidget =
+   *   new QmitkSliceNavigationWidget(parent);
    *
-   * // Connect the navigator to the slice-stepper of the
-   * // SliceNavigationController. For initialization (position, minimal and
+   * // Connect the navigation widget to the slice-stepper of the
+   * // SliceNavigationController. For initialization (position, mininal and
    * // maximal values) the values of the SliceNavigationController are used.
-   * // Thus, accessing methods of a navigator is normally not necessary, since
-   * // everything can be set via the (Qt-independent) SliceNavigationController.
+   * // Thus, accessing methods of a navigation widget is normally not necessary,
+   * // since everything can be set via the (Qt-independent) SliceNavigationController.
    * // The QmitkStepperAdapter converts the Qt-signals to Qt-independent
    * // itk-events.
-   * new QmitkStepperAdapter(navigator, sliceCtrl->GetSlice(), "navigatoradaptor");
+   * new QmitkStepperAdapter(navigationWidget, sliceCtrl->GetSlice(), "navigatoradaptor");
    * \endcode
    *
    * If you do not want that all renderwindows are updated when a new slice is
    * selected, you can use a specific RenderingManager, which updates only those
    * renderwindows that should be updated. This is sometimes useful when a 3D view
    * does not need to be updated when the slices in some 2D views are changed.
-   * QmitkSliderNavigator (for Qt):
    *
    * \code
    * // create a specific RenderingManager

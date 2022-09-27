@@ -103,7 +103,7 @@ namespace mitk
    * // since everything can be set via the (Qt-independent) SliceNavigationController.
    * // The QmitkStepperAdapter converts the Qt-signals to Qt-independent
    * // itk-events.
-   * new QmitkStepperAdapter(navigationWidget, sliceCtrl->GetSlice(), "navigatoradaptor");
+   * new QmitkStepperAdapter(navigationWidget, sliceCtrl->GetSlice());
    * \endcode
    *
    * If you do not want that all renderwindows are updated when a new slice is

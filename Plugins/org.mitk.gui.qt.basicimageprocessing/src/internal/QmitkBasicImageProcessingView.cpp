@@ -246,7 +246,7 @@ void QmitkBasicImageProcessing::InternalGetTimeNavigationController()
     auto tnc = renwin_part->GetTimeNavigationController();
     if( tnc != nullptr )
     {
-      m_TimeStepperAdapter = new QmitkStepperAdapter(m_Controls->timeSliceNavigationWidget, tnc->GetTime(), "sliceNavigatorTimeFromBIP");
+      m_TimeStepperAdapter = new QmitkStepperAdapter(m_Controls->timeSliceNavigationWidget, tnc->GetTime());
     }
   }
 }

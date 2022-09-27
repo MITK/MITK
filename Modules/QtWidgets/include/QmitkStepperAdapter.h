@@ -30,12 +30,13 @@ found in the LICENSE file.
 //## ask the \a Stepper for its new values.
 //## \warning The \a Navigator has to be aware that it might have caused the changes
 //## of the \a Stepper itself. So take care that no infinite recursion is created!
-//## @ingroup NavigationControl
 class MITKQTWIDGETS_EXPORT QmitkStepperAdapter : public QObject
 {
   Q_OBJECT
+
 public:
-  QmitkStepperAdapter(QObject *navigator, mitk::Stepper *stepper, const char *name);
+
+  QmitkStepperAdapter(QObject* navigator, mitk::Stepper* stepper);
   ~QmitkStepperAdapter() override;
 
   void SetStepper(mitk::Stepper *stepper)

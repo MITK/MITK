@@ -12,8 +12,9 @@ found in the LICENSE file.
 
 #include "QmitkStepperAdapter.h"
 
-QmitkStepperAdapter::QmitkStepperAdapter(QObject *navigator, mitk::Stepper *stepper, const char *)
-  : QObject(navigator), m_Stepper(stepper)
+QmitkStepperAdapter::QmitkStepperAdapter(QObject* navigator, mitk::Stepper* stepper)
+  : QObject(navigator)
+  , m_Stepper(stepper)
 {
   connect(this, SIGNAL(SendStepper(mitk::Stepper *)), navigator, SLOT(SetStepper(mitk::Stepper *)));
   connect(this, SIGNAL(Refetch()), navigator, SLOT(Refetch()));

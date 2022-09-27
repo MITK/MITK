@@ -43,6 +43,7 @@ set(CPP_FILES
   Interactions/mitkErasePaintbrushTool.cpp
   Interactions/mitkEraseRegionTool.cpp
   Interactions/mitkFeedbackContourTool.cpp
+  Interactions/mitkFillRegionBaseTool.cpp
   Interactions/mitkFillRegionTool.cpp
   Interactions/mitkOtsuTool3D.cpp
   Interactions/mitkPaintbrushTool.cpp
@@ -97,6 +98,7 @@ set(RESOURCE_FILES
   Interactions/dummy.xml
   Interactions/EditableContourTool.xml
   Interactions/PickingTool.xml
+  Interactions/MouseReleaseOnly.xml
   Interactions/PressMoveRelease.xml
   Interactions/PressMoveReleaseAndPointSetting.xml
   Interactions/PressMoveReleaseWithCTRLInversion.xml

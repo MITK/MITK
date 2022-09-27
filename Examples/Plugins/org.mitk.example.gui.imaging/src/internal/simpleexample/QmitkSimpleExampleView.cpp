@@ -79,7 +79,7 @@ void QmitkSimpleExampleView::RenderWindowPartActivated(mitk::IRenderWindowPart *
   }
 
   RenderWindowSelected(m_Controls->renderWindowComboBox->currentText());
-  m_TimeStepper.reset(new QmitkStepperAdapter(m_Controls->sliceNavigatorTime,
+  m_TimeStepper.reset(new QmitkStepperAdapter(m_Controls->timeSliceNavigationWidget,
                                               renderWindowPart->GetTimeNavigationController()->GetTime(),
                                               "sliceNavigatorTimeFromSimpleExample"));
   m_MovieStepper.reset(new QmitkStepperAdapter(m_Controls->movieNavigatorTime,
@@ -410,8 +410,7 @@ void QmitkSimpleExampleView::RenderWindowSelected(const QString &id)
 {
   if (!id.isEmpty())
   {
-    m_SliceStepper.reset(new QmitkStepperAdapter(
-      m_Controls->sliceNavigator,
+    m_SliceStepper.reset(new QmitkStepperAdapter(m_Controls->sliceNavigationWidget,
       this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetQmitkRenderWindow(id)->GetSliceNavigationController()->GetSlice(),
       "sliceNavigatorFromSimpleExample"));
   }

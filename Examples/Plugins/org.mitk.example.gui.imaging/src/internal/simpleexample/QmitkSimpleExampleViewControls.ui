@@ -63,7 +63,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QmitkSliderNavigatorWidget" name="sliceNavigator" native="true">
+      <widget class="QmitkSliceNavigationWidget" name="sliceNavigationWidget" native="true">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>1</horstretch>
@@ -84,7 +84,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QmitkSliderNavigatorWidget" name="sliceNavigatorTime" native="true">
+      <widget class="QmitkSliceNavigationWidget" name="timeSliceNavigationWidget" native="true">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>1</horstretch>
@@ -212,9 +212,9 @@
  <layoutdefault spacing="0" margin="0"/>
  <customwidgets>
   <customwidget>
-   <class>QmitkSliderNavigatorWidget</class>
+   <class>QmitkSliceNavigationWidget</class>
    <extends>QWidget</extends>
-   <header>QmitkSliderNavigatorWidget.h</header>
+   <header>QmitkSliceNavigationWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

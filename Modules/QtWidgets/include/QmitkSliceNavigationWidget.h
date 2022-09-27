@@ -26,21 +26,19 @@ class MITKQTWIDGETS_EXPORT QmitkSliceNavigationWidget : public QWidget, public U
   Q_OBJECT
 
 public:
-  QmitkSliceNavigationWidget(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
 
-  QString GetLabelUnit();
+  QmitkSliceNavigationWidget(QWidget* parent = nullptr, Qt::WindowFlags f = nullptr);
 
   /**
-   * \brief Converts the passed value to a QString representation.
+   * \brief Convert the passed value to a QString representation.
    *
    * If the value exceeds a certain maximum, "INF" (for "infinity") is displayed
    * instead.
    */
   QString ClippedValueToString(float value);
 
-  /**
-   * \brief Returns range-minimum (displayed as label left of slider if enabled)
-   */
+  QString GetLabelUnit();
+
   QString GetMinValueLabel();
 
   QString GetMaxValueLabel();
@@ -54,19 +52,26 @@ public:
 public slots:
 
   /**
-   * \brief Updates the slider with the recent changes applied to the navigation widget.
+   * \brief Update the slider with the recent changes applied to the navigation widget.
    *
    * Intended to be called via event mechanism, e.g. if the connected
    * mitk::Stepper is modified.
    */
   void Refetch();
 
-  void SetStepper(mitk::Stepper *stepper);
+  /**
+   * \brief Set the stepper that should be represented and modified.
+   *
+   */
+  void SetStepper(mitk::Stepper* stepper);
 
+  /**
+   * \brief Enable / disable displaying of the minimum and maximum labels
+   */
   void ShowLabels(bool show);
 
   /**
-   * \brief En-/disables displaying of the unit label (range will be displayed
+   * \brief Enable / disable displaying of the unit label (range will be displayed
    * without unit if enabled).
    */
   void ShowLabelUnit(bool show);
@@ -79,37 +84,61 @@ public slots:
 
 protected slots:
 
-  void slider_valueChanged(double);
+  /**
+   * \brief React on changes of the slider.
+   *
+   *  The position of the stepper (class member) is set according to the
+   *  current slider value.
+   *  This will also update the value labels.
+   */
+  void SliderChanged(double);
 
   /**
-   * \brief Set range minimum and maximum (displayed as labels left and right
-   * of slider if enabled)
+   * \brief React on changes of the spinbox.
+   *
+   *  The position of the stepper (class member) is set according to the
+   *  current spinbox value.
+   *  This will also update the value labels.
+   */
+  void SpinBoxChanged(double);
+
+  /**
+   * \brief Set label values for the range minimum and maximum.
+   *
+   *  Displayed as labels to the left and the right of the slider, if enabled.
    */
   void SetLabelValues(float min, float max);
 
+  /**
+   * \brief Enable / disable labels for the range minimum or maximum.
+   *
+   *  Displayed as labels to the left and the right of the slider, if enabled.
+   */
   void SetLabelValuesValid(bool minValid, bool maxValid);
 
   /**
-   * \brief Set range unit (e.g. mm or ms) which will be displayed below range
-   * labels if enabled.
+   * \brief Set the range unit (e.g. mm or ms).
+   *
+   *  Displayed below the range labels, if enabled.
    */
-  void SetLabelUnit(const char *unit);
+  void SetLabelUnit(const char* unit);
 
   /**
-   * \brief Configure slider with labels according to range and unit settings
+   * \brief Configure slider with labels according to range and unit settings.
    */
   void SetLabels();
 
-  void spinBox_valueChanged(double);
-
-
 protected:
+
+  mitk::Stepper::Pointer m_Stepper;
+  bool m_InRefetch;
+
+  QString m_LabelUnit;
+
   bool m_HasLabelUnit;
   bool m_MaxValueValid;
   bool m_MinValueValid;
-  QString m_LabelUnit;
-  mitk::Stepper::Pointer m_Stepper;
-  bool m_InRefetch;
+
   bool m_HasLabels;
   float m_MinValue;
   float m_MaxValue;

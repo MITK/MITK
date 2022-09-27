@@ -21,7 +21,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="2" column="2" colspan="3">
-    <widget class="QmitkSliderNavigatorWidget" name="m_SliceNavigatorSagittal" native="true">
+    <widget class="QmitkSliceNavigationWidget" name="m_SagittalSliceNavigationWidget" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -31,7 +31,7 @@
     </widget>
    </item>
    <item row="1" column="2" colspan="3">
-    <widget class="QmitkSliderNavigatorWidget" name="m_SliceNavigatorAxial" native="true">
+    <widget class="QmitkSliceNavigationWidget" name="m_AxialSliceNavigationWidget" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -47,7 +47,7 @@
     </widget>
    </item>
    <item row="3" column="2" colspan="3">
-    <widget class="QmitkSliderNavigatorWidget" name="m_SliceNavigatorCoronal" native="true">
+    <widget class="QmitkSliceNavigationWidget" name="m_CoronalSliceNavigationWidget" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -57,7 +57,7 @@
     </widget>
    </item>
    <item row="4" column="2" colspan="3">
-    <widget class="QmitkSliderNavigatorWidget" name="m_SliceNavigatorTime" native="true">
+    <widget class="QmitkSliceNavigationWidget" name="m_TimeSliceNavigationWidget" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -230,9 +230,9 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>QmitkSliderNavigatorWidget</class>
+   <class>QmitkSliceNavigationWidget</class>
    <extends>QWidget</extends>
-   <header location="global">QmitkSliderNavigatorWidget.h</header>
+   <header location="global">QmitkSliceNavigationWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -83,7 +83,7 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QmitkSliderNavigatorWidget" name="sliceNavigatorTime" native="true">
+       <widget class="QmitkSliceNavigationWidget" name="timeSliceNavigationWidget" native="true">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -437,9 +437,9 @@
    <header location="global">QmitkSingleNodeSelectionWidget.h</header>
   </customwidget>
   <customwidget>
-   <class>QmitkSliderNavigatorWidget</class>
+   <class>QmitkSliceNavigationWidget</class>
    <extends>QWidget</extends>
-   <header location="global">QmitkSliderNavigatorWidget.h</header>
+   <header location="global">QmitkSliceNavigationWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

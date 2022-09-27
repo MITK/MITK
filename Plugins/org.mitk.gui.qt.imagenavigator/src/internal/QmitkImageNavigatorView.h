@@ -75,10 +75,10 @@ protected:
 
   Ui::QmitkImageNavigatorViewControls m_Controls;
 
-  QmitkStepperAdapter* m_AxialStepper;
-  QmitkStepperAdapter* m_SagittalStepper;
-  QmitkStepperAdapter* m_CoronalStepper;
-  QmitkStepperAdapter* m_TimeStepper;
+  QmitkStepperAdapter* m_AxialStepperAdapter;
+  QmitkStepperAdapter* m_SagittalStepperAdapter;
+  QmitkStepperAdapter* m_CoronalStepperAdapter;
+  QmitkStepperAdapter* m_TimeStepperAdapter;
 
   QWidget* m_Parent;
 

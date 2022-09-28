@@ -57,14 +57,23 @@ namespace mitk
     * Pixels that should stay untouched should have the value 0.
     * The default implementation marks the connected reagion around seedPoint, that has
     * the same pixel value/label like the seedPoint.
-    * You may reimplement this function to change the strategy to determin the fill region.*/
-    virtual Image::Pointer GenerateFillImage(const Image* workingSlice, Point3D seedPoint) const;
+    * You may reimplement this function to change the strategy to determin the fill region.
+    * @param workingSlice part of the segmentation image that should be used to determin the fill image.
+    * @param seedPoint The world coordinate position where the user has cliced.
+    * @param [out] seedLabelValue The function should return the label value that should be assumed
+    * as clicked on, given the seedPoint.
+    * @return Return the image maske that indicates which pixels should be filled. Returning
+    * a null pointer indicates that there is nothing to fill.
+    */
+    virtual Image::Pointer GenerateFillImage(const Image* workingSlice, Point3D seedPoint, mitk::Label::PixelType& seedLabelValue) const;
 
     /** Function that is called by OnClick before the filling is executed. If you want to do special
-    * preperation (e.g. change m_FillValue, you can overwrite this function. */
+    * preperation (e.g. change m_FillLabelValue, you can overwrite this function. */
     virtual void PrepareFilling(const Image* workingSlice, Point3D seedPoint) = 0;
 
-    Label::PixelType m_FillValue = 0;
+    Label::PixelType m_FillLabelValue = 0;
+    Label::PixelType m_SeedLabelValue = 0;
+
     MultiLabelSegmentation::MergeStyle m_MergeStyle = MultiLabelSegmentation::MergeStyle::Replace;
   private:
   };

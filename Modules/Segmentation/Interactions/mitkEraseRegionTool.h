@@ -55,7 +55,7 @@ namespace mitk
     EraseRegionTool() = default; // purposely hidden
     ~EraseRegionTool() = default;
 
-    Image::Pointer GenerateFillImage(const Image* workingSlice, Point3D seedPoint) const override;
+    Image::Pointer GenerateFillImage(const Image* workingSlice, Point3D seedPoint, mitk::Label::PixelType& seedLabelValue) const override;
     void PrepareFilling(const Image* workingSlice, Point3D seedPoint) override;
   };
 

@@ -58,7 +58,7 @@ void DoFillImage(itk::Image<TPixel, VImageDimension>* image)
   image->FillBuffer(1);
 };
 
-mitk::Image::Pointer mitk::EraseRegionTool::GenerateFillImage(const Image* workingSlice, Point3D seedPoint) const
+mitk::Image::Pointer mitk::EraseRegionTool::GenerateFillImage(const Image* workingSlice, Point3D seedPoint, mitk::Label::PixelType& seedLabelValue) const
 {
   auto labelSetImage = dynamic_cast<const LabelSetImage*>(this->GetWorkingData());
 
@@ -67,17 +67,17 @@ mitk::Image::Pointer mitk::EraseRegionTool::GenerateFillImage(const Image* worki
 
   using AccessorType = ImagePixelReadAccessor<Label::PixelType, 2>;
   AccessorType accessor(workingSlice);
-
+  seedLabelValue = accessor.GetPixelByIndex(seedIndex);
   Image::Pointer fillImage;
 
-  if (accessor.GetPixelByIndex(seedIndex) == labelSetImage->GetExteriorLabel()->GetValue())
+  if ( seedLabelValue == labelSetImage->GetExteriorLabel()->GetValue())
   { //clicked on background remove everything which is not locked.
     fillImage = workingSlice->Clone();
     AccessByItk(fillImage, DoFillImage);
   }
   else
   {
-    fillImage = Superclass::GenerateFillImage(workingSlice, seedPoint);
+    fillImage = Superclass::GenerateFillImage(workingSlice, seedPoint, seedLabelValue);
   }
 
   return fillImage;
@@ -88,6 +88,6 @@ void mitk::EraseRegionTool::PrepareFilling(const Image* /*workingSlice*/, Point3
   auto labelSetImage = dynamic_cast<const LabelSetImage*>(this->GetWorkingData());
   if (nullptr != labelSetImage)
   {
-    m_FillValue = labelSetImage->GetExteriorLabel()->GetValue();
+    m_FillLabelValue = labelSetImage->GetExteriorLabel()->GetValue();
   }
 };

@@ -75,8 +75,6 @@ void DoITKRegionGrowing(const itk::Image<TPixel, VImageDimension>* oldSegImage,
   mitk::CastToMitkImage(itkResultImage, filledRegionImage);
 }
 
-#include "mitkIOUtil.h"
-
 void mitk::FillRegionBaseTool::OnClick(StateMachineAction*, InteractionEvent* interactionEvent)
 {
   auto positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(interactionEvent);
@@ -101,37 +99,47 @@ void mitk::FillRegionBaseTool::OnClick(StateMachineAction*, InteractionEvent* in
 
   auto click = positionEvent->GetPositionInWorld();
 
-  auto fillImage = this->GenerateFillImage(workingSlice, click);
+  m_SeedLabelValue = 0;
+  auto fillImage = this->GenerateFillImage(workingSlice, click, m_SeedLabelValue);
+
+  if (fillImage.IsNull())
+  {
+    return; //nothing to fill;
+  }
+
+  auto label = labelSetImage->GetLabel(m_SeedLabelValue, labelSetImage->GetActiveLayer());
+
+  if (label->GetLocked() && label->GetValue()!=labelSetImage->GetActiveLabel()->GetValue())
+  {
+    ErrorMessage.Send("Label of selected region is locked. Tool operation has no effect.");
+    return;
+  }
+
   this->PrepareFilling(workingSlice, click);
 
-  TransferLabelContent(fillImage, workingSlice, labelSetImage->GetActiveLabelSet(), 0, labelSetImage->GetExteriorLabel()->GetValue(), false, { {1, m_FillValue} }, m_MergeStyle);
+  //as fill region tools should always allow to manipulate active label
+  //(that is what the user expects/knows when using tools so far:
+  //the active label can always be changed even if locked)
+  //we realize that by cloning the relevant label set and changing the lock state
+  //this fillLabelSet is used for the transfer.
+  auto fillLabelSet = labelSetImage->GetActiveLabelSet()->Clone();
+  fillLabelSet->GetLabel(labelSetImage->GetActiveLabel()->GetValue())->SetLocked(false);
+
+  TransferLabelContent(fillImage, workingSlice, fillLabelSet, 0, labelSetImage->GetExteriorLabel()->GetValue(), false, { {1, m_FillLabelValue} }, m_MergeStyle);
 
   this->WriteBackSegmentationResult(positionEvent, workingSlice);
 
   mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
 }
 
-mitk::Image::Pointer mitk::FillRegionBaseTool::GenerateFillImage(const Image* workingSlice, Point3D seedPoint) const
+mitk::Image::Pointer mitk::FillRegionBaseTool::GenerateFillImage(const Image* workingSlice, Point3D seedPoint, mitk::Label::PixelType& seedLabelValue) const
 {
   itk::Index<2> seedIndex;
   workingSlice->GetGeometry()->WorldToIndex(seedPoint, seedIndex);
 
   Image::Pointer fillImage;
-  Label::PixelType seedLabelValue;
 
   AccessFixedDimensionByItk_n(workingSlice, DoITKRegionGrowing, 2, (fillImage, seedIndex, seedLabelValue));
 
-  auto labelSetImage = dynamic_cast<const LabelSetImage*>(this->GetWorkingData());
-  if (nullptr != labelSetImage)
-  {
-    auto label = labelSetImage->GetLabel(seedLabelValue, labelSetImage->GetActiveLayer());
-
-    if (label->GetLocked())
-    {
-      ErrorMessage.Send("Label of selected region is locked. Tool operation may not have an effect.");
-    }
-  }
-
   return fillImage;
 }
-

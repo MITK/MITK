@@ -101,8 +101,6 @@ void mitk::FillRegionBaseTool::OnClick(StateMachineAction*, InteractionEvent* in
 
   auto click = positionEvent->GetPositionInWorld();
 
-  auto workingImage = this->GetWorkingData();
-
   auto fillImage = this->GenerateFillImage(workingSlice, click);
   this->PrepareFilling(workingSlice, click);
 

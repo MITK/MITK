@@ -33,6 +33,7 @@ set(CPP_FILES
   Interactions/mitkBinaryThresholdBaseTool.cpp
   Interactions/mitkBinaryThresholdTool.cpp
   Interactions/mitkBinaryThresholdULTool.cpp
+  Interactions/mitkCloseRegionTool.cpp
   Interactions/mitkContourModelInteractor.cpp
   Interactions/mitkContourModelLiveWireInteractor.cpp
   Interactions/mitkEditableContourTool.cpp

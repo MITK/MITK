@@ -50,7 +50,6 @@ set(CPP_FILES
   Interactions/mitkPaintbrushTool.cpp
   Interactions/mitkRegionGrowingTool.cpp
   Interactions/mitkSegmentationsProcessingTool.cpp
-  Interactions/mitkSetRegionTool.cpp
   Interactions/mitkSegTool2D.cpp
   Interactions/mitkSubtractContourTool.cpp
   Interactions/mitkTool.cpp

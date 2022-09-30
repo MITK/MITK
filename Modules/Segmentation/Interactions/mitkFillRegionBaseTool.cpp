@@ -123,7 +123,11 @@ void mitk::FillRegionBaseTool::OnClick(StateMachineAction*, InteractionEvent* in
   //we realize that by cloning the relevant label set and changing the lock state
   //this fillLabelSet is used for the transfer.
   auto fillLabelSet = labelSetImage->GetActiveLabelSet()->Clone();
-  fillLabelSet->GetLabel(labelSetImage->GetActiveLabel()->GetValue())->SetLocked(false);
+  auto activeLabelClone = fillLabelSet->GetLabel(labelSetImage->GetActiveLabel()->GetValue());
+  if (nullptr != activeLabelClone)
+  {
+    activeLabelClone->SetLocked(false);
+  }
 
   TransferLabelContent(fillImage, workingSlice, fillLabelSet, 0, labelSetImage->GetExteriorLabel()->GetValue(), false, { {1, m_FillLabelValue} }, m_MergeStyle);
 

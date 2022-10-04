@@ -82,6 +82,8 @@ namespace mitk
 
     void OnToolManagerWorkingDataModified();
 
+    void ResetPaintingSlice();
+
     int m_PaintingPixelValue;
     static int m_Size;
 
@@ -89,10 +91,14 @@ namespace mitk
 
     int m_LastContourSize;
 
+    const int m_InternalFillValue = 255;
+
     Image::Pointer m_WorkingSlice;
+    Image::Pointer m_PaintingSlice;
     PlaneGeometry::ConstPointer m_CurrentPlane;
-    DataNode::Pointer m_WorkingNode;
+    DataNode::Pointer m_PaintingNode;
     mitk::Point3D m_LastPosition;
+
   };
 
 } // namespace

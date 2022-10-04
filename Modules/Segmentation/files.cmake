@@ -74,6 +74,8 @@ set(RESOURCE_FILES
   Add_Cursor.svg
   AI.svg
   AI_Cursor.svg
+  Close.svg
+  Close_Cursor.svg
   Erase.svg
   Erase_Cursor.svg
   Fill.svg

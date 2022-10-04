@@ -20,6 +20,7 @@ found in the LICENSE file.
 
 // qt
 #include <QGridLayout>
+#include <QMessageBox>
 
 QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
                                          Qt::WindowFlags f/* = 0*/,
@@ -39,7 +40,6 @@ QmitkMxNMultiWidget::~QmitkMxNMultiWidget()
     m_TimeNavigationController->Disconnect(renderWindow->GetSliceNavigationController());
   }
 }
-
 
 void QmitkMxNMultiWidget::InitializeMultiWidget()
 {
@@ -128,28 +128,67 @@ void QmitkMxNMultiWidget::SetSelectedPosition(const mitk::Point3D& newPosition, 
   if (nullptr != renderWindowWidget)
   {
     renderWindowWidget->GetSliceNavigationController()->SelectSliceByPoint(newPosition);
-    renderWindowWidget->RequestUpdate();
+    renderWindowWidget->SetCrosshairPosition(newPosition);
     return;
   }
 
   MITK_ERROR << "Position can not be set for an unknown render window widget.";
 }
 
-const mitk::Point3D QmitkMxNMultiWidget::GetSelectedPosition(const QString& /*widgetName*/) const
+const mitk::Point3D QmitkMxNMultiWidget::GetSelectedPosition(const QString& widgetName) const
 {
-  // see T26208
-  return mitk::Point3D();
-}
-
-void QmitkMxNMultiWidget::SetCrosshairVisibility(bool activate)
-{
-  auto renderWindowWidgets = GetRenderWindowWidgets();
-  for (const auto& renderWindowWidget : renderWindowWidgets)
+  RenderWindowWidgetPointer renderWindowWidget;
+  if (widgetName.isNull())
   {
-    renderWindowWidget.second->ActivateCrosshair(activate);
+    renderWindowWidget = GetActiveRenderWindowWidget();
+  }
+  else
+  {
+    renderWindowWidget = GetRenderWindowWidget(widgetName);
   }
 
-  m_CrosshairVisibility = activate;
+  if (nullptr != renderWindowWidget)
+  {
+    return renderWindowWidget->GetCrosshairPosition();
+  }
+
+  MITK_ERROR << "Crosshair position can not be retrieved.";
+  return mitk::Point3D(0.0);
+}
+
+void QmitkMxNMultiWidget::SetCrosshairVisibility(bool visible)
+{
+  // get the specific render window that sent the signal
+  QmitkRenderWindow* renderWindow = qobject_cast<QmitkRenderWindow*>(sender());
+  if (nullptr == renderWindow)
+  {
+    return;
+  }
+
+  auto renderWindowWidget = this->GetRenderWindowWidget(renderWindow);
+  renderWindowWidget->SetCrosshairVisibility(visible);
+}
+
+bool QmitkMxNMultiWidget::GetCrosshairVisibility() const
+{
+  // get the specific render window that sent the signal
+  QmitkRenderWindow* renderWindow = qobject_cast<QmitkRenderWindow*>(sender());
+  if (nullptr == renderWindow)
+  {
+    return false;
+  }
+
+  auto renderWindowWidget = this->GetRenderWindowWidget(renderWindow);
+  return renderWindowWidget->GetCrosshairVisibility();
+}
+
+void QmitkMxNMultiWidget::SetCrosshairGap(unsigned int gapSize)
+{
+  auto renderWindowWidgets = this->GetRenderWindowWidgets();
+  for (const auto& renderWindowWidget : renderWindowWidgets)
+  {
+    renderWindowWidget.second->SetCrosshairGap(gapSize);
+  }
 }
 
 void QmitkMxNMultiWidget::ResetCrosshair()
@@ -161,13 +200,13 @@ void QmitkMxNMultiWidget::ResetCrosshair()
   }
 
   // get the specific render window that sent the signal
-  QmitkRenderWindow* renderwindow = qobject_cast<QmitkRenderWindow*>(sender());
-  if (nullptr == renderwindow)
+  QmitkRenderWindow* renderWindow = qobject_cast<QmitkRenderWindow*>(sender());
+  if (nullptr == renderWindow)
   {
     return;
   }
 
-  mitk::RenderingManager::GetInstance()->InitializeViewByBoundingObjects(renderwindow->GetRenderWindow(), dataStorage);
+  mitk::RenderingManager::GetInstance()->InitializeViewByBoundingObjects(renderWindow->GetRenderWindow(), dataStorage);
 
   SetWidgetPlaneMode(mitk::InteractionSchemeSwitcher::MITKStandard);
 }
@@ -196,6 +235,24 @@ void QmitkMxNMultiWidget::SetWidgetPlaneMode(int userMode)
 mitk::SliceNavigationController* QmitkMxNMultiWidget::GetTimeNavigationController()
 {
   return m_TimeNavigationController;
+}
+
+void QmitkMxNMultiWidget::AddPlanesToDataStorage()
+{
+  auto renderWindowWidgets = this->GetRenderWindowWidgets();
+  for (const auto& renderWindowWidget : renderWindowWidgets)
+  {
+    renderWindowWidget.second->AddPlanesToDataStorage();
+  }
+}
+
+void QmitkMxNMultiWidget::RemovePlanesFromDataStorage()
+{
+  auto renderWindowWidgets = this->GetRenderWindowWidgets();
+  for (const auto& renderWindowWidget : renderWindowWidgets)
+  {
+    renderWindowWidget.second->RemovePlanesFromDataStorage();
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////

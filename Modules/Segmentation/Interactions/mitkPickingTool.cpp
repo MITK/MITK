@@ -26,7 +26,6 @@ found in the LICENSE file.
 #include "mitkImageAccessByItk.h"
 #include "mitkImageCast.h"
 #include "mitkImageTimeSelector.h"
-#include "mitkImageTimeSelector.h"
 
 #include <itkImage.h>
 #include <itkConnectedThresholdImageFilter.h>

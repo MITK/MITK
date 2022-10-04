@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkEraseRegionTool_h_Included
-#define mitkEraseRegionTool_h_Included
+#ifndef mitkCloseRegionTool_h_Included
+#define mitkCloseRegionTool_h_Included
 
 #include "mitkFillRegionBaseTool.h"
 #include <MitkSegmentationExports.h>
@@ -24,39 +24,39 @@ namespace us
 namespace mitk
 {
   /**
-    \brief Erase the inside of a contour by
-           filling the inside of a contour with the background pixel value.
+    \brief Closes/Fills the inside of a contour with the foreground pixel value.
 
-    \sa SetRegionTool
+    \sa FillRegionBaseTool
 
     \ingroup Interactions
 
-    Finds the outer contour of a shape in 2D (possibly including single patches) and sets all
-    the pixels inside to the background pixel value (erasing a segmentation).
+    Finds the outer contour of a shape in 2D (possibly including holes) and sets all
+    the pixels inside to the foreground pixel value (filling holes in a segmentation).
     If clicked on the background, the outer contour might contain the whole image and thus
-    fill the whole image with the background pixel value.
+    fill the whole image with the foreground pixel value.
 
     \warning Only to be instantiated by mitk::ToolManager.
   */
-  class MITKSEGMENTATION_EXPORT EraseRegionTool : public FillRegionBaseTool
+  class MITKSEGMENTATION_EXPORT CloseRegionTool : public FillRegionBaseTool
   {
   public:
-    mitkClassMacro(EraseRegionTool, FillRegionBaseTool);
+    mitkClassMacro(CloseRegionTool, FillRegionBaseTool);
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
 
-    const char **GetXPM() const override;
+      const char **GetXPM() const override;
     us::ModuleResource GetCursorIconResource() const override;
     us::ModuleResource GetIconResource() const override;
 
     const char *GetName() const override;
 
   protected:
-    EraseRegionTool() = default; // purposely hidden
-    ~EraseRegionTool() = default;
+    CloseRegionTool() = default; // purposely hidden
+    ~CloseRegionTool() = default;
 
     Image::Pointer GenerateFillImage(const Image* workingSlice, Point3D seedPoint, mitk::Label::PixelType& seedLabelValue) const override;
     void PrepareFilling(const Image* workingSlice, Point3D seedPoint) override;
+
   };
 
 } // namespace

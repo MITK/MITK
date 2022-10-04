@@ -67,19 +67,6 @@ berry::IPartListener::Events::Types QmitkMxNMultiWidgetEditor::GetPartEventTypes
   return Events::CLOSED | Events::OPENED | Events::HIDDEN | Events::VISIBLE;
 }
 
-void QmitkMxNMultiWidgetEditor::PartOpened(const berry::IWorkbenchPartReference::Pointer& partRef)
-{
-  if (partRef->GetId() == QmitkMxNMultiWidgetEditor::EDITOR_ID)
-  {
-    const auto& multiWidget = dynamic_cast<QmitkMxNMultiWidget*>(GetMultiWidget());
-    if (nullptr != multiWidget)
-    {
-      multiWidget->SetCrosshairVisibility(true);
-      multiWidget->ActivateMenuWidget(true);
-    }
-  }
-}
-
 void QmitkMxNMultiWidgetEditor::PartClosed(const berry::IWorkbenchPartReference::Pointer& partRef)
 {
   if (partRef->GetId() == QmitkMxNMultiWidgetEditor::EDITOR_ID)
@@ -87,8 +74,21 @@ void QmitkMxNMultiWidgetEditor::PartClosed(const berry::IWorkbenchPartReference:
     const auto& multiWidget = dynamic_cast<QmitkMxNMultiWidget*>(GetMultiWidget());
     if (nullptr != multiWidget)
     {
-      multiWidget->SetCrosshairVisibility(false);
+      multiWidget->RemovePlanesFromDataStorage();
       multiWidget->ActivateMenuWidget(false);
+    }
+  }
+}
+
+void QmitkMxNMultiWidgetEditor::PartOpened(const berry::IWorkbenchPartReference::Pointer& partRef)
+{
+  if (partRef->GetId() == QmitkMxNMultiWidgetEditor::EDITOR_ID)
+  {
+    const auto& multiWidget = dynamic_cast<QmitkMxNMultiWidget*>(GetMultiWidget());
+    if (nullptr != multiWidget)
+    {
+      multiWidget->AddPlanesToDataStorage();
+      multiWidget->ActivateMenuWidget(true);
     }
   }
 }
@@ -119,11 +119,11 @@ void QmitkMxNMultiWidgetEditor::PartVisible(const berry::IWorkbenchPartReference
 
 void QmitkMxNMultiWidgetEditor::OnLayoutSet(int row, int column)
 {
-  const auto &multiWidget = dynamic_cast<QmitkMxNMultiWidget *>(GetMultiWidget());
+  const auto &multiWidget = dynamic_cast<QmitkMxNMultiWidget*>(GetMultiWidget());
   if (nullptr != multiWidget)
   {
     QmitkAbstractMultiWidgetEditor::OnLayoutSet(row, column);
-    multiWidget->SetCrosshairVisibility(true);
+    multiWidget->AddPlanesToDataStorage();
   }
 }
 
@@ -216,6 +216,9 @@ void QmitkMxNMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
   // update decoration preferences
   //m_Impl->m_MultiWidgetDecorationManager->DecorationPreferencesChanged(preferences);
 
+  int crosshairGapSize = preferences->GetInt("crosshair gap size", 32);
+  multiWidget->SetCrosshairGap(crosshairGapSize);
+
   // zooming and panning preferences
   bool constrainedZooming = preferences->GetBool("Use constrained zooming and panning", true);
   mitk::RenderingManager::GetInstance()->SetConstrainedPanningZooming(constrainedZooming);
@@ -225,5 +228,5 @@ void QmitkMxNMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
     mitk::InteractionSchemeSwitcher::PACSStandard :
     mitk::InteractionSchemeSwitcher::MITKStandard);
 
-  mitk::RenderingManager::GetInstance()->InitializeViewsByBoundingObjects(GetDataStorage());
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

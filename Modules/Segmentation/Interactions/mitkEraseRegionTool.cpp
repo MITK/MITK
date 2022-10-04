@@ -13,6 +13,9 @@ found in the LICENSE file.
 #include "mitkEraseRegionTool.h"
 
 #include "mitkEraseRegionTool.xpm"
+#include <mitkImagePixelReadAccessor.h>
+#include <mitkImageGenerator.h>
+#include <mitkImageAccessByItk.h>
 
 // us
 #include <usGetModuleContext.h>
@@ -23,15 +26,6 @@ found in the LICENSE file.
 namespace mitk
 {
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, EraseRegionTool, "Erase tool");
-}
-
-mitk::EraseRegionTool::EraseRegionTool() : SetRegionTool(0)
-{
-  FeedbackContourTool::SetFeedbackContourColor(1.0, 1.0, 0.0);
-}
-
-mitk::EraseRegionTool::~EraseRegionTool()
-{
 }
 
 const char **mitk::EraseRegionTool::GetXPM() const
@@ -57,3 +51,43 @@ const char *mitk::EraseRegionTool::GetName() const
 {
   return "Erase";
 }
+
+template <typename TPixel, unsigned int VImageDimension>
+void DoFillImage(itk::Image<TPixel, VImageDimension>* image)
+{
+  image->FillBuffer(1);
+};
+
+mitk::Image::Pointer mitk::EraseRegionTool::GenerateFillImage(const Image* workingSlice, Point3D seedPoint, mitk::Label::PixelType& seedLabelValue) const
+{
+  auto labelSetImage = dynamic_cast<const LabelSetImage*>(this->GetWorkingData());
+
+  itk::Index<2> seedIndex;
+  workingSlice->GetGeometry()->WorldToIndex(seedPoint, seedIndex);
+
+  using AccessorType = ImagePixelReadAccessor<Label::PixelType, 2>;
+  AccessorType accessor(workingSlice);
+  seedLabelValue = accessor.GetPixelByIndex(seedIndex);
+  Image::Pointer fillImage;
+
+  if ( seedLabelValue == labelSetImage->GetExteriorLabel()->GetValue())
+  { //clicked on background remove everything which is not locked.
+    fillImage = workingSlice->Clone();
+    AccessByItk(fillImage, DoFillImage);
+  }
+  else
+  {
+    fillImage = Superclass::GenerateFillImage(workingSlice, seedPoint, seedLabelValue);
+  }
+
+  return fillImage;
+}
+
+void mitk::EraseRegionTool::PrepareFilling(const Image* /*workingSlice*/, Point3D /*seedPoint*/)
+{
+  auto labelSetImage = dynamic_cast<const LabelSetImage*>(this->GetWorkingData());
+  if (nullptr != labelSetImage)
+  {
+    m_FillLabelValue = labelSetImage->GetExteriorLabel()->GetValue();
+  }
+};

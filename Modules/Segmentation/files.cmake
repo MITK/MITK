@@ -33,6 +33,7 @@ set(CPP_FILES
   Interactions/mitkBinaryThresholdBaseTool.cpp
   Interactions/mitkBinaryThresholdTool.cpp
   Interactions/mitkBinaryThresholdULTool.cpp
+  Interactions/mitkCloseRegionTool.cpp
   Interactions/mitkContourModelInteractor.cpp
   Interactions/mitkContourModelLiveWireInteractor.cpp
   Interactions/mitkEditableContourTool.cpp
@@ -43,12 +44,12 @@ set(CPP_FILES
   Interactions/mitkErasePaintbrushTool.cpp
   Interactions/mitkEraseRegionTool.cpp
   Interactions/mitkFeedbackContourTool.cpp
+  Interactions/mitkFillRegionBaseTool.cpp
   Interactions/mitkFillRegionTool.cpp
   Interactions/mitkOtsuTool3D.cpp
   Interactions/mitkPaintbrushTool.cpp
   Interactions/mitkRegionGrowingTool.cpp
   Interactions/mitkSegmentationsProcessingTool.cpp
-  Interactions/mitkSetRegionTool.cpp
   Interactions/mitkSegTool2D.cpp
   Interactions/mitkSubtractContourTool.cpp
   Interactions/mitkTool.cpp
@@ -97,6 +98,7 @@ set(RESOURCE_FILES
   Interactions/dummy.xml
   Interactions/EditableContourTool.xml
   Interactions/PickingTool.xml
+  Interactions/MouseReleaseOnly.xml
   Interactions/PressMoveRelease.xml
   Interactions/PressMoveReleaseAndPointSetting.xml
   Interactions/PressMoveReleaseWithCTRLInversion.xml

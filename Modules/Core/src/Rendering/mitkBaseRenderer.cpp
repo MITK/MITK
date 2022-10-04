@@ -94,8 +94,8 @@ mitk::BaseRenderer::BaseRenderer(const char *name,
     m_DataStorage(nullptr),
     m_LastUpdateTime(0),
     m_CameraController(nullptr),
-    m_SliceNavigationController(nullptr),
     m_CameraRotationController(nullptr),
+    m_SliceNavigationController(nullptr),
     m_WorldTimeGeometry(nullptr),
     m_CurrentWorldGeometry(nullptr),
     m_CurrentWorldPlaneGeometry(nullptr),
@@ -159,13 +159,12 @@ mitk::BaseRenderer::BaseRenderer(const char *name,
 
   m_CurrentWorldPlaneGeometryTransformTime = m_CurrentWorldPlaneGeometryNode->GetVtkTransform()->GetMTime();
 
-  mitk::SliceNavigationController::Pointer sliceNavigationController = mitk::SliceNavigationController::New();
-  sliceNavigationController->SetRenderer(this);
-  sliceNavigationController->ConnectGeometrySendEvent(this);
-  sliceNavigationController->ConnectGeometryUpdateEvent(this);
-  sliceNavigationController->ConnectGeometrySliceEvent(this);
-  sliceNavigationController->ConnectGeometryTimeEvent(this);
-  m_SliceNavigationController = sliceNavigationController;
+  m_SliceNavigationController = mitk::SliceNavigationController::New();
+  m_SliceNavigationController->SetRenderer(this);
+  m_SliceNavigationController->ConnectGeometrySendEvent(this);
+  m_SliceNavigationController->ConnectGeometryUpdateEvent(this);
+  m_SliceNavigationController->ConnectGeometrySliceEvent(this);
+  m_SliceNavigationController->ConnectGeometryTimeEvent(this);
 
   m_CameraRotationController = mitk::CameraRotationController::New();
   m_CameraRotationController->SetRenderWindow(m_RenderWindow);
@@ -664,17 +663,24 @@ void mitk::BaseRenderer::UpdateCurrentGeometries()
 
 void mitk::BaseRenderer::SetCurrentWorldPlaneGeometry(const mitk::PlaneGeometry* geometry2d)
 {
-  if (m_CurrentWorldPlaneGeometry != geometry2d)
+  if (m_CurrentWorldPlaneGeometry == geometry2d)
   {
-    m_CurrentWorldPlaneGeometry = geometry2d->Clone();
-    m_CurrentWorldPlaneGeometryData->SetPlaneGeometry(m_CurrentWorldPlaneGeometry);
-    m_CurrentWorldPlaneGeometryUpdateTime.Modified();
-    Modified();
+    return;
   }
+
+  m_CurrentWorldPlaneGeometry = geometry2d->Clone();
+  m_CurrentWorldPlaneGeometryData->SetPlaneGeometry(m_CurrentWorldPlaneGeometry);
+  m_CurrentWorldPlaneGeometryUpdateTime.Modified();
+  Modified();
 }
 
 void mitk::BaseRenderer::SetCurrentWorldGeometry(const mitk::BaseGeometry* geometry)
 {
+  if (m_CurrentWorldGeometry == geometry)
+  {
+    return;
+  }
+
   m_CurrentWorldGeometry = geometry;
   if (geometry == nullptr)
   {
@@ -687,6 +693,7 @@ void mitk::BaseRenderer::SetCurrentWorldGeometry(const mitk::BaseGeometry* geome
     m_EmptyWorldGeometry = true;
     return;
   }
+
   BoundingBox::Pointer boundingBox = m_CurrentWorldGeometry->CalculateBoundingBoxRelativeToTransform(nullptr);
   const BoundingBox::BoundsArrayType& worldBounds = boundingBox->GetBounds();
   m_Bounds[0] = worldBounds[0];
@@ -695,6 +702,7 @@ void mitk::BaseRenderer::SetCurrentWorldGeometry(const mitk::BaseGeometry* geome
   m_Bounds[3] = worldBounds[3];
   m_Bounds[4] = worldBounds[4];
   m_Bounds[5] = worldBounds[5];
+
   if (boundingBox->GetDiagonalLength2() <= mitk::eps)
   {
     m_EmptyWorldGeometry = true;

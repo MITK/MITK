@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include "mitkSliceNavigationController.h"
 
+#include <mitkSliceNavigationHelper.h>
 #include "mitkBaseRenderer.h"
 #include "mitkCrosshairPositionEvent.h"
 #include "mitkOperation.h"
@@ -291,61 +292,23 @@ namespace mitk
       return;
     }
 
-    //@todo add time to PositionEvent and use here!!
-    const auto* slicedWorldGeometry = dynamic_cast<SlicedGeometry3D*>(
-      m_CreatedWorldGeometry->GetGeometryForTimeStep(this->GetTime()->GetPos()).GetPointer());
+    int selectedSlice = -1;
+    try
+    {
+      selectedSlice = SliceNavigationHelper::SelectSliceByPoint(m_CreatedWorldGeometry, point);
+    }
+    catch (const mitk::Exception& e)
+    {
+      MITK_ERROR << "Unable to select a slice by the given point " << point << "\n"
+                 << "Reason: " << e.GetDescription();
+    }
 
-    if (nullptr == slicedWorldGeometry)
+    if (-1 == selectedSlice)
     {
       return;
     }
 
-    int bestSlice = -1;
-    double bestDistance = itk::NumericTraits<double>::max();
-
-    if (slicedWorldGeometry->GetEvenlySpaced())
-    {
-      PlaneGeometry* plane = slicedWorldGeometry->GetPlaneGeometry(0);
-
-      const Vector3D& direction = slicedWorldGeometry->GetDirectionVector();
-
-      Point3D projectedPoint;
-      plane->Project(point, projectedPoint);
-
-      // Check whether the point is somewhere within the slice stack volume;
-      // otherwise, the default slice (0) will be selected
-      if (direction[0] * (point[0] - projectedPoint[0]) + direction[1] * (point[1] - projectedPoint[1]) +
-            direction[2] * (point[2] - projectedPoint[2]) >= 0)
-      {
-        bestSlice = static_cast<int>(plane->Distance(point) / slicedWorldGeometry->GetSpacing()[2] + 0.5);
-      }
-    }
-    else
-    {
-      int numberOfSlices = slicedWorldGeometry->GetSlices();
-      Point3D projectedPoint;
-      for (int slice = 0; slice < numberOfSlices; ++slice)
-      {
-        slicedWorldGeometry->GetPlaneGeometry(slice)->Project(point, projectedPoint);
-        const Vector3D distance = projectedPoint - point;
-        ScalarType currentDistance = distance.GetSquaredNorm();
-
-        if (currentDistance < bestDistance)
-        {
-          bestDistance = currentDistance;
-          bestSlice = slice;
-        }
-      }
-    }
-
-    if (bestSlice >= 0)
-    {
-      this->GetSlice()->SetPos(bestSlice);
-    }
-    else
-    {
-      this->GetSlice()->SetPos(0);
-    }
+    this->GetSlice()->SetPos(selectedSlice);
 
     this->SendCreatedWorldGeometryUpdate();
     // send crosshair event

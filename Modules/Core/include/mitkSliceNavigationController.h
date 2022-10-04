@@ -322,7 +322,7 @@ namespace mitk
       m_ReceiverToObserverTagsMap.erase(i);
     }
 
-    Message1<Point3D> SetCrosshairEvent;
+    Message1<const Point3D&> SetCrosshairEvent;
 
     /**
      * \brief To connect multiple SliceNavigationController, we can

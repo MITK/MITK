@@ -47,12 +47,12 @@ const char **mitk::LiveWireTool2D::GetXPM() const
 
 us::ModuleResource mitk::LiveWireTool2D::GetIconResource() const
 {
-  return us::GetModuleContext()->GetModule()->GetResource("LiveWire_48x48.png");
+  return us::GetModuleContext()->GetModule()->GetResource("LiveWire.svg");
 }
 
 us::ModuleResource mitk::LiveWireTool2D::GetCursorIconResource() const
 {
-  return us::GetModuleContext()->GetModule()->GetResource("LiveWire_Cursor_32x32.png");
+  return us::GetModuleContext()->GetModule()->GetResource("LiveWire_Cursor.svg");
 }
 
 const char *mitk::LiveWireTool2D::GetName() const

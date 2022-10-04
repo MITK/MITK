@@ -78,7 +78,7 @@ void mitk::nnUNetTool::ClearOutputBuffer()
 us::ModuleResource mitk::nnUNetTool::GetIconResource() const
 {
   us::Module *module = us::GetModuleContext()->GetModule();
-  us::ModuleResource resource = module->GetResource("AI_48x48.png");
+  us::ModuleResource resource = module->GetResource("AI.svg");
   return resource;
 }
 

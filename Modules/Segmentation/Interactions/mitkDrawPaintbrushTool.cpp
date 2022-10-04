@@ -42,14 +42,14 @@ const char **mitk::DrawPaintbrushTool::GetXPM() const
 us::ModuleResource mitk::DrawPaintbrushTool::GetIconResource() const
 {
   us::Module *module = us::GetModuleContext()->GetModule();
-  us::ModuleResource resource = module->GetResource("Paint_48x48.png");
+  us::ModuleResource resource = module->GetResource("Paint.svg");
   return resource;
 }
 
 us::ModuleResource mitk::DrawPaintbrushTool::GetCursorIconResource() const
 {
   us::Module *module = us::GetModuleContext()->GetModule();
-  us::ModuleResource resource = module->GetResource("Paint_Cursor_32x32.png");
+  us::ModuleResource resource = module->GetResource("Paint_Cursor.svg");
   return resource;
 }
 

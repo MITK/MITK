@@ -36,14 +36,14 @@ const char **mitk::CloseRegionTool::GetXPM() const
 us::ModuleResource mitk::CloseRegionTool::GetIconResource() const
 {
   us::Module *module = us::GetModuleContext()->GetModule();
-  us::ModuleResource resource = module->GetResource("Close_48x48.png");
+  us::ModuleResource resource = module->GetResource("Close.svg");
   return resource;
 }
 
 us::ModuleResource mitk::CloseRegionTool::GetCursorIconResource() const
 {
   us::Module *module = us::GetModuleContext()->GetModule();
-  us::ModuleResource resource = module->GetResource("Close_Cursor_32x32.png");
+  us::ModuleResource resource = module->GetResource("Close_Cursor.svg");
   return resource;
 }
 

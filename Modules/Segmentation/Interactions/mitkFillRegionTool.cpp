@@ -31,14 +31,14 @@ const char **mitk::FillRegionTool::GetXPM() const
 us::ModuleResource mitk::FillRegionTool::GetIconResource() const
 {
   us::Module *module = us::GetModuleContext()->GetModule();
-  us::ModuleResource resource = module->GetResource("Fill_48x48.png");
+  us::ModuleResource resource = module->GetResource("Fill.svg");
   return resource;
 }
 
 us::ModuleResource mitk::FillRegionTool::GetCursorIconResource() const
 {
   us::Module *module = us::GetModuleContext()->GetModule();
-  us::ModuleResource resource = module->GetResource("Fill_Cursor_32x32.png");
+  us::ModuleResource resource = module->GetResource("Fill_Cursor.svg");
   return resource;
 }
 

@@ -72,14 +72,14 @@ const char **mitk::RegionGrowingTool::GetXPM() const
 us::ModuleResource mitk::RegionGrowingTool::GetIconResource() const
 {
   us::Module *module = us::GetModuleContext()->GetModule();
-  us::ModuleResource resource = module->GetResource("RegionGrowing_48x48.png");
+  us::ModuleResource resource = module->GetResource("RegionGrowing.svg");
   return resource;
 }
 
 us::ModuleResource mitk::RegionGrowingTool::GetCursorIconResource() const
 {
   us::Module *module = us::GetModuleContext()->GetModule();
-  us::ModuleResource resource = module->GetResource("RegionGrowing_Cursor_32x32.png");
+  us::ModuleResource resource = module->GetResource("RegionGrowing_Cursor.svg");
   return resource;
 }
 

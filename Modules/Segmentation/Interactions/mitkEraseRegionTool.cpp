@@ -36,14 +36,14 @@ const char **mitk::EraseRegionTool::GetXPM() const
 us::ModuleResource mitk::EraseRegionTool::GetIconResource() const
 {
   us::Module *module = us::GetModuleContext()->GetModule();
-  us::ModuleResource resource = module->GetResource("Erase_48x48.png");
+  us::ModuleResource resource = module->GetResource("Erase.svg");
   return resource;
 }
 
 us::ModuleResource mitk::EraseRegionTool::GetCursorIconResource() const
 {
   us::Module *module = us::GetModuleContext()->GetModule();
-  us::ModuleResource resource = module->GetResource("Erase_Cursor_32x32.png");
+  us::ModuleResource resource = module->GetResource("Erase_Cursor.svg");
   return resource;
 }
 

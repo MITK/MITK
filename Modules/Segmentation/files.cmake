@@ -74,6 +74,8 @@ set(RESOURCE_FILES
   Add_Cursor_32x32.png
   AI_48x48.png
   AI_Cursor_32x32.png
+  Close_48x48.png
+  Close_Cursor_32x32.png
   Erase_48x48.png
   Erase_Cursor_32x32.png
   Fill_48x48.png

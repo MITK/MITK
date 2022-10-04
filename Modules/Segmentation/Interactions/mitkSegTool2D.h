@@ -265,6 +265,10 @@ namespace mitk
 
     void InteractiveSegmentationBugMessage(const std::string &message) const;
 
+    /** Helper function to check if a position events points to a point inside the boundingbox of a passed
+     data instance.*/
+    static bool IsPositionEventInsideImageRegion(InteractionPositionEvent* positionEvent, const BaseData* data);
+
     BaseRenderer *m_LastEventSender = nullptr;
     unsigned int m_LastEventSlice = 0;
 

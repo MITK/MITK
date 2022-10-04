@@ -239,14 +239,21 @@ The Region Growing tool comes with a "leakage detection/removal" feature. If lea
 \subsection org_mitk_views_segmentationfilltool Fill tool
 \imageMacro{QmitkSegmentation_IMGIconFill.png,"Fill tool",3.81}
 
-Left-click inside a segmentation with holes to completely fill all holes. Left-click inside a hole to fill only this specific hole.
+Left-click inside a region/segmentation to flood fill all connected pixels that have the same label with the active label. This tool will only work on regions of unlocked labels or on regions that are not labeled at all.
 
 \subsection org_mitk_views_segmentationerasetool Erase tool
-
 \imageMacro{QmitkSegmentation_IMGIconErase.png,"Erase tool",3.79}
 
 This tool removes a connected part of pixels that form a segmentation.
-You may use it to remove single segmentations (left-click on specific segmentation) or to clear a whole slice at once (left-click outside a segmentation).
+You may use it to remove single segmented regions (left-click on specific segmentation) or to clear a whole slice at once (left-click at the non-labeled background).
+This tool will only work and regions of unlocked labels or on regions of the active label.
+
+\subsection org_mitk_views_segmentationclosetool Close tool
+\imageMacro{QmitkSegmentation_IMGIconClose.png,"Close tool",3.79}
+
+Left-click inside the region/segmentation to fill all "holes" (pixels labelled with another label or no label) inside the region.
+Therefore this tool behaves like a local closing operation. This tool will not work, when a non-labeled region is selected and holes of locked labels will not be filled.
+\remark This tool always uses the label of the selected region (even if this label is not the active label). Therefore you can use this tool on regions of the active label and of none locked labels (without the need to change the active label). 
 
 \subsection org_mitk_views_segmentationlivewiretool Live wire tool
 

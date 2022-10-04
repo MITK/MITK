@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="48"
+   height="48"
+   viewBox="0 0 12.7 12.7"
+   version="1.1"
+   id="svg1138"
+   inkscape:version="1.0 (4035a4fb49, 2020-05-01)"
+   sodipodi:docname="Otsu.svg">
+  <defs
+     id="defs1132">
+    <linearGradient
+       id="linearGradient5112">
+      <stop
+         style="stop-color:#00adff;stop-opacity:1;"
+         offset="0"
+         id="stop5114" />
+      <stop
+         style="stop-color:#bfebff;stop-opacity:1;"
+         offset="1"
+         id="stop5116" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient5120">
+      <stop
+         style="stop-color:#00a6f4;stop-opacity:1;"
+         offset="0"
+         id="stop5122" />
+      <stop
+         style="stop-color:#00618e;stop-opacity:1;"
+         offset="1"
+         id="stop5124" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4826">
+      <stop
+         style="stop-color:#f0a0a0;stop-opacity:1;"
+         offset="0"
+         id="stop4828" />
+      <stop
+         style="stop-color:#c86464;stop-opacity:0;"
+         offset="1"
+         id="stop4830" />
+    </linearGradient>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#2d2d30"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="1"
+     inkscape:pageshadow="2"
+     inkscape:zoom="11.2"
+     inkscape:cx="25.80159"
+     inkscape:cy="21.839433"
+     inkscape:document-units="px"
+     inkscape:current-layer="g4941"
+     inkscape:document-rotation="0"
+     showgrid="true"
+     units="px"
+     inkscape:showpageshadow="false"
+     inkscape:window-width="2560"
+     inkscape:window-height="1377"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1">
+    <inkscape:grid
+       type="xygrid"
+       id="grid1701"
+       dotted="false"
+       snapvisiblegridlinesonly="true"
+       empspacing="4"
+       color="#9f9f9f"
+       opacity="0.1254902"
+       empcolor="#9f9f9f"
+       empopacity="0.25098039" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata1135">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 2"
+     id="layer3"
+     inkscape:groupmode="layer">
+    <g
+       id="g4941"
+       transform="matrix(0.55797517,0,0,0.55797517,-24.077083,-240.84825)"
+       inkscape:export-filename="C:\Users\Stefan\Desktop\wipe48x48.png"
+       inkscape:export-xdpi="198.05157"
+       inkscape:export-ydpi="198.05157"
+       style="display:inline">
+      <g
+         style="font-style:normal;font-weight:normal;font-size:13.5637px;line-height:0%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#00adff;fill-opacity:1;stroke:none;stroke-width:1.1303"
+         id="text3119"
+         aria-label="大津">
+        <path
+           id="path2619"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.5613px;line-height:1.25;font-family:'Arial Unicode MS';-inkscape-font-specification:'Arial Unicode MS';fill:#00adff;fill-opacity:1;stroke-width:1.1303"
+           d="m 43.624788,447.0241 q 4.154842,-1.44516 4.380649,-5.55484 h -4.06452 v -0.99355 h 4.154842 v -2.39355 h 0.99355 q 0.451613,0.0903 0.04516,0.36129 v 2.03226 h 4.335487 v 0.99355 h -4.245164 q 0.948387,3.74839 4.606455,5.32904 l -0.587097,1.08387 q -3.161293,-1.44517 -4.470972,-4.87743 -0.767742,3.70323 -4.741939,5.10323 z" />
+        <path
+           id="path2621"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.5613px;line-height:1.25;font-family:'Arial Unicode MS';-inkscape-font-specification:'Arial Unicode MS';fill:#00adff;fill-opacity:1;stroke-width:1.1303"
+           d="m 55.050604,447.24991 q 0.767743,-1.12903 1.580647,-3.20646 l 0.812903,0.45162 q -0.451613,1.49032 -1.400001,3.16129 0.09032,0.36129 -0.135484,0.22581 z m 1.670969,-4.20001 q -0.541936,-0.63225 -1.445162,-1.21935 l 0.541936,-0.72258 q 0.948387,0.54193 1.535485,1.17419 z m 0.451613,-2.75484 q -0.858065,-0.67742 -1.490323,-1.12903 l 0.541936,-0.72258 q 0.677419,0.31613 1.535485,1.03871 z m 6.954845,0.40646 h 1.309679 v 0.72258 h -1.309679 v 1.58064 h -2.39355 v 0.81291 h 2.800002 v 0.85806 h -2.800002 v 0.76775 h 3.567745 v 0.85806 h -3.567745 v 1.89678 h -0.903227 v -1.89678 h -3.251616 v -0.85806 h 3.251616 v -0.76775 h -2.619357 v -0.85806 h 2.619357 v -0.81291 h -2.303228 v -0.72258 h 2.303228 v -0.85806 h -3.161293 v -0.72258 h 3.161293 v -0.90323 h -2.303228 v -0.72258 h 2.303228 v -1.21936 h 0.858065 q 0.361291,0.0452 0.04516,0.27097 v 0.94839 h 2.39355 z m -0.767742,0 v -0.90323 h -1.625808 v 0.90323 z m 0,0.72258 h -1.625808 v 0.85806 h 1.625808 z" />
+      </g>
+      <text
+         id="text2626"
+         y="442.07898"
+         x="54.53125"
+         style="font-size:10.7532px;line-height:1.25;font-family:sans-serif;stroke-width:0.474185"
+         xml:space="preserve"><tspan
+           style="stroke-width:0.474185"
+           y="442.07898"
+           x="54.53125"
+           id="tspan2624"
+           sodipodi:role="line"></tspan></text>
+    </g>
+  </g>
+</svg>

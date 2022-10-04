@@ -42,14 +42,14 @@ const char **mitk::SubtractContourTool::GetXPM() const
 us::ModuleResource mitk::SubtractContourTool::GetIconResource() const
 {
   us::Module *module = us::GetModuleContext()->GetModule();
-  us::ModuleResource resource = module->GetResource("Subtract_48x48.png");
+  us::ModuleResource resource = module->GetResource("Subtract.svg");
   return resource;
 }
 
 us::ModuleResource mitk::SubtractContourTool::GetCursorIconResource() const
 {
   us::Module *module = us::GetModuleContext()->GetModule();
-  us::ModuleResource resource = module->GetResource("Subtract_Cursor_32x32.png");
+  us::ModuleResource resource = module->GetResource("Subtract_Cursor.svg");
   return resource;
 }
 

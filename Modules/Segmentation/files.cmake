@@ -69,30 +69,30 @@ set(CPP_FILES
 )
 
 set(RESOURCE_FILES
-  Add_48x48.png
-  Add_Cursor_32x32.png
-  AI_48x48.png
-  AI_Cursor_32x32.png
-  Erase_48x48.png
-  Erase_Cursor_32x32.png
-  Fill_48x48.png
-  Fill_Cursor_32x32.png
-  LiveWire_48x48.png
-  LiveWire_Cursor_32x32.png
-  NewAdd_48x48.png
-  NewAdd_Cursor_32x32.png
-  Otsu_48x48.png
-  Paint_48x48.png
-  Paint_Cursor_32x32.png
-  Pick_48x48.png
-  RegionGrowing_48x48.png
-  RegionGrowing_Cursor_32x32.png
-  Subtract_48x48.png
-  Subtract_Cursor_32x32.png
-  Threshold_48x48.png
-  TwoThresholds_48x48.png
-  Wipe_48x48.png
-  Wipe_Cursor_32x32.png
+  Add.svg
+  Add_Cursor.svg
+  AI.svg
+  AI_Cursor.svg
+  Erase.svg
+  Erase_Cursor.svg
+  Fill.svg
+  Fill_Cursor.svg
+  LiveWire.svg
+  LiveWire_Cursor.svg
+  Lasso.svg
+  Lasso_Cursor.svg
+  Otsu.svg
+  Paint.svg
+  Paint_Cursor.svg
+  Picking.svg
+  RegionGrowing.svg
+  RegionGrowing_Cursor.svg
+  Subtract.svg
+  Subtract_Cursor.svg
+  Threshold.svg
+  ULThreshold.svg
+  Wipe.svg
+  Wipe_Cursor.svg
 
   Interactions/dummy.xml
   Interactions/EditableContourTool.xml

@@ -21,13 +21,6 @@ found in the LICENSE file.
 
 #include <berryConstants.h>
 #include <mitkPlaneGeometry.h>
-#include <mitkNodePredicateDataType.h>
-#include <mitkStatusBar.h>
-#include <mitkPixelTypeMultiplex.h>
-#include <mitkImagePixelReadAccessor.h>
-#include <mitkNodePredicateProperty.h>
-
-#include <mitkCompositePixelValueToString.h>
 
 const std::string QmitkImageNavigatorView::VIEW_ID = "org.mitk.views.imagenavigator";
 
@@ -84,7 +77,6 @@ void QmitkImageNavigatorView::RenderWindowPartActivated(mitk::IRenderWindowPart*
       m_Controls.m_AxialLabel->setEnabled(true);
       m_Controls.m_ZWorldCoordinateSpinBox->setEnabled(true);
       connect(m_AxialStepper, SIGNAL(Refetch()), this, SLOT(OnRefetch()));
-      connect(m_AxialStepper, SIGNAL(Refetch()), this, SLOT(UpdateStatusBar()));
     }
     else
     {
@@ -104,7 +96,6 @@ void QmitkImageNavigatorView::RenderWindowPartActivated(mitk::IRenderWindowPart*
       m_Controls.m_SagittalLabel->setEnabled(true);
       m_Controls.m_YWorldCoordinateSpinBox->setEnabled(true);
       connect(m_SagittalStepper, SIGNAL(Refetch()), this, SLOT(OnRefetch()));
-      connect(m_SagittalStepper, SIGNAL(Refetch()), this, SLOT(UpdateStatusBar()));
     }
     else
     {
@@ -124,7 +115,6 @@ void QmitkImageNavigatorView::RenderWindowPartActivated(mitk::IRenderWindowPart*
       m_Controls.m_CoronalLabel->setEnabled(true);
       m_Controls.m_XWorldCoordinateSpinBox->setEnabled(true);
       connect(m_CoronalStepper, SIGNAL(Refetch()), this, SLOT(OnRefetch()));
-      connect(m_CoronalStepper, SIGNAL(Refetch()), this, SLOT(UpdateStatusBar()));
     }
     else
     {
@@ -142,7 +132,6 @@ void QmitkImageNavigatorView::RenderWindowPartActivated(mitk::IRenderWindowPart*
                                               "sliceNavigatorTimeFromSimpleExample");
       m_Controls.m_SliceNavigatorTime->setEnabled(true);
       m_Controls.m_TimeLabel->setEnabled(true);
-      connect(m_TimeStepper, SIGNAL(Refetch()), this, SLOT(UpdateStatusBar()));
     }
     else
     {
@@ -151,102 +140,6 @@ void QmitkImageNavigatorView::RenderWindowPartActivated(mitk::IRenderWindowPart*
     }
 
     this->OnRefetch();
-    this->UpdateStatusBar();
-  }
-}
-
-void QmitkImageNavigatorView::UpdateStatusBar()
-{
-  if (m_IRenderWindowPart != nullptr)
-  {
-    mitk::Point3D position = m_IRenderWindowPart->GetSelectedPosition();
-    mitk::BaseRenderer::Pointer baseRenderer = mitk::BaseRenderer::GetInstance(m_IRenderWindowPart->GetActiveQmitkRenderWindow()->GetVtkRenderWindow());
-    auto globalCurrentTimePoint = baseRenderer->GetTime();
-    mitk::TNodePredicateDataType<mitk::Image>::Pointer isImageData = mitk::TNodePredicateDataType<mitk::Image>::New();
-
-    mitk::DataStorage::SetOfObjects::ConstPointer nodes = GetDataStorage()->GetSubset(isImageData).GetPointer();
-
-    if (nodes.IsNotNull())
-    {
-      mitk::Image::Pointer image3D;
-      mitk::DataNode::Pointer node;
-      mitk::DataNode::Pointer topSourceNode;
-
-      int component = 0;
-
-      node = mitk::FindTopmostVisibleNode(nodes, position, globalCurrentTimePoint, baseRenderer);
-
-      if (node.IsNotNull())
-      {
-        bool isBinary(false);
-        node->GetBoolProperty("binary", isBinary);
-        if (isBinary)
-        {
-          mitk::DataStorage::SetOfObjects::ConstPointer sourcenodes = GetDataStorage()->GetSources(node, nullptr, true);
-          if (!sourcenodes->empty())
-          {
-            topSourceNode = mitk::FindTopmostVisibleNode(sourcenodes, position, globalCurrentTimePoint, baseRenderer);
-          }
-          if (topSourceNode.IsNotNull())
-          {
-            image3D = dynamic_cast<mitk::Image*>(topSourceNode->GetData());
-            topSourceNode->GetIntProperty("Image.Displayed Component", component);
-          }
-          else
-          {
-            image3D = dynamic_cast<mitk::Image*>(node->GetData());
-            node->GetIntProperty("Image.Displayed Component", component);
-          }
-        }
-        else
-        {
-          image3D = dynamic_cast<mitk::Image*>(node->GetData());
-          node->GetIntProperty("Image.Displayed Component", component);
-        }
-      }
-
-      // get the position and pixel value from the image and build up status bar text
-      auto statusBar = mitk::StatusBar::GetInstance();
-
-      if (image3D.IsNotNull() && statusBar != nullptr)
-      {
-        itk::Index<3> p;
-        image3D->GetGeometry()->WorldToIndex(position, p);
-
-        auto pixelType = image3D->GetChannelDescriptor().GetPixelType().GetPixelType();
-
-        if (pixelType == itk::IOPixelEnum::RGB || pixelType == itk::IOPixelEnum::RGBA)
-        {
-          std::string pixelValue = "Pixel RGB(A) value: ";
-          pixelValue.append(ConvertCompositePixelValueToString(image3D, p));
-          statusBar->DisplayImageInfo(position, p, globalCurrentTimePoint, pixelValue.c_str());
-        }
-        else if (pixelType == itk::IOPixelEnum::DIFFUSIONTENSOR3D || pixelType == itk::IOPixelEnum::SYMMETRICSECONDRANKTENSOR)
-        {
-          std::string pixelValue = "See ODF Details view. ";
-          statusBar->DisplayImageInfo(position, p, globalCurrentTimePoint, pixelValue.c_str());
-        }
-        else
-        {
-          itk::Index<3> p;
-          image3D->GetGeometry()->WorldToIndex(position, p);
-          mitk::ScalarType pixelValue;
-          mitkPixelTypeMultiplex5(
-            mitk::FastSinglePixelAccess,
-            image3D->GetChannelDescriptor().GetPixelType(),
-            image3D,
-            image3D->GetVolumeData(image3D->GetTimeGeometry()->TimePointToTimeStep(globalCurrentTimePoint)),
-            p,
-            pixelValue,
-            component);
-          statusBar->DisplayImageInfo(position, p, globalCurrentTimePoint, pixelValue);
-        }
-      }
-      else
-      {
-        statusBar->DisplayImageInfoInvalid();
-      }
-    }
   }
 }
 

@@ -32,7 +32,7 @@ m_CurrentSelectedTimePoint(std::numeric_limits<mitk::TimePointType>::lowest())
 QmitkSliceNavigationListener::~QmitkSliceNavigationListener()
 {
   this->RemoveAllObservers();
-};
+}
 
 mitk::TimePointType QmitkSliceNavigationListener::GetCurrentSelectedTimePoint() const
 {
@@ -67,12 +67,10 @@ void QmitkSliceNavigationListener::OnSliceChangedDelayed()
       emit SelectedTimePointChanged(newSelectedTimePoint);
     }
   }
-};
+}
 
-void
-QmitkSliceNavigationListener::OnSliceChangedInternal(const itk::EventObject&)
+void QmitkSliceNavigationListener::OnSliceChangedInternal(const itk::EventObject&)
 {
-  // Taken from QmitkStdMultiWidget::HandleCrosshairPositionEvent().
   // Since there are always 3 events arriving (one for each render window) every time the slice
   // or time changes, the slot OnSliceChangedDelayed is triggered - and only if it hasn't been
   // triggered yet - so it is only executed once for every slice/time change.
@@ -82,7 +80,7 @@ QmitkSliceNavigationListener::OnSliceChangedInternal(const itk::EventObject&)
 
     QTimer::singleShot(0, this, SLOT(OnSliceChangedDelayed()));
   }
-};
+}
 
 void QmitkSliceNavigationListener::OnSliceNavigationControllerDeleted(const itk::Object* sender, const itk::EventObject& /*e*/)
 {
@@ -90,7 +88,7 @@ void QmitkSliceNavigationListener::OnSliceNavigationControllerDeleted(const itk:
     dynamic_cast<const mitk::SliceNavigationController*>(sender);
 
   this->RemoveObservers(sendingSlicer);
-};
+}
 
 void QmitkSliceNavigationListener::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
 {
@@ -108,13 +106,13 @@ void QmitkSliceNavigationListener::RenderWindowPartActivated(mitk::IRenderWindow
     m_CurrentSelectedPosition = m_renderWindowPart->GetSelectedPosition();
     m_CurrentSelectedTimePoint = m_renderWindowPart->GetSelectedTimePoint();
   }
-};
+}
 
 void QmitkSliceNavigationListener::RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart)
 {
   m_renderWindowPart = nullptr;
   this->RemoveAllObservers(renderWindowPart);
-};
+}
 
 bool QmitkSliceNavigationListener::InitObservers()
 {
@@ -169,7 +167,7 @@ bool QmitkSliceNavigationListener::InitObservers()
   }
 
   return result;
-};
+}
 
 void QmitkSliceNavigationListener::RemoveObservers(const mitk::SliceNavigationController* deletedSlicer)
 {
@@ -182,7 +180,7 @@ void QmitkSliceNavigationListener::RemoveObservers(const mitk::SliceNavigationCo
   }
 
   m_ObserverMap.erase(deletedSlicer);
-};
+}
 
 void QmitkSliceNavigationListener::RemoveAllObservers(mitk::IRenderWindowPart* deletedPart)
 {
@@ -196,10 +194,10 @@ void QmitkSliceNavigationListener::RemoveAllObservers(mitk::IRenderWindowPart* d
       m_ObserverMap.erase(delPos);
     }
   }
-};
+}
 
 QmitkSliceNavigationListener::ObserverInfo::ObserverInfo(mitk::SliceNavigationController* controller, int observerTag,
   const std::string& renderWindowName, mitk::IRenderWindowPart* part) : controller(controller), observerTag(observerTag),
   renderWindowName(renderWindowName), renderWindowPart(part)
 {
-};
+}

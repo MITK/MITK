@@ -186,7 +186,6 @@ set(CPP_FILES
 
   Interactions/mitkAction.cpp
   Interactions/mitkBindDispatcherInteractor.cpp
-  Interactions/mitkCrosshairPositionEvent.cpp
   Interactions/mitkDataInteractor.cpp
   Interactions/mitkDispatcher.cpp
   Interactions/mitkDisplayActionEventBroadcast.cpp

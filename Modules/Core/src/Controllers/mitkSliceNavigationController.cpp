@@ -14,7 +14,6 @@ found in the LICENSE file.
 
 #include <mitkSliceNavigationHelper.h>
 #include "mitkBaseRenderer.h"
-#include "mitkCrosshairPositionEvent.h"
 #include "mitkOperation.h"
 #include "mitkOperationActor.h"
 #include "mitkPlaneGeometry.h"
@@ -31,7 +30,6 @@ found in the LICENSE file.
 #include "mitkPixelTypeMultiplex.h"
 #include "mitkPlaneOperation.h"
 #include "mitkPointOperation.h"
-#include "mitkStatusBar.h"
 
 #include "mitkApplyTransformMatrixOperation.h"
 

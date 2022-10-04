@@ -49,7 +49,6 @@ QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget *parent,
                                          const QString &name/* = "stdmulti"*/)
   : QmitkAbstractMultiWidget(parent, f, name)
   , m_TimeNavigationController(nullptr)
-  , m_PendingCrosshairPositionEvent(false)
 {
   m_TimeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
 }
@@ -304,15 +303,6 @@ void QmitkStdMultiWidget::RemovePlanesFromDataStorage()
   }
 }
 
-void QmitkStdMultiWidget::HandleCrosshairPositionEvent()
-{
-  if (!m_PendingCrosshairPositionEvent)
-  {
-    m_PendingCrosshairPositionEvent = true;
-    QTimer::singleShot(0, this, SLOT(HandleCrosshairPositionEventDelayed()));
-  }
-}
-
 QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow(unsigned int number) const
 {
   switch (number)
@@ -491,98 +481,6 @@ void QmitkStdMultiWidget::moveEvent(QMoveEvent* e)
 void QmitkStdMultiWidget::wheelEvent(QWheelEvent* e)
 {
   emit WheelMoved(e);
-}
-
-void QmitkStdMultiWidget::HandleCrosshairPositionEventDelayed()
-{
-  auto dataStorage = GetDataStorage();
-  if (nullptr == dataStorage)
-  {
-    return;
-  }
-
-  m_PendingCrosshairPositionEvent = false;
-
-  // find image with highest layer
-  mitk::TNodePredicateDataType<mitk::Image>::Pointer isImageData = mitk::TNodePredicateDataType<mitk::Image>::New();
-  mitk::DataStorage::SetOfObjects::ConstPointer nodes = dataStorage->GetSubset(isImageData).GetPointer();
-  mitk::Point3D crosshairPos = GetSelectedPosition("");
-  mitk::BaseRenderer* baseRenderer = GetRenderWindow1()->GetSliceNavigationController()->GetRenderer();
-  auto globalCurrentTimePoint = baseRenderer->GetTime();
-  mitk::DataNode::Pointer node = mitk::FindTopmostVisibleNode(nodes, crosshairPos, globalCurrentTimePoint, baseRenderer);
-
-  mitk::DataNode::Pointer topSourceNode;
-  mitk::Image::Pointer image;
-  bool isBinary = false;
-  int component = 0;
-
-  if (node.IsNotNull())
-  {
-    node->GetBoolProperty("binary", isBinary);
-    if (isBinary)
-    {
-      mitk::DataStorage::SetOfObjects::ConstPointer sourcenodes = dataStorage->GetSources(node, nullptr, true);
-      if (!sourcenodes->empty())
-      {
-        topSourceNode = mitk::FindTopmostVisibleNode(sourcenodes, crosshairPos, globalCurrentTimePoint, baseRenderer);
-      }
-      if (topSourceNode.IsNotNull())
-      {
-        image = dynamic_cast<mitk::Image *>(topSourceNode->GetData());
-        topSourceNode->GetIntProperty("Image.Displayed Component", component);
-      }
-      else
-      {
-        image = dynamic_cast<mitk::Image *>(node->GetData());
-        node->GetIntProperty("Image.Displayed Component", component);
-      }
-    }
-    else
-    {
-      image = dynamic_cast<mitk::Image *>(node->GetData());
-      node->GetIntProperty("Image.Displayed Component", component);
-    }
-  }
-
-  std::string statusText;
-  std::stringstream stream;
-  itk::Index<3> p;
-  unsigned int timestep = baseRenderer->GetTimeStep();
-
-  if (image.IsNotNull() && (image->GetTimeSteps() > timestep))
-  {
-    image->GetGeometry()->WorldToIndex(crosshairPos, p);
-    stream.precision(2);
-    stream << "Position: <" << std::fixed << crosshairPos[0] << ", " << std::fixed << crosshairPos[1] << ", "
-      << std::fixed << crosshairPos[2] << "> mm";
-    stream << "; Index: <" << p[0] << ", " << p[1] << ", " << p[2] << "> ";
-
-    mitk::ScalarType pixelValue;
-
-    mitkPixelTypeMultiplex5(mitk::FastSinglePixelAccess,
-      image->GetChannelDescriptor().GetPixelType(),
-      image,
-      image->GetVolumeData(image->GetTimeGeometry()->TimePointToTimeStep(globalCurrentTimePoint)),
-      p,
-      pixelValue,
-      component);
-
-    if (fabs(pixelValue) > 1000000 || fabs(pixelValue) < 0.01)
-    {
-      stream << "; Time: " << globalCurrentTimePoint << " ms; Pixelvalue: " << std::scientific << pixelValue << "  ";
-    }
-    else
-    {
-      stream << "; Time: " << globalCurrentTimePoint << " ms; Pixelvalue: " << pixelValue << "  ";
-    }
-  }
-  else
-  {
-    stream << "No image information at this position!";
-  }
-
-  statusText = stream.str();
-  mitk::StatusBar::GetInstance()->DisplayGreyValueText(statusText.c_str());
 }
 
 void QmitkStdMultiWidget::Fit()

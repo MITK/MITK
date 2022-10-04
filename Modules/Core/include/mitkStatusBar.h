@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <MitkCoreExports.h>
 #include <itkObject.h>
 #include <mitkPoint.h>
+#include <mitkTimeGeometry.h>
 #include <itkIndex.h>
 
 namespace mitk
@@ -61,11 +62,11 @@ namespace mitk
     void DisplayGreyValueText(const char *t);
 
     //##Documentation
-    void DisplayRendererInfo(Point3D point, ScalarType time);
+    void DisplayRendererInfo(Point3D point, TimePointType time);
     //## @brief Display position, index, time and pixel value
-    void DisplayImageInfo(Point3D point, itk::Index<3> index, ScalarType time, ScalarType pixelValue);
+    void DisplayImageInfo(Point3D point, itk::Index<3> index, TimePointType time, ScalarType pixelValue);
     //## @brief Display rotation, index, time and custom pixel value
-    void DisplayImageInfo(Point3D point, itk::Index<3> index, ScalarType time, const char* pixelValue);
+    void DisplayImageInfo(Point3D point, itk::Index<3> index, TimePointType time, const char* pixelValue);
     //## @brief Display placeholder text for invalid information
     void DisplayImageInfoInvalid();
 

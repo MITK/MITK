@@ -52,7 +52,7 @@ namespace mitk
     /**
     \brief Fill a contour in a 2D slice with a specified pixel value.
     This version always uses the contour of time step 0 and fills the image.
-    \depricated Ths function is depricated. Use FillContourInSlice2 (in
+    \deprecated Ths function is deprecated. Use FillContourInSlice2() (in
     conjunction e.g. with TransferLabelContent()) instead.
     \pre sliceImage points to a valid instance
     \pre projectedContour points to a valid instance
@@ -67,7 +67,7 @@ namespace mitk
     \brief Fill a contour in a 2D slice with a specified pixel value.
     This overloaded version uses the contour at the passed contourTimeStep
     to fill the passed image slice.
-    \depricated Ths function is depricated. Use FillContourInSlice2 (in
+    \deprecated Ths function is deprecated. Use FillContourInSlice2() (in
     conjunction e.g. with TransferLabelContent()) instead.
     \pre sliceImage points to a valid instance
     \pre projectedContour points to a valid instance
@@ -119,7 +119,7 @@ namespace mitk
     \param paintingPixelValue the pixelvalue/label that should be used in the result image when filling.
     \param fillForegroundThreshold The threshold value that decides if a pixel in the filled image counts
     as foreground (>=fillForegroundThreshold) or not.
-    \depricated Ths function is depricated. Use TransferLabelContent() instead.
+    \deprecated Ths function is deprecated. Use TransferLabelContent() instead.
     */
     [[deprecated]]
     static void FillSliceInSlice(vtkSmartPointer<vtkImageData> filledImage,

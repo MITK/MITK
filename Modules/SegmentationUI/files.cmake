@@ -9,6 +9,7 @@ Qmitk/QmitkCopyToClipBoardDialog.cpp
 Qmitk/QmitkDrawPaintbrushToolGUI.cpp
 Qmitk/QmitkErasePaintbrushToolGUI.cpp
 Qmitk/QmitkEditableContourToolGUIBase.cpp
+Qmitk/QmitkGrowCutToolGUI.cpp
 Qmitk/QmitkLiveWireTool2DGUI.cpp
 Qmitk/QmitkLassoToolGUI.cpp
 Qmitk/QmitkOtsuTool3DGUI.cpp
@@ -40,6 +41,7 @@ Qmitk/QmitkCopyToClipBoardDialog.h
 Qmitk/QmitkDrawPaintbrushToolGUI.h
 Qmitk/QmitkErasePaintbrushToolGUI.h
 Qmitk/QmitkEditableContourToolGUIBase.h
+Qmitk/QmitkGrowCutToolGUI.h
 Qmitk/QmitkLiveWireTool2DGUI.h
 Qmitk/QmitkLassoToolGUI.h
 Qmitk/QmitkOtsuTool3DGUI.h
@@ -63,6 +65,7 @@ Qmitk/QmitkSimpleLabelSetListWidget.h
 
 set(UI_FILES
 Qmitk/QmitkConfirmSegmentationDialog.ui
+Qmitk/QmitkGrowCutToolWidgetControls.ui
 Qmitk/QmitkOtsuToolWidgetControls.ui
 Qmitk/QmitkSurfaceStampWidgetGUIControls.ui
 Qmitk/QmitkMaskStampWidgetGUIControls.ui

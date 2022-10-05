@@ -8,6 +8,7 @@ set(CPP_FILES
   Algorithms/mitkDiffSliceOperation.cpp
   Algorithms/mitkDiffSliceOperationApplier.cpp
   Algorithms/mitkFeatureBasedEdgeDetectionFilter.cpp
+  Algorithms/mitkGrowCutSegmentationFilter.cpp
   Algorithms/mitkImageLiveWireContourModelFilter.cpp
   Algorithms/mitkImageToContourFilter.cpp
   #Algorithms/mitkImageToContourModelFilter.cpp
@@ -46,6 +47,7 @@ set(CPP_FILES
   Interactions/mitkFeedbackContourTool.cpp
   Interactions/mitkFillRegionBaseTool.cpp
   Interactions/mitkFillRegionTool.cpp
+  Interactions/mitkGrowCutTool.cpp
   Interactions/mitkOtsuTool3D.cpp
   Interactions/mitkPaintbrushTool.cpp
   Interactions/mitkRegionGrowingTool.cpp
@@ -83,6 +85,7 @@ set(RESOURCE_FILES
   LiveWire.svg
   LiveWire_Cursor.svg
   Lasso.svg
+  GrowCut.svg
   Lasso_Cursor.svg
   Otsu.svg
   Paint.svg

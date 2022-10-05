@@ -4,6 +4,7 @@ mitk_create_module(
   PACKAGE_DEPENDS
     PUBLIC ITK|QuadEdgeMesh+RegionGrowing
     PRIVATE ITK|LabelMap+MathematicalMorphology VTK|ImagingGeneral
+  TARGET_DEPENDS PRIVATE GrowCut
 )
 
 add_subdirectory(Testing)

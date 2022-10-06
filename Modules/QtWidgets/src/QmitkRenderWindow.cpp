@@ -41,6 +41,7 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const QString &name, mitk:
   , m_MenuWidget(nullptr)
   , m_MenuWidgetActivated(false)
   , m_LayoutIndex(QmitkRenderWindowMenu::LayoutIndex::AXIAL)
+  , m_GeometryViolationWarningOverlay(nullptr)
 {
   m_InternalRenderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
   m_InternalRenderWindow->SetMultiSamples(0);
@@ -54,6 +55,13 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const QString &name, mitk:
   setMouseTracking(true);
   QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   setSizePolicy(sizePolicy);
+
+  // setup overlay widget to show a warning message
+  m_GeometryViolationWarningOverlay = new QmitkSimpleTextOverlayWidget(this);
+  m_GeometryViolationWarningOverlay->setVisible(false);
+  m_GeometryViolationWarningOverlay->SetOverlayText(
+    QStringLiteral("<font class=\"warning\"><p style=\"text-align:center\">Interaction is not possible because the "
+                   "render window is not aligned.</p></center></font>"));
 }
 
 QmitkRenderWindow::~QmitkRenderWindow()
@@ -131,6 +139,11 @@ void QmitkRenderWindow::ActivateMenuWidget(bool state)
 
     m_MenuWidget->hide();
   }
+}
+
+void QmitkRenderWindow::ShowOverlayMessage(bool show)
+{
+  m_GeometryViolationWarningOverlay->setVisible(show);
 }
 
 void QmitkRenderWindow::moveEvent(QMoveEvent *event)

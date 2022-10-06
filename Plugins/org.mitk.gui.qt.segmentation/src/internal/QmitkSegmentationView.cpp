@@ -62,7 +62,6 @@ QmitkSegmentationView::QmitkSegmentationView()
   , m_ToolManager(nullptr)
   , m_ReferenceNode(nullptr)
   , m_WorkingNode(nullptr)
-  , m_RendererAnnotation(mitk::LogoAnnotation::New())
   , m_DrawOutline(true)
   , m_SelectionMode(false)
   , m_MouseCursorSet(false)
@@ -97,20 +96,6 @@ QmitkSegmentationView::QmitkSegmentationView()
   m_ReferencePredicate->AddPredicate(mitk::NodePredicateNot::New(m_SegmentationPredicate));
   m_ReferencePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
   m_ReferencePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
-
-  // setup annotation for an overlay image to indicated a blocked renderer
-  m_RendererAnnotation->SetOpacity(0.5);
-  m_RendererAnnotation->SetRelativeSize(0.25);
-  m_RendererAnnotation->SetCornerPosition(4);
-
-  QImage* qimage = new QImage(qPrintable(":/Qmitk/Cancel_48x48.png"));
-  vtkSmartPointer<vtkQImageToImageSource> qImageToVtk;
-  qImageToVtk = vtkSmartPointer<vtkQImageToImageSource>::New();
-
-  qImageToVtk->SetQImage(qimage);
-  qImageToVtk->Update();
-  vtkSmartPointer<vtkImageData> vtkLogo = qImageToVtk->GetOutput();
-  m_RendererAnnotation->SetLogoImage(vtkLogo);
 
   m_SegmentationInteractor = mitk::SegmentationInteractor::New();
   // add observer for the 'SegmentationInteractionEvent'
@@ -662,7 +647,7 @@ void QmitkSegmentationView::ValidateRendererGeometry(const itk::EventObject& eve
           {
             MITK_ERROR << "Unable to validate renderer geometry\n"
                        << "Reason: " << e.GetDescription();
-            this->BlockRenderer(sendingRenderer, true);
+            this->ShowRenderWindowWarning(sendingRenderer, true);
             this->UpdateWarningLabel(
               tr("Unable to validate renderer geometry. Please see log!"));
             return;
@@ -670,7 +655,7 @@ void QmitkSegmentationView::ValidateRendererGeometry(const itk::EventObject& eve
 
           if (!isGeometryAligned)
           {
-            this->BlockRenderer(sendingRenderer, true);
+            this->ShowRenderWindowWarning(sendingRenderer, true);
             this->UpdateWarningLabel(
               tr("Please perform a reinit on the segmentation image inside the entered Render Window!"));
             return;
@@ -680,22 +665,15 @@ void QmitkSegmentationView::ValidateRendererGeometry(const itk::EventObject& eve
     }
   }
 
-  this->BlockRenderer(sendingRenderer, false);
+  this->ShowRenderWindowWarning(sendingRenderer, false);
   this->UpdateWarningLabel(tr(""));
 }
 
-void QmitkSegmentationView::BlockRenderer(mitk::BaseRenderer* baseRenderer, bool blocked)
+void QmitkSegmentationView::ShowRenderWindowWarning(mitk::BaseRenderer* baseRenderer, bool show)
 {
-  if (blocked)
-  {
-    mitk::ManualPlacementAnnotationRenderer::AddAnnotation(m_RendererAnnotation.GetPointer(), baseRenderer);
-    m_RendererAnnotation->Update(baseRenderer);
-    baseRenderer->RequestUpdate();
-  }
-  else
-  {
-    m_RendererAnnotation->RemoveFromBaseRenderer(baseRenderer);
-  }
+  const auto* rendererName = baseRenderer->GetName();
+  auto* renderWindow = m_RenderWindowPart->GetQmitkRenderWindow(rendererName);
+  renderWindow->ShowOverlayMessage(show);
 }
 
 void QmitkSegmentationView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)

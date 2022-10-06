@@ -652,8 +652,21 @@ void QmitkSegmentationView::ValidateRendererGeometry(const itk::EventObject& eve
         const mitk::TimeGeometry* workingImageGeometry = workingImage->GetTimeGeometry();
         if (nullptr != workingImageGeometry)
         {
-          bool isGeometryAligned =
-            mitk::BaseRendererHelper::IsRendererAlignedWithSegmentation(sendingRenderer, workingImageGeometry);
+          bool isGeometryAligned = false;
+          try
+          {
+            isGeometryAligned =
+              mitk::BaseRendererHelper::IsRendererAlignedWithSegmentation(sendingRenderer, workingImageGeometry);
+          }
+          catch (const mitk::Exception& e)
+          {
+            MITK_ERROR << "Unable to validate renderer geometry\n"
+                       << "Reason: " << e.GetDescription();
+            this->BlockRenderer(sendingRenderer, true);
+            this->UpdateWarningLabel(
+              tr("Unable to validate renderer geometry. Please see log!"));
+            return;
+          }
 
           if (!isGeometryAligned)
           {

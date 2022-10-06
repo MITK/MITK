@@ -62,6 +62,10 @@ public:
   /**
   * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart
   */
+  virtual void SetReferenceGeometry(const mitk::TimeGeometry* referenceGeometry, bool resetCamera) override;
+  /**
+  * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart
+  */
   virtual mitk::Point3D GetSelectedPosition(const QString& id = QString()) const override;
   /**
   * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart

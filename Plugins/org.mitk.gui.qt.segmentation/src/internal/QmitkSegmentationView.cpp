@@ -275,7 +275,12 @@ void QmitkSegmentationView::OnAnySelectionChanged()
 
   // Reset camera if any selection changed but only if both reference node and working node are set
   if ((referenceNodeChanged || workingNodeChanged) && (m_ReferenceNode.IsNotNull() && m_WorkingNode.IsNotNull()))
-    this->InitializeRenderWindows(m_ReferenceNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, false);
+  {
+    if (nullptr != m_RenderWindowPart)
+    {
+      m_RenderWindowPart->SetReferenceGeometry(m_ReferenceNode->GetData()->GetTimeGeometry(), false);
+    }
+  }
 
   this->UpdateGUI();
 }

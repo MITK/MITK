@@ -117,6 +117,17 @@ struct MITK_GUI_COMMON_PLUGIN IRenderWindowPart {
    */
   virtual void ForceImmediateUpdate(mitk::RenderingManager::RequestType requestType = mitk::RenderingManager::REQUEST_UPDATE_ALL) = 0;
 
+   /**
+   * @brief Set the reference geometry for interaction inside the render windows of the render window part.
+   *
+   * @param referenceGeometry   The reference geometry which is used for updating the
+   *                            time geometry inside the render windows.
+   * @param resetCamera         If true, the camera and crosshair will be reset to the default view (centered, no zoom).
+   *                            If false, the current crosshair position and the camera zoom will be stored and reset
+   *                            after the reference geometry has been updated.
+   */
+  virtual void SetReferenceGeometry(const mitk::TimeGeometry* referenceGeometry, bool resetCamera) = 0;
+
   /**
    * Get the SliceNavigationController for controlling time positions.
    *
@@ -148,7 +159,8 @@ struct MITK_GUI_COMMON_PLUGIN IRenderWindowPart {
    * or in the active render window if <code>id</code> is an empty string.
    *
    * \param id The render window id.
-   * \return The currently selected position in world coordinates.*/
+   * \return The currently selected position in world coordinates.
+   */
   virtual TimePointType GetSelectedTimePoint(const QString& id = QString()) const = 0;
 
   /**

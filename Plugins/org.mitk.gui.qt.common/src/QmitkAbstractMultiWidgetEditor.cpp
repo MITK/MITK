@@ -98,6 +98,17 @@ QmitkRenderWindow* QmitkAbstractMultiWidgetEditor::GetQmitkRenderWindow(const mi
   return multiWidget->GetRenderWindow(viewDirection);
 }
 
+void QmitkAbstractMultiWidgetEditor::SetReferenceGeometry(const mitk::TimeGeometry* referenceGeometry, bool resetCamera)
+{
+  const auto& multiWidget = GetMultiWidget();
+  if (nullptr == multiWidget)
+  {
+    return;
+  }
+
+  multiWidget->SetReferenceGeometry(referenceGeometry, resetCamera);
+}
+
 mitk::Point3D QmitkAbstractMultiWidgetEditor::GetSelectedPosition(const QString& id/* = QString()*/) const
 {
   const auto& multiWidget = GetMultiWidget();

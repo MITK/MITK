@@ -142,6 +142,34 @@ QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow(const mitk::BaseRenderer
   return GetRenderWindow(static_cast<unsigned int>(viewDirection));
 }
 
+void QmitkStdMultiWidget::SetReferenceGeometry(const mitk::TimeGeometry* referenceGeometry, bool resetCamera)
+{
+  auto* renderingManager = mitk::RenderingManager::GetInstance();
+  mitk::Point3D currentPosition = mitk::Point3D();
+  unsigned int imageTimeStep = 0;
+  if (!resetCamera)
+  {
+    // store the current position to set it again later, if the camera should not be reset
+    currentPosition = this->GetSelectedPosition("");
+
+    // store the current time step to set it again later, if the camera should not be reset
+    const auto currentTimePoint = renderingManager->GetTimeNavigationController()->GetSelectedTimePoint();
+    if (referenceGeometry->IsValidTimePoint(currentTimePoint))
+    {
+      imageTimeStep = referenceGeometry->TimePointToTimeStep(currentTimePoint);
+    }
+  }
+
+  // initialize render windows
+  renderingManager->InitializeViews(referenceGeometry, mitk::RenderingManager::REQUEST_UPDATE_ALL, resetCamera);
+
+  if (!resetCamera)
+  {
+    this->SetSelectedPosition(currentPosition, "");
+    renderingManager->GetTimeNavigationController()->GetTime()->SetPos(imageTimeStep);
+  }
+}
+
 void QmitkStdMultiWidget::SetSelectedPosition(const mitk::Point3D& newPosition, const QString& /*widgetName*/)
 {
   GetRenderWindow1()->GetSliceNavigationController()->SelectSliceByPoint(newPosition);

@@ -652,8 +652,21 @@ void QmitkSegmentationView::ValidateRendererGeometry(const itk::EventObject& eve
         const mitk::TimeGeometry* workingImageGeometry = workingImage->GetTimeGeometry();
         if (nullptr != workingImageGeometry)
         {
-          bool isGeometryAligned =
-            mitk::BaseRendererHelper::IsRendererAlignedWithSegmentation(sendingRenderer, workingImageGeometry);
+          bool isGeometryAligned = false;
+          try
+          {
+            isGeometryAligned =
+              mitk::BaseRendererHelper::IsRendererAlignedWithSegmentation(sendingRenderer, workingImageGeometry);
+          }
+          catch (const mitk::Exception& e)
+          {
+            MITK_ERROR << "Unable to validate renderer geometry\n"
+                       << "Reason: " << e.GetDescription();
+            this->BlockRenderer(sendingRenderer, true);
+            this->UpdateWarningLabel(
+              tr("Unable to validate renderer geometry. Please see log!"));
+            return;
+          }
 
           if (!isGeometryAligned)
           {
@@ -1066,47 +1079,29 @@ void QmitkSegmentationView::ValidateSelectionInput()
     return;
   }
 
-  /*
-  * Here we check whether the geometry of the selected segmentation image is aligned with the worldgeometry.
-  * At the moment it is not supported to use a geometry different from the selected image for reslicing.
-  * For further information see Bug 16063
-  */
-  const mitk::BaseGeometry* workingNodeGeo = workingNode->GetData()->GetGeometry();
-  const mitk::BaseGeometry* worldGeo =
-    renderWindowPart->GetQmitkRenderWindow("3d")->GetSliceNavigationController()->GetCurrentGeometry3D();
-  if (nullptr != workingNodeGeo && nullptr != worldGeo)
-  {
-    if (/*mitk::Equal(*workingNodeGeo->GetBoundingBox(), *worldGeo->GetBoundingBox(), mitk::eps, true)*/true)
-    {
-      m_ToolManager->SetReferenceData(referenceNode);
-      m_ToolManager->SetWorkingData(workingNode);
-      m_Controls->layersWidget->setEnabled(true);
-      m_Controls->labelsWidget->setEnabled(true);
-      m_Controls->labelSetWidget->setEnabled(true);
-      m_Controls->toolSelectionBox2D->setEnabled(true);
-      m_Controls->toolSelectionBox3D->setEnabled(true);
+  m_ToolManager->SetReferenceData(referenceNode);
+  m_ToolManager->SetWorkingData(workingNode);
+  m_Controls->layersWidget->setEnabled(true);
+  m_Controls->labelsWidget->setEnabled(true);
+  m_Controls->labelSetWidget->setEnabled(true);
+  m_Controls->toolSelectionBox2D->setEnabled(true);
+  m_Controls->toolSelectionBox3D->setEnabled(true);
 
-      auto labelSetImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
-      if (nullptr != labelSetImage)
-      {
-        int numberOfLabels = labelSetImage->GetNumberOfLabels(labelSetImage->GetActiveLayer());
-        if (2 == numberOfLabels) // fix for T27319: exterior is label 0, first label is label 1
-        {
-          m_Controls->slicesInterpolator->setEnabled(true);
-        }
-        else
-        {
-          m_Controls->interpolatorWarningLabel->show();
-          m_Controls->interpolatorWarningLabel->setText("<font color=\"red\">Interpolation only works for single label segmentations.</font>");
-        }
-      }
-      return;
+  auto labelSetImage = dynamic_cast<mitk::LabelSetImage *>(workingNode->GetData());
+  if (nullptr != labelSetImage)
+  {
+    int numberOfLabels = labelSetImage->GetNumberOfLabels(labelSetImage->GetActiveLayer());
+    if (2 == numberOfLabels) // fix for T27319: exterior is label 0, first label is label 1
+    {
+      m_Controls->slicesInterpolator->setEnabled(true);
+    }
+    else
+    {
+      m_Controls->interpolatorWarningLabel->show();
+      m_Controls->interpolatorWarningLabel->setText(
+        "<font color=\"red\">Interpolation only works for single label segmentations.</font>");
     }
   }
-
-  m_ToolManager->SetReferenceData(referenceNode);
-  m_ToolManager->SetWorkingData(nullptr);
-  this->UpdateWarningLabel(tr("Please perform a reinit on the segmentation image!"));
 }
 
 void QmitkSegmentationView::UpdateWarningLabel(QString text)

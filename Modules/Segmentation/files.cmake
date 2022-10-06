@@ -108,6 +108,8 @@ set(RESOURCE_FILES
   Interactions/PressMoveReleaseAndPointSetting.xml
   Interactions/PressMoveReleaseWithCTRLInversion.xml
   Interactions/PressMoveReleaseWithCTRLInversionAllMouseMoves.xml
+  Interactions/SegmentationConfig.xml
+  Interactions/SegmentationInteraction.xml
   Interactions/SegmentationToolsConfig.xml
 
   Interactions/ContourModelModificationConfig.xml

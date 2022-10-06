@@ -30,12 +30,15 @@ namespace mitk
   class MITKSEGMENTATION_EXPORT SegmentationInteractor : public DisplayActionEventBroadcast
   {
   public:
+
     mitkClassMacro(SegmentationInteractor, DisplayActionEventBroadcast);
     itkNewMacro(Self);
 
   protected:
-    SegmentationInteractor(){};
-    ~SegmentationInteractor() override{};
+
+    SegmentationInteractor();
+    ~SegmentationInteractor() override;
+
     /**
      * Derived function.
      * Connects the action names used in the state machine pattern with functions implemented within
@@ -43,10 +46,15 @@ namespace mitk
      */
     void ConnectActionsAndFunctions() override;
 
+  private:
     /**
-    * Changes the active label.
+    * @brief Reference to the service registration of the observer.
+    *   This is needed to unregister the observer on unload.
     */
-    void ChangeActiveLabel(StateMachineAction*, InteractionEvent*);
+    us::ServiceRegistration<InteractionEventObserver> m_ServiceRegistration;
+
+    void OnEnterRenderWindow(StateMachineAction*, InteractionEvent* interactionEvent);
+    void OnLeaveRenderWindow(StateMachineAction*, InteractionEvent* interactionEvent);
   };
 }
 #endif

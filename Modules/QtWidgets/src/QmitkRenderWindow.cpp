@@ -212,16 +212,19 @@ bool QmitkRenderWindow::event(QEvent* e)
 
 void QmitkRenderWindow::enterEvent(QEvent *e)
 {
-  // TODO implement new event
-  QVTKOpenGLNativeWidget::enterEvent(e);
+  mitk::InternalEvent::Pointer internalEvent = mitk::InternalEvent::New(m_Renderer, nullptr, "EnterRenderWindow");
+
+  this->HandleEvent(internalEvent.GetPointer());
 
   if (nullptr != m_MenuWidget)
     m_MenuWidget->ShowMenu();
+
+  QVTKOpenGLNativeWidget::enterEvent(e);
 }
 
 void QmitkRenderWindow::leaveEvent(QEvent *e)
 {
-  mitk::InternalEvent::Pointer internalEvent = mitk::InternalEvent::New(this->m_Renderer, nullptr, "LeaveRenderWindow");
+  mitk::InternalEvent::Pointer internalEvent = mitk::InternalEvent::New(m_Renderer, nullptr, "LeaveRenderWindow");
 
   this->HandleEvent(internalEvent.GetPointer());
 

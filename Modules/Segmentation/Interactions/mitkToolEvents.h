@@ -149,7 +149,7 @@ class MyTool : public Tool
     bool CheckEvent(const ::itk::EventObject *e) const override { return dynamic_cast<const Self *>(e); }
     ::itk::EventObject *MakeObject() const override { return new Self(m_Parameter1, m_Parameter2); }
     const T GetParameter1() const { return m_Parameter1; }
-    const T GetParameter2() const { return m_Parameter2; }
+    const U GetParameter2() const { return m_Parameter2; }
   protected:
     const T m_Parameter1;
     const U m_Parameter2;

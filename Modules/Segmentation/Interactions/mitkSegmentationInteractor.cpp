@@ -11,53 +11,68 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkSegmentationInteractor.h"
+
 #include "mitkInteractionPositionEvent.h"
-#include "mitkLabelSetImage.h"
-#include "mitkToolManager.h"
-#include "mitkToolManagerProvider.h"
-#include <mitkImagePixelReadAccessor.h>
+#include <mitkInternalEvent.h>
+#include <mitkSegmentationInteractionEvents.h>
+
+// us
+#include "usGetModuleContext.h"
+#include "usModuleContext.h"
 
 #include <cstring>
+
+mitk::SegmentationInteractor::SegmentationInteractor()
+{
+  // register the class (itself) as an interaction event observer via micro services
+  us::ServiceProperties props;
+  props["name"] = std::string("SegmentationInteractor");
+  m_ServiceRegistration = us::GetModuleContext()->RegisterService<InteractionEventObserver>(this, props);
+
+  auto contextModule = us::GetModuleContext()->GetModule();
+
+  this->LoadStateMachine("SegmentationInteraction.xml", contextModule);
+  this->SetEventConfig("SegmentationConfig.xml", contextModule);
+}
+
+mitk::SegmentationInteractor::~SegmentationInteractor()
+{
+  m_ServiceRegistration.Unregister();
+}
 
 void mitk::SegmentationInteractor::ConnectActionsAndFunctions()
 {
   Superclass::ConnectActionsAndFunctions();
 
   // CONNECT_FUNCTION("change_active_label", ChangeActiveLabel);
+  CONNECT_FUNCTION("EnterRenderWindow", OnEnterRenderWindow);
+  CONNECT_FUNCTION("LeaveRenderWindow", OnLeaveRenderWindow);
 }
 
-void mitk::SegmentationInteractor::ChangeActiveLabel(StateMachineAction*, InteractionEvent* interactionEvent)
+void mitk::SegmentationInteractor::OnEnterRenderWindow(StateMachineAction*, InteractionEvent* interactionEvent)
 {
-  BaseRenderer::Pointer sender = interactionEvent->GetSender();
-  auto positionEvent = static_cast<InteractionPositionEvent*>(interactionEvent);
-
-  auto toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
-
-  assert(toolManager);
-
-  DataNode *workingNode(toolManager->GetWorkingData(0));
-  if (workingNode && positionEvent)
+  if (this->IsEnabled())
   {
-    //TODO T28561
-    //Code uses a deprecated method. deactivated whole code until the refactorization is done.
-    throw "TODO T28561. Was forgot to refactor in context of T28524. The new MultiLabelSegmentation class will have a dedicated function for querying the label of world position.";
+    auto* internalEvent = dynamic_cast<InternalEvent*>(interactionEvent);
+    if (nullptr == internalEvent)
+    {
+      return;
+    }
 
-    //auto *workingImage = dynamic_cast<mitk::LabelSetImage *>(workingNode->GetData());
-    //assert(workingImage);
-
-    //const auto timestep = positionEvent->GetSender()->GetTimeStep(workingImage);
-
-   //int pixelValue = static_cast<int>(workingImage->GetPixelValueByWorldCoordinate(positionEvent->GetPositionInWorld(), timestep));
-    //workingImage->GetActiveLabelSet()->SetActiveLabel(pixelValue); // can be the background
-
-    // // Call Events
-    // // workingImage->ActiveLabelEvent.Send(pixelValue);
-
-    // // MLI TODO
-    // // toolManager->WorkingDataModified.Send();
-
-    //TODO END Refactor with T28524
+    this->InvokeEvent(SegmentationInteractionEvent(interactionEvent, true));
   }
+}
 
-  RenderingManager::GetInstance()->RequestUpdateAll();
+void mitk::SegmentationInteractor::OnLeaveRenderWindow(StateMachineAction*, InteractionEvent* interactionEvent)
+{
+  if (this->IsEnabled())
+  {
+    auto* internalEvent = dynamic_cast<InternalEvent*>(interactionEvent);
+    if (nullptr == internalEvent)
+    {
+      return;
+    }
+
+    this->InvokeEvent(SegmentationInteractionEvent(interactionEvent, false));
+  }
 }

@@ -330,7 +330,7 @@ void QmitkMxNMultiWidget::CreateRenderWindowWidget()
 {
   // create the render window widget and connect signal / slot
   QString renderWindowWidgetName = GetNameFromIndex(GetNumberOfRenderWindowWidgets());
-  RenderWindowWidgetPointer renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage());
+  RenderWindowWidgetPointer renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage(), true);
   renderWindowWidget->SetCornerAnnotationText(renderWindowWidgetName.toStdString());
   AddRenderWindowWidget(renderWindowWidgetName, renderWindowWidget);
 

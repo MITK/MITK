@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define QMITKDATASTORAGERENDERWINDOWTREEMODEL_H
 
 // render window manager UI model
-#include "MitkRenderWindowManagerUIExports.h"
+#include "MitkQtWidgetsExports.h"
 
 // render window manager module
 #include "mitkRenderWindowLayerController.h"
@@ -30,7 +30,7 @@ found in the LICENSE file.
 /*
 * @brief The 'QmitkRenderWindowDataStorageTreeModel' is a tree model derived from the 'QmitkAbstractDataStorageModel'.
 */
-class MITKRENDERWINDOWMANAGERUI_EXPORT QmitkRenderWindowDataStorageTreeModel : public QmitkAbstractDataStorageModel
+class MITKQTWIDGETS_EXPORT QmitkRenderWindowDataStorageTreeModel : public QmitkAbstractDataStorageModel
 {
   Q_OBJECT
 

@@ -3,5 +3,5 @@ project(org_mitk_gui_qt_renderwindowmanager)
 mitk_create_plugin(
   EXPORT_DIRECTIVE RENDERWINDOWMANAGER_EXPORT
   EXPORTED_INCLUDE_SUFFIXES src
-  MODULE_DEPENDS MitkQtWidgetsExt MitkRenderWindowManager MitkRenderWindowManagerUI
+  MODULE_DEPENDS MitkQtWidgetsExt MitkQtWidgets MitkRenderWindowManagerUI
 )

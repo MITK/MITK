@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include "QmitkRenderWindow.h"
 #include "mitkDataStorage.h"
 #include "mitkSliceNavigationController.h"
+#include "QmitkSliderNavigatorWidget.h"
 #include "mitkSlicedGeometry3D.h"
 #include "mitkStandaloneDataStorage.h"
 #include <QWidget>

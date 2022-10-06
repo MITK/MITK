@@ -13,11 +13,11 @@ found in the LICENSE file.
 #ifndef QMITKSTEPPERADAPTER_H_HEADER_INCLUDED_C1E77191
 #define QMITKSTEPPERADAPTER_H_HEADER_INCLUDED_C1E77191
 
-#include "MitkQtWidgetsExtExports.h"
 #include "itkCommand.h"
 #include "itkObject.h"
 #include "mitkStepper.h"
 #include "qobject.h"
+#include "MitkQtWidgetsExports.h"
 
 //##Documentation
 //## @brief Helper class to connect Qt-based navigators to instances of Stepper
@@ -31,7 +31,7 @@ found in the LICENSE file.
 //## \warning The \a Navigator has to be aware that it might have caused the changes
 //## of the \a Stepper itself. So take care that no infinite recursion is created!
 //## @ingroup NavigationControl
-class MITKQTWIDGETSEXT_EXPORT QmitkStepperAdapter : public QObject
+class MITKQTWIDGETS_EXPORT QmitkStepperAdapter : public QObject
 {
   Q_OBJECT
 public:
@@ -44,7 +44,7 @@ public:
     this->Refetch();
   }
 
-  class MITKQTWIDGETSEXT_EXPORT ItkEventListener : public itk::Command
+  class ItkEventListener : public itk::Command
   {
   public:
     mitkClassMacroItkParent(ItkEventListener, itk::Command);

@@ -32,9 +32,7 @@ set(CPP_FILES
   QmitkPrimitiveMovieNavigatorWidget.cpp
   QmitkPropertyViewFactory.cpp
   QmitkSliceWidget.cpp
-  QmitkSliderNavigatorWidget.cpp
   QmitkStandardViews.cpp
-  QmitkStepperAdapter.cpp
   QmitkStringPropertyEditor.cpp
   QmitkStringPropertyOnDemandEdit.cpp
   QmitkStringPropertyView.cpp
@@ -73,9 +71,7 @@ set(MOC_H_FILES
   include/QmitkPointListWidget.h
   include/QmitkPrimitiveMovieNavigatorWidget.h
   include/QmitkSliceWidget.h
-  include/QmitkSliderNavigatorWidget.h
   include/QmitkStandardViews.h
-  include/QmitkStepperAdapter.h
   include/QmitkStringPropertyEditor.h
   include/QmitkStringPropertyOnDemandEdit.h
   include/QmitkStringPropertyView.h
@@ -91,7 +87,6 @@ set(UI_FILES
   src/QmitkGnuplotWidget.ui
   src/QmitkPrimitiveMovieNavigatorWidget.ui
   src/QmitkSliceWidget.ui
-  src/QmitkSliderNavigator.ui
   src/QmitkTransferFunctionGeneratorWidget.ui
   src/QmitkTransferFunctionWidget.ui
 )

@@ -13,15 +13,15 @@ found in the LICENSE file.
 #ifndef QMITKSLIDERNAVIGATORWIDGET_H_
 #define QMITKSLIDERNAVIGATORWIDGET_H_
 
-#include "MitkQtWidgetsExtExports.h"
 #include "ui_QmitkSliderNavigator.h"
+#include "MitkQtWidgetsExports.h"
 
 #include <mitkStepper.h>
 
 #include <QString>
 #include <QWidget>
 
-class MITKQTWIDGETSEXT_EXPORT QmitkSliderNavigatorWidget : public QWidget, public Ui::QmitkSliderNavigator
+class MITKQTWIDGETS_EXPORT QmitkSliderNavigatorWidget : public QWidget, public Ui::QmitkSliderNavigator
 {
   Q_OBJECT
 

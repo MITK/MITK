@@ -529,8 +529,9 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_ToolManager->ActiveToolChanged +=
      mitk::MessageDelegate<QmitkSegmentationView>(this, &QmitkSegmentationView::ActiveToolChanged);
 
-   QString segTools2D = tr("Add Subtract Lasso Fill Erase Paint Wipe 'Region Growing' 'Live Wire'");
-   QString segTools3D = tr("Threshold 'UL Threshold' Otsu 'Region Growing 3D' Picking");
+   QString segTools2D = tr("Add Subtract Lasso Fill Erase Close Paint Wipe 'Region Growing' 'Live Wire'");
+   QString segTools3D = tr("Threshold 'UL Threshold' Otsu 'Region Growing 3D' Picking GrowCut");
+
 #ifdef __linux__
    segTools3D.append(" nnUNet"); // plugin not enabled for MacOS / Windows
 #endif

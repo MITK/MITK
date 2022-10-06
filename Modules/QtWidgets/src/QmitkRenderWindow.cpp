@@ -19,6 +19,8 @@ found in the LICENSE file.
 #include "mitkMousePressEvent.h"
 #include "mitkMouseReleaseEvent.h"
 #include "mitkMouseWheelEvent.h"
+#include <mitkStatusBar.h>
+
 #include <QCursor>
 #include <QDragEnterEvent>
 #include <QDropEvent>
@@ -151,12 +153,16 @@ void QmitkRenderWindow::showEvent(QShowEvent *event)
 bool QmitkRenderWindow::event(QEvent* e)
 {
   mitk::InteractionEvent::Pointer mitkEvent = nullptr;
+  mitk::Point2D mousePosition;
+  bool updateStatusBar = false;
   switch (e->type())
   {
     case QEvent::MouseMove:
     {
       auto me = static_cast<QMouseEvent *>(e);
-      mitkEvent = mitk::MouseMoveEvent::New(m_Renderer, GetMousePosition(me), GetButtonState(me), GetModifiers(me));
+      mousePosition = this->GetMousePosition(me);
+      mitkEvent = mitk::MouseMoveEvent::New(m_Renderer, mousePosition, GetButtonState(me), GetModifiers(me));
+      updateStatusBar = true;
       break;
     }
     case QEvent::MouseButtonPress:
@@ -180,7 +186,9 @@ bool QmitkRenderWindow::event(QEvent* e)
     case QEvent::Wheel:
     {
       auto we = static_cast<QWheelEvent *>(e);
-      mitkEvent = mitk::MouseWheelEvent::New( m_Renderer, GetMousePosition(we), GetButtonState(we), GetModifiers(we), GetDelta(we));
+      mousePosition = this->GetMousePosition(we);
+      mitkEvent = mitk::MouseWheelEvent::New(m_Renderer, mousePosition, GetButtonState(we), GetModifiers(we), GetDelta(we));
+      updateStatusBar = true;
       break;
     }
     case QEvent::KeyPress:
@@ -207,6 +215,11 @@ bool QmitkRenderWindow::event(QEvent* e)
     }
   }
 
+  if (updateStatusBar)
+  {
+    this->UpdateStatusBar(mousePosition);
+  }
+
   return QVTKOpenGLNativeWidget::event(e);
 }
 
@@ -224,6 +237,9 @@ void QmitkRenderWindow::enterEvent(QEvent *e)
 
 void QmitkRenderWindow::leaveEvent(QEvent *e)
 {
+  auto statusBar = mitk::StatusBar::GetInstance();
+  statusBar->DisplayGreyValueText("");
+
   mitk::InternalEvent::Pointer internalEvent = mitk::InternalEvent::New(m_Renderer, nullptr, "LeaveRenderWindow");
 
   this->HandleEvent(internalEvent.GetPointer());
@@ -464,4 +480,13 @@ std::string QmitkRenderWindow::GetKeyLetter(QKeyEvent *ke) const
 int QmitkRenderWindow::GetDelta(QWheelEvent *we) const
 {
   return we->delta();
+}
+
+void QmitkRenderWindow::UpdateStatusBar(mitk::Point2D pointerPositionOnScreen)
+{
+  mitk::Point3D worldPosition;
+  m_Renderer->ForceImmediateUpdate();
+  m_Renderer->DisplayToWorld(pointerPositionOnScreen, worldPosition);
+  auto statusBar = mitk::StatusBar::GetInstance();
+  statusBar->DisplayRendererInfo(worldPosition, m_Renderer->GetTime());
 }

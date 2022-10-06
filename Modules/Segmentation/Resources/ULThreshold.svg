@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   sodipodi:docname="ULThreshold.svg"
+   inkscape:version="1.0 (4035a4fb49, 2020-05-01)"
+   id="svg1138"
+   version="1.1"
+   viewBox="0 0 12.7 12.7"
+   height="48"
+   width="48">
+  <defs
+     id="defs1132">
+    <linearGradient
+       id="linearGradient5112">
+      <stop
+         id="stop5114"
+         offset="0"
+         style="stop-color:#00adff;stop-opacity:1;" />
+      <stop
+         id="stop5116"
+         offset="1"
+         style="stop-color:#bfebff;stop-opacity:1;" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient5120">
+      <stop
+         id="stop5122"
+         offset="0"
+         style="stop-color:#00a6f4;stop-opacity:1;" />
+      <stop
+         id="stop5124"
+         offset="1"
+         style="stop-color:#00618e;stop-opacity:1;" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4826">
+      <stop
+         id="stop4828"
+         offset="0"
+         style="stop-color:#f0a0a0;stop-opacity:1;" />
+      <stop
+         id="stop4830"
+         offset="1"
+         style="stop-color:#c86464;stop-opacity:0;" />
+    </linearGradient>
+  </defs>
+  <sodipodi:namedview
+     inkscape:window-maximized="0"
+     inkscape:window-y="114"
+     inkscape:window-x="642"
+     inkscape:window-height="1198"
+     inkscape:window-width="1274"
+     inkscape:showpageshadow="false"
+     units="px"
+     showgrid="true"
+     inkscape:document-rotation="0"
+     inkscape:current-layer="g4941"
+     inkscape:document-units="px"
+     inkscape:cy="21.839433"
+     inkscape:cx="25.80159"
+     inkscape:zoom="11.2"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="1"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#2d2d30"
+     id="base">
+    <inkscape:grid
+       empopacity="0.25098039"
+       empcolor="#9f9f9f"
+       opacity="0.1254902"
+       color="#9f9f9f"
+       empspacing="4"
+       snapvisiblegridlinesonly="true"
+       dotted="false"
+       id="grid1701"
+       type="xygrid" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata1135">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="Layer 2">
+    <g
+       style="display:inline"
+       inkscape:export-ydpi="198.05157"
+       inkscape:export-xdpi="198.05157"
+       inkscape:export-filename="C:\Users\Stefan\Desktop\wipe48x48.png"
+       transform="matrix(0.55797517,0,0,0.55797517,-24.077083,-240.84825)"
+       id="g4941">
+      <g
+         transform="matrix(1.090625,0,0,1.090625,69.747729,-664.72247)"
+         id="g4039">
+        <path
+           inkscape:connector-curvature="0"
+           style="fill:#808080;fill-opacity:1;stroke:none"
+           d="m -6.7645731,1025.6384 h 2.8125 v -2.1562 c -0.313812,-1.8239 -1.082283,-3.7544 -2.8125,-3.6876 z"
+           id="path3954"
+           inkscape:export-filename="D:\MITK\Modules\Segmentation\resources\TwoThresholds_48x48.png"
+           inkscape:export-xdpi="216"
+           inkscape:export-ydpi="216" />
+        <path
+           inkscape:connector-curvature="0"
+           style="fill:#808080;fill-opacity:1;stroke:none"
+           d="m -18.202073,1011.6384 c -0.07469,-0.011 -0.150669,-0.042 -0.21875,-0.031 -1.597279,0.2542 -1.46135,6.3487 -3.28125,9.7812 -0.652424,1.2305 -1.528719,2.3588 -2.25,3.2188 v 1.0312 h 5.75 v -14 z"
+           id="path3952"
+           inkscape:export-filename="D:\MITK\Modules\Segmentation\resources\TwoThresholds_48x48.png"
+           inkscape:export-xdpi="216"
+           inkscape:export-ydpi="216" />
+        <path
+           inkscape:connector-curvature="0"
+           style="fill:#f0a0a0;fill-opacity:1;stroke:none"
+           d="m -18.202073,1011.6384 v 14 h 11.4374999 v -5.8438 c -0.15333,0.01 -0.267914,-0.072 -0.4375,-0.031 -1.859893,0.4439 -0.963423,3.329 -2.8749999,3.375 -1.704012,0.041 -1.171554,-5.6978 -2.5,-5.25 -1.625796,0.548 -0.880393,2.9082 -2,3.625 -0.779327,0.4989 -1.00982,-9.1167 -3.5,-9.875 -0.04436,-0.014 -0.08287,0.01 -0.125,0 z"
+           id="rect3106-1-7"
+           inkscape:export-filename="D:\MITK\Modules\Segmentation\resources\TwoThresholds_48x48.png"
+           inkscape:export-xdpi="216"
+           inkscape:export-ydpi="216" />
+        <path
+           style="fill:#f0a0a0;fill-opacity:1;stroke:#00adff;stroke-width:1.0027;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="m -18.263221,1006.2664 v 18.8596"
+           id="path3881-0"
+           inkscape:connector-curvature="0"
+           inkscape:export-filename="D:\MITK\Modules\Segmentation\resources\TwoThresholds_48x48.png"
+           inkscape:export-xdpi="216"
+           inkscape:export-ydpi="216" />
+        <path
+           style="fill:#f0a0a0;fill-opacity:1;stroke:#00adff;stroke-width:1.0027;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="m -6.8909251,1006.2664 v 18.8596"
+           id="path3881-0-4"
+           inkscape:connector-curvature="0"
+           inkscape:export-filename="D:\MITK\Modules\Segmentation\resources\TwoThresholds_48x48.png"
+           inkscape:export-xdpi="216"
+           inkscape:export-ydpi="216" />
+      </g>
+    </g>
+  </g>
+</svg>

@@ -1075,6 +1075,15 @@ void TransferLabelContentHelper(const itk::Image<mitk::Label::PixelType, VImageD
   typename ContentImageType::Pointer itkDestinationImage;
   mitk::CastToItkImage(destinationImage, itkDestinationImage);
 
+  auto sourceRegion = itkSourceImage->GetLargestPossibleRegion();
+  auto relevantRegion = itkDestinationImage->GetLargestPossibleRegion();
+  bool overlapping = relevantRegion.Crop(sourceRegion);
+
+  if (!overlapping)
+  {
+    mitkThrow() << "Invalid call of TransferLabelContent; sourceImage and destinationImage seem to have no overlapping image region.";
+  }
+
   typedef LabelTransferFunctor <mitk::Label::PixelType, mitk::Label::PixelType, mitk::Label::PixelType> LabelTransferFunctorType;
   typedef itk::BinaryFunctorImageFilter<ContentImageType, ContentImageType, ContentImageType, LabelTransferFunctorType> FilterType;
 
@@ -1087,6 +1096,7 @@ void TransferLabelContentHelper(const itk::Image<mitk::Label::PixelType, VImageD
   transferFilter->InPlaceOn();
   transferFilter->SetInput1(itkDestinationImage);
   transferFilter->SetInput2(itkSourceImage);
+  transferFilter->GetOutput()->SetRequestedRegion(relevantRegion);
 
   transferFilter->Update();
 }

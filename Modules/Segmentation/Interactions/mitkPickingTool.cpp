@@ -26,7 +26,6 @@ found in the LICENSE file.
 #include "mitkImageAccessByItk.h"
 #include "mitkImageCast.h"
 #include "mitkImageTimeSelector.h"
-#include "mitkImageTimeSelector.h"
 
 #include <itkImage.h>
 #include <itkConnectedThresholdImageFilter.h>
@@ -73,7 +72,7 @@ const char *mitk::PickingTool::GetName() const
 us::ModuleResource mitk::PickingTool::GetIconResource() const
 {
   us::Module *module = us::GetModuleContext()->GetModule();
-  us::ModuleResource resource = module->GetResource("Pick_48x48.png");
+  us::ModuleResource resource = module->GetResource("Picking.svg");
   return resource;
 }
 

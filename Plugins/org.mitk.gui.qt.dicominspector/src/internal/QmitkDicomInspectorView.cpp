@@ -195,7 +195,6 @@ void QmitkDicomInspectorView::OnCurrentSelectionChanged(QList<mitk::DataNode::Po
 
 void QmitkDicomInspectorView::OnSliceChanged()
 {
-  // Taken from QmitkStdMultiWidget::HandleCrosshairPositionEvent().
   // Since there are always 3 events arriving (one for each render window) every time the slice
   // or time changes, the slot OnSliceChangedDelayed is triggered - and only if it hasn't been
   // triggered yet - so it is only executed once for every slice/time change.

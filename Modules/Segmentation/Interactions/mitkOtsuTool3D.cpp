@@ -45,7 +45,7 @@ const char **mitk::OtsuTool3D::GetXPM() const
 us::ModuleResource mitk::OtsuTool3D::GetIconResource() const
 {
   us::Module *module = us::GetModuleContext()->GetModule();
-  us::ModuleResource resource = module->GetResource("Otsu_48x48.png");
+  us::ModuleResource resource = module->GetResource("Otsu.svg");
   return resource;
 }
 

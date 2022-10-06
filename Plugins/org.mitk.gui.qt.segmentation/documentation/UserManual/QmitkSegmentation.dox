@@ -239,14 +239,21 @@ The Region Growing tool comes with a "leakage detection/removal" feature. If lea
 \subsection org_mitk_views_segmentationfilltool Fill tool
 \imageMacro{QmitkSegmentation_IMGIconFill.png,"Fill tool",3.81}
 
-Left-click inside a segmentation with holes to completely fill all holes. Left-click inside a hole to fill only this specific hole.
+Left-click inside a region/segmentation to flood fill all connected pixels that have the same label with the active label. This tool will only work on regions of unlocked labels or on regions that are not labeled at all.
 
 \subsection org_mitk_views_segmentationerasetool Erase tool
-
 \imageMacro{QmitkSegmentation_IMGIconErase.png,"Erase tool",3.79}
 
 This tool removes a connected part of pixels that form a segmentation.
-You may use it to remove single segmentations (left-click on specific segmentation) or to clear a whole slice at once (left-click outside a segmentation).
+You may use it to remove single segmented regions (left-click on specific segmentation) or to clear a whole slice at once (left-click at the non-labeled background).
+This tool will only work and regions of unlocked labels or on regions of the active label.
+
+\subsection org_mitk_views_segmentationclosetool Close tool
+\imageMacro{QmitkSegmentation_IMGIconClose.png,"Close tool",3.79}
+
+Left-click inside the region/segmentation to fill all "holes" (pixels labelled with another label or no label) inside the region.
+Therefore this tool behaves like a local closing operation. This tool will not work, when a non-labeled region is selected and holes of locked labels will not be filled.
+\remark This tool always uses the label of the selected region (even if this label is not the active label). Therefore you can use this tool on regions of the active label and of none locked labels (without the need to change the active label). 
 
 \subsection org_mitk_views_segmentationlivewiretool Live wire tool
 
@@ -324,8 +331,18 @@ values within this threshold interval will be labeled as part of the segmentatio
 
 The 3D Otsu tool provides a more sophisticated thresholding algorithm. It allows you to define a number of regions. Based on the image histogram the pixels will
 then be divided into different regions. The more regions you define the longer the calculation will take. You can select afterwards which of these regions you want to confirm as segmentation.
-
 \imageMacro{QmitkSegmentation_3DOtsuTool.png,"3D Otsu tool",10.00}
+
+\subsection org_mitk_views_segmentation3dgrowcuttool 3D GrowCut tool
+
+The 3D GrowCut tool uses previously created segmentation labels (e.g. by the "Add"-tool) stored in the segmentation layer 0.
+The GrowCut tool will use these segmentation labels to create a seedimage that will serve as input to the algorithm.
+As an advanced setting option, a Distance penalty can be set, which increases the cohesion in the immediate surroundings of the initial labels.
+Based on the seedimage and the Distance penalty, a growing is started, which includes all areas that are not initially assigned to a specific label.
+During this process, initially unassigned areas are assigned to the best fitting labels.
+After the segmentation process, the user can decide which newly generated labels should be confirmed.
+
+\imageMacro{QmitkSegmentation_3DGrowCutTool.png,"3D GrowCut tool",16.00}
 
 \subsection org_mitk_views_segmentation3drgtool 3D Region growing tool
 

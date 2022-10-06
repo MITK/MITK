@@ -39,7 +39,7 @@ const char **mitk::BinaryThresholdTool::GetXPM() const
 us::ModuleResource mitk::BinaryThresholdTool::GetIconResource() const
 {
   us::Module *module = us::GetModuleContext()->GetModule();
-  us::ModuleResource resource = module->GetResource("Threshold_48x48.png");
+  us::ModuleResource resource = module->GetResource("Threshold.svg");
   return resource;
 }
 

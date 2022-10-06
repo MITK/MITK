@@ -755,3 +755,15 @@ void mitk::SegTool2D::WritePreviewOnWorkingImage(
 
   ContourModelUtils::FillSliceInSlice(nonConstVtkSource, targetSlice->GetVtkImageData(), workingImage, paintingPixelValue, 1.0);
 }
+
+bool mitk::SegTool2D::IsPositionEventInsideImageRegion(mitk::InteractionPositionEvent* positionEvent,
+  const mitk::BaseData* data)
+{
+  bool isPositionEventInsideImageRegion =
+    nullptr != data && data->GetGeometry()->IsInside(positionEvent->GetPositionInWorld());
+
+  if (!isPositionEventInsideImageRegion)
+    MITK_WARN("EditableContourTool") << "PositionEvent is outside ImageRegion!";
+
+  return isPositionEventInsideImageRegion;
+}

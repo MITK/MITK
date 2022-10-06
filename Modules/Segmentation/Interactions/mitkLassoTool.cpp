@@ -44,12 +44,12 @@ const char **mitk::LassoTool::GetXPM() const
 
 us::ModuleResource mitk::LassoTool::GetIconResource() const
 {
-  return us::GetModuleContext()->GetModule()->GetResource("NewAdd_48x48.png");
+  return us::GetModuleContext()->GetModule()->GetResource("Lasso.svg");
 }
 
 us::ModuleResource mitk::LassoTool::GetCursorIconResource() const
 {
-  return us::GetModuleContext()->GetModule()->GetResource("NewAdd_Cursor_32x32.png");
+  return us::GetModuleContext()->GetModule()->GetResource("Lasso_Cursor.svg");
 }
 
 const char *mitk::LassoTool::GetName() const

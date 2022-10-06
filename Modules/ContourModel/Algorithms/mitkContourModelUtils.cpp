@@ -95,6 +95,62 @@ mitk::ContourModel::Pointer mitk::ContourModelUtils::BackProjectContourFrom2DSli
   return worldContour;
 }
 
+void mitk::ContourModelUtils::FillContourInSlice2(
+  const ContourModel* projectedContour, Image* sliceImage, int paintingPixelValue)
+{
+  FillContourInSlice2(projectedContour, 0, sliceImage, paintingPixelValue);
+}
+
+void mitk::ContourModelUtils::FillContourInSlice2(
+  const ContourModel* projectedContour, TimeStepType contourTimeStep, Image* sliceImage, int paintingPixelValue)
+{
+  if (nullptr == projectedContour)
+  {
+    mitkThrow() << "Cannot fill contour in slice. Passed contour is invalid";
+  }
+
+  if (nullptr == sliceImage)
+  {
+    mitkThrow() << "Cannot fill contour in slice. Passed slice is invalid";
+  }
+
+  auto contourModelFilter = mitk::ContourModelToSurfaceFilter::New();
+  contourModelFilter->SetInput(projectedContour);
+  contourModelFilter->Update();
+
+  auto surface = mitk::Surface::New();
+  surface = contourModelFilter->GetOutput();
+
+  if (nullptr == surface->GetVtkPolyData(contourTimeStep))
+  {
+    MITK_WARN << "Could not create surface from contour model.";
+    return;
+  }
+
+  auto surface2D = vtkSmartPointer<vtkPolyData>::New();
+  surface2D->SetPoints(surface->GetVtkPolyData(contourTimeStep)->GetPoints());
+  surface2D->SetLines(surface->GetVtkPolyData(contourTimeStep)->GetLines());
+
+  auto polyDataToImageStencil = vtkSmartPointer<vtkPolyDataToImageStencil>::New();
+
+  // Set a minimal tolerance, so that clipped pixels will be added to contour as well.
+  polyDataToImageStencil->SetTolerance(mitk::eps);
+  polyDataToImageStencil->SetInputData(surface2D);
+  polyDataToImageStencil->Update();
+
+  auto imageStencil = vtkSmartPointer<vtkImageStencil>::New();
+
+  imageStencil->SetInputData(sliceImage->GetVtkImageData());
+  imageStencil->SetStencilConnection(polyDataToImageStencil->GetOutputPort());
+  imageStencil->ReverseStencilOn();
+  imageStencil->SetBackgroundValue(paintingPixelValue);
+  imageStencil->Update();
+
+  vtkSmartPointer<vtkImageData> filledImage = imageStencil->GetOutput();
+
+  sliceImage->SetVolume(filledImage->GetScalarPointer());
+}
+
 void mitk::ContourModelUtils::FillContourInSlice(
   const ContourModel *projectedContour, Image *sliceImage, const Image* workingImage, int paintingPixelValue)
 {

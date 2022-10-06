@@ -60,7 +60,6 @@ set(MITK_MODULES
   XNAT
   TubeGraph
   BoundingShape
-  RenderWindowManager
   RenderWindowManagerUI
   SemanticRelations
   SemanticRelationsUI

@@ -38,13 +38,21 @@ set(CPP_FILES
   QmitkPropertyDelegate.cpp
   QmitkRegisterClasses.cpp
   QmitkRenderingManager.cpp
+  QmitkRenderWindowDataStorageTreeModel.cpp
   QmitkRenderingManagerFactory.cpp
   QmitkRenderWindow.cpp
   QmitkRenderWindowMenu.cpp
+  QmitkRenderWindowUtilityWidget.cpp
   QmitkRenderWindowWidget.cpp
+  QmitkRenderWindowContextDataStorageInspector.cpp
+  mitkRenderWindowLayerController.cpp
+  mitkRenderWindowLayerUtilities.cpp
+  mitkRenderWindowViewDirectionController.cpp
   QmitkServiceListWidget.cpp
   QmitkSliderLevelWindowWidget.cpp
+  QmitkSliderNavigatorWidget.cpp
   QmitkStdMultiWidget.cpp
+  QmitkStepperAdapter.cpp
   QmitkMxNMultiWidget.cpp
   QmitkDataStorageComboBoxWithSelectNone.cpp
   QmitkDataStorageFilterProxyModel.cpp
@@ -97,12 +105,20 @@ set(MOC_H_FILES
   include/QmitkPropertyDelegate.h
   include/QmitkRenderingManager.h
   include/QmitkRenderWindow.h
+  include/QmitkRenderWindowDataStorageTreeModel.h
   include/QmitkRenderWindowMenu.h
+  include/QmitkRenderWindowUtilityWidget.h
   include/QmitkRenderWindowWidget.h
+  include/QmitkRenderWindowContextDataStorageInspector.h
+  include/mitkRenderWindowLayerController.h
+  include/mitkRenderWindowLayerUtilities.h
+  include/mitkRenderWindowViewDirectionController.h
   include/QmitkServiceListWidget.h
   include/QmitkSliderLevelWindowWidget.h
+  include/QmitkSliderNavigatorWidget.h
   include/QmitkStdMultiWidget.h
   include/QmitkMxNMultiWidget.h
+  include/QmitkStepperAdapter.h
   include/QmitkDataStorageComboBoxWithSelectNone.h
   include/QmitkPropertyItemDelegate.h
   include/QmitkPropertyItemModel.h
@@ -126,7 +142,9 @@ set(UI_FILES
   src/QmitkLevelWindowRangeChange.ui
   src/QmitkMemoryUsageIndicator.ui
   src/QmitkMultiWidgetLayoutSelectionWidget.ui
+  src/QmitkRenderWindowContextDataStorageInspector.ui
   src/QmitkServiceListWidgetControls.ui
+  src/QmitkSliderNavigator.ui
   src/QmitkDataStorageListInspector.ui
   src/QmitkDataStorageTreeInspector.ui
   src/QmitkDataStorageSelectionHistoryInspector.ui

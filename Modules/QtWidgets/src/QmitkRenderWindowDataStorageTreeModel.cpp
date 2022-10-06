@@ -430,6 +430,13 @@ void QmitkRenderWindowDataStorageTreeModel::UpdateModelData()
 
     if (baseRenderer.IsNotNull())
     {
+      auto allDataNodes = dataStorage->GetAll();
+      for (const auto& dataNode : *allDataNodes)
+      {
+        // add the node to each render window
+        mitk::RenderWindowLayerUtilities::SetRenderWindowProperties(dataNode, baseRenderer);
+      }
+
       mitk::NodePredicateAnd::Pointer combinedNodePredicate = mitk::RenderWindowLayerUtilities::GetRenderWindowPredicate(baseRenderer);
       auto filteredDataNodes = dataStorage->GetSubset(combinedNodePredicate);
       for (const auto& dataNode : *filteredDataNodes)

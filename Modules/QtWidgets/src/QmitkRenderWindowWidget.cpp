@@ -12,18 +12,28 @@ found in the LICENSE file.
 
 #include "QmitkRenderWindowWidget.h"
 
+#include <mitkImage.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateProperty.h>
+
+// itk
+#include <itkSpatialOrientationAdapter.h>
+
 // vtk
 #include <vtkCornerAnnotation.h>
 #include <vtkTextProperty.h>
 
 QmitkRenderWindowWidget::QmitkRenderWindowWidget(QWidget* parent/* = nullptr*/,
                                                  const QString& widgetName/* = ""*/,
-                                                 mitk::DataStorage* dataStorage/* = nullptr*/)
+                                                 mitk::DataStorage* dataStorage/* = nullptr*/,
+                                                 bool windowControls/* = false */)
   : QFrame(parent)
   , m_WidgetName(widgetName)
   , m_DataStorage(dataStorage)
   , m_RenderWindow(nullptr)
   , m_CrosshairManager(nullptr)
+  , m_UtilityWidget(nullptr)
+  , m_WindowControls(windowControls)
 {
   this->InitializeGUI();
 }
@@ -175,7 +185,7 @@ void QmitkRenderWindowWidget::RemovePlanesFromDataStorage()
 
 void QmitkRenderWindowWidget::InitializeGUI()
 {
-  m_Layout = new QHBoxLayout(this);
+  m_Layout = new QVBoxLayout(this);
   m_Layout->setMargin(0);
   setLayout(m_Layout);
   setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -194,6 +204,16 @@ void QmitkRenderWindowWidget::InitializeGUI()
 
   auto sliceNavigationController = m_RenderWindow->GetSliceNavigationController();
   sliceNavigationController->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
+
+  if (m_WindowControls)
+  {
+    m_UtilityWidget = new QmitkRenderWindowUtilityWidget(this, m_RenderWindow, m_DataStorage);
+    m_Layout->addWidget(m_UtilityWidget);
+    connect(m_UtilityWidget, &QmitkRenderWindowUtilityWidget::ReinitAction,
+      this, &QmitkRenderWindowWidget::OnReinitAction);
+    connect(m_UtilityWidget, &QmitkRenderWindowUtilityWidget::ResetAction,
+      this, &QmitkRenderWindowWidget::OnResetAction);
+  }
 
   m_Layout->addWidget(m_RenderWindow);
 
@@ -259,6 +279,135 @@ void QmitkRenderWindowWidget::SetGeometry(const itk::EventObject& event)
   }
 
   auto sliceNavigationController = m_RenderWindow->GetSliceNavigationController();
-  const auto* inputWorldTimeGeometry = sliceNavigationController->GetInputWorldTimeGeometry();
-  m_CrosshairManager->ComputeOrientedTimeGeometries(inputWorldTimeGeometry);
+  const auto* inputTimeGeometry = sliceNavigationController->GetInputWorldTimeGeometry();
+  m_CrosshairManager->ComputeOrientedTimeGeometries(inputTimeGeometry);
+
+  if (m_WindowControls)
+  {
+    this->ComputeInvertedSliceNavigation();
+  }
+
+}
+
+void QmitkRenderWindowWidget::ComputeInvertedSliceNavigation()
+{
+  auto sliceNavigationController = m_RenderWindow->GetSliceNavigationController();
+  auto viewDirection = sliceNavigationController->GetViewDirection();
+  unsigned int axis = 0;
+  switch (viewDirection)
+  {
+    case mitk::SliceNavigationController::Original:
+      return;
+    case mitk::SliceNavigationController::Axial:
+    {
+      axis = 2;
+      break;
+    }
+    case mitk::SliceNavigationController::Coronal:
+    {
+      axis = 1;
+      break;
+    }
+    case mitk::SliceNavigationController::Sagittal:
+    {
+      axis = 0;
+      break;
+    }
+  }
+
+  const auto* inputTimeGeometry = sliceNavigationController->GetInputWorldTimeGeometry();
+  const mitk::BaseGeometry* rendererGeometry = m_RenderWindow->GetRenderer()->GetCurrentWorldGeometry();
+
+  // todo: check timepoint / timestep
+  mitk::TimeStepType timeStep = sliceNavigationController->GetTime()->GetPos();
+  mitk::BaseGeometry::ConstPointer geometry = inputTimeGeometry->GetGeometryForTimeStep(timeStep);
+
+  mitk::AffineTransform3D::MatrixType matrix = geometry->GetIndexToWorldTransform()->GetMatrix();
+  matrix.GetVnlMatrix().normalize_columns();
+  mitk::AffineTransform3D::MatrixType::InternalMatrixType inverseMatrix = matrix.GetInverse();
+
+  int dominantAxis = itk::Function::Max3(inverseMatrix[0][axis], inverseMatrix[1][axis], inverseMatrix[2][axis]);
+
+  bool referenceGeometryAxisInverted = inverseMatrix[dominantAxis][axis] < 0;
+  bool rendererZAxisInverted = rendererGeometry->GetAxisVector(2)[axis] < 0;
+
+  m_UtilityWidget->SetInvertedSliceNavigation(referenceGeometryAxisInverted != rendererZAxisInverted);
+}
+
+void QmitkRenderWindowWidget::OnReinitAction(QList<mitk::DataNode::Pointer> selectedNodes)
+{
+  if (selectedNodes.empty())
+  {
+    return;
+  }
+
+  auto* baseRenderer = mitk::BaseRenderer::GetInstance(m_RenderWindow->renderWindow());
+  auto boundingBoxPredicate = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false), baseRenderer));
+  mitk::DataStorage::SetOfObjects::Pointer nodes = mitk::DataStorage::SetOfObjects::New();
+  for (const auto& dataNode : selectedNodes)
+  {
+    if (boundingBoxPredicate->CheckNode(dataNode))
+    {
+      nodes->InsertElement(nodes->Size(), dataNode);
+    }
+  }
+
+  if (nodes->empty())
+  {
+    return;
+  }
+
+  if (1 == nodes->Size())
+  {
+    auto selectedImage = dynamic_cast<mitk::Image*>(nodes->ElementAt(0)->GetData());
+
+    if (nullptr != selectedImage)
+    {
+      mitk::RenderingManager::GetInstance()->InitializeView(baseRenderer->GetRenderWindow(), selectedImage->GetTimeGeometry());
+      return;
+    }
+  }
+
+  auto boundingGeometry = m_DataStorage->ComputeBoundingGeometry3D(nodes, "visible", baseRenderer);
+  mitk::RenderingManager::GetInstance()->InitializeView(baseRenderer->GetRenderWindow(), boundingGeometry);
+}
+
+void QmitkRenderWindowWidget::OnResetAction(QList<mitk::DataNode::Pointer> selectedNodes)
+{
+  if (selectedNodes.empty())
+  {
+    return;
+  }
+
+  auto selectedImage = dynamic_cast<mitk::Image*>(selectedNodes.front()->GetData());
+  if (nullptr == selectedImage)
+  {
+    return;
+  }
+
+  const mitk::TimeGeometry* referenceGeometry = selectedImage->GetTimeGeometry();
+  if (nullptr == referenceGeometry)
+  {
+    return;
+  }
+
+  mitk::TimeStepType imageTimeStep = 0;
+
+  // store the current position to set it again later, if the camera should not be reset
+  mitk::Point3D currentPosition = this->GetCrosshairPosition();
+
+  // store the current time step to set it again later, if the camera should not be reset
+  auto* renderingManager = mitk::RenderingManager::GetInstance();
+  const auto currentTimePoint = renderingManager->GetTimeNavigationController()->GetSelectedTimePoint();
+  if (referenceGeometry->IsValidTimePoint(currentTimePoint))
+  {
+    imageTimeStep = referenceGeometry->TimePointToTimeStep(currentTimePoint);
+  }
+
+  auto* baseRenderer = mitk::BaseRenderer::GetInstance(m_RenderWindow->renderWindow());
+  renderingManager->InitializeView(baseRenderer->GetRenderWindow(), referenceGeometry, false);
+
+  // reset position and time step
+  this->SetCrosshairPosition(currentPosition);
+  renderingManager->GetTimeNavigationController()->GetTime()->SetPos(imageTimeStep);
 }

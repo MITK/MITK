@@ -13,8 +13,8 @@ found in the LICENSE file.
 #ifndef MITKRENDERWINDOWLAYERCONTROLLER_H
 #define MITKRENDERWINDOWLAYERCONTROLLER_H
 
-// render window manager module
-#include "MitkRenderWindowManagerExports.h"
+// qt widgets module
+#include "MitkQtWidgetsExports.h"
 #include "mitkRenderWindowLayerUtilities.h"
 
 // mitk core
@@ -39,7 +39,7 @@ namespace mitk
   * Functions with 'mitk::BaseRenderer* renderer' have 'nullptr' as their default argument. Using the nullptr
   * these functions operate on all base renderer. Giving a specific base renderer will modify the node only for the given renderer.
   */
-  class MITKRENDERWINDOWMANAGER_EXPORT RenderWindowLayerController
+  class MITKQTWIDGETS_EXPORT RenderWindowLayerController
   {
   public:
 

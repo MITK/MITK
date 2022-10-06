@@ -38,6 +38,17 @@ public:
   virtual QmitkRenderWindow* GetRenderWindow(const QString& widgetName) const override;
   virtual QmitkRenderWindow* GetRenderWindow(const mitk::BaseRenderer::ViewDirection& viewDirection) const override;
 
+  /**
+   * @brief Set the reference geometry for interaction inside all render windows of the StdMultiWidget.
+   *
+   * @param referenceGeometry   The reference geometry which is used for updating the
+   *                            time geometry inside all four render windows.
+   * @param resetCamera         If true, the camera and crosshair will be reset to the default view (centered, no zoom).
+   *                            If false, the current crosshair position and the camera zoom will be stored and reset
+   *                            after the reference geometry has been updated.
+   */
+  void SetReferenceGeometry(const mitk::TimeGeometry* referenceGeometry, bool resetCamera) override;
+
   virtual void SetSelectedPosition(const mitk::Point3D& newPosition, const QString& widgetName) override;
   virtual const mitk::Point3D GetSelectedPosition(const QString& widgetName) const override;
 

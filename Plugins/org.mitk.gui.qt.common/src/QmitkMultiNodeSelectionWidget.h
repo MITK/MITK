@@ -26,7 +26,6 @@ found in the LICENSE file.
 #include <QmitkAbstractNodeSelectionWidget.h>
 
 class QmitkAbstractDataStorageModel;
-class QAbstractItemVew;
 
 /**
 * @class QmitkMultiNodeSelectionWidget

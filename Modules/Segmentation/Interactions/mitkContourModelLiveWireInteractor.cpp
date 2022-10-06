@@ -160,8 +160,6 @@ void mitk::ContourModelLiveWireInteractor::OnMovePoint(StateMachineAction *, Int
     return;
   }
 
-  std::cout << currentPosition << std::endl;
-
   mitk::ContourModel::Pointer editingContour = mitk::ContourModel::New();
   editingContour->Expand(contour->GetTimeSteps());
   editingContour->SetTimeGeometry(contour->GetTimeGeometry()->Clone());

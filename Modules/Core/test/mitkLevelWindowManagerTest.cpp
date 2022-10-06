@@ -375,7 +375,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, false, false));
 
     auto levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty *>(m_DataNode3->GetProperty("levelwindow"));
-    m_LevelWindowManager->SetLevelWindowProperty(levelWindowProperty); // explicitely set the level window to node3
+    m_LevelWindowManager->SetLevelWindowProperty(levelWindowProperty); // explicitly set the level window to node3
     CPPUNIT_ASSERT_MESSAGE("\"imageForLevelWindow\" property not correctly set", AssertImageForLevelWindowProperty(false, false, true));
     CPPUNIT_ASSERT_MESSAGE("\"levelwindow\" property not correctly set", AssertLevelWindowProperty(false, false, true));
 

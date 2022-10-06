@@ -94,7 +94,7 @@ public:
   {
     m_ImagePath = GetTestDataFilePath("BallBinary30x30x30.nrrd");
 
-    preference = { "Prefered Test Service" };
+    preference = { "Preferred Test Service" };
     black = { "Unwanted Test Service" };
     emptyList = {};
 
@@ -109,7 +109,7 @@ public:
     context->RegisterService(m_TestMimeType, props);
 
     m_NormalService = new mitk::TestFileReaderService("Normal Test Service");
-    m_PrefService = new mitk::TestFileReaderService("Prefered Test Service");
+    m_PrefService = new mitk::TestFileReaderService("Preferred Test Service");
     m_BlackService = new mitk::TestFileReaderService("Unwanted Test Service");
   }
 
@@ -128,7 +128,7 @@ public:
     mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor(preference, emptyList);
     CPPUNIT_ASSERT(true == functor(info));
     auto description = info.m_ReaderSelector.GetSelected().GetDescription();
-    CPPUNIT_ASSERT_EQUAL(std::string("Prefered Test Service"), description);
+    CPPUNIT_ASSERT_EQUAL(std::string("Preferred Test Service"), description);
     CPPUNIT_ASSERT("0" == info.m_ReaderSelector.GetSelected().GetReader()->GetOptions()["o1"].ToString());
   }
 
@@ -159,14 +159,14 @@ public:
     mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor(preference, black);
     CPPUNIT_ASSERT(true == functor(info));
     auto description = info.m_ReaderSelector.GetSelected().GetDescription();
-    CPPUNIT_ASSERT_EQUAL(std::string("Prefered Test Service"), description);
+    CPPUNIT_ASSERT_EQUAL(std::string("Preferred Test Service"), description);
   }
 
   void UseOverlappingBlackAndPreferenceList()
   {
     mitk::IOUtil::LoadInfo info(m_ImagePath);
 
-    black.push_back("Prefered Test Service");
+    black.push_back("Preferred Test Service");
     black.push_back("Normal Test Service");
 
     mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor(preference, black);
@@ -183,7 +183,7 @@ public:
     mitk::PreferenceListReaderOptionsFunctor functor = mitk::PreferenceListReaderOptionsFunctor(preference, emptyList);
     CPPUNIT_ASSERT(true == functor(info));
     auto description = info.m_ReaderSelector.GetSelected().GetDescription();
-    CPPUNIT_ASSERT_EQUAL(std::string("Prefered Test Service"), description);
+    CPPUNIT_ASSERT_EQUAL(std::string("Preferred Test Service"), description);
   }
 
   void UseAllBlackedList()
@@ -210,7 +210,7 @@ public:
 
     CPPUNIT_ASSERT(true == functor(info));
     auto description = info.m_ReaderSelector.GetSelected().GetDescription();
-    CPPUNIT_ASSERT_EQUAL(std::string("Prefered Test Service"), description);
+    CPPUNIT_ASSERT_EQUAL(std::string("Preferred Test Service"), description);
     CPPUNIT_ASSERT("42" == info.m_ReaderSelector.GetSelected().GetReader()->GetOption("o1").ToString());
   }
 

@@ -625,7 +625,7 @@ static void CheckIntersectionWithRotatedGeometry90()
     MITK_INFO << "min: " << minMax.first << " max: " << minMax.second;
   }
 
-  // now we make a rotation of the Image about 270 degrees around  Z Axis to get an aligment on the positiv x axis
+  // now we make a rotation of the Image about 270 degrees around  Z Axis to get an alignment on the positive x axis
   double angleInDegrees = 270 * itk::Math::pi / 180;
 
   mitk::AffineTransform3D::MatrixType matrix2;

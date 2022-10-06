@@ -58,21 +58,18 @@ namespace mitk
   \ingroup Interaction
   \ingroup ToolManagerEtAl
 
-  Every tool is a mitk::StateMachine, which can follow any transition pattern that it likes. One important thing to know
-  is, that
-  every derived tool should always call SuperClass::Deactivated() at the end of its own implementation of Deactivated,
-  because mitk::Tool
-  resets the StateMachine in this method. Only if you are very sure that you covered all possible things that might
-  happen to your
-  own tool, you should consider not to reset the StateMachine from time to time.
+  Every tool is a mitk::EventStateMachine, which can follow any transition pattern that it likes.
+  Every derived tool should always call SuperClass::Deactivated() at the end of its own implementation of Deactivated,
+  because mitk::Tool resets the interaction configuration in this method.
+  Only if you are very sure that you covered all possible things that might happen to your own tool,
+  you should consider not to reset the configuration.
 
   To learn about the MITK implementation of state machines in general, have a look at \ref InteractionPage.
 
   To derive a non-abstract tool, you inherit from mitk::Tool (or some other base class further down the inheritance
-  tree), and in your
-  own parameterless constructor (that is called from the itkFactorylessNewMacro that you use) you pass a StateMachine
-  pattern name to the superclass.
-  Names for valid patterns can be found in StateMachine.xml (which might be enhanced by you).
+  tree), and in your own parameterless constructor (that is called from the itkFactorylessNewMacro that you use)
+  you pass a state machine name (interactor type).
+  Names and .xml-files for valid state machines can be found in different "Interaction" directories (which might be enhanced by you).
 
   You have to implement at least GetXPM() and GetName() to provide some identification.
 
@@ -120,6 +117,7 @@ namespace mitk
     XPM is e.g. supported by The Gimp. But if you open any XPM file in your text editor, you will see that you could
     also "draw" it with an editor.
     */
+    [[deprecated]]
     virtual const char **GetXPM() const = 0;
 
     /**

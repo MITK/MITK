@@ -20,7 +20,7 @@ namespace mitk
   StatusBar *StatusBar::m_Instance = nullptr;
 
   /**
-   * Display the text in the statusbar of the applikation
+   * Display the text in the statusbar of the application
    */
   void StatusBar::DisplayText(const char *t)
   {
@@ -29,7 +29,7 @@ namespace mitk
   }
 
   /**
-   * Display the text in the statusbar of the applikation for ms seconds
+   * Display the text in the statusbar of the application for ms seconds
    */
   void StatusBar::DisplayText(const char *t, int ms)
   {
@@ -68,8 +68,16 @@ namespace mitk
       m_Implementation->DisplayGreyValueText(t);
   }
 
-  static void WriteCommonImageInfo(
-    std::ostringstream &stream, Point3D point, itk::Index<3> index, ScalarType time)
+  static void WriteCommonRendererInfo(std::ostringstream& stream, Point3D point, TimePointType time)
+  {
+    stream << "Position: <" << std::fixed << point[0] << ", "
+      << std::fixed << point[1] << ", "
+      << std::fixed << point[2] << "> mm; ";
+
+    stream << "Time: " << time << " ms";
+  }
+
+  static void WriteCommonImageInfo(std::ostringstream& stream, Point3D point, itk::Index<3> index, TimePointType time)
   {
     stream << "Position: <" << std::fixed << point[0] << ", "
                             << std::fixed << point[1] << ", "
@@ -82,7 +90,21 @@ namespace mitk
     stream << "Time: " << time << " ms";
   }
 
-  void StatusBar::DisplayImageInfo(Point3D point, itk::Index<3> index, ScalarType time, ScalarType pixelValue)
+  void StatusBar::DisplayRendererInfo(Point3D point, TimePointType time)
+  {
+    if (m_Implementation == nullptr)
+      return;
+
+    std::ostringstream stream;
+    stream.imbue(std::locale::classic());
+    stream.precision(2);
+
+    WriteCommonRendererInfo(stream, point, time);
+
+    m_Implementation->DisplayGreyValueText(stream.str().c_str());
+  }
+
+  void StatusBar::DisplayImageInfo(Point3D point, itk::Index<3> index, TimePointType time, ScalarType pixelValue)
   {
     if (m_Implementation == nullptr)
       return;
@@ -102,7 +124,7 @@ namespace mitk
     m_Implementation->DisplayGreyValueText(stream.str().c_str());
   }
 
-  void StatusBar::DisplayImageInfo(Point3D point, itk::Index<3> index, ScalarType time, const char *pixelValue)
+  void StatusBar::DisplayImageInfo(Point3D point, itk::Index<3> index, TimePointType time, const char* pixelValue)
   {
     if (m_Implementation == nullptr)
       return;
@@ -122,11 +144,13 @@ namespace mitk
     if (m_Implementation != nullptr)
       m_Implementation->DisplayGreyValueText("No image information at this position!");
   }
+
   void StatusBar::Clear()
   {
     if (m_Implementation != nullptr)
       m_Implementation->Clear();
   }
+
   void StatusBar::SetSizeGripEnabled(bool enable)
   {
     if (m_Implementation != nullptr)
@@ -134,6 +158,7 @@ namespace mitk
       m_Implementation->SetSizeGripEnabled(enable);
     }
   }
+
   /**
    * Get the instance of this StatusBar
    */

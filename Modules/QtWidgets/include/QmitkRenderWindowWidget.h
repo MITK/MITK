@@ -16,26 +16,27 @@ found in the LICENSE file.
 // qt widgets module
 #include "MitkQtWidgetsExports.h"
 #include "QmitkRenderWindow.h"
+#include "QmitkRenderWindowUtilityWidget.h"
 
 // mitk core
+#include <mitkCrosshairManager.h>
 #include <mitkDataStorage.h>
-#include <mitkPointSet.h>
 #include <mitkRenderWindow.h>
 
 // qt
 #include <QFrame>
-#include <QHBoxLayout>
 #include <QMouseEvent>
 
 class vtkCornerAnnotation;
 
 /**
 * @brief The 'QmitkRenderWindowWidget' is a QFrame that holds a render window
-*        and some associates properties, like a crosshair (pointset) and decorations.
+*        and some associates properties, e.g. decorations.
 *        Decorations are corner annotation (text and color), frame color or background color
 *        and can be set using this class.
 *        The 'QmitkRenderWindowWidget' is used inside a 'QmitkAbstractMultiWidget', where a map contains
 *        several render window widgets to create the multi widget display.
+*        This class uses a CrosshairManager, which allows to use plane geometries as crosshair.
 */
 class MITKQTWIDGETS_EXPORT QmitkRenderWindowWidget : public QFrame
 {
@@ -46,7 +47,8 @@ public:
   QmitkRenderWindowWidget(
     QWidget* parent = nullptr,
     const QString& widgetName = "",
-    mitk::DataStorage* dataStorage = nullptr);
+    mitk::DataStorage* dataStorage = nullptr,
+    bool windowControls = false);
 
   ~QmitkRenderWindowWidget() override;
 
@@ -78,28 +80,45 @@ public:
 
   bool IsRenderWindowMenuActivated() const;
 
-  void ActivateCrosshair(bool activate);
+  void SetCrosshairVisibility(bool visible);
+  bool GetCrosshairVisibility();
+  void SetCrosshairGap(unsigned int gapSize);
+
+  void AddPlanesToDataStorage();
+  void RemovePlanesFromDataStorage();
+
+  void SetCrosshairPosition(const mitk::Point3D& newPosition);
+  mitk::Point3D GetCrosshairPosition() const;
+
+  void SetGeometry(const itk::EventObject& event);
+
+private Q_SLOTS:
+
+  void OnReinitAction(QList<mitk::DataNode::Pointer> selectedNodes);
+  void OnResetAction(QList<mitk::DataNode::Pointer> selectedNodes);
 
 private:
 
   void InitializeGUI();
   void InitializeDecorations();
-
-  void SetCrosshair(mitk::Point3D selectedPoint);
+  void ComputeInvertedSliceNavigation();
 
   QString m_WidgetName;
-  QHBoxLayout* m_Layout;
+  QVBoxLayout* m_Layout;
 
   mitk::DataStorage* m_DataStorage;
 
   QmitkRenderWindow* m_RenderWindow;
 
-  mitk::DataNode::Pointer m_PointSetNode;
-  mitk::PointSet::Pointer m_PointSet;
+  mitk::CrosshairManager::Pointer m_CrosshairManager;
 
   std::pair<mitk::Color, mitk::Color> m_GradientBackgroundColors;
   mitk::Color m_DecorationColor;
   vtkSmartPointer<vtkCornerAnnotation> m_CornerAnnotation;
+
+  QmitkRenderWindowUtilityWidget* m_UtilityWidget;
+
+  bool m_WindowControls;
 
 };
 

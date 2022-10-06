@@ -79,10 +79,10 @@ void mitk::HistogramGenerator::ComputeHistogram()
 
   // debug code
   /*
-    MITK_INFO << "Histogram modfied 1" << m_Histogram->GetMTime() << std::endl;
+    MITK_INFO << "Histogram modified 1" << m_Histogram->GetMTime() << std::endl;
     m_Histogram->Modified();
-    MITK_INFO << "Histogram modfied 2" << m_Histogram->GetMTime() << std::endl;
-    MITK_INFO << "Image modfied" << m_Image->GetMTime() << std::endl;
+    MITK_INFO << "Histogram modified 2" << m_Histogram->GetMTime() << std::endl;
+    MITK_INFO << "Image modified" << m_Image->GetMTime() << std::endl;
   const unsigned int histogramSize = m_Histogram->Size();
 
   MITK_INFO << "Histogram size " << histogramSize << std::endl;

@@ -68,10 +68,10 @@ namespace mitk
     void SaveAsPNG(std::string fileName);
 
     /**
-     * @brief SetStopRenderWindow Convenience method to make the renderwindow hold after rendering. Usefull for
+     * @brief SetStopRenderWindow Convenience method to make the renderwindow hold after rendering. Useful for
      * debugging.
      * @param automaticallyCloseRenderWindow Flag indicating whether the renderwindow should automatically close (false, default) or stay open
-     * (true). Usefull for debugging.
+     * (true). Useful for debugging.
      */
     void SetAutomaticallyCloseRenderWindow(bool automaticallyCloseRenderWindow);
 
@@ -148,7 +148,7 @@ namespace mitk
     bool CompareRenderWindowAgainstReference(int argc, char *argv[], double threshold = 10.0);
 
     /**
-     * @brief The ArgcHelperClass class is a convinience class to convert a vector
+     * @brief The ArgcHelperClass class is a convenience class to convert a vector
      * of strings to the standard c++ argv and argc arguments. This is necessary for
      * the vtkTesting::Test, since is requires the reference image (and other
      * optional parameters) via command line.
@@ -209,7 +209,7 @@ namespace mitk
     mitk::DataStorage::Pointer m_DataStorage;   //<< Contains the mitkDataStorage which contains the data to be rendered
     bool
       m_AutomaticallyCloseRenderWindow; //<< Flag indicating whether the renderwindow should automatically close (true,
-                                        // default) or stay open (false). Usefull for debugging.
+                                        // default) or stay open (false). Useful for debugging.
   };
 } // namespace mitk
 #endif

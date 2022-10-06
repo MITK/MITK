@@ -31,7 +31,7 @@ namespace mitk
    * \brief The common interface of all MITK file writers.
    *
    * Implementations of this interface must be registered as a service
-   * to make themselve available via the service registry. If the
+   * to make themselves available via the service registry. If the
    * implementation is stateful, the service should be registered using
    * a PrototypeServiceFactory.
    *

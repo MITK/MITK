@@ -140,7 +140,7 @@ namespace mitk
     void SetDefaultLevelWindow(ScalarType level, ScalarType window);
 
     /*!
-    * set the default Bounderies
+    * set the default Boundaries
     */
     void SetDefaultBoundaries(ScalarType low, ScalarType up);
 

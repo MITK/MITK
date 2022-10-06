@@ -39,12 +39,14 @@ set(CPP_FILES
   Controllers/mitkCallbackFromGUIThread.cpp
   Controllers/mitkCameraController.cpp
   Controllers/mitkCameraRotationController.cpp
+  Controllers/mitkCrosshairManager.cpp
   Controllers/mitkLimitedLinearUndo.cpp
   Controllers/mitkOperationEvent.cpp
   Controllers/mitkPlanePositionManager.cpp
   Controllers/mitkProgressBar.cpp
   Controllers/mitkRenderingManager.cpp
   Controllers/mitkSliceNavigationController.cpp
+  Controllers/mitkSliceNavigationHelper.cpp
   Controllers/mitkStatusBar.cpp
   Controllers/mitkStepper.cpp
   Controllers/mitkTestManager.cpp
@@ -184,7 +186,6 @@ set(CPP_FILES
 
   Interactions/mitkAction.cpp
   Interactions/mitkBindDispatcherInteractor.cpp
-  Interactions/mitkCrosshairPositionEvent.cpp
   Interactions/mitkDataInteractor.cpp
   Interactions/mitkDispatcher.cpp
   Interactions/mitkDisplayActionEventBroadcast.cpp
@@ -273,6 +274,7 @@ set(CPP_FILES
   Rendering/mitkAbstractAnnotationRenderer.cpp
   Rendering/mitkAnnotationUtils.cpp
   Rendering/mitkBaseRenderer.cpp
+  Rendering/mitkBaseRendererHelper.cpp
   #Rendering/mitkGLMapper.cpp Moved to deprecated LegacyGL Module
   Rendering/mitkGradientBackground.cpp
   Rendering/mitkImageVtkMapper2D.cpp
@@ -302,7 +304,6 @@ set(CPP_FILES
 set(RESOURCE_FILES
 Interactions/globalConfig.xml
 Interactions/DisplayInteraction.xml
-Interactions/DisplayConfig.xml
 Interactions/DisplayConfigMITKBase.xml
 Interactions/DisplayConfigPACSBase.xml
 Interactions/DisplayConfigCrosshair.xml
@@ -315,8 +316,6 @@ Interactions/DisplayConfigPACSZoom.xml
 Interactions/DisplayConfigPACSLevelWindow.xml
 Interactions/DisplayConfigBlockLMB.xml
 Interactions/PointSet.xml
-Interactions/Legacy/StateMachine.xml
-Interactions/Legacy/DisplayConfigMITKTools.xml
 Interactions/PointSetConfig.xml
 
 mitkLevelWindowPresets.xml

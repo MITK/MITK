@@ -41,14 +41,14 @@ const char **mitk::AddContourTool::GetXPM() const
 us::ModuleResource mitk::AddContourTool::GetIconResource() const
 {
   us::Module *module = us::GetModuleContext()->GetModule();
-  us::ModuleResource resource = module->GetResource("Add_48x48.png");
+  us::ModuleResource resource = module->GetResource("Add.svg");
   return resource;
 }
 
 us::ModuleResource mitk::AddContourTool::GetCursorIconResource() const
 {
   us::Module *module = us::GetModuleContext()->GetModule();
-  us::ModuleResource resource = module->GetResource("Add_Cursor_32x32.png");
+  us::ModuleResource resource = module->GetResource("Add_Cursor.svg");
   return resource;
 }
 

@@ -55,7 +55,7 @@ namespace mitk
    *
    * PointSet issues the following events, for which observers can register
    * (the below events are grouped into a class hierarchy as indicated by
-   * identation level; e.g. PointSetSizeChangeEvent comprises PointSetAddEvent
+   * indentation level; e.g. PointSetSizeChangeEvent comprises PointSetAddEvent
    * and PointSetRemoveEvent):
    *
    * <tt>
@@ -291,14 +291,14 @@ namespace mitk
   };
 
   /**
-   * @brief Equal A function comparing two pointsets for beeing identical.
+   * @brief Equal A function comparing two pointsets for being identical.
    * @warning This method is deprecated and will not be available in the future. Use the \a bool mitk::Equal(const
    * mitk::PointSet& p1, const mitk::PointSet& p2) instead.
    *
    * @ingroup MITKTestingAPI
    *
    * The function compares the Geometry, the size and all points element-wise.
-   * The parameter eps is a tolarence value for all methods which are internally used for comparion.
+   * The parameter eps is a tolarence value for all methods which are internally used for comparison.
    *
    * @param rightHandSide Compare this against leftHandSide.
    * @param leftHandSide Compare this against rightHandSide.
@@ -315,12 +315,12 @@ namespace mitk
                                         bool checkGeometry = true));
 
   /**
-   * @brief Equal A function comparing two pointsets for beeing identical.
+   * @brief Equal A function comparing two pointsets for being identical.
    *
    * @ingroup MITKTestingAPI
    *
    * The function compares the Geometry, the size and all points element-wise.
-   * The parameter eps is a tolarence value for all methods which are internally used for comparion.
+   * The parameter eps is a tolarence value for all methods which are internally used for comparison.
    *
    * @param rightHandSide Compare this against leftHandSide.
    * @param leftHandSide Compare this against rightHandSide.

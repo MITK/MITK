@@ -305,7 +305,6 @@ void QmitkSegmentationTaskListWidget::OnPreviousButtonClicked()
  */
 void QmitkSegmentationTaskListWidget::OnNextButtonClicked()
 {
-  MITK_INFO << "NEXT";
   const auto maxIndex = m_TaskList->GetNumberOfTasks() - 1;
   auto current = m_CurrentTaskIndex.value();
 
@@ -317,6 +316,14 @@ void QmitkSegmentationTaskListWidget::OnNextButtonClicked()
 
 void QmitkSegmentationTaskListWidget::UpdateNavigationButtons()
 {
+  if (m_TaskList.IsNull() || m_TaskList->GetNumberOfTasks() == 0)
+  {
+    m_Ui->previousButton->setEnabled(false);
+    m_Ui->nextButton->setEnabled(false);
+
+    return;
+  }
+
   const auto maxIndex = m_TaskList->GetNumberOfTasks() - 1;
   const auto current = m_CurrentTaskIndex.value();
 

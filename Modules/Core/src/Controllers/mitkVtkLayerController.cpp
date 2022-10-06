@@ -36,7 +36,7 @@ void mitk::VtkLayerController::AddInstance(vtkSmartPointer<vtkRenderWindow> renW
   // ensure that no vtkRenderWindow is managed twice
   mitk::VtkLayerController::RemoveInstance(renWin);
 
-  // instanciate controller, add it to the map
+  // instantiate controller, add it to the map
   mitk::VtkLayerController *ControllerInstance = new mitk::VtkLayerController(renWin);
   ControllerInstance->InsertSceneRenderer(mitkSceneRenderer);
 
@@ -253,7 +253,7 @@ bool mitk::VtkLayerController::IsRendererInserted(vtkSmartPointer<vtkRenderer> r
 /**
  * Internally used to sort all registered renderers and to connect the with the vtkRenderWindow.
  * Mention that VTK Version 5 and above is rendering higher numbers in the background and VTK
- * Verison < 5 in the foreground.
+ * Version < 5 in the foreground.
  */
 void mitk::VtkLayerController::UpdateLayers()
 {
@@ -271,7 +271,7 @@ void mitk::VtkLayerController::UpdateLayers()
 
   m_RenderWindow->SetNumberOfLayers(numberOfLayers);
   RendererVectorType::iterator it;
-  // assign a layer number for the backround renderers
+  // assign a layer number for the background renderers
   for (it = m_BackgroundRenderers.begin(); it != m_BackgroundRenderers.end(); ++it)
   {
     (*it)->SetRenderWindow(m_RenderWindow);

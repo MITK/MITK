@@ -43,6 +43,7 @@ public:
 
   virtual void SetCrosshairVisibility(bool) override;
   virtual bool GetCrosshairVisibility() const override;
+  void SetCrosshairGap(unsigned int gapSize) override;
 
   virtual void ResetCrosshair() override;
 
@@ -52,12 +53,6 @@ public:
 
   void AddPlanesToDataStorage();
   void RemovePlanesFromDataStorage();
-
-  /** \brief Listener to the CrosshairPositionEvent
-
-    Ensures the CrosshairPositionEvent is handled only once and at the end of the Qt-Event loop
-  */
-  void HandleCrosshairPositionEvent();
 
   /**
    * @brief Convenience method to get a render window widget.
@@ -102,9 +97,6 @@ public Q_SLOTS:
   virtual void mousePressEvent(QMouseEvent*) override;
   virtual void moveEvent(QMoveEvent* e) override;
   virtual void wheelEvent(QWheelEvent* e) override;
-
-  /// Receives the signal from HandleCrosshairPositionEvent, executes the StatusBar update
-  void HandleCrosshairPositionEventDelayed();
 
   void Fit();
 
@@ -153,8 +145,6 @@ private:
    * There is no node for widget 4, hence, we need an extra member.
    */
   mitk::Color m_DecorationColorWidget4;
-
-  bool m_PendingCrosshairPositionEvent;
 
 };
 

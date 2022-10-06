@@ -13,17 +13,17 @@ found in the LICENSE file.
 #ifndef MITKBASERENDERER_H
 #define MITKBASERENDERER_H
 
-#include "mitkDataStorage.h"
-#include "mitkPlaneGeometry.h"
-#include "mitkPlaneGeometryData.h"
-#include "mitkTimeGeometry.h"
+#include <mitkDataStorage.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkPlaneGeometryData.h>
+#include <mitkTimeGeometry.h>
 
-#include "mitkCameraController.h"
-#include "mitkCameraRotationController.h"
-#include "mitkSliceNavigationController.h"
+#include <mitkCameraController.h>
+#include <mitkCameraRotationController.h>
+#include <mitkSliceNavigationController.h>
 
-#include "mitkBindDispatcherInteractor.h"
-#include "mitkDispatcher.h"
+#include <mitkBindDispatcherInteractor.h>
+#include <mitkDispatcher.h>
 
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
@@ -390,8 +390,8 @@ namespace mitk
     unsigned long m_LastUpdateTime;
 
     CameraController::Pointer m_CameraController;
-    SliceNavigationController::Pointer m_SliceNavigationController;
     CameraRotationController::Pointer m_CameraRotationController;
+    SliceNavigationController::Pointer m_SliceNavigationController;
 
     void UpdateCurrentGeometries();
     virtual void SetCurrentWorldPlaneGeometry(const PlaneGeometry* geometry2d);

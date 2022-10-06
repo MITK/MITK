@@ -1022,8 +1022,8 @@ bool mitk::IsSubGeometry(const mitk::BaseGeometry& testGeo,
     referenceGeo.WorldToIndex(testCorner, testCornerIndex);
 
     std::bitset<sizeof(int)> bs(i);
-    //To regard the coordinateEps, we substract or add it to the index elements
-    //depending on wether it was constructed by a lower or an upper bound value
+    //To regard the coordinateEps, we subtract or add it to the index elements
+    //depending on whether it was constructed by a lower or an upper bound value
     //(see implementation of BaseGeometry::GetCorner()).
     if (bs.test(0))
     {

@@ -868,12 +868,12 @@ namespace mitk
 
   void PlaneGeometry::Map(const mitk::Point2D &pt2d_mm, mitk::Point3D &pt3d_mm) const
   {
-    // pt2d_mm is measured from the origin of the world geometry (at leats it called form BaseRendere::Mouse...Event)
+    // pt2d_mm is measured from the origin of the world geometry (at least it called form BaseRendere::Mouse...Event)
     Point3D pt3d_units;
     pt3d_units[0] = pt2d_mm[0] / (GetExtentInMM(0) / GetExtent(0));
     pt3d_units[1] = pt2d_mm[1] / (GetExtentInMM(1) / GetExtent(1));
     pt3d_units[2] = 0;
-    // pt3d_units is a continuos index. We divided it with the Scale Factor (= spacing in x and y) to convert it from mm
+    // pt3d_units is a continuous index. We divided it with the Scale Factor (= spacing in x and y) to convert it from mm
     // to index units.
     //
     pt3d_mm = GetIndexToWorldTransform()->TransformPoint(pt3d_units);

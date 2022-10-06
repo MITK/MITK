@@ -48,7 +48,7 @@ namespace mitk
      *   and a check if VDimension equals to the Dimension of the Image.
      *
      *  \note
-     *  To avoid intermittent Update() calls to a predecessing filter pipeline, a call to Modifed() method after the
+     *  To avoid intermittent Update() calls to a predecessing filter pipeline, a call to Modified() method after the
      * access is finished is left to the developer.
      */
     ImagePixelWriteAccessor(ImagePointer iP,

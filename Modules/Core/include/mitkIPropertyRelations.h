@@ -64,7 +64,7 @@ namespace mitk
     */
     virtual RuleResultVectorType GetRulesForDestinationCandidate(const IPropertyProvider* destCandidate) const = 0;
 
-    /** \brief Get the relation rule that has the specfied ruleID.
+    /** \brief Get the relation rule that has the specified ruleID.
     *
     * \return Property relation rule or null pointer, if no relation rule is available.
     */

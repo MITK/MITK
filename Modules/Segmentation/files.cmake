@@ -8,6 +8,7 @@ set(CPP_FILES
   Algorithms/mitkDiffSliceOperation.cpp
   Algorithms/mitkDiffSliceOperationApplier.cpp
   Algorithms/mitkFeatureBasedEdgeDetectionFilter.cpp
+  Algorithms/mitkGrowCutSegmentationFilter.cpp
   Algorithms/mitkImageLiveWireContourModelFilter.cpp
   Algorithms/mitkImageToContourFilter.cpp
   #Algorithms/mitkImageToContourModelFilter.cpp
@@ -33,6 +34,7 @@ set(CPP_FILES
   Interactions/mitkBinaryThresholdBaseTool.cpp
   Interactions/mitkBinaryThresholdTool.cpp
   Interactions/mitkBinaryThresholdULTool.cpp
+  Interactions/mitkCloseRegionTool.cpp
   Interactions/mitkContourModelInteractor.cpp
   Interactions/mitkContourModelLiveWireInteractor.cpp
   Interactions/mitkEditableContourTool.cpp
@@ -43,12 +45,13 @@ set(CPP_FILES
   Interactions/mitkErasePaintbrushTool.cpp
   Interactions/mitkEraseRegionTool.cpp
   Interactions/mitkFeedbackContourTool.cpp
+  Interactions/mitkFillRegionBaseTool.cpp
   Interactions/mitkFillRegionTool.cpp
+  Interactions/mitkGrowCutTool.cpp
   Interactions/mitkOtsuTool3D.cpp
   Interactions/mitkPaintbrushTool.cpp
   Interactions/mitkRegionGrowingTool.cpp
   Interactions/mitkSegmentationsProcessingTool.cpp
-  Interactions/mitkSetRegionTool.cpp
   Interactions/mitkSegTool2D.cpp
   Interactions/mitkSubtractContourTool.cpp
   Interactions/mitkTool.cpp
@@ -69,38 +72,44 @@ set(CPP_FILES
 )
 
 set(RESOURCE_FILES
-  Add_48x48.png
-  Add_Cursor_32x32.png
-  AI_48x48.png
-  AI_Cursor_32x32.png
-  Erase_48x48.png
-  Erase_Cursor_32x32.png
-  Fill_48x48.png
-  Fill_Cursor_32x32.png
-  LiveWire_48x48.png
-  LiveWire_Cursor_32x32.png
-  NewAdd_48x48.png
-  NewAdd_Cursor_32x32.png
-  Otsu_48x48.png
-  Paint_48x48.png
-  Paint_Cursor_32x32.png
-  Pick_48x48.png
-  RegionGrowing_48x48.png
-  RegionGrowing_Cursor_32x32.png
-  Subtract_48x48.png
-  Subtract_Cursor_32x32.png
-  Threshold_48x48.png
-  TwoThresholds_48x48.png
-  Wipe_48x48.png
-  Wipe_Cursor_32x32.png
+  Add.svg
+  Add_Cursor.svg
+  AI.svg
+  AI_Cursor.svg
+  Close.svg
+  Close_Cursor.svg
+  Erase.svg
+  Erase_Cursor.svg
+  Fill.svg
+  Fill_Cursor.svg
+  LiveWire.svg
+  LiveWire_Cursor.svg
+  Lasso.svg
+  GrowCut.svg
+  Lasso_Cursor.svg
+  Otsu.svg
+  Paint.svg
+  Paint_Cursor.svg
+  Picking.svg
+  RegionGrowing.svg
+  RegionGrowing_Cursor.svg
+  Subtract.svg
+  Subtract_Cursor.svg
+  Threshold.svg
+  ULThreshold.svg
+  Wipe.svg
+  Wipe_Cursor.svg
 
   Interactions/dummy.xml
   Interactions/EditableContourTool.xml
   Interactions/PickingTool.xml
+  Interactions/MouseReleaseOnly.xml
   Interactions/PressMoveRelease.xml
   Interactions/PressMoveReleaseAndPointSetting.xml
   Interactions/PressMoveReleaseWithCTRLInversion.xml
   Interactions/PressMoveReleaseWithCTRLInversionAllMouseMoves.xml
+  Interactions/SegmentationConfig.xml
+  Interactions/SegmentationInteraction.xml
   Interactions/SegmentationToolsConfig.xml
 
   Interactions/ContourModelModificationConfig.xml

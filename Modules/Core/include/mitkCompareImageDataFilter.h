@@ -73,14 +73,14 @@ namespace mitk
        * The method compares only the number of pixels with differences. It returns true if the amount
        * is under the specified threshold. To get the complete results, use the GetCompareResults method.
        *
-       * Returns false also if the itk ComparisionImageFilter raises an exception during update.
+       * Returns false also if the itk ComparisonImageFilter raises an exception during update.
        *
        * @param threshold Allowed amount of pixels with differences
        */
       bool GetResult(size_t threshold = 0);
 
     /**
-     * @brief Get the detailed results of the comparision run
+     * @brief Get the detailed results of the comparison run
      *
      * @sa CompareFilterResults
      */
@@ -91,10 +91,10 @@ namespace mitk
     ~CompareImageDataFilter() override {}
     void GenerateData() override;
 
-    /*! \brief Method resets the compare detail memeber struct to its initial state */
+    /*! \brief Method resets the compare detail member struct to its initial state */
     void ResetCompareResultsToInitial();
 
-    /** ITK-like method which calls the ComparisionFilter on the two inputs of the filter */
+    /** ITK-like method which calls the ComparisonFilter on the two inputs of the filter */
     template <typename TPixel, unsigned int VImageDimension>
     void EstimateValueDifference(const itk::Image<TPixel, VImageDimension> *itkImage1,
                                  const mitk::Image *referenceImage);

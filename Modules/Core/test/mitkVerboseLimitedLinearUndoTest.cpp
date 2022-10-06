@@ -75,7 +75,7 @@ int mitkVerboseLimitedLinearUndoTest(int /* argc */, char * /*argv*/ [])
     mitk::OperationEvent::IncCurrObjectEventId();
   }
 
-  // now 2 * 2 operation should have been instanciated
+  // now 2 * 2 operation should have been instantiated
   MITK_TEST_CONDITION_REQUIRED(g_GlobalCounter == 4, "checking initialization of mitkOperation");
 
   // undo one operation; 1 operationEvent element in undo list, 1 in Redo list

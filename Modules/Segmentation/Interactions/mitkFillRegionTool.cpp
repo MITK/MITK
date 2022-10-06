@@ -12,8 +12,6 @@ found in the LICENSE file.
 
 #include "mitkFillRegionTool.h"
 
-#include "mitkFillRegionTool.xpm"
-
 // us
 #include <usGetModuleContext.h>
 #include <usModule.h>
@@ -25,30 +23,22 @@ namespace mitk
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, FillRegionTool, "Fill tool");
 }
 
-mitk::FillRegionTool::FillRegionTool() : SetRegionTool(1)
-{
-}
-
-mitk::FillRegionTool::~FillRegionTool()
-{
-}
-
 const char **mitk::FillRegionTool::GetXPM() const
 {
-  return mitkFillRegionTool_xpm;
+  return nullptr;
 }
 
 us::ModuleResource mitk::FillRegionTool::GetIconResource() const
 {
   us::Module *module = us::GetModuleContext()->GetModule();
-  us::ModuleResource resource = module->GetResource("Fill_48x48.png");
+  us::ModuleResource resource = module->GetResource("Fill.svg");
   return resource;
 }
 
 us::ModuleResource mitk::FillRegionTool::GetCursorIconResource() const
 {
   us::Module *module = us::GetModuleContext()->GetModule();
-  us::ModuleResource resource = module->GetResource("Fill_Cursor_32x32.png");
+  us::ModuleResource resource = module->GetResource("Fill_Cursor.svg");
   return resource;
 }
 
@@ -56,3 +46,14 @@ const char *mitk::FillRegionTool::GetName() const
 {
   return "Fill";
 }
+
+void mitk::FillRegionTool::PrepareFilling(const Image* /*workingSlice*/, Point3D /*seedPoint*/)
+{
+  auto labelSetImage = dynamic_cast<const LabelSetImage*>(this->GetWorkingData());
+
+  if (nullptr == labelSetImage) mitkThrow() << "Invalid state of FillRegionTool. Working image is not of correct type.";
+
+  m_FillLabelValue = labelSetImage->GetActiveLabel()->GetValue();
+  m_MergeStyle = MultiLabelSegmentation::MergeStyle::Merge;
+};
+

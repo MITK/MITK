@@ -48,7 +48,7 @@ namespace mitk
     \brief Toolkit specific implementation of mitk::CallbackFromGUIThread
 
     For any toolkit, this class has to be sub-classed. One instance of that sub-class has to
-    be registered with mitk::CallbackFromGUIThread. See the (very simple) implmentation of
+    be registered with mitk::CallbackFromGUIThread. See the (very simple) implementation of
     QmitkCallbackFromGUIThread for an example.
   */
   class MITKCORE_EXPORT CallbackFromGUIThreadImplementation

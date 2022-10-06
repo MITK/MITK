@@ -20,6 +20,11 @@ found in the LICENSE file.
 
 #include <berryIBerryPreferences.h>
 
+#include <mitkSegmentationInteractor.h>
+
+// mitk annotation
+#include <mitkLogoAnnotation.h>
+
 /**
 * @brief The segmentation view provides a set of tool to use different segmentation algorithms.
 *        It provides two selection widgets to load an image node and a segmentation node
@@ -87,6 +92,47 @@ private:
   void CreateQtPartControl(QWidget* parent) override;
 
   void SetFocus() override {}
+  /**
+  * @brief Add an observer for the mitk::Tool::ToolEnteredRenderWindow-event
+  *        to the currently active tool.
+  *
+  * The active tool is retrieved from the tool manager.
+  * If the event is not already observerd by the active tool,
+  * an observer for this event is added, using a 'ReceptorMemberCommand'.
+  * This command uses 'ValidateRendererGeometry' as a callback function,
+  * and will call this function, if the event is invoked.
+  */
+  void ActiveToolChanged();
+  /**
+  * @brief Test whether the geometry of the reference image
+  *        fits the world geometry of the respective renderer.
+  *
+  * The respective renderer is retrieved from the given event, which
+  * needs to be a 'ToolEnteredRenderWindow'. This event provides not only
+  * the sending base renderer but also a bool that indicates whether
+  * the mouse cursor entered or left the base renderer.
+  * This information is used to compare the renderer's world geometry
+  * with the oriented time geometry of the current reference image.
+  * If the geometries align, the renderer is not blocked anymore and the
+  * view's warning message is removed.
+  * If the geometries do not align, 'BlockRenderer' is called and a
+  * warning message is added to the top of the plugin view.
+  *
+  * @param event   The observed mitk::Tool::ToolEnteredRenderWindow-event.
+  */
+  void ValidateRendererGeometry(const itk::EventObject& event);
+  /**
+  * @brief Block a base renderer for segmentation.
+  *
+  * This function will add an overlay image to the given base renderer
+  * to indicate that the renderer should not be used for interactive
+  * image segmentation.
+  *
+  * @param baseRenderer   The base renderer to "block"
+  * @param blocked        If true, the overlay image will be added.
+  *                       If false, the overlay image will be removed.
+  */
+  void BlockRenderer(mitk::BaseRenderer* baseRenderer, bool blocked);
 
   void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
@@ -135,12 +181,17 @@ private:
   mitk::DataNode::Pointer m_ReferenceNode;
   mitk::DataNode::Pointer m_WorkingNode;
 
+  mitk::SegmentationInteractor::Pointer m_SegmentationInteractor;
+
   typedef std::map<mitk::DataNode*, unsigned long> NodeTagMapType;
   NodeTagMapType m_WorkingDataObserverTags;
+  NodeTagMapType m_ReferenceDataObserverTags;
   unsigned int m_RenderingManagerObserverTag;
 
   mitk::NodePredicateAnd::Pointer m_ReferencePredicate;
   mitk::NodePredicateAnd::Pointer m_SegmentationPredicate;
+
+  mitk::LogoAnnotation::Pointer m_RendererAnnotation;
 
   bool m_DrawOutline;
   bool m_SelectionMode;

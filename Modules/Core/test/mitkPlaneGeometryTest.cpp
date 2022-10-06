@@ -233,14 +233,14 @@ public:
    *
    * See also bug #7151. (ref 2 this test: iggy)
    * This test was written due to incorrect calculation of the intersection point
-   * between a given line and plane. This only occured when the pointdistance of
+   * between a given line and plane. This only occurred when the pointdistance of
    * the line was less than 1.
-   * Test Behavour:
-   * ==============
+   * Test Behaviour:
+   * ===============
    * we have a given line and a given plane.
    * we let the line intersect the plane.
    * when testing several positions on the line the resulting intersection point must be the same
-   * we test a position where the distance between the correspoinding points is < 0 and another position where the
+   * we test a position where the distance between the corresponding points is < 0 and another position where the
    * distance is > 0.
    *
    */
@@ -332,7 +332,7 @@ public:
     // initialize plane geometry
     myPlaneGeometry->InitializePlane(origin, normal);
 
-    // output to descripe the test
+    // output to describe the test
     std::cout << "Testing PlaneGeometry according to bug #3409" << std::endl;
     std::cout << "Our normal is: " << normal << std::endl;
     std::cout << "So ALL projected points should have exactly the same z-value!" << std::endl;
@@ -398,7 +398,7 @@ public:
     {
       CPPUNIT_FAIL("Error during access on a member of cloned geometry");
     }
-    // direction [row] [coloum]
+    // direction [row] [column]
     MITK_TEST_OUTPUT(<< "Casting a rotated 2D ITK Image to a MITK Image and check if Geometry is still same");
   }
 
@@ -946,7 +946,7 @@ public:
 
     CPPUNIT_ASSERT_MESSAGE("Testing Clone(): ",
                            !((clonedplanegeometry2.IsNull()) || (clonedplanegeometry2->GetReferenceCount() != 1)));
-    CPPUNIT_ASSERT_MESSAGE("Testing wheter original and clone are at the same position",
+    CPPUNIT_ASSERT_MESSAGE("Testing whether original and clone are at the same position",
                            clonedplanegeometry2->IsOnPlane(planegeometry.GetPointer()));
     CPPUNIT_ASSERT_MESSAGE(" Asserting that origin is on the plane cloned plane:",
                            clonedplanegeometry2->IsOnPlane(origin));
@@ -975,21 +975,21 @@ public:
     planerot = new mitk::RotationOperation(mitk::OpROTATE, origin, clonedplanegeometry2->GetAxisVector(0), 0.5);
     clonedplanegeometry2->ExecuteOperation(planerot);
 
-    CPPUNIT_ASSERT_MESSAGE("Testing if a non-paralell plane gets recognized as not paralell  [rotation +0.5 degree] : ",
+    CPPUNIT_ASSERT_MESSAGE("Testing if a non-parallel plane gets recognized as not parallel  [rotation +0.5 degree] : ",
                            !clonedplanegeometry2->IsParallel(planegeometry));
     delete planerot;
 
     planerot = new mitk::RotationOperation(mitk::OpROTATE, origin, clonedplanegeometry2->GetAxisVector(0), -1.0);
     clonedplanegeometry2->ExecuteOperation(planerot);
 
-    CPPUNIT_ASSERT_MESSAGE("Testing if a non-paralell plane gets recognized as not paralell  [rotation -0.5 degree] : ",
+    CPPUNIT_ASSERT_MESSAGE("Testing if a non-parallel plane gets recognized as not parallel  [rotation -0.5 degree] : ",
                            !clonedplanegeometry2->IsParallel(planegeometry));
     delete planerot;
 
     planerot = new mitk::RotationOperation(mitk::OpROTATE, origin, clonedplanegeometry2->GetAxisVector(0), 360.5);
     clonedplanegeometry2->ExecuteOperation(planerot);
 
-    CPPUNIT_ASSERT_MESSAGE("Testing if a non-paralell plane gets recognized as paralell  [rotation 360 degree] : ",
+    CPPUNIT_ASSERT_MESSAGE("Testing if a non-parallel plane gets recognized as parallel  [rotation 360 degree] : ",
                            clonedplanegeometry2->IsParallel(planegeometry));
   }
 

@@ -146,7 +146,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::FilterSetOfObje
   for (DataStorage::SetOfObjects::ConstIterator it = set->Begin(); it != set->End(); it++)
     if (condition == nullptr ||
         condition->CheckNode(it.Value()) ==
-          true) // alway copy the set, otherwise the iterator in DataStorage::Remove() will crash
+          true) // always copy the set, otherwise the iterator in DataStorage::Remove() will crash
       result->InsertElement(result->Size(), it.Value());
 
   return DataStorage::SetOfObjects::ConstPointer(result);

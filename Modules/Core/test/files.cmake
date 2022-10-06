@@ -9,7 +9,7 @@ set(MODULE_TESTS
   # mark it as critical.
 
   ################## DISABLED TESTS #################################################
-  #mitkAbstractTransformGeometryTest.cpp #seems as tested class mitkExternAbstractTransformGeometry doesnt exist any more
+  #mitkAbstractTransformGeometryTest.cpp #seems as tested class mitkExternAbstractTransformGeometry doesn't exist any more
   #mitkStateMachineContainerTest.cpp #rewrite test, indirect since no longer exported Bug 14529
   #mitkRegistrationBaseTest.cpp #tested class  mitkRegistrationBase doesn't exist any more
   #mitkSegmentationInterpolationTest.cpp #file doesn't exist!

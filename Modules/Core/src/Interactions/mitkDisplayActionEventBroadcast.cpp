@@ -17,17 +17,12 @@ found in the LICENSE file.
 #include "usModuleContext.h"
 
 // mitk core module
-#include <mitkCompositePixelValueToString.h>
 #include <mitkDisplayActionEvents.h>
 #include <mitkImage.h>
-#include <mitkImagePixelReadAccessor.h>
 #include <mitkInteractionConst.h>
 #include <mitkInteractionPositionEvent.h>
 #include <mitkLine.h>
-#include <mitkNodePredicateDataType.h>
-#include <mitkPixelTypeMultiplex.h>
 #include <mitkRotationOperation.h>
-#include <mitkStatusBar.h>
 
 #include <rotate_cursor.xpm>
 
@@ -44,7 +39,6 @@ mitk::DisplayActionEventBroadcast::DisplayActionEventBroadcast()
 {
   m_StartCoordinateInMM.Fill(0);
   m_LastDisplayCoordinate.Fill(0);
-  m_LastCoordinateInMM.Fill(0);
   m_CurrentDisplayCoordinate.Fill(0);
 
   // register the broadcast class (itself) as an interaction event observer via micro services
@@ -82,8 +76,6 @@ void mitk::DisplayActionEventBroadcast::ConnectActionsAndFunctions()
   CONNECT_FUNCTION("levelWindow", AdjustLevelWindow);
   CONNECT_FUNCTION("setCrosshair", SetCrosshair);
 
-  CONNECT_FUNCTION("updateStatusbar", UpdateStatusbar)
-
   CONNECT_FUNCTION("startRotation", StartRotation);
   CONNECT_FUNCTION("endRotation", EndRotation);
   CONNECT_FUNCTION("rotate", Rotate);
@@ -98,7 +90,7 @@ void mitk::DisplayActionEventBroadcast::ConfigurationChanged()
 {
   PropertyList::Pointer properties = GetAttributes();
 
-  // allwaysReact
+  // alwaysReact
   std::string strAlwaysReact = "";
   m_AlwaysReact = false;
   if (properties->GetStringProperty("alwaysReact", strAlwaysReact))
@@ -465,7 +457,6 @@ void mitk::DisplayActionEventBroadcast::Init(StateMachineAction* /*stateMachineA
   m_LastDisplayCoordinate = positionEvent->GetPointerPositionOnScreen();
   m_CurrentDisplayCoordinate = m_LastDisplayCoordinate;
   positionEvent->GetSender()->DisplayToPlane(m_LastDisplayCoordinate, m_StartCoordinateInMM);
-  m_LastCoordinateInMM = m_StartCoordinateInMM;
 }
 
 void mitk::DisplayActionEventBroadcast::Move(StateMachineAction* /*stateMachineAction*/, InteractionEvent* interactionEvent)
@@ -793,104 +784,6 @@ void mitk::DisplayActionEventBroadcast::DecreaseTimeStep(StateMachineAction*, In
   auto stepper = sliceNaviController->GetTime();
   stepper->SetAutoRepeat(true);
   stepper->Previous();
-}
-
-void mitk::DisplayActionEventBroadcast::UpdateStatusbar(StateMachineAction* /*stateMachineAction*/, InteractionEvent* interactionEvent)
-{
-  const auto* positionEvent = dynamic_cast<InteractionPositionEvent*>(interactionEvent);
-  if (nullptr == positionEvent)
-  {
-    return;
-  }
-
-  BaseRenderer::Pointer renderer = positionEvent->GetSender();
-
-  TNodePredicateDataType<Image>::Pointer isImageData = TNodePredicateDataType<Image>::New();
-  DataStorage::SetOfObjects::ConstPointer nodes = renderer->GetDataStorage()->GetSubset(isImageData).GetPointer();
-  if (nodes.IsNull())
-  {
-    return;
-  }
-
-  Point3D worldposition;
-  renderer->DisplayToWorld(positionEvent->GetPointerPositionOnScreen(), worldposition);
-  auto globalCurrentTimePoint = renderer->GetTime();
-
-  Image::Pointer image3D;
-  DataNode::Pointer node;
-  DataNode::Pointer topSourceNode;
-
-  int component = 0;
-
-  node = FindTopmostVisibleNode(nodes, worldposition, globalCurrentTimePoint, renderer);
-  if (node.IsNull())
-  {
-    return;
-  }
-
-  bool isBinary(false);
-  node->GetBoolProperty("binary", isBinary);
-  if (isBinary)
-  {
-    DataStorage::SetOfObjects::ConstPointer sourcenodes = renderer->GetDataStorage()->GetSources(node, nullptr, true);
-    if (!sourcenodes->empty())
-    {
-      topSourceNode = FindTopmostVisibleNode(nodes, worldposition, globalCurrentTimePoint, renderer);
-    }
-    if (topSourceNode.IsNotNull())
-    {
-      image3D = dynamic_cast<Image*>(topSourceNode->GetData());
-      topSourceNode->GetIntProperty("Image.Displayed Component", component);
-    }
-    else
-    {
-      image3D = dynamic_cast<Image*>(node->GetData());
-      node->GetIntProperty("Image.Displayed Component", component);
-    }
-  }
-  else
-  {
-    image3D = dynamic_cast<Image *>(node->GetData());
-    node->GetIntProperty("Image.Displayed Component", component);
-  }
-
-  // get the position and pixel value from the image and build up status bar text
-  auto statusBar = StatusBar::GetInstance();
-  if (image3D.IsNotNull() && statusBar != nullptr)
-  {
-    itk::Index<3> p;
-    image3D->GetGeometry()->WorldToIndex(worldposition, p);
-
-    auto pixelType = image3D->GetChannelDescriptor().GetPixelType().GetPixelType();
-    if (pixelType == itk::IOPixelEnum::RGB || pixelType == itk::IOPixelEnum::RGBA)
-    {
-      std::string pixelValue = "Pixel RGB(A) value: ";
-      pixelValue.append(ConvertCompositePixelValueToString(image3D, p));
-      statusBar->DisplayImageInfo(worldposition, p, renderer->GetTime(), pixelValue.c_str());
-    }
-    else if (pixelType == itk::IOPixelEnum::DIFFUSIONTENSOR3D || pixelType == itk::IOPixelEnum::SYMMETRICSECONDRANKTENSOR)
-    {
-      std::string pixelValue = "See ODF Details view. ";
-      statusBar->DisplayImageInfo(worldposition, p, renderer->GetTime(), pixelValue.c_str());
-    }
-    else
-    {
-      ScalarType pixelValue;
-      mitkPixelTypeMultiplex5(
-        FastSinglePixelAccess,
-        image3D->GetChannelDescriptor().GetPixelType(),
-        image3D,
-        image3D->GetVolumeData(renderer->GetTimeStep()),
-        p,
-        pixelValue,
-        component);
-      statusBar->DisplayImageInfo(worldposition, p, renderer->GetTime(), pixelValue);
-    }
-  }
-  else
-  {
-    statusBar->DisplayImageInfoInvalid();
-  }
 }
 
 bool mitk::DisplayActionEventBroadcast::GetBoolProperty(PropertyList::Pointer propertyList, const char* propertyName, bool defaultValue)

@@ -104,18 +104,6 @@ bool mitk::EditableContourTool::IsDrawingContour() const
   return m_PreviewContour.IsNotNull();
 };
 
-bool mitk::EditableContourTool::IsPositionEventInsideImageRegion(mitk::InteractionPositionEvent *positionEvent,
-                                                            mitk::BaseData *data)
-{
-  bool isPositionEventInsideImageRegion =
-    nullptr != data && data->GetGeometry()->IsInside(positionEvent->GetPositionInWorld());
-
-  if (!isPositionEventInsideImageRegion)
-    MITK_WARN("EditableContourTool") << "PositionEvent is outside ImageRegion!";
-
-  return isPositionEventInsideImageRegion;
-}
-
 mitk::Point3D mitk::EditableContourTool::PrepareInitContour(const Point3D& clickedPoint)
 { //default implementation does nothing
   return clickedPoint;

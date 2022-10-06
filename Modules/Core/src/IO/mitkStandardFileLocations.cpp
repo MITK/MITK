@@ -94,7 +94,7 @@ std::string mitk::StandardFileLocations::SearchDirectoriesForFile(const char *fi
     // convert to OS dependent path schema
     currDir = Utf8Util::Utf8ToLocal8Bit(itksys::SystemTools::ConvertToOutputPath(Utf8Util::Local8BitToUtf8(currDir).c_str()));
 
-    // On windows systems, the ConvertToOutputPath method quotes pathes that contain empty spaces.
+    // On windows systems, the ConvertToOutputPath method quotes paths that contain empty spaces.
     // These quotes are not expected by the FileExists method and therefore removed, if existing.
     if (currDir.find_last_of("\"") + 1 == currDir.size())
       currDir.erase(currDir.size() - 1, currDir.size());

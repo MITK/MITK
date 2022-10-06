@@ -32,14 +32,14 @@ QmitkMultiLabelSegWithPreviewToolGUIBase::QmitkMultiLabelSegWithPreviewToolGUIBa
 void QmitkMultiLabelSegWithPreviewToolGUIBase::InitializeUI(QBoxLayout* mainLayout)
 {
   auto radioTransferAll = new QRadioButton("Transfer all labels", this);
-  radioTransferAll->setToolTip("Transfer all preview label when confirmed.");
+  radioTransferAll->setToolTip("Transfer all preview labels when confirmed.");
   radioTransferAll->setChecked(true);
   connect(radioTransferAll, &QAbstractButton::toggled, this, &QmitkMultiLabelSegWithPreviewToolGUIBase::OnRadioTransferAllClicked);
   mainLayout->addWidget(radioTransferAll);
   m_RadioTransferAll = radioTransferAll;
 
   auto radioTransferSelected = new QRadioButton("Transfer selected labels", this);
-  radioTransferSelected->setToolTip("Transfer the selected preview label when confirmed.");
+  radioTransferSelected->setToolTip("Transfer the selected preview labels when confirmed.");
   radioTransferSelected->setChecked(false);
   mainLayout->addWidget(radioTransferSelected);
   m_RadioTransferSelected = radioTransferSelected;

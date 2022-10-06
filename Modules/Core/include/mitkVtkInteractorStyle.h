@@ -18,7 +18,7 @@ found in the LICENSE file.
 *
 * Most event-types needed for typical MITK interaction have already
 * been implemented in vtkInteractorStyleUser (Mouse-Buttons + Keyboard).
-* However, wheel-events and widgetModifed-events (whatever these are)
+* However, wheel-events and widgetModified-events (whatever these are)
 * have not been handled so far. This is the purpose of this class.
 */
 

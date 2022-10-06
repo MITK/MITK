@@ -176,7 +176,7 @@ public:
   void SetLengthCorrectly_Success()
   {
     mitk::PixelType obscurePixelType = mitk::MakePixelType<MyObscureImageType>();
-    CPPUNIT_ASSERT_MESSAGE("Lenght was set correctly", obscurePixelType.GetNumberOfComponents() == MyObscurePixelType::Length);
+    CPPUNIT_ASSERT_MESSAGE("Length was set correctly", obscurePixelType.GetNumberOfComponents() == MyObscurePixelType::Length);
   }
 
   void ValueTypeCorresponds_Success()

@@ -484,7 +484,7 @@ void mitk::BoundingShapeInteractor::ScaleObject(StateMachineAction *, Interactio
     if ((numFaces != faces[0]) && (numFaces != faces[1]) && (numFaces != faces[2]) && (numFaces != faces[3]))
     {
       Point3D point = pointscontainer->GetElement(numFaces);
-      if (m_Impl->RotationEnabled) // apply if geometry is rotated at a pixel aligned shift is not possible
+      if (m_Impl->RotationEnabled) // apply if geometry is rotated and a pixel aligned shift is not possible
       {
         point[0] += faceShift[0];
         point[1] += faceShift[1];

@@ -47,14 +47,18 @@ public:
   void SetSelectedPosition(const mitk::Point3D& newPosition, const QString& widgetName) override;
   const mitk::Point3D GetSelectedPosition(const QString& widgetName) const override;
 
-  void SetCrosshairVisibility(bool activate) override;
-  bool GetCrosshairVisibility() const override { return m_CrosshairVisibility; }
+  void SetCrosshairVisibility(bool visible) override;
+  bool GetCrosshairVisibility() const override;
+  void SetCrosshairGap(unsigned int gapSize) override;
 
   void ResetCrosshair() override;
 
   void SetWidgetPlaneMode(int userMode) override;
 
   mitk::SliceNavigationController* GetTimeNavigationController();
+
+  void AddPlanesToDataStorage();
+  void RemovePlanesFromDataStorage();
 
 public Q_SLOTS:
 

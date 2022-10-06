@@ -50,6 +50,7 @@ if(MITK_USE_DCMTK)
          -DDCMTK_WITH_XML:BOOL=OFF  # see bug #9894
          -DDCMTK_WITH_ICONV:BOOL=OFF  # see bug #9894
          -DDCMTK_WITH_ICU:BOOL=OFF  # see T26438
+         -DDCMTK_WITH_WRAP:BOOL=OFF # see T27578
          ${${proj}_CUSTOM_CMAKE_ARGS}
       CMAKE_CACHE_ARGS
         ${ep_common_cache_args}

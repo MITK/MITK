@@ -121,7 +121,7 @@ namespace mitk
     this->SetStream(&stream);
     bool success = this->Parse();
     if (!success)
-      MITK_ERROR << "Error occured during parsing of EventXML File.";
+      MITK_ERROR << "Error occurred during parsing of EventXML File.";
   }
 
   mitk::XML2EventParser::XML2EventParser(std::istream &inputStream)
@@ -129,6 +129,6 @@ namespace mitk
     this->SetStream(&inputStream);
     bool success = this->Parse();
     if (!success)
-      MITK_ERROR << "Error occured during parsing of EventXML File.";
+      MITK_ERROR << "Error occurred during parsing of EventXML File.";
   }
 }

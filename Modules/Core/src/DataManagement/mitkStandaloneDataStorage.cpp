@@ -211,7 +211,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetRe
       }
   }
 
-  /* now finally copy the results to a proper SetOfObjects variable exluding the initial node and checking the condition
+  /* now finally copy the results to a proper SetOfObjects variable excluding the initial node and checking the condition
    * if any is given */
   mitk::DataStorage::SetOfObjects::Pointer realResultset = mitk::DataStorage::SetOfObjects::New();
   if (condition != nullptr)

@@ -1,0 +1,13 @@
+<statemachine name="SegmentationInteraction">
+  <state name="neutral" startstate="true">
+
+    <transition event_class="InternalEvent" event_variant="EnterRenderWindow" target="neutral">
+      <action name="EnterRenderWindow"/>
+    </transition>
+
+    <transition event_class="InternalEvent" event_variant="LeaveRenderWindow" target="neutral">
+      <action name="LeaveRenderWindow"/>
+    </transition>
+
+  </state>
+</statemachine>

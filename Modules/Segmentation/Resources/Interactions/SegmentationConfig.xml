@@ -1,0 +1,7 @@
+<config>
+  <!-- Internal events do not need a config -->
+  <!-- SegmentationInteraction only contains internal events as "event_class" -->
+  <!-- In order to work we need some dummy "event_variant" -->
+  <event_variant class="InternalEvent" name="EnterRenderWindow"/>
+  <event_variant class="InternalEvent" name="LeaveRenderWindow"/>
+</config>

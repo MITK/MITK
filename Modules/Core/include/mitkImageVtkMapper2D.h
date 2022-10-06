@@ -149,7 +149,7 @@ namespace mitk
       /** \brief Actor of the shadowimage in a 2D render window. */
       vtkSmartPointer<vtkActor> m_ShadowOutlineActor;
 
-      /** Prop assembly containting everything for a regular display of the image.*/
+      /** Prop assembly containing everything for a regular display of the image.*/
       vtkSmartPointer<vtkPropAssembly> m_Actors;
       /** Prop assembly used if workspace is in an invalid state (e.g. invalid time point or
        * invalid world coordinate position is selected) and mapper has to "early out"
@@ -183,7 +183,7 @@ namespace mitk
       mitk::ExtractSliceFilter::Pointer m_Reslicer;
       /** \brief Filter for thick slices */
       vtkSmartPointer<vtkMitkThickSlicesFilter> m_TSFilter;
-      /** \brief PolyData object containg all lines/points needed for outlining the contour.
+      /** \brief PolyData object containing all lines/points needed for outlining the contour.
             This container is used to save a computed contour for the next rendering execution.
             For instance, if you zoom or pann, there is no need to recompute the contour. */
       vtkSmartPointer<vtkPolyData> m_OutlinePolyData;
@@ -226,7 +226,7 @@ namespace mitk
       */
     void TransformActor(mitk::BaseRenderer *renderer);
 
-    /** \brief Generates a plane according to the size of the resliced image in milimeters.
+    /** \brief Generates a plane according to the size of the resliced image in millimeters.
       *
       * In VTK a vtkPlaneSource is defined through three points. The origin and two
       * points defining the axes of the plane (see VTK documentation). The origin is
@@ -268,7 +268,7 @@ namespace mitk
     void GenerateDataForRenderer(mitk::BaseRenderer *renderer) override;
 
     /** \brief This method uses the vtkCamera clipping range and the layer property
-      * to calcualte the depth of the object (e.g. image or contour). The depth is used
+      * to calculate the depth of the object (e.g. image or contour). The depth is used
       * to keep the correct order for the final VTK rendering.*/
     float CalculateLayerDepth(mitk::BaseRenderer *renderer);
 
@@ -279,7 +279,7 @@ namespace mitk
     void ApplyLookuptable(mitk::BaseRenderer *renderer);
 
     /** \brief This method applies a color transfer function.
-     * Internally, a vtkColorTransferFunction is used. This is usefull for coloring continous
+     * Internally, a vtkColorTransferFunction is used. This is useful for coloring continuous
      * images (e.g. float)
      * \warning To use the color transfer function, the property 'Image Rendering.Transfer Function' must be set and a
      * 'Image Rendering.Mode' which uses the color transfer function must be set.

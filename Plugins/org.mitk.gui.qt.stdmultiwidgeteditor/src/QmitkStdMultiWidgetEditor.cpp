@@ -277,10 +277,8 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
     ++i;
   }
 
-  int crosshairgapsize = preferences->GetInt("crosshair gap size", 32);
-  multiWidget->GetWidgetPlane1()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
-  multiWidget->GetWidgetPlane2()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
-  multiWidget->GetWidgetPlane3()->SetIntProperty("Crosshair.Gap Size", crosshairgapsize);
+  int crosshairGapSize = preferences->GetInt("crosshair gap size", 32);
+  multiWidget->SetCrosshairGap(crosshairGapSize);
 
   // zooming and panning preferences
   bool constrainedZooming = preferences->GetBool("Use constrained zooming and panning", true);

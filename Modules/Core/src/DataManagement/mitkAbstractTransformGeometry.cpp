@@ -128,7 +128,7 @@ bool mitk::AbstractTransformGeometry::Project(const mitk::Vector3D & /*vec3d_mm*
                                               mitk::Vector3D & /*projectedVec3d_mm*/) const
 {
   MITK_WARN << "Need additional point! No standard value defined. Please use Project(const mitk::Point3D & atPt3d_mm, "
-               "const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm). Unfortunatley this one is not "
+               "const mitk::Vector3D &vec3d_mm, mitk::Vector3D &projectedVec3d_mm). Unfortunately this one is not "
                "implemented at the moment. Sorry :(";
   itkExceptionMacro("not implemented yet - replace GetIndexToWorldTransform by "
                     "m_ItkVtkAbstractTransform->GetInverseVtkAbstractTransform()");

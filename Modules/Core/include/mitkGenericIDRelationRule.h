@@ -25,7 +25,7 @@ namespace mitk
   used. It must be specified when creating a rule instance. The ruleIDTag will be used as suffix
   for the rule ID of the instance and therefore allows to create specific and distinguishable rules
   instances based on this class.
-  One may also specify the display name and the role names of the instance. If not speficied the default values
+  One may also specify the display name and the role names of the instance. If not specified, the default values
   are used (display name: "<ruleIDTag> relation", source role name: "source of <ruleIDTag> relation",
   destination role name: "destination <ruleIDTag> of relation")
   */

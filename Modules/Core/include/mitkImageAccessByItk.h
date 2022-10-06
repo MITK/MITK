@@ -325,7 +325,7 @@ namespace mitk
 /**
  * \brief Access a MITK image by an ITK image with one or more parameters.
  *
- * Define a templated function or method (\a itkImageTypeFunction) with one ore more
+ * Define a templated function or method (\a itkImageTypeFunction) with one or more
  * additional parameters, within which the mitk-image (\a mitkImage) is accessed:
  * \code
  *   template < typename TPixel, unsigned int VImageDimension >

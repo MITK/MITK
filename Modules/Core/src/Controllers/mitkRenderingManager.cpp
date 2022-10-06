@@ -189,7 +189,7 @@ namespace mitk
 
   void RenderingManager::RequestUpdate(vtkRenderWindow *renderWindow)
   {
-    // If the renderWindow is not valid, we do not want to inadvertantly create
+    // If the renderWindow is not valid, we do not want to inadvertently create
     // an entry in the m_RenderWindowList map. It is possible if the user is
     // regularly calling AddRenderer and RemoveRenderer for a rendering update
     // to come into this method with a renderWindow pointer that is valid in the
@@ -212,7 +212,7 @@ namespace mitk
 
   void RenderingManager::ForceImmediateUpdate(vtkRenderWindow *renderWindow)
   {
-    // If the renderWindow is not valid, we do not want to inadvertantly create
+    // If the renderWindow is not valid, we do not want to inadvertently create
     // an entry in the m_RenderWindowList map. It is possible if the user is
     // regularly calling AddRenderer and RemoveRenderer for a rendering update
     // to come into this method with a renderWindow pointer that is valid in the
@@ -295,6 +295,29 @@ namespace mitk
 
     // initialize the views to the bounding geometry
     this->InitializeViews(boundingGeometry);
+  }
+
+  void RenderingManager::InitializeViewByBoundingObjects(vtkRenderWindow* renderWindow, const DataStorage* dataStorage, bool resetCamera)
+  {
+    if (nullptr == dataStorage)
+    {
+      return;
+    }
+
+    // get all nodes that have not set "includeInBoundingBox" to false
+    auto pred = NodePredicateNot::New(NodePredicateProperty::New("includeInBoundingBox", BoolProperty::New(false)));
+    DataStorage::SetOfObjects::ConstPointer filteredNodes = dataStorage->GetSubset(pred);
+
+    BaseRenderer* baseRenderer = BaseRenderer::GetInstance(renderWindow);
+    TimeGeometry::ConstPointer boundingGeometry;
+    if (!filteredNodes->empty())
+    {
+      // calculate bounding geometry of these nodes
+      boundingGeometry = dataStorage->ComputeBoundingGeometry3D(filteredNodes, "visible", baseRenderer);
+    }
+
+    // initialize the views to the bounding geometry
+    this->InitializeView(renderWindow, boundingGeometry, resetCamera);
   }
 
   bool RenderingManager::InitializeViews(const BaseGeometry* geometry, RequestType type, bool resetCamera)

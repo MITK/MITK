@@ -19,11 +19,14 @@ found in the LICENSE file.
 // mitk
 #include <mitkApplicationCursor.h>
 #include <mitkBaseApplication.h>
+#include <mitkBaseRendererHelper.h>
 #include <mitkCameraController.h>
 #include <mitkLabelSetImage.h>
 #include <mitkLabelSetImageHelper.h>
 #include <mitkLabelSetIOHelper.h>
+#include <mitkManualPlacementAnnotationRenderer.h>
 #include <mitkNodePredicateSubGeometry.h>
+#include <mitkSegmentationInteractionEvents.h>
 #include <mitkSegmentationObjectFactory.h>
 #include <mitkSegTool2D.h>
 #include <mitkStatusBar.h>
@@ -45,6 +48,9 @@ found in the LICENSE file.
 #include <QShortcut>
 #include <QDir>
 
+// vtk
+#include <vtkQImageToImageSource.h>
+
 #include <regex>
 
 const std::string QmitkSegmentationView::VIEW_ID = "org.mitk.views.segmentation";
@@ -56,6 +62,7 @@ QmitkSegmentationView::QmitkSegmentationView()
   , m_ToolManager(nullptr)
   , m_ReferenceNode(nullptr)
   , m_WorkingNode(nullptr)
+  , m_RendererAnnotation(mitk::LogoAnnotation::New())
   , m_DrawOutline(true)
   , m_SelectionMode(false)
   , m_MouseCursorSet(false)
@@ -90,6 +97,28 @@ QmitkSegmentationView::QmitkSegmentationView()
   m_ReferencePredicate->AddPredicate(mitk::NodePredicateNot::New(m_SegmentationPredicate));
   m_ReferencePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
   m_ReferencePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
+
+  // setup annotation for an overlay image to indicated a blocked renderer
+  m_RendererAnnotation->SetOpacity(0.5);
+  m_RendererAnnotation->SetRelativeSize(0.25);
+  m_RendererAnnotation->SetCornerPosition(4);
+
+  QImage* qimage = new QImage(qPrintable(":/Qmitk/Cancel_48x48.png"));
+  vtkSmartPointer<vtkQImageToImageSource> qImageToVtk;
+  qImageToVtk = vtkSmartPointer<vtkQImageToImageSource>::New();
+
+  qImageToVtk->SetQImage(qimage);
+  qImageToVtk->Update();
+  vtkSmartPointer<vtkImageData> vtkLogo = qImageToVtk->GetOutput();
+  m_RendererAnnotation->SetLogoImage(vtkLogo);
+
+  m_SegmentationInteractor = mitk::SegmentationInteractor::New();
+  // add observer for the 'SegmentationInteractionEvent'
+  itk::ReceptorMemberCommand<QmitkSegmentationView>::Pointer geometryNotAlignedCommand =
+    itk::ReceptorMemberCommand<QmitkSegmentationView>::New();
+  geometryNotAlignedCommand->SetCallbackFunction(this, &QmitkSegmentationView::ValidateRendererGeometry);
+  m_SegmentationInteractor->AddObserver(mitk::SegmentationInteractionEvent(nullptr, true), geometryNotAlignedCommand);
+  m_SegmentationInteractor->Disable();
 }
 
 QmitkSegmentationView::~QmitkSegmentationView()
@@ -101,12 +130,19 @@ QmitkSegmentationView::~QmitkSegmentationView()
     // deactivate all tools
     m_ToolManager->ActivateTool(-1);
 
-    // removing all observers
+    // removing all observers from working data
     for (NodeTagMapType::iterator dataIter = m_WorkingDataObserverTags.begin(); dataIter != m_WorkingDataObserverTags.end(); ++dataIter)
     {
       (*dataIter).first->GetProperty("visible")->RemoveObserver((*dataIter).second);
     }
     m_WorkingDataObserverTags.clear();
+
+    // removing all observers from reference data
+    for (NodeTagMapType::iterator dataIter = m_ReferenceDataObserverTags.begin(); dataIter != m_ReferenceDataObserverTags.end(); ++dataIter)
+    {
+      (*dataIter).first->GetProperty("visible")->RemoveObserver((*dataIter).second);
+    }
+    m_ReferenceDataObserverTags.clear();
 
     mitk::RenderingManager::GetInstance()->RemoveObserver(m_RenderingManagerObserverTag);
 
@@ -120,6 +156,9 @@ QmitkSegmentationView::~QmitkSegmentationView()
     m_ToolManager->SetWorkingData(nullptr);
   }
 
+  m_ToolManager->ActiveToolChanged -=
+    mitk::MessageDelegate<QmitkSegmentationView>(this, &QmitkSegmentationView::ActiveToolChanged);
+
   delete m_Controls;
 }
 
@@ -129,6 +168,14 @@ QmitkSegmentationView::~QmitkSegmentationView()
 void QmitkSegmentationView::OnReferenceSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
 {
   m_ToolManager->ActivateTool(-1);
+
+  // Remove observer if one was registered to the reference node
+  auto finding = m_ReferenceDataObserverTags.find(m_ReferenceNode);
+  if (finding != m_ReferenceDataObserverTags.end())
+  {
+    m_ReferenceNode->GetProperty("visible")->RemoveObserver(m_ReferenceDataObserverTags[m_ReferenceNode]);
+    m_ReferenceDataObserverTags.erase(m_ReferenceNode);
+  }
 
   if (nodes.empty())
   {
@@ -160,6 +207,11 @@ void QmitkSegmentationView::OnReferenceSelectionChanged(QList<mitk::DataNode::Po
       }
     }
     m_ReferenceNode->SetVisibility(true);
+
+    auto command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
+    command->SetCallbackFunction(this, &QmitkSegmentationView::ValidateSelectionInput);
+    m_ReferenceDataObserverTags[m_ReferenceNode] =
+      m_ReferenceNode->GetProperty("visible")->AddObserver(itk::ModifiedEvent(), command);
   }
 
   this->UpdateGUI();
@@ -219,8 +271,8 @@ void QmitkSegmentationView::OnSegmentationSelectionChanged(QList<mitk::DataNode:
 
     auto command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
     command->SetCallbackFunction(this, &QmitkSegmentationView::ValidateSelectionInput);
-    m_WorkingDataObserverTags.insert(std::pair<mitk::DataNode*, unsigned long>(m_WorkingNode,
-      m_WorkingNode->GetProperty("visible")->AddObserver(itk::ModifiedEvent(), command)));
+    m_WorkingDataObserverTags[m_WorkingNode] =
+      m_WorkingNode->GetProperty("visible")->AddObserver(itk::ModifiedEvent(), command);
 
     this->InitializeRenderWindows(referenceImage->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, false);
   }
@@ -473,8 +525,13 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_ToolManager->SetDataStorage(*(this->GetDataStorage()));
    m_ToolManager->InitializeTools();
 
-   QString segTools2D = tr("Add Subtract Lasso Fill Erase Paint Wipe 'Region Growing' 'Live Wire'");
-   QString segTools3D = tr("Threshold 'UL Threshold' Otsu 'Region Growing 3D' Picking");
+   // react if the active tool changed
+   m_ToolManager->ActiveToolChanged +=
+     mitk::MessageDelegate<QmitkSegmentationView>(this, &QmitkSegmentationView::ActiveToolChanged);
+
+   QString segTools2D = tr("Add Subtract Lasso Fill Erase Close Paint Wipe 'Region Growing' 'Live Wire'");
+   QString segTools3D = tr("Threshold 'UL Threshold' Otsu 'Region Growing 3D' Picking GrowCut");
+
 #ifdef __linux__
    segTools3D.append(" nnUNet"); // plugin not enabled for MacOS / Windows
 #endif
@@ -549,6 +606,83 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_Controls->workingNodeSelector->SetAutoSelectNewNodes(true);
 
    this->UpdateGUI();
+}
+
+void QmitkSegmentationView::ActiveToolChanged()
+{
+  auto activeTool = m_ToolManager->GetActiveTool();
+  if (nullptr == activeTool)
+  {
+    // no tool activated, deactivate the segmentation interactor
+    m_SegmentationInteractor->Disable();
+    return;
+  }
+
+  // activate segmentation interactor to get informed about render window entered / left events
+  m_SegmentationInteractor->Enable();
+}
+
+void QmitkSegmentationView::ValidateRendererGeometry(const itk::EventObject& event)
+{
+  if (!mitk::SegmentationInteractionEvent().CheckEvent(&event))
+  {
+    return;
+  }
+
+  const auto* segmentationInteractionEvent =
+    dynamic_cast<const mitk::SegmentationInteractionEvent*>(&event);
+
+  const mitk::BaseRenderer::Pointer sendingRenderer = segmentationInteractionEvent->GetSender();
+  if (nullptr == sendingRenderer)
+  {
+    return;
+  }
+
+  bool entered = segmentationInteractionEvent->HasEnteredRenderWindow();
+  if (entered)
+  {
+    // mouse cursor of tool inside render window
+    // check if tool can be used: reference geometry needs to be aligned with renderer geometry
+    const auto* referenceDataNode = m_ToolManager->GetReferenceData(0);
+    if (nullptr != referenceDataNode)
+    {
+      const auto workingImage = dynamic_cast<mitk::Image*>(referenceDataNode->GetData());
+      if (nullptr != workingImage)
+      {
+        const mitk::TimeGeometry* workingImageGeometry = workingImage->GetTimeGeometry();
+        if (nullptr != workingImageGeometry)
+        {
+          bool isGeometryAligned =
+            mitk::BaseRendererHelper::IsRendererAlignedWithSegmentation(sendingRenderer, workingImageGeometry);
+
+          if (!isGeometryAligned)
+          {
+            this->BlockRenderer(sendingRenderer, true);
+            this->UpdateWarningLabel(
+              tr("Please perform a reinit on the segmentation image inside the entered Render Window!"));
+            return;
+          }
+        }
+      }
+    }
+  }
+
+  this->BlockRenderer(sendingRenderer, false);
+  this->UpdateWarningLabel(tr(""));
+}
+
+void QmitkSegmentationView::BlockRenderer(mitk::BaseRenderer* baseRenderer, bool blocked)
+{
+  if (blocked)
+  {
+    mitk::ManualPlacementAnnotationRenderer::AddAnnotation(m_RendererAnnotation.GetPointer(), baseRenderer);
+    m_RendererAnnotation->Update(baseRenderer);
+    baseRenderer->RequestUpdate();
+  }
+  else
+  {
+    m_RendererAnnotation->RemoveFromBaseRenderer(baseRenderer);
+  }
 }
 
 void QmitkSegmentationView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
@@ -942,7 +1076,7 @@ void QmitkSegmentationView::ValidateSelectionInput()
     renderWindowPart->GetQmitkRenderWindow("3d")->GetSliceNavigationController()->GetCurrentGeometry3D();
   if (nullptr != workingNodeGeo && nullptr != worldGeo)
   {
-    if (mitk::Equal(*workingNodeGeo->GetBoundingBox(), *worldGeo->GetBoundingBox(), mitk::eps, true))
+    if (/*mitk::Equal(*workingNodeGeo->GetBoundingBox(), *worldGeo->GetBoundingBox(), mitk::eps, true)*/true)
     {
       m_ToolManager->SetReferenceData(referenceNode);
       m_ToolManager->SetWorkingData(workingNode);

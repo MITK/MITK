@@ -136,6 +136,7 @@ void mitk::GrowCutTool::DoUpdatePreview(const Image *inputAtTimeStep,
       growCutFilter->SetSeedImage(seedImage);
       growCutFilter->SetDistancePenalty(m_DistancePenalty);
       growCutFilter->SetInput(inputAtTimeStep);
+      growCutFilter->AddObserver(itk::ProgressEvent(), m_ProgressCommand);
 
       try
       {

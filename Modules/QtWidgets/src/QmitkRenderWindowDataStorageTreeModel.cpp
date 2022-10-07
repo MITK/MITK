@@ -13,8 +13,10 @@ found in the LICENSE file.
 // render window manager UI module
 #include "QmitkRenderWindowDataStorageTreeModel.h"
 
-// mitk core
 #include <QmitkDataStorageTreeModelInternalItem.h>
+
+// mitk core
+#include <mitkNodePredicateAnd.h>
 
 // qt widgets module
 #include "QmitkCustomVariants.h"
@@ -53,7 +55,19 @@ void QmitkRenderWindowDataStorageTreeModel::NodeAdded(const mitk::DataNode* node
 
   auto baseRenderer = m_BaseRenderer.Lock();
 
-  if (baseRenderer.IsNotNull())
+  if (baseRenderer.IsNull())
+  {
+    return;
+  }
+
+  mitk::NodePredicateBase::Pointer renderWindowPredicate = mitk::RenderWindowLayerUtilities::GetRenderWindowPredicate(baseRenderer);
+  mitk::NodePredicateAnd::Pointer combinedNodePredicate = mitk::NodePredicateAnd::New();
+  combinedNodePredicate->AddPredicate(renderWindowPredicate);
+  if (m_NodePredicate.IsNotNull())
+  {
+    combinedNodePredicate->AddPredicate(m_NodePredicate);
+  }
+  if (combinedNodePredicate->CheckNode(node))
   {
     AddNodeInternal(node, baseRenderer);
   }
@@ -437,7 +451,14 @@ void QmitkRenderWindowDataStorageTreeModel::UpdateModelData()
         mitk::RenderWindowLayerUtilities::SetRenderWindowProperties(dataNode, baseRenderer);
       }
 
-      mitk::NodePredicateAnd::Pointer combinedNodePredicate = mitk::RenderWindowLayerUtilities::GetRenderWindowPredicate(baseRenderer);
+      mitk::NodePredicateBase::Pointer renderWindowPredicate = mitk::RenderWindowLayerUtilities::GetRenderWindowPredicate(baseRenderer);
+      mitk::NodePredicateAnd::Pointer combinedNodePredicate = mitk::NodePredicateAnd::New();
+      combinedNodePredicate->AddPredicate(renderWindowPredicate);
+      if (m_NodePredicate.IsNotNull())
+      {
+        combinedNodePredicate->AddPredicate(m_NodePredicate);
+      }
+
       auto filteredDataNodes = dataStorage->GetSubset(combinedNodePredicate);
       for (const auto& dataNode : *filteredDataNodes)
       {

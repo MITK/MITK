@@ -14,7 +14,6 @@ found in the LICENSE file.
 #include "mitkRenderWindowLayerUtilities.h"
 
 // mitk core
-#include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 
 mitk::RenderWindowLayerUtilities::LayerStack mitk::RenderWindowLayerUtilities::GetLayerStack(const DataStorage* dataStorage, const BaseRenderer* renderer, bool withBaseNode)
@@ -27,8 +26,8 @@ mitk::RenderWindowLayerUtilities::LayerStack mitk::RenderWindowLayerUtilities::G
   }
 
   int layer = -1;
-  NodePredicateAnd::Pointer combinedNodePredicate = GetRenderWindowPredicate(renderer);
-  DataStorage::SetOfObjects::ConstPointer filteredDataNodes = dataStorage->GetSubset(combinedNodePredicate);
+  NodePredicateBase::Pointer fixedLayerPredicate = GetRenderWindowPredicate(renderer);
+  DataStorage::SetOfObjects::ConstPointer filteredDataNodes = dataStorage->GetSubset(fixedLayerPredicate);
   for (DataStorage::SetOfObjects::ConstIterator it = filteredDataNodes->Begin(); it != filteredDataNodes->End(); ++it)
   {
     DataNode::Pointer dataNode = it->Value();
@@ -50,17 +49,12 @@ mitk::RenderWindowLayerUtilities::LayerStack mitk::RenderWindowLayerUtilities::G
   return stackedLayers;
 }
 
-mitk::NodePredicateAnd::Pointer mitk::RenderWindowLayerUtilities::GetRenderWindowPredicate(const BaseRenderer* renderer)
+mitk::NodePredicateBase::Pointer mitk::RenderWindowLayerUtilities::GetRenderWindowPredicate(const BaseRenderer* renderer)
 {
-  NodePredicateAnd::Pointer renderWindowPredicate = NodePredicateAnd::New();
+  NodePredicateBase::Pointer fixedLayerPredicate =
+    NodePredicateProperty::New("fixedLayer", BoolProperty::New(true), renderer);
 
-  NodePredicateProperty::Pointer helperObject = NodePredicateProperty::New("helper object", BoolProperty::New(true));
-  NodePredicateProperty::Pointer fixedLayer = NodePredicateProperty::New("fixedLayer", BoolProperty::New(true), renderer);
-
-  renderWindowPredicate->AddPredicate(NodePredicateNot::New(helperObject));
-  renderWindowPredicate->AddPredicate(fixedLayer);
-
-  return renderWindowPredicate;
+  return fixedLayerPredicate;
 }
 
 void mitk::RenderWindowLayerUtilities::SetRenderWindowProperties(mitk::DataNode* dataNode, const BaseRenderer* renderer)

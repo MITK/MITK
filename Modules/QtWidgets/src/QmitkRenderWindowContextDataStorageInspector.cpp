@@ -16,6 +16,10 @@ found in the LICENSE file.
 #include <QmitkCustomVariants.h>
 #include <QmitkEnums.h>
 
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateProperty.h>
+
 // qt
 #include <QMenu>
 #include <QSignalMapper>
@@ -93,7 +97,11 @@ void QmitkRenderWindowContextDataStorageInspector::Initialize()
     return;
 
   m_StorageModel->SetDataStorage(dataStorage);
-  m_StorageModel->SetNodePredicate(m_NodePredicate);
+
+  mitk::NodePredicateAnd::Pointer noHelperObjects = mitk::NodePredicateAnd::New();
+  noHelperObjects->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
+  noHelperObjects->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
+  m_StorageModel->SetNodePredicate(noHelperObjects);
 
   m_RenderWindowLayerController->SetDataStorage(dataStorage);
 
@@ -135,23 +143,4 @@ void QmitkRenderWindowContextDataStorageInspector::OnReset()
 {
   auto nodes = this->GetSelectedNodes();
   emit ResetAction(nodes);
-}
-
-QList<mitk::DataNode::Pointer> QmitkRenderWindowContextDataStorageInspector::GetSelectedNodes()
-{
-  auto baseRenderer = m_StorageModel->GetCurrentRenderer();
-
-  QList<mitk::DataNode::Pointer> nodes;
-  QModelIndexList selectedIndexes = this->GetDataNodeSelectionModel()->selectedIndexes();
-  for (const auto& index : qAsConst(selectedIndexes))
-  {
-    QVariant qvariantDataNode = m_StorageModel->data(index, QmitkDataNodeRole);
-    if (qvariantDataNode.canConvert<mitk::DataNode::Pointer>())
-    {
-      mitk::DataNode* dataNode = qvariantDataNode.value<mitk::DataNode::Pointer>();
-      nodes.insert(nodes.size(), dataNode);
-    }
-  }
-
-  return nodes;
 }

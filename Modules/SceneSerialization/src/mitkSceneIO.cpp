@@ -504,7 +504,9 @@ tinyxml2::XMLElement *mitk::SceneIO::SaveBaseData(tinyxml2::XMLDocument &doc, Ba
       {
         std::string writtenfilename = serializer->Serialize();
         element->SetAttribute("file", writtenfilename.c_str());
-        error = false;
+
+        if (!writtenfilename.empty())
+          error = false;
       }
       catch (std::exception &e)
       {

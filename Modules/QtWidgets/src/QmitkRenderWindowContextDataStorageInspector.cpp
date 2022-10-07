@@ -16,6 +16,10 @@ found in the LICENSE file.
 #include <QmitkCustomVariants.h>
 #include <QmitkEnums.h>
 
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateProperty.h>
+
 // qt
 #include <QMenu>
 #include <QSignalMapper>
@@ -93,7 +97,11 @@ void QmitkRenderWindowContextDataStorageInspector::Initialize()
     return;
 
   m_StorageModel->SetDataStorage(dataStorage);
-  m_StorageModel->SetNodePredicate(m_NodePredicate);
+
+  mitk::NodePredicateAnd::Pointer noHelperObjects = mitk::NodePredicateAnd::New();
+  noHelperObjects->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
+  noHelperObjects->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
+  m_StorageModel->SetNodePredicate(noHelperObjects);
 
   m_RenderWindowLayerController->SetDataStorage(dataStorage);
 

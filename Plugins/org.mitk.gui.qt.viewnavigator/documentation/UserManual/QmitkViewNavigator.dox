@@ -1,17 +1,17 @@
 /**
-\page org_mitk_views_viewnavigatorview The View Navigator
+\page org_mitk_views_viewnavigator The View Navigator
 
 \imageMacro{view-manager.png,"Icon of the view navigator",2.00}
 
 \tableofcontents
 
-\section org_mitk_views_viewnavigatorviewOverview Overview
+\section org_mitk_views_viewnavigatorOverview Overview
 
 This view allows for the easy navigation of the available views.
 
 You can select which view to open by double-clicking the name of the view in the view navigator. It provides a keyworded, grouped and searchable list of views.
 
-\section org_mitk_views_viewnavigatorviewUsage Usage
+\section org_mitk_views_viewnavigatorUsage Usage
 
 You can toggle the View Navigator on and off by clicking on its icon in the menu bar. Alternatively it is also available via the Window->Show Views dialog.
 
@@ -21,13 +21,13 @@ Once the View Navigator has been opened you will see a list divided in workflows
 
 An entry on the list is opened by a double left-click.
 
-\subsection org_mitk_views_viewnavigatorviewSearch Search
+\subsection org_mitk_views_viewnavigatorSearch Search
 
 You can search the lists for view/workflow names, keywords or categories.
 
 \imageMacro{QmitkViewNavigatorSearch.png,"Search the View Navigator",4.00}
 
-\subsection org_mitk_views_viewnavigatorviewCustomWorkflows Custom Workflows
+\subsection org_mitk_views_viewnavigatorCustomWorkflows Custom Workflows
 
 \imageMacro{QmitkViewNavigatorContextMenuWorkflows.png,"The workflow context menu",4.00}
 

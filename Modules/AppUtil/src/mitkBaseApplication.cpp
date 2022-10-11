@@ -508,6 +508,10 @@ namespace mitk
     if (nullptr != qApp)
       return;
 
+#ifdef Q_OS_LINUX
+    qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--single-process"); // See T29332
+#endif
+
     // If parameters have been set before, we have to store them to hand them
     // through to the application
     auto appName = this->getApplicationName();

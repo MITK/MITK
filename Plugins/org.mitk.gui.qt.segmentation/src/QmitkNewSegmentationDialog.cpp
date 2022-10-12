@@ -22,7 +22,6 @@ found in the LICENSE file.
 #include <berryPlatform.h>
 
 #include <algorithm>
-#include <iterator>
 
 #include <vtkNew.h>
 
@@ -36,17 +35,24 @@ namespace
   // Get standard label name and color suggestions from embedded XML preset file for anatomical structures.
   QmitkNewSegmentationDialog::SuggestionsType GetStandardSuggestions()
   {
-    QmitkNewSegmentationDialog::SuggestionsType standardSuggestions;
-
     vtkNew<mitk::AnatomicalStructureColorPresets> presets;
     presets->LoadPreset();
 
-    for (const auto& preset : presets->GetColorPresets())
+    auto colorPresets = presets->GetColorPresets();
+
+    QmitkNewSegmentationDialog::SuggestionsType standardSuggestions;
+    standardSuggestions.reserve(colorPresets.size());
+
+    for (const auto& preset : colorPresets)
     {
       auto name = QString::fromStdString(preset.first);
       auto color = QColor::fromRgbF(preset.second.GetRed(), preset.second.GetGreen(), preset.second.GetBlue());
-      standardSuggestions.emplace(name, color);
+      standardSuggestions.emplace_back(name, color);
     }
+
+    std::sort(begin(standardSuggestions), end(standardSuggestions), [](const auto& lhs, const auto& rhs) {
+      return lhs.first < rhs.first;
+    });
 
     return standardSuggestions;
   }
@@ -81,13 +87,32 @@ namespace
         continue;
 
       auto name = QString::fromStdString(obj["name"]);
-
-      QColor color(QColor::Invalid);
+      QColor color;
 
       if (obj.contains("color"))
         color.setNamedColor(QString::fromStdString(obj["color"]));
 
-      parsedSuggestions.emplace(name, color);
+      auto it = std::find_if(begin(parsedSuggestions), end(parsedSuggestions), [&name](const auto& suggestion) {
+        return name == suggestion.first;
+      });
+
+      // Ignore duplicates...
+      if (it != parsedSuggestions.end())
+      {
+        // unless we can complete the original suggestion with a valid color.
+        if (!it->second.isValid() && color.isValid())
+        {
+          it->second = color;
+        }
+        else
+        {
+          MITK_WARN << "Ignoring duplicate of suggestion \"" << name.toStdString() << "\"!";
+        }
+
+        continue;
+      }
+
+      parsedSuggestions.emplace_back(name, color);
     }
 
     if (parsedSuggestions.empty())
@@ -101,6 +126,7 @@ namespace
     QString labelSuggestions;
     bool replaceStandardSuggestions;
     bool suggestOnce;
+    QByteArray geometry;
   };
 
   // Get all relevant preferences and consider command-line arguments overrides.
@@ -117,8 +143,15 @@ namespace
 
     prefs.replaceStandardSuggestions = nodePrefs->GetBool("replace standard suggestions", true);
     prefs.suggestOnce = nodePrefs->GetBool("suggest once", true);
+    prefs.geometry = nodePrefs->GetByteArray("QmitkNewSegmentationDialog geometry", QByteArray());
 
     return prefs;
+  }
+
+  void SaveGeometry(QByteArray geometry)
+  {
+    auto nodePrefs = berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.views.segmentation");
+    nodePrefs->PutByteArray("QmitkNewSegmentationDialog geometry", geometry);
   }
 
   // Get names of all labels in all layers of a LabelSetImage.
@@ -152,7 +185,7 @@ namespace
   {
     QmitkNewSegmentationDialog::SuggestionsType filteredSuggestions;
 
-    std::remove_copy_if(suggestions.begin(), suggestions.end(), std::inserter(filteredSuggestions, filteredSuggestions.end()), [&blacklist](const auto& suggestion) {
+    std::remove_copy_if(begin(suggestions), end(suggestions), std::inserter(filteredSuggestions, end(filteredSuggestions)), [&blacklist](const auto& suggestion) {
       return blacklist.contains(suggestion.first);
     });
 
@@ -181,6 +214,7 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget *parent, mitk::La
 
   m_Ui->nameLineEdit->setFocus();
 
+  connect(this, &QDialog::finished, this, &QmitkNewSegmentationDialog::OnFinished);
   connect(m_Ui->colorButton, &QToolButton::clicked, this, &QmitkNewSegmentationDialog::OnColorButtonClicked);
   connect(m_Ui->nameLineEdit, &QLineEdit::textChanged, this, &QmitkNewSegmentationDialog::OnTextChanged);
   connect(m_Ui->nameList, &QListWidget::itemSelectionChanged, this, &QmitkNewSegmentationDialog::OnSuggestionSelected);
@@ -208,10 +242,18 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget *parent, mitk::La
 
     this->UpdateNameList();
   }
+
+  if (!(prefs.geometry.isNull() || prefs.geometry.isEmpty()))
+    this->restoreGeometry(prefs.geometry);
 }
 
 QmitkNewSegmentationDialog::~QmitkNewSegmentationDialog()
 {
+}
+
+void QmitkNewSegmentationDialog::OnFinished(int)
+{
+  SaveGeometry(this->saveGeometry());
 }
 
 void QmitkNewSegmentationDialog::UpdateColorButtonBackground()
@@ -255,19 +297,18 @@ void QmitkNewSegmentationDialog::SetColor(const mitk::Color& color)
 
 void QmitkNewSegmentationDialog::SetSuggestions(const SuggestionsType& suggestions, bool replaceStandardSuggestions)
 {
-  if (replaceStandardSuggestions)
-  {
-    m_Suggestions = suggestions;
-  }
-  else
-  {
-    m_Suggestions = GetStandardSuggestions();
+  m_Suggestions = suggestions;
 
-    for (const auto& [name, color] : suggestions)
-    {
-      if (m_Suggestions.end() == m_Suggestions.find(name))
-        m_Suggestions[name] = color;
-    }
+  if (!replaceStandardSuggestions)
+  {
+    auto standardSuggestions = GetStandardSuggestions();
+
+    // Append all standard suggestions with unique names to the list of custom suggestions
+    std::remove_copy_if(begin(standardSuggestions), end(standardSuggestions), std::inserter(m_Suggestions, end(m_Suggestions)), [this](const auto& suggestion) {
+      return m_Suggestions.end() != std::find_if(begin(m_Suggestions), end(m_Suggestions), [&suggestion](const auto& otherSuggestion) {
+        return suggestion.first == otherSuggestion.first;
+      });
+    });
   }
 
   this->UpdateNameList();
@@ -316,9 +357,10 @@ void QmitkNewSegmentationDialog::OnSuggestionSelected()
   if (currentItem == nullptr)
     return;
 
-  const auto name = currentItem->text();
-  m_Ui->nameLineEdit->setText(name);
-  auto color = m_Suggestions[name];
+  auto row = m_Ui->nameList->selectionModel()->selectedIndexes().first().row();
+
+  m_Ui->nameLineEdit->setText(m_Suggestions[row].first);
+  auto color = m_Suggestions[row].second;
 
   if (color.isValid())
   {

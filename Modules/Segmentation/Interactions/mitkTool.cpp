@@ -12,7 +12,6 @@ found in the LICENSE file.
 
 #include "mitkTool.h"
 
-#include <mitkAnatomicalStructureColorPresets.h>
 #include "mitkDisplayActionEventBroadcast.h"
 #include "mitkImageReadAccessor.h"
 #include "mitkImageWriteAccessor.h"

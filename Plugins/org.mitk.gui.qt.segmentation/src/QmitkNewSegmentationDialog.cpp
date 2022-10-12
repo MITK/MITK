@@ -50,9 +50,9 @@ namespace
       standardSuggestions.emplace_back(name, color);
     }
 
-    using PredType = QmitkNewSegmentationDialog::SuggestionsType::value_type;
-    auto Pred = [](const PredType& lhs, const PredType& rhs) { return lhs.first < rhs.first; };
-    std::sort(standardSuggestions.begin(), standardSuggestions.end(), Pred);
+    std::sort(begin(standardSuggestions), end(standardSuggestions), [](const auto& lhs, const auto& rhs) {
+      return lhs.first < rhs.first;
+    });
 
     return standardSuggestions;
   }
@@ -87,11 +87,30 @@ namespace
         continue;
 
       auto name = QString::fromStdString(obj["name"]);
-
-      QColor color(QColor::Invalid);
+      QColor color;
 
       if (obj.contains("color"))
         color.setNamedColor(QString::fromStdString(obj["color"]));
+
+      auto it = std::find_if(begin(parsedSuggestions), end(parsedSuggestions), [&name](const auto& suggestion) {
+        return name == suggestion.first;
+      });
+
+      // Ignore duplicates...
+      if (it != parsedSuggestions.end())
+      {
+        // unless we can complete the original suggestion with a valid color.
+        if (!it->second.isValid() && color.isValid())
+        {
+          it->second = color;
+        }
+        else
+        {
+          MITK_WARN << "Ignoring duplicate of suggestion \"" << name.toStdString() << "\"!";
+        }
+
+        continue;
+      }
 
       parsedSuggestions.emplace_back(name, color);
     }
@@ -166,7 +185,7 @@ namespace
   {
     QmitkNewSegmentationDialog::SuggestionsType filteredSuggestions;
 
-    std::remove_copy_if(suggestions.begin(), suggestions.end(), std::inserter(filteredSuggestions, filteredSuggestions.end()), [&blacklist](const auto& suggestion) {
+    std::remove_copy_if(begin(suggestions), end(suggestions), std::inserter(filteredSuggestions, end(filteredSuggestions)), [&blacklist](const auto& suggestion) {
       return blacklist.contains(suggestion.first);
     });
 
@@ -283,7 +302,13 @@ void QmitkNewSegmentationDialog::SetSuggestions(const SuggestionsType& suggestio
   if (!replaceStandardSuggestions)
   {
     auto standardSuggestions = GetStandardSuggestions();
-    m_Suggestions.insert(m_Suggestions.end(), standardSuggestions.begin(), standardSuggestions.end());
+
+    // Append all standard suggestions with unique names to the list of custom suggestions
+    std::remove_copy_if(begin(standardSuggestions), end(standardSuggestions), std::inserter(m_Suggestions, end(m_Suggestions)), [this](const auto& suggestion) {
+      return m_Suggestions.end() != std::find_if(begin(m_Suggestions), end(m_Suggestions), [&suggestion](const auto& otherSuggestion) {
+        return suggestion.first == otherSuggestion.first;
+      });
+    });
   }
 
   this->UpdateNameList();

@@ -61,6 +61,7 @@ public:
 
 private:
   void OnAccept();
+  void OnFinished(int result);
   void OnSuggestionSelected();
   void OnColorButtonClicked();
   void OnTextChanged(const QString& text);

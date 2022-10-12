@@ -107,6 +107,7 @@ namespace
     QString labelSuggestions;
     bool replaceStandardSuggestions;
     bool suggestOnce;
+    QByteArray geometry;
   };
 
   // Get all relevant preferences and consider command-line arguments overrides.
@@ -123,8 +124,15 @@ namespace
 
     prefs.replaceStandardSuggestions = nodePrefs->GetBool("replace standard suggestions", true);
     prefs.suggestOnce = nodePrefs->GetBool("suggest once", true);
+    prefs.geometry = nodePrefs->GetByteArray("QmitkNewSegmentationDialog geometry", QByteArray());
 
     return prefs;
+  }
+
+  void SaveGeometry(QByteArray geometry)
+  {
+    auto nodePrefs = berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.views.segmentation");
+    nodePrefs->PutByteArray("QmitkNewSegmentationDialog geometry", geometry);
   }
 
   // Get names of all labels in all layers of a LabelSetImage.
@@ -187,6 +195,7 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget *parent, mitk::La
 
   m_Ui->nameLineEdit->setFocus();
 
+  connect(this, &QDialog::finished, this, &QmitkNewSegmentationDialog::OnFinished);
   connect(m_Ui->colorButton, &QToolButton::clicked, this, &QmitkNewSegmentationDialog::OnColorButtonClicked);
   connect(m_Ui->nameLineEdit, &QLineEdit::textChanged, this, &QmitkNewSegmentationDialog::OnTextChanged);
   connect(m_Ui->nameList, &QListWidget::itemSelectionChanged, this, &QmitkNewSegmentationDialog::OnSuggestionSelected);
@@ -214,10 +223,18 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget *parent, mitk::La
 
     this->UpdateNameList();
   }
+
+  if (!(prefs.geometry.isNull() || prefs.geometry.isEmpty()))
+    this->restoreGeometry(prefs.geometry);
 }
 
 QmitkNewSegmentationDialog::~QmitkNewSegmentationDialog()
 {
+}
+
+void QmitkNewSegmentationDialog::OnFinished(int)
+{
+  SaveGeometry(this->saveGeometry());
 }
 
 void QmitkNewSegmentationDialog::UpdateColorButtonBackground()

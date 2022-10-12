@@ -579,6 +579,12 @@ void QmitkLabelSetWidget::OnItemDoubleClicked(QTableWidgetItem *item)
   if (!item)
     return;
 
+  if (QApplication::queryKeyboardModifiers().testFlag(Qt::AltModifier))
+  {
+    this->OnRenameLabelShortcutActivated();
+    return;
+  }
+
   int pixelValue = item->data(Qt::UserRole).toInt();
   // OnItemClicked(item); <<-- Double click first call OnItemClicked
   WaitCursorOn();

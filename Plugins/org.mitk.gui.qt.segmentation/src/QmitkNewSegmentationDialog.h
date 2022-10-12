@@ -17,7 +17,8 @@ found in the LICENSE file.
 
 #include <mitkColorProperty.h>
 
-#include <map>
+#include <vector>
+#include <utility>
 
 #include <QColor>
 #include <QDialog>
@@ -41,7 +42,7 @@ class MITK_QT_SEGMENTATION QmitkNewSegmentationDialog : public QDialog
   Q_OBJECT
 
 public:
-  using SuggestionsType = std::map<QString, QColor>;
+  using SuggestionsType = std::vector<std::pair<QString, QColor>>;
 
   enum Mode
   {

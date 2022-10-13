@@ -254,7 +254,7 @@ namespace mitk
     virtual void BuildLegacyRainbowColorLookupTable();
     virtual void BuildInverseGrayScaleLookupTable();
     virtual void BuildHotIronLookupTable(bool transparent = false);
-	  virtual void BuildPlasmaLookupTable();
+    virtual void BuildPlasmaLookupTable();
 	  virtual void BuildInfernoLookupTable();
     virtual void BuildViridisLookupTable(bool transparent = false);
     virtual void BuildCividsLookupTable(bool transparent = false);

@@ -130,6 +130,8 @@ namespace mitk
     template <typename ItkImageType>
     friend PixelType MakePixelType(size_t);
 
+    friend PixelType MakePixelType(const PixelType &, std::size_t numOfComponents);
+
     PixelType(ItkIOComponentType componentType,
               ItkIOPixelType pixelType,
               std::size_t bytesPerComponent,
@@ -163,6 +165,30 @@ namespace mitk
    * @return the mitk::PixelType
    */
   MITKCORE_EXPORT mitk::PixelType MakePixelType(vtkImageData *vtkimagedata);
+
+
+  /** \brief An interface to the MakePixelType method for creating pixel types with 
+   *         same component type but varying number of components.
+    *
+    * @param inputPixelType the source PixelType, the PixelType shall be deducted from
+    * @return the mitk::PixelType
+    * Usage: for example MakeScalarPixelType(mitkImage->GetPixelType(),1) for a scalar image
+    * if mitkImage is a multi component image. 
+    */
+  MITKCORE_EXPORT inline mitk::PixelType MakePixelType(const PixelType & inputPixelType, std::size_t numOfComponents){
+    itk::CommonEnums::IOPixel pixelType;
+    if(numOfComponents > 1)
+      pixelType = itk::CommonEnums::IOPixel::VECTOR;
+    else
+      pixelType = itk::CommonEnums::IOPixel::SCALAR;
+
+    return PixelType(inputPixelType.GetComponentType(),
+                           pixelType,
+                           inputPixelType.GetBitsPerComponent()/8,
+                           numOfComponents,
+                           inputPixelType.GetComponentTypeAsString(),
+                           std::string());
+  }
 
   /**
    * \brief A template method for creating a pixel type.

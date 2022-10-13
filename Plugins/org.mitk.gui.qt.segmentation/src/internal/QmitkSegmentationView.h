@@ -143,9 +143,11 @@ private:
 
   void NodeRemoved(const mitk::DataNode* node) override;
 
-  void OnEstablishLabelSetConnection();
+  void EstablishLabelSetConnection();
 
-  void OnLooseLabelSetConnection();
+  void LooseLabelSetConnection();
+
+  void OnAnySelectionChanged();
 
   // make sure all images / segmentations look according to the user preference settings
   void ApplyDisplayOptions();

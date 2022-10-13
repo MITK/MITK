@@ -170,7 +170,7 @@ void QmitkSegmentationView::OnReferenceSelectionChanged(QList<mitk::DataNode::Po
   this->OnAnySelectionChanged();
 }
 
-void QmitkSegmentationView::OnSegmentationSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
+void QmitkSegmentationView::OnSegmentationSelectionChanged(QList<mitk::DataNode::Pointer>)
 {
   this->OnAnySelectionChanged();
 }

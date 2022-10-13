@@ -210,7 +210,12 @@ namespace mitk
       LEGACY_RAINBOW_COLOR,
       MULTILABEL,
       PET_COLOR,
-      PET_20
+      PET_20,
+      GRAYSCALE_TRANSPARENT,
+      HOT_IRON_TRANSPARENT,
+      VIRIDIS_TRANSPARENT,
+      CIVIDS_TRANSPARENT,
+      CIVIDS,
     };
 
     static std::vector<std::string> typenameList;
@@ -244,14 +249,15 @@ namespace mitk
 
     LookupTable(const LookupTable &other);
 
-    virtual void BuildGrayScaleLookupTable();
+    virtual void BuildGrayScaleLookupTable(bool transparent = false);
     virtual void BuildLegacyBinaryLookupTable();
     virtual void BuildLegacyRainbowColorLookupTable();
     virtual void BuildInverseGrayScaleLookupTable();
-    virtual void BuildHotIronLookupTable();
+    virtual void BuildHotIronLookupTable(bool transparent = false);
 	  virtual void BuildPlasmaLookupTable();
 	  virtual void BuildInfernoLookupTable();
-	  virtual void BuildViridisLookupTable();
+    virtual void BuildViridisLookupTable(bool transparent = false);
+    virtual void BuildCividsLookupTable(bool transparent = false);
     virtual void BuildMagmaLookupTable();
     virtual void BuildJetLookupTable(bool transparent = false);
     virtual void BuildPETColorLookupTable();

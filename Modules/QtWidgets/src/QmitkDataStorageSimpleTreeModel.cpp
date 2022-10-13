@@ -67,7 +67,10 @@ void QmitkDataStorageSimpleTreeModel::NodeAdded(const mitk::DataNode *node)
       m_Root->Find(node) != nullptr)
     return;
 
-  this->AddNodeInternal(node);
+  if (m_NodePredicate.IsNull() || m_NodePredicate->CheckNode(node))
+  {
+    this->AddNodeInternal(node);
+  }
 }
 
 void QmitkDataStorageSimpleTreeModel::NodeChanged(const mitk::DataNode *node)

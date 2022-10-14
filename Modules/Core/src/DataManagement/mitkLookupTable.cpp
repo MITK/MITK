@@ -25,6 +25,9 @@ found in the LICENSE file.
 #include <itkProcessObject.h>
 #include <mitkLookupTableProperty.h>
 
+#include <vtkPiecewiseFunction.h>
+#include <vtkColorTransferFunction.h>
+
 std::vector<std::string> mitk::LookupTable::typenameList = {
   "Grayscale",
   "Inverse Grayscale",

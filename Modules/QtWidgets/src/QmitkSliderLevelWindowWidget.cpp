@@ -120,7 +120,7 @@ void QmitkSliderLevelWindowWidget::paintEvent(QPaintEvent *itkNotUsed(e))
   painter.setBrush(c);
   painter.drawRect(m_Rect);
 
-  float mr = m_LevelWindow.GetRange();
+  double mr = m_LevelWindow.GetRange();
   float smallestLevelableValue = 1e-9;
 
   //This check is needed as safe guard. LevelWindow is refactored to only deduce finite ranges
@@ -137,7 +137,7 @@ void QmitkSliderLevelWindowWidget::paintEvent(QPaintEvent *itkNotUsed(e))
   if (mr < smallestLevelableValue)
     mr = smallestLevelableValue;
 
-  float fact = (float)m_MoveHeight / mr;
+  double fact = (double)m_MoveHeight / mr;
 
   // begin draw scale
   if (m_ScaleVisible)
@@ -322,7 +322,7 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent(QMouseEvent *mouseEvent)
 
   else
   {
-    float fact = (float)m_MoveHeight / m_LevelWindow.GetRange();
+    double fact = (double)m_MoveHeight / m_LevelWindow.GetRange();
 
     if (m_Leftbutton)
     {
@@ -398,13 +398,13 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent(QMouseEvent *mouseEvent)
       {
         const float minv = m_LevelWindow.GetRangeMin();
 
-        const float level = (m_MoveHeight - mouseEvent->pos().y()) / fact + minv;
+        const double level = (m_MoveHeight - mouseEvent->pos().y()) / fact + minv;
 
         double diff = (mouseEvent->pos().x()) / fact;
         diff -= (m_StartPos.x()) / fact;
         m_StartPos = mouseEvent->pos();
 
-        float window;
+        double window;
         if (m_Bottom)
           window = m_LevelWindow.GetWindow() + ((2 * diff));
         else
@@ -484,12 +484,12 @@ void QmitkSliderLevelWindowWidget::Update()
     setMaximumSize(QSize(50, 2000));
     setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding));
   }
-  float mr = m_LevelWindow.GetRange();
+  double mr = m_LevelWindow.GetRange();
 
   if (mr < 1e-9)
     mr = 1e-9;
 
-  float fact = (float)m_MoveHeight / mr;
+  double fact = (double)m_MoveHeight / mr;
 
   float rectHeight = m_LevelWindow.GetWindow() * fact;
 

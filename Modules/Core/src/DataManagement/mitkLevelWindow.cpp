@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include "mitkImageStatisticsHolder.h"
 
 #include <algorithm>
+#include <limits>
 
 void mitk::LevelWindow::EnsureConsistency()
 {
@@ -133,6 +134,24 @@ void mitk::LevelWindow::SetWindowBounds(mitk::ScalarType lowerBound,
 {
   if (IsFixed())
     return;
+
+  if (upperBound > std::numeric_limits<float>::max())
+  {
+    upperBound = std::numeric_limits<float>::max();
+  }
+  else if (upperBound < std::numeric_limits<float>::lowest())
+  {
+    upperBound = std::numeric_limits<float>::lowest();
+  }
+
+  if (lowerBound > std::numeric_limits<float>::max())
+  {
+    lowerBound = std::numeric_limits<float>::max();
+  }
+  else if (lowerBound < std::numeric_limits<float>::lowest())
+  {
+    lowerBound = std::numeric_limits<float>::lowest();
+  }
 
   m_LowerWindowBound = lowerBound;
   m_UpperWindowBound = upperBound;

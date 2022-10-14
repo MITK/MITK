@@ -25,8 +25,6 @@ found in the LICENSE file.
 #include <fstream>
 #endif
 
-#include <iostream>
-
 size_t mitk::MemoryUtilities::GetProcessMemoryUsage()
 {
   size_t size = 0;

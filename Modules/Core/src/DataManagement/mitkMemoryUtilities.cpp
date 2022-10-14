@@ -16,8 +16,7 @@ found in the LICENSE file.
 #include <windows.h>
 #include <psapi.h>
 #elif defined(__APPLE__)
-#include <mach/mach_host.h>
-#include <mach/mach_init.h>
+#include <mach/mach.h>
 #include <mach/task.h>
 #include <sys/sysctl.h>
 #else
@@ -25,6 +24,8 @@ found in the LICENSE file.
 #include <unistd.h>
 #include <fstream>
 #endif
+
+#include <iostream>
 
 size_t mitk::MemoryUtilities::GetProcessMemoryUsage()
 {
@@ -44,10 +45,11 @@ size_t mitk::MemoryUtilities::GetProcessMemoryUsage()
     CloseHandle(hProcess);
   }
 #elif defined(__APPLE__)
-  struct task_basic_info t_info;
-  mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;
-  task_info(current_task(), TASK_BASIC_INFO, (task_info_t)&t_info, &t_info_count);
-  size = t_info.virtual_size;
+  task_vm_info taskInfo;
+  mach_msg_type_number_t count = TASK_VM_INFO_COUNT;
+
+  if (task_info(mach_task_self(), TASK_VM_INFO, reinterpret_cast<task_info_t>(&taskInfo), &count) == KERN_SUCCESS)
+    size = taskInfo.resident_size - taskInfo.reusable; // That's what Chromium reports as process memory
 #else
   std::ifstream statm("/proc/self/statm");
 

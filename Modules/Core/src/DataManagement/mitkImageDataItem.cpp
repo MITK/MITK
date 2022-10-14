@@ -10,8 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkImageDataItem.h"
-#include "mitkMemoryUtilities.h"
+#include <mitkImageDataItem.h>
 #include <vtkImageData.h>
 #include <vtkPointData.h>
 
@@ -122,7 +121,7 @@ mitk::ImageDataItem::ImageDataItem(const mitk::ImageDescriptor::Pointer desc,
 
   if (m_Data == nullptr)
   {
-    m_Data = mitk::MemoryUtilities::AllocateElements<unsigned char>(m_Size);
+    m_Data = new unsigned char[m_Size];
     m_ManageMemory = true;
   }
 
@@ -157,7 +156,7 @@ mitk::ImageDataItem::ImageDataItem(const mitk::PixelType &type,
 
   if (m_Data == nullptr)
   {
-    m_Data = mitk::MemoryUtilities::AllocateElements<unsigned char>(m_Size);
+    m_Data = new unsigned char[m_Size];
     m_ManageMemory = true;
   }
 

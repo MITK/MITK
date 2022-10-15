@@ -177,10 +177,19 @@ void QmitkSegmentationView::OnSegmentationSelectionChanged(QList<mitk::DataNode:
 
 void QmitkSegmentationView::OnAnySelectionChanged()
 {
+  // When only a segmentation has been selected and the method is then called by a reference image selection,
+  // the already selected segmentation may not match the geometry predicate of the new reference image anymore.
+  // This will trigger a recursive call of this method further below. While it would be resolved gracefully, we
+  // can spare the extra call with an early-out. The original call of this method will handle the segmentation
+  // selection change afterwards anyway.
+
+  static bool isRecursiveCall = false;
+
+  if (isRecursiveCall)
+    return;
+
   auto selectedReferenceNode = m_Controls->referenceNodeSelector->GetSelectedNode();
-  auto selectedWorkingNode = m_Controls->workingNodeSelector->GetSelectedNode();
   bool referenceNodeChanged = false;
-  bool workingNodeChanged = false;
 
   m_ToolManager->ActivateTool(-1);
 
@@ -199,17 +208,23 @@ void QmitkSegmentationView::OnAnySelectionChanged()
     m_ReferenceNode = selectedReferenceNode;
     m_ToolManager->SetReferenceData(m_ReferenceNode);
 
+    // Prepare for a potential recursive call when changing node predicates of the working node selector
+    isRecursiveCall = true;
+
     if (m_ReferenceNode.IsNull())
     {
       // Without a reference image, allow all segmentations to be selected
       m_Controls->workingNodeSelector->SetNodePredicate(m_SegmentationPredicate);
+      isRecursiveCall = false;
     }
     else
     {
-      // With a reference image, only allow segmentations that fit the geometry of the reference image to be selected
+      // With a reference image, only allow segmentations that fit the geometry of the reference image to be selected.
       m_Controls->workingNodeSelector->SetNodePredicate(mitk::NodePredicateAnd::New(
         mitk::NodePredicateSubGeometry::New(m_ReferenceNode->GetData()->GetGeometry()),
         m_SegmentationPredicate.GetPointer()));
+
+      isRecursiveCall = false;
 
       if (m_SelectionMode)
       {
@@ -228,6 +243,9 @@ void QmitkSegmentationView::OnAnySelectionChanged()
         m_ReferenceNode->GetProperty("visible")->AddObserver(itk::ModifiedEvent(), command);
     }
   }
+
+  auto selectedWorkingNode = m_Controls->workingNodeSelector->GetSelectedNode();
+  bool workingNodeChanged = false;
 
   if (m_WorkingNode != selectedWorkingNode)
   {

@@ -201,6 +201,8 @@ private:
 
   QString m_LabelSetPresetPreference;
   bool m_DefaultLabelNaming;
+
+  bool m_SelectionChangeIsAlreadyBeingHandled;
 };
 
 #endif // QMITKSEGMENTATIONVIEW_H

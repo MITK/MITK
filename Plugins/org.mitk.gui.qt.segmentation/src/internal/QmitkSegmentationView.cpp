@@ -67,6 +67,7 @@ QmitkSegmentationView::QmitkSegmentationView()
   , m_SelectionMode(false)
   , m_MouseCursorSet(false)
   , m_DefaultLabelNaming(true)
+  , m_SelectionChangeIsAlreadyBeingHandled(false)
 {
   auto isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
   auto isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
@@ -183,9 +184,7 @@ void QmitkSegmentationView::OnAnySelectionChanged()
   // can spare the extra call with an early-out. The original call of this method will handle the segmentation
   // selection change afterwards anyway.
 
-  static bool isRecursiveCall = false;
-
-  if (isRecursiveCall)
+  if (m_SelectionChangeIsAlreadyBeingHandled)
     return;
 
   auto selectedReferenceNode = m_Controls->referenceNodeSelector->GetSelectedNode();
@@ -209,13 +208,13 @@ void QmitkSegmentationView::OnAnySelectionChanged()
     m_ToolManager->SetReferenceData(m_ReferenceNode);
 
     // Prepare for a potential recursive call when changing node predicates of the working node selector
-    isRecursiveCall = true;
+    m_SelectionChangeIsAlreadyBeingHandled = true;
 
     if (m_ReferenceNode.IsNull())
     {
       // Without a reference image, allow all segmentations to be selected
       m_Controls->workingNodeSelector->SetNodePredicate(m_SegmentationPredicate);
-      isRecursiveCall = false;
+      m_SelectionChangeIsAlreadyBeingHandled = false;
     }
     else
     {
@@ -224,7 +223,7 @@ void QmitkSegmentationView::OnAnySelectionChanged()
         mitk::NodePredicateSubGeometry::New(m_ReferenceNode->GetData()->GetGeometry()),
         m_SegmentationPredicate.GetPointer()));
 
-      isRecursiveCall = false;
+      m_SelectionChangeIsAlreadyBeingHandled = false;
 
       if (m_SelectionMode)
       {

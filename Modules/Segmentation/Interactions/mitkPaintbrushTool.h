@@ -49,7 +49,7 @@ namespace mitk
     void SetSize(int value);
 
   protected:
-    PaintbrushTool(int paintingPixelValue = 1); // purposely hidden
+    PaintbrushTool(bool startWithFillMode = true); // purposely hidden
     ~PaintbrushTool() override;
 
     void ConnectActionsAndFunctions() override;
@@ -62,6 +62,7 @@ namespace mitk
     virtual void OnPrimaryButtonPressedMoved(StateMachineAction *, InteractionEvent *);
     virtual void MouseMoved(mitk::InteractionEvent *interactionEvent, bool leftMouseButtonPressed);
     virtual void OnMouseReleased(StateMachineAction *, InteractionEvent *);
+    void UpdateFeedbackColor();
     virtual void OnInvertLogic(StateMachineAction *, InteractionEvent *);
 
     /**
@@ -82,9 +83,9 @@ namespace mitk
 
     void OnToolManagerWorkingDataModified();
 
-    void ResetPaintingSlice();
+    //void ResetPaintingSlice();
 
-    int m_PaintingPixelValue;
+    bool m_FillMode;
     static int m_Size;
 
     ContourModel::Pointer m_MasterContour;

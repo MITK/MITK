@@ -67,12 +67,12 @@
       </widget>
      </item>
      <item>
-      <widget class="QRadioButton" name="m_SubstractMode">
+      <widget class="QRadioButton" name="m_SubtractMode">
        <property name="toolTip">
-        <string>If confirmed the contour will be added as background, thus it will be substracted from the active label.</string>
+        <string>If confirmed the contour will be added as background, thus it will be subtracted from the active label.</string>
        </property>
        <property name="text">
-        <string>Substract mode</string>
+        <string>Subtract mode</string>
        </property>
       </widget>
      </item>

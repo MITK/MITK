@@ -19,7 +19,7 @@ QmitkEditableContourToolGUIBase::QmitkEditableContourToolGUIBase() : QmitkToolGU
   m_Controls.m_AutoCheck->setChecked(true);
   m_Controls.m_ConfirmButton->hide();
   m_Controls.m_AddMode->setChecked(true);
-  m_Controls.m_SubstractMode->hide();
+  m_Controls.m_SubtractMode->hide();
   m_Controls.m_AddMode->hide();
 
   m_Controls.m_ClearButton->hide();
@@ -79,7 +79,7 @@ void QmitkEditableContourToolGUIBase::OnAutoConfirm(bool on)
   {
     m_Controls.m_AddMode->setChecked(true);
   }
-  m_Controls.m_SubstractMode->setVisible(!on);
+  m_Controls.m_SubtractMode->setVisible(!on);
 
   if (m_NewTool.IsNotNull())
   {

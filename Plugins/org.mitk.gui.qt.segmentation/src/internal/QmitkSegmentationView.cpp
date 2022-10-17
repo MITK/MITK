@@ -557,8 +557,6 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_Controls->toolSelectionBox2D->SetToolGUIArea(m_Controls->toolGUIArea2D);
    m_Controls->toolSelectionBox2D->SetDisplayedToolGroups(segTools2D.toStdString());
    m_Controls->toolSelectionBox2D->SetLayoutColumns(3);
-   m_Controls->toolSelectionBox2D->SetEnabledMode(
-     QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible);
    connect(m_Controls->toolSelectionBox2D, &QmitkToolSelectionBox::ToolSelected,
            this, &QmitkSegmentationView::OnManualTool2DSelected);
 
@@ -568,8 +566,6 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_Controls->toolSelectionBox3D->SetToolGUIArea(m_Controls->toolGUIArea3D);
    m_Controls->toolSelectionBox3D->SetDisplayedToolGroups(segTools3D.toStdString());
    m_Controls->toolSelectionBox3D->SetLayoutColumns(3);
-   m_Controls->toolSelectionBox3D->SetEnabledMode(
-     QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible);
 
    m_Controls->slicesInterpolator->SetDataStorage(this->GetDataStorage());
 

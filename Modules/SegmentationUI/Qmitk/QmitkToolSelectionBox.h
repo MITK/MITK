@@ -53,14 +53,6 @@ class MITKSEGMENTATIONUI_EXPORT QmitkToolSelectionBox : public QWidget
   Q_OBJECT
 
 public:
-  enum EnabledMode
-  {
-    EnabledWithReferenceAndWorkingDataVisible,
-    EnabledWithReferenceData,
-    EnabledWithWorkingData,
-    AlwaysEnabled
-  };
-
   QmitkToolSelectionBox(QWidget *parent = nullptr, mitk::DataStorage *storage = nullptr);
   ~QmitkToolSelectionBox() override;
 
@@ -102,7 +94,6 @@ signals:
 public slots:
 
   virtual void setEnabled(bool);
-  virtual void SetEnabledMode(EnabledMode mode);
 
   virtual void SetLayoutColumns(int);
   virtual void SetShowNames(bool);
@@ -143,8 +134,6 @@ protected:
   // store buttons in this group
   QButtonGroup *m_ToolButtonGroup;
   QGridLayout *m_ButtonLayout;
-
-  EnabledMode m_EnabledMode;
 };
 
 #endif

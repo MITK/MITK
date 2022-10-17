@@ -66,6 +66,7 @@ QmitkSegmentationView::QmitkSegmentationView()
   , m_SelectionMode(false)
   , m_MouseCursorSet(false)
   , m_DefaultLabelNaming(true)
+  , m_SelectionChangeIsAlreadyBeingHandled(false)
 {
   auto isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
   auto isDwi = mitk::NodePredicateDataType::New("DiffusionImage");
@@ -110,7 +111,7 @@ QmitkSegmentationView::~QmitkSegmentationView()
 {
   if (nullptr != m_Controls)
   {
-    OnLooseLabelSetConnection();
+    this->LooseLabelSetConnection();
 
     // deactivate all tools
     m_ToolManager->ActivateTool(-1);
@@ -150,117 +151,131 @@ QmitkSegmentationView::~QmitkSegmentationView()
 /**********************************************************************/
 /* private Q_SLOTS                                                    */
 /**********************************************************************/
-void QmitkSegmentationView::OnReferenceSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
+void QmitkSegmentationView::OnReferenceSelectionChanged(QList<mitk::DataNode::Pointer>)
 {
-  m_ToolManager->ActivateTool(-1);
-
-  // Remove observer if one was registered to the reference node
-  auto finding = m_ReferenceDataObserverTags.find(m_ReferenceNode);
-  if (finding != m_ReferenceDataObserverTags.end())
-  {
-    m_ReferenceNode->GetProperty("visible")->RemoveObserver(m_ReferenceDataObserverTags[m_ReferenceNode]);
-    m_ReferenceDataObserverTags.erase(m_ReferenceNode);
-  }
-
-  if (nodes.empty())
-  {
-    m_Controls->workingNodeSelector->SetNodePredicate(m_SegmentationPredicate);
-    m_ReferenceNode = nullptr;
-    m_ToolManager->SetReferenceData(m_ReferenceNode);
-    this->UpdateGUI();
-    return;
-  }
-
-  m_ReferenceNode = nodes.first();
-  m_ToolManager->SetReferenceData(m_ReferenceNode);
-  if (m_ReferenceNode.IsNotNull())
-  {
-    // set a predicate such that a segmentation fits the selected reference image geometry
-    auto segPredicate = mitk::NodePredicateAnd::New(m_SegmentationPredicate.GetPointer(),
-      mitk::NodePredicateSubGeometry::New(m_ReferenceNode->GetData()->GetGeometry()));
-
-    m_Controls->workingNodeSelector->SetNodePredicate(segPredicate);
-
-    if (m_SelectionMode)
-    {
-      // hide all image nodes to later show only the automatically selected ones
-      mitk::DataStorage::SetOfObjects::ConstPointer imageNodes =
-        this->GetDataStorage()->GetSubset(m_ReferencePredicate);
-      for (mitk::DataStorage::SetOfObjects::const_iterator iter = imageNodes->begin(); iter != imageNodes->end(); ++iter)
-      {
-        (*iter)->SetVisibility(false);
-      }
-    }
-    m_ReferenceNode->SetVisibility(true);
-
-    auto command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
-    command->SetCallbackFunction(this, &QmitkSegmentationView::ValidateSelectionInput);
-    m_ReferenceDataObserverTags[m_ReferenceNode] =
-      m_ReferenceNode->GetProperty("visible")->AddObserver(itk::ModifiedEvent(), command);
-  }
-
-  this->UpdateGUI();
+  this->OnAnySelectionChanged();
 }
 
-void QmitkSegmentationView::OnSegmentationSelectionChanged(QList<mitk::DataNode::Pointer> nodes)
+void QmitkSegmentationView::OnSegmentationSelectionChanged(QList<mitk::DataNode::Pointer>)
 {
+  this->OnAnySelectionChanged();
+}
+
+void QmitkSegmentationView::OnAnySelectionChanged()
+{
+  // When only a segmentation has been selected and the method is then called by a reference image selection,
+  // the already selected segmentation may not match the geometry predicate of the new reference image anymore.
+  // This will trigger a recursive call of this method further below. While it would be resolved gracefully, we
+  // can spare the extra call with an early-out. The original call of this method will handle the segmentation
+  // selection change afterwards anyway.
+
+  if (m_SelectionChangeIsAlreadyBeingHandled)
+    return;
+
+  auto selectedReferenceNode = m_Controls->referenceNodeSelector->GetSelectedNode();
+  bool referenceNodeChanged = false;
+
   m_ToolManager->ActivateTool(-1);
 
-  // Remove observer if one was registered
-  auto finding = m_WorkingDataObserverTags.find(m_WorkingNode);
-  if (finding != m_WorkingDataObserverTags.end())
+  if (m_ReferenceNode != selectedReferenceNode)
   {
-    m_WorkingNode->GetProperty("visible")->RemoveObserver(m_WorkingDataObserverTags[m_WorkingNode]);
-    m_WorkingDataObserverTags.erase(m_WorkingNode);
-  }
+    referenceNodeChanged = true;
 
-  if (nodes.empty())
-  {
-    m_WorkingNode = nullptr;
-    m_ToolManager->SetWorkingData(m_WorkingNode);
-    this->UpdateGUI();
-    return;
-  }
-
-  if (m_ReferenceNode.IsNull())
-  {
-    this->UpdateGUI();
-    return;
-  }
-
-  mitk::Image::ConstPointer referenceImage = dynamic_cast<mitk::Image*>(m_ReferenceNode->GetData());
-  if (referenceImage.IsNull())
-  {
-    this->UpdateGUI();
-    return;
-  }
-
-  m_WorkingNode = nodes.first();
-  m_ToolManager->SetWorkingData(m_WorkingNode);
-  if (m_WorkingNode.IsNotNull())
-  {
-    if (m_SelectionMode)
+    // Remove visibility observer for the current reference node
+    if (m_ReferenceDataObserverTags.find(m_ReferenceNode) != m_ReferenceDataObserverTags.end())
     {
-      // hide all segmentation nodes to later show only the selected ones
-      mitk::DataStorage::SetOfObjects::ConstPointer segmentationNodes =
-        this->GetDataStorage()->GetSubset(m_SegmentationPredicate);
-      for (mitk::DataStorage::SetOfObjects::const_iterator iter = segmentationNodes->begin(); iter != segmentationNodes->end(); ++iter)
-      {
-        (*iter)->SetVisibility(false);
-      }
+      m_ReferenceNode->GetProperty("visible")->RemoveObserver(m_ReferenceDataObserverTags[m_ReferenceNode]);
+      m_ReferenceDataObserverTags.erase(m_ReferenceNode);
     }
-    m_WorkingNode->SetVisibility(true);
 
-    this->OnEstablishLabelSetConnection();
-    m_Controls->labelSetWidget->ResetAllTableWidgetItems();
+    // Set new reference node
+    m_ReferenceNode = selectedReferenceNode;
+    m_ToolManager->SetReferenceData(m_ReferenceNode);
 
-    auto command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
-    command->SetCallbackFunction(this, &QmitkSegmentationView::ValidateSelectionInput);
-    m_WorkingDataObserverTags[m_WorkingNode] =
-      m_WorkingNode->GetProperty("visible")->AddObserver(itk::ModifiedEvent(), command);
+    // Prepare for a potential recursive call when changing node predicates of the working node selector
+    m_SelectionChangeIsAlreadyBeingHandled = true;
 
-    this->InitializeRenderWindows(referenceImage->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, false);
+    if (m_ReferenceNode.IsNull())
+    {
+      // Without a reference image, allow all segmentations to be selected
+      m_Controls->workingNodeSelector->SetNodePredicate(m_SegmentationPredicate);
+      m_SelectionChangeIsAlreadyBeingHandled = false;
+    }
+    else
+    {
+      // With a reference image, only allow segmentations that fit the geometry of the reference image to be selected.
+      m_Controls->workingNodeSelector->SetNodePredicate(mitk::NodePredicateAnd::New(
+        mitk::NodePredicateSubGeometry::New(m_ReferenceNode->GetData()->GetGeometry()),
+        m_SegmentationPredicate.GetPointer()));
+
+      m_SelectionChangeIsAlreadyBeingHandled = false;
+
+      if (m_SelectionMode)
+      {
+        // Hide all image nodes except the selected reference node
+        auto imageNodes = this->GetDataStorage()->GetSubset(m_ReferencePredicate);
+
+        for (auto iter = imageNodes->begin(); iter != imageNodes->end(); ++iter)
+          (*iter)->SetVisibility(*iter == m_ReferenceNode);
+      }
+
+      // Add visibility observer for the new reference node
+      auto command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
+      command->SetCallbackFunction(this, &QmitkSegmentationView::ValidateSelectionInput);
+
+      m_ReferenceDataObserverTags[m_ReferenceNode] =
+        m_ReferenceNode->GetProperty("visible")->AddObserver(itk::ModifiedEvent(), command);
+    }
   }
+
+  auto selectedWorkingNode = m_Controls->workingNodeSelector->GetSelectedNode();
+  bool workingNodeChanged = false;
+
+  if (m_WorkingNode != selectedWorkingNode)
+  {
+    workingNodeChanged = true;
+
+    // Remove visibility observer for the current working node
+    if (m_WorkingDataObserverTags.find(m_WorkingNode) != m_WorkingDataObserverTags.end())
+    {
+      m_WorkingNode->GetProperty("visible")->RemoveObserver(m_WorkingDataObserverTags[m_WorkingNode]);
+      m_WorkingDataObserverTags.erase(m_WorkingNode);
+    }
+
+    // Disconnect from current label set image
+    this->LooseLabelSetConnection();
+
+    // Set new working node
+    m_WorkingNode = selectedWorkingNode;
+    m_ToolManager->SetWorkingData(m_WorkingNode);
+
+    if (m_WorkingNode.IsNotNull())
+    {
+      if (m_SelectionMode)
+      {
+        // Hide all segmentation nodes except the selected working node
+        auto segmentationNodes = this->GetDataStorage()->GetSubset(m_SegmentationPredicate);
+
+        for (auto iter = segmentationNodes->begin(); iter != segmentationNodes->end(); ++iter)
+          (*iter)->SetVisibility(*iter == m_WorkingNode);
+      }
+
+      // Connect to new label set image
+      this->EstablishLabelSetConnection();
+      m_Controls->labelSetWidget->ResetAllTableWidgetItems();
+
+      // Add visibility observer for the new segmentation node
+      auto command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
+      command->SetCallbackFunction(this, &QmitkSegmentationView::ValidateSelectionInput);
+
+      m_WorkingDataObserverTags[m_WorkingNode] =
+        m_WorkingNode->GetProperty("visible")->AddObserver(itk::ModifiedEvent(), command);
+    }
+  }
+
+  // Reset camera if any selection changed but only if both reference node and working node are set
+  if ((referenceNodeChanged || workingNodeChanged) && (m_ReferenceNode.IsNotNull() && m_WorkingNode.IsNotNull()))
+    this->InitializeRenderWindows(m_ReferenceNode->GetData()->GetTimeGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, false);
 
   this->UpdateGUI();
 }
@@ -443,7 +458,7 @@ void QmitkSegmentationView::OnShowMarkerNodes(bool state)
 
 void QmitkSegmentationView::OnLayersChanged()
 {
-  this->OnEstablishLabelSetConnection();
+  this->EstablishLabelSetConnection();
   m_Controls->labelSetWidget->ResetAllTableWidgetItems();
 }
 
@@ -779,18 +794,12 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
   mitk::SurfaceInterpolationController::GetInstance()->RemoveInterpolationSession(image);
 }
 
-void QmitkSegmentationView::OnEstablishLabelSetConnection()
+void QmitkSegmentationView::EstablishLabelSetConnection()
 {
   if (m_WorkingNode.IsNull())
-  {
     return;
-  }
 
   auto workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
-  if (nullptr == workingImage)
-  {
-    return;
-  }
 
   workingImage->GetActiveLabelSet()->AddLabelEvent += mitk::MessageDelegate<QmitkLabelSetWidget>(
     m_Controls->labelSetWidget, &QmitkLabelSetWidget::ResetAllTableWidgetItems);
@@ -802,29 +811,17 @@ void QmitkSegmentationView::OnEstablishLabelSetConnection()
     m_Controls->labelSetWidget, &QmitkLabelSetWidget::UpdateAllTableWidgetItems);
   workingImage->GetActiveLabelSet()->ActiveLabelEvent += mitk::MessageDelegate1<QmitkLabelSetWidget,
     mitk::Label::PixelType>(m_Controls->labelSetWidget, &QmitkLabelSetWidget::SelectLabelByPixelValue);
-
-  // Removed in T27851 to have a chance to react to AfterChangeLayerEvent. Did it brake something?
-  // workingImage->BeforeChangeLayerEvent += mitk::MessageDelegate<QmitkMultiLabelSegmentationView>(
-  //   this, &QmitkMultiLabelSegmentationView::OnLooseLabelSetConnection);
-
   workingImage->AfterChangeLayerEvent += mitk::MessageDelegate<QmitkSegmentationView>(
     this, &QmitkSegmentationView::UpdateGUI);
 }
 
-void QmitkSegmentationView::OnLooseLabelSetConnection()
+void QmitkSegmentationView::LooseLabelSetConnection()
 {
   if (m_WorkingNode.IsNull())
-  {
     return;
-  }
 
   auto workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
-  if (nullptr == workingImage)
-  {
-    return;
-  }
 
-  // Reset LabelSetWidget Events
   workingImage->GetActiveLabelSet()->AddLabelEvent -= mitk::MessageDelegate<QmitkLabelSetWidget>(
     m_Controls->labelSetWidget, &QmitkLabelSetWidget::ResetAllTableWidgetItems);
   workingImage->GetActiveLabelSet()->RemoveLabelEvent -= mitk::MessageDelegate<QmitkLabelSetWidget>(
@@ -835,11 +832,6 @@ void QmitkSegmentationView::OnLooseLabelSetConnection()
     m_Controls->labelSetWidget, &QmitkLabelSetWidget::UpdateAllTableWidgetItems);
   workingImage->GetActiveLabelSet()->ActiveLabelEvent -= mitk::MessageDelegate1<QmitkLabelSetWidget,
     mitk::Label::PixelType>(m_Controls->labelSetWidget, &QmitkLabelSetWidget::SelectLabelByPixelValue);
-
-  // Removed in T27851 to have a chance to react to AfterChangeLayerEvent. Did it brake something?
-  // workingImage->BeforeChangeLayerEvent -= mitk::MessageDelegate<QmitkMultiLabelSegmentationView>(
-  //   this, &QmitkMultiLabelSegmentationView::OnLooseLabelSetConnection);
-
   workingImage->AfterChangeLayerEvent -= mitk::MessageDelegate<QmitkSegmentationView>(
     this, &QmitkSegmentationView::UpdateGUI);
 }
@@ -1022,75 +1014,69 @@ void QmitkSegmentationView::UpdateGUI()
 
 void QmitkSegmentationView::ValidateSelectionInput()
 {
-  this->UpdateWarningLabel("");
+  auto referenceNode = m_Controls->referenceNodeSelector->GetSelectedNode();
+  auto workingNode = m_Controls->workingNodeSelector->GetSelectedNode();
 
-  m_Controls->layersWidget->setEnabled(false);
-  m_Controls->labelsWidget->setEnabled(false);
-  m_Controls->labelSetWidget->setEnabled(false);
+  bool hasReferenceNode = referenceNode.IsNotNull();
+  bool hasWorkingNode = workingNode.IsNotNull();
+  bool hasBothNodes = hasReferenceNode && hasWorkingNode;
 
-  // the argument is actually not used
-  // enable status depends on the tool manager selection
-  m_Controls->toolSelectionBox2D->setEnabled(false);
-  m_Controls->toolSelectionBox3D->setEnabled(false);
+  QString warning;
+
+  m_Controls->layersWidget->setEnabled(hasWorkingNode);
+  m_Controls->labelsWidget->setEnabled(hasWorkingNode);
+  m_Controls->labelSetWidget->setEnabled(hasWorkingNode);
+
+  m_Controls->toolSelectionBox2D->setEnabled(hasBothNodes);
+  m_Controls->toolSelectionBox3D->setEnabled(hasBothNodes);
+
   m_Controls->slicesInterpolator->setEnabled(false);
   m_Controls->interpolatorWarningLabel->hide();
 
-  mitk::DataNode* referenceNode = m_Controls->referenceNodeSelector->GetSelectedNode();
-  mitk::DataNode* workingNode = m_Controls->workingNodeSelector->GetSelectedNode();
+  auto* renderWindowPart = this->GetRenderWindowPart();
 
-  if (nullptr == referenceNode)
+  if (hasReferenceNode)
   {
-    return;
+    if (nullptr != renderWindowPart && !referenceNode->IsVisible(renderWindowPart->GetQmitkRenderWindow("axial")->GetRenderer()))
+      warning += tr("The selected reference image is currently not visible!");
   }
 
-  if (nullptr == workingNode)
+  if (hasWorkingNode)
   {
-    return;
-  }
+    if (nullptr != renderWindowPart && !workingNode->IsVisible(renderWindowPart->GetQmitkRenderWindow("axial")->GetRenderer()))
+       warning += (!warning.isEmpty() ? "<br>" : "") + tr("The selected segmentation is currently not visible!");
 
-  mitk::IRenderWindowPart* renderWindowPart = this->GetRenderWindowPart();
-  auto workingNodeIsVisible = renderWindowPart &&
-    workingNode->IsVisible(renderWindowPart->GetQmitkRenderWindow("axial")->GetRenderer());
-  if (!workingNodeIsVisible)
-  {
-    this->UpdateWarningLabel(tr("The selected segmentation is currently not visible!"));
-    return;
-  }
+    auto labelSetImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+    auto activeLayer = labelSetImage->GetActiveLayer();
+    auto numLabels = labelSetImage->GetNumberOfLabels(activeLayer);
 
-  m_ToolManager->SetReferenceData(referenceNode);
-  m_ToolManager->SetWorkingData(workingNode);
-  m_Controls->layersWidget->setEnabled(true);
-  m_Controls->labelsWidget->setEnabled(true);
-  m_Controls->labelSetWidget->setEnabled(true);
-  m_Controls->toolSelectionBox2D->setEnabled(true);
-  m_Controls->toolSelectionBox3D->setEnabled(true);
-
-  auto labelSetImage = dynamic_cast<mitk::LabelSetImage *>(workingNode->GetData());
-  if (nullptr != labelSetImage)
-  {
-    int numberOfLabels = labelSetImage->GetNumberOfLabels(labelSetImage->GetActiveLayer());
-    if (2 == numberOfLabels) // fix for T27319: exterior is label 0, first label is label 1
+    if (2 == numLabels)
     {
       m_Controls->slicesInterpolator->setEnabled(true);
     }
-    else
+    else if (2 < numLabels)
     {
-      m_Controls->interpolatorWarningLabel->show();
       m_Controls->interpolatorWarningLabel->setText(
         "<font color=\"red\">Interpolation only works for single label segmentations.</font>");
+      m_Controls->interpolatorWarningLabel->show();
     }
   }
+
+  this->UpdateWarningLabel(warning);
+
+  m_ToolManager->SetReferenceData(referenceNode);
+  m_ToolManager->SetWorkingData(workingNode);
 }
 
 void QmitkSegmentationView::UpdateWarningLabel(QString text)
 {
-  if (text.size() == 0)
+  if (text.isEmpty())
   {
     m_Controls->selectionWarningLabel->hide();
   }
   else
   {
-    m_Controls->selectionWarningLabel->show();
     m_Controls->selectionWarningLabel->setText("<font color=\"red\">" + text + "</font>");
+    m_Controls->selectionWarningLabel->show();
   }
 }

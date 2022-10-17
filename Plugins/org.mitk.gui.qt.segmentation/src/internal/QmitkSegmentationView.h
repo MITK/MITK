@@ -138,9 +138,11 @@ private:
 
   void NodeRemoved(const mitk::DataNode* node) override;
 
-  void OnEstablishLabelSetConnection();
+  void EstablishLabelSetConnection();
 
-  void OnLooseLabelSetConnection();
+  void LooseLabelSetConnection();
+
+  void OnAnySelectionChanged();
 
   // make sure all images / segmentations look according to the user preference settings
   void ApplyDisplayOptions();
@@ -192,6 +194,8 @@ private:
 
   QString m_LabelSetPresetPreference;
   bool m_DefaultLabelNaming;
+
+  bool m_SelectionChangeIsAlreadyBeingHandled;
 };
 
 #endif // QMITKSEGMENTATIONVIEW_H

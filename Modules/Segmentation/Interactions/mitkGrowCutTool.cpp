@@ -32,9 +32,10 @@ namespace mitk
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, GrowCutTool, "GrowCutTool");
 }
 
-mitk::GrowCutTool::GrowCutTool() : SegWithPreviewTool(false, "PressMoveReleaseAndPointSetting")
+mitk::GrowCutTool::GrowCutTool() : SegWithPreviewTool(true, "PressMoveReleaseAndPointSetting")
 {
   this->ResetsToEmptyPreviewOn();
+  this->UseSpecialPreviewColorOff();
 }
 
 mitk::GrowCutTool::~GrowCutTool() {}
@@ -96,6 +97,11 @@ bool mitk::GrowCutTool::HasMoreThanTwoSeedLabel()
     return false;
   }
 
+  if (workingDataLabelSetImage->GetNumberOfLayers()>1)
+  {
+    return false;
+  }
+
   workingDataLabelSetImage->SetActiveLayer(0);
   auto numberOfLabels = workingDataLabelSetImage->GetNumberOfLabels();
 
@@ -108,7 +114,7 @@ bool mitk::GrowCutTool::HasMoreThanTwoSeedLabel()
 }
 
 void mitk::GrowCutTool::DoUpdatePreview(const Image *inputAtTimeStep,
-                                        const Image * /*oldSegAtTimeStep*/,
+                                        const Image * oldSegAtTimeStep,
                                         LabelSetImage *previewImage,
                                         TimeStepType timeStep)
 {
@@ -122,16 +128,8 @@ void mitk::GrowCutTool::DoUpdatePreview(const Image *inputAtTimeStep,
         return;
       }
 
-      auto *workingDataLabelSetImage = dynamic_cast<mitk::LabelSetImage *>(this->GetToolManager()->GetWorkingData(0)->GetData());
-
-      if (nullptr == workingDataLabelSetImage)
-      {
-        return;
-      }
-
       SeedImageType::Pointer seedImage = SeedImageType::New();
-      workingDataLabelSetImage->SetActiveLayer(0);
-      CastToItkImage(workingDataLabelSetImage, seedImage);
+      CastToItkImage(oldSegAtTimeStep, seedImage);
 
       growCutFilter->SetSeedImage(seedImage);
       growCutFilter->SetDistancePenalty(m_DistancePenalty);
@@ -149,6 +147,7 @@ void mitk::GrowCutTool::DoUpdatePreview(const Image *inputAtTimeStep,
 
       auto growCutResultImage = mitk::LabelSetImage::New();
       growCutResultImage->InitializeByLabeledImage(growCutFilter->GetOutput());
+
       TransferLabelSetImageContent(growCutResultImage, previewImage, timeStep);
   }
 }

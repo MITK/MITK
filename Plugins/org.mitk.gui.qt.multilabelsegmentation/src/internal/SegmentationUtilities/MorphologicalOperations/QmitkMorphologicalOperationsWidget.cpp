@@ -35,7 +35,6 @@ QmitkMorphologicalOperationsWidget::QmitkMorphologicalOperationsWidget(mitk::Sli
   m_Controls.m_ToolSelectionBox->SetToolManager(*mitk::ToolManagerProvider::GetInstance()->GetToolManager());
   m_Controls.m_ToolSelectionBox->SetGenerateAccelerators(true);
   m_Controls.m_ToolSelectionBox->SetToolGUIArea( m_Controls.m_ToolGUIContainer );
-  m_Controls.m_ToolSelectionBox->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingDataVisible );
   m_Controls.m_ToolSelectionBox->SetDisplayedToolGroups("Median Dilate Erode Open Close 'Fill Holes' 'Keep N Largest' 'Split' 'Region Selector'");
 
   connect(m_Controls.btnClosing, SIGNAL(clicked()), this, SLOT(OnClosingButtonClicked()));

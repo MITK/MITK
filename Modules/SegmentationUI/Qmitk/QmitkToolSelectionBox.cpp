@@ -41,8 +41,7 @@ QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget *parent, mitk::DataStorage 
     m_ToolGUIWidget(nullptr),
     m_LastToolGUI(nullptr),
     m_ToolButtonGroup(nullptr),
-    m_ButtonLayout(nullptr),
-    m_EnabledMode(EnabledWithReferenceAndWorkingDataVisible)
+    m_ButtonLayout(nullptr)
 {
   QFont currentFont = QWidget::font();
   currentFont.setBold(true);
@@ -89,12 +88,6 @@ QmitkToolSelectionBox::~QmitkToolSelectionBox()
     mitk::MessageDelegate<QmitkToolSelectionBox>(this, &QmitkToolSelectionBox::OnToolManagerReferenceDataModified);
   m_ToolManager->WorkingDataChanged -=
     mitk::MessageDelegate<QmitkToolSelectionBox>(this, &QmitkToolSelectionBox::OnToolManagerWorkingDataModified);
-}
-
-void QmitkToolSelectionBox::SetEnabledMode(EnabledMode mode)
-{
-  m_EnabledMode = mode;
-  SetGUIEnabledAccordingToToolManagerState();
 }
 
 mitk::ToolManager *QmitkToolSelectionBox::GetToolManager()
@@ -302,39 +295,29 @@ void QmitkToolSelectionBox::OnToolManagerWorkingDataModified()
 */
 void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
 {
-  mitk::DataNode *referenceNode = m_ToolManager->GetReferenceData(0);
-  mitk::DataNode *workingNode = m_ToolManager->GetWorkingData(0);
+  auto* referenceNode = m_ToolManager->GetReferenceData(0);
+  auto* workingNode = m_ToolManager->GetWorkingData(0);
+  mitk::LabelSetImage* workingData = nullptr;
 
-  bool enabled = true;
+  if (workingNode != nullptr)
+    workingData = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
 
-  switch (m_EnabledMode)
-  {
-    default:
-    case EnabledWithReferenceAndWorkingDataVisible:
-      enabled = referenceNode && workingNode &&
-                referenceNode->IsVisible(nullptr) && workingNode->IsVisible(nullptr) &&
-                isVisible();
-      break;
-    case EnabledWithReferenceData:
-      enabled = referenceNode && isVisible();
-      break;
-    case EnabledWithWorkingData:
-      enabled = workingNode && isVisible();
-      break;
-    case AlwaysEnabled:
-      enabled = isVisible();
-      break;
-  }
+  bool enabled =
+    referenceNode != nullptr && workingNode != nullptr && workingData != nullptr &&
+    referenceNode->IsVisible(nullptr) && workingNode->IsVisible(nullptr) &&
+    workingData->GetNumberOfLabels(workingData->GetActiveLayer()) > 1 &&
+    isVisible();
 
   if (QWidget::isEnabled() == enabled)
-    return; // nothing to change
+    return;
 
   QWidget::setEnabled(enabled);
+
   if (enabled)
   {
     m_ToolManager->RegisterClient();
 
-    int id = m_ToolManager->GetActiveToolID();
+    auto id = m_ToolManager->GetActiveToolID();
     emit ToolSelected(id);
   }
   else

@@ -1039,39 +1039,44 @@ void QmitkSegmentationView::ValidateSelectionInput()
   auto referenceNode = m_Controls->referenceNodeSelector->GetSelectedNode();
   auto workingNode = m_Controls->workingNodeSelector->GetSelectedNode();
 
+  bool hasReferenceNode = referenceNode.IsNotNull();
+  bool hasWorkingNode = workingNode.IsNotNull();
+  bool hasBothNodes = hasReferenceNode && hasWorkingNode;
+
   QString warning;
 
-  m_Controls->layersWidget->setEnabled(workingNode.IsNotNull());
-  m_Controls->labelsWidget->setEnabled(workingNode.IsNotNull());
-  m_Controls->labelSetWidget->setEnabled(workingNode.IsNotNull());
+  m_Controls->layersWidget->setEnabled(hasWorkingNode);
+  m_Controls->labelsWidget->setEnabled(hasWorkingNode);
+  m_Controls->labelSetWidget->setEnabled(hasWorkingNode);
 
-  m_Controls->toolSelectionBox2D->setEnabled(referenceNode.IsNotNull() && workingNode.IsNotNull());
-  m_Controls->toolSelectionBox3D->setEnabled(referenceNode.IsNotNull() && workingNode.IsNotNull());
+  m_Controls->toolSelectionBox2D->setEnabled(hasBothNodes);
+  m_Controls->toolSelectionBox3D->setEnabled(hasBothNodes);
 
   m_Controls->slicesInterpolator->setEnabled(false);
   m_Controls->interpolatorWarningLabel->hide();
 
   auto* renderWindowPart = this->GetRenderWindowPart();
 
-  if (referenceNode.IsNotNull())
+  if (hasReferenceNode)
   {
     if (nullptr != renderWindowPart && !referenceNode->IsVisible(renderWindowPart->GetQmitkRenderWindow("axial")->GetRenderer()))
       warning += tr("The selected reference image is currently not visible!");
   }
 
-  if (workingNode.IsNotNull())
+  if (hasWorkingNode)
   {
     if (nullptr != renderWindowPart && !workingNode->IsVisible(renderWindowPart->GetQmitkRenderWindow("axial")->GetRenderer()))
        warning += (!warning.isEmpty() ? "<br>" : "") + tr("The selected segmentation is currently not visible!");
 
     auto labelSetImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
     auto activeLayer = labelSetImage->GetActiveLayer();
+    auto numLabels = labelSetImage->GetNumberOfLabels(activeLayer);
 
-    if (2 == labelSetImage->GetNumberOfLabels(activeLayer))
+    if (2 == numLabels)
     {
       m_Controls->slicesInterpolator->setEnabled(true);
     }
-    else
+    else if (2 < numLabels)
     {
       m_Controls->interpolatorWarningLabel->setText(
         "<font color=\"red\">Interpolation only works for single label segmentations.</font>");

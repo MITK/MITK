@@ -23,10 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>QmitkLiveWireTool2DGUIControls</string>
-  </property>
-  <property name="toolTip">
-   <string>Confirm all previous contour.</string>
+   <string>QmitkEditableContourToolGUIControls</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="leftMargin">
@@ -86,7 +83,7 @@
      <item>
       <widget class="QPushButton" name="m_ClearButton">
        <property name="text">
-        <string>Clear Segmentation</string>
+        <string>Clear Contour</string>
        </property>
       </widget>
      </item>
@@ -138,7 +135,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans'; font-size:10pt;&quot;&gt;You can fix preview segments by adding ancor points with a single left mouse button click. When you keep the mouse button pressed, you can manually draw contours (freehand contours) by moving the mouse. To close a contour and finish current segmentation perform a double click.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans'; font-size:10pt;&quot;&gt;If &amp;quot;Auto confirm&amp;quot; is active and the segmentation is finished, the preview will be directly added as segmentation. From there you are free to start a new contour (double click).&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans'; font-size:10pt;&quot;&gt;If &amp;quot;Auto confirm&amp;quot; is active and the contour is finished, the preview will be directly added as segmentation. From there you are free to start a new contour (double click).&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans'; font-size:10pt;&quot;&gt;If &amp;quot;Auto confirm&amp;quot; is not active, the contour will be still editable after finishing the segmentation. You can move, insert (CTRL+click on the contour segment) and delete (press DEL while ancor is selected) its ancor points. To confirm the segmentation, push the &amp;quot;Confirm Segmentation&amp;quot; button. Please be aware that freehand contour parts are treated differently: You cannot add an ancor point there, also you are not allowed to select/move/delete an ancor point that is at the beginning or end of a freehand contour part. &lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;

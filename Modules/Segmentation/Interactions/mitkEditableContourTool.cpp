@@ -44,7 +44,7 @@ void mitk::EditableContourTool::Activated()
 
 void mitk::EditableContourTool::Deactivated()
 {
-  this->ClearSegmentation();
+  this->ClearContour();
   Superclass::Deactivated();
 }
 
@@ -86,7 +86,7 @@ void mitk::EditableContourTool::ConfirmSegmentation(bool resetStatMachine)
   if (resetStatMachine) this->ResetToStartState();
 }
 
-void mitk::EditableContourTool::ClearSegmentation() 
+void mitk::EditableContourTool::ClearContour()
 {
   this->ReleaseHelperObjects();
   this->ReleaseInteractors();

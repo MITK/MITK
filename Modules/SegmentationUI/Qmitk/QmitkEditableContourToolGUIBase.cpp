@@ -25,7 +25,7 @@ QmitkEditableContourToolGUIBase::QmitkEditableContourToolGUIBase() : QmitkToolGU
   m_Controls.m_ClearButton->hide();
 
   connect(m_Controls.m_ConfirmButton, SIGNAL(clicked()), this, SLOT(OnConfirmSegmentation()));
-  connect(m_Controls.m_ClearButton, SIGNAL(clicked()), this, SLOT(OnClearSegmentation()));
+  connect(m_Controls.m_ClearButton, SIGNAL(clicked()), this, SLOT(OnClearContour()));
   connect(this, SIGNAL(NewToolAssociated(mitk::Tool *)), this, SLOT(OnNewToolAssociated(mitk::Tool *)));
   connect(m_Controls.m_InformationCheckBox, SIGNAL(toggled(bool)), this, SLOT(OnShowInformation(bool)));
   connect(m_Controls.m_AutoCheck, SIGNAL(toggled(bool)), this, SLOT(OnAutoConfirm(bool)));
@@ -59,10 +59,10 @@ void QmitkEditableContourToolGUIBase::OnConfirmSegmentation()
   }
 }
 
-void QmitkEditableContourToolGUIBase::OnClearSegmentation()
+void QmitkEditableContourToolGUIBase::OnClearContour()
 {
   if (m_NewTool.IsNotNull())
-    m_NewTool->ClearSegmentation();
+    m_NewTool->ClearContour();
 }
 
 void QmitkEditableContourToolGUIBase::OnShowInformation(bool on)

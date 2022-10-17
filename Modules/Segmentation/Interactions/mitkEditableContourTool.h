@@ -33,7 +33,7 @@ namespace mitk
     virtual void ConfirmSegmentation(bool resetStatMachine = true);
 
     /// \brief Delete all current contours.
-    virtual void ClearSegmentation();
+    virtual void ClearContour();
 
     itkBooleanMacro(AutoConfirm);
     itkSetMacro(AutoConfirm, bool);
@@ -43,7 +43,7 @@ namespace mitk
     itkSetMacro(AddMode, bool);
     itkGetMacro(AddMode, bool);
 
-    /* Indicated if a contour is drawn, but not confirmed yet. This the tool is in interactor mode
+    /* Indicated if a contour is drawn, but not confirmed yet. This tool is in interactor mode
      to allow users to edit the contour. This state can be reached if AutoConfirm is false, after the finalizing double
      click before the contour is confirmed.*/
     bool IsEditingContour() const;

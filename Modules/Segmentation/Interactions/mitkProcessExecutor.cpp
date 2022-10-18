@@ -88,7 +88,7 @@ namespace mitk
       itksysProcess_SetCommand(m_ProcessID, pArguments_.data());
       
       /* Place the process in a new process group for seamless interruption when required. */
-      itksysProcess_SetOption(m_ProcessID, 4, 1);
+      itksysProcess_SetOption(m_ProcessID, itksysProcess_Option_CreateProcessGroup, 1);
 
       itksysProcess_SetWorkingDirectory(m_ProcessID, executionPath.c_str());
 

@@ -191,6 +191,7 @@ namespace mitk
      * \li MULTILABEL A LookupTable for multilabel images.
      * \li PET_COLOR A LookupTable for PET color rendering.
      * \li PET_20 A LookupTable for PET_20 color rendering.
+     * \li TURBO An improved rainbow LookupTable for visualization.
      *
      * The different LookupTableTypes can be applied in the MitkWorkbench via right-clicking
      * on an image and choosing a color map.
@@ -210,7 +211,8 @@ namespace mitk
       LEGACY_RAINBOW_COLOR,
       MULTILABEL,
       PET_COLOR,
-      PET_20
+      PET_20,
+      TURBO
     };
 
     static std::vector<std::string> typenameList;
@@ -257,6 +259,7 @@ namespace mitk
     virtual void BuildPETColorLookupTable();
     virtual void BuildPET20LookupTable();
     virtual void BuildMultiLabelLookupTable();
+    virtual void BuildTurboLookupTable();
 
     vtkSmartPointer<vtkLookupTable> m_LookupTable;
 

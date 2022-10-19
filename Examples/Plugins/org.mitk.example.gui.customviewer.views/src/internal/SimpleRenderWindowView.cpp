@@ -148,6 +148,11 @@ void SimpleRenderWindowView::SetReferenceGeometry(const mitk::TimeGeometry* /*re
   // not implemented
 }
 
+bool SimpleRenderWindowView::HasCoupledRenderWindows() const
+{
+  return false;
+}
+
 mitk::SliceNavigationController *SimpleRenderWindowView::GetTimeNavigationController() const
 {
   if (GetRenderingManager())

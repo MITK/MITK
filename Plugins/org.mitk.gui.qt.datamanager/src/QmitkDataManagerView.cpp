@@ -78,11 +78,10 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   berry::IBerryPreferences::Pointer prefs = this->GetPreferences().Cast<berry::IBerryPreferences>();
   assert(prefs);
 
-  //# GUI
   m_NodeTreeModel = new QmitkDataStorageTreeModel(GetDataStorage(), prefs->GetBool("Place new nodes on top", true));
   m_NodeTreeModel->setParent(parent);
   m_NodeTreeModel->SetAllowHierarchyChange(prefs->GetBool("Allow changing of parent node", false));
-  m_SurfaceDecimation = prefs->GetBool("Use surface decimation", false);
+
   // Prepare filters
   m_HelperObjectFilterPredicate = mitk::NodePredicateOr::New(
     mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true)),
@@ -118,7 +117,6 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   // data node context menu and menu actions
   m_DataNodeContextMenu = new QmitkDataNodeContextMenu(GetSite(), m_NodeTreeView);
   m_DataNodeContextMenu->SetDataStorage(GetDataStorage());
-  m_DataNodeContextMenu->SetSurfaceDecimation(m_SurfaceDecimation);
   connect(m_NodeTreeView, SIGNAL(customContextMenuRequested(const QPoint&)), m_DataNodeContextMenu, SLOT(OnContextMenuRequested(const QPoint&)));
 
   QGridLayout* dndFrameWidgetLayout = new QGridLayout;
@@ -220,9 +218,6 @@ void QmitkDataManagerView::OnPreferencesChanged(const berry::IBerryPreferences* 
     }
   }
   m_NodeTreeView->expandAll();
-
-  m_SurfaceDecimation = prefs->GetBool("Use surface decimation", false);
-  m_DataNodeContextMenu->SetSurfaceDecimation(m_SurfaceDecimation);
 
   m_NodeTreeModel->SetAllowHierarchyChange(prefs->GetBool("Allow changing of parent node", false));
 

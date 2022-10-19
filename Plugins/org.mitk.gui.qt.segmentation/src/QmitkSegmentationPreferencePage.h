@@ -49,7 +49,6 @@ public:
 
 protected Q_SLOTS:
 
-  void OnSmoothingCheckboxChecked(int);
   void OnLabelSetPresetButtonClicked();
   void OnSuggestionsButtonClicked();
 

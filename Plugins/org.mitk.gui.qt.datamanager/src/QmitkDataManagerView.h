@@ -108,10 +108,6 @@ protected:
   /// \brief The context menu that shows up when right clicking on a node.
   ///
   QmitkDataNodeContextMenu* m_DataNodeContextMenu;
-  ///
-  /// \brief flag indicating whether a surface created from a selected decimation is decimated with vtkQuadricDecimation or not
-  ///
-  bool m_SurfaceDecimation;
 
   /// saves the current amount of rows shown in the data manager
   size_t m_CurrentRowCount;

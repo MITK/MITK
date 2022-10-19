@@ -20,7 +20,7 @@
   </extension>
 
   <extension point="org.blueberry.ui.keywords">
-    <keyword id="org.mitk.gui.qt.application.DataManagerPreferencePageKeywords" label="data manager global reinit surface decimation parent helper objects single click property editing nodes top show containing data deleted added call"></keyword>
+    <keyword id="org.mitk.gui.qt.application.DataManagerPreferencePageKeywords" label="data manager global reinit parent helper objects single click property editing nodes top show containing data deleted added call"></keyword>
     <keyword id="org.mitk.gui.qt.application.DataManagerHotkeysPrefPageKeywords" label="data manager hotkeys delete selected nodes global reinit invisible show information toggle visibility selected"></keyword>
   </extension>
 

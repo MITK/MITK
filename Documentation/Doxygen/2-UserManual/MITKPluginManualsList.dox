@@ -21,7 +21,6 @@ The plugins and bundles provide much of the extended functionality of MITK. Each
   <li> \subpage org_mitk_views_measurement </li>
   <li> \subpage org_mitk_views_imagestatistics </li>
   <li> \subpage org_mitk_views_moviemaker </li>
-  <li> \subpage org_mitk_views_multilabelsegmentation </li>
   <li> \subpage org_mitk_views_pointsetinteraction </li>
   <li> \subpage org_mitk_views_python </li>
   <li> \subpage org_mitk_views_remeshing </li>

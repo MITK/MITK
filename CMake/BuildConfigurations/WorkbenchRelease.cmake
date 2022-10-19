@@ -5,7 +5,6 @@ set(MITK_CONFIG_PACKAGES ${MITK_CONFIG_PACKAGES}
 )
 
 set(MITK_CONFIG_PLUGINS ${MITK_CONFIG_PLUGINS}
-  org.mitk.gui.qt.multilabelsegmentation
   org.mitk.matchpoint.core.helper
   org.mitk.gui.qt.matchpoint.algorithm.browser
   org.mitk.gui.qt.matchpoint.algorithm.control

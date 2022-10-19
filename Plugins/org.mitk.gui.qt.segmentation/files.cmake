@@ -12,6 +12,10 @@ set(INTERNAL_CPP_FILES
   QmitkCreatePolygonModelAction.cpp
   QmitkLoadMultiLabelPresetAction.cpp
   QmitkSaveMultiLabelPresetAction.cpp
+  QmitkConvertSurfaceToLabelAction.cpp
+  QmitkConvertMaskToLabelAction.cpp
+  QmitkConvertToMultiLabelSegmentationAction.cpp
+  QmitkCreateMultiLabelSegmentationAction.cpp
   Common/QmitkDataSelectionWidget.cpp
   Common/QmitkLabelsWidget.cpp
   Common/QmitkLayersWidget.cpp
@@ -51,6 +55,10 @@ set(MOC_H_FILES
   src/internal/QmitkCreatePolygonModelAction.h
   src/internal/QmitkLoadMultiLabelPresetAction.h
   src/internal/QmitkSaveMultiLabelPresetAction.h
+  src/internal/QmitkConvertSurfaceToLabelAction.h
+  src/internal/QmitkConvertMaskToLabelAction.h
+  src/internal/QmitkConvertToMultiLabelSegmentationAction.h
+  src/internal/QmitkCreateMultiLabelSegmentationAction.h
   src/internal/Common/QmitkDataSelectionWidget.h
   src/internal/Common/QmitkLabelsWidget.h
   src/internal/Common/QmitkLayersWidget.h

@@ -530,10 +530,6 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_ToolManager->SetDataStorage(*(this->GetDataStorage()));
    m_ToolManager->InitializeTools();
 
-   // react if the active tool changed
-   m_ToolManager->ActiveToolChanged +=
-     mitk::MessageDelegate<QmitkSegmentationView>(this, &QmitkSegmentationView::ActiveToolChanged);
-
    QString segTools2D = tr("Add Subtract Lasso Fill Erase Close Paint Wipe 'Region Growing' 'Live Wire'");
    QString segTools3D = tr("Threshold 'UL Threshold' Otsu 'Region Growing 3D' Picking GrowCut");
 
@@ -709,14 +705,21 @@ void QmitkSegmentationView::RenderWindowPartActivated(mitk::IRenderWindowPart* r
     return;
   }
 
-  // tell the interpolation about tool manager, data storage and render window part
   if (nullptr != m_RenderWindowPart)
   {
+    // tell the interpolation about tool manager, data storage and render window part
     QList<mitk::SliceNavigationController*> controllers;
     controllers.push_back(m_RenderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController());
     controllers.push_back(m_RenderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController());
     controllers.push_back(m_RenderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController());
     m_Controls->slicesInterpolator->Initialize(m_ToolManager, controllers);
+
+    if (!m_RenderWindowPart->HasCoupledRenderWindows())
+    {
+      // react if the active tool changed, only if a render window part with decoupled render windows is used
+      m_ToolManager->ActiveToolChanged +=
+        mitk::MessageDelegate<QmitkSegmentationView>(this, &QmitkSegmentationView::ActiveToolChanged);
+    }
   }
 }
 
@@ -727,6 +730,10 @@ void QmitkSegmentationView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*
   {
     m_Parent->setEnabled(false);
   }
+
+  // remove message-connection to make sure no message is processed if no render window part is available
+  m_ToolManager->ActiveToolChanged -=
+    mitk::MessageDelegate<QmitkSegmentationView>(this, &QmitkSegmentationView::ActiveToolChanged);
 }
 
 void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences* prefs)

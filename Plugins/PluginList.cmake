@@ -64,7 +64,6 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.classificationsegmentation:OFF
   org.mitk.gui.qt.overlaymanager:OFF
   org.mitk.gui.qt.igt.app.hummelprotocolmeasurements:OFF
-  org.mitk.gui.qt.multilabelsegmentation:OFF
   org.mitk.matchpoint.core.helper:OFF
   org.mitk.gui.qt.matchpoint.algorithm.browser:OFF
   org.mitk.gui.qt.matchpoint.algorithm.control:OFF

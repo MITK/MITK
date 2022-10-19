@@ -9,26 +9,26 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __QmitkConvertSurfaceToLabelAction_H_
-#define __QmitkConvertSurfaceToLabelAction_H_
+#ifndef __QmitkConvertMaskToLabelAction_H_
+#define __QmitkConvertMaskToLabelAction_H_
 
 #include "mitkIContextMenuAction.h"
 
-#include "org_mitk_gui_qt_multilabelsegmentation_Export.h"
+#include <org_mitk_gui_qt_segmentation_Export.h>
 
 #include "vector"
 #include "mitkDataNode.h"
 #include "mitkImage.h"
 
-class MITK_QT_SEGMENTATION QmitkConvertSurfaceToLabelAction : public QObject, public mitk::IContextMenuAction
+class MITK_QT_SEGMENTATION QmitkConvertMaskToLabelAction : public QObject, public mitk::IContextMenuAction
 {
   Q_OBJECT
   Q_INTERFACES(mitk::IContextMenuAction)
 
 public:
 
-  QmitkConvertSurfaceToLabelAction();
-  ~QmitkConvertSurfaceToLabelAction() override;
+  QmitkConvertMaskToLabelAction();
+  ~QmitkConvertMaskToLabelAction() override;
 
   //interface methods
   void Run( const QList<mitk::DataNode::Pointer>& selectedNodes ) override;
@@ -45,4 +45,4 @@ private:
 
 };
 
-#endif // __QmitkConvertSurfaceToLabelAction_H_
+#endif // __QmitkConvertMaskToLabelAction_H_

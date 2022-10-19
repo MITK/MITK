@@ -14,7 +14,7 @@ found in the LICENSE file.
 
 #include "mitkIContextMenuAction.h"
 
-#include "org_mitk_gui_qt_multilabelsegmentation_Export.h"
+#include <org_mitk_gui_qt_segmentation_Export.h>
 
 #include "vector"
 #include "mitkDataNode.h"

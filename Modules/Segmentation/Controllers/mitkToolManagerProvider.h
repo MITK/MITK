@@ -50,7 +50,6 @@ namespace mitk
 
     // Known ToolManager contexts
     static const char* const SEGMENTATION;
-    static const char* const MULTILABEL_SEGMENTATION;
 
     /**
     \brief Returns ToolManager object.

@@ -865,6 +865,10 @@ void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataNode* node)
     return;
   }
 
+  //  m_SelectionMode == true means only the selected segmentation node should be visible.
+  if (m_WorkingNode.IsNotNull() && m_SelectionMode)
+    node->SetVisibility(node == m_WorkingNode);
+
   auto labelSetImage = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
   if (nullptr != labelSetImage)
   {

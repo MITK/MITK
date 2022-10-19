@@ -150,6 +150,11 @@ private:
   // decorates a DataNode according to the user preference settings
   void ApplyDisplayOptions(mitk::DataNode* node);
 
+  void ApplySelectionMode();
+  void ApplySelectionModeOnReferenceNode();
+  void ApplySelectionModeOnWorkingNode();
+  void ApplySelectionMode(mitk::DataNode* node, mitk::NodePredicateBase* predicate);
+
   // If a contourmarker is selected, the plane in the related widget will be reoriented according to the marker`s geometry
   void OnContourMarkerSelected(const mitk::DataNode* node);
 

@@ -210,14 +210,7 @@ void QmitkSegmentationView::OnAnySelectionChanged()
 
       m_SelectionChangeIsAlreadyBeingHandled = false;
 
-      if (m_SelectionMode)
-      {
-        // Hide all image nodes except the selected reference node
-        auto imageNodes = this->GetDataStorage()->GetSubset(m_ReferencePredicate);
-
-        for (auto iter = imageNodes->begin(); iter != imageNodes->end(); ++iter)
-          (*iter)->SetVisibility(*iter == m_ReferenceNode);
-      }
+      this->ApplySelectionModeOnReferenceNode();
 
       // Add visibility observer for the new reference node
       auto command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
@@ -251,14 +244,7 @@ void QmitkSegmentationView::OnAnySelectionChanged()
 
     if (m_WorkingNode.IsNotNull())
     {
-      if (m_SelectionMode)
-      {
-        // Hide all segmentation nodes except the selected working node
-        auto segmentationNodes = this->GetDataStorage()->GetSubset(m_SegmentationPredicate);
-
-        for (auto iter = segmentationNodes->begin(); iter != segmentationNodes->end(); ++iter)
-          (*iter)->SetVisibility(*iter == m_WorkingNode);
-      }
+      this->ApplySelectionModeOnWorkingNode();
 
       // Connect to new label set image
       this->EstablishLabelSetConnection();
@@ -752,14 +738,15 @@ void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences*
   m_LabelSetPresetPreference = prefs->Get("label set preset", "");
 
   this->ApplyDisplayOptions();
+  this->ApplySelectionMode();
 }
 
 void QmitkSegmentationView::NodeAdded(const mitk::DataNode* node)
 {
   if (m_SegmentationPredicate->CheckNode(node))
-  {
     this->ApplyDisplayOptions(const_cast<mitk::DataNode*>(node));
-  }
+
+  this->ApplySelectionMode();
 }
 
 void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
@@ -888,6 +875,36 @@ void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataNode* node)
       node->GetData()->Modified();
     }
   }
+}
+
+void QmitkSegmentationView::ApplySelectionMode()
+{
+  if (!m_SelectionMode)
+    return;
+
+  this->ApplySelectionModeOnReferenceNode();
+  this->ApplySelectionModeOnWorkingNode();
+}
+
+void QmitkSegmentationView::ApplySelectionModeOnReferenceNode()
+{
+  this->ApplySelectionMode(m_ReferenceNode, m_ReferencePredicate);
+}
+
+void QmitkSegmentationView::ApplySelectionModeOnWorkingNode()
+{
+  this->ApplySelectionMode(m_WorkingNode, m_SegmentationPredicate);
+}
+
+void QmitkSegmentationView::ApplySelectionMode(mitk::DataNode* node, mitk::NodePredicateBase* predicate)
+{
+  if (!m_SelectionMode || node == nullptr || predicate == nullptr)
+    return;
+
+  auto nodes = this->GetDataStorage()->GetSubset(predicate);
+
+  for (auto iter = nodes->begin(); iter != nodes->end(); ++iter)
+    (*iter)->SetVisibility(*iter == node);
 }
 
 void QmitkSegmentationView::OnContourMarkerSelected(const mitk::DataNode* node)

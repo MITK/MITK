@@ -124,6 +124,14 @@ public:
    */
   virtual void SetReferenceGeometry(const mitk::TimeGeometry* referenceGeometry, bool resetCamera) = 0;
 
+  /**
+  * @brief Returns true if the render windows are coupled; false if not.
+  *
+  * Render windows are coupled if the slice navigation controller of the render windows
+  * are connected which means that always the same geometry is used for the render windows.
+  */
+  virtual bool HasCoupledRenderWindows() const = 0;
+
   virtual void SetSelectedPosition(const mitk::Point3D& newPosition, const QString& widgetName) = 0;
   virtual const mitk::Point3D GetSelectedPosition(const QString& widgetName) const = 0;
 

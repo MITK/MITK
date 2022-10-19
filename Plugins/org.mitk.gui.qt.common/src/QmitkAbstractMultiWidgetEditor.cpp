@@ -109,6 +109,17 @@ void QmitkAbstractMultiWidgetEditor::SetReferenceGeometry(const mitk::TimeGeomet
   multiWidget->SetReferenceGeometry(referenceGeometry, resetCamera);
 }
 
+bool QmitkAbstractMultiWidgetEditor::HasCoupledRenderWindows() const
+{
+  const auto& multiWidget = GetMultiWidget();
+  if (nullptr == multiWidget)
+  {
+    return false;
+  }
+
+  return multiWidget->HasCoupledRenderWindows();
+}
+
 mitk::Point3D QmitkAbstractMultiWidgetEditor::GetSelectedPosition(const QString& id/* = QString()*/) const
 {
   const auto& multiWidget = GetMultiWidget();

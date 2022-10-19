@@ -170,6 +170,11 @@ void QmitkStdMultiWidget::SetReferenceGeometry(const mitk::TimeGeometry* referen
   }
 }
 
+bool QmitkStdMultiWidget::HasCoupledRenderWindows() const
+{
+  return true;
+}
+
 void QmitkStdMultiWidget::SetSelectedPosition(const mitk::Point3D& newPosition, const QString& /*widgetName*/)
 {
   GetRenderWindow1()->GetSliceNavigationController()->SelectSliceByPoint(newPosition);

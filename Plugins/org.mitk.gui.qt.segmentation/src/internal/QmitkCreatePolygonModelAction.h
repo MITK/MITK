@@ -44,8 +44,8 @@ private:
   QmitkCreatePolygonModelAction & operator=(const QmitkCreatePolygonModelAction &);
 
   mitk::DataStorage::Pointer m_DataStorage;
-  bool m_IsSmoothed;
-  bool m_IsDecimated;
+  bool m_IsSmoothed = false;
+  bool m_IsDecimated = true;
 };
 
 #endif

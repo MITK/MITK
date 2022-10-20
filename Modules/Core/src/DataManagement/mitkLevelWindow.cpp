@@ -134,6 +134,9 @@ void mitk::LevelWindow::SetWindowBounds(mitk::ScalarType lowerBound,
   if (IsFixed())
     return;
 
+  upperBound = std::clamp(upperBound, -1e300, 1e300);
+  lowerBound = std::clamp(lowerBound, -1e300, 1e300);
+
   m_LowerWindowBound = lowerBound;
   m_UpperWindowBound = upperBound;
 

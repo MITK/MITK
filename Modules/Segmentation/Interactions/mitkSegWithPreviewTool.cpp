@@ -688,7 +688,7 @@ mitk::Image::Pointer mitk::SegWithPreviewTool::GetImageByTimeStep(mitk::Image* i
 
 mitk::Image::ConstPointer mitk::SegWithPreviewTool::GetImageByTimePoint(const mitk::Image* image, TimePointType timePoint)
 {
-  return SelectImageByTimeStep(image, timePoint);
+  return SelectImageByTimePoint(image, timePoint);
 }
 
 void mitk::SegWithPreviewTool::EnsureTargetSegmentationNodeInDataStorage() const

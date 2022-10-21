@@ -1030,6 +1030,8 @@ void QmitkSegmentationView::ValidateSelectionInput()
   bool hasBothNodes = hasReferenceNode && hasWorkingNode;
 
   QString warning;
+  bool toolSelectionBoxesEnabled = hasReferenceNode && hasWorkingNode;
+  unsigned int numberOfLabels = 0;
 
   m_Controls->layersWidget->setEnabled(hasWorkingNode);
   m_Controls->labelsWidget->setEnabled(hasWorkingNode);
@@ -1041,34 +1043,62 @@ void QmitkSegmentationView::ValidateSelectionInput()
   m_Controls->slicesInterpolator->setEnabled(false);
   m_Controls->interpolatorWarningLabel->hide();
 
-  auto* renderWindowPart = this->GetRenderWindowPart();
-
   if (hasReferenceNode)
   {
-    if (nullptr != renderWindowPart && !referenceNode->IsVisible(renderWindowPart->GetQmitkRenderWindow("axial")->GetRenderer()))
+    if (!referenceNode->IsVisible(nullptr))
+    {
       warning += tr("The selected reference image is currently not visible!");
+      toolSelectionBoxesEnabled = false;
+    }
   }
 
   if (hasWorkingNode)
   {
-    if (nullptr != renderWindowPart && !workingNode->IsVisible(renderWindowPart->GetQmitkRenderWindow("axial")->GetRenderer()))
-       warning += (!warning.isEmpty() ? "<br>" : "") + tr("The selected segmentation is currently not visible!");
+    if (!workingNode->IsVisible(nullptr))
+    {
+      warning += (!warning.isEmpty() ? "<br>" : "") + tr("The selected segmentation is currently not visible!");
+      toolSelectionBoxesEnabled = false;
+    }
 
     auto labelSetImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
     auto activeLayer = labelSetImage->GetActiveLayer();
-    auto numLabels = labelSetImage->GetNumberOfLabels(activeLayer);
+    numberOfLabels = labelSetImage->GetNumberOfLabels(activeLayer);
 
-    if (2 == numLabels)
+    if (2 == numberOfLabels)
     {
       m_Controls->slicesInterpolator->setEnabled(true);
     }
-    else if (2 < numLabels)
+    else if (2 < numberOfLabels)
     {
       m_Controls->interpolatorWarningLabel->setText(
         "<font color=\"red\">Interpolation only works for single label segmentations.</font>");
       m_Controls->interpolatorWarningLabel->show();
     }
   }
+
+  toolSelectionBoxesEnabled &= numberOfLabels > 1;
+
+  // Here we need to check whether the geometry of the selected segmentation image (working image geometry)
+  // is aligned with the geometry of the 3D render window.
+  // It is not allowed to use a geometry different from the working image geometry for segmenting.
+  // We only need to this if the tool selection box would be enabled without this check.
+  if (toolSelectionBoxesEnabled && nullptr != m_RenderWindowPart && m_RenderWindowPart->HasCoupledRenderWindows())
+  {
+    const mitk::BaseGeometry* workingNodeGeometry = workingNode->GetData()->GetGeometry();
+    const mitk::BaseGeometry* renderWindowGeometry =
+      m_RenderWindowPart->GetQmitkRenderWindow("3d")->GetSliceNavigationController()->GetCurrentGeometry3D();
+    if (nullptr != workingNodeGeometry && nullptr != renderWindowGeometry)
+    {
+      if (!mitk::Equal(*workingNodeGeometry->GetBoundingBox(), *renderWindowGeometry->GetBoundingBox(), mitk::eps, true))
+      {
+        warning += (!warning.isEmpty() ? "<br>" : "") + tr("Please reinitialize the selected segmentation image!");
+        toolSelectionBoxesEnabled = false;
+      }
+    }
+  }
+
+  m_Controls->toolSelectionBox2D->setEnabled(toolSelectionBoxesEnabled);
+  m_Controls->toolSelectionBox3D->setEnabled(toolSelectionBoxesEnabled);
 
   this->UpdateWarningLabel(warning);
 

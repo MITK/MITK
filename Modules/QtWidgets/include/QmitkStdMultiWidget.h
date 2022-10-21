@@ -49,6 +49,13 @@ public:
    */
   void SetReferenceGeometry(const mitk::TimeGeometry* referenceGeometry, bool resetCamera) override;
 
+  /**
+  * @brief Returns true if the render windows are coupled; false if not.
+  *
+  * For the StdMultiWidget the render windows are typically coupled.
+  */
+  bool HasCoupledRenderWindows() const override;
+
   virtual void SetSelectedPosition(const mitk::Point3D& newPosition, const QString& widgetName) override;
   virtual const mitk::Point3D GetSelectedPosition(const QString& widgetName) const override;
 

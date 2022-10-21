@@ -104,7 +104,6 @@ public slots:
 protected slots:
 
   void toolButtonClicked(int id);
-  void SetGUIEnabledAccordingToToolManagerState();
   void UpdateButtonsEnabledState();
 
 protected:

@@ -59,8 +59,6 @@ public:
   mitk::ToolManager *GetToolManager();
   void SetToolManager(mitk::ToolManager &); // no nullptr pointer allowed here, a manager is required
 
-  void setTitle(const QString &title);
-
   /**
     You may specify a list of tool "groups" that should be displayed in this widget. Every Tool can report its group
     as a string. This method will try to find the tool's group inside the supplied string \c toolGroups . If there is
@@ -107,8 +105,6 @@ protected slots:
   void UpdateButtonsEnabledState();
 
 protected:
-  void showEvent(QShowEvent *) override;
-  void hideEvent(QHideEvent *) override;
 
   void SetOrUnsetButtonForActiveTool();
 

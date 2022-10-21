@@ -620,16 +620,3 @@ void QmitkToolSelectionBox::SetToolGUIArea(QWidget *parentWidget)
   m_ToolGUIWidget = parentWidget;
 }
 
-void QmitkToolSelectionBox::setTitle(const QString & /*title*/)
-{
-}
-
-void QmitkToolSelectionBox::showEvent(QShowEvent *e)
-{
-  QWidget::showEvent(e);
-}
-
-void QmitkToolSelectionBox::hideEvent(QHideEvent *e)
-{
-  QWidget::hideEvent(e);
-}

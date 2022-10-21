@@ -45,7 +45,7 @@ namespace mitk
     void Activated() override;
     void Deactivated() override;
 
-    bool HasMoreThanTwoSeedLabel();
+    bool SeedImageIsValid();
 
   protected:
     GrowCutTool(); // purposely hidden

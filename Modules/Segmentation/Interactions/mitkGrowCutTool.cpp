@@ -82,7 +82,7 @@ void mitk::GrowCutTool::Deactivated()
   Superclass::Deactivated();
 }
 
-bool mitk::GrowCutTool::HasMoreThanTwoSeedLabel()
+bool mitk::GrowCutTool::SeedImageIsValid()
 {
   if (nullptr == this->GetToolManager()->GetWorkingData(0))
   {
@@ -97,13 +97,7 @@ bool mitk::GrowCutTool::HasMoreThanTwoSeedLabel()
     return false;
   }
 
-  if (workingDataLabelSetImage->GetNumberOfLayers()>1)
-  {
-    return false;
-  }
-
-  workingDataLabelSetImage->SetActiveLayer(0);
-  auto numberOfLabels = workingDataLabelSetImage->GetNumberOfLabels();
+  auto numberOfLabels = workingDataLabelSetImage->GetNumberOfLabels(workingDataLabelSetImage->GetActiveLayer());
 
   if (numberOfLabels >= 3)
   {

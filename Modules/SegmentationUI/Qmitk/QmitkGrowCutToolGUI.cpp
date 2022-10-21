@@ -52,7 +52,7 @@ void QmitkGrowCutToolGUI::InitializeUI(QBoxLayout *mainLayout)
     auto tool = this->GetConnectedToolAs<mitk::GrowCutTool>();
     if (nullptr != tool)
     {
-      return tool->HasMoreThanTwoSeedLabel();
+      return tool->SeedImageIsValid();
     }
     return false;
   };

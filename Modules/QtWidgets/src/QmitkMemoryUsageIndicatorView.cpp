@@ -37,19 +37,18 @@ found in the LICENSE file.
 
 #include <ui_QmitkMemoryUsageIndicator.h>
 
-std::array<std::pair<float, QPixmap>, 4> QmitkMemoryUsageIndicatorView::s_States = {
-  std::make_pair(0.0f, QPixmap(QmitkMemoryUsageIndicatorImagesGreen_xpm)),
-  std::make_pair(50.0f, QPixmap(QmitkMemoryUsageIndicatorImagesYellow_xpm)),
-  std::make_pair(65.0f, QPixmap(QmitkMemoryUsageIndicatorImagesOrange_xpm)),
-  std::make_pair(85.0f, QPixmap(QmitkMemoryUsageIndicatorImagesRed_xpm))
-};
-
 QmitkMemoryUsageIndicatorView::QmitkMemoryUsageIndicatorView(QWidget*)
   : m_Ui(new Ui::QmitkMemoryUsageIndicator),
-    m_PreviousState(0)
+    m_PreviousState(0),
+    m_States {
+      std::make_pair(0.0f, QPixmap(QmitkMemoryUsageIndicatorImagesGreen_xpm)),
+      std::make_pair(50.0f, QPixmap(QmitkMemoryUsageIndicatorImagesYellow_xpm)),
+      std::make_pair(65.0f, QPixmap(QmitkMemoryUsageIndicatorImagesOrange_xpm)),
+      std::make_pair(85.0f, QPixmap(QmitkMemoryUsageIndicatorImagesRed_xpm))
+    }
 {
   m_Ui->setupUi(this);
-  m_Ui->led->setPixmap(s_States[0].second);
+  m_Ui->led->setPixmap(m_States[0].second);
 
   auto timer = new QTimer(this);
   connect(timer, &QTimer::timeout, this, &QmitkMemoryUsageIndicatorView::UpdateMemoryUsage);
@@ -68,13 +67,13 @@ void QmitkMemoryUsageIndicatorView::UpdateMemoryUsage()
 
   m_Ui->label->setText(QString::fromStdString(this->GetMemoryDescription(processSize, percentage)));
 
-  for (size_t i = s_States.size() - 1; i >= 0; --i)
+  for (size_t i = m_States.size() - 1; i >= 0; --i)
   {
-    if (percentage >= s_States[i].first)
+    if (percentage >= m_States[i].first)
     {
       if (m_PreviousState != i)
       {
-        m_Ui->led->setPixmap(s_States[i].second);
+        m_Ui->led->setPixmap(m_States[i].second);
         m_PreviousState = i;
       }
 

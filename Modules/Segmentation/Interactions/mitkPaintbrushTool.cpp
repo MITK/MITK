@@ -293,19 +293,17 @@ void mitk::PaintbrushTool::OnMousePressed(StateMachineAction *, InteractionEvent
   if (m_WorkingSlice.IsNull())
     return;
 
-  auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+  auto* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(interactionEvent);
   if (!positionEvent)
     return;
 
-  m_WorkingSlice->GetGeometry()->WorldToIndex(positionEvent->GetPositionInWorld(), m_LastPosition);
+  this->ResetWorkingSlice(positionEvent);
 
+  m_WorkingSlice->GetGeometry()->WorldToIndex(positionEvent->GetPositionInWorld(), m_LastPosition);
   this->m_PaintingNode->SetVisibility(true);
 
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
-  m_PaintingSlice = nullptr; //force reset of the painting slice. Will be triggered in MouseMoved() by
-                             //CheckIfCurrentSliceHasChanged
-
   m_MasterContour->SetClosed(true);
   this->MouseMoved(interactionEvent, true);
 }
@@ -327,7 +325,11 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent *interactionEvent, 
 {
   auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
 
-  CheckIfCurrentSliceHasChanged(positionEvent);
+  bool newSlice = CheckIfCurrentSliceHasChanged(positionEvent);
+  if (newSlice)
+  {
+    this->ResetWorkingSlice(positionEvent);
+  }
 
   if (m_LastContourSize != m_Size)
   {
@@ -451,8 +453,15 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent *interactionEvent, 
 
   this->UpdateCurrentFeedbackContour(tmp);
 
-  assert(positionEvent->GetSender()->GetRenderWindow());
-  RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
+  if (newSlice)
+  {
+    RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+  else
+  {
+    assert(positionEvent->GetSender()->GetRenderWindow());
+    RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
+  }
 }
 
 void mitk::PaintbrushTool::OnMouseReleased(StateMachineAction *, InteractionEvent *interactionEvent)
@@ -490,8 +499,9 @@ void mitk::PaintbrushTool::OnMouseReleased(StateMachineAction *, InteractionEven
   m_PaintingNode->SetVisibility(false);
   m_PaintingNode->SetData(nullptr);
   m_PaintingSlice = nullptr;
+  m_WorkingSlice = nullptr;
 
-  RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
+  RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void mitk::PaintbrushTool::UpdateFeedbackColor()
@@ -525,26 +535,14 @@ void mitk::PaintbrushTool::OnInvertLogic(StateMachineAction *, InteractionEvent 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositionEvent *event)
+bool mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositionEvent *event)
 {
   const PlaneGeometry* planeGeometry((event->GetSender()->GetCurrentWorldPlaneGeometry()));
   const auto* abstractTransformGeometry(
     dynamic_cast<const AbstractTransformGeometry *>(event->GetSender()->GetCurrentWorldPlaneGeometry()));
   if (nullptr == planeGeometry || nullptr != abstractTransformGeometry)
   {
-    return;
-  }
-
-  DataNode* workingNode = this->GetToolManager()->GetWorkingData(0);
-  if (nullptr == workingNode)
-  {
-    return;
-  }
-
-  Image::Pointer image = dynamic_cast<Image *>(workingNode->GetData());
-  if (nullptr == image)
-  {
-    return;
+    return false;
   }
 
   bool newPlane = false;
@@ -557,27 +555,52 @@ void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositi
        m_CurrentPlane->GetIndexToWorldTransform()->GetOffset()))
   {
     m_CurrentPlane = planeGeometry;
-    m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, image)->Clone();
     newPlane = true;
   }
 
-  if (m_PaintingSlice.IsNull())
+  return newPlane;
+}
+
+void mitk::PaintbrushTool::ResetWorkingSlice(const InteractionPositionEvent* event)
+{
+  const PlaneGeometry* planeGeometry((event->GetSender()->GetCurrentWorldPlaneGeometry()));
+  const auto* abstractTransformGeometry(
+    dynamic_cast<const AbstractTransformGeometry*>(event->GetSender()->GetCurrentWorldPlaneGeometry()));
+  if (nullptr == planeGeometry || nullptr != abstractTransformGeometry)
   {
-    m_PaintingSlice = Image::New();
-    m_PaintingSlice->Initialize(m_WorkingSlice);
-
-    unsigned int byteSize = m_PaintingSlice->GetPixelType().GetSize();
-    for (unsigned int dim = 0; dim < m_PaintingSlice->GetDimension(); ++dim)
-    {
-      byteSize *= m_PaintingSlice->GetDimension(dim);
-    }
-    mitk::ImageWriteAccessor writeAccess(m_PaintingSlice.GetPointer(), m_PaintingSlice->GetVolumeData(0));
-    memset(writeAccess.GetData(), 0, byteSize);
-
-    m_PaintingNode->SetData(m_PaintingSlice);
+    return;
   }
 
-  if(newPlane) mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  m_WorkingSlice = nullptr;
+  m_PaintingSlice = nullptr;
+  m_PaintingNode->SetData(nullptr);
+
+  DataNode* workingNode = this->GetToolManager()->GetWorkingData(0);
+  if (nullptr == workingNode)
+  {
+    return;
+  }
+
+  Image::Pointer image = dynamic_cast<Image*>(workingNode->GetData());
+  if (nullptr == image)
+  {
+    return;
+  }
+
+  m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, image)->Clone();
+
+  m_PaintingSlice = Image::New();
+  m_PaintingSlice->Initialize(m_WorkingSlice);
+
+  unsigned int byteSize = m_PaintingSlice->GetPixelType().GetSize();
+  for (unsigned int dim = 0; dim < m_PaintingSlice->GetDimension(); ++dim)
+  {
+    byteSize *= m_PaintingSlice->GetDimension(dim);
+  }
+  mitk::ImageWriteAccessor writeAccess(m_PaintingSlice.GetPointer(), m_PaintingSlice->GetVolumeData(0));
+  memset(writeAccess.GetData(), 0, byteSize);
+
+  m_PaintingNode->SetData(m_PaintingSlice);
 }
 
 void mitk::PaintbrushTool::OnToolManagerWorkingDataModified()

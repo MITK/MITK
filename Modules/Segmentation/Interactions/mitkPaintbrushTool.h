@@ -77,13 +77,13 @@ namespace mitk
     mitk::Point2D upperLeft(mitk::Point2D p);
 
     /**
-      * Checks  if the current slice has changed
+      * Checks  if the current slice has changed and updates (if needed m_CurrentPlane).
       */
-    void CheckIfCurrentSliceHasChanged(const InteractionPositionEvent *event);
+    bool CheckIfCurrentSliceHasChanged(const InteractionPositionEvent *event);
+
+    void ResetWorkingSlice(const InteractionPositionEvent* event);
 
     void OnToolManagerWorkingDataModified();
-
-    //void ResetPaintingSlice();
 
     bool m_FillMode;
     static int m_Size;

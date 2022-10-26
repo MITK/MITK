@@ -377,11 +377,11 @@ bool QmitkViewNavigatorWidget::FillTreeList()
     // initialize tree model
     m_TreeModel->clear();
 
-    // add all available perspectives
-    this->AddPerspectivesToTree();
-
     // add all available views
     this->AddViewsToTree();
+
+    // add all available perspectives
+    this->AddPerspectivesToTree();
 
     m_Controls.m_PluginTreeView->expandAll();
 

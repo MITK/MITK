@@ -485,7 +485,7 @@ void mitk::PaintbrushTool::OnMouseReleased(StateMachineAction *, InteractionEven
   //we realize that by cloning the relevant label set and changing the lock state
   //this fillLabelSet is used for the transfer.
   auto fillLabelSet = workingImage->GetActiveLabelSet()->Clone();
-  auto activeLabelClone = fillLabelSet->GetLabel(workingImage->GetActiveLabel()->GetValue());
+  auto activeLabelClone = fillLabelSet->GetLabel(workingImage->GetActiveLabel(workingImage->GetActiveLayer())->GetValue());
   if (nullptr != activeLabelClone)
   {
     activeLabelClone->SetLocked(false);

@@ -109,7 +109,7 @@ void mitk::FillRegionBaseTool::OnClick(StateMachineAction*, InteractionEvent* in
 
   auto label = labelSetImage->GetLabel(m_SeedLabelValue, labelSetImage->GetActiveLayer());
 
-  if (label->GetLocked() && label->GetValue()!=labelSetImage->GetActiveLabel()->GetValue())
+  if (label->GetLocked() && label->GetValue()!=labelSetImage->GetActiveLabel(labelSetImage->GetActiveLayer())->GetValue())
   {
     ErrorMessage.Send("Label of selected region is locked. Tool operation has no effect.");
     return;
@@ -123,7 +123,7 @@ void mitk::FillRegionBaseTool::OnClick(StateMachineAction*, InteractionEvent* in
   //we realize that by cloning the relevant label set and changing the lock state
   //this fillLabelSet is used for the transfer.
   auto fillLabelSet = labelSetImage->GetActiveLabelSet()->Clone();
-  auto activeLabelClone = fillLabelSet->GetLabel(labelSetImage->GetActiveLabel()->GetValue());
+  auto activeLabelClone = fillLabelSet->GetLabel(labelSetImage->GetActiveLabel(labelSetImage->GetActiveLayer())->GetValue());
   if (nullptr != activeLabelClone)
   {
     activeLabelClone->SetLocked(false);

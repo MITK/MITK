@@ -131,7 +131,7 @@ namespace
         }
       }
     }
-    else if (scheme.contains("http"))
+    else if (scheme.contains("https"))
     {
       QDesktopServices::openUrl(url);
     }
@@ -197,7 +197,7 @@ void QmitkMitkWorkbenchIntroPart::CreateQtPartControl(QWidget* parent)
     auto page = new QmitkWebEnginePage(this, parent);
     m_Impl->View->setPage(page);
 
-    QUrl urlQtResource(QString("qrc:/org.mitk.gui.qt.welcomescreen/mitkworkbenchwelcomeview.html"),  QUrl::TolerantMode );
+    QUrl urlQtResource(QString("qrc:/org.mitk.gui.qt.welcomescreen/index.html"),  QUrl::TolerantMode);
     m_Impl->View->load( urlQtResource );
 
     // adds the webview as a widget

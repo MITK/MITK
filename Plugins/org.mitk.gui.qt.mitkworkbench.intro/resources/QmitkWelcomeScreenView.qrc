@@ -1,59 +1,13 @@
 <RCC>
     <qresource prefix="/org.mitk.gui.qt.welcomescreen">
+        <file>img/levelwindow/standarddisplay.svg</file>
+        <file>img/mousenavigation/click.svg</file>
+        <file>img/mousenavigation/crosshair.svg</file>
+        <file>img/mousenavigation/pan.svg</file>
+        <file>img/mousenavigation/scroll.svg</file>
+        <file>img/mousenavigation/zoom.svg</file>
+        <file>index.html</file>
+        <file>script.js</file>
         <file>style.css</file>
-        <file>function.js</file>
-        <file>pics/background.jpg</file>
-        <file>pics/popup_bttn_close.png</file>
-        <file>pics/experimental.png</file>
-        <file>pics/button_mitka.png</file>
-        <file>pics/button_mitk.png</file>
-        <file>pics/WelcomeMITK.png</file>
-        <file>mitkworkbenchwelcomeview.html</file>
-    </qresource>
-    <qresource prefix="/org.mitk.gui.qt.welcomescreen.welcome.tutorial">
-        <file>WelcomePresentation.html</file>
-        <file>js/reveal.js</file>
-        <file>css/print/paper.css</file>
-        <file>css/print/pdf.css</file>
-        <file>css/reveal.css</file>
-        <file>css/reveal.scss</file>
-        <file>css/theme/MITK.css</file>
-        <file>css/theme/README.md</file>
-        <file>css/theme/source/MITK.scss</file>
-        <file>images/welcome/Alt.png</file>
-        <file>images/welcome/ArrowDown.png</file>
-        <file>images/welcome/ArrowKeys.png</file>
-        <file>images/welcome/ControlArrows.png</file>
-        <file>images/welcome/DataManagerData.png</file>
-        <file>images/welcome/DisplayAreaScan.png</file>
-        <file>images/welcome/DisplayAreaSmall.png</file>
-        <file>images/welcome/DisplayWindowAxial.png</file>
-        <file>images/welcome/DisplayWindowButtons.png</file>
-        <file>images/welcome/Esc.png</file>
-        <file>images/welcome/HelpWelcome.png</file>
-        <file>images/welcome/IconDataManager.png</file>
-        <file>images/welcome/IconHelp.svg</file>
-        <file>images/welcome/IconImageNavigator.png</file>
-        <file>images/welcome/ImageNavigator.png</file>
-        <file>images/welcome/LayoutList.png</file>
-        <file>images/welcome/Levelwindow.png</file>
-        <file>images/welcome/MITK.png</file>
-        <file>images/welcome/MITKArrow.png</file>
-        <file>images/welcome/MITKArrow2.png</file>
-        <file>images/welcome/MITKPoint.png</file>
-        <file>images/welcome/MousePointerClick.png</file>
-        <file>images/welcome/MouseTangoStyle.svg</file>
-        <file>images/welcome/ScreenScanData.png</file>
-        <file>images/welcome/ScreenScanPlugins.png</file>
-        <file>images/welcome/ScreenWithScan.png</file>
-        <file>images/welcome/Spacebar.png</file>
-        <file>images/welcome/Toolbar.png</file>
-        <file>images/welcome/ToolbarLeft.png</file>
-        <file>images/welcome/ToolbarRight.png</file>
-        <file>images/welcome/WelcomePage.png</file>
-        <file>lib/css/zenburn.css</file>
-        <file>lib/js/classList.js</file>
-        <file>lib/js/head.min.js</file>
-        <file>lib/js/html5shiv.js</file>
     </qresource>
 </RCC>

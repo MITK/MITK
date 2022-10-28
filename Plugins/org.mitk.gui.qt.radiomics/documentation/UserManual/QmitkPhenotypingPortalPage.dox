@@ -30,7 +30,6 @@ This section contains views that are included within MITK Phenotyping, but were 
 \li \ref org_mitk_views_matchpoint_visualizer : Visualize a Registration obtained with MatchPoint
 \li \ref org_mitk_views_segmentation : Creating Multilabel Segmentations
 \li \ref org_mitk_views_segmentationutilities : Utilities for the processing of simple segmentations
-\li \ref org_mitk_views_multilabelsegmentation : Utilities for the processing of Multilabel Segmentations
 
 \section radiomics_miniapps MiniApps (Command line Tools)
 \li \subpage MiniAppExplainPage Explanation of the Command Line App concept in MITK

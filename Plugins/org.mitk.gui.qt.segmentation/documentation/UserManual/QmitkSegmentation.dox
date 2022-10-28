@@ -195,14 +195,14 @@ Adding and subtracting voxels can be iteratively repeated for the same segmentat
 \subsection org_mitk_views_segmentationlassotool Lasso tool
 \imageMacro{QmitkSegmentation_Lasso.png,"Lasso tool",7.70}
 
-The tool is a more advanced version of the add/substract tool. It offers you the following features:
+The tool is a more advanced version of the add/subtract tool. It offers you the following features:
 <ol>
   <li> Generating a polygon segmentation (click left mouse button to set ancor point)
   <li> Freehand contouring (like the add tool; press left mouse button while moving the mouse)
   <li> Move ancor points (select an ancor point, press left mouse button while moving the mouse)
   <li> Add new ancor points (press CTRL while click left mouse to add an ancor to the contour)
   <li> Delete an ancor point (press Del while ancor point is selected)
-  <li> Segmentation can be added to the label (Add mode) or substracted (Substract mode)
+  <li> Segmentation can be added to the label (Add mode) or subtracted (Subtract mode)
 </ol>
 To start a segmentation double left click where the first ancor point should be. To end the segmentation double left click where the last ancor point should be.
 Please note that:

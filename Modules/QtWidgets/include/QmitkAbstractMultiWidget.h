@@ -111,6 +111,27 @@ public:
   void ForceImmediateUpdate(const QString& widgetName);
   void ForceImmediateUpdateAll();
 
+  /**
+   * @brief Set the reference geometry for interaction inside the render windows of the render window part.
+   *
+   * The concrete implementation is subclass-specific, no default implementation is provided here.
+   *
+   * @param referenceGeometry   The reference geometry which is used for updating the
+   *                            time geometry inside the render windows.
+   * @param resetCamera         If true, the camera and crosshair will be reset to the default view (centered, no zoom).
+   *                            If false, the current crosshair position and the camera zoom will be stored and reset
+   *                            after the reference geometry has been updated.
+   */
+  virtual void SetReferenceGeometry(const mitk::TimeGeometry* referenceGeometry, bool resetCamera) = 0;
+
+  /**
+  * @brief Returns true if the render windows are coupled; false if not.
+  *
+  * Render windows are coupled if the slice navigation controller of the render windows
+  * are connected which means that always the same geometry is used for the render windows.
+  */
+  virtual bool HasCoupledRenderWindows() const = 0;
+
   virtual void SetSelectedPosition(const mitk::Point3D& newPosition, const QString& widgetName) = 0;
   virtual const mitk::Point3D GetSelectedPosition(const QString& widgetName) const = 0;
 

@@ -22,37 +22,37 @@ found in the LICENSE file.
 ** destructor.
 *****************************************************************************/
 
-#include "QmitkMemoryUsageIndicatorView.h"
+#include <QmitkMemoryUsageIndicatorView.h>
+
 #include <mitkMemoryUtilities.h>
 
-#include <qapplication.h>
-#include <qeventloop.h>
-#include <qimage.h>
-#include <qpixmap.h>
-#include <qtimer.h>
-
 #include <iomanip>
-#include <iostream>
-#include <sstream>
 
-#include "QmitkMemoryUsageIndicatorImagesGreen.xpm"
-#include "QmitkMemoryUsageIndicatorImagesOrange.xpm"
-#include "QmitkMemoryUsageIndicatorImagesRed.xpm"
-#include "QmitkMemoryUsageIndicatorImagesYellow.xpm"
+#include <QTimer>
 
-QmitkMemoryUsageIndicatorView::QmitkMemoryUsageIndicatorView(QWidget * /*parent*/, Qt::WindowFlags /*f*/)
+#include <QmitkMemoryUsageIndicatorImagesGreen.xpm>
+#include <QmitkMemoryUsageIndicatorImagesOrange.xpm>
+#include <QmitkMemoryUsageIndicatorImagesRed.xpm>
+#include <QmitkMemoryUsageIndicatorImagesYellow.xpm>
+
+#include <ui_QmitkMemoryUsageIndicator.h>
+
+QmitkMemoryUsageIndicatorView::QmitkMemoryUsageIndicatorView(QWidget*)
+  : m_Ui(new Ui::QmitkMemoryUsageIndicator),
+    m_PreviousState(0),
+    m_States {
+      std::make_pair(0.0f, QPixmap(QmitkMemoryUsageIndicatorImagesGreen_xpm)),
+      std::make_pair(50.0f, QPixmap(QmitkMemoryUsageIndicatorImagesYellow_xpm)),
+      std::make_pair(65.0f, QPixmap(QmitkMemoryUsageIndicatorImagesOrange_xpm)),
+      std::make_pair(85.0f, QPixmap(QmitkMemoryUsageIndicatorImagesRed_xpm))
+    }
 {
-  this->setupUi(this);
+  m_Ui->setupUi(this);
+  m_Ui->led->setPixmap(m_States[0].second);
 
   auto timer = new QTimer(this);
-  QObject::connect(timer, SIGNAL(timeout()), this, SLOT(UpdateMemoryUsage()));
+  connect(timer, &QTimer::timeout, this, &QmitkMemoryUsageIndicatorView::UpdateMemoryUsage);
   timer->start(1000);
-  m_LEDGreen = QPixmap(QmitkMemoryUsageIndicatorImagesGreen_xpm);
-  m_LEDYellow = QPixmap(QmitkMemoryUsageIndicatorImagesYellow_xpm);
-  m_LEDOrange = QPixmap(QmitkMemoryUsageIndicatorImagesOrange_xpm);
-  m_LEDRed = QPixmap(QmitkMemoryUsageIndicatorImagesRed_xpm);
-  m_LED->setPixmap(m_LEDGreen);
-  m_PreviousState = 0;
 }
 
 QmitkMemoryUsageIndicatorView::~QmitkMemoryUsageIndicatorView()
@@ -63,42 +63,21 @@ void QmitkMemoryUsageIndicatorView::UpdateMemoryUsage()
 {
   size_t processSize = mitk::MemoryUtilities::GetProcessMemoryUsage();
   size_t totalSize = mitk::MemoryUtilities::GetTotalSizeOfPhysicalRam();
-  float percentage = ((float)processSize / (float)totalSize) * 100.0;
-  m_Label->setText(GetMemoryDescription(processSize, percentage).c_str());
-  if (percentage < 50.0)
+  float percentage = static_cast<float>(processSize) / totalSize * 100.0f;
+
+  m_Ui->label->setText(QString::fromStdString(this->GetMemoryDescription(processSize, percentage)));
+
+  for (size_t i = m_States.size() - 1; i >= 0; --i)
   {
-    if (m_PreviousState != 0)
+    if (percentage >= m_States[i].first)
     {
-      m_LED->setPixmap(m_LEDGreen);
-      m_PreviousState = 0;
-      m_LED->update();
-    }
-  }
-  else if (percentage < 65.0)
-  {
-    if (m_PreviousState != 1)
-    {
-      m_LED->setPixmap(m_LEDYellow);
-      m_PreviousState = 1;
-      m_LED->update();
-    }
-  }
-  else if (percentage < 80.0)
-  {
-    if (m_PreviousState != 2)
-    {
-      m_LED->setPixmap(m_LEDOrange);
-      m_PreviousState = 2;
-      m_LED->update();
-    }
-  }
-  else
-  {
-    if (m_PreviousState != 3)
-    {
-      m_LED->setPixmap(m_LEDRed);
-      m_PreviousState = 3;
-      m_LED->update();
+      if (m_PreviousState != i)
+      {
+        m_Ui->led->setPixmap(m_States[i].second);
+        m_PreviousState = i;
+      }
+
+      break;
     }
   }
 }
@@ -106,25 +85,31 @@ void QmitkMemoryUsageIndicatorView::UpdateMemoryUsage()
 std::string QmitkMemoryUsageIndicatorView::FormatMemorySize(size_t size)
 {
   double val = size;
-  std::string descriptor("B");
-  if (val >= 1000.0)
+  std::string unit;
+
+  if (val >= 1024.0)
   {
     val /= 1024.0;
-    descriptor = "KB";
+    unit = "K";
   }
-  if (val >= 1000.0)
+
+  if (val >= 1024.0)
   {
     val /= 1024.0;
-    descriptor = "MB";
+    unit = "M";
   }
-  if (val >= 1000.0)
+
+  if (val >= 1024.0)
   {
     val /= 1024.0;
-    descriptor = "GB";
+    unit = "G";
   }
+
+  unit += "B";
+
   std::ostringstream str;
   str.imbue(std::locale::classic());
-  str << std::fixed << std::setprecision(2) << val << " " << descriptor;
+  str << std::fixed << std::setprecision(2) << val << " " << unit;
   return str.str();
 }
 
@@ -132,8 +117,7 @@ std::string QmitkMemoryUsageIndicatorView::FormatPercentage(double val)
 {
   std::ostringstream str;
   str.imbue(std::locale::classic());
-  str << std::fixed << std::setprecision(2) << val << " "
-      << "%";
+  str << std::fixed << std::setprecision(2) << val << " " << "%";
   return str.str();
 }
 

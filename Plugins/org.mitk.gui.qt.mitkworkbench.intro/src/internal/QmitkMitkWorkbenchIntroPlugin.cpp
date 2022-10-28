@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include "QmitkMitkWorkbenchIntroPlugin.h"
 #include "QmitkMitkWorkbenchIntroPart.h"
+#include "QmitkMitkWorkbenchIntroPreferencePage.h"
 
 #include <mitkVersion.h>
 #include <mitkLogMacros.h>
@@ -44,7 +45,8 @@ void QmitkMitkWorkbenchIntroPlugin::start(ctkPluginContext* context)
 
   this->context = context;
 
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkMitkWorkbenchIntroPart, context);
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkMitkWorkbenchIntroPart, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkMitkWorkbenchIntroPreferencePage, context)
 }
 
 ctkPluginContext* QmitkMitkWorkbenchIntroPlugin::GetPluginContext() const

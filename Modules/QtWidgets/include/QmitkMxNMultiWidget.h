@@ -43,6 +43,23 @@ public:
   QmitkRenderWindow* GetRenderWindow(const mitk::BaseRenderer::ViewDirection& viewDirection) const override;
 
   void SetActiveRenderWindowWidget(RenderWindowWidgetPointer activeRenderWindowWidget) override;
+  /**
+   * @brief Set the reference geometry for interaction inside the active render windows of the MxNMultiWidget.
+   *
+   * @param referenceGeometry   The reference geometry which is used for updating the
+   *                            time geometry inside the active render window.
+   * @param resetCamera         If true, the camera and crosshair will be reset to the default view (centered, no zoom).
+   *                            If false, the current crosshair position and the camera zoom will be stored and reset
+   *                            after the reference geometry has been updated.
+   */
+  void SetReferenceGeometry(const mitk::TimeGeometry* referenceGeometry, bool resetCamera) override;
+
+  /**
+  * @brief Returns true if the render windows are coupled; false if not.
+  *
+  * For the MxNMultiWidget the render windows are typically decoupled.
+  */
+  bool HasCoupledRenderWindows() const override;
 
   void SetSelectedPosition(const mitk::Point3D& newPosition, const QString& widgetName) override;
   const mitk::Point3D GetSelectedPosition(const QString& widgetName) const override;

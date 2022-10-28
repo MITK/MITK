@@ -46,7 +46,6 @@ void QmitkSegmentationPreferencePage::CreateQtControl(QWidget* parent)
   m_Control = new QWidget(parent);
   m_Ui->setupUi(m_Control);
 
-  connect(m_Ui->smoothingCheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnSmoothingCheckboxChecked(int)));
   connect(m_Ui->labelSetPresetToolButton, SIGNAL(clicked()), this, SLOT(OnLabelSetPresetButtonClicked()));
   connect(m_Ui->suggestionsToolButton, SIGNAL(clicked()), this, SLOT(OnSuggestionsButtonClicked()));
 
@@ -64,10 +63,6 @@ bool QmitkSegmentationPreferencePage::PerformOk()
   m_SegmentationPreferencesNode->PutBool("slim view", m_Ui->slimViewCheckBox->isChecked());
   m_SegmentationPreferencesNode->PutBool("draw outline", m_Ui->outlineRadioButton->isChecked());
   m_SegmentationPreferencesNode->PutBool("selection mode", m_Ui->selectionModeCheckBox->isChecked());
-  m_SegmentationPreferencesNode->PutBool("smoothing hint", m_Ui->smoothingCheckBox->isChecked());
-  m_SegmentationPreferencesNode->PutDouble("smoothing value", m_Ui->smoothingSpinBox->value());
-  m_SegmentationPreferencesNode->PutDouble("decimation rate", m_Ui->decimationSpinBox->value());
-  m_SegmentationPreferencesNode->PutDouble("closing ratio", m_Ui->closingSpinBox->value());
   m_SegmentationPreferencesNode->Put("label set preset", m_Ui->labelSetPresetLineEdit->text());
   m_SegmentationPreferencesNode->PutBool("default label naming", m_Ui->defaultNameRadioButton->isChecked());
   m_SegmentationPreferencesNode->Put("label suggestions", m_Ui->suggestionsLineEdit->text());
@@ -94,21 +89,6 @@ void QmitkSegmentationPreferencePage::Update()
   }
 
   m_Ui->selectionModeCheckBox->setChecked(m_SegmentationPreferencesNode->GetBool("selection mode", false));
-
-  if (m_SegmentationPreferencesNode->GetBool("smoothing hint", true))
-  {
-    m_Ui->smoothingCheckBox->setChecked(true);
-    m_Ui->smoothingSpinBox->setDisabled(true);
-  }
-  else
-  {
-    m_Ui->smoothingCheckBox->setChecked(false);
-    m_Ui->smoothingSpinBox->setEnabled(true);
-  }
-
-  m_Ui->smoothingSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("smoothing value", 1.0));
-  m_Ui->decimationSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("decimation rate", 0.5));
-  m_Ui->closingSpinBox->setValue(m_SegmentationPreferencesNode->GetDouble("closing ratio", 0.0));
 
   auto labelSetPreset = mitk::BaseApplication::instance().config().getString(mitk::BaseApplication::ARG_SEGMENTATION_LABELSET_PRESET.toStdString(), "");
   bool isOverriddenByCmdLineArg = !labelSetPreset.empty();
@@ -147,14 +127,6 @@ void QmitkSegmentationPreferencePage::Update()
 
   m_Ui->replaceStandardSuggestionsCheckBox->setChecked(m_SegmentationPreferencesNode->GetBool("replace standard suggestions", true));
   m_Ui->suggestOnceCheckBox->setChecked(m_SegmentationPreferencesNode->GetBool("suggest once", true));
-}
-
-void QmitkSegmentationPreferencePage::OnSmoothingCheckboxChecked(int state)
-{
-  if (state != Qt::Unchecked)
-    m_Ui->smoothingSpinBox->setDisabled(true);
-  else
-    m_Ui->smoothingSpinBox->setEnabled(true);
 }
 
 void QmitkSegmentationPreferencePage::OnLabelSetPresetButtonClicked()

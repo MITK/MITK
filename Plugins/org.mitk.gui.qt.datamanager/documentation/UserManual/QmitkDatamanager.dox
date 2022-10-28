@@ -151,8 +151,6 @@ It allows to set the following preferences for the Datamanager, which define the
   If disabled, data nodes that have set <tt>"helper object"</tt> to true will not be visible in the Datamanager.
   <li> <em>Show nodes containing no data</em>: If enabled, data nodes that have no underlying base data defined will be displayed in the Datamanager.
   If disabled, data nodes that have no underlying base data defined will not be visible in the Datamanager.
-  <li> <em>Use surface decimation</em>: If enabled, a newly created surface will be decimated to reduce the number of triangles in the triangle mesh.
-  Such a surface can be created as a polygon model from a segmentation (see \ref DataManagerContextMenu "Context Menu").
   If disabled, the surface will have its original number of triangles in the triangle mesh.
   <li> <em>Allow changing of parent node</em>: If enabled, the user can change the hierarchy of the data nodes manually by dragging one or multiple data nodes and
   dropping them at any position inside the Datamanager (see \ref DataManagerWorking "Working with the Datamanager") for changing the order of the data nodes manually).

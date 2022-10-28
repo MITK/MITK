@@ -40,7 +40,7 @@ protected slots :
 
   void OnConfirmSegmentation();
 
-  void OnClearSegmentation();
+  void OnClearContour();
 
   void OnAutoConfirm(bool on);
   void OnAddModeToogled(bool on);

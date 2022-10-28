@@ -59,17 +59,6 @@ namespace mitk
     typedef std::map<vtkRenderWindow*, BaseRenderer*> BaseRendererMapType;
     static BaseRendererMapType baseRendererMap;
 
-    static BaseRenderer* GetInstance(vtkRenderWindow* renderWindow);
-    static void AddInstance(vtkRenderWindow* renderWindow, BaseRenderer* baseRenderer);
-    static void RemoveInstance(vtkRenderWindow* renderWindow);
-
-    static BaseRenderer* GetByName(const std::string& name);
-    static vtkRenderWindow* GetRenderWindowByName(const std::string& name);
-
-    mitkClassMacroItkParent(BaseRenderer, itk::Object);
-
-    BaseRenderer(const char* name = nullptr, vtkRenderWindow* renderWindow = nullptr);
-
     /**
      * \brief Defines which kind of mapper (e.g. 2D or 3D) should be used.
      */
@@ -89,6 +78,32 @@ namespace mitk
       CORONAL,
       THREE_D
     };
+
+    static BaseRenderer* GetInstance(vtkRenderWindow* renderWindow);
+    static void AddInstance(vtkRenderWindow* renderWindow, BaseRenderer* baseRenderer);
+    static void RemoveInstance(vtkRenderWindow* renderWindow);
+
+    static BaseRenderer* GetByName(const std::string& name);
+    static vtkRenderWindow* GetRenderWindowByName(const std::string& name);
+
+    /**
+     * \brief Get a map of specific RenderWindows
+     */
+    static BaseRendererMapType GetSpecificRenderWindows(MapperSlotId mapper);
+
+    /**
+     * \brief Convenience function: Get a map of all 2D RenderWindows
+     */
+    static BaseRendererMapType GetAll2DRenderWindows();
+
+    /**
+     * \brief Convenience function: Get a map of all 3D RenderWindows
+     */
+    static BaseRendererMapType GetAll3DRenderWindows();
+
+    mitkClassMacroItkParent(BaseRenderer, itk::Object);
+
+    BaseRenderer(const char* name = nullptr, vtkRenderWindow* renderWindow = nullptr);
 
     void RemoveAllLocalStorages();
     void RegisterLocalStorageHandler(BaseLocalStorageHandler* lsh);

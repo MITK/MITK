@@ -10,39 +10,39 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKMEMORYUSAGEINDICATORVIEW_WIDGET
-#define QMITKMEMORYUSAGEINDICATORVIEW_WIDGET
+#ifndef QmitkMemoryUsageIndicatorView_h
+#define QmitkMemoryUsageIndicatorView_h
 
 #include <MitkQtWidgetsExports.h>
 
-#include "ui_QmitkMemoryUsageIndicator.h"
 #include <QWidget>
-#include <qpixmap.h>
+
+#include <array>
+#include <utility>
+
+namespace Ui
+{
+  class QmitkMemoryUsageIndicator;
+}
 
 /// \ingroup QmitkModule
-class MITKQTWIDGETS_EXPORT QmitkMemoryUsageIndicatorView : public QWidget, public Ui::QmitkMemoryUsageIndicator
+class MITKQTWIDGETS_EXPORT QmitkMemoryUsageIndicatorView : public QWidget
 {
   Q_OBJECT
 
 public:
-  /// constructor
-  QmitkMemoryUsageIndicatorView(QWidget *parent = nullptr, Qt::WindowFlags f = nullptr);
-
-  /// destructor
+  QmitkMemoryUsageIndicatorView(QWidget* parent = nullptr);
   ~QmitkMemoryUsageIndicatorView() override;
 
-protected slots:
+private:
   void UpdateMemoryUsage();
-
-protected:
   std::string FormatMemorySize(size_t size);
   std::string FormatPercentage(double val);
   std::string GetMemoryDescription(size_t processSize, float percentage);
 
-  QPixmap m_LEDGreen;
-  QPixmap m_LEDYellow;
-  QPixmap m_LEDOrange;
-  QPixmap m_LEDRed;
-  char m_PreviousState;
+  Ui::QmitkMemoryUsageIndicator* m_Ui;
+  size_t m_PreviousState;
+  std::array<std::pair<float, QPixmap>, 4> m_States;
 };
-#endif // QMITKMEMORYUSAGEINDICATORVIEW_WIDGET
+
+#endif

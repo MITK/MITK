@@ -190,12 +190,10 @@ void QmitkUSNavigationStepCombinedModality::OnCombinedModalityCreateNewButtonCli
 void QmitkUSNavigationStepCombinedModality::OnCombinedModalityCreationExit()
 {
   this->SetCombinedModalityCreateWidgetEnabled(false);
-  mitk::DataNode::Pointer usNode = mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))->GetDataStorage()//GetDataStorage
-    ->GetNamedNode("US Viewing Stream - Image 0");
+  mitk::DataNode::Pointer usNode = mitk::RenderingManager::GetInstance()->GetDataStorage()->GetNamedNode("US Viewing Stream - Image 0");
   if (usNode.IsNotNull())
   {
-    mitk::RenderingManager::GetInstance()->InitializeViews(//Reinit
-      usNode->GetData()->GetTimeGeometry());//GetNode
+    mitk::RenderingManager::GetInstance()->InitializeViews(usNode->GetData()->GetTimeGeometry());
   }
   else
   {

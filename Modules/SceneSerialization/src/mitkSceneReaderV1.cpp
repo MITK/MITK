@@ -351,6 +351,11 @@ mitk::DataNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag(const tinyx
         error = true;
       }
     }
+    else
+    {
+      MITK_ERROR << "File attribute of data tag is empty!";
+      error = true;
+    }
 
     const char* dataUID = dataElement->Attribute("UID");
     if (!error && dataUID != nullptr)

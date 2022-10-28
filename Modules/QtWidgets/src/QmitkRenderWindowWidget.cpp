@@ -408,6 +408,7 @@ void QmitkRenderWindowWidget::OnResetAction(QList<mitk::DataNode::Pointer> selec
   renderingManager->InitializeView(baseRenderer->GetRenderWindow(), referenceGeometry, false);
 
   // reset position and time step
+  this->GetSliceNavigationController()->SelectSliceByPoint(currentPosition);
   this->SetCrosshairPosition(currentPosition);
   renderingManager->GetTimeNavigationController()->GetTime()->SetPos(imageTimeStep);
 }

@@ -93,7 +93,17 @@ public:
   void ForceImmediateUpdate(mitk::RenderingManager::RequestType) override;
 
   /**
-   * \see mitk::QmitkAbstractRenderEditor::GetTimeNavigationController()
+  * \see mitk::IRenderWindowPart::SetReferenceGeometry()
+  */
+  void SetReferenceGeometry(const mitk::TimeGeometry* referenceGeometry, bool resetCamera) override;
+
+  /**
+  * \see mitk::IRenderWindowPart::HasCoupledRenderWindows
+  */
+  bool HasCoupledRenderWindows() const override;
+
+  /**
+   * \see mitk::IRenderWindowPart::GetTimeNavigationController()
    */
   mitk::SliceNavigationController *GetTimeNavigationController() const override;
 

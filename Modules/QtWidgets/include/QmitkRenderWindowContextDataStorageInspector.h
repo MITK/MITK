@@ -80,7 +80,6 @@ private:
 
   void Initialize() override;
   void SetUpConnections();
-  QList<mitk::DataNode::Pointer> GetSelectedNodes();
 
   Ui::QmitkRenderWindowContextDataStorageInspector m_Controls;
 

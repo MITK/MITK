@@ -20,7 +20,7 @@ found in the LICENSE file.
 #include <mitkBaseRenderer.h>
 #include <mitkDataNode.h>
 #include <mitkDataStorage.h>
-#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateBase.h>
 
 /**
 * @brief Render window layer helper functions to retrieve the currently valid layer stack
@@ -56,10 +56,12 @@ namespace mitk
     MITKQTWIDGETS_EXPORT LayerStack GetLayerStack(const DataStorage* dataStorage, const BaseRenderer* renderer, bool withBaseNode);
     /**
     * @brief Helper function to get a node predicate that can be used to filter render window specific data nodes.
+    *        The data nodes must have set a 'fixed layer' property for the given renderer.
     *
-    *        The data nodes must not be 'helper objects'. The must have set a 'fixed layer' property for the given renderer.
+    * @param renderer       Pointer to the renderer instance for which the 'fixed layer' should be true.
+    * @return               The node predicate to filter 'fixed layer' data nodes.
     */
-    MITKQTWIDGETS_EXPORT NodePredicateAnd::Pointer GetRenderWindowPredicate(const BaseRenderer* renderer);
+    MITKQTWIDGETS_EXPORT NodePredicateBase::Pointer GetRenderWindowPredicate(const BaseRenderer* renderer);
     /**
     * @brief Set renderer-specific properties to mark a data node as 'managed by the specific renderer'.
     *        In order for a renderer to manage a data node, the 'fixedLayer' property has to be set for the given renderer.

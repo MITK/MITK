@@ -113,10 +113,44 @@ void QmitkMxNMultiWidget::SetActiveRenderWindowWidget(RenderWindowWidgetPointer 
   QmitkAbstractMultiWidget::SetActiveRenderWindowWidget(activeRenderWindowWidget);
 }
 
+void QmitkMxNMultiWidget::SetReferenceGeometry(const mitk::TimeGeometry* referenceGeometry, bool resetCamera)
+{
+  auto* renderingManager = mitk::RenderingManager::GetInstance();
+  mitk::Point3D currentPosition = mitk::Point3D();
+  unsigned int imageTimeStep = 0;
+  if (!resetCamera)
+  {
+    // store the current position to set it again later, if the camera should not be reset
+    currentPosition = this->GetSelectedPosition("");
+
+    // store the current time step to set it again later, if the camera should not be reset
+    const auto currentTimePoint = renderingManager->GetTimeNavigationController()->GetSelectedTimePoint();
+    if (referenceGeometry->IsValidTimePoint(currentTimePoint))
+    {
+      imageTimeStep = referenceGeometry->TimePointToTimeStep(currentTimePoint);
+    }
+  }
+
+  // initialize active render window
+  renderingManager->InitializeView(
+    this->GetActiveRenderWindowWidget()->GetRenderWindow()->GetVtkRenderWindow(), referenceGeometry, resetCamera);
+
+  if (!resetCamera)
+  {
+    this->SetSelectedPosition(currentPosition, "");
+    renderingManager->GetTimeNavigationController()->GetTime()->SetPos(imageTimeStep);
+  }
+}
+
+bool QmitkMxNMultiWidget::HasCoupledRenderWindows() const
+{
+  return false;
+}
+
 void QmitkMxNMultiWidget::SetSelectedPosition(const mitk::Point3D& newPosition, const QString& widgetName)
 {
   RenderWindowWidgetPointer renderWindowWidget;
-  if (widgetName.isNull())
+  if (widgetName.isNull() || widgetName.isEmpty())
   {
     renderWindowWidget = GetActiveRenderWindowWidget();
   }
@@ -138,7 +172,7 @@ void QmitkMxNMultiWidget::SetSelectedPosition(const mitk::Point3D& newPosition, 
 const mitk::Point3D QmitkMxNMultiWidget::GetSelectedPosition(const QString& widgetName) const
 {
   RenderWindowWidgetPointer renderWindowWidget;
-  if (widgetName.isNull())
+  if (widgetName.isNull() || widgetName.isEmpty())
   {
     renderWindowWidget = GetActiveRenderWindowWidget();
   }

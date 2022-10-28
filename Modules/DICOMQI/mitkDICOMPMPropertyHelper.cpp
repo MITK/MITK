@@ -10,7 +10,6 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <mitkAnatomicalStructureColorPresets.h>
 #include <mitkDICOMTag.h>
 #include <mitkIDICOMTagsOfInterest.h>
 #include <mitkPropertyList.h>

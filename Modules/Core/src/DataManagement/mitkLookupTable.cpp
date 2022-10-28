@@ -25,6 +25,7 @@ found in the LICENSE file.
 #include <Colortables/Multilabel.h>
 #include <Colortables/PET20.h>
 #include <Colortables/PETColor.h>
+#include <Colortables/Turbo.h>
 #include <mitkLookupTableProperty.h>
 
 std::vector<std::string> mitk::LookupTable::typenameList = {
@@ -41,7 +42,8 @@ std::vector<std::string> mitk::LookupTable::typenameList = {
   "Legacy Rainbow Color",
   "Multilabel",
   "PET Color",
-  "PET 20"
+  "PET 20",
+  "Turbo"
 };
 
 mitk::LookupTable::LookupTable()
@@ -125,6 +127,9 @@ void mitk::LookupTable::SetType(const mitk::LookupTable::LookupTableType type)
       break;
     case (mitk::LookupTable::PET_20):
       this->BuildPET20LookupTable();
+      break;
+    case (mitk::LookupTable::TURBO):
+      this->BuildTurboLookupTable();
       break;
     case (mitk::LookupTable::LEGACY_RAINBOW_COLOR):
       this->BuildLegacyRainbowColorLookupTable();
@@ -519,6 +524,20 @@ void mitk::LookupTable::BuildPET20LookupTable()
   {
     lut->SetTableValue(i, (double)PET20[i][0] / 255.0, (double)PET20[i][1] / 255.0, (double)PET20[i][2] / 255.0, 1.0);
   }
+
+  m_LookupTable = lut;
+  this->Modified();
+}
+
+void mitk::LookupTable::BuildTurboLookupTable()
+{
+  auto lut = vtkSmartPointer<vtkLookupTable>::New();
+  lut->SetNumberOfTableValues(256);
+  lut->SetTableRange((m_Level - m_Window / 2.0), (m_Level + m_Window / 2.0));
+  lut->Build();
+
+  for (int i = 0; i < 256; ++i)
+    lut->SetTableValue(i, (double)Turbo[i][0] / 255.0, (double)Turbo[i][1] / 255.0, (double)Turbo[i][2] / 255.0, 1.0);
 
   m_LookupTable = lut;
   this->Modified();

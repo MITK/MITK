@@ -17,7 +17,6 @@ found in the LICENSE file.
 #include <usServiceReference.h>
 
 const char* const mitk::ToolManagerProvider::SEGMENTATION = "";
-const char* const mitk::ToolManagerProvider::MULTILABEL_SEGMENTATION = "org.mitk.views.multilabelsegmentation";
 
 mitk::ToolManagerProvider::ToolManagerProvider()
 {

@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef MITKCHANNELDESCRIPTOR_H
 #define MITKCHANNELDESCRIPTOR_H
 
-#include "mitkPixelType.h"
+#include <mitkPixelType.h>
 #include <string>
 
 namespace mitk
@@ -52,8 +52,6 @@ namespace mitk
         m_Data = (unsigned char *)dataPtr;
       }
     }
-
-    void AllocateData();
 
     /** Name of the channel */
     std::string m_Name;

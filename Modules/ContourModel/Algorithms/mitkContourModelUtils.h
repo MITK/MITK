@@ -85,6 +85,7 @@ namespace mitk
     \param projectedContour Pointer to the contour that should be projected.
     \param sliceImage Pointer to the image which content should be altered by
     adding the contour with the specified paintingPixelValue.
+    \param paintingPixelValue
     \pre sliceImage points to a valid instance
     \pre projectedContour points to a valid instance
     */
@@ -97,7 +98,9 @@ namespace mitk
     This overloaded version uses the contour at the passed contourTimeStep
     to fill the passed image slice.
     \param projectedContour Pointer to the contour that should be projected.
+    \param contourTimeStep
     \param sliceImage Pointer to the image which content should be altered by
+    \param paintingPixelValue
     adding the contour with the specified paintingPixelValue.
     \pre sliceImage points to a valid instance
     \pre projectedContour points to a valid instance

@@ -339,47 +339,6 @@ void QmitkAbstractView::RequestRenderWindowUpdate(mitk::RenderingManager::Reques
   }
 }
 
-void QmitkAbstractView::InitializeRenderWindows(const mitk::TimeGeometry *referenceGeometry,
-                                        mitk::RenderingManager::RequestType requestType,
-                                        bool resetCamera)
-{
-  mitk::IRenderWindowPart* renderWindowPart = this->GetRenderWindowPart();
-  if (nullptr == renderWindowPart)
-  {
-    return;
-  }
-
-  mitk::IRenderingManager* renderingManager = renderWindowPart->GetRenderingManager();
-  if (nullptr == renderingManager)
-  {
-    return;
-  }
-
-  mitk::Point3D currentPosition = mitk::Point3D();
-  unsigned int imageTimeStep = 0;
-  if (!resetCamera)
-  {
-    // store the current position to set it again later, if the camera should not be reset
-    currentPosition = renderWindowPart->GetSelectedPosition();
-
-    // store the current time step to set it again later, if the camera should not be reset
-    const auto currentTimePoint = renderingManager->GetTimeNavigationController()->GetSelectedTimePoint();
-    if (referenceGeometry->IsValidTimePoint(currentTimePoint))
-    {
-      imageTimeStep = referenceGeometry->TimePointToTimeStep(currentTimePoint);
-    }
-  }
-
-  // initialize render windows
-  renderingManager->InitializeViews(referenceGeometry, requestType, resetCamera);
-
-  if (!resetCamera)
-  {
-    renderWindowPart->SetSelectedPosition(currentPosition);
-    renderingManager->GetTimeNavigationController()->GetTime()->SetPos(imageTimeStep);
-  }
-}
-
 void QmitkAbstractView::HandleException( const char* str, QWidget* parent, bool showDialog ) const
 {
   //itkGenericOutputMacro( << "Exception caught: " << str );

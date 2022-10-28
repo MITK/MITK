@@ -67,7 +67,7 @@ WorkbenchWindowConfigurer::WorkbenchWindowConfigurer(const WorkbenchWindow::Poin
  , showMenuBar(true)
  , showProgressIndicator(false)
  , dropTargetListener(nullptr)
- , initialSize(1024,768)
+ , initialSize(1632, 918) // 85% of 1920 x 1080 (FullHD, 1080p)
 {
   if (window.IsNull())
   {

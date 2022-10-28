@@ -41,8 +41,7 @@ QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget *parent, mitk::DataStorage 
     m_ToolGUIWidget(nullptr),
     m_LastToolGUI(nullptr),
     m_ToolButtonGroup(nullptr),
-    m_ButtonLayout(nullptr),
-    m_EnabledMode(EnabledWithReferenceAndWorkingDataVisible)
+    m_ButtonLayout(nullptr)
 {
   QFont currentFont = QWidget::font();
   currentFont.setBold(true);
@@ -89,12 +88,6 @@ QmitkToolSelectionBox::~QmitkToolSelectionBox()
     mitk::MessageDelegate<QmitkToolSelectionBox>(this, &QmitkToolSelectionBox::OnToolManagerReferenceDataModified);
   m_ToolManager->WorkingDataChanged -=
     mitk::MessageDelegate<QmitkToolSelectionBox>(this, &QmitkToolSelectionBox::OnToolManagerWorkingDataModified);
-}
-
-void QmitkToolSelectionBox::SetEnabledMode(EnabledMode mode)
-{
-  m_EnabledMode = mode;
-  SetGUIEnabledAccordingToToolManagerState();
 }
 
 mitk::ToolManager *QmitkToolSelectionBox::GetToolManager()
@@ -283,7 +276,6 @@ void QmitkToolSelectionBox::OnToolManagerReferenceDataModified()
   MITK_DEBUG << "OnToolManagerReferenceDataModified()";
 
   this->UpdateButtonsEnabledState();
-  this->SetGUIEnabledAccordingToToolManagerState();
 }
 
 void QmitkToolSelectionBox::OnToolManagerWorkingDataModified()
@@ -294,50 +286,20 @@ void QmitkToolSelectionBox::OnToolManagerWorkingDataModified()
   MITK_DEBUG << "OnToolManagerWorkingDataModified()";
 
   this->UpdateButtonsEnabledState();
-  this->SetGUIEnabledAccordingToToolManagerState();
 }
 
-/**
- Implementes the logic, which decides, when tools are activated/deactivated.
-*/
-void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
+void QmitkToolSelectionBox::setEnabled(bool enable)
 {
-  mitk::DataNode *referenceNode = m_ToolManager->GetReferenceData(0);
-  mitk::DataNode *workingNode = m_ToolManager->GetWorkingData(0);
+  if (QWidget::isEnabled() == enable)
+    return;
 
-  bool enabled = true;
+  QWidget::setEnabled(enable);
 
-  switch (m_EnabledMode)
-  {
-    default:
-    case EnabledWithReferenceAndWorkingDataVisible:
-      enabled = referenceNode && workingNode &&
-                referenceNode->IsVisible(
-                  mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget0"))) &&
-                workingNode->IsVisible(
-                  mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget0"))) &&
-                isVisible();
-      break;
-    case EnabledWithReferenceData:
-      enabled = referenceNode && isVisible();
-      break;
-    case EnabledWithWorkingData:
-      enabled = workingNode && isVisible();
-      break;
-    case AlwaysEnabled:
-      enabled = isVisible();
-      break;
-  }
-
-  if (QWidget::isEnabled() == enabled)
-    return; // nothing to change
-
-  QWidget::setEnabled(enabled);
-  if (enabled)
+  if (enable)
   {
     m_ToolManager->RegisterClient();
 
-    int id = m_ToolManager->GetActiveToolID();
+    auto id = m_ToolManager->GetActiveToolID();
     emit ToolSelected(id);
   }
   else
@@ -347,14 +309,6 @@ void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
 
     emit ToolSelected(-1);
   }
-}
-
-/**
- External enableization...
-*/
-void QmitkToolSelectionBox::setEnabled(bool /*enable*/)
-{
-  SetGUIEnabledAccordingToToolManagerState();
 }
 
 void QmitkToolSelectionBox::UpdateButtonsEnabledState()
@@ -666,18 +620,3 @@ void QmitkToolSelectionBox::SetToolGUIArea(QWidget *parentWidget)
   m_ToolGUIWidget = parentWidget;
 }
 
-void QmitkToolSelectionBox::setTitle(const QString & /*title*/)
-{
-}
-
-void QmitkToolSelectionBox::showEvent(QShowEvent *e)
-{
-  QWidget::showEvent(e);
-  SetGUIEnabledAccordingToToolManagerState();
-}
-
-void QmitkToolSelectionBox::hideEvent(QHideEvent *e)
-{
-  QWidget::hideEvent(e);
-  SetGUIEnabledAccordingToToolManagerState();
-}

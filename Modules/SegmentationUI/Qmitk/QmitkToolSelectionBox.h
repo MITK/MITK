@@ -53,21 +53,11 @@ class MITKSEGMENTATIONUI_EXPORT QmitkToolSelectionBox : public QWidget
   Q_OBJECT
 
 public:
-  enum EnabledMode
-  {
-    EnabledWithReferenceAndWorkingDataVisible,
-    EnabledWithReferenceData,
-    EnabledWithWorkingData,
-    AlwaysEnabled
-  };
-
   QmitkToolSelectionBox(QWidget *parent = nullptr, mitk::DataStorage *storage = nullptr);
   ~QmitkToolSelectionBox() override;
 
   mitk::ToolManager *GetToolManager();
   void SetToolManager(mitk::ToolManager &); // no nullptr pointer allowed here, a manager is required
-
-  void setTitle(const QString &title);
 
   /**
     You may specify a list of tool "groups" that should be displayed in this widget. Every Tool can report its group
@@ -102,7 +92,6 @@ signals:
 public slots:
 
   virtual void setEnabled(bool);
-  virtual void SetEnabledMode(EnabledMode mode);
 
   virtual void SetLayoutColumns(int);
   virtual void SetShowNames(bool);
@@ -113,12 +102,9 @@ public slots:
 protected slots:
 
   void toolButtonClicked(int id);
-  void SetGUIEnabledAccordingToToolManagerState();
   void UpdateButtonsEnabledState();
 
 protected:
-  void showEvent(QShowEvent *) override;
-  void hideEvent(QHideEvent *) override;
 
   void SetOrUnsetButtonForActiveTool();
 
@@ -143,8 +129,6 @@ protected:
   // store buttons in this group
   QButtonGroup *m_ToolButtonGroup;
   QGridLayout *m_ButtonLayout;
-
-  EnabledMode m_EnabledMode;
 };
 
 #endif

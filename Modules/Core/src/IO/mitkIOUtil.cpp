@@ -806,7 +806,7 @@ namespace mitk
                     bool setPathProperty)
   {
     if ((data == nullptr) || (data->IsEmpty()))
-      mitkThrow() << "BaseData cannotbe null or empty for save methods in IOUtil.h.";
+      mitkThrow() << "BaseData cannot be null or empty for save methods in IOUtil.h.";
 
     std::string errMsg;
     if (options.empty())

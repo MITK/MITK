@@ -120,7 +120,7 @@ void QmitkSliderLevelWindowWidget::paintEvent(QPaintEvent *itkNotUsed(e))
   painter.setBrush(c);
   painter.drawRect(m_Rect);
 
-  float mr = m_LevelWindow.GetRange();
+  mitk::ScalarType mr = m_LevelWindow.GetRange();
   float smallestLevelableValue = 1e-9;
 
   //This check is needed as safe guard. LevelWindow is refactored to only deduce finite ranges
@@ -137,13 +137,13 @@ void QmitkSliderLevelWindowWidget::paintEvent(QPaintEvent *itkNotUsed(e))
   if (mr < smallestLevelableValue)
     mr = smallestLevelableValue;
 
-  float fact = (float)m_MoveHeight / mr;
+  mitk::ScalarType fact = m_MoveHeight / mr;
 
   // begin draw scale
   if (m_ScaleVisible)
   {
-    double minRange = (double)m_LevelWindow.GetRangeMin();
-    double maxRange = (double)m_LevelWindow.GetRangeMax();
+    mitk::ScalarType minRange = m_LevelWindow.GetRangeMin();
+    mitk::ScalarType maxRange = m_LevelWindow.GetRangeMax();
 
     //This check is needed as safe guard. LevelWindow is refactored to only deduce finite ranges
     //from images, but old scene serialization may contain infinite ranges that overwrite the new
@@ -162,7 +162,7 @@ void QmitkSliderLevelWindowWidget::paintEvent(QPaintEvent *itkNotUsed(e))
       maxRange = m_LevelWindow.GetUpperWindowBound();
     }
 
-    int yValue = m_MoveHeight + (int)(minRange * fact);
+    int yValue = m_MoveHeight + static_cast<int>(minRange * fact);
     QString s = " 0";
     if (minRange < 0 && maxRange > 0)
     {
@@ -177,7 +177,7 @@ void QmitkSliderLevelWindowWidget::paintEvent(QPaintEvent *itkNotUsed(e))
 
     double dStepSize = pow(10, floor(log10(mr / 100)) + 1);
 
-    for (int i = m_MoveHeight + (int)(minRange * fact); i < m_MoveHeight;) // negative
+    for (int i = m_MoveHeight + static_cast<int>(minRange * fact); i < m_MoveHeight;) // negative
     {
 
       if (-count * dStepSize < minRange)
@@ -185,7 +185,7 @@ void QmitkSliderLevelWindowWidget::paintEvent(QPaintEvent *itkNotUsed(e))
         break;
       }
 
-      yValue = m_MoveHeight + (int)((minRange + count * dStepSize) * fact);
+      yValue = m_MoveHeight + static_cast<int>((minRange + count * dStepSize) * fact);
 
       s = QString::number(-count * dStepSize);
       if (count % k && ((dStepSize * fact) > 2.5))
@@ -227,13 +227,13 @@ void QmitkSliderLevelWindowWidget::paintEvent(QPaintEvent *itkNotUsed(e))
     k = 5;
     enoughSpace = false;
     enoughSpace2 = false;
-    for (int i = m_MoveHeight + (int)(minRange * fact); i >= 0;)
+    for (int i = m_MoveHeight + static_cast<int>(minRange * fact); i >= 0;)
     {
       if (count * dStepSize > maxRange)
       {
         break;
       }
-      yValue = m_MoveHeight + (int)((minRange - count * dStepSize) * fact);
+      yValue = m_MoveHeight + static_cast<int>((minRange - count * dStepSize) * fact);
       s = QString::number(count * dStepSize);
       if (count % k && ((dStepSize * fact) > 2.5))
       {
@@ -322,19 +322,19 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent(QMouseEvent *mouseEvent)
 
   else
   {
-    float fact = (float)m_MoveHeight / m_LevelWindow.GetRange();
+    mitk::ScalarType fact = m_MoveHeight / m_LevelWindow.GetRange();
 
     if (m_Leftbutton)
     {
       if (m_Resize && !m_CtrlPressed)
       {
-        double diff = (mouseEvent->pos().y()) / fact;
+        mitk::ScalarType diff = (mouseEvent->pos().y()) / fact;
         diff -= (m_StartPos.y()) / fact;
         m_StartPos = mouseEvent->pos();
 
         if (diff == 0)
           return;
-        float value;
+        mitk::ScalarType value;
         if (m_Bottom)
           value = m_LevelWindow.GetWindow() + ((2 * diff));
         else
@@ -349,21 +349,21 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent(QMouseEvent *mouseEvent)
       {
         if (!m_Bottom)
         {
-          double diff = (mouseEvent->pos().y()) / fact;
+          mitk::ScalarType diff = (mouseEvent->pos().y()) / fact;
           diff -= (m_StartPos.y()) / fact;
           m_StartPos = mouseEvent->pos();
 
           if (diff == 0)
             return;
-          float value;
+          mitk::ScalarType value;
 
           value = m_LevelWindow.GetWindow() - ((diff));
 
           if (value < 0)
             value = 0;
-          float oldWindow;
-          float oldLevel;
-          float newLevel;
+          mitk::ScalarType oldWindow;
+          mitk::ScalarType oldLevel;
+          mitk::ScalarType newLevel;
           oldWindow = m_LevelWindow.GetWindow();
           oldLevel = m_LevelWindow.GetLevel();
           newLevel = oldLevel + (value - oldWindow) / 2;
@@ -372,21 +372,21 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent(QMouseEvent *mouseEvent)
         }
         else
         {
-          double diff = (mouseEvent->pos().y()) / fact;
+          mitk::ScalarType diff = (mouseEvent->pos().y()) / fact;
           diff -= (m_StartPos.y()) / fact;
           m_StartPos = mouseEvent->pos();
 
           if (diff == 0)
             return;
-          float value;
+          mitk::ScalarType value;
 
           value = m_LevelWindow.GetWindow() + ((diff));
 
           if (value < 0)
             value = 0;
-          float oldWindow;
-          float oldLevel;
-          float newLevel;
+          mitk::ScalarType oldWindow;
+          mitk::ScalarType oldLevel;
+          mitk::ScalarType newLevel;
           oldWindow = m_LevelWindow.GetWindow();
           oldLevel = m_LevelWindow.GetLevel();
           newLevel = oldLevel - (value - oldWindow) / 2;
@@ -396,15 +396,15 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent(QMouseEvent *mouseEvent)
       }
       else
       {
-        const float minv = m_LevelWindow.GetRangeMin();
+        const mitk::ScalarType minv = m_LevelWindow.GetRangeMin();
 
-        const float level = (m_MoveHeight - mouseEvent->pos().y()) / fact + minv;
+        const mitk::ScalarType level = (m_MoveHeight - mouseEvent->pos().y()) / fact + minv;
 
-        double diff = (mouseEvent->pos().x()) / fact;
+        mitk::ScalarType diff = (mouseEvent->pos().x()) / fact;
         diff -= (m_StartPos.x()) / fact;
         m_StartPos = mouseEvent->pos();
 
-        float window;
+        mitk::ScalarType window;
         if (m_Bottom)
           window = m_LevelWindow.GetWindow() + ((2 * diff));
         else
@@ -484,28 +484,28 @@ void QmitkSliderLevelWindowWidget::Update()
     setMaximumSize(QSize(50, 2000));
     setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding));
   }
-  float mr = m_LevelWindow.GetRange();
+  mitk::ScalarType mr = m_LevelWindow.GetRange();
 
   if (mr < 1e-9)
     mr = 1e-9;
 
-  float fact = (float)m_MoveHeight / mr;
+  mitk::ScalarType fact = m_MoveHeight / mr;
 
-  float rectHeight = m_LevelWindow.GetWindow() * fact;
+  mitk::ScalarType rectHeight = m_LevelWindow.GetWindow() * fact;
 
   if (rectHeight < 15)
     rectHeight = 15;
 
   if (m_LevelWindow.GetLowerWindowBound() < 0)
     m_Rect.setRect(2,
-                   (int)(m_MoveHeight - (m_LevelWindow.GetUpperWindowBound() - m_LevelWindow.GetRangeMin()) * fact),
+                   static_cast<int>(m_MoveHeight - (m_LevelWindow.GetUpperWindowBound() - m_LevelWindow.GetRangeMin()) * fact),
                    rectWidth,
-                   (int)rectHeight);
+                   static_cast<int>(rectHeight));
   else
     m_Rect.setRect(2,
-                   (int)(m_MoveHeight - (m_LevelWindow.GetUpperWindowBound() - m_LevelWindow.GetRangeMin()) * fact),
+                   static_cast<int>(m_MoveHeight - (m_LevelWindow.GetUpperWindowBound() - m_LevelWindow.GetRangeMin()) * fact),
                    rectWidth,
-                   (int)rectHeight);
+                   static_cast<int>(rectHeight));
 
   QWidget::repaint();
 }

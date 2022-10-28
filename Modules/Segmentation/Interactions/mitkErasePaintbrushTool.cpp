@@ -25,9 +25,8 @@ namespace mitk
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, ErasePaintbrushTool, "Paintbrush erasing tool");
 }
 
-mitk::ErasePaintbrushTool::ErasePaintbrushTool() : PaintbrushTool(0)
+mitk::ErasePaintbrushTool::ErasePaintbrushTool() : PaintbrushTool(false)
 {
-  FeedbackContourTool::SetFeedbackContourColor(1.0, 0.0, 0.0);
 }
 
 mitk::ErasePaintbrushTool::~ErasePaintbrushTool()

@@ -285,11 +285,14 @@ void mitk::SegWithPreviewTool::ResetPreviewNode()
 
       m_PreviewSegmentationNode->SetData(newPreviewImage);
 
-      // Let's paint the feedback node green...
       auto* activeLayer = newPreviewImage->GetActiveLabelSet();
       auto* activeLabel = activeLayer->GetActiveLabel();
-      activeLabel->SetColor(previewColor);
-      activeLayer->UpdateLookupTable(activeLabel->GetValue());
+      if (m_UseSpecialPreviewColor)
+      {
+        // Let's paint the feedback node green...
+        activeLabel->SetColor(previewColor);
+        activeLayer->UpdateLookupTable(activeLabel->GetValue());
+      }
       activeLabel->SetVisible(true);
     }
     else
@@ -688,7 +691,7 @@ mitk::Image::Pointer mitk::SegWithPreviewTool::GetImageByTimeStep(mitk::Image* i
 
 mitk::Image::ConstPointer mitk::SegWithPreviewTool::GetImageByTimePoint(const mitk::Image* image, TimePointType timePoint)
 {
-  return SelectImageByTimeStep(image, timePoint);
+  return SelectImageByTimePoint(image, timePoint);
 }
 
 void mitk::SegWithPreviewTool::EnsureTargetSegmentationNodeInDataStorage() const

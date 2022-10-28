@@ -143,6 +143,16 @@ void SimpleRenderWindowView::ForceImmediateUpdate(mitk::RenderingManager::Reques
     GetRenderingManager()->ForceImmediateUpdateAll(requestType);
 }
 
+void SimpleRenderWindowView::SetReferenceGeometry(const mitk::TimeGeometry* /*referenceGeometry*/, bool /*resetCamera*/)
+{
+  // not implemented
+}
+
+bool SimpleRenderWindowView::HasCoupledRenderWindows() const
+{
+  return false;
+}
+
 mitk::SliceNavigationController *SimpleRenderWindowView::GetTimeNavigationController() const
 {
   if (GetRenderingManager())

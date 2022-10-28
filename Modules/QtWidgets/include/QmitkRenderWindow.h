@@ -24,6 +24,8 @@ found in the LICENSE file.
 #include "mitkBaseRenderer.h"
 #include "mitkInteractionEventConst.h"
 
+#include <QmitkSimpleTextOverlayWidget.h>
+
 class QDragEnterEvent;
 class QDropEvent;
 class QInputEvent;
@@ -79,6 +81,9 @@ public:
   void ActivateMenuWidget(bool state);
 
   bool GetActivateMenuWidgetFlag() { return m_MenuWidgetActivated; }
+
+  void ShowOverlayMessage(bool show);
+
   // Get it from the QVTKWidget parent
   vtkRenderWindow *GetVtkRenderWindow() override { return this->renderWindow(); }
 
@@ -150,6 +155,8 @@ private:
   QmitkRenderWindowMenu::LayoutIndex m_LayoutIndex;
 
   vtkSmartPointer<vtkGenericOpenGLRenderWindow> m_InternalRenderWindow;
+
+  QmitkSimpleTextOverlayWidget* m_GeometryViolationWarningOverlay;
 
 };
 

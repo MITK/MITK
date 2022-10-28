@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Welcome to the MITK Workbench!</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
+  </head>
+  <body>
+    <div class="content">
+      <h1>Welcome to the MITK Workbench!</h1>
+        <p>
+          Load and view medical images from all kinds of imaging modalities like X-ray, US, CT, MRI, and many more.
+          Use our tools to efficiently create segmentations, measure anatomical structures, inspect image statistics, or register multiple images to each other.
+        </p>
+        <p>
+          <small>
+            The MITK Workbench is developed at the <a href="https://www.dkfz.de">↪ German Cancer Research Center (DKFZ)</a>.<br>
+            It is based on the free open source <a href="https://www.mitk.org">↪ Medical Imaging Interaction Toolkit (MITK)</a>.
+          </small>
+        </p>
+      <div class="tips">
+        <button class="button" style="float: right;" onclick="showNextTip()">Next tip »</button>
+        <div class="tip">
+          <h2>Mouse navigation</h2>
+          <div class="tip-content">
+            <img class="center" style="width: 50%" alt="Crosshair" src="img/mousenavigation/crosshair.svg">
+            <p>
+              Your images are typically shown from three different view directions at once: axial, sagittal, and coronal.
+              Together, the view planes resemble the shape of a three-dimensional crosshair slicing through your image data.
+              Use the mouse to navigate in these views.
+            </p>
+            <div class="table">
+              <div class="tr">
+                <div class="td">
+                  <h3>Focus</h3>
+                  <img style="width: 100%" alt="Left mouse button" src="img/mousenavigation/click.svg">
+                  <p>Use the left mouse button to focus all views on the clicked position.</p>
+                </div>
+                <div class="td">
+                  <h3>Zoom</h3>
+                  <img style="width: 100%" alt="Right mouse button" src="img/mousenavigation/zoom.svg">
+                  <p>Press and hold the right mouse button and move the mouse up and down to zoom in and out.</p>
+                </div>
+                <div class="td">
+                  <h3>Pan</h3>
+                  <img style="width: 100%" alt="Middle mouse button" src="img/mousenavigation/pan.svg">
+                  <p>Press and hold the middle mouse button and move the mouse to pan around.</p>
+                </div>
+                <div class="td">
+                  <h3>Scroll</h3>
+                  <img style="width: 100%" alt="Scroll wheel" src="img/mousenavigation/scroll.svg">
+                  <p>Use the scroll wheel to scroll through slices along the view's direction.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tip">
+          <h2>Image contrast</h2>
+          <div class="tip-content">
+            <img class="float-left" style="width: 40%;" alt="Standard display with level window" src="img/levelwindow/standarddisplay.svg">
+            <p>
+              For images, a vertical scale is shown right next to the views.
+              It is called the <b>level window</b>.
+            </p>
+            <p>
+              The values shown in the level window represent the pixel intensities of an image.
+              The blue bar defines the range of pixel intensities that is mapped onto the whole range of displayable pixel brightness.
+              Hence, a shorter range of pixel intensities results in higher displayed image contrast.
+            </p>
+            <p>
+              Grab the blue bar to move it up and down.<br>
+              Grab the tips of the blue bar to change its size.
+            </p>
+            <p>
+              Right-click on the level window for many more options.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

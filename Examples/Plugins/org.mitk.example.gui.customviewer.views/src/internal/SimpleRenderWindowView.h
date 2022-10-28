@@ -98,6 +98,11 @@ public:
   void SetReferenceGeometry(const mitk::TimeGeometry* referenceGeometry, bool resetCamera) override;
 
   /**
+  * \see mitk::IRenderWindowPart::HasCoupledRenderWindows
+  */
+  bool HasCoupledRenderWindows() const override;
+
+  /**
    * \see mitk::IRenderWindowPart::GetTimeNavigationController()
    */
   mitk::SliceNavigationController *GetTimeNavigationController() const override;

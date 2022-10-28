@@ -62,6 +62,10 @@ namespace mitk
     itkGetMacro(ResetsToEmptyPreview, bool);
     itkBooleanMacro(ResetsToEmptyPreview);
 
+    itkSetMacro(UseSpecialPreviewColor, bool);
+    itkGetMacro(UseSpecialPreviewColor, bool);
+    itkBooleanMacro(UseSpecialPreviewColor);
+
     /*itk macro was not used on purpose, to aviod the change of mtime.*/
     void SetMergeStyle(MultiLabelSegmentation::MergeStyle mergeStyle);
     itkGetMacro(MergeStyle, MultiLabelSegmentation::MergeStyle);
@@ -257,6 +261,10 @@ namespace mitk
     /** Controls if ResetPreviewNode generates an empty content (true) or clones the current
     segmentation (false).*/
     bool m_ResetsToEmptyPreview = false;
+
+    /** Controls if for the preview of the active label a special preview color is used.
+     * If set to false, coloring will stay in the preview like it is in the working image.*/
+    bool m_UseSpecialPreviewColor = true;
 
     TimePointType m_LastTimePointOfUpdate = 0.;
 

@@ -128,8 +128,14 @@ QmitkSegmentationTaskListWidget::QmitkSegmentationTaskListWidget(QWidget* parent
   auto* prevShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key::Key_P), this);
   connect(prevShortcut, &QShortcut::activated, this, &Self::OnPreviousTaskShortcutActivated);
 
+  auto* prevUndoneShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key::Key_P), this);
+  connect(prevUndoneShortcut, &QShortcut::activated, this, &Self::OnPreviousTaskShortcutActivated);
+
   auto* nextShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key::Key_N), this);
   connect(nextShortcut, &QShortcut::activated, this, &Self::OnNextTaskShortcutActivated);
+
+  auto* nextUndoneShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key::Key_N), this);
+  connect(nextUndoneShortcut, &QShortcut::activated, this, &Self::OnNextTaskShortcutActivated);
 
   auto* loadShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key::Key_L), this);
   connect(loadShortcut, &QShortcut::activated, this, &Self::OnLoadTaskShortcutActivated);
@@ -294,8 +300,26 @@ void QmitkSegmentationTaskListWidget::OnPreviousButtonClicked()
 {
   auto current = m_CurrentTaskIndex.value();
 
-  if (current != 0)
-    this->SetCurrentTaskIndex(current - 1);
+  // If the shift modifier key is pressed, look for the previous undone task.
+  if (QApplication::queryKeyboardModifiers().testFlag(Qt::ShiftModifier))
+  {
+    if (current > 0)
+    {
+      for (decltype(current) i = current; i > 0; --i)
+      {
+        if (!m_TaskList->IsDone(i - 1))
+        {
+          this->SetCurrentTaskIndex(i - 1);
+          break;
+        }
+      }
+    }
+  }
+  else
+  {
+    if (current != 0)
+      this->SetCurrentTaskIndex(current - 1);
+  }
 
   this->UpdateNavigationButtons();
 }
@@ -305,11 +329,26 @@ void QmitkSegmentationTaskListWidget::OnPreviousButtonClicked()
  */
 void QmitkSegmentationTaskListWidget::OnNextButtonClicked()
 {
-  const auto maxIndex = m_TaskList->GetNumberOfTasks() - 1;
+  const auto numTasks = m_TaskList->GetNumberOfTasks();
   auto current = m_CurrentTaskIndex.value();
 
-  if (current < maxIndex)
-    this->SetCurrentTaskIndex(current + 1);
+  // If the shift modifier key is pressed, look for the next undone task.
+  if (QApplication::queryKeyboardModifiers().testFlag(Qt::ShiftModifier))
+  {
+    for (std::remove_const_t<decltype(numTasks)> i = current + 1; i < numTasks; ++i)
+    {
+      if (!m_TaskList->IsDone(i))
+      {
+        this->SetCurrentTaskIndex(i);
+        break;
+      }
+    }
+  }
+  else
+  {
+    if (current < numTasks - 1)
+      this->SetCurrentTaskIndex(current + 1);
+  }
 
   this->UpdateNavigationButtons();
 }

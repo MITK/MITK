@@ -4,15 +4,18 @@ set(SRC_CPP_FILES
 set(INTERNAL_CPP_FILES
   QmitkMitkWorkbenchIntroPlugin.cpp
   QmitkMitkWorkbenchIntroPart.cpp
+  QmitkMitkWorkbenchIntroPreferencePage.cpp
 )
 
 set(MOC_H_FILES
   src/internal/QmitkMitkWorkbenchIntroPlugin.h
   src/internal/QmitkMitkWorkbenchIntroPart.h
+  src/internal/QmitkMitkWorkbenchIntroPreferencePage.h
 )
 
 set(UI_FILES
   src/internal/QmitkWelcomeScreenViewControls.ui
+  src/internal/QmitkMitkWorkbenchIntroPreferencePage.ui
 )
 
 set(CACHED_RESOURCE_FILES

@@ -57,16 +57,14 @@ public:
   QmitkMitkWorkbenchIntroPart();
  ~QmitkMitkWorkbenchIntroPart() override;
 
-
   void CreateQtPartControl(QWidget *parent) override;
-
   void StandbyStateChanged(bool) override;
-
   void SetFocus() override;
+  void ReloadPage();
 
-  virtual void CreateConnections();
-
-protected:
+private:
+  void CreateConnections();
+  void OnLoadFinished(bool ok);
 
   Ui::QmitkWelcomeScreenViewControls* m_Controls;
 

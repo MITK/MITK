@@ -142,6 +142,11 @@ void QmitkMxNMultiWidget::SetReferenceGeometry(const mitk::TimeGeometry* referen
   }
 }
 
+bool QmitkMxNMultiWidget::HasCoupledRenderWindows() const
+{
+  return false;
+}
+
 void QmitkMxNMultiWidget::SetSelectedPosition(const mitk::Point3D& newPosition, const QString& widgetName)
 {
   RenderWindowWidgetPointer renderWindowWidget;

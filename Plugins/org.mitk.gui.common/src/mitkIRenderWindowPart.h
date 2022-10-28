@@ -129,6 +129,14 @@ struct MITK_GUI_COMMON_PLUGIN IRenderWindowPart {
   virtual void SetReferenceGeometry(const mitk::TimeGeometry* referenceGeometry, bool resetCamera) = 0;
 
   /**
+  * @brief Returns true if the render windows are coupled; false if not.
+  *
+  * Render windows are coupled if the slice navigation controller of the render windows
+  * are connected which means that always the same geometry is used for the render windows.
+  */
+  virtual bool HasCoupledRenderWindows() const = 0;
+
+  /**
    * Get the SliceNavigationController for controlling time positions.
    *
    * \return A SliceNavigationController if the render window supports this

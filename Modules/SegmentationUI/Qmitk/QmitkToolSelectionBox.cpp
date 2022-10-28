@@ -276,7 +276,6 @@ void QmitkToolSelectionBox::OnToolManagerReferenceDataModified()
   MITK_DEBUG << "OnToolManagerReferenceDataModified()";
 
   this->UpdateButtonsEnabledState();
-  this->SetGUIEnabledAccordingToToolManagerState();
 }
 
 void QmitkToolSelectionBox::OnToolManagerWorkingDataModified()
@@ -287,33 +286,16 @@ void QmitkToolSelectionBox::OnToolManagerWorkingDataModified()
   MITK_DEBUG << "OnToolManagerWorkingDataModified()";
 
   this->UpdateButtonsEnabledState();
-  this->SetGUIEnabledAccordingToToolManagerState();
 }
 
-/**
- Implementes the logic, which decides, when tools are activated/deactivated.
-*/
-void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
+void QmitkToolSelectionBox::setEnabled(bool enable)
 {
-  auto* referenceNode = m_ToolManager->GetReferenceData(0);
-  auto* workingNode = m_ToolManager->GetWorkingData(0);
-  mitk::LabelSetImage* workingData = nullptr;
-
-  if (workingNode != nullptr)
-    workingData = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
-
-  bool enabled =
-    referenceNode != nullptr && workingNode != nullptr && workingData != nullptr &&
-    referenceNode->IsVisible(nullptr) && workingNode->IsVisible(nullptr) &&
-    workingData->GetNumberOfLabels(workingData->GetActiveLayer()) > 1 &&
-    isVisible();
-
-  if (QWidget::isEnabled() == enabled)
+  if (QWidget::isEnabled() == enable)
     return;
 
-  QWidget::setEnabled(enabled);
+  QWidget::setEnabled(enable);
 
-  if (enabled)
+  if (enable)
   {
     m_ToolManager->RegisterClient();
 
@@ -327,14 +309,6 @@ void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
 
     emit ToolSelected(-1);
   }
-}
-
-/**
- External enableization...
-*/
-void QmitkToolSelectionBox::setEnabled(bool /*enable*/)
-{
-  SetGUIEnabledAccordingToToolManagerState();
 }
 
 void QmitkToolSelectionBox::UpdateButtonsEnabledState()
@@ -646,18 +620,3 @@ void QmitkToolSelectionBox::SetToolGUIArea(QWidget *parentWidget)
   m_ToolGUIWidget = parentWidget;
 }
 
-void QmitkToolSelectionBox::setTitle(const QString & /*title*/)
-{
-}
-
-void QmitkToolSelectionBox::showEvent(QShowEvent *e)
-{
-  QWidget::showEvent(e);
-  SetGUIEnabledAccordingToToolManagerState();
-}
-
-void QmitkToolSelectionBox::hideEvent(QHideEvent *e)
-{
-  QWidget::hideEvent(e);
-  SetGUIEnabledAccordingToToolManagerState();
-}

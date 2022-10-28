@@ -32,9 +32,10 @@ namespace mitk
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, GrowCutTool, "GrowCutTool");
 }
 
-mitk::GrowCutTool::GrowCutTool() : SegWithPreviewTool(false, "PressMoveReleaseAndPointSetting")
+mitk::GrowCutTool::GrowCutTool() : SegWithPreviewTool(true, "PressMoveReleaseAndPointSetting")
 {
   this->ResetsToEmptyPreviewOn();
+  this->UseSpecialPreviewColorOff();
 }
 
 mitk::GrowCutTool::~GrowCutTool() {}
@@ -81,7 +82,7 @@ void mitk::GrowCutTool::Deactivated()
   Superclass::Deactivated();
 }
 
-bool mitk::GrowCutTool::HasMoreThanTwoSeedLabel()
+bool mitk::GrowCutTool::SeedImageIsValid()
 {
   if (nullptr == this->GetToolManager()->GetWorkingData(0))
   {
@@ -96,8 +97,7 @@ bool mitk::GrowCutTool::HasMoreThanTwoSeedLabel()
     return false;
   }
 
-  workingDataLabelSetImage->SetActiveLayer(0);
-  auto numberOfLabels = workingDataLabelSetImage->GetNumberOfLabels();
+  auto numberOfLabels = workingDataLabelSetImage->GetNumberOfLabels(workingDataLabelSetImage->GetActiveLayer());
 
   if (numberOfLabels >= 3)
   {
@@ -108,7 +108,7 @@ bool mitk::GrowCutTool::HasMoreThanTwoSeedLabel()
 }
 
 void mitk::GrowCutTool::DoUpdatePreview(const Image *inputAtTimeStep,
-                                        const Image * /*oldSegAtTimeStep*/,
+                                        const Image * oldSegAtTimeStep,
                                         LabelSetImage *previewImage,
                                         TimeStepType timeStep)
 {
@@ -122,16 +122,8 @@ void mitk::GrowCutTool::DoUpdatePreview(const Image *inputAtTimeStep,
         return;
       }
 
-      auto *workingDataLabelSetImage = dynamic_cast<mitk::LabelSetImage *>(this->GetToolManager()->GetWorkingData(0)->GetData());
-
-      if (nullptr == workingDataLabelSetImage)
-      {
-        return;
-      }
-
       SeedImageType::Pointer seedImage = SeedImageType::New();
-      workingDataLabelSetImage->SetActiveLayer(0);
-      CastToItkImage(workingDataLabelSetImage, seedImage);
+      CastToItkImage(oldSegAtTimeStep, seedImage);
 
       growCutFilter->SetSeedImage(seedImage);
       growCutFilter->SetDistancePenalty(m_DistancePenalty);
@@ -149,6 +141,7 @@ void mitk::GrowCutTool::DoUpdatePreview(const Image *inputAtTimeStep,
 
       auto growCutResultImage = mitk::LabelSetImage::New();
       growCutResultImage->InitializeByLabeledImage(growCutFilter->GetOutput());
+
       TransferLabelSetImageContent(growCutResultImage, previewImage, timeStep);
   }
 }

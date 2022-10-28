@@ -283,10 +283,7 @@ QPoint Window::GetInitialLocation(const QPoint& initialSize)
     centerPoint.setY(parentBounds.height()/2);
   }
 
-  return QPoint(centerPoint.x() - (initialSize.x() / 2),
-              std::max<int>(parentBounds.y(),
-                            std::min<int>(centerPoint.y() - (initialSize.y() * 2 / 3),
-                                          parentBounds.y() + parentBounds.height() - initialSize.y())));
+  return QPoint(centerPoint.x() - initialSize.x() / 2, centerPoint.y() - initialSize.y() / 2);
 }
 
 QPoint Window::GetInitialSize()

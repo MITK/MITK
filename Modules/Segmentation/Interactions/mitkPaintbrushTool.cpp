@@ -22,9 +22,9 @@ found in the LICENSE file.
 
 int mitk::PaintbrushTool::m_Size = 1;
 
-mitk::PaintbrushTool::PaintbrushTool(int paintingPixelValue)
+mitk::PaintbrushTool::PaintbrushTool(bool startWithFillMode)
   : FeedbackContourTool("PressMoveReleaseWithCTRLInversionAllMouseMoves"),
-    m_PaintingPixelValue(paintingPixelValue),
+  m_FillMode(startWithFillMode),
     m_LastContourSize(0) // other than initial mitk::PaintbrushTool::m_Size (around l. 28)
 {
   m_MasterContour = ContourModel::New();
@@ -49,7 +49,6 @@ void mitk::PaintbrushTool::Activated()
 {
   Superclass::Activated();
 
-  FeedbackContourTool::SetFeedbackContourVisible(true);
   SizeChanged.Send(m_Size);
   this->GetToolManager()->WorkingDataChanged +=
     mitk::MessageDelegate<mitk::PaintbrushTool>(this, &mitk::PaintbrushTool::OnToolManagerWorkingDataModified);
@@ -68,6 +67,9 @@ void mitk::PaintbrushTool::Activated()
   {
     m_PaintingNode->SetVisibility(false, mapit->second);
   }
+
+  this->UpdateFeedbackColor();
+  FeedbackContourTool::SetFeedbackContourVisible(true);
 
   this->GetToolManager()->GetDataStorage()->Add(m_PaintingNode);
 }
@@ -291,19 +293,17 @@ void mitk::PaintbrushTool::OnMousePressed(StateMachineAction *, InteractionEvent
   if (m_WorkingSlice.IsNull())
     return;
 
-  auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
+  auto* positionEvent = dynamic_cast<mitk::InteractionPositionEvent*>(interactionEvent);
   if (!positionEvent)
     return;
 
-  m_WorkingSlice->GetGeometry()->WorldToIndex(positionEvent->GetPositionInWorld(), m_LastPosition);
+  this->ResetWorkingSlice(positionEvent);
 
+  m_WorkingSlice->GetGeometry()->WorldToIndex(positionEvent->GetPositionInWorld(), m_LastPosition);
   this->m_PaintingNode->SetVisibility(true);
 
   m_LastEventSender = positionEvent->GetSender();
   m_LastEventSlice = m_LastEventSender->GetSlice();
-  m_PaintingSlice = nullptr; //force reset of the painting slice. Will be triggered in MouseMoved() by
-                             //CheckIfCurrentSliceHasChanged
-
   m_MasterContour->SetClosed(true);
   this->MouseMoved(interactionEvent, true);
 }
@@ -325,7 +325,11 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent *interactionEvent, 
 {
   auto *positionEvent = dynamic_cast<mitk::InteractionPositionEvent *>(interactionEvent);
 
-  CheckIfCurrentSliceHasChanged(positionEvent);
+  bool newSlice = CheckIfCurrentSliceHasChanged(positionEvent);
+  if (newSlice)
+  {
+    this->ResetWorkingSlice(positionEvent);
+  }
 
   if (m_LastContourSize != m_Size)
   {
@@ -449,8 +453,15 @@ void mitk::PaintbrushTool::MouseMoved(mitk::InteractionEvent *interactionEvent, 
 
   this->UpdateCurrentFeedbackContour(tmp);
 
-  assert(positionEvent->GetSender()->GetRenderWindow());
-  RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
+  if (newSlice)
+  {
+    RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+  else
+  {
+    assert(positionEvent->GetSender()->GetRenderWindow());
+    RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
+  }
 }
 
 void mitk::PaintbrushTool::OnMouseReleased(StateMachineAction *, InteractionEvent *interactionEvent)
@@ -462,7 +473,11 @@ void mitk::PaintbrushTool::OnMouseReleased(StateMachineAction *, InteractionEven
 
   DataNode* workingNode(this->GetToolManager()->GetWorkingData(0));
   auto workingImage = dynamic_cast<LabelSetImage*>(workingNode->GetData());
-  int activePixelValue = ContourModelUtils::GetActivePixelValue(workingImage);
+  Label::PixelType activePixelValue = ContourModelUtils::GetActivePixelValue(workingImage);
+  if (!m_FillMode)
+  {
+    activePixelValue = workingImage->GetExteriorLabel()->GetValue();
+  }
 
   //as paintbrush tools should always allow to manipulate active label
   //(that is what the user expects/knows when using tools so far:
@@ -470,62 +485,67 @@ void mitk::PaintbrushTool::OnMouseReleased(StateMachineAction *, InteractionEven
   //we realize that by cloning the relevant label set and changing the lock state
   //this fillLabelSet is used for the transfer.
   auto fillLabelSet = workingImage->GetActiveLabelSet()->Clone();
-  auto activeLabelClone = fillLabelSet->GetLabel(workingImage->GetActiveLabel()->GetValue());
+  auto activeLabelClone = fillLabelSet->GetLabel(workingImage->GetActiveLabel(workingImage->GetActiveLayer())->GetValue());
   if (nullptr != activeLabelClone)
   {
     activeLabelClone->SetLocked(false);
   }
 
-  TransferLabelContent(m_PaintingSlice, m_WorkingSlice, fillLabelSet, 0, workingImage->GetExteriorLabel()->GetValue(), false, { {m_InternalFillValue, m_PaintingPixelValue * activePixelValue} }, mitk::MultiLabelSegmentation::MergeStyle::Merge);
+  TransferLabelContent(m_PaintingSlice, m_WorkingSlice, fillLabelSet, 0, workingImage->GetExteriorLabel()->GetValue(), false, { {m_InternalFillValue, activePixelValue} }, mitk::MultiLabelSegmentation::MergeStyle::Merge);
 
   this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice->Clone());
 
   // deactivate visibility of helper node
   m_PaintingNode->SetVisibility(false);
+  m_PaintingNode->SetData(nullptr);
+  m_PaintingSlice = nullptr;
+  m_WorkingSlice = nullptr;
 
-  RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
+  RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void mitk::PaintbrushTool::UpdateFeedbackColor()
+{
+  mitk::Color currentColor;
+  if (m_FillMode)
+  {
+    FeedbackContourTool::SetFeedbackContourColorDefault();
+    currentColor.Set(0.0, 1.0, 0.);
+  }
+  else
+  {
+    FeedbackContourTool::SetFeedbackContourColor(1.0, 0.0, 0.0);
+    currentColor.Set(1.0, 0.0, 0.);
+  }
+
+  if (m_PaintingNode.IsNotNull())
+  {
+    m_PaintingNode->SetProperty("color", mitk::ColorProperty::New(currentColor[0], currentColor[1], currentColor[2]));
+  }
 }
 
 /**
-  Called when the CTRL key is pressed. Will change the painting pixel value from 0 to 1 or from 1 to 0.
+  Called when the CTRL key is pressed.
   */
 void mitk::PaintbrushTool::OnInvertLogic(StateMachineAction *, InteractionEvent *)
 {
-  // Inversion only for 0 and 1 as painting values
-  if (m_PaintingPixelValue == 1)
-  {
-    m_PaintingPixelValue = 0;
-    FeedbackContourTool::SetFeedbackContourColor(1.0, 0.0, 0.0);
-  }
-  else if (m_PaintingPixelValue == 0)
-  {
-    m_PaintingPixelValue = 1;
-    FeedbackContourTool::SetFeedbackContourColorDefault();
-  }
+  m_FillMode = !m_FillMode;
+  UpdateFeedbackColor();
+
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositionEvent *event)
+bool mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositionEvent *event)
 {
   const PlaneGeometry* planeGeometry((event->GetSender()->GetCurrentWorldPlaneGeometry()));
   const auto* abstractTransformGeometry(
     dynamic_cast<const AbstractTransformGeometry *>(event->GetSender()->GetCurrentWorldPlaneGeometry()));
   if (nullptr == planeGeometry || nullptr != abstractTransformGeometry)
   {
-    return;
+    return false;
   }
 
-  DataNode* workingNode = this->GetToolManager()->GetWorkingData(0);
-  if (nullptr == workingNode)
-  {
-    return;
-  }
-
-  Image::Pointer image = dynamic_cast<Image *>(workingNode->GetData());
-  if (nullptr == image)
-  {
-    return;
-  }
+  bool newPlane = false;
 
   if (m_CurrentPlane.IsNull() || m_WorkingSlice.IsNull()
       //or not the same slice
@@ -535,36 +555,52 @@ void mitk::PaintbrushTool::CheckIfCurrentSliceHasChanged(const InteractionPositi
        m_CurrentPlane->GetIndexToWorldTransform()->GetOffset()))
   {
     m_CurrentPlane = planeGeometry;
-    m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, image)->Clone();
+    newPlane = true;
   }
 
-  if (m_PaintingSlice.IsNull())
+  return newPlane;
+}
+
+void mitk::PaintbrushTool::ResetWorkingSlice(const InteractionPositionEvent* event)
+{
+  const PlaneGeometry* planeGeometry((event->GetSender()->GetCurrentWorldPlaneGeometry()));
+  const auto* abstractTransformGeometry(
+    dynamic_cast<const AbstractTransformGeometry*>(event->GetSender()->GetCurrentWorldPlaneGeometry()));
+  if (nullptr == planeGeometry || nullptr != abstractTransformGeometry)
   {
-    m_PaintingSlice = Image::New();
-    m_PaintingSlice->Initialize(m_WorkingSlice);
-
-    unsigned int byteSize = m_PaintingSlice->GetPixelType().GetSize();
-    for (unsigned int dim = 0; dim < m_PaintingSlice->GetDimension(); ++dim)
-    {
-      byteSize *= m_PaintingSlice->GetDimension(dim);
-    }
-    mitk::ImageWriteAccessor writeAccess(m_PaintingSlice.GetPointer(), m_PaintingSlice->GetVolumeData(0));
-    memset(writeAccess.GetData(), 0, byteSize);
-
-    m_PaintingNode->SetData(m_PaintingSlice);
+    return;
   }
 
-  mitk::Color currentColor;
-  if (m_PaintingPixelValue == 1)
+  m_WorkingSlice = nullptr;
+  m_PaintingSlice = nullptr;
+  m_PaintingNode->SetData(nullptr);
+
+  DataNode* workingNode = this->GetToolManager()->GetWorkingData(0);
+  if (nullptr == workingNode)
   {
-    currentColor.Set(0.0, 1.0, 0.);
-  }
-  else
-  {
-    currentColor.Set(1.0, 0.0, 0.);
+    return;
   }
 
-  m_PaintingNode->SetProperty("color", mitk::ColorProperty::New(currentColor[0], currentColor[1], currentColor[2]));
+  Image::Pointer image = dynamic_cast<Image*>(workingNode->GetData());
+  if (nullptr == image)
+  {
+    return;
+  }
+
+  m_WorkingSlice = SegTool2D::GetAffectedImageSliceAs2DImage(event, image)->Clone();
+
+  m_PaintingSlice = Image::New();
+  m_PaintingSlice->Initialize(m_WorkingSlice);
+
+  unsigned int byteSize = m_PaintingSlice->GetPixelType().GetSize();
+  for (unsigned int dim = 0; dim < m_PaintingSlice->GetDimension(); ++dim)
+  {
+    byteSize *= m_PaintingSlice->GetDimension(dim);
+  }
+  mitk::ImageWriteAccessor writeAccess(m_PaintingSlice.GetPointer(), m_PaintingSlice->GetVolumeData(0));
+  memset(writeAccess.GetData(), 0, byteSize);
+
+  m_PaintingNode->SetData(m_PaintingSlice);
 }
 
 void mitk::PaintbrushTool::OnToolManagerWorkingDataModified()

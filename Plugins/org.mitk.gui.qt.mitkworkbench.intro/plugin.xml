@@ -9,4 +9,9 @@
       productId="org.mitk.gui.qt.extapplication.workbench"
       introId="org.mitk.qt.extapplicationintro"/>
   </extension>
+  <extension point="org.blueberry.ui.preferencePages">
+    <page id="org.mitk.gui.qt.application.MitkWorkbenchIntroPreferencePage" name="Welcome Page" class="QmitkMitkWorkbenchIntroPreferencePage">
+      <keywordreference id="org.mitk.gui.qt.application.MitkWorkbenchIntroPreferencePageKeywords"></keywordreference>
+    </page>
+  </extension>
 </plugin>

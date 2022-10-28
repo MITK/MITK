@@ -11,11 +11,11 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkPluginActivator.h"
-#include "QmitkVoxelValueView.h"
+#include "QmitkPixelValueView.h"
 
 void mitk::mitkPluginActivator::start(ctkPluginContext* context)
 {
-  BERRY_REGISTER_EXTENSION_CLASS(QmitkVoxelValueView, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkPixelValueView, context)
 }
 
 void mitk::mitkPluginActivator::stop(ctkPluginContext*)

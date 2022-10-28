@@ -1,18 +1,19 @@
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
-  QmitkVoxelValueView.cpp
+  QmitkPixelValueView.cpp
 )
 
 set(UI_FILES
+  src/internal/QmitkPixelValueView.ui
 )
 
 set(MOC_H_FILES
   src/internal/mitkPluginActivator.h
-  src/internal/QmitkVoxelValueView.h
+  src/internal/QmitkPixelValueView.h
 )
 
 set(CACHED_RESOURCE_FILES
-  resources/icon.svg
+  resources/PixelValueIcon.svg
   plugin.xml
 )
 

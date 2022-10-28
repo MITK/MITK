@@ -10,45 +10,47 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkVoxelValueView_h
-#define QmitkVoxelValueView_h
+#ifndef QmitkPixelValueView_h
+#define QmitkPixelValueView_h
 
 #include <QmitkAbstractView.h>
 #include <QmitkSliceNavigationListener.h>
 #include <mitkIRenderWindowPartListener.h>
 
-#include <QLineEdit.h>
-#include <QLabel.h>
-#include <QHBoxLayout>
-
-class QmitkVoxelValueView : public QmitkAbstractView, public mitk::IRenderWindowPartListener
+namespace Ui
 {
+  class QmitkPixelValueView;
+}
 
+class QmitkPixelValueView : public QmitkAbstractView, public mitk::IRenderWindowPartListener
+{
   Q_OBJECT
 
 public:
   static const std::string VIEW_ID;
 
-  QmitkVoxelValueView(QObject *parent = nullptr);
+  QmitkPixelValueView(QObject* parent = nullptr);
 
-  ~QmitkVoxelValueView() override;
+  ~QmitkPixelValueView() override;
 
-  void CreateQtPartControl(QWidget *parent) override;
+  void CreateQtPartControl(QWidget* parent) override;
 
-  void SetFocus() override { };
+  void SetFocus() override;
 
-protected Q_SLOTS:
-  void OnSliceChanged();
-
-protected:
+private:
   void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
 
-private:
-  QHBoxLayout* m_Layout;
-  QLabel* m_Label;
-  QLineEdit* m_TextWidget;
+  void OnSelectedPositionChanged(const mitk::Point3D& position);
+  void OnSelectedTimePointChanged(const mitk::TimePointType& timePoint);
+
+  void NodeChanged(const mitk::DataNode* node) override;
+
+  void Clear();
+  void Update();
+
   QmitkSliceNavigationListener m_SliceNavigationListener;
+  Ui::QmitkPixelValueView* m_Ui;
 };
 
-#endif // QmitkVoxelValueView_h
+#endif

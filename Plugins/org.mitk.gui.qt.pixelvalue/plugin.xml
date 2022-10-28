@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<plugin>
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.pixelvalue"
+          name="Pixel Value"
+          category="Data"
+          icon="resources/PixelValueIcon.svg"
+          class="QmitkPixelValueView" />
+  </extension>
+</plugin>

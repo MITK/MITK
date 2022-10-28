@@ -29,7 +29,6 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.datamanagerlight:OFF
   org.mitk.gui.qt.datastorageviewertest:OFF
   org.mitk.gui.qt.properties:ON
-  org.mitk.gui.qt.voxelvalue:ON
   org.mitk.gui.qt.basicimageprocessing:OFF
   org.mitk.gui.qt.dicombrowser:OFF
   org.mitk.gui.qt.dicominspector:OFF
@@ -86,4 +85,5 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.pharmacokinetics.concentration.mri:OFF
   org.mitk.gui.qt.flowapplication:OFF
   org.mitk.gui.qt.flow.segmentation:OFF
+  org.mitk.gui.qt.pixelvalue:ON
 )

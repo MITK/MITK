@@ -85,4 +85,5 @@ set(MITK_PLUGINS
   org.mitk.gui.qt.pharmacokinetics.concentration.mri:OFF
   org.mitk.gui.qt.flowapplication:OFF
   org.mitk.gui.qt.flow.segmentation:OFF
+  org.mitk.gui.qt.pixelvalue:ON
 )

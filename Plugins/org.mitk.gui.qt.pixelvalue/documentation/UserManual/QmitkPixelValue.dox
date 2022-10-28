@@ -1,0 +1,7 @@
+/**
+\page org_mitk_views_pixelvalue The Pixel Value View
+
+\imageMacro{PixelValueIcon.png,"Icon of the Pixel Value Plugin.",2.00}
+
+This is the pixel value plugin. It shows the value of the selected pixel in images.
+*/

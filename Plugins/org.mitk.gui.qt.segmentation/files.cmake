@@ -17,7 +17,6 @@ set(INTERNAL_CPP_FILES
   QmitkConvertMaskToLabelAction.cpp
   QmitkConvertToMultiLabelSegmentationAction.cpp
   QmitkCreateMultiLabelSegmentationAction.cpp
-  Common/QmitkDataSelectionWidget.cpp
   Common/QmitkLabelsWidget.cpp
   Common/QmitkLayersWidget.cpp
 )
@@ -28,7 +27,6 @@ set(UI_FILES
   src/QmitkLabelSetWidgetControls.ui
   src/internal/QmitkSegmentationViewControls.ui
   src/internal/QmitkSegmentationUtilitiesViewControls.ui
-  src/internal/Common/QmitkDataSelectionWidgetControls.ui
   src/internal/Common/QmitkLabelsWidgetControls.ui
   src/internal/Common/QmitkLayersWidgetControls.ui
 )
@@ -49,7 +47,6 @@ set(MOC_H_FILES
   src/internal/QmitkConvertMaskToLabelAction.h
   src/internal/QmitkConvertToMultiLabelSegmentationAction.h
   src/internal/QmitkCreateMultiLabelSegmentationAction.h
-  src/internal/Common/QmitkDataSelectionWidget.h
   src/internal/Common/QmitkLabelsWidget.h
   src/internal/Common/QmitkLayersWidget.h
 )

@@ -34,6 +34,7 @@ set(CPP_FILES
   SegmentationUtilities/QmitkMorphologicalOperationsWidget.cpp
   SegmentationUtilities/QmitkSurfaceToImageWidget.cpp
   SegmentationUtilities/QmitkSegmentationUtilityWidget.cpp
+  SegmentationUtilities/QmitkDataSelectionWidget.cpp
 )
 
 set(MOC_H_FILES
@@ -73,6 +74,7 @@ set(MOC_H_FILES
   SegmentationUtilities/QmitkMorphologicalOperationsWidget.h
   SegmentationUtilities/QmitkSurfaceToImageWidget.h
   SegmentationUtilities/QmitkSegmentationUtilityWidget.h
+  SegmentationUtilities/QmitkDataSelectionWidget.h
 )
 
 set(UI_FILES
@@ -89,6 +91,7 @@ set(UI_FILES
   SegmentationUtilities/QmitkImageMaskingWidgetControls.ui
   SegmentationUtilities/QmitkMorphologicalOperationsWidgetControls.ui
   SegmentationUtilities/QmitkSurfaceToImageWidgetControls.ui
+  SegmentationUtilities/QmitkDataSelectionWidgetControls.ui
 )
 
 set(QRC_FILES

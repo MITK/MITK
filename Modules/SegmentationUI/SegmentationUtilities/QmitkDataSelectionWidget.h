@@ -13,6 +13,8 @@ found in the LICENSE file.
 #ifndef QmitkDataSelectionWidget_h
 #define QmitkDataSelectionWidget_h
 
+#include <MitkSegmentationUIExports.h>
+
 #include <ui_QmitkDataSelectionWidgetControls.h>
 #include <mitkDataNode.h>
 #include <mitkDataStorage.h>
@@ -25,7 +27,7 @@ namespace mitk
 
 class QmitkSingleNodeSelectionWidget;
 
-class QmitkDataSelectionWidget : public QWidget
+class MITKSEGMENTATIONUI_EXPORT QmitkDataSelectionWidget : public QWidget
 {
   Q_OBJECT
 

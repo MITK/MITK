@@ -7,6 +7,7 @@ set(SRC_CPP_FILES
 set(INTERNAL_CPP_FILES
   mitkPluginActivator.cpp
   QmitkSegmentationView.cpp
+  QmitkSegmentationUtilitiesView.cpp
   QmitkAutocropAction.cpp
   QmitkAutocropLabelSetImageAction.cpp
   QmitkCreatePolygonModelAction.cpp
@@ -19,7 +20,6 @@ set(INTERNAL_CPP_FILES
   Common/QmitkDataSelectionWidget.cpp
   Common/QmitkLabelsWidget.cpp
   Common/QmitkLayersWidget.cpp
-  SegmentationUtilities/QmitkSegmentationUtilitiesView.cpp
 )
 
 set(UI_FILES
@@ -27,10 +27,10 @@ set(UI_FILES
   src/QmitkNewSegmentationDialog.ui
   src/QmitkLabelSetWidgetControls.ui
   src/internal/QmitkSegmentationViewControls.ui
+  src/internal/QmitkSegmentationUtilitiesViewControls.ui
   src/internal/Common/QmitkDataSelectionWidgetControls.ui
   src/internal/Common/QmitkLabelsWidgetControls.ui
   src/internal/Common/QmitkLayersWidgetControls.ui
-  src/internal/SegmentationUtilities/QmitkSegmentationUtilitiesViewControls.ui
 )
 
 set(MOC_H_FILES
@@ -39,6 +39,7 @@ set(MOC_H_FILES
   src/QmitkLabelSetWidget.h
   src/internal/mitkPluginActivator.h
   src/internal/QmitkSegmentationView.h
+  src/internal/QmitkSegmentationUtilitiesView.h
   src/internal/QmitkAutocropAction.h
   src/internal/QmitkAutocropLabelSetImageAction.h
   src/internal/QmitkCreatePolygonModelAction.h
@@ -51,7 +52,6 @@ set(MOC_H_FILES
   src/internal/Common/QmitkDataSelectionWidget.h
   src/internal/Common/QmitkLabelsWidget.h
   src/internal/Common/QmitkLayersWidget.h
-  src/internal/SegmentationUtilities/QmitkSegmentationUtilitiesView.h
 )
 
 set(CACHED_RESOURCE_FILES

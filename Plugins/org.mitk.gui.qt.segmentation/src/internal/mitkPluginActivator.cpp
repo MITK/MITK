@@ -13,7 +13,7 @@ found in the LICENSE file.
 
 #include "QmitkSegmentationView.h"
 #include "QmitkSegmentationPreferencePage.h"
-#include "SegmentationUtilities/QmitkSegmentationUtilitiesView.h"
+#include "QmitkSegmentationUtilitiesView.h"
 
 #include "QmitkAutocropAction.h"
 #include "QmitkAutocropLabelSetImageAction.h"

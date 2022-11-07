@@ -758,39 +758,42 @@ void mitk::LabelSetImage::MaskStampProcessing(ImageType *itkImage, mitk::Image *
 template <typename ImageType>
 void mitk::LabelSetImage::CalculateCenterOfMassProcessing(ImageType *itkImage, PixelType pixelValue, unsigned int layer)
 {
-  // for now, we just retrieve the voxel in the middle
   typedef itk::ImageRegionConstIterator<ImageType> IteratorType;
   IteratorType iter(itkImage, itkImage->GetLargestPossibleRegion());
   iter.GoToBegin();
 
-  std::vector<typename ImageType::IndexType> indexVector;
+  if (iter.GetImageIteratorDimension() != 3)
+  {
+    return;
+  }
+
+  double meanIndex[3] = {0.0, 0.0, 0.0};
+  unsigned int count = 0;
 
   while (!iter.IsAtEnd())
   {
     // TODO fix comparison warning more effective
     if (iter.Get() == pixelValue)
     {
-      indexVector.push_back(iter.GetIndex());
+      for (int i = 0; i < 3; ++i)
+      {
+        // Iteratively update center of mass. Previous value is multiplied by count/count+1 to correct the weighting
+        meanIndex[i] = static_cast<double>(meanIndex[i]) * count / (count + 1.0) + static_cast<double>(iter.GetIndex()[i]) / (count + 1.0);
+      }
+      ++count;
     }
     ++iter;
   }
 
-  mitk::Point3D pos;
-  pos.Fill(0.0);
-
-  if (!indexVector.empty())
+  if (count == 0)
   {
-    typename itk::ImageRegionConstIteratorWithIndex<ImageType>::IndexType centerIndex;
-    centerIndex = indexVector.at(indexVector.size() / 2);
-    if (centerIndex.GetIndexDimension() == 3)
-    {
-      pos[0] = centerIndex[0];
-      pos[1] = centerIndex[1];
-      pos[2] = centerIndex[2];
-    }
-    else
-      return;
+    return;
   }
+
+  mitk::Point3D pos;
+  pos[0] = meanIndex[0];
+  pos[1] = meanIndex[1];
+  pos[2] = meanIndex[2];
 
   GetLabelSet(layer)->GetLabel(pixelValue)->SetCenterOfMassIndex(pos);
   this->GetSlicedGeometry()->IndexToWorld(pos, pos); // TODO: TimeGeometry?

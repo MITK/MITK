@@ -68,21 +68,23 @@ bool mitk::SegWithPreviewTool::CanHandle(const BaseData* referenceData, const Ba
     return false;
 
   if (workingData == nullptr)
-    return true;
+    return false;
+
+  auto* referenceImage = dynamic_cast<const Image*>(referenceData);
+  if (referenceImage == nullptr)
+    return false;
 
   auto* labelSet = dynamic_cast<const LabelSetImage*>(workingData);
-
   if (labelSet != nullptr)
     return true;
 
-  auto* image = dynamic_cast<const Image*>(workingData);
-
-  if (image == nullptr)
+  auto* workingImage = dynamic_cast<const Image*>(workingData);
+  if (workingImage == nullptr)
     return false;
 
-  //if it is a normal image and not a label set image is used as working data
-  //it must have the same pixel type as a label set.
-  return MakeScalarPixelType< DefaultSegmentationDataType >() == image->GetPixelType();
+  // If the working image is a normal image and not a label set image
+  // it must have the same pixel type as a label set.
+  return MakeScalarPixelType< DefaultSegmentationDataType >() == workingImage->GetPixelType();
 }
 
 void mitk::SegWithPreviewTool::Activated()
@@ -415,7 +417,7 @@ void mitk::SegWithPreviewTool::CreateResultSegmentationFromPreview()
       auto resultSegmentation = dynamic_cast<Image*>(resultSegmentationNode->GetData());
 
       // REMARK: the following code in this scope assumes that previewImage and resultSegmentation
-      // are clones of the working image (segmentation provided to the tool). Therefore they have
+      // are clones of the working referenceImage (segmentation provided to the tool). Therefore they have
       // the same time geometry.
       if (previewImage->GetTimeSteps() != resultSegmentation->GetTimeSteps())
       {
@@ -437,7 +439,7 @@ void mitk::SegWithPreviewTool::CreateResultSegmentationFromPreview()
         this->TransferImageAtTimeStep(previewImage, resultSegmentation, timeStep);
       }
 
-      // since we are maybe working on a smaller image, pad it to the size of the original image
+      // since we are maybe working on a smaller referenceImage, pad it to the size of the original referenceImage
       if (m_ReferenceDataNode.GetPointer() != m_SegmentationInputNode.GetPointer())
       {
         PadImageFilter::Pointer padFilter = PadImageFilter::New();
@@ -494,7 +496,7 @@ void mitk::SegWithPreviewTool::OnTimePointChanged()
     const bool isStaticSegOnDynamicImage = m_PreviewSegmentationNode->GetData()->GetTimeSteps() == 1 && m_SegmentationInputNode->GetData()->GetTimeSteps() > 1;
     if (timePoint!=m_LastTimePointOfUpdate && (isStaticSegOnDynamicImage || m_LazyDynamicPreviews))
     { //we only need to update either because we are lazzy
-      //or because we have a static segmentation with a dynamic image 
+      //or because we have a static segmentation with a dynamic referenceImage 
       this->UpdatePreview();
     }
   }
@@ -553,12 +555,12 @@ void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
           auto inputTimeStep = inputImage->GetTimeGeometry()->TimePointToTimeStep(previewTimePoint);
 
           if (nullptr != this->GetWorkingPlaneGeometry())
-          { //only extract a specific slice defined by the working plane as feedback image.
+          { //only extract a specific slice defined by the working plane as feedback referenceImage.
             feedBackImage = SegTool2D::GetAffectedImageSliceAs2DImage(this->GetWorkingPlaneGeometry(), inputImage, inputTimeStep);
             currentSegImage = SegTool2D::GetAffectedImageSliceAs2DImageByTimePoint(this->GetWorkingPlaneGeometry(), workingImage, previewTimePoint);
           }
           else
-          { //work on the whole feedback image
+          { //work on the whole feedback referenceImage
             feedBackImage = this->GetImageByTimeStep(inputImage, inputTimeStep);
             currentSegImage = this->GetImageByTimePoint(workingImage, previewTimePoint);
           }

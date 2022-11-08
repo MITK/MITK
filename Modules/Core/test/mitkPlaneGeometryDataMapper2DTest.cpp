@@ -23,7 +23,7 @@ found in the LICENSE file.
 
 mitk::DataNode::Pointer addPlaneToDataStorage(mitk::RenderingTestHelper &renderingHelper,
                                               mitk::Image *image,
-                                              mitk::PlaneGeometry::PlaneOrientation orientation,
+                                              mitk::AnatomicalPlane orientation,
                                               mitk::ScalarType zPos)
 {
   auto geometry = mitk::PlaneGeometry::New();
@@ -62,10 +62,10 @@ int mitkPlaneGeometryDataMapper2DTest(int argc, char *argv[])
     renderingHelper.GetDataStorage()->GetNode(mitk::TNodePredicateDataType<mitk::Image>::New())->GetData());
 
   auto zCoord = image->GetGeometry()->GetBoundingBox()->GetCenter()[0];
-  addPlaneToDataStorage(renderingHelper, image, mitk::PlaneGeometry::Sagittal, zCoord);
-  addPlaneToDataStorage(renderingHelper, image, mitk::PlaneGeometry::Coronal, zCoord);
+  addPlaneToDataStorage(renderingHelper, image, mitk::AnatomicalPlane::Sagittal, zCoord);
+  addPlaneToDataStorage(renderingHelper, image, mitk::AnatomicalPlane::Coronal, zCoord);
 
-  auto planeNode = addPlaneToDataStorage(renderingHelper, image, mitk::PlaneGeometry::Sagittal, zCoord);
+  auto planeNode = addPlaneToDataStorage(renderingHelper, image, mitk::AnatomicalPlane::Sagittal, zCoord);
   auto planeGeometry = static_cast<mitk::PlaneGeometryData *>(planeNode->GetData())->GetPlaneGeometry();
 
   auto transform = mitk::AffineTransform3D::New();

@@ -32,8 +32,6 @@ QmitkRenderWindowContextDataStorageInspector::QmitkRenderWindowContextDataStorag
   m_Controls.setupUi(this);
 
   mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer{ renderer };
-
-  // initialize the render window layer controller and the render window view direction controller
   m_RenderWindowLayerController = std::make_unique<mitk::RenderWindowLayerController>();
   m_RenderWindowLayerController->SetControlledRenderer(controlledRenderer);
 

@@ -455,8 +455,6 @@ namespace mitk
                                                     bool boundingBoxInitialized, int mapperID, bool resetCamera)
   {
     SliceNavigationController *nc = baseRenderer->GetSliceNavigationController();
-
-    // Re-initialize view direction
     nc->SetViewDirectionToDefault();
 
     if (boundingBoxInitialized)

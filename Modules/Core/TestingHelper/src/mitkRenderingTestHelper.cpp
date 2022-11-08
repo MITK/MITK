@@ -143,7 +143,7 @@ void mitk::RenderingTestHelper::SetInputFileNames(int argc, char *argv[])
   }
 }
 
-void mitk::RenderingTestHelper::SetViewDirection(mitk::SliceNavigationController::ViewDirection viewDirection)
+void mitk::RenderingTestHelper::SetViewDirection(mitk::AnatomicalPlane viewDirection)
 {
   mitk::BaseRenderer::GetInstance(m_RenderWindow->GetVtkRenderWindow())
     ->GetSliceNavigationController()

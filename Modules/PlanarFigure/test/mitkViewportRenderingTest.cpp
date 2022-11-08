@@ -76,10 +76,7 @@ int mitkViewportRenderingTest(int argc, char *argv[])
             << "in render window of size " << renderWindowWidth << "x" << renderWindowHeight << "px";
 
   mitk::RenderingTestHelper renderingHelper(renderWindowWidth, renderWindowHeight, argc, argv); // non-power-of-2
-
-  // for now this test renders Sagittal
-  // renderingHelper.SetViewDirection(mitk::SliceNavigationController::Axial);
-  renderingHelper.SetViewDirection(mitk::SliceNavigationController::Axial);
+  renderingHelper.SetViewDirection(mitk::AnatomicalPlane::Axial);
 
   typedef mitk::DataStorage::SetOfObjects ObjectsSet;
 

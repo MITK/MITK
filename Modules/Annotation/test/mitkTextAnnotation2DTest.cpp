@@ -79,7 +79,7 @@ public:
     m_CommandlineArgs.push_back(refImagePath);
     // Convert vector of strings to argc/argv
     mitk::RenderingTestHelper::ArgcHelperClass arg(m_CommandlineArgs);
-    m_RenderingTestHelper.SetViewDirection(mitk::SliceNavigationController::Sagittal);
+    m_RenderingTestHelper.SetViewDirection(mitk::AnatomicalPlane::Sagittal);
 
     mitk::TextAnnotation2D::Pointer textAnnotation2D = mitk::TextAnnotation2D::New();
 

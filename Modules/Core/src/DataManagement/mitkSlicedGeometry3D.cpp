@@ -215,7 +215,7 @@ void mitk::SlicedGeometry3D::InitializeEvenlySpaced(mitk::PlaneGeometry *geometr
 }
 
 void mitk::SlicedGeometry3D::InitializePlanes(const mitk::BaseGeometry *geometry3D,
-                                              mitk::PlaneGeometry::PlaneOrientation planeorientation,
+                                              mitk::AnatomicalPlane orientation,
                                               bool top,
                                               bool frontside,
                                               bool rotated)
@@ -223,11 +223,11 @@ void mitk::SlicedGeometry3D::InitializePlanes(const mitk::BaseGeometry *geometry
   m_ReferenceGeometry = geometry3D;
 
   PlaneGeometry::Pointer planeGeometry = mitk::PlaneGeometry::New();
-  planeGeometry->InitializeStandardPlane(geometry3D, top, planeorientation, frontside, rotated);
+  planeGeometry->InitializeStandardPlane(geometry3D, top, orientation, frontside, rotated);
 
-  int worldAxis =
-      planeorientation == PlaneGeometry::Sagittal ? 0 :
-      planeorientation == PlaneGeometry::Coronal  ? 1 : 2;
+  int worldAxis = 
+    orientation == AnatomicalPlane::Sagittal ? 0 :
+    orientation == AnatomicalPlane::Coronal  ? 1 : 2;
 
   // Inspired by:
   // http://www.na-mic.org/Wiki/index.php/Coordinate_System_Conversion_Between_ITK_and_Slicer3

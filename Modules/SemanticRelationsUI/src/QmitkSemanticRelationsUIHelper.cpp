@@ -42,7 +42,7 @@ QPixmap QmitkSemanticRelationsUIHelper::GetPixmapFromImageNode(const mitk::DataN
 
   mitk::PlaneGeometry::Pointer sagittalPlaneGeometry = mitk::PlaneGeometry::New();
   int sliceNumber = image->GetDimension(1) / 2;
-  sagittalPlaneGeometry->InitializeStandardPlane(image->GetGeometry(), mitk::PlaneGeometry::Sagittal, sliceNumber);
+  sagittalPlaneGeometry->InitializeStandardPlane(image->GetGeometry(), mitk::AnatomicalPlane::Sagittal, sliceNumber);
 
   mitk::ExtractSliceFilter::Pointer extractSliceFilter = mitk::ExtractSliceFilter::New();
   extractSliceFilter->SetInput(image);

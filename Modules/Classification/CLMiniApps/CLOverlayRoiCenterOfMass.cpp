@@ -83,7 +83,7 @@ void SaveSliceOrImageAsPNG(mitk::Image::Pointer image, mitk::Image::Pointer mask
   mitk::RenderingManager::GetInstance()->InitializeViews(mask->GetTimeGeometry());
 
   mitk::SliceNavigationController::Pointer sliceNaviController = renderWindow.GetSliceNavigationController();
-  sliceNaviController->SetViewDirection(mitk::SliceNavigationController::Axial);
+  sliceNaviController->SetViewDirection(mitk::AnatomicalPlane::Axial);
   unsigned int numberOfSteps = 1;
   if (sliceNaviController)
   {

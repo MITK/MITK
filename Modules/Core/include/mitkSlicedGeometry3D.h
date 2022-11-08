@@ -221,9 +221,9 @@ namespace mitk
     * BaseGeometry::GetExtent(2).
     *
     * \param geometry3D
-    * \param planeorientation side parallel to which the slices will be oriented
+    * \param orientation side parallel to which the slices will be oriented
     * \param top if \a true, create plane at top, otherwise at bottom
-    * (for PlaneOrientation Axial, for other plane locations respectively)
+    * (for AnatomicalPlane Axial, for other plane locations respectively)
     * \param frontside defines the side of the plane (the definition of
     * front/back is somewhat arbitrary)
     *
@@ -231,7 +231,7 @@ namespace mitk
     * definition of rotated vs not rotated is somewhat arbitrary)
     */
     virtual void InitializePlanes(const mitk::BaseGeometry *geometry3D,
-                                  mitk::PlaneGeometry::PlaneOrientation planeorientation,
+                                  mitk::AnatomicalPlane orientation,
                                   bool top = true,
                                   bool frontside = true,
                                   bool rotated = false);

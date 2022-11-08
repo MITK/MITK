@@ -84,7 +84,7 @@ public:
     m_CommandlineArgs.push_back(refImagePath);
     // Convert vector of strings to argc/argv
     mitk::RenderingTestHelper::ArgcHelperClass arg(m_CommandlineArgs);
-    m_RenderingTestHelper.SetViewDirection(mitk::SliceNavigationController::Sagittal);
+    m_RenderingTestHelper.SetViewDirection(mitk::AnatomicalPlane::Sagittal);
 
     mitk::LogoAnnotation::Pointer logoAnnotation = mitk::LogoAnnotation::New();
 
@@ -122,7 +122,7 @@ public:
     m_CommandlineArgs.push_back(refImagePath);
     // Convert vector of strings to argc/argv
     mitk::RenderingTestHelper::ArgcHelperClass arg(m_CommandlineArgs);
-    m_RenderingTestHelper.SetViewDirection(mitk::SliceNavigationController::Sagittal);
+    m_RenderingTestHelper.SetViewDirection(mitk::AnatomicalPlane::Sagittal);
 
     mitk::LogoAnnotation::Pointer logoAnnotation = mitk::LogoAnnotation::New();
 

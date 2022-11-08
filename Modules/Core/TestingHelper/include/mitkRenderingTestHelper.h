@@ -85,7 +85,7 @@ namespace mitk
 
     /** @brief Set the view direction of the renderwindow (e.g. sagittal, coronal, axial)
       **/
-    void SetViewDirection(mitk::SliceNavigationController::ViewDirection viewDirection);
+    void SetViewDirection(mitk::AnatomicalPlane viewDirection);
 
     /** @brief Reorient the slice (e.g. rotation and translation like the swivel mode).
       **/

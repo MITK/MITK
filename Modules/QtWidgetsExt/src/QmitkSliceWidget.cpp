@@ -36,7 +36,7 @@ QmitkSliceWidget::QmitkSliceWidget(QWidget *parent, const char *name, Qt::Window
   setPopUpEnabled(false);
 
   m_SlicedGeometry = nullptr;
-  m_View = mitk::SliceNavigationController::Axial;
+  m_View = mitk::AnatomicalPlane::Axial;
 
   QHBoxLayout *hlayout = new QHBoxLayout(container);
   hlayout->setMargin(0);
@@ -83,7 +83,7 @@ void QmitkSliceWidget::SetData(mitk::DataStorage::SetOfObjects::ConstIterator it
 }
 
 void QmitkSliceWidget::SetData(mitk::DataStorage::SetOfObjects::ConstIterator it,
-                               mitk::SliceNavigationController::ViewDirection view)
+                               mitk::AnatomicalPlane view)
 {
   SetData(it->Value(), view);
 }
@@ -103,7 +103,7 @@ void QmitkSliceWidget::SetData(mitk::DataNode::Pointer node)
   SetData(node, m_View);
 }
 
-void QmitkSliceWidget::SetData(mitk::DataNode::Pointer node, mitk::SliceNavigationController::ViewDirection view)
+void QmitkSliceWidget::SetData(mitk::DataNode::Pointer node, mitk::AnatomicalPlane view)
 {
   mitk::Image::Pointer image = dynamic_cast<mitk::Image *>(node->GetData());
 
@@ -117,24 +117,24 @@ void QmitkSliceWidget::SetData(mitk::DataNode::Pointer node, mitk::SliceNavigati
   this->InitWidget(view);
 }
 
-void QmitkSliceWidget::InitWidget(mitk::SliceNavigationController::ViewDirection viewDirection)
+void QmitkSliceWidget::InitWidget(mitk::AnatomicalPlane view)
 {
-  m_View = viewDirection;
+  m_View = view;
 
   mitk::SliceNavigationController *controller = m_RenderWindow->GetSliceNavigationController();
 
-  if (viewDirection == mitk::SliceNavigationController::Axial)
+  if (view == mitk::AnatomicalPlane::Axial)
   {
-    controller->SetViewDirection(mitk::SliceNavigationController::Axial);
+    controller->SetViewDirection(mitk::AnatomicalPlane::Axial);
   }
-  else if (viewDirection == mitk::SliceNavigationController::Coronal)
+  else if (view == mitk::AnatomicalPlane::Coronal)
   {
-    controller->SetViewDirection(mitk::SliceNavigationController::Coronal);
+    controller->SetViewDirection(mitk::AnatomicalPlane::Coronal);
   }
-  // init sagittal view
+  // init sagittal view for all other cases ('original' is covered here as well)
   else
   {
-    controller->SetViewDirection(mitk::SliceNavigationController::Sagittal);
+    controller->SetViewDirection(mitk::AnatomicalPlane::Sagittal);
   }
 
   if (m_SlicedGeometry.IsNull())
@@ -203,15 +203,15 @@ void QmitkSliceWidget::ChangeView(QAction *val)
 {
   if (val->text() == "Axial")
   {
-    InitWidget(mitk::SliceNavigationController::Axial);
+    InitWidget(mitk::AnatomicalPlane::Axial);
   }
   else if (val->text() == "Coronal")
   {
-    InitWidget(mitk::SliceNavigationController::Coronal);
+    InitWidget(mitk::AnatomicalPlane::Coronal);
   }
   else if (val->text() == "Sagittal")
   {
-    InitWidget(mitk::SliceNavigationController::Sagittal);
+    InitWidget(mitk::AnatomicalPlane::Sagittal);
   }
 }
 

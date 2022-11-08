@@ -121,11 +121,11 @@ void QmitkToFUtilView::Activated()
     {
       linkedRenderWindowPart->EnableSlicingPlanes(false);
     }
-    renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Axial);
+    renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::AnatomicalPlane::Axial);
     renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController()->SliceLockedOn();
-    renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Axial);
+    renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::AnatomicalPlane::Axial);
     renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController()->SliceLockedOn();
-    renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Axial);
+    renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::AnatomicalPlane::Axial);
     renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController()->SliceLockedOn();
 
     mitk::RenderingManager::GetInstance()->InitializeViews();
@@ -227,11 +227,11 @@ void QmitkToFUtilView::ResetGUIToDefault()
     {
       linkedRenderWindowPart->EnableSlicingPlanes(true);
     }
-    renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Axial);
+    renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::AnatomicalPlane::Axial);
     renderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController()->SliceLockedOff();
-    renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
+    renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::AnatomicalPlane::Sagittal);
     renderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController()->SliceLockedOff();
-    renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Coronal);
+    renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController()->SetDefaultViewDirection(mitk::AnatomicalPlane::Coronal);
     renderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController()->SliceLockedOff();
 
     this->UseToFVisibilitySettings(false);

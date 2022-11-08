@@ -78,7 +78,7 @@ public:
     auto sliceNavigationController = mitk::SliceNavigationController::New();
 
     sliceNavigationController->SetInputWorldTimeGeometry(m_TimeGeometry);
-    sliceNavigationController->SetViewDirection(mitk::SliceNavigationController::Axial);
+    sliceNavigationController->SetViewDirection(mitk::AnatomicalPlane::Axial);
     sliceNavigationController->Update();
 
     mitk::Point3D origin;
@@ -102,7 +102,7 @@ public:
     auto sliceNavigationController = mitk::SliceNavigationController::New();
 
     sliceNavigationController->SetInputWorldTimeGeometry(m_TimeGeometry);
-    sliceNavigationController->SetViewDirection(mitk::SliceNavigationController::Coronal);
+    sliceNavigationController->SetViewDirection(mitk::AnatomicalPlane::Coronal);
     sliceNavigationController->Update();
 
     mitk::Point3D origin;
@@ -126,7 +126,7 @@ public:
     auto sliceNavigationController = mitk::SliceNavigationController::New();
 
     sliceNavigationController->SetInputWorldTimeGeometry(m_TimeGeometry);
-    sliceNavigationController->SetViewDirection(mitk::SliceNavigationController::Sagittal);
+    sliceNavigationController->SetViewDirection(mitk::AnatomicalPlane::Sagittal);
     sliceNavigationController->Update();
 
     mitk::Point3D origin;
@@ -152,7 +152,7 @@ public:
     CPPUNIT_ASSERT(sliceNavigationController->GetSelectedTimePoint() == 0.);
 
     sliceNavigationController->SetInputWorldTimeGeometry(m_TimeGeometry);
-    sliceNavigationController->SetViewDirection(mitk::SliceNavigationController::Sagittal);
+    sliceNavigationController->SetViewDirection(mitk::AnatomicalPlane::Sagittal);
     sliceNavigationController->Update();
 
     CPPUNIT_ASSERT(sliceNavigationController->GetSelectedTimeStep() == 0);

@@ -44,8 +44,8 @@ int SetUpBeforeTest()
 
   // Creating different Geometries
   m_Geometries.reserve(100);
-  mitk::PlaneGeometry::PlaneOrientation views[] = {
-    mitk::PlaneGeometry::Axial, mitk::PlaneGeometry::Sagittal, mitk::PlaneGeometry::Coronal};
+  mitk::AnatomicalPlane views[] = {
+    mitk::AnatomicalPlane::Axial, mitk::AnatomicalPlane::Sagittal, mitk::AnatomicalPlane::Coronal};
   for (unsigned int i = 0; i < 100; ++i)
   {
     mitk::PlaneGeometry::Pointer plane = mitk::PlaneGeometry::New();

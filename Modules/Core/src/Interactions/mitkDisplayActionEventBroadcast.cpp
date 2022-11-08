@@ -268,7 +268,7 @@ bool mitk::DisplayActionEventBroadcast::CheckRotationPossible(const InteractionE
     }
 
     // check distance from intersection line
-    const double distanceFromIntersectionLine = intersectionLine.Distance(position) / spacing[snc->GetDefaultViewDirection()];
+    const double distanceFromIntersectionLine = intersectionLine.Distance(position) / spacing[static_cast<int>(snc->GetDefaultViewDirection())];
 
     // far away line, only remember for linked rotation if necessary
     if (distanceFromIntersectionLine > threshholdDistancePixels)

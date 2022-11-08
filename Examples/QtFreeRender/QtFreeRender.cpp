@@ -62,10 +62,10 @@ mitk::DataNode::Pointer m_Node;
 void InitializeWindows()
 {
   // Set default view directions for SNCs
-  mitkWidget1->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Axial);
-  mitkWidget2->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
-  mitkWidget3->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Coronal);
-  mitkWidget4->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Original);
+  mitkWidget1->GetSliceNavigationController()->SetDefaultViewDirection(mitk::AnatomicalPlane::Axial);
+  mitkWidget2->GetSliceNavigationController()->SetDefaultViewDirection(mitk::AnatomicalPlane::Sagittal);
+  mitkWidget3->GetSliceNavigationController()->SetDefaultViewDirection(mitk::AnatomicalPlane::Coronal);
+  mitkWidget4->GetSliceNavigationController()->SetDefaultViewDirection(mitk::AnatomicalPlane::Original);
 
   // initialize m_TimeNavigationController: send time via sliceNavigationControllers
   m_TimeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();

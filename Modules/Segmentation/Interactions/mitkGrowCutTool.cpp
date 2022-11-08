@@ -40,19 +40,6 @@ mitk::GrowCutTool::GrowCutTool() : SegWithPreviewTool(true, "PressMoveReleaseAnd
 
 mitk::GrowCutTool::~GrowCutTool() {}
 
-bool mitk::GrowCutTool::CanHandle(const BaseData *referenceData, const BaseData *workingData) const
-{
-  if (!Superclass::CanHandle(referenceData, workingData))
-    return false;
-
-  auto *image = dynamic_cast<const Image *>(referenceData);
-
-  if (image == nullptr)
-    return false;
-
-  return true;
-}
-
 const char **mitk::GrowCutTool::GetXPM() const
 {
   return nullptr;

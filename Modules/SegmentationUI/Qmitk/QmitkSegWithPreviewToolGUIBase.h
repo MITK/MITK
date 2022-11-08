@@ -25,7 +25,7 @@ class QBoxLayout;
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
-  \brief GUI base clase for tools derived from mitk::AutoSegmentationTool.
+  \brief GUI base clase for tools derived from mitk::SegWithPreviewTool.
 */
 class MITKSEGMENTATIONUI_EXPORT QmitkSegWithPreviewToolGUIBase : public QmitkToolGUI
 {

@@ -16,7 +16,7 @@ found in the LICENSE file.
 #include "mitkBaseRenderer.h"
 #include "mitkOperation.h"
 #include "mitkOperationActor.h"
-#include "mitkPlaneGeometry.h"
+
 #include "mitkProportionalTimeGeometry.h"
 #include "mitkArbitraryTimeGeometry.h"
 #include "mitkSlicedGeometry3D.h"
@@ -28,6 +28,7 @@ found in the LICENSE file.
 #include "mitkNodePredicateDataType.h"
 #include "mitkOperationEvent.h"
 #include "mitkPixelTypeMultiplex.h"
+#include "mitkPlaneGeometry.h"
 #include "mitkPlaneOperation.h"
 #include "mitkPointOperation.h"
 
@@ -35,29 +36,12 @@ found in the LICENSE file.
 
 namespace mitk
 {
-
-  PlaneGeometry::PlaneOrientation ViewDirectionToPlaneOrientation(SliceNavigationController::ViewDirection viewDiretion)
-  {
-    switch (viewDiretion)
-    {
-    case SliceNavigationController::Axial:
-      return PlaneGeometry::Axial;
-    case SliceNavigationController::Sagittal:
-      return PlaneGeometry::Sagittal;
-    case SliceNavigationController::Coronal:
-      return PlaneGeometry::Coronal;
-    case SliceNavigationController::Original:
-    default:
-      return PlaneGeometry::None;
-    }
-  }
-
   SliceNavigationController::SliceNavigationController()
     : BaseController()
     , m_InputWorldTimeGeometry(TimeGeometry::ConstPointer())
     , m_CreatedWorldGeometry(TimeGeometry::Pointer())
-    , m_ViewDirection(Axial)
-    , m_DefaultViewDirection(Axial)
+    , m_ViewDirection(AnatomicalPlane::Axial)
+    , m_DefaultViewDirection(AnatomicalPlane::Axial)
     , m_RenderingManager(RenderingManager::Pointer())
     , m_Renderer(nullptr)
     , m_BlockUpdate(false)
@@ -114,24 +98,24 @@ namespace mitk
     const char* viewDirectionString;
     switch (m_ViewDirection)
     {
-      case SliceNavigationController::Axial:
+      case AnatomicalPlane::Axial:
         viewDirectionString = "Axial";
         break;
 
-      case SliceNavigationController::Sagittal:
+      case AnatomicalPlane::Sagittal:
         viewDirectionString = "Sagittal";
         break;
 
-      case SliceNavigationController::Coronal:
+      case AnatomicalPlane::Coronal:
         viewDirectionString = "Coronal";
         break;
 
-      case SliceNavigationController::Original:
+      case AnatomicalPlane::Original:
         viewDirectionString = "Original";
         break;
 
       default:
-        viewDirectionString = "No View Direction Available";
+        viewDirectionString = "No view direction available";
         break;
     }
     return viewDirectionString;
@@ -141,17 +125,17 @@ namespace mitk
   {
     if (!m_BlockUpdate)
     {
-      if (m_ViewDirection == Sagittal)
+      if (m_ViewDirection == AnatomicalPlane::Sagittal)
       {
-        this->Update(Sagittal, true, true, false);
+        this->Update(AnatomicalPlane::Sagittal, true, true, false);
       }
-      else if (m_ViewDirection == Coronal)
+      else if (m_ViewDirection == AnatomicalPlane::Coronal)
       {
-        this->Update(Coronal, false, true, false);
+        this->Update(AnatomicalPlane::Coronal, false, true, false);
       }
-      else if (m_ViewDirection == Axial)
+      else if (m_ViewDirection == AnatomicalPlane::Axial)
       {
-        this->Update(Axial, false, false, true);
+        this->Update(AnatomicalPlane::Axial, false, false, true);
       }
       else
       {
@@ -160,7 +144,7 @@ namespace mitk
     }
   }
 
-  void SliceNavigationController::Update(SliceNavigationController::ViewDirection viewDirection,
+  void SliceNavigationController::Update(AnatomicalPlane viewDirection,
                                          bool top,
                                          bool frontside,
                                          bool rotated)
@@ -491,23 +475,21 @@ namespace mitk
       currentGeometry = m_InputWorldTimeGeometry->GetGeometryForTimeStep(0);
     }
 
-    if (Original == m_ViewDirection)
+    if (AnatomicalPlane::Original == m_ViewDirection)
     {
       slicedWorldGeometry = dynamic_cast<SlicedGeometry3D*>(
         m_InputWorldTimeGeometry->GetGeometryForTimeStep(currentTimeStep).GetPointer());
       if (slicedWorldGeometry.IsNull())
       {
         slicedWorldGeometry = SlicedGeometry3D::New();
-        slicedWorldGeometry->InitializePlanes(
-          currentGeometry, PlaneGeometry::None, top, frontside, rotated);
+        slicedWorldGeometry->InitializePlanes(currentGeometry, AnatomicalPlane::Original, top, frontside, rotated);
         slicedWorldGeometry->SetSliceNavigationController(this);
       }
     }
     else
     {
       slicedWorldGeometry = SlicedGeometry3D::New();
-      slicedWorldGeometry->InitializePlanes(
-        currentGeometry, ViewDirectionToPlaneOrientation(m_ViewDirection), top, frontside, rotated);
+      slicedWorldGeometry->InitializePlanes(currentGeometry, m_ViewDirection, top, frontside, rotated);
       slicedWorldGeometry->SetSliceNavigationController(this);
     }
 

@@ -17,6 +17,7 @@ found in the LICENSE file.
 
 #include <mitkBaseController.h>
 #include <mitkMessage.h>
+#include <mitkAnatomicalPlanes.h>
 #include <mitkRenderingManager.h>
 #include <mitkRestorePlanePositionOperation.h>
 #include <mitkTimeGeometry.h>
@@ -74,7 +75,7 @@ namespace mitk
    * sliceCtrl->SetInputWorldTimeGeometry(geometry.GetPointer());
    *
    * // Tell the navigation controller in which direction it shall slice the data
-   * sliceCtrl->SetViewDirection(mitk::SliceNavigationController::Axial);
+   * sliceCtrl->SetViewDirection(mitk::AnatomicalPlane::Axial);
    *
    * // Connect one or more BaseRenderer to this navigation controller, i.e.:
    * // events sent by the navigation controller when stepping through the slices
@@ -136,19 +137,6 @@ namespace mitk
     itkNewMacro(Self);
 
     /**
-     * \brief Possible view directions, \a Original will use
-     * the PlaneGeometry instances in a SlicedGeometry3D provided
-     * as input world geometry (by SetInputWorldTimeGeometry).
-     */
-    enum ViewDirection
-    {
-      Axial,
-      Sagittal,
-      Coronal,
-      Original
-    };
-
-    /**
      * \brief Set the input world time geometry out of which the
      * geometries for slicing will be created.
      *
@@ -168,11 +156,11 @@ namespace mitk
      * \brief Set the desired view directions
      *
      * \sa ViewDirection
-     * \sa Update(ViewDirection viewDirection, bool top = true,
+     * \sa Update(AnatomicalPlane viewDirection, bool top = true,
      *     bool frontside = true, bool rotated = false)
      */
-    itkSetEnumMacro(ViewDirection, ViewDirection);
-    itkGetEnumMacro(ViewDirection, ViewDirection);
+    itkSetEnumMacro(ViewDirection, AnatomicalPlane);
+    itkGetEnumMacro(ViewDirection, AnatomicalPlane);
 
     /**
      * \brief Set the default view direction
@@ -181,11 +169,11 @@ namespace mitk
      * default value with SetViewDirectionToDefault()
      *
      * \sa ViewDirection
-     * \sa Update(ViewDirection viewDirection, bool top = true,
+     * \sa Update(AnatomicalPlane viewDirection, bool top = true,
      *     bool frontside = true, bool rotated = false)
      */
-    itkSetEnumMacro(DefaultViewDirection, ViewDirection);
-    itkGetEnumMacro(DefaultViewDirection, ViewDirection);
+    itkSetEnumMacro(DefaultViewDirection, AnatomicalPlane);
+    itkGetEnumMacro(DefaultViewDirection, AnatomicalPlane);
 
     const char *GetViewDirectionAsString() const;
 
@@ -203,7 +191,7 @@ namespace mitk
      * specify the direction/orientation of the created geometry.
      *
      */
-    virtual void Update(ViewDirection viewDirection, bool top = true, bool frontside = true, bool rotated = false);
+    virtual void Update(AnatomicalPlane viewDirection, bool top = true, bool frontside = true, bool rotated = false);
 
     /**
      * \brief Send the created geometry to the connected
@@ -417,8 +405,8 @@ namespace mitk
     TimeGeometry::ConstPointer m_InputWorldTimeGeometry;
     TimeGeometry::Pointer m_CreatedWorldGeometry;
 
-    ViewDirection m_ViewDirection;
-    ViewDirection m_DefaultViewDirection;
+    AnatomicalPlane m_ViewDirection;
+    AnatomicalPlane m_DefaultViewDirection;
 
     RenderingManager::Pointer m_RenderingManager;
 

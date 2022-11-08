@@ -720,6 +720,8 @@ void QmitkSegmentationView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*
   // remove message-connection to make sure no message is processed if no render window part is available
   m_ToolManager->ActiveToolChanged -=
     mitk::MessageDelegate<QmitkSegmentationView>(this, &QmitkSegmentationView::ActiveToolChanged);
+
+  m_Controls->slicesInterpolator->Uninitialize();
 }
 
 void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences* prefs)

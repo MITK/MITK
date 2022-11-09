@@ -51,7 +51,7 @@ QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget* parent,
   , m_Parent(parent)
   , m_CrosshairRotationMode(0)
   , m_CrosshairVisibility(true)
-  , m_Layout(LayoutIndex::AXIAL)
+  , m_Layout(LayoutIndex::Axial)
   , m_LayoutDesign(LayoutDesign::DEFAULT)
   , m_OldLayoutDesign(LayoutDesign::DEFAULT)
 {

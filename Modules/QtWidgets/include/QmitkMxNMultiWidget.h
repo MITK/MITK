@@ -40,7 +40,7 @@ public:
   void Synchronize(bool synchronized) override;
 
   QmitkRenderWindow* GetRenderWindow(const QString& widgetName) const override;
-  QmitkRenderWindow* GetRenderWindow(const mitk::BaseRenderer::ViewDirection& viewDirection) const override;
+  QmitkRenderWindow* GetRenderWindow(const mitk::AnatomicalPlane& orientation) const override;
 
   void SetActiveRenderWindowWidget(RenderWindowWidgetPointer activeRenderWindowWidget) override;
   /**

@@ -40,7 +40,7 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const QString &name, mitk:
   , m_ResendQtEvents(true)
   , m_MenuWidget(nullptr)
   , m_MenuWidgetActivated(false)
-  , m_LayoutIndex(QmitkRenderWindowMenu::LayoutIndex::AXIAL)
+  , m_LayoutIndex(QmitkRenderWindowMenu::LayoutIndex::Axial)
   , m_GeometryViolationWarningOverlay(nullptr)
 {
   m_InternalRenderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
@@ -91,7 +91,7 @@ QmitkRenderWindowMenu::LayoutIndex QmitkRenderWindow::GetLayoutIndex()
   }
   else
   {
-    return QmitkRenderWindowMenu::LayoutIndex::AXIAL;
+    return QmitkRenderWindowMenu::LayoutIndex::Axial;
   }
 }
 

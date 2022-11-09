@@ -58,7 +58,7 @@ public:
   /**
   * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart
   */
-  virtual QmitkRenderWindow* GetQmitkRenderWindow(const mitk::BaseRenderer::ViewDirection& viewDirection) const override;
+  virtual QmitkRenderWindow* GetQmitkRenderWindow(const mitk::AnatomicalPlane& orientation) const override;
   /**
   * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart
   */

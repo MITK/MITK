@@ -200,7 +200,7 @@ void QmitkRenderWindowWidget::InitializeGUI()
 
   // create render window for this render window widget
   m_RenderWindow = new QmitkRenderWindow(this, m_WidgetName, nullptr);
-  m_RenderWindow->SetLayoutIndex(mitk::BaseRenderer::ViewDirection::SAGITTAL);
+  m_RenderWindow->SetLayoutIndex(mitk::AnatomicalPlane::Sagittal);
 
   auto sliceNavigationController = this->GetSliceNavigationController();
   sliceNavigationController->SetDefaultViewDirection(mitk::AnatomicalPlane::Sagittal);

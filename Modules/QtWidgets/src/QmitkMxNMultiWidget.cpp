@@ -80,9 +80,9 @@ QmitkRenderWindow* QmitkMxNMultiWidget::GetRenderWindow(const QString& widgetNam
   return QmitkAbstractMultiWidget::GetRenderWindow(widgetName);
 }
 
-QmitkRenderWindow* QmitkMxNMultiWidget::GetRenderWindow(const mitk::BaseRenderer::ViewDirection& /*viewDirection*/) const
+QmitkRenderWindow* QmitkMxNMultiWidget::GetRenderWindow(const mitk::AnatomicalPlane& /*orientation*/) const
 {
-  // currently no mapping between view directions and render windows
+  // currently no mapping between plane orientation and render windows
   // simply return the currently active render window
   return GetActiveRenderWindowWidget()->GetRenderWindow();
 }

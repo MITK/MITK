@@ -51,7 +51,7 @@ class MITKQTWIDGETS_EXPORT QmitkRenderWindowMenu : public QWidget
 
 public:
 
-  using LayoutIndex = mitk::BaseRenderer::ViewDirection;
+  using LayoutIndex = mitk::AnatomicalPlane;
   using LayoutDesign = QmitkMultiWidgetLayoutManager::LayoutDesign;
 
   QmitkRenderWindowMenu(QWidget *parent = nullptr,

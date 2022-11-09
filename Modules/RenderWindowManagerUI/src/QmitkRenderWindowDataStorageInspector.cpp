@@ -118,16 +118,16 @@ void QmitkRenderWindowDataStorageInspector::SetActiveRenderWindow(const QString&
   }
 
   m_StorageModel->SetCurrentRenderer(selectedRenderer);
-  mitk::SliceNavigationController::ViewDirection viewDirection = selectedRenderer->GetSliceNavigationController()->GetDefaultViewDirection();
+  mitk::AnatomicalPlane viewDirection = selectedRenderer->GetSliceNavigationController()->GetDefaultViewDirection();
   switch (viewDirection)
   {
-  case mitk::SliceNavigationController::Axial:
+  case mitk::AnatomicalPlane::Axial:
     m_Controls.radioButtonAxial->setChecked(true);
     break;
-  case mitk::SliceNavigationController::Coronal:
+  case mitk::AnatomicalPlane::Coronal:
     m_Controls.radioButtonCoronal->setChecked(true);
     break;
-  case mitk::SliceNavigationController::Sagittal:
+  case mitk::AnatomicalPlane::Sagittal:
     m_Controls.radioButtonSagittal->setChecked(true);
     break;
   default:

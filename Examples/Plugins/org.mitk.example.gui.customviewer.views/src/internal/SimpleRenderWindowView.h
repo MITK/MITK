@@ -72,9 +72,9 @@ public:
   QmitkRenderWindow *GetQmitkRenderWindow(const QString &id) const override;
 
   /**
-  * \see mitk::IRenderWindowPart::GetQmitkRenderWindow(mitk::BaseRenderer::ViewDirection)
+  * \see mitk::IRenderWindowPart::GetQmitkRenderWindow(mitk::AnatomicalPlane)
   */
-  QmitkRenderWindow *GetQmitkRenderWindow(const mitk::BaseRenderer::ViewDirection &viewDirection) const override;
+  QmitkRenderWindow *GetQmitkRenderWindow(const mitk::AnatomicalPlane &orientation) const override;
 
   /**
    * \see mitk::QmitkAbstractRenderEditor::GetRenderingManager()

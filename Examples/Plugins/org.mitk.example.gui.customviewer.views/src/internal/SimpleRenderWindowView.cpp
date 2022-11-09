@@ -94,9 +94,9 @@ QmitkRenderWindow *SimpleRenderWindowView::GetQmitkRenderWindow(const QString &i
   return nullptr;
 }
 
-QmitkRenderWindow *SimpleRenderWindowView::GetQmitkRenderWindow(const mitk::BaseRenderer::ViewDirection &viewDirection) const
+QmitkRenderWindow *SimpleRenderWindowView::GetQmitkRenderWindow(const mitk::AnatomicalPlane& orientation) const
 {
-  if (viewDirection == mitk::BaseRenderer::ViewDirection::AXIAL)
+  if (orientation == mitk::AnatomicalPlane::Axial)
   {
     return m_RenderWindow;
   }

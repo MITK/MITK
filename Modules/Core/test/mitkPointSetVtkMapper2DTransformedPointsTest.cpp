@@ -41,7 +41,7 @@ int mitkPointSetVtkMapper2DTransformedPointsTest(int argc, char *argv[])
 
   mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
 
-  renderingHelper.SetViewDirection(mitk::SliceNavigationController::Sagittal);
+  renderingHelper.SetViewDirection(mitk::AnatomicalPlane::Sagittal);
 
   mitk::DataNode *dataNode = renderingHelper.GetDataStorage()->GetNode(mitk::NodePredicateDataType::New("PointSet"));
 

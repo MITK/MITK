@@ -52,9 +52,11 @@ found in the LICENSE file.
 #ifndef PLANEGEOMETRY_H_HEADER_INCLUDED_C1C68A2C
 #define PLANEGEOMETRY_H_HEADER_INCLUDED_C1C68A2C
 
-#include "mitkBaseGeometry.h"
-#include "mitkRestorePlanePositionOperation.h"
 #include <MitkCoreExports.h>
+
+#include <mitkAnatomicalPlanes.h>
+#include <mitkBaseGeometry.h>
+#include <mitkRestorePlanePositionOperation.h>
 
 #include <vnl/vnl_cross.h>
 
@@ -81,14 +83,6 @@ namespace mitk
     /** Method for creation through the object factory. */
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
-
-      enum PlaneOrientation {
-        Axial,
-        Sagittal,
-        Coronal,
-        None     // This defines the PlaneGeometry for the 3D renderWindow which
-        // curiously also needs a PlaneGeometry. This should be reconsidered some time.
-      };
 
     virtual void IndexToWorld(const Point2D &pt_units, Point2D &pt_mm) const;
 
@@ -127,7 +121,7 @@ namespace mitk
     virtual void WorldToIndex(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
 
     /**
-    * \brief Initialize a plane with orientation \a planeorientation
+    * \brief Initialize a plane with orientation \a AnatomicalPlane
     * (default: axial) with respect to \a BaseGeometry (default: identity).
     * Spacing also taken from \a BaseGeometry.
     *
@@ -144,32 +138,32 @@ namespace mitk
     * \endcode
     */
     virtual void InitializeStandardPlane(const BaseGeometry *geometry3D,
-                                         PlaneOrientation planeorientation = Axial,
+                                         AnatomicalPlane planeorientation = AnatomicalPlane::Axial,
                                          ScalarType zPosition = 0,
                                          bool frontside = true,
                                          bool rotated = false,
                                          bool top = true);
 
     /**
-    * \brief Initialize a plane with orientation \a planeorientation
+    * \brief Initialize a plane with orientation \a AnatomicalPlane
     * (default: axial) with respect to \a BaseGeometry (default: identity).
     * Spacing also taken from \a BaseGeometry.
     *
     * \param geometry3D
     * \param top if \a true, create plane at top, otherwise at bottom
-    * (for PlaneOrientation Axial, for other plane locations respectively)
+    * (for AnatomicalPlane Axial, for other plane locations respectively)
     * \param planeorientation
     * \param frontside
     * \param rotated
     */
     virtual void InitializeStandardPlane(const BaseGeometry *geometry3D,
                                          bool top,
-                                         PlaneOrientation planeorientation = Axial,
+                                         AnatomicalPlane planeorientation = AnatomicalPlane::Axial,
                                          bool frontside = true,
                                          bool rotated = false);
 
     /**
-    * \brief Initialize a plane with orientation \a planeorientation
+    * \brief Initialize a plane with orientation \a AnatomicalPlane
     * (default: axial) with respect to \a transform (default: identity)
     * given width and height in units.
     *
@@ -189,21 +183,21 @@ namespace mitk
     virtual void InitializeStandardPlane(ScalarType width,
                                          ScalarType height,
                                          const AffineTransform3D *transform = nullptr,
-                                         PlaneOrientation planeorientation = Axial,
+                                         AnatomicalPlane planeorientation = AnatomicalPlane::Axial,
                                          ScalarType zPosition = 0,
                                          bool frontside = true,
                                          bool rotated = false,
                                          bool top = true);
 
     /**
-    * \brief Initialize plane with orientation \a planeorientation
+    * \brief Initialize plane with orientation \a AnatomicalPlane
     * (default: axial) given width, height and spacing.
     *
     */
     virtual void InitializeStandardPlane(ScalarType width,
                                          ScalarType height,
                                          const Vector3D &spacing,
-                                         PlaneOrientation planeorientation = Axial,
+                                         AnatomicalPlane planeorientation = AnatomicalPlane::Axial,
                                          ScalarType zPosition = 0,
                                          bool frontside = true,
                                          bool rotated = false,

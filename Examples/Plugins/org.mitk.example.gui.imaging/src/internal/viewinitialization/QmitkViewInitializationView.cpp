@@ -79,22 +79,22 @@ void QmitkViewInitializationView::Hidden()
 
 void QmitkViewInitializationView::OnApply()
 {
-  mitk::SliceNavigationController::ViewDirection viewDirection(mitk::SliceNavigationController::Axial);
+  mitk::AnatomicalPlane anatomicalPlane(mitk::AnatomicalPlane::Axial);
   if (m_Controls->rbAxial->isChecked())
-    viewDirection = mitk::SliceNavigationController::Axial;
+    anatomicalPlane = mitk::AnatomicalPlane::Axial;
 
   else if (m_Controls->rbCoronal->isChecked())
-    viewDirection = mitk::SliceNavigationController::Coronal;
+    anatomicalPlane = mitk::AnatomicalPlane::Coronal;
 
   else if (m_Controls->rbSagittal->isChecked())
-    viewDirection = mitk::SliceNavigationController::Sagittal;
+    anatomicalPlane = mitk::AnatomicalPlane::Sagittal;
 
   vtkRenderWindow *renderwindow = this->GetSelectedRenderWindow();
   if (renderwindow != nullptr)
   {
     mitk::BaseRenderer::GetInstance(renderwindow)
       ->GetSliceNavigationController()
-      ->Update(viewDirection,
+      ->Update(anatomicalPlane,
                m_Controls->cbTop->isChecked(),
                m_Controls->cbFrontSide->isChecked(),
                m_Controls->cbRotated->isChecked());

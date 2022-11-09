@@ -52,7 +52,7 @@ QPixmap GetPixmapFromImageNode(const mitk::DataNode* dataNode, int height)
 
   mitk::PlaneGeometry::Pointer planeGeometry = mitk::PlaneGeometry::New();
   int sliceNumber = image->GetDimension(2) / 2;
-  planeGeometry->InitializeStandardPlane(image->GetGeometry(), mitk::PlaneGeometry::Axial, sliceNumber);
+  planeGeometry->InitializeStandardPlane(image->GetGeometry(), mitk::AnatomicalPlane::Axial, sliceNumber);
 
   mitk::ExtractSliceFilter::Pointer extractSliceFilter = mitk::ExtractSliceFilter::New();
   extractSliceFilter->SetInput(image);

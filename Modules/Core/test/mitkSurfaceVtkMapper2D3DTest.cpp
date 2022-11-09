@@ -132,7 +132,7 @@ public:
     m_CommandlineArgs.push_back(GetTestDataFilePath("RenderingTestData/ReferenceScreenshots/ballLUT2D_300x300.png"));
     // Convert vector of strings to argc/argv
     mitk::RenderingTestHelper::ArgcHelperClass arg(m_CommandlineArgs);
-    m_RenderingTestHelper.SetViewDirection(mitk::SliceNavigationController::Sagittal);
+    m_RenderingTestHelper.SetViewDirection(mitk::AnatomicalPlane::Sagittal);
     CPPUNIT_ASSERT(m_RenderingTestHelper.CompareRenderWindowAgainstReference(arg.GetArgc(), arg.GetArgv()) == true);
   }
 

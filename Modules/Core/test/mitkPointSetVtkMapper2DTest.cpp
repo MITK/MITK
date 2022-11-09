@@ -35,9 +35,7 @@ int mitkPointSetVtkMapper2DTest(int argc, char *argv[])
   MITK_TEST_BEGIN("mitkPointSetVtkMapper2DTest")
 
   mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
-
-  // sagittal view direction
-  renderingHelper.SetViewDirection(mitk::SliceNavigationController::Sagittal);
+  renderingHelper.SetViewDirection(mitk::AnatomicalPlane::Sagittal);
 
   // disables anti-aliasing which is enabled on several graphics cards and
   // causes problems when doing a pixel-wise comparison to a reference image

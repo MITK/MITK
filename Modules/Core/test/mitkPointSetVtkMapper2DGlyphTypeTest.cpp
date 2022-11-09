@@ -39,8 +39,7 @@ int mitkPointSetVtkMapper2DGlyphTypeTest(int argc, char *argv[])
   MITK_TEST_BEGIN("mitkPointSetVtkMapper2DGlyphTypeTest")
 
   mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
-
-  renderingHelper.SetViewDirection(mitk::SliceNavigationController::Sagittal);
+  renderingHelper.SetViewDirection(mitk::AnatomicalPlane::Sagittal);
 
   mitk::EnumerationProperty *eP =
     dynamic_cast<mitk::EnumerationProperty *>(renderingHelper.GetDataStorage()

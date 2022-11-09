@@ -26,17 +26,16 @@ namespace mitk
   /**
   * The RenderWindowViewDirectionController is used to manipulate the 'sliceNavigationController' of a given base renderer.
   * The 'sliceNavigationController' is used to set the view direction / camera perspective of a base renderer.
-  * The view direction can be changed to 'mitk::SliceNavigationController::Axial', 'mitk::SliceNavigationController::Coronal'
-  * or 'mitk::SliceNavigationController::Sagittal'.
+  * The view direction can be changed to 'mitk::AnatomicalPlane::Axial', 'mitk::AnatomicalPlane::Coronal'
+  * or 'mitk::AnatomicalPlane::Sagittal'.
   *
-  * Functions with 'mitk::BaseRenderer* renderer' have 'nullptr' as their default argument. Using the nullptr
-  * these functions operate on all base renderer. Giving a specific base renderer will modify the view direction only for the given renderer.
+  * Functions with 'mitk::BaseRenderer* renderer' have 'nullptr' as their default argument.
+  * Using the nullptr these functions operate on all base renderer.
+  * Giving a specific base renderer will change the view direction only for the given renderer.
   */
   class MITKQTWIDGETS_EXPORT RenderWindowViewDirectionController
   {
   public:
-
-    using ViewDirection = mitk::SliceNavigationController::ViewDirection;
 
     RenderWindowViewDirectionController();
     /**
@@ -48,9 +47,9 @@ namespace mitk
     */
     void SetControlledRenderer(RenderWindowLayerUtilities::RendererVector controlledRenderer);
 
-    // wrapper functions to modify the view direction
+    // wrapper functions to change the view direction
     /**
-    * @brief Set the view direction for the given renderer (nullptr = all renderer)
+    * @brief Set the ciew direction for the given renderer (nullptr = all renderer)
     * @param viewDirection  The view direction that should be used for this renderer as a string.
     *                       Currently "axial", "coronal" and "sagittal" is supported.
     * @param renderer       Pointer to the renderer instance for which the view direction should be changed.
@@ -58,15 +57,15 @@ namespace mitk
     */
     void SetViewDirectionOfRenderer(const std::string& viewDirection, BaseRenderer* renderer = nullptr);
     /**
-    * @brief Set the view direction for the given renderer (nullptr = all renderer)
+    * @brief Set the ciew direction for the given renderer (nullptr = all renderer)
     * @param viewDirection  The view direction that should be used for this renderer.
     * @param renderer       Pointer to the renderer instance for which the view direction should be changed.
     *                       If it is a nullptr (default) nothing happens.
     */
-    void SetViewDirectionOfRenderer(ViewDirection viewDirection, BaseRenderer* renderer = nullptr);
+    void SetViewDirectionOfRenderer(AnatomicalPlane viewDirection, BaseRenderer* renderer = nullptr);
     /**
     * @brief Reinitialize the given renderer with the currently visible nodes.
-    * @param renderer       Pointer to the renderer instance for which the view direction should be changed.
+    * @param renderer       Pointer to the renderer instance which should be reinitialized.
     *                       If it is a nullptr (default) all controlled renderer will be affected.
     */
     void InitializeViewByBoundingObjects(const BaseRenderer* renderer);

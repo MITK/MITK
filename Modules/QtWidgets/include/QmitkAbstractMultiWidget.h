@@ -59,7 +59,6 @@ public:
   using RenderWindowWidgetPointer = std::shared_ptr<QmitkRenderWindowWidget>;
   using RenderWindowWidgetMap = std::map<QString, std::shared_ptr<QmitkRenderWindowWidget>>;
   using RenderWindowHash = QHash<QString, QmitkRenderWindow*>;
-  using ViewDirection = mitk::BaseRenderer::ViewDirection;
 
   QmitkAbstractMultiWidget(QWidget* parent = 0,
                            Qt::WindowFlags f = 0,
@@ -94,7 +93,7 @@ public:
   RenderWindowHash GetRenderWindows() const;
   QmitkRenderWindow* GetRenderWindow(int row, int column) const;
   virtual QmitkRenderWindow* GetRenderWindow(const QString& widgetName) const;
-  virtual QmitkRenderWindow* GetRenderWindow(const ViewDirection& viewDirection) const = 0;
+  virtual QmitkRenderWindow* GetRenderWindow(const mitk::AnatomicalPlane& orientation) const = 0;
 
   virtual void SetActiveRenderWindowWidget(RenderWindowWidgetPointer activeRenderWindowWidget);
   RenderWindowWidgetPointer GetActiveRenderWindowWidget() const;

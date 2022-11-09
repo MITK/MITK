@@ -192,7 +192,7 @@ void Step6::SetupWidgets()
   // By default, it slices the data axially
   view2->SetDataStorage(m_DataStorage);
   mitk::DataStorage::SetOfObjects::ConstPointer rs = m_DataStorage->GetAll();
-  view2->SetData(rs->Begin(), mitk::SliceNavigationController::Axial);
+  view2->SetData(rs->Begin(), mitk::AnatomicalPlane::Axial);
 
   // We want to see the position of the slice in 2D and the
   // slice itself in 3D: add it to the tree!
@@ -210,7 +210,7 @@ void Step6::SetupWidgets()
   // Tell the QmitkSliceWidget which (part of) the tree to render
   // and to slice sagittally
   view3->SetDataStorage(m_DataStorage);
-  view3->SetData(rs->Begin(), mitk::SliceNavigationController::Sagittal);
+  view3->SetData(rs->Begin(), mitk::AnatomicalPlane::Sagittal);
 
   // We want to see the position of the slice in 2D and the
   // slice itself in 3D: add it to the tree!

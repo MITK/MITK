@@ -200,10 +200,10 @@ void QmitkRenderWindowWidget::InitializeGUI()
 
   // create render window for this render window widget
   m_RenderWindow = new QmitkRenderWindow(this, m_WidgetName, nullptr);
-  m_RenderWindow->SetLayoutIndex(mitk::BaseRenderer::ViewDirection::SAGITTAL);
+  m_RenderWindow->SetLayoutIndex(mitk::AnatomicalPlane::Sagittal);
 
   auto sliceNavigationController = this->GetSliceNavigationController();
-  sliceNavigationController->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
+  sliceNavigationController->SetDefaultViewDirection(mitk::AnatomicalPlane::Sagittal);
 
   if (m_WindowControls)
   {
@@ -307,19 +307,19 @@ void QmitkRenderWindowWidget::ComputeInvertedSliceNavigation()
   unsigned int axis = 0;
   switch (viewDirection)
   {
-    case mitk::SliceNavigationController::Original:
+    case mitk::AnatomicalPlane::Original:
       return;
-    case mitk::SliceNavigationController::Axial:
+    case mitk::AnatomicalPlane::Axial:
     {
       axis = 2;
       break;
     }
-    case mitk::SliceNavigationController::Coronal:
+    case mitk::AnatomicalPlane::Coronal:
     {
       axis = 1;
       break;
     }
-    case mitk::SliceNavigationController::Sagittal:
+    case mitk::AnatomicalPlane::Sagittal:
     {
       axis = 0;
       break;

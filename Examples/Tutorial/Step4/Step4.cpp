@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
   // is used to get only nodes of the type mitk::Image.
   mitk::DataStorage::SetOfObjects::ConstPointer rs = ds->GetSubset(mitk::TNodePredicateDataType<mitk::Image>::New());
 
-  view2.SetData(rs->Begin(), mitk::SliceNavigationController::Axial);
+  view2.SetData(rs->Begin(), mitk::AnatomicalPlane::Axial);
   // We want to see the position of the slice in 2D and the
   // slice itself in 3D: add it to the datastorage!
   ds->Add(view2.GetRenderer()->GetCurrentWorldPlaneGeometryNode());
@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
   view3.SetDataStorage(ds);
   // Tell the QmitkSliceWidget which (part of) the datastorage to render
   // and to slice sagittally
-  view3.SetData(rs->Begin(), mitk::SliceNavigationController::Sagittal);
+  view3.SetData(rs->Begin(), mitk::AnatomicalPlane::Sagittal);
   // We want to see the position of the slice in 2D and the
   // slice itself in 3D: add it to the datastorage!
   ds->Add(view3.GetRenderer()->GetCurrentWorldPlaneGeometryNode());

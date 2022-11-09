@@ -68,17 +68,6 @@ namespace mitk
       Standard3D = 2
     };
 
-    /**
-     * \brief Defines which view direction should be rendered.
-     */
-    enum class ViewDirection
-    {
-      AXIAL = 0,
-      SAGITTAL,
-      CORONAL,
-      THREE_D
-    };
-
     static BaseRenderer* GetInstance(vtkRenderWindow* renderWindow);
     static void AddInstance(vtkRenderWindow* renderWindow, BaseRenderer* baseRenderer);
     static void RemoveInstance(vtkRenderWindow* renderWindow);

@@ -36,7 +36,7 @@ public:
   virtual void InitializeMultiWidget() override;
 
   virtual QmitkRenderWindow* GetRenderWindow(const QString& widgetName) const override;
-  virtual QmitkRenderWindow* GetRenderWindow(const mitk::BaseRenderer::ViewDirection& viewDirection) const override;
+  virtual QmitkRenderWindow* GetRenderWindow(const mitk::AnatomicalPlane& orientation) const override;
 
   /**
    * @brief Set the reference geometry for interaction inside all render windows of the StdMultiWidget.

@@ -679,8 +679,8 @@ public:
     mitk::Point3D cornerpoint0 = planegeometry->GetCornerPoint(0);
     mitk::PlaneGeometry::Pointer clonedplanegeometry = planegeometry->Clone();
 
-    // Testing InitializeStandardPlane(clonedplanegeometry, planeorientation = Sagittal, zPosition = 0, frontside=true):
-    planegeometry->InitializeStandardPlane(clonedplanegeometry, mitk::PlaneGeometry::Sagittal);
+    // Testing InitializeStandardPlane(clonedplanegeometry, anatomicalplane = Sagittal, zPosition = 0, frontside=true):
+    planegeometry->InitializeStandardPlane(clonedplanegeometry, mitk::AnatomicalPlane::Sagittal);
 
     mitk::Vector3D newright, newbottom, newnormal;
     mitk::ScalarType newthicknessInMM;
@@ -725,9 +725,9 @@ public:
 
     // set origin back to the one of the axial slice:
     origin = clonedplanegeometry->GetOrigin();
-    // Testing backside initialization: InitializeStandardPlane(clonedplanegeometry, planeorientation = Axial, zPosition
+    // Testing backside initialization: InitializeStandardPlane(clonedplanegeometry, anatomicalplane = Axial, zPosition
     // = 0, frontside=false, rotated=true):
-    planegeometry->InitializeStandardPlane(clonedplanegeometry, mitk::PlaneGeometry::Axial, 0, false, true);
+    planegeometry->InitializeStandardPlane(clonedplanegeometry, mitk::AnatomicalPlane::Axial, 0, false, true);
     mitk::Point3D backsideorigin;
     backsideorigin = origin + clonedplanegeometry->GetAxisVector(1); //+clonedplanegeometry->GetAxisVector(2);
 
@@ -778,8 +778,8 @@ public:
     mitk::Vector3D newright, newbottom, newnormal;
     mitk::ScalarType newthicknessInMM;
 
-    // Testing InitializeStandardPlane(clonedplanegeometry, planeorientation = Coronal, zPosition = 0, frontside=true)
-    planegeometry->InitializeStandardPlane(clonedplanegeometry, mitk::PlaneGeometry::Coronal);
+    // Testing InitializeStandardPlane(clonedplanegeometry, anatomicalplane = Coronal, zPosition = 0, frontside=true)
+    planegeometry->InitializeStandardPlane(clonedplanegeometry, mitk::AnatomicalPlane::Coronal);
     newright = right;
     newbottom = normal;
     newbottom.Normalize();
@@ -900,7 +900,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Testing Clone(): ",
                            !((clonedplanegeometry.IsNull()) || (clonedplanegeometry->GetReferenceCount() != 1)));
 
-    std::cout << "Testing InitializeStandardPlane(clonedplanegeometry, planeorientation = Axial, zPosition = 0, "
+    std::cout << "Testing InitializeStandardPlane(clonedplanegeometry, anatomicalplane = Axial, zPosition = 0, "
                  "frontside=true): "
               << std::endl;
     planegeometry->InitializeStandardPlane(clonedplanegeometry);

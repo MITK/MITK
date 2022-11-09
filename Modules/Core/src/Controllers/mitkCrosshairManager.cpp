@@ -77,11 +77,11 @@ void mitk::CrosshairManager::ComputeOrientedTimeGeometries(const TimeGeometry* g
   try
   {
     m_AxialTimeGeometry = SliceNavigationHelper::CreateOrientedTimeGeometry(
-      m_InputTimeGeometry, PlaneGeometry::Axial, false, false, true);
+      m_InputTimeGeometry, AnatomicalPlane::Axial, false, false, true);
     m_CoronalTimeGeometry = SliceNavigationHelper::CreateOrientedTimeGeometry(
-      m_InputTimeGeometry, PlaneGeometry::Coronal, false, true, false);
+      m_InputTimeGeometry, AnatomicalPlane::Coronal, false, true, false);
     m_SagittalTimeGeometry = SliceNavigationHelper::CreateOrientedTimeGeometry(
-      m_InputTimeGeometry, PlaneGeometry::Sagittal, true, true, false);
+      m_InputTimeGeometry, AnatomicalPlane::Sagittal, true, true, false);
   }
   catch (const mitk::Exception& e)
   {
@@ -164,21 +164,21 @@ void mitk::CrosshairManager::UpdateSlice(const SliceNavigationController* sliceN
   unsigned int slicePosition = sliceNavigationController->GetSlice()->GetPos();
   switch (viewDirection)
   {
-    case mitk::SliceNavigationController::Original:
+    case AnatomicalPlane::Original:
       return;
-    case mitk::SliceNavigationController::Axial:
+    case AnatomicalPlane::Axial:
     {
       m_AxialSlice = slicePosition;
       this->UpdatePlaneSlice(m_AxialPlaneNode, m_AxialTimeGeometry, m_AxialSlice);
       break;
     }
-    case mitk::SliceNavigationController::Coronal:
+    case AnatomicalPlane::Coronal:
     {
       m_CoronalSlice = slicePosition;
       this->UpdatePlaneSlice(m_CoronalPlaneNode, m_CoronalTimeGeometry, m_CoronalSlice);
       break;
     }
-    case mitk::SliceNavigationController::Sagittal:
+    case AnatomicalPlane::Sagittal:
     {
       m_SagittalSlice = slicePosition;
       this->UpdatePlaneSlice(m_SagittalPlaneNode, m_SagittalTimeGeometry, m_SagittalSlice);

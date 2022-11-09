@@ -38,7 +38,7 @@ int mitkImageVtkMapper2DColorTest(int argc, char *argv[])
   // Set the opacity for all images
   renderingHelper.SetImageProperty("color", mitk::ColorProperty::New(0.0f, 0.0f, 1.0f));
   // for now this test renders in sagittal view direction
-  renderingHelper.SetViewDirection(mitk::SliceNavigationController::Sagittal);
+  renderingHelper.SetViewDirection(mitk::AnatomicalPlane::Sagittal);
 
   //### Usage of CompareRenderWindowAgainstReference: See docu of mitkRrenderingTestHelper
   MITK_TEST_CONDITION(renderingHelper.CompareRenderWindowAgainstReference(argc, argv) == true,

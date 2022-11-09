@@ -59,15 +59,15 @@ void mitk::RenderWindowViewDirectionController::SetViewDirectionOfRenderer(const
     mitk::SliceNavigationController* sliceNavigationController = renderer->GetSliceNavigationController();
     if ("axial" == viewDirection)
     {
-      sliceNavigationController->SetDefaultViewDirection(ViewDirection::Axial);
+      sliceNavigationController->SetDefaultViewDirection(AnatomicalPlane::Axial);
     }
     else if ("coronal" == viewDirection)
     {
-      sliceNavigationController->SetDefaultViewDirection(ViewDirection::Coronal);
+      sliceNavigationController->SetDefaultViewDirection(AnatomicalPlane::Coronal);
     }
     else if ("sagittal" == viewDirection)
     {
-      sliceNavigationController->SetDefaultViewDirection(ViewDirection::Sagittal);
+      sliceNavigationController->SetDefaultViewDirection(AnatomicalPlane::Sagittal);
     }
 
     if ("3D" == viewDirection)
@@ -84,7 +84,7 @@ void mitk::RenderWindowViewDirectionController::SetViewDirectionOfRenderer(const
   }
 }
 
-void mitk::RenderWindowViewDirectionController::SetViewDirectionOfRenderer(ViewDirection viewDirection , BaseRenderer* renderer/* =nullptr*/)
+void mitk::RenderWindowViewDirectionController::SetViewDirectionOfRenderer(AnatomicalPlane viewDirection , BaseRenderer* renderer/* =nullptr*/)
 {
   if (nullptr == renderer)
   {

@@ -65,13 +65,13 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   auto viewDirection = sliceNavigationController->GetDefaultViewDirection();
   switch (viewDirection)
   {
-  case mitk::SliceNavigationController::Axial:
+  case mitk::AnatomicalPlane::Axial:
     m_ViewDirectionSelector->setCurrentIndex(0);
     break;
-  case mitk::SliceNavigationController::Coronal:
+  case mitk::AnatomicalPlane::Coronal:
     m_ViewDirectionSelector->setCurrentIndex(1);
     break;
-  case mitk::SliceNavigationController::Sagittal:
+  case mitk::AnatomicalPlane::Sagittal:
     m_ViewDirectionSelector->setCurrentIndex(2);
     break;
   default:

@@ -40,7 +40,7 @@ QmitkRenderWindowWidget::QmitkRenderWindowWidget(QWidget* parent/* = nullptr*/,
 
 QmitkRenderWindowWidget::~QmitkRenderWindowWidget()
 {
-  auto sliceNavigationController = m_RenderWindow->GetSliceNavigationController();
+  auto sliceNavigationController = this->GetSliceNavigationController();
   if (nullptr != sliceNavigationController)
   {
     sliceNavigationController->SetCrosshairEvent.RemoveListener(
@@ -202,7 +202,7 @@ void QmitkRenderWindowWidget::InitializeGUI()
   m_RenderWindow = new QmitkRenderWindow(this, m_WidgetName, nullptr);
   m_RenderWindow->SetLayoutIndex(mitk::BaseRenderer::ViewDirection::SAGITTAL);
 
-  auto sliceNavigationController = m_RenderWindow->GetSliceNavigationController();
+  auto sliceNavigationController = this->GetSliceNavigationController();
   sliceNavigationController->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
 
   if (m_WindowControls)
@@ -279,7 +279,7 @@ void QmitkRenderWindowWidget::SetGeometry(const itk::EventObject& event)
     return;
   }
 
-  auto sliceNavigationController = m_RenderWindow->GetSliceNavigationController();
+  auto sliceNavigationController = this->GetSliceNavigationController();
   const auto* inputTimeGeometry = sliceNavigationController->GetInputWorldTimeGeometry();
   m_CrosshairManager->ComputeOrientedTimeGeometries(inputTimeGeometry);
 
@@ -302,7 +302,7 @@ void QmitkRenderWindowWidget::SetGeometrySlice(const itk::EventObject& event)
 
 void QmitkRenderWindowWidget::ComputeInvertedSliceNavigation()
 {
-  auto sliceNavigationController = m_RenderWindow->GetSliceNavigationController();
+  auto sliceNavigationController = this->GetSliceNavigationController();
   auto viewDirection = sliceNavigationController->GetViewDirection();
   unsigned int axis = 0;
   switch (viewDirection)
@@ -420,6 +420,5 @@ void QmitkRenderWindowWidget::OnResetAction(QList<mitk::DataNode::Pointer> selec
 
   // reset position and time step
   this->GetSliceNavigationController()->SelectSliceByPoint(currentPosition);
-  this->SetCrosshairPosition(currentPosition);
   renderingManager->GetTimeNavigationController()->GetTime()->SetPos(imageTimeStep);
 }

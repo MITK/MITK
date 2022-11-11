@@ -352,8 +352,6 @@ void mitk::CrosshairManager::SetCrosshairPosition(const Point3D& selectedPoint,
                                                   const TimeGeometry* timeGeometry,
                                                   unsigned int& slice)
 {
-  PlaneGeometryData::Pointer planeData = dynamic_cast<PlaneGeometryData*>(planeNode->GetData());
-
   int selectedSlice = -1;
   try
   {
@@ -385,6 +383,12 @@ void mitk::CrosshairManager::SetCrosshairPosition(const Point3D& selectedPoint,
   }
 
   if (nullptr == planeGeometry)
+  {
+    return;
+  }
+
+  PlaneGeometryData::Pointer planeData = dynamic_cast<PlaneGeometryData*>(planeNode->GetData());
+  if (nullptr == planeData)
   {
     return;
   }

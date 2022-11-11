@@ -150,6 +150,16 @@ bool QmitkSliceNavigationListener::InitObservers()
       m_ObserverMap.insert(std::make_pair(sliceNavController, ObserverInfo(sliceNavController, tag,
         i.key().toStdString(), m_renderWindowPart)));
 
+      itk::ReceptorMemberCommand<QmitkSliceNavigationListener>::Pointer cmdUpdateEvent =
+        itk::ReceptorMemberCommand<QmitkSliceNavigationListener>::New();
+      cmdUpdateEvent->SetCallbackFunction(this, &QmitkSliceNavigationListener::OnSliceChangedInternal);
+      tag = sliceNavController->AddObserver(
+        mitk::SliceNavigationController::GeometryUpdateEvent(nullptr, 0),
+        cmdUpdateEvent);
+
+      m_ObserverMap.insert(std::make_pair(sliceNavController, ObserverInfo(sliceNavController, tag,
+        i.key().toStdString(), m_renderWindowPart)));
+
       itk::MemberCommand<QmitkSliceNavigationListener>::Pointer cmdDelEvent =
         itk::MemberCommand<QmitkSliceNavigationListener>::New();
       cmdDelEvent->SetCallbackFunction(this,

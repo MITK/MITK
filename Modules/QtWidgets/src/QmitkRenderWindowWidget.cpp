@@ -228,6 +228,7 @@ void QmitkRenderWindowWidget::InitializeGUI()
 
   // finally add observer, after all relevant objects have been created / initialized
   sliceNavigationController->ConnectGeometrySendEvent(this);
+  sliceNavigationController->ConnectGeometrySliceEvent(this);
 
   mitk::TimeGeometry::ConstPointer timeGeometry = m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll());
   mitk::RenderingManager::GetInstance()->InitializeView(m_RenderWindow->GetVtkRenderWindow(), timeGeometry);
@@ -286,7 +287,17 @@ void QmitkRenderWindowWidget::SetGeometry(const itk::EventObject& event)
   {
     this->ComputeInvertedSliceNavigation();
   }
+}
 
+void QmitkRenderWindowWidget::SetGeometrySlice(const itk::EventObject& event)
+{
+  if (!mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0).CheckEvent(&event))
+  {
+    return;
+  }
+
+  auto sliceNavigationController = this->GetSliceNavigationController();
+  m_CrosshairManager->UpdateSlice(sliceNavigationController);
 }
 
 void QmitkRenderWindowWidget::ComputeInvertedSliceNavigation()

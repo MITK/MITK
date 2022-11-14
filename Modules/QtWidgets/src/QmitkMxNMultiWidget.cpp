@@ -162,7 +162,6 @@ void QmitkMxNMultiWidget::SetSelectedPosition(const mitk::Point3D& newPosition, 
   if (nullptr != renderWindowWidget)
   {
     renderWindowWidget->GetSliceNavigationController()->SelectSliceByPoint(newPosition);
-    renderWindowWidget->SetCrosshairPosition(newPosition);
     return;
   }
 

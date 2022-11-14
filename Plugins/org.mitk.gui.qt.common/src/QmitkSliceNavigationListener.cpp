@@ -98,9 +98,7 @@ void QmitkSliceNavigationListener::RenderWindowPartActivated(mitk::IRenderWindow
 
     if (!InitObservers())
     {
-      QMessageBox::information(nullptr, "Error", "Unable to set up the event observers. The " \
-        "plot will not be triggered on changing the crosshair, " \
-        "position or time step.");
+      QMessageBox::information(nullptr, "Error", "Unable to set up the event observers.");
     }
 
     m_CurrentSelectedPosition = m_renderWindowPart->GetSelectedPosition();
@@ -112,6 +110,20 @@ void QmitkSliceNavigationListener::RenderWindowPartDeactivated(mitk::IRenderWind
 {
   m_renderWindowPart = nullptr;
   this->RemoveAllObservers(renderWindowPart);
+}
+
+void QmitkSliceNavigationListener::RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart)
+{
+  if (m_renderWindowPart == renderWindowPart)
+  {
+    if (!InitObservers())
+    {
+      QMessageBox::information(nullptr, "Error", "Unable to set up the event observers.");
+    }
+
+    m_CurrentSelectedPosition = m_renderWindowPart->GetSelectedPosition();
+    m_CurrentSelectedTimePoint = m_renderWindowPart->GetSelectedTimePoint();
+  }
 }
 
 bool QmitkSliceNavigationListener::InitObservers()
@@ -130,35 +142,49 @@ bool QmitkSliceNavigationListener::InitObservers()
 
     if (sliceNavController)
     {
-      itk::ReceptorMemberCommand<QmitkSliceNavigationListener>::Pointer cmdSliceEvent =
-        itk::ReceptorMemberCommand<QmitkSliceNavigationListener>::New();
-      cmdSliceEvent->SetCallbackFunction(this, &QmitkSliceNavigationListener::OnSliceChangedInternal);
-      int tag = sliceNavController->AddObserver(
-        mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0),
-        cmdSliceEvent);
+      bool observersInitialized = this->ObserversInitialized(sliceNavController);
+      if(false == observersInitialized)
+      {
+        itk::ReceptorMemberCommand<QmitkSliceNavigationListener>::Pointer cmdSliceEvent =
+          itk::ReceptorMemberCommand<QmitkSliceNavigationListener>::New();
+        cmdSliceEvent->SetCallbackFunction(this, &QmitkSliceNavigationListener::OnSliceChangedInternal);
+        int tag = sliceNavController->AddObserver(
+          mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0),
+          cmdSliceEvent);
 
-      m_ObserverMap.insert(std::make_pair(sliceNavController, ObserverInfo(sliceNavController, tag,
-        i.key().toStdString(), m_renderWindowPart)));
+        m_ObserverMap.insert(std::make_pair(sliceNavController, ObserverInfo(sliceNavController, tag,
+          i.key().toStdString(), m_renderWindowPart)));
 
-      itk::ReceptorMemberCommand<QmitkSliceNavigationListener>::Pointer cmdTimeEvent =
-        itk::ReceptorMemberCommand<QmitkSliceNavigationListener>::New();
-      cmdTimeEvent->SetCallbackFunction(this, &QmitkSliceNavigationListener::OnSliceChangedInternal);
-      tag = sliceNavController->AddObserver(
-        mitk::SliceNavigationController::GeometryTimeEvent(nullptr, 0),
-        cmdTimeEvent);
+        itk::ReceptorMemberCommand<QmitkSliceNavigationListener>::Pointer cmdTimeEvent =
+          itk::ReceptorMemberCommand<QmitkSliceNavigationListener>::New();
+        cmdTimeEvent->SetCallbackFunction(this, &QmitkSliceNavigationListener::OnSliceChangedInternal);
+        tag = sliceNavController->AddObserver(
+          mitk::SliceNavigationController::GeometryTimeEvent(nullptr, 0),
+          cmdTimeEvent);
 
-      m_ObserverMap.insert(std::make_pair(sliceNavController, ObserverInfo(sliceNavController, tag,
-        i.key().toStdString(), m_renderWindowPart)));
+        m_ObserverMap.insert(std::make_pair(sliceNavController, ObserverInfo(sliceNavController, tag,
+          i.key().toStdString(), m_renderWindowPart)));
 
-      itk::MemberCommand<QmitkSliceNavigationListener>::Pointer cmdDelEvent =
-        itk::MemberCommand<QmitkSliceNavigationListener>::New();
-      cmdDelEvent->SetCallbackFunction(this,
-        &QmitkSliceNavigationListener::OnSliceNavigationControllerDeleted);
-      tag = sliceNavController->AddObserver(
-        itk::DeleteEvent(), cmdDelEvent);
+        itk::ReceptorMemberCommand<QmitkSliceNavigationListener>::Pointer cmdUpdateEvent =
+          itk::ReceptorMemberCommand<QmitkSliceNavigationListener>::New();
+        cmdUpdateEvent->SetCallbackFunction(this, &QmitkSliceNavigationListener::OnSliceChangedInternal);
+        tag = sliceNavController->AddObserver(
+          mitk::SliceNavigationController::GeometryUpdateEvent(nullptr, 0),
+          cmdUpdateEvent);
 
-      m_ObserverMap.insert(std::make_pair(sliceNavController, ObserverInfo(sliceNavController, tag,
-        i.key().toStdString(), m_renderWindowPart)));
+        m_ObserverMap.insert(std::make_pair(sliceNavController, ObserverInfo(sliceNavController, tag,
+          i.key().toStdString(), m_renderWindowPart)));
+
+        itk::MemberCommand<QmitkSliceNavigationListener>::Pointer cmdDelEvent =
+          itk::MemberCommand<QmitkSliceNavigationListener>::New();
+        cmdDelEvent->SetCallbackFunction(this,
+          &QmitkSliceNavigationListener::OnSliceNavigationControllerDeleted);
+        tag = sliceNavController->AddObserver(
+          itk::DeleteEvent(), cmdDelEvent);
+
+        m_ObserverMap.insert(std::make_pair(sliceNavController, ObserverInfo(sliceNavController, tag,
+          i.key().toStdString(), m_renderWindowPart)));
+      }
     }
 
     ++i;
@@ -194,6 +220,12 @@ void QmitkSliceNavigationListener::RemoveAllObservers(mitk::IRenderWindowPart* d
       m_ObserverMap.erase(delPos);
     }
   }
+}
+
+bool QmitkSliceNavigationListener::ObserversInitialized(mitk::SliceNavigationController* controller)
+{
+  auto it = m_ObserverMap.find(controller);
+  return it != m_ObserverMap.end();
 }
 
 QmitkSliceNavigationListener::ObserverInfo::ObserverInfo(mitk::SliceNavigationController* controller, int observerTag,

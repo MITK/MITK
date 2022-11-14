@@ -40,7 +40,7 @@ QmitkRenderWindowWidget::QmitkRenderWindowWidget(QWidget* parent/* = nullptr*/,
 
 QmitkRenderWindowWidget::~QmitkRenderWindowWidget()
 {
-  auto sliceNavigationController = m_RenderWindow->GetSliceNavigationController();
+  auto sliceNavigationController = this->GetSliceNavigationController();
   if (nullptr != sliceNavigationController)
   {
     sliceNavigationController->SetCrosshairEvent.RemoveListener(
@@ -202,7 +202,7 @@ void QmitkRenderWindowWidget::InitializeGUI()
   m_RenderWindow = new QmitkRenderWindow(this, m_WidgetName, nullptr);
   m_RenderWindow->SetLayoutIndex(mitk::BaseRenderer::ViewDirection::SAGITTAL);
 
-  auto sliceNavigationController = m_RenderWindow->GetSliceNavigationController();
+  auto sliceNavigationController = this->GetSliceNavigationController();
   sliceNavigationController->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
 
   if (m_WindowControls)
@@ -228,6 +228,7 @@ void QmitkRenderWindowWidget::InitializeGUI()
 
   // finally add observer, after all relevant objects have been created / initialized
   sliceNavigationController->ConnectGeometrySendEvent(this);
+  sliceNavigationController->ConnectGeometrySliceEvent(this);
 
   mitk::TimeGeometry::ConstPointer timeGeometry = m_DataStorage->ComputeBoundingGeometry3D(m_DataStorage->GetAll());
   mitk::RenderingManager::GetInstance()->InitializeView(m_RenderWindow->GetVtkRenderWindow(), timeGeometry);
@@ -278,7 +279,7 @@ void QmitkRenderWindowWidget::SetGeometry(const itk::EventObject& event)
     return;
   }
 
-  auto sliceNavigationController = m_RenderWindow->GetSliceNavigationController();
+  auto sliceNavigationController = this->GetSliceNavigationController();
   const auto* inputTimeGeometry = sliceNavigationController->GetInputWorldTimeGeometry();
   m_CrosshairManager->ComputeOrientedTimeGeometries(inputTimeGeometry);
 
@@ -286,12 +287,22 @@ void QmitkRenderWindowWidget::SetGeometry(const itk::EventObject& event)
   {
     this->ComputeInvertedSliceNavigation();
   }
+}
 
+void QmitkRenderWindowWidget::SetGeometrySlice(const itk::EventObject& event)
+{
+  if (!mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0).CheckEvent(&event))
+  {
+    return;
+  }
+
+  auto sliceNavigationController = this->GetSliceNavigationController();
+  m_CrosshairManager->UpdateSlice(sliceNavigationController);
 }
 
 void QmitkRenderWindowWidget::ComputeInvertedSliceNavigation()
 {
-  auto sliceNavigationController = m_RenderWindow->GetSliceNavigationController();
+  auto sliceNavigationController = this->GetSliceNavigationController();
   auto viewDirection = sliceNavigationController->GetViewDirection();
   unsigned int axis = 0;
   switch (viewDirection)
@@ -409,6 +420,5 @@ void QmitkRenderWindowWidget::OnResetAction(QList<mitk::DataNode::Pointer> selec
 
   // reset position and time step
   this->GetSliceNavigationController()->SelectSliceByPoint(currentPosition);
-  this->SetCrosshairPosition(currentPosition);
   renderingManager->GetTimeNavigationController()->GetTime()->SetPos(imageTimeStep);
 }

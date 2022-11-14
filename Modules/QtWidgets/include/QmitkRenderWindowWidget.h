@@ -91,6 +91,7 @@ public:
   mitk::Point3D GetCrosshairPosition() const;
 
   void SetGeometry(const itk::EventObject& event);
+  void SetGeometrySlice(const itk::EventObject& event);
 
 private Q_SLOTS:
 

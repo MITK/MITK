@@ -797,6 +797,8 @@ void QmitkSegmentationView::EstablishLabelSetConnection()
     return;
 
   auto workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
+  if (nullptr == workingImage)
+    return;
 
   workingImage->GetActiveLabelSet()->AddLabelEvent += mitk::MessageDelegate<QmitkLabelSetWidget>(
     m_Controls->labelSetWidget, &QmitkLabelSetWidget::ResetAllTableWidgetItems);
@@ -818,6 +820,8 @@ void QmitkSegmentationView::LooseLabelSetConnection()
     return;
 
   auto workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
+  if (nullptr == workingImage)
+    return;
 
   workingImage->GetActiveLabelSet()->AddLabelEvent -= mitk::MessageDelegate<QmitkLabelSetWidget>(
     m_Controls->labelSetWidget, &QmitkLabelSetWidget::ResetAllTableWidgetItems);
@@ -1080,18 +1084,21 @@ void QmitkSegmentationView::ValidateSelectionInput()
     }
 
     auto labelSetImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
-    auto activeLayer = labelSetImage->GetActiveLayer();
-    numberOfLabels = labelSetImage->GetNumberOfLabels(activeLayer);
+    if (nullptr != labelSetImage)
+    {
+      auto activeLayer = labelSetImage->GetActiveLayer();
+      numberOfLabels = labelSetImage->GetNumberOfLabels(activeLayer);
 
-    if (2 == numberOfLabels)
-    {
-      m_Controls->slicesInterpolator->setEnabled(true);
-    }
-    else if (2 < numberOfLabels)
-    {
-      m_Controls->interpolatorWarningLabel->setText(
-        "<font color=\"red\">Interpolation only works for single label segmentations.</font>");
-      m_Controls->interpolatorWarningLabel->show();
+      if (2 == numberOfLabels)
+      {
+        m_Controls->slicesInterpolator->setEnabled(true);
+      }
+      else if (2 < numberOfLabels)
+      {
+        m_Controls->interpolatorWarningLabel->setText(
+          "<font color=\"red\">Interpolation only works for single label segmentations.</font>");
+        m_Controls->interpolatorWarningLabel->show();
+      }
     }
   }
 

@@ -80,15 +80,8 @@ QmitkSegmentationView::QmitkSegmentationView()
   validImages->AddPredicate(isDti);
   validImages->AddPredicate(isOdf);
 
-  auto isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
-  auto isMask = mitk::NodePredicateAnd::New(isBinary, isImage);
-
-  auto validSegmentations = mitk::NodePredicateOr::New();
-  validSegmentations->AddPredicate(mitk::TNodePredicateDataType<mitk::LabelSetImage>::New());
-  validSegmentations->AddPredicate(isMask);
-
   m_SegmentationPredicate = mitk::NodePredicateAnd::New();
-  m_SegmentationPredicate->AddPredicate(validSegmentations);
+  m_SegmentationPredicate->AddPredicate(mitk::TNodePredicateDataType<mitk::LabelSetImage>::New());
   m_SegmentationPredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
   m_SegmentationPredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
 
@@ -866,28 +859,16 @@ void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataNode* node)
   }
 
   auto labelSetImage = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
-  if (nullptr != labelSetImage)
+  if (nullptr == labelSetImage)
   {
-    // node is a multi label segmentation
-    // its outline property can be set in the segmentation preference page
-    node->SetProperty("labelset.contour.active", mitk::BoolProperty::New(m_DrawOutline));
+    return;
+  }
 
-    // force render window update to show outline
-    node->GetData()->Modified();
-  }
-  else if (nullptr != node->GetData())
-  {
-    // node is a legacy binary segmentation
-    bool isBinary = false;
-    node->GetBoolProperty("binary", isBinary);
-    if (isBinary)
-    {
-      node->SetProperty("outline binary", mitk::BoolProperty::New(m_DrawOutline));
-      node->SetProperty("outline width", mitk::FloatProperty::New(2.0));
-      // force render window update to show outline
-      node->GetData()->Modified();
-    }
-  }
+  // the outline property can be set in the segmentation preference page
+  node->SetProperty("labelset.contour.active", mitk::BoolProperty::New(m_DrawOutline));
+
+  // force render window update to show outline
+  node->GetData()->Modified();
 }
 
 void QmitkSegmentationView::ApplySelectionMode()

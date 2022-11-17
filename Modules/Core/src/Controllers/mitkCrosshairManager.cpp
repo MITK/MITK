@@ -242,7 +242,6 @@ void mitk::CrosshairManager::RemovePlanesFromDataStorage()
 
 void mitk::CrosshairManager::InitializePlaneProperties(DataNode::Pointer planeNode, const std::string& planeName)
 {
-  planeNode->GetPropertyList()->SetProperty("layer", mitk::IntProperty::New(1000));
   planeNode->SetProperty("reslice.thickslices", mitk::ResliceMethodProperty::New());
   planeNode->SetProperty("reslice.thickslices.num", mitk::IntProperty::New(5));
   planeNode->SetProperty("Crosshair.Gap Size", mitk::IntProperty::New(32));

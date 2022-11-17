@@ -72,33 +72,24 @@ void QmitkStdMultiWidget::InitializeMultiWidget()
   SetLayout(2, 2);
 
   // transfer colors in WorldGeometry-Nodes of the associated Renderer
-  mitk::IntProperty::Pointer layer;
   // of widget 1
   m_PlaneNode1 =
     mitk::BaseRenderer::GetInstance(GetRenderWindow1()->renderWindow())->GetCurrentWorldPlaneGeometryNode();
   m_PlaneNode1->SetColor(GetDecorationColor(0));
-  layer = mitk::IntProperty::New(1000);
-  m_PlaneNode1->SetProperty("layer", layer);
 
   // of widget 2
   m_PlaneNode2 =
     mitk::BaseRenderer::GetInstance(GetRenderWindow2()->renderWindow())->GetCurrentWorldPlaneGeometryNode();
   m_PlaneNode2->SetColor(GetDecorationColor(1));
-  layer = mitk::IntProperty::New(1000);
-  m_PlaneNode2->SetProperty("layer", layer);
 
   // of widget 3
   m_PlaneNode3 =
     mitk::BaseRenderer::GetInstance(GetRenderWindow3()->renderWindow())->GetCurrentWorldPlaneGeometryNode();
   m_PlaneNode3->SetColor(GetDecorationColor(2));
-  layer = mitk::IntProperty::New(1000);
-  m_PlaneNode3->SetProperty("layer", layer);
 
   // the parent node
   m_ParentNodeForGeometryPlanes =
     mitk::BaseRenderer::GetInstance(GetRenderWindow4()->renderWindow())->GetCurrentWorldPlaneGeometryNode();
-  layer = mitk::IntProperty::New(1000);
-  m_ParentNodeForGeometryPlanes->SetProperty("layer", layer);
 
   AddDisplayPlaneSubTree();
 

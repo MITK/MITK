@@ -30,6 +30,7 @@ found in the LICENSE file.
 #include <itkImageRegionIterator.h>
 #include <itkQuadEdgeMesh.h>
 #include <itkTriangleMeshToBinaryImageFilter.h>
+#include <itkLabelGeometryImageFilter.h>
 //#include <itkRelabelComponentImageFilter.h>
 
 #include <itkCommand.h>
@@ -758,42 +759,20 @@ void mitk::LabelSetImage::MaskStampProcessing(ImageType *itkImage, mitk::Image *
 template <typename ImageType>
 void mitk::LabelSetImage::CalculateCenterOfMassProcessing(ImageType *itkImage, PixelType pixelValue, unsigned int layer)
 {
-  typedef itk::ImageRegionConstIterator<ImageType> IteratorType;
-  IteratorType iter(itkImage, itkImage->GetLargestPossibleRegion());
-  iter.GoToBegin();
-
-  if (iter.GetImageIteratorDimension() != 3)
+  if (ImageType::GetImageDimension() != 3)
   {
     return;
   }
 
-  double meanIndex[3] = {0.0, 0.0, 0.0};
-  unsigned int count = 0;
-
-  while (!iter.IsAtEnd())
-  {
-    // TODO fix comparison warning more effective
-    if (iter.Get() == pixelValue)
-    {
-      for (int i = 0; i < 3; ++i)
-      {
-        // Iteratively update center of mass. Previous value is multiplied by count/count+1 to correct the weighting
-        meanIndex[i] = static_cast<double>(meanIndex[i]) * count / (count + 1.0) + static_cast<double>(iter.GetIndex()[i]) / (count + 1.0);
-      }
-      ++count;
-    }
-    ++iter;
-  }
-
-  if (count == 0)
-  {
-    return;
-  }
+  auto labelGeometryFilter = itk::LabelGeometryImageFilter<ImageType>::New();
+  labelGeometryFilter->SetInput(itkImage);
+  labelGeometryFilter->Update();
+  auto centroid = labelGeometryFilter->GetCentroid(pixelValue);
 
   mitk::Point3D pos;
-  pos[0] = meanIndex[0];
-  pos[1] = meanIndex[1];
-  pos[2] = meanIndex[2];
+  pos[0] = centroid[0];
+  pos[1] = centroid[1];
+  pos[2] = centroid[2];
 
   GetLabelSet(layer)->GetLabel(pixelValue)->SetCenterOfMassIndex(pos);
   this->GetSlicedGeometry()->IndexToWorld(pos, pos); // TODO: TimeGeometry?

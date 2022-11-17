@@ -30,6 +30,7 @@ found in the LICENSE file.
 #include <itkImageRegionIterator.h>
 #include <itkQuadEdgeMesh.h>
 #include <itkTriangleMeshToBinaryImageFilter.h>
+#include <itkLabelGeometryImageFilter.h>
 //#include <itkRelabelComponentImageFilter.h>
 
 #include <itkCommand.h>
@@ -758,39 +759,20 @@ void mitk::LabelSetImage::MaskStampProcessing(ImageType *itkImage, mitk::Image *
 template <typename ImageType>
 void mitk::LabelSetImage::CalculateCenterOfMassProcessing(ImageType *itkImage, PixelType pixelValue, unsigned int layer)
 {
-  // for now, we just retrieve the voxel in the middle
-  typedef itk::ImageRegionConstIterator<ImageType> IteratorType;
-  IteratorType iter(itkImage, itkImage->GetLargestPossibleRegion());
-  iter.GoToBegin();
-
-  std::vector<typename ImageType::IndexType> indexVector;
-
-  while (!iter.IsAtEnd())
+  if (ImageType::GetImageDimension() != 3)
   {
-    // TODO fix comparison warning more effective
-    if (iter.Get() == pixelValue)
-    {
-      indexVector.push_back(iter.GetIndex());
-    }
-    ++iter;
+    return;
   }
+
+  auto labelGeometryFilter = itk::LabelGeometryImageFilter<ImageType>::New();
+  labelGeometryFilter->SetInput(itkImage);
+  labelGeometryFilter->Update();
+  auto centroid = labelGeometryFilter->GetCentroid(pixelValue);
 
   mitk::Point3D pos;
-  pos.Fill(0.0);
-
-  if (!indexVector.empty())
-  {
-    typename itk::ImageRegionConstIteratorWithIndex<ImageType>::IndexType centerIndex;
-    centerIndex = indexVector.at(indexVector.size() / 2);
-    if (centerIndex.GetIndexDimension() == 3)
-    {
-      pos[0] = centerIndex[0];
-      pos[1] = centerIndex[1];
-      pos[2] = centerIndex[2];
-    }
-    else
-      return;
-  }
+  pos[0] = centroid[0];
+  pos[1] = centroid[1];
+  pos[2] = centroid[2];
 
   GetLabelSet(layer)->GetLabel(pixelValue)->SetCenterOfMassIndex(pos);
   this->GetSlicedGeometry()->IndexToWorld(pos, pos); // TODO: TimeGeometry?

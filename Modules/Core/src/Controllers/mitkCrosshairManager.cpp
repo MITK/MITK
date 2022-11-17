@@ -242,7 +242,6 @@ void mitk::CrosshairManager::RemovePlanesFromDataStorage()
 
 void mitk::CrosshairManager::InitializePlaneProperties(DataNode::Pointer planeNode, const std::string& planeName)
 {
-  planeNode->GetPropertyList()->SetProperty("layer", mitk::IntProperty::New(1000));
   planeNode->SetProperty("reslice.thickslices", mitk::ResliceMethodProperty::New());
   planeNode->SetProperty("reslice.thickslices.num", mitk::IntProperty::New(5));
   planeNode->SetProperty("Crosshair.Gap Size", mitk::IntProperty::New(32));
@@ -252,12 +251,6 @@ void mitk::CrosshairManager::InitializePlaneProperties(DataNode::Pointer planeNo
   planeNode->SetVisibility(true, m_BaseRenderer);
   planeNode->SetProperty("name", mitk::StringProperty::New(planeName));
   planeNode->SetProperty("helper object", mitk::BoolProperty::New(true));
-
-  // this is not required, since the mapper is set for this node automatically
-  // if no mapper was previously defined (see mitk::CoreObjectFactory)
-  // However, we can explicitly set it here to be explicit about it.
-  PlaneGeometryDataMapper2D::Pointer planeMapper = mitk::PlaneGeometryDataMapper2D::New();
-  planeNode->SetMapper(mitk::BaseRenderer::Standard2D, planeMapper);
 }
 
 void mitk::CrosshairManager::InitializePlaneData(DataNode::Pointer planeNode, const TimeGeometry* timeGeometry, unsigned int& slice)
@@ -292,6 +285,7 @@ void mitk::CrosshairManager::InitializePlaneData(DataNode::Pointer planeNode, co
   PlaneGeometryData::Pointer planeData = PlaneGeometryData::New();
   planeData->SetPlaneGeometry(slicedGeometry->GetPlaneGeometry(slice));
   planeNode->SetData(planeData);
+  planeNode->SetMapper(mitk::BaseRenderer::Standard2D, mitk::PlaneGeometryDataMapper2D::New());
 }
 
 void mitk::CrosshairManager::SetCrosshairPosition(const Point3D& selectedPoint,

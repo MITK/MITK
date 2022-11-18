@@ -87,7 +87,7 @@ namespace mitk
       return Unsupported;
 
     // Check if the input file is a segmentation
-    const LabelSetImage *input = static_cast<const LabelSetImage *>(this->GetInput());
+    const LabelSetImage *input = dynamic_cast<const LabelSetImage *>(this->GetInput());
 
     if (input)
     {

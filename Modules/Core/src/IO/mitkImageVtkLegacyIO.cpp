@@ -103,9 +103,8 @@ namespace mitk
       return Unsupported;
 
     //Fix to ensure T29391. Can be removed as soon as T28524 is solved
-    //and the new MultiLabelSegmentation class is in place, this
-    //check can be removed, as Segmentation won't be confused with
-    //simple images anymore.
+    //and the new MultiLabelSegmentation class is in place, as
+    //segmentations won't be confused with simple images anymore.
     std::string className = this->GetInput()->GetNameOfClass();
     if (className == "LabelSetImage")
     {

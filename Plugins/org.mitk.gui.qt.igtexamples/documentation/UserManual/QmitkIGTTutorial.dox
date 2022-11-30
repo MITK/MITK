@@ -31,8 +31,6 @@ First of all, you will have to add an IGT dependency to your cmake list. For thi
     )
 \endcode
 
-More information on how to create your own plugin can be found here: \ref NewPluginPage
-
 When clicking the start button, a cone should move in the 3D view and stop after clicking the stop button.
 
 The view has several fuctions. Most of them deal with the basic functionality with the plugin (e.g. CreateQTPartControl or CreateConnections). For a deeper understanding, you might have a look at the files QmitkIGTTutorialView.cpp and QmitkIGTTutorialView.h

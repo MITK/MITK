@@ -4,11 +4,6 @@ set(MITK_EXPORTS_FILE_INCLUDED 1)
 
 if(MITK_USE_Qt5)
 
-  #[[ See T27701
-  if(MITK_USE_CTK)
-    add_subdirectory(PluginGenerator)
-  endif()]]
-
   if(MITK_USE_BLUEBERRY)
 
     foreach(MITK_EXTENSION_DIR ${MITK_DIR_PLUS_EXTENSION_DIRS})

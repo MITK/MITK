@@ -26,8 +26,6 @@ The next smallest unit is a CTK Plug-in (the term \e Bundle is used interchangea
 
 A plugin usually represents a solution to a specific problem, such as segmentation or data management. As such they may provide any number of views and other contributions to the MITK application framework.
 
-If you want to create your own MITK plugin you find further information \ref NewPluginPage "here".
-
 \subsection ModularizationPagePerspectives Perspectives
 
 Perspectives represent a configuration for the MITK application framework (specifically, for the \e Workbench) needed for a specific workflow. They allow the arrangement of different views (contributed by different plug-ins) to reflect the usage scenario, such as a data loading view in the top right, a segmentation view to the right and a visualization view to the bottom right. A perspective is provided by arbitrary plug-ins as an extension (contribution) to the application framework.
@@ -38,7 +36,4 @@ A specific selection of plug-ins together with custom configuration data defines
 
 Example applications can be found in the MITK/Applications directory.
 
-\section ModularizationPageHowTo How to create your own application
-
-It is suggested to use the project generator provided by MITK unless one knows what one is doing. See \ref NewPluginWithProject "here" for more information.
 */

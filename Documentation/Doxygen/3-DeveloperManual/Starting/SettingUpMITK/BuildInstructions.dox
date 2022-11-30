@@ -158,10 +158,6 @@ You can build this to generate the HTML documentation of MITK in the
 Documentation/Doxygen directory of your MITK-build binary tree or in the
 <tt>MITK_DOXYGEN_OUTPUT_DIR</tt> CMake variable (if specified).
 
-\section BuildInstructions_Extending Extend MITK on your own (using the application framework BlueBerry)
-
-Please see \ref NewPluginPage
-
 \section BuildInstructions_As_Toolkit Use MITK in your own project (as a toolkit)
 
 To use MITK in your external project, add the CMake command

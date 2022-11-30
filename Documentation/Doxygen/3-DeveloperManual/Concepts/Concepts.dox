@@ -28,5 +28,4 @@ The following items describe some issues about MITK on a more abstract level.
 -# \subpage ExceptionPage
 -# \subpage ModularizationPage "Modularization Concept"
  -# \ref ModularizationPageOverview
- -# \ref ModularizationPageHowTo
 */

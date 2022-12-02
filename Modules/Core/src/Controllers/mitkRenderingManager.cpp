@@ -342,6 +342,12 @@ namespace mitk
       mitkReThrow(exception);
     }
 
+    if (boundingBoxInitialized)
+    {
+      this->GetTimeNavigationController()->SetInputWorldTimeGeometry(modifiedGeometry);
+    }
+    this->GetTimeNavigationController()->Update();
+
     RenderWindowVector allRenderWindows = this->GetAllRegisteredRenderWindows();
     RenderWindowVector::const_iterator it;
     for (it = allRenderWindows.cbegin(); it != allRenderWindows.cend(); ++it)
@@ -357,12 +363,6 @@ namespace mitk
         this->InternalViewInitialization(baseRenderer, modifiedGeometry, boundingBoxInitialized, id, resetCamera);
       }
     }
-
-    if (boundingBoxInitialized)
-    {
-      this->GetTimeNavigationController()->SetInputWorldTimeGeometry(modifiedGeometry);
-    }
-    this->GetTimeNavigationController()->Update();
 
     this->RequestUpdateAll(type);
 
@@ -417,18 +417,17 @@ namespace mitk
       mitkReThrow(exception);
     }
 
+    if (boundingBoxInitialized)
+    {
+      this->GetTimeNavigationController()->SetInputWorldTimeGeometry(modifiedGeometry);
+    }
+    this->GetTimeNavigationController()->Update();
+
     BaseRenderer* baseRenderer = BaseRenderer::GetInstance(renderWindow);
     baseRenderer->SetConstrainZoomingAndPanning(this->GetConstrainedPanningZooming());
 
     int id = baseRenderer->GetMapperID();
     this->InternalViewInitialization(baseRenderer, modifiedGeometry, boundingBoxInitialized, id, resetCamera);
-
-    if (boundingBoxInitialized)
-    {
-      this->GetTimeNavigationController()->SetInputWorldTimeGeometry(modifiedGeometry);
-    }
-
-    this->GetTimeNavigationController()->Update();
 
     this->RequestUpdate(renderWindow);
 

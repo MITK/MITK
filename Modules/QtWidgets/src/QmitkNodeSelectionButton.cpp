@@ -22,12 +22,9 @@ found in the LICENSE file.
 // mitk qt widgets module
 #include <QmitkNodeDescriptorManager.h>
 
-// berry includes
-#include <berryWorkbenchPlugin.h>
-#include <berryQtStyleManager.h>
-
 #include <vtkLookupTable.h>
 
+#include <QApplication>
 #include <QEvent>
 #include <QPainter>
 #include <QTextDocument>
@@ -184,21 +181,13 @@ void QmitkNodeSelectionButton::SetNodeInfo(QString info)
 
 void QmitkNodeSelectionButton::paintEvent(QPaintEvent *p)
 {
-  QString stylesheet;
-
-  ctkPluginContext* context = berry::WorkbenchPlugin::GetDefault()->GetPluginContext();
-  ctkServiceReference styleManagerRef = context->getServiceReference<berry::IQtStyleManager>();
-  if (styleManagerRef)
-  {
-    auto styleManager = context->getService<berry::IQtStyleManager>(styleManagerRef);
-    stylesheet = styleManager->GetStylesheet();
-  }
-
   QPushButton::paintEvent(p);
+
+  auto styleSheet = qApp->styleSheet();
 
   QPainter painter(this);
   QTextDocument td(this);
-  td.setDefaultStyleSheet(stylesheet);
+  td.setDefaultStyleSheet(styleSheet);
 
   auto widgetSize = this->size();
   QPoint origin = QPoint(5, 5);

@@ -12,15 +12,14 @@ found in the LICENSE file.
 
 #include "QmitkSingleNodeSelectionWidget.h"
 
-#include <berryQtStyleManager.h>
+#include <mitkNodePredicateFunction.h>
+#include <mitkNodePredicateAnd.h>
 
-#include "mitkNodePredicateFunction.h"
-#include "mitkNodePredicateAnd.h"
+#include <QmitkNodeSelectionDialog.h>
+#include <QmitkNodeDetailsDialog.h>
+#include <QmitkStyleManager.h>
 
 #include <QMouseEvent>
-
-#include "QmitkNodeSelectionDialog.h"
-#include "QmitkNodeDetailsDialog.h"
 
 QmitkSingleNodeSelectionWidget::QmitkSingleNodeSelectionWidget(QWidget* parent)
   : QmitkAbstractNodeSelectionWidget(parent)
@@ -32,7 +31,7 @@ QmitkSingleNodeSelectionWidget::QmitkSingleNodeSelectionWidget(QWidget* parent)
   m_Controls.btnSelect->setVisible(true);
   m_Controls.btnClear->setVisible(false);
 
-  m_Controls.btnClear->setIcon(berry::QtStyleManager::ThemeIcon(QStringLiteral(":/org.mitk.gui.qt.common/times.svg")));
+  m_Controls.btnClear->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/times.svg")));
 
   this->UpdateInfo();
 

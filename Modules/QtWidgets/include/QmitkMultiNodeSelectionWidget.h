@@ -13,17 +13,16 @@ found in the LICENSE file.
 #ifndef QMITK_MULTI_NODE_SELECTION_WIDGET_H
 #define QMITK_MULTI_NODE_SELECTION_WIDGET_H
 
+#include <MitkQtWidgetsExports.h>
+
+#include "ui_QmitkMultiNodeSelectionWidget.h"
+
 #include <mitkDataStorage.h>
 #include <mitkWeakPointer.h>
 #include <mitkNodePredicateBase.h>
 
-#include "QmitkSimpleTextOverlayWidget.h"
-
-#include "org_mitk_gui_qt_common_Export.h"
-
-#include "ui_QmitkMultiNodeSelectionWidget.h"
-
 #include <QmitkAbstractNodeSelectionWidget.h>
+#include <QmitkSimpleTextOverlayWidget.h>
 
 class QmitkAbstractDataStorageModel;
 
@@ -31,7 +30,7 @@ class QmitkAbstractDataStorageModel;
 * @class QmitkMultiNodeSelectionWidget
 * @brief Widget that allows to perform and represents a multiple node selection.
 */
-class MITK_QT_COMMON QmitkMultiNodeSelectionWidget : public QmitkAbstractNodeSelectionWidget
+class MITKQTWIDGETS_EXPORT QmitkMultiNodeSelectionWidget : public QmitkAbstractNodeSelectionWidget
 {
   Q_OBJECT
 

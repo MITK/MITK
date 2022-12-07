@@ -5,3 +5,4 @@ See [Font Awsome 4] in Licenses/ICONS.md for:
 - favorite_add.svg based on Font Awsome's star-solid.svg
 - favorite_remove.svg based on Font Awsome's star-solid.svg
 - hourglass-half-solid.svg based on Font Awsome's hourglass-half-solid.svg
+- times.svg

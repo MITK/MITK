@@ -12,12 +12,15 @@ found in the LICENSE file.
 
 #include "QmitkNodeSelectionDialog.h"
 
-#include <berryQtStyleManager.h>
+#include <QmitkStyleManager.h>
 
 #include <mitkDataStorageInspectorGenerator.h>
 #include <QmitkNodeSelectionPreferenceHelper.h>
 #include <QmitkDataStorageSelectionHistoryInspector.h>
 #include <QmitkDataStorageFavoriteNodesInspector.h>
+
+#include <string>
+#include <map>
 
 QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString title, QString hint)
   : QDialog(parent)
@@ -99,7 +102,7 @@ QmitkNodeSelectionDialog::QmitkNodeSelectionDialog(QWidget* parent, QString titl
 
   this->SetErrorText("");
 
-  m_Controls.btnAddToFav->setIcon(berry::QtStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/favorite_add.svg")));
+  m_Controls.btnAddToFav->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/favorite_add.svg")));
 
   connect(m_Controls.btnAddToFav, &QPushButton::clicked, this, &QmitkNodeSelectionDialog::OnFavoriteNodesButtonClicked);
   connect(m_Controls.buttonBox, &QDialogButtonBox::accepted, this, &QmitkNodeSelectionDialog::OnOK);

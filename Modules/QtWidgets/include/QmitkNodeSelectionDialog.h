@@ -13,7 +13,7 @@ found in the LICENSE file.
 #ifndef QMITK_NODE_SELECTION_DIALOG_H
 #define QMITK_NODE_SELECTION_DIALOG_H
 
-#include "org_mitk_gui_qt_common_Export.h"
+#include <MitkQtWidgetsExports.h>
 
 #include "ui_QmitkNodeSelectionDialog.h"
 
@@ -32,7 +32,7 @@ found in the LICENSE file.
 * @brief A customized QDialog that displays different data storage inspectors and allows to
 *        set and get a current selection by selecting data nodes in the data storage inspectors.
 */
-class MITK_QT_COMMON QmitkNodeSelectionDialog : public QDialog
+class MITKQTWIDGETS_EXPORT QmitkNodeSelectionDialog : public QDialog
 {
   Q_OBJECT
 

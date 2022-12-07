@@ -13,11 +13,10 @@ found in the LICENSE file.
 
 #include "QmitkNodeSelectionListItemWidget.h"
 
-#include <berryQtStyleManager.h>
+#include <QmitkNodeDetailsDialog.h>
+#include <QmitkStyleManager.h>
 
 #include <QMouseEvent>
-
-#include "QmitkNodeDetailsDialog.h"
 
 QmitkNodeSelectionListItemWidget::QmitkNodeSelectionListItemWidget(QWidget *parent)
   : QWidget(parent)
@@ -29,7 +28,7 @@ QmitkNodeSelectionListItemWidget::QmitkNodeSelectionListItemWidget(QWidget *pare
   m_Controls.btnSelect->SetNodeInfo("No valid selection");
   m_Controls.btnClear->setVisible(false);
 
-  m_Controls.btnClear->setIcon(berry::QtStyleManager::ThemeIcon(QStringLiteral(":/org.mitk.gui.qt.common/times.svg")));
+  m_Controls.btnClear->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/times.svg")));
 
   connect(m_Controls.btnClear, SIGNAL(clicked(bool)), this, SLOT(OnClearSelection()));
 }

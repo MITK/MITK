@@ -13,13 +13,13 @@ found in the LICENSE file.
 #ifndef QMITK_SINGLE_NODE_SELECTION_WIDGET_H
 #define QMITK_SINGLE_NODE_SELECTION_WIDGET_H
 
+#include <MitkQtWidgetsExports.h>
+
+#include "ui_QmitkSingleNodeSelectionWidget.h"
+
 #include <mitkDataStorage.h>
 #include <mitkWeakPointer.h>
 #include <mitkNodePredicateBase.h>
-
-#include "org_mitk_gui_qt_common_Export.h"
-
-#include "ui_QmitkSingleNodeSelectionWidget.h"
 
 #include <QmitkAbstractNodeSelectionWidget.h>
 #include <QmitkNodeSelectionButton.h>
@@ -37,7 +37,7 @@ class QmitkAbstractDataStorageModel;
 *         'CurrentSelectionChanged', which will be emitted by this function, is already
 *         connected to a receiving slot, if the initial valid auto selection should not get lost.
 */
-class MITK_QT_COMMON QmitkSingleNodeSelectionWidget : public QmitkAbstractNodeSelectionWidget
+class MITKQTWIDGETS_EXPORT QmitkSingleNodeSelectionWidget : public QmitkAbstractNodeSelectionWidget
 {
   Q_OBJECT
 

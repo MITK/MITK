@@ -26,9 +26,16 @@ set(CPP_FILES
   QmitkLineEditLevelWindowWidget.cpp
   QmitkMemoryUsageIndicatorView.cpp
   QmitkMimeTypes.cpp
+  QmitkMultiNodeSelectionWidget.cpp
   QmitkMultiWidgetConfigurationToolBar.cpp
   QmitkMultiWidgetLayoutManager.cpp
   QmitkMultiWidgetLayoutSelectionWidget.cpp
+  QmitkNodeDescriptor.cpp
+  QmitkNodeSelectionButton.cpp
+  QmitkNodeSelectionConstants.cpp
+  QmitkNodeSelectionDialog.cpp
+  QmitkNodeSelectionListItemWidget.cpp
+  QmitkNodeSelectionPreferenceHelper.cpp
   QmitkNodeDescriptor.cpp
   QmitkColoredNodeDescriptor.cpp
   QmitkNodeDescriptorManager.cpp
@@ -49,6 +56,7 @@ set(CPP_FILES
   mitkRenderWindowLayerUtilities.cpp
   mitkRenderWindowViewDirectionController.cpp
   QmitkServiceListWidget.cpp
+  QmitkSingleNodeSelectionWidget.cpp
   QmitkSliceNavigationWidget.cpp
   QmitkSliderLevelWindowWidget.cpp
   QmitkStdMultiWidget.cpp
@@ -94,10 +102,14 @@ set(MOC_H_FILES
   include/QmitkLevelWindowWidget.h
   include/QmitkLineEditLevelWindowWidget.h
   include/QmitkMemoryUsageIndicatorView.h
+  include/QmitkMultiNodeSelectionWidget.h
   include/QmitkMultiWidgetConfigurationToolBar.h
   include/QmitkMultiWidgetLayoutManager.h
   include/QmitkMultiWidgetLayoutSelectionWidget.h
   include/QmitkNodeDescriptor.h
+  include/QmitkNodeSelectionButton.h
+  include/QmitkNodeSelectionDialog.h
+  include/QmitkNodeSelectionListItemWidget.h
   include/QmitkColoredNodeDescriptor.h
   include/QmitkNodeDescriptorManager.h
   include/QmitkProgressBar.h
@@ -114,6 +126,7 @@ set(MOC_H_FILES
   include/mitkRenderWindowLayerUtilities.h
   include/mitkRenderWindowViewDirectionController.h
   include/QmitkServiceListWidget.h
+  include/QmitkSingleNodeSelectionWidget.h
   include/QmitkSliceNavigationWidget.h
   include/QmitkSliderLevelWindowWidget.h
   include/QmitkStdMultiWidget.h
@@ -141,9 +154,13 @@ set(UI_FILES
   src/QmitkLevelWindowWidget.ui
   src/QmitkLevelWindowRangeChange.ui
   src/QmitkMemoryUsageIndicator.ui
+  src/QmitkMultiNodeSelectionWidget.ui
   src/QmitkMultiWidgetLayoutSelectionWidget.ui
+  src/QmitkNodeSelectionDialog.ui
+  src/QmitkNodeSelectionListItemWidget.ui
   src/QmitkRenderWindowContextDataStorageInspector.ui
   src/QmitkServiceListWidgetControls.ui
+  src/QmitkSingleNodeSelectionWidget.ui
   src/QmitkSliceNavigationWidget.ui
   src/QmitkDataStorageListInspector.ui
   src/QmitkDataStorageTreeInspector.ui

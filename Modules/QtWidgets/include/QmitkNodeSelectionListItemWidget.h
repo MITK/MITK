@@ -14,15 +14,15 @@ found in the LICENSE file.
 #ifndef QMITK_NODE_SELECTION_LIST_ITEM_WIDGET_H
 #define QMITK_NODE_SELECTION_LIST_ITEM_WIDGET_H
 
+#include <MitkQtWidgetsExports.h>
+
+#include "ui_QmitkNodeSelectionListItemWidget.h"
+
 #include <QWidget>
 
 #include <mitkDataNode.h>
 
-#include "ui_QmitkNodeSelectionListItemWidget.h"
-
-#include "org_mitk_gui_qt_common_Export.h"
-
-class MITK_QT_COMMON QmitkNodeSelectionListItemWidget : public QWidget
+class MITKQTWIDGETS_EXPORT QmitkNodeSelectionListItemWidget : public QWidget
 {
   Q_OBJECT
 

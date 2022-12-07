@@ -14,9 +14,9 @@ found in the LICENSE file.
 
 #include <algorithm>
 
-#include "QmitkNodeSelectionDialog.h"
-#include "QmitkCustomVariants.h"
-#include "internal/QmitkNodeSelectionListItemWidget.h"
+#include <QmitkCustomVariants.h>
+#include <QmitkNodeSelectionDialog.h>
+#include <QmitkNodeSelectionListItemWidget.h>
 
 QmitkMultiNodeSelectionWidget::QmitkMultiNodeSelectionWidget(QWidget* parent)
   : QmitkAbstractNodeSelectionWidget(parent)

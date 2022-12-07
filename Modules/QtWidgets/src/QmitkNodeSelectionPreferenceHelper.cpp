@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 #include "QmitkNodeSelectionPreferenceHelper.h"
 
-#include <internal/QmitkNodeSelectionConstants.h>
+#include <QmitkNodeSelectionConstants.h>
 
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>

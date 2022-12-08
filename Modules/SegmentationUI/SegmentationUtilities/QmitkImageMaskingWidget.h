@@ -15,12 +15,17 @@ found in the LICENSE file.
 
 #include <MitkSegmentationUIExports.h>
 
-#include "QmitkSegmentationUtilityWidget.h"
-#include <ui_QmitkImageMaskingWidgetControls.h>
-
+#include <mitkDataStorage.h>
 #include <mitkSurface.h>
+#include <QmitkSegmentationUtilityWidget.h>
 
-namespace mitk {
+namespace Ui
+{
+  class QmitkImageMaskingWidgetControls;
+}
+
+namespace mitk
+{
   class Image;
 }
 
@@ -73,7 +78,7 @@ private:
   void AddToDataStorage(mitk::DataStorage::Pointer dataStorage, itk::SmartPointer<mitk::Image> segmentation,
                         const std::string& name, mitk::DataNode::Pointer parent = nullptr);
 
-  Ui::QmitkImageMaskingWidgetControls m_Controls;
+  Ui::QmitkImageMaskingWidgetControls* m_Controls;
 };
 
 #endif

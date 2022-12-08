@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkSurfaceToImageWidget.h"
+#include <ui_QmitkSurfaceToImageWidgetControls.h>
 
 #include <mitkException.h>
 #include <mitkExceptionMacro.h>
@@ -28,22 +29,23 @@ static const char* const HelpText = "Select an image and a surface above";
 QmitkSurfaceToImageWidget::QmitkSurfaceToImageWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent)
   : QmitkSegmentationUtilityWidget(timeNavigationController, parent)
 {
-  m_Controls.setupUi(this);
+  m_Controls = new Ui::QmitkSurfaceToImageWidgetControls;
+  m_Controls->setupUi(this);
 
-  m_Controls.dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::ImageAndSegmentationPredicate);
-  m_Controls.dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::SurfacePredicate);
-  m_Controls.dataSelectionWidget->SetHelpText(HelpText);
+  m_Controls->dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::ImageAndSegmentationPredicate);
+  m_Controls->dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::SurfacePredicate);
+  m_Controls->dataSelectionWidget->SetHelpText(HelpText);
 
   this->EnableButtons(false);
 
-  connect (m_Controls.btnSurface2Image, SIGNAL(pressed()), this, SLOT(OnSurface2ImagePressed()));
-  connect(m_Controls.dataSelectionWidget, SIGNAL(SelectionChanged(unsigned int, const mitk::DataNode*)),
+  connect (m_Controls->btnSurface2Image, SIGNAL(pressed()), this, SLOT(OnSurface2ImagePressed()));
+  connect(m_Controls->dataSelectionWidget, SIGNAL(SelectionChanged(unsigned int, const mitk::DataNode*)),
     this, SLOT(OnSelectionChanged(unsigned int, const mitk::DataNode*)));
 
-  if( m_Controls.dataSelectionWidget->GetSelection(0).IsNotNull() &&
-    m_Controls.dataSelectionWidget->GetSelection(1).IsNotNull() )
+  if( m_Controls->dataSelectionWidget->GetSelection(0).IsNotNull() &&
+    m_Controls->dataSelectionWidget->GetSelection(1).IsNotNull() )
   {
-    this->OnSelectionChanged(0, m_Controls.dataSelectionWidget->GetSelection(0));
+    this->OnSelectionChanged(0, m_Controls->dataSelectionWidget->GetSelection(0));
   }
 }
 
@@ -53,12 +55,12 @@ QmitkSurfaceToImageWidget::~QmitkSurfaceToImageWidget()
 
 void QmitkSurfaceToImageWidget::EnableButtons(bool enable)
 {
-  m_Controls.btnSurface2Image->setEnabled(enable);
+  m_Controls->btnSurface2Image->setEnabled(enable);
 }
 
 void QmitkSurfaceToImageWidget::OnSelectionChanged(unsigned int, const mitk::DataNode*)
 {
-  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
+  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls->dataSelectionWidget;
   mitk::DataNode::Pointer imageNode = dataSelectionWidget->GetSelection(0);
   mitk::DataNode::Pointer surfaceNode = dataSelectionWidget->GetSelection(1);
 
@@ -88,7 +90,7 @@ void QmitkSurfaceToImageWidget::OnSurface2ImagePressed()
 {
   this->EnableButtons(false);
 
-  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
+  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls->dataSelectionWidget;
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( dataSelectionWidget->GetSelection(0)->GetData() );
   mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>( dataSelectionWidget->GetSelection(1)->GetData() );
 

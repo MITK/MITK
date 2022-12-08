@@ -15,10 +15,18 @@ found in the LICENSE file.
 
 #include <MitkSegmentationUIExports.h>
 
-#include "QmitkSegmentationUtilityWidget.h"
-#include <ui_QmitkSurfaceToImageWidgetControls.h>
+#include <QmitkSegmentationUtilityWidget.h>
 
-namespace mitk {
+#include "itkSmartPointer.h"
+
+namespace Ui
+{
+  class QmitkSurfaceToImageWidgetControls;
+}
+
+namespace mitk
+{
+  class DataNode;
   class Surface;
   class Image;
   class LabelSetImage;
@@ -60,7 +68,7 @@ private:
   /** @brief Convert a surface into an binary image. */
   itk::SmartPointer<mitk::LabelSetImage> ConvertSurfaceToImage( itk::SmartPointer<mitk::Image> image, itk::SmartPointer<mitk::Surface> surface );
 
-  Ui::QmitkSurfaceToImageWidgetControls m_Controls;
+  Ui::QmitkSurfaceToImageWidgetControls* m_Controls;
 };
 
 #endif

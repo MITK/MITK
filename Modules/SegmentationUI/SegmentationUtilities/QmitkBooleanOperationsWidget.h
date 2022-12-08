@@ -15,9 +15,18 @@ found in the LICENSE file.
 
 #include <MitkSegmentationUIExports.h>
 
-#include "QmitkSegmentationUtilityWidget.h"
-#include <ui_QmitkBooleanOperationsWidgetControls.h>
 #include <mitkBooleanOperation.h>
+#include <QmitkSegmentationUtilityWidget.h>
+
+namespace Ui
+{
+  class QmitkBooleanOperationsWidgetControls;
+}
+
+namespace mitk
+{
+  class DataNode;
+}
 
 class MITKSEGMENTATIONUI_EXPORT QmitkBooleanOperationsWidget : public QmitkSegmentationUtilityWidget
 {
@@ -37,7 +46,7 @@ private:
   void EnableButtons(bool enable = true);
   void DoBooleanOperation(mitk::BooleanOperation::Type type);
 
-  Ui::QmitkBooleanOperationsWidgetControls m_Controls;
+  Ui::QmitkBooleanOperationsWidgetControls* m_Controls;
 };
 
 #endif

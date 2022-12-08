@@ -15,9 +15,18 @@ found in the LICENSE file.
 
 #include <MitkSegmentationUIExports.h>
 
-#include "QmitkSegmentationUtilityWidget.h"
-#include <ui_QmitkMorphologicalOperationsWidgetControls.h>
 #include <mitkMorphologicalOperations.h>
+#include <QmitkSegmentationUtilityWidget.h>
+
+namespace Ui
+{
+  class QmitkMorphologicalOperationsWidgetControls;
+}
+
+namespace mitk
+{
+  class DataNode;
+}
 
 /** \brief GUI class for morphological segmentation tools.
  */
@@ -42,7 +51,7 @@ protected:
   void EnableButtons(bool enable);
 
 private:
-  Ui::QmitkMorphologicalOperationsWidgetControls m_Controls;
+  Ui::QmitkMorphologicalOperationsWidgetControls* m_Controls;
   mitk::MorphologicalOperations::StructuralElementType CreateStructerElement_UI();
 };
 

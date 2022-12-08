@@ -15,14 +15,15 @@ found in the LICENSE file.
 
 #include <MitkSegmentationUIExports.h>
 
-#include "QmitkSegmentationUtilityWidget.h"
-#include <ui_QmitkContourModelToImageWidgetControls.h>
+#include <QmitkSegmentationUtilityWidget.h>
 
 #include <QScopedPointer>
 
 class QmitkContourModelToImageWidgetPrivate;
 
-namespace mitk {
+namespace mitk
+{
+  class DataNode;
   class Image;
   class ContourModelSet;
   class ContourModel;

@@ -11,8 +11,9 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkContourModelToImageWidget.h"
-#include "mitkImage.h"
-#include "QmitkDataSelectionWidget.h"
+#include <ui_QmitkContourModelToImageWidgetControls.h>
+
+#include <mitkImage.h>
 
 #include <mitkContourModelSet.h>
 #include <mitkContourModelSetToImageFilter.h>

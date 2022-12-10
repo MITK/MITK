@@ -81,5 +81,7 @@ T->SetMatrix(TransformationR);
 MovingSurface->GetGeometry()->SetIndexToWorldTransform(T);
 MITK_INFO << "Performed ICP";
 MITK_INFO << "n:" << n;
+MITK_INFO << "R:" << TransformationR;
+MITK_INFO << "T:" << TransformationT;
 MITK_INFO << "Message:" << ErrorMessage;
 }

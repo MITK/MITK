@@ -95,7 +95,8 @@ bool mitk::StandardICPPointRegister::StandardICPPointRegisterAlgorithm(  vtkSmar
   TransformationT[1] = m->GetElement(1,3);
   TransformationT[2] = m->GetElement(2,3);
   n = icp->GetNumberOfIterations();
-  ErrorMessage = "Registraition succeeded";
+  //vtkIterativeClosestPointTransform does not compute FRE, needs to be computed separately
+  ErrorMessage = "Registration succeeded";
   return true;
   }
 

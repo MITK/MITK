@@ -5,6 +5,7 @@ set(SRC_CPP_FILES
 set(INTERNAL_CPP_FILES
   org_mitk_example_gui_icpregistration_Activator.cpp
   IterativeClosestPointRegistration.cpp
+  mitkStandardICPPointRegister.cpp
 )
 
 set(UI_FILES
@@ -14,6 +15,7 @@ set(UI_FILES
 set(MOC_H_FILES
   src/internal/org_mitk_example_gui_icpregistration_Activator.h
   src/internal/IterativeClosestPointRegistration.h
+  src/internal/mitkStandardICPPointRegister.h
 )
 
 # list of resource files which can be used by the plug-in

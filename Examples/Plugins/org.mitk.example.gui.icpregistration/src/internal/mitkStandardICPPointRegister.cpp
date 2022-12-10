@@ -32,59 +32,13 @@ bool mitk::StandardICPPointRegister::StandardICPPointRegisterAlgorithm(  mitk::P
                                                     int max_iterations
                                                     )
   {
-  //################# clean up return variables at first ####################
-  TransformationR = itk::Matrix<double,3,3>(); TransformationR.Fill(0);
-  TransformationR[0][0] = 1; TransformationR[1][1] = 1; TransformationR[2][2] = 1;
-  TransformationT = itk::Vector<double,3>(); TransformationT.Fill(0);
-  n = 0;
-  FRE = 0;
-  ErrorMessage = "";
-
-  //################# check for right input #################################
-  if (MovingSet.IsNull() || StaticSet.IsNull())
-    {
-    ErrorMessage = "Error, at least one input value is missing";
-    return false;
-    }
-  else if (MovingSet->GetSize()>StaticSet->GetSize())
-    {
-    ErrorMessage = "Error, static set is smaller than moving set.";
-    return false;
-    }
-
   //##################### convert input data ################################
   //convert source points (= moving points) to vtkPolyData:
   vtkSmartPointer<vtkPolyData> source = convertPointSetToVtkPolyData(MovingSet);
   //convert target points (= static points) to vtkPolyData:
   vtkSmartPointer<vtkPolyData> target = convertPointSetToVtkPolyData(StaticSet);
 
-  //##################### setup ICP transform ###############################
-  vtkSmartPointer<vtkIterativeClosestPointTransform> icp = vtkSmartPointer<vtkIterativeClosestPointTransform>::New();
-  icp->SetMaximumMeanDistance(Threshold);
-  icp->SetSource(source);
-  icp->SetTarget(target);
-  icp->GetLandmarkTransform()->SetModeToRigidBody();
-  icp->SetMaximumNumberOfIterations(max_iterations);
-  icp->Modified();
-  icp->Update();
-
-  //##################### get results #######################################
-  vtkSmartPointer<vtkMatrix4x4> m = icp->GetMatrix();
-  TransformationR[0][0] = m->GetElement(0,0);
-  TransformationR[0][1] = m->GetElement(0,1);
-  TransformationR[0][2] = m->GetElement(0,2);
-  TransformationR[1][0] = m->GetElement(1,0);
-  TransformationR[1][1] = m->GetElement(1,1);
-  TransformationR[1][2] = m->GetElement(1,2);
-  TransformationR[2][0] = m->GetElement(2,0);
-  TransformationR[2][1] = m->GetElement(2,1);
-  TransformationR[2][2] = m->GetElement(2,2);
-  TransformationT[0] = m->GetElement(0,3);
-  TransformationT[1] = m->GetElement(1,3);
-  TransformationT[2] = m->GetElement(2,3);
-  n = icp->GetNumberOfIterations();
-
-  return true;
+  return StandardICPPointRegisterAlgorithm(source,target,Threshold,TransformationR,TransformationT,FRE,n,ErrorMessage,max_iterations);
   }
 
 bool mitk::StandardICPPointRegister::StandardICPPointRegisterAlgorithm(  vtkSmartPointer<vtkPolyData> MovingSurface,

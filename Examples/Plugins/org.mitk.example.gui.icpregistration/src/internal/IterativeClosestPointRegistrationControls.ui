@@ -21,22 +21,29 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="labelWarning">
-     <property name="styleSheet">
-      <string notr="true">QLabel { color: rgb(255, 0, 0) }</string>
-     </property>
+    <widget class="QLabel" name="label">
      <property name="text">
-      <string>Please select an image!</string>
+      <string>Select fixed surface:</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="buttonPerformImageProcessing">
-     <property name="toolTip">
-      <string>Do image processing</string>
-     </property>
+    <widget class="QmitkDataStorageComboBox" name="m_comboBoxFixedSurface"/>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>Do Something</string>
+      <string>Select moving surface:</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QmitkDataStorageComboBox" name="m_comboBoxMovingSurface"/>
+   </item>
+   <item>
+    <widget class="QPushButton" name="m_performICP">
+     <property name="text">
+      <string>Peform ICP</string>
      </property>
     </widget>
    </item>
@@ -59,6 +66,13 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkDataStorageComboBox</class>
+   <extends>QComboBox</extends>
+   <header>QmitkDataStorageComboBox.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -51,7 +51,7 @@ protected:
                                   const QList<mitk::DataNode::Pointer> &nodes) override;
 
   /// \brief Called when the user clicks the GUI button
-  void DoImageProcessing();
+  void PerformICP();
 
   Ui::IterativeClosestPointRegistrationControls m_Controls;
 };

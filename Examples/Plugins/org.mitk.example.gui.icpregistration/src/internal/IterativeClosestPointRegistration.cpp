@@ -28,6 +28,9 @@ See LICENSE.txt or http://www.mitk.org for details.
 // Mitk
 #include <mitkImage.h>
 #include <mitkNodePredicateDataType.h>
+#include <mitkSurface.h>
+#include <mitkPointSet.h>
+#include "mitkStandardICPPointRegister.h"
 
 const std::string IterativeClosestPointRegistration::VIEW_ID = "org.mitk.views.iterativeclosestpointregistration";
 
@@ -58,5 +61,25 @@ void IterativeClosestPointRegistration::OnSelectionChanged(berry::IWorkbenchPart
 
 void IterativeClosestPointRegistration::PerformICP()
 {
-MITK_INFO << "Perform ICP";
+mitk::Surface::Pointer MovingSurface = dynamic_cast<mitk::Surface*>(m_Controls.m_comboBoxMovingSurface->GetSelectedNode()->GetData());
+mitk::Surface::Pointer FixedSurface = dynamic_cast<mitk::Surface*>(m_Controls.m_comboBoxFixedSurface->GetSelectedNode()->GetData());
+double Threshold = 0.0001;
+itk::Matrix<double,3,3> TransformationR;
+itk::Vector<double,3> TransformationT;
+double FRE;
+int n;
+std::string ErrorMessage;
+mitk::StandardICPPointRegister::StandardICPPointRegisterAlgorithm(MovingSurface->GetVtkPolyData(),
+                                                                  FixedSurface->GetVtkPolyData(),
+                                                                  Threshold,
+                                                                  TransformationR,
+                                                                  TransformationT,
+                                                                  FRE, n, ErrorMessage);
+mitk::AffineTransform3D::Pointer T = mitk::AffineTransform3D::New();
+T->SetTranslation(TransformationT);
+T->SetMatrix(TransformationR);
+MovingSurface->GetGeometry()->SetIndexToWorldTransform(T);
+MITK_INFO << "Performed ICP";
+MITK_INFO << "n:" << n;
+MITK_INFO << "Message:" << ErrorMessage;
 }

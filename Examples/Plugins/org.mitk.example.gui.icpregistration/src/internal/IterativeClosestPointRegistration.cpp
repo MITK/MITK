@@ -63,7 +63,8 @@ void IterativeClosestPointRegistration::PerformICP()
 {
 mitk::Surface::Pointer MovingSurface = dynamic_cast<mitk::Surface*>(m_Controls.m_comboBoxMovingSurface->GetSelectedNode()->GetData());
 mitk::Surface::Pointer FixedSurface = dynamic_cast<mitk::Surface*>(m_Controls.m_comboBoxFixedSurface->GetSelectedNode()->GetData());
-double Threshold = 0.0001;
+double Threshold = m_Controls.m_threshold->value();
+int maxIterations = m_Controls.m_maxIterations->value();
 itk::Matrix<double,3,3> TransformationR;
 itk::Vector<double,3> TransformationT;
 double FRE;
@@ -74,7 +75,7 @@ mitk::StandardICPPointRegister::StandardICPPointRegisterAlgorithm(MovingSurface-
                                                                   Threshold,
                                                                   TransformationR,
                                                                   TransformationT,
-                                                                  FRE, n, ErrorMessage);
+                                                                  FRE, n, ErrorMessage,maxIterations);
 mitk::AffineTransform3D::Pointer T = mitk::AffineTransform3D::New();
 T->SetTranslation(TransformationT);
 T->SetMatrix(TransformationR);

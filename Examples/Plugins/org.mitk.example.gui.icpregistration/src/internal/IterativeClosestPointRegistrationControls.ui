@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>222</width>
-    <height>161</height>
+    <height>408</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -39,6 +39,54 @@
    </item>
    <item>
     <widget class="QmitkDataStorageComboBox" name="m_comboBoxMovingSurface"/>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Threshold:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDoubleSpinBox" name="m_threshold">
+       <property name="decimals">
+        <number>5</number>
+       </property>
+       <property name="singleStep">
+        <double>0.000100000000000</double>
+       </property>
+       <property name="value">
+        <double>0.000100000000000</double>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Max iterations:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="m_maxIterations">
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>99999999</number>
+       </property>
+       <property name="value">
+        <number>100</number>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QPushButton" name="m_performICP">

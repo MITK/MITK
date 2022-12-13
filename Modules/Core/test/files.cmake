@@ -121,6 +121,7 @@ set(MODULE_TESTS
   mitkGenericIDRelationRuleTest.cpp
   mitkSourceImageRelationRuleTest.cpp
   mitkTemporalJoinImagesFilterTest.cpp
+  mitkPreferencesTest.cpp
 )
 
 set(MODULE_RENDERING_TESTS

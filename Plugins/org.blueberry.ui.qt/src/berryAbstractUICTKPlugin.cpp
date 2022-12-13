@@ -17,13 +17,19 @@ found in the LICENSE file.
 
 #include "berryQtStyleManager.h"
 #include "berryPlatformUI.h"
-#include "berryIPreferencesService.h"
-#include "berryIPreferences.h"
 
 #include <QApplication>
 #include <QIcon>
 #include <QImage>
 #include <QString>
+
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
+
+#include <usModuleInitialization.h>
+
+US_INITIALIZE_MODULE
 
 namespace berry
 {
@@ -31,7 +37,6 @@ namespace berry
 const QString AbstractUICTKPlugin::FN_DIALOG_SETTINGS = "dialog_settings.xml";
 
 AbstractUICTKPlugin::AbstractUICTKPlugin()
-  : preferencesService(nullptr)
 {
 }
 
@@ -52,27 +57,14 @@ AbstractUICTKPlugin::AbstractUICTKPlugin()
 //    }
 
 
-IPreferencesService* AbstractUICTKPlugin::GetPreferencesService() const
+mitk::IPreferencesService* AbstractUICTKPlugin::GetPreferencesService() const
 {
-  // Create the preference store lazily.
-  if (preferencesService == nullptr)
-  {
-    ctkServiceReference serviceRef = m_Context->getServiceReference<IPreferencesService>();
-    if (!serviceRef)
-    {
-      BERRY_ERROR << "Preferences service not available";
-    }
-    preferencesService = m_Context->getService<IPreferencesService>(serviceRef);
-  }
-  return preferencesService;
+  return mitk::CoreServices::GetPreferencesService();
 }
 
-SmartPointer<IPreferences> AbstractUICTKPlugin::GetPreferences() const
+mitk::IPreferences* AbstractUICTKPlugin::GetPreferences() const
 {
-  IPreferencesService* prefService = this->GetPreferencesService();
-  if (prefService == nullptr) return IPreferences::Pointer(nullptr);
-
-  return prefService->GetSystemPreferences();
+  return this->GetPreferencesService()->GetSystemPreferences();
 }
 
 IWorkbench* AbstractUICTKPlugin::GetWorkbench()

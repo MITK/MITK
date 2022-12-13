@@ -24,7 +24,6 @@ found in the LICENSE file.
 #include "berryPlatform.h"
 #include "berryInternalPlatform.h"
 #include "berryErrorApplication.h"
-#include "berryPreferencesService.h"
 #include "berryExtensionRegistry.h"
 #include "berryRegistryConstants.h"
 #include "berryRegistryProperties.h"
@@ -53,9 +52,6 @@ void org_blueberry_core_runtime_Activator::start(ctkPluginContext* context)
   //ProcessCommandLine();
   this->startRegistry();
 
-  preferencesService.reset(new PreferencesService(context->getDataFile("").absolutePath()));
-  prefServiceReg = context->registerService<IPreferencesService>(preferencesService.data());
-
 //  // register a listener to catch new plugin installations/resolutions.
 //  pluginListener.reset(new CTKPluginListener(m_ExtensionPointService));
 //  context->connectPluginListener(pluginListener.data(), SLOT(pluginChanged(ctkPluginEvent)), Qt::DirectConnection);
@@ -81,11 +77,6 @@ void org_blueberry_core_runtime_Activator::stop(ctkPluginContext* context)
   //pluginListener.reset();
 
   //Platform::GetServiceRegistry().UnRegisterService(IExtensionPointService::SERVICE_ID);
-
-  prefServiceReg.unregister();
-  preferencesService->ShutDown();
-  preferencesService.reset();
-  prefServiceReg = 0;
 
   this->stopRegistry();
   RegistryProperties::SetContext(nullptr);

@@ -15,8 +15,9 @@ found in the LICENSE file.
 
 #include "mitkRTUIConstants.h"
 
-#include <berryIPreferencesService.h>
-#include <berryPlatform.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 //-----------------------------------------------------------------------------
 RTUIPreferencePage::RTUIPreferencePage()
@@ -43,9 +44,9 @@ void RTUIPreferencePage::Init(berry::IWorkbench::Pointer )
 //-----------------------------------------------------------------------------
 void RTUIPreferencePage::CreateQtControl(QWidget* parent)
 {
-  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+  auto* prefService = mitk::CoreServices::GetPreferencesService();
 
-  m_PreferencesNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_PREFERENCE_NODE_ID.c_str());
+  m_PreferencesNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_PREFERENCE_NODE_ID);
 
   m_MainControl = new QWidget(parent);
   m_Controls = new Ui::RTUIPreferencePageControls;
@@ -68,15 +69,15 @@ QWidget* RTUIPreferencePage::GetQtControl() const
 bool RTUIPreferencePage::PerformOk()
 {
   bool useAsDefaultValue =  m_Controls->radioDefault->isChecked();
-  m_PreferencesNode->PutBool(mitk::RTUIConstants::UNKNOWN_PRESCRIBED_DOSE_HANDLING_AS_DEFAULT_ID.c_str(),useAsDefaultValue);
+  m_PreferencesNode->PutBool(mitk::RTUIConstants::UNKNOWN_PRESCRIBED_DOSE_HANDLING_AS_DEFAULT_ID, useAsDefaultValue);
 
   if (useAsDefaultValue)
   {
-    m_PreferencesNode->PutDouble(mitk::RTUIConstants::UNKNOWN_PRESCRIBED_DOSE_HANDLING_VALUE_ID.c_str(), m_Controls->spinDefault->value());
+    m_PreferencesNode->PutDouble(mitk::RTUIConstants::UNKNOWN_PRESCRIBED_DOSE_HANDLING_VALUE_ID, m_Controls->spinDefault->value());
   }
   else
   {
-    m_PreferencesNode->PutDouble(mitk::RTUIConstants::UNKNOWN_PRESCRIBED_DOSE_HANDLING_VALUE_ID.c_str(), m_Controls->spinRelativeToMax->value()/100.0);
+    m_PreferencesNode->PutDouble(mitk::RTUIConstants::UNKNOWN_PRESCRIBED_DOSE_HANDLING_VALUE_ID, m_Controls->spinRelativeToMax->value()/100.0);
   }
 
   return true;
@@ -92,8 +93,8 @@ void RTUIPreferencePage::PerformCancel()
 //-----------------------------------------------------------------------------
 void RTUIPreferencePage::Update()
 {
-  bool useAsDefaultValue = m_PreferencesNode->GetBool(mitk::RTUIConstants::UNKNOWN_PRESCRIBED_DOSE_HANDLING_AS_DEFAULT_ID.c_str(), true);
-  double doseValue = m_PreferencesNode->GetDouble(mitk::RTUIConstants::UNKNOWN_PRESCRIBED_DOSE_HANDLING_VALUE_ID.c_str(), 50.0);
+  bool useAsDefaultValue = m_PreferencesNode->GetBool(mitk::RTUIConstants::UNKNOWN_PRESCRIBED_DOSE_HANDLING_AS_DEFAULT_ID, true);
+  double doseValue = m_PreferencesNode->GetDouble(mitk::RTUIConstants::UNKNOWN_PRESCRIBED_DOSE_HANDLING_VALUE_ID, 50.0);
 
   m_Controls->radioDefault->setChecked(useAsDefaultValue);
   m_Controls->radioRelativeToMax->setChecked(!useAsDefaultValue);

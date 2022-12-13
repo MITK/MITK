@@ -15,12 +15,10 @@ found in the LICENSE file.
 #define MITKPLUGINACTIVATOR_H
 
 #include <ctkPluginActivator.h>
-#include <ctkServiceTracker.h>
-
-#include <berryIPreferencesService.h>
-
 
 namespace mitk {
+
+class IPreferencesService;
 
 class org_mitk_gui_qt_application_Activator :
   public QObject, public ctkPluginActivator
@@ -37,15 +35,12 @@ public:
   static ctkPluginContext* GetContext();
   static org_mitk_gui_qt_application_Activator* GetInstance();
 
-  berry::IPreferencesService* GetPreferencesService();
+  mitk::IPreferencesService* GetPreferencesService();
 
 private:
 
   static org_mitk_gui_qt_application_Activator* m_Instance;
   static ctkPluginContext* m_Context;
-
-  QScopedPointer<ctkServiceTracker<berry::IPreferencesService*> > m_PrefServiceTracker;
-
 }; // org_mitk_gui_common_Activator
 
 typedef org_mitk_gui_qt_application_Activator PluginActivator;

@@ -12,9 +12,9 @@ found in the LICENSE file.
 
 #include "QmitkAppInstancesPreferencePage.h"
 
-#include <berryIPreferencesService.h>
-#include <berryQtPreferences.h>
-#include <berryPlatform.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 QmitkAppInstancesPreferencePage::QmitkAppInstancesPreferencePage()
 {
@@ -31,7 +31,7 @@ void QmitkAppInstancesPreferencePage::CreateQtControl(QWidget* parent)
   mainWidget = new QWidget(parent);
   controls.setupUi(mainWidget);
 
-  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+  auto* prefService = mitk::CoreServices::GetPreferencesService();
   prefs = prefService->GetSystemPreferences()->Node("/General");
 
   Update();

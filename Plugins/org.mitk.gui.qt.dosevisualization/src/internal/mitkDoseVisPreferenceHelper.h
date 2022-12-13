@@ -14,9 +14,6 @@ found in the LICENSE file.
 #ifndef __DOSE_VIS_PREFERENCE_HELPER_H
 #define __DOSE_VIS_PREFERENCE_HELPER_H
 
-#include <berryIPreferencesService.h>
-#include <berryPlatform.h>
-
 #include "mitkIsoDoseLevelCollections.h"
 
 class ctkPluginContext;

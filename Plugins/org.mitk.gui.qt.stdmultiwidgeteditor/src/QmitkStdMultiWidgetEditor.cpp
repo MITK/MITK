@@ -14,8 +14,10 @@ found in the LICENSE file.
 
 #include <berryUIException.h>
 #include <berryIWorkbenchPage.h>
-#include <berryIPreferencesService.h>
-#include <berryIPreferences.h>
+
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 #include <mitkColorProperty.h>
 #include <mitkNodePredicateNot.h>
@@ -209,7 +211,7 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
   QHBoxLayout* layout = new QHBoxLayout(parent);
   layout->setContentsMargins(0, 0, 0, 0);
 
-  berry::IBerryPreferences* preferences = dynamic_cast<berry::IBerryPreferences*>(GetPreferences().GetPointer());
+  auto* preferences = this->GetPreferences();
 
   auto multiWidget = GetMultiWidget();
   if (nullptr == multiWidget)
@@ -255,7 +257,7 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
   OnPreferencesChanged(preferences);
 }
 
-void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferences* preferences)
+void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const mitk::IPreferences* preferences)
 {
   const auto& multiWidget = dynamic_cast<QmitkStdMultiWidget*>(GetMultiWidget());
   if (nullptr == multiWidget)
@@ -297,7 +299,7 @@ void QmitkStdMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferen
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkStdMultiWidgetEditor::InitializePreferences(berry::IBerryPreferences * preferences)
+void QmitkStdMultiWidgetEditor::InitializePreferences(mitk::IPreferences * preferences)
 {
   auto multiWidget = this->GetMultiWidget();
 
@@ -308,7 +310,7 @@ void QmitkStdMultiWidgetEditor::InitializePreferences(berry::IBerryPreferences *
 
   for (const auto& renderWindowWidget : multiWidget->GetRenderWindowWidgets())
   {
-    auto widgetName = renderWindowWidget.second->GetWidgetName();
+    auto widgetName = renderWindowWidget.second->GetWidgetName().toStdString();
 
     auto gradientBackgroundColors = renderWindowWidget.second->GetGradientBackgroundColors();
     preferences->Put(widgetName + " first background color", this->MitkColorToHex(gradientBackgroundColors.first));
@@ -318,11 +320,11 @@ void QmitkStdMultiWidgetEditor::InitializePreferences(berry::IBerryPreferences *
     preferences->Put(widgetName + " decoration color", this->MitkColorToHex(decorationColor));
 
     auto cornerAnnotation = renderWindowWidget.second->GetCornerAnnotationText();
-    preferences->Put(widgetName + " corner annotation", QString::fromStdString(cornerAnnotation));
+    preferences->Put(widgetName + " corner annotation", cornerAnnotation);
   }
 }
 
-void QmitkStdMultiWidgetEditor::GetPreferenceDecorations(const berry::IBerryPreferences * preferences)
+void QmitkStdMultiWidgetEditor::GetPreferenceDecorations(const mitk::IPreferences * preferences)
 {
   auto multiWidget = dynamic_cast<QmitkStdMultiWidget*>(GetMultiWidget());
 
@@ -337,7 +339,7 @@ void QmitkStdMultiWidgetEditor::GetPreferenceDecorations(const berry::IBerryPref
   int i = 0;
   for (const auto& renderWindowWidget : renderWindowWidgets)
   {
-    auto widgetName = renderWindowWidget.second->GetWidgetName();
+    auto widgetName = renderWindowWidget.second->GetWidgetName().toStdString();
 
     if (mitk::BaseRenderer::Standard3D == mitk::BaseRenderer::GetInstance(renderWindowWidget.second->GetRenderWindow()->GetVtkRenderWindow())->GetMapperID())
     {
@@ -357,24 +359,24 @@ void QmitkStdMultiWidgetEditor::GetPreferenceDecorations(const berry::IBerryPref
     renderWindowWidget.second->SetDecorationColor(HexColorToMitkColor(decorationColor));
 
     auto defaultCornerAnnotation = renderWindowWidget.second->GetCornerAnnotationText();
-    auto cornerAnnotation = preferences->Get(widgetName + " corner annotation", QString::fromStdString(defaultCornerAnnotation));
-    renderWindowWidget.second->SetCornerAnnotationText(cornerAnnotation.toStdString());
+    auto cornerAnnotation = preferences->Get(widgetName + " corner annotation", defaultCornerAnnotation);
+    renderWindowWidget.second->SetCornerAnnotationText(cornerAnnotation);
 
     ++i;
   }
 }
 
-mitk::Color QmitkStdMultiWidgetEditor::HexColorToMitkColor(const QString& hexColor)
+mitk::Color QmitkStdMultiWidgetEditor::HexColorToMitkColor(const std::string& hexColor)
 {
-  QColor qColor(hexColor);
+  QColor qColor(hexColor.c_str());
   mitk::Color returnColor;
   float colorMax = 255.0f;
-  if (hexColor.isEmpty()) // default value
+  if (hexColor.empty()) // default value
   {
     returnColor[0] = 1.0;
     returnColor[1] = 1.0;
     returnColor[2] = 1.0;
-    MITK_ERROR << "Using default color for unknown hex color " << qPrintable(hexColor);
+    MITK_ERROR << "Using default color for unknown hex color " << hexColor;
   }
   else
   {
@@ -385,12 +387,12 @@ mitk::Color QmitkStdMultiWidgetEditor::HexColorToMitkColor(const QString& hexCol
   return returnColor;
 }
 
-QString QmitkStdMultiWidgetEditor::MitkColorToHex(const mitk::Color& color)
+std::string QmitkStdMultiWidgetEditor::MitkColorToHex(const mitk::Color& color)
 {
   QColor returnColor;
   float colorMax = 255.0f;
   returnColor.setRed(static_cast<int>(color[0] * colorMax + 0.5));
   returnColor.setGreen(static_cast<int>(color[1] * colorMax + 0.5));
   returnColor.setBlue(static_cast<int>(color[2] * colorMax + 0.5));
-  return returnColor.name();
+  return returnColor.name().toStdString();
 }

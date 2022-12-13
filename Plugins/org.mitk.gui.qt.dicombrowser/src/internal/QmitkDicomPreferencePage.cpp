@@ -12,10 +12,10 @@ found in the LICENSE file.
 
 #include "QmitkDicomPreferencePage.h"
 
-#include <berryIPreferencesService.h>
-#include <berryIBerryPreferences.h>
-#include <berryPlatform.h>
 #include "mitkPluginActivator.h"
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 #include <QLabel>
 #include <QPushButton>
@@ -50,8 +50,7 @@ void QmitkDicomPreferencePage::Init(berry::IWorkbench::Pointer )
 
 void QmitkDicomPreferencePage::CreateQtControl(QWidget* parent)
 {
-  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
-
+  auto* prefService = mitk::CoreServices::GetPreferencesService();
   m_DicomPreferencesNode = prefService->GetSystemPreferences()->Node("/org.mitk.views.dicomreader");
 
   m_MainControl = new QWidget(parent);
@@ -90,13 +89,13 @@ void QmitkDicomPreferencePage::PerformCancel()
 
 bool QmitkDicomPreferencePage::PerformOk()
 {
-  m_DicomPreferencesNode->Put("default dicom path",m_PathEdit->text());
+  m_DicomPreferencesNode->Put("default dicom path",m_PathEdit->text().toStdString());
   return true;
 }
 
 void QmitkDicomPreferencePage::Update()
 {
-  QString path = m_DicomPreferencesNode->Get("default dicom path", CreateDefaultPath());
+  const auto path = QString::fromStdString(m_DicomPreferencesNode->Get("default dicom path", CreateDefaultPath().toStdString()));
   m_PathEdit->setText(path);
 }
 

@@ -22,7 +22,6 @@ found in the LICENSE file.
 #include "berryPersistentState.h"
 #include "berryWorkbenchPlugin.h"
 #include "berryElementReference.h"
-#include "berryIPreferences.h"
 
 #include <berryIHandler.h>
 #include <berryIElementUpdater.h>
@@ -35,12 +34,12 @@ found in the LICENSE file.
 
 namespace berry {
 
-const QString CommandService::PREFERENCE_KEY_PREFIX = "org.blueberry.ui.commands/state";
+const std::string CommandService::PREFERENCE_KEY_PREFIX = "org.blueberry.ui.commands/state";
 
-const QString CommandService::CreatePreferenceKey(const SmartPointer<Command>& command,
-                                                  const QString& stateId)
+std::string CommandService::CreatePreferenceKey(const SmartPointer<Command>& command,
+                                                const QString& stateId)
 {
-  return PREFERENCE_KEY_PREFIX + '/' + command->GetId() + '/' + stateId;
+  return PREFERENCE_KEY_PREFIX + '/' + command->GetId().toStdString() + '/' + stateId.toStdString();
 }
 
 CommandService::CommandService( CommandManager* commandManager)

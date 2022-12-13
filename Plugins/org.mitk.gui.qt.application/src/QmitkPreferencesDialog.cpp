@@ -18,7 +18,6 @@ found in the LICENSE file.
 #include "berryIConfigurationElement.h"
 #include "berryIExtensionRegistry.h"
 #include "berryIExtension.h"
-#include <berryIBerryPreferencesService.h>
 #include <berryIQtPreferencePage.h>
 
 #include "internal/org_mitk_gui_qt_application_Activator.h"
@@ -32,6 +31,9 @@ found in the LICENSE file.
 #include <algorithm>
 
 #include <mitkLogMacros.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 using namespace std;
 
@@ -148,12 +150,6 @@ QmitkPreferencesDialog::QmitkPreferencesDialog(QWidget * parent, Qt::WindowFlags
 
   QObject::connect(d->m_PreferencesTree, SIGNAL(itemSelectionChanged()), this, SLOT(OnPreferencesTreeItemSelectionChanged()));
 
-  QPushButton* importButton = d->buttonBox->addButton("Import...", QDialogButtonBox::ActionRole);
-  QObject::connect(importButton, SIGNAL(clicked()), this, SLOT(OnImportButtonClicked()));
-
-  QPushButton* exportButton = d->buttonBox->addButton("Export...", QDialogButtonBox::ActionRole);
-  QObject::connect(exportButton, SIGNAL(clicked()), this, SLOT(OnExportButtonClicked()));
-
   QObject::connect(this, SIGNAL(accepted()), this, SLOT(OnDialogAccepted()));
   QObject::connect(this, SIGNAL(rejected()), this, SLOT(OnDialogRejected()));
 
@@ -176,84 +172,6 @@ void QmitkPreferencesDialog::SetSelectedPage(const QString& id)
   }
 }
 
-void QmitkPreferencesDialog::OnImportButtonClicked()
-{
-  int answer = QMessageBox::question(this, "Importing Preferences"
-                                     , "All existing preferences will be overwritten!\nAre you sure that you want to import other preferences?", QMessageBox::Yes | QMessageBox::No );
-  if(answer == QMessageBox::No)
-    return;
-
-  try
-  {
-    berry::IBerryPreferencesService* berryPrefService =
-        dynamic_cast<berry::IBerryPreferencesService*>(berry::Platform::GetPreferencesService());
-    if(berryPrefService != nullptr)
-    {
-      static QString importDir = "";
-      QString fileName = QFileDialog::getOpenFileName(this, tr("Choose file to import preferences"),
-                                                      importDir, tr("XML files (*.xml)"));
-
-      if(!fileName.isEmpty())
-      {
-        importDir = QFileInfo(fileName).absoluteDir().path();
-        berryPrefService->ImportPreferences(fileName, "");
-        berry::IQtPreferencePage* prefPage = d->m_PrefPages[d->m_CurrentPage].prefPage;
-        if(prefPage)
-          prefPage->Update();
-
-        MITK_INFO("QmitkPreferencesDialog") << "Preferences successfully imported from " << fileName;
-      }
-    }
-  }
-  catch (Poco::Exception& pe)
-  {
-    QMessageBox::critical(this, "Error Importing", pe.message().c_str());
-    MITK_ERROR("QmitkPreferencesDialog") << pe.what();
-  }
-  catch (std::exception& e)
-  {
-    QMessageBox::critical(this, "Error Importing", e.what());
-    MITK_ERROR("QmitkPreferencesDialog") << e.what();
-  }
-}
-
-void QmitkPreferencesDialog::OnExportButtonClicked()
-{
-  try
-  {
-    berry::IBerryPreferencesService* berryPrefService =
-        dynamic_cast<berry::IBerryPreferencesService*>(berry::Platform::GetPreferencesService());
-    if(berryPrefService != nullptr)
-    {
-      SavePreferences();
-      static QString exportDir = "";
-      QString fileName = QFileDialog::getSaveFileName(this, tr("Choose file to export preferences"),
-                                                      exportDir, tr("XML files (*.xml)"));
-
-      if(!fileName.isEmpty())
-      {
-        if(QFileInfo(fileName).suffix() != ".xml")
-        {
-          fileName += ".xml";
-        }
-        exportDir = QFileInfo(fileName).absoluteDir().path();
-        berryPrefService->ExportPreferences(fileName, "");
-        MITK_INFO("QmitkPreferencesDialog") << "Preferences successfully exported to " << fileName;
-      }
-    }
-  }
-  catch (Poco::Exception& pe)
-  {
-    QMessageBox::critical(this, "Error Exporting", pe.message().c_str());
-    MITK_ERROR("QmitkPreferencesDialog") << pe.what();
-  }
-  catch (std::exception& e)
-  {
-    QMessageBox::critical(this, "Error Exporting", e.what());
-    MITK_ERROR("QmitkPreferencesDialog") << e.what();
-  }
-}
-
 void QmitkPreferencesDialog::SavePreferences()
 {
   berry::IQtPreferencePage* prefPage = nullptr;
@@ -272,7 +190,7 @@ void QmitkPreferencesDialog::SavePreferences()
    * performed and confirmed.
    *
    */
-  berry::Platform::GetPreferencesService()->GetSystemPreferences()->Flush();
+  mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Flush();
 }
 
 void QmitkPreferencesDialog::OnDialogAccepted()
@@ -296,24 +214,6 @@ void QmitkPreferencesDialog::OnKeywordTextChanged(const QString &  /*s*/)
 void QmitkPreferencesDialog::OnKeywordEditingFinished()
 {
 }
-
-//bool QmitkPreferencesDialog::eventFilter( QObject *obj, QEvent *event )
-//{
-//  if(obj == d->m_Keyword)
-//  {
-//    if(event->type() == QEvent::FocusIn && d->m_Keyword->text() == "search ...")
-//    {
-//      d->m_Keyword->setText("");
-//      d->m_Keyword->setStyleSheet("color: black;");
-//    }
-//    else if(event->type() == QEvent::FocusOut && d->m_Keyword->text() == "")
-//    {
-//      d->m_Keyword->setText("search ...");
-//      d->m_Keyword->setStyleSheet("color: gray;");
-//    }
-//  }
-//  return true;
-//}
 
 void QmitkPreferencesDialog::OnPreferencesTreeItemSelectionChanged()
 {

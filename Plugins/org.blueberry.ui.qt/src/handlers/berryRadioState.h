@@ -58,9 +58,9 @@ public:
   void SetInitializationData(const SmartPointer<IConfigurationElement>& config,
                              const QString& propertyName, const Object::Pointer& data) override;
 
-  void Load(const SmartPointer<IPreferences>& store, const QString& preferenceKey) override;
+  void Load(const mitk::IPreferences* store, const std::string& preferenceKey) override;
 
-  void Save(const SmartPointer<IPreferences>& store, const QString& preferenceKey) override;
+  void Save(mitk::IPreferences* store, const std::string& preferenceKey) override;
 
   void SetValue(const Object::Pointer& value) override;
 

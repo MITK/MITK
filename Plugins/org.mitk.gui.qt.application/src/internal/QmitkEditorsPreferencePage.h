@@ -15,7 +15,6 @@ found in the LICENSE file.
 #define QMITKEDITORSPREFERENCEPAGE_H_
 
 #include "berryIQtPreferencePage.h"
-#include <berryIPreferences.h>
 
 class QWidget;
 

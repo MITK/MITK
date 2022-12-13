@@ -177,11 +177,6 @@ protected:
 private:
 
   /**
-   * Initialize the preference change listener.
-   */
-  void InitializePreferenceChangeListener();
-
-  /**
    * @param desc
    */
   void Add(PerspectiveDescriptor::Pointer desc);

@@ -22,16 +22,16 @@ found in the LICENSE file.
 #include <mitkDataStorageEditorInput.h>
 #include <berryIEditorPart.h>
 #include <berryIWorkbenchPage.h>
-#include <berryIPreferencesService.h>
 #include <berryIWorkbench.h>
-#include <berryPlatform.h>
 #include <berryFileEditorInput.h>
 
 #include "mitkProperties.h"
 #include "mitkNodePredicateData.h"
 #include "mitkNodePredicateNot.h"
 #include "mitkNodePredicateProperty.h"
-
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 QmitkOpenDicomEditorAction::QmitkOpenDicomEditorAction(berry::IWorkbenchWindow::Pointer window)
 : QAction(nullptr)
@@ -54,7 +54,7 @@ void QmitkOpenDicomEditorAction::init(berry::IWorkbenchWindow::Pointer window)
   this->setText("&DICOM");
   this->setToolTip("Open dicom browser");
 
-  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+  auto* prefService = mitk::CoreServices::GetPreferencesService();
 
   m_GeneralPreferencesNode = prefService->GetSystemPreferences()->Node("/General");
 

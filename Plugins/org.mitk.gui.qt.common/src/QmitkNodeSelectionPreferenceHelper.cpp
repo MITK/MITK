@@ -14,11 +14,9 @@ found in the LICENSE file.
 
 #include <internal/QmitkNodeSelectionConstants.h>
 
-#include <berryIPreferencesService.h>
-
-#include <berryIPreferences.h>
-#include <berryIPreferencesService.h>
-#include <berryPlatform.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 #include <QmitkDataStorageSelectionHistoryInspector.h>
 #include <QmitkDataStorageFavoriteNodesInspector.h>
@@ -28,27 +26,20 @@ found in the LICENSE file.
 
 void mitk::PutVisibleDataStorageInspectors(const VisibleDataStorageInspectorMapType &inspectors)
 {
-  berry::IPreferencesService *prefService = berry::Platform::GetPreferencesService();
-  berry::IPreferences::Pointer prefNode =
-    prefService->GetSystemPreferences()->Node(mitk::NodeSelectionConstants::ROOT_PREFERENCE_NODE_ID.c_str());
-  berry::IPreferences::Pointer visNode =
-    prefNode->Node(mitk::NodeSelectionConstants::VISIBLE_INSPECTORS_NODE_ID.c_str());
+  auto* prefService = mitk::CoreServices::GetPreferencesService();
+  auto* prefNode = prefService->GetSystemPreferences()->Node(mitk::NodeSelectionConstants::ROOT_PREFERENCE_NODE_ID);
+  auto* visNode = prefNode->Node(mitk::NodeSelectionConstants::VISIBLE_INSPECTORS_NODE_ID);
 
-  visNode->RemoveNode();
-  prefNode->Flush();
-
-  // new empty preset node
-  visNode = prefNode->Node(mitk::NodeSelectionConstants::VISIBLE_INSPECTORS_NODE_ID.c_str());
+  visNode->Clear();
 
   // store map in new node
   for (const auto &inspector : inspectors)
   {
     std::ostringstream sstr;
     sstr << inspector.first;
-    berry::IPreferences::Pointer aNode = visNode->Node(QString::fromStdString(sstr.str()));
+    auto* aNode = visNode->Node(sstr.str());
 
-    aNode->Put(mitk::NodeSelectionConstants::VISIBLE_INSPECTOR_ID.c_str(), inspector.second.c_str());
-    aNode->Flush();
+    aNode->Put(mitk::NodeSelectionConstants::VISIBLE_INSPECTOR_ID, inspector.second);
   }
 
   visNode->Flush();
@@ -56,42 +47,35 @@ void mitk::PutVisibleDataStorageInspectors(const VisibleDataStorageInspectorMapT
 
 mitk::VisibleDataStorageInspectorMapType mitk::GetVisibleDataStorageInspectors()
 {
-  berry::IPreferencesService *prefService = berry::Platform::GetPreferencesService();
+  auto* prefService = mitk::CoreServices::GetPreferencesService();
 
-  berry::IPreferences::Pointer prefNode =
-    prefService->GetSystemPreferences()->Node(mitk::NodeSelectionConstants::ROOT_PREFERENCE_NODE_ID.c_str());
-  berry::IPreferences::Pointer visNode =
-    prefNode->Node(mitk::NodeSelectionConstants::VISIBLE_INSPECTORS_NODE_ID.c_str());
+  auto* prefNode = prefService->GetSystemPreferences()->Node(mitk::NodeSelectionConstants::ROOT_PREFERENCE_NODE_ID);
+  auto* visNode = prefNode->Node(mitk::NodeSelectionConstants::VISIBLE_INSPECTORS_NODE_ID);
 
-  typedef QStringList NamesType;
+  using NamesType = std::vector<std::string>;
   NamesType names = visNode->ChildrenNames();
 
   VisibleDataStorageInspectorMapType visMap;
 
   if (!names.empty())
   {
-    for (NamesType::const_iterator pos = names.begin(); pos != names.end(); ++pos)
+    for (const auto& name : names)
     {
-      berry::IPreferences::Pointer aNode = visNode->Node(*pos);
+      auto* aNode = visNode->Node(name);
 
-      if (aNode.IsNull())
-      {
-        mitkThrow() << "Error in preference interface. Cannot find preset node under given name. Name: "
-                    << (*pos).toStdString();
-      }
+      if (aNode == nullptr)
+        mitkThrow() << "Error in preference interface. Cannot find preset node under given name. Name: " << name;
 
-      std::istringstream isstr(pos->toStdString());
+      std::istringstream isstr(name);
       unsigned int order = 0;
       isstr >> order;
 
-      auto id = aNode->Get(mitk::NodeSelectionConstants::VISIBLE_INSPECTOR_ID.c_str(), "");
-      if (id.isEmpty())
-      {
-        mitkThrow() << "Error in preference interface. ID of visible inspector is not set. Inspector position: "
-                    << order;
-      }
+      auto id = aNode->Get(mitk::NodeSelectionConstants::VISIBLE_INSPECTOR_ID, "");
 
-      visMap.insert(std::make_pair(order, id.toStdString()));
+      if (id.empty())
+        mitkThrow() << "Error in preference interface. ID of visible inspector is not set. Inspector position: " << order;
+
+      visMap.insert(std::make_pair(order, id));
     }
   }
 
@@ -116,76 +100,59 @@ mitk::VisibleDataStorageInspectorMapType mitk::GetVisibleDataStorageInspectors()
 
 mitk::DataStorageInspectorIDType mitk::GetPreferredDataStorageInspector()
 {
-  berry::IPreferencesService *prefService = berry::Platform::GetPreferencesService();
+  auto* prefService = mitk::CoreServices::GetPreferencesService();
+  auto* prefNode = prefService->GetSystemPreferences()->Node(mitk::NodeSelectionConstants::ROOT_PREFERENCE_NODE_ID);
+  auto id = prefNode->Get(mitk::NodeSelectionConstants::PREFERRED_INSPECTOR_ID, "");
 
-  berry::IPreferences::Pointer prefNode =
-    prefService->GetSystemPreferences()->Node(mitk::NodeSelectionConstants::ROOT_PREFERENCE_NODE_ID.c_str());
-
-  auto id = prefNode->Get(mitk::NodeSelectionConstants::PREFERRED_INSPECTOR_ID.c_str(), "");
-
-  mitk::DataStorageInspectorIDType result = id.toStdString();
-
-  if (result.empty())
+  if (id.empty())
   { //nothing set, deduce default preferred inspector
     auto visibleInspectors = GetVisibleDataStorageInspectors();
     if (!visibleInspectors.empty())
-    {
-      result = visibleInspectors.begin()->second;
-    }
+      id = visibleInspectors.begin()->second;
   }
 
-  return result;
+  return id;
 }
 
 void mitk::PutPreferredDataStorageInspector(const DataStorageInspectorIDType &id)
 {
-  berry::IPreferencesService *prefService = berry::Platform::GetPreferencesService();
+  auto* prefService = mitk::CoreServices::GetPreferencesService();
+  auto* prefNode = prefService->GetSystemPreferences()->Node(mitk::NodeSelectionConstants::ROOT_PREFERENCE_NODE_ID);
 
-  berry::IPreferences::Pointer prefNode =
-    prefService->GetSystemPreferences()->Node(mitk::NodeSelectionConstants::ROOT_PREFERENCE_NODE_ID.c_str());
-
-  prefNode->Put(mitk::NodeSelectionConstants::PREFERRED_INSPECTOR_ID.c_str(), id.c_str());
+  prefNode->Put(mitk::NodeSelectionConstants::PREFERRED_INSPECTOR_ID, id);
   prefNode->Flush();
 }
 
 void mitk::PutShowFavoritesInspector(bool show)
 {
-  berry::IPreferencesService *prefService = berry::Platform::GetPreferencesService();
+  auto* prefService = mitk::CoreServices::GetPreferencesService();
+  auto* prefNode = prefService->GetSystemPreferences()->Node(mitk::NodeSelectionConstants::ROOT_PREFERENCE_NODE_ID);
 
-  berry::IPreferences::Pointer prefNode =
-    prefService->GetSystemPreferences()->Node(mitk::NodeSelectionConstants::ROOT_PREFERENCE_NODE_ID.c_str());
-
-  prefNode->PutBool(mitk::NodeSelectionConstants::SHOW_FAVORITE_INSPECTOR.c_str(), show);
+  prefNode->PutBool(mitk::NodeSelectionConstants::SHOW_FAVORITE_INSPECTOR, show);
   prefNode->Flush();
 }
 
 bool mitk::GetShowFavoritesInspector()
 {
-  berry::IPreferencesService *prefService = berry::Platform::GetPreferencesService();
+  auto* prefService = mitk::CoreServices::GetPreferencesService();
+  auto* prefNode = prefService->GetSystemPreferences()->Node(mitk::NodeSelectionConstants::ROOT_PREFERENCE_NODE_ID);
 
-  berry::IPreferences::Pointer prefNode =
-    prefService->GetSystemPreferences()->Node(mitk::NodeSelectionConstants::ROOT_PREFERENCE_NODE_ID.c_str());
-
-  return prefNode->GetBool(mitk::NodeSelectionConstants::SHOW_FAVORITE_INSPECTOR.c_str(), true);
+  return prefNode->GetBool(mitk::NodeSelectionConstants::SHOW_FAVORITE_INSPECTOR, true);
 }
 
 void mitk::PutShowHistoryInspector(bool show)
 {
-  berry::IPreferencesService *prefService = berry::Platform::GetPreferencesService();
+  auto* prefService = mitk::CoreServices::GetPreferencesService();
+  auto* prefNode = prefService->GetSystemPreferences()->Node(mitk::NodeSelectionConstants::ROOT_PREFERENCE_NODE_ID);
 
-  berry::IPreferences::Pointer prefNode =
-    prefService->GetSystemPreferences()->Node(mitk::NodeSelectionConstants::ROOT_PREFERENCE_NODE_ID.c_str());
-
-  prefNode->PutBool(mitk::NodeSelectionConstants::SHOW_HISTORY_INSPECTOR.c_str(), show);
+  prefNode->PutBool(mitk::NodeSelectionConstants::SHOW_HISTORY_INSPECTOR, show);
   prefNode->Flush();
 }
 
 bool mitk::GetShowHistoryInspector()
 {
-  berry::IPreferencesService *prefService = berry::Platform::GetPreferencesService();
+  auto* prefService = mitk::CoreServices::GetPreferencesService();
+  auto* prefNode = prefService->GetSystemPreferences()->Node(mitk::NodeSelectionConstants::ROOT_PREFERENCE_NODE_ID);
 
-  berry::IPreferences::Pointer prefNode =
-    prefService->GetSystemPreferences()->Node(mitk::NodeSelectionConstants::ROOT_PREFERENCE_NODE_ID.c_str());
-
-  return prefNode->GetBool(mitk::NodeSelectionConstants::SHOW_HISTORY_INSPECTOR.c_str(), true);
+  return prefNode->GetBool(mitk::NodeSelectionConstants::SHOW_HISTORY_INSPECTOR, true);
 }

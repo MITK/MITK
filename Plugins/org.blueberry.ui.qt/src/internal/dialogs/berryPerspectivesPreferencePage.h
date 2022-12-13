@@ -15,6 +15,11 @@ found in the LICENSE file.
 
 #include <berryIQtPreferencePage.h>
 
+namespace mitk
+{
+  class IPreferences;
+}
+
 namespace Ui {
 class PerspectivesPreferencePage;
 }
@@ -65,7 +70,7 @@ private:
   QWidget* pageWidget;
 
   int openPerspMode;
-  SmartPointer<IPreferences> preferences;
+  mitk::IPreferences* preferences;
   IWorkbench* workbench;
   PerspectiveRegistry* perspRegistry;
 

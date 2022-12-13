@@ -12,11 +12,12 @@ found in the LICENSE file.
 
 #include "QmitkXnatTreeBrowserView.h"
 
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
+
 // Qmitk
 #include "org_mitk_gui_qt_xnatinterface_Activator.h"
-
-// Blueberry
-#include <berryPlatform.h>
 
 // CTK XNAT Core
 #include <ctkXnatAssessor.h>
@@ -33,7 +34,6 @@ found in the LICENSE file.
 #include <ctkXnatScan.h>
 #include <ctkXnatScanFolder.h>
 #include <ctkXnatSubject.h>
-
 
 // MITK XNAT
 #include <mitkDataStorage.h>
@@ -93,7 +93,7 @@ QmitkXnatTreeBrowserView::QmitkXnatTreeBrowserView() :
   m_DataStorageServiceTracker(mitk::org_mitk_gui_qt_xnatinterface_Activator::GetContext()),
   m_TreeModel(new QmitkXnatTreeModel()),
   m_Tracker(nullptr),
-  m_DownloadPath(berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node(VIEW_ID)->Get("Download Path", "")),
+  m_DownloadPath(QString::fromStdString(mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Node(VIEW_ID.toStdString())->Get("Download Path", ""))),
   m_SilentMode(false)
 {
   m_DataStorageServiceTracker.open();
@@ -441,9 +441,9 @@ void QmitkXnatTreeBrowserView::OnProgress(QUuid /*queryID*/, double progress)
   }
 }
 
-void QmitkXnatTreeBrowserView::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
+void QmitkXnatTreeBrowserView::OnPreferencesChanged(const mitk::IPreferences* prefs)
 {
-  QString downloadPath = prefs->Get("Download Path", "");
+  QString downloadPath = QString::fromStdString(prefs->Get("Download Path", ""));
   QDir downloadDir (downloadPath);
   if (downloadPath.length() != 0 && downloadDir.exists())
     m_DownloadPath = downloadPath;
@@ -476,7 +476,7 @@ void QmitkXnatTreeBrowserView::InternalFileDownload(const QModelIndex& index, bo
     // The path to the downloaded file
     QString filePath;
     QDir downloadPath (m_DownloadPath);
-    QString serverURL = berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node(VIEW_ID)->Get("Server Address", "");
+    auto serverURL = QString::fromStdString(mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Node(VIEW_ID.toStdString())->Get("Server Address", ""));
     bool isDICOM (false);
     bool filePathExists (true);
 
@@ -849,7 +849,7 @@ void QmitkXnatTreeBrowserView::OnContextMenuCopyXNATUrlToClipboard()
   ctkXnatObject* currentXnatObject = m_TreeModel->xnatObject(index);
   if (currentXnatObject != nullptr)
   {
-    QString serverURL = berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node(VIEW_ID)->Get("Server Address", "");
+    auto serverURL = QString::fromStdString(mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Node(VIEW_ID.toStdString())->Get("Server Address", ""));
     serverURL.append(currentXnatObject->resourceUri());
     QClipboard *clipboard = QApplication::clipboard();
     clipboard->setText(serverURL);

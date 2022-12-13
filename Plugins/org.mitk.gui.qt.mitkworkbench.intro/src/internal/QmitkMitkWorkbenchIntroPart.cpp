@@ -14,8 +14,6 @@ found in the LICENSE file.
 #include "QmitkMitkWorkbenchIntroPlugin.h"
 
 #include <berryIPerspectiveDescriptor.h>
-#include <berryIPreferences.h>
-#include <berryIPreferencesService.h>
 #include <berryIWorkbench.h>
 #include <berryIWorkbenchPage.h>
 #include <berryIWorkbenchWindow.h>
@@ -23,6 +21,9 @@ found in the LICENSE file.
 
 #include <mitkDataStorageEditorInput.h>
 #include <mitkIDataStorageService.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 #include <QDesktopServices>
 #include <QWebEnginePage>
@@ -126,7 +127,7 @@ QmitkMitkWorkbenchIntroPart::QmitkMitkWorkbenchIntroPart()
   : m_Controls(nullptr),
     m_Impl(new Impl)
 {
-  berry::IPreferences::Pointer workbenchPrefs = QmitkMitkWorkbenchIntroPlugin::GetDefault()->GetPreferencesService()->GetSystemPreferences();
+  auto* workbenchPrefs = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
   workbenchPrefs->PutBool(berry::WorkbenchPreferenceConstants::SHOW_INTRO, true);
   workbenchPrefs->Flush();
 }
@@ -134,18 +135,11 @@ QmitkMitkWorkbenchIntroPart::QmitkMitkWorkbenchIntroPart()
 QmitkMitkWorkbenchIntroPart::~QmitkMitkWorkbenchIntroPart()
 {
   // if the workbench is not closing (that means, welcome screen was closed explicitly), set "Show_intro" false
-  if (!this->GetIntroSite()->GetPage()->GetWorkbenchWindow()->GetWorkbench()->IsClosing())
-  {
-    berry::IPreferences::Pointer workbenchPrefs = QmitkMitkWorkbenchIntroPlugin::GetDefault()->GetPreferencesService()->GetSystemPreferences();
-    workbenchPrefs->PutBool(berry::WorkbenchPreferenceConstants::SHOW_INTRO, false);
-    workbenchPrefs->Flush();
-  }
-  else
-  {
-    berry::IPreferences::Pointer workbenchPrefs = QmitkMitkWorkbenchIntroPlugin::GetDefault()->GetPreferencesService()->GetSystemPreferences();
-    workbenchPrefs->PutBool(berry::WorkbenchPreferenceConstants::SHOW_INTRO, true);
-    workbenchPrefs->Flush();
-  }
+  bool showIntro = this->GetIntroSite()->GetPage()->GetWorkbenchWindow()->GetWorkbench()->IsClosing();
+
+  auto* workbenchPrefs = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
+  workbenchPrefs->PutBool(berry::WorkbenchPreferenceConstants::SHOW_INTRO, showIntro);
+  workbenchPrefs->Flush();
 
   // if workbench is not closing (Just welcome screen closing), open last used perspective
   if (this->GetIntroSite()->GetPage()->GetPerspective()->GetId()
@@ -209,7 +203,7 @@ void QmitkMitkWorkbenchIntroPart::OnLoadFinished(bool ok)
   if (!ok)
     return;
 
-  auto prefs = QmitkMitkWorkbenchIntroPlugin::GetDefault()->GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.qt.extapplicationintro");
+  auto* prefs = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.qt.extapplicationintro");
   bool showTips = prefs->GetBool("show tips", true);
 
   if (showTips)

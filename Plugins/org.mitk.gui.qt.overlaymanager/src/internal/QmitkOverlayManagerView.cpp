@@ -13,7 +13,6 @@ found in the LICENSE file.
 #include <memory>
 
 // Blueberry
-#include <berryIBerryPreferences.h>
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
 

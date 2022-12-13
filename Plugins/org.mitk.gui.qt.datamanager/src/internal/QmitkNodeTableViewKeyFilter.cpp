@@ -21,8 +21,9 @@ found in the LICENSE file.
 #include <QmitkDataNodeShowDetailsAction.h>
 #include <QmitkDataNodeToggleVisibilityAction.h>
 
-#include "berryIPreferencesService.h"
-#include "berryPlatform.h"
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 // qt
 #include <QKeyEvent>
@@ -31,7 +32,7 @@ found in the LICENSE file.
 QmitkNodeTableViewKeyFilter::QmitkNodeTableViewKeyFilter(QObject *dataManagerView, mitk::DataStorage *dataStorage)
   : QObject(dataManagerView), m_DataStorage(dataStorage)
 {
-  m_PreferencesService = berry::Platform::GetPreferencesService();
+  m_Preferences = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Node("/DataManager/Hotkeys");
 }
 
 bool QmitkNodeTableViewKeyFilter::eventFilter(QObject *obj, QEvent *event)
@@ -47,15 +48,12 @@ bool QmitkNodeTableViewKeyFilter::eventFilter(QObject *obj, QEvent *event)
   QmitkDataManagerView *dataManagerView = qobject_cast<QmitkDataManagerView *>(this->parent());
   if (event->type() == QEvent::KeyPress && dataManagerView)
   {
-    berry::IPreferences::Pointer nodeTableKeyPrefs =
-      m_PreferencesService->GetSystemPreferences()->Node("/DataManager/Hotkeys");
-
-    QKeySequence makeAllInvisible = QKeySequence(nodeTableKeyPrefs->Get("Make all nodes invisible", "Ctrl+V"));
-    QKeySequence toggleVisibility = QKeySequence(nodeTableKeyPrefs->Get("Toggle visibility of selected nodes", "V"));
-    QKeySequence deleteSelectedNodes = QKeySequence(nodeTableKeyPrefs->Get("Delete selected nodes", "Del"));
-    QKeySequence reinit = QKeySequence(nodeTableKeyPrefs->Get("Reinit selected nodes", "R"));
-    QKeySequence globalReinit = QKeySequence(nodeTableKeyPrefs->Get("Global reinit", "Ctrl+R"));
-    QKeySequence showInfo = QKeySequence(nodeTableKeyPrefs->Get("Show node information", "Ctrl+I"));
+    QKeySequence makeAllInvisible = QKeySequence(QString::fromStdString(m_Preferences->Get("Make all nodes invisible", "Ctrl+V")));
+    QKeySequence toggleVisibility = QKeySequence(QString::fromStdString(m_Preferences->Get("Toggle visibility of selected nodes", "V")));
+    QKeySequence deleteSelectedNodes = QKeySequence(QString::fromStdString(m_Preferences->Get("Delete selected nodes", "Del")));
+    QKeySequence reinit = QKeySequence(QString::fromStdString(m_Preferences->Get("Reinit selected nodes", "R")));
+    QKeySequence globalReinit = QKeySequence(QString::fromStdString(m_Preferences->Get("Global reinit", "Ctrl+R")));
+    QKeySequence showInfo = QKeySequence(QString::fromStdString(m_Preferences->Get("Show node information", "Ctrl+I")));
 
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
     QKeySequence keySequence = QKeySequence(keyEvent->modifiers() + keyEvent->key());

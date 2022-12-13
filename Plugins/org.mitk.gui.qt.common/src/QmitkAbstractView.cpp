@@ -17,6 +17,9 @@ found in the LICENSE file.
 
 // mitk Includes
 #include <mitkLogMacros.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferences.h>
+#include <mitkIPreferencesService.h>
 #include <mitkIDataStorageService.h>
 #include <mitkDataStorageEditorInput.h>
 #include <mitkDataNodeObject.h>
@@ -24,7 +27,6 @@ found in the LICENSE file.
 
 // berry Includes
 #include <berryIWorkbenchPage.h>
-#include <berryIBerryPreferences.h>
 #include <berryIEditorPart.h>
 #include <berryINullSelectionListener.h>
 #include <berryUIException.h>
@@ -45,14 +47,12 @@ public:
 
   QmitkAbstractViewPrivate(QmitkAbstractView* qq)
     : q(qq)
-    , m_PrefServiceTracker(QmitkCommonActivator::GetContext())
     , m_DataStorageServiceTracker(QmitkCommonActivator::GetContext())
     , m_Parent(nullptr)
     , m_DataNodeItemModel(new QmitkDataNodeItemModel)
     , m_DataNodeSelectionModel(new QItemSelectionModel(m_DataNodeItemModel))
     , m_InDataStorageChanged(false)
   {
-    m_PrefServiceTracker.open();
     m_DataStorageServiceTracker.open();
   }
 
@@ -61,7 +61,6 @@ public:
     delete m_DataNodeSelectionModel;
     delete m_DataNodeItemModel;
 
-    m_PrefServiceTracker.close();
     m_DataStorageServiceTracker.close();
   }
 
@@ -142,8 +141,6 @@ public:
   QList<mitk::DataNode::Pointer> DataNodeSelectionToQList(mitk::DataNodeSelection::ConstPointer currentSelection) const;
 
   QmitkAbstractView* const q;
-
-  ctkServiceTracker<berry::IPreferencesService*> m_PrefServiceTracker;
 
   ctkServiceTracker<mitk::IDataStorageService*> m_DataStorageServiceTracker;
 
@@ -235,11 +232,10 @@ void QmitkAbstractView::AfterCreateQtPartControl()
                                                        ( d.data(), &QmitkAbstractViewPrivate::NodeRemovedProxy ) );
 
   // REGISTER PREFERENCES LISTENER
-  berry::IBerryPreferences::Pointer prefs = this->GetPreferences().Cast<berry::IBerryPreferences>();
-  if(prefs.IsNotNull())
-    prefs->OnChanged.AddListener(
-          berry::MessageDelegate1<QmitkAbstractView, const berry::IBerryPreferences*>(this,
-                                                                              &QmitkAbstractView::OnPreferencesChanged));
+  auto* prefs = this->GetPreferences();
+
+  if (prefs != nullptr)
+    prefs->OnChanged.AddListener(mitk::MessageDelegate1<QmitkAbstractView, const mitk::IPreferences*>(this, &QmitkAbstractView::OnPreferencesChanged));
 
   // REGISTER FOR WORKBENCH SELECTION EVENTS
   d->m_BlueBerrySelectionListener.reset(new berry::NullSelectionChangedAdapter<QmitkAbstractViewPrivate>(
@@ -256,7 +252,7 @@ void QmitkAbstractView::AfterCreateQtPartControl()
   }
 
   // send preferences changed event
-  this->OnPreferencesChanged(this->GetPreferences().Cast<berry::IBerryPreferences>().GetPointer());
+  this->OnPreferencesChanged(this->GetPreferences());
 }
 
 QmitkAbstractView::~QmitkAbstractView()
@@ -270,15 +266,10 @@ QmitkAbstractView::~QmitkAbstractView()
   this->GetDataStorage()->ChangedNodeEvent.RemoveListener( mitk::MessageDelegate1<QmitkAbstractViewPrivate, const mitk::DataNode*>
                                                            ( d.data(), &QmitkAbstractViewPrivate::NodeChangedProxy ) );
 
-  berry::IBerryPreferences::Pointer prefs = this->GetPreferences().Cast<berry::IBerryPreferences>();
-  if(prefs.IsNotNull())
-  {
-    prefs->OnChanged.RemoveListener(
-          berry::MessageDelegate1<QmitkAbstractView, const berry::IBerryPreferences*>(this,
-                                                                              &QmitkAbstractView::OnPreferencesChanged));
-    // flush the preferences here (disabled, everyone should flush them by themselves at the right moment)
-    // prefs->Flush();
-  }
+  auto* prefs = this->GetPreferences();
+
+  if(prefs != nullptr)
+    prefs->OnChanged.RemoveListener(mitk::MessageDelegate1<QmitkAbstractView, const mitk::IPreferences*>(this, &QmitkAbstractView::OnPreferencesChanged));
 
   // REMOVE SELECTION PROVIDER
   this->GetSite()->SetSelectionProvider(berry::ISelectionProvider::Pointer(nullptr));
@@ -305,7 +296,7 @@ QItemSelectionModel *QmitkAbstractView::GetDataNodeSelectionModel() const
   return nullptr;
 }
 
-void QmitkAbstractView::OnPreferencesChanged( const berry::IBerryPreferences* )
+void QmitkAbstractView::OnPreferencesChanged( const mitk::IPreferences* )
 {
 }
 
@@ -379,12 +370,20 @@ void QmitkAbstractView::RestoreOverrideCursor()
   QApplication::restoreOverrideCursor();
 }
 
-berry::IPreferences::Pointer QmitkAbstractView::GetPreferences() const
+mitk::IPreferences* QmitkAbstractView::GetPreferences() const
 {
-  berry::IPreferencesService* prefService = d->m_PrefServiceTracker.getService();
-  // const_cast workaround for bad programming: const uncorrectness this->GetViewSite() should be const
-  QString id = "/" + (const_cast<QmitkAbstractView*>(this))->GetViewSite()->GetId();
-  return prefService ? prefService->GetSystemPreferences()->Node(id): berry::IPreferences::Pointer(nullptr);
+  mitk::CoreServicePointer prefsService(mitk::CoreServices::GetPreferencesService());
+  auto* prefs = prefsService->GetSystemPreferences();
+
+  if (prefs != nullptr)
+  {
+    auto viewSite = const_cast<QmitkAbstractView*>(this)->GetViewSite();
+
+    if (viewSite.IsNotNull())
+      return prefs->Node("/" + viewSite->GetId().toStdString());
+  }
+
+  return nullptr;
 }
 
 mitk::DataStorage::Pointer QmitkAbstractView::GetDataStorage() const

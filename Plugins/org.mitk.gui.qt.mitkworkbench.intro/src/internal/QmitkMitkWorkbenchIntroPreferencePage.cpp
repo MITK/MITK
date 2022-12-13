@@ -13,9 +13,11 @@ found in the LICENSE file.
 #include "QmitkMitkWorkbenchIntroPreferencePage.h"
 #include "QmitkMitkWorkbenchIntroPart.h"
 
-#include <berryIPreferencesService.h>
-#include <berryPlatform.h>
 #include <berryPlatformUI.h>
+
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 #include <ui_QmitkMitkWorkbenchIntroPreferencePage.h>
 
@@ -35,7 +37,7 @@ void QmitkMitkWorkbenchIntroPreferencePage::Init(berry::IWorkbench::Pointer)
 
 void QmitkMitkWorkbenchIntroPreferencePage::CreateQtControl(QWidget* parent)
 {
-  auto* prefService = berry::Platform::GetPreferencesService();
+  auto* prefService = mitk::CoreServices::GetPreferencesService();
   m_MitkWorkbenchIntroPreferencesNode = prefService->GetSystemPreferences()->Node("/org.mitk.qt.extapplicationintro");
 
   m_Control = new QWidget(parent);

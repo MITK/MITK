@@ -14,10 +14,14 @@ found in the LICENSE file.
 #define BERRYPERSISTENTSTATE_H
 
 #include "berryState.h"
+#include <string>
+
+namespace mitk
+{
+  class IPreferences;
+}
 
 namespace berry {
-
-struct IPreferences;
 
 /**
  * <p>
@@ -50,8 +54,8 @@ public:
    *            The key at which the state is stored; must not be
    *            <code>null</code>.
    */
-  virtual void Load(const SmartPointer<IPreferences>& store,
-                    const QString& preferenceKey) = 0;
+  virtual void Load(const mitk::IPreferences* store,
+                    const std::string& preferenceKey) = 0;
 
   /**
    * Saves this state to the preference store, given the location at which to
@@ -65,8 +69,8 @@ public:
    *            The key at which the state should be stored; must not be
    *            <code>null</code>.
    */
-  virtual void Save(const SmartPointer<IPreferences>& store,
-                    const QString& preferenceKey) = 0;
+  virtual void Save(mitk::IPreferences* store,
+                    const std::string& preferenceKey) = 0;
 
   /**
    * Sets whether this state should be persisted.

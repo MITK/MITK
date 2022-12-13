@@ -9,13 +9,9 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#include "berryIPreferencesService.h"
 
-namespace berry
+#include <mitkIPreferencesService.h>
+
+mitk::IPreferencesService::~IPreferencesService()
 {
-
-IPreferencesService::~IPreferencesService()
-{
-}
-
 }

@@ -14,7 +14,12 @@ found in the LICENSE file.
 
 #include <berryPlatformUI.h>
 #include <mitkLogMacros.h>
+#include <mitkCoreServices.h>
 #include "QmitkNodeSelectionPreferencePage.h"
+
+#include <usModuleInitialization.h>
+
+US_INITIALIZE_MODULE
 
 QmitkCommonActivator* QmitkCommonActivator::m_Instance = nullptr;
 ctkPluginContext* QmitkCommonActivator::m_Context = nullptr;
@@ -29,9 +34,9 @@ QmitkCommonActivator* QmitkCommonActivator::GetInstance()
   return m_Instance;
 }
 
-berry::IPreferencesService* QmitkCommonActivator::GetPreferencesService()
+mitk::IPreferencesService* QmitkCommonActivator::GetPreferencesService()
 {
-  return m_PrefServiceTracker->getService();
+  return mitk::CoreServices::GetPreferencesService();
 }
 
 void
@@ -39,7 +44,6 @@ QmitkCommonActivator::start(ctkPluginContext* context)
 {
   this->m_Instance = this;
   this->m_Context = context;
-  this->m_PrefServiceTracker.reset(new ctkServiceTracker<berry::IPreferencesService*>(context));
 
   if(berry::PlatformUI::IsWorkbenchRunning())
   {
@@ -61,8 +65,6 @@ QmitkCommonActivator::stop(ctkPluginContext* context)
 
   m_ViewCoordinator->Stop();
   m_ViewCoordinator.reset();
-
-  this->m_PrefServiceTracker.reset();
 
   this->m_Context = nullptr;
   this->m_Instance = nullptr;

@@ -12,12 +12,18 @@ found in the LICENSE file.
 
 #include "org_mitk_gui_qt_application_Activator.h"
 
+#include <mitkCoreServices.h>
+
 #include "QmitkGeneralPreferencePage.h"
 #include "QmitkEditorsPreferencePage.h"
 
 #include <QmitkRegisterClasses.h>
 
 #include "QmitkShowPreferencePageHandler.h"
+
+#include <usModuleInitialization.h>
+
+US_INITIALIZE_MODULE
 
 namespace mitk
 {
@@ -35,16 +41,11 @@ namespace mitk
     BERRY_REGISTER_EXTENSION_CLASS(QmitkShowPreferencePageHandler, context)
 
     QmitkRegisterClasses();
-
-    this->m_PrefServiceTracker.reset(new ctkServiceTracker<berry::IPreferencesService*>(context));
-    this->m_PrefServiceTracker->open();
   }
 
   void org_mitk_gui_qt_application_Activator::stop(ctkPluginContext* context)
   {
     Q_UNUSED(context)
-
-    this->m_PrefServiceTracker.reset();
 
     this->m_Context = nullptr;
     this->m_Instance = nullptr;
@@ -60,9 +61,9 @@ namespace mitk
     return m_Instance;
   }
 
-  berry::IPreferencesService* org_mitk_gui_qt_application_Activator::GetPreferencesService()
+  mitk::IPreferencesService* org_mitk_gui_qt_application_Activator::GetPreferencesService()
   {
-    return m_PrefServiceTracker->getService();
+    return mitk::CoreServices::GetPreferencesService();
   }
 
 }

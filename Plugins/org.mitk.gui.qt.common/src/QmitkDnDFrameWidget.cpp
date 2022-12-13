@@ -12,13 +12,13 @@ found in the LICENSE file.
 
 #include <QmitkDnDFrameWidget.h>
 
-#include <berryIPreferencesService.h>
-#include <berryIPreferences.h>
 #include <berryPlatformUI.h>
 
 #include "internal/QmitkCommonActivator.h"
 
 #include <mitkWorkbenchUtil.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 #include <QDragEnterEvent>
 #include <QMimeData>
@@ -27,20 +27,19 @@ class QmitkDnDFrameWidgetPrivate
 {
 public:
 
-  berry::IPreferences::Pointer GetPreferences() const
+  mitk::IPreferences* GetPreferences() const
   {
-    berry::IPreferencesService* prefService = QmitkCommonActivator::GetInstance()->GetPreferencesService();
-    if (prefService)
-    {
-      return prefService->GetSystemPreferences()->Node("/General");
-    }
-    return berry::IPreferences::Pointer(nullptr);
+    auto* prefService = QmitkCommonActivator::GetInstance()->GetPreferencesService();
+
+    return prefService != nullptr
+      ? prefService->GetSystemPreferences()->Node("/General")
+      : nullptr;
   }
 
   bool GetOpenEditor() const
   {
-    berry::IPreferences::Pointer prefs = GetPreferences();
-    if(prefs.IsNotNull())
+    auto* prefs = GetPreferences();
+    if(prefs != nullptr)
     {
       return prefs->GetBool("OpenEditor", true);
     }

@@ -18,7 +18,11 @@ found in the LICENSE file.
 
 #include "berryIQtPreferencePage.h"
 #include <org_mitk_gui_qt_dicombrowser_Export.h>
-#include <berryIPreferences.h>
+
+namespace mitk
+{
+  class IPreferences;
+}
 
 class QWidget;
 class QCheckBox;
@@ -58,7 +62,7 @@ public:
 
 protected:
     QWidget* m_MainControl;
-    berry::IPreferences::Pointer m_DicomPreferencesNode;
+    mitk::IPreferences* m_DicomPreferencesNode;
 
     QLineEdit* m_PathEdit;
     QPushButton* m_PathSelect;

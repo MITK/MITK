@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <mitkManualSegmentationToSurfaceFilter.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkSurface.h>
+#include <mitkIPreferences.h>
 
 // Qt-GUI headers
 #include <QApplication>
@@ -38,9 +39,9 @@ void QmitkIsoSurface::CreateQtPartControl(QWidget *parent)
     m_Controls->m_ImageSelector->SetDataStorage(this->GetDataStorage());
     m_Controls->m_ImageSelector->SetPredicate(mitk::NodePredicateDataType::New("Image"));
 
-    berry::IPreferences::Pointer prefs = this->GetPreferences();
-    if (prefs.IsNotNull())
-      m_Controls->thresholdLineEdit->setText(prefs->Get("defaultThreshold", "0"));
+    auto* prefs = this->GetPreferences();
+    if (prefs != nullptr)
+      m_Controls->thresholdLineEdit->setText(QString::fromStdString(prefs->Get("defaultThreshold", "0")));
   }
 }
 
@@ -154,7 +155,7 @@ float QmitkIsoSurface::getThreshold()
 
 QmitkIsoSurface::~QmitkIsoSurface()
 {
-  berry::IPreferences::Pointer prefs = this->GetPreferences();
-  if (prefs.IsNotNull())
-    prefs->Put("defaultThreshold", m_Controls->thresholdLineEdit->text());
+  auto* prefs = this->GetPreferences();
+  if (prefs != nullptr)
+    prefs->Put("defaultThreshold", m_Controls->thresholdLineEdit->text().toStdString());
 }

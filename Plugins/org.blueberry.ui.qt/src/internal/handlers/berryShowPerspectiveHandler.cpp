@@ -12,7 +12,6 @@ found in the LICENSE file.
 
 #include "berryShowPerspectiveHandler.h"
 
-#include <berryIPreferences.h>
 #include <berryIWorkbenchCommandConstants.h>
 #include <berryIWorkbenchWindow.h>
 
@@ -25,6 +24,8 @@ found in the LICENSE file.
 #include "berryWorkbenchPlugin.h"
 
 #include <QMessageBox>
+
+#include <mitkIPreferences.h>
 
 namespace berry
 {

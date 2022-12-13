@@ -15,10 +15,14 @@ found in the LICENSE file.
 
 #include "org_mitk_gui_qt_segmentation_Export.h"
 
-#include <berryIPreferences.h>
 #include <berryIQtPreferencePage.h>
 
 class QWidget;
+
+namespace mitk
+{
+  class IPreferences;
+}
 
 namespace Ui
 {
@@ -59,7 +63,7 @@ protected:
 
   bool m_Initializing;
 
-  berry::IPreferences::Pointer m_SegmentationPreferencesNode;
+  mitk::IPreferences* m_SegmentationPreferencesNode;
 };
 
 #endif // QMITKSEGMENTATIONPREFERENCEPAGE_H

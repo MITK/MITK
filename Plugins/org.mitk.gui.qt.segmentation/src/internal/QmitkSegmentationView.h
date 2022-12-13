@@ -18,8 +18,6 @@ found in the LICENSE file.
 #include <QmitkAbstractView.h>
 #include <mitkIRenderWindowPartListener.h>
 
-#include <berryIBerryPreferences.h>
-
 #include <mitkSegmentationInteractor.h>
 
 /**
@@ -132,7 +130,7 @@ private:
   void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
 
-  void OnPreferencesChanged(const berry::IBerryPreferences* prefs) override;
+  void OnPreferencesChanged(const mitk::IPreferences* prefs) override;
 
   void NodeAdded(const mitk::DataNode* node) override;
 

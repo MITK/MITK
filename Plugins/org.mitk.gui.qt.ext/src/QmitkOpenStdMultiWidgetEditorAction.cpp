@@ -16,10 +16,11 @@ found in the LICENSE file.
 
 #include <berryIEditorPart.h>
 #include <berryIWorkbenchPage.h>
-#include <berryIPreferencesService.h>
 #include <berryIWorkbench.h>
-#include <berryPlatform.h>
 #include <mitkDataStorageEditorInput.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 #include "internal/QmitkCommonExtPlugin.h"
 #include <mitkIDataStorageService.h>
@@ -47,7 +48,7 @@ void QmitkOpenStdMultiWidgetEditorAction::init(berry::IWorkbenchWindow::Pointer 
   this->setText("Standard Display");
   this->setToolTip("Open the standard multi widget editor");
 
-  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+  auto* prefService = mitk::CoreServices::GetPreferencesService();
 
   m_GeneralPreferencesNode = prefService->GetSystemPreferences()->Node("/General");
 

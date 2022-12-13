@@ -15,7 +15,6 @@ found in the LICENSE file.
 #include "berryExpressions.h"
 #include "berryExpressionPlugin.h"
 
-#include <berryPlatform.h>
 #include <berryIConfigurationElement.h>
 
 namespace berry {

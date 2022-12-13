@@ -15,7 +15,6 @@ found in the LICENSE file.
 #define QMITKABSTRACTRENDEREDITOR_H
 
 #include <berryQtEditorPart.h>
-#include <berryIBerryPreferences.h>
 
 #include "mitkIRenderWindowPart.h"
 
@@ -25,6 +24,11 @@ found in the LICENSE file.
 #include <org_mitk_gui_qt_common_Export.h>
 
 class QmitkAbstractRenderEditorPrivate;
+
+namespace mitk
+{
+  class IPreferences;
+}
 
 /**
  * \ingroup org_mitk_gui_qt_common
@@ -48,7 +52,7 @@ class QmitkAbstractRenderEditorPrivate;
  *
  * You may reimplement the following private virtual methods to be notified about certain changes:
  * <ul>
- * <li>void OnPreferencesChanged(const berry::IBerryPreferences*)
+ * <li>void OnPreferencesChanged(const mitk::IPreferences*)
  * </ul>
  *
  * \see IRenderWindowPart
@@ -96,7 +100,7 @@ protected:
   /**
    * Get the preferences for this editor.
    */
-  virtual berry::IPreferences::Pointer GetPreferences() const;
+  virtual mitk::IPreferences* GetPreferences() const;
 
   /**
    * Get the RenderingManager used by this editor. This default implementation uses the
@@ -151,7 +155,7 @@ protected:
 
 private:
 
-  virtual void OnPreferencesChanged(const berry::IBerryPreferences*);
+  virtual void OnPreferencesChanged(const mitk::IPreferences*);
 
 private:
 

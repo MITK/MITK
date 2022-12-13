@@ -13,15 +13,22 @@ found in the LICENSE file.
 #ifndef QmitkStdMultiWidgetEditorPreferencePage_h
 #define QmitkStdMultiWidgetEditorPreferencePage_h
 
-#include <berryIPreferences.h>
 #include <berryIQtPreferencePage.h>
-#include <QProcess>
 #include <QScopedPointer>
-#include <QPushButton>
+#include <QString>
+
+#include <array>
+
+class QPushButton;
+
+namespace mitk
+{
+  class IPreferences;
+}
 
 namespace Ui
 {
-class QmitkStdMultiWidgetEditorPreferencePage;
+  class QmitkStdMultiWidgetEditorPreferencePage;
 }
 
 class QmitkStdMultiWidgetEditorPreferencePage : public QObject, public berry::IQtPreferencePage
@@ -64,25 +71,25 @@ protected:
    *
    * If two different colors are chosen, a gradient background appears.
    */
-  QString m_WidgetBackgroundColor1[4];
-  QString m_WidgetBackgroundColor2[4];
+  std::array<QString, 4> m_WidgetBackgroundColor1;
+  std::array<QString, 4> m_WidgetBackgroundColor2;
 
   /**
    * @brief m_WidgetDecorationColor the decoration color.
    *
    * The rectangle prop, the crosshair, the 3D planes and the corner annotation use this.
    */
-  QString m_WidgetDecorationColor[4];
+  std::array<QString, 4> m_WidgetDecorationColor;
 
   /**
    * @brief m_Widget1Annotation the text of the corner annotation.
    */
-  QString m_WidgetAnnotation[4];
+  std::array<QString, 4> m_WidgetAnnotation;
 
   /**
    * @brief m_Preferences the berry preferences.
    */
-  berry::IPreferences::Pointer m_Preferences;
+  mitk::IPreferences* m_Preferences;
 
   /**
    * @brief SetStyleSheetToColorChooserButton colorize a button.

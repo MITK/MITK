@@ -15,11 +15,15 @@ found in the LICENSE file.
 
 #include "ui_QmitkMxNMultiWidgetEditorPreferencePage.h"
 
-#include <berryIPreferences.h>
 #include <berryIQtPreferencePage.h>
 #include <QProcess>
 #include <QScopedPointer>
 #include <QPushButton>
+
+namespace mitk
+{
+  class IPreferences;
+}
 
 class QmitkMxNMultiWidgetEditorPreferencePage : public QObject, public berry::IQtPreferencePage
 {
@@ -53,7 +57,7 @@ protected:
   /**
    * @brief m_Preferences the berry preferences.
    */
-  berry::IPreferences::Pointer m_Preferences;
+  mitk::IPreferences* m_Preferences;
 
 private:
 

@@ -33,6 +33,7 @@ found in the LICENSE file.
 #include <mitkToolManagerProvider.h>
 #include <mitkVtkResliceInterpolationProperty.h>
 #include <mitkWorkbenchUtil.h>
+#include <mitkIPreferences.h>
 
 // Qmitk
 #include <QmitkRenderWindow.h>
@@ -717,7 +718,7 @@ void QmitkSegmentationView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*
   m_Controls->slicesInterpolator->Uninitialize();
 }
 
-void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
+void QmitkSegmentationView::OnPreferencesChanged(const mitk::IPreferences* prefs)
 {
   auto labelSuggestions = mitk::BaseApplication::instance().config().getString(mitk::BaseApplication::ARG_SEGMENTATION_LABEL_SUGGESTIONS.toStdString(), "");
 
@@ -737,7 +738,7 @@ void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences*
   m_DrawOutline = prefs->GetBool("draw outline", true);
   m_SelectionMode = prefs->GetBool("selection mode", false);
 
-  m_LabelSetPresetPreference = prefs->Get("label set preset", "");
+  m_LabelSetPresetPreference = QString::fromStdString(prefs->Get("label set preset", ""));
 
   this->ApplyDisplayOptions();
   this->ApplySelectionMode();

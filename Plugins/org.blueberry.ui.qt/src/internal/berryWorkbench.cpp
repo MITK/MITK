@@ -52,8 +52,6 @@ found in the LICENSE file.
 #include <berryIElementFactory.h>
 #include <berryIHandler.h>
 #include <berryIHandlerService.h>
-#include <berryIPreferencesService.h>
-#include <berryIPreferences.h>
 #include <berryIProduct.h>
 #include <berryISourceProvider.h>
 #include <berryIServiceScopes.h>
@@ -63,6 +61,9 @@ found in the LICENSE file.
 #include <QMessageBox>
 
 #include <Poco/FileStream.h>
+
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 namespace berry
 {
@@ -1247,7 +1248,7 @@ IWorkbenchPage::Pointer Workbench::ShowPerspective(
   win = window.Cast<WorkbenchWindow>();
   if (win)
   {
-    IPreferencesService* store = WorkbenchPlugin::GetDefault()->GetPreferencesService();
+    auto* store = WorkbenchPlugin::GetDefault()->GetPreferencesService();
     int mode = store->GetSystemPreferences()->GetInt(PreferenceConstants::OPEN_PERSP_MODE,
                                                      PreferenceConstants::OPM_ACTIVE_PAGE);
     IWorkbenchPage::Pointer page = win->GetActivePage();

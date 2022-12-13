@@ -14,9 +14,9 @@ found in the LICENSE file.
 
 #include "berryObjects.h"
 
-#include "berryIPreferences.h"
-
 #include <QStringList>
+
+#include <mitkIPreferences.h>
 
 namespace berry {
 
@@ -26,12 +26,12 @@ ToggleState::ToggleState()
   SetValue(value);
 }
 
-void ToggleState::Load(const SmartPointer<IPreferences>& store,
-                       const QString& preferenceKey)
+void ToggleState::Load(const mitk::IPreferences* store,
+                       const std::string& preferenceKey)
 {
   bool currentValue = GetValue().Cast<ObjectBool>()->GetValue();
-  //store.setDefault(preferenceKey, currentValue);
-  if (ShouldPersist() && (store->Keys().contains(preferenceKey)))
+  const auto keys = store->Keys();
+  if (ShouldPersist() && (std::find(keys.begin(), keys.end(), preferenceKey) != keys.end()))
   {
     const bool value = store->GetBool(preferenceKey, currentValue);
     if (value != currentValue)
@@ -42,8 +42,8 @@ void ToggleState::Load(const SmartPointer<IPreferences>& store,
   }
 }
 
-void ToggleState::Save(const SmartPointer<IPreferences>& store,
-                       const QString& preferenceKey)
+void ToggleState::Save(mitk::IPreferences* store,
+                       const std::string& preferenceKey)
 {
   if (ShouldPersist())
   {

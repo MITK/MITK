@@ -15,6 +15,11 @@ found in the LICENSE file.
 
 #include <berryIQtPreferencePage.h>
 
+namespace mitk
+{
+  class IPreferences;
+}
+
 namespace Ui
 {
   class QmitkMitkWorkbenchIntroPreferencePage;
@@ -37,7 +42,7 @@ public:
   void Update() override;
 
 private:
-  berry::IPreferences::Pointer m_MitkWorkbenchIntroPreferencesNode;
+  mitk::IPreferences* m_MitkWorkbenchIntroPreferencesNode;
 
   Ui::QmitkMitkWorkbenchIntroPreferencePage* m_Ui;
   QWidget* m_Control;

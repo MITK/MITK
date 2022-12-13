@@ -14,6 +14,7 @@ found in the LICENSE file.
 #define BERRYWORKBENCHPREFERENCECONSTANTS_H_
 
 #include <org_blueberry_ui_qt_Export.h>
+#include <string>
 
 namespace berry
 {
@@ -35,12 +36,12 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    * Value is of type <code>boolean</code>.
    * </p>
    */
-  static const QString LINK_NAVIGATOR_TO_EDITOR; // "LINK_NAVIGATOR_TO_EDITOR";
+  static const std::string LINK_NAVIGATOR_TO_EDITOR; // "LINK_NAVIGATOR_TO_EDITOR";
 
   /**
    * A named preference for how a new perspective is opened.
    * <p>
-   * Value is of type <code>QString</code>. The possible values are defined
+   * Value is of type <code>std::string</code>. The possible values are defined
    * by <code>OPEN_PERSPECTIVE_WINDOW, OPEN_PERSPECTIVE_PAGE and
    * OPEN_PERSPECTIVE_REPLACE</code>.
    * </p>
@@ -50,13 +51,13 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    * @see #OPEN_PERSPECTIVE_REPLACE
    * @see #NO_NEW_PERSPECTIVE
    */
-  static const QString OPEN_NEW_PERSPECTIVE; // "OPEN_NEW_PERSPECTIVE";
+  static const std::string OPEN_NEW_PERSPECTIVE; // "OPEN_NEW_PERSPECTIVE";
 
   /**
    * A preference value indicating that an action should open a new
    * perspective in a new window.
    */
-  static const QString OPEN_PERSPECTIVE_WINDOW; // "OPEN_PERSPECTIVE_WINDOW";
+  static const std::string OPEN_PERSPECTIVE_WINDOW; // "OPEN_PERSPECTIVE_WINDOW";
 
   /**
    * A preference value indicating that an action should open a new
@@ -64,24 +65,24 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    * @deprecated Opening a Perspective in a new page is no longer supported
    *             functionality as of 2.0.
    */
-  static const QString OPEN_PERSPECTIVE_PAGE; // "OPEN_PERSPECTIVE_PAGE";
+  static const std::string OPEN_PERSPECTIVE_PAGE; // "OPEN_PERSPECTIVE_PAGE";
 
   /**
    * A preference value indicating that an action should open a new
    * perspective by replacing the current perspective.
    */
-  static const QString OPEN_PERSPECTIVE_REPLACE; // "OPEN_PERSPECTIVE_REPLACE";
+  static const std::string OPEN_PERSPECTIVE_REPLACE; // "OPEN_PERSPECTIVE_REPLACE";
 
   /**
    * A preference value indicating that an action should not open a new
    * perspective.
    */
-  static const QString NO_NEW_PERSPECTIVE; // "NO_NEW_PERSPECTIVE";
+  static const std::string NO_NEW_PERSPECTIVE; // "NO_NEW_PERSPECTIVE";
 
   /**
    * A named preference indicating the default workbench perspective.
    */
-  static const QString DEFAULT_PERSPECTIVE_ID; // "defaultPerspectiveId";
+  static const std::string DEFAULT_PERSPECTIVE_ID; // "defaultPerspectiveId";
 
   /**
    * A named preference indicating the presentation factory to use for the
@@ -89,7 +90,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    *
    * @since 3.0
    */
-  static const QString PRESENTATION_FACTORY_ID; // "presentationFactoryId";
+  static const std::string PRESENTATION_FACTORY_ID; // "presentationFactoryId";
 
   /**
    * A named preference indicating where the perspective bar should be docked.
@@ -102,7 +103,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    *
    * @since 3.0
    */
-  static const QString DOCK_PERSPECTIVE_BAR; // "DOCK_PERSPECTIVE_BAR";
+  static const std::string DOCK_PERSPECTIVE_BAR; // "DOCK_PERSPECTIVE_BAR";
 
   /**
    * A preference indication the initial size of the perspective bar. The default value is 160.
@@ -114,7 +115,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    *
    *  @since 3.5
    */
-  static const QString PERSPECTIVE_BAR_SIZE; // "PERSPECTIVE_BAR_SIZE";
+  static const std::string PERSPECTIVE_BAR_SIZE; // "PERSPECTIVE_BAR_SIZE";
 
   /**
    * A named preference indicating where the fast view bar should be docked in
@@ -129,7 +130,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    * @see #RIGHT
    * @since 3.0
    */
-  static const QString INITIAL_FAST_VIEW_BAR_LOCATION; // "initialFastViewBarLocation";
+  static const std::string INITIAL_FAST_VIEW_BAR_LOCATION; // "initialFastViewBarLocation";
 
   /**
    * A named preference indicating the preferred layout direction of parts
@@ -139,7 +140,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    * This preference may be one of the following values: {@link #LEFT} or {@link #RIGHT}.
    * </p>
    */
-  static const QString PREFERRED_SASH_LAYOUT; // "preferredSashLayout";
+  static const std::string PREFERRED_SASH_LAYOUT; // "preferredSashLayout";
 
   /**
    * Constant to be used when referring to the top right of the workbench
@@ -148,7 +149,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    * @see #DOCK_PERSPECTIVE_BAR
    * @since 3.0
    */
-  static const QString TOP_RIGHT; // "topRight";
+  static const std::string TOP_RIGHT; // "topRight";
 
   /**
    * Constant to be used when referring to the top left of the workbench
@@ -157,7 +158,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    * @see #DOCK_PERSPECTIVE_BAR
    * @since 3.0
    */
-  static const QString TOP_LEFT; // "topLeft";
+  static const std::string TOP_LEFT; // "topLeft";
 
   /**
    * Constant to be used when referring to the left side of the workbench
@@ -167,7 +168,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    * @see #INITIAL_FAST_VIEW_BAR_LOCATION
    * @since 3.0
    */
-  static const QString LEFT; // "left";
+  static const std::string LEFT; // "left";
 
   /**
    * Constant to be used when referring to the bottom of the workbench window.
@@ -175,7 +176,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    * @see #INITIAL_FAST_VIEW_BAR_LOCATION
    * @since 3.0
    */
-  static const QString BOTTOM; // "bottom";
+  static const std::string BOTTOM; // "bottom";
 
   /**
    * Constant to be used when referring to the right side of the workbench
@@ -184,7 +185,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    * @see #INITIAL_FAST_VIEW_BAR_LOCATION
    * @since 3.0
    */
-  static const QString RIGHT; // "right";
+  static const std::string RIGHT; // "right";
 
   /**
    * A named preference indicating whether the workbench should show the
@@ -198,7 +199,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    * @see org.eclipse.ui.application.WorkbenchWindowAdvisor#openIntro()
    * @since 3.0
    */
-  static const QString SHOW_INTRO; // "showIntro";
+  static const std::string SHOW_INTRO; // "showIntro";
 
   /**
    * A named preference for whether the workbench should show traditional
@@ -213,7 +214,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    *
    * @since 3.0
    */
-  static const QString SHOW_TRADITIONAL_STYLE_TABS; // "SHOW_TRADITIONAL_STYLE_TABS";
+  static const std::string SHOW_TRADITIONAL_STYLE_TABS; // "SHOW_TRADITIONAL_STYLE_TABS";
 
   /**
    * A named preference for whether the workbench should show text on the
@@ -228,7 +229,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    *
    * @since 3.0
    */
-  static const QString SHOW_TEXT_ON_PERSPECTIVE_BAR; // "SHOW_TEXT_ON_PERSPECTIVE_BAR";
+  static const std::string SHOW_TEXT_ON_PERSPECTIVE_BAR; // "SHOW_TEXT_ON_PERSPECTIVE_BAR";
 
   /**
    * A named preference for whether the workbench should show the "open
@@ -244,7 +245,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    *
    * @since 3.4
    */
-  static const QString SHOW_OPEN_ON_PERSPECTIVE_BAR; // "SHOW_OPEN_ON_PERSPECTIVE_BAR";
+  static const std::string SHOW_OPEN_ON_PERSPECTIVE_BAR; // "SHOW_OPEN_ON_PERSPECTIVE_BAR";
 
   /**
    * A named preference for whether the workbench should show the "Other..."
@@ -259,7 +260,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    *
    * @since 3.4
    */
-  static const QString SHOW_OTHER_IN_PERSPECTIVE_MENU; // "SHOW_OTHER_IN_PERSPECTIVE_MENU";
+  static const std::string SHOW_OTHER_IN_PERSPECTIVE_MENU; // "SHOW_OTHER_IN_PERSPECTIVE_MENU";
 
   /**
    * A named preference for the text of the Help Contents action.
@@ -271,7 +272,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    *
    * @since 3.0
    */
-  static const QString HELP_CONTENTS_ACTION_TEXT; // "helpContentsActionText";
+  static const std::string HELP_CONTENTS_ACTION_TEXT; // "helpContentsActionText";
 
   /**
    * A named preference for the text of the Help Search action.
@@ -283,7 +284,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    *
    * @since 3.1
    */
-  static const QString HELP_SEARCH_ACTION_TEXT; // "helpSearchActionText";
+  static const std::string HELP_SEARCH_ACTION_TEXT; // "helpSearchActionText";
 
   /**
    * A named preference for the text of the Dynamic Help action.
@@ -295,7 +296,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    *
    * @since 3.1
    */
-  static const QString DYNAMIC_HELP_ACTION_TEXT; // "dynamicHelpActionText";
+  static const std::string DYNAMIC_HELP_ACTION_TEXT; // "dynamicHelpActionText";
 
   /**
    * A named preference for enabling animations when a layout transition
@@ -307,7 +308,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    *
    * @since 3.1
    */
-  static const QString ENABLE_ANIMATIONS; // "ENABLE_ANIMATIONS";
+  static const std::string ENABLE_ANIMATIONS; // "ENABLE_ANIMATIONS";
 
   /**
    * A named preference that view implementors can used to determine whether
@@ -320,7 +321,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    *
    * @since 3.4
    */
-  static const QString USE_COLORED_LABELS; // "USE_COLORED_LABELS";
+  static const std::string USE_COLORED_LABELS; // "USE_COLORED_LABELS";
 
   /**
    * <p>
@@ -334,7 +335,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    *
    * @since 3.1
    */
-  static const QString KEY_CONFIGURATION_ID; // "KEY_CONFIGURATION_ID";
+  static const std::string KEY_CONFIGURATION_ID; // "KEY_CONFIGURATION_ID";
 
   /**
    * <p>
@@ -349,7 +350,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    *
    * @since 3.1
    */
-  static const QString EDITOR_MINIMUM_CHARACTERS; // "EDITOR_MINIMUM_CHARACTERS";
+  static const std::string EDITOR_MINIMUM_CHARACTERS; // "EDITOR_MINIMUM_CHARACTERS";
 
   /**
    * <p>
@@ -361,21 +362,21 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    *
    * @since 3.2
    */
-  static const QString VIEW_MINIMUM_CHARACTERS; // "VIEW_MINIMUM_CHARACTERS";
+  static const std::string VIEW_MINIMUM_CHARACTERS; // "VIEW_MINIMUM_CHARACTERS";
 
   /**
    * Stores whether or not system jobs are being shown.
    *
    * @since 3.1
    */
-  static const QString SHOW_SYSTEM_JOBS; // "SHOW_SYSTEM_JOBS";
+  static const std::string SHOW_SYSTEM_JOBS; // "SHOW_SYSTEM_JOBS";
 
   /**
    * Workbench preference for the current theme.
    *
    * @since 3.1
    */
-  static const QString CURRENT_THEME_ID; // "CURRENT_THEME_ID";
+  static const std::string CURRENT_THEME_ID; // "CURRENT_THEME_ID";
 
   /**
    * A preference value indicating whether editors should be closed before
@@ -384,7 +385,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    *
    * @since 3.1
    */
-  static const QString CLOSE_EDITORS_ON_EXIT; // "CLOSE_EDITORS_ON_EXIT";
+  static const std::string CLOSE_EDITORS_ON_EXIT; // "CLOSE_EDITORS_ON_EXIT";
 
   /**
    * Stores whether or not to show progress while starting the workbench. The
@@ -392,14 +393,14 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    *
    * @since 3.1
    */
-  static const QString SHOW_PROGRESS_ON_STARTUP; // "SHOW_PROGRESS_ON_STARTUP";
+  static const std::string SHOW_PROGRESS_ON_STARTUP; // "SHOW_PROGRESS_ON_STARTUP";
 
   /**
    * Stores whether or not to show the memory monitor in the workbench window.
    *
    * @since 3.1
    */
-  static const QString SHOW_MEMORY_MONITOR; // "SHOW_MEMORY_MONITOR";
+  static const std::string SHOW_MEMORY_MONITOR; // "SHOW_MEMORY_MONITOR";
 
   /**
    * Stores whether or not to use the window working set as the default
@@ -408,7 +409,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    *
    * @since 3.2
    */
-  static const QString USE_WINDOW_WORKING_SET_BY_DEFAULT; // "USE_WINDOW_WORKING_SET_BY_DEFAULT";
+  static const std::string USE_WINDOW_WORKING_SET_BY_DEFAULT; // "USE_WINDOW_WORKING_SET_BY_DEFAULT";
 
   /**
    * Stores whether or not to show the text widget that allows type-ahead
@@ -417,7 +418,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    *
    * @since 3.2
    */
-  static const QString SHOW_FILTERED_TEXTS; // "SHOW_FILTERED_TEXTS";
+  static const std::string SHOW_FILTERED_TEXTS; // "SHOW_FILTERED_TEXTS";
 
   /**
    * Stores whether or not views may be detached. The default is
@@ -425,7 +426,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    *
    * @since 3.2
    */
-  static const QString ENABLE_DETACHED_VIEWS; // "ENABLE_DETACHED_VIEWS";
+  static const std::string ENABLE_DETACHED_VIEWS; // "ENABLE_DETACHED_VIEWS";
 
   /**
    * Stores whether or not the workbench prompts for saving when a dirty
@@ -437,7 +438,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    * @see Saveable
    * @since 3.2
    */
-  static const QString PROMPT_WHEN_SAVEABLE_STILL_OPEN; // "PROMPT_WHEN_SAVEABLE_STILL_OPEN";
+  static const std::string PROMPT_WHEN_SAVEABLE_STILL_OPEN; // "PROMPT_WHEN_SAVEABLE_STILL_OPEN";
 
   /**
    * Lists the extra perspectives to show in the perspective bar. The value is
@@ -446,7 +447,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    *
    * @since 3.2
    */
-  static const QString PERSPECTIVE_BAR_EXTRAS; // "PERSPECTIVE_BAR_EXTRAS";
+  static const std::string PERSPECTIVE_BAR_EXTRAS; // "PERSPECTIVE_BAR_EXTRAS";
 
   /**
    * Allows locking the trim to prevent user dragging on startup. The default
@@ -454,7 +455,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    *
    * @since 3.2
    */
-  static const QString LOCK_TRIM; // "LOCK_TRIM";
+  static const std::string LOCK_TRIM; // "LOCK_TRIM";
 
   /**
    * A named preference for providing the 3.3 presentation's min/max behaviour
@@ -465,7 +466,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    *
    * @since 3.3
    */
-  static const QString ENABLE_NEW_MIN_MAX; // "ENABLE_MIN_MAX";
+  static const std::string ENABLE_NEW_MIN_MAX; // "ENABLE_MIN_MAX";
 
   /**
    * A named preference for disabling opening a new fast view from the fast
@@ -480,7 +481,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    *
    * @since 3.3
    */
-  static const QString DISABLE_NEW_FAST_VIEW; // "disableNewFastView";
+  static const std::string DISABLE_NEW_FAST_VIEW; // "disableNewFastView";
 
   /**
    * A named preference for enabling the 3.2 behavior for closing sticky
@@ -493,7 +494,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    *
    * @since 3.3
    */
-  static const QString ENABLE_32_STICKY_CLOSE_BEHAVIOR; // "ENABLE_32_STICKY_CLOSE_BEHAVIOR";
+  static const std::string ENABLE_32_STICKY_CLOSE_BEHAVIOR; // "ENABLE_32_STICKY_CLOSE_BEHAVIOR";
 
   /**
    * An named preference for whether or not tabs are on the top or bottom
@@ -504,7 +505,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    *
    * @since 3.4
    */
-  static const QString VIEW_TAB_POSITION; // "VIEW_TAB_POSITION";
+  static const std::string VIEW_TAB_POSITION; // "VIEW_TAB_POSITION";
 
   /**
    * An named preference for whether or not tabs are on the top or bottom
@@ -515,7 +516,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    *
    * @since 3.4
    */
-  static const QString EDITOR_TAB_POSITION; // "EDITOR_TAB_POSITION";
+  static const std::string EDITOR_TAB_POSITION; // "EDITOR_TAB_POSITION";
 
   /**
    * Workbench preference id for whether the workbench should show multiple
@@ -530,7 +531,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    *
    * @since 3.4
    */
-  static const QString SHOW_MULTIPLE_EDITOR_TABS; // "SHOW_MULTIPLE_EDITOR_TABS";
+  static const std::string SHOW_MULTIPLE_EDITOR_TABS; // "SHOW_MULTIPLE_EDITOR_TABS";
 
   /**
    * Workbench preference id for whether the workbench may open editors
@@ -546,7 +547,7 @@ struct BERRY_UI_QT WorkbenchPreferenceConstants
    *
    * @since 3.4
    */
-  static const QString DISABLE_OPEN_EDITOR_IN_PLACE; // "DISABLE_OPEN_EDITOR_IN_PLACE";
+  static const std::string DISABLE_OPEN_EDITOR_IN_PLACE; // "DISABLE_OPEN_EDITOR_IN_PLACE";
 };
 
 }

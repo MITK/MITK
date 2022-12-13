@@ -12,6 +12,8 @@ found in the LICENSE file.
 
 #include "QmitkMultiWidgetDecorationManager.h"
 
+#include <mitkIPreferences.h>
+
 // org mitk gui common plugin
 #include <mitkIRenderWindowPart.h>
 
@@ -34,7 +36,7 @@ QmitkMultiWidgetDecorationManager::QmitkMultiWidgetDecorationManager(QmitkAbstra
   // nothing here
 }
 
-void QmitkMultiWidgetDecorationManager::DecorationPreferencesChanged(const berry::IBerryPreferences* preferences)
+void QmitkMultiWidgetDecorationManager::DecorationPreferencesChanged(const mitk::IPreferences* preferences)
 {
   // Enable change of logo. If no DepartmentLogo was set explicitly, MBILogo is used.
   // Set new department logo by prefs->Set("DepartmentLogo", "PathToImage");
@@ -47,19 +49,19 @@ void QmitkMultiWidgetDecorationManager::DecorationPreferencesChanged(const berry
   SetupLogo(qPrintable(":/org.mitk.gui.qt.stdmultiwidgeteditor/defaultWatermark.png"));
   ShowLogo(true);
 
-  const berry::IPreferences* currentNode = preferences;
+  const auto* currentNode = preferences;
   while (currentNode)
   {
     bool logoFound = false;
-    foreach(const QString& key, currentNode->Keys())
+    for(const auto& key : currentNode->Keys())
     {
       if (key == "DepartmentLogo")
       {
         ShowLogo(false);
-        QString departmentLogoLocation = currentNode->Get("DepartmentLogo", "");
-        if (!departmentLogoLocation.isEmpty())
+        auto departmentLogoLocation = currentNode->Get("DepartmentLogo", "");
+        if (!departmentLogoLocation.empty())
         {
-          SetupLogo(qPrintable(departmentLogoLocation));
+          SetupLogo(departmentLogoLocation.c_str());
           ShowLogo(true);
         }
         logoFound = true;
@@ -71,7 +73,7 @@ void QmitkMultiWidgetDecorationManager::DecorationPreferencesChanged(const berry
     {
       break;
     }
-    currentNode = currentNode->Parent().GetPointer();
+    currentNode = currentNode->Parent();
   }
 
   /*

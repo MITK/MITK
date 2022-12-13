@@ -12,6 +12,8 @@ found in the LICENSE file.
 
 #include <mitkBaseApplication.h>
 
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
 #include <mitkExceptionMacro.h>
 #include <mitkLogMacros.h>
 #include <mitkProvisioningInfo.h>
@@ -564,7 +566,13 @@ namespace mitk
     QString storageDir = this->getCTKFrameworkStorageDir();
 
     if (!storageDir.isEmpty())
+    {
       d->m_FWProps[ctkPluginConstants::FRAMEWORK_STORAGE] = storageDir;
+
+      // Initialize core service preferences at the exact same location as their predecessor BlueBerry preferences
+      mitk::CoreServicePointer preferencesService(mitk::CoreServices::GetPreferencesService());
+      preferencesService->InitializeStorage(storageDir.toStdString() + "/data/3/prefs.xml");
+    }
 
     // 8. Set the library search paths and the pre-load library property
     this->initializeLibraryPaths();

@@ -15,7 +15,6 @@ found in the LICENSE file.
 #include "QmitkPropertyItemModel.h"
 #include "QmitkPropertyItemSortFilterProxyModel.h"
 #include "QmitkPropertyTreeView.h"
-#include <berryIBerryPreferences.h>
 #include <berryQtStyleManager.h>
 #include <mitkIPropertyAliases.h>
 #include <mitkIPropertyDescriptions.h>

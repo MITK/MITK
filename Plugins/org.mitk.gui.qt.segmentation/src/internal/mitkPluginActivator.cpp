@@ -25,6 +25,10 @@ found in the LICENSE file.
 #include "QmitkConvertToMultiLabelSegmentationAction.h"
 #include "QmitkCreateMultiLabelSegmentationAction.h"
 
+#include <usModuleInitialization.h>
+
+US_INITIALIZE_MODULE
+
 using namespace mitk;
 
 ctkPluginContext* PluginActivator::m_context = nullptr;

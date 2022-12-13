@@ -13,8 +13,6 @@ found in the LICENSE file.
 #include "berryPerspectivesPreferencePage.h"
 #include "ui_berryPerspectivesPreferencePage.h"
 
-#include <berryIPreferencesService.h>
-#include <berryIPreferences.h>
 #include <berryIWorkbenchPage.h>
 
 #include "internal/berryPerspective.h"
@@ -25,6 +23,9 @@ found in the LICENSE file.
 
 #include <QListWidgetItem>
 #include <QMessageBox>
+
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 namespace berry {
 

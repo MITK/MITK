@@ -16,10 +16,9 @@ found in the LICENSE file.
 // qt
 #include <QMessageBox>
 
-// berry
-#include <berryIPreferences.h>
-#include <berryIPreferencesService.h>
-#include <berryPlatform.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 namespace RemoveAction
 {
@@ -61,9 +60,8 @@ namespace RemoveAction
         dataStorage->Remove(dataNode);
       }
 
-      berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
-      berry::IPreferences::Pointer preferencesNode =
-        prefService->GetSystemPreferences()->Node(QmitkDataNodeGlobalReinitAction::ACTION_ID);
+      auto* prefService = mitk::CoreServices::GetPreferencesService();
+      auto* preferencesNode = prefService->GetSystemPreferences()->Node(QmitkDataNodeGlobalReinitAction::ACTION_ID.toStdString());
 
       bool globalReinit = preferencesNode->GetBool("Call global reinit if node is deleted", true);
       if (globalReinit)

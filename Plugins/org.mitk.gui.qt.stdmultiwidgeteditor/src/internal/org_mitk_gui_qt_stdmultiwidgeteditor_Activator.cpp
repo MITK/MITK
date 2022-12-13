@@ -15,6 +15,10 @@ found in the LICENSE file.
 #include "../QmitkStdMultiWidgetEditor.h"
 #include "QmitkStdMultiWidgetEditorPreferencePage.h"
 
+#include <usModuleInitialization.h>
+
+US_INITIALIZE_MODULE
+
 ctkPluginContext* org_mitk_gui_qt_stdmultiwidgeteditor_Activator::m_Context = nullptr;
 
 void

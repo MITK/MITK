@@ -15,8 +15,9 @@ found in the LICENSE file.
 
 #include "org_mitk_gui_qt_xnatinterface_Activator.h"
 
-#include "berryPlatform.h"
-#include "berryIPreferences.h"
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 #include "mitkLogMacros.h"
 
 #include <QApplication>
@@ -56,17 +57,17 @@ void QmitkXnatSessionManager::OpenXnatSession()
 
 void QmitkXnatSessionManager::CreateXnatSession()
 {
-  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
-  berry::IPreferences::Pointer nodeConnectionPref = prefService->GetSystemPreferences()->Node(QmitkXnatTreeBrowserView::VIEW_ID);
+  auto* prefService = mitk::CoreServices::GetPreferencesService();
+  auto* nodeConnectionPref = prefService->GetSystemPreferences()->Node(QmitkXnatTreeBrowserView::VIEW_ID.toStdString());
 
-  QUrl url(nodeConnectionPref->Get("Server Address", ""));
-  url.setPort(nodeConnectionPref->Get("Port", "").toInt());
+  QUrl url(QString::fromStdString(nodeConnectionPref->Get("Server Address", "")));
+  url.setPort(std::stoi(nodeConnectionPref->Get("Port", "")));
 
   ctkXnatLoginProfile profile;
   profile.setName("Default");
   profile.setServerUrl(url);
-  profile.setUserName(nodeConnectionPref->Get("Username", ""));
-  profile.setPassword(nodeConnectionPref->Get("Password", ""));
+  profile.setUserName(QString::fromStdString(nodeConnectionPref->Get("Username", "")));
+  profile.setPassword(QString::fromStdString(nodeConnectionPref->Get("Password", "")));
   profile.setDefault(true);
 
   m_Session = new ctkXnatSession(profile);
@@ -75,14 +76,14 @@ void QmitkXnatSessionManager::CreateXnatSession()
   {
     QNetworkProxy proxy;
     proxy.setType(QNetworkProxy::HttpProxy);
-    proxy.setHostName(nodeConnectionPref->Get("Proxy Server Address", ""));
-    proxy.setPort(nodeConnectionPref->Get("Proxy Port", "").toUShort());
+    proxy.setHostName(QString::fromStdString(nodeConnectionPref->Get("Proxy Server Address", "")));
+    proxy.setPort(QString::fromStdString(nodeConnectionPref->Get("Proxy Port", "")).toUShort());
 
     if (nodeConnectionPref->Get("Proxy Username", "").length() != 0 &&
         nodeConnectionPref->Get("Proxy Password", "").length() != 0)
     {
-      proxy.setUser(nodeConnectionPref->Get("Proxy Username", ""));
-      proxy.setPassword(nodeConnectionPref->Get("Proxy Password", ""));
+      proxy.setUser(QString::fromStdString(nodeConnectionPref->Get("Proxy Username", "")));
+      proxy.setPassword(QString::fromStdString(nodeConnectionPref->Get("Proxy Password", "")));
     }
     // Setting the proxy
     m_Session->setHttpNetworkProxy(proxy);

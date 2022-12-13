@@ -25,5 +25,6 @@ endif()
 mitk_create_plugin(
   EXPORT_DIRECTIVE BERRY_UI_QT
   EXPORTED_INCLUDE_SUFFIXES ${PLUGIN_exported_include_suffixes}
+  MODULE_DEPENDS PUBLIC MitkCore
   PACKAGE_DEPENDS ${PLUGIN_package_depends}
 )

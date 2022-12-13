@@ -34,6 +34,7 @@ namespace mitk
   class IPropertyFilters;
   class IPropertyPersistence;
   class IPropertyRelations;
+  class IPreferencesService;
 
   /**
    * @brief Access MITK core services.
@@ -105,6 +106,14 @@ namespace mitk
      * @return A non-nullptr IMimeTypeProvider instance.
      */
     static IMimeTypeProvider *GetMimeTypeProvider(us::ModuleContext *context = us::GetModuleContext());
+
+    /**
+     * @brief Get an IPreferencesService instance.
+     * @param context The module context of the module getting the service.
+     * @return A non-nullptr IPreferencesService instance.
+     * @sa IPreferences
+     */
+    static IPreferencesService *GetPreferencesService(us::ModuleContext *context = us::GetModuleContext());
 
     /**
      * @brief Unget a previously acquired service instance.

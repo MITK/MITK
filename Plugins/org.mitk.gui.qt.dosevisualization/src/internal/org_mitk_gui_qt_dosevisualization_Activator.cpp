@@ -10,11 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-
 #include "org_mitk_gui_qt_dosevisualization_Activator.h"
 #include "RTDoseVisualizer.h"
 #include "RTUIPreferencePage.h"
 #include "DoseVisualizationPreferencePage.h"
+
+#include <usModuleInitialization.h>
+
+US_INITIALIZE_MODULE
 
 namespace mitk {
 

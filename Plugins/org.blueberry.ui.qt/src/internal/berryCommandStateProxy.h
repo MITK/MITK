@@ -18,7 +18,6 @@ found in the LICENSE file.
 namespace berry {
 
 struct IConfigurationElement;
-struct IPreferences;
 
 /**
  * <p>
@@ -56,12 +55,12 @@ private:
   /**
    * The key in the preference store to locate the persisted state.
    */
-  const QString preferenceKey;
+  const std::string preferenceKey;
 
   /**
    * The preference store containing the persisted state, if any.
    */
-  const SmartPointer<IPreferences> preferenceStore;
+  mitk::IPreferences* preferenceStore;
 
   /**
    * The real state. This value is <code>null</code> until the proxy is
@@ -98,8 +97,8 @@ public:
    */
   CommandStateProxy(const SmartPointer<IConfigurationElement>& configurationElement,
                     const QString& stateAttributeName,
-                    const SmartPointer<IPreferences>& preferenceStore,
-                    const QString& preferenceKey);
+                    mitk::IPreferences* preferenceStore,
+                    const std::string& preferenceKey);
 
   void AddListener(IStateListener* listener) override;
 
@@ -107,14 +106,14 @@ public:
 
   Object::Pointer GetValue() const override;
 
-  void Load(const SmartPointer<IPreferences>& store,
-            const QString& preferenceKey) override;
+  void Load(const mitk::IPreferences* store,
+            const std::string& preferenceKey) override;
 
   using State::RemoveListener;
   void RemoveListener(IStateListener* listener) override;
 
-  void Save(const SmartPointer<IPreferences>& store,
-            const QString& preferenceKey) override;
+  void Save(mitk::IPreferences* store,
+            const std::string& preferenceKey) override;
 
   void SetId(const QString& id) override;
 

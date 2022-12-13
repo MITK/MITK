@@ -18,8 +18,9 @@ found in the LICENSE file.
 #include <QFormLayout>
 #include <QCheckBox>
 
-#include <berryIPreferencesService.h>
-#include <berryPlatform.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 QmitkDataManagerPreferencePage::QmitkDataManagerPreferencePage()
   : m_MainControl(nullptr)
@@ -34,9 +35,9 @@ void QmitkDataManagerPreferencePage::Init(berry::IWorkbench::Pointer )
 
 void QmitkDataManagerPreferencePage::CreateQtControl(QWidget* parent)
 {
-  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+  auto* prefService = mitk::CoreServices::GetPreferencesService();
 
-  m_DataManagerPreferencesNode = prefService->GetSystemPreferences()->Node(QmitkDataManagerView::VIEW_ID);
+  m_DataManagerPreferencesNode = prefService->GetSystemPreferences()->Node(QmitkDataManagerView::VIEW_ID.toStdString());
 
   m_MainControl = new QWidget(parent);
   m_EnableSingleEditing = new QCheckBox;

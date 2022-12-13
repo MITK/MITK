@@ -12,12 +12,9 @@ found in the LICENSE file.
 
 #include "mitkWorkbenchUtil.h"
 
-#include <berryPlatform.h>
 #include <berryPlatformUI.h>
 #include <berryIEditorRegistry.h>
 #include <berryCoreException.h>
-#include <berryIPreferencesService.h>
-#include <berryIPreferences.h>
 
 #include "mitkIDataStorageService.h"
 #include "mitkDataStorageEditorInput.h"
@@ -29,6 +26,9 @@ found in the LICENSE file.
 #include "mitkNodePredicateNot.h"
 #include "mitkNodePredicateProperty.h"
 #include "mitkCoreObjectFactory.h"
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 #include "QmitkIOUtil.h"
 
@@ -161,15 +161,13 @@ namespace mitk {
     }
 
     bool globalReinitOnNodeAdded = true;
-    berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+    auto* prefService = mitk::CoreServices::GetPreferencesService();
     if (prefService != nullptr)
     {
-      berry::IPreferences::Pointer prefs
-        = prefService->GetSystemPreferences()->Node("org.mitk.views.datamanager");
-      if (prefs.IsNotNull())
-      {
+      auto* prefs = prefService->GetSystemPreferences()->Node("org.mitk.views.datamanager");
+
+      if (prefs != nullptr)
         globalReinitOnNodeAdded = prefs->GetBool("Call global reinit if node is added", true);
-      }
     }
 
     if (openEditor && globalReinitOnNodeAdded)
@@ -443,15 +441,9 @@ namespace mitk {
 
     if (logoFileInfo.exists())
     {
-      // Get the preferences service
-      ctkServiceReference prefServiceRef = context->getServiceReference<berry::IPreferencesService>();
-      berry::IPreferencesService* prefService = nullptr;
-      if (prefServiceRef)
-      {
-        prefService = context->getService<berry::IPreferencesService>(prefServiceRef);
-      }
+      auto* prefService = mitk::CoreServices::GetPreferencesService();
 
-      if (prefService)
+      if (prefService != nullptr)
       {
         prefService->GetSystemPreferences()->Put("DepartmentLogo", qPrintable(logoFileInfo.absoluteFilePath()));
       }

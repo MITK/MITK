@@ -31,9 +31,6 @@ found in the LICENSE file.
 #include <berryIEditorPart.h>
 #include <berryIWorkbenchPage.h>
 #include <berryIWorkbenchWindow.h>
-#include <berryIPreferencesService.h>
-#include "berryPlatform.h"
-
 
 QmitkExtFileSaveProjectAction::QmitkExtFileSaveProjectAction(berry::IWorkbenchWindow::Pointer window)
   : QAction(nullptr)

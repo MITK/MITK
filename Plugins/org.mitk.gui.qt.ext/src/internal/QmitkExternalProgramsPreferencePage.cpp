@@ -10,24 +10,25 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <berryIPreferencesService.h>
-#include <berryPlatform.h>
 #include <mitkExceptionMacro.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 #include <QFileDialog>
 #include <QProcess>
 #include <QTextCodec>
 #include <ui_QmitkExternalProgramsPreferencePage.h>
 #include "QmitkExternalProgramsPreferencePage.h"
 
-static berry::IPreferences::Pointer GetPreferences()
+static mitk::IPreferences* GetPreferences()
 {
-  berry::IPreferencesService* preferencesService = berry::Platform::GetPreferencesService();
+  auto* preferencesService = mitk::CoreServices::GetPreferencesService();
 
   if (preferencesService != nullptr)
   {
-    berry::IPreferences::Pointer systemPreferences = preferencesService->GetSystemPreferences();
+    auto* systemPreferences = preferencesService->GetSystemPreferences();
 
-    if (systemPreferences.IsNotNull())
+    if (systemPreferences != nullptr)
       return systemPreferences->Node("/org.mitk.gui.qt.ext.externalprograms");
   }
 
@@ -165,19 +166,19 @@ void QmitkExternalProgramsPreferencePage::PerformCancel()
 
 bool QmitkExternalProgramsPreferencePage::PerformOk()
 {
-  m_Preferences->Put("ffmpeg", m_FFmpegPath);
-  m_Preferences->Put("gnuplot", m_GnuplotPath);
+  m_Preferences->Put("ffmpeg", m_FFmpegPath.toStdString());
+  m_Preferences->Put("gnuplot", m_GnuplotPath.toStdString());
   return true;
 }
 
 void QmitkExternalProgramsPreferencePage::Update()
 {
-  m_FFmpegPath = m_Preferences->Get("ffmpeg", "");
+  m_FFmpegPath = QString::fromStdString(m_Preferences->Get("ffmpeg", ""));
 
   if (!m_FFmpegPath.isEmpty())
     m_FFmpegProcess->start(m_FFmpegPath, QStringList() << "-version", QProcess::ReadOnly);
 
-  m_GnuplotPath = m_Preferences->Get("gnuplot", "");
+  m_GnuplotPath = QString::fromStdString(m_Preferences->Get("gnuplot", ""));
 
   if (!m_GnuplotPath.isEmpty())
     m_GnuplotProcess->start(m_GnuplotPath, QStringList() << "--version", QProcess::ReadOnly);

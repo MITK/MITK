@@ -16,10 +16,9 @@ found in the LICENSE file.
 // mitk core
 #include <mitkRenderingManager.h>
 
-// berry
-#include <berryIPreferences.h>
-#include <berryIPreferencesService.h>
-#include <berryPlatform.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 // namespace that contains the concrete action
 namespace ToggleVisibilityAction
@@ -37,9 +36,9 @@ namespace ToggleVisibilityAction
       }
     }
 
-    berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+    auto* prefService = mitk::CoreServices::GetPreferencesService();
 
-    berry::IPreferences::Pointer preferences = prefService->GetSystemPreferences()->Node(QmitkDataNodeGlobalReinitAction::ACTION_ID);
+    auto* preferences = prefService->GetSystemPreferences()->Node(QmitkDataNodeGlobalReinitAction::ACTION_ID.toStdString());
     bool globalReinit = preferences->GetBool("Call global reinit if node visibility is changed", false);
     if (globalReinit)
     {

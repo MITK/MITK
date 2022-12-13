@@ -12,8 +12,10 @@ found in the LICENSE file.
 
 #include "QmitkMxNMultiWidgetEditor.h"
 
-#include <berryIPreferencesService.h>
-#include <berryIPreferences.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
+
 #include <berryIWorkbenchPage.h>
 #include <berryIWorkbenchPartConstants.h>
 #include <berryUIException.h>
@@ -164,7 +166,7 @@ void QmitkMxNMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
   QHBoxLayout *layout = new QHBoxLayout(parent);
   layout->setContentsMargins(0, 0, 0, 0);
 
-  berry::IBerryPreferences *preferences = dynamic_cast<berry::IBerryPreferences *>(GetPreferences().GetPointer());
+  auto* preferences = this->GetPreferences();
 
   auto multiWidget = GetMultiWidget();
   if (nullptr == multiWidget)
@@ -205,7 +207,7 @@ void QmitkMxNMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
   OnPreferencesChanged(preferences);
 }
 
-void QmitkMxNMultiWidgetEditor::OnPreferencesChanged(const berry::IBerryPreferences* preferences)
+void QmitkMxNMultiWidgetEditor::OnPreferencesChanged(const mitk::IPreferences* preferences)
 {
   const auto& multiWidget = GetMultiWidget();
   if (nullptr == multiWidget)

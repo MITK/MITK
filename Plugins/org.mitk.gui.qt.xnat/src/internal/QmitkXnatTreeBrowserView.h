@@ -30,10 +30,7 @@ found in the LICENSE file.
 #include <mitkIDataStorageService.h>
 #include <ctkServiceTracker.h>
 
-#include <berryIBerryPreferences.h>
-
 class QMenu;
-
 
 /*!
 \brief QmitkXnatTreeBrowserView
@@ -112,7 +109,7 @@ private slots:
 
 private:
 
-  void OnPreferencesChanged(const berry::IBerryPreferences*) override;
+  void OnPreferencesChanged(const mitk::IPreferences*) override;
 
   void InternalFileDownload(const QModelIndex& index, bool loadData);
   void InternalDICOMDownload(ctkXnatObject* obj, QDir &DICOMDirPath);

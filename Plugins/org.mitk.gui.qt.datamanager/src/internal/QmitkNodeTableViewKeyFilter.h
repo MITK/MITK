@@ -19,9 +19,9 @@ found in the LICENSE file.
 
 #include <QObject>
 
-namespace berry
+namespace mitk
 {
-  struct IPreferencesService;
+  class IPreferences;
 }
 
 /**
@@ -38,10 +38,8 @@ public:
 protected:
 
   bool eventFilter(QObject *obj, QEvent *event) override;
-  /**
-   * @brief The Preferences Service to retrieve and store preferences.
-   */
-  berry::IPreferencesService *m_PreferencesService;
+
+  mitk::IPreferences* m_Preferences;
 
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
 };

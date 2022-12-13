@@ -16,11 +16,11 @@ found in the LICENSE file.
 
 #include <mitkDataStorageEditorInput.h>
 #include <mitkIRenderingManager.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
-#include <berryIPreferencesService.h>
 #include <berryUIException.h>
-
-#include <ctkServiceTracker.h>
 
 class QmitkAbstractRenderEditorPrivate
 {
@@ -28,9 +28,7 @@ public:
 
   QmitkAbstractRenderEditorPrivate()
     : m_RenderingManagerInterface(mitk::MakeRenderingManagerInterface(mitk::RenderingManager::GetInstance()))
-    , m_PrefServiceTracker(QmitkCommonActivator::GetContext())
   {
-    m_PrefServiceTracker.open();
   }
 
   ~QmitkAbstractRenderEditorPrivate()
@@ -39,8 +37,7 @@ public:
   }
 
   mitk::IRenderingManager* m_RenderingManagerInterface;
-  ctkServiceTracker<berry::IPreferencesService*> m_PrefServiceTracker;
-  berry::IBerryPreferences::Pointer m_Prefs;
+  mitk::IPreferences* m_Prefs;
 };
 
 QmitkAbstractRenderEditor::QmitkAbstractRenderEditor()
@@ -50,9 +47,9 @@ QmitkAbstractRenderEditor::QmitkAbstractRenderEditor()
 
 QmitkAbstractRenderEditor::~QmitkAbstractRenderEditor()
 {
-  if (d->m_Prefs.IsNotNull())
+  if (d->m_Prefs != nullptr)
   {
-    d->m_Prefs->OnChanged.RemoveListener(berry::MessageDelegate1<QmitkAbstractRenderEditor, const berry::IBerryPreferences*>
+    d->m_Prefs->OnChanged.RemoveListener(mitk::MessageDelegate1<QmitkAbstractRenderEditor, const mitk::IPreferences*>
                                          (this, &QmitkAbstractRenderEditor::OnPreferencesChanged ) );
   }
 }
@@ -65,10 +62,10 @@ void QmitkAbstractRenderEditor::Init(berry::IEditorSite::Pointer site, berry::IE
   this->SetSite(site);
   this->SetInput(input);
 
-  d->m_Prefs = this->GetPreferences().Cast<berry::IBerryPreferences>();
-  if (d->m_Prefs.IsNotNull())
+  d->m_Prefs = this->GetPreferences();
+  if (d->m_Prefs != nullptr)
   {
-    d->m_Prefs->OnChanged.AddListener(berry::MessageDelegate1<QmitkAbstractRenderEditor, const berry::IBerryPreferences*>
+    d->m_Prefs->OnChanged.AddListener(mitk::MessageDelegate1<QmitkAbstractRenderEditor, const mitk::IPreferences*>
                                       (this, &QmitkAbstractRenderEditor::OnPreferencesChanged ) );
   }
 }
@@ -90,14 +87,10 @@ mitk::DataStorage::Pointer QmitkAbstractRenderEditor::GetDataStorage() const
   return mitk::DataStorage::Pointer(nullptr);
 }
 
-berry::IPreferences::Pointer QmitkAbstractRenderEditor::GetPreferences() const
+mitk::IPreferences* QmitkAbstractRenderEditor::GetPreferences() const
 {
-  berry::IPreferencesService* prefService = d->m_PrefServiceTracker.getService();
-  if (prefService != nullptr)
-  {
-    return prefService->GetSystemPreferences()->Node(this->GetSite()->GetId());
-  }
-  return berry::IPreferences::Pointer(nullptr);
+  mitk::CoreServicePointer prefService(mitk::CoreServices::GetPreferencesService());
+  return prefService->GetSystemPreferences()->Node(this->GetSite()->GetId().toStdString());
 }
 
 mitk::IRenderingManager* QmitkAbstractRenderEditor::GetRenderingManager() const
@@ -126,7 +119,7 @@ mitk::SliceNavigationController* QmitkAbstractRenderEditor::GetTimeNavigationCon
   return nullptr;
 }
 
-void QmitkAbstractRenderEditor::OnPreferencesChanged(const berry::IBerryPreferences *)
+void QmitkAbstractRenderEditor::OnPreferencesChanged(const mitk::IPreferences *)
 {}
 
 void QmitkAbstractRenderEditor::DoSave()

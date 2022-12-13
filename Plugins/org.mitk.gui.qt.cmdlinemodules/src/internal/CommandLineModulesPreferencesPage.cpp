@@ -13,6 +13,10 @@ found in the LICENSE file.
 #include "CommandLineModulesPreferencesPage.h"
 #include "CommandLineModulesViewConstants.h"
 
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
+
 #include <QWidget>
 #include <QGridLayout>
 #include <QLabel>
@@ -23,8 +27,6 @@ found in the LICENSE file.
 #include <QSpinBox>
 #include <ctkDirectoryButton.h>
 #include <ctkCmdLineModuleManager.h>
-#include <berryIPreferencesService.h>
-#include <berryPlatform.h>
 
 #include "QmitkDirectoryListWidget.h"
 #include "QmitkFileListWidget.h"
@@ -71,9 +73,9 @@ void CommandLineModulesPreferencesPage::Init(berry::IWorkbench::Pointer )
 //-----------------------------------------------------------------------------
 void CommandLineModulesPreferencesPage::CreateQtControl(QWidget* parent)
 {
-  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+  mitk::CoreServicePointer prefService(mitk::CoreServices::GetPreferencesService());
 
-  QString id = "/" + CommandLineModulesViewConstants::VIEW_ID;
+  const auto id = "/" + CommandLineModulesViewConstants::VIEW_ID;
   m_CLIPreferencesNode = prefService->GetSystemPreferences()->Node(id);
 
   m_MainControl = new QWidget(parent);
@@ -185,8 +187,8 @@ std::string CommandLineModulesPreferencesPage::ConvertToStdString(const QStringL
 //-----------------------------------------------------------------------------
 bool CommandLineModulesPreferencesPage::PerformOk()
 {
-  m_CLIPreferencesNode->Put(CommandLineModulesViewConstants::TEMPORARY_DIRECTORY_NODE_NAME, m_TemporaryDirectory->directory());
-  m_CLIPreferencesNode->Put(CommandLineModulesViewConstants::OUTPUT_DIRECTORY_NODE_NAME, m_OutputDirectory->directory());
+  m_CLIPreferencesNode->Put(CommandLineModulesViewConstants::TEMPORARY_DIRECTORY_NODE_NAME, m_TemporaryDirectory->directory().toStdString());
+  m_CLIPreferencesNode->Put(CommandLineModulesViewConstants::OUTPUT_DIRECTORY_NODE_NAME, m_OutputDirectory->directory().toStdString());
   m_CLIPreferencesNode->PutBool(CommandLineModulesViewConstants::DEBUG_OUTPUT_NODE_NAME, m_DebugOutput->isChecked());
   m_CLIPreferencesNode->PutBool(CommandLineModulesViewConstants::SHOW_ADVANCED_WIDGETS_NAME, m_ShowAdvancedWidgets->isChecked());
   m_CLIPreferencesNode->PutBool(CommandLineModulesViewConstants::LOAD_FROM_APPLICATION_DIR, m_LoadFromApplicationDir->isChecked());
@@ -197,10 +199,10 @@ bool CommandLineModulesPreferencesPage::PerformOk()
   m_CLIPreferencesNode->PutBool(CommandLineModulesViewConstants::LOAD_FROM_CURRENT_DIR_CLI_MODULES, m_LoadFromCurrentDirCliModules->isChecked());
   m_CLIPreferencesNode->PutBool(CommandLineModulesViewConstants::LOAD_FROM_AUTO_LOAD_DIR, m_LoadFromAutoLoadPathDir->isChecked());
 
-  QString paths = m_ModulesDirectories->directories().join(";");
+  const auto paths = m_ModulesDirectories->directories().join(";").toStdString();
   m_CLIPreferencesNode->Put(CommandLineModulesViewConstants::MODULE_DIRECTORIES_NODE_NAME, paths);
 
-  QString modules = m_ModulesFiles->files().join(";");
+  const auto modules = m_ModulesFiles->files().join(";").toStdString();
   m_CLIPreferencesNode->Put(CommandLineModulesViewConstants::MODULE_FILES_NODE_NAME, modules);
 
   int currentValidationMode = m_CLIPreferencesNode->GetInt(CommandLineModulesViewConstants::XML_VALIDATION_MODE, 2);
@@ -227,11 +229,11 @@ void CommandLineModulesPreferencesPage::PerformCancel()
 //-----------------------------------------------------------------------------
 void CommandLineModulesPreferencesPage::Update()
 {
-  QString fallbackTmpDir = QDir::tempPath();
-  m_TemporaryDirectory->setDirectory(m_CLIPreferencesNode->Get(CommandLineModulesViewConstants::TEMPORARY_DIRECTORY_NODE_NAME, fallbackTmpDir));
+  const auto fallbackTmpDir = QDir::tempPath().toStdString();
+  m_TemporaryDirectory->setDirectory(QString::fromStdString(m_CLIPreferencesNode->Get(CommandLineModulesViewConstants::TEMPORARY_DIRECTORY_NODE_NAME, fallbackTmpDir)));
 
-  QString fallbackOutputDir = QDir::homePath();
-  m_OutputDirectory->setDirectory(m_CLIPreferencesNode->Get(CommandLineModulesViewConstants::OUTPUT_DIRECTORY_NODE_NAME, fallbackOutputDir));
+  const auto fallbackOutputDir = QDir::homePath().toStdString();
+  m_OutputDirectory->setDirectory(QString::fromStdString(m_CLIPreferencesNode->Get(CommandLineModulesViewConstants::OUTPUT_DIRECTORY_NODE_NAME, fallbackOutputDir)));
 
   m_ShowAdvancedWidgets->setChecked(m_CLIPreferencesNode->GetBool(CommandLineModulesViewConstants::SHOW_ADVANCED_WIDGETS_NAME, false));
   m_DebugOutput->setChecked(m_CLIPreferencesNode->GetBool(CommandLineModulesViewConstants::DEBUG_OUTPUT_NODE_NAME, false));
@@ -243,11 +245,11 @@ void CommandLineModulesPreferencesPage::Update()
   m_LoadFromCurrentDirCliModules->setChecked(m_CLIPreferencesNode->GetBool(CommandLineModulesViewConstants::LOAD_FROM_CURRENT_DIR_CLI_MODULES, false));
   m_LoadFromAutoLoadPathDir->setChecked(m_CLIPreferencesNode->GetBool(CommandLineModulesViewConstants::LOAD_FROM_AUTO_LOAD_DIR, false));
 
-  QString paths = m_CLIPreferencesNode->Get(CommandLineModulesViewConstants::MODULE_DIRECTORIES_NODE_NAME, "");
+  const auto paths = QString::fromStdString(m_CLIPreferencesNode->Get(CommandLineModulesViewConstants::MODULE_DIRECTORIES_NODE_NAME, ""));
   QStringList directoryList = paths.split(";", QString::SkipEmptyParts);
   m_ModulesDirectories->setDirectories(directoryList);
 
-  QString files = m_CLIPreferencesNode->Get(CommandLineModulesViewConstants::MODULE_FILES_NODE_NAME, "");
+  const auto files = QString::fromStdString(m_CLIPreferencesNode->Get(CommandLineModulesViewConstants::MODULE_FILES_NODE_NAME, ""));
   QStringList fileList = files.split(";", QString::SkipEmptyParts);
   m_ModulesFiles->setFiles(fileList);
 

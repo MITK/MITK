@@ -18,9 +18,6 @@ found in the LICENSE file.
 // mitk core
 #include <mitkNodePredicateBase.h>
 
-// berry plugin
-#include <berryIBerryPreferences.h>
-
 // mitk gui qt common plugin
 #include <QmitkAbstractView.h>
 
@@ -58,7 +55,7 @@ public:
 public Q_SLOTS:
 
   // invoked when the berry preferences were changed
-  void OnPreferencesChanged(const berry::IBerryPreferences* prefs) override;
+  void OnPreferencesChanged(const mitk::IPreferences* prefs) override;
 
   //////////////////////////////////////////////////////////////////////////
   // Slots for Qt node tree signals
@@ -96,10 +93,7 @@ protected:
   QmitkDataStorageFilterProxyModel* m_FilterModel;
   mitk::NodePredicateBase::Pointer m_HelperObjectFilterPredicate;
   mitk::NodePredicateBase::Pointer m_NodeWithNoDataFilterPredicate;
-  ///
-  /// Holds the preferences for the data manager.
-  ///
-  berry::IBerryPreferences::Pointer m_DataManagerPreferencesNode;
+
   ///
   /// \brief The Table view to show the selected nodes.
   ///

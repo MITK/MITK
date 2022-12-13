@@ -23,7 +23,10 @@ class QmitkDirectoryListWidget;
 class QmitkFileListWidget;
 class ctkDirectoryButton;
 
-class berryIPreferences;
+namespace mitk
+{
+  class IPreferences;
+}
 
 /**
  * \class MatchPointBrowserPreferencesPage
@@ -84,11 +87,11 @@ protected:
     QCheckBox*                m_LoadFromApplicationDir;
     QCheckBox*                m_LoadFromAutoLoadPathDir;
 
-    berry::IPreferences::Pointer m_BrowserPreferencesNode;
+    mitk::IPreferences* m_BrowserPreferencesNode;
 
 private:
 
-    QString ConvertToString(const QStringList& list);
+    std::string ConvertToString(const QStringList& list);
 };
 
 #endif // COMMANDLINEMODULESPREFERENCESPAGE_H

@@ -15,7 +15,6 @@ found in the LICENSE file.
 #define __QMITK_NODE_SELECTION_PREFERENCE_PAGE_H
 
 #include "berryIQtPreferencePage.h"
-#include "berryIPreferences.h"
 
 #include "mitkDataStorageInspectorGenerator.h"
 

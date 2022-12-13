@@ -21,7 +21,9 @@ found in the LICENSE file.
 #include "QmitkTimeSliceAnimationItem.h"
 #include "QmitkTimeSliceAnimationWidget.h"
 
-#include <berryPlatform.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 #include <mitkGL.h>
 
@@ -52,11 +54,11 @@ namespace
 
   QString GetFFmpegPath()
   {
-    auto preferences = berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.gui.qt.ext.externalprograms");
+    auto* preferences = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.gui.qt.ext.externalprograms");
 
-    return preferences.IsNotNull()
-      ? preferences->Get("ffmpeg", "")
-      : "";
+    return preferences != nullptr
+      ? QString::fromStdString(preferences->Get("ffmpeg", ""))
+      : QString();
   }
 
   void ReadPixels(std::unique_ptr<unsigned char[]>& frame, vtkRenderWindow* renderWindow, int x, int y, int width, int height)

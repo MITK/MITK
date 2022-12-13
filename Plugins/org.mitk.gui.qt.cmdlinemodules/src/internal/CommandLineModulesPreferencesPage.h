@@ -14,7 +14,6 @@ found in the LICENSE file.
 #define COMMANDLINEMODULESPREFERENCESPAGE_H
 
 #include "berryIQtPreferencePage.h"
-#include "berryIPreferences.h"
 #include <org_mitk_gui_qt_cmdlinemodules_Export.h>
 
 class QWidget;
@@ -25,6 +24,11 @@ class QSpinBox;
 class QmitkDirectoryListWidget;
 class QmitkFileListWidget;
 class ctkDirectoryButton;
+
+namespace mitk
+{
+  class IPreferences;
+}
 
 /**
  * \class CommandLineModulesPreferencesPage
@@ -98,7 +102,7 @@ protected:
   QSpinBox                 *m_XmlTimeoutInSeconds;
   QSpinBox                 *m_MaximumNumberProcesses;
 
-  berry::IPreferences::Pointer m_CLIPreferencesNode;
+  mitk::IPreferences* m_CLIPreferencesNode;
 
 private:
 

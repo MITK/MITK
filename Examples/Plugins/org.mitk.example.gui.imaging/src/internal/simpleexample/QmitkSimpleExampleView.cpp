@@ -26,12 +26,14 @@ found in the LICENSE file.
 #include "mitkNodePredicateNot.h"
 #include "mitkNodePredicateProperty.h"
 #include "mitkProperties.h"
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 #include <QDir>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QMessageBox>
-#include <berryPlatform.h>
 
 const std::string QmitkSimpleExampleView::VIEW_ID = "org.mitk.views.simpleexample";
 
@@ -136,10 +138,12 @@ void QmitkSimpleExampleView::InitNavigators()
  */
 QString QmitkSimpleExampleView::GetFFmpegPath() const
 {
-  berry::IPreferences::Pointer preferences =
-    berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.gui.qt.ext.externalprograms");
+  auto* preferences =
+    mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.gui.qt.ext.externalprograms");
 
-  return preferences.IsNotNull() ? preferences->Get("ffmpeg", "") : "";
+  return preferences != nullptr
+    ? QString::fromStdString(preferences->Get("ffmpeg", ""))
+    : QString("");
 }
 
 /**

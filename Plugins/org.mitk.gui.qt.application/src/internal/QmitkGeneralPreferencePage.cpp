@@ -17,8 +17,9 @@ found in the LICENSE file.
 #include <QCheckBox>
 #include <QFormLayout>
 
-#include <berryIPreferencesService.h>
-#include <berryPlatform.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 QmitkGeneralPreferencePage::QmitkGeneralPreferencePage()
   : m_MainControl(nullptr)
@@ -33,8 +34,8 @@ void QmitkGeneralPreferencePage::Init(berry::IWorkbench::Pointer)
 
 void QmitkGeneralPreferencePage::CreateQtControl(QWidget* parent)
 {
-  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
-  m_GeneralPreferencesNode = prefService->GetSystemPreferences()->Node(QmitkDataNodeGlobalReinitAction::ACTION_ID);
+  auto* prefService = mitk::CoreServices::GetPreferencesService();
+  m_GeneralPreferencesNode = prefService->GetSystemPreferences()->Node(QmitkDataNodeGlobalReinitAction::ACTION_ID.toStdString());
 
   m_MainControl = new QWidget(parent);
 

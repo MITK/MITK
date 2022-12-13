@@ -51,9 +51,9 @@ found in the LICENSE file.
 #include <mitkLocaleSwitch.h>
 #include <mitkIOUtil.h>
 
-#include <berryIPreferencesService.h>
-#include <berryIPreferences.h>
-#include <berryPlatform.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 #include <ImporterUtil.h>
 
@@ -116,19 +116,17 @@ void DicomEventHandler::OnSignalAddSeriesToDataManager(const ctkEvent& ctkEvent)
                   doseImageNode->SetName(sopUID);
                 };
 
-                berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
-                berry::IPreferences::Pointer prefNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID.c_str());
+                auto* prefService = mitk::CoreServices::GetPreferencesService();
+                auto* prefNode = prefService->GetSystemPreferences()->Node(mitk::RTUIConstants::ROOT_DOSE_VIS_PREFERENCE_NODE_ID);
 
-                if (prefNode.IsNull())
-                {
-                    mitkThrow() << "Error in preference interface. Cannot find preset node under given name. Name: " << prefNode->ToString().toStdString();
-                }
+                if (prefNode == nullptr)
+                    mitkThrow() << "Error in preference interface. Cannot find preset node under given name. Name: " << prefNode;
 
                 //set some specific colorwash and isoline properties
-                bool showColorWashGlobal = prefNode->GetBool(mitk::RTUIConstants::GLOBAL_VISIBILITY_COLORWASH_ID.c_str(), true);
+                bool showColorWashGlobal = prefNode->GetBool(mitk::RTUIConstants::GLOBAL_VISIBILITY_COLORWASH_ID, true);
 
                 //Set reference dose property
-                double referenceDose = prefNode->GetDouble(mitk::RTUIConstants::REFERENCE_DOSE_ID.c_str(), mitk::RTUIConstants::DEFAULT_REFERENCE_DOSE_VALUE);
+                double referenceDose = prefNode->GetDouble(mitk::RTUIConstants::REFERENCE_DOSE_ID, mitk::RTUIConstants::DEFAULT_REFERENCE_DOSE_VALUE);
 
                 mitk::ConfigureNodeAsDoseNode(doseImageNode, mitk::GenerateIsoLevels_Virtuos(), referenceDose, showColorWashGlobal);
 

@@ -16,11 +16,15 @@ found in the LICENSE file.
 
 #include <berryIQtPreferencePage.h>
 #include <berryIQtStyleManager.h>
-#include <berryIPreferences.h>
 
 #include <ui_berryQtStylePreferencePage.h>
 
 #include <QStringList>
+
+namespace mitk
+{
+  class IPreferences;
+}
 
 namespace berry {
 
@@ -64,7 +68,7 @@ private:
   berry::IQtStyleManager* styleManager;
 
   Ui::QtStylePreferencePageUI controls;
-  berry::IPreferences::Pointer m_StylePref;
+  mitk::IPreferences* m_StylePref;
   berry::IQtStyleManager::Style oldStyle;
 
   berry::IQtStyleManager::StyleList styles;

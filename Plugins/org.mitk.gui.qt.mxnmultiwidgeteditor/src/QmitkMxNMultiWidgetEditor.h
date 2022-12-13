@@ -71,7 +71,7 @@ private:
   /**
   * @brief Overridden from QmitkAbstractRenderEditor
   */
-  void OnPreferencesChanged(const berry::IBerryPreferences* preferences) override;
+  void OnPreferencesChanged(const mitk::IPreferences* preferences) override;
 
   struct Impl;
   std::unique_ptr<Impl> m_Impl;

@@ -41,11 +41,11 @@ public:
    */
   ToggleState();
 
-  void Load(const SmartPointer<IPreferences>& store,
-            const QString& preferenceKey) override;
+  void Load(const mitk::IPreferences* store,
+            const std::string& preferenceKey) override;
 
-  void Save(const SmartPointer<IPreferences>& store,
-            const QString& preferenceKey) override;
+  void Save(mitk::IPreferences* store,
+            const std::string& preferenceKey) override;
 
   void SetValue(const Object::Pointer& value) override;
 };

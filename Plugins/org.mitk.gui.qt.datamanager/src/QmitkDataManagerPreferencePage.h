@@ -16,10 +16,14 @@ found in the LICENSE file.
 
 #include "berryIQtPreferencePage.h"
 #include <org_mitk_gui_qt_datamanager_Export.h>
-#include <berryIPreferences.h>
 
 class QWidget;
 class QCheckBox;
+
+namespace mitk
+{
+  class IPreferences;
+}
 
 struct MITK_QT_DATAMANAGER QmitkDataManagerPreferencePage : public QObject, public berry::IQtPreferencePage
 {
@@ -57,7 +61,7 @@ protected:
   QCheckBox* m_ShowHelperObjects;
   QCheckBox* m_ShowNodesContainingNoData;
   QCheckBox* m_AllowParentChange;
-  berry::IPreferences::Pointer m_DataManagerPreferencesNode;
+  mitk::IPreferences* m_DataManagerPreferencesNode;
 };
 
 #endif /* QMITKDATAMANAGERPREFERENCEPAGE_H_ */

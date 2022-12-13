@@ -38,8 +38,6 @@ public:
 
 protected slots:
 
-  void OnImportButtonClicked();
-  void OnExportButtonClicked();
   void OnDialogAccepted();
   void OnDialogRejected();
 

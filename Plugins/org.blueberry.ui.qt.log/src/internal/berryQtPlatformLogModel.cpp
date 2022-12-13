@@ -13,8 +13,6 @@ found in the LICENSE file.
 #include "berryQtPlatformLogModel.h"
 #include "berryQtLogPlugin.h"
 
-#include "berryPlatform.h"
-
 #include "mbilogLoggingTypes.h"
 
 #include <sstream>

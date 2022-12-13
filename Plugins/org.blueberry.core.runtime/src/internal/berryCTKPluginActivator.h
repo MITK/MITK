@@ -23,7 +23,6 @@ found in the LICENSE file.
 namespace berry {
 
 class ApplicationContainer;
-class PreferencesService;
 
 struct IConfigurationElement;
 struct IContributor;
@@ -70,9 +69,6 @@ private:
   static ctkPluginContext* context;
 
   //QScopedPointer<CTKPluginListener> pluginListener;
-
-  QScopedPointer<PreferencesService> preferencesService;
-  ctkServiceRegistration prefServiceReg;
 
   QScopedPointer<IExtensionRegistry> defaultRegistry;
   ctkServiceRegistration registryServiceReg;

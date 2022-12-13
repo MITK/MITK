@@ -90,7 +90,7 @@ IExtensionRegistry *Platform::GetExtensionRegistry()
   return InternalPlatform::GetInstance()->GetExtensionRegistry();
 }
 
-IPreferencesService *Platform::GetPreferencesService()
+mitk::IPreferencesService *Platform::GetPreferencesService()
 {
   return InternalPlatform::GetInstance()->GetPreferencesService();
 }

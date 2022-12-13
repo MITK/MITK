@@ -34,7 +34,6 @@ found in the LICENSE file.
 // Blueberry
 #include <berryQModelIndexObject.h>
 #include <berryIWorkbenchPage.h>
-#include <berryPlatform.h>
 
 // Qt
 #include <QListView>
@@ -47,6 +46,9 @@ found in the LICENSE file.
 // MITK
 #include <mitkDataStorage.h>
 #include <QmitkIOUtil.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 // Poco
 #include <Poco/Zip/Decompress.h>
@@ -54,8 +56,8 @@ found in the LICENSE file.
 const QString QmitkXnatEditor::EDITOR_ID = "org.mitk.editors.xnat.browser";
 
 QmitkXnatEditor::QmitkXnatEditor() :
-m_DownloadPath(berry::Platform::GetPreferencesService()->
-GetSystemPreferences()->Node("/XnatConnection")->Get("Download Path", "")),
+m_DownloadPath(QString::fromStdString(mitk::CoreServices::GetPreferencesService()->
+GetSystemPreferences()->Node("/XnatConnection")->Get("Download Path", ""))),
 m_ListModel(new ctkXnatListModel()),
 m_Session(0),
 m_DataStorageServiceTracker(mitk::org_mitk_gui_qt_xnatinterface_Activator::GetContext()),

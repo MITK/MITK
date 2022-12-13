@@ -16,8 +16,9 @@ found in the LICENSE file.
 #include <QmitkHotkeyLineEdit.h>
 
 // berry
-#include <berryIPreferencesService.h>
-#include <berryPlatform.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 // qt
 #include <QLabel>
@@ -38,8 +39,8 @@ void QmitkDataManagerHotkeysPrefPage::Init(berry::IWorkbench::Pointer)
 
 void QmitkDataManagerHotkeysPrefPage::CreateQtControl(QWidget* parent)
 {
-  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
-  berry::IPreferences::Pointer dataManagerHotkeysPreferencesNode = prefService->GetSystemPreferences()->Node("/DataManager/Hotkeys");
+  auto* prefService = mitk::CoreServices::GetPreferencesService();
+  auto* dataManagerHotkeysPreferencesNode = prefService->GetSystemPreferences()->Node("/DataManager/Hotkeys");
   m_DataManagerHotkeysPreferencesNode = dataManagerHotkeysPreferencesNode;
 
   m_HotkeyEditors["Make all nodes invisible"] = new QmitkHotkeyLineEdit("Ctrl+V");
@@ -73,8 +74,7 @@ QWidget* QmitkDataManagerHotkeysPrefPage::GetQtControl() const
 
 bool QmitkDataManagerHotkeysPrefPage::PerformOk()
 {
-  berry::IPreferences::Pointer dataManagerHotkeysPreferencesNode = m_DataManagerHotkeysPreferencesNode.Lock();
-  if (dataManagerHotkeysPreferencesNode.IsNotNull())
+  if (m_DataManagerHotkeysPreferencesNode != nullptr)
   {
     QString keyString;
     QString errString;
@@ -112,10 +112,10 @@ bool QmitkDataManagerHotkeysPrefPage::PerformOk()
     for (auto it = m_HotkeyEditors.begin(); it != m_HotkeyEditors.end(); ++it)
     {
       QString keySequence = it->second->GetKeySequenceAsString();
-      dataManagerHotkeysPreferencesNode->Put(it->first, it->second->GetKeySequenceAsString());
+      m_DataManagerHotkeysPreferencesNode->Put(it->first.toStdString(), it->second->GetKeySequenceAsString().toStdString());
     }
 
-    dataManagerHotkeysPreferencesNode->Flush();
+    m_DataManagerHotkeysPreferencesNode->Flush();
     return true;
   }
 
@@ -128,12 +128,9 @@ void QmitkDataManagerHotkeysPrefPage::PerformCancel()
 
 void QmitkDataManagerHotkeysPrefPage::Update()
 {
-  berry::IPreferences::Pointer dataManagerHotkeysPreferencesNode = m_DataManagerHotkeysPreferencesNode.Lock();
-  if (dataManagerHotkeysPreferencesNode.IsNotNull())
+  if (m_DataManagerHotkeysPreferencesNode != nullptr)
   {
     for (auto it = m_HotkeyEditors.begin(); it != m_HotkeyEditors.end(); ++it)
-    {
-      it->second->setText(dataManagerHotkeysPreferencesNode->Get(it->first, it->second->text()));
-    }
+      it->second->setText(QString::fromStdString(m_DataManagerHotkeysPreferencesNode->Get(it->first.toStdString(), it->second->text().toStdString())));
   }
 }

@@ -19,6 +19,10 @@ found in the LICENSE file.
 
 #include <service/cm/ctkConfigurationAdmin.h>
 
+#include <usModuleInitialization.h>
+
+US_INITIALIZE_MODULE
+
 QmitkFlowApplicationPlugin* QmitkFlowApplicationPlugin::inst = nullptr;
 
 QmitkFlowApplicationPlugin::QmitkFlowApplicationPlugin()

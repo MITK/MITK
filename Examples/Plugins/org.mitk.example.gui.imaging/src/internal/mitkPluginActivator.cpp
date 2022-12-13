@@ -19,6 +19,10 @@ found in the LICENSE file.
 #include "src/internal/viewinitialization/QmitkViewInitializationView.h"
 #include "src/internal/volumetry/QmitkVolumetryView.h"
 
+#include <usModuleInitialization.h>
+
+US_INITIALIZE_MODULE
+
 namespace mitk
 {
   void PluginActivator::start(ctkPluginContext *context)

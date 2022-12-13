@@ -21,7 +21,6 @@ found in the LICENSE file.
 
 #include <berryIEditorPart.h>
 #include <berryIWorkbenchPage.h>
-#include <berryPlatform.h>
 
 QmitkSimpleMeasurement::QmitkSimpleMeasurement()
 {

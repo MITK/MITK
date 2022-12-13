@@ -13,9 +13,9 @@ found in the LICENSE file.
 #include "QmitkMxNMultiWidgetEditorPreferencePage.h"
 #include <QmitkMxNMultiWidgetEditor.h>
 
-// berry framework
-#include <berryIPreferencesService.h>
-#include <berryPlatform.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 QmitkMxNMultiWidgetEditorPreferencePage::QmitkMxNMultiWidgetEditorPreferencePage()
   : m_Preferences(nullptr)
@@ -39,9 +39,9 @@ void QmitkMxNMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent)
 
   m_Ui.setupUi(m_MainControl);
 
-  berry::IPreferencesService* preferenceService = berry::Platform::GetPreferencesService();
+  auto* preferenceService = mitk::CoreServices::GetPreferencesService();
   Q_ASSERT(preferenceService);
-  m_Preferences = preferenceService->GetSystemPreferences()->Node(QmitkMxNMultiWidgetEditor::EDITOR_ID);
+  m_Preferences = preferenceService->GetSystemPreferences()->Node(QmitkMxNMultiWidgetEditor::EDITOR_ID.toStdString());
 
   connect(m_Ui.m_ColormapComboBox, SIGNAL(activated(int)), SLOT(ChangeColormap(int)));
   connect(m_Ui.m_ResetButton, SIGNAL(clicked()), SLOT(ResetPreferencesAndGUI()));

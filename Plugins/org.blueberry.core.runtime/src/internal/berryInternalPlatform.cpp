@@ -33,7 +33,6 @@ found in the LICENSE file.
 //#include "berryPlatformLogChannel.h"
 
 #include <berryIApplicationContext.h>
-#include <berryIPreferencesService.h>
 #include <berryIExtensionRegistry.h>
 #include <berryIProduct.h>
 
@@ -49,6 +48,13 @@ found in the LICENSE file.
 #include <QDesktopServices>
 #include <QDebug>
 #include <QMutexLocker>
+
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+
+#include <usModuleInitialization.h>
+
+US_INITIALIZE_MODULE
 
 namespace berry {
 
@@ -283,9 +289,6 @@ void InternalPlatform::OpenServiceTrackers()
   installLocation.reset(new ctkServiceTracker<ctkLocation*>(context, ctkLDAPSearchFilter(ctkLocation::INSTALL_FILTER)));
   installLocation->open();
 
-  m_PreferencesTracker.reset(new ctkServiceTracker<berry::IPreferencesService*>(context));
-  m_PreferencesTracker->open();
-
   m_RegistryTracker.reset(new ctkServiceTracker<berry::IExtensionRegistry*>(context));
   m_RegistryTracker->open();
 
@@ -295,11 +298,6 @@ void InternalPlatform::OpenServiceTrackers()
 
 void InternalPlatform::CloseServiceTrackers()
 {
-  if (!m_PreferencesTracker.isNull())
-  {
-    m_PreferencesTracker->close();
-    m_PreferencesTracker.reset();
-  }
   if (!m_RegistryTracker.isNull())
   {
     m_RegistryTracker->close();
@@ -346,9 +344,9 @@ IExtensionRegistry* InternalPlatform::GetExtensionRegistry()
   return m_RegistryTracker.isNull() ? nullptr : m_RegistryTracker->getService();
 }
 
-IPreferencesService *InternalPlatform::GetPreferencesService()
+mitk::IPreferencesService *InternalPlatform::GetPreferencesService()
 {
-  return m_PreferencesTracker.isNull() ? nullptr : m_PreferencesTracker->getService();
+  return mitk::CoreServices::GetPreferencesService();
 }
 
 ctkLocation* InternalPlatform::GetConfigurationLocation()

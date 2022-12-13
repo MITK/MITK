@@ -15,11 +15,15 @@ found in the LICENSE file.
 #include "mitkCoreExtConstants.h"
 #include "mitkLogMacros.h"
 
-#include <berryPlatform.h>
-#include <berryIPreferences.h>
-#include <berryIPreferencesService.h>
-
 #include <ctkPluginContext.h>
+
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
+
+#include <usModuleInitialization.h>
+
+US_INITIALIZE_MODULE
 
 namespace mitk
 {
@@ -40,24 +44,15 @@ namespace mitk
     m_InputDeviceRegistry.reset(new InputDeviceRegistry());
     context->registerService<mitk::IInputDeviceRegistry>(m_InputDeviceRegistry.data());
 
-    // Gets the last setting of the preferences; if a device was selected,
-    // it will still be activated after a restart
-    ctkServiceReference prefServiceRef = context->getServiceReference<berry::IPreferencesService>();
-    if (!prefServiceRef)
-    {
-      MITK_WARN << "Preferences service not available";
-      return;
-    }
-    berry::IPreferencesService* prefService = context->getService<berry::IPreferencesService>(prefServiceRef);
-    berry::IPreferences::Pointer extPreferencesNode =
-        prefService->GetSystemPreferences()->Node(CoreExtConstants::INPUTDEVICE_PREFERENCES);
+    auto* prefService = mitk::CoreServices::GetPreferencesService();
+    auto* extPreferencesNode = prefService->GetSystemPreferences()->Node(CoreExtConstants::INPUTDEVICE_PREFERENCES.toStdString());
 
     // Initializes the modules
     QList<IInputDeviceDescriptor::Pointer> descriptors(m_InputDeviceRegistry->GetInputDevices());
     for (QList<IInputDeviceDescriptor::Pointer>::const_iterator it = descriptors.begin();
          it != descriptors.end(); ++it)
     {
-      if (extPreferencesNode->GetBool((*it)->GetID(), false))
+      if (extPreferencesNode->GetBool((*it)->GetID().toStdString(), false))
       {
         IInputDevice::Pointer temp = (*it)->CreateInputDevice();
         temp->RegisterInputDevice();

@@ -14,10 +14,12 @@ found in the LICENSE file.
 
 #include <berryIEditorPart.h>
 #include <berryIWorkbenchPage.h>
-#include <berryIPreferencesService.h>
 #include <berryIWorkbench.h>
-#include <berryPlatform.h>
 #include <berryFileEditorInput.h>
+
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 QmitkOpenXnatEditorAction::QmitkOpenXnatEditorAction(berry::IWorkbenchWindow::Pointer window)
 : QAction(nullptr)
@@ -40,7 +42,7 @@ void QmitkOpenXnatEditorAction::init(berry::IWorkbenchWindow::Pointer window)
   this->setText("&XNAT");
   this->setToolTip("Open XNAT tool");
 
-  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+  auto* prefService = mitk::CoreServices::GetPreferencesService();
 
   m_GeneralPreferencesNode = prefService->GetSystemPreferences()->Node("/General");
 

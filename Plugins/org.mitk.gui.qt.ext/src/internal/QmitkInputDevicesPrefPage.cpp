@@ -12,8 +12,9 @@ found in the LICENSE file.
 
 #include "QmitkInputDevicesPrefPage.h"
 
-#include <berryIPreferencesService.h>
-#include <berryPlatform.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 #include <QLabel>
 #include <QPushButton>
@@ -33,8 +34,8 @@ QmitkInputDevicesPrefPage::QmitkInputDevicesPrefPage()
 : m_MainControl(nullptr)
 {
   // gets the old setting of the preferences and loads them into the preference node
-  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
-  this->m_InputDevicesPrefNode = prefService->GetSystemPreferences()->Node(mitk::CoreExtConstants::INPUTDEVICE_PREFERENCES);
+  auto* prefService = mitk::CoreServices::GetPreferencesService();
+  this->m_InputDevicesPrefNode = prefService->GetSystemPreferences()->Node(mitk::CoreExtConstants::INPUTDEVICE_PREFERENCES.toStdString());
 }
 
 void QmitkInputDevicesPrefPage::Init(berry::IWorkbench::Pointer )
@@ -99,8 +100,8 @@ bool QmitkInputDevicesPrefPage::PerformOk()
 
     if(it.value() == mitk::CoreExtConstants::WIIMOTE_XMLATTRIBUTE_NAME)
     {
-      QString headTracking(m_WiiMoteHeadTracking->text());
-      QString surfaceInteraction(m_WiiMoteSurfaceInteraction->text());
+      const auto headTracking(m_WiiMoteHeadTracking->text().toStdString());
+      const auto surfaceInteraction(m_WiiMoteSurfaceInteraction->text().toStdString());
 
       this->m_InputDevicesPrefNode->PutBool
         (headTracking, m_WiiMoteHeadTracking->isChecked());
@@ -111,9 +112,9 @@ bool QmitkInputDevicesPrefPage::PerformOk()
       // because otherwise the mitk::WiiMoteActivator class
       // cannot distinguish the two different modes without
       // changing the interface for all input devices
-      berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
+      auto* prefService = mitk::CoreServices::GetPreferencesService();
 
-      if (prefService)
+      if (prefService != nullptr)
       {
         prefService->GetSystemPreferences()->Flush();
       }
@@ -147,7 +148,7 @@ bool QmitkInputDevicesPrefPage::PerformOk()
 
     if(result)
     {
-      this->m_InputDevicesPrefNode->PutBool(it.value(),it.key()->isChecked());
+      this->m_InputDevicesPrefNode->PutBool(it.value().toStdString(), it.key()->isChecked());
     }
   }
   return result;
@@ -164,13 +165,13 @@ void QmitkInputDevicesPrefPage::Update()
   while (it.hasNext())
   {
     it.next();
-    it.key()->setChecked(this->m_InputDevicesPrefNode->GetBool(it.value(), false));
+    it.key()->setChecked(this->m_InputDevicesPrefNode->GetBool(it.value().toStdString(), false));
     if(it.value() == mitk::CoreExtConstants::WIIMOTE_XMLATTRIBUTE_NAME)
     {
       m_WiiMoteHeadTracking->setChecked(
-        this->m_InputDevicesPrefNode->GetBool(mitk::CoreExtConstants::WIIMOTE_HEADTRACKING,false));
+        this->m_InputDevicesPrefNode->GetBool(mitk::CoreExtConstants::WIIMOTE_HEADTRACKING.toStdString(), false));
       m_WiiMoteSurfaceInteraction->setChecked
-        (this->m_InputDevicesPrefNode->GetBool(mitk::CoreExtConstants::WIIMOTE_SURFACEINTERACTION,false));
+        (this->m_InputDevicesPrefNode->GetBool(mitk::CoreExtConstants::WIIMOTE_SURFACEINTERACTION.toStdString(), false));
     }
   }
 }

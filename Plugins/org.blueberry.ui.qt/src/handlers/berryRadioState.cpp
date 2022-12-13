@@ -15,7 +15,7 @@ found in the LICENSE file.
 #include "berryObjectString.h"
 #include "berryObjectStringMap.h"
 
-#include "berryIPreferences.h"
+#include <mitkIPreferences.h>
 
 namespace berry {
 
@@ -52,12 +52,12 @@ void RadioState::SetInitializationData(const SmartPointer<IConfigurationElement>
   SetShouldPersist(shouldPersist);
 }
 
-void RadioState::Load(const SmartPointer<IPreferences>& store, const QString& preferenceKey)
+void RadioState::Load(const mitk::IPreferences* store, const std::string& preferenceKey)
 {
   if (!ShouldPersist())
     return;
 
-  const QString prefValue = store->Get(preferenceKey, QString());
+  const auto prefValue = QString::fromStdString(store->Get(preferenceKey, ""));
   if (!prefValue.isEmpty())
   {
     Object::Pointer value(new ObjectString(prefValue));
@@ -65,7 +65,7 @@ void RadioState::Load(const SmartPointer<IPreferences>& store, const QString& pr
   }
 }
 
-void RadioState::Save(const SmartPointer<IPreferences>& store, const QString& preferenceKey)
+void RadioState::Save(mitk::IPreferences* store, const std::string& preferenceKey)
 {
   if (!ShouldPersist())
     return;
@@ -73,7 +73,7 @@ void RadioState::Save(const SmartPointer<IPreferences>& store, const QString& pr
   const Object::Pointer value = GetValue();
   if (ObjectString::Pointer objStr = value.Cast<ObjectString>())
   {
-    store->Put(preferenceKey, *objStr);
+    store->Put(preferenceKey, (*objStr).toStdString());
   }
 }
 

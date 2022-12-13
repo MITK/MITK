@@ -17,9 +17,9 @@ found in the LICENSE file.
 #include <mitkBaseApplication.h>
 #include <mitkLabelSetImage.h>
 
-#include <berryIPreferences.h>
-#include <berryIPreferencesService.h>
-#include <berryPlatform.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 #include <algorithm>
 
@@ -123,35 +123,35 @@ namespace
 
   struct Preferences
   {
-    QString labelSuggestions;
+    std::string labelSuggestions;
     bool replaceStandardSuggestions;
     bool suggestOnce;
-    QByteArray geometry;
+    std::vector<std::byte> geometry;
   };
 
   // Get all relevant preferences and consider command-line arguments overrides.
   Preferences GetPreferences()
   {
-    auto nodePrefs = berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.views.segmentation");
+    auto* nodePrefs = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.views.segmentation");
 
     Preferences prefs;
     
-    prefs.labelSuggestions = QString::fromStdString(mitk::BaseApplication::instance().config().getString(mitk::BaseApplication::ARG_SEGMENTATION_LABEL_SUGGESTIONS.toStdString(), ""));
+    prefs.labelSuggestions = mitk::BaseApplication::instance().config().getString(mitk::BaseApplication::ARG_SEGMENTATION_LABEL_SUGGESTIONS.toStdString(), "");
 
-    if (prefs.labelSuggestions.isEmpty())
+    if (prefs.labelSuggestions.empty())
       prefs.labelSuggestions = nodePrefs->Get("label suggestions", "");
 
     prefs.replaceStandardSuggestions = nodePrefs->GetBool("replace standard suggestions", true);
     prefs.suggestOnce = nodePrefs->GetBool("suggest once", true);
-    prefs.geometry = nodePrefs->GetByteArray("QmitkNewSegmentationDialog geometry", QByteArray());
+    prefs.geometry = nodePrefs->GetByteArray("QmitkNewSegmentationDialog geometry", nullptr, 0);
 
     return prefs;
   }
 
-  void SaveGeometry(QByteArray geometry)
+  void SaveGeometry(const QByteArray& geometry)
   {
-    auto nodePrefs = berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.views.segmentation");
-    nodePrefs->PutByteArray("QmitkNewSegmentationDialog geometry", geometry);
+    auto* nodePrefs = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.views.segmentation");
+    nodePrefs->PutByteArray("QmitkNewSegmentationDialog geometry", reinterpret_cast<const std::byte*>(geometry.data()), geometry.size());
   }
 
   // Get names of all labels in all layers of a LabelSetImage.
@@ -225,9 +225,9 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget *parent, mitk::La
 
   auto prefs = GetPreferences();
 
-  if (!prefs.labelSuggestions.isEmpty())
+  if (!prefs.labelSuggestions.empty())
   {
-    auto suggestions = ParseSuggestions(prefs.labelSuggestions.toStdString());
+    auto suggestions = ParseSuggestions(prefs.labelSuggestions);
     this->SetSuggestions(suggestions, prefs.replaceStandardSuggestions && !suggestions.empty());
   }
   else
@@ -243,8 +243,8 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget *parent, mitk::La
     this->UpdateNameList();
   }
 
-  if (!(prefs.geometry.isNull() || prefs.geometry.isEmpty()))
-    this->restoreGeometry(prefs.geometry);
+  if (!(prefs.geometry.empty()))
+    this->restoreGeometry(QByteArray(reinterpret_cast<const char*>(prefs.geometry.data()), prefs.geometry.size()));
 }
 
 QmitkNewSegmentationDialog::~QmitkNewSegmentationDialog()

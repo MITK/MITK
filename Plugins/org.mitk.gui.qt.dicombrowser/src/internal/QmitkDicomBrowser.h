@@ -15,7 +15,6 @@ found in the LICENSE file.
 
 // Blueberry
 #include <berryIPartListener.h>
-#include <berryIBerryPreferences.h>
 #include <berryISelectionListener.h>
 #include <berryQtEditorPart.h>
 
@@ -34,6 +33,11 @@ found in the LICENSE file.
 #include <QStringList>
 #include <QThread>
 #include <QVariant>
+
+namespace mitk
+{
+  class IPreferences;
+}
 
 /**
 * \brief QmitkDicomBrowser is an editor providing functionality for dicom storage and import and query retrieve functionality.
@@ -74,7 +78,7 @@ public:
     bool IsDirty() const override { return false; }
     bool IsSaveAsAllowed() const override { return false; }
 
-    virtual void OnPreferencesChanged(const berry::IBerryPreferences* prefs);
+    virtual void OnPreferencesChanged(const  mitk::IPreferences* prefs);
 
 signals:
 

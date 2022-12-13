@@ -25,12 +25,16 @@ struct ctkLocation;
 class ctkPluginFrameworkFactory;
 class ctkPluginContext;
 
+namespace mitk
+{
+  class IPreferencesService;
+}
+
 namespace berry {
 
 struct IAdapterManager;
 struct IApplicationContext;
 struct IExtensionRegistry;
-struct IPreferencesService;
 struct IProduct;
 struct ILog;
 
@@ -50,7 +54,6 @@ private:
 
   ctkPluginContext* m_Context;
 
-  QScopedPointer<ctkServiceTracker<berry::IPreferencesService*> > m_PreferencesTracker;
   QScopedPointer<ctkServiceTracker<berry::IExtensionRegistry*> > m_RegistryTracker;
   QScopedPointer<ctkServiceTracker<ctkDebugOptions*> > m_DebugTracker;
 
@@ -103,7 +106,7 @@ public:
 
   IExtensionRegistry* GetExtensionRegistry();
 
-  IPreferencesService* GetPreferencesService();
+  mitk::IPreferencesService* GetPreferencesService();
 
   bool ConsoleLog() const;
 

@@ -12,7 +12,6 @@ found in the LICENSE file.
 
 #include "berryReopenEditorMenu.h"
 
-#include <berryIPreferences.h>
 #include <berryIWorkbench.h>
 #include <berryIWorkbenchPage.h>
 
@@ -28,6 +27,8 @@ found in the LICENSE file.
 #include <QAction>
 #include <QMenu>
 #include <QMessageBox>
+
+#include <mitkIPreferences.h>
 
 namespace berry {
 

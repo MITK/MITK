@@ -13,9 +13,9 @@ found in the LICENSE file.
 #include "QmitkSegmentationTaskListWidget.h"
 #include "org_mitk_gui_qt_flow_segmentation_Activator.h"
 
-#include <berryIPreferences.h>
-#include <berryIPreferencesService.h>
-#include <berryPlatform.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 #include <mitkIDataStorageService.h>
 #include <mitkIOUtil.h>
@@ -39,9 +39,9 @@ found in the LICENSE file.
 
 namespace
 {
-  berry::IPreferences::Pointer GetSegmentationPreferences()
+  mitk::IPreferences* GetSegmentationPreferences()
   {
-    return berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.views.segmentation");
+    return mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.views.segmentation");
   }
 
   mitk::DataStorage* GetDataStorage()
@@ -675,14 +675,14 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
 
   auto prefs = GetSegmentationPreferences();
 
-  if (prefs.IsNotNull())
+  if (prefs != nullptr)
   {
     if (m_TaskList->HasLabelNameSuggestions(current))
     {
       auto path = m_TaskList->GetAbsolutePath(m_TaskList->GetLabelNameSuggestions(current));
 
       prefs->PutBool("default label naming", false);
-      prefs->Put("label suggestions", QString::fromStdString(path.string()));
+      prefs->Put("label suggestions", path.string());
       prefs->PutBool("replace standard suggestions", true);
       prefs->PutBool("suggest once", true);
     }

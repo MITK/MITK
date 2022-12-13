@@ -2,7 +2,7 @@
   \defgroup org_blueberry_core_runtime org.blueberry.core.runtime
   \ingroup BlueBerryPlugins
 
-  \brief Provides runtime services like preferences.
+  \brief Provides runtime services.
 
 */
 

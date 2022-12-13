@@ -19,8 +19,6 @@ found in the LICENSE file.
 #include <mitkUndoController.h>
 #include <mitkVerboseLimitedLinearUndo.h>
 
-#include <berryIPreferences.h>
-
 class QmitkRedoActionPrivate
 {
 public:

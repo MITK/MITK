@@ -14,8 +14,6 @@ found in the LICENSE file.
 #ifndef QMITKXNATSESSIONMANAGER_H_
 #define QMITKXNATSESSIONMANAGER_H_
 
-#include <berryIPreferencesService.h>
-
 #include "ctkXnatLoginProfile.h"
 
 #include "mitkXnatSessionTracker.h"

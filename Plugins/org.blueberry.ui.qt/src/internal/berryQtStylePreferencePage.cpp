@@ -12,14 +12,15 @@ found in the LICENSE file.
 
 #include "berryQtStylePreferencePage.h"
 
-#include <berryIPreferencesService.h>
-#include <berryQtPreferences.h>
-
 #include "berryWorkbenchPlugin.h"
+#include <berryQtPreferences.h>
 
 #include <QFileDialog>
 #include <QDirIterator>
 #include <QFontDatabase>
+
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 namespace berry
 {
@@ -39,7 +40,7 @@ void QtStylePreferencePage::CreateQtControl(QWidget* parent)
   mainWidget = new QWidget(parent);
   controls.setupUi(mainWidget);
 
-  berry::IPreferencesService* prefService = berry::WorkbenchPlugin::GetDefault()->GetPreferencesService();
+  auto* prefService = berry::WorkbenchPlugin::GetDefault()->GetPreferencesService();
 
   ctkPluginContext* context = berry::WorkbenchPlugin::GetDefault()->GetPluginContext();
   ctkServiceReference styleManagerRef = context->getServiceReference<berry::IQtStyleManager>();
@@ -206,8 +207,7 @@ QWidget* QtStylePreferencePage::GetQtControl() const
 
 bool QtStylePreferencePage::PerformOk()
 {
-  m_StylePref->Put(berry::QtPreferences::QT_STYLE_NAME,
-      controls.m_StylesCombo->itemData(controls.m_StylesCombo->currentIndex()).toString());
+  m_StylePref->Put(berry::QtPreferences::QT_STYLE_NAME, controls.m_StylesCombo->itemData(controls.m_StylesCombo->currentIndex()).toString().toStdString());
 
   QString paths;
   for (int i = 0; i < controls.m_PathList->count(); ++i)
@@ -216,11 +216,9 @@ bool QtStylePreferencePage::PerformOk()
     paths += path;
   }
 
-  m_StylePref->Put(berry::QtPreferences::QT_STYLE_SEARCHPATHS, paths);
-  m_StylePref->Put(berry::QtPreferences::QT_FONT_NAME,
-      controls.m_FontComboBox->currentText());
-  m_StylePref->Put(berry::QtPreferences::QT_FONT_SIZE,
-      QString::number(controls.m_FontSizeSpinBox->value()));
+  m_StylePref->Put(berry::QtPreferences::QT_STYLE_SEARCHPATHS, paths.toStdString());
+  m_StylePref->Put(berry::QtPreferences::QT_FONT_NAME, controls.m_FontComboBox->currentText().toStdString());
+  m_StylePref->Put(berry::QtPreferences::QT_FONT_SIZE, std::to_string(controls.m_FontSizeSpinBox->value()));
 
   m_StylePref->PutBool(berry::QtPreferences::QT_SHOW_TOOLBAR_CATEGORY_NAMES,
     controls.m_ToolbarCategoryCheckBox->isChecked());
@@ -237,7 +235,7 @@ void QtStylePreferencePage::Update()
 {
   styleManager->RemoveStyles();
 
-  QString paths = m_StylePref->Get(berry::QtPreferences::QT_STYLE_SEARCHPATHS, "");
+  auto paths = QString::fromStdString(m_StylePref->Get(berry::QtPreferences::QT_STYLE_SEARCHPATHS, ""));
   QStringList pathList = paths.split(";", QString::SkipEmptyParts);
   QStringListIterator it(pathList);
   while (it.hasNext())
@@ -245,15 +243,15 @@ void QtStylePreferencePage::Update()
     AddPath(it.next(), false);
   }
 
-  QString styleName = m_StylePref->Get(berry::QtPreferences::QT_STYLE_NAME, "");
+  auto styleName = QString::fromStdString(m_StylePref->Get(berry::QtPreferences::QT_STYLE_NAME, ""));
   styleManager->SetStyle(styleName);
   oldStyle = styleManager->GetStyle();
   FillStyleCombo(oldStyle);
 
-  QString fontName = m_StylePref->Get(berry::QtPreferences::QT_FONT_NAME, "Open Sans");
+  auto fontName = QString::fromStdString(m_StylePref->Get(berry::QtPreferences::QT_FONT_NAME, "Open Sans"));
   styleManager->SetFont(fontName);
 
-  int fontSize = m_StylePref->Get(berry::QtPreferences::QT_FONT_SIZE, "9").toInt();
+  auto fontSize = std::stoi(m_StylePref->Get(berry::QtPreferences::QT_FONT_SIZE, "9"));
   styleManager->SetFontSize(fontSize);
   controls.m_FontSizeSpinBox->setValue(fontSize);
   styleManager->UpdateWorkbenchFont();

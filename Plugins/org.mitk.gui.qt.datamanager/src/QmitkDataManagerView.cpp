@@ -31,6 +31,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateProperty.h>
 #include <mitkProperties.h>
 #include <mitkRenderingModeProperty.h>
+#include <mitkIPreferences.h>
 
 // qt widgets module
 #include <QmitkCustomVariants.h>
@@ -75,8 +76,8 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_CurrentRowCount = 0;
   m_Parent = parent;
 
-  berry::IBerryPreferences::Pointer prefs = this->GetPreferences().Cast<berry::IBerryPreferences>();
-  assert(prefs);
+  auto* prefs = this->GetPreferences();
+  assert(prefs != nullptr);
 
   m_NodeTreeModel = new QmitkDataStorageTreeModel(GetDataStorage(), prefs->GetBool("Place new nodes on top", true));
   m_NodeTreeModel->setParent(parent);
@@ -185,7 +186,7 @@ void QmitkDataManagerView::NodeChanged(const mitk::DataNode* /*node*/)
   QMetaObject::invokeMethod(m_FilterModel, "invalidate", Qt::QueuedConnection);
 }
 
-void QmitkDataManagerView::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
+void QmitkDataManagerView::OnPreferencesChanged(const mitk::IPreferences* prefs)
 {
   if (m_NodeTreeModel->GetPlaceNewNodesOnTopFlag() != prefs->GetBool("Place new nodes on top", true))
   {

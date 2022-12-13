@@ -24,8 +24,15 @@ found in the LICENSE file.
 #include <QListWidgetItem>
 #include <QMessageBox>
 
-#include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
+
+namespace
+{
+  mitk::IPreferences* GetPreferences()
+  {
+    return berry::WorkbenchPlugin::GetDefault()->GetPreferences();
+  }
+}
 
 namespace berry {
 
@@ -117,7 +124,8 @@ bool PerspectivesPreferencePage::PerformOk()
   perspRegistry->RevertPerspectives(perspToRevert);
 
   // store the open perspective mode setting
-  preferences->PutInt(PreferenceConstants::OPEN_PERSP_MODE, openPerspMode);
+  auto* prefs = GetPreferences();
+  prefs->PutInt(PreferenceConstants::OPEN_PERSP_MODE, openPerspMode);
 
   return true;
 }
@@ -129,9 +137,8 @@ void PerspectivesPreferencePage::PerformCancel()
 
 void PerspectivesPreferencePage::Update()
 {
-  preferences = WorkbenchPlugin::GetDefault()->GetPreferences();
-
-  openPerspMode = preferences->GetInt(PreferenceConstants::OPEN_PERSP_MODE, PreferenceConstants::OPM_ACTIVE_PAGE);
+  auto* prefs = GetPreferences();
+  openPerspMode = prefs->GetInt(PreferenceConstants::OPEN_PERSP_MODE, PreferenceConstants::OPM_ACTIVE_PAGE);
 
   ui->sameWindowButton->setChecked(openPerspMode == PreferenceConstants::OPM_ACTIVE_PAGE);
   ui->newWindowButton->setChecked(openPerspMode == PreferenceConstants::OPM_NEW_WINDOW);

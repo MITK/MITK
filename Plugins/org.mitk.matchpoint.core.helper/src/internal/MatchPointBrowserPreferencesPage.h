@@ -23,11 +23,6 @@ class QmitkDirectoryListWidget;
 class QmitkFileListWidget;
 class ctkDirectoryButton;
 
-namespace mitk
-{
-  class IPreferences;
-}
-
 /**
  * \class MatchPointBrowserPreferencesPage
  * \brief Preference page for the MatchPoint Browser plugin
@@ -86,8 +81,6 @@ protected:
     QCheckBox*                m_LoadFromCurrentDir;
     QCheckBox*                m_LoadFromApplicationDir;
     QCheckBox*                m_LoadFromAutoLoadPathDir;
-
-    mitk::IPreferences* m_BrowserPreferencesNode;
 
 private:
 

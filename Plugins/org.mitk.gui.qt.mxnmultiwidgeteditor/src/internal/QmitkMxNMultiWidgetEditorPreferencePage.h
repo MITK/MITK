@@ -20,11 +20,6 @@ found in the LICENSE file.
 #include <QScopedPointer>
 #include <QPushButton>
 
-namespace mitk
-{
-  class IPreferences;
-}
-
 class QmitkMxNMultiWidgetEditorPreferencePage : public QObject, public berry::IQtPreferencePage
 {
   Q_OBJECT
@@ -53,11 +48,6 @@ public slots:
 
 protected:
   std::string m_CurrentColormap;
-
-  /**
-   * @brief m_Preferences the berry preferences.
-   */
-  mitk::IPreferences* m_Preferences;
 
 private:
 

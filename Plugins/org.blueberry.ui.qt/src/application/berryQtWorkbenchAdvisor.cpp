@@ -25,7 +25,6 @@ found in the LICENSE file.
 
 #include <vector>
 
-#include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 
 namespace berry
@@ -35,8 +34,7 @@ void QtWorkbenchAdvisor::Initialize(IWorkbenchConfigurer::Pointer configurer)
 {
   WorkbenchAdvisor::Initialize(configurer);
 
-  auto* prefService = WorkbenchPlugin::GetDefault()->GetPreferencesService();
-  auto* prefs = prefService->GetSystemPreferences()->Node(QtPreferences::QT_STYLES_NODE);
+  auto* prefs = WorkbenchPlugin::GetDefault()->GetPreferences()->Node(QtPreferences::QT_STYLES_NODE);
   auto styleName = QString::fromStdString(prefs->Get(QtPreferences::QT_STYLE_NAME, ""));
   auto fontName = QString::fromStdString(prefs->Get(QtPreferences::QT_FONT_NAME, "Open Sans"));
   auto fontSize = QString::fromStdString(prefs->Get(QtPreferences::QT_FONT_SIZE, "9"));

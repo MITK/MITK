@@ -18,11 +18,6 @@ found in the LICENSE file.
 
 #include <ui_QmitkAppInstancesPreferencePage.h>
 
-namespace mitk
-{
-  class IPreferences;
-}
-
 class QmitkAppInstancesPreferencePage : public QObject, public berry::IQtPreferencePage
 {
 
@@ -46,9 +41,6 @@ public:
 private:
 
   Ui::QmitkAppInstancesPreferencePage controls;
-
-  mitk::IPreferences* prefs;
-
   QWidget* mainWidget;
 };
 

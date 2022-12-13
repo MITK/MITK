@@ -21,11 +21,6 @@ found in the LICENSE file.
 
 class QPushButton;
 
-namespace mitk
-{
-  class IPreferences;
-}
-
 namespace Ui
 {
   class QmitkStdMultiWidgetEditorPreferencePage;
@@ -85,11 +80,6 @@ protected:
    * @brief m_Widget1Annotation the text of the corner annotation.
    */
   std::array<QString, 4> m_WidgetAnnotation;
-
-  /**
-   * @brief m_Preferences the berry preferences.
-   */
-  mitk::IPreferences* m_Preferences;
 
   /**
    * @brief SetStyleSheetToColorChooserButton colorize a button.

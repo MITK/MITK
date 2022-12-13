@@ -21,11 +21,6 @@ found in the LICENSE file.
 
 #include <QStringList>
 
-namespace mitk
-{
-  class IPreferences;
-}
-
 namespace berry {
 
 class QtStylePreferencePage : public QObject, public IQtPreferencePage
@@ -68,7 +63,6 @@ private:
   berry::IQtStyleManager* styleManager;
 
   Ui::QtStylePreferencePageUI controls;
-  mitk::IPreferences* m_StylePref;
   berry::IQtStyleManager::Style oldStyle;
 
   berry::IQtStyleManager::StyleList styles;

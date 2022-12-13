@@ -28,6 +28,15 @@ found in the LICENSE file.
 #include <QMessageBox>
 #include <QApplication>
 
+namespace
+{
+  mitk::IPreferences* GetPreferences()
+  {
+    auto* preferencesService = mitk::CoreServices::GetPreferencesService();
+    return preferencesService->GetSystemPreferences()->Node("DataManager/Hotkeys");
+  }
+}
+
 QmitkDataManagerHotkeysPrefPage::QmitkDataManagerHotkeysPrefPage()
   : m_MainControl(nullptr)
 {
@@ -39,10 +48,6 @@ void QmitkDataManagerHotkeysPrefPage::Init(berry::IWorkbench::Pointer)
 
 void QmitkDataManagerHotkeysPrefPage::CreateQtControl(QWidget* parent)
 {
-  auto* prefService = mitk::CoreServices::GetPreferencesService();
-  auto* dataManagerHotkeysPreferencesNode = prefService->GetSystemPreferences()->Node("/DataManager/Hotkeys");
-  m_DataManagerHotkeysPreferencesNode = dataManagerHotkeysPreferencesNode;
-
   m_HotkeyEditors["Make all nodes invisible"] = new QmitkHotkeyLineEdit("Ctrl+V");
   m_HotkeyEditors["Toggle visibility of selected nodes"] = new QmitkHotkeyLineEdit("V");
   m_HotkeyEditors["Delete selected nodes"] = new QmitkHotkeyLineEdit("Del");
@@ -74,7 +79,9 @@ QWidget* QmitkDataManagerHotkeysPrefPage::GetQtControl() const
 
 bool QmitkDataManagerHotkeysPrefPage::PerformOk()
 {
-  if (m_DataManagerHotkeysPreferencesNode != nullptr)
+  auto* prefs = GetPreferences();
+
+  if (prefs != nullptr)
   {
     QString keyString;
     QString errString;
@@ -112,10 +119,10 @@ bool QmitkDataManagerHotkeysPrefPage::PerformOk()
     for (auto it = m_HotkeyEditors.begin(); it != m_HotkeyEditors.end(); ++it)
     {
       QString keySequence = it->second->GetKeySequenceAsString();
-      m_DataManagerHotkeysPreferencesNode->Put(it->first.toStdString(), it->second->GetKeySequenceAsString().toStdString());
+      prefs->Put(it->first.toStdString(), it->second->GetKeySequenceAsString().toStdString());
     }
 
-    m_DataManagerHotkeysPreferencesNode->Flush();
+    prefs->Flush();
     return true;
   }
 
@@ -128,9 +135,11 @@ void QmitkDataManagerHotkeysPrefPage::PerformCancel()
 
 void QmitkDataManagerHotkeysPrefPage::Update()
 {
-  if (m_DataManagerHotkeysPreferencesNode != nullptr)
+  auto* prefs = GetPreferences();
+
+  if (prefs != nullptr)
   {
     for (auto it = m_HotkeyEditors.begin(); it != m_HotkeyEditors.end(); ++it)
-      it->second->setText(QString::fromStdString(m_DataManagerHotkeysPreferencesNode->Get(it->first.toStdString(), it->second->text().toStdString())));
+      it->second->setText(QString::fromStdString(prefs->Get(it->first.toStdString(), it->second->text().toStdString())));
   }
 }

@@ -20,11 +20,6 @@ found in the LICENSE file.
 
 class QWidget;
 
-namespace mitk
-{
-  class IPreferences;
-}
-
 /**
 * \class RTUIPreferencePage
 * \brief Preference page for general RT visualization settings.
@@ -77,9 +72,6 @@ protected:
 
   QWidget                 *m_MainControl;
   Ui::RTUIPreferencePageControls* m_Controls;
-
-  mitk::IPreferences* m_PreferencesNode;
-
 };
 
 #endif

@@ -31,7 +31,6 @@ found in the LICENSE file.
 
 #include "berryConstants.h"
 
-#include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 
 namespace berry
@@ -217,9 +216,9 @@ PartSashContainer::PartSashContainer(const QString& id,
 {
   resizeListener = new ControlListener(this);
 
-  auto layout = WorkbenchPlugin::GetDefault()->GetPreferencesService()->
-      GetSystemPreferences()->Get(WorkbenchPreferenceConstants::PREFERRED_SASH_LAYOUT,
-          WorkbenchPreferenceConstants::LEFT);
+  auto layout = WorkbenchPlugin::GetDefault()->GetPreferences()->Get(
+    WorkbenchPreferenceConstants::PREFERRED_SASH_LAYOUT, WorkbenchPreferenceConstants::LEFT);
+
   if (layout == WorkbenchPreferenceConstants::RIGHT)
   {
     leftToRight = false;

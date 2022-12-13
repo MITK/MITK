@@ -20,11 +20,6 @@ found in the LICENSE file.
 class QWidget;
 class QCheckBox;
 
-namespace mitk
-{
-  class IPreferences;
-}
-
 struct MITK_QT_DATAMANAGER QmitkDataManagerPreferencePage : public QObject, public berry::IQtPreferencePage
 {
   Q_OBJECT
@@ -61,7 +56,6 @@ protected:
   QCheckBox* m_ShowHelperObjects;
   QCheckBox* m_ShowNodesContainingNoData;
   QCheckBox* m_AllowParentChange;
-  mitk::IPreferences* m_DataManagerPreferencesNode;
 };
 
 #endif /* QMITKDATAMANAGERPREFERENCEPAGE_H_ */

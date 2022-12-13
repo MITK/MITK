@@ -19,8 +19,15 @@ found in the LICENSE file.
 #include <QDirIterator>
 #include <QFontDatabase>
 
-#include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
+
+namespace
+{
+  mitk::IPreferences* GetPreferences()
+  {
+    return berry::WorkbenchPlugin::GetDefault()->GetPreferences()->Node(berry::QtPreferences::QT_STYLES_NODE);
+  }
+}
 
 namespace berry
 {
@@ -40,16 +47,12 @@ void QtStylePreferencePage::CreateQtControl(QWidget* parent)
   mainWidget = new QWidget(parent);
   controls.setupUi(mainWidget);
 
-  auto* prefService = berry::WorkbenchPlugin::GetDefault()->GetPreferencesService();
-
   ctkPluginContext* context = berry::WorkbenchPlugin::GetDefault()->GetPluginContext();
   ctkServiceReference styleManagerRef = context->getServiceReference<berry::IQtStyleManager>();
   if (styleManagerRef)
   {
     styleManager = context->getService<berry::IQtStyleManager>(styleManagerRef);
   }
-
-  m_StylePref = prefService->GetSystemPreferences()->Node(berry::QtPreferences::QT_STYLES_NODE);
 
   Update();
 
@@ -207,7 +210,9 @@ QWidget* QtStylePreferencePage::GetQtControl() const
 
 bool QtStylePreferencePage::PerformOk()
 {
-  m_StylePref->Put(berry::QtPreferences::QT_STYLE_NAME, controls.m_StylesCombo->itemData(controls.m_StylesCombo->currentIndex()).toString().toStdString());
+  auto* prefs = GetPreferences();
+
+  prefs->Put(berry::QtPreferences::QT_STYLE_NAME, controls.m_StylesCombo->itemData(controls.m_StylesCombo->currentIndex()).toString().toStdString());
 
   QString paths;
   for (int i = 0; i < controls.m_PathList->count(); ++i)
@@ -216,11 +221,11 @@ bool QtStylePreferencePage::PerformOk()
     paths += path;
   }
 
-  m_StylePref->Put(berry::QtPreferences::QT_STYLE_SEARCHPATHS, paths.toStdString());
-  m_StylePref->Put(berry::QtPreferences::QT_FONT_NAME, controls.m_FontComboBox->currentText().toStdString());
-  m_StylePref->Put(berry::QtPreferences::QT_FONT_SIZE, std::to_string(controls.m_FontSizeSpinBox->value()));
+  prefs->Put(berry::QtPreferences::QT_STYLE_SEARCHPATHS, paths.toStdString());
+  prefs->Put(berry::QtPreferences::QT_FONT_NAME, controls.m_FontComboBox->currentText().toStdString());
+  prefs->Put(berry::QtPreferences::QT_FONT_SIZE, std::to_string(controls.m_FontSizeSpinBox->value()));
 
-  m_StylePref->PutBool(berry::QtPreferences::QT_SHOW_TOOLBAR_CATEGORY_NAMES,
+  prefs->PutBool(berry::QtPreferences::QT_SHOW_TOOLBAR_CATEGORY_NAMES,
     controls.m_ToolbarCategoryCheckBox->isChecked());
 
   return true;
@@ -235,7 +240,9 @@ void QtStylePreferencePage::Update()
 {
   styleManager->RemoveStyles();
 
-  auto paths = QString::fromStdString(m_StylePref->Get(berry::QtPreferences::QT_STYLE_SEARCHPATHS, ""));
+  auto* prefs = GetPreferences();
+
+  auto paths = QString::fromStdString(prefs->Get(berry::QtPreferences::QT_STYLE_SEARCHPATHS, ""));
   QStringList pathList = paths.split(";", QString::SkipEmptyParts);
   QStringListIterator it(pathList);
   while (it.hasNext())
@@ -243,15 +250,15 @@ void QtStylePreferencePage::Update()
     AddPath(it.next(), false);
   }
 
-  auto styleName = QString::fromStdString(m_StylePref->Get(berry::QtPreferences::QT_STYLE_NAME, ""));
+  auto styleName = QString::fromStdString(prefs->Get(berry::QtPreferences::QT_STYLE_NAME, ""));
   styleManager->SetStyle(styleName);
   oldStyle = styleManager->GetStyle();
   FillStyleCombo(oldStyle);
 
-  auto fontName = QString::fromStdString(m_StylePref->Get(berry::QtPreferences::QT_FONT_NAME, "Open Sans"));
+  auto fontName = QString::fromStdString(prefs->Get(berry::QtPreferences::QT_FONT_NAME, "Open Sans"));
   styleManager->SetFont(fontName);
 
-  auto fontSize = std::stoi(m_StylePref->Get(berry::QtPreferences::QT_FONT_SIZE, "9"));
+  auto fontSize = std::stoi(prefs->Get(berry::QtPreferences::QT_FONT_SIZE, "9"));
   styleManager->SetFontSize(fontSize);
   controls.m_FontSizeSpinBox->setValue(fontSize);
   styleManager->UpdateWorkbenchFont();
@@ -259,7 +266,7 @@ void QtStylePreferencePage::Update()
   FillFontCombo(styleManager->GetFont());
 
   controls.m_ToolbarCategoryCheckBox->setChecked(
-    m_StylePref->GetBool(berry::QtPreferences::QT_SHOW_TOOLBAR_CATEGORY_NAMES, true));
+    prefs->GetBool(berry::QtPreferences::QT_SHOW_TOOLBAR_CATEGORY_NAMES, true));
 }
 
 }

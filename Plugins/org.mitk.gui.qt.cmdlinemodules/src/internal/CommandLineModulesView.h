@@ -25,11 +25,6 @@ class QmitkCmdLineModuleRunner;
 class QAction;
 class QVBoxLayout;
 
-namespace mitk
-{
-  class IPreferences;
-}
-
 /*!
  * \class CommandLineModulesView
  * \brief Provides basic GUI interface to the CTK command line modules.

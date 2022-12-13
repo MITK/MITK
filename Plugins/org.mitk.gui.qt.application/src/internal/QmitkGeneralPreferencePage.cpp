@@ -21,6 +21,15 @@ found in the LICENSE file.
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 
+namespace
+{
+  mitk::IPreferences* GetPreferences()
+  {
+    auto* preferencesService = mitk::CoreServices::GetPreferencesService();
+    return preferencesService->GetSystemPreferences()->Node(QmitkDataNodeGlobalReinitAction::ACTION_ID.toStdString());
+  }
+}
+
 QmitkGeneralPreferencePage::QmitkGeneralPreferencePage()
   : m_MainControl(nullptr)
 {
@@ -34,9 +43,6 @@ void QmitkGeneralPreferencePage::Init(berry::IWorkbench::Pointer)
 
 void QmitkGeneralPreferencePage::CreateQtControl(QWidget* parent)
 {
-  auto* prefService = mitk::CoreServices::GetPreferencesService();
-  m_GeneralPreferencesNode = prefService->GetSystemPreferences()->Node(QmitkDataNodeGlobalReinitAction::ACTION_ID.toStdString());
-
   m_MainControl = new QWidget(parent);
 
   m_GlobalReinitOnNodeDelete = new QCheckBox;
@@ -57,8 +63,10 @@ QWidget* QmitkGeneralPreferencePage::GetQtControl() const
 
 bool QmitkGeneralPreferencePage::PerformOk()
 {
-  m_GeneralPreferencesNode->PutBool("Call global reinit if node is deleted", m_GlobalReinitOnNodeDelete->isChecked());
-  m_GeneralPreferencesNode->PutBool("Call global reinit if node visibility is changed", m_GlobalReinitOnNodeVisibilityChanged->isChecked());
+  auto* prefs = GetPreferences();
+
+  prefs->PutBool("Call global reinit if node is deleted", m_GlobalReinitOnNodeDelete->isChecked());
+  prefs->PutBool("Call global reinit if node visibility is changed", m_GlobalReinitOnNodeVisibilityChanged->isChecked());
 
   return true;
 }
@@ -70,6 +78,8 @@ void QmitkGeneralPreferencePage::PerformCancel()
 
 void QmitkGeneralPreferencePage::Update()
 {
-  m_GlobalReinitOnNodeDelete->setChecked(m_GeneralPreferencesNode->GetBool("Call global reinit if node is deleted", true));
-  m_GlobalReinitOnNodeVisibilityChanged->setChecked(m_GeneralPreferencesNode->GetBool("Call global reinit if node visibility is changed", false));
+  auto* prefs = GetPreferences();
+
+  m_GlobalReinitOnNodeDelete->setChecked(prefs->GetBool("Call global reinit if node is deleted", true));
+  m_GlobalReinitOnNodeVisibilityChanged->setChecked(prefs->GetBool("Call global reinit if node visibility is changed", false));
 }

@@ -18,9 +18,6 @@ found in the LICENSE file.
 #include <berryIWorkbenchPage.h>
 #include <berryIWorkbench.h>
 #include <mitkDataStorageEditorInput.h>
-#include <mitkCoreServices.h>
-#include <mitkIPreferencesService.h>
-#include <mitkIPreferences.h>
 
 #include "internal/QmitkCommonExtPlugin.h"
 #include <mitkIDataStorageService.h>
@@ -47,10 +44,6 @@ void QmitkOpenMxNMultiWidgetEditorAction::init(berry::IWorkbenchWindow::Pointer 
   this->setParent(static_cast<QWidget*>(m_Window->GetShell()->GetControl()));
   this->setText("MxN Display");
   this->setToolTip("Open the mxn multi widget editor");
-
-  auto* prefService = mitk::CoreServices::GetPreferencesService();
-
-  m_GeneralPreferencesNode = prefService->GetSystemPreferences()->Node("/General");
 
   this->connect(this, SIGNAL(triggered(bool)), this, SLOT(Run()));
 }

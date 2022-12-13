@@ -27,11 +27,6 @@ found in the LICENSE file.
 
 #include <berryIWorkbenchWindow.h>
 
-namespace mitk
-{
-  class IPreferences;
-}
-
 class MITK_QT_COMMON_EXT_EXPORT QmitkOpenMxNMultiWidgetEditorAction : public QAction
 {
   Q_OBJECT
@@ -49,7 +44,6 @@ private:
 
   void init(berry::IWorkbenchWindow::Pointer window);
   berry::IWorkbenchWindow::Pointer m_Window;
-  mitk::IPreferences* m_GeneralPreferencesNode;
 
 };
 

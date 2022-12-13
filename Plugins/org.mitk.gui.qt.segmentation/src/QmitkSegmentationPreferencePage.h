@@ -19,11 +19,6 @@ found in the LICENSE file.
 
 class QWidget;
 
-namespace mitk
-{
-  class IPreferences;
-}
-
 namespace Ui
 {
   class QmitkSegmentationPreferencePageControls;
@@ -62,8 +57,6 @@ protected:
   QWidget* m_Control;
 
   bool m_Initializing;
-
-  mitk::IPreferences* m_SegmentationPreferencesNode;
 };
 
 #endif // QMITKSEGMENTATIONPREFERENCEPAGE_H

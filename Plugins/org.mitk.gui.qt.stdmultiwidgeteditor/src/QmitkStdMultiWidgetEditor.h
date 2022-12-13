@@ -26,11 +26,6 @@ found in the LICENSE file.
 class QmitkStdMultiWidget;
 class QmitkStdMultiWidgetEditorPrivate;
 
-namespace mitk
-{
-  class IPreferences;
-}
-
 /**
  * @brief
  */

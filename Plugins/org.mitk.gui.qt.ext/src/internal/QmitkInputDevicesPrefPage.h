@@ -25,7 +25,6 @@ class QCheckBox;
 
 namespace mitk {
 struct IInputDeviceRegistry;
-class IPreferences;
 }
 
 class QmitkInputDevicesPrefPage : public QObject, public berry::IQtPreferencePage
@@ -80,8 +79,6 @@ protected:
   QGroupBox* m_WiiMoteModes;
   QRadioButton* m_WiiMoteHeadTracking;
   QRadioButton* m_WiiMoteSurfaceInteraction;
-
-  mitk::IPreferences* m_InputDevicesPrefNode;
 
   mitk::IInputDeviceRegistry* GetInputDeviceRegistry() const;
 

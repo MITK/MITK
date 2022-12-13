@@ -18,11 +18,6 @@ found in the LICENSE file.
 
 #include "ui_QmitkXnatConnectionPreferencePageControls.h"
 
-namespace mitk
-{
-  class IPreferences;
-}
-
 class QWidget;
 class QLineEdit;
 
@@ -72,8 +67,6 @@ protected:
   Ui::QmitkXnatConnectionPreferencePageControls m_Controls;
 
   QWidget* m_Control;
-
-  mitk::IPreferences* m_XnatConnectionPreferencesNode;
 
 private:
 

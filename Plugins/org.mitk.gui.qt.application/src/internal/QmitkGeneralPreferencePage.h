@@ -18,11 +18,6 @@ found in the LICENSE file.
 class QWidget;
 class QCheckBox;
 
-namespace mitk
-{
-  class IPreferences;
-}
-
 class QmitkGeneralPreferencePage : public QObject, public berry::IQtPreferencePage
 {
   Q_OBJECT
@@ -68,8 +63,6 @@ protected:
 
     QCheckBox* m_GlobalReinitOnNodeDelete;
     QCheckBox* m_GlobalReinitOnNodeVisibilityChanged;
-
-    mitk::IPreferences* m_GeneralPreferencesNode;
 };
 
 #endif // QMITKGENERALPREFERENCEPAGE_H

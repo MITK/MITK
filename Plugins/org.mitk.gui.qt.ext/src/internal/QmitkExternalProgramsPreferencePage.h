@@ -17,11 +17,6 @@ found in the LICENSE file.
 #include <QProcess>
 #include <QScopedPointer>
 
-namespace mitk
-{
-  class IPreferences;
-}
-
 namespace Ui
 {
   class QmitkExternalProgramsPreferencePage;
@@ -53,7 +48,6 @@ private slots:
   void OnGnuplotProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
 private:
-  mitk::IPreferences* m_Preferences;
   QScopedPointer<Ui::QmitkExternalProgramsPreferencePage> m_Ui;
   QWidget* m_Control;
 

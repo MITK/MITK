@@ -23,7 +23,6 @@ found in the LICENSE file.
 #include "berryIExtension.h"
 #include "berryIExtensionTracker.h"
 
-#include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 
 namespace berry
@@ -154,7 +153,7 @@ PerspectiveRegistry::PerspectiveRegistry()
   IExtensionTracker* tracker = PlatformUI::GetWorkbench()->GetExtensionTracker();
   tracker->RegisterHandler(this, QString("org.blueberry.ui.perspectives"));
 
-  mitk::IPreferences* prefs = WorkbenchPlugin::GetDefault()->GetPreferencesService()->GetSystemPreferences();
+  mitk::IPreferences* prefs = WorkbenchPlugin::GetDefault()->GetPreferences();
   prefs->OnPropertyChanged +=
       mitk::MessageDelegate1<PreferenceChangeListener, const mitk::IPreferences::ChangeEvent&>(
         preferenceListener.data(), &PreferenceChangeListener::PropertyChange);
@@ -228,20 +227,20 @@ void PerspectiveRegistry::Load()
 void PerspectiveRegistry::SaveCustomPersp(PerspectiveDescriptor::Pointer desc,
                                           XMLMemento* memento)
 {
-  auto* prefs = WorkbenchPlugin::GetDefault()->GetPreferencesService();
+  auto* prefs = WorkbenchPlugin::GetDefault()->GetPreferences();
 
   // Save it to the preference store.
   std::stringstream ss;
   memento->Save(ss);
-  prefs->GetSystemPreferences()->Put((desc->GetId() + PERSP).toStdString(), ss.str());
+  prefs->Put((desc->GetId() + PERSP).toStdString(), ss.str());
 }
 
 IMemento::Pointer PerspectiveRegistry::GetCustomPersp(const QString&  id)
 {
   std::stringstream ss;
 
-  auto* prefs = WorkbenchPlugin::GetDefault()->GetPreferencesService();
-  const auto xmlString = prefs->GetSystemPreferences()->Get((id + PERSP).toStdString(), "");
+  auto* prefs = WorkbenchPlugin::GetDefault()->GetPreferences();
+  const auto xmlString = prefs->Get((id + PERSP).toStdString(), "");
   if (!xmlString.empty())
   { // defined in store
     ss.str(xmlString);
@@ -385,22 +384,20 @@ void PerspectiveRegistry::RevertPerspective(IPerspectiveDescriptor::Pointer pers
 PerspectiveRegistry::~PerspectiveRegistry()
 {
 //  PlatformUI::GetWorkbench()->GetExtensionTracker()->UnregisterHandler(this);
-//  WorkbenchPlugin::GetDefault()->GetPreferencesService()->GetSystemPreferences()->RemovePropertyChangeListener(
-//      preferenceListener);
+//  WorkbenchPlugin::GetDefault()->GetPreferences()->RemovePropertyChangeListener(preferenceListener);
 }
 
 void PerspectiveRegistry::DeleteCustomDefinition(PerspectiveDescriptor::Pointer  desc)
 {
   // remove the entry from the preference store.
-  auto* store = WorkbenchPlugin::GetDefault()->GetPreferencesService();
-
-  store->GetSystemPreferences()->Remove((desc->GetId() + PERSP).toStdString());
+  auto* prefs = WorkbenchPlugin::GetDefault()->GetPreferences();
+  prefs->Remove((desc->GetId() + PERSP).toStdString());
 }
 
 bool PerspectiveRegistry::HasCustomDefinition(PerspectiveDescriptor::ConstPointer desc) const
 {
-  auto* store = WorkbenchPlugin::GetDefault()->GetPreferencesService();
-  const auto keys = store->GetSystemPreferences()->Keys();
+  auto* prefs = WorkbenchPlugin::GetDefault()->GetPreferences();
+  const auto keys = prefs->Keys();
   return std::find(keys.begin(), keys.end(), (desc->GetId() + PERSP).toStdString()) != keys.end();
 }
 
@@ -428,8 +425,7 @@ void PerspectiveRegistry::LoadCustom()
   QScopedPointer<std::istream> reader;
 
   /* Get the entries from the Preference store */
-  auto* store = WorkbenchPlugin::GetDefault()->GetPreferencesService();
-  auto* prefs = store->GetSystemPreferences();
+  auto* prefs = WorkbenchPlugin::GetDefault()->GetPreferences();
 
   /* Get the space-delimited list of custom perspective ids */
   QString customPerspectives = QString::fromStdString(prefs->Get(PreferenceConstants::PERSPECTIVES, ""));

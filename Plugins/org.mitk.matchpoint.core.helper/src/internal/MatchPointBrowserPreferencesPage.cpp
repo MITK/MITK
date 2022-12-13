@@ -29,6 +29,15 @@ found in the LICENSE file.
 #include "QmitkDirectoryListWidget.h"
 #include "QmitkFileListWidget.h"
 
+namespace
+{
+  mitk::IPreferences* GetPreferences()
+  {
+    auto* preferencesService = mitk::CoreServices::GetPreferencesService();
+    return preferencesService->GetSystemPreferences()->Node(MatchPointBrowserConstants::VIEW_ID);
+  }
+}
+
 //-----------------------------------------------------------------------------
 MatchPointBrowserPreferencesPage::MatchPointBrowserPreferencesPage()
 : m_MainControl(nullptr)
@@ -38,7 +47,6 @@ MatchPointBrowserPreferencesPage::MatchPointBrowserPreferencesPage()
 , m_LoadFromCurrentDir(nullptr)
 , m_LoadFromApplicationDir(nullptr)
 , m_LoadFromAutoLoadPathDir(nullptr)
-, m_BrowserPreferencesNode(nullptr)
 {
 
 }
@@ -61,11 +69,6 @@ void MatchPointBrowserPreferencesPage::Init(berry::IWorkbench::Pointer )
 //-----------------------------------------------------------------------------
 void MatchPointBrowserPreferencesPage::CreateQtControl(QWidget* parent)
 {
-  auto* prefService = mitk::CoreServices::GetPreferencesService();
-
-  const auto id = "/" + MatchPointBrowserConstants::VIEW_ID;
-  m_BrowserPreferencesNode = prefService->GetSystemPreferences()->Node(id);
-
   m_MainControl = new QWidget(parent);
 
   m_AlgDirectories = new QmitkDirectoryListWidget(m_MainControl);
@@ -110,17 +113,19 @@ std::string MatchPointBrowserPreferencesPage::ConvertToString( const QStringList
 //-----------------------------------------------------------------------------
 bool MatchPointBrowserPreferencesPage::PerformOk()
 {
-  m_BrowserPreferencesNode->PutBool(MatchPointBrowserConstants::DEBUG_OUTPUT_NODE_NAME, m_DebugOutput->isChecked());
-  m_BrowserPreferencesNode->PutBool(MatchPointBrowserConstants::LOAD_FROM_APPLICATION_DIR, m_LoadFromApplicationDir->isChecked());
-  m_BrowserPreferencesNode->PutBool(MatchPointBrowserConstants::LOAD_FROM_HOME_DIR, m_LoadFromHomeDir->isChecked());
-  m_BrowserPreferencesNode->PutBool(MatchPointBrowserConstants::LOAD_FROM_CURRENT_DIR, m_LoadFromCurrentDir->isChecked());
-  m_BrowserPreferencesNode->PutBool(MatchPointBrowserConstants::LOAD_FROM_AUTO_LOAD_DIR, m_LoadFromAutoLoadPathDir->isChecked());
+  auto* prefs = GetPreferences();
+
+  prefs->PutBool(MatchPointBrowserConstants::DEBUG_OUTPUT_NODE_NAME, m_DebugOutput->isChecked());
+  prefs->PutBool(MatchPointBrowserConstants::LOAD_FROM_APPLICATION_DIR, m_LoadFromApplicationDir->isChecked());
+  prefs->PutBool(MatchPointBrowserConstants::LOAD_FROM_HOME_DIR, m_LoadFromHomeDir->isChecked());
+  prefs->PutBool(MatchPointBrowserConstants::LOAD_FROM_CURRENT_DIR, m_LoadFromCurrentDir->isChecked());
+  prefs->PutBool(MatchPointBrowserConstants::LOAD_FROM_AUTO_LOAD_DIR, m_LoadFromAutoLoadPathDir->isChecked());
 
   const auto paths = this->ConvertToString(m_AlgDirectories->directories());
-  m_BrowserPreferencesNode->Put(MatchPointBrowserConstants::MDAR_DIRECTORIES_NODE_NAME, paths);
+  prefs->Put(MatchPointBrowserConstants::MDAR_DIRECTORIES_NODE_NAME, paths);
 
   const auto modules = this->ConvertToString(m_AlgFiles->files());
-  m_BrowserPreferencesNode->Put(MatchPointBrowserConstants::MDAR_FILES_NODE_NAME, modules);
+  prefs->Put(MatchPointBrowserConstants::MDAR_FILES_NODE_NAME, modules);
 
   return true;
 }
@@ -135,17 +140,19 @@ void MatchPointBrowserPreferencesPage::PerformCancel()
 //-----------------------------------------------------------------------------
 void MatchPointBrowserPreferencesPage::Update()
 {
-  m_DebugOutput->setChecked(m_BrowserPreferencesNode->GetBool(MatchPointBrowserConstants::DEBUG_OUTPUT_NODE_NAME, false));
-  m_LoadFromApplicationDir->setChecked(m_BrowserPreferencesNode->GetBool(MatchPointBrowserConstants::LOAD_FROM_APPLICATION_DIR, true));
-  m_LoadFromHomeDir->setChecked(m_BrowserPreferencesNode->GetBool(MatchPointBrowserConstants::LOAD_FROM_HOME_DIR, false));
-  m_LoadFromCurrentDir->setChecked(m_BrowserPreferencesNode->GetBool(MatchPointBrowserConstants::LOAD_FROM_CURRENT_DIR, false));
-  m_LoadFromAutoLoadPathDir->setChecked(m_BrowserPreferencesNode->GetBool(MatchPointBrowserConstants::LOAD_FROM_AUTO_LOAD_DIR, false));
+  auto* prefs = GetPreferences();
 
-  QString paths = QString::fromStdString(m_BrowserPreferencesNode->Get(MatchPointBrowserConstants::MDAR_DIRECTORIES_NODE_NAME, ""));
+  m_DebugOutput->setChecked(prefs->GetBool(MatchPointBrowserConstants::DEBUG_OUTPUT_NODE_NAME, false));
+  m_LoadFromApplicationDir->setChecked(prefs->GetBool(MatchPointBrowserConstants::LOAD_FROM_APPLICATION_DIR, true));
+  m_LoadFromHomeDir->setChecked(prefs->GetBool(MatchPointBrowserConstants::LOAD_FROM_HOME_DIR, false));
+  m_LoadFromCurrentDir->setChecked(prefs->GetBool(MatchPointBrowserConstants::LOAD_FROM_CURRENT_DIR, false));
+  m_LoadFromAutoLoadPathDir->setChecked(prefs->GetBool(MatchPointBrowserConstants::LOAD_FROM_AUTO_LOAD_DIR, false));
+
+  QString paths = QString::fromStdString(prefs->Get(MatchPointBrowserConstants::MDAR_DIRECTORIES_NODE_NAME, ""));
   QStringList directoryList = paths.split(";", QString::SkipEmptyParts);
   m_AlgDirectories->setDirectories(directoryList);
 
-  QString files = QString::fromStdString(m_BrowserPreferencesNode->Get(MatchPointBrowserConstants::MDAR_FILES_NODE_NAME, ""));
+  QString files = QString::fromStdString(prefs->Get(MatchPointBrowserConstants::MDAR_FILES_NODE_NAME, ""));
   QStringList fileList = files.split(";", QString::SkipEmptyParts);
   m_AlgFiles->setFiles(fileList);
 }

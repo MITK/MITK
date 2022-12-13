@@ -21,6 +21,15 @@ found in the LICENSE file.
 
 #include <ui_QmitkSegmentationPreferencePageControls.h>
 
+namespace
+{
+  mitk::IPreferences* GetPreferences()
+  {
+    auto* preferencesService = mitk::CoreServices::GetPreferencesService();
+    return preferencesService->GetSystemPreferences()->Node("org.mitk.views.segmentation");
+  }
+}
+
 QmitkSegmentationPreferencePage::QmitkSegmentationPreferencePage()
   : m_Ui(new Ui::QmitkSegmentationPreferencePageControls),
     m_Control(nullptr),
@@ -39,9 +48,6 @@ void QmitkSegmentationPreferencePage::Init(berry::IWorkbench::Pointer)
 void QmitkSegmentationPreferencePage::CreateQtControl(QWidget* parent)
 {
   m_Initializing = true;
-  mitk::CoreServicePointer prefService(mitk::CoreServices::GetPreferencesService());
-
-  m_SegmentationPreferencesNode = prefService->GetSystemPreferences()->Node("/org.mitk.views.segmentation");
 
   m_Control = new QWidget(parent);
   m_Ui->setupUi(m_Control);
@@ -60,14 +66,16 @@ QWidget* QmitkSegmentationPreferencePage::GetQtControl() const
 
 bool QmitkSegmentationPreferencePage::PerformOk()
 {
-  m_SegmentationPreferencesNode->PutBool("slim view", m_Ui->slimViewCheckBox->isChecked());
-  m_SegmentationPreferencesNode->PutBool("draw outline", m_Ui->outlineRadioButton->isChecked());
-  m_SegmentationPreferencesNode->PutBool("selection mode", m_Ui->selectionModeCheckBox->isChecked());
-  m_SegmentationPreferencesNode->Put("label set preset", m_Ui->labelSetPresetLineEdit->text().toStdString());
-  m_SegmentationPreferencesNode->PutBool("default label naming", m_Ui->defaultNameRadioButton->isChecked());
-  m_SegmentationPreferencesNode->Put("label suggestions", m_Ui->suggestionsLineEdit->text().toStdString());
-  m_SegmentationPreferencesNode->PutBool("replace standard suggestions", m_Ui->replaceStandardSuggestionsCheckBox->isChecked());
-  m_SegmentationPreferencesNode->PutBool("suggest once", m_Ui->suggestOnceCheckBox->isChecked());
+  auto* prefs = GetPreferences();
+
+  prefs->PutBool("slim view", m_Ui->slimViewCheckBox->isChecked());
+  prefs->PutBool("draw outline", m_Ui->outlineRadioButton->isChecked());
+  prefs->PutBool("selection mode", m_Ui->selectionModeCheckBox->isChecked());
+  prefs->Put("label set preset", m_Ui->labelSetPresetLineEdit->text().toStdString());
+  prefs->PutBool("default label naming", m_Ui->defaultNameRadioButton->isChecked());
+  prefs->Put("label suggestions", m_Ui->suggestionsLineEdit->text().toStdString());
+  prefs->PutBool("replace standard suggestions", m_Ui->replaceStandardSuggestionsCheckBox->isChecked());
+  prefs->PutBool("suggest once", m_Ui->suggestOnceCheckBox->isChecked());
   return true;
 }
 
@@ -77,9 +85,11 @@ void QmitkSegmentationPreferencePage::PerformCancel()
 
 void QmitkSegmentationPreferencePage::Update()
 {
-  m_Ui->slimViewCheckBox->setChecked(m_SegmentationPreferencesNode->GetBool("slim view", false));
+  auto* prefs = GetPreferences();
 
-  if (m_SegmentationPreferencesNode->GetBool("draw outline", true))
+  m_Ui->slimViewCheckBox->setChecked(prefs->GetBool("slim view", false));
+
+  if (prefs->GetBool("draw outline", true))
   {
     m_Ui->outlineRadioButton->setChecked(true);
   }
@@ -88,13 +98,13 @@ void QmitkSegmentationPreferencePage::Update()
     m_Ui->overlayRadioButton->setChecked(true);
   }
 
-  m_Ui->selectionModeCheckBox->setChecked(m_SegmentationPreferencesNode->GetBool("selection mode", false));
+  m_Ui->selectionModeCheckBox->setChecked(prefs->GetBool("selection mode", false));
 
   auto labelSetPreset = mitk::BaseApplication::instance().config().getString(mitk::BaseApplication::ARG_SEGMENTATION_LABELSET_PRESET.toStdString(), "");
   bool isOverriddenByCmdLineArg = !labelSetPreset.empty();
 
   if (!isOverriddenByCmdLineArg)
-    labelSetPreset = m_SegmentationPreferencesNode->Get("label set preset", "");
+    labelSetPreset = prefs->Get("label set preset", "");
 
   m_Ui->labelSetPresetLineEdit->setDisabled(isOverriddenByCmdLineArg);
   m_Ui->labelSetPresetToolButton->setDisabled(isOverriddenByCmdLineArg);
@@ -102,7 +112,7 @@ void QmitkSegmentationPreferencePage::Update()
 
   m_Ui->labelSetPresetLineEdit->setText(QString::fromStdString(labelSetPreset));
 
-  if (m_SegmentationPreferencesNode->GetBool("default label naming", true))
+  if (prefs->GetBool("default label naming", true))
   {
     m_Ui->defaultNameRadioButton->setChecked(true);
   }
@@ -115,7 +125,7 @@ void QmitkSegmentationPreferencePage::Update()
   isOverriddenByCmdLineArg = !labelSuggestions.empty();
 
   if (!isOverriddenByCmdLineArg)
-    labelSuggestions = m_SegmentationPreferencesNode->Get("label suggestions", "");
+    labelSuggestions = prefs->Get("label suggestions", "");
 
   m_Ui->defaultNameRadioButton->setDisabled(isOverriddenByCmdLineArg);
   m_Ui->askForNameRadioButton->setDisabled(isOverriddenByCmdLineArg);
@@ -125,8 +135,8 @@ void QmitkSegmentationPreferencePage::Update()
 
   m_Ui->suggestionsLineEdit->setText(QString::fromStdString(labelSuggestions));
 
-  m_Ui->replaceStandardSuggestionsCheckBox->setChecked(m_SegmentationPreferencesNode->GetBool("replace standard suggestions", true));
-  m_Ui->suggestOnceCheckBox->setChecked(m_SegmentationPreferencesNode->GetBool("suggest once", true));
+  m_Ui->replaceStandardSuggestionsCheckBox->setChecked(prefs->GetBool("replace standard suggestions", true));
+  m_Ui->suggestOnceCheckBox->setChecked(prefs->GetBool("suggest once", true));
 }
 
 void QmitkSegmentationPreferencePage::OnLabelSetPresetButtonClicked()

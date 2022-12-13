@@ -29,11 +29,6 @@ class QmitkDoseVisualStyleDelegate;
 
 class QWidget;
 
-namespace mitk
-{
-  class IPreferences;
-}
-
 /**
 * \class DoseVisualizationPreferencePage
 * \brief Preference page for RT Dose visualization
@@ -104,8 +99,6 @@ protected:
 
   QWidget                 *m_MainControl;
   Ui::DoseVisualizationPreferencePageControls* m_Controls;
-
-  mitk::IPreferences* m_DoseVisNode;
 
   typedef mitk::PresetMapType PresetMapType;
   PresetMapType m_Presets;

@@ -35,6 +35,15 @@ found in the LICENSE file.
 
 using namespace berry;
 
+namespace
+{
+  mitk::IPreferences* GetPreferences()
+  {
+    auto* preferencesService = mitk::CoreServices::GetPreferencesService();
+    return preferencesService->GetSystemPreferences()->Node(QmitkXnatTreeBrowserView::VIEW_ID.toStdString());
+  }
+}
+
 QmitkXnatConnectionPreferencePage::QmitkXnatConnectionPreferencePage()
   : m_Control(nullptr)
 {
@@ -46,9 +55,6 @@ void QmitkXnatConnectionPreferencePage::Init(berry::IWorkbench::Pointer)
 
 void QmitkXnatConnectionPreferencePage::CreateQtControl(QWidget* parent)
 {
-  auto* prefService = mitk::CoreServices::GetPreferencesService();
-  m_XnatConnectionPreferencesNode = prefService->GetSystemPreferences()->Node(QmitkXnatTreeBrowserView::VIEW_ID.toStdString());
-
   m_Controls.setupUi(parent);
   m_Control = new QWidget(parent);
   m_Control->setLayout(m_Controls.gridLayout);
@@ -99,26 +105,28 @@ QWidget* QmitkXnatConnectionPreferencePage::GetQtControl() const
 
 bool QmitkXnatConnectionPreferencePage::PerformOk()
 {
-  if (m_XnatConnectionPreferencesNode != nullptr)
+  auto* prefs = GetPreferences();
+
+  if (prefs != nullptr)
   {
-    m_XnatConnectionPreferencesNode->Put(m_Controls.xnatHostAddressLabel->text().toStdString(), m_Controls.inXnatHostAddress->text().toStdString());
-    m_XnatConnectionPreferencesNode->Put(m_Controls.xnatPortLabel->text().toStdString(), m_Controls.inXnatPort->text().toStdString());
-    m_XnatConnectionPreferencesNode->Put(m_Controls.xnatUsernameLabel->text().toStdString(), m_Controls.inXnatUsername->text().toStdString());
-    m_XnatConnectionPreferencesNode->Put(m_Controls.xnatPasswortLabel->text().toStdString(), m_Controls.inXnatPassword->text().toStdString());
-    m_XnatConnectionPreferencesNode->Put(m_Controls.xnatDownloadPathLabel->text().toStdString(), m_Controls.inXnatDownloadPath->text().toStdString());
+    prefs->Put(m_Controls.xnatHostAddressLabel->text().toStdString(), m_Controls.inXnatHostAddress->text().toStdString());
+    prefs->Put(m_Controls.xnatPortLabel->text().toStdString(), m_Controls.inXnatPort->text().toStdString());
+    prefs->Put(m_Controls.xnatUsernameLabel->text().toStdString(), m_Controls.inXnatUsername->text().toStdString());
+    prefs->Put(m_Controls.xnatPasswortLabel->text().toStdString(), m_Controls.inXnatPassword->text().toStdString());
+    prefs->Put(m_Controls.xnatDownloadPathLabel->text().toStdString(), m_Controls.inXnatDownloadPath->text().toStdString());
 
     // Network proxy settings
-    m_XnatConnectionPreferencesNode->PutBool(m_Controls.cbUseNetworkProxy->text().toStdString(), m_Controls.cbUseNetworkProxy->isChecked());
-    m_XnatConnectionPreferencesNode->Put(m_Controls.proxyAddressLabel->text().toStdString(), m_Controls.inProxyAddress->text().toStdString());
-    m_XnatConnectionPreferencesNode->Put(m_Controls.proxyPortLabel->text().toStdString(), m_Controls.inProxyPort->text().toStdString());
-    m_XnatConnectionPreferencesNode->Put(m_Controls.proxyUsernameLabel->text().toStdString(), m_Controls.inProxyUsername->text().toStdString());
-    m_XnatConnectionPreferencesNode->Put(m_Controls.proxyPasswordLabel->text().toStdString(), m_Controls.inProxyPassword->text().toStdString());
+    prefs->PutBool(m_Controls.cbUseNetworkProxy->text().toStdString(), m_Controls.cbUseNetworkProxy->isChecked());
+    prefs->Put(m_Controls.proxyAddressLabel->text().toStdString(), m_Controls.inProxyAddress->text().toStdString());
+    prefs->Put(m_Controls.proxyPortLabel->text().toStdString(), m_Controls.inProxyPort->text().toStdString());
+    prefs->Put(m_Controls.proxyUsernameLabel->text().toStdString(), m_Controls.inProxyUsername->text().toStdString());
+    prefs->Put(m_Controls.proxyPasswordLabel->text().toStdString(), m_Controls.inProxyPassword->text().toStdString());
 
     // Silent Mode
-    m_XnatConnectionPreferencesNode->PutBool(m_Controls.cbUseSilentMode->text().toStdString(), m_Controls.cbUseSilentMode->isChecked());
+    prefs->PutBool(m_Controls.cbUseSilentMode->text().toStdString(), m_Controls.cbUseSilentMode->isChecked());
 
     //Write
-    m_XnatConnectionPreferencesNode->Flush();
+    prefs->Flush();
 
     return true;
   }
@@ -164,23 +172,25 @@ bool QmitkXnatConnectionPreferencePage::UserInformationEmpty()
 
 void QmitkXnatConnectionPreferencePage::Update()
 {
-  if (m_XnatConnectionPreferencesNode != nullptr)
+  auto* prefs = GetPreferences();
+
+  if (prefs != nullptr)
   {
-    m_Controls.inXnatHostAddress->setText(QString::fromStdString(m_XnatConnectionPreferencesNode->Get(m_Controls.xnatHostAddressLabel->text().toStdString(), m_Controls.inXnatHostAddress->text().toStdString())));
-    m_Controls.inXnatPort->setText(QString::fromStdString(m_XnatConnectionPreferencesNode->Get(m_Controls.xnatPortLabel->text().toStdString(), m_Controls.inXnatPort->text().toStdString())));
-    m_Controls.inXnatUsername->setText(QString::fromStdString(m_XnatConnectionPreferencesNode->Get(m_Controls.xnatUsernameLabel->text().toStdString(), m_Controls.inXnatUsername->text().toStdString())));
-    m_Controls.inXnatPassword->setText(QString::fromStdString(m_XnatConnectionPreferencesNode->Get(m_Controls.xnatPasswortLabel->text().toStdString(), m_Controls.inXnatPassword->text().toStdString())));
-    m_Controls.inXnatDownloadPath->setText(QString::fromStdString(m_XnatConnectionPreferencesNode->Get(m_Controls.xnatDownloadPathLabel->text().toStdString(), m_Controls.inXnatDownloadPath->text().toStdString())));
+    m_Controls.inXnatHostAddress->setText(QString::fromStdString(prefs->Get(m_Controls.xnatHostAddressLabel->text().toStdString(), m_Controls.inXnatHostAddress->text().toStdString())));
+    m_Controls.inXnatPort->setText(QString::fromStdString(prefs->Get(m_Controls.xnatPortLabel->text().toStdString(), m_Controls.inXnatPort->text().toStdString())));
+    m_Controls.inXnatUsername->setText(QString::fromStdString(prefs->Get(m_Controls.xnatUsernameLabel->text().toStdString(), m_Controls.inXnatUsername->text().toStdString())));
+    m_Controls.inXnatPassword->setText(QString::fromStdString(prefs->Get(m_Controls.xnatPasswortLabel->text().toStdString(), m_Controls.inXnatPassword->text().toStdString())));
+    m_Controls.inXnatDownloadPath->setText(QString::fromStdString(prefs->Get(m_Controls.xnatDownloadPathLabel->text().toStdString(), m_Controls.inXnatDownloadPath->text().toStdString())));
 
     // Network proxy settings
-    m_Controls.cbUseNetworkProxy->setChecked(m_XnatConnectionPreferencesNode->GetBool(m_Controls.cbUseNetworkProxy->text().toStdString(), false));
-    m_Controls.inProxyAddress->setText(QString::fromStdString(m_XnatConnectionPreferencesNode->Get(m_Controls.proxyAddressLabel->text().toStdString(), m_Controls.inProxyAddress->text().toStdString())));
-    m_Controls.inProxyPort->setText(QString::fromStdString(m_XnatConnectionPreferencesNode->Get(m_Controls.proxyPortLabel->text().toStdString(), m_Controls.inProxyPort->text().toStdString())));
-    m_Controls.inProxyUsername->setText(QString::fromStdString(m_XnatConnectionPreferencesNode->Get(m_Controls.proxyUsernameLabel->text().toStdString(), m_Controls.inProxyUsername->text().toStdString())));
-    m_Controls.inProxyPassword->setText(QString::fromStdString(m_XnatConnectionPreferencesNode->Get(m_Controls.proxyPasswordLabel->text().toStdString(), m_Controls.inProxyPassword->text().toStdString())));
+    m_Controls.cbUseNetworkProxy->setChecked(prefs->GetBool(m_Controls.cbUseNetworkProxy->text().toStdString(), false));
+    m_Controls.inProxyAddress->setText(QString::fromStdString(prefs->Get(m_Controls.proxyAddressLabel->text().toStdString(), m_Controls.inProxyAddress->text().toStdString())));
+    m_Controls.inProxyPort->setText(QString::fromStdString(prefs->Get(m_Controls.proxyPortLabel->text().toStdString(), m_Controls.inProxyPort->text().toStdString())));
+    m_Controls.inProxyUsername->setText(QString::fromStdString(prefs->Get(m_Controls.proxyUsernameLabel->text().toStdString(), m_Controls.inProxyUsername->text().toStdString())));
+    m_Controls.inProxyPassword->setText(QString::fromStdString(prefs->Get(m_Controls.proxyPasswordLabel->text().toStdString(), m_Controls.inProxyPassword->text().toStdString())));
 
     // Silent Mode
-    m_Controls.cbUseSilentMode->setChecked(m_XnatConnectionPreferencesNode->GetBool(m_Controls.cbUseSilentMode->text().toStdString(), false));
+    m_Controls.cbUseSilentMode->setChecked(prefs->GetBool(m_Controls.cbUseSilentMode->text().toStdString(), false));
   }
 }
 

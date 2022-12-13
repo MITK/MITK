@@ -22,7 +22,6 @@ found in the LICENSE file.
 #include "internal/berryWorkbenchWindowConfigurer.h"
 #include "berryWorkbenchPlugin.h"
 
-#include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 
 namespace berry
@@ -76,7 +75,7 @@ void WorkbenchWindowAdvisor::OpenIntro()
 
   wbConfig->SetData(key, ObjectBool::Pointer(new ObjectBool(true)));
 
-  auto* workbenchPrefs = WorkbenchPlugin::GetDefault()->GetPreferencesService()->GetSystemPreferences();
+  auto* workbenchPrefs = WorkbenchPlugin::GetDefault()->GetPreferences();
 
   bool showIntro = workbenchPrefs->GetBool(WorkbenchPreferenceConstants::SHOW_INTRO, true);
 

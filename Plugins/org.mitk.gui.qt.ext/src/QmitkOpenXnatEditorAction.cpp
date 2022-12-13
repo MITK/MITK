@@ -17,10 +17,6 @@ found in the LICENSE file.
 #include <berryIWorkbench.h>
 #include <berryFileEditorInput.h>
 
-#include <mitkCoreServices.h>
-#include <mitkIPreferencesService.h>
-#include <mitkIPreferences.h>
-
 QmitkOpenXnatEditorAction::QmitkOpenXnatEditorAction(berry::IWorkbenchWindow::Pointer window)
 : QAction(nullptr)
 {
@@ -41,10 +37,6 @@ void QmitkOpenXnatEditorAction::init(berry::IWorkbenchWindow::Pointer window)
   this->setParent(static_cast<QWidget*>(m_Window->GetShell()->GetControl()));
   this->setText("&XNAT");
   this->setToolTip("Open XNAT tool");
-
-  auto* prefService = mitk::CoreServices::GetPreferencesService();
-
-  m_GeneralPreferencesNode = prefService->GetSystemPreferences()->Node("/General");
 
   this->connect(this, SIGNAL(triggered(bool)), this, SLOT(Run()));
 }

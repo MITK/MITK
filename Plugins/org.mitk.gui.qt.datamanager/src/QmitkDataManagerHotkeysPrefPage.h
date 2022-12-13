@@ -24,11 +24,6 @@ found in the LICENSE file.
 // c++
 #include <map>
 
-namespace mitk
-{
-  class IPreferences;
-}
-
 class QmitkHotkeyLineEdit;
 
 struct MITK_QT_DATAMANAGER QmitkDataManagerHotkeysPrefPage : public QObject, public berry::IQtPreferencePage
@@ -59,12 +54,6 @@ public:
   void Update() override;
 
 protected:
-  /**
-  * @brief The node from which the properties are taken (will be catched from the preferences service in ctor)
-  *
-  *
-  */
-  mitk::IPreferences* m_DataManagerHotkeysPreferencesNode;
   /**
   * @brief Maps a label to hotkey lineedit, e.g. "Toggle Visibility of selected nodes" => QmitkHotkeyLineEdit
   *

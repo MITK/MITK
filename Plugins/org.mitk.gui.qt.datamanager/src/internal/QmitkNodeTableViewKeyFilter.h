@@ -19,11 +19,6 @@ found in the LICENSE file.
 
 #include <QObject>
 
-namespace mitk
-{
-  class IPreferences;
-}
-
 /**
 * @brief A small class which receives key-pressed events on the node table.
 */
@@ -38,8 +33,6 @@ public:
 protected:
 
   bool eventFilter(QObject *obj, QEvent *event) override;
-
-  mitk::IPreferences* m_Preferences;
 
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
 };

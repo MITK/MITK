@@ -21,6 +21,15 @@ found in the LICENSE file.
 
 #include <ui_QmitkMitkWorkbenchIntroPreferencePage.h>
 
+namespace
+{
+  mitk::IPreferences* GetPreferences()
+  {
+    auto* preferencesService = mitk::CoreServices::GetPreferencesService();
+    return preferencesService->GetSystemPreferences()->Node("org.mitk.qt.extapplicationintro");
+  }
+}
+
 QmitkMitkWorkbenchIntroPreferencePage::QmitkMitkWorkbenchIntroPreferencePage()
   : m_Ui(new Ui::QmitkMitkWorkbenchIntroPreferencePage),
     m_Control(nullptr)
@@ -37,9 +46,6 @@ void QmitkMitkWorkbenchIntroPreferencePage::Init(berry::IWorkbench::Pointer)
 
 void QmitkMitkWorkbenchIntroPreferencePage::CreateQtControl(QWidget* parent)
 {
-  auto* prefService = mitk::CoreServices::GetPreferencesService();
-  m_MitkWorkbenchIntroPreferencesNode = prefService->GetSystemPreferences()->Node("/org.mitk.qt.extapplicationintro");
-
   m_Control = new QWidget(parent);
   m_Ui->setupUi(m_Control);
 
@@ -53,7 +59,8 @@ QWidget* QmitkMitkWorkbenchIntroPreferencePage::GetQtControl() const
 
 bool QmitkMitkWorkbenchIntroPreferencePage::PerformOk()
 {
-  m_MitkWorkbenchIntroPreferencesNode->PutBool("show tips", m_Ui->showTipsCheckBox->isChecked());
+  auto* prefs = GetPreferences();
+  prefs->PutBool("show tips", m_Ui->showTipsCheckBox->isChecked());
 
   auto intro = berry::PlatformUI::GetWorkbench()->GetIntroManager()->GetIntro();
 
@@ -74,5 +81,6 @@ void QmitkMitkWorkbenchIntroPreferencePage::PerformCancel()
 
 void QmitkMitkWorkbenchIntroPreferencePage::Update()
 {
-  m_Ui->showTipsCheckBox->setChecked(m_MitkWorkbenchIntroPreferencesNode->GetBool("show tips", true));
+  auto* prefs = GetPreferences();
+  m_Ui->showTipsCheckBox->setChecked(prefs->GetBool("show tips", true));
 }

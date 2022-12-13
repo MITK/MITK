@@ -29,9 +29,6 @@ found in the LICENSE file.
 #include "mitkNodePredicateData.h"
 #include "mitkNodePredicateNot.h"
 #include "mitkNodePredicateProperty.h"
-#include <mitkCoreServices.h>
-#include <mitkIPreferencesService.h>
-#include <mitkIPreferences.h>
 
 QmitkOpenDicomEditorAction::QmitkOpenDicomEditorAction(berry::IWorkbenchWindow::Pointer window)
 : QAction(nullptr)
@@ -53,10 +50,6 @@ void QmitkOpenDicomEditorAction::init(berry::IWorkbenchWindow::Pointer window)
   this->setParent(static_cast<QWidget*>(m_Window->GetShell()->GetControl()));
   this->setText("&DICOM");
   this->setToolTip("Open dicom browser");
-
-  auto* prefService = mitk::CoreServices::GetPreferencesService();
-
-  m_GeneralPreferencesNode = prefService->GetSystemPreferences()->Node("/General");
 
   this->connect(this, SIGNAL(triggered(bool)), this, SLOT(Run()));
 }

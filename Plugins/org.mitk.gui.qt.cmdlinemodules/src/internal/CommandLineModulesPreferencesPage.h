@@ -25,11 +25,6 @@ class QmitkDirectoryListWidget;
 class QmitkFileListWidget;
 class ctkDirectoryButton;
 
-namespace mitk
-{
-  class IPreferences;
-}
-
 /**
  * \class CommandLineModulesPreferencesPage
  * \brief Preference page for CommandLineModulesView
@@ -101,8 +96,6 @@ protected:
   QComboBox                *m_ValidationMode;
   QSpinBox                 *m_XmlTimeoutInSeconds;
   QSpinBox                 *m_MaximumNumberProcesses;
-
-  mitk::IPreferences* m_CLIPreferencesNode;
 
 private:
 

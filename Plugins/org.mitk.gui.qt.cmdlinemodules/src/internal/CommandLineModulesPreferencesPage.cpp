@@ -59,7 +59,6 @@ CommandLineModulesPreferencesPage::CommandLineModulesPreferencesPage()
 , m_LoadFromAutoLoadPathDir(nullptr)
 , m_ValidationMode(nullptr)
 , m_MaximumNumberProcesses(nullptr)
-, m_CLIPreferencesNode(nullptr)
 {
 
 }

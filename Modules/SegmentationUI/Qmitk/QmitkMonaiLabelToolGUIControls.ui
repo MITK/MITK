@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+	<class>QmitkMonaiLabelToolGUIControls</class>
+	<widget class="QWidget" name="QmitkMonaiLabelToolGUIControls">
+		<property name="geometry">
+			<rect>
+				<x>0</x>
+				<y>0</y>
+				<width>699</width>
+				<height>352</height>
+			</rect>
+		</property>
+		<property name="sizePolicy">
+			<sizepolicy hsizetype="Ignored" vsizetype="Minimum">
+				<horstretch>0</horstretch>
+				<verstretch>0</verstretch>
+			</sizepolicy>
+		</property>
+		<property name="minimumSize">
+			<size>
+				<width>100</width>
+				<height>0</height>
+			</size>
+		</property>
+		<property name="maximumSize">
+			<size>
+				<width>100000</width>
+				<height>100000</height>
+			</size>
+		</property>
+		<property name="windowTitle">
+			<string>QmitkMonaiToolWidget</string>
+		</property>
+		<layout class="QVBoxLayout" name="verticalLayout">
+			<property name="spacing">
+				<number>0</number>
+			</property>
+			<property name="leftMargin">
+				<number>0</number>
+			</property>
+			<property name="topMargin">
+				<number>0</number>
+			</property>
+			<property name="rightMargin">
+				<number>0</number>
+			</property>
+			<property name="bottomMargin">
+				<number>0</number>
+			</property>
+			<item>
+				<layout class="QGridLayout" name="basicSettingsLayout">
+					<item row="0" column="0" colspan="4">
+						<widget class="QLabel" name="welcomeNote">
+							<property name="sizePolicy">
+								<sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+									<horstretch>0</horstretch>
+									<verstretch>0</verstretch>
+								</sizepolicy>
+							</property>
+							<property name="text">
+								<string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Welcome to MONAI Label App in MITK. [Experimental]&lt;/p&gt;&lt;p&gt;Please note that this is only an interface to MONAI Label. MITK does not ship with any apps. Make sure to have a started a MONAI Label server beforehand. Provide the URL in the URL path to start the workflow. &lt;/p&gt;&lt;p&gt;Refer to &lt;a href=&quot;https://github.com/MIC-DKFZ/nnUNet&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://docs.monai.io/projects/label/en/latest/&lt;/span&gt;&lt;/a&gt; to learn everything about the MONAI Label App.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+							</property>
+							<property name="textFormat">
+								<enum>Qt::RichText</enum>
+							</property>
+							<property name="wordWrap">
+								<bool>true</bool>
+							</property>
+						</widget>
+					</item>
+
+					<item row="1" column="0">
+						<widget class="QLabel" name="monaiUrlLabel">
+							<property name="sizePolicy">
+								<sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+									<horstretch>0</horstretch>
+									<verstretch>0</verstretch>
+								</sizepolicy>
+							</property>
+							<property name="text">
+								<string>Monai Server URL:</string>
+							</property>
+						</widget>
+					</item>
+					<item row="1" column="1" colspan="3">
+						<widget class="QLineEdit" name="urlBox"/>
+					</item>
+					<item row="1" column="4">
+						<widget class="QPushButton" name="fetchUrl"/>
+					</item>
+
+					<item row="2" column="0">
+						<widget class="QLabel" name="appLabel">
+							<property name="sizePolicy">
+								<sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+									<horstretch>0</horstretch>
+									<verstretch>0</verstretch>
+								</sizepolicy>
+							</property>
+							<property name="text">
+								<string>Available Apps:</string>
+							</property>
+						</widget>
+					</item>
+					<item row="2" column="1" colspan="3">
+						<widget class="ctkComboBox" name="appBox"/>
+					</item>
+
+					<item row="3" column="0">
+						<widget class="QLabel" name="modelLabel">
+							<property name="sizePolicy">
+								<sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+									<horstretch>0</horstretch>
+									<verstretch>0</verstretch>
+								</sizepolicy>
+							</property>
+							<property name="text">
+								<string>Models:</string>
+							</property>
+						</widget>
+					</item>
+					<item row="3" column="1" colspan="3">
+						<widget class="ctkComboBox" name="modelBox"/>
+					</item>
+
+
+					<item row="4" column="0" colspan="4">
+						<widget class="QLabel" name="responseNote">
+							<property name="sizePolicy">
+								<sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+									<horstretch>0</horstretch>
+									<verstretch>0</verstretch>
+								</sizepolicy>
+							</property>
+							<property name="text">
+								<string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Welcome to Monai Label in MITK. [Experimental]</string>
+							</property>
+							<property name="textFormat">
+								<enum>Qt::RichText</enum>
+							</property>
+							<property name="wordWrap">
+								<bool>true</bool>
+							</property>
+						</widget>
+					</item>
+				</layout>
+			</item>
+
+			<item>
+				<widget class="QPushButton" name="previewButton">
+					<property name="sizePolicy">
+						<sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+							<horstretch>0</horstretch>
+							<verstretch>0</verstretch>
+						</sizepolicy>
+					</property>
+					<property name="maximumSize">
+						<size>
+							<width>100000</width>
+							<height>16777215</height>
+						</size>
+					</property>
+					<property name="text">
+						<string>Preview</string>
+					</property>
+				</widget>
+			</item>
+		</layout>
+	</widget>
+	<layoutdefault spacing="6" margin="11"/>
+	<customwidgets>
+		<customwidget>
+			<class>ctkExpandButton</class>
+			<extends>QToolButton</extends>
+			<header>ctkExpandButton.h</header>
+		</customwidget>
+		<customwidget>
+			<class>ctkComboBox</class>
+			<extends>QComboBox</extends>
+			<header location="global">ctkComboBox.h</header>
+			<container>1</container>
+		</customwidget>
+	</customwidgets>
+	<resources/>
+	<connections/>
+</ui>

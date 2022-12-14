@@ -23,6 +23,7 @@ Qmitk/QmitknnUNetFolderParser.cpp
 Qmitk/QmitknnUNetToolGUI.cpp
 Qmitk/QmitknnUNetWorker.cpp
 Qmitk/QmitknnUNetGPU.cpp
+Qmitk/QmitkMonaiLabelToolGUI.cpp
 Qmitk/QmitkSurfaceStampWidget.cpp
 Qmitk/QmitkMaskStampWidget.cpp
 Qmitk/QmitkStaticDynamicSegmentationDialog.cpp
@@ -55,6 +56,7 @@ Qmitk/QmitknnUNetFolderParser.h
 Qmitk/QmitknnUNetToolGUI.h
 Qmitk/QmitknnUNetGPU.h
 Qmitk/QmitknnUNetWorker.h
+Qmitk/QmitkMonaiLabelToolGUI.h
 Qmitk/QmitknnUNetEnsembleLayout.h
 Qmitk/QmitkSurfaceStampWidget.h
 Qmitk/QmitkMaskStampWidget.h

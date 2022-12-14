@@ -60,6 +60,7 @@ set(CPP_FILES
   Interactions/mitknnUnetTool.cpp
   Interactions/mitkSegmentationInteractor.cpp #SO
   Interactions/mitkProcessExecutor.cpp
+  Interactions/mitkMonaiLabelTool.cpp
   Rendering/mitkContourMapper2D.cpp
   Rendering/mitkContourSetMapper2D.cpp
   Rendering/mitkContourSetVtkMapper3D.cpp

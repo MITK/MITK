@@ -10,14 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#include <future>
 #include <httplib.h>
+#include <map>
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 #include <nlohmann/json.hpp>
-#include <future>
 #include <thread>
-#include <map>
-
 
 class mitkRESTServerHttpLibTestSuite : public mitk::TestFixture
 {
@@ -25,16 +24,16 @@ class mitkRESTServerHttpLibTestSuite : public mitk::TestFixture
   MITK_TEST(OpenListener_Succeed);
   MITK_TEST(OpenListenerGetRequestSamePath_ReturnExpectedJSON);
   CPPUNIT_TEST_SUITE_END();
+  std::vector<std::future<void>> m_ft;
 
 public:
   void OpenListener_Succeed()
   {
     httplib::Server svr;
-    auto serverlambda = [&]() { svr.listen("localhost", 8080); };
     svr.Get("/get",
             [](const httplib::Request &, httplib::Response &res)
             { res.set_content("Hello World from MITK!", "text/plain"); });
-    std::future<void> ft = std::async(std::launch::async, serverlambda);
+    std::future<void> ft = std::async(std::launch::async, [&]() { svr.listen("localhost", 8080); });
     while (!svr.is_running())
       ;
     CPPUNIT_ASSERT_MESSAGE("Server is running", svr.is_running());
@@ -44,7 +43,6 @@ public:
   void OpenListenerGetRequestSamePath_ReturnExpectedJSON()
   {
     httplib::Server svr;
-    auto serverlambda = [&]() { svr.listen("localhost", 8080); };
     std::map<size_t, std::string> msgdb;
     msgdb[0] = "hello_MITK";
 
@@ -65,12 +63,12 @@ public:
                 res.set_content("Cannot find the requested message.", "text/plain");
               }
             });
-    std::future<void> ft = std::async(std::launch::async, serverlambda);
+    std::future<void> ft = std::async(std::launch::async, [&]() { svr.listen("localhost", 8080); });
     while (!svr.is_running())
       ;
-    
+
     httplib::Client cli("http://localhost:8080");
-    auto response = cli.Get("/msg/1");
+    auto response = cli.Get("/msg/0");
     try
     {
       if (NULL == response)
@@ -84,13 +82,13 @@ public:
         CPPUNIT_ASSERT_MESSAGE("Result is the expected JSON value", msg == msgdb[0]);
       }
     }
-    catch (const std::exception &e) 
-    { 
+    catch (const std::exception &e)
+    {
       svr.stop();
       CPPUNIT_ASSERT_MESSAGE(e.what(), false);
     }
     svr.stop();
   }
- };
+};
 
 MITK_TEST_SUITE_REGISTRATION(mitkRESTServerHttpLib)

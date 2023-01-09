@@ -13,12 +13,20 @@ found in the LICENSE file.
 #ifndef QmitkImageMaskingWidget_h
 #define QmitkImageMaskingWidget_h
 
-#include "../QmitkSegmentationUtilityWidget.h"
-#include <ui_QmitkImageMaskingWidgetControls.h>
+#include <MitkSegmentationUIExports.h>
 
+#include <mitkDataStorage.h>
 #include <mitkSurface.h>
+#include <QmitkSegmentationUtilityWidget.h>
 
-namespace mitk {
+namespace Ui
+{
+  class QmitkImageMaskingWidgetControls;
+}
+
+namespace mitk
+{
+  class DataStorage;
   class Image;
 }
 
@@ -30,14 +38,16 @@ namespace mitk {
   image mask must be of the same size. Masking with a surface creates first a
   binary image of the surface and then use this for the masking of the input image.
 */
-class QmitkImageMaskingWidget : public QmitkSegmentationUtilityWidget
+class MITKSEGMENTATIONUI_EXPORT QmitkImageMaskingWidget : public QmitkSegmentationUtilityWidget
 {
   Q_OBJECT
 
 public:
 
   /** @brief Default constructor, including creation of GUI elements and signals/slots connections. */
-  explicit QmitkImageMaskingWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent = nullptr);
+  explicit QmitkImageMaskingWidget(mitk::DataStorage* dataStorage,
+                                   mitk::SliceNavigationController* timeNavigationController,
+                                   QWidget* parent = nullptr);
 
   /** @brief Defaul destructor. */
   ~QmitkImageMaskingWidget() override;
@@ -71,7 +81,7 @@ private:
   void AddToDataStorage(mitk::DataStorage::Pointer dataStorage, itk::SmartPointer<mitk::Image> segmentation,
                         const std::string& name, mitk::DataNode::Pointer parent = nullptr);
 
-  Ui::QmitkImageMaskingWidgetControls m_Controls;
+  Ui::QmitkImageMaskingWidgetControls* m_Controls;
 };
 
 #endif

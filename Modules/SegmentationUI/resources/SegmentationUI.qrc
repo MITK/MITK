@@ -6,6 +6,13 @@
     <file>BooleanDifference_48x48.png</file>
     <file>BooleanIntersection_48x48.png</file>
     <file>BooleanUnion_48x48.png</file>
+    <file>BooleanLabelA_32x32.png</file>
+    <file>BooleanLabelB_32x32.png</file>
+    <file>Dilate_48x48.png</file>
+    <file>Erode_48x48.png</file>
+    <file>Closing_48x48.png</file>
+    <file>Opening_48x48.png</file>
+    <file>FillHoles_48x48.png</file>
     <file>Accept_48x48.png</file>
     <file>Cancel_48x48.png</file>
     <file>Run_48x48.png</file>

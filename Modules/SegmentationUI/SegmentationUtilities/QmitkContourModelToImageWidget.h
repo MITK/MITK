@@ -13,14 +13,18 @@ found in the LICENSE file.
 #ifndef QmitkContourModelToImageWidget_h
 #define QmitkContourModelToImageWidget_h
 
-#include "../QmitkSegmentationUtilityWidget.h"
-#include <ui_QmitkContourModelToImageWidgetControls.h>
+#include <MitkSegmentationUIExports.h>
+
+#include <QmitkSegmentationUtilityWidget.h>
 
 #include <QScopedPointer>
 
 class QmitkContourModelToImageWidgetPrivate;
 
-namespace mitk {
+namespace mitk
+{
+  class DataNode;
+  class DataStorage;
   class Image;
   class ContourModelSet;
   class ContourModel;
@@ -36,14 +40,16 @@ namespace mitk {
   image mask must be of the same size. Masking with a surface creates first a
   binary image of the surface and then use this for the masking of the input image.
 */
-class QmitkContourModelToImageWidget : public QmitkSegmentationUtilityWidget
+class MITKSEGMENTATIONUI_EXPORT QmitkContourModelToImageWidget : public QmitkSegmentationUtilityWidget
 {
   Q_OBJECT
 
 public:
 
   /** @brief Default constructor, including creation of GUI elements and signals/slots connections. */
-  explicit QmitkContourModelToImageWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent = nullptr);
+  explicit QmitkContourModelToImageWidget(mitk::DataStorage* dataStorage,
+                                          mitk::SliceNavigationController* timeNavigationController,
+                                          QWidget* parent = nullptr);
 
   /** @brief Defaul destructor. */
   ~QmitkContourModelToImageWidget() override;

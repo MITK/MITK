@@ -15,7 +15,7 @@ found in the LICENSE file.
 
 #include <MitkQtWidgetsExports.h>
 
-#include "ui_QmitkNodeSelectionDialog.h"
+#include <ui_QmitkNodeSelectionDialog.h>
 
 #include <mitkDataStorage.h>
 #include <mitkWeakPointer.h>

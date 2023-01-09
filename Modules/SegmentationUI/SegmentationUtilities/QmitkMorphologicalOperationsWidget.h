@@ -13,18 +13,32 @@ found in the LICENSE file.
 #ifndef QmitkMorphologicalOperationsWidget_h
 #define QmitkMorphologicalOperationsWidget_h
 
-#include "../QmitkSegmentationUtilityWidget.h"
-#include <ui_QmitkMorphologicalOperationsWidgetControls.h>
+#include <MitkSegmentationUIExports.h>
+
 #include <mitkMorphologicalOperations.h>
+#include <QmitkSegmentationUtilityWidget.h>
+
+namespace Ui
+{
+  class QmitkMorphologicalOperationsWidgetControls;
+}
+
+namespace mitk
+{
+  class DataNode;
+  class DataStorage;
+}
 
 /** \brief GUI class for morphological segmentation tools.
  */
-class QmitkMorphologicalOperationsWidget : public QmitkSegmentationUtilityWidget
+class MITKSEGMENTATIONUI_EXPORT QmitkMorphologicalOperationsWidget : public QmitkSegmentationUtilityWidget
 {
   Q_OBJECT
 
 public:
-  explicit QmitkMorphologicalOperationsWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent = nullptr);
+  explicit QmitkMorphologicalOperationsWidget(mitk::DataStorage* dataStorage,
+                                              mitk::SliceNavigationController* timeNavigationController,
+                                              QWidget* parent = nullptr);
   ~QmitkMorphologicalOperationsWidget() override;
 
 public slots:
@@ -40,7 +54,7 @@ protected:
   void EnableButtons(bool enable);
 
 private:
-  Ui::QmitkMorphologicalOperationsWidgetControls m_Controls;
+  Ui::QmitkMorphologicalOperationsWidgetControls* m_Controls;
   mitk::MorphologicalOperations::StructuralElementType CreateStructerElement_UI();
 };
 

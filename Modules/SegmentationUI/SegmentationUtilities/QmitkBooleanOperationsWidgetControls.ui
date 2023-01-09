@@ -41,8 +41,9 @@
         <string>Difference</string>
        </property>
        <property name="icon">
-        <iconset resource="../../../../resources/BooleanOperationsWidget.qrc">
-         <normaloff>:/SegmentationUtilities/BooleanOperations/BooleanDifference_48x48.png</normaloff>:/SegmentationUtilities/BooleanOperations/BooleanDifference_48x48.png</iconset>
+        <iconset>
+         <normaloff>:/Qmitk/BooleanDifference_48x48.png</normaloff>:/Qmitk/BooleanDifference_48x48.png
+        </iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -82,8 +83,9 @@
         <string>Intersection</string>
        </property>
        <property name="icon">
-        <iconset resource="../../../../resources/BooleanOperationsWidget.qrc">
-         <normaloff>:/SegmentationUtilities/BooleanOperations/BooleanIntersection_48x48.png</normaloff>:/SegmentationUtilities/BooleanOperations/BooleanIntersection_48x48.png</iconset>
+        <iconset>
+         <normaloff>:/Qmitk/BooleanIntersection_48x48.png</normaloff>:/Qmitk/BooleanIntersection_48x48.png
+        </iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -123,8 +125,9 @@
         <string>Union</string>
        </property>
        <property name="icon">
-        <iconset resource="../../../../resources/BooleanOperationsWidget.qrc">
-         <normaloff>:/SegmentationUtilities/BooleanOperations/BooleanUnion_48x48.png</normaloff>:/SegmentationUtilities/BooleanOperations/BooleanUnion_48x48.png</iconset>
+        <iconset>
+         <normaloff>:/Qmitk/BooleanUnion_48x48.png</normaloff>:/Qmitk/BooleanUnion_48x48.png
+        </iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -167,12 +170,12 @@
   <customwidget>
    <class>QmitkDataSelectionWidget</class>
    <extends>QWidget</extends>
-   <header>internal/Common/QmitkDataSelectionWidget.h</header>
+   <header>QmitkDataSelectionWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../../../resources/BooleanOperationsWidget.qrc"/>
+  <include location="../resources/SegmentationUI.qrc"/>
  </resources>
  <connections/>
 </ui>

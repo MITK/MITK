@@ -13,10 +13,21 @@ found in the LICENSE file.
 #ifndef QmitkSurfaceToImageWidget_h
 #define QmitkSurfaceToImageWidget_h
 
-#include "../QmitkSegmentationUtilityWidget.h"
-#include <ui_QmitkSurfaceToImageWidgetControls.h>
+#include <MitkSegmentationUIExports.h>
 
-namespace mitk {
+#include <QmitkSegmentationUtilityWidget.h>
+
+#include "itkSmartPointer.h"
+
+namespace Ui
+{
+  class QmitkSurfaceToImageWidgetControls;
+}
+
+namespace mitk
+{
+  class DataNode;
+  class DataStorage;
   class Surface;
   class Image;
   class LabelSetImage;
@@ -30,14 +41,16 @@ namespace mitk {
   image. The resulting binary image has the same dimension, size, and
   Geometry3D as the input image.
 */
-class QmitkSurfaceToImageWidget : public QmitkSegmentationUtilityWidget
+class MITKSEGMENTATIONUI_EXPORT QmitkSurfaceToImageWidget : public QmitkSegmentationUtilityWidget
 {
   Q_OBJECT
 
 public:
 
   /** @brief Default constructor, including creation of GUI elements and signals/slots connections. */
-  explicit QmitkSurfaceToImageWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent = nullptr);
+  explicit QmitkSurfaceToImageWidget(mitk::DataStorage* dataStorage,
+                                     mitk::SliceNavigationController* timeNavigationController,
+                                     QWidget* parent = nullptr);
 
   /** @brief Defaul destructor. */
   ~QmitkSurfaceToImageWidget() override;
@@ -58,7 +71,7 @@ private:
   /** @brief Convert a surface into an binary image. */
   itk::SmartPointer<mitk::LabelSetImage> ConvertSurfaceToImage( itk::SmartPointer<mitk::Image> image, itk::SmartPointer<mitk::Surface> surface );
 
-  Ui::QmitkSurfaceToImageWidgetControls m_Controls;
+  Ui::QmitkSurfaceToImageWidgetControls* m_Controls;
 };
 
 #endif

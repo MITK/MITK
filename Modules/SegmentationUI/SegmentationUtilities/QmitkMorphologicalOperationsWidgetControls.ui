@@ -125,8 +125,9 @@
         <string>Dilation</string>
        </property>
        <property name="icon">
-        <iconset resource="../../../../resources/MorphologicalOperationsWidget.qrc">
-         <normaloff>:/SegmentationUtilities/MorphologicalOperations/Dilate_48x48.png</normaloff>:/SegmentationUtilities/MorphologicalOperations/Dilate_48x48.png</iconset>
+        <iconset>
+         <normaloff>:/Qmitk/Dilate_48x48.png</normaloff>:/Qmitk/Dilate_48x48.png
+        </iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -154,8 +155,9 @@
         <string>Erosion</string>
        </property>
        <property name="icon">
-        <iconset resource="../../../../resources/MorphologicalOperationsWidget.qrc">
-         <normaloff>:/SegmentationUtilities/MorphologicalOperations/Erode_48x48.png</normaloff>:/SegmentationUtilities/MorphologicalOperations/Erode_48x48.png</iconset>
+        <iconset>
+         <normaloff>:/Qmitk/Erode_48x48.png</normaloff>:/Qmitk/Erode_48x48.png
+        </iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -183,8 +185,9 @@
         <string>Closing</string>
        </property>
        <property name="icon">
-        <iconset resource="../../../../resources/MorphologicalOperationsWidget.qrc">
-         <normaloff>:/SegmentationUtilities/MorphologicalOperations/Closing_48x48.png</normaloff>:/SegmentationUtilities/MorphologicalOperations/Closing_48x48.png</iconset>
+        <iconset>
+         <normaloff>:/Qmitk/Closing_48x48.png</normaloff>:/Qmitk/Closing_48x48.png
+        </iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -212,8 +215,9 @@
         <string>Opening</string>
        </property>
        <property name="icon">
-        <iconset resource="../../../../resources/MorphologicalOperationsWidget.qrc">
-         <normaloff>:/SegmentationUtilities/MorphologicalOperations/Opening_48x48.png</normaloff>:/SegmentationUtilities/MorphologicalOperations/Opening_48x48.png</iconset>
+        <iconset>
+         <normaloff>:/Qmitk/Opening_48x48.png</normaloff>:/Qmitk/Opening_48x48.png
+        </iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -244,8 +248,9 @@
         <string>Fill Holes</string>
        </property>
        <property name="icon">
-        <iconset resource="../../../../resources/MorphologicalOperationsWidget.qrc">
-         <normaloff>:/SegmentationUtilities/MorphologicalOperations/FillHoles_48x48.png</normaloff>:/SegmentationUtilities/MorphologicalOperations/FillHoles_48x48.png</iconset>
+        <iconset>
+         <normaloff>:/Qmitk/FillHoles_48x48.png</normaloff>:/Qmitk/FillHoles_48x48.png
+        </iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -279,12 +284,12 @@
   <customwidget>
    <class>QmitkDataSelectionWidget</class>
    <extends>QWidget</extends>
-   <header>internal/Common/QmitkDataSelectionWidget.h</header>
+   <header>QmitkDataSelectionWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../../../resources/MorphologicalOperationsWidget.qrc"/>
+  <include location="../resources/SegmentationUI.qrc"/>
  </resources>
  <connections>
   <connection>

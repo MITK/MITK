@@ -20,7 +20,6 @@ found in the LICENSE file.
 #include <mitkImageToUnstructuredGridFilter.h>
 #include <mitkProgressBar.h>
 #include <mitkUnstructuredGrid.h>
-#include <SegmentationUtilities/MorphologicalOperations/mitkMorphologicalOperations.h>
 #include <mitkImageMaskGenerator.h>
 #include <mitkImageStatisticsConstants.h>
 

@@ -11,11 +11,12 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkImageMaskingWidget.h"
-#include "mitkImage.h"
-#include "../../Common/QmitkDataSelectionWidget.h"
+#include <ui_QmitkImageMaskingWidgetControls.h>
 
+#include <mitkDataStorage.h>
 #include <mitkException.h>
 #include <mitkExceptionMacro.h>
+#include <mitkImage.h>
 #include <mitkImageStatisticsHolder.h>
 #include <mitkMaskImageFilter.h>
 #include <mitkProgressBar.h>
@@ -47,31 +48,35 @@ namespace
 
 static const char* const HelpText = "Select an image and a segmentation or surface";
 
-QmitkImageMaskingWidget::QmitkImageMaskingWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent)
+QmitkImageMaskingWidget::QmitkImageMaskingWidget(mitk::DataStorage* dataStorage,
+                                                 mitk::SliceNavigationController* timeNavigationController,
+                                                 QWidget* parent)
   : QmitkSegmentationUtilityWidget(timeNavigationController, parent)
 {
-  m_Controls.setupUi(this);
+  m_Controls = new Ui::QmitkImageMaskingWidgetControls;
+  m_Controls->setupUi(this);
 
-  m_Controls.dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::ImagePredicate);
-  m_Controls.dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::SegmentationOrSurfacePredicate);
-  m_Controls.dataSelectionWidget->SetHelpText(HelpText);
+  m_Controls->dataSelectionWidget->SetDataStorage(dataStorage);
+  m_Controls->dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::ImagePredicate);
+  m_Controls->dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::SegmentationOrSurfacePredicate);
+  m_Controls->dataSelectionWidget->SetHelpText(HelpText);
 
   // T28795: Disable 2-d reference images since they do not work yet (segmentations are at least 3-d images with a single slice)
-  m_Controls.dataSelectionWidget->SetPredicate(0, mitk::NodePredicateAnd::New(
+  m_Controls->dataSelectionWidget->SetPredicate(0, mitk::NodePredicateAnd::New(
     mitk::NodePredicateNot::New(mitk::NodePredicateDimension::New(2)),
-    m_Controls.dataSelectionWidget->GetPredicate(0)));
+    m_Controls->dataSelectionWidget->GetPredicate(0)));
 
   this->EnableButtons(false);
 
-  connect(m_Controls.btnMaskImage, SIGNAL(clicked()), this, SLOT(OnMaskImagePressed()));
-  connect(m_Controls.rbnCustom, SIGNAL(toggled(bool)), this, SLOT(OnCustomValueButtonToggled(bool)));
-  connect(m_Controls.dataSelectionWidget, SIGNAL(SelectionChanged(unsigned int, const mitk::DataNode*)),
+  connect(m_Controls->btnMaskImage, SIGNAL(clicked()), this, SLOT(OnMaskImagePressed()));
+  connect(m_Controls->rbnCustom, SIGNAL(toggled(bool)), this, SLOT(OnCustomValueButtonToggled(bool)));
+  connect(m_Controls->dataSelectionWidget, SIGNAL(SelectionChanged(unsigned int, const mitk::DataNode*)),
     this, SLOT(OnSelectionChanged(unsigned int, const mitk::DataNode*)));
 
-  if( m_Controls.dataSelectionWidget->GetSelection(0).IsNotNull() &&
-    m_Controls.dataSelectionWidget->GetSelection(1).IsNotNull() )
+  if( m_Controls->dataSelectionWidget->GetSelection(0).IsNotNull() &&
+    m_Controls->dataSelectionWidget->GetSelection(1).IsNotNull() )
   {
-    this->OnSelectionChanged(0, m_Controls.dataSelectionWidget->GetSelection(0));
+    this->OnSelectionChanged(0, m_Controls->dataSelectionWidget->GetSelection(0));
   }
 }
 
@@ -81,7 +86,7 @@ QmitkImageMaskingWidget::~QmitkImageMaskingWidget()
 
 void QmitkImageMaskingWidget::OnSelectionChanged(unsigned int index, const mitk::DataNode *selection)
 {
-  auto *dataSelectionWidget = m_Controls.dataSelectionWidget;
+  auto *dataSelectionWidget = m_Controls->dataSelectionWidget;
   auto node0 = dataSelectionWidget->GetSelection(0);
 
   if (index == 0)
@@ -111,7 +116,7 @@ void QmitkImageMaskingWidget::OnSelectionChanged(unsigned int index, const mitk:
 
 void QmitkImageMaskingWidget::SelectionControl(unsigned int index, const mitk::DataNode* selection)
 {
-  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
+  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls->dataSelectionWidget;
   mitk::DataNode::Pointer node = dataSelectionWidget->GetSelection(index);
 
   //if Image-Masking is enabled, check if image-dimension of reference and binary image is identical
@@ -150,8 +155,8 @@ void QmitkImageMaskingWidget::SelectionControl(unsigned int index, const mitk::D
 
 void QmitkImageMaskingWidget::EnableButtons(bool enable)
 {
-  m_Controls.grpBackgroundValue->setEnabled(enable);
-  m_Controls.btnMaskImage->setEnabled(enable);
+  m_Controls->grpBackgroundValue->setEnabled(enable);
+  m_Controls->btnMaskImage->setEnabled(enable);
 }
 
 template<typename TPixel, unsigned int VImageDimension>
@@ -163,7 +168,7 @@ void GetRange(const itk::Image<TPixel, VImageDimension>*, double& bottom, double
 
 void QmitkImageMaskingWidget::OnCustomValueButtonToggled(bool checked)
 {
-  m_Controls.txtCustom->setEnabled(checked);
+  m_Controls->txtCustom->setEnabled(checked);
 }
 
 void QmitkImageMaskingWidget::OnMaskImagePressed()
@@ -173,7 +178,7 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
   mitk::ProgressBar::GetInstance()->AddStepsToDo(4);
   mitk::ProgressBar::GetInstance()->Progress();
 
-  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls.dataSelectionWidget;
+  QmitkDataSelectionWidget* dataSelectionWidget = m_Controls->dataSelectionWidget;
 
   //create result image, get mask node and reference image
   mitk::Image::Pointer resultImage(nullptr);
@@ -184,7 +189,7 @@ void QmitkImageMaskingWidget::OnMaskImagePressed()
   {
     MITK_ERROR << "Selection does not contain an image";
     QMessageBox::information( this, "Image and Surface Masking", "Selection does not contain an image", QMessageBox::Ok );
-    m_Controls.btnMaskImage->setEnabled(true);
+    m_Controls->btnMaskImage->setEnabled(true);
     return;
   }
 
@@ -261,16 +266,16 @@ mitk::Image::Pointer QmitkImageMaskingWidget::MaskImage(mitk::Image::Pointer ref
 {
   mitk::ScalarType backgroundValue = 0.0;
 
-  if (m_Controls.rbnMinimum->isChecked())
+  if (m_Controls->rbnMinimum->isChecked())
   {
     backgroundValue = referenceImage->GetStatistics()->GetScalarValueMin();
   }
-  else if (m_Controls.rbnCustom->isChecked())
+  else if (m_Controls->rbnCustom->isChecked())
   {
     auto warningTitle = QStringLiteral("Invalid custom pixel value");
 
     bool ok = false;
-    auto originalBackgroundValue = m_Controls.txtCustom->text().toDouble(&ok);
+    auto originalBackgroundValue = m_Controls->txtCustom->text().toDouble(&ok);
 
     if (!ok)
     {
@@ -315,7 +320,7 @@ mitk::Image::Pointer QmitkImageMaskingWidget::MaskImage(mitk::Image::Pointer ref
       if (QMessageBox::StandardButton::Apply != ret)
         return nullptr;
 
-      m_Controls.txtCustom->setText(QString("%1").arg(backgroundValue));
+      m_Controls->txtCustom->setText(QString("%1").arg(backgroundValue));
     }
   }
 
@@ -366,8 +371,14 @@ mitk::Image::Pointer QmitkImageMaskingWidget::ConvertSurfaceToImage( mitk::Image
 
 void QmitkImageMaskingWidget::AddToDataStorage(mitk::DataStorage::Pointer dataStorage, mitk::Image::Pointer segmentation, const std::string& name, mitk::DataNode::Pointer parent )
 {
-  auto dataNode = mitk::DataNode::New();
+  if (dataStorage.IsNull())
+  {
+    std::string exception = "Cannot add result to the data storage. Data storage invalid.";
+    MITK_ERROR << "Masking failed: " << exception;
+    QMessageBox::information(nullptr, "Masking failed", QString::fromStdString(exception));
+  }
 
+  auto dataNode = mitk::DataNode::New();
   dataNode->SetName(name);
   dataNode->SetData(segmentation);
 

@@ -13,6 +13,8 @@ found in the LICENSE file.
 #ifndef QmitkSegmentationUtilityWidget_h
 #define QmitkSegmentationUtilityWidget_h
 
+#include <MitkSegmentationUIExports.h>
+
 #include <QWidget>
 
 namespace mitk
@@ -25,7 +27,7 @@ namespace mitk
  * Call GetTimeNavigationController() in your derived class to gain access to the time navigation controller.
  * The time navigation controller is not not available at all times and hence this method can return nullptr.
  */
-class QmitkSegmentationUtilityWidget : public QWidget
+class MITKSEGMENTATIONUI_EXPORT QmitkSegmentationUtilityWidget : public QWidget
 {
   Q_OBJECT
 

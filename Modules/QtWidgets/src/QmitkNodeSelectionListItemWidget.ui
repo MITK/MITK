@@ -100,7 +100,7 @@
      </property>
      <property name="icon">
       <iconset>
-       <normaloff>:/org.mitk.gui.qt.common/resources/times.svg</normaloff>:/org.mitk.gui.qt.common/resources/times.svg</iconset>
+       <normaloff>:/Qmitk/times.svg</normaloff>:/Qmitk/times.svg</iconset>
      </property>
      <property name="iconSize">
       <size>

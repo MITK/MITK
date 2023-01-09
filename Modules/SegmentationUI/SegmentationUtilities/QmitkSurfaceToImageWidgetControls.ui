@@ -47,7 +47,7 @@
   <customwidget>
    <class>QmitkDataSelectionWidget</class>
    <extends>QWidget</extends>
-   <header>internal/Common/QmitkDataSelectionWidget.h</header>
+   <header>QmitkDataSelectionWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

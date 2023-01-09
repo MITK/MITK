@@ -11,13 +11,9 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkDataSelectionWidget.h"
-#include "../mitkPluginActivator.h"
-
-#include <berryIWorkbench.h>
 
 #include <mitkContourModel.h>
 #include <mitkContourModelSet.h>
-#include <mitkIDataStorageService.h>
 #include <mitkLabelSetImage.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateDataType.h>
@@ -176,18 +172,22 @@ unsigned int QmitkDataSelectionWidget::AddDataSelection(const QString &labelText
 
   m_NodeSelectionWidgets.push_back(nodeSelection);
   return static_cast<unsigned int>(m_NodeSelectionWidgets.size() - 1);
+  return row;
+}
+
+void QmitkDataSelectionWidget::SetDataStorage(mitk::DataStorage* dataStorage)
+{
+  if (m_DataStorage == dataStorage)
+  {
+    return;
+  }
+
+  m_DataStorage = dataStorage;
 }
 
 mitk::DataStorage::Pointer QmitkDataSelectionWidget::GetDataStorage() const
 {
-  ctkServiceReference ref = mitk::PluginActivator::getContext()->getServiceReference<mitk::IDataStorageService>();
-  assert(ref == true);
-
-  mitk::IDataStorageService* service = mitk::PluginActivator::getContext()->getService<mitk::IDataStorageService>(ref);
-
-  assert(service);
-
-  return service->GetDefaultDataStorage()->GetDataStorage();
+  return m_DataStorage.Lock();
 }
 
 mitk::DataNode::Pointer QmitkDataSelectionWidget::GetSelection(unsigned int index)

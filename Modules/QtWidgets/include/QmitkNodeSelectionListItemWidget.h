@@ -16,7 +16,7 @@ found in the LICENSE file.
 
 #include <MitkQtWidgetsExports.h>
 
-#include "ui_QmitkNodeSelectionListItemWidget.h"
+#include <ui_QmitkNodeSelectionListItemWidget.h>
 
 #include <QWidget>
 

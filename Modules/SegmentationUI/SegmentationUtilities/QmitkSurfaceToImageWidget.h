@@ -27,6 +27,7 @@ namespace Ui
 namespace mitk
 {
   class DataNode;
+  class DataStorage;
   class Surface;
   class Image;
   class LabelSetImage;
@@ -47,7 +48,9 @@ class MITKSEGMENTATIONUI_EXPORT QmitkSurfaceToImageWidget : public QmitkSegmenta
 public:
 
   /** @brief Default constructor, including creation of GUI elements and signals/slots connections. */
-  explicit QmitkSurfaceToImageWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent = nullptr);
+  explicit QmitkSurfaceToImageWidget(mitk::DataStorage* dataStorage,
+                                     mitk::SliceNavigationController* timeNavigationController,
+                                     QWidget* parent = nullptr);
 
   /** @brief Defaul destructor. */
   ~QmitkSurfaceToImageWidget() override;

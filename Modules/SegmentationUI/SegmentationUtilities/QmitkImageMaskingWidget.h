@@ -26,6 +26,7 @@ namespace Ui
 
 namespace mitk
 {
+  class DataStorage;
   class Image;
 }
 
@@ -44,7 +45,9 @@ class MITKSEGMENTATIONUI_EXPORT QmitkImageMaskingWidget : public QmitkSegmentati
 public:
 
   /** @brief Default constructor, including creation of GUI elements and signals/slots connections. */
-  explicit QmitkImageMaskingWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent = nullptr);
+  explicit QmitkImageMaskingWidget(mitk::DataStorage* dataStorage,
+                                   mitk::SliceNavigationController* timeNavigationController,
+                                   QWidget* parent = nullptr);
 
   /** @brief Defaul destructor. */
   ~QmitkImageMaskingWidget() override;

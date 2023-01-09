@@ -41,11 +41,12 @@ void QmitkSegmentationUtilitiesView::CreateQtPartControl(QWidget* parent)
     ? renderWindowPart->GetTimeNavigationController()
     : nullptr;
 
-  m_BooleanOperationsWidget = new QmitkBooleanOperationsWidget(timeNavigationController, parent);
-  m_ContourModelToImageWidget = new QmitkContourModelToImageWidget(timeNavigationController, parent);
-  m_ImageMaskingWidget = new QmitkImageMaskingWidget(timeNavigationController, parent);
-  m_MorphologicalOperationsWidget = new QmitkMorphologicalOperationsWidget(timeNavigationController, parent);
-  m_SurfaceToImageWidget = new QmitkSurfaceToImageWidget(timeNavigationController, parent);
+  auto dataStorage = this->GetDataStorage();
+  m_BooleanOperationsWidget = new QmitkBooleanOperationsWidget(dataStorage, timeNavigationController, parent);
+  m_ContourModelToImageWidget = new QmitkContourModelToImageWidget(dataStorage, timeNavigationController, parent);
+  m_ImageMaskingWidget = new QmitkImageMaskingWidget(dataStorage, timeNavigationController, parent);
+  m_MorphologicalOperationsWidget = new QmitkMorphologicalOperationsWidget(dataStorage, timeNavigationController, parent);
+  m_SurfaceToImageWidget = new QmitkSurfaceToImageWidget(dataStorage, timeNavigationController, parent);
 
   this->AddUtilityWidget(m_BooleanOperationsWidget, QIcon(":/SegmentationUtilities/BooleanOperations_48x48.png"), "Boolean Operations");
   this->AddUtilityWidget(m_ContourModelToImageWidget, QIcon(":/SegmentationUtilities/ContourModelSetToImage_48x48.png"), "Contour to Image");

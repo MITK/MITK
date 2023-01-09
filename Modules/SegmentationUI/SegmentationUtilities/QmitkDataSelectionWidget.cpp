@@ -175,17 +175,19 @@ unsigned int QmitkDataSelectionWidget::AddDataSelection(const QString &labelText
   return row;
 }
 
+void QmitkDataSelectionWidget::SetDataStorage(mitk::DataStorage* dataStorage)
+{
+  if (m_DataStorage == dataStorage)
+  {
+    return;
+  }
+
+  m_DataStorage = dataStorage;
+}
+
 mitk::DataStorage::Pointer QmitkDataSelectionWidget::GetDataStorage() const
 {
-  //ctkServiceReference ref = mitk::PluginActivator::getContext()->getServiceReference<mitk::IDataStorageService>();
-  //assert(ref == true);
-
-  //mitk::IDataStorageService* service = mitk::PluginActivator::getContext()->getService<mitk::IDataStorageService>(ref);
-
-  //assert(service);
-
-  //return service->GetDefaultDataStorage()->GetDataStorage();
-  return nullptr;
+  return m_DataStorage.Lock();
 }
 
 mitk::DataNode::Pointer QmitkDataSelectionWidget::GetSelection(unsigned int index)

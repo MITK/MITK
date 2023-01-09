@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include "QmitkSurfaceToImageWidget.h"
 #include <ui_QmitkSurfaceToImageWidgetControls.h>
 
+#include <mitkDataStorage.h>
 #include <mitkException.h>
 #include <mitkExceptionMacro.h>
 #include <mitkProgressBar.h>
@@ -26,12 +27,15 @@ found in the LICENSE file.
 
 static const char* const HelpText = "Select an image and a surface above";
 
-QmitkSurfaceToImageWidget::QmitkSurfaceToImageWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent)
+QmitkSurfaceToImageWidget::QmitkSurfaceToImageWidget(mitk::DataStorage* dataStorage,
+                                                     mitk::SliceNavigationController* timeNavigationController,
+                                                     QWidget* parent)
   : QmitkSegmentationUtilityWidget(timeNavigationController, parent)
 {
   m_Controls = new Ui::QmitkSurfaceToImageWidgetControls;
   m_Controls->setupUi(this);
 
+  m_Controls->dataSelectionWidget->SetDataStorage(dataStorage);
   m_Controls->dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::ImageAndSegmentationPredicate);
   m_Controls->dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::SurfacePredicate);
   m_Controls->dataSelectionWidget->SetHelpText(HelpText);
@@ -124,8 +128,15 @@ void QmitkSurfaceToImageWidget::OnSurface2ImagePressed()
   resultNode->SetProperty("name", mitk::StringProperty::New(nameOfResultImage) );
 //  resultNode->SetProperty("binary", mitk::BoolProperty::New(true) );
 
-  dataSelectionWidget->GetDataStorage()->Add(resultNode, dataSelectionWidget->GetSelection(0));
+  auto dataStorage = dataSelectionWidget->GetDataStorage();
+  if (dataStorage.IsNull())
+  {
+    std::string exception = "Cannot add result to the data storage. Data storage invalid.";
+    MITK_ERROR << "Error converting surface to binary image: " << exception;
+    QMessageBox::information(nullptr, "Error converting surface to binary image", QString::fromStdString(exception));
+  }
 
+  dataStorage->Add(resultNode, dataSelectionWidget->GetSelection(0));
   this->EnableButtons();
 }
 

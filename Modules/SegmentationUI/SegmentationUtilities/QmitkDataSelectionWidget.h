@@ -18,6 +18,8 @@ found in the LICENSE file.
 #include <ui_QmitkDataSelectionWidgetControls.h>
 #include <mitkDataNode.h>
 #include <mitkDataStorage.h>
+#include <mitkWeakPointer.h>
+
 #include <vector>
 
 namespace mitk
@@ -50,6 +52,7 @@ public:
   unsigned int AddDataSelection(const QString &labelText, const QString &info, const QString &popupTitel, const QString &popupHint, Predicate predicate);
   unsigned int AddDataSelection(const QString &labelText, const QString &info, const QString &popupTitel, const QString &popupHint, mitk::NodePredicateBase* predicate = nullptr);
 
+  void SetDataStorage(mitk::DataStorage* dataStorage);
   mitk::DataStorage::Pointer GetDataStorage() const;
   mitk::DataNode::Pointer GetSelection(unsigned int index);
   void SetPredicate(unsigned int index, Predicate predicate);
@@ -65,6 +68,7 @@ private slots:
 
 private:
   Ui::QmitkDataSelectionWidgetControls m_Controls;
+  mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
   std::vector<QmitkSingleNodeSelectionWidget*> m_NodeSelectionWidgets;
 };
 

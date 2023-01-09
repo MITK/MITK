@@ -20,12 +20,15 @@ found in the LICENSE file.
 
 static const char* const HelpText = "Select a segmentation above";
 
-QmitkMorphologicalOperationsWidget::QmitkMorphologicalOperationsWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent)
+QmitkMorphologicalOperationsWidget::QmitkMorphologicalOperationsWidget(mitk::DataStorage* dataStorage,
+                                                                       mitk::SliceNavigationController* timeNavigationController,
+                                                                       QWidget* parent)
   : QmitkSegmentationUtilityWidget(timeNavigationController, parent)
 {
   m_Controls = new Ui::QmitkMorphologicalOperationsWidgetControls;
   m_Controls->setupUi(this);
 
+  m_Controls->dataSelectionWidget->SetDataStorage(dataStorage);
   m_Controls->dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::SegmentationPredicate);
   m_Controls->dataSelectionWidget->SetHelpText(HelpText);
 

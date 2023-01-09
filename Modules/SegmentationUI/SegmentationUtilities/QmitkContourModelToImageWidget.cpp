@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include "QmitkContourModelToImageWidget.h"
 #include <ui_QmitkContourModelToImageWidgetControls.h>
 
+#include <mitkDataStorage.h>
 #include <mitkImage.h>
 
 #include <mitkContourModelSet.h>
@@ -143,7 +144,15 @@ void QmitkContourModelToImageWidget::OnProcessingFinished()
     filled->SetName(stream.str());
     filled->SetData(result);
 
-    dataSelectionWidget->GetDataStorage()->Add(filled, imageNode);
+    auto dataStorage = dataSelectionWidget->GetDataStorage();
+    if (dataStorage.IsNull())
+    {
+      std::string exception = "Cannot add result to the data storage. Data storage invalid.";
+      MITK_ERROR << "Error filling contours into an image: " << exception;
+      QMessageBox::information(nullptr, "Error filling contours into an image", QString::fromStdString(exception));
+    }
+
+    dataStorage->Add(filled, imageNode);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
   else
@@ -216,7 +225,9 @@ void QmitkContourModelToImageWidget::OnProcessPressed()
   d->m_Watcher.setFuture(future);
 }
 
-QmitkContourModelToImageWidget::QmitkContourModelToImageWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent)
+QmitkContourModelToImageWidget::QmitkContourModelToImageWidget(mitk::DataStorage* dataStorage,
+                                                               mitk::SliceNavigationController* timeNavigationController,
+                                                               QWidget* parent)
   : QmitkSegmentationUtilityWidget(timeNavigationController, parent),
     d_ptr(new QmitkContourModelToImageWidgetPrivate())
 {
@@ -224,6 +235,7 @@ QmitkContourModelToImageWidget::QmitkContourModelToImageWidget(mitk::SliceNaviga
 
   // Set up UI
   d->m_Controls.setupUi(this);
+  d->m_Controls.dataSelectionWidget->SetDataStorage(dataStorage);
   d->m_Controls.dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::ImageAndSegmentationPredicate);
   d->m_Controls.dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::ContourModelPredicate);
   d->m_Controls.dataSelectionWidget->SetHelpText(HelpText);

@@ -24,6 +24,7 @@ class QmitkContourModelToImageWidgetPrivate;
 namespace mitk
 {
   class DataNode;
+  class DataStorage;
   class Image;
   class ContourModelSet;
   class ContourModel;
@@ -46,7 +47,9 @@ class MITKSEGMENTATIONUI_EXPORT QmitkContourModelToImageWidget : public QmitkSeg
 public:
 
   /** @brief Default constructor, including creation of GUI elements and signals/slots connections. */
-  explicit QmitkContourModelToImageWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent = nullptr);
+  explicit QmitkContourModelToImageWidget(mitk::DataStorage* dataStorage,
+                                          mitk::SliceNavigationController* timeNavigationController,
+                                          QWidget* parent = nullptr);
 
   /** @brief Defaul destructor. */
   ~QmitkContourModelToImageWidget() override;

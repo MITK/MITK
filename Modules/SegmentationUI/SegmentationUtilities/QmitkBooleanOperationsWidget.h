@@ -26,6 +26,7 @@ namespace Ui
 namespace mitk
 {
   class DataNode;
+  class DataStorage;
 }
 
 class MITKSEGMENTATIONUI_EXPORT QmitkBooleanOperationsWidget : public QmitkSegmentationUtilityWidget
@@ -33,7 +34,9 @@ class MITKSEGMENTATIONUI_EXPORT QmitkBooleanOperationsWidget : public QmitkSegme
   Q_OBJECT
 
 public:
-  explicit QmitkBooleanOperationsWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent = nullptr);
+  explicit QmitkBooleanOperationsWidget(mitk::DataStorage* dataStorage,
+                                        mitk::SliceNavigationController* timeNavigationController,
+                                        QWidget* parent = nullptr);
   ~QmitkBooleanOperationsWidget() override;
 
 private slots:

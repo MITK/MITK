@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include "QmitkBooleanOperationsWidget.h"
 #include <ui_QmitkBooleanOperationsWidgetControls.h>
 
+#include <mitkDataStorage.h>
 #include <mitkException.h>
 #include <mitkSliceNavigationController.h>
 
@@ -45,8 +46,14 @@ namespace
 
   static void AddToDataStorage(mitk::DataStorage::Pointer dataStorage, mitk::Image::Pointer segmentation, const std::string& name, mitk::DataNode::Pointer parent = nullptr)
   {
-    auto dataNode = mitk::DataNode::New();
+    if (dataStorage.IsNull())
+    {
+      std::string exception = "Cannot add result to the data storage. Data storage invalid.";
+      MITK_ERROR << "Boolean operation failed: " << exception;
+      QMessageBox::information(nullptr, "Boolean operation failed", QString::fromStdString(exception));
+    }
 
+    auto dataNode = mitk::DataNode::New();
     dataNode->SetName(name);
     dataNode->SetData(segmentation);
 
@@ -54,12 +61,15 @@ namespace
   }
 }
 
-QmitkBooleanOperationsWidget::QmitkBooleanOperationsWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent)
+QmitkBooleanOperationsWidget::QmitkBooleanOperationsWidget(mitk::DataStorage* dataStorage,
+                                                           mitk::SliceNavigationController* timeNavigationController,
+                                                           QWidget* parent)
   : QmitkSegmentationUtilityWidget(timeNavigationController, parent)
 {
   m_Controls = new Ui::QmitkBooleanOperationsWidgetControls;
   m_Controls->setupUi(this);
 
+  m_Controls->dataSelectionWidget->SetDataStorage(dataStorage);
   m_Controls->dataSelectionWidget->AddDataSelection("<img width=16 height=16 src=\":/Qmitk/BooleanLabelA_32x32.png\"/>", "Select 1st segmentation", "Select 1st segmentation", "", QmitkDataSelectionWidget::SegmentationPredicate);
   m_Controls->dataSelectionWidget->AddDataSelection("<img width=16 height=16 src=\":/Qmitk/BooleanLabelB_32x32.png\"/>", "Select 2nd segmentation", "Select 2nd segmentation", "", QmitkDataSelectionWidget::SegmentationPredicate);
 

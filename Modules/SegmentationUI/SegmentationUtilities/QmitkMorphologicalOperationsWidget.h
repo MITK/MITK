@@ -26,6 +26,7 @@ namespace Ui
 namespace mitk
 {
   class DataNode;
+  class DataStorage;
 }
 
 /** \brief GUI class for morphological segmentation tools.
@@ -35,7 +36,9 @@ class MITKSEGMENTATIONUI_EXPORT QmitkMorphologicalOperationsWidget : public Qmit
   Q_OBJECT
 
 public:
-  explicit QmitkMorphologicalOperationsWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent = nullptr);
+  explicit QmitkMorphologicalOperationsWidget(mitk::DataStorage* dataStorage,
+                                              mitk::SliceNavigationController* timeNavigationController,
+                                              QWidget* parent = nullptr);
   ~QmitkMorphologicalOperationsWidget() override;
 
 public slots:

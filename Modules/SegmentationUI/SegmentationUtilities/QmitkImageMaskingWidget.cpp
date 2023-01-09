@@ -13,6 +13,7 @@ found in the LICENSE file.
 #include "QmitkImageMaskingWidget.h"
 #include <ui_QmitkImageMaskingWidgetControls.h>
 
+#include <mitkDataStorage.h>
 #include <mitkException.h>
 #include <mitkExceptionMacro.h>
 #include <mitkImage.h>
@@ -47,12 +48,15 @@ namespace
 
 static const char* const HelpText = "Select an image and a segmentation or surface";
 
-QmitkImageMaskingWidget::QmitkImageMaskingWidget(mitk::SliceNavigationController* timeNavigationController, QWidget* parent)
+QmitkImageMaskingWidget::QmitkImageMaskingWidget(mitk::DataStorage* dataStorage,
+                                                 mitk::SliceNavigationController* timeNavigationController,
+                                                 QWidget* parent)
   : QmitkSegmentationUtilityWidget(timeNavigationController, parent)
 {
   m_Controls = new Ui::QmitkImageMaskingWidgetControls;
   m_Controls->setupUi(this);
 
+  m_Controls->dataSelectionWidget->SetDataStorage(dataStorage);
   m_Controls->dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::ImagePredicate);
   m_Controls->dataSelectionWidget->AddDataSelection(QmitkDataSelectionWidget::SegmentationOrSurfacePredicate);
   m_Controls->dataSelectionWidget->SetHelpText(HelpText);
@@ -367,8 +371,14 @@ mitk::Image::Pointer QmitkImageMaskingWidget::ConvertSurfaceToImage( mitk::Image
 
 void QmitkImageMaskingWidget::AddToDataStorage(mitk::DataStorage::Pointer dataStorage, mitk::Image::Pointer segmentation, const std::string& name, mitk::DataNode::Pointer parent )
 {
-  auto dataNode = mitk::DataNode::New();
+  if (dataStorage.IsNull())
+  {
+    std::string exception = "Cannot add result to the data storage. Data storage invalid.";
+    MITK_ERROR << "Masking failed: " << exception;
+    QMessageBox::information(nullptr, "Masking failed", QString::fromStdString(exception));
+  }
 
+  auto dataNode = mitk::DataNode::New();
   dataNode->SetName(name);
   dataNode->SetData(segmentation);
 

@@ -21,24 +21,24 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Select fixed surface:</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QmitkDataStorageComboBox" name="m_comboBoxFixedSurface"/>
-   </item>
-   <item>
     <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>Select moving surface:</string>
+      <string>Select moving surface (A):</string>
      </property>
     </widget>
    </item>
    <item>
     <widget class="QmitkDataStorageComboBox" name="m_comboBoxMovingSurface"/>
+   </item>
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Select fixed surface (B):</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QmitkDataStorageComboBox" name="m_comboBoxFixedSurface"/>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">

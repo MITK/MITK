@@ -43,6 +43,7 @@ void IterativeClosestPointRegistration::CreateQtPartControl(QWidget *parent)
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi(parent);
   connect(m_Controls.m_performICP, &QPushButton::clicked, this, &IterativeClosestPointRegistration::PerformICP);
+  connect(m_Controls.m_moveBack, &QPushButton::clicked, this, &IterativeClosestPointRegistration::MoveSurfaceBack);
   //initialize Combo Boxes
   m_Controls.m_comboBoxFixedSurface->SetDataStorage(this->GetDataStorage());
   m_Controls.m_comboBoxFixedSurface->SetAutoSelectNewItems(false);
@@ -79,10 +80,19 @@ mitk::StandardICPPointRegister::StandardICPPointRegisterAlgorithm(MovingSurface-
 mitk::AffineTransform3D::Pointer T = mitk::AffineTransform3D::New();
 T->SetTranslation(TransformationT);
 T->SetMatrix(TransformationR);
+m_OldTransformation = MovingSurface->GetGeometry()->GetIndexToWorldTransform();
 MovingSurface->GetGeometry()->SetIndexToWorldTransform(T);
 MITK_INFO << "Performed ICP";
 MITK_INFO << "n:" << n;
 MITK_INFO << "R:" << TransformationR;
 MITK_INFO << "T:" << TransformationT;
 MITK_INFO << "Message:" << ErrorMessage;
+m_Controls.m_moveBack->setEnabled(true);
+this->RequestRenderWindowUpdate();
+}
+
+void IterativeClosestPointRegistration::MoveSurfaceBack(){
+  mitk::Surface::Pointer MovingSurface = dynamic_cast<mitk::Surface*>(m_Controls.m_comboBoxMovingSurface->GetSelectedNode()->GetData());
+  MovingSurface->GetGeometry()->SetIndexToWorldTransform(m_OldTransformation);
+  this->RequestRenderWindowUpdate();
 }

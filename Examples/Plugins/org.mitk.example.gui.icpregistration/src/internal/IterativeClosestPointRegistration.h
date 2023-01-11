@@ -50,8 +50,13 @@ protected:
   virtual void OnSelectionChanged(berry::IWorkbenchPart::Pointer source,
                                   const QList<mitk::DataNode::Pointer> &nodes) override;
 
-  /// \brief Called when the user clicks the GUI button
+  /// \brief Called when the user clicks the GUI button perform the ICP
   void PerformICP();
+
+  /// \brief Called when the user clicks the GUI button to move the surface back
+  void MoveSurfaceBack();
+
+  mitk::AffineTransform3D::Pointer m_OldTransformation;
 
   Ui::IterativeClosestPointRegistrationControls m_Controls;
 };

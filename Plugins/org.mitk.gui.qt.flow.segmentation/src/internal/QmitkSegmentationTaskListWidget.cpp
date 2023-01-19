@@ -25,6 +25,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateFunction.h>
 #include <mitkRenderingManager.h>
 #include <mitkSegmentationHelper.h>
+#include <mitkDICOMQIPropertyHelper.h>
 
 #include <QmitkStaticDynamicSegmentationDialog.h>
 #include <QmitkStyleManager.h>
@@ -678,6 +679,9 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
 
     dataStorage->Add(segmentationNode, imageNode);
   }
+
+  // Workaround for T29431. Remove when T26953 is fixed.
+  mitk::DICOMQIPropertyHelper::DeriveDICOMSourceProperties(image, segmentation);
 
   auto prefs = GetSegmentationPreferences();
 

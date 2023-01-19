@@ -22,6 +22,10 @@ found in the LICENSE file.
 #include <QmitkNodeDescriptorManager.h>
 #include <QmitkStyleManager.h>
 
+#include <usModuleInitialization.h>
+
+US_INITIALIZE_MODULE
+
 ctkPluginContext* org_mitk_gui_qt_flow_segmentation_Activator::m_Context = nullptr;
 
 void org_mitk_gui_qt_flow_segmentation_Activator::start(ctkPluginContext* context)

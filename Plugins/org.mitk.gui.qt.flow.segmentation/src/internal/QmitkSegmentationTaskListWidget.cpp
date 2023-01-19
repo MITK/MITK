@@ -274,6 +274,7 @@ void QmitkSegmentationTaskListWidget::UpdateProgressBar()
 
 /* Provided that a valid segmentation task list is currently selected and the
  * widget is in its default state, update all controls accordingly.
+ * Then, load the first unfinished task, if any.
  */
 void QmitkSegmentationTaskListWidget::OnTaskListChanged(mitk::SegmentationTaskList* taskList)
 {
@@ -291,6 +292,8 @@ void QmitkSegmentationTaskListWidget::OnTaskListChanged(mitk::SegmentationTaskLi
 
   if (numTasks > 1)
     m_Ui->nextButton->setEnabled(true);
+
+  this->LoadNextUnfinishedTask();
 }
 
 /* If possible, change the currently displayed task to the previous task.

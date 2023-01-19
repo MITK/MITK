@@ -869,7 +869,7 @@ void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataNode* node)
   node->SetProperty("labelset.contour.active", mitk::BoolProperty::New(m_DrawOutline));
 
   // force render window update to show outline
-  node->GetData()->Modified();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkSegmentationView::ApplySelectionMode()

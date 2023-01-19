@@ -274,7 +274,7 @@ void QmitkSegmentationTaskListWidget::UpdateProgressBar()
 
 /* Provided that a valid segmentation task list is currently selected and the
  * widget is in its default state, update all controls accordingly.
- * Then, load the first unfinished task, if any.
+ * TODO: Then, load the first unfinished task, if any.
  */
 void QmitkSegmentationTaskListWidget::OnTaskListChanged(mitk::SegmentationTaskList* taskList)
 {
@@ -293,7 +293,10 @@ void QmitkSegmentationTaskListWidget::OnTaskListChanged(mitk::SegmentationTaskLi
   if (numTasks > 1)
     m_Ui->nextButton->setEnabled(true);
 
-  this->LoadNextUnfinishedTask();
+  // TODO: This line should be enough but it is happening too early even before
+  // the RenderingManager has any registered render windows, resulting in mismatching
+  // renderer and data geometries.
+  // this->LoadNextUnfinishedTask();
 }
 
 /* If possible, change the currently displayed task to the previous task.

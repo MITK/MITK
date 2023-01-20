@@ -19,7 +19,15 @@ mitk::LabelSet::LabelSet() : m_ActiveLabelValue(0), m_Layer(0)
 {
   m_LookupTable = mitk::LookupTable::New();
   m_LookupTable->SetType(mitk::LookupTable::MULTILABEL);
-  m_ReservedLabelValuesFunctor = []() { return std::vector<LabelValueType>({ 0 }); };
+  m_ReservedLabelValuesFunctor = [this]() {
+    std::vector<LabelValueType> result = { 0 };
+
+    for (auto [value, label] : this->m_LabelContainer)
+    {
+      result.emplace_back(value);
+    }
+    return result;
+  };
 }
 
 mitk::LabelSet::~LabelSet()
@@ -98,13 +106,13 @@ bool mitk::LabelSet::ExistLabel(PixelType pixelValue)
   return m_LabelContainer.count(pixelValue) > 0 ? true : false;
 }
 
-void mitk::LabelSet::AddLabel(mitk::Label *label)
+void mitk::LabelSet::AddLabel(mitk::Label *label, bool addAsClone)
 {
   unsigned int max_size = mitk::Label::MAX_LABEL_VALUE + 1;
   if (m_LabelContainer.size() >= max_size)
     return;
 
-  mitk::Label::Pointer newLabel(label->Clone());
+  mitk::Label::Pointer newLabel = addAsClone ? label->Clone() : label;
 
   // TODO use layer of label parameter
   newLabel->SetLayer(m_Layer);
@@ -112,8 +120,6 @@ void mitk::LabelSet::AddLabel(mitk::Label *label)
   PixelType pixelValue = newLabel->GetValue();
   if (!m_LabelContainer.empty())
   {
-    pixelValue = m_LabelContainer.rbegin()->first;
-
     auto usedValues = m_ReservedLabelValuesFunctor();
     auto finding = std::find(usedValues.begin(), usedValues.end(), pixelValue);
 

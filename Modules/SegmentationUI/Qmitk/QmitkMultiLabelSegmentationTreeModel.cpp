@@ -202,7 +202,7 @@ QVariant QmitkMultiLabelSegmentationTreeModel::data(const QModelIndex &index, in
       switch (item->m_ItemType)
       {
         case QmitkMultiLabelSegTreeItem::ItemType::Group:
-          return QVariant(QString("Group")+QString::number(item->GetGroupID()));
+          return QVariant(QString("Group ")+QString::number(item->GetGroupID()));
         case QmitkMultiLabelSegTreeItem::ItemType::Label:
         {
           auto label = item->GetLabel();
@@ -225,7 +225,7 @@ QVariant QmitkMultiLabelSegmentationTreeModel::data(const QModelIndex &index, in
         }
         else if (TableColumns::COLOR_COL == index.column())
         {
-          return QVariant(label->GetColor().GetScalarValue());
+          return QVariant(QColor(label->GetColor().GetRed() * 255, label->GetColor().GetGreen() * 255, label->GetColor().GetBlue() * 255));
         }
         else if (TableColumns::VISIBLE_COL == index.column())
         {
@@ -362,6 +362,12 @@ QVariant QmitkMultiLabelSegmentationTreeModel::headerData(int section, Qt::Orien
   return QVariant();
 }
 
+const mitk::LabelSetImage* QmitkMultiLabelSegmentationTreeModel::GetSegmentation() const
+{
+  return m_Segmentation;
+}
+
+
 void QmitkMultiLabelSegmentationTreeModel::SetSegmentation(mitk::LabelSetImage* segmentation)
 {
   if (m_Segmentation != segmentation)
@@ -419,12 +425,10 @@ void QmitkMultiLabelSegmentationTreeModel::GenerateInternalGroupTree(unsigned in
 {
   auto labelSet = m_Segmentation->GetLabelSet(groupID);
 
-  QmitkMultiLabelSegTreeItem* labelItem = nullptr;
-  std::map<std::string, QmitkMultiLabelSegTreeItem*> labelNameToTreeItem;
-
   for (auto lIter = labelSet->IteratorConstBegin(); lIter != labelSet->IteratorConstEnd(); lIter++)
   {
-    auto finding = labelNameToTreeItem.find(lIter->second->GetName());
+    if (lIter->second == m_Segmentation->GetExteriorLabel()) continue;
+
     bool newItemCreated = false;
     AddLabelToGroupTree(lIter->second, groupItem, newItemCreated);
   }
@@ -509,6 +513,7 @@ void QmitkMultiLabelSegmentationTreeModel::OnLabelAdded(LabelValueType labelValu
   {
     auto label = m_Segmentation->GetLabel(labelValue);
     if (nullptr == label) mitkThrow() << "Invalid internal state. Segmentation signaled the addition of an label that does not exist in the segmentation. Invalid label value:" << labelValue;
+    if (label == m_Segmentation->GetExteriorLabel()) return;
 
     auto groupItem = GetGroupItem(groupIndex, this->m_RootItem.get());
 
@@ -544,9 +549,14 @@ void QmitkMultiLabelSegmentationTreeModel::OnLabelAdded(LabelValueType labelValu
 
 void QmitkMultiLabelSegmentationTreeModel::OnLabelModified(LabelValueType labelValue)
 {
+  if (labelValue == m_Segmentation->GetExteriorLabel()->GetValue()) return;
+
   auto instanceItem = GetInstanceItem(labelValue, this->m_RootItem.get());
 
-  if (nullptr == instanceItem) mitkThrow() << "Internal invalid state. QmitkMultiLabelSegmentationTreeModel recieved a LabelModified signal for a label that is not represented in the model. Invalid label: " << labelValue;
+  if (nullptr == instanceItem)
+  {
+    mitkThrow() << "Internal invalid state. QmitkMultiLabelSegmentationTreeModel recieved a LabelModified signal for a label that is not represented in the model. Invalid label: " << labelValue;
+  }
 
   auto labelItem = instanceItem->ParentItem();
 
@@ -565,6 +575,7 @@ void QmitkMultiLabelSegmentationTreeModel::OnLabelModified(LabelValueType labelV
 
 void QmitkMultiLabelSegmentationTreeModel::OnLabelRemoved(LabelValueType labelValue)
 {
+  if (labelValue == m_Segmentation->GetExteriorLabel()->GetValue()) return;
   auto instanceItem = GetInstanceItem(labelValue, this->m_RootItem.get());
 
   if (nullptr == instanceItem) mitkThrow() << "Internal invalid state. QmitkMultiLabelSegmentationTreeModel recieved a LabelRemoved signal for a label that is not represented in the model. Invalid label: " << labelValue;

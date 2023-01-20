@@ -249,7 +249,7 @@ void mitk::LabelSetImage::RemoveLayer()
 
 mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::GetUsedLabelValues() const
 {
-  LabelValueVectorType result = { 0 };
+  LabelValueVectorType result = { this->GetExteriorLabel()->GetValue() };
 
   for (auto [value, label] : m_LabelMap)
   {
@@ -257,7 +257,6 @@ mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::GetUsedLabelValue
   }
   return result;
 }
-
 
 unsigned int mitk::LabelSetImage::AddLayer(mitk::LabelSet::Pointer labelSet)
 {
@@ -293,7 +292,7 @@ unsigned int mitk::LabelSetImage::AddLayer(mitk::Image::Pointer layerImage, mitk
   else
   {
     ls = mitk::LabelSet::New();
-    ls->AddLabel(GetExteriorLabel());
+    ls->AddLabel(GetExteriorLabel(), false);
     ls->SetActiveLabel(0 /*Exterior Label*/);
   }
 
@@ -492,8 +491,10 @@ void mitk::LabelSetImage::MergeLabels(PixelType pixelValue, const std::vector<Pi
 
 void mitk::LabelSetImage::RemoveLabel(PixelType pixelValue, unsigned int layer)
 {
-  this->GetLabelSet(layer)->RemoveLabel(pixelValue);
+  //first erase the pixel content (also triggers a LabelModified event)
   this->EraseLabel(pixelValue);
+  //now remove the label entry itself
+  this->GetLabelSet(layer)->RemoveLabel(pixelValue);
   // in the interim version triggered by label set events: this->m_LabelRemovedMessage.Send(pixelValue);
   this->m_LabelsChangedMessage.Send({ pixelValue });
   this->m_GroupModifiedMessage.Send(layer);

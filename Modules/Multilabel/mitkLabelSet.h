@@ -142,7 +142,7 @@ namespace mitk
 
     /** \brief
     */
-    void AddLabel(mitk::Label *label);
+    void AddLabel(mitk::Label *label, bool addAsClone = true);
 
     /** \brief
     */

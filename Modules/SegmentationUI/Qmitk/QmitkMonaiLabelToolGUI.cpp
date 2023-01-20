@@ -86,7 +86,7 @@ void QmitkMonaiLabelToolGUI::OnPreviewBtnClicked()
     MITK_INFO << "tool found" << url.toStdString();*/
 
     //tool->GetOverallInfo("https://httpbin.org/get");
-    
+    tool->PostSegmentationRequest();
   }
    //tool->UpdatePreview();
 }

@@ -18,6 +18,9 @@ found in the LICENSE file.
 #include <memory>
 #include <unordered_map>
 #include <set>
+#include <httplib.h>
+#include <nlohmann/json.hpp>
+
 
 namespace us
 {
@@ -86,6 +89,7 @@ namespace mitk
   private:
     void InitializeRESTManager();
     std::unique_ptr<MonaiAppMetadata> DataMapper(web::json::value&);
+    std::unique_ptr<MonaiAppMetadata> mitk::MonaiLabelTool::DataMapper(nlohmann::json&);
     mitk::IRESTManager *m_RESTManager;
     const std::set<std::string> m_AUTO_SEG_TYPE_NAME = {"segmentation"};
     const std::set<std::string> m_SCRIBBLE_SEG_TYPE_NAME = {"scribbles"};

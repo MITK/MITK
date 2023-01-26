@@ -628,6 +628,6 @@ void QmitkMultiLabelSegmentationTreeModel::OnGroupRemoved(SpatialGroupIndexType 
   }
 }
 
-//
-//treeview ableiten und selection command überschreiben. soll nur reagieren by labels bzw instancen, wenn es welche gibt
+//TODO
+//treeview ableiten und selection command Ã¼berschreiben. soll nur reagieren by labels bzw instancen, wenn es welche gibt
 //und nur in column 0

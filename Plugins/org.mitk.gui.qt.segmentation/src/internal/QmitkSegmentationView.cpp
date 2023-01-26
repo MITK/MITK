@@ -749,11 +749,11 @@ void QmitkSegmentationView::EstablishLabelSetConnection()
   if (nullptr == workingImage)
     return;
 
-  workingImage->GetActiveLabelSet()->AddLabelEvent += mitk::MessageDelegate<QmitkLabelSetWidget>(
+  workingImage->GetActiveLabelSet()->AddLabelEvent += mitk::MessageDelegate1<QmitkLabelSetWidget, mitk::LabelSetImage::LabelValueType>(
     m_Controls->labelSetWidget, &QmitkLabelSetWidget::ResetAllTableWidgetItems);
-  workingImage->GetActiveLabelSet()->RemoveLabelEvent += mitk::MessageDelegate<QmitkLabelSetWidget>(
+  workingImage->GetActiveLabelSet()->RemoveLabelEvent += mitk::MessageDelegate1<QmitkLabelSetWidget, mitk::LabelSetImage::LabelValueType>(
     m_Controls->labelSetWidget, &QmitkLabelSetWidget::ResetAllTableWidgetItems);
-  workingImage->GetActiveLabelSet()->ModifyLabelEvent += mitk::MessageDelegate<QmitkLabelSetWidget>(
+  workingImage->GetActiveLabelSet()->ModifyLabelEvent += mitk::MessageDelegate1<QmitkLabelSetWidget, mitk::LabelSetImage::LabelValueType>(
     m_Controls->labelSetWidget, &QmitkLabelSetWidget::UpdateAllTableWidgetItems);
   workingImage->GetActiveLabelSet()->AllLabelsModifiedEvent += mitk::MessageDelegate<QmitkLabelSetWidget>(
     m_Controls->labelSetWidget, &QmitkLabelSetWidget::UpdateAllTableWidgetItems);
@@ -772,11 +772,11 @@ void QmitkSegmentationView::LooseLabelSetConnection()
   if (nullptr == workingImage)
     return;
 
-  workingImage->GetActiveLabelSet()->AddLabelEvent -= mitk::MessageDelegate<QmitkLabelSetWidget>(
+  workingImage->GetActiveLabelSet()->AddLabelEvent -= mitk::MessageDelegate1<QmitkLabelSetWidget, mitk::LabelSetImage::LabelValueType>(
     m_Controls->labelSetWidget, &QmitkLabelSetWidget::ResetAllTableWidgetItems);
-  workingImage->GetActiveLabelSet()->RemoveLabelEvent -= mitk::MessageDelegate<QmitkLabelSetWidget>(
+  workingImage->GetActiveLabelSet()->RemoveLabelEvent -= mitk::MessageDelegate1<QmitkLabelSetWidget, mitk::LabelSetImage::LabelValueType>(
     m_Controls->labelSetWidget, &QmitkLabelSetWidget::ResetAllTableWidgetItems);
-  workingImage->GetActiveLabelSet()->ModifyLabelEvent -= mitk::MessageDelegate<QmitkLabelSetWidget>(
+  workingImage->GetActiveLabelSet()->ModifyLabelEvent -= mitk::MessageDelegate1<QmitkLabelSetWidget, mitk::LabelSetImage::LabelValueType>(
     m_Controls->labelSetWidget, &QmitkLabelSetWidget::UpdateAllTableWidgetItems);
   workingImage->GetActiveLabelSet()->AllLabelsModifiedEvent -= mitk::MessageDelegate<QmitkLabelSetWidget>(
     m_Controls->labelSetWidget, &QmitkLabelSetWidget::UpdateAllTableWidgetItems);

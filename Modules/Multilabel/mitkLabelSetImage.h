@@ -213,7 +213,6 @@ namespace mitk
 
       /**This type is internally used to track which label is currently
        * associated with which layer.*/
-      using LabelValueVectorType = std::vector<LabelValueType>;
       using GroupToLabelMapType = std::map<SpatialGroupIndexType, LabelValueVectorType>;
       GroupToLabelMapType m_GroupToLabelMap;
       using LabelToGroupMapType = std::map<LabelValueType, SpatialGroupIndexType>;

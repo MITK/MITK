@@ -112,7 +112,7 @@ void mitk::LabelSet::AddLabel(mitk::Label *label, bool addAsClone)
   if (m_LabelContainer.size() >= max_size)
     return;
 
-  mitk::Label::Pointer newLabel = addAsClone ? label->Clone() : label;
+  mitk::Label::Pointer newLabel = addAsClone ? label->Clone() : Label::Pointer(label);
 
   // TODO use layer of label parameter
   newLabel->SetLayer(m_Layer);

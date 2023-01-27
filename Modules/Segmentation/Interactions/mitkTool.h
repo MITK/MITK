@@ -118,7 +118,7 @@ namespace mitk
     also "draw" it with an editor.
     */
     //[[deprecated]]
-    DEPRECATED(virtual const char **GetXPM() const = 0);
+    DEPRECATED(virtual const char **GetXPM() const) = 0;
 
     /**
      * \brief Returns the path of an icon.

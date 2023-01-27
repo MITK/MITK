@@ -295,8 +295,8 @@ namespace mitk
 
     /**
       * \brief  Returns true if the value exists in one of the labelsets*/
-    [[deprecated("Will be changed with T28524")]]
-    bool ExistLabel(PixelType pixelValue) const;
+    //[[deprecated("Will be changed with T28524")]]
+    DEPRECATED(bool ExistLabel(PixelType pixelValue) const);
 
     /**
      * @brief Checks if a label exists in a certain layer
@@ -304,23 +304,23 @@ namespace mitk
      * @param layer the layer in which should be searched for the label
      * @return true if the label exists otherwise false
      */
-    [[deprecated("Will be changed with T28524")]]
-    bool ExistLabel(PixelType pixelValue, unsigned int layer) const;
+    //[[deprecated("Will be changed with T28524")]]
+    DEPRECATED(bool ExistLabel(PixelType pixelValue, unsigned int layer) const);
 
     /**
       * \brief  Returns true if the labelset exists*/
-    [[deprecated("Will be removed with T28524")]]
-    bool ExistLabelSet(unsigned int layer) const;
+    //[[deprecated("Will be removed with T28524")]]
+    DEPRECATED(bool ExistLabelSet(unsigned int layer) const);
 
     /**
      * @brief Returns the active label of a specific layer
      * @param layer the layer ID for which the active label should be returned
      * @return the active label of the specified layer
      */
-    [[deprecated("Will be removed with T28524")]]
-    mitk::Label *GetActiveLabel(unsigned int layer = 0);
-    [[deprecated("Will be removed with T28524")]]
-    const mitk::Label* GetActiveLabel(unsigned int layer = 0) const;
+    //[[deprecated("Will be removed with T28524")]]
+    DEPRECATED(mitk::Label *GetActiveLabel(unsigned int layer = 0));
+    //[[deprecated("Will be removed with T28524")]]
+    DEPRECATED(const mitk::Label* GetActiveLabel(unsigned int layer = 0) const);
 
     /**
      * @brief Returns the mitk::Label with the given pixelValue and for the given layer
@@ -334,10 +334,10 @@ namespace mitk
      * @brief Returns the currently active mitk::LabelSet
      * @return the mitk::LabelSet of the active layer or nullptr if non is present
      */
-    [[deprecated ("Will be removed with T28524")]]
-    mitk::LabelSet *GetActiveLabelSet();
-    [[deprecated("Will be removed with T28524")]]
-    const mitk::LabelSet* GetActiveLabelSet() const;
+    //[[deprecated ("Will be removed with T28524")]]
+    DEPRECATED(mitk::LabelSet *GetActiveLabelSet());
+    //[[deprecated("Will be removed with T28524")]]
+    DEPRECATED(const mitk::LabelSet* GetActiveLabelSet() const);
 
     /**
      * @brief Gets the mitk::LabelSet for the given layer

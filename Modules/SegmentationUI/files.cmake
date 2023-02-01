@@ -28,8 +28,12 @@ set(CPP_FILES
   Qmitk/QmitkStaticDynamicSegmentationDialog.cpp
   Qmitk/QmitkSimpleLabelSetListWidget.cpp
   Qmitk/QmitkSegmentationTaskListWidget.cpp
+  Qmitk/QmitkMultiLabelSegmentationInspector.cpp
+  Qmitk/QmitkMultiLabelSegmentationTreeModel.cpp
+  Qmitk/QmitkMultiLabelSegmentationTreeView.cpp
+  Qmitk/QmitkLabelColorItemDelegate.cpp
+  Qmitk/QmitkLabelToggleItemDelegate.cpp
   SegmentationUtilities/QmitkBooleanOperationsWidget.cpp
-Qmitk/QmitkMultiLabelSegmentationTreeModel.cpp
   SegmentationUtilities/QmitkContourModelToImageWidget.cpp
   SegmentationUtilities/QmitkImageMaskingWidget.cpp
   SegmentationUtilities/QmitkMorphologicalOperationsWidget.cpp
@@ -69,7 +73,11 @@ set(MOC_H_FILES
   Qmitk/QmitkStaticDynamicSegmentationDialog.h
   Qmitk/QmitkSimpleLabelSetListWidget.h
   Qmitk/QmitkSegmentationTaskListWidget.h
+  Qmitk/QmitkMultiLabelSegmentationInspector.h
   Qmitk/QmitkMultiLabelSegmentationTreeModel.h
+  Qmitk/QmitkMultiLabelSegmentationTreeView.h
+  Qmitk/QmitkLabelColorItemDelegate.h
+  Qmitk/QmitkLabelToggleItemDelegate.h
   SegmentationUtilities/QmitkBooleanOperationsWidget.h
   SegmentationUtilities/QmitkContourModelToImageWidget.h
   SegmentationUtilities/QmitkImageMaskingWidget.h
@@ -88,6 +96,7 @@ set(UI_FILES
   Qmitk/QmitknnUNetToolGUIControls.ui
   Qmitk/QmitkEditableContourToolGUIControls.ui
   Qmitk/QmitkSegmentationTaskListWidget.ui
+  Qmitk/QmitkMultiLabelSegmentationInspector.ui
   SegmentationUtilities/QmitkBooleanOperationsWidgetControls.ui
   SegmentationUtilities/QmitkContourModelToImageWidgetControls.ui
   SegmentationUtilities/QmitkImageMaskingWidgetControls.ui

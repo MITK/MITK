@@ -14,7 +14,10 @@ abstract: >-
   open-source software for the development of interactive
   medical image processing software. Based on MITK, we
   provide the MITK Workbench, a powerful and free
-  application to view, process, and segment medical images.
+  application to view, process, and segment medical images,
+  as well as a set of useful commandline applications for
+  typical image processing tasks (like image registration,
+  conversion, stitching).
 keywords:
   - dicom
   - medical-imaging
@@ -23,6 +26,12 @@ keywords:
   - cpp-library
   - dicom-rt
   - mitk
+  - image-segmentation
+  - annotation
+  - image-registration
+  - perfusion
+  - visualization
+  - application-framework
 license: BSD-3-Clause
 version: v2022.10
 date-released: '2022-10-29'

@@ -83,6 +83,11 @@ namespace mitk
     bool IsLabeInGroup(LabelValueType value) const;
     bool IsLabeInGroup(LabelValueType value, SpatialGroupIndexType& groupIndex) const;
 
+    /** Returns the group id of the based label value.
+    * @pre label value must exists.
+    */
+    SpatialGroupIndexType GetGroupIndexOfLabel(LabelValueType value) const;
+
     /**
      * @brief Returns the mitk::Label with the given value.
      * @param value the pixel value of the label

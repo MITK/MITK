@@ -195,7 +195,7 @@ QVariant QmitkMultiLabelSegmentationTreeModel::data(const QModelIndex &index, in
   if (!item)
     return QVariant();
 
-  if (role == Qt::DisplayRole)
+  if (role == Qt::DisplayRole||role == Qt::EditRole)
   {
     if (TableColumns::NAME_COL == index.column())
     {
@@ -238,7 +238,83 @@ QVariant QmitkMultiLabelSegmentationTreeModel::data(const QModelIndex &index, in
       }
     }
   }
+  else if (role == ItemModelRole::LabelDataRole)
+  {
+    if (TableColumns::NAME_COL == index.column())
+    {
+      if (item->HandleAsInstance())
+      {
+        auto label = item->GetLabel();
+        return QVariant::fromValue<void*>(label);
+      }
+    }
+  }
+  else if (role == ItemModelRole::LabelValueRole)
+  {
+    if (TableColumns::NAME_COL == index.column())
+    {
+      if (item->HandleAsInstance())
+      {
+        auto label = item->GetLabel();
+        return QVariant(label->GetValue());
+      }
+    }
+  }
   return QVariant();
+}
+
+mitk::Color QtToMitk(const QColor& color)
+{
+  mitk::Color mitkColor;
+
+  mitkColor.SetRed(color.red() / 255.0f);
+  mitkColor.SetGreen(color.green() / 255.0f);
+  mitkColor.SetBlue(color.blue() / 255.0f);
+
+  return mitkColor;
+}
+
+bool QmitkMultiLabelSegmentationTreeModel::setData(const QModelIndex& index, const QVariant& value, int role)
+{
+  if (!index.isValid())
+    return false;
+
+  auto item = static_cast<QmitkMultiLabelSegTreeItem*>(index.internalPointer());
+
+  if (!item)
+    return false;
+
+  if (role == Qt::EditRole)
+  {
+    if (TableColumns::NAME_COL != index.column())
+    {
+      if (item->HandleAsInstance())
+      {
+        auto label = item->GetLabel();
+
+        if (TableColumns::LOCKED_COL == index.column())
+        {
+          label->SetLocked(value.toBool());
+        }
+        else if (TableColumns::COLOR_COL == index.column())
+        {
+          label->SetColor(QtToMitk(value.value<QColor>()));
+        }
+        else if (TableColumns::VISIBLE_COL == index.column())
+        {
+          label->SetVisible(value.toBool());
+        }
+        auto groupID = m_Segmentation->GetGroupIndexOfLabel(label->GetValue());
+        m_Segmentation->GetLabelSet(groupID)->UpdateLookupTable(label->GetValue());
+      }
+      else
+      {
+
+      }
+      return true;
+    }
+  }
+  return false;
 }
 
 QModelIndex QmitkMultiLabelSegmentationTreeModel::index(int row, int column, const QModelIndex &parent) const
@@ -333,9 +409,42 @@ QmitkMultiLabelSegTreeItem* GetLabelItemInGroup(const std::string& labelName, Qm
 Qt::ItemFlags QmitkMultiLabelSegmentationTreeModel::flags(const QModelIndex &index) const
 {
   if (!index.isValid())
-    return nullptr;
+    return Qt::NoItemFlags;
 
-  return QAbstractItemModel::flags(index);
+  if (!index.isValid())
+    return Qt::NoItemFlags;
+
+  auto item = static_cast<QmitkMultiLabelSegTreeItem*>(index.internalPointer());
+
+  if (!item)
+    return Qt::NoItemFlags;
+
+  if (TableColumns::NAME_COL != index.column())
+  {
+    if (item->HandleAsInstance())
+    {
+      return Qt::ItemIsEnabled | Qt::ItemIsEditable;
+    }
+    else
+    {
+      return Qt::ItemIsEnabled;
+    }
+    return true;
+  }
+  else
+  {
+    if (item->HandleAsInstance())
+    {
+      return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+    }
+    else
+    {
+      return Qt::ItemIsEnabled;
+    }
+    return true;
+  }
+
+  return Qt::NoItemFlags;
 }
 
 QVariant QmitkMultiLabelSegmentationTreeModel::headerData(int section, Qt::Orientation orientation, int role) const

@@ -1047,6 +1047,17 @@ bool mitk::LabelSetImage::IsLabeInGroup(LabelValueType value, SpatialGroupIndexT
   return false;
 }
 
+mitk::LabelSetImage::SpatialGroupIndexType mitk::LabelSetImage::GetGroupIndexOfLabel(LabelValueType value) const
+{
+  auto finding = m_LabelToGroupMap.find(value);
+  if (m_LabelToGroupMap.end() == finding)
+  {
+    mitkThrow()<< "Cannot deduce group index. Passed label value does not exist. Value: "<< value;
+  }
+  return finding->second;
+}
+
+
 const mitk::Label* mitk::LabelSetImage::GetLabel(LabelValueType value) const
 {
   auto finding = m_LabelMap.find(value);

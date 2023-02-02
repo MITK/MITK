@@ -5,9 +5,9 @@ message: >-
   metadata from this file.
 type: software
 authors:
-  - given-names: MITK Team (MIC)
+  - given-names: MITK Team
     affiliation: German Cancer Research Center (DKFZ)
-repository-code: 'https://phabricator.mitk.org/source/mitk/'
+repository-code: 'https://github.com/MITK/MITK'
 url: 'https://www.mitk.org/'
 abstract: >-
   The Medical Imaging Interaction Toolkit (MITK) is a free
@@ -16,8 +16,8 @@ abstract: >-
   provide the MITK Workbench, a powerful and free
   application to view, process, and segment medical images,
   as well as a set of useful commandline applications for
-  typical image processing tasks (like image registration,
-  conversion, stitching).
+  typical image processing tasks like image registration,
+  conversion, stitching.
 keywords:
   - dicom
   - medical-imaging

@@ -25,7 +25,7 @@ found in the LICENSE file.
 namespace mitk
 {
   /**
-  * The RenderWindowLayerController is used to manipulate the 'layer', 'fixedLayer' and 'visible' property of a given data node.
+  * The RenderWindowLayerController is used to manipulate the 'layer' and 'visible' property of a given data node.
   * The 'layer' property is used to denote the layer level of a data node. Data from nodes on higher layer level are rendered
   * on top of data from nodes on lower layer level. It can be changed using the 'MoveNode*'-functions.
   *
@@ -59,7 +59,7 @@ namespace mitk
     * @param renderer   Pointer to the renderer instance for which the data node should be inserted.
     *                   If it is a nullptr (default) all controlled renderer will be affected.
     *
-    * @post After a successful call, the "fixedLayer" and "visibility" property will be true and the "layer" property will be set correctly.
+    * @post After a successful call, the "visibility" property will be true and the "layer" property will be set correctly.
     */
     void InsertLayerNode(DataNode* dataNode, int layer = RenderWindowLayerUtilities::TOP_LAYER_INDEX, const BaseRenderer* renderer = nullptr);
     /**

@@ -123,7 +123,6 @@ private:
   QModelIndex GetIndexByItem(QmitkDataStorageTreeModelInternalItem* item) const;
 
   std::unique_ptr<mitk::RenderWindowLayerController> m_RenderWindowLayerController;
-  mitk::RenderWindowLayerUtilities::RendererVector m_ControlledRenderer;
   QmitkDataStorageTreeModelInternalItem* m_Root;
   mitk::WeakPointer<mitk::BaseRenderer> m_BaseRenderer;
 

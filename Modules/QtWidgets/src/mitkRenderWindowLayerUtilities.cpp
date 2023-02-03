@@ -16,19 +16,19 @@ found in the LICENSE file.
 // mitk core
 #include <mitkNodePredicateProperty.h>
 
-mitk::RenderWindowLayerUtilities::LayerStack mitk::RenderWindowLayerUtilities::GetLayerStack(const DataStorage* dataStorage, const BaseRenderer* renderer, bool withBaseNode)
+mitk::RenderWindowLayerUtilities::LayerStack mitk::RenderWindowLayerUtilities::GetLayerStack(const DataStorage* dataStorage, const BaseRenderer* renderer)
 {
   LayerStack stackedLayers;
-  if (nullptr == dataStorage || nullptr == renderer)
+  if (nullptr == dataStorage)
   {
-    // no nodes to stack or no renderer selected
+    // no nodes to stack
     return stackedLayers;
   }
 
   int layer = -1;
-  NodePredicateBase::Pointer fixedLayerPredicate = GetRenderWindowPredicate(renderer);
-  DataStorage::SetOfObjects::ConstPointer filteredDataNodes = dataStorage->GetSubset(fixedLayerPredicate);
-  for (DataStorage::SetOfObjects::ConstIterator it = filteredDataNodes->Begin(); it != filteredDataNodes->End(); ++it)
+
+  auto allDataNodes = dataStorage->GetAll();
+  for (DataStorage::SetOfObjects::ConstIterator it = allDataNodes->Begin(); it != allDataNodes->End(); ++it)
   {
     DataNode::Pointer dataNode = it->Value();
     if (dataNode.IsNull())
@@ -39,27 +39,14 @@ mitk::RenderWindowLayerUtilities::LayerStack mitk::RenderWindowLayerUtilities::G
     bool layerFound = dataNode->GetIntProperty("layer", layer, renderer);
     if (layerFound)
     {
-      if (BASE_LAYER_INDEX != layer|| withBaseNode)
-      {
-        // data node is not on the base layer or the base layer should be included anyway
-        stackedLayers.insert(std::make_pair(layer, dataNode));
-      }
+      stackedLayers.insert(std::make_pair(layer, dataNode));
     }
   }
   return stackedLayers;
 }
 
-mitk::NodePredicateBase::Pointer mitk::RenderWindowLayerUtilities::GetRenderWindowPredicate(const BaseRenderer* renderer)
-{
-  NodePredicateBase::Pointer fixedLayerPredicate =
-    NodePredicateProperty::New("fixedLayer", BoolProperty::New(true), renderer);
-
-  return fixedLayerPredicate;
-}
-
 void mitk::RenderWindowLayerUtilities::SetRenderWindowProperties(mitk::DataNode* dataNode, const BaseRenderer* renderer)
 {
-  dataNode->SetBoolProperty("fixedLayer", true, renderer);
   // use visibility of existing renderer or common renderer
   // common renderer is used if renderer-specific property does not exist
   bool visible = false;

@@ -74,6 +74,7 @@ Qmitk/QmitkMaskStampWidgetGUIControls.ui
 Qmitk/QmitkSurfaceBasedInterpolatorWidgetGUIControls.ui
 Qmitk/QmitknnUNetToolGUIControls.ui
 Qmitk/QmitkEditableContourToolGUIControls.ui
+Qmitk/QmitkMonaiLabelToolGUIControls.ui
 )
 
 set(QRC_FILES

@@ -1,14 +1,13 @@
 #include "QmitkMonaiLabelToolGUI.h"
-#include "mitkMonaiLabelTool.h"
 
-#include <usGetModuleContext.h>
-#include <usModule.h>
-#include <usModuleContext.h>
+#include "mitkMonaiLabelTool.h"
 #include "usServiceReference.h"
 #include <QIcon>
 #include <QUrl>
 #include <QmitkStyleManager.h>
-
+#include <usGetModuleContext.h>
+#include <usModule.h>
+#include <usModuleContext.h>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkMonaiLabelToolGUI, "")
 
@@ -16,27 +15,26 @@ QmitkMonaiLabelToolGUI::QmitkMonaiLabelToolGUI()
   : QmitkMultiLabelSegWithPreviewToolGUIBase(), m_SuperclassEnableConfirmSegBtnFnc(m_EnableConfirmSegBtnFnc)
 {
   m_EnableConfirmSegBtnFnc = [this](bool enabled)
-  { 
-    return !m_FirstPreviewComputation ? m_SuperclassEnableConfirmSegBtnFnc(enabled) : false;
-  };
+  { return !m_FirstPreviewComputation ? m_SuperclassEnableConfirmSegBtnFnc(enabled) : false; };
 }
 
-void QmitkMonaiLabelToolGUI::ConnectNewTool(mitk::SegWithPreviewTool* newTool)
+void QmitkMonaiLabelToolGUI::ConnectNewTool(mitk::SegWithPreviewTool *newTool)
 {
   Superclass::ConnectNewTool(newTool);
   newTool->IsTimePointChangeAwareOff();
   m_FirstPreviewComputation = true;
 }
 
-void QmitkMonaiLabelToolGUI::InitializeUI(QBoxLayout* mainLayout)
-{ 
+void QmitkMonaiLabelToolGUI::InitializeUI(QBoxLayout *mainLayout)
+{
   m_Controls.setupUi(this);
   mainLayout->addLayout(m_Controls.verticalLayout);
 
   connect(m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnPreviewBtnClicked()));
   connect(m_Controls.fetchUrl, SIGNAL(clicked()), this, SLOT(OnFetchBtnClicked()));
 
-  QIcon refreshIcon = QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/view-refresh.svg"));
+  QIcon refreshIcon =
+    QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/view-refresh.svg"));
   m_Controls.fetchUrl->setIcon(refreshIcon);
 
   Superclass::InitializeUI(mainLayout);
@@ -52,27 +50,39 @@ void QmitkMonaiLabelToolGUI::OnFetchBtnClicked()
   auto tool = this->GetConnectedToolAs<mitk::MonaiLabelTool>();
   if (nullptr != tool)
   {
+    tool->m_InfoParameters.reset();
+    m_Controls.modelBox->clear();
+    m_Controls.appBox->clear();
     QString urlString = m_Controls.urlBox->text();
     QUrl url(urlString);
     if (url.isValid() && !url.isLocalFile() && !url.hasFragment() && !url.hasQuery()) // sanity check
     {
-      tool->GetOverallInfo(urlString.toStdString());
-      // tool->GetOverallInfo("http://localhost:8000/info");
-      if (nullptr != tool->m_Parameters)
+      QString hostName = url.host();
+      int port = url.port();
+      try
       {
-        std::string response = tool->m_Parameters->name;
-        std::vector<mitk::MonaiModelInfo> autoModels = tool->GetAutoSegmentationModels();
-        m_Controls.responseNote->setText(QString::fromStdString(response));
-        m_Controls.appBox->addItem(QString::fromStdString(response));
-        for (auto &model : autoModels)
+        tool->GetOverallInfo(hostName.toStdString(), port);
+        // tool->GetOverallInfo("localhost",8000");
+        if (nullptr != tool->m_InfoParameters)
         {
-          m_Controls.modelBox->addItem(QString::fromStdString(model.name));
+          std::string response = tool->m_InfoParameters->name;
+          std::vector<mitk::MonaiModelInfo> autoModels = tool->GetAutoSegmentationModels();
+          m_Controls.responseNote->setText(QString::fromStdString(response));
+          m_Controls.appBox->addItem(QString::fromStdString(response));
+          for (auto &model : autoModels)
+          {
+            m_Controls.modelBox->addItem(QString::fromStdString(model.name));
+          }
         }
+      }
+      catch (const mitk::Exception &e)
+      {
+        MITK_ERROR << e.GetDescription(); // Add GUI msg box to show
       }
     }
     else
     {
-      MITK_ERROR << "Invalid URL entered: " << urlString.toStdString();
+      MITK_ERROR << "Invalid URL entered: " << urlString.toStdString(); // set as status message on GUI
     }
   }
 }
@@ -82,11 +92,56 @@ void QmitkMonaiLabelToolGUI::OnPreviewBtnClicked()
   auto tool = this->GetConnectedToolAs<mitk::MonaiLabelTool>();
   if (nullptr != tool)
   {
-    /* QString url = m_Controls.url->text();
-    MITK_INFO << "tool found" << url.toStdString();*/
+    if (false)
+    {
+      std::string selectedModel = m_Controls.modelBox->currentText().toStdString();
+      for (const mitk::MonaiModelInfo &modelObject : tool->m_InfoParameters->models)
+      {
+        if (modelObject.name == selectedModel)
+        {
+          tool->m_RequestParameters = std::make_unique<mitk::MonaiLabelRequest>();
+          tool->m_RequestParameters->model = modelObject;
+          tool->m_RequestParameters->hostName = tool->m_InfoParameters->hostName;
+          tool->m_RequestParameters->port = tool->m_InfoParameters->port;
+          MITK_INFO << "tool found" << selectedModel;
+          break;
+        }
+      }
+    }
+    else
+    {
+      MITK_INFO << " RUNNING ON TEST parameters...";
+      tool->m_RequestParameters = std::make_unique<mitk::MonaiLabelRequest>();
+      mitk::MonaiModelInfo modelObject;
+      modelObject.name = "deepedit_seg";
+      tool->m_RequestParameters->model = modelObject;
+      tool->m_RequestParameters->hostName = "localhost";
+      tool->m_RequestParameters->port = 8000;
+    }
+    try
+    {
+      tool->UpdatePreview();
+    }
+    catch (const mitk::Exception &e)
+    {
+      MITK_ERROR << "Connection error"; // Add GUI msg box to show
+    }
+    mitk::LabelSetImage *temp = tool->GetPreviewSegmentation();
+    for (int i = 0; i < temp->GetNumberOfLabels(); ++i)
+    {
+      mitk::Label *labelptr = temp->GetLabel(i, 0);
+      if (nullptr != labelptr)
+      {
+        MITK_INFO << "Label with name: " << labelptr->GetName();
+      }
+      else
+      {
+        MITK_INFO << "nullptr found for " << i;
+      }
+    }
 
-    //tool->GetOverallInfo("https://httpbin.org/get");
-    tool->PostSegmentationRequest();
+    this->SetLabelSetPreview(tool->GetPreviewSegmentation());
+    tool->IsTimePointChangeAwareOn();
+    this->ActualizePreviewLabelVisibility();
   }
-   //tool->UpdatePreview();
 }

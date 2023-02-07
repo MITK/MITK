@@ -54,7 +54,13 @@ namespace mitk
     *        The last two mentioned properties are set so that they initially have the same value as the corresponding
     *        global property.
     */
-    MITKQTWIDGETS_EXPORT void SetRenderWindowProperties(mitk::DataNode* dataNode, const BaseRenderer* renderer);
+    MITKQTWIDGETS_EXPORT void SetRenderWindowProperties(DataNode* dataNode, const BaseRenderer* renderer);
+
+    MITKQTWIDGETS_EXPORT void DeleteRenderWindowProperties(DataNode* dataNode, const BaseRenderer* renderer);
+
+    MITKQTWIDGETS_EXPORT void TransferRenderWindowProperties(DataNode* dataNode, const BaseRenderer* newRenderer, const BaseRenderer* oldRenderer);
+
+
   } // namespace RenderWindowLayerUtilities
 } // namespace mitk
 

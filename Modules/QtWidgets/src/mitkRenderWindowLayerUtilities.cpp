@@ -67,3 +67,59 @@ void mitk::RenderWindowLayerUtilities::SetRenderWindowProperties(mitk::DataNode*
     dataNode->SetIntProperty("layer", layer, renderer);
   }
 }
+
+void mitk::RenderWindowLayerUtilities::DeleteRenderWindowProperties(mitk::DataNode* dataNode, const BaseRenderer* renderer)
+{
+  if (nullptr == renderer)
+  {
+    MITK_ERROR << "Cannot remove general properties. Please provide a specific base renderer.";
+    return;
+  }
+
+  try
+  {
+    dataNode->RemoveProperty("visible", renderer->GetName());
+  }
+  catch (mitk::Exception& e)
+  {
+    MITK_DEBUG << "Exception caught: " << e.GetDescription() << " Nothing to remove.";
+  }
+
+  try
+  {
+    dataNode->RemoveProperty("layer", renderer->GetName());
+  }
+  catch (mitk::Exception& e)
+  {
+    MITK_ERROR << "Exception caught: " << e.GetDescription() << " Nothing to remove.";
+  }
+}
+
+void mitk::RenderWindowLayerUtilities::TransferRenderWindowProperties(DataNode* dataNode, const BaseRenderer* newRenderer, const BaseRenderer* oldRenderer)
+{
+  if (nullptr == newRenderer)
+  {
+    MITK_ERROR << "Cannot transfer properties. Please provide a specific base renderer for the new renderer-specific properties.";
+    return;
+  }
+
+  // use visibility of existing renderer or common renderer
+  // common renderer is used if renderer-specific property does not exist
+  bool visible = false;
+  bool visibilityProperty = dataNode->GetVisibility(visible, oldRenderer);
+  if (true == visibilityProperty)
+  {
+    // found a visibility property
+    dataNode->SetVisibility(visible, newRenderer);
+  }
+
+  // use layer of existing renderer or common renderer
+  // common renderer is used if renderer-specific property does not exist
+  int layer = -1;
+  bool layerProperty = dataNode->GetIntProperty("layer", layer, oldRenderer);
+  if (true == layerProperty)
+  {
+    // found a layer property
+    dataNode->SetIntProperty("layer", layer, newRenderer);
+  }
+}

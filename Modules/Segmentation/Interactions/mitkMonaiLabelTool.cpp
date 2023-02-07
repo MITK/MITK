@@ -67,8 +67,9 @@ const char *mitk::MonaiLabelTool::GetName() const
 bool mitk::MonaiLabelTool::IsMonaiServerOn(std::string &hostName, int &port)
 {
   httplib::Client cli(hostName, port);
-  while (cli.is_socket_open());
-  if (auto response = cli.Get("/info/")) 
+  while (cli.is_socket_open())
+    ;
+  if (auto response = cli.Get("/info/"))
   {
     return true;
   }
@@ -82,10 +83,11 @@ void mitk::MonaiLabelTool::DoUpdatePreview(const Image *inputAtTimeStep,
 {
   std::string &hostName = m_RequestParameters->hostName;
   int port = m_RequestParameters->port;
-  if (!IsMonaiServerOn(hostName, port))
-  {
-    mitkThrow() << m_SERVER_503_ERROR_TEXT;
-  }
+  if (!m_TEST)
+    if (!IsMonaiServerOn(hostName, port))
+    {
+      mitkThrow() << m_SERVER_503_ERROR_TEXT;
+    }
   std::string inDir, outDir, inputImagePath, outputImagePath;
   inDir = IOUtil::CreateTemporaryDirectory("monai-in-XXXXXX", this->GetMitkTempDir());
   std::ofstream tmpStream;
@@ -97,9 +99,9 @@ void mitk::MonaiLabelTool::DoUpdatePreview(const Image *inputAtTimeStep,
   outDir = IOUtil::CreateTemporaryDirectory("monai-out-XXXXXX", this->GetMitkTempDir());
   outputImagePath = outDir + IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";
 
- 
   try
   {
+    m_IsLastSuccess = false;
     if (!m_TEST)
     {
       IOUtil::Save(inputAtTimeStep, inputImagePath);
@@ -120,39 +122,45 @@ void mitk::MonaiLabelTool::DoUpdatePreview(const Image *inputAtTimeStep,
     }
 
     Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
-    auto m_OutputBuffer = mitk::LabelSetImage::New();
-    m_OutputBuffer->InitializeByLabeledImage(outputImage);
-    m_OutputBuffer->SetGeometry(inputAtTimeStep->GetGeometry());
-    MITK_INFO << m_OutputBuffer->GetNumberOfLabels();
+    auto outputBuffer = mitk::LabelSetImage::New();
+    outputBuffer->InitializeByLabeledImage(outputImage);
+    outputBuffer->SetGeometry(inputAtTimeStep->GetGeometry());
 
     std::map<std::string, int> labelMap = m_ResultMetadata["label_names"];
-    std::map<int, std::string> flippedLabelMap;
-
-    for (auto const &[key, val] : labelMap)
-    {
-      flippedLabelMap[val] = key;
-    }
-    int labelId = 0;
-    for (auto const &[key, val] : flippedLabelMap)
-    {
-      mitk::Label *labelptr = m_OutputBuffer->GetLabel(labelId, 0);
-      if (nullptr != labelptr)
-      {
-        MITK_INFO << "Replacing label with name: " << labelptr->GetName() << " as " << val;
-        labelptr->SetName(val);
-      }
-      else
-      {
-        MITK_INFO << "nullptr found for " << val;
-      }
-      labelId++;
-    }
-    TransferLabelSetImageContent(m_OutputBuffer, previewImage, timeStep);
+    MapLabelsToSegmentation(outputBuffer, labelMap);
+    TransferLabelSetImageContent(outputBuffer, previewImage, timeStep);
+    this->SetIsLastSuccess(true);
   }
   catch (const mitk::Exception &e)
   {
+    m_IsLastSuccess = false;
     MITK_ERROR << e.GetDescription();
     mitkThrow() << e.GetDescription();
+  }
+}
+
+void mitk::MonaiLabelTool::MapLabelsToSegmentation(mitk::LabelSetImage::Pointer outputBuffer,
+                                                   std::map<std::string, int> &labelMap)
+{
+  std::map<int, std::string> flippedLabelMap;
+  for (auto const &[key, val] : labelMap)
+  {
+    flippedLabelMap[val] = key;
+  }
+  int labelId = 0;
+  for (auto const &[key, val] : flippedLabelMap)
+  {
+    mitk::Label *labelptr = outputBuffer->GetLabel(labelId, 0);
+    if (nullptr != labelptr)
+    {
+      MITK_INFO << "Replacing label with name: " << labelptr->GetName() << " as " << val;
+      labelptr->SetName(val);
+    }
+    else
+    {
+      MITK_INFO << "nullptr found for " << val;
+    }
+    labelId++;
   }
 }
 
@@ -164,7 +172,7 @@ void mitk::MonaiLabelTool::GetOverallInfo(std::string &hostName, int &port)
     Tool::ErrorMessage.Send(m_SERVER_503_ERROR_TEXT);
     mitkThrow() << m_SERVER_503_ERROR_TEXT;
   }
-  httplib::Client cli(hostName, port); // httplib::Client cli("localhost", 8000);  
+  httplib::Client cli(hostName, port); // httplib::Client cli("localhost", 8000);
   if (auto response = cli.Get("/info/"))
   {
     if (response->status == 200)
@@ -185,18 +193,18 @@ void mitk::MonaiLabelTool::GetOverallInfo(std::string &hostName, int &port)
   }
   else
   {
-    Tool::ErrorMessage.Send(httplib::to_string(response.error())+" error occured.");
+    Tool::ErrorMessage.Send(httplib::to_string(response.error()) + " error occured.");
   }
 }
 
 void mitk::MonaiLabelTool::PostInferRequest(std::string &hostName,
-                                                   int &port,
-                                                   std::string &filePath,
-                                                   std::string &outFile)
+                                            int &port,
+                                            std::string &filePath,
+                                            std::string &outFile)
 {
   // std::string url = "http://localhost:8000/infer/deepedit_seg"; // + m_ModelName;
   std::string &modelName = m_RequestParameters->model.name; // Get this from args as well.
-  std::string postPath = "/infer/"; // make this separate class of constants
+  std::string postPath = "/infer/";                         // make this separate class of constants
   postPath.append(modelName);
 
   // std::string filePath = "C:/DKFZ/MONAI_work/monai_test_python/la_030.nii.gz";
@@ -211,12 +219,13 @@ void mitk::MonaiLabelTool::PostInferRequest(std::string &hostName,
 
   httplib::MultipartFormDataItems items = {
     {"file", buffer_lf_img.str(), "post_from_mitk.nii.gz", "application/octet-stream"}};
-  // httplib::MultipartFormDataMap itemMap = {{"file", {"file", buffer_lf_img.str(), "spleen_58.nii.gz", "application/octet-stream"}}};
+  // httplib::MultipartFormDataMap itemMap = {{"file", {"file", buffer_lf_img.str(), "spleen_58.nii.gz",
+  // "application/octet-stream"}}};
 
   httplib::Client cli(hostName, port);
-  cli.set_read_timeout(60);
-  if (auto response = cli.Post(postPath, items)) //auto response = cli.Post("/infer/deepedit_seg", items);
-  { 
+  cli.set_read_timeout(60); // arbitary 1 minute time-out to avoid corner cases.
+  if (auto response = cli.Post(postPath, items)) // cli.Post("/infer/deepedit_seg", items);
+  {
     if (response->status == 200)
     {
       // Find boundary
@@ -270,6 +279,7 @@ void mitk::MonaiLabelTool::PostInferRequest(std::string &hostName,
     }
   }
 }
+
 std::vector<std::string> mitk::MonaiLabelTool::getPartsBetweenBoundary(const std::string &body,
                                                                        const std::string &boundary)
 {

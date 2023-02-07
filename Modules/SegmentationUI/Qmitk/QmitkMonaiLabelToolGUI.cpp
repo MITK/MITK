@@ -92,18 +92,27 @@ void QmitkMonaiLabelToolGUI::OnPreviewBtnClicked()
   auto tool = this->GetConnectedToolAs<mitk::MonaiLabelTool>();
   if (nullptr != tool)
   {
-    if (false)
+    bool test = false;
+    if (!test)
     {
       std::string selectedModel = m_Controls.modelBox->currentText().toStdString();
       for (const mitk::MonaiModelInfo &modelObject : tool->m_InfoParameters->models)
       {
         if (modelObject.name == selectedModel)
         {
-          tool->m_RequestParameters = std::make_unique<mitk::MonaiLabelRequest>();
-          tool->m_RequestParameters->model = modelObject;
-          tool->m_RequestParameters->hostName = tool->m_InfoParameters->hostName;
-          tool->m_RequestParameters->port = tool->m_InfoParameters->port;
-          MITK_INFO << "tool found" << selectedModel;
+          auto requestObject = std::make_unique<mitk::MonaiLabelRequest>();
+          requestObject->model = modelObject;
+          requestObject->hostName = tool->m_InfoParameters->hostName;
+          requestObject->port = tool->m_InfoParameters->port;
+          if (!m_FirstPreviewComputation && tool->GetIsLastSuccess() && *requestObject == *(tool->m_RequestParameters))
+          {
+            MITK_INFO << "won't do segmentation...";
+            return;
+          }
+          else
+          {
+            tool->m_RequestParameters = std::move(requestObject);
+          }
           break;
         }
       }
@@ -121,27 +130,14 @@ void QmitkMonaiLabelToolGUI::OnPreviewBtnClicked()
     try
     {
       tool->UpdatePreview();
+      m_FirstPreviewComputation = false;
+      this->SetLabelSetPreview(tool->GetPreviewSegmentation());
+      tool->IsTimePointChangeAwareOn();
+      this->ActualizePreviewLabelVisibility();
     }
-    catch (const mitk::Exception &e)
+    catch (...)
     {
-      MITK_ERROR << "Connection error"; // Add GUI msg box to show
+      MITK_ERROR << "Connection error"; //This catch is never reached when exception is thrown in UpdatePreview method
     }
-    mitk::LabelSetImage *temp = tool->GetPreviewSegmentation();
-    for (int i = 0; i < temp->GetNumberOfLabels(); ++i)
-    {
-      mitk::Label *labelptr = temp->GetLabel(i, 0);
-      if (nullptr != labelptr)
-      {
-        MITK_INFO << "Label with name: " << labelptr->GetName();
-      }
-      else
-      {
-        MITK_INFO << "nullptr found for " << i;
-      }
-    }
-
-    this->SetLabelSetPreview(tool->GetPreviewSegmentation());
-    tool->IsTimePointChangeAwareOn();
-    this->ActualizePreviewLabelVisibility();
   }
 }

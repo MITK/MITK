@@ -36,6 +36,15 @@ namespace mitk
     int dimension;
     std::string description;
     std::unordered_map<bool, std::string> config; //TODO: find the full extent
+
+    inline bool operator==(const MonaiModelInfo &rhs) const
+    {
+      if (this->name == rhs.name && this->type == rhs.type) // Comparing only name and type, for now.
+      {
+        return true;
+      }
+      return false;
+    }
   };
 
   struct MonaiAppMetadata
@@ -50,12 +59,23 @@ namespace mitk
     std::vector<MonaiModelInfo> models;
   };
 
+  /**
+  * Parameters that goes into infer POST
+  */
   struct MonaiLabelRequest
   {
-    /*Parameters that goes into infer POST*/
     MonaiModelInfo model;
     std::string hostName;
     int port;
+
+    inline bool operator==(const MonaiLabelRequest &rhs) const
+    { 
+      if (this->model == rhs.model && this->hostName == rhs.hostName && this->port == rhs.port)
+      {
+        return true;
+      }
+      return false;
+    }
   };
 
 
@@ -86,6 +106,8 @@ namespace mitk
     itkGetConstMacro(URL, std::string);
     itkSetMacro(MitkTempDir, std::string);
     itkGetConstMacro(MitkTempDir, std::string);
+    itkSetMacro(IsLastSuccess, bool);
+    itkGetConstMacro(IsLastSuccess, bool);
 
   protected:
     MonaiLabelTool();
@@ -96,7 +118,9 @@ namespace mitk
     std::string m_MitkTempDir;
     std::vector<std::string> getPartsBetweenBoundary(const std::string &, const std::string &);
     std::unique_ptr<MonaiAppMetadata> mitk::MonaiLabelTool::DataMapper(nlohmann::json&);
+    void MapLabelsToSegmentation(mitk::LabelSetImage::Pointer, std::map<std::string, int> &);
     bool IsMonaiServerOn(std::string &, int &);
+    bool m_IsLastSuccess = false;
     std::string m_ModelName;
     std::string m_URL;
     nlohmann::json m_ResultMetadata;

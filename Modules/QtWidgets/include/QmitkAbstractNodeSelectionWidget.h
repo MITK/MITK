@@ -167,10 +167,20 @@ protected:
   virtual void OnNodeAddedToStorage(const mitk::DataNode* node);
 
   /** Method is called when a node is removed from the storage. The removed node is passed as
-  *   variable. This member is called directly before the node will be removed from the current selection if
-  *   he was a part. Default implementation does nothing.
+  *   variable. This member is called directly before the node will be removed from the current selection.
+  *   Default implementation does nothing.
+  *   Derived widgets can override the method if they want to handle to-be-removed nodes before.
   */
   virtual void OnNodeRemovedFromStorage(const mitk::DataNode* node);
+
+  /** Method is called when a node is modified. The modified node is passed as 'caller' variable.
+  *   Default implementation handles changes that are related to the node predicate:
+  *             - If the node does not fit the node predicate anymore, it will be removed.
+  *             - If the node was part of the external selection and now fits the node predicate,
+  *               a new selection is compiled and emitted.
+  *   Derived widgets can override the method if they want to react on modified nodes.
+  */
+  virtual void OnNodeModified(const itk::Object* caller, const itk::EventObject& event);
 
   /** Method is called if the internal selection has changed. It will call following methods, that can be overriden to change
   *   behavior in derived classes:
@@ -234,8 +244,6 @@ private:
   Derived classes can override OnNodeRemovedFromStorage() to react on the fact that a node might be removed and
   their selection might change, because the removed node is part of there selection.*/
   void NodeRemovedFromStorage(const mitk::DataNode* node);
-
-  void OnNodeModified(const itk::Object * /*caller*/, const itk::EventObject &);
 
   void AddNodeObserver(mitk::DataNode* node);
   void RemoveNodeObserver(mitk::DataNode* node);

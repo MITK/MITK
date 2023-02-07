@@ -11,12 +11,18 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkMxNMultiWidget.h"
-#include "QmitkRenderWindowWidget.h"
 
 // mitk core
 #include <mitkDisplayActionEventFunctions.h>
 #include <mitkDisplayActionEventHandlerDesynchronized.h>
 #include <mitkDisplayActionEventHandlerSynchronized.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateProperty.h>
+
+// mitk qt widget
+#include <QmitkRenderWindowUtilityWidget.h>
+#include <QmitkRenderWindowWidget.h>
 
 // qt
 #include <QGridLayout>
@@ -27,6 +33,7 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
                                          const QString& multiWidgetName/* = "mxnmulti"*/)
   : QmitkAbstractMultiWidget(parent, f, multiWidgetName)
   , m_TimeNavigationController(nullptr)
+  , m_SynchronizedWidgetConnector(std::make_unique<QmitkSynchronizedWidgetConnector>())
   , m_CrosshairVisibility(false)
 {
   m_TimeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
@@ -50,6 +57,8 @@ void QmitkMxNMultiWidget::InitializeMultiWidget()
   {
     displayActionEventHandler->InitActions();
   }
+
+  this->SetInitialSelection();
 }
 
 void QmitkMxNMultiWidget::Synchronize(bool synchronized)
@@ -374,11 +383,22 @@ void QmitkMxNMultiWidget::CreateRenderWindowWidget()
 {
   // create the render window widget and connect signal / slot
   QString renderWindowWidgetName = GetNameFromIndex(GetNumberOfRenderWindowWidgets());
-  RenderWindowWidgetPointer renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage(), true);
+  RenderWindowWidgetPointer renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage());
   renderWindowWidget->SetCornerAnnotationText(renderWindowWidgetName.toStdString());
   AddRenderWindowWidget(renderWindowWidgetName, renderWindowWidget);
 
   auto renderWindow = renderWindowWidget->GetRenderWindow();
+
+  QmitkRenderWindowUtilityWidget* utilityWidget = new QmitkRenderWindowUtilityWidget(this, renderWindow, GetDataStorage());
+  renderWindowWidget->AddUtilityWidget(utilityWidget);
+
+  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::SynchronizationToggled,
+    this, &QmitkMxNMultiWidget::ToggleSynchronization);
+
+  // needs to be done after 'QmitkRenderWindowUtilityWidget::ToggleSynchronization' has been connected
+  // initially synchronize the node selection widget
+  utilityWidget->ToggleSynchronization(true);
+
   auto layoutManager = GetMultiWidgetLayoutManager();
   connect(renderWindow, &QmitkRenderWindow::LayoutDesignChanged, layoutManager, &QmitkMultiWidgetLayoutManager::SetLayoutDesign);
   connect(renderWindow, &QmitkRenderWindow::ResetView, this, &QmitkMxNMultiWidget::ResetCrosshair);
@@ -389,4 +409,40 @@ void QmitkMxNMultiWidget::CreateRenderWindowWidget()
   m_TimeNavigationController->ConnectGeometryTimeEvent(renderWindow->GetSliceNavigationController());
   // reverse connection between the render window's slice navigation controller and the time navigation controller
   renderWindow->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController);
+}
+
+void QmitkMxNMultiWidget::SetInitialSelection()
+{
+  auto dataStorage = this->GetDataStorage();
+  if (nullptr == dataStorage)
+  {
+    return;
+  }
+
+  mitk::NodePredicateAnd::Pointer noHelperObjects = mitk::NodePredicateAnd::New();
+  noHelperObjects->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
+  noHelperObjects->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
+  auto allNodes = dataStorage->GetSubset(noHelperObjects);
+  QmitkSynchronizedNodeSelectionWidget::NodeList currentSelection;
+  for (auto& node : *allNodes)
+  {
+    currentSelection.append(node);
+  }
+
+  m_SynchronizedWidgetConnector->ChangeSelection(currentSelection);
+}
+
+void QmitkMxNMultiWidget::ToggleSynchronization(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget)
+{
+  bool synchronized = synchronizedWidget->IsSynchronized();
+
+  if (synchronized)
+  {
+    m_SynchronizedWidgetConnector->ConnectWidget(synchronizedWidget);
+    m_SynchronizedWidgetConnector->SynchronizeWidget(synchronizedWidget);
+  }
+  else
+  {
+    m_SynchronizedWidgetConnector->DisconnectWidget(synchronizedWidget);
+  }
 }

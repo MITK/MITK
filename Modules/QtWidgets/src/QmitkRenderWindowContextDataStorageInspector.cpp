@@ -33,7 +33,6 @@ QmitkRenderWindowContextDataStorageInspector::QmitkRenderWindowContextDataStorag
 
   mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer{ renderer };
   m_RenderWindowLayerController = std::make_unique<mitk::RenderWindowLayerController>();
-  m_RenderWindowLayerController->SetControlledRenderer(controlledRenderer);
 
   m_StorageModel = std::make_unique<QmitkRenderWindowDataStorageTreeModel>(this);
   m_StorageModel->SetControlledRenderer(controlledRenderer);
@@ -114,12 +113,6 @@ void QmitkRenderWindowContextDataStorageInspector::SetUpConnections()
 void QmitkRenderWindowContextDataStorageInspector::ModelRowsInserted(const QModelIndex& parent, int /*start*/, int /*end*/)
 {
   m_Controls.renderWindowTreeView->setExpanded(parent, true);
-}
-
-void QmitkRenderWindowContextDataStorageInspector::ResetRenderer()
-{
-  m_RenderWindowLayerController->ResetRenderer(true, m_StorageModel->GetCurrentRenderer());
-  m_Controls.renderWindowTreeView->clearSelection();
 }
 
 void QmitkRenderWindowContextDataStorageInspector::OnContextMenuRequested(const QPoint& pos)

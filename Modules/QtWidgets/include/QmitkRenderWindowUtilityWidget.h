@@ -13,16 +13,14 @@ found in the LICENSE file.
 #ifndef QmitkRenderWindowUtilityWidget_h
 #define QmitkRenderWindowUtilityWidget_h
 
-// qt widgets module
 #include "MitkQtWidgetsExports.h"
-#include "QmitkSliceNavigationWidget.h"
-#include "QmitkStepperAdapter.h"
-#include "QmitkRenderWindow.h"
-#include "QmitkRenderWindowContextDataStorageInspector.h"
-#include "mitkRenderWindowViewDirectionController.h"
 
-// mitk core
-#include "mitkDataStorage.h"
+// qt widgets module
+#include <QmitkSynchronizedNodeSelectionWidget.h>
+#include <QmitkSliceNavigationWidget.h>
+#include <QmitkStepperAdapter.h>
+#include <mitkRenderWindowLayerController.h>
+#include <mitkRenderWindowViewDirectionController.h>
 
 // qt
 #include <QWidget>
@@ -30,11 +28,19 @@ found in the LICENSE file.
 #include <QMenuBar>
 #include <QComboBox>
 
+namespace mitk
+{
+  class DataStorage;
+}
+
+class QmitkRenderWindow;
+
 class MITKQTWIDGETS_EXPORT QmitkRenderWindowUtilityWidget : public QWidget
 {
 	Q_OBJECT
 
 public:
+
   QmitkRenderWindowUtilityWidget(
     QWidget* parent = nullptr,
     QmitkRenderWindow* renderWindow = nullptr,
@@ -43,28 +49,26 @@ public:
 
   ~QmitkRenderWindowUtilityWidget() override;
 
-  void SetInvertedSliceNavigation(bool inverted);
+  void ToggleSynchronization(bool synchronized);
+
+  void SetGeometry(const itk::EventObject& event);
 
 Q_SIGNALS:
 
-  void ReinitAction(QList<mitk::DataNode::Pointer> selectedNodes);
-  void ResetAction(QList<mitk::DataNode::Pointer> selectedNodes);
+  void SynchronizationToggled(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget);
 
 private:
 
-  QHBoxLayout* m_Layout;
-  QMenuBar* m_MenuBar;
-
-  QmitkRenderWindow* m_RenderWindow;
-  mitk::DataStorage* m_DataStorage;
-
-  QmitkRenderWindowContextDataStorageInspector* m_RenderWindowInspector;
+  mitk::BaseRenderer* m_BaseRenderer;
+  QmitkSynchronizedNodeSelectionWidget* m_NodeSelectionWidget;
   QmitkSliceNavigationWidget* m_SliceNavigationWidget;
   QmitkStepperAdapter* m_StepperAdapter;
+  std::unique_ptr<mitk::RenderWindowLayerController> m_RenderWindowLayerController;
   std::unique_ptr<mitk::RenderWindowViewDirectionController> m_RenderWindowViewDirectionController;
   QComboBox* m_ViewDirectionSelector;
 
   void ChangeViewDirection(const QString& viewDirection);
+
 };
 
 #endif

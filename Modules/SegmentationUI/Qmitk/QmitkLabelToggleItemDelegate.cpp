@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <QPainter>
 #include <QMouseEvent>
 
-QmitkLabelToggleItemDelegate::QmitkLabelToggleItemDelegate(const QIcon& onIcon, const QIcon& offIcon, QObject * /*parent*/) : m_OnIcon(onIcon), m_OffIcon(offIcon)
+QmitkLabelToggleItemDelegate::QmitkLabelToggleItemDelegate(const QIcon& onIcon, const QIcon& offIcon, QObject * parent) : QStyledItemDelegate(parent), m_OnIcon(onIcon), m_OffIcon(offIcon)
 {
 }
 
@@ -28,9 +28,6 @@ void QmitkLabelToggleItemDelegate::paint(QPainter *painter, const QStyleOptionVi
 
   if (data.canConvert<bool>())
   {
-    //if (option.state & QStyle::State_Selected)
-    //  painter->fillRect(option.rect, option.palette.highlight());
-
     if (data.toBool())
     {
       m_OnIcon.paint(painter, option.rect);
@@ -44,6 +41,12 @@ void QmitkLabelToggleItemDelegate::paint(QPainter *painter, const QStyleOptionVi
   {
     QStyledItemDelegate::paint(painter, option, index);
   }
+}
+
+QSize QmitkLabelToggleItemDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
+{
+  auto defaultSize = QStyledItemDelegate::sizeHint(option, index);
+  return QSize(defaultSize.height(), defaultSize.height());
 }
 
 bool QmitkLabelToggleItemDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &,

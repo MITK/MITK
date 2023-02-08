@@ -40,6 +40,11 @@ QmitkMultiLabelSegmentationInspector::QmitkMultiLabelSegmentationInspector(QWidg
   this->m_Controls.view->setItemDelegateForColumn(2, m_ColorItemDelegate);
   this->m_Controls.view->setItemDelegateForColumn(3, m_VisibilityItemDelegate);
 
+  this->m_Controls.view->header()->setSectionResizeMode(0,QHeaderView::Stretch);
+  this->m_Controls.view->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+  this->m_Controls.view->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+  this->m_Controls.view->header()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
+
   connect(m_Model, &QAbstractItemModel::modelReset, this, &QmitkMultiLabelSegmentationInspector::OnModelReset);
   //connect(m_Controls.view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), SLOT(ChangeModelSelection(const QItemSelection&, const QItemSelection&)));
 }

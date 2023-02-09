@@ -46,11 +46,12 @@ QmitkMultiLabelSegmentationInspector::QmitkMultiLabelSegmentationInspector(QWidg
   this->m_Controls.view->header()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
 
   connect(m_Model, &QAbstractItemModel::modelReset, this, &QmitkMultiLabelSegmentationInspector::OnModelReset);
-  //connect(m_Controls.view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), SLOT(ChangeModelSelection(const QItemSelection&, const QItemSelection&)));
+  connect(m_Controls.view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), SLOT(ChangeModelSelection(const QItemSelection&, const QItemSelection&)));
 }
 
 void QmitkMultiLabelSegmentationInspector::Initialize()
 {
+  m_LastValidSelectedLabels = {};
   m_Model->SetSegmentation(m_Segmentation.Lock());
   m_Controls.view->expandAll();
 }
@@ -76,6 +77,7 @@ void QmitkMultiLabelSegmentationInspector::SetMultiLabelSegmentation(mitk::Label
 
 void QmitkMultiLabelSegmentationInspector::OnModelReset()
 {
+  m_LastValidSelectedLabels = {};
 }
 
 bool EqualLabelSelections(const QmitkMultiLabelSegmentationInspector::LabelValueVectorType& selection1, const QmitkMultiLabelSegmentationInspector::LabelValueVectorType& selection2)
@@ -90,15 +92,20 @@ bool EqualLabelSelections(const QmitkMultiLabelSegmentationInspector::LabelValue
   return false;
 }
 
-void QmitkMultiLabelSegmentationInspector::SetSelectedLabels(LabelValueVectorType selectedLabels)
+void QmitkMultiLabelSegmentationInspector::SetSelectedLabels(const LabelValueVectorType& selectedLabels)
 {
-
   bool equal = EqualLabelSelections(this->GetSelectedLabels(), selectedLabels);
   if (equal)
   {
     return;
   }
 
+  this->UpdateSelectionModel(selectedLabels);
+  m_LastValidSelectedLabels = selectedLabels;
+}
+
+void QmitkMultiLabelSegmentationInspector::UpdateSelectionModel(const LabelValueVectorType& selectedLabels)
+{
   // create new selection by retrieving the corresponding indices of the labels
   QItemSelection newCurrentSelection;
   for (const auto& labelID : selectedLabels)
@@ -118,7 +125,7 @@ void QmitkMultiLabelSegmentationInspector::SetSelectedLabel(mitk::LabelSetImage:
   this->SetSelectedLabels({ selectedLabel });
 }
 
-QmitkMultiLabelSegmentationInspector::LabelValueVectorType QmitkMultiLabelSegmentationInspector::GetSelectedLabels() const
+QmitkMultiLabelSegmentationInspector::LabelValueVectorType QmitkMultiLabelSegmentationInspector::GetSelectedLabelsFromSelectionModel() const
 {
   LabelValueVectorType result;
   QModelIndexList selectedIndexes = m_Controls.view->selectionModel()->selectedIndexes();
@@ -133,8 +140,24 @@ QmitkMultiLabelSegmentationInspector::LabelValueVectorType QmitkMultiLabelSegmen
   return result;
 }
 
+QmitkMultiLabelSegmentationInspector::LabelValueVectorType QmitkMultiLabelSegmentationInspector::GetSelectedLabels() const
+{
+  return m_LastValidSelectedLabels;
+}
+
 void QmitkMultiLabelSegmentationInspector::ChangeModelSelection(const QItemSelection& selected, const QItemSelection& deselected)
 {
-  emit CurrentSelectionChanged(GetSelectedLabels());
+  auto internalSelection = GetSelectedLabelsFromSelectionModel();
+  if (internalSelection.empty())
+  {
+    //empty selections are not allowed by UI interactions, there should always be at least on label selected.
+    //but selections are e.g. also cleared if the model is updated (e.g. due to addition of labels)
+    UpdateSelectionModel(m_LastValidSelectedLabels);
+  }
+  else
+  {
+    m_LastValidSelectedLabels = internalSelection;
+    emit CurrentSelectionChanged(GetSelectedLabels());
+  }
 }
 

@@ -66,7 +66,7 @@ public Q_SLOTS:
   *
   * @param selectedNodes A list of data nodes that should be newly selected.
   */
-  void SetSelectedLabels(LabelValueVectorType selectedLabels);
+  void SetSelectedLabels(const LabelValueVectorType& selectedLabels);
   void SetSelectedLabel(mitk::LabelSetImage::LabelValueType selectedLabel);
 
 protected:
@@ -76,12 +76,15 @@ protected:
   QmitkMultiLabelSegmentationTreeModel* m_Model;
   mitk::WeakPointer<mitk::LabelSetImage> m_Segmentation;
 
+  LabelValueVectorType m_LastValidSelectedLabels;
   QStyledItemDelegate* m_LockItemDelegate;
   QStyledItemDelegate* m_ColorItemDelegate;
   QStyledItemDelegate* m_VisibilityItemDelegate;
 
   Ui_QmitkMultiLabelSegmentationInspector m_Controls;
 
+  LabelValueVectorType GetSelectedLabelsFromSelectionModel() const;
+  void UpdateSelectionModel(const LabelValueVectorType& selectedLabels);
 private Q_SLOTS:
   /**
   * @brief Transform a labels selection into a data node list and emit the 'CurrentSelectionChanged'-signal.

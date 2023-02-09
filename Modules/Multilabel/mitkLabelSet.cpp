@@ -142,8 +142,8 @@ void mitk::LabelSet::AddLabel(mitk::Label *label, bool addAsClone)
   command->SetCallbackFunction(this, &LabelSet::OnLabelModified);
   newLabel->AddObserver(itk::ModifiedEvent(), command);
 
-  SetActiveLabel(newLabel->GetValue());
   AddLabelEvent.Send(newLabel->GetValue());
+  SetActiveLabel(newLabel->GetValue());
   Modified();
 }
 

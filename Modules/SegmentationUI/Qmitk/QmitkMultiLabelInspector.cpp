@@ -10,19 +10,19 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <QmitkMultiLabelSegmentationInspector.h>
+#include <QmitkMultiLabelInspector.h>
 
-#include <QmitkMultiLabelSegmentationTreeModel.h>
+#include <QmitkMultiLabelTreeModel.h>
 #include <QmitkLabelColorItemDelegate.h>
 #include <QmitkLabelToggleItemDelegate.h>
 #include <QmitkStyleManager.h>
 
-QmitkMultiLabelSegmentationInspector::QmitkMultiLabelSegmentationInspector(QWidget* parent/* = nullptr*/)
+QmitkMultiLabelInspector::QmitkMultiLabelInspector(QWidget* parent/* = nullptr*/)
   : QWidget(parent)
 {
   m_Controls.setupUi(this);
 
-  m_Model = new QmitkMultiLabelSegmentationTreeModel(this);
+  m_Model = new QmitkMultiLabelTreeModel(this);
 
   m_Controls.view->setModel(m_Model);
 
@@ -45,28 +45,28 @@ QmitkMultiLabelSegmentationInspector::QmitkMultiLabelSegmentationInspector(QWidg
   this->m_Controls.view->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
   this->m_Controls.view->header()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
 
-  connect(m_Model, &QAbstractItemModel::modelReset, this, &QmitkMultiLabelSegmentationInspector::OnModelReset);
+  connect(m_Model, &QAbstractItemModel::modelReset, this, &QmitkMultiLabelInspector::OnModelReset);
   connect(m_Controls.view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), SLOT(ChangeModelSelection(const QItemSelection&, const QItemSelection&)));
 }
 
-void QmitkMultiLabelSegmentationInspector::Initialize()
+void QmitkMultiLabelInspector::Initialize()
 {
   m_LastValidSelectedLabels = {};
   m_Model->SetSegmentation(m_Segmentation.Lock());
   m_Controls.view->expandAll();
 }
 
-void QmitkMultiLabelSegmentationInspector::SetSelectionMode(SelectionMode mode)
+void QmitkMultiLabelInspector::SetSelectionMode(SelectionMode mode)
 {
   m_Controls.view->setSelectionMode(mode);
 }
 
-QmitkMultiLabelSegmentationInspector::SelectionMode QmitkMultiLabelSegmentationInspector::GetSelectionMode() const
+QmitkMultiLabelInspector::SelectionMode QmitkMultiLabelInspector::GetSelectionMode() const
 {
   return m_Controls.view->selectionMode();
 }
 
-void QmitkMultiLabelSegmentationInspector::SetMultiLabelSegmentation(mitk::LabelSetImage* segmentation)
+void QmitkMultiLabelInspector::SetMultiLabelSegmentation(mitk::LabelSetImage* segmentation)
 {
   if (segmentation != m_Segmentation.Lock())
   {
@@ -75,12 +75,12 @@ void QmitkMultiLabelSegmentationInspector::SetMultiLabelSegmentation(mitk::Label
   }
 }
 
-void QmitkMultiLabelSegmentationInspector::OnModelReset()
+void QmitkMultiLabelInspector::OnModelReset()
 {
   m_LastValidSelectedLabels = {};
 }
 
-bool EqualLabelSelections(const QmitkMultiLabelSegmentationInspector::LabelValueVectorType& selection1, const QmitkMultiLabelSegmentationInspector::LabelValueVectorType& selection2)
+bool EqualLabelSelections(const QmitkMultiLabelInspector::LabelValueVectorType& selection1, const QmitkMultiLabelInspector::LabelValueVectorType& selection2)
 {
   if (selection1.size() == selection2.size())
   {
@@ -92,7 +92,7 @@ bool EqualLabelSelections(const QmitkMultiLabelSegmentationInspector::LabelValue
   return false;
 }
 
-void QmitkMultiLabelSegmentationInspector::SetSelectedLabels(const LabelValueVectorType& selectedLabels)
+void QmitkMultiLabelInspector::SetSelectedLabels(const LabelValueVectorType& selectedLabels)
 {
   bool equal = EqualLabelSelections(this->GetSelectedLabels(), selectedLabels);
   if (equal)
@@ -104,13 +104,13 @@ void QmitkMultiLabelSegmentationInspector::SetSelectedLabels(const LabelValueVec
   m_LastValidSelectedLabels = selectedLabels;
 }
 
-void QmitkMultiLabelSegmentationInspector::UpdateSelectionModel(const LabelValueVectorType& selectedLabels)
+void QmitkMultiLabelInspector::UpdateSelectionModel(const LabelValueVectorType& selectedLabels)
 {
   // create new selection by retrieving the corresponding indices of the labels
   QItemSelection newCurrentSelection;
   for (const auto& labelID : selectedLabels)
   {
-    QModelIndexList matched = m_Model->match(m_Model->index(0, 0), QmitkMultiLabelSegmentationTreeModel::ItemModelRole::LabelValueRole, QVariant(labelID), 1, Qt::MatchRecursive);
+    QModelIndexList matched = m_Model->match(m_Model->index(0, 0), QmitkMultiLabelTreeModel::ItemModelRole::LabelValueRole, QVariant(labelID), 1, Qt::MatchRecursive);
     if (!matched.empty())
     {
       newCurrentSelection.select(matched.front(), matched.front());
@@ -120,18 +120,18 @@ void QmitkMultiLabelSegmentationInspector::UpdateSelectionModel(const LabelValue
   m_Controls.view->selectionModel()->select(newCurrentSelection, QItemSelectionModel::ClearAndSelect);
 }
 
-void QmitkMultiLabelSegmentationInspector::SetSelectedLabel(mitk::LabelSetImage::LabelValueType selectedLabel)
+void QmitkMultiLabelInspector::SetSelectedLabel(mitk::LabelSetImage::LabelValueType selectedLabel)
 {
   this->SetSelectedLabels({ selectedLabel });
 }
 
-QmitkMultiLabelSegmentationInspector::LabelValueVectorType QmitkMultiLabelSegmentationInspector::GetSelectedLabelsFromSelectionModel() const
+QmitkMultiLabelInspector::LabelValueVectorType QmitkMultiLabelInspector::GetSelectedLabelsFromSelectionModel() const
 {
   LabelValueVectorType result;
   QModelIndexList selectedIndexes = m_Controls.view->selectionModel()->selectedIndexes();
   for (const auto& index : qAsConst(selectedIndexes))
   {
-    QVariant qvariantDataNode = m_Model->data(index, QmitkMultiLabelSegmentationTreeModel::ItemModelRole::LabelValueRole);
+    QVariant qvariantDataNode = m_Model->data(index, QmitkMultiLabelTreeModel::ItemModelRole::LabelValueRole);
     if (qvariantDataNode.canConvert<mitk::LabelSetImage::LabelValueType>())
     {
       result.push_back(qvariantDataNode.value<mitk::LabelSetImage::LabelValueType>());
@@ -140,12 +140,12 @@ QmitkMultiLabelSegmentationInspector::LabelValueVectorType QmitkMultiLabelSegmen
   return result;
 }
 
-QmitkMultiLabelSegmentationInspector::LabelValueVectorType QmitkMultiLabelSegmentationInspector::GetSelectedLabels() const
+QmitkMultiLabelInspector::LabelValueVectorType QmitkMultiLabelInspector::GetSelectedLabels() const
 {
   return m_LastValidSelectedLabels;
 }
 
-void QmitkMultiLabelSegmentationInspector::ChangeModelSelection(const QItemSelection& selected, const QItemSelection& deselected)
+void QmitkMultiLabelInspector::ChangeModelSelection(const QItemSelection& selected, const QItemSelection& deselected)
 {
   auto internalSelection = GetSelectedLabelsFromSelectionModel();
   if (internalSelection.empty())

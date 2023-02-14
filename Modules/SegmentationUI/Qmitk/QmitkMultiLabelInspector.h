@@ -17,21 +17,21 @@ found in the LICENSE file.
 #include <mitkWeakPointer.h>
 
 #include <QWidget>
-#include <QmitkMultiLabelSegmentationTreeModel.h>
-#include "ui_QmitkMultiLabelSegmentationInspector.h"
+#include <QmitkMultiLabelTreeModel.h>
+#include "ui_QmitkMultiLabelInspectorControls.h"
 
-class QmitkMultiLabelSegmentationTreeModel;
+class QmitkMultiLabelTreeModel;
 class QStyledItemDelegate;
 
 /*
 * @brief This is an inspector that offers a simple list view on a data storage.
 */
-class MITKSEGMENTATIONUI_EXPORT QmitkMultiLabelSegmentationInspector : public QWidget
+class MITKSEGMENTATIONUI_EXPORT QmitkMultiLabelInspector : public QWidget
 {
   Q_OBJECT
 
 public:
-  QmitkMultiLabelSegmentationInspector(QWidget* parent = nullptr);
+  QmitkMultiLabelInspector(QWidget* parent = nullptr);
 
   using SelectionMode = QAbstractItemView::SelectionMode;
   void SetSelectionMode(SelectionMode mode);
@@ -73,7 +73,7 @@ protected:
   void Initialize();
   void OnModelReset();
 
-  QmitkMultiLabelSegmentationTreeModel* m_Model;
+  QmitkMultiLabelTreeModel* m_Model;
   mitk::WeakPointer<mitk::LabelSetImage> m_Segmentation;
 
   LabelValueVectorType m_LastValidSelectedLabels;
@@ -81,7 +81,7 @@ protected:
   QStyledItemDelegate* m_ColorItemDelegate;
   QStyledItemDelegate* m_VisibilityItemDelegate;
 
-  Ui_QmitkMultiLabelSegmentationInspector m_Controls;
+  Ui_QmitkMultiLabelInspector m_Controls;
 
   LabelValueVectorType GetSelectedLabelsFromSelectionModel() const;
   void UpdateSelectionModel(const LabelValueVectorType& selectedLabels);

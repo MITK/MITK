@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QmitkMultiLabelSegmentationTreeModel_h
-#define QmitkMultiLabelSegmentationTreeModel_h
+#ifndef QmitkMultiLabelTreeModel_h
+#define QmitkMultiLabelTreeModel_h
 
 #include "mitkLabelSetImage.h"
 
@@ -25,10 +25,10 @@ found in the LICENSE file.
 class QmitkMultiLabelSegTreeItem;
 
 /*!
-\class QmitkMultiLabelSegmentationTreeModel
+\class QmitkMultiLabelTreeModel
 The class is used to represent the information of an MITK MultiLabel segmentation instance (labels, spacial groups...).
 */
-class MITKSEGMENTATIONUI_EXPORT QmitkMultiLabelSegmentationTreeModel : public QAbstractItemModel
+class MITKSEGMENTATIONUI_EXPORT QmitkMultiLabelTreeModel : public QAbstractItemModel
 {
     Q_OBJECT
 
@@ -36,8 +36,8 @@ public:
   using LabelValueType = mitk::LabelSetImage::LabelValueType;
   using SpatialGroupIndexType = mitk::LabelSetImage::SpatialGroupIndexType;
 
-  QmitkMultiLabelSegmentationTreeModel(QObject *parent = nullptr);
-  ~QmitkMultiLabelSegmentationTreeModel() override;
+  QmitkMultiLabelTreeModel(QObject *parent = nullptr);
+  ~QmitkMultiLabelTreeModel() override;
 
   void SetSegmentation(mitk::LabelSetImage* segmentation);
   const mitk::LabelSetImage* GetSegmentation() const;
@@ -105,4 +105,4 @@ private:
   bool m_ShowGroups = true;
 };
 
-#endif // mitkQmitkMultiLabelSegmentationTreeModel_h
+#endif // mitkQmitkMultiLabelTreeModel_h

@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkMultiLabelSegmentationTreeModel.h"
+#include "QmitkMultiLabelTreeModel.h"
 
 #include "mitkImageStatisticsContainerManager.h"
 #include "mitkProportionalTimeGeometry.h"
@@ -103,7 +103,7 @@ public:
 
     auto iter = std::find(root->m_childItems.begin(), root->m_childItems.end(), item);
 
-    if (root->m_childItems.end() == iter) mitkThrow() << "Invalid internal state of QmitkMultiLabelSegmentationTreeModel. Root does not have an item as child that has root as parent.";
+    if (root->m_childItems.end() == iter) mitkThrow() << "Invalid internal state of QmitkMultiLabelTreeModel. Root does not have an item as child that has root as parent.";
 
     return std::distance(root->m_childItems.begin(), iter);
   }
@@ -121,7 +121,7 @@ public:
     }
     if (ItemType::Label == m_ItemType)
     {
-      if (m_childItems.empty()) mitkThrow() << "Invalid internal state of QmitkMultiLabelSegmentationTreeModel. Internal label item has no instance item.";
+      if (m_childItems.empty()) mitkThrow() << "Invalid internal state of QmitkMultiLabelTreeModel. Internal label item has no instance item.";
       return m_childItems[0]->GetLabel();
     }
 
@@ -134,7 +134,7 @@ public:
 
     if (nullptr == label)
     {
-      mitkThrow() << "Invalid internal state of QmitkMultiLabelSegmentationTreeModel. Called GetLabelValue on an group item.";
+      mitkThrow() << "Invalid internal state of QmitkMultiLabelTreeModel. Called GetLabelValue on an group item.";
     }
 
     return label->GetValue();
@@ -148,23 +148,23 @@ public:
 };
 
 
-QmitkMultiLabelSegmentationTreeModel::QmitkMultiLabelSegmentationTreeModel(QObject *parent) : QAbstractItemModel(parent)
+QmitkMultiLabelTreeModel::QmitkMultiLabelTreeModel(QObject *parent) : QAbstractItemModel(parent)
 , m_Observed(false)
 {
   m_RootItem = std::make_unique<QmitkMultiLabelSegTreeItem>();
 }
 
-QmitkMultiLabelSegmentationTreeModel ::~QmitkMultiLabelSegmentationTreeModel()
+QmitkMultiLabelTreeModel ::~QmitkMultiLabelTreeModel()
 {
   this->SetSegmentation(nullptr);
 };
 
-int QmitkMultiLabelSegmentationTreeModel::columnCount(const QModelIndex& /*parent*/) const
+int QmitkMultiLabelTreeModel::columnCount(const QModelIndex& /*parent*/) const
 {
   return 4;
 }
 
-int QmitkMultiLabelSegmentationTreeModel::rowCount(const QModelIndex &parent) const
+int QmitkMultiLabelTreeModel::rowCount(const QModelIndex &parent) const
 {
   if (parent.column() > 0)
     return 0;
@@ -185,7 +185,7 @@ int QmitkMultiLabelSegmentationTreeModel::rowCount(const QModelIndex &parent) co
   return parentItem->m_childItems.size();
 }
 
-QVariant QmitkMultiLabelSegmentationTreeModel::data(const QModelIndex &index, int role) const
+QVariant QmitkMultiLabelTreeModel::data(const QModelIndex &index, int role) const
 {
   if (!index.isValid())
     return QVariant();
@@ -206,7 +206,7 @@ QVariant QmitkMultiLabelSegmentationTreeModel::data(const QModelIndex &index, in
         case QmitkMultiLabelSegTreeItem::ItemType::Label:
         {
           auto label = item->GetLabel();
-          if (nullptr == label) mitkThrow() << "Invalid internal state. QmitkMultiLabelSegmentationTreeModel item is refering to a label that does not exist.";
+          if (nullptr == label) mitkThrow() << "Invalid internal state. QmitkMultiLabelTreeModel item is refering to a label that does not exist.";
           return QVariant(QString::fromStdString(label->GetName()));
         }
         case QmitkMultiLabelSegTreeItem::ItemType::Instance:
@@ -274,7 +274,7 @@ mitk::Color QtToMitk(const QColor& color)
   return mitkColor;
 }
 
-bool QmitkMultiLabelSegmentationTreeModel::setData(const QModelIndex& index, const QVariant& value, int role)
+bool QmitkMultiLabelTreeModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
   if (!index.isValid())
     return false;
@@ -317,7 +317,7 @@ bool QmitkMultiLabelSegmentationTreeModel::setData(const QModelIndex& index, con
   return false;
 }
 
-QModelIndex QmitkMultiLabelSegmentationTreeModel::index(int row, int column, const QModelIndex &parent) const
+QModelIndex QmitkMultiLabelTreeModel::index(int row, int column, const QModelIndex &parent) const
 {
   if (!hasIndex(row, column, parent))
     return QModelIndex();
@@ -334,7 +334,7 @@ QModelIndex QmitkMultiLabelSegmentationTreeModel::index(int row, int column, con
     return QModelIndex();
 }
 
-QModelIndex QmitkMultiLabelSegmentationTreeModel::parent(const QModelIndex &child) const
+QModelIndex QmitkMultiLabelTreeModel::parent(const QModelIndex &child) const
 {
   if (!child.isValid())
     return QModelIndex();
@@ -348,7 +348,7 @@ QModelIndex QmitkMultiLabelSegmentationTreeModel::parent(const QModelIndex &chil
   return createIndex(parentItem->Row(), 0, parentItem);
 }
 
-QModelIndex GetIndexByItem(QmitkMultiLabelSegTreeItem* start, QmitkMultiLabelSegmentationTreeModel* model)
+QModelIndex GetIndexByItem(QmitkMultiLabelSegTreeItem* start, QmitkMultiLabelTreeModel* model)
 {
   QModelIndex parentIndex = QModelIndex();
   if (nullptr != start->m_parentItem)
@@ -363,7 +363,7 @@ QModelIndex GetIndexByItem(QmitkMultiLabelSegTreeItem* start, QmitkMultiLabelSeg
   return model->index(start->Row(), 0, parentIndex);
 }
 
-QmitkMultiLabelSegTreeItem* GetGroupItem(QmitkMultiLabelSegmentationTreeModel::SpatialGroupIndexType groupIndex, QmitkMultiLabelSegTreeItem* root)
+QmitkMultiLabelSegTreeItem* GetGroupItem(QmitkMultiLabelTreeModel::SpatialGroupIndexType groupIndex, QmitkMultiLabelSegTreeItem* root)
 {
   if (nullptr != root && groupIndex < root->m_childItems.size())
   {
@@ -373,7 +373,7 @@ QmitkMultiLabelSegTreeItem* GetGroupItem(QmitkMultiLabelSegmentationTreeModel::S
   return nullptr;
 }
 
-QmitkMultiLabelSegTreeItem* GetInstanceItem(QmitkMultiLabelSegmentationTreeModel::LabelValueType labelValue, QmitkMultiLabelSegTreeItem* root)
+QmitkMultiLabelSegTreeItem* GetInstanceItem(QmitkMultiLabelTreeModel::LabelValueType labelValue, QmitkMultiLabelSegTreeItem* root)
 {
   QmitkMultiLabelSegTreeItem* result = nullptr;
 
@@ -406,7 +406,7 @@ QmitkMultiLabelSegTreeItem* GetLabelItemInGroup(const std::string& labelName, Qm
   return nullptr;
 }
 
-Qt::ItemFlags QmitkMultiLabelSegmentationTreeModel::flags(const QModelIndex &index) const
+Qt::ItemFlags QmitkMultiLabelTreeModel::flags(const QModelIndex &index) const
 {
   if (!index.isValid())
     return Qt::NoItemFlags;
@@ -447,7 +447,7 @@ Qt::ItemFlags QmitkMultiLabelSegmentationTreeModel::flags(const QModelIndex &ind
   return Qt::NoItemFlags;
 }
 
-QVariant QmitkMultiLabelSegmentationTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant QmitkMultiLabelTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
   if ((Qt::DisplayRole == role) && (Qt::Horizontal == orientation))
   {
@@ -471,13 +471,13 @@ QVariant QmitkMultiLabelSegmentationTreeModel::headerData(int section, Qt::Orien
   return QVariant();
 }
 
-const mitk::LabelSetImage* QmitkMultiLabelSegmentationTreeModel::GetSegmentation() const
+const mitk::LabelSetImage* QmitkMultiLabelTreeModel::GetSegmentation() const
 {
   return m_Segmentation;
 }
 
 
-void QmitkMultiLabelSegmentationTreeModel::SetSegmentation(mitk::LabelSetImage* segmentation)
+void QmitkMultiLabelTreeModel::SetSegmentation(mitk::LabelSetImage* segmentation)
 {
   if (m_Segmentation != segmentation)
   {
@@ -530,7 +530,7 @@ QmitkMultiLabelSegTreeItem* AddLabelToGroupTree(mitk::Label* label, QmitkMultiLa
   return instanceItem;
 }
 
-void QmitkMultiLabelSegmentationTreeModel::GenerateInternalGroupTree(unsigned int groupID, QmitkMultiLabelSegTreeItem* groupItem)
+void QmitkMultiLabelTreeModel::GenerateInternalGroupTree(unsigned int groupID, QmitkMultiLabelSegTreeItem* groupItem)
 {
   auto labelSet = m_Segmentation->GetLabelSet(groupID);
 
@@ -543,7 +543,7 @@ void QmitkMultiLabelSegmentationTreeModel::GenerateInternalGroupTree(unsigned in
   }
 }
 
-QmitkMultiLabelSegTreeItem* QmitkMultiLabelSegmentationTreeModel::GenerateInternalTree()
+QmitkMultiLabelSegTreeItem* QmitkMultiLabelTreeModel::GenerateInternalTree()
 {
   auto rootItem = new QmitkMultiLabelSegTreeItem();
 
@@ -561,7 +561,7 @@ QmitkMultiLabelSegTreeItem* QmitkMultiLabelSegmentationTreeModel::GenerateIntern
   return rootItem;
 }
 
-void QmitkMultiLabelSegmentationTreeModel::UpdateInternalTree()
+void QmitkMultiLabelTreeModel::UpdateInternalTree()
 {
   emit beginResetModel();
   auto newTree = this->GenerateInternalTree();
@@ -570,52 +570,52 @@ void QmitkMultiLabelSegmentationTreeModel::UpdateInternalTree()
   emit modelChanged();
 }
 
-void QmitkMultiLabelSegmentationTreeModel::AddObserver()
+void QmitkMultiLabelTreeModel::AddObserver()
 {
   if (this->m_Segmentation.IsNotNull())
   {
     if (m_Observed)
     {
-      MITK_DEBUG << "Invalid observer state in QmitkMultiLabelSegmentationTreeModel. There is already a registered observer. Internal logic is not correct. May be an old observer was not removed.";
+      MITK_DEBUG << "Invalid observer state in QmitkMultiLabelTreeModel. There is already a registered observer. Internal logic is not correct. May be an old observer was not removed.";
     }
 
-    this->m_Segmentation->AddLabelAddedListener(mitk::MessageDelegate1<QmitkMultiLabelSegmentationTreeModel, LabelValueType>(
-      this, &QmitkMultiLabelSegmentationTreeModel::OnLabelAdded));
-    this->m_Segmentation->AddLabelModifiedListener(mitk::MessageDelegate1<QmitkMultiLabelSegmentationTreeModel, LabelValueType>(
-      this, &QmitkMultiLabelSegmentationTreeModel::OnLabelModified));
-    this->m_Segmentation->AddLabelRemovedListener(mitk::MessageDelegate1<QmitkMultiLabelSegmentationTreeModel, LabelValueType>(
-      this, &QmitkMultiLabelSegmentationTreeModel::OnLabelRemoved));
-    this->m_Segmentation->AddGroupAddedListener(mitk::MessageDelegate1<QmitkMultiLabelSegmentationTreeModel, SpatialGroupIndexType>(
-      this, &QmitkMultiLabelSegmentationTreeModel::OnGroupAdded));
-    this->m_Segmentation->AddGroupModifiedListener(mitk::MessageDelegate1<QmitkMultiLabelSegmentationTreeModel, SpatialGroupIndexType>(
-      this, &QmitkMultiLabelSegmentationTreeModel::OnGroupModified));
-    this->m_Segmentation->AddGroupRemovedListener(mitk::MessageDelegate1<QmitkMultiLabelSegmentationTreeModel, SpatialGroupIndexType>(
-      this, &QmitkMultiLabelSegmentationTreeModel::OnGroupRemoved));
+    this->m_Segmentation->AddLabelAddedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, LabelValueType>(
+      this, &QmitkMultiLabelTreeModel::OnLabelAdded));
+    this->m_Segmentation->AddLabelModifiedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, LabelValueType>(
+      this, &QmitkMultiLabelTreeModel::OnLabelModified));
+    this->m_Segmentation->AddLabelRemovedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, LabelValueType>(
+      this, &QmitkMultiLabelTreeModel::OnLabelRemoved));
+    this->m_Segmentation->AddGroupAddedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, SpatialGroupIndexType>(
+      this, &QmitkMultiLabelTreeModel::OnGroupAdded));
+    this->m_Segmentation->AddGroupModifiedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, SpatialGroupIndexType>(
+      this, &QmitkMultiLabelTreeModel::OnGroupModified));
+    this->m_Segmentation->AddGroupRemovedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, SpatialGroupIndexType>(
+      this, &QmitkMultiLabelTreeModel::OnGroupRemoved));
     m_Observed = true;
   }
 }
 
-void QmitkMultiLabelSegmentationTreeModel::RemoveObserver()
+void QmitkMultiLabelTreeModel::RemoveObserver()
 {
   if (this->m_Segmentation.IsNotNull())
   {
-    this->m_Segmentation->RemoveLabelAddedListener(mitk::MessageDelegate1<QmitkMultiLabelSegmentationTreeModel, LabelValueType>(
-      this, &QmitkMultiLabelSegmentationTreeModel::OnLabelAdded));
-    this->m_Segmentation->RemoveLabelModifiedListener(mitk::MessageDelegate1<QmitkMultiLabelSegmentationTreeModel, LabelValueType>(
-      this, &QmitkMultiLabelSegmentationTreeModel::OnLabelModified));
-    this->m_Segmentation->RemoveLabelRemovedListener(mitk::MessageDelegate1<QmitkMultiLabelSegmentationTreeModel, LabelValueType>(
-      this, &QmitkMultiLabelSegmentationTreeModel::OnLabelRemoved));
-    this->m_Segmentation->RemoveGroupAddedListener(mitk::MessageDelegate1<QmitkMultiLabelSegmentationTreeModel, SpatialGroupIndexType>(
-      this, &QmitkMultiLabelSegmentationTreeModel::OnGroupAdded));
-    this->m_Segmentation->RemoveGroupModifiedListener(mitk::MessageDelegate1<QmitkMultiLabelSegmentationTreeModel, SpatialGroupIndexType>(
-      this, &QmitkMultiLabelSegmentationTreeModel::OnGroupModified));
-    this->m_Segmentation->RemoveGroupRemovedListener(mitk::MessageDelegate1<QmitkMultiLabelSegmentationTreeModel, SpatialGroupIndexType>(
-      this, &QmitkMultiLabelSegmentationTreeModel::OnGroupRemoved));
+    this->m_Segmentation->RemoveLabelAddedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, LabelValueType>(
+      this, &QmitkMultiLabelTreeModel::OnLabelAdded));
+    this->m_Segmentation->RemoveLabelModifiedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, LabelValueType>(
+      this, &QmitkMultiLabelTreeModel::OnLabelModified));
+    this->m_Segmentation->RemoveLabelRemovedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, LabelValueType>(
+      this, &QmitkMultiLabelTreeModel::OnLabelRemoved));
+    this->m_Segmentation->RemoveGroupAddedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, SpatialGroupIndexType>(
+      this, &QmitkMultiLabelTreeModel::OnGroupAdded));
+    this->m_Segmentation->RemoveGroupModifiedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, SpatialGroupIndexType>(
+      this, &QmitkMultiLabelTreeModel::OnGroupModified));
+    this->m_Segmentation->RemoveGroupRemovedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, SpatialGroupIndexType>(
+      this, &QmitkMultiLabelTreeModel::OnGroupRemoved));
   }
   m_Observed = false;
 }
 
-void QmitkMultiLabelSegmentationTreeModel::OnLabelAdded(LabelValueType labelValue)
+void QmitkMultiLabelTreeModel::OnLabelAdded(LabelValueType labelValue)
 {
   SpatialGroupIndexType groupIndex = 0;
   if (m_Segmentation->IsLabeInGroup(labelValue, groupIndex))
@@ -656,7 +656,7 @@ void QmitkMultiLabelSegmentationTreeModel::OnLabelAdded(LabelValueType labelValu
   }
 }
 
-void QmitkMultiLabelSegmentationTreeModel::OnLabelModified(LabelValueType labelValue)
+void QmitkMultiLabelTreeModel::OnLabelModified(LabelValueType labelValue)
 {
   if (labelValue == m_Segmentation->GetExteriorLabel()->GetValue()) return;
 
@@ -664,7 +664,7 @@ void QmitkMultiLabelSegmentationTreeModel::OnLabelModified(LabelValueType labelV
 
   if (nullptr == instanceItem)
   {
-    mitkThrow() << "Internal invalid state. QmitkMultiLabelSegmentationTreeModel recieved a LabelModified signal for a label that is not represented in the model. Invalid label: " << labelValue;
+    mitkThrow() << "Internal invalid state. QmitkMultiLabelTreeModel recieved a LabelModified signal for a label that is not represented in the model. Invalid label: " << labelValue;
   }
 
   auto labelItem = instanceItem->ParentItem();
@@ -682,12 +682,12 @@ void QmitkMultiLabelSegmentationTreeModel::OnLabelModified(LabelValueType labelV
   }
 }
 
-void QmitkMultiLabelSegmentationTreeModel::OnLabelRemoved(LabelValueType labelValue)
+void QmitkMultiLabelTreeModel::OnLabelRemoved(LabelValueType labelValue)
 {
   if (labelValue == m_Segmentation->GetExteriorLabel()->GetValue()) return;
   auto instanceItem = GetInstanceItem(labelValue, this->m_RootItem.get());
 
-  if (nullptr == instanceItem) mitkThrow() << "Internal invalid state. QmitkMultiLabelSegmentationTreeModel recieved a LabelRemoved signal for a label that is not represented in the model. Invalid label: " << labelValue;
+  if (nullptr == instanceItem) mitkThrow() << "Internal invalid state. QmitkMultiLabelTreeModel recieved a LabelRemoved signal for a label that is not represented in the model. Invalid label: " << labelValue;
 
   auto labelItem = instanceItem->ParentItem();
 
@@ -708,7 +708,7 @@ void QmitkMultiLabelSegmentationTreeModel::OnLabelRemoved(LabelValueType labelVa
   }
 }
 
-void QmitkMultiLabelSegmentationTreeModel::OnGroupAdded(SpatialGroupIndexType groupIndex)
+void QmitkMultiLabelTreeModel::OnGroupAdded(SpatialGroupIndexType groupIndex)
 {
   if (m_ShowGroups)
   {
@@ -721,12 +721,12 @@ void QmitkMultiLabelSegmentationTreeModel::OnGroupAdded(SpatialGroupIndexType gr
   }
 }
 
-void QmitkMultiLabelSegmentationTreeModel::OnGroupModified(SpatialGroupIndexType groupIndex)
+void QmitkMultiLabelTreeModel::OnGroupModified(SpatialGroupIndexType groupIndex)
 {
   //currently not needed
 }
 
-void QmitkMultiLabelSegmentationTreeModel::OnGroupRemoved(SpatialGroupIndexType groupIndex)
+void QmitkMultiLabelTreeModel::OnGroupRemoved(SpatialGroupIndexType groupIndex)
 {
   if (m_ShowGroups)
   {
@@ -737,6 +737,3 @@ void QmitkMultiLabelSegmentationTreeModel::OnGroupRemoved(SpatialGroupIndexType 
   }
 }
 
-//TODO
-//treeview ableiten und selection command überschreiben. soll nur reagieren by labels bzw instancen, wenn es welche gibt
-//und nur in column 0

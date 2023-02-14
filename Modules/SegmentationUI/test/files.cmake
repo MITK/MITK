@@ -1,3 +1,3 @@
 set(MODULE_TESTS
-  QmitkMultiLabelSegmentationTreeModelTest.cpp
+  QmitkMultiLabelTreeModelTest.cpp
 )

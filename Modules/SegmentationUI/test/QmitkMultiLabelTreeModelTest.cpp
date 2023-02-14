@@ -12,14 +12,14 @@ found in the LICENSE file.
 
 #include <QApplication>
 #include <QColor>
-#include "QmitkMultiLabelSegmentationTreeModel.h"
+#include "QmitkMultiLabelTreeModel.h"
 
 #include <mitkTestFixture.h>
 #include <mitkTestingMacros.h>
 
-class QmitkMultiLabelSegmentationTreeModelTestSuite : public mitk::TestFixture
+class QmitkMultiLabelTreeModelTestSuite : public mitk::TestFixture
 {
-  CPPUNIT_TEST_SUITE(QmitkMultiLabelSegmentationTreeModelTestSuite);
+  CPPUNIT_TEST_SUITE(QmitkMultiLabelTreeModelTestSuite);
   MITK_TEST(NullTest);
   MITK_TEST(GetterSetterTest);
   MITK_TEST(AddingLabelTest);
@@ -108,7 +108,7 @@ public:
     delete m_TestApp;
   }
 
-  QModelIndex GetIndex(const QmitkMultiLabelSegmentationTreeModel& model, const std::vector<int>& rows, int column = 0) const
+  QModelIndex GetIndex(const QmitkMultiLabelTreeModel& model, const std::vector<int>& rows, int column = 0) const
   {
     QModelIndex testIndex;
 
@@ -129,7 +129,7 @@ public:
     return testIndex;
   }
 
-  bool CheckModelItem(const QmitkMultiLabelSegmentationTreeModel& model, const std::vector<int>& rows, const QVariant& reference, int column = 0, const mitk::Label* label = nullptr) const
+  bool CheckModelItem(const QmitkMultiLabelTreeModel& model, const std::vector<int>& rows, const QVariant& reference, int column = 0, const mitk::Label* label = nullptr) const
   {
     QModelIndex testIndex = GetIndex(model, rows, column);
 
@@ -141,7 +141,7 @@ public:
     return test;
   }
 
-  bool CheckModelRow(const QmitkMultiLabelSegmentationTreeModel& model, const std::vector<int>& rows, const std::vector<QVariant> references) const
+  bool CheckModelRow(const QmitkMultiLabelTreeModel& model, const std::vector<int>& rows, const std::vector<QVariant> references) const
   {
     int column = 0;
     bool test = true;
@@ -153,7 +153,7 @@ public:
     return test;
   }
 
-  void CheckModelGroup0Default(const QmitkMultiLabelSegmentationTreeModel& model)
+  void CheckModelGroup0Default(const QmitkMultiLabelTreeModel& model)
   {
     CPPUNIT_ASSERT(CheckModelRow(model, { 0 }, { QString("Group 0"), QVariant(), QVariant(), QVariant() }));
     CPPUNIT_ASSERT_EQUAL(3, model.rowCount(GetIndex(model, { 0 })));
@@ -169,13 +169,13 @@ public:
     CPPUNIT_ASSERT_EQUAL(0, model.rowCount(GetIndex(model, { 0,2 })));
   }
 
-  void CheckModelGroup1Default(const QmitkMultiLabelSegmentationTreeModel& model)
+  void CheckModelGroup1Default(const QmitkMultiLabelTreeModel& model)
   {
     CPPUNIT_ASSERT(CheckModelRow(model, { 1 }, { QString("Group 1"), QVariant(), QVariant(), QVariant() }));
     CPPUNIT_ASSERT_EQUAL(0, model.rowCount(GetIndex(model, { 1 })));
   }
 
-  void CheckModelGroup2Default(const QmitkMultiLabelSegmentationTreeModel& model)
+  void CheckModelGroup2Default(const QmitkMultiLabelTreeModel& model)
   {
     CPPUNIT_ASSERT(CheckModelRow(model, { 2 }, { QString("Group 2"), QVariant(), QVariant(), QVariant() }));
     CPPUNIT_ASSERT_EQUAL(1, model.rowCount(GetIndex(model, { 2 })));
@@ -183,7 +183,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(0, model.rowCount(GetIndex(model, { 2,0 })));
   }
 
-  void CheckModelDefault(const QmitkMultiLabelSegmentationTreeModel& model)
+  void CheckModelDefault(const QmitkMultiLabelTreeModel& model)
   {
     CPPUNIT_ASSERT_EQUAL(3, model.rowCount(QModelIndex()));
     CheckModelGroup0Default(model);
@@ -193,14 +193,14 @@ public:
 
   void NullTest()
   {
-    QmitkMultiLabelSegmentationTreeModel model(nullptr);
+    QmitkMultiLabelTreeModel model(nullptr);
 
     CPPUNIT_ASSERT(nullptr == model.GetSegmentation());
   }
 
   void GetterSetterTest()
   {
-    QmitkMultiLabelSegmentationTreeModel model(nullptr);
+    QmitkMultiLabelTreeModel model(nullptr);
     model.SetSegmentation(m_Segmentation);
 
     CheckModelDefault(model);
@@ -212,7 +212,7 @@ public:
 
   void AddingLabelTest()
   {
-    QmitkMultiLabelSegmentationTreeModel model(nullptr);
+    QmitkMultiLabelTreeModel model(nullptr);
     model.SetSegmentation(m_Segmentation);
 
     //Add label instance (not visible) to labelwith multiple instances (at the end)
@@ -286,7 +286,7 @@ public:
 
   void AddingLayerTest()
   {
-    QmitkMultiLabelSegmentationTreeModel model(nullptr);
+    QmitkMultiLabelTreeModel model(nullptr);
     model.SetSegmentation(m_Segmentation);
 
     m_Segmentation->AddLayer();
@@ -301,7 +301,7 @@ public:
 
   void RemovingLabelTest()
   {
-    QmitkMultiLabelSegmentationTreeModel model(nullptr);
+    QmitkMultiLabelTreeModel model(nullptr);
     model.SetSegmentation(m_Segmentation);
     //remove label instance from label with multiple instances (middel)
     m_Segmentation->RemoveLabel(5, 0);
@@ -371,7 +371,7 @@ public:
 
   void RemovingLayerTest()
   {
-    QmitkMultiLabelSegmentationTreeModel model(nullptr);
+    QmitkMultiLabelTreeModel model(nullptr);
     model.SetSegmentation(m_Segmentation);
     //remove group in the middle
     m_Segmentation->SetActiveLayer(1);
@@ -414,7 +414,7 @@ public:
 
   void ModifyLabelNameTest()
   {
-    QmitkMultiLabelSegmentationTreeModel model(nullptr);
+    QmitkMultiLabelTreeModel model(nullptr);
     model.SetSegmentation(m_Segmentation);
     //move from multiple instance to new label in the middle
     auto label = m_Segmentation->GetLabel(5,0);
@@ -498,7 +498,7 @@ public:
 
   void ModifyLabelTest()
   {
-    QmitkMultiLabelSegmentationTreeModel model(nullptr);
+    QmitkMultiLabelTreeModel model(nullptr);
     model.SetSegmentation(m_Segmentation);
 
     auto label = m_Segmentation->GetLabel(9, 2);
@@ -540,4 +540,4 @@ public:
 
 };
 
-MITK_TEST_SUITE_REGISTRATION(QmitkMultiLabelSegmentationTreeModel)
+MITK_TEST_SUITE_REGISTRATION(QmitkMultiLabelTreeModel)

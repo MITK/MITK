@@ -10,17 +10,17 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include <QmitkMultiLabelSegmentationTreeView.h>
+#include <QmitkMultiLabelTreeView.h>
 
-#include <QmitkMultiLabelSegmentationTreeModel.h>
+#include <QmitkMultiLabelTreeModel.h>
 
-QmitkMultiLabelSegmentationTreeView::QmitkMultiLabelSegmentationTreeView(QWidget* parent) : QTreeView(parent)
+QmitkMultiLabelTreeView::QmitkMultiLabelTreeView(QWidget* parent) : QTreeView(parent)
 {
 }
 
-QItemSelectionModel::SelectionFlags QmitkMultiLabelSegmentationTreeView::selectionCommand(const QModelIndex& index, const QEvent* event) const
+QItemSelectionModel::SelectionFlags QmitkMultiLabelTreeView::selectionCommand(const QModelIndex& index, const QEvent* event) const
 {
-  auto value = index.data(QmitkMultiLabelSegmentationTreeModel::ItemModelRole::LabelValueRole);
+  auto value = index.data(QmitkMultiLabelTreeModel::ItemModelRole::LabelValueRole);
   if (index.column()!=0 || !value.isValid())
   {
     return QItemSelectionModel::NoUpdate;

@@ -138,6 +138,11 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
 
     args.push_back("--ml");
 
+    if (this->GetFast())
+    {
+      args.push_back("--fast");
+    }
+
    try
     {
       std::string cudaEnv = "CUDA_VISIBLE_DEVICES=" + std::to_string(this->GetGpuId());

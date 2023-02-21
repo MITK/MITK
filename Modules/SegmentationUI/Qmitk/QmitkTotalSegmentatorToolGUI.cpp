@@ -50,6 +50,7 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
   m_Controls.previewButton->setDisabled(true);
   m_Controls.statusLabel->setTextFormat(Qt::RichText);
   AutoParsePythonPaths();
+  SetGPUInfo();
   if (m_GpuLoader.GetGPUCount() != 0)
   {
     WriteStatusMessage(QString("<b>STATUS: </b><i>Welcome to Total Segmentator tool. You're in luck: " + QString::number(m_GpuLoader.GetGPUCount()) +
@@ -79,6 +80,34 @@ void QmitkTotalSegmentatorToolGUI::EnableWidgets(bool enabled)
   Superclass::EnableWidgets(enabled);
 }
 
+void QmitkTotalSegmentatorToolGUI::SetGPUInfo()
+{
+  std::vector<QmitkGPUSpec> specs = m_GpuLoader.GetAllGPUSpecs();
+  for (const QmitkGPUSpec &gpuSpec : specs)
+  {
+    m_Controls.gpuComboBox->addItem(QString::number(gpuSpec.id) + ": " + gpuSpec.name + " (" + gpuSpec.memory + ")");
+  }
+  if (specs.empty())
+  {
+    m_Controls.gpuComboBox->setEditable(true);
+    m_Controls.gpuComboBox->addItem(QString::number(0));
+    m_Controls.gpuComboBox->setValidator(new QIntValidator(0, 999, this));
+  }
+}
+
+unsigned int QmitkTotalSegmentatorToolGUI::FetchSelectedGPUFromUI()
+{
+  QString gpuInfo = m_Controls.gpuComboBox->currentText();
+  if (m_GpuLoader.GetGPUCount() == 0)
+  {
+    return static_cast<unsigned int>(gpuInfo.toInt());
+  }
+  else
+  {
+    QString gpuId = gpuInfo.split(":", QString::SplitBehavior::SkipEmptyParts).first();
+    return static_cast<unsigned int>(gpuId.toInt());
+  }
+}
 
 void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
 {
@@ -100,7 +129,8 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
                                "python environment or install TotalSegmentator.");
     }
     tool->SetPythonPath(m_PythonPath.toStdString());
-    tool->SetGpuId(0);
+    tool->SetGpuId(FetchSelectedGPUFromUI());
+    tool->SetFast(m_Controls.fastBox->isChecked());
     this->WriteStatusMessage(QString("<b>STATUS: </b><i>Starting Segmentation task... This might take a while.</i>"));
     tool->UpdatePreview();
     m_Controls.previewButton->setEnabled(true);

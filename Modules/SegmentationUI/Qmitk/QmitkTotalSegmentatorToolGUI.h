@@ -65,6 +65,20 @@ protected:
   void WriteErrorMessage(const QString &);
   
   /**
+   * @brief Adds GPU information to the gpu combo box.
+   * In case, there aren't any GPUs avaialble, the combo box will be
+   * rendered editable.
+   */
+  void SetGPUInfo();
+
+  /**
+   * @brief Returns GPU id of the selected GPU from the Combo box.
+   *
+   * @return unsigned int
+   */
+  unsigned int FetchSelectedGPUFromUI();
+
+  /**
    * @brief For storing values like Python path across sessions.
    */
   QSettings m_Settings;

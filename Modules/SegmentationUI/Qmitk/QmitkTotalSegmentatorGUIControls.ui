@@ -68,23 +68,104 @@
        </property>
       </widget>
      </item>
-	 <item row="1" column="0">
-			<widget class="QLabel" name="pythonEnvLabel">
-				<property name="sizePolicy">
-					<sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-						<horstretch>0</horstretch>
-						<verstretch>0</verstretch>
-					</sizepolicy>
-				</property>
-				<property name="text">
-					<string>Python Path:</string>
-				</property>
-			</widget>
-	 </item>
-	 <item row="1" column="1" colspan="3">
-	  <widget class="ctkComboBox" name="pythonEnvComboBox"/>
-	 </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="pythonEnvLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Python Path:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1" colspan="3">
+      <widget class="ctkComboBox" name="pythonEnvComboBox"/>
+     </item>
     </layout>
+   </item>
+   <item>
+    <widget class="ctkCollapsibleGroupBox" name="inputGroupBox" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="title" stdset="0">
+      <string>Advanced</string>
+     </property>
+     <property name="flat" stdset="0">
+      <bool>true</bool>
+     </property>
+     <property name="collapsedHeight" stdset="0">
+      <number>5</number>
+     </property>
+     <property name="collapsed" stdset="0">
+      <bool>true</bool>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <layout class="QGridLayout" name="_2">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <property name="spacing">
+         <number>6</number>
+        </property>
+    
+        <item row="0" column="0">
+         <widget class="QLabel" name="fastLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Fast</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="ctkCheckBox" name="fastBox" native="true">
+          <property name="checked" stdset="0">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        
+        <item row="1" column="0">
+         <widget class="QLabel" name="gpuSpinLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>GPU Id:</string>
+          </property>
+         </widget>
+        </item>
+		<item row="1" column="1" colspan="3">
+		  <widget class="ctkComboBox" name="gpuComboBox"/>
+		 </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
    </item>
    <item>
     <widget class="QPushButton" name="previewButton">
@@ -105,31 +186,39 @@
      </property>
     </widget>
    </item>
-	  <item>
-		  <widget class="QLabel" name="statusLabel">
-			  <property name="sizePolicy">
-				  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-					  <horstretch>0</horstretch>
-					  <verstretch>0</verstretch>
-				  </sizepolicy>
-			  </property>
-			  <property name="wordWrap">
-				  <bool>true</bool>
-			  </property>
-		  </widget>
-	  </item>
+   <item>
+    <widget class="QLabel" name="statusLabel">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
-	<customwidgets>
-		<customwidget>
-		<class>ctkComboBox</class>
-		<extends>QComboBox</extends>
-		<header location="global">ctkComboBox.h</header>
-		<container>1</container>
-	</customwidget>
-	</customwidgets>
-
-	<!--<layoutdefault spacing="6" margin="11"/>-->
+ <customwidgets>
+  <customwidget>
+   <class>ctkComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">ctkComboBox.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ctkCollapsibleGroupBox</class>
+   <extends>QWidget</extends>
+   <header>ctkcollapsiblegroupbox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ctkCheckBox</class>
+   <extends>QWidget</extends>
+   <header>ctkcheckbox.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

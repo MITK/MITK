@@ -23,7 +23,6 @@ namespace us
 
 namespace mitk
 {
-
   class MITKSEGMENTATION_EXPORT TotalSegmentatorTool : public SegWithPreviewTool
   {
   public:
@@ -34,7 +33,6 @@ namespace mitk
     const char *GetName() const override;
     const char **GetXPM() const override;
     us::ModuleResource GetIconResource() const override;
-
     void Activated() override;
 
     itkSetMacro(MitkTempDir, std::string);
@@ -45,6 +43,10 @@ namespace mitk
 
     itkSetMacro(GpuId, unsigned int);
     itkGetConstMacro(GpuId, unsigned int);
+
+    itkSetMacro(Fast, bool);
+    itkGetConstMacro(Fast, bool);
+    itkBooleanMacro(Fast);
 
   protected:
     TotalSegmentatorTool();
@@ -70,6 +72,7 @@ namespace mitk
     std::string m_MitkTempDir;
     std::string m_PythonPath;
     unsigned int m_GpuId;
+    bool m_Fast;
     const std::string m_TEMPLATE_FILENAME = "XXXXXX_000_0000.nii.gz";
   }; // class
 } // namespace

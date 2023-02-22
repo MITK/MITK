@@ -13,10 +13,10 @@ found in the LICENSE file.
 #ifndef QmitkRenderWindowWidget_h
 #define QmitkRenderWindowWidget_h
 
-// qt widgets module
 #include "MitkQtWidgetsExports.h"
-#include "QmitkRenderWindow.h"
-#include "QmitkRenderWindowUtilityWidget.h"
+
+// qt widgets module
+#include <QmitkRenderWindow.h>
 
 // mitk core
 #include <mitkCrosshairManager.h>
@@ -26,6 +26,7 @@ found in the LICENSE file.
 // qt
 #include <QFrame>
 #include <QMouseEvent>
+#include <QVBoxLayout>
 
 class vtkCornerAnnotation;
 
@@ -47,8 +48,7 @@ public:
   QmitkRenderWindowWidget(
     QWidget* parent = nullptr,
     const QString& widgetName = "",
-    mitk::DataStorage* dataStorage = nullptr,
-    bool windowControls = false);
+    mitk::DataStorage* dataStorage = nullptr);
 
   ~QmitkRenderWindowWidget() override;
 
@@ -61,6 +61,8 @@ public:
 
   void RequestUpdate();
   void ForceImmediateUpdate();
+
+  void AddUtilityWidget(QWidget* utilityWidget);
 
   void SetGradientBackgroundColors(const mitk::Color& upper, const mitk::Color& lower);
   void ShowGradientBackground(bool enable);
@@ -93,11 +95,7 @@ public:
   void SetGeometry(const itk::EventObject& event);
   void SetGeometrySlice(const itk::EventObject& event);
 
-private Q_SLOTS:
-
-  void OnReinitAction(QList<mitk::DataNode::Pointer> selectedNodes);
-
-  void OnResetAction(QList<mitk::DataNode::Pointer> selectedNodes);
+public Q_SLOTS:
 
   void OnResetGeometry();
 
@@ -105,7 +103,6 @@ private:
 
   void InitializeGUI();
   void InitializeDecorations();
-  void ComputeInvertedSliceNavigation();
   void ResetGeometry(const mitk::TimeGeometry* referenceGeometry);
 
   QString m_WidgetName;
@@ -120,10 +117,6 @@ private:
   std::pair<mitk::Color, mitk::Color> m_GradientBackgroundColors;
   mitk::Color m_DecorationColor;
   vtkSmartPointer<vtkCornerAnnotation> m_CornerAnnotation;
-
-  QmitkRenderWindowUtilityWidget* m_UtilityWidget;
-
-  bool m_WindowControls;
 
 };
 

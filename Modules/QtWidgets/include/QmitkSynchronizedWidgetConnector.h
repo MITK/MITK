@@ -48,8 +48,9 @@ public:
   QmitkSynchronizedWidgetConnector();
 
   /*
-  * @brief This function connects the different signals and slots, such that changes to the
-  *        current list of nodes and the selection mode can be forwarded or received.
+  * @brief This function connects the different signals and slots of this instance and the given
+  *        given node selection widget, such that changes to the current list of nodes
+  *        and the selection mode can be forwarded or received.
   *        The connections are as follows:
   *           - QmitkAbstractNodeSelectionWidget::CurrentSelectionChanged
   *             -> QmitkSynchronizedWidgetConnector::ChangeSelection
@@ -64,16 +65,17 @@ public:
   */
   void ConnectWidget(const QmitkSynchronizedNodeSelectionWidget* nodeSelectionWidget) const;
   /*
-  * @brief This function disconnects the different signals and slots, such that changes to the
-  *        current list of nodes and the selection mode cannot be forwarded or received anymore.
+  * @brief This function disconnects the different signals and slot of this instance and the given
+  *        given node selection widget, such that changes to the current list of nodes
+  *        and the selection mode cannot be forwarded or received anymore.
   *
   * @param nodeSelectionWidget    The synchronized node selection widget to be disconnected / desynchronized.
   */
   void DisconnectWidget(const QmitkSynchronizedNodeSelectionWidget* nodeSelectionWidget) const;
   /*
-  * @brief This function set the current selection and the selection mode of the given node selection widget.
-  *        It can be used to initialize a newly connected / synchronized.
-  *        The required values are stored in this class internally.
+  * @brief This function sets the current selection and the selection mode of the given node selection widget
+  *        to the values of this instance. The required values are stored in this class internally.
+  *        It can be used to newly initialize the given node selection widget.
   *
   * @param nodeSelectionWidget    The synchronized node selection widget for which the
   *                               current selection and the selection mode should be set.

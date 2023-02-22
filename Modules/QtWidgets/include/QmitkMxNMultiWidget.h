@@ -13,9 +13,12 @@ found in the LICENSE file.
 #ifndef QmitkMxNMultiWidget_h
 #define QmitkMxNMultiWidget_h
 
-// qt widgets module
 #include "MitkQtWidgetsExports.h"
+
+// qt widgets module
 #include "QmitkAbstractMultiWidget.h"
+#include <QmitkSynchronizedNodeSelectionWidget.h>
+#include <QmitkSynchronizedWidgetConnector.h>
 
 /**
 * @brief The 'QmitkMxNMultiWidget' is a 'QmitkAbstractMultiWidget' that is used to display multiple render windows at once.
@@ -109,8 +112,11 @@ private:
   void SetInteractionSchemeImpl() override { }
 
   void CreateRenderWindowWidget();
+  void SetInitialSelection();
+  void ToggleSynchronization(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget);
 
   mitk::SliceNavigationController* m_TimeNavigationController;
+  std::unique_ptr<QmitkSynchronizedWidgetConnector> m_SynchronizedWidgetConnector;
 
   bool m_CrosshairVisibility;
 

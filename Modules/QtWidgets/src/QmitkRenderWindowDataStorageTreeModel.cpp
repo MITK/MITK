@@ -374,7 +374,6 @@ bool QmitkRenderWindowDataStorageTreeModel::dropMimeData(const QMimeData* data, 
 
 void QmitkRenderWindowDataStorageTreeModel::SetControlledRenderer(mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer)
 {
-  m_RenderWindowLayerController->SetControlledRenderer(controlledRenderer);
   m_ControlledRenderer = controlledRenderer;
 
   ResetTree();

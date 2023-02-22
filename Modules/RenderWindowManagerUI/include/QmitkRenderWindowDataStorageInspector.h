@@ -71,10 +71,6 @@ private Q_SLOTS:
 
   void ModelRowsInserted(const QModelIndex& parent, int start, int end);
 
-  void SetAsBaseLayer();
-
-  void ResetRenderer();
-
   void ChangeViewDirection(const QString& viewDirection);
 
 private:

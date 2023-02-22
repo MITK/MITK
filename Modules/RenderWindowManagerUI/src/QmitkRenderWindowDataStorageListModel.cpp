@@ -288,7 +288,6 @@ bool QmitkRenderWindowDataStorageListModel::dropMimeData(const QMimeData* data, 
 
 void QmitkRenderWindowDataStorageListModel::SetControlledRenderer(mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer)
 {
-  m_RenderWindowLayerController->SetControlledRenderer(controlledRenderer);
   auto dataStorage = m_DataStorage.Lock();
 
   if (dataStorage.IsNotNull())

@@ -13,10 +13,8 @@ found in the LICENSE file.
 // MITK
 #include "mitkTotalSegmentatorTool.h"
 
-
 #include "mitkIOUtil.h"
 #include <itksys/SystemTools.hxx>
-#include "mitkProcessExecutor.h"
 
 // us
 #include <usGetModuleContext.h>
@@ -87,12 +85,11 @@ namespace
   }
 } // namespace
 
-
 void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
-                                           const Image * /*oldSegAtTimeStep*/,
-                                           LabelSetImage *previewImage,
-                                           TimeStepType timeStep)
-{ 
+                                                 const Image * /*oldSegAtTimeStep*/,
+                                                 LabelSetImage *previewImage,
+                                                 TimeStepType timeStep)
+{
   std::string inDir, outDir, inputImagePath, outputImagePath, scriptPath;
 
   ProcessExecutor::Pointer spExec = ProcessExecutor::New();
@@ -111,60 +108,92 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
   outputImagePath = outDir + IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";
   ProcessExecutor::ArgumentListType args;
 
-  MITK_INFO << inputImagePath;
-  MITK_INFO << outputImagePath;
-
   IOUtil::Save(inputAtTimeStep, inputImagePath);
-  
-   // Code calls external process
+
+  std::string *outArg = &outputImagePath;
+  bool isSubTask = false;
+  if (this->GetSubTask() != m_DEFAULT_TOTAL_TASK)
+  {
+    isSubTask = true;
+    outputImagePath = outDir + IOUtil::GetDirectorySeparator() + this->GetSubTask() + ".nii.gz";
+    outArg = &outDir;
+  }
+
+  this->run_totalsegmentator(
+    spExec, inputImagePath, *outArg, this->GetFast(), !isSubTask, this->GetGpuId(), m_DEFAULT_TOTAL_TASK);
+
+  if (isSubTask)
+  {
+    this->run_totalsegmentator(
+      spExec, inputImagePath, *outArg, !isSubTask, !isSubTask, this->GetGpuId(), this->GetSubTask());
+  }
+
+  Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
+  auto outputBuffer = mitk::LabelSetImage::New();
+  outputBuffer->InitializeByLabeledImage(outputImage);
+  outputBuffer->SetGeometry(inputAtTimeStep->GetGeometry());
+
+  TransferLabelSetImageContent(outputBuffer, previewImage, timeStep);
+}
+
+void mitk::TotalSegmentatorTool::run_totalsegmentator(ProcessExecutor::Pointer spExec,
+                                                      const std::string &inputImagePath,
+                                                      const std::string &outputImagePath,
+                                                      bool isFast,
+                                                      bool isMultiLabel,
+                                                      unsigned int gpuId,
+                                                      const std::string &subTask)
+{
+  ProcessExecutor::ArgumentListType args;
   std::string command = "TotalSegmentator";
 #ifdef _WIN32
-    command = "python";
+  command = "python";
 #else
-    command = "TotalSegmentator";
+  command = "TotalSegmentator";
 #endif
-  
-    args.clear();
+
+  args.clear();
 
 #ifdef _WIN32
-    args.push_back("TotalSegmentator");
+  args.push_back("TotalSegmentator");
 #endif
 
-    args.push_back("-i");
-    args.push_back(inputImagePath);
+  args.push_back("-i");
+  args.push_back(inputImagePath);
 
-    args.push_back("-o");
-    args.push_back(outputImagePath);
+  args.push_back("-o");
+  args.push_back(outputImagePath);
 
+  if (subTask != m_DEFAULT_TOTAL_TASK)
+  {
+    args.push_back("-ta");
+    args.push_back(subTask);
+  }
+
+  if (isMultiLabel)
+  {
     args.push_back("--ml");
+  }
 
-    if (this->GetFast())
-    {
-      args.push_back("--fast");
-    }
+  if (isFast)
+  {
+    args.push_back("--fast");
+  }
 
-   try
-    {
-      std::string cudaEnv = "CUDA_VISIBLE_DEVICES=" + std::to_string(this->GetGpuId());
-      itksys::SystemTools::PutEnv(cudaEnv.c_str());
+  try
+  {
+    std::string cudaEnv = "CUDA_VISIBLE_DEVICES=" + std::to_string(gpuId);
+    itksys::SystemTools::PutEnv(cudaEnv.c_str());
 
-      for (auto &arg : args)
+    for (auto &arg : args)
       MITK_INFO << arg;
-      MITK_INFO << this->GetPythonPath();
+    MITK_INFO << this->GetPythonPath();
 
-      spExec->Execute(this->GetPythonPath(), command, args);
-    }
-    catch (const mitk::Exception &e)
-    {
-      MITK_ERROR << e.GetDescription();
-      return;
-    }
-
-    Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
-    auto outputBuffer = mitk::LabelSetImage::New();
-    outputBuffer->InitializeByLabeledImage(outputImage);
-    outputBuffer->SetGeometry(inputAtTimeStep->GetGeometry());
-
-    TransferLabelSetImageContent(outputBuffer, previewImage, timeStep);
-   
+    spExec->Execute(this->GetPythonPath(), command, args);
+  }
+  catch (const mitk::Exception &e)
+  {
+    MITK_ERROR << e.GetDescription();
+    return;
+  }
 }

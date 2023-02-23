@@ -88,6 +88,10 @@ protected:
   Ui_QmitkTotalSegmentatorToolGUIControls m_Controls;
   bool m_FirstPreviewComputation = true;
   EnableConfirmSegBtnFunctionType m_SuperclassEnableConfirmSegBtnFnc;
+
+  const std::string m_WARNING_TOTALSEG_NOT_FOUND = "TotalSegmentator is not detected in the selected python environment.Please select a valid "
+                        "python environment or install TotalSegmentator.";
+  const QStringList m_VALID_TASKS = {"total", "cerebral_bleed", "hip_implant", "coronary_arteries"};
   
 };
 

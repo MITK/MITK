@@ -58,7 +58,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Welcome to Total Segmentator tool in MITK. [Experimental]&lt;/p&gt;&lt;p&gt;Please note that this is only an interface to Total Segmentator. MITK does not ship with Total Segmentator. Make sure to have a working Python environment with nnUNet set up beforehand. Choose that environment in the Python Path before inferencing. &lt;/p&gt;&lt;p&gt;Refer to &lt;a href=&quot;https://github.com/wasserth/TotalSegmentator&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/wasserth/TotalSegmentator&lt;/span&gt;&lt;/a&gt; to learn everything about the Total Segmentator.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Welcome to Total Segmentator tool in MITK. [Experimental]&lt;/p&gt;&lt;p&gt;Please note that this is only an interface to Total Segmentator. MITK does not ship with Total Segmentator. Make sure to have a working Python environment with TotalSegmentator set up beforehand. Choose that environment in the Python Path before inferencing. &lt;/p&gt;&lt;p&gt;Refer to &lt;a href=&quot;https://github.com/wasserth/TotalSegmentator&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/wasserth/TotalSegmentator&lt;/span&gt;&lt;/a&gt; to learn everything about the Total Segmentator.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="textFormat">
         <enum>Qt::RichText</enum>
@@ -68,22 +68,39 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="pythonEnvLabel">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Python Path:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1" colspan="3">
-      <widget class="ctkComboBox" name="pythonEnvComboBox"/>
-     </item>
+	<item row="1" column="0">
+		<widget class="QLabel" name="pythonEnvLabel">
+			<property name="sizePolicy">
+				<sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+					<horstretch>0</horstretch>
+					<verstretch>0</verstretch>
+				</sizepolicy>
+			</property>
+			<property name="text">
+				<string>Python Path:</string>
+			</property>
+		</widget>
+	</item>
+	<item row="1" column="1" colspan="3">
+		<widget class="ctkComboBox" name="pythonEnvComboBox"/>
+	</item>
+
+		<item row="2" column="0">
+			<widget class="QLabel" name="subtaskLabel">
+				<property name="sizePolicy">
+					<sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+						<horstretch>0</horstretch>
+						<verstretch>0</verstretch>
+					</sizepolicy>
+				</property>
+				<property name="text">
+					<string>Task:</string>
+				</property>
+			</widget>
+		</item>
+		<item row="2" column="1" colspan="3">
+			<widget class="ctkComboBox" name="subtaskComboBox"/>
+		</item>
     </layout>
    </item>
    <item>
@@ -124,28 +141,6 @@
         <property name="spacing">
          <number>6</number>
         </property>
-    
-        <item row="0" column="0">
-         <widget class="QLabel" name="fastLabel">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Fast</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="ctkCheckBox" name="fastBox" native="true">
-          <property name="checked" stdset="0">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        
         <item row="1" column="0">
          <widget class="QLabel" name="gpuSpinLabel">
           <property name="sizePolicy">
@@ -159,9 +154,29 @@
           </property>
          </widget>
         </item>
-		<item row="1" column="1" colspan="3">
-		  <widget class="ctkComboBox" name="gpuComboBox"/>
-		 </item>
+        <item row="1" column="1" colspan="3">
+         <widget class="ctkComboBox" name="gpuComboBox"/>
+        </item>
+        <item row="0" column="1">
+         <widget class="ctkCheckBox" name="fastBox" native="true">
+          <property name="checked" stdset="0">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="fastLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Fast</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
      </layout>
@@ -201,7 +216,8 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
+ <layoutdefault spacing="6" margin="11"/>
+  <customwidgets>
   <customwidget>
    <class>ctkComboBox</class>
    <extends>QComboBox</extends>

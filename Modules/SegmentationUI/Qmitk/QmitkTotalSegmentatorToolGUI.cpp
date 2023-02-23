@@ -1,22 +1,13 @@
 #include "QmitkTotalSegmentatorToolGUI.h"
 
-#include "usServiceReference.h"
 #include <QIcon>
 #include <QUrl>
-#include <QmitkStyleManager.h>
-#include <usGetModuleContext.h>
-#include <usModule.h>
-#include <usModuleContext.h>
 #include <QMessageBox>
 #include <QApplication>
 #include <QDir>
 #include <QDirIterator>
-#include <QIcon>
-#include <QmitkStyleManager.h>
-#include <QmitknnUNetEnsembleLayout.h>
 #include <QtGlobal>
 #include <QFileDialog>
-#include <QApplication>
 #include "mitkTotalSegmentatorTool.h"
 
 
@@ -49,6 +40,7 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
   m_Controls.pythonEnvComboBox->addItem("Select");
   m_Controls.previewButton->setDisabled(true);
   m_Controls.statusLabel->setTextFormat(Qt::RichText);
+  m_Controls.subtaskComboBox->addItems(m_VALID_TASKS);
   AutoParsePythonPaths();
   SetGPUInfo();
   if (m_GpuLoader.GetGPUCount() != 0)
@@ -72,7 +64,7 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
   Superclass::InitializeUI(mainLayout);
 
   QString lastSelectedPyEnv = m_Settings.value("TotalSeg/LastPythonPath").toString();
-  m_Controls.pythonEnvComboBox->setCurrentText(lastSelectedPyEnv);
+  m_Controls.pythonEnvComboBox->insertItem(0, lastSelectedPyEnv);
 }
 
 void QmitkTotalSegmentatorToolGUI::EnableWidgets(bool enabled)
@@ -121,16 +113,21 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
   {
     m_Controls.previewButton->setEnabled(false);
     qApp->processEvents();
-    pythonPathTextItem = m_Controls.pythonEnvComboBox->currentText();
-
     if (!this->IsTotalSegmentatorInstalled(m_PythonPath))
     {
-      throw std::runtime_error("TotalSegmentator is not detected in the selected python environment. Please select a valid "
-                               "python environment or install TotalSegmentator.");
+      throw std::runtime_error(m_WARNING_TOTALSEG_NOT_FOUND);
+    }
+    pythonPathTextItem = m_Controls.pythonEnvComboBox->currentText();
+    bool isFast = m_Controls.fastBox->isChecked();
+    QString& subTask = m_Controls.subtaskComboBox->currentText();
+    if (subTask != m_VALID_TASKS[0])
+    {
+      isFast = true;
     }
     tool->SetPythonPath(m_PythonPath.toStdString());
     tool->SetGpuId(FetchSelectedGPUFromUI());
-    tool->SetFast(m_Controls.fastBox->isChecked());
+    tool->SetFast(isFast);
+    tool->SetSubTask(subTask.toStdString());
     this->WriteStatusMessage(QString("<b>STATUS: </b><i>Starting Segmentation task... This might take a while.</i>"));
     tool->UpdatePreview();
     m_Controls.previewButton->setEnabled(true);
@@ -154,6 +151,7 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
   this->SetLabelSetPreview(tool->GetPreviewSegmentation());
   tool->IsTimePointChangeAwareOn();
   this->ActualizePreviewLabelVisibility();
+  this->WriteStatusMessage("<b>STATUS: </b><i>Segmentation task finished successfully.</i>");
   if (!pythonPathTextItem.isEmpty())
   { // only cache if the prediction ended without errors.
     m_Settings.setValue("TotalSeg/LastPythonPath", pythonPathTextItem);
@@ -263,10 +261,7 @@ void QmitkTotalSegmentatorToolGUI::OnPythonPathChanged(const QString &pyEnv)
   }
   else if (!this->IsTotalSegmentatorInstalled(pyEnv))
   {
-    std::string warning =
-      "WARNING: nnUNet is not detected on the Python environment you selected. Please select another "
-      "environment or create one. For more info refer https://github.com/MIC-DKFZ/nnUNet";
-    this->ShowErrorMessage(warning);
+    this->ShowErrorMessage(m_WARNING_TOTALSEG_NOT_FOUND);
     m_Controls.previewButton->setDisabled(true);
   }
   else

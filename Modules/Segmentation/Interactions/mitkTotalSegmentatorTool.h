@@ -14,6 +14,7 @@ found in the LICENSE file.
 
 #include "mitkSegWithPreviewTool.h"
 #include <MitkSegmentationExports.h>
+#include "mitkProcessExecutor.h"
 
 
 namespace us
@@ -36,7 +37,10 @@ namespace mitk
     void Activated() override;
 
     itkSetMacro(MitkTempDir, std::string);
-    itkGetConstMacro(MitkTempDir, std::string);
+    itkGetConstMacro(MitkTempDir, std::string); 
+    
+    itkSetMacro(SubTask, std::string);
+    itkGetConstMacro(SubTask, std::string);
     
     itkSetMacro(PythonPath, std::string);
     itkGetConstMacro(PythonPath, std::string);
@@ -69,11 +73,15 @@ namespace mitk
     void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep) override;
    
   private:
+    void run_totalsegmentator(ProcessExecutor::Pointer,const std::string &, const std::string &, bool, bool, unsigned int, const std::string &);
+
     std::string m_MitkTempDir;
     std::string m_PythonPath;
+    std::string m_SubTask = "total";
     unsigned int m_GpuId;
     bool m_Fast;
     const std::string m_TEMPLATE_FILENAME = "XXXXXX_000_0000.nii.gz";
+    const std::string m_DEFAULT_TOTAL_TASK = "total";
   }; // class
 } // namespace
 #endif

@@ -151,6 +151,32 @@ namespace mitk
     itkGetConstObjectMacro(WorldTimeGeometry, TimeGeometry);
 
     /**
+     * \brief Set the interaction reference world time geometry using the given TimeGeometry.
+     *
+     * Setting a new interaction reference world time geometry also updates the
+     * alignment status of the reference geometry, which can be retrieved using
+     * 'GetReferenceGeometryAligned'.
+     * Using a nullptr as the interaction reference geomertry implies that
+     * no requirements on the geometry exist, thus in this case any check
+     * will result in 'ReferenceGeometryAligned' being true.
+     *
+     * \param geometry  The reference geometry used for render window interaction.
+     */
+    virtual void SetInteractionReferenceGeometry(const TimeGeometry* geometry);
+
+    /**
+     * \brief Get the current interaction reference geometry.
+     */
+    itkGetConstObjectMacro(InteractionReferenceGeometry, TimeGeometry);
+
+    /**
+     * \brief Return if the reference geometry aligns with the base renderer's world geometry.
+     *        If true, the interaction reference geometry aligns with the base renderer's
+     *        current world geometry. False otherwise.
+     */
+    itkGetMacro(ReferenceGeometryAligned, bool);
+
+    /**
      * \brief Get the current time-extracted 3D-geometry.
      */
     itkGetConstObjectMacro(CurrentWorldGeometry, BaseGeometry);
@@ -417,6 +443,15 @@ namespace mitk
     TimeGeometry::ConstPointer m_WorldTimeGeometry;
 
     /**
+     * \brief Pointer to the interaction reference geometry used for interaction.
+     *
+     * This InteractionReferenceGeometry is used to decide if a base renderer /
+     * render window is able to correctly handle display interaction, e.g. drawing.
+     * It will be set using the "SetInteractionReferenceGeometry"-function.
+     */
+    TimeGeometry::ConstPointer m_InteractionReferenceGeometry;
+
+    /**
      * \brief Pointer to the current time-extracted 3D-geometry.
      *
      * This CurrentWorldGeometry is used to define the bounds for this
@@ -443,6 +478,7 @@ namespace mitk
     BindDispatcherInteractor* m_BindDispatcherInteractor;
 
     bool m_KeepDisplayedRegion;
+    bool m_ReferenceGeometryAligned;
 
   protected:
 

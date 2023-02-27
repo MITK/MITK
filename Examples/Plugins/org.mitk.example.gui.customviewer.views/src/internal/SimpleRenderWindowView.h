@@ -93,9 +93,14 @@ public:
   void ForceImmediateUpdate(mitk::RenderingManager::RequestType) override;
 
   /**
-  * \see mitk::IRenderWindowPart::SetReferenceGeometry()
+  * \see mitk::IRenderWindowPart::InitializeViews()
   */
-  void SetReferenceGeometry(const mitk::TimeGeometry* referenceGeometry, bool resetCamera) override;
+  void InitializeViews(const mitk::TimeGeometry* geometry, bool resetCamera) override;
+
+  /**
+  * \see mitk::IRenderWindowPart::SetInteractionReferenceGeometry()
+  */
+  void SetInteractionReferenceGeometry(const mitk::TimeGeometry* referenceGeometry) override;
 
   /**
   * \see mitk::IRenderWindowPart::HasCoupledRenderWindows

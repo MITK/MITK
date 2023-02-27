@@ -258,7 +258,7 @@ void QmitkSegmentationView::OnAnySelectionChanged()
   {
     if (nullptr != m_RenderWindowPart)
     {
-      m_RenderWindowPart->SetReferenceGeometry(m_ReferenceNode->GetData()->GetTimeGeometry(), false);
+      m_RenderWindowPart->InitializeViews(m_ReferenceNode->GetData()->GetTimeGeometry(), false);
     }
   }
 

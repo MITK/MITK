@@ -62,7 +62,11 @@ public:
   /**
   * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart
   */
-  void SetReferenceGeometry(const mitk::TimeGeometry* referenceGeometry, bool resetCamera) override;
+  void InitializeViews(const mitk::TimeGeometry* geometry, bool resetCamera) override;
+  /**
+  * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart
+  */
+  void SetInteractionReferenceGeometry(const mitk::TimeGeometry* referenceGeometry) override;
   /**
   * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart
   */

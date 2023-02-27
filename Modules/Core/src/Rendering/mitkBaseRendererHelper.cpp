@@ -14,13 +14,23 @@ found in the LICENSE file.
 
 #include <mitkSliceNavigationHelper.h>
 
-bool mitk::BaseRendererHelper::IsRendererAlignedWithSegmentation(BaseRenderer* renderer, const TimeGeometry* timeGeometry)
+bool mitk::BaseRendererHelper::IsRendererGeometryAlignedWithGeometry(BaseRenderer* renderer, const TimeGeometry* timeGeometry)
 {
-  const BaseGeometry* renderWindowGeometry = renderer->GetCurrentWorldGeometry();
-
-  if (nullptr == renderWindowGeometry || nullptr == timeGeometry)
+  if (nullptr == renderer)
   {
     return false;
+  }
+
+  const BaseGeometry* renderWindowGeometry = renderer->GetCurrentWorldGeometry();
+  if (nullptr == renderWindowGeometry)
+  {
+    return false;
+  }
+
+  if (nullptr == timeGeometry)
+  {
+    // no reference geometry given, so everything is fine
+    return true;
   }
 
   auto viewDirection = renderer->GetSliceNavigationController()->GetViewDirection();

@@ -238,9 +238,8 @@ bool QmitkRenderWindow::event(QEvent* e)
 
 void QmitkRenderWindow::enterEvent(QEvent *e)
 {
-  mitk::InternalEvent::Pointer internalEvent = mitk::InternalEvent::New(m_Renderer, nullptr, "EnterRenderWindow");
-
-  this->HandleEvent(internalEvent.GetPointer());
+  auto* baseRenderer = mitk::BaseRenderer::GetInstance(this->GetRenderWindow());
+  this->ShowOverlayMessage(!baseRenderer->GetReferenceGeometryAligned());
 
   if (nullptr != m_MenuWidget)
     m_MenuWidget->ShowMenu();
@@ -252,10 +251,7 @@ void QmitkRenderWindow::leaveEvent(QEvent *e)
 {
   auto statusBar = mitk::StatusBar::GetInstance();
   statusBar->DisplayGreyValueText("");
-
-  mitk::InternalEvent::Pointer internalEvent = mitk::InternalEvent::New(m_Renderer, nullptr, "LeaveRenderWindow");
-
-  this->HandleEvent(internalEvent.GetPointer());
+  this->ShowOverlayMessage(false);
 
   if (nullptr != m_MenuWidget)
     m_MenuWidget->HideMenu();

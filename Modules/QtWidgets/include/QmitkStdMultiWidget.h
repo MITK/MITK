@@ -39,15 +39,22 @@ public:
   virtual QmitkRenderWindow* GetRenderWindow(const mitk::AnatomicalPlane& orientation) const override;
 
   /**
-   * @brief Set the reference geometry for interaction inside all render windows of the StdMultiWidget.
-   *
-   * @param referenceGeometry   The reference geometry which is used for updating the
-   *                            time geometry inside all four render windows.
-   * @param resetCamera         If true, the camera and crosshair will be reset to the default view (centered, no zoom).
-   *                            If false, the current crosshair position and the camera zoom will be stored and reset
-   *                            after the reference geometry has been updated.
-   */
-  void SetReferenceGeometry(const mitk::TimeGeometry* referenceGeometry, bool resetCamera) override;
+  * @brief Initialize all render windows of the StdMultiWidget to the given geometry.
+  *        Overridem from 'QmitkAbstractMultiWidget'.
+  *
+  * @param geometry       The geometry to be used to initialize / update all
+  *                       render window's time and slice navigation controller.
+  * @param resetCamera    If true, the camera and crosshair will be reset to the default view (centered, no zoom).
+  *                       If false, the current crosshair position and the camera zoom will be stored and reset
+  *                       after the reference geometry has been updated.
+  */
+  void InitializeViews(const mitk::TimeGeometry* geometry, bool resetCamera) override;
+
+  /**
+  * @brief Not implemented in this class.
+  *        Overridem from 'QmitkAbstractMultiWidget'.
+  */
+  void SetInteractionReferenceGeometry(const mitk::TimeGeometry* referenceGeometry) override;
 
   /**
   * @brief Returns true if the render windows are coupled; false if not.

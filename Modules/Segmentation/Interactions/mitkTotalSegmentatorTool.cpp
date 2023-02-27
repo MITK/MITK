@@ -15,6 +15,7 @@ found in the LICENSE file.
 
 #include "mitkIOUtil.h"
 #include <itksys/SystemTools.hxx>
+#include <filesystem>
 
 // us
 #include <usGetModuleContext.h>
@@ -26,11 +27,6 @@ found in the LICENSE file.
 namespace mitk
 {
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, TotalSegmentatorTool, "Total Segmentator");
-}
-
-mitk::TotalSegmentatorTool::TotalSegmentatorTool()
-{
-  this->SetMitkTempDir(IOUtil::CreateTemporaryDirectory("mitk-XXXXXX"));
 }
 
 mitk::TotalSegmentatorTool::~TotalSegmentatorTool()
@@ -90,13 +86,19 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
                                                  LabelSetImage *previewImage,
                                                  TimeStepType timeStep)
 {
-  std::string inDir, outDir, inputImagePath, outputImagePath, scriptPath;
+  if (!m_IsMitkTempDirAvailable) // create temp directory if not done already
+  {
+    this->SetMitkTempDir(IOUtil::CreateTemporaryDirectory("mitk-XXXXXX"));
+    m_IsMitkTempDirAvailable = true;
+  }
+  this->ParseLabelNames(this->GetLabelMapPath());
 
   ProcessExecutor::Pointer spExec = ProcessExecutor::New();
   itk::CStyleCommand::Pointer spCommand = itk::CStyleCommand::New();
   spCommand->SetCallback(&onPythonProcessEvent);
   spExec->AddObserver(ExternalProcessOutputEvent(), spCommand);
-
+  
+  std::string inDir, outDir, inputImagePath, outputImagePath, scriptPath;
   inDir = IOUtil::CreateTemporaryDirectory("totalseg-in-XXXXXX", this->GetMitkTempDir());
   std::ofstream tmpStream;
   inputImagePath = IOUtil::CreateTemporaryFile(tmpStream, m_TEMPLATE_FILENAME, inDir + IOUtil::GetDirectorySeparator());
@@ -120,7 +122,7 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
   }
 
   this->run_totalsegmentator(
-    spExec, inputImagePath, *outArg, this->GetFast(), !isSubTask, this->GetGpuId(), m_DEFAULT_TOTAL_TASK);
+     spExec, inputImagePath, *outArg, this->GetFast(), !isSubTask, this->GetGpuId(), m_DEFAULT_TOTAL_TASK);
 
   if (isSubTask)
   {
@@ -132,7 +134,7 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
   auto outputBuffer = mitk::LabelSetImage::New();
   outputBuffer->InitializeByLabeledImage(outputImage);
   outputBuffer->SetGeometry(inputAtTimeStep->GetGeometry());
-
+  MapLabelsToSegmentation(outputBuffer, m_LabelMapTotal);
   TransferLabelSetImageContent(outputBuffer, previewImage, timeStep);
 }
 
@@ -196,4 +198,58 @@ void mitk::TotalSegmentatorTool::run_totalsegmentator(ProcessExecutor::Pointer s
     MITK_ERROR << e.GetDescription();
     return;
   }
+}
+
+void mitk::TotalSegmentatorTool::ParseLabelNames(const std::string &fileName)
+{
+  std::fstream newfile;
+  newfile.open(fileName, ios::in);
+  std::stringstream buffer;
+  if (newfile.is_open())
+  {
+    int line = 0;
+    std::string temp;
+    while (std::getline(newfile, temp))
+    {
+      if (line > 1 && line < 106)
+      {
+        buffer << temp;
+      }
+      ++line;
+    }
+  }
+  std::string key, val;
+  while (std::getline(std::getline(buffer, key, ':'), val, ','))
+  {
+    m_LabelMapTotal[std::stoi(key)] = val;
+  }
+}
+
+void mitk::TotalSegmentatorTool::MapLabelsToSegmentation(mitk::LabelSetImage::Pointer outputBuffer,
+                                                         std::map<int, std::string> &labelMap)
+{
+  for (auto const &[key, val] : labelMap)
+  {
+    mitk::Label *labelptr = outputBuffer->GetLabel(key, 0);
+    if (nullptr != labelptr)
+    {
+      MITK_INFO << "Replacing label with name: " << labelptr->GetName() << " as " << val;
+      labelptr->SetName(val);
+    }
+    else
+    {
+      MITK_INFO << "nullptr found for " << val;
+    }
+  }
+}
+
+std::string mitk::TotalSegmentatorTool::GetLabelMapPath()
+{
+  std::string pythonFileName;
+  std::filesystem::path pathToLabelMap(this->GetPythonPath());
+#ifdef _WIN32
+  pathToLabelMap = pathToLabelMap.parent_path();
+  pythonFileName = pathToLabelMap.string() + "/Lib/site-packages/totalsegmentator/map_to_binary.py";
+#endif
+  return pythonFileName;
 }

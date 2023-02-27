@@ -52,8 +52,12 @@ namespace mitk
     itkGetConstMacro(Fast, bool);
     itkBooleanMacro(Fast);
 
+    itkSetMacro(IsMitkTempDirAvailable, bool);
+    itkGetConstMacro(IsMitkTempDirAvailable, bool);
+    itkBooleanMacro(IsMitkTempDirAvailable);
+
   protected:
-    TotalSegmentatorTool();
+    TotalSegmentatorTool() = default;
     ~TotalSegmentatorTool();
 
     /**
@@ -74,12 +78,17 @@ namespace mitk
    
   private:
     void run_totalsegmentator(ProcessExecutor::Pointer,const std::string &, const std::string &, bool, bool, unsigned int, const std::string &);
+    void MapLabelsToSegmentation(mitk::LabelSetImage::Pointer, std::map<int, std::string>&);
+    void ParseLabelNames(const std::string &);
+    std::string GetLabelMapPath();
 
     std::string m_MitkTempDir;
     std::string m_PythonPath;
     std::string m_SubTask = "total";
     unsigned int m_GpuId;
+    std::map<int, std::string> m_LabelMapTotal;
     bool m_Fast;
+    bool m_IsMitkTempDirAvailable = false;
     const std::string m_TEMPLATE_FILENAME = "XXXXXX_000_0000.nii.gz";
     const std::string m_DEFAULT_TOTAL_TASK = "total";
   }; // class

@@ -26,7 +26,6 @@ found in the LICENSE file.
 #include <mitkLabelSetIOHelper.h>
 #include <mitkManualPlacementAnnotationRenderer.h>
 #include <mitkNodePredicateSubGeometry.h>
-#include <mitkSegmentationInteractionEvents.h>
 #include <mitkSegmentationObjectFactory.h>
 #include <mitkSegTool2D.h>
 #include <mitkStatusBar.h>
@@ -91,14 +90,6 @@ QmitkSegmentationView::QmitkSegmentationView()
   m_ReferencePredicate->AddPredicate(mitk::NodePredicateNot::New(m_SegmentationPredicate));
   m_ReferencePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
   m_ReferencePredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
-
-  m_SegmentationInteractor = mitk::SegmentationInteractor::New();
-  // add observer for the 'SegmentationInteractionEvent'
-  itk::ReceptorMemberCommand<QmitkSegmentationView>::Pointer geometryNotAlignedCommand =
-    itk::ReceptorMemberCommand<QmitkSegmentationView>::New();
-  geometryNotAlignedCommand->SetCallbackFunction(this, &QmitkSegmentationView::ValidateRendererGeometry);
-  m_SegmentationInteractor->AddObserver(mitk::SegmentationInteractionEvent(nullptr, true), geometryNotAlignedCommand);
-  m_SegmentationInteractor->Disable();
 }
 
 QmitkSegmentationView::~QmitkSegmentationView()
@@ -587,85 +578,25 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
 void QmitkSegmentationView::ActiveToolChanged()
 {
+  if (nullptr == m_RenderWindowPart)
+  {
+    return;
+  }
+
+  mitk::TimeGeometry* interactionReferenceGeometry = nullptr;
   auto activeTool = m_ToolManager->GetActiveTool();
-  if (nullptr == activeTool)
+  if (nullptr != activeTool && m_ReferenceNode.IsNotNull())
   {
-    // no tool activated, deactivate the segmentation interactor
-    m_SegmentationInteractor->Disable();
-    return;
-  }
-
-  // activate segmentation interactor to get informed about render window entered / left events
-  m_SegmentationInteractor->Enable();
-}
-
-void QmitkSegmentationView::ValidateRendererGeometry(const itk::EventObject& event)
-{
-  if (!mitk::SegmentationInteractionEvent().CheckEvent(&event))
-  {
-    return;
-  }
-
-  const auto* segmentationInteractionEvent =
-    dynamic_cast<const mitk::SegmentationInteractionEvent*>(&event);
-
-  const mitk::BaseRenderer::Pointer sendingRenderer = segmentationInteractionEvent->GetSender();
-  if (nullptr == sendingRenderer)
-  {
-    return;
-  }
-
-  bool entered = segmentationInteractionEvent->HasEnteredRenderWindow();
-  if (entered)
-  {
-    // mouse cursor of tool inside render window
-    // check if tool can be used: reference geometry needs to be aligned with renderer geometry
-    const auto* referenceDataNode = m_ToolManager->GetReferenceData(0);
-    if (nullptr != referenceDataNode)
+    mitk::Image::ConstPointer referenceImage = dynamic_cast<mitk::Image *>(m_ReferenceNode->GetData());
+    if (referenceImage.IsNotNull())
     {
-      const auto workingImage = dynamic_cast<mitk::Image*>(referenceDataNode->GetData());
-      if (nullptr != workingImage)
-      {
-        const mitk::TimeGeometry* workingImageGeometry = workingImage->GetTimeGeometry();
-        if (nullptr != workingImageGeometry)
-        {
-          bool isGeometryAligned = false;
-          try
-          {
-            isGeometryAligned =
-              mitk::BaseRendererHelper::IsRendererAlignedWithSegmentation(sendingRenderer, workingImageGeometry);
-          }
-          catch (const mitk::Exception& e)
-          {
-            MITK_ERROR << "Unable to validate renderer geometry\n"
-                       << "Reason: " << e.GetDescription();
-            this->ShowRenderWindowWarning(sendingRenderer, true);
-            this->UpdateWarningLabel(
-              tr("Unable to validate renderer geometry. Please see log!"));
-            return;
-          }
-
-          if (!isGeometryAligned)
-          {
-            this->ShowRenderWindowWarning(sendingRenderer, true);
-            this->UpdateWarningLabel(
-              tr("Please perform a reinit on the segmentation image inside the entered Render Window!"));
-            return;
-          }
-        }
-      }
+      // tool activated, reference image available: set reference geometry
+      interactionReferenceGeometry = m_ReferenceNode->GetData()->GetTimeGeometry();
     }
   }
 
-  this->ShowRenderWindowWarning(sendingRenderer, false);
-  this->UpdateWarningLabel(tr(""));
-}
-
-void QmitkSegmentationView::ShowRenderWindowWarning(mitk::BaseRenderer* baseRenderer, bool show)
-{
-  const auto* rendererName = baseRenderer->GetName();
-  auto* renderWindow = m_RenderWindowPart->GetQmitkRenderWindow(rendererName);
-  renderWindow->ShowOverlayMessage(show);
+  // set the interaction reference geometry for the render window part (might be nullptr)
+  m_RenderWindowPart->SetInteractionReferenceGeometry(interactionReferenceGeometry);
 }
 
 void QmitkSegmentationView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)

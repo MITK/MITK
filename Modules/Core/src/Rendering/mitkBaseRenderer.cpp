@@ -678,6 +678,7 @@ void mitk::BaseRenderer::UpdateCurrentGeometries()
   {
     // simply mark the base renderer as modified
     Modified();
+    return;
   }
 
   if (m_TimeStep >= m_WorldTimeGeometry->CountTimeSteps())

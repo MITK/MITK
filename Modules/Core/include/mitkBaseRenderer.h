@@ -147,7 +147,7 @@ namespace mitk
      * Setting a new world time geometry updates the current world geometry and the
      * curent world plane geometry, using the currently selected slice and timestep.
      */
-    virtual void SetWorldTimeGeometry(const mitk::TimeGeometry* geometry);
+    virtual void SetWorldTimeGeometry(const TimeGeometry* geometry);
     itkGetConstObjectMacro(WorldTimeGeometry, TimeGeometry);
 
     /**
@@ -434,11 +434,9 @@ namespace mitk
      *
      * This WorldTimeGeometry is used to extract a SlicedGeometry3D,
      * using the current timestep (set via SetTimeStep).
-     * The time-extracted 3D-geometry is used as the "CurrentWorldgeometry".
-     * It will be set using the "SetCurrentWorldGeometry"-function.
+     * The time-extracted 3D-geometry is used as the "CurrentWorldGeometry".
      * A PlaneGeometry can further be extracted using the current slice (set via SetSlice).
      * The slice-extracted 2D-geometry is used as the "CurrentWorldPlaneGeometry".
-     * It will be set using the "SetCurrentWorldPlaneGeometry"-function.
      */
     TimeGeometry::ConstPointer m_WorldTimeGeometry;
 

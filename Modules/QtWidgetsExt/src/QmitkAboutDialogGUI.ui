@@ -33,7 +33,6 @@
           <font>
            <family>MS Sans Serif</family>
            <pointsize>48</pointsize>
-           <weight>75</weight>
            <bold>true</bold>
           </font>
          </property>
@@ -54,11 +53,16 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Revision: hash
-Description:</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Revision: &amp;lt;hash&amp;gt;&lt;br/&gt;Description:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::RichText</enum>
          </property>
          <property name="alignment">
           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         </property>
+         <property name="openExternalLinks">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -66,6 +70,9 @@ Description:</string>
         <widget class="QLabel" name="m_ToolkitVersionsLabel">
          <property name="text">
           <string>ITK x.x.x, VTK x.x.x, Qt x.x.x</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::PlainText</enum>
          </property>
         </widget>
        </item>
@@ -140,14 +147,17 @@ p, li { white-space: pre-wrap; }
         <x>0</x>
         <y>0</y>
         <width>514</width>
-        <height>221</height>
+        <height>192</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout">
        <item row="0" column="0">
         <widget class="QLabel" name="m_AboutLabel">
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;The Medical Imaging Interaction Toolkit (MITK) [1] has been developed by the Division of Computer-Assisted Medical Interventions and the Division of Medical Image Computing of the German Cancer Research Center (DKFZ) [2,3].&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;[1] &lt;/span&gt;&lt;a href=&quot;http://www.mitk.org/&quot;&gt;&lt;span style=&quot; font-size:8pt; text-decoration: underline; color:#5555ff;&quot;&gt;mitk.org&lt;br/&gt;&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;[2] &lt;/span&gt;&lt;a href=&quot;https://www.dkfz.de/en/cami/index.php&quot;&gt;&lt;span style=&quot; font-size:8pt; text-decoration: underline; color:#5555ff;&quot;&gt;dkfz.de/en/cami&lt;br/&gt;&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;[3] &lt;/span&gt;&lt;a href=&quot;https://www.dkfz.de/en/mic/index.php&quot;&gt;&lt;span style=&quot; font-size:8pt; text-decoration: underline; color:#5555ff;&quot;&gt;dkfz.de/en/mic&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;To contact the MITK team, see &lt;/span&gt;&lt;a href=&quot;http://www.mitk.org/wiki/Contact&quot;&gt;&lt;span style=&quot; font-size:8pt; text-decoration: underline; color:#5555ff;&quot;&gt;mitk.org/wiki/contact&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;Third Party Libraries&lt;br/&gt;&lt;/span&gt;&lt;a href=&quot;https://docs.mitk.org/nightly/thirdpartylibs.html&quot;&gt;&lt;span style=&quot; font-size:8pt; text-decoration: underline; color:#5555ff;&quot;&gt;docs.mitk.org/nightly/thirdpartylibs.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;The Medical Imaging Interaction Toolkit (MITK) [1] is developed by the Division of Medical Image Computing [2] of the German Cancer Research Center (DKFZ) [3].&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;[1] &lt;/span&gt;&lt;a href=&quot;https://www.mitk.org&quot;&gt;&lt;span style=&quot; font-size:8pt; text-decoration: underline; color:#5555ff;&quot;&gt;mitk.org&lt;br/&gt;&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;[2] &lt;/span&gt;&lt;a href=&quot;https://www.dkfz.de/en/mic/index.php&quot;&gt;&lt;span style=&quot; font-size:8pt; text-decoration: underline; color:#5555ff;&quot;&gt;dkfz.de/en/mic&lt;br/&gt;&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;[3] &lt;/span&gt;&lt;a href=&quot;https://www.dkfz.de&quot;&gt;&lt;span style=&quot; font-size:8pt; text-decoration: underline; color:#5555ff;&quot;&gt;dkfz.de&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;To contact the MITK team, visit &lt;/span&gt;&lt;a href=&quot;https://www.mitk.org/wiki/Contact&quot;&gt;&lt;span style=&quot; font-size:8pt; text-decoration: underline; color:#5555ff;&quot;&gt;mitk.org/wiki/Contact&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;Third Party Libraries&lt;br/&gt;&lt;/span&gt;&lt;a href=&quot;https://docs.mitk.org/nightly/thirdpartylibs.html&quot;&gt;&lt;span style=&quot; font-size:8pt; text-decoration: underline; color:#5555ff;&quot;&gt;docs.mitk.org/nightly/thirdpartylibs.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::RichText</enum>
          </property>
          <property name="wordWrap">
           <bool>true</bool>

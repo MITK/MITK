@@ -254,7 +254,6 @@ std::string mitk::TotalSegmentatorTool::GetLabelMapPath()
   pathToLabelMap.append("lib");
   for (auto const &dir_entry : std::filesystem::directory_iterator{pathToLabelMap})
   {
-    MITK_INFO << dir_entry << '\n';
     if (dir_entry.is_directory())
     {
       MITK_INFO << dir_entry.path().filename();

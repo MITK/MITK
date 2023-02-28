@@ -19,7 +19,10 @@ public:
   itkCloneMacro(Self);
 
 protected slots :
-
+ 
+  /**
+   * @brief Qt Slot
+   */
   void OnPreviewBtnClicked();
 
   /**

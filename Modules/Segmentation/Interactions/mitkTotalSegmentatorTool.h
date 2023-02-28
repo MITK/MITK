@@ -24,6 +24,15 @@ namespace us
 
 namespace mitk
 {
+
+  /**
+    \brief TotalSegmentator segmentation tool.
+
+    \ingroup Interaction
+    \ingroup ToolManagerEtAl
+
+    \warning Only to be instantiated by mitk::ToolManager.
+  */
   class MITKSEGMENTATION_EXPORT TotalSegmentatorTool : public SegWithPreviewTool
   {
   public:
@@ -63,9 +72,9 @@ namespace mitk
     /**
      * @brief Overriden method from the tool manager to execute the segmentation
      * Implementation:
-     * 1. Saves the inputAtTimeStep in a temporary directory.
-     * 3. Sets CUDA_VISIBLE_DEVICES variables in the environment.
-     * 3. Executes "TotalSegmentator" command with the parameters
+     * 1. Creates temp directory, if not done already.
+     * 2. Parses Label names from map_to_binary.py for using later on.
+     * 3. Calls "run_totalsegmentator" method.
      * 4. Expects an output image to be saved in the temporary directory by the python proces. Loads it as
      *    LabelSetImage and sets to previewImage.
      *
@@ -77,9 +86,32 @@ namespace mitk
     void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep) override;
    
   private:
-    void run_totalsegmentator(ProcessExecutor::Pointer,const std::string &, const std::string &, bool, bool, unsigned int, const std::string &);
+
+    /**
+     * @brief Runs Totalsegmentator python process with desired arguments
+     * 
+     */
+    void run_totalsegmentator(ProcessExecutor::Pointer, const std::string &, const std::string &, bool, bool, unsigned int, const std::string &);
+
+    /**
+     * @brief Applies the m_LabelMapTotal lookup table on the output segmentation LabelSetImage.
+     * 
+     */
     void MapLabelsToSegmentation(mitk::LabelSetImage::Pointer, std::map<int, std::string>&);
+
+    /**
+     * @brief Parses map_to_binary.py file to extract label ids and names
+     * and stores as a map for reference in m_LabelMapTotal
+     * 
+     * @param filePath
+     */
     void ParseLabelNames(const std::string &);
+
+    /**
+     * @brief Get the Label Map Path from the virtual environment location
+     * 
+     * @return std::string 
+     */
     std::string GetLabelMapPath();
 
     std::string m_MitkTempDir;

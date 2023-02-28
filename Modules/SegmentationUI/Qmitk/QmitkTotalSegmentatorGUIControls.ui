@@ -227,12 +227,12 @@
   <customwidget>
    <class>ctkCollapsibleGroupBox</class>
    <extends>QWidget</extends>
-   <header>ctkcollapsiblegroupbox.h</header>
+   <header>ctkCollapsibleGroupBox.h</header>
   </customwidget>
   <customwidget>
    <class>ctkCheckBox</class>
    <extends>QWidget</extends>
-   <header>ctkcheckbox.h</header>
+   <header>ctkCheckBox.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

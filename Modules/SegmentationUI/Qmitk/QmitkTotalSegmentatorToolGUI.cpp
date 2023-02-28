@@ -119,7 +119,7 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
     }
     pythonPathTextItem = m_Controls.pythonEnvComboBox->currentText();
     bool isFast = m_Controls.fastBox->isChecked();
-    QString& subTask = m_Controls.subtaskComboBox->currentText();
+    QString subTask = m_Controls.subtaskComboBox->currentText();
     if (subTask != m_VALID_TASKS[0])
     {
       isFast = true;

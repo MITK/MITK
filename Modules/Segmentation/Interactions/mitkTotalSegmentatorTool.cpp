@@ -247,9 +247,26 @@ std::string mitk::TotalSegmentatorTool::GetLabelMapPath()
 {
   std::string pythonFileName;
   std::filesystem::path pathToLabelMap(this->GetPythonPath());
-#ifdef _WIN32
   pathToLabelMap = pathToLabelMap.parent_path();
+#ifdef _WIN32
   pythonFileName = pathToLabelMap.string() + "/Lib/site-packages/totalsegmentator/map_to_binary.py";
+#else
+  pathToLabelMap.append("lib");
+  for (auto const &dir_entry : std::filesystem::directory_iterator{pathToLabelMap})
+  {
+    MITK_INFO << dir_entry << '\n';
+    if (dir_entry.is_directory())
+    {
+      MITK_INFO << dir_entry.path().filename();
+      auto dirName = dir_entry.path().filename().string();
+      if (dirName.rfind("python", 0) == 0)
+      {
+        pathToLabelMap.append(dir_entry.path().filename().string());
+        break;
+      }
+    }
+  }
+  pythonFileName = pathToLabelMap.string() + "/site-packages/totalsegmentator/map_to_binary.py";
 #endif
   return pythonFileName;
 }

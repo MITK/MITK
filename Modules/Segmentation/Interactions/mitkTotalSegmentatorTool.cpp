@@ -134,7 +134,7 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
   auto outputBuffer = mitk::LabelSetImage::New();
   outputBuffer->InitializeByLabeledImage(outputImage);
   outputBuffer->SetGeometry(inputAtTimeStep->GetGeometry());
-  MapLabelsToSegmentation(outputBuffer, m_LabelMapTotal);
+  this->MapLabelsToSegmentation(outputBuffer, m_LabelMapTotal);
   TransferLabelSetImageContent(outputBuffer, previewImage, timeStep);
 }
 
@@ -233,12 +233,7 @@ void mitk::TotalSegmentatorTool::MapLabelsToSegmentation(mitk::LabelSetImage::Po
     mitk::Label *labelptr = outputBuffer->GetLabel(key, 0);
     if (nullptr != labelptr)
     {
-      MITK_INFO << "Replacing label with name: " << labelptr->GetName() << " as " << val;
       labelptr->SetName(val);
-    }
-    else
-    {
-      MITK_INFO << "nullptr found for " << val;
     }
   }
 }
@@ -256,7 +251,6 @@ std::string mitk::TotalSegmentatorTool::GetLabelMapPath()
   {
     if (dir_entry.is_directory())
     {
-      MITK_INFO << dir_entry.path().filename();
       auto dirName = dir_entry.path().filename().string();
       if (dirName.rfind("python", 0) == 0)
       {

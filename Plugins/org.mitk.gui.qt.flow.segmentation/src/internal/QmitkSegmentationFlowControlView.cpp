@@ -98,6 +98,7 @@ void QmitkSegmentationFlowControlView::CreateQtPartControl(QWidget* parent)
   m_Controls->btnStore->setIcon(berry::QtStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-save.svg")));
   m_Controls->btnStore->setVisible(false);
 
+  m_Controls->segmentationTaskListWidget->SetDataStorage(this->GetDataStorage());
   m_Controls->segmentationTaskListWidget->setVisible(false);
 
   m_Controls->labelStored->setVisible(false);

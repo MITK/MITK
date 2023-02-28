@@ -30,13 +30,15 @@ namespace Ui
   class QmitkSegmentationTaskListWidget;
 }
 
-class QmitkSegmentationTaskListWidget : public QWidget
+class MITKSEGMENTATIONUI_EXPORT QmitkSegmentationTaskListWidget : public QWidget
 {
   Q_OBJECT
 
 public:
   explicit QmitkSegmentationTaskListWidget(QWidget* parent = nullptr);
   ~QmitkSegmentationTaskListWidget() override;
+
+  void SetDataStorage(mitk::DataStorage* dataStorage);
 
   bool ActiveTaskIsShown() const;
   void LoadNextUnfinishedTask();
@@ -79,6 +81,7 @@ private:
 
   Ui::QmitkSegmentationTaskListWidget* m_Ui;
   QFileSystemWatcher* m_FileSystemWatcher;
+  mitk::DataStorage* m_DataStorage;
   mitk::SegmentationTaskList::Pointer m_TaskList;
   mitk::DataNode::Pointer m_TaskListNode;
   std::optional<size_t> m_CurrentTaskIndex;

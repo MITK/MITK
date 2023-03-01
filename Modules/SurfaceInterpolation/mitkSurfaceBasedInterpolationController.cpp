@@ -12,23 +12,23 @@ found in the LICENSE file.
 
 #include "mitkSurfaceBasedInterpolationController.h"
 
-#include "mitkColorProperty.h"
+#include <mitkColorProperty.h>
 #include "mitkComputeContourSetNormalsFilter.h"
-#include "mitkContourModelToSurfaceFilter.h"
-#include "mitkIOUtil.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkImageCast.h"
-#include "mitkImageToSurfaceFilter.h"
-#include "mitkInteractionConst.h"
-#include "mitkMemoryUtilities.h"
-#include "mitkProperties.h"
-#include "mitkRestorePlanePositionOperation.h"
+#include <mitkContourModelToSurfaceFilter.h>
+#include <mitkIOUtil.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkImageCast.h>
+#include <mitkImageToSurfaceFilter.h>
+#include <mitkInteractionConst.h>
+#include <mitkMemoryUtilities.h>
+#include <mitkProperties.h>
+#include <mitkRestorePlanePositionOperation.h>
 
-#include "mitkVtkRepresentationProperty.h"
-#include "vtkAppendPolyData.h"
-#include "vtkPolyData.h"
-#include "vtkProperty.h"
-#include "vtkSmartPointer.h"
+#include <mitkVtkRepresentationProperty.h>
+#include <vtkAppendPolyData.h>
+#include <vtkPolyData.h>
+#include <vtkProperty.h>
+#include <vtkSmartPointer.h>
 
 #include <itkCommand.h>
 
@@ -83,7 +83,7 @@ void mitk::SurfaceBasedInterpolationController::AddNewContour(mitk::ContourModel
   transform = op->GetTransform();
 
   mitk::Vector3D direction = op->GetDirectionVector();
-  int pos(-1);
+  int pos = -1;
 
   for (unsigned int i = 0; i < m_MapOfContourLists[m_ActiveLabel].size(); i++)
   {
@@ -259,7 +259,9 @@ void mitk::SurfaceBasedInterpolationController::SetActiveLabel(int activeLabel)
   if (it == m_MapOfContourLists.end())
   {
     ContourPositionPairList newList;
-    m_MapOfContourLists.insert(std::pair<unsigned int, ContourPositionPairList>(m_ActiveLabel, newList));
+
+    m_MapOfContourLists[m_ActiveLabel] = newList;
+
     m_InterpolationResult = nullptr;
   }
 

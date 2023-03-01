@@ -1065,23 +1065,20 @@ void QmitkSegmentationView::ValidateSelectionInput()
       toolSelectionBoxesEnabled = false;
     }
 
-    auto labelSetImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
-    if (nullptr != labelSetImage)
-    {
-      auto activeLayer = labelSetImage->GetActiveLayer();
-      numberOfLabels = labelSetImage->GetNumberOfLabels(activeLayer);
+    m_ToolManager->SetReferenceData(referenceNode);
+    m_ToolManager->SetWorkingData(workingNode);
+    m_Controls->layersWidget->setEnabled(true);
+    m_Controls->labelsWidget->setEnabled(true);
+    m_Controls->labelSetWidget->setEnabled(true);
+    m_Controls->toolSelectionBox2D->setEnabled(true);
+    m_Controls->toolSelectionBox3D->setEnabled(true);
 
-      if (2 == numberOfLabels)
-      {
-        m_Controls->slicesInterpolator->setEnabled(true);
-      }
-      else if (2 < numberOfLabels)
-      {
-        m_Controls->interpolatorWarningLabel->setText(
-          "<font color=\"red\">Interpolation only works for single label segmentations.</font>");
-        m_Controls->interpolatorWarningLabel->show();
-      }
-    }
+    auto labelSetImage = dynamic_cast<mitk::LabelSetImage *>(workingNode->GetData());
+    auto activeLayer = labelSetImage->GetActiveLayer();
+    numberOfLabels = labelSetImage->GetNumberOfLabels(activeLayer);
+
+    if (numberOfLabels > 1)
+      m_Controls->slicesInterpolator->setEnabled(true);
   }
 
   toolSelectionBoxesEnabled &= numberOfLabels > 1;

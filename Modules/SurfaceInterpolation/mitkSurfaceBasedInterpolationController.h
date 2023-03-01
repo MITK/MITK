@@ -15,14 +15,14 @@ found in the LICENSE file.
 
 //#include "mitkCommon.h"
 #include "mitkContourModel.h"
-#include "mitkRestorePlanePositionOperation.h"
-#include "mitkSurface.h"
+#include <mitkRestorePlanePositionOperation.h>
+#include <mitkSurface.h>
 #include <MitkSurfaceInterpolationExports.h>
 
 #include "mitkCreateDistanceImageFromSurfaceFilter.h"
 #include "mitkReduceContourSetFilter.h"
 
-#include "mitkProgressBar.h"
+#include <mitkProgressBar.h>
 
 namespace mitk
 {
@@ -95,6 +95,7 @@ namespace mitk
      * \returns The percentage of the real memory which will be used by the interpolation calculation
      */
     double EstimatePortionOfNeededMemory();
+
 
   protected:
     SurfaceBasedInterpolationController();

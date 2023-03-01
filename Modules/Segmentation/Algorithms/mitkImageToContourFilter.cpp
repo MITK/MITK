@@ -10,16 +10,19 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkImageToContourFilter.h"
-#include "mitkImageAccessByItk.h"
-#include "mitkImageCast.h"
-#include "mitkVtkRepresentationProperty.h"
-#include "vtkLinearTransform.h"
-#include "vtkMatrix4x4.h"
-#include "vtkProperty.h"
-#include "vtkSmartPointer.h"
+#include <mitkImageToContourFilter.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkImageCast.h>
+#include <mitkVtkRepresentationProperty.h>
+#include <vtkLinearTransform.h>
+#include <vtkMatrix4x4.h>
+#include <vtkProperty.h>
+#include <vtkSmartPointer.h>
 
 #include <itkConstantPadImageFilter.h>
+#include <itkUnaryGeneratorImageFilter.h>
+
+#include <mitkNumericConstants.h>
 
 mitk::ImageToContourFilter::ImageToContourFilter()
 {
@@ -78,20 +81,32 @@ void mitk::ImageToContourFilter::Itk2DContourExtraction(const itk::Image<TPixel,
   upperExtendRegion[0] = 1;
   upperExtendRegion[1] = 1;
 
+  auto  filter = itk::UnaryGeneratorImageFilter<ImageType,ImageType>::New();
+
+  auto contourValPicker = [this] (TPixel pixVal)
+  {
+    return fabs(pixVal-m_ContourValue) < mitk::eps
+    ? pixVal
+    : TPixel();
+  };
+
+  filter->SetInput(sliceImage);
+  filter->SetFunctor(contourValPicker);
+  filter->Update();
+
   /*
    * We need to pad here, since the ITK contour extractor fails if the
    * segmentation touches more than one image edge.
    * By padding the image for one row at each edge we overcome this issue
    */
-  padFilter->SetInput(sliceImage);
+  padFilter->SetInput(filter->GetOutput());
   padFilter->SetConstant(0);
   padFilter->SetPadLowerBound(lowerExtendRegion);
   padFilter->SetPadUpperBound(upperExtendRegion);
 
   typename ContourExtractor::Pointer contourExtractor = ContourExtractor::New();
   contourExtractor->SetInput(padFilter->GetOutput());
-  contourExtractor->SetContourValue(0.5);
-
+  contourExtractor->SetContourValue(m_ContourValue-1.0);
   contourExtractor->Update();
 
   unsigned int foundPaths = contourExtractor->GetNumberOfOutputs();
@@ -100,7 +115,7 @@ void mitk::ImageToContourFilter::Itk2DContourExtraction(const itk::Image<TPixel,
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
   vtkSmartPointer<vtkCellArray> polygons = vtkSmartPointer<vtkCellArray>::New();
 
-  unsigned int pointId(0);
+  unsigned int pointId = 0;
 
   for (unsigned int i = 0; i < foundPaths; i++)
   {
@@ -127,7 +142,6 @@ void mitk::ImageToContourFilter::Itk2DContourExtraction(const itk::Image<TPixel,
     } // for2
 
     polygons->InsertNextCell(polygon);
-
   } // for1
 
   contourSurface->SetPoints(points);
@@ -136,7 +150,7 @@ void mitk::ImageToContourFilter::Itk2DContourExtraction(const itk::Image<TPixel,
   Surface::Pointer finalSurface = this->GetOutput();
 
   finalSurface->SetVtkPolyData(contourSurface);
-}
+ }
 
 void mitk::ImageToContourFilter::GenerateOutputInformation()
 {

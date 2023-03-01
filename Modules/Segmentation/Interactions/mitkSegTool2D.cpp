@@ -15,7 +15,6 @@ found in the LICENSE file.
 
 #include "mitkBaseRenderer.h"
 #include "mitkDataStorage.h"
-
 #include "mitkPlaneGeometry.h"
 
 // Include of the new ImageExtractor
@@ -44,7 +43,9 @@ found in the LICENSE file.
 
 #include "mitkContourModelUtils.h"
 
-#include "itkImageRegionIterator.h"
+// #include <itkImageRegionIterator.h>
+
+#include <vtkAbstractArray.h>
 
 #define ROUND(a) ((a) > 0 ? (int)((a) + 0.5) : -(int)(0.5 - (a)))
 
@@ -147,20 +148,22 @@ void mitk::SegTool2D::UpdateSurfaceInterpolation(const Image *slice,
                                                  bool detectIntersection)
 {
   std::vector<SliceInformation> slices = { SliceInformation(slice, plane, 0)};
-  Self::UpdateSurfaceInterpolation(slices, workingImage, detectIntersection);
+  Self::UpdateSurfaceInterpolation(slices, workingImage, detectIntersection, 0, 0);
 }
 
 void  mitk::SegTool2D::RemoveContourFromInterpolator(const SliceInformation& sliceInfo)
 {
   mitk::SurfaceInterpolationController::ContourPositionInformation contourInfo;
-  contourInfo.contourNormal = sliceInfo.plane->GetNormal();
-  contourInfo.contourPoint = sliceInfo.plane->GetOrigin();
+  contourInfo.ContourNormal = sliceInfo.plane->GetNormal();
+  contourInfo.ContourPoint = sliceInfo.plane->GetOrigin();
   mitk::SurfaceInterpolationController::GetInstance()->RemoveContour(contourInfo);
 }
 
 void mitk::SegTool2D::UpdateSurfaceInterpolation(const std::vector<SliceInformation>& sliceInfos,
   const Image* workingImage,
-  bool detectIntersection)
+  bool detectIntersection,
+  unsigned int activeLayerID,
+  mitk::Label::PixelType activeLabelValue)
 {
   if (!m_SurfaceInterpolationEnabled)
     return;
@@ -213,10 +216,11 @@ void mitk::SegTool2D::UpdateSurfaceInterpolation(const std::vector<SliceInformat
   if (relevantSlices.empty())
     return;
 
+  std::vector<const mitk::PlaneGeometry*> contourPlanes;
   for (const auto& sliceInfo : relevantSlices)
   {
-
     contourExtractor->SetInput(sliceInfo.slice);
+    contourExtractor->SetContourValue(activeLabelValue);
     contourExtractor->Update();
     mitk::Surface::Pointer contour = contourExtractor->GetOutput();
 
@@ -226,11 +230,17 @@ void mitk::SegTool2D::UpdateSurfaceInterpolation(const std::vector<SliceInformat
     }
     else
     {
+      vtkSmartPointer<vtkIntArray> intArray = vtkSmartPointer<vtkIntArray>::New();
+      intArray->InsertNextValue(activeLabelValue);
+      intArray->InsertNextValue(activeLayerID);
+      contour->GetVtkPolyData()->GetFieldData()->AddArray(intArray);
       contour->DisconnectPipeline();
       contourList.push_back(contour);
+      contourPlanes.push_back(sliceInfo.plane);
     }
   }
-  mitk::SurfaceInterpolationController::GetInstance()->AddNewContours(contourList);
+
+  mitk::SurfaceInterpolationController::GetInstance()->AddNewContours(contourList, contourPlanes);
 }
 
 
@@ -472,7 +482,13 @@ void mitk::SegTool2D::WriteBackSegmentationResult(const PlaneGeometry *planeGeom
   if (!planeGeometry || !segmentationResult)
     return;
 
+  if(m_LastEventSender == nullptr)
+  {
+    return;
+  }
+  unsigned int currentSlicePosition = m_LastEventSender->GetSliceNavigationController()->GetSlice()->GetPos();
   SliceInformation sliceInfo(segmentationResult, const_cast<mitk::PlaneGeometry *>(planeGeometry), timeStep);
+  sliceInfo.slicePosition = currentSlicePosition;
   WriteBackSegmentationResults({ sliceInfo }, true);
 }
 
@@ -492,14 +508,15 @@ void mitk::SegTool2D::WriteBackSegmentationResults(const std::vector<SegTool2D::
 
   const auto workingNode = this->GetWorkingDataNode();
 
-  mitk::SegTool2D::WriteBackSegmentationResults(workingNode, sliceList, writeSliceToVolume);
-
   // the first geometry is needed otherwise restoring the position is not working
   const auto* plane3 =
     dynamic_cast<const PlaneGeometry*>(dynamic_cast<const mitk::SlicedGeometry3D*>(
       m_LastEventSender->GetSliceNavigationController()->GetCurrentGeometry3D())
       ->GetPlaneGeometry(0));
   unsigned int slicePosition = m_LastEventSender->GetSliceNavigationController()->GetSlice()->GetPos();
+
+  mitk::SegTool2D::WriteBackSegmentationResults(workingNode, sliceList, writeSliceToVolume);
+
 
   /* A cleaner solution would be to add a contour marker for each slice info. It currently
    does not work as the contour markers expect that the plane is always the plane of slice 0.
@@ -519,7 +536,21 @@ void mitk::SegTool2D::WriteBackSegmentationResults(const DataNode* workingNode, 
     mitkThrow() << "Cannot write slice to working node. Working node is invalid.";
   }
 
-  auto* image = dynamic_cast<Image*>(workingNode->GetData());
+  auto image = dynamic_cast<Image*>(workingNode->GetData());
+
+  mitk::Label::PixelType activeLabelValue = 0;
+  unsigned int activeLayerID = 0;
+
+  try{
+    auto labelSetImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+    activeLayerID = labelSetImage->GetActiveLayer();
+    activeLabelValue = labelSetImage->GetActiveLabelSet()->GetActiveLabel()->GetValue();
+  }
+  catch(...)
+  {
+    mitkThrow() << "Working node does not contain  labelSetImage.";
+  }
+
 
   if (nullptr == image)
   {
@@ -530,11 +561,11 @@ void mitk::SegTool2D::WriteBackSegmentationResults(const DataNode* workingNode, 
   {
     if (writeSliceToVolume && nullptr != sliceInfo.plane && sliceInfo.slice.IsNotNull())
     {
-      mitk::SegTool2D::WriteSliceToVolume(image, sliceInfo, true);
+      SegTool2D::WriteSliceToVolume(image, sliceInfo, true);
     }
   }
 
-  mitk::SegTool2D::UpdateSurfaceInterpolation(sliceList, image, false);
+  SegTool2D::UpdateSurfaceInterpolation(sliceList, image, false, activeLayerID, activeLabelValue);
 
   // also mark its node as modified (T27308). Can be removed if T27307
   // is properly solved
@@ -546,7 +577,8 @@ void mitk::SegTool2D::WriteBackSegmentationResults(const DataNode* workingNode, 
 void mitk::SegTool2D::WriteSliceToVolume(Image* workingImage, const PlaneGeometry* planeGeometry, const Image* slice, TimeStepType timeStep, bool allowUndo)
 {
   SliceInformation sliceInfo(slice, planeGeometry, timeStep);
-  WriteSliceToVolume(workingImage, sliceInfo , allowUndo);
+
+  WriteSliceToVolume(workingImage, sliceInfo, allowUndo);
 }
 
 void mitk::SegTool2D::WriteSliceToVolume(Image* workingImage, const SliceInformation &sliceInfo, bool allowUndo)
@@ -623,7 +655,6 @@ void mitk::SegTool2D::WriteSliceToVolume(Image* workingImage, const SliceInforma
     UndoController::GetCurrentUndoModel()->SetOperationEvent(undoStackItem);
     /*============= END undo/redo feature block ========================*/
   }
-
 }
 
 
@@ -636,7 +667,6 @@ void mitk::SegTool2D::SetEnable3DInterpolation(bool enabled)
 {
   m_SurfaceInterpolationEnabled = enabled;
 }
-
 
 int mitk::SegTool2D::AddContourmarker(const PlaneGeometry* planeGeometry, unsigned int sliceIndex)
 {

@@ -25,10 +25,11 @@ found in the LICENSE file.
 #include <mitkNumericConstants.h>
 
 mitk::ImageToContourFilter::ImageToContourFilter()
+  : m_SliceGeometry(nullptr),
+    m_UseProgressBar(false),
+    m_ProgressStepSize(1),
+    m_ContourValue(1.0)
 {
-  this->m_UseProgressBar = false;
-  this->m_ProgressStepSize = 1;
-  this->m_SliceGeometry = nullptr;
 }
 
 mitk::ImageToContourFilter::~ImageToContourFilter()
@@ -106,7 +107,7 @@ void mitk::ImageToContourFilter::Itk2DContourExtraction(const itk::Image<TPixel,
 
   typename ContourExtractor::Pointer contourExtractor = ContourExtractor::New();
   contourExtractor->SetInput(padFilter->GetOutput());
-  contourExtractor->SetContourValue(m_ContourValue-1.0);
+  contourExtractor->SetContourValue(m_ContourValue-0.5);
   contourExtractor->Update();
 
   unsigned int foundPaths = contourExtractor->GetNumberOfOutputs();

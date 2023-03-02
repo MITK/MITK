@@ -108,7 +108,7 @@ private:
 
   void CreateRenderWindowWidget();
   nlohmann::json BuildJSONFromLayout(QSplitter* splitter);
-  QSplitter* BuildLayoutFromJSON(nlohmann::json jsonData, int* windowCounter, QSplitter* parentSplitter = nullptr);
+  QSplitter* BuildLayoutFromJSON(nlohmann::json jsonData, unsigned int* windowCounter, QSplitter* parentSplitter = nullptr);
 
   mitk::SliceNavigationController* m_TimeNavigationController;
 

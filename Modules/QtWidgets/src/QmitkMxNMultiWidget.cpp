@@ -421,7 +421,7 @@ void QmitkMxNMultiWidget::LoadLayout(nlohmann::json data)
   }
 
   delete this->layout();
-  int windowCounter = 0;
+  unsigned int windowCounter = 0;
   auto content = BuildLayoutFromJSON(data, &windowCounter);
   auto hBoxLayout = new QHBoxLayout(this);
   this->setLayout(hBoxLayout);
@@ -490,7 +490,7 @@ nlohmann::json QmitkMxNMultiWidget::BuildJSONFromLayout(QSplitter* splitter)
   return resultJSON;
 }
 
-QSplitter* QmitkMxNMultiWidget::BuildLayoutFromJSON(nlohmann::json jsonData, int* windowCounter, QSplitter* parentSplitter)
+QSplitter* QmitkMxNMultiWidget::BuildLayoutFromJSON(nlohmann::json jsonData, unsigned int* windowCounter, QSplitter* parentSplitter)
 {
   bool vertical = jsonData["vertical"].get<bool>();
   auto orientation = vertical ? Qt::Vertical : Qt::Horizontal;

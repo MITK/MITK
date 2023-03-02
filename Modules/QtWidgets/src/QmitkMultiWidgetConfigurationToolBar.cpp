@@ -40,6 +40,9 @@ void QmitkMultiWidgetConfigurationToolBar::InitializeToolBar()
   AddButtons();
 
   connect(m_LayoutSelectionPopup, &QmitkMultiWidgetLayoutSelectionWidget::LayoutSet, this, &QmitkMultiWidgetConfigurationToolBar::LayoutSet);
+  connect(m_LayoutSelectionPopup, &QmitkMultiWidgetLayoutSelectionWidget::SaveLayout, this, &QmitkMultiWidgetConfigurationToolBar::SaveLayout);
+  connect(m_LayoutSelectionPopup, &QmitkMultiWidgetLayoutSelectionWidget::CustomLayoutLoad, this, &QmitkMultiWidgetConfigurationToolBar::CustomLayoutLoad);
+  connect(m_LayoutSelectionPopup, &QmitkMultiWidgetLayoutSelectionWidget::PresetLayoutLoad, this, &QmitkMultiWidgetConfigurationToolBar::PresetLayoutLoad);
 }
 
 void QmitkMultiWidgetConfigurationToolBar::AddButtons()

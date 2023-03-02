@@ -167,6 +167,10 @@ set(UI_FILES
   src/QmitkDataStorageSelectionHistoryInspector.ui
 )
 
+set(RESOURCE_FILES
+  twoRowsEachDirection.json
+)
+
 set(QRC_FILES
   resource/Qmitk.qrc
 )

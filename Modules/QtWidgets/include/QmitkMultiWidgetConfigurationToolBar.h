@@ -40,6 +40,9 @@ public:
 Q_SIGNALS:
 
   void LayoutSet(int row, int column);
+  void CustomLayoutLoad(std::string filename);
+  void PresetLayoutLoad(std::string filename);
+  void SaveLayout(std::string filename);
   void Synchronized(bool synchronized);
   void InteractionSchemeChanged(mitk::InteractionSchemeSwitcher::InteractionScheme scheme);
 

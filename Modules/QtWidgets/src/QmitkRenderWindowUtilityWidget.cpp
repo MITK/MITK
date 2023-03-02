@@ -93,3 +93,27 @@ void QmitkRenderWindowUtilityWidget::ChangeViewDirection(const QString& viewDire
 {
   m_RenderWindowViewDirectionController->SetViewDirectionOfRenderer(viewDirection.toStdString());
 }
+
+void QmitkRenderWindowUtilityWidget::SetGeometry(const itk::EventObject& event)
+{
+  if (!mitk::SliceNavigationController::GeometrySendEvent(nullptr, 0).CheckEvent(&event))
+  {
+    return;
+  }
+
+  auto viewDirection = m_RenderWindow->GetSliceNavigationController()->GetDefaultViewDirection();
+  switch (viewDirection)
+  {
+  case mitk::AnatomicalPlane::Axial:
+    m_ViewDirectionSelector->setCurrentIndex(0);
+    break;
+  case mitk::AnatomicalPlane::Coronal:
+    m_ViewDirectionSelector->setCurrentIndex(1);
+    break;
+  case mitk::AnatomicalPlane::Sagittal:
+    m_ViewDirectionSelector->setCurrentIndex(2);
+    break;
+  default:
+    break;
+  }
+}

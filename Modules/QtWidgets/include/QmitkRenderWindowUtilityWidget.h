@@ -44,6 +44,7 @@ public:
   ~QmitkRenderWindowUtilityWidget() override;
 
   void SetInvertedSliceNavigation(bool inverted);
+  void SetGeometry(const itk::EventObject& event);
 
 Q_SIGNALS:
 

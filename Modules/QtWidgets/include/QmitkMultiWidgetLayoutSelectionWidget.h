@@ -36,11 +36,17 @@ public:
 Q_SIGNALS:
 
   void LayoutSet(int row, int column);
+  void SaveLayout(std::string filename);
+  void CustomLayoutLoad(std::string filename);
+  void PresetLayoutLoad(std::string filename);
 
 private Q_SLOTS:
 
   void OnTableItemSelectionChanged();
   void OnSetLayoutButtonClicked();
+  void OnSaveLayoutButtonClicked();
+  void OnLoadLayoutButtonClicked();
+  void OnLayoutPresetSelected(int index);
 
 private:
 
@@ -48,6 +54,7 @@ private:
 
 
   Ui::QmitkMultiWidgetLayoutSelectionWidget ui;
+  std::map<int, std::string> m_PresetNameMap;
 
 };
 

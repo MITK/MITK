@@ -213,6 +213,7 @@ void QmitkRenderWindowWidget::InitializeGUI()
       this, &QmitkRenderWindowWidget::OnReinitAction);
     connect(m_UtilityWidget, &QmitkRenderWindowUtilityWidget::ResetAction,
       this, &QmitkRenderWindowWidget::OnResetAction);
+    sliceNavigationController->ConnectGeometrySendEvent(m_UtilityWidget);
   }
 
   m_Layout->addWidget(m_RenderWindow);

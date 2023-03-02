@@ -17,6 +17,10 @@ found in the LICENSE file.
 #include "MitkQtWidgetsExports.h"
 #include "QmitkAbstractMultiWidget.h"
 
+#include <nlohmann/json.hpp>
+
+class QSplitter;
+
 /**
 * @brief The 'QmitkMxNMultiWidget' is a 'QmitkAbstractMultiWidget' that is used to display multiple render windows at once.
 *        Render windows can dynamically be added and removed to change the layout of the multi widget. This
@@ -83,6 +87,10 @@ public Q_SLOTS:
   void wheelEvent(QWheelEvent* e) override;
   void mousePressEvent(QMouseEvent* e) override;
   void moveEvent(QMoveEvent* e) override;
+  void LoadCustomLayout(std::string filename);
+  void LoadPresetLayout(std::string filename);
+  void LoadLayout(nlohmann::json data);
+  void SaveLayout(std::string filename);
 
 Q_SIGNALS:
 
@@ -99,6 +107,8 @@ private:
   void SetInteractionSchemeImpl() override { }
 
   void CreateRenderWindowWidget();
+  nlohmann::json BuildJSONFromLayout(QSplitter* splitter);
+  QSplitter* BuildLayoutFromJSON(nlohmann::json jsonData, int* windowCounter, QSplitter* parentSplitter = nullptr);
 
   mitk::SliceNavigationController* m_TimeNavigationController;
 

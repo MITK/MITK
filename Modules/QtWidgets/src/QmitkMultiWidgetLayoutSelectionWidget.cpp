@@ -12,6 +12,15 @@ found in the LICENSE file.
 
 #include "QmitkMultiWidgetLayoutSelectionWidget.h"
 
+#include <QFileDialog>
+
+#include <usGetModuleContext.h>
+#include <usModuleContext.h>
+#include <usModuleResource.h>
+#include <usModuleResourceStream.h>
+
+#include <nlohmann/json.hpp>
+
 QmitkMultiWidgetLayoutSelectionWidget::QmitkMultiWidgetLayoutSelectionWidget(QWidget* parent/* = 0*/)
   : QWidget(parent)
 {
@@ -27,6 +36,20 @@ void QmitkMultiWidgetLayoutSelectionWidget::Init()
 
   connect(ui.tableWidget, &QTableWidget::itemSelectionChanged, this, &QmitkMultiWidgetLayoutSelectionWidget::OnTableItemSelectionChanged);
   connect(ui.setLayoutPushButton, &QPushButton::clicked, this, &QmitkMultiWidgetLayoutSelectionWidget::OnSetLayoutButtonClicked);
+  connect(ui.loadLayoutPushButton, &QPushButton::clicked, this, &QmitkMultiWidgetLayoutSelectionWidget::OnLoadLayoutButtonClicked);
+  connect(ui.saveLayoutPushButton, &QPushButton::clicked, this, &QmitkMultiWidgetLayoutSelectionWidget::OnSaveLayoutButtonClicked);
+  connect(ui.selectDefaultLayoutComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &QmitkMultiWidgetLayoutSelectionWidget::OnLayoutPresetSelected);
+
+  ui.selectDefaultLayoutComboBox->addItem("Select a layout preset");
+  auto presetResources = us::GetModuleContext()->GetModule()->FindResources("/", "*.json", false);
+  for (const auto& resource : presetResources)
+  {
+    us::ModuleResourceStream jsonStream(resource);
+    auto data = nlohmann::json::parse(jsonStream);
+    auto resourceName = data["name"].get<std::string>();
+    ui.selectDefaultLayoutComboBox->addItem(QString::fromStdString(resourceName));
+    m_PresetNameMap[ui.selectDefaultLayoutComboBox->count() - 1] = resource.GetResourcePath();
+  }
 }
 
 void QmitkMultiWidgetLayoutSelectionWidget::OnTableItemSelectionChanged()
@@ -73,4 +96,34 @@ void QmitkMultiWidgetLayoutSelectionWidget::OnSetLayoutButtonClicked()
     close();
     emit LayoutSet(row+1, column+1);
   }
+}
+
+void QmitkMultiWidgetLayoutSelectionWidget::OnSaveLayoutButtonClicked()
+{
+  QString filename = QFileDialog::getSaveFileName(nullptr, "Select where to save the current layout", "", "MITK Window Layout (*.json)");
+  if (filename.isEmpty())
+    return;
+
+  emit SaveLayout(filename.toStdString());
+}
+
+void QmitkMultiWidgetLayoutSelectionWidget::OnLoadLayoutButtonClicked()
+{
+  QString filename = QFileDialog::getOpenFileName(nullptr, "Load a layout file", "", "MITK Window Layouts (*.json)");
+  if (filename.isEmpty())
+    return;
+
+  emit CustomLayoutLoad(filename.toStdString());
+}
+
+void QmitkMultiWidgetLayoutSelectionWidget::OnLayoutPresetSelected(int index)
+{
+  if (index == 0)
+  {
+    // First entry is only for description
+    return;
+  }
+
+  std::string filename = m_PresetNameMap[index];
+  emit PresetLayoutLoad(filename);
 }

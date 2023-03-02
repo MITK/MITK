@@ -96,13 +96,17 @@ public:
 private Q_SLOTS:
 
   void OnReinitAction(QList<mitk::DataNode::Pointer> selectedNodes);
+
   void OnResetAction(QList<mitk::DataNode::Pointer> selectedNodes);
+
+  void OnResetGeometry();
 
 private:
 
   void InitializeGUI();
   void InitializeDecorations();
   void ComputeInvertedSliceNavigation();
+  void ResetGeometry(const mitk::TimeGeometry* referenceGeometry);
 
   QString m_WidgetName;
   QVBoxLayout* m_Layout;

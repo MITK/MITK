@@ -98,15 +98,26 @@ QmitkRenderWindow* QmitkAbstractMultiWidgetEditor::GetQmitkRenderWindow(const mi
   return multiWidget->GetRenderWindow(orientation);
 }
 
-void QmitkAbstractMultiWidgetEditor::SetReferenceGeometry(const mitk::TimeGeometry* referenceGeometry, bool resetCamera)
+void QmitkAbstractMultiWidgetEditor::InitializeViews(const mitk::TimeGeometry* geometry, bool resetCamera)
 {
-  const auto& multiWidget = GetMultiWidget();
+  const auto& multiWidget = this->GetMultiWidget();
   if (nullptr == multiWidget)
   {
     return;
   }
 
-  multiWidget->SetReferenceGeometry(referenceGeometry, resetCamera);
+  multiWidget->InitializeViews(geometry, resetCamera);
+}
+
+void QmitkAbstractMultiWidgetEditor::SetInteractionReferenceGeometry(const mitk::TimeGeometry* referenceGeometry)
+{
+  const auto& multiWidget = this->GetMultiWidget();
+  if (nullptr == multiWidget)
+  {
+    return;
+  }
+
+  multiWidget->SetInteractionReferenceGeometry(referenceGeometry);
 }
 
 bool QmitkAbstractMultiWidgetEditor::HasCoupledRenderWindows() const

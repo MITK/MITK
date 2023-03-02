@@ -147,8 +147,34 @@ namespace mitk
      * Setting a new world time geometry updates the current world geometry and the
      * curent world plane geometry, using the currently selected slice and timestep.
      */
-    virtual void SetWorldTimeGeometry(const mitk::TimeGeometry* geometry);
+    virtual void SetWorldTimeGeometry(const TimeGeometry* geometry);
     itkGetConstObjectMacro(WorldTimeGeometry, TimeGeometry);
+
+    /**
+     * \brief Set the interaction reference world time geometry using the given TimeGeometry.
+     *
+     * Setting a new interaction reference world time geometry also updates the
+     * alignment status of the reference geometry, which can be retrieved using
+     * 'GetReferenceGeometryAligned'.
+     * Using a nullptr as the interaction reference geomertry implies that
+     * no requirements on the geometry exist, thus in this case any check
+     * will result in 'ReferenceGeometryAligned' being true.
+     *
+     * \param geometry  The reference geometry used for render window interaction.
+     */
+    virtual void SetInteractionReferenceGeometry(const TimeGeometry* geometry);
+
+    /**
+     * \brief Get the current interaction reference geometry.
+     */
+    itkGetConstObjectMacro(InteractionReferenceGeometry, TimeGeometry);
+
+    /**
+     * \brief Return if the reference geometry aligns with the base renderer's world geometry.
+     *        If true, the interaction reference geometry aligns with the base renderer's
+     *        current world geometry. False otherwise.
+     */
+    itkGetMacro(ReferenceGeometryAligned, bool);
 
     /**
      * \brief Get the current time-extracted 3D-geometry.
@@ -408,13 +434,20 @@ namespace mitk
      *
      * This WorldTimeGeometry is used to extract a SlicedGeometry3D,
      * using the current timestep (set via SetTimeStep).
-     * The time-extracted 3D-geometry is used as the "CurrentWorldgeometry".
-     * It will be set using the "SetCurrentWorldGeometry"-function.
+     * The time-extracted 3D-geometry is used as the "CurrentWorldGeometry".
      * A PlaneGeometry can further be extracted using the current slice (set via SetSlice).
      * The slice-extracted 2D-geometry is used as the "CurrentWorldPlaneGeometry".
-     * It will be set using the "SetCurrentWorldPlaneGeometry"-function.
      */
     TimeGeometry::ConstPointer m_WorldTimeGeometry;
+
+    /**
+     * \brief Pointer to the interaction reference geometry used for interaction.
+     *
+     * This InteractionReferenceGeometry is used to decide if a base renderer /
+     * render window is able to correctly handle display interaction, e.g. drawing.
+     * It will be set using the "SetInteractionReferenceGeometry"-function.
+     */
+    TimeGeometry::ConstPointer m_InteractionReferenceGeometry;
 
     /**
      * \brief Pointer to the current time-extracted 3D-geometry.
@@ -443,6 +476,7 @@ namespace mitk
     BindDispatcherInteractor* m_BindDispatcherInteractor;
 
     bool m_KeepDisplayedRegion;
+    bool m_ReferenceGeometryAligned;
 
   protected:
 

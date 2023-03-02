@@ -11,6 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "mitkBaseRenderer.h"
+#include "mitkBaseRendererHelper.h"
+
 #include "mitkMapper.h"
 #include "mitkResliceMethodProperty.h"
 
@@ -313,6 +315,18 @@ void mitk::BaseRenderer::SetWorldTimeGeometry(const mitk::TimeGeometry* geometry
   }
 
   m_WorldTimeGeometry = geometry;
+
+  this->UpdateCurrentGeometries();
+}
+
+void mitk::BaseRenderer::SetInteractionReferenceGeometry(const TimeGeometry* geometry)
+{
+  if (m_InteractionReferenceGeometry == geometry)
+  {
+    return;
+  }
+
+  m_InteractionReferenceGeometry = geometry;
 
   this->UpdateCurrentGeometries();
 }
@@ -664,6 +678,7 @@ void mitk::BaseRenderer::UpdateCurrentGeometries()
   {
     // simply mark the base renderer as modified
     Modified();
+    return;
   }
 
   if (m_TimeStep >= m_WorldTimeGeometry->CountTimeSteps())
@@ -682,6 +697,7 @@ void mitk::BaseRenderer::UpdateCurrentGeometries()
 
     SetCurrentWorldGeometry(slicedWorldGeometry);
     SetCurrentWorldPlaneGeometry(slicedWorldGeometry->GetPlaneGeometry(m_Slice));
+    m_ReferenceGeometryAligned = BaseRendererHelper::IsRendererGeometryAlignedWithGeometry(this, m_InteractionReferenceGeometry);
   }
 }
 

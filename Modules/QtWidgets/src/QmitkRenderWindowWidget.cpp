@@ -201,6 +201,8 @@ void QmitkRenderWindowWidget::InitializeGUI()
   // create render window for this render window widget
   m_RenderWindow = new QmitkRenderWindow(this, m_WidgetName, nullptr);
   m_RenderWindow->SetLayoutIndex(mitk::AnatomicalPlane::Sagittal);
+  connect(m_RenderWindow, &QmitkRenderWindow::ResetGeometry,
+    this, &QmitkRenderWindowWidget::OnResetGeometry);
 
   auto sliceNavigationController = this->GetSliceNavigationController();
   sliceNavigationController->SetDefaultViewDirection(mitk::AnatomicalPlane::Sagittal);
@@ -397,6 +399,19 @@ void QmitkRenderWindowWidget::OnResetAction(QList<mitk::DataNode::Pointer> selec
   }
 
   const mitk::TimeGeometry* referenceGeometry = selectedImage->GetTimeGeometry();
+  this->ResetGeometry(referenceGeometry);
+}
+
+void QmitkRenderWindowWidget::OnResetGeometry()
+{
+  auto* baseRenderer = mitk::BaseRenderer::GetInstance(m_RenderWindow->GetRenderWindow());
+  const auto* interactionReferenceGeometry = baseRenderer->GetInteractionReferenceGeometry();
+  this->ResetGeometry(interactionReferenceGeometry);
+  m_RenderWindow->ShowOverlayMessage(false);
+}
+
+void QmitkRenderWindowWidget::ResetGeometry(const mitk::TimeGeometry* referenceGeometry)
+{
   if (nullptr == referenceGeometry)
   {
     return;

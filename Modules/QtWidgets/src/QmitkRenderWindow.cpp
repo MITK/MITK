@@ -32,8 +32,9 @@ found in the LICENSE file.
 #include <QWheelEvent>
 #include <QWindow>
 
-#include "QmitkMimeTypes.h"
-#include "QmitkRenderWindowMenu.h"
+#include <QmitkMimeTypes.h>
+#include <QmitkRenderWindowMenu.h>
+#include <QmitkStyleManager.h>
 
 QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const QString &name, mitk::VtkPropRenderer *)
   : QVTKOpenGLNativeWidget(parent)
@@ -56,12 +57,17 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, const QString &name, mitk:
   QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   setSizePolicy(sizePolicy);
 
-  // setup overlay widget to show a warning message
-  m_GeometryViolationWarningOverlay = new QmitkSimpleTextOverlayWidget(this);
+  // setup overlay widget to show a warning message with a button
+  m_GeometryViolationWarningOverlay = new QmitkButtonOverlayWidget(this);
   m_GeometryViolationWarningOverlay->setVisible(false);
   m_GeometryViolationWarningOverlay->SetOverlayText(
-    QStringLiteral("<font class=\"warning\"><p style=\"text-align:center\">Interaction is not possible because the "
-                   "render window is not aligned.</p></center></font>"));
+    QStringLiteral("<font color=\"red\"><p style=\"text-align:center\">Interaction is not possible because the "
+                   "render window geometry<br>does not match the interaction reference geometry.</p></center></font>"));
+  m_GeometryViolationWarningOverlay->SetButtonText("Reset geometry");
+  m_GeometryViolationWarningOverlay->SetButtonIcon(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/reset.svg")));
+
+  connect(m_GeometryViolationWarningOverlay, &QmitkButtonOverlayWidget::Clicked,
+          this, &QmitkRenderWindow::ResetGeometry);
 }
 
 QmitkRenderWindow::~QmitkRenderWindow()

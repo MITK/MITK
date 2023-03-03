@@ -308,6 +308,7 @@ unsigned int mitk::LabelSetImage::AddLayer(mitk::Image::Pointer layerImage, mitk
   m_LabelSetContainer.push_back(ls);
 
   RegisterLabelSet(ls);
+  this->ReinitMaps();
 
   SetActiveLayer(newLabelSetId);
   this->Modified();
@@ -345,12 +346,14 @@ void mitk::LabelSetImage::AddLabelSetToLayer(const unsigned int layerIdx, const 
       defaultLabelSet->SetActiveLabel(0 /*Exterior Label*/);
       defaultLabelSet->SetLayer(m_LabelSetContainer.size());
       this->RegisterLabelSet(defaultLabelSet);
+      this->ReinitMaps();
       m_LabelSetContainer.push_back(defaultLabelSet);
       this->m_GroupAddedMessage.Send(m_LabelSetContainer.size()-1);
     }
     m_LabelSetContainer.push_back(clonedLabelSet);
     this->OnGroupAdded(layerIdx);
   }
+  this->ReinitMaps();
 }
 
 void mitk::LabelSetImage::SetActiveLayer(unsigned int layer)
@@ -957,19 +960,24 @@ void mitk::LabelSetImage::OnLabelAdded(LabelValueType labelValue)
 
   if (!label) mitkThrow() << "Wrong internal state. OnLabelAdded was triggered, but label cannot be found. Invalid label: " << labelValue;
 
+  AddLabelToMap(labelValue, label, layerID);
+
+  this->m_LabelAddedMessage.Send(labelValue);
+}
+
+void mitk::LabelSetImage::AddLabelToMap(LabelValueType labelValue, mitk::Label* label, SpatialGroupIndexType groupID)
+{
   m_LabelMap[labelValue] = label;
-  m_LabelToGroupMap[labelValue] = layerID;
-  auto groupFinding = m_GroupToLabelMap.find(layerID);
+  m_LabelToGroupMap[labelValue] = groupID;
+  auto groupFinding = m_GroupToLabelMap.find(groupID);
   if (groupFinding == m_GroupToLabelMap.end())
   {
-    m_GroupToLabelMap[layerID] = { labelValue };
+    m_GroupToLabelMap[groupID] = { labelValue };
   }
   else
   {
-    m_GroupToLabelMap[layerID].push_back(labelValue);
+    m_GroupToLabelMap[groupID].push_back(labelValue);
   }
-
-  this->m_LabelAddedMessage.Send(labelValue);
 }
 
 void mitk::LabelSetImage::OnLabelModified(LabelValueType labelValue)
@@ -1098,6 +1106,24 @@ const mitk::LabelSetImage::LabelVectorType mitk::LabelSetImage::GetLabels()
   return result;
 }
 
+void mitk::LabelSetImage::ReinitMaps()
+{
+  this->m_LabelMap.clear();
+  this->m_LabelToGroupMap.clear();
+  this->m_GroupToLabelMap.clear();
+
+  for (SpatialGroupIndexType layerID = 0; layerID < this->GetNumberOfLayers(); ++layerID)
+  {
+    auto labelSet = this->GetLabelSet(layerID);
+    for (auto iter = labelSet->IteratorBegin(); iter != labelSet->IteratorEnd(); ++iter)
+    {
+      if (iter->first != UnlabeledLabelValue)
+      {
+        this->AddLabelToMap(iter->first, iter->second, layerID);
+      }
+    }
+  }
+}
 
 
 bool mitk::Equal(const mitk::LabelSetImage &leftHandSide,

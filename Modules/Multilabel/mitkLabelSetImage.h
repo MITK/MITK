@@ -208,11 +208,16 @@ namespace mitk
     protected:
 
       void OnLabelAdded(LabelValueType labelValue);
+      void AddLabelToMap(LabelValueType labelValue, mitk::Label* label, SpatialGroupIndexType groupID);
       void OnLabelModified(LabelValueType labelValue);
       void OnLabelRemoved(LabelValueType labelValue);
       void OnGroupAdded(SpatialGroupIndexType groupIndex);
       void OnGroupModified(SpatialGroupIndexType groupIndex);
       void OnGroupRemoved(SpatialGroupIndexType groupIndex);
+
+      /** Reeinitalizes the internal maps based on the current layer/label content
+      * of the instance. */
+      void ReinitMaps();
 
       using LabelMapType = std::map<LabelValueType, Label::Pointer>;
       LabelMapType m_LabelMap;

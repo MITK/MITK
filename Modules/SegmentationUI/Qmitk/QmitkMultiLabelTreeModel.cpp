@@ -240,24 +240,18 @@ QVariant QmitkMultiLabelTreeModel::data(const QModelIndex &index, int role) cons
   }
   else if (role == ItemModelRole::LabelDataRole)
   {
-    if (TableColumns::NAME_COL == index.column())
+    if (item->HandleAsInstance())
     {
-      if (item->HandleAsInstance())
-      {
-        auto label = item->GetLabel();
-        return QVariant::fromValue<void*>(label);
-      }
+      auto label = item->GetLabel();
+      return QVariant::fromValue<void*>(label);
     }
   }
   else if (role == ItemModelRole::LabelValueRole)
   {
-    if (TableColumns::NAME_COL == index.column())
+    if (item->HandleAsInstance())
     {
-      if (item->HandleAsInstance())
-      {
-        auto label = item->GetLabel();
-        return QVariant(label->GetValue());
-      }
+      auto label = item->GetLabel();
+      return QVariant(label->GetValue());
     }
   }
   return QVariant();

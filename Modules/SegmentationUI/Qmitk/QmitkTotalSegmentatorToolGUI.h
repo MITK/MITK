@@ -81,6 +81,8 @@ protected:
    */
   unsigned int FetchSelectedGPUFromUI();
 
+  void setUpTotalSegmentator(const QString &);
+  
   /**
    * @brief For storing values like Python path across sessions.
    */

@@ -8,6 +8,7 @@
 #include <QDirIterator>
 #include <QtGlobal>
 #include <QFileDialog>
+#include <QStandardPaths>
 #include "mitkTotalSegmentatorTool.h"
 
 
@@ -25,6 +26,10 @@ QmitkTotalSegmentatorToolGUI::QmitkTotalSegmentatorToolGUI()
   }
   m_EnableConfirmSegBtnFnc = [this](bool enabled)
   { return !m_FirstPreviewComputation ? m_SuperclassEnableConfirmSegBtnFnc(enabled) : false; };
+  const QString storageDir =
+    QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/" + qApp->organizationName() + "/";
+  MITK_INFO << storageDir.toStdString();
+  setUpTotalSegmentator(storageDir);
 }
 
 void QmitkTotalSegmentatorToolGUI::ConnectNewTool(mitk::SegWithPreviewTool *newTool)
@@ -101,6 +106,13 @@ unsigned int QmitkTotalSegmentatorToolGUI::FetchSelectedGPUFromUI()
   }
 }
 
+
+void QmitkTotalSegmentatorToolGUI::setUpTotalSegmentator(const QString &path)
+{
+  QDir folderPath(path);
+  folderPath.mkdir(".totalsegmentator");
+}
+
 void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
 {
   auto tool = this->GetConnectedToolAs<mitk::TotalSegmentatorTool>();
@@ -108,6 +120,7 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
   {
     return;
   }
+  
   QString pythonPathTextItem = "";
   try
   {
@@ -156,6 +169,7 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
   { // only cache if the prediction ended without errors.
     m_Settings.setValue("TotalSeg/LastPythonPath", pythonPathTextItem);
   }
+  
 }
 
 

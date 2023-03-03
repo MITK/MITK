@@ -1,16 +1,16 @@
 #include "QmitkTotalSegmentatorToolGUI.h"
 
-#include <QIcon>
-#include <QUrl>
-#include <QMessageBox>
+#include "mitkProcessExecutor.h"
+#include "mitkTotalSegmentatorTool.h"
 #include <QApplication>
 #include <QDir>
 #include <QDirIterator>
-#include <QtGlobal>
 #include <QFileDialog>
+#include <QIcon>
+#include <QMessageBox>
 #include <QStandardPaths>
-#include "mitkTotalSegmentatorTool.h"
-
+#include <QUrl>
+#include <QtGlobal>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkTotalSegmentatorToolGUI, "")
 
@@ -106,11 +106,67 @@ unsigned int QmitkTotalSegmentatorToolGUI::FetchSelectedGPUFromUI()
   }
 }
 
+namespace
+{
+  void onPythonProcessEvent(itk::Object * /*pCaller*/, const itk::EventObject &e, void *)
+  {
+    std::string testCOUT;
+    std::string testCERR;
+    const auto *pEvent = dynamic_cast<const mitk::ExternalProcessStdOutEvent *>(&e);
+
+    if (pEvent)
+    {
+      testCOUT = testCOUT + pEvent->GetOutput();
+      MITK_INFO << testCOUT;
+    }
+
+    const auto *pErrEvent = dynamic_cast<const mitk::ExternalProcessStdErrEvent *>(&e);
+
+    if (pErrEvent)
+    {
+      testCERR = testCERR + pErrEvent->GetOutput();
+      MITK_ERROR << testCERR;
+    }
+  }
+} // namespace
 
 void QmitkTotalSegmentatorToolGUI::setUpTotalSegmentator(const QString &path)
 {
+  const QString VENV_NAME = ".totalsegmentator";
   QDir folderPath(path);
-  folderPath.mkdir(".totalsegmentator");
+  folderPath.mkdir(VENV_NAME);
+  if (!folderPath.cd(VENV_NAME))
+  {
+    return;
+  }
+  mitk::ProcessExecutor::ArgumentListType args;
+  auto spExec = mitk::ProcessExecutor::New();
+  itk::CStyleCommand::Pointer spCommand = itk::CStyleCommand::New();
+  spCommand->SetCallback(&onPythonProcessEvent);
+  spExec->AddObserver(mitk::ExternalProcessOutputEvent(), spCommand);
+
+  args.push_back("-m");
+  args.push_back("venv");
+  args.push_back(VENV_NAME.toStdString());
+  spExec->Execute(path.toStdString(), "python", args);
+
+  if (folderPath.cd("bin"))
+  {
+    std::string workingDir;
+    workingDir = folderPath.absolutePath().toStdString();
+    args.clear();
+    args.push_back("install");
+    args.push_back("Totalsegmentator");
+    spExec->Execute(workingDir, "pip3", args);
+    if (this->IsTotalSegmentatorInstalled(folderPath.absolutePath()))
+    {
+      m_PythonPath = folderPath.absolutePath();
+    }
+    else
+    {
+      MITK_ERROR << m_WARNING_TOTALSEG_NOT_FOUND;
+    }
+  }
 }
 
 void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
@@ -120,7 +176,7 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
   {
     return;
   }
-  
+
   QString pythonPathTextItem = "";
   try
   {
@@ -148,7 +204,8 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
   catch (const std::exception &e)
   {
     std::stringstream errorMsg;
-    errorMsg << "<b>STATUS: </b>Error while processing parameters for TotalSegmentator segmentation. Reason: " << e.what();
+    errorMsg << "<b>STATUS: </b>Error while processing parameters for TotalSegmentator segmentation. Reason: "
+             << e.what();
     this->ShowErrorMessage(errorMsg.str());
     this->WriteErrorMessage(QString::fromStdString(errorMsg.str()));
     m_Controls.previewButton->setEnabled(true);
@@ -169,12 +226,10 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
   { // only cache if the prediction ended without errors.
     m_Settings.setValue("TotalSeg/LastPythonPath", pythonPathTextItem);
   }
-  
 }
 
-
 void QmitkTotalSegmentatorToolGUI::ShowErrorMessage(const std::string &message, QMessageBox::Icon icon)
-{ 
+{
   this->setCursor(Qt::ArrowCursor);
   QMessageBox *messageBox = new QMessageBox(icon, nullptr, message.c_str());
   messageBox->exec();
@@ -193,7 +248,6 @@ void QmitkTotalSegmentatorToolGUI::WriteErrorMessage(const QString &message)
   m_Controls.statusLabel->setText(message);
   m_Controls.statusLabel->setStyleSheet("font-weight: bold; color: red");
 }
-
 
 bool QmitkTotalSegmentatorToolGUI::IsTotalSegmentatorInstalled(const QString &pythonPath)
 {
@@ -221,7 +275,6 @@ bool QmitkTotalSegmentatorToolGUI::IsTotalSegmentatorInstalled(const QString &py
 
 void QmitkTotalSegmentatorToolGUI::AutoParsePythonPaths()
 {
-  
   QString homeDir = QDir::homePath();
   std::vector<QString> searchDirs;
 #ifdef _WIN32
@@ -266,11 +319,12 @@ void QmitkTotalSegmentatorToolGUI::OnPythonPathChanged(const QString &pyEnv)
       QFileDialog::getExistingDirectory(m_Controls.pythonEnvComboBox->parentWidget(), "Python Path", "dir");
     if (!path.isEmpty())
     {
-      this->OnPythonPathChanged(path); // recall same function for new path validation
+      this->OnPythonPathChanged(path);                                  // recall same function for new path validation
       bool oldState = m_Controls.pythonEnvComboBox->blockSignals(true); // block signal firing while inserting item
       m_Controls.pythonEnvComboBox->insertItem(0, path);
       m_Controls.pythonEnvComboBox->setCurrentIndex(0);
-      m_Controls.pythonEnvComboBox->blockSignals(oldState); // unblock signal firing after inserting item. Remove this after Qt6 migration
+      m_Controls.pythonEnvComboBox->blockSignals(
+        oldState); // unblock signal firing after inserting item. Remove this after Qt6 migration
     }
   }
   else if (!this->IsTotalSegmentatorInstalled(pyEnv))

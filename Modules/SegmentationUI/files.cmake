@@ -29,6 +29,7 @@ set(CPP_FILES
   Qmitk/QmitkSurfaceBasedInterpolatorWidget.cpp
   Qmitk/QmitkSimpleLabelSetListWidget.cpp
   Qmitk/QmitkSegmentationTaskListWidget.cpp
+  Qmitk/QmitkTotalSegmentatorToolGUI.cpp
   SegmentationUtilities/QmitkBooleanOperationsWidget.cpp
   SegmentationUtilities/QmitkContourModelToImageWidget.cpp
   SegmentationUtilities/QmitkImageMaskingWidget.cpp
@@ -70,6 +71,7 @@ set(MOC_H_FILES
   Qmitk/QmitkSurfaceBasedInterpolatorWidget.h
   Qmitk/QmitkSimpleLabelSetListWidget.h
   Qmitk/QmitkSegmentationTaskListWidget.h
+  Qmitk/QmitkTotalSegmentatorToolGUI.h
   SegmentationUtilities/QmitkBooleanOperationsWidget.h
   SegmentationUtilities/QmitkContourModelToImageWidget.h
   SegmentationUtilities/QmitkImageMaskingWidget.h
@@ -89,6 +91,7 @@ set(UI_FILES
   Qmitk/QmitknnUNetToolGUIControls.ui
   Qmitk/QmitkEditableContourToolGUIControls.ui
   Qmitk/QmitkSegmentationTaskListWidget.ui
+  Qmitk/QmitkTotalSegmentatorGUIControls.ui
   SegmentationUtilities/QmitkBooleanOperationsWidgetControls.ui
   SegmentationUtilities/QmitkContourModelToImageWidgetControls.ui
   SegmentationUtilities/QmitkImageMaskingWidgetControls.ui

@@ -536,7 +536,7 @@ void QmitkMultiLabelTreeModel::GenerateInternalGroupTree(unsigned int groupID, Q
 
   for (auto lIter = labelSet->IteratorConstBegin(); lIter != labelSet->IteratorConstEnd(); lIter++)
   {
-    if (lIter->second == m_Segmentation->GetExteriorLabel()) continue;
+    if (lIter->first== mitk::LabelSetImage::UnlabeledLabelValue || lIter->second == m_Segmentation->GetExteriorLabel()) continue;
 
     bool newItemCreated = false;
     AddLabelToGroupTree(lIter->second, groupItem, newItemCreated);

@@ -30,6 +30,11 @@ protected slots :
    */
   void OnPythonPathChanged(const QString &);
 
+  /**
+    @brief Qt Slot
+   */
+  void OnInstallBtnClicked();
+
 protected:
   QmitkTotalSegmentatorToolGUI();
   ~QmitkTotalSegmentatorToolGUI() = default;
@@ -38,6 +43,8 @@ protected:
   void InitializeUI(QBoxLayout* mainLayout) override;
 
   void EnableWidgets(bool enabled) override;
+
+  void ToggleEnableEverything(bool);
 
   /**
    * @brief Searches and parses paths of python virtual enviroments
@@ -81,7 +88,7 @@ protected:
    */
   unsigned int FetchSelectedGPUFromUI();
 
-  void setUpTotalSegmentator(const QString &);
+  bool SetUpTotalSegmentator(const QString &);
   
   /**
    * @brief For storing values like Python path across sessions.
@@ -97,6 +104,7 @@ protected:
   const std::string m_WARNING_TOTALSEG_NOT_FOUND = "TotalSegmentator is not detected in the selected python environment.Please select a valid "
                         "python environment or install TotalSegmentator.";
   const QStringList m_VALID_TASKS = {"total", "cerebral_bleed", "hip_implant", "coronary_arteries"};
+  const QString m_VENV_NAME = ".totalsegmentator";
   
 };
 

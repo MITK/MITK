@@ -26,10 +26,6 @@ QmitkTotalSegmentatorToolGUI::QmitkTotalSegmentatorToolGUI()
   }
   m_EnableConfirmSegBtnFnc = [this](bool enabled)
   { return !m_FirstPreviewComputation ? m_SuperclassEnableConfirmSegBtnFnc(enabled) : false; };
-  const QString storageDir =
-    QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/" + qApp->organizationName() + "/";
-  MITK_INFO << storageDir.toStdString();
-  setUpTotalSegmentator(storageDir);
 }
 
 void QmitkTotalSegmentatorToolGUI::ConnectNewTool(mitk::SegWithPreviewTool *newTool)
@@ -43,11 +39,12 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
 {
   m_Controls.setupUi(this);
   m_Controls.pythonEnvComboBox->addItem("Select");
+  m_Controls.pythonEnvComboBox->setDuplicatesEnabled(false);
   m_Controls.previewButton->setDisabled(true);
   m_Controls.statusLabel->setTextFormat(Qt::RichText);
   m_Controls.subtaskComboBox->addItems(m_VALID_TASKS);
-  AutoParsePythonPaths();
-  SetGPUInfo();
+  this->AutoParsePythonPaths();
+  this->SetGPUInfo();
   if (m_GpuLoader.GetGPUCount() != 0)
   {
     WriteStatusMessage(QString("<b>STATUS: </b><i>Welcome to Total Segmentator tool. You're in luck: " + QString::number(m_GpuLoader.GetGPUCount()) +
@@ -61,6 +58,7 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
   mainLayout->addLayout(m_Controls.verticalLayout);
 
   connect(m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnPreviewBtnClicked()));
+  connect(m_Controls.installButton, SIGNAL(clicked()), this, SLOT(OnInstallBtnClicked()));
   connect(m_Controls.pythonEnvComboBox,
           SIGNAL(currentTextChanged(const QString &)),
           this,
@@ -70,6 +68,15 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
 
   QString lastSelectedPyEnv = m_Settings.value("TotalSeg/LastPythonPath").toString();
   m_Controls.pythonEnvComboBox->insertItem(0, lastSelectedPyEnv);
+
+  const QString storageDir =
+    QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/" + qApp->organizationName() + "/";
+  MITK_INFO << storageDir.toStdString();
+  this->ToggleEnableEverything(false);
+  if (this->IsTotalSegmentatorInstalled(storageDir + QDir::separator() + m_VENV_NAME))
+  {
+    this->ToggleEnableEverything(true);
+  }
 }
 
 void QmitkTotalSegmentatorToolGUI::EnableWidgets(bool enabled)
@@ -130,14 +137,45 @@ namespace
   }
 } // namespace
 
-void QmitkTotalSegmentatorToolGUI::setUpTotalSegmentator(const QString &path)
+void QmitkTotalSegmentatorToolGUI::ToggleEnableEverything(bool isEnable) 
 {
-  const QString VENV_NAME = ".totalsegmentator";
-  QDir folderPath(path);
-  folderPath.mkdir(VENV_NAME);
-  if (!folderPath.cd(VENV_NAME))
+  m_Controls.previewButton->setEnabled(isEnable);
+  m_Controls.subtaskComboBox->setEnabled(isEnable);
+  m_Controls.installButton->setEnabled((!isEnable));
+}
+
+void QmitkTotalSegmentatorToolGUI::OnInstallBtnClicked()
+{
+  const QString storageDir =
+    QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/" + qApp->organizationName() + "/";
+  MITK_INFO << storageDir.toStdString();
+  bool isSuccess = false;
+#ifndef _WIN32
+  isSuccess = SetUpTotalSegmentator(storageDir);
+#endif
+  if (isSuccess)
   {
-    return;
+    this->ToggleEnableEverything(true);
+    this->WriteStatusMessage("Successfully installed TotalSegmentator");
+  }
+  else
+  {
+    this->WriteErrorMessage("Couldn't find TotalSegmentator");
+  }
+}
+
+bool QmitkTotalSegmentatorToolGUI::SetUpTotalSegmentator(const QString &path)
+{
+  bool isInstalled = false;
+  QDir folderPath(path);
+  if (this->IsTotalSegmentatorInstalled(folderPath.absoluteFilePath(m_VENV_NAME)))
+  {
+    return true;
+  }
+  folderPath.mkdir(m_VENV_NAME);
+  if (!folderPath.cd(m_VENV_NAME))
+  {
+    return false; // Check if directory creation was successful.
   }
   mitk::ProcessExecutor::ArgumentListType args;
   auto spExec = mitk::ProcessExecutor::New();
@@ -145,10 +183,10 @@ void QmitkTotalSegmentatorToolGUI::setUpTotalSegmentator(const QString &path)
   spCommand->SetCallback(&onPythonProcessEvent);
   spExec->AddObserver(mitk::ExternalProcessOutputEvent(), spCommand);
 
-  args.push_back("-m");
+  args.push_back("-m"); 
   args.push_back("venv");
-  args.push_back(VENV_NAME.toStdString());
-  spExec->Execute(path.toStdString(), "python", args);
+  args.push_back(m_VENV_NAME.toStdString());
+  spExec->Execute(path.toStdString(), "/usr/bin/python", args);// Setup local virtual environment
 
   if (folderPath.cd("bin"))
   {
@@ -157,16 +195,13 @@ void QmitkTotalSegmentatorToolGUI::setUpTotalSegmentator(const QString &path)
     args.clear();
     args.push_back("install");
     args.push_back("Totalsegmentator");
-    spExec->Execute(workingDir, "pip3", args);
-    if (this->IsTotalSegmentatorInstalled(folderPath.absolutePath()))
+    spExec->Execute(workingDir, "pip3", args); // Install TotalSegmentator in it.
+    if (this->IsTotalSegmentatorInstalled(folderPath.absolutePath())) 
     {
-      m_PythonPath = folderPath.absolutePath();
-    }
-    else
-    {
-      MITK_ERROR << m_WARNING_TOTALSEG_NOT_FOUND;
+      isInstalled = true; // Check if installation was successful
     }
   }
+  return isInstalled;
 }
 
 void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
@@ -176,7 +211,6 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
   {
     return;
   }
-
   QString pythonPathTextItem = "";
   try
   {
@@ -222,9 +256,13 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
   tool->IsTimePointChangeAwareOn();
   this->ActualizePreviewLabelVisibility();
   this->WriteStatusMessage("<b>STATUS: </b><i>Segmentation task finished successfully.</i>");
-  if (!pythonPathTextItem.isEmpty())
-  { // only cache if the prediction ended without errors.
-    m_Settings.setValue("TotalSeg/LastPythonPath", pythonPathTextItem);
+  if (!pythonPathTextItem.isEmpty())// only cache if the prediction ended without errors.
+  { 
+    QString lastSelectedPyEnv = m_Settings.value("TotalSeg/LastPythonPath").toString();
+    if (lastSelectedPyEnv != pythonPathTextItem) 
+    {
+      m_Settings.setValue("TotalSeg/LastPythonPath", pythonPathTextItem);
+    }
   }
 }
 

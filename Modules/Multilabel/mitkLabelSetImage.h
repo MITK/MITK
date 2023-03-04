@@ -230,6 +230,11 @@ namespace mitk
       LabelToGroupMapType m_LabelToGroupMap;
 
     public:
+
+      /**
+        * \brief  */
+      void UpdateCenterOfMass(PixelType pixelValue);
+
     ///////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////
     // END FUTURE MultiLabelSegmentation
@@ -268,7 +273,7 @@ namespace mitk
 
     /**
       * \brief  */
-    void UpdateCenterOfMass(PixelType pixelValue, unsigned int layer = 0);
+    void UpdateCenterOfMass(PixelType pixelValue, unsigned int layer);
 
     /**
      * @brief Removes the label with the given value.

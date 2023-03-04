@@ -600,6 +600,11 @@ const mitk::LabelSet* mitk::LabelSetImage::GetActiveLabelSet() const
     return m_LabelSetContainer[GetActiveLayer()].GetPointer();
 }
 
+void mitk::LabelSetImage::UpdateCenterOfMass(PixelType pixelValue)
+{
+  this->UpdateCenterOfMass(pixelValue, this->GetGroupIndexOfLabel(pixelValue));
+}
+
 void mitk::LabelSetImage::UpdateCenterOfMass(PixelType pixelValue, unsigned int layer)
 {
   if (4 == this->GetDimension())

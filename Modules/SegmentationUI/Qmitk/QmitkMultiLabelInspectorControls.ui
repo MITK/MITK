@@ -32,7 +32,7 @@
    <item>
     <widget class="QmitkMultiLabelTreeView" name="view">
      <property name="editTriggers">
-      <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
+      <set>QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
      </property>
      <property name="showDropIndicator" stdset="0">
       <bool>false</bool>

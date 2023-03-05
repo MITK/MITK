@@ -14,8 +14,8 @@ found in the LICENSE file.
 #include "mitkTotalSegmentatorTool.h"
 
 #include "mitkIOUtil.h"
-#include <itksys/SystemTools.hxx>
 #include <filesystem>
+#include <itksys/SystemTools.hxx>
 
 // us
 #include <usGetModuleContext.h>
@@ -57,29 +57,26 @@ const char *mitk::TotalSegmentatorTool::GetName() const
   return "Total Segmentator";
 }
 
-namespace
+void mitk::TotalSegmentatorTool::onPythonProcessEvent(itk::Object * /*pCaller*/, const itk::EventObject &e, void *)
 {
-  void onPythonProcessEvent(itk::Object * /*pCaller*/, const itk::EventObject &e, void *)
+  std::string testCOUT;
+  std::string testCERR;
+  const auto *pEvent = dynamic_cast<const mitk::ExternalProcessStdOutEvent *>(&e);
+
+  if (pEvent)
   {
-    std::string testCOUT;
-    std::string testCERR;
-    const auto *pEvent = dynamic_cast<const mitk::ExternalProcessStdOutEvent *>(&e);
-
-    if (pEvent)
-    {
-      testCOUT = testCOUT + pEvent->GetOutput();
-      MITK_INFO << testCOUT;
-    }
-
-    const auto *pErrEvent = dynamic_cast<const mitk::ExternalProcessStdErrEvent *>(&e);
-
-    if (pErrEvent)
-    {
-      testCERR = testCERR + pErrEvent->GetOutput();
-      MITK_ERROR << testCERR;
-    }
+    testCOUT = testCOUT + pEvent->GetOutput();
+    MITK_INFO << testCOUT;
   }
-} // namespace
+
+  const auto *pErrEvent = dynamic_cast<const mitk::ExternalProcessStdErrEvent *>(&e);
+
+  if (pErrEvent)
+  {
+    testCERR = testCERR + pErrEvent->GetOutput();
+    MITK_ERROR << testCERR;
+  }
+}
 
 void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
                                                  const Image * /*oldSegAtTimeStep*/,
@@ -97,7 +94,7 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
   itk::CStyleCommand::Pointer spCommand = itk::CStyleCommand::New();
   spCommand->SetCallback(&onPythonProcessEvent);
   spExec->AddObserver(ExternalProcessOutputEvent(), spCommand);
-  
+
   std::string inDir, outDir, inputImagePath, outputImagePath, scriptPath;
   inDir = IOUtil::CreateTemporaryDirectory("totalseg-in-XXXXXX", this->GetMitkTempDir());
   std::ofstream tmpStream;
@@ -122,7 +119,7 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
   }
 
   this->run_totalsegmentator(
-     spExec, inputImagePath, *outArg, this->GetFast(), !isSubTask, this->GetGpuId(), m_DEFAULT_TOTAL_TASK);
+    spExec, inputImagePath, *outArg, this->GetFast(), !isSubTask, this->GetGpuId(), m_DEFAULT_TOTAL_TASK);
 
   if (isSubTask)
   {

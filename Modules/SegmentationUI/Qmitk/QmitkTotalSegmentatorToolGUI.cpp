@@ -72,11 +72,8 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
   const QString storageDir =
     QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/" + qApp->organizationName() + "/";
   MITK_INFO << storageDir.toStdString();
-  this->ToggleEnableEverything(false);
-  if (this->IsTotalSegmentatorInstalled(storageDir + QDir::separator() + m_VENV_NAME))
-  {
-    this->ToggleEnableEverything(true);
-  }
+  m_IsInstalled = this->IsTotalSegmentatorInstalled(storageDir + QDir::separator() + m_VENV_NAME);
+  this->EnableAll(m_IsInstalled);
 }
 
 void QmitkTotalSegmentatorToolGUI::EnableWidgets(bool enabled)
@@ -113,31 +110,31 @@ unsigned int QmitkTotalSegmentatorToolGUI::FetchSelectedGPUFromUI()
   }
 }
 
-namespace
-{
-  void onPythonProcessEvent(itk::Object * /*pCaller*/, const itk::EventObject &e, void *)
-  {
-    std::string testCOUT;
-    std::string testCERR;
-    const auto *pEvent = dynamic_cast<const mitk::ExternalProcessStdOutEvent *>(&e);
+//namespace
+//{
+//  void onPythonProcessEvent(itk::Object * /*pCaller*/, const itk::EventObject &e, void *)
+//  {
+//    std::string testCOUT;
+//    std::string testCERR;
+//    const auto *pEvent = dynamic_cast<const mitk::ExternalProcessStdOutEvent *>(&e);
+//
+//    if (pEvent)
+//    {
+//      testCOUT = testCOUT + pEvent->GetOutput();
+//      MITK_INFO << testCOUT;
+//    }
+//
+//    const auto *pErrEvent = dynamic_cast<const mitk::ExternalProcessStdErrEvent *>(&e);
+//
+//    if (pErrEvent)
+//    {
+//      testCERR = testCERR + pErrEvent->GetOutput();
+//      MITK_ERROR << testCERR;
+//    }
+//  }
+//} // namespace
 
-    if (pEvent)
-    {
-      testCOUT = testCOUT + pEvent->GetOutput();
-      MITK_INFO << testCOUT;
-    }
-
-    const auto *pErrEvent = dynamic_cast<const mitk::ExternalProcessStdErrEvent *>(&e);
-
-    if (pErrEvent)
-    {
-      testCERR = testCERR + pErrEvent->GetOutput();
-      MITK_ERROR << testCERR;
-    }
-  }
-} // namespace
-
-void QmitkTotalSegmentatorToolGUI::ToggleEnableEverything(bool isEnable) 
+void QmitkTotalSegmentatorToolGUI::EnableAll(bool isEnable) 
 {
   m_Controls.previewButton->setEnabled(isEnable);
   m_Controls.subtaskComboBox->setEnabled(isEnable);
@@ -149,13 +146,13 @@ void QmitkTotalSegmentatorToolGUI::OnInstallBtnClicked()
   const QString storageDir =
     QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/" + qApp->organizationName() + "/";
   MITK_INFO << storageDir.toStdString();
-  bool isSuccess = false;
+  bool isInstalled = false;
 #ifndef _WIN32
   isSuccess = SetUpTotalSegmentator(storageDir);
 #endif
-  if (isSuccess)
+  if (isInstalled)
   {
-    this->ToggleEnableEverything(true);
+    this->EnableAll(true);
     this->WriteStatusMessage("Successfully installed TotalSegmentator");
   }
   else
@@ -164,8 +161,20 @@ void QmitkTotalSegmentatorToolGUI::OnInstallBtnClicked()
   }
 }
 
+
+bool QmitkTotalSegmentatorToolGUI::SetUpTotalSegmentatorWIN(const QString& path)
+{
+  return false;
+}
+
+
 bool QmitkTotalSegmentatorToolGUI::SetUpTotalSegmentator(const QString &path)
 {
+  auto tool = this->GetConnectedToolAs<mitk::TotalSegmentatorTool>();
+  if (nullptr == tool)
+  {
+    return false;
+  }
   bool isInstalled = false;
   QDir folderPath(path);
   if (this->IsTotalSegmentatorInstalled(folderPath.absoluteFilePath(m_VENV_NAME)))
@@ -179,8 +188,8 @@ bool QmitkTotalSegmentatorToolGUI::SetUpTotalSegmentator(const QString &path)
   }
   mitk::ProcessExecutor::ArgumentListType args;
   auto spExec = mitk::ProcessExecutor::New();
-  itk::CStyleCommand::Pointer spCommand = itk::CStyleCommand::New();
-  spCommand->SetCallback(&onPythonProcessEvent);
+  auto spCommand = itk::CStyleCommand::New();
+  spCommand->SetCallback(tool->onPythonProcessEvent);
   spExec->AddObserver(mitk::ExternalProcessOutputEvent(), spCommand);
 
   args.push_back("-m"); 
@@ -194,12 +203,19 @@ bool QmitkTotalSegmentatorToolGUI::SetUpTotalSegmentator(const QString &path)
     workingDir = folderPath.absolutePath().toStdString();
     args.clear();
     args.push_back("install");
-    args.push_back("Totalsegmentator");
+    args.push_back("Totalsegmentator==" + m_TOTALSEGMENTATOR_VERSION);
     spExec->Execute(workingDir, "pip3", args); // Install TotalSegmentator in it.
     if (this->IsTotalSegmentatorInstalled(folderPath.absolutePath())) 
     {
       isInstalled = true; // Check if installation was successful
     }
+    args.clear();
+    args.push_back("-c");
+    std::string pythonCode; // python syntax to check if torch is installed with CUDA.
+    pythonCode.append("import torch;");
+    pythonCode.append("if not torch.cuda.is_available: raise ValueError('PyTorch installed without CUDA');");
+    args.push_back(pythonCode);
+    spExec->Execute(workingDir, "python3", args);
   }
   return isInstalled;
 }

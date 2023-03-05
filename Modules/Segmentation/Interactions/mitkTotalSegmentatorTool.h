@@ -65,6 +65,8 @@ namespace mitk
     itkGetConstMacro(IsMitkTempDirAvailable, bool);
     itkBooleanMacro(IsMitkTempDirAvailable);
 
+    static void onPythonProcessEvent(itk::Object * /*pCaller*/, const itk::EventObject &e, void *);
+
   protected:
     TotalSegmentatorTool() = default;
     ~TotalSegmentatorTool();

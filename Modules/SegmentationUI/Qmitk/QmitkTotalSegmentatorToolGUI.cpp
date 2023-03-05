@@ -69,11 +69,15 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
   QString lastSelectedPyEnv = m_Settings.value("TotalSeg/LastPythonPath").toString();
   m_Controls.pythonEnvComboBox->insertItem(0, lastSelectedPyEnv);
 
-  const QString storageDir =
-    QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/" + qApp->organizationName() + "/";
+  const QString storageDir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QDir::separator() +
+                             qApp->organizationName() + QDir::separator() + m_VENV_NAME;
   MITK_INFO << storageDir.toStdString();
-  m_IsInstalled = this->IsTotalSegmentatorInstalled(storageDir + QDir::separator() + m_VENV_NAME);
-  this->EnableAll(m_IsInstalled);
+  m_IsInstalled = this->IsTotalSegmentatorInstalled(storageDir);
+  if (m_IsInstalled)
+  {
+    this->EnableAll(m_IsInstalled);
+    m_PythonPath = storageDir;
+  }
 }
 
 void QmitkTotalSegmentatorToolGUI::EnableWidgets(bool enabled)
@@ -143,26 +147,28 @@ void QmitkTotalSegmentatorToolGUI::EnableAll(bool isEnable)
 
 void QmitkTotalSegmentatorToolGUI::OnInstallBtnClicked()
 {
-  const QString storageDir =
-    QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/" + qApp->organizationName() + "/";
+  const QString storageDir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QDir::separator() +
+                             qApp->organizationName() + QDir::separator();
   MITK_INFO << storageDir.toStdString();
+
   bool isInstalled = false;
 #ifndef _WIN32
-  isSuccess = SetUpTotalSegmentator(storageDir);
+  isInstalled = SetUpTotalSegmentator(storageDir);
 #endif
   if (isInstalled)
   {
-    this->EnableAll(true);
+    m_PythonPath = storageDir + m_VENV_NAME;
     this->WriteStatusMessage("Successfully installed TotalSegmentator");
   }
   else
   {
     this->WriteErrorMessage("Couldn't find TotalSegmentator");
   }
+  this->EnableAll(isInstalled);
 }
 
 
-bool QmitkTotalSegmentatorToolGUI::SetUpTotalSegmentatorWIN(const QString& path)
+bool QmitkTotalSegmentatorToolGUI::SetUpTotalSegmentatorWIN(const QString & /*path*/)
 {
   return false;
 }
@@ -195,7 +201,7 @@ bool QmitkTotalSegmentatorToolGUI::SetUpTotalSegmentator(const QString &path)
   args.push_back("-m"); 
   args.push_back("venv");
   args.push_back(m_VENV_NAME.toStdString());
-  spExec->Execute(path.toStdString(), "/usr/bin/python", args);// Setup local virtual environment
+  spExec->Execute(path.toStdString(), "/usr/bin/python3", args);// Setup local virtual environment
 
   if (folderPath.cd("bin"))
   {
@@ -213,7 +219,7 @@ bool QmitkTotalSegmentatorToolGUI::SetUpTotalSegmentator(const QString &path)
     args.push_back("-c");
     std::string pythonCode; // python syntax to check if torch is installed with CUDA.
     pythonCode.append("import torch;");
-    pythonCode.append("if not torch.cuda.is_available: raise ValueError('PyTorch installed without CUDA');");
+    pythonCode.append("print('Pytorch installed with CUDA') if torch.cuda.is_available else ValueError('PyTorch installed without CUDA');");
     args.push_back(pythonCode);
     spExec->Execute(workingDir, "python3", args);
   }
@@ -236,7 +242,7 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
     {
       throw std::runtime_error(m_WARNING_TOTALSEG_NOT_FOUND);
     }
-    pythonPathTextItem = m_Controls.pythonEnvComboBox->currentText();
+    //pythonPathTextItem = m_Controls.pythonEnvComboBox->currentText();
     bool isFast = m_Controls.fastBox->isChecked();
     QString subTask = m_Controls.subtaskComboBox->currentText();
     if (subTask != m_VALID_TASKS[0])

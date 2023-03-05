@@ -44,6 +44,9 @@ protected:
 
   void EnableWidgets(bool enabled) override;
 
+  /**
+    @brief Enable (or Disable) GUI elements.
+   */
   void EnableAll(bool);
 
   /**

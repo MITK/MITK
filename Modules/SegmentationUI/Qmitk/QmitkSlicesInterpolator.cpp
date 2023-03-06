@@ -52,6 +52,8 @@ found in the LICENSE file.
 #include <QPushButton>
 #include <QVBoxLayout>
 
+#include <vtkDoubleArray.h>
+#include <vtkFieldData.h>
 #include <vtkPolyVertex.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkPolyData.h>
@@ -1925,7 +1927,7 @@ void QmitkSlicesInterpolator::MergeContours(unsigned int timeStep,
       if ( areContoursCoplanar  && (contours[i].LabelValue == contours[j].LabelValue) )
       {
         //  Update the contour by re-extracting the slice from the corresponding plane.
-        mitk::Image::Pointer slice = ExtractSliceFromImage(m_Segmentation, contours[i].plane, timeStep);
+        mitk::Image::Pointer slice = ExtractSliceFromImage(m_Segmentation, contours[i].Plane, timeStep);
         mitk::ImageToContourFilter::Pointer contourExtractor = mitk::ImageToContourFilter::New();
         contourExtractor->SetInput(slice);
         contourExtractor->SetContourValue(contours[i].LabelValue);

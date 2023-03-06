@@ -40,6 +40,8 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
   m_Controls.setupUi(this);
   m_Controls.pythonEnvComboBox->addItem("Select");
   m_Controls.pythonEnvComboBox->setDuplicatesEnabled(false);
+  m_Controls.pythonEnvComboBox->setVisible(false);
+  m_Controls.pythonEnvLabel->setVisible(false);
   m_Controls.previewButton->setDisabled(true);
   m_Controls.statusLabel->setTextFormat(Qt::RichText);
   m_Controls.subtaskComboBox->addItems(m_VALID_TASKS);
@@ -47,13 +49,13 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
   this->SetGPUInfo();
   if (m_GpuLoader.GetGPUCount() != 0)
   {
-    WriteStatusMessage(QString("<b>STATUS: </b><i>Welcome to Total Segmentator tool. You're in luck: " + QString::number(m_GpuLoader.GetGPUCount()) +
-                               " GPU(s) were detected.</i>"));
+    WriteStatusMessage(QString("<b>STATUS: </b><i>Welcome to Total Segmentator tool. You're in luck: " +
+                               QString::number(m_GpuLoader.GetGPUCount()) + " GPU(s) were detected.</i>"));
   }
   else
   {
-    WriteErrorMessage(QString("<b>STATUS: </b><i>Welcome to Total Segmentator tool. Sorry, " + QString::number(m_GpuLoader.GetGPUCount()) +
-                              " GPUs were detected.</i>"));
+    WriteErrorMessage(QString("<b>STATUS: </b><i>Welcome to Total Segmentator tool. Sorry, " +
+                              QString::number(m_GpuLoader.GetGPUCount()) + " GPUs were detected.</i>"));
   }
   mainLayout->addLayout(m_Controls.verticalLayout);
 
@@ -113,31 +115,7 @@ unsigned int QmitkTotalSegmentatorToolGUI::FetchSelectedGPUFromUI()
   }
 }
 
-//namespace
-//{
-//  void onPythonProcessEvent(itk::Object * /*pCaller*/, const itk::EventObject &e, void *)
-//  {
-//    std::string testCOUT;
-//    std::string testCERR;
-//    const auto *pEvent = dynamic_cast<const mitk::ExternalProcessStdOutEvent *>(&e);
-//
-//    if (pEvent)
-//    {
-//      testCOUT = testCOUT + pEvent->GetOutput();
-//      MITK_INFO << testCOUT;
-//    }
-//
-//    const auto *pErrEvent = dynamic_cast<const mitk::ExternalProcessStdErrEvent *>(&e);
-//
-//    if (pErrEvent)
-//    {
-//      testCERR = testCERR + pErrEvent->GetOutput();
-//      MITK_ERROR << testCERR;
-//    }
-//  }
-//} // namespace
-
-void QmitkTotalSegmentatorToolGUI::EnableAll(bool isEnable) 
+void QmitkTotalSegmentatorToolGUI::EnableAll(bool isEnable)
 {
   m_Controls.previewButton->setEnabled(isEnable);
   m_Controls.subtaskComboBox->setEnabled(isEnable);
@@ -146,21 +124,14 @@ void QmitkTotalSegmentatorToolGUI::EnableAll(bool isEnable)
 
 void QmitkTotalSegmentatorToolGUI::OnInstallBtnClicked()
 {
-  //const QString storageDir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QDir::separator() +
-  //                           qApp->organizationName() + QDir::separator();
-  //MITK_INFO << storageDir.toStdString();
-
   bool isInstalled = false;
 #ifndef _WIN32
-  //isInstalled = SetUpTotalSegmentator(storageDir);
   isInstalled = m_Installer.SetupVirtualEnv();
 #endif
   if (isInstalled)
   {
-    // const QString pythonPath = storageDir + m_VENV_NAME;
     const QString pythonPath = m_Installer.GetVirtualEnvPath();
-    MITK_INFO << pythonPath.toStdString();
-    OnPythonPathChanged(pythonPath);
+    this->OnPythonPathChanged(pythonPath); // Bug: isInstalled still true even if totalsegmentator not found
     this->WriteStatusMessage("Successfully installed TotalSegmentator");
   }
   else
@@ -168,71 +139,6 @@ void QmitkTotalSegmentatorToolGUI::OnInstallBtnClicked()
     this->WriteErrorMessage("Couldn't find TotalSegmentator");
   }
   this->EnableAll(isInstalled);
-}
-
-
-bool QmitkTotalSegmentatorToolGUI::SetUpTotalSegmentatorWIN(const QString & /*path*/)
-{
-  return false;
-}
-
-bool QmitkTotalSegmentatorToolGUI::SetUpTotalSegmentator(const QString &path)
-{
-  auto tool = this->GetConnectedToolAs<mitk::TotalSegmentatorTool>();
-  if (nullptr == tool)
-  {
-    return false;
-  }
-  bool isInstalled = false;
-  QDir folderPath(path);
-  if (this->IsTotalSegmentatorInstalled(folderPath.absoluteFilePath(m_VENV_NAME)))
-  {
-    return true;
-  }
-  folderPath.mkdir(m_VENV_NAME);
-  if (!folderPath.cd(m_VENV_NAME))
-  {
-    return false; // Check if directory creation was successful.
-  }
-  mitk::ProcessExecutor::ArgumentListType args;
-  auto spExec = mitk::ProcessExecutor::New();
-  auto spCommand = itk::CStyleCommand::New();
-  spCommand->SetCallback(tool->onPythonProcessEvent);
-  spExec->AddObserver(mitk::ExternalProcessOutputEvent(), spCommand);
-
-  args.push_back("-m"); 
-  args.push_back("venv");
-  args.push_back(m_VENV_NAME.toStdString());
-  spExec->Execute(path.toStdString(), "/usr/bin/python3", args);// Setup local virtual environment
-
-  if (folderPath.cd("bin"))
-  {
-    std::string workingDir;
-    workingDir = folderPath.absolutePath().toStdString();
-    args.clear();
-    args.push_back("install");
-    args.push_back("Totalsegmentator==" + m_TOTALSEGMENTATOR_VERSION);
-    spExec->Execute(workingDir, "pip3", args); // Install TotalSegmentator in it.
-
-    args.clear();
-    args.push_back("install");
-    args.push_back("scikit-image");
-    spExec->Execute(workingDir, "pip3", args); // Install TotalSegmentator in it.
-    
-    if (this->IsTotalSegmentatorInstalled(folderPath.absolutePath())) 
-    {
-      isInstalled = true; // Check if installation was successful
-    }
-
-    args.clear();
-    args.push_back("-c");
-    std::string pythonCode; // python syntax to check if torch is installed with CUDA.
-    pythonCode.append("import torch;");
-    pythonCode.append("print('Pytorch installed with CUDA') if torch.cuda.is_available else ValueError('PyTorch installed without CUDA');");
-    args.push_back(pythonCode);
-    spExec->Execute(workingDir, "python3", args);
-  }
-  return isInstalled;
 }
 
 void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
@@ -251,7 +157,7 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
     {
       throw std::runtime_error(m_WARNING_TOTALSEG_NOT_FOUND);
     }
-    //pythonPathTextItem = m_Controls.pythonEnvComboBox->currentText();
+    // pythonPathTextItem = m_Controls.pythonEnvComboBox->currentText();
     bool isFast = m_Controls.fastBox->isChecked();
     QString subTask = m_Controls.subtaskComboBox->currentText();
     if (subTask != m_VALID_TASKS[0])
@@ -287,10 +193,10 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
   tool->IsTimePointChangeAwareOn();
   this->ActualizePreviewLabelVisibility();
   this->WriteStatusMessage("<b>STATUS: </b><i>Segmentation task finished successfully.</i>");
-  if (!pythonPathTextItem.isEmpty())// only cache if the prediction ended without errors.
-  { 
+  if (!pythonPathTextItem.isEmpty()) // only cache if the prediction ended without errors.
+  {
     QString lastSelectedPyEnv = m_Settings.value("TotalSeg/LastPythonPath").toString();
-    if (lastSelectedPyEnv != pythonPathTextItem) 
+    if (lastSelectedPyEnv != pythonPathTextItem)
     {
       m_Settings.setValue("TotalSeg/LastPythonPath", pythonPathTextItem);
     }

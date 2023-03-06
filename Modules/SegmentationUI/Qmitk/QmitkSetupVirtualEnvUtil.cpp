@@ -11,11 +11,12 @@ found in the LICENSE file.s
 ============================================================================*/
 
 #include "QmitkSetupVirtualEnvUtil.h"
-#include <QStandardPaths>
+
+#include "mitkLogMacros.h"
 #include <QApplication>
 #include <QDir>
+#include <QStandardPaths>
 #include <itkCommand.h>
-#include "mitkLogMacros.h"
 
 QmitkSetupVirtualEnvUtil::QmitkSetupVirtualEnvUtil()
 {
@@ -61,7 +62,6 @@ std::map<std::string, std::string> QmitkSetupVirtualEnvUtil::GetInstallParameter
   return parameters;
 }
 
-
 void QmitkSetupVirtualEnvUtil::PrintProcessEvent(itk::Object * /*pCaller*/, const itk::EventObject &e, void *)
 {
   std::string testCOUT;
@@ -80,7 +80,6 @@ void QmitkSetupVirtualEnvUtil::PrintProcessEvent(itk::Object * /*pCaller*/, cons
   }
 }
 
-
 bool QmitkSetupVirtualEnvUtil::SetupVirtualEnv(QmitkSetupVirtualEnvUtil::Tool packageName)
 {
   std::vector<std::string> packages;
@@ -93,7 +92,6 @@ bool QmitkSetupVirtualEnvUtil::SetupVirtualEnv(QmitkSetupVirtualEnvUtil::Tool pa
     std::getline(pkgs, pkg, ',');
     packages.push_back(pkg);
   }
-
   QString venvName = QString::fromStdString(params["venv_name"]);
   QDir folderPath(m_BaseDir);
   folderPath.mkdir(venvName);
@@ -116,7 +114,7 @@ bool QmitkSetupVirtualEnvUtil::SetupVirtualEnv(QmitkSetupVirtualEnvUtil::Tool pa
   {
     m_venvPath = folderPath.absolutePath();
     std::string workingDir = m_venvPath.toStdString();
-    for (auto& package : packages)
+    for (auto &package : packages)
     {
       PipInstall(package, workingDir);
     }
@@ -126,7 +124,7 @@ bool QmitkSetupVirtualEnvUtil::SetupVirtualEnv(QmitkSetupVirtualEnvUtil::Tool pa
                       "installed without CUDA');");
     ExecutePython(pythonCode, workingDir);
     return true;
-  }  
+  }
   return false;
 }
 

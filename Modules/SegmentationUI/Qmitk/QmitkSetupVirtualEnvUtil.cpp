@@ -61,6 +61,26 @@ std::map<std::string, std::string> QmitkSetupVirtualEnvUtil::GetInstallParameter
   return parameters;
 }
 
+
+void QmitkSetupVirtualEnvUtil::PrintProcessEvent(itk::Object * /*pCaller*/, const itk::EventObject &e, void *)
+{
+  std::string testCOUT;
+  std::string testCERR;
+  const auto *pEvent = dynamic_cast<const mitk::ExternalProcessStdOutEvent *>(&e);
+  if (pEvent)
+  {
+    testCOUT = testCOUT + pEvent->GetOutput();
+    MITK_INFO << testCOUT;
+  }
+  const auto *pErrEvent = dynamic_cast<const mitk::ExternalProcessStdErrEvent *>(&e);
+  if (pErrEvent)
+  {
+    testCERR = testCERR + pErrEvent->GetOutput();
+    MITK_ERROR << testCERR;
+  }
+}
+
+
 bool QmitkSetupVirtualEnvUtil::SetupVirtualEnv(QmitkSetupVirtualEnvUtil::Tool packageName)
 {
   std::vector<std::string> packages;
@@ -84,23 +104,7 @@ bool QmitkSetupVirtualEnvUtil::SetupVirtualEnv(QmitkSetupVirtualEnvUtil::Tool pa
   mitk::ProcessExecutor::ArgumentListType args;
   auto spExec = mitk::ProcessExecutor::New();
   auto spCommand = itk::CStyleCommand::New();
-  spCommand->SetCallback([](itk::Object * /*pCaller*/, const itk::EventObject &e, void *)
-                         {
-                           std::string testCOUT;
-                           std::string testCERR;
-                           const auto *pEvent = dynamic_cast<const mitk::ExternalProcessStdOutEvent *>(&e);
-                           if (pEvent)
-                           {
-                             testCOUT += pEvent->GetOutput();
-                             MITK_INFO << testCOUT;
-                           }
-                           const auto *pErrEvent = dynamic_cast<const mitk::ExternalProcessStdErrEvent *>(&e);
-                           if (pErrEvent)
-                           {
-                             testCERR += pErrEvent->GetOutput();
-                             MITK_ERROR << testCERR;
-                           }
-                         });
+  spCommand->SetCallback(&PrintProcessEvent);
   spExec->AddObserver(mitk::ExternalProcessOutputEvent(), spCommand);
 
   args.push_back("-m");
@@ -131,7 +135,7 @@ void QmitkSetupVirtualEnvUtil::PipInstall(const std::string &library, const std:
   mitk::ProcessExecutor::ArgumentListType args;
   auto spExec = mitk::ProcessExecutor::New();
   auto spCommand = itk::CStyleCommand::New();
-  //spCommand->SetCallback(tool->onPythonProcessEvent);
+  spCommand->SetCallback(&PrintProcessEvent);
   spExec->AddObserver(mitk::ExternalProcessOutputEvent(), spCommand);
   args.push_back("install");
   args.push_back(library);
@@ -143,7 +147,7 @@ void QmitkSetupVirtualEnvUtil::ExecutePython(const std::string &pythonCode, cons
   mitk::ProcessExecutor::ArgumentListType args;
   auto spExec = mitk::ProcessExecutor::New();
   auto spCommand = itk::CStyleCommand::New();
-  // spCommand->SetCallback(tool->onPythonProcessEvent);
+  spCommand->SetCallback(&PrintProcessEvent);
   spExec->AddObserver(mitk::ExternalProcessOutputEvent(), spCommand);
   args.push_back("-c");
   args.push_back(pythonCode);

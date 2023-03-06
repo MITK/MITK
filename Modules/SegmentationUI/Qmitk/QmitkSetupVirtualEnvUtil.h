@@ -38,6 +38,7 @@ public:
   std::map<std::string, std::string> GetInstallParameters(QmitkSetupVirtualEnvUtil::Tool);
   QString GetBaseDir();
   QString GetVirtualEnvPath();
+  static void QmitkSetupVirtualEnvUtil::PrintProcessEvent(itk::Object * /*pCaller*/, const itk::EventObject &e, void *);
 
 private:
   QString m_BaseDir;

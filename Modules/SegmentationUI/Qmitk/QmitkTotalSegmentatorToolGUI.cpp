@@ -59,10 +59,10 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
 
   connect(m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnPreviewBtnClicked()));
   connect(m_Controls.installButton, SIGNAL(clicked()), this, SLOT(OnInstallBtnClicked()));
-  connect(m_Controls.pythonEnvComboBox,
-          SIGNAL(currentTextChanged(const QString &)),
-          this,
-          SLOT(OnPythonPathChanged(const QString &)));
+  // connect(m_Controls.pythonEnvComboBox,
+  //         SIGNAL(currentTextChanged(const QString &)),
+  //         this,
+  //         SLOT(OnPythonPathChanged(const QString &)));
 
   Superclass::InitializeUI(mainLayout);
 
@@ -71,12 +71,11 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
 
   const QString storageDir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QDir::separator() +
                              qApp->organizationName() + QDir::separator() + m_VENV_NAME;
-  MITK_INFO << storageDir.toStdString();
   m_IsInstalled = this->IsTotalSegmentatorInstalled(storageDir);
   if (m_IsInstalled)
   {
+    OnPythonPathChanged(storageDir);
     this->EnableAll(m_IsInstalled);
-    m_PythonPath = storageDir;
   }
 }
 
@@ -157,7 +156,8 @@ void QmitkTotalSegmentatorToolGUI::OnInstallBtnClicked()
 #endif
   if (isInstalled)
   {
-    m_PythonPath = storageDir + m_VENV_NAME;
+    const QString pythonPath = storageDir + m_VENV_NAME;
+    OnPythonPathChanged(pythonPath);
     this->WriteStatusMessage("Successfully installed TotalSegmentator");
   }
   else

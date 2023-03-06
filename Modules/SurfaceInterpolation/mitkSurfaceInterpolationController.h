@@ -10,44 +10,23 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkSurfaceInterpolationController_h_Included
-#define mitkSurfaceInterpolationController_h_Included
+#ifndef mitkSurfaceInterpolationController_h
+#define mitkSurfaceInterpolationController_h
 
-#include <mitkColorProperty.h>
-#include <mitkCommon.h>
-#include <mitkInteractionConst.h>
-#include <mitkProperties.h>
-#include <mitkLabel.h>
-#include <mitkLabelSetImage.h>
-#include <mitkRestorePlanePositionOperation.h>
-#include <mitkSurface.h>
-#include <MitkSurfaceInterpolationExports.h>
-#include <mitkExtractSliceFilter.h>
-
-#include "mitkComputeContourSetNormalsFilter.h"
-#include "mitkCreateDistanceImageFromSurfaceFilter.h"
-#include "mitkReduceContourSetFilter.h"
-
-#include <mitkDataNode.h>
 #include <mitkDataStorage.h>
+#include <mitkImage.h>
+#include <mitkLabel.h>
+#include <mitkSurface.h>
 
-#include <vtkAppendPolyData.h>
-#include <vtkCellArray.h>
-#include <vtkPoints.h>
-#include <vtkPolyData.h>
-#include <vtkPolygon.h>
-#include <vtkSmartPointer.h>
-
-#include <mitkImageTimeSelector.h>
-#include <mitkVtkRepresentationProperty.h>
-#include <vtkImageData.h>
-#include <vtkMarchingCubes.h>
-#include <vtkProperty.h>
-
-#include <mitkProgressBar.h>
+#include <MitkSurfaceInterpolationExports.h>
 
 namespace mitk
 {
+  class ComputeContourSetNormalsFilter;
+  class CreateDistanceImageFromSurfaceFilter;
+  class LabelSetImage;
+  class ReduceContourSetFilter;
+
   class MITKSURFACEINTERPOLATION_EXPORT SurfaceInterpolationController : public itk::Object
   {
   public:
@@ -56,31 +35,26 @@ namespace mitk
     itkCloneMacro(Self);
     itkGetMacro(DistanceImageSpacing, double);
 
-    struct ContourPositionInformation
+    struct MITKSURFACEINTERPOLATION_EXPORT ContourPositionInformation
     {
       int Pos;
       unsigned int SliceIndex;
       Surface::Pointer Contour;
       Vector3D ContourNormal;
       Point3D ContourPoint;
-      mitk::PlaneGeometry* plane;
+      mitk::PlaneGeometry* Plane;
       mitk::Label::PixelType LabelValue;
       unsigned int LayerValue;
       size_t TimeStep;
 
-      ContourPositionInformation():
-      Pos(-1),
-      LabelValue(std::numeric_limits<mitk::Label::PixelType>::max()),
-      LayerValue(std::numeric_limits<unsigned int>::max()),
-      TimeStep(std::numeric_limits<size_t>::max())
-      {}
-
-      friend std::ostream& operator << (std::ostream& os, ContourPositionInformation contour)
+      ContourPositionInformation()
+        : Pos(-1),
+          SliceIndex(0),
+          Plane(nullptr),
+          LabelValue(std::numeric_limits<mitk::Label::PixelType>::max()),
+          LayerValue(std::numeric_limits<unsigned int>::max()),
+          TimeStep(std::numeric_limits<size_t>::max())
       {
-        os << "contour lbl: " << contour.LabelValue <<  " lyr: " << contour.LayerValue;
-        os << " t: " << contour.TimeStep  << " nPt: " << contour.Contour->GetVtkPolyData()->GetNumberOfPoints() << " ";
-        os << " Pt: " << contour.ContourPoint << " N: " << contour.ContourNormal << "\n";
-        return os;
       }
     };
 
@@ -405,17 +379,9 @@ namespace mitk
      */
     void OnLayerChanged();
 
-
-    /**
-     * @brief PrintListOfContoursPresentInStruct
-     *
-     */
-    void PrintListOfContours();
-
-
-    ReduceContourSetFilter::Pointer m_ReduceFilter;
-    ComputeContourSetNormalsFilter::Pointer m_NormalsFilter;
-    CreateDistanceImageFromSurfaceFilter::Pointer m_InterpolateSurfaceFilter;
+    itk::SmartPointer<ReduceContourSetFilter> m_ReduceFilter;
+    itk::SmartPointer<ComputeContourSetNormalsFilter> m_NormalsFilter;
+    itk::SmartPointer<CreateDistanceImageFromSurfaceFilter> m_InterpolateSurfaceFilter;
 
     mitk::Surface::Pointer m_Contours;
 

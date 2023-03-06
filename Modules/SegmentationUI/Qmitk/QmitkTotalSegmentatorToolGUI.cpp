@@ -167,12 +167,10 @@ void QmitkTotalSegmentatorToolGUI::OnInstallBtnClicked()
   this->EnableAll(isInstalled);
 }
 
-
 bool QmitkTotalSegmentatorToolGUI::SetUpTotalSegmentatorWIN(const QString & /*path*/)
 {
   return false;
 }
-
 
 bool QmitkTotalSegmentatorToolGUI::SetUpTotalSegmentator(const QString &path)
 {
@@ -211,10 +209,17 @@ bool QmitkTotalSegmentatorToolGUI::SetUpTotalSegmentator(const QString &path)
     args.push_back("install");
     args.push_back("Totalsegmentator==" + m_TOTALSEGMENTATOR_VERSION);
     spExec->Execute(workingDir, "pip3", args); // Install TotalSegmentator in it.
+
+    args.clear();
+    args.push_back("install");
+    args.push_back("scikit-image");
+    spExec->Execute(workingDir, "pip3", args); // Install TotalSegmentator in it.
+    
     if (this->IsTotalSegmentatorInstalled(folderPath.absolutePath())) 
     {
       isInstalled = true; // Check if installation was successful
     }
+
     args.clear();
     args.push_back("-c");
     std::string pythonCode; // python syntax to check if torch is installed with CUDA.

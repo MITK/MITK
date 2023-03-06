@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include "QmitknnUNetGPU.h"
 #include <QSettings>
+#include "QmitkSetupVirtualEnvUtil.h"
 
 
 class MITKSEGMENTATIONUI_EXPORT QmitkTotalSegmentatorToolGUI : public QmitkMultiLabelSegWithPreviewToolGUIBase
@@ -100,6 +101,7 @@ protected:
   QSettings m_Settings;
 
   QString m_PythonPath;
+  QmitkSetupVirtualEnvUtil m_Installer;
   QmitkGPULoader m_GpuLoader;
   Ui_QmitkTotalSegmentatorToolGUIControls m_Controls;
   bool m_FirstPreviewComputation = true;

@@ -146,17 +146,20 @@ void QmitkTotalSegmentatorToolGUI::EnableAll(bool isEnable)
 
 void QmitkTotalSegmentatorToolGUI::OnInstallBtnClicked()
 {
-  const QString storageDir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QDir::separator() +
-                             qApp->organizationName() + QDir::separator();
-  MITK_INFO << storageDir.toStdString();
+  //const QString storageDir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QDir::separator() +
+  //                           qApp->organizationName() + QDir::separator();
+  //MITK_INFO << storageDir.toStdString();
 
   bool isInstalled = false;
 #ifndef _WIN32
-  isInstalled = SetUpTotalSegmentator(storageDir);
+  //isInstalled = SetUpTotalSegmentator(storageDir);
+  isInstalled = m_Installer.SetupVirtualEnv();
 #endif
   if (isInstalled)
   {
-    const QString pythonPath = storageDir + m_VENV_NAME;
+    // const QString pythonPath = storageDir + m_VENV_NAME;
+    const QString pythonPath = m_Installer.GetVirtualEnvPath();
+    MITK_INFO << pythonPath.toStdString();
     OnPythonPathChanged(pythonPath);
     this->WriteStatusMessage("Successfully installed TotalSegmentator");
   }
@@ -166,6 +169,7 @@ void QmitkTotalSegmentatorToolGUI::OnInstallBtnClicked()
   }
   this->EnableAll(isInstalled);
 }
+
 
 bool QmitkTotalSegmentatorToolGUI::SetUpTotalSegmentatorWIN(const QString & /*path*/)
 {

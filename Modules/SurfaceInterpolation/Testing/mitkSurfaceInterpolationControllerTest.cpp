@@ -86,7 +86,8 @@ public:
   void setUp() override
   {
     m_Controller = mitk::SurfaceInterpolationController::GetInstance();
-    m_Controller->SetCurrentTimePoint(0.);
+    m_Controller->RemoveAllInterpolationSessions();
+    m_Controller->SetCurrentTimePoint(0);
 
     vtkSmartPointer<vtkRegularPolygonSource> polygonSource = vtkSmartPointer<vtkRegularPolygonSource>::New();
     polygonSource->SetRadius(100);
@@ -349,20 +350,20 @@ public:
 
   void TestOnSegmentationDeleted()
   {
-    {
-      m_Controller->RemoveAllInterpolationSessions();
-      // Create image for testing
-      unsigned int dimensions1[] = {10, 10, 10};
-      mitk::Image::Pointer segmentation_1 = createLabelSetImage(dimensions1);
-      m_Controller->SetCurrentInterpolationSession(segmentation_1);
-    }
+    // Create image for testing
+    unsigned int dimensions1[] = {10, 10, 10};
+    auto segmentation_1 = createLabelSetImage(dimensions1);
+
+    m_Controller->SetCurrentInterpolationSession(segmentation_1);
+
+    segmentation_1 = nullptr;
+
     CPPUNIT_ASSERT_MESSAGE("Number of interpolation session not 0",
                            m_Controller->GetNumberOfInterpolationSessions() == 0);
   }
 
   void TestAddNewContour()
   {
-    m_Controller->RemoveAllInterpolationSessions();
     // Create segmentation image
     unsigned int dimensions1[] = {10, 10, 10};
     mitk::Image::Pointer segmentation_1 = createLabelSetImage(dimensions1);
@@ -656,7 +657,6 @@ public:
 
   void TestRemoveContour()
   {
-    m_Controller->RemoveAllInterpolationSessions();
     // Create segmentation image
     unsigned int dimensions1[] = {12, 12, 12};
     mitk::LabelSetImage::Pointer segmentation_1 = createLabelSetImage(dimensions1);
@@ -851,7 +851,6 @@ public:
 
   void TestReplaceInterpolationSession4D()
   {
-    m_Controller->RemoveAllInterpolationSessions();
     // Create segmentation image
     unsigned int dimensions1[] = {10, 10, 10, 5};
     mitk::LabelSetImage::Pointer segmentation_1 = createLabelSetImage4D(dimensions1);

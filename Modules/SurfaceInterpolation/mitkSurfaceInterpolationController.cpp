@@ -602,7 +602,7 @@ void mitk::SurfaceInterpolationController::Interpolate()
   if (m_CurrentNumberOfReducedContours < 2)
   {
     // If no interpolation is possible reset the interpolation result
-    MITK_WARN << "No interpolation is possible. Too few reduced contours.";
+    MITK_INFO << "Interpolation impossible: not enough contours.";
     m_InterpolationResult = nullptr;
     return;
   }
@@ -749,6 +749,7 @@ void mitk::SurfaceInterpolationController::SetCurrentInterpolationSession(mitk::
 
       auto command = itk::MemberCommand<SurfaceInterpolationController>::New();
       command->SetCallbackFunction(this, &SurfaceInterpolationController::OnSegmentationDeleted);
+      m_SegmentationObserverTags[m_SelectedSegmentation] = labelSetImage->AddObserver(itk::DeleteEvent(), command);
 
       m_NumberOfLayersInCurrentSegmentation = labelSetImage->GetNumberOfLayers();
     }

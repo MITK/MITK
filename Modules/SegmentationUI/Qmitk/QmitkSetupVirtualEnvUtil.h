@@ -33,8 +33,12 @@ public:
   QmitkSetupVirtualEnvUtil();
 
   bool SetupVirtualEnv(Tool packageName = Tool::TOTALSEGMENTATOR);
-  void PipInstall(const std::string &library, const std::string &workingDir);
-  void ExecutePython(const std::string &args, const std::string &pythonPath);
+  void PipInstall(const std::string &library,
+                  const std::string &workingDir,
+                  void (*callback)(itk::Object *, const itk::EventObject &, void *));
+  void ExecutePython(const std::string &args,
+                     const std::string &pythonPath,
+                     void (*callback)(itk::Object *, const itk::EventObject &, void *));
   std::map<std::string, std::string> GetInstallParameters(QmitkSetupVirtualEnvUtil::Tool);
   QString GetBaseDir();
   QString GetVirtualEnvPath();

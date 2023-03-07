@@ -50,9 +50,10 @@ std::map<std::string, std::string> QmitkSetupVirtualEnvUtil::GetInstallParameter
     {
       parameters["venv_name"] = ".totalsegmentator";
       parameters["pkg_version"] = "1.5.2";
-      parameters["pkg_names"] = "Totalsegmentator==1.5.2,scikit-image";
+      parameters["pkg_names"] = "Totalsegmentator==1.5.2,scipy==1.9.1";
+      /*Add other parameters here...*/
       break;
-    }
+    } /*Add more tools here...*/
     default:
     {
       std::runtime_error("Unsupported Tool type");
@@ -116,36 +117,40 @@ bool QmitkSetupVirtualEnvUtil::SetupVirtualEnv(QmitkSetupVirtualEnvUtil::Tool pa
     std::string workingDir = m_venvPath.toStdString();
     for (auto &package : packages)
     {
-      PipInstall(package, workingDir);
+      PipInstall(package, workingDir, &PrintProcessEvent);
     }
     std::string pythonCode; // python syntax to check if torch is installed with CUDA.
     pythonCode.append("import torch;");
     pythonCode.append("print('Pytorch installed with CUDA') if torch.cuda.is_available else ValueError('PyTorch "
                       "installed without CUDA');");
-    ExecutePython(pythonCode, workingDir);
+    ExecutePython(pythonCode, workingDir, &PrintProcessEvent);
     return true;
   }
   return false;
 }
 
-void QmitkSetupVirtualEnvUtil::PipInstall(const std::string &library, const std::string &workingDir)
+void QmitkSetupVirtualEnvUtil::PipInstall(const std::string &library,
+                                          const std::string &workingDir,
+                                          void (*callback)(itk::Object *, const itk::EventObject &, void *))
 {
   mitk::ProcessExecutor::ArgumentListType args;
   auto spExec = mitk::ProcessExecutor::New();
   auto spCommand = itk::CStyleCommand::New();
-  spCommand->SetCallback(&PrintProcessEvent);
+  spCommand->SetCallback(callback);
   spExec->AddObserver(mitk::ExternalProcessOutputEvent(), spCommand);
   args.push_back("install");
   args.push_back(library);
   spExec->Execute(workingDir, "pip3", args); // Install TotalSegmentator in it.
 }
 
-void QmitkSetupVirtualEnvUtil::ExecutePython(const std::string &pythonCode, const std::string &workingDir)
+void QmitkSetupVirtualEnvUtil::ExecutePython(const std::string &pythonCode,
+                                             const std::string &workingDir,
+                                             void (*callback)(itk::Object *, const itk::EventObject &, void *))
 {
   mitk::ProcessExecutor::ArgumentListType args;
   auto spExec = mitk::ProcessExecutor::New();
   auto spCommand = itk::CStyleCommand::New();
-  spCommand->SetCallback(&PrintProcessEvent);
+  spCommand->SetCallback(callback);
   spExec->AddObserver(mitk::ExternalProcessOutputEvent(), spCommand);
   args.push_back("-c");
   args.push_back(pythonCode);

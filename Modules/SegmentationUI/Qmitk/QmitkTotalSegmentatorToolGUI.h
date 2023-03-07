@@ -94,6 +94,9 @@ protected:
 
   bool SetUpTotalSegmentator(const QString &);
   bool SetUpTotalSegmentatorWIN(const QString &);
+
+  QString GetPythonPathFromUI(const QString &pyEnv);
+
   
   /**
    * @brief For storing values like Python path across sessions.

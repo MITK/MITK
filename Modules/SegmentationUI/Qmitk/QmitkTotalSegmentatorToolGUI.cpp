@@ -40,8 +40,6 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
   m_Controls.setupUi(this);
   m_Controls.pythonEnvComboBox->addItem("Select");
   m_Controls.pythonEnvComboBox->setDuplicatesEnabled(false);
-  m_Controls.pythonEnvComboBox->setVisible(false);
-  m_Controls.pythonEnvLabel->setVisible(false);
   m_Controls.previewButton->setDisabled(true);
   m_Controls.statusLabel->setTextFormat(Qt::RichText);
   m_Controls.subtaskComboBox->addItems(m_VALID_TASKS);
@@ -61,10 +59,10 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
 
   connect(m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnPreviewBtnClicked()));
   connect(m_Controls.installButton, SIGNAL(clicked()), this, SLOT(OnInstallBtnClicked()));
-  // connect(m_Controls.pythonEnvComboBox,
-  //         SIGNAL(currentTextChanged(const QString &)),
-  //         this,
-  //         SLOT(OnPythonPathChanged(const QString &)));
+  connect(m_Controls.pythonEnvComboBox,
+           SIGNAL(currentTextChanged(const QString &)),
+           this,
+           SLOT(OnPythonPathChanged(const QString &)));
 
   Superclass::InitializeUI(mainLayout);
 
@@ -76,7 +74,7 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
   m_IsInstalled = this->IsTotalSegmentatorInstalled(storageDir);
   if (m_IsInstalled)
   {
-    OnPythonPathChanged(storageDir);
+    m_PythonPath = GetPythonPathFromUI(storageDir);
     this->EnableAll(m_IsInstalled);
   }
 }
@@ -120,16 +118,20 @@ void QmitkTotalSegmentatorToolGUI::EnableAll(bool isEnable)
   m_Controls.previewButton->setEnabled(isEnable);
   m_Controls.subtaskComboBox->setEnabled(isEnable);
   m_Controls.installButton->setEnabled((!isEnable));
+  m_Controls.pythonEnvComboBox->setEnabled((!isEnable));
 }
 
 void QmitkTotalSegmentatorToolGUI::OnInstallBtnClicked()
 {
   bool isInstalled = false;
+  QString pythonPathTextItem = m_Controls.pythonEnvComboBox->currentText();
+
+
   isInstalled = m_Installer.SetupVirtualEnv();
   if (isInstalled)
   {
     const QString pythonPath = m_Installer.GetVirtualEnvPath();
-    this->OnPythonPathChanged(pythonPath); // Bug: isInstalled still true even if totalsegmentator not found
+    m_PythonPath = GetPythonPathFromUI(m_Installer.GetVirtualEnvPath());
     this->WriteStatusMessage("Successfully installed TotalSegmentator");
   }
   else
@@ -146,7 +148,7 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
   {
     return;
   }
-  QString pythonPathTextItem = "";
+  // QString pythonPathTextItem = "";
   try
   {
     m_Controls.previewButton->setEnabled(false);
@@ -155,7 +157,6 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
     {
       throw std::runtime_error(m_WARNING_TOTALSEG_NOT_FOUND);
     }
-    // pythonPathTextItem = m_Controls.pythonEnvComboBox->currentText();
     bool isFast = m_Controls.fastBox->isChecked();
     QString subTask = m_Controls.subtaskComboBox->currentText();
     if (subTask != m_VALID_TASKS[0])
@@ -191,14 +192,14 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
   tool->IsTimePointChangeAwareOn();
   this->ActualizePreviewLabelVisibility();
   this->WriteStatusMessage("<b>STATUS: </b><i>Segmentation task finished successfully.</i>");
-  if (!pythonPathTextItem.isEmpty()) // only cache if the prediction ended without errors.
+  /* if (!pythonPathTextItem.isEmpty()) // only cache if the prediction ended without errors.
   {
     QString lastSelectedPyEnv = m_Settings.value("TotalSeg/LastPythonPath").toString();
     if (lastSelectedPyEnv != pythonPathTextItem)
     {
       m_Settings.setValue("TotalSeg/LastPythonPath", pythonPathTextItem);
     }
-  }
+  }*/
 }
 
 void QmitkTotalSegmentatorToolGUI::ShowErrorMessage(const std::string &message, QMessageBox::Icon icon)
@@ -300,27 +301,26 @@ void QmitkTotalSegmentatorToolGUI::OnPythonPathChanged(const QString &pyEnv)
         oldState); // unblock signal firing after inserting item. Remove this after Qt6 migration
     }
   }
-  else if (!this->IsTotalSegmentatorInstalled(pyEnv))
-  {
-    this->ShowErrorMessage(m_WARNING_TOTALSEG_NOT_FOUND);
-    m_Controls.previewButton->setDisabled(true);
-  }
   else
   {
-    // Show positive status meeage
-    m_Controls.previewButton->setDisabled(false);
-    m_PythonPath = pyEnv.mid(pyEnv.indexOf(" ") + 1);
-#ifdef _WIN32
-    if (!(m_PythonPath.endsWith("Scripts", Qt::CaseInsensitive) ||
-          m_PythonPath.endsWith("Scripts/", Qt::CaseInsensitive)))
-    {
-      m_PythonPath += QDir::separator() + QString("Scripts");
-    }
-#else
-    if (!(m_PythonPath.endsWith("bin", Qt::CaseInsensitive) || m_PythonPath.endsWith("bin/", Qt::CaseInsensitive)))
-    {
-      m_PythonPath += QDir::separator() + QString("bin");
-    }
-#endif
+    QString pythonPath = GetPythonPathFromUI(pyEnv);
+    m_Installer.SetSystemPythonPath(pythonPath);
   }
+}
+
+QString QmitkTotalSegmentatorToolGUI::GetPythonPathFromUI(const QString &pyEnv)
+{
+  QString pythonPath = pyEnv.mid(pyEnv.indexOf(" ") + 1);
+#ifdef _WIN32
+  if (!(pythonPath.endsWith("Scripts", Qt::CaseInsensitive) || pythonPath.endsWith("Scripts/", Qt::CaseInsensitive)))
+  {
+    pythonPath += QDir::separator() + QString("Scripts");
+  }
+#else
+  if (!(pythonPath.endsWith("bin", Qt::CaseInsensitive) || pythonPath.endsWith("bin/", Qt::CaseInsensitive)))
+  {
+    pythonPath += QDir::separator() + QString("bin");
+  }
+#endif
+  return pythonPath;
 }

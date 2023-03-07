@@ -47,11 +47,14 @@ public:
   std::map<std::string, std::string> GetInstallParameters(QmitkSetupVirtualEnvUtil::Tool);
   QString GetBaseDir();
   QString GetVirtualEnvPath();
+  void SetSystemPythonPath(QString& path);
+  bool IsPythonPath(const QString &pythonPath);
   static void PrintProcessEvent(itk::Object * /*pCaller*/, const itk::EventObject &e, void *);
 
 private:
   QString m_BaseDir;
   QString m_venvPath;
+  QString m_SysPythonPath;
 };
 
 #endif

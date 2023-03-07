@@ -39,6 +39,19 @@ QString QmitkSetupVirtualEnvUtil::GetVirtualEnvPath()
   return m_venvPath;
 }
 
+void QmitkSetupVirtualEnvUtil::SetSystemPythonPath(QString& path)
+{
+  if (IsPythonPath(path))
+  {
+    m_SysPythonPath = path;
+    MITK_ERROR << "Python was detected in " + path.toStdString();
+  }
+  else
+  {
+    MITK_ERROR << "Python was not detected in "+path.toStdString();
+  }
+}
+
 std::map<std::string, std::string> QmitkSetupVirtualEnvUtil::GetInstallParameters(
   QmitkSetupVirtualEnvUtil::Tool packageName)
 {
@@ -110,6 +123,7 @@ bool QmitkSetupVirtualEnvUtil::SetupVirtualEnv(QmitkSetupVirtualEnvUtil::Tool pa
   args.push_back("venv");
   args.push_back(venvName.toStdString());
 #ifdef _WIN32
+  MITK_INFO << m_SysPythonPath.toStdString();
   spExec->Execute(
     m_BaseDir.toStdString(), "C:/ProgramData/Anaconda3/python.exe", args); // Setup local virtual environment
   QString pythonExeFolder = "Scripts";
@@ -181,4 +195,29 @@ void QmitkSetupVirtualEnvUtil::ExecutePython(const std::string &pythonCode,
   args.push_back("-c");
   args.push_back(pythonCode);
   spExec->Execute(workingDir, command, args);
+}
+
+
+bool QmitkSetupVirtualEnvUtil::IsPythonPath(const QString &pythonPath)
+{
+  QString fullPath = pythonPath;
+#ifdef _WIN32
+  if (!(fullPath.endsWith("Scripts", Qt::CaseInsensitive) || fullPath.endsWith("Scripts/", Qt::CaseInsensitive)))
+  {
+    fullPath += QDir::separator() + QString("Scripts");
+  }
+#else
+  if (!(fullPath.endsWith("bin", Qt::CaseInsensitive) || fullPath.endsWith("bin/", Qt::CaseInsensitive)))
+  {
+    fullPath += QDir::separator() + QString("bin");
+  }
+#endif
+  fullPath = fullPath.mid(fullPath.indexOf(" ") + 1);
+  bool isExists =
+#ifdef _WIN32
+                  QFile::exists(fullPath + QDir::separator() + QString("python.exe"));
+#else
+                  QFile::exists(fullPath + QDir::separator() + QString("python3"));
+#endif
+  return isExists;
 }

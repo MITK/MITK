@@ -125,9 +125,7 @@ void QmitkTotalSegmentatorToolGUI::EnableAll(bool isEnable)
 void QmitkTotalSegmentatorToolGUI::OnInstallBtnClicked()
 {
   bool isInstalled = false;
-#ifndef _WIN32
   isInstalled = m_Installer.SetupVirtualEnv();
-#endif
   if (isInstalled)
   {
     const QString pythonPath = m_Installer.GetVirtualEnvPath();

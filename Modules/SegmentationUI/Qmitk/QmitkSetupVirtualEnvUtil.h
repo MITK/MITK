@@ -13,10 +13,10 @@ found in the LICENSE file.s
 #ifndef QmitkSetupVirtualEnvUtil_h_Included
 #define QmitkSetupVirtualEnvUtil_h_Included
 
+#include "mitkLogMacros.h"
 #include "mitkProcessExecutor.h"
 #include <MitkSegmentationUIExports.h>
 #include <QString>
-#include "mitkLogMacros.h"
 
 /**
  * @brief Class to ...
@@ -35,10 +35,15 @@ public:
   bool SetupVirtualEnv(Tool packageName = Tool::TOTALSEGMENTATOR);
   void PipInstall(const std::string &library,
                   const std::string &workingDir,
-                  void (*callback)(itk::Object *, const itk::EventObject &, void *));
+                  void (*callback)(itk::Object *, const itk::EventObject &, void *),
+                  const std::string &command = "pip3");
   void ExecutePython(const std::string &args,
                      const std::string &pythonPath,
-                     void (*callback)(itk::Object *, const itk::EventObject &, void *));
+                     void (*callback)(itk::Object *, const itk::EventObject &, void *),
+                     const std::string &command = "python");
+
+  void InstallPytorch(const std::string &workingDir, void (*callback)(itk::Object *, const itk::EventObject &, void *));
+
   std::map<std::string, std::string> GetInstallParameters(QmitkSetupVirtualEnvUtil::Tool);
   QString GetBaseDir();
   QString GetVirtualEnvPath();

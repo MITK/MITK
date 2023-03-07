@@ -50,7 +50,7 @@ std::map<std::string, std::string> QmitkSetupVirtualEnvUtil::GetInstallParameter
     {
       parameters["venv_name"] = ".totalsegmentator";
       parameters["pkg_version"] = "1.5.2";
-      parameters["pkg_names"] = "Totalsegmentator==1.5.2,scipy==1.9.1";
+      parameters["pkg_names"] = "Totalsegmentator==1.5.2,scipy==1.9.1"; // comma separated string
       /*Add other parameters here...*/
       break;
     } /*Add more tools here...*/
@@ -109,29 +109,54 @@ bool QmitkSetupVirtualEnvUtil::SetupVirtualEnv(QmitkSetupVirtualEnvUtil::Tool pa
   args.push_back("-m");
   args.push_back("venv");
   args.push_back(venvName.toStdString());
+#ifdef _WIN32
+  spExec->Execute(
+    m_BaseDir.toStdString(), "C:/ProgramData/Anaconda3/python.exe", args); // Setup local virtual environment
+  QString pythonExeFolder = "Scripts";
+#else
   spExec->Execute(m_BaseDir.toStdString(), "/usr/bin/python3", args); // Setup local virtual environment
+  QString pythonExeFolder = "bin";
+#endif
 
-  if (folderPath.cd("bin"))
+  if (folderPath.cd(pythonExeFolder))
   {
     m_venvPath = folderPath.absolutePath();
     std::string workingDir = m_venvPath.toStdString();
+    InstallPytorch(workingDir, &PrintProcessEvent);
     for (auto &package : packages)
     {
       PipInstall(package, workingDir, &PrintProcessEvent);
     }
     std::string pythonCode; // python syntax to check if torch is installed with CUDA.
     pythonCode.append("import torch;");
-    pythonCode.append("print('Pytorch installed with CUDA') if torch.cuda.is_available else ValueError('PyTorch "
-                      "installed without CUDA');");
+    pythonCode.append("print('Pytorch was installed with CUDA') if torch.cuda.is_available() else print('PyTorch was "
+                      "installed WITHOUT CUDA');");
     ExecutePython(pythonCode, workingDir, &PrintProcessEvent);
     return true;
   }
   return false;
 }
 
+void QmitkSetupVirtualEnvUtil::InstallPytorch(const std::string &workingDir,
+                                              void (*callback)(itk::Object *, const itk::EventObject &, void *))
+{
+  mitk::ProcessExecutor::ArgumentListType args;
+  auto spExec = mitk::ProcessExecutor::New();
+  auto spCommand = itk::CStyleCommand::New();
+  spCommand->SetCallback(callback);
+  spExec->AddObserver(mitk::ExternalProcessOutputEvent(), spCommand);
+  args.push_back("-m");
+  args.push_back("pip");
+  args.push_back("install");
+  args.push_back("light-the-torch");
+  spExec->Execute(workingDir, "python", args);
+  PipInstall("torch", workingDir, callback, "ltt");
+}
+
 void QmitkSetupVirtualEnvUtil::PipInstall(const std::string &library,
                                           const std::string &workingDir,
-                                          void (*callback)(itk::Object *, const itk::EventObject &, void *))
+                                          void (*callback)(itk::Object *, const itk::EventObject &, void *),
+                                          const std::string &command)
 {
   mitk::ProcessExecutor::ArgumentListType args;
   auto spExec = mitk::ProcessExecutor::New();
@@ -140,12 +165,13 @@ void QmitkSetupVirtualEnvUtil::PipInstall(const std::string &library,
   spExec->AddObserver(mitk::ExternalProcessOutputEvent(), spCommand);
   args.push_back("install");
   args.push_back(library);
-  spExec->Execute(workingDir, "pip3", args); // Install TotalSegmentator in it.
+  spExec->Execute(workingDir, command, args);
 }
 
 void QmitkSetupVirtualEnvUtil::ExecutePython(const std::string &pythonCode,
                                              const std::string &workingDir,
-                                             void (*callback)(itk::Object *, const itk::EventObject &, void *))
+                                             void (*callback)(itk::Object *, const itk::EventObject &, void *),
+                                             const std::string &command)
 {
   mitk::ProcessExecutor::ArgumentListType args;
   auto spExec = mitk::ProcessExecutor::New();
@@ -154,5 +180,5 @@ void QmitkSetupVirtualEnvUtil::ExecutePython(const std::string &pythonCode,
   spExec->AddObserver(mitk::ExternalProcessOutputEvent(), spCommand);
   args.push_back("-c");
   args.push_back(pythonCode);
-  spExec->Execute(workingDir, "python3", args);
+  spExec->Execute(workingDir, command, args);
 }

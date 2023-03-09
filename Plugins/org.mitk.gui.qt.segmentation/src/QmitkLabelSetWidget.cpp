@@ -22,7 +22,6 @@ found in the LICENSE file.
 #include <mitkShowSegmentationAsSurface.h>
 #include <mitkSliceBasedInterpolationController.h>
 #include <mitkStatusBar.h>
-#include <mitkSurfaceBasedInterpolationController.h>
 #include <mitkToolManagerProvider.h>
 
 // Qmitk
@@ -546,12 +545,6 @@ void QmitkLabelSetWidget::OnActiveLabelChanged(int pixelValue)
   assert(workingImage);
   workingImage->GetActiveLabelSet()->SetActiveLabel(pixelValue);
   // MITK_INFO << "Active Label set to << " << pixelValue;
-
-  mitk::SurfaceBasedInterpolationController *interpolator = mitk::SurfaceBasedInterpolationController::GetInstance();
-  if (interpolator)
-  {
-    interpolator->SetActiveLabel(pixelValue);
-  }
 
   workingImage->Modified();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();

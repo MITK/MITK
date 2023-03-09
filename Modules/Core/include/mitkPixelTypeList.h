@@ -10,6 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#ifndef mitkPixelTypeList_h
+#define mitkPixelTypeList_h
+
 #include <stdexcept>
 
 namespace mitk
@@ -179,4 +182,6 @@ namespace mitk
     T3 t3;
   };
 
-} // namespace mitk
+}
+
+#endif

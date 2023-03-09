@@ -10,6 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#ifndef mitkToolFactoryMacro_h
+#define mitkToolFactoryMacro_h
+
 #define MITK_TOOL_MACRO(EXPORT_SPEC, CLASS_NAME, DESCRIPTION)                                                          \
 class EXPORT_SPEC CLASS_NAME##Factory : public ::itk::ObjectFactoryBase                                                \
 {                                                                                                                      \
@@ -182,3 +185,5 @@ extern "C"                                                                      
     return p;                                                                                                          \
   }                                                                                                                    \
 }
+
+#endif

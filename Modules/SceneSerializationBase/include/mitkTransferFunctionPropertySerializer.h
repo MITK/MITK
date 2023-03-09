@@ -10,6 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#ifndef mitkTransferFunctionPropertySerializer_h
+#define mitkTransferFunctionPropertySerializer_h
+
 #include "mitkBasePropertySerializer.h"
 #include "mitkTransferFunctionProperty.h"
 
@@ -32,4 +35,6 @@ namespace mitk
     TransferFunctionPropertySerializer();
     ~TransferFunctionPropertySerializer() override;
   };
-} // namespace
+}
+
+#endif

@@ -10,6 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#ifndef mitkSceneReader_h
+#define mitkSceneReader_h
+
 #include <MitkSceneSerializationExports.h>
 
 #include <itkObjectFactory.h>
@@ -33,3 +36,5 @@ namespace mitk
     virtual bool LoadScene(tinyxml2::XMLDocument &document, const std::string &workingDirectory, DataStorage *storage);
   };
 }
+
+#endif

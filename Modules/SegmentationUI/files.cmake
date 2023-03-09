@@ -26,7 +26,6 @@ set(CPP_FILES
   Qmitk/QmitkSurfaceStampWidget.cpp
   Qmitk/QmitkMaskStampWidget.cpp
   Qmitk/QmitkStaticDynamicSegmentationDialog.cpp
-  Qmitk/QmitkSurfaceBasedInterpolatorWidget.cpp
   Qmitk/QmitkSimpleLabelSetListWidget.cpp
   Qmitk/QmitkSegmentationTaskListWidget.cpp
   SegmentationUtilities/QmitkBooleanOperationsWidget.cpp
@@ -67,7 +66,6 @@ set(MOC_H_FILES
   Qmitk/QmitkSurfaceStampWidget.h
   Qmitk/QmitkMaskStampWidget.h
   Qmitk/QmitkStaticDynamicSegmentationDialog.h
-  Qmitk/QmitkSurfaceBasedInterpolatorWidget.h
   Qmitk/QmitkSimpleLabelSetListWidget.h
   Qmitk/QmitkSegmentationTaskListWidget.h
   SegmentationUtilities/QmitkBooleanOperationsWidget.h
@@ -85,7 +83,6 @@ set(UI_FILES
   Qmitk/QmitkOtsuToolWidgetControls.ui
   Qmitk/QmitkSurfaceStampWidgetGUIControls.ui
   Qmitk/QmitkMaskStampWidgetGUIControls.ui
-  Qmitk/QmitkSurfaceBasedInterpolatorWidgetGUIControls.ui
   Qmitk/QmitknnUNetToolGUIControls.ui
   Qmitk/QmitkEditableContourToolGUIControls.ui
   Qmitk/QmitkSegmentationTaskListWidget.ui

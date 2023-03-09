@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _mitkToolCommand_H
-#define _mitkToolCommand_H
+#ifndef mitkToolCommand_h
+#define mitkToolCommand_h
 
 #include "itkCommand.h"
 #include "mitkCommon.h"
@@ -80,4 +80,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif // _mitkToolCommand_H
+#endif

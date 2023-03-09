@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKWORKBENCHCOMMANDCONSTANTS_H
-#define MITKWORKBENCHCOMMANDCONSTANTS_H
+#ifndef mitkWorkbenchCommandConstants_h
+#define mitkWorkbenchCommandConstants_h
 
 #include <org_mitk_gui_common_Export.h>
 
@@ -42,4 +42,4 @@ public:
 }
 
 
-#endif // MITKWORKBENCHCOMMANDCONSTANTS_H
+#endif

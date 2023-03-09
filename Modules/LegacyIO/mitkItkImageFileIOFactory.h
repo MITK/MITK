@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __mitkItkImageFileIOFactory_h
-#define __mitkItkImageFileIOFactory_h
+#ifndef mitkItkImageFileIOFactory_h
+#define mitkItkImageFileIOFactory_h
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4786)

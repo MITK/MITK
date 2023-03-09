@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKUSNAVIGATIONCALIBRATIONSDATAMODEL_H
-#define QMITKUSNAVIGATIONCALIBRATIONSDATAMODEL_H
+#ifndef QmitkUSNavigationCalibrationsDataModel_h
+#define QmitkUSNavigationCalibrationsDataModel_h
 
 #include <QAbstractTableModel>
 
@@ -67,4 +67,4 @@ private:
   mitk::MessageDelegate2<QmitkUSNavigationCalibrationsDataModel, const std::string&, const std::string&> m_ListenerDeviceChanged;
 };
 
-#endif // QMITKUSNAVIGATIONCALIBRATIONSDATAMODEL_H
+#endif

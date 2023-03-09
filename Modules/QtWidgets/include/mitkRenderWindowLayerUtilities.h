@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKRENDERWINDOWLAYERUTILITIES_H
-#define MITKRENDERWINDOWLAYERUTILITIES_H
+#ifndef mitkRenderWindowLayerUtilities_h
+#define mitkRenderWindowLayerUtilities_h
 
 // qt widgets module
 #include "MitkQtWidgetsExports.h"
@@ -74,4 +74,4 @@ namespace mitk
   } // namespace RenderWindowLayerUtilities
 } // namespace mitk
 
-#endif // MITKRENDERWINDOWLAYERUTILITIES_H
+#endif

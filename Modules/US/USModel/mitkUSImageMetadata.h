@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKUSIMAGEMETADATA_H_HEADER_INCLUDED_
-#define MITKUSIMAGEMETADATA_H_HEADER_INCLUDED_
+#ifndef mitkUSImageMetadata_h
+#define mitkUSImageMetadata_h
 
 #include <MitkUSExports.h>
 #include <mitkCommon.h>

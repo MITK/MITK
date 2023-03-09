@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QUATERNIONAVERAGING_H_HEADER_INCLUDED_
-#define QUATERNIONAVERAGING_H_HEADER_INCLUDED_
+#ifndef mitkQuaternionAveraging_h
+#define mitkQuaternionAveraging_h
 
 #include "MitkIGTBaseExports.h"
 #include <itkObject.h>

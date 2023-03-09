@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkMessageHIncluded
-#define mitkMessageHIncluded
+#ifndef mitkMessage_h
+#define mitkMessage_h
 
 #include <functional>
 #include <mutex>

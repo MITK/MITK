@@ -69,4 +69,4 @@ namespace mitk
     double m_Range;
   };
 }
-#endif //mitkGIFLocalIntensity_h
+#endif

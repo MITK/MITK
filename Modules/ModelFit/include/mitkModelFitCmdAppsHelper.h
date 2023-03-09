@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_MODEL_FIT_CMD_APPS_HELPER_H_
-#define _MITK_MODEL_FIT_CMD_APPS_HELPER_H_
+#ifndef mitkModelFitCmdAppsHelper_h
+#define mitkModelFitCmdAppsHelper_h
 
 // std includes
 #include <string>

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkGrowCutSegmentationFilter_h_Included
-#define mitkGrowCutSegmentationFilter_h_Included
+#ifndef mitkGrowCutSegmentationFilter_h
+#define mitkGrowCutSegmentationFilter_h
 
 #include "itkImage.h"
 #include "mitkITKImageImport.h"

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef NAVIGATIONDATAVISUALIZATIONFILTER_H_INCLUDED
-#define NAVIGATIONDATAVISUALIZATIONFILTER_H_INCLUDED
+#ifndef mitkNavigationDataVisualizationFilter_h
+#define mitkNavigationDataVisualizationFilter_h
 
 #include <itkProcessObject.h>
 

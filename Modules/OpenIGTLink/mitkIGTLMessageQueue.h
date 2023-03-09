@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef IGTLMessageQueue_H
-#define IGTLMessageQueue_H
+#ifndef mitkIGTLMessageQueue_h
+#define mitkIGTLMessageQueue_h
 
 #include "MitkOpenIGTLinkExports.h"
 

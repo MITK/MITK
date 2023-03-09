@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKBPREPROCESSINGRESAMPLINGACTIVATOR_H
-#define MITKBPREPROCESSINGRESAMPLINGACTIVATOR_H
+#ifndef mitkPreprocessingResamplingActivator_h
+#define mitkPreprocessingResamplingActivator_h
 
 #include <ctkPluginActivator.h>
 
@@ -33,4 +33,4 @@ public:
 
 }
 
-#endif // MITKBPREPROCESSINGRESAMPLINGACTIVATOR_H
+#endif

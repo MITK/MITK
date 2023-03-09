@@ -124,4 +124,4 @@ namespace mitk
     FeatureListType DoCalculateFeatures(const Image* image, const Image* mask) override;
   };
 }
-#endif //mitkGIFVolumetricStatistics_h
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKRENDERWINDOW_H
-#define QMITKRENDERWINDOW_H
+#ifndef QmitkRenderWindow_h
+#define QmitkRenderWindow_h
 
 #include "mitkRenderWindowBase.h"
 
@@ -160,4 +160,4 @@ private:
 
 };
 
-#endif // QMITKRENDERWINDOW_H
+#endif

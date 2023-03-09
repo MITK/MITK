@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef BOUNDINGOBJECTCUTANDCAST_H_HEADER_INCLUDED_C10B22CD
-#define BOUNDINGOBJECTCUTANDCAST_H_HEADER_INCLUDED_C10B22CD
+#ifndef mitkBoundingObjectCutAndCast_h
+#define mitkBoundingObjectCutAndCast_h
 
 #include "mitkBoundingObjectCutter.h"
 #include "mitkCommon.h"
@@ -53,4 +53,4 @@ namespace mitk
 #include "mitkBoundingObjectCutAndCast.txx" // because it is a template
 #endif
 
-#endif /* BOUNDINGOBJECTCUTANDCAST_H_HEADER_INCLUDED_C10B22CD */
+#endif

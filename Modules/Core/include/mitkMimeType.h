@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKMIMETYPE_H
-#define MITKMIMETYPE_H
+#ifndef mitkMimeType_h
+#define mitkMimeType_h
 
 #include <MitkCoreExports.h>
 
@@ -86,4 +86,4 @@ namespace mitk
   MITKCORE_EXPORT std::ostream &operator<<(std::ostream &os, const MimeType &mimeType);
 }
 
-#endif // MITKMIMETYPE_H
+#endif

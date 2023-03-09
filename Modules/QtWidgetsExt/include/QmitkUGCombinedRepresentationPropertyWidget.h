@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKUGCOMBINEDREPRESENTATIONPROPERTYWIDGET_H
-#define QMITKUGCOMBINEDREPRESENTATIONPROPERTYWIDGET_H
+#ifndef QmitkUGCombinedRepresentationPropertyWidget_h
+#define QmitkUGCombinedRepresentationPropertyWidget_h
 
 #include "MitkQtWidgetsExtExports.h"
 

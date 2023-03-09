@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_UNSTRUCTURED_GRID_VTK_WRITER__H_
-#define _MITK_UNSTRUCTURED_GRID_VTK_WRITER__H_
+#ifndef mitkUnstructuredGridVtkWriter_h
+#define mitkUnstructuredGridVtkWriter_h
 
 #include <itkProcessObject.h>
 #include <mitkFileWriterWithInformation.h>
@@ -136,4 +136,4 @@ namespace mitk
   };
 }
 
-#endif // _MITK_UNSTRUCTURED_GRID_VTK_WRITER__H_
+#endif

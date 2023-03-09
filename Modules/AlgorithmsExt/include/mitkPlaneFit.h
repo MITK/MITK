@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#if !defined(MITK_PLANEFIT_H__INCLUDED_)
-#define MITK_PLANEFIT_H__INCLUDED_
+#ifndef mitkPlaneFit_h
+#define mitkPlaneFit_h
 
 #include "MitkAlgorithmsExtExports.h"
 #include "mitkGeometryDataSource.h"
@@ -135,4 +135,4 @@ namespace mitk
     std::vector<mitk::Vector3D> m_PlaneVectors;
   };
 } // namespace mitk
-#endif // MITK_PLANFIT_INCLUDE_
+#endif

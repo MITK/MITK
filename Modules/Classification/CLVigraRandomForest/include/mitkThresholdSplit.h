@@ -95,4 +95,4 @@ namespace mitk
 
 
 #include <../src/Splitter/mitkThresholdSplit.cpp>
-#endif //mitkThresholdSplit_h
+#endif

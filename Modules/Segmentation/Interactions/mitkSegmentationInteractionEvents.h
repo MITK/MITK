@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKSEGMENTATIONINTERACTIONEVENTS_H
-#define MITKSEGMENTATIONINTERACTIONEVENTS_H
+#ifndef mitkSegmentationInteractionEvents_h
+#define mitkSegmentationInteractionEvents_h
 
 #include <MitkSegmentationExports.h>
 
@@ -62,4 +62,4 @@ namespace mitk
 
 } // end namespace
 
-#endif // MITKSEGMENTATIONINTERACTIONEVENTS_H
+#endif

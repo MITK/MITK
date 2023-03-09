@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATANODEREMOVEACTION_H
-#define QMITKDATANODEREMOVEACTION_H
+#ifndef QmitkDataNodeRemoveAction_h
+#define QmitkDataNodeRemoveAction_h
 
 #include <org_mitk_gui_qt_application_Export.h>
 
@@ -51,4 +51,4 @@ private:
 
 };
 
-#endif // QMITKDATANODEREMOVEACTION_H
+#endif

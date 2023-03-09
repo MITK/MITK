@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkTubeGraphDataInteractor3D_h_
-#define mitkTubeGraphDataInteractor3D_h_
+#ifndef mitkTubeGraphDataInteractor_h
+#define mitkTubeGraphDataInteractor_h
 
 #include <MitkTubeGraphExports.h>
 

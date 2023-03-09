@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkOclImageFormats_h
-#define __mitkOclImageFormats_h
+#ifndef mitkOclImageFormats_h
+#define mitkOclImageFormats_h
 
 //mitk
 #include <mitkCommon.h>
@@ -115,4 +115,4 @@ private:
 
 }
 
-#endif // __mitkOclImageFormats_h
+#endif

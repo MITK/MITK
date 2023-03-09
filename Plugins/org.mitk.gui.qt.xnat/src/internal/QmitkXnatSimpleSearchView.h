@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKXNATSIMPLESEARCHVIEW_H
-#define QMITKXNATSIMPLESEARCHVIEW_H
+#ifndef QmitkXnatSimpleSearchView_h
+#define QmitkXnatSimpleSearchView_h
 
 #include <berryISelectionListener.h>
 
@@ -77,4 +77,4 @@ private:
 
 };
 
-#endif // QMITKXNATSIMPLESEARCHVIEW_H
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKDICOMIOMETAINFORMATIONCONSTANTS_H_
-#define MITKDICOMIOMETAINFORMATIONCONSTANTS_H_
+#ifndef mitkDICOMIOMetaInformationPropertyConstants_h
+#define mitkDICOMIOMetaInformationPropertyConstants_h
 
 #include <MitkDICOMExports.h>
 
@@ -48,4 +48,4 @@ namespace mitk
   };
 }
 
-#endif // MITKIOCONSTANTS_H_
+#endif

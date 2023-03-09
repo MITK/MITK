@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkSegWithPreviewToolGUIBase_h_Included
-#define QmitkSegWithPreviewToolGUIBase_h_Included
+#ifndef QmitkSegWithPreviewToolGUIBase_h
+#define QmitkSegWithPreviewToolGUIBase_h
 
 #include "QmitkToolGUI.h"
 

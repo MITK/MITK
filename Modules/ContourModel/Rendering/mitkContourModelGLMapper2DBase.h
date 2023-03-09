@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITK_ContourModelGLMapper2DBase_H_
-#define MITK_ContourModelGLMapper2DBase_H_
+#ifndef mitkContourModelGLMapper2DBase_h
+#define mitkContourModelGLMapper2DBase_h
 
 #include "mitkCommon.h"
 #include "mitkMapper.h"

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKMIMETYPES_H
-#define QMITKMIMETYPES_H
+#ifndef QmitkMimeTypes_h
+#define QmitkMimeTypes_h
 
 #include <MitkQtWidgetsExports.h>
 
@@ -39,4 +39,4 @@ public:
   static QList<mitk::DataNode *> ToDataNodePtrList(const QMimeData *mimeData);
 };
 
-#endif // QMITKMIMETYPES_H
+#endif

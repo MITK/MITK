@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __MITK_COVARIANCEMATRIXCALCULATOR_H__
-#define __MITK_COVARIANCEMATRIXCALCULATOR_H__
+#ifndef mitkCovarianceMatrixCalculator_h
+#define mitkCovarianceMatrixCalculator_h
 
 // exports
 #include "MitkAlgorithmsExtExports.h"

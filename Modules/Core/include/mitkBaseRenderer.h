@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKBASERENDERER_H
-#define MITKBASERENDERER_H
+#ifndef mitkBaseRenderer_h
+#define mitkBaseRenderer_h
 
 #include <mitkDataStorage.h>
 #include <mitkPlaneGeometry.h>
@@ -468,4 +468,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif // MITKBASERENDERER_H
+#endif

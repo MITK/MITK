@@ -141,4 +141,4 @@ namespace mitk
                               Point3D &point2);
   };
 } // namespace mitk
-#endif /* mitkPlaneGeometryDataMapper2D_h */
+#endif

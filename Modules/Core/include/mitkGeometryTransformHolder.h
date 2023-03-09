@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKGEOMETRYTRANSFORMHOLDER_H_
-#define MITKGEOMETRYTRANSFORMHOLDER_H_
+#ifndef mitkGeometryTransformHolder_h
+#define mitkGeometryTransformHolder_h
 
 #include <MitkCoreExports.h>
 #include <mitkAffineTransform3D.h>
@@ -153,4 +153,4 @@ namespace mitk
                              ScalarType eps,
                              bool verbose);
 }
-#endif /* MITKGEOMETRYTRANSFORMHOLDER_H_ */
+#endif

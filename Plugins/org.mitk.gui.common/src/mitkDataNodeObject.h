@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKDATATREENODEOBJECT_H_
-#define MITKDATATREENODEOBJECT_H_
+#ifndef mitkDataNodeObject_h
+#define mitkDataNodeObject_h
 
 #include <berryObject.h>
 #include <berryMacros.h>
@@ -50,4 +50,4 @@ private:
 
 }
 
-#endif /* MITKDATATREENODEOBJECT_H_ */
+#endif

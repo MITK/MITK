@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkIGTUIActivator_H
-#define mitkIGTUIActivator_H
+#ifndef mitkIGTUIActivator_h
+#define mitkIGTUIActivator_h
 
 #include <usModuleActivator.h>
 #include <mitkTrackingDeviceWidgetCollection.h>
@@ -39,4 +39,4 @@ namespace mitk
   };
 }
 
-#endif // mitkIGTUIActivator_H
+#endif

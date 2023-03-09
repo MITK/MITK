@@ -212,4 +212,4 @@ namespace mitk
     void Update(BaseRenderer *renderer) override;
   };
 } // namespace mitk
-#endif /* mitkSurfaceVtkMapper2D_h */
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MV_CONSTRAINED_COST_FUNCTION_DECORATOR_H
-#define MV_CONSTRAINED_COST_FUNCTION_DECORATOR_H
+#ifndef mitkMVConstrainedCostFunctionDecorator_h
+#define mitkMVConstrainedCostFunctionDecorator_h
 
 #include <mitkMVModelFitCostFunction.h>
 #include <mitkConstraintCheckerBase.h>

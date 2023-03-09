@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKGEOMETRYCLIPIMAGEFILTER_H_HEADER_INCLUDED_C1F48A22
-#define MITKGEOMETRYCLIPIMAGEFILTER_H_HEADER_INCLUDED_C1F48A22
+#ifndef mitkGeometryClipImageFilter_h
+#define mitkGeometryClipImageFilter_h
 
 #include "MitkAlgorithmsExtExports.h"
 #include "mitkCommon.h"
@@ -179,4 +179,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKGEOMETRYCLIPIMAGEFILTER_H_HEADER_INCLUDED_C1F48A22 */
+#endif

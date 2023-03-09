@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_CONTOURMODELSET_MAPPER_3D_H_
-#define _MITK_CONTOURMODELSET_MAPPER_3D_H_
+#ifndef mitkContourModelSetMapper3D_h
+#define mitkContourModelSetMapper3D_h
 
 #include "mitkCommon.h"
 #include <MitkContourModelExports.h>

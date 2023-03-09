@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITK_TRANSFER_FUNCTION_H_HEADER_INCLUDED
-#define MITK_TRANSFER_FUNCTION_H_HEADER_INCLUDED
+#ifndef mitkTransferFunction_h
+#define mitkTransferFunction_h
 
 #include "mitkHistogramGenerator.h"
 #include "mitkImage.h"
@@ -192,4 +192,4 @@ namespace mitk
   };
 }
 
-#endif /* MITK_TRANSFER_FUNCTION_H_HEADER_INCLUDED */
+#endif

@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITKFLOWAPPLICATIONWORKBENCHWINDOWADVISOR_H_
-#define QMITKFLOWAPPLICATIONWORKBENCHWINDOWADVISOR_H_
+#ifndef QmitkFlowApplicationWorkbenchWindowAdvisor_h
+#define QmitkFlowApplicationWorkbenchWindowAdvisor_h
 
 #include <berryWorkbenchWindowAdvisor.h>
 
@@ -150,4 +150,4 @@ private:
   QAction* resetPerspAction;
 };
 
-#endif /*QMITKFLOWAPPLICATIONWORKBENCHWINDOWADVISOR_H_*/
+#endif

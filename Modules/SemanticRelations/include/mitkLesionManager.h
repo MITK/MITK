@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKLESIONMANAGER_H
-#define MITKLESIONMANAGER_H
+#ifndef mitkLesionManager_h
+#define mitkLesionManager_h
 
 #include <MitkSemanticRelationsExports.h>
 
@@ -68,4 +68,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif // MITKLESIONMANAGER_H
+#endif

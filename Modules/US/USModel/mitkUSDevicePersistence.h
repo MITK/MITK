@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKUSDevicePersistence_H_HEADER_INCLUDED_
-#define MITKUSDevicePersistence_H_HEADER_INCLUDED_
+#ifndef mitkUSDevicePersistence_h
+#define mitkUSDevicePersistence_h
 
 // MITK
 #include <mitkCommon.h>

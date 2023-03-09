@@ -91,4 +91,4 @@ namespace mitk
     bool m_IsEnabled;
   };
 } // end of namespace mitk
-#endif // mitkRenderWindowFrame_h
+#endif

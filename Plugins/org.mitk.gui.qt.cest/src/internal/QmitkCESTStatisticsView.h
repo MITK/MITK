@@ -127,4 +127,4 @@ class QmitkCESTStatisticsView : public QmitkAbstractView, public mitk::IRenderWi
 
 };
 
-#endif // QmitkCESTStatisticsView_h
+#endif

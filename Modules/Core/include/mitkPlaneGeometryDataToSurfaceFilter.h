@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKGEOMETRY2DDATATOSURFACEDATAFILTER_H_HEADER_INCLUDED_C10B22CD
-#define MITKGEOMETRY2DDATATOSURFACEDATAFILTER_H_HEADER_INCLUDED_C10B22CD
+#ifndef mitkPlaneGeometryDataToSurfaceFilter_h
+#define mitkPlaneGeometryDataToSurfaceFilter_h
 
 #include "mitkGeometry3D.h"
 #include "mitkSurfaceSource.h"
@@ -220,4 +220,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif /* MITKGEOMETRY2DDATATOSURFACEDATAFILTER_H_HEADER_INCLUDED_C10B22CD */
+#endif

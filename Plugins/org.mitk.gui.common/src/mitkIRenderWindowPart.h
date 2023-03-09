@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIRENDERWINDOWPART_H
-#define MITKIRENDERWINDOWPART_H
+#ifndef mitkIRenderWindowPart_h
+#define mitkIRenderWindowPart_h
 
 #include <QString>
 #include <QStringList>
@@ -215,4 +215,4 @@ struct MITK_GUI_COMMON_PLUGIN IRenderWindowPart {
 
 Q_DECLARE_INTERFACE(mitk::IRenderWindowPart, "org.mitk.ui.IRenderWindowPart")
 
-#endif // MITKIRENDERWINDOWPART_H
+#endif

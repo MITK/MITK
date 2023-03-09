@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef USCOMBINEDMODALITYPERSISTENCE_H
-#define USCOMBINEDMODALITYPERSISTENCE_H
+#ifndef mitkUSNavigationCombinedModalityPersistence_h
+#define mitkUSNavigationCombinedModalityPersistence_h
 
 #include <itkObjectFactory.h>
 
@@ -83,4 +83,4 @@ private:
 };
 } // namespace mitk
 
-#endif // USCOMBINEDMODALITYPERSISTENCE_H
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKINTERACTIONKEYEVENT_H_
-#define MITKINTERACTIONKEYEVENT_H_
+#ifndef mitkInteractionKeyEvent_h
+#define mitkInteractionKeyEvent_h
 
 #include "itkObject.h"
 #include "itkObjectFactory.h"
@@ -56,4 +56,4 @@ namespace mitk
   };
 } /* namespace mitk */
 
-#endif /* MITKINTERACTIONKEYEVENT_H_ */
+#endif

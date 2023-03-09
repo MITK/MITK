@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkUSNAVIGATIONMARKERPLACEMENT_H
-#define QmitkUSNAVIGATIONMARKERPLACEMENT_H
+#ifndef QmitkUSNavigationMarkerPlacement_h
+#define QmitkUSNavigationMarkerPlacement_h
 
 #include <QmitkAbstractView.h>
 
@@ -206,4 +206,4 @@ private:
   Ui::QmitkUSNavigationMarkerPlacement *ui;
 };
 
-#endif // USNAVIGATIONMARKERPLACEMENT_H
+#endif

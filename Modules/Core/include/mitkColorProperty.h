@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKCOLORPROPERTY_H_HEADER_INCLUDED_C17953D1
-#define MITKCOLORPROPERTY_H_HEADER_INCLUDED_C17953D1
+#ifndef mitkColorProperty_h
+#define mitkColorProperty_h
 
 #include "mitkBaseProperty.h"
 #include <MitkCoreExports.h>
@@ -93,4 +93,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKCOLORPROPERTY_H_HEADER_INCLUDED_C17953D1 */
+#endif

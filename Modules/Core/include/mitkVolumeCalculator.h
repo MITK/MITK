@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef VOLUME_CALCULATOR_H_HEADER_INCLUDED
-#define VOLUME_CALCULATOR_H_HEADER_INCLUDED
+#ifndef mitkVolumeCalculator_h
+#define mitkVolumeCalculator_h
 
 #include "itkImage.h"
 #include "itkObject.h"
@@ -82,4 +82,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* VOLUME_CALCULATOR_H_HEADER_INCLUDED */
+#endif

@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __mitkCESTImageDetectionHelper_h
-#define __mitkCESTImageDetectionHelper_h
+#ifndef mitkCESTImageDetectionHelper_h
+#define mitkCESTImageDetectionHelper_h
 
 #include <MitkCESTExports.h>
 

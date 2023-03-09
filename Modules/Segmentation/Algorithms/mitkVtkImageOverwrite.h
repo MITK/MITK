@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkVtkImageOverwrite_h_Included
-#define mitkVtkImageOverwrite_h_Included
+#ifndef mitkVtkImageOverwrite_h
+#define mitkVtkImageOverwrite_h
 
 #include <MitkSegmentationExports.h>
 #include <vtkImageReslice.h>
@@ -81,4 +81,4 @@ protected:
                                    int id) override;
 };
 
-#endif // mitkVtkImageOverwrite_h_Included
+#endif

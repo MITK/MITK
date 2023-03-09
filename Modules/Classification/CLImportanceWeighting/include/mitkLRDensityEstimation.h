@@ -58,4 +58,4 @@ namespace mitk
   }; // class LRDensityEstimation
 } //namespace mitk
 
-#endif //mitkLRDensityEstimation_h
+#endif

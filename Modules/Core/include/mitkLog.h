@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_LOG_H
-#define _MITK_LOG_H
+#ifndef mitkLog_h
+#define mitkLog_h
 
 #include <MitkCoreExports.h>
 #include <mbilog.h>

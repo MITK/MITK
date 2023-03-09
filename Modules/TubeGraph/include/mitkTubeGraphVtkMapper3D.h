@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef TubeGraphVtkMapper3D_H_HEADER_INCLUDED
-#define TubeGraphVtkMapper3D_H_HEADER_INCLUDED
+#ifndef mitkTubeGraphVtkMapper3D_h
+#define mitkTubeGraphVtkMapper3D_h
 
 #include <MitkTubeGraphExports.h>
 #include <mitkLocalStorageHandler.h>

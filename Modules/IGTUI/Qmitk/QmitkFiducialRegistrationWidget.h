@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QmitkFiducialRegistrationWidget_H_INCLUDED
-#define _QmitkFiducialRegistrationWidget_H_INCLUDED
+#ifndef QmitkFiducialRegistrationWidget_h
+#define QmitkFiducialRegistrationWidget_h
 
 #include "ui_QmitkFiducialRegistrationWidget.h"
 #include "QmitkAbstractMultiWidget.h"
@@ -129,4 +129,4 @@ protected:
   mitk::NavigationData::Pointer m_T_ObjectReg;
 
 };
-#endif // _QmitkFiducialRegistrationWidget_H_INCLUDED
+#endif

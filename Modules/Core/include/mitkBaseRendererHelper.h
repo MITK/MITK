@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKBASERENDERERHELPER_H
-#define MITKBASERENDERERHELPER_H
+#ifndef mitkBaseRendererHelper_h
+#define mitkBaseRendererHelper_h
 
 #include <mitkBaseRenderer.h>
 #include <mitkTimeGeometry.h>
@@ -28,4 +28,4 @@ namespace mitk
   } // namespace BaseRendererHelper
 } // namespace mitk
 
-#endif // MITKBASERENDERERHELPER_H
+#endif

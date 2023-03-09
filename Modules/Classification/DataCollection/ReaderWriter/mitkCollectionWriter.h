@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITK_COLLECTION_WRITER_H
-#define MITK_COLLECTION_WRITER_H
+#ifndef mitkCollectionWriter_h
+#define mitkCollectionWriter_h
 
 //#include "mitkCommon.h"
 #include "mitkDataCollection.h"
@@ -66,4 +66,4 @@ namespace mitk {
   };
 } // namespace mitk
 
-#endif /* MITK_COLLECTION_WRITER_H */
+#endif

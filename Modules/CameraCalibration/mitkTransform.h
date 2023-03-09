@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef MITKTRANSFORM_H
-#define MITKTRANSFORM_H
+#ifndef mitkTransform_h
+#define mitkTransform_h
 
 #include <itkObject.h>
 #include <opencv2/calib3d.hpp>
@@ -297,4 +297,4 @@ namespace mitk {
 MITKCAMERACALIBRATION_EXPORT std::ostream& operator<<
     (std::ostream& os, mitk::Transform::Pointer p);
 
-#endif // MITKTRANSFORM_H
+#endif

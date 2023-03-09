@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_MEMORY_UTILITIES_H_
-#define _MITK_MEMORY_UTILITIES_H_
+#ifndef mitkMemoryUtilities_h
+#define mitkMemoryUtilities_h
 
 #include <MitkCoreExports.h>
 #include <itkMacro.h>

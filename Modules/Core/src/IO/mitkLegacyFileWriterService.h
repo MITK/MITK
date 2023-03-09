@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef LegacyFileWriterService_H_HEADER_INCLUDED_C1E7E521
-#define LegacyFileWriterService_H_HEADER_INCLUDED_C1E7E521
+#ifndef mitkLegacyFileWriterService_h
+#define mitkLegacyFileWriterService_h
 
 #include <mitkAbstractFileWriter.h>
 #include <mitkFileWriter.h>
@@ -41,4 +41,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* LegacyFileWriterService_H_HEADER_INCLUDED_C1E7E521 */
+#endif

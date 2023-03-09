@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITK_SHOW_SEGMENTATION_AS_SMOOTHED_SURFACE_H
-#define MITK_SHOW_SEGMENTATION_AS_SMOOTHED_SURFACE_H
+#ifndef mitkShowSegmentationAsSmoothedSurface_h
+#define mitkShowSegmentationAsSmoothedSurface_h
 
 #include "mitkSegmentationSink.h"
 #include <MitkSegmentationExports.h>

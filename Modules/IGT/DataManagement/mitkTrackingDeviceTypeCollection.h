@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef TRACKINGDEVICETYPECOLLECTION_H_INCLUDED
-#define TRACKINGDEVICETYPECOLLECTION_H_INCLUDED
+#ifndef mitkTrackingDeviceTypeCollection_h
+#define mitkTrackingDeviceTypeCollection_h
 
 #include <MitkIGTExports.h>
 
@@ -80,4 +80,4 @@ namespace mitk {
   };
 } // namespace mitk
 MITK_DECLARE_SERVICE_INTERFACE(mitk::TrackingDeviceTypeCollection, "org.mitk.services.TrackingDeviceTypeCollection")
-#endif //TRACKINGDEVICETYPECOLLECTION_H_INCLUDED
+#endif

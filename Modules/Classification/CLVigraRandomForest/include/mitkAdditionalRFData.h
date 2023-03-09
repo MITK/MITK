@@ -42,4 +42,4 @@ namespace mitk
   };
 }
 
-#endif //mitkAdditionalRFData_h
+#endif

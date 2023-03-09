@@ -50,4 +50,4 @@ namespace mitk {
   };
 }
 
-#endif // mitkCostingStatistic_h
+#endif

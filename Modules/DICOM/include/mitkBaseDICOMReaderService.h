@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKBASEDICOMREADERSERVICE_H
-#define MITKBASEDICOMREADERSERVICE_H
+#ifndef mitkBaseDICOMReaderService_h
+#define mitkBaseDICOMReaderService_h
 
 #include <mitkAbstractFileReader.h>
 #include <mitkDICOMFileReader.h>
@@ -67,4 +67,4 @@ std::string MITKDICOM_EXPORT GenerateNameFromDICOMProperties(const mitk::IProper
 
 }
 
-#endif // MITKBASEDICOMREADERSERVICE_H
+#endif

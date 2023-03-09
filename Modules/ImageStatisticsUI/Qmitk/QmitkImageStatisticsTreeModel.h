@@ -124,4 +124,4 @@ private:
     unsigned int m_HistogramNBins = 100;
 };
 
-#endif // mitkQmitkImageStatisticsTreeModel_h
+#endif

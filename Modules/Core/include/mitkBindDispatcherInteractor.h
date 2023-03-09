@@ -70,4 +70,4 @@ namespace mitk
     DataStorage::Pointer m_DataStorage;
   };
 }
-#endif /* mitkBindDispatcherInteractor_h */
+#endif

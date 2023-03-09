@@ -90,5 +90,4 @@ private:
 
 };
 
-#endif // QmitkInitialValuesModel_h
-
+#endif

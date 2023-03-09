@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITK_MINMAXLABELIMAGEFILTERWITHINDEX_H
-#define MITK_MINMAXLABELIMAGEFILTERWITHINDEX_H
+#ifndef mitkMinMaxLabelmageFilterWithIndex_h
+#define mitkMinMaxLabelmageFilterWithIndex_h
 
 #include <MitkImageStatisticsExports.h>
 

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKTRACKINGTYPES_H_HEADER_INCLUDED_
-#define MITKTRACKINGTYPES_H_HEADER_INCLUDED_
+#ifndef mitkTrackingTypes_h
+#define mitkTrackingTypes_h
 
 #include <itkPoint.h>
 #include <mitkColorProperty.h>
@@ -88,4 +88,4 @@ namespace mitk
   static mitk::Color IGTColor_VALID = mitk::ColorProperty::New(0.0f, 1.0f, 0.0f)->GetColor();
   static mitk::Color IGTColor_INVALID = mitk::ColorProperty::New(1.0f, 1.0f, 1.0f)->GetColor();
 } // namespace mitk
-#endif /* MITKTRACKINGTYPES_H_HEADER_INCLUDED_ */
+#endif

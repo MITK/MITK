@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef VtkUnstructuredGridReader_H_HEADER_INCLUDED
-#define VtkUnstructuredGridReader_H_HEADER_INCLUDED
+#ifndef mitkVtkUnstructuredGridReader_h
+#define mitkVtkUnstructuredGridReader_h
 
 #include <mitkAbstractFileReader.h>
 
@@ -34,4 +34,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* VtkUnstructuredGridReader_H_HEADER_INCLUDED */
+#endif

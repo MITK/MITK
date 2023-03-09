@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef BASEVTKMAPPER3D_H_HEADER_INCLUDED
-#define BASEVTKMAPPER3D_H_HEADER_INCLUDED
+#ifndef mitkVtkMapper3D_h
+#define mitkVtkMapper3D_h
 
 #include "mitkVtkMapper.h"
 
@@ -23,4 +23,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* BASEVTKMAPPER3D_H_HEADER_INCLUDED */
+#endif

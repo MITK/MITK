@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATASTORAGERENDERWINDOWLISTMODEL_H
-#define QMITKDATASTORAGERENDERWINDOWLISTMODEL_H
+#ifndef QmitkRenderWindowDataStorageListModel_h
+#define QmitkRenderWindowDataStorageListModel_h
 
 // render window manager UI model
 #include "MitkRenderWindowManagerUIExports.h"
@@ -101,4 +101,4 @@ private:
 
 };
 
-#endif // QMITKDATASTORAGERENDERWINDOWLISTMODEL_H
+#endif

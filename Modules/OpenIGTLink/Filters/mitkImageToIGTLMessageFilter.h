@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITKIMAGEToIGTLMessageFILTER_H__
-#define _MITKIMAGEToIGTLMessageFILTER_H__
+#ifndef mitkImageToIGTLMessageFilter_h
+#define mitkImageToIGTLMessageFilter_h
 
 #include <mitkCommon.h>
 #include <mitkIGTLMessageSource.h>
@@ -91,4 +91,4 @@ class MITKOPENIGTLINK_EXPORT ImageToIGTLMessageFilter : public IGTLMessageSource
 };
 }  // namespace mitk
 
-#endif  // _MITKIMAGEToIGTLMessageFILTER_H__
+#endif

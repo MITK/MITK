@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __mitkToFImageCsvWriter_h
-#define __mitkToFImageCsvWriter_h
+#ifndef mitkToFImageCsvWriter_h
+#define mitkToFImageCsvWriter_h
 
 #include "mitkToFImageWriter.h"
 #include <MitkToFHardwareExports.h>
@@ -85,4 +85,4 @@ namespace mitk
     void WriteCsvFile(FILE* outfile, float* floatData);
   };
 } //END mitk namespace
-#endif // __mitkToFImageCsvWriter_h
+#endif

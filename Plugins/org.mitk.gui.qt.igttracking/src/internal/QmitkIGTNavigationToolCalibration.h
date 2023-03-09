@@ -12,7 +12,7 @@ found in the LICENSE file.
 
 
 #ifndef QmitkIGTNavigationToolCalibration_h
-#define  QmitkIGTNavigationToolCalibration_h
+#define QmitkIGTNavigationToolCalibration_h
 
 #include <berryISelectionListener.h>
 
@@ -136,4 +136,4 @@ protected:
 
 };
 
-#endif // IGTNavigationToolCalibration_h
+#endif

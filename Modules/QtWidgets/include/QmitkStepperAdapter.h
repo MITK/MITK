@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKSTEPPERADAPTER_H_HEADER_INCLUDED_C1E77191
-#define QMITKSTEPPERADAPTER_H_HEADER_INCLUDED_C1E77191
+#ifndef QmitkStepperAdapter_h
+#define QmitkStepperAdapter_h
 
 #include "MitkQtWidgetsExports.h"
 #include "mitkStepper.h"

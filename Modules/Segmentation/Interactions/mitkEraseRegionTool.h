@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkEraseRegionTool_h_Included
-#define mitkEraseRegionTool_h_Included
+#ifndef mitkEraseRegionTool_h
+#define mitkEraseRegionTool_h
 
 #include "mitkFillRegionBaseTool.h"
 #include <MitkSegmentationExports.h>

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QmitkTrackingSourcesCheckBoxPanelWidget_H_INCLUDED
-#define _QmitkTrackingSourcesCheckBoxPanelWidget_H_INCLUDED
+#ifndef QmitkTrackingSourcesCheckBoxPanelWidget_h
+#define QmitkTrackingSourcesCheckBoxPanelWidget_h
 
 #include "ui_QmitkTrackingSourcesCheckBoxPanelWidgetControls.h"
 #include "MitkIGTUIExports.h"
@@ -152,5 +152,4 @@ private:
 
 
 };
-#endif // _QmitkTrackingSourcesCheckBoxPanelWidget_H_INCLUDED
-
+#endif

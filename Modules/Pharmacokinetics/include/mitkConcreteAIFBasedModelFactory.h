@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef MITK_CONCRETE_AIF_BASED_MODEL_FACTORY_H
-#define MITK_CONCRETE_AIF_BASED_MODEL_FACTORY_H
+#ifndef mitkConcreteAIFBasedModelFactory_h
+#define mitkConcreteAIFBasedModelFactory_h
 
 #include "mitkConcreteModelFactoryBase.h"
 #include "mitkAIFParametrizerHelper.h"
@@ -69,4 +69,4 @@ namespace mitk
   };
 
 }
-#endif // MITKTWOCOMPARTMENTEXCHANGEMODELFACTORY_H
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKPLANARFIGUREINTERACTOR_H
-#define MITKPLANARFIGUREINTERACTOR_H
+#ifndef mitkPlanarFigureInteractor_h
+#define mitkPlanarFigureInteractor_h
 
 #include <MitkPlanarFigureExports.h>
 
@@ -195,4 +195,4 @@ namespace mitk
   };
 }
 
-#endif // MITKPLANARFIGUREINTERACTOR_H
+#endif

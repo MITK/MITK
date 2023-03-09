@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _mitk_Video_Source_h_
-#define _mitk_Video_Source_h_
+#ifndef mitkVideoSource_h
+#define mitkVideoSource_h
 
 #include "MitkDataTypesExtExports.h"
 #include "mitkCommon.h"
@@ -133,4 +133,4 @@ namespace mitk
     bool m_CapturePaused;
   };
 }
-#endif // Header
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkCustomWidgetOverlay_H_HEADER_INCLUDED_C10DC4EB
-#define QmitkCustomWidgetOverlay_H_HEADER_INCLUDED_C10DC4EB
+#ifndef QmitkCustomWidgetOverlay_h
+#define QmitkCustomWidgetOverlay_h
 
 // MITK
 #include "QmitkOverlay.h"
@@ -52,4 +52,4 @@ public:
   QSize GetNeededSize() override;
 };
 
-#endif /* QmitkCustomWidgetOverlay_H_HEADER_INCLUDED_C10DC4EB */
+#endif

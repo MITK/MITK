@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKAREAUNDERFIRSTMOMENTDESCRIPTIONPARAMETER_H
-#define MITKAREAUNDERFIRSTMOMENTDESCRIPTIONPARAMETER_H
+#ifndef mitkAreaUnderFirstMomentDescriptionParameter_h
+#define mitkAreaUnderFirstMomentDescriptionParameter_h
 
 #include "mitkCurveDescriptionParameterBase.h"
 
@@ -42,4 +42,4 @@ namespace  mitk
     };
 }
 
-#endif // MITKAREAUNDERFIRSTMOMENTDESCRIPTIONPARAMETER_H
+#endif

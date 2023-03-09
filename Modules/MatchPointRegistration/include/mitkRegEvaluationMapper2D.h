@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITK_REG_EVALUATION_MAPPER_2D_H
-#define MITK_REG_EVALUATION_MAPPER_2D_H
+#ifndef mitkRegEvaluationMapper2D_h
+#define mitkRegEvaluationMapper2D_h
 
 //MatchPoint
 #include <mapRegistration.h>
@@ -245,4 +245,4 @@ protected:
 
 } // namespace mitk
 
-#endif /* MITKRegEvaluationMapper2D_H_HEADER_INCLUDED_C10E906E */
+#endif

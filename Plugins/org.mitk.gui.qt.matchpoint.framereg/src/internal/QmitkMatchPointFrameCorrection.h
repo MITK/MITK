@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef __Q_MITK_MATCHPOINT_FRAME_CORRECTION_H
-#define __Q_MITK_MATCHPOINT_FRAME_CORRECTION_H
+#ifndef QmitkMatchPointFrameCorrection_h
+#define QmitkMatchPointFrameCorrection_h
 
 #include <berryISelectionListener.h>
 
@@ -188,5 +188,4 @@ private:
   Ui::MatchPointFrameCorrectionControls m_Controls;
 };
 
-#endif // MatchPoint_h
-
+#endif

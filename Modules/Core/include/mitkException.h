@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKEXCEPTION_H_INCLUDED
-#define MITKEXCEPTION_H_INCLUDED
+#ifndef mitkException_h
+#define mitkException_h
 
 #include <MitkCoreExports.h>
 #include <itkMacro.h>

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __Q_MITK_MATCHPOINT_H
-#define __Q_MITK_MATCHPOINT_H
+#ifndef QmitkMatchPointBrowser_h
+#define QmitkMatchPointBrowser_h
 
 #include <QmitkAbstractView.h>
 
@@ -118,5 +118,4 @@ private:
     ::map::algorithm::RegistrationAlgorithmBase::Pointer m_LoadedAlgorithm;
 };
 
-#endif // MatchPoint_h
-
+#endif

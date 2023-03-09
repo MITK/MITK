@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKUSNAVIGATIONSTEPTUMOURSELECTION_H
-#define QMITKUSNAVIGATIONSTEPTUMOURSELECTION_H
+#ifndef QmitkUSNavigationStepTumourSelection_h
+#define QmitkUSNavigationStepTumourSelection_h
 
 #include "QmitkUSAbstractNavigationStep.h"
 
@@ -161,4 +161,4 @@ private:
   Ui::QmitkUSNavigationStepTumourSelection *ui;
 };
 
-#endif // QMITKUSNAVIGATIONSTEPTUMOURSELECTION_H
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkDataManagerLightView_H_
-#define QmitkDataManagerLightView_H_
+#ifndef QmitkDataManagerLightView_h
+#define QmitkDataManagerLightView_h
 
 /// Qmitk
 #include <QmitkAbstractView.h>
@@ -84,4 +84,4 @@ private:
   QmitkDataManagerLightViewData* d;
 };
 
-#endif /*QmitkDataManagerLightView_H_*/
+#endif

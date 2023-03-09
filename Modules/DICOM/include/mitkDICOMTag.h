@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkTag_h
-#define mitkTag_h
+#ifndef mitkDICOMTag_h
+#define mitkDICOMTag_h
 
 #include "mitkPoint.h"
 #include "mitkVector.h"

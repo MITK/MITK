@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKHTTPSTATUSCODEHANDLER_H
-#define QMITKHTTPSTATUSCODEHANDLER_H
+#ifndef QmitkHttpStatusCodeHandler_h
+#define QmitkHttpStatusCodeHandler_h
 
 #include <MitkXNATExports.h>
 
@@ -27,4 +27,4 @@ private:
   ~QmitkHttpStatusCodeHandler();
 };
 
-#endif // QMITKHTTPSTATUSCODEHANDLER_H
+#endif

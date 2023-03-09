@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QmitkServiceListWidget_H_INCLUDED
-#define _QmitkServiceListWidget_H_INCLUDED
+#ifndef QmitkServiceListWidget_h
+#define QmitkServiceListWidget_h
 
 #include "MitkQtWidgetsExports.h"
 #include "ui_QmitkServiceListWidgetControls.h"
@@ -285,4 +285,4 @@ protected:
   QString CreateCaptionForService(const us::ServiceReferenceU &serviceRef);
 };
 
-#endif // _QmitkServiceListWidget_H_INCLUDED
+#endif

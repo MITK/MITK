@@ -263,4 +263,4 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkAbstractView
 };
 
 
-#endif // _QMITKMITKIGTTRACKINGTOOLBOXVIEW_H_INCLUDED
+#endif

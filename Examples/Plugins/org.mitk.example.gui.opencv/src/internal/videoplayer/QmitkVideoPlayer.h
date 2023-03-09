@@ -45,4 +45,4 @@ private:
   QmitkOpenCVVideoControls *m_OpenCVVideoControls;
 };
 
-#endif // QmitkVideoPlayer_h
+#endif

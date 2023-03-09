@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_VTK_SCALARMODE_PROPERTY__H_
-#define _MITK_VTK_SCALARMODE_PROPERTY__H_
+#ifndef mitkVtkScalarModeProperty_h
+#define mitkVtkScalarModeProperty_h
 
 #include "mitkEnumerationProperty.h"
 
@@ -107,4 +107,4 @@ namespace mitk
 
 } // end of namespace mitk
 
-#endif //_MITK_VTK_SCALARMODE_PROPERTY__H_
+#endif

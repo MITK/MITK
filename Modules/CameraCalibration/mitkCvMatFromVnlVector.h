@@ -66,4 +66,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif // mitkCvMatFromVnlVector_h
+#endif

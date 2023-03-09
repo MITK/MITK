@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKSELECTIONSERVICECONNECTOR_H
-#define QMITKSELECTIONSERVICECONNECTOR_H
+#ifndef QmitkSelectionServiceConnector_h
+#define QmitkSelectionServiceConnector_h
 
 #include <org_mitk_gui_qt_common_Export.h>
 
@@ -130,4 +130,4 @@ private:
 
 };
 
-#endif // QMITKSELECTIONSERVICECONNECTOR_H
+#endif

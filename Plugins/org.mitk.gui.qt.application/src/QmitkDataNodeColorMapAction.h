@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATANODECOLORMAPACTION_H
-#define QMITKDATANODECOLORMAPACTION_H
+#ifndef QmitkDataNodeColorMapAction_h
+#define QmitkDataNodeColorMapAction_h
 
 #include <org_mitk_gui_qt_application_Export.h>
 
@@ -43,4 +43,4 @@ protected:
 
 };
 
-#endif // QMITKDATANODECOLORMAPACTION_H
+#endif

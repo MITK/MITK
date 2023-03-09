@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITK_ISOSURFACE_H__INCLUDED
-#define QMITK_ISOSURFACE_H__INCLUDED
+#ifndef QmitkIsoSurface_h
+#define QmitkIsoSurface_h
 
 #include "QmitkAbstractView.h"
 #include "mitkColorSequenceRainbow.h"
@@ -81,4 +81,4 @@ private:
   mitk::ColorSequenceRainbow m_RainbowColor;
 };
 
-#endif // QMITK_ISOSURFACE_H__INCLUDED
+#endif

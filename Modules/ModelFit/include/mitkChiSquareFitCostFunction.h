@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef CHI_SQUARE_FITCOSTFUNCTION_H
-#define CHI_SQUARE_FITCOSTFUNCTION_H
+#ifndef mitkChiSquareFitCostFunction_h
+#define mitkChiSquareFitCostFunction_h
 
 #include <mitkSVModelFitCostFunction.h>
 
@@ -48,4 +48,4 @@ protected:
 };
 }
 
-#endif // CHISQUAREFITCOSTFUNCTION_H
+#endif

@@ -98,4 +98,4 @@ protected:
   QAction *m_Separator;
 };
 
-#endif // QmitkNodeDescriptor_h
+#endif

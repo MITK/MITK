@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKXNATOBJECTEDITORINPUT_H_
-#define QMITKXNATOBJECTEDITORINPUT_H_
+#ifndef QmitkXnatObjectEditorInput_h
+#define QmitkXnatObjectEditorInput_h
 
 #include "berryIEditorInput.h"
 #include "ctkXnatObject.h"
@@ -41,4 +41,4 @@ private:
   ctkXnatObject* m_Object;
 };
 
-#endif /*QMITKXNATOBJECTEDITORINPUT_H_*/
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITK_CALCULATE_SEGMENTATION_VOLUME_H_INCLUDET_WAD
-#define MITK_CALCULATE_SEGMENTATION_VOLUME_H_INCLUDET_WAD
+#ifndef mitkCalculateSegmentationVolume_h
+#define mitkCalculateSegmentationVolume_h
 
 #include "mitkImageCast.h"
 #include "mitkSegmentationSink.h"

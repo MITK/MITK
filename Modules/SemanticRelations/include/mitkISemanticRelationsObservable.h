@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKISEMANTICRELATIONSOBSERVABLE_H
-#define MITKISEMANTICRELATIONSOBSERVABLE_H
+#ifndef mitkISemanticRelationsObservable_h
+#define mitkISemanticRelationsObservable_h
 
 #include "mitkISemanticRelationsObserver.h"
 
@@ -48,4 +48,4 @@ namespace mitk
   }; // class ISemanticRelationsObservable
 } // namespace mitk
 
-#endif // MITKISEMANTICRELATIONSOBSERVABLE_H
+#endif

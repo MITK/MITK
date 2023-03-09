@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QMITKBOUNDINGOBJECTWIDGET_H_INCLUDED
-#define _QMITKBOUNDINGOBJECTWIDGET_H_INCLUDED
+#ifndef QmitkBoundingObjectWidget_h
+#define QmitkBoundingObjectWidget_h
 
 // includes
 #include "MitkQtWidgetsExtExports.h"

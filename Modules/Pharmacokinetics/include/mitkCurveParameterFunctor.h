@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef CURVE_PARAMETER_FUNCTOR_H
-#define CURVE_PARAMETER_FUNCTOR_H
+#ifndef mitkCurveParameterFunctor_h
+#define mitkCurveParameterFunctor_h
 
 #include "mitkCurveDescriptionParameterBase.h"
 #include "mitkSimpleFunctorBase.h"
@@ -70,4 +70,4 @@ namespace mitk
 
 }
 
-#endif // CURVE_PARAMETER_FUNCTOR_H
+#endif

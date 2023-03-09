@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef CONCENTRATIONCURVEGENERATOR_H
-#define CONCENTRATIONCURVEGENERATOR_H
+#ifndef mitkConcentrationCurveGenerator_h
+#define mitkConcentrationCurveGenerator_h
 
 #include <mitkImage.h>
 #include <itkBinaryFunctorImageFilter.h>
@@ -154,4 +154,4 @@ private:
 };
 
 }
-#endif // CONCENTRATIONCURVEGENERATOR_H
+#endif

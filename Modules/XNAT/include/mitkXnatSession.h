@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKXNATSESSION_H
-#define MITKXNATSESSION_H
+#ifndef mitkXnatSession_h
+#define mitkXnatSession_h
 
 #include <ctkXnatSession.h>
 
@@ -23,4 +23,4 @@ namespace mitk
 }
 US_DECLARE_SERVICE_INTERFACE(mitk::XnatSession, "org.mitk.services.XnatSession")
 
-#endif // MITKCTKXNATSESSION_H
+#endif

@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __mitkIOAdapter_h
-#define __mitkIOAdapter_h
+#ifndef mitkIOAdapter_h
+#define mitkIOAdapter_h
 
 #include "mitkBaseProcess.h"
 

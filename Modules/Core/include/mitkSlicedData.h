@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef SLICEDDATA_H_HEADER_INCLUDED
-#define SLICEDDATA_H_HEADER_INCLUDED
+#ifndef mitkSlicedData_h
+#define mitkSlicedData_h
 
 #include "itkImageRegion.h"
 #include "itkIndex.h"
@@ -208,4 +208,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* SLICEDDATA_H_HEADER_INCLUDED */
+#endif

@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef QMITKUSZONEMANAGEMENTWIDGET_H
-#define QMITKUSZONEMANAGEMENTWIDGET_H
+#ifndef QmitkUSZoneManagementWidget_h
+#define QmitkUSZoneManagementWidget_h
 
 #include <QWidget>
 #include "mitkDataStorage.h"
@@ -147,4 +147,4 @@ private:
   unsigned int m_CurMaxNumOfZones;
 };
 
-#endif // QMITKUSZONEMANAGEMENTWIDGET_H
+#endif

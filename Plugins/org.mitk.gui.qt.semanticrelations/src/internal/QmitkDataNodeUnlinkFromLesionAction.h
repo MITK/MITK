@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATANODEUNLINKFROMLESIONACTION_H
-#define QMITKDATANODEUNLINKFROMLESIONACTION_H
+#ifndef QmitkDataNodeUnlinkFromLesionAction_h
+#define QmitkDataNodeUnlinkFromLesionAction_h
 
 #include <org_mitk_gui_qt_semanticrelations_Export.h>
 
@@ -45,4 +45,4 @@ protected:
 
 };
 
-#endif // QMITKDATANODEUNLINKFROMLESIONACTION_H
+#endif

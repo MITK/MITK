@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkDiffSliceOpertationApplier_h_Included
-#define mitkDiffSliceOpertationApplier_h_Included
+#ifndef mitkDiffSliceOperationApplier_h
+#define mitkDiffSliceOperationApplier_h
 
 #include "mitkCommon.h"
 #include <MitkSegmentationExports.h>

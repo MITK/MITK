@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_DATA_TREE_NODE_SOURCE_H
-#define _MITK_DATA_TREE_NODE_SOURCE_H
+#ifndef mitkDataNodeSource_h
+#define mitkDataNodeSource_h
 
 #include "itkProcessObject.h"
 #include "mitkDataNode.h"
@@ -69,4 +69,4 @@ namespace mitk
     ~DataNodeSource() override;
   };
 }
-#endif // #define _MITK_BASE_DATA_SOURCE_H
+#endif

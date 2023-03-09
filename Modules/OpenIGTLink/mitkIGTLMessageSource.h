@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKIGTLMESSAGESOURCE_H_HEADER_INCLUDED_
-#define MITKIGTLMESSAGESOURCE_H_HEADER_INCLUDED_
+#ifndef mitkIGTLMessageSource_h
+#define mitkIGTLMessageSource_h
 
 #include <itkProcessObject.h>
 #include "mitkPropertyList.h"
@@ -204,4 +204,4 @@ namespace mitk {
 } // namespace mitk
 // This is the microservice declaration. Do not meddle!
 MITK_DECLARE_SERVICE_INTERFACE(mitk::IGTLMessageSource, "org.mitk.services.IGTLMessageSource")
-#endif /* MITKIGTLMESSAGESOURCE_H_HEADER_INCLUDED_ */
+#endif

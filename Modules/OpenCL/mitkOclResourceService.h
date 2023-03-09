@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkOclResourceService_h
-#define __mitkOclResourceService_h
+#ifndef mitkOclResourceService_h
+#define mitkOclResourceService_h
 
 #include <mitkServiceInterface.h>
 
@@ -76,4 +76,4 @@ public:
 };
 
 MITK_DECLARE_SERVICE_INTERFACE(OclResourceService, "OpenCLResourceService/1.0")
-#endif // __mitkOclResourceService_h
+#endif

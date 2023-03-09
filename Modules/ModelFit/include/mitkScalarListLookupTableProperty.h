@@ -24,4 +24,4 @@ namespace mitk
 }
 
 
-#endif // mitkScalarListLookupTableProperty_h
+#endif

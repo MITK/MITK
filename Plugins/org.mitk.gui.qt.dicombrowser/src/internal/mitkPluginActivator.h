@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKPLUGINACTIVATOR_H
-#define MITKPLUGINACTIVATOR_H
+#ifndef mitkPluginActivator_h
+#define mitkPluginActivator_h
 
 #include <ctkPluginActivator.h>
 
@@ -35,4 +35,4 @@ private:
 
 }
 
-#endif // MITKPLUGINACTIVATOR_H
+#endif

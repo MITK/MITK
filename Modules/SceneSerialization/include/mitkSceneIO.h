@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkSceneIO_h_included
-#define mitkSceneIO_h_included
+#ifndef mitkSceneIO_h
+#define mitkSceneIO_h
 
 #include <MitkSceneSerializationExports.h>
 

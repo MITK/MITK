@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITK_PLANE_DECORATION_PROPERTY__H
-#define MITK_PLANE_DECORATION_PROPERTY__H
+#ifndef mitkPlaneOrientationProperty_h
+#define mitkPlaneOrientationProperty_h
 
 #include "mitkEnumerationProperty.h"
 

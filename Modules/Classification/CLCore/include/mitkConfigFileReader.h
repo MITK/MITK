@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef ConfigFileReader_h
-#define ConfigFileReader_h
+#ifndef mitkConfigFileReader_h
+#define mitkConfigFileReader_h
 
 #include <stdlib.h>
 #include <algorithm>

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKTWOTISSUECOMPARTMENTMODEL_H
-#define MITKTWOTISSUECOMPARTMENTMODEL_H
+#ifndef mitkTwoTissueCompartmentModel_h
+#define mitkTwoTissueCompartmentModel_h
 
 #include "mitkAIFBasedModelBase.h"
 #include "MitkPharmacokineticsExports.h"
@@ -91,4 +91,4 @@ namespace mitk
   };
 }
 
-#endif // MITKTWOTISSUECOMPARTMENTMODEL_H
+#endif

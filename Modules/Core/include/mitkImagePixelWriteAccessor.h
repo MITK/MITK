@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIMAGEPIXELWRITEACCESSOR_H
-#define MITKIMAGEPIXELWRITEACCESSOR_H
+#ifndef mitkImagePixelWriteAccessor_h
+#define mitkImagePixelWriteAccessor_h
 
 #include "mitkImagePixelAccessor.h"
 #include "mitkImageWriteAccessor.h"
@@ -135,4 +135,4 @@ namespace mitk
     ImagePixelWriteAccessor(const ImagePixelWriteAccessor &);
   };
 }
-#endif // MITKIMAGEWRITEACCESSOR_H
+#endif

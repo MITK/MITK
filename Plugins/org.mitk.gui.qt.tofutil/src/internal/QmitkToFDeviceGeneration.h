@@ -58,4 +58,4 @@ class QmitkToFDeviceGeneration : public QmitkAbstractView
 
 };
 
-#endif // _QmitkToFDeviceGeneration_H_INCLUDED
+#endif

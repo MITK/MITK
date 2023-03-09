@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QmitkIOUtil__h_
-#define _QmitkIOUtil__h_
+#ifndef QmitkIOUtil_h
+#define QmitkIOUtil_h
 
 #include "MitkQtWidgetsExports.h"
 
@@ -235,4 +235,4 @@ private:
   struct Impl;
 };
 
-#endif // _QmitkIOUtil__h_
+#endif

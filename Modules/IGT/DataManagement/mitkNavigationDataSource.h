@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKNAVIGATIONDATASOURCE_H_HEADER_INCLUDED_
-#define MITKNAVIGATIONDATASOURCE_H_HEADER_INCLUDED_
+#ifndef mitkNavigationDataSource_h
+#define mitkNavigationDataSource_h
 
 #include <itkProcessObject.h>
 #include "mitkNavigationData.h"
@@ -207,4 +207,4 @@ namespace mitk {
 } // namespace mitk
 // This is the microservice declaration. Do not meddle!
 MITK_DECLARE_SERVICE_INTERFACE(mitk::NavigationDataSource, "org.mitk.services.NavigationDataSource")
-#endif /* MITKNAVIGATIONDATASOURCE_H_HEADER_INCLUDED_ */
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_PLANAR_FIGURE_H_
-#define _MITK_PLANAR_FIGURE_H_
+#ifndef mitkPlanarFigure_h
+#define mitkPlanarFigure_h
 
 #include "mitkBaseData.h"
 #include "mitkCommon.h"
@@ -374,4 +374,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif //_MITK_PLANAR_FIGURE_H_
+#endif

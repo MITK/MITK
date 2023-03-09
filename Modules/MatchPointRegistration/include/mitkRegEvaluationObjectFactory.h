@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __MITKRegEvaluationObjectFactory_h
-#define __MITKRegEvaluationObjectFactory_h
+#ifndef mitkRegEvaluationObjectFactory_h
+#define mitkRegEvaluationObjectFactory_h
 
 #include <mitkCoreObjectFactory.h>
 #include "MitkMatchPointRegistrationExports.h"

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKINTERACTIONPOSITIONEVENT_H_
-#define MITKINTERACTIONPOSITIONEVENT_H_
+#ifndef mitkInteractionPositionEvent_h
+#define mitkInteractionPositionEvent_h
 
 #include "itkObject.h"
 #include "itkObjectFactory.h"
@@ -56,4 +56,4 @@ namespace mitk
 
 } /* namespace mitk */
 
-#endif /* MITKINTERACTIONPOSITIONEVENT_H_ */
+#endif

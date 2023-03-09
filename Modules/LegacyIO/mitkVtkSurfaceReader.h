@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef VtkSurfaceReader_H_HEADER_INCLUDED
-#define VtkSurfaceReader_H_HEADER_INCLUDED
+#ifndef mitkVtkSurfaceReader_h
+#define mitkVtkSurfaceReader_h
 
 #include "mitkSurfaceSource.h"
 #include <MitkLegacyIOExports.h>
@@ -52,4 +52,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* VtkSurfaceReader_H_HEADER_INCLUDED */
+#endif

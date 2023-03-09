@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIMAGESTATISTICSCONTAINERNODEHELPER
-#define MITKIMAGESTATISTICSCONTAINERNODEHELPER
+#ifndef mitkImageStatisticsContainerNodeHelper_h
+#define mitkImageStatisticsContainerNodeHelper_h
 
 #include <MitkImageStatisticsExports.h>
 
@@ -22,5 +22,4 @@ namespace mitk
 {
   MITKIMAGESTATISTICS_EXPORT DataNode::Pointer CreateImageStatisticsNode(ImageStatisticsContainer::Pointer statistic, const std::string& name = "statistics");
 }
-#endif // MITKIMAGESTATISTICSCONTAINERNODEHELPER
-
+#endif

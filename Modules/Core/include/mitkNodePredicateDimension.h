@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKNODEPREDICATEDIMENSION_H_HEADER_INCLUDED_
-#define MITKNODEPREDICATEDIMENSION_H_HEADER_INCLUDED_
+#ifndef mitkNodePredicateDimension_h
+#define mitkNodePredicateDimension_h
 
 #include "mitkNodePredicateBase.h"
 
@@ -55,4 +55,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif /* MITKNodePredicateDimension_H_HEADER_INCLUDED_ */
+#endif

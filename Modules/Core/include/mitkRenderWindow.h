@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKRENDERWINDOW_H_HEADER_INCLUDED_C1C40D66ASDF
-#define MITKRENDERWINDOW_H_HEADER_INCLUDED_C1C40D66ASDF
+#ifndef mitkRenderWindow_h
+#define mitkRenderWindow_h
 
 #include <MitkCoreExports.h>
 
@@ -90,4 +90,4 @@ namespace mitk
   };
 } // namespace
 
-#endif /* MITKRENDERWINDOW_H_HEADER_INCLUDED_C1C40D66ASDF */
+#endif

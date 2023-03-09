@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIGTLMESSAGEFACTORYH_HEADER_INCLUDED_
-#define MITKIGTLMESSAGEFACTORYH_HEADER_INCLUDED_
+#ifndef mitkIGTLMessageFactory_h
+#define mitkIGTLMessageFactory_h
 
 #include "MitkOpenIGTLinkExports.h"
 #include "mitkCommon.h"

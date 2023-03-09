@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _mitkImageToLiveWireContourFilter_h__
-#define _mitkImageToLiveWireContourFilter_h__
+#ifndef mitkImageToLiveWireContourFilter_h
+#define mitkImageToLiveWireContourFilter_h
 
 #include "mitkCommon.h"
 #include "mitkContourModel.h"

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef PLANARFIGUREOBJECTFACTORY_H_INCLUDED
-#define PLANARFIGUREOBJECTFACTORY_H_INCLUDED
+#ifndef mitkPlanarFigureObjectFactory_h
+#define mitkPlanarFigureObjectFactory_h
 
 #include "mitkCoreObjectFactoryBase.h"
 #include <MitkPlanarFigureExports.h>
@@ -45,4 +45,4 @@ namespace mitk
   };
 }
 
-#endif // PLANARFIGUREOBJECTFACTORY_H_INCLUDED
+#endif

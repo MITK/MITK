@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIMAGEACCESSBYITK_H_HEADER_INCLUDED
-#define MITKIMAGEACCESSBYITK_H_HEADER_INCLUDED
+#ifndef mitkImageAccessByItk_h
+#define mitkImageAccessByItk_h
 
 #include <itkCastImageFilter.h>
 #include <mitkImageToItk.h>
@@ -703,4 +703,4 @@ namespace mitk
     }                                                                                                                  \
   }
 
-#endif // of MITKIMAGEACCESSBYITK_H_HEADER_INCLUDED
+#endif

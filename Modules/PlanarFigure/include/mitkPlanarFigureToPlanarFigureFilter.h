@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKPlanarFigureToPlanarFigureFilter_H_HEADER_INCLUDED
-#define MITKPlanarFigureToPlanarFigureFilter_H_HEADER_INCLUDED
+#ifndef mitkPlanarFigureToPlanarFigureFilter_h
+#define mitkPlanarFigureToPlanarFigureFilter_h
 
 #include "mitkCommon.h"
 #include "mitkPlanarFigure.h"

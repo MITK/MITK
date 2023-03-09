@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_RT_UI_CONSTANTS_H_
-#define _MITK_RT_UI_CONSTANTS_H_
+#ifndef mitkRTUIConstants_h
+#define mitkRTUIConstants_h
 
 #include <string>
 #include <mitkDoseValueType.h>

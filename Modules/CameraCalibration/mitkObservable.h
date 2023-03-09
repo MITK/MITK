@@ -33,4 +33,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif // mitkObservable_h
+#endif

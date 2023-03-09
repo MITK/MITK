@@ -40,4 +40,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif //mitkUnspecifiedTrackingTypeInformation_h
+#endif

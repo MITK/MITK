@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKSEGMENTATIONVIEW_H
-#define QMITKSEGMENTATIONVIEW_H
+#ifndef QmitkSegmentationView_h
+#define QmitkSegmentationView_h
 
 #include "ui_QmitkSegmentationViewControls.h"
 
@@ -201,4 +201,4 @@ private:
   bool m_SelectionChangeIsAlreadyBeingHandled;
 };
 
-#endif // QMITKSEGMENTATIONVIEW_H
+#endif

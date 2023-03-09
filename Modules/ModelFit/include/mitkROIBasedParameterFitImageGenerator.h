@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __MITK_ROI_BASED_PARAMETER_FIT_IMAGE_GENERATOR_H_
-#define __MITK_ROI_BASED_PARAMETER_FIT_IMAGE_GENERATOR_H_
+#ifndef mitkROIBasedParameterFitImageGenerator_h
+#define mitkROIBasedParameterFitImageGenerator_h
 
 #include <map>
 
@@ -117,4 +117,4 @@ private:
 
 }
 
-#endif // __MITK_PARAMETER_FIT_IMAGE_GENERATOR_H_
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKMouseDoubleClickEvent_H_
-#define MITKMouseDoubleClickEvent_H_
+#ifndef mitkMouseDoubleClickEvent_h
+#define mitkMouseDoubleClickEvent_h
 
 #include "itkObject.h"
 #include "itkObjectFactory.h"
@@ -57,4 +57,4 @@ namespace mitk
   };
 } /* namespace mitk */
 
-#endif /* MITKMouseDoubleClickEvent_H_ */
+#endif

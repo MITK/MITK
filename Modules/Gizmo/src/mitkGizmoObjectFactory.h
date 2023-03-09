@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef GizmoObjectFactor_h
-#define GizmoObjectFactor_h
+#ifndef mitkGizmoObjectFactory_h
+#define mitkGizmoObjectFactory_h
 
 // MITK includes
 #include <mitkCoreObjectFactory.h>

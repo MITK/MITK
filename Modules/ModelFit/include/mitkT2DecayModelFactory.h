@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __T2_DECAY_TEST_MODEL_FACTORY_H
-#define __T2_DECAY_TEST_MODEL_FACTORY_H
+#ifndef mitkT2DecayModelFactory_h
+#define mitkT2DecayModelFactory_h
 
 #include <mitkCommon.h>
 
@@ -50,4 +50,4 @@ namespace mitk
 }
 
 
-#endif //__LINEAR_TEST_MODEL_FACTORY_H
+#endif

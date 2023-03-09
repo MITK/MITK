@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKFILEWRITERSELECTOR_H
-#define MITKFILEWRITERSELECTOR_H
+#ifndef mitkFileWriterSelector_h
+#define mitkFileWriterSelector_h
 
 #include <mitkIFileWriter.h>
 
@@ -117,4 +117,4 @@ namespace mitk
   void swap(FileWriterSelector &fws1, FileWriterSelector &fws2);
 }
 
-#endif // MITKFILEWRITERSELECTOR_H
+#endif

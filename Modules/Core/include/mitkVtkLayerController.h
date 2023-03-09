@@ -111,4 +111,4 @@ namespace mitk
   };
 
 } // Namespace MITK
-#endif /* mitkVtkLayerController_h */
+#endif

@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef _mitk_VideoInput_Source_h_
-#define _mitk_VideoInput_Source_h_
+#ifndef mitkVideoInputSource_h
+#define mitkVideoInputSource_h
 
 #include "mitkConfig.h"
 #include "mitkOpenCVVideoSource.h"
@@ -68,6 +68,4 @@ namespace mitk
 
   };
 }
-#endif // Header
-
-
+#endif

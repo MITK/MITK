@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIMAGEREADACCESSOR_H
-#define MITKIMAGEREADACCESSOR_H
+#ifndef mitkImageReadAccessor_h
+#define mitkImageReadAccessor_h
 
 #include "mitkImageAccessorBase.h"
 
@@ -70,4 +70,4 @@ namespace mitk
   };
 }
 
-#endif // MITKIMAGEACCESSOR_H
+#endif

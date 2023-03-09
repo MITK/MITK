@@ -185,4 +185,4 @@ namespace mitk
   };
 }
 
-#endif // mitkDataStorageSelection_h
+#endif

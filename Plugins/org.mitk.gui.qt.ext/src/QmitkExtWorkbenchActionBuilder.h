@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITKEXTWORKBENCHACTIONBUILDER_H
-#define QMITKEXTWORKBENCHACTIONBUILDER_H
+#ifndef QmitkExtWorkbenchActionBuilder_h
+#define QmitkExtWorkbenchActionBuilder_h
 
 #include <berryActionBarAdvisor.h>
 
@@ -24,4 +24,4 @@ public:
   QmitkExtWorkbenchActionBuilder();
 };
 
-#endif // QMITKEXTWORKBENCHACTIONBUILDER_H
+#endif

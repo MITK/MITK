@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATAMANAGERVIEW_H
-#define QMITKDATAMANAGERVIEW_H
+#ifndef QmitkDataManagerView_h
+#define QmitkDataManagerView_h
 
 #include <org_mitk_gui_qt_datamanager_Export.h>
 
@@ -114,4 +114,4 @@ private:
 
 };
 
-#endif // QMITKDATAMANAGERVIEW_H
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkFillRegionBaseTool_h_Included
-#define mitkFillRegionBaseTool_h_Included
+#ifndef mitkFillRegionBaseTool_h
+#define mitkFillRegionBaseTool_h
 
 #include "mitkCommon.h"
 #include "mitkContourModelUtils.h"

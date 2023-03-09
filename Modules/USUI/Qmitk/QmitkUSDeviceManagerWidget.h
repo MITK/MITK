@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QmitkUSDeviceManagerWidget_H_INCLUDED
-#define _QmitkUSDeviceManagerWidget_H_INCLUDED
+#ifndef QmitkUSDeviceManagerWidget_h
+#define QmitkUSDeviceManagerWidget_h
 
 #include "MitkUSUIExports.h"
 #include "ui_QmitkUSDeviceManagerWidgetControls.h"
@@ -86,4 +86,4 @@ protected:
 private:
 };
 
-#endif // _QmitkUSDeviceManagerWidget_H_INCLUDED
+#endif

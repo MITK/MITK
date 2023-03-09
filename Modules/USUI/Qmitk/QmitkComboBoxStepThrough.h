@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkComboBoxStepThrough_H
-#define QmitkComboBoxStepThrough_H
+#ifndef QmitkComboBoxStepThrough_h
+#define QmitkComboBoxStepThrough_h
 
 #include <QComboBox>
 
@@ -76,4 +76,4 @@ private:
   int m_LastIndex;
 };
 
-#endif // QmitkComboBoxStepThrough_H
+#endif

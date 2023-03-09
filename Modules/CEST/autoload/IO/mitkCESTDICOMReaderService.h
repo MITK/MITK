@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKCESTDICOMReaderService_H
-#define MITKCESTDICOMReaderService_H
+#ifndef mitkCESTDICOMReaderService_h
+#define mitkCESTDICOMReaderService_h
 
 #include <mitkBaseDICOMReaderService.h>
 
@@ -43,4 +43,4 @@ namespace mitk {
 
 }
 
-#endif // MITKCESTDICOMREADERSERVICE_H
+#endif

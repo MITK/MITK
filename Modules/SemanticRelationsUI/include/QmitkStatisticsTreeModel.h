@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKSTATISTICSTREEMODEL_H
-#define QMITKSTATISTICSTREEMODEL_H
+#ifndef QmitkStatisticsTreeModel_h
+#define QmitkStatisticsTreeModel_h
 
 // mitk semantic relations UI
 #include "MitkSemanticRelationsUIExports.h"
@@ -91,4 +91,4 @@ private:
   mitk::SemanticTypes::LesionVector m_CurrentLesions;
 };
 
-#endif // QMITKSTATISTICSTREEMODEL_H
+#endif

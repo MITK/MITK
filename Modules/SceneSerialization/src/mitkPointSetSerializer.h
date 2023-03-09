@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkPointSetSerializer_h_included
-#define mitkPointSetSerializer_h_included
+#ifndef mitkPointSetSerializer_h
+#define mitkPointSetSerializer_h
 
 #include "mitkBaseDataSerializer.h"
 

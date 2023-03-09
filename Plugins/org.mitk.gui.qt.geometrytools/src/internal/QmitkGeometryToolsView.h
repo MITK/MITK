@@ -100,4 +100,4 @@ protected:
     Ui::QmitkGeometryToolsViewControls m_Controls;
 };
 
-#endif // QmitkGeometryToolsView_h
+#endif

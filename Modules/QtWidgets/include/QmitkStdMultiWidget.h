@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKSTDMULTIWIDGET_H
-#define QMITKSTDMULTIWIDGET_H
+#ifndef QmitkStdMultiWidget_h
+#define QmitkStdMultiWidget_h
 
 // qt widgets module
 #include "MitkQtWidgetsExports.h"
@@ -166,4 +166,4 @@ private:
 
 };
 
-#endif // QMITKSTDMULTIWIDGET_H
+#endif

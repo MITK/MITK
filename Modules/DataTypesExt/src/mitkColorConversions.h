@@ -10,6 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#ifndef mitkColorConversions_h
+#define mitkColorConversions_h
+
 namespace mitk
 {
   /// some conversion routines to convert between different color spaces
@@ -20,6 +23,7 @@ namespace mitk
     /// convert a RGB color to HSV color, rgb parameters from 0 to 1
     void Rgb2Hsv(float r, float g, float b, float &h, float &s, float &v);
 
-  } // ColorConversion
+  }
+}
 
-} // mitk
+#endif

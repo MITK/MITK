@@ -43,4 +43,3 @@ namespace mitk
 }
 
 #endif
-

@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __mitkVtiFileIOFactory_h
-#define __mitkVtiFileIOFactory_h
+#ifndef mitkVtiFileIOFactory_h
+#define mitkVtiFileIOFactory_h
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4786)

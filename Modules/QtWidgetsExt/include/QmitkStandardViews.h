@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkStandardViews_h_included
-#define QmitkStandardViews_h_included
+#ifndef QmitkStandardViews_h
+#define QmitkStandardViews_h
 
 #include "MitkQtWidgetsExtExports.h"
 #include "mitkCameraController.h"

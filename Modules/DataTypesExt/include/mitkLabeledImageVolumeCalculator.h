@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_LABELEDIMAGEVOLUMECALCULATOR_H
-#define _MITK_LABELEDIMAGEVOLUMECALCULATOR_H
+#ifndef mitkLabeledImageVolumeCalculator_h
+#define mitkLabeledImageVolumeCalculator_h
 
 #include "MitkDataTypesExtExports.h"
 #include <itkObject.h>
@@ -73,4 +73,4 @@ namespace mitk
   };
 }
 
-#endif // #define _MITK_LABELEDIMAGEVOLUMECALCULATOR_H
+#endif

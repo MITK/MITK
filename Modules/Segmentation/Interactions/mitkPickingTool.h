@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkPickingTool_h_Included
-#define mitkPickingTool_h_Included
+#ifndef mitkPickingTool_h
+#define mitkPickingTool_h
 
 #include "mitkSegWithPreviewTool.h"
 #include "mitkPointSet.h"

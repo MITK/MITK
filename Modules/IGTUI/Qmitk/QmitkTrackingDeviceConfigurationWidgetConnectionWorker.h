@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QmitkTrackingDeviceConfigurationWidgetConnectionWorker_H
-#define QmitkTrackingDeviceConfigurationWidgetConnectionWorker_H
+#ifndef QmitkTrackingDeviceConfigurationWidgetConnectionWorker_h
+#define QmitkTrackingDeviceConfigurationWidgetConnectionWorker_h
 
 #include <QWidget>
 #include "mitkTrackingDevice.h"

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkArithmeticOperation_h
-#define mitkArithmeticOperation_h
+#ifndef mitkTransformationOperation_h
+#define mitkTransformationOperation_h
 
 #include <mitkImage.h>
 #include <MitkBasicImageProcessingExports.h>
@@ -60,4 +60,4 @@ namespace mitk
 
 
 }
-#endif // mitkArithmeticOperation_h
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATANODEOPACITYACTION_H
-#define QMITKDATANODEOPACITYACTION_H
+#ifndef QmitkDataNodeOpacityAction_h
+#define QmitkDataNodeOpacityAction_h
 
 #include <org_mitk_gui_qt_application_Export.h>
 
@@ -45,4 +45,4 @@ protected:
 
 };
 
-#endif // QMITKDATANODEOPACITYACTION_H
+#endif

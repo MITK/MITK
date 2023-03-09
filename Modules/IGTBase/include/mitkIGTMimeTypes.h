@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIOMIMETYPE_H_HEADER_INCLUDED_
-#define MITKIOMIMETYPE_H_HEADER_INCLUDED_
+#ifndef mitkIGTMimeTypes_h
+#define mitkIGTMimeTypes_h
 
 #include <MitkIGTBaseExports.h>
 #include <mitkIOMimeTypes.h>
@@ -28,4 +28,4 @@ namespace mitk {
 }
 
 
-#endif // MITKIOMIMETYPE_H_HEADER_INCLUDED_
+#endif

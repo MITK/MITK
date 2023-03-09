@@ -91,4 +91,4 @@ public: \
 protected: \
     type m_##name;
 
-#endif // mitkEndoMacros_h
+#endif

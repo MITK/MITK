@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKSTATICDYNAMICSEGMENTATIONDIALOG_H
-#define QMITKSTATICDYNAMICSEGMENTATIONDIALOG_H
+#ifndef QmitkStaticDynamicSegmentationDialog_h
+#define QmitkStaticDynamicSegmentationDialog_h
 
 #include <MitkSegmentationUIExports.h>
 
@@ -48,4 +48,4 @@ private:
   const mitk::Image* m_ReferenceImage;
 };
 
-#endif // QMITKSTATICDYNAMICSEGMENTATIONDIALOG_H
+#endif

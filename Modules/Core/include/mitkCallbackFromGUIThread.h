@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITK_CALLBACK_WITHIN_GUI_TREAD_H_INCLUDGEWQ
-#define MITK_CALLBACK_WITHIN_GUI_TREAD_H_INCLUDGEWQ
+#ifndef mitkCallbackFromGUIThread_h
+#define mitkCallbackFromGUIThread_h
 
 #include <MitkCoreExports.h>
 #include <itkCommand.h>

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKRTSTRUCTURESETREADER_H
-#define MITKRTSTRUCTURESETREADER_H
+#ifndef mitkRTStructureSetReaderService_h
+#define mitkRTStructureSetReaderService_h
 
 #include <mitkAbstractFileReader.h>
 
@@ -84,4 +84,4 @@ namespace mitk
   };
 }
 
-#endif // MITKRTSTRUCTURESETREADER_H
+#endif

@@ -49,4 +49,4 @@ namespace mitk
 
 Q_DECLARE_INTERFACE(mitk::IInputDevice, "org.mitk.IInputDevice")
 
-#endif /*MITKIINPUTDEVICE_H_*/
+#endif

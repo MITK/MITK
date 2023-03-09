@@ -57,4 +57,4 @@ protected:
 };
 } // namespace mitk
 
-#endif // MITKUSAbstractControlInterface_H_HEADER_INCLUDED_
+#endif

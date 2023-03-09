@@ -32,4 +32,4 @@ namespace mitk {
 
 }
 
-#endif // MITKMATERIALEDITORPLUGINACTIVATOR_H
+#endif

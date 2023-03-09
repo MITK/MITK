@@ -104,4 +104,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKNodePredicateGeometry_H_HEADER_INCLUDED_ */
+#endif

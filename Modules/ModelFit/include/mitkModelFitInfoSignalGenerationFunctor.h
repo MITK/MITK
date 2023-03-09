@@ -78,4 +78,4 @@ namespace  mitk
   };
 }
 
-#endif // MITKModelFitInfoSignalGenerationFunctor_H
+#endif

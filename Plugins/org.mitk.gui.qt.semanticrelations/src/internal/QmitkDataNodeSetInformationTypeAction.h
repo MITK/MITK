@@ -40,4 +40,4 @@ protected:
 
 };
 
-#endif // QMITKDATANODESETINFORMATIONTYPEACTION_H
+#endif

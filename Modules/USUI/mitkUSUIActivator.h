@@ -54,4 +54,4 @@ namespace mitk
 
 US_EXPORT_MODULE_ACTIVATOR(mitk::USUIActivator)
 
-#endif // __mitkUSUIActivator_h
+#endif

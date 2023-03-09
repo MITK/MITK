@@ -55,4 +55,4 @@ namespace mitk {
   }; //namespace
 }
 
-#endif /* MITKLINUXREALTIMECLOCK_H_HEADER_INCLUDED_ */
+#endif

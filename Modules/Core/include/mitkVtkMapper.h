@@ -147,4 +147,4 @@ namespace mitk
     VtkMapper &operator=(const VtkMapper &);
   };
 } // namespace mitk
-#endif /* VTKMAPPER_H_HEADER_INCLUDED_C1C5453B */
+#endif

@@ -50,4 +50,4 @@ private:
   ctkXnatExperiment *m_Experiment;
 };
 
-#endif // QMITKXNATEXPERIMENTWIDGET_H
+#endif

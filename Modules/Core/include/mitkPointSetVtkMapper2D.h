@@ -236,4 +236,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* mitkPointSetVtkMapper2D_h */
+#endif

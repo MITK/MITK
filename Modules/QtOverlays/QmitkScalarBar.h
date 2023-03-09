@@ -70,4 +70,4 @@ protected:
   unsigned int m_NumberOfSubDivisions;
 };
 
-#endif /* MITKSCALARBAR_H_HEADER_INCLUDED_C10DC4EB */
+#endif

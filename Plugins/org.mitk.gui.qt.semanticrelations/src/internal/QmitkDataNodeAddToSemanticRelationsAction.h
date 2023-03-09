@@ -66,4 +66,4 @@ protected:
 
 };
 
-#endif // QMITKDATANODEADDTOSEMANTICRELATIONSACTION_H
+#endif

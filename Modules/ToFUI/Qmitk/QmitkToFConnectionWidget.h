@@ -114,4 +114,4 @@ class MITKTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
     void HideAllParameterWidgets();
 };
 
-#endif // _QMITKTOFCONNECTIONWIDGET_H_INCLUDED
+#endif

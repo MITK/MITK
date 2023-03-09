@@ -46,4 +46,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* PlyFileReaderService_h */
+#endif

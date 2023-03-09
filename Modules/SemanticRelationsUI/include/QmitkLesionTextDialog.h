@@ -40,4 +40,4 @@ private:
 
 };
 
-#endif // QMITKLESIONTEXTDIALOG_H
+#endif

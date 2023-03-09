@@ -167,4 +167,4 @@ protected slots:
     void ReinitTransferFunction(int widget, int type);
 };
 
-#endif // _QMITKTOFVISUALISATIONSETTINGSWIDGET_H_INCLUDED
+#endif

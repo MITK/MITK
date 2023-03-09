@@ -32,4 +32,4 @@ public:
 
 }
 
-#endif // MITKPLUGINACTIVATOR_H
+#endif

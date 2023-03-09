@@ -114,4 +114,4 @@ protected:
   Ui::QmitkDicomExternalDataWidgetControls *m_Controls;
 };
 
-#endif // _QmitkDicomExternalDataWidget_H_INCLUDED
+#endif

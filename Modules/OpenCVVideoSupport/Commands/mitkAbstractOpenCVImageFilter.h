@@ -61,4 +61,4 @@ protected:
 
 } // namespace mitk
 
-#endif // mitkCropOpenCVImageFilter_h
+#endif

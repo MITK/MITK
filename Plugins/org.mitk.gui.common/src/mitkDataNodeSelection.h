@@ -60,4 +60,4 @@ protected:
 }
 
 
-#endif /* MITKDATATREENODESELECTION_H_ */
+#endif

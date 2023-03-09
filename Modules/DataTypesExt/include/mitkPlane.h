@@ -55,4 +55,4 @@ namespace mitk
     vtkDoubleArray *m_PlaneNormal;
   };
 }
-#endif /* MITKPLANE_H_HEADER_INCLUDED */
+#endif

@@ -52,4 +52,4 @@ private Q_SLOTS:
   void OnPathsChanged(const QStringList&, const QStringList&);
 };
 
-#endif // QMITKDIRECTORYLISTWIDGET_H
+#endif

@@ -44,4 +44,4 @@ private:
 };
 
 
-#endif /*QmitkExtFileSaveProjectAction_H_*/
+#endif

@@ -95,4 +95,4 @@ namespace mitk
     itk::LightObject::Pointer InternalClone() const override;
   };
 } // end of namespace mitk
-#endif // _MITK_GRID_VOLUME_MAPPER_PROPERTY__H_
+#endif

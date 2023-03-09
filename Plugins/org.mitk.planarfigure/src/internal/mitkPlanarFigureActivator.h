@@ -46,4 +46,4 @@ public:
 };
 
 }
-#endif /* MITKPLANARFIGUREACTIVATOR_H_  */
+#endif

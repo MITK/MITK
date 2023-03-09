@@ -101,4 +101,4 @@ namespace mitk {
 
 } // namespace mitk
 
-#endif // mitkUSDeviceReaderXML_H_HEADER_INCLUDED_
+#endif

@@ -21,4 +21,4 @@ namespace mitk
   typedef vnl_quaternion<ScalarType> Quaternion;
 }
 
-#endif /* MITKQUATERNION_H_ */
+#endif

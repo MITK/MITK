@@ -48,4 +48,4 @@ protected:
 };
 }
 
-#endif // CHISQUAREFITCOSTFUNCTION_H
+#endif

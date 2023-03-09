@@ -170,4 +170,4 @@ found in the LICENSE file.
       function<double>(ptype, param1, param2, param3, param4, param5);                                                 \
   }
 
-#endif // MITKPIXELTYPEMULTIPLEX_H
+#endif

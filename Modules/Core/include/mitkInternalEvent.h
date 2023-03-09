@@ -53,4 +53,4 @@ namespace mitk
     std::string m_SignalName;
   };
 }
-#endif /* mitkInternalEvent_h */
+#endif

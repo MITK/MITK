@@ -141,4 +141,4 @@ private:
   Q_DISABLE_COPY(QmitkFileReaderWriterOptionsWidget)
 };
 
-#endif // QMITKFILEREADERWRITEROPTIONSWIDGET_H
+#endif

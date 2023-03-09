@@ -45,4 +45,4 @@ protected:
 
 };
 
-#endif // QMITKDATANODEOPACITYACTION_H
+#endif

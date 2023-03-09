@@ -45,4 +45,4 @@ protected:
 
 } // namespace mitk
 
-#endif // NAVIGATIONDATAPASSTHROUGHFILTER_H
+#endif

@@ -153,4 +153,4 @@ protected:
   mitk::PropertyList::Pointer m_PropertyList;
 };
 
-#endif /* MITKOVERLAYCONTROLLER_H_HEADER_INCLUDED_C1E77191 */
+#endif

@@ -63,4 +63,4 @@ namespace mitk
   };
 }
 
-#endif // MITKEXTENDEDONETISSUECOMPARTMENTMODELPARAME_H
+#endif

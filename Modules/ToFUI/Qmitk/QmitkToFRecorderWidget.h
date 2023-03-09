@@ -180,4 +180,4 @@ class MITKTOFUI_EXPORT QmitkToFRecorderWidget :public QWidget
 
 };
 
-#endif // _QMITKTOFRECORDERWIDGET_H_INCLUDED
+#endif

@@ -91,4 +91,4 @@ namespace mitk
     TransitionVector m_Transitions;
   };
 } // namespace mitk
-#endif /* SMSTATE_H_HEADER_INCLUDED_C19A8A5D */
+#endif

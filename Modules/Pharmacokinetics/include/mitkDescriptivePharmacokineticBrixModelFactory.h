@@ -50,4 +50,4 @@ namespace mitk
 }
 
 
-#endif //__DESCRIPTIVEPHARMACOKINETICBRIXMODEL_FACTORY_H
+#endif

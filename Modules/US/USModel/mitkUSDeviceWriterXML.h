@@ -88,4 +88,4 @@ namespace mitk {
   };
 }
 
-#endif // mitkUSDeviceWriterXML_H_Header_INCLUDED_
+#endif

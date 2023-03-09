@@ -53,4 +53,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif //TRACKINGDEVICETYPEINFORMATION_H_INCLUDED
+#endif

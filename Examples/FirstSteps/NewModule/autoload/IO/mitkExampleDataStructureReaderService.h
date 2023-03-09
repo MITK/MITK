@@ -46,4 +46,4 @@ namespace mitk
 
 } // namespace MITK
 
-#endif // __mitkExampleDataStructureReaderService_h
+#endif

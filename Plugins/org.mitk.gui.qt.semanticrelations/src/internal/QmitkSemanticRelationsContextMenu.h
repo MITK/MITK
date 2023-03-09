@@ -64,4 +64,4 @@ private:
   QmitkDataSetOpenInAction* m_DataSetOpenInAction;
 };
 
-#endif // QMITKSEMANTICRELATIONSCONTEXTMENU_H
+#endif

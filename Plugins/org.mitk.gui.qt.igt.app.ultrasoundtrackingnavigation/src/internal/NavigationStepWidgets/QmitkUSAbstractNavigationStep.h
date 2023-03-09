@@ -304,4 +304,4 @@ private:
   NavigationStepState                         m_NavigationStepState;
 };
 
-#endif // QMITKUSABSTRACTNAVIGATIONSTEP_H
+#endif

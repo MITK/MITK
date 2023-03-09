@@ -68,4 +68,4 @@ namespace mitk
   };
 }
 
-#endif /* MITKDISPLAYCOORDINATEOPERATION_H_HEADER_INCLUDED_C10E33D0 */
+#endif

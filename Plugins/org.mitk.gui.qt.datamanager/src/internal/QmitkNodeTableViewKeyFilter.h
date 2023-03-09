@@ -37,4 +37,4 @@ protected:
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
 };
 
-#endif // QMITKNODETABLEVIEWKEYFILTER_H
+#endif

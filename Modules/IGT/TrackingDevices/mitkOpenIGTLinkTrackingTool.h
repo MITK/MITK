@@ -38,4 +38,4 @@ namespace mitk
     ~OpenIGTLinkTrackingTool() override;
   };
 }//mitk
-#endif // MITKOpenIGTLinkTrackingTOOL_H_HEADER_INCLUDED_
+#endif

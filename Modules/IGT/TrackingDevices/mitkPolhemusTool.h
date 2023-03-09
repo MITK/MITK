@@ -80,4 +80,4 @@ namespace mitk
     DistortionLevel m_DistortionLevel;
   };
 }//mitk
-#endif // MITKPolhemusTOOL_H_HEADER_INCLUDED_
+#endif

@@ -107,4 +107,4 @@ namespace mitk
     itk::LightObject::Pointer InternalClone() const override;
   };
 } // end of namespace mitk
-#endif // _MITK_GRID_REPRESENTATION_PROPERTY__H_
+#endif

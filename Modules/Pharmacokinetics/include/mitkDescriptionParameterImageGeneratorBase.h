@@ -60,4 +60,4 @@ namespace mitk
 
 }
 
-#endif //__MITK_DESCRIPTION_PARAMETER_IMAGE_GENERATOR_BASE_H_
+#endif

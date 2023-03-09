@@ -115,4 +115,4 @@ private:
 
 }
 
-#endif // __mitkOclImageFormats_h
+#endif

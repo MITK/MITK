@@ -54,4 +54,4 @@ protected:
   void FireSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected) override;
 };
 
-#endif /* QMITKDATATREENODESELECTIONPROVIDER_H_ */
+#endif

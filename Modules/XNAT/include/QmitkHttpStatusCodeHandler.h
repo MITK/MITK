@@ -27,4 +27,4 @@ private:
   ~QmitkHttpStatusCodeHandler();
 };
 
-#endif // QMITKHTTPSTATUSCODEHANDLER_H
+#endif

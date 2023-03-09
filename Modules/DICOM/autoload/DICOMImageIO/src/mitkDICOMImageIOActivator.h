@@ -47,4 +47,4 @@ private:
 
 }
 
-#endif // MITKDICOMIMAGEIOACTIVATOR_H
+#endif

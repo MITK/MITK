@@ -179,4 +179,4 @@ public:
   unsigned int GetMaximumImageSize(unsigned int dimension, cl_mem_object_type _imagetype);
 };
 
-#endif // __mitkOclResourceServiceImpl_h
+#endif

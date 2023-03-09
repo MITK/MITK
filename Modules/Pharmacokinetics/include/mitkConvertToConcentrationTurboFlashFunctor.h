@@ -64,4 +64,4 @@ namespace mitk {
 
 }
 
-#endif // MITKCONVERTTOCONCENTRATIONTURBOFLASCHFUNCTOR_H
+#endif

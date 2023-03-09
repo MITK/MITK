@@ -87,4 +87,4 @@ private:
   std::unique_ptr<mitk::RenderWindowLayerController> m_RenderWindowLayerController;
 };
 
-#endif // QMITKRENDERWINDOWCONTEXTDATASTORAGEINSPECTOR_H
+#endif

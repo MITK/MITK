@@ -409,4 +409,4 @@ namespace mitk {
   itkEventMacroDeclaration(LostConnectionEvent, itk::AnyEvent);
 } // namespace mitk
 
-#endif /* MITKIGTLDEVICE_H */
+#endif

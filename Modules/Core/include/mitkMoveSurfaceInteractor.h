@@ -21,4 +21,4 @@ namespace mitk
   typedef MoveBaseDataInteractor MoveSurfaceInteractor;
 }
 
-#endif /* MITKMoveSurfaceInteractor_H_HEADER_INCLUDED */
+#endif

@@ -129,4 +129,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif /* UNDOCONTROLLER_H_HEADER_INCLUDED_C16EFF79 */
+#endif

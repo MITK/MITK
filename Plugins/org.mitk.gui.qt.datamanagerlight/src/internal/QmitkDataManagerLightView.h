@@ -84,4 +84,4 @@ private:
   QmitkDataManagerLightViewData* d;
 };
 
-#endif /*QmitkDataManagerLightView_H_*/
+#endif

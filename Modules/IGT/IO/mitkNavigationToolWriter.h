@@ -63,4 +63,4 @@ namespace mitk
     std::string ConvertQuaternionToString(mitk::Quaternion quat);
   };
 } // namespace mitk
-#endif //NAVIGATIONTOOLWRITER
+#endif

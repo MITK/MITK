@@ -79,4 +79,4 @@ protected:
 
 };
 
-#endif /* QMITKPROPERTIESTABLEMODEL_H_ */
+#endif

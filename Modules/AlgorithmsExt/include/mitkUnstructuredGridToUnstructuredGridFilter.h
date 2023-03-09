@@ -60,4 +60,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif //_MITKUNSTRUCTUREDGRIDTOUNSTRUCTUREDGRID_h__
+#endif

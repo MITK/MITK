@@ -71,4 +71,4 @@ namespace mitk
 
 }
 
-#endif // __mitkOclBaseData_h
+#endif

@@ -86,4 +86,4 @@ namespace mitk
   MITKCORE_EXPORT std::ostream &operator<<(std::ostream &os, const MimeType &mimeType);
 }
 
-#endif // MITKMIMETYPE_H
+#endif

@@ -66,4 +66,4 @@ private:
   bool m_internalUpdate;
 };
 
-#endif // QmitkRegEvalSettingsWidget_H
+#endif

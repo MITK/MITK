@@ -58,4 +58,4 @@ protected:
   short m_CurrentType;
 };
 }
-#endif // __mitkOclImageFilter_h
+#endif

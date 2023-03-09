@@ -37,4 +37,4 @@ private:
 
 }
 
-#endif // MITKCLASSICDICOMSERIESREADERSERVICE_H
+#endif

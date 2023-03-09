@@ -52,4 +52,4 @@ private:
 
 }
 
-#endif /*MITKDATASTORAGESERVICE_H_*/
+#endif

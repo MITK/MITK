@@ -410,4 +410,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKLINE_H_HEADER_INCLUDED_C19C01E2 */
+#endif

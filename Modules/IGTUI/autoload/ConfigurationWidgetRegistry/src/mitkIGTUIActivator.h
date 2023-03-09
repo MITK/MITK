@@ -39,4 +39,4 @@ namespace mitk
   };
 }
 
-#endif // mitkIGTUIActivator_H
+#endif

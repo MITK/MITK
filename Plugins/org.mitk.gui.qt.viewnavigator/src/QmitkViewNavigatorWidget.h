@@ -84,4 +84,4 @@ private:
     berry::IWorkbenchWindow::Pointer m_Window;
 };
 
-#endif // QMIKVIEWNAVIGATORWIDGET_H
+#endif

@@ -43,4 +43,4 @@ protected:
   void InitializeAction() override;
 };
 
-#endif // QMITKLABELSETJUMPTOACTION_H
+#endif

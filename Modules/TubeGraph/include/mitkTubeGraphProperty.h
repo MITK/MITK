@@ -143,4 +143,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* _mitk_TubeGraphProperty_h */
+#endif

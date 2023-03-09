@@ -45,4 +45,4 @@ protected:
 
 };
 
-#endif // QMITKDATANODEHIDEALLACTION_H
+#endif

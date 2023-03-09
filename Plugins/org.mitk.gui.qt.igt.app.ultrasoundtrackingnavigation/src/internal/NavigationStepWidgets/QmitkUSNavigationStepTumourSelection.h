@@ -161,4 +161,4 @@ private:
   Ui::QmitkUSNavigationStepTumourSelection *ui;
 };
 
-#endif // QMITKUSNAVIGATIONSTEPTUMOURSELECTION_H
+#endif

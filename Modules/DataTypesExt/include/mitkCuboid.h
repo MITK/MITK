@@ -36,4 +36,4 @@ namespace mitk
     ~Cuboid() override;
   };
 }
-#endif /* MITCUBOID_H_HEADER_INCLUDED */
+#endif

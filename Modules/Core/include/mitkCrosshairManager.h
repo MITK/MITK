@@ -102,4 +102,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif // MITKCROSSHAIRMANAGER_H
+#endif

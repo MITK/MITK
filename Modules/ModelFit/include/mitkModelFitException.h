@@ -30,4 +30,4 @@ namespace mitk
     }
 }
 
-#endif // mitkModelFitException_h
+#endif

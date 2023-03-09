@@ -62,4 +62,4 @@ namespace mitk
 }
 
 
-#endif // SIMPLEFUNCTORBASE_H
+#endif

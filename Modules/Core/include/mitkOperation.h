@@ -61,4 +61,4 @@ namespace mitk
   };
 
 } // namespace mitk
-#endif /* OPERATION_H_HEADER_INCLUDED_C16E7D9E */
+#endif

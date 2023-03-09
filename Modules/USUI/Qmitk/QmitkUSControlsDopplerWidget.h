@@ -51,4 +51,4 @@ private:
   mitk::USControlInterfaceDoppler::Pointer  m_ControlInterface;
 };
 
-#endif // QMITKUSCONTROLSDOPPLERWIDGET_H
+#endif

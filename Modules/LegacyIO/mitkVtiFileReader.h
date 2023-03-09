@@ -63,4 +63,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* VtiFileReader_H_HEADER_INCLUDED */
+#endif

@@ -100,4 +100,4 @@ namespace mitk
 
 MITK_DECLARE_SERVICE_INTERFACE(mitk::IModelFitProvider, "org.mitk.IModelFitProvider")
 
-#endif /* __I_MODEL_FIT_PROVIDER_H */
+#endif

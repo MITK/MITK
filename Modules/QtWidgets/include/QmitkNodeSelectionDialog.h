@@ -143,4 +143,4 @@ protected:
   Ui_QmitkNodeSelectionDialog m_Controls;
 };
 
-#endif // QMITK_NODE_SELECTION_DIALOG_H
+#endif

@@ -223,4 +223,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* AbstractFileWriter_H_HEADER_INCLUDED_C1E7E521 */
+#endif

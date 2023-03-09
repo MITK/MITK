@@ -236,4 +236,4 @@ namespace mitk
 
 } // end namespace mitk
 
-#endif /* MITKVECTOR_H_ */
+#endif

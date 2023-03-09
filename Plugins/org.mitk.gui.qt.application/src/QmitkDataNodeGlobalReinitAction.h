@@ -46,4 +46,4 @@ private:
 
 };
 
-#endif // QMITKDATANODEGLOBALREINITACTION_H
+#endif

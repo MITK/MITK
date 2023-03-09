@@ -32,4 +32,4 @@ namespace mitk {
 
 }
 
-#endif // MITKIMAGENAVIGATORPLUGINACTIVATOR_H
+#endif

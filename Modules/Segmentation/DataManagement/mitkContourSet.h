@@ -104,4 +104,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif //_MITK_CONTOUR_SET_H_
+#endif

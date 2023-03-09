@@ -50,4 +50,4 @@ namespace mitk
   };
 }
 
-#endif /* OPERATIONACTOR_H_HEADER_INCLUDED_C16E28BD */
+#endif

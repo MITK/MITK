@@ -168,4 +168,4 @@ signals:
     mitk::DataStorage::Pointer m_DataStorage;
 };
 
-#endif // _QMITKTOFCOMPOSITEFILTERWIDGET_H_INCLUDED
+#endif

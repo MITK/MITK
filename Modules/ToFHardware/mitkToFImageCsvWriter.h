@@ -85,4 +85,4 @@ namespace mitk
     void WriteCsvFile(FILE* outfile, float* floatData);
   };
 } //END mitk namespace
-#endif // __mitkToFImageCsvWriter_h
+#endif

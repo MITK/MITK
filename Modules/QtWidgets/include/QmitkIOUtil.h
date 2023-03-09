@@ -235,4 +235,4 @@ private:
   struct Impl;
 };
 
-#endif // _QmitkIOUtil__h_
+#endif

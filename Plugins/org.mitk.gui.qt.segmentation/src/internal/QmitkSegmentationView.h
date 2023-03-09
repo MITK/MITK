@@ -201,4 +201,4 @@ private:
   bool m_SelectionChangeIsAlreadyBeingHandled;
 };
 
-#endif // QMITKSEGMENTATIONVIEW_H
+#endif

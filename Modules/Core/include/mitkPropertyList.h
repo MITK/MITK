@@ -251,4 +251,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* PROPERTYLIST_H_HEADER_INCLUDED_C1C77D8D */
+#endif

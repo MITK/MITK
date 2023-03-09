@@ -56,4 +56,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* SUBIMAGESELECTOR_H_HEADER_INCLUDED_C1E4F463 */
+#endif

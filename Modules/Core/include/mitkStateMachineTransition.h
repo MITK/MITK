@@ -102,4 +102,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* SMTRANSITION_H_HEADER_INCLUDED */
+#endif

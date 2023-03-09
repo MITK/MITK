@@ -345,4 +345,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKPointSet_H_HEADER_INCLUDED */
+#endif

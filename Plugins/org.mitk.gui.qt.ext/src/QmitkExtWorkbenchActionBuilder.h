@@ -24,4 +24,4 @@ public:
   QmitkExtWorkbenchActionBuilder();
 };
 
-#endif // QMITKEXTWORKBENCHACTIONBUILDER_H
+#endif

@@ -56,4 +56,4 @@ private:
   ctkXnatObject *InternalGetXnatObjectFromUrl(const QString &xnatObjectType, const QString &url, ctkXnatObject *parent);
 };
 
-#endif // QMITKXNATTREEMODEL_H
+#endif

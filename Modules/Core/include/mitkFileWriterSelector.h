@@ -117,4 +117,4 @@ namespace mitk
   void swap(FileWriterSelector &fws1, FileWriterSelector &fws2);
 }
 
-#endif // MITKFILEWRITERSELECTOR_H
+#endif

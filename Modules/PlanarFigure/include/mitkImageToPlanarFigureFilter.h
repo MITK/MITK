@@ -71,4 +71,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* IMAGETOPLANARFIGUREFILTER_H_HEADER_INCLUDED_C1E5E869 */
+#endif

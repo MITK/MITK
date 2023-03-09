@@ -159,4 +159,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* IMAGEDATAITEM_H */
+#endif

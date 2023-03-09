@@ -46,4 +46,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKPlaneOperation_H */
+#endif

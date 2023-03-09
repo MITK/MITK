@@ -75,4 +75,4 @@ namespace mitk
 
 MITK_DECLARE_SERVICE_INTERFACE(mitk::AbstractAnnotationRenderer, "org.mitk.services.AbstractAnnotationRenderer")
 
-#endif // ABSTRACTANNOTATIONRENDERER_H
+#endif

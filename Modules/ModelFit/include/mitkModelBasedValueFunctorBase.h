@@ -55,4 +55,4 @@ namespace mitk
 }
 
 
-#endif // ModelBasedValueFunctorBase_H
+#endif

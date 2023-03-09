@@ -81,4 +81,4 @@ private:
 
 }
 
-#endif // ATERIALINPUTFUNCTIONGENERATOR_H
+#endif

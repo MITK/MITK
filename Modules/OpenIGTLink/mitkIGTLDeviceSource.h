@@ -202,4 +202,4 @@ namespace mitk {
     unsigned int m_IncomingMessageObserverTag;
   };
 } // namespace mitk
-#endif /* MITKIGTLDeviceSource_H_HEADER_INCLUDED_ */
+#endif

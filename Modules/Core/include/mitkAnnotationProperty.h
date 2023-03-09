@@ -76,4 +76,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKANNOTATIONPROPERTY_H_HEADER_INCLUDED */
+#endif

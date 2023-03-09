@@ -103,4 +103,4 @@ protected:
 
 }
 
-#endif // #define _MITK_PointSetDifferenceStatisticsCalculator_H
+#endif

@@ -99,4 +99,4 @@ private:
   QScopedPointer<Ui::QmitkStdMultiWidgetEditorPreferencePage> m_Ui;
   QWidget* m_Control;
 };
-#endif //QmitkStdMultiWidgetEditorPreferencePage_h
+#endif

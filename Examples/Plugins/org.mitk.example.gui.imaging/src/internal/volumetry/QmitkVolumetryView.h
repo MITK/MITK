@@ -82,4 +82,4 @@ private:
   QWidget *m_ParentWidget;
 };
 
-#endif // _QMITKVOLUMETRYVIEW_H_INCLUDED
+#endif

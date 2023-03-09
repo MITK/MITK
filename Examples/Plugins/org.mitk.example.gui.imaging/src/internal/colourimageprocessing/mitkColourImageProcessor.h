@@ -60,4 +60,4 @@ namespace mitk
       const unsigned char *input, const unsigned char *input2, int sizeX, int sizeY, int sizeZ);
   };
 } // end namespace mitk
-#endif /* MITKCOLOURIMAGEPROCESSOR_H */
+#endif

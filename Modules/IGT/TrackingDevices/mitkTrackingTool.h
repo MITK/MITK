@@ -98,4 +98,4 @@ namespace mitk
     bool m_ToolTipSet;
   };
 } // namespace mitk
-#endif /* MITKTRACKINGTOOL_H_HEADER_INCLUDED_ */
+#endif

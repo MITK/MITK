@@ -55,4 +55,4 @@ private:
   Ui::QmitkNavigationDataPlayerControlWidget *ui;
 };
 
-#endif // QMITKNAVIGATIONDATAPLAYERCONTROLWIDGET_H
+#endif

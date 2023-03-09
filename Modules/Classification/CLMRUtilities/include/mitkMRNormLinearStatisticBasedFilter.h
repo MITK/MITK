@@ -78,4 +78,4 @@ namespace mitk {
   };
 } // namespace mitk
 
-#endif /* MRNORMLINEARSTATISTICBASEDFILTER_H */
+#endif

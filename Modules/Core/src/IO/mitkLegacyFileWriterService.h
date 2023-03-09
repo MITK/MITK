@@ -41,4 +41,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* LegacyFileWriterService_H_HEADER_INCLUDED_C1E7E521 */
+#endif

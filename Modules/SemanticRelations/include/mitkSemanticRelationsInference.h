@@ -344,4 +344,4 @@ namespace mitk
   } // namespace SemanticRelationsInference
 } // namespace mitk
 
-#endif // MITKSEMANTICRELATIONSINFERENCE_H
+#endif

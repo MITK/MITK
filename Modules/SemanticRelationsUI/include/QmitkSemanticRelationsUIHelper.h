@@ -38,4 +38,4 @@ namespace QmitkSemanticRelationsUIHelper
 
 } // namespace QmitkSemanticRelationsUIHelper
 
-#endif // QMITKSEMANTICRELATIONSUIHELPER_H
+#endif

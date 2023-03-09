@@ -171,4 +171,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif // MITKRENDERWINDOWLAYERCONTROLLER_H
+#endif

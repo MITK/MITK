@@ -151,4 +151,4 @@ private:
   } m_SelectedInterpolation;
 };
 
-#endif // !defined(QmitkBasicImageProcessing_H__INCLUDED)QMITKBASICIMAGEPROCESSINGVIEW_H
+#endif

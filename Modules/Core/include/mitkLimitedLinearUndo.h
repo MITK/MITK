@@ -156,4 +156,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* LIMITEDLINEARUNDO_H_HEADER_INCLUDED_C16E9C96 */
+#endif

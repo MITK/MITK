@@ -70,4 +70,4 @@ namespace mitk
 
 MITK_DECLARE_SERVICE_INTERFACE(mitk::IDataStorageInspectorProvider, "org.mitk.IDataStorageInspectorProvider")
 
-#endif /* __I_DATA_STORAGE_INSPECTOR_PROVIDER_H */
+#endif

@@ -117,4 +117,4 @@ namespace mitk
   };
 }
 
-#endif // MITKIFILEIO_H
+#endif

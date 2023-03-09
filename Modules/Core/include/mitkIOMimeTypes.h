@@ -100,4 +100,4 @@ namespace mitk
   };
 }
 
-#endif // MITKIOMIMETYPES_H
+#endif

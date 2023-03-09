@@ -164,4 +164,4 @@ private:
   long m_cRef ;
 };
 
-#endif // MITKUSTelemedScanConverterPlugin_H_HEADER_INCLUDED_
+#endif

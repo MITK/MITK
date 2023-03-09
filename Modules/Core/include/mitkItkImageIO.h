@@ -79,4 +79,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKITKFILEIO_H */
+#endif

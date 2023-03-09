@@ -210,4 +210,4 @@ namespace mitk
   };
 }
 
-#endif // MODELBASE_H
+#endif

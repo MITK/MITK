@@ -749,4 +749,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* BaseGeometry_H_HEADER_INCLUDED */
+#endif

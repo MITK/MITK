@@ -125,4 +125,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif //_MITKUNSTRUCTUREDGRIDCLUSTERINGFILTER_h__
+#endif

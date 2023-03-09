@@ -103,4 +103,4 @@ namespace mitk
   void swap(FileReaderSelector &fws1, FileReaderSelector &fws2);
 }
 
-#endif // MITKFILEREADERSELECTOR_H
+#endif

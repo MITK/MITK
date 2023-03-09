@@ -238,4 +238,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif // __mitkLabelSetImageVtkMapper2D_H_
+#endif

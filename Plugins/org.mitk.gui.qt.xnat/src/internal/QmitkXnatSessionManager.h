@@ -44,4 +44,4 @@ private:
 
 };
 
-#endif /*QMITKXNATSESSIONMANAGER_H_*/
+#endif

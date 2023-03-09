@@ -42,4 +42,4 @@ private:
   std::vector<mitk::FileWriterSelector::Item> m_WriterItems;
 };
 
-#endif // QMITKFILEREADEROPTIONSDIALOG_H
+#endif

@@ -193,4 +193,4 @@ calling object*/
 #define MITK_LOCAL
 #endif
 
-#endif // MITK_COMMON_H_DEFINED
+#endif

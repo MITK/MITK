@@ -41,4 +41,4 @@ private:
   mitk::USControlInterfaceBMode::Pointer m_ControlInterfaceBMode;
 };
 
-#endif // QMITKUSNAVIGATIONCALIBRATIONUPDATEDEPTHDELEGATE_H
+#endif

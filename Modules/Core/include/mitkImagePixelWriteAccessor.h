@@ -135,4 +135,4 @@ namespace mitk
     ImagePixelWriteAccessor(const ImagePixelWriteAccessor &);
   };
 }
-#endif // MITKIMAGEWRITEACCESSOR_H
+#endif

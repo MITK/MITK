@@ -184,4 +184,4 @@ namespace mitk
   };
 }
 
-#endif // MITKCORESERVICES_H
+#endif

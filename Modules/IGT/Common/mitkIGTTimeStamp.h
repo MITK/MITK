@@ -183,4 +183,4 @@ namespace mitk {
   };
 } // namespace mitk
 
-#endif /* MITKTIMESTAMP_H_HEADER_INCLUDED_ */
+#endif

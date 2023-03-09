@@ -132,4 +132,4 @@ private:
 
 };
 
-#endif // QMITKABSTRACTMULTIWIDGETEDITOR_H
+#endif

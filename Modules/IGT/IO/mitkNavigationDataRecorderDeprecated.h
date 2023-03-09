@@ -205,4 +205,4 @@ namespace mitk
     std::map<const mitk::NavigationData*, std::pair<std::string, std::string> > m_AdditionalAttributes;
   };
 }
-#endif // #define _MITK_POINT_SET_SOURCE_H
+#endif

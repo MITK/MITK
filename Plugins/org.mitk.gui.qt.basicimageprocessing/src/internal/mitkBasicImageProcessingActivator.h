@@ -33,4 +33,4 @@ public:
 
 }
 
-#endif // MITKBASICIMAGEPROCESSINGACTIVATOR_H
+#endif

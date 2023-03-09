@@ -37,4 +37,4 @@ namespace mitk
   };
 }
 
-#endif // MITK_TESTMANAGER_H_INCLUDED
+#endif

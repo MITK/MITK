@@ -300,4 +300,4 @@ namespace mitk {
 
 } // namespace mitk
 
-#endif /* MITKDoseImageVtkMapper2D_H_HEADER_INCLUDED_C10E906E */
+#endif

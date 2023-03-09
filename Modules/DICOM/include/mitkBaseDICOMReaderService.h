@@ -67,4 +67,4 @@ std::string MITKDICOM_EXPORT GenerateNameFromDICOMProperties(const mitk::IProper
 
 }
 
-#endif // MITKBASEDICOMREADERSERVICE_H
+#endif

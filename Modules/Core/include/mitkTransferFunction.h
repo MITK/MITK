@@ -192,4 +192,4 @@ namespace mitk
   };
 }
 
-#endif /* MITK_TRANSFER_FUNCTION_H_HEADER_INCLUDED */
+#endif

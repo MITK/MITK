@@ -40,4 +40,4 @@ namespace mitk
 
 } // end of namespace mitk
 
-#endif //__mitkExampleDataStructureWriterService_h
+#endif

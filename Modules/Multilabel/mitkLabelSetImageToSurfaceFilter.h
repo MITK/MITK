@@ -154,4 +154,4 @@ namespace mitk
 
 } // end of namespace mitk
 
-#endif //_mitkLabelSetImageToSurfaceFilter_H_
+#endif

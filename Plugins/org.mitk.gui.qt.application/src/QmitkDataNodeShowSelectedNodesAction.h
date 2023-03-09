@@ -39,4 +39,4 @@ protected:
 
 };
 
-#endif // QMITKDATANODESHOWSELECTEDNODESACTION_H
+#endif

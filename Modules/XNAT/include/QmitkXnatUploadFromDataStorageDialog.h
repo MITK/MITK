@@ -54,4 +54,4 @@ private:
   mitk::DataNode::Pointer m_SelectedNode;
 };
 
-#endif // QMITKXNATUPLOADFROMDATASTORAGEDIALOG_H
+#endif

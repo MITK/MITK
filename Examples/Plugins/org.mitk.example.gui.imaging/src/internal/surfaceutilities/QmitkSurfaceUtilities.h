@@ -60,4 +60,4 @@ protected:
 
   Ui::QmitkSurfaceUtilitiesControls m_Controls;
 };
-#endif // !defined(QMITK_ISOSURFACE_H__INCLUDED)
+#endif

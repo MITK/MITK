@@ -44,4 +44,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* ObjFileReaderService_h */
+#endif

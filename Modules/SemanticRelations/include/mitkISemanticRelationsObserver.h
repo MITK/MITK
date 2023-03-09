@@ -36,4 +36,4 @@ namespace mitk
   }; // class ISemanticRelationsObserver
 } // namespace mitk
 
-#endif // MITKISEMANTICRELATIONSOBSERVER_H
+#endif

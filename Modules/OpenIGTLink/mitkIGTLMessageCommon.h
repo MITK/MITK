@@ -66,4 +66,4 @@ namespace mitk {
 
 
 } // namespace mitk
-#endif /* MITKIGTLMESSAGECOMMONH_HEADER_INCLUDED_ */
+#endif

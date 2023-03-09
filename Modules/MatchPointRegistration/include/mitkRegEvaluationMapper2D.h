@@ -245,4 +245,4 @@ protected:
 
 } // namespace mitk
 
-#endif /* MITKRegEvaluationMapper2D_H_HEADER_INCLUDED_C10E906E */
+#endif

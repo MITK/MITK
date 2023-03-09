@@ -80,4 +80,4 @@ private:
   mitk::USControlInterfaceBMode::Pointer  m_ControlInterface;
 };
 
-#endif // QMITKUSCONTROLSBMODEWIDGET_H
+#endif

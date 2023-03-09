@@ -77,4 +77,4 @@ private:
   unsigned int m_BlockDims[3];
 };
 }
-#endif // __mitkOclDataSetToDataSetFilter_h
+#endif

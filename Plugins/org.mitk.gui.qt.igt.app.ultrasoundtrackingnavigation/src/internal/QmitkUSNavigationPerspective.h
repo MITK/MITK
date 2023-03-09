@@ -33,4 +33,4 @@ public:
   void CreateInitialLayout (berry::IPageLayout::Pointer layout) override;
 };
 
-#endif // QMITKUSNAVIGATIONPERSPECTIVE_H
+#endif

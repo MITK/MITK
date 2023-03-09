@@ -95,4 +95,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKSMARTPOINTERPROPERTY_H_HEADER_INCLUDED_C126B791 */
+#endif

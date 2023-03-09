@@ -305,4 +305,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif // _mitkContourElement_H_
+#endif

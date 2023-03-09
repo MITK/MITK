@@ -48,4 +48,4 @@ namespace mitk
   }; // class ISemanticRelationsObservable
 } // namespace mitk
 
-#endif // MITKISEMANTICRELATIONSOBSERVABLE_H
+#endif

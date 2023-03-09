@@ -72,4 +72,4 @@ mitk::DataCollectionUtility::EnsureDataImageInCollection(mitk::DataCollection::P
     }
 };
 
-#endif //mitkDataCollectionUtilit_h
+#endif

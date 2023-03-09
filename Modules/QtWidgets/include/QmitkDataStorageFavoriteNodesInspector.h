@@ -55,4 +55,4 @@ private:
   mitk::NodePredicateProperty::Pointer m_FavoriteNodeSelectionPredicate;
 };
 
-#endif // QMITKDATASTORAGEFAVORITENODESINSPECTOR_H
+#endif

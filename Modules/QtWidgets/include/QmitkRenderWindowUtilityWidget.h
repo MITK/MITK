@@ -67,4 +67,4 @@ private:
   void ChangeViewDirection(const QString& viewDirection);
 };
 
-#endif // QMITKRENDERWINDOWUTILITYWIDGET_H
+#endif

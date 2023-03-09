@@ -91,4 +91,4 @@ namespace mitk
   };
 }
 
-#endif // MITKTWOTISSUECOMPARTMENTMODEL_H
+#endif

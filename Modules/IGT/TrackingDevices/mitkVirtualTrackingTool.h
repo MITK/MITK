@@ -59,4 +59,4 @@ namespace mitk {
     mitk::ScalarType m_Velocity;
   };
 } // namespace mitk
-#endif /* MITKVirtualTrackingTool_H_HEADER_INCLUDED_ */
+#endif

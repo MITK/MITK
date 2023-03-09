@@ -47,4 +47,4 @@ public:
 
 };
 
-#endif // QMITKSEMANTICRELATIONSNODESELECTIONDIALOG_H
+#endif

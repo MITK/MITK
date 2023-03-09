@@ -107,4 +107,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* STATEMACHINECONTAINER_H_HEADER_INCLUDED_C19AEDDD */
+#endif

@@ -31,4 +31,4 @@ public:
 
 };
 
-#endif /*QMITKFLOWAPPLICATIONWORKBENCHADVISOR_H_*/
+#endif

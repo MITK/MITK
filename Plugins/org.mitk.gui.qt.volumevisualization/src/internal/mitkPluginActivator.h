@@ -31,4 +31,4 @@ namespace mitk
   };
 }
 
-#endif // MITKPLUGINACTIVATOR_H
+#endif

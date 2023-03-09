@@ -121,4 +121,4 @@ namespace mitk
     std::mutex m_SentListMutex;
   };
 } // namespace mitk
-#endif /* MITKIGTLSERVER_H */
+#endif

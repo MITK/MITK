@@ -164,4 +164,4 @@ namespace mitk
   MITKIMAGESTATISTICS_EXPORT ImageStatisticsContainer::ImageStatisticsObject::StatisticNameVector GetAllStatisticNames(const ImageStatisticsContainer* container);
   MITKIMAGESTATISTICS_EXPORT ImageStatisticsContainer::ImageStatisticsObject::StatisticNameVector GetAllStatisticNames(std::vector<ImageStatisticsContainer::ConstPointer> containers);
 }
-#endif // MITKIMAGESTATISTICSCONTAINER
+#endif

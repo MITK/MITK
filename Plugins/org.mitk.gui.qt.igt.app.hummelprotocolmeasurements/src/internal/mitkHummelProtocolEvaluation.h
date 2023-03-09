@@ -89,4 +89,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif /* MITKHummelProtocolEvaluation_H_HEADER_INCLUDED_ */
+#endif

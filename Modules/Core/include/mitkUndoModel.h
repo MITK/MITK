@@ -96,4 +96,4 @@ namespace mitk
   };
 
 } // namespace mitk
-#endif /* UNDOMODEL_H_HEADER_INCLUDED_C16ED098 */
+#endif

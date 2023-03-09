@@ -206,4 +206,4 @@ private:
   Ui::QmitkUSNavigationMarkerPlacement *ui;
 };
 
-#endif // USNAVIGATIONMARKERPLACEMENT_H
+#endif

@@ -123,4 +123,4 @@ namespace mitk
 
 }
 
-#endif // SimpleBarrierConstraintChecker_H
+#endif

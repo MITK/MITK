@@ -103,4 +103,4 @@ namespace mitk
   };
 }
 
-#endif // MITKFILEREADERWRITERBASE_H
+#endif

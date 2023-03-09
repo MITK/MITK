@@ -126,4 +126,4 @@ private:
   QStandardItemModel* m_HeaderModel;
 };
 
-#endif // QMITKPATIENTTABLEMODEL_H
+#endif

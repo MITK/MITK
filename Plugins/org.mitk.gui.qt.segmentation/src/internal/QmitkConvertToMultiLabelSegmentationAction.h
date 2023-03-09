@@ -44,4 +44,4 @@ private:
   mitk::DataStorage::Pointer m_DataStorage;
 };
 
-#endif // QMITK_ConvertToMultiLabelSegmentation_H
+#endif

@@ -87,4 +87,4 @@ private:
   Ui::QmitkImageCropperViewControls m_Controls;
 };
 
-#endif // QmitkImageCropperView_h
+#endif

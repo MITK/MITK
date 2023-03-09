@@ -51,4 +51,4 @@ namespace mitk {
   DICOMTagPath DICOM_IMAGING_FREQUENCY_PATH();
 }
 
-#endif // MITKCESTGenericDICOMReaderService_H
+#endif

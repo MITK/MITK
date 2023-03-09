@@ -81,4 +81,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif //_MITK_PLANAR_SUBDIVISION_POLYGON_H_
+#endif

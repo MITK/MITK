@@ -33,4 +33,4 @@ namespace mitk
   };
 }
 
-#endif // MITKCONTOURMODELSERIALIZER_H
+#endif

@@ -207,4 +207,4 @@ namespace mitk {
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(mitk::WorkbenchUtil::IRenderWindowPartStrategies)
 
-#endif // MITKWORKBENCHUTIL_H
+#endif

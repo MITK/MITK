@@ -66,4 +66,4 @@ namespace mitk
 
 }
 
-#endif // MODELFITCOSTFUNCTION_H
+#endif

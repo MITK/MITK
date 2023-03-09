@@ -53,4 +53,4 @@ namespace mitk
   };
 }
 
-#endif // MITKPROVISIONINGINFO_H
+#endif

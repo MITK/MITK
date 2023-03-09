@@ -87,4 +87,4 @@ namespace mitk {
 
   };
 } // namespace mitk
-#endif /* MITKUSImageSource_H_HEADER_INCLUDED_ */
+#endif

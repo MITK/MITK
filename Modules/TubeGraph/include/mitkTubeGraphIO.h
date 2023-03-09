@@ -66,4 +66,4 @@ namespace mitk
   };
 }
 
-#endif //_MITK_SURFACE_VTK_IO_H_
+#endif

@@ -40,4 +40,4 @@ protected slots:
   void inputValidator();
 };
 
-#endif /*QMITKLEVELWINDOWRANGECHANGEDIALOG_H_*/
+#endif

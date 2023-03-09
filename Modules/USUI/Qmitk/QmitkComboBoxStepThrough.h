@@ -76,4 +76,4 @@ private:
   int m_LastIndex;
 };
 
-#endif // QmitkComboBoxStepThrough_H
+#endif

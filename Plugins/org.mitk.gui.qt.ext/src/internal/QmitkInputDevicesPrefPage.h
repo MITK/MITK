@@ -84,4 +84,4 @@ protected:
 
 };
 
-#endif // QMITK_INPUTDEVICESPREFPAGE_H_
+#endif

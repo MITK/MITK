@@ -78,4 +78,4 @@ protected:
   unsigned long m_ObserverTag;
 };
 
-#endif /* MITKSCALARBAROVERLAY_H_HEADER_INCLUDED_C10DC4EB */
+#endif

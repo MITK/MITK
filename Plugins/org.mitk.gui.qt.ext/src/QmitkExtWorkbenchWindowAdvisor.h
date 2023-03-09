@@ -174,4 +174,4 @@ private:
   QAction* openMxNMultiWidgetEditorAction;
 };
 
-#endif /*QMITKEXTWORKBENCHWINDOWADVISOR_H_*/
+#endif

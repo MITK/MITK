@@ -82,4 +82,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* VOLUME_CALCULATOR_H_HEADER_INCLUDED */
+#endif

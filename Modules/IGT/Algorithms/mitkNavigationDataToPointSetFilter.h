@@ -152,4 +152,4 @@ namespace mitk {
     unsigned int m_NumberForMean;   ///< Number of Navigation Data, which should be averaged
   };
 } // namespace mitk
-#endif // _MITKNAVIGATIONDATATOPOINTSETFILTER_H__
+#endif

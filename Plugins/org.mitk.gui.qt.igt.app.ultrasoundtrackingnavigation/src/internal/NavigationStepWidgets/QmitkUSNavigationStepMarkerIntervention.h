@@ -160,4 +160,4 @@ private:
   Ui::QmitkUSNavigationStepMarkerIntervention *ui;
 };
 
-#endif // QMITKUSNAVIGATIONSTEPMARKERINTERVENTION_H
+#endif

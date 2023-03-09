@@ -47,4 +47,4 @@ private:
   const QScopedPointer<QmitkUndoActionPrivate> d;
 };
 
-#endif /*QmitkUndoAction_H_*/
+#endif

@@ -38,4 +38,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif //VIRTUALTRACKERTYPEINFORMATION_H_INCLUDED
+#endif

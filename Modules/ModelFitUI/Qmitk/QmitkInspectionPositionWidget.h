@@ -65,4 +65,4 @@ protected:
 
 };
 
-#endif // QmitkInspectionPositionWidget_H
+#endif

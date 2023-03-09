@@ -423,4 +423,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif // MITKSLICENAVIGATIONCONTROLLER_H
+#endif

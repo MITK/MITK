@@ -344,4 +344,4 @@ namespace mitk
 #endif
   };
 } // namespace mitk
-#endif /* MITKSERIALCOMMUNICATION_H_HEADER_INCLUDED_ */
+#endif

@@ -38,4 +38,4 @@ private:
 
 }
 
-#endif // MITKDICOMSERIESREADERSERVICE_H
+#endif

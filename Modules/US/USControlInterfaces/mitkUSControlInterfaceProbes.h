@@ -94,4 +94,4 @@ protected:
 };
 } // namespace mitk
 
-#endif // MITKUSControlInterfaceProbes_H_HEADER_INCLUDED_
+#endif

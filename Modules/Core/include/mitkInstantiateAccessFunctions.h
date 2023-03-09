@@ -147,4 +147,4 @@ found in the LICENSE file.
   InstantiateAccessFunctionForFixedType(                                                                               \
     itkImgFunc, MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES_SEQ, MITK_ACCESSBYITK_DIMENSIONS_SEQ)
 
-#endif // of MITKINSTANTIATEACCESSFUNCTIONS_H_HEADER_INCLUDED
+#endif

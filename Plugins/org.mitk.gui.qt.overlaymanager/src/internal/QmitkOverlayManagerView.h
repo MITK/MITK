@@ -118,4 +118,4 @@ private:
   OverlayMapType m_OverlayMap;
 };
 
-#endif // QmitkOverlayManagerView_h
+#endif

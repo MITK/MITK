@@ -75,4 +75,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* IMAGETIMESELECTOR_H_HEADER_INCLUDED_C1E4861D */
+#endif

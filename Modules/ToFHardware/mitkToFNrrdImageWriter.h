@@ -74,4 +74,4 @@ namespace mitk
     void ConvertStreamToNrrdFormat( std::string fileName );
   };
 } //END mitk namespace
-#endif // __mitkToFNrrdImageWriter_h
+#endif

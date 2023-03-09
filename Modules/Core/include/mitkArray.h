@@ -139,4 +139,4 @@ namespace mitk
   }
 }
 
-#endif /* MITKARRAY_H_ */
+#endif

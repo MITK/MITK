@@ -21,4 +21,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* BASEPROCESS_H_HEADER_INCLUDED_C19BE6FC */
+#endif

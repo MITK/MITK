@@ -134,4 +134,4 @@ namespace mitk
     void GenerateOutputInformation() override;
   };
 } // namespace mitk
-#endif /* MITKOPENIGTLMESSAGETONAVIGATIONDATAFILTER_H_HEADER_INCLUDED_ */
+#endif

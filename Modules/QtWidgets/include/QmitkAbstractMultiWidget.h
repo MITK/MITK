@@ -178,4 +178,4 @@ private:
 
 };
 
-#endif // QMITKABSTRACTMULTIWIDGET_H
+#endif

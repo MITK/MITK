@@ -42,4 +42,4 @@ private:
 
 }
 
-#endif /*MITKDATASTORAGEREFERENCE_H_*/
+#endif

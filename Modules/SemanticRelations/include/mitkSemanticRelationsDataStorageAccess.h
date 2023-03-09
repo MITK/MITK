@@ -181,4 +181,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif // MITKSEMANTICRELATIONSDATASTORAGEACCESS_H
+#endif

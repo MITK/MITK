@@ -194,4 +194,4 @@ namespace mitk {
   };
 } // namespace mitk
 MITK_DECLARE_SERVICE_INTERFACE(mitk::NavigationToolStorage, "org.mitk.services.NavigationToolStorage")
-#endif //NAVIGATIONTOOLSTORAGE
+#endif

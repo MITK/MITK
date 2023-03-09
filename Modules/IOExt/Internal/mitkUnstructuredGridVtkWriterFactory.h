@@ -56,4 +56,4 @@ namespace mitk
 
 } // end namespace mitk
 
-#endif // UNSTRUCTURED_GRID_WRITERFACTORY_H_HEADER_INCLUDED
+#endif

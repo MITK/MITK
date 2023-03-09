@@ -40,4 +40,4 @@ namespace mitk
     ImageVtkLegacyIO *IOClone() const override;
   };
 }
-#endif // MITKIMAGEVTKLEGACYIO_H
+#endif

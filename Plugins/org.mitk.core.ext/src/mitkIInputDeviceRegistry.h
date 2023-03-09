@@ -61,4 +61,4 @@ namespace mitk
 
 Q_DECLARE_INTERFACE(mitk::IInputDeviceRegistry, "org.mitk.service.IInputDeviceRegistry")
 
-#endif /*MITKIINPUTDEVICEREGISTRY_H_*/
+#endif

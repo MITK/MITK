@@ -133,4 +133,4 @@ namespace mitk {
   } // namespace telemed
 } // namespace mitk
 
-#endif // MITKUSTelemedSDKHeader_H
+#endif

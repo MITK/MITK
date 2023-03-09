@@ -86,4 +86,4 @@ private:
 
 };
 
-#endif // QMITKDATASTORAGELAYERSTACKMODEL_H
+#endif

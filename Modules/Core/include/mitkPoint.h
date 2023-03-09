@@ -132,4 +132,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKPOINT_H_ */
+#endif

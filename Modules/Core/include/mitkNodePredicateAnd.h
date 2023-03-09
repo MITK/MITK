@@ -62,4 +62,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKNODEPREDICATEAND_H_HEADER_INCLUDED_ */
+#endif

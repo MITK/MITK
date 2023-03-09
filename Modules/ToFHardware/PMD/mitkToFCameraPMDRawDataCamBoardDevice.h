@@ -76,4 +76,4 @@ namespace mitk
     void ResizeOutputImage(float* in, float* out);
   };
 } //END mitk namespace
-#endif // __mitkToFCameraPMDRawDataCamBoardDevice_h
+#endif

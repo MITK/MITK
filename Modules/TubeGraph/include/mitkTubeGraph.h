@@ -149,4 +149,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /*  _mitk_TubeGraph_h */
+#endif

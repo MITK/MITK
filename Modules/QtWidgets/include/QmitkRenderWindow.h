@@ -160,4 +160,4 @@ private:
 
 };
 
-#endif // QMITKRENDERWINDOW_H
+#endif

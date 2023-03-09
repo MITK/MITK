@@ -25,4 +25,4 @@ found in the LICENSE file.
 // calls to these functions shall be removed in future bugsquashings so that this include can be removed.
 #include "mitkVectorDeprecated.h"
 
-#endif /* MITKNUMERICTYPES_H_ */
+#endif

@@ -59,4 +59,4 @@ protected:
 
 };
 
-#endif /* BERRYQMITKPREFERENCESDIALOG_H_ */
+#endif

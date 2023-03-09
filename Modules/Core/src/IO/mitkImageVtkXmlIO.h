@@ -40,4 +40,4 @@ namespace mitk
     ImageVtkXmlIO *IOClone() const override;
   };
 }
-#endif // MITKIMAGEVTKXMLIO_H
+#endif

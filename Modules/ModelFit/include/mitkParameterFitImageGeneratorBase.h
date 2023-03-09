@@ -101,4 +101,4 @@ namespace mitk
 
 }
 
-#endif // __MITK_PARAMETER_FIT_IMAGE_GENERATOR_H_
+#endif

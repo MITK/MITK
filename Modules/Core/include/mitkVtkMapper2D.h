@@ -23,4 +23,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* BASEVTKMAPPER2D_H_HEADER_INCLUDED */
+#endif

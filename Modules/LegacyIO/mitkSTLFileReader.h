@@ -52,4 +52,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* STLFileReader_H_HEADER_INCLUDED */
+#endif

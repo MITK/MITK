@@ -81,4 +81,4 @@ namespace mitk
 #endif
 } // namespace mitk
 
-#endif /* MITKLookupTablePROPERTY_H_HEADER_INCLUDED_C10EEAA8 */
+#endif

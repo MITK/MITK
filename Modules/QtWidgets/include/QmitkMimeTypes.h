@@ -39,4 +39,4 @@ public:
   static QList<mitk::DataNode *> ToDataNodePtrList(const QMimeData *mimeData);
 };
 
-#endif // QMITKMIMETYPES_H
+#endif

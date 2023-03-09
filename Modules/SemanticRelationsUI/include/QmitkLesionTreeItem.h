@@ -117,4 +117,4 @@ private:
 Q_DECLARE_METATYPE(QmitkLesionTreeItem)
 Q_DECLARE_METATYPE(QmitkLesionTreeItem*)
 
-#endif // QMITKLESIONTREEITEM_H
+#endif

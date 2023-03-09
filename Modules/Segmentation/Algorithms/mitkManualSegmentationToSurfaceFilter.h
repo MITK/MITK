@@ -161,4 +161,4 @@ namespace mitk
 
   }; // namespace
 }
-#endif //_MITKMANUALSEGMENTATIONTISURFACEFILTER_h__
+#endif

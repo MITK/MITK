@@ -124,4 +124,4 @@ protected:
 
 };
 
-#endif // QMITKABSTRACTDATASTORAGEMODEL_H
+#endif

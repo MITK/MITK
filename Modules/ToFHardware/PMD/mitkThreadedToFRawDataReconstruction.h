@@ -112,4 +112,4 @@ namespace mitk
   };
 } //end mitk namespace
 
-#endif // __mitkThreadedToFRawDataReconstruction_h
+#endif

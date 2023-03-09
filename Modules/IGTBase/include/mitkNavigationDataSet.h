@@ -158,4 +158,4 @@ namespace mitk {
   };
 }
 
-#endif // MITKNAVIGATIONDATASET_H_HEADER_INCLUDED_
+#endif

@@ -63,4 +63,4 @@ namespace  mitk
   };
 }
 
-#endif // MITKMODELDATAGENERATIONFUNCTOR_H
+#endif

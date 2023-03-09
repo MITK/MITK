@@ -92,5 +92,3 @@ private:
 } // end of namespace mitk
 
 #endif
-
-

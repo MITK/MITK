@@ -273,4 +273,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKVECTORDEPRECATED_H_ */
+#endif

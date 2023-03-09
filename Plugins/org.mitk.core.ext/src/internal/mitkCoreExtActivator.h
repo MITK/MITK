@@ -61,4 +61,4 @@ namespace mitk
   }; // end class CoreExtActivator
 } //end namespace mitk
 
-#endif /* MITKCOREEXTACTIVATOR_H_ */
+#endif

@@ -110,4 +110,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif // mitkExtractDirectedPlaneImageFilter_h_Included
+#endif

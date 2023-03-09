@@ -169,4 +169,4 @@ namespace mitk
   };
 }
 
-#endif // __CONCRETE_MODEL_FACTORY_BASE_H
+#endif

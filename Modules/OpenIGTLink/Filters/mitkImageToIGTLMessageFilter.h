@@ -91,4 +91,4 @@ class MITKOPENIGTLINK_EXPORT ImageToIGTLMessageFilter : public IGTLMessageSource
 };
 }  // namespace mitk
 
-#endif  // _MITKIMAGEToIGTLMessageFILTER_H__
+#endif

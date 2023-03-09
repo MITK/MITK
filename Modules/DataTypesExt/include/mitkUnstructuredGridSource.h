@@ -65,4 +65,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* _MITK_UNSTRUCTURED_GRID_DATA_SOURCE_H_HEADER_ */
+#endif

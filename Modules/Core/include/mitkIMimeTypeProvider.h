@@ -65,4 +65,4 @@ namespace mitk
 
 MITK_DECLARE_SERVICE_INTERFACE(mitk::IMimeTypeProvider, "org.mitk.IMimeTypeProvider")
 
-#endif // MITKIMIMETYPEPROVIDER_H
+#endif

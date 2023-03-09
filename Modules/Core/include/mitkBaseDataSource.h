@@ -151,4 +151,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITK_BASE_DATA_SOURCE_H */
+#endif

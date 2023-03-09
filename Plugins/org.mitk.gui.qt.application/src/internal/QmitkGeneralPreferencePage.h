@@ -65,4 +65,4 @@ protected:
     QCheckBox* m_GlobalReinitOnNodeVisibilityChanged;
 };
 
-#endif // QMITKGENERALPREFERENCEPAGE_H
+#endif

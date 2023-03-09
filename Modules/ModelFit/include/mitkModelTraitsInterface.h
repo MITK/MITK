@@ -92,4 +92,4 @@ namespace mitk
   };
 }
 
-#endif // __MODEL_TRAITS_INTERFACE_H
+#endif

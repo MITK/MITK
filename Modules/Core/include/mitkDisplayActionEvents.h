@@ -176,4 +176,4 @@ namespace mitk
 
 } // end namespace
 
-#endif // MITKDISPLAYACTIONEVENTS_H
+#endif

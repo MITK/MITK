@@ -105,5 +105,4 @@ private:
 
 
 
-#endif // _QMITKMITKSURFACEMATERIALEDITORVIEW_H_INCLUDED
-
+#endif

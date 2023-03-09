@@ -139,4 +139,4 @@ private:
 
 };
 
-#endif // QMITKMULTIWIDGETDECORATIONMANAGER_H
+#endif

@@ -132,4 +132,4 @@ class MITKIGT_EXPORT NavigationDataSliceVisualization : public NavigationDataToN
 
 } // end namespace mitk
 
-#endif // NEMOSLICEVISUALIZATIONFILTER_H
+#endif

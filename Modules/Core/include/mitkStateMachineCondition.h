@@ -71,4 +71,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* StateMachineCondition_H_HEADER_INCLUDED_C19AE06B */
+#endif

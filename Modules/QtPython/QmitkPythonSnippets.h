@@ -97,5 +97,4 @@ signals:
 
 
 
-#endif // _QmitkPythonSnippets_H_INCLUDED
-
+#endif

@@ -23,4 +23,4 @@ namespace mitk
 }
 US_DECLARE_SERVICE_INTERFACE(mitk::XnatSession, "org.mitk.services.XnatSession")
 
-#endif // MITKCTKXNATSESSION_H
+#endif

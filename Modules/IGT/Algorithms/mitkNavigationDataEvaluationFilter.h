@@ -118,4 +118,4 @@ namespace mitk {
   };
 } // namespace mitk
 
-#endif /* MITKNavigationDataEvaluationFilter_H_HEADER_INCLUDED_ */
+#endif

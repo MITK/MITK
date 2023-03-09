@@ -185,4 +185,4 @@ protected Q_SLOTS:
   void ShowScale();
 };
 
-#endif // QMITKSLIDERLEVELWINDOWWIDGET_H
+#endif

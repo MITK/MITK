@@ -45,4 +45,4 @@ protected:
 
 };
 
-#endif // QMITKDATANODEUNLINKFROMLESIONACTION_H
+#endif

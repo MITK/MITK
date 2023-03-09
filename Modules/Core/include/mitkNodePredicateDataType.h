@@ -79,4 +79,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKNODEPREDICATEDATATYPE_H_HEADER_INCLUDED_ */
+#endif

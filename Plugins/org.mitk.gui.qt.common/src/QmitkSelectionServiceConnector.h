@@ -130,4 +130,4 @@ private:
 
 };
 
-#endif // QMITKSELECTIONSERVICECONNECTOR_H
+#endif

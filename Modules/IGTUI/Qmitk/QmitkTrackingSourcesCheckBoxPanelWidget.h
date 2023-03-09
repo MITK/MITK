@@ -152,5 +152,4 @@ private:
 
 
 };
-#endif // _QmitkTrackingSourcesCheckBoxPanelWidget_H_INCLUDED
-
+#endif

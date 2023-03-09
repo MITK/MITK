@@ -28,4 +28,4 @@ namespace mitk {
 }
 
 
-#endif // MITKIOMIMETYPE_H_HEADER_INCLUDED_
+#endif

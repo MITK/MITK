@@ -22,4 +22,4 @@ namespace mitk
   typedef ConcreteModelParameterizerBase<mitk::LinearModel> LinearModelParameterizer;
 }
 
-#endif // __LINEAR_MODEL_PARAMETERIZER_H
+#endif

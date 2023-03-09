@@ -249,4 +249,4 @@ namespace mitk
   }; // end class ArbitraryTimeGeometry
 
 } // end namespace MITK
-#endif // ArbitraryTimeGeometry_h
+#endif

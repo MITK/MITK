@@ -179,4 +179,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKGEOMETRYCLIPIMAGEFILTER_H_HEADER_INCLUDED_C1F48A22 */
+#endif

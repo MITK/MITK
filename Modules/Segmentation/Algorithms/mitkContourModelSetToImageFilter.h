@@ -88,4 +88,4 @@ namespace mitk
     const mitk::Image *m_ReferenceImage;
   };
 }
-#endif // #_MITK_CONTOURMODEL_SOURCE_H
+#endif

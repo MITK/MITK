@@ -56,4 +56,4 @@ namespace mitk
   };
 } /* namespace mitk */
 
-#endif /* MITKINTERACTIONKEYEVENT_H_ */
+#endif

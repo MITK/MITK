@@ -53,4 +53,4 @@ struct MITK_GUI_COMMON_PLUGIN ILifecycleAwarePart
 
 }
 
-#endif // MITKILIFECYCLEAWAREPART_H
+#endif

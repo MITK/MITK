@@ -144,5 +144,4 @@ private:
   static const std::string HelperNodeName;
 };
 
-#endif // MatchPoint_h
-
+#endif

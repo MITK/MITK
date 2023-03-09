@@ -119,4 +119,4 @@ class MITKTOFUI_EXPORT QmitkToFMESAParameterWidget :public QWidget
 
 };
 
-#endif // _QMITKTOFCONNECTIONWIDGET_H_INCLUDED
+#endif

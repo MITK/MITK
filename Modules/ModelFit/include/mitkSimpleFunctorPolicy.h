@@ -63,4 +63,4 @@ namespace mitk
 }
 
 
-#endif // SIMPLEFUNCTORPOLICY_H
+#endif

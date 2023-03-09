@@ -143,4 +143,4 @@ namespace mitk
     FeatureListType DoCalculateFeatures(const Image* image, const Image* mask) override;
   };
 }
-#endif //mitkGIFFirstNumericOrderStatistics_h
+#endif

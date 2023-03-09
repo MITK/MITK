@@ -286,4 +286,4 @@ private:
 };
 } // namespace mitk
 
-#endif // MITKGRABCUTOPENCVIMAGEFILTER_H
+#endif

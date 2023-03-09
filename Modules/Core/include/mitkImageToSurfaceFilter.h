@@ -244,4 +244,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif //_MITKIMAGETOSURFACEFILTER_h__
+#endif

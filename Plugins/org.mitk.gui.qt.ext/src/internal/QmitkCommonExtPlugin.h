@@ -44,4 +44,4 @@ private:
 
 };
 
-#endif /* QMITKCOMMONEXTPLUGIN_H_ */
+#endif

@@ -318,4 +318,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKIMAGEVTKMAPPER2D_H_HEADER_INCLUDED_C10E906E */
+#endif

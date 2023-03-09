@@ -106,4 +106,4 @@ namespace mitk
   };
 
 } // namespace mitk
-#endif // LabelAnnotation3D_H
+#endif

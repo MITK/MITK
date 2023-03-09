@@ -32,4 +32,4 @@ namespace mitk {
 
 }
 
-#endif // MITKMOVIEMAKERPLUGINACTIVATOR_H
+#endif

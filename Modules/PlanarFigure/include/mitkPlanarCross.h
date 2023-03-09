@@ -111,4 +111,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif //_MITK_PLANAR_CROSS_H_
+#endif

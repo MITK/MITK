@@ -60,4 +60,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif // MITK_CONTOUR_VTK_MAPPER_3D_H
+#endif

@@ -71,4 +71,4 @@ namespace mitk
     std::string m_File;                   ///< the original file from which this tool was loaded
   };
 } // namespace mitk
-#endif /* MITKNDIPASSIVETOOL_H_HEADER_INCLUDED_ */
+#endif

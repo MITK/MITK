@@ -42,4 +42,4 @@ public:
 }
 
 
-#endif // MITKWORKBENCHCOMMANDCONSTANTS_H
+#endif

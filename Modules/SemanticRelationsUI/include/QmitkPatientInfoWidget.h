@@ -47,4 +47,4 @@ private:
 
 };
 
-#endif // QMITKPATIENTINFOWIDGET_H
+#endif

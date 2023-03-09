@@ -39,4 +39,4 @@ private:
   berry::IMemento::Pointer viewState;
 };
 
-#endif // QMITKMODULEVIEW_H
+#endif

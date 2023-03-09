@@ -45,4 +45,4 @@ protected:
     void UpdateModelData() override;
 };
 
-#endif // QMITKDATASTORAGEHISTORYMODEL_H
+#endif

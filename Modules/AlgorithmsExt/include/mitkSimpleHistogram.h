@@ -148,4 +148,4 @@ namespace mitk
   };
 }
 
-#endif // MITKSIMPLEHISTOGRAM_H
+#endif

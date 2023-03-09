@@ -47,4 +47,4 @@ private:
 
 };
 
-#endif // QMITKOPENMXNMULTIWIDGETEDITORACTION_H
+#endif

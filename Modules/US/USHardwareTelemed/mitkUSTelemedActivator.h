@@ -46,4 +46,4 @@ namespace mitk
 
 US_EXPORT_MODULE_ACTIVATOR(mitk::USTelemedActivator)
 
-#endif // __mitkUSTelemedActivator_h
+#endif

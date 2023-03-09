@@ -69,4 +69,4 @@ namespace mitk
     ~DataNodeSource() override;
   };
 }
-#endif // #define _MITK_BASE_DATA_SOURCE_H
+#endif

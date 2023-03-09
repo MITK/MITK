@@ -33,4 +33,4 @@ public:
 
 }
 
-#endif // MITKBPREPROCESSINGRESAMPLINGACTIVATOR_H
+#endif

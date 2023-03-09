@@ -74,4 +74,4 @@ public:
 
 }
 
-#endif // MITKDICOMRTMimeTypes_H
+#endif

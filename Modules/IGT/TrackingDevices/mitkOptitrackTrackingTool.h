@@ -210,4 +210,4 @@ namespace mitk
 
   };
 }
-#endif /* OptiTrackTrackingTool_H_HEADER_INCLUDED_ */
+#endif

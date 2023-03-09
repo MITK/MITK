@@ -61,4 +61,4 @@ namespace mitk
   };
 } // end namespace
 
-#endif // MITKLESIONDATA_H
+#endif

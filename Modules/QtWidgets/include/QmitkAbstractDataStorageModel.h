@@ -85,4 +85,4 @@ private:
 
 };
 
-#endif // QMITKABSTRACTDATASTORAGEMODEL_H
+#endif

@@ -41,4 +41,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKLEGACYFILEREADERSERVICE_H */
+#endif

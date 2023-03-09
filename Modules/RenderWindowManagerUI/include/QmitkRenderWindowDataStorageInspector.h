@@ -89,4 +89,4 @@ private:
   std::unique_ptr<mitk::RenderWindowViewDirectionController> m_RenderWindowViewDirectionController;
 };
 
-#endif // QMITKRENDERWINDOWDATASTORAGEINSPECTOR_H
+#endif

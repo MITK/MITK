@@ -82,4 +82,4 @@ private:
 
 };
 
-#endif // QMITKPATIENTTABLEINSPECTOR_H
+#endif

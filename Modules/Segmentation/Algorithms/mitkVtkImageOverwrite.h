@@ -81,4 +81,4 @@ protected:
                                    int id) override;
 };
 
-#endif // mitkVtkImageOverwrite_h_Included
+#endif

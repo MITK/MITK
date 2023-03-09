@@ -67,4 +67,4 @@ namespace mitk
   };
 } // end of namespace mitk
 
-#endif // __mitkDICOMSegmentationIO_h
+#endif

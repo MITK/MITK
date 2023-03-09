@@ -64,4 +64,4 @@ protected:
   QWidget* m_MainControl;
 };
 
-#endif // QMITKDATAMANAGERHOTKEYSPREFPAGE_H
+#endif

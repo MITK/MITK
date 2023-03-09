@@ -41,4 +41,4 @@ private:
 
 };
 
-#endif // QMITKDEFAULTDROPTARGETLISTENER_H
+#endif

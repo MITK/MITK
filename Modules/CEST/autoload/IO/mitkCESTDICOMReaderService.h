@@ -43,4 +43,4 @@ namespace mitk {
 
 }
 
-#endif // MITKCESTDICOMREADERSERVICE_H
+#endif

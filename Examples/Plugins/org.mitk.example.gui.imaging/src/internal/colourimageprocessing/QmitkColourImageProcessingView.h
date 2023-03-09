@@ -55,4 +55,4 @@ private:
   int m_Color[3];
 };
 
-#endif // _QMITKCOLOURIMAGEPROCESSINGVIEW_H_INCLUDED
+#endif

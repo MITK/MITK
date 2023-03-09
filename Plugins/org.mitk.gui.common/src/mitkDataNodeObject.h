@@ -50,4 +50,4 @@ private:
 
 }
 
-#endif /* MITKDATATREENODEOBJECT_H_ */
+#endif

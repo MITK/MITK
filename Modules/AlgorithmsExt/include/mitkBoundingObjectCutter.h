@@ -138,4 +138,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif /* BOUNDINGOBJECTCUTTER_H_HEADER_INCLUDED_C10B22CD */
+#endif

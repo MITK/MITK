@@ -116,5 +116,4 @@ namespace mitk
     };
 
 }
-#endif // MITKIMAGESTATISTICSCALCULATOR
-
+#endif

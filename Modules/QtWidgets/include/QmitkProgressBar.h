@@ -74,4 +74,4 @@ private:
   unsigned int m_Progress;
 };
 
-#endif /* define QMITKPROGRESSBAR_H */
+#endif

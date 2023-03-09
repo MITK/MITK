@@ -55,4 +55,4 @@ protected:
   FilterPredicatesCollection m_Predicates;
 };
 
-#endif /* QMITKDATASTORAGEFILTERPROXYMODEL_H_ */
+#endif

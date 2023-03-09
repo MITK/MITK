@@ -96,4 +96,4 @@ namespace mitk
   } // namespace SliceNavigationHelper
 } // namespace mitk
 
-#endif // MITKSLICENAVIGATIONHELPER_H
+#endif

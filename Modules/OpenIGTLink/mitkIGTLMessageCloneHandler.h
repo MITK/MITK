@@ -80,4 +80,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif // MITKIGTLMESSAGECLONE_H_
+#endif

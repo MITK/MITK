@@ -58,4 +58,4 @@ namespace mitk
 
 //#include "mitkLabelSetImageSource.cpp"
 
-#endif // __mitkLabelSetImageSource_H_
+#endif

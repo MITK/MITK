@@ -297,4 +297,4 @@ namespace mitk {
 MITKCAMERACALIBRATION_EXPORT std::ostream& operator<<
     (std::ostream& os, mitk::Transform::Pointer p);
 
-#endif // MITKTRANSFORM_H
+#endif

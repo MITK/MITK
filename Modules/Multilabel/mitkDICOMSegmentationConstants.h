@@ -51,4 +51,4 @@ namespace mitk
   };
 }
 
-#endif // MITKDICOMSEGMENTATIONCONSTANTS_H_
+#endif

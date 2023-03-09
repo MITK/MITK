@@ -86,4 +86,4 @@ namespace mitk
     void StopCommunicationWithSocket(igtl::Socket*) override;
   };
 } // namespace mitk
-#endif /* MITKIGTLCLIENT_H */
+#endif

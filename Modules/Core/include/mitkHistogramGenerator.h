@@ -54,4 +54,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* HISTOGRAM_GENERATOR_H_HEADER_INCLUDED */
+#endif

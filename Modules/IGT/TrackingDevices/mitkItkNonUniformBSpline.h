@@ -203,4 +203,4 @@ protected:
 #endif
 
 
-#endif // __itkNonUniformBSpline_h
+#endif

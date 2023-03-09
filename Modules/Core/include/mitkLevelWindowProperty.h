@@ -82,4 +82,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKLEVELWINDOWPROPERTY_H_HEADER_INCLUDED_C10EEAA8 */
+#endif

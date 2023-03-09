@@ -59,4 +59,4 @@ namespace mitk
 }
 
 
-#endif // MODELSIGNALIMAGEGENERATOR_H
+#endif

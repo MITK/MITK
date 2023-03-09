@@ -44,4 +44,4 @@ namespace mitk
   };
 }
 
-#endif //_MITK_SURFACE_STL_IO_H_
+#endif

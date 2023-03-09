@@ -66,4 +66,4 @@ typedef org_mitk_core_services_Activator PluginActivator;
 
 }
 
-#endif /*MITKCORESERVICESPLUGIN_H_*/
+#endif

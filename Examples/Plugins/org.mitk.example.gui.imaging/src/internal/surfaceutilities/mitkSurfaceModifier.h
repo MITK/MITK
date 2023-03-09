@@ -111,4 +111,4 @@ namespace mitk
   };
 
 } // namespace mitk
-#endif /* MITKSurfaceModifier_H_HEADER_INCLUDED_ */
+#endif

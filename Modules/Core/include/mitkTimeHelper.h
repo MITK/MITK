@@ -74,4 +74,4 @@ namespace mitk
 
 } // end namespace mitk
 
-#endif // MITKTIMEHELPER_H_HEADER_INCLUDED_C1C2FCD2
+#endif

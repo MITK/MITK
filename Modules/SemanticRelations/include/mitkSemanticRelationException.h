@@ -28,4 +28,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif // MITKSEMANTICRELATIONEXCEPTION_H
+#endif

@@ -269,4 +269,4 @@ namespace mitk
 
 } // end namespace mitk
 
-#endif // PIXELTYPETRAITS_H
+#endif

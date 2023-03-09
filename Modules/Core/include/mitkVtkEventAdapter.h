@@ -62,4 +62,4 @@ namespace mitk
   };
 }
 
-#endif /*QMITKEVENTADAPTER_H_*/
+#endif

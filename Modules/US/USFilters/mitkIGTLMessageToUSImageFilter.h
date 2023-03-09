@@ -75,4 +75,4 @@ namespace mitk
   };
 }  // namespace mitk
 
-#endif  // MITKIGTLMessageToUSImageFilter_H_HEADER_INCLUDED_
+#endif

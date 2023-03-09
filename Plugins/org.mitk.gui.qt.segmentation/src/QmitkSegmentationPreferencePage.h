@@ -59,4 +59,4 @@ protected:
   bool m_Initializing;
 };
 
-#endif // QMITKSEGMENTATIONPREFERENCEPAGE_H
+#endif

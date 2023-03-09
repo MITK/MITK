@@ -30,4 +30,4 @@ public:
 
 };
 
-#endif // QMITKSHOWPREFERENCEPAGEHANDLER_H
+#endif

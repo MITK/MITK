@@ -32,4 +32,4 @@ namespace mitk
   mitkSpecializeGenericLookupTable(StringLookupTable, std::string);
 } // namespace mitk
 
-#endif /* MITKLOOKUPTABLES_H_HEADER_INCLUDED*/
+#endif

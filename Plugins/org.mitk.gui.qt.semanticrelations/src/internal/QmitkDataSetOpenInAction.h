@@ -41,4 +41,4 @@ protected:
   void InitializeAction() override;
 };
 
-#endif // QMITKDATASETOPENINACTION_H
+#endif

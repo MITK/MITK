@@ -46,4 +46,4 @@ protected:
 
 };
 
-#endif // QMITKDATANODEREINITVIEWACTION_H
+#endif

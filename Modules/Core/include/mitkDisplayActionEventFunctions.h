@@ -83,4 +83,4 @@ namespace mitk
   } // end namespace DisplayActionEventFunctions
 } // end namespace mitk
 
-#endif // MITKDISPLAYACTIONEVENTFUNCTIONS_H
+#endif

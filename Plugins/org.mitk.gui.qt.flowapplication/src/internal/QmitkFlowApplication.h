@@ -30,4 +30,4 @@ public:
   void Stop() override;
 };
 
-#endif /*QMITKFLOWAPPLICATIONLICATION_H_*/
+#endif

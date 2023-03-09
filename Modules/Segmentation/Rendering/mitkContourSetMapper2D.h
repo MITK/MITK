@@ -57,4 +57,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITK_CONTOUR_SET_MAPPER_2D_H_ */
+#endif

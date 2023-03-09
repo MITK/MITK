@@ -41,4 +41,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif //NDIPOLARISTYPEINFORMATION_H_INCLUDED
+#endif

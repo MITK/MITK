@@ -35,4 +35,4 @@ public:
   QString m_Description;
 };
 
-#endif // QMITKPERSPECTIVEITEM_H
+#endif

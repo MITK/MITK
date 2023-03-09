@@ -52,4 +52,4 @@ protected:
 
 }
 
-#endif /* BERRYQTSELECTIONPROVIDER_H_ */
+#endif

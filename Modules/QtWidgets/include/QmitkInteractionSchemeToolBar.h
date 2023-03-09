@@ -52,4 +52,4 @@ private:
 
 };
 
-#endif // QMITKINTERACTIONSCHEMETOOLBAR_H
+#endif

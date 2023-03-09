@@ -49,4 +49,4 @@ private:
 
 };
 
-#endif // QMITKDATANODESHOWDETAILSACTION_H
+#endif

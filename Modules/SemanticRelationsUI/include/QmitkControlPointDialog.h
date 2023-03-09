@@ -37,4 +37,4 @@ private:
   QDateEdit* m_DateEdit;
 };
 
-#endif // QMITKCONTROLPOINTDIALOG_H
+#endif

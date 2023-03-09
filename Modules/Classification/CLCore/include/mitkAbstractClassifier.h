@@ -192,4 +192,4 @@ public:
 };
 }
 
-#endif //mitkAbstractClassifier_h
+#endif

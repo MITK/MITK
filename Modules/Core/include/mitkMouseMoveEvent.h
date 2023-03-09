@@ -52,4 +52,4 @@ namespace mitk
   };
 } /* namespace mitk */
 
-#endif /* MITKMOUSEMOVEEVENT_H_ */
+#endif

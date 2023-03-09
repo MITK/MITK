@@ -140,4 +140,4 @@ namespace mitk {
   };
 } // namespace mitk
 
-#endif /* MITK_COLLECTION_READER_H */
+#endif

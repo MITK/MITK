@@ -49,4 +49,4 @@ namespace mitk
   };
 
 }
-#endif // MITKEXTENDEDTOFTSMODELFACTORY_H
+#endif

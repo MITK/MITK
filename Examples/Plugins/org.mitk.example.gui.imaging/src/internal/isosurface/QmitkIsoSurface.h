@@ -81,4 +81,4 @@ private:
   mitk::ColorSequenceRainbow m_RainbowColor;
 };
 
-#endif // QMITK_ISOSURFACE_H__INCLUDED
+#endif

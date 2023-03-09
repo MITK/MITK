@@ -123,4 +123,4 @@ private:
 
 };
 
-#endif // QMITKRENDERWINDOWWIDGET_H
+#endif

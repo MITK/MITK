@@ -83,4 +83,4 @@ private:
 };
 } // namespace mitk
 
-#endif // USCOMBINEDMODALITYPERSISTENCE_H
+#endif

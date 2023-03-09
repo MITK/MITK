@@ -43,4 +43,4 @@ protected:
 
 };
 
-#endif // QMITKDATANODECOLORMAPACTION_H
+#endif

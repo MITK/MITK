@@ -208,4 +208,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* SLICEDDATA_H_HEADER_INCLUDED */
+#endif

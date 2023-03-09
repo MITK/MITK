@@ -92,5 +92,4 @@ private:
 
 
 
-#endif /* MITKRegistrationWrapperMapperBase_H_HEADER_INCLUDED */
-
+#endif

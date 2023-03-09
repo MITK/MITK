@@ -122,4 +122,4 @@ namespace mitk
   }
 }
 
-#endif // MITKGETCLASSHIERARCHY_H
+#endif

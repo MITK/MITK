@@ -35,4 +35,4 @@ namespace mitk {
     };
 } // namespace mitk
 
-#endif /* MITKMICROBIRDTOOL_H_HEADER_INCLUDED_ */
+#endif

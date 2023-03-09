@@ -62,4 +62,4 @@ namespace mitk
   };
 
 } // namespace mitk
-#endif // VTKAnnotation2D_H
+#endif

@@ -157,4 +157,4 @@ namespace mitk
                                                                                                                        \
   virtual void Update() override { Write(); }
 } // namespace mitk
-#endif /* FILEWRITER_H_HEADER_INCLUDED */
+#endif

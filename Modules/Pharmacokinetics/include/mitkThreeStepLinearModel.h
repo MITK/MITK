@@ -120,4 +120,4 @@ namespace mitk
 }
 
 
-#endif // MITKTHREESTEPLINEARMODEL_H
+#endif

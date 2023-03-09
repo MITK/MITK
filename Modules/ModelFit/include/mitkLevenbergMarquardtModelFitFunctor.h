@@ -101,4 +101,4 @@ namespace mitk
 }
 
 
-#endif // MODEL_FIT_FUNCTOR_BASE_H
+#endif

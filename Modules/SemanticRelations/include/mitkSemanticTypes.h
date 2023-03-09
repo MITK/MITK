@@ -122,4 +122,4 @@ namespace mitk
   } // namespace SemanticTypes
 } // namespace mitk
 
-#endif // MITKSEMANTICTYPES_H
+#endif

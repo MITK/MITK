@@ -57,4 +57,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKContourMapper2D_H_HEADER_INCLUDED */
+#endif

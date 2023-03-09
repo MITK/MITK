@@ -101,4 +101,4 @@ private:
 
 };
 
-#endif // QMITKDATASTORAGERENDERWINDOWLISTMODEL_H
+#endif

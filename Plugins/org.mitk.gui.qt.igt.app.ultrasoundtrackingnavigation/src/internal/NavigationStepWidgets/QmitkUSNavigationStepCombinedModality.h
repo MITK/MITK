@@ -115,4 +115,4 @@ private:
   Ui::QmitkUSNavigationStepCombinedModality *ui;
 };
 
-#endif // QMITKUSNAVIGATIONSTEPCOMBINEDMODALITY_H
+#endif

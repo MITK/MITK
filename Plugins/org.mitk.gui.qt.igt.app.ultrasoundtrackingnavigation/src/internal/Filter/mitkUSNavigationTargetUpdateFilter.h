@@ -133,4 +133,4 @@ protected:
 };
 } // namespace mitk
 
-#endif // USNAVIGATIONTARGETUPDATEFILTER_H
+#endif

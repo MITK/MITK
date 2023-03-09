@@ -50,4 +50,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif // ManualPlacementAnnotationRenderer_H
+#endif

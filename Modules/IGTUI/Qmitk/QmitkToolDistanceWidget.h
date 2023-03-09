@@ -81,5 +81,4 @@ private:
   DistanceLabelType* m_DistanceLabels;
 
 };
-#endif // _QmitkToolDistanceWidget_H_INCLUDED
-
+#endif

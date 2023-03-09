@@ -145,4 +145,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif /* MITKNavigationDataCSVSequentialPlayer_H_HEADER_INCLUDED_ */
+#endif

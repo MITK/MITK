@@ -62,4 +62,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* IMAGESLICESELECTOR_H_HEADER_INCLUDED_C1E4BE7B */
+#endif

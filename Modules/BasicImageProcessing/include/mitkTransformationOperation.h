@@ -60,4 +60,4 @@ namespace mitk
 
 
 }
-#endif // mitkArithmeticOperation_h
+#endif

@@ -285,4 +285,4 @@ protected:
   QString CreateCaptionForService(const us::ServiceReferenceU &serviceRef);
 };
 
-#endif // _QmitkServiceListWidget_H_INCLUDED
+#endif

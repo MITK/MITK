@@ -141,4 +141,4 @@ class MITKTOFUI_EXPORT QmitkToFPointSetWidget :public QWidget
   private:
 };
 
-#endif // _QmitkToFPointSetWidget_H_INCLUDED
+#endif

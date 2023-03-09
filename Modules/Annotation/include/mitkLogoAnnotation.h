@@ -98,4 +98,4 @@ namespace mitk
   };
 
 } // namespace mitk
-#endif // LOGOAnnotation_H
+#endif

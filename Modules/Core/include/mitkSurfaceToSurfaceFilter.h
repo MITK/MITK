@@ -77,4 +77,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKSURFACETOSURFACEFILTER_H_HEADER_INCLUDED_C10B4740 */
+#endif

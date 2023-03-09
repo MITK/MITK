@@ -80,4 +80,4 @@ namespace mitk
   };
 
 } // namespace mitk
-#endif // TEXTAnnotation2D_H
+#endif

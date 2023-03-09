@@ -201,5 +201,4 @@ private:
   Ui::MatchPointAdvancedControls m_Controls;
 };
 
-#endif // MatchPoint_h
-
+#endif

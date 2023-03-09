@@ -51,4 +51,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* SMACTION_H_HEADER_INCLUDED_C19AE06B */
+#endif

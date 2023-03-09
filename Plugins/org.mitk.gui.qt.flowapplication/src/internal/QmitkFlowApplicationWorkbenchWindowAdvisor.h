@@ -150,4 +150,4 @@ private:
   QAction* resetPerspAction;
 };
 
-#endif /*QMITKFLOWAPPLICATIONWORKBENCHWINDOWADVISOR_H_*/
+#endif

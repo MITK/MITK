@@ -49,4 +49,4 @@ protected:
   mitk::SemanticTypes::Lesion m_Lesion;
 };
 
-#endif // QMITKLESIONSHOWINACTION_H
+#endif

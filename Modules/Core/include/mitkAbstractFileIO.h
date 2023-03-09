@@ -156,4 +156,4 @@ namespace mitk
   };
 }
 
-#endif // MITKABSTRACTFILEIO_H
+#endif

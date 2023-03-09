@@ -640,4 +640,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKIMAGE_H_HEADER_INCLUDED_C1C2FCD2 */
+#endif

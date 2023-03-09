@@ -116,4 +116,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif /* MITKEnhancedPointSetVtkMapper3D_H_HEADER_INCLUDED_C1907273 */
+#endif

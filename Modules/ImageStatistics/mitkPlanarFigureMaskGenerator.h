@@ -143,4 +143,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif // MITKPLANARFIGUREMASKGENERATOR
+#endif

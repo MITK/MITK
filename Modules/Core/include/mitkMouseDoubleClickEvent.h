@@ -57,4 +57,4 @@ namespace mitk
   };
 } /* namespace mitk */
 
-#endif /* MITKMouseDoubleClickEvent_H_ */
+#endif

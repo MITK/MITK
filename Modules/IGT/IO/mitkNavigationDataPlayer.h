@@ -94,4 +94,4 @@ namespace mitk {
   };
 } // namespace mitk
 
-#endif /* MITKNavigationDataPlayer_H_HEADER_INCLUDED_ */
+#endif

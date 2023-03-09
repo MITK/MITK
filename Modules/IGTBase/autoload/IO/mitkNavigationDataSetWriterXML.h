@@ -42,4 +42,4 @@ namespace mitk {
   };
 }
 
-#endif // MITKNavigationDataSetWriterXML_H_HEADER_INCLUDED_
+#endif

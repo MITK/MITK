@@ -171,4 +171,4 @@ namespace mitk
 
 #include "mitkUndirectedGraph.txx"
 
-#endif /*  _MITK_UndirectedGraph_H */
+#endif

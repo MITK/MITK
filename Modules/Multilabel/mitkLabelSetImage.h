@@ -414,4 +414,4 @@ namespace mitk
     const TimeStepType timeStep = 0);
 } // namespace mitk
 
-#endif // __mitkLabelSetImage_H_
+#endif

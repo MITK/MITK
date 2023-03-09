@@ -50,4 +50,4 @@ namespace mitk
 }
 
 
-#endif //__LINEAR_TEST_MODEL_FACTORY_H
+#endif

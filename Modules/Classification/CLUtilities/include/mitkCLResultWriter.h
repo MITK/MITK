@@ -56,4 +56,4 @@ namespace mitk
   }
 }
 
-#endif //mitkCLResultWritter_h
+#endif

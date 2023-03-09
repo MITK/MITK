@@ -48,4 +48,4 @@ private:
 
 };
 
-#endif // QMITKDATANODECOMPONENTACTION_H
+#endif

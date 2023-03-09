@@ -87,4 +87,4 @@ protected:
   };
 }
 
-#endif // MITKUSNAVIGATIONTARGETINTERSECTIONFILTER_H
+#endif

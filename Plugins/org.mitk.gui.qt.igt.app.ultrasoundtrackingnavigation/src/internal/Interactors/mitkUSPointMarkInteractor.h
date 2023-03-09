@@ -58,4 +58,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif // MITKUSPOINTMARKINTERACTOR_H
+#endif

@@ -108,4 +108,4 @@ namespace mitk {
   };
 } // namespace mitk
 
-#endif // MITKUSTelemedBModeControls_H_HEADER_INCLUDED_
+#endif

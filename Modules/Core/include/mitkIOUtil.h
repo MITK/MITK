@@ -441,4 +441,4 @@ namespace mitk
   };
 }
 
-#endif // MITKIOUTIL_H
+#endif

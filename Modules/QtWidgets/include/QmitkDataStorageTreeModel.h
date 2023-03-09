@@ -206,4 +206,4 @@ private:
   unsigned long m_DataStorageDeletedTag;
 };
 
-#endif /* QMITKDATASTORAGETREEMODEL_H_ */
+#endif

@@ -84,4 +84,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKCLIPPINGPROPERTY_H_HEADER_INCLUDED */
+#endif

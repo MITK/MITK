@@ -36,4 +36,4 @@ public:
 
 }
 
-#endif // MITKRadiomicsStatisticACTIVATOR_H
+#endif

@@ -47,4 +47,4 @@ public:
 
 
 
-#endif // __mitkOpenCLActivator_h
+#endif

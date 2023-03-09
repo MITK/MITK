@@ -96,4 +96,4 @@ namespace mitk {
     std::mutex m_ImageFilterMutex;
   };
 } // namespace mitk
-#endif /* MITKUSImageSource_H_HEADER_INCLUDED_ */
+#endif

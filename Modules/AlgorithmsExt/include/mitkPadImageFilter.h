@@ -65,4 +65,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKPADIMAGEFILTER_H_HEADER_INCLUDED */
+#endif

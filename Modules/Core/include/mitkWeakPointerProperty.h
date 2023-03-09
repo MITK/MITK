@@ -75,4 +75,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKWEAKPOINTERPROPERTY_H_HEADER_INCLUDED_C126B791 */
+#endif

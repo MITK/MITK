@@ -74,4 +74,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* BASECONTROLLER_H_HEADER_INCLUDED_C1E745A3 */
+#endif

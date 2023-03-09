@@ -81,4 +81,4 @@ private:
 }; // end class
 } // end namespace
 
-#endif /*MITKINPUTDEVICEDESCRIPTOR_H_*/
+#endif

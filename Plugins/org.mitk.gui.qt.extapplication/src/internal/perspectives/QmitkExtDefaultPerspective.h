@@ -29,4 +29,4 @@ public:
 
 };
 
-#endif /* QMITKEXTDEFAULTPERSPECTIVE_H_ */
+#endif

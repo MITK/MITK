@@ -31,4 +31,4 @@ public:
   bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index) override;
 };
 
-#endif // QMITKUSNAVIGATIONCALIBRATIONREMOVEDELEGATE_H
+#endif

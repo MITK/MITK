@@ -73,4 +73,4 @@ private:
 
 };
 
-#endif // QMITKSTATISTICSCALCULATOR_H
+#endif

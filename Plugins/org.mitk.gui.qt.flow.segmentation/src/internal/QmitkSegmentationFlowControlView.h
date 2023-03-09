@@ -85,5 +85,4 @@ private:
     QString m_FileExtension;
 };
 
-#endif // MatchPoint_h
-
+#endif

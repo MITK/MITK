@@ -124,4 +124,4 @@ private:
 
 };
 
-#endif // QMITKMULTIWIDGETLAYOUTMANAGER_H
+#endif

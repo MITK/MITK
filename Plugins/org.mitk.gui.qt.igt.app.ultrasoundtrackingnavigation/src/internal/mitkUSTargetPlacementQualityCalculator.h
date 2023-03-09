@@ -86,4 +86,4 @@ protected:
 };
 } // namespace mitk
 
-#endif // MITKUSTARGETPLACEMENTQUALITYCALCULATOR_H
+#endif

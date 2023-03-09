@@ -25,4 +25,4 @@ namespace mitk
   } // namespace UIDGeneratorBoost
 } // namespace mitk
 
-#endif // MITKUIDGENERATORBOOST_H
+#endif

@@ -46,4 +46,4 @@ private:
   Ui::QmitkUSNavigationCombinedSettingsWidget *ui;
 };
 
-#endif // QMITKUSNAVIGATIONCOMBINEDSETTINGSWIDGET_H
+#endif

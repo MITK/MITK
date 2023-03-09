@@ -67,4 +67,4 @@ namespace mitk {
 } // namespace mitk
 
 
-#endif // MITKUSNAVIGATIONLOGGINGBACKEND_H
+#endif

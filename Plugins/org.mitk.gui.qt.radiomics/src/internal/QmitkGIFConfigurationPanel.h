@@ -43,4 +43,4 @@ namespace mitkUI
   };
 }
 
-#endif // QMITK_GIF_CONFIGURATION_PANEL_H
+#endif

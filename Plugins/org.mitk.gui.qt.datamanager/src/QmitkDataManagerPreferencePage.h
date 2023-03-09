@@ -58,4 +58,4 @@ protected:
   QCheckBox* m_AllowParentChange;
 };
 
-#endif /* QMITKDATAMANAGERPREFERENCEPAGE_H_ */
+#endif

@@ -59,4 +59,4 @@ private:
   void operator=(const Self&);  //purposely not implemented
 };}
 
-#endif // MITKTHREESTEPLINEARMODELPARAMETERIZER_H
+#endif

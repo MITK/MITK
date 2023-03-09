@@ -35,4 +35,4 @@ private:
 
 }
 
-#endif // MITKPLUGINACTIVATOR_H
+#endif

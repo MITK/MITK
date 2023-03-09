@@ -36,4 +36,4 @@ namespace mitk
     ~Ellipsoid() override;
   };
 }
-#endif /* MITKELLIPSEDATA_H_HEADER_INCLUDED */
+#endif

@@ -75,4 +75,4 @@ private:
 
 }
 
-#endif // MVModelFitCostFunction_H
+#endif

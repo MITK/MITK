@@ -70,4 +70,4 @@ private:
 } // namespace mitk
 
 
-#endif /* _MITK_DOSE_ISO_LEVEL_SET_PROPERTY_H_ */
+#endif

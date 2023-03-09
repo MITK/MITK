@@ -51,4 +51,4 @@ namespace mitk
 
 } // namespace
 
-#endif // BASEDATA_H_HEADER_INCLUDED
+#endif

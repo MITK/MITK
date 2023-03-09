@@ -119,4 +119,4 @@ namespace mitk
   };
 }
 
-#endif // MITKTESTFIXTURE_H
+#endif

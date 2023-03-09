@@ -76,4 +76,4 @@ private:
 
 };
 
-#endif // QMITKPATIENTTABLEHEADERVIEW_H
+#endif

@@ -56,4 +56,4 @@ namespace mitk
   };
 }
 
-#endif /* mitkItkLoggingAdapter_H_HEADER_INCLUDED */
+#endif

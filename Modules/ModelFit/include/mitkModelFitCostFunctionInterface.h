@@ -52,4 +52,4 @@ private:
 
 }
 
-#endif // MODELFITCOSTFUNCTION_H
+#endif

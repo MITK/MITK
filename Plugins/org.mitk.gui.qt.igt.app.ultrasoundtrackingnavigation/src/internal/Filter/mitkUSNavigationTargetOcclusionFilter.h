@@ -78,4 +78,4 @@ protected:
 };
 } // namespace mitk
 
-#endif // USNAVIGATIONTARGETOCCLUSIONFILTER_H
+#endif

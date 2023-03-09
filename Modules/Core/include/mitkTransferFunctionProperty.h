@@ -76,4 +76,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKTRANFERFUNCTIONPROPERTY_H_HEADER_INCLUDED */
+#endif

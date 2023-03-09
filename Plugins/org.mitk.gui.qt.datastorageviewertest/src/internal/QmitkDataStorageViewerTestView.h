@@ -66,4 +66,4 @@ private:
   std::unique_ptr<QmitkSelectionServiceConnector> m_SelectionServiceConnector4;
 };
 
-#endif // QMITKDATASTORAGEVIEWERTESTVIEW_H
+#endif

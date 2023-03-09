@@ -67,4 +67,4 @@ namespace mitk
 
   };
 } // namespace mitk
-#endif // MITKFLOATINGIMAGETOULTRASOUNDREGISTRATIONFILTER_H_HEADER_INCLUDED_
+#endif

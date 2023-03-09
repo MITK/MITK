@@ -72,4 +72,4 @@ private:
   Impl* m_Impl;
 };
 
-#endif /* QMITKWORKBENCHINTROPART_H_ */
+#endif

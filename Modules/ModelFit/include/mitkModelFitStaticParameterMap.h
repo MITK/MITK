@@ -143,4 +143,4 @@ namespace mitk
   }
 }
 
-#endif // mitkModelFitStaticParameterMap_h
+#endif

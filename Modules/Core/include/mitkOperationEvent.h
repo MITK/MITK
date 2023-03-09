@@ -198,4 +198,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* OPERATIONEVENT_H_HEADER_INCLUDED_C16E83FC */
+#endif

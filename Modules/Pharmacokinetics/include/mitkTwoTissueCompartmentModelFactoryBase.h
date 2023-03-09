@@ -78,4 +78,4 @@ namespace mitk
   };
 
 }
-#endif // MITKTWOCOMPARTMENTEXCHANGEMODELFACTORY_H
+#endif

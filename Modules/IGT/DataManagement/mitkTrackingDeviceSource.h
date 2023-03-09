@@ -128,4 +128,4 @@ namespace mitk {
     mitk::TrackingDevice::Pointer m_TrackingDevice;  ///< the tracking device that is used as a source for this filter object
   };
 } // namespace mitk
-#endif /* MITKTrackingDeviceSource_H_HEADER_INCLUDED_ */
+#endif

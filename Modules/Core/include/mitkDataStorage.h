@@ -439,4 +439,4 @@ namespace mitk
                                                            const BaseRenderer* baseRender);
 } // namespace mitk
 
-#endif // MITKDATASTORAGE_H
+#endif

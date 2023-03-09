@@ -121,4 +121,4 @@ private:
 };
 
 
-#endif//QMITK_TubeGraphView_H
+#endif

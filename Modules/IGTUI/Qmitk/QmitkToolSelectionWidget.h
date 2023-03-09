@@ -125,5 +125,4 @@ protected:
   Ui::QmitkToolSelectionWidgetControls* m_Controls;  ///< gui widgets
 
 };
-#endif // _QmitkToolSelectionWidget_H_INCLUDED
-
+#endif

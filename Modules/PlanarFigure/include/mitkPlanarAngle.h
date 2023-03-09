@@ -69,4 +69,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif //_MITK_PLANAR_ANGLE_H_
+#endif

@@ -248,4 +248,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* IMAGESOURCE_H_HEADER_INCLUDED_C1E7D6EC */
+#endif

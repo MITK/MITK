@@ -60,4 +60,4 @@ struct MITK_GUI_COMMON_PLUGIN IZombieViewPart : public virtual ILifecycleAwarePa
 
 }
 
-#endif // MITKIZOMBIEVIEWPART_H
+#endif

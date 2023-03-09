@@ -136,4 +136,4 @@ protected:
 
 };
 
-#endif // IGTNavigationToolCalibration_h
+#endif

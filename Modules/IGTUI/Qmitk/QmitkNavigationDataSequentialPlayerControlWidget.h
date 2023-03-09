@@ -57,4 +57,4 @@ private:
   Ui::QmitkNavigationDataSequentialPlayerControlWidget *ui;
 };
 
-#endif // QMITKNAVIGATIONDATASEQUENTIALPLAYERCONTROLWIDGET_H
+#endif

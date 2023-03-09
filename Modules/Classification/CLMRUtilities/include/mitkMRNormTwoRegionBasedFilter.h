@@ -69,4 +69,4 @@ namespace mitk {
   };
 } // namespace mitk
 
-#endif /* MITKMRNORMTWOREGIONBASEDFILTER_H */
+#endif

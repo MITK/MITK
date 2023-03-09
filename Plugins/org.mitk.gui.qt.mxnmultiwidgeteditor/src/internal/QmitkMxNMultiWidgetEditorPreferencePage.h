@@ -56,4 +56,4 @@ private:
 
 };
 
-#endif // QMITKMXNMULTIWIDGETEDITORPREFERENCEPAGE_H
+#endif

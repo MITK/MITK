@@ -45,4 +45,4 @@ namespace mitk
   };
 }
 
-#endif // PLANARFIGUREOBJECTFACTORY_H_INCLUDED
+#endif

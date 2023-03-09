@@ -211,4 +211,4 @@ namespace mitk
   double m_DeviationDistributionParam;  ///< deviation distribution for Gaussian Noise, 1.0 by default
   };
 }//mitk
-#endif /* MITKVIRTUALTRACKINGDEVICE_H_HEADER_INCLUDED_ */
+#endif

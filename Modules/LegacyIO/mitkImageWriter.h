@@ -168,4 +168,4 @@ namespace mitk
   };
 }
 
-#endif //_MITK_IMAGE_WRITER__H_
+#endif

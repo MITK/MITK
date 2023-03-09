@@ -218,4 +218,4 @@ namespace mitk {
   itkEventMacroDeclaration(StreamingStopRequiredEvent, itk::AnyEvent);
 
 } // namespace mitk
-#endif /* MITKIGTLMESSAGEPROVIDER_H_HEADER_INCLUDED_ */
+#endif

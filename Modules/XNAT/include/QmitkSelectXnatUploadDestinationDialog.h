@@ -56,4 +56,4 @@ private:
   Ui::QmitkSelectXnatUploadDestinationDialog *ui;
 };
 
-#endif // QMITKSELECTXNATUPLOADDESTINATIONDIALOG_H
+#endif

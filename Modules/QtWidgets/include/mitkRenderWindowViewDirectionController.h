@@ -78,4 +78,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif // MITKRENDERWINDOWVIEWDIRECTIONCONTROLLER_H
+#endif

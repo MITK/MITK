@@ -70,4 +70,4 @@ private:
 };
 }
 
-#endif //__MITK_IMAGEGENERATIONHELPER_H
+#endif

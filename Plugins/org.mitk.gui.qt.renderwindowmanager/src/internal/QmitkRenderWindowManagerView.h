@@ -76,4 +76,4 @@ private:
   QItemSelectionModel* GetDataNodeSelectionModel() const override;
 };
 
-#endif // QMITKRENDERWINDOWMANAGERVIEW_H
+#endif

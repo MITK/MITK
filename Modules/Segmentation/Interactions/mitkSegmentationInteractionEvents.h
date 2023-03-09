@@ -62,4 +62,4 @@ namespace mitk
 
 } // end namespace
 
-#endif // MITKSEGMENTATIONINTERACTIONEVENTS_H
+#endif

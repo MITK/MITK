@@ -51,4 +51,4 @@ protected:
 
 };
 
-#endif // QMITKDATANODEOPENINACTION_H
+#endif

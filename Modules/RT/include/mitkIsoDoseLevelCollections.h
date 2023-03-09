@@ -151,4 +151,4 @@ private:
 
 }
 
-#endif //_MITK_DOSE_ISO_LEVEL_COLLECTIONS_H_
+#endif

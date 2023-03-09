@@ -71,4 +71,4 @@ protected:
 
 };
 
-#endif // QmitkFreeIsoDoseLevelWidget_H
+#endif

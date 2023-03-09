@@ -129,4 +129,4 @@ private:
 
 };
 
-#endif // QMITKDATASTORAGERENDERWINDOWTREEMODEL_H
+#endif

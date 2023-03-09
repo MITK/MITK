@@ -49,4 +49,4 @@ protected:
 
 }
 
-#endif // SquaredDifferencesFitCostFunction_H
+#endif

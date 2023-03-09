@@ -95,4 +95,4 @@ private:
   std::vector<HistogramType::ConstPointer> m_HistogramVector;          ///< member holds the histograms of all time steps.
   std::string m_message;
 };
-#endif // QMITKIMAGESTATISTICSCALCULATIONTHREAD_H_INCLUDED
+#endif

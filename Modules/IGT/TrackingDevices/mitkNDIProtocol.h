@@ -159,4 +159,4 @@ namespace mitk
     bool m_UseCRC;  ///< whether to append a CRC16 checksum to each message
   };
 } // namespace mitk
-#endif /* MITKNDIPROTOCOL_H_HEADER_INCLUDED_ */
+#endif

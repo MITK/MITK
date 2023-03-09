@@ -66,4 +66,4 @@ protected:
 
 };
 
-#endif /* QMITKEDITORSPREFERENCEPAGE_H_ */
+#endif

@@ -97,4 +97,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif //_MITKIMAGETOUNSTRUCTUREDGRIDFILTER_h__
+#endif

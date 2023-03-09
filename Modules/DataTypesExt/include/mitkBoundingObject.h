@@ -61,4 +61,4 @@ namespace mitk
     BoundingObject &operator=(const BoundingObject &);
   };
 }
-#endif /* BOUNDINGOBJECT_H_HEADER_INCLUDED */
+#endif

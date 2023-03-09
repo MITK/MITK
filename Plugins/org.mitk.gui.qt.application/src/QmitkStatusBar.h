@@ -77,4 +77,4 @@ private:
 
 };
 
-#endif /* define QMITKSTATUSBAR_H */
+#endif

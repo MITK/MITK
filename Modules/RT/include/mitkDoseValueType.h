@@ -30,4 +30,4 @@ typedef double DoseValueRel;
 
 } // namespace mitk
 
-#endif //_MITK_DOSE_VALUE_TYPE_H_
+#endif

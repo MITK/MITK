@@ -67,4 +67,4 @@ private:
   mitk::MessageDelegate2<QmitkUSNavigationCalibrationsDataModel, const std::string&, const std::string&> m_ListenerDeviceChanged;
 };
 
-#endif // QMITKUSNAVIGATIONCALIBRATIONSDATAMODEL_H
+#endif

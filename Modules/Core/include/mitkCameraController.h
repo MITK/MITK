@@ -109,4 +109,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* CAMERACONTROLLER_H_HEADER_INCLUDED_C1C53722 */
+#endif

@@ -118,4 +118,4 @@ protected:
   bool m_WidgetIsCustom;
 };
 
-#endif /* MITKOVERLAY_H_HEADER_INCLUDED_C10DC4EB */
+#endif

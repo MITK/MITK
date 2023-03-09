@@ -134,4 +134,4 @@ namespace mitk {
     AGC_MODE_TYPE m_agc;
   };
 } // namespace mitk
-#endif /* MITKMIRCOBIRDTRACKINGDEVICE_H_HEADER_INCLUDED*/
+#endif

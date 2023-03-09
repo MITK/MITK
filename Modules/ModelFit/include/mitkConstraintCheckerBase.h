@@ -59,4 +59,4 @@ private:
 
 }
 
-#endif // ConstraintCheckerBase_H
+#endif

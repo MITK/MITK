@@ -100,4 +100,4 @@ namespace mitk
   };
 
 } // namespace mitk
-#endif // SCALELEGENDAnnotation_H
+#endif

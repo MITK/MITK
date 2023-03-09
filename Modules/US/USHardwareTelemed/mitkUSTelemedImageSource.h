@@ -74,4 +74,4 @@ protected:
 };
 } // namespace mitk
 
-#endif // MITKUSTelemedImageSource_H
+#endif

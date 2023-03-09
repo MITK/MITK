@@ -75,4 +75,4 @@ protected:
 
 };
 
-#endif // QMITKDATASTORAGEDEFAULTLISTMODEL_H
+#endif

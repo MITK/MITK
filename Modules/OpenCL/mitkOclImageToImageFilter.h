@@ -75,4 +75,4 @@ private:
 
 };
 }
-#endif // __mitkOclImageToImageFilter_h
+#endif

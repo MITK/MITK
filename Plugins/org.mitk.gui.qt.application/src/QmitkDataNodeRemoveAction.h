@@ -51,4 +51,4 @@ private:
 
 };
 
-#endif // QMITKDATANODEREMOVEACTION_H
+#endif

@@ -325,4 +325,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif /* MITKSLICEDGEOMETRY3D_H_HEADER_INCLUDED_C1EBD0AD */
+#endif

@@ -615,4 +615,4 @@ namespace mitk
   MITKCORE_EXPORT std::ostream &operator<<(std::ostream &o, DataNode::Pointer &dtn);
 } // namespace mitk
 
-#endif /* DATATREENODE_H_HEADER_INCLUDED_C1E14338 */
+#endif

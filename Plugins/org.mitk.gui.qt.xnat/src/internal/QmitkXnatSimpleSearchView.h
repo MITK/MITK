@@ -77,4 +77,4 @@ private:
 
 };
 
-#endif // QMITKXNATSIMPLESEARCHVIEW_H
+#endif

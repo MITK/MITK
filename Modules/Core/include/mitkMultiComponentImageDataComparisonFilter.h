@@ -82,4 +82,4 @@ namespace mitk
   };
 } // end namespace mitk
 
-#endif // MITKMULTICOMPONENTIMAGEDATACOMPARISONFILTER_H
+#endif

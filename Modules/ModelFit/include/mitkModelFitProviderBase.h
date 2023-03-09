@@ -81,4 +81,4 @@ namespace mitk
 #include "mitkModelFitProviderBase.tpp"
 #endif
 
-#endif /* __MODEL_FIT_PROVIDER_BASE_H */
+#endif

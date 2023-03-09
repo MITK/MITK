@@ -45,4 +45,4 @@ namespace mitk
     };
 
 }
-#endif // REDUCEDCHISQUAREFITCOSTFUNCTION_H
+#endif

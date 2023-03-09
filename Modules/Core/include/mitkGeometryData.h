@@ -65,4 +65,4 @@ namespace mitk
                              bool verbose);
 
 } // namespace mitk
-#endif /* MITKGEOMETRYDATA_H_HEADER_INCLUDED_C19C01E2 */
+#endif

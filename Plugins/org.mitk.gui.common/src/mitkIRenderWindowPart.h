@@ -215,4 +215,4 @@ struct MITK_GUI_COMMON_PLUGIN IRenderWindowPart {
 
 Q_DECLARE_INTERFACE(mitk::IRenderWindowPart, "org.mitk.ui.IRenderWindowPart")
 
-#endif // MITKIRENDERWINDOWPART_H
+#endif

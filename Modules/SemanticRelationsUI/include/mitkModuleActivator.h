@@ -39,4 +39,4 @@ namespace mitk
     std::unique_ptr<mitk::IDataStorageInspectorProvider> m_PatientTableInspector;
   };
 }
-#endif // MITKMODULEACTIVATOR_H
+#endif

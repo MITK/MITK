@@ -59,4 +59,4 @@ namespace mitk
   };
 }
 
-#endif // MITKWHITELISTREADEROPTIONSFUNCTOR_H
+#endif

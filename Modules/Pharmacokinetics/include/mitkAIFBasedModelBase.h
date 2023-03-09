@@ -111,4 +111,4 @@ namespace mitk
 
   };
 }
-#endif // AIFBASEDMODELBASE_H
+#endif

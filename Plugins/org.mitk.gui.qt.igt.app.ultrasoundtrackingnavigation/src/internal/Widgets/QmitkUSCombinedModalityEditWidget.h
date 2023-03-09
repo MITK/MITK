@@ -54,4 +54,4 @@ private:
   Ui::QmitkUSCombinedModalityEditWidget*           ui;
 };
 
-#endif // QMITKUSCOMBINEDMODALITYEDITWIDGET_H
+#endif

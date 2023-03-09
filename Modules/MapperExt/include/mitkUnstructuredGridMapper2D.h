@@ -104,4 +104,4 @@ namespace mitk
   };
 
 } // namespace mitk
-#endif /* MitkPointSetSliceLMapper2D_H */
+#endif

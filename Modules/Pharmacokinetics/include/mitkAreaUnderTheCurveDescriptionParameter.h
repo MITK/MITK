@@ -42,4 +42,4 @@ namespace  mitk
     };
 }
 
-#endif // MITKAREAUNDERTHECURVEDESCRIPTIONPARAMETER_H
+#endif

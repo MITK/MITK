@@ -64,4 +64,4 @@ namespace mitk
   };
 }
 
-#endif // MITKMIMETYPEPROVIDER_H
+#endif

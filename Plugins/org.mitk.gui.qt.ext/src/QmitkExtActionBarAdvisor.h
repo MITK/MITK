@@ -78,4 +78,4 @@ private:
   berry::IWorkbenchWindow* window;
 };
 
-#endif /*QMITKEXTACTIONBARADVISOR_H_*/
+#endif

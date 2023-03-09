@@ -236,4 +236,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif // __mitkLabelSet_H_
+#endif

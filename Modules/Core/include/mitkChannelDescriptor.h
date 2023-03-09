@@ -73,4 +73,4 @@ namespace mitk
   };
 
 } // end namespace mitk
-#endif // MITKCHANNELDESCRIPTOR_H
+#endif

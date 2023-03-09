@@ -92,4 +92,4 @@ MITKOPENCL_EXPORT void GetSupportedImageFormats(cl_context _context, cl_mem_obje
 */
 MITKOPENCL_EXPORT std::string GetImageTypeAsString( const unsigned int _in);
 
-#endif //mitkOclUtils_h
+#endif

@@ -20,4 +20,4 @@ found in the LICENSE file.
 #include <CL/cl.h>
 #endif
 
-#endif /* MITKOPENCL_H_HEADER_INCLUDED */
+#endif

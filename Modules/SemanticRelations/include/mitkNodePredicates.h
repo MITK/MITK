@@ -40,4 +40,4 @@ namespace mitk
   } // namespace NodePredicates
 } // namespace mitk
 
-#endif // MITKNODEPREDICATES_H
+#endif

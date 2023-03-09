@@ -87,4 +87,4 @@ namespace mitk
     void GenerateData() override;
   };
 } // namespace mitk
-#endif /* MITKNAVIGATIONDATATOMESSAGEFILTER_H_HEADER_INCLUDED_ */
+#endif

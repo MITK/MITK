@@ -48,4 +48,4 @@ struct MITK_CORE_SERVICES_PLUGIN IDataStorageService
 
 Q_DECLARE_INTERFACE(mitk::IDataStorageService, "org.mitk.service.IDataStorageService")
 
-#endif /*MITKIDATASTORAGESERVICE_H_*/
+#endif

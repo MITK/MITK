@@ -57,5 +57,4 @@ private:
 
 };
 
-#endif // QmitkFitPlotDataModel_h
-
+#endif

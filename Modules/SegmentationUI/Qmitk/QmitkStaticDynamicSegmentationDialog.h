@@ -48,4 +48,4 @@ private:
   const mitk::Image* m_ReferenceImage;
 };
 
-#endif // QMITKSTATICDYNAMICSEGMENTATIONDIALOG_H
+#endif

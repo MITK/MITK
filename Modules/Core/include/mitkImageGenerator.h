@@ -233,4 +233,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif /* ImageGenerator_H_HEADER_INCLUDED */
+#endif

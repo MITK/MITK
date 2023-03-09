@@ -146,4 +146,4 @@ protected:
     QString m_DatabaseDirectory;
 };
 
-#endif // QmitkDicomBrowser_h
+#endif

@@ -63,4 +63,4 @@ private:
 
 };
 
-#endif // QMITKMULTIWIDGETCONFIGURATIONTOOLBAR_H
+#endif

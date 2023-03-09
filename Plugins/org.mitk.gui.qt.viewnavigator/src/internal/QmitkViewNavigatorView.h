@@ -41,4 +41,4 @@ private:
 
 };
 
-#endif // QMITKVIEWNAVIGATORVIEW_H
+#endif

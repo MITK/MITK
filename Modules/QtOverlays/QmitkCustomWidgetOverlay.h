@@ -52,4 +52,4 @@ public:
   QSize GetNeededSize() override;
 };
 
-#endif /* QmitkCustomWidgetOverlay_H_HEADER_INCLUDED_C10DC4EB */
+#endif

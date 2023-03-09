@@ -45,4 +45,4 @@ private:
 
 };
 
-#endif // __QmitkConvertSurfaceToLabelAction_H_
+#endif

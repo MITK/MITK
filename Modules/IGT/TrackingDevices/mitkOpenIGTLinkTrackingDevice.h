@@ -171,4 +171,4 @@ namespace mitk
     mitk::NavigationTool::Pointer ConstructDefaultOpenIGTLinkTool(std::string name, std::string identifier);
   };
 }//mitk
-#endif /* MITKOpenIGTLinkTRACKINGDEVICE_H_HEADER_INCLUDED_ */
+#endif

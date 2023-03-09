@@ -28,4 +28,4 @@ namespace mitk
   } // namespace BaseRendererHelper
 } // namespace mitk
 
-#endif // MITKBASERENDERERHELPER_H
+#endif

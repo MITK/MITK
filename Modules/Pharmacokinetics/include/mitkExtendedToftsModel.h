@@ -103,4 +103,4 @@ namespace mitk
   };
 }
 
-#endif // MITKEXTENDEDTOFTSMODEL_H
+#endif

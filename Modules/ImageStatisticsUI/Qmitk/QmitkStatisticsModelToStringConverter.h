@@ -60,4 +60,4 @@ private:
 
 };
 
-#endif // QmitkTableModelToQString_H__INCLUDED
+#endif

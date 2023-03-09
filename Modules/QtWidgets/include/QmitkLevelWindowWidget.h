@@ -34,4 +34,4 @@ protected:
   // unsigned long m_ObserverTag;
   mitk::LevelWindowManager::Pointer m_Manager;
 };
-#endif /*QMITKLEVELWINDOWWIDGET_H_*/
+#endif

@@ -74,4 +74,4 @@ protected:
  Moved to header in order to be reusabel for other ModelFitUI widgets.*/
 std::string SanatizeString(std::string str);
 
-#endif // QmitkFitParameterWidget_H
+#endif

@@ -71,4 +71,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* FileWriterRegistry_H_HEADER_INCLUDED_C1E7E521 */
+#endif

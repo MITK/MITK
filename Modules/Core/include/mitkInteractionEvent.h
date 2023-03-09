@@ -143,4 +143,4 @@ namespace mitk
 
 } /* namespace mitk */
 
-#endif /* MITKINTERACTIONEVENT_H_ */
+#endif

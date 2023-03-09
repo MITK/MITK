@@ -93,4 +93,4 @@ namespace mitk
   };
 }
 
-#endif // MITKEXTENDEDONETISSUECOMPARTMENTMODEL_H
+#endif

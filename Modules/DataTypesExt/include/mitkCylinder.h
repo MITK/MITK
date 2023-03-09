@@ -36,4 +36,4 @@ namespace mitk
     ~Cylinder() override;
   };
 }
-#endif /* MITKCYLINDER_H_HEADER_INCLUDED */
+#endif

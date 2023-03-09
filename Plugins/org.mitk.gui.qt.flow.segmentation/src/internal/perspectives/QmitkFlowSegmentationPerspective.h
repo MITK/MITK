@@ -29,4 +29,4 @@ public:
 
 };
 
-#endif /* QMITKFLOWSEGMENTATIONPERSPECTIVE_H_ */
+#endif

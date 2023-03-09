@@ -36,4 +36,4 @@ namespace mitk {
   };
 }
 
-#endif // MITKNavigationDataSetWriterCSV_H_HEADER_INCLUDED_
+#endif

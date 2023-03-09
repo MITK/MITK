@@ -154,4 +154,4 @@ private:
 };
 
 }
-#endif // CONCENTRATIONCURVEGENERATOR_H
+#endif

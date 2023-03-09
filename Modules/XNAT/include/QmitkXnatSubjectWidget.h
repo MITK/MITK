@@ -49,4 +49,4 @@ private:
   ctkXnatSubject *m_Subject;
 };
 
-#endif // QMITKXNATSUBJECTWIDGET_H
+#endif

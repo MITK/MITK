@@ -47,4 +47,4 @@ namespace mitk
 
 } // end of namespace mitk
 
-#endif // MITKXNATSESSIONTRACKER_H
+#endif

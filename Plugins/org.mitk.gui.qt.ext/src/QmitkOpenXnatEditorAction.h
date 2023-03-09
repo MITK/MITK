@@ -38,4 +38,4 @@ private:
 };
 
 
-#endif /*QMITKOPENXNATEDITORACTION_H_*/
+#endif

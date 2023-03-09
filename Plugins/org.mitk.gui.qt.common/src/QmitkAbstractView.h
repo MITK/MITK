@@ -353,4 +353,4 @@ private:
 
 };
 
-#endif /*QMITKABSTRACTVIEW_H_*/
+#endif

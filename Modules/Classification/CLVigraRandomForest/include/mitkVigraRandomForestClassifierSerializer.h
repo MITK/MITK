@@ -36,4 +36,4 @@ protected:
 
 }
 
-#endif // MITKCONTOURMODELSETSERIALIZER_H
+#endif

@@ -49,4 +49,4 @@ private:
   Ui::QmitkConfirmSegmentationDialog *m_Controls;
 };
 
-#endif // QMITKCONFIRMSEGMENTATIONDIALOG_H
+#endif

@@ -118,5 +118,4 @@ private:
     ::map::algorithm::RegistrationAlgorithmBase::Pointer m_LoadedAlgorithm;
 };
 
-#endif // MatchPoint_h
-
+#endif

@@ -212,4 +212,4 @@ namespace mitk
     MemberCommandType::Pointer m_ImageMapperDeletedCommand;
   };
 } // namespace mitk
-#endif /* MITKGEOMETRY2DDATAVTKMAPPER3D_H_HEADER_INCLUDED_C196C71F */
+#endif

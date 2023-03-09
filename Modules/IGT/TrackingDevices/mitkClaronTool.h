@@ -78,4 +78,4 @@ namespace mitk
     std::string m_Filename;
   };
 }//mitk
-#endif // MITKCLARONTOOL_H_HEADER_INCLUDED_
+#endif

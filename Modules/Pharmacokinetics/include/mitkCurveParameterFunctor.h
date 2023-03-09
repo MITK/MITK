@@ -70,4 +70,4 @@ namespace mitk
 
 }
 
-#endif // CURVE_PARAMETER_FUNCTOR_H
+#endif

@@ -56,4 +56,4 @@ private:
   us::ServiceReference<mitk::IPythonService> m_PythonServiceRef;
 };
 
-#endif // QmitkPythonVariableStackTableModel_h
+#endif

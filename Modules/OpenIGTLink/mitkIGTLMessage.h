@@ -192,4 +192,4 @@ namespace mitk {
                                           bool verbose = false );
 
 } // namespace mitk
-#endif /* MITKIGTLMESSAGEH_HEADER_INCLUDED_ */
+#endif

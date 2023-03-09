@@ -114,4 +114,4 @@ namespace mitk
 }
 
 
-#endif // LEVENBERGMARQUARDTMODELFITFUNCTOR_H
+#endif

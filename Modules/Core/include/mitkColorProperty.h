@@ -93,4 +93,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKCOLORPROPERTY_H_HEADER_INCLUDED_C17953D1 */
+#endif

@@ -128,4 +128,4 @@ namespace mitk
 }
 
 
-#endif //DESCRIPTIVEPHARMACOKINETICBRIXMODEL_H
+#endif

@@ -62,4 +62,4 @@ protected:
   bool m_allowSampling;
 };
 
-#endif // QmitkMapperSettingsWidget_H
+#endif

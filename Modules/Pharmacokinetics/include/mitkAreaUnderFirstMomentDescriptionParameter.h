@@ -42,4 +42,4 @@ namespace  mitk
     };
 }
 
-#endif // MITKAREAUNDERFIRSTMOMENTDESCRIPTIONPARAMETER_H
+#endif

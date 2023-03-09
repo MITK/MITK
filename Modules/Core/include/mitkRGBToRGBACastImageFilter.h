@@ -78,4 +78,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKRGBTORGBACASTIMAGEFILTER_H_HEADER_INCLUDED */
+#endif

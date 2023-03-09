@@ -50,4 +50,4 @@ namespace mitk
   * templated GetPropertyValue() method in mitkPropertyList.cpp!
   */
 } // namespace mitk
-#endif /* MITKPROPERTIES_H_HEADER_INCLUDED */
+#endif

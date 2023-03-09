@@ -82,4 +82,4 @@ namespace mitk {
   };
 } // namespace mitk
 
-#endif /* MITKNavigationDataTransformFilter_H_HEADER_INCLUDED_ */
+#endif

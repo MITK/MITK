@@ -90,4 +90,4 @@ namespace mitk {
     std::map<int,Transform::Pointer> m_HandEyeTransformations;
   };
 } // namespace mitk
-#endif /* MITKNavigationDataHandEyeCalibrationFilter_H_HEADER_INCLUDED_ */
+#endif

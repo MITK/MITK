@@ -149,4 +149,4 @@ private:
 * @brief Return true, if the nodes in the list of two given selections are equal (Sorting is ignored. Any permutation is valid.)*/
 bool MITKQTWIDGETS_EXPORT EqualNodeSelections(const QList<mitk::DataNode::Pointer>& selection1, const QList<mitk::DataNode::Pointer>& selection2);
 
-#endif // QMITKMODELVIEWSELECTIONCONNECTOR_H
+#endif

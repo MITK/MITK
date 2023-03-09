@@ -75,4 +75,4 @@ namespace mitk
   }
 }
 
-#endif /* MITKEQUAL_H_ */
+#endif

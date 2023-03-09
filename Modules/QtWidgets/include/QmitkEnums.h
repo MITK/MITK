@@ -20,4 +20,4 @@ enum QmitkItemModelRole
   QmitkDataNodeRawPointerRole = 65
 };
 
-#endif /* QMITKENUMS_H_ */
+#endif

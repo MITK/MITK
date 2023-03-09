@@ -63,4 +63,4 @@ private:
   unsigned long m_CommandTag;
 };
 
-#endif // _QMITKVIEWINITIALIZATIONVIEW_H_INCLUDED
+#endif

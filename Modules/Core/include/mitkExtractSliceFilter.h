@@ -205,4 +205,4 @@ namespace mitk
   };
 }
 
-#endif // mitkExtractSliceFilter_h_Included
+#endif

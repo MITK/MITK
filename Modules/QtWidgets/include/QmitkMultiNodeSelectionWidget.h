@@ -76,4 +76,4 @@ protected:
   Ui_QmitkMultiNodeSelectionWidget m_Controls;
 };
 
-#endif // QMITK_MULTI_NODE_SELECTION_WIDGET_H
+#endif

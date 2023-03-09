@@ -66,4 +66,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKSURFACEDATASOURCE_H_HEADER_INCLUDED_C10B4740 */
+#endif

@@ -189,4 +189,4 @@ private:
   QVariant m_MaxValueYView;
 };
 
-#endif  //QmitkC3Data_h
+#endif

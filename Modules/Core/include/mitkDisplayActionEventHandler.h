@@ -112,4 +112,4 @@ namespace mitk
 
 } // end namespace mitk
 
-#endif // MITKDISPLAYACTIONEVENTHANDLER_H
+#endif

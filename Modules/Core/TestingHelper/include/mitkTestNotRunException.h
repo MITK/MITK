@@ -37,4 +37,4 @@ namespace mitk
   };
 }
 
-#endif // MITKTESTNOTRUNEXCEPTION_H
+#endif

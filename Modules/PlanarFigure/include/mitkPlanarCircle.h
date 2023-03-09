@@ -102,4 +102,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif //_MITK_PLANAR_CIRCLE_H_
+#endif

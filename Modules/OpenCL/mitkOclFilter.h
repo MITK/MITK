@@ -154,4 +154,4 @@ protected:
   void LoadSourceFiles(CStringList &SourceCodeList, ClSizeList &SourceCodeSizeList);
 };
 }
-#endif // __mitkOclFilter_h
+#endif

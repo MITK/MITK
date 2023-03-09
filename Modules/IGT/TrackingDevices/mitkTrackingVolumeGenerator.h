@@ -99,6 +99,4 @@ class MITKIGT_EXPORT TrackingVolumeGenerator : public mitk::SurfaceSource
       void GenerateData() override;
   };
 }
-#endif // MITKTRACKINGVOLUMEGENERATOR_H
-
-
+#endif

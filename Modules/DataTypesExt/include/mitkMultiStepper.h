@@ -58,4 +58,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MULTISTEPPER_H_HEADER_INCLUDED */
+#endif

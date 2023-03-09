@@ -153,4 +153,4 @@ namespace mitk
                              ScalarType eps,
                              bool verbose);
 }
-#endif /* MITKGEOMETRYTRANSFORMHOLDER_H_ */
+#endif

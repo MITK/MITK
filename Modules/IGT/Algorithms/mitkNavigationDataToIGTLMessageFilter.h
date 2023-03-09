@@ -166,4 +166,4 @@ namespace mitk {
     /** Measurement class to calculate latency and frame count */
   };
 } // namespace mitk
-#endif // _MITKNAVIGATIONDATATOIGTLMessageFILTER_H__
+#endif

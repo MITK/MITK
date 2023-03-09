@@ -138,4 +138,4 @@ namespace mitk
   };
 }
 
-#endif // MITKIMAGEACCESSOR_H
+#endif

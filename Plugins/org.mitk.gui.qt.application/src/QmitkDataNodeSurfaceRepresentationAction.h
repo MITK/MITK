@@ -40,4 +40,4 @@ protected:
 
 };
 
-#endif // QMITKDATANODESURFACEREPRESENTATIONACTION_H
+#endif

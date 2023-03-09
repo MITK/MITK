@@ -133,4 +133,4 @@ namespace mitk
     bool m_CapturePaused;
   };
 }
-#endif // Header
+#endif

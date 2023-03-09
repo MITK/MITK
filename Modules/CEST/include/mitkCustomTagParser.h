@@ -136,4 +136,4 @@ namespace mitk
 
 }
 
-#endif // MITKCUSTOMTAGPARSER_H
+#endif

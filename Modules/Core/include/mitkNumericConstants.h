@@ -24,4 +24,4 @@ namespace mitk
   MITKCORE_EXPORT extern const double large;
 }
 
-#endif // MITKNUMERICCONSTANTS_H_
+#endif

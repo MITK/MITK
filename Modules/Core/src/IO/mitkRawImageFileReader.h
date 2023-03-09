@@ -48,4 +48,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKRAWIMAGEFILEREADER_H_ */
+#endif

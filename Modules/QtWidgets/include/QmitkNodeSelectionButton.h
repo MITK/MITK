@@ -68,4 +68,4 @@ protected:
   bool m_NodeObserved;
 };
 
-#endif // QMITK_NODE_SELECTION_BUTTON_H
+#endif

@@ -56,4 +56,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKNODEPREDICATECOMPOSITEBASE_H_HEADER_INCLUDED_ */
+#endif

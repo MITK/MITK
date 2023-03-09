@@ -139,4 +139,4 @@ namespace mitk
     return result;                                                                                                     \
   }
 
-#endif /* MITKGENERICPROPERTY_H_HEADER_INCLUDED_C1061CEE */
+#endif

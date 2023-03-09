@@ -52,4 +52,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* IMAGECHANNELSELECTOR_H_HEADER_INCLUDED_C1E4F4E7 */
+#endif

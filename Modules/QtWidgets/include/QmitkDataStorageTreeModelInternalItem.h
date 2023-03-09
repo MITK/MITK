@@ -94,4 +94,4 @@ found in the LICENSE file.
     mitk::WeakPointer<mitk::DataNode> m_DataNode;
   };
 
-#endif /* QMITKDATASTORAGETREEMODEL_H_ */
+#endif

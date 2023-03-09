@@ -73,5 +73,4 @@ private:
 
 };
 
-#endif // QmitkFitParameterModel_h
-
+#endif

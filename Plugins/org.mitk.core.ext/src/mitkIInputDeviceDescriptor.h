@@ -83,4 +83,4 @@ namespace mitk
   }; // end struct IInputDeviceDescriptor
 } //end namespace mitk
 
-#endif /*MITKIINPUTDEVICEDESCRIPTOR_H_*/
+#endif

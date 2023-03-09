@@ -154,5 +154,4 @@ private:
     bool m_preparedForBinaryInput;
 };
 
-#endif // MatchPoint_h
-
+#endif

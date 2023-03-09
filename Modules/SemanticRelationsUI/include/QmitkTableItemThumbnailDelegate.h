@@ -29,4 +29,4 @@ public:
   void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 };
 
-#endif // QMITKTABLEITEMTHUMBNAILDELEGATE_H
+#endif

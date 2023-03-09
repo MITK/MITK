@@ -135,4 +135,4 @@ private:
   bool m_SurfaceDecimation;
 };
 
-#endif // QMITKDATANODECONTEXTMENU_H
+#endif

@@ -82,4 +82,4 @@ private:
 
 } // namespace mitk
 
-#endif /* MovieGeneratorOpenCV_H_HEADER_INCLUDED */
+#endif

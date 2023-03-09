@@ -21,4 +21,4 @@ found in the LICENSE file.
 #define MITK_FATAL MBI_FATAL
 #define MITK_DEBUG MBI_DEBUG
 
-#endif /*__MITK_LOG_H__*/
+#endif

@@ -35,4 +35,4 @@ public:
   QString m_Description;
 };
 
-#endif // QMITKVIEWITEM_H
+#endif

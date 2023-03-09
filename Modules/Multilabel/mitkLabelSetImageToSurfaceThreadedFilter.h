@@ -43,4 +43,4 @@ namespace mitk
 
 } // namespace
 
-#endif // __mitkLabelSetImageToSurfaceThreadedFilter_H_
+#endif

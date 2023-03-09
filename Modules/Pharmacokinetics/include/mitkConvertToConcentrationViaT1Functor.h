@@ -76,4 +76,4 @@ namespace mitk {
     };
 
 }
-#endif // MITKCONVERTTOCONCENTRATIONVIAT1CALCFUNCTOR_H
+#endif

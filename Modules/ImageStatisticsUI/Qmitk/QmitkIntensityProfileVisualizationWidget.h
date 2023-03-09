@@ -61,4 +61,4 @@ private:
 	std::vector<double> m_IntensityProfileList;
 };
 
-#endif //QmitkIntensityProfileVisualizationWidget_H__INCLUDED
+#endif

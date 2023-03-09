@@ -47,4 +47,4 @@ namespace mitk {
 
 } // namespace mitk
 
-#endif // MITKNavigationDataReaderXML_H_HEADER_INCLUDED_
+#endif

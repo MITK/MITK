@@ -53,4 +53,4 @@ private:
 
 };
 
-#endif // QMITKNODEDETAILSDIALOG_H
+#endif

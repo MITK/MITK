@@ -91,4 +91,4 @@ namespace mitk
   };
 
 } // namespace mitk
-#endif // COLORBARAnnotation_H
+#endif

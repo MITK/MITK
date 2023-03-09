@@ -38,4 +38,4 @@ private:
 };
 
 
-#endif /*QMITKOPENDICOMEDITORACTION_H_*/
+#endif

@@ -114,4 +114,4 @@ private:
 
 };
 
-#endif // QMITKDATAMANAGERVIEW_H
+#endif

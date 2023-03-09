@@ -29,4 +29,4 @@ public:
   void CreateInitialLayout(berry::IPageLayout::Pointer layout) override;
 };
 
-#endif /* QmitkVisualizationPerspective_H_ */
+#endif

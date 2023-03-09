@@ -66,4 +66,4 @@ namespace mitk
   };
 } // end of namespace mitk
 
-#endif // __mitkLabelSetImageIO_h
+#endif

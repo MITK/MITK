@@ -44,4 +44,4 @@ private:
   ctkPluginContext* context;
 };
 
-#endif /* QMITKEXTAPPLICATIONPLUGIN_H_ */
+#endif

@@ -92,4 +92,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKGLMAPPER2D_H_HEADER_INCLUDED_C197C872 */
+#endif

@@ -163,4 +163,4 @@ private:
 
 };
 
-#endif // QMITKABSTRACTRENDEREDITOR_H
+#endif

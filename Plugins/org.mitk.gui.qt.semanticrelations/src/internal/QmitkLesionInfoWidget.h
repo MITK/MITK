@@ -100,4 +100,4 @@ private:
 
 };
 
-#endif // QMITKLESIONINFOWIDGET_H
+#endif

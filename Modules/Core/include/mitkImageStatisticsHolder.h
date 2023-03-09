@@ -173,4 +173,4 @@ namespace mitk
   };
 
 } // end namespace
-#endif // MITKIMAGESTATISTICSHOLDER_H
+#endif

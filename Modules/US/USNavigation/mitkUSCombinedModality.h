@@ -70,4 +70,4 @@ namespace mitk {
   };
 } // namespace mitk
 
-#endif // MITKUSCombinedModality_H_HEADER_INCLUDED_
+#endif

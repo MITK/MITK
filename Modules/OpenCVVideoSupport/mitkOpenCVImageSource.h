@@ -36,4 +36,4 @@ namespace mitk
   };
 }
 
-#endif // MITKOPENCVIMAGESOURCE_H
+#endif

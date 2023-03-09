@@ -155,4 +155,4 @@ private:
     mitk::AffineTransform3D::MatrixType m_FOVRefOrientation;
 };
 
-#endif // MatchPoint_h
+#endif

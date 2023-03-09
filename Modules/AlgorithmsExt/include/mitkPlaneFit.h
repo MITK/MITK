@@ -135,4 +135,4 @@ namespace mitk
     std::vector<mitk::Vector3D> m_PlaneVectors;
   };
 } // namespace mitk
-#endif // MITK_PLANFIT_INCLUDE_
+#endif

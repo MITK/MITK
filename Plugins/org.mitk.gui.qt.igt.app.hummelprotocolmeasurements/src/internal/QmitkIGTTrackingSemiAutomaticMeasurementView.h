@@ -117,4 +117,4 @@ protected:
   bool m_tracking;
 };
 
-#endif // _QMITKIGTTRACKINGSEMIAUTOMATICMEASUREMENTVIEW_H_INCLUDED
+#endif

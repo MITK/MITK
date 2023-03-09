@@ -52,4 +52,4 @@ namespace mitk
   }
 }
 
-#endif // mitkScalarListLookupTablePropertySerializer_h
+#endif

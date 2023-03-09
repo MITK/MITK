@@ -30,4 +30,4 @@ public:
 
 };
 
-#endif /*QMITKEXTAPPWORKBENCHADVISOR_H_*/
+#endif

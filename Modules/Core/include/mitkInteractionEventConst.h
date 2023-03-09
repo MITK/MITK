@@ -72,4 +72,4 @@ namespace mitk
   };
 
 } // namespace mitk
-#endif // ifndef MITKINTERACTEVENTCONST_H
+#endif

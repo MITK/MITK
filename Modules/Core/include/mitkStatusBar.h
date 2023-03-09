@@ -89,4 +89,4 @@ namespace mitk
   };
 
 } // end namespace mitk
-#endif /* define MITKSTATUSBAR_H */
+#endif

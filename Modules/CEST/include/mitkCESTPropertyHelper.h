@@ -57,4 +57,4 @@ namespace mitk
   double MITKCEST_EXPORT GetCESTDutyCycle(const IPropertyProvider* provider);
 }
 
-#endif // __CEST_PROERTY_HELPER_H
+#endif

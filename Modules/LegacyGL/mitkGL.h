@@ -24,4 +24,4 @@ found in the LICENSE file.
 #include "OpenGL/gl.h"
 #endif
 
-#endif /* MITKGL_H_HEADER_INCLUDED_C1C53722 */
+#endif

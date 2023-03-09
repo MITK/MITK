@@ -52,4 +52,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* VtkSurfaceReader_H_HEADER_INCLUDED */
+#endif

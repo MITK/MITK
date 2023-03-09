@@ -201,4 +201,4 @@ namespace mitk {
     };
 } // namespace mitk
 
-#endif /* MITKTRACKINGDEVICE_H_HEADER_INCLUDED_C1C2FCD2 */
+#endif

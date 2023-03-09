@@ -87,4 +87,4 @@ private:
     QmitkMeasurementViewData* d;
 };
 
-#endif // QMITK_MEASUREMENT_H__INCLUDED
+#endif

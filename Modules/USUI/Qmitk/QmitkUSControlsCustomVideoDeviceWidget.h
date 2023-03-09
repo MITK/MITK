@@ -98,4 +98,4 @@ private:
   mitk::USVideoDeviceCustomControls::Pointer  m_ControlInterface;
 };
 
-#endif // QmitkUSControlsCustomVideoDeviceWidget_H
+#endif

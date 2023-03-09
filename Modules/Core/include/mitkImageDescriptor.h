@@ -119,4 +119,4 @@ namespace mitk
   };
 
 } // end namespace
-#endif // MITKIMAGEDESCRIPTOR_H
+#endif

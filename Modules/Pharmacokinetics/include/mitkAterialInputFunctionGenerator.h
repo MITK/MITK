@@ -104,4 +104,4 @@ namespace mitk
 
 }
 
-#endif // ATERIALINPUTFUNCTIONGENERATOR_H
+#endif

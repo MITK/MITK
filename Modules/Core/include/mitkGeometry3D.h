@@ -72,4 +72,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif /* GEOMETRY3D_H_HEADER_INCLUDED_C1EBD0AD */
+#endif

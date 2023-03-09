@@ -56,4 +56,4 @@ namespace mitk
 }
 
 
-#endif // IndexedValueFunctorPolicy_H
+#endif

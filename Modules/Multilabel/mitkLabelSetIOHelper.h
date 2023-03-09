@@ -95,4 +95,4 @@ namespace mitk
   };
 }
 
-#endif // __mitkLabelSetIOHelper_h
+#endif

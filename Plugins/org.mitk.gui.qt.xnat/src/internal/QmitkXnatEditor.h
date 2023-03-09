@@ -119,4 +119,4 @@ private:
     const berry::ISelection::ConstPointer& selection);
 };
 
-#endif // QMITKXNATEDITOR_h
+#endif

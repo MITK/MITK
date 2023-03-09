@@ -53,4 +53,4 @@ protected:
   QmitkSimpleTextOverlayWidget* m_Overlay;
 };
 
-#endif // QMITKDATASTORAGESELECTIONHISTORYINSPECTOR_H
+#endif

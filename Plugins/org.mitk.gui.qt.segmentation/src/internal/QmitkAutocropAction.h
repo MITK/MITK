@@ -47,4 +47,4 @@ private:
 
 };
 
-#endif // QMITK_AUTOCROPACTION_H
+#endif

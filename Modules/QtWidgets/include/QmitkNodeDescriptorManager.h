@@ -111,4 +111,4 @@ protected:
   QList<QmitkNodeDescriptor*> m_NodeDescriptors;
 };
 
-#endif // QmitkNodeDescriptorManager_h
+#endif

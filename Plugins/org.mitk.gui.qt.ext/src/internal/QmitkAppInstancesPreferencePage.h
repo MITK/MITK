@@ -44,4 +44,4 @@ private:
   QWidget* mainWidget;
 };
 
-#endif /* QMITKAPPINSTANCESPREFERENCEPAGE_H_ */
+#endif

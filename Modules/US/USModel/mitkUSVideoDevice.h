@@ -245,4 +245,4 @@ namespace mitk {
   };
 } // namespace mitk
 
-#endif // MITKUSVideoDevice_H_HEADER_INCLUDED_
+#endif

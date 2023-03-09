@@ -74,4 +74,4 @@ protected:
 
 };
 
-#endif // QmitkSimpleBarrierManagerWidget_H
+#endif

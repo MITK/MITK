@@ -67,4 +67,4 @@ namespace mitk
   } // namespace LabelSetImageHelper
 } // namespace mitk
 
-#endif // MITKLABELSETIMAGEHELPER_H
+#endif

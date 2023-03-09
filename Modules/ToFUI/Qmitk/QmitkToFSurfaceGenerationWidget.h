@@ -152,4 +152,4 @@ protected slots:
 
 };
 
-#endif // _QMITKTOFVISUALISATIONSETTINGSWIDGET_H_INCLUDED
+#endif

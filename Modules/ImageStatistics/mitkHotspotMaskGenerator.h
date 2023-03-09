@@ -175,6 +175,4 @@ namespace mitk
         unsigned long m_InternalMaskUpdateTime;
     };
 }
-#endif // MITKHOTSPOTCALCULATOR
-
-
+#endif

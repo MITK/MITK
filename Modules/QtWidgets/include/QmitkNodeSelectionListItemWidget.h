@@ -49,4 +49,4 @@ protected:
 };
 
 
-#endif // QMITK_NODE_SELECTION_LIST_ITEM_WIDGET_H
+#endif

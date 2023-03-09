@@ -96,4 +96,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif //_MITK_PLANAR_ELLIPSE_H_
+#endif

@@ -46,4 +46,4 @@ class QmitkDicomDataEventPublisher : public QObject
 
         void SignalRemoveSeriesFromStorage(const ctkDictionary&);
 };
-#endif // QmitkDicomDataEventPublisher_H
+#endif

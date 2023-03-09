@@ -97,4 +97,4 @@ namespace mitk
 
 }
 
-#endif // __MITK_PIXEL_BASED_DESCRIPTION_PARAMETER_IMAGE_GENERATOR_H_
+#endif

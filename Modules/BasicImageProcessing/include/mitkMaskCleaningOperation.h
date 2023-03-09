@@ -55,4 +55,4 @@ namespace mitk
 
 
 }
-#endif // mitkMaskClearningOperation_h
+#endif

@@ -68,4 +68,4 @@ namespace mitk
   };
 
 } // namespace mitk
-#endif // Annotation_H
+#endif

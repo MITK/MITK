@@ -141,4 +141,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* STEPPER_H_HEADER_INCLUDED_C1E77191 */
+#endif

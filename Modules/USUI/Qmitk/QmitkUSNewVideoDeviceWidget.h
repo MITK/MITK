@@ -162,4 +162,4 @@ protected:
   std::vector<mitk::USProbe::Pointer> m_ConfigProbes;
 };
 
-#endif // _QmitkUSNewVideoDeviceWidget_H_INCLUDED
+#endif

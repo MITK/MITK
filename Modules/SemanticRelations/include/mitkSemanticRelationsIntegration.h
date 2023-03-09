@@ -319,4 +319,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif // MITKSEMANTICRELATIONSINTEGRATION_H
+#endif

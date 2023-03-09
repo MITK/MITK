@@ -49,4 +49,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* VtkLoggingAdapter_H_HEADER_INCLUDED */
+#endif

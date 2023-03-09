@@ -55,4 +55,4 @@ private:
   mitk::USControlInterfaceProbes::Pointer  m_ControlInterface;
 };
 
-#endif // QMITKUSCONTROLSPROBESWIDGET_H
+#endif

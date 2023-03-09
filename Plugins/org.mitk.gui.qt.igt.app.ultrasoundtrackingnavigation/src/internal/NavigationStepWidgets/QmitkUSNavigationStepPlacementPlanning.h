@@ -141,4 +141,4 @@ private:
   Ui::QmitkUSNavigationStepPlacementPlanning *ui;
 };
 
-#endif // QMITKUSNAVIGATIONSTEPPLACEMENTPLANNING_H
+#endif

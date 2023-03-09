@@ -44,4 +44,4 @@ namespace mitk
 
 }
 
-#endif // MITKCESTIOActivator_H
+#endif

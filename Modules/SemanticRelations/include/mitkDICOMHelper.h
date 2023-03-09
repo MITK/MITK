@@ -123,4 +123,4 @@ namespace mitk
   MITKSEMANTICRELATIONS_EXPORT std::string TrimDICOM(const std::string& identifier);
 } // namespace mitk
 
-#endif // MITKDICOMHELPER_H
+#endif

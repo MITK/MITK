@@ -199,4 +199,4 @@ namespace mitk
 #endif
 }
 
-#endif //_MITK_SURFACE_VTK_WRITER__H_
+#endif

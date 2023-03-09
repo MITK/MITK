@@ -37,4 +37,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif //mitkOpenIGTLinkTypeInformation_h
+#endif

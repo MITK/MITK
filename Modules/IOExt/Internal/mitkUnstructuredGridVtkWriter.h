@@ -136,4 +136,4 @@ namespace mitk
   };
 }
 
-#endif // _MITK_UNSTRUCTURED_GRID_VTK_WRITER__H_
+#endif

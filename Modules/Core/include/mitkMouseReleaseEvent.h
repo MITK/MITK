@@ -57,4 +57,4 @@ namespace mitk
   };
 } /* namespace mitk */
 
-#endif /* MITKMOUSERELEASEEVENT_H_ */
+#endif

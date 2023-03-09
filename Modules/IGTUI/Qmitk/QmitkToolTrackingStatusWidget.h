@@ -134,4 +134,4 @@ private:
   us::ModuleContext* m_Context;
 
 };
-#endif // _QmitkToolTrackingStatusWidget_H_INCLUDED
+#endif

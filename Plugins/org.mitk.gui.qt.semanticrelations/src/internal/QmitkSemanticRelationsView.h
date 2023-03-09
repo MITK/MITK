@@ -103,4 +103,4 @@ private:
   QmitkSemanticRelationsContextMenu* m_ContextMenu;
 };
 
-#endif // QMITKSEMANTICRELATIONSVIEW_H
+#endif

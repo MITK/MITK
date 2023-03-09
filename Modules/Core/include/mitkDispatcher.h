@@ -124,4 +124,4 @@ namespace mitk
   };
 
 } /* namespace mitk */
-#endif /* mitkDispatcher_h */
+#endif

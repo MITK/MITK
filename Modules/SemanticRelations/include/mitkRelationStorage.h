@@ -76,4 +76,4 @@ namespace mitk
   } // namespace RelationStorage
 } // namespace mitk
 
-#endif // MITKRELATIONSTORAGE_H
+#endif

@@ -57,5 +57,4 @@ private:
   QScopedPointer<QmitkViewCoordinator> m_ViewCoordinator;
 };
 
-#endif /* QMITKCOMMONACTIVATOR_H_ */
-
+#endif

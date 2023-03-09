@@ -76,4 +76,4 @@ public:
 };
 
 MITK_DECLARE_SERVICE_INTERFACE(OclResourceService, "OpenCLResourceService/1.0")
-#endif // __mitkOclResourceService_h
+#endif

@@ -80,4 +80,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /*  _MITK_ExampleDataStructure_H */
+#endif

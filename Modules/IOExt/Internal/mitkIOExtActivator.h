@@ -38,4 +38,4 @@ namespace mitk
   };
 }
 
-#endif // MITKIOEXTACTIVATOR_H
+#endif

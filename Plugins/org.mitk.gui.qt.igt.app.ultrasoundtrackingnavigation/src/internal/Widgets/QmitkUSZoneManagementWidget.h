@@ -147,4 +147,4 @@ private:
   unsigned int m_CurMaxNumOfZones;
 };
 
-#endif // QMITKUSZONEMANAGEMENTWIDGET_H
+#endif

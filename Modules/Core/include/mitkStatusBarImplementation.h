@@ -57,4 +57,4 @@ namespace mitk
   };
 
 } // end namespace mitk
-#endif /* define MITKSTATUSBARIMPLEMENTATION_H */
+#endif

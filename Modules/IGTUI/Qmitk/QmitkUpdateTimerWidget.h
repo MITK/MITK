@@ -137,5 +137,4 @@ private:
   void SetFrameRateLabel();
 
 };
-#endif // _QmitkUpdateTimerWidget_H_INCLUDED
-
+#endif

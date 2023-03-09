@@ -92,4 +92,4 @@ private:
   void UpdateMeasurementList();
 };
 
-#endif // QMITK_MEASUREMENT_H__INCLUDED
+#endif

@@ -95,4 +95,4 @@ namespace mitk {
 
   };
 } // namespace mitk
-#endif /* MITKTrackingDeviceSource_H_HEADER_INCLUDED_ */
+#endif

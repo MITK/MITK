@@ -114,4 +114,4 @@ protected Q_SLOTS:
   void OnSetMaximumWindow();
 };
 
-#endif // QMITKLEVELWINDOWWIDGETCONTEXTMENU_H
+#endif

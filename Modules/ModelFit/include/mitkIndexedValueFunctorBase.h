@@ -62,4 +62,4 @@ namespace mitk
 }
 
 
-#endif // IndexedValueFunctorBase_H
+#endif

@@ -29,4 +29,4 @@ public:
   void Stop() override;
 };
 
-#endif /*QMITKEXTAPPLICATION_H_*/
+#endif

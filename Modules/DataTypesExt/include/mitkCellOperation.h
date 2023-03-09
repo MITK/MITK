@@ -47,4 +47,4 @@ namespace mitk
     Vector3D m_Vector;
   };
 } // namespace mitk
-#endif /* MITKCELLOPERATION_H_INCLUDED*/
+#endif

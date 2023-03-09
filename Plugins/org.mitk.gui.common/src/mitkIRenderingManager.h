@@ -141,4 +141,4 @@ namespace mitk {
 MITK_GUI_COMMON_PLUGIN IRenderingManager* MakeRenderingManagerInterface(RenderingManager::Pointer manager);
 }
 
-#endif // MITKIRENDERINGMANAGER_H
+#endif

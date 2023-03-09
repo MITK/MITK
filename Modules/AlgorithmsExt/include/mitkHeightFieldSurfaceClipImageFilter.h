@@ -146,4 +146,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKHEIGHTFIELDSURFACECLIPIMAGEFILTER_H_HEADER_INCLUDED */
+#endif

@@ -260,4 +260,4 @@ namespace mitk
   };
 
 } /* namespace mitk */
-#endif /* MITKEVENTSTATEMACHINE_H_ */
+#endif

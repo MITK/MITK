@@ -188,5 +188,4 @@ private:
   Ui::MatchPointFrameCorrectionControls m_Controls;
 };
 
-#endif // MatchPoint_h
-
+#endif

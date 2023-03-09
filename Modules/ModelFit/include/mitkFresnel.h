@@ -49,5 +49,4 @@ namespace mitk
   double fresnel_s2(double x);
 }
 
-#endif /* FRESNEL_H_ */
-
+#endif

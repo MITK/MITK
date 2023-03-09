@@ -103,4 +103,4 @@ namespace mitk
     void CreateOutputsForAllInputs();
   };
 } // namespace mitk
-#endif /* MITKNAVIGATIONDATATONAVIGATIONDATAFILTER_H_HEADER_INCLUDED_ */
+#endif

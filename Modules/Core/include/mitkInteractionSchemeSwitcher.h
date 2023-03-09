@@ -113,4 +113,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif // MITKINTERACTIONSCHEMESWITCHER_H
+#endif

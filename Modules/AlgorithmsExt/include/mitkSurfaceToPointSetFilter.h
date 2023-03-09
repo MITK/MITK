@@ -52,4 +52,4 @@ namespace mitk
   };
 
 } // namespace mitk
-#endif /* MITKSURFACETODISTANCEIMAGEFILTER_H_HEADER_INCLUDED_ */
+#endif

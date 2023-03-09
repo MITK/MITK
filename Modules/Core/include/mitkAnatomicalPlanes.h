@@ -24,4 +24,4 @@ namespace mitk
   };
 }
 
-#endif // MITKANATOMICALPLANES_H
+#endif

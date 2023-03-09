@@ -64,4 +64,4 @@ protected:
   unsigned int m_CurrentSize;
 };
 }
-#endif // __mitkOclDataSetFilter_h
+#endif

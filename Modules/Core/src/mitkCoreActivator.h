@@ -79,4 +79,4 @@ private:
   us::ModuleContext *m_Context;
 };
 
-#endif // MITKCOREACTIVATOR_H_
+#endif

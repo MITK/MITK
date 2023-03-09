@@ -41,4 +41,4 @@ private:
   bool m_SafeMode;
 };
 
-#endif // QMITKSINGLEAPPLICATION_H
+#endif

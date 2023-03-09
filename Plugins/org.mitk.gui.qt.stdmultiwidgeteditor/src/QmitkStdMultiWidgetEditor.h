@@ -122,4 +122,4 @@ private:
 
 };
 
-#endif // QMITKSTDMULTIWIDGETEDITOR_H
+#endif

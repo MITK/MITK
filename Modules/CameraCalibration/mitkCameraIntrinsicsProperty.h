@@ -70,4 +70,4 @@ private:
 
 } // namespace mitk
 
-#endif // MITKCAMERAINTRINSICSPROPERTY_H
+#endif

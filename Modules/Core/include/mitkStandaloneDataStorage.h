@@ -126,4 +126,4 @@ namespace mitk
     AdjacencyList m_DerivedNodes;
   };
 } // namespace mitk
-#endif /* MITKSTANDALONEDATASTORAGE_H_HEADER_INCLUDED_ */
+#endif

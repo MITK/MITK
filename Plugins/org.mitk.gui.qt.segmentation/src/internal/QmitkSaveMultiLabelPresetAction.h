@@ -31,4 +31,4 @@ public:
   void SetDecimated(bool) override;
 };
 
-#endif // QMITKSAVEMULTILABELPRESETACTION_H
+#endif

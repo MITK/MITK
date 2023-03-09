@@ -82,4 +82,4 @@ protected:
 
 
 
-#endif // _QMITKIGTTUTORIALVIEW_H_INCLUDED
+#endif

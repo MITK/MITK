@@ -81,4 +81,4 @@ protected Q_SLOTS:
 
 };
 
-#endif // QmitkInitialValuesManagerWidget_H
+#endif

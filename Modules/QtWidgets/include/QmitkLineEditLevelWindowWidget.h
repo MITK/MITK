@@ -90,4 +90,4 @@ protected:
   QmitkLevelWindowWidgetContextMenu *m_Contextmenu;
 };
 
-#endif // QMITKLINEEDITLEVELWINDOWWIDGET_H
+#endif

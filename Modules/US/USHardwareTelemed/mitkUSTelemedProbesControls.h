@@ -81,4 +81,4 @@ namespace mitk {
   };
 }
 
-#endif // MITKUSTelemedProbesControls_H_HEADER_INCLUDED_
+#endif

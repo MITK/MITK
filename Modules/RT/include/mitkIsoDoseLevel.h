@@ -97,4 +97,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif //_MITK_DOSE_ISO_LEVEL_H_
+#endif

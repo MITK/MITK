@@ -46,4 +46,4 @@ namespace mitk
   };
 }
 
-#endif /*MITKCOREEXTCONSTANTS_H_*/
+#endif

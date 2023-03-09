@@ -56,4 +56,4 @@ namespace mitk
   };
 }
 
-#endif // MODEL_GENERATOR_H
+#endif

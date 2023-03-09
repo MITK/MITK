@@ -153,4 +153,4 @@ namespace mitk
 
 MITK_DECLARE_SERVICE_INTERFACE(mitk::IFileReader, "org.mitk.IFileReader")
 
-#endif /* IFileReader_H_HEADER_INCLUDED_C1E7E521 */
+#endif

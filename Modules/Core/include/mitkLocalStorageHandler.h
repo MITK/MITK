@@ -109,4 +109,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* LOCALSTORAGEHANDLER_H_HEADER_INCLUDED_C1E6EA08 */
+#endif

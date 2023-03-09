@@ -46,4 +46,4 @@ private:
 };
 
 
-#endif /*QMITKFILESAVEACTION_H_*/
+#endif

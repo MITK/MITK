@@ -69,4 +69,4 @@ namespace mitk
   };
 }
 
-#endif // __mitkLocaleSwitch_h
+#endif

@@ -44,4 +44,4 @@ namespace mitk
 
 }
 
-#endif // MITKTWOTISSUECOMPARTMENTMODELFACTORY_H
+#endif

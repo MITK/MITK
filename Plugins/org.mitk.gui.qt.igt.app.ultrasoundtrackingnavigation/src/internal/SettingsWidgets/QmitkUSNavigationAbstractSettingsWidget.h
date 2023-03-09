@@ -96,4 +96,4 @@ private:
   mitk::DataNode::Pointer m_SettingsNode;
 };
 
-#endif // QMITKUSNAVIGATIONABSTRACTSETTINGSWIDGET_H
+#endif

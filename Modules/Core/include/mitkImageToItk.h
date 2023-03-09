@@ -180,4 +180,4 @@ namespace mitk
 #include "mitkImageToItk.txx"
 #endif
 
-#endif // IMAGETOITK_H_HEADER_INCLUDED_C1C2FCD2
+#endif

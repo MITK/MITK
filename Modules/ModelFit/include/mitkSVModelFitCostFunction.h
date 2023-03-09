@@ -71,4 +71,4 @@ private:
 
 }
 
-#endif // SV_MODELFITCOSTFUNCTION_H
+#endif

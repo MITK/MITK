@@ -61,4 +61,4 @@ namespace mitk
   };
 } /* namespace mitk */
 
-#endif /* MITKMOUSEPRESSEVENT_H_ */
+#endif

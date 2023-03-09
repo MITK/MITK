@@ -152,4 +152,4 @@ private:
 
 };
 
-#endif // QmitkDicomInspectorView_h
+#endif

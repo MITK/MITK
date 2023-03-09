@@ -89,4 +89,4 @@ namespace mitk
   };
 }
 
-#endif // __DESCRIPTIVEPHARMACOKINETICBRIXMODEL_PARAMETERIZER_H
+#endif

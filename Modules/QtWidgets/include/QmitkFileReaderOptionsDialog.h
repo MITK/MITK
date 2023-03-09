@@ -45,4 +45,4 @@ private:
   std::vector<mitk::FileReaderSelector::Item> m_ReaderItems;
 };
 
-#endif // QMITKFILEREADEROPTIONSDIALOG_H
+#endif

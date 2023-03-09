@@ -94,4 +94,4 @@ namespace mitk
   };
 } // end of namespace mitk
 
-#endif // MITK_PLANAR_FIGURE_IO_H
+#endif

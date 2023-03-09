@@ -64,4 +64,4 @@ namespace mitk
     ~PointSetSource() override;
   };
 }
-#endif // #define _MITK_POINT_SET_SOURCE_H
+#endif

@@ -29,4 +29,4 @@ namespace mitk
   }; // PluginActivator
 }
 
-#endif // MITKPLUGINACTIVATOR_H
+#endif

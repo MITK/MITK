@@ -41,4 +41,4 @@ private:
   ctkXnatObject* m_Object;
 };
 
-#endif /*QMITKXNATOBJECTEDITORINPUT_H_*/
+#endif

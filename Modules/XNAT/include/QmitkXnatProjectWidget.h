@@ -50,4 +50,4 @@ private:
   ctkXnatProject *m_Project;
 };
 
-#endif // QMITKXNATPROJECTWIDGET_H
+#endif

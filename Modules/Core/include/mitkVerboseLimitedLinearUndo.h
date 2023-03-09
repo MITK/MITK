@@ -55,4 +55,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* VERBOSELIMITEDLINEARUNDO_H_HEADER_INCLUDED_C16E96 */
+#endif

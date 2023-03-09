@@ -260,4 +260,4 @@ namespace mitk
     inline void EnsureConsistency();
   };
 } // namespace mitk
-#endif /* LEVELWINDOW_H_HEADER_INCLUDED_C1F4F02C */
+#endif

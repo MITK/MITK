@@ -56,4 +56,4 @@ namespace mitk {
   };
 }
 
-#endif // MITKIRENDERWINDOWPARTLISTENER_H
+#endif

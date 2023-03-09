@@ -81,4 +81,4 @@ namespace mitk
     ScalarType m_TimeInMS;
   };
 } // namespace mitk
-#endif /* MITKPOINTOPERATION_H*/
+#endif

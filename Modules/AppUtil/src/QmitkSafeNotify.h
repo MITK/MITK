@@ -66,4 +66,4 @@ bool QmitkSafeNotify(A *app, QObject *receiver, QEvent *event)
   return false;
 }
 
-#endif // QMITKSAFENOTIFY_H
+#endif

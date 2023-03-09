@@ -95,4 +95,4 @@ namespace mitk
 }
 
 
-#endif // MITKGAUSSIANNOISEFUNCTOR_H
+#endif

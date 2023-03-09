@@ -58,4 +58,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* ItkImageFileReader_H_HEADER_INCLUDED */
+#endif

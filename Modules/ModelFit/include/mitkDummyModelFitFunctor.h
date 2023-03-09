@@ -73,4 +73,4 @@ namespace mitk
 }
 
 
-#endif // __DUMMYMODELFITFUNCTOR_H
+#endif

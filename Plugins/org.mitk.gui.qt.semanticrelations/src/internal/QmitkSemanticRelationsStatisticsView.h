@@ -71,4 +71,4 @@ private:
   QmitkStatisticsTreeModel* m_StatisticsTreeModel;
 };
 
-#endif // QMITKSEMANTICRELATIONSSTATISTICSVIEW_H
+#endif

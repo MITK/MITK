@@ -68,4 +68,4 @@ private:
 
 };
 
-#endif // QMITKABSTRACTDATANODEACTION_H
+#endif

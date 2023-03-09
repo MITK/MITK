@@ -80,4 +80,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif // _mitkToolCommand_H
+#endif

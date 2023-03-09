@@ -61,4 +61,4 @@ namespace mitk
     ImagePointer m_Image;
   };
 }
-#endif // MITKIMAGEWRITEACCESSOR_H
+#endif

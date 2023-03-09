@@ -42,4 +42,4 @@ private:
   void init(berry::IWorkbenchWindow* window);
   berry::IWorkbenchWindow* m_Window;
 };
-#endif /*QmitkCloseProjectAction_H_*/
+#endif

@@ -33,4 +33,4 @@ namespace mitk {
   };
 }
 
-#endif // MITKNavigationDataReaderInterface_H_HEADER_INCLUDED_
+#endif

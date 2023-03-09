@@ -40,4 +40,4 @@ private:
 
 }
 
-#endif // MITKMANUALSELECTINGDICOMREADERSERVICE_H
+#endif

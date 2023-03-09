@@ -127,4 +127,4 @@ namespace mitk
     bool m_RecordOnlyValidData; ///< indicates whether only valid data is recorded
   };
 }
-#endif // #define _MITK_POINT_SET_SOURCE_H
+#endif

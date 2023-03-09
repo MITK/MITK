@@ -38,4 +38,4 @@ DICOMFilePathList FilterForDICOMFiles(const DICOMFilePathList& fileList);
 DICOMFilePathList FilterDICOMFilesForSameSeries(const std::string& refFilePath, const DICOMFilePathList& fileList);
 }
 
-#endif // MITKDICOMFILESHELPER_H
+#endif

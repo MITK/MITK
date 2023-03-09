@@ -51,4 +51,4 @@ struct MITK_GUI_COMMON_PLUGIN ILinkedRenderWindowPart : public virtual IRenderWi
 
 }
 
-#endif // MITKILINKEDRENDERWINDOWPART_H
+#endif

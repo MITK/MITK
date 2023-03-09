@@ -106,4 +106,4 @@ private:
 
 };
 
-#endif // QMITKMXNMULTIWIDGET_H
+#endif

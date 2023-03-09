@@ -61,4 +61,4 @@ private:
 
 }
 
-#endif /*MITKDATASTORAGEEDITORINPUT_H_*/
+#endif

@@ -123,4 +123,4 @@ namespace mitk
     itk::TimeStamp m_LastCalculateExtrusionTime;
   };
 }
-#endif /* MITKEXTRUDEDCONTOUR_H_HEADER_INCLUDED */
+#endif

@@ -62,4 +62,4 @@ private:
   QmitkImageStatisticsTreeModel *m_imageStatisticsModel;
   QSortFilterProxyModel *m_ProxyModel;
 };
-#endif // QmitkImageStatisticsWidget_H__INCLUDED
+#endif

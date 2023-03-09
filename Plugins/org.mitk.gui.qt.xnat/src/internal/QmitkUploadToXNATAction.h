@@ -43,4 +43,4 @@ private:
 
 };
 
-#endif // QMITK_UPLOADTOXNATACTION_H
+#endif

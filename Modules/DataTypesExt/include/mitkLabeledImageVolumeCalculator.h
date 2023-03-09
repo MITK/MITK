@@ -73,4 +73,4 @@ namespace mitk
   };
 }
 
-#endif // #define _MITK_LABELEDIMAGEVOLUMECALCULATOR_H
+#endif

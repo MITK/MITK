@@ -72,4 +72,4 @@ namespace mitk
 } // end namespace
 
 #include <Iterators/mitkDataCollectionSingleImageIterator.cxx>
-#endif //mitkDataCollectionSingleImageIterator_H
+#endif

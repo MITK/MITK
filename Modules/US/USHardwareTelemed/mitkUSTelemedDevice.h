@@ -204,4 +204,4 @@ namespace mitk {
   };
 } // namespace mitk
 
-#endif // MITKUSTelemedDevice_H_HEADER_INCLUDED_
+#endif

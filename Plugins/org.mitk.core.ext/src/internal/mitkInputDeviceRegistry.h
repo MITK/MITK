@@ -57,4 +57,4 @@ namespace mitk
   }; // end class InputDeviceRegistry
 } // end namespace mitk
 
-#endif /*MITKSPACENAVIGATORREGISTRY_H_*/
+#endif

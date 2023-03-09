@@ -34,4 +34,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* VtkUnstructuredGridReader_H_HEADER_INCLUDED */
+#endif

@@ -60,4 +60,4 @@ namespace mitk
   };
 }
 
-#endif // __LINEAR_MODEL_PARAMETERIZER_H
+#endif

@@ -77,4 +77,4 @@ class MITKTOFUI_EXPORT QmitkKinectParameterWidget :public QWidget
   private:
 };
 
-#endif // _QmitkKinectParameterWIDGET_H_INCLUDED
+#endif

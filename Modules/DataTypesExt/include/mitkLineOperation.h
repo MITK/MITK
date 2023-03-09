@@ -52,4 +52,4 @@ namespace mitk
     int m_Id;
   };
 } // namespace mitk
-#endif /* MITKLINEOPERATION_H_INCLUDED*/
+#endif

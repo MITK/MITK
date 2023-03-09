@@ -51,4 +51,4 @@ namespace mitk
 }
 
 
-#endif //__GENERIC_PARAM_MODEL_FACTORY_H
+#endif

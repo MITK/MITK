@@ -110,4 +110,4 @@ namespace mitk
   };
 }
 
-#endif // MITKTWOCOMPARTMENTEXCHANGEMODEL_H
+#endif

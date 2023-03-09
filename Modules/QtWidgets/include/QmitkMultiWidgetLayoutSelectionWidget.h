@@ -51,4 +51,4 @@ private:
 
 };
 
-#endif // QMITKMULTIWIDGETLAYOUTSELECTIONWIDGET_H
+#endif

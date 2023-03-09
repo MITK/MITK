@@ -500,4 +500,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif // MITKRENDERINGMANAGER_H
+#endif

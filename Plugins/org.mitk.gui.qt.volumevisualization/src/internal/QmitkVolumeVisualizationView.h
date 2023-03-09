@@ -65,4 +65,4 @@ private:
 
 };
 
-#endif // QMITKVOLUMEVISUALIZATIONVIEW_H
+#endif

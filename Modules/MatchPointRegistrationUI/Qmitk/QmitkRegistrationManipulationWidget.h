@@ -124,5 +124,4 @@ private:
   bool m_internalUpdate;
 };
 
-#endif // MatchPoint_h
-
+#endif

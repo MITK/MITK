@@ -133,4 +133,3 @@ class MITK_QT_COMMON QmitkSliceNavigationListener : public QObject
   };
 
 #endif
-

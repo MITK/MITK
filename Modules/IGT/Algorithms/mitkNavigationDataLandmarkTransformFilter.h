@@ -180,4 +180,4 @@ namespace mitk {
     bool m_UseICPInitialization; ///< find source <--> target point correspondences with iterative closest point optimization
   };
 } // namespace mitk
-#endif /* MITKNavigationDataLandmarkTransformFilter_H_HEADER_INCLUDED_ */
+#endif

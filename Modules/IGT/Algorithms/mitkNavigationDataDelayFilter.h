@@ -66,4 +66,4 @@ namespace mitk {
   };
 } // namespace mitk
 
-#endif // MITKNavigationDataDelayFilter_H
+#endif

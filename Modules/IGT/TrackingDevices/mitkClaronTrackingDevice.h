@@ -161,4 +161,4 @@ namespace mitk
     std::string m_ToolfilesDir;
   };
 }//mitk
-#endif /* MITKCLARONTRACKINGDEVICE_H_HEADER_INCLUDED_ */
+#endif

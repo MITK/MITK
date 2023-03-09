@@ -215,4 +215,4 @@ namespace mitk
   };
 } // end namespace
 
-#endif // MITKDISPLAYACTIONEVENTBROADCAST_H
+#endif

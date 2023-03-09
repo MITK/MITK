@@ -69,4 +69,4 @@ namespace mitk
 
 #include <Iterators/mitkDataCollectionVectorImageIterator.cxx>
 
-#endif /* DATACOLLECTIONFEATUREVECTORIMAGEITERATOR_H_ */
+#endif

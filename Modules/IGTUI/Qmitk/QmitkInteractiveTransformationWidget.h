@@ -94,4 +94,4 @@ private:
   void SetSynchronizedValuesToSliderAndSpinbox(QDoubleSpinBox* _spinbox, QSlider* _slider, double _value);
 
 };
-#endif // QmitkInteractiveTransformationWidget_H
+#endif

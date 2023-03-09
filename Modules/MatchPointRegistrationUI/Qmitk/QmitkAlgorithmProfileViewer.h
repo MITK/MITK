@@ -47,4 +47,4 @@ public Q_SLOTS:
   void OnInfoChanged(const map::deployment::DLLInfo *newInfo);
 };
 
-#endif // QmitkAlgorithmProfileViewer_H
+#endif

@@ -81,4 +81,4 @@ private:
   Ui::QmitkChartExampleViewControls m_Controls;
 };
 
-#endif // QmitkChartExample_h
+#endif

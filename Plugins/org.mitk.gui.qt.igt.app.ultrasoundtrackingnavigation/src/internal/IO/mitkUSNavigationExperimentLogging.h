@@ -105,4 +105,4 @@ protected:
 };
 } // namespace mitk
 
-#endif // MITKUSNAVIGATIONEXPERIMENTLOGGING_H
+#endif

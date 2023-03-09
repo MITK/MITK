@@ -79,4 +79,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKVtkGLMapperWrapper_H_HEADER_INCLUDED_C1902626 */
+#endif

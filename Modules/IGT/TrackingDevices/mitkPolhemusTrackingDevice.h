@@ -157,4 +157,4 @@ namespace mitk
     bool m_HemisphereTrackingEnabled;
   };
 }//mitk
-#endif /* MITKPolhemusTRACKINGDEVICE_H_HEADER_INCLUDED_ */
+#endif

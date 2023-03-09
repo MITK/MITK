@@ -47,4 +47,4 @@ private:
 };
 
 
-#endif /*QMITKFILEOPENACTION_H_*/
+#endif

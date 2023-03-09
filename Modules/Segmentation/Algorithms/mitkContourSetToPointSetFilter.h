@@ -60,4 +60,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif // _mitkContourSetToPointSetFilter_h__
+#endif

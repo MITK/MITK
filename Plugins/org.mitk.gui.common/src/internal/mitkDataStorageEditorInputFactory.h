@@ -35,4 +35,4 @@ public:
 
 }
 
-#endif // MITKDATASTORAGEEDITORINPUTFACTORY_H
+#endif

@@ -49,4 +49,4 @@ namespace mitk
   };
 
 }
-#endif // MITKTWOTISSUECOMPARTMENTFDGMODELFACTORY_H
+#endif

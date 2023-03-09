@@ -47,4 +47,4 @@ protected:
 
 };
 
-#endif // QMITKDATANODETOGGLEVISIBILITYACTION_H
+#endif

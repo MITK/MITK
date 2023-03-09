@@ -257,4 +257,4 @@ namespace mitk
                              bool verbose);
 
 } // end namespace MITK
-#endif // ProportionalTimeGeometry_h
+#endif

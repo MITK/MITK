@@ -55,4 +55,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif /* MITKNodePredicateDimension_H_HEADER_INCLUDED_ */
+#endif

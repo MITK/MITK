@@ -117,4 +117,4 @@ namespace mitk
   };
 }
 
-#endif // MITKTESTCALLER_H
+#endif

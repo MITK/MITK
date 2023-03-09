@@ -127,4 +127,4 @@ namespace mitk
     ToFImageWriter::ToFImageType m_ToFImageType; ///< type of image to be recorded: ToFImageType3D (0) or ToFImageType2DPlusT (1)
   };
 } //END mitk namespace
-#endif // __mitkToFImageWriter_h
+#endif

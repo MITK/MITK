@@ -126,4 +126,4 @@ namespace mitk
 
 } // namespace
 
-#endif // MITKPLANEPROPOSER_H
+#endif

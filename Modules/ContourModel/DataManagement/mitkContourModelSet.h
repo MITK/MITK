@@ -117,4 +117,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif // _mitkContourModelSet_H_
+#endif

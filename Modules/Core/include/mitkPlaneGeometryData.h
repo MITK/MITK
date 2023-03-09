@@ -77,4 +77,4 @@ namespace mitk
     ~PlaneGeometryData() override;
   };
 } // namespace mitk
-#endif /* MITKGEOMETRY2DDATA_H_HEADER_INCLUDED_C19C01E2 */
+#endif

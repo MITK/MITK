@@ -22,5 +22,4 @@ namespace mitk
 {
   MITKIMAGESTATISTICS_EXPORT DataNode::Pointer CreateImageStatisticsNode(ImageStatisticsContainer::Pointer statistic, const std::string& name = "statistics");
 }
-#endif // MITKIMAGESTATISTICSCONTAINERNODEHELPER
-
+#endif

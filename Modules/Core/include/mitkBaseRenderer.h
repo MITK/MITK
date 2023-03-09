@@ -468,4 +468,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif // MITKBASERENDERER_H
+#endif

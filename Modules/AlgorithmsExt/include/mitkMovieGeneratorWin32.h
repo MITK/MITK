@@ -75,4 +75,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MovieGeneratorWin32WIN32_H_HEADER_INCLUDED */
+#endif

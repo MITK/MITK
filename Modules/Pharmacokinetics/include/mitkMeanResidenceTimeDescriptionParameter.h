@@ -42,4 +42,4 @@ namespace  mitk
 
     };
 }
-#endif // MEANRESIDENCETIMEDESCRIPTIONPARAMETER_H
+#endif

@@ -214,4 +214,4 @@ namespace mitk {
     CropOpenCVImageFilter::Pointer              m_CropFilter;
   };
 } // namespace mitk
-#endif /* MITKUSImageVideoSource_H_HEADER_INCLUDED_ */
+#endif

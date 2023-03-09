@@ -82,4 +82,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* _MITK_UNSTRUCTURED_GRID_VTK_MAPPER_3D_H_ */
+#endif

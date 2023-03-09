@@ -50,4 +50,4 @@ protected:
 
 };
 
-#endif // QMITKHOTKEYLINEEDIT_H
+#endif

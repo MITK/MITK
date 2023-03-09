@@ -84,4 +84,4 @@ namespace mitk
   };
 }
 
-#endif // MITKRTSTRUCTURESETREADER_H
+#endif

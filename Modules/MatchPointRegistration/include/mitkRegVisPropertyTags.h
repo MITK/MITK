@@ -53,5 +53,3 @@ const char* const nodeProp_RegEvalCurrentPosition = "matchpoint.RegEval.CurrentP
 
 
 #endif
-
-

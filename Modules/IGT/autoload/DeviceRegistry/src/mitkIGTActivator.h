@@ -38,4 +38,4 @@ namespace mitk
   };
 }
 
-#endif // mitkIGTActivator_H
+#endif

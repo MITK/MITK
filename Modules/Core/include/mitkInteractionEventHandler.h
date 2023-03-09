@@ -126,4 +126,4 @@ namespace mitk
   };
 
 } /* namespace mitk */
-#endif /* MITKEVENTHANDLER_H_ */
+#endif

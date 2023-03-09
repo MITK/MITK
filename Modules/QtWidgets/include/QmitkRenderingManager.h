@@ -78,4 +78,4 @@ public:
   QmitkRenderingRequestEvent() : QEvent((QEvent::Type)RenderingRequest){};
 };
 
-#endif /* MITKRenderingManager_H_HEADER_INCLUDED_C135A197 */
+#endif

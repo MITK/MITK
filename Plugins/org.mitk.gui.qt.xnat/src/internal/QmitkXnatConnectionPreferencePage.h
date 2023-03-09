@@ -77,4 +77,4 @@ private:
 
 };
 
-#endif /* QMITKXNATCONNECTIONPREFERENCEPAGE_H_ */
+#endif

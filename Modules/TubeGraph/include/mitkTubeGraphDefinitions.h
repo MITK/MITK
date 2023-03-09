@@ -107,4 +107,4 @@ namespace mitk
 
 } // namespace MITK
 
-#endif // __mitkTubeGraphDefinitions_h
+#endif

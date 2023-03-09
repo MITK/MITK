@@ -51,4 +51,4 @@ namespace mitk
 
 }
 
-#endif // MITKEXTENDEDONETISSUECOMPARTMENTMODELFACTORY_H
+#endif

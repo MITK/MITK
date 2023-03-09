@@ -40,4 +40,4 @@ protected:
 
 };
 
-#endif // QMITKDATANODESETCONTROLPOINTACTION_H
+#endif

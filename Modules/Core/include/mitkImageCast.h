@@ -96,4 +96,4 @@ namespace mitk
   }
 }
 
-#endif // of MITKIMAGECAST_H_HEADER_INCLUDED
+#endif

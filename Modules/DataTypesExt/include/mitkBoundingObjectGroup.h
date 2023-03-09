@@ -63,4 +63,4 @@ namespace mitk
     CSGMode m_CSGMode;
   };
 }
-#endif /* BOUNDINGOBJECTGROUP_H_HEADER_INCLUDED */
+#endif

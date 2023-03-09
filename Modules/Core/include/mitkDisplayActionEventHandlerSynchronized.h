@@ -34,4 +34,4 @@ namespace mitk
   };
 } // end namespace mitk
 
-#endif // MITKDISPLAYACTIONEVENTHANDLERSYNCHRONIZED_H
+#endif

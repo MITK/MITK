@@ -214,4 +214,4 @@ namespace mitk
 #include "mitkITKImageImport.txx"
 #endif
 
-#endif /* MITKITKIMAGEIMPORT_H_HEADER_INCLUDED_C1E4861D */
+#endif

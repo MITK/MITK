@@ -39,4 +39,4 @@ private:
 
 }
 
-#endif // MITKIGTBASEACTIVATOR_H
+#endif

@@ -106,4 +106,4 @@ protected:
 };
 } // namespace mitk
 
-#endif // MITKUSNAVIGATIONSTEPTIMER_H
+#endif

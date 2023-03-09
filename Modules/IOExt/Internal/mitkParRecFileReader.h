@@ -64,4 +64,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* PARRECFILEREADER_H_HEADER_INCLUDED_C1F48A22 */
+#endif

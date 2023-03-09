@@ -129,4 +129,4 @@ protected:
   mitk::NavigationData::Pointer m_T_ObjectReg;
 
 };
-#endif // _QmitkFiducialRegistrationWidget_H_INCLUDED
+#endif

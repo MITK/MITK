@@ -102,4 +102,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* _MITK_UNSTRUCTURED_GRID_H_ */
+#endif

@@ -78,4 +78,4 @@ namespace mitk
   };
 
 } // namespace mitk
-#endif // TextAnnotation3D_H
+#endif

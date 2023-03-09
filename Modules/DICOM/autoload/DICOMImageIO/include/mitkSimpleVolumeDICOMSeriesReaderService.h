@@ -37,4 +37,4 @@ private:
 
 }
 
-#endif // MITKSIMPLEVOLUMEDICOMSERIESREADERSERVICE_H
+#endif

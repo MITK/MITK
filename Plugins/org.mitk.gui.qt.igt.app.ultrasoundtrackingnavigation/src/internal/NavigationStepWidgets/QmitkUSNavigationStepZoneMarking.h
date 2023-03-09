@@ -127,4 +127,4 @@ private:
   Ui::QmitkUSNavigationStepZoneMarking *ui;
 };
 
-#endif // QMITKUSNAVIGATIONSTEPZONEMARKING_H
+#endif

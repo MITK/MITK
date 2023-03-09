@@ -202,4 +202,4 @@ namespace mitk
   };
 }
 
-#endif // MITKLEVELWINDOWMANAGER_H
+#endif

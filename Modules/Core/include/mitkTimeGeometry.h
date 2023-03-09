@@ -346,4 +346,4 @@ namespace mitk
     bool verbose);
 
 } // end namespace MITK
-#endif // TimeGeometry_h
+#endif

@@ -50,5 +50,4 @@ private:
 
 
 
-#endif /* MITKRegistrationWrapperMapper3D_H_HEADER_INCLUDED */
-
+#endif

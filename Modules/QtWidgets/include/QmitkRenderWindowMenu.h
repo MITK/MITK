@@ -191,4 +191,4 @@ private:
 
 };
 
-#endif // QMITKRENDERWINDOWMENU_H
+#endif

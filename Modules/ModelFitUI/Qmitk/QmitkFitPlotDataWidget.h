@@ -62,4 +62,4 @@ protected:
 
 };
 
-#endif // QmitkFitPlotDataWidget_H
+#endif

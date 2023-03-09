@@ -48,4 +48,4 @@ namespace mitk {
     void GenerateData() override;
   };
 } // namespace mitk
-#endif /* MITKIGTLDeviceSource_H_HEADER_INCLUDED_ */
+#endif

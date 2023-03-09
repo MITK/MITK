@@ -53,4 +53,4 @@ namespace mitk
 #include "mitkBoundingObjectCutAndCast.txx" // because it is a template
 #endif
 
-#endif /* BOUNDINGOBJECTCUTANDCAST_H_HEADER_INCLUDED_C10B22CD */
+#endif

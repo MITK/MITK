@@ -61,4 +61,4 @@ namespace mitk {
   };
 } // namespace mitk
 MITK_DECLARE_SERVICE_INTERFACE(mitk::TrackingDeviceWidgetCollection, "org.mitk.services.TrackingDeviceWidgetCollection")
-#endif //TrackingDeviceWidgetCollection_H_INCLUDED
+#endif

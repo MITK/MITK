@@ -74,4 +74,4 @@ private:
   bool m_FreezeButtonToggle;
 };
 
-#endif // QMITKUSNAVIGATIONFREEZEBUTTON_H
+#endif

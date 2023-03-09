@@ -72,4 +72,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKVTKSMARTVOLUMEMAPPER_H_HEADER_INCLUDED */
+#endif

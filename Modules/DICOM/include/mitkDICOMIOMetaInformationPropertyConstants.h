@@ -48,4 +48,4 @@ namespace mitk
   };
 }
 
-#endif // MITKIOCONSTANTS_H_
+#endif

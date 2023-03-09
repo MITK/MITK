@@ -48,4 +48,4 @@ protected:
   QmitkSimpleTextOverlayWidget* m_Overlay;
 };
 
-#endif // QMITKDATASTORAGETREEINSPECTOR_H
+#endif

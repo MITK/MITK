@@ -773,4 +773,4 @@ namespace mitk
   };
 
 } // namespace mitk
-#endif // ifndef MITKINTERACTCONST_H
+#endif

@@ -102,4 +102,4 @@ namespace mitk
 }
 
 
-#endif // MITKTWOSTEPLINEARMODEL_H
+#endif

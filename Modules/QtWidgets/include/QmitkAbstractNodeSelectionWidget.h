@@ -255,4 +255,4 @@ private:
   bool m_RecursionGuard;
 };
 
-#endif // QMITK_ABSTRACT_NODE_SELECTION_WIDGET_H
+#endif

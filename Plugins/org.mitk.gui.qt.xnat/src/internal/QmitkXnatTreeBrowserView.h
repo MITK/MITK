@@ -139,4 +139,4 @@ private:
   std::string ReplaceSpecialChars(const std::string& input) const;
 };
 
-#endif // QMITKXNATTREEBROWSERVIEW_H
+#endif

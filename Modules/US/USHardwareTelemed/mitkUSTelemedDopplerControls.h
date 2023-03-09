@@ -43,4 +43,4 @@ namespace mitk {
   };
 }
 
-#endif // MITKUSTelemedDopplerControls_H_HEADER_INCLUDED_
+#endif

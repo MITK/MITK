@@ -127,5 +127,4 @@ protected:
   mitk::Surface::Pointer LoadSurfaceFromSTLFile(QString surfaceFilename);
 
 };
-#endif // _QmitkNDIConfigurationWidget_H_INCLUDED
-
+#endif

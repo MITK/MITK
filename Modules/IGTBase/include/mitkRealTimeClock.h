@@ -44,4 +44,4 @@ namespace mitk {
     virtual double GetCurrentStamp() = 0;
   };
 } //namespace
-#endif /* MITKWREALTIMECLOCK_H_HEADER_INCLUDED_ */
+#endif

@@ -189,4 +189,4 @@ namespace mitk
 
 }
 
-#endif // MITKIMAGEPIXELREADACCESSOR_H
+#endif

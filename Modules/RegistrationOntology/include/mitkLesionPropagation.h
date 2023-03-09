@@ -28,4 +28,4 @@ namespace mitk
   MITKREGISTRATIONONTOLOGY_EXPORT void FindClosestSegmentationMask();
 } // namespace mitk
 
-#endif // MITKLESIONPROPAGATION_H
+#endif

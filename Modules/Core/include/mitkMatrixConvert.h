@@ -124,4 +124,4 @@ namespace mitk
   }
 }
 
-#endif /* MITKMATRIXCONVERT_H_HEADER_INCLUDED_C1EBD0AD */
+#endif

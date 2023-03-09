@@ -89,4 +89,4 @@ namespace mitk
   };
 
 }
-#endif // __AIFBASED_MODEL_PARAMETERIZER_BASE_H
+#endif

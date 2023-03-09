@@ -54,4 +54,4 @@ protected:
   QmitkAbstractSemanticRelationsStorageInspector(QWidget* parent = nullptr);
 };
 
-#endif // QMITKABSTRACTSEMANTICRELATIONSSTORAGEINSPECTOR_H
+#endif

@@ -190,6 +190,4 @@ namespace mitk
     bool m_FlipYAxisEnabled;
   };
 }
-#endif // Header
-
-
+#endif

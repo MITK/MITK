@@ -75,4 +75,4 @@ private slots:
   void SpinBoxValueChanged(const QString &value);
 };
 
-#endif /* QMITKPROPERTIESTABLEMODEL_H_ */
+#endif

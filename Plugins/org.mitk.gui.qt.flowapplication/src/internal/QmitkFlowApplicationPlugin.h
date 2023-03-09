@@ -43,4 +43,4 @@ private:
   ctkPluginContext* _context;
 };
 
-#endif /* QMITKFLOWAPPLICATIONLICATIONPLUGIN_H_ */
+#endif

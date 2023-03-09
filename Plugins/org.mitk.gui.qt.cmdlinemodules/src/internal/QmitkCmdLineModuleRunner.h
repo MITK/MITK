@@ -229,4 +229,4 @@ private:
   int m_ErrorCount;
 };
 
-#endif // QMITKCMDLINEMODULERUNNER_H
+#endif

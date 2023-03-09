@@ -76,4 +76,4 @@ private:
   std::map < std::string, itk::Statistics::Histogram<double>::ConstPointer> m_Histograms;
 };
 
-#endif // QmitkHistogramVisualizationWidget_H__INCLUDED
+#endif

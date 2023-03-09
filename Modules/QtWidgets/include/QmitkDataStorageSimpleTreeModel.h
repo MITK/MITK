@@ -98,4 +98,4 @@ private:
   std::list<const TreeItem*> m_TreeItems;
 };
 
-#endif // QMITKDATASTORAGESIMPLETREEMODEL_H
+#endif

@@ -205,5 +205,4 @@ bool IsTransformDifferenceHigh(mitk::NavigationData::Pointer transformA, mitk::N
 
 };
 
-#endif // QmitkIGTTrackingLabView_h
-
+#endif

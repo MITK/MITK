@@ -94,4 +94,4 @@ protected:
   Ui_QmitkSingleNodeSelectionWidget m_Controls;
 };
 
-#endif // QMITK_SINGLE_NODE_SELECTION_WIDGET_H
+#endif

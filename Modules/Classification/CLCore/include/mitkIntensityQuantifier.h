@@ -88,4 +88,4 @@ private:
 };
 }
 
-#endif //mitkIntensityQuantifier_h
+#endif

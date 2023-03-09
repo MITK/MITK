@@ -20,4 +20,4 @@ typedef mitk::DataNode::Pointer mitkDataNodePtr;
 Q_DECLARE_METATYPE(mitkDataNodePtr)
 Q_DECLARE_METATYPE(mitk::DataNode *)
 
-#endif /* QMITKCUSTOMVARIANTS_H_ */
+#endif

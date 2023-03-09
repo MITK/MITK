@@ -195,4 +195,4 @@ namespace mitk
   };
 }
 
-#endif // MITKPLANARFIGUREINTERACTOR_H
+#endif

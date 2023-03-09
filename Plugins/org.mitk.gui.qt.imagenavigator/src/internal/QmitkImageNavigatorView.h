@@ -91,4 +91,4 @@ protected:
   QString GetDecorationColorOfGeometry(QmitkRenderWindow *renderWindow);
 };
 
-#endif // QMITKIMAGENAVIGATORVIEW_H
+#endif

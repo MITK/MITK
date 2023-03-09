@@ -42,4 +42,4 @@ struct MITK_CORE_SERVICES_PLUGIN IDataStorageReference : public berry::Object
 
 }
 
-#endif /*MITKIDATASTORAGEREFERENCE_H_*/
+#endif

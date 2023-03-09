@@ -292,4 +292,4 @@ namespace mitk {
       MITKIGTBASE_EXPORT bool Equal( const mitk::NavigationData& leftHandSide, const mitk::NavigationData& rightHandSide, ScalarType eps = mitk::eps, bool verbose = false );
 
 } // namespace mitk
-#endif /* MITKNAVIGATIONDATA_H_HEADER_INCLUDED_ */
+#endif

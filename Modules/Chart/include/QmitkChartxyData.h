@@ -168,4 +168,4 @@ private:
   QVariant m_MarkerSymbolName;
 };
 
-#endif // QmitkC3xyData_h
+#endif

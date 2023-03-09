@@ -45,4 +45,4 @@ protected:
   void paintEvent(QPaintEvent *event) override;
 };
 
-#endif /* QmitkOverlayContainerWidget_H_HEADER_INCLUDED_C10DC4EB */
+#endif

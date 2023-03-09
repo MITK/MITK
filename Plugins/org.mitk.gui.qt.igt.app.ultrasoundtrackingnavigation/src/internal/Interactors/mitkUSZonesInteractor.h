@@ -105,4 +105,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif // MITKUSZONESINTERACTOR_H
+#endif

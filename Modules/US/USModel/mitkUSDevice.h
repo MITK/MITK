@@ -529,4 +529,4 @@ namespace mitk {
 // This is the microservice declaration. Do not meddle!
 MITK_DECLARE_SERVICE_INTERFACE(mitk::USDevice, "org.mitk.services.UltrasoundDevice")
 
-#endif // MITKUSDevice_H_HEADER_INCLUDED_
+#endif

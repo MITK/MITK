@@ -45,4 +45,4 @@ private:
 
 };
 
-#endif // __QmitkConvertMaskToLabelAction_H_
+#endif

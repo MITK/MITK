@@ -90,4 +90,4 @@ private:
   mitk::MessageDelegate1<QmitkUSZonesDataModel, const mitk::DataNode*> m_ListenerRemoveNode;
 };
 
-#endif // QMITKUSZONESDATAMODEL_H
+#endif

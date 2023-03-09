@@ -60,4 +60,4 @@ private:
 };}
 
 
-#endif // MITKTWOSTEPLINEARMODELPARAMETERIZER_H
+#endif

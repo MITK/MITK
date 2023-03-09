@@ -82,4 +82,4 @@ namespace mitk {
     bool m_IsStarted;
   };
 } // namespace mitk
-#endif /* MITKIGTLMeasurements_H_HEADER_INCLUDED_ */
+#endif

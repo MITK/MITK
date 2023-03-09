@@ -59,4 +59,4 @@ namespace mitk
     ~ContourModelSetSource() override;
   };
 }
-#endif // #_MITK_CONTOURMODEL_SOURCE_H
+#endif

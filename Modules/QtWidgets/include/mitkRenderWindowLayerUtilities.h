@@ -74,4 +74,4 @@ namespace mitk
   } // namespace RenderWindowLayerUtilities
 } // namespace mitk
 
-#endif // MITKRENDERWINDOWLAYERUTILITIES_H
+#endif

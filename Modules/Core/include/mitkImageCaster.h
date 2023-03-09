@@ -59,4 +59,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif // MITKIMAGECASTER_H
+#endif

@@ -158,4 +158,4 @@ namespace mitk
   };
 }  // namespace mitk
 
-#endif  // MITKIGTLDevice_H_HEADER_INCLUDED_
+#endif

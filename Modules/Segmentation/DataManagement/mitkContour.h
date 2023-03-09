@@ -177,4 +177,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif //_MITK_CONTOUR_H_
+#endif

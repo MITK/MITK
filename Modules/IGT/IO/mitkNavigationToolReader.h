@@ -69,4 +69,4 @@ namespace mitk {
 
   };
 } // namespace mitk
-#endif //NAVIGATIONTOOLREADER
+#endif

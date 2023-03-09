@@ -115,4 +115,4 @@ protected:
 
 }
 
-#endif // #define _MITK_PointSetSTATISTICSCALCULATOR_H
+#endif

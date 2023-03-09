@@ -56,4 +56,4 @@ namespace mitk
 
 } /* namespace mitk */
 
-#endif /* MITKINTERACTIONPOSITIONEVENT_H_ */
+#endif

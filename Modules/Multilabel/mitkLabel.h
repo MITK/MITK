@@ -101,4 +101,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif // __mitkLabel_H_
+#endif

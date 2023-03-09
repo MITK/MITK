@@ -91,4 +91,4 @@ private:
   mitk::SemanticTypes::LesionVector m_CurrentLesions;
 };
 
-#endif // QMITKSTATISTICSTREEMODEL_H
+#endif

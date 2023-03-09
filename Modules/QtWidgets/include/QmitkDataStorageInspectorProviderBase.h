@@ -78,4 +78,4 @@ private:
 #include "QmitkDataStorageInspectorProviderBase.tpp"
 #endif
 
-#endif /* __QMITK_DATA_STORAGE_INSPECTOR_PROVIDER_BASE_H */
+#endif

@@ -96,4 +96,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif /* MITKCOONSPATCHFILTER_H_HEADER_INCLUDED_C10B22CD */
+#endif

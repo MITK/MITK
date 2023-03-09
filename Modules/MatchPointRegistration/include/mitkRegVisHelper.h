@@ -75,5 +75,3 @@ MITKMATCHPOINTREGISTRATION_EXPORT const map::core::RegistrationKernelBase<3,3>* 
 
 
 #endif
-
-

@@ -198,4 +198,4 @@ public:
 };
 
 }
-#endif //__mitkOclImage_h
+#endif

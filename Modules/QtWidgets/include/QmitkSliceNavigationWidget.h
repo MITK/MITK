@@ -148,4 +148,4 @@ protected:
 
 };
 
-#endif // QMITKSLICENAVIGATIONWIDGET_H
+#endif

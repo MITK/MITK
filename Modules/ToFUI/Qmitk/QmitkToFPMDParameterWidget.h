@@ -111,4 +111,4 @@ class MITKTOFUI_EXPORT QmitkToFPMDParameterWidget :public QWidget
 
 };
 
-#endif // _QMITKTOFCONNECTIONWIDGET_H_INCLUDED
+#endif

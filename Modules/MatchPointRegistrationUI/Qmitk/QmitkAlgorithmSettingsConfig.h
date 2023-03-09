@@ -53,4 +53,4 @@ protected:
   QSortFilterProxyModel *m_ProxyModel;
 };
 
-#endif // QmitkAlgorithmSettingsConfig_H
+#endif

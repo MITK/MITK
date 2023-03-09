@@ -54,4 +54,4 @@ namespace mitk
   };
 }
 
-#endif // mitkUSDeviceReaderWriterConstants_H_HEADER_INCLUDED_
+#endif

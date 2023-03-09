@@ -56,4 +56,4 @@ namespace mitk
 
 } // end of namespace mitk
 
-#endif //_MITK_VTK_SCALARMODE_PROPERTY__H_
+#endif

@@ -50,4 +50,4 @@ private:
   QWidget *m_Widget;
 };
 
-#endif // QMITKXNATCREATEOBJECTDIALOG_H
+#endif

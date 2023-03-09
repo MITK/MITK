@@ -57,4 +57,4 @@ private:
 
 };
 
-#endif // QMITKDNDDATANODEWIDGET_H
+#endif

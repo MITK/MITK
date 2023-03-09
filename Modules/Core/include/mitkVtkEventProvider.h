@@ -60,4 +60,4 @@ namespace mitk
     void operator=(const vtkEventProvider &);   // Not implemented.
   };
 }
-#endif /* VTKMITKEVENTPROVIDER_H_HEADER_INCLUDED_C1C53723 */
+#endif

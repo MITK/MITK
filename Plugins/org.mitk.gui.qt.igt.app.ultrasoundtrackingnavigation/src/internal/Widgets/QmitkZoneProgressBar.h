@@ -95,4 +95,4 @@ protected:
   QString m_StyleSheet;
 };
 
-#endif // QMITKZONEPROGRESSBAR_H
+#endif

@@ -303,6 +303,4 @@ if(!(a)) { \
 
 #endif
 
-#endif // mitkEndoDebug_h
-
-
+#endif

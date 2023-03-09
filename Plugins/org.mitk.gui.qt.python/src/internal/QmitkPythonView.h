@@ -57,4 +57,4 @@ private:
   QmitkPythonViewData* d;
 };
 
-#endif /*QmitkPythonView_H_*/
+#endif

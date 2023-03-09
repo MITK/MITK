@@ -142,4 +142,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif /* BOUNDINGSHAPECROPPER_H */
+#endif

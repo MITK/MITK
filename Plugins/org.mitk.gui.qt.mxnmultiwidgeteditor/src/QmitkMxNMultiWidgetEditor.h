@@ -78,4 +78,4 @@ private:
 
 };
 
-#endif // QMITKMXNMULTIWIDGETEDITOR_H
+#endif

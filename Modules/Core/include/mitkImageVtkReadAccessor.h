@@ -52,4 +52,4 @@ namespace mitk
   };
 }
 
-#endif // MITKIMAGEVTKREADACCESSOR_H
+#endif

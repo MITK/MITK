@@ -88,4 +88,4 @@ namespace mitk
 
 } // end namespace mitk
 
-#endif // MITKSTDFUNCTIONCOMMAND_H
+#endif

@@ -86,4 +86,4 @@ protected:
 private:
 };
 
-#endif // _QmitkUSDeviceManagerWidget_H_INCLUDED
+#endif

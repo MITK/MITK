@@ -80,4 +80,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /*  MOVIEGENERATOR_H_HEADER_INCLUDED */
+#endif

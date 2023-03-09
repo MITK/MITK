@@ -251,4 +251,4 @@ protected:
 };
 } // namespace mitk
 
-#endif // MITKUSControlInterfaceBMode_H_HEADER_INCLUDED_
+#endif

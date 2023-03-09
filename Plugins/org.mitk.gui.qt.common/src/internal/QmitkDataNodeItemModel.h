@@ -29,4 +29,4 @@ public:
   void AddDataNodes(const QList<mitk::DataNode::Pointer>& nodes);
 };
 
-#endif // QMITKDATANODEITEMMODEL_H
+#endif

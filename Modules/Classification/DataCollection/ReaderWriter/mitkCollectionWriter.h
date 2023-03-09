@@ -66,4 +66,4 @@ namespace mitk {
   };
 } // namespace mitk
 
-#endif /* MITK_COLLECTION_WRITER_H */
+#endif

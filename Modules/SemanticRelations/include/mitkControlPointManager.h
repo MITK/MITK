@@ -116,4 +116,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif // MITKCONTROLPOINTMANAGER_H
+#endif

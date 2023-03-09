@@ -39,4 +39,4 @@ namespace mitk
   };
 } // end namespace mitk
 
-#endif // MITKSTDDISPLAYACTIONEVENTHANDLERSTD_H
+#endif

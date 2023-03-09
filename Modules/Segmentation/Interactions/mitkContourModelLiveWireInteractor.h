@@ -88,4 +88,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif // mitkContourModelLiveWireInteractor_h_Included
+#endif

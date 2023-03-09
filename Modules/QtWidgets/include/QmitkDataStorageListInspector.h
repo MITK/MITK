@@ -45,4 +45,4 @@ protected:
   QmitkSimpleTextOverlayWidget* m_Overlay;
 };
 
-#endif // QMITKDATASTORAGELISTINSPECTOR_H
+#endif

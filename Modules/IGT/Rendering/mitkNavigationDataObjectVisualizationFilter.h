@@ -174,4 +174,4 @@ namespace mitk {
     RotationMode m_RotationMode; ///< defines the rotation mode Standard or Transposed, Standard is default
   };
 } // namespace mitk
-#endif /* MITKNAVIGATIONDATAOBJECTVISUALIZATIONFILTER_H_HEADER_INCLUDED_ */
+#endif

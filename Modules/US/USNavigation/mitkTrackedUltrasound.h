@@ -65,4 +65,4 @@ namespace mitk {
 
   };
 } // namespace mitk
-#endif // __mitkTrackedUltrasound_h
+#endif

@@ -315,4 +315,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITK_PLANAR_FIGURE_MAPPER_2D_H_ */
+#endif

@@ -73,4 +73,4 @@ class MITKPHARMACOKINETICS_EXPORT CurveDescriptionParameterBase : public itk::Ob
    };
 }
 
-#endif // CURVEDESCRIPTIONPARAMETERBASE_H
+#endif

@@ -76,4 +76,4 @@ namespace mitk
   };
 
 }
-#endif // __GENERIC_PARAM_MODEL_PARAMETERIZER_H
+#endif

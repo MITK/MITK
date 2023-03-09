@@ -108,4 +108,4 @@ protected:
   mitk::SemanticTypes::Lesion m_Lesion;
 };
 
-#endif // QMITKABSTRACTSEMANTICRELATIONSSTORAGEMODEL_H
+#endif

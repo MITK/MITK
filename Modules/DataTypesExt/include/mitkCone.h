@@ -36,4 +36,4 @@ namespace mitk
     ~Cone() override;
   };
 }
-#endif /* MITKCONE_H_HEADER_INCLUDED */
+#endif

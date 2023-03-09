@@ -70,4 +70,4 @@ protected:
   QVector<QmitkZoneProgressBar*>                  m_ZoneProgressBars;
 };
 
-#endif // QMITKUSNAVIGATIONZONEDISTANCESWIDGET_H
+#endif

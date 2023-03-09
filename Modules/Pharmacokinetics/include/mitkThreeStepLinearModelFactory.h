@@ -52,4 +52,4 @@ namespace mitk
 
 }
 
-#endif // MITKTHREESTEPLINEARMODELFACTORY_H
+#endif

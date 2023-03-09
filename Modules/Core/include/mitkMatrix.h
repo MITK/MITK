@@ -177,4 +177,4 @@ namespace mitk
   }
 }
 
-#endif /* MITKMATRIX_H_ */
+#endif

@@ -116,4 +116,4 @@ private:
   vtkSmartPointer<vtkPoints> m_IntersectPoints;
 };
 
-#endif // QMITKUSNAVIGATIONSTEPPUNCTUATIONINTERVENTION_H
+#endif

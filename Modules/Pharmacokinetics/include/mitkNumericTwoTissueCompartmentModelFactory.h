@@ -45,4 +45,4 @@ namespace mitk
 }
 
 
-#endif // MITKNUMERICTWOTISSUECOMPARTMENTMODELFACTORY_H
+#endif

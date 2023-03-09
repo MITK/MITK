@@ -83,4 +83,4 @@ private:
   bool m_IgnoreZeros;                                             ///< member variable holds flag to indicate if zero valued voxel should be suppressed
   unsigned int m_HistogramNBins;                                      ///< member variable holds the bin size for histogram resolution.
 };
-#endif // QMITKIMAGESTATISTICSCALCULATIONRUNNABLE_H_INCLUDED
+#endif

@@ -105,4 +105,4 @@ namespace mitk
   };
 } // end namespace mitk
 
-#endif // MITKCompareImageDataFilter_H
+#endif

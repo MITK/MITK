@@ -98,4 +98,4 @@ protected:
   QSortFilterProxyModel m_SortModel;
 };
 
-#endif /*QMITKLEVELWINDOWPRESETDEFINITIONDIALOG_H_*/
+#endif

@@ -39,4 +39,4 @@ template <typename TPixel, unsigned int VImageDimension>
 DEPRECATED(void _mitkItkPictureWriteComposite(itk::Image<TPixel, VImageDimension> *itkImage,
                                               const std::string &fileName));
 
-#endif /* MITKITKPICTUREWRITE_H */
+#endif

@@ -87,4 +87,4 @@ namespace mitk
   };
 }
 
-#endif // __MODEL_FACTORY_BASE_H
+#endif

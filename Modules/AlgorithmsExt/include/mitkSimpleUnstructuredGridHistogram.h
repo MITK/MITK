@@ -51,4 +51,4 @@ namespace mitk
   };
 }
 
-#endif // MITKSIMPLEUNSTRUCTUREDGRIDHISTOGRAM_H
+#endif

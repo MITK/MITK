@@ -59,4 +59,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* GROUPTAGPROPERTY_H_HEADER_INCLUDED_C1F4DF54 */
+#endif

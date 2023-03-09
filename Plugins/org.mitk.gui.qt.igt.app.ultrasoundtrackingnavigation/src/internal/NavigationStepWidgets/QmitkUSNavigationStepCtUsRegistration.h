@@ -230,4 +230,4 @@ private:
 
 };
 
-#endif // QMITKUSNAVIGATIONSTEPCTUSREGISTRATION_H
+#endif

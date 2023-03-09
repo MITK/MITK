@@ -703,4 +703,4 @@ namespace mitk
     }                                                                                                                  \
   }
 
-#endif // of MITKIMAGEACCESSBYITK_H_HEADER_INCLUDED
+#endif

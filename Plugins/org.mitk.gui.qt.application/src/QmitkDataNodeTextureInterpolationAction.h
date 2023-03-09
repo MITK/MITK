@@ -42,4 +42,4 @@ protected:
 
 };
 
-#endif // QMITKDATANODETEXTUREINTERPOLATIONACTION_H
+#endif

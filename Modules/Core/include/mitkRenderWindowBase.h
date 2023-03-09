@@ -73,4 +73,4 @@ namespace mitk
   };
 }
 
-#endif /* MITKRENDERWINDOWBASE_H_HEADER_INCLUDED_C1C40D66ASDF */
+#endif

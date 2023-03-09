@@ -39,16 +39,20 @@ QString QmitkSetupVirtualEnvUtil::GetVirtualEnvPath()
   return m_venvPath;
 }
 
-void QmitkSetupVirtualEnvUtil::SetSystemPythonPath(QString& path)
+void QmitkSetupVirtualEnvUtil::SetVirtualEnvPath(const QString &path)
 {
-  if (IsPythonPath(path))
+  m_venvPath = path;
+}
+
+void QmitkSetupVirtualEnvUtil::SetSystemPythonPath(const QString& path)
+{
+  if (this->IsPythonPath(path))
   {
     m_SysPythonPath = path;
-    MITK_ERROR << "Python was detected in " + path.toStdString();
   }
   else
   {
-    MITK_ERROR << "Python was not detected in "+path.toStdString();
+    MITK_INFO << "Python was not detected in "+path.toStdString();
   }
 }
 
@@ -62,8 +66,8 @@ std::map<std::string, std::string> QmitkSetupVirtualEnvUtil::GetInstallParameter
     case QmitkSetupVirtualEnvUtil::Tool::TOTALSEGMENTATOR:
     {
       parameters["venv_name"] = ".totalsegmentator";
-      parameters["pkg_version"] = "1.5.2";
-      parameters["pkg_names"] = "Totalsegmentator==1.5.2,scipy==1.9.1"; // comma separated string
+      parameters["pkg_version"] = "1.5.3";
+      parameters["pkg_names"] = "Totalsegmentator==1.5.3,scipy==1.9.1"; // comma separated string
       /*Add other parameters here...*/
       break;
     } /*Add more tools here...*/
@@ -96,6 +100,11 @@ void QmitkSetupVirtualEnvUtil::PrintProcessEvent(itk::Object * /*pCaller*/, cons
 
 bool QmitkSetupVirtualEnvUtil::SetupVirtualEnv(QmitkSetupVirtualEnvUtil::Tool packageName)
 {
+  MITK_INFO << m_SysPythonPath.toStdString();
+  if (m_SysPythonPath.isEmpty())
+  {
+    return false;
+  }
   std::vector<std::string> packages;
   std::map<std::string, std::string> params = GetInstallParameters(packageName);
 
@@ -123,11 +132,11 @@ bool QmitkSetupVirtualEnvUtil::SetupVirtualEnv(QmitkSetupVirtualEnvUtil::Tool pa
   args.push_back("venv");
   args.push_back(venvName.toStdString());
 #ifdef _WIN32
-  MITK_INFO << m_SysPythonPath.toStdString();
-  spExec->Execute(
-    m_BaseDir.toStdString(), "C:/ProgramData/Anaconda3/python.exe", args); // Setup local virtual environment
+  QString pythonFile = m_SysPythonPath + QDir::separator() + "python.exe";
+  spExec->Execute(m_BaseDir.toStdString(), pythonFile.toStdString(), args); // Setup local virtual environment
   QString pythonExeFolder = "Scripts";
 #else
+  QString pythonFile = m_SysPythonPath + QDir::separator() + "python3";
   spExec->Execute(m_BaseDir.toStdString(), "/usr/bin/python3", args); // Setup local virtual environment
   QString pythonExeFolder = "bin";
 #endif
@@ -201,17 +210,6 @@ void QmitkSetupVirtualEnvUtil::ExecutePython(const std::string &pythonCode,
 bool QmitkSetupVirtualEnvUtil::IsPythonPath(const QString &pythonPath)
 {
   QString fullPath = pythonPath;
-#ifdef _WIN32
-  if (!(fullPath.endsWith("Scripts", Qt::CaseInsensitive) || fullPath.endsWith("Scripts/", Qt::CaseInsensitive)))
-  {
-    fullPath += QDir::separator() + QString("Scripts");
-  }
-#else
-  if (!(fullPath.endsWith("bin", Qt::CaseInsensitive) || fullPath.endsWith("bin/", Qt::CaseInsensitive)))
-  {
-    fullPath += QDir::separator() + QString("bin");
-  }
-#endif
   fullPath = fullPath.mid(fullPath.indexOf(" ") + 1);
   bool isExists =
 #ifdef _WIN32

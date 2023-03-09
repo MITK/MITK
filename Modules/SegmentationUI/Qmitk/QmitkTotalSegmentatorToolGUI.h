@@ -32,9 +32,14 @@ protected slots :
   void OnPythonPathChanged(const QString &);
 
   /**
-    @brief Qt Slot
+   * @brief Qt Slot
    */
   void OnInstallBtnClicked();
+
+  /**
+   * @brief Qt Slot 
+   */
+  void OnOverrideChecked(int);
 
 protected:
   QmitkTotalSegmentatorToolGUI();
@@ -46,7 +51,7 @@ protected:
   void EnableWidgets(bool enabled) override;
 
   /**
-    @brief Enable (or Disable) GUI elements.
+   * @brief Enable (or Disable) GUI elements.
    */
   void EnableAll(bool);
 

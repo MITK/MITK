@@ -154,7 +154,15 @@ void mitk::TotalSegmentatorTool::run_totalsegmentator(ProcessExecutor::Pointer s
   args.clear();
 
 #ifdef _WIN32
-  args.push_back("TotalSegmentator");
+  std::string ending = "Scripts";
+  if (0 == this->GetPythonPath().compare(this->GetPythonPath().length() - ending.length(), ending.length(), ending))
+  {
+    args.push_back("TotalSegmentator");
+  }
+  else
+  {
+    args.push_back("Scripts/TotalSegmentator");
+  }
 #endif
 
   args.push_back("-i");

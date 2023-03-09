@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITKMANUALSEGMENTATIONTISURFACEFILTER_h__
-#define _MITKMANUALSEGMENTATIONTISURFACEFILTER_h__
+#ifndef mitkManualSegmentationToSurfaceFilter_h
+#define mitkManualSegmentationToSurfaceFilter_h
 
 #include <MitkSegmentationExports.h>
 #include <mitkImageToSurfaceFilter.h>

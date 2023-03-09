@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITK_NON_BLOCKING_ALGORITHM_H_INCLUDED_DFARdfWN1tr
-#define MITK_NON_BLOCKING_ALGORITHM_H_INCLUDED_DFARdfWN1tr
+#ifndef mitkNonBlockingAlgorithm_h
+#define mitkNonBlockingAlgorithm_h
 
 #include "MitkAlgorithmsExtExports.h"
 #include <itkImage.h>

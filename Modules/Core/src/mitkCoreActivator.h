@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKCOREACTIVATOR_H_
-#define MITKCOREACTIVATOR_H_
+#ifndef mitkCoreActivator_h
+#define mitkCoreActivator_h
 
 // File IO
 #include <mitkAbstractFileIO.h>

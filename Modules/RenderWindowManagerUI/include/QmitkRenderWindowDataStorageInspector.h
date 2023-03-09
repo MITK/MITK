@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKRENDERWINDOWDATASTORAGEINSPECTOR_H
-#define QMITKRENDERWINDOWDATASTORAGEINSPECTOR_H
+#ifndef QmitkRenderWindowDataStorageInspector_h
+#define QmitkRenderWindowDataStorageInspector_h
 
 // render window manager UI module
 #include "MitkRenderWindowManagerUIExports.h"

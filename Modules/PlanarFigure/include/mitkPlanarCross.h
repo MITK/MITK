@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_PLANAR_CROSS_H_
-#define _MITK_PLANAR_CROSS_H_
+#ifndef mitkPlanarCross_h
+#define mitkPlanarCross_h
 
 #include "mitkPlanarFigure.h"
 #include <MitkPlanarFigureExports.h>

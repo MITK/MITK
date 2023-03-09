@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKNODEPREDICATEOR_H_HEADER_INCLUDED_
-#define MITKNODEPREDICATEOR_H_HEADER_INCLUDED_
+#ifndef mitkNodePredicateOr_h
+#define mitkNodePredicateOr_h
 
 #include "mitkNodePredicateCompositeBase.h"
 

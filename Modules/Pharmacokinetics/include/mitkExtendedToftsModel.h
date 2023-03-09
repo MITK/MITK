@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKEXTENDEDTOFTSMODEL_H
-#define MITKEXTENDEDTOFTSMODEL_H
+#ifndef mitkExtendedToftsModel_h
+#define mitkExtendedToftsModel_h
 
 #include "mitkAIFBasedModelBase.h"
 #include "MitkPharmacokineticsExports.h"

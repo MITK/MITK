@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_GRID_REPRESENTATION_PROPERTY__H_
-#define _MITK_GRID_REPRESENTATION_PROPERTY__H_
+#ifndef mitkGridRepresentationProperty_h
+#define mitkGridRepresentationProperty_h
 
 #include "MitkDataTypesExtExports.h"
 #include "mitkEnumerationProperty.h"

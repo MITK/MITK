@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkBinaryThresholdTool_h_Included
-#define mitkBinaryThresholdTool_h_Included
+#ifndef mitkBinaryThresholdTool_h
+#define mitkBinaryThresholdTool_h
 
 #include "mitkBinaryThresholdBaseTool.h"
 #include <MitkSegmentationExports.h>

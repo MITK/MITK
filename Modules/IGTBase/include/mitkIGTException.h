@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef IGTEXCEPTION_H_INCLUDED
-#define IGTEXCEPTION_H_INCLUDED
+#ifndef mitkIGTException_h
+#define mitkIGTException_h
 
 #include <MitkIGTBaseExports.h>
 #include <mitkException.h>

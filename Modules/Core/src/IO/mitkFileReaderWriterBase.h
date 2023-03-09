@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKFILEREADERWRITERBASE_H
-#define MITKFILEREADERWRITERBASE_H
+#ifndef mitkFileReaderWriterBase_h
+#define mitkFileReaderWriterBase_h
 
 #include <mitkCustomMimeType.h>
 #include <mitkMessage.h>

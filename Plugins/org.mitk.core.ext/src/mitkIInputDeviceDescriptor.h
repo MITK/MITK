@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIINPUTDEVICEDESCRIPTOR_H_
-#define MITKIINPUTDEVICEDESCRIPTOR_H_
+#ifndef mitkIInputDeviceDescriptor_h
+#define mitkIInputDeviceDescriptor_h
 
 #include <berryObject.h>
 #include <berryMacros.h>

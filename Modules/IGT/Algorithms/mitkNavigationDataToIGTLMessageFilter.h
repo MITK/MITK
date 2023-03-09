@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITKNAVIGATIONDATATOIGTLMessageFILTER_H__
-#define _MITKNAVIGATIONDATATOIGTLMessageFILTER_H__
+#ifndef mitkNavigationDataToIGTLMessageFilter_h
+#define mitkNavigationDataToIGTLMessageFilter_h
 
 #include "mitkCommon.h"
 #include "mitkPointSet.h"

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATANODESHOWDETAILSACTION_H
-#define QMITKDATANODESHOWDETAILSACTION_H
+#ifndef QmitkDataNodeShowDetailsAction_h
+#define QmitkDataNodeShowDetailsAction_h
 
 #include <org_mitk_gui_qt_application_Export.h>
 

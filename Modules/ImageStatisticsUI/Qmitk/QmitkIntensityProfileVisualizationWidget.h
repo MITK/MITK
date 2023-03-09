@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef QmitkIntensityProfileVisualizationWidget_H__INCLUDED
-#define QmitkIntensityProfileVisualizationWidget_H__INCLUDED
+#ifndef QmitkIntensityProfileVisualizationWidget_h
+#define QmitkIntensityProfileVisualizationWidget_h
 
 //Qt
 #include <QWidget>

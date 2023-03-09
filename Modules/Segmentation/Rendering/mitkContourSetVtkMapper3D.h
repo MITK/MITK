@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITK_CONTOUR_SET_VTK_MAPPER_3D_H
-#define MITK_CONTOUR_SET_VTK_MAPPER_3D_H
+#ifndef mitkContourSetVtkMapper3D_h
+#define mitkContourSetVtkMapper3D_h
 
 #include "mitkBaseRenderer.h"
 #include "mitkCommon.h"

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATANODESETINFORMATIONTYPEACTION_H
-#define QMITKDATANODESETINFORMATIONTYPEACTION_H
+#ifndef QmitkDataNodeSetInformationTypeAction_h
+#define QmitkDataNodeSetInformationTypeAction_h
 
 // mitk gui qt application plugin
 #include <QmitkAbstractDataNodeAction.h>

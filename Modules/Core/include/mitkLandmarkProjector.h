@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKLANDMARKPROJECTOR_H_HEADER_INCLUDED_C1C68A2C
-#define MITKLANDMARKPROJECTOR_H_HEADER_INCLUDED_C1C68A2C
+#ifndef mitkLandmarkProjector_h
+#define mitkLandmarkProjector_h
 
 #include "itkObject.h"
 #include <MitkCoreExports.h>

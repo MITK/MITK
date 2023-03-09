@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_ExampleDataStructure_H
-#define _MITK_ExampleDataStructure_H
+#ifndef mitkExampleDataStructure_h
+#define mitkExampleDataStructure_h
 
 #include <MitkNewModuleExports.h>
 

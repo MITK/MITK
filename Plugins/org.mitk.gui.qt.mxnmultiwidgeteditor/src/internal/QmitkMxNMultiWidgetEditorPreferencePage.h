@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKMXNMULTIWIDGETEDITORPREFERENCEPAGE_H
-#define QMITKMXNMULTIWIDGETEDITORPREFERENCEPAGE_H
+#ifndef QmitkMxNMultiWidgetEditorPreferencePage_h
+#define QmitkMxNMultiWidgetEditorPreferencePage_h
 
 #include "ui_QmitkMxNMultiWidgetEditorPreferencePage.h"
 

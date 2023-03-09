@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATANODECONTEXTMENU_H
-#define QMITKDATANODECONTEXTMENU_H
+#ifndef QmitkDataNodeContextMenu_h
+#define QmitkDataNodeContextMenu_h
 
 #include <org_mitk_gui_qt_application_Export.h>
 

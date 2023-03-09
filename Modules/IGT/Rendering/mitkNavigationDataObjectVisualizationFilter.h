@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKNAVIGATIONDATAOBJECTVISUALIZATIONFILTER_H_HEADER_INCLUDED_
-#define MITKNAVIGATIONDATAOBJECTVISUALIZATIONFILTER_H_HEADER_INCLUDED_
+#ifndef mitkNavigationDataObjectVisualizationFilter_h
+#define mitkNavigationDataObjectVisualizationFilter_h
 
 #include "mitkNavigationDataToNavigationDataFilter.h"
 #include "mitkNavigationData.h"

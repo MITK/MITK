@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKMXNMULTIWIDGETEDITOR_H
-#define QMITKMXNMULTIWIDGETEDITOR_H
+#ifndef QmitkMxNMultiWidgetEditor_h
+#define QmitkMxNMultiWidgetEditor_h
 
 #include <org_mitk_gui_qt_mxnmultiwidgeteditor_Export.h>
 

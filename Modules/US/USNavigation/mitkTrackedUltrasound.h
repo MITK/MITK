@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkTrackedUltrasound_h
-#define __mitkTrackedUltrasound_h
+#ifndef mitkTrackedUltrasound_h
+#define mitkTrackedUltrasound_h
 
 #include <MitkUSNavigationExports.h>
 #include "mitkUSDevice.h"

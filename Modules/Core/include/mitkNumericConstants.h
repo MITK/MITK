@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKNUMERICCONSTANTS_H_
-#define MITKNUMERICCONSTANTS_H_
+#ifndef mitkNumericConstants_h
+#define mitkNumericConstants_h
 
 #include <MitkCoreExports.h>
 

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkRadiomicsMaskProcessingView_H__INCLUDED
-#define QmitkRadiomicsMaskProcessingView_H__INCLUDED
+#ifndef QmitkRadiomicsMaskProcessingView_h
+#define QmitkRadiomicsMaskProcessingView_h
 
 #include <QmitkAbstractView.h>
 #include <org_mitk_gui_qt_radiomics_Export.h>

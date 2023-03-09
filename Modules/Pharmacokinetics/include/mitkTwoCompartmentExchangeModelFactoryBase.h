@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef MITKTWOCOMPARTMENTEXCHANGEMODELFACTORYBASE_H
-#define MITKTWOCOMPARTMENTEXCHANGEMODELFACTORYBASE_H
+#ifndef mitkTwoCompartmentExchangeModelFactoryBase_h
+#define mitkTwoCompartmentExchangeModelFactoryBase_h
 
 #include "mitkConcreteAIFBasedModelFactory.h"
 #include "mitkAIFBasedModelParameterizerBase.h"

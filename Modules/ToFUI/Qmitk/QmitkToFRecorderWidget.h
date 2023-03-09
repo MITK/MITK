@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QMITKTOFRECORDERWIDGET_H_INCLUDED
-#define _QMITKTOFRECORDERWIDGET_H_INCLUDED
+#ifndef QmitkToFRecorderWidget_h
+#define QmitkToFRecorderWidget_h
 
 #include <MitkToFUIExports.h>
 #include <ui_QmitkToFRecorderWidgetControls.h>

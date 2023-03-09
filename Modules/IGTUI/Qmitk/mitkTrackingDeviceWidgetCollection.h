@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef TrackingDeviceWidgetCollection_H_INCLUDED
-#define TrackingDeviceWidgetCollection_H_INCLUDED
+#ifndef mitkTrackingDeviceWidgetCollection_h
+#define mitkTrackingDeviceWidgetCollection_h
 
 #include <MitkIGTUIExports.h>
 

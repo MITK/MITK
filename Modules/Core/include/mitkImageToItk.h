@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef IMAGETOITK_H_HEADER_INCLUDED_C1C2FCD2
-#define IMAGETOITK_H_HEADER_INCLUDED_C1C2FCD2
+#ifndef mitkImageToItk_h
+#define mitkImageToItk_h
 
 #include "mitkImage.h"
 #include "mitkImageDataItem.h"

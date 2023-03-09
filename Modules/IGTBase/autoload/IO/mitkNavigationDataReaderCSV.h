@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKNavigationDataReaderCSV_H_HEADER_INCLUDED_
-#define MITKNavigationDataReaderCSV_H_HEADER_INCLUDED_
+#ifndef mitkNavigationDataReaderCSV_h
+#define mitkNavigationDataReaderCSV_h
 
 #include <MitkIGTIOExports.h>
 

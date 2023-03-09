@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKTABLEITEMTHUMBNAILDELEGATE_H
-#define QMITKTABLEITEMTHUMBNAILDELEGATE_H
+#ifndef QmitkTableItemThumbnailDelegate_h
+#define QmitkTableItemThumbnailDelegate_h
 
 #include <QStyledItemDelegate>
 

@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITKCOMMONACTIVATOR_H_
-#define QMITKCOMMONACTIVATOR_H_
+#ifndef QmitkCommonActivator_h
+#define QmitkCommonActivator_h
 
 #include <ctkPluginActivator.h>
 #include "QmitkViewCoordinator.h"

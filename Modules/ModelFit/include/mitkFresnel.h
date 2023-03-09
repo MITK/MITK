@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKFRESNEL_H_
-#define MITKFRESNEL_H_
+#ifndef mitkFresnel_h
+#define mitkFresnel_h
 
 /****************************************************************************
  *              fresnel.h -

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QmitkToolTrackingStatusWidget_H_INCLUDED
-#define _QmitkToolTrackingStatusWidget_H_INCLUDED
+#ifndef QmitkToolTrackingStatusWidget_h
+#define QmitkToolTrackingStatusWidget_h
 
 #include "ui_QmitkToolTrackingStatusWidgetControls.h"
 #include "MitkIGTUIExports.h"

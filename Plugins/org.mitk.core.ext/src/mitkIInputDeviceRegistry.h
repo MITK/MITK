@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIINPUTDEVICEREGISTRY_H_
-#define MITKIINPUTDEVICEREGISTRY_H_
+#ifndef mitkIInputDeviceRegistry_h
+#define mitkIInputDeviceRegistry_h
 
 #include <QtPlugin>
 

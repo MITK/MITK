@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKMICROBIRDTOOL_H_HEADER_INCLUDED_
-#define MITKMICROBIRDTOOL_H_HEADER_INCLUDED_
+#ifndef mitkMicroBirdTool_h
+#define mitkMicroBirdTool_h
 
 #include <mitkTrackingTool.h>
 

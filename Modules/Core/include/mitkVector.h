@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKVECTOR_H_
-#define MITKVECTOR_H_
+#ifndef mitkVector_h
+#define mitkVector_h
 
 #include <itkVector.h>
 #include <vnl/vnl_vector.h>

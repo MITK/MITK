@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKLINE_H_HEADER_INCLUDED_C19C01E2
-#define MITKLINE_H_HEADER_INCLUDED_C19C01E2
+#ifndef mitkLine_h
+#define mitkLine_h
 
 #include "mitkNumericTypes.h"
 #include <itkMatrix.h>

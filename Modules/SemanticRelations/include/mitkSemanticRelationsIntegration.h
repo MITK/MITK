@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKSEMANTICRELATIONSINTEGRATION_H
-#define MITKSEMANTICRELATIONSINTEGRATION_H
+#ifndef mitkSemanticRelationsIntegration_h
+#define mitkSemanticRelationsIntegration_h
 
 #include <MitkSemanticRelationsExports.h>
 

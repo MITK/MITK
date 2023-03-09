@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIMAGECASTER_H
-#define MITKIMAGECASTER_H
+#ifndef mitkImageCaster_h
+#define mitkImageCaster_h
 
 #include <itkCastImageFilter.h>
 #include <itkImage.h>

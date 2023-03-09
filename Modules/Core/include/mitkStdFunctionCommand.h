@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKSTDFUNCTIONCOMMAND_H
-#define MITKSTDFUNCTIONCOMMAND_H
+#ifndef mitkStdFunctionCommand_h
+#define mitkStdFunctionCommand_h
 
 #include <MitkCoreExports.h>
 

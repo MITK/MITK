@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKUSImageLoggingFiler_H_HEADER_INCLUDED_
-#define MITKUSImageLoggingFiler_H_HEADER_INCLUDED_
+#ifndef mitkUSImageLoggingFilter_h
+#define mitkUSImageLoggingFilter_h
 
 // MITK
 #include <MitkUSExports.h>

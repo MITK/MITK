@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKDATASTORAGE_H
-#define MITKDATASTORAGE_H
+#ifndef mitkDataStorage_h
+#define mitkDataStorage_h
 
 #include "itkObject.h"
 #include "itkVectorContainer.h"

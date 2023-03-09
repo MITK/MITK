@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef _MITK_DOSE_ISO_LEVEL_VECTOR_PROPERTY_H_
-#define _MITK_DOSE_ISO_LEVEL_VECTOR_PROPERTY_H_
+#ifndef mitkIsoDoseLevelVectorProperty_h
+#define mitkIsoDoseLevelVectorProperty_h
 
 #include "mitkBaseProperty.h"
 #include "mitkIsoDoseLevelCollections.h"

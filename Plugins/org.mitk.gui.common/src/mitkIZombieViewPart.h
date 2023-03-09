@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKIZOMBIEVIEWPART_H
-#define MITKIZOMBIEVIEWPART_H
+#ifndef mitkIZombieViewPart_h
+#define mitkIZombieViewPart_h
 
 #include "mitkILifecycleAwarePart.h"
 

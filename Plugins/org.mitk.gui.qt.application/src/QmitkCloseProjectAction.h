@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkCloseProjectAction_H_
-#define QmitkCloseProjectAction_H_
+#ifndef QmitkCloseProjectAction_h
+#define QmitkCloseProjectAction_h
 
 #include <berrySmartPointer.h>
 

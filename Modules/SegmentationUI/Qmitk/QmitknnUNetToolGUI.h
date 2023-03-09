@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitknnUNetToolGUI_h_Included
-#define QmitknnUNetToolGUI_h_Included
+#ifndef QmitknnUNetToolGUI_h
+#define QmitknnUNetToolGUI_h
 
 #include "QmitkMultiLabelSegWithPreviewToolGUIBase.h"
 #include "QmitknnUNetFolderParser.h"

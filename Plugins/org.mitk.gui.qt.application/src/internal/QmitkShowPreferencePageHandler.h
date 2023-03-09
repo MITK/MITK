@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKSHOWPREFERENCEPAGEHANDLER_H
-#define QMITKSHOWPREFERENCEPAGEHANDLER_H
+#ifndef QmitkShowPreferencePageHandler_h
+#define QmitkShowPreferencePageHandler_h
 
 #include <berryAbstractHandler.h>
 

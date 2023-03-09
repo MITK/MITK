@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef VTKMAPPER_H_HEADER_INCLUDED_C1C5453B
-#define VTKMAPPER_H_HEADER_INCLUDED_C1C5453B
+#ifndef mitkVtkMapper_h
+#define mitkVtkMapper_h
 
 #include "mitkBaseRenderer.h"
 #include "mitkDataNode.h"

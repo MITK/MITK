@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef DATACOLLECTIONFEATUREVECTORIMAGEITERATOR_H_
-#define DATACOLLECTIONFEATUREVECTORIMAGEITERATOR_H_
+#ifndef mitkDataCollectionVectorImageIterator_h
+#define mitkDataCollectionVectorImageIterator_h
 #include <mitkDataCollection.h>
 #include <mitkDataCollectionSingleImageIterator.h>
 

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkSegTool2D_h_Included
-#define mitkSegTool2D_h_Included
+#ifndef mitkSegTool2D_h
+#define mitkSegTool2D_h
 
 #include <mitkCommon.h>
 #include <mitkImage.h>

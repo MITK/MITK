@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKRENDERINGMANAGER_H_HEADER_INCLUDED_C135A197
-#define QMITKRENDERINGMANAGER_H_HEADER_INCLUDED_C135A197
+#ifndef QmitkRenderingManager_h
+#define QmitkRenderingManager_h
 
 #include <MitkQtWidgetsExports.h>
 

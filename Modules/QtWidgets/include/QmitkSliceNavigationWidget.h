@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKSLICENAVIGATIONWIDGET_H
-#define QMITKSLICENAVIGATIONWIDGET_H
+#ifndef QmitkSliceNavigationWidget_h
+#define QmitkSliceNavigationWidget_h
 
 #include "MitkQtWidgetsExports.h"
 #include "ui_QmitkSliceNavigationWidget.h"

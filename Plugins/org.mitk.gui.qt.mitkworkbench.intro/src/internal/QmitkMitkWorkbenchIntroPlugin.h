@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITKMITKWORKBENCHINTROPLUGIN_H_
-#define QMITKMITKWORKBENCHINTROPLUGIN_H_
+#ifndef QmitkMitkWorkbenchIntroPlugin_h
+#define QmitkMitkWorkbenchIntroPlugin_h
 
 #include <berryAbstractUICTKPlugin.h>
 

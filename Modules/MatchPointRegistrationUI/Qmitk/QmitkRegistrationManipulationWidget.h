@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef __Q_MITK_REGISTRATION_MANIPULATION_WIDGET_H
-#define __Q_MITK_REGISTRATION_MANIPULATION_WIDGET_H
+#ifndef QmitkRegistrationManipulationWidget_h
+#define QmitkRegistrationManipulationWidget_h
 
 
 #include <itkEuler3DTransform.h>

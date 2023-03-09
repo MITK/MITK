@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKTWOSTEPLINEARMODEL_H
-#define MITKTWOSTEPLINEARMODEL_H
+#ifndef mitkTwoStepLinearModel_h
+#define mitkTwoStepLinearModel_h
 
 #include "mitkModelBase.h"
 

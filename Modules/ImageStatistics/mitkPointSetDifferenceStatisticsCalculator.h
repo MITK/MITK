@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef _MITK_PointSetDifferenceStatisticsCalculator_H
-#define _MITK_PointSetDifferenceStatisticsCalculator_H
+#ifndef mitkPointSetDifferenceStatisticsCalculator_h
+#define mitkPointSetDifferenceStatisticsCalculator_h
 
 #include <itkObject.h>
 #include <MitkImageStatisticsExports.h>

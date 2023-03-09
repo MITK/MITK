@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef __Q_MITK_MATCHPOINT_REGISTRATION_EVALUATOR_H
-#define __Q_MITK_MATCHPOINT_REGISTRATION_EVALUATOR_H
+#ifndef QmitkMatchPointRegistrationEvaluator_h
+#define QmitkMatchPointRegistrationEvaluator_h
 
 #include <QmitkAbstractView.h>
 #include <mitkIRenderWindowPartListener.h>

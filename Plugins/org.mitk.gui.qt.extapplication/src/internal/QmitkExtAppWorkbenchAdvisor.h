@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKEXTAPPWORKBENCHADVISOR_H_
-#define QMITKEXTAPPWORKBENCHADVISOR_H_
+#ifndef QmitkExtAppWorkbenchAdvisor_h
+#define QmitkExtAppWorkbenchAdvisor_h
 
 #include <berryQtWorkbenchAdvisor.h>
 

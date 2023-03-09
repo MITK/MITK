@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef PLANEGEOMETRY_H_HEADER_INCLUDED_C1C68A2C
-#define PLANEGEOMETRY_H_HEADER_INCLUDED_C1C68A2C
+#ifndef mitkPlaneGeometry_h
+#define mitkPlaneGeometry_h
 
 #include <MitkCoreExports.h>
 

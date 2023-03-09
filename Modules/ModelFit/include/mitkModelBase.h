@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MODELBASE_H
-#define MODELBASE_H
+#ifndef mitkModelBase_h
+#define mitkModelBase_h
 
 #include <iostream>
 

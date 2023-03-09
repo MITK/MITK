@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKEXTAPPLICATION_H_
-#define QMITKEXTAPPLICATION_H_
+#ifndef QmitkExtApplication_h
+#define QmitkExtApplication_h
 
 #include <berryIApplication.h>
 

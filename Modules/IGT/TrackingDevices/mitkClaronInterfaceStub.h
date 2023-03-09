@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKCLARONINTERFACE_H_HEADER_INCLUDED_
-#define MITKCLARONINTERFACE_H_HEADER_INCLUDED_
+#ifndef mitkClaronInterfaceStub_h
+#define mitkClaronInterfaceStub_h
 
 #include <vector>
 #include <string>

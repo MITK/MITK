@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef TimeGeometry_h
-#define TimeGeometry_h
+#ifndef mitkTimeGeometry_h
+#define mitkTimeGeometry_h
 
 // ITK
 #include <itkObject.h>

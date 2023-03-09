@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __mitkAbstractToFDeviceFactory_h
-#define __mitkAbstractToFDeviceFactory_h
+#ifndef mitkAbstractToFDeviceFactory_h
+#define mitkAbstractToFDeviceFactory_h
 
 #include <MitkToFHardwareExports.h>
 #include "mitkIToFDeviceFactory.h"

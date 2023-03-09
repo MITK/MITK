@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKGRABCUTOPENCVIMAGEFILTER_H
-#define MITKGRABCUTOPENCVIMAGEFILTER_H
+#ifndef mitkGrabCutOpenCVImageFilter_h
+#define mitkGrabCutOpenCVImageFilter_h
 
 // mitk headers
 #include "mitkAbstractOpenCVImageFilter.h"

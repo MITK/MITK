@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKOVERLAY_H_HEADER_INCLUDED_C10DC4EB
-#define MITKOVERLAY_H_HEADER_INCLUDED_C10DC4EB
+#ifndef QmitkOverlay_h
+#define QmitkOverlay_h
 
 // MITK
 #include "mitkCommon.h"

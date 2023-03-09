@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKMRNORMTWOREGIONBASEDFILTER_H
-#define MITKMRNORMTWOREGIONBASEDFILTER_H
+#ifndef mitkMRNormTwoRegionBasedFilter_h
+#define mitkMRNormTwoRegionBasedFilter_h
 
 #include "mitkCommon.h"
 #include "MitkCLMRUtilitiesExports.h"

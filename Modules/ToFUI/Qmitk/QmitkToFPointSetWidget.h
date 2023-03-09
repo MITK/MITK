@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QmitkToFPointSetWidget_H_INCLUDED
-#define _QmitkToFPointSetWidget_H_INCLUDED
+#ifndef QmitkToFPointSetWidget_h
+#define QmitkToFPointSetWidget_h
 
 #include <MitkToFUIExports.h>
 #include "ui_QmitkToFPointSetWidgetControls.h"

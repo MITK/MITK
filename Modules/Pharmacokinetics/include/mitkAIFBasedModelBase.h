@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef AIFBASEDMODELBASE_H
-#define AIFBASEDMODELBASE_H
+#ifndef mitkAIFBasedModelBase_h
+#define mitkAIFBasedModelBase_h
 
 
 #include "MitkPharmacokineticsExports.h"

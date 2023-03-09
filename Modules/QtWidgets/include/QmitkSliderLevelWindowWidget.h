@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKSLIDERLEVELWINDOWWIDGET_H
-#define QMITKSLIDERLEVELWINDOWWIDGET_H
+#ifndef QmitkSliderLevelWindowWidget_h
+#define QmitkSliderLevelWindowWidget_h
 
 #include <MitkQtWidgetsExports.h>
 

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKCONFIRMSEGMENTATIONDIALOG_H
-#define QMITKCONFIRMSEGMENTATIONDIALOG_H
+#ifndef QmitkConfirmSegmentationDialog_h
+#define QmitkConfirmSegmentationDialog_h
 
 #include <QDialog>
 

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKHOTSPOTCALCULATOR_H
-#define MITKHOTSPOTCALCULATOR_H
+#ifndef mitkHotspotMaskGenerator_h
+#define mitkHotspotMaskGenerator_h
 
 #include <itkObject.h>
 #include <mitkImage.h>

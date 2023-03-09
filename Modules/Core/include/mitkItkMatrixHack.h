@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef ITKMATRIXHACK_H_HEADER_INCLUDED_C1EBD0AD
-#define ITKMATRIXHACK_H_HEADER_INCLUDED_C1EBD0AD
+#ifndef mitkItkMatrixHack_h
+#define mitkItkMatrixHack_h
 
 namespace mitk
 {

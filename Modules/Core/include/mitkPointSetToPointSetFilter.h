@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _mitkpointsettopointsetfilter_h
-#define _mitkpointsettopointsetfilter_h
+#ifndef mitkPointSetToPointSetFilter_h
+#define mitkPointSetToPointSetFilter_h
 
 #include "mitkPointSetSource.h"
 #include <MitkCoreExports.h>

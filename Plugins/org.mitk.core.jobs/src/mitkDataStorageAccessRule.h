@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKDATASTORAGEACCESSRULE_H_HEADER_INCLUDED_
-#define MITKDATASTORAGEACCESSRULE_H_HEADER_INCLUDED_
+#ifndef mitkDataStorageAccessRule_h
+#define mitkDataStorageAccessRule_h
 
 #include <org_mitk_core_jobs_Export.h>
 

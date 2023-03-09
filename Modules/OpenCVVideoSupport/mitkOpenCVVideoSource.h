@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _mitk_OpenCVVideo_Source_h_
-#define _mitk_OpenCVVideo_Source_h_
+#ifndef mitkOpenCVVideoSource_h
+#define mitkOpenCVVideoSource_h
 
 #include "mitkConfig.h"
 

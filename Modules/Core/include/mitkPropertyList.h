@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef PROPERTYLIST_H_HEADER_INCLUDED_C1C77D8D
-#define PROPERTYLIST_H_HEADER_INCLUDED_C1C77D8D
+#ifndef mitkPropertyList_h
+#define mitkPropertyList_h
 
 #include "mitkBaseProperty.h"
 #include "mitkGenericProperty.h"

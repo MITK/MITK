@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_SURFACE_VTK_WRITER__H_
-#define _MITK_SURFACE_VTK_WRITER__H_
+#ifndef mitkSurfaceVtkWriter_h
+#define mitkSurfaceVtkWriter_h
 
 #include <iomanip>
 

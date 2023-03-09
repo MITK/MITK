@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkOclImageFilter_h
-#define __mitkOclImageFilter_h
+#ifndef mitkOclImageFilter_h
+#define mitkOclImageFilter_h
 
 #include "mitkOclFilter.h"
 #include "mitkOclImage.h"

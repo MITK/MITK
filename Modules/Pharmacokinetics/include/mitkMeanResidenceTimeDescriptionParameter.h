@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MEANRESIDENCETIMEDESCRIPTIONPARAMETER_H
-#define MEANRESIDENCETIMEDESCRIPTIONPARAMETER_H
+#ifndef mitkMeanResidenceTimeDescriptionParameter_h
+#define mitkMeanResidenceTimeDescriptionParameter_h
 
 
 #include "mitkCurveDescriptionParameterBase.h"

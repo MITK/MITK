@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef OPERATION_H_HEADER_INCLUDED_C16E7D9E
-#define OPERATION_H_HEADER_INCLUDED_C16E7D9E
+#ifndef mitkOperation_h
+#define mitkOperation_h
 
 #include <MitkCoreExports.h>
 #include <itkEventObject.h>

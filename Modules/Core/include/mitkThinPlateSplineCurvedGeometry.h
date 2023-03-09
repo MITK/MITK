@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKTHINPLATESPLINECURVEDGEOMETRY_H_HEADER_INCLUDED_C1C68A2C
-#define MITKTHINPLATESPLINECURVEDGEOMETRY_H_HEADER_INCLUDED_C1C68A2C
+#ifndef mitkThinPlateSplineCurvedGeometry_h
+#define mitkThinPlateSplineCurvedGeometry_h
 
 #include "mitkLandmarkProjectorBasedCurvedGeometry.h"
 

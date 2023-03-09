@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef IGTLMeasurements_H_HEADER_INCLUDED_
-#define IGTLMeasurements_H_HEADER_INCLUDED_
+#ifndef mitkIGTLMeasurements_h
+#define mitkIGTLMeasurements_h
 
 // Microservices
 #include <mitkServiceInterface.h>

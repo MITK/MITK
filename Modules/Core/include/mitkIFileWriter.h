@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef IFileWriter_H_HEADER_INCLUDED_C1E7E521
-#define IFileWriter_H_HEADER_INCLUDED_C1E7E521
+#ifndef mitkIFileWriter_h
+#define mitkIFileWriter_h
 
 #include <mitkIFileIO.h>
 

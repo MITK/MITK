@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef org_mitk_gui_qt_igtapphummelprotocolmeasurements_Activator_h
-#define org_mitk_gui_qt_igtapphummelprotocolmeasurements_Activator_h
+#ifndef mitkPluginActivator_h
+#define mitkPluginActivator_h
 
 #include <ctkPluginActivator.h>
 

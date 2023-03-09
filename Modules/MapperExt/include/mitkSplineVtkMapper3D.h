@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_SPLINE_VTK_MAPPER_3D__H
-#define _MITK_SPLINE_VTK_MAPPER_3D__H
+#ifndef mitkSplineVtkMapper3D_h
+#define mitkSplineVtkMapper3D_h
 
 #include "MitkMapperExtExports.h"
 #include "mitkPointSetVtkMapper3D.h"

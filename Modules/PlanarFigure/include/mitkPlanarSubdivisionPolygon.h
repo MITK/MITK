@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_PLANAR_SUBDIVISION_POLYGON_H_
-#define _MITK_PLANAR_SUBDIVISION_POLYGON_H_
+#ifndef mitkPlanarSubdivisionPolygon_h
+#define mitkPlanarSubdivisionPolygon_h
 
 #include "mitkPlanarFigure.h"
 #include "mitkPlanarPolygon.h"

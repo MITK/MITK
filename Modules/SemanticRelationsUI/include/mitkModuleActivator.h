@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKMODULEACTIVATOR_H
-#define MITKMODULEACTIVATOR_H
+#ifndef mitkModuleActivator_h
+#define mitkModuleActivator_h
 
 // Micro Services
 #include <usModuleActivator.h>

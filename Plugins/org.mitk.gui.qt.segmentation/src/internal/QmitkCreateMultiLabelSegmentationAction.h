@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef QMITK_CreateMultiLabelSegmentation_H
-#define QMITK_CreateMultiLabelSegmentation_H
+#ifndef QmitkCreateMultiLabelSegmentationAction_h
+#define QmitkCreateMultiLabelSegmentationAction_h
 
 #include "mitkIContextMenuAction.h"
 

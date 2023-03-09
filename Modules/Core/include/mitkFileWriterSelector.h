@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKFILEWRITERSELECTOR_H
-#define MITKFILEWRITERSELECTOR_H
+#ifndef mitkFileWriterSelector_h
+#define mitkFileWriterSelector_h
 
 #include <mitkIFileWriter.h>
 

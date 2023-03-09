@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKINTERACTIONSCHEMETOOLBAR_H
-#define QMITKINTERACTIONSCHEMETOOLBAR_H
+#ifndef QmitkInteractionSchemeToolBar_h
+#define QmitkInteractionSchemeToolBar_h
 
 #include "MitkQtWidgetsExports.h"
 

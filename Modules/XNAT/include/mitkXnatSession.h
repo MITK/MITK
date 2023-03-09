@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKXNATSESSION_H
-#define MITKXNATSESSION_H
+#ifndef mitkXnatSession_h
+#define mitkXnatSession_h
 
 #include <ctkXnatSession.h>
 

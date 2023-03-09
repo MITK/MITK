@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKRENDERWINDOWCONTEXTDATASTORAGEINSPECTOR_H
-#define QMITKRENDERWINDOWCONTEXTDATASTORAGEINSPECTOR_H
+#ifndef QmitkRenderWindowContextDataStorageInspector_h
+#define QmitkRenderWindowContextDataStorageInspector_h
 
 // qt widgets module
 #include "MitkQtWidgetsExports.h"

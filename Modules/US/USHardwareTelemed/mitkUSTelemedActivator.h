@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkUSTelemedActivator_h
-#define __mitkUSTelemedActivator_h
+#ifndef mitkUSTelemedActivator_h
+#define mitkUSTelemedActivator_h
 
 #include "mitkUSTelemedDevice.h"
 

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef POINTSETWRITERFACTORY_H_HEADER_INCLUDED
-#define POINTSETWRITERFACTORY_H_HEADER_INCLUDED
+#ifndef mitkPointSetWriterFactory_h
+#define mitkPointSetWriterFactory_h
 
 #include <MitkLegacyIOExports.h>
 

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __MITK_MODEL_FIT_PLOT_DATA_HELPER_H_
-#define __MITK_MODEL_FIT_PLOT_DATA_HELPER_H_
+#ifndef mitkModelFitPlotDataHelper_h
+#define mitkModelFitPlotDataHelper_h
 
 #include <vector>
 

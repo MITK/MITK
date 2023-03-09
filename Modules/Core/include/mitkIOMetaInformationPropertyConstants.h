@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIOMETAINFORMATIONCONSTANTS_H_
-#define MITKIOMETAINFORMATIONCONSTANTS_H_
+#ifndef mitkIOMetaInformationPropertyConstants_h
+#define mitkIOMetaInformationPropertyConstants_h
 
 #include <MitkCoreExports.h>
 

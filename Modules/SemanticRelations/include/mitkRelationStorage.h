@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKRELATIONSTORAGE_H
-#define MITKRELATIONSTORAGE_H
+#ifndef mitkRelationStorage_h
+#define mitkRelationStorage_h
 
 #include <MitkSemanticRelationsExports.h>
 

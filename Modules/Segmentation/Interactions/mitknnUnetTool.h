@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitknnUnetTool_h_Included
-#define mitknnUnetTool_h_Included
+#ifndef mitknnUnetTool_h
+#define mitknnUnetTool_h
 
 #include "mitkSegWithPreviewTool.h"
 #include "mitkCommon.h"

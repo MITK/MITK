@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKVTKEVENTADAPTER_H_
-#define MITKVTKEVENTADAPTER_H_
+#ifndef mitkVtkEventAdapter_h
+#define mitkVtkEventAdapter_h
 
 #include "mitkInteractionKeyEvent.h"
 #include "mitkMouseMoveEvent.h"

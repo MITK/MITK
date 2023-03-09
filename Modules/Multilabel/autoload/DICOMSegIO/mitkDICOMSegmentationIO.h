@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkDICOMSegmentationIO_h
-#define __mitkDICOMSegmentationIO_h
+#ifndef mitkDICOMSegmentationIO_h
+#define mitkDICOMSegmentationIO_h
 
 #include <mitkAbstractFileIO.h>
 #include <mitkLabelSetImage.h>

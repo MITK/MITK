@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKHOTKEYLINEEDIT_H
-#define QMITKHOTKEYLINEEDIT_H
+#ifndef QmitkHotkeyLineEdit_h
+#define QmitkHotkeyLineEdit_h
 
 #include "MitkQtWidgetsExtExports.h"
 

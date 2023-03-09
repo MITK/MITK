@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKDICOMFILESHELPER_H
-#define MITKDICOMFILESHELPER_H
+#ifndef mitkDICOMFilesHelper_h
+#define mitkDICOMFilesHelper_h
 
 #include <string>
 #include <vector>

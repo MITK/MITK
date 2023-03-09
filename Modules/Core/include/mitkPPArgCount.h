@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKPPARGCOUNT_H
-#define MITKPPARGCOUNT_H
+#ifndef mitkPPArgCount_h
+#define mitkPPArgCount_h
 
 #define MITK_PP_ARG_COUNT(...) MITK_PP_ARG_COUNT_((__VA_ARGS__, MITK_PP_RSEQ_N()))
 

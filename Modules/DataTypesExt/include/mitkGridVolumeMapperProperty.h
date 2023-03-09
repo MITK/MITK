@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_GRID_VOLUME_MAPPER_PROPERTY__H_
-#define _MITK_GRID_VOLUME_MAPPER_PROPERTY__H_
+#ifndef mitkGridVolumeMapperProperty_h
+#define mitkGridVolumeMapperProperty_h
 
 #include "MitkDataTypesExtExports.h"
 #include "mitkEnumerationProperty.h"

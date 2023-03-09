@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKSLICEWIDGET_H_
-#define QMITKSLICEWIDGET_H_
+#ifndef QmitkSliceWidget_h
+#define QmitkSliceWidget_h
 
 #include "MitkQtWidgetsExtExports.h"
 #include "ui_QmitkSliceWidget.h"

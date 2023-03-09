@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKCOMPAREIMAGEDATAFILTER_H
-#define MITKCOMPAREIMAGEDATAFILTER_H
+#ifndef mitkCompareImageDataFilter_h
+#define mitkCompareImageDataFilter_h
 
 // MITK
 #include "mitkImage.h"

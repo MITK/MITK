@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkTrackingDeviceConfigurationWidgetScanPortsWorker_H
-#define QmitkTrackingDeviceConfigurationWidgetScanPortsWorker_H
+#ifndef QmitkTrackingDeviceConfigurationWidgetScanPortsWorker_h
+#define QmitkTrackingDeviceConfigurationWidgetScanPortsWorker_h
 
 #include <QWidget>
 #include "mitkTrackingDevice.h"

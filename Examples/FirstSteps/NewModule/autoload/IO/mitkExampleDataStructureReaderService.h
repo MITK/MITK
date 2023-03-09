@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkExampleDataStructureReaderService_h
-#define __mitkExampleDataStructureReaderService_h
+#ifndef mitkExampleDataStructureReaderService_h
+#define mitkExampleDataStructureReaderService_h
 
 #include "mitkCommon.h"
 #include "mitkExampleDataStructure.h"

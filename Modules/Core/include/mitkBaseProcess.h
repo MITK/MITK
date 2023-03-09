@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef BASEPROCESS_H_HEADER_INCLUDED_C19BE6FC
-#define BASEPROCESS_H_HEADER_INCLUDED_C19BE6FC
+#ifndef mitkBaseProcess_h
+#define mitkBaseProcess_h
 
 #include "mitkBaseDataSource.h"
 

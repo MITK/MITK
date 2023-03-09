@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATANODEREINITACTION_H
-#define QMITKDATANODEREINITACTION_H
+#ifndef QmitkDataNodeReinitAction_h
+#define QmitkDataNodeReinitAction_h
 
 #include <org_mitk_gui_qt_application_Export.h>
 

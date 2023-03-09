@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __mitkLabelSetImageSurfaceStampFilter_h
-#define __mitkLabelSetImageSurfaceStampFilter_h
+#ifndef mitkLabelSetImageSurfaceStampFilter_h
+#define mitkLabelSetImageSurfaceStampFilter_h
 
 #include "MitkMultilabelExports.h"
 

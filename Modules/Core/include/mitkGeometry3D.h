@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef GEOMETRY3D_H_HEADER_INCLUDED_C1EBD0AD
-#define GEOMETRY3D_H_HEADER_INCLUDED_C1EBD0AD
+#ifndef mitkGeometry3D_h
+#define mitkGeometry3D_h
 
 #include "mitkNumericTypes.h"
 #include <MitkCoreExports.h>

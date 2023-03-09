@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKCORESERVICES_H
-#define MITKCORESERVICES_H
+#ifndef mitkCoreServices_h
+#define mitkCoreServices_h
 
 #include "MitkCoreExports.h"
 

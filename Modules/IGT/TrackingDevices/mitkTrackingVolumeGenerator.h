@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKTRACKINGVOLUMEGENERATOR_H
-#define MITKTRACKINGVOLUMEGENERATOR_H
+#ifndef mitkTrackingVolumeGenerator_h
+#define mitkTrackingVolumeGenerator_h
 
 #include "MitkIGTExports.h"
 

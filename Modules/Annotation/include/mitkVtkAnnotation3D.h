@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef VTKAnnotation3D_H
-#define VTKAnnotation3D_H
+#ifndef mitkVtkAnnotation3D_h
+#define mitkVtkAnnotation3D_h
 
 #include "mitkVtkAnnotation.h"
 #include <MitkAnnotationExports.h>

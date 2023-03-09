@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATANODECOLORACTION_H
-#define QMITKDATANODECOLORACTION_H
+#ifndef QmitkDataNodeColorAction_h
+#define QmitkDataNodeColorAction_h
 
 #include <org_mitk_gui_qt_application_Export.h>
 

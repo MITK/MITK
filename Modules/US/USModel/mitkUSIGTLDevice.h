@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIGTLDevice_H_HEADER_INCLUDED_
-#define MITKIGTLDevice_H_HEADER_INCLUDED_
+#ifndef mitkUSIGTLDevice_h
+#define mitkUSIGTLDevice_h
 
 #include <mitkCommon.h>
 #include <MitkUSExports.h>

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef BaseGeometry_H_HEADER_INCLUDED
-#define BaseGeometry_H_HEADER_INCLUDED
+#ifndef mitkBaseGeometry_h
+#define mitkBaseGeometry_h
 
 #include "mitkOperationActor.h"
 #include <MitkCoreExports.h>

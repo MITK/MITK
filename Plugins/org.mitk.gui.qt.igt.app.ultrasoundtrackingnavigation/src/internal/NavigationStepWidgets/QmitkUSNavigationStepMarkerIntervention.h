@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKUSNAVIGATIONSTEPMARKERINTERVENTION_H
-#define QMITKUSNAVIGATIONSTEPMARKERINTERVENTION_H
+#ifndef QmitkUSNavigationStepMarkerIntervention_h
+#define QmitkUSNavigationStepMarkerIntervention_h
 
 #include "QmitkUSAbstractNavigationStep.h"
 

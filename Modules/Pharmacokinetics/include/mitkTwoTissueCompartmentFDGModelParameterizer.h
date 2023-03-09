@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKTWOTISSUECOMPARTMENTFDGMODELPARAMETERIZER_H
-#define MITKTWOTISSUECOMPARTMENTFDGMODELPARAMETERIZER_H
+#ifndef mitkTwoTissueCompartmentFDGModelParameterizer_h
+#define mitkTwoTissueCompartmentFDGModelParameterizer_h
 
 #include "mitkAIFBasedModelParameterizerBase.h"
 #include "mitkTwoTissueCompartmentFDGModel.h"

@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __mitkToFDistanceImageToPointSetFilter_h
-#define __mitkToFDistanceImageToPointSetFilter_h
+#ifndef mitkToFDistanceImageToPointSetFilter_h
+#define mitkToFDistanceImageToPointSetFilter_h
 
 
 #include <mitkCameraIntrinsics.h>

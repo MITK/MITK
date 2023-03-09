@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkDICOMPMIO_h
-#define __mitkDICOMPMIO_h
+#ifndef mitkDICOMPMIO_h
+#define mitkDICOMPMIO_h
 
 #include <mitkAbstractFileIO.h>
 #include <mitkImage.h>

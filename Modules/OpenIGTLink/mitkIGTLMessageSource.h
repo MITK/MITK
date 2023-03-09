@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKIGTLMESSAGESOURCE_H_HEADER_INCLUDED_
-#define MITKIGTLMESSAGESOURCE_H_HEADER_INCLUDED_
+#ifndef mitkIGTLMessageSource_h
+#define mitkIGTLMessageSource_h
 
 #include <itkProcessObject.h>
 #include "mitkPropertyList.h"

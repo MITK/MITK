@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKNAVIGATIONDATAPLAYERCONTROLWIDGET_H
-#define QMITKNAVIGATIONDATAPLAYERCONTROLWIDGET_H
+#ifndef QmitkNavigationDataPlayerControlWidget_h
+#define QmitkNavigationDataPlayerControlWidget_h
 
 #include <QWidget>
 #include "mitkNavigationDataPlayer.h"

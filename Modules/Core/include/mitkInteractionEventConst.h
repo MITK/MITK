@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKINTERACTEVENTCONST_H
-#define MITKINTERACTEVENTCONST_H
+#ifndef mitkInteractionEventConst_h
+#define mitkInteractionEventConst_h
 
 #include <MitkCoreExports.h>
 #include <string>

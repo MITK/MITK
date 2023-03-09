@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKARRAY_H_
-#define MITKARRAY_H_
+#ifndef mitkArray_h
+#define mitkArray_h
 
 #include <itkFixedArray.h>
 

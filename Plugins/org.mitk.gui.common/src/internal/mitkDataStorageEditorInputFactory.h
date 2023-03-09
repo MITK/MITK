@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKDATASTORAGEEDITORINPUTFACTORY_H
-#define MITKDATASTORAGEEDITORINPUTFACTORY_H
+#ifndef mitkDataStorageEditorInputFactory_h
+#define mitkDataStorageEditorInputFactory_h
 
 #include <berryIElementFactory.h>
 

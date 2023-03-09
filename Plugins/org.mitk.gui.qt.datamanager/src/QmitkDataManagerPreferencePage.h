@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITKDATAMANAGERPREFERENCEPAGE_H_
-#define QMITKDATAMANAGERPREFERENCEPAGE_H_
+#ifndef QmitkDataManagerPreferencePage_h
+#define QmitkDataManagerPreferencePage_h
 
 #include "berryIQtPreferencePage.h"
 #include <org_mitk_gui_qt_datamanager_Export.h>

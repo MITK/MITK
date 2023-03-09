@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKCUSTOMVARIANTS_H_
-#define QMITKCUSTOMVARIANTS_H_
+#ifndef QmitkCustomVariants_h
+#define QmitkCustomVariants_h
 
 #include <mitkDataNode.h>
 

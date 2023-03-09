@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKCONVERTTOCONCENTRATIONVIAT1CALCFUNCTOR_H
-#define MITKCONVERTTOCONCENTRATIONVIAT1CALCFUNCTOR_H
+#ifndef mitkConvertToConcentrationViaT1Functor_h
+#define mitkConvertToConcentrationViaT1Functor_h
 
 #include "itkMath.h"
 

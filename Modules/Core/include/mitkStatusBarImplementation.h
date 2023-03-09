@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKSTATUSBARIMPLEMENTATION_H
-#define MITKSTATUSBARIMPLEMENTATION_H
+#ifndef mitkStatusBarImplementation_h
+#define mitkStatusBarImplementation_h
 #include <MitkCoreExports.h>
 #include <mitkCommon.h>
 

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef NAVIGATIONTOOL_H_INCLUDED
-#define NAVIGATIONTOOL_H_INCLUDED
+#ifndef mitkNavigationTool_h
+#define mitkNavigationTool_h
 
 //itk headers
 #include <itkObjectFactory.h>

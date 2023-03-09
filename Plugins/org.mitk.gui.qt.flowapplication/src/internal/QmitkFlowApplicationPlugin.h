@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITKFLOWAPPLICATIONLICATIONPLUGIN_H_
-#define QMITKFLOWAPPLICATIONLICATIONPLUGIN_H_
+#ifndef QmitkFlowApplicationPlugin_h
+#define QmitkFlowApplicationPlugin_h
 
 #include <berryAbstractUICTKPlugin.h>
 

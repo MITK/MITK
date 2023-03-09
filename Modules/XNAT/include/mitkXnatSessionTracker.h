@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKXNATSESSIONTRACKER_H
-#define MITKXNATSESSIONTRACKER_H
+#ifndef mitkXnatSessionTracker_h
+#define mitkXnatSessionTracker_h
 
 #include "usServiceTracker.h"
 

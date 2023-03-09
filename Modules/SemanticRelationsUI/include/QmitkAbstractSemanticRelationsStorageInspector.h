@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKABSTRACTSEMANTICRELATIONSSTORAGEINSPECTOR_H
-#define QMITKABSTRACTSEMANTICRELATIONSSTORAGEINSPECTOR_H
+#ifndef QmitkAbstractSemanticRelationsStorageInspector_h
+#define QmitkAbstractSemanticRelationsStorageInspector_h
 
 // semantic relations UI module
 #include "MitkSemanticRelationsUIExports.h"

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef BASEPROPERTY_H_HEADER_INCLUDED_C1F4DF54
-#define BASEPROPERTY_H_HEADER_INCLUDED_C1F4DF54
+#ifndef mitkBaseProperty_h
+#define mitkBaseProperty_h
 
 #include <MitkCoreExports.h>
 #include <itkObjectFactory.h>

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKSLICENAVIGATIONCONTROLLER_H
-#define MITKSLICENAVIGATIONCONTROLLER_H
+#ifndef mitkSliceNavigationController_h
+#define mitkSliceNavigationController_h
 
 #include <MitkCoreExports.h>
 

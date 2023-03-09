@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKMOUSEMOVEEVENT_H_
-#define MITKMOUSEMOVEEVENT_H_
+#ifndef mitkMouseMoveEvent_h
+#define mitkMouseMoveEvent_h
 #include "itkObject.h"
 #include "itkObjectFactory.h"
 #include "mitkBaseRenderer.h"

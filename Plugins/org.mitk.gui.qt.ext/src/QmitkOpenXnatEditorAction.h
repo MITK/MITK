@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKOPENXNATEDITORACTION_H_
-#define QMITKOPENXNATEDITORACTION_H_
+#ifndef QmitkOpenXnatEditorAction_h
+#define QmitkOpenXnatEditorAction_h
 
 #include <QAction>
 #include <QIcon>

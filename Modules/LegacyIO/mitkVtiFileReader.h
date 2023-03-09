@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef VtiFileReader_H_HEADER_INCLUDED
-#define VtiFileReader_H_HEADER_INCLUDED
+#ifndef mitkVtiFileReader_h
+#define mitkVtiFileReader_h
 
 #include "mitkFileReader.h"
 #include "mitkImageSource.h"

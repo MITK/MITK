@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKUSProbe_H_HEADER_INCLUDED_
-#define MITKUSProbe_H_HEADER_INCLUDED_
+#ifndef mitkUSProbe_h
+#define mitkUSProbe_h
 
 #include <MitkUSExports.h>
 #include <mitkCommon.h>

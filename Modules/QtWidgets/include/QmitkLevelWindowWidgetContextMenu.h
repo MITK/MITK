@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKLEVELWINDOWWIDGETCONTEXTMENU_H
-#define QMITKLEVELWINDOWWIDGETCONTEXTMENU_H
+#ifndef QmitkLevelWindowWidgetContextMenu_h
+#define QmitkLevelWindowWidgetContextMenu_h
 
 #include <MitkQtWidgetsExports.h>
 

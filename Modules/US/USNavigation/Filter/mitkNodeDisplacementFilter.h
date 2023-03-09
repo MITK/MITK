@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef NODEDISPLACEMENTFILTER_H_INCLUDED
-#define NODEDISPLACEMENTFILTER_H_INCLUDED
+#ifndef mitkNodeDisplacementFilter_h
+#define mitkNodeDisplacementFilter_h
 
 #include "MitkUSNavigationExports.h"
 

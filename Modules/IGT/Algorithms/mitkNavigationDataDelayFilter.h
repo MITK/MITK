@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKNavigationDataDelayFilter_H
-#define MITKNavigationDataDelayFilter_H
+#ifndef mitkNavigationDataDelayFilter_h
+#define mitkNavigationDataDelayFilter_h
 
 // MITK Header
 #include "MitkIGTExports.h"

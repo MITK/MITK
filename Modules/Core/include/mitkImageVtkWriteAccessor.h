@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIMAGEVTKWRITEACCESSOR_H
-#define MITKIMAGEVTKWRITEACCESSOR_H
+#ifndef mitkImageVtkWriteAccessor_h
+#define mitkImageVtkWriteAccessor_h
 
 #include "mitkImageAccessorBase.h"
 

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKNUMERICTYPES_H_
-#define MITKNUMERICTYPES_H_
+#ifndef mitkNumericTypes_h
+#define mitkNumericTypes_h
 
 #include "mitkAffineTransform3D.h"
 #include "mitkEqual.h"

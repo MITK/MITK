@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITK_SIMPLE_BARRIER_MANAGER_WIDGET_H
-#define QMITK_SIMPLE_BARRIER_MANAGER_WIDGET_H
+#ifndef QmitkSimpleBarrierManagerWidget_h
+#define QmitkSimpleBarrierManagerWidget_h
 
 #include "MitkModelFitUIExports.h"
 

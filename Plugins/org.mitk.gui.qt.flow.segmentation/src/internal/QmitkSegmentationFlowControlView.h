@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef __Q_MITK_MATCHPOINT_MAPPER_H
-#define __Q_MITK_MATCHPOINT_MAPPER_H
+#ifndef QmitkSegmentationFlowControlView_h
+#define QmitkSegmentationFlowControlView_h
 
 #include <berryISelectionListener.h>
 #include <berryIWorkbenchListener.h>

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKAREAUNDERTHECURVEDESCRIPTIONPARAMETER_H
-#define MITKAREAUNDERTHECURVEDESCRIPTIONPARAMETER_H
+#ifndef mitkAreaUnderTheCurveDescriptionParameter_h
+#define mitkAreaUnderTheCurveDescriptionParameter_h
 
 #include "mitkCurveDescriptionParameterBase.h"
 

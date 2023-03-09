@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QMITKTOFCOMPOSITEFILTERWIDGET_H_INCLUDED
-#define _QMITKTOFCOMPOSITEFILTERWIDGET_H_INCLUDED
+#ifndef QmitkToFCompositeFilterWidget_h
+#define QmitkToFCompositeFilterWidget_h
 
 #include <MitkToFUIExports.h>
 #include "ui_QmitkToFCompositeFilterWidgetControls.h"

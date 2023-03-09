@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef _MITK_DOSE_ISO_LEVEL_COLLECTIONS_H_
-#define _MITK_DOSE_ISO_LEVEL_COLLECTIONS_H_
+#ifndef mitkIsoDoseLevelCollections_h
+#define mitkIsoDoseLevelCollections_h
 
 #include <set>
 #include <itkVectorContainer.h>

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKPERSPECTIVEITEM_H
-#define QMITKPERSPECTIVEITEM_H
+#ifndef QmitkPerspectiveItem_h
+#define QmitkPerspectiveItem_h
 
 #include <QStandardItem>
 #include <berryPlatformUI.h>

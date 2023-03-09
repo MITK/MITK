@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKENUMS_H_
-#define QMITKENUMS_H_
+#ifndef QmitkEnums_h
+#define QmitkEnums_h
 
 /// \ingroup QmitkModule
 enum QmitkItemModelRole

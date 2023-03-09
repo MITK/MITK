@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_NavigationDataRecorder_H
-#define _MITK_NavigationDataRecorder_H
+#ifndef mitkNavigationDataRecorder_h
+#define mitkNavigationDataRecorder_h
 
 #include "mitkNavigationDataToNavigationDataFilter.h"
 #include "mitkNavigationData.h"

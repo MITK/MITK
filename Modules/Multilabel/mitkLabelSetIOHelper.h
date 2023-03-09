@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkLabelSetIOHelper_h
-#define __mitkLabelSetIOHelper_h
+#ifndef mitkLabelSetIOHelper_h
+#define mitkLabelSetIOHelper_h
 
 #include <MitkMultilabelExports.h>
 #include <itkSmartPointer.h>

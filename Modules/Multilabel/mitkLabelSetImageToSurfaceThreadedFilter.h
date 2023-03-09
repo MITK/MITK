@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkLabelSetImageToSurfaceThreadedFilter_H_
-#define __mitkLabelSetImageToSurfaceThreadedFilter_H_
+#ifndef mitkLabelSetImageToSurfaceThreadedFilter_h
+#define mitkLabelSetImageToSurfaceThreadedFilter_h
 
 #include "mitkSegmentationSink.h"
 #include "mitkSurface.h"

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkRadiomicsArithmetricView_H__INCLUDED
-#define QmitkRadiomicsArithmetricView_H__INCLUDED
+#ifndef QmitkRadiomicsArithmetricView_h
+#define QmitkRadiomicsArithmetricView_h
 
 #include <QmitkAbstractView.h>
 #include <org_mitk_gui_qt_radiomics_Export.h>

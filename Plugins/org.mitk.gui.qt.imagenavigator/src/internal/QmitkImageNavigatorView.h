@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKIMAGENAVIGATORVIEW_H
-#define QMITKIMAGENAVIGATORVIEW_H
+#ifndef QmitkImageNavigatorView_h
+#define QmitkImageNavigatorView_h
 
 #include <berryISizeProvider.h>
 

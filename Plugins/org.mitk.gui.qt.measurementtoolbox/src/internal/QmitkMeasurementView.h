@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITK_MEASUREMENT_H__INCLUDED
-#define QMITK_MEASUREMENT_H__INCLUDED
+#ifndef QmitkMeasurementView_h
+#define QmitkMeasurementView_h
 
 #include <QmitkAbstractView.h>
 

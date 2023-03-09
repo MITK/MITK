@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef FILEWRITER_H_HEADER_INCLUDED
-#define FILEWRITER_H_HEADER_INCLUDED
+#ifndef mitkFileWriter_h
+#define mitkFileWriter_h
 
 #include <MitkCoreExports.h>
 #include <itkProcessObject.h>

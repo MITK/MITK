@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef VIRTUALTRACKERTYPEINFORMATION_H_INCLUDED
-#define VIRTUALTRACKERTYPEINFORMATION_H_INCLUDED
+#ifndef mitkVirtualTrackerTypeInformation_h
+#define mitkVirtualTrackerTypeInformation_h
 
 #include "mitkTrackingDeviceTypeInformation.h"
 

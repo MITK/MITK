@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKCUSTOMMIMETYPE_H
-#define MITKCUSTOMMIMETYPE_H
+#ifndef mitkCustomMimeType_h
+#define mitkCustomMimeType_h
 
 #include <MitkCoreExports.h>
 

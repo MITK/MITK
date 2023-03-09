@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __CONCRETE_MODEL_PARAMETERIZER_BASE_H
-#define __CONCRETE_MODEL_PARAMETERIZER_BASE_H
+#ifndef mitkConcreteModelParameterizerBase_h
+#define mitkConcreteModelParameterizerBase_h
 
 #include "mitkModelParameterizerBase.h"
 

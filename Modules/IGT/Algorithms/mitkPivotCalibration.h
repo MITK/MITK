@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef PIVOTCALIBRATION_H_HEADER_INCLUDED_
-#define PIVOTCALIBRATION_H_HEADER_INCLUDED_
+#ifndef mitkPivotCalibration_h
+#define mitkPivotCalibration_h
 
 #include "MitkIGTExports.h"
 #include <itkObject.h>

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKINTERACTIONEVENT_H_
-#define MITKINTERACTIONEVENT_H_
+#ifndef mitkInteractionEvent_h
+#define mitkInteractionEvent_h
 
 #include "itkLightObject.h"
 #include "itkObjectFactory.h"

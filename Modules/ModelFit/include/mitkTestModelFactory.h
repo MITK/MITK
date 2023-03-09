@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __TEST_MODEL_FACTORY_H
-#define __TEST_MODEL_FACTORY_H
+#ifndef mitkTestModelFactory_h
+#define mitkTestModelFactory_h
 
 #include <mitkCommon.h>
 

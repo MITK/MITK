@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef IMAGESOURCE_H_HEADER_INCLUDED_C1E7D6EC
-#define IMAGESOURCE_H_HEADER_INCLUDED_C1E7D6EC
+#ifndef mitkImageSource_h
+#define mitkImageSource_h
 
 #include "mitkBaseDataSource.h"
 #include "mitkImage.h"

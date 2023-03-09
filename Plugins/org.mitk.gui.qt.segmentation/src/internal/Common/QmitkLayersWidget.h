@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKLAYERSWIDGET_H
-#define QMITKLAYERSWIDGET_H
+#ifndef QmitkLayersWidget_h
+#define QmitkLayersWidget_h
 
 // Qt
 #include <QWidget>

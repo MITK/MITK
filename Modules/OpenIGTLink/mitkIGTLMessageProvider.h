@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef IGTLMESSAGEPROVIDER_H_HEADER_INCLUDED_
-#define IGTLMESSAGEPROVIDER_H_HEADER_INCLUDED_
+#ifndef mitkIGTLMessageProvider_h
+#define mitkIGTLMessageProvider_h
 
 #include "mitkIGTLDevice.h"
 #include "mitkIGTLDeviceSource.h"

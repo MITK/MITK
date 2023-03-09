@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKGAUSSIANNOISEFUNCTOR_H
-#define MITKGAUSSIANNOISEFUNCTOR_H
+#ifndef mitkGaussianNoiseFunctor_h
+#define mitkGaussianNoiseFunctor_h
 
 #include <iostream>
 #include <cstdlib>

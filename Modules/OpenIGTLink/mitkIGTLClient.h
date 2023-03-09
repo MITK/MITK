@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKIGTLCLIENT_H
-#define MITKIGTLCLIENT_H
+#ifndef mitkIGTLClient_h
+#define mitkIGTLClient_h
 
 #include "mitkIGTLDevice.h"
 

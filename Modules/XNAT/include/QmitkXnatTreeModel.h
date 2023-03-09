@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKXNATTREEMODEL_H
-#define QMITKXNATTREEMODEL_H
+#ifndef QmitkXnatTreeModel_h
+#define QmitkXnatTreeModel_h
 
 // CTK includes
 #include <ctkXnatTreeModel.h>

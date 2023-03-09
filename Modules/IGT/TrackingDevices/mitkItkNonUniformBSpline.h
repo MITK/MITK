@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __itkNonUniformBSpline_h
-#define __itkNonUniformBSpline_h
+#ifndef mitkItkNonUniformBSpline_h
+#define mitkItkNonUniformBSpline_h
 
 /*===================================================================
 

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDNDDATANODEWIDGET_H
-#define QMITKDNDDATANODEWIDGET_H
+#ifndef QmitkDnDDataNodeWidget_h
+#define QmitkDnDDataNodeWidget_h
 
 #include "MitkQtWidgetsExports.h"
 

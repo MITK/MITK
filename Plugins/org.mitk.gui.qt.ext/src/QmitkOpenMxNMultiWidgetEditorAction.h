@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKOPENMXNMULTIWIDGETEDITORACTION_H
-#define QMITKOPENMXNMULTIWIDGETEDITORACTION_H
+#ifndef QmitkOpenMxNMultiWidgetEditorAction_h
+#define QmitkOpenMxNMultiWidgetEditorAction_h
 
 #ifdef __MINGW32__
 // We need to include winbase.h here in order to declare

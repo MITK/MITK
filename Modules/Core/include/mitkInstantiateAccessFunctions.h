@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKINSTANTIATEACCESSFUNCTIONS_H_HEADER_INCLUDED
-#define MITKINSTANTIATEACCESSFUNCTIONS_H_HEADER_INCLUDED
+#ifndef mitkInstantiateAccessFunctions_h
+#define mitkInstantiateAccessFunctions_h
 
 #include <itkCastImageFilter.h>
 #include <mitkConfig.h>

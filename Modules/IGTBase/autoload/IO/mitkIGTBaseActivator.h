@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIGTBASEACTIVATOR_H
-#define MITKIGTBASEACTIVATOR_H
+#ifndef mitkIGTBaseActivator_h
+#define mitkIGTBaseActivator_h
 
 #include <usModuleActivator.h>
 

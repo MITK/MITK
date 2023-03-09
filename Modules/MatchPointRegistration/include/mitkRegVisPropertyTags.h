@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef _MITK_REG_VIS_PROPERTY_TAGS__H_
-#define _MITK_REG_VIS_PROPERTY_TAGS__H_
+#ifndef mitkRegVisPropertyTags_h
+#define mitkRegVisPropertyTags_h
 
 // MITK
 #include "MitkMatchPointRegistrationExports.h"

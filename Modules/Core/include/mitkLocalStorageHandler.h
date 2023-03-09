@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef LOCALSTORAGEHANDLER_H_HEADER_INCLUDED_C1E6EA08
-#define LOCALSTORAGEHANDLER_H_HEADER_INCLUDED_C1E6EA08
+#ifndef mitkLocalStorageHandler_h
+#define mitkLocalStorageHandler_h
 
 #include "mitkBaseRenderer.h"
 #include "mitkCommon.h"

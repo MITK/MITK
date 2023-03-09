@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKLABELSETIMAGEHELPER_H
-#define MITKLABELSETIMAGEHELPER_H
+#ifndef mitkLabelSetImageHelper_h
+#define mitkLabelSetImageHelper_h
 
 #include <MitkMultilabelExports.h>
 

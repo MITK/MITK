@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QmitkUpdateTimerWidget_H_INCLUDED
-#define _QmitkUpdateTimerWidget_H_INCLUDED
+#ifndef QmitkUpdateTimerWidget_h
+#define QmitkUpdateTimerWidget_h
 
 #include "ui_QmitkUpdateTimerWidgetControls.h"
 #include "MitkIGTUIExports.h"

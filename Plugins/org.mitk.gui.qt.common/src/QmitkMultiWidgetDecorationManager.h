@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKMULTIWIDGETDECORATIONMANAGER_H
-#define QMITKMULTIWIDGETDECORATIONMANAGER_H
+#ifndef QmitkMultiWidgetDecorationManager_h
+#define QmitkMultiWidgetDecorationManager_h
 
 #include <org_mitk_gui_qt_common_Export.h>
 

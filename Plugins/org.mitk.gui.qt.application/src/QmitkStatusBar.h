@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITKSTATUSBAR_H
-#define QMITKSTATUSBAR_H
+#ifndef QmitkStatusBar_h
+#define QmitkStatusBar_h
 #include <mitkStatusBarImplementation.h>
 #include <mitkCommon.h>
 #include <QStatusBar>

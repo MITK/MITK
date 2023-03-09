@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKLINUXREALTIMECLOCK_H_HEADER_INCLUDED_
-#define MITKLINUXREALTIMECLOCK_H_HEADER_INCLUDED_
+#ifndef mitkLinuxRealTimeClock_h
+#define mitkLinuxRealTimeClock_h
 
 #include "mitkRealTimeClock.h"
 #include "MitkIGTBaseExports.h"

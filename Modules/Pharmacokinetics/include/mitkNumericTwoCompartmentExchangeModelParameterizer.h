@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKNUMERICTWOCOMPARTMENTEXCHANGEMODELPARAMETRIZER_H
-#define MITKNUMERICTWOCOMPARTMENTEXCHANGEMODELPARAMETRIZER_H
+#ifndef mitkNumericTwoCompartmentExchangeModelParameterizer_h
+#define mitkNumericTwoCompartmentExchangeModelParameterizer_h
 
 #include "mitkAIFBasedModelParameterizerBase.h"
 #include "mitkNumericTwoCompartmentExchangeModel.h"

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkOclResourceServiceImpl_h
-#define __mitkOclResourceServiceImpl_h
+#ifndef mitkOclResourceServiceImpl_p_h
+#define mitkOclResourceServiceImpl_p_h
 
 #include <map>
 

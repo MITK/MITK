@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKDATATREENODESELECTION_H_
-#define MITKDATATREENODESELECTION_H_
+#ifndef mitkDataNodeSelection_h
+#define mitkDataNodeSelection_h
 
 #include <berryIStructuredSelection.h>
 #include <mitkDataNode.h>

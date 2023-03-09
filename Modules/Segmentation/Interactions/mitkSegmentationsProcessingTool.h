@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkSegmentationsProcessingTool_h_Included
-#define mitkSegmentationsProcessingTool_h_Included
+#ifndef mitkSegmentationsProcessingTool_h
+#define mitkSegmentationsProcessingTool_h
 
 #include "mitkCommon.h"
 #include "mitkDataNode.h"

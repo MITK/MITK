@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __mitkIToFDeviceFactory_h
-#define __mitkIToFDeviceFactory_h
+#ifndef mitkIToFDeviceFactory_h
+#define mitkIToFDeviceFactory_h
 
 #include "mitkCameraIntrinsics.h"
 #include "mitkToFCameraDevice.h"

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkIGTLoggerWidget_H
-#define QmitkIGTLoggerWidget_H
+#ifndef QmitkIGTLoggerWidget_h
+#define QmitkIGTLoggerWidget_h
 
 //QT headers
 #include <QWidget>

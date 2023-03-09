@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITKMODULEVIEW_H
-#define QMITKMODULEVIEW_H
+#ifndef QmitkModuleView_h
+#define QmitkModuleView_h
 
 #include <berryQtViewPart.h>
 

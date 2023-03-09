@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITKUNSTRUCTUREDGRIDCLUSTERINGFILTER_h__
-#define _MITKUNSTRUCTUREDGRIDCLUSTERINGFILTER_h__
+#ifndef mitkUnstructuredGridClusteringFilter_h
+#define mitkUnstructuredGridClusteringFilter_h
 
 #include <MitkAlgorithmsExtExports.h>
 

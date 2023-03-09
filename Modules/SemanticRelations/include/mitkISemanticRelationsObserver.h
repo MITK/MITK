@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKISEMANTICRELATIONSOBSERVER_H
-#define MITKISEMANTICRELATIONSOBSERVER_H
+#ifndef mitkISemanticRelationsObserver_h
+#define mitkISemanticRelationsObserver_h
 
 #include "mitkSemanticTypes.h"
 

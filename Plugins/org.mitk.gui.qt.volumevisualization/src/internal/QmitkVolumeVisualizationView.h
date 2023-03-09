@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKVOLUMEVISUALIZATIONVIEW_H
-#define QMITKVOLUMEVISUALIZATIONVIEW_H
+#ifndef QmitkVolumeVisualizationView_h
+#define QmitkVolumeVisualizationView_h
 
 #include "ui_QmitkVolumeVisualizationViewControls.h"
 

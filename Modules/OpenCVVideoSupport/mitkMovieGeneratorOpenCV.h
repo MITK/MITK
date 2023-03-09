@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MovieGeneratorOpenCV_H_HEADER_INCLUDED
-#define MovieGeneratorOpenCV_H_HEADER_INCLUDED
+#ifndef mitkMovieGeneratorOpenCV_h
+#define mitkMovieGeneratorOpenCV_h
 
 #include "mitkMovieGenerator.h"
 #include <MitkOpenCVVideoSupportExports.h>

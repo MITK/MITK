@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKRENDERWINDOWWIDGET_H
-#define QMITKRENDERWINDOWWIDGET_H
+#ifndef QmitkRenderWindowWidget_h
+#define QmitkRenderWindowWidget_h
 
 // qt widgets module
 #include "MitkQtWidgetsExports.h"

@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITKXNATSESSIONMANAGER_H_
-#define QMITKXNATSESSIONMANAGER_H_
+#ifndef QmitkXnatSessionManager_h
+#define QmitkXnatSessionManager_h
 
 #include "ctkXnatLoginProfile.h"
 

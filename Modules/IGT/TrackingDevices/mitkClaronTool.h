@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKCLARONTOOL_H_HEADER_INCLUDED_
-#define MITKCLARONTOOL_H_HEADER_INCLUDED_
+#ifndef mitkClaronTool_h
+#define mitkClaronTool_h
 
 #include <mitkClaronInterface.h>
 #include <mitkTrackingTool.h>

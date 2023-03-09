@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef MITKPIXELTYPEMULTIPLEX_H
-#define MITKPIXELTYPEMULTIPLEX_H
+#ifndef mitkPixelTypeMultiplex_h
+#define mitkPixelTypeMultiplex_h
 
 #define mitkPixelTypeMultiplex0(function, ptype)                                                                       \
                                                                                                                        \

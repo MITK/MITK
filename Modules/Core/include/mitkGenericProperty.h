@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKGENERICPROPERTY_H_HEADER_INCLUDED_C1061CEE
-#define MITKGENERICPROPERTY_H_HEADER_INCLUDED_C1061CEE
+#ifndef mitkGenericProperty_h
+#define mitkGenericProperty_h
 
 #include <sstream>
 #include <cstdlib>

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkC3Data_h
-#define QmitkC3Data_h
+#ifndef QmitkChartData_h
+#define QmitkChartData_h
 
 #include <QmitkChartWidget.h>
 #include <QVariant>

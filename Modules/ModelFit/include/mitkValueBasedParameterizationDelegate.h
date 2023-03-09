@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __VALUE_BASED_PARAMETERIZATION_DELEGATE_H
-#define __VALUE_BASED_PARAMETERIZATION_DELEGATE_H
+#ifndef mitkValueBasedParameterizationDelegate_h
+#define mitkValueBasedParameterizationDelegate_h
 
 #include <itkObject.h>
 #include <itkIndex.h>

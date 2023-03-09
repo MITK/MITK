@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKSIMPLEUNSTRUCTUREDGRIDHISTOGRAM_H
-#define MITKSIMPLEUNSTRUCTUREDGRIDHISTOGRAM_H
+#ifndef mitkSimpleUnstructuredGridHistogram_h
+#define mitkSimpleUnstructuredGridHistogram_h
 
 #include <MitkAlgorithmsExtExports.h>
 

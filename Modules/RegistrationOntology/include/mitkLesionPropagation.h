@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKLESIONPROPAGATION_H
-#define MITKLESIONPROPAGATION_H
+#ifndef mitkLesionPropagation_h
+#define mitkLesionPropagation_h
 
 // registration ontology module
 #include "MitkRegistrationOntologyExports.h"

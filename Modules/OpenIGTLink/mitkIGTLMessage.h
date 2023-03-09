@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKIGTLMESSAGEH_HEADER_INCLUDED_
-#define MITKIGTLMESSAGEH_HEADER_INCLUDED_
+#ifndef mitkIGTLMessage_h
+#define mitkIGTLMessage_h
 
 #include <itkDataObject.h>
 #include "MitkOpenIGTLinkExports.h"

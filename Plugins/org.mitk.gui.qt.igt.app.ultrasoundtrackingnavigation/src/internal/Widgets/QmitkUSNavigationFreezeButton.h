@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKUSNAVIGATIONFREEZEBUTTON_H
-#define QMITKUSNAVIGATIONFREEZEBUTTON_H
+#ifndef QmitkUSNavigationFreezeButton_h
+#define QmitkUSNavigationFreezeButton_h
 
 #include <QPushButton>
 

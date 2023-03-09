@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkUSUIActivator_h
-#define __mitkUSUIActivator_h
+#ifndef mitkUSUIActivator_h
+#define mitkUSUIActivator_h
 
 #include "QmitkUSAbstractCustomWidget.h"
 

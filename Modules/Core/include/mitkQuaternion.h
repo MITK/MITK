@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKQUATERNION_H_
-#define MITKQUATERNION_H_
+#ifndef mitkQuaternion_h
+#define mitkQuaternion_h
 
 #include "mitkNumericConstants.h"
 #include <vnl/vnl_quaternion.h>

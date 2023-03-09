@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKHummelProtocolEvaluation_H_HEADER_INCLUDED_
-#define MITKHummelProtocolEvaluation_H_HEADER_INCLUDED_
+#ifndef mitkHummelProtocolEvaluation_h
+#define mitkHummelProtocolEvaluation_h
 
 #include <mitkPointSet.h>
 #include <array>

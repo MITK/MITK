@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __DESCRIPTIVEPHARMACOKINETICBRIXMODEL_FACTORY_H
-#define __DESCRIPTIVEPHARMACOKINETICBRIXMODEL_FACTORY_H
+#ifndef mitkDescriptivePharmacokineticBrixModelFactory_h
+#define mitkDescriptivePharmacokineticBrixModelFactory_h
 
 #include <mitkCommon.h>
 

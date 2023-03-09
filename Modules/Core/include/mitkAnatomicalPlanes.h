@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKANATOMICALPLANES_H
-#define MITKANATOMICALPLANES_H
+#ifndef mitkAnatomicalPlanes_h
+#define mitkAnatomicalPlanes_h
 
 namespace mitk
 {

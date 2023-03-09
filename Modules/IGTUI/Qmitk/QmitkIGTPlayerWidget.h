@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkIGTPlayerWidget_H
-#define QmitkIGTPlayerWidget_H
+#ifndef QmitkIGTPlayerWidget_h
+#define QmitkIGTPlayerWidget_h
 
 //QT headers
 #include <QWidget>

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkCommandLineParser_h
-#define __mitkCommandLineParser_h
+#ifndef mitkCommandLineParser_h
+#define mitkCommandLineParser_h
 
 #include <map>
 #include <usAny.h>

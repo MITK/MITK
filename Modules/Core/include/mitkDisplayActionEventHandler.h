@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKDISPLAYACTIONEVENTHANDLER_H
-#define MITKDISPLAYACTIONEVENTHANDLER_H
+#ifndef mitkDisplayActionEventHandler_h
+#define mitkDisplayActionEventHandler_h
 
 #include <MitkCoreExports.h>
 

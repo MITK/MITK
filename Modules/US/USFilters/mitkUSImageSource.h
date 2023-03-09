@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKUSImageSource_H_HEADER_INCLUDED_
-#define MITKUSImageSource_H_HEADER_INCLUDED_
+#ifndef mitkUSImageSource_h
+#define mitkUSImageSource_h
 
 #include <mutex>
 

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKSAFENOTIFY_H
-#define QMITKSAFENOTIFY_H
+#ifndef QmitkSafeNotify_h
+#define QmitkSafeNotify_h
 
 #include <mitkException.h>
 #include <mitkLogMacros.h>

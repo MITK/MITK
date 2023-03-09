@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QmitkPlotDialog_H
-#define _QmitkPlotDialog_H
+#ifndef QmitkPlotDialog_h
+#define QmitkPlotDialog_h
 
 #include "MitkQtWidgetsExtExports.h"
 #include "mitkCommon.h"

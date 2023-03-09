@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKTWOTISSUECOMPARTMENTMODELDIFFERENTIALEQUATIONS_H
-#define MITKTWOTISSUECOMPARTMENTMODELDIFFERENTIALEQUATIONS_H
+#ifndef mitkTwoTissueCompartmentModelDifferentialEquations_h
+#define mitkTwoTissueCompartmentModelDifferentialEquations_h
 #include "mitkNumericTwoTissueCompartmentModel.h"
 
 namespace mitk{

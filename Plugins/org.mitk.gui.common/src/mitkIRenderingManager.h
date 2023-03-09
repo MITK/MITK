@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIRENDERINGMANAGER_H
-#define MITKIRENDERINGMANAGER_H
+#ifndef mitkIRenderingManager_h
+#define mitkIRenderingManager_h
 
 #include <mitkRenderingManager.h>
 

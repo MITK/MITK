@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATANODESURFACEREPRESENTATIONACTION_H
-#define QMITKDATANODESURFACEREPRESENTATIONACTION_H
+#ifndef QmitkDataNodeSurfaceRepresentationAction_h
+#define QmitkDataNodeSurfaceRepresentationAction_h
 
 #include <org_mitk_gui_qt_application_Export.h>
 

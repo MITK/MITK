@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QMITKTOFMESAPARAMETERWIDGET_H_INCLUDED
-#define _QMITKTOFMESAPARAMETERWIDGET_H_INCLUDED
+#ifndef QmitkToFMESAParameterWidget_h
+#define QmitkToFMESAParameterWidget_h
 
 #include <MitkToFUIExports.h>
 #include "ui_QmitkToFMESAParameterWidgetControls.h"

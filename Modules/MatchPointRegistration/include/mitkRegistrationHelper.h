@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef _mitkRegistrationHelper_h
-#define _mitkRegistrationHelper_h
+#ifndef mitkRegistrationHelper_h
+#define mitkRegistrationHelper_h
 
 //ITK
 #include "itkScalableAffineTransform.h"

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIMAGEPIXELREADACCESSOR_H
-#define MITKIMAGEPIXELREADACCESSOR_H
+#ifndef mitkImagePixelReadAccessor_h
+#define mitkImagePixelReadAccessor_h
 
 #include "mitkImagePixelAccessor.h"
 #include "mitkImageReadAccessor.h"

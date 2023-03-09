@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKFILEREADERSELECTOR_H
-#define MITKFILEREADERSELECTOR_H
+#ifndef mitkFileReaderSelector_h
+#define mitkFileReaderSelector_h
 
 #include <mitkIFileReader.h>
 

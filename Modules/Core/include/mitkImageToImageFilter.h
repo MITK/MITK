@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef IMAGETOIMAGEFILTER_H_HEADER_INCLUDED_C1E5E869
-#define IMAGETOIMAGEFILTER_H_HEADER_INCLUDED_C1E5E869
+#ifndef mitkImageToImageFilter_h
+#define mitkImageToImageFilter_h
 
 #include "mitkImageSource.h"
 #include <MitkCoreExports.h>

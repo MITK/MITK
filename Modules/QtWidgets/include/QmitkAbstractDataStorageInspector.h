@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKABSTRACTDATASTORAGEINSPECTOR_H
-#define QMITKABSTRACTDATASTORAGEINSPECTOR_H
+#ifndef QmitkAbstractDataStorageInspector_h
+#define QmitkAbstractDataStorageInspector_h
 
 #include <QmitkModelViewSelectionConnector.h>
 

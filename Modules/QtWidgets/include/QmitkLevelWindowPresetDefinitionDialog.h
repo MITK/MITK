@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKLEVELWINDOWPRESETDEFINITIONDIALOG_H_
-#define QMITKLEVELWINDOWPRESETDEFINITIONDIALOG_H_
+#ifndef QmitkLevelWindowPresetDefinitionDialog_h
+#define QmitkLevelWindowPresetDefinitionDialog_h
 
 #include <MitkQtWidgetsExports.h>
 

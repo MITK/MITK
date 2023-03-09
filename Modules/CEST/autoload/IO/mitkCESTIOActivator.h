@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKCESTIOActivator_H
-#define MITKCESTIOActivator_H
+#ifndef mitkCESTIOActivator_h
+#define mitkCESTIOActivator_h
 
 #include <mitkCustomMimeType.h>
 #include <mitkDICOMTagsOfInterestAddHelper.h>

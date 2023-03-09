@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_UNSTRUCTURED_GRID_VTK_MAPPER_3D_H_
-#define _MITK_UNSTRUCTURED_GRID_VTK_MAPPER_3D_H_
+#ifndef mitkUnstructuredGridVtkMapper3D_h
+#define mitkUnstructuredGridVtkMapper3D_h
 
 #include "MitkMapperExtExports.h"
 #include "mitkBaseRenderer.h"

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKTRACKINGTYPES_H_HEADER_INCLUDED_
-#define MITKTRACKINGTYPES_H_HEADER_INCLUDED_
+#ifndef mitkTrackingTypes_h
+#define mitkTrackingTypes_h
 
 #include <itkPoint.h>
 #include <mitkColorProperty.h>

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDIRECTORYLISTWIDGET_H
-#define QMITKDIRECTORYLISTWIDGET_H
+#ifndef QmitkDirectoryListWidget_h
+#define QmitkDirectoryListWidget_h
 
 #include "ui_QmitkPathListWidget.h"
 #include <QWidget>

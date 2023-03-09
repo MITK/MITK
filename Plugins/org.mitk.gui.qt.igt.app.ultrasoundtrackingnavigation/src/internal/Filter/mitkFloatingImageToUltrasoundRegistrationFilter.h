@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKFLOATINGIMAGETOULTRASOUNDREGISTRATIONFILTER_H_HEADER_INCLUDED_
-#define MITKFLOATINGIMAGETOULTRASOUNDREGISTRATIONFILTER_H_HEADER_INCLUDED_
+#ifndef mitkFloatingImageToUltrasoundRegistrationFilter_h
+#define mitkFloatingImageToUltrasoundRegistrationFilter_h
 
 #include <mitkNavigationDataPassThroughFilter.h>
 #include <mitkImage.h>

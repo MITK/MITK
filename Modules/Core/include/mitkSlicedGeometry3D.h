@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKSLICEDGEOMETRY3D_H_HEADER_INCLUDED_C1EBD0AD
-#define MITKSLICEDGEOMETRY3D_H_HEADER_INCLUDED_C1EBD0AD
+#ifndef mitkSlicedGeometry3D_h
+#define mitkSlicedGeometry3D_h
 
 #include "mitkBaseGeometry.h"
 #include "mitkPlaneGeometry.h"

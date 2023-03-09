@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITK_ALGORITHM_PROFILE_VIEWER_H
-#define QMITK_ALGORITHM_PROFILE_VIEWER_H
+#ifndef QmitkAlgorithmProfileViewer_h
+#define QmitkAlgorithmProfileViewer_h
 
 #include <mapDeploymentDLLInfo.h>
 

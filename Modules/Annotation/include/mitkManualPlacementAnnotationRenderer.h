@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef ManualPlacementAnnotationRenderer_H
-#define ManualPlacementAnnotationRenderer_H
+#ifndef mitkManualPlacementAnnotationRenderer_h
+#define mitkManualPlacementAnnotationRenderer_h
 
 #include "MitkAnnotationExports.h"
 #include "mitkAbstractAnnotationRenderer.h"

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIMAGEVTKLEGACYIO_H
-#define MITKIMAGEVTKLEGACYIO_H
+#ifndef mitkImageVtkLegacyIO_h
+#define mitkImageVtkLegacyIO_h
 
 #include "mitkAbstractFileIO.h"
 

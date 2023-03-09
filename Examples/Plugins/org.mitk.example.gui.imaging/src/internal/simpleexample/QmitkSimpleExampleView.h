@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QMITKSIMPLEEXAMPLEVIEW_H_INCLUDED
-#define _QMITKSIMPLEEXAMPLEVIEW_H_INCLUDED
+#ifndef QmitkSimpleExampleView_h
+#define QmitkSimpleExampleView_h
 
 #include <QmitkAbstractView.h>
 #include <mitkIRenderWindowPartListener.h>

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKITKIMAGEIMPORT_H_HEADER_INCLUDED_C1E4861D
-#define MITKITKIMAGEIMPORT_H_HEADER_INCLUDED_C1E4861D
+#ifndef mitkITKImageImport_h
+#define mitkITKImageImport_h
 
 #include "itkImageToImageFilterDetail.h"
 #include "mitkImageSource.h"

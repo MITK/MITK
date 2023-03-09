@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QMITKTOFSURFACEGENERATIONWIDGET_H_INCLUDED
-#define _QMITKTOFSURFACEGENERATIONWIDGET_H_INCLUDED
+#ifndef QmitkToFSurfaceGenerationWidget_h
+#define QmitkToFSurfaceGenerationWidget_h
 
 #include <MitkToFUIExports.h>
 #include "ui_QmitkToFSurfaceGenerationWidgetControls.h"

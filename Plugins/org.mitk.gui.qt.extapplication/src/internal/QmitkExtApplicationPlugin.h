@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITKEXTAPPLICATIONPLUGIN_H_
-#define QMITKEXTAPPLICATIONPLUGIN_H_
+#ifndef QmitkExtApplicationPlugin_h
+#define QmitkExtApplicationPlugin_h
 
 #include <berryAbstractUICTKPlugin.h>
 

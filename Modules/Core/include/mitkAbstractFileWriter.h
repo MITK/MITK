@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef AbstractFileWriter_H_HEADER_INCLUDED_C1E7E521
-#define AbstractFileWriter_H_HEADER_INCLUDED_C1E7E521
+#ifndef mitkAbstractFileWriter_h
+#define mitkAbstractFileWriter_h
 
 // Macro
 #include <MitkCoreExports.h>

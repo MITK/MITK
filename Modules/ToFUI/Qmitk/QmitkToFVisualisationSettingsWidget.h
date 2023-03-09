@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QMITKTOFVISUALISATIONSETTINGSWIDGET_H_INCLUDED
-#define _QMITKTOFVISUALISATIONSETTINGSWIDGET_H_INCLUDED
+#ifndef QmitkToFVisualisationSettingsWidget_h
+#define QmitkToFVisualisationSettingsWidget_h
 
 #include <MitkToFUIExports.h>
 #include "ui_QmitkToFVisualisationSettingsWidgetControls.h"

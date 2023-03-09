@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKHISTOGRAMSTATISTICSCALCULATOR
-#define MITKHISTOGRAMSTATISTICSCALCULATOR
+#ifndef mitkHistogramStatisticsCalculator_h
+#define mitkHistogramStatisticsCalculator_h
 
 #include <MitkImageStatisticsExports.h>
 #include <itkHistogram.h>

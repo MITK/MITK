@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkAddContourTool_h_Included
-#define mitkAddContourTool_h_Included
+#ifndef mitkAddContourTool_h
+#define mitkAddContourTool_h
 
 #include "mitkContourTool.h"
 #include <MitkSegmentationExports.h>

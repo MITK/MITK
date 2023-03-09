@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIDATASTORAGEREFERENCE_H_
-#define MITKIDATASTORAGEREFERENCE_H_
+#ifndef mitkIDataStorageReference_h
+#define mitkIDataStorageReference_h
 
 #include <berryObject.h>
 #include <berryMacros.h>

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef ObjFileReaderService_h
-#define ObjFileReaderService_h
+#ifndef mitkObjFileReaderService_h
+#define mitkObjFileReaderService_h
 
 #include <mitkAbstractFileReader.h>
 #include <mitkIOMimeTypes.h>

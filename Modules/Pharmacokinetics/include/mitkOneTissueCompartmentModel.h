@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKONETISSUECOMPARTMENTMODEL_H
-#define MITKONETISSUECOMPARTMENTMODEL_H
+#ifndef mitkOneTissueCompartmentModel_h
+#define mitkOneTissueCompartmentModel_h
 
 #include "mitkAIFBasedModelBase.h"
 #include "MitkPharmacokineticsExports.h"

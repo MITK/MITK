@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QmitkToolDistanceWidget_H_INCLUDED
-#define _QmitkToolDistanceWidget_H_INCLUDED
+#ifndef QmitkToolDistanceWidget_h
+#define QmitkToolDistanceWidget_h
 
 #include "ui_QmitkToolDistanceWidgetControls.h"
 #include "MitkIGTUIExports.h"

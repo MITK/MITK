@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef USNAVIGATIONTARGETUPDATEFILTER_H
-#define USNAVIGATIONTARGETUPDATEFILTER_H
+#ifndef mitkUSNavigationTargetUpdateFilter_h
+#define mitkUSNavigationTargetUpdateFilter_h
 
 #include "itkObjectFactory.h"
 #include "mitkCommon.h"

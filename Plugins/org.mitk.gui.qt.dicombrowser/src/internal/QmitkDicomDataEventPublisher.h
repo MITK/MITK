@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkDicomDataEventPublisher_H
-#define QmitkDicomDataEventPublisher_H
+#ifndef QmitkDicomDataEventPublisher_h
+#define QmitkDicomDataEventPublisher_h
 
 #include <ctkPluginContext.h>
 #include <QObject>

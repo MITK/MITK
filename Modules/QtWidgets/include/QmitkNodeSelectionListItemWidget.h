@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITK_NODE_SELECTION_LIST_ITEM_WIDGET_H
-#define QMITK_NODE_SELECTION_LIST_ITEM_WIDGET_H
+#ifndef QmitkNodeSelectionListItemWidget_h
+#define QmitkNodeSelectionListItemWidget_h
 
 #include <MitkQtWidgetsExports.h>
 

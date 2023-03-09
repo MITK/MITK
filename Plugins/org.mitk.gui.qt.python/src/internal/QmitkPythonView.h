@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkPythonView_H_
-#define QmitkPythonView_H_
+#ifndef QmitkPythonView_h
+#define QmitkPythonView_h
 
 /// Qmitk
 #include <QmitkAbstractView.h>

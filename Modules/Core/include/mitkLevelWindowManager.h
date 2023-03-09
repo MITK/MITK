@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKLEVELWINDOWMANAGER_H
-#define MITKLEVELWINDOWMANAGER_H
+#ifndef mitkLevelWindowManager_h
+#define mitkLevelWindowManager_h
 
 // mitk core
 #include "mitkBaseProperty.h"

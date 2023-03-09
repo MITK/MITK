@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKSINGLEAPPLICATION_H
-#define QMITKSINGLEAPPLICATION_H
+#ifndef QmitkSingleApplication_h
+#define QmitkSingleApplication_h
 
 #include <MitkAppUtilExports.h>
 

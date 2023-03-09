@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkMicronTrackerWidget_H
-#define QmitkMicronTrackerWidget_H
+#ifndef QmitkMicronTrackerWidget_h
+#define QmitkMicronTrackerWidget_h
 
 #include "ui_QmitkMicronTrackerWidget.h"
 

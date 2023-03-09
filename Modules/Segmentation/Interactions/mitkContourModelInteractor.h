@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkContourModelInteractor_h_Included
-#define mitkContourModelInteractor_h_Included
+#ifndef mitkContourModelInteractor_h
+#define mitkContourModelInteractor_h
 
 #include "mitkCommon.h"
 #include "mitkDataInteractor.h"

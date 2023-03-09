@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkExtractSliceFilter_h_Included
-#define mitkExtractSliceFilter_h_Included
+#ifndef mitkExtractSliceFilter_h
+#define mitkExtractSliceFilter_h
 
 #include "MitkCoreExports.h"
 #include "mitkImageToImageFilter.h"

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKLANDMARKPROJECTORBASEDCURVEDGEOMETRY_H_HEADER_INCLUDED_C1C68A2C
-#define MITKLANDMARKPROJECTORBASEDCURVEDGEOMETRY_H_HEADER_INCLUDED_C1C68A2C
+#ifndef mitkLandmarkProjectorBasedCurvedGeometry_h
+#define mitkLandmarkProjectorBasedCurvedGeometry_h
 
 #include "mitkLandmarkProjector.h"
 

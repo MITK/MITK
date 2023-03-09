@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef IGTLTrackingDataDeviceSource_H_HEADER_INCLUDED_
-#define IGTLTrackingDataDeviceSource_H_HEADER_INCLUDED_
+#ifndef mitkIGTLTrackingDataDeviceSource_h
+#define mitkIGTLTrackingDataDeviceSource_h
 
 #include "mitkIGTLDeviceSource.h"
 

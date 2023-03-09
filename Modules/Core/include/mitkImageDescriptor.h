@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIMAGEDESCRIPTOR_H
-#define MITKIMAGEDESCRIPTOR_H
+#ifndef mitkImageDescriptor_h
+#define mitkImageDescriptor_h
 
 #include <itkObjectFactory.h>
 

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKCESTIOMIMETYPES_H
-#define MITKCESTIOMIMETYPES_H
+#ifndef mitkCESTIOMimeTypes_h
+#define mitkCESTIOMimeTypes_h
 
 #include "mitkIOMimeTypes.h"
 

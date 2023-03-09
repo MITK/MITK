@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef HISTOGRAM_GENERATOR_H_HEADER_INCLUDED
-#define HISTOGRAM_GENERATOR_H_HEADER_INCLUDED
+#ifndef mitkHistogramGenerator_h
+#define mitkHistogramGenerator_h
 
 #include "mitkImage.h"
 #include <itkHistogram.h>

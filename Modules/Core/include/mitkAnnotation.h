@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef Annotation_H
-#define Annotation_H
+#ifndef mitkAnnotation_h
+#define mitkAnnotation_h
 
 #include "mitkServiceInterface.h"
 #include "usServiceRegistration.h"

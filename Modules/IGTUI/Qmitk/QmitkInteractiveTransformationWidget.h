@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkInteractiveTransformationWidget_H
-#define QmitkInteractiveTransformationWidget_H
+#ifndef QmitkInteractiveTransformationWidget_h
+#define QmitkInteractiveTransformationWidget_h
 
 //QT headers
 #include <QDialog>

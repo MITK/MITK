@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef LOGOAnnotation_H
-#define LOGOAnnotation_H
+#ifndef mitkLogoAnnotation_h
+#define mitkLogoAnnotation_h
 
 #include "MitkAnnotationExports.h"
 #include <mitkLocalStorageHandler.h>

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKABSTRACTDATASTORAGEMODEL_H
-#define QMITKABSTRACTDATASTORAGEMODEL_H
+#ifndef QmitkAbstractDataStorageModel_h
+#define QmitkAbstractDataStorageModel_h
 
 #include <MitkQtWidgetsExports.h>
 

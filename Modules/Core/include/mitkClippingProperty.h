@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKCLIPPINGPROPERTY_H_HEADER_INCLUDED
-#define MITKCLIPPINGPROPERTY_H_HEADER_INCLUDED
+#ifndef mitkClippingProperty_h
+#define mitkClippingProperty_h
 
 #include "mitkBaseProperty.h"
 #include "mitkNumericTypes.h"

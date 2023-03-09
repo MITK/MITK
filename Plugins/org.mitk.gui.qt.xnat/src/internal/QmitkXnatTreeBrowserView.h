@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKXNATTREEBROWSERVIEW_H
-#define QMITKXNATTREEBROWSERVIEW_H
+#ifndef QmitkXnatTreeBrowserView_h
+#define QmitkXnatTreeBrowserView_h
 
 #include <QmitkAbstractView.h>
 

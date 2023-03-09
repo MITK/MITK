@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_UndirectedGraph_H
-#define _MITK_UndirectedGraph_H
+#ifndef mitkUndirectedGraph_h
+#define mitkUndirectedGraph_h
 
 #include <mitkBaseData.h>
 

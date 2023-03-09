@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef BASEDATA_H_HEADER_INCLUDED_C1EBB6FA
-#define BASEDATA_H_HEADER_INCLUDED_C1EBB6FA
+#ifndef mitkBaseData_h
+#define mitkBaseData_h
 
 #include <itkDataObject.h>
 

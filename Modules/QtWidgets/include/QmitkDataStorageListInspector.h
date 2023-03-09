@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATASTORAGELISTINSPECTOR_H
-#define QMITKDATASTORAGELISTINSPECTOR_H
+#ifndef QmitkDataStorageListInspector_h
+#define QmitkDataStorageListInspector_h
 
 #include <MitkQtWidgetsExports.h>
 

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkModalityProperty_h_Included
-#define mitkModalityProperty_h_Included
+#ifndef mitkModalityProperty_h
+#define mitkModalityProperty_h
 
 #include "mitkEnumerationProperty.h"
 #include <MitkCoreExports.h>

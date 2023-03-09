@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKSPACENAVIGATORREGISTRY_H_
-#define MITKSPACENAVIGATORREGISTRY_H_
+#ifndef mitkInputDeviceRegistry_h
+#define mitkInputDeviceRegistry_h
 
 #include <mitkIInputDeviceDescriptor.h>
 #include <mitkIInputDeviceRegistry.h>

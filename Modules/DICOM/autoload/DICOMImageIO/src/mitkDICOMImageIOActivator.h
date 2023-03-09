@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKDICOMIMAGEIOACTIVATOR_H
-#define MITKDICOMIMAGEIOACTIVATOR_H
+#ifndef mitkDICOMImageIOActivator_h
+#define mitkDICOMImageIOActivator_h
 
 #include <usModuleActivator.h>
 #include <usModuleEvent.h>

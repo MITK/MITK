@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef MITKMASKANDCUTROIIMAGEFILTER_H
-#define MITKMASKANDCUTROIIMAGEFILTER_H
+#ifndef mitkMaskAndCutRoiImageFilter_h
+#define mitkMaskAndCutRoiImageFilter_h
 
 #include "MitkAlgorithmsExtExports.h"
 #include "mitkImageToImageFilter.h"

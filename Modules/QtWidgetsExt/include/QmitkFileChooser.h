@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkFileChooser_h_Included
-#define QmitkFileChooser_h_Included
+#ifndef QmitkFileChooser_h
+#define QmitkFileChooser_h
 
 #include "MitkQtWidgetsExtExports.h"
 #include <QWidget>

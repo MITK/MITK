@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKMANUALSELECTINGDICOMREADERSERVICE_H
-#define MITKMANUALSELECTINGDICOMREADERSERVICE_H
+#ifndef mitkManualSelectingDICOMReaderService_h
+#define mitkManualSelectingDICOMReaderService_h
 
 #include <mitkBaseDICOMReaderService.h>
 #include <mitkDICOMFileReaderSelector.h>

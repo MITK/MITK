@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKEQUAL_H_
-#define MITKEQUAL_H_
+#ifndef mitkEqual_h
+#define mitkEqual_h
 
 #include <cmath>
 #include <iomanip>

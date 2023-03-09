@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef SV_MODELFITCOSTFUNCTION_H
-#define SV_MODELFITCOSTFUNCTION_H
+#ifndef mitkSVModelFitCostFunction_h
+#define mitkSVModelFitCostFunction_h
 
 #include <itkSingleValuedCostFunction.h>
 #include <itkMacro.h>

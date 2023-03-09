@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __MODEL_FIT_PROVIDER_BASE_H
-#define __MODEL_FIT_PROVIDER_BASE_H
+#ifndef mitkModelFitProviderBase_h
+#define mitkModelFitProviderBase_h
 
 #include <memory>
 

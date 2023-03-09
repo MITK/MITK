@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKPOINTOPERATION_H
-#define MITKPOINTOPERATION_H
+#ifndef mitkPointOperation_h
+#define mitkPointOperation_h
 
 #include "mitkNumericTypes.h"
 #include "mitkOperation.h"

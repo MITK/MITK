@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKUSZONESINTERACTOR_H
-#define MITKUSZONESINTERACTOR_H
+#ifndef mitkUSZonesInteractor_h
+#define mitkUSZonesInteractor_h
 
 #include "mitkDataInteractor.h"
 

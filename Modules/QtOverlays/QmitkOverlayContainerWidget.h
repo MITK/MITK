@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkOverlayContainerWidget_H_HEADER_INCLUDED_C10DC4EB
-#define QmitkOverlayContainerWidget_H_HEADER_INCLUDED_C10DC4EB
+#ifndef QmitkOverlayContainerWidget_h
+#define QmitkOverlayContainerWidget_h
 
 // Qt
 #include <QWidget>

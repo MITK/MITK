@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIMAGESTATISTICSCONTAINERNODEHELPER
-#define MITKIMAGESTATISTICSCONTAINERNODEHELPER
+#ifndef mitkImageStatisticsContainerNodeHelper_h
+#define mitkImageStatisticsContainerNodeHelper_h
 
 #include <MitkImageStatisticsExports.h>
 

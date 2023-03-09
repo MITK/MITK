@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitknnUNetToolGPU_h_Included
-#define QmitknnUNetToolGPU_h_Included
+#ifndef QmitknnUNetGPU_h
+#define QmitknnUNetGPU_h
 
 #include <vector>
 #include <QString>

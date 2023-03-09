@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKPROGRESSBAR_H
-#define QMITKPROGRESSBAR_H
+#ifndef QmitkProgressBar_h
+#define QmitkProgressBar_h
 
 #include <MitkQtWidgetsExports.h>
 

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKPROGRESSBARIMPLEMENTATION_H
-#define MITKPROGRESSBARIMPLEMENTATION_H
+#ifndef mitkProgressBarImplementation_h
+#define mitkProgressBarImplementation_h
 #include <MitkCoreExports.h>
 
 namespace mitk

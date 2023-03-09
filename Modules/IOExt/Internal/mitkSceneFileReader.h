@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef SceneFileReader_H_HEADER_INCLUDED
-#define SceneFileReader_H_HEADER_INCLUDED
+#ifndef mitkSceneFileReader_h
+#define mitkSceneFileReader_h
 
 // MITK
 #include <mitkAbstractFileReader.h>

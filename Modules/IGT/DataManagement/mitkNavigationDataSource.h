@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKNAVIGATIONDATASOURCE_H_HEADER_INCLUDED_
-#define MITKNAVIGATIONDATASOURCE_H_HEADER_INCLUDED_
+#ifndef mitkNavigationDataSource_h
+#define mitkNavigationDataSource_h
 
 #include <itkProcessObject.h>
 #include "mitkNavigationData.h"

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkLabel_H_
-#define __mitkLabel_H_
+#ifndef mitkLabel_h
+#define mitkLabel_h
 
 #include "MitkMultilabelExports.h"
 #include <mitkColorProperty.h>

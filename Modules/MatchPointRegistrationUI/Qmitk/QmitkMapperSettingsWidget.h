@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITK_MAPPER_SETTINGS_WIDGET_H
-#define QMITK_MAPPER_SETTINGS_WIDGET_H
+#ifndef QmitkMapperSettingsWidget_h
+#define QmitkMapperSettingsWidget_h
 
 #include <MitkMatchPointRegistrationUIExports.h>
 

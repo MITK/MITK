@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_MODEL_FIT_CONSTANTS_H_
-#define _MITK_MODEL_FIT_CONSTANTS_H_
+#ifndef mitkModelFitConstants_h
+#define mitkModelFitConstants_h
 
 #include <string>
 

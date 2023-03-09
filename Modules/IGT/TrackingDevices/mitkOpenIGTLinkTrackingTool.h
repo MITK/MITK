@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKOpenIGTLinkTrackingTOOL_H_HEADER_INCLUDED_
-#define MITKOpenIGTLinkTrackingTOOL_H_HEADER_INCLUDED_
+#ifndef mitkOpenIGTLinkTrackingTool_h
+#define mitkOpenIGTLinkTrackingTool_h
 
 #include <mitkTrackingTool.h>
 

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitknnUNetEnsembleLayout_h_Included
-#define QmitknnUNetEnsembleLayout_h_Included
+#ifndef QmitknnUNetEnsembleLayout_h
+#define QmitknnUNetEnsembleLayout_h
 
 
 #include <QtWidgets/QGridLayout>

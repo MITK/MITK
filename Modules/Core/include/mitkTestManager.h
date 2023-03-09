@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITK_TESTMANAGER_H_INCLUDED
-#define MITK_TESTMANAGER_H_INCLUDED
+#ifndef mitkTestManager_h
+#define mitkTestManager_h
 
 #include <MitkCoreExports.h>
 

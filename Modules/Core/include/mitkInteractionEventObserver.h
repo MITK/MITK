@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef InteractionEventObserver_h
-#define InteractionEventObserver_h
+#ifndef mitkInteractionEventObserver_h
+#define mitkInteractionEventObserver_h
 
 #include "mitkInteractionEvent.h"
 #include "mitkServiceInterface.h"

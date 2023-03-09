@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKUSABSTRACTNAVIGATIONSTEP_H
-#define QMITKUSABSTRACTNAVIGATIONSTEP_H
+#ifndef QmitkUSAbstractNavigationStep_h
+#define QmitkUSAbstractNavigationStep_h
 
 #include <QWidget>
 

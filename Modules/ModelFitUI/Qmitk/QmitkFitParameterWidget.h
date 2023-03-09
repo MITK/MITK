@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITK_FIT_PARAMETER_WIDGET_H
-#define QMITK_FIT_PARAMETER_WIDGET_H
+#ifndef QmitkFitParameterWidget_h
+#define QmitkFitParameterWidget_h
 
 #include "mitkModelFitInfo.h"
 #include "mitkPointSet.h"

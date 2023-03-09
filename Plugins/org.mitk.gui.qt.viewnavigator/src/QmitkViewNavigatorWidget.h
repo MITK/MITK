@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef QMIKVIEWNAVIGATORWIDGET_H
-#define QMIKVIEWNAVIGATORWIDGET_H
+#ifndef QmitkViewNavigatorWidget_h
+#define QmitkViewNavigatorWidget_h
 
 #include "ui_QmitkViewNavigatorWidgetControls.h"
 

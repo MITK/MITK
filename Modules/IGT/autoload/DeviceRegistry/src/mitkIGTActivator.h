@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkIGTActivator_H
-#define mitkIGTActivator_H
+#ifndef mitkIGTActivator_h
+#define mitkIGTActivator_h
 
 #include <usModuleActivator.h>
 #include <mitkTrackingDeviceTypeCollection.h>

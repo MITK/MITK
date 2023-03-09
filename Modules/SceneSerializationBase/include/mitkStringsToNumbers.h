@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkVectorPropertySerializer_h
-#define mitkVectorPropertySerializer_h
+#ifndef mitkStringsToNumbers_h
+#define mitkStringsToNumbers_h
 
 #include <mitkLexicalCast.h>
 

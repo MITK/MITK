@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKMOUSEWHEELEVENT_H_
-#define MITKMOUSEWHEELEVENT_H_
+#ifndef mitkMouseWheelEvent_h
+#define mitkMouseWheelEvent_h
 
 #include "itkObject.h"
 #include "itkObjectFactory.h"

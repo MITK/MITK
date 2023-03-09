@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIRENDERWINDOWPART_H
-#define MITKIRENDERWINDOWPART_H
+#ifndef mitkIRenderWindowPart_h
+#define mitkIRenderWindowPart_h
 
 #include <QString>
 #include <QStringList>

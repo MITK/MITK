@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QMITKCOLOURIMAGEPROCESSINGVIEW_H_INCLUDED
-#define _QMITKCOLOURIMAGEPROCESSINGVIEW_H_INCLUDED
+#ifndef QmitkColourImageProcessingView_h
+#define QmitkColourImageProcessingView_h
 
 #include <QmitkAbstractView.h>
 

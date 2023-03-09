@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKPLANEPROPOSER_H
-#define MITKPLANEPROPOSER_H
+#ifndef mitkPlaneProposer_h
+#define mitkPlaneProposer_h
 
 #include <MitkSurfaceInterpolationExports.h>
 

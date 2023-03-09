@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __MITKRESLICEMETHODENUMPROPERTY_H
-#define __MITKRESLICEMETHODENUMPROPERTY_H
+#ifndef mitkResliceMethodProperty_h
+#define mitkResliceMethodProperty_h
 
 #include "mitkEnumerationProperty.h"
 

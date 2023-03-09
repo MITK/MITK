@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKLESIONTREEMODEL_H
-#define QMITKLESIONTREEMODEL_H
+#ifndef QmitkLesionTreeModel_h
+#define QmitkLesionTreeModel_h
 
 // mitk semantic relations UI
 #include "MitkSemanticRelationsUIExports.h"

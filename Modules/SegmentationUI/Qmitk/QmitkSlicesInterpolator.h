@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkSlicesInterpolator_h_Included
-#define QmitkSlicesInterpolator_h_Included
+#ifndef QmitkSlicesInterpolator_h
+#define QmitkSlicesInterpolator_h
 
 #include "mitkDataNode.h"
 #include "mitkDataStorage.h"

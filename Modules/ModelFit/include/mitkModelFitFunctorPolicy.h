@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MODELFITFUNCTOR_POLICY_H
-#define MODELFITFUNCTOR_POLICY_H
+#ifndef mitkModelFitFunctorPolicy_h
+#define mitkModelFitFunctorPolicy_h
 
 #include "itkIndex.h"
 #include "mitkModelFitFunctorBase.h"

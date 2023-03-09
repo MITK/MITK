@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKCONTROLPOINTMANAGER_H
-#define MITKCONTROLPOINTMANAGER_H
+#ifndef mitkControlPointManager_h
+#define mitkControlPointManager_h
 
 #include <MitkSemanticRelationsExports.h>
 

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKLABELSWIDGET_H
-#define QMITKLABELSWIDGET_H
+#ifndef QmitkLabelsWidget_h
+#define QmitkLabelsWidget_h
 
 // mitk core
 #include <mitkWeakPointer.h>

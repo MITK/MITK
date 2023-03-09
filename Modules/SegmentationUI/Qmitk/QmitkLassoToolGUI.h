@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkLassoToolGUI_h_Included
-#define QmitkLassoToolGUI_h_Included
+#ifndef QmitkLassoToolGUI_h
+#define QmitkLassoToolGUI_h
 
 #include "QmitkEditableContourToolGUIBase.h"
 #include <MitkSegmentationUIExports.h>

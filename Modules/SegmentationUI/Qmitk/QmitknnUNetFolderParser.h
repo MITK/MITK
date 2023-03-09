@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitknnUNetFolderParser_h_Included
-#define QmitknnUNetFolderParser_h_Included
+#ifndef QmitknnUNetFolderParser_h
+#define QmitknnUNetFolderParser_h
 
 #include <QDirIterator>
 #include <memory>

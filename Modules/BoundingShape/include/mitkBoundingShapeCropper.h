@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef BOUNDINGSHAPECROPPER_H
-#define BOUNDINGSHAPECROPPER_H
+#ifndef mitkBoundingShapeCropper_h
+#define mitkBoundingShapeCropper_h
 
 #include "MitkBoundingShapeExports.h"
 #include "mitkBoundingShapeCropper.h"

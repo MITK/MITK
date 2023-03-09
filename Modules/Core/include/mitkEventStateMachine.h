@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKEVENTSTATEMACHINE_H_
-#define MITKEVENTSTATEMACHINE_H_
+#ifndef mitkEventStateMachine_h
+#define mitkEventStateMachine_h
 
 #include "itkObject.h"
 #include "mitkCommon.h"

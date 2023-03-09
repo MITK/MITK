@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKNavigationDataSetWriterCSV_H_HEADER_INCLUDED_
-#define MITKNavigationDataSetWriterCSV_H_HEADER_INCLUDED_
+#ifndef mitkNavigationDataSetWriterCSV_h
+#define mitkNavigationDataSetWriterCSV_h
 
 #include <MitkIGTIOExports.h>
 

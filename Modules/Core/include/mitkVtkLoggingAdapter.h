@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef VtkLoggingAdapter_H_HEADER_INCLUDED
-#define VtkLoggingAdapter_H_HEADER_INCLUDED
+#ifndef mitkVtkLoggingAdapter_h
+#define mitkVtkLoggingAdapter_h
 
 #include <MitkCoreExports.h>
 #include <vtkOutputWindow.h>

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_TUBE_GRAPH_IO_H_
-#define _MITK_TUBE_GRAPH_IO_H_
+#ifndef mitkTubeGraphIO_h
+#define mitkTubeGraphIO_h
 
 #include <mitkAbstractFileIO.h>
 #include <mitkCustomMimeType.h>

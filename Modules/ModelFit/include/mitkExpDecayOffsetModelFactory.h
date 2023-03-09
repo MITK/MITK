@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __EXP_DECAY_OFFSET_TEST_MODEL_FACTORY_H
-#define __EXP_DECAY_OFFSET_TEST_MODEL_FACTORY_H
+#ifndef mitkExpDecayOffsetModelFactory_h
+#define mitkExpDecayOffsetModelFactory_h
 
 #include <mitkCommon.h>
 

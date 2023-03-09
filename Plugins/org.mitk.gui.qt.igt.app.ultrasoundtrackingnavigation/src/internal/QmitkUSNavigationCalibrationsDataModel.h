@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKUSNAVIGATIONCALIBRATIONSDATAMODEL_H
-#define QMITKUSNAVIGATIONCALIBRATIONSDATAMODEL_H
+#ifndef QmitkUSNavigationCalibrationsDataModel_h
+#define QmitkUSNavigationCalibrationsDataModel_h
 
 #include <QAbstractTableModel>
 

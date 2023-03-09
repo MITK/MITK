@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKUSImageVideoSource_H_HEADER_INCLUDED_
-#define MITKUSImageVideoSource_H_HEADER_INCLUDED_
+#ifndef mitkUSImageVideoSource_h
+#define mitkUSImageVideoSource_h
 
 // ITK
 #include <itkProcessObject.h>

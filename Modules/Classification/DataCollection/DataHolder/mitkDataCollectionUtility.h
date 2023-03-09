@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef mitkDataCollectionUtilit_h
-#define mitkDataCollectionUtilit_h
+#ifndef mitkDataCollectionUtility_h
+#define mitkDataCollectionUtility_h
 
 
 #include <mitkDataCollection.h>

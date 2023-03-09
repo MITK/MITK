@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKUSDevice_H_HEADER_INCLUDED_
-#define MITKUSDevice_H_HEADER_INCLUDED_
+#ifndef mitkUSDevice_h
+#define mitkUSDevice_h
 
 // STL
 #include <condition_variable>

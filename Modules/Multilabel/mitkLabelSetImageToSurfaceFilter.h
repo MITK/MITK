@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _mitkLabelSetImageToSurfaceFilter_H_
-#define _mitkLabelSetImageToSurfaceFilter_H_
+#ifndef mitkLabelSetImageToSurfaceFilter_h
+#define mitkLabelSetImageToSurfaceFilter_h
 
 #include "MitkMultilabelExports.h"
 #include "mitkLabelSetImage.h"

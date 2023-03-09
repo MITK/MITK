@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITK_UID_GENERATOR_INDCLUDED_FASAWE
-#define MITK_UID_GENERATOR_INDCLUDED_FASAWE
+#ifndef mitkUIDGenerator_h
+#define mitkUIDGenerator_h
 
 #include <MitkCoreExports.h>
 #include <string>

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_SURFACE_VTK_XML_IO_H_
-#define _MITK_SURFACE_VTK_XML_IO_H_
+#ifndef mitkSurfaceVtkXmlIO_h
+#define mitkSurfaceVtkXmlIO_h
 
 #include "mitkSurfaceVtkIO.h"
 

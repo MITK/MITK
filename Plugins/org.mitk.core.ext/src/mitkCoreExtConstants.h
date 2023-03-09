@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKCOREEXTCONSTANTS_H_
-#define MITKCOREEXTCONSTANTS_H_
+#ifndef mitkCoreExtConstants_h
+#define mitkCoreExtConstants_h
 
 #include <QString>
 

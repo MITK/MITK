@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef _MITK_REG_EVAL_STYLE_PROPERTY__H_
-#define _MITK_REG_EVAL_STYLE_PROPERTY__H_
+#ifndef mitkRegEvalStyleProperty_h
+#define mitkRegEvalStyleProperty_h
 
 // MITK
 #include <mitkEnumerationProperty.h>

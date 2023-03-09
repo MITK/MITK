@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKELLIPSEDATA_H_HEADER_INCLUDED
-#define MITKELLIPSEDATA_H_HEADER_INCLUDED
+#ifndef mitkEllipsoid_h
+#define mitkEllipsoid_h
 
 #include "MitkDataTypesExtExports.h"
 #include "mitkBoundingObject.h"

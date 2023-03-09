@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKXNATEDITOR_h
-#define QMITKXNATEDITOR_h
+#ifndef QmitkXnatEditor_h
+#define QmitkXnatEditor_h
 
 #include <berryIReusableEditor.h>
 #include <berryQtEditorPart.h>

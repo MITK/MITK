@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __EXP_DECAY_OFFSET_MODEL_PARAMETERIZER_H
-#define __EXP_DECAY_OFFSET_MODEL_PARAMETERIZER_H
+#ifndef mitkExpDecayOffsetModelParameterizer_h
+#define mitkExpDecayOffsetModelParameterizer_h
 
 #include "mitkConcreteModelParameterizerBase.h"
 #include "mitkExpDecayOffsetModel.h"

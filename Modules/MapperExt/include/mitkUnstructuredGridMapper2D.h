@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MitkPointSetSliceLMapper2D_H
-#define MitkPointSetSliceLMapper2D_H
+#ifndef mitkUnstructuredGridMapper2D_h
+#define mitkUnstructuredGridMapper2D_h
 
 #include "MitkMapperExtExports.h"
 #include "mitkColorProperty.h"

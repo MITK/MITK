@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKOPENDICOMEDITORACTION_H_
-#define QMITKOPENDICOMEDITORACTION_H_
+#ifndef QmitkOpenDicomEditorAction_h
+#define QmitkOpenDicomEditorAction_h
 
 #include <QAction>
 #include <QIcon>

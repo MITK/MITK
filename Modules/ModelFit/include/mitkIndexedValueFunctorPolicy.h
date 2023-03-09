@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef IndexedValueFunctorPolicy_H
-#define IndexedValueFunctorPolicy_H
+#ifndef mitkIndexedValueFunctorPolicy_h
+#define mitkIndexedValueFunctorPolicy_h
 
 #include "itkIndex.h"
 #include "mitkIndexedValueFunctorBase.h"

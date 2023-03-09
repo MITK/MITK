@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef ModifiedLock_H_HEADER_INCLUDED
-#define ModifiedLock_H_HEADER_INCLUDED
+#ifndef mitkModifiedLock_h
+#define mitkModifiedLock_h
 
 #include <MitkCoreExports.h>
 #include <mitkBaseGeometry.h>

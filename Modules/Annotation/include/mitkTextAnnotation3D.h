@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef TextAnnotation3D_H
-#define TextAnnotation3D_H
+#ifndef mitkTextAnnotation3D_h
+#define mitkTextAnnotation3D_h
 
 #include "MitkAnnotationExports.h"
 #include <mitkLocalStorageHandler.h>

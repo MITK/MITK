@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITK_ScreenshotMaker_H__INCLUDED
-#define QMITK_ScreenshotMaker_H__INCLUDED
+#ifndef QmitkScreenshotMaker_h
+#define QmitkScreenshotMaker_h
 
 #include <QmitkAbstractView.h>
 #include <mitkIRenderWindowPartListener.h>

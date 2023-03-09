@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKTRACKINGDEVICESOURCE_H_HEADER_INCLUDED_
-#define MITKTRACKINGDEVICESOURCE_H_HEADER_INCLUDED_
+#ifndef mitkTrackingDeviceSource_h
+#define mitkTrackingDeviceSource_h
 
 #include <mitkNavigationDataSource.h>
 #include "mitkTrackingDevice.h"

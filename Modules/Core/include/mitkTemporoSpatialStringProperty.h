@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKTEMPOROSPATIALSTRINGPROPERTY_H_HEADER
-#define MITKTEMPOROSPATIALSTRINGPROPERTY_H_HEADER
+#ifndef mitkTemporoSpatialStringProperty_h
+#define mitkTemporoSpatialStringProperty_h
 
 #include <itkConfigure.h>
 

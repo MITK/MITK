@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITK_REG_EVAL_SETTINGS_WIDGET_H
-#define QMITK_REG_EVAL_SETTINGS_WIDGET_H
+#ifndef QmitkRegEvalSettingsWidget_h
+#define QmitkRegEvalSettingsWidget_h
 
 #include <MitkMatchPointRegistrationUIExports.h>
 

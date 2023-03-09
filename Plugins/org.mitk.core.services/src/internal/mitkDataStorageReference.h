@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKDATASTORAGEREFERENCE_H_
-#define MITKDATASTORAGEREFERENCE_H_
+#ifndef mitkDataStorageReference_h
+#define mitkDataStorageReference_h
 
 #include "../mitkIDataStorageReference.h"
 

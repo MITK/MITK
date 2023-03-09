@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKIMAGESTATISTICSVIEW_H
-#define QMITKIMAGESTATISTICSVIEW_H
+#ifndef QmitkImageStatisticsView_h
+#define QmitkImageStatisticsView_h
 
 #include "ui_QmitkImageStatisticsViewControls.h"
 

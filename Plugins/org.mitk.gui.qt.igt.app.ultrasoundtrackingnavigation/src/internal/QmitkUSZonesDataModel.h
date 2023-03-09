@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKUSZONESDATAMODEL_H
-#define QMITKUSZONESDATAMODEL_H
+#ifndef QmitkUSZonesDataModel_h
+#define QmitkUSZonesDataModel_h
 
 #include <mitkCommon.h>
 #include <mitkDataNode.h>

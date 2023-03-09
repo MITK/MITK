@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkDataCollection_H_
-#define mitkDataCollection_H_
+#ifndef mitkDataCollection_h
+#define mitkDataCollection_h
 
 #ifdef _MSC_VER
 #  pragma warning (disable : 4996)

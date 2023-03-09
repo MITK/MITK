@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkEditableContourToolGUIBase_h_Included
-#define QmitkEditableContourToolGUIBase_h_Included
+#ifndef QmitkEditableContourToolGUIBase_h
+#define QmitkEditableContourToolGUIBase_h
 
 #include "QmitkToolGUI.h"
 #include "mitkEditableContourTool.h"

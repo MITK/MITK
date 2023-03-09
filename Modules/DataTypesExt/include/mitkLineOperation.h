@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKLINEOPERATION_H_INCLUDED
-#define MITKLINEOPERATION_H_INCLUDED
+#ifndef mitkLineOperation_h
+#define mitkLineOperation_h
 
 #include "MitkDataTypesExtExports.h"
 #include "mitkCellOperation.h"

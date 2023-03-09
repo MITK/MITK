@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKSTATICDYNAMICSEGMENTATIONDIALOG_H
-#define QMITKSTATICDYNAMICSEGMENTATIONDIALOG_H
+#ifndef QmitkStaticDynamicSegmentationDialog_h
+#define QmitkStaticDynamicSegmentationDialog_h
 
 #include <MitkSegmentationUIExports.h>
 

@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef __Q_MITK_MATCHPOINT_REGISTRATION_VISUALIZER_H
-#define __Q_MITK_MATCHPOINT_REGISTRATION_VISUALIZER_H
+#ifndef QmitkMatchPointRegistrationVisualizer_h
+#define QmitkMatchPointRegistrationVisualizer_h
 
 #include <vtkPolyData.h>
 #include <vtkSmartPointer.h>

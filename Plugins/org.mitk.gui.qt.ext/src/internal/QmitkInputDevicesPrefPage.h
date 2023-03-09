@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITK_INPUTDEVICESPREFPAGE_H_
-#define QMITK_INPUTDEVICESPREFPAGE_H_
+#ifndef QmitkInputDevicesPrefPage_h
+#define QmitkInputDevicesPrefPage_h
 
 #include "berryIQtPreferencePage.h"
 

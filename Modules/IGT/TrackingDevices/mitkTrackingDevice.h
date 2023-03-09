@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKTRACKINGDEVICE_H_HEADER_INCLUDED_C1C2FCD2
-#define MITKTRACKINGDEVICE_H_HEADER_INCLUDED_C1C2FCD2
+#ifndef mitkTrackingDevice_h
+#define mitkTrackingDevice_h
 
 #include <MitkIGTExports.h>
 #include "itkObject.h"

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKModelFitInfoSignalGenerationFunctor_H
-#define MITKModelFitInfoSignalGenerationFunctor_H
+#ifndef mitkModelFitInfoSignalGenerationFunctor_h
+#define mitkModelFitInfoSignalGenerationFunctor_h
 
 #include "mitkModelBasedValueFunctorBase.h"
 #include "mitkModelParameterizerBase.h"

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkNDIAuroraWidget_H
-#define QmitkNDIAuroraWidget_H
+#ifndef QmitkNDIAuroraWidget_h
+#define QmitkNDIAuroraWidget_h
 
 #include "ui_QmitkNDIAuroraWidget.h"
 #include "QmitkNDIAbstractDeviceWidget.h"

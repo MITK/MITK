@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKVIEWITEM_H
-#define QMITKVIEWITEM_H
+#ifndef QmitkViewItem_h
+#define QmitkViewItem_h
 
 #include <QStandardItem>
 #include <berryPlatformUI.h>

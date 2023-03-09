@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QMITKKINECTPARAMETERWIDGET_H_INCLUDED
-#define _QMITKKINECTPARAMETERWIDGET_H_INCLUDED
+#ifndef QmitkKinectParameterWidget_h
+#define QmitkKinectParameterWidget_h
 
 #include <MitkToFUIExports.h>
 #include "ui_QmitkKinectParameterWidgetControls.h"

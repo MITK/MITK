@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKUIDGENERATORBOOST_H
-#define MITKUIDGENERATORBOOST_H
+#ifndef mitkUIDGeneratorBoost_h
+#define mitkUIDGeneratorBoost_h
 
 #include <MitkSemanticRelationsExports.h>
 

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkRegisterClassesHIncluded
-#define QmitkRegisterClassesHIncluded
+#ifndef QmitkRegisterClasses_h
+#define QmitkRegisterClasses_h
 
 #include <MitkQtWidgetsExports.h>
 

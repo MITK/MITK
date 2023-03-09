@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKNDIPASSIVETOOL_H_HEADER_INCLUDED_
-#define MITKNDIPASSIVETOOL_H_HEADER_INCLUDED_
+#ifndef mitkNDIPassiveTool_h
+#define mitkNDIPassiveTool_h
 
 #include <mitkTrackingTool.h>
 #include "mitkTrackingTypes.h"

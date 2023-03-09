@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __mitkToFCameraPMDCamBoardDevice_h
-#define __mitkToFCameraPMDCamBoardDevice_h
+#ifndef mitkToFCameraPMDCamBoardDevice_h
+#define mitkToFCameraPMDCamBoardDevice_h
 
 #include <MitkPMDExports.h>
 #include "mitkCommon.h"

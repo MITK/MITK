@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITK_MULTI_NODE_SELECTION_WIDGET_H
-#define QMITK_MULTI_NODE_SELECTION_WIDGET_H
+#ifndef QmitkMultiNodeSelectionWidget_h
+#define QmitkMultiNodeSelectionWidget_h
 
 #include <MitkQtWidgetsExports.h>
 

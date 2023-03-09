@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __mitkToFNrrdImageWriter_h
-#define __mitkToFNrrdImageWriter_h
+#ifndef mitkToFNrrdImageWriter_h
+#define mitkToFNrrdImageWriter_h
 
 #include <MitkToFHardwareExports.h>
 #include "mitkToFImageWriter.h"

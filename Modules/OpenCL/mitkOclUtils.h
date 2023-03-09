@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkOclUtils_h
-#define __mitkOclUtils_h
+#ifndef mitkOclUtils_h
+#define mitkOclUtils_h
 
 #include "mitkOpenCL.h"
 

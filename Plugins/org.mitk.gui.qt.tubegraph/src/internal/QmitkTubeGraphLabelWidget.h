@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QMITKTUBEGRAPHLABELWIDGET_H_INCLUDED
-#define _QMITKTUBEGRAPHLABELWIDGET_H_INCLUDED
+#ifndef QmitkTubeGraphLabelWidget_h
+#define QmitkTubeGraphLabelWidget_h
 
 #include "mitkColorProperty.h"
 

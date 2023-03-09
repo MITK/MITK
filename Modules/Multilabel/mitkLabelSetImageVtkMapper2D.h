@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkLabelSetImageVtkMapper2D_H_
-#define __mitkLabelSetImageVtkMapper2D_H_
+#ifndef mitkLabelSetImageVtkMapper2D_h
+#define mitkLabelSetImageVtkMapper2D_h
 
 // MITK
 #include "MitkMultilabelExports.h"

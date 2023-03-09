@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __QMITK_DATA_STORAGE_INSPECTOR_PROVIDER_BASE_H
-#define __QMITK_DATA_STORAGE_INSPECTOR_PROVIDER_BASE_H
+#ifndef QmitkDataStorageInspectorProviderBase_h
+#define QmitkDataStorageInspectorProviderBase_h
 
 #include <memory>
 

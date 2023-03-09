@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKCOLOURIMAGEPROCESSOR_H
-#define MITKCOLOURIMAGEPROCESSOR_H
+#ifndef mitkColourImageProcessor_h
+#define mitkColourImageProcessor_h
 
 #include <itkImage.h>
 #include <mitkImage.h>

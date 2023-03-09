@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITK_PLANEFIT_H__INCLUDED_
-#define MITK_PLANEFIT_H__INCLUDED_
+#ifndef mitkPlaneFit_h
+#define mitkPlaneFit_h
 
 #include "MitkAlgorithmsExtExports.h"
 #include "mitkGeometryDataSource.h"

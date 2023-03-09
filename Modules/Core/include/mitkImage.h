@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIMAGE_H_HEADER_INCLUDED_C1C2FCD2
-#define MITKIMAGE_H_HEADER_INCLUDED_C1C2FCD2
+#ifndef mitkImage_h
+#define mitkImage_h
 
 #include "mitkBaseData.h"
 #include "mitkImageAccessorBase.h"

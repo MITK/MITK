@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKWORKBENCHUTIL_H
-#define MITKWORKBENCHUTIL_H
+#ifndef mitkWorkbenchUtil_h
+#define mitkWorkbenchUtil_h
 
 #include <org_mitk_gui_common_Export.h>
 

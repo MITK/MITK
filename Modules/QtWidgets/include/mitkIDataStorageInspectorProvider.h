@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __I_DATA_STORAGE_INSPECTOR_PROVIDER_H
-#define __I_DATA_STORAGE_INSPECTOR_PROVIDER_H
+#ifndef mitkIDataStorageInspectorProvider_h
+#define mitkIDataStorageInspectorProvider_h
 
 #include <mitkServiceInterface.h>
 

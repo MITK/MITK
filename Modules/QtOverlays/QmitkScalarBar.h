@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKSCALARBAR_H_HEADER_INCLUDED_C10DC4EB
-#define MITKSCALARBAR_H_HEADER_INCLUDED_C10DC4EB
+#ifndef QmitkScalarBar_h
+#define QmitkScalarBar_h
 
 #include <MitkQtOverlaysExports.h>
 #include <mitkCommon.h>

@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __mitkToFImageSource_h
-#define __mitkToFImageSource_h
+#ifndef mitkToFImageSource_h
+#define mitkToFImageSource_h
 
 #include <MitkToFHardwareExports.h>
 #include <mitkImageSource.h>

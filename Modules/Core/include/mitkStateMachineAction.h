@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef SMACTION_H_HEADER_INCLUDED_C19AE06B
-#define SMACTION_H_HEADER_INCLUDED_C19AE06B
+#ifndef mitkStateMachineAction_h
+#define mitkStateMachineAction_h
 
 #include "MitkCoreExports.h"
 #include "mitkCommon.h"

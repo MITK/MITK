@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKPointSet_H_HEADER_INCLUDED
-#define MITKPointSet_H_HEADER_INCLUDED
+#ifndef mitkPointSet_h
+#define mitkPointSet_h
 
 #include "mitkBaseData.h"
 

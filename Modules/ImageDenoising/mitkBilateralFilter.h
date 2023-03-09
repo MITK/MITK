@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __mitkBilateralFilter_h
-#define __mitkBilateralFilter_h
+#ifndef mitkBilateralFilter_h
+#define mitkBilateralFilter_h
 
 #include "MitkImageDenoisingExports.h"
 

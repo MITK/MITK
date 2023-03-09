@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef OptiTrackErrorMessages_H_HEADER_INCLUDED_
-#define OptiTrackErrorMessages_H_HEADER_INCLUDED_
+#ifndef mitkOptitrackErrorMessages_h
+#define mitkOptitrackErrorMessages_h
 
 /**
 * \brief Maximum number of attempts for Initialization, Shutdown and CleanUp

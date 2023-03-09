@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKNavigationDataSequentialPlayer_H_HEADER_INCLUDED_
-#define MITKNavigationDataSequentialPlayer_H_HEADER_INCLUDED_
+#ifndef mitkNavigationDataSequentialPlayer_h
+#define mitkNavigationDataSequentialPlayer_h
 
 #include <mitkNavigationDataPlayerBase.h>
 

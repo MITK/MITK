@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKFILESAVEACTION_H_
-#define QMITKFILESAVEACTION_H_
+#ifndef QmitkFileSaveAction_h
+#define QmitkFileSaveAction_h
 
 #include <org_mitk_gui_qt_application_Export.h>
 

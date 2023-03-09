@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_MAP_REGISTRATION_WRAPPER_IO_H
-#define _MITK_MAP_REGISTRATION_WRAPPER_IO_H
+#ifndef mitkMAPRegistrationWrapperIO_h
+#define mitkMAPRegistrationWrapperIO_h
 
 #include <mitkAbstractFileIO.h>
 

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkBaseDataCompare_h_included
-#define mitkBaseDataCompare_h_included
+#ifndef mitkBaseDataCompare_h
+#define mitkBaseDataCompare_h
 
 #include "mitkBaseData.h"
 

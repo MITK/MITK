@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_IMAGE_WRITER__H_
-#define _MITK_IMAGE_WRITER__H_
+#ifndef mitkImageWriter_h
+#define mitkImageWriter_h
 
 #include <MitkLegacyIOExports.h>
 #include <mitkFileWriterWithInformation.h>

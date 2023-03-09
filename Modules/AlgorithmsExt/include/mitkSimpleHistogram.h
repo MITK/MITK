@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKSIMPLEHISTOGRAM_H
-#define MITKSIMPLEHISTOGRAM_H
+#ifndef mitkSimpleHistogram_h
+#define mitkSimpleHistogram_h
 
 #ifndef __itkHistogram_h
 #include <itkHistogram.h>

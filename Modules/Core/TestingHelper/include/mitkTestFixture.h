@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKTESTFIXTURE_H
-#define MITKTESTFIXTURE_H
+#ifndef mitkTestFixture_h
+#define mitkTestFixture_h
 
 #include <cppunit/TestFixture.h>
 #include <mitkTestingConfig.h>

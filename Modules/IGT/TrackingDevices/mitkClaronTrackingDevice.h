@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKCLARONTRACKINGDEVICE_H_HEADER_INCLUDED_
-#define MITKCLARONTRACKINGDEVICE_H_HEADER_INCLUDED_
+#ifndef mitkClaronTrackingDevice_h
+#define mitkClaronTrackingDevice_h
 
 
 #include <thread>

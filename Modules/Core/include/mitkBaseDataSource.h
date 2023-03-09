@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITK_BASE_DATA_SOURCE_H
-#define MITK_BASE_DATA_SOURCE_H
+#ifndef mitkBaseDataSource_h
+#define mitkBaseDataSource_h
 
 #include <MitkCoreExports.h>
 #include <itkProcessObject.h>

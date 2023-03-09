@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKPLANARFIGUREACTIVATOR_H_
-#define MITKPLANARFIGUREACTIVATOR_H_
+#ifndef mitkPlanarFigureActivator_h
+#define mitkPlanarFigureActivator_h
 
 #include <ctkPluginActivator.h>
 

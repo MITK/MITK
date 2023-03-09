@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKTIMETOPEAKCURVEDESCRIPTIONPARAMETER_H
-#define MITKTIMETOPEAKCURVEDESCRIPTIONPARAMETER_H
+#ifndef mitkTimeToPeakCurveDescriptionParameter_h
+#define mitkTimeToPeakCurveDescriptionParameter_h
 #include "mitkCurveDescriptionParameterBase.h"
 
 namespace mitk {

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkLabelSetImage_H_
-#define __mitkLabelSetImage_H_
+#ifndef mitkLabelSetImage_h
+#define mitkLabelSetImage_h
 
 #include <mitkImage.h>
 #include <mitkLabelSet.h>

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKGL_H_HEADER_INCLUDED_C1C53722
-#define MITKGL_H_HEADER_INCLUDED_C1C53722
+#ifndef mitkGL_h
+#define mitkGL_h
 
 #ifdef WIN32
 #include <windows.h>

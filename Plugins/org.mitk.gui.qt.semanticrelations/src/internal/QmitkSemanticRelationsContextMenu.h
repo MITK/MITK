@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKSEMANTICRELATIONSCONTEXTMENU_H
-#define QMITKSEMANTICRELATIONSCONTEXTMENU_H
+#ifndef QmitkSemanticRelationsContextMenu_h
+#define QmitkSemanticRelationsContextMenu_h
 
 // semantic relations plugin
 #include "QmitkDataNodeSetControlPointAction.h"

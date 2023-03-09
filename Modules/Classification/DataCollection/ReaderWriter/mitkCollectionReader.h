@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITK_COLLECTION_READER_H
-#define MITK_COLLECTION_READER_H
+#ifndef mitkCollectionReader_h
+#define mitkCollectionReader_h
 
 #include "mitkCommon.h"
 #include "mitkDataCollection.h"

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkRedoAction_H_
-#define QmitkRedoAction_H_
+#ifndef QmitkRedoAction_h
+#define QmitkRedoAction_h
 
 #include <QAction>
 #include <QIcon>

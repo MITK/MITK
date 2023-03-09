@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKRAWIMAGEFILEREADER_H_
-#define MITKRAWIMAGEFILEREADER_H_
+#ifndef mitkRawImageFileReader_h
+#define mitkRawImageFileReader_h
 
 #include "mitkAbstractFileReader.h"
 

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __MITK_PROCESS_EXECUTOR_H
-#define __MITK_PROCESS_EXECUTOR_H
+#ifndef mitkProcessExecutor_h
+#define mitkProcessExecutor_h
 
 #include <MitkSegmentationExports.h>
 #include <itkObject.h>

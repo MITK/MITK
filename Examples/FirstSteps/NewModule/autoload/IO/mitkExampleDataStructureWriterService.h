@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkExampleDataStructureWriterService_h
-#define __mitkExampleDataStructureWriterService_h
+#ifndef mitkExampleDataStructureWriterService_h
+#define mitkExampleDataStructureWriterService_h
 
 #include <mitkAbstractFileWriter.h>
 #include <mitkExampleDataStructure.h>

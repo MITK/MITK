@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKMODELVIEWSELECTIONCONNECTOR_H
-#define QMITKMODELVIEWSELECTIONCONNECTOR_H
+#ifndef QmitkModelViewSelectionConnector_h
+#define QmitkModelViewSelectionConnector_h
 
 #include <MitkQtWidgetsExports.h>
 

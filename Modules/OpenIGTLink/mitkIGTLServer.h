@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIGTLSERVER_H
-#define MITKIGTLSERVER_H
+#ifndef mitkIGTLServer_h
+#define mitkIGTLServer_h
 
 #include "mitkIGTLDevice.h"
 

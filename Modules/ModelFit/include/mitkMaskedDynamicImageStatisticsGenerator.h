@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __MITK_MASKED_DYMAMIC_IMAGE_STATISTICS_GENERATOR_H
-#define __MITK_MASKED_DYMAMIC_IMAGE_STATISTICS_GENERATOR_H
+#ifndef mitkMaskedDynamicImageStatisticsGenerator_h
+#define mitkMaskedDynamicImageStatisticsGenerator_h
 
 #include <mitkImage.h>
 

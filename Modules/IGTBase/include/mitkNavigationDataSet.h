@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKNAVIGATIONDATASET_H_HEADER_INCLUDED_
-#define MITKNAVIGATIONDATASET_H_HEADER_INCLUDED_
+#ifndef mitkNavigationDataSet_h
+#define mitkNavigationDataSet_h
 
 #include <MitkIGTBaseExports.h>
 #include "mitkBaseData.h"

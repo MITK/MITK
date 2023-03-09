@@ -17,11 +17,11 @@ found in the LICENSE file.
 
 vtkStandardNewMacro(mitk::VtkInteractorStyle);
 
-mitk::VtkInteractorStyle::mitkVtkInteractorStyle() : vtkInteractorStyleUser()
+mitk::VtkInteractorStyle::VtkInteractorStyle() : vtkInteractorStyleUser()
 {
 }
 
-mitk::VtkInteractorStyle::~mitkVtkInteractorStyle()
+mitk::VtkInteractorStyle::~VtkInteractorStyle()
 {
 }
 

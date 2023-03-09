@@ -10,22 +10,17 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-/// Header guard.
 #ifndef QmitkPropertiesTableModel_h
 #define QmitkPropertiesTableModel_h
 
 #include <MitkQtWidgetsExports.h>
 
-//# Own includes
 #include "mitkDataNode.h"
 #include "mitkWeakPointer.h"
 
-//# Toolkit includes
 #include <QAbstractTableModel>
 #include <string>
 #include <vector>
-
-//# Forward declarations
 
 /**
  * \ingroup QmitkModule
@@ -35,7 +30,6 @@ found in the LICENSE file.
  */
 class MITKQTWIDGETS_EXPORT QmitkPropertiesTableModel : public QAbstractTableModel
 {
-  //# PUBLIC CTORS,DTOR,TYPEDEFS,CONSTANTS
 public:
   static const int PROPERTY_NAME_COLUMN = 0;
   static const int PROPERTY_VALUE_COLUMN = 1;
@@ -54,7 +48,6 @@ public:
   /// Standard dtor. Nothing to do here.
   ~QmitkPropertiesTableModel() override;
 
-  //# PUBLIC GETTER
 public:
   ///
   /// Returns the property list of this table model.
@@ -82,8 +75,6 @@ public:
   /// the properties name and its value.
   int columnCount(const QModelIndex &parent) const override;
 
-  //# PUBLIC SETTER
-public:
   ///
   /// Sets the Property List to show. Resets the whole model. If _PropertyList is nullptr the model is empty.
   ///
@@ -119,7 +110,6 @@ public:
   ///
   void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
 
-  //#PROTECTED INNER CLASSES
 protected:
   ///
   /// \struct PropertyDataSetCompareFunction
@@ -176,16 +166,12 @@ protected:
     std::string m_FilterKeyWord;
   };
 
-  //# PROTECTED GETTER
-protected:
   ///
   /// \brief Searches for the specified property and returns the row of the element in this QTableModel.
   /// If any errors occur, the function returns -1.
   ///
   int FindProperty(const mitk::BaseProperty *_Property) const;
 
-  //# PROTECTED SETTER
-protected:
   ///
   /// Adds a property dataset to the current selection.
   /// When a property is added a modified and delete listener
@@ -206,8 +192,6 @@ protected:
   ///
   void Reset();
 
-  //# PROTECTED MEMBERS
-protected:
   ///
   /// Holds the pointer to the properties list. Dont use smart pointers here. Instead: Listen
   /// to the delete event.
@@ -246,4 +230,4 @@ protected:
   std::string m_FilterKeyWord;
 };
 
-#endif /* QMITKPROPERTIESTABLEMODEL_H_ */
+#endif

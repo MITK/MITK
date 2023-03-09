@@ -10,7 +10,6 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-// change number
 #ifndef VTKMAPPER_H_HEADER_INCLUDED_C1C5453B
 #define VTKMAPPER_H_HEADER_INCLUDED_C1C5453B
 

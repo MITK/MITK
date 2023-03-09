@@ -10,13 +10,6 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-/*
- * mitkEqual.h
- *
- *  Created on: Apr 14, 2014
- *      Author: wirkert
- */
-
 #ifndef MITKEQUAL_H_
 #define MITKEQUAL_H_
 

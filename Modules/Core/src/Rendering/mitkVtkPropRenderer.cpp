@@ -700,7 +700,7 @@ bool mitk::VtkPropRenderer::Initialize2DvtkCamera()
     // TODO Implement a property for light in the 2D render windows (in another method)
     this->GetVtkRenderer()->RemoveAllLights();
 
-    vtkSmartPointer<mitkVtkInteractorStyle> style = vtkSmartPointer<mitkVtkInteractorStyle>::New();
+    auto style = vtkSmartPointer<VtkInteractorStyle>::New();
     this->GetRenderWindow()->GetInteractor()->SetInteractorStyle(style);
     this->GetRenderWindow()->GetInteractor()->EnableRenderOff();
     m_CameraInitializedForMapperID = Standard2D;

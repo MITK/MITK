@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-// This file is based on ITK's itkLabelStatisticsImageFilter.h
-
 #ifndef mitkLabelStatisticsImageFilter_h
 #define mitkLabelStatisticsImageFilter_h
+
+// This file is based on ITK's itkLabelStatisticsImageFilter.h
 
 #include <itkCompensatedSummation.h>
 #include <itkHistogram.h>

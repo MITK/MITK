@@ -11,7 +11,6 @@ found in the LICENSE file.
 ============================================================================*/
 
 #ifndef MOVIEGENERATOR_H_HEADER_INCLUDED
-
 #define MOVIEGENERATOR_H_HEADER_INCLUDED
 
 #include "MitkAlgorithmsExtExports.h"

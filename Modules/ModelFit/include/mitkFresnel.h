@@ -10,6 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#ifndef MITKFRESNEL_H_
+#define MITKFRESNEL_H_
+
 /****************************************************************************
  *              fresnel.h -
  *  Calculation of Fresnel integrals by expansion to Chebyshev series
@@ -18,9 +21,6 @@ found in the LICENSE file.
  *  Ìoscow, "Mir", 1980. PP. 145-149 (Russian edition)
  ****************************************************************************
  */
-
-#ifndef MITKFRESNEL_H_
-#define MITKFRESNEL_H_
 
 namespace mitk
 {

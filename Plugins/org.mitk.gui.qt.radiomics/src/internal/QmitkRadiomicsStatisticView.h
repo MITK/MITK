@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#if !defined(QmitkRadiomicsStatisticView_H__INCLUDED)
+#ifndef QmitkRadiomicsStatisticView_H__INCLUDED
 #define QmitkRadiomicsStatisticView_H__INCLUDED
 
 #include <QmitkAbstractView.h>
@@ -91,6 +91,4 @@ private:
 
 };
 
-#endif // !defined(QmitkRadiomicsStatistic_H__INCLUDED)
-
-
+#endif

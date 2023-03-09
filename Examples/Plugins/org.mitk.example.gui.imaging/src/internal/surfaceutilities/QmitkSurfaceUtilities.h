@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#if !defined(QMITK_SurfaceUtilities_H__INCLUDED)
+#ifndef QMITK_SurfaceUtilities_H__INCLUDED
 #define QMITK_SurfaceUtilities_H__INCLUDED
 
 #include <berryISelectionListener.h>

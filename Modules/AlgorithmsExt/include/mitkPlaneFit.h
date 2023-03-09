@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#if !defined(MITK_PLANEFIT_H__INCLUDED_)
+#ifndef MITK_PLANEFIT_H__INCLUDED_
 #define MITK_PLANEFIT_H__INCLUDED_
 
 #include "MitkAlgorithmsExtExports.h"

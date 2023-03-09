@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#if !defined(QmitkPreprocessingResamplingView_H__INCLUDED)
+#ifndef QmitkPreprocessingResamplingView_H__INCLUDED
 #define QmitkPreprocessingResamplingView_H__INCLUDED
 
 #include <QmitkAbstractView.h>
@@ -118,5 +118,3 @@ private:
 };
 
 #endif
-
-

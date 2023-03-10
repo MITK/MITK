@@ -169,7 +169,7 @@
 		   </sizepolicy>
 		  </property>
 		  <property name="text">
-		   <string>Override install</string>
+		   <string>Use Custom Installation</string>
 		  </property>
 		 </widget>
 		</item>
@@ -206,7 +206,7 @@
 		   </sizepolicy>
 		  </property>
 		  <property name="text">
-		   <string>Override Python:</string>
+		   <string>Custom Env. Path:</string>
 		  </property>
 		 </widget>
 		</item>

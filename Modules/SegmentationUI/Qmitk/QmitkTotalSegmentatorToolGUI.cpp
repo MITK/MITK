@@ -44,7 +44,6 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
   m_Controls.sysPythonComboBox->addItem("Select");
   this->AutoParsePythonPaths();
 
-  m_Controls.pythonEnvComboBox->addItem("Default");
   m_Controls.pythonEnvComboBox->addItem("Select");
   m_Controls.pythonEnvComboBox->setDuplicatesEnabled(false);
   m_Controls.pythonEnvComboBox->setDisabled(true);
@@ -68,6 +67,9 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
   connect(m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnPreviewBtnClicked()));
   connect(m_Controls.installButton, SIGNAL(clicked()), this, SLOT(OnInstallBtnClicked()));
   connect(m_Controls.overrideBox, SIGNAL(stateChanged(int)), this, SLOT(OnOverrideChecked(int)));
+  connect(m_Controls.pythonEnvComboBox,
+          QOverload<int>::of(&QComboBox::activated),
+          [=](int index) { OnPythonPathChanged(m_Controls.pythonEnvComboBox->itemText(index)); });
 
   Superclass::InitializeUI(mainLayout);
   //QString lastSelectedPyEnv = m_Settings.value("TotalSeg/LastPythonPath").toString();
@@ -246,7 +248,7 @@ bool QmitkTotalSegmentatorToolGUI::IsTotalSegmentatorInstalled(const QString &py
 {
   QString fullPath = pythonPath;
   fullPath = fullPath.mid(fullPath.indexOf(" ") + 1);
-  bool isPythonExists, isTotalSegExists = false;
+  bool isPythonExists = false;
 #ifdef _WIN32
   isPythonExists = QFile::exists(fullPath + QDir::separator() + QString("python.exe"));
   if (!(fullPath.endsWith("Scripts", Qt::CaseInsensitive) || fullPath.endsWith("Scripts/", Qt::CaseInsensitive)))
@@ -310,6 +312,7 @@ void QmitkTotalSegmentatorToolGUI::OnPythonPathChanged(const QString &pyEnv)
 {
   if (pyEnv == QString("Select"))
   {
+    m_Controls.previewButton->setDisabled(true);
     QString path =
       QFileDialog::getExistingDirectory(m_Controls.pythonEnvComboBox->parentWidget(), "Python Path", "dir");
     if (!path.isEmpty())
@@ -373,18 +376,11 @@ void QmitkTotalSegmentatorToolGUI::OnOverrideChecked(int state)
     isEnabled = true;
     m_Controls.previewButton->setDisabled(true);
     m_PythonPath.clear();
-    connect(m_Controls.pythonEnvComboBox,
-            SIGNAL(currentTextChanged(const QString &)),
-            this,
-            SLOT(OnPythonPathChanged(const QString &)));
   }
   else
   {
     m_PythonPath.clear();
-    disconnect(m_Controls.pythonEnvComboBox,
-            SIGNAL(currentTextChanged(const QString &)),
-            this,
-            SLOT(OnPythonPathChanged(const QString &)));
+    m_Controls.previewButton->setDisabled(true);
     if (m_IsInstalled)
     {
       m_PythonPath = m_Installer.GetVirtualEnvPath();

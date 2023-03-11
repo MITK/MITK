@@ -83,8 +83,105 @@
 		<string>Install Total Segmentator</string>
 	   </property>
 	  </widget>
+	 </item>
+		
+	 <item row="2" colspan="4">
+	  <widget class="ctkCollapsibleGroupBox" name="installGroupBox" native="true">
+	   <property name="minimumSize">
+		<size>
+		 <width>0</width>
+		 <height>0</height>
+		</size>
+	   </property>
+	   <property name="title" stdset="0">
+		<string>Install Options</string>
+	   </property>
+	   <property name="flat" stdset="0">
+		<bool>true</bool>
+	   </property>
+	   <property name="collapsedHeight" stdset="0">
+		<number>5</number>
+	    </property>
+		<property name="collapsed" stdset="0">
+		 <bool>true</bool>
+		</property>
+		<layout class="QVBoxLayout" name="verticalLayout_0">
+		<item>
+		 <layout class="QGridLayout" name="_1">
+		  <property name="leftMargin">
+		   <number>0</number>
+		  </property>
+		  <property name="topMargin">
+		   <number>0</number>
+		  </property>
+		  <property name="rightMargin">
+		   <number>0</number>
+		  </property>
+		  <property name="bottomMargin">
+		   <number>0</number>
+		  </property>
+		  <property name="spacing">
+		   <number>6</number>
+		  </property>
+		  <item row="0" column="0">
+		   <widget class="QLabel" name="OverrideLabel">
+			<property name="sizePolicy">
+			 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+			  <horstretch>0</horstretch>
+			  <verstretch>0</verstretch>
+			 </sizepolicy>
+			</property>
+			<property name="text">
+				<string>Use Custom Installation</string>
+			</property>
+		   </widget>
+		  </item>
+		  <item row="0" column="1">
+		   <widget class="ctkCheckBox" name="overrideBox" native="true">
+			<property name="checked" stdset="0">
+			 <bool>false</bool>
+			</property>
+		   </widget>
+		  </item>
+		  <item row="1" column="0">
+		   <widget class="QLabel" name="pythonEnvLabel">
+			<property name="sizePolicy">
+			 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+			  <horstretch>0</horstretch>
+			  <verstretch>0</verstretch>
+			 </sizepolicy>
+			</property>
+			<property name="text">
+			 <string>Custom Env. Path:</string>
+			</property>
+		   </widget>
+		  </item>
+		  <item row="1" column="1" colspan="3">
+		   <widget class="ctkComboBox" name="pythonEnvComboBox"/>
+		  </item>
+		  <item row="2" column="0">
+		   <widget class="QLabel" name="sysPythonLabel">
+			<property name="sizePolicy">
+			 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+			  <horstretch>0</horstretch>
+			  <verstretch>0</verstretch>
+			 </sizepolicy>
+			</property>
+			<property name="text">
+			  <string>System Python:</string>
+			</property>
+		   </widget>
+		  </item>
+		  <item row="2" column="1" colspan="3">
+		   <widget class="ctkComboBox" name="sysPythonComboBox"/>
+		  </item>
+		 </layout>
+		</item>
+	   </layout>
+	  </widget>
 	 </item>	
-	 <item row="2" column="0">
+		
+	 <item row="3" colspan="4">
 	  <widget class="QLabel" name="subtaskLabel">
 	   <property name="sizePolicy">
 		<sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -97,13 +194,13 @@
 	   </property>
 	  </widget>
 	 </item>
-	 <item row="2" column="1" colspan="3">
+	 <item row="3" column="1" colspan="3">
 	  <widget class="ctkComboBox" name="subtaskComboBox"/>
 	 </item>
     </layout>
    </item>
    <item>
-    <widget class="ctkCollapsibleGroupBox" name="inputGroupBox" native="true">
+    <widget class="ctkCollapsibleGroupBox" name="advancedGroupBox" native="true">
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -160,26 +257,6 @@
 		  </property>
 		 </widget>
 		</item>
-		<item row="0" column="2">
-		 <widget class="QLabel" name="OverrideLabel">
-		  <property name="sizePolicy">
-		   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-			<horstretch>0</horstretch>
-			<verstretch>0</verstretch>
-		   </sizepolicy>
-		  </property>
-		  <property name="text">
-		   <string>Use Custom Installation</string>
-		  </property>
-		 </widget>
-		</item>
-		<item row="0" column="3">
-		 <widget class="ctkCheckBox" name="overrideBox" native="true">
-		  <property name="checked" stdset="0">
-		   <bool>false</bool>
-		  </property>
-		 </widget>
-		</item>
         <item row="2" column="0">
          <widget class="QLabel" name="gpuSpinLabel">
           <property name="sizePolicy">
@@ -196,39 +273,6 @@
         <item row="2" column="1" colspan="3">
          <widget class="ctkComboBox" name="gpuComboBox"/>
         </item>
-        
-		<item row="1" column="0">
-		 <widget class="QLabel" name="pythonEnvLabel">
-		  <property name="sizePolicy">
-		   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-			<horstretch>0</horstretch>
-			<verstretch>0</verstretch>
-		   </sizepolicy>
-		  </property>
-		  <property name="text">
-		   <string>Custom Env. Path:</string>
-		  </property>
-		 </widget>
-		</item>
-		<item row="1" column="1" colspan="3">
-	     <widget class="ctkComboBox" name="pythonEnvComboBox"/>
-		</item>
-		<item row="3" column="0">
-		 <widget class="QLabel" name="sysPythonLabel">
-		  <property name="sizePolicy">
-		   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-			<horstretch>0</horstretch>
-			<verstretch>0</verstretch>
-		   </sizepolicy>
-		  </property>
-		  <property name="text">
-		   <string>System Python:</string>
-		  </property>
-		 </widget>
-		</item>
-		<item row="3" column="1" colspan="3">
-		 <widget class="ctkComboBox" name="sysPythonComboBox"/>
-		</item>      
        </layout>
       </item>
      </layout>

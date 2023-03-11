@@ -2,13 +2,29 @@
 #define QmitkTotalSegmentatorToolGUI_h_Included
 
 #include "QmitkMultiLabelSegWithPreviewToolGUIBase.h"
+#include "QmitkSetupVirtualEnvUtil.h"
+#include "QmitknnUNetGPU.h"
 #include "ui_QmitkTotalSegmentatorGUIControls.h"
 #include <MitkSegmentationUIExports.h>
 #include <QMessageBox>
-#include "QmitknnUNetGPU.h"
 #include <QSettings>
-#include "QmitkSetupVirtualEnvUtil.h"
+#include <QStandardPaths>
 
+class QmitkTotalSegmentatorToolInstaller : public QmitkSetupVirtualEnvUtil
+{
+public:
+  const QString m_VENV_NAME = ".totalsegmentator";
+  const QString m_TOTALSEGMENTATOR_VERSION = "1.5.3";
+  const std::vector<QString> m_PACKAGES = {QString("Totalsegmentator==") + m_TOTALSEGMENTATOR_VERSION,
+                                           QString("scipy==1.9.1")};
+  const QString m_STORAGE_DIR;
+  inline QmitkTotalSegmentatorToolInstaller(
+    const QString baseDir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QDir::separator() +
+                            qApp->organizationName() + QDir::separator())
+    : QmitkSetupVirtualEnvUtil(baseDir), m_STORAGE_DIR(baseDir){};
+  bool SetupVirtualEnv(const QString &) override;
+  QString GetVirtualEnvPath();
+};
 
 class MITKSEGMENTATIONUI_EXPORT QmitkTotalSegmentatorToolGUI : public QmitkMultiLabelSegWithPreviewToolGUIBase
 {
@@ -19,8 +35,8 @@ public:
   itkFactorylessNewMacro(Self);
   itkCloneMacro(Self);
 
-protected slots :
- 
+protected slots:
+
   /**
    * @brief Qt Slot
    */
@@ -37,7 +53,7 @@ protected slots :
   void OnInstallBtnClicked();
 
   /**
-   * @brief Qt Slot 
+   * @brief Qt Slot
    */
   void OnOverrideChecked(int);
 
@@ -45,8 +61,8 @@ protected:
   QmitkTotalSegmentatorToolGUI();
   ~QmitkTotalSegmentatorToolGUI() = default;
 
-  void ConnectNewTool(mitk::SegWithPreviewTool* newTool) override;
-  void InitializeUI(QBoxLayout* mainLayout) override;
+  void ConnectNewTool(mitk::SegWithPreviewTool *newTool) override;
+  void InitializeUI(QBoxLayout *mainLayout) override;
 
   void EnableWidgets(bool enabled) override;
 
@@ -58,9 +74,9 @@ protected:
   /**
    * @brief Searches and parses paths of python virtual enviroments
    * from predefined lookout locations
-  */
+   */
   void AutoParsePythonPaths();
-  
+
   /**
    * @brief Checks if TotalSegmentator command is valid in the selected python virtual environment.
    *
@@ -82,7 +98,7 @@ protected:
    * @brief Writes any message in red on the tool pane.
    */
   void WriteErrorMessage(const QString &);
-  
+
   /**
    * @brief Adds GPU information to the gpu combo box.
    * In case, there aren't any GPUs avaialble, the combo box will be
@@ -102,25 +118,22 @@ protected:
 
   QString GetPythonPathFromUI(const QString &pyEnv);
 
-  
   /**
    * @brief For storing values like Python path across sessions.
    */
   QSettings m_Settings;
 
   QString m_PythonPath;
-  QmitkSetupVirtualEnvUtil m_Installer;
   QmitkGPULoader m_GpuLoader;
   Ui_QmitkTotalSegmentatorToolGUIControls m_Controls;
   bool m_FirstPreviewComputation = true;
   bool m_IsInstalled = false;
   EnableConfirmSegBtnFunctionType m_SuperclassEnableConfirmSegBtnFnc;
 
-  const std::string m_WARNING_TOTALSEG_NOT_FOUND = "TotalSegmentator is not detected in the selected python environment.Please select a valid "
-                        "python environment or install TotalSegmentator.";
+  const std::string m_WARNING_TOTALSEG_NOT_FOUND =
+    "TotalSegmentator is not detected in the selected python environment.Please select a valid "
+    "python environment or install TotalSegmentator.";
   const QStringList m_VALID_TASKS = {"total", "cerebral_bleed", "hip_implant", "coronary_arteries"};
-  const QString m_VENV_NAME = ".totalsegmentator";
-  const std::string m_TOTALSEGMENTATOR_VERSION = "1.5.2";
+  QmitkTotalSegmentatorToolInstaller m_Installer;
 };
-
 #endif

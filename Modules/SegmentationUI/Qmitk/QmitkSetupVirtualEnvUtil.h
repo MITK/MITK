@@ -17,6 +17,8 @@ found in the LICENSE file.s
 #include "mitkProcessExecutor.h"
 #include <MitkSegmentationUIExports.h>
 #include <QString>
+#include <QDir>
+#include <QApplication>
 
 /**
  * @brief Class to ...
@@ -24,31 +26,41 @@ found in the LICENSE file.s
 class MITKSEGMENTATIONUI_EXPORT QmitkSetupVirtualEnvUtil
 {
 public:
-  enum Tool
-  {
-    TOTALSEGMENTATOR
-  };
-
-  QmitkSetupVirtualEnvUtil(const QString baseDir);
+  QmitkSetupVirtualEnvUtil(const QString& baseDir);
   QmitkSetupVirtualEnvUtil();
 
-  bool SetupVirtualEnv(Tool packageName = Tool::TOTALSEGMENTATOR);
+  virtual bool SetupVirtualEnv(const QString& venvName) = 0;
   void PipInstall(const std::string &library,
                   const std::string &workingDir,
                   void (*callback)(itk::Object *, const itk::EventObject &, void *),
                   const std::string &command = "pip3");
+
+  void PipInstall(const std::string &library,
+                  void (*callback)(itk::Object *, const itk::EventObject &, void *),
+                  const std::string &command = "pip3");
+
+
   void ExecutePython(const std::string &args,
                      const std::string &pythonPath,
                      void (*callback)(itk::Object *, const itk::EventObject &, void *),
                      const std::string &command = "python");
 
+  void ExecutePython(const std::string &args,
+                     void (*callback)(itk::Object *, const itk::EventObject &, void *),
+                     const std::string &command = "python");
+
   void InstallPytorch(const std::string &workingDir, void (*callback)(itk::Object *, const itk::EventObject &, void *));
 
-  std::map<std::string, std::string> GetInstallParameters(QmitkSetupVirtualEnvUtil::Tool);
-  QString GetBaseDir();
-  QString GetVirtualEnvPath();
+  QString& GetBaseDir();
+  QString& GetVirtualEnvPath();
+  QString& GetSystemPythonPath();
+  QString& GetPythonPath();
+  QString& GetPipPath();
   void SetSystemPythonPath(const QString& path);
+  void SetPythonPath(const QString& path);
+  void SetPipPath(const QString& path);
   void SetVirtualEnvPath(const QString &path);
+
   bool IsPythonPath(const QString &pythonPath);
   static void PrintProcessEvent(itk::Object * /*pCaller*/, const itk::EventObject &e, void *);
 
@@ -59,5 +71,4 @@ private:
   QString m_venvPath;
   QString m_SysPythonPath;
 };
-
 #endif

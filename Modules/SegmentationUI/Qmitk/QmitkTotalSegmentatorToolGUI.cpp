@@ -8,7 +8,6 @@
 #include <QFileDialog>
 #include <QIcon>
 #include <QMessageBox>
-#include <QStandardPaths>
 #include <QUrl>
 #include <QtGlobal>
 
@@ -38,12 +37,11 @@ void QmitkTotalSegmentatorToolGUI::ConnectNewTool(mitk::SegWithPreviewTool *newT
 void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
 {
   m_Controls.setupUi(this);
+  this->AutoParsePythonPaths();
 #ifndef _WIN32
   m_Controls.sysPythonComboBox->addItem("/usr/bin");
 #endif
   m_Controls.sysPythonComboBox->addItem("Select");
-  this->AutoParsePythonPaths();
-
   m_Controls.pythonEnvComboBox->addItem("Select");
   m_Controls.pythonEnvComboBox->setDuplicatesEnabled(false);
   m_Controls.pythonEnvComboBox->setDisabled(true);
@@ -74,15 +72,14 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
   Superclass::InitializeUI(mainLayout);
   //QString lastSelectedPyEnv = m_Settings.value("TotalSeg/LastPythonPath").toString();
   //m_Controls.pythonEnvComboBox->insertItem(0, lastSelectedPyEnv);
-  const QString storageDir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QDir::separator() +
-                               qApp->organizationName() + QDir::separator() + m_VENV_NAME;
+  const QString storageDir = m_Installer.GetVirtualEnvPath();
   m_IsInstalled = this->IsTotalSegmentatorInstalled(storageDir);
   if (m_IsInstalled)
   {
     m_PythonPath = GetPythonPathFromUI(storageDir);
     m_Installer.SetVirtualEnvPath(m_PythonPath);
     this->EnableAll(m_IsInstalled);
-    welcomeText += " Totalsegmentator is already found installed"; 
+    welcomeText += " Totalsegmentator is already found installed."; 
   }
   else
   {
@@ -148,7 +145,7 @@ void QmitkTotalSegmentatorToolGUI::OnInstallBtnClicked()
     m_Installer.SetSystemPythonPath(systemPython);
   }
   
-  isInstalled = m_Installer.SetupVirtualEnv();
+  isInstalled = m_Installer.SetupVirtualEnv(m_Installer.m_VENV_NAME);
   if (isInstalled)
   {
     const QString pythonPath = m_Installer.GetVirtualEnvPath();
@@ -305,7 +302,6 @@ void QmitkTotalSegmentatorToolGUI::AutoParsePythonPaths()
       }
     }
   }
-  m_Controls.sysPythonComboBox->setCurrentIndex(-1);
 }
 
 void QmitkTotalSegmentatorToolGUI::OnPythonPathChanged(const QString &pyEnv)
@@ -341,6 +337,10 @@ QString QmitkTotalSegmentatorToolGUI::GetPythonPathFromUI(const QString &pyEnv)
 {
   QString pythonPath;
   QString fullPath = pyEnv.mid(pyEnv.indexOf(" ") + 1);
+  if (fullPath.isEmpty())
+  {
+    return fullPath;
+  }
   bool isPythonExists = false;
 #ifdef _WIN32
   isPythonExists = QFile::exists(fullPath + QDir::separator() + QString("python.exe"));
@@ -388,4 +388,63 @@ void QmitkTotalSegmentatorToolGUI::OnOverrideChecked(int state)
     }
   }
   m_Controls.pythonEnvComboBox->setEnabled(isEnabled);
+}
+
+
+bool QmitkTotalSegmentatorToolInstaller::SetupVirtualEnv(const QString& venvName)
+{
+  MITK_INFO << GetSystemPythonPath().toStdString();
+  if (GetSystemPythonPath().isEmpty())
+  {
+    return false;
+  }
+  QDir folderPath(GetBaseDir());
+  folderPath.mkdir(venvName);
+  if (!folderPath.cd(venvName))
+  {
+    return false; // Check if directory creation was successful.
+  }
+  mitk::ProcessExecutor::ArgumentListType args;
+  auto spExec = mitk::ProcessExecutor::New();
+  auto spCommand = itk::CStyleCommand::New();
+  spCommand->SetCallback(&PrintProcessEvent);
+  spExec->AddObserver(mitk::ExternalProcessOutputEvent(), spCommand);
+
+  args.push_back("-m");
+  args.push_back("venv");
+  args.push_back(venvName.toStdString());
+#ifdef _WIN32
+  QString pythonFile = GetSystemPythonPath() + QDir::separator() + "python.exe";
+  spExec->Execute(GetBaseDir().toStdString(), pythonFile.toStdString(), args); // Setup local virtual environment
+  QString pythonExeFolder = "Scripts";
+#else
+  QString pythonFile = m_SysPythonPath + QDir::separator() + "python3";
+  spExec->Execute(m_BaseDir.toStdString(), "/usr/bin/python3", args); // Setup local virtual environment
+  QString pythonExeFolder = "bin";
+#endif
+
+  if (folderPath.cd(pythonExeFolder))
+  {
+    SetPythonPath(folderPath.absolutePath());
+    SetPipPath(folderPath.absolutePath());
+    std::string workingDir = GetPythonPath().toStdString();
+    MITK_INFO << "workingDir: " << workingDir;
+    InstallPytorch(workingDir, &PrintProcessEvent);
+    for (auto &package : m_PACKAGES)
+    {
+      PipInstall(package.toStdString(), &PrintProcessEvent);
+    }
+    std::string pythonCode; // python syntax to check if torch is installed with CUDA.
+    pythonCode.append("import torch;");
+    pythonCode.append("print('Pytorch was installed with CUDA') if torch.cuda.is_available() else print('PyTorch was "
+                      "installed WITHOUT CUDA');");
+    ExecutePython(pythonCode, &PrintProcessEvent);
+    return true;
+  }
+  return false;
+}
+
+QString QmitkTotalSegmentatorToolInstaller::GetVirtualEnvPath() 
+{
+  return m_STORAGE_DIR + m_VENV_NAME;
 }

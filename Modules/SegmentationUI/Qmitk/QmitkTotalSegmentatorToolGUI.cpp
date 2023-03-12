@@ -415,14 +415,12 @@ bool QmitkTotalSegmentatorToolInstaller::SetupVirtualEnv(const QString& venvName
   args.push_back(venvName.toStdString());
 #ifdef _WIN32
   QString pythonFile = GetSystemPythonPath() + QDir::separator() + "python.exe";
-  spExec->Execute(GetBaseDir().toStdString(), pythonFile.toStdString(), args); // Setup local virtual environment
   QString pythonExeFolder = "Scripts";
 #else
-  QString pythonFile = m_SysPythonPath + QDir::separator() + "python3";
-  spExec->Execute(m_BaseDir.toStdString(), "/usr/bin/python3", args); // Setup local virtual environment
+  QString pythonFile = GetSystemPythonPath() + QDir::separator() + "python3";
   QString pythonExeFolder = "bin";
 #endif
-
+  spExec->Execute(GetBaseDir().toStdString(), pythonFile.toStdString(), args); // Setup local virtual environment
   if (folderPath.cd(pythonExeFolder))
   {
     SetPythonPath(folderPath.absolutePath());

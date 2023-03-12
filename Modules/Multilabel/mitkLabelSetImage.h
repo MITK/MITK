@@ -63,6 +63,23 @@ namespace mitk
     const static LabelValueType UnlabeledLabelValue = 0;
     using ConstLabelVectorType = std::vector<Label::ConstPointer>;
     using LabelVectorType = std::vector<Label::Pointer>;
+    using LabelValueVectorType = std::vector<LabelValueType>;
+
+    /**
+     * @brief Removes the label with the given value.
+     *        The label is removed from the labelset of the given layer and
+     *        the pixel values of the image below the label are reset.
+     * @param labelValue the pixel value of the label to be removed
+     */
+    void RemoveLabel(LabelValueType labelValue);
+
+    /**
+     * @brief Removes labels from the mitk::MultiLabelSegmentation.
+     * Calls mitk::MultiLabelSegmentation::EraseLabels() which also removes the labels from within the image.
+     * If a label value does not exist, it will be ignored.
+     * @param labelValues a list of labels to be removed
+     */
+    void RemoveLabels(const LabelValueVectorType& vectorOfLabelPixelValues);
 
     //future declaration (T28524) currently conflicted with old declaration
     ///**
@@ -104,8 +121,6 @@ namespace mitk
 
     ////////////////////////////////////////////////////////////////////
     //Message slots that allow to react to changes in an instance
-
-    using LabelValueVectorType = std::vector<LabelValueType>;
 
     using LabelEventType = Message1<LabelValueType>;
     using LabelsEventType = Message1<LabelValueVectorType>;
@@ -274,25 +289,6 @@ namespace mitk
     /**
       * \brief  */
     void UpdateCenterOfMass(PixelType pixelValue, unsigned int layer);
-
-    /**
-     * @brief Removes the label with the given value.
-     *        The label is removed from the labelset of the given layer and
-     *        the pixel values of the image below the label are reset.
-     * @param pixelValue the pixel value of the label to be removed
-     * @param layer the layer from which the label should be removed
-     */
-    void RemoveLabel(PixelType pixelValue, unsigned int layer = 0);
-
-    /**
-     * @brief Removes a list of labels with th given value.
-     *        The labels are removed from the labelset of the given layer and
-     *        the pixel values of the image below the label are reset.
-     *        Calls mitk::LabelSetImage::EraseLabels().
-     * @param VectorOfLabelPixelValues a list of pixel values of labels to be removed
-     * @param layer the layer from which the labels should be removed
-     */
-    void RemoveLabels(const std::vector<PixelType> &VectorOfLabelPixelValues, unsigned int layer = 0);
 
     /**
      * @brief Erases the label with the given value from the labelset image.

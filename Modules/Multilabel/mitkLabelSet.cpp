@@ -19,15 +19,7 @@ mitk::LabelSet::LabelSet() : m_ActiveLabelValue(0), m_Layer(0)
 {
   m_LookupTable = mitk::LookupTable::New();
   m_LookupTable->SetType(mitk::LookupTable::MULTILABEL);
-  m_ReservedLabelValuesFunctor = [this]() {
-    std::vector<LabelValueType> result = { 0 };
-
-    for (auto [value, label] : this->m_LabelContainer)
-    {
-      result.emplace_back(value);
-    }
-    return result;
-  };
+  m_ReservedLabelValuesFunctor = nullptr;
 }
 
 mitk::LabelSet::~LabelSet()
@@ -52,6 +44,25 @@ mitk::LabelSet::LabelSet(const LabelSet &other)
     m_LabelContainer[otherIt->first]->AddObserver(itk::ModifiedEvent(), command);
   }
   m_ReservedLabelValuesFunctor = other.m_ReservedLabelValuesFunctor;
+}
+
+std::vector<mitk::LabelSet::LabelValueType> mitk::LabelSet::GetUsedLabelValues() const
+{
+  std::vector<LabelValueType> result = { 0 };
+
+  if (m_ReservedLabelValuesFunctor != nullptr)
+  {
+    result = m_ReservedLabelValuesFunctor();
+  }
+  else
+  {
+
+    for (auto [value, label] : this->m_LabelContainer)
+    {
+      result.emplace_back(value);
+    }
+  }
+  return result;
 }
 
 void mitk::LabelSet::OnLabelModified(const Object* sender, const itk::EventObject&)
@@ -106,11 +117,11 @@ bool mitk::LabelSet::ExistLabel(PixelType pixelValue)
   return m_LabelContainer.count(pixelValue) > 0 ? true : false;
 }
 
-void mitk::LabelSet::AddLabel(mitk::Label *label, bool addAsClone)
+mitk::Label* mitk::LabelSet::AddLabel(mitk::Label *label, bool addAsClone)
 {
   unsigned int max_size = mitk::Label::MAX_LABEL_VALUE + 1;
   if (m_LabelContainer.size() >= max_size)
-    return;
+    return nullptr;
 
   mitk::Label::Pointer newLabel = addAsClone ? label->Clone() : Label::Pointer(label);
 
@@ -120,7 +131,7 @@ void mitk::LabelSet::AddLabel(mitk::Label *label, bool addAsClone)
   PixelType pixelValue = newLabel->GetValue();
   if (!m_LabelContainer.empty())
   {
-    auto usedValues = m_ReservedLabelValuesFunctor();
+    auto usedValues = this->GetUsedLabelValues();
     auto finding = std::find(usedValues.begin(), usedValues.end(), pixelValue);
 
     if (!usedValues.empty() && usedValues.end() != finding)
@@ -145,14 +156,16 @@ void mitk::LabelSet::AddLabel(mitk::Label *label, bool addAsClone)
   AddLabelEvent.Send(newLabel->GetValue());
   SetActiveLabel(newLabel->GetValue());
   Modified();
+
+  return newLabel;
 }
 
-void mitk::LabelSet::AddLabel(const std::string &name, const mitk::Color &color)
+mitk::Label* mitk::LabelSet::AddLabel(const std::string &name, const mitk::Color &color)
 {
   mitk::Label::Pointer newLabel = mitk::Label::New();
   newLabel->SetName(name);
   newLabel->SetColor(color);
-  AddLabel(newLabel);
+  return AddLabel(newLabel);
 }
 
 void mitk::LabelSet::RenameLabel(PixelType pixelValue, const std::string &name, const mitk::Color &color)

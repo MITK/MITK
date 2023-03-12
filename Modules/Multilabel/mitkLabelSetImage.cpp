@@ -203,6 +203,8 @@ void mitk::LabelSetImage::RegisterLabelSet(mitk::LabelSet* ls)
     this, &LabelSetImage::OnLabelModified));
   ls->RemoveLabelEvent.AddListener(mitk::MessageDelegate1<LabelSetImage, LabelValueType>(
     this, &LabelSetImage::OnLabelRemoved));
+
+  ls->m_ReservedLabelValuesFunctor = [this]() {return this->GetUsedLabelValues(); };
 }
 
 void mitk::LabelSetImage::ReleaseLabelSet(mitk::LabelSet* ls)
@@ -215,6 +217,8 @@ void mitk::LabelSetImage::ReleaseLabelSet(mitk::LabelSet* ls)
     this, &LabelSetImage::OnLabelModified));
   ls->RemoveLabelEvent.RemoveListener(mitk::MessageDelegate1<LabelSetImage, LabelValueType>(
     this, &LabelSetImage::OnLabelRemoved));
+
+  ls->m_ReservedLabelValuesFunctor = nullptr;
 }
 
 void mitk::LabelSetImage::RemoveLayer()
@@ -296,7 +300,6 @@ unsigned int mitk::LabelSetImage::AddLayer(mitk::Image::Pointer layerImage, mitk
     ls->SetActiveLabel(0 /*Exterior Label*/);
   }
 
-  ls->m_ReservedLabelValuesFunctor = [this]() {return this->GetUsedLabelValues(); };
   ls->SetLayer(newLabelSetId);
   // Add exterior Label to label set
   // mitk::Label::Pointer exteriorLabel = CreateExteriorLabel();
@@ -492,38 +495,47 @@ void mitk::LabelSetImage::MergeLabels(PixelType pixelValue, const std::vector<Pi
   Modified();
 }
 
-void mitk::LabelSetImage::RemoveLabel(PixelType pixelValue, unsigned int layer)
+void mitk::LabelSetImage::RemoveLabel(LabelValueType pixelValue)
 {
+  auto groupID = this->GetGroupIndexOfLabel(pixelValue);
+
   //first erase the pixel content (also triggers a LabelModified event)
   this->EraseLabel(pixelValue);
   //now remove the label entry itself
-  this->GetLabelSet(layer)->RemoveLabel(pixelValue);
+  this->GetLabelSet(groupID)->RemoveLabel(pixelValue);
   // in the interim version triggered by label set events: this->m_LabelRemovedMessage.Send(pixelValue);
   this->m_LabelsChangedMessage.Send({ pixelValue });
-  this->m_GroupModifiedMessage.Send(layer);
+  this->m_GroupModifiedMessage.Send(groupID);
 }
 
-void mitk::LabelSetImage::RemoveLabels(const std::vector<PixelType>& VectorOfLabelPixelValues, unsigned int layer)
+void mitk::LabelSetImage::RemoveLabels(const std::vector<PixelType>& VectorOfLabelPixelValues)
 {
   for (unsigned int idx = 0; idx < VectorOfLabelPixelValues.size(); idx++)
   {
-    this->RemoveLabel(VectorOfLabelPixelValues[idx], layer);
+    this->RemoveLabel(VectorOfLabelPixelValues[idx]);
     this->m_LabelsChangedMessage.Send({ VectorOfLabelPixelValues[idx] });
   }
-  this->m_GroupModifiedMessage.Send(layer);
 }
 
 void mitk::LabelSetImage::EraseLabel(PixelType pixelValue)
 {
   try
   {
+    mitk::Image* groupImage = this;
+    auto groupID = this->GetGroupIndexOfLabel(pixelValue);
+
+    if (groupID != this->GetActiveLayer())
+    {
+      groupImage = this->GetLayerImage(groupID);
+    }
+
     if (4 == this->GetDimension())
     {
-      AccessFixedDimensionByItk_1(this, EraseLabelProcessing, 4, pixelValue);
+      AccessFixedDimensionByItk_1(groupImage, EraseLabelProcessing, 4, pixelValue);
     }
     else
     {
-      AccessByItk_1(this, EraseLabelProcessing, pixelValue);
+      AccessByItk_1(groupImage, EraseLabelProcessing, pixelValue);
     }
   }
   catch (const itk::ExceptionObject& e)
@@ -972,6 +984,9 @@ void mitk::LabelSetImage::OnLabelAdded(LabelValueType labelValue)
 
 void mitk::LabelSetImage::AddLabelToMap(LabelValueType labelValue, mitk::Label* label, SpatialGroupIndexType groupID)
 {
+  if (m_LabelMap.find(labelValue)!=m_LabelMap.end())
+    mitkThrow() << "Segmentation is in an invalid state: Label value collision. A label was added with a LabelValue already in use. LabelValue: " << labelValue;
+
   m_LabelMap[labelValue] = label;
   m_LabelToGroupMap[labelValue] = groupID;
   auto groupFinding = m_GroupToLabelMap.find(groupID);

@@ -142,11 +142,11 @@ namespace mitk
 
     /** \brief
     */
-    void AddLabel(mitk::Label *label, bool addAsClone = true);
+    mitk::Label* AddLabel(mitk::Label *label, bool addAsClone = true);
 
     /** \brief
     */
-    void AddLabel(const std::string &name, const Color &color);
+    mitk::Label* AddLabel(const std::string &name, const Color &color);
 
     /** \brief
     */
@@ -207,7 +207,9 @@ namespace mitk
 
     mitkCloneMacro(Self);
 
-      ~LabelSet() override;
+    ~LabelSet() override;
+
+    std::vector<LabelValueType> GetUsedLabelValues() const;
 
     void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 

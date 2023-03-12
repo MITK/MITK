@@ -304,7 +304,7 @@ public:
     QmitkMultiLabelTreeModel model(nullptr);
     model.SetSegmentation(m_Segmentation);
     //remove label instance from label with multiple instances (middel)
-    m_Segmentation->RemoveLabel(5, 0);
+    m_Segmentation->RemoveLabel(5);
     CPPUNIT_ASSERT_EQUAL(3, model.rowCount(QModelIndex()));
     CPPUNIT_ASSERT(CheckModelRow(model, { 0 }, { QString("Group 0"), QVariant(), QVariant(), QVariant() }));
     CPPUNIT_ASSERT_EQUAL(3, model.rowCount(GetIndex(model, { 0 })));
@@ -320,7 +320,7 @@ public:
     CheckModelGroup2Default(model);
 
     //remove label instance from label with multiple instances (first)
-    m_Segmentation->RemoveLabel(1, 0);
+    m_Segmentation->RemoveLabel(1);
     CPPUNIT_ASSERT_EQUAL(3, model.rowCount(QModelIndex()));
     CPPUNIT_ASSERT(CheckModelRow(model, { 0 }, { QString("Group 0"), QVariant(), QVariant(), QVariant() }));
     CPPUNIT_ASSERT_EQUAL(3, model.rowCount(GetIndex(model, { 0 })));
@@ -340,7 +340,7 @@ public:
     model.SetSegmentation(m_Segmentation);
 
     //remove label instance from label with multiple instances (at the end)
-    m_Segmentation->RemoveLabel(10, 0);
+    m_Segmentation->RemoveLabel(10);
     CPPUNIT_ASSERT_EQUAL(3, model.rowCount(QModelIndex()));
     CPPUNIT_ASSERT(CheckModelRow(model, { 0 }, { QString("Group 0"), QVariant(), QVariant(), QVariant() }));
     CPPUNIT_ASSERT_EQUAL(3, model.rowCount(GetIndex(model, { 0 })));
@@ -361,7 +361,7 @@ public:
     model.SetSegmentation(m_Segmentation);
 
     //remove label instance from label with only one instance
-    m_Segmentation->RemoveLabel(9, 2);
+    m_Segmentation->RemoveLabel(9);
     CPPUNIT_ASSERT_EQUAL(3, model.rowCount(QModelIndex()));
     CheckModelGroup0Default(model);
     CheckModelGroup1Default(model);

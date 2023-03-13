@@ -23,7 +23,7 @@ public:
                             qApp->organizationName() + QDir::separator())
     : QmitkSetupVirtualEnvUtil(baseDir), m_STORAGE_DIR(baseDir){};
   bool SetupVirtualEnv(const QString &) override;
-  QString GetVirtualEnvPath();
+  QString GetVirtualEnvPath() override;
 };
 
 class MITKSEGMENTATIONUI_EXPORT QmitkTotalSegmentatorToolGUI : public QmitkMultiLabelSegWithPreviewToolGUIBase
@@ -56,6 +56,11 @@ protected slots:
    * @brief Qt Slot
    */
   void OnOverrideChecked(int);
+
+  /**
+   * @brief Qt Slot
+   */
+  void OnClearInstall();
 
 protected:
   QmitkTotalSegmentatorToolGUI();

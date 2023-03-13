@@ -63,6 +63,7 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
   mainLayout->addLayout(m_Controls.verticalLayout);
 
   connect(m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnPreviewBtnClicked()));
+  connect(m_Controls.clearButton, SIGNAL(clicked()), this, SLOT(OnClearInstall()));
   connect(m_Controls.installButton, SIGNAL(clicked()), this, SLOT(OnInstallBtnClicked()));
   connect(m_Controls.overrideBox, SIGNAL(stateChanged(int)), this, SLOT(OnOverrideChecked(int)));
   connect(m_Controls.pythonEnvComboBox,
@@ -390,10 +391,22 @@ void QmitkTotalSegmentatorToolGUI::OnOverrideChecked(int state)
   m_Controls.pythonEnvComboBox->setEnabled(isEnabled);
 }
 
+void QmitkTotalSegmentatorToolGUI::OnClearInstall()
+{
+  QDir folderPath(m_Installer.GetVirtualEnvPath());
+  if (folderPath.removeRecursively())
+  {
+    m_Controls.installButton->setEnabled(true);
+  }
+  else
+  {
+    MITK_ERROR
+      << "The virtual environment couldn't be removed. Please check if you have the required access privileges.";
+  }
+}
 
 bool QmitkTotalSegmentatorToolInstaller::SetupVirtualEnv(const QString& venvName)
 {
-  MITK_INFO << GetSystemPythonPath().toStdString();
   if (GetSystemPythonPath().isEmpty())
   {
     return false;
@@ -423,20 +436,18 @@ bool QmitkTotalSegmentatorToolInstaller::SetupVirtualEnv(const QString& venvName
   spExec->Execute(GetBaseDir().toStdString(), pythonFile.toStdString(), args); // Setup local virtual environment
   if (folderPath.cd(pythonExeFolder))
   {
-    SetPythonPath(folderPath.absolutePath());
-    SetPipPath(folderPath.absolutePath());
-    std::string workingDir = GetPythonPath().toStdString();
-    MITK_INFO << "workingDir: " << workingDir;
-    InstallPytorch(workingDir, &PrintProcessEvent);
+    this->SetPythonPath(folderPath.absolutePath());
+    this->SetPipPath(folderPath.absolutePath());
+    this->InstallPytorch();
     for (auto &package : m_PACKAGES)
     {
-      PipInstall(package.toStdString(), &PrintProcessEvent);
+      this->PipInstall(package.toStdString(), &PrintProcessEvent);
     }
     std::string pythonCode; // python syntax to check if torch is installed with CUDA.
     pythonCode.append("import torch;");
     pythonCode.append("print('Pytorch was installed with CUDA') if torch.cuda.is_available() else print('PyTorch was "
                       "installed WITHOUT CUDA');");
-    ExecutePython(pythonCode, &PrintProcessEvent);
+    this->ExecutePython(pythonCode, &PrintProcessEvent);
     return true;
   }
   return false;

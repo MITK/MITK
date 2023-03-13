@@ -32,7 +32,7 @@ QString& QmitkSetupVirtualEnvUtil::GetBaseDir()
   return m_BaseDir;
 }
 
-QString& QmitkSetupVirtualEnvUtil::GetVirtualEnvPath()
+QString QmitkSetupVirtualEnvUtil::GetVirtualEnvPath()
 {
   return m_venvPath;
 }
@@ -118,6 +118,11 @@ void QmitkSetupVirtualEnvUtil::InstallPytorch(const std::string &workingDir,
   args.push_back("light-the-torch");
   spExec->Execute(workingDir, "python", args);
   PipInstall("torch", workingDir, callback, "ltt");
+}
+
+void QmitkSetupVirtualEnvUtil::InstallPytorch()
+{
+  this->InstallPytorch(GetPythonPath().toStdString(), &PrintProcessEvent);
 }
 
 void QmitkSetupVirtualEnvUtil::PipInstall(const std::string &library,

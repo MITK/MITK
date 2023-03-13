@@ -21,7 +21,7 @@ found in the LICENSE file.s
 #include <QApplication>
 
 /**
- * @brief Class to ...
+ * @brief Super Class to Setup a python virtual environment and pip install required packages
  */
 class MITKSEGMENTATIONUI_EXPORT QmitkSetupVirtualEnvUtil
 {
@@ -30,6 +30,8 @@ public:
   QmitkSetupVirtualEnvUtil();
 
   virtual bool SetupVirtualEnv(const QString& venvName) = 0;
+  virtual QString GetVirtualEnvPath();
+
   void PipInstall(const std::string &library,
                   const std::string &workingDir,
                   void (*callback)(itk::Object *, const itk::EventObject &, void *),
@@ -50,9 +52,9 @@ public:
                      const std::string &command = "python");
 
   void InstallPytorch(const std::string &workingDir, void (*callback)(itk::Object *, const itk::EventObject &, void *));
+  void InstallPytorch();
 
   QString& GetBaseDir();
-  QString& GetVirtualEnvPath();
   QString& GetSystemPythonPath();
   QString& GetPythonPath();
   QString& GetPipPath();

@@ -77,14 +77,14 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
   m_IsInstalled = this->IsTotalSegmentatorInstalled(storageDir);
   if (m_IsInstalled)
   {
-    m_PythonPath = GetPythonPathFromUI(storageDir);
+    m_PythonPath = GetExactPythonPath(storageDir);
     m_Installer.SetVirtualEnvPath(m_PythonPath);
     this->EnableAll(m_IsInstalled);
     welcomeText += " Totalsegmentator is already found installed."; 
   }
   else
   {
-    welcomeText += " Totalsegmentator not installed. Please click on \"Install Totalsegmentator\" above.";
+    welcomeText += " Totalsegmentator not installed. Please click on \"Install TotalSegmentator\" above.";
   }
   this->WriteStatusMessage(welcomeText);
 }
@@ -150,7 +150,8 @@ void QmitkTotalSegmentatorToolGUI::OnInstallBtnClicked()
   if (isInstalled)
   {
     const QString pythonPath = m_Installer.GetVirtualEnvPath();
-    m_PythonPath = GetPythonPathFromUI(m_Installer.GetVirtualEnvPath());
+    MITK_INFO << "installed pytohn path:" << pythonPath.toStdString();
+    m_PythonPath = GetExactPythonPath(pythonPath);
     this->WriteStatusMessage("Successfully installed TotalSegmentator");
   }
   else
@@ -245,7 +246,6 @@ void QmitkTotalSegmentatorToolGUI::WriteErrorMessage(const QString &message)
 bool QmitkTotalSegmentatorToolGUI::IsTotalSegmentatorInstalled(const QString &pythonPath)
 {
   QString fullPath = pythonPath;
-  fullPath = fullPath.mid(fullPath.indexOf(" ") + 1);
   bool isPythonExists = false;
 #ifdef _WIN32
   isPythonExists = QFile::exists(fullPath + QDir::separator() + QString("python.exe"));
@@ -330,29 +330,36 @@ void QmitkTotalSegmentatorToolGUI::OnPythonPathChanged(const QString &pyEnv)
   else
   {// Show positive status meeage
     m_Controls.previewButton->setDisabled(false);
-    m_PythonPath = GetPythonPathFromUI(pyEnv);
+    QString uiPyPath = this->GetPythonPathFromUI(pyEnv);
+    m_PythonPath = this->GetExactPythonPath(uiPyPath);
   }
 }
 
-QString QmitkTotalSegmentatorToolGUI::GetPythonPathFromUI(const QString &pyEnv)
+QString QmitkTotalSegmentatorToolGUI::GetPythonPathFromUI(const QString &pyUI)
 {
-  QString pythonPath;
-  QString fullPath = pyEnv.mid(pyEnv.indexOf(" ") + 1);
-  if (fullPath.isEmpty())
+  QString fullPath = pyUI;
+  if (-1 != fullPath.indexOf(")"))
   {
-    return fullPath;
+    fullPath = fullPath.mid(fullPath.indexOf(")") + 2);
   }
+  return fullPath.simplified();
+}
+
+QString QmitkTotalSegmentatorToolGUI::GetExactPythonPath(const QString &pyEnv)
+{
+  QString fullPath = pyEnv;
   bool isPythonExists = false;
 #ifdef _WIN32
   isPythonExists = QFile::exists(fullPath + QDir::separator() + QString("python.exe"));
-  if (isPythonExists)
-  {
-    pythonPath = fullPath;
-  }
-  else if (!(fullPath.endsWith("Scripts", Qt::CaseInsensitive) || fullPath.endsWith("Scripts/", Qt::CaseInsensitive)))
+  if (!isPythonExists &&
+      !(fullPath.endsWith("Scripts", Qt::CaseInsensitive) || fullPath.endsWith("Scripts/", Qt::CaseInsensitive)))
   {
     fullPath += QDir::separator() + QString("Scripts");
-    pythonPath = fullPath;
+    isPythonExists = QFile::exists(fullPath + QDir::separator() + QString("python.exe"));
+  }
+  if (!isPythonExists)
+  {
+    fullPath.clear();
   }
 #else
   isPythonExists = QFile::exists(fullPath + QDir::separator() + QString("python3"));
@@ -366,7 +373,7 @@ QString QmitkTotalSegmentatorToolGUI::GetPythonPathFromUI(const QString &pyEnv)
     pythonPath = fullPath;
   }
 #endif
-  return pythonPath;
+  return fullPath;
 }
 
 void QmitkTotalSegmentatorToolGUI::OnOverrideChecked(int state)
@@ -401,7 +408,7 @@ void QmitkTotalSegmentatorToolGUI::OnClearInstall()
   else
   {
     MITK_ERROR
-      << "The virtual environment couldn't be removed. Please check if you have the required access privileges.";
+      << "The virtual environment couldn't be removed. Please check if you have the required access privileges or, some other process is accessing the folders.";
   }
 }
 

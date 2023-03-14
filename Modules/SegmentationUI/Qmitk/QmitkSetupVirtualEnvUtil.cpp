@@ -172,7 +172,6 @@ void QmitkSetupVirtualEnvUtil::ExecutePython(const std::string &args,
 bool QmitkSetupVirtualEnvUtil::IsPythonPath(const QString &pythonPath)
 {
   QString fullPath = pythonPath;
-  fullPath = fullPath.mid(fullPath.indexOf(" ") + 1);
   bool isExists =
 #ifdef _WIN32
     QFile::exists(fullPath + QDir::separator() + QString("python.exe"));

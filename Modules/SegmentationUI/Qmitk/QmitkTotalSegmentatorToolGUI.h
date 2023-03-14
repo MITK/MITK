@@ -19,8 +19,8 @@ public:
                                            QString("scipy==1.9.1")};
   const QString m_STORAGE_DIR;
   inline QmitkTotalSegmentatorToolInstaller(
-    const QString baseDir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QDir::separator() +
-                            qApp->organizationName() + QDir::separator())
+    const QString baseDir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QDir::separator() 
+                            + qApp->organizationName() + QDir::separator())
     : QmitkSetupVirtualEnvUtil(baseDir), m_STORAGE_DIR(baseDir){};
   bool SetupVirtualEnv(const QString &) override;
   QString GetVirtualEnvPath() override;
@@ -121,7 +121,9 @@ protected:
   bool SetUpTotalSegmentator(const QString &);
   bool SetUpTotalSegmentatorWIN(const QString &);
 
-  QString GetPythonPathFromUI(const QString &pyEnv);
+  QString GetPythonPathFromUI(const QString &);
+
+  QString GetExactPythonPath(const QString &);
 
   /**
    * @brief For storing values like Python path across sessions.

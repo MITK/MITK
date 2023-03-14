@@ -50,6 +50,11 @@ protected slots:
   /**
    * @brief Qt Slot
    */
+  QString OnSystemPythonChanged(const QString &);
+
+  /**
+   * @brief Qt Slot
+   */
   void OnInstallBtnClicked();
 
   /**

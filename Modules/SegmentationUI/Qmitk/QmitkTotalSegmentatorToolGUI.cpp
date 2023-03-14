@@ -69,6 +69,9 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
   connect(m_Controls.pythonEnvComboBox,
           QOverload<int>::of(&QComboBox::activated),
           [=](int index) { OnPythonPathChanged(m_Controls.pythonEnvComboBox->itemText(index)); });
+  connect(m_Controls.sysPythonComboBox,
+          QOverload<int>::of(&QComboBox::activated),
+          [=](int index) { OnSystemPythonChanged(m_Controls.sysPythonComboBox->itemText(index)); });
 
   Superclass::InitializeUI(mainLayout);
   //QString lastSelectedPyEnv = m_Settings.value("TotalSeg/LastPythonPath").toString();
@@ -133,9 +136,7 @@ void QmitkTotalSegmentatorToolGUI::EnableAll(bool isEnable)
 void QmitkTotalSegmentatorToolGUI::OnInstallBtnClicked()
 {
   bool isInstalled = false;
-  MITK_INFO << m_Controls.sysPythonComboBox->currentText().toStdString();
-  QString systemPython = GetPythonPathFromUI(m_Controls.sysPythonComboBox->currentText());
-  MITK_INFO << systemPython.toStdString();
+  QString systemPython = OnSystemPythonChanged(m_Controls.sysPythonComboBox->currentText());
   if (systemPython.isEmpty())
   {
     this->WriteErrorMessage("Couldn't find Python");
@@ -150,7 +151,6 @@ void QmitkTotalSegmentatorToolGUI::OnInstallBtnClicked()
   if (isInstalled)
   {
     const QString pythonPath = m_Installer.GetVirtualEnvPath();
-    MITK_INFO << "installed pytohn path:" << pythonPath.toStdString();
     m_PythonPath = GetExactPythonPath(pythonPath);
     this->WriteStatusMessage("Successfully installed TotalSegmentator");
   }
@@ -303,6 +303,32 @@ void QmitkTotalSegmentatorToolGUI::AutoParsePythonPaths()
       }
     }
   }
+}
+
+QString QmitkTotalSegmentatorToolGUI::OnSystemPythonChanged(const QString &pyEnv)
+{
+  QString pyPath;
+  if (pyEnv == QString("Select"))
+  {
+    m_Controls.previewButton->setDisabled(true);
+    QString path =
+      QFileDialog::getExistingDirectory(m_Controls.sysPythonComboBox->parentWidget(), "Python Path", "dir");
+    if (!path.isEmpty())
+    {
+      this->OnSystemPythonChanged(path);                                // recall same function for new path validation
+      bool oldState = m_Controls.sysPythonComboBox->blockSignals(true); // block signal firing while inserting item
+      m_Controls.sysPythonComboBox->insertItem(0, path);
+      m_Controls.sysPythonComboBox->setCurrentIndex(0);
+      m_Controls.sysPythonComboBox->blockSignals(
+        oldState); // unblock signal firing after inserting item. Remove this after Qt6 migration
+    }
+  }
+  else
+  { 
+    QString uiPyPath = this->GetPythonPathFromUI(pyEnv);
+    pyPath = this->GetExactPythonPath(uiPyPath);
+  }
+  return pyPath;
 }
 
 void QmitkTotalSegmentatorToolGUI::OnPythonPathChanged(const QString &pyEnv)

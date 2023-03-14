@@ -19,8 +19,6 @@ found in the LICENSE file.
 #include <usModuleResource.h>
 #include <usModuleResourceStream.h>
 
-#include <nlohmann/json.hpp>
-
 QmitkMultiWidgetLayoutSelectionWidget::QmitkMultiWidgetLayoutSelectionWidget(QWidget* parent/* = 0*/)
   : QWidget(parent)
 {
@@ -48,7 +46,7 @@ void QmitkMultiWidgetLayoutSelectionWidget::Init()
     auto data = nlohmann::json::parse(jsonStream);
     auto resourceName = data["name"].get<std::string>();
     ui.selectDefaultLayoutComboBox->addItem(QString::fromStdString(resourceName));
-    m_PresetNameMap[ui.selectDefaultLayoutComboBox->count() - 1] = resource.GetResourcePath();
+    m_PresetMap[ui.selectDefaultLayoutComboBox->count() - 1] = data;
   }
 }
 
@@ -113,7 +111,9 @@ void QmitkMultiWidgetLayoutSelectionWidget::OnLoadLayoutButtonClicked()
   if (filename.isEmpty())
     return;
 
-  emit CustomLayoutLoad(filename.toStdString());
+  std::ifstream f(filename.toStdString());
+  auto jsonData = nlohmann::json::parse(f);
+  emit LoadLayout(&jsonData);
 }
 
 void QmitkMultiWidgetLayoutSelectionWidget::OnLayoutPresetSelected(int index)
@@ -124,6 +124,6 @@ void QmitkMultiWidgetLayoutSelectionWidget::OnLayoutPresetSelected(int index)
     return;
   }
 
-  std::string filename = m_PresetNameMap[index];
-  emit PresetLayoutLoad(filename);
+  auto jsonData = m_PresetMap[index];
+  emit LoadLayout(&jsonData);
 }

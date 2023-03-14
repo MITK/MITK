@@ -17,6 +17,8 @@ found in the LICENSE file.
 
 #include "ui_QmitkMultiWidgetLayoutSelectionWidget.h"
 
+#include <nlohmann/json.hpp>
+
 // qt
 #include "QWidget"
 
@@ -37,8 +39,7 @@ Q_SIGNALS:
 
   void LayoutSet(int row, int column);
   void SaveLayout(std::string filename);
-  void CustomLayoutLoad(std::string filename);
-  void PresetLayoutLoad(std::string filename);
+  void LoadLayout(const nlohmann::json* jsonData);
 
 private Q_SLOTS:
 
@@ -54,7 +55,7 @@ private:
 
 
   Ui::QmitkMultiWidgetLayoutSelectionWidget ui;
-  std::map<int, std::string> m_PresetNameMap;
+  std::map<int, nlohmann::json> m_PresetMap;
 
 };
 

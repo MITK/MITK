@@ -17,6 +17,8 @@ found in the LICENSE file.
 
 #include <mitkInteractionSchemeSwitcher.h>
 
+#include <nlohmann/json.hpp>
+
 // qt
 #include <QToolBar>
 
@@ -40,9 +42,8 @@ public:
 Q_SIGNALS:
 
   void LayoutSet(int row, int column);
-  void CustomLayoutLoad(std::string filename);
-  void PresetLayoutLoad(std::string filename);
   void SaveLayout(std::string filename);
+  void LoadLayout(const nlohmann::json * jsonData);
   void Synchronized(bool synchronized);
   void InteractionSchemeChanged(mitk::InteractionSchemeSwitcher::InteractionScheme scheme);
 

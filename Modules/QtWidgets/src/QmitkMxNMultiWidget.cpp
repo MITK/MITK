@@ -23,11 +23,6 @@ found in the LICENSE file.
 #include <QMessageBox>
 #include <QSplitter>
 
-#include <usGetModuleContext.h>
-#include <usModuleContext.h>
-#include <usModuleResource.h>
-#include <usModuleResourceStream.h>
-
 #include <fstream>
 
 QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
@@ -388,41 +383,16 @@ void QmitkMxNMultiWidget::CreateRenderWindowWidget()
   renderWindow->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController);
 }
 
-void QmitkMxNMultiWidget::LoadCustomLayout(std::string filename)
+void QmitkMxNMultiWidget::LoadLayout(const nlohmann::json* jsonData)
 {
-  if (filename.empty())
-  {
-    return;
-  }
-
-  std::ifstream f(filename);
-  auto data = nlohmann::json::parse(f);
-  LoadLayout(data);
-}
-
-void QmitkMxNMultiWidget::LoadPresetLayout(std::string filename)
-{
-  auto jsonResource = us::GetModuleContext()->GetModule()->GetResource(filename);
-  if (!jsonResource.IsValid() || !jsonResource.IsFile())
-  {
-    return;
-  }
-
-  us::ModuleResourceStream jsonStream(jsonResource);
-  auto data = nlohmann::json::parse(jsonStream);
-  LoadLayout(data);
-}
-
-void QmitkMxNMultiWidget::LoadLayout(nlohmann::json data)
-{
-  if (data.is_null())
+  if ((*jsonData).is_null())
   {
     QMessageBox::warning(this, "Load layout", "Could not read window layout");
   }
 
   delete this->layout();
   unsigned int windowCounter = 0;
-  auto content = BuildLayoutFromJSON(data, &windowCounter);
+  auto content = BuildLayoutFromJSON(jsonData, &windowCounter);
   auto hBoxLayout = new QHBoxLayout(this);
   this->setLayout(hBoxLayout);
   hBoxLayout->addWidget(content);
@@ -490,15 +460,16 @@ nlohmann::json QmitkMxNMultiWidget::BuildJSONFromLayout(QSplitter* splitter)
   return resultJSON;
 }
 
-QSplitter* QmitkMxNMultiWidget::BuildLayoutFromJSON(nlohmann::json jsonData, unsigned int* windowCounter, QSplitter* parentSplitter)
+QSplitter* QmitkMxNMultiWidget::BuildLayoutFromJSON(const nlohmann::json* jsonData, unsigned int* windowCounter, QSplitter* parentSplitter)
 {
-  bool vertical = jsonData["vertical"].get<bool>();
+
+  bool vertical = jsonData->at("vertical").get<bool>();
   auto orientation = vertical ? Qt::Vertical : Qt::Horizontal;
 
   auto split = new QSplitter(orientation, parentSplitter);
   QList<int> sizes;
 
-  for (auto object : jsonData["content"])
+  for (auto object : jsonData->at("content"))
   {
     bool isWindow = object["isWindow"].get<bool>();
     int size = object["size"].get<int>();
@@ -552,7 +523,7 @@ QSplitter* QmitkMxNMultiWidget::BuildLayoutFromJSON(nlohmann::json jsonData, uns
     }
     else
     {
-      auto subSplitter = BuildLayoutFromJSON(object, windowCounter, split);
+      auto subSplitter = BuildLayoutFromJSON(&object, windowCounter, split);
       split->addWidget(subSplitter);
     }
   }

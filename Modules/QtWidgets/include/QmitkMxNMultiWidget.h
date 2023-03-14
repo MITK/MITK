@@ -87,9 +87,7 @@ public Q_SLOTS:
   void wheelEvent(QWheelEvent* e) override;
   void mousePressEvent(QMouseEvent* e) override;
   void moveEvent(QMoveEvent* e) override;
-  void LoadCustomLayout(std::string filename);
-  void LoadPresetLayout(std::string filename);
-  void LoadLayout(nlohmann::json data);
+  void LoadLayout(const nlohmann::json* jsonData);
   void SaveLayout(std::string filename);
 
 Q_SIGNALS:
@@ -108,7 +106,7 @@ private:
 
   void CreateRenderWindowWidget();
   nlohmann::json BuildJSONFromLayout(QSplitter* splitter);
-  QSplitter* BuildLayoutFromJSON(nlohmann::json jsonData, unsigned int* windowCounter, QSplitter* parentSplitter = nullptr);
+  QSplitter* BuildLayoutFromJSON(const nlohmann::json* jsonData, unsigned int* windowCounter, QSplitter* parentSplitter = nullptr);
 
   mitk::SliceNavigationController* m_TimeNavigationController;
 

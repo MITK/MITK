@@ -383,22 +383,19 @@ QString QmitkTotalSegmentatorToolGUI::GetExactPythonPath(const QString &pyEnv)
     fullPath += QDir::separator() + QString("Scripts");
     isPythonExists = QFile::exists(fullPath + QDir::separator() + QString("python.exe"));
   }
+#else
+  isPythonExists = QFile::exists(fullPath + QDir::separator() + QString("python3"));
+  else if (!isPythonExists && !(fullPath.endsWith("bin", Qt::CaseInsensitive) ||
+                            fullPath.endsWith("bin/", Qt::CaseInsensitive)))
+  {
+    fullPath += QDir::separator() + QString("bin");
+    isPythonExists = QFile::exists(fullPath + QDir::separator() + QString("python3"));
+  }
+#endif
   if (!isPythonExists)
   {
     fullPath.clear();
   }
-#else
-  isPythonExists = QFile::exists(fullPath + QDir::separator() + QString("python3"));
-  if (isPythonExists)
-  {
-    pythonPath = fullPath;
-  }
-  else if (!(fullPath.endsWith("bin", Qt::CaseInsensitive) || fullPath.endsWith("bin/", Qt::CaseInsensitive)))
-  {
-    fullPath += QDir::separator() + QString("bin");
-    pythonPath = fullPath;
-  }
-#endif
   return fullPath;
 }
 

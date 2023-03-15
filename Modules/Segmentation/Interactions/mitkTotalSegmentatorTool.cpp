@@ -54,7 +54,7 @@ us::ModuleResource mitk::TotalSegmentatorTool::GetIconResource() const
 
 const char *mitk::TotalSegmentatorTool::GetName() const
 {
-  return "Total Segmentator";
+  return "TotalSegmentator";
 }
 
 void mitk::TotalSegmentatorTool::onPythonProcessEvent(itk::Object * /*pCaller*/, const itk::EventObject &e, void *)

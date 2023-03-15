@@ -7,9 +7,8 @@
 #include <QDirIterator>
 #include <QFileDialog>
 #include <QIcon>
+#include <QmitkStyleManager.h>
 #include <QMessageBox>
-#include <QUrl>
-#include <QtGlobal>
 
 MITK_TOOL_GUI_MACRO(MITKSEGMENTATIONUI_EXPORT, QmitkTotalSegmentatorToolGUI, "")
 
@@ -60,7 +59,6 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
     welcomeText = "<b>STATUS: </b><i>Welcome to Total Segmentator tool. Sorry, " +
                               QString::number(m_GpuLoader.GetGPUCount()) + " GPUs were detected.</i>";
   }
-  mainLayout->addLayout(m_Controls.verticalLayout);
 
   connect(m_Controls.previewButton, SIGNAL(clicked()), this, SLOT(OnPreviewBtnClicked()));
   connect(m_Controls.clearButton, SIGNAL(clicked()), this, SLOT(OnClearInstall()));
@@ -73,9 +71,8 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
           QOverload<int>::of(&QComboBox::activated),
           [=](int index) { OnSystemPythonChanged(m_Controls.sysPythonComboBox->itemText(index)); });
 
-  Superclass::InitializeUI(mainLayout);
-  //QString lastSelectedPyEnv = m_Settings.value("TotalSeg/LastPythonPath").toString();
-  //m_Controls.pythonEnvComboBox->insertItem(0, lastSelectedPyEnv);
+  QString lastSelectedPyEnv = m_Settings.value("TotalSeg/LastCustomPythonPath").toString();
+  m_Controls.pythonEnvComboBox->insertItem(0, lastSelectedPyEnv);
   const QString storageDir = m_Installer.GetVirtualEnvPath();
   m_IsInstalled = this->IsTotalSegmentatorInstalled(storageDir);
   if (m_IsInstalled)
@@ -90,6 +87,16 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
     welcomeText += " Totalsegmentator not installed. Please click on \"Install TotalSegmentator\" above.";
   }
   this->WriteStatusMessage(welcomeText);
+
+  QIcon deleteIcon =
+    QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/edit-delete.svg"));
+  QIcon arrowIcon =
+    QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/go-next.svg"));
+  m_Controls.clearButton->setIcon(deleteIcon);
+  m_Controls.previewButton->setIcon(arrowIcon);
+
+  mainLayout->addLayout(m_Controls.verticalLayout);
+  Superclass::InitializeUI(mainLayout);
 }
 
 void QmitkTotalSegmentatorToolGUI::EnableWidgets(bool enabled)
@@ -168,7 +175,6 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
   {
     return;
   }
-  // QString pythonPathTextItem = "";
   try
   {
     m_Controls.previewButton->setEnabled(false);
@@ -213,14 +219,15 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
   tool->IsTimePointChangeAwareOn();
   this->ActualizePreviewLabelVisibility();
   this->WriteStatusMessage("<b>STATUS: </b><i>Segmentation task finished successfully.</i>");
-  /* if (!pythonPathTextItem.isEmpty()) // only cache if the prediction ended without errors.
+  QString pythonPathTextItem = m_Controls.pythonEnvComboBox->currentText();
+  if (!pythonPathTextItem.isEmpty()) // only cache if the prediction ended without errors.
   {
-    QString lastSelectedPyEnv = m_Settings.value("TotalSeg/LastPythonPath").toString();
+    QString lastSelectedPyEnv = m_Settings.value("TotalSeg/LastCustomPythonPath").toString();
     if (lastSelectedPyEnv != pythonPathTextItem)
     {
-      m_Settings.setValue("TotalSeg/LastPythonPath", pythonPathTextItem);
+      m_Settings.setValue("TotalSeg/LastCustomPythonPath", pythonPathTextItem);
     }
-  }*/
+  }
 }
 
 void QmitkTotalSegmentatorToolGUI::ShowErrorMessage(const std::string &message, QMessageBox::Icon icon)

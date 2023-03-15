@@ -20,9 +20,7 @@ found in the LICENSE file.
 #include <mitkLabelSetImageToSurfaceThreadedFilter.h>
 #include <mitkRenderingManager.h>
 #include <mitkShowSegmentationAsSurface.h>
-#include <mitkSliceBasedInterpolationController.h>
 #include <mitkStatusBar.h>
-#include <mitkSurfaceBasedInterpolationController.h>
 #include <mitkToolManagerProvider.h>
 
 // Qmitk
@@ -121,14 +119,9 @@ void QmitkMultiLabelManager::OnSelectedLabelChanged(LabelValueVectorType labels)
   this->m_Segmentation->SetActiveLayer(groupID);
   this->m_Segmentation->GetActiveLabelSet()->SetActiveLabel(labelValue);
 
-  mitk::SurfaceBasedInterpolationController *interpolator = mitk::SurfaceBasedInterpolationController::GetInstance();
-  if (interpolator)
-  {
-    interpolator->SetActiveLabel(labelValue);
-  }
-
   this->m_Segmentation->Modified();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  //end TODO
 
   emit CurrentSelectionChanged(labels);
 }

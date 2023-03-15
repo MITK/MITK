@@ -177,7 +177,7 @@ private:
    * @brief Function that handles label removal from the segmentation image.
    *
    */
-  void OnRemoveLabel();
+  void OnRemoveLabel(mitk::Label::PixelType removedLabelValue);
 
   /**
    * @brief Function that to changes in the segmentation image. It handles the layer removal, addition, label erasure,

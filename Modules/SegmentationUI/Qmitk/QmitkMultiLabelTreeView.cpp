@@ -20,7 +20,7 @@ QmitkMultiLabelTreeView::QmitkMultiLabelTreeView(QWidget* parent) : QTreeView(pa
 
 QItemSelectionModel::SelectionFlags QmitkMultiLabelTreeView::selectionCommand(const QModelIndex& index, const QEvent* event) const
 {
-  auto value = index.data(QmitkMultiLabelTreeModel::ItemModelRole::LabelValueRole);
+  auto value = index.data(QmitkMultiLabelTreeModel::ItemModelRole::LabelInstanceValueRole);
   if (index.column()!=0 || !value.isValid())
   {
     return QItemSelectionModel::NoUpdate;

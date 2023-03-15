@@ -53,6 +53,18 @@ public:
   QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
   QModelIndex parent(const QModelIndex &child) const override;
 
+  /** returns the index of a passed label value (always first column). If label value does not exist in
+  segmentation or segmentation is not set an invalid index will be returned.*/
+  QModelIndex indexOfLabel(mitk::Label::PixelType labelValue) const;
+  QModelIndex indexOfGroup(mitk::LabelSetImage::SpatialGroupIndexType groupIndex) const;
+  /** Returns the index to the next node in the tree that behaves like an instance (label node with only one instance
+  or instance node). If current index is at the end, an invalid index is returned.*/
+  QModelIndex ClosestLabelInstanceIndex(const QModelIndex& currentIndex) const;
+
+  ///** Returns the index to the next node in the tree that behaves like an instance (label node with only one instance
+  //or instance node). If current index is at the end, an invalid index is returned.*/
+  //QModelIndex PrevLabelInstanceIndex(const QModelIndex& currentIndex) const;
+
   enum TableColumns
   {
     NAME_COL = 0,
@@ -63,13 +75,35 @@ public:
 
   enum ItemModelRole
   {
+    /**This role returns the label object that is associated with an index.
+       - On group level it always returns an invalid QVariant
+       - On label level (with multiple instances) it returns the first label instance).
+       - On instance level it returns the label instance object.*/
     LabelDataRole = 64,
-    LabelValueRole = 65, //this role returns the value of the label instance.
-                         //If index is in a row that does not represent a a Label instance
-                         //an invalid QVarient will be returned.
+    /**This role returns only the label value of the label that would be returned by
+       LabelDataRole.*/
+    LabelValueRole = 65,
+    /**Simelar to LabelDataRole, but only returns a valid QVariant if index points only to
+      a specific instance (so either instance level or label level with only one instance).
+      You can use that role if you want to assure that only one specific label instance is
+      referenced by the index.*/
+    LabelInstanceDataRole = 66,
+    /**Simelar to LabelValueRole, but like LabelInstanceDataRole only returns a valid QVariant
+      if index points only to a specific instance (so either instance level or label
+      level with only one instance).
+      You can use that role if you want to assure that only one specific label instance is
+      referenced by the index.*/
+    LabelInstanceValueRole = 67
   };
 
-signals:
+  bool GetAllowVisibilityModification() const;
+  bool GetAllowLockModification() const;
+
+public Q_SLOTS:
+  void SetAllowVisibilityModification(bool vmod);
+  void SetAllowLockModification(bool lmod);
+
+Q_SIGNALS:
   void dataAvailable();
   /** Is emitted whenever the model changes are finished (usually a bit later than dataAvailable()).*/
   void modelChanged();
@@ -103,6 +137,13 @@ private:
 
   bool m_Observed;
   bool m_ShowGroups = true;
+
+  bool m_ShowVisibility = true;
+  bool m_ShowLock = true;
+  bool m_ShowOther = false;
+
+  bool m_AllowVisibilityModification = true;
+  bool m_AllowLockModification = true;
 };
 
 #endif // mitkQmitkMultiLabelTreeModel_h

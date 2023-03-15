@@ -14,6 +14,7 @@ found in the LICENSE file.
 
 // mitk
 #include <mitkRenderingManager.h>
+#include <mitkLabelSetImageHelper.h>
 
 // Qmitk
 #include <QmitkMultiLabelTreeModel.h>
@@ -27,14 +28,16 @@ found in the LICENSE file.
 #include <QWidgetAction>
 #include <QMessageBox>
 
+#include "ui_QmitkMultiLabelInspectorControls.h"
+
 QmitkMultiLabelInspector::QmitkMultiLabelInspector(QWidget* parent/* = nullptr*/)
-  : QWidget(parent)
+  : QWidget(parent), m_Controls(new Ui::QmitkMultiLabelInspector)
 {
-  m_Controls.setupUi(this);
+  m_Controls->setupUi(this);
 
   m_Model = new QmitkMultiLabelTreeModel(this);
 
-  m_Controls.view->setModel(m_Model);
+  m_Controls->view->setModel(m_Model);
 
   m_ColorItemDelegate = new QmitkLabelColorItemDelegate(this);
 
@@ -46,49 +49,61 @@ QmitkMultiLabelInspector::QmitkMultiLabelInspector(QWidget* parent/* = nullptr*/
   auto unlockIcon = QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/unlock.svg"));
   m_LockItemDelegate = new QmitkLabelToggleItemDelegate(lockIcon, unlockIcon, this);
 
-  this->m_Controls.view->setItemDelegateForColumn(1, m_LockItemDelegate);
-  this->m_Controls.view->setItemDelegateForColumn(2, m_ColorItemDelegate);
-  this->m_Controls.view->setItemDelegateForColumn(3, m_VisibilityItemDelegate);
+  this->m_Controls->view->setItemDelegateForColumn(1, m_LockItemDelegate);
+  this->m_Controls->view->setItemDelegateForColumn(2, m_ColorItemDelegate);
+  this->m_Controls->view->setItemDelegateForColumn(3, m_VisibilityItemDelegate);
 
-  this->m_Controls.view->header()->setSectionResizeMode(0,QHeaderView::Stretch);
-  this->m_Controls.view->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
-  this->m_Controls.view->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
-  this->m_Controls.view->header()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
-  this->m_Controls.view->setContextMenuPolicy(Qt::CustomContextMenu);
+  this->m_Controls->view->header()->setSectionResizeMode(0,QHeaderView::Stretch);
+  this->m_Controls->view->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+  this->m_Controls->view->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+  this->m_Controls->view->header()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
+  this->m_Controls->view->setContextMenuPolicy(Qt::CustomContextMenu);
 
   connect(m_Model, &QAbstractItemModel::modelReset, this, &QmitkMultiLabelInspector::OnModelReset);
-  connect(m_Controls.view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), SLOT(ChangeModelSelection(const QItemSelection&, const QItemSelection&)));
-  connect(m_Controls.view, &QAbstractItemView::customContextMenuRequested, this, &QmitkMultiLabelInspector::OnContextMenuRequested);
-  connect(m_Controls.view, &QAbstractItemView::doubleClicked, this, &QmitkMultiLabelInspector::OnItemDoubleClicked);
+  connect(m_Controls->view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), SLOT(OnChangeModelSelection(const QItemSelection&, const QItemSelection&)));
+  connect(m_Controls->view, &QAbstractItemView::customContextMenuRequested, this, &QmitkMultiLabelInspector::OnContextMenuRequested);
+  connect(m_Controls->view, &QAbstractItemView::doubleClicked, this, &QmitkMultiLabelInspector::OnItemDoubleClicked);
+}
+
+QmitkMultiLabelInspector::~QmitkMultiLabelInspector()
+{
+  delete m_Controls;
 }
 
 void QmitkMultiLabelInspector::Initialize()
 {
   m_LastValidSelectedLabels = {};
+  m_ModelManipulationOngoing = false;
   m_Model->SetSegmentation(m_Segmentation);
-  m_Controls.view->expandAll();
+  m_Controls->view->expandAll();
 }
 
 void QmitkMultiLabelInspector::SetMultiSelectionMode(bool multiMode)
 {
   if (multiMode)
   {
-    m_Controls.view->setSelectionMode(QAbstractItemView::SelectionMode::MultiSelection);
+    m_Controls->view->setSelectionMode(QAbstractItemView::SelectionMode::MultiSelection);
   }
   else
   {
-    m_Controls.view->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
+    m_Controls->view->setSelectionMode(QAbstractItemView::SelectionMode::SingleSelection);
   }
 }
 
 bool QmitkMultiLabelInspector::GetMultiSelectionMode() const
 {
-  return QAbstractItemView::SelectionMode::MultiSelection == m_Controls.view->selectionMode();
+  return QAbstractItemView::SelectionMode::MultiSelection == m_Controls->view->selectionMode();
 }
 
 void QmitkMultiLabelInspector::SetAllowVisibilityModification(bool vmod)
 {
   m_AllowVisibilityModification = vmod;
+  this->m_Model->SetAllowVisibilityModification(vmod);
+}
+
+void QmitkMultiLabelInspector::SetAllowLabelModification(bool labelMod)
+{
+  m_AllowLabelModification = labelMod;
 }
 
 bool QmitkMultiLabelInspector::GetAllowVisibilityModification() const
@@ -99,11 +114,22 @@ bool QmitkMultiLabelInspector::GetAllowVisibilityModification() const
 void QmitkMultiLabelInspector::SetAllowLockModification(bool lmod)
 {
   m_AllowLockModification = lmod;
+  this->m_Model->SetAllowLockModification(lmod);
 }
 
 bool QmitkMultiLabelInspector::GetAllowLockModification() const
 {
   return m_AllowLockModification;
+}
+
+bool QmitkMultiLabelInspector::GetAllowLabelModification() const
+{
+  return m_AllowLabelModification;
+}
+
+void QmitkMultiLabelInspector::SetDefaultLabelNaming(bool defaultLabelNaming)
+{
+  m_DefaultLabelNaming = defaultLabelNaming;
 }
 
 void QmitkMultiLabelInspector::SetMultiLabelSegmentation(mitk::LabelSetImage* segmentation)
@@ -118,6 +144,7 @@ void QmitkMultiLabelInspector::SetMultiLabelSegmentation(mitk::LabelSetImage* se
 void QmitkMultiLabelInspector::OnModelReset()
 {
   m_LastValidSelectedLabels = {};
+  m_ModelManipulationOngoing = false;
 }
 
 bool EqualLabelSelections(const QmitkMultiLabelInspector::LabelValueVectorType& selection1, const QmitkMultiLabelInspector::LabelValueVectorType& selection2)
@@ -150,14 +177,16 @@ void QmitkMultiLabelInspector::UpdateSelectionModel(const LabelValueVectorType& 
   QItemSelection newCurrentSelection;
   for (const auto& labelID : selectedLabels)
   {
-    QModelIndexList matched = m_Model->match(m_Model->index(0, 0), QmitkMultiLabelTreeModel::ItemModelRole::LabelValueRole, QVariant(labelID), 1, Qt::MatchRecursive);
+    QModelIndexList matched = m_Model->match(m_Model->index(0, 0), QmitkMultiLabelTreeModel::ItemModelRole::LabelInstanceValueRole, QVariant(labelID), 1, Qt::MatchRecursive);
     if (!matched.empty())
     {
+      auto f = matched.front();
+      auto d = f.data(QmitkMultiLabelTreeModel::ItemModelRole::LabelDataRole);
       newCurrentSelection.select(matched.front(), matched.front());
     }
   }
 
-  m_Controls.view->selectionModel()->select(newCurrentSelection, QItemSelectionModel::ClearAndSelect);
+  m_Controls->view->selectionModel()->select(newCurrentSelection, QItemSelectionModel::ClearAndSelect);
 }
 
 void QmitkMultiLabelInspector::SetSelectedLabel(mitk::LabelSetImage::LabelValueType selectedLabel)
@@ -168,10 +197,10 @@ void QmitkMultiLabelInspector::SetSelectedLabel(mitk::LabelSetImage::LabelValueT
 QmitkMultiLabelInspector::LabelValueVectorType QmitkMultiLabelInspector::GetSelectedLabelsFromSelectionModel() const
 {
   LabelValueVectorType result;
-  QModelIndexList selectedIndexes = m_Controls.view->selectionModel()->selectedIndexes();
+  QModelIndexList selectedIndexes = m_Controls->view->selectionModel()->selectedIndexes();
   for (const auto& index : qAsConst(selectedIndexes))
   {
-    QVariant qvariantDataNode = m_Model->data(index, QmitkMultiLabelTreeModel::ItemModelRole::LabelValueRole);
+    QVariant qvariantDataNode = m_Model->data(index, QmitkMultiLabelTreeModel::ItemModelRole::LabelInstanceValueRole);
     if (qvariantDataNode.canConvert<mitk::LabelSetImage::LabelValueType>())
     {
       result.push_back(qvariantDataNode.value<mitk::LabelSetImage::LabelValueType>());
@@ -185,19 +214,29 @@ QmitkMultiLabelInspector::LabelValueVectorType QmitkMultiLabelInspector::GetSele
   return m_LastValidSelectedLabels;
 }
 
-void QmitkMultiLabelInspector::ChangeModelSelection(const QItemSelection& selected, const QItemSelection& deselected)
+mitk::Label* QmitkMultiLabelInspector::GetFirstSelectedLabelObject() const
 {
-  auto internalSelection = GetSelectedLabelsFromSelectionModel();
-  if (internalSelection.empty())
+  if (m_LastValidSelectedLabels.empty() || m_Segmentation.IsNull()) return nullptr;
+
+  return m_Segmentation->GetLabel(m_LastValidSelectedLabels.front());
+}
+
+void QmitkMultiLabelInspector::OnChangeModelSelection(const QItemSelection& selected, const QItemSelection& deselected)
+{
+  if (!m_ModelManipulationOngoing)
   {
-    //empty selections are not allowed by UI interactions, there should always be at least on label selected.
-    //but selections are e.g. also cleared if the model is updated (e.g. due to addition of labels)
-    UpdateSelectionModel(m_LastValidSelectedLabels);
-  }
-  else
-  {
-    m_LastValidSelectedLabels = internalSelection;
-    emit CurrentSelectionChanged(GetSelectedLabels());
+    auto internalSelection = GetSelectedLabelsFromSelectionModel();
+    if (internalSelection.empty())
+    {
+      //empty selections are not allowed by UI interactions, there should always be at least on label selected.
+      //but selections are e.g. also cleared if the model is updated (e.g. due to addition of labels)
+      UpdateSelectionModel(m_LastValidSelectedLabels);
+    }
+    else
+    {
+      m_LastValidSelectedLabels = internalSelection;
+      emit CurrentSelectionChanged(GetSelectedLabels());
+    }
   }
 }
 
@@ -218,7 +257,7 @@ void QmitkMultiLabelInspector::RestoreOverrideCursor() const
 
 mitk::Label* QmitkMultiLabelInspector::GetCurrentLabel() const
 {
-  auto currentIndex = this->m_Controls.view->currentIndex();
+  auto currentIndex = this->m_Controls->view->currentIndex();
   auto labelVariant = currentIndex.data(QmitkMultiLabelTreeModel::ItemModelRole::LabelDataRole);
   mitk::Label::Pointer currentIndexLabel = nullptr;
 
@@ -230,11 +269,233 @@ mitk::Label* QmitkMultiLabelInspector::GetCurrentLabel() const
   return currentIndexLabel;
 }
 
+mitk::Label* QmitkMultiLabelInspector::AddNewLabelInstance()
+{
+  if (!m_AllowLabelModification)
+    mitkThrow() << "QmitkMultiLabelInspector is configured incorrectly. Set AllowLabelModification to true to allow the usage of AddNewLabelInstance.";
+
+  auto currentLabel = this->GetFirstSelectedLabelObject();
+  if (nullptr == currentLabel)
+    return nullptr;
+
+  auto groupID = m_Segmentation->GetGroupIndexOfLabel(currentLabel->GetValue());
+  auto group = m_Segmentation->GetLabelSet(groupID);
+  m_ModelManipulationOngoing = true;
+  auto newLabel = group->AddLabel(currentLabel, true);
+  m_ModelManipulationOngoing = false;
+  this->SetSelectedLabel(newLabel->GetValue());
+
+  auto index = m_Model->indexOfLabel(newLabel->GetValue());
+  if (index.isValid())
+  {
+    m_Controls->view->expand(index.parent());
+  }
+  else
+  {
+    mitkThrow() << "Segmentation or QmitkMultiLabelTreeModel is in an invalid state. Label is not present in the model after adding it to the segmentation. Label value: " << newLabel->GetValue();
+  }
+
+  return newLabel;
+}
+
+mitk::Label* QmitkMultiLabelInspector::AddNewLabelInternal(const mitk::LabelSetImage::SpatialGroupIndexType& containingGroup)
+{
+  mitk::Label::Pointer newLabel = mitk::LabelSetImageHelper::CreateNewLabel(m_Segmentation);
+
+  if (!m_DefaultLabelNaming)
+  {
+    // TODO
+  }
+
+  auto group = m_Segmentation->GetLabelSet(containingGroup);
+  m_ModelManipulationOngoing = true;
+  group->AddLabel(newLabel, false);
+  m_ModelManipulationOngoing = false;
+  this->SetSelectedLabel(newLabel->GetValue());
+
+  auto index = m_Model->indexOfLabel(newLabel->GetValue());
+  if (index.isValid())
+  {
+    m_Controls->view->expand(index.parent());
+  }
+  else
+  {
+    mitkThrow() << "Segmentation or QmitkMultiLabelTreeModel is in an invalid state. Label is not present in the model after adding it to the segmentation. Label value: " << newLabel->GetValue();
+  }
+
+  return newLabel;
+}
+
+mitk::Label* QmitkMultiLabelInspector::AddNewLabel()
+{
+  //todo das sollte eigentlich weg gelassen werden können.
+  //Wenn beim Testen kein problem auffällt, dann kann die Zeile wirklich raus.
+  //m_ToolManager->ActivateTool(-1);
+  if (!m_AllowLabelModification)
+    mitkThrow() << "QmitkMultiLabelInspector is configured incorrectly. Set AllowLabelModification to true to allow the usage of AddNewLabel.";
+
+  if (m_Segmentation.IsNull())
+  {
+    return nullptr;
+  }
+
+  auto currentLabel = this->GetFirstSelectedLabelObject();
+  mitk::LabelSetImage::SpatialGroupIndexType groupID = nullptr == currentLabel ? 0 : m_Segmentation->GetGroupIndexOfLabel(currentLabel->GetValue());
+
+  return AddNewLabelInternal(groupID);
+}
+
+void QmitkMultiLabelInspector::RemoveLabel()
+{
+  if (!m_AllowLabelModification)
+    mitkThrow() << "QmitkMultiLabelInspector is configured incorrectly. Set AllowLabelModification to true to allow the usage of RemoveLabel.";
+
+  if (m_Segmentation.IsNull())
+  {
+    return;
+  }
+
+  auto currentLabel = GetFirstSelectedLabelObject();
+  QString question = "Do you really want to remove label \"";
+  question.append(
+    QString::fromStdString(currentLabel->GetName()));
+  question.append("\"?");
+
+  QMessageBox::StandardButton answerButton =
+    QMessageBox::question(this, "Remove label", question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
+
+  if (answerButton == QMessageBox::Yes)
+  {
+    auto currentIndex = m_Model->indexOfLabel(currentLabel->GetValue());
+    auto nextIndex = m_Model->ClosestLabelInstanceIndex(currentIndex);
+    auto labelVariant = nextIndex.data(QmitkMultiLabelTreeModel::ItemModelRole::LabelInstanceValueRole);
+
+    this->WaitCursorOn();
+    m_ModelManipulationOngoing = true;
+    m_Segmentation->RemoveLabel(currentLabel->GetValue());
+    m_ModelManipulationOngoing = false;
+    this->WaitCursorOff();
+
+    if (labelVariant.isValid())
+    {
+      auto newLabelValue = labelVariant.value<LabelValueType>();
+      this->SetSelectedLabel(newLabelValue);
+
+      auto index = m_Model->indexOfLabel(newLabelValue); //we have to get index again, because it could have changed due to remove operation.
+      if (index.isValid())
+      {
+        m_Controls->view->expand(index.parent());
+      }
+      else
+      {
+        mitkThrow() << "Segmentation or QmitkMultiLabelTreeModel is in an invalid state. Label is not present in the model after adding it to the segmentation. Label value: " << newLabelValue;
+      }
+    }
+
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+}
+
+mitk::Label* QmitkMultiLabelInspector::AddNewGroup()
+{
+  if (!m_AllowLabelModification)
+    mitkThrow() << "QmitkMultiLabelInspector is configured incorrectly. Set AllowLabelModification to true to allow the usage of AddNewLabel.";
+
+  if (m_Segmentation.IsNull())
+  {
+    return nullptr;
+  }
+
+  mitk::LabelSetImage::SpatialGroupIndexType groupID = 0;
+  mitk::Label* newLabel = nullptr;
+  m_ModelManipulationOngoing = true;
+  try
+  {
+    this->WaitCursorOn();
+    groupID = m_Segmentation->AddLayer();
+    this->WaitCursorOff();
+    newLabel =  AddNewLabelInternal(groupID);
+  }
+  catch (mitk::Exception& e)
+  {
+    this->WaitCursorOff();
+    m_ModelManipulationOngoing = false;
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    QMessageBox::information(
+      this, "Add layer", "Could not add a new layer. See error log for details.\n");
+  }
+  m_ModelManipulationOngoing = false;
+
+  return newLabel;
+}
+
+void QmitkMultiLabelInspector::RemoveGroup()
+{
+  if (!m_AllowLabelModification)
+    mitkThrow() << "QmitkMultiLabelInspector is configured incorrectly. Set AllowLabelModification to true to allow the usage of RemoveLabel.";
+
+  if (m_Segmentation.IsNull())
+  {
+    return;
+  }
+
+  QString question = "Do you really want to delete the current layer with all labels?";
+  QMessageBox::StandardButton answerButton = QMessageBox::question(
+    this, "Delete layer", question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
+
+  if (answerButton != QMessageBox::Yes)
+  {
+    return;
+  }
+
+  auto currentLabel = GetFirstSelectedLabelObject();
+  const auto currentGroup = m_Segmentation->GetGroupIndexOfLabel(currentLabel->GetValue());
+
+  auto currentIndex = m_Model->indexOfGroup(currentGroup);
+  auto nextIndex = m_Model->ClosestLabelInstanceIndex(currentIndex);
+  auto labelVariant = nextIndex.data(QmitkMultiLabelTreeModel::ItemModelRole::LabelInstanceValueRole);
+
+  try
+  {
+    this->WaitCursorOn();
+    m_ModelManipulationOngoing = true;
+    m_Segmentation->RemoveSpatialGroup(currentGroup);
+    m_ModelManipulationOngoing = false;
+    this->WaitCursorOff();
+  }
+  catch (mitk::Exception& e)
+  {
+    m_ModelManipulationOngoing = false;
+    this->WaitCursorOff();
+    MITK_ERROR << "Exception caught: " << e.GetDescription();
+    QMessageBox::information(
+      this, "Delete layer", "Could not delete the currently active layer. See error log for details.\n");
+    return;
+  }
+
+  if (labelVariant.isValid())
+  {
+    auto newLabelValue = labelVariant.value<LabelValueType>();
+    this->SetSelectedLabel(newLabelValue);
+
+    auto index = m_Model->indexOfLabel(newLabelValue); //we have to get index again, because it could have changed due to remove operation.
+    if (index.isValid())
+    {
+      m_Controls->view->expand(index.parent());
+    }
+    else
+    {
+      mitkThrow() << "Segmentation or QmitkMultiLabelTreeModel is in an invalid state. Label is not present in the model after adding it to the segmentation. Label value: " << newLabelValue;
+    }
+  }
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
 void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& pos)
 {
   auto selectedLabelValues = this->GetSelectedLabels();
-  auto currentLabel = this->GetCurrentLabel();
-  if (nullptr== currentLabel)
+  if (m_Segmentation.IsNull() || !this->isEnabled() || selectedLabelValues.empty())
     return;
 
   QMenu* menu = new QMenu(this);
@@ -260,6 +521,11 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& pos)
   {
     if (m_AllowLabelModification)
     {
+      QAction* addInstanceAction = new QAction(QIcon(":/Qmitk/RenameLabel.png"), "Add label instance...", this);
+      addInstanceAction->setEnabled(true);
+      QObject::connect(addInstanceAction, &QAction::triggered, this, &QmitkMultiLabelInspector::AddNewLabelInstance);
+      menu->addAction(addInstanceAction);
+
       QAction* renameAction = new QAction(QIcon(":/Qmitk/RenameLabel.png"), "Rename...", this);
       renameAction->setEnabled(true);
       QObject::connect(renameAction, SIGNAL(triggered(bool)), this, SLOT(OnRenameLabel(bool)));
@@ -267,7 +533,7 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& pos)
 
       QAction* removeAction = new QAction(QIcon(":/Qmitk/RemoveLabel.png"), "Remove...", this);
       removeAction->setEnabled(true);
-      QObject::connect(removeAction, SIGNAL(triggered(bool)), this, SLOT(OnRemoveLabel(bool)));
+      QObject::connect(removeAction, &QAction::triggered, this, &QmitkMultiLabelInspector::RemoveLabel);
       menu->addAction(removeAction);
 
       QAction* eraseAction = new QAction(QIcon(":/Qmitk/EraseLabel.png"), "Erase...", this);
@@ -310,6 +576,7 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& pos)
       opacitySlider->setMinimum(0);
       opacitySlider->setMaximum(100);
       opacitySlider->setOrientation(Qt::Horizontal);
+      auto currentLabel = this->GetFirstSelectedLabelObject();
       auto opacity = currentLabel->GetOpacity();
       opacitySlider->setValue(static_cast<int>(opacity * 100));
       auto segmentation = m_Segmentation;
@@ -364,7 +631,7 @@ void QmitkMultiLabelInspector::OnRemoveLabels(bool /*value*/)
   if (answerButton == QMessageBox::Yes)
   {
     this->WaitCursorOn();
-    m_Segmentation->RemoveLabels(this->GetSelectedLabels(), m_Segmentation->GetActiveLayer());
+    m_Segmentation->RemoveLabels(this->GetSelectedLabels());
     this->WaitCursorOff();
   }
 }
@@ -390,9 +657,14 @@ void QmitkMultiLabelInspector::OnMergeLabels(bool /*value*/)
   }
 }
 
+void QmitkMultiLabelInspector::OnAddLabelInstance(bool /*value*/)
+{
+  this->AddNewLabelInstance();
+}
+
 void QmitkMultiLabelInspector::OnEraseLabel(bool /*value*/)
 {
-  auto currentLabel = GetCurrentLabel();
+  auto currentLabel = GetFirstSelectedLabelObject();
   QString question = "Do you really want to erase the contents of label \"";
   question.append(
     QString::fromStdString(currentLabel->GetName()));
@@ -410,25 +682,6 @@ void QmitkMultiLabelInspector::OnEraseLabel(bool /*value*/)
   }
 }
 
-void QmitkMultiLabelInspector::OnRemoveLabel(bool /*value*/)
-{
-  auto currentLabel = GetCurrentLabel();
-  QString question = "Do you really want to remove label \"";
-  question.append(
-    QString::fromStdString(currentLabel->GetName()));
-  question.append("\"?");
-
-  QMessageBox::StandardButton answerButton =
-    QMessageBox::question(this, "Remove label", question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
-
-  if (answerButton == QMessageBox::Yes)
-  {
-    this->WaitCursorOn();
-    m_Segmentation->RemoveLabel(currentLabel->GetValue(), m_Segmentation->GetActiveLayer());
-    this->WaitCursorOff();
-  }
-}
-
 void QmitkMultiLabelInspector::OnRenameLabel(bool /*value*/)
 {
  //TODO
@@ -436,7 +689,7 @@ void QmitkMultiLabelInspector::OnRenameLabel(bool /*value*/)
 
 void QmitkMultiLabelInspector::OnUnlockAllLabels(bool /*value*/)
 {
-  auto currentLabel = GetCurrentLabel();
+  auto currentLabel = GetFirstSelectedLabelObject();
 
   auto groupID = m_Segmentation->GetGroupIndexOfLabel(currentLabel->GetValue());
   auto group = m_Segmentation->GetLabelSet(groupID);
@@ -446,7 +699,7 @@ void QmitkMultiLabelInspector::OnUnlockAllLabels(bool /*value*/)
 
 void QmitkMultiLabelInspector::OnLockAllLabels(bool /*value*/)
 {
-  auto currentLabel = GetCurrentLabel();
+  auto currentLabel = GetFirstSelectedLabelObject();
 
   auto groupID = m_Segmentation->GetGroupIndexOfLabel(currentLabel->GetValue());
   auto group = m_Segmentation->GetLabelSet(groupID);
@@ -456,7 +709,7 @@ void QmitkMultiLabelInspector::OnLockAllLabels(bool /*value*/)
 
 void QmitkMultiLabelInspector::OnSetAllLabelsVisible(bool /*value*/)
 {
-  auto currentLabel = GetCurrentLabel();
+  auto currentLabel = GetFirstSelectedLabelObject();
 
   auto groupID = m_Segmentation->GetGroupIndexOfLabel(currentLabel->GetValue());
   auto group = m_Segmentation->GetLabelSet(groupID);
@@ -465,7 +718,7 @@ void QmitkMultiLabelInspector::OnSetAllLabelsVisible(bool /*value*/)
 
 void QmitkMultiLabelInspector::OnSetAllLabelsInvisible(bool /*value*/)
 {
-  auto currentLabel = GetCurrentLabel();
+  auto currentLabel = GetFirstSelectedLabelObject();
 
   auto groupID = m_Segmentation->GetGroupIndexOfLabel(currentLabel->GetValue());
   auto group = m_Segmentation->GetLabelSet(groupID);
@@ -474,7 +727,7 @@ void QmitkMultiLabelInspector::OnSetAllLabelsInvisible(bool /*value*/)
 
 void QmitkMultiLabelInspector::OnSetOnlyActiveLabelVisible(bool /*value*/)
 {
-  auto currentLabel = GetCurrentLabel();
+  auto currentLabel = GetFirstSelectedLabelObject();
   const auto labelID = currentLabel->GetValue();
   auto groupID = m_Segmentation->GetGroupIndexOfLabel(currentLabel->GetValue());
   auto group = m_Segmentation->GetLabelSet(groupID);
@@ -489,8 +742,9 @@ void QmitkMultiLabelInspector::OnSetOnlyActiveLabelVisible(bool /*value*/)
 void QmitkMultiLabelInspector::OnItemDoubleClicked(const QModelIndex& index)
 {
   if (!index.isValid()) return;
+  if (index.column() > 0) return;
 
-  auto labelVariant = index.data(QmitkMultiLabelTreeModel::ItemModelRole::LabelValueRole);
+  auto labelVariant = index.data(QmitkMultiLabelTreeModel::ItemModelRole::LabelInstanceValueRole);
 
   if (!labelVariant.isValid()) return;
 
@@ -498,8 +752,7 @@ void QmitkMultiLabelInspector::OnItemDoubleClicked(const QModelIndex& index)
 
   if (QApplication::queryKeyboardModifiers().testFlag(Qt::AltModifier))
   {
-    this->OnRemoveLabel(false);
-//  t  this->OnRenameLabelShortcutActivated();
+    this->OnRenameLabel(false);
     return;
   }
 

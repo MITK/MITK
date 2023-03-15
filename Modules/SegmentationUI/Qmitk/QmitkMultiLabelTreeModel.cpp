@@ -80,6 +80,35 @@ public:
     return m_parentItem;
   };
 
+  const QmitkMultiLabelSegTreeItem* ParentItem() const
+  {
+    return m_parentItem;
+  };
+
+  const QmitkMultiLabelSegTreeItem* NextSibblingItem() const
+  {
+    if (m_parentItem)
+    {
+      const auto row = this->Row()+1;
+      if (row < m_parentItem->m_childItems.size())
+        return m_parentItem->m_childItems[row];
+    }
+
+    return nullptr;
+  };
+
+  const QmitkMultiLabelSegTreeItem* PrevSibblingItem() const
+  {
+    if (m_parentItem)
+    {
+      const auto row = this->Row();
+      if (row > 0)
+        return m_parentItem->m_childItems[row-1];
+    }
+
+    return nullptr;
+  };
+
   const QmitkMultiLabelSegTreeItem* RootItem() const
   {
     auto item = this;
@@ -103,7 +132,7 @@ public:
 
     auto iter = std::find(root->m_childItems.begin(), root->m_childItems.end(), item);
 
-    if (root->m_childItems.end() == iter) mitkThrow() << "Invalid internal state of QmitkMultiLabelTreeModel. Root does not have an item as child that has root as parent.";
+    if (root->m_childItems.end() == iter) mitkThrow() << "Invalid internal state of QmitkMultiLabelTreeModel. Root does not have an currentItem as child that has root as parent.";
 
     return std::distance(root->m_childItems.begin(), iter);
   }
@@ -121,7 +150,7 @@ public:
     }
     if (ItemType::Label == m_ItemType)
     {
-      if (m_childItems.empty()) mitkThrow() << "Invalid internal state of QmitkMultiLabelTreeModel. Internal label item has no instance item.";
+      if (m_childItems.empty()) mitkThrow() << "Invalid internal state of QmitkMultiLabelTreeModel. Internal label currentItem has no instance currentItem.";
       return m_childItems[0]->GetLabel();
     }
 
@@ -134,7 +163,7 @@ public:
 
     if (nullptr == label)
     {
-      mitkThrow() << "Invalid internal state of QmitkMultiLabelTreeModel. Called GetLabelValue on an group item.";
+      mitkThrow() << "Invalid internal state of QmitkMultiLabelTreeModel. Called GetLabelValue on an group currentItem.";
     }
 
     return label->GetValue();
@@ -147,6 +176,84 @@ public:
   std::string m_ClassName;
 };
 
+
+
+QModelIndex GetIndexByItem(const QmitkMultiLabelSegTreeItem* start, const QmitkMultiLabelTreeModel* model)
+{
+  QModelIndex parentIndex = QModelIndex();
+  if (nullptr != start->m_parentItem)
+  {
+    parentIndex = GetIndexByItem(start->m_parentItem, model);
+  }
+  else
+  {
+    return parentIndex;
+  }
+
+  return model->index(start->Row(), 0, parentIndex);
+}
+
+QmitkMultiLabelSegTreeItem* GetGroupItem(QmitkMultiLabelTreeModel::SpatialGroupIndexType groupIndex, QmitkMultiLabelSegTreeItem* root)
+{
+  if (nullptr != root && groupIndex < root->m_childItems.size())
+  {
+    return root->m_childItems[groupIndex];
+  }
+
+  return nullptr;
+}
+
+QmitkMultiLabelSegTreeItem* GetInstanceItem(QmitkMultiLabelTreeModel::LabelValueType labelValue, QmitkMultiLabelSegTreeItem* root)
+{
+  QmitkMultiLabelSegTreeItem* result = nullptr;
+
+  for (auto item : root->m_childItems)
+  {
+    result = GetInstanceItem(labelValue, item);
+    if (nullptr != result) return result;
+  }
+
+  if (root->m_ItemType == QmitkMultiLabelSegTreeItem::ItemType::Instance && root->GetLabelValue() == labelValue)
+  {
+    return root;
+  }
+
+  return nullptr;
+}
+
+const QmitkMultiLabelSegTreeItem* GetFirstInstanceLikeItem(const QmitkMultiLabelSegTreeItem* startItem)
+{
+  const QmitkMultiLabelSegTreeItem* result = nullptr;
+
+  if (nullptr != startItem)
+  {
+    if (startItem->HandleAsInstance())
+    {
+      result = startItem;
+    }
+    else if (!startItem->m_childItems.empty())
+    {
+      result = GetFirstInstanceLikeItem(startItem->m_childItems.front());
+    }
+  }
+
+  return result;
+}
+
+QmitkMultiLabelSegTreeItem* GetLabelItemInGroup(const std::string& labelName, QmitkMultiLabelSegTreeItem* group)
+{
+  if (nullptr != group)
+  {
+    auto predicate = [labelName](const QmitkMultiLabelSegTreeItem* item) { return labelName == item->m_ClassName; };
+    auto finding = std::find_if(group->m_childItems.begin(), group->m_childItems.end(), predicate);
+    if (group->m_childItems.end() != finding)
+    {
+      return *finding;
+    }
+  }
+
+  return nullptr;
+}
 
 QmitkMultiLabelTreeModel::QmitkMultiLabelTreeModel(QObject *parent) : QAbstractItemModel(parent)
 , m_Observed(false)
@@ -206,7 +313,7 @@ QVariant QmitkMultiLabelTreeModel::data(const QModelIndex &index, int role) cons
         case QmitkMultiLabelSegTreeItem::ItemType::Label:
         {
           auto label = item->GetLabel();
-          if (nullptr == label) mitkThrow() << "Invalid internal state. QmitkMultiLabelTreeModel item is refering to a label that does not exist.";
+          if (nullptr == label) mitkThrow() << "Invalid internal state. QmitkMultiLabelTreeModel currentItem is refering to a label that does not exist.";
           return QVariant(QString::fromStdString(label->GetName()));
         }
         case QmitkMultiLabelSegTreeItem::ItemType::Instance:
@@ -240,13 +347,23 @@ QVariant QmitkMultiLabelTreeModel::data(const QModelIndex &index, int role) cons
   }
   else if (role == ItemModelRole::LabelDataRole)
   {
+    auto label = item->GetLabel();
+    if (nullptr!=label)  return QVariant::fromValue<void*>(label);
+  }
+  else if (role == ItemModelRole::LabelValueRole)
+  {
+    auto label = item->GetLabel();
+    if (nullptr != label)  return QVariant(label->GetValue());
+  }
+  else if (role == ItemModelRole::LabelInstanceDataRole)
+  {
     if (item->HandleAsInstance())
     {
       auto label = item->GetLabel();
       return QVariant::fromValue<void*>(label);
     }
   }
-  else if (role == ItemModelRole::LabelValueRole)
+  else if (role == ItemModelRole::LabelInstanceValueRole)
   {
     if (item->HandleAsInstance())
     {
@@ -254,6 +371,7 @@ QVariant QmitkMultiLabelTreeModel::data(const QModelIndex &index, int role) cons
       return QVariant(label->GetValue());
     }
   }
+
   return QVariant();
 }
 
@@ -328,6 +446,32 @@ QModelIndex QmitkMultiLabelTreeModel::index(int row, int column, const QModelInd
     return QModelIndex();
 }
 
+QModelIndex QmitkMultiLabelTreeModel::indexOfLabel(mitk::Label::PixelType labelValue) const
+{
+  if (labelValue == mitk::LabelSetImage::UnlabeledLabelValue) return QModelIndex();
+  auto relevantItem = GetInstanceItem(labelValue, this->m_RootItem.get());
+
+  if (nullptr == relevantItem) QModelIndex();
+
+  auto labelItem = relevantItem->ParentItem();
+
+  if (labelItem->m_childItems.size() == 1)
+  { //was the only instance of the label, therefor return the label item instat.
+    relevantItem = labelItem;
+  }
+
+  return GetIndexByItem(relevantItem, this);
+}
+
+QModelIndex QmitkMultiLabelTreeModel::indexOfGroup(mitk::LabelSetImage::SpatialGroupIndexType groupIndex) const
+{
+  auto relevantItem = GetGroupItem(groupIndex, this->m_RootItem.get());
+
+  if (nullptr == relevantItem) QModelIndex();
+
+  return GetIndexByItem(relevantItem, this);
+}
+
 QModelIndex QmitkMultiLabelTreeModel::parent(const QModelIndex &child) const
 {
   if (!child.isValid())
@@ -342,63 +486,42 @@ QModelIndex QmitkMultiLabelTreeModel::parent(const QModelIndex &child) const
   return createIndex(parentItem->Row(), 0, parentItem);
 }
 
-QModelIndex GetIndexByItem(QmitkMultiLabelSegTreeItem* start, QmitkMultiLabelTreeModel* model)
+QModelIndex QmitkMultiLabelTreeModel::ClosestLabelInstanceIndex(const QModelIndex& currentIndex) const
 {
-  QModelIndex parentIndex = QModelIndex();
-  if (nullptr != start->m_parentItem)
+  if (!currentIndex.isValid()) return QModelIndex();
+
+  auto currentItem = static_cast<const QmitkMultiLabelSegTreeItem*>(currentIndex.internalPointer());
+  if (!currentItem) return QModelIndex();
+
+  if (currentItem->RootItem() != this->m_RootItem.get()) mitkThrow() << "Invalid call. Passed currentIndex does not seem to be a valid index of this model. It is either outdated or from another model.";
+
+  const QmitkMultiLabelSegTreeItem* resultItem = nullptr;
+  auto searchItem = currentItem;
+  const auto rootItem = currentItem->RootItem();
+
+  while (searchItem != rootItem)
   {
-    parentIndex = GetIndexByItem(start->m_parentItem, model);
-  }
-  else
-  {
-    return parentIndex;
+    resultItem = GetFirstInstanceLikeItem(searchItem->NextSibblingItem());
+    if (nullptr != resultItem) break;
+
+    //no next closest label instance on this level -> check for closest before
+    resultItem = GetFirstInstanceLikeItem(searchItem->PrevSibblingItem());
+    if (nullptr != resultItem) break;
+
+    //no closest label instance before current on this level -> moeve one level up
+    searchItem = searchItem->ParentItem();
   }
 
-  return model->index(start->Row(), 0, parentIndex);
+  if (nullptr == resultItem)
+    return QModelIndex();
+
+  return GetIndexByItem(resultItem, this);
 }
 
-QmitkMultiLabelSegTreeItem* GetGroupItem(QmitkMultiLabelTreeModel::SpatialGroupIndexType groupIndex, QmitkMultiLabelSegTreeItem* root)
-{
-  if (nullptr != root && groupIndex < root->m_childItems.size())
-  {
-    return root->m_childItems[groupIndex];
-  }
+///** Returns the index to the next node in the tree that behaves like an instance (label node with only one instance
+//or instance node). If current index is at the end, an invalid index is returned.*/
+//QModelIndex QmitkMultiLabelTreeModel::PrevLabelInstanceIndex(const QModelIndex& currentIndex) const;
 
-  return nullptr;
-}
-
-QmitkMultiLabelSegTreeItem* GetInstanceItem(QmitkMultiLabelTreeModel::LabelValueType labelValue, QmitkMultiLabelSegTreeItem* root)
-{
-  QmitkMultiLabelSegTreeItem* result = nullptr;
-
-  for (auto item : root->m_childItems)
-  {
-    result = GetInstanceItem(labelValue, item);
-    if (nullptr != result) return result;
-  }
-
-  if (root->m_ItemType == QmitkMultiLabelSegTreeItem::ItemType::Instance && root->GetLabelValue() == labelValue)
-  {
-    return root;
-  }
-
-  return nullptr;
-}
-
-QmitkMultiLabelSegTreeItem* GetLabelItemInGroup(const std::string& labelName, QmitkMultiLabelSegTreeItem * group)
-{
-  if (nullptr != group)
-  {
-    auto predicate = [labelName](const QmitkMultiLabelSegTreeItem* item) { return labelName == item->m_ClassName; };
-    auto finding = std::find_if(group->m_childItems.begin(), group->m_childItems.end(), predicate);
-    if (group->m_childItems.end() != finding)
-    {
-      return *finding;
-    }
-  }
-
-  return nullptr;
-}
 
 Qt::ItemFlags QmitkMultiLabelTreeModel::flags(const QModelIndex &index) const
 {
@@ -415,7 +538,9 @@ Qt::ItemFlags QmitkMultiLabelTreeModel::flags(const QModelIndex &index) const
 
   if (TableColumns::NAME_COL != index.column())
   {
-    if (item->HandleAsInstance())
+    if (item->HandleAsInstance() &&
+      ((TableColumns::VISIBLE_COL == index.column() && m_AllowVisibilityModification) ||
+       (TableColumns::LOCKED_COL == index.column() && m_AllowLockModification)))
     {
       return Qt::ItemIsEnabled | Qt::ItemIsEditable;
     }
@@ -638,10 +763,21 @@ void QmitkMultiLabelTreeModel::OnLabelAdded(LabelValueType labelValue)
       }
     }
     else
-    { // instance item was added to existing label item
-      auto labelIndex = GetIndexByItem(instanceItem->ParentItem(), this);
-      this->beginInsertRows(labelIndex, instanceItem->Row(), instanceItem->Row());
-      this->endInsertRows();
+    {
+      if (instanceItem->ParentItem()->m_childItems.size() < 3)
+      { //second instance item was added, so label item will now able to colapse
+        // -> the whole label node has to be updated.
+        auto labelIndex = GetIndexByItem(instanceItem->ParentItem(), this);
+        emit dataChanged(labelIndex, labelIndex);
+      }
+      else
+      {
+        // instance item was added to existing label item with multiple instances
+        //-> just notify the row insertion
+        auto labelIndex = GetIndexByItem(instanceItem->ParentItem(), this);
+        this->beginInsertRows(labelIndex, instanceItem->Row(), instanceItem->Row());
+        this->endInsertRows();
+      }
     }
   }
   else
@@ -685,12 +821,20 @@ void QmitkMultiLabelTreeModel::OnLabelRemoved(LabelValueType labelValue)
 
   auto labelItem = instanceItem->ParentItem();
 
-  if (labelItem->m_childItems.size() > 1)
+  if (labelItem->m_childItems.size() > 2)
   {
     auto labelIndex = GetIndexByItem(labelItem, this);
     this->beginRemoveRows(labelIndex, instanceItem->Row(), instanceItem->Row());
     labelItem->RemoveChild(instanceItem->Row());
     this->endRemoveRows();
+  }
+  else if (labelItem->m_childItems.size() == 2)
+  { //After removal only one label is left -> the whole label node is about to be changed (no instances are shown any more).
+    auto labelIndex = GetIndexByItem(labelItem, this);
+    this->beginRemoveRows(labelIndex, instanceItem->Row(), instanceItem->Row());
+    labelItem->RemoveChild(instanceItem->Row());
+    this->endRemoveRows();
+    emit dataChanged(labelIndex, labelIndex);
   }
   else
   { //was the only instance of the label, therefor also remove the label node from the tree.
@@ -731,3 +875,22 @@ void QmitkMultiLabelTreeModel::OnGroupRemoved(SpatialGroupIndexType groupIndex)
   }
 }
 
+void QmitkMultiLabelTreeModel::SetAllowVisibilityModification(bool vmod)
+{
+  m_AllowVisibilityModification = vmod;
+}
+
+bool QmitkMultiLabelTreeModel::GetAllowVisibilityModification() const
+{
+  return m_AllowVisibilityModification;
+}
+
+void QmitkMultiLabelTreeModel::SetAllowLockModification(bool lmod)
+{
+  m_AllowLockModification = lmod;
+}
+
+bool QmitkMultiLabelTreeModel::GetAllowLockModification() const
+{
+  return m_AllowLockModification;
+}

@@ -23,6 +23,11 @@ found in the LICENSE file.
 class QmitkMultiLabelTreeModel;
 class QStyledItemDelegate;
 
+namespace Ui
+{
+  class QmitkMultiLabelInspector;
+}
+
 /*
 * @brief This is an inspector that offers a simple list view on a data storage.
 */
@@ -32,12 +37,15 @@ class MITKSEGMENTATIONUI_EXPORT QmitkMultiLabelInspector : public QWidget
 
 public:
   QmitkMultiLabelInspector(QWidget* parent = nullptr);
+  ~QmitkMultiLabelInspector();
 
   bool GetMultiSelectionMode() const;
 
   bool GetAllowVisibilityModification() const;
   bool GetAllowLockModification() const;
+  bool GetAllowLabelModification() const;
 
+  using LabelValueType = mitk::LabelSetImage::LabelValueType;
   using LabelValueVectorType = mitk::LabelSetImage::LabelValueVectorType;
 
   /**
@@ -51,6 +59,7 @@ public:
   is not over a label (instance item), the method will return a null pointer.*/
   mitk::Label* GetCurrentLabel() const;
 
+
 Q_SIGNALS:
   /**
   * @brief A signal that will be emitted if the selected labels change.
@@ -59,16 +68,23 @@ Q_SIGNALS:
   */
   void CurrentSelectionChanged(LabelValueVectorType labels) const;
 
-  void GoToLabel(mitk::LabelSetImage::LabelValueType label, const mitk::Point3D&) const;
+  void GoToLabel(LabelValueType label, const mitk::Point3D&) const;
 
 public Q_SLOTS:
 
   /**
-  * @brief Transform a list label values into a model selection and set this as a new selection of the view
-  *
-  * @param selectedNodes A list of data nodes that should be newly selected.
+  * @brief Transform a list label values into the new selection of the inspector.
+  * @param selectedNodes A list of selected label values.
+  * @remark Using this method to select labels will not trigger the CurrentSelectionChanged signal. Observers
+  * should regard that to avoid signal loops.
   */
   void SetSelectedLabels(const LabelValueVectorType& selectedLabels);
+  /**
+  * @brief The passed label will be used as new selection in the widget
+  * @param selectedLabel Value of the selected label.
+  * @remark Using this method to select labels will not trigger the CurrentSelectionChanged signal. Observers
+  * should regard that to avoid signal loops.
+  */
   void SetSelectedLabel(mitk::LabelSetImage::LabelValueType selectedLabel);
 
   /**
@@ -82,6 +98,38 @@ public Q_SLOTS:
 
   void SetAllowVisibilityModification(bool vmod);
   void SetAllowLockModification(bool lmod);
+  void SetAllowLabelModification(bool labelMod);
+
+  void SetDefaultLabelNaming(bool defaultLabelNaming);
+
+  /** Adds an instance of the same label/class like the label instance
+  * returned by GetCurrentLabel() to the segmentation. This new label
+  * instance is returned by the function. If the inspector has no current label,
+  * no new instance will be generated and nullptr will be returned.
+  * @remark The new label instance is a clone of current label instance. Therefore
+  * all properties but the LabelValue will be the same.
+  * @pre AllowLabeModification must be set to true.*/
+  mitk::Label* AddNewLabelInstance();
+
+  /** Adds a new label to the segmentation. Depending on the settings the name of
+  * the label will be either default generated or the rename delegate will be used.
+  * @pre AllowLabeModification must be set to true.*/
+  mitk::Label* AddNewLabel();
+
+  /** Removes the first currently selected label of the segmentation. If no label is selected
+  * nothing will happen.
+  * @pre AllowLabeModification must be set to true.*/
+  void RemoveLabel();
+
+  /** Adds a new group with a new label to segmentation.
+  * @pre AllowLabeModification must be set to true.*/
+  mitk::Label* AddNewGroup();
+
+  /** Removes the group of the first currently selected label of the segmentation. If no label is selected
+  * nothing will happen.
+  * @pre AllowLabeModification must be set to true.*/
+  void RemoveGroup();
+
 
 protected:
   void Initialize();
@@ -95,20 +143,16 @@ protected:
   QStyledItemDelegate* m_ColorItemDelegate;
   QStyledItemDelegate* m_VisibilityItemDelegate;
 
-  Ui_QmitkMultiLabelInspector m_Controls;
+  Ui::QmitkMultiLabelInspector* m_Controls;
 
   LabelValueVectorType GetSelectedLabelsFromSelectionModel() const;
   void UpdateSelectionModel(const LabelValueVectorType& selectedLabels);
 
-  bool m_ShowVisibility = true;
-  bool m_ShowLock = true;
-  bool m_ShowOther = false;
+  /** Helper that returns the label object (if multiple labels are selected the first).*/
+  mitk::Label* GetFirstSelectedLabelObject() const;
 
-  /** Indicates if the context menu allows changes in visiblity.
-      Visiblity includes also color*/
-  bool m_AllowVisibilityModification = true;
-  bool m_AllowLockModification = true;
-  bool m_AllowLabelModification = false;
+  mitk::Label* AddNewLabelInternal(const mitk::LabelSetImage::SpatialGroupIndexType& containingGroup);
+
 
 private Q_SLOTS:
   /**
@@ -121,15 +165,15 @@ private Q_SLOTS:
   * @param selected	The newly selected items.
   * @param deselected	The newly deselected items.
   */
-  void ChangeModelSelection(const QItemSelection& selected, const QItemSelection& deselected);
+  void OnChangeModelSelection(const QItemSelection& selected, const QItemSelection& deselected);
 
   void OnContextMenuRequested(const QPoint&);
 
+  void OnAddLabelInstance(bool);
   void OnRemoveLabels(bool);
   void OnEraseLabels(bool);
   void OnMergeLabels(bool);
 
-  void OnRemoveLabel(bool);
   void OnRenameLabel(bool);
   void OnEraseLabel(bool);
 
@@ -146,8 +190,22 @@ private Q_SLOTS:
   void WaitCursorOff() const;
   void RestoreOverrideCursor() const;
 
-  void PrepareGoToLabel(mitk::Label::PixelType labelID) const;
+  void PrepareGoToLabel(LabelValueType labelID) const;
 
+private:
+  bool m_ShowVisibility = true;
+  bool m_ShowLock = true;
+  bool m_ShowOther = false;
+
+  /** Indicates if the context menu allows changes in visiblity.
+      Visiblity includes also color*/
+  bool m_AllowVisibilityModification = true;
+  bool m_AllowLockModification = true;
+  bool m_AllowLabelModification = false;
+
+  bool m_DefaultLabelNaming = true;
+
+  bool m_ModelManipulationOngoing = false;
 };
 
 #endif // QMITKDATASTORAGELISTINSPECTOR_H

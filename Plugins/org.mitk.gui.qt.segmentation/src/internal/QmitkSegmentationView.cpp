@@ -38,7 +38,7 @@ found in the LICENSE file.
 #include <QmitkRenderWindow.h>
 #include <QmitkStaticDynamicSegmentationDialog.h>
 #include <QmitkNewSegmentationDialog.h>
-#include <QmitkMultiLabelInspector.h>
+#include <QmitkMultiLabelManager.h>
 
 // us
 #include <usModuleResource.h>
@@ -590,9 +590,6 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_Controls->referenceNodeSelector->SetAutoSelectNewNodes(true);
    m_Controls->workingNodeSelector->SetAutoSelectNewNodes(true);
 
-   m_Inspector = new QmitkMultiLabelInspector(parent);
-   m_Controls->verticalLayout->addWidget(m_Inspector);
-
    this->UpdateGUI();
 }
 
@@ -688,6 +685,7 @@ void QmitkSegmentationView::OnPreferencesChanged(const mitk::IPreferences* prefs
   if (nullptr != m_Controls)
   {
     m_Controls->labelsWidget->SetDefaultLabelNaming(m_DefaultLabelNaming);
+    m_Controls->multiLabelWidget->SetDefaultLabelNaming(m_DefaultLabelNaming);
 
     bool slimView = prefs->GetBool("slim view", false);
     m_Controls->toolSelectionBox2D->SetShowNames(!slimView);
@@ -765,8 +763,6 @@ void QmitkSegmentationView::EstablishLabelSetConnection()
     mitk::Label::PixelType>(m_Controls->labelSetWidget, &QmitkLabelSetWidget::SelectLabelByPixelValue);
   workingImage->AfterChangeLayerEvent += mitk::MessageDelegate<QmitkSegmentationView>(
     this, &QmitkSegmentationView::UpdateGUI);
-  workingImage->GetActiveLabelSet()->ActiveLabelEvent += mitk::MessageDelegate1<QmitkMultiLabelInspector,
-    mitk::Label::PixelType>(m_Inspector, &QmitkMultiLabelInspector::SetSelectedLabel);
 }
 
 void QmitkSegmentationView::LooseLabelSetConnection()
@@ -1041,7 +1037,7 @@ void QmitkSegmentationView::ValidateSelectionInput()
     if (numberOfLabels > 1)
       m_Controls->slicesInterpolator->setEnabled(true);
   }
-    m_Inspector->SetMultiLabelSegmentation(dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData()));
+    m_Controls->multiLabelWidget->SetMultiLabelSegmentation(dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData()));
 
   toolSelectionBoxesEnabled &= numberOfLabels > 1;
 

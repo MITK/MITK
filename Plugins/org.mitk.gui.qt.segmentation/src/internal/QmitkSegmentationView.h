@@ -18,7 +18,6 @@ found in the LICENSE file.
 #include <QmitkAbstractView.h>
 #include <mitkIRenderWindowPartListener.h>
 
-class QmitkMultiLabelInspector;
 /**
 * @brief The segmentation view provides a set of tool to use different segmentation algorithms.
 *        It provides two selection widgets to load an image node and a segmentation node
@@ -185,8 +184,6 @@ private:
   bool m_DefaultLabelNaming;
 
   bool m_SelectionChangeIsAlreadyBeingHandled;
-
-  QmitkMultiLabelInspector* m_Inspector;
 };
 
 #endif

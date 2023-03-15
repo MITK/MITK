@@ -81,6 +81,16 @@ namespace mitk
      */
     void RemoveLabels(const LabelValueVectorType& vectorOfLabelPixelValues);
 
+    /**
+     * @brief Removes a complete spatial group with all its labels.
+     * @remark with removing a spatial group all spatial groups with greater index will be reindexed to
+     * close the gap. So externaly stored spatial group indeces may become invalid.
+     * @param spatial group index of the spatial group that should be removed. If the spatial group does not exist, an
+     * exception will be raised.
+     * @pre spatial group index must be valid.
+     */
+    void RemoveSpatialGroup(SpatialGroupIndexType spatielGroup);
+
     //future declaration (T28524) currently conflicted with old declaration
     ///**
     //  * \brief  Returns true if the value exists in the MultiLabelSegmentation instance*/

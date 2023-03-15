@@ -289,7 +289,7 @@ void QmitkLabelSetWidget::OnRemoveLabel(bool /*value*/)
   if (answerButton == QMessageBox::Yes)
   {
     this->WaitCursorOn();
-    GetWorkingImage()->RemoveLabel(pixelValue, GetWorkingImage()->GetActiveLayer());
+    GetWorkingImage()->RemoveLabel(pixelValue);
     this->WaitCursorOff();
   }
 
@@ -392,7 +392,7 @@ void QmitkLabelSetWidget::OnRemoveLabels(bool /*value*/)
     }
 
     this->WaitCursorOn();
-    GetWorkingImage()->RemoveLabels(VectorOfLablePixelValues, GetWorkingImage()->GetActiveLayer());
+    GetWorkingImage()->RemoveLabels(VectorOfLablePixelValues);
     this->WaitCursorOff();
   }
 

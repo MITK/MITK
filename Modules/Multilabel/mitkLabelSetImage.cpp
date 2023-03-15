@@ -251,6 +251,38 @@ void mitk::LabelSetImage::RemoveLayer()
   this->Modified();
 }
 
+void mitk::LabelSetImage::RemoveSpatialGroup(SpatialGroupIndexType indexToDelete)
+{
+  const auto activeIndex = GetActiveLayer();
+
+  // remove all observers from active label set
+  GetLabelSet(indexToDelete)->RemoveAllObservers();
+
+  // set the active layer to one below, if exists.
+  if (activeIndex>indexToDelete)
+  {
+    SetActiveLayer(activeIndex - 1);
+  }
+  else if (activeIndex==indexToDelete)
+  {
+    // we are deleting layer zero, it should not be copied back into the vector
+    m_activeLayerInvalid = true;
+  }
+
+  // remove labelset and image data
+  m_LabelSetContainer.erase(m_LabelSetContainer.begin() + indexToDelete);
+  m_LayerContainer.erase(m_LayerContainer.begin() + indexToDelete);
+
+  if (indexToDelete == activeIndex)
+  { //enforces the new active layer to be set and copied
+    auto newActiveIndex = indexToDelete < GetNumberOfLayers() ? indexToDelete : GetNumberOfLayers() - 1;
+    this->SetActiveLayer(newActiveIndex);
+  }
+
+  this->OnGroupRemoved(indexToDelete);
+  this->Modified();
+}
+
 mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::GetUsedLabelValues() const
 {
   LabelValueVectorType result = { this->GetExteriorLabel()->GetValue() };
@@ -1038,7 +1070,7 @@ void mitk::LabelSetImage::OnGroupModified(SpatialGroupIndexType groupIndex)
 
 void mitk::LabelSetImage::OnGroupRemoved(SpatialGroupIndexType groupIndex)
 {
-  m_GroupToLabelMap.erase(groupIndex);
+  this->ReinitMaps();
   this->m_GroupRemovedMessage.Send(groupIndex);
 }
 

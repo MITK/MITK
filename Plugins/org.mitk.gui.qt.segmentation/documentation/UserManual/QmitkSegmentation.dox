@@ -393,6 +393,31 @@ Remark: The tool assumes that you have a Python3 environment with nnUNet (pip) i
     current parameters will neither be checked against the existing cache nor a segmentation be loaded from it when Preview is clicked.
     -# You may always clear all the cached segmentations by clicking "Clear Cache" button.
 
+
+\subsection org_mitk_views_segmentationTotalSegmentator TotalSegmentator Tool
+
+\imageMacro{QmitkSegmentation_nnUnetTool.png,"TotalSegmentator tool",10.00}
+
+This tool provides a GUI to the deep learning-based segmentation algorithm called the TotalSegmentator. With this tool, you can get a segmentation mask predicted for 104 classes in CT images, loaded in MITK. 
+For a detailed explanation on tasks and supported classes etc., please refer to https://github.com/wasserth/TotalSegmentator <br>
+The tool assumes that you have Python3 installed & available on your machine. We recommend you to install TotalSegmentator via MITK itself.
+For best results, your machine should be also ideally equipped with a CUDA enabled GPU. 
+\imageMacro{QmitkSegmentation_TotalsegmentatorTool.png, "TotalSegmentator Settings",10}
+
+\subsubsection org_mitk_views_segmentationTotalSegmentatorWorkflow Workflow:
+    -# Install TotalSegmentator: Click "Install TotalSegmentator" to install TotalSegmentator (version: 1.5.3) virtual environment. Make sure you have a working internet connection. This might take a while. This is only a one time job.
+    Once installed, the "Install TotalSegmentator" button is grayed out.
+    -# If system python is not found by MITK then goto "Install Options" & select the "System Python Path" drop-down to see if MITK has automatically detected other Python environments.
+    Click on a fitting base python for TotalSegmentator installation or click "Select" in the dropdown to choose an unlisted python. Note that, while selecting an arbitrary environment folder, only select the base folder, e.g. "/usr/bin/".
+    No need to select all the way until "../usr/bin/python3", for example.
+    -# From the "Tasks" drop-down to select specific available subtasks. Default is "total", for non-specific total segmentation.
+    -# Click on "Run TotalSegmentator" for Preview.
+    -# In the "Advanced" section, you can also activate other options like "Fast" for faster runtime and less memory requirements. Use "Fast" if you only have CPU for inferencing.
+    -# Use "Advanced" > "GPU Id" combobox to change the preferred GPU for inferencing. This is internally equivalent to setting the <b>CUDA_VISIBLE_DEVICES</b> environment variable.
+    -# In case you want to use your own virtual environment containing TotalSegmentator, then goto "Install Options" & check "Use Custom Installation" checkbox. Now, select the environment of your choice using "Custom Env. Path".
+
+
+
 \subsubsection org_mitk_views_segmentationnnUNetToolMisc Miscellaneous:
     -# In case you want to reload/reparse the folders in the "nnUNet Results Folder", eg. after adding new tasks into it, you may do so without reselecting the folder again by clicking the "Refresh Results Folder" button.
     -# The "Advanced" > "GPU Id" combobox lists the Nvidia GPUs available by parsing the <tt>nvidia-smi</tt> utility output. In case your machine has Nvidia CUDA enabled GPUs but the <tt>nvidia-smi</tt> fails for some reason, the "GPU Id" combobox will show no entries.

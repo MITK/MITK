@@ -27,6 +27,7 @@ found in the LICENSE file.
 namespace mitk
 {
   class LabelSetImage;
+  class Label;
 }
 
 namespace Ui
@@ -58,6 +59,8 @@ public:
 
   void SetName(const QString& name);
   void SetColor(const mitk::Color& color);
+
+  static bool DoRenameLabel(const mitk::Label* currentLabel, mitk::LabelSetImage* segmentation, QWidget* parent = nullptr);
 
 private:
   void OnAccept();

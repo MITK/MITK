@@ -1,0 +1,147 @@
+/*============================================================================
+
+The Medical Imaging Interaction Toolkit (MITK)
+
+Copyright (c) German Cancer Research Center (DKFZ)
+All rights reserved.
+
+Use of this source code is governed by a 3-clause BSD license that can be
+found in the LICENSE file.
+
+============================================================================*/
+
+#ifndef QmitkMultiLabelManager_h
+#define QmitkMultiLabelManager_h
+
+#include <MitkSegmentationUIExports.h>
+
+#include <mitkLabelSetImage.h>
+#include <mitkDataNode.h>
+#include <mitkNumericTypes.h>
+
+#include <Qwidget>
+
+class QmitkDataStorageComboBox;
+class QCompleter;
+
+namespace Ui
+{
+  class QmitkMultiLabelManagerControls;
+}
+
+namespace mitk
+{
+  class DataStorage;
+}
+
+class MITKSEGMENTATIONUI_EXPORT QmitkMultiLabelManager : public QWidget
+{
+  Q_OBJECT
+
+public:
+  explicit QmitkMultiLabelManager(QWidget *parent = nullptr);
+  ~QmitkMultiLabelManager() override;
+
+
+  using LabelValueVectorType = mitk::LabelSetImage::LabelValueVectorType;
+
+  /**
+  * @brief Retrieve the currently selected labels (equals the last CurrentSelectionChanged values).
+  */
+  LabelValueVectorType GetSelectedLabels() const;
+
+Q_SIGNALS:
+  /**
+  * @brief A signal that will be emitted if the selected labels change.
+  *
+  * @param labels A list of label values that are now selected.
+  */
+  void CurrentSelectionChanged(LabelValueVectorType labels);
+
+  void GoToLabel(mitk::LabelSetImage::LabelValueType label, const mitk::Point3D&);
+
+public Q_SLOTS:
+
+  /**
+  * @brief Transform a list label values into a model selection and set this as a new selection of the view
+  *
+  * @param selectedNodes A list of data nodes that should be newly selected.
+  */
+  void SetSelectedLabels(const LabelValueVectorType& selectedLabels);
+  void SetSelectedLabel(mitk::LabelSetImage::LabelValueType selectedLabel);
+
+  /**
+  * @brief Sets the segmentation that will be used /monitored by the widget.
+  *
+  * @param segmentation      A pointer to the segmentation to set.
+  */
+  void SetMultiLabelSegmentation(mitk::LabelSetImage* segmentation);
+
+  void SetDataStorage(mitk::DataStorage *storage);
+
+  void UpdateControls();
+
+  virtual void setEnabled(bool enabled);
+
+  QStringList &GetLabelStringList();
+
+  void SetDefaultLabelNaming(bool defaultLabelNaming);
+
+private Q_SLOTS:
+
+  // LabelSet dependent
+
+  void OnRenameLabelShortcutActivated();
+
+  // reaction to "returnPressed" signal from ...
+  void OnSearchLabel();
+  // reaction to the change of labels. If multiple labels are selected, it is ignored.
+  void OnSelectedLabelChanged(LabelValueVectorType labels);
+
+  // LabelSetImage Dependet
+  void OnCreateDetailedSurface(bool);
+  void OnCreateSmoothedSurface(bool);
+  // reaction to the signal "createMask" from QmitkLabelSetTableWidget
+  void OnCreateMask(bool);
+  // reaction to the signal "createCroppedMask" from QmitkLabelSetTableWidget
+  void OnCreateCroppedMask(bool);
+
+  void OnSavePreset();
+  void OnLoadPreset();
+
+  void OnGoToLabel(mitk::LabelSetImage::LabelValueType label, const mitk::Point3D& position);
+
+private:
+  enum TableColumns
+  {
+    NAME_COL = 0,
+    LOCKED_COL,
+    COLOR_COL,
+    VISIBLE_COL
+  };
+
+  void WaitCursorOn();
+
+  void WaitCursorOff();
+
+  void RestoreOverrideCursor();
+
+  void OnThreadedCalculationDone();
+
+  Ui::QmitkMultiLabelManagerControls* m_Controls;
+
+  QCompleter *m_Completer;
+
+  QStringList m_OrganColors;
+
+  QStringList m_LabelStringList;
+
+  bool m_ProcessingManualSelection;
+
+  mitk::LabelSetImage::Pointer m_Segmentation;
+  mitk::DataNode::Pointer m_SegmentationNode;
+  mitk::DataStorage* m_DataStorage;
+
+};
+
+#endif

@@ -29,6 +29,7 @@ set(CPP_FILES
   Qmitk/QmitkSimpleLabelSetListWidget.cpp
   Qmitk/QmitkSegmentationTaskListWidget.cpp
   Qmitk/QmitkMultiLabelInspector.cpp
+  Qmitk/QmitkMultiLabelManager.cpp
   Qmitk/QmitkMultiLabelTreeModel.cpp
   Qmitk/QmitkMultiLabelTreeView.cpp
   Qmitk/QmitkLabelColorItemDelegate.cpp
@@ -74,6 +75,7 @@ set(MOC_H_FILES
   Qmitk/QmitkSimpleLabelSetListWidget.h
   Qmitk/QmitkSegmentationTaskListWidget.h
   Qmitk/QmitkMultiLabelInspector.h
+  Qmitk/QmitkMultiLabelManager.h
   Qmitk/QmitkMultiLabelTreeModel.h
   Qmitk/QmitkMultiLabelTreeView.h
   Qmitk/QmitkLabelColorItemDelegate.h
@@ -97,6 +99,7 @@ set(UI_FILES
   Qmitk/QmitkEditableContourToolGUIControls.ui
   Qmitk/QmitkSegmentationTaskListWidget.ui
   Qmitk/QmitkMultiLabelInspectorControls.ui
+  Qmitk/QmitkMultiLabelManagerControls.ui
   SegmentationUtilities/QmitkBooleanOperationsWidgetControls.ui
   SegmentationUtilities/QmitkContourModelToImageWidgetControls.ui
   SegmentationUtilities/QmitkImageMaskingWidgetControls.ui

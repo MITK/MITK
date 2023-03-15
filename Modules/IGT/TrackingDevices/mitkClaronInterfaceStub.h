@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkClaronInterfaceStub_h
-#define mitkClaronInterfaceStub_h
+#ifndef mitkClaronInterface_h // Must be equal to include guard in mitkClaronInterface.h
+#define mitkClaronInterface_h
 
 #include <vector>
 #include <string>

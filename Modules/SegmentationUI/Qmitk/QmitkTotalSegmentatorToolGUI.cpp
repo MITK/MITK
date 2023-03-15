@@ -190,6 +190,7 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
     this->WriteStatusMessage(QString("<b>STATUS: </b><i>Starting Segmentation task... This might take a while.</i>"));
     tool->UpdatePreview();
     m_Controls.previewButton->setEnabled(true);
+    m_FirstPreviewComputation = false;
   }
   catch (const std::exception &e)
   {
@@ -385,7 +386,7 @@ QString QmitkTotalSegmentatorToolGUI::GetExactPythonPath(const QString &pyEnv)
   }
 #else
   isPythonExists = QFile::exists(fullPath + QDir::separator() + QString("python3"));
-  else if (!isPythonExists && !(fullPath.endsWith("bin", Qt::CaseInsensitive) ||
+  if (!isPythonExists && !(fullPath.endsWith("bin", Qt::CaseInsensitive) ||
                             fullPath.endsWith("bin/", Qt::CaseInsensitive)))
   {
     fullPath += QDir::separator() + QString("bin");

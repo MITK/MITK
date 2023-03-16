@@ -10,6 +10,12 @@
 #include <QSettings>
 #include <QStandardPaths>
 
+/**
+ * @brief Installer class for TotalSegmentator Tool.
+ * Class specifies the virtual environment name, install version, packages required to pip install
+ * and implements SetupVirtualEnv method.
+ * 
+ */
 class QmitkTotalSegmentatorToolInstaller : public QmitkSetupVirtualEnvUtil
 {
 public:
@@ -26,6 +32,11 @@ public:
   QString GetVirtualEnvPath() override;
 };
 
+/**
+  \ingroup org_mitk_gui_qt_interactivesegmentation_internal
+  \brief GUI for mitk::TotalSegmentatorTool.
+  \sa mitk::
+*/
 class MITKSEGMENTATIONUI_EXPORT QmitkTotalSegmentatorToolGUI : public QmitkMultiLabelSegWithPreviewToolGUIBase
 {
   Q_OBJECT
@@ -123,11 +134,19 @@ protected:
    */
   unsigned int FetchSelectedGPUFromUI();
 
-  bool SetUpTotalSegmentator(const QString &);
-  bool SetUpTotalSegmentatorWIN(const QString &);
-
+  /**
+   * @brief Get the virtual env path from UI combobox removing any 
+   * extra special characters.
+   * 
+   * @return QString 
+   */
   QString GetPythonPathFromUI(const QString &);
 
+  /**
+   * @brief Get the Exact Python Path for any OS
+   * from the virtual environment path.
+   * @return QString 
+   */
   QString GetExactPythonPath(const QString &);
 
   /**

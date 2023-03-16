@@ -293,21 +293,21 @@ mitk::SliceNavigationController* QmitkMxNMultiWidget::GetTimeNavigationControlle
   return m_TimeNavigationController;
 }
 
-void QmitkMxNMultiWidget::AddPlanesToDataStorage()
+void QmitkMxNMultiWidget::EnableCrosshair()
 {
   auto renderWindowWidgets = this->GetRenderWindowWidgets();
   for (const auto& renderWindowWidget : renderWindowWidgets)
   {
-    renderWindowWidget.second->AddPlanesToDataStorage();
+    renderWindowWidget.second->EnableCrosshair();
   }
 }
 
-void QmitkMxNMultiWidget::RemovePlanesFromDataStorage()
+void QmitkMxNMultiWidget::DisableCrosshair()
 {
   auto renderWindowWidgets = this->GetRenderWindowWidgets();
   for (const auto& renderWindowWidget : renderWindowWidgets)
   {
-    renderWindowWidget.second->RemovePlanesFromDataStorage();
+    renderWindowWidget.second->DisableCrosshair();
   }
 }
 

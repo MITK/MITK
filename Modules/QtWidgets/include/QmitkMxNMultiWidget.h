@@ -91,8 +91,8 @@ public:
 
   mitk::SliceNavigationController* GetTimeNavigationController();
 
-  void AddPlanesToDataStorage();
-  void RemovePlanesFromDataStorage();
+  void EnableCrosshair();
+  void DisableCrosshair();
 
 public Q_SLOTS:
 

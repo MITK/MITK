@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QMITKSIMPLEEXAMPLEVIEW_H_INCLUDED
-#define _QMITKSIMPLEEXAMPLEVIEW_H_INCLUDED
+#ifndef QmitkSimpleExampleView_h
+#define QmitkSimpleExampleView_h
 
 #include <QmitkAbstractView.h>
 #include <mitkIRenderWindowPartListener.h>
@@ -102,4 +102,4 @@ private:
   QString m_PNGExtension = "PNG File (*.png)";
   QString m_JPGExtension = "JPEG File (*.jpg)";
 };
-#endif // _QMITKSIMPLEEXAMPLEVIEW_H_INCLUDED
+#endif

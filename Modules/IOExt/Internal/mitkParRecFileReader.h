@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef PARRECFILEREADER_H_HEADER_INCLUDED_C1F48A22
-#define PARRECFILEREADER_H_HEADER_INCLUDED_C1F48A22
+#ifndef mitkParRecFileReader_h
+#define mitkParRecFileReader_h
 
 #include "mitkCommon.h"
 #include "mitkFileReader.h"
@@ -64,4 +64,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* PARRECFILEREADER_H_HEADER_INCLUDED_C1F48A22 */
+#endif

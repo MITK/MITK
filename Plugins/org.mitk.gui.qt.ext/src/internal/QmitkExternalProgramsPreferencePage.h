@@ -13,7 +13,6 @@ found in the LICENSE file.
 #ifndef QmitkExternalProgramsPreferencePage_h
 #define QmitkExternalProgramsPreferencePage_h
 
-#include <berryIPreferences.h>
 #include <berryIQtPreferencePage.h>
 #include <QProcess>
 #include <QScopedPointer>
@@ -49,7 +48,6 @@ private slots:
   void OnGnuplotProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
 private:
-  berry::IPreferences::Pointer m_Preferences;
   QScopedPointer<Ui::QmitkExternalProgramsPreferencePage> m_Ui;
   QWidget* m_Control;
 

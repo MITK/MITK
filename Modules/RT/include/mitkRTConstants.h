@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_RT_CONSTANTS_H_
-#define _MITK_RT_CONSTANTS_H_
+#ifndef mitkRTConstants_h
+#define mitkRTConstants_h
 
 #include <string>
 

@@ -23,8 +23,6 @@ class QmitkDirectoryListWidget;
 class QmitkFileListWidget;
 class ctkDirectoryButton;
 
-class berryIPreferences;
-
 /**
  * \class MatchPointBrowserPreferencesPage
  * \brief Preference page for the MatchPoint Browser plugin
@@ -84,11 +82,9 @@ protected:
     QCheckBox*                m_LoadFromApplicationDir;
     QCheckBox*                m_LoadFromAutoLoadPathDir;
 
-    berry::IPreferences::Pointer m_BrowserPreferencesNode;
-
 private:
 
-    QString ConvertToString(const QStringList& list);
+    std::string ConvertToString(const QStringList& list);
 };
 
 #endif // COMMANDLINEMODULESPREFERENCESPAGE_H

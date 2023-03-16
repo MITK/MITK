@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKBASERENDERER_H
-#define MITKBASERENDERER_H
+#ifndef mitkBaseRenderer_h
+#define mitkBaseRenderer_h
 
 #include <mitkDataStorage.h>
 #include <mitkPlaneGeometry.h>
@@ -66,17 +66,6 @@ namespace mitk
     {
       Standard2D = 1,
       Standard3D = 2
-    };
-
-    /**
-     * \brief Defines which view direction should be rendered.
-     */
-    enum class ViewDirection
-    {
-      AXIAL = 0,
-      SAGITTAL,
-      CORONAL,
-      THREE_D
     };
 
     static BaseRenderer* GetInstance(vtkRenderWindow* renderWindow);
@@ -479,4 +468,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif // MITKBASERENDERER_H
+#endif

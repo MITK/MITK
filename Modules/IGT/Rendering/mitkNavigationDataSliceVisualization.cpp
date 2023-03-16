@@ -92,17 +92,17 @@ void mitk::NavigationDataSliceVisualization::GenerateData()
 
     if (Axial == m_ViewDirection)
     {
-      snc->SetViewDirection(mitk::SliceNavigationController::Axial);
+      snc->SetViewDirection(mitk::AnatomicalPlane::Axial);
       snc->SelectSliceByPoint(slicePosition);
     }
     else if (Sagittal == m_ViewDirection)
     {
-      snc->SetViewDirection(mitk::SliceNavigationController::Sagittal);
+      snc->SetViewDirection(mitk::AnatomicalPlane::Sagittal);
       snc->SelectSliceByPoint(slicePosition);
     }
     else if (Coronal == m_ViewDirection)
     {
-      snc->SetViewDirection(mitk::SliceNavigationController::Coronal);
+      snc->SetViewDirection(mitk::AnatomicalPlane::Coronal);
       snc->SelectSliceByPoint(slicePosition);
     }
     else if (AxialOblique == m_ViewDirection || SagittalOblique == m_ViewDirection)

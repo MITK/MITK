@@ -72,4 +72,4 @@ namespace mitk
   };
 }
 
-#endif //mitkLibSVMClassifier_h
+#endif

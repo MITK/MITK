@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATASTORAGESELECTIONHISTORYINSPECTOR_H
-#define QMITKDATASTORAGESELECTIONHISTORYINSPECTOR_H
+#ifndef QmitkDataStorageSelectionHistoryInspector_h
+#define QmitkDataStorageSelectionHistoryInspector_h
 
 #include <MitkQtWidgetsExports.h>
 
@@ -53,4 +53,4 @@ protected:
   QmitkSimpleTextOverlayWidget* m_Overlay;
 };
 
-#endif // QMITKDATASTORAGESELECTIONHISTORYINSPECTOR_H
+#endif

@@ -38,4 +38,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif //mitkPolhemusTrackerTypeInformation_h
+#endif

@@ -72,5 +72,4 @@ private:
 
 };
 
-#endif // mitkQMAPAlgorithmModel_h
-
+#endif

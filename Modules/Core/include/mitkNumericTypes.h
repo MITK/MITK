@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKNUMERICTYPES_H_
-#define MITKNUMERICTYPES_H_
+#ifndef mitkNumericTypes_h
+#define mitkNumericTypes_h
 
 #include "mitkAffineTransform3D.h"
 #include "mitkEqual.h"
@@ -25,4 +25,4 @@ found in the LICENSE file.
 // calls to these functions shall be removed in future bugsquashings so that this include can be removed.
 #include "mitkVectorDeprecated.h"
 
-#endif /* MITKNUMERICTYPES_H_ */
+#endif

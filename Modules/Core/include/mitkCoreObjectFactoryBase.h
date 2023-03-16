@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef COREOBJECTFACTORYBASE_H_INCLUDED
-#define COREOBJECTFACTORYBASE_H_INCLUDED
+#ifndef mitkCoreObjectFactoryBase_h
+#define mitkCoreObjectFactoryBase_h
 
 // the mbilog header is necessary for CMake test drivers.
 // Since the EXTRA_INCLUDE parameter of CREATE_TEST_SOURCELIST only

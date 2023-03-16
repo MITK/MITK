@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKEnhancedPointSetVtkMapper3D_H_HEADER_INCLUDED_C1907273
-#define MITKEnhancedPointSetVtkMapper3D_H_HEADER_INCLUDED_C1907273
+#ifndef mitkEnhancedPointSetVtkMapper3D_h
+#define mitkEnhancedPointSetVtkMapper3D_h
 
 #include "MitkMapperExtExports.h"
 #include "mitkBaseRenderer.h"
@@ -116,4 +116,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif /* MITKEnhancedPointSetVtkMapper3D_H_HEADER_INCLUDED_C1907273 */
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKLEGACYFILEREADERSERVICE_H
-#define MITKLEGACYFILEREADERSERVICE_H
+#ifndef mitkLegacyFileReaderService_h
+#define mitkLegacyFileReaderService_h
 
 #include <mitkAbstractFileReader.h>
 
@@ -41,4 +41,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKLEGACYFILEREADERSERVICE_H */
+#endif

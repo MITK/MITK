@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKCHANNELDESCRIPTOR_H
-#define MITKCHANNELDESCRIPTOR_H
+#ifndef mitkChannelDescriptor_h
+#define mitkChannelDescriptor_h
 
 #include <mitkPixelType.h>
 #include <string>
@@ -73,4 +73,4 @@ namespace mitk
   };
 
 } // end namespace mitk
-#endif // MITKCHANNELDESCRIPTOR_H
+#endif

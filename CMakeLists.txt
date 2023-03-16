@@ -37,7 +37,7 @@ if(MITK_USE_SUPERBUILD)
   set(MITK_SOURCE_DIR ${PROJECT_SOURCE_DIR})
   set(MITK_BINARY_DIR ${PROJECT_BINARY_DIR})
 else()
-  project(MITK VERSION 2022.10.00)
+  project(MITK VERSION 2022.10.99)
   include_directories(SYSTEM ${MITK_SUPERBUILD_BINARY_DIR})
 endif()
 
@@ -959,14 +959,6 @@ endif()
 #-----------------------------------------------------------------------------
 
 if(BUILD_TESTING)
-  #[[ See T27701
-  # Initial cache for ProjectTemplate and PluginGenerator tests
-  configure_file(
-     CMake/mitkTestInitialCache.txt.in
-     ${MITK_BINARY_DIR}/mitkTestInitialCache.txt
-     @ONLY
-  )]]
-
   # Configuration for the CMake-generated test driver
   set(CMAKE_TESTDRIVER_EXTRA_INCLUDES "#include <stdexcept>")
   set(CMAKE_TESTDRIVER_BEFORE_TESTMAIN "

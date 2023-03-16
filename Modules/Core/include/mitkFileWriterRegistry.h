@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef FileWriterRegistry_H_HEADER_INCLUDED_C1E7E521
-#define FileWriterRegistry_H_HEADER_INCLUDED_C1E7E521
+#ifndef mitkFileWriterRegistry_h
+#define mitkFileWriterRegistry_h
 
 #include <MitkCoreExports.h>
 
@@ -71,4 +71,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* FileWriterRegistry_H_HEADER_INCLUDED_C1E7E521 */
+#endif

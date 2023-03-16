@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef QmitkIGTCommonHelper_H
-#define QmitkIGTCommonHelper_H
+#ifndef QmitkIGTCommonHelper_h
+#define QmitkIGTCommonHelper_h
 
 #include "MitkIGTUIExports.h"
 #include <QString>

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef LayoutAnnotationRenderer_H
-#define LayoutAnnotationRenderer_H
+#ifndef mitkLayoutAnnotationRenderer_h
+#define mitkLayoutAnnotationRenderer_h
 
 #include "MitkAnnotationExports.h"
 #include "mitkAbstractAnnotationRenderer.h"
@@ -100,4 +100,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif // LayoutAnnotationRenderer_H
+#endif

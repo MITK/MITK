@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef SUBIMAGESELECTOR_H_HEADER_INCLUDED_C1E4F463
-#define SUBIMAGESELECTOR_H_HEADER_INCLUDED_C1E4F463
+#ifndef mitkSubImageSelector_h
+#define mitkSubImageSelector_h
 
 #include "mitkBaseData.h"
 #include "mitkImageDataItem.h"
@@ -56,4 +56,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* SUBIMAGESELECTOR_H_HEADER_INCLUDED_C1E4F463 */
+#endif

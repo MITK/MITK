@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkGIFFirstNumericOrderStatistics_h
-#define mitkGIFFirstNumericOrderStatistics_h
+#ifndef mitkGIFFirstOrderNumericStatistics_h
+#define mitkGIFFirstOrderNumericStatistics_h
 
 #include <mitkAbstractGlobalImageFeature.h>
 #include <mitkBaseData.h>
@@ -143,4 +143,4 @@ namespace mitk
     FeatureListType DoCalculateFeatures(const Image* image, const Image* mask) override;
   };
 }
-#endif //mitkGIFFirstNumericOrderStatistics_h
+#endif

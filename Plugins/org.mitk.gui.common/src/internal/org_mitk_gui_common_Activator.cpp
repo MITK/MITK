@@ -12,6 +12,10 @@ found in the LICENSE file.
 
 #include "org_mitk_gui_common_Activator.h"
 
+#include <usModuleInitialization.h>
+
+US_INITIALIZE_MODULE
+
 namespace mitk {
 
 ctkPluginContext* org_mitk_gui_common_Activator::m_Context = nullptr;

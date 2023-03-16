@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKNODEDETAILSDIALOG_H
-#define QMITKNODEDETAILSDIALOG_H
+#ifndef QmitkNodeDetailsDialog_h
+#define QmitkNodeDetailsDialog_h
 
 #include <mitkDataNode.h>
 
@@ -53,4 +53,4 @@ private:
 
 };
 
-#endif // QMITKNODEDETAILSDIALOG_H
+#endif

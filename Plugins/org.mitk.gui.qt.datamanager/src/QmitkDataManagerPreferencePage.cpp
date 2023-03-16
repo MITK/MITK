@@ -18,8 +18,18 @@ found in the LICENSE file.
 #include <QFormLayout>
 #include <QCheckBox>
 
-#include <berryIPreferencesService.h>
-#include <berryPlatform.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
+
+namespace
+{
+  mitk::IPreferences* GetPreferences()
+  {
+    auto* preferencesService = mitk::CoreServices::GetPreferencesService();
+    return preferencesService->GetSystemPreferences()->Node(QmitkDataManagerView::VIEW_ID.toStdString());
+  }
+}
 
 QmitkDataManagerPreferencePage::QmitkDataManagerPreferencePage()
   : m_MainControl(nullptr)
@@ -34,10 +44,6 @@ void QmitkDataManagerPreferencePage::Init(berry::IWorkbench::Pointer )
 
 void QmitkDataManagerPreferencePage::CreateQtControl(QWidget* parent)
 {
-  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
-
-  m_DataManagerPreferencesNode = prefService->GetSystemPreferences()->Node(QmitkDataManagerView::VIEW_ID);
-
   m_MainControl = new QWidget(parent);
   m_EnableSingleEditing = new QCheckBox;
   m_PlaceNewNodesOnTop = new QCheckBox;
@@ -64,11 +70,13 @@ QWidget* QmitkDataManagerPreferencePage::GetQtControl() const
 
 bool QmitkDataManagerPreferencePage::PerformOk()
 {
-  m_DataManagerPreferencesNode->PutBool("Single click property editing", m_EnableSingleEditing->isChecked());
-  m_DataManagerPreferencesNode->PutBool("Place new nodes on top", m_PlaceNewNodesOnTop->isChecked());
-  m_DataManagerPreferencesNode->PutBool("Show helper objects", m_ShowHelperObjects->isChecked());
-  m_DataManagerPreferencesNode->PutBool("Show nodes containing no data", m_ShowNodesContainingNoData->isChecked());
-  m_DataManagerPreferencesNode->PutBool("Allow changing of parent node", m_AllowParentChange->isChecked());
+  auto* prefs = GetPreferences();
+
+  prefs->PutBool("Single click property editing", m_EnableSingleEditing->isChecked());
+  prefs->PutBool("Place new nodes on top", m_PlaceNewNodesOnTop->isChecked());
+  prefs->PutBool("Show helper objects", m_ShowHelperObjects->isChecked());
+  prefs->PutBool("Show nodes containing no data", m_ShowNodesContainingNoData->isChecked());
+  prefs->PutBool("Allow changing of parent node", m_AllowParentChange->isChecked());
 
   return true;
 }
@@ -80,9 +88,11 @@ void QmitkDataManagerPreferencePage::PerformCancel()
 
 void QmitkDataManagerPreferencePage::Update()
 {
-  m_EnableSingleEditing->setChecked(m_DataManagerPreferencesNode->GetBool("Single click property editing", true));
-  m_PlaceNewNodesOnTop->setChecked(m_DataManagerPreferencesNode->GetBool("Place new nodes on top", true));
-  m_ShowHelperObjects->setChecked(m_DataManagerPreferencesNode->GetBool("Show helper objects", false));
-  m_ShowNodesContainingNoData->setChecked(m_DataManagerPreferencesNode->GetBool("Show nodes containing no data", false));
-  m_AllowParentChange->setChecked(m_DataManagerPreferencesNode->GetBool("Allow changing of parent node", false));
+  auto* prefs = GetPreferences();
+
+  m_EnableSingleEditing->setChecked(prefs->GetBool("Single click property editing", true));
+  m_PlaceNewNodesOnTop->setChecked(prefs->GetBool("Place new nodes on top", true));
+  m_ShowHelperObjects->setChecked(prefs->GetBool("Show helper objects", false));
+  m_ShowNodesContainingNoData->setChecked(prefs->GetBool("Show nodes containing no data", false));
+  m_AllowParentChange->setChecked(prefs->GetBool("Allow changing of parent node", false));
 }

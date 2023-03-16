@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef MITKLookupTablePROPERTY_H_HEADER_INCLUDED_C10EEAA8
-#define MITKLookupTablePROPERTY_H_HEADER_INCLUDED_C10EEAA8
+#ifndef mitkLookupTableProperty_h
+#define mitkLookupTableProperty_h
 
 #include "mitkBaseProperty.h"
 #include "mitkLookupTable.h"
@@ -81,4 +81,4 @@ namespace mitk
 #endif
 } // namespace mitk
 
-#endif /* MITKLookupTablePROPERTY_H_HEADER_INCLUDED_C10EEAA8 */
+#endif

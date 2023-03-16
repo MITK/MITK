@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkSegWithPreviewToolGUIBase_h_Included
-#define QmitkSegWithPreviewToolGUIBase_h_Included
+#ifndef QmitkSegWithPreviewToolGUIBase_h
+#define QmitkSegWithPreviewToolGUIBase_h
 
 #include "QmitkToolGUI.h"
 
@@ -25,7 +25,7 @@ class QBoxLayout;
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
-  \brief GUI base clase for tools derived from mitk::AutoSegmentationTool.
+  \brief GUI base clase for tools derived from mitk::SegWithPreviewTool.
 */
 class MITKSEGMENTATIONUI_EXPORT QmitkSegWithPreviewToolGUIBase : public QmitkToolGUI
 {

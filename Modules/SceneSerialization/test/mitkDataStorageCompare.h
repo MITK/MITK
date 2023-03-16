@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkDataStorageCompare_h_included
-#define mitkDataStorageCompare_h_included
+#ifndef mitkDataStorageCompare_h
+#define mitkDataStorageCompare_h
 
 #include "mitkDataStorage.h"
 

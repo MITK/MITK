@@ -132,7 +132,18 @@ namespace mitk
   {
     if (AbstractFileIO::GetWriterConfidenceLevel() == Unsupported)
       return Unsupported;
-    const auto *input = static_cast<const Image *>(this->GetInput());
+
+    //Fix to ensure T29391. Can be removed as soon as T28524 is solved
+    //and the new MultiLabelSegmentation class is in place, as
+    //segmentations won't be confused with simple images anymore.
+    std::string className = this->GetInput()->GetNameOfClass();
+    if (className == "LabelSetImage")
+    {
+      // We cannot write a null object, DUH!
+      return IFileWriter::Unsupported;
+    }
+
+    const auto *input = dynamic_cast<const Image *>(this->GetInput());
     if (input->GetDimension() == 3)
       return Supported;
     else if (input->GetDimension() < 3)

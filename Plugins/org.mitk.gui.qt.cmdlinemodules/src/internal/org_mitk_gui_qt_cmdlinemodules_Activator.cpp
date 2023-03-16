@@ -15,6 +15,10 @@ found in the LICENSE file.
 #include "CommandLineModulesView.h"
 #include "CommandLineModulesPreferencesPage.h"
 
+#include <usModuleInitialization.h>
+
+US_INITIALIZE_MODULE
+
 namespace mitk {
 
 void org_mitk_gui_qt_cmdlinemodules_Activator::start(ctkPluginContext* context)

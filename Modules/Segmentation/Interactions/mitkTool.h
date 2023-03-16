@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkTool_h_Included
-#define mitkTool_h_Included
+#ifndef mitkTool_h
+#define mitkTool_h
 
 #include "itkObjectFactoryBase.h"
 #include "itkVersion.h"

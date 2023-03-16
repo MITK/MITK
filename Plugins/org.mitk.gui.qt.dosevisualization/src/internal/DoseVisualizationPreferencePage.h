@@ -15,7 +15,6 @@ found in the LICENSE file.
 #define __DOSE_VISUALIZATION_PREFERENCE_PAGE_H
 
 #include "berryIQtPreferencePage.h"
-#include "berryIPreferences.h"
 
 #include "ui_DoseVisualizationPreferencePageControls.h"
 
@@ -100,8 +99,6 @@ protected:
 
   QWidget                 *m_MainControl;
   Ui::DoseVisualizationPreferencePageControls* m_Controls;
-
-  berry::IPreferences::Pointer m_DoseVisNode;
 
   typedef mitk::PresetMapType PresetMapType;
   PresetMapType m_Presets;

@@ -10,12 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKRENDERWINDOWUTILITYWIDGET_H
-#define QMITKRENDERWINDOWUTILITYWIDGET_H
+#ifndef QmitkRenderWindowUtilityWidget_h
+#define QmitkRenderWindowUtilityWidget_h
 
 // qt widgets module
 #include "MitkQtWidgetsExports.h"
-#include "QmitkSliderNavigatorWidget.h"
+#include "QmitkSliceNavigationWidget.h"
 #include "QmitkStepperAdapter.h"
 #include "QmitkRenderWindow.h"
 #include "QmitkRenderWindowContextDataStorageInspector.h"
@@ -59,7 +59,7 @@ private:
   mitk::DataStorage* m_DataStorage;
 
   QmitkRenderWindowContextDataStorageInspector* m_RenderWindowInspector;
-  QmitkSliderNavigatorWidget* m_SliceNavigator;
+  QmitkSliceNavigationWidget* m_SliceNavigationWidget;
   QmitkStepperAdapter* m_StepperAdapter;
   std::unique_ptr<mitk::RenderWindowViewDirectionController> m_RenderWindowViewDirectionController;
   QComboBox* m_ViewDirectionSelector;
@@ -67,4 +67,4 @@ private:
   void ChangeViewDirection(const QString& viewDirection);
 };
 
-#endif // QMITKRENDERWINDOWUTILITYWIDGET_H
+#endif

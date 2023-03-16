@@ -10,51 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-/**
-* \brief Describes the geometry of a plane object
-*
-* Describes a two-dimensional manifold, i.e., to put it simply,
-* an object that can be described using a 2D coordinate-system.
-*
-* PlaneGeometry can map points between 3D world coordinates
-* (in mm) and the described 2D coordinate-system (in mm) by first projecting
-* the 3D point onto the 2D manifold and then calculating the 2D-coordinates
-* (in mm). These 2D-mm-coordinates can be further converted into
-* 2D-unit-coordinates (e.g., pixels), giving a parameter representation of
-* the object with parameter values inside a rectangle
-* (e.g., [0,0]..[width, height]), which is the bounding box (bounding range
-* in z-direction always [0]..[1]).
-*
-* A PlaneGeometry describes the 2D representation within a 3D object (derived from BaseGeometry). For example,
-* a single CT-image (slice) is 2D in the sense that you can access the
-* pixels using 2D-coordinates, but is also 3D, as the pixels are really
-* voxels, thus have an extension (thickness) in the 3rd dimension.
-*
-*
-* Optionally, a reference BaseGeometry can be specified, which usually would
-* be the geometry associated with the underlying dataset. This is currently
-* used for calculating the intersection of inclined / rotated planes
-* (represented as PlaneGeometry) with the bounding box of the associated
-* BaseGeometry.
-*
-* \warning The PlaneGeometry are not necessarily up-to-date and not even
-* initialized. As described in the previous paragraph, one of the
-* Generate-/Copy-/UpdateOutputInformation methods have to initialize it.
-* mitk::BaseData::GetPlaneGeometry() makes sure, that the PlaneGeometry is
-* up-to-date before returning it (by setting the update extent appropriately
-* and calling UpdateOutputInformation).
-*
-* Rule: everything is in mm (or ms for temporal information) if not
-* stated otherwise.
-* \ingroup Geometry
-*/
+#ifndef mitkPlaneGeometry_h
+#define mitkPlaneGeometry_h
 
-#ifndef PLANEGEOMETRY_H_HEADER_INCLUDED_C1C68A2C
-#define PLANEGEOMETRY_H_HEADER_INCLUDED_C1C68A2C
-
-#include "mitkBaseGeometry.h"
-#include "mitkRestorePlanePositionOperation.h"
 #include <MitkCoreExports.h>
+
+#include <mitkAnatomicalPlanes.h>
+#include <mitkBaseGeometry.h>
+#include <mitkRestorePlanePositionOperation.h>
 
 #include <vnl/vnl_cross.h>
 
@@ -63,6 +26,45 @@ namespace mitk
   template <class TCoordRep, unsigned int NPointDimension>
   class Line;
   typedef Line<ScalarType, 3> Line3D;
+
+  /**
+   * \brief Describes the geometry of a plane object
+   *
+   * Describes a two-dimensional manifold, i.e., to put it simply,
+   * an object that can be described using a 2D coordinate-system.
+   *
+   * PlaneGeometry can map points between 3D world coordinates
+   * (in mm) and the described 2D coordinate-system (in mm) by first projecting
+   * the 3D point onto the 2D manifold and then calculating the 2D-coordinates
+   * (in mm). These 2D-mm-coordinates can be further converted into
+   * 2D-unit-coordinates (e.g., pixels), giving a parameter representation of
+   * the object with parameter values inside a rectangle
+   * (e.g., [0,0]..[width, height]), which is the bounding box (bounding range
+   * in z-direction always [0]..[1]).
+   *
+   * A PlaneGeometry describes the 2D representation within a 3D object (derived from BaseGeometry). For example,
+   * a single CT-image (slice) is 2D in the sense that you can access the
+   * pixels using 2D-coordinates, but is also 3D, as the pixels are really
+   * voxels, thus have an extension (thickness) in the 3rd dimension.
+   *
+   *
+   * Optionally, a reference BaseGeometry can be specified, which usually would
+   * be the geometry associated with the underlying dataset. This is currently
+   * used for calculating the intersection of inclined / rotated planes
+   * (represented as PlaneGeometry) with the bounding box of the associated
+   * BaseGeometry.
+   *
+   * \warning The PlaneGeometry are not necessarily up-to-date and not even
+   * initialized. As described in the previous paragraph, one of the
+   * Generate-/Copy-/UpdateOutputInformation methods have to initialize it.
+   * mitk::BaseData::GetPlaneGeometry() makes sure, that the PlaneGeometry is
+   * up-to-date before returning it (by setting the update extent appropriately
+   * and calling UpdateOutputInformation).
+   *
+   * Rule: everything is in mm (or ms for temporal information) if not
+   * stated otherwise.
+   * \ingroup Geometry
+   */
 
   class PlaneGeometry;
   /** \deprecatedSince{2014_10} This class is deprecated. Please use PlaneGeometry instead. */
@@ -81,14 +83,6 @@ namespace mitk
     /** Method for creation through the object factory. */
     itkFactorylessNewMacro(Self);
     itkCloneMacro(Self);
-
-      enum PlaneOrientation {
-        Axial,
-        Sagittal,
-        Coronal,
-        None     // This defines the PlaneGeometry for the 3D renderWindow which
-        // curiously also needs a PlaneGeometry. This should be reconsidered some time.
-      };
 
     virtual void IndexToWorld(const Point2D &pt_units, Point2D &pt_mm) const;
 
@@ -127,7 +121,7 @@ namespace mitk
     virtual void WorldToIndex(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
 
     /**
-    * \brief Initialize a plane with orientation \a planeorientation
+    * \brief Initialize a plane with orientation \a AnatomicalPlane
     * (default: axial) with respect to \a BaseGeometry (default: identity).
     * Spacing also taken from \a BaseGeometry.
     *
@@ -144,32 +138,32 @@ namespace mitk
     * \endcode
     */
     virtual void InitializeStandardPlane(const BaseGeometry *geometry3D,
-                                         PlaneOrientation planeorientation = Axial,
+                                         AnatomicalPlane planeorientation = AnatomicalPlane::Axial,
                                          ScalarType zPosition = 0,
                                          bool frontside = true,
                                          bool rotated = false,
                                          bool top = true);
 
     /**
-    * \brief Initialize a plane with orientation \a planeorientation
+    * \brief Initialize a plane with orientation \a AnatomicalPlane
     * (default: axial) with respect to \a BaseGeometry (default: identity).
     * Spacing also taken from \a BaseGeometry.
     *
     * \param geometry3D
     * \param top if \a true, create plane at top, otherwise at bottom
-    * (for PlaneOrientation Axial, for other plane locations respectively)
+    * (for AnatomicalPlane Axial, for other plane locations respectively)
     * \param planeorientation
     * \param frontside
     * \param rotated
     */
     virtual void InitializeStandardPlane(const BaseGeometry *geometry3D,
                                          bool top,
-                                         PlaneOrientation planeorientation = Axial,
+                                         AnatomicalPlane planeorientation = AnatomicalPlane::Axial,
                                          bool frontside = true,
                                          bool rotated = false);
 
     /**
-    * \brief Initialize a plane with orientation \a planeorientation
+    * \brief Initialize a plane with orientation \a AnatomicalPlane
     * (default: axial) with respect to \a transform (default: identity)
     * given width and height in units.
     *
@@ -189,21 +183,21 @@ namespace mitk
     virtual void InitializeStandardPlane(ScalarType width,
                                          ScalarType height,
                                          const AffineTransform3D *transform = nullptr,
-                                         PlaneOrientation planeorientation = Axial,
+                                         AnatomicalPlane planeorientation = AnatomicalPlane::Axial,
                                          ScalarType zPosition = 0,
                                          bool frontside = true,
                                          bool rotated = false,
                                          bool top = true);
 
     /**
-    * \brief Initialize plane with orientation \a planeorientation
+    * \brief Initialize plane with orientation \a AnatomicalPlane
     * (default: axial) given width, height and spacing.
     *
     */
     virtual void InitializeStandardPlane(ScalarType width,
                                          ScalarType height,
                                          const Vector3D &spacing,
-                                         PlaneOrientation planeorientation = Axial,
+                                         AnatomicalPlane planeorientation = AnatomicalPlane::Axial,
                                          ScalarType zPosition = 0,
                                          bool frontside = true,
                                          bool rotated = false,
@@ -611,4 +605,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif /* PLANEGEOMETRY_H_HEADER_INCLUDED_C1C68A2C */
+#endif

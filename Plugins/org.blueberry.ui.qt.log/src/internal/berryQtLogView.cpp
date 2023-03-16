@@ -14,8 +14,6 @@ found in the LICENSE file.
 
 #include "berryQtLogPlugin.h"
 
-#include <berryIPreferencesService.h>
-#include <berryIBerryPreferences.h>
 #include <berryPlatform.h>
 #include <berryPlatformUI.h>
 
@@ -24,15 +22,16 @@ found in the LICENSE file.
 #include <QTimer>
 #include <QClipboard>
 
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
+
 namespace berry {
 
 QtLogView::QtLogView(QWidget *parent)
     : QWidget(parent)
 {
-  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
-  berry::IBerryPreferences::Pointer prefs
-      = (prefService->GetSystemPreferences()->Node("org_blueberry_ui_qt_log"))
-        .Cast<berry::IBerryPreferences>();
+  auto* prefService = berry::Platform::GetPreferencesService();
+  auto* prefs = prefService->GetSystemPreferences()->Node("org_blueberry_ui_qt_log");
 
 
   prefs->PutBool("ShowAdvancedFields", false);
@@ -112,10 +111,8 @@ void QtLogView::on_ShowAdvancedFields_clicked( bool checked )
   ui.tableView->resizeColumnsToContents();
   ui.tableView->setVisible(true);
 
-  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
-  berry::IBerryPreferences::Pointer prefs
-      = (prefService->GetSystemPreferences()->Node("org_blueberry_ui_qt_log"))
-        .Cast<berry::IBerryPreferences>();
+  auto* prefService = berry::Platform::GetPreferencesService();
+  auto* prefs = prefService->GetSystemPreferences()->Node("org_blueberry_ui_qt_log");
 
   prefs->PutBool("ShowAdvancedFields", checked);
   prefs->Flush();
@@ -128,10 +125,8 @@ void QtLogView::on_ShowCategory_clicked( bool checked )
   ui.tableView->resizeColumnsToContents();
   ui.tableView->setVisible(true);
 
-  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
-  berry::IBerryPreferences::Pointer prefs
-      = (prefService->GetSystemPreferences()->Node("org_blueberry_ui_qt_log"))
-        .Cast<berry::IBerryPreferences>();
+  auto* prefService = berry::Platform::GetPreferencesService();
+  auto* prefs = prefService->GetSystemPreferences()->Node("org_blueberry_ui_qt_log");
 
   prefs->PutBool("ShowCategory", checked);
   prefs->Flush();

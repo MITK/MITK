@@ -27,8 +27,6 @@ found in the LICENSE file.
 #include "berryPlatform.h"
 #include "berryPlatformUI.h"
 #include "berryWorkbenchPlugin.h"
-#include "berryIPreferencesService.h"
-#include "berryIPreferences.h"
 #include "berryCommandService.h"
 
 namespace berry {

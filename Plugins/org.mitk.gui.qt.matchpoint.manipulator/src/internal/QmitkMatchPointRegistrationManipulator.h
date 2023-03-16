@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef __Q_MITK_MATCHPOINT_REGISTRATION_MANIPULATOR_H
-#define __Q_MITK_MATCHPOINT_REGISTRATION_MANIPULATOR_H
+#ifndef QmitkMatchPointRegistrationManipulator_h
+#define QmitkMatchPointRegistrationManipulator_h
 
 #include <QmitkAbstractView.h>
 #include <mitkIRenderWindowPartListener.h>
@@ -144,5 +144,4 @@ private:
   static const std::string HelperNodeName;
 };
 
-#endif // MatchPoint_h
-
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIRENDERINGMANAGER_H
-#define MITKIRENDERINGMANAGER_H
+#ifndef mitkIRenderingManager_h
+#define mitkIRenderingManager_h
 
 #include <mitkRenderingManager.h>
 
@@ -141,4 +141,4 @@ namespace mitk {
 MITK_GUI_COMMON_PLUGIN IRenderingManager* MakeRenderingManagerInterface(RenderingManager::Pointer manager);
 }
 
-#endif // MITKIRENDERINGMANAGER_H
+#endif

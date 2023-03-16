@@ -10,15 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKSEGMENTATIONVIEW_H
-#define QMITKSEGMENTATIONVIEW_H
+#ifndef QmitkSegmentationView_h
+#define QmitkSegmentationView_h
 
 #include "ui_QmitkSegmentationViewControls.h"
 
 #include <QmitkAbstractView.h>
 #include <mitkIRenderWindowPartListener.h>
-
-#include <berryIBerryPreferences.h>
 
 #include <mitkSegmentationInteractor.h>
 
@@ -132,7 +130,7 @@ private:
   void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
 
-  void OnPreferencesChanged(const berry::IBerryPreferences* prefs) override;
+  void OnPreferencesChanged(const mitk::IPreferences* prefs) override;
 
   void NodeAdded(const mitk::DataNode* node) override;
 
@@ -203,4 +201,4 @@ private:
   bool m_SelectionChangeIsAlreadyBeingHandled;
 };
 
-#endif // QMITKSEGMENTATIONVIEW_H
+#endif

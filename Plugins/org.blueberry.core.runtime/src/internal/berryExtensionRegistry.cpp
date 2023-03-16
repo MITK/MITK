@@ -27,7 +27,6 @@ found in the LICENSE file.
 #include "berryIExtensionPoint.h"
 #include "berrySimpleExtensionPointFilter.h"
 #include "berryMultiStatus.h"
-#include "berryPlatform.h"
 #include "berryRegistryConstants.h"
 #include "berryRegistryContribution.h"
 #include "berryRegistryContributor.h"

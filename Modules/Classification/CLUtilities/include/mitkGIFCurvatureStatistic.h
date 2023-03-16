@@ -95,4 +95,4 @@ namespace mitk
     FeatureListType DoCalculateFeatures(const Image* image, const Image* mask) override;
   };
 }
-#endif //mitkGIFCurvatureStatistic_h
+#endif

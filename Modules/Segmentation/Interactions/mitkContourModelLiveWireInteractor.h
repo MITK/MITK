@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkContourModelLiveWireInteractor_h_Included
-#define mitkContourModelLiveWireInteractor_h_Included
+#ifndef mitkContourModelLiveWireInteractor_h
+#define mitkContourModelLiveWireInteractor_h
 
 #include "mitkCommon.h"
 #include "mitkContourModelInteractor.h"
@@ -88,4 +88,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif // mitkContourModelLiveWireInteractor_h_Included
+#endif

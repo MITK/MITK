@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef CAMERAVISUALIZATION_H_INCLUDED
-#define CAMERAVISUALIZATION_H_INCLUDED
+#ifndef mitkCameraVisualization_h
+#define mitkCameraVisualization_h
 
 #include "mitkCommon.h"
 #include "mitkNavigationDataToNavigationDataFilter.h"

@@ -151,4 +151,4 @@ inline    itk::Array<double> wrap1d(itk::Array<double> kernel)
 
 }
 
-#endif // mitkConvolutionHelper_h
+#endif

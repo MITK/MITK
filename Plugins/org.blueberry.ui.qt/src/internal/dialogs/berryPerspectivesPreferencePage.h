@@ -65,7 +65,6 @@ private:
   QWidget* pageWidget;
 
   int openPerspMode;
-  SmartPointer<IPreferences> preferences;
   IWorkbench* workbench;
   PerspectiveRegistry* perspRegistry;
 

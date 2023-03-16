@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkSegWithPreviewTool_h_Included
-#define mitkSegWithPreviewTool_h_Included
+#ifndef mitkSegWithPreviewTool_h
+#define mitkSegWithPreviewTool_h
 
 #include "mitkTool.h"
 #include "mitkCommon.h"

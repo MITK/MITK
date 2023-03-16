@@ -87,7 +87,10 @@ unsigned int mitk::SliceNavigationHelper::SelectSliceByPoint(const TimeGeometry*
 }
 
 mitk::TimeGeometry::Pointer mitk::SliceNavigationHelper::CreateOrientedTimeGeometry(const TimeGeometry* timeGeometry,
-  PlaneGeometry::PlaneOrientation planeOrientation, bool top,  bool frontside, bool rotated)
+                                                                                    AnatomicalPlane orientation,
+                                                                                    bool top,
+                                                                                    bool frontside,
+                                                                                    bool rotated)
 {
   if (nullptr == timeGeometry)
   {
@@ -109,7 +112,7 @@ mitk::TimeGeometry::Pointer mitk::SliceNavigationHelper::CreateOrientedTimeGeome
   }
 
   slicedGeometry = SlicedGeometry3D::New();
-  slicedGeometry->InitializePlanes(currentGeometry, planeOrientation, top, frontside, rotated);
+  slicedGeometry->InitializePlanes(currentGeometry, orientation, top, frontside, rotated);
 
   // use the existing time geometry but replace all time steps with the newly created
   // sliced geometry (base geometry), initialized to the desired plane orientation

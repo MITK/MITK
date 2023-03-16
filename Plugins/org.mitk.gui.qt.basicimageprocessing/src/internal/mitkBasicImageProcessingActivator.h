@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKBASICIMAGEPROCESSINGACTIVATOR_H
-#define MITKBASICIMAGEPROCESSINGACTIVATOR_H
+#ifndef mitkBasicImageProcessingActivator_h
+#define mitkBasicImageProcessingActivator_h
 
 #include <ctkPluginActivator.h>
 
@@ -33,4 +33,4 @@ public:
 
 }
 
-#endif // MITKBASICIMAGEPROCESSINGACTIVATOR_H
+#endif

@@ -10,13 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkDiffImageApplier_h_Included
-#define mitkDiffImageApplier_h_Included
+#ifndef mitkDiffImageApplier_h
+#define mitkDiffImageApplier_h
 
 #include "mitkCommon.h"
 #include "mitkImage.h"
 #include "mitkOperationActor.h"
 #include <MitkSegmentationExports.h>
+#include <mitkLabelSetImage.h>
 
 #include <itkImage.h>
 #include <itkObjectFactory.h>
@@ -41,6 +42,8 @@ namespace mitk
     itkCloneMacro(Self);
 
       void ExecuteOperation(Operation *operation) override;
+
+    void SetDestinationLabel(mitk::Label::PixelType);
 
     static DiffImageApplier *GetInstanceForUndo();
 
@@ -73,6 +76,8 @@ namespace mitk
     unsigned int m_TimeStep;
     unsigned int m_Dimension0;
     unsigned int m_Dimension1;
+
+    mitk::Label::PixelType m_DestinationLabel;
 
     double m_Factor;
   };

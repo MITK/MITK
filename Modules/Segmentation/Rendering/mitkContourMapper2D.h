@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITK_CONTOUR_MAPPER_2D_H_
-#define MITK_CONTOUR_MAPPER_2D_H_
+#ifndef mitkContourMapper2D_h
+#define mitkContourMapper2D_h
 
 #include "mitkCommon.h"
 #include "mitkMapper.h"
@@ -57,4 +57,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKContourMapper2D_H_HEADER_INCLUDED */
+#endif

@@ -1,7 +1,7 @@
 /**
 \page NewViewPage Adding a new view to a MITK Plugin
 
-A plugin can bundle several views. If you want to extend an existing plugin, for example created as in \ref NewPluginPage, by an additional view, you only need to adapt a few files.
+A plugin can bundle several views. If you want to extend an existing plugin by an additional view, you only need to adapt a few files.
 This guide will give you a quick overview of what to do. We assume you are adding the view "Useful Functions View" and use default file names and locations (relative to your plugin folder root).
 
 \section NewViewPageFilesToAdd Files to add

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKMULTIWIDGETLAYOUTMANAGER_H
-#define QMITKMULTIWIDGETLAYOUTMANAGER_H
+#ifndef QmitkMultiWidgetLayoutManager_h
+#define QmitkMultiWidgetLayoutManager_h
 
 #include "MitkQtWidgetsExports.h"
 
@@ -124,4 +124,4 @@ private:
 
 };
 
-#endif // QMITKMULTIWIDGETLAYOUTMANAGER_H
+#endif

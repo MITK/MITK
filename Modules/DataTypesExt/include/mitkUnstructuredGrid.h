@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_UNSTRUCTURED_GRID_H_
-#define _MITK_UNSTRUCTURED_GRID_H_
+#ifndef mitkUnstructuredGrid_h
+#define mitkUnstructuredGrid_h
 
 #include "MitkDataTypesExtExports.h"
 #include "itkImageRegion.h"
@@ -102,4 +102,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* _MITK_UNSTRUCTURED_GRID_H_ */
+#endif

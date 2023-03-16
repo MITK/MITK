@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKPATIENTINFOWIDGET_H
-#define QMITKPATIENTINFOWIDGET_H
+#ifndef QmitkPatientInfoWidget_h
+#define QmitkPatientInfoWidget_h
 
 // semantic relations UI module
 #include "MitkSemanticRelationsUIExports.h"
@@ -47,4 +47,4 @@ private:
 
 };
 
-#endif // QMITKPATIENTINFOWIDGET_H
+#endif

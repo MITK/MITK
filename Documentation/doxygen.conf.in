@@ -801,7 +801,6 @@ RECURSIVE              = YES
 # run.
 
 EXCLUDE                = "@MITK_SOURCE_DIR@/Utilities/qtsingleapplication/" \
-                         "@MITK_SOURCE_DIR@/Applications/PluginGenerator/" \
                          "@MITK_SOURCE_DIR@/Modules/CppMicroServices/core/doc/snippets/" \
                          "@MITK_SOURCE_DIR@/Modules/CppMicroServices/core/doc/doxygen/standalone/" \
                          "@MITK_SOURCE_DIR@/Modules/CppMicroServices/core/test/" \

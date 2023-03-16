@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __mitkToFImageRecorderFilter_h
-#define __mitkToFImageRecorderFilter_h
+#ifndef mitkToFImageRecorderFilter_h
+#define mitkToFImageRecorderFilter_h
 
 #include <mitkImageToImageFilter.h>
 #include <MitkToFHardwareExports.h>

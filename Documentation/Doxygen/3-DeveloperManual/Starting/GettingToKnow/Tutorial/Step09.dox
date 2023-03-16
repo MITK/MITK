@@ -7,11 +7,6 @@ application framework (for example the MITK Workbench) consists of several bundl
 resources and program logic. It can also contribute so-called Views to the main application, which provide a specific
 user interface for controlling the bundles functions.
 
-The creation of a MITK plug-in is considerably facilitated by using the MITK PluginGenerator as described in \ref NewPluginPage if you want to add a new view to an existing plugin see \ref NewViewPage.
-
-The mentioned tool was used to create a plug-in called org.mitk.example.gui.regiongrowing.
-Let's first take a look at which files the PluginGenerator has created:
-
 \verbatim
 documentation\doxygen\
   modules.dox......................... Doxygen file for documenting your plug-in

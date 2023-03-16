@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKANNOTATIONPROPERTY_H_HEADER_INCLUDED
-#define MITKANNOTATIONPROPERTY_H_HEADER_INCLUDED
+#ifndef mitkAnnotationProperty_h
+#define mitkAnnotationProperty_h
 
 #include "mitkBaseProperty.h"
 #include "mitkNumericTypes.h"
@@ -76,4 +76,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKANNOTATIONPROPERTY_H_HEADER_INCLUDED */
+#endif

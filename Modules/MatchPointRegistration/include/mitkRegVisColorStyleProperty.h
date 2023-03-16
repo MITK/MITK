@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef _MITK_REG_VIS_COLOR_STYLE_PROPERTY__H_
-#define _MITK_REG_VIS_COLOR_STYLE_PROPERTY__H_
+#ifndef mitkRegVisColorStyleProperty_h
+#define mitkRegVisColorStyleProperty_h
 
 // MITK
 #include <mitkEnumerationProperty.h>

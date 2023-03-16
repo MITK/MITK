@@ -10,12 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKMXNMULTIWIDGETEDITORPREFERENCEPAGE_H
-#define QMITKMXNMULTIWIDGETEDITORPREFERENCEPAGE_H
+#ifndef QmitkMxNMultiWidgetEditorPreferencePage_h
+#define QmitkMxNMultiWidgetEditorPreferencePage_h
 
 #include "ui_QmitkMxNMultiWidgetEditorPreferencePage.h"
 
-#include <berryIPreferences.h>
 #include <berryIQtPreferencePage.h>
 #include <QProcess>
 #include <QScopedPointer>
@@ -50,11 +49,6 @@ public slots:
 protected:
   std::string m_CurrentColormap;
 
-  /**
-   * @brief m_Preferences the berry preferences.
-   */
-  berry::IPreferences::Pointer m_Preferences;
-
 private:
 
   Ui::QmitkMxNMultiWidgetEditorPreferencePage m_Ui;
@@ -62,4 +56,4 @@ private:
 
 };
 
-#endif // QMITKMXNMULTIWIDGETEDITORPREFERENCEPAGE_H
+#endif

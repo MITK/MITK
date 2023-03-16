@@ -23,7 +23,7 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   , m_RenderWindow(renderWindow)
   , m_DataStorage(dataStorage)
   , m_RenderWindowInspector(nullptr)
-  , m_SliceNavigator(nullptr)
+  , m_SliceNavigationWidget(nullptr)
   , m_StepperAdapter(nullptr)
   , m_ViewDirectionSelector(nullptr)
 {
@@ -48,10 +48,10 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   menu->addAction(newAct);
   m_Layout->addWidget(m_MenuBar);
 
-  m_SliceNavigator = new QmitkSliderNavigatorWidget(this);
+  m_SliceNavigationWidget = new QmitkSliceNavigationWidget(this);
   m_StepperAdapter =
-    new QmitkStepperAdapter(m_SliceNavigator, sliceNavigationController->GetSlice(), "sliceNavigator");
-  m_Layout->addWidget(m_SliceNavigator);
+    new QmitkStepperAdapter(m_SliceNavigationWidget, sliceNavigationController->GetSlice());
+  m_Layout->addWidget(m_SliceNavigationWidget);
 
   mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer{ baseRenderer };
   m_RenderWindowViewDirectionController = std::make_unique<mitk::RenderWindowViewDirectionController>();
@@ -65,13 +65,13 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   auto viewDirection = sliceNavigationController->GetDefaultViewDirection();
   switch (viewDirection)
   {
-  case mitk::SliceNavigationController::Axial:
+  case mitk::AnatomicalPlane::Axial:
     m_ViewDirectionSelector->setCurrentIndex(0);
     break;
-  case mitk::SliceNavigationController::Coronal:
+  case mitk::AnatomicalPlane::Coronal:
     m_ViewDirectionSelector->setCurrentIndex(1);
     break;
-  case mitk::SliceNavigationController::Sagittal:
+  case mitk::AnatomicalPlane::Sagittal:
     m_ViewDirectionSelector->setCurrentIndex(2);
     break;
   default:
@@ -86,7 +86,7 @@ QmitkRenderWindowUtilityWidget::~QmitkRenderWindowUtilityWidget()
 
 void QmitkRenderWindowUtilityWidget::SetInvertedSliceNavigation(bool inverted)
 {
-  m_SliceNavigator->SetInverseDirection(inverted);
+  m_SliceNavigationWidget->SetInverseDirection(inverted);
 }
 
 void QmitkRenderWindowUtilityWidget::ChangeViewDirection(const QString& viewDirection)

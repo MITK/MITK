@@ -10,13 +10,14 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKSLICENAVIGATIONCONTROLLER_H
-#define MITKSLICENAVIGATIONCONTROLLER_H
+#ifndef mitkSliceNavigationController_h
+#define mitkSliceNavigationController_h
 
 #include <MitkCoreExports.h>
 
 #include <mitkBaseController.h>
 #include <mitkMessage.h>
+#include <mitkAnatomicalPlanes.h>
 #include <mitkRenderingManager.h>
 #include <mitkRestorePlanePositionOperation.h>
 #include <mitkTimeGeometry.h>
@@ -69,16 +70,16 @@ namespace mitk
    * // Initialization
    * sliceCtrl = mitk::SliceNavigationController::New();
    *
-   * // Tell the navigator the geometry to be sliced (with geometry a
-   * // BaseGeometry::ConstPointer)
+   * // Tell the navigation controller the geometry to be sliced
+   * // (with geometry a BaseGeometry::ConstPointer)
    * sliceCtrl->SetInputWorldTimeGeometry(geometry.GetPointer());
    *
-   * // Tell the navigator in which direction it shall slice the data
-   * sliceCtrl->SetViewDirection(mitk::SliceNavigationController::Axial);
+   * // Tell the navigation controller in which direction it shall slice the data
+   * sliceCtrl->SetViewDirection(mitk::AnatomicalPlane::Axial);
    *
-   * // Connect one or more BaseRenderer to this navigator, i.e.: events sent
-   * // by the navigator when stepping through the slices (e.g. by
-   * // sliceCtrl->GetSlice()->Next()) will be received by the BaseRenderer
+   * // Connect one or more BaseRenderer to this navigation controller, i.e.:
+   * // events sent by the navigation controller when stepping through the slices
+   * // (e.g. by sliceCtrl->GetSlice()->Next()) will be received by the BaseRenderer
    * // (in this example only slice-changes, see also ConnectGeometryTimeEvent
    * // and ConnectGeometryEvents.)
    * sliceCtrl->ConnectGeometrySliceEvent(renderer.GetPointer());
@@ -88,29 +89,28 @@ namespace mitk
    * \endcode
    *
    *
-   * You can connect visible navigators to a SliceNavigationController, e.g., a
-   * QmitkSliderNavigator (for Qt):
+   * You can connect visible navigation widgets to a SliceNavigationController, e.g., a
+   * QmitkSliceNavigationWidget (for Qt):
    *
    * \code
-   * // Create the visible navigator (a slider with a spin-box)
-   * QmitkSliderNavigator* navigator =
-   *   new QmitkSliderNavigator(parent, "slidernavigator");
+   * // Create the visible navigation widget (a slider with a spin-box)
+   * QmitkSliceNavigationWidget* navigationWidget =
+   *   new QmitkSliceNavigationWidget(parent);
    *
-   * // Connect the navigator to the slice-stepper of the
-   * // SliceNavigationController. For initialization (position, minimal and
+   * // Connect the navigation widget to the slice-stepper of the
+   * // SliceNavigationController. For initialization (position, mininal and
    * // maximal values) the values of the SliceNavigationController are used.
-   * // Thus, accessing methods of a navigator is normally not necessary, since
-   * // everything can be set via the (Qt-independent) SliceNavigationController.
+   * // Thus, accessing methods of a navigation widget is normally not necessary,
+   * // since everything can be set via the (Qt-independent) SliceNavigationController.
    * // The QmitkStepperAdapter converts the Qt-signals to Qt-independent
    * // itk-events.
-   * new QmitkStepperAdapter(navigator, sliceCtrl->GetSlice(), "navigatoradaptor");
+   * new QmitkStepperAdapter(navigationWidget, sliceCtrl->GetSlice());
    * \endcode
    *
    * If you do not want that all renderwindows are updated when a new slice is
    * selected, you can use a specific RenderingManager, which updates only those
    * renderwindows that should be updated. This is sometimes useful when a 3D view
    * does not need to be updated when the slices in some 2D views are changed.
-   * QmitkSliderNavigator (for Qt):
    *
    * \code
    * // create a specific RenderingManager
@@ -137,19 +137,6 @@ namespace mitk
     itkNewMacro(Self);
 
     /**
-     * \brief Possible view directions, \a Original will use
-     * the PlaneGeometry instances in a SlicedGeometry3D provided
-     * as input world geometry (by SetInputWorldTimeGeometry).
-     */
-    enum ViewDirection
-    {
-      Axial,
-      Sagittal,
-      Coronal,
-      Original
-    };
-
-    /**
      * \brief Set the input world time geometry out of which the
      * geometries for slicing will be created.
      *
@@ -169,11 +156,11 @@ namespace mitk
      * \brief Set the desired view directions
      *
      * \sa ViewDirection
-     * \sa Update(ViewDirection viewDirection, bool top = true,
+     * \sa Update(AnatomicalPlane viewDirection, bool top = true,
      *     bool frontside = true, bool rotated = false)
      */
-    itkSetEnumMacro(ViewDirection, ViewDirection);
-    itkGetEnumMacro(ViewDirection, ViewDirection);
+    itkSetEnumMacro(ViewDirection, AnatomicalPlane);
+    itkGetEnumMacro(ViewDirection, AnatomicalPlane);
 
     /**
      * \brief Set the default view direction
@@ -182,11 +169,11 @@ namespace mitk
      * default value with SetViewDirectionToDefault()
      *
      * \sa ViewDirection
-     * \sa Update(ViewDirection viewDirection, bool top = true,
+     * \sa Update(AnatomicalPlane viewDirection, bool top = true,
      *     bool frontside = true, bool rotated = false)
      */
-    itkSetEnumMacro(DefaultViewDirection, ViewDirection);
-    itkGetEnumMacro(DefaultViewDirection, ViewDirection);
+    itkSetEnumMacro(DefaultViewDirection, AnatomicalPlane);
+    itkGetEnumMacro(DefaultViewDirection, AnatomicalPlane);
 
     const char *GetViewDirectionAsString() const;
 
@@ -204,7 +191,7 @@ namespace mitk
      * specify the direction/orientation of the created geometry.
      *
      */
-    virtual void Update(ViewDirection viewDirection, bool top = true, bool frontside = true, bool rotated = false);
+    virtual void Update(AnatomicalPlane viewDirection, bool top = true, bool frontside = true, bool rotated = false);
 
     /**
      * \brief Send the created geometry to the connected
@@ -418,8 +405,8 @@ namespace mitk
     TimeGeometry::ConstPointer m_InputWorldTimeGeometry;
     TimeGeometry::Pointer m_CreatedWorldGeometry;
 
-    ViewDirection m_ViewDirection;
-    ViewDirection m_DefaultViewDirection;
+    AnatomicalPlane m_ViewDirection;
+    AnatomicalPlane m_DefaultViewDirection;
 
     RenderingManager::Pointer m_RenderingManager;
 
@@ -436,4 +423,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif // MITKSLICENAVIGATIONCONTROLLER_H
+#endif

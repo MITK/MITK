@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKABSTRACTMULTIWIDGETEDITOR_H
-#define QMITKABSTRACTMULTIWIDGETEDITOR_H
+#ifndef QmitkAbstractMultiWidgetEditor_h
+#define QmitkAbstractMultiWidgetEditor_h
 
 #include <org_mitk_gui_qt_common_Export.h>
 
@@ -58,7 +58,7 @@ public:
   /**
   * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart
   */
-  virtual QmitkRenderWindow* GetQmitkRenderWindow(const mitk::BaseRenderer::ViewDirection& viewDirection) const override;
+  virtual QmitkRenderWindow* GetQmitkRenderWindow(const mitk::AnatomicalPlane& orientation) const override;
   /**
   * @brief Overridden from QmitkAbstractRenderEditor : IRenderWindowPart
   */
@@ -132,4 +132,4 @@ private:
 
 };
 
-#endif // QMITKABSTRACTMULTIWIDGETEDITOR_H
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKRGBTORGBACASTIMAGEFILTER_H_HEADER_INCLUDED
-#define MITKRGBTORGBACASTIMAGEFILTER_H_HEADER_INCLUDED
+#ifndef mitkRGBToRGBACastImageFilter_h
+#define mitkRGBToRGBACastImageFilter_h
 
 #include "mitkImageTimeSelector.h"
 #include "mitkImageToImageFilter.h"
@@ -78,4 +78,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKRGBTORGBACASTIMAGEFILTER_H_HEADER_INCLUDED */
+#endif

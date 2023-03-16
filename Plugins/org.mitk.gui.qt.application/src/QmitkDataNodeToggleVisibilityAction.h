@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATANODETOGGLEVISIBILITYACTION_H
-#define QMITKDATANODETOGGLEVISIBILITYACTION_H
+#ifndef QmitkDataNodeToggleVisibilityAction_h
+#define QmitkDataNodeToggleVisibilityAction_h
 
 #include <org_mitk_gui_qt_application_Export.h>
 
@@ -47,4 +47,4 @@ protected:
 
 };
 
-#endif // QMITKDATANODETOGGLEVISIBILITYACTION_H
+#endif

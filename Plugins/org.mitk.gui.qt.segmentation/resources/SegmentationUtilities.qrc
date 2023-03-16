@@ -6,7 +6,5 @@
      <file>MorphologicalOperations_48x48.png</file>
      <file>SurfaceToImage_48x48.png</file>
      <file>segmentation_utilities.svg</file>
-     <file>BooleanLabelA_32x32.png</file>
-     <file>BooleanLabelB_32x32.png</file>
   </qresource>
 </RCC>

@@ -79,4 +79,4 @@ namespace mitk
     FeatureListType DoCalculateFeatures(const Image* image, const Image* mask) override;
   };
 }
-#endif //mitkGIFImageDescriptionFeatures_h
+#endif

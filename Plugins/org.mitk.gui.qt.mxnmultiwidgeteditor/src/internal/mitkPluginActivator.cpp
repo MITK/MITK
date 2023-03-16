@@ -15,6 +15,10 @@ found in the LICENSE file.
 #include <QmitkMxNMultiWidgetEditor.h>
 #include "QmitkMxNMultiWidgetEditorPreferencePage.h"
 
+#include <usModuleInitialization.h>
+
+US_INITIALIZE_MODULE
+
 namespace mitk
 {
   ctkPluginContext* MxNMultiWidgetActivator::m_Context = nullptr;

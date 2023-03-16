@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKUSTelemedDopplerControls_H_HEADER_INCLUDED_
-#define MITKUSTelemedDopplerControls_H_HEADER_INCLUDED_
+#ifndef mitkUSTelemedDopplerControls_h
+#define mitkUSTelemedDopplerControls_h
 
 #include "mitkUSTelemedSDKHeader.h"
 #include "mitkUSControlInterfaceDoppler.h"
@@ -43,4 +43,4 @@ namespace mitk {
   };
 }
 
-#endif // MITKUSTelemedDopplerControls_H_HEADER_INCLUDED_
+#endif

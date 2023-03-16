@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef __Q_MITK_SLICE_NAVIGATION_LISTENER_H
-#define __Q_MITK_SLICE_NAVIGATION_LISTENER_H
+#ifndef QmitkSliceNavigationListener_h
+#define QmitkSliceNavigationListener_h
 
 #include <mitkTimeGeometry.h>
 #include <mitkPoint.h>
@@ -86,6 +86,7 @@ class MITK_QT_COMMON QmitkSliceNavigationListener : public QObject
   public slots:
     void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart);
     void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart);
+    void RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart);
 
   protected slots:
       /** Overwrite function to implement the behavior on slice/time changes. */
@@ -104,6 +105,8 @@ class MITK_QT_COMMON QmitkSliceNavigationListener : public QObject
     void RemoveObservers(const mitk::SliceNavigationController* deletedSlicer);
     /** Removes all observers of the deletedPart. If null pointer is passed all observers will be removed.*/
     void RemoveAllObservers(mitk::IRenderWindowPart* deletedPart = nullptr);
+
+    bool ObserversInitialized(mitk::SliceNavigationController* controller);
 
     mitk::IRenderWindowPart* m_renderWindowPart;
 
@@ -130,4 +133,3 @@ class MITK_QT_COMMON QmitkSliceNavigationListener : public QObject
   };
 
 #endif
-

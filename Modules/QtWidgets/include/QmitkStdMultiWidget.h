@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKSTDMULTIWIDGET_H
-#define QMITKSTDMULTIWIDGET_H
+#ifndef QmitkStdMultiWidget_h
+#define QmitkStdMultiWidget_h
 
 // qt widgets module
 #include "MitkQtWidgetsExports.h"
@@ -36,7 +36,7 @@ public:
   virtual void InitializeMultiWidget() override;
 
   virtual QmitkRenderWindow* GetRenderWindow(const QString& widgetName) const override;
-  virtual QmitkRenderWindow* GetRenderWindow(const mitk::BaseRenderer::ViewDirection& viewDirection) const override;
+  virtual QmitkRenderWindow* GetRenderWindow(const mitk::AnatomicalPlane& orientation) const override;
 
   /**
    * @brief Set the reference geometry for interaction inside all render windows of the StdMultiWidget.
@@ -166,4 +166,4 @@ private:
 
 };
 
-#endif // QMITKSTDMULTIWIDGET_H
+#endif

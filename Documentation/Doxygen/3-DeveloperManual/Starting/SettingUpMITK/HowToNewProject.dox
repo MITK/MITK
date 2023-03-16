@@ -18,24 +18,8 @@ take a look at \ref TutorialPage.
 
 \section HowToNewProjectGettingStarted Getting Started
 
-To bootstrap your project MITK offers two convenient options:
-
-<ol>
- <li> Use the MITK Plugin Generator, a command line tool used to generate a customized
-      MITK project and/or MITK plug-ins.
- <li> Use the <a href="https://github.com/MITK/MITK-ProjectTemplate">MITK project template</a>
-      as an example project.
-</ol>
-
-Both options will provide you with a project which contains a "superbuild" mechanism
-to automatically download, configure, and build MITK as a dependency of your own project.
-
-The MITK Plugin Generator generates code using the supplied command line arguments,
-whereas the MITK project template needs immediate modifications to customize it to
-your naming schemes. However, the project template will potentially contain more
-code demonstrating features of MITK.
-
-\note Using the MITK Plugin Generator is recommended for beginners.
+Use the <a href="https://github.com/MITK/MITK-ProjectTemplate">MITK project template</a> as an
+example-based project template.
 
 \section HowToNewProjectPrerequisites Prerequisites
 
@@ -49,11 +33,6 @@ yourself. This will be done automatically.
 
 In order to start developing with MITK, you first have to set up the source directory
 for your project.
-
-\subsection HowToNewProjectSourceUsingGenerator Using the MITK Plugin Generator
-
-The usage of the Plugin Generator for creating a new project is described in
-\ref NewPluginWithProject, please have a look there.
 
 \subsection HowToNewProjectSourceUsingTemplate Using the MITK Project Template
 
@@ -149,8 +128,6 @@ of the "D:\AwesomeProject-superbuild\MITK-superbuild\MITK-build\" folder.
 
 \subsection HowToNewProjectCustomizingMITK Customizing MITK
 
-The %CMake scripts from the Plugin Generator of the project template provide some
-handy options which allow you to customize the MITK build used in your project.
 You can either inject an already build MITK to be used by your project or configure
 some MITK options directly in your project's superbuild configuration if MITK is
 going to be build inside your project.
@@ -243,8 +220,7 @@ MyProject-superbuild/MITK-superbuild/MITK-build build directory.
 
 \subsection HowToNewProjectPackaging Packaging
 
-The project template and the generated projects by the Plugin Generator come
-with full packaging support. You can create deployable packages of your project
+You can create deployable packages of your project
 for all supported operating systems my building the PACKAGE target. On Linux,
 this will create a tarball, on MacOS a .dmg file, and on Windows a zipball and
 an NSIS installer (if NSIS is installed and found).

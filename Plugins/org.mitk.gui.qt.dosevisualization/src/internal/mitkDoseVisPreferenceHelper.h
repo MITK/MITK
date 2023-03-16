@@ -11,11 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef __DOSE_VIS_PREFERENCE_HELPER_H
-#define __DOSE_VIS_PREFERENCE_HELPER_H
-
-#include <berryIPreferencesService.h>
-#include <berryPlatform.h>
+#ifndef mitkDoseVisPreferenceHelper_h
+#define mitkDoseVisPreferenceHelper_h
 
 #include "mitkIsoDoseLevelCollections.h"
 

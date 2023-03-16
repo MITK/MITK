@@ -20,34 +20,33 @@ found in the LICENSE file.
 
 #include "internal/org_mitk_gui_qt_application_Activator.h"
 
-#include <berryIPreferencesService.h>
-#include <berryIPreferences.h>
 #include <berryPlatformUI.h>
 
 #include <mitkWorkbenchUtil.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 class QmitkDefaultDropTargetListenerPrivate
 {
 public:
 
-  berry::IPreferences::Pointer GetPreferences() const
+  mitk::IPreferences* GetPreferences() const
   {
-    berry::IPreferencesService* prefService = mitk::PluginActivator::GetInstance()->GetPreferencesService();
-    if (prefService)
-    {
-      return prefService->GetSystemPreferences()->Node("/General");
-    }
-    return berry::IPreferences::Pointer(nullptr);
+    auto* prefService = mitk::CoreServices::GetPreferencesService();
+
+    return prefService != nullptr
+      ? prefService->GetSystemPreferences()->Node("/General")
+      : nullptr;
   }
 
   bool GetOpenEditor() const
   {
-    berry::IPreferences::Pointer prefs = GetPreferences();
-    if(prefs.IsNotNull())
-    {
-      return prefs->GetBool("OpenEditor", true);
-    }
-    return true;
+    auto* prefs = GetPreferences();
+
+    return prefs != nullptr
+      ? prefs->GetBool("OpenEditor", true)
+      : true;
   }
 };
 

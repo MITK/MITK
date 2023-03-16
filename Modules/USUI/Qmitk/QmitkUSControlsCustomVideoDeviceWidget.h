@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkUSControlsCustomVideoDeviceWidget_H
-#define QmitkUSControlsCustomVideoDeviceWidget_H
+#ifndef QmitkUSControlsCustomVideoDeviceWidget_h
+#define QmitkUSControlsCustomVideoDeviceWidget_h
 
 #include "QmitkUSAbstractCustomWidget.h"
 #include "mitkUSVideoDeviceCustomControls.h"
@@ -98,4 +98,4 @@ private:
   mitk::USVideoDeviceCustomControls::Pointer  m_ControlInterface;
 };
 
-#endif // QmitkUSControlsCustomVideoDeviceWidget_H
+#endif

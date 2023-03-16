@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKSEMANTICTYPES_H
-#define MITKSEMANTICTYPES_H
+#ifndef mitkSemanticTypes_h
+#define mitkSemanticTypes_h
 
 #define BOOST_DATE_TIME_NO_LIB
 #if defined(BOOST_ALL_DYN_LINK)
@@ -122,4 +122,4 @@ namespace mitk
   } // namespace SemanticTypes
 } // namespace mitk
 
-#endif // MITKSEMANTICTYPES_H
+#endif

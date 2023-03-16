@@ -142,4 +142,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif /* mitkSurfaceVtkMapper3D_h */
+#endif

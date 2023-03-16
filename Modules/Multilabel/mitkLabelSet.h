@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkLabelSet_H_
-#define __mitkLabelSet_H_
+#ifndef mitkLabelSet_h
+#define mitkLabelSet_h
 
 #include "MitkMultilabelExports.h"
 #include <mitkLookupTable.h>
@@ -236,4 +236,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif // __mitkLabelSet_H_
+#endif

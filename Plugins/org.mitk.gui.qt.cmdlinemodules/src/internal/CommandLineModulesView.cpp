@@ -10,12 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-
-// Blueberry
-#include <berryIPreferences.h>
-#include <berryIPreferencesService.h>
-#include <berryIBerryPreferences.h>
-#include <berryPlatform.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 // Qmitk
 #include "CommandLineModulesView.h"
@@ -149,37 +146,26 @@ void CommandLineModulesView::CreateQtPartControl( QWidget *parent )
 
 
 //-----------------------------------------------------------------------------
-berry::IBerryPreferences::Pointer CommandLineModulesView::RetrievePreferences()
+mitk::IPreferences* CommandLineModulesView::RetrievePreferences() const
 {
-  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
-  assert( prefService );
-
-  QString id = "/" + CommandLineModulesViewConstants::VIEW_ID;
-  berry::IBerryPreferences::Pointer prefs
-      = (prefService->GetSystemPreferences()->Node(id))
-        .Cast<berry::IBerryPreferences>();
-
-  assert( prefs );
-
-  return prefs;
+  return mitk::CoreServices::GetPreferencesService()->GetSystemPreferences();
 }
 
 
 //-----------------------------------------------------------------------------
 void CommandLineModulesView::RetrieveAndStoreTemporaryDirectoryPreferenceValues()
 {
-  berry::IBerryPreferences::Pointer prefs = this->RetrievePreferences();
+  auto* prefs = this->RetrievePreferences();
 
-  QString fallbackTmpDir = QDir::tempPath();
-  m_TemporaryDirectoryName =
-      prefs->Get(CommandLineModulesViewConstants::TEMPORARY_DIRECTORY_NODE_NAME, fallbackTmpDir);
+  const auto fallbackTmpDir = QDir::tempPath().toStdString();
+  m_TemporaryDirectoryName = QString::fromStdString(prefs->Get(CommandLineModulesViewConstants::TEMPORARY_DIRECTORY_NODE_NAME, fallbackTmpDir));
 }
 
 
 //-----------------------------------------------------------------------------
 void CommandLineModulesView::RetrieveAndStoreValidationMode()
 {
-  berry::IBerryPreferences::Pointer prefs = this->RetrievePreferences();
+  auto* prefs = this->RetrievePreferences();
 
   int value = prefs->GetInt(CommandLineModulesViewConstants::XML_VALIDATION_MODE, 2);
   if (value == 0)
@@ -200,11 +186,10 @@ void CommandLineModulesView::RetrieveAndStoreValidationMode()
 //-----------------------------------------------------------------------------
 void CommandLineModulesView::RetrieveAndStorePreferenceValues()
 {
-  berry::IBerryPreferences::Pointer prefs = this->RetrievePreferences();
+  auto* prefs = this->RetrievePreferences();
 
-  QString fallbackHomeDir = QDir::homePath();
-  m_OutputDirectoryName =
-      prefs->Get(CommandLineModulesViewConstants::OUTPUT_DIRECTORY_NODE_NAME, fallbackHomeDir);
+  const auto fallbackHomeDir = QDir::homePath().toStdString();
+  m_OutputDirectoryName = QString::fromStdString(prefs->Get(CommandLineModulesViewConstants::OUTPUT_DIRECTORY_NODE_NAME, fallbackHomeDir));
 
   m_MaximumConcurrentProcesses = prefs->GetInt(CommandLineModulesViewConstants::MAX_CONCURRENT, 4);
 
@@ -242,7 +227,7 @@ void CommandLineModulesView::RetrieveAndStorePreferenceValues()
   QStringList defaultPaths = builder.getDirectoryList();
 
   // We get additional directory paths from preferences.
-  QString pathString = prefs->Get(CommandLineModulesViewConstants::MODULE_DIRECTORIES_NODE_NAME, "");
+  const auto pathString = QString::fromStdString(prefs->Get(CommandLineModulesViewConstants::MODULE_DIRECTORIES_NODE_NAME, ""));
   QStringList additionalPaths = pathString.split(";", QString::SkipEmptyParts);
 
   // Combine the sets of directory paths.
@@ -250,7 +235,7 @@ void CommandLineModulesView::RetrieveAndStorePreferenceValues()
   totalPaths << defaultPaths;
   totalPaths << additionalPaths;
 
-  QString additionalModulesString = prefs->Get(CommandLineModulesViewConstants::MODULE_FILES_NODE_NAME, "");
+  const auto additionalModulesString = QString::fromStdString(prefs->Get(CommandLineModulesViewConstants::MODULE_FILES_NODE_NAME, ""));
   QStringList additionalModules = additionalModulesString.split(";", QString::SkipEmptyParts);
 
   // OnPreferencesChanged can be called for each preference in a dialog box, so
@@ -269,7 +254,7 @@ void CommandLineModulesView::RetrieveAndStorePreferenceValues()
 
 
 //-----------------------------------------------------------------------------
-void CommandLineModulesView::OnPreferencesChanged(const berry::IBerryPreferences* /*prefs*/)
+void CommandLineModulesView::OnPreferencesChanged(const mitk::IPreferences* /*prefs*/)
 {
   this->RetrieveAndStoreTemporaryDirectoryPreferenceValues();
   this->RetrieveAndStoreValidationMode();

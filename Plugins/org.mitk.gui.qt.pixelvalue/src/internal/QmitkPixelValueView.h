@@ -40,6 +40,7 @@ public:
 private:
   void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart) override;
 
   void OnSelectedPositionChanged(const mitk::Point3D& position);
   void OnSelectedTimePointChanged(const mitk::TimePointType& timePoint);

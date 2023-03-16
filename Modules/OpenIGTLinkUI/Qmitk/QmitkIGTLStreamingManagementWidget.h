@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKIGTLStreamingMANAGEMENTWIDGET_H
-#define QMITKIGTLStreamingMANAGEMENTWIDGET_H
+#ifndef QmitkIGTLStreamingManagementWidget_h
+#define QmitkIGTLStreamingManagementWidget_h
 
 //QT headers
 #include <QWidget>

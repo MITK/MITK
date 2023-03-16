@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKCMDLINEMODULEMENUCOMBOBOX_H
-#define QMITKCMDLINEMODULEMENUCOMBOBOX_H
+#ifndef QmitkCmdLineModuleMenuComboBox_h
+#define QmitkCmdLineModuleMenuComboBox_h
 
 #include <QObject>
 #include <QList>
@@ -61,4 +61,4 @@ private:
   ctkCmdLineModuleManager* m_ModuleManager;
 };
 
-#endif // QMITKCMDLINEMODULEMENUCOMBOBOX_H
+#endif

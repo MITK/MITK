@@ -11,11 +11,10 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef __QMITK_NODE_SELECTION_PREFERENCE_PAGE_H
-#define __QMITK_NODE_SELECTION_PREFERENCE_PAGE_H
+#ifndef QmitkNodeSelectionPreferencePage_h
+#define QmitkNodeSelectionPreferencePage_h
 
 #include "berryIQtPreferencePage.h"
-#include "berryIPreferences.h"
 
 #include "mitkDataStorageInspectorGenerator.h"
 

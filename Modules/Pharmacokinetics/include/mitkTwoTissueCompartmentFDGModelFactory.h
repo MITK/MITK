@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef MITKTWOTISSUECOMPARTMENTFDGMODELFACTORY_H
-#define MITKTWOTISSUECOMPARTMENTFDGMODELFACTORY_H
+#ifndef mitkTwoTissueCompartmentFDGModelFactory_h
+#define mitkTwoTissueCompartmentFDGModelFactory_h
 
 #include "mitkConcreteAIFBasedModelFactory.h"
 #include "mitkTwoTissueCompartmentFDGModel.h"
@@ -49,4 +49,4 @@ namespace mitk
   };
 
 }
-#endif // MITKTWOTISSUECOMPARTMENTFDGMODELFACTORY_H
+#endif

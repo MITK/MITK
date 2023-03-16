@@ -95,11 +95,11 @@ namespace mitk
     RenderWindow *GetRenderWindowByName(const std::string &name);
 
     /**
-     * @brief GetRenderWindowByDefaultViewDirection Get a renderWindow by its default viewdirection.
+     * @brief Get a renderWindow by its default view direction.
      * @param viewDirection
      * @return nullptr if not found.
      */
-    RenderWindow *GetRenderWindowByDefaultViewDirection(SliceNavigationController::ViewDirection viewDirection);
+    RenderWindow *GetRenderWindowByDefaultViewDirection(AnatomicalPlane viewDirection);
 
     /**
      * @brief GetRenderWindow Get renderWindow at position 'index'.
@@ -143,4 +143,4 @@ namespace mitk
   };
 }
 
-#endif // namespace mitk
+#endif

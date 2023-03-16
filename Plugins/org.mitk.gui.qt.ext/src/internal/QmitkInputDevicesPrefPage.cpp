@@ -12,8 +12,9 @@ found in the LICENSE file.
 
 #include "QmitkInputDevicesPrefPage.h"
 
-#include <berryIPreferencesService.h>
-#include <berryPlatform.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 #include <QLabel>
 #include <QPushButton>
@@ -28,13 +29,18 @@ found in the LICENSE file.
 
 #include "QmitkCommonExtPlugin.h"
 
+namespace
+{
+  mitk::IPreferences* GetPreferences()
+  {
+    auto* preferencesService = mitk::CoreServices::GetPreferencesService();
+    return preferencesService->GetSystemPreferences()->Node(mitk::CoreExtConstants::INPUTDEVICE_PREFERENCES.toStdString());
+  }
+}
 
 QmitkInputDevicesPrefPage::QmitkInputDevicesPrefPage()
 : m_MainControl(nullptr)
 {
-  // gets the old setting of the preferences and loads them into the preference node
-  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
-  this->m_InputDevicesPrefNode = prefService->GetSystemPreferences()->Node(mitk::CoreExtConstants::INPUTDEVICE_PREFERENCES);
 }
 
 void QmitkInputDevicesPrefPage::Init(berry::IWorkbench::Pointer )
@@ -87,6 +93,7 @@ QWidget* QmitkInputDevicesPrefPage::GetQtControl() const
 
 bool QmitkInputDevicesPrefPage::PerformOk()
 {
+  auto* prefs = GetPreferences();
   bool result = true;
 
   mitk::IInputDeviceRegistry* inputDeviceRegistry = GetInputDeviceRegistry();
@@ -99,24 +106,17 @@ bool QmitkInputDevicesPrefPage::PerformOk()
 
     if(it.value() == mitk::CoreExtConstants::WIIMOTE_XMLATTRIBUTE_NAME)
     {
-      QString headTracking(m_WiiMoteHeadTracking->text());
-      QString surfaceInteraction(m_WiiMoteSurfaceInteraction->text());
+      const auto headTracking(m_WiiMoteHeadTracking->text().toStdString());
+      const auto surfaceInteraction(m_WiiMoteSurfaceInteraction->text().toStdString());
 
-      this->m_InputDevicesPrefNode->PutBool
-        (headTracking, m_WiiMoteHeadTracking->isChecked());
-      this->m_InputDevicesPrefNode->PutBool
-        (surfaceInteraction, m_WiiMoteSurfaceInteraction->isChecked());
+      prefs->PutBool(headTracking, m_WiiMoteHeadTracking->isChecked());
+      prefs->PutBool(surfaceInteraction, m_WiiMoteSurfaceInteraction->isChecked());
 
       // forced flush of the preferences is needed
       // because otherwise the mitk::WiiMoteActivator class
       // cannot distinguish the two different modes without
       // changing the interface for all input devices
-      berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
-
-      if (prefService)
-      {
-        prefService->GetSystemPreferences()->Flush();
-      }
+      prefs->Flush();
     }
 
     if(it.key()->isChecked())
@@ -147,7 +147,7 @@ bool QmitkInputDevicesPrefPage::PerformOk()
 
     if(result)
     {
-      this->m_InputDevicesPrefNode->PutBool(it.value(),it.key()->isChecked());
+      prefs->PutBool(it.value().toStdString(), it.key()->isChecked());
     }
   }
   return result;
@@ -160,17 +160,19 @@ void QmitkInputDevicesPrefPage::PerformCancel()
 
 void QmitkInputDevicesPrefPage::Update()
 {
+  auto* prefs = GetPreferences();
   QHashIterator<QCheckBox*, QString> it(m_InputDevices);
+
   while (it.hasNext())
   {
     it.next();
-    it.key()->setChecked(this->m_InputDevicesPrefNode->GetBool(it.value(), false));
+    it.key()->setChecked(prefs->GetBool(it.value().toStdString(), false));
     if(it.value() == mitk::CoreExtConstants::WIIMOTE_XMLATTRIBUTE_NAME)
     {
       m_WiiMoteHeadTracking->setChecked(
-        this->m_InputDevicesPrefNode->GetBool(mitk::CoreExtConstants::WIIMOTE_HEADTRACKING,false));
+        prefs->GetBool(mitk::CoreExtConstants::WIIMOTE_HEADTRACKING.toStdString(), false));
       m_WiiMoteSurfaceInteraction->setChecked
-        (this->m_InputDevicesPrefNode->GetBool(mitk::CoreExtConstants::WIIMOTE_SURFACEINTERACTION,false));
+        (prefs->GetBool(mitk::CoreExtConstants::WIIMOTE_SURFACEINTERACTION.toStdString(), false));
     }
   }
 }

@@ -77,11 +77,11 @@ void mitk::CrosshairManager::ComputeOrientedTimeGeometries(const TimeGeometry* g
   try
   {
     m_AxialTimeGeometry = SliceNavigationHelper::CreateOrientedTimeGeometry(
-      m_InputTimeGeometry, PlaneGeometry::Axial, false, false, true);
+      m_InputTimeGeometry, AnatomicalPlane::Axial, false, false, true);
     m_CoronalTimeGeometry = SliceNavigationHelper::CreateOrientedTimeGeometry(
-      m_InputTimeGeometry, PlaneGeometry::Coronal, false, true, false);
+      m_InputTimeGeometry, AnatomicalPlane::Coronal, false, true, false);
     m_SagittalTimeGeometry = SliceNavigationHelper::CreateOrientedTimeGeometry(
-      m_InputTimeGeometry, PlaneGeometry::Sagittal, true, true, false);
+      m_InputTimeGeometry, AnatomicalPlane::Sagittal, true, true, false);
   }
   catch (const mitk::Exception& e)
   {
@@ -156,6 +156,35 @@ mitk::Point3D mitk::CrosshairManager::GetCrosshairPosition() const
 
   // return input geometry center point if no intersection point was found
   return point;
+}
+
+void mitk::CrosshairManager::UpdateSlice(const SliceNavigationController* sliceNavigationController)
+{
+  auto viewDirection = sliceNavigationController->GetViewDirection();
+  unsigned int slicePosition = sliceNavigationController->GetSlice()->GetPos();
+  switch (viewDirection)
+  {
+    case AnatomicalPlane::Original:
+      return;
+    case AnatomicalPlane::Axial:
+    {
+      m_AxialSlice = slicePosition;
+      this->UpdatePlaneSlice(m_AxialPlaneNode, m_AxialTimeGeometry, m_AxialSlice);
+      break;
+    }
+    case AnatomicalPlane::Coronal:
+    {
+      m_CoronalSlice = slicePosition;
+      this->UpdatePlaneSlice(m_CoronalPlaneNode, m_CoronalTimeGeometry, m_CoronalSlice);
+      break;
+    }
+    case AnatomicalPlane::Sagittal:
+    {
+      m_SagittalSlice = slicePosition;
+      this->UpdatePlaneSlice(m_SagittalPlaneNode, m_SagittalTimeGeometry, m_SagittalSlice);
+      break;
+    }
+  }
 }
 
 void mitk::CrosshairManager::SetCrosshairVisibility(bool visible)
@@ -242,7 +271,6 @@ void mitk::CrosshairManager::RemovePlanesFromDataStorage()
 
 void mitk::CrosshairManager::InitializePlaneProperties(DataNode::Pointer planeNode, const std::string& planeName)
 {
-  planeNode->GetPropertyList()->SetProperty("layer", mitk::IntProperty::New(1000));
   planeNode->SetProperty("reslice.thickslices", mitk::ResliceMethodProperty::New());
   planeNode->SetProperty("reslice.thickslices.num", mitk::IntProperty::New(5));
   planeNode->SetProperty("Crosshair.Gap Size", mitk::IntProperty::New(32));
@@ -286,6 +314,37 @@ void mitk::CrosshairManager::InitializePlaneData(DataNode::Pointer planeNode, co
   PlaneGeometryData::Pointer planeData = PlaneGeometryData::New();
   planeData->SetPlaneGeometry(slicedGeometry->GetPlaneGeometry(slice));
   planeNode->SetData(planeData);
+  planeNode->SetMapper(mitk::BaseRenderer::Standard2D, mitk::PlaneGeometryDataMapper2D::New());
+}
+
+void mitk::CrosshairManager::UpdatePlaneSlice(DataNode::Pointer planeNode, const TimeGeometry* timeGeometry, unsigned int slice)
+{
+  mitk::PlaneGeometry* planeGeometry = nullptr;
+  // get the currently selected time point
+  auto selectedTimePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+  try
+  {
+    planeGeometry = SliceNavigationHelper::GetCurrentPlaneGeometry(timeGeometry, selectedTimePoint, slice);
+  }
+  catch (const mitk::Exception& e)
+  {
+    MITK_ERROR << "Unable to get plane geometries\n"
+      << "Reason: " << e.GetDescription();
+  }
+
+  if (nullptr == planeGeometry)
+  {
+    return;
+  }
+
+  PlaneGeometryData::Pointer planeData = dynamic_cast<PlaneGeometryData*>(planeNode->GetData());
+  if (nullptr == planeData)
+  {
+    return;
+  }
+
+  planeData->SetPlaneGeometry(planeGeometry);
+  planeNode->SetData(planeData);
 }
 
 void mitk::CrosshairManager::SetCrosshairPosition(const Point3D& selectedPoint,
@@ -293,8 +352,6 @@ void mitk::CrosshairManager::SetCrosshairPosition(const Point3D& selectedPoint,
                                                   const TimeGeometry* timeGeometry,
                                                   unsigned int& slice)
 {
-  PlaneGeometryData::Pointer planeData = PlaneGeometryData::New();
-
   int selectedSlice = -1;
   try
   {
@@ -326,6 +383,12 @@ void mitk::CrosshairManager::SetCrosshairPosition(const Point3D& selectedPoint,
   }
 
   if (nullptr == planeGeometry)
+  {
+    return;
+  }
+
+  PlaneGeometryData::Pointer planeData = dynamic_cast<PlaneGeometryData*>(planeNode->GetData());
+  if (nullptr == planeData)
   {
     return;
   }

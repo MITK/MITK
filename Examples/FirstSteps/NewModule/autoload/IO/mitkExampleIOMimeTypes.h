@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKEXAMPLEIOMIMETYPES_H
-#define MITKEXAMPLEIOMIMETYPES_H
+#ifndef mitkExampleIOMimeTypes_h
+#define mitkExampleIOMimeTypes_h
 
 #include "mitkCustomMimeType.h"
 
@@ -48,4 +48,4 @@ namespace mitk
   };
 }
 
-#endif // MITKEXAMPLEIOMIMETYPES_H
+#endif

@@ -26,12 +26,14 @@ found in the LICENSE file.
 #include "mitkNodePredicateNot.h"
 #include "mitkNodePredicateProperty.h"
 #include "mitkProperties.h"
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 #include <QDir>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QMessageBox>
-#include <berryPlatform.h>
 
 const std::string QmitkSimpleExampleView::VIEW_ID = "org.mitk.views.simpleexample";
 
@@ -79,12 +81,10 @@ void QmitkSimpleExampleView::RenderWindowPartActivated(mitk::IRenderWindowPart *
   }
 
   RenderWindowSelected(m_Controls->renderWindowComboBox->currentText());
-  m_TimeStepper.reset(new QmitkStepperAdapter(m_Controls->sliceNavigatorTime,
-                                              renderWindowPart->GetTimeNavigationController()->GetTime(),
-                                              "sliceNavigatorTimeFromSimpleExample"));
+  m_TimeStepper.reset(new QmitkStepperAdapter(m_Controls->timeSliceNavigationWidget,
+                                              renderWindowPart->GetTimeNavigationController()->GetTime()));
   m_MovieStepper.reset(new QmitkStepperAdapter(m_Controls->movieNavigatorTime,
-                                               renderWindowPart->GetTimeNavigationController()->GetTime(),
-                                               "movieNavigatorTimeFromSimpleExample"));
+                                               renderWindowPart->GetTimeNavigationController()->GetTime()));
 
   m_Parent->setEnabled(true);
 }
@@ -136,10 +136,12 @@ void QmitkSimpleExampleView::InitNavigators()
  */
 QString QmitkSimpleExampleView::GetFFmpegPath() const
 {
-  berry::IPreferences::Pointer preferences =
-    berry::Platform::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.gui.qt.ext.externalprograms");
+  auto* preferences =
+    mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.gui.qt.ext.externalprograms");
 
-  return preferences.IsNotNull() ? preferences->Get("ffmpeg", "") : "";
+  return preferences != nullptr
+    ? QString::fromStdString(preferences->Get("ffmpeg", ""))
+    : QString("");
 }
 
 /**
@@ -410,9 +412,7 @@ void QmitkSimpleExampleView::RenderWindowSelected(const QString &id)
 {
   if (!id.isEmpty())
   {
-    m_SliceStepper.reset(new QmitkStepperAdapter(
-      m_Controls->sliceNavigator,
-      this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetQmitkRenderWindow(id)->GetSliceNavigationController()->GetSlice(),
-      "sliceNavigatorFromSimpleExample"));
+    m_SliceStepper.reset(new QmitkStepperAdapter(m_Controls->sliceNavigationWidget,
+      this->GetRenderWindowPart(mitk::WorkbenchUtil::OPEN)->GetQmitkRenderWindow(id)->GetSliceNavigationController()->GetSlice()));
   }
 }

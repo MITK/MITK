@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef BERRYQMITKPREFERENCESDIALOG_H_
-#define BERRYQMITKPREFERENCESDIALOG_H_
+#ifndef QmitkPreferencesDialog_h
+#define QmitkPreferencesDialog_h
 
 #include <org_mitk_gui_qt_application_Export.h>
 
@@ -38,8 +38,6 @@ public:
 
 protected slots:
 
-  void OnImportButtonClicked();
-  void OnExportButtonClicked();
   void OnDialogAccepted();
   void OnDialogRejected();
 
@@ -61,4 +59,4 @@ protected:
 
 };
 
-#endif /* BERRYQMITKPREFERENCESDIALOG_H_ */
+#endif

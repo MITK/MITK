@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATASTORAGETREEMODELINTERNALITEM_H_
-#define QMITKDATASTORAGETREEMODELINTERNALITEM_H_
+#ifndef QmitkDataStorageTreeModelInternalItem_h
+#define QmitkDataStorageTreeModelInternalItem_h
 
 #include <MitkQtWidgetsExports.h>
 
@@ -94,4 +94,4 @@ found in the LICENSE file.
     mitk::WeakPointer<mitk::DataNode> m_DataNode;
   };
 
-#endif /* QMITKDATASTORAGETREEMODEL_H_ */
+#endif

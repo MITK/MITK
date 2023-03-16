@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATAMANAGERHOTKEYSPREFPAGE_H
-#define QMITKDATAMANAGERHOTKEYSPREFPAGE_H
+#ifndef QmitkDataManagerHotkeysPrefPage_h
+#define QmitkDataManagerHotkeysPrefPage_h
 
 #include <org_mitk_gui_qt_datamanager_Export.h>
 
@@ -55,12 +55,6 @@ public:
 
 protected:
   /**
-  * @brief The node from which the properties are taken (will be catched from the preferences service in ctor)
-  *
-  *
-  */
-  berry::IPreferences::WeakPtr m_DataManagerHotkeysPreferencesNode;
-  /**
   * @brief Maps a label to hotkey lineedit, e.g. "Toggle Visibility of selected nodes" => QmitkHotkeyLineEdit
   *
   *
@@ -70,4 +64,4 @@ protected:
   QWidget* m_MainControl;
 };
 
-#endif // QMITKDATAMANAGERHOTKEYSPREFPAGE_H
+#endif

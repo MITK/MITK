@@ -119,4 +119,4 @@ namespace mitk
     FeatureListType DoCalculateFeatures(const Image* image, const Image* mask) override;
   };
 }
-#endif //mitkGIFVolumetricDensityStatistics_h
+#endif

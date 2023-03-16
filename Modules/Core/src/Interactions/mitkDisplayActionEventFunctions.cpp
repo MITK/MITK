@@ -58,7 +58,7 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::SetC
         return;
       }
 
-      BaseRenderer::GetInstance(sendingRenderer->GetRenderWindow())->GetSliceNavigationController()->SelectSliceByPoint(displayActionEvent->GetPosition());
+      sendingRenderer->GetSliceNavigationController()->SelectSliceByPoint(displayActionEvent->GetPosition());
     }
   };
 
@@ -200,9 +200,8 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Move
       {
         if (BaseRenderer::GetInstance(renderWindow)->GetMapperID() == BaseRenderer::Standard2D)
         {
-          BaseRenderer* currentRenderer = BaseRenderer::GetInstance(renderWindow);
-          currentRenderer->GetCameraController()->MoveBy(displayActionEvent->GetMoveVector());
-          renderingManager->RequestUpdate(currentRenderer->GetRenderWindow());
+          BaseRenderer::GetInstance(renderWindow)->GetCameraController()->MoveBy(displayActionEvent->GetMoveVector());
+          renderingManager->RequestUpdate(renderWindow);
         }
       }
     }
@@ -289,7 +288,7 @@ mitk::StdFunctionCommand::ActionFunction mitk::DisplayActionEventFunctions::Scro
       {
         if (BaseRenderer::GetInstance(renderWindow)->GetMapperID() == BaseRenderer::Standard2D)
         {
-          mitk::SliceNavigationController* sliceNavigationController = BaseRenderer::GetInstance(renderWindow)->GetSliceNavigationController();
+          SliceNavigationController* sliceNavigationController = BaseRenderer::GetInstance(renderWindow)->GetSliceNavigationController();
           if (nullptr == sliceNavigationController)
           {
             return;

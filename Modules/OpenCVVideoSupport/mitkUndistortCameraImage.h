@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkUndistortCameraImage_h
-#define __mitkUndistortCameraImage_h
+#ifndef mitkUndistortCameraImage_h
+#define mitkUndistortCameraImage_h
 
 #include "mitkCommon.h"
 #include <MitkOpenCVVideoSupportExports.h>

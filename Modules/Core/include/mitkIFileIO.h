@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIFILEIO_H
-#define MITKIFILEIO_H
+#ifndef mitkIFileIO_h
+#define mitkIFileIO_h
 
 #include <MitkCoreExports.h>
 #include <mitkMessage.h>
@@ -117,4 +117,4 @@ namespace mitk
   };
 }
 
-#endif // MITKIFILEIO_H
+#endif

@@ -16,14 +16,15 @@ found in the LICENSE file.
 #include "berryStatus.h"
 #include "berryPlatformUI.h"
 #include "berryWorkbenchPlugin.h"
-#include "berryIPreferences.h"
+
+#include <mitkIPreferences.h>
 
 namespace berry {
 
 CommandStateProxy::CommandStateProxy(const SmartPointer<IConfigurationElement>& configurationElement,
                                      const QString& stateAttributeName,
-                                     const SmartPointer<IPreferences>& preferenceStore,
-                                     const QString& preferenceKey)
+                                     mitk::IPreferences* preferenceStore,
+                                     const std::string& preferenceKey)
   : configurationElement(configurationElement)
   , preferenceKey(preferenceKey)
   , preferenceStore(preferenceStore)
@@ -60,8 +61,8 @@ CommandStateProxy::~CommandStateProxy()
   {
     if (PersistentState::Pointer persistableState = state.Cast<PersistentState>())
     {
-      if (persistableState->ShouldPersist() && preferenceStore.IsNotNull()
-          && !preferenceKey.isNull())
+      if (persistableState->ShouldPersist() && preferenceStore != nullptr
+          && !preferenceKey.empty())
       {
         persistableState->Save(preferenceStore, preferenceKey);
       }
@@ -79,15 +80,15 @@ Object::Pointer CommandStateProxy::GetValue() const
   return Object::Pointer(nullptr);
 }
 
-void CommandStateProxy::Load(const SmartPointer<IPreferences>& /*store*/,
-                             const QString& preferenceKey)
+void CommandStateProxy::Load(const mitk::IPreferences* /*store*/,
+                             const std::string& preferenceKey)
 {
   if (LoadState())
   {
     if (PersistentState::Pointer persistableState = state.Cast<PersistentState>())
     {
-      if (persistableState->ShouldPersist() && preferenceStore.IsNotNull()
-          && !preferenceKey.isNull())
+      if (persistableState->ShouldPersist() && preferenceStore != nullptr
+          && !preferenceKey.empty())
       {
       persistableState->Load(preferenceStore, preferenceKey);
       }
@@ -107,8 +108,8 @@ void CommandStateProxy::RemoveListener(IStateListener* listener)
   }
 }
 
-void CommandStateProxy::Save(const SmartPointer<IPreferences>& store,
-                             const QString& preferenceKey)
+void CommandStateProxy::Save(mitk::IPreferences* store,
+                             const std::string& preferenceKey)
 {
   if (LoadState())
   {

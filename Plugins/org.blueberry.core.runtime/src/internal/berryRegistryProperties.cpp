@@ -12,8 +12,6 @@ found in the LICENSE file.
 
 #include "berryRegistryProperties.h"
 
-#include <berryPlatform.h>
-
 #include <ctkPluginContext.h>
 
 namespace berry {

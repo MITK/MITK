@@ -423,12 +423,12 @@ public:
     writer->SetFileName(file);
     writer->Update();*/
 
-    PixelvalueBasedTestByPlane(imageInMitk, mitk::PlaneGeometry::Coronal);
-    PixelvalueBasedTestByPlane(imageInMitk, mitk::PlaneGeometry::Sagittal);
-    PixelvalueBasedTestByPlane(imageInMitk, mitk::PlaneGeometry::Axial);
+    PixelvalueBasedTestByPlane(imageInMitk, mitk::AnatomicalPlane::Coronal);
+    PixelvalueBasedTestByPlane(imageInMitk, mitk::AnatomicalPlane::Sagittal);
+    PixelvalueBasedTestByPlane(imageInMitk, mitk::AnatomicalPlane::Axial);
   }
 
-  static void PixelvalueBasedTestByPlane(mitk::Image *imageInMitk, mitk::PlaneGeometry::PlaneOrientation orientation)
+  static void PixelvalueBasedTestByPlane(mitk::Image *imageInMitk, mitk::AnatomicalPlane orientation)
   {
     typedef itk::Image<unsigned short, 3> ImageType;
 
@@ -440,7 +440,7 @@ public:
     bool isFrontside = true;
     bool isRotated = false;
 
-    if (orientation == mitk::PlaneGeometry::Axial)
+    if (orientation == mitk::AnatomicalPlane::Axial)
     {
       /*isFrontside = false;
       isRotated = true;*/
@@ -839,7 +839,7 @@ int mitkExtractSliceFilterTest(int /*argc*/, char * /*argv*/ [])
   /* axial plane */
   mitk::PlaneGeometry::Pointer geometryAxial = mitk::PlaneGeometry::New();
   geometryAxial->InitializeStandardPlane(
-    planeSize, planeSize, spacing, mitk::PlaneGeometry::Axial, sphereCenter, false, true);
+    planeSize, planeSize, spacing, mitk::AnatomicalPlane::Axial, sphereCenter, false, true);
   geometryAxial->ChangeImageGeometryConsideringOriginOffset(true);
 
   mitk::Point3D origin = geometryAxial->GetOrigin();
@@ -858,7 +858,7 @@ int mitkExtractSliceFilterTest(int /*argc*/, char * /*argv*/ [])
   /* sagittal plane */
   mitk::PlaneGeometry::Pointer geometrySagittal = mitk::PlaneGeometry::New();
   geometrySagittal->InitializeStandardPlane(
-    planeSize, planeSize, spacing, mitk::PlaneGeometry::Sagittal, sphereCenter, true, false);
+    planeSize, planeSize, spacing, mitk::AnatomicalPlane::Sagittal, sphereCenter, true, false);
   geometrySagittal->ChangeImageGeometryConsideringOriginOffset(true);
 
   origin = geometrySagittal->GetOrigin();
@@ -876,7 +876,7 @@ int mitkExtractSliceFilterTest(int /*argc*/, char * /*argv*/ [])
   /* sagittal shifted plane */
   mitk::PlaneGeometry::Pointer geometrySagittalShifted = mitk::PlaneGeometry::New();
   geometrySagittalShifted->InitializeStandardPlane(
-    planeSize, planeSize, spacing, mitk::PlaneGeometry::Sagittal, (sphereCenter - 14), true, false);
+    planeSize, planeSize, spacing, mitk::AnatomicalPlane::Sagittal, (sphereCenter - 14), true, false);
   geometrySagittalShifted->ChangeImageGeometryConsideringOriginOffset(true);
 
   origin = geometrySagittalShifted->GetOrigin();
@@ -894,7 +894,7 @@ int mitkExtractSliceFilterTest(int /*argc*/, char * /*argv*/ [])
   /* coronal plane */
   mitk::PlaneGeometry::Pointer geometryCoronal = mitk::PlaneGeometry::New();
   geometryCoronal->InitializeStandardPlane(
-    planeSize, planeSize, spacing, mitk::PlaneGeometry::Coronal, sphereCenter, true, false);
+    planeSize, planeSize, spacing, mitk::AnatomicalPlane::Coronal, sphereCenter, true, false);
   geometryCoronal->ChangeImageGeometryConsideringOriginOffset(true);
 
   origin = geometryCoronal->GetOrigin();
@@ -912,7 +912,7 @@ int mitkExtractSliceFilterTest(int /*argc*/, char * /*argv*/ [])
   /* oblique plane */
   mitk::PlaneGeometry::Pointer obliquePlane = mitk::PlaneGeometry::New();
   obliquePlane->InitializeStandardPlane(
-    planeSize, planeSize, spacing, mitk::PlaneGeometry::Sagittal, sphereCenter, true, false);
+    planeSize, planeSize, spacing, mitk::AnatomicalPlane::Sagittal, sphereCenter, true, false);
   obliquePlane->ChangeImageGeometryConsideringOriginOffset(true);
 
   origin = obliquePlane->GetOrigin();
@@ -951,7 +951,7 @@ int mitkExtractSliceFilterTest(int /*argc*/, char * /*argv*/ [])
 
   mitk::PlaneGeometry::Pointer obliquePl = mitk::PlaneGeometry::New();
   obliquePl->InitializeStandardPlane(
-    pic->GetGeometry(), mitk::PlaneGeometry::Sagittal, pic->GetGeometry()->GetCenter()[0], true, false);
+    pic->GetGeometry(), mitk::AnatomicalPlane::Sagittal, pic->GetGeometry()->GetCenter()[0], true, false);
   obliquePl->ChangeImageGeometryConsideringOriginOffset(true);
 
   mitk::Point3D origin2 = obliquePl->GetOrigin();

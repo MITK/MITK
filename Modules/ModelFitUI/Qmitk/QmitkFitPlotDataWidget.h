@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITK_FIT_PLOT_DATA_WIDGET_H
-#define QMITK_FIT_PLOT_DATA_WIDGET_H
+#ifndef QmitkFitPlotDataWidget_h
+#define QmitkFitPlotDataWidget_h
 
 #include "mitkModelFitPlotDataHelper.h"
 
@@ -62,4 +62,4 @@ protected:
 
 };
 
-#endif // QmitkFitPlotDataWidget_H
+#endif

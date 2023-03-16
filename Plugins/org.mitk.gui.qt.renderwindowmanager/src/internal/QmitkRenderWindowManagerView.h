@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKRENDERWINDOWMANAGERVIEW_H
-#define QMITKRENDERWINDOWMANAGERVIEW_H
+#ifndef QmitkRenderWindowManagerView_h
+#define QmitkRenderWindowManagerView_h
 
 // render window manager plugin
 #include "ui_QmitkRenderWindowManagerControls.h"
@@ -76,4 +76,4 @@ private:
   QItemSelectionModel* GetDataNodeSelectionModel() const override;
 };
 
-#endif // QMITKRENDERWINDOWMANAGERVIEW_H
+#endif

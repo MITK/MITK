@@ -37,8 +37,6 @@ public:
   void Update() override;
 
 private:
-  berry::IPreferences::Pointer m_MitkWorkbenchIntroPreferencesNode;
-
   Ui::QmitkMitkWorkbenchIntroPreferencePage* m_Ui;
   QWidget* m_Control;
 };

@@ -23,6 +23,10 @@ found in the LICENSE file.
 #include <QFileInfo>
 #include <QDateTime>
 
+#include <usModuleInitialization.h>
+
+US_INITIALIZE_MODULE
+
 QmitkMitkWorkbenchIntroPlugin* QmitkMitkWorkbenchIntroPlugin::inst = nullptr;
 
 QmitkMitkWorkbenchIntroPlugin::QmitkMitkWorkbenchIntroPlugin()

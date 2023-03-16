@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATASTORAGELAYERSTACKMODEL_H
-#define QMITKDATASTORAGELAYERSTACKMODEL_H
+#ifndef QmitkDataStorageLayerStackModel_h
+#define QmitkDataStorageLayerStackModel_h
 
 // render window manager UI module
 #include "MitkRenderWindowManagerUIExports.h"
@@ -86,4 +86,4 @@ private:
 
 };
 
-#endif // QMITKDATASTORAGELAYERSTACKMODEL_H
+#endif

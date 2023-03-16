@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkReduceContourSetFilter_h_Included
-#define mitkReduceContourSetFilter_h_Included
+#ifndef mitkReduceContourSetFilter_h
+#define mitkReduceContourSetFilter_h
 
 #include "mitkProgressBar.h"
 #include "mitkSurface.h"

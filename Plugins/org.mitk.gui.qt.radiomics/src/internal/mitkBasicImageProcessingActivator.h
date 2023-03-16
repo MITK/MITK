@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKRadiomicsStatisticACTIVATOR_H
-#define MITKRadiomicsStatisticACTIVATOR_H
+#ifndef mitkBasicImageProcessingActivator_h
+#define mitkBasicImageProcessingActivator_h
 
 #include <ctkPluginActivator.h>
 
@@ -36,4 +36,4 @@ public:
 
 }
 
-#endif // MITKRadiomicsStatisticACTIVATOR_H
+#endif

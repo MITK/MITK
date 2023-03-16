@@ -17,12 +17,16 @@ found in the LICENSE file.
 
 #include <berryPlugin.h>
 
+namespace mitk
+{
+  class IPreferencesService;
+  class IPreferences;
+}
+
 namespace berry {
 
 template<class T> class SmartPointer;
 
-struct IPreferences;
-struct IPreferencesService;
 struct IWorkbench;
 
 /**
@@ -33,29 +37,6 @@ struct IWorkbench;
  * Subclasses obtain the following capabilities:
  * </p>
  * <p>
- * Preferences
- * <ul>
- * <li> The platform core runtime contains general support for plug-in
- *      preferences (<code>org.blueberry.core.runtime.Preferences</code>).
- *      This class provides appropriate conversion to the older JFace preference
- *      API (<code>org.blueberry.jface.preference.IPreferenceStore</code>).</li>
- * <li> The method <code>getPreferenceStore</code> returns the JFace preference
- *      store (cf. <code>Plugin.getPluginPreferences</code> which returns
- *      a core runtime preferences object.</li>
- * <li> Subclasses may reimplement <code>initializeDefaultPreferences</code>
- *      to set up any default values for preferences using JFace API. In this
- *      case, <code>initializeDefaultPluginPreferences</code> should not be
- *      overridden.</li>
- * <li> Subclasses may reimplement
- *      <code>initializeDefaultPluginPreferences</code> to set up any default
- *      values for preferences using core runtime API. In this
- *      case, <code>initializeDefaultPreferences</code> should not be
- *      overridden.</li>
- * <li> Preferences are also saved automatically on plug-in shutdown.
- *      However, saving preferences immediately after changing them is
- *      strongly recommended, since that ensures that preference settings
- *      are not lost even in the event of a platform crash.</li>
- * </ul>
  * Dialogs
  * <ul>
  * <li> The dialog store is read the first time <code>getDialogSettings</code>
@@ -100,11 +81,6 @@ private:
      */
    static const QString FN_DIALOG_SETTINGS;
 
-    /**
-     * Storage for preferences.
-     */
-    mutable IPreferencesService* preferencesService;
-
 public:
 
     /**
@@ -121,16 +97,12 @@ public:
      * This preferences service is used to hold persistent settings for this plug-in in
      * the context of a workbench. Some of these settings will be user controlled,
      * whereas others may be internal setting that are never exposed to the user.
-     * <p>
-     * If an error occurs reading the preferences service, an empty preference service is
-     * quietly created, initialized with defaults, and returned.
-     * </p>
      *
      * @return the preferences service
      */
-    IPreferencesService* GetPreferencesService() const;
+    mitk::IPreferencesService* GetPreferencesService() const;
 
-    SmartPointer<IPreferences> GetPreferences() const;
+    mitk::IPreferences* GetPreferences() const;
 
     /**
      * Returns the Platform UI workbench.

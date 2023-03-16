@@ -73,4 +73,4 @@ namespace mitk
     FeatureListType DoCalculateFeatures(const Image* image, const Image* mask) override;
   };
 }
-#endif //mitkGIFIntensityVolumeHistogramFeatures_h
+#endif

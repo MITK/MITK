@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKXNATTREEBROWSERVIEW_H
-#define QMITKXNATTREEBROWSERVIEW_H
+#ifndef QmitkXnatTreeBrowserView_h
+#define QmitkXnatTreeBrowserView_h
 
 #include <QmitkAbstractView.h>
 
@@ -30,10 +30,7 @@ found in the LICENSE file.
 #include <mitkIDataStorageService.h>
 #include <ctkServiceTracker.h>
 
-#include <berryIBerryPreferences.h>
-
 class QMenu;
-
 
 /*!
 \brief QmitkXnatTreeBrowserView
@@ -112,7 +109,7 @@ private slots:
 
 private:
 
-  void OnPreferencesChanged(const berry::IBerryPreferences*) override;
+  void OnPreferencesChanged(const mitk::IPreferences*) override;
 
   void InternalFileDownload(const QModelIndex& index, bool loadData);
   void InternalDICOMDownload(ctkXnatObject* obj, QDir &DICOMDirPath);
@@ -142,4 +139,4 @@ private:
   std::string ReplaceSpecialChars(const std::string& input) const;
 };
 
-#endif // QMITKXNATTREEBROWSERVIEW_H
+#endif

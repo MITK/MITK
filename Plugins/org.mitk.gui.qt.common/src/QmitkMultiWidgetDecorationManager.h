@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKMULTIWIDGETDECORATIONMANAGER_H
-#define QMITKMULTIWIDGETDECORATIONMANAGER_H
+#ifndef QmitkMultiWidgetDecorationManager_h
+#define QmitkMultiWidgetDecorationManager_h
 
 #include <org_mitk_gui_qt_common_Export.h>
 
@@ -24,9 +24,6 @@ found in the LICENSE file.
 // mitk qt widgets
 #include <QmitkAbstractMultiWidget.h>
 
-// berry
-#include <berryIBerryPreferences.h>
-
 // vtk
 #include <vtkImageData.h>
 #include <vtkSmartPointer.h>
@@ -34,6 +31,11 @@ found in the LICENSE file.
 // qt
 #include <QString>
 #include <QStringList>
+
+namespace mitk
+{
+  class IPreferences;
+}
 
 /**
 * @brief
@@ -52,7 +54,7 @@ public:
     BlackAndWhite = 0 // black background, white decoration
   };
 
-  void DecorationPreferencesChanged(const berry::IBerryPreferences* preferences);
+  void DecorationPreferencesChanged(const mitk::IPreferences* preferences);
 
   /**
   * @brief Show or hide decorations like like colored borders or background, logos, menu widgets, logos and
@@ -137,4 +139,4 @@ private:
 
 };
 
-#endif // QMITKMULTIWIDGETDECORATIONMANAGER_H
+#endif

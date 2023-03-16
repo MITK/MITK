@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkTubeGraphDefinitions_h
-#define __mitkTubeGraphDefinitions_h
+#ifndef mitkTubeGraphDefinitions_h
+#define mitkTubeGraphDefinitions_h
 
 #include <string>
 
@@ -107,4 +107,4 @@ namespace mitk
 
 } // namespace MITK
 
-#endif // __mitkTubeGraphDefinitions_h
+#endif

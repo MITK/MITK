@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKIMAGENAVIGATORVIEW_H
-#define QMITKIMAGENAVIGATORVIEW_H
+#ifndef QmitkImageNavigatorView_h
+#define QmitkImageNavigatorView_h
 
 #include <berryISizeProvider.h>
 
@@ -75,10 +75,10 @@ protected:
 
   Ui::QmitkImageNavigatorViewControls m_Controls;
 
-  QmitkStepperAdapter* m_AxialStepper;
-  QmitkStepperAdapter* m_SagittalStepper;
-  QmitkStepperAdapter* m_CoronalStepper;
-  QmitkStepperAdapter* m_TimeStepper;
+  QmitkStepperAdapter* m_AxialStepperAdapter;
+  QmitkStepperAdapter* m_SagittalStepperAdapter;
+  QmitkStepperAdapter* m_CoronalStepperAdapter;
+  QmitkStepperAdapter* m_TimeStepperAdapter;
 
   QWidget* m_Parent;
 
@@ -91,4 +91,4 @@ protected:
   QString GetDecorationColorOfGeometry(QmitkRenderWindow *renderWindow);
 };
 
-#endif // QMITKIMAGENAVIGATORVIEW_H
+#endif

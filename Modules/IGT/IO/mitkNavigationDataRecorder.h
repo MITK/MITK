@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_NavigationDataRecorder_H
-#define _MITK_NavigationDataRecorder_H
+#ifndef mitkNavigationDataRecorder_h
+#define mitkNavigationDataRecorder_h
 
 #include "mitkNavigationDataToNavigationDataFilter.h"
 #include "mitkNavigationData.h"
@@ -127,4 +127,4 @@ namespace mitk
     bool m_RecordOnlyValidData; ///< indicates whether only valid data is recorded
   };
 }
-#endif // #define _MITK_POINT_SET_SOURCE_H
+#endif

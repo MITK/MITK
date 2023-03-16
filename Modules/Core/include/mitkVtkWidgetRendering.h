@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _vtk_Widget_Rendering_h_
-#define _vtk_Widget_Rendering_h_
+#ifndef mitkVtkWidgetRendering_h
+#define mitkVtkWidgetRendering_h
 
 #include <mitkBaseData.h>
 

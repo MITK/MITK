@@ -19,7 +19,6 @@ found in the LICENSE file.
 #include <berrySeparator.h>
 #include <berryIPluginContribution.h>
 #include <berryIPerspectiveRegistry.h>
-#include <berryIPreferences.h>
 #include <berryIWorkbenchCommandConstants.h>
 #include <berryObjectString.h>
 #include <berryObjects.h>
@@ -30,6 +29,8 @@ found in the LICENSE file.
 #include "berryPreferenceConstants.h"
 
 #include <QMenu>
+
+#include <mitkIPreferences.h>
 
 namespace  berry {
 
@@ -137,9 +138,8 @@ void ChangeToPerspectiveMenu::FillMenu(IMenuManager* manager)
     manager->Add(item);
   }
 
-  IPreferences::Pointer prefs = WorkbenchPlugin::GetDefault()->GetPreferences();
-  bool showOther = true;
-  prefs->GetBool(WorkbenchPreferenceConstants::SHOW_OTHER_IN_PERSPECTIVE_MENU, showOther);
+  auto* prefs = WorkbenchPlugin::GetDefault()->GetPreferences();
+  bool showOther = prefs->GetBool(WorkbenchPreferenceConstants::SHOW_OTHER_IN_PERSPECTIVE_MENU, true);
   if (showOther)
   {
     // Add a separator and then "Other..."
@@ -154,7 +154,7 @@ void ChangeToPerspectiveMenu::FillMenu(IMenuManager* manager)
 
 SmartPointer<CommandContributionItemParameter> ChangeToPerspectiveMenu::GetItem(const IPerspectiveDescriptor::Pointer& desc) const
 {
-  IPreferences::Pointer prefs = WorkbenchPlugin::GetDefault()->GetPreferences();
+  auto* prefs = WorkbenchPlugin::GetDefault()->GetPreferences();
   int mode = prefs->GetInt(PreferenceConstants::OPEN_PERSP_MODE, PreferenceConstants::OPM_ACTIVE_PAGE);
   IWorkbenchPage::Pointer page = window->GetActivePage();
   IPerspectiveDescriptor::Pointer persp;

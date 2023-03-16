@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKNDIPASSIVETOOL_H_HEADER_INCLUDED_
-#define MITKNDIPASSIVETOOL_H_HEADER_INCLUDED_
+#ifndef mitkNDIPassiveTool_h
+#define mitkNDIPassiveTool_h
 
 #include <mitkTrackingTool.h>
 #include "mitkTrackingTypes.h"
@@ -71,4 +71,4 @@ namespace mitk
     std::string m_File;                   ///< the original file from which this tool was loaded
   };
 } // namespace mitk
-#endif /* MITKNDIPASSIVETOOL_H_HEADER_INCLUDED_ */
+#endif

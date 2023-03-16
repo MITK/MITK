@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKMXNMULTIWIDGET_H
-#define QMITKMXNMULTIWIDGET_H
+#ifndef QmitkMxNMultiWidget_h
+#define QmitkMxNMultiWidget_h
 
 // qt widgets module
 #include "MitkQtWidgetsExports.h"
@@ -40,7 +40,7 @@ public:
   void Synchronize(bool synchronized) override;
 
   QmitkRenderWindow* GetRenderWindow(const QString& widgetName) const override;
-  QmitkRenderWindow* GetRenderWindow(const mitk::BaseRenderer::ViewDirection& viewDirection) const override;
+  QmitkRenderWindow* GetRenderWindow(const mitk::AnatomicalPlane& orientation) const override;
 
   void SetActiveRenderWindowWidget(RenderWindowWidgetPointer activeRenderWindowWidget) override;
   /**
@@ -106,4 +106,4 @@ private:
 
 };
 
-#endif // QMITKMXNMULTIWIDGET_H
+#endif

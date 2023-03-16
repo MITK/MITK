@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef NDIPOLARISTYPEINFORMATION_H_INCLUDED
-#define NDIPOLARISTYPEINFORMATION_H_INCLUDED
+#ifndef mitkNDIPolarisTypeInformation_h
+#define mitkNDIPolarisTypeInformation_h
 
 #include "mitkTrackingDeviceTypeInformation.h"
 
@@ -41,4 +41,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif //NDIPOLARISTYPEINFORMATION_H_INCLUDED
+#endif

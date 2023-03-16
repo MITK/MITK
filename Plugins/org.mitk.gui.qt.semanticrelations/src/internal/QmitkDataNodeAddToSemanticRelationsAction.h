@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATANODEADDTOSEMANTICRELATIONSACTION_H
-#define QMITKDATANODEADDTOSEMANTICRELATIONSACTION_H
+#ifndef QmitkDataNodeAddToSemanticRelationsAction_h
+#define QmitkDataNodeAddToSemanticRelationsAction_h
 
 #include <org_mitk_gui_qt_semanticrelations_Export.h>
 
@@ -66,4 +66,4 @@ protected:
 
 };
 
-#endif // QMITKDATANODEADDTOSEMANTICRELATIONSACTION_H
+#endif

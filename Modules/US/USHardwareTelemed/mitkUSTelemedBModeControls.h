@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKUSTelemedBModeControls_H_HEADER_INCLUDED_
-#define MITKUSTelemedBModeControls_H_HEADER_INCLUDED_
+#ifndef mitkUSTelemedBModeControls_h
+#define mitkUSTelemedBModeControls_h
 
 #include "mitkUSTelemedSDKHeader.h"
 #include "mitkUSControlInterfaceBMode.h"
@@ -108,4 +108,4 @@ namespace mitk {
   };
 } // namespace mitk
 
-#endif // MITKUSTelemedBModeControls_H_HEADER_INCLUDED_
+#endif

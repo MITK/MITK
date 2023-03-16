@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __mitkThreadedToFRawDataReconstruction_h
-#define __mitkThreadedToFRawDataReconstruction_h
+#ifndef mitkThreadedToFRawDataReconstruction_h
+#define mitkThreadedToFRawDataReconstruction_h
 
 // mitk includes
 #include "mitkImageSource.h"
@@ -112,4 +112,4 @@ namespace mitk
   };
 } //end mitk namespace
 
-#endif // __mitkThreadedToFRawDataReconstruction_h
+#endif

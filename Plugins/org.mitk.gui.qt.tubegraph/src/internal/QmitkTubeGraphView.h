@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QMITKTUBEGRAPHVIEW_H_INCLUDED
-#define _QMITKTUBEGRAPHVIEW_H_INCLUDED
+#ifndef QmitkTubeGraphView_h
+#define QmitkTubeGraphView_h
 
 #include "ui_QmitkTubeGraphViewControls.h"
 
@@ -121,4 +121,4 @@ private:
 };
 
 
-#endif//QMITK_TubeGraphView_H
+#endif

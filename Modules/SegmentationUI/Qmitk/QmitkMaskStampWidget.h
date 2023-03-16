@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkMaskStampWidget_h_Included
-#define QmitkMaskStampWidget_h_Included
+#ifndef QmitkMaskStampWidget_h
+#define QmitkMaskStampWidget_h
 
 #include "MitkSegmentationUIExports.h"
 #include "mitkDataNode.h"

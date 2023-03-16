@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKRENDERWINDOWMENU_H
-#define QMITKRENDERWINDOWMENU_H
+#ifndef QmitkRenderWindowMenu_h
+#define QmitkRenderWindowMenu_h
 
 // mitk qtwidgets module
 #include "MitkQtWidgetsExports.h"
@@ -51,7 +51,7 @@ class MITKQTWIDGETS_EXPORT QmitkRenderWindowMenu : public QWidget
 
 public:
 
-  using LayoutIndex = mitk::BaseRenderer::ViewDirection;
+  using LayoutIndex = mitk::AnatomicalPlane;
   using LayoutDesign = QmitkMultiWidgetLayoutManager::LayoutDesign;
 
   QmitkRenderWindowMenu(QWidget *parent = nullptr,
@@ -191,4 +191,4 @@ private:
 
 };
 
-#endif // QMITKRENDERWINDOWMENU_H
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef TubeGraphObjectFactory_H_INCLUDED
-#define TubeGraphObjectFactory_H_INCLUDED
+#ifndef mitkTubeGraphObjectFactory_h
+#define mitkTubeGraphObjectFactory_h
 
 #include <MitkTubeGraphExports.h>
 

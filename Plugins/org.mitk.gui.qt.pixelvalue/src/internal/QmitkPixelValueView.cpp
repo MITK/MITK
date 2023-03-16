@@ -52,6 +52,11 @@ void QmitkPixelValueView::RenderWindowPartDeactivated(mitk::IRenderWindowPart* r
   this->m_SliceNavigationListener.RenderWindowPartDeactivated(renderWindowPart);
 }
 
+void QmitkPixelValueView::RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart)
+{
+  this->m_SliceNavigationListener.RenderWindowPartInputChanged(renderWindowPart);
+}
+
 void QmitkPixelValueView::OnSelectedPositionChanged(const mitk::Point3D&)
 {
   this->Update();

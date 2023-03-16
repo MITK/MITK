@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MODELFITCOSTFUNCTION_INTERFACE_H
-#define MODELFITCOSTFUNCTION_INTERFACE_H
+#ifndef mitkModelFitCostFunctionInterface_h
+#define mitkModelFitCostFunctionInterface_h
 
 #include "mitkModelBase.h"
 
@@ -52,4 +52,4 @@ private:
 
 }
 
-#endif // MODELFITCOSTFUNCTION_H
+#endif

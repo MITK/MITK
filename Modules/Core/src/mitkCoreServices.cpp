@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <mitkIPropertyFilters.h>
 #include <mitkIPropertyPersistence.h>
 #include <mitkIPropertyRelations.h>
+#include <mitkIPreferencesService.h>
 
 #include <usGetModuleContext.h>
 #include <usModuleContext.h>
@@ -96,6 +97,11 @@ namespace mitk
   IMimeTypeProvider *CoreServices::GetMimeTypeProvider(us::ModuleContext *context)
   {
     return GetCoreService<IMimeTypeProvider>(context);
+  }
+
+  IPreferencesService *CoreServices::GetPreferencesService(us::ModuleContext *context)
+  {
+    return GetCoreService<IPreferencesService>(context);
   }
 
   bool CoreServices::Unget(us::ModuleContext *context, const std::string & /*interfaceId*/, void *service)

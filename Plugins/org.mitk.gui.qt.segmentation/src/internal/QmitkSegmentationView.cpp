@@ -33,6 +33,7 @@ found in the LICENSE file.
 #include <mitkToolManagerProvider.h>
 #include <mitkVtkResliceInterpolationProperty.h>
 #include <mitkWorkbenchUtil.h>
+#include <mitkIPreferences.h>
 
 // Qmitk
 #include <QmitkRenderWindow.h>
@@ -80,15 +81,8 @@ QmitkSegmentationView::QmitkSegmentationView()
   validImages->AddPredicate(isDti);
   validImages->AddPredicate(isOdf);
 
-  auto isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
-  auto isMask = mitk::NodePredicateAnd::New(isBinary, isImage);
-
-  auto validSegmentations = mitk::NodePredicateOr::New();
-  validSegmentations->AddPredicate(mitk::TNodePredicateDataType<mitk::LabelSetImage>::New());
-  validSegmentations->AddPredicate(isMask);
-
   m_SegmentationPredicate = mitk::NodePredicateAnd::New();
-  m_SegmentationPredicate->AddPredicate(validSegmentations);
+  m_SegmentationPredicate->AddPredicate(mitk::TNodePredicateDataType<mitk::LabelSetImage>::New());
   m_SegmentationPredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
   m_SegmentationPredicate->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
 
@@ -720,9 +714,11 @@ void QmitkSegmentationView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*
   // remove message-connection to make sure no message is processed if no render window part is available
   m_ToolManager->ActiveToolChanged -=
     mitk::MessageDelegate<QmitkSegmentationView>(this, &QmitkSegmentationView::ActiveToolChanged);
+
+  m_Controls->slicesInterpolator->Uninitialize();
 }
 
-void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
+void QmitkSegmentationView::OnPreferencesChanged(const mitk::IPreferences* prefs)
 {
   auto labelSuggestions = mitk::BaseApplication::instance().config().getString(mitk::BaseApplication::ARG_SEGMENTATION_LABEL_SUGGESTIONS.toStdString(), "");
 
@@ -742,7 +738,7 @@ void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences*
   m_DrawOutline = prefs->GetBool("draw outline", true);
   m_SelectionMode = prefs->GetBool("selection mode", false);
 
-  m_LabelSetPresetPreference = prefs->Get("label set preset", "");
+  m_LabelSetPresetPreference = QString::fromStdString(prefs->Get("label set preset", ""));
 
   this->ApplyDisplayOptions();
   this->ApplySelectionMode();
@@ -795,6 +791,8 @@ void QmitkSegmentationView::EstablishLabelSetConnection()
     return;
 
   auto workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
+  if (nullptr == workingImage)
+    return;
 
   workingImage->GetActiveLabelSet()->AddLabelEvent += mitk::MessageDelegate<QmitkLabelSetWidget>(
     m_Controls->labelSetWidget, &QmitkLabelSetWidget::ResetAllTableWidgetItems);
@@ -816,6 +814,8 @@ void QmitkSegmentationView::LooseLabelSetConnection()
     return;
 
   auto workingImage = dynamic_cast<mitk::LabelSetImage*>(m_WorkingNode->GetData());
+  if (nullptr == workingImage)
+    return;
 
   workingImage->GetActiveLabelSet()->AddLabelEvent -= mitk::MessageDelegate<QmitkLabelSetWidget>(
     m_Controls->labelSetWidget, &QmitkLabelSetWidget::ResetAllTableWidgetItems);
@@ -860,28 +860,16 @@ void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataNode* node)
   }
 
   auto labelSetImage = dynamic_cast<mitk::LabelSetImage*>(node->GetData());
-  if (nullptr != labelSetImage)
+  if (nullptr == labelSetImage)
   {
-    // node is a multi label segmentation
-    // its outline property can be set in the segmentation preference page
-    node->SetProperty("labelset.contour.active", mitk::BoolProperty::New(m_DrawOutline));
+    return;
+  }
 
-    // force render window update to show outline
-    node->GetData()->Modified();
-  }
-  else if (nullptr != node->GetData())
-  {
-    // node is a legacy binary segmentation
-    bool isBinary = false;
-    node->GetBoolProperty("binary", isBinary);
-    if (isBinary)
-    {
-      node->SetProperty("outline binary", mitk::BoolProperty::New(m_DrawOutline));
-      node->SetProperty("outline width", mitk::FloatProperty::New(2.0));
-      // force render window update to show outline
-      node->GetData()->Modified();
-    }
-  }
+  // the outline property can be set in the segmentation preference page
+  node->SetProperty("labelset.contour.active", mitk::BoolProperty::New(m_DrawOutline));
+
+  // force render window update to show outline
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkSegmentationView::ApplySelectionMode()
@@ -1077,20 +1065,20 @@ void QmitkSegmentationView::ValidateSelectionInput()
       toolSelectionBoxesEnabled = false;
     }
 
-    auto labelSetImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+    m_ToolManager->SetReferenceData(referenceNode);
+    m_ToolManager->SetWorkingData(workingNode);
+    m_Controls->layersWidget->setEnabled(true);
+    m_Controls->labelsWidget->setEnabled(true);
+    m_Controls->labelSetWidget->setEnabled(true);
+    m_Controls->toolSelectionBox2D->setEnabled(true);
+    m_Controls->toolSelectionBox3D->setEnabled(true);
+
+    auto labelSetImage = dynamic_cast<mitk::LabelSetImage *>(workingNode->GetData());
     auto activeLayer = labelSetImage->GetActiveLayer();
     numberOfLabels = labelSetImage->GetNumberOfLabels(activeLayer);
 
-    if (2 == numberOfLabels)
-    {
+    if (numberOfLabels > 1)
       m_Controls->slicesInterpolator->setEnabled(true);
-    }
-    else if (2 < numberOfLabels)
-    {
-      m_Controls->interpolatorWarningLabel->setText(
-        "<font color=\"red\">Interpolation only works for single label segmentations.</font>");
-      m_Controls->interpolatorWarningLabel->show();
-    }
   }
 
   toolSelectionBoxesEnabled &= numberOfLabels > 1;

@@ -18,11 +18,11 @@ found in the LICENSE file.
 #include <berryActionBarAdvisor.h>
 #include <berryWorkbenchPreferenceConstants.h>
 #include <berryObjects.h>
-#include <berryIPreferences.h>
-#include <berryIPreferencesService.h>
 
 #include "internal/berryWorkbenchWindowConfigurer.h"
 #include "berryWorkbenchPlugin.h"
+
+#include <mitkIPreferences.h>
 
 namespace berry
 {
@@ -75,7 +75,7 @@ void WorkbenchWindowAdvisor::OpenIntro()
 
   wbConfig->SetData(key, ObjectBool::Pointer(new ObjectBool(true)));
 
-  IPreferences::Pointer workbenchPrefs = WorkbenchPlugin::GetDefault()->GetPreferencesService()->GetSystemPreferences();
+  auto* workbenchPrefs = WorkbenchPlugin::GetDefault()->GetPreferences();
 
   bool showIntro = workbenchPrefs->GetBool(WorkbenchPreferenceConstants::SHOW_INTRO, true);
 

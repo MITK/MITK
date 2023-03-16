@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkPickingTool_h_Included
-#define mitkPickingTool_h_Included
+#ifndef mitkPickingTool_h
+#define mitkPickingTool_h
 
 #include "mitkSegWithPreviewTool.h"
 #include "mitkPointSet.h"
@@ -47,8 +47,6 @@ namespace mitk
     const char **GetXPM() const override;
     const char *GetName() const override;
     us::ModuleResource GetIconResource() const override;
-
-    bool CanHandle(const BaseData* referenceData, const BaseData* workingData) const override;
 
     void Activated() override;
     void Deactivated() override;

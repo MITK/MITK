@@ -216,14 +216,14 @@ void QmitkDicomExternalDataWidget::SetupImportDialog()
   m_ImportDialog->setFileMode(QFileDialog::Directory);
   m_ImportDialog->setLabelText(QFileDialog::Accept, "Import");
   m_ImportDialog->setWindowTitle("Import DICOM files from directory");
-  m_ImportDialog->setWindowModality(Qt::ApplicationModal);
+  m_ImportDialog->setWindowModality(Qt::WindowModal);
 }
 
 void QmitkDicomExternalDataWidget::SetupProgressDialog()
 {
   m_ProgressDialog = new QProgressDialog("Initialization ...", "Cancel", 0, 100, this);
   m_ProgressDialog->setWindowTitle("DICOM Import");
-  m_ProgressDialog->setWindowModality(Qt::ApplicationModal);
+  m_ProgressDialog->setWindowModality(Qt::WindowModal);
   m_ProgressDialog->setMinimumDuration(0);
   // FIX T20008: immediately set the progress dialog value to maximum --> will close the dialog
   m_ProgressDialog->setValue(100);

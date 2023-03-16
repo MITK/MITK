@@ -246,7 +246,7 @@ void QmitkBasicImageProcessing::InternalGetTimeNavigationController()
     auto tnc = renwin_part->GetTimeNavigationController();
     if( tnc != nullptr )
     {
-      m_TimeStepperAdapter = new QmitkStepperAdapter((QObject*) m_Controls->sliceNavigatorTime, tnc->GetTime(), "sliceNavigatorTimeFromBIP");
+      m_TimeStepperAdapter = new QmitkStepperAdapter(m_Controls->timeSliceNavigationWidget, tnc->GetTime());
     }
   }
 }
@@ -260,7 +260,7 @@ void QmitkBasicImageProcessing::OnCurrentSelectionChanged(const QList<mitk::Data
 {
   if (nodes.empty() || nodes.front().IsNull())
   {
-    m_Controls->sliceNavigatorTime->setEnabled(false);
+    m_Controls->timeSliceNavigationWidget->setEnabled(false);
     m_Controls->tlTime->setEnabled(false);
     m_Controls->tlWhat1->setEnabled(false);
     m_Controls->cbWhat1->setEnabled(false);
@@ -280,7 +280,7 @@ void QmitkBasicImageProcessing::OnCurrentSelectionChanged(const QList<mitk::Data
     // try to retrieve the TNC (for 4-D Processing )
     this->InternalGetTimeNavigationController();
 
-    m_Controls->sliceNavigatorTime->setEnabled(true);
+    m_Controls->timeSliceNavigationWidget->setEnabled(true);
     m_Controls->tlTime->setEnabled(true);
   }
 
@@ -644,7 +644,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
   {
     auto timeSelector = mitk::ImageTimeSelector::New();
     timeSelector->SetInput(newImage);
-    timeSelector->SetTimeNr( ((QmitkSliderNavigatorWidget*)m_Controls->sliceNavigatorTime)->GetPos() );
+    timeSelector->SetTimeNr(m_Controls->timeSliceNavigationWidget->GetPos() );
     timeSelector->Update();
     newImage = timeSelector->GetOutput();
   }
@@ -1134,7 +1134,7 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
   {
     auto timeSelector = mitk::ImageTimeSelector::New();
 
-    auto sn_widget = static_cast<QmitkSliderNavigatorWidget*>( m_Controls->sliceNavigatorTime );
+    auto sn_widget = static_cast<QmitkSliceNavigationWidget*>(m_Controls->timeSliceNavigationWidget);
     int time = 0;
 
     if( sn_widget != nullptr )

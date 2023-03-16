@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKCOREACTIVATOR_H_
-#define MITKCOREACTIVATOR_H_
+#ifndef mitkCoreActivator_h
+#define mitkCoreActivator_h
 
 // File IO
 #include <mitkAbstractFileIO.h>
@@ -26,6 +26,7 @@ found in the LICENSE file.
 #include <mitkPropertyFilters.h>
 #include <mitkPropertyPersistence.h>
 #include <mitkPropertyRelations.h>
+#include <mitkPreferencesService.h>
 
 // Micro Services
 #include <usModuleActivator.h>
@@ -63,6 +64,7 @@ private:
   std::unique_ptr<mitk::PropertyPersistence> m_PropertyPersistence;
   std::unique_ptr<mitk::PropertyRelations> m_PropertyRelations;
   std::unique_ptr<mitk::MimeTypeProvider> m_MimeTypeProvider;
+  std::unique_ptr<mitk::PreferencesService> m_PreferencesService;
 
   // File IO
   std::vector<mitk::IFileReader *> m_FileReaders;
@@ -77,4 +79,4 @@ private:
   us::ModuleContext *m_Context;
 };
 
-#endif // MITKCOREACTIVATOR_H_
+#endif

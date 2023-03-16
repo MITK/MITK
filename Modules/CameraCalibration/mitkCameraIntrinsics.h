@@ -139,4 +139,4 @@ namespace mitk
 MITKCAMERACALIBRATION_EXPORT std::ostream& operator<<
     (std::ostream& os, mitk::CameraIntrinsics::Pointer p);
 
-#endif // mitkCameraIntrinsics_h
+#endif

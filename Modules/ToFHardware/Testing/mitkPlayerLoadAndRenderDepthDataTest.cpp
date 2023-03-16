@@ -73,8 +73,6 @@ int mitkPlayerLoadAndRenderDepthDataTest(int argc, char* argv[])
     // render the datastorage
     // compare rendering to reference image
     mitk::RenderingTestHelper renderingHelper(640, 480, argc, argv);
-    //Set the opacity for all images
-    //for now this test renders in sagittal view direction
     renderingHelper.AddNodeToStorage(node);
 
     //use this to generate a reference screenshot or save the file:

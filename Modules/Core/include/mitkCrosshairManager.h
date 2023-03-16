@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKCROSSHAIRMANAGER_H
-#define MITKCROSSHAIRMANAGER_H
+#ifndef mitkCrosshairManager_h
+#define mitkCrosshairManager_h
 
 #include <MitkCoreExports.h>
 
@@ -56,6 +56,8 @@ namespace mitk
     void SetCrosshairPosition(const Point3D& selectedPoint);
     Point3D GetCrosshairPosition() const;
 
+    void UpdateSlice(const SliceNavigationController* sliceNavigationController);
+
     void SetCrosshairVisibility(bool visible);
     bool GetCrosshairVisibility() const;
     void SetCrosshairGap(unsigned int gapSize);
@@ -70,6 +72,7 @@ namespace mitk
 
     void InitializePlaneProperties(DataNode::Pointer planeNode, const std::string& planeName);
     void InitializePlaneData(DataNode::Pointer planeNode, const TimeGeometry* timeGeometry, unsigned int& slice);
+    void UpdatePlaneSlice(DataNode::Pointer planeNode, const TimeGeometry* timeGeometry, unsigned int slice);
     void SetCrosshairPosition(const Point3D& selectedPoint,
                               DataNode::Pointer planeNode,
                               const TimeGeometry* timeGeometry,
@@ -99,4 +102,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif // MITKCROSSHAIRMANAGER_H
+#endif

@@ -89,4 +89,4 @@ namespace mitk
   };
 }
 
-#endif //mitkVigraRandomForestClassifier_h
+#endif

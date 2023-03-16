@@ -8,7 +8,6 @@ set(MOC_H_FILES
   src/internal/berryCTKPluginActivator.h
   src/internal/berryErrorApplication.h
   src/internal/berryExtensionRegistry.h
-  src/internal/berryPreferencesService.h
 )
 
 set(CACHED_RESOURCE_FILES
@@ -27,10 +26,7 @@ set(SRC_CPP_FILES
   berryIAdapterManager.cpp
   berryIDebugObjectListener.cpp
   berryILog.cpp
-  berryIPreferences.cpp
   berryIProduct.cpp
-  berryIBerryPreferences.cpp
-  berryIPreferencesService.cpp
   berryIProductProvider.h
   berryListenerList.h
   berryLog.cpp
@@ -77,7 +73,6 @@ set(SRC_CPP_FILES
 )
 
 set(INTERNAL_CPP_FILES
-  berryAbstractPreferencesStorage.cpp
   berryApplicationContainer.cpp
   berryApplicationDescriptor.cpp
   berryApplicationHandle.cpp
@@ -106,8 +101,6 @@ set(INTERNAL_CPP_FILES
   berryKeyedElement.cpp
   berryKeyedHashSet.cpp
   berryMainApplicationLauncher.cpp
-  berryPreferences.cpp
-  berryPreferencesService.cpp
   berryProduct.cpp
   berryProductExtensionBranding.cpp
   berryProviderExtensionBranding.cpp
@@ -127,7 +120,6 @@ set(INTERNAL_CPP_FILES
   berrySimpleExtensionPointFilter.cpp
   berryTemporaryObjectManager.cpp
   berryThirdLevelConfigurationElementHandle.cpp
-  berryXMLPreferencesStorage.cpp
 )
 
 set(CPP_FILES )

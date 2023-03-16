@@ -72,33 +72,24 @@ void QmitkStdMultiWidget::InitializeMultiWidget()
   SetLayout(2, 2);
 
   // transfer colors in WorldGeometry-Nodes of the associated Renderer
-  mitk::IntProperty::Pointer layer;
   // of widget 1
   m_PlaneNode1 =
     mitk::BaseRenderer::GetInstance(GetRenderWindow1()->renderWindow())->GetCurrentWorldPlaneGeometryNode();
   m_PlaneNode1->SetColor(GetDecorationColor(0));
-  layer = mitk::IntProperty::New(1000);
-  m_PlaneNode1->SetProperty("layer", layer);
 
   // of widget 2
   m_PlaneNode2 =
     mitk::BaseRenderer::GetInstance(GetRenderWindow2()->renderWindow())->GetCurrentWorldPlaneGeometryNode();
   m_PlaneNode2->SetColor(GetDecorationColor(1));
-  layer = mitk::IntProperty::New(1000);
-  m_PlaneNode2->SetProperty("layer", layer);
 
   // of widget 3
   m_PlaneNode3 =
     mitk::BaseRenderer::GetInstance(GetRenderWindow3()->renderWindow())->GetCurrentWorldPlaneGeometryNode();
   m_PlaneNode3->SetColor(GetDecorationColor(2));
-  layer = mitk::IntProperty::New(1000);
-  m_PlaneNode3->SetProperty("layer", layer);
 
   // the parent node
   m_ParentNodeForGeometryPlanes =
     mitk::BaseRenderer::GetInstance(GetRenderWindow4()->renderWindow())->GetCurrentWorldPlaneGeometryNode();
-  layer = mitk::IntProperty::New(1000);
-  m_ParentNodeForGeometryPlanes->SetProperty("layer", layer);
 
   AddDisplayPlaneSubTree();
 
@@ -137,9 +128,9 @@ QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow(const QString& widgetNam
   return QmitkAbstractMultiWidget::GetRenderWindow(widgetName);
 }
 
-QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow(const mitk::BaseRenderer::ViewDirection& viewDirection) const
+QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow(const mitk::AnatomicalPlane& orientation) const
 {
-  return GetRenderWindow(static_cast<unsigned int>(viewDirection));
+  return GetRenderWindow(static_cast<unsigned int>(orientation));
 }
 
 void QmitkStdMultiWidget::SetReferenceGeometry(const mitk::TimeGeometry* referenceGeometry, bool resetCamera)
@@ -661,41 +652,41 @@ void QmitkStdMultiWidget::CreateRenderWindowWidgets()
   QString renderWindowWidgetName = GetNameFromIndex(0, 0);
   RenderWindowWidgetPointer renderWindowWidget1 = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage());
   auto renderWindow1 = renderWindowWidget1->GetRenderWindow();
-  renderWindow1->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Axial);
+  renderWindow1->GetSliceNavigationController()->SetDefaultViewDirection(mitk::AnatomicalPlane::Axial);
   renderWindowWidget1->SetDecorationColor(GetDecorationColor(0));
   renderWindowWidget1->SetCornerAnnotationText("Axial");
-  renderWindowWidget1->GetRenderWindow()->SetLayoutIndex(ViewDirection::AXIAL);
+  renderWindowWidget1->GetRenderWindow()->SetLayoutIndex(mitk::AnatomicalPlane::Axial);
   AddRenderWindowWidget(renderWindowWidgetName, renderWindowWidget1);
 
   // create sagittal render window (widget)
   renderWindowWidgetName = GetNameFromIndex(0, 1);
   RenderWindowWidgetPointer renderWindowWidget2 = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage());
   auto renderWindow2 = renderWindowWidget2->GetRenderWindow();
-  renderWindow2->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Sagittal);
+  renderWindow2->GetSliceNavigationController()->SetDefaultViewDirection(mitk::AnatomicalPlane::Sagittal);
   renderWindowWidget2->SetDecorationColor(GetDecorationColor(1));
   renderWindowWidget2->setStyleSheet("border: 0px");
   renderWindowWidget2->SetCornerAnnotationText("Sagittal");
-  renderWindowWidget2->GetRenderWindow()->SetLayoutIndex(ViewDirection::SAGITTAL);
+  renderWindowWidget2->GetRenderWindow()->SetLayoutIndex(mitk::AnatomicalPlane::Sagittal);
   AddRenderWindowWidget(renderWindowWidgetName, renderWindowWidget2);
 
   // create coronal render window (widget)
   renderWindowWidgetName = GetNameFromIndex(1, 0);
   RenderWindowWidgetPointer renderWindowWidget3 = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage());
   auto renderWindow3 = renderWindowWidget3->GetRenderWindow();
-  renderWindow3->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Coronal);
+  renderWindow3->GetSliceNavigationController()->SetDefaultViewDirection(mitk::AnatomicalPlane::Coronal);
   renderWindowWidget3->SetDecorationColor(GetDecorationColor(2));
   renderWindowWidget3->SetCornerAnnotationText("Coronal");
-  renderWindowWidget3->GetRenderWindow()->SetLayoutIndex(ViewDirection::CORONAL);
+  renderWindowWidget3->GetRenderWindow()->SetLayoutIndex(mitk::AnatomicalPlane::Coronal);
   AddRenderWindowWidget(renderWindowWidgetName, renderWindowWidget3);
 
   // create 3D render window (widget)
   renderWindowWidgetName = GetNameFromIndex(1, 1);
   RenderWindowWidgetPointer renderWindowWidget4 = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage());
   auto renderWindow4 = renderWindowWidget4->GetRenderWindow();
-  renderWindow4->GetSliceNavigationController()->SetDefaultViewDirection(mitk::SliceNavigationController::Original);
+  renderWindow4->GetSliceNavigationController()->SetDefaultViewDirection(mitk::AnatomicalPlane::Original);
   renderWindowWidget4->SetDecorationColor(GetDecorationColor(3));
   renderWindowWidget4->SetCornerAnnotationText("3D");
-  renderWindowWidget4->GetRenderWindow()->SetLayoutIndex(ViewDirection::THREE_D);
+  renderWindowWidget4->GetRenderWindow()->SetLayoutIndex(mitk::AnatomicalPlane::Original);
   mitk::BaseRenderer::GetInstance(renderWindowWidget4->GetRenderWindow()->renderWindow())->SetMapperID(mitk::BaseRenderer::Standard3D);
   AddRenderWindowWidget(renderWindowWidgetName, renderWindowWidget4);
 

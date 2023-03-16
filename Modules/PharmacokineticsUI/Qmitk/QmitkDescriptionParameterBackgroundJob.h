@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __QMITK_DESCRIPTION_PARAMETER_BACKGROUND_JOB_H
-#define __QMITK_DESCRIPTION_PARAMETER_BACKGROUND_JOB_H
+#ifndef QmitkDescriptionParameterBackgroundJob_h
+#define QmitkDescriptionParameterBackgroundJob_h
 
 
 //QT
@@ -70,4 +70,3 @@ protected:
 };
 
 #endif
-

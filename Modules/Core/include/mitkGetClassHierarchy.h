@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKGETCLASSHIERARCHY_H
-#define MITKGETCLASSHIERARCHY_H
+#ifndef mitkGetClassHierarchy_h
+#define mitkGetClassHierarchy_h
 
 #include <string>
 #include <vector>
@@ -122,4 +122,4 @@ namespace mitk
   }
 }
 
-#endif // MITKGETCLASSHIERARCHY_H
+#endif

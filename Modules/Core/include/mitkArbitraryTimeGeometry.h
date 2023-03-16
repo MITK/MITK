@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef ArbitraryTimeGeometry_h
-#define ArbitraryTimeGeometry_h
+#ifndef mitkArbitraryTimeGeometry_h
+#define mitkArbitraryTimeGeometry_h
 
 //MITK
 #include <mitkTimeGeometry.h>
@@ -249,4 +249,4 @@ namespace mitk
   }; // end class ArbitraryTimeGeometry
 
 } // end namespace MITK
-#endif // ArbitraryTimeGeometry_h
+#endif

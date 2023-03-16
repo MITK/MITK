@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __mitkToFCameraMESASR4000Controller_h
-#define __mitkToFCameraMESASR4000Controller_h
+#ifndef mitkToFCameraMESASR4000Controller_h
+#define mitkToFCameraMESASR4000Controller_h
 
 #include <MitkMESASR4000ModuleExports.h>
 #include "mitkCommon.h"

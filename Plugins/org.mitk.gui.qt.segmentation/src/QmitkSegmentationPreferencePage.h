@@ -10,12 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKSEGMENTATIONPREFERENCEPAGE_H
-#define QMITKSEGMENTATIONPREFERENCEPAGE_H
+#ifndef QmitkSegmentationPreferencePage_h
+#define QmitkSegmentationPreferencePage_h
 
 #include "org_mitk_gui_qt_segmentation_Export.h"
 
-#include <berryIPreferences.h>
 #include <berryIQtPreferencePage.h>
 
 class QWidget;
@@ -58,8 +57,6 @@ protected:
   QWidget* m_Control;
 
   bool m_Initializing;
-
-  berry::IPreferences::Pointer m_SegmentationPreferencesNode;
 };
 
-#endif // QMITKSEGMENTATIONPREFERENCEPAGE_H
+#endif

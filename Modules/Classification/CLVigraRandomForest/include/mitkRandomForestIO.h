@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_DecisionForestFileIO__H_
-#define _MITK_DecisionForestFileIO__H_
+#ifndef mitkRandomForestIO_h
+#define mitkRandomForestIO_h
 
 #include <mitkAbstractFileIO.h>
 #include "vigra/random_forest.hxx"

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkPaintContourTool_h_Included
-#define mitkPaintContourTool_h_Included
+#ifndef mitkDrawPaintbrushTool_h
+#define mitkDrawPaintbrushTool_h
 
 #include "mitkPaintbrushTool.h"
 #include <MitkSegmentationExports.h>

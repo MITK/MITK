@@ -22,8 +22,6 @@ found in the LICENSE file.
 #include "berryPerspectiveHelper.h"
 #include "berryDragUtil.h"
 #include "berryWorkbenchPlugin.h"
-#include "berryIPreferencesService.h"
-#include "berryIPreferences.h"
 
 #include "berryWorkbenchPreferenceConstants.h"
 #include "berryGeometry.h"
@@ -33,6 +31,7 @@ found in the LICENSE file.
 
 #include "berryConstants.h"
 
+#include <mitkIPreferences.h>
 
 namespace berry
 {
@@ -217,9 +216,9 @@ PartSashContainer::PartSashContainer(const QString& id,
 {
   resizeListener = new ControlListener(this);
 
-  QString layout = WorkbenchPlugin::GetDefault()->GetPreferencesService()->
-      GetSystemPreferences()->Get(WorkbenchPreferenceConstants::PREFERRED_SASH_LAYOUT,
-          WorkbenchPreferenceConstants::LEFT);
+  auto layout = WorkbenchPlugin::GetDefault()->GetPreferences()->Get(
+    WorkbenchPreferenceConstants::PREFERRED_SASH_LAYOUT, WorkbenchPreferenceConstants::LEFT);
+
   if (layout == WorkbenchPreferenceConstants::RIGHT)
   {
     leftToRight = false;

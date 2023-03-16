@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKMODULESDIALOG_H
-#define QMITKMODULESDIALOG_H
+#ifndef QmitkModulesDialog_h
+#define QmitkModulesDialog_h
 
 #include <QDialog>
 

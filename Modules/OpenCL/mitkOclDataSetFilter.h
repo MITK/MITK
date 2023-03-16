@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkOclDataSetFilter_h
-#define __mitkOclDataSetFilter_h
+#ifndef mitkOclDataSetFilter_h
+#define mitkOclDataSetFilter_h
 
 #include "mitkOclFilter.h"
 #include "mitkOclDataSet.h"
@@ -64,4 +64,4 @@ protected:
   unsigned int m_CurrentSize;
 };
 }
-#endif // __mitkOclDataSetFilter_h
+#endif

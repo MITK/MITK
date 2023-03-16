@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef SMTRANSITION_H_HEADER_INCLUDED
-#define SMTRANSITION_H_HEADER_INCLUDED
+#ifndef mitkStateMachineTransition_h
+#define mitkStateMachineTransition_h
 
 #include "mitkCommon.h"
 #include "mitkInteractionEvent.h"
@@ -102,4 +102,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* SMTRANSITION_H_HEADER_INCLUDED */
+#endif

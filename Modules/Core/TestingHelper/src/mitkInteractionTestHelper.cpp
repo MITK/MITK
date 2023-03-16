@@ -55,12 +55,12 @@ void mitk::InteractionTestHelper::Initialize(const std::string &interactionXmlFi
         element->Attribute(mitk::InteractionEventConst::xmlEventPropertyRendererName().c_str());
 
       // get view direction
-      mitk::SliceNavigationController::ViewDirection viewDirection = mitk::SliceNavigationController::Axial;
+      mitk::AnatomicalPlane viewDirection = mitk::AnatomicalPlane::Axial;
       if (element->Attribute(mitk::InteractionEventConst::xmlEventPropertyViewDirection().c_str()) != nullptr)
       {
         int viewDirectionNum =
           std::atoi(element->Attribute(mitk::InteractionEventConst::xmlEventPropertyViewDirection().c_str()));
-        viewDirection = static_cast<mitk::SliceNavigationController::ViewDirection>(viewDirectionNum);
+        viewDirection = static_cast<mitk::AnatomicalPlane>(viewDirectionNum);
       }
 
       // get mapper slot id
@@ -289,8 +289,7 @@ mitk::RenderWindow *mitk::InteractionTestHelper::GetRenderWindowByName(const std
   return nullptr;
 }
 
-mitk::RenderWindow *mitk::InteractionTestHelper::GetRenderWindowByDefaultViewDirection(
-  mitk::SliceNavigationController::ViewDirection viewDirection)
+mitk::RenderWindow *mitk::InteractionTestHelper::GetRenderWindowByDefaultViewDirection(AnatomicalPlane viewDirection)
 {
   auto it = m_RenderWindowList.begin();
   auto end = m_RenderWindowList.end();

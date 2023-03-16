@@ -31,7 +31,6 @@ found in the LICENSE file.
 #include <berryIActionBarConfigurer.h>
 #include <berryIWorkbenchWindow.h>
 #include <berryIWorkbenchPage.h>
-#include <berryIPreferencesService.h>
 #include <berryIPerspectiveRegistry.h>
 #include <berryIPerspectiveDescriptor.h>
 #include <berryIProduct.h>
@@ -65,6 +64,9 @@ found in the LICENSE file.
 #include <mitkIDataStorageReference.h>
 #include <mitkDataStorageEditorInput.h>
 #include <mitkWorkbenchUtil.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 #include <vtkVersionMacros.h>
 
 // UGLYYY
@@ -844,8 +846,8 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
   if (showViewToolbar)
   {
-    auto prefService = berry::WorkbenchPlugin::GetDefault()->GetPreferencesService();
-    berry::IPreferences::Pointer stylePrefs = prefService->GetSystemPreferences()->Node(berry::QtPreferences::QT_STYLES_NODE);
+    auto* prefService = mitk::CoreServices::GetPreferencesService();
+    auto* stylePrefs = prefService->GetSystemPreferences()->Node(berry::QtPreferences::QT_STYLES_NODE);
     bool showCategoryNames = stylePrefs->GetBool(berry::QtPreferences::QT_SHOW_TOOLBAR_CATEGORY_NAMES, true);
 
     // Order view descriptors by category

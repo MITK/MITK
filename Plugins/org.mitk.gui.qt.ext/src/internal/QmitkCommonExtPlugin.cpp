@@ -26,17 +26,23 @@ found in the LICENSE file.
 #include <mitkProgressBar.h>
 #include <mitkRenderingManager.h>
 #include <mitkIOUtil.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 #include <mitkBaseApplication.h>
 
 #include <berryPlatformUI.h>
-#include <berryIPreferencesService.h>
 #include <berryPlatform.h>
 
 #include <Poco/Util/OptionProcessor.h>
 
 #include <QProcess>
 #include <QMainWindow>
+
+#include <usModuleInitialization.h>
+
+US_INITIALIZE_MODULE
 
 ctkPluginContext* QmitkCommonExtPlugin::_context = nullptr;
 
@@ -174,8 +180,8 @@ void QmitkCommonExtPlugin::handleIPCMessage(const QByteArray& msg)
   mainWindow->activateWindow();
 
   // Get the preferences for the instantiation behavior
-  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
-  berry::IPreferences::Pointer prefs = prefService->GetSystemPreferences()->Node("/General");
+  auto* prefService = mitk::CoreServices::GetPreferencesService();
+  auto* prefs = prefService->GetSystemPreferences()->Node("/General");
   bool newInstanceAlways = prefs->GetBool("newInstance.always", false);
   bool newInstanceScene = prefs->GetBool("newInstance.scene", true);
 

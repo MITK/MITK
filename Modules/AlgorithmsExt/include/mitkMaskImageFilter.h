@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKMASKIMAGEFILTER_H_HEADER_INCLUDED_C1F48A22
-#define MITKMASKIMAGEFILTER_H_HEADER_INCLUDED_C1F48A22
+#ifndef mitkMaskImageFilter_h
+#define mitkMaskImageFilter_h
 
 #include "MitkAlgorithmsExtExports.h"
 #include "mitkCommon.h"
@@ -108,4 +108,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKMASKIMAGEFILTER_H_HEADER_INCLUDED_C1F48A22 */
+#endif

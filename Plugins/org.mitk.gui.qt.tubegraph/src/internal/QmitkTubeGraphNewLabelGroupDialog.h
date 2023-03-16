@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QMITKTUBEGRAPHNEWLABELGROUPDIALOG_H_INCLUDED
-#define _QMITKTUBEGRAPHNEWLABELGROUPDIALOG_H_INCLUDED
+#ifndef QmitkTubeGraphNewLabelGroupDialog_h
+#define QmitkTubeGraphNewLabelGroupDialog_h
 
 #include <qdialog.h>
 #include <vector>

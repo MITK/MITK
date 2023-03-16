@@ -194,6 +194,9 @@ void MitkCoreActivator::Load(us::ModuleContext *context)
   m_PropertyRelations.reset(new mitk::PropertyRelations);
   context->RegisterService<mitk::IPropertyRelations>(m_PropertyRelations.get());
 
+  m_PreferencesService.reset(new mitk::PreferencesService);
+  context->RegisterService<mitk::IPreferencesService>(m_PreferencesService.get());
+
   m_MimeTypeProvider.reset(new mitk::MimeTypeProvider);
   m_MimeTypeProvider->Start();
   m_MimeTypeProviderReg = context->RegisterService<mitk::IMimeTypeProvider>(m_MimeTypeProvider.get());

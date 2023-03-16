@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKLABELSETJUMPTOACTION_H
-#define QMITKLABELSETJUMPTOACTION_H
+#ifndef QmitkLabelSetJumpToAction_h
+#define QmitkLabelSetJumpToAction_h
 
 #include "QmitkAbstractDataNodeAction.h"
 
@@ -43,4 +43,4 @@ protected:
   void InitializeAction() override;
 };
 
-#endif // QMITKLABELSETJUMPTOACTION_H
+#endif

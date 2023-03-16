@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITKCOMMONEXTPLUGIN_H_
-#define QMITKCOMMONEXTPLUGIN_H_
+#ifndef QmitkCommonExtPlugin_h
+#define QmitkCommonExtPlugin_h
 
 #include <ctkPluginActivator.h>
 
@@ -44,4 +44,4 @@ private:
 
 };
 
-#endif /* QMITKCOMMONEXTPLUGIN_H_ */
+#endif

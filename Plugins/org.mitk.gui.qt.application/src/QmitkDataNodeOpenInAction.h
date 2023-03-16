@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATANODEOPENINACTION_H
-#define QMITKDATANODEOPENINACTION_H
+#ifndef QmitkDataNodeOpenInAction_h
+#define QmitkDataNodeOpenInAction_h
 
 #include <org_mitk_gui_qt_application_Export.h>
 
@@ -51,4 +51,4 @@ protected:
 
 };
 
-#endif // QMITKDATANODEOPENINACTION_H
+#endif

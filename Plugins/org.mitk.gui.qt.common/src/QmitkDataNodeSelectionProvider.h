@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITKDATATREENODESELECTIONPROVIDER_H_
-#define QMITKDATATREENODESELECTIONPROVIDER_H_
+#ifndef QmitkDataNodeSelectionProvider_h
+#define QmitkDataNodeSelectionProvider_h
 
 #include <org_mitk_gui_qt_common_Export.h>
 
@@ -54,4 +54,4 @@ protected:
   void FireSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected) override;
 };
 
-#endif /* QMITKDATATREENODESELECTIONPROVIDER_H_ */
+#endif

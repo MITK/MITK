@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkFeatureBasedEdgeDetectionFilter_h_Included
-#define mitkFeatureBasedEdgeDetectionFilter_h_Included
+#ifndef mitkFeatureBasedEdgeDetectionFilter_h
+#define mitkFeatureBasedEdgeDetectionFilter_h
 
 #include <MitkSegmentationExports.h>
 #include <mitkImageToUnstructuredGridFilter.h>

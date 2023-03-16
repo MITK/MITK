@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __MITK_IMAGEGENERATIONHELPER_H
-#define __MITK_IMAGEGENERATIONHELPER_H
+#ifndef mitkImageGenerationHelper_h
+#define mitkImageGenerationHelper_h
 
 #include "itkImage.h"
 #include "itkImageRegionIterator.h"
@@ -70,4 +70,4 @@ private:
 };
 }
 
-#endif //__MITK_IMAGEGENERATIONHELPER_H
+#endif

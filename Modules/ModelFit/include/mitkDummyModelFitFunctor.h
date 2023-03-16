@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __DUMMYMODELFITFUNCTOR_H
-#define __DUMMYMODELFITFUNCTOR_H
+#ifndef mitkDummyModelFitFunctor_h
+#define mitkDummyModelFitFunctor_h
 
 #include <itkObject.h>
 
@@ -73,4 +73,4 @@ namespace mitk
 }
 
 
-#endif // __DUMMYMODELFITFUNCTOR_H
+#endif

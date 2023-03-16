@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKSAVEMULTILABELPRESETACTION_H
-#define QMITKSAVEMULTILABELPRESETACTION_H
+#ifndef QmitkSaveMultiLabelPresetAction_h
+#define QmitkSaveMultiLabelPresetAction_h
 
 #include <mitkIContextMenuAction.h>
 
@@ -31,4 +31,4 @@ public:
   void SetDecimated(bool) override;
 };
 
-#endif // QMITKSAVEMULTILABELPRESETACTION_H
+#endif

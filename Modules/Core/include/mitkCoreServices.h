@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKCORESERVICES_H
-#define MITKCORESERVICES_H
+#ifndef mitkCoreServices_h
+#define mitkCoreServices_h
 
 #include "MitkCoreExports.h"
 
@@ -34,6 +34,7 @@ namespace mitk
   class IPropertyFilters;
   class IPropertyPersistence;
   class IPropertyRelations;
+  class IPreferencesService;
 
   /**
    * @brief Access MITK core services.
@@ -107,6 +108,14 @@ namespace mitk
     static IMimeTypeProvider *GetMimeTypeProvider(us::ModuleContext *context = us::GetModuleContext());
 
     /**
+     * @brief Get an IPreferencesService instance.
+     * @param context The module context of the module getting the service.
+     * @return A non-nullptr IPreferencesService instance.
+     * @sa IPreferences
+     */
+    static IPreferencesService *GetPreferencesService(us::ModuleContext *context = us::GetModuleContext());
+
+    /**
      * @brief Unget a previously acquired service instance.
      * @param service The service instance to be released.
      * @param context
@@ -175,4 +184,4 @@ namespace mitk
   };
 }
 
-#endif // MITKCORESERVICES_H
+#endif

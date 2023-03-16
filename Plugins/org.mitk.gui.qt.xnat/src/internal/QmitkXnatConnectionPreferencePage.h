@@ -11,11 +11,10 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITKXNATCONNECTIONPREFERENCEPAGE_H_
-#define QMITKXNATCONNECTIONPREFERENCEPAGE_H_
+#ifndef QmitkXnatConnectionPreferencePage_h
+#define QmitkXnatConnectionPreferencePage_h
 
 #include "berryIQtPreferencePage.h"
-#include <berryIPreferences.h>
 
 #include "ui_QmitkXnatConnectionPreferencePageControls.h"
 
@@ -69,8 +68,6 @@ protected:
 
   QWidget* m_Control;
 
-  berry::IPreferences::WeakPtr m_XnatConnectionPreferencesNode;
-
 private:
 
   ///
@@ -80,4 +77,4 @@ private:
 
 };
 
-#endif /* QMITKXNATCONNECTIONPREFERENCEPAGE_H_ */
+#endif

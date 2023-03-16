@@ -270,6 +270,12 @@ set(CPP_FILES
   IO/mitkVtkLoggingAdapter.cpp
   IO/mitkPreferenceListReaderOptionsFunctor.cpp
   IO/mitkIOMetaInformationPropertyConstants.cpp
+  IO/mitkIPreferences.cpp
+  IO/mitkPreferences.cpp
+  IO/mitkIPreferencesService.cpp
+  IO/mitkPreferencesService.cpp
+  IO/mitkIPreferencesStorage.cpp
+  IO/mitkXMLPreferencesStorage.cpp
 
   Rendering/mitkAbstractAnnotationRenderer.cpp
   Rendering/mitkAnnotationUtils.cpp

@@ -76,4 +76,3 @@ class MITKDICOM_EXPORT ClassicDICOMSeriesReader : public ThreeDnTDICOMSeriesRead
 }
 
 #endif
-

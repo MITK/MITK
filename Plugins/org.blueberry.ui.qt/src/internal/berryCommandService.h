@@ -15,8 +15,8 @@ found in the LICENSE file.
 #define BERRYCOMMANDSERVICE_H
 
 #include <berryICommandService.h>
-
 #include "berryCommandPersistence.h"
+#include <string>
 
 namespace berry {
 
@@ -38,7 +38,7 @@ private:
   /**
    * The preference key prefix for all handler state.
    */
-  static const QString PREFERENCE_KEY_PREFIX;
+  static const std::string PREFERENCE_KEY_PREFIX;
 
   /**
    * Creates a preference key for the given piece of state on the given
@@ -52,8 +52,8 @@ private:
    *            should be created; must not be <code>null</code>.
    * @return A suitable preference key; never <code>null</code>.
    */
-  static const QString CreatePreferenceKey(const SmartPointer<Command>& command,
-                                           const QString& stateId);
+  static std::string CreatePreferenceKey(const SmartPointer<Command>& command,
+                                         const QString& stateId);
 
   /**
    * The command manager that supports this service. This value is never

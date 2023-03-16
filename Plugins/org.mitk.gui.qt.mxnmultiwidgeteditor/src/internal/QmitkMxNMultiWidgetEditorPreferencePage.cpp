@@ -13,12 +13,20 @@ found in the LICENSE file.
 #include "QmitkMxNMultiWidgetEditorPreferencePage.h"
 #include <QmitkMxNMultiWidgetEditor.h>
 
-// berry framework
-#include <berryIPreferencesService.h>
-#include <berryPlatform.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
+
+namespace
+{
+  mitk::IPreferences* GetPreferences()
+  {
+    auto* preferencesService = mitk::CoreServices::GetPreferencesService();
+    return preferencesService->GetSystemPreferences()->Node(QmitkMxNMultiWidgetEditor::EDITOR_ID.toStdString());
+  }
+}
 
 QmitkMxNMultiWidgetEditorPreferencePage::QmitkMxNMultiWidgetEditorPreferencePage()
-  : m_Preferences(nullptr)
 {
   // nothing here
 }
@@ -39,10 +47,6 @@ void QmitkMxNMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent)
 
   m_Ui.setupUi(m_MainControl);
 
-  berry::IPreferencesService* preferenceService = berry::Platform::GetPreferencesService();
-  Q_ASSERT(preferenceService);
-  m_Preferences = preferenceService->GetSystemPreferences()->Node(QmitkMxNMultiWidgetEditor::EDITOR_ID);
-
   connect(m_Ui.m_ColormapComboBox, SIGNAL(activated(int)), SLOT(ChangeColormap(int)));
   connect(m_Ui.m_ResetButton, SIGNAL(clicked()), SLOT(ResetPreferencesAndGUI()));
 
@@ -56,13 +60,15 @@ QWidget* QmitkMxNMultiWidgetEditorPreferencePage::GetQtControl() const
 
 bool QmitkMxNMultiWidgetEditorPreferencePage::PerformOk()
 {
-  m_Preferences->PutBool("Use constrained zooming and panning", m_Ui.m_EnableFlexibleZooming->isChecked());
-  m_Preferences->PutBool("Show level/window widget", m_Ui.m_ShowLevelWindowWidget->isChecked());
-  m_Preferences->PutBool("PACS like mouse interaction", m_Ui.m_PACSLikeMouseMode->isChecked());
-  m_Preferences->PutInt("Render window widget colormap", m_Ui.m_ColormapComboBox->currentIndex());
-  m_Preferences->PutBool("Render window individual decorations", m_Ui.m_IndividualDecorations->isChecked());
+  auto* prefs = GetPreferences();
 
-  m_Preferences->PutInt("crosshair gap size", m_Ui.m_CrosshairGapSize->value());
+  prefs->PutBool("Use constrained zooming and panning", m_Ui.m_EnableFlexibleZooming->isChecked());
+  prefs->PutBool("Show level/window widget", m_Ui.m_ShowLevelWindowWidget->isChecked());
+  prefs->PutBool("PACS like mouse interaction", m_Ui.m_PACSLikeMouseMode->isChecked());
+  prefs->PutInt("Render window widget colormap", m_Ui.m_ColormapComboBox->currentIndex());
+  prefs->PutBool("Render window individual decorations", m_Ui.m_IndividualDecorations->isChecked());
+
+  prefs->PutInt("crosshair gap size", m_Ui.m_CrosshairGapSize->value());
 
   return true;
 }
@@ -74,21 +80,25 @@ void QmitkMxNMultiWidgetEditorPreferencePage::PerformCancel()
 
 void QmitkMxNMultiWidgetEditorPreferencePage::Update()
 {
-  m_Ui.m_EnableFlexibleZooming->setChecked(m_Preferences->GetBool("Use constrained zooming and panning", true));
-  m_Ui.m_ShowLevelWindowWidget->setChecked(m_Preferences->GetBool("Show level/window widget", true));
-  m_Ui.m_PACSLikeMouseMode->setChecked(m_Preferences->GetBool("PACS like mouse interaction", false));
+  auto* prefs = GetPreferences();
 
-  int colormap = m_Preferences->GetInt("Render window widget colormap", 0);
+  m_Ui.m_EnableFlexibleZooming->setChecked(prefs->GetBool("Use constrained zooming and panning", true));
+  m_Ui.m_ShowLevelWindowWidget->setChecked(prefs->GetBool("Show level/window widget", true));
+  m_Ui.m_PACSLikeMouseMode->setChecked(prefs->GetBool("PACS like mouse interaction", false));
+
+  int colormap = prefs->GetInt("Render window widget colormap", 0);
   m_Ui.m_ColormapComboBox->setCurrentIndex(colormap);
 
-  m_Ui.m_IndividualDecorations->setChecked(m_Preferences->GetBool("Render window individual decorations", false));
+  m_Ui.m_IndividualDecorations->setChecked(prefs->GetBool("Render window individual decorations", false));
 
-  m_Ui.m_CrosshairGapSize->setValue(m_Preferences->GetInt("crosshair gap size", 32));
+  m_Ui.m_CrosshairGapSize->setValue(prefs->GetInt("crosshair gap size", 32));
 }
 
 void QmitkMxNMultiWidgetEditorPreferencePage::ResetPreferencesAndGUI()
 {
-  m_Preferences->Clear();
+  auto* prefs = GetPreferences();
+
+  prefs->Clear();
   Update();
 }
 

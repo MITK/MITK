@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkGrowCutTool_h_Included
-#define mitkGrowCutTool_h_Included
+#ifndef mitkGrowCutTool_h
+#define mitkGrowCutTool_h
 
 #include "mitkSegWithPreviewTool.h"
 #include <MitkSegmentationExports.h>
@@ -39,8 +39,6 @@ namespace mitk
     const char **GetXPM() const override;
     const char *GetName() const override;
     us::ModuleResource GetIconResource() const override;
-
-    bool CanHandle(const BaseData *referenceData, const BaseData *workingData) const override;
 
     void Activated() override;
     void Deactivated() override;

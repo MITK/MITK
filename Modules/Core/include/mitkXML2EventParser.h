@@ -88,4 +88,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* mitkStateMachineConfig_h */
+#endif

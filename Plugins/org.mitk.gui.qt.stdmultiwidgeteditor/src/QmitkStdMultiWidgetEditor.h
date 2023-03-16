@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKSTDMULTIWIDGETEDITOR_H
-#define QMITKSTDMULTIWIDGETEDITOR_H
+#ifndef QmitkStdMultiWidgetEditor_h
+#define QmitkStdMultiWidgetEditor_h
 
 // mitk gui qt common plugin
 #include <QmitkAbstractMultiWidgetEditor.h>
@@ -87,7 +87,7 @@ private:
   /**
   * @brief Overridden from QmitkAbstractRenderEditor
   */
-  virtual void OnPreferencesChanged(const berry::IBerryPreferences* preferences) override;
+  virtual void OnPreferencesChanged(const mitk::IPreferences* preferences) override;
   /**
   * @brief InitializePreferences Internal helper method to set default preferences.
   * This method is used to show the current preferences in the first call of
@@ -95,7 +95,7 @@ private:
   *
   * @param preferences berry preferences.
   */
-  void InitializePreferences(berry::IBerryPreferences *preferences);
+  void InitializePreferences(mitk::IPreferences *preferences);
   /**
    * @brief GetPreferenceDecorations Getter to fill internal members with values of preferences.
    * @param preferences The berry preferences.
@@ -103,23 +103,23 @@ private:
    * If a preference is set, the value will overwrite the current value. If it does not exist,
    * the value will not change.
    */
-  void GetPreferenceDecorations(const berry::IBerryPreferences *preferences);
+  void GetPreferenceDecorations(const mitk::IPreferences *preferences);
   /**
    * @brief GetColorForWidget helper method to convert a saved color string to mitk::Color.
    * @param hexColor color in hex format (#12356) where each digit is in the form (0-F).
    * @return the color in mitk format.
    */
-  mitk::Color HexColorToMitkColor(const QString& hexColor);
+  mitk::Color HexColorToMitkColor(const std::string& hexColor);
   /**
    * @brief MitkColorToHex Convert an mitk::Color to hex string.
    * @param color mitk format.
    * @return String in hex (#RRGGBB).
    */
-  QString MitkColorToHex(const mitk::Color& color);
+  std::string MitkColorToHex(const mitk::Color& color);
 
   struct Impl;
   std::unique_ptr<Impl> m_Impl;
 
 };
 
-#endif // QMITKSTDMULTIWIDGETEDITOR_H
+#endif

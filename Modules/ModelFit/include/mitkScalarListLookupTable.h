@@ -88,4 +88,4 @@ namespace mitk
             const ScalarListLookupTable& l);
 }
 
-#endif // mitkScalarListLookupTable_h
+#endif

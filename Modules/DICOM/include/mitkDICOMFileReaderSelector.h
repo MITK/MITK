@@ -113,4 +113,4 @@ class MITKDICOM_EXPORT DICOMFileReaderSelector : public itk::LightObject
 
 } // namespace
 
-#endif // mitkDICOMFileReaderSelector_h
+#endif

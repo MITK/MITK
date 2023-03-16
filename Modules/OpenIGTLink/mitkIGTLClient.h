@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKIGTLCLIENT_H
-#define MITKIGTLCLIENT_H
+#ifndef mitkIGTLClient_h
+#define mitkIGTLClient_h
 
 #include "mitkIGTLDevice.h"
 
@@ -86,4 +86,4 @@ namespace mitk
     void StopCommunicationWithSocket(igtl::Socket*) override;
   };
 } // namespace mitk
-#endif /* MITKIGTLCLIENT_H */
+#endif

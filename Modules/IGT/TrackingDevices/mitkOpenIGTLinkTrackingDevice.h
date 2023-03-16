@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKOPENIGTLINKTRACKINGDEVICE_H_HEADER_INCLUDED_
-#define MITKOPENIGTLINKTRACKINGDEVICE_H_HEADER_INCLUDED_
+#ifndef mitkOpenIGTLinkTrackingDevice_h
+#define mitkOpenIGTLinkTrackingDevice_h
 
 #include <mitkIGTConfig.h>
 #include <mitkTrackingDevice.h>
@@ -171,4 +171,4 @@ namespace mitk
     mitk::NavigationTool::Pointer ConstructDefaultOpenIGTLinkTool(std::string name, std::string identifier);
   };
 }//mitk
-#endif /* MITKOpenIGTLinkTRACKINGDEVICE_H_HEADER_INCLUDED_ */
+#endif

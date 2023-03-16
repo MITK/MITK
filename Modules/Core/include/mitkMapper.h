@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MAPPER_H_HEADER_INCLUDED_C1E6EA08
-#define MAPPER_H_HEADER_INCLUDED_C1E6EA08
+#ifndef mitkMapper_h
+#define mitkMapper_h
 
 #include "mitkBaseRenderer.h"
 #include "mitkCommon.h"
@@ -208,4 +208,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MAPPER_H_HEADER_INCLUDED_C1E6EA08 */
+#endif

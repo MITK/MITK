@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __GENERIC_PARAM_MODEL_FACTORY_H
-#define __GENERIC_PARAM_MODEL_FACTORY_H
+#ifndef mitkGenericParamModelFactory_h
+#define mitkGenericParamModelFactory_h
 
 #include <mitkCommon.h>
 
@@ -51,4 +51,4 @@ namespace mitk
 }
 
 
-#endif //__GENERIC_PARAM_MODEL_FACTORY_H
+#endif

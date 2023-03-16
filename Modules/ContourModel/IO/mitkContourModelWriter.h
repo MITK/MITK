@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_CONTOURMODEL_WRITER__H_
-#define _MITK_CONTOURMODEL_WRITER__H_
+#ifndef mitkContourModelWriter_h
+#define mitkContourModelWriter_h
 
 #include <mitkAbstractFileWriter.h>
 #include <mitkContourModel.h>

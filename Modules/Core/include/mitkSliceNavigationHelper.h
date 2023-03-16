@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKSLICENAVIGATIONHELPER_H
-#define MITKSLICENAVIGATIONHELPER_H
+#ifndef mitkSliceNavigationHelper_h
+#define mitkSliceNavigationHelper_h
 
 #include <MitkCoreExports.h>
 
@@ -54,7 +54,7 @@ namespace mitk
     * keeping the time steps (time point + time duration) from the original time geometry.
     *
     * \param timeGeometry       The TimeGeometry which should be used for cloning.
-    * \param planeOrientation   The PlaneOrientation that specifies the new orientation of the time geometry.
+    * \param orientation        The AnatomicalPlane that specifies the new orientation of the time geometry.
     * \param top                If true, create the plane at top, otherwise at bottom.
     * \param frontside          Defines the side of the plane.
     * \param rotated            Rotates the plane by 180 degree around its normal.
@@ -66,7 +66,7 @@ namespace mitk
     * \return The created geometry as TimeGeometry.
     */
     MITKCORE_EXPORT TimeGeometry::Pointer CreateOrientedTimeGeometry(const TimeGeometry* timeGeometry,
-                                                                     PlaneGeometry::PlaneOrientation planeOrientation,
+                                                                     AnatomicalPlane orientation,
                                                                      bool top,
                                                                      bool frontside,
                                                                      bool rotated);
@@ -96,4 +96,4 @@ namespace mitk
   } // namespace SliceNavigationHelper
 } // namespace mitk
 
-#endif // MITKSLICENAVIGATIONHELPER_H
+#endif

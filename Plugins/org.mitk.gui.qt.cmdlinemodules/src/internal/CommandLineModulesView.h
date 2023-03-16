@@ -14,9 +14,6 @@ found in the LICENSE file.
 #define CommandLineModulesView_h
 
 #include <QmitkAbstractView.h>
-#include <berryIPreferences.h>
-#include <berryIPreferencesService.h>
-#include <berryIBerryPreferences.h>
 #include <ctkCmdLineModuleReference.h>
 #include <ctkCmdLineModuleResult.h>
 #include <ctkCmdLineModuleManager.h>
@@ -27,11 +24,6 @@ class CommandLineModulesViewControls;
 class QmitkCmdLineModuleRunner;
 class QAction;
 class QVBoxLayout;
-
-namespace berry
-{
-  struct IBerryPreferences;
-}
 
 /*!
  * \class CommandLineModulesView
@@ -61,7 +53,7 @@ public:
    * \brief Called by the framework to indicate that the preferences have changed.
    * \param prefs not used, as we call RetrievePreferenceValues().
    */
-  void OnPreferencesChanged(const berry::IBerryPreferences* prefs) override;
+  void OnPreferencesChanged(const mitk::IPreferences* prefs) override;
 
 protected Q_SLOTS:
 
@@ -144,7 +136,7 @@ private:
   /**
    * \brief Called to get hold of the actual preferences node.
    */
-  berry::IBerryPreferences::Pointer RetrievePreferences();
+  mitk::IPreferences* RetrievePreferences() const;
 
   /**
    * \brief Search all modules for the one matching the given identifier.

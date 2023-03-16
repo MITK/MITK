@@ -166,20 +166,20 @@ void mitk::ContourModelSetToImageFilter::GenerateData()
     vec.Normalize();
     outputImageGeo->WorldToIndex(point3D, point3D);
 
-    mitk::PlaneGeometry::PlaneOrientation orientation;
+    mitk::AnatomicalPlane orientation;
     if (mitk::Equal(vec[0], 0))
     {
-      orientation = mitk::PlaneGeometry::Sagittal;
+      orientation = mitk::AnatomicalPlane::Sagittal;
       sliceIndex = point3D[0];
     }
     else if (mitk::Equal(vec[1], 0))
     {
-      orientation = mitk::PlaneGeometry::Coronal;
+      orientation = mitk::AnatomicalPlane::Coronal;
       sliceIndex = point3D[1];
     }
     else if (mitk::Equal(vec[2], 0))
     {
-      orientation = mitk::PlaneGeometry::Axial;
+      orientation = mitk::AnatomicalPlane::Axial;
       sliceIndex = point3D[2];
     }
     else

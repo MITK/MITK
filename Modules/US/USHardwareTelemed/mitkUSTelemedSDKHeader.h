@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKUSTelemedSDKHeader_H
-#define MITKUSTelemedSDKHeader_H
+#ifndef mitkUSTelemedSDKHeader_h
+#define mitkUSTelemedSDKHeader_h
 
 /*#include <strmif.h>
 #include <usgfw2.h>
@@ -133,4 +133,4 @@ namespace mitk {
   } // namespace telemed
 } // namespace mitk
 
-#endif // MITKUSTelemedSDKHeader_H
+#endif

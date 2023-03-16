@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef _MITK_MITK_REGISTRATION_WRAPPER_MAPPER_BASE_H
-#define _MITK_MITK_REGISTRATION_WRAPPER_MAPPER_BASE_H
+#ifndef mitkRegistrationWrapperMapperBase_h
+#define mitkRegistrationWrapperMapperBase_h
 
 
 #include <vtkSmartPointer.h>
@@ -92,5 +92,4 @@ private:
 
 
 
-#endif /* MITKRegistrationWrapperMapperBase_H_HEADER_INCLUDED */
-
+#endif

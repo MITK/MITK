@@ -12,13 +12,13 @@ found in the LICENSE file.
 
 // Qmitk
 #include "QmitkDicomBrowser.h"
+
 #include "mitkPluginActivator.h"
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 #include "berryIQtPreferencePage.h"
-#include <berryIPreferences.h>
-#include <berryIPreferencesService.h>
-#include <berryIBerryPreferences.h>
-#include <berryPlatform.h>
 
 const std::string QmitkDicomBrowser::EDITOR_ID = "org.mitk.editors.dicombrowser";
 const QString QmitkDicomBrowser::TEMP_DICOM_FOLDER_SUFFIX="TmpDicomFolder";
@@ -184,10 +184,10 @@ void QmitkDicomBrowser::CreateTemporaryDirectory()
   tmp.mkdir(QDir::toNativeSeparators( m_TempDirectory ));
 }
 
-void QmitkDicomBrowser::OnPreferencesChanged(const berry::IBerryPreferences*)
+void QmitkDicomBrowser::OnPreferencesChanged(const mitk::IPreferences*)
 {
   SetPluginDirectory();
-  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
-  m_DatabaseDirectory = prefService->GetSystemPreferences()->Node("/org.mitk.views.dicomreader")->Get("default dicom path", m_PluginDirectory);
+  auto* prefService = mitk::CoreServices::GetPreferencesService();
+  m_DatabaseDirectory = QString::fromStdString(prefService->GetSystemPreferences()->Node("/org.mitk.views.dicomreader")->Get("default dicom path", m_PluginDirectory.toStdString()));
   m_Controls.internalDataWidget->SetDatabaseDirectory(m_DatabaseDirectory);
 }

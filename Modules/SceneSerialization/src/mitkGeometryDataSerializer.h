@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkGeometryDataSerializer_h_included
-#define mitkGeometryDataSerializer_h_included
+#ifndef mitkGeometryDataSerializer_h
+#define mitkGeometryDataSerializer_h
 
 #include "mitkBaseDataSerializer.h"
 

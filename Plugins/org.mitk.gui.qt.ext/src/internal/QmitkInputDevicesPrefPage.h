@@ -11,11 +11,10 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITK_INPUTDEVICESPREFPAGE_H_
-#define QMITK_INPUTDEVICESPREFPAGE_H_
+#ifndef QmitkInputDevicesPrefPage_h
+#define QmitkInputDevicesPrefPage_h
 
 #include "berryIQtPreferencePage.h"
-#include <berryIPreferences.h>
 
 #include <QHash>
 #include <QGroupBox>
@@ -81,10 +80,8 @@ protected:
   QRadioButton* m_WiiMoteHeadTracking;
   QRadioButton* m_WiiMoteSurfaceInteraction;
 
-  berry::IPreferences::Pointer m_InputDevicesPrefNode;
-
   mitk::IInputDeviceRegistry* GetInputDeviceRegistry() const;
 
 };
 
-#endif // QMITK_INPUTDEVICESPREFPAGE_H_
+#endif

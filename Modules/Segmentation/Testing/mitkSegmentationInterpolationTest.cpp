@@ -35,21 +35,21 @@ class mitkSegmentationInterpolationTestSuite : public mitk::TestFixture
 
 private:
   // The tests all do the same, only in different directions
-  void testRoutine(mitk::SliceNavigationController::ViewDirection viewDirection)
+  void testRoutine(mitk::AnatomicalPlane viewDirection)
   {
     int dim;
     switch (viewDirection)
     {
-      case (mitk::SliceNavigationController::Axial):
+      case (mitk::AnatomicalPlane::Axial):
         dim = 2;
         break;
-      case (mitk::SliceNavigationController::Coronal):
+      case (mitk::AnatomicalPlane::Coronal):
         dim = 1;
         break;
-      case (mitk::SliceNavigationController::Sagittal):
+      case (mitk::AnatomicalPlane::Sagittal):
         dim = 0;
         break;
-      default: // mitk::SliceNavigationController::Original
+      default: // mitk::AnatomicalPlane::Original
         dim = -1;
         break;
     }
@@ -184,19 +184,19 @@ public:
 
   void Equal_Axial_TestInterpolationAndReferenceInterpolation_ReturnsTrue()
   {
-    mitk::SliceNavigationController::ViewDirection viewDirection = mitk::SliceNavigationController::Axial;
+    mitk::AnatomicalPlane viewDirection = mitk::AnatomicalPlane::Axial;
     testRoutine(viewDirection);
   }
 
   void Equal_Coronal_TestInterpolationAndReferenceInterpolation_ReturnsTrue() // Coronal
   {
-    mitk::SliceNavigationController::ViewDirection viewDirection = mitk::SliceNavigationController::Coronal;
+    mitk::AnatomicalPlane viewDirection = mitk::AnatomicalPlane::Coronal;
     testRoutine(viewDirection);
   }
 
   void Equal_Sagittal_TestInterpolationAndReferenceInterpolation_ReturnsTrue()
   {
-    mitk::SliceNavigationController::ViewDirection viewDirection = mitk::SliceNavigationController::Sagittal;
+    mitk::AnatomicalPlane viewDirection = mitk::AnatomicalPlane::Sagittal;
     testRoutine(viewDirection);
   }
 };

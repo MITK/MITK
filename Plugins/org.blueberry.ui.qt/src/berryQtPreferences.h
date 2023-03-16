@@ -22,12 +22,12 @@ namespace berry {
 
 struct BERRY_UI_QT QtPreferences
 {
-  static const QString QT_STYLES_NODE; // = "qtstyles";
-  static const QString QT_STYLE_NAME; // = "stylename";
-  static const QString QT_STYLE_SEARCHPATHS; // = "searchpaths";
-  static const QString QT_FONT_NAME; // = "fontname";
-  static const QString QT_FONT_SIZE; // = "fontsize";
-  static const QString QT_SHOW_TOOLBAR_CATEGORY_NAMES; // = "show_toolbar_category_names";
+  static const std::string QT_STYLES_NODE; // = "qtstyles";
+  static const std::string QT_STYLE_NAME; // = "stylename";
+  static const std::string QT_STYLE_SEARCHPATHS; // = "searchpaths";
+  static const std::string QT_FONT_NAME; // = "fontname";
+  static const std::string QT_FONT_SIZE; // = "fontsize";
+  static const std::string QT_SHOW_TOOLBAR_CATEGORY_NAMES; // = "show_toolbar_category_names";
 };
 }
 

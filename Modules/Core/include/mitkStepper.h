@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef STEPPER_H_HEADER_INCLUDED_C1E77191
-#define STEPPER_H_HEADER_INCLUDED_C1E77191
+#ifndef mitkStepper_h
+#define mitkStepper_h
 
 #include "mitkNumericTypes.h"
 #include <MitkCoreExports.h>
@@ -141,4 +141,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* STEPPER_H_HEADER_INCLUDED_C1E77191 */
+#endif

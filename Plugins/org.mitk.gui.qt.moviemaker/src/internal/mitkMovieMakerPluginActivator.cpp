@@ -13,6 +13,9 @@ found in the LICENSE file.
 #include "mitkMovieMakerPluginActivator.h"
 #include "QmitkMovieMakerView.h"
 #include "QmitkScreenshotMaker.h"
+#include <usModuleInitialization.h>
+
+US_INITIALIZE_MODULE
 
 namespace mitk {
 

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIMAGEVTKLEGACYIO_H
-#define MITKIMAGEVTKLEGACYIO_H
+#ifndef mitkImageVtkLegacyIO_h
+#define mitkImageVtkLegacyIO_h
 
 #include "mitkAbstractFileIO.h"
 
@@ -40,4 +40,4 @@ namespace mitk
     ImageVtkLegacyIO *IOClone() const override;
   };
 }
-#endif // MITKIMAGEVTKLEGACYIO_H
+#endif

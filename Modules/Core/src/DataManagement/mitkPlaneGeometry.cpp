@@ -118,7 +118,7 @@ namespace mitk
   void PlaneGeometry::InitializeStandardPlane(mitk::ScalarType width,
                                               ScalarType height,
                                               const Vector3D &spacing,
-                                              PlaneGeometry::PlaneOrientation planeorientation,
+                                              AnatomicalPlane planeorientation,
                                               ScalarType zPosition,
                                               bool frontside,
                                               bool rotated,
@@ -143,7 +143,7 @@ namespace mitk
   void PlaneGeometry::InitializeStandardPlane(mitk::ScalarType width,
                                               mitk::ScalarType height,
                                               const AffineTransform3D *transform /* = nullptr */,
-                                              PlaneGeometry::PlaneOrientation planeorientation /* = Axial */,
+                                              AnatomicalPlane planeorientation /* = Axial */,
                                               mitk::ScalarType zPosition /* = 0 */,
                                               bool frontside /* = true */,
                                               bool rotated /* = false */,
@@ -187,10 +187,10 @@ namespace mitk
 
     switch (planeorientation) // Switch through our limited choice of standard planes:
     {
-      case None:
-      /** Orientation 'None' shall be done like the axial plane orientation,
+      case AnatomicalPlane::Original:
+      /** Orientation 'Original' shall be done like the axial plane,
        *  for whatever reasons. */
-      case Axial:
+      case AnatomicalPlane::Axial:
         if (frontside) // Radiologist's view from below. A cut along the triangle ear-ear-nose.
         {
           if (rotated == false)
@@ -237,7 +237,7 @@ namespace mitk
         normalDirection = 2; // That is S=Superior=z=third_axis=middlefinger in righthanded LPS-system.
         break;
 
-      case Coronal: // Coronal=Frontal plane; cuts through patient's ear-ear-heel-heel:
+      case AnatomicalPlane::Coronal: // Coronal=Frontal plane; cuts through patient's ear-ear-heel-heel:
         if (frontside)
         {
           if (rotated == false) // x=[1; 0; 0], y=[0; 0; 1], z=[0; 1; 0], origin=[0,zpos,0]: LAI (r.h.)
@@ -271,7 +271,7 @@ namespace mitk
         normalDirection = 1; // Normal vector = posterior direction.
         break;
 
-      case Sagittal: // Sagittal=Medial plane, the symmetry-plane mirroring your face.
+      case AnatomicalPlane::Sagittal: // Sagittal=Medial plane, the symmetry-plane mirroring your face.
         if (frontside)
         {
           if (rotated == false) //  x=[0;1;0], y=[0;0;1], z=[1;0;0], origin=[zpos,0,0]:  LAI (r.h.)
@@ -306,7 +306,7 @@ namespace mitk
         break;
 
       default:
-        itkExceptionMacro("unknown PlaneOrientation");
+        itkExceptionMacro("unknown AnatomicalPlane");
     }
 
     VnlVector normal(3);
@@ -374,7 +374,7 @@ namespace mitk
   }
 
   void PlaneGeometry::InitializeStandardPlane(const BaseGeometry *geometry3D,
-                                              PlaneOrientation planeorientation,
+                                              AnatomicalPlane planeorientation,
                                               ScalarType zPosition,
                                               bool frontside,
                                               bool rotated,
@@ -441,23 +441,23 @@ namespace mitk
 
     switch(planeorientation)
     {
-    case None:
-    /** Orientation 'None' shall be done like the axial plane orientation,
+    case AnatomicalPlane::Original:
+    /** Orientation 'Original' shall be done like the axial plane orientation,
      *  for whatever reasons. */
-    case Axial:
+    case AnatomicalPlane::Axial:
       width  = extents[0];
       height = extents[1];
       break;
-    case Coronal:
+    case AnatomicalPlane::Coronal:
       width  = extents[0];
       height = extents[2];
       break;
-    case Sagittal:
+    case AnatomicalPlane::Sagittal:
       width  = extents[1];
       height = extents[2];
       break;
     default:
-      itkExceptionMacro("unknown PlaneOrientation");
+      itkExceptionMacro("unknown AnatomicalPlane");
     }
 
     ScalarType bounds[6]= { 0, width, 0, height, 0, 1 };
@@ -471,27 +471,30 @@ namespace mitk
       width, height, transform, planeorientation, zPosition, frontside, rotated, top);
   }
 
-  void PlaneGeometry::InitializeStandardPlane(
-    const BaseGeometry *geometry3D, bool top, PlaneOrientation planeorientation, bool frontside, bool rotated)
+  void PlaneGeometry::InitializeStandardPlane(const BaseGeometry *geometry3D,
+                                              bool top,
+                                              AnatomicalPlane planeorientation,
+                                              bool frontside,
+                                              bool rotated)
   {
     /// The index of the sagittal, coronal and axial axes in world coordinate system.
     int worldAxis;
     switch(planeorientation)
     {
-    case None:
-    /** Orientation 'None' shall be done like the axial plane orientation,
+    case AnatomicalPlane::Original:
+    /** Orientation 'Original' shall be done like the axial plane orientation,
      *  for whatever reasons. */
-    case Axial:
+    case AnatomicalPlane::Axial:
       worldAxis = 2;
       break;
-    case Coronal:
+    case AnatomicalPlane::Coronal:
       worldAxis = 1;
       break;
-    case Sagittal:
+    case AnatomicalPlane::Sagittal:
       worldAxis = 0;
       break;
     default:
-      itkExceptionMacro("unknown PlaneOrientation");
+      itkExceptionMacro("unknown AnatomicalPlane");
     }
 
     // Inspired by:

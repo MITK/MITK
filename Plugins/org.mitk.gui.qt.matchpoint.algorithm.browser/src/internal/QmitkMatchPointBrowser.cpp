@@ -15,7 +15,6 @@ found in the LICENSE file.
 // Blueberry
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
-#include <berryPlatform.h>
 
 // Qmitk
 #include "QmitkMatchPointBrowser.h"
@@ -30,6 +29,9 @@ found in the LICENSE file.
 #include <mitkStatusBar.h>
 #include "MatchPointBrowserConstants.h"
 #include "mitkAlgorithmInfoSelectionProvider.h"
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 // MatchPoint
 #include "mapRegistrationAlgorithmInterface.h"
@@ -50,7 +52,7 @@ QmitkMatchPointBrowser::~QmitkMatchPointBrowser()
 {
 }
 
-void QmitkMatchPointBrowser::OnPreferencesChanged(const berry::IBerryPreferences* /*prefs*/)
+void QmitkMatchPointBrowser::OnPreferencesChanged(const mitk::IPreferences* /*prefs*/)
 {
     this->OnSearchFolderButtonPushed();
 }
@@ -196,15 +198,12 @@ void QmitkMatchPointBrowser::Error(QString msg)
 
 void QmitkMatchPointBrowser::RetrieveAndStorePreferenceValues()
 {
-    berry::IBerryPreferences::Pointer prefs = this->RetrievePreferences();
+    auto* prefs = this->RetrievePreferences();
 
-    bool loadApplicationDir = prefs->GetBool(
-        MatchPointBrowserConstants::LOAD_FROM_APPLICATION_DIR.c_str(), true);
-    bool loadHomeDir = prefs->GetBool(MatchPointBrowserConstants::LOAD_FROM_HOME_DIR.c_str(), false);
-    bool loadCurrentDir = prefs->GetBool(MatchPointBrowserConstants::LOAD_FROM_CURRENT_DIR.c_str(),
-        false);
-    bool loadAutoLoadDir = prefs->GetBool(MatchPointBrowserConstants::LOAD_FROM_AUTO_LOAD_DIR.c_str(),
-        false);
+    bool loadApplicationDir = prefs->GetBool(MatchPointBrowserConstants::LOAD_FROM_APPLICATION_DIR, true);
+    bool loadHomeDir = prefs->GetBool(MatchPointBrowserConstants::LOAD_FROM_HOME_DIR, false);
+    bool loadCurrentDir = prefs->GetBool(MatchPointBrowserConstants::LOAD_FROM_CURRENT_DIR, false);
+    bool loadAutoLoadDir = prefs->GetBool(MatchPointBrowserConstants::LOAD_FROM_AUTO_LOAD_DIR, false);
 
     // Get some default application paths.
     QStringList newPaths;
@@ -252,34 +251,19 @@ void QmitkMatchPointBrowser::RetrieveAndStorePreferenceValues()
     }
 
     // We get additional directory paths from preferences.
-    QString pathString = prefs->Get(MatchPointBrowserConstants::MDAR_DIRECTORIES_NODE_NAME.c_str(),
-        tr(""));
+    const auto pathString = QString::fromStdString(prefs->Get(MatchPointBrowserConstants::MDAR_DIRECTORIES_NODE_NAME, ""));
     QStringList additionalPaths = pathString.split(";", QString::SkipEmptyParts);
     newPaths << additionalPaths;
 
-    QString additionalAlgorirthmsString = prefs->Get(
-        MatchPointBrowserConstants::MDAR_FILES_NODE_NAME.c_str(), tr(""));
+    const auto additionalAlgorirthmsString = QString::fromStdString(prefs->Get(MatchPointBrowserConstants::MDAR_FILES_NODE_NAME, ""));
     additionalPaths = additionalAlgorirthmsString.split(";", QString::SkipEmptyParts);
     newPaths << additionalPaths;
 
     m_currentSearchPaths = newPaths;
 }
 
-berry::IBerryPreferences::Pointer QmitkMatchPointBrowser::RetrievePreferences()
+mitk::IPreferences* QmitkMatchPointBrowser::RetrievePreferences()
 {
-    berry::IPreferencesService* prefService
-        = berry::Platform::GetPreferencesService();
-
-    assert(prefService);
-
-    QString id = tr("/") + QString::fromStdString(MatchPointBrowserConstants::VIEW_ID);
-    berry::IBerryPreferences::Pointer prefs
-        = (prefService->GetSystemPreferences()->Node(id))
-        .Cast<berry::IBerryPreferences>();
-
-    assert(prefs);
-
-    return prefs;
+  const auto id = "/" + MatchPointBrowserConstants::VIEW_ID;
+  return mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Node(id);
 }
-
-

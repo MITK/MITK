@@ -274,4 +274,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif /* mitkLookupTable_h */
+#endif

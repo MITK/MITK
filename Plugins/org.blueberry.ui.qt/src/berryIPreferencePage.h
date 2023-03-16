@@ -14,7 +14,6 @@ found in the LICENSE file.
 #define BERRYIPREFERENCEPAGE_H_
 
 #include "berryObject.h"
-#include "berryIPreferences.h"
 #include "berryIWorkbench.h"
 
 #include <QObject>

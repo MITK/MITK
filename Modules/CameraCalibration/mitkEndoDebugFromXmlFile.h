@@ -58,4 +58,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif // mitkEndoDebugFromXmlFile_h
+#endif

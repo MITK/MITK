@@ -16,7 +16,6 @@ found in the LICENSE file.
 
 #include <berryIQtPreferencePage.h>
 #include <berryIQtStyleManager.h>
-#include <berryIPreferences.h>
 
 #include <ui_berryQtStylePreferencePage.h>
 
@@ -64,7 +63,6 @@ private:
   berry::IQtStyleManager* styleManager;
 
   Ui::QtStylePreferencePageUI controls;
-  berry::IPreferences::Pointer m_StylePref;
   berry::IQtStyleManager::Style oldStyle;
 
   berry::IQtStyleManager::StyleList styles;

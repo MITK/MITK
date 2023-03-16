@@ -96,4 +96,4 @@ namespace mitk
   };
 }
 
-#endif //mitkGeneralizedLInearModel_h
+#endif

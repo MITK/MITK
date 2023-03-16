@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#if !defined(QmitkPreprocessingResamplingView_H__INCLUDED)
-#define QmitkPreprocessingResamplingView_H__INCLUDED
+#ifndef QmitkPreprocessingResamplingView_h
+#define QmitkPreprocessingResamplingView_h
 
 #include <QmitkAbstractView.h>
 #include <org_mitk_gui_qt_preprocessing_resampling_Export.h>
@@ -118,5 +118,3 @@ private:
 };
 
 #endif
-
-

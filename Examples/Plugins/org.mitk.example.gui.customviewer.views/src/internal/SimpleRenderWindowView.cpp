@@ -15,8 +15,6 @@ found in the LICENSE file.
 #include <QmitkRenderWindow.h>
 
 #include "org_mitk_example_gui_customviewer_views_Activator.h"
-#include <berryIBerryPreferences.h>
-#include <ctkServiceTracker.h>
 #include <mitkIRenderingManager.h>
 #include <mitkInteractionConst.h>
 #include <mitkSliceNavigationController.h>
@@ -34,17 +32,13 @@ class AbstractRenderWindowViewPrivate
 {
 public:
   AbstractRenderWindowViewPrivate()
-    : m_RenderingManagerInterface(mitk::MakeRenderingManagerInterface(mitk::RenderingManager::GetInstance())),
-      m_PrefServiceTracker(org_mitk_example_gui_customviewer_views_Activator::GetPluginContext())
+    : m_RenderingManagerInterface(mitk::MakeRenderingManagerInterface(mitk::RenderingManager::GetInstance()))
   // //! [SimpleRenderWindowViewHelper]
   {
-    m_PrefServiceTracker.open();
   }
 
   ~AbstractRenderWindowViewPrivate() { delete m_RenderingManagerInterface; }
   mitk::IRenderingManager *m_RenderingManagerInterface;
-  ctkServiceTracker<berry::IPreferencesService *> m_PrefServiceTracker;
-  berry::IBerryPreferences::Pointer m_Prefs;
 };
 
 const std::string SimpleRenderWindowView::VIEW_ID = "org.mitk.customviewer.views.simplerenderwindowview";
@@ -94,9 +88,9 @@ QmitkRenderWindow *SimpleRenderWindowView::GetQmitkRenderWindow(const QString &i
   return nullptr;
 }
 
-QmitkRenderWindow *SimpleRenderWindowView::GetQmitkRenderWindow(const mitk::BaseRenderer::ViewDirection &viewDirection) const
+QmitkRenderWindow *SimpleRenderWindowView::GetQmitkRenderWindow(const mitk::AnatomicalPlane& orientation) const
 {
-  if (viewDirection == mitk::BaseRenderer::ViewDirection::AXIAL)
+  if (orientation == mitk::AnatomicalPlane::Axial)
   {
     return m_RenderWindow;
   }

@@ -23,5 +23,6 @@
 		<file>favorite_add.svg</file>
 		<file>favorite_remove.svg</file>
 		<file>hourglass-half-solid.svg</file>
+		<file>times.svg</file>
 	</qresource>
 </RCC>

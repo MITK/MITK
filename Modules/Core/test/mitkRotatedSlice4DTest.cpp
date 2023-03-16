@@ -50,7 +50,7 @@ int mitkRotatedSlice4DTest(int, char *argv[])
     int sliceNumber = std::min(5, static_cast<int>(image3D->GetSlicedGeometry()->GetSlices()));
 
     mitk::PlaneGeometry::Pointer plane = mitk::PlaneGeometry::New();
-    plane->InitializeStandardPlane(image3D->GetGeometry(), mitk::PlaneGeometry::Coronal, sliceNumber, true, false);
+    plane->InitializeStandardPlane(image3D->GetGeometry(), mitk::AnatomicalPlane::Coronal, sliceNumber, true, false);
 
     // rotate about an arbitrary point and axis...
     float angle = 30;

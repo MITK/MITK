@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKMODULETABLEMODEL_H
-#define QMITKMODULETABLEMODEL_H
+#ifndef QmitkModuleTableModel_h
+#define QmitkModuleTableModel_h
 
 #include <QAbstractTableModel>
 #include <QList>

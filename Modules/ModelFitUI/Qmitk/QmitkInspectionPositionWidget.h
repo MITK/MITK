@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITK_INSPECTION_POSITION_WIDGET_H
-#define QMITK_INSPECTION_POSITION_WIDGET_H
+#ifndef QmitkInspectionPositionWidget_h
+#define QmitkInspectionPositionWidget_h
 
 #include "mitkModelFitInfo.h"
 #include "mitkPointSet.h"
@@ -65,4 +65,4 @@ protected:
 
 };
 
-#endif // QmitkInspectionPositionWidget_H
+#endif

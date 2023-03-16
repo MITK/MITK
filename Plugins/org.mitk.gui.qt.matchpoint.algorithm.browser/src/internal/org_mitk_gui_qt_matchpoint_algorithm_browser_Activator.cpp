@@ -14,6 +14,10 @@ found in the LICENSE file.
 
 #include "QmitkMatchPointBrowser.h"
 
+#include <usModuleInitialization.h>
+
+US_INITIALIZE_MODULE
+
 ctkPluginContext* org_mitk_gui_qt_matchpoint_algorithm_browser_Activator::m_Context = nullptr;
 
 void org_mitk_gui_qt_matchpoint_algorithm_browser_Activator::start(ctkPluginContext* context)

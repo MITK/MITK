@@ -56,4 +56,4 @@ protected:
   std::vector<mitk::NavigationToolStorage::Pointer> m_AllStoragesHandledByThisWidget;
 };
 
-#endif // _QMITKMITKIGTNAVIGATIONTOOLMANAGERVIEW_H_INCLUDED
+#endif

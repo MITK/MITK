@@ -1,0 +1,37 @@
+cff-version: 1.2.0
+title: MITK
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: MITK Team
+    affiliation: German Cancer Research Center (DKFZ)
+repository-code: 'https://github.com/MITK/MITK'
+url: 'https://www.mitk.org/'
+abstract: >-
+  The Medical Imaging Interaction Toolkit (MITK) is a free
+  open-source software for the development of interactive
+  medical image processing software. Based on MITK, we
+  provide the MITK Workbench, a powerful and free
+  application to view, process, and segment medical images,
+  as well as a set of useful commandline applications for
+  typical image processing tasks like image registration,
+  conversion, stitching.
+keywords:
+  - dicom
+  - medical-imaging
+  - dicom-browser
+  - medical-image-computing
+  - cpp-library
+  - dicom-rt
+  - mitk
+  - image-segmentation
+  - annotation
+  - image-registration
+  - perfusion
+  - visualization
+  - application-framework
+license: BSD-3-Clause
+version: v2022.10
+date-released: '2022-10-29'

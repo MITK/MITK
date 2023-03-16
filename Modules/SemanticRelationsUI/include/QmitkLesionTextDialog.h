@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKLESIONTEXTDIALOG_H
-#define QMITKLESIONTEXTDIALOG_H
+#ifndef QmitkLesionTextDialog_h
+#define QmitkLesionTextDialog_h
 
 #include <MitkSemanticRelationsUIExports.h>
 
@@ -40,4 +40,4 @@ private:
 
 };
 
-#endif // QMITKLESIONTEXTDIALOG_H
+#endif

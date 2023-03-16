@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __mitkKinectDeviceFactory_h
-#define __mitkKinectDeviceFactory_h
+#ifndef mitkKinectDeviceFactory_h
+#define mitkKinectDeviceFactory_h
 
 #include <MitkKinectExports.h>
 #include "mitkKinectDevice.h"

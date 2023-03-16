@@ -165,4 +165,4 @@ namespace mitk
   };
 
 }
-#endif //mitkGIFGreyLevelDistanceZone_h
+#endif

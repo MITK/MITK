@@ -13,12 +13,8 @@ found in the LICENSE file.
 #include "berryQtWorkbenchAdvisor.h"
 #include "internal/berryQtGlobalEventFilter.h"
 #include "berryWorkbenchPlugin.h"
-#include "berryQtPreferences.h"
-
-#include <berryPlatform.h>
-#include <berryIPreferencesService.h>
-#include <berryIPreferences.h>
 #include <berryIQtStyleManager.h>
+#include <berryQtPreferences.h>
 
 #include <QApplication>
 #include <QString>
@@ -29,6 +25,8 @@ found in the LICENSE file.
 
 #include <vector>
 
+#include <mitkIPreferences.h>
+
 namespace berry
 {
 
@@ -36,11 +34,10 @@ void QtWorkbenchAdvisor::Initialize(IWorkbenchConfigurer::Pointer configurer)
 {
   WorkbenchAdvisor::Initialize(configurer);
 
-  IPreferencesService* prefService = WorkbenchPlugin::GetDefault()->GetPreferencesService();
-  IPreferences::Pointer prefs = prefService->GetSystemPreferences()->Node(QtPreferences::QT_STYLES_NODE);
-  QString styleName = prefs->Get(QtPreferences::QT_STYLE_NAME, "");
-  QString fontName = prefs->Get(QtPreferences::QT_FONT_NAME, "Open Sans");
-  QString fontSize = prefs->Get(QtPreferences::QT_FONT_SIZE, "9");
+  auto* prefs = WorkbenchPlugin::GetDefault()->GetPreferences()->Node(QtPreferences::QT_STYLES_NODE);
+  auto styleName = QString::fromStdString(prefs->Get(QtPreferences::QT_STYLE_NAME, ""));
+  auto fontName = QString::fromStdString(prefs->Get(QtPreferences::QT_FONT_NAME, "Open Sans"));
+  auto fontSize = QString::fromStdString(prefs->Get(QtPreferences::QT_FONT_SIZE, "9"));
 
   ctkServiceReference serviceRef = WorkbenchPlugin::GetDefault()->GetPluginContext()->getServiceReference<IQtStyleManager>();
   if (serviceRef)

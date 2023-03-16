@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATANODESHOWSELECTEDNODESACTION_H
-#define QMITKDATANODESHOWSELECTEDNODESACTION_H
+#ifndef QmitkDataNodeShowSelectedNodesAction_h
+#define QmitkDataNodeShowSelectedNodesAction_h
 
 #include <org_mitk_gui_qt_application_Export.h>
 
@@ -39,4 +39,4 @@ protected:
 
 };
 
-#endif // QMITKDATANODESHOWSELECTEDNODESACTION_H
+#endif

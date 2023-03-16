@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef StateMachineCondition_H_HEADER_INCLUDED_C19AE06B
-#define StateMachineCondition_H_HEADER_INCLUDED_C19AE06B
+#ifndef mitkStateMachineCondition_h
+#define mitkStateMachineCondition_h
 
 #include <string>
 
@@ -71,4 +71,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* StateMachineCondition_H_HEADER_INCLUDED_C19AE06B */
+#endif

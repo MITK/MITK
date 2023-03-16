@@ -87,7 +87,7 @@ QmitkRenderWindow* QmitkAbstractMultiWidgetEditor::GetQmitkRenderWindow(const QS
   return multiWidget->GetRenderWindow(id);
 }
 
-QmitkRenderWindow* QmitkAbstractMultiWidgetEditor::GetQmitkRenderWindow(const mitk::BaseRenderer::ViewDirection& viewDirection) const
+QmitkRenderWindow* QmitkAbstractMultiWidgetEditor::GetQmitkRenderWindow(const mitk::AnatomicalPlane& orientation) const
 {
   const auto& multiWidget = GetMultiWidget();
   if (nullptr == multiWidget)
@@ -95,7 +95,7 @@ QmitkRenderWindow* QmitkAbstractMultiWidgetEditor::GetQmitkRenderWindow(const mi
     return nullptr;
   }
 
-  return multiWidget->GetRenderWindow(viewDirection);
+  return multiWidget->GetRenderWindow(orientation);
 }
 
 void QmitkAbstractMultiWidgetEditor::SetReferenceGeometry(const mitk::TimeGeometry* referenceGeometry, bool resetCamera)

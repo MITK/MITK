@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITKIMAGETOUNSTRUCTUREDGRIDFILTER_h__
-#define _MITKIMAGETOUNSTRUCTUREDGRIDFILTER_h__
+#ifndef mitkImageToUnstructuredGridFilter_h
+#define mitkImageToUnstructuredGridFilter_h
 
 #include <MitkAlgorithmsExtExports.h>
 
@@ -97,4 +97,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif //_MITKIMAGETOUNSTRUCTUREDGRIDFILTER_h__
+#endif

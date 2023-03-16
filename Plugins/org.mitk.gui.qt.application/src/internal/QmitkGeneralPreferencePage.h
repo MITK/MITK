@@ -10,11 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKGENERALPREFERENCEPAGE_H
-#define QMITKGENERALPREFERENCEPAGE_H
+#ifndef QmitkGeneralPreferencePage_h
+#define QmitkGeneralPreferencePage_h
 
 #include "berryIQtPreferencePage.h"
-#include <berryIPreferences.h>
 
 class QWidget;
 class QCheckBox;
@@ -64,8 +63,6 @@ protected:
 
     QCheckBox* m_GlobalReinitOnNodeDelete;
     QCheckBox* m_GlobalReinitOnNodeVisibilityChanged;
-
-    berry::IPreferences::Pointer m_GeneralPreferencesNode;
 };
 
-#endif // QMITKGENERALPREFERENCEPAGE_H
+#endif

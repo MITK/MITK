@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkExtFileSaveProjectAction_H_
-#define QmitkExtFileSaveProjectAction_H_
+#ifndef QmitkExtFileSaveProjectAction_h
+#define QmitkExtFileSaveProjectAction_h
 
 #include <QAction>
 
@@ -44,4 +44,4 @@ private:
 };
 
 
-#endif /*QmitkExtFileSaveProjectAction_H_*/
+#endif

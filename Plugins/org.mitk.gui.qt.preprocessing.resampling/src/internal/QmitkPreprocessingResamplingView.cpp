@@ -127,7 +127,7 @@ void QmitkPreprocessingResampling::InternalGetTimeNavigationController()
     auto tnc = renwin_part->GetTimeNavigationController();
     if( tnc != nullptr )
     {
-      m_TimeStepperAdapter = new QmitkStepperAdapter((QObject*) m_Controls->sliceNavigatorTime, tnc->GetTime(), "sliceNavigatorTimeFromBIP");
+      m_TimeStepperAdapter = new QmitkStepperAdapter(m_Controls->timeSliceNavigationWidget, tnc->GetTime());
     }
   }
 }
@@ -144,7 +144,7 @@ void QmitkPreprocessingResampling::OnSelectionChanged(berry::IWorkbenchPart::Poi
   if (!nodes.empty())
   {
     // reset GUI
-    m_Controls->sliceNavigatorTime->setEnabled(false);
+    m_Controls->timeSliceNavigationWidget->setEnabled(false);
     m_Controls->leImage1->setText(tr("Select an Image in Data Manager"));
 
     m_SelectedNodes.clear();
@@ -191,7 +191,7 @@ void QmitkPreprocessingResampling::OnSelectionChanged(berry::IWorkbenchPart::Poi
           // try to retrieve the TNC (for 4-D Processing )
           this->InternalGetTimeNavigationController();
 
-          m_Controls->sliceNavigatorTime->setEnabled(true);
+          m_Controls->timeSliceNavigationWidget->setEnabled(true);
           m_Controls->tlTime->setEnabled(true);
         }
       }
@@ -273,7 +273,7 @@ void QmitkPreprocessingResampling::StartButtonClicked()
   {
     mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
     timeSelector->SetInput(newImage);
-    timeSelector->SetTimeNr( ((QmitkSliderNavigatorWidget*)m_Controls->sliceNavigatorTime)->GetPos() );
+    timeSelector->SetTimeNr(m_Controls->timeSliceNavigationWidget->GetPos());
     timeSelector->Update();
     newImage = timeSelector->GetOutput();
   }

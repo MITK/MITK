@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef SQUARED_DIFFERENCES_FITCOSTFUNCTION_H
-#define SQUARED_DIFFERENCES_FITCOSTFUNCTION_H
+#ifndef mitkSquaredDifferencesFitCostFunction_h
+#define mitkSquaredDifferencesFitCostFunction_h
 
 #include <mitkMVModelFitCostFunction.h>
 
@@ -49,4 +49,4 @@ protected:
 
 }
 
-#endif // SquaredDifferencesFitCostFunction_H
+#endif

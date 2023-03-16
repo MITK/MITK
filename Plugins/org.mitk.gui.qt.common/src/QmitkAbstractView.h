@@ -10,15 +10,12 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKABSTRACTVIEW_H_
-#define QMITKABSTRACTVIEW_H_
+#ifndef QmitkAbstractView_h
+#define QmitkAbstractView_h
 
 //# blueberry stuff
 #include <berryQtViewPart.h>
-#include <berryIPreferencesService.h>
 #include <berryISelectionListener.h>
-
-#include <berryIPreferences.h>
 
 //# mitk stuff
 #include <org_mitk_gui_qt_common_Export.h>
@@ -36,10 +33,7 @@ found in the LICENSE file.
 
 namespace mitk {
   class DataNode;
-}
-
-namespace berry {
-  struct IBerryPreferences;
+  class IPreferences;
 }
 
 class QmitkAbstractViewPrivate;
@@ -80,7 +74,7 @@ class QmitkAbstractViewSelectionProvider;
  * <ul>
  * <li>void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer> &nodes)
  * <li>void OnNullSelection(berry::IWorkbenchPart::Pointer part)
- * <li>void OnPreferencesChanged(const berry::IBerryPreferences*)
+ * <li>void OnPreferencesChanged(const mitk::IPreferences*)
  * <li>void NodeAdded(const mitk::DataNode* node)
  * <li>void NodeChanged(const mitk::DataNode* node)
  * <li>void NodeRemoved(const mitk::DataNode* node)
@@ -183,7 +177,7 @@ protected:
    * <b>Important</b>: When refering to this preferences, e.g. in a PreferencePage: The ID
    * for this preferences object is "/<VIEW-ID>", e.g. "/org.mitk.views.datamanager"
    */
-  berry::IPreferences::Pointer GetPreferences() const;
+  mitk::IPreferences* GetPreferences() const;
 
   /**
    * Returns a reference to the currently active DataStorage.
@@ -301,7 +295,7 @@ private:
    *
    * \see GetPreferences()
    */
-  virtual void OnPreferencesChanged(const berry::IBerryPreferences*);
+  virtual void OnPreferencesChanged(const mitk::IPreferences*);
 
   /**
    * Called when a DataStorage Add event was thrown. May be reimplemented
@@ -359,4 +353,4 @@ private:
 
 };
 
-#endif /*QMITKABSTRACTVIEW_H_*/
+#endif

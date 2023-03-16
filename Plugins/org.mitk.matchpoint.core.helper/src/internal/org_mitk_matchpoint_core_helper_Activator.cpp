@@ -18,6 +18,9 @@ found in the LICENSE file.
 #include "QmitkStyleManager.h"
 #include "mitkNodePredicateDataType.h"
 
+#include <usModuleInitialization.h>
+
+US_INITIALIZE_MODULE
 
 ctkPluginContext* org_mitk_matchpoint_core_helper_Activator::m_Context = nullptr;
 org_mitk_matchpoint_core_helper_Activator*

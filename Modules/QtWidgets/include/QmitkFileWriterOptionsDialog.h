@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKFILEWRITEROPTIONSDIALOG_H
-#define QMITKFILEWRITEROPTIONSDIALOG_H
+#ifndef QmitkFileWriterOptionsDialog_h
+#define QmitkFileWriterOptionsDialog_h
 
 #include <mitkIOUtil.h>
 
@@ -42,4 +42,4 @@ private:
   std::vector<mitk::FileWriterSelector::Item> m_WriterItems;
 };
 
-#endif // QMITKFILEREADEROPTIONSDIALOG_H
+#endif

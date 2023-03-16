@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef MITKSTANDARDTOFTSMODELFACTORY_H
-#define MITKSTANDARDTOFTSMODELFACTORY_H
+#ifndef mitkStandardToftsModelFactory_h
+#define mitkStandardToftsModelFactory_h
 
 #include "mitkConcreteAIFBasedModelFactory.h"
 #include "mitkStandardToftsModel.h"
@@ -48,4 +48,4 @@ namespace mitk
   };
 
 }
-#endif // MITKSTANDARDTOFTSMODELFACTORY_H
+#endif

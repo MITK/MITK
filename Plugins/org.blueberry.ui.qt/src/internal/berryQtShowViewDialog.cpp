@@ -13,7 +13,6 @@ found in the LICENSE file.
 #include "berryQtShowViewDialog.h"
 
 #include <berryIViewDescriptor.h>
-#include <berryIPreferences.h>
 
 #include <berryViewTreeModel.h>
 
@@ -22,6 +21,8 @@ found in the LICENSE file.
 
 #include <QSortFilterProxyModel>
 #include <QPushButton>
+
+#include <mitkIPreferences.h>
 
 namespace berry {
 
@@ -185,8 +186,8 @@ void QtShowViewDialog::UpdateButtons()
 
 void QtShowViewDialog::RestoreState()
 {
-  IPreferences::Pointer prefs = WorkbenchPlugin::GetDefault()->GetPreferences();
-  QString str = prefs->Get(TAG_SHOWVIEWDIALOG, QString::null);
+  auto* prefs = WorkbenchPlugin::GetDefault()->GetPreferences();
+  auto str = QString::fromStdString(prefs->Get(TAG_SHOWVIEWDIALOG.toStdString(), ""));
   if (str.isEmpty()) return;
 
   std::stringstream ss(str.toStdString());
@@ -298,9 +299,9 @@ void QtShowViewDialog::SaveState()
   std::stringstream ss;
   memento->Save(ss);
 
-  IPreferences::Pointer prefs = WorkbenchPlugin::GetDefault()->GetPreferences();
-  prefs->Put(TAG_SHOWVIEWDIALOG, QString::fromStdString(ss.str()));
-  prefs->Sync();
+  auto* prefs = WorkbenchPlugin::GetDefault()->GetPreferences();
+  prefs->Put(TAG_SHOWVIEWDIALOG.toStdString(), ss.str());
+  prefs->Flush();
 }
 
 void QtShowViewDialog::done(int r)

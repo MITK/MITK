@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKUSVideoDevice_H_HEADER_INCLUDED_
-#define MITKUSVideoDevice_H_HEADER_INCLUDED_
+#ifndef mitkUSVideoDevice_h
+#define mitkUSVideoDevice_h
 
 #include <MitkUSExports.h>
 #include <mitkCommon.h>
@@ -245,4 +245,4 @@ namespace mitk {
   };
 } // namespace mitk
 
-#endif // MITKUSVideoDevice_H_HEADER_INCLUDED_
+#endif

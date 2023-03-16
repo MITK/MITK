@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATASTORAGETREEMODEL_H_
-#define QMITKDATASTORAGETREEMODEL_H_
+#ifndef QmitkDataStorageTreeModel_h
+#define QmitkDataStorageTreeModel_h
 
 #include <MitkQtWidgetsExports.h>
 
@@ -206,4 +206,4 @@ private:
   unsigned long m_DataStorageDeletedTag;
 };
 
-#endif /* QMITKDATASTORAGETREEMODEL_H_ */
+#endif

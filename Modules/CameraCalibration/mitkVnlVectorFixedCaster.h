@@ -58,4 +58,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif // mitkVnlVectorFixedCaster_h
+#endif

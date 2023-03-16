@@ -15,14 +15,23 @@ found in the LICENSE file.
 #include <ui_QmitkStdMultiWidgetEditorPreferencePage.h>
 #include <QmitkStdMultiWidgetEditor.h>
 
-#include <berryIPreferencesService.h>
-#include <berryPlatform.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 #include <QColorDialog>
 
+namespace
+{
+  mitk::IPreferences* GetPreferences()
+  {
+    auto* preferencesService = mitk::CoreServices::GetPreferencesService();
+    return preferencesService->GetSystemPreferences()->Node(QmitkStdMultiWidgetEditor::EDITOR_ID.toStdString());
+  }
+}
+
 QmitkStdMultiWidgetEditorPreferencePage::QmitkStdMultiWidgetEditorPreferencePage()
-  : m_Preferences(nullptr),
-    m_Ui(new Ui::QmitkStdMultiWidgetEditorPreferencePage),
+  : m_Ui(new Ui::QmitkStdMultiWidgetEditorPreferencePage),
     m_Control(nullptr)
 {
 }
@@ -36,11 +45,6 @@ void QmitkStdMultiWidgetEditorPreferencePage::CreateQtControl(QWidget* parent)
   m_Control = new QWidget(parent);
 
   m_Ui->setupUi(m_Control);
-
-  berry::IPreferencesService* prefService = berry::Platform::GetPreferencesService();
-  Q_ASSERT(prefService);
-
-  m_Preferences = prefService->GetSystemPreferences()->Node(QmitkStdMultiWidgetEditor::EDITOR_ID);
 
   QObject::connect( m_Ui->m_ColorButton1, SIGNAL( clicked() )
                     , this, SLOT( ColorChooserButtonClicked() ) );
@@ -77,60 +81,64 @@ void QmitkStdMultiWidgetEditorPreferencePage::PerformCancel()
 
 bool QmitkStdMultiWidgetEditorPreferencePage::PerformOk()
 {
-  m_Preferences->Put("stdmulti.widget0 corner annotation", m_WidgetAnnotation[0]);
-  m_Preferences->Put("stdmulti.widget1 corner annotation", m_WidgetAnnotation[1]);
-  m_Preferences->Put("stdmulti.widget2 corner annotation", m_WidgetAnnotation[2]);
-  m_Preferences->Put("stdmulti.widget3 corner annotation", m_WidgetAnnotation[3]);
+  auto* prefs = GetPreferences();
 
-  m_Preferences->Put("stdmulti.widget0 decoration color", m_WidgetDecorationColor[0]);
-  m_Preferences->Put("stdmulti.widget1 decoration color", m_WidgetDecorationColor[1]);
-  m_Preferences->Put("stdmulti.widget2 decoration color", m_WidgetDecorationColor[2]);
-  m_Preferences->Put("stdmulti.widget3 decoration color", m_WidgetDecorationColor[3]);
+  prefs->Put("stdmulti.widget0 corner annotation", m_WidgetAnnotation[0].toStdString());
+  prefs->Put("stdmulti.widget1 corner annotation", m_WidgetAnnotation[1].toStdString());
+  prefs->Put("stdmulti.widget2 corner annotation", m_WidgetAnnotation[2].toStdString());
+  prefs->Put("stdmulti.widget3 corner annotation", m_WidgetAnnotation[3].toStdString());
 
-  m_Preferences->Put("stdmulti.widget0 first background color", m_WidgetBackgroundColor1[0]);
-  m_Preferences->Put("stdmulti.widget1 first background color", m_WidgetBackgroundColor1[1]);
-  m_Preferences->Put("stdmulti.widget2 first background color", m_WidgetBackgroundColor1[2]);
-  m_Preferences->Put("stdmulti.widget3 first background color", m_WidgetBackgroundColor1[3]);
-  m_Preferences->Put("stdmulti.widget0 second background color", m_WidgetBackgroundColor2[0]);
-  m_Preferences->Put("stdmulti.widget1 second background color", m_WidgetBackgroundColor2[1]);
-  m_Preferences->Put("stdmulti.widget2 second background color", m_WidgetBackgroundColor2[2]);
-  m_Preferences->Put("stdmulti.widget3 second background color", m_WidgetBackgroundColor2[3]);
-  m_Preferences->PutInt("crosshair gap size", m_Ui->m_CrosshairGapSize->value());
+  prefs->Put("stdmulti.widget0 decoration color", m_WidgetDecorationColor[0].toStdString());
+  prefs->Put("stdmulti.widget1 decoration color", m_WidgetDecorationColor[1].toStdString());
+  prefs->Put("stdmulti.widget2 decoration color", m_WidgetDecorationColor[2].toStdString());
+  prefs->Put("stdmulti.widget3 decoration color", m_WidgetDecorationColor[3].toStdString());
 
-  m_Preferences->PutBool("Use constrained zooming and panning"
+  prefs->Put("stdmulti.widget0 first background color", m_WidgetBackgroundColor1[0].toStdString());
+  prefs->Put("stdmulti.widget1 first background color", m_WidgetBackgroundColor1[1].toStdString());
+  prefs->Put("stdmulti.widget2 first background color", m_WidgetBackgroundColor1[2].toStdString());
+  prefs->Put("stdmulti.widget3 first background color", m_WidgetBackgroundColor1[3].toStdString());
+  prefs->Put("stdmulti.widget0 second background color", m_WidgetBackgroundColor2[0].toStdString());
+  prefs->Put("stdmulti.widget1 second background color", m_WidgetBackgroundColor2[1].toStdString());
+  prefs->Put("stdmulti.widget2 second background color", m_WidgetBackgroundColor2[2].toStdString());
+  prefs->Put("stdmulti.widget3 second background color", m_WidgetBackgroundColor2[3].toStdString());
+  prefs->PutInt("crosshair gap size", m_Ui->m_CrosshairGapSize->value());
+
+  prefs->PutBool("Use constrained zooming and panning"
                          , m_Ui->m_EnableFlexibleZooming->isChecked());
-  m_Preferences->PutBool("Show level/window widget", m_Ui->m_ShowLevelWindowWidget->isChecked());
-  m_Preferences->PutBool("PACS like mouse interaction", m_Ui->m_PACSLikeMouseMode->isChecked());
+  prefs->PutBool("Show level/window widget", m_Ui->m_ShowLevelWindowWidget->isChecked());
+  prefs->PutBool("PACS like mouse interaction", m_Ui->m_PACSLikeMouseMode->isChecked());
 
   return true;
 }
 
 void QmitkStdMultiWidgetEditorPreferencePage::Update()
 {
+  auto* prefs = GetPreferences();
+
   //Note: there should be default preferences already defined in the
   //QmitkStdMultiWidgetEditor::InitializePreferences(). Therefore,
   //all default values here are not relevant.
   //gradient background colors
-  m_WidgetBackgroundColor1[0] = m_Preferences->Get("stdmulti.widget0 first background color", "#000000");
-  m_WidgetBackgroundColor2[0] = m_Preferences->Get("stdmulti.widget0 second background color", "#000000");
-  m_WidgetBackgroundColor1[1] = m_Preferences->Get("stdmulti.widget1 first background color", "#000000");
-  m_WidgetBackgroundColor2[1] = m_Preferences->Get("stdmulti.widget1 second background color", "#000000");
-  m_WidgetBackgroundColor1[2] = m_Preferences->Get("stdmulti.widget2 first background color", "#000000");
-  m_WidgetBackgroundColor2[2] = m_Preferences->Get("stdmulti.widget2 second background color", "#000000");
-  m_WidgetBackgroundColor1[3] = m_Preferences->Get("stdmulti.widget3 first background color", "#191919");
-  m_WidgetBackgroundColor2[3] = m_Preferences->Get("stdmulti.widget3 second background color", "#7F7F7F");
+  m_WidgetBackgroundColor1[0] = QString::fromStdString(prefs->Get("stdmulti.widget0 first background color", "#000000"));
+  m_WidgetBackgroundColor2[0] = QString::fromStdString(prefs->Get("stdmulti.widget0 second background color", "#000000"));
+  m_WidgetBackgroundColor1[1] = QString::fromStdString(prefs->Get("stdmulti.widget1 first background color", "#000000"));
+  m_WidgetBackgroundColor2[1] = QString::fromStdString(prefs->Get("stdmulti.widget1 second background color", "#000000"));
+  m_WidgetBackgroundColor1[2] = QString::fromStdString(prefs->Get("stdmulti.widget2 first background color", "#000000"));
+  m_WidgetBackgroundColor2[2] = QString::fromStdString(prefs->Get("stdmulti.widget2 second background color", "#000000"));
+  m_WidgetBackgroundColor1[3] = QString::fromStdString(prefs->Get("stdmulti.widget3 first background color", "#191919"));
+  m_WidgetBackgroundColor2[3] = QString::fromStdString(prefs->Get("stdmulti.widget3 second background color", "#7F7F7F"));
 
   //decoration colors
-  m_WidgetDecorationColor[0] = m_Preferences->Get("stdmulti.widget0 decoration color", "#c00000");
-  m_WidgetDecorationColor[1] = m_Preferences->Get("stdmulti.widget1 decoration color", "#00b000");
-  m_WidgetDecorationColor[2] = m_Preferences->Get("stdmulti.widget2 decoration color", "#0080ff");
-  m_WidgetDecorationColor[3] = m_Preferences->Get("stdmulti.widget3 decoration color", "#ffff00");
+  m_WidgetDecorationColor[0] = QString::fromStdString(prefs->Get("stdmulti.widget0 decoration color", "#c00000"));
+  m_WidgetDecorationColor[1] = QString::fromStdString(prefs->Get("stdmulti.widget1 decoration color", "#00b000"));
+  m_WidgetDecorationColor[2] = QString::fromStdString(prefs->Get("stdmulti.widget2 decoration color", "#0080ff"));
+  m_WidgetDecorationColor[3] = QString::fromStdString(prefs->Get("stdmulti.widget3 decoration color", "#ffff00"));
 
   //annotation text
-  m_WidgetAnnotation[0] = m_Preferences->Get("stdmulti.widget0 corner annotation", "Axial");
-  m_WidgetAnnotation[1] = m_Preferences->Get("stdmulti.widget1 corner annotation", "Sagittal");
-  m_WidgetAnnotation[2] = m_Preferences->Get("stdmulti.widget2 corner annotation", "Coronal");
-  m_WidgetAnnotation[3] = m_Preferences->Get("stdmulti.widget3 corner annotation", "3D");
+  m_WidgetAnnotation[0] = QString::fromStdString(prefs->Get("stdmulti.widget0 corner annotation", "Axial"));
+  m_WidgetAnnotation[1] = QString::fromStdString(prefs->Get("stdmulti.widget1 corner annotation", "Sagittal"));
+  m_WidgetAnnotation[2] = QString::fromStdString(prefs->Get("stdmulti.widget2 corner annotation", "Coronal"));
+  m_WidgetAnnotation[3] = QString::fromStdString(prefs->Get("stdmulti.widget3 corner annotation", "3D"));
 
 
   //Ui stuff
@@ -145,10 +153,10 @@ void QmitkStdMultiWidgetEditorPreferencePage::Update()
 
   m_Ui->m_RenderWindowDecorationText->setText(m_WidgetAnnotation[index]);
 
-  m_Ui->m_EnableFlexibleZooming->setChecked(m_Preferences->GetBool("Use constrained zooming and panning", true));
-  m_Ui->m_ShowLevelWindowWidget->setChecked(m_Preferences->GetBool("Show level/window widget", true));
-  m_Ui->m_PACSLikeMouseMode->setChecked(m_Preferences->GetBool("PACS like mouse interaction", false));
-  m_Ui->m_CrosshairGapSize->setValue(m_Preferences->GetInt("crosshair gap size", 32));
+  m_Ui->m_EnableFlexibleZooming->setChecked(prefs->GetBool("Use constrained zooming and panning", true));
+  m_Ui->m_ShowLevelWindowWidget->setChecked(prefs->GetBool("Show level/window widget", true));
+  m_Ui->m_PACSLikeMouseMode->setChecked(prefs->GetBool("PACS like mouse interaction", false));
+  m_Ui->m_CrosshairGapSize->setValue(prefs->GetInt("crosshair gap size", 32));
 }
 
 void QmitkStdMultiWidgetEditorPreferencePage::ColorChooserButtonClicked()
@@ -224,7 +232,9 @@ void QmitkStdMultiWidgetEditorPreferencePage::AnnotationTextChanged(QString text
 
 void QmitkStdMultiWidgetEditorPreferencePage::ResetPreferencesAndGUI()
 {
-  m_Preferences->Clear();
+  auto* prefs = GetPreferences();
+
+  prefs->Clear();
   this->Update();
 }
 

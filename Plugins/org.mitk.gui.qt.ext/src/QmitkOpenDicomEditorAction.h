@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKOPENDICOMEDITORACTION_H_
-#define QMITKOPENDICOMEDITORACTION_H_
+#ifndef QmitkOpenDicomEditorAction_h
+#define QmitkOpenDicomEditorAction_h
 
 #include <QAction>
 #include <QIcon>
@@ -19,7 +19,6 @@ found in the LICENSE file.
 #include <org_mitk_gui_qt_ext_Export.h>
 
 #include <berryIWorkbenchWindow.h>
-#include <berryIPreferences.h>
 
 class MITK_QT_COMMON_EXT_EXPORT QmitkOpenDicomEditorAction : public QAction
 {
@@ -36,8 +35,7 @@ protected slots:
 private:
   void init ( berry::IWorkbenchWindow::Pointer window );
   berry::IWorkbenchWindow::Pointer m_Window;
-  berry::IPreferences::WeakPtr m_GeneralPreferencesNode;
 };
 
 
-#endif /*QMITKOPENDICOMEDITORACTION_H_*/
+#endif

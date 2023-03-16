@@ -7,7 +7,7 @@ mitk_create_plugin(
     src/application
     src/dynamichelpers
     src/registry
-  MODULE_DEPENDS PUBLIC mbilog
+  MODULE_DEPENDS PUBLIC MitkCore
   PACKAGE_DEPENDS
     PUBLIC Poco|Foundation+Util+XML
     PRIVATE Qt5|Gui+Xml

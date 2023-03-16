@@ -74,19 +74,19 @@ void mitk::ExtractImageFilter::GenerateData()
     return;
   }
 
-  PlaneGeometry::PlaneOrientation orientation = PlaneGeometry::Axial;
+  AnatomicalPlane orientation = AnatomicalPlane::Axial;
 
   switch (m_SliceDimension)
   {
     default:
     case 2:
-      orientation = PlaneGeometry::Axial;
+      orientation = AnatomicalPlane::Axial;
       break;
     case 1:
-      orientation = PlaneGeometry::Coronal;
+      orientation = AnatomicalPlane::Coronal;
       break;
     case 0:
-      orientation = PlaneGeometry::Sagittal;
+      orientation = AnatomicalPlane::Sagittal;
       break;
   }
 
@@ -227,17 +227,17 @@ void mitk::ExtractImageFilter::GenerateOutputInformation()
   {
     default:
     case 2:
-      // orientation = PlaneGeometry::Axial;
+      // orientation = AnatomicalPlane::Axial;
       tmpDimensions[0] = input->GetDimension(0);
       tmpDimensions[1] = input->GetDimension(1);
       break;
     case 1:
-      // orientation = PlaneGeometry::Coronal;
+      // orientation = AnatomicalPlane::Coronal;
       tmpDimensions[0] = input->GetDimension(0);
       tmpDimensions[1] = input->GetDimension(2);
       break;
     case 0:
-      // orientation = PlaneGeometry::Sagittal;
+      // orientation = AnatomicalPlane::Sagittal;
       tmpDimensions[0] = input->GetDimension(1);
       tmpDimensions[1] = input->GetDimension(2);
       break;

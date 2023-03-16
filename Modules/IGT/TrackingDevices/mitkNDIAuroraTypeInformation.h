@@ -42,4 +42,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif //mitkNDIAuroraTypeInformation_h
+#endif

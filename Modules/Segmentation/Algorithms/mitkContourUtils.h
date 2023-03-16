@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkContourUtilshIncludett
-#define mitkContourUtilshIncludett
+#ifndef mitkContourUtils_h
+#define mitkContourUtils_h
 
 #include "mitkContour.h"
 #include "mitkContourModel.h"

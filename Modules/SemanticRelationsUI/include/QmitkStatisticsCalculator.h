@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKSTATISTICSCALCULATOR_H
-#define QMITKSTATISTICSCALCULATOR_H
+#ifndef QmitkStatisticsCalculator_h
+#define QmitkStatisticsCalculator_h
 
 // mitk semantic relations UI
 #include "MitkSemanticRelationsUIExports.h"
@@ -73,4 +73,4 @@ private:
 
 };
 
-#endif // QMITKSTATISTICSCALCULATOR_H
+#endif

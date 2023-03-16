@@ -17,10 +17,12 @@ found in the LICENSE file.
 #include <mitkWorkbenchUtil.h>
 #include <mitkDataNodeSelection.h>
 #include <mitkIDataStorageService.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 #include <berryISelectionService.h>
 #include <berryINullSelectionListener.h>
-#include <berryIPreferences.h>
 
 #include <QmitkIOUtil.h>
 
@@ -134,32 +136,30 @@ public:
     QObject::connect(m_Action, SIGNAL(triggered(bool)), m_Action, SLOT(Run()));
   }
 
-  berry::IPreferences::Pointer GetPreferences() const
+  mitk::IPreferences* GetPreferences() const
   {
-    berry::IPreferencesService* prefService = mitk::PluginActivator::GetInstance()->GetPreferencesService();
-    if (prefService != nullptr)
-    {
-      return prefService->GetSystemPreferences()->Node("/General");
-    }
-    return berry::IPreferences::Pointer(nullptr);
+    auto* prefService = mitk::CoreServices::GetPreferencesService();
+    
+    return prefService != nullptr
+      ? prefService->GetSystemPreferences()->Node("/General")
+      : nullptr;
   }
 
   QString GetLastFileSavePath() const
   {
-    berry::IPreferences::Pointer prefs = GetPreferences();
-    if (prefs.IsNotNull())
-    {
-      return prefs->Get("LastFileSavePath", "");
-    }
-    return QString();
+    auto* prefs = GetPreferences();
+    
+    return prefs != nullptr
+      ? QString::fromStdString(prefs->Get("LastFileSavePath", ""))
+      : QString();
   }
 
   void SetLastFileSavePath(const QString& path) const
   {
-    berry::IPreferences::Pointer prefs = GetPreferences();
-    if (prefs.IsNotNull())
+    auto* prefs = GetPreferences();
+    if (prefs != nullptr)
     {
-      prefs->Put("LastFileSavePath", path);
+      prefs->Put("LastFileSavePath", path.toStdString());
       prefs->Flush();
     }
   }

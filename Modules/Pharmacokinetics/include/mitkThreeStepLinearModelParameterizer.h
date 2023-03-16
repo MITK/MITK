@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKTHREESTEPLINEARMODELPARAMETERIZER_H
-#define MITKTHREESTEPLINEARMODELPARAMETERIZER_H
+#ifndef mitkThreeStepLinearModelParameterizer_h
+#define mitkThreeStepLinearModelParameterizer_h
 
 #include "mitkConcreteModelParameterizerBase.h"
 #include "mitkThreeStepLinearModel.h"
@@ -59,4 +59,4 @@ private:
   void operator=(const Self&);  //purposely not implemented
 };}
 
-#endif // MITKTHREESTEPLINEARMODELPARAMETERIZER_H
+#endif

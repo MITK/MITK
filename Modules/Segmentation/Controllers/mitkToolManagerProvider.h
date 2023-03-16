@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITK_TOOLMANAGERPROVIDER_H
-#define MITK_TOOLMANAGERPROVIDER_H
+#ifndef mitkToolManagerProvider_h
+#define mitkToolManagerProvider_h
 
 #include <MitkSegmentationExports.h>
 

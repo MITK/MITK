@@ -79,7 +79,7 @@ public:
     m_CommandlineArgs.push_back(refImagePath);
     // Convert vector of strings to argc/argv
     mitk::RenderingTestHelper::ArgcHelperClass arg(m_CommandlineArgs);
-    m_RenderingTestHelper.SetViewDirection(mitk::SliceNavigationController::Sagittal);
+    m_RenderingTestHelper.SetViewDirection(mitk::AnatomicalPlane::Sagittal);
 
     mitk::ScaleLegendAnnotation::Pointer colorbar = mitk::ScaleLegendAnnotation::New();
 

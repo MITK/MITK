@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKABSTRACTDATANODEACTION_H
-#define QMITKABSTRACTDATANODEACTION_H
+#ifndef QmitkAbstractDataNodeAction_h
+#define QmitkAbstractDataNodeAction_h
 
 #include <org_mitk_gui_qt_application_Export.h>
 
@@ -68,4 +68,4 @@ private:
 
 };
 
-#endif // QMITKABSTRACTDATANODEACTION_H
+#endif

@@ -13,8 +13,6 @@ found in the LICENSE file.
 #include "berryHelpEditorInput.h"
 #include "berryHelpEditorInputFactory.h"
 
-#include <berryPlatform.h>
-
 #include <QIcon>
 
 namespace berry

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _mitkSurfaceToImageFilter_h__
-#define _mitkSurfaceToImageFilter_h__
+#ifndef mitkSurfaceToImageFilter_h
+#define mitkSurfaceToImageFilter_h
 
 #include "MitkCoreExports.h"
 #include "mitkCommon.h"
@@ -94,4 +94,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKCOONSPATCHFILTER_H_HEADER_INCLUDED_C10B22CD */
+#endif

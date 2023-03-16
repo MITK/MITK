@@ -15,7 +15,6 @@ found in the LICENSE file.
 #define __RT_UI_PREFERENCE_PAGE_H
 
 #include "berryIQtPreferencePage.h"
-#include "berryIPreferences.h"
 
 #include "ui_RTUIPreferencePageControls.h"
 
@@ -73,9 +72,6 @@ protected:
 
   QWidget                 *m_MainControl;
   Ui::RTUIPreferencePageControls* m_Controls;
-
-  berry::IPreferences::Pointer m_PreferencesNode;
-
 };
 
 #endif

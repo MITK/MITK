@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef MITKOPENCVIMAGESOURCE_H
-#define MITKOPENCVIMAGESOURCE_H
+#ifndef mitkOpenCVImageSource_h
+#define mitkOpenCVImageSource_h
 
 #include <mitkCommon.h>
 
@@ -36,4 +36,4 @@ namespace mitk
   };
 }
 
-#endif // MITKOPENCVIMAGESOURCE_H
+#endif

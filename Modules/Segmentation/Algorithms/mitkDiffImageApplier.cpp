@@ -19,6 +19,8 @@ found in the LICENSE file.
 #include "mitkRenderingManager.h"
 #include "mitkSegmentationInterpolationController.h"
 
+#include <mitkIOUtil.h>
+
 #include <itkImageRegionConstIterator.h>
 #include <itkImageSliceIteratorWithIndex.h>
 
@@ -32,12 +34,18 @@ mitk::DiffImageApplier::DiffImageApplier()
     m_TimeStep(0),
     m_Dimension0(0),
     m_Dimension1(0),
+    m_DestinationLabel(std::numeric_limits<mitk::Label::PixelType>::max()),
     m_Factor(1.0)
 {
 }
 
 mitk::DiffImageApplier::~DiffImageApplier()
 {
+}
+
+void mitk::DiffImageApplier::SetDestinationLabel(mitk::Label::PixelType label)
+{
+  m_DestinationLabel = label;
 }
 
 void mitk::DiffImageApplier::ExecuteOperation(Operation *operation)
@@ -95,7 +103,6 @@ void mitk::DiffImageApplier::ExecuteOperation(Operation *operation)
         image3D = timeSelector->GetOutput();
       }
 
-      // this will do a long long if/else to find out both pixel types
       AccessFixedDimensionByItk(image3D, ItkImageSwitch2DDiff, 3);
 
       if (m_Factor == 1 || m_Factor == -1)
@@ -154,8 +161,20 @@ void mitk::DiffImageApplier::ExecuteOperation(Operation *operation)
         image3D = timeSelector->GetOutput();
       }
 
+      auto labelSetImage = dynamic_cast<mitk::LabelSetImage* >(m_Image.GetPointer());
+
       // this will do a long long if/else to find out both pixel types
-      AccessFixedDimensionByItk(image3D, ItkImageSwitch3DDiff, 3);
+      TransferLabelContent(
+        m_SliceDifferenceImage,
+        labelSetImage,
+        labelSetImage->GetActiveLabelSet(),
+        0,
+        0,
+        false,
+        {{1, m_DestinationLabel}},
+        mitk::MultiLabelSegmentation::MergeStyle::Merge,
+        mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks,
+        m_TimeStep);
 
       if (m_Factor == 1 || m_Factor == -1)
       {
@@ -173,8 +192,6 @@ void mitk::DiffImageApplier::ExecuteOperation(Operation *operation)
           interpolator->BlockModified(true);
           interpolator->SetChangedVolume(m_SliceDifferenceImage, m_TimeStep);
         }
-
-        m_Image->Modified();
 
         if (interpolator)
         {

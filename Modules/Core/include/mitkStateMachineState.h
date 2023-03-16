@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef SMSTATE_H_HEADER_INCLUDED_C19A8A5D
-#define SMSTATE_H_HEADER_INCLUDED_C19A8A5D
+#ifndef mitkStateMachineState_h
+#define mitkStateMachineState_h
 
 #include "MitkCoreExports.h"
 #include "mitkStateMachineTransition.h"
@@ -91,4 +91,4 @@ namespace mitk
     TransitionVector m_Transitions;
   };
 } // namespace mitk
-#endif /* SMSTATE_H_HEADER_INCLUDED_C19A8A5D */
+#endif

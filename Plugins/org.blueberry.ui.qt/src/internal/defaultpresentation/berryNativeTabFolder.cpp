@@ -20,7 +20,6 @@ found in the LICENSE file.
 #include <berryIQtStyleManager.h>
 #include <berryShell.h>
 #include <berryConstants.h>
-#include <berryPlatform.h>
 #include <berryPlatformUI.h>
 
 #include <berryLog.h>

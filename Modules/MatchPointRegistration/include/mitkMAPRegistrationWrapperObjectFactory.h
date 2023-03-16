@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef __mitkMAPRegistrationWrapperObjectFactory_h
-#define __mitkMAPRegistrationWrapperObjectFactory_h
+#ifndef mitkMAPRegistrationWrapperObjectFactory_h
+#define mitkMAPRegistrationWrapperObjectFactory_h
 
 #include <mitkCoreObjectFactory.h>
 #include "MitkMatchPointRegistrationExports.h"

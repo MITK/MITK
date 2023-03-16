@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKOPENMXNMULTIWIDGETEDITORACTION_H
-#define QMITKOPENMXNMULTIWIDGETEDITORACTION_H
+#ifndef QmitkOpenMxNMultiWidgetEditorAction_h
+#define QmitkOpenMxNMultiWidgetEditorAction_h
 
 #ifdef __MINGW32__
 // We need to include winbase.h here in order to declare
@@ -26,7 +26,6 @@ found in the LICENSE file.
 #include <org_mitk_gui_qt_ext_Export.h>
 
 #include <berryIWorkbenchWindow.h>
-#include <berryIPreferences.h>
 
 class MITK_QT_COMMON_EXT_EXPORT QmitkOpenMxNMultiWidgetEditorAction : public QAction
 {
@@ -45,8 +44,7 @@ private:
 
   void init(berry::IWorkbenchWindow::Pointer window);
   berry::IWorkbenchWindow::Pointer m_Window;
-  berry::IPreferences::WeakPtr m_GeneralPreferencesNode;
 
 };
 
-#endif // QMITKOPENMXNMULTIWIDGETEDITORACTION_H
+#endif

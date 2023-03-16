@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIINPUTDEVICE_H_
-#define MITKIINPUTDEVICE_H_
+#ifndef mitkIInputDevice_h
+#define mitkIInputDevice_h
 
 #include <berryObject.h>
 #include <berryMacros.h>
@@ -49,4 +49,4 @@ namespace mitk
 
 Q_DECLARE_INTERFACE(mitk::IInputDevice, "org.mitk.IInputDevice")
 
-#endif /*MITKIINPUTDEVICE_H_*/
+#endif

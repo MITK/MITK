@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkPropertyListDeserializerV1_h_included
-#define mitkPropertyListDeserializerV1_h_included
+#ifndef mitkPropertyListDeserializerV1_h
+#define mitkPropertyListDeserializerV1_h
 
 #include "mitkPropertyListDeserializer.h"
 

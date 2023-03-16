@@ -13,7 +13,7 @@ found in the LICENSE file.
 
 #include "QmitkSegmentationView.h"
 #include "QmitkSegmentationPreferencePage.h"
-#include "SegmentationUtilities/QmitkSegmentationUtilitiesView.h"
+#include "QmitkSegmentationUtilitiesView.h"
 
 #include "QmitkAutocropAction.h"
 #include "QmitkAutocropLabelSetImageAction.h"
@@ -24,6 +24,10 @@ found in the LICENSE file.
 #include "QmitkConvertMaskToLabelAction.h"
 #include "QmitkConvertToMultiLabelSegmentationAction.h"
 #include "QmitkCreateMultiLabelSegmentationAction.h"
+
+#include <usModuleInitialization.h>
+
+US_INITIALIZE_MODULE
 
 using namespace mitk;
 

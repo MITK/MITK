@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef ATERIALINPUTFUNCTIONGENERATOR_H
-#define ATERIALINPUTFUNCTIONGENERATOR_H
+#ifndef mitkAterialInputFunctionGenerator_h
+#define mitkAterialInputFunctionGenerator_h
 
 #include <mitkImage.h>
 #include "mitkAIFBasedModelBase.h"
@@ -104,4 +104,4 @@ namespace mitk
 
 }
 
-#endif // ATERIALINPUTFUNCTIONGENERATOR_H
+#endif

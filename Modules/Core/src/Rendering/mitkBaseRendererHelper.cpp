@@ -29,24 +29,24 @@ bool mitk::BaseRendererHelper::IsRendererAlignedWithSegmentation(BaseRenderer* r
   {
     switch (viewDirection)
     {
-    case mitk::SliceNavigationController::Original:
+    case mitk::AnatomicalPlane::Original:
       break;
-    case mitk::SliceNavigationController::Axial:
+    case mitk::AnatomicalPlane::Axial:
     {
       orientedTimeGeometry = SliceNavigationHelper::CreateOrientedTimeGeometry(
-        timeGeometry, PlaneGeometry::Axial, false, false, true);
-      break;
-    }
-    case mitk::SliceNavigationController::Coronal:
-    {
-      orientedTimeGeometry = SliceNavigationHelper::CreateOrientedTimeGeometry(
-        timeGeometry, PlaneGeometry::Coronal, false, true, false);
+        timeGeometry, viewDirection, false, false, true);
       break;
     }
-    case mitk::SliceNavigationController::Sagittal:
+    case mitk::AnatomicalPlane::Coronal:
     {
       orientedTimeGeometry = SliceNavigationHelper::CreateOrientedTimeGeometry(
-        timeGeometry, PlaneGeometry::Sagittal, true, true, false);
+        timeGeometry, viewDirection, false, true, false);
+      break;
+    }
+    case mitk::AnatomicalPlane::Sagittal:
+    {
+      orientedTimeGeometry = SliceNavigationHelper::CreateOrientedTimeGeometry(
+        timeGeometry, viewDirection, true, true, false);
       break;
     }
     }

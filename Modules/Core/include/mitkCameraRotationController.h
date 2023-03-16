@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef CAMERAROTATIONCONTROLLER_H_HEADER_INCLUDED_NXYCBIU
-#define CAMERAROTATIONCONTROLLER_H_HEADER_INCLUDED_NXYCBIU
+#ifndef mitkCameraRotationController_h
+#define mitkCameraRotationController_h
 
 #include "mitkBaseController.h"
 #include <MitkCoreExports.h>

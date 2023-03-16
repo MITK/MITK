@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKRENDERWINDOWWIDGET_H
-#define QMITKRENDERWINDOWWIDGET_H
+#ifndef QmitkRenderWindowWidget_h
+#define QmitkRenderWindowWidget_h
 
 // qt widgets module
 #include "MitkQtWidgetsExports.h"
@@ -91,6 +91,7 @@ public:
   mitk::Point3D GetCrosshairPosition() const;
 
   void SetGeometry(const itk::EventObject& event);
+  void SetGeometrySlice(const itk::EventObject& event);
 
 private Q_SLOTS:
 
@@ -122,4 +123,4 @@ private:
 
 };
 
-#endif // QMITKRENDERWINDOWWIDGET_H
+#endif

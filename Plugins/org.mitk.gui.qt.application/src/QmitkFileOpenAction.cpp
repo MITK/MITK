@@ -17,10 +17,11 @@ found in the LICENSE file.
 #include <mitkIDataStorageService.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkWorkbenchUtil.h>
+#include <mitkCoreServices.h>
+#include <mitkIPreferencesService.h>
+#include <mitkIPreferences.h>
 
 #include <QmitkIOUtil.h>
-
-#include <berryIPreferences.h>
 
 #include <QFileDialog>
 
@@ -100,44 +101,41 @@ public:
     QObject::connect(action, SIGNAL(triggered(bool)), action, SLOT(Run()));
   }
 
-  berry::IPreferences::Pointer GetPreferences() const
+  mitk::IPreferences* GetPreferences() const
   {
-    berry::IPreferencesService* prefService = mitk::PluginActivator::GetInstance()->GetPreferencesService();
-    if (prefService != nullptr)
-    {
-      return prefService->GetSystemPreferences()->Node("/General");
-    }
-    return berry::IPreferences::Pointer(nullptr);
+    auto* prefService = mitk::CoreServices::GetPreferencesService();
+
+    return prefService != nullptr
+      ? prefService->GetSystemPreferences()->Node("/General")
+      : nullptr;
   }
 
   QString GetLastFileOpenPath() const
   {
-    berry::IPreferences::Pointer prefs = GetPreferences();
-    if (prefs.IsNotNull())
-    {
-      return prefs->Get("LastFileOpenPath", "");
-    }
-    return QString();
+    auto* prefs = GetPreferences();
+    
+    return prefs != nullptr
+      ? QString::fromStdString(prefs->Get("LastFileOpenPath", ""))
+      : QString();
   }
 
   void SetLastFileOpenPath(const QString& path) const
   {
-    berry::IPreferences::Pointer prefs = GetPreferences();
-    if (prefs.IsNotNull())
+    auto* prefs = GetPreferences();
+    if (prefs != nullptr)
     {
-      prefs->Put("LastFileOpenPath", path);
+      prefs->Put("LastFileOpenPath", path.toStdString());
       prefs->Flush();
     }
   }
 
   bool GetOpenEditor() const
   {
-    berry::IPreferences::Pointer prefs = GetPreferences();
-    if (prefs.IsNotNull())
-    {
-      return prefs->GetBool("OpenEditor", true);
-    }
-    return true;
+    auto* prefs = GetPreferences();
+
+    return prefs != nullptr
+      ? prefs->GetBool("OpenEditor", true)
+      : true;
   }
 
   berry::IWorkbenchWindow* m_Window;

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef DESCRIPTIVEPHARMACOKINETICBRIXMODEL_H
-#define DESCRIPTIVEPHARMACOKINETICBRIXMODEL_H
+#ifndef mitkDescriptivePharmacokineticBrixModel_h
+#define mitkDescriptivePharmacokineticBrixModel_h
 
 #include <iostream>
 
@@ -128,4 +128,4 @@ namespace mitk
 }
 
 
-#endif //DESCRIPTIVEPHARMACOKINETICBRIXMODEL_H
+#endif

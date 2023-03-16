@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef NAVIGATIONDATAPASSTHROUGHFILTER_H
-#define NAVIGATIONDATAPASSTHROUGHFILTER_H
+#ifndef mitkNavigationDataPassThroughFilter_h
+#define mitkNavigationDataPassThroughFilter_h
 
 #include "mitkNavigationDataToNavigationDataFilter.h"
 #include "MitkIGTExports.h"
@@ -45,4 +45,4 @@ protected:
 
 } // namespace mitk
 
-#endif // NAVIGATIONDATAPASSTHROUGHFILTER_H
+#endif

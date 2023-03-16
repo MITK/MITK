@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIRENDERWINDOWPART_H
-#define MITKIRENDERWINDOWPART_H
+#ifndef mitkIRenderWindowPart_h
+#define mitkIRenderWindowPart_h
 
 #include <QString>
 #include <QStringList>
@@ -44,7 +44,7 @@ class SliceNavigationController;
  * A IRenderWindowPart provides zero or more QmitkRenderWindow instances which can
  * be controlled via this interface. QmitkRenderWindow instances have an associated
  * \e id, which is implementation specific.
- * Additionally the defined values AXIAL, SAGITTAL, CORONAL, THREE_D from mitk::BaseRenderer
+ * Additionally the defined values Axial, Sagittal, Coronal and Original from mitk::AnatomicalPlane
  * can be used to retrieve a specific QmitkRenderWindow.
  *
  * \see ILinkedRenderWindowPart
@@ -86,12 +86,12 @@ struct MITK_GUI_COMMON_PLUGIN IRenderWindowPart {
   virtual QmitkRenderWindow* GetQmitkRenderWindow(const QString& id) const = 0;
 
   /**
-  * Get a render window with a specific view direction.
+  * Get a render window with a specific plane orientation.
   *
-  * \param viewDirection The render window view direction.
-  * \return The QmitkRenderWindow instance for <code>viewDirection</code>
+  * \param orientation The render window plane orientation.
+  * \return The QmitkRenderWindow instance for <code>orientation</code>
   */
-  virtual QmitkRenderWindow* GetQmitkRenderWindow(const mitk::BaseRenderer::ViewDirection& viewDirection) const = 0;
+  virtual QmitkRenderWindow* GetQmitkRenderWindow(const mitk::AnatomicalPlane& orientation) const = 0;
 
   /**
    * Get the rendering manager used by this render window part.
@@ -215,4 +215,4 @@ struct MITK_GUI_COMMON_PLUGIN IRenderWindowPart {
 
 Q_DECLARE_INTERFACE(mitk::IRenderWindowPart, "org.mitk.ui.IRenderWindowPart")
 
-#endif // MITKIRENDERWINDOWPART_H
+#endif

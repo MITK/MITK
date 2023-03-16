@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkUSActivator_h
-#define __mitkUSActivator_h
+#ifndef mitkUSActivator_h
+#define mitkUSActivator_h
 
 #include "mitkUSVideoDevice.h"
 
@@ -60,4 +60,4 @@ protected:
 
 US_EXPORT_MODULE_ACTIVATOR(mitk::USActivator)
 
-#endif // __mitkUSActivator_h
+#endif

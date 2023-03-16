@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIINPUTDEVICEREGISTRY_H_
-#define MITKIINPUTDEVICEREGISTRY_H_
+#ifndef mitkIInputDeviceRegistry_h
+#define mitkIInputDeviceRegistry_h
 
 #include <QtPlugin>
 
@@ -61,4 +61,4 @@ namespace mitk
 
 Q_DECLARE_INTERFACE(mitk::IInputDeviceRegistry, "org.mitk.service.IInputDeviceRegistry")
 
-#endif /*MITKIINPUTDEVICEREGISTRY_H_*/
+#endif

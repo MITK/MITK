@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkIGTLDeviceSourceSelectionWidget_H
-#define QmitkIGTLDeviceSourceSelectionWidget_H
+#ifndef QmitkIGTLDeviceSourceSelectionWidget_h
+#define QmitkIGTLDeviceSourceSelectionWidget_h
 
 //QT headers
 #include <QWidget>

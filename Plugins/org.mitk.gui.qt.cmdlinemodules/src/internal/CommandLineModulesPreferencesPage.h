@@ -14,7 +14,6 @@ found in the LICENSE file.
 #define COMMANDLINEMODULESPREFERENCESPAGE_H
 
 #include "berryIQtPreferencePage.h"
-#include "berryIPreferences.h"
 #include <org_mitk_gui_qt_cmdlinemodules_Export.h>
 
 class QWidget;
@@ -97,8 +96,6 @@ protected:
   QComboBox                *m_ValidationMode;
   QSpinBox                 *m_XmlTimeoutInSeconds;
   QSpinBox                 *m_MaximumNumberProcesses;
-
-  berry::IPreferences::Pointer m_CLIPreferencesNode;
 
 private:
 

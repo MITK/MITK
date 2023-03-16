@@ -242,4 +242,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif /* mitkVtkPropRenderer_h */
+#endif

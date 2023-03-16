@@ -168,13 +168,17 @@ class Path;
 
 }
 
+namespace mitk
+{
+  class IPreferencesService;
+}
+
 namespace berry {
 
 struct IAdapterManager;
 struct IBundle;
 struct IExtensionPointService;
 struct IExtensionRegistry;
-struct IPreferencesService;
 struct IProduct;
 
 
@@ -262,15 +266,11 @@ public:
   /**
    * Return the interface into the preference mechanism. The returned
    * object can be used for such operations as searching for preference
-   * values across multiple scopes and preference import/export.
-   * <p>
-   * Clients are also able to acquire the IPreferencesService service via
-   * CTK mechanisms and use it for preference functions.
-   * </p>
+   * values across multiple scopes.
    *
    * @return an object to interface into the preference mechanism
    */
-  static IPreferencesService* GetPreferencesService();
+  static mitk::IPreferencesService* GetPreferencesService();
 
   /**
    * Returns the product which was selected when running this BlueBerry instance

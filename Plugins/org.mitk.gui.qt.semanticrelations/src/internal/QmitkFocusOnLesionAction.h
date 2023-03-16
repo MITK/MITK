@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKLESIONSHOWINACTION_H
-#define QMITKLESIONSHOWINACTION_H
+#ifndef QmitkFocusOnLesionAction_h
+#define QmitkFocusOnLesionAction_h
 
 // mitk gui qt application plugin
 #include <QmitkAbstractDataNodeAction.h>
@@ -49,4 +49,4 @@ protected:
   mitk::SemanticTypes::Lesion m_Lesion;
 };
 
-#endif // QMITKLESIONSHOWINACTION_H
+#endif

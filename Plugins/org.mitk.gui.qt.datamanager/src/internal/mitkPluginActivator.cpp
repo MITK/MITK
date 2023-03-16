@@ -14,6 +14,10 @@ found in the LICENSE file.
 #include "../QmitkDataManagerPreferencePage.h"
 #include "../QmitkDataManagerView.h"
 
+#include <usModuleInitialization.h>
+
+US_INITIALIZE_MODULE
+
 namespace mitk {
 
 void PluginActivator::start(ctkPluginContext* context)

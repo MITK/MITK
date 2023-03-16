@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKUSVideoDeviceCustomControls_H_HEADER_INCLUDED_
-#define MITKUSVideoDeviceCustomControls_H_HEADER_INCLUDED_
+#ifndef mitkUSVideoDeviceCustomControls_h
+#define mitkUSVideoDeviceCustomControls_h
 
 #include "mitkUSAbstractControlInterface.h"
 #include "mitkUSImageVideoSource.h"
@@ -100,4 +100,4 @@ namespace mitk {
   };
 } // namespace mitk
 
-#endif // MITKUSVideoDeviceCustomControls_H_HEADER_INCLUDED_
+#endif

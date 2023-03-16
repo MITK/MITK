@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef MITKTRANFERFUNCTIONPROPERTY_H_HEADER_INCLUDED
-#define MITKTRANFERFUNCTIONPROPERTY_H_HEADER_INCLUDED
+#ifndef mitkTransferFunctionProperty_h
+#define mitkTransferFunctionProperty_h
 
 #include "mitkBaseProperty.h"
 #include "mitkTransferFunction.h"
@@ -76,4 +76,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKTRANFERFUNCTIONPROPERTY_H_HEADER_INCLUDED */
+#endif

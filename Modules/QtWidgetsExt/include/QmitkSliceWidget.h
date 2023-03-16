@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKSLICEWIDGET_H_
-#define QMITKSLICEWIDGET_H_
+#ifndef QmitkSliceWidget_h
+#define QmitkSliceWidget_h
 
 #include "MitkQtWidgetsExtExports.h"
 #include "ui_QmitkSliceWidget.h"
@@ -19,7 +19,7 @@ found in the LICENSE file.
 #include "QmitkRenderWindow.h"
 #include "mitkDataStorage.h"
 #include "mitkSliceNavigationController.h"
-#include "QmitkSliderNavigatorWidget.h"
+#include "QmitkSliceNavigationWidget.h"
 #include "mitkSlicedGeometry3D.h"
 #include "mitkStandaloneDataStorage.h"
 #include <QWidget>
@@ -45,7 +45,7 @@ public:
 
   mitk::StandaloneDataStorage *GetDataStorage();
 
-  QmitkSliderNavigatorWidget *GetNavigatorWidget();
+  QmitkSliceNavigationWidget* GetSliceNavigationWidget();
 
   bool IsLevelWindowEnabled();
 
@@ -61,13 +61,13 @@ public slots:
 
   void SetData(mitk::DataStorage::SetOfObjects::ConstIterator it);
 
-  void SetData(mitk::DataStorage::SetOfObjects::ConstIterator it, mitk::SliceNavigationController::ViewDirection view);
+  void SetData(mitk::DataStorage::SetOfObjects::ConstIterator it, mitk::AnatomicalPlane view);
 
   void SetData(mitk::DataNode::Pointer node);
 
-  void SetData(mitk::DataNode::Pointer node, mitk::SliceNavigationController::ViewDirection view);
+  void SetData(mitk::DataNode::Pointer node, mitk::AnatomicalPlane view);
 
-  void InitWidget(mitk::SliceNavigationController::ViewDirection viewDirection);
+  void InitWidget(mitk::AnatomicalPlane viewDirection);
 
   void wheelEvent(QWheelEvent *e) override;
 
@@ -77,7 +77,7 @@ public slots:
 
 protected:
   QmitkRenderWindow *m_RenderWindow;
-  mitk::SliceNavigationController::ViewDirection m_View;
+  mitk::AnatomicalPlane m_View;
 
 private:
   bool popUpEnabled;

@@ -18,7 +18,7 @@ We will assume in this guide, that the path to your source is /MITK/.
 See \ref BuildInstructions_Prerequisites.
 
 \subsection CMAKE_FAQ_Question_NewPluginNothing I coded a new plugin for the Workbench and nothing happened. Why?
-The correct way to create a new plugin is described in \ref NewPluginOnly. Do note that you need to move the source to the MITK/Plugins directory and you will have to add the plugin to the config file (most likely MITK/Plugins/Plugins.cmake). After that see \ref CMAKE_FAQ_Question_HowDoIActivatePlugin.
+Do note that you need to move the source to the Plugins directory and you will have to add the plugin to the config file (most likely Plugins/PluginList.cmake). After that see \ref CMAKE_FAQ_Question_HowDoIActivatePlugin.
 
 \subsection CMAKE_FAQ_Question_HowDoIActivatePlugin I want to use a plugin, how do I activate it?
 <ol>

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QmitkToolSelectionWidget_H_INCLUDED
-#define _QmitkToolSelectionWidget_H_INCLUDED
+#ifndef QmitkToolSelectionWidget_h
+#define QmitkToolSelectionWidget_h
 
 #include "ui_QmitkToolSelectionWidgetControls.h"
 #include "MitkIGTUIExports.h"
@@ -125,5 +125,4 @@ protected:
   Ui::QmitkToolSelectionWidgetControls* m_Controls;  ///< gui widgets
 
 };
-#endif // _QmitkToolSelectionWidget_H_INCLUDED
-
+#endif

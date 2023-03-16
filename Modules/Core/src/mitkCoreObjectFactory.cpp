@@ -50,6 +50,9 @@ found in the LICENSE file.
 #include <mitkLegacyFileReaderService.h>
 #include <mitkLegacyFileWriterService.h>
 
+#include <mitkCrosshairData.h>
+#include <mitkCrosshairVtkMapper2D.h>
+
 void mitk::CoreObjectFactory::RegisterExtraFactory(CoreObjectFactoryBase *factory)
 {
   MITK_DEBUG << "CoreObjectFactory: registering extra factory of type " << factory->GetNameOfClass();
@@ -141,6 +144,13 @@ void mitk::CoreObjectFactory::SetDefaultProperties(mitk::DataNode *node)
     mitk::PointSetVtkMapper2D::SetDefaultProperties(node);
     mitk::PointSetVtkMapper3D::SetDefaultProperties(node);
   }
+
+  mitk::CrosshairData::Pointer crosshairData = dynamic_cast<mitk::CrosshairData*>(node->GetData());
+  if (crosshairData.IsNotNull())
+  {
+    mitk::CrosshairVtkMapper2D::SetDefaultProperties(node);
+  }
+
   for (auto it = m_ExtraFactories.begin(); it != m_ExtraFactories.end(); ++it)
   {
     (*it)->SetDefaultProperties(node);

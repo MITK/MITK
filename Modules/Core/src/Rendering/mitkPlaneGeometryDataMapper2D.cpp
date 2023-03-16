@@ -19,7 +19,6 @@ found in the LICENSE file.
 #include <mitkLine.h>
 #include <mitkPlaneGeometry.h>
 #include <mitkPlaneOrientationProperty.h>
-#include <mitkPointSet.h>
 #include <mitkProperties.h>
 #include <mitkResliceMethodProperty.h>
 #include <mitkSlicedGeometry3D.h>
@@ -28,7 +27,6 @@ found in the LICENSE file.
 #include <mitkIPropertyAliases.h>
 #include <vtkActor2D.h>
 #include <vtkCellArray.h>
-#include <vtkCellData.h>
 #include <vtkLine.h>
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
@@ -154,7 +152,7 @@ const mitk::PlaneGeometryData *mitk::PlaneGeometryDataMapper2D::GetInput() const
 }
 
 mitk::PlaneGeometryDataMapper2D::PlaneGeometryDataMapper2D()
-  : m_RenderOrientationArrows(false), m_ArrowOrientationPositive(true), m_DepthValue(1.0f)
+  : m_RenderOrientationArrows(false), m_ArrowOrientationPositive(true)
 {
   s_AllInstances.insert(this);
 }
@@ -574,30 +572,6 @@ void mitk::PlaneGeometryDataMapper2D::DrawOrientationArrow(vtkSmartPointer<vtkCe
   triangles->InsertNextCell(triangle);
 }
 
-int mitk::PlaneGeometryDataMapper2D::DetermineThickSliceMode(DataNode *dn, int &thickSlicesNum)
-{
-  int thickSlicesMode = 0;
-  // determine the state and the extend of the thick-slice mode
-  mitk::ResliceMethodProperty *resliceMethodEnumProperty = nullptr;
-  if (dn->GetProperty(resliceMethodEnumProperty, "reslice.thickslices") && resliceMethodEnumProperty)
-    thickSlicesMode = resliceMethodEnumProperty->GetValueAsId();
-
-  IntProperty *intProperty = nullptr;
-  if (dn->GetProperty(intProperty, "reslice.thickslices.num") && intProperty)
-  {
-    thickSlicesNum = intProperty->GetValue();
-    if (thickSlicesNum < 1)
-      thickSlicesNum = 0;
-    if (thickSlicesNum > 10)
-      thickSlicesNum = 10;
-  }
-
-  if (thickSlicesMode == 0)
-    thickSlicesNum = 0;
-
-  return thickSlicesMode;
-}
-
 void mitk::PlaneGeometryDataMapper2D::ApplyAllProperties(BaseRenderer *renderer)
 {
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
@@ -662,10 +636,6 @@ void mitk::PlaneGeometryDataMapper2D::SetDefaultProperties(mitk::DataNode *node,
   aliases->AddAlias("decoration", "Crosshair.Orientation Decoration", "");
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
-}
-
-void mitk::PlaneGeometryDataMapper2D::UpdateVtkTransform(mitk::BaseRenderer * /*renderer*/)
-{
 }
 
 mitk::PlaneGeometryDataMapper2D::LocalStorage::LocalStorage()

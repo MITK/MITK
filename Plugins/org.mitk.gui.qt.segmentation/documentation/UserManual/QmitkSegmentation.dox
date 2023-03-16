@@ -400,9 +400,9 @@ Remark: The tool assumes that you have a Python3 environment with nnUNet (pip) i
 
 This tool provides a GUI to the deep learning-based segmentation algorithm called the TotalSegmentator. With this tool, you can get a segmentation mask predicted for 104 classes in CT images, loaded in MITK. 
 For a detailed explanation on tasks and supported classes etc., please refer to https://github.com/wasserth/TotalSegmentator <br>
-The tool assumes that you have Python3 installed & available on your machine. We recommend you to install TotalSegmentator via MITK itself.
-For best results, your machine should be also ideally equipped with a CUDA enabled GPU. 
-\imageMacro{QmitkSegmentation_TotalsegmentatorTool.png, "TotalSegmentator Settings",10}
+The tool assumes that you have Python3 installed & available on your machine. We recommend you to install TotalSegmentator via MITK itself. The "Install TotalSegmentator" action implicitly creates a python virtual environment in MITK mainitained
+directory. Note: on Debian/Ubuntu systems, you need to install the python3-venv package using the following command:  `apt install python3-venv`. For best results, your machine should be also ideally equipped with a CUDA enabled GPU. 
+\imageMacro{QmitkSegmentation_TotalsegmentatorTool.png, "TotalSegmentator Settings",5}
 
 \subsubsection org_mitk_views_segmentationTotalSegmentatorWorkflow Workflow:
     -# Install TotalSegmentator: Click "Install TotalSegmentator" to install TotalSegmentator (version: 1.5.3) virtual environment. Make sure you have a working internet connection. This might take a while. This is only a one time job.

@@ -145,7 +145,7 @@ void mitk::TotalSegmentatorTool::run_totalsegmentator(ProcessExecutor::Pointer s
 {
   ProcessExecutor::ArgumentListType args;
   std::string command = "TotalSegmentator";
-#ifdef _WIN32
+#if defined(__APPLE__) || defined(_WIN32)
   command = "python";
 #else
   command = "TotalSegmentator";
@@ -163,6 +163,10 @@ void mitk::TotalSegmentatorTool::run_totalsegmentator(ProcessExecutor::Pointer s
   {
     args.push_back("Scripts/TotalSegmentator");
   }
+#endif
+
+#if defined(__APPLE__)
+  args.push_back("TotalSegmentator");
 #endif
 
   args.push_back("-i");

@@ -64,4 +64,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* mitkRotationOperation_h */
+#endif

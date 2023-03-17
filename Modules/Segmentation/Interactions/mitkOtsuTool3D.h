@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef MITKOTSUTOOL3D_H
-#define MITKOTSUTOOL3D_H
+#ifndef mitkOtsuTool3D_h
+#define mitkOtsuTool3D_h
 
 #include "mitkSegWithPreviewTool.h"
 #include <MitkSegmentationExports.h>

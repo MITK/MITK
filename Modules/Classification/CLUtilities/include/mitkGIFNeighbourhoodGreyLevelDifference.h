@@ -52,4 +52,4 @@ namespace mitk
     bool m_UseCTRange;
   };
 }
-#endif //mitkGIFNeighbourhoodGreyLevelDifference_h
+#endif

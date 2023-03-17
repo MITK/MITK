@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKDISPLAYCOORDINATEOPERATION_H_HEADER_INCLUDED_C10E33D0
-#define MITKDISPLAYCOORDINATEOPERATION_H_HEADER_INCLUDED_C10E33D0
+#ifndef mitkDisplayCoordinateOperation_h
+#define mitkDisplayCoordinateOperation_h
 
 #include "mitkBaseRenderer.h"
 #include "mitkNumericTypes.h"
@@ -68,4 +68,4 @@ namespace mitk
   };
 }
 
-#endif /* MITKDISPLAYCOORDINATEOPERATION_H_HEADER_INCLUDED_C10E33D0 */
+#endif

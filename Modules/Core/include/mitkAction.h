@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef ACTION_H_HEADER_INCLUDED_C19AE06B
-#define ACTION_H_HEADER_INCLUDED_C19AE06B
+#ifndef mitkAction_h
+#define mitkAction_h
 
 #include "mitkPropertyList.h"
 #include <MitkCoreExports.h>
@@ -75,4 +75,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* ACTION_H_HEADER_INCLUDED_C19AE06B */
+#endif

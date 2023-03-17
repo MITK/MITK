@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef MITKMOVIEMAKERPLUGINACTIVATOR_H
-#define MITKMOVIEMAKERPLUGINACTIVATOR_H
+#ifndef mitkMovieMakerPluginActivator_h
+#define mitkMovieMakerPluginActivator_h
 
 #include <ctkPluginActivator.h>
 
@@ -32,4 +32,4 @@ namespace mitk {
 
 }
 
-#endif // MITKMOVIEMAKERPLUGINACTIVATOR_H
+#endif

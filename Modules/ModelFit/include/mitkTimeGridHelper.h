@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __MITK_TIME_GRID_HELPER_H_
-#define __MITK_TIME_GRID_HELPER_H_
+#ifndef mitkTimeGridHelper_h
+#define mitkTimeGridHelper_h
 
 #include "mitkModelBase.h"
 

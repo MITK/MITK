@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKDATASTORAGESERVICE_H_
-#define MITKDATASTORAGESERVICE_H_
+#ifndef mitkDataStorageService_h
+#define mitkDataStorageService_h
 
 #include "../mitkIDataStorageService.h"
 
@@ -52,4 +52,4 @@ private:
 
 }
 
-#endif /*MITKDATASTORAGESERVICE_H_*/
+#endif

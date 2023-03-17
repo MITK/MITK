@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKSURFACETOSURFACEFILTER_H_HEADER_INCLUDED_C10B4740
-#define MITKSURFACETOSURFACEFILTER_H_HEADER_INCLUDED_C10B4740
+#ifndef mitkSurfaceToSurfaceFilter_h
+#define mitkSurfaceToSurfaceFilter_h
 
 #include "mitkSurfaceSource.h"
 
@@ -77,4 +77,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKSURFACETOSURFACEFILTER_H_HEADER_INCLUDED_C10B4740 */
+#endif

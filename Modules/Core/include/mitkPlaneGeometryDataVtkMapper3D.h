@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKGEOMETRY2DDATAVTKMAPPER3D_H_HEADER_INCLUDED_C196C71F
-#define MITKGEOMETRY2DDATAVTKMAPPER3D_H_HEADER_INCLUDED_C196C71F
+#ifndef mitkPlaneGeometryDataVtkMapper3D_h
+#define mitkPlaneGeometryDataVtkMapper3D_h
 
 #include "mitkDataStorage.h"
 #include "mitkPlaneGeometryDataToSurfaceFilter.h"
@@ -212,4 +212,4 @@ namespace mitk
     MemberCommandType::Pointer m_ImageMapperDeletedCommand;
   };
 } // namespace mitk
-#endif /* MITKGEOMETRY2DDATAVTKMAPPER3D_H_HEADER_INCLUDED_C196C71F */
+#endif

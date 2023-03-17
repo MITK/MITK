@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkSurfaceStampWidget_h_Included
-#define QmitkSurfaceStampWidget_h_Included
+#ifndef QmitkSurfaceStampWidget_h
+#define QmitkSurfaceStampWidget_h
 
 #include "MitkSegmentationUIExports.h"
 

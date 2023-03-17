@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITK_ALGORITHM_SETTINGS_CONFIG_H
-#define QMITK_ALGORITHM_SETTINGS_CONFIG_H
+#ifndef QmitkAlgorithmSettingsConfig_h
+#define QmitkAlgorithmSettingsConfig_h
 
 #include <QSortFilterProxyModel>
 #include <QWidget>
@@ -53,4 +53,4 @@ protected:
   QSortFilterProxyModel *m_ProxyModel;
 };
 
-#endif // QmitkAlgorithmSettingsConfig_H
+#endif

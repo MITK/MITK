@@ -10,47 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-/**
-* \brief Describes the geometry of a plane object
-*
-* Describes a two-dimensional manifold, i.e., to put it simply,
-* an object that can be described using a 2D coordinate-system.
-*
-* PlaneGeometry can map points between 3D world coordinates
-* (in mm) and the described 2D coordinate-system (in mm) by first projecting
-* the 3D point onto the 2D manifold and then calculating the 2D-coordinates
-* (in mm). These 2D-mm-coordinates can be further converted into
-* 2D-unit-coordinates (e.g., pixels), giving a parameter representation of
-* the object with parameter values inside a rectangle
-* (e.g., [0,0]..[width, height]), which is the bounding box (bounding range
-* in z-direction always [0]..[1]).
-*
-* A PlaneGeometry describes the 2D representation within a 3D object (derived from BaseGeometry). For example,
-* a single CT-image (slice) is 2D in the sense that you can access the
-* pixels using 2D-coordinates, but is also 3D, as the pixels are really
-* voxels, thus have an extension (thickness) in the 3rd dimension.
-*
-*
-* Optionally, a reference BaseGeometry can be specified, which usually would
-* be the geometry associated with the underlying dataset. This is currently
-* used for calculating the intersection of inclined / rotated planes
-* (represented as PlaneGeometry) with the bounding box of the associated
-* BaseGeometry.
-*
-* \warning The PlaneGeometry are not necessarily up-to-date and not even
-* initialized. As described in the previous paragraph, one of the
-* Generate-/Copy-/UpdateOutputInformation methods have to initialize it.
-* mitk::BaseData::GetPlaneGeometry() makes sure, that the PlaneGeometry is
-* up-to-date before returning it (by setting the update extent appropriately
-* and calling UpdateOutputInformation).
-*
-* Rule: everything is in mm (or ms for temporal information) if not
-* stated otherwise.
-* \ingroup Geometry
-*/
-
-#ifndef PLANEGEOMETRY_H_HEADER_INCLUDED_C1C68A2C
-#define PLANEGEOMETRY_H_HEADER_INCLUDED_C1C68A2C
+#ifndef mitkPlaneGeometry_h
+#define mitkPlaneGeometry_h
 
 #include <MitkCoreExports.h>
 
@@ -65,6 +26,45 @@ namespace mitk
   template <class TCoordRep, unsigned int NPointDimension>
   class Line;
   typedef Line<ScalarType, 3> Line3D;
+
+  /**
+   * \brief Describes the geometry of a plane object
+   *
+   * Describes a two-dimensional manifold, i.e., to put it simply,
+   * an object that can be described using a 2D coordinate-system.
+   *
+   * PlaneGeometry can map points between 3D world coordinates
+   * (in mm) and the described 2D coordinate-system (in mm) by first projecting
+   * the 3D point onto the 2D manifold and then calculating the 2D-coordinates
+   * (in mm). These 2D-mm-coordinates can be further converted into
+   * 2D-unit-coordinates (e.g., pixels), giving a parameter representation of
+   * the object with parameter values inside a rectangle
+   * (e.g., [0,0]..[width, height]), which is the bounding box (bounding range
+   * in z-direction always [0]..[1]).
+   *
+   * A PlaneGeometry describes the 2D representation within a 3D object (derived from BaseGeometry). For example,
+   * a single CT-image (slice) is 2D in the sense that you can access the
+   * pixels using 2D-coordinates, but is also 3D, as the pixels are really
+   * voxels, thus have an extension (thickness) in the 3rd dimension.
+   *
+   *
+   * Optionally, a reference BaseGeometry can be specified, which usually would
+   * be the geometry associated with the underlying dataset. This is currently
+   * used for calculating the intersection of inclined / rotated planes
+   * (represented as PlaneGeometry) with the bounding box of the associated
+   * BaseGeometry.
+   *
+   * \warning The PlaneGeometry are not necessarily up-to-date and not even
+   * initialized. As described in the previous paragraph, one of the
+   * Generate-/Copy-/UpdateOutputInformation methods have to initialize it.
+   * mitk::BaseData::GetPlaneGeometry() makes sure, that the PlaneGeometry is
+   * up-to-date before returning it (by setting the update extent appropriately
+   * and calling UpdateOutputInformation).
+   *
+   * Rule: everything is in mm (or ms for temporal information) if not
+   * stated otherwise.
+   * \ingroup Geometry
+   */
 
   class PlaneGeometry;
   /** \deprecatedSince{2014_10} This class is deprecated. Please use PlaneGeometry instead. */
@@ -605,4 +605,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif /* PLANEGEOMETRY_H_HEADER_INCLUDED_C1C68A2C */
+#endif

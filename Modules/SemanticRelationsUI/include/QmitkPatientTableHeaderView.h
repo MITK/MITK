@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKPATIENTTABLEHEADERVIEW_H
-#define QMITKPATIENTTABLEHEADERVIEW_H
+#ifndef QmitkPatientTableHeaderView_h
+#define QmitkPatientTableHeaderView_h
 
 // semantic relations ui module
 #include "MitkSemanticRelationsUIExports.h"
@@ -76,4 +76,4 @@ private:
 
 };
 
-#endif // QMITKPATIENTTABLEHEADERVIEW_H
+#endif

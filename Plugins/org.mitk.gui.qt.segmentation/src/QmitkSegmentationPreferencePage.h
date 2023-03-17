@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKSEGMENTATIONPREFERENCEPAGE_H
-#define QMITKSEGMENTATIONPREFERENCEPAGE_H
+#ifndef QmitkSegmentationPreferencePage_h
+#define QmitkSegmentationPreferencePage_h
 
 #include "org_mitk_gui_qt_segmentation_Export.h"
 
@@ -59,4 +59,4 @@ protected:
   bool m_Initializing;
 };
 
-#endif // QMITKSEGMENTATIONPREFERENCEPAGE_H
+#endif

@@ -66,4 +66,4 @@ protected slots:
     void DefaultButtonPushed();
     void PathSelectButtonPushed();
 };
-#endif // QmitkQmitkDicomPreferencePage_h
+#endif

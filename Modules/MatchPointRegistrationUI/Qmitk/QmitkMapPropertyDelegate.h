@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkPropertyDelegate_h
-#define QmitkPropertyDelegate_h
+#ifndef QmitkMapPropertyDelegate_h
+#define QmitkMapPropertyDelegate_h
 
 /// Toolkit includes.
 #include "mitkBaseProperty.h"
@@ -75,4 +75,4 @@ private slots:
   void SpinBoxValueChanged(const QString &value);
 };
 
-#endif /* QMITKPROPERTIESTABLEMODEL_H_ */
+#endif

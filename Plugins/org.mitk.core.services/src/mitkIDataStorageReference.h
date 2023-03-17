@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIDATASTORAGEREFERENCE_H_
-#define MITKIDATASTORAGEREFERENCE_H_
+#ifndef mitkIDataStorageReference_h
+#define mitkIDataStorageReference_h
 
 #include <berryObject.h>
 #include <berryMacros.h>
@@ -42,4 +42,4 @@ struct MITK_CORE_SERVICES_PLUGIN IDataStorageReference : public berry::Object
 
 }
 
-#endif /*MITKIDATASTORAGEREFERENCE_H_*/
+#endif

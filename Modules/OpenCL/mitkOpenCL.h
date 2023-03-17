@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKOPENCL_H_HEADER_INCLUDED
-#define MITKOPENCL_H_HEADER_INCLUDED
+#ifndef mitkOpenCL_h
+#define mitkOpenCL_h
 
 #if defined (__APPLE__) || defined(MACOSX)
 #include <OpenCL/cl.h>
@@ -20,4 +20,4 @@ found in the LICENSE file.
 #include <CL/cl.h>
 #endif
 
-#endif /* MITKOPENCL_H_HEADER_INCLUDED */
+#endif

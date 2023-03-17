@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKNavigationDataCSVSequentialPlayer_H_HEADER_INCLUDED_
-#define MITKNavigationDataCSVSequentialPlayer_H_HEADER_INCLUDED_
+#ifndef mitkNavigationDataCSVSequentialPlayer_h
+#define mitkNavigationDataCSVSequentialPlayer_h
 
 #include <mitkNavigationDataPlayerBase.h>
 
@@ -145,4 +145,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif /* MITKNavigationDataCSVSequentialPlayer_H_HEADER_INCLUDED_ */
+#endif

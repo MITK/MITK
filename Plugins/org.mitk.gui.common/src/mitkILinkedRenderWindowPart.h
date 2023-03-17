@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKILINKEDRENDERWINDOWPART_H
-#define MITKILINKEDRENDERWINDOWPART_H
+#ifndef mitkILinkedRenderWindowPart_h
+#define mitkILinkedRenderWindowPart_h
 
 #include "mitkIRenderWindowPart.h"
 
@@ -51,4 +51,4 @@ struct MITK_GUI_COMMON_PLUGIN ILinkedRenderWindowPart : public virtual IRenderWi
 
 }
 
-#endif // MITKILINKEDRENDERWINDOWPART_H
+#endif

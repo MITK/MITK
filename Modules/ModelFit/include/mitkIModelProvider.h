@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __I_MODEL_FIT_PROVIDER_H
-#define __I_MODEL_FIT_PROVIDER_H
+#ifndef mitkIModelProvider_h
+#define mitkIModelProvider_h
 
 
 #include <mitkServiceInterface.h>
@@ -110,4 +110,4 @@ namespace mitk
 
 MITK_DECLARE_SERVICE_INTERFACE(mitk::IFileReader, "org.mitk.IFileReader")
 
-#endif /* IFileReader_H_HEADER_INCLUDED_C1E7E521 */
+#endif

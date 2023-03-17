@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkExtractDirectedPlaneImageFilter_h_Included
-#define mitkExtractDirectedPlaneImageFilter_h_Included
+#ifndef mitkExtractDirectedPlaneImageFilter_h
+#define mitkExtractDirectedPlaneImageFilter_h
 
 #include "mitkImageToImageFilter.h"
 #include <MitkImageExtractionExports.h>
@@ -110,4 +110,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif // mitkExtractDirectedPlaneImageFilter_h_Included
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKINTERACTIONSCHEMESWITCHER_H
-#define MITKINTERACTIONSCHEMESWITCHER_H
+#ifndef mitkInteractionSchemeSwitcher_h
+#define mitkInteractionSchemeSwitcher_h
 
 #include "MitkCoreExports.h"
 
@@ -113,4 +113,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif // MITKINTERACTIONSCHEMESWITCHER_H
+#endif

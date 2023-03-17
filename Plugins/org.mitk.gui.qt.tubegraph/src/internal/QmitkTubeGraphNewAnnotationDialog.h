@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QMITKTUBEGRAPHNEWANNOTATIONDIALOG_H_INCLUDED
-#define _QMITKTUBEGRAPHNEWANNOTATIONDIALOG_H_INCLUDED
+#ifndef QmitkTubeGraphNewAnnotationDialog_h
+#define QmitkTubeGraphNewAnnotationDialog_h
 
 #include <qdialog.h>
 

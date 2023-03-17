@@ -106,4 +106,4 @@ namespace mitk
 
   };
 }
-#endif //mitkGIFFirstOrderHistogramStatistics_h
+#endif

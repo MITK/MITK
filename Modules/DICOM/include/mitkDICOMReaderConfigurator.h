@@ -142,4 +142,4 @@ class MITKDICOM_EXPORT DICOMReaderConfigurator : public itk::LightObject
 
 } // namespace
 
-#endif // mitkDICOMReaderConfigurator_h
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __MODEL_TRAITS_INTERFACE_H
-#define __MODEL_TRAITS_INTERFACE_H
+#ifndef mitkModelTraitsInterface_h
+#define mitkModelTraitsInterface_h
 
 #include "MitkModelFitExports.h"
 
@@ -92,4 +92,4 @@ namespace mitk
   };
 }
 
-#endif // __MODEL_TRAITS_INTERFACE_H
+#endif

@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef _MITK_DOSE_ISO_LEVEL_H_
-#define _MITK_DOSE_ISO_LEVEL_H_
+#ifndef mitkIsoDoseLevel_h
+#define mitkIsoDoseLevel_h
 
 #include <itkRGBPixel.h>
 #include <itkObject.h>
@@ -97,4 +97,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif //_MITK_DOSE_ISO_LEVEL_H_
+#endif

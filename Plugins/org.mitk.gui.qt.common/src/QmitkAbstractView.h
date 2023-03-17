@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKABSTRACTVIEW_H_
-#define QMITKABSTRACTVIEW_H_
+#ifndef QmitkAbstractView_h
+#define QmitkAbstractView_h
 
 //# blueberry stuff
 #include <berryQtViewPart.h>
@@ -353,4 +353,4 @@ private:
 
 };
 
-#endif /*QMITKABSTRACTVIEW_H_*/
+#endif

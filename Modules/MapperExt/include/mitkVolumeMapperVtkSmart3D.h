@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKVTKSMARTVOLUMEMAPPER_H_HEADER_INCLUDED
-#define MITKVTKSMARTVOLUMEMAPPER_H_HEADER_INCLUDED
+#ifndef mitkVolumeMapperVtkSmart3D_h
+#define mitkVolumeMapperVtkSmart3D_h
 
 // MITK
 #include "MitkMapperExtExports.h"
@@ -72,4 +72,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKVTKSMARTVOLUMEMAPPER_H_HEADER_INCLUDED */
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKSURFACEDATASOURCE_H_HEADER_INCLUDED_C10B4740
-#define MITKSURFACEDATASOURCE_H_HEADER_INCLUDED_C10B4740
+#ifndef mitkSurfaceSource_h
+#define mitkSurfaceSource_h
 
 #include "mitkBaseDataSource.h"
 
@@ -66,4 +66,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKSURFACEDATASOURCE_H_HEADER_INCLUDED_C10B4740 */
+#endif

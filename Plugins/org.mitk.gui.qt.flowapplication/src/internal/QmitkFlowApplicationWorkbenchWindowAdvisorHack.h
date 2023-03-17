@@ -10,6 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#ifndef QmitkFlowApplicationWorkbenchWindowAdvisorHack_h
+#define QmitkFlowApplicationWorkbenchWindowAdvisorHack_h
+
 #include <QObject>
 
 class ctkPluginContext;
@@ -52,3 +55,5 @@ class QmitkFlowApplicationWorkbenchWindowAdvisorHack : public QObject
 
     static QmitkFlowApplicationWorkbenchWindowAdvisorHack* undohack;
 };
+
+#endif

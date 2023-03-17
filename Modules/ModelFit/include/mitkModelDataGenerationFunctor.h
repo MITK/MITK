@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKMODELDATAGENERATIONFUNCTOR_H
-#define MITKMODELDATAGENERATIONFUNCTOR_H
+#ifndef mitkModelDataGenerationFunctor_h
+#define mitkModelDataGenerationFunctor_h
 
 #include "mitkSimpleFunctorBase.h"
 #include "mitkModelBase.h"
@@ -63,4 +63,4 @@ namespace  mitk
   };
 }
 
-#endif // MITKMODELDATAGENERATIONFUNCTOR_H
+#endif

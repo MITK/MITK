@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkDicomDataEventPublisher_H
-#define QmitkDicomDataEventPublisher_H
+#ifndef QmitkDicomDataEventPublisher_h
+#define QmitkDicomDataEventPublisher_h
 
 #include <ctkPluginContext.h>
 #include <QObject>
@@ -46,4 +46,4 @@ class QmitkDicomDataEventPublisher : public QObject
 
         void SignalRemoveSeriesFromStorage(const ctkDictionary&);
 };
-#endif // QmitkDicomDataEventPublisher_H
+#endif

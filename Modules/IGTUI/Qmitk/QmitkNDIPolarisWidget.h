@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkNDIPolarisWidget_H
-#define QmitkNDIPolarisWidget_H
+#ifndef QmitkNDIPolarisWidget_h
+#define QmitkNDIPolarisWidget_h
 
 #include "ui_QmitkNDIPolarisWidget.h"
 #include "QmitkNDIAbstractDeviceWidget.h"

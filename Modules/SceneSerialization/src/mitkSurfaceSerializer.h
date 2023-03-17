@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkSurfaceSerializer_h_included
-#define mitkSurfaceSerializer_h_included
+#ifndef mitkSurfaceSerializer_h
+#define mitkSurfaceSerializer_h
 
 #include "mitkBaseDataSerializer.h"
 

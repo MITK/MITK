@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_VTK_INTERPOLATION_PROPERTY__H_
-#define _MITK_VTK_INTERPOLATION_PROPERTY__H_
+#ifndef mitkVtkInterpolationProperty_h
+#define mitkVtkInterpolationProperty_h
 
 #include "mitkEnumerationProperty.h"
 

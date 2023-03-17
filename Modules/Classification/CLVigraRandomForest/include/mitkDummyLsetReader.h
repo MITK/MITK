@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_DummyLsetFileReader__H_
-#define _MITK_DummyLsetFileReader__H_
+#ifndef mitkDummyLsetReader_h
+#define mitkDummyLsetReader_h
 
 #include <mitkAbstractFileReader.h>
 

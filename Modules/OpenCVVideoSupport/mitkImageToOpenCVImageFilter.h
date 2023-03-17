@@ -92,6 +92,4 @@ class MITKOPENCVVIDEOSUPPORT_EXPORT ImageToOpenCVImageFilter : public itk::Objec
 
 } // namespace
 
-#endif // mitkImageToOpenCVImageFilter_h
-
-
+#endif

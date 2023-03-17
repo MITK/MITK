@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _mitkContourSetToPointSetFilter_h__
-#define _mitkContourSetToPointSetFilter_h__
+#ifndef mitkContourSetToPointSetFilter_h
+#define mitkContourSetToPointSetFilter_h
 
 #include "mitkCommon.h"
 #include "mitkContourSet.h"
@@ -60,4 +60,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif // _mitkContourSetToPointSetFilter_h__
+#endif

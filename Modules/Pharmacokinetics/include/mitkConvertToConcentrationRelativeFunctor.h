@@ -58,4 +58,4 @@ namespace mitk {
     };
 
 }
-#endif // mitkConvertToConcentrationRelativeFunctor_h
+#endif

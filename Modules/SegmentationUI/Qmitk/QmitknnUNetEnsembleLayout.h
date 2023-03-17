@@ -6,12 +6,12 @@ Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
 Use of this source code is governed by a 3-clause BSD license that can be
-found in the LICENSE file.s
+found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitknnUNetEnsembleLayout_h_Included
-#define QmitknnUNetEnsembleLayout_h_Included
+#ifndef QmitknnUNetEnsembleLayout_h
+#define QmitknnUNetEnsembleLayout_h
 
 
 #include <QtWidgets/QGridLayout>
@@ -88,4 +88,3 @@ public:
 QT_END_NAMESPACE
 
 #endif
-

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKTESTCALLER_H
-#define MITKTESTCALLER_H
+#ifndef mitkTestCaller_h
+#define mitkTestCaller_h
 
 #include "cppunit/TestCase.h"
 
@@ -117,4 +117,4 @@ namespace mitk
   };
 }
 
-#endif // MITKTESTCALLER_H
+#endif

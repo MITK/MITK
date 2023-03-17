@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKSCALARBAROVERLAY_H_HEADER_INCLUDED_C10DC4EB
-#define MITKSCALARBAROVERLAY_H_HEADER_INCLUDED_C10DC4EB
+#ifndef QmitkScalarBarOverlay_h
+#define QmitkScalarBarOverlay_h
 
 #include <MitkQtOverlaysExports.h>
 
@@ -78,4 +78,4 @@ protected:
   unsigned long m_ObserverTag;
 };
 
-#endif /* MITKSCALARBAROVERLAY_H_HEADER_INCLUDED_C10DC4EB */
+#endif

@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKNNAVIGATIONDATATONAVIGATIONDATAFILTER_H_HEADER_INCLUDED_
-#define MITKNNAVIGATIONDATATONAVIGATIONDATAFILTER_H_HEADER_INCLUDED_
+#ifndef mitkNavigationDataToNavigationDataFilter_h
+#define mitkNavigationDataToNavigationDataFilter_h
 
 #include <mitkNavigationDataSource.h>
 
@@ -103,4 +103,4 @@ namespace mitk
     void CreateOutputsForAllInputs();
   };
 } // namespace mitk
-#endif /* MITKNAVIGATIONDATATONAVIGATIONDATAFILTER_H_HEADER_INCLUDED_ */
+#endif

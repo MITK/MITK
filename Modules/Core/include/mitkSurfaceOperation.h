@@ -10,7 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#pragma once
+#ifndef mitkSurfaceOperation_h
+#define mitkSurfaceOperation_h
 
 #include "mitkOperation.h"
 #include <MitkCoreExports.h>
@@ -43,4 +44,6 @@ namespace mitk
     vtkPolyData *m_polyData;
     unsigned int m_timeStep;
   };
-}; // end namespace mitk
+}
+
+#endif

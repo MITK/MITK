@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __DESCRIPTIVEPHARMACOKINETICBRIXMODEL_VALUEBASED_PARAMETERIZER_H
-#define __DESCRIPTIVEPHARMACOKINETICBRIXMODEL_VALUEBASED_PARAMETERIZER_H
+#ifndef mitkDescriptivePharmacokineticBrixModelValueBasedParameterizer_h
+#define mitkDescriptivePharmacokineticBrixModelValueBasedParameterizer_h
 
 #include "mitkConcreteModelParameterizerBase.h"
 
@@ -87,4 +87,4 @@ namespace mitk
   };
 }
 
-#endif // __DESCRIPTIVEPHARMACOKINETICBRIXMODEL_VALUEBASED_PARAMETERIZER_H
+#endif

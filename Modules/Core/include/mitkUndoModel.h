@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef UNDOMODEL_H_HEADER_INCLUDED_C16ED098
-#define UNDOMODEL_H_HEADER_INCLUDED_C16ED098
+#ifndef mitkUndoModel_h
+#define mitkUndoModel_h
 
 #include "mitkCommon.h"
 #include "mitkOperation.h"
@@ -96,4 +96,4 @@ namespace mitk
   };
 
 } // namespace mitk
-#endif /* UNDOMODEL_H_HEADER_INCLUDED_C16ED098 */
+#endif

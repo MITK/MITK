@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKTIMEHELPER_H_HEADER_INCLUDED_C1C2FCD2
-#define MITKTIMEHELPER_H_HEADER_INCLUDED_C1C2FCD2
+#ifndef mitkTimeHelper_h
+#define mitkTimeHelper_h
 
 #include <mitkTimeGeometry.h>
 
@@ -74,4 +74,4 @@ namespace mitk
 
 } // end namespace mitk
 
-#endif // MITKTIMEHELPER_H_HEADER_INCLUDED_C1C2FCD2
+#endif

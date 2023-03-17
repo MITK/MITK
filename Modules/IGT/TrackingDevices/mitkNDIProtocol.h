@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKNDIPROTOCOL_H_HEADER_INCLUDED_
-#define MITKNDIPROTOCOL_H_HEADER_INCLUDED_
+#ifndef mitkNDIProtocol_h
+#define mitkNDIProtocol_h
 
 #include <itkObject.h>
 #include <itkObjectFactory.h>
@@ -159,4 +159,4 @@ namespace mitk
     bool m_UseCRC;  ///< whether to append a CRC16 checksum to each message
   };
 } // namespace mitk
-#endif /* MITKNDIPROTOCOL_H_HEADER_INCLUDED_ */
+#endif

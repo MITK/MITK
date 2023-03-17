@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef SCALELEGENDAnnotation_H
-#define SCALELEGENDAnnotation_H
+#ifndef mitkScaleLegendAnnotation_h
+#define mitkScaleLegendAnnotation_h
 
 #include "MitkAnnotationExports.h"
 #include <mitkLocalStorageHandler.h>
@@ -100,4 +100,4 @@ namespace mitk
   };
 
 } // namespace mitk
-#endif // SCALELEGENDAnnotation_H
+#endif

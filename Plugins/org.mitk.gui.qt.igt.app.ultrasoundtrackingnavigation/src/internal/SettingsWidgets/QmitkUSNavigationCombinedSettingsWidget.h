@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef QMITKUSNAVIGATIONCOMBINEDSETTINGSWIDGET_H
-#define QMITKUSNAVIGATIONCOMBINEDSETTINGSWIDGET_H
+#ifndef QmitkUSNavigationCombinedSettingsWidget_h
+#define QmitkUSNavigationCombinedSettingsWidget_h
 
 #include "QmitkUSNavigationAbstractSettingsWidget.h"
 #include "mitkDataNode.h"
@@ -46,4 +46,4 @@ private:
   Ui::QmitkUSNavigationCombinedSettingsWidget *ui;
 };
 
-#endif // QMITKUSNAVIGATIONCOMBINEDSETTINGSWIDGET_H
+#endif

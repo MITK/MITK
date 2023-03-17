@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef CONSTRAINT_CHECKER_BASE_H
-#define CONSTRAINT_CHECKER_BASE_H
+#ifndef mitkConstraintCheckerBase_h
+#define mitkConstraintCheckerBase_h
 
 #include <itkObject.h>
 #include <itkMacro.h>
@@ -59,4 +59,4 @@ private:
 
 }
 
-#endif // ConstraintCheckerBase_H
+#endif

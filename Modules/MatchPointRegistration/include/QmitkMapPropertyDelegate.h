@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkPropertyDelegate_h
-#define QmitkPropertyDelegate_h
+#ifndef QmitkMapPropertyDelegate_h
+#define QmitkMapPropertyDelegate_h
 
 
 /// Toolkit includes.
@@ -79,4 +79,4 @@ protected:
 
 };
 
-#endif /* QMITKPROPERTIESTABLEMODEL_H_ */
+#endif

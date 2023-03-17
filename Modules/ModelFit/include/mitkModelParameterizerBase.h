@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __MODEL_PARAMETERIZER_BASE_H
-#define __MODEL_PARAMETERIZER_BASE_H
+#ifndef mitkModelParameterizerBase_h
+#define mitkModelParameterizerBase_h
 
 #include <itkObject.h>
 #include <itkIndex.h>
@@ -97,4 +97,4 @@ namespace mitk
   };
 }
 
-#endif // __MODEL_PARAMETERIZER_BASE_H
+#endif

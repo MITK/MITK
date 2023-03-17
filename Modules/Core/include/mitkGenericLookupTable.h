@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKGENERICLOOKUPTABLE_H_HEADER_INCLUDED_C1061CEE
-#define MITKGENERICLOOKUPTABLE_H_HEADER_INCLUDED_C1061CEE
+#ifndef mitkGenericLookupTable_h
+#define mitkGenericLookupTable_h
 
 #include <map>
 #include <sstream>

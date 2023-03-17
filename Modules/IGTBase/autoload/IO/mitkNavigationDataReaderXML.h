@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKNavigationDataReaderXML_H_HEADER_INCLUDED_
-#define MITKNavigationDataReaderXML_H_HEADER_INCLUDED_
+#ifndef mitkNavigationDataReaderXML_h
+#define mitkNavigationDataReaderXML_h
 
 #include <MitkIGTIOExports.h>
 
@@ -47,4 +47,4 @@ namespace mitk {
 
 } // namespace mitk
 
-#endif // MITKNavigationDataReaderXML_H_HEADER_INCLUDED_
+#endif

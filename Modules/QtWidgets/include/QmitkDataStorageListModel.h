@@ -153,4 +153,4 @@ private:
   bool m_BlockEvents;
 };
 
-#endif /* QMITKDATASTORAGELISTMODEL_H_ */
+#endif

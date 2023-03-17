@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef QMITKUSNAVIGATIONCALIBRATIONUPDATEDEPTHDELEGATE_H
-#define QMITKUSNAVIGATIONCALIBRATIONUPDATEDEPTHDELEGATE_H
+#ifndef QmitkUSNavigationCalibrationUpdateDepthDelegate_h
+#define QmitkUSNavigationCalibrationUpdateDepthDelegate_h
 
 #include <QStyledItemDelegate>
 
@@ -41,4 +41,4 @@ private:
   mitk::USControlInterfaceBMode::Pointer m_ControlInterfaceBMode;
 };
 
-#endif // QMITKUSNAVIGATIONCALIBRATIONUPDATEDEPTHDELEGATE_H
+#endif

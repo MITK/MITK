@@ -339,4 +339,4 @@ private:
 };
 }
 
-#endif //mitkAbstractGlobalImageFeature_h
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkMaskClearningOperation_h
-#define mitkMaskClearningOperation_h
+#ifndef mitkMaskCleaningOperation_h
+#define mitkMaskCleaningOperation_h
 
 #include <mitkImage.h>
 #include <MitkBasicImageProcessingExports.h>
@@ -55,4 +55,4 @@ namespace mitk
 
 
 }
-#endif // mitkMaskClearningOperation_h
+#endif

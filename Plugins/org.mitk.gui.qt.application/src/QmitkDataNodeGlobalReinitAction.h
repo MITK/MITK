@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATANODEGLOBALREINITACTION_H
-#define QMITKDATANODEGLOBALREINITACTION_H
+#ifndef QmitkDataNodeGlobalReinitAction_h
+#define QmitkDataNodeGlobalReinitAction_h
 
 #include <org_mitk_gui_qt_application_Export.h>
 
@@ -46,4 +46,4 @@ private:
 
 };
 
-#endif // QMITKDATANODEGLOBALREINITACTION_H
+#endif

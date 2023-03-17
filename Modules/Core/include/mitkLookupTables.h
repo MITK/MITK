@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKLOOKUPTABLES_H_HEADER_INCLUDED
-#define MITKLOOKUPTABLES_H_HEADER_INCLUDED
+#ifndef mitkLookupTables_h
+#define mitkLookupTables_h
 
 #include "mitkGenericLookupTable.h"
 
@@ -32,4 +32,4 @@ namespace mitk
   mitkSpecializeGenericLookupTable(StringLookupTable, std::string);
 } // namespace mitk
 
-#endif /* MITKLOOKUPTABLES_H_HEADER_INCLUDED*/
+#endif

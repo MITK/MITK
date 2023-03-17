@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKUSTelemedScanConverterPlugin_H_HEADER_INCLUDED_
-#define MITKUSTelemedScanConverterPlugin_H_HEADER_INCLUDED_
+#ifndef mitkUSTelemedScanConverterPlugin_h
+#define mitkUSTelemedScanConverterPlugin_h
 
 #include <initguid.h>
 #include <strmif.h>
@@ -164,4 +164,4 @@ private:
   long m_cRef ;
 };
 
-#endif // MITKUSTelemedScanConverterPlugin_H_HEADER_INCLUDED_
+#endif

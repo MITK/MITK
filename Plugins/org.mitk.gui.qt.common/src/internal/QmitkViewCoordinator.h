@@ -121,4 +121,4 @@ private:
 
 };
 
-#endif // QmitkViewCoordinator_h
+#endif

@@ -117,4 +117,4 @@ protected:
     bool m_IsListening;
 };
 
-#endif // QmitkDicomListener_h
+#endif

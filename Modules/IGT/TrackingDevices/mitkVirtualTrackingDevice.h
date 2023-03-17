@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKVIRTUALTRACKINGDEVICE_H_HEADER_INCLUDED_
-#define MITKVIRTUALTRACKINGDEVICE_H_HEADER_INCLUDED_
+#ifndef mitkVirtualTrackingDevice_h
+#define mitkVirtualTrackingDevice_h
 
 #include <MitkIGTExports.h>
 #include <mitkTrackingDevice.h>
@@ -211,4 +211,4 @@ namespace mitk
   double m_DeviationDistributionParam;  ///< deviation distribution for Gaussian Noise, 1.0 by default
   };
 }//mitk
-#endif /* MITKVIRTUALTRACKINGDEVICE_H_HEADER_INCLUDED_ */
+#endif

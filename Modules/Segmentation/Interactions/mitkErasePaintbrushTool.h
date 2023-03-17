@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkErasePaintbrushTool_h_Included
-#define mitkErasePaintbrushTool_h_Included
+#ifndef mitkErasePaintbrushTool_h
+#define mitkErasePaintbrushTool_h
 
 #include "mitkPaintbrushTool.h"
 #include <MitkSegmentationExports.h>

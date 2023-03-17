@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __WEIGHTEDPOINTTRANSFORM_H__
-#define __WEIGHTEDPOINTTRANSFORM_H__
+#ifndef mitkWeightedPointTransform_h
+#define mitkWeightedPointTransform_h
 
 // EXPORTS
 #include "MitkAlgorithmsExtExports.h"

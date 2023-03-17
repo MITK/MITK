@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKSEMANTICRELATIONSUIHELPER_H
-#define QMITKSEMANTICRELATIONSUIHELPER_H
+#ifndef QmitkSemanticRelationsUIHelper_h
+#define QmitkSemanticRelationsUIHelper_h
 
 // semantic relations ui module
 #include "MitkSemanticRelationsUIExports.h"
@@ -38,4 +38,4 @@ namespace QmitkSemanticRelationsUIHelper
 
 } // namespace QmitkSemanticRelationsUIHelper
 
-#endif // QMITKSEMANTICRELATIONSUIHELPER_H
+#endif

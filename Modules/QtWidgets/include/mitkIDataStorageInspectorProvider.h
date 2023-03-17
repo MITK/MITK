@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __I_DATA_STORAGE_INSPECTOR_PROVIDER_H
-#define __I_DATA_STORAGE_INSPECTOR_PROVIDER_H
+#ifndef mitkIDataStorageInspectorProvider_h
+#define mitkIDataStorageInspectorProvider_h
 
 #include <mitkServiceInterface.h>
 
@@ -70,4 +70,4 @@ namespace mitk
 
 MITK_DECLARE_SERVICE_INTERFACE(mitk::IDataStorageInspectorProvider, "org.mitk.IDataStorageInspectorProvider")
 
-#endif /* __I_DATA_STORAGE_INSPECTOR_PROVIDER_H */
+#endif

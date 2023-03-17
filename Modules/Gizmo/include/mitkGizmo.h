@@ -182,4 +182,4 @@ namespace mitk
     std::unique_ptr<GizmoRemover> m_GizmoRemover;
   };
 }
-#endif /* BOUNDINGOBJECT_H_HEADER_INCLUDED */
+#endif

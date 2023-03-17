@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkCreateDistanceImageFromSurfaceFilter_h_Included
-#define mitkCreateDistanceImageFromSurfaceFilter_h_Included
+#ifndef mitkCreateDistanceImageFromSurfaceFilter_h
+#define mitkCreateDistanceImageFromSurfaceFilter_h
 
 #include <MitkSurfaceInterpolationExports.h>
 

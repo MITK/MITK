@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_CONTOUR_H_
-#define _MITK_CONTOUR_H_
+#ifndef mitkContour_h
+#define mitkContour_h
 
 #include "mitkBaseData.h"
 #include "mitkCommon.h"
@@ -177,4 +177,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif //_MITK_CONTOUR_H_
+#endif

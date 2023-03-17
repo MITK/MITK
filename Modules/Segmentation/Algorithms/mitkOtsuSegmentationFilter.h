@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkOtsuSegmentationFilter_h_Included
-#define mitkOtsuSegmentationFilter_h_Included
+#ifndef mitkOtsuSegmentationFilter_h
+#define mitkOtsuSegmentationFilter_h
 
 //#include "MitkSBExports.h"
 #include "mitkITKImageImport.h"

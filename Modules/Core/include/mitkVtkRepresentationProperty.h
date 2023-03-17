@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_VTK_REPRESENTATION_PROPERTY__H_
-#define _MITK_VTK_REPRESENTATION_PROPERTY__H_
+#ifndef mitkVtkRepresentationProperty_h
+#define mitkVtkRepresentationProperty_h
 
 #include "mitkEnumerationProperty.h"
 

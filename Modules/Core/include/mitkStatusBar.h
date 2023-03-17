@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKSTATUSBAR_H
-#define MITKSTATUSBAR_H
+#ifndef mitkStatusBar_h
+#define mitkStatusBar_h
 #include "mitkStatusBarImplementation.h"
 #include <MitkCoreExports.h>
 #include <itkObject.h>
@@ -89,4 +89,4 @@ namespace mitk
   };
 
 } // end namespace mitk
-#endif /* define MITKSTATUSBAR_H */
+#endif

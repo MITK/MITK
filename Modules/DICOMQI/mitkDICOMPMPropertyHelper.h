@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef DICOMSEGMENTATIONPROPERTYHELPER_H_
-#define DICOMSEGMENTATIONPROPERTYHELPER_H_
+#ifndef mitkDICOMPMPropertyHelper_h
+#define mitkDICOMPMPropertyHelper_h
 
 #include <mitkDICOMTag.h>
 #include <mitkBaseData.h>

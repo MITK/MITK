@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkDndFrameWidget_h
-#define QmitkDndFrameWidget_h
+#ifndef QmitkDnDFrameWidget_h
+#define QmitkDnDFrameWidget_h
 
 #include <QWidget>
 #include <org_mitk_gui_qt_common_Export.h>

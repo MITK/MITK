@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKUSCONTROLSPROBESWIDGET_H
-#define QMITKUSCONTROLSPROBESWIDGET_H
+#ifndef QmitkUSControlsProbesWidget_h
+#define QmitkUSControlsProbesWidget_h
 
 #include <QWidget>
 
@@ -55,4 +55,4 @@ private:
   mitk::USControlInterfaceProbes::Pointer  m_ControlInterface;
 };
 
-#endif // QMITKUSCONTROLSPROBESWIDGET_H
+#endif

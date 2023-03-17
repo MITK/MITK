@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKABSTRACTMULTIWIDGET_H
-#define QMITKABSTRACTMULTIWIDGET_H
+#ifndef QmitkAbstractMultiWidget_h
+#define QmitkAbstractMultiWidget_h
 
 // mitk qt widgets module
 #include "MitkQtWidgetsExports.h"
@@ -111,17 +111,27 @@ public:
   void ForceImmediateUpdateAll();
 
   /**
-   * @brief Set the reference geometry for interaction inside the render windows of the render window part.
-   *
-   * The concrete implementation is subclass-specific, no default implementation is provided here.
-   *
-   * @param referenceGeometry   The reference geometry which is used for updating the
-   *                            time geometry inside the render windows.
-   * @param resetCamera         If true, the camera and crosshair will be reset to the default view (centered, no zoom).
-   *                            If false, the current crosshair position and the camera zoom will be stored and reset
-   *                            after the reference geometry has been updated.
-   */
-  virtual void SetReferenceGeometry(const mitk::TimeGeometry* referenceGeometry, bool resetCamera) = 0;
+  * @brief Initialize the render windows of the concrete multi widget to the given geometry.
+  *
+  * The concrete implementation is subclass-specific, no default implementation is provided here.
+  *
+  * @param geometry      The geometry to be used to initialize / update the
+  *                      render window's time and slice navigation controller.
+  * @param resetCamera   If true, the camera and crosshair will be reset to the default view (centered, no zoom).
+  *                      If false, the current crosshair position and the camera zoom will be stored and reset
+  *                      after the reference geometry has been updated.
+  */
+  virtual void InitializeViews(const mitk::TimeGeometry* geometry, bool resetCamera) = 0;
+
+  /**
+  * @brief Define the reference geometry for interaction withing a render window.
+  *
+  * The concrete implementation is subclass-specific, no default implementation is provided here.
+  *
+  * @param referenceGeometry  The interaction reference geometry for the base renderer of the concrete multi widget.
+  *                           For more details, see 'BaseRenderer::SetInteractionReferenceGeometry'.
+  */
+  virtual void SetInteractionReferenceGeometry(const mitk::TimeGeometry* referenceGeometry) = 0;
 
   /**
   * @brief Returns true if the render windows are coupled; false if not.
@@ -178,4 +188,4 @@ private:
 
 };
 
-#endif // QMITKABSTRACTMULTIWIDGET_H
+#endif

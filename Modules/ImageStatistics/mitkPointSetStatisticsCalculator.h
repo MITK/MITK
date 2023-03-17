@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef _MITK_PointSetSTATISTICSCALCULATOR_H
-#define _MITK_PointSetSTATISTICSCALCULATOR_H
+#ifndef mitkPointSetStatisticsCalculator_h
+#define mitkPointSetStatisticsCalculator_h
 
 #include <itkObject.h>
 #include <MitkImageStatisticsExports.h>
@@ -115,4 +115,4 @@ protected:
 
 }
 
-#endif // #define _MITK_PointSetSTATISTICSCALCULATOR_H
+#endif

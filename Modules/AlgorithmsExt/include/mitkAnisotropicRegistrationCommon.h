@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __ANISOTROPICREGISTRATIONCOMMON_H__
-#define __ANISOTROPICREGISTRATIONCOMMON_H__
+#ifndef mitkAnisotropicRegistrationCommon_h
+#define mitkAnisotropicRegistrationCommon_h
 
 #include <itkMatrix.h>
 #include <mitkCommon.h>

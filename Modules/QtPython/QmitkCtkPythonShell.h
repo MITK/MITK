@@ -52,5 +52,4 @@ private:
 
 
 
-#endif // QmitkCtkPythonShell_h
-
+#endif

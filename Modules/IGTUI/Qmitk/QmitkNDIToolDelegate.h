@@ -111,4 +111,4 @@ private:
     mitk::BaseProperty::Pointer m_TagProperty;
     std::string m_TagPropertyName;
 };
-#endif /* QmitkNDIToolDelegate_h */
+#endif

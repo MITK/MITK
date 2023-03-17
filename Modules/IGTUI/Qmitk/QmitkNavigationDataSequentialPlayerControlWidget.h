@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKNAVIGATIONDATASEQUENTIALPLAYERCONTROLWIDGET_H
-#define QMITKNAVIGATIONDATASEQUENTIALPLAYERCONTROLWIDGET_H
+#ifndef QmitkNavigationDataSequentialPlayerControlWidget_h
+#define QmitkNavigationDataSequentialPlayerControlWidget_h
 
 #include <QWidget>
 #include "mitkNavigationDataSequentialPlayer.h"
@@ -57,4 +57,4 @@ private:
   Ui::QmitkNavigationDataSequentialPlayerControlWidget *ui;
 };
 
-#endif // QMITKNAVIGATIONDATASEQUENTIALPLAYERCONTROLWIDGET_H
+#endif

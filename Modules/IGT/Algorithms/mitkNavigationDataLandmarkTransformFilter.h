@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKNavigationDataLandmarkTransformFilter_H_HEADER_INCLUDED_
-#define MITKNavigationDataLandmarkTransformFilter_H_HEADER_INCLUDED_
+#ifndef mitkNavigationDataLandmarkTransformFilter_h
+#define mitkNavigationDataLandmarkTransformFilter_h
 
 #include <mitkNavigationDataToNavigationDataFilter.h>
 #include <mitkPointSet.h>
@@ -180,4 +180,4 @@ namespace mitk {
     bool m_UseICPInitialization; ///< find source <--> target point correspondences with iterative closest point optimization
   };
 } // namespace mitk
-#endif /* MITKNavigationDataLandmarkTransformFilter_H_HEADER_INCLUDED_ */
+#endif

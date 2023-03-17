@@ -377,4 +377,4 @@ private:
   mitk::MessageDelegate2<QmitkUltrasoundCalibration, const std::string &, const std::string &> m_USDeviceChanged;
 };
 
-#endif // UltrasoundCalibration_h
+#endif

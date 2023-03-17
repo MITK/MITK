@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef _MITK_REG_EVAL_WIPE_STYLE_PROPERTY__H_
-#define _MITK_REG_EVAL_WIPE_STYLE_PROPERTY__H_
+#ifndef mitkRegEvalWipeStyleProperty_h
+#define mitkRegEvalWipeStyleProperty_h
 
 // MITK
 #include <mitkEnumerationProperty.h>
@@ -92,5 +92,3 @@ private:
 } // end of namespace mitk
 
 #endif
-
-

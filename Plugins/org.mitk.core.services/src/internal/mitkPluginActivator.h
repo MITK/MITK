@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKCORESERVICESPLUGIN_H_
-#define MITKCORESERVICESPLUGIN_H_
+#ifndef mitkPluginActivator_h
+#define mitkPluginActivator_h
 
 #include <ctkPluginActivator.h>
 
@@ -66,4 +66,4 @@ typedef org_mitk_core_services_Activator PluginActivator;
 
 }
 
-#endif /*MITKCORESERVICESPLUGIN_H_*/
+#endif

@@ -46,6 +46,7 @@ found in the LICENSE file.
 // #include <itkImageRegionIterator.h>
 
 #include <vtkAbstractArray.h>
+#include <vtkFieldData.h>
 
 #define ROUND(a) ((a) > 0 ? (int)((a) + 0.5) : -(int)(0.5 - (a)))
 

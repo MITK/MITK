@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkUSDeviceWriterXML_H_Header_INCLUDED_
-#define mitkUSDeviceWriterXML_H_Header_INCLUDED_
+#ifndef mitkUSDeviceWriterXML_h
+#define mitkUSDeviceWriterXML_h
 
 #include <MitkUSExports.h>
 
@@ -88,4 +88,4 @@ namespace mitk {
   };
 }
 
-#endif // mitkUSDeviceWriterXML_H_Header_INCLUDED_
+#endif

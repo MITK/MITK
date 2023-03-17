@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef SIMPLEFUNCTORBASE_H
-#define SIMPLEFUNCTORBASE_H
+#ifndef mitkSimpleFunctorBase_h
+#define mitkSimpleFunctorBase_h
 
 #include <itkObject.h>
 
@@ -62,4 +62,4 @@ namespace mitk
 }
 
 
-#endif // SIMPLEFUNCTORBASE_H
+#endif

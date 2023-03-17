@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITK_MODELFIT_RESULT_RELATION_RULE_H
-#define MITK_MODELFIT_RESULT_RELATION_RULE_H
+#ifndef mitkModelFitResultRelationRule_h
+#define mitkModelFitResultRelationRule_h
 
 #include "mitkSourceImageRelationRule.h"
 

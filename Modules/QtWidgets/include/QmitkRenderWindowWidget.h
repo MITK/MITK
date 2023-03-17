@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKRENDERWINDOWWIDGET_H
-#define QMITKRENDERWINDOWWIDGET_H
+#ifndef QmitkRenderWindowWidget_h
+#define QmitkRenderWindowWidget_h
 
 // qt widgets module
 #include "MitkQtWidgetsExports.h"
@@ -96,13 +96,17 @@ public:
 private Q_SLOTS:
 
   void OnReinitAction(QList<mitk::DataNode::Pointer> selectedNodes);
+
   void OnResetAction(QList<mitk::DataNode::Pointer> selectedNodes);
+
+  void OnResetGeometry();
 
 private:
 
   void InitializeGUI();
   void InitializeDecorations();
   void ComputeInvertedSliceNavigation();
+  void ResetGeometry(const mitk::TimeGeometry* referenceGeometry);
 
   QString m_WidgetName;
   QVBoxLayout* m_Layout;
@@ -123,4 +127,4 @@ private:
 
 };
 
-#endif // QMITKRENDERWINDOWWIDGET_H
+#endif

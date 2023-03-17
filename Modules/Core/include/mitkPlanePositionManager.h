@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkPlanePositionManager_h_Included
-#define mitkPlanePositionManager_h_Included
+#ifndef mitkPlanePositionManager_h
+#define mitkPlanePositionManager_h
 
 #include "mitkCommon.h"
 #include "mitkDataStorage.h"

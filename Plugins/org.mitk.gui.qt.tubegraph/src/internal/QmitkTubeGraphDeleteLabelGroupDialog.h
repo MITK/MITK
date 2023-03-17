@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QMITKTUBEGRAPHDELETELABELGROUPDIALOG_H_INCLUDED
-#define _QMITKTUBEGRAPHDELETELABELGROUPDIALOG_H_INCLUDED
+#ifndef QmitkTubeGraphDeleteLabelGroupDialog_h
+#define QmitkTubeGraphDeleteLabelGroupDialog_h
 
 
 #include <QDialog>

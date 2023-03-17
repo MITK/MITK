@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKTCROSSWIDGET_H_INCLUDED
-#define QMITKTCROSSWIDGET_H_INCLUDED
+#ifndef QmitkCrossWidget_h
+#define QmitkCrossWidget_h
 
 #include "MitkQtWidgetsExtExports.h"
 #include <QLabel>

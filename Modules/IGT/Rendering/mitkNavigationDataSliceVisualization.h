@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef MITKNAVIGATIONDATASLICEVISUALIZATION_H_HEADER_INCLUDED_
-#define MITKNAVIGATIONDATASLICEVISUALIZATION_H_HEADER_INCLUDED_
+#ifndef mitkNavigationDataSliceVisualization_h
+#define mitkNavigationDataSliceVisualization_h
 
 #include "mitkNavigationDataToNavigationDataFilter.h"
 #include "mitkBaseRenderer.h"
@@ -132,4 +132,4 @@ class MITKIGT_EXPORT NavigationDataSliceVisualization : public NavigationDataToN
 
 } // end namespace mitk
 
-#endif // NEMOSLICEVISUALIZATIONFILTER_H
+#endif

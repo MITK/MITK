@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKRENDERWINDOWVIEWDIRECTIONCONTROLLER_H
-#define MITKRENDERWINDOWVIEWDIRECTIONCONTROLLER_H
+#ifndef mitkRenderWindowViewDirectionController_h
+#define mitkRenderWindowViewDirectionController_h
 
 // qt widgets module
 #include "MitkQtWidgetsExports.h"
@@ -78,4 +78,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif // MITKRENDERWINDOWVIEWDIRECTIONCONTROLLER_H
+#endif

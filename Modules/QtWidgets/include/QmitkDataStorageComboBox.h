@@ -222,4 +222,4 @@ protected:
   bool m_AutoSelectNewNodes;
 };
 
-#endif // QmitkDataStorageComboBox_h
+#endif

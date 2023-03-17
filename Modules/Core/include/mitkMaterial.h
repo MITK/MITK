@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_MATERIAL_H_
-#define _MITK_MATERIAL_H_
+#ifndef mitkMaterial_h
+#define mitkMaterial_h
 
 #include <MitkCoreExports.h>
 #include <itkObject.h>

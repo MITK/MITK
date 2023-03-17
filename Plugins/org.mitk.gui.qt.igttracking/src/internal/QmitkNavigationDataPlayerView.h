@@ -117,4 +117,4 @@ protected:
 private:
 };
 
-#endif // _QMITKNAVIGATIONDATAPLAYERVIEW_H_INCLUDED
+#endif

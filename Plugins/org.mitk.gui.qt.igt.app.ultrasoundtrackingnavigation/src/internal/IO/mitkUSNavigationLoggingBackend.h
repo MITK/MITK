@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKUSNAVIGATIONLOGGINGBACKEND_H
-#define MITKUSNAVIGATIONLOGGINGBACKEND_H
+#ifndef mitkUSNavigationLoggingBackend_h
+#define mitkUSNavigationLoggingBackend_h
 
 #include <fstream>
 #include <vector>
@@ -67,4 +67,4 @@ namespace mitk {
 } // namespace mitk
 
 
-#endif // MITKUSNAVIGATIONLOGGINGBACKEND_H
+#endif

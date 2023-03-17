@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkUSUIActivator_h
-#define __mitkUSUIActivator_h
+#ifndef mitkUSUIActivator_h
+#define mitkUSUIActivator_h
 
 #include "QmitkUSAbstractCustomWidget.h"
 
@@ -54,4 +54,4 @@ namespace mitk
 
 US_EXPORT_MODULE_ACTIVATOR(mitk::USUIActivator)
 
-#endif // __mitkUSUIActivator_h
+#endif

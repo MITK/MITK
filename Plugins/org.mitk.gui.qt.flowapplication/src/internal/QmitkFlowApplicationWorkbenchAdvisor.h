@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITKFLOWAPPLICATIONWORKBENCHADVISOR_H_
-#define QMITKFLOWAPPLICATIONWORKBENCHADVISOR_H_
+#ifndef QmitkFlowApplicationWorkbenchAdvisor_h
+#define QmitkFlowApplicationWorkbenchAdvisor_h
 
 #include <berryQtWorkbenchAdvisor.h>
 
@@ -31,4 +31,4 @@ public:
 
 };
 
-#endif /*QMITKFLOWAPPLICATIONWORKBENCHADVISOR_H_*/
+#endif

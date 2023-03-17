@@ -175,4 +175,4 @@ private:
 
 };
 } //END mitk namespace
-#endif //mitkToFImageRecorder_h
+#endif

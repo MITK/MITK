@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkVtkLogoRepresentation_h
-#define __mitkVtkLogoRepresentation_h
+#ifndef mitkVtkLogoRepresentation_h
+#define mitkVtkLogoRepresentation_h
 
 #include "vtkLogoRepresentation.h"
 

@@ -10,10 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-/** @file mitkItkPictureWrite.h */
-
-#ifndef MITKITKPICTUREWRITE_H
-#define MITKITKPICTUREWRITE_H
+#ifndef mitkItkPictureWrite_h
+#define mitkItkPictureWrite_h
 
 #include <itkImage.h>
 #include <mitkCommon.h>
@@ -41,4 +39,4 @@ template <typename TPixel, unsigned int VImageDimension>
 DEPRECATED(void _mitkItkPictureWriteComposite(itk::Image<TPixel, VImageDimension> *itkImage,
                                               const std::string &fileName));
 
-#endif /* MITKITKPICTUREWRITE_H */
+#endif

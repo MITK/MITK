@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkDiffImageApplier_h_Included
-#define mitkDiffImageApplier_h_Included
+#ifndef mitkDiffImageApplier_h
+#define mitkDiffImageApplier_h
 
 #include "mitkCommon.h"
 #include "mitkImage.h"

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKGEOMETRYDATASOURCE_H_HEADER_INCLUDED_C10B4740
-#define MITKGEOMETRYDATASOURCE_H_HEADER_INCLUDED_C10B4740
+#ifndef mitkGeometryDataSource_h
+#define mitkGeometryDataSource_h
 
 #include "MitkAlgorithmsExtExports.h"
 #include "mitkBaseDataSource.h"
@@ -65,4 +65,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKGEOMETRYDATASOURCE_H_HEADER_INCLUDED_C10B4740 */
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _mitk_TubeGraphPicker_h
-#define _mitk_TubeGraphPicker_h
+#ifndef mitkTubeGraphPicker_h
+#define mitkTubeGraphPicker_h
 
 #include <MitkTubeGraphExports.h>
 

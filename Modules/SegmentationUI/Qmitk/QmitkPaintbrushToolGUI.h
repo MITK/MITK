@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkPaintbrushToolGUI_h_Included
-#define QmitkPaintbrushToolGUI_h_Included
+#ifndef QmitkPaintbrushToolGUI_h
+#define QmitkPaintbrushToolGUI_h
 
 #include "QmitkToolGUI.h"
 #include "mitkPaintbrushTool.h"

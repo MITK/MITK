@@ -53,4 +53,4 @@ private:
 
 }; // end class
 
-#endif // QmitkUiLoader_h
+#endif

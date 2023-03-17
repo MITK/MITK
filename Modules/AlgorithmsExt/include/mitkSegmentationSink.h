@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITK_SEGMENTATION_SINK_H_INCLUDET_WAD
-#define MITK_SEGMENTATION_SINK_H_INCLUDET_WAD
+#ifndef mitkSegmentationSink_h
+#define mitkSegmentationSink_h
 
 #include "mitkNonBlockingAlgorithm.h"
 #include <MitkAlgorithmsExtExports.h>

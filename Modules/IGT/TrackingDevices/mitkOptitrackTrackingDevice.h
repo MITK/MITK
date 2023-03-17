@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef OptitrackTrackingDevice_H_HEADER_INCLUDED
-#define OptitrackTrackingDevice_H_HEADER_INCLUDED
+#ifndef mitkOptitrackTrackingDevice_h
+#define mitkOptitrackTrackingDevice_h
 
 #include <MitkIGTExports.h>
 #include <mitkTrackingDevice.h>

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef REDUCED_CHI_SQUARE_FITCOSTFUNCTION_H
-#define REDUCED_CHI_SQUARE_FITCOSTFUNCTION_H
+#ifndef mitkReducedChiSquareFitCostFunction_h
+#define mitkReducedChiSquareFitCostFunction_h
 
 #include <mitkSVModelFitCostFunction.h>
 
@@ -45,4 +45,4 @@ namespace mitk
     };
 
 }
-#endif // REDUCEDCHISQUAREFITCOSTFUNCTION_H
+#endif

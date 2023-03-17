@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKPATIENTTABLEMODEL_H
-#define QMITKPATIENTTABLEMODEL_H
+#ifndef QmitkPatientTableModel_h
+#define QmitkPatientTableModel_h
 
 // semantic relations UI module
 #include "QmitkAbstractSemanticRelationsStorageModel.h"
@@ -126,4 +126,4 @@ private:
   QStandardItemModel* m_HeaderModel;
 };
 
-#endif // QMITKPATIENTTABLEMODEL_H
+#endif

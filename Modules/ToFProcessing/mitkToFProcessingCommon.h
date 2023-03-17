@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKTOFPROCESSINGCOMMON_H
-#define MITKTOFPROCESSINGCOMMON_H
+#ifndef mitkToFProcessingCommon_h
+#define mitkToFProcessingCommon_h
 
 #include <MitkToFProcessingExports.h>
 #include <mitkCameraIntrinsics.h>

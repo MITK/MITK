@@ -33,4 +33,4 @@ protected:
 private:
 };
 
-#endif // QmitkPythonScriptEditorHighlighter_h
+#endif

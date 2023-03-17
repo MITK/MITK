@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKSURFACETOPOINTSETFILTER_H_HEADER_INCLUDED_
-#define MITKSURFACETOPOINTSETFILTER_H_HEADER_INCLUDED_
+#ifndef mitkSurfaceToPointSetFilter_h
+#define mitkSurfaceToPointSetFilter_h
 
 // exports
 #include "MitkAlgorithmsExtExports.h"
@@ -52,4 +52,4 @@ namespace mitk
   };
 
 } // namespace mitk
-#endif /* MITKSURFACETODISTANCEIMAGEFILTER_H_HEADER_INCLUDED_ */
+#endif

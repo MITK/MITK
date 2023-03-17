@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef mitkDataCollectionSingleImageIterator_H
-#define mitkDataCollectionSingleImageIterator_H
+#ifndef mitkDataCollectionSingleImageIterator_h
+#define mitkDataCollectionSingleImageIterator_h
 
 
 #include <mitkDataCollection.h>
@@ -72,4 +72,4 @@ namespace mitk
 } // end namespace
 
 #include <Iterators/mitkDataCollectionSingleImageIterator.cxx>
-#endif //mitkDataCollectionSingleImageIterator_H
+#endif

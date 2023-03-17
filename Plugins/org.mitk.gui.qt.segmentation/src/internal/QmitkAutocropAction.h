@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef QMITK_AUTOCROPACTION_H
-#define QMITK_AUTOCROPACTION_H
+#ifndef QmitkAutocropAction_h
+#define QmitkAutocropAction_h
 
 #include "mitkIContextMenuAction.h"
 
@@ -47,4 +47,4 @@ private:
 
 };
 
-#endif // QMITK_AUTOCROPACTION_H
+#endif

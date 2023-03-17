@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __MITKRESLICEMETHODENUMPROPERTY_H
-#define __MITKRESLICEMETHODENUMPROPERTY_H
+#ifndef mitkResliceMethodProperty_h
+#define mitkResliceMethodProperty_h
 
 #include "mitkEnumerationProperty.h"
 
@@ -56,4 +56,4 @@ namespace mitk
 
 } // end of namespace mitk
 
-#endif //_MITK_VTK_SCALARMODE_PROPERTY__H_
+#endif

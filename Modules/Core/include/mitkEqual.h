@@ -10,15 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-/*
- * mitkEqual.h
- *
- *  Created on: Apr 14, 2014
- *      Author: wirkert
- */
-
-#ifndef MITKEQUAL_H_
-#define MITKEQUAL_H_
+#ifndef mitkEqual_h
+#define mitkEqual_h
 
 #include <cmath>
 #include <iomanip>
@@ -82,4 +75,4 @@ namespace mitk
   }
 }
 
-#endif /* MITKEQUAL_H_ */
+#endif

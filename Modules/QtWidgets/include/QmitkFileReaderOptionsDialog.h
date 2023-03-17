@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKFILEREADEROPTIONSDIALOG_H
-#define QMITKFILEREADEROPTIONSDIALOG_H
+#ifndef QmitkFileReaderOptionsDialog_h
+#define QmitkFileReaderOptionsDialog_h
 
 #include "mitkIOUtil.h"
 
@@ -45,4 +45,4 @@ private:
   std::vector<mitk::FileReaderSelector::Item> m_ReaderItems;
 };
 
-#endif // QMITKFILEREADEROPTIONSDIALOG_H
+#endif

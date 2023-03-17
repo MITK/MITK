@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __GENERIC_PARAM_MODEL_PARAMETERIZER_H
-#define __GENERIC_PARAM_MODEL_PARAMETERIZER_H
+#ifndef mitkGenericParamModelParameterizer_h
+#define mitkGenericParamModelParameterizer_h
 
 #include "mitkConcreteModelParameterizerBase.h"
 #include "mitkGenericParamModel.h"
@@ -76,4 +76,4 @@ namespace mitk
   };
 
 }
-#endif // __GENERIC_PARAM_MODEL_PARAMETERIZER_H
+#endif

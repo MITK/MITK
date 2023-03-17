@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKPYTHONTEXTEDITOR_H_
-#define QMITKPYTHONTEXTEDITOR_H_
+#ifndef QmitkPythonTextEditor_h
+#define QmitkPythonTextEditor_h
 
 #include <QTextEdit>
 #include <QDragEnterEvent>

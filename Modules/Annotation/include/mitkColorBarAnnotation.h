@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef COLORBARAnnotation_H
-#define COLORBARAnnotation_H
+#ifndef mitkColorBarAnnotation_h
+#define mitkColorBarAnnotation_h
 
 #include "MitkAnnotationExports.h"
 #include <mitkLocalStorageHandler.h>
@@ -91,4 +91,4 @@ namespace mitk
   };
 
 } // namespace mitk
-#endif // COLORBARAnnotation_H
+#endif

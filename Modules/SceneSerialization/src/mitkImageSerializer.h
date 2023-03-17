@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkImageSerializer_h_included
-#define mitkImageSerializer_h_included
+#ifndef mitkImageSerializer_h
+#define mitkImageSerializer_h
 
 #include "mitkBaseDataSerializer.h"
 

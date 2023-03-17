@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKMOUSERELEASEEVENT_H_
-#define MITKMOUSERELEASEEVENT_H_
+#ifndef mitkMouseReleaseEvent_h
+#define mitkMouseReleaseEvent_h
 
 #include "itkObject.h"
 #include "itkObjectFactory.h"
@@ -57,4 +57,4 @@ namespace mitk
   };
 } /* namespace mitk */
 
-#endif /* MITKMOUSERELEASEEVENT_H_ */
+#endif

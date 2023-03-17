@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKUSCONTROLSBMODEWIDGET_H
-#define QMITKUSCONTROLSBMODEWIDGET_H
+#ifndef QmitkUSControlsBModeWidget_h
+#define QmitkUSControlsBModeWidget_h
 
 #include <QWidget>
 
@@ -80,4 +80,4 @@ private:
   mitk::USControlInterfaceBMode::Pointer  m_ControlInterface;
 };
 
-#endif // QMITKUSCONTROLSBMODEWIDGET_H
+#endif

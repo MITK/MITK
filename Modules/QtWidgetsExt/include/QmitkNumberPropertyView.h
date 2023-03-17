@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef QMITK_NUMBERPROPERTYVIEW_H_INCLUDED
-#define QMITK_NUMBERPROPERTYVIEW_H_INCLUDED
+#ifndef QmitkNumberPropertyView_h
+#define QmitkNumberPropertyView_h
 
 #include "MitkQtWidgetsExtExports.h"
 #include <QLabel>

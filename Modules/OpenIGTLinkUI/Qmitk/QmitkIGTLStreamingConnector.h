@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKIGTLSTREAMINGCONNECTOR_H
-#define QMITKIGTLSTREAMINGCONNECTOR_H
+#ifndef QmitkIGTLStreamingConnector_h
+#define QmitkIGTLStreamingConnector_h
 
 //QT headers
 #include <QTimer>

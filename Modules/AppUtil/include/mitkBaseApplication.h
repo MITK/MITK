@@ -317,4 +317,4 @@ private:
   };
 }
 
-#endif // MITKBASEAPPLICATION_H
+#endif

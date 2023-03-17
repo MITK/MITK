@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKEXTENDEDONETISSUECOMPARTMENTMODELPARAME_H
-#define MITKEXTENDEDONETISSUECOMPARTMENTMODELPARAME_H
+#ifndef mitkExtendedOneTissueCompartmentModelParameterizer_h
+#define mitkExtendedOneTissueCompartmentModelParameterizer_h
 
 #include "mitkAIFBasedModelParameterizerBase.h"
 #include "mitkExtendedOneTissueCompartmentModel.h"
@@ -63,4 +63,4 @@ namespace mitk
   };
 }
 
-#endif // MITKEXTENDEDONETISSUECOMPARTMENTMODELPARAME_H
+#endif

@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKTRACKINGVOLUMEGENERATOR_H
-#define MITKTRACKINGVOLUMEGENERATOR_H
+#ifndef mitkTrackingVolumeGenerator_h
+#define mitkTrackingVolumeGenerator_h
 
 #include "MitkIGTExports.h"
 
@@ -99,6 +99,4 @@ class MITKIGT_EXPORT TrackingVolumeGenerator : public mitk::SurfaceSource
       void GenerateData() override;
   };
 }
-#endif // MITKTRACKINGVOLUMEGENERATOR_H
-
-
+#endif

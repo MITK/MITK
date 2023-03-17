@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITK_BASEPROPERTYOBSERVER_H_INCLUDED
-#define MITK_BASEPROPERTYOBSERVER_H_INCLUDED
+#ifndef mitkPropertyObserver_h
+#define mitkPropertyObserver_h
 
 #include "MitkCoreExports.h"
 #include "mitkCommon.h"

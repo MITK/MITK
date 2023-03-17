@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKITKFILEIO_H
-#define MITKITKFILEIO_H
+#ifndef mitkItkImageIO_h
+#define mitkItkImageIO_h
 
 #include "mitkAbstractFileIO.h"
 
@@ -79,4 +79,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKITKFILEIO_H */
+#endif

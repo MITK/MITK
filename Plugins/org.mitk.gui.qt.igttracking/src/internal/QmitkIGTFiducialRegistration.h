@@ -62,4 +62,4 @@ class QmitkIGTFiducialRegistration : public QmitkAbstractView
 
 };
 
-#endif // IGTFiducialRegistration_h
+#endif

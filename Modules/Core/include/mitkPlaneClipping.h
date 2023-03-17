@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKPLANECLIPPING_H_HEADER_INCLUDED
-#define MITKPLANECLIPPING_H_HEADER_INCLUDED
+#ifndef mitkPlaneClipping_h
+#define mitkPlaneClipping_h
 
 #include <mitkGeometry3D.h>
 #include <mitkPlaneGeometry.h>

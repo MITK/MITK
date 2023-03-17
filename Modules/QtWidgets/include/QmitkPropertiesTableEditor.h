@@ -83,4 +83,4 @@ protected:
   QmitkPropertiesTableModel *m_Model;
 };
 
-#endif /* QMITKPROPERTIESTABLEMODEL_H_ */
+#endif

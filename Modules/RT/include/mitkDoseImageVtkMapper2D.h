@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKDoseImageVtkMapper2D2D_H_HEADER_INCLUDED
-#define MITKDoseImageVtkMapper2D2D_H_HEADER_INCLUDED
+#ifndef mitkDoseImageVtkMapper2D_h
+#define mitkDoseImageVtkMapper2D_h
 
 //MITK
 #include <mitkCommon.h>
@@ -300,4 +300,4 @@ namespace mitk {
 
 } // namespace mitk
 
-#endif /* MITKDoseImageVtkMapper2D_H_HEADER_INCLUDED_C10E906E */
+#endif

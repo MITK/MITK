@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_POINT_SET_WRITER_SERVICE__H_
-#define _MITK_POINT_SET_WRITER_SERVICE__H_
+#ifndef mitkPointSetWriterService_h
+#define mitkPointSetWriterService_h
 
 #include <mitkAbstractFileWriter.h>
 #include <mitkPointSet.h>

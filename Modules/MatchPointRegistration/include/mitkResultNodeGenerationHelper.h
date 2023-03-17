@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITK_RESULT_NODE_GENERATION_HELPER_H
-#define MITK_RESULT_NODE_GENERATION_HELPER_H
+#ifndef mitkResultNodeGenerationHelper_h
+#define mitkResultNodeGenerationHelper_h
 
 #include "mitkDataNode.h"
 #include "mitkMAPRegistrationWrapper.h"

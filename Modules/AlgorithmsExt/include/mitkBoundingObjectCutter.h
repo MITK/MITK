@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef BOUNDINGOBJECTCUTTER_H_HEADER_INCLUDED_C10B22CD
-#define BOUNDINGOBJECTCUTTER_H_HEADER_INCLUDED_C10B22CD
+#ifndef mitkBoundingObjectCutter_h
+#define mitkBoundingObjectCutter_h
 
 #include "MitkAlgorithmsExtExports.h"
 #include "itkImage.h"
@@ -138,4 +138,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif /* BOUNDINGOBJECTCUTTER_H_HEADER_INCLUDED_C10B22CD */
+#endif

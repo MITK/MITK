@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKRENDERWINDOWCONTEXTDATASTORAGEINSPECTOR_H
-#define QMITKRENDERWINDOWCONTEXTDATASTORAGEINSPECTOR_H
+#ifndef QmitkRenderWindowContextDataStorageInspector_h
+#define QmitkRenderWindowContextDataStorageInspector_h
 
 // qt widgets module
 #include "MitkQtWidgetsExports.h"
@@ -87,4 +87,4 @@ private:
   std::unique_ptr<mitk::RenderWindowLayerController> m_RenderWindowLayerController;
 };
 
-#endif // QMITKRENDERWINDOWCONTEXTDATASTORAGEINSPECTOR_H
+#endif

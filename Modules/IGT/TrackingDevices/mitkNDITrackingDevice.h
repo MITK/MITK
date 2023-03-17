@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKNDITRACKINGDEVICE_H_HEADER_INCLUDED_C1C2FCD2
-#define MITKNDITRACKINGDEVICE_H_HEADER_INCLUDED_C1C2FCD2
+#ifndef mitkNDITrackingDevice_h
+#define mitkNDITrackingDevice_h
 
 #include "mitkTrackingDevice.h"
 
@@ -326,4 +326,4 @@ public:
     MarkerPointContainerType m_MarkerPoints;          ///< container for markers (3D point tracking mode)
   };
 } // namespace mitk
-#endif /* MITKNDITRACKINGDEVICE_H_HEADER_INCLUDED_C1C2FCD2 */
+#endif

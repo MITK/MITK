@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITK_STANDARD_FILE_LOCATIONS_H_INCLUDED_SWDG
-#define MITK_STANDARD_FILE_LOCATIONS_H_INCLUDED_SWDG
+#ifndef mitkStandardFileLocations_h
+#define mitkStandardFileLocations_h
 
 #include <string>
 

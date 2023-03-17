@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef PlyFileReaderService_h
-#define PlyFileReaderService_h
+#ifndef mitkPlyFileReaderService_h
+#define mitkPlyFileReaderService_h
 
 #include <mitkAbstractFileReader.h>
 #include <mitkIOMimeTypes.h>
@@ -46,4 +46,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* PlyFileReaderService_h */
+#endif

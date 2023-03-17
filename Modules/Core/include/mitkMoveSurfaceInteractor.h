@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKMoveSurfaceInteractor_H_HEADER_INCLUDED
-#define MITKMoveSurfaceInteractor_H_HEADER_INCLUDED
+#ifndef mitkMoveSurfaceInteractor_h
+#define mitkMoveSurfaceInteractor_h
 
 #include <mitkMoveBaseDataInteractor.h>
 
@@ -21,4 +21,4 @@ namespace mitk
   typedef MoveBaseDataInteractor MoveSurfaceInteractor;
 }
 
-#endif /* MITKMoveSurfaceInteractor_H_HEADER_INCLUDED */
+#endif

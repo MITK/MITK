@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKSEMANTICRELATIONSDATASTORAGEACCESS_H
-#define MITKSEMANTICRELATIONSDATASTORAGEACCESS_H
+#ifndef mitkSemanticRelationsDataStorageAccess_h
+#define mitkSemanticRelationsDataStorageAccess_h
 
 #include <MitkSemanticRelationsExports.h>
 
@@ -181,4 +181,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif // MITKSEMANTICRELATIONSDATASTORAGEACCESS_H
+#endif

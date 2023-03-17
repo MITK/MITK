@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_MAP_ALGORITHM_INFO_OBJECT_H
-#define _MITK_MAP_ALGORITHM_INFO_OBJECT_H
+#ifndef mitkMAPAlgorithmInfoObject_h
+#define mitkMAPAlgorithmInfoObject_h
 
 #include <berryObject.h>
 #include <berryMacros.h>

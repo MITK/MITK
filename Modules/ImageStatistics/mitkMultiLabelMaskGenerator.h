@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKMULTILABELMASKGENERATOR
-#define MITKMULTILABELMASKGENERATOR
+#ifndef mitkMultiLabelMaskGenerator_h
+#define mitkMultiLabelMaskGenerator_h
 
 #include <MitkImageStatisticsExports.h>
 #include <mitkMaskGenerator.h>

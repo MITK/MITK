@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __mitkToFImageDownsamplingFilter_h
-#define __mitkToFImageDownsamplingFilter_h
+#ifndef mitkToFImageDownsamplingFilter_h
+#define mitkToFImageDownsamplingFilter_h
 
 //MITK includes
 #include <mitkImage.h>

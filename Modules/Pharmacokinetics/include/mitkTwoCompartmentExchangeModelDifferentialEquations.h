@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKTWOCOMPARTMENTEXCHANGEMODELDIFFERENTIALEQUATIONS_H
-#define MITKTWOCOMPARTMENTEXCHANGEMODELDIFFERENTIALEQUATIONS_H
+#ifndef mitkTwoCompartmentExchangeModelDifferentialEquations_h
+#define mitkTwoCompartmentExchangeModelDifferentialEquations_h
 
 #include "mitkNumericTwoCompartmentExchangeModel.h"
 
@@ -111,4 +111,4 @@ private:
 };
 }
 
-#endif // MITKTWOCOMPARTMENTEXCHANGEMODELDIFFERENTIALEQUATIONS_H
+#endif

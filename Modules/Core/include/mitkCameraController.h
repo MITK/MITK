@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef CAMERACONTROLLER_H_HEADER_INCLUDED_C1C53722
-#define CAMERACONTROLLER_H_HEADER_INCLUDED_C1C53722
+#ifndef mitkCameraController_h
+#define mitkCameraController_h
 
 #include "mitkBaseController.h"
 #include <MitkCoreExports.h>
@@ -109,4 +109,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* CAMERACONTROLLER_H_HEADER_INCLUDED_C1C53722 */
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __MITK_PIXEL_BASED_DESCRIPTION_PARAMETER_IMAGE_GENERATOR_H_
-#define __MITK_PIXEL_BASED_DESCRIPTION_PARAMETER_IMAGE_GENERATOR_H_
+#ifndef mitkPixelBasedDescriptionParameterImageGenerator_h
+#define mitkPixelBasedDescriptionParameterImageGenerator_h
 
 #include <map>
 
@@ -97,4 +97,4 @@ namespace mitk
 
 }
 
-#endif // __MITK_PIXEL_BASED_DESCRIPTION_PARAMETER_IMAGE_GENERATOR_H_
+#endif

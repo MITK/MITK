@@ -81,4 +81,4 @@ class MITKTOFUI_EXPORT QmitkStructureSensorParameterWidget :public QWidget
     mitk::ToFImageGrabber::Pointer m_ToFImageGrabber; ///< image grabber object to be configured by the widget
 };
 
-#endif // QmitkStructureSensorParameterWidget_h
+#endif

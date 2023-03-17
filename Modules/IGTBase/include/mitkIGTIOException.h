@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef IGTIOEXCEPTION_H_INCLUDED
-#define IGTIOEXCEPTION_H_INCLUDED
+#ifndef mitkIGTIOException_h
+#define mitkIGTIOException_h
 
 #include <mitkIGTException.h>
 #include "mitkExceptionMacro.h"

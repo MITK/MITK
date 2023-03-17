@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATASTORAGESIMPLETREEMODEL_H
-#define QMITKDATASTORAGESIMPLETREEMODEL_H
+#ifndef QmitkDataStorageSimpleTreeModel_h
+#define QmitkDataStorageSimpleTreeModel_h
 
 #include <MitkQtWidgetsExports.h>
 
@@ -98,4 +98,4 @@ private:
   std::list<const TreeItem*> m_TreeItems;
 };
 
-#endif // QMITKDATASTORAGESIMPLETREEMODEL_H
+#endif

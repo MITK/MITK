@@ -140,4 +140,4 @@ private:
 // This is the microservice declaration. Do not meddle!
 MITK_DECLARE_SERVICE_INTERFACE(QmitkUSAbstractCustomWidget, "org.mitk.QmitkUSAbstractCustomWidget")
 
-#endif // QmitkUSAbstractCustomWidget_h
+#endif

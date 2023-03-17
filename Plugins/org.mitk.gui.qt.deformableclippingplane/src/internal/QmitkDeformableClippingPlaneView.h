@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDEFORMABLECLIPPINGPLANEVIEW_H
-#define QMITKDEFORMABLECLIPPINGPLANEVIEW_H
+#ifndef QmitkDeformableClippingPlaneView_h
+#define QmitkDeformableClippingPlaneView_h
 
 #include <ui_QmitkDeformableClippingPlaneViewControls.h>
 

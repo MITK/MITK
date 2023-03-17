@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKFILEREADERSELECTOR_H
-#define MITKFILEREADERSELECTOR_H
+#ifndef mitkFileReaderSelector_h
+#define mitkFileReaderSelector_h
 
 #include <mitkIFileReader.h>
 
@@ -103,4 +103,4 @@ namespace mitk
   void swap(FileReaderSelector &fws1, FileReaderSelector &fws2);
 }
 
-#endif // MITKFILEREADERSELECTOR_H
+#endif

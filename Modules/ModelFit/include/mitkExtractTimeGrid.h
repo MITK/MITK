@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __MITK_EXTRACT_TIME_GRID_H_
-#define __MITK_EXTRACT_TIME_GRID_H_
+#ifndef mitkExtractTimeGrid_h
+#define mitkExtractTimeGrid_h
 
 #include <iostream>
 

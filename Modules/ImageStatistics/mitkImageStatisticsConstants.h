@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_IMAGE_STATISTICS_CONSTANTS_H_
-#define _MITK_IMAGE_STATISTICS_CONSTANTS_H_
+#ifndef mitkImageStatisticsConstants_h
+#define mitkImageStatisticsConstants_h
 
 #include <string>
 

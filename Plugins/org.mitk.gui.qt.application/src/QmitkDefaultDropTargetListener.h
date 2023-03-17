@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITKDEFAULTDROPTARGETLISTENER_H
-#define QMITKDEFAULTDROPTARGETLISTENER_H
+#ifndef QmitkDefaultDropTargetListener_h
+#define QmitkDefaultDropTargetListener_h
 
 #include <org_mitk_gui_qt_application_Export.h>
 
@@ -41,4 +41,4 @@ private:
 
 };
 
-#endif // QMITKDEFAULTDROPTARGETLISTENER_H
+#endif

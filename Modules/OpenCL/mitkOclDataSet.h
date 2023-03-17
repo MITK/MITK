@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkOclDataSet_h
-#define __mitkOclDataSet_h
+#ifndef mitkOclDataSet_h
+#define mitkOclDataSet_h
 
 #define GPU_DATA 0
 #define CPU_DATA 1
@@ -127,4 +127,4 @@ private:
 };
 
 }
-#endif //__mitkOclDataSet_h
+#endif

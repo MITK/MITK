@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKUSTelemedProbesControls_H_HEADER_INCLUDED_
-#define MITKUSTelemedProbesControls_H_HEADER_INCLUDED_
+#ifndef mitkUSTelemedProbesControls_h
+#define mitkUSTelemedProbesControls_h
 
 #include "mitkUSTelemedSDKHeader.h"
 #include "mitkUSTelemedProbe.h"
@@ -81,4 +81,4 @@ namespace mitk {
   };
 }
 
-#endif // MITKUSTelemedProbesControls_H_HEADER_INCLUDED_
+#endif

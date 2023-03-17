@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef MITKCOLORSEQUENCE_H_DEFG2390JKD
-#define MITKCOLORSEQUENCE_H_DEFG2390JKD
+#ifndef mitkColorSequenceCycleH_h
+#define mitkColorSequenceCycleH_h
 
 #include "MitkDataTypesExtExports.h"
 #include <mitkColorSequence.h>

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKXNATCREATEOBJECTDIALOG_H
-#define QMITKXNATCREATEOBJECTDIALOG_H
+#ifndef QmitkXnatCreateObjectDialog_h
+#define QmitkXnatCreateObjectDialog_h
 
 #include <MitkXNATExports.h>
 
@@ -50,4 +50,4 @@ private:
   QWidget *m_Widget;
 };
 
-#endif // QMITKXNATCREATEOBJECTDIALOG_H
+#endif

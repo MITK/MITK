@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkRegionGrowingTool_h_Included
-#define mitkRegionGrowingTool_h_Included
+#ifndef mitkRegionGrowingTool_h
+#define mitkRegionGrowingTool_h
 
 #include "mitkFeedbackContourTool.h"
 #include <MitkSegmentationExports.h>

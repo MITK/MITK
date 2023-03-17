@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __MITK_TEST_MODEL_H_
-#define __MITK_TEST_MODEL_H_
+#ifndef mitkTestModel_h
+#define mitkTestModel_h
 
 #include "mitkModelBase.h"
 

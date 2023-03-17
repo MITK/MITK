@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKNODEPREDICATESUBGEOMETRY_H_HEADER_INCLUDED_
-#define MITKNODEPREDICATESUBGEOMETRY_H_HEADER_INCLUDED_
+#ifndef mitkNodePredicateSubGeometry_h
+#define mitkNodePredicateSubGeometry_h
 
 #include "mitkNodePredicateBase.h"
 #include "mitkBaseGeometry.h"

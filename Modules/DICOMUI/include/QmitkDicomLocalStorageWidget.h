@@ -110,4 +110,4 @@ protected:
   Ui::QmitkDicomLocalStorageWidgetControls *m_Controls;
 };
 
-#endif // _QmitkDicomLocalStorageWidget_H_INCLUDED
+#endif

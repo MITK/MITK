@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATAMANAGERHOTKEYSPREFPAGE_H
-#define QMITKDATAMANAGERHOTKEYSPREFPAGE_H
+#ifndef QmitkDataManagerHotkeysPrefPage_h
+#define QmitkDataManagerHotkeysPrefPage_h
 
 #include <org_mitk_gui_qt_datamanager_Export.h>
 
@@ -64,4 +64,4 @@ protected:
   QWidget* m_MainControl;
 };
 
-#endif // QMITKDATAMANAGERHOTKEYSPREFPAGE_H
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef COREOBJECTFACTORY_H_INCLUDED
-#define COREOBJECTFACTORY_H_INCLUDED
+#ifndef mitkCoreObjectFactory_h
+#define mitkCoreObjectFactory_h
 
 #include <set>
 

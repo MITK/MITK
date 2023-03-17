@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKTRANSFERFUNCTIONCANVAS_H_INCLUDED
-#define QMITKTRANSFERFUNCTIONCANVAS_H_INCLUDED
+#ifndef QmitkTransferFunctionCanvas_h
+#define QmitkTransferFunctionCanvas_h
 
 #include "MitkQtWidgetsExtExports.h"
 

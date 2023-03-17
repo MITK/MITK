@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKGEOMETRY2DDATA_H_HEADER_INCLUDED_C19C01E2
-#define MITKGEOMETRY2DDATA_H_HEADER_INCLUDED_C19C01E2
+#ifndef mitkPlaneGeometryData_h
+#define mitkPlaneGeometryData_h
 
 #include "mitkBaseData.h"
 #include "mitkGeometryData.h"
@@ -77,4 +77,4 @@ namespace mitk
     ~PlaneGeometryData() override;
   };
 } // namespace mitk
-#endif /* MITKGEOMETRY2DDATA_H_HEADER_INCLUDED_C19C01E2 */
+#endif

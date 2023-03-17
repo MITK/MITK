@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKCROSSHAIRMANAGER_H
-#define MITKCROSSHAIRMANAGER_H
+#ifndef mitkCrosshairManager_h
+#define mitkCrosshairManager_h
 
 #include <MitkCoreExports.h>
 
@@ -102,4 +102,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif // MITKCROSSHAIRMANAGER_H
+#endif

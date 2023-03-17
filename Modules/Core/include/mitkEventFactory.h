@@ -52,4 +52,4 @@ namespace mitk
   };
 }
 
-#endif /* mitkEventFactory_h */
+#endif

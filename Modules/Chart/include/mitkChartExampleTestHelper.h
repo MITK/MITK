@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITK_CHART_EXAMPLE_TEST_HELPER_H
-#define MITK_CHART_EXAMPLE_TEST_HELPER_H
+#ifndef mitkChartExampleTestHelper_h
+#define mitkChartExampleTestHelper_h
 
 #include <MitkChartExports.h>
 

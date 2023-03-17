@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkVirtualTrackerWidget_H
-#define QmitkVirtualTrackerWidget_H
+#ifndef QmitkVirtualTrackerWidget_h
+#define QmitkVirtualTrackerWidget_h
 
 #include "ui_QmitkVirtualTrackerWidget.h"
 #include "QmitkAbstractTrackingDeviceWidget.h"

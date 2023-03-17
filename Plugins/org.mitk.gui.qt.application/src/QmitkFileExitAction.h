@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKFILEEXITACTION_H_
-#define QMITKFILEEXITACTION_H_
+#ifndef QmitkFileExitAction_h
+#define QmitkFileExitAction_h
 
 #include <berrySmartPointer.h>
 
@@ -47,4 +47,4 @@ private:
 };
 
 
-#endif /*QMITKFILEOPENACTION_H_*/
+#endif

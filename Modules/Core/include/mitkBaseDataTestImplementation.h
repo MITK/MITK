@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef BASEDATAIMPLEMENTATION_H_HEADER_INCLUDED
-#define BASEDATAIMPLEMENTATION_H_HEADER_INCLUDED
+#ifndef mitkBaseDataTestImplementation_h
+#define mitkBaseDataTestImplementation_h
 
 #include "mitkBaseData.h"
 
@@ -51,4 +51,4 @@ namespace mitk
 
 } // namespace
 
-#endif // BASEDATA_H_HEADER_INCLUDED
+#endif

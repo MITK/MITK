@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef mitkIContextMenuAction_H_
-#define mitkIContextMenuAction_H_
+#ifndef mitkIContextMenuAction_h
+#define mitkIContextMenuAction_h
 
 #include <berryMacros.h>
 #include <berryQtViewPart.h>
@@ -46,4 +46,4 @@ namespace mitk
 
 Q_DECLARE_INTERFACE(mitk::IContextMenuAction, "org.mitk.datamanager.IContextMenuAction")
 
-#endif // mitkIContextMenuAction_H_
+#endif

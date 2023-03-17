@@ -10,6 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#ifndef QmitkDataNodeSelection_h
+#define QmitkDataNodeSelection_h
+
 #include <mitkDataNodeSelection.h>
 #include <mitkDataNode.h>
 
@@ -42,3 +45,5 @@ public:
   bool operator==(const berry::Object* obj) const override;
 
 };
+
+#endif

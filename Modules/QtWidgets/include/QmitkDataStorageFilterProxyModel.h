@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATASTORAGEFILTERPROXYMODEL_H_
-#define QMITKDATASTORAGEFILTERPROXYMODEL_H_
+#ifndef QmitkDataStorageFilterProxyModel_h
+#define QmitkDataStorageFilterProxyModel_h
 
 #include <MitkQtWidgetsExports.h>
 
@@ -55,4 +55,4 @@ protected:
   FilterPredicatesCollection m_Predicates;
 };
 
-#endif /* QMITKDATASTORAGEFILTERPROXYMODEL_H_ */
+#endif

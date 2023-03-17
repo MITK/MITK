@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkOclUtils_h
-#define __mitkOclUtils_h
+#ifndef mitkOclUtils_h
+#define mitkOclUtils_h
 
 #include "mitkOpenCL.h"
 
@@ -92,4 +92,4 @@ MITKOPENCL_EXPORT void GetSupportedImageFormats(cl_context _context, cl_mem_obje
 */
 MITKOPENCL_EXPORT std::string GetImageTypeAsString( const unsigned int _in);
 
-#endif //mitkOclUtils_h
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKPADIMAGEFILTER_H_HEADER_INCLUDED
-#define MITKPADIMAGEFILTER_H_HEADER_INCLUDED
+#ifndef mitkPadImageFilter_h
+#define mitkPadImageFilter_h
 
 #include "MitkAlgorithmsExtExports.h"
 #include "mitkCommon.h"
@@ -65,4 +65,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKPADIMAGEFILTER_H_HEADER_INCLUDED */
+#endif

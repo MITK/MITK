@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __LINEAR_MODEL_PARAMETERIZER_H
-#define __LINEAR_MODEL_PARAMETERIZER_H
+#ifndef mitkLinearModelParameterizer_h
+#define mitkLinearModelParameterizer_h
 
 #include "mitkConcreteModelParameterizerBase.h"
 #include "mitkLinearModel.h"
@@ -22,4 +22,4 @@ namespace mitk
   typedef ConcreteModelParameterizerBase<mitk::LinearModel> LinearModelParameterizer;
 }
 
-#endif // __LINEAR_MODEL_PARAMETERIZER_H
+#endif

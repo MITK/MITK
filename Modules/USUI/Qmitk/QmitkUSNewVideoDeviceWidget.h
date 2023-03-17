@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QmitkUSNewVideoDeviceWidget_H_INCLUDED
-#define _QmitkUSNewVideoDeviceWidget_H_INCLUDED
+#ifndef QmitkUSNewVideoDeviceWidget_h
+#define QmitkUSNewVideoDeviceWidget_h
 
 #include "MitkUSUIExports.h"
 #include "ui_QmitkUSNewVideoDeviceWidgetControls.h"
@@ -162,4 +162,4 @@ protected:
   std::vector<mitk::USProbe::Pointer> m_ConfigProbes;
 };
 
-#endif // _QmitkUSNewVideoDeviceWidget_H_INCLUDED
+#endif

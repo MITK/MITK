@@ -100,4 +100,4 @@ namespace mitk
     vtkSmartPointer<vtkRenderer> m_Renderer;
   };
 } // end of namespace mitk
-#endif // mitkGradientBackground_h
+#endif

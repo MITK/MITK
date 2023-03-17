@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKCOREEXTACTIVATOR_H_
-#define MITKCOREEXTACTIVATOR_H_
+#ifndef mitkCoreExtActivator_h
+#define mitkCoreExtActivator_h
 
 #include <ctkPluginActivator.h>
 
@@ -61,4 +61,4 @@ namespace mitk
   }; // end class CoreExtActivator
 } //end namespace mitk
 
-#endif /* MITKCOREEXTACTIVATOR_H_ */
+#endif

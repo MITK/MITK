@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKGEOMETRYDATA_H_HEADER_INCLUDED_C19C01E2
-#define MITKGEOMETRYDATA_H_HEADER_INCLUDED_C19C01E2
+#ifndef mitkGeometryData_h
+#define mitkGeometryData_h
 
 #include "mitkBaseData.h"
 
@@ -65,4 +65,4 @@ namespace mitk
                              bool verbose);
 
 } // namespace mitk
-#endif /* MITKGEOMETRYDATA_H_HEADER_INCLUDED_C19C01E2 */
+#endif

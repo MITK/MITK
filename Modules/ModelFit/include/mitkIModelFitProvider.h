@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __I_MODEL_FIT_PROVIDER_H
-#define __I_MODEL_FIT_PROVIDER_H
+#ifndef mitkIModelFitProvider_h
+#define mitkIModelFitProvider_h
 
 #include <mitkServiceInterface.h>
 #include <mitkModelBase.h>
@@ -100,4 +100,4 @@ namespace mitk
 
 MITK_DECLARE_SERVICE_INTERFACE(mitk::IModelFitProvider, "org.mitk.IModelFitProvider")
 
-#endif /* __I_MODEL_FIT_PROVIDER_H */
+#endif

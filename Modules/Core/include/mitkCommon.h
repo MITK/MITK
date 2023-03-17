@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITK_COMMON_H_DEFINED
-#define MITK_COMMON_H_DEFINED
+#ifndef mitkCommon_h
+#define mitkCommon_h
 
 #ifdef _MSC_VER
 // This warns about truncation to 255 characters in debug/browse info
@@ -193,4 +193,4 @@ calling object*/
 #define MITK_LOCAL
 #endif
 
-#endif // MITK_COMMON_H_DEFINED
+#endif

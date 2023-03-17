@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkGrowCutTool_h_Included
-#define mitkGrowCutTool_h_Included
+#ifndef mitkGrowCutTool_h
+#define mitkGrowCutTool_h
 
 #include "mitkSegWithPreviewTool.h"
 #include <MitkSegmentationExports.h>

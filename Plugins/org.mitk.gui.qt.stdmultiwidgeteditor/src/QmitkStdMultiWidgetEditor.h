@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKSTDMULTIWIDGETEDITOR_H
-#define QMITKSTDMULTIWIDGETEDITOR_H
+#ifndef QmitkStdMultiWidgetEditor_h
+#define QmitkStdMultiWidgetEditor_h
 
 // mitk gui qt common plugin
 #include <QmitkAbstractMultiWidgetEditor.h>
@@ -122,4 +122,4 @@ private:
 
 };
 
-#endif // QMITKSTDMULTIWIDGETEDITOR_H
+#endif

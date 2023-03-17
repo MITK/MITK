@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITKFLOWAPPLICATIONLICATION_H_
-#define QMITKFLOWAPPLICATIONLICATION_H_
+#ifndef QmitkFlowApplication_h
+#define QmitkFlowApplication_h
 
 #include <berryIApplication.h>
 
@@ -30,4 +30,4 @@ public:
   void Stop() override;
 };
 
-#endif /*QMITKFLOWAPPLICATIONLICATION_H_*/
+#endif

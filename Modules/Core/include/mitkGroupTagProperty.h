@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef GROUPTAGPROPERTY_H_HEADER_INCLUDED_C1F4DF54
-#define GROUPTAGPROPERTY_H_HEADER_INCLUDED_C1F4DF54
+#ifndef mitkGroupTagProperty_h
+#define mitkGroupTagProperty_h
 
 #include <mitkBaseProperty.h>
 
@@ -59,4 +59,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* GROUPTAGPROPERTY_H_HEADER_INCLUDED_C1F4DF54 */
+#endif

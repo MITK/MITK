@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKTWOSTEPLINEARMODELPARAMETERIZER_H
-#define MITKTWOSTEPLINEARMODELPARAMETERIZER_H
+#ifndef mitkTwoStepLinearModelParameterizer_h
+#define mitkTwoStepLinearModelParameterizer_h
 
 #include "mitkConcreteModelParameterizerBase.h"
 #include "mitkTwoStepLinearModel.h"
@@ -60,4 +60,4 @@ private:
 };}
 
 
-#endif // MITKTWOSTEPLINEARMODELPARAMETERIZER_H
+#endif

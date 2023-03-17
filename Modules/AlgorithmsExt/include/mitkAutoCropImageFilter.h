@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkAutoCropImageFilter_h_
-#define __mitkAutoCropImageFilter_h_
+#ifndef mitkAutoCropImageFilter_h
+#define mitkAutoCropImageFilter_h
 
 #include "MitkAlgorithmsExtExports.h"
 #include "mitkCommon.h"

@@ -125,4 +125,4 @@ class QmitkIGTTrackingDataEvaluationView : public QmitkAbstractView
 
 
 
-#endif // _QMITKIGTTRACKINGDATAEVALUATIONVIEW_H_INCLUDED
+#endif

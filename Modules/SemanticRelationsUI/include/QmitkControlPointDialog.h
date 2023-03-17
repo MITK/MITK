@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKCONTROLPOINTDIALOG_H
-#define QMITKCONTROLPOINTDIALOG_H
+#ifndef QmitkControlPointDialog_h
+#define QmitkControlPointDialog_h
 
 #include <MitkSemanticRelationsUIExports.h>
 
@@ -37,4 +37,4 @@ private:
   QDateEdit* m_DateEdit;
 };
 
-#endif // QMITKCONTROLPOINTDIALOG_H
+#endif

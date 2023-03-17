@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_NavigationDataRecorderDeprecated_H
-#define _MITK_NavigationDataRecorderDeprecated_H
+#ifndef mitkNavigationDataRecorderDeprecated_h
+#define mitkNavigationDataRecorderDeprecated_h
 
 #include <itkProcessObject.h>
 #include "mitkNavigationData.h"
@@ -205,4 +205,4 @@ namespace mitk
     std::map<const mitk::NavigationData*, std::pair<std::string, std::string> > m_AdditionalAttributes;
   };
 }
-#endif // #define _MITK_POINT_SET_SOURCE_H
+#endif

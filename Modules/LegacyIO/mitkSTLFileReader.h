@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef STLFileReader_H_HEADER_INCLUDED
-#define STLFileReader_H_HEADER_INCLUDED
+#ifndef mitkSTLFileReader_h
+#define mitkSTLFileReader_h
 
 #include "mitkSurfaceSource.h"
 #include <MitkLegacyIOExports.h>
@@ -52,4 +52,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* STLFileReader_H_HEADER_INCLUDED */
+#endif

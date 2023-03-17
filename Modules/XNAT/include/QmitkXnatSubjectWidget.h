@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKXNATSUBJECTWIDGET_H
-#define QMITKXNATSUBJECTWIDGET_H
+#ifndef QmitkXnatSubjectWidget_h
+#define QmitkXnatSubjectWidget_h
 
 #include <MitkXNATExports.h>
 #include <ui_QmitkXnatSubjectWidgetControls.h>
@@ -49,4 +49,4 @@ private:
   ctkXnatSubject *m_Subject;
 };
 
-#endif // QMITKXNATSUBJECTWIDGET_H
+#endif

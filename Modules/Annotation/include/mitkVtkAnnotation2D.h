@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef VTKAnnotation2D_H
-#define VTKAnnotation2D_H
+#ifndef mitkVtkAnnotation2D_h
+#define mitkVtkAnnotation2D_h
 
 #include "mitkVtkAnnotation.h"
 #include <MitkAnnotationExports.h>
@@ -62,4 +62,4 @@ namespace mitk
   };
 
 } // namespace mitk
-#endif // VTKAnnotation2D_H
+#endif

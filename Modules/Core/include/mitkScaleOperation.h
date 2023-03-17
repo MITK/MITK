@@ -59,4 +59,4 @@ namespace mitk
     Point3D m_ScaleAnchorPoint;
   };
 } // namespace mitk
-#endif /* mitkScaleOperation_h */
+#endif

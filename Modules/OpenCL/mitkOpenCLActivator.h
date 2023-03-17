@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkOpenCLActivator_h
-#define __mitkOpenCLActivator_h
+#ifndef mitkOpenCLActivator_h
+#define mitkOpenCLActivator_h
 
 #include "mitkOclResourceServiceImpl_p.h"
 
@@ -47,4 +47,4 @@ public:
 
 
 
-#endif // __mitkOpenCLActivator_h
+#endif

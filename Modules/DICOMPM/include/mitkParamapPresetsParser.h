@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef PARAMAPPRESETS_H_HEADER
-#define PARAMAPPRESETS_H_HEADER
+#ifndef mitkParamapPresetsParser_h
+#define mitkParamapPresetsParser_h
 
 #include <MitkDICOMPMExports.h>
 #include <vtkXMLParser.h>

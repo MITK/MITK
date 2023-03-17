@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKVIGRARANDOMFORESTCLASSIFIERSERIALIZER_H
-#define MITKVIGRARANDOMFORESTCLASSIFIERSERIALIZER_H
+#ifndef mitkVigraRandomForestClassifierSerializer_h
+#define mitkVigraRandomForestClassifierSerializer_h
 
 #include <mitkBaseDataSerializer.h>
 #include <MitkCLVigraRandomForestExports.h>
@@ -36,4 +36,4 @@ protected:
 
 }
 
-#endif // MITKCONTOURMODELSETSERIALIZER_H
+#endif

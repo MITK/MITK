@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _mitkContourModelToPointSetFilter_h__
-#define _mitkContourModelToPointSetFilter_h__
+#ifndef mitkContourModelToPointSetFilter_h
+#define mitkContourModelToPointSetFilter_h
 
 #include "mitkCommon.h"
 #include "mitkContourModel.h"

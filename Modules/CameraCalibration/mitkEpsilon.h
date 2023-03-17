@@ -21,4 +21,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif // mitkEpsilon_h
+#endif

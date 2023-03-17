@@ -10,24 +10,25 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkSurfaceInterpolationController.h"
-#include <mitkImageAccessByItk.h>
-#include <mitkImageCast.h>
-#include <mitkMemoryUtilities.h>
-#include <mitkImagePixelReadAccessor.h>
-#include <mitkNodePredicateDataType.h>
-#include <mitkPlanarCircle.h>
+#include <mitkSurfaceInterpolationController.h>
 
+#include <mitkCreateDistanceImageFromSurfaceFilter.h>
+#include <mitkComputeContourSetNormalsFilter.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkImagePixelReadAccessor.h>
+#include <mitkImageTimeSelector.h>
 #include <mitkImageToSurfaceFilter.h>
-//#include "vtkXMLPolyDataWriter.h"
-#include <vtkPolyDataWriter.h>
-#include <vtkIntArray.h>
-#include <mitkIOUtil.h>
 #include <mitkLabelSetImage.h>
-#include <mitkPlaneGeometryData.h>
-#include <mitkNodePredicateProperty.h>
+#include <mitkMemoryUtilities.h>
 #include <mitkNodePredicateDataUID.h>
-#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkPlanarCircle.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkReduceContourSetFilter.h>
+
+#include <vtkFieldData.h>
+#include <vtkMath.h>
+#include <vtkPolygon.h>
 
 // Check whether the given contours are coplanar
 bool ContoursCoplanar(mitk::SurfaceInterpolationController::ContourPositionInformation leftHandSide,
@@ -79,7 +80,7 @@ mitk::SurfaceInterpolationController::ContourPositionInformation CreateContourPo
   contourInfo.ContourNormal = n;
   contourInfo.Pos = -1;
   contourInfo.TimeStep = std::numeric_limits<long unsigned int>::max();
-  contourInfo.plane = const_cast<mitk::PlaneGeometry *>(planeGeometry);
+  contourInfo.Plane = const_cast<mitk::PlaneGeometry *>(planeGeometry);
 
   auto contourIntArray = vtkIntArray::SafeDownCast( contour->GetVtkPolyData()->GetFieldData()->GetAbstractArray(0) );
 
@@ -237,7 +238,7 @@ mitk::DataNode* mitk::SurfaceInterpolationController::GetSegmentationImageNode()
 
 void mitk::SurfaceInterpolationController::AddPlaneGeometryNodeToDataStorage(const ContourPositionInformation& contourInfo)
 {
-  auto planeGeometry = contourInfo.plane;
+  auto planeGeometry = contourInfo.Plane;
   auto planeGeometryData = mitk::PlanarCircle::New();
   planeGeometryData->SetPlaneGeometry(planeGeometry);
   mitk::Point2D p1;
@@ -403,7 +404,7 @@ void mitk::SurfaceInterpolationController::AddToInterpolationPipeline(ContourPos
   contourInfo.Pos = pos;
   m_ListOfContours.at(m_SelectedSegmentation).at(currentTimeStep).at(currentLayerID).push_back(contourInfo);
 
-  if (contourInfo.plane == nullptr)
+  if (contourInfo.Plane == nullptr)
   {
     MITK_ERROR << "contourInfo plane is null.";
   }
@@ -601,7 +602,7 @@ void mitk::SurfaceInterpolationController::Interpolate()
   if (m_CurrentNumberOfReducedContours < 2)
   {
     // If no interpolation is possible reset the interpolation result
-    MITK_WARN << "No interpolation is possible. Too few reduced contours.";
+    MITK_INFO << "Interpolation impossible: not enough contours.";
     m_InterpolationResult = nullptr;
     return;
   }
@@ -748,6 +749,7 @@ void mitk::SurfaceInterpolationController::SetCurrentInterpolationSession(mitk::
 
       auto command = itk::MemberCommand<SurfaceInterpolationController>::New();
       command->SetCallbackFunction(this, &SurfaceInterpolationController::OnSegmentationDeleted);
+      m_SegmentationObserverTags[m_SelectedSegmentation] = labelSetImage->AddObserver(itk::DeleteEvent(), command);
 
       m_NumberOfLayersInCurrentSegmentation = labelSetImage->GetNumberOfLayers();
     }
@@ -1133,7 +1135,7 @@ void mitk::SurfaceInterpolationController::OnRemoveLayer()
     assert (m_CurrentLayerIndex < contoursForSegmentation.at(t).size());
     contoursForSegmentation.at(t).erase(contoursForSegmentation.at(t).begin() + m_PreviousLayerIndex);
   }
-  this->PrintListOfContours();
+
   this->Modified();
 }
 
@@ -1142,30 +1144,6 @@ void mitk::SurfaceInterpolationController::OnLayerChanged()
   auto currentLayer = dynamic_cast<mitk::LabelSetImage*>(m_SelectedSegmentation)->GetActiveLayer();
   m_PreviousLayerIndex = m_CurrentLayerIndex;
   m_CurrentLayerIndex = currentLayer;
-}
-
-void mitk::SurfaceInterpolationController::PrintListOfContours()
-{
-  std::cout << "----------------------------------------------\n";
-  auto contourStruct = m_ListOfContours.at(m_SelectedSegmentation);
-  std::cout << "numTimeSteps: " << m_ListOfContours.at(m_SelectedSegmentation).size() << "\n";
-  for (size_t t = 0; t < contourStruct.size(); ++t)
-  {
-    auto contourStruct2 = contourStruct[t];
-    std::cout << "numLayers at current time step: " << contourStruct2.size() << "\n";
-    for (size_t j = 0; j < contourStruct2.size(); ++j)
-    {
-      std::cout << "num contours at layer: " <<  contourStruct2[j].size() << "\n";
-      auto a_contourList = contourStruct2[j];
-      for (size_t c = 0; c < a_contourList.size(); ++c)
-      {
-        std::cout << a_contourList[c] << "\n";
-      }
-      // std::cout << "\n";
-    }
-    std::cout << "\n";
-  }
-  std::cout << "----------------------------------------------\n";
 }
 
 mitk::SurfaceInterpolationController::ContourPositionInformationList& mitk::SurfaceInterpolationController::GetContours(unsigned int timeStep, unsigned int layerID)

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkEnumerationPropertySerializer_h_included
-#define mitkEnumerationPropertySerializer_h_included
+#ifndef mitkEnumerationPropertySerializer_h
+#define mitkEnumerationPropertySerializer_h
 
 #include "mitkBasePropertySerializer.h"
 

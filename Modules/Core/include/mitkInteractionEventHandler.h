@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKEVENTHANDLER_H_
-#define MITKEVENTHANDLER_H_
+#ifndef mitkInteractionEventHandler_h
+#define mitkInteractionEventHandler_h
 
 #include "itkLightObject.h"
 #include "itkObjectFactory.h"
@@ -126,4 +126,4 @@ namespace mitk
   };
 
 } /* namespace mitk */
-#endif /* MITKEVENTHANDLER_H_ */
+#endif

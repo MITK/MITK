@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKPLANARFIGUREMASKGENERATOR
-#define MITKPLANARFIGUREMASKGENERATOR
+#ifndef mitkPlanarFigureMaskGenerator_h
+#define mitkPlanarFigureMaskGenerator_h
 
 #include <MitkImageStatisticsExports.h>
 #include <itkImage.h>
@@ -143,4 +143,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif // MITKPLANARFIGUREMASKGENERATOR
+#endif

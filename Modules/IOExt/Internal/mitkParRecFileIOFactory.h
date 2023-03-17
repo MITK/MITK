@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkParRecFileIOFactory_h
-#define __mitkParRecFileIOFactory_h
+#ifndef mitkParRecFileIOFactory_h
+#define mitkParRecFileIOFactory_h
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4786)

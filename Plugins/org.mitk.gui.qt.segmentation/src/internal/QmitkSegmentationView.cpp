@@ -448,10 +448,10 @@ void QmitkSegmentationView::OnCurrentLabelSelectionChanged(QmitkMultiLabelManage
   auto segmentation = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
   if (nullptr == segmentation) mitkThrow() << "Segmentation view is in an invalid state. Working node contains no segmentation, but a label selection change has been triggered.";
 
-  auto labelValue = labels.front();
-  auto groupID = segmentation->GetGroupIndexOfLabel(labelValue);
-  segmentation->SetActiveLayer(groupID);
-  segmentation->GetActiveLabelSet()->SetActiveLabel(labelValue);
+  const auto labelValue = labels.front();
+  const auto groupID = segmentation->GetGroupIndexOfLabel(labelValue);
+  if (groupID != segmentation->GetActiveLayer()) segmentation->SetActiveLayer(groupID);
+  if (labelValue != segmentation->GetActiveLabelSet()->GetActiveLabel()->GetValue()) segmentation->GetActiveLabelSet()->SetActiveLabel(labelValue);
 
   segmentation->Modified();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();

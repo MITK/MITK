@@ -80,6 +80,7 @@ QmitkMultiLabelManager::QmitkMultiLabelManager(QWidget *parent)
   connect(m_Controls->btnSavePreset, &QToolButton::clicked, this, &QmitkMultiLabelManager::OnLoadPreset);
 
   connect(this->m_Controls->labelInspector, &QmitkMultiLabelInspector::GoToLabel, this, &QmitkMultiLabelManager::OnGoToLabel);
+  connect(this->m_Controls->labelInspector, &QmitkMultiLabelInspector::CurrentSelectionChanged, this, &QmitkMultiLabelManager::CurrentSelectionChanged);
 
   auto* renameLabelShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_L, Qt::CTRL | Qt::Key::Key_R), this);
   connect(renameLabelShortcut, &QShortcut::activated, this, &QmitkMultiLabelManager::OnRenameLabelShortcutActivated);
@@ -112,16 +113,6 @@ void QmitkMultiLabelManager::OnRenameLabelShortcutActivated()
 void QmitkMultiLabelManager::OnSelectedLabelChanged(LabelValueVectorType labels)
 {
   if (labels.empty() || labels.size() > 1) return;
-
-  //TODO das sollte eigentlich raus und in die View. Das Widget sollte am besten keine dependency zum interpolator aufbauen!!!
-  auto labelValue = labels.front();
-  auto groupID = this->m_Segmentation->GetGroupIndexOfLabel(labelValue);
-  this->m_Segmentation->SetActiveLayer(groupID);
-  this->m_Segmentation->GetActiveLabelSet()->SetActiveLabel(labelValue);
-
-  this->m_Segmentation->Modified();
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  //end TODO
 
   emit CurrentSelectionChanged(labels);
 }

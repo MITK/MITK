@@ -60,6 +60,10 @@ public:
   /** Returns the index to the next node in the tree that behaves like an instance (label node with only one instance
   or instance node). If current index is at the end, an invalid index is returned.*/
   QModelIndex ClosestLabelInstanceIndex(const QModelIndex& currentIndex) const;
+  /** Returns the index to the first child node (or itself) in the tree that behaves like an instance (label node with only one instance
+  or instance node). If current index is at the end, an invalid index is returned. If an invalid index is passed into the methods,
+  the search starts at the root; thus the whole tree is search for the first label instance.*/
+  QModelIndex FirstLabelInstanceIndex(const QModelIndex& currentIndex) const;
 
   ///** Returns the index to the next node in the tree that behaves like an instance (label node with only one instance
   //or instance node). If current index is at the end, an invalid index is returned.*/

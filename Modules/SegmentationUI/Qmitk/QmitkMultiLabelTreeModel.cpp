@@ -518,6 +518,32 @@ QModelIndex QmitkMultiLabelTreeModel::ClosestLabelInstanceIndex(const QModelInde
   return GetIndexByItem(resultItem, this);
 }
 
+QModelIndex QmitkMultiLabelTreeModel::FirstLabelInstanceIndex(const QModelIndex& currentIndex) const
+{
+  const QmitkMultiLabelSegTreeItem* currentItem = nullptr;
+
+  if (!currentIndex.isValid())
+  {
+    currentItem = this->m_RootItem.get();
+  }
+  else
+  {
+    currentItem = static_cast<const QmitkMultiLabelSegTreeItem*>(currentIndex.internalPointer());
+  }
+
+  if (!currentItem) return QModelIndex();
+
+  if (currentItem->RootItem() != this->m_RootItem.get()) mitkThrow() << "Invalid call. Passed currentIndex does not seem to be a valid index of this model. It is either outdated or from another model.";
+
+  const QmitkMultiLabelSegTreeItem* resultItem = nullptr;
+  resultItem = GetFirstInstanceLikeItem(currentItem);
+
+  if (nullptr == resultItem)
+    return QModelIndex();
+
+  return GetIndexByItem(resultItem, this);
+}
+
 ///** Returns the index to the next node in the tree that behaves like an instance (label node with only one instance
 //or instance node). If current index is at the end, an invalid index is returned.*/
 //QModelIndex QmitkMultiLabelTreeModel::PrevLabelInstanceIndex(const QModelIndex& currentIndex) const;

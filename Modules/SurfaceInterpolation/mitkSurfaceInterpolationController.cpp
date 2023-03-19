@@ -179,6 +179,8 @@ void mitk::SurfaceInterpolationController::AddNewContours(const std::vector<mitk
                                                           std::vector<const mitk::PlaneGeometry*>& contourPlanes,
                                                           bool reinitializationAction)
 {
+  if (nullptr == m_SelectedSegmentation) return;
+
   if (newContours.size() != contourPlanes.size())
   {
     MITK_ERROR << "SurfaceInterpolationController::AddNewContours. contourPlanes and newContours are not of the same size.";

@@ -553,11 +553,16 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_Controls->toolSelectionBox3D->SetDisplayedToolGroups(segTools3D.toStdString());
    m_Controls->toolSelectionBox3D->SetLayoutColumns(3);
 
-   m_Controls->slicesInterpolator->SetDataStorage(this->GetDataStorage());
+   //TODO temporary interpolator deactivation
+   //m_Controls->slicesInterpolator->SetDataStorage(this->GetDataStorage());
+   //TODO END temporary interpolator deactivation
 
    // create general signal / slot connections
    connect(m_Controls->newSegmentationButton, &QToolButton::clicked, this, &QmitkSegmentationView::OnNewSegmentation);
-   connect(m_Controls->slicesInterpolator, &QmitkSlicesInterpolator::SignalShowMarkerNodes, this, &QmitkSegmentationView::OnShowMarkerNodes);
+
+   //TODO temporary interpolator deactivation
+//   connect(m_Controls->slicesInterpolator, &QmitkSlicesInterpolator::SignalShowMarkerNodes, this, &QmitkSegmentationView::OnShowMarkerNodes);
+   //TODO END temporary interpolator deactivation
 
    connect(m_Controls->multiLabelWidget, &QmitkMultiLabelManager::CurrentSelectionChanged, this, &QmitkSegmentationView::OnCurrentLabelSelectionChanged);
    connect(m_Controls->multiLabelWidget, &QmitkMultiLabelManager::GoToLabel, this, &QmitkSegmentationView::OnGoToLabel);
@@ -725,8 +730,10 @@ void QmitkSegmentationView::NodeRemoved(const mitk::DataNode* node)
   context->ungetService(ppmRef);
   service = nullptr;
 
-  mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
-  mitk::SurfaceInterpolationController::GetInstance()->RemoveInterpolationSession(image);
+  //TODO temporary interpolator deactivation
+  //mitk::Image* image = dynamic_cast<mitk::Image*>(node->GetData());
+  //mitk::SurfaceInterpolationController::GetInstance()->RemoveInterpolationSession(image);
+  //TODO END temporary interpolator deactivation
 }
 
 void QmitkSegmentationView::ApplyDisplayOptions()
@@ -968,8 +975,10 @@ void QmitkSegmentationView::ValidateSelectionInput()
     auto activeLayer = labelSetImage->GetActiveLayer();
     numberOfLabels = labelSetImage->GetNumberOfLabels(activeLayer);
 
-    if (numberOfLabels > 1)
-      m_Controls->slicesInterpolator->setEnabled(true);
+    //TODO temporary interpolator deactivation
+     //if (numberOfLabels > 1)
+    //  m_Controls->slicesInterpolator->setEnabled(true);
+   //TODO END temporary interpolator deactivation
 
     m_Controls->multiLabelWidget->SetMultiLabelSegmentation(dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData()));
   }

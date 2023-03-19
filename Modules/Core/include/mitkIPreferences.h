@@ -41,8 +41,8 @@ namespace mitk
    * Call Flush() to enforce the persistence of the whole (!) preferences tree. Preferences are flushed
    * automatically at least on a regular application shutdown.
    *
-   * Structural changes of a preference node can be observed via IPreferences::OnChanged.
-   * Property changes of a preference node can be observed via IPreferences::OnPropertyChanged.
+   * Changes of a preference node can be observed via IPreferences::OnChanged.
+   * Property changes of a preference node can be observed additionally via IPreferences::OnPropertyChanged.
    *
    * \sa CoreServices::GetPreferencesService()
    * \sa IPreferencesService
@@ -289,7 +289,7 @@ namespace mitk
      */
     virtual void RemoveNode() = 0;
 
-    Message1<const IPreferences*> OnChanged; /**< \brief Notify on structural node changes. */
+    Message1<const IPreferences*> OnChanged; /**< \brief Notify on node changes. */
     Message1<const ChangeEvent&> OnPropertyChanged; /**< \brief Notify on property changes. */
   };
 }

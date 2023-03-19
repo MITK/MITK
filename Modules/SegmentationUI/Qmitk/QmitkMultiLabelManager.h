@@ -58,7 +58,14 @@ Q_SIGNALS:
   */
   void CurrentSelectionChanged(LabelValueVectorType labels);
 
-  void GoToLabel(mitk::LabelSetImage::LabelValueType label, const mitk::Point3D&);
+  void GoToLabel(mitk::LabelSetImage::LabelValueType label, const mitk::Point3D&) const;
+
+  /** Signal that is emitted, if a label should be (re) named and default
+   label naming is deactivated. The instance for which a new name is requested
+   is passed with the signal.
+   @param label Pointer to the instance that needs a (new) name.
+   @param rename Indicates if it is a renaming or naming of a new label.*/
+  void LabelRenameRequested(mitk::Label* label, bool rename) const;
 
 public Q_SLOTS:
 
@@ -109,7 +116,8 @@ private Q_SLOTS:
   void OnSavePreset();
   void OnLoadPreset();
 
-  void OnGoToLabel(mitk::LabelSetImage::LabelValueType label, const mitk::Point3D& position);
+  void OnGoToLabel(mitk::LabelSetImage::LabelValueType label, const mitk::Point3D& position) const;
+  void OnLabelRenameRequested(mitk::Label* label, bool rename) const;
 
 private:
   enum TableColumns

@@ -369,12 +369,11 @@ void QmitkNewSegmentationDialog::OnSuggestionSelected()
   }
 }
 
-bool QmitkNewSegmentationDialog::DoRenameLabel(const mitk::Label* currentLabel, mitk::LabelSetImage* segmentation, QWidget* parent)
+bool QmitkNewSegmentationDialog::DoRenameLabel(const mitk::Label* currentLabel, mitk::LabelSetImage* segmentation, QWidget* parent, Mode mode)
 {
   if (nullptr == currentLabel) mitkThrow() << "Invalid call of QmitkNewSegmentationDialog::RenameLabel. Passed label is null.";
-  if (nullptr == segmentation) mitkThrow() << "Invalid call of QmitkNewSegmentationDialog::RenameLabel. Passed segmentation is null.";
-  if (segmentation->IsLabeInGroup(currentLabel->GetValue())) mitkThrow() << "Invalid call of QmitkNewSegmentationDialog::RenameLabel. Passed label value does not exist in segmentation.";
-  QmitkNewSegmentationDialog dialog(parent, segmentation, QmitkNewSegmentationDialog::RenameLabel);
+  if (nullptr != segmentation && !segmentation->IsLabeInGroup(currentLabel->GetValue())) mitkThrow() << "Invalid call of QmitkNewSegmentationDialog::RenameLabel. Passed label value does not exist in segmentation.";
+  QmitkNewSegmentationDialog dialog(parent, segmentation, mode);
 
   dialog.SetColor(currentLabel->GetColor());
   dialog.SetName(QString::fromStdString(currentLabel->GetName()));
@@ -390,10 +389,13 @@ bool QmitkNewSegmentationDialog::DoRenameLabel(const mitk::Label* currentLabel, 
     segmentationName = "Unnamed";
   }
 
-  auto groupID = segmentation->GetGroupIndexOfLabel(currentLabel->GetValue());
-  auto group = segmentation->GetLabelSet(groupID);
-  group->RenameLabel(currentLabel->GetValue(), segmentationName.toStdString(), dialog.GetColor());
-  group->UpdateLookupTable(currentLabel->GetValue());
+  if (nullptr != segmentation)
+  {
+    auto groupID = segmentation->GetGroupIndexOfLabel(currentLabel->GetValue());
+    auto group = segmentation->GetLabelSet(groupID);
+    group->RenameLabel(currentLabel->GetValue(), segmentationName.toStdString(), dialog.GetColor());
+    group->UpdateLookupTable(currentLabel->GetValue());
+  }
 
   return true;
 }

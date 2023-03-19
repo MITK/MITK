@@ -316,7 +316,7 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabelInternal(const mitk::LabelSetI
 
   if (!m_DefaultLabelNaming)
   {
-    // TODO
+    emit LabelRenameRequested(newLabel, false);
   }
 
   auto group = m_Segmentation->GetLabelSet(containingGroup);
@@ -510,7 +510,12 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& pos)
   if (m_Segmentation.IsNull() || !this->isEnabled() || selectedLabelValues.empty())
     return;
 
+  if (nullptr == this->GetCurrentLabel())
+    return; //for now we only have context menues if we realy click on an instance
+            //context menues for group level and label class level will be added later.
+
   QMenu* menu = new QMenu(this);
+
 
   if (this->GetMultiSelectionMode() && selectedLabelValues.size()>1)
   {
@@ -556,12 +561,12 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& pos)
 
     if (m_AllowLockModification)
     {
-      QAction* lockAllAction = new QAction(QIcon(":/Qmitk/lock.png"), "Lock all", this);
+      QAction* lockAllAction = new QAction(QIcon(":/Qmitk/lock.png"), "Lock group", this);
       lockAllAction->setEnabled(true);
       QObject::connect(lockAllAction, SIGNAL(triggered(bool)), this, SLOT(OnLockAllLabels(bool)));
       menu->addAction(lockAllAction);
 
-      QAction* unlockAllAction = new QAction(QIcon(":/Qmitk/unlock.png"), "Unlock all", this);
+      QAction* unlockAllAction = new QAction(QIcon(":/Qmitk/unlock.png"), "Unlock group", this);
       unlockAllAction->setEnabled(true);
       QObject::connect(unlockAllAction, SIGNAL(triggered(bool)), this, SLOT(OnUnlockAllLabels(bool)));
       menu->addAction(unlockAllAction);
@@ -574,12 +579,12 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& pos)
       QObject::connect(viewOnlyAction, SIGNAL(triggered(bool)), this, SLOT(OnSetOnlyActiveLabelVisible(bool)));
       menu->addAction(viewOnlyAction);
 
-      QAction* viewAllAction = new QAction(QIcon(":/Qmitk/visible.png"), "View all", this);
+      QAction* viewAllAction = new QAction(QIcon(":/Qmitk/visible.png"), "View group", this);
       viewAllAction->setEnabled(true);
       QObject::connect(viewAllAction, SIGNAL(triggered(bool)), this, SLOT(OnSetAllLabelsVisible(bool)));
       menu->addAction(viewAllAction);
 
-      QAction* hideAllAction = new QAction(QIcon(":/Qmitk/invisible.png"), "Hide all", this);
+      QAction* hideAllAction = new QAction(QIcon(":/Qmitk/invisible.png"), "Hide group", this);
       hideAllAction->setEnabled(true);
       QObject::connect(hideAllAction, SIGNAL(triggered(bool)), this, SLOT(OnSetAllLabelsInvisible(bool)));
       menu->addAction(hideAllAction);
@@ -696,7 +701,8 @@ void QmitkMultiLabelInspector::OnEraseLabel(bool /*value*/)
 
 void QmitkMultiLabelInspector::OnRenameLabel(bool /*value*/)
 {
- //TODO
+  auto currentLabel = GetFirstSelectedLabelObject();
+  emit LabelRenameRequested(currentLabel, true);
 }
 
 void QmitkMultiLabelInspector::OnUnlockAllLabels(bool /*value*/)
@@ -726,6 +732,7 @@ void QmitkMultiLabelInspector::OnSetAllLabelsVisible(bool /*value*/)
   auto groupID = m_Segmentation->GetGroupIndexOfLabel(currentLabel->GetValue());
   auto group = m_Segmentation->GetLabelSet(groupID);
   group->SetAllLabelsVisible(true);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkMultiLabelInspector::OnSetAllLabelsInvisible(bool /*value*/)
@@ -735,6 +742,7 @@ void QmitkMultiLabelInspector::OnSetAllLabelsInvisible(bool /*value*/)
   auto groupID = m_Segmentation->GetGroupIndexOfLabel(currentLabel->GetValue());
   auto group = m_Segmentation->GetLabelSet(groupID);
   group->SetAllLabelsVisible(false);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkMultiLabelInspector::OnSetOnlyActiveLabelVisible(bool /*value*/)
@@ -744,9 +752,10 @@ void QmitkMultiLabelInspector::OnSetOnlyActiveLabelVisible(bool /*value*/)
   auto groupID = m_Segmentation->GetGroupIndexOfLabel(currentLabel->GetValue());
   auto group = m_Segmentation->GetLabelSet(groupID);
   group->SetAllLabelsVisible(false);
-  currentLabel->SetVisible(true);
 
+  currentLabel->SetVisible(true);
   group->UpdateLookupTable(labelID);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
   this->PrepareGoToLabel(labelID);
 }

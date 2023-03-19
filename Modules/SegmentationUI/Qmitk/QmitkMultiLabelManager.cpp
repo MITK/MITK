@@ -80,6 +80,7 @@ QmitkMultiLabelManager::QmitkMultiLabelManager(QWidget *parent)
   connect(m_Controls->btnSavePreset, &QToolButton::clicked, this, &QmitkMultiLabelManager::OnLoadPreset);
 
   connect(this->m_Controls->labelInspector, &QmitkMultiLabelInspector::GoToLabel, this, &QmitkMultiLabelManager::OnGoToLabel);
+  connect(this->m_Controls->labelInspector, &QmitkMultiLabelInspector::LabelRenameRequested, this, &QmitkMultiLabelManager::OnLabelRenameRequested);
   connect(this->m_Controls->labelInspector, &QmitkMultiLabelInspector::CurrentSelectionChanged, this, &QmitkMultiLabelManager::CurrentSelectionChanged);
 
   auto* renameLabelShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_L, Qt::CTRL | Qt::Key::Key_R), this);
@@ -104,9 +105,12 @@ QmitkMultiLabelManager::LabelValueVectorType QmitkMultiLabelManager::GetSelected
 
 void QmitkMultiLabelManager::OnRenameLabelShortcutActivated()
 {
-  if (this->GetSelectedLabels().size() == 1)
+  auto selectedLabels = this->GetSelectedLabels();
+
+  for (auto labelValue : selectedLabels)
   {
-    //TODO delegate like inspector -> will call  QmitkNewSegmentationDialog::RenameLabel()
+    auto currentLabel = this->m_Segmentation->GetLabel(this->GetSelectedLabels().front());
+    emit LabelRenameRequested(currentLabel, true);
   }
 }
 
@@ -421,9 +425,14 @@ void QmitkMultiLabelManager::OnLoadPreset()
 
 }
 
-void QmitkMultiLabelManager::OnGoToLabel(mitk::LabelSetImage::LabelValueType label, const mitk::Point3D& position)
+void QmitkMultiLabelManager::OnGoToLabel(mitk::LabelSetImage::LabelValueType label, const mitk::Point3D& position) const
 {
   emit GoToLabel(label, position);
+}
+
+void QmitkMultiLabelManager::OnLabelRenameRequested(mitk::Label* label, bool rename) const
+{
+  emit LabelRenameRequested(label, rename);
 }
 
 

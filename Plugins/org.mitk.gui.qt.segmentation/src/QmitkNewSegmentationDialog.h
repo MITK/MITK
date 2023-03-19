@@ -60,7 +60,9 @@ public:
   void SetName(const QString& name);
   void SetColor(const mitk::Color& color);
 
-  static bool DoRenameLabel(const mitk::Label* currentLabel, mitk::LabelSetImage* segmentation, QWidget* parent = nullptr);
+  /**Static helper function to do (re)naming of a label via the dialog class. If mode == NewLabel, the function assumes that the label is not yet
+  added, thus e.g. no lookup table update is done. In rename mode, if a segmentation is provided, the segmentation will directly be updated.*/
+  static bool DoRenameLabel(const mitk::Label* currentLabel, mitk::LabelSetImage* segmentation, QWidget* parent = nullptr, Mode mode = NewLabel);
 
 private:
   void OnAccept();

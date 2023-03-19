@@ -75,6 +75,7 @@ private Q_SLOTS:
   void OnCurrentLabelSelectionChanged(QmitkMultiLabelManager::LabelValueVectorType labels);
 
   void OnGoToLabel(mitk::LabelSetImage::LabelValueType label, const mitk::Point3D&);
+  void OnLabelRenameRequested(mitk::Label* label, bool rename) const;
 
   void OnLabelSetWidgetReset();
 
@@ -150,6 +151,8 @@ private:
   void UpdateWarningLabel(QString text);
 
   std::string GetDefaultLabelSetPreset() const;
+
+  mitk::LabelSetImage* GetCurrentSegmentation() const;
 
   QWidget* m_Parent;
 

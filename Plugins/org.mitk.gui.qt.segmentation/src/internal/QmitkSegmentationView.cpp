@@ -363,19 +363,7 @@ void QmitkSegmentationView::OnNewSegmentation()
 
     if (!m_DefaultLabelNaming)
     {
-      QmitkNewSegmentationDialog dialog(m_Parent);
-      dialog.SetName(QString::fromStdString(newLabel->GetName()));
-      dialog.SetColor(newLabel->GetColor());
-
-      if (QDialog::Rejected == dialog.exec())
-        return;
-
-      auto name = dialog.GetName();
-
-      if (!name.isEmpty())
-        newLabel->SetName(name.toStdString());
-
-      newLabel->SetColor(dialog.GetColor());
+      QmitkNewSegmentationDialog::DoRenameLabel(newLabel,nullptr,m_Parent);
     }
 
     newLabelSetImage->GetActiveLabelSet()->AddLabel(newLabel);
@@ -442,11 +430,7 @@ void QmitkSegmentationView::OnShowMarkerNodes(bool state)
 
 void QmitkSegmentationView::OnCurrentLabelSelectionChanged(QmitkMultiLabelManager::LabelValueVectorType labels)
 {
-  auto workingNode = m_Controls->workingNodeSelector->GetSelectedNode();
-  if (workingNode.IsNull()) mitkThrow() << "Segmentation view is in an invalid state. Working node is null, but a label selection change has been triggered.";
-
-  auto segmentation = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
-  if (nullptr == segmentation) mitkThrow() << "Segmentation view is in an invalid state. Working node contains no segmentation, but a label selection change has been triggered.";
+  auto segmentation = this->GetCurrentSegmentation();
 
   const auto labelValue = labels.front();
   const auto groupID = segmentation->GetGroupIndexOfLabel(labelValue);
@@ -463,6 +447,31 @@ void QmitkSegmentationView::OnGoToLabel(mitk::LabelSetImage::LabelValueType labe
   {
     m_RenderWindowPart->SetSelectedPosition(pos);
   }
+}
+
+void QmitkSegmentationView::OnLabelRenameRequested(mitk::Label* label, bool rename) const
+{
+  auto segmentation = this->GetCurrentSegmentation();
+
+  if (rename)
+  {
+    QmitkNewSegmentationDialog::DoRenameLabel(label, segmentation, this->m_Parent, QmitkNewSegmentationDialog::Mode::RenameLabel);
+  }
+  else
+  {
+    QmitkNewSegmentationDialog::DoRenameLabel(label, segmentation, this->m_Parent, QmitkNewSegmentationDialog::Mode::NewLabel);
+  }
+}
+
+mitk::LabelSetImage* QmitkSegmentationView::GetCurrentSegmentation() const
+{
+  auto workingNode = m_Controls->workingNodeSelector->GetSelectedNode();
+  if (workingNode.IsNull()) mitkThrow() << "Segmentation view is in an invalid state. Working node is null, but a label selection change has been triggered.";
+
+  auto segmentation = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+  if (nullptr == segmentation) mitkThrow() << "Segmentation view is in an invalid state. Working node contains no segmentation, but a label selection change has been triggered.";
+
+  return segmentation;
 }
 
 void QmitkSegmentationView::OnLabelSetWidgetReset()
@@ -566,6 +575,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
    connect(m_Controls->multiLabelWidget, &QmitkMultiLabelManager::CurrentSelectionChanged, this, &QmitkSegmentationView::OnCurrentLabelSelectionChanged);
    connect(m_Controls->multiLabelWidget, &QmitkMultiLabelManager::GoToLabel, this, &QmitkSegmentationView::OnGoToLabel);
+   connect(m_Controls->multiLabelWidget, &QmitkMultiLabelManager::LabelRenameRequested, this, &QmitkSegmentationView::OnLabelRenameRequested);
 
    auto command = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
    command->SetCallbackFunction(this, &QmitkSegmentationView::ValidateSelectionInput);

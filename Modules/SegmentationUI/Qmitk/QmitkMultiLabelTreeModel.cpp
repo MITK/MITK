@@ -795,6 +795,8 @@ void QmitkMultiLabelTreeModel::OnLabelAdded(LabelValueType labelValue)
         // -> the whole label node has to be updated.
         auto labelIndex = GetIndexByItem(instanceItem->ParentItem(), this);
         emit dataChanged(labelIndex, labelIndex);
+        this->beginInsertRows(labelIndex, 0, instanceItem->ParentItem()->m_childItems.size()-1);
+        this->endInsertRows();
       }
       else
       {

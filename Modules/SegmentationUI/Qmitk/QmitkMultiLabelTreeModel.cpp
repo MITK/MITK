@@ -12,10 +12,7 @@ found in the LICENSE file.
 
 #include "QmitkMultiLabelTreeModel.h"
 
-#include "mitkImageStatisticsContainerManager.h"
-#include "mitkProportionalTimeGeometry.h"
-#include "mitkStatisticsToImageRelationRule.h"
-#include "mitkStatisticsToMaskRelationRule.h"
+#include "mitkRenderingManager.h"
 
 #include "QmitkStyleManager.h"
 
@@ -418,6 +415,8 @@ bool QmitkMultiLabelTreeModel::setData(const QModelIndex& index, const QVariant&
         }
         auto groupID = m_Segmentation->GetGroupIndexOfLabel(label->GetValue());
         m_Segmentation->GetLabelSet(groupID)->UpdateLookupTable(label->GetValue());
+        m_Segmentation->Modified();
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       }
       else
       {
@@ -566,6 +565,7 @@ Qt::ItemFlags QmitkMultiLabelTreeModel::flags(const QModelIndex &index) const
   {
     if (item->HandleAsInstance() &&
       ((TableColumns::VISIBLE_COL == index.column() && m_AllowVisibilityModification) ||
+       (TableColumns::COLOR_COL == index.column() && m_AllowVisibilityModification) || //m_AllowVisibilityModification controls visibility and color
        (TableColumns::LOCKED_COL == index.column() && m_AllowLockModification)))
     {
       return Qt::ItemIsEnabled | Qt::ItemIsEditable;

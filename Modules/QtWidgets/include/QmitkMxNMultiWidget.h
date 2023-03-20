@@ -104,8 +104,8 @@ private:
   void SetLayoutImpl() override;
   void SetInteractionSchemeImpl() override { }
 
-  void CreateRenderWindowWidget();
-  nlohmann::json BuildJSONFromLayout(QSplitter* splitter);
+  QmitkAbstractMultiWidget::RenderWindowWidgetPointer CreateRenderWindowWidget();
+  static nlohmann::json BuildJSONFromLayout(const QSplitter* splitter);
   QSplitter* BuildLayoutFromJSON(const nlohmann::json* jsonData, unsigned int* windowCounter, QSplitter* parentSplitter = nullptr);
 
   mitk::SliceNavigationController* m_TimeNavigationController;

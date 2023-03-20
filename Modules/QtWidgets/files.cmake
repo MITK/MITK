@@ -168,7 +168,7 @@ set(UI_FILES
 )
 
 set(RESOURCE_FILES
-  twoRowsEachDirection.json
+  mxnLayout_twoRowsEachDirection.json
 )
 
 set(QRC_FILES

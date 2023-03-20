@@ -39,7 +39,7 @@ void QmitkMultiWidgetLayoutSelectionWidget::Init()
   connect(ui.selectDefaultLayoutComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &QmitkMultiWidgetLayoutSelectionWidget::OnLayoutPresetSelected);
 
   ui.selectDefaultLayoutComboBox->addItem("Select a layout preset");
-  auto presetResources = us::GetModuleContext()->GetModule()->FindResources("/", "*.json", false);
+  auto presetResources = us::GetModuleContext()->GetModule()->FindResources("/", "mxnLayout_*.json", false);
   for (const auto& resource : presetResources)
   {
     us::ModuleResourceStream jsonStream(resource);
@@ -110,6 +110,8 @@ void QmitkMultiWidgetLayoutSelectionWidget::OnLoadLayoutButtonClicked()
   QString filename = QFileDialog::getOpenFileName(nullptr, "Load a layout file", "", "MITK Window Layouts (*.json)");
   if (filename.isEmpty())
     return;
+
+  ui.selectDefaultLayoutComboBox->setCurrentIndex(0);
 
   std::ifstream f(filename.toStdString());
   auto jsonData = nlohmann::json::parse(f);

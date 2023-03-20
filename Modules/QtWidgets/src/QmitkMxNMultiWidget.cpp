@@ -442,6 +442,7 @@ void QmitkMxNMultiWidget::SaveLayout(std::string filename)
 
   auto layoutJSON = BuildJSONFromLayout(splitter);
   layoutJSON["version"] = "1.0";
+  layoutJSON["name"] = "Custom Layout";
 
   std::ofstream outStream(filename);
   outStream << std::setw(4) << layoutJSON << std::endl;

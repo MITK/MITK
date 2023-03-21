@@ -340,9 +340,6 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabelInternal(const mitk::LabelSetI
 
 mitk::Label* QmitkMultiLabelInspector::AddNewLabel()
 {
-  //todo das sollte eigentlich weg gelassen werden können.
-  //Wenn beim Testen kein problem auffällt, dann kann die Zeile wirklich raus.
-  //m_ToolManager->ActivateTool(-1);
   if (!m_AllowLabelModification)
     mitkThrow() << "QmitkMultiLabelInspector is configured incorrectly. Set AllowLabelModification to true to allow the usage of AddNewLabel.";
 

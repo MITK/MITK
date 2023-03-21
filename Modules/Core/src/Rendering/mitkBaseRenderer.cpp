@@ -123,6 +123,7 @@ mitk::BaseRenderer::BaseRenderer(const char *name,
     m_CameraRotationController(nullptr),
     m_SliceNavigationController(nullptr),
     m_WorldTimeGeometry(nullptr),
+    m_InteractionReferenceGeometry(nullptr),
     m_CurrentWorldGeometry(nullptr),
     m_CurrentWorldPlaneGeometry(nullptr),
     m_Slice(0),
@@ -130,6 +131,7 @@ mitk::BaseRenderer::BaseRenderer(const char *name,
     m_CurrentWorldPlaneGeometryUpdateTime(),
     m_TimeStepUpdateTime(),
     m_KeepDisplayedRegion(true),
+    m_ReferenceGeometryAligned(true),
     m_CurrentWorldPlaneGeometryData(nullptr),
     m_CurrentWorldPlaneGeometryNode(nullptr),
     m_CurrentWorldPlaneGeometryTransformTime(0),
@@ -674,6 +676,8 @@ void mitk::BaseRenderer::SetConstrainZoomingAndPanning(bool constrain)
 
 void mitk::BaseRenderer::UpdateCurrentGeometries()
 {
+  m_ReferenceGeometryAligned = true;
+
   if (m_WorldTimeGeometry.IsNull())
   {
     // simply mark the base renderer as modified

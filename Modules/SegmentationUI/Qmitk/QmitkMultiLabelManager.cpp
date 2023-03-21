@@ -109,7 +109,7 @@ void QmitkMultiLabelManager::OnRenameLabelShortcutActivated()
 
   for (auto labelValue : selectedLabels)
   {
-    auto currentLabel = this->m_Segmentation->GetLabel(this->GetSelectedLabels().front());
+    auto currentLabel = this->m_Segmentation->GetLabel(labelValue);
     emit LabelRenameRequested(currentLabel, true);
   }
 }

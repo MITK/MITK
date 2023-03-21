@@ -301,7 +301,7 @@
   <customwidget>
    <class>QmitkMultiLabelManager</class>
    <extends>QWidget</extends>
-   <header>QmitkMultilabelManager.h</header>
+   <header>QmitkMultiLabelManager.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

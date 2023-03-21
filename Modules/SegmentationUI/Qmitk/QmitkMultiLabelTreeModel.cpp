@@ -32,7 +32,7 @@ public:
   };
 
   explicit QmitkMultiLabelSegTreeItem(ItemType type, QmitkMultiLabelSegTreeItem* parentItem,
-    mitk::Label* label = nullptr, std::string className = ""): m_ItemType(type), m_Label(label), m_parentItem(parentItem), m_ClassName(className)
+    mitk::Label* label = nullptr, std::string className = ""): m_parentItem(parentItem), m_ItemType(type), m_Label(label), m_ClassName(className)
   {
   };
 
@@ -86,8 +86,8 @@ public:
   {
     if (m_parentItem)
     {
-      const auto row = this->Row()+1;
-      if (row < m_parentItem->m_childItems.size())
+      const std::vector<QmitkMultiLabelSegTreeItem*>::size_type row = this->Row();
+      if (row + 1 < m_parentItem->m_childItems.size())
         return m_parentItem->m_childItems[row];
     }
 
@@ -98,8 +98,9 @@ public:
   {
     if (m_parentItem)
     {
-      const auto row = this->Row();
+      const std::vector<QmitkMultiLabelSegTreeItem*>::size_type row = this->Row();
       if (row > 0)
+
         return m_parentItem->m_childItems[row-1];
     }
 
@@ -166,8 +167,8 @@ public:
     return label->GetValue();
   };
 
-  QmitkMultiLabelSegTreeItem* m_parentItem = nullptr;
   std::vector<QmitkMultiLabelSegTreeItem*> m_childItems;
+  QmitkMultiLabelSegTreeItem* m_parentItem = nullptr;
   ItemType m_ItemType = ItemType::Group;
   mitk::Label::Pointer m_Label;
   std::string m_ClassName;
@@ -574,7 +575,6 @@ Qt::ItemFlags QmitkMultiLabelTreeModel::flags(const QModelIndex &index) const
     {
       return Qt::ItemIsEnabled;
     }
-    return true;
   }
   else
   {
@@ -586,7 +586,6 @@ Qt::ItemFlags QmitkMultiLabelTreeModel::flags(const QModelIndex &index) const
     {
       return Qt::ItemIsEnabled;
     }
-    return true;
   }
 
   return Qt::NoItemFlags;
@@ -887,7 +886,7 @@ void QmitkMultiLabelTreeModel::OnGroupAdded(SpatialGroupIndexType groupIndex)
   }
 }
 
-void QmitkMultiLabelTreeModel::OnGroupModified(SpatialGroupIndexType groupIndex)
+void QmitkMultiLabelTreeModel::OnGroupModified(SpatialGroupIndexType /*groupIndex*/)
 {
   //currently not needed
 }

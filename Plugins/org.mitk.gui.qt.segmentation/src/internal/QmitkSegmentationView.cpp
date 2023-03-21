@@ -441,7 +441,7 @@ void QmitkSegmentationView::OnCurrentLabelSelectionChanged(QmitkMultiLabelManage
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkSegmentationView::OnGoToLabel(mitk::LabelSetImage::LabelValueType label, const mitk::Point3D& pos)
+void QmitkSegmentationView::OnGoToLabel(mitk::LabelSetImage::LabelValueType /*label*/, const mitk::Point3D& pos)
 {
   if (m_RenderWindowPart)
   {

@@ -115,7 +115,7 @@ public:
     int i = 0;
     for (auto row : rows)
     {
-      if (i + 1 < rows.size())
+      if (static_cast<std::vector<int>::size_type>(i) + 1 < rows.size())
       {
         testIndex = model.index(row, 0, testIndex);
       }
@@ -129,7 +129,7 @@ public:
     return testIndex;
   }
 
-  bool CheckModelItem(const QmitkMultiLabelTreeModel& model, const std::vector<int>& rows, const QVariant& reference, int column = 0, const mitk::Label* label = nullptr) const
+  bool CheckModelItem(const QmitkMultiLabelTreeModel& model, const std::vector<int>& rows, const QVariant& reference, int column, const mitk::Label* /*label = nullptr*/) const
   {
     QModelIndex testIndex = GetIndex(model, rows, column);
 

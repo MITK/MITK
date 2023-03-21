@@ -1834,7 +1834,7 @@ void QmitkSlicesInterpolator::OnRemoveLabelSetConnection()
   }
 }
 
-void QmitkSlicesInterpolator::OnRemoveLabel(mitk::Label::PixelType removedLabelValue)
+void QmitkSlicesInterpolator::OnRemoveLabel(mitk::Label::PixelType /*removedLabelValue*/)
 {
   if (m_ToolManager->GetWorkingData(0) != nullptr)
   {

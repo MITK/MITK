@@ -1062,7 +1062,7 @@ void mitk::SurfaceInterpolationController::RemoveLabelSetConnection()
   }
 }
 
-void mitk::SurfaceInterpolationController::OnRemoveLabel(mitk::Label::PixelType removedLabelValue)
+void mitk::SurfaceInterpolationController::OnRemoveLabel(mitk::Label::PixelType /*removedLabelValue*/)
 {
   if (m_SelectedSegmentation != nullptr)
   {

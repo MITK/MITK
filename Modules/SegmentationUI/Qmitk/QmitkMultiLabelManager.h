@@ -19,7 +19,7 @@ found in the LICENSE file.
 #include <mitkDataNode.h>
 #include <mitkNumericTypes.h>
 
-#include <Qwidget>
+#include <QWidget>
 
 class QmitkDataStorageComboBox;
 class QCompleter;

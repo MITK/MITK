@@ -313,7 +313,7 @@ namespace mitk
      * @param VectorOfLabelPixelValues the list of pixel values of the labels
      *                                 that will be erased from the labelset image
      */
-    void EraseLabels(std::vector<PixelType> &VectorOfLabelPixelValues);
+    void EraseLabels(const std::vector<PixelType> &VectorOfLabelPixelValues);
 
     /**
       * \brief  Returns true if the value exists in one of the labelsets*/

@@ -580,7 +580,7 @@ void mitk::LabelSetImage::EraseLabel(PixelType pixelValue)
   Modified();
 }
 
-void mitk::LabelSetImage::EraseLabels(std::vector<PixelType>& VectorOfLabelPixelValues)
+void mitk::LabelSetImage::EraseLabels(const std::vector<PixelType>& VectorOfLabelPixelValues)
 {
   for (unsigned int idx = 0; idx < VectorOfLabelPixelValues.size(); idx++)
   {

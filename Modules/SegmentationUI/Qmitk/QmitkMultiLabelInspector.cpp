@@ -233,7 +233,7 @@ mitk::Label* QmitkMultiLabelInspector::GetFirstSelectedLabelObject() const
   return m_Segmentation->GetLabel(m_LastValidSelectedLabels.front());
 }
 
-void QmitkMultiLabelInspector::OnChangeModelSelection(const QItemSelection& selected, const QItemSelection& deselected)
+void QmitkMultiLabelInspector::OnChangeModelSelection(const QItemSelection& /*selected*/, const QItemSelection& /*deselected*/)
 {
   if (!m_ModelManipulationOngoing)
   {
@@ -501,7 +501,7 @@ void QmitkMultiLabelInspector::RemoveGroup()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& pos)
+void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
 {
   auto selectedLabelValues = this->GetSelectedLabels();
   if (m_Segmentation.IsNull() || !this->isEnabled() || selectedLabelValues.empty())

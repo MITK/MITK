@@ -51,12 +51,12 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
   this->SetGPUInfo();
   if (m_GpuLoader.GetGPUCount() != 0)
   {
-    welcomeText = "<b>STATUS: </b><i>Welcome to Total Segmentator tool. You're in luck: " +
+    welcomeText = "<b>STATUS: </b><i>Welcome to TotalSegmentator tool. You're in luck: " +
                                QString::number(m_GpuLoader.GetGPUCount()) + " GPU(s) were detected.</i>";
   }
   else
   {
-    welcomeText = "<b>STATUS: </b><i>Welcome to Total Segmentator tool. Sorry, " +
+    welcomeText = "<b>STATUS: </b><i>Welcome to TotalSegmentator tool. Sorry, " +
                               QString::number(m_GpuLoader.GetGPUCount()) + " GPUs were detected.</i>";
   }
 
@@ -80,11 +80,11 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
     m_PythonPath = GetExactPythonPath(storageDir);
     m_Installer.SetVirtualEnvPath(m_PythonPath);
     this->EnableAll(m_IsInstalled);
-    welcomeText += " Totalsegmentator is already found installed."; 
+    welcomeText += " TotalSegmentator is already found installed."; 
   }
   else
   {
-    welcomeText += " Totalsegmentator not installed. Please click on \"Install TotalSegmentator\" above.";
+    welcomeText += " TotalSegmentator is not installed. Please click on \"Install TotalSegmentator\" above.";
   }
   this->WriteStatusMessage(welcomeText);
 
@@ -146,24 +146,23 @@ void QmitkTotalSegmentatorToolGUI::OnInstallBtnClicked()
   QString systemPython = OnSystemPythonChanged(m_Controls.sysPythonComboBox->currentText());
   if (systemPython.isEmpty())
   {
-    this->WriteErrorMessage("Couldn't find Python");
-    return;
+    this->WriteErrorMessage("<b>ERROR: </b>Couldn't find Python");
   }
   else
   {
+    this->WriteStatusMessage("<b>STATUS: </b>Installing TotalSegmentator...");
     m_Installer.SetSystemPythonPath(systemPython);
-  }
-  
-  isInstalled = m_Installer.SetupVirtualEnv(m_Installer.m_VENV_NAME);
-  if (isInstalled)
-  {
-    const QString pythonPath = m_Installer.GetVirtualEnvPath();
-    m_PythonPath = GetExactPythonPath(pythonPath);
-    this->WriteStatusMessage("Successfully installed TotalSegmentator");
-  }
-  else
-  {
-    this->WriteErrorMessage("Couldn't find TotalSegmentator");
+    isInstalled = m_Installer.SetupVirtualEnv(m_Installer.m_VENV_NAME);
+    if (isInstalled)
+    {
+      const QString pythonPath = m_Installer.GetVirtualEnvPath();
+      m_PythonPath = GetExactPythonPath(pythonPath);
+      this->WriteStatusMessage("<b>STATUS: </b>Successfully installed TotalSegmentator");
+    }
+    else
+    {
+      this->WriteErrorMessage("<b>ERROR: </b>Couldn't find TotalSegmentator");
+    }
   }
   this->EnableAll(isInstalled);
 }
@@ -220,7 +219,7 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
   this->ActualizePreviewLabelVisibility();
   this->WriteStatusMessage("<b>STATUS: </b><i>Segmentation task finished successfully.</i>");
   QString pythonPathTextItem = m_Controls.pythonEnvComboBox->currentText();
-  if (!pythonPathTextItem.isEmpty()) // only cache if the prediction ended without errors.
+  if (!pythonPathTextItem.isEmpty() && pythonPathTextItem != "Select") // only cache if the prediction ended without errors.
   {
     QString lastSelectedPyEnv = m_Settings.value("TotalSeg/LastCustomPythonPath").toString();
     if (lastSelectedPyEnv != pythonPathTextItem)

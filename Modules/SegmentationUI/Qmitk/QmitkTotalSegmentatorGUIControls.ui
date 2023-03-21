@@ -132,7 +132,7 @@
 			 </sizepolicy>
 			</property>
 			<property name="text">
-				<string>Use Custom Installation</string>
+				<string>Use Custom Installation:</string>
 			</property>
 		   </widget>
 		  </item>
@@ -265,7 +265,7 @@
 		   </sizepolicy>
 		  </property>
 		  <property name="text">
-	       <string>Fast</string>
+	       <string>Fast:</string>
 		  </property>
 		 </widget>
 		</item>  

@@ -72,7 +72,10 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
           [=](int index) { OnSystemPythonChanged(m_Controls.sysPythonComboBox->itemText(index)); });
 
   QString lastSelectedPyEnv = m_Settings.value("TotalSeg/LastCustomPythonPath").toString();
-  m_Controls.pythonEnvComboBox->insertItem(0, lastSelectedPyEnv);
+  if (!lastSelectedPyEnv.isEmpty() && lastSelectedPyEnv!= "Select")
+  {
+    m_Controls.pythonEnvComboBox->insertItem(0, lastSelectedPyEnv);
+  }
   const QString storageDir = m_Installer.GetVirtualEnvPath();
   m_IsInstalled = this->IsTotalSegmentatorInstalled(storageDir);
   if (m_IsInstalled)

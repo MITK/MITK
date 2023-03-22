@@ -25,5 +25,6 @@
 		<file>hourglass-half-solid.svg</file>
 		<file>times.svg</file>
 		<file>reset.svg</file>
+		<file>SegmentationTaskListIcon.svg</file>
 	</qresource>
 </RCC>

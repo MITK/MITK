@@ -88,7 +88,7 @@ public Q_SLOTS:
   void mousePressEvent(QMouseEvent* e) override;
   void moveEvent(QMoveEvent* e) override;
   void LoadLayout(const nlohmann::json* jsonData);
-  void SaveLayout(std::string filename);
+  void SaveLayout(std::ostream* outStream);
 
 Q_SIGNALS:
 

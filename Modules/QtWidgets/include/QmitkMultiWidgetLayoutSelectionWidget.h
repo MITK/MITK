@@ -38,7 +38,7 @@ public:
 Q_SIGNALS:
 
   void LayoutSet(int row, int column);
-  void SaveLayout(std::string filename);
+  void SaveLayout(std::ostream* outStream);
   void LoadLayout(const nlohmann::json* jsonData);
 
 private Q_SLOTS:

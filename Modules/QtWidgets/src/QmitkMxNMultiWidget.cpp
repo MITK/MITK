@@ -422,10 +422,12 @@ void QmitkMxNMultiWidget::LoadLayout(const nlohmann::json* jsonData)
   }
 }
 
-void QmitkMxNMultiWidget::SaveLayout(std::string filename)
+void QmitkMxNMultiWidget::SaveLayout(std::ostream* outStream)
 {
-  if (filename.empty())
+  if (outStream == nullptr)
+  {
     return;
+  }
 
   auto layout = this->layout();
   if (layout == nullptr)
@@ -444,8 +446,7 @@ void QmitkMxNMultiWidget::SaveLayout(std::string filename)
   layoutJSON["version"] = "1.0";
   layoutJSON["name"] = "Custom Layout";
 
-  std::ofstream outStream(filename);
-  outStream << std::setw(4) << layoutJSON << std::endl;
+  *outStream << std::setw(4) << layoutJSON << std::endl;
 
 }
 

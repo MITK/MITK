@@ -102,7 +102,8 @@ void QmitkMultiWidgetLayoutSelectionWidget::OnSaveLayoutButtonClicked()
   if (filename.isEmpty())
     return;
 
-  emit SaveLayout(filename.toStdString());
+  auto outStream = std::ofstream(filename.toStdString());
+  emit SaveLayout(&outStream);
 }
 
 void QmitkMultiWidgetLayoutSelectionWidget::OnLoadLayoutButtonClicked()

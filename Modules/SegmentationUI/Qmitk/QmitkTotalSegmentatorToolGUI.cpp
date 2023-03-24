@@ -36,11 +36,12 @@ void QmitkTotalSegmentatorToolGUI::ConnectNewTool(mitk::SegWithPreviewTool *newT
 void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
 {
   m_Controls.setupUi(this);
-  this->AutoParsePythonPaths();
 #ifndef _WIN32
   m_Controls.sysPythonComboBox->addItem("/usr/bin");
 #endif
+  this->AutoParsePythonPaths();
   m_Controls.sysPythonComboBox->addItem("Select");
+  m_Controls.sysPythonComboBox->setCurrentIndex(0);
   m_Controls.pythonEnvComboBox->addItem("Select");
   m_Controls.pythonEnvComboBox->setDuplicatesEnabled(false);
   m_Controls.pythonEnvComboBox->setDisabled(true);
@@ -299,7 +300,7 @@ void QmitkTotalSegmentatorToolGUI::AutoParsePythonPaths()
     {
       if (QDir(searchDir).exists())
       {
-        m_Controls.sysPythonComboBox->insertItem(0, "(base): " + searchDir);
+        m_Controls.sysPythonComboBox->addItem("(base): " + searchDir);
         searchDir.append((QDir::separator() + QString("envs")));
       }
     }
@@ -309,7 +310,7 @@ void QmitkTotalSegmentatorToolGUI::AutoParsePythonPaths()
       QString envName = subIt.fileName();
       if (!envName.startsWith('.')) // Filter out irrelevent hidden folders, if any.
       {
-        m_Controls.sysPythonComboBox->insertItem(0, "(" + envName + "): " + subIt.filePath());
+        m_Controls.sysPythonComboBox->addItem("(" + envName + "): " + subIt.filePath());
       }
     }
   }

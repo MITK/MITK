@@ -150,7 +150,7 @@ void QmitkTotalSegmentatorToolGUI::OnInstallBtnClicked()
   QString systemPython = OnSystemPythonChanged(m_Controls.sysPythonComboBox->currentText());
   if (systemPython.isEmpty())
   {
-    this->WriteErrorMessage("<b>ERROR: </b>Couldn't find Python");
+    this->WriteErrorMessage("<b>ERROR: </b>Couldn't find Python.");
   }
   else
   {
@@ -161,11 +161,11 @@ void QmitkTotalSegmentatorToolGUI::OnInstallBtnClicked()
     {
       const QString pythonPath = m_Installer.GetVirtualEnvPath();
       m_PythonPath = GetExactPythonPath(pythonPath);
-      this->WriteStatusMessage("<b>STATUS: </b>Successfully installed TotalSegmentator");
+      this->WriteStatusMessage("<b>STATUS: </b>Successfully installed TotalSegmentator.");
     }
     else
     {
-      this->WriteErrorMessage("<b>ERROR: </b>Couldn't find TotalSegmentator");
+      this->WriteErrorMessage("<b>ERROR: </b>Couldn't install TotalSegmentator.");
     }
   }
   this->EnableAll(isInstalled);
@@ -246,12 +246,14 @@ void QmitkTotalSegmentatorToolGUI::WriteStatusMessage(const QString &message)
 {
   m_Controls.statusLabel->setText(message);
   m_Controls.statusLabel->setStyleSheet("font-weight: bold; color: white");
+  qApp->processEvents();
 }
 
 void QmitkTotalSegmentatorToolGUI::WriteErrorMessage(const QString &message)
 {
   m_Controls.statusLabel->setText(message);
   m_Controls.statusLabel->setStyleSheet("font-weight: bold; color: red");
+  qApp->processEvents();
 }
 
 bool QmitkTotalSegmentatorToolGUI::IsTotalSegmentatorInstalled(const QString &pythonPath)
@@ -438,6 +440,10 @@ void QmitkTotalSegmentatorToolGUI::OnClearInstall()
   if (folderPath.removeRecursively())
   {
     m_Controls.installButton->setEnabled(true);
+    if (!m_Controls.overrideBox->isChecked())
+    {
+      m_Controls.previewButton->setEnabled(false);
+    }
   }
   else
   {

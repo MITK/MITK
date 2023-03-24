@@ -77,8 +77,6 @@ private Q_SLOTS:
   void OnGoToLabel(mitk::LabelSetImage::LabelValueType label, const mitk::Point3D&);
   void OnLabelRenameRequested(mitk::Label* label, bool rename) const;
 
-  void OnLabelSetWidgetReset();
-
 private:
 
   void CreateQtPartControl(QWidget* parent) override;

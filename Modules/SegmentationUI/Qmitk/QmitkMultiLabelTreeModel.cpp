@@ -88,7 +88,7 @@ public:
     {
       const std::vector<QmitkMultiLabelSegTreeItem*>::size_type row = this->Row();
       if (row + 1 < m_parentItem->m_childItems.size())
-        return m_parentItem->m_childItems[row];
+        return m_parentItem->m_childItems[row+1];
     }
 
     return nullptr;

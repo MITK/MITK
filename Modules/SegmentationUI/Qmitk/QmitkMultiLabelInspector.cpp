@@ -431,7 +431,7 @@ mitk::Label* QmitkMultiLabelInspector::AddNewGroup()
     m_ModelManipulationOngoing = false;
     MITK_ERROR << "Exception caught: " << e.GetDescription();
     QMessageBox::information(
-      this, "Add layer", "Could not add a new layer. See error log for details.\n");
+      this, "Add group", "Could not add a new group. See error log for details.\n");
   }
   m_ModelManipulationOngoing = false;
 
@@ -448,9 +448,9 @@ void QmitkMultiLabelInspector::RemoveGroup()
     return;
   }
 
-  QString question = "Do you really want to delete the current layer with all labels?";
+  QString question = "Do you really want to delete the current group with all labels?";
   QMessageBox::StandardButton answerButton = QMessageBox::question(
-    this, "Delete layer", question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
+    this, "Delete group", question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
 
   if (answerButton != QMessageBox::Yes)
   {
@@ -478,7 +478,7 @@ void QmitkMultiLabelInspector::RemoveGroup()
     this->WaitCursorOff();
     MITK_ERROR << "Exception caught: " << e.GetDescription();
     QMessageBox::information(
-      this, "Delete layer", "Could not delete the currently active layer. See error log for details.\n");
+      this, "Delete group", "Could not delete the currently active group. See error log for details.\n");
     return;
   }
 

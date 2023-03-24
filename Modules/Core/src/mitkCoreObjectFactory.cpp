@@ -119,34 +119,30 @@ void mitk::CoreObjectFactory::SetDefaultProperties(mitk::DataNode *node)
 
   mitk::DataNode::Pointer nodePointer = node;
 
-  mitk::Image::Pointer image = dynamic_cast<mitk::Image *>(node->GetData());
-  if (image.IsNotNull() && image->IsInitialized())
+  mitk::Image* image = dynamic_cast<mitk::Image *>(node->GetData());
+  if (nullptr != image && image->IsInitialized())
   {
     mitk::ImageVtkMapper2D::SetDefaultProperties(node);
   }
 
-  mitk::PlaneGeometryData::Pointer planeGeometry = dynamic_cast<mitk::PlaneGeometryData *>(node->GetData());
-  if (planeGeometry.IsNotNull())
+  if (nullptr != dynamic_cast<mitk::PlaneGeometryData*>(node->GetData()))
   {
     mitk::PlaneGeometryDataMapper2D::SetDefaultProperties(node);
   }
 
-  mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface *>(node->GetData());
-  if (surface.IsNotNull())
+  if (nullptr != dynamic_cast<mitk::Surface*>(node->GetData()))
   {
     mitk::SurfaceVtkMapper2D::SetDefaultProperties(node);
     mitk::SurfaceVtkMapper3D::SetDefaultProperties(node);
   }
 
-  mitk::PointSet::Pointer pointSet = dynamic_cast<mitk::PointSet *>(node->GetData());
-  if (pointSet.IsNotNull())
+  if (nullptr != dynamic_cast<mitk::PointSet*>(node->GetData()))
   {
     mitk::PointSetVtkMapper2D::SetDefaultProperties(node);
     mitk::PointSetVtkMapper3D::SetDefaultProperties(node);
   }
 
-  mitk::CrosshairData::Pointer crosshairData = dynamic_cast<mitk::CrosshairData*>(node->GetData());
-  if (crosshairData.IsNotNull())
+  if (nullptr != dynamic_cast<mitk::CrosshairData*>(node->GetData()))
   {
     mitk::CrosshairVtkMapper2D::SetDefaultProperties(node);
   }

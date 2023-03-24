@@ -104,7 +104,6 @@ mitk::Image::Pointer mitk::CloseRegionTool::GenerateFillImage(const Image* worki
 
   AccessFixedDimensionByItk_n(workingSlice, DoITKRegionClosing, 2, (fillImage, seedIndex, seedLabelValue));
 
-  auto labelSetImage = dynamic_cast<const LabelSetImage*>(this->GetWorkingData());
   if (seedLabelValue == LabelSetImage::UnlabeledLabelValue)
   {
     return nullptr;

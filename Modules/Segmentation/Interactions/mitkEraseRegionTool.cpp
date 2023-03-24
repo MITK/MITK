@@ -60,8 +60,6 @@ void DoFillImage(itk::Image<TPixel, VImageDimension>* image)
 
 mitk::Image::Pointer mitk::EraseRegionTool::GenerateFillImage(const Image* workingSlice, Point3D seedPoint, mitk::Label::PixelType& seedLabelValue) const
 {
-  auto labelSetImage = dynamic_cast<const LabelSetImage*>(this->GetWorkingData());
-
   itk::Index<2> seedIndex;
   workingSlice->GetGeometry()->WorldToIndex(seedPoint, seedIndex);
 
@@ -85,9 +83,5 @@ mitk::Image::Pointer mitk::EraseRegionTool::GenerateFillImage(const Image* worki
 
 void mitk::EraseRegionTool::PrepareFilling(const Image* /*workingSlice*/, Point3D /*seedPoint*/)
 {
-  auto labelSetImage = dynamic_cast<const LabelSetImage*>(this->GetWorkingData());
-  if (nullptr != labelSetImage)
-  {
-    m_FillLabelValue = LabelSetImage::UnlabeledLabelValue;
-  }
+  m_FillLabelValue = LabelSetImage::UnlabeledLabelValue;
 };

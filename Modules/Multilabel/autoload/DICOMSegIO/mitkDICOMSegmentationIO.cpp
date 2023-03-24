@@ -330,7 +330,7 @@ namespace mitk
         while (!iter.IsAtEnd())
         {
           itkInputImageType::PixelType value = iter.Get();
-          if (value != 0)
+          if (value != LabelSetImage::UnlabeledLabelValue)
           {
             segValue = value;
             break;

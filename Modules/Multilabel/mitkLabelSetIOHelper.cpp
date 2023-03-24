@@ -117,7 +117,7 @@ bool mitk::LabelSetIOHelper::LoadLabelSetImagePreset(const std::string &presetFi
       auto label = mitk::LabelSetIOHelper::LoadLabelFromXMLDocument(labelElement);
       const auto labelValue = label->GetValue();
 
-      if (0 != labelValue)
+      if (LabelSetImage::UnlabeledLabelValue != labelValue)
       {
         auto* labelSet = inputImage->GetLabelSet(layerIndex);
         auto* alreadyExistingLabel = labelSet->GetLabel(labelValue);

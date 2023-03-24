@@ -65,27 +65,17 @@ void CreateLabelMaskProcessing(mitk::Image *layerImage, mitk::Image *mask, mitk:
 }
 
 mitk::LabelSetImage::LabelSetImage()
-  : mitk::Image(), m_ActiveLayer(0), m_activeLayerInvalid(false), m_ExteriorLabel(nullptr)
+  : mitk::Image(), m_UnlabeledLabelLock(false), m_ActiveLayer(0), m_activeLayerInvalid(false)
 {
-  // Iniitlaize Background Label
-  mitk::Color color;
-  color.Set(0, 0, 0);
-  m_ExteriorLabel = mitk::Label::New();
-  m_ExteriorLabel->SetColor(color);
-  m_ExteriorLabel->SetName("Exterior");
-  m_ExteriorLabel->SetOpacity(0.0);
-  m_ExteriorLabel->SetLocked(false);
-  m_ExteriorLabel->SetValue(0);
-
   // Add some DICOM Tags as properties to segmentation image
   DICOMSegmentationPropertyHelper::DeriveDICOMSegmentationProperties(this);
 }
 
 mitk::LabelSetImage::LabelSetImage(const mitk::LabelSetImage &other)
   : Image(other),
+    m_UnlabeledLabelLock(other.m_UnlabeledLabelLock),
     m_ActiveLayer(other.GetActiveLayer()),
-    m_activeLayerInvalid(false),
-    m_ExteriorLabel(other.GetExteriorLabel()->Clone())
+    m_activeLayerInvalid(false)
 {
   for (unsigned int i = 0; i < other.GetNumberOfLayers(); i++)
   {
@@ -108,21 +98,6 @@ mitk::LabelSetImage::LabelSetImage(const mitk::LabelSetImage &other)
 void mitk::LabelSetImage::OnLabelSetModified()
 {
   Superclass::Modified();
-}
-
-void mitk::LabelSetImage::SetExteriorLabel(mitk::Label *label)
-{
-  m_ExteriorLabel = label;
-}
-
-mitk::Label *mitk::LabelSetImage::GetExteriorLabel()
-{
-  return m_ExteriorLabel;
-}
-
-const mitk::Label *mitk::LabelSetImage::GetExteriorLabel() const
-{
-  return m_ExteriorLabel;
 }
 
 void mitk::LabelSetImage::Initialize(const mitk::Image *other)
@@ -285,7 +260,7 @@ void mitk::LabelSetImage::RemoveSpatialGroup(SpatialGroupIndexType indexToDelete
 
 mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::GetUsedLabelValues() const
 {
-  LabelValueVectorType result = { this->GetExteriorLabel()->GetValue() };
+  LabelValueVectorType result = { UnlabeledLabelValue };
 
   for (auto [value, label] : m_LabelMap)
   {
@@ -328,8 +303,7 @@ unsigned int mitk::LabelSetImage::AddLayer(mitk::Image::Pointer layerImage, mitk
   else
   {
     ls = mitk::LabelSet::New();
-    ls->AddLabel(GetExteriorLabel(), false);
-    ls->SetActiveLabel(0 /*Exterior Label*/);
+    ls->SetActiveLabel(UnlabeledLabelValue);
   }
 
   ls->SetLayer(newLabelSetId);
@@ -377,8 +351,7 @@ void mitk::LabelSetImage::AddLabelSetToLayer(const unsigned int layerIdx, const 
     while (layerIdx >= m_LabelSetContainer.size())
     {
       mitk::LabelSet::Pointer defaultLabelSet = mitk::LabelSet::New();
-      defaultLabelSet->AddLabel(GetExteriorLabel());
-      defaultLabelSet->SetActiveLabel(0 /*Exterior Label*/);
+      defaultLabelSet->SetActiveLabel(UnlabeledLabelValue);
       defaultLabelSet->SetLayer(m_LabelSetContainer.size());
       this->RegisterLabelSet(defaultLabelSet);
       this->ReinitMaps();
@@ -813,7 +786,7 @@ void mitk::LabelSetImage::InitializeByLabeledImageProcessing(LabelSetImageType *
     auto sourceValue = static_cast<PixelType>(sourceIter.Get());
     targetIter.Set(sourceValue);
 
-    if (!this->ExistLabel(sourceValue))
+    if (LabelSetImage::UnlabeledLabelValue!=sourceValue && !this->ExistLabel(sourceValue))
     {
       std::stringstream name;
       name << "object-" << sourceValue;
@@ -866,8 +839,8 @@ void mitk::LabelSetImage::MaskStampProcessing(ImageType *itkImage, mitk::Image *
     PixelType sourceValue = sourceIter.Get();
     PixelType targetValue = targetIter.Get();
 
-    if ((sourceValue != 0) &&
-        (forceOverwrite || !this->GetLabel(targetValue)->GetLocked())) // skip exterior and locked labels
+    if ((sourceValue != UnlabeledLabelValue) &&
+        (forceOverwrite || !this->IsLabelLocked(targetValue))) // skip exterior and locked labels
     {
       targetIter.Set(activeLabel);
     }
@@ -1138,6 +1111,17 @@ mitk::Label* mitk::LabelSetImage::GetLabel(LabelValueType value)
   return nullptr;
 };
 
+bool mitk::LabelSetImage::IsLabelLocked(LabelValueType value) const
+{
+  if (value == UnlabeledLabelValue)
+  {
+    return m_UnlabeledLabelLock;
+  }
+
+  const auto label = this->GetLabel(value);
+  return label->GetLocked();
+}
+
 const mitk::LabelSetImage::ConstLabelVectorType mitk::LabelSetImage::GetLabels() const
 {
   ConstLabelVectorType result;
@@ -1321,10 +1305,20 @@ public:
       }
       else
       {
-        auto label = this->m_DestinationLabelSet->GetLabel(existingDestinationValue);
-        if (nullptr == label || !label->GetLocked())
+        if (existingDestinationValue == m_DestinationBackground)
         {
-          return this->m_NewDestinationLabel;
+          if (!m_DestinationBackgroundLocked)
+          {
+            return this->m_NewDestinationLabel;
+          }
+        }
+        else
+        {
+          auto label = this->m_DestinationLabelSet->GetLabel(existingDestinationValue);
+          if (nullptr == label || !label->GetLocked())
+          {
+            return this->m_NewDestinationLabel;
+          }
         }
       }
     }
@@ -1419,7 +1413,7 @@ void mitk::TransferLabelContent(
 
   for (const auto& [sourceLabel, newDestinationLabel] : labelMapping)
   {
-    if (nullptr == destinationLabelSet->GetLabel(newDestinationLabel))
+    if (LabelSetImage::UnlabeledLabelValue!=newDestinationLabel && nullptr == destinationLabelSet->GetLabel(newDestinationLabel))
     {
       mitkThrow() << "Invalid call of TransferLabelContent. Defined destination label does not exist in destinationImage. newDestinationLabel: " << newDestinationLabel;
     }
@@ -1439,20 +1433,17 @@ void mitk::TransferLabelContent(
     mitkThrow() << "Invalid call of TransferLabelContent; sourceImage must not be null.";
   }
 
-  const auto sourceBackground = sourceImage->GetExteriorLabel()->GetValue();
-  const auto destinationBackground = destinationImage->GetExteriorLabel()->GetValue();
-  const auto destinationBackgroundLocked = destinationImage->GetExteriorLabel()->GetLocked();
   const auto destinationLabelSet = destinationImage->GetLabelSet(destinationImage->GetActiveLayer());
 
   for (const auto& mappingElement : labelMapping)
   {
-    if (!sourceImage->ExistLabel(mappingElement.first, sourceImage->GetActiveLayer()))
+    if (LabelSetImage::UnlabeledLabelValue != mappingElement.first && !sourceImage->ExistLabel(mappingElement.first, sourceImage->GetActiveLayer()))
     {
       mitkThrow() << "Invalid call of TransferLabelContent. Defined source label does not exist in sourceImage. SourceLabel: " << mappingElement.first;
     }
   }
 
-  TransferLabelContent(sourceImage, destinationImage, destinationLabelSet, sourceBackground, destinationBackground, destinationBackgroundLocked,
+  TransferLabelContent(sourceImage, destinationImage, destinationLabelSet, LabelSetImage::UnlabeledLabelValue, LabelSetImage::UnlabeledLabelValue, destinationImage->GetUnlabeledLabelLock(),
     labelMapping, mergeStyle, overwriteStlye, timeStep);
 }
 

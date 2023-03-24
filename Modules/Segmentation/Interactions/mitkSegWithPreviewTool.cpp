@@ -637,14 +637,16 @@ void mitk::SegWithPreviewTool::TransferLabelInformation(LabelMappingType& labelM
 {
   for (const auto& [sourceLabel, targetLabel] : labelMapping)
   {
-    if (!target->ExistLabel(targetLabel, target->GetActiveLayer()))
+    if (LabelSetImage::UnlabeledLabelValue != sourceLabel &&
+        LabelSetImage::UnlabeledLabelValue != targetLabel &&
+        !target->ExistLabel(targetLabel, target->GetActiveLayer()))
     {
       if (!source->ExistLabel(sourceLabel, source->GetActiveLayer()))
       {
         mitkThrow() << "Cannot prepare segmentation for preview transfer. Preview seems invalid as label is missing. Missing label: " << sourceLabel;
       }
 
-      auto clonedLabel = source->GetLabel(sourceLabel, source->GetActiveLayer())->Clone();
+      auto clonedLabel = source->GetLabel(sourceLabel)->Clone();
       clonedLabel->SetValue(targetLabel);
       target->GetActiveLabelSet()->AddLabel(clonedLabel);
     }

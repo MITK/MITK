@@ -33,7 +33,7 @@ namespace
     auto timeSelector = mitk::ImageTimeSelector::New();
     timeSelector->SetInput(labelSetImage);
 
-    const auto background = labelSetImage->GetExteriorLabel()->GetValue();
+    const auto background = mitk::LabelSetImage::UnlabeledLabelValue;
     const auto numLayers = labelSetImage->GetNumberOfLayers();
     const auto numTimeSteps = labelSetImage->GetTimeSteps();
 

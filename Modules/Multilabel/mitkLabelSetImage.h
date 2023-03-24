@@ -124,10 +124,18 @@ namespace mitk
     const mitk::Label* GetLabel(LabelValueType value) const;
     mitk::Label* GetLabel(LabelValueType value);
 
+    /** Returns the lock state of the label (including UnlabeledLabel value).
+     @pre Requested label does exist.*/
+    bool IsLabelLocked(LabelValueType value) const;
+
     /** Returns a vector with all labels currently defined in the MultiLabelSegmentation
     instance.*/
     const ConstLabelVectorType GetLabels() const;
     const LabelVectorType GetLabels();
+
+    itkGetConstMacro(UnlabeledLabelLock, bool);
+    itkSetMacro(UnlabeledLabelLock, bool);
+    itkBooleanMacro(UnlabeledLabelLock);
 
     ////////////////////////////////////////////////////////////////////
     //Message slots that allow to react to changes in an instance
@@ -254,6 +262,10 @@ namespace mitk
       using LabelToGroupMapType = std::map<LabelValueType, SpatialGroupIndexType>;
       LabelToGroupMapType m_LabelToGroupMap;
 
+    private:
+      /** Indicates if the MultiLabelSegmentation allows to overwrite unlabeled pixels in normal pixel manipulation operations (e.g. TransferLabelConent).*/
+      bool m_UnlabeledLabelLock;
+
     public:
 
       /**
@@ -350,7 +362,7 @@ namespace mitk
      * @param layer the layer in which the labels should be located
      * @return the mitk::Label if available otherwise nullptr
      */
-    mitk::Label *GetLabel(PixelType pixelValue, unsigned int layer = 0) const;
+    mitk::Label *GetLabel(PixelType pixelValue, unsigned int layer) const;
 
     /**
      * @brief Returns the currently active mitk::LabelSet
@@ -466,20 +478,6 @@ namespace mitk
 
     void OnLabelSetModified();
 
-    /**
-     * @brief Sets the label which is used as default exterior label when creating a new layer
-     * @param label the label which will be used as new exterior label
-     */
-    void SetExteriorLabel(mitk::Label *label);
-
-    /**
-     * @brief Gets the mitk::Label which is used as default exterior label
-     * @return the exterior mitk::Label
-     */
-    mitk::Label *GetExteriorLabel();
-
-    const mitk::Label *GetExteriorLabel() const;
-
   protected:
     mitkCloneMacro(Self);
 
@@ -525,8 +523,6 @@ namespace mitk
     int m_ActiveLayer;
 
     bool m_activeLayerInvalid;
-
-    mitk::Label::Pointer m_ExteriorLabel;
   };
 
   /**
@@ -624,7 +620,7 @@ namespace mitk
   @pre sourceImage and destinationImage must contain the indicated timeStep
   @pre destinationLabelSet must contain all indicated destinationLabels for mapping.*/
   MITKMULTILABEL_EXPORT void TransferLabelContent(const Image* sourceImage, Image* destinationImage, const mitk::LabelSet* destinationLabelSet,
-    mitk::Label::PixelType sourceBackground = 0, mitk::Label::PixelType destinationBackground = 0, bool destinationBackgroundLocked = false,
+    mitk::Label::PixelType sourceBackground = LabelSetImage::UnlabeledLabelValue, mitk::Label::PixelType destinationBackground = LabelSetImage::UnlabeledLabelValue, bool destinationBackgroundLocked = false,
     std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping = { {1,1} },
     MultiLabelSegmentation::MergeStyle mergeStyle = MultiLabelSegmentation::MergeStyle::Replace,
     MultiLabelSegmentation::OverwriteStyle overwriteStlye = MultiLabelSegmentation::OverwriteStyle::RegardLocks,

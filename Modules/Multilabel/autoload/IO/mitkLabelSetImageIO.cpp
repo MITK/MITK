@@ -499,10 +499,15 @@ namespace mitk
 
         label = mitk::LabelSetIOHelper::LoadLabelFromXMLDocument(labelElem);
 
-        if (label->GetValue() == 0) // set exterior label is needed to hold exterior information
-          output->SetExteriorLabel(label);
-        labelSet->AddLabel(label);
-        labelSet->SetLayer(layerIdx);
+        if (label->GetValue() != mitk::LabelSetImage::UnlabeledLabelValue)
+        {
+          labelSet->AddLabel(label);
+          labelSet->SetLayer(layerIdx);
+        }
+        else
+        {
+          MITK_INFO << "Multi label image contains a label specification for unlabeled pixels. This legacy information is ignored.";
+        }
       }
       output->AddLabelSetToLayer(layerIdx, labelSet);
     }

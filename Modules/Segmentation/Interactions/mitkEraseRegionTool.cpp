@@ -70,7 +70,7 @@ mitk::Image::Pointer mitk::EraseRegionTool::GenerateFillImage(const Image* worki
   seedLabelValue = accessor.GetPixelByIndex(seedIndex);
   Image::Pointer fillImage;
 
-  if ( seedLabelValue == labelSetImage->GetExteriorLabel()->GetValue())
+  if ( seedLabelValue == LabelSetImage::UnlabeledLabelValue)
   { //clicked on background remove everything which is not locked.
     fillImage = workingSlice->Clone();
     AccessByItk(fillImage, DoFillImage);
@@ -88,6 +88,6 @@ void mitk::EraseRegionTool::PrepareFilling(const Image* /*workingSlice*/, Point3
   auto labelSetImage = dynamic_cast<const LabelSetImage*>(this->GetWorkingData());
   if (nullptr != labelSetImage)
   {
-    m_FillLabelValue = labelSetImage->GetExteriorLabel()->GetValue();
+    m_FillLabelValue = LabelSetImage::UnlabeledLabelValue;
   }
 };

@@ -100,7 +100,6 @@ public:
     {
       const std::vector<QmitkMultiLabelSegTreeItem*>::size_type row = this->Row();
       if (row > 0)
-
         return m_parentItem->m_childItems[row-1];
     }
 
@@ -680,7 +679,7 @@ void QmitkMultiLabelTreeModel::GenerateInternalGroupTree(unsigned int groupID, Q
 
   for (auto lIter = labelSet->IteratorConstBegin(); lIter != labelSet->IteratorConstEnd(); lIter++)
   {
-    if (lIter->first== mitk::LabelSetImage::UnlabeledLabelValue || lIter->second == m_Segmentation->GetExteriorLabel()) continue;
+    if (lIter->first== mitk::LabelSetImage::UnlabeledLabelValue) continue;
 
     bool newItemCreated = false;
     AddLabelToGroupTree(lIter->second, groupItem, newItemCreated);
@@ -766,7 +765,7 @@ void QmitkMultiLabelTreeModel::OnLabelAdded(LabelValueType labelValue)
   {
     auto label = m_Segmentation->GetLabel(labelValue);
     if (nullptr == label) mitkThrow() << "Invalid internal state. Segmentation signaled the addition of an label that does not exist in the segmentation. Invalid label value:" << labelValue;
-    if (label == m_Segmentation->GetExteriorLabel()) return;
+    if (labelValue == mitk::LabelSetImage::UnlabeledLabelValue) return;
 
     auto groupItem = GetGroupItem(groupIndex, this->m_RootItem.get());
 
@@ -815,7 +814,7 @@ void QmitkMultiLabelTreeModel::OnLabelAdded(LabelValueType labelValue)
 
 void QmitkMultiLabelTreeModel::OnLabelModified(LabelValueType labelValue)
 {
-  if (labelValue == m_Segmentation->GetExteriorLabel()->GetValue()) return;
+  if (labelValue == mitk::LabelSetImage::UnlabeledLabelValue) return;
 
   auto instanceItem = GetInstanceItem(labelValue, this->m_RootItem.get());
 
@@ -841,7 +840,7 @@ void QmitkMultiLabelTreeModel::OnLabelModified(LabelValueType labelValue)
 
 void QmitkMultiLabelTreeModel::OnLabelRemoved(LabelValueType labelValue)
 {
-  if (labelValue == m_Segmentation->GetExteriorLabel()->GetValue()) return;
+  if (labelValue == mitk::LabelSetImage::UnlabeledLabelValue) return;
   auto instanceItem = GetInstanceItem(labelValue, this->m_RootItem.get());
 
   if (nullptr == instanceItem) mitkThrow() << "Internal invalid state. QmitkMultiLabelTreeModel recieved a LabelRemoved signal for a label that is not represented in the model. Invalid label: " << labelValue;

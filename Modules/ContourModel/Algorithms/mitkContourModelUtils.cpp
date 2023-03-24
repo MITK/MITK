@@ -235,9 +235,7 @@ void mitk::ContourModelUtils::FillSliceInSlice(
   }
   else
   {
-    const auto backgroundValue = labelImage->GetExteriorLabel()->GetValue();
-
-    if (paintingPixelValue != backgroundValue)
+    if (paintingPixelValue != LabelSetImage::UnlabeledLabelValue)
     {
       for (std::remove_const_t<decltype(numberOfPoints)> i = 0; i < numberOfPoints; ++i)
       {
@@ -246,7 +244,7 @@ void mitk::ContourModelUtils::FillSliceInSlice(
         {
           const auto existingValue = resultImage->GetPointData()->GetScalars()->GetTuple1(i);
 
-          if (!labelImage->GetLabel(existingValue, labelImage->GetActiveLayer())->GetLocked())
+          if (!labelImage->IsLabelLocked(existingValue))
             resultImage->GetPointData()->GetScalars()->SetTuple1(i, paintingPixelValue);
         }
       }

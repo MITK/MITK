@@ -28,7 +28,7 @@ class mitkLabelSetImageTestSuite : public mitk::TestFixture
   MITK_TEST(TestInitializeByLabeledImage);
   MITK_TEST(TestGetLabelSet);
   MITK_TEST(TestGetLabel);
-  MITK_TEST(TestSetExteriorLabel);
+  MITK_TEST(TestSetUnlabeledLabelLock);
   MITK_TEST(TestGetTotalNumberOfLabels);
   MITK_TEST(TestExistsLabel);
   MITK_TEST(TestExistsLabelSet);
@@ -219,21 +219,17 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Label from non existing layer should be nullptr", label3 == nullptr);
   }
 
-  void TestSetExteriorLabel()
+  void TestSetUnlabeledLabelLock()
   {
-    mitk::Label::Pointer exteriorLabel = mitk::Label::New();
-    exteriorLabel->SetName("MyExteriorSpecialLabel");
-    mitk::Label::PixelType value1 = 10000;
-    exteriorLabel->SetValue(value1);
-
-    m_LabelSetImage->SetExteriorLabel(exteriorLabel);
-    CPPUNIT_ASSERT_MESSAGE("Wrong label retrieved for layer 1",
-                           mitk::Equal(*m_LabelSetImage->GetExteriorLabel(), *exteriorLabel, 0.0001, true));
+    auto locked = m_LabelSetImage->GetUnlabeledLabelLock();
+    CPPUNIT_ASSERT_MESSAGE("Wrong UnlabeledLabelLock default state",
+      locked == false);
 
     // Exterior label should be set automatically for each new layer
-    m_LabelSetImage->AddLayer();
-    CPPUNIT_ASSERT_MESSAGE("Wrong label retrieved for layer 1",
-                           mitk::Equal(*m_LabelSetImage->GetLabel(10000, 1), *exteriorLabel, 0.0001, true));
+    m_LabelSetImage->SetUnlabeledLabelLock(true);
+    locked = m_LabelSetImage->GetUnlabeledLabelLock();
+    CPPUNIT_ASSERT_MESSAGE("Wrong UnlabeledLabelLock state",
+      locked == true);
   }
 
   void TestGetTotalNumberOfLabels()

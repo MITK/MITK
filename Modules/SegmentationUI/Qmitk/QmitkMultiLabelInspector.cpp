@@ -78,7 +78,7 @@ void QmitkMultiLabelInspector::Initialize()
   m_Controls->view->expandAll();
 
   m_LastValidSelectedLabels = {};
-  if (m_Segmentation->GetTotalNumberOfLabels() > 0 && !this->GetMultiSelectionMode())
+  if (m_Segmentation.IsNotNull() && !this->GetMultiSelectionMode() && m_Segmentation->GetTotalNumberOfLabels() > 0 )
   { //in singel selection mode, if at least one label exist select the first label of the mode.
     auto firstIndex = m_Model->FirstLabelInstanceIndex(QModelIndex());
     auto labelVariant = firstIndex.data(QmitkMultiLabelTreeModel::ItemModelRole::LabelInstanceValueRole);

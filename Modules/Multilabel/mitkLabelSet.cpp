@@ -129,17 +129,14 @@ mitk::Label* mitk::LabelSet::AddLabel(mitk::Label *label, bool addAsClone)
   newLabel->SetLayer(m_Layer);
 
   PixelType pixelValue = newLabel->GetValue();
-  if (!m_LabelContainer.empty())
-  {
-    auto usedValues = this->GetUsedLabelValues();
-    auto finding = std::find(usedValues.begin(), usedValues.end(), pixelValue);
+  auto usedValues = this->GetUsedLabelValues();
+  auto finding = std::find(usedValues.begin(), usedValues.end(), pixelValue);
 
-    if (!usedValues.empty() && usedValues.end() != finding)
-    {
-      pixelValue = usedValues.back()+1;
-      MITK_DEBUG << "LabelSet label collision. Tried to add a label with a value already in use. Value will be adapted. Old value: " << newLabel->GetValue() << "; new value: " << pixelValue;
-      newLabel->SetValue(pixelValue);
-    }
+  if (!usedValues.empty() && usedValues.end() != finding)
+  {
+    pixelValue = usedValues.back()+1;
+    MITK_DEBUG << "LabelSet label collision. Tried to add a label with a value already in use. Value will be adapted. Old value: " << newLabel->GetValue() << "; new value: " << pixelValue;
+    newLabel->SetValue(pixelValue);
   }
 
   // new map entry
@@ -190,6 +187,8 @@ void mitk::LabelSet::PrintSelf(std::ostream & /*os*/, itk::Indent /*indent*/) co
 
 void mitk::LabelSet::RemoveLabel(PixelType pixelValue)
 {
+  if (LabelSetImage::UnlabeledLabelValue == pixelValue) return;
+
   auto it = m_LabelContainer.rbegin();
   PixelType nextActivePixelValue = it->first;
 

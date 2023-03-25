@@ -15,12 +15,9 @@ found in the LICENSE file.
 #define QmitkSegmentationFlowControlView_h
 
 #include <berryISelectionListener.h>
-#include <berryIWorkbenchListener.h>
 #include <QmitkAbstractView.h>
 
 #include "mitkNodePredicateBase.h"
-
-#include <optional>
 
 namespace Ui
 {
@@ -35,7 +32,7 @@ namespace Ui
 
   The working directory is specified by command line arguments. If no commandline flag is set the current working directory will be used.
 */
-class QmitkSegmentationFlowControlView : public QmitkAbstractView, public berry::IWorkbenchListener
+class QmitkSegmentationFlowControlView : public QmitkAbstractView
 {
     // this is needed for all Qt objects that should have a Qt meta-object
     // (everything that derives from QObject and wants to have signal/slots)
@@ -57,12 +54,8 @@ public:
 
 protected slots:
 
-    void OnStoreButtonClicked();
     void OnAcceptButtonClicked();
-    void OnActiveTaskChanged(const std::optional<size_t>& index);
-    void OnCurrentTaskChanged(const std::optional<size_t>& index);
-    void OnStoreInterimResultShortcutActivated();
-    void OnAcceptSegmentationShortcutActivated();
+
 
 protected:
     void SetFocus() override;
@@ -71,8 +64,6 @@ protected:
     void NodeChanged(const mitk::DataNode* node) override;
     void NodeRemoved(const mitk::DataNode* node) override;
 
-    bool PreShutdown(berry::IWorkbench*, bool) override;
-
     void UpdateControls();
 
     Ui::SegmentationFlowControlView* m_Controls;
@@ -80,7 +71,6 @@ protected:
 private:
     QWidget *m_Parent;
     mitk::NodePredicateBase::Pointer m_SegmentationPredicate;
-    mitk::NodePredicateBase::Pointer m_SegmentationTaskListPredicate;
     QString m_OutputDir;
     QString m_FileExtension;
 };

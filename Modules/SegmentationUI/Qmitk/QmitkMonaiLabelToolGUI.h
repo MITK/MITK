@@ -34,6 +34,9 @@ protected:
 
   bool m_FirstPreviewComputation = true;
   EnableConfirmSegBtnFunctionType m_SuperclassEnableConfirmSegBtnFnc;
+
+  QString m_CONFIRM_QUESTION_TEXT =
+    "Data will be sent to the processing server devoid of any patient information. Are you sure you want continue?";
 };
 
 #endif

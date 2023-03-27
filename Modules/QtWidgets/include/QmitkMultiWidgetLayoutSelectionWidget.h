@@ -38,7 +38,10 @@ public:
 Q_SIGNALS:
 
   void LayoutSet(int row, int column);
+
+  // needs to be connected via Qt::DirectConnection (usually default), to ensure the stream pointers validity
   void SaveLayout(std::ostream* outStream);
+
   void LoadLayout(const nlohmann::json* jsonData);
 
 private Q_SLOTS:

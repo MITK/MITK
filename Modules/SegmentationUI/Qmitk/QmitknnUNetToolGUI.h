@@ -26,6 +26,7 @@ found in the LICENSE file.
 #include <QSettings>
 #include <QThread>
 #include <QmitkDataStorageComboBox.h>
+#include <QmitkSingleNodeSelectionWidget.h>
 #include <QmitknnUNetEnsembleLayout.h>
 #include <boost/functional/hash.hpp>
 #include <unordered_map>
@@ -352,7 +353,7 @@ private:
    * @brief Stores all dynamically added ctk-path-line-edit UI elements.
    *
    */
-  std::vector<QmitkDataStorageComboBox*> m_Modalities;
+  std::vector<QmitkSingleNodeSelectionWidget*> m_Modalities;
   std::vector<QLabel*> m_ModalLabels;
 
   std::vector<std::unique_ptr<QmitknnUNetTaskParamsUITemplate>> m_EnsembleParams;

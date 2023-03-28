@@ -18,7 +18,7 @@ found in the LICENSE file.
 
 #include <mitkDICOMQIPropertyHelper.h>
 #include <mitkIOUtil.h>
-#include <mitkLabelSetIOHelper.h>
+#include <mitkMultiLabelIOHelper.h>
 #include <mitkLabelSetImageHelper.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateFunction.h>
@@ -739,7 +739,7 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
     if (m_TaskList->HasPreset(current))
     {
       const auto path = m_TaskList->GetAbsolutePath(m_TaskList->GetPreset(current));
-      mitk::LabelSetIOHelper::LoadLabelSetImagePreset(path.string(), segmentation);
+      mitk::MultiLabelIOHelper::LoadLabelSetImagePreset(path.string(), segmentation);
     }
     else
     {

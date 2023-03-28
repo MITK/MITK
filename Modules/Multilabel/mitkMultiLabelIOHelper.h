@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkLabelSetIOHelper_h
-#define mitkLabelSetIOHelper_h
+#ifndef mitkMultiLabelIOHelper_h
+#define mitkMultiLabelIOHelper_h
 
 #include <MitkMultilabelExports.h>
 #include <itkSmartPointer.h>
@@ -29,12 +29,12 @@ namespace mitk
   class Label;
 
   /**
-   * @brief The LabelSetIOHelper is a static helper class that supports serialization of mitk::LabelSetImage
+   * @brief The MultiLabelIOHelper is a static helper class that supports serialization of mitk::LabelSetImage
    *
    * This class provides static functions for converting mitk::Label into XML and also allows the serialization
    * of mitk::LabelSet as presets
    */
-  class MITKMULTILABEL_EXPORT LabelSetIOHelper
+  class MITKMULTILABEL_EXPORT MultiLabelIOHelper
   {
   public:
     /**
@@ -91,7 +91,7 @@ namespace mitk
     static bool PropertyFromXMLElement(std::string &key, itk::SmartPointer<mitk::BaseProperty> &prop, const tinyxml2::XMLElement *elem);
 
   private:
-    LabelSetIOHelper();
+    MultiLabelIOHelper();
   };
 }
 

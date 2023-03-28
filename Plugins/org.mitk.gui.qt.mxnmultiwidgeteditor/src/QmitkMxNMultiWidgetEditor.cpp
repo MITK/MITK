@@ -201,6 +201,10 @@ void QmitkMxNMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
           this, &QmitkMxNMultiWidgetEditor::OnSynchronize);
   connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::InteractionSchemeChanged,
           this, &QmitkMxNMultiWidgetEditor::OnInteractionSchemeChanged);
+  connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::SaveLayout,
+    static_cast<QmitkMxNMultiWidget*>(GetMultiWidget()), &QmitkMxNMultiWidget::SaveLayout, Qt::DirectConnection);
+  connect(m_Impl->m_ConfigurationToolBar, &QmitkMultiWidgetConfigurationToolBar::LoadLayout,
+    static_cast<QmitkMxNMultiWidget*>(GetMultiWidget()), &QmitkMxNMultiWidget::LoadLayout);
 
   GetSite()->GetPage()->AddPartListener(this);
 

@@ -27,6 +27,9 @@ found in the LICENSE file.
 // qt
 #include <QGridLayout>
 #include <QMessageBox>
+#include <QSplitter>
+
+#include <fstream>
 
 QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
                                          Qt::WindowFlags f/* = 0*/,
@@ -379,7 +382,7 @@ void QmitkMxNMultiWidget::SetLayoutImpl()
   GetMultiWidgetLayoutManager()->SetLayoutDesign(QmitkMultiWidgetLayoutManager::LayoutDesign::DEFAULT);
 }
 
-void QmitkMxNMultiWidget::CreateRenderWindowWidget()
+QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateRenderWindowWidget()
 {
   // create the render window widget and connect signal / slot
   QString renderWindowWidgetName = GetNameFromIndex(GetNumberOfRenderWindowWidgets());
@@ -394,6 +397,8 @@ void QmitkMxNMultiWidget::CreateRenderWindowWidget()
 
   connect(utilityWidget, &QmitkRenderWindowUtilityWidget::SynchronizationToggled,
     this, &QmitkMxNMultiWidget::ToggleSynchronization);
+  connect(this, &QmitkMxNMultiWidget::UpdateUtilityWidgetViewPlanes,
+    utilityWidget, &QmitkRenderWindowUtilityWidget::UpdateViewPlaneSelection);
 
   // needs to be done after 'QmitkRenderWindowUtilityWidget::ToggleSynchronization' has been connected
   // initially synchronize the node selection widget
@@ -409,6 +414,183 @@ void QmitkMxNMultiWidget::CreateRenderWindowWidget()
   m_TimeNavigationController->ConnectGeometryTimeEvent(renderWindow->GetSliceNavigationController());
   // reverse connection between the render window's slice navigation controller and the time navigation controller
   renderWindow->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController);
+
+  return renderWindowWidget;
+}
+
+void QmitkMxNMultiWidget::LoadLayout(const nlohmann::json* jsonData)
+{
+  if ((*jsonData).is_null())
+  {
+    QMessageBox::warning(this, "Load layout", "Could not read window layout");
+    return;
+  }
+
+  unsigned int windowCounter = 0;
+
+  try
+  {
+    auto version = jsonData->at("version").get<std::string>();
+    if (version != "1.0")
+    {
+      QMessageBox::warning(this, "Load layout", "Unknown layout version, could not load");
+      return;
+    }
+
+    delete this->layout();
+    auto content = BuildLayoutFromJSON(jsonData, &windowCounter);
+    auto hBoxLayout = new QHBoxLayout(this);
+    this->setLayout(hBoxLayout);
+    hBoxLayout->addWidget(content);
+    emit UpdateUtilityWidgetViewPlanes();
+  }
+  catch (nlohmann::json::out_of_range& e)
+  {
+    MITK_ERROR << "Error in loading window layout from JSON: " << e.what();
+    return;
+  }
+
+  while (GetNumberOfRenderWindowWidgets() > windowCounter)
+  {
+    RemoveRenderWindowWidget();
+  }
+}
+
+void QmitkMxNMultiWidget::SaveLayout(std::ostream* outStream)
+{
+  if (outStream == nullptr)
+  {
+    return;
+  }
+
+  auto layout = this->layout();
+  if (layout == nullptr)
+    return;
+
+  // There should only ever be one item: a splitter
+  auto widget = layout->itemAt(0)->widget();
+  auto splitter = dynamic_cast<QSplitter*>(widget);
+  if (!splitter)
+  {
+    MITK_ERROR << "Tried to save unexpected layout format. Make sure the layout of this instance contains a single QSplitter.";
+    return;
+  }
+
+  auto layoutJSON = BuildJSONFromLayout(splitter);
+  layoutJSON["version"] = "1.0";
+  layoutJSON["name"] = "Custom Layout";
+
+  *outStream << std::setw(4) << layoutJSON << std::endl;
+
+}
+
+nlohmann::json QmitkMxNMultiWidget::BuildJSONFromLayout(const QSplitter* splitter)
+{
+  nlohmann::json resultJSON;
+  resultJSON["isWindow"] = false;
+  resultJSON["vertical"] = (splitter->orientation() == Qt::Vertical) ? true : false;
+  auto sizes = splitter->sizes();
+
+  auto content = nlohmann::json::array();
+
+  auto countSplitter = splitter->count();
+  for (int i = 0; i < countSplitter; ++i)
+  {
+    auto widget = splitter->widget(i);
+    nlohmann::json widgetJSON;
+    if (auto widgetSplitter = dynamic_cast<QSplitter*>(widget); widgetSplitter)
+    {
+      widgetJSON = BuildJSONFromLayout(widgetSplitter);
+    }
+    else if (auto widgetWindow = dynamic_cast<QmitkRenderWindowWidget*>(widget); widgetWindow)
+    {
+      widgetJSON["isWindow"] = true;
+      widgetJSON["viewDirection"] = widgetWindow->GetSliceNavigationController()->GetViewDirectionAsString();
+    }
+    widgetJSON["size"] = sizes[i];
+    content.push_back(widgetJSON);
+  }
+  resultJSON["content"] = content;
+  return resultJSON;
+}
+
+QSplitter* QmitkMxNMultiWidget::BuildLayoutFromJSON(const nlohmann::json* jsonData, unsigned int* windowCounter, QSplitter* parentSplitter)
+{
+
+  bool vertical = jsonData->at("vertical").get<bool>();
+  auto orientation = vertical ? Qt::Vertical : Qt::Horizontal;
+
+  auto split = new QSplitter(orientation, parentSplitter);
+  QList<int> sizes;
+
+  for (auto object : jsonData->at("content"))
+  {
+    bool isWindow = object["isWindow"].get<bool>();
+    int size = object["size"].get<int>();
+    sizes.append(size);
+
+    if (isWindow)
+    {
+      auto viewDirection = object["viewDirection"].get<std::string>();
+      mitk::AnatomicalPlane viewPlane = mitk::AnatomicalPlane::Sagittal;
+      if (viewDirection == "Axial")
+      {
+        viewPlane = mitk::AnatomicalPlane::Axial;
+      }
+      else if (viewDirection == "Coronal")
+      {
+        viewPlane = mitk::AnatomicalPlane::Coronal;
+      }
+      else if (viewDirection == "Original")
+      {
+        viewPlane = mitk::AnatomicalPlane::Original;
+      }
+      else if (viewDirection == "Sagittal")
+      {
+        viewPlane = mitk::AnatomicalPlane::Sagittal;
+      }
+
+      QmitkAbstractMultiWidget::RenderWindowWidgetPointer window = nullptr;
+      QString renderWindowName;
+      QmitkAbstractMultiWidget::RenderWindowWidgetMap::iterator it;
+
+      // repurpose existing render windows as far as they already exist
+      if (*windowCounter < GetRenderWindowWidgets().size())
+      {
+        renderWindowName = this->GetNameFromIndex(*windowCounter);
+        auto renderWindowWidgets = GetRenderWindowWidgets();
+        it = renderWindowWidgets.find(renderWindowName);
+        if (it != renderWindowWidgets.end())
+        {
+          window = it->second;
+        }
+        else
+        {
+          MITK_ERROR << "Could not find render window " << renderWindowName.toStdString() << ", although it should be there.";
+        }
+      }
+
+      if (window == nullptr)
+      {
+        window = CreateRenderWindowWidget();
+      }
+
+      window->GetSliceNavigationController()->SetDefaultViewDirection(viewPlane);
+      window->GetSliceNavigationController()->Update();
+      split->addWidget(window.get());
+      window->show();
+      (*windowCounter)++;
+    }
+    else
+    {
+      auto subSplitter = BuildLayoutFromJSON(&object, windowCounter, split);
+      split->addWidget(subSplitter);
+    }
+  }
+  split->setSizes(sizes);
+
+  return split;
+
 }
 
 void QmitkMxNMultiWidget::SetInitialSelection()

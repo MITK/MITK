@@ -176,6 +176,10 @@ set(UI_FILES
   src/QmitkSynchronizedNodeSelectionWidget.ui
 )
 
+set(RESOURCE_FILES
+  mxnLayout_twoRowsEachDirection.json
+)
+
 set(QRC_FILES
   resource/Qmitk.qrc
 )

@@ -88,21 +88,7 @@ QmitkRenderWindowUtilityWidget::QmitkRenderWindowUtilityWidget(
   QStringList viewDirections{ "axial", "coronal", "sagittal"};
   m_ViewDirectionSelector->insertItems(0, viewDirections);
   connect(m_ViewDirectionSelector, &QComboBox::currentTextChanged, this, &QmitkRenderWindowUtilityWidget::ChangeViewDirection);
-  auto viewDirection = sliceNavigationController->GetDefaultViewDirection();
-  switch (viewDirection)
-  {
-  case mitk::AnatomicalPlane::Axial:
-    m_ViewDirectionSelector->setCurrentIndex(0);
-    break;
-  case mitk::AnatomicalPlane::Coronal:
-    m_ViewDirectionSelector->setCurrentIndex(1);
-    break;
-  case mitk::AnatomicalPlane::Sagittal:
-    m_ViewDirectionSelector->setCurrentIndex(2);
-    break;
-  default:
-    break;
-  }
+  UpdateViewPlaneSelection();
 
   layout->addWidget(m_ViewDirectionSelector);
 
@@ -172,4 +158,24 @@ void QmitkRenderWindowUtilityWidget::SetGeometry(const itk::EventObject& event)
 void QmitkRenderWindowUtilityWidget::ChangeViewDirection(const QString& viewDirection)
 {
   m_RenderWindowViewDirectionController->SetViewDirectionOfRenderer(viewDirection.toStdString());
+}
+
+void QmitkRenderWindowUtilityWidget::UpdateViewPlaneSelection()
+{
+  const auto sliceNavigationController = m_BaseRenderer->GetSliceNavigationController();
+  const auto viewDirection = sliceNavigationController->GetDefaultViewDirection();
+  switch (viewDirection)
+  {
+  case mitk::AnatomicalPlane::Axial:
+    m_ViewDirectionSelector->setCurrentIndex(0);
+    break;
+  case mitk::AnatomicalPlane::Coronal:
+    m_ViewDirectionSelector->setCurrentIndex(1);
+    break;
+  case mitk::AnatomicalPlane::Sagittal:
+    m_ViewDirectionSelector->setCurrentIndex(2);
+    break;
+  default:
+    break;
+  }
 }

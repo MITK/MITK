@@ -20,6 +20,10 @@ found in the LICENSE file.
 #include <QmitkSynchronizedNodeSelectionWidget.h>
 #include <QmitkSynchronizedWidgetConnector.h>
 
+#include <nlohmann/json.hpp>
+
+class QSplitter;
+
 /**
 * @brief The 'QmitkMxNMultiWidget' is a 'QmitkAbstractMultiWidget' that is used to display multiple render windows at once.
 *        Render windows can dynamically be added and removed to change the layout of the multi widget. This
@@ -96,11 +100,14 @@ public Q_SLOTS:
   void wheelEvent(QWheelEvent* e) override;
   void mousePressEvent(QMouseEvent* e) override;
   void moveEvent(QMoveEvent* e) override;
+  void LoadLayout(const nlohmann::json* jsonData);
+  void SaveLayout(std::ostream* outStream);
 
 Q_SIGNALS:
 
   void WheelMoved(QWheelEvent *);
   void Moved();
+  void UpdateUtilityWidgetViewPlanes();
 
 protected:
 
@@ -111,9 +118,12 @@ private:
   void SetLayoutImpl() override;
   void SetInteractionSchemeImpl() override { }
 
-  void CreateRenderWindowWidget();
+  QmitkAbstractMultiWidget::RenderWindowWidgetPointer CreateRenderWindowWidget();
   void SetInitialSelection();
   void ToggleSynchronization(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget);
+
+  static nlohmann::json BuildJSONFromLayout(const QSplitter* splitter);
+  QSplitter* BuildLayoutFromJSON(const nlohmann::json* jsonData, unsigned int* windowCounter, QSplitter* parentSplitter = nullptr);
 
   mitk::SliceNavigationController* m_TimeNavigationController;
   std::unique_ptr<QmitkSynchronizedWidgetConnector> m_SynchronizedWidgetConnector;

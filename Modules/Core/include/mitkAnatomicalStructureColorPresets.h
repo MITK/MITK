@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef ANATOMICALSTRUCTURECOLORPRESETS_H_HEADER
-#define ANATOMICALSTRUCTURECOLORPRESETS_H_HEADER
+#ifndef mitkAnatomicalStructureColorPresets_h
+#define mitkAnatomicalStructureColorPresets_h
 
 #include <vtkXMLParser.h>
 #include <MitkCoreExports.h>

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef VtkImageReader_H_HEADER_INCLUDED
-#define VtkImageReader_H_HEADER_INCLUDED
+#ifndef mitkVtkImageReader_h
+#define mitkVtkImageReader_h
 
 #include "mitkFileReader.h"
 #include "mitkImageSource.h"
@@ -63,4 +63,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* VtkImageReader_H_HEADER_INCLUDED */
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKPLANELANDMARKPROJECTOR_H_HEADER_INCLUDED_C1C68A2C
-#define MITKPLANELANDMARKPROJECTOR_H_HEADER_INCLUDED_C1C68A2C
+#ifndef mitkPlaneLandmarkProjector_h
+#define mitkPlaneLandmarkProjector_h
 
 #include "MitkAlgorithmsExtExports.h"
 #include "mitkLandmarkProjector.h"
@@ -54,4 +54,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKPLANELANDMARKPROJECTOR_H_HEADER_INCLUDED_C1C68A2C */
+#endif

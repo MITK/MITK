@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKCONVERTTOCONCENTRATIONTURBOFLASCHFUNCTOR_H
-#define MITKCONVERTTOCONCENTRATIONTURBOFLASCHFUNCTOR_H
+#ifndef mitkConvertToConcentrationTurboFlashFunctor_h
+#define mitkConvertToConcentrationTurboFlashFunctor_h
 
 #include "MitkPharmacokineticsExports.h"
 
@@ -64,4 +64,4 @@ namespace mitk {
 
 }
 
-#endif // MITKCONVERTTOCONCENTRATIONTURBOFLASCHFUNCTOR_H
+#endif

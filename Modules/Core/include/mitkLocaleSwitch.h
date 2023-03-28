@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkLocaleSwitch_h
-#define __mitkLocaleSwitch_h
+#ifndef mitkLocaleSwitch_h
+#define mitkLocaleSwitch_h
 
 #include "MitkCoreExports.h"
 
@@ -69,4 +69,4 @@ namespace mitk
   };
 }
 
-#endif // __mitkLocaleSwitch_h
+#endif

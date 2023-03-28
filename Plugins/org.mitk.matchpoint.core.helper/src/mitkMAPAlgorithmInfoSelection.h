@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_MAP_ALGORITHM_INFO_SELECTION_H
-#define _MITK_MAP_ALGORITHM_INFO_SELECTION_H
+#ifndef mitkMAPAlgorithmInfoSelection_h
+#define mitkMAPAlgorithmInfoSelection_h
 
 #include <berryIStructuredSelection.h>
 

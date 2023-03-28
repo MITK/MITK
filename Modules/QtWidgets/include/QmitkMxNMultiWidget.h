@@ -10,12 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKMXNMULTIWIDGET_H
-#define QMITKMXNMULTIWIDGET_H
+#ifndef QmitkMxNMultiWidget_h
+#define QmitkMxNMultiWidget_h
+
+#include "MitkQtWidgetsExports.h"
 
 // qt widgets module
-#include "MitkQtWidgetsExports.h"
 #include "QmitkAbstractMultiWidget.h"
+#include <QmitkSynchronizedNodeSelectionWidget.h>
+#include <QmitkSynchronizedWidgetConnector.h>
 
 #include <nlohmann/json.hpp>
 
@@ -47,16 +50,26 @@ public:
   QmitkRenderWindow* GetRenderWindow(const mitk::AnatomicalPlane& orientation) const override;
 
   void SetActiveRenderWindowWidget(RenderWindowWidgetPointer activeRenderWindowWidget) override;
+
   /**
-   * @brief Set the reference geometry for interaction inside the active render windows of the MxNMultiWidget.
-   *
-   * @param referenceGeometry   The reference geometry which is used for updating the
-   *                            time geometry inside the active render window.
-   * @param resetCamera         If true, the camera and crosshair will be reset to the default view (centered, no zoom).
-   *                            If false, the current crosshair position and the camera zoom will be stored and reset
-   *                            after the reference geometry has been updated.
-   */
-  void SetReferenceGeometry(const mitk::TimeGeometry* referenceGeometry, bool resetCamera) override;
+  * @brief Initialize the active render windows of the MxNMultiWidget to the given geometry.
+  *
+  * @param geometry       The geometry to be used to initialize / update the
+  *                       active render window's time and slice navigation controller.
+  * @param resetCamera    If true, the camera and crosshair will be reset to the default view (centered, no zoom).
+  *                       If false, the current crosshair position and the camera zoom will be stored and reset
+  *                       after the reference geometry has been updated.
+  */
+  void InitializeViews(const mitk::TimeGeometry* geometry, bool resetCamera) override;
+
+  /**
+  * @brief Forward the given time geometry to all base renderers, so that they can store it as their
+  *        interaction reference geometry.
+  *        This will update the alignment status of the reference geometry for each base renderer.
+  *        For more details, see 'BaseRenderer::SetInteractionReferenceGeometry'.
+  *        Overridem from 'QmitkAbstractMultiWidget'.
+  */
+  void SetInteractionReferenceGeometry(const mitk::TimeGeometry* referenceGeometry) override;
 
   /**
   * @brief Returns true if the render windows are coupled; false if not.
@@ -105,13 +118,17 @@ private:
   void SetInteractionSchemeImpl() override { }
 
   QmitkAbstractMultiWidget::RenderWindowWidgetPointer CreateRenderWindowWidget();
+  void SetInitialSelection();
+  void ToggleSynchronization(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget);
+
   static nlohmann::json BuildJSONFromLayout(const QSplitter* splitter);
   QSplitter* BuildLayoutFromJSON(const nlohmann::json* jsonData, unsigned int* windowCounter, QSplitter* parentSplitter = nullptr);
 
   mitk::SliceNavigationController* m_TimeNavigationController;
+  std::unique_ptr<QmitkSynchronizedWidgetConnector> m_SynchronizedWidgetConnector;
 
   bool m_CrosshairVisibility;
 
 };
 
-#endif // QMITKMXNMULTIWIDGET_H
+#endif

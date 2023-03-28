@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATASTORAGEVIEWERTESTVIEW_H
-#define QMITKDATASTORAGEVIEWERTESTVIEW_H
+#ifndef QmitkDataStorageViewerTestView_h
+#define QmitkDataStorageViewerTestView_h
 
 // data storage viewer test plugin
 #include "ui_QmitkDataStorageViewerTestControls.h"
@@ -66,4 +66,4 @@ private:
   std::unique_ptr<QmitkSelectionServiceConnector> m_SelectionServiceConnector4;
 };
 
-#endif // QMITKDATASTORAGEVIEWERTESTVIEW_H
+#endif

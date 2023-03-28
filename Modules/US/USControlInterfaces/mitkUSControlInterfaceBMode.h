@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKUSControlInterfaceBMode_H_HEADER_INCLUDED_
-#define MITKUSControlInterfaceBMode_H_HEADER_INCLUDED_
+#ifndef mitkUSControlInterfaceBMode_h
+#define mitkUSControlInterfaceBMode_h
 
 #include "mitkUSAbstractControlInterface.h"
 
@@ -251,4 +251,4 @@ protected:
 };
 } // namespace mitk
 
-#endif // MITKUSControlInterfaceBMode_H_HEADER_INCLUDED_
+#endif

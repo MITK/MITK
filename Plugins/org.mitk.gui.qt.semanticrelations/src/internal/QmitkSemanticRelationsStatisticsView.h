@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKSEMANTICRELATIONSSTATISTICSVIEW_H
-#define QMITKSEMANTICRELATIONSSTATISTICSVIEW_H
+#ifndef QmitkSemanticRelationsStatisticsView_h
+#define QmitkSemanticRelationsStatisticsView_h
 
 // semantic relations plugin
 #include "ui_QmitkSemanticRelationsStatisticsControls.h"
@@ -71,4 +71,4 @@ private:
   QmitkStatisticsTreeModel* m_StatisticsTreeModel;
 };
 
-#endif // QMITKSEMANTICRELATIONSSTATISTICSVIEW_H
+#endif

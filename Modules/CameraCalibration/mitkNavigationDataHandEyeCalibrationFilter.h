@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKNavigationDataHandEyeCalibrationFilter_H_HEADER_INCLUDED_
-#define MITKNavigationDataHandEyeCalibrationFilter_H_HEADER_INCLUDED_
+#ifndef mitkNavigationDataHandEyeCalibrationFilter_h
+#define mitkNavigationDataHandEyeCalibrationFilter_h
 
 #include "mitkNavigationDataToNavigationDataFilter.h"
 #include "mitkNavigationData.h"
@@ -90,4 +90,4 @@ namespace mitk {
     std::map<int,Transform::Pointer> m_HandEyeTransformations;
   };
 } // namespace mitk
-#endif /* MITKNavigationDataHandEyeCalibrationFilter_H_HEADER_INCLUDED_ */
+#endif

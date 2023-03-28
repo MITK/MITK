@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKUSNAVIGATIONSTEPZONEMARKING_H
-#define QMITKUSNAVIGATIONSTEPZONEMARKING_H
+#ifndef QmitkUSNavigationStepZoneMarking_h
+#define QmitkUSNavigationStepZoneMarking_h
 
 #include "QmitkUSAbstractNavigationStep.h"
 
@@ -127,4 +127,4 @@ private:
   Ui::QmitkUSNavigationStepZoneMarking *ui;
 };
 
-#endif // QMITKUSNAVIGATIONSTEPZONEMARKING_H
+#endif

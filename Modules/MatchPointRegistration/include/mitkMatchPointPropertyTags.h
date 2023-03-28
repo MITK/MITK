@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_MATCHPOINTPROPERTY_TAGS__H_
-#define _MITK_MATCHPOINTPROPERTY_TAGS__H_
+#ifndef mitkMatchPointPropertyTags_h
+#define mitkMatchPointPropertyTags_h
 
 // MITK
 #include "MitkMatchPointRegistrationExports.h"
@@ -42,5 +42,3 @@ namespace mitk
 
 
 #endif
-
-

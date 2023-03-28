@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITK_FREE_ISO_DOSE_LEVEL_WIDGET_H
-#define QMITK_FREE_ISO_DOSE_LEVEL_WIDGET_H
+#ifndef QmitkFreeIsoDoseLevelWidget_h
+#define QmitkFreeIsoDoseLevelWidget_h
 
 #include "MitkRTUIExports.h"
 
@@ -71,4 +71,4 @@ protected:
 
 };
 
-#endif // QmitkFreeIsoDoseLevelWidget_H
+#endif

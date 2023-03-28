@@ -296,4 +296,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* mitkPixelType_h */
+#endif

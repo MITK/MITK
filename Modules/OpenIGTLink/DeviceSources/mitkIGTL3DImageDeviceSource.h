@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef IGTL3DIMAGEDEVICESOURCE_H_HEADER_INCLUDED_
-#define IGTL3DIMAGEDEVICESOURCE_H_HEADER_INCLUDED_
+#ifndef mitkIGTL3DImageDeviceSource_h
+#define mitkIGTL3DImageDeviceSource_h
 
 #include "mitkIGTLDeviceSource.h"
 
@@ -48,4 +48,4 @@ namespace mitk {
     void GenerateData() override;
   };
 } // namespace mitk
-#endif /* MITKIGTLDeviceSource_H_HEADER_INCLUDED_ */
+#endif

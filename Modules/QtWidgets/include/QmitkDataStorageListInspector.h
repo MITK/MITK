@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATASTORAGELISTINSPECTOR_H
-#define QMITKDATASTORAGELISTINSPECTOR_H
+#ifndef QmitkDataStorageListInspector_h
+#define QmitkDataStorageListInspector_h
 
 #include <MitkQtWidgetsExports.h>
 
@@ -45,4 +45,4 @@ protected:
   QmitkSimpleTextOverlayWidget* m_Overlay;
 };
 
-#endif // QMITKDATASTORAGELISTINSPECTOR_H
+#endif

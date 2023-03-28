@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKSMARTPOINTERPROPERTY_H_HEADER_INCLUDED_C126B791
-#define MITKSMARTPOINTERPROPERTY_H_HEADER_INCLUDED_C126B791
+#ifndef mitkSmartPointerProperty_h
+#define mitkSmartPointerProperty_h
 
 #include "mitkBaseProperty.h"
 #include "mitkUIDGenerator.h"
@@ -95,4 +95,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKSMARTPOINTERPROPERTY_H_HEADER_INCLUDED_C126B791 */
+#endif

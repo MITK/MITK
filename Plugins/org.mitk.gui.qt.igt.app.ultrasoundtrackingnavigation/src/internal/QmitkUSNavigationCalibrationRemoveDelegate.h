@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef QMITKUSNAVIGATIONCALIBRATIONREMOVEDELEGATE_H
-#define QMITKUSNAVIGATIONCALIBRATIONREMOVEDELEGATE_H
+#ifndef QmitkUSNavigationCalibrationRemoveDelegate_h
+#define QmitkUSNavigationCalibrationRemoveDelegate_h
 
 #include <QStyledItemDelegate>
 
@@ -31,4 +31,4 @@ public:
   bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index) override;
 };
 
-#endif // QMITKUSNAVIGATIONCALIBRATIONREMOVEDELEGATE_H
+#endif

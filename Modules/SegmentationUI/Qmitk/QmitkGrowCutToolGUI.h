@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkGrowCutToolGUI_h_Included
-#define QmitkGrowCutToolGUI_h_Included
+#ifndef QmitkGrowCutToolGUI_h
+#define QmitkGrowCutToolGUI_h
 
 #include "QmitkMultiLabelSegWithPreviewToolGUIBase.h"
 

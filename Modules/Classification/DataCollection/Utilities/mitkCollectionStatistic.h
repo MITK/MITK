@@ -155,4 +155,4 @@ private:
 };
 }
 
-#endif // mitkCollectionStatistic_h
+#endif

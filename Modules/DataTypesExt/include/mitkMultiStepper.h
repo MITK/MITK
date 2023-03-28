@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MULTISTEPPER_H_HEADER_INCLUDED
-#define MULTISTEPPER_H_HEADER_INCLUDED
+#ifndef mitkMultiStepper_h
+#define mitkMultiStepper_h
 
 #include "MitkDataTypesExtExports.h"
 #include "mitkCommon.h"
@@ -58,4 +58,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MULTISTEPPER_H_HEADER_INCLUDED */
+#endif

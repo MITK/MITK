@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKUSTARGETPLACEMENTQUALITYCALCULATOR_H
-#define MITKUSTARGETPLACEMENTQUALITYCALCULATOR_H
+#ifndef mitkUSTargetPlacementQualityCalculator_h
+#define mitkUSTargetPlacementQualityCalculator_h
 
 #include <mitkCommon.h>
 #include <mitkNumericTypes.h>
@@ -86,4 +86,4 @@ protected:
 };
 } // namespace mitk
 
-#endif // MITKUSTARGETPLACEMENTQUALITYCALCULATOR_H
+#endif

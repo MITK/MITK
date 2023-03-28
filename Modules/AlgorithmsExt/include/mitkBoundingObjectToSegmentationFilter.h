@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef MITKBOUNDINGOBJECTTOSEGMENTATIONFILTER_H
-#define MITKBOUNDINGOBJECTTOSEGMENTATIONFILTER_H
+#ifndef mitkBoundingObjectToSegmentationFilter_h
+#define mitkBoundingObjectToSegmentationFilter_h
 
 #include <mitkBoundingObjectGroup.h>
 #include <mitkImageToImageFilter.h>

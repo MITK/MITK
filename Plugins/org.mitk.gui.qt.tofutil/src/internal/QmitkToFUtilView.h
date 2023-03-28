@@ -160,5 +160,4 @@ private:
   void ResetGUIToDefault();
 };
 
-#endif // _QMITKTOFUTILVIEW_H_INCLUDED
-
+#endif

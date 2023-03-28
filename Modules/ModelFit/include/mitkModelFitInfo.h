@@ -192,4 +192,4 @@ namespace mitk
   }
 }
 
-#endif // mitkModelFit_h
+#endif

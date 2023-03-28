@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkOclImage_h
-#define __mitkOclImage_h
+#ifndef mitkOclImage_h
+#define mitkOclImage_h
 
 #define GPU_DATA 0
 #define CPU_DATA 1
@@ -198,4 +198,4 @@ public:
 };
 
 }
-#endif //__mitkOclImage_h
+#endif

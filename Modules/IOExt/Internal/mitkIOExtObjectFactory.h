@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef COREEXTOBJECTFACTORY_H_INCLUDED
-#define COREEXTOBJECTFACTORY_H_INCLUDED
+#ifndef mitkIOExtObjectFactory_h
+#define mitkIOExtObjectFactory_h
 
 #include "mitkCoreObjectFactoryBase.h"
 

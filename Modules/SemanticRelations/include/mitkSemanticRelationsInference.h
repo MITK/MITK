@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKSEMANTICRELATIONSINFERENCE_H
-#define MITKSEMANTICRELATIONSINFERENCE_H
+#ifndef mitkSemanticRelationsInference_h
+#define mitkSemanticRelationsInference_h
 
 #include <MitkSemanticRelationsExports.h>
 
@@ -344,4 +344,4 @@ namespace mitk
   } // namespace SemanticRelationsInference
 } // namespace mitk
 
-#endif // MITKSEMANTICRELATIONSINFERENCE_H
+#endif

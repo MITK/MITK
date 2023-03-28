@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkOclResourceServiceImpl_h
-#define __mitkOclResourceServiceImpl_h
+#ifndef mitkOclResourceServiceImpl_p_h
+#define mitkOclResourceServiceImpl_p_h
 
 #include <map>
 
@@ -179,4 +179,4 @@ public:
   unsigned int GetMaximumImageSize(unsigned int dimension, cl_mem_object_type _imagetype);
 };
 
-#endif // __mitkOclResourceServiceImpl_h
+#endif

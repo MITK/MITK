@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_CONTOURMODEL_SOURCE_H
-#define _MITK_CONTOURMODEL_SOURCE_H
+#ifndef mitkContourModelSetToImageFilter_h
+#define mitkContourModelSetToImageFilter_h
 
 #include <MitkSegmentationExports.h>
 #include <mitkImageSource.h>
@@ -88,4 +88,4 @@ namespace mitk
     const mitk::Image *m_ReferenceImage;
   };
 }
-#endif // #_MITK_CONTOURMODEL_SOURCE_H
+#endif

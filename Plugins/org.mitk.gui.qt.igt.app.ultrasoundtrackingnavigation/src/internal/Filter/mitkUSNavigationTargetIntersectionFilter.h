@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKUSNAVIGATIONTARGETINTERSECTIONFILTER_H
-#define MITKUSNAVIGATIONTARGETINTERSECTIONFILTER_H
+#ifndef mitkUSNavigationTargetIntersectionFilter_h
+#define mitkUSNavigationTargetIntersectionFilter_h
 
 #include "mitkCommon.h"
 #include "mitkNumericTypes.h"
@@ -87,4 +87,4 @@ protected:
   };
 }
 
-#endif // MITKUSNAVIGATIONTARGETINTERSECTIONFILTER_H
+#endif

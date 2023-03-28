@@ -107,7 +107,7 @@
   <customwidget>
    <class>QmitkSegmentationTaskListWidget</class>
    <extends>QWidget</extends>
-   <header location="global">internal/QmitkSegmentationTaskListWidget.h</header>
+   <header location="global">QmitkSegmentationTaskListWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

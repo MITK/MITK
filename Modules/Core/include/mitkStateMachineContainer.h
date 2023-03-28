@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef STATEMACHINECONTAINER_H_HEADER_INCLUDED_C19AEDDD
-#define STATEMACHINECONTAINER_H_HEADER_INCLUDED_C19AEDDD
+#ifndef mitkStateMachineContainer_h
+#define mitkStateMachineContainer_h
 
 #include "itkObject.h"
 #include <iostream>
@@ -107,4 +107,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* STATEMACHINECONTAINER_H_HEADER_INCLUDED_C19AEDDD */
+#endif

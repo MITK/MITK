@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __QmitkConvertMaskToLabelAction_H_
-#define __QmitkConvertMaskToLabelAction_H_
+#ifndef QmitkConvertMaskToLabelAction_h
+#define QmitkConvertMaskToLabelAction_h
 
 #include "mitkIContextMenuAction.h"
 
@@ -45,4 +45,4 @@ private:
 
 };
 
-#endif // __QmitkConvertMaskToLabelAction_H_
+#endif

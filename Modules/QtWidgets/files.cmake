@@ -79,7 +79,11 @@ set(CPP_FILES
   mitkDataStorageInspectorGenerator.cpp
   QmitkOverlayWidget.cpp
   QmitkSimpleTextOverlayWidget.cpp
+  QmitkButtonOverlayWidget.cpp
   QmitkNodeDetailsDialog.cpp
+  QmitkRenderWindowDataNodeTableModel.cpp
+  QmitkSynchronizedNodeSelectionWidget.cpp
+  QmitkSynchronizedWidgetConnector.cpp
 )
 
 set(MOC_H_FILES
@@ -144,7 +148,11 @@ set(MOC_H_FILES
   include/QmitkModelViewSelectionConnector.h
   include/QmitkOverlayWidget.h
   include/QmitkSimpleTextOverlayWidget.h
+  include/QmitkButtonOverlayWidget.h
   include/QmitkNodeDetailsDialog.h
+  include/QmitkRenderWindowDataNodeTableModel.h
+  include/QmitkSynchronizedNodeSelectionWidget.h
+  include/QmitkSynchronizedWidgetConnector.h
 )
 
 set(UI_FILES
@@ -165,6 +173,7 @@ set(UI_FILES
   src/QmitkDataStorageListInspector.ui
   src/QmitkDataStorageTreeInspector.ui
   src/QmitkDataStorageSelectionHistoryInspector.ui
+  src/QmitkSynchronizedNodeSelectionWidget.ui
 )
 
 set(RESOURCE_FILES

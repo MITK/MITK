@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIRENDERWINDOWPARTLISTENER_H
-#define MITKIRENDERWINDOWPARTLISTENER_H
+#ifndef mitkIRenderWindowPartListener_h
+#define mitkIRenderWindowPartListener_h
 
 #include <org_mitk_gui_common_Export.h>
 
@@ -56,4 +56,4 @@ namespace mitk {
   };
 }
 
-#endif // MITKIRENDERWINDOWPARTLISTENER_H
+#endif

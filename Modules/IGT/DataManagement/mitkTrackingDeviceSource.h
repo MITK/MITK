@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKTRACKINGDEVICESOURCE_H_HEADER_INCLUDED_
-#define MITKTRACKINGDEVICESOURCE_H_HEADER_INCLUDED_
+#ifndef mitkTrackingDeviceSource_h
+#define mitkTrackingDeviceSource_h
 
 #include <mitkNavigationDataSource.h>
 #include "mitkTrackingDevice.h"
@@ -128,4 +128,4 @@ namespace mitk {
     mitk::TrackingDevice::Pointer m_TrackingDevice;  ///< the tracking device that is used as a source for this filter object
   };
 } // namespace mitk
-#endif /* MITKTrackingDeviceSource_H_HEADER_INCLUDED_ */
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKCMDLINEMODULERUNNER_H
-#define QMITKCMDLINEMODULERUNNER_H
+#ifndef QmitkCmdLineModuleRunner_h
+#define QmitkCmdLineModuleRunner_h
 
 #include <QWidget>
 #include <QTimer>
@@ -229,4 +229,4 @@ private:
   int m_ErrorCount;
 };
 
-#endif // QMITKCMDLINEMODULERUNNER_H
+#endif

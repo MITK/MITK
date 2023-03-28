@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKUSTelemedImageSource_H_HEADER_INCLUDED_
-#define MITKUSTelemedImageSource_H_HEADER_INCLUDED_
+#ifndef mitkUSTelemedImageSource_h
+#define mitkUSTelemedImageSource_h
 
 #include "mitkUSImageSource.h"
 #include "mitkUSTelemedSDKHeader.h"
@@ -74,4 +74,4 @@ protected:
 };
 } // namespace mitk
 
-#endif // MITKUSTelemedImageSource_H
+#endif

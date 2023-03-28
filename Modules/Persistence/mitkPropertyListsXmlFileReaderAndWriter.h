@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkXmlSceneIO_h_included
-#define mitkXmlSceneIO_h_included
+#ifndef mitkPropertyListsXmlFileReaderAndWriter_h
+#define mitkPropertyListsXmlFileReaderAndWriter_h
 
 #include "mitkDataStorage.h"
 

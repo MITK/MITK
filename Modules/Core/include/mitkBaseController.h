@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef BASECONTROLLER_H_HEADER_INCLUDED_C1E745A3
-#define BASECONTROLLER_H_HEADER_INCLUDED_C1E745A3
+#ifndef mitkBaseController_h
+#define mitkBaseController_h
 
 #include "mitkEventStateMachine.h"
 #include "mitkOperationActor.h"
@@ -74,4 +74,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* BASECONTROLLER_H_HEADER_INCLUDED_C1E745A3 */
+#endif

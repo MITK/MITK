@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef mitkUSDeviceReaderWriterConstants_H_HEADER_INCLUDED_
-#define mitkUSDeviceReaderWriterConstants_H_HEADER_INCLUDED_
+#ifndef mitkUSDeviceReaderWriterConstants_h
+#define mitkUSDeviceReaderWriterConstants_h
 
 namespace mitk
 {
@@ -54,4 +54,4 @@ namespace mitk
   };
 }
 
-#endif // mitkUSDeviceReaderWriterConstants_H_HEADER_INCLUDED_
+#endif

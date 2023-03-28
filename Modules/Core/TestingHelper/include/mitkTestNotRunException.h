@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKTESTNOTRUNEXCEPTION_H
-#define MITKTESTNOTRUNEXCEPTION_H
+#ifndef mitkTestNotRunException_h
+#define mitkTestNotRunException_h
 
 #include <mitkException.h>
 #include <mitkCommon.h>
@@ -37,4 +37,4 @@ namespace mitk
   };
 }
 
-#endif // MITKTESTNOTRUNEXCEPTION_H
+#endif

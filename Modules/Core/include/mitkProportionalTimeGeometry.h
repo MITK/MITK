@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef ProportionalTimeGeometry_h
-#define ProportionalTimeGeometry_h
+#ifndef mitkProportionalTimeGeometry_h
+#define mitkProportionalTimeGeometry_h
 
 // MITK
 #include <MitkCoreExports.h>
@@ -257,4 +257,4 @@ namespace mitk
                              bool verbose);
 
 } // end namespace MITK
-#endif // ProportionalTimeGeometry_h
+#endif

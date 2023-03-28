@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITK_ENUMERATIONPROPERTYWIDGET_H_INCLUDED
-#define QMITK_ENUMERATIONPROPERTYWIDGET_H_INCLUDED
+#ifndef QmitkEnumerationPropertyWidget_h
+#define QmitkEnumerationPropertyWidget_h
 
 #include "MitkQtWidgetsExtExports.h"
 

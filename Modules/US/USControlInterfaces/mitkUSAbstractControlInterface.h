@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKUSAbstractControlInterface_H_HEADER_INCLUDED_
-#define MITKUSAbstractControlInterface_H_HEADER_INCLUDED_
+#ifndef mitkUSAbstractControlInterface_h
+#define mitkUSAbstractControlInterface_h
 
 #include <mitkCommon.h>
 #include <MitkUSExports.h>
@@ -57,4 +57,4 @@ protected:
 };
 } // namespace mitk
 
-#endif // MITKUSAbstractControlInterface_H_HEADER_INCLUDED_
+#endif

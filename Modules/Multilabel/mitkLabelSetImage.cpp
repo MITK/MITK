@@ -1150,3 +1150,4 @@ void mitk::TransferLabelContent(
   TransferLabelContent(sourceImage, destinationImage, destinationLabelSet, sourceBackground, destinationBackground, destinationBackgroundLocked,
     labelMapping, mergeStyle, overwriteStlye, timeStep);
 }
+

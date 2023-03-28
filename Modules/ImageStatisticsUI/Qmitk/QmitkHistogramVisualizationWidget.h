@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef QmitkHistogramVisualizationWidget_H__INCLUDED
-#define QmitkHistogramVisualizationWidget_H__INCLUDED
+#ifndef QmitkHistogramVisualizationWidget_h
+#define QmitkHistogramVisualizationWidget_h
 
 #include <MitkImageStatisticsUIExports.h>
 #include <ui_QmitkHistogramVisualizationWidget.h>
@@ -76,4 +76,4 @@ private:
   std::map < std::string, itk::Statistics::Histogram<double>::ConstPointer> m_Histograms;
 };
 
-#endif // QmitkHistogramVisualizationWidget_H__INCLUDED
+#endif

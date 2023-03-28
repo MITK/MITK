@@ -14,10 +14,6 @@ found in the LICENSE file.
 #include "QmitkRenderWindowDataStorageTreeModel.h"
 
 #include <QmitkDataStorageTreeModelInternalItem.h>
-
-// mitk core
-#include <mitkNodePredicateAnd.h>
-
 // qt widgets module
 #include "QmitkCustomVariants.h"
 #include "QmitkEnums.h"
@@ -47,12 +43,6 @@ void QmitkRenderWindowDataStorageTreeModel::NodePredicateChanged()
 
 void QmitkRenderWindowDataStorageTreeModel::NodeAdded(const mitk::DataNode* node)
 {
-  for (const auto renderer : m_ControlledRenderer)
-  {
-    // add the node to each render window
-    mitk::RenderWindowLayerUtilities::SetRenderWindowProperties(const_cast<mitk::DataNode*>(node), renderer);
-  }
-
   auto baseRenderer = m_BaseRenderer.Lock();
 
   if (baseRenderer.IsNull())
@@ -60,16 +50,12 @@ void QmitkRenderWindowDataStorageTreeModel::NodeAdded(const mitk::DataNode* node
     return;
   }
 
-  mitk::NodePredicateBase::Pointer renderWindowPredicate = mitk::RenderWindowLayerUtilities::GetRenderWindowPredicate(baseRenderer);
-  mitk::NodePredicateAnd::Pointer combinedNodePredicate = mitk::NodePredicateAnd::New();
-  combinedNodePredicate->AddPredicate(renderWindowPredicate);
   if (m_NodePredicate.IsNotNull())
   {
-    combinedNodePredicate->AddPredicate(m_NodePredicate);
-  }
-  if (combinedNodePredicate->CheckNode(node))
-  {
-    AddNodeInternal(node, baseRenderer);
+    if (m_NodePredicate->CheckNode(node))
+    {
+      AddNodeInternal(node, baseRenderer);
+    }
   }
 }
 
@@ -374,9 +360,6 @@ bool QmitkRenderWindowDataStorageTreeModel::dropMimeData(const QMimeData* data, 
 
 void QmitkRenderWindowDataStorageTreeModel::SetControlledRenderer(mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer)
 {
-  m_RenderWindowLayerController->SetControlledRenderer(controlledRenderer);
-  m_ControlledRenderer = controlledRenderer;
-
   ResetTree();
   auto dataStorage = m_DataStorage.Lock();
 
@@ -451,18 +434,13 @@ void QmitkRenderWindowDataStorageTreeModel::UpdateModelData()
         mitk::RenderWindowLayerUtilities::SetRenderWindowProperties(dataNode, baseRenderer);
       }
 
-      mitk::NodePredicateBase::Pointer renderWindowPredicate = mitk::RenderWindowLayerUtilities::GetRenderWindowPredicate(baseRenderer);
-      mitk::NodePredicateAnd::Pointer combinedNodePredicate = mitk::NodePredicateAnd::New();
-      combinedNodePredicate->AddPredicate(renderWindowPredicate);
       if (m_NodePredicate.IsNotNull())
       {
-        combinedNodePredicate->AddPredicate(m_NodePredicate);
-      }
-
-      auto filteredDataNodes = dataStorage->GetSubset(combinedNodePredicate);
-      for (const auto& dataNode : *filteredDataNodes)
-      {
-        AddNodeInternal(dataNode, baseRenderer);
+        auto filteredDataNodes = dataStorage->GetSubset(m_NodePredicate);
+        for (const auto& dataNode : *filteredDataNodes)
+        {
+          AddNodeInternal(dataNode, baseRenderer);
+        }
       }
     }
   }

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKRENDERWINDOWDATASTORAGEINSPECTOR_H
-#define QMITKRENDERWINDOWDATASTORAGEINSPECTOR_H
+#ifndef QmitkRenderWindowDataStorageInspector_h
+#define QmitkRenderWindowDataStorageInspector_h
 
 // render window manager UI module
 #include "MitkRenderWindowManagerUIExports.h"
@@ -71,10 +71,6 @@ private Q_SLOTS:
 
   void ModelRowsInserted(const QModelIndex& parent, int start, int end);
 
-  void SetAsBaseLayer();
-
-  void ResetRenderer();
-
   void ChangeViewDirection(const QString& viewDirection);
 
 private:
@@ -89,4 +85,4 @@ private:
   std::unique_ptr<mitk::RenderWindowViewDirectionController> m_RenderWindowViewDirectionController;
 };
 
-#endif // QMITKRENDERWINDOWDATASTORAGEINSPECTOR_H
+#endif

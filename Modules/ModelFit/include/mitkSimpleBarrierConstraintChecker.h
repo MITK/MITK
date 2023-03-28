@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef SIMPLE_BARRIER_CONSTRAINT_CHECKER_H
-#define SIMPLE_BARRIER_CONSTRAINT_CHECKER_H
+#ifndef mitkSimpleBarrierConstraintChecker_h
+#define mitkSimpleBarrierConstraintChecker_h
 
 #include "mitkConstraintCheckerBase.h"
 
@@ -123,4 +123,4 @@ namespace mitk
 
 }
 
-#endif // SimpleBarrierConstraintChecker_H
+#endif

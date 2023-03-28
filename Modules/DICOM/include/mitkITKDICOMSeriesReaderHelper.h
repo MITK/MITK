@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkDICOMSeriesReaderHelper_h
-#define mitkDICOMSeriesReaderHelper_h
+#ifndef mitkITKDICOMSeriesReaderHelper_h
+#define mitkITKDICOMSeriesReaderHelper_h
 
 #include "mitkImage.h"
 #include "mitkGantryTiltInformation.h"

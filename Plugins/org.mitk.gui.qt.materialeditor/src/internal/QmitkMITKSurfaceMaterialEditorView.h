@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QMITKMITKSURFACEMATERIALEDITORVIEW_H_INCLUDED
-#define _QMITKMITKSURFACEMATERIALEDITORVIEW_H_INCLUDED
+#ifndef QmitkMITKSurfaceMaterialEditorView_h
+#define QmitkMITKSurfaceMaterialEditorView_h
 
 #include <QmitkAbstractView.h>
 #include <berryIStructuredSelection.h>
@@ -105,5 +105,4 @@ private:
 
 
 
-#endif // _QMITKMITKSURFACEMATERIALEDITORVIEW_H_INCLUDED
-
+#endif

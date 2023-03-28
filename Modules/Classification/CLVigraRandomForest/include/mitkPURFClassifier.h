@@ -90,4 +90,4 @@ namespace mitk
   };
 }
 
-#endif //mitkPURFClassifier_h
+#endif

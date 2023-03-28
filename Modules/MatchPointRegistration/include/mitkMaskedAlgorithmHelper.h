@@ -83,4 +83,3 @@ namespace mitk
 }
 
 #endif
-

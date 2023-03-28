@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKNODEPREDICATEBASE_H_HEADER_INCLUDED_
-#define MITKNODEPREDICATEBASE_H_HEADER_INCLUDED_
+#ifndef mitkNodePredicateBase_h
+#define mitkNodePredicateBase_h
 
 #include "itkObject.h"
 #include <MitkCoreExports.h>
@@ -48,4 +48,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKNODEPREDICATEBASE_H_HEADER_INCLUDED_ */
+#endif

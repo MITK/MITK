@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKUSIMAGE_H_HEADER_INCLUDED_
-#define MITKUSIMAGE_H_HEADER_INCLUDED_
+#ifndef mitkUSImage_h
+#define mitkUSImage_h
 
 #include <MitkUSExports.h>
 #include <mitkCommon.h>

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKEXTACTIONBARADVISOR_H_
-#define QMITKEXTACTIONBARADVISOR_H_
+#ifndef QmitkExtActionBarAdvisor_h
+#define QmitkExtActionBarAdvisor_h
 
 #include <berryActionBarAdvisor.h>
 
@@ -78,4 +78,4 @@ private:
   berry::IWorkbenchWindow* window;
 };
 
-#endif /*QMITKEXTACTIONBARADVISOR_H_*/
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITCUBOID_H_HEADER_INCLUDED
-#define MITCUBOID_H_HEADER_INCLUDED
+#ifndef mitkCuboid_h
+#define mitkCuboid_h
 
 #include "MitkDataTypesExtExports.h"
 #include "mitkBoundingObject.h"
@@ -36,4 +36,4 @@ namespace mitk
     ~Cuboid() override;
   };
 }
-#endif /* MITCUBOID_H_HEADER_INCLUDED */
+#endif

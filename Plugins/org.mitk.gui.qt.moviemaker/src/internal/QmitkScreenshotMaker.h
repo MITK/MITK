@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#if !defined(QMITK_ScreenshotMaker_H__INCLUDED)
-#define QMITK_ScreenshotMaker_H__INCLUDED
+#ifndef QmitkScreenshotMaker_h
+#define QmitkScreenshotMaker_h
 
 #include <QmitkAbstractView.h>
 #include <mitkIRenderWindowPartListener.h>
@@ -124,5 +124,5 @@ private:
   QString           m_PNGExtension = "PNG File (*.png)";
   QString           m_JPGExtension = "JPEG File (*.jpg)";
 };
-#endif // !defined(QMITK_ScreenshotMaker_H__INCLUDED)
 
+#endif

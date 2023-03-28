@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKPREDICATEHELPER_H
-#define MITKPREDICATEHELPER_H
+#ifndef mitkImageStatisticsPredicateHelper_h
+#define mitkImageStatisticsPredicateHelper_h
 
 #include <MitkImageStatisticsExports.h>
 #include <mitkNodePredicateBase.h>

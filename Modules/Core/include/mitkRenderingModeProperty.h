@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_RENDERING_MODE_PROPERTY__H_
-#define _MITK_RENDERING_MODE_PROPERTY__H_
+#ifndef mitkRenderingModeProperty_h
+#define mitkRenderingModeProperty_h
 
 #include "mitkEnumerationProperty.h"
 

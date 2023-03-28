@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKSurfaceModifier_H_HEADER_INCLUDED_
-#define MITKSurfaceModifier_H_HEADER_INCLUDED_
+#ifndef mitkSurfaceModifier_h
+#define mitkSurfaceModifier_h
 
 // mitk headers
 #include <mitkCommon.h>
@@ -111,4 +111,4 @@ namespace mitk
   };
 
 } // namespace mitk
-#endif /* MITKSurfaceModifier_H_HEADER_INCLUDED_ */
+#endif

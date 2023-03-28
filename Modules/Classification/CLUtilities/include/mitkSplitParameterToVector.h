@@ -28,4 +28,4 @@ namespace mitk
 }
 
 
-#endif //mitkSplitParameterToVector_h
+#endif

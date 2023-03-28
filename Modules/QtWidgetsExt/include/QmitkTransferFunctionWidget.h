@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKTRANSFERFUNCTIONWIDGET_H
-#define QMITKTRANSFERFUNCTIONWIDGET_H
+#ifndef QmitkTransferFunctionWidget_h
+#define QmitkTransferFunctionWidget_h
 
 #include "MitkQtWidgetsExtExports.h"
 #include "ui_QmitkTransferFunctionWidget.h"

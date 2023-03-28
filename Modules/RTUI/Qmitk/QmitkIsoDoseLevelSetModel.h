@@ -90,5 +90,4 @@ private:
 
 };
 
-#endif // QmitkIsoDoseLevelSetModel_h
-
+#endif

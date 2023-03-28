@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef NAVIGATIONTOOLSTORAGESERIALIZER_H_INCLUDED
-#define NAVIGATIONTOOLSTORAGESERIALIZER_H_INCLUDED
+#ifndef mitkNavigationToolStorageSerializer_h
+#define mitkNavigationToolStorageSerializer_h
 
 //itk headers
 #include <itkObjectFactory.h>
@@ -52,4 +52,4 @@ namespace mitk {
 
   };
 } // namespace mitk
-#endif //NAVIGATIONTOOLSTORAGESERIALIZER
+#endif

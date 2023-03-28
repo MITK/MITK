@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKUSCombinedModality_H_HEADER_INCLUDED_
-#define MITKUSCombinedModality_H_HEADER_INCLUDED_
+#ifndef mitkUSCombinedModality_h
+#define mitkUSCombinedModality_h
 
 #include <MitkUSNavigationExports.h>
 #include "mitkUSDevice.h"
@@ -70,4 +70,4 @@ namespace mitk {
   };
 } // namespace mitk
 
-#endif // MITKUSCombinedModality_H_HEADER_INCLUDED_
+#endif

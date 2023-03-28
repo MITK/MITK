@@ -146,4 +146,4 @@ namespace mitk
   };
 
 }
-#endif //mitkGIFNeighbouringGreyLevelDependenceFeature_h
+#endif

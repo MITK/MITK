@@ -87,4 +87,4 @@ namespace mitk
     int m_Range;
   };
 }
-#endif //mitkGIFNeighbourhoodGreyToneDifferenceFeatures_h
+#endif

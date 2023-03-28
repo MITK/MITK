@@ -6,12 +6,12 @@ Copyright (c) German Cancer Research Center (DKFZ)
 All rights reserved.
 
 Use of this source code is governed by a 3-clause BSD license that can be
-found in the LICENSE file.s
+found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitknnUNetFolderParser_h_Included
-#define QmitknnUNetFolderParser_h_Included
+#ifndef QmitknnUNetFolderParser_h
+#define QmitknnUNetFolderParser_h
 
 #include <QDirIterator>
 #include <memory>

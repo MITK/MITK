@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __mitkRandomImageSampler_h
-#define __mitkRandomImageSampler_h
+#ifndef mitkRandomImageSampler_h
+#define mitkRandomImageSampler_h
 
 #include "MitkCLUtilitiesExports.h"
 

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITK_OVERLAY_WIDGET_H
-#define QMITK_OVERLAY_WIDGET_H
+#ifndef QmitkOverlayWidget_h
+#define QmitkOverlayWidget_h
 
 #include <QWidget>
 

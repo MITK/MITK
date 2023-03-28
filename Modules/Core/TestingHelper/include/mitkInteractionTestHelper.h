@@ -143,4 +143,4 @@ namespace mitk
   };
 }
 
-#endif // namespace mitk
+#endif

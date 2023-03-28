@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKMODELVIEWSELECTIONCONNECTOR_H
-#define QMITKMODELVIEWSELECTIONCONNECTOR_H
+#ifndef QmitkModelViewSelectionConnector_h
+#define QmitkModelViewSelectionConnector_h
 
 #include <MitkQtWidgetsExports.h>
 
@@ -149,4 +149,4 @@ private:
 * @brief Return true, if the nodes in the list of two given selections are equal (Sorting is ignored. Any permutation is valid.)*/
 bool MITKQTWIDGETS_EXPORT EqualNodeSelections(const QList<mitk::DataNode::Pointer>& selection1, const QList<mitk::DataNode::Pointer>& selection2);
 
-#endif // QMITKMODELVIEWSELECTIONCONNECTOR_H
+#endif

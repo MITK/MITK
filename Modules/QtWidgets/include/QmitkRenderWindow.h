@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKRENDERWINDOW_H
-#define QMITKRENDERWINDOW_H
+#ifndef QmitkRenderWindow_h
+#define QmitkRenderWindow_h
 
 #include "mitkRenderWindowBase.h"
 
@@ -24,7 +24,7 @@ found in the LICENSE file.
 #include "mitkBaseRenderer.h"
 #include "mitkInteractionEventConst.h"
 
-#include <QmitkSimpleTextOverlayWidget.h>
+#include <QmitkButtonOverlayWidget.h>
 
 class QDragEnterEvent;
 class QDropEvent;
@@ -119,6 +119,8 @@ Q_SIGNALS:
 
   void ResetView();
 
+  void ResetGeometry();
+
   void CrosshairRotationModeChanged(int);
 
   void CrosshairVisibilityChanged(bool);
@@ -156,8 +158,8 @@ private:
 
   vtkSmartPointer<vtkGenericOpenGLRenderWindow> m_InternalRenderWindow;
 
-  QmitkSimpleTextOverlayWidget* m_GeometryViolationWarningOverlay;
+  QmitkButtonOverlayWidget* m_GeometryViolationWarningOverlay;
 
 };
 
-#endif // QMITKRENDERWINDOW_H
+#endif

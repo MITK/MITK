@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKUSNAVIGATIONSTEPTIMER_H
-#define MITKUSNAVIGATIONSTEPTIMER_H
+#ifndef mitkUSNavigationStepTimer_h
+#define mitkUSNavigationStepTimer_h
 
 #include <mitkCommon.h>
 
@@ -106,4 +106,4 @@ protected:
 };
 } // namespace mitk
 
-#endif // MITKUSNAVIGATIONSTEPTIMER_H
+#endif

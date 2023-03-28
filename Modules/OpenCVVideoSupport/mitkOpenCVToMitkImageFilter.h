@@ -94,4 +94,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif // mitkOpenCVToMitkImageFilter_h
+#endif

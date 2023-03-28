@@ -84,4 +84,4 @@ namespace mitk
 
 
 
-#endif //mitkGlobalImageFeaturesParameter_h
+#endif

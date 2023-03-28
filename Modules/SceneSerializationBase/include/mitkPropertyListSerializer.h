@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkPropertyListSerializer_h_included
-#define mitkPropertyListSerializer_h_included
+#ifndef mitkPropertyListSerializer_h
+#define mitkPropertyListSerializer_h
 
 #include <MitkSceneSerializationBaseExports.h>
 

@@ -105,5 +105,4 @@ class QmitkUGVisualizationView : public QmitkAbstractView
 
 
 
-#endif // _QMITKUGVISUALIZATIONVIEW_H_INCLUDED
-
+#endif

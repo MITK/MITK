@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef __ISO_LEVELS_GENERATOR_H
-#define __ISO_LEVELS_GENERATOR_H
+#ifndef mitkIsoLevelsGenerator_h
+#define mitkIsoLevelsGenerator_h
 
 #include "mitkIsoDoseLevelCollections.h"
 

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef LIMITEDLINEARUNDO_H_HEADER_INCLUDED_C16E9C96
-#define LIMITEDLINEARUNDO_H_HEADER_INCLUDED_C16E9C96
+#ifndef mitkLimitedLinearUndo_h
+#define mitkLimitedLinearUndo_h
 
 // MITK header
 #include "mitkOperationEvent.h"
@@ -156,4 +156,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* LIMITEDLINEARUNDO_H_HEADER_INCLUDED_C16E9C96 */
+#endif

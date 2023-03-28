@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QmitkNDIConfigurationWidget_H_INCLUDED
-#define _QmitkNDIConfigurationWidget_H_INCLUDED
+#ifndef QmitkNDIConfigurationWidget_h
+#define QmitkNDIConfigurationWidget_h
 
 #include "ui_QmitkNDIConfigurationWidget.h"
 #include "mitkNDITrackingDevice.h"
@@ -127,5 +127,4 @@ protected:
   mitk::Surface::Pointer LoadSurfaceFromSTLFile(QString surfaceFilename);
 
 };
-#endif // _QmitkNDIConfigurationWidget_H_INCLUDED
-
+#endif

@@ -337,6 +337,33 @@ void QmitkAbstractNodeSelectionWidget::OnNodeRemovedFromStorage(const mitk::Data
 {
 }
 
+void QmitkAbstractNodeSelectionWidget::OnNodeModified(const itk::Object* caller, const itk::EventObject& event)
+{
+  if (itk::ModifiedEvent().CheckEvent(&event))
+  {
+    auto node = dynamic_cast<const mitk::DataNode*>(caller);
+
+    if (node)
+    {
+      if (m_NodePredicate.IsNotNull() && !m_NodePredicate->CheckNode(node))
+      {
+        this->RemoveNodeFromSelection(node);
+      }
+      else
+      {
+        auto oldAllowance = m_LastEmissionAllowance;
+        auto newEmission = this->CompileEmitSelection();
+        auto nonConstNode = const_cast<mitk::DataNode*>(node);
+        if (newEmission.contains(nonConstNode) && (oldAllowance != this->AllowEmissionOfSelection(newEmission)))
+        {
+          this->EmitSelection(newEmission);
+          this->UpdateInfo();
+        }
+      }
+    }
+  }
+}
+
 QmitkAbstractNodeSelectionWidget::NodeList QmitkAbstractNodeSelectionWidget::CompileEmitSelection() const
 {
   NodeList result = m_CurrentInternalSelection;
@@ -365,33 +392,6 @@ void QmitkAbstractNodeSelectionWidget::RemoveNodeFromSelection(const mitk::DataN
   {
     newSelection.erase(finding);
     this->HandleChangeOfInternalSelection(newSelection);
-  }
-}
-
-void QmitkAbstractNodeSelectionWidget::OnNodeModified(const itk::Object * caller, const itk::EventObject & event)
-{
-  if (itk::ModifiedEvent().CheckEvent(&event))
-  {
-    auto node = dynamic_cast<const mitk::DataNode*>(caller);
-
-    if (node)
-    {
-      if (m_NodePredicate.IsNotNull() && !m_NodePredicate->CheckNode(node))
-      {
-        this->RemoveNodeFromSelection(node);
-      }
-      else
-      {
-        auto oldAllowance = m_LastEmissionAllowance;
-        auto newEmission = this->CompileEmitSelection();
-        auto nonConstNode = const_cast<mitk::DataNode*>(node);
-        if (newEmission.contains(nonConstNode) && (oldAllowance != this->AllowEmissionOfSelection(newEmission)))
-        {
-          this->EmitSelection(newEmission);
-          this->UpdateInfo();
-        }
-      }
-    }
   }
 }
 

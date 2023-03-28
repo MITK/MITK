@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkImageToPointCloudFilter_h_Included
-#define mitkImageToPointCloudFilter_h_Included
+#ifndef mitkImageToPointCloudFilter_h
+#define mitkImageToPointCloudFilter_h
 
 #include <MitkSurfaceInterpolationExports.h>
 #include <mitkImageToUnstructuredGridFilter.h>

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKMULTIWIDGETCONFIGURATIONTOOLBAR_H
-#define QMITKMULTIWIDGETCONFIGURATIONTOOLBAR_H
+#ifndef QmitkMultiWidgetConfigurationToolBar_h
+#define QmitkMultiWidgetConfigurationToolBar_h
 
 #include "MitkQtWidgetsExports.h"
 
@@ -67,4 +67,4 @@ private:
 
 };
 
-#endif // QMITKMULTIWIDGETCONFIGURATIONTOOLBAR_H
+#endif

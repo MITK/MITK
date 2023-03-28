@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITK_INITIAL_VALUES_MANAGER_WIDGET_H
-#define QMITK_INITIAL_VALUES_MANAGER_WIDGET_H
+#ifndef QmitkInitialValuesManagerWidget_h
+#define QmitkInitialValuesManagerWidget_h
 
 #include "MitkModelFitUIExports.h"
 
@@ -81,4 +81,4 @@ protected Q_SLOTS:
 
 };
 
-#endif // QmitkInitialValuesManagerWidget_H
+#endif

@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __AIFBASED_MODEL_PARAMETERIZER_BASE_H
-#define __AIFBASED_MODEL_PARAMETERIZER_BASE_H
+#ifndef mitkAIFBasedModelParameterizerBase_h
+#define mitkAIFBasedModelParameterizerBase_h
 
 #include "mitkConcreteModelParameterizerBase.h"
 #include "mitkAIFParametrizerHelper.h"
@@ -89,4 +89,4 @@ namespace mitk
   };
 
 }
-#endif // __AIFBASED_MODEL_PARAMETERIZER_BASE_H
+#endif

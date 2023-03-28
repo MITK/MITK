@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef QmitkImageStatisticsContainerManager_H__INCLUDED
-#define QmitkImageStatisticsContainerManager_H__INCLUDED
+#ifndef mitkImageStatisticsContainerManager_h
+#define mitkImageStatisticsContainerManager_h
 
 #include "MitkImageStatisticsExports.h"
 

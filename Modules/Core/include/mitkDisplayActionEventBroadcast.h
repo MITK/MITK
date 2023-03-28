@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKDISPLAYACTIONEVENTBROADCAST_H
-#define MITKDISPLAYACTIONEVENTBROADCAST_H
+#ifndef mitkDisplayActionEventBroadcast_h
+#define mitkDisplayActionEventBroadcast_h
 
 #include "mitkInteractionEventObserver.h"
 #include <MitkCoreExports.h>
@@ -215,4 +215,4 @@ namespace mitk
   };
 } // end namespace
 
-#endif // MITKDISPLAYACTIONEVENTBROADCAST_H
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKSTANDALONEDATASTORAGE_H_HEADER_INCLUDED_
-#define MITKSTANDALONEDATASTORAGE_H_HEADER_INCLUDED_
+#ifndef mitkStandaloneDataStorage_h
+#define mitkStandaloneDataStorage_h
 
 #include "itkVectorContainer.h"
 #include "mitkDataStorage.h"
@@ -126,4 +126,4 @@ namespace mitk
     AdjacencyList m_DerivedNodes;
   };
 } // namespace mitk
-#endif /* MITKSTANDALONEDATASTORAGE_H_HEADER_INCLUDED_ */
+#endif

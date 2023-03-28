@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKTIMESTAMP_H_HEADER_INCLUDED_
-#define MITKTIMESTAMP_H_HEADER_INCLUDED_
+#ifndef mitkIGTTimeStamp_h
+#define mitkIGTTimeStamp_h
 
 #include <itkObject.h>
 #include <itkObjectFactory.h>
@@ -183,4 +183,4 @@ namespace mitk {
   };
 } // namespace mitk
 
-#endif /* MITKTIMESTAMP_H_HEADER_INCLUDED_ */
+#endif

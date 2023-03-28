@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKOPENIGTLINKMESSAGETONAVIGATIONDATAFILTER_H_HEADER_INCLUDED_
-#define MITKOPENIGTLINKMESSAGETONAVIGATIONDATAFILTER_H_HEADER_INCLUDED_
+#ifndef mitkIGTLMessageToNavigationDataFilter_h
+#define mitkIGTLMessageToNavigationDataFilter_h
 
 #include <mitkNavigationDataSource.h>
 #include "mitkIGTLMessage.h"
@@ -134,4 +134,4 @@ namespace mitk
     void GenerateOutputInformation() override;
   };
 } // namespace mitk
-#endif /* MITKOPENIGTLMESSAGETONAVIGATIONDATAFILTER_H_HEADER_INCLUDED_ */
+#endif

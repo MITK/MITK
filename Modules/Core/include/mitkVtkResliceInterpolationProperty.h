@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_VTK_RESLICE_INTERPOLATION_PROPERTY__H_
-#define _MITK_VTK_RESLICE_INTERPOLATION_PROPERTY__H_
+#ifndef mitkVtkResliceInterpolationProperty_h
+#define mitkVtkResliceInterpolationProperty_h
 
 #include "mitkEnumerationProperty.h"
 

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKWEAKPOINTERPROPERTY_H_HEADER_INCLUDED_C126B791
-#define MITKWEAKPOINTERPROPERTY_H_HEADER_INCLUDED_C126B791
+#ifndef mitkWeakPointerProperty_h
+#define mitkWeakPointerProperty_h
 
 #include "itkWeakPointer.h"
 #include "mitkBaseProperty.h"
@@ -75,4 +75,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* MITKWEAKPOINTERPROPERTY_H_HEADER_INCLUDED_C126B791 */
+#endif

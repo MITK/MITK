@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKPolhemusINTERFACE_H_HEADER_INCLUDED_
-#define MITKPolhemusINTERFACE_H_HEADER_INCLUDED_
+#ifndef mitkPolhemusInterface_h
+#define mitkPolhemusInterface_h
 
 #include <vector>
 #include <string>

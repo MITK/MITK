@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKPolhemusTRACKINGDEVICE_H_HEADER_INCLUDED_
-#define MITKPolhemusTRACKINGDEVICE_H_HEADER_INCLUDED_
+#ifndef mitkPolhemusTrackingDevice_h
+#define mitkPolhemusTrackingDevice_h
 
 
 #include <vector>
@@ -157,4 +157,4 @@ namespace mitk
     bool m_HemisphereTrackingEnabled;
   };
 }//mitk
-#endif /* MITKPolhemusTRACKINGDEVICE_H_HEADER_INCLUDED_ */
+#endif

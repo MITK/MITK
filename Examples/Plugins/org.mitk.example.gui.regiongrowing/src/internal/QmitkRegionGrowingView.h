@@ -86,4 +86,4 @@ private:
   //! [members]
 };
 
-#endif // QmitkRegionGrowingView_h
+#endif

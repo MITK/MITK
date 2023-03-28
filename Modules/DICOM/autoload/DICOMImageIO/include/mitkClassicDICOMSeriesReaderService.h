@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKCLASSICDICOMSERIESREADERSERVICE_H
-#define MITKCLASSICDICOMSERIESREADERSERVICE_H
+#ifndef mitkClassicDICOMSeriesReaderService_h
+#define mitkClassicDICOMSeriesReaderService_h
 
 #include <mitkBaseDICOMReaderService.h>
 
@@ -37,4 +37,4 @@ private:
 
 }
 
-#endif // MITKCLASSICDICOMSERIESREADERSERVICE_H
+#endif

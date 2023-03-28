@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef RawImageFileReader_H_HEADER_INCLUDED
-#define RawImageFileReader_H_HEADER_INCLUDED
+#ifndef mitkRawImageFileReader_h
+#define mitkRawImageFileReader_h
 #include "itkVector.h"
 #include "mitkFileReader.h"
 #include "mitkImageSource.h"
@@ -100,4 +100,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* RawImageFileReader_H_HEADER_INCLUDED */
+#endif

@@ -43,4 +43,4 @@ private:
   mitk::IPythonService* m_PythonService;
 };
 
-#endif // QmitkPythonVariableStackTableView_h
+#endif

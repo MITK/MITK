@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _QmitkPythonSnippets_H
-#define _QmitkPythonSnippets_H
+#ifndef QmitkPythonSnippets_h
+#define QmitkPythonSnippets_h
 
 #include <QWidget>
 #include <QMap>
@@ -97,5 +97,4 @@ signals:
 
 
 
-#endif // _QmitkPythonSnippets_H_INCLUDED
-
+#endif

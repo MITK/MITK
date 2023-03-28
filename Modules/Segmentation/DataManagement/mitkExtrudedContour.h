@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKEXTRUDEDCONTOUR_H_HEADER_INCLUDED
-#define MITKEXTRUDEDCONTOUR_H_HEADER_INCLUDED
+#ifndef mitkExtrudedContour_h
+#define mitkExtrudedContour_h
 
 #include "mitkBoundingObject.h"
 #include <MitkSegmentationExports.h>
@@ -123,4 +123,4 @@ namespace mitk
     itk::TimeStamp m_LastCalculateExtrusionTime;
   };
 }
-#endif /* MITKEXTRUDEDCONTOUR_H_HEADER_INCLUDED */
+#endif

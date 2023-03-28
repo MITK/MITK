@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKUSNAVIGATIONSTEPPUNCTUATIONINTERVENTION_H
-#define QMITKUSNAVIGATIONSTEPPUNCTUATIONINTERVENTION_H
+#ifndef QmitkUSNavigationStepPunctuationIntervention_h
+#define QmitkUSNavigationStepPunctuationIntervention_h
 
 #include "QmitkUSAbstractNavigationStep.h"
 #include <mitkPointSet.h>
@@ -116,4 +116,4 @@ private:
   vtkSmartPointer<vtkPoints> m_IntersectPoints;
 };
 
-#endif // QMITKUSNAVIGATIONSTEPPUNCTUATIONINTERVENTION_H
+#endif

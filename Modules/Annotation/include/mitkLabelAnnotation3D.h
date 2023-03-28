@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef LabelAnnotation3D_H
-#define LabelAnnotation3D_H
+#ifndef mitkLabelAnnotation3D_h
+#define mitkLabelAnnotation3D_h
 
 #include "MitkAnnotationExports.h"
 #include <mitkLocalStorageHandler.h>
@@ -106,4 +106,4 @@ namespace mitk
   };
 
 } // namespace mitk
-#endif // LabelAnnotation3D_H
+#endif

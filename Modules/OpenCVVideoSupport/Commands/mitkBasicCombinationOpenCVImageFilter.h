@@ -70,4 +70,4 @@ protected:
 
 } // namespace mitk
 
-#endif // mitkBasicCombinationOpenCVImageFilter_h
+#endif

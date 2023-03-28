@@ -64,5 +64,4 @@ private:
 
 };
 
-#endif // QmitkSimpleBarrierModel_h
-
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKMULTIWIDGETLAYOUTSELECTIONWIDGET_H
-#define QMITKMULTIWIDGETLAYOUTSELECTIONWIDGET_H
+#ifndef QmitkMultiWidgetLayoutSelectionWidget_h
+#define QmitkMultiWidgetLayoutSelectionWidget_h
 
 #include "MitkQtWidgetsExports.h"
 
@@ -62,4 +62,4 @@ private:
 
 };
 
-#endif // QMITKMULTIWIDGETLAYOUTSELECTIONWIDGET_H
+#endif

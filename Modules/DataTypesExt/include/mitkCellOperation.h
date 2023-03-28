@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKCELLOPERATION_H_INCLUDED
-#define MITKCELLOPERATION_H_INCLUDED
+#ifndef mitkCellOperation_h
+#define mitkCellOperation_h
 
 #include "MitkDataTypesExtExports.h"
 #include "mitkCommon.h"
@@ -47,4 +47,4 @@ namespace mitk
     Vector3D m_Vector;
   };
 } // namespace mitk
-#endif /* MITKCELLOPERATION_H_INCLUDED*/
+#endif

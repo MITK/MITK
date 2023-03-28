@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef AbstractFileReader_H_HEADER_INCLUDED_C1E7E521
-#define AbstractFileReader_H_HEADER_INCLUDED_C1E7E521
+#ifndef mitkAbstractFileReader_h
+#define mitkAbstractFileReader_h
 
 // Macro
 #include <MitkCoreExports.h>
@@ -240,4 +240,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* AbstractFileReader_H_HEADER_INCLUDED_C1E7E521 */
+#endif

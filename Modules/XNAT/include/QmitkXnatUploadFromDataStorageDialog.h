@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKXNATUPLOADFROMDATASTORAGEDIALOG_H
-#define QMITKXNATUPLOADFROMDATASTORAGEDIALOG_H
+#ifndef QmitkXnatUploadFromDataStorageDialog_h
+#define QmitkXnatUploadFromDataStorageDialog_h
 
 #include <QDialog>
 
@@ -54,4 +54,4 @@ private:
   mitk::DataNode::Pointer m_SelectedNode;
 };
 
-#endif // QMITKXNATUPLOADFROMDATASTORAGEDIALOG_H
+#endif

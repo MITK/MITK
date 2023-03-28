@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITKOCLBINARYTHRESHOLDIMAGEFILTER_H_
-#define _MITKOCLBINARYTHRESHOLDIMAGEFILTER_H_
+#ifndef mitkOclBinaryThresholdImageFilter_h
+#define mitkOclBinaryThresholdImageFilter_h
 
 #include "mitkOclImageToImageFilter.h"
 #include <itkObject.h>

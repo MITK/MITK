@@ -11,12 +11,18 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkMxNMultiWidget.h"
-#include "QmitkRenderWindowWidget.h"
 
 // mitk core
 #include <mitkDisplayActionEventFunctions.h>
 #include <mitkDisplayActionEventHandlerDesynchronized.h>
 #include <mitkDisplayActionEventHandlerSynchronized.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateAnd.h>
+#include <mitkNodePredicateProperty.h>
+
+// mitk qt widget
+#include <QmitkRenderWindowUtilityWidget.h>
+#include <QmitkRenderWindowWidget.h>
 
 // qt
 #include <QGridLayout>
@@ -30,6 +36,7 @@ QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
                                          const QString& multiWidgetName/* = "mxnmulti"*/)
   : QmitkAbstractMultiWidget(parent, f, multiWidgetName)
   , m_TimeNavigationController(nullptr)
+  , m_SynchronizedWidgetConnector(std::make_unique<QmitkSynchronizedWidgetConnector>())
   , m_CrosshairVisibility(false)
 {
   m_TimeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
@@ -53,6 +60,8 @@ void QmitkMxNMultiWidget::InitializeMultiWidget()
   {
     displayActionEventHandler->InitActions();
   }
+
+  this->SetInitialSelection();
 }
 
 void QmitkMxNMultiWidget::Synchronize(bool synchronized)
@@ -116,7 +125,7 @@ void QmitkMxNMultiWidget::SetActiveRenderWindowWidget(RenderWindowWidgetPointer 
   QmitkAbstractMultiWidget::SetActiveRenderWindowWidget(activeRenderWindowWidget);
 }
 
-void QmitkMxNMultiWidget::SetReferenceGeometry(const mitk::TimeGeometry* referenceGeometry, bool resetCamera)
+void QmitkMxNMultiWidget::InitializeViews(const mitk::TimeGeometry* geometry, bool resetCamera)
 {
   auto* renderingManager = mitk::RenderingManager::GetInstance();
   mitk::Point3D currentPosition = mitk::Point3D();
@@ -128,20 +137,31 @@ void QmitkMxNMultiWidget::SetReferenceGeometry(const mitk::TimeGeometry* referen
 
     // store the current time step to set it again later, if the camera should not be reset
     const auto currentTimePoint = renderingManager->GetTimeNavigationController()->GetSelectedTimePoint();
-    if (referenceGeometry->IsValidTimePoint(currentTimePoint))
+    if (geometry->IsValidTimePoint(currentTimePoint))
     {
-      imageTimeStep = referenceGeometry->TimePointToTimeStep(currentTimePoint);
+      imageTimeStep = geometry->TimePointToTimeStep(currentTimePoint);
     }
   }
 
   // initialize active render window
   renderingManager->InitializeView(
-    this->GetActiveRenderWindowWidget()->GetRenderWindow()->GetVtkRenderWindow(), referenceGeometry, resetCamera);
+    this->GetActiveRenderWindowWidget()->GetRenderWindow()->GetVtkRenderWindow(), geometry, resetCamera);
 
   if (!resetCamera)
   {
     this->SetSelectedPosition(currentPosition, "");
     renderingManager->GetTimeNavigationController()->GetTime()->SetPos(imageTimeStep);
+  }
+}
+
+void QmitkMxNMultiWidget::SetInteractionReferenceGeometry(const mitk::TimeGeometry* referenceGeometry)
+{
+  // Set the interaction reference referenceGeometry for all render windows.
+  auto allRenderWindows = this->GetRenderWindows();
+  for (auto& renderWindow : allRenderWindows)
+  {
+    auto* baseRenderer = mitk::BaseRenderer::GetInstance(renderWindow->GetRenderWindow());
+    baseRenderer->SetInteractionReferenceGeometry(referenceGeometry);
   }
 }
 
@@ -366,18 +386,29 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
 {
   // create the render window widget and connect signal / slot
   QString renderWindowWidgetName = GetNameFromIndex(GetNumberOfRenderWindowWidgets());
-  RenderWindowWidgetPointer renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage(), true);
+  RenderWindowWidgetPointer renderWindowWidget = std::make_shared<QmitkRenderWindowWidget>(this, renderWindowWidgetName, GetDataStorage());
   renderWindowWidget->SetCornerAnnotationText(renderWindowWidgetName.toStdString());
   AddRenderWindowWidget(renderWindowWidgetName, renderWindowWidget);
 
   auto renderWindow = renderWindowWidget->GetRenderWindow();
+
+  QmitkRenderWindowUtilityWidget* utilityWidget = new QmitkRenderWindowUtilityWidget(this, renderWindow, GetDataStorage());
+  renderWindowWidget->AddUtilityWidget(utilityWidget);
+
+  connect(utilityWidget, &QmitkRenderWindowUtilityWidget::SynchronizationToggled,
+    this, &QmitkMxNMultiWidget::ToggleSynchronization);
+
+  // needs to be done after 'QmitkRenderWindowUtilityWidget::ToggleSynchronization' has been connected
+  // initially synchronize the node selection widget
+  utilityWidget->ToggleSynchronization(true);
+
   auto layoutManager = GetMultiWidgetLayoutManager();
   connect(renderWindow, &QmitkRenderWindow::LayoutDesignChanged, layoutManager, &QmitkMultiWidgetLayoutManager::SetLayoutDesign);
   connect(renderWindow, &QmitkRenderWindow::ResetView, this, &QmitkMxNMultiWidget::ResetCrosshair);
   connect(renderWindow, &QmitkRenderWindow::CrosshairVisibilityChanged, this, &QmitkMxNMultiWidget::SetCrosshairVisibility);
   connect(renderWindow, &QmitkRenderWindow::CrosshairRotationModeChanged, this, &QmitkMxNMultiWidget::SetWidgetPlaneMode);
 
-  // connect time navigation controller to react on geometry time events with the render window's slice naviation controller
+  // connect time navigation controller to react on referenceGeometry time events with the render window's slice naviation controller
   m_TimeNavigationController->ConnectGeometryTimeEvent(renderWindow->GetSliceNavigationController());
   // reverse connection between the render window's slice navigation controller and the time navigation controller
   renderWindow->GetSliceNavigationController()->ConnectGeometryTimeEvent(m_TimeNavigationController);
@@ -558,4 +589,40 @@ QSplitter* QmitkMxNMultiWidget::BuildLayoutFromJSON(const nlohmann::json* jsonDa
 
   return split;
 
+}
+
+void QmitkMxNMultiWidget::SetInitialSelection()
+{
+  auto dataStorage = this->GetDataStorage();
+  if (nullptr == dataStorage)
+  {
+    return;
+  }
+
+  mitk::NodePredicateAnd::Pointer noHelperObjects = mitk::NodePredicateAnd::New();
+  noHelperObjects->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object")));
+  noHelperObjects->AddPredicate(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("hidden object")));
+  auto allNodes = dataStorage->GetSubset(noHelperObjects);
+  QmitkSynchronizedNodeSelectionWidget::NodeList currentSelection;
+  for (auto& node : *allNodes)
+  {
+    currentSelection.append(node);
+  }
+
+  m_SynchronizedWidgetConnector->ChangeSelection(currentSelection);
+}
+
+void QmitkMxNMultiWidget::ToggleSynchronization(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget)
+{
+  bool synchronized = synchronizedWidget->IsSynchronized();
+
+  if (synchronized)
+  {
+    m_SynchronizedWidgetConnector->ConnectWidget(synchronizedWidget);
+    m_SynchronizedWidgetConnector->SynchronizeWidget(synchronizedWidget);
+  }
+  else
+  {
+    m_SynchronizedWidgetConnector->DisconnectWidget(synchronizedWidget);
+  }
 }

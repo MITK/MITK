@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef ABSTRACTANNOTATIONRENDERER_H
-#define ABSTRACTANNOTATIONRENDERER_H
+#ifndef mitkAbstractAnnotationRenderer_h
+#define mitkAbstractAnnotationRenderer_h
 
 #include "mitkAnnotation.h"
 #include "mitkServiceInterface.h"
@@ -75,4 +75,4 @@ namespace mitk
 
 MITK_DECLARE_SERVICE_INTERFACE(mitk::AbstractAnnotationRenderer, "org.mitk.services.AbstractAnnotationRenderer")
 
-#endif // ABSTRACTANNOTATIONRENDERER_H
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkBaseDataIO_h
-#define __mitkBaseDataIO_h
+#ifndef mitkBaseDataIOFactory_h
+#define mitkBaseDataIOFactory_h
 
 #include <MitkLegacyIOExports.h>
 

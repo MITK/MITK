@@ -10,22 +10,22 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkVtkInteractorStyle.h"
+#include <mitkVtkInteractorStyle.h>
 
 #include <vtkCommand.h>
 #include <vtkObjectFactory.h>
 
-vtkStandardNewMacro(mitkVtkInteractorStyle);
+vtkStandardNewMacro(mitk::VtkInteractorStyle);
 
-mitkVtkInteractorStyle::mitkVtkInteractorStyle() : vtkInteractorStyleUser()
+mitk::VtkInteractorStyle::VtkInteractorStyle() : vtkInteractorStyleUser()
 {
 }
 
-mitkVtkInteractorStyle::~mitkVtkInteractorStyle()
+mitk::VtkInteractorStyle::~VtkInteractorStyle()
 {
 }
 
-void mitkVtkInteractorStyle::OnMouseWheelForward()
+void mitk::VtkInteractorStyle::OnMouseWheelForward()
 {
   if (this->HasObserver(vtkCommand::MouseWheelForwardEvent))
   {
@@ -33,7 +33,7 @@ void mitkVtkInteractorStyle::OnMouseWheelForward()
   }
 }
 
-void mitkVtkInteractorStyle::OnMouseWheelBackward()
+void mitk::VtkInteractorStyle::OnMouseWheelBackward()
 {
   if (this->HasObserver(vtkCommand::MouseWheelBackwardEvent))
   {

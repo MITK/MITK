@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkIGTLMessageSourceSelectionWidget_H
-#define QmitkIGTLMessageSourceSelectionWidget_H
+#ifndef QmitkIGTLMessageSourceSelectionWidget_h
+#define QmitkIGTLMessageSourceSelectionWidget_h
 
 //QT headers
 #include <QWidget>

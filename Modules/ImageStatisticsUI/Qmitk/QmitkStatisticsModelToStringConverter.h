@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef QmitkTableModelToQString_H__INCLUDED
-#define QmitkTableModelToQString_H__INCLUDED
+#ifndef QmitkStatisticsModelToStringConverter_h
+#define QmitkStatisticsModelToStringConverter_h
 
 #include <MitkImageStatisticsUIExports.h>
 #include <QmitkImageStatisticsTreeModel.h>
@@ -60,4 +60,4 @@ private:
 
 };
 
-#endif // QmitkTableModelToQString_H__INCLUDED
+#endif

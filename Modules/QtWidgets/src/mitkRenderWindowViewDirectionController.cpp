@@ -122,11 +122,8 @@ void mitk::RenderWindowViewDirectionController::InitializeViewByBoundingObjects(
   mitk::NodePredicateProperty::Pointer helperObject = mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true));
   mitk::NodePredicateNot::Pointer notAHelperObject = mitk::NodePredicateNot::New(helperObject);
 
-  // get all nodes that have a fixed layer for the given renderer
-  mitk::NodePredicateProperty::Pointer fixedLayer = mitk::NodePredicateProperty::New("fixedLayer", mitk::BoolProperty::New(true), renderer);
-
   // combine node predicates
-  mitk::NodePredicateAnd::Pointer combinedNodePredicate = mitk::NodePredicateAnd::New(notIncludeInBoundingBox, notAHelperObject, fixedLayer);
+  mitk::NodePredicateAnd::Pointer combinedNodePredicate = mitk::NodePredicateAnd::New(notIncludeInBoundingBox, notAHelperObject);
   mitk::DataStorage::SetOfObjects::ConstPointer filteredDataNodes = m_DataStorage->GetSubset(combinedNodePredicate);
 
   // calculate bounding geometry of these nodes

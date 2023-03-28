@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __MITK_MODEL_FIT_RESULT_HELPER_H_
-#define __MITK_MODEL_FIT_RESULT_HELPER_H_
+#ifndef mitkModelFitResultHelper_h
+#define mitkModelFitResultHelper_h
 
 #include <mitkImage.h>
 #include <mitkDataNode.h>

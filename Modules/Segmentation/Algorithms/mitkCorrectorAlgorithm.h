@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkCorrectorAlgorithmhIncluded
-#define mitkCorrectorAlgorithmhIncluded
+#ifndef mitkCorrectorAlgorithm_h
+#define mitkCorrectorAlgorithm_h
 
 #include "mitkContourModel.h"
 #include "mitkImageToImageFilter.h"

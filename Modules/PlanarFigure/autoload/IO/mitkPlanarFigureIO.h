@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITK_PLANAR_FIGURE_IO_H
-#define MITK_PLANAR_FIGURE_IO_H
+#ifndef mitkPlanarFigureIO_h
+#define mitkPlanarFigureIO_h
 
 #include <mitkAbstractFileIO.h>
 #include <mitkPlanarFigure.h>
@@ -94,4 +94,4 @@ namespace mitk
   };
 } // end of namespace mitk
 
-#endif // MITK_PLANAR_FIGURE_IO_H
+#endif

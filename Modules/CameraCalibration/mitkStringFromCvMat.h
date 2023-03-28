@@ -86,4 +86,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif // mitkStringFromCvMat_h
+#endif

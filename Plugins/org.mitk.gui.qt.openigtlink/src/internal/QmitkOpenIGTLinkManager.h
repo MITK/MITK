@@ -66,4 +66,4 @@ class QmitkOpenIGTLinkManager : public QmitkAbstractView
     mitk::IGTLDevice::Pointer m_CurrentIGTLDevice;
 };
 
-#endif // OpenIGTLinkManager_h
+#endif

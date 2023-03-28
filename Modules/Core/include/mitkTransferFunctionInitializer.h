@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITK_TRANSFER_FUNCTION_MODE_CREATOR_H_HEADER_INCLUDED
-#define MITK_TRANSFER_FUNCTION_MODE_CREATOR_H_HEADER_INCLUDED
+#ifndef mitkTransferFunctionInitializer_h
+#define mitkTransferFunctionInitializer_h
 
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
@@ -92,4 +92,4 @@ namespace mitk
   };
 }
 
-#endif /* MITK_TRANSFER_FUNCTION_MODE_CREATOR_H_HEADER_INCLUDED */
+#endif

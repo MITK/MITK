@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkSimpleLabelSetListWidget_h_Included
-#define QmitkSimpleLabelSetListWidget_h_Included
+#ifndef QmitkSimpleLabelSetListWidget_h
+#define QmitkSimpleLabelSetListWidget_h
 
 #include "mitkLabel.h"
 #include "mitkLabelSetImage.h"

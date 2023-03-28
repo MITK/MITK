@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef _MITK_REG_VIS_HELPER__H_
-#define _MITK_REG_VIS_HELPER__H_
+#ifndef mitkRegVisHelper_h
+#define mitkRegVisHelper_h
 
 //VTK
 #include <vtkSmartPointer.h>
@@ -75,5 +75,3 @@ MITKMATCHPOINTREGISTRATION_EXPORT const map::core::RegistrationKernelBase<3,3>* 
 
 
 #endif
-
-

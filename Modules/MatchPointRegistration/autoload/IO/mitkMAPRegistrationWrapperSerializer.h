@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef __mitkMAPRegistrationWrapperSerializer_h
-#define __mitkMAPRegistrationWrapperSerializer_h
+#ifndef mitkMAPRegistrationWrapperSerializer_h
+#define mitkMAPRegistrationWrapperSerializer_h
 
 #include <mitkBaseDataSerializer.h>
 

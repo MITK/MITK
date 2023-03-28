@@ -11,13 +11,11 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkSegmentationTaskListWidget.h"
-#include "org_mitk_gui_qt_flow_segmentation_Activator.h"
 
 #include <mitkCoreServices.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 
-#include <mitkIDataStorageService.h>
 #include <mitkIOUtil.h>
 #include <mitkLabelSetIOHelper.h>
 #include <mitkLabelSetImageHelper.h>
@@ -43,27 +41,6 @@ namespace
   mitk::IPreferences* GetSegmentationPreferences()
   {
     return mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.views.segmentation");
-  }
-
-  mitk::DataStorage* GetDataStorage()
-  {
-    auto* pluginContext = org_mitk_gui_qt_flow_segmentation_Activator::GetContext();
-    auto dataStorageServiceReference = pluginContext->getServiceReference<mitk::IDataStorageService>();
-
-    if (dataStorageServiceReference)
-    {
-      auto* dataStorageService = pluginContext->getService<mitk::IDataStorageService>(dataStorageServiceReference);
-
-      if (dataStorageService != nullptr)
-      {
-        auto dataStorageReference = dataStorageService->GetDataStorage();
-        pluginContext->ungetService(dataStorageServiceReference);
-
-        return dataStorageReference->GetDataStorage();
-      }
-    }
-
-    return nullptr;
   }
 
   std::filesystem::path GetInputLocation(const mitk::BaseData* data)
@@ -109,7 +86,6 @@ QmitkSegmentationTaskListWidget::QmitkSegmentationTaskListWidget(QWidget* parent
 {
   m_Ui->setupUi(this);
 
-  m_Ui->selectionWidget->SetDataStorage(GetDataStorage());
   m_Ui->selectionWidget->SetSelectionIsOptional(true);
   m_Ui->selectionWidget->SetEmptyInfo(QStringLiteral("Select a segmentation task list"));
   m_Ui->selectionWidget->SetAutoSelectNewNodes(true);
@@ -140,12 +116,16 @@ QmitkSegmentationTaskListWidget::QmitkSegmentationTaskListWidget(QWidget* parent
 
   auto* loadShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key::Key_L), this);
   connect(loadShortcut, &QShortcut::activated, this, &Self::OnLoadTaskShortcutActivated);
-
-  this->OnSelectionChanged(m_Ui->selectionWidget->GetSelectedNodes());
 }
 
 QmitkSegmentationTaskListWidget::~QmitkSegmentationTaskListWidget()
 {
+}
+
+void QmitkSegmentationTaskListWidget::SetDataStorage(mitk::DataStorage* dataStorage)
+{
+  m_DataStorage = dataStorage;
+  m_Ui->selectionWidget->SetDataStorage(dataStorage); // Triggers OnSelectionChanged()
 }
 
 void QmitkSegmentationTaskListWidget::OnUnsavedChangesSaved()
@@ -497,7 +477,7 @@ mitk::DataNode* QmitkSegmentationTaskListWidget::GetImageDataNode(size_t index) 
 {
   const auto imagePath = m_TaskList->GetAbsolutePath(m_TaskList->GetImage(index));
 
-  auto imageNodes = GetDataStorage()->GetDerivations(m_TaskListNode, mitk::NodePredicateFunction::New([imagePath](const mitk::DataNode* node) {
+  auto imageNodes = m_DataStorage->GetDerivations(m_TaskListNode, mitk::NodePredicateFunction::New([imagePath](const mitk::DataNode* node) {
     return imagePath == GetInputLocation(node->GetData());
   }));
 
@@ -515,7 +495,7 @@ mitk::DataNode* QmitkSegmentationTaskListWidget::GetSegmentationDataNode(size_t 
 
   if (imageNode != nullptr)
   {
-    auto segmentations = GetDataStorage()->GetDerivations(imageNode, mitk::TNodePredicateDataType<mitk::LabelSetImage>::New());
+    auto segmentations = m_DataStorage->GetDerivations(imageNode, mitk::TNodePredicateDataType<mitk::LabelSetImage>::New());
 
     if (!segmentations->empty())
       return segmentations->front();
@@ -532,16 +512,14 @@ void QmitkSegmentationTaskListWidget::UnloadTasks(const mitk::DataNode* skip)
 
   if (m_TaskListNode.IsNotNull())
   {
-    mitk::DataStorage::Pointer dataStorage = GetDataStorage();
-
-    auto imageNodes = dataStorage->GetDerivations(m_TaskListNode, mitk::TNodePredicateDataType<mitk::Image>::New());
+    auto imageNodes = m_DataStorage->GetDerivations(m_TaskListNode, mitk::TNodePredicateDataType<mitk::Image>::New());
 
     for (auto imageNode : *imageNodes)
     {
-      dataStorage->Remove(dataStorage->GetDerivations(imageNode, nullptr, false));
+      m_DataStorage->Remove(m_DataStorage->GetDerivations(imageNode, nullptr, false));
 
       if (imageNode != skip)
-        dataStorage->Remove(imageNode);
+        m_DataStorage->Remove(imageNode);
     }
   }
 
@@ -611,14 +589,12 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
     return;
   }
 
-  auto dataStorage = GetDataStorage();
-
   if (imageNode.IsNull())
   {
     imageNode = mitk::DataNode::New();
     imageNode->SetData(image);
 
-    dataStorage->Add(imageNode, m_TaskListNode);
+    m_DataStorage->Add(imageNode, m_TaskListNode);
 
     mitk::RenderingManager::GetInstance()->InitializeViews(image->GetTimeGeometry());
   }
@@ -669,7 +645,7 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
       segmentation->GetActiveLabelSet()->AddLabel(label);
     }
 
-    dataStorage->Add(segmentationNode, imageNode);
+    m_DataStorage->Add(segmentationNode, imageNode);
   }
   else
   {
@@ -677,7 +653,7 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
     segmentationNode->SetName(name);
     segmentationNode->SetData(segmentation);
 
-    dataStorage->Add(segmentationNode, imageNode);
+    m_DataStorage->Add(segmentationNode, imageNode);
   }
 
   // Workaround for T29431. Remove when T26953 is fixed.

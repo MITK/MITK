@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKINTERACTCONST_H
-#define MITKINTERACTCONST_H
+#ifndef mitkInteractionConst_h
+#define mitkInteractionConst_h
 
 //##Documentation
 //## @file mitkInteractionConst.h
@@ -773,4 +773,4 @@ namespace mitk
   };
 
 } // namespace mitk
-#endif // ifndef MITKINTERACTCONST_H
+#endif

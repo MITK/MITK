@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef USNAVIGATIONTARGETOCCLUSIONFILTER_H
-#define USNAVIGATIONTARGETOCCLUSIONFILTER_H
+#ifndef mitkUSNavigationTargetOcclusionFilter_h
+#define mitkUSNavigationTargetOcclusionFilter_h
 
 #include "mitkNavigationDataPassThroughFilter.h"
 #include "mitkDataStorage.h"
@@ -78,4 +78,4 @@ protected:
 };
 } // namespace mitk
 
-#endif // USNAVIGATIONTARGETOCCLUSIONFILTER_H
+#endif

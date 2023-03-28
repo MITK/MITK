@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef MITKNavigationDataDisplacementFilter_H_HEADER_INCLUDED_
-#define MITKNavigationDataDisplacementFilter_H_HEADER_INCLUDED_
+#ifndef mitkNavigationDataDisplacementFilter_h
+#define mitkNavigationDataDisplacementFilter_h
 
 #include <mitkNavigationDataToNavigationDataFilter.h>
 
@@ -77,4 +77,4 @@ namespace mitk
 
   };
 } // namespace mitk
-#endif /* MITKNAVIGATIONDATATONAVIGATIONDATAFILTER_H_HEADER_INCLUDED_ */
+#endif

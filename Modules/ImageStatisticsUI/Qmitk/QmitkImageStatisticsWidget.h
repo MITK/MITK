@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef QmitkImageStatisticsWidget_H__INCLUDED
-#define QmitkImageStatisticsWidget_H__INCLUDED
+#ifndef QmitkImageStatisticsWidget_h
+#define QmitkImageStatisticsWidget_h
 
 #include <MitkImageStatisticsUIExports.h>
 #include <ui_QmitkImageStatisticsWidget.h>
@@ -62,4 +62,4 @@ private:
   QmitkImageStatisticsTreeModel *m_imageStatisticsModel;
   QSortFilterProxyModel *m_ProxyModel;
 };
-#endif // QmitkImageStatisticsWidget_H__INCLUDED
+#endif

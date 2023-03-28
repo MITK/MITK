@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITK_NODE_SELECTION_BUTTON_H
-#define QMITK_NODE_SELECTION_BUTTON_H
+#ifndef QmitkNodeSelectionButton_h
+#define QmitkNodeSelectionButton_h
 
 #include <MitkQtWidgetsExports.h>
 
@@ -68,4 +68,4 @@ protected:
   bool m_NodeObserved;
 };
 
-#endif // QMITK_NODE_SELECTION_BUTTON_H
+#endif

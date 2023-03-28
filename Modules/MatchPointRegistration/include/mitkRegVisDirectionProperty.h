@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef _MITK_REG_VIS_DIRECTION_PROPERTY__H_
-#define _MITK_REG_VIS_DIRECTION_PROPERTY__H_
+#ifndef mitkRegVisDirectionProperty_h
+#define mitkRegVisDirectionProperty_h
 
 // MITK
 #include <mitkEnumerationProperty.h>

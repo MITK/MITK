@@ -110,4 +110,4 @@ private:
     QStringList m_ArgumentList;
     QStringList m_ImportFilesList;
 };
-#endif //QmitkStoreSCPLauncher_h
+#endif

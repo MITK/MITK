@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKCLARONINTERFACE_H_HEADER_INCLUDED_
-#define MITKCLARONINTERFACE_H_HEADER_INCLUDED_
+#ifndef mitkClaronInterface_h // Must be equal to include guard in mitkClaronInterface.h
+#define mitkClaronInterface_h
 
 #include <vector>
 #include <string>

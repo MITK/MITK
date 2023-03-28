@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKUSPOINTMARKINTERACTOR_H
-#define MITKUSPOINTMARKINTERACTOR_H
+#ifndef mitkUSPointMarkInteractor_h
+#define mitkUSPointMarkInteractor_h
 
 #include "mitkDataInteractor.h"
 
@@ -58,4 +58,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif // MITKUSPOINTMARKINTERACTOR_H
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATANODERESETGEOMETRYACTION_H
-#define QMITKDATANODERESETGEOMETRYACTION_H
+#ifndef QmitkDataNodeResetGeometryAction_h
+#define QmitkDataNodeResetGeometryAction_h
 
 #include <org_mitk_gui_qt_application_Export.h>
 
@@ -46,4 +46,4 @@ protected:
 
 };
 
-#endif // QMITKDATANODEREINITVIEWACTION_H
+#endif

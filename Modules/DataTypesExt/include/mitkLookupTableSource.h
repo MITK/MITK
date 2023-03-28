@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKLOOKUPTABLESOURCE_H_HEADER_INCLUDED
-#define MITKLOOKUPTABLESOURCE_H_HEADER_INCLUDED
+#ifndef mitkLookupTableSource_h
+#define mitkLookupTableSource_h
 
 #include "MitkDataTypesExtExports.h"
 #include "mitkCommon.h"

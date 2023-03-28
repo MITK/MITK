@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKSERIALCOMMUNICATION_H_HEADER_INCLUDED_
-#define MITKSERIALCOMMUNICATION_H_HEADER_INCLUDED_
+#ifndef mitkSerialCommunication_h
+#define mitkSerialCommunication_h
 
 #include <MitkIGTExports.h>
 #include "mitkCommon.h"
@@ -344,4 +344,4 @@ namespace mitk
 #endif
   };
 } // namespace mitk
-#endif /* MITKSERIALCOMMUNICATION_H_HEADER_INCLUDED_ */
+#endif

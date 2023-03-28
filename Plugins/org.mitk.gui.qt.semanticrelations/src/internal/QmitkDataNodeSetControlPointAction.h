@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATANODESETCONTROLPOINTACTION_H
-#define QMITKDATANODESETCONTROLPOINTACTION_H
+#ifndef QmitkDataNodeSetControlPointAction_h
+#define QmitkDataNodeSetControlPointAction_h
 
 // mitk gui qt application plugin
 #include <QmitkAbstractDataNodeAction.h>
@@ -40,4 +40,4 @@ protected:
 
 };
 
-#endif // QMITKDATANODESETCONTROLPOINTACTION_H
+#endif

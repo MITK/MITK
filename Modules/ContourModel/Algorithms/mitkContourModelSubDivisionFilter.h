@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _mitkContourModelSubDivisionFilter_h__
-#define _mitkContourModelSubDivisionFilter_h__
+#ifndef mitkContourModelSubDivisionFilter_h
+#define mitkContourModelSubDivisionFilter_h
 
 #include "mitkCommon.h"
 #include "mitkContourModel.h"

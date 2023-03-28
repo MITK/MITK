@@ -10,15 +10,13 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKSEGMENTATIONVIEW_H
-#define QMITKSEGMENTATIONVIEW_H
+#ifndef QmitkSegmentationView_h
+#define QmitkSegmentationView_h
 
 #include "ui_QmitkSegmentationViewControls.h"
 
 #include <QmitkAbstractView.h>
 #include <mitkIRenderWindowPartListener.h>
-
-#include <mitkSegmentationInteractor.h>
 
 /**
 * @brief The segmentation view provides a set of tool to use different segmentation algorithms.
@@ -114,18 +112,6 @@ private:
   * @param event   The observed mitk::SegmentationInteractionEvent.
   */
   void ValidateRendererGeometry(const itk::EventObject& event);
-  /**
-  * @brief Show a warning on the given base renderer.
-  *
-  * This function will show the overlay on the QmitkRenderWindow
-  * corresponding to the given base renderer to indicate that the
-  * renderer should not be used for interactive image segmentation.
-  *
-  * @param baseRenderer   The base renderer to "block"
-  * @param show           If true, the overlay widget will be shown.
-  *                       If false, the overlay widget will be hid.
-  */
-  void ShowRenderWindowWarning(mitk::BaseRenderer* baseRenderer, bool show);
 
   void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
@@ -181,8 +167,6 @@ private:
   mitk::DataNode::Pointer m_ReferenceNode;
   mitk::DataNode::Pointer m_WorkingNode;
 
-  mitk::SegmentationInteractor::Pointer m_SegmentationInteractor;
-
   typedef std::map<mitk::DataNode*, unsigned long> NodeTagMapType;
   NodeTagMapType m_WorkingDataObserverTags;
   NodeTagMapType m_ReferenceDataObserverTags;
@@ -201,4 +185,4 @@ private:
   bool m_SelectionChangeIsAlreadyBeingHandled;
 };
 
-#endif // QMITKSEGMENTATIONVIEW_H
+#endif

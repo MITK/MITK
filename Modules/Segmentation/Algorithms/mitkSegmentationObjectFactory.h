@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef SEGMENTATIONOBJECTFACTORY_H_INCLUDED
-#define SEGMENTATIONOBJECTFACTORY_H_INCLUDED
+#ifndef mitkSegmentationObjectFactory_h
+#define mitkSegmentationObjectFactory_h
 
 #include "mitkCoreObjectFactoryBase.h"
 #include <MitkSegmentationExports.h>

@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITKEXTDEFAULTPERSPECTIVE_H_
-#define QMITKEXTDEFAULTPERSPECTIVE_H_
+#ifndef QmitkExtDefaultPerspective_h
+#define QmitkExtDefaultPerspective_h
 
 #include <berryIPerspectiveFactory.h>
 
@@ -29,4 +29,4 @@ public:
 
 };
 
-#endif /* QMITKEXTDEFAULTPERSPECTIVE_H_ */
+#endif

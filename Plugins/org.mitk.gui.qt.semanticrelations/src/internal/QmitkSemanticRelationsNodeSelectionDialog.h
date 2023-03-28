@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKSEMANTICRELATIONSNODESELECTIONDIALOG_H
-#define QMITKSEMANTICRELATIONSNODESELECTIONDIALOG_H
+#ifndef QmitkSemanticRelationsNodeSelectionDialog_h
+#define QmitkSemanticRelationsNodeSelectionDialog_h
 
 // semantic relations module
 #include <mitkSemanticTypes.h>
@@ -47,4 +47,4 @@ public:
 
 };
 
-#endif // QMITKSEMANTICRELATIONSNODESELECTIONDIALOG_H
+#endif

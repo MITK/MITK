@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef LEVELWINDOWPRESET_H_HEADER
-#define LEVELWINDOWPRESET_H_HEADER
+#ifndef mitkLevelWindowPreset_h
+#define mitkLevelWindowPreset_h
 
 #include <MitkCoreExports.h>
 #include <map>

@@ -30,4 +30,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif // mitkAlgorithm_h
+#endif

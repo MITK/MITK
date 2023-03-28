@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __Q_MITK_MATCHPOINT_H
-#define __Q_MITK_MATCHPOINT_H
+#ifndef QmitkMatchPoint_h
+#define QmitkMatchPoint_h
 
 #include <berryISelectionListener.h>
 
@@ -201,5 +201,4 @@ private:
   Ui::MatchPointAdvancedControls m_Controls;
 };
 
-#endif // MatchPoint_h
-
+#endif

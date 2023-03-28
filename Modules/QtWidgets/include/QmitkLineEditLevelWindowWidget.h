@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKLINEEDITLEVELWINDOWWIDGET_H
-#define QMITKLINEEDITLEVELWINDOWWIDGET_H
+#ifndef QmitkLineEditLevelWindowWidget_h
+#define QmitkLineEditLevelWindowWidget_h
 
 #include <MitkQtWidgetsExports.h>
 
@@ -90,4 +90,4 @@ protected:
   QmitkLevelWindowWidgetContextMenu *m_Contextmenu;
 };
 
-#endif // QMITKLINEEDITLEVELWINDOWWIDGET_H
+#endif

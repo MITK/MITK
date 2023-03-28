@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef LEVENBERGMARQUARDTMODELFITFUNCTOR_H
-#define LEVENBERGMARQUARDTMODELFITFUNCTOR_H
+#ifndef mitkLevenbergMarquardtModelFitFunctor_h
+#define mitkLevenbergMarquardtModelFitFunctor_h
 
 #include <itkObject.h>
 #include <itkLevenbergMarquardtOptimizer.h>
@@ -101,4 +101,4 @@ namespace mitk
 }
 
 
-#endif // MODEL_FIT_FUNCTOR_BASE_H
+#endif

@@ -178,4 +178,4 @@ protected:
   void WriteSpacingToDevice();
 };
 
-#endif // UltrasoundSupport_h
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKXNATTREEMODEL_H
-#define QMITKXNATTREEMODEL_H
+#ifndef QmitkXnatTreeModel_h
+#define QmitkXnatTreeModel_h
 
 // CTK includes
 #include <ctkXnatTreeModel.h>
@@ -56,4 +56,4 @@ private:
   ctkXnatObject *InternalGetXnatObjectFromUrl(const QString &xnatObjectType, const QString &url, ctkXnatObject *parent);
 };
 
-#endif // QMITKXNATTREEMODEL_H
+#endif

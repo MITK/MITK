@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIGTLSERVER_H
-#define MITKIGTLSERVER_H
+#ifndef mitkIGTLServer_h
+#define mitkIGTLServer_h
 
 #include "mitkIGTLDevice.h"
 
@@ -121,4 +121,4 @@ namespace mitk
     std::mutex m_SentListMutex;
   };
 } // namespace mitk
-#endif /* MITKIGTLSERVER_H */
+#endif

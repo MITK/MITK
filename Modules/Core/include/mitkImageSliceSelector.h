@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef IMAGESLICESELECTOR_H_HEADER_INCLUDED_C1E4BE7B
-#define IMAGESLICESELECTOR_H_HEADER_INCLUDED_C1E4BE7B
+#ifndef mitkImageSliceSelector_h
+#define mitkImageSliceSelector_h
 
 #include "mitkSubImageSelector.h"
 #include <MitkCoreExports.h>
@@ -62,4 +62,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif /* IMAGESLICESELECTOR_H_HEADER_INCLUDED_C1E4BE7B */
+#endif

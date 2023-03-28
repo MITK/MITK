@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef _MITK_CONTOURMODEL_H_
-#define _MITK_CONTOURMODEL_H_
+#ifndef mitkContourModel_h
+#define mitkContourModel_h
 
 #include "mitkBaseData.h"
 #include "mitkCommon.h"

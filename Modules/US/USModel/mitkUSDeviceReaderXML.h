@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef mitkUSDeviceReaderXML_H_HEADER_INCLUDED_
-#define mitkUSDeviceReaderXML_H_HEADER_INCLUDED_
+#ifndef mitkUSDeviceReaderXML_h
+#define mitkUSDeviceReaderXML_h
 
 #include <MitkUSExports.h>
 
@@ -101,4 +101,4 @@ namespace mitk {
 
 } // namespace mitk
 
-#endif // mitkUSDeviceReaderXML_H_HEADER_INCLUDED_
+#endif

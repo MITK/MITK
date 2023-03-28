@@ -10,7 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-// mitk core
+#ifndef mitkSemanticRelationsTestHelper_h
+#define mitkSemanticRelationsTestHelper_h
+
 #include <mitkDataNode.h>
 
 namespace mitk
@@ -65,3 +67,5 @@ namespace mitk
 
   } // end SemanticRelationsTestHelper
 } // end mitk
+
+#endif

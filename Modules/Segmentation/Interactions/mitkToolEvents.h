@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITK_TOOL_EVENTS_H
-#define MITK_TOOL_EVENTS_H
+#ifndef mitkToolEvents_h
+#define mitkToolEvents_h
 
 #pragma GCC visibility push(default)
 #include <itkEventObject.h>

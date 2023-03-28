@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkLabelSetImageIO_h
-#define __mitkLabelSetImageIO_h
+#ifndef mitkLabelSetImageIO_h
+#define mitkLabelSetImageIO_h
 
 #include <mitkAbstractFileIO.h>
 #include <mitkLabelSetImage.h>
@@ -66,4 +66,4 @@ namespace mitk
   };
 } // end of namespace mitk
 
-#endif // __mitkLabelSetImageIO_h
+#endif

@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __mitkConvert2Dto3DImageFilter_h
-#define __mitkConvert2Dto3DImageFilter_h
+#ifndef mitkConvert2Dto3DImageFilter_h
+#define mitkConvert2Dto3DImageFilter_h
 
 // MITK
 #include "mitkImageToImageFilter.h"

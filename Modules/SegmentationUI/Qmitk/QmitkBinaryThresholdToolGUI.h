@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkBinaryThresholdToolGUI_h_Included
-#define QmitkBinaryThresholdToolGUI_h_Included
+#ifndef QmitkBinaryThresholdToolGUI_h
+#define QmitkBinaryThresholdToolGUI_h
 
 #include "QmitkBinaryThresholdToolGUIBase.h"
 #include "mitkBinaryThresholdTool.h"

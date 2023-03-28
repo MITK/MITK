@@ -100,4 +100,4 @@ namespace mitk
 }
 
 #include <../src/Splitter/mitkLinearSplitting.cpp>
-#endif //mitkLinearSplitting_h
+#endif

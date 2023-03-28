@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIMAGEBASEDPARAMETERIZATIONDELEGATE_H
-#define MITKIMAGEBASEDPARAMETERIZATIONDELEGATE_H
+#ifndef mitkImageBasedParameterizationDelegate_h
+#define mitkImageBasedParameterizationDelegate_h
 
 #include "mitkValueBasedParameterizationDelegate.h"
 #include <itkIndex.h>
@@ -78,4 +78,4 @@ private:
 };
 
 }
-#endif // MITKTWOCXINITIALPARAMETERIZATIONDELEGATE_H
+#endif

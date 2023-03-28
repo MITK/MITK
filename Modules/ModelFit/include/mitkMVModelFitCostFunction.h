@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MV_MODELFITCOSTFUNCTION_H
-#define MV_MODELFITCOSTFUNCTION_H
+#ifndef mitkMVModelFitCostFunction_h
+#define mitkMVModelFitCostFunction_h
 
 #include <itkMultipleValuedCostFunction.h>
 #include <itkMacro.h>
@@ -75,4 +75,4 @@ private:
 
 }
 
-#endif // MVModelFitCostFunction_H
+#endif

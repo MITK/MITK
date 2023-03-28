@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __ANISOTROPICITERATIVECLOSESTPOINTREGISTRATION_H__
-#define __ANISOTROPICITERATIVECLOSESTPOINTREGISTRATION_H__
+#ifndef mitkAnisotropicIterativeClosestPointRegistration_h
+#define mitkAnisotropicIterativeClosestPointRegistration_h
 
 // MITK
 #include <mitkCommon.h>

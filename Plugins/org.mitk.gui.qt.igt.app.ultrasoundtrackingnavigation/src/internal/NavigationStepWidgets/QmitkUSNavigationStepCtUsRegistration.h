@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKUSNAVIGATIONSTEPCTUSREGISTRATION_H
-#define QMITKUSNAVIGATIONSTEPCTUSREGISTRATION_H
+#ifndef QmitkUSNavigationStepCtUsRegistration_h
+#define QmitkUSNavigationStepCtUsRegistration_h
 
 #include "QmitkUSAbstractNavigationStep.h"
 
@@ -230,4 +230,4 @@ private:
 
 };
 
-#endif // QMITKUSNAVIGATIONSTEPCTUSREGISTRATION_H
+#endif

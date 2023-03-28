@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef __Q_MITK_MATCHPOINT_MAPPER_H
-#define __Q_MITK_MATCHPOINT_MAPPER_H
+#ifndef QmitkMatchPointMapper_h
+#define QmitkMatchPointMapper_h
 
 #include <berryISelectionListener.h>
 
@@ -154,5 +154,4 @@ private:
     bool m_preparedForBinaryInput;
 };
 
-#endif // MatchPoint_h
-
+#endif

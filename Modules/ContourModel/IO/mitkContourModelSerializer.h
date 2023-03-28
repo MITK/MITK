@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKCONTOURMODELSERIALIZER_H
-#define MITKCONTOURMODELSERIALIZER_H
+#ifndef mitkContourModelSerializer_h
+#define mitkContourModelSerializer_h
 
 #include <MitkContourModelExports.h>
 #include <mitkBaseDataSerializer.h>
@@ -33,4 +33,4 @@ namespace mitk
   };
 }
 
-#endif // MITKCONTOURMODELSERIALIZER_H
+#endif

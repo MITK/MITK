@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkPointCloudScoringFilter_h_Included
-#define mitkPointCloudScoringFilter_h_Included
+#ifndef mitkPointCloudScoringFilter_h
+#define mitkPointCloudScoringFilter_h
 
 #include <MitkSurfaceInterpolationExports.h>
 #include <mitkUnstructuredGridToUnstructuredGridFilter.h>

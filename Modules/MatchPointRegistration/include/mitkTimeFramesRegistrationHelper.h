@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __MITK_TIME_FRAMES_REGISTRATION_HELPER_H_
-#define __MITK_TIME_FRAMES_REGISTRATION_HELPER_H_
+#ifndef mitkTimeFramesRegistrationHelper_h
+#define mitkTimeFramesRegistrationHelper_h
 
 
 #include <mitkImage.h>
@@ -157,4 +157,4 @@ namespace mitk
 
 }
 
-#endif // __MITK_PARAMETER_FIT_IMAGE_GENERATOR_H_
+#endif

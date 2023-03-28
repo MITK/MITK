@@ -11,8 +11,8 @@ found in the LICENSE file.
 ============================================================================*/
 
 
-#ifndef QMITKXNATCONNECTIONPREFERENCEPAGE_H_
-#define QMITKXNATCONNECTIONPREFERENCEPAGE_H_
+#ifndef QmitkXnatConnectionPreferencePage_h
+#define QmitkXnatConnectionPreferencePage_h
 
 #include "berryIQtPreferencePage.h"
 
@@ -77,4 +77,4 @@ private:
 
 };
 
-#endif /* QMITKXNATCONNECTIONPREFERENCEPAGE_H_ */
+#endif

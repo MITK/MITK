@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKUSNAVIGATIONPERSPECTIVE_H
-#define QMITKUSNAVIGATIONPERSPECTIVE_H
+#ifndef QmitkUSNavigationPerspective_h
+#define QmitkUSNavigationPerspective_h
 
 #include <QObject>
 #include <berryIPerspectiveFactory.h>
@@ -33,4 +33,4 @@ public:
   void CreateInitialLayout (berry::IPageLayout::Pointer layout) override;
 };
 
-#endif // QMITKUSNAVIGATIONPERSPECTIVE_H
+#endif

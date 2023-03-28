@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __LINEAR_TEST_MODEL_FACTORY_H
-#define __LINEAR_TEST_MODEL_FACTORY_H
+#ifndef mitkLinearModelFactory_h
+#define mitkLinearModelFactory_h
 
 #include <mitkCommon.h>
 
@@ -50,4 +50,4 @@ namespace mitk
 }
 
 
-#endif //__LINEAR_TEST_MODEL_FACTORY_H
+#endif

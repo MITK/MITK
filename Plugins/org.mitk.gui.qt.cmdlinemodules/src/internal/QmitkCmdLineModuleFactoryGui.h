@@ -48,4 +48,4 @@ private:
 
 };
 
-#endif // QmitkCmdLineModuleFactoryGui_h
+#endif

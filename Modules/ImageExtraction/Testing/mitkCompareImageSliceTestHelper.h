@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkCompareImageSliceTestHelperhincluded
-#define mitkCompareImageSliceTestHelperhincluded
+#ifndef mitkCompareImageSliceTestHelper_h
+#define mitkCompareImageSliceTestHelper_h
 
 #include "mitkImageCast.h"
 #include <itkImageRegionConstIterator.h>

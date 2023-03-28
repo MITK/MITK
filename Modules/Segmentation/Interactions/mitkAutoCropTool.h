@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkAutoCropTool_h_Included
-#define mitkAutoCropTool_h_Included
+#ifndef mitkAutoCropTool_h
+#define mitkAutoCropTool_h
 
 #include "mitkCommon.h"
 #include "mitkSegmentationsProcessingTool.h"

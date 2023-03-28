@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITK_GIF_CONFIGURATION_PANEL_H
-#define QMITK_GIF_CONFIGURATION_PANEL_H
+#ifndef QmitkGIFConfigurationPanel_h
+#define QmitkGIFConfigurationPanel_h
 
 // MITK
 #include <mitkAbstractGlobalImageFeature.h>
@@ -43,4 +43,4 @@ namespace mitkUI
   };
 }
 
-#endif // QMITK_GIF_CONFIGURATION_PANEL_H
+#endif

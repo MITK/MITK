@@ -10,41 +10,23 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkSurfaceInterpolationController_h_Included
-#define mitkSurfaceInterpolationController_h_Included
+#ifndef mitkSurfaceInterpolationController_h
+#define mitkSurfaceInterpolationController_h
 
-#include "mitkColorProperty.h"
-#include "mitkCommon.h"
-#include "mitkInteractionConst.h"
-#include "mitkProperties.h"
-#include "mitkRestorePlanePositionOperation.h"
-#include "mitkSurface.h"
+#include <mitkDataStorage.h>
+#include <mitkImage.h>
+#include <mitkLabel.h>
+#include <mitkSurface.h>
+
 #include <MitkSurfaceInterpolationExports.h>
-
-#include "mitkComputeContourSetNormalsFilter.h"
-#include "mitkCreateDistanceImageFromSurfaceFilter.h"
-#include "mitkReduceContourSetFilter.h"
-
-#include "mitkDataNode.h"
-#include "mitkDataStorage.h"
-
-#include "vtkAppendPolyData.h"
-#include "vtkCellArray.h"
-#include "vtkPoints.h"
-#include "vtkPolyData.h"
-#include "vtkPolygon.h"
-#include "vtkSmartPointer.h"
-
-#include "mitkImageTimeSelector.h"
-#include "mitkVtkRepresentationProperty.h"
-#include "vtkImageData.h"
-#include "vtkMarchingCubes.h"
-#include "vtkProperty.h"
-
-#include "mitkProgressBar.h"
 
 namespace mitk
 {
+  class ComputeContourSetNormalsFilter;
+  class CreateDistanceImageFromSurfaceFilter;
+  class LabelSetImage;
+  class ReduceContourSetFilter;
+
   class MITKSURFACEINTERPOLATION_EXPORT SurfaceInterpolationController : public itk::Object
   {
   public:
@@ -53,16 +35,37 @@ namespace mitk
     itkCloneMacro(Self);
     itkGetMacro(DistanceImageSpacing, double);
 
-    struct ContourPositionInformation
+    struct MITKSURFACEINTERPOLATION_EXPORT ContourPositionInformation
     {
-      Surface::Pointer contour;
-      Vector3D contourNormal;
-      Point3D contourPoint;
+      int Pos;
+      unsigned int SliceIndex;
+      Surface::Pointer Contour;
+      Vector3D ContourNormal;
+      Point3D ContourPoint;
+      mitk::PlaneGeometry* Plane;
+      mitk::Label::PixelType LabelValue;
+      unsigned int LayerValue;
+      size_t TimeStep;
+
+      ContourPositionInformation()
+        : Pos(-1),
+          SliceIndex(0),
+          Plane(nullptr),
+          LabelValue(std::numeric_limits<mitk::Label::PixelType>::max()),
+          LayerValue(std::numeric_limits<unsigned int>::max()),
+          TimeStep(std::numeric_limits<size_t>::max())
+      {
+      }
     };
 
     typedef std::vector<ContourPositionInformation> ContourPositionInformationList;
     typedef std::vector<ContourPositionInformationList> ContourPositionInformationVec2D;
-    typedef std::map<mitk::Image *, ContourPositionInformationVec2D> ContourListMap;
+
+    //  first index is the current time step. second index is the layerID. third index is the contour index.
+    typedef std::vector<ContourPositionInformationVec2D> ContourPositionInformationVec3D;
+
+    typedef std::map<mitk::Image *, ContourPositionInformationVec3D> ContourListMap;
+    typedef std::map<mitk::Image *, ContourPositionInformationVec2D> ContourContainer;
 
     static SurfaceInterpolationController *GetInstance();
 
@@ -89,25 +92,82 @@ namespace mitk
     void AddNewContour(Surface::Pointer newContour);
 
     /**
-     * @brief Removes the contour for a given plane for the current selected segmenation
-     * @param contourInfo the contour which should be removed
-     * @return true if a contour was found and removed, false if no contour was found
-     */
-    bool RemoveContour(ContourPositionInformation contourInfo);
-
-    /**
      * @brief Adds new extracted contours to the list. If one or more contours at a given position
      *        already exist they will be updated respectively
      * @param newContours the list of the contours
      */
-    void AddNewContours(std::vector<Surface::Pointer> newContours);
+    void AddNewContours(const std::vector<Surface::Pointer>& newContours, std::vector<const mitk::PlaneGeometry*>& contourPlanes, bool reinitializeAction = false);
 
     /**
     * @brief Returns the contour for a given plane for the current selected segmenation
     * @param contourInfo the contour which should be returned
     * @return the contour as an mitk::Surface. If no contour is available at the give position nullptr is returned
     */
-    const mitk::Surface *GetContour(ContourPositionInformation contourInfo);
+    const mitk::Surface *GetContour(const ContourPositionInformation& contourInfo);
+
+    /**
+     * @brief Computes an interior point of the input contour. It's used to detect merge and erase operations.
+     *
+     * @param contour Contour for which to compute the contour
+     * @param labelSetImage LabelSetImage used input to check contour Label.
+     * @return mitk::Point3D 3D Interior point of the contour returned.
+     */
+    mitk::Point3D ComputeInteriorPointOfContour(const ContourPositionInformation& contour,
+                                                 mitk::LabelSetImage * labelSetImage);
+
+    /**
+     * @brief Make the surface interpolator responsive to the segmentation image by subscribing to events from the image.
+     *
+     */
+    void AddLabelSetConnection();
+
+    /**
+     * @brief Make the surface interpolator responsive to the segmentation image by stopping subscription to events from the image.
+     *
+     */
+    void RemoveLabelSetConnection();
+
+    void RemoveLabelSetConnection(mitk::LabelSetImage* labelSetImage, unsigned int layerID);
+
+
+    /**
+     * @brief Resets the pipeline for interpolation. The various filters used are reset.
+     *
+     */
+    void ReinitializeInterpolation();
+
+    void RemoveObservers();
+
+    void AddLabelSetConnection(unsigned int layerID);
+
+    void UnsetSelectedImage()
+    {
+      m_SelectedSegmentation = nullptr;
+    }
+
+    /**
+     * @brief Returns the number of layers in the current segmentation image.
+     *
+     */
+    unsigned int GetNumberOfLayersInCurrentSegmentation() const;
+
+    /**
+     * @brief Set the number of layers in the current segmentation image.
+     *
+     */
+    void SetNumberOfLayersInCurrentSegmentation(unsigned int);
+
+    /**
+     * @brief Function that does the data management when a layer is removed.
+     *
+     */
+    void OnRemoveLayer();
+
+    /**
+     * @brief  Function that does the data management when a layer is added.
+     *
+     */
+    void OnAddLayer();
 
     /**
     * @brief Returns the number of available contours for the current selected segmentation
@@ -116,21 +176,30 @@ namespace mitk
     unsigned int GetNumberOfContours();
 
     /**
-     * Interpolates the 3D surface from the given extracted contours
+     * @brief Performs the interpolation.
+     *
      */
     void Interpolate();
 
+    /**
+     * @brief Get the Result of the interpolation operation.
+     *
+     * @return mitk::Surface::Pointer
+     */
     mitk::Surface::Pointer GetInterpolationResult();
 
     /**
-     * Sets the minimum spacing of the current selected segmentation
-     * This is needed since the contour points we reduced before they are used to interpolate the surface
+     * @brief Sets the minimum spacing of the current selected segmentation
+     * This is needed since the contour points we reduced before they are used to interpolate the surface.
+     *
+     * @param minSpacing Paramter to set
      */
     void SetMinSpacing(double minSpacing);
 
     /**
-     * Sets the minimum spacing of the current selected segmentation
+     * @brief Sets the minimum spacing of the current selected segmentation
      * This is needed since the contour points we reduced before they are used to interpolate the surface
+     * @param maxSpacing Set the max Spacing for interpolation
      */
     void SetMaxSpacing(double maxSpacing);
 
@@ -191,13 +260,35 @@ namespace mitk
      */
     void RemoveAllInterpolationSessions();
 
-    /**
-     * @brief Reinitializes the interpolation using the provided contour data
-     * @param contours a mitk::Surface which contains the contours as polys in the vtkPolyData
-     */
-    void ReinitializeInterpolation(mitk::Surface::Pointer contours);
-
     mitk::Image *GetImage();
+
+    /**
+     * @brief Get the Contours at a certain timeStep and layerID.
+     *
+     * @param timeStep Time Step from which to get the contours.
+     * @param layerID Layer from which to get the contours.
+     * @return std::vector<ContourPositionInformation> Returns contours.
+     */
+    ContourPositionInformationList& GetContours(unsigned int timeStep, unsigned int layerID);
+
+    /**
+     * @brief Trigerred with the "Reinit Interpolation" action. The contours are used to repopulate the
+     *        surfaceInterpolator data structures so that interpolation can be performed after reloading data.
+     *
+     * @param contourList List of contours extracted
+     * @param contourPlanes List of planes at which the contours were extracted
+     */
+    void CompleteReinitialization(const std::vector<mitk::Surface::Pointer>& contourList,
+                                           std::vector<const mitk::PlaneGeometry *>& contourPlanes);
+
+    /**
+     * @brief Removes contours of a particular label, at a given time step and layerID.
+     *
+     * @param label Label of contour to remove.
+     * @param timeStep Time step in which to remove the contours.
+     * @param layerID Layer in which the contour should be removed.
+     */
+    void RemoveContours(mitk::Label::PixelType label, unsigned int timeStep, unsigned int layerID);
 
     /**
      * Estimates the memory which is needed to build up the equationsystem for the interpolation.
@@ -205,7 +296,28 @@ namespace mitk
      */
     double EstimatePortionOfNeededMemory();
 
+    /**
+     * Adds Contours from the active Label to the interpolation pipeline
+     */
+    void AddActiveLabelContoursForInterpolation(mitk::Label::PixelType activeLabel);
+
     unsigned int GetNumberOfInterpolationSessions();
+
+    /**
+     * @brief Removes the contour for a given plane for the current selected segmenation
+     * @param contourInfo the contour which should be removed
+     * @return true if a contour was found and removed, false if no contour was found
+     */
+    bool RemoveContour(ContourPositionInformation contourInfo);
+
+    /**
+     * @brief Get the Segmentation Image Node object
+     *
+     * @return DataNode* returns the DataNode containing the segmentation image.
+     */
+    mitk::DataNode* GetSegmentationImageNode();
+
+
 
   protected:
     SurfaceInterpolationController();
@@ -216,17 +328,62 @@ namespace mitk
     void GetImageBase(itk::Image<TPixel, VImageDimension> *input, itk::ImageBase<3>::Pointer &result);
 
   private:
-    void ReinitializeInterpolation();
 
+    /**
+     * @brief
+     *
+     * @param caller
+     * @param event
+     */
     void OnSegmentationDeleted(const itk::Object *caller, const itk::EventObject &event);
 
-    void AddToInterpolationPipeline(ContourPositionInformation contourInfo);
+    /**
+     * @brief Function that removes contours of a particular label when the "Remove Label" event is trigerred in the labelSetImage.
+     *
+     */
+    void OnRemoveLabel();
 
-    ReduceContourSetFilter::Pointer m_ReduceFilter;
-    ComputeContourSetNormalsFilter::Pointer m_NormalsFilter;
-    CreateDistanceImageFromSurfaceFilter::Pointer m_InterpolateSurfaceFilter;
+    /**
+     * @brief When a new contour is added to the pipeline or an existing contour is replaced,
+     *        the plane geometry information of that contour is added as a child node to the
+     *        current node of the segmentation image. This is useful in the retrieval of contour information
+     *        when data is reloaded after saving.
+     *
+     * @param contourInfo contourInfo struct to add to data storage.
+     */
+    void AddPlaneGeometryNodeToDataStorage(const ContourPositionInformation& contourInfo);
 
-    Surface::Pointer m_Contours;
+    /**
+     * @brief Function that toggles active label, when the active label is changed.
+     *
+     */
+    void OnActiveLabel(mitk::Label::PixelType);
+
+    /**
+     * @brief Clears the interpolation data structures. Called from CompleteReinitialization().
+     *
+     */
+    void ClearInterpolationSession();
+
+    /**
+     * @brief Add contour to the interpolation pipeline
+     *
+     * @param contourInfo Contour information to be added
+     * @param reinitializationAction If the contour is coming from a reinitialization process or not
+     */
+    void AddToInterpolationPipeline(ContourPositionInformation& contourInfo, bool reinitializationAction = false);
+
+    /**
+     * @brief Function to respond to layer changed
+     *
+     */
+    void OnLayerChanged();
+
+    itk::SmartPointer<ReduceContourSetFilter> m_ReduceFilter;
+    itk::SmartPointer<ComputeContourSetNormalsFilter> m_NormalsFilter;
+    itk::SmartPointer<CreateDistanceImageFromSurfaceFilter> m_InterpolateSurfaceFilter;
+
+    mitk::Surface::Pointer m_Contours;
 
     double m_DistanceImageSpacing;
 
@@ -234,17 +391,79 @@ namespace mitk
 
     mitk::DataStorage::Pointer m_DataStorage;
 
-    ContourListMap m_ListOfInterpolationSessions;
+    ContourContainer m_ListOfInterpolationSessions;
+    ContourListMap m_ListOfContours;
 
     mitk::Surface::Pointer m_InterpolationResult;
 
     unsigned int m_CurrentNumberOfReducedContours;
+    unsigned int m_NumberOfConnectionsAdded;
 
     mitk::Image *m_SelectedSegmentation;
 
     std::map<mitk::Image *, unsigned long> m_SegmentationObserverTags;
 
     mitk::TimePointType m_CurrentTimePoint;
+
+    unsigned int m_ContourIndex;
+    unsigned int m_ContourPosIndex;
+    unsigned int m_NumberOfLayersInCurrentSegmentation;
+
+    mitk::Label::PixelType m_PreviousActiveLabelValue;
+    mitk::Label::PixelType m_CurrentActiveLabelValue;
+
+    unsigned int m_PreviousLayerIndex;
+    unsigned int m_CurrentLayerIndex;
   };
+
+  namespace ContourExt
+  {
+    /**
+     * @brief Returns the plane the contour belongs to.
+     *
+     * @param ContourNormal
+     * @return size_t
+     */
+    size_t GetContourOrientation(const mitk::Vector3D& ContourNormal);
+
+    /**
+     * @brief Function used to compute an interior point of the contour.
+     *        Used to react to the merge label and erase label actions.
+     *
+     *
+     * @tparam VImageDimension Dimension of the image
+     * @param contour Contour for which to compute the interior point
+     * @param labelSetImage Label Set Image For which to find the contour
+     * @param currentTimePoint Current Time Point of the Image
+     * @return mitk::Point3D The returned point in the interior of the contour.s
+     */
+    template<unsigned int VImageDimension>
+    mitk::Point3D ComputeInteriorPointOfContour(const mitk::SurfaceInterpolationController::ContourPositionInformation& contour,
+                                                 mitk::LabelSetImage * labelSetImage,
+                                                 mitk::TimePointType currentTimePoint);
+    /**
+     * @brief Get a Grid points within the bounding box of the contour at a certain spacing.
+     *
+     * @param planeDimension  Plane orientation (Sagittal, Coronal, Axial)
+     * @param startDim1 Starting coordinate along dimension 1 to start the grid point sampling from
+     * @param numPointsToSampleDim1 Number of points to sample along dimension 1
+     * @param deltaDim1 Spacing for dimension 1 at which points should be sampled
+     * @param startDim2 Starting coordinate along dimension 2 to start the grid point sampling from
+     * @param numPointsToSampleDim2 Number of points to sample along dimension 2
+     * @param deltaDim2 Spacing for dimension 1 at which points should be sampled
+     * @param valuePlaneDim Slice index of the plane in the volume
+     * @return std::vector< mitk::Point3D > The computed grid points are returned by the function.
+     */
+    std::vector< mitk::Point3D > GetBoundingBoxGridPoints(size_t planeDimension,
+                                            double startDim1,
+                                            size_t numPointsToSampleDim1,
+                                            double deltaDim1,
+                                            double startDim2,
+                                            size_t numPointsToSampleDim2,
+                                            double deltaDim2,
+                                            double valuePlaneDim);
+  };
+
 }
+
 #endif

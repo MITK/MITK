@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef SIMPLEFUNCTOR_POLICY_H
-#define SIMPLEFUNCTOR_POLICY_H
+#ifndef mitkSimpleFunctorPolicy_h
+#define mitkSimpleFunctorPolicy_h
 
 #include "itkIndex.h"
 #include "mitkSimpleFunctorBase.h"
@@ -63,4 +63,4 @@ namespace mitk
 }
 
 
-#endif // SIMPLEFUNCTORPOLICY_H
+#endif

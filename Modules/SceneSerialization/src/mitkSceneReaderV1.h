@@ -10,6 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#ifndef mitkSceneReaderV1_h
+#define mitkSceneReaderV1_h
+
 #include "mitkSceneReader.h"
 
 namespace tinyxml2
@@ -69,3 +72,5 @@ namespace mitk
     UIDGenerator m_UIDGen;
   };
 }
+
+#endif

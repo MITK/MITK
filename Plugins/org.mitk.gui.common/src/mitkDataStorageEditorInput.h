@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKDATASTORAGEEDITORINPUT_H_
-#define MITKDATASTORAGEEDITORINPUT_H_
+#ifndef mitkDataStorageEditorInput_h
+#define mitkDataStorageEditorInput_h
 
 #include <berryIEditorInput.h>
 #include <berryIPersistableElement.h>
@@ -61,4 +61,4 @@ private:
 
 }
 
-#endif /*MITKDATASTORAGEEDITORINPUT_H_*/
+#endif

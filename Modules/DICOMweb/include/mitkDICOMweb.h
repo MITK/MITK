@@ -134,4 +134,4 @@ namespace mitk
  };
 }
 
-#endif // DICOMweb_h
+#endif

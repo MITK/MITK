@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef OptiTrackTrackingTool_H_HEADER_INCLUDED_
-#define OptiTrackTrackingTool_H_HEADER_INCLUDED_
+#ifndef mitkOptitrackTrackingTool_h
+#define mitkOptitrackTrackingTool_h
 
 #include <MitkIGTExports.h>
 #include "mitkTrackingDevice.h"
@@ -210,4 +210,4 @@ namespace mitk
 
   };
 }
-#endif /* OptiTrackTrackingTool_H_HEADER_INCLUDED_ */
+#endif

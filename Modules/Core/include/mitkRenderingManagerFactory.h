@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKRENDERINGMANAGERFACTORY_H_HEADER_INCLUDED_C135A197
-#define MITKRENDERINGMANAGERFACTORY_H_HEADER_INCLUDED_C135A197
+#ifndef mitkRenderingManagerFactory_h
+#define mitkRenderingManagerFactory_h
 
 #include "mitkRenderingManager.h"
 

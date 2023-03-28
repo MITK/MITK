@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKSEMANTICRELATIONSVIEW_H
-#define QMITKSEMANTICRELATIONSVIEW_H
+#ifndef QmitkSemanticRelationsView_h
+#define QmitkSemanticRelationsView_h
 
 // semantic relations plugin
 #include "ui_QmitkSemanticRelationsControls.h"
@@ -103,4 +103,4 @@ private:
   QmitkSemanticRelationsContextMenu* m_ContextMenu;
 };
 
-#endif // QMITKSEMANTICRELATIONSVIEW_H
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKCONVERTT2CONCENTRATIONFUNCTOR
-#define MITKCONVERTT2CONCENTRATIONFUNCTOR
+#ifndef mitkConvertT2ConcentrationFunctor_h
+#define mitkConvertT2ConcentrationFunctor_h
 
 #include "MitkPharmacokineticsExports.h"
 
@@ -59,5 +59,4 @@ namespace mitk {
     };
 
 }
-#endif // MITKCONVERTT2CONCENTRATIONFUNCTOR
-
+#endif

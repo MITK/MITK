@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkOclDataSetToDataSetFilter_h
-#define __mitkOclDataSetToDataSetFilter_h
+#ifndef mitkOclDataSetToDataSetFilter_h
+#define mitkOclDataSetToDataSetFilter_h
 
 #include "mitkOclDataSetFilter.h"
 
@@ -77,4 +77,4 @@ private:
   unsigned int m_BlockDims[3];
 };
 }
-#endif // __mitkOclDataSetToDataSetFilter_h
+#endif

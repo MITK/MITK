@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MODEL_GENERATOR_H
-#define MODEL_GENERATOR_H
+#ifndef mitkModelGenerator_h
+#define mitkModelGenerator_h
 
 #include "mitkModelBase.h"
 #include "mitkModelFactoryBase.h"
@@ -56,4 +56,4 @@ namespace mitk
   };
 }
 
-#endif // MODEL_GENERATOR_H
+#endif

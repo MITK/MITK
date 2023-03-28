@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKCAMERAINTRINSICSPROPERTY_H
-#define MITKCAMERAINTRINSICSPROPERTY_H
+#ifndef mitkCameraIntrinsicsProperty_h
+#define mitkCameraIntrinsicsProperty_h
 
 #include "mitkBaseProperty.h"
 #include "mitkCameraIntrinsics.h"
@@ -70,4 +70,4 @@ private:
 
 } // namespace mitk
 
-#endif // MITKCAMERAINTRINSICSPROPERTY_H
+#endif

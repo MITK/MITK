@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef TEXTAnnotation2D_H
-#define TEXTAnnotation2D_H
+#ifndef mitkTextAnnotation2D_h
+#define mitkTextAnnotation2D_h
 
 #include "MitkAnnotationExports.h"
 #include <mitkLocalStorageHandler.h>
@@ -80,4 +80,4 @@ namespace mitk
   };
 
 } // namespace mitk
-#endif // TEXTAnnotation2D_H
+#endif

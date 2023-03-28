@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_CircularProfileTubeElement_H
-#define _MITK_CircularProfileTubeElement_H
+#ifndef mitkCircularProfileTubeElement_h
+#define mitkCircularProfileTubeElement_h
 
 #include <MitkTubeGraphExports.h>
 

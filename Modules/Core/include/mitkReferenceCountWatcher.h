@@ -10,6 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#ifndef mitkReferenceCountWatcher_h
+#define mitkReferenceCountWatcher_h
+
 #include "itkCommand.h"
 #include <MitkCoreExports.h>
 #include <mitkCommon.h>
@@ -91,3 +94,5 @@ namespace mitk
     unsigned long m_ObserverTag;
   };
 }
+
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MRNORMLINEARSTATISTICBASEDFILTER_H
-#define MRNORMLINEARSTATISTICBASEDFILTER_H
+#ifndef mitkMRNormLinearStatisticBasedFilter_h
+#define mitkMRNormLinearStatisticBasedFilter_h
 
 #include "mitkCommon.h"
 #include "MitkCLMRUtilitiesExports.h"
@@ -78,4 +78,4 @@ namespace mitk {
   };
 } // namespace mitk
 
-#endif /* MRNORMLINEARSTATISTICBASEDFILTER_H */
+#endif

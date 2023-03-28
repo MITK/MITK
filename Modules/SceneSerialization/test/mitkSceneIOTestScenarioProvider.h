@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkSceneIOTestScenarioProvider_h_included
-#define mitkSceneIOTestScenarioProvider_h_included
+#ifndef mitkSceneIOTestScenarioProvider_h
+#define mitkSceneIOTestScenarioProvider_h
 
 #include "mitkStandaloneDataStorage.h"
 

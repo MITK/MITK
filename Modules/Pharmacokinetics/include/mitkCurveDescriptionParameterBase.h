@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef CURVEDESCRIPTIONPARAMETERBASE_H
-#define CURVEDESCRIPTIONPARAMETERBASE_H
+#ifndef mitkCurveDescriptionParameterBase_h
+#define mitkCurveDescriptionParameterBase_h
 
 #include <iostream>
 
@@ -73,4 +73,4 @@ class MITKPHARMACOKINETICS_EXPORT CurveDescriptionParameterBase : public itk::Ob
    };
 }
 
-#endif // CURVEDESCRIPTIONPARAMETERBASE_H
+#endif

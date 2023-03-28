@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITK_POINTLIST_VIEW_H_INCLUDED
-#define QMITK_POINTLIST_VIEW_H_INCLUDED
+#ifndef QmitkPointListView_h
+#define QmitkPointListView_h
 
 #include "MitkQtWidgetsExtExports.h"
 

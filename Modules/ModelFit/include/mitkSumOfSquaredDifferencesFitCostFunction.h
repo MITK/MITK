@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef SUM_OF_SQUARED_DIFFERENCES_FITCOSTFUNCTION_H
-#define SUM_OF_SQUARED_DIFFERENCES_FITCOSTFUNCTION_H
+#ifndef mitkSumOfSquaredDifferencesFitCostFunction_h
+#define mitkSumOfSquaredDifferencesFitCostFunction_h
 
 #include <mitkSVModelFitCostFunction.h>
 
@@ -49,4 +49,4 @@ protected:
 
 }
 
-#endif // SumOfSquaredDifferencesFitCostFunction_H
+#endif

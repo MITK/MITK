@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef VTKMITKEVENTPROVIDER_H_HEADER_INCLUDED_C1C53723
-#define VTKMITKEVENTPROVIDER_H_HEADER_INCLUDED_C1C53723
+#ifndef mitkVtkEventProvider_h
+#define mitkVtkEventProvider_h
 
 #include "mitkRenderWindow.h"
 #include <MitkCoreExports.h>
@@ -60,4 +60,4 @@ namespace mitk
     void operator=(const vtkEventProvider &);   // Not implemented.
   };
 }
-#endif /* VTKMITKEVENTPROVIDER_H_HEADER_INCLUDED_C1C53723 */
+#endif

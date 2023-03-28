@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef DICOMQIPROPERTYHELPER_H_
-#define DICOMQIPROPERTYHELPER_H_
+#ifndef mitkDICOMQIPropertyHelper_h
+#define mitkDICOMQIPropertyHelper_h
 
 #include <mitkDICOMTag.h>
 #include <mitkBaseData.h>

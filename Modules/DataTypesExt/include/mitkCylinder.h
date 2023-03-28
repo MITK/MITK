@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKCYLINDER_H_HEADER_INCLUDED
-#define MITKCYLINDER_H_HEADER_INCLUDED
+#ifndef mitkCylinder_h
+#define mitkCylinder_h
 
 #include "MitkDataTypesExtExports.h"
 #include "mitkBoundingObject.h"
@@ -36,4 +36,4 @@ namespace mitk
     ~Cylinder() override;
   };
 }
-#endif /* MITKCYLINDER_H_HEADER_INCLUDED */
+#endif

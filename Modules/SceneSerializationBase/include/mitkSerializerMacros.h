@@ -10,6 +10,9 @@ found in the LICENSE file.
 
 ============================================================================*/
 
+#ifndef mitkSerializerMacros_h
+#define mitkSerializerMacros_h
+
 #include <itkObjectFactoryBase.h>
 #include <itkVersion.h>
 
@@ -73,3 +76,5 @@ class classname##Factory : public ::itk::ObjectFactoryBase                      
 }                                                                                                                 \
   \
 static mitk::classname##RegistrationMethod somestaticinitializer_##classname;
+
+#endif

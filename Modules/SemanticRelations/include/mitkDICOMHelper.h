@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKDICOMHELPER_H
-#define MITKDICOMHELPER_H
+#ifndef mitkDICOMHelper_h
+#define mitkDICOMHelper_h
 
 #include <MitkSemanticRelationsExports.h>
 
@@ -123,4 +123,4 @@ namespace mitk
   MITKSEMANTICRELATIONS_EXPORT std::string TrimDICOM(const std::string& identifier);
 } // namespace mitk
 
-#endif // MITKDICOMHELPER_H
+#endif

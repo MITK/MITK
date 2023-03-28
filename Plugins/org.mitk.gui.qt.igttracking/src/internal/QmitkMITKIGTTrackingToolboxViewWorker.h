@@ -91,4 +91,4 @@ protected:
   void DisconnectDevice();
 };
 
-#endif // _QMITKMITKIGTTRACKINGTOOLBOXVIEWWorker_H_INCLUDED
+#endif

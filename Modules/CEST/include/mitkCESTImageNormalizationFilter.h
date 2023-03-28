@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef __mitkCESTImageNormalizationFilter_h
-#define __mitkCESTImageNormalizationFilter_h
+#ifndef mitkCESTImageNormalizationFilter_h
+#define mitkCESTImageNormalizationFilter_h
 
 #include <MitkCESTExports.h>
 

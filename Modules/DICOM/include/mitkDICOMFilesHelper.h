@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKDICOMFILESHELPER_H
-#define MITKDICOMFILESHELPER_H
+#ifndef mitkDICOMFilesHelper_h
+#define mitkDICOMFilesHelper_h
 
 #include <string>
 #include <vector>
@@ -38,4 +38,4 @@ DICOMFilePathList FilterForDICOMFiles(const DICOMFilePathList& fileList);
 DICOMFilePathList FilterDICOMFilesForSameSeries(const std::string& refFilePath, const DICOMFilePathList& fileList);
 }
 
-#endif // MITKDICOMFILESHELPER_H
+#endif

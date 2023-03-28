@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKDATANODETEXTUREINTERPOLATIONACTION_H
-#define QMITKDATANODETEXTUREINTERPOLATIONACTION_H
+#ifndef QmitkDataNodeTextureInterpolationAction_h
+#define QmitkDataNodeTextureInterpolationAction_h
 
 #include <org_mitk_gui_qt_application_Export.h>
 
@@ -42,4 +42,4 @@ protected:
 
 };
 
-#endif // QMITKDATANODETEXTUREINTERPOLATIONACTION_H
+#endif

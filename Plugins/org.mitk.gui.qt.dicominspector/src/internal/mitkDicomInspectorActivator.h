@@ -29,4 +29,4 @@ public:
 
 }; // mitkDicomInspectorActivator
 
-#endif // mitkDicomInspectorActivator_h
+#endif

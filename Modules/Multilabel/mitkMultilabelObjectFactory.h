@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MULTILABELOBJECTFACTORY_H_INCLUDED
-#define MULTILABELOBJECTFACTORY_H_INCLUDED
+#ifndef mitkMultilabelObjectFactory_h
+#define mitkMultilabelObjectFactory_h
 
 #include "mitkCoreObjectFactoryBase.h"
 

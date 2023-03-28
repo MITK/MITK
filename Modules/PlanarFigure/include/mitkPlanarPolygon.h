@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef _MITK_PLANAR_POLYGON_H_
-#define _MITK_PLANAR_POLYGON_H_
+#ifndef mitkPlanarPolygon_h
+#define mitkPlanarPolygon_h
 
 #include "mitkPlanarFigure.h"
 #include <MitkPlanarFigureExports.h>
@@ -87,4 +87,4 @@ namespace mitk
 
 } // namespace mitk
 
-#endif //_MITK_PLANAR_POLYGON_H_
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef InteractionEventObserver_h
-#define InteractionEventObserver_h
+#ifndef mitkInteractionEventObserver_h
+#define mitkInteractionEventObserver_h
 
 #include "mitkInteractionEvent.h"
 #include "mitkServiceInterface.h"
@@ -68,4 +68,4 @@ namespace mitk
 
 } /* namespace mitk */
 MITK_DECLARE_SERVICE_INTERFACE(mitk::InteractionEventObserver, "org.mitk.InteractionEventObserver")
-#endif /* InteractionEventObserver_h */
+#endif

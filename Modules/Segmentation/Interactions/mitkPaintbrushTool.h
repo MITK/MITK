@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkPaintbrushTool_h_Included
-#define mitkPaintbrushTool_h_Included
+#ifndef mitkPaintbrushTool_h
+#define mitkPaintbrushTool_h
 
 #include "mitkCommon.h"
 #include "mitkFeedbackContourTool.h"

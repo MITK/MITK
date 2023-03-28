@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKTABLEITEMTHUMBNAILDELEGATE_H
-#define QMITKTABLEITEMTHUMBNAILDELEGATE_H
+#ifndef QmitkTableItemThumbnailDelegate_h
+#define QmitkTableItemThumbnailDelegate_h
 
 #include <QStyledItemDelegate>
 
@@ -29,4 +29,4 @@ public:
   void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 };
 
-#endif // QMITKTABLEITEMTHUMBNAILDELEGATE_H
+#endif

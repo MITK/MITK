@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKOVERLAYCONTROLLER_H_HEADER_INCLUDED_C1E77191
-#define MITKOVERLAYCONTROLLER_H_HEADER_INCLUDED_C1E77191
+#ifndef QmitkOverlayController_h
+#define QmitkOverlayController_h
 
 // MITK-Stuff
 #include "QmitkOverlay.h"
@@ -153,4 +153,4 @@ protected:
   mitk::PropertyList::Pointer m_PropertyList;
 };
 
-#endif /* MITKOVERLAYCONTROLLER_H_HEADER_INCLUDED_C1E77191 */
+#endif

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef PIXELTYPETRAITS_H
-#define PIXELTYPETRAITS_H
+#ifndef mitkPixelTypeTraits_h
+#define mitkPixelTypeTraits_h
 
 #include <itkDiffusionTensor3D.h>
 #include <itkImage.h>
@@ -269,4 +269,4 @@ namespace mitk
 
 } // end namespace mitk
 
-#endif // PIXELTYPETRAITS_H
+#endif

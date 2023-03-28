@@ -9,8 +9,8 @@ Use of this source code is governed by a 3-clause BSD license that can be
 found in the LICENSE file.
 
 ============================================================================*/
-#ifndef QmitkC3jsWidget_h
-#define QmitkC3jsWidget_h
+#ifndef QmitkChartWidget_h
+#define QmitkChartWidget_h
 
 #include <map>
 #include <memory>

@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKABOUTHANDLER_H
-#define QMITKABOUTHANDLER_H
+#ifndef QmitkAboutHandler_h
+#define QmitkAboutHandler_h
 
 #include <berryAbstractHandler.h>
 
@@ -24,4 +24,4 @@ public:
   Object::Pointer Execute(const berry::SmartPointer<const berry::ExecutionEvent>& event) override;
 };
 
-#endif // QMITKABOUTHANDLER_H
+#endif

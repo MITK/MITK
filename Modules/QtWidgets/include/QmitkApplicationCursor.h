@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITK_APPLICATION_CURSOR_H_INCLUDED
-#define QMITK_APPLICATION_CURSOR_H_INCLUDED
+#ifndef QmitkApplicationCursor_h
+#define QmitkApplicationCursor_h
 
 #include "mitkApplicationCursor.h"
 #include <MitkQtWidgetsExports.h>

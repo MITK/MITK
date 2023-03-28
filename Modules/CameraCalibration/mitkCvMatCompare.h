@@ -103,4 +103,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif // mitkCvMatCompare_h
+#endif

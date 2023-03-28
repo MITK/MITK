@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKNavigationDataPlayer_H_HEADER_INCLUDED_
-#define MITKNavigationDataPlayer_H_HEADER_INCLUDED_
+#ifndef mitkNavigationDataPlayer_h
+#define mitkNavigationDataPlayer_h
 
 #include <mitkNavigationDataPlayerBase.h>
 
@@ -94,4 +94,4 @@ namespace mitk {
   };
 } // namespace mitk
 
-#endif /* MITKNavigationDataPlayer_H_HEADER_INCLUDED_ */
+#endif

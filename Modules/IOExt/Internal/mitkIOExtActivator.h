@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef MITKIOEXTACTIVATOR_H
-#define MITKIOEXTACTIVATOR_H
+#ifndef mitkIOExtActivator_h
+#define mitkIOExtActivator_h
 
 #include <usModuleActivator.h>
 
@@ -38,4 +38,4 @@ namespace mitk
   };
 }
 
-#endif // MITKIOEXTACTIVATOR_H
+#endif

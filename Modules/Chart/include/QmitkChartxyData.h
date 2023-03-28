@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkC3xyData_h
-#define QmitkC3xyData_h
+#ifndef QmitkChartxyData_h
+#define QmitkChartxyData_h
 
 #include <QVariant>
 
@@ -168,4 +168,4 @@ private:
   QVariant m_MarkerSymbolName;
 };
 
-#endif // QmitkC3xyData_h
+#endif

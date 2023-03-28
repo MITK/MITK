@@ -48,20 +48,17 @@ namespace OpenInAction
     auto renderWindowLayerController = std::make_unique<mitk::RenderWindowLayerController>();
     renderWindowLayerController->SetDataStorage(dataStorage);
 
-    // get currently fixed layer nodes of the specified renderer
+    // get current layer stack of the specified renderer
     // remove them from the specified renderer
-    auto layerStack = mitk::RenderWindowLayerUtilities::GetLayerStack(dataStorage, renderer, true);
-    for (auto& fixedLayer : layerStack)
+    auto layerStack = mitk::RenderWindowLayerUtilities::GetLayerStack(dataStorage, renderer);
+    for (auto& layerNode : layerStack)
     {
       // hide all nodes of the specified renderer
-      fixedLayer.second->SetVisibility(false, renderer);
-      fixedLayer.second->Modified();
+      layerNode.second->SetVisibility(false, renderer);
+      layerNode.second->Modified();
     }
 
-    // add the selected data node to the specified renderer
-    // only needed in case the render window manager plugin is not used
-    imageNode->SetBoolProperty("fixedLayer", true, renderer);
-    // make is visible
+    // make the selected data node visible
     imageNode->SetVisibility(true, renderer);
     imageNode->Modified();
     // move node to front, which also request a render update
@@ -74,7 +71,6 @@ namespace OpenInAction
     for (auto it = segmentationNodes->Begin(); it != segmentationNodes->End(); ++it)
     {
       auto segmentation = it->Value();
-      segmentation->SetBoolProperty("fixedLayer", true, renderer);
       segmentation->SetVisibility(true, renderer);
       // move node to front, which also request a render update
       renderWindowLayerController->MoveNodeToFront(segmentation, renderer);

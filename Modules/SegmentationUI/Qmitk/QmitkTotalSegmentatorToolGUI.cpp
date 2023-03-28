@@ -29,7 +29,6 @@ QmitkTotalSegmentatorToolGUI::QmitkTotalSegmentatorToolGUI()
 void QmitkTotalSegmentatorToolGUI::ConnectNewTool(mitk::SegWithPreviewTool *newTool)
 {
   Superclass::ConnectNewTool(newTool);
-  newTool->IsTimePointChangeAwareOff();
   m_FirstPreviewComputation = true;
 }
 
@@ -47,7 +46,7 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
   m_Controls.pythonEnvComboBox->setDisabled(true);
   m_Controls.previewButton->setDisabled(true);
   m_Controls.statusLabel->setTextFormat(Qt::RichText);
-  m_Controls.subtaskComboBox->addItems(m_VALID_TASKS);
+  m_Controls.subtaskComboBox->addItems(VALID_TASKS);
   QString welcomeText;
   this->SetGPUInfo();
   if (m_GpuLoader.GetGPUCount() != 0)
@@ -103,11 +102,6 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
   Superclass::InitializeUI(mainLayout);
 }
 
-void QmitkTotalSegmentatorToolGUI::EnableWidgets(bool enabled)
-{
-  Superclass::EnableWidgets(enabled);
-}
-
 void QmitkTotalSegmentatorToolGUI::SetGPUInfo()
 {
   std::vector<QmitkGPUSpec> specs = m_GpuLoader.GetAllGPUSpecs();
@@ -123,7 +117,7 @@ void QmitkTotalSegmentatorToolGUI::SetGPUInfo()
   }
 }
 
-unsigned int QmitkTotalSegmentatorToolGUI::FetchSelectedGPUFromUI()
+unsigned int QmitkTotalSegmentatorToolGUI::FetchSelectedGPUFromUI() const
 {
   QString gpuInfo = m_Controls.gpuComboBox->currentText();
   if (m_GpuLoader.GetGPUCount() == 0)
@@ -156,7 +150,7 @@ void QmitkTotalSegmentatorToolGUI::OnInstallBtnClicked()
   {
     this->WriteStatusMessage("<b>STATUS: </b>Installing TotalSegmentator...");
     m_Installer.SetSystemPythonPath(systemPython);
-    isInstalled = m_Installer.SetupVirtualEnv(m_Installer.m_VENV_NAME);
+    isInstalled = m_Installer.SetupVirtualEnv(m_Installer.VENV_NAME);
     if (isInstalled)
     {
       const QString pythonPath = m_Installer.GetVirtualEnvPath();
@@ -184,11 +178,11 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
     qApp->processEvents();
     if (!this->IsTotalSegmentatorInstalled(m_PythonPath))
     {
-      throw std::runtime_error(m_WARNING_TOTALSEG_NOT_FOUND);
+      throw std::runtime_error(WARNING_TOTALSEG_NOT_FOUND);
     }
     bool isFast = m_Controls.fastBox->isChecked();
     QString subTask = m_Controls.subtaskComboBox->currentText();
-    if (subTask != m_VALID_TASKS[0])
+    if (subTask != VALID_TASKS[0])
     {
       isFast = true;
     }
@@ -219,7 +213,6 @@ void QmitkTotalSegmentatorToolGUI::OnPreviewBtnClicked()
     return;
   }
   this->SetLabelSetPreview(tool->GetPreviewSegmentation());
-  tool->IsTimePointChangeAwareOn();
   this->ActualizePreviewLabelVisibility();
   this->WriteStatusMessage("<b>STATUS: </b><i>Segmentation task finished successfully.</i>");
   QString pythonPathTextItem = m_Controls.pythonEnvComboBox->currentText();
@@ -363,7 +356,7 @@ void QmitkTotalSegmentatorToolGUI::OnPythonPathChanged(const QString &pyEnv)
   }
   else if (!this->IsTotalSegmentatorInstalled(pyEnv))
   {
-    this->ShowErrorMessage(m_WARNING_TOTALSEG_NOT_FOUND);
+    this->ShowErrorMessage(WARNING_TOTALSEG_NOT_FOUND);
     m_Controls.previewButton->setDisabled(true);
   }
   else
@@ -374,7 +367,7 @@ void QmitkTotalSegmentatorToolGUI::OnPythonPathChanged(const QString &pyEnv)
   }
 }
 
-QString QmitkTotalSegmentatorToolGUI::GetPythonPathFromUI(const QString &pyUI)
+QString QmitkTotalSegmentatorToolGUI::GetPythonPathFromUI(const QString &pyUI) const
 {
   QString fullPath = pyUI;
   if (-1 != fullPath.indexOf(")"))
@@ -384,7 +377,7 @@ QString QmitkTotalSegmentatorToolGUI::GetPythonPathFromUI(const QString &pyUI)
   return fullPath.simplified();
 }
 
-QString QmitkTotalSegmentatorToolGUI::GetExactPythonPath(const QString &pyEnv)
+QString QmitkTotalSegmentatorToolGUI::GetExactPythonPath(const QString &pyEnv) const
 {
   QString fullPath = pyEnv;
   bool isPythonExists = false;
@@ -486,7 +479,7 @@ bool QmitkTotalSegmentatorToolInstaller::SetupVirtualEnv(const QString& venvName
     this->SetPythonPath(folderPath.absolutePath());
     this->SetPipPath(folderPath.absolutePath());
     this->InstallPytorch();
-    for (auto &package : m_PACKAGES)
+    for (auto &package : PACKAGES)
     {
       this->PipInstall(package.toStdString(), &PrintProcessEvent);
     }
@@ -502,5 +495,5 @@ bool QmitkTotalSegmentatorToolInstaller::SetupVirtualEnv(const QString& venvName
 
 QString QmitkTotalSegmentatorToolInstaller::GetVirtualEnvPath() 
 {
-  return m_STORAGE_DIR + m_VENV_NAME;
+  return STORAGE_DIR + VENV_NAME;
 }

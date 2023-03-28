@@ -34,6 +34,11 @@ mitk::TotalSegmentatorTool::~TotalSegmentatorTool()
   itksys::SystemTools::RemoveADirectory(this->GetMitkTempDir());
 }
 
+mitk::TotalSegmentatorTool::TotalSegmentatorTool()
+{
+  this->IsTimePointChangeAwareOff();
+}
+
 void mitk::TotalSegmentatorTool::Activated()
 {
   Superclass::Activated();
@@ -83,13 +88,14 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
                                                  LabelSetImage *previewImage,
                                                  TimeStepType timeStep)
 {
-  if (!m_IsMitkTempDirAvailable) // create temp directory if not done already
+  if (this->m_MitkTempDir.empty())
   {
     this->SetMitkTempDir(IOUtil::CreateTemporaryDirectory("mitk-XXXXXX"));
-    m_IsMitkTempDirAvailable = true;
   }
-  this->ParseLabelNames(this->GetLabelMapPath());
-
+  if (m_LabelMapTotal.empty())
+  {
+    this->ParseLabelNames(this->GetLabelMapPath());
+  }
   ProcessExecutor::Pointer spExec = ProcessExecutor::New();
   itk::CStyleCommand::Pointer spCommand = itk::CStyleCommand::New();
   spCommand->SetCallback(&onPythonProcessEvent);
@@ -98,7 +104,7 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
   std::string inDir, outDir, inputImagePath, outputImagePath, scriptPath;
   inDir = IOUtil::CreateTemporaryDirectory("totalseg-in-XXXXXX", this->GetMitkTempDir());
   std::ofstream tmpStream;
-  inputImagePath = IOUtil::CreateTemporaryFile(tmpStream, m_TEMPLATE_FILENAME, inDir + IOUtil::GetDirectorySeparator());
+  inputImagePath = IOUtil::CreateTemporaryFile(tmpStream, TEMPLATE_FILENAME, inDir + IOUtil::GetDirectorySeparator());
   tmpStream.close();
   std::size_t found = inputImagePath.find_last_of(IOUtil::GetDirectorySeparator());
   std::string fileName = inputImagePath.substr(found + 1);
@@ -109,22 +115,22 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
 
   IOUtil::Save(inputAtTimeStep, inputImagePath);
 
-  std::string *outArg = &outputImagePath;
+  std::string &outArg = outputImagePath;
   bool isSubTask = false;
-  if (this->GetSubTask() != m_DEFAULT_TOTAL_TASK)
+  if (this->GetSubTask() != DEFAULT_TOTAL_TASK)
   {
     isSubTask = true;
     outputImagePath = outDir + IOUtil::GetDirectorySeparator() + this->GetSubTask() + ".nii.gz";
-    outArg = &outDir;
+    outArg = outDir;
   }
 
   this->run_totalsegmentator(
-    spExec, inputImagePath, *outArg, this->GetFast(), !isSubTask, this->GetGpuId(), m_DEFAULT_TOTAL_TASK);
+    spExec, inputImagePath, outArg, this->GetFast(), !isSubTask, this->GetGpuId(), DEFAULT_TOTAL_TASK);
 
   if (isSubTask)
   {
     this->run_totalsegmentator(
-      spExec, inputImagePath, *outArg, !isSubTask, !isSubTask, this->GetGpuId(), this->GetSubTask());
+      spExec, inputImagePath, outArg, !isSubTask, !isSubTask, this->GetGpuId(), this->GetSubTask());
   }
 
   Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
@@ -147,8 +153,6 @@ void mitk::TotalSegmentatorTool::run_totalsegmentator(ProcessExecutor::Pointer s
   std::string command = "TotalSegmentator";
 #if defined(__APPLE__) || defined(_WIN32)
   command = "python";
-#else
-  command = "TotalSegmentator";
 #endif
 
   args.clear();
@@ -175,7 +179,7 @@ void mitk::TotalSegmentatorTool::run_totalsegmentator(ProcessExecutor::Pointer s
   args.push_back("-o");
   args.push_back(outputImagePath);
 
-  if (subTask != m_DEFAULT_TOTAL_TASK)
+  if (subTask != DEFAULT_TOTAL_TASK)
   {
     args.push_back("-ta");
     args.push_back(subTask);

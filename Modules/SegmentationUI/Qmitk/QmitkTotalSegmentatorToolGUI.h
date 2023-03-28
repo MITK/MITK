@@ -19,15 +19,15 @@
 class QmitkTotalSegmentatorToolInstaller : public QmitkSetupVirtualEnvUtil
 {
 public:
-  const QString m_VENV_NAME = ".totalsegmentator";
-  const QString m_TOTALSEGMENTATOR_VERSION = "1.5.3";
-  const std::vector<QString> m_PACKAGES = {QString("Totalsegmentator==") + m_TOTALSEGMENTATOR_VERSION,
+  const QString VENV_NAME = ".totalsegmentator";
+  const QString TOTALSEGMENTATOR_VERSION = "1.5.3";
+  const std::vector<QString> PACKAGES = {QString("Totalsegmentator==") + TOTALSEGMENTATOR_VERSION,
                                            QString("scipy==1.9.1")};
-  const QString m_STORAGE_DIR;
+  const QString STORAGE_DIR;
   inline QmitkTotalSegmentatorToolInstaller(
     const QString baseDir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QDir::separator() 
                             + qApp->organizationName() + QDir::separator())
-    : QmitkSetupVirtualEnvUtil(baseDir), m_STORAGE_DIR(baseDir){};
+    : QmitkSetupVirtualEnvUtil(baseDir), STORAGE_DIR(baseDir){};
   bool SetupVirtualEnv(const QString &) override;
   QString GetVirtualEnvPath() override;
 };
@@ -85,8 +85,6 @@ protected:
   void ConnectNewTool(mitk::SegWithPreviewTool *newTool) override;
   void InitializeUI(QBoxLayout *mainLayout) override;
 
-  void EnableWidgets(bool enabled) override;
-
   /**
    * @brief Enable (or Disable) GUI elements.
    */
@@ -132,7 +130,7 @@ protected:
    *
    * @return unsigned int
    */
-  unsigned int FetchSelectedGPUFromUI();
+  unsigned int FetchSelectedGPUFromUI() const;
 
   /**
    * @brief Get the virtual env path from UI combobox removing any 
@@ -140,14 +138,14 @@ protected:
    * 
    * @return QString 
    */
-  QString GetPythonPathFromUI(const QString &);
+  QString GetPythonPathFromUI(const QString &) const;
 
   /**
    * @brief Get the Exact Python Path for any OS
    * from the virtual environment path.
    * @return QString 
    */
-  QString GetExactPythonPath(const QString &);
+  QString GetExactPythonPath(const QString &) const;
 
   /**
    * @brief For storing values like Python path across sessions.
@@ -161,10 +159,10 @@ protected:
   bool m_IsInstalled = false;
   EnableConfirmSegBtnFunctionType m_SuperclassEnableConfirmSegBtnFnc;
 
-  const std::string m_WARNING_TOTALSEG_NOT_FOUND =
+  const std::string WARNING_TOTALSEG_NOT_FOUND =
     "TotalSegmentator is not detected in the selected python environment.Please select a valid "
     "python environment or install TotalSegmentator.";
-  const QStringList m_VALID_TASKS = {"total", "cerebral_bleed", "hip_implant", "coronary_arteries"};
+  const QStringList VALID_TASKS = {"total", "cerebral_bleed", "hip_implant", "coronary_arteries"};
   QmitkTotalSegmentatorToolInstaller m_Installer;
 };
 #endif

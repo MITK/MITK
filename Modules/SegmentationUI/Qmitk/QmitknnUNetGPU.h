@@ -50,7 +50,7 @@ public:
    *
    * @return int
    */
-  int GetGPUCount();
+  int GetGPUCount() const;
 
   /**
    * @brief Returns all the parsed GPU  information

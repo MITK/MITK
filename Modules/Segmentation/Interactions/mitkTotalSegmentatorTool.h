@@ -61,10 +61,6 @@ namespace mitk
     itkGetConstMacro(Fast, bool);
     itkBooleanMacro(Fast);
 
-    itkSetMacro(IsMitkTempDirAvailable, bool);
-    itkGetConstMacro(IsMitkTempDirAvailable, bool);
-    itkBooleanMacro(IsMitkTempDirAvailable);
-
     /**
      * @brief Static function to print out everything from itk::EventObject.
      * Used as callback in mitk::ProcessExecutor object.
@@ -73,7 +69,7 @@ namespace mitk
     static void onPythonProcessEvent(itk::Object *, const itk::EventObject &e, void *);
 
   protected:
-    TotalSegmentatorTool() = default;
+    TotalSegmentatorTool();
     ~TotalSegmentatorTool();
 
     /**
@@ -98,7 +94,7 @@ namespace mitk
      * @brief Runs Totalsegmentator python process with desired arguments
      * 
      */
-    void run_totalsegmentator(ProcessExecutor::Pointer, const std::string &, const std::string &, bool, bool, unsigned int, const std::string &);
+    void run_totalsegmentator(ProcessExecutor::Pointer, const std::string&, const std::string&, bool, bool, unsigned int, const std::string&);
 
     /**
      * @brief Applies the m_LabelMapTotal lookup table on the output segmentation LabelSetImage.
@@ -124,12 +120,11 @@ namespace mitk
     std::string m_MitkTempDir;
     std::string m_PythonPath;
     std::string m_SubTask = "total";
-    unsigned int m_GpuId;
+    unsigned int m_GpuId = 0;
     std::map<int, std::string> m_LabelMapTotal;
-    bool m_Fast;
-    bool m_IsMitkTempDirAvailable = false;
-    const std::string m_TEMPLATE_FILENAME = "XXXXXX_000_0000.nii.gz";
-    const std::string m_DEFAULT_TOTAL_TASK = "total";
+    bool m_Fast = true;
+    const std::string TEMPLATE_FILENAME = "XXXXXX_000_0000.nii.gz";
+    const std::string DEFAULT_TOTAL_TASK = "total";
   }; // class
 } // namespace
 #endif

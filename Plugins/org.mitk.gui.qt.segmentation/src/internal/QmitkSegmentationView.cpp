@@ -992,7 +992,7 @@ void QmitkSegmentationView::ValidateSelectionInput()
     m_Controls->multiLabelWidget->SetMultiLabelSegmentation(nullptr);
   }
 
-  toolSelectionBoxesEnabled &= numberOfLabels > 1;
+  toolSelectionBoxesEnabled &= numberOfLabels > 0;
 
   // Here we need to check whether the geometry of the selected segmentation image (working image geometry)
   // is aligned with the geometry of the 3D render window.

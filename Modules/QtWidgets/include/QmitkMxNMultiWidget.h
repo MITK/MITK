@@ -107,6 +107,7 @@ Q_SIGNALS:
 
   void WheelMoved(QWheelEvent *);
   void Moved();
+  void UpdateUtilityWidgetViewPlanes();
 
 protected:
 

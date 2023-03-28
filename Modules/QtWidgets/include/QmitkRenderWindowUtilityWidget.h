@@ -53,6 +53,9 @@ public:
 
   void SetGeometry(const itk::EventObject& event);
 
+public Q_SLOTS:
+  void UpdateViewPlaneSelection();
+
 Q_SIGNALS:
 
   void SynchronizationToggled(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget);

@@ -94,6 +94,7 @@ void QmitkMultiWidgetLayoutSelectionWidget::OnSetLayoutButtonClicked()
     close();
     emit LayoutSet(row+1, column+1);
   }
+  ui.selectDefaultLayoutComboBox->setCurrentIndex(0);
 }
 
 void QmitkMultiWidgetLayoutSelectionWidget::OnSaveLayoutButtonClicked()
@@ -128,5 +129,6 @@ void QmitkMultiWidgetLayoutSelectionWidget::OnLayoutPresetSelected(int index)
   }
 
   auto jsonData = m_PresetMap[index];
+  close();
   emit LoadLayout(&jsonData);
 }

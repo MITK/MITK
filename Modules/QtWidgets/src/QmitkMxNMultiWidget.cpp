@@ -397,6 +397,8 @@ QmitkAbstractMultiWidget::RenderWindowWidgetPointer QmitkMxNMultiWidget::CreateR
 
   connect(utilityWidget, &QmitkRenderWindowUtilityWidget::SynchronizationToggled,
     this, &QmitkMxNMultiWidget::ToggleSynchronization);
+  connect(this, &QmitkMxNMultiWidget::UpdateUtilityWidgetViewPlanes,
+    utilityWidget, &QmitkRenderWindowUtilityWidget::UpdateViewPlaneSelection);
 
   // needs to be done after 'QmitkRenderWindowUtilityWidget::ToggleSynchronization' has been connected
   // initially synchronize the node selection widget
@@ -440,6 +442,7 @@ void QmitkMxNMultiWidget::LoadLayout(const nlohmann::json* jsonData)
     auto hBoxLayout = new QHBoxLayout(this);
     this->setLayout(hBoxLayout);
     hBoxLayout->addWidget(content);
+    emit UpdateUtilityWidgetViewPlanes();
   }
   catch (nlohmann::json::out_of_range& e)
   {
@@ -572,7 +575,6 @@ QSplitter* QmitkMxNMultiWidget::BuildLayoutFromJSON(const nlohmann::json* jsonDa
         window = CreateRenderWindowWidget();
       }
 
-      // trigger QmitkRenderWindowUtilityWidget::ViewDirectionChanged()
       window->GetSliceNavigationController()->SetDefaultViewDirection(viewPlane);
       window->GetSliceNavigationController()->Update();
       split->addWidget(window.get());

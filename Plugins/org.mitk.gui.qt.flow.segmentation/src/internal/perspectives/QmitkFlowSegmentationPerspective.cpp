@@ -12,7 +12,6 @@ found in the LICENSE file.
 
 #include "QmitkFlowSegmentationPerspective.h"
 #include <berryIViewLayout.h>
-#include <mitkBaseApplication.h>
 
 QmitkFlowSegmentationPerspective::QmitkFlowSegmentationPerspective()
 {

@@ -76,7 +76,7 @@ void QmitkMxNMultiWidgetEditor::PartClosed(const berry::IWorkbenchPartReference:
     const auto& multiWidget = dynamic_cast<QmitkMxNMultiWidget*>(GetMultiWidget());
     if (nullptr != multiWidget)
     {
-      multiWidget->RemovePlanesFromDataStorage();
+      multiWidget->DisableCrosshair();
       multiWidget->ActivateMenuWidget(false);
     }
   }
@@ -89,7 +89,7 @@ void QmitkMxNMultiWidgetEditor::PartOpened(const berry::IWorkbenchPartReference:
     const auto& multiWidget = dynamic_cast<QmitkMxNMultiWidget*>(GetMultiWidget());
     if (nullptr != multiWidget)
     {
-      multiWidget->AddPlanesToDataStorage();
+      multiWidget->EnableCrosshair();
       multiWidget->ActivateMenuWidget(true);
     }
   }
@@ -125,7 +125,7 @@ void QmitkMxNMultiWidgetEditor::OnLayoutSet(int row, int column)
   if (nullptr != multiWidget)
   {
     QmitkAbstractMultiWidgetEditor::OnLayoutSet(row, column);
-    multiWidget->AddPlanesToDataStorage();
+    multiWidget->EnableCrosshair();
   }
 }
 

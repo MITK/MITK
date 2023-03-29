@@ -86,8 +86,8 @@ public:
   bool GetCrosshairVisibility();
   void SetCrosshairGap(unsigned int gapSize);
 
-  void AddPlanesToDataStorage();
-  void RemovePlanesFromDataStorage();
+  void EnableCrosshair();
+  void DisableCrosshair();
 
   void SetCrosshairPosition(const mitk::Point3D& newPosition);
   mitk::Point3D GetCrosshairPosition() const;

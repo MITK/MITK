@@ -127,6 +127,12 @@ void QmitkRenderWindow::ActivateMenuWidget(bool state)
     m_MenuWidget->SetLayoutIndex(m_LayoutIndex);
   }
 
+  if (m_MenuWidgetActivated == state)
+  {
+    // no new state; nothing to do
+    return;
+  }
+
   m_MenuWidgetActivated = state;
 
   if (m_MenuWidgetActivated)

@@ -426,7 +426,7 @@ namespace mitk
     BaseRenderer* baseRenderer = BaseRenderer::GetInstance(renderWindow);
     baseRenderer->SetConstrainZoomingAndPanning(this->GetConstrainedPanningZooming());
 
-    int id = baseRenderer->GetMapperID();
+    const int id = baseRenderer->GetMapperID();
     this->InternalViewInitialization(baseRenderer, modifiedGeometry, boundingBoxInitialized, id, resetCamera);
 
     this->RequestUpdate(renderWindow);

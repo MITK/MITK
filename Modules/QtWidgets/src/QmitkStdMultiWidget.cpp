@@ -137,7 +137,7 @@ void QmitkStdMultiWidget::InitializeViews(const mitk::TimeGeometry* geometry, bo
     currentPosition = this->GetSelectedPosition("");
 
     // store the current time step to set it again later, if the camera should not be reset
-    const auto currentTimePoint = renderingManager->GetTimeNavigationController()->GetSelectedTimePoint();
+    const mitk::TimePointType currentTimePoint = renderingManager->GetTimeNavigationController()->GetSelectedTimePoint();
     if (geometry->IsValidTimePoint(currentTimePoint))
     {
       imageTimeStep = geometry->TimePointToTimeStep(currentTimePoint);

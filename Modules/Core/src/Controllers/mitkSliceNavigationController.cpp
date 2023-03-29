@@ -280,13 +280,13 @@ namespace mitk
 
     }
 
-    auto timeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
+    const auto* timeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
     if (nullptr == timeNavigationController)
     {
       return nullptr;
     }
 
-    TimeStepType selectedTimestep = timeNavigationController->GetSelectedTimeStep();
+    const TimeStepType selectedTimestep = timeNavigationController->GetSelectedTimeStep();
     return m_CreatedWorldGeometry->GetGeometryForTimeStep(selectedTimestep);
   }
 
@@ -391,7 +391,7 @@ namespace mitk
 
   void SliceNavigationController::CreateWorldGeometry(bool top, bool frontside, bool rotated)
   {
-    auto timeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
+    const auto timeNavigationController = mitk::RenderingManager::GetInstance()->GetTimeNavigationController();
     if (nullptr == timeNavigationController)
     {
       return;
@@ -402,7 +402,7 @@ namespace mitk
     BaseGeometry::ConstPointer currentGeometry;
 
     // get the BaseGeometry (ArbitraryTimeGeometry or ProportionalTimeGeometry) of the current time step
-    TimeStepType selectedTimestep = timeNavigationController->GetSelectedTimeStep();
+    const TimeStepType selectedTimestep = timeNavigationController->GetSelectedTimeStep();
     if (m_InputWorldTimeGeometry->IsValidTimeStep(selectedTimestep))
     {
       currentGeometry = m_InputWorldTimeGeometry->GetGeometryForTimeStep(selectedTimestep);
@@ -434,7 +434,7 @@ namespace mitk
     m_Stepper->SetSteps(slicedWorldGeometry->GetSlices());
     m_Stepper->SetPos(0);
 
-    TimeStepType inputTimeSteps = m_InputWorldTimeGeometry->CountTimeSteps();
+    const TimeStepType inputTimeSteps = m_InputWorldTimeGeometry->CountTimeSteps();
     // create new time geometry and initialize it according to the type of the 'm_InputWorldTimeGeometry'
     // the created world geometry will either have equidistant timesteps (ProportionalTimeGeometry)
     // or individual time bounds for each timestep (ArbitraryTimeGeometry)

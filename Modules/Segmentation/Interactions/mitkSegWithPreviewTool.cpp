@@ -473,7 +473,7 @@ void mitk::SegWithPreviewTool::CreateResultSegmentationFromPreview()
 
     if (resultSegmentationNode.IsNotNull())
     {
-      const auto timePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+      const TimePointType timePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
       auto resultSegmentation = dynamic_cast<Image*>(resultSegmentationNode->GetData());
 
       // REMARK: the following code in this scope assumes that previewImage and resultSegmentation
@@ -552,7 +552,7 @@ void mitk::SegWithPreviewTool::OnTimePointChanged()
 {
   if (m_IsTimePointChangeAware && m_PreviewSegmentationNode.IsNotNull() && m_SegmentationInputNode.IsNotNull())
   {
-    const auto timePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+    const TimePointType timePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
 
     const bool isStaticSegOnDynamicImage = m_PreviewSegmentationNode->GetData()->GetTimeSteps() == 1 && m_SegmentationInputNode->GetData()->GetTimeSteps() > 1;
     if (timePoint!=m_LastTimePointOfUpdate && (isStaticSegOnDynamicImage || m_LazyDynamicPreviews))
@@ -597,7 +597,7 @@ void mitk::SegWithPreviewTool::UpdatePreview(bool ignoreLazyPreviewSetting)
 
   this->UpdatePrepare();
 
-  const auto timePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
+  const TimePointType timePoint = RenderingManager::GetInstance()->GetTimeNavigationController()->GetSelectedTimePoint();
 
   try
   {

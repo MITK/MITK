@@ -14,6 +14,8 @@ found in the LICENSE file.
 
 #include <itksys/SystemTools.hxx>
 
+#include <berryPlatformUI.h>
+
 //MITK
 #include <mitkBaseApplication.h>
 #include <mitkLabelSetImage.h>
@@ -34,19 +36,25 @@ found in the LICENSE file.
 const std::string QmitkSegmentationFlowControlView::VIEW_ID = "org.mitk.views.flow.control";
 
 QmitkSegmentationFlowControlView::QmitkSegmentationFlowControlView()
-    : m_Controls(new Ui::SegmentationFlowControlView),
-      m_Parent(nullptr)
+    : m_Controls(new Ui::SegmentationFlowControlView)
 {
+  berry::PlatformUI::GetWorkbench()->AddWorkbenchListener(this);
+
   auto notHelperObject = mitk::NodePredicateNot::New(
     mitk::NodePredicateProperty::New("helper object"));
 
   m_SegmentationPredicate = mitk::NodePredicateAnd::New(
     mitk::TNodePredicateDataType<mitk::LabelSetImage>::New(),
     notHelperObject);
+
+  m_SegmentationTaskListPredicate = mitk::NodePredicateAnd::New(
+    mitk::TNodePredicateDataType<mitk::SegmentationTaskList>::New(),
+    notHelperObject);
 }
 
 QmitkSegmentationFlowControlView::~QmitkSegmentationFlowControlView()
 {
+  berry::PlatformUI::GetWorkbench()->RemoveWorkbenchListener(this);
 }
 
 void QmitkSegmentationFlowControlView::SetFocus()
@@ -57,13 +65,15 @@ void QmitkSegmentationFlowControlView::SetFocus()
 void QmitkSegmentationFlowControlView::CreateQtPartControl(QWidget* parent)
 {
   m_Controls->setupUi(parent);
-  m_Parent = parent;
+
+  m_Controls->segmentationTaskListWidget->SetDataStorage(this->GetDataStorage());
+  m_Controls->segmentationTaskListWidget->setVisible(false);
+
+  m_Controls->labelStored->setVisible(false);
 
   using Self = QmitkSegmentationFlowControlView;
 
   connect(m_Controls->btnStoreAndAccept, &QPushButton::clicked, this, &Self::OnAcceptButtonClicked);
-
-  m_Controls->labelStored->setVisible(false);
 
   this->UpdateControls();
 
@@ -90,9 +100,21 @@ void QmitkSegmentationFlowControlView::OnAcceptButtonClicked()
 void QmitkSegmentationFlowControlView::UpdateControls()
 {
   auto dataStorage = this->GetDataStorage();
+  auto hasSegmentationTaskList = !dataStorage->GetSubset(m_SegmentationTaskListPredicate)->empty();
+
+  m_Controls->segmentationTaskListWidget->setVisible(hasSegmentationTaskList);
+
+  if (hasSegmentationTaskList) // Give precedence to segmentation task list
+  {
+    m_Controls->btnStoreAndAccept->setVisible(false);
+    m_Controls->labelStored->setVisible(false);
+    return;
+  }
+
   auto hasSegmentation = !dataStorage->GetSubset(m_SegmentationPredicate)->empty();
 
   m_Controls->btnStoreAndAccept->setEnabled(hasSegmentation);
+  m_Controls->btnStoreAndAccept->setVisible(true);
 }
 
 void QmitkSegmentationFlowControlView::NodeAdded(const mitk::DataNode* node)
@@ -111,4 +133,12 @@ void QmitkSegmentationFlowControlView::NodeRemoved(const mitk::DataNode* node)
 {
   if (dynamic_cast<const mitk::LabelSetImage*>(node->GetData()) != nullptr)
     this->UpdateControls();
+}
+
+bool QmitkSegmentationFlowControlView::PreShutdown(berry::IWorkbench*, bool)
+{
+  if (m_Controls->segmentationTaskListWidget->isVisible())
+    return m_Controls->segmentationTaskListWidget->OnPreShutdown();
+
+  return true; // No veto against shutdown
 }

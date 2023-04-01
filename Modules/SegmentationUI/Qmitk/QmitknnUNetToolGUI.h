@@ -25,7 +25,6 @@ found in the LICENSE file.
 #include <QMessageBox>
 #include <QSettings>
 #include <QThread>
-#include <QmitkDataStorageComboBox.h>
 #include <QmitkSingleNodeSelectionWidget.h>
 #include <QmitknnUNetEnsembleLayout.h>
 #include <boost/functional/hash.hpp>

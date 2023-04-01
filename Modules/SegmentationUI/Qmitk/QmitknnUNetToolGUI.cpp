@@ -231,7 +231,7 @@ bool QmitknnUNetToolGUI::IsNNUNetInstalled(const QString &pythonPath)
 #endif
   fullPath = fullPath.mid(fullPath.indexOf(" ") + 1);
   bool isExists = QFile::exists(fullPath + QDir::separator() + QString("nnUNet_predict")) &&
-                  QFile::exists(fullPath + QDir::separator() + QString("python"));
+                  QFile::exists(fullPath + QDir::separator() + QString("python3"));
   return isExists;
 }
 

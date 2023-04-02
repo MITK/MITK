@@ -37,6 +37,7 @@ QmitkRenderWindowWidget::~QmitkRenderWindowWidget()
       mitk::MessageDelegate1<QmitkRenderWindowWidget, const mitk::Point3D &>(
         this, &QmitkRenderWindowWidget::SetCrosshairPosition));
   }
+  this->DisableCrosshair();
 }
 
 void QmitkRenderWindowWidget::SetDataStorage(mitk::DataStorage* dataStorage)

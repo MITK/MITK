@@ -28,6 +28,22 @@ found in the LICENSE file.
 #include <vtkPolyDataMapper2D.h>
 #include <vtkProperty2D.h>
 
+namespace
+{
+  void SwapInvertedCoordinates(mitk::Point2D& displayBoundsMinimum, mitk::Point2D& displayBoundsMaximum)
+  {
+    for (int i = 0; i < 2; ++i)
+    {
+      if (displayBoundsMaximum[i] < displayBoundsMinimum[i])
+      {
+        auto temporarySwapVariable = displayBoundsMaximum[i];
+        displayBoundsMaximum[i] = displayBoundsMinimum[i];
+        displayBoundsMinimum[i] = temporarySwapVariable;
+      }
+    }
+  }
+}
+
 const mitk::CrosshairData* mitk::CrosshairVtkMapper2D::GetInput() const
 {
   return static_cast<CrosshairData*>(this->GetDataNode()->GetData());
@@ -145,6 +161,8 @@ void mitk::CrosshairVtkMapper2D::CreateVtkCrosshair(BaseRenderer* renderer)
   Point2D displayBoundsMaximum;
   renderer->WorldToDisplay(worldBoundsMinimum, displayBoundsMinimum);
   renderer->WorldToDisplay(worldBoundsMaximum, displayBoundsMaximum);
+
+  SwapInvertedCoordinates(displayBoundsMinimum, displayBoundsMaximum);
 
   // define points for the first / left half of the crosshair x-line
   displayPointOne[0] = displayBoundsMinimum[0];

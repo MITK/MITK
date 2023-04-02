@@ -76,7 +76,6 @@ void QmitkMxNMultiWidgetEditor::PartClosed(const berry::IWorkbenchPartReference:
     const auto& multiWidget = dynamic_cast<QmitkMxNMultiWidget*>(GetMultiWidget());
     if (nullptr != multiWidget)
     {
-      multiWidget->DisableCrosshair();
       multiWidget->ActivateMenuWidget(false);
     }
   }

@@ -23,6 +23,14 @@ mitk::NodePredicateOr::NodePredicateOr(const NodePredicateBase *p1, const NodePr
   this->AddPredicate(p2);
 }
 
+mitk::NodePredicateOr::NodePredicateOr(const NodePredicateBase *p1, const NodePredicateBase *p2, const NodePredicateBase *p3)
+  : NodePredicateCompositeBase()
+{
+  this->AddPredicate(p1);
+  this->AddPredicate(p2);
+  this->AddPredicate(p3);
+}
+
 mitk::NodePredicateOr::~NodePredicateOr()
 {
 }

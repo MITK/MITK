@@ -41,7 +41,7 @@ QmitkGPULoader::QmitkGPULoader()
   }
 }
 
-int QmitkGPULoader::GetGPUCount()
+int QmitkGPULoader::GetGPUCount() const
 {
   return static_cast<int>(m_Gpus.size());
 }

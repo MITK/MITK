@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkTotalSegmentatorToolGUIControls</class>
+ <widget class="QWidget" name="QmitkTotalSegmentatorToolGUIControls">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>699</width>
+    <height>352</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Ignored" vsizetype="Minimum">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>100</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>100000</width>
+    <height>100000</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>QmitkTotalSegmentatorToolWidget</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <layout class="QGridLayout" name="basicSettingsLayout">
+     <item row="0" column="0" colspan="4">
+      <widget class="QLabel" name="welcomeNote">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Welcome to TotalSegmentator tool in MITK. [Experimental]&lt;/p&gt;&lt;p&gt;Please note that this is only an interface to TotalSegmentator. MITK does not ship with TotalSegmentator. Make sure to have a working internet connection to install TotalSegmentator. Or, choose an python environment with TotalSegmentator in it before inferencing.
+		 Currently, the tool is pretrained on CT images only. &lt;/p&gt;&lt;p&gt;Refer to &lt;a href=&quot;https://github.com/wasserth/TotalSegmentator&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/wasserth/TotalSegmentator&lt;/span&gt;&lt;/a&gt; to learn everything about the TotalSegmentator.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::RichText</enum>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+	 <item row ="1" colspan="4">
+	  <widget class="QPushButton" name="installButton">
+	   <property name="sizePolicy">
+		<sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+		 <horstretch>0</horstretch>
+		 <verstretch>0</verstretch>
+		</sizepolicy>
+	   </property>
+	   <property name="maximumSize">
+		<size>
+		 <width>100000</width>
+		 <height>16777215</height>
+		</size>
+	   </property>
+	   <property name="text">
+		<string>Install TotalSegmentator</string>
+	   </property>
+	  </widget>
+	 </item>
+		
+	 <item row="2" colspan="4">
+	  <widget class="ctkCollapsibleGroupBox" name="installGroupBox" native="true">
+	   <property name="minimumSize">
+		<size>
+		 <width>0</width>
+		 <height>0</height>
+		</size>
+	   </property>
+	   <property name="title" stdset="0">
+		<string>Install Options</string>
+	   </property>
+	   <property name="flat" stdset="0">
+		<bool>true</bool>
+	   </property>
+	   <property name="collapsedHeight" stdset="0">
+		<number>5</number>
+	    </property>
+		<property name="collapsed" stdset="0">
+		 <bool>true</bool>
+		</property>
+		<layout class="QVBoxLayout" name="verticalLayout_0">
+		<item>
+		 <layout class="QGridLayout" name="_1">
+		  <property name="leftMargin">
+		   <number>0</number>
+		  </property>
+		  <property name="topMargin">
+		   <number>0</number>
+		  </property>
+		  <property name="rightMargin">
+		   <number>0</number>
+		  </property>
+		  <property name="bottomMargin">
+		   <number>0</number>
+		  </property>
+		  <property name="spacing">
+		   <number>6</number>
+		  </property>
+		  <item row="0" column="0">
+		   <widget class="QLabel" name="OverrideLabel">
+			<property name="sizePolicy">
+			 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+			  <horstretch>0</horstretch>
+			  <verstretch>0</verstretch>
+			 </sizepolicy>
+			</property>
+			<property name="text">
+				<string>Use Custom Installation:</string>
+			</property>
+		   </widget>
+		  </item>
+		  <item row="0" column="1">
+		   <widget class="ctkCheckBox" name="overrideBox" native="true">
+			<property name="checked" stdset="0">
+			 <bool>false</bool>
+			</property>
+		   </widget>
+		  </item>
+		  <item row="0" column="3">
+		   <widget class="QPushButton" name="clearButton">
+			<property name="sizePolicy">
+			 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+			  <horstretch>0</horstretch>
+			  <verstretch>0</verstretch>
+			 </sizepolicy>
+			</property>
+		    <property name="maximumSize">
+			 <size>
+			  <width>100000</width>
+			  <height>16777215</height>
+			 </size>
+		    </property>
+		    <property name="text">
+			 <string>Clear Install</string>
+		    </property>
+		   </widget>
+		  </item>	 
+		  <item row="1" column="0">
+		   <widget class="QLabel" name="pythonEnvLabel">
+			<property name="sizePolicy">
+			 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+			  <horstretch>0</horstretch>
+			  <verstretch>0</verstretch>
+			 </sizepolicy>
+			</property>
+			<property name="text">
+			 <string>Custom Env. Path:</string>
+			</property>
+		   </widget>
+		  </item>
+		  <item row="1" column="1" colspan="3">
+		   <widget class="ctkComboBox" name="pythonEnvComboBox"/>
+		  </item>
+		  <item row="2" column="0">
+		   <widget class="QLabel" name="sysPythonLabel">
+			<property name="sizePolicy">
+			 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+			  <horstretch>0</horstretch>
+			  <verstretch>0</verstretch>
+			 </sizepolicy>
+			</property>
+			<property name="text">
+			  <string>System Python:</string>
+			</property>
+		   </widget>
+		  </item>
+		  <item row="2" column="1" colspan="3">
+		   <widget class="ctkComboBox" name="sysPythonComboBox"/>
+		  </item>
+		 </layout>
+		</item>
+	   </layout>
+	  </widget>
+	 </item>	
+		
+	 <item row="3" colspan="4">
+	  <widget class="QLabel" name="subtaskLabel">
+	   <property name="sizePolicy">
+		<sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+		 <horstretch>0</horstretch>
+		 <verstretch>0</verstretch>
+		</sizepolicy>
+	   </property>
+	   <property name="text">
+		<string>Task:</string>
+	   </property>
+	  </widget>
+	 </item>
+	 <item row="3" column="1" colspan="3">
+	  <widget class="ctkComboBox" name="subtaskComboBox"/>
+	 </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="ctkCollapsibleGroupBox" name="advancedGroupBox" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="title" stdset="0">
+      <string>Advanced</string>
+     </property>
+     <property name="flat" stdset="0">
+      <bool>true</bool>
+     </property>
+     <property name="collapsedHeight" stdset="0">
+      <number>5</number>
+     </property>
+     <property name="collapsed" stdset="0">
+      <bool>true</bool>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <layout class="QGridLayout" name="_2">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <property name="spacing">
+         <number>6</number>
+        </property>
+		<item row="0" column="0">
+	     <widget class="QLabel" name="fastLabel">
+		  <property name="sizePolicy">
+		   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+			<horstretch>0</horstretch>
+			<verstretch>0</verstretch>
+		   </sizepolicy>
+		  </property>
+		  <property name="text">
+	       <string>Fast:</string>
+		  </property>
+		 </widget>
+		</item>  
+		<item row="0" column="1">
+	     <widget class="ctkCheckBox" name="fastBox" native="true">
+		  <property name="checked" stdset="0">
+		   <bool>true</bool>
+		  </property>
+		 </widget>
+		</item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="gpuSpinLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>GPU Id:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1" colspan="3">
+         <widget class="ctkComboBox" name="gpuComboBox"/>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="previewButton">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>100000</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Run TotalSegmentator</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="statusLabel">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+  <customwidgets>
+  <customwidget>
+   <class>ctkComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">ctkComboBox.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ctkCollapsibleGroupBox</class>
+   <extends>QWidget</extends>
+   <header>ctkCollapsibleGroupBox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ctkCheckBox</class>
+   <extends>QWidget</extends>
+   <header>ctkCheckBox.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
+

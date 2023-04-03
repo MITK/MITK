@@ -74,6 +74,26 @@ namespace
 
     return result;
   }
+
+  mitk::DataStorage::SetOfObjects::ConstPointer GetSubset(const mitk::DataStorage* dataStorage, const mitk::NodePredicateBase* condition, const mitk::DataNode* removedDataNode)
+  {
+    auto subset = dataStorage->GetSubset(condition);
+
+    if (nullptr != removedDataNode)
+    {
+      auto actualSubset = mitk::DataStorage::SetOfObjects::New();
+
+      for (auto node : *subset)
+      {
+        if (node != removedDataNode)
+          actualSubset->push_back(node);
+      }
+
+      return actualSubset;
+    }
+
+    return subset;
+  }
 }
 
 /* This constructor has three objectives:
@@ -90,9 +110,8 @@ QmitkSegmentationTaskListWidget::QmitkSegmentationTaskListWidget(QWidget* parent
 {
   m_Ui->setupUi(this);
 
-  m_Ui->selectionWidget->SetSelectionIsOptional(true);
-  m_Ui->selectionWidget->SetEmptyInfo(QStringLiteral("Select a segmentation task list"));
   m_Ui->selectionWidget->SetAutoSelectNewNodes(true);
+  m_Ui->selectionWidget->SetInvalidInfo(QStringLiteral("Unload everything but a single<br>segmentation task list to continue"));
   m_Ui->selectionWidget->SetNodePredicate(mitk::TNodePredicateDataType<mitk::SegmentationTaskList>::New());
 
   m_Ui->progressBar->setStyleSheet(QString("QProgressBar::chunk { background-color: %1; }").arg(QmitkStyleManager::GetIconAccentColor()));
@@ -147,53 +166,64 @@ void QmitkSegmentationTaskListWidget::SetDataStorage(mitk::DataStorage* dataStor
   this->CheckDataStorage();
 }
 
-void QmitkSegmentationTaskListWidget::CheckDataStorage()
+void QmitkSegmentationTaskListWidget::CheckDataStorage(const mitk::DataNode* removedNode)
 {
+  QString warning;
+
   if (nullptr == m_DataStorage)
   {
-    // TODO
-    return;
+    warning = QStringLiteral("<h3>Developer warning</h3><p>Call <code>SetDataStorage()</code> to fully initialize "
+                             "this instance of <code>QmitkSegmentationTaskListWidget</code>.</p>");
   }
-
-  auto isSegmentationTaskList = mitk::TNodePredicateDataType<mitk::SegmentationTaskList>::New();
-  auto segmentationTaskListNodes = m_DataStorage->GetSubset(isSegmentationTaskList);
-
-  if (segmentationTaskListNodes->empty())
+  else
   {
-    // TODO
-    return;
-  }
+    auto isTaskList = mitk::TNodePredicateDataType<mitk::SegmentationTaskList>::New();
+    auto taskListNodes = GetSubset(m_DataStorage, isTaskList, removedNode);
 
-  if (segmentationTaskListNodes->Size() > 1)
-  {
-    // TODO
-    return;
-  }
-
-  const auto* segmentationTaskListNode = (*segmentationTaskListNodes)[0].GetPointer();
-  auto isChildOfSegmentationTaskListNode = mitk::NodePredicateFunction::New([this, segmentationTaskListNode](const mitk::DataNode* node)
-  {
-    auto parentNodes = m_DataStorage->GetSources(node);
-
-    for (auto parentNode : *parentNodes)
+    if (taskListNodes->empty())
     {
-      if (parentNode == segmentationTaskListNode)
-        return true;
+      warning = QStringLiteral("<h3>No segmentation task list found</h3><p>Load a segmentation task list to use "
+                               "this plugin.</p>");
     }
+    else if (taskListNodes->Size() > 1)
+    {
+      warning = QStringLiteral("<h3>More than one segmentation task list found</h3><p>Unload everything but a "
+                               "single segmentation task list to use this plugin.</p>");
+    }
+    else
+    {
+      const auto* taskListNode = (*taskListNodes)[0].GetPointer();
 
-    return false;
-  });
+      auto isTaskListNode = mitk::NodePredicateFunction::New([taskListNode](const mitk::DataNode* node)
+        {
+          return node == taskListNode;
+        });
 
-  auto isHelperObject = mitk::NodePredicateProperty::New("helper object");
-  auto isUndesiredNode = mitk::NodePredicateNot::New(mitk::NodePredicateOr::New(isChildOfSegmentationTaskListNode, isHelperObject));
+      auto isChildOfTaskListNode = mitk::NodePredicateFunction::New([this, taskListNode](const mitk::DataNode* node)
+        {
+          auto parentNodes = m_DataStorage->GetSources(node);
 
-  if (!m_DataStorage->GetSubset(isUndesiredNode)->empty())
-  {
-    // TODO
-    return;
+          for (auto parentNode : *parentNodes)
+          {
+            if (parentNode == taskListNode)
+              return true;
+          }
+
+          return false;
+        });
+
+      auto isHelperObject = mitk::NodePredicateProperty::New("helper object");
+      auto isUndesiredNode = mitk::NodePredicateNot::New(mitk::NodePredicateOr::New(isTaskListNode, isChildOfTaskListNode, isHelperObject));
+
+      if (!GetSubset(m_DataStorage, isUndesiredNode, removedNode)->empty())
+        warning = QStringLiteral("<h3>Unrelated data found</h3><p>Unload everything but a single segmentation task "
+                                 "list to use this plugin.</p>");
+    }
   }
 
-  // TODO
+  m_Ui->label->setText("<span style=\"color: " + QmitkStyleManager::GetIconAccentColor() + "\">" + warning + "</span>");
+  m_Ui->label->setVisible(!warning.isEmpty());
+  m_Ui->widget->setVisible(warning.isEmpty());
 }
 
 void QmitkSegmentationTaskListWidget::OnUnsavedChangesSaved()

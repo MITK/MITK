@@ -35,7 +35,7 @@ private:
   void CreateQtPartControl(QWidget* parent) override;
   void SetFocus() override;
   void NodeAdded(const mitk::DataNode*) override;
-  void NodeRemoved(const mitk::DataNode*) override;
+  void NodeRemoved(const mitk::DataNode* removedNode) override;
 
   bool PreShutdown(berry::IWorkbench*, bool) override;
 

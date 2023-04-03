@@ -335,12 +335,6 @@ QMimeData* QmitkRenderWindowDataNodeTableModel::mimeData(const QModelIndexList& 
 
 bool QmitkRenderWindowDataNodeTableModel::dropMimeData(const QMimeData* data, Qt::DropAction action, int /*row*/, int /*column*/, const QModelIndex& parent)
 {
-  auto baseRenderer = m_BaseRenderer.Lock();
-  if (baseRenderer.IsNull())
-  {
-    return false;
-  }
-
   if (action == Qt::IgnoreAction)
   {
     return true;
@@ -353,9 +347,9 @@ bool QmitkRenderWindowDataNodeTableModel::dropMimeData(const QMimeData* data, Qt
 
   if (parent.isValid())
   {
+    auto baseRenderer = m_BaseRenderer.Lock();
     int layer = -1;
     auto dataNode = this->data(parent, QmitkDataNodeRawPointerRole).value<mitk::DataNode*>();
-
     if (nullptr != dataNode)
     {
       dataNode->GetIntProperty("layer", layer, baseRenderer);

@@ -39,6 +39,7 @@ public:
   ~QmitkSegmentationTaskListWidget() override;
 
   void SetDataStorage(mitk::DataStorage* dataStorage);
+  void CheckDataStorage();
 
   bool ActiveTaskIsShown() const;
   void LoadNextUnfinishedTask();

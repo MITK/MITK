@@ -85,6 +85,7 @@ QmitkSegmentationTaskListWidget::QmitkSegmentationTaskListWidget(QWidget* parent
   : QWidget(parent),
     m_Ui(new Ui::QmitkSegmentationTaskListWidget),
     m_FileSystemWatcher(new QFileSystemWatcher(this)),
+    m_DataStorage(nullptr),
     m_UnsavedChanges(false)
 {
   m_Ui->setupUi(this);
@@ -131,6 +132,7 @@ QmitkSegmentationTaskListWidget::QmitkSegmentationTaskListWidget(QWidget* parent
   connect(acceptShortcut, &QShortcut::activated, this, &Self::OnAcceptSegmentationShortcutActivated);
 
   this->ResetControls();
+  this->CheckDataStorage();
 }
 
 QmitkSegmentationTaskListWidget::~QmitkSegmentationTaskListWidget()
@@ -141,6 +143,57 @@ void QmitkSegmentationTaskListWidget::SetDataStorage(mitk::DataStorage* dataStor
 {
   m_DataStorage = dataStorage;
   m_Ui->selectionWidget->SetDataStorage(dataStorage); // Triggers OnSelectionChanged()
+
+  this->CheckDataStorage();
+}
+
+void QmitkSegmentationTaskListWidget::CheckDataStorage()
+{
+  if (nullptr == m_DataStorage)
+  {
+    // TODO
+    return;
+  }
+
+  auto isSegmentationTaskList = mitk::TNodePredicateDataType<mitk::SegmentationTaskList>::New();
+  auto segmentationTaskListNodes = m_DataStorage->GetSubset(isSegmentationTaskList);
+
+  if (segmentationTaskListNodes->empty())
+  {
+    // TODO
+    return;
+  }
+
+  if (segmentationTaskListNodes->Size() > 1)
+  {
+    // TODO
+    return;
+  }
+
+  const auto* segmentationTaskListNode = (*segmentationTaskListNodes)[0].GetPointer();
+  auto isChildOfSegmentationTaskListNode = mitk::NodePredicateFunction::New([this, segmentationTaskListNode](const mitk::DataNode* node)
+  {
+    auto parentNodes = m_DataStorage->GetSources(node);
+
+    for (auto parentNode : *parentNodes)
+    {
+      if (parentNode == segmentationTaskListNode)
+        return true;
+    }
+
+    return false;
+  });
+
+  auto isHelperObject = mitk::NodePredicateProperty::New("helper object");
+  auto isUndesiredNode = mitk::NodePredicateNot::New(mitk::NodePredicateOr::New(isChildOfSegmentationTaskListNode, isHelperObject));
+
+  if (!m_DataStorage->GetSubset(isUndesiredNode)->empty())
+  {
+    // TODO
+    return;
+  }
+
+  // TODO
 }
 
 void QmitkSegmentationTaskListWidget::OnUnsavedChangesSaved()

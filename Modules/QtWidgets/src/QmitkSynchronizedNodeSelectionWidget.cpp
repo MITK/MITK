@@ -170,8 +170,15 @@ void QmitkSynchronizedNodeSelectionWidget::SetSynchronized(bool synchronize)
     auto allNodes = dataStorage->GetAll();
     for (auto& node : *allNodes)
     {
-      // Delete the relevant renderer-specific properties for the node using the current base renderer.
-      mitk::RenderWindowLayerUtilities::DeleteRenderWindowProperties(node, baseRenderer);
+      // For helper / hidden nodes:
+      // If the node predicate does not match, do not remove the renderer-specific property
+      // This is relevant for the crosshair data nodes, which are only visible inside their
+      // corresponding render window.
+      if (m_NodePredicate.IsNull() || m_NodePredicate->CheckNode(node))
+      {
+        // Delete the relevant renderer-specific properties for the node using the current base renderer.
+        mitk::RenderWindowLayerUtilities::DeleteRenderWindowProperties(node, baseRenderer);
+      }
     }
   }
   else

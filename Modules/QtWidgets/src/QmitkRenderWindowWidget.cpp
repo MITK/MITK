@@ -265,8 +265,13 @@ void QmitkRenderWindowWidget::SetGeometry(const itk::EventObject& event)
     return;
   }
 
-  const auto* sliceNavigationController = this->GetSliceNavigationController();
-  m_CrosshairManager->UpdateCrosshairPosition(sliceNavigationController);
+  const auto* planeGeometry = this->GetSliceNavigationController()->GetCurrentPlaneGeometry();
+  if (nullptr == planeGeometry)
+  {
+    mitkThrow() << "No valid plane geometry set. Render window is in an invalid state.";
+  }
+
+  return SetCrosshairPosition(planeGeometry->GetCenter());
 }
 
 void QmitkRenderWindowWidget::SetGeometrySlice(const itk::EventObject& event)

@@ -194,23 +194,13 @@ void QmitkSegmentationTaskListWidget::CheckDataStorage(const mitk::DataNode* rem
     {
       const auto* taskListNode = (*taskListNodes)[0].GetPointer();
 
-      auto isTaskListNode = mitk::NodePredicateFunction::New([taskListNode](const mitk::DataNode* node)
-        {
-          return node == taskListNode;
-        });
+      auto isTaskListNode = mitk::NodePredicateFunction::New([taskListNode](const mitk::DataNode* node) {
+        return node == taskListNode;
+      });
 
-      auto isChildOfTaskListNode = mitk::NodePredicateFunction::New([this, taskListNode](const mitk::DataNode* node)
-        {
-          auto parentNodes = m_DataStorage->GetSources(node);
-
-          for (auto parentNode : *parentNodes)
-          {
-            if (parentNode == taskListNode)
-              return true;
-          }
-
-          return false;
-        });
+      auto isChildOfTaskListNode = mitk::NodePredicateFunction::New([this, isTaskListNode](const mitk::DataNode* node) {
+        return !m_DataStorage->GetSources(node, isTaskListNode, false)->empty();
+      });
 
       auto isHelperObject = mitk::NodePredicateProperty::New("helper object");
       auto isUndesiredNode = mitk::NodePredicateNot::New(mitk::NodePredicateOr::New(isTaskListNode, isChildOfTaskListNode, isHelperObject));

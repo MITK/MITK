@@ -172,8 +172,9 @@ void QmitkSegmentationTaskListWidget::CheckDataStorage(const mitk::DataNode* rem
 
   if (nullptr == m_DataStorage)
   {
-    warning = QStringLiteral("<h3>Developer warning</h3><p>Call <code>SetDataStorage()</code> to fully initialize "
-                             "this instance of <code>QmitkSegmentationTaskListWidget</code>.</p>");
+    warning = QStringLiteral(
+      "<h3>Developer warning</h3><p>Call <code>SetDataStorage()</code> to fully initialize "
+      "this instance of <code>QmitkSegmentationTaskListWidget</code>.</p>");
   }
   else
   {
@@ -182,13 +183,15 @@ void QmitkSegmentationTaskListWidget::CheckDataStorage(const mitk::DataNode* rem
 
     if (taskListNodes->empty())
     {
-      warning = QStringLiteral("<h3>No segmentation task list found</h3><p>Load a segmentation task list to use "
-                               "this plugin.</p>");
+      warning = QStringLiteral(
+        "<h3>No segmentation task list found</h3><p>Load a segmentation task list to use "
+        "this plugin.</p>");
     }
     else if (taskListNodes->Size() > 1)
     {
-      warning = QStringLiteral("<h3>More than one segmentation task list found</h3><p>Unload everything but a "
-                               "single segmentation task list to use this plugin.</p>");
+      warning = QStringLiteral(
+        "<h3>More than one segmentation task list found</h3><p>Unload everything but a "
+        "single segmentation task list to use this plugin.</p>");
     }
     else
     {
@@ -203,11 +206,17 @@ void QmitkSegmentationTaskListWidget::CheckDataStorage(const mitk::DataNode* rem
       });
 
       auto isHelperObject = mitk::NodePredicateProperty::New("helper object");
-      auto isUndesiredNode = mitk::NodePredicateNot::New(mitk::NodePredicateOr::New(isTaskListNode, isChildOfTaskListNode, isHelperObject));
+      auto isUndesiredNode = mitk::NodePredicateNot::New(mitk::NodePredicateOr::New(
+        isTaskListNode,
+        isChildOfTaskListNode,
+        isHelperObject));
 
       if (!GetSubset(m_DataStorage, isUndesiredNode, removedNode)->empty())
-        warning = QStringLiteral("<h3>Unrelated data found</h3><p>Unload everything but a single segmentation task "
-                                 "list to use this plugin.</p>");
+      {
+        warning = QStringLiteral(
+          "<h3>Unrelated data found</h3><p>Unload everything but a single segmentation task "
+          "list to use this plugin.</p>");
+      }
     }
   }
 

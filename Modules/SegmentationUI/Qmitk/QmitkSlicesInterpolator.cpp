@@ -1194,17 +1194,17 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
   auto timeStep = segmentationGeometry->TimePointToTimeStep(timePoint);
   const mitk::Label::PixelType newDestinationLabel = labelSetImage->GetActiveLabelSet()->GetActiveLabel()->GetValue();
 
-  TransferLabelContent(
+  TransferLabelContentAtTimeStep(
     interpolatedSegmentation,
     labelSetImage,
     labelSetImage->GetActiveLabelSet(),
+    timeStep,
     0,
     0,
     false,
     {{1, newDestinationLabel}},
     mitk::MultiLabelSegmentation::MergeStyle::Merge,
-    mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks,
-    timeStep);
+    mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
 
   // m_CmbInterpolation->setCurrentIndex(0);
   this->Show3DInterpolationResult(false);

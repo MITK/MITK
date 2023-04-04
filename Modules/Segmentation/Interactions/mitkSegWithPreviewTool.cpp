@@ -393,7 +393,7 @@ void mitk::SegWithPreviewTool::TransferImageAtTimeStep(const Image* sourceImage,
       auto destLSImage = dynamic_cast<LabelSetImage*>(destinationImage);
 
       auto labelMapping = this->GetLabelMapping();
-      TransferLabelContent(sourceLSImage, destLSImage, labelMapping, m_MergeStyle, m_OverwriteStyle, timeStep);
+      TransferLabelContentAtTimeStep(sourceLSImage, destLSImage, timeStep, labelMapping, m_MergeStyle, m_OverwriteStyle);
     }
   }
   catch (...)

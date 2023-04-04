@@ -589,11 +589,15 @@ namespace mitk
   @pre sourceImage and destinationImage must contain the indicated timeStep
   @pre sourceImage must contain all indicated sourceLabels in its active layer.
   @pre destinationImage must contain all indicated destinationLabels in its active layer.*/
-  MITKMULTILABEL_EXPORT void TransferLabelContent(const LabelSetImage* sourceImage, LabelSetImage* destinationImage,
-    std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping = { {1,1} },
+  MITKMULTILABEL_EXPORT void TransferLabelContentAtTimeStep(const LabelSetImage* sourceImage, LabelSetImage* destinationImage,
+    const TimeStepType timeStep, std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping = { {1,1} },
     MultiLabelSegmentation::MergeStyle mergeStyle = MultiLabelSegmentation::MergeStyle::Replace,
-    MultiLabelSegmentation::OverwriteStyle overwriteStlye = MultiLabelSegmentation::OverwriteStyle::RegardLocks,
-    const TimeStepType timeStep = 0);
+    MultiLabelSegmentation::OverwriteStyle overwriteStlye = MultiLabelSegmentation::OverwriteStyle::RegardLocks);
+
+  MITKMULTILABEL_EXPORT void TransferLabelContent(const LabelSetImage* sourceImage, LabelSetImage* destinationImage, std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping = { {1,1} },
+    MultiLabelSegmentation::MergeStyle mergeStyle = MultiLabelSegmentation::MergeStyle::Replace,
+    MultiLabelSegmentation::OverwriteStyle overwriteStlye = MultiLabelSegmentation::OverwriteStyle::RegardLocks);
+
 
   /**Helper function that transfers pixels of the specified source label from source image to the destination image by using
   a specified destination label. Function processes the whole image volume of the specified time step.
@@ -619,12 +623,22 @@ namespace mitk
   @pre sourceImage, destinationImage and destinationLabelSet must be valid
   @pre sourceImage and destinationImage must contain the indicated timeStep
   @pre destinationLabelSet must contain all indicated destinationLabels for mapping.*/
-  MITKMULTILABEL_EXPORT void TransferLabelContent(const Image* sourceImage, Image* destinationImage, const mitk::LabelSet* destinationLabelSet,
-    mitk::Label::PixelType sourceBackground = LabelSetImage::UnlabeledLabelValue, mitk::Label::PixelType destinationBackground = LabelSetImage::UnlabeledLabelValue, bool destinationBackgroundLocked = false,
+  MITKMULTILABEL_EXPORT void TransferLabelContentAtTimeStep(const Image* sourceImage, Image* destinationImage, const mitk::LabelSet* destinationLabelSet,
+    const TimeStepType timeStep, mitk::Label::PixelType sourceBackground = LabelSetImage::UnlabeledLabelValue,
+    mitk::Label::PixelType destinationBackground = LabelSetImage::UnlabeledLabelValue,
+    bool destinationBackgroundLocked = false,
     std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping = { {1,1} },
     MultiLabelSegmentation::MergeStyle mergeStyle = MultiLabelSegmentation::MergeStyle::Replace,
-    MultiLabelSegmentation::OverwriteStyle overwriteStlye = MultiLabelSegmentation::OverwriteStyle::RegardLocks,
-    const TimeStepType timeStep = 0);
+    MultiLabelSegmentation::OverwriteStyle overwriteStlye = MultiLabelSegmentation::OverwriteStyle::RegardLocks);
+
+  MITKMULTILABEL_EXPORT void TransferLabelContent(const Image* sourceImage, Image* destinationImage, const mitk::LabelSet* destinationLabelSet,
+    mitk::Label::PixelType sourceBackground = LabelSetImage::UnlabeledLabelValue,
+    mitk::Label::PixelType destinationBackground = LabelSetImage::UnlabeledLabelValue,
+    bool destinationBackgroundLocked = false,
+    std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping = { {1,1} },
+    MultiLabelSegmentation::MergeStyle mergeStyle = MultiLabelSegmentation::MergeStyle::Replace,
+    MultiLabelSegmentation::OverwriteStyle overwriteStlye = MultiLabelSegmentation::OverwriteStyle::RegardLocks);
+
 } // namespace mitk
 
 #endif

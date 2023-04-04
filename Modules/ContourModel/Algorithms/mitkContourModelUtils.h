@@ -68,7 +68,7 @@ namespace mitk
     This overloaded version uses the contour at the passed contourTimeStep
     to fill the passed image slice.
     \deprecated Ths function is deprecated. Use FillContourInSlice2() (in
-    conjunction e.g. with TransferLabelContent()) instead.
+    conjunction e.g. with TransferLabelContentAtTimeStep()) instead.
     \pre sliceImage points to a valid instance
     \pre projectedContour points to a valid instance
     */

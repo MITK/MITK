@@ -164,17 +164,17 @@ void mitk::DiffImageApplier::ExecuteOperation(Operation *operation)
       auto labelSetImage = dynamic_cast<mitk::LabelSetImage* >(m_Image.GetPointer());
 
       // this will do a long long if/else to find out both pixel types
-      TransferLabelContent(
+      TransferLabelContentAtTimeStep(
         m_SliceDifferenceImage,
         labelSetImage,
         labelSetImage->GetActiveLabelSet(),
+        m_TimeStep,
         0,
         0,
         false,
         {{1, m_DestinationLabel}},
         mitk::MultiLabelSegmentation::MergeStyle::Merge,
-        mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks,
-        m_TimeStep);
+        mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
 
       if (m_Factor == 1 || m_Factor == -1)
       {

@@ -491,7 +491,7 @@ void mitk::PaintbrushTool::OnMouseReleased(StateMachineAction *, InteractionEven
     activeLabelClone->SetLocked(false);
   }
 
-  TransferLabelContent(m_PaintingSlice, m_WorkingSlice, fillLabelSet, LabelSetImage::UnlabeledLabelValue, LabelSetImage::UnlabeledLabelValue, false, { {m_InternalFillValue, activePixelValue} }, mitk::MultiLabelSegmentation::MergeStyle::Merge);
+  TransferLabelContentAtTimeStep(m_PaintingSlice, m_WorkingSlice, fillLabelSet, 0, LabelSetImage::UnlabeledLabelValue, LabelSetImage::UnlabeledLabelValue, false, { {m_InternalFillValue, activePixelValue} }, mitk::MultiLabelSegmentation::MergeStyle::Merge);
 
   this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice->Clone());
 

@@ -162,7 +162,15 @@ protected:
   const std::string WARNING_TOTALSEG_NOT_FOUND =
     "TotalSegmentator is not detected in the selected python environment.Please select a valid "
     "python environment or install TotalSegmentator.";
-  const QStringList VALID_TASKS = {"total", "cerebral_bleed", "hip_implant", "coronary_arteries"};
+  const QStringList VALID_TASKS = {
+    "total",
+    "cerebral_bleed",
+    "hip_implant",
+    "coronary_arteries",
+    "body",
+    "lung_vessels",
+    "pleural_pericard_effusion"
+  };
   QmitkTotalSegmentatorToolInstaller m_Installer;
 };
 #endif

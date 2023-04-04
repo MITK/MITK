@@ -108,7 +108,7 @@ namespace mitk
      * 
      * @param filePath
      */
-    void ParseLabelNames(const std::string &);
+    void ParseLabelNames(const std::string&);
 
     /**
      * @brief Get the Label Map Path from the virtual environment location
@@ -116,6 +116,17 @@ namespace mitk
      * @return std::string 
      */
     std::string GetLabelMapPath();
+
+    /**
+     * @brief Agglomerate many individual mask image files into one multi-label LabelSetImage in the
+     * given filePath order.
+     * 
+     * @param filePaths 
+     * @param dimension 
+     * @param geometry 
+     * @return LabelSetImage::Pointer 
+     */
+    LabelSetImage::Pointer AgglomerateLabelFiles(std::vector<std::string>& filePaths, unsigned int* dimension, mitk::BaseGeometry* geometry);
 
     std::string m_MitkTempDir;
     std::string m_PythonPath;
@@ -125,6 +136,15 @@ namespace mitk
     bool m_Fast = true;
     const std::string TEMPLATE_FILENAME = "XXXXXX_000_0000.nii.gz";
     const std::string DEFAULT_TOTAL_TASK = "total";
+    const std::unordered_map<std::string, std::vector<std::string>> SUBTASKS_MAP =
+    {
+      {"body", { "body.nii.gz", "body_trunc.nii.gz", "body_extremities.nii.gz", "skin.nii.gz"}},
+      {"hip_implant", {"hip_implant.nii.gz"}},
+      {"cerebral_bleed", {"intracerebral_hemorrhage.nii.gz"}},
+      {"coronary_arteries", {"coronary_arteries.nii.gz"}},
+      {"lung_vessels", {"lung_vessels.nii.gz", "lung_trachea_bronchia.nii.gz"}},
+      {"pleural_pericard_effusion", {"pleural_effusion.nii.gz", "pericardial_effusion.nii.gz"}}
+    };  
   }; // class
 } // namespace
 #endif

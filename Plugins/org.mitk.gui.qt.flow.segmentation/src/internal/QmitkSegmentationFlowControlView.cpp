@@ -121,6 +121,9 @@ void QmitkSegmentationFlowControlView::NodeAdded(const mitk::DataNode* node)
 {
   if (dynamic_cast<const mitk::LabelSetImage*>(node->GetData()) != nullptr)
     this->UpdateControls();
+
+  if (m_Controls->segmentationTaskListWidget->isVisible())
+    m_Controls->segmentationTaskListWidget->CheckDataStorage();
 }
 
 void QmitkSegmentationFlowControlView::NodeChanged(const mitk::DataNode* node)
@@ -133,6 +136,9 @@ void QmitkSegmentationFlowControlView::NodeRemoved(const mitk::DataNode* node)
 {
   if (dynamic_cast<const mitk::LabelSetImage*>(node->GetData()) != nullptr)
     this->UpdateControls();
+
+  if (m_Controls->segmentationTaskListWidget->isVisible())
+    m_Controls->segmentationTaskListWidget->CheckDataStorage(node);
 }
 
 bool QmitkSegmentationFlowControlView::PreShutdown(berry::IWorkbench*, bool)

@@ -116,22 +116,22 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
 
   IOUtil::Save(inputAtTimeStep, inputImagePath);
 
-  std::string &outArg = outputImagePath;
+  std::string *outArg = &outputImagePath;
   bool isSubTask = false;
   if (this->GetSubTask() != DEFAULT_TOTAL_TASK)
   {
     isSubTask = true;
     outputImagePath = outDir + IOUtil::GetDirectorySeparator() + this->GetSubTask() + ".nii.gz";
-    outArg = outDir;
+    outArg = &outDir;
   }
 
   this->run_totalsegmentator(
-    spExec, inputImagePath, outArg, this->GetFast(), !isSubTask, this->GetGpuId(), DEFAULT_TOTAL_TASK);
+    spExec, inputImagePath, *outArg, this->GetFast(), !isSubTask, this->GetGpuId(), DEFAULT_TOTAL_TASK);
 
   if (isSubTask)
   { // Run total segmentator again
     this->run_totalsegmentator(
-      spExec, inputImagePath, outArg, !isSubTask, !isSubTask, this->GetGpuId(), this->GetSubTask());
+      spExec, inputImagePath, *outArg, !isSubTask, !isSubTask, this->GetGpuId(), this->GetSubTask());
     // Construct Label Id map
     std::vector<std::string> files = SUBTASKS_MAP.at(this->GetSubTask());
     std::map<int, std::string> labelMapSubtask;

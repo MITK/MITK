@@ -177,9 +177,19 @@ mitk::LabelSetImage::Pointer mitk::TotalSegmentatorTool::AgglomerateLabelFiles(s
 
   for (auto const &outputImagePath : filePaths)
   {
+    double rgba[4];
+    aggloLabelImage->GetActiveLabelSet()->GetLookupTable()->GetTableValue(labelId, rgba);
+    mitk::Color color;
+    color.SetRed(rgba[0]);
+    color.SetGreen(rgba[1]);
+    color.SetBlue(rgba[2]);
+
     auto label = mitk::Label::New();
     label->SetName("object-" + std::to_string(labelId));
-    label->SetValue(labelId); //TODO: set color
+    label->SetValue(labelId);
+    label->SetColor(color);
+    label->SetOpacity(rgba[3]);
+
     aggloLabelImage->GetActiveLabelSet()->AddLabel(label);
 
     Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);

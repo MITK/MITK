@@ -337,6 +337,8 @@ void mitk::LabelSetImage::AddLabelSetToLayer(const unsigned int layerIdx, const 
 
   this->RegisterLabelSet(clonedLabelSet);
 
+  std::vector<SpatialGroupIndexType> addedGroups;
+
   if (layerIdx < m_LabelSetContainer.size())
   {
     if (m_LabelSetContainer[layerIdx].IsNotNull())
@@ -356,12 +358,18 @@ void mitk::LabelSetImage::AddLabelSetToLayer(const unsigned int layerIdx, const 
       this->RegisterLabelSet(defaultLabelSet);
       this->ReinitMaps();
       m_LabelSetContainer.push_back(defaultLabelSet);
-      this->m_GroupAddedMessage.Send(m_LabelSetContainer.size()-1);
+      addedGroups.emplace_back(m_LabelSetContainer.size() - 1);
     }
     m_LabelSetContainer.push_back(clonedLabelSet);
-    this->OnGroupAdded(layerIdx);
+    addedGroups.emplace_back(m_LabelSetContainer.size() - 1);
   }
+
   this->ReinitMaps();
+
+  for (auto groupID : addedGroups)
+  {
+    this->m_GroupAddedMessage.Send(groupID);
+  }
 }
 
 void mitk::LabelSetImage::SetActiveLayer(unsigned int layer)
@@ -1031,7 +1039,6 @@ void mitk::LabelSetImage::OnLabelRemoved(LabelValueType labelValue)
 void mitk::LabelSetImage::OnGroupAdded(SpatialGroupIndexType groupIndex)
 {
   auto result = m_GroupToLabelMap.insert(std::make_pair(groupIndex, LabelValueVectorType()));
-  if (!result.second) mitkThrow() << "Invalid state of LabelSetImage. A GroupAdded signal was triggered for a group that alread exists. GroupIndex: " << groupIndex;
 
   this->m_GroupAddedMessage.Send(groupIndex);
 }
@@ -1397,6 +1404,11 @@ void mitk::TransferLabelContentAtTimeStep(
   if (nullptr == destinationLabelSet)
   {
     mitkThrow() << "Invalid call of TransferLabelContentAtTimeStep; destinationLabelSet must not be null";
+  }
+
+  if (sourceImage == destinationImage && labelMapping.size() > 1)
+  {
+    MITK_DEBUG << "Warning. Using TransferLabelContentAtTimeStep or TransferLabelContent with equal source and destination and more then on label to transfer, can lead to wrong results. Please see documentation and verify that the usage is OK.";
   }
 
   Image::ConstPointer sourceImageAtTimeStep = SelectImageByTimeStep(sourceImage, timeStep);

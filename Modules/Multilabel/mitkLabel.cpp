@@ -60,6 +60,12 @@ mitk::Label::Label() : PropertyList()
   DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(this);
 }
 
+mitk::Label::Label(PixelType value, const std::string& name) : Label()
+{
+  this->SetValue(value);
+  this->SetName(name);
+}
+
 mitk::Label::Label(const Label &other) : PropertyList(other)
 // copyconstructer of property List handles the coping action
 {

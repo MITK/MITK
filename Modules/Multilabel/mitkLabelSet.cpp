@@ -318,12 +318,15 @@ bool mitk::Equal(const mitk::LabelSet &leftHandSide, const mitk::LabelSet &right
   }
 
   // m_ActiveLabel;
-  returnValue = mitk::Equal(*leftHandSide.GetActiveLabel(), *rightHandSide.GetActiveLabel(), eps, verbose);
-  if (!returnValue)
+  if (leftHandSide.GetActiveLabel() != rightHandSide.GetActiveLabel())
   {
-    MITK_INFO(verbose) << "Active label not equal.";
-    return returnValue;
-    ;
+    returnValue = mitk::Equal(*leftHandSide.GetActiveLabel(), *rightHandSide.GetActiveLabel(), eps, verbose);
+    if (!returnValue)
+    {
+      MITK_INFO(verbose) << "Active label not equal.";
+      return returnValue;
+      ;
+    }
   }
 
   // m_Layer;

@@ -569,9 +569,13 @@ namespace mitk
   }
 
   /**Helper function that transfers pixels of the specified source label from source image to the destination image by using
-  a specified destination label. Function processes the whole image volume of the specified time step.
+  a specified destination label for a specific timestep. Function processes the whole image volume of the specified time step.
   @remark in its current implementation the function only transfers contents of the active layer of the passed LabelSetImages.
   @remark the function assumes that it is only called with source and destination image of same geometry.
+  @remark CAUTION: The function is not save, if sourceImage and destinationImage are the same instance and you transfer more then one
+  label, because the changes are made inplace for performance reasons but not in one pass. If a mapped value A equals a "old value"
+  that is later in the mapping, one ends up with a wrong transfer, as a pixel would be first mapped to A and then latter again, because
+  it is also an "old" value in the mapping table.
   @param sourceImage Pointer to the LabelSetImage which active layer should be used as source for the transfer.
   @param destinationImage Pointer to the LabelSetImage which active layer should be used as destination for the transfer.
   @param labelMapping Map that encodes the mappings of all label pixel transfers that should be done. First element is the
@@ -594,14 +598,23 @@ namespace mitk
     MultiLabelSegmentation::MergeStyle mergeStyle = MultiLabelSegmentation::MergeStyle::Replace,
     MultiLabelSegmentation::OverwriteStyle overwriteStlye = MultiLabelSegmentation::OverwriteStyle::RegardLocks);
 
+  /**Helper function that transfers pixels of the specified source label from source image to the destination image by using
+  a specified destination label. Function processes the whole image volume for all time steps.
+  For more details please see TransferLabelContentAtTimeStep for LabelSetImages.
+  @sa TransferLabelContentAtTimeStep*/
   MITKMULTILABEL_EXPORT void TransferLabelContent(const LabelSetImage* sourceImage, LabelSetImage* destinationImage, std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping = { {1,1} },
     MultiLabelSegmentation::MergeStyle mergeStyle = MultiLabelSegmentation::MergeStyle::Replace,
     MultiLabelSegmentation::OverwriteStyle overwriteStlye = MultiLabelSegmentation::OverwriteStyle::RegardLocks);
 
 
   /**Helper function that transfers pixels of the specified source label from source image to the destination image by using
-  a specified destination label. Function processes the whole image volume of the specified time step.
+  a specified destination label for a specific timestep. Function processes the whole image volume of the specified time step.
   @remark the function assumes that it is only called with source and destination image of same geometry.
+  @remark CAUTION: The function is not save, if sourceImage and destinationImage are the same instance and you transfer more then one
+  label, because the changes are made inplace for performance reasons but not in one pass. If a mapped value A equals a "old value"
+  that is later in the mapping, one ends up with a wrong transfer, as a pixel would be first mapped to A and then latter again, because
+  it is also an "old" value in the mapping table.
+  @param sourceImage Pointer to the image that should be used as source for the transfer.
   @param sourceImage Pointer to the image that should be used as source for the transfer.
   @param destinationImage Pointer to the image that should be used as destination for the transfer.
   @param destinationLabelSet Pointer to the label set specifying labels and lock states in the destination image. Unkown pixel
@@ -631,6 +644,10 @@ namespace mitk
     MultiLabelSegmentation::MergeStyle mergeStyle = MultiLabelSegmentation::MergeStyle::Replace,
     MultiLabelSegmentation::OverwriteStyle overwriteStlye = MultiLabelSegmentation::OverwriteStyle::RegardLocks);
 
+  /**Helper function that transfers pixels of the specified source label from source image to the destination image by using
+  a specified destination label. Function processes the whole image volume for all time steps.
+  For more details please see TransferLabelContentAtTimeStep.
+  @sa TransferLabelContentAtTimeStep*/
   MITKMULTILABEL_EXPORT void TransferLabelContent(const Image* sourceImage, Image* destinationImage, const mitk::LabelSet* destinationLabelSet,
     mitk::Label::PixelType sourceBackground = LabelSetImage::UnlabeledLabelValue,
     mitk::Label::PixelType destinationBackground = LabelSetImage::UnlabeledLabelValue,

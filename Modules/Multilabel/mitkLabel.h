@@ -30,9 +30,10 @@ namespace mitk
   public:
     mitkClassMacro(Label, mitk::PropertyList);
 
-    itkNewMacro(Self);
-
     typedef unsigned short PixelType;
+
+    itkNewMacro(Self);
+    mitkNewMacro2Param(Self, PixelType, const std::string&);
 
     /// The maximum value a label can get: Since the value is of type unsigned short MAX_LABEL_VALUE = 65535
     static const PixelType MAX_LABEL_VALUE;
@@ -69,6 +70,7 @@ namespace mitk
     using itk::Object::Modified;
     void Modified() { Superclass::Modified(); }
     Label();
+    Label(PixelType value, const std::string& name);
     ~Label() override;
 
   protected:

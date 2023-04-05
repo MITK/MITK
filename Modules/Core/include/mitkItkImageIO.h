@@ -14,7 +14,7 @@ found in the LICENSE file.
 #define mitkItkImageIO_h
 
 #include "mitkAbstractFileIO.h"
-
+#include <mitkImage.h>
 #include <itkImageIOBase.h>
 
 namespace mitk
@@ -46,6 +46,18 @@ namespace mitk
 
     void Write() override;
     ConfidenceLevel GetWriterConfidenceLevel() const override;
+
+    /**Helper function that can be used to convert a MetaDataDictionary into a PropertyList for a certain mimeType.
+    The function uses the Property serialization service for that.
+    @param mimeTypeName Mime type that should be assumed for the meta data deserialization.
+    @param defaultMetaDataKeys Vector of keys that should be assumed as defaults. For defaults no PropertyInfo will be registered
+    at the PropertyPersistence service, as they are assumed to be handled anyways. For all other keys an info will be registered
+    to ensure that they will be serialized again, even if unkown.*/
+    static PropertyList::Pointer ExtractMetaDataAsPropertyList(const itk::MetaDataDictionary& dictionary, const std::string& mimeTypeName, const std::vector<std::string>& defaultMetaDataKeys);
+
+    /** Helper function that van be used to extract a raw mitk image for the passed path using the also passed ImageIOBase instance.
+    Raw means, that only the pixel data and geometry information is loaded. But e.g. no properties etc...*/
+    static Image::Pointer LoadRawMitkImageFromImageIO(itk::ImageIOBase* imageIO, const std::string& path);
 
   protected:
     virtual std::vector<std::string> FixUpImageIOExtensions(const std::string &imageIOName);

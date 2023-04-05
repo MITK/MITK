@@ -30,7 +30,7 @@ mitk::LabelSet::~LabelSet()
 mitk::LabelSet::LabelSet(const LabelSet &other)
   : itk::Object(),
     m_LookupTable(other.GetLookupTable()->Clone()),
-    m_ActiveLabelValue(other.GetActiveLabel()->GetValue()),
+    m_ActiveLabelValue(other.m_ActiveLabelValue),
     m_Layer(other.GetLayer())
 {
   // clone Labels
@@ -56,7 +56,6 @@ std::vector<mitk::LabelSet::LabelValueType> mitk::LabelSet::GetUsedLabelValues()
   }
   else
   {
-
     for (auto [value, label] : this->m_LabelContainer)
     {
       result.emplace_back(value);

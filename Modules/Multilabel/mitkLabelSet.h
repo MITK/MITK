@@ -201,6 +201,8 @@ namespace mitk
     using ReservedLabelValuesFunctor = std::function<std::vector<LabelValueType>()>;
     ReservedLabelValuesFunctor m_ReservedLabelValuesFunctor;
 
+    std::vector<LabelValueType> GetUsedLabelValues() const;
+
   protected:
     LabelSet();
     LabelSet(const LabelSet &);
@@ -208,8 +210,6 @@ namespace mitk
     mitkCloneMacro(Self);
 
     ~LabelSet() override;
-
-    std::vector<LabelValueType> GetUsedLabelValues() const;
 
     void PrintSelf(std::ostream &os, itk::Indent indent) const override;
 
@@ -241,6 +241,14 @@ namespace mitk
                                    const mitk::LabelSet &rightHandSide,
                                    ScalarType eps,
                                    bool verbose);
+
+  /**
+  * Methods takes a label set and generates a new label set with the same labels but updated labels values according to
+  * the passed labelMapping.
+  * @pre sourceLabelSet is valid
+  */
+  MITKMULTILABEL_EXPORT LabelSet::Pointer GenerateLabelSetWithMappedValues(const LabelSet* sourceLabelSet,
+    std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping = { {1,1} });
 
 } // namespace mitk
 

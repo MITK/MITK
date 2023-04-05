@@ -84,15 +84,14 @@ mitk::Image::Pointer mitk::ConvertLabelSetImageToImage(LabelSetImage::ConstPoint
   return image;
 }
 
+
 template <typename TPixel, unsigned int VDimensions>
-static void ConvertImageToLabelSetImage(const itk::VectorImage<TPixel, VDimensions> *image,
-                                        mitk::LabelSetImage::Pointer &labelSetImage)
+static void SplitVectorImage(const itk::VectorImage<TPixel, VDimensions>* image,
+  std::vector<mitk::Image::Pointer>& result)
 {
   typedef itk::VectorImage<TPixel, VDimensions> VectorImageType;
   typedef itk::Image<TPixel, VDimensions> ImageType;
   typedef itk::VectorIndexSelectionCastImageFilter<VectorImageType, ImageType> VectorIndexSelectorType;
-
-  labelSetImage = mitk::LabelSetImage::New();
 
   auto numberOfLayers = image->GetVectorLength();
   for (decltype(numberOfLayers) layer = 0; layer < numberOfLayers; ++layer)
@@ -102,44 +101,97 @@ static void ConvertImageToLabelSetImage(const itk::VectorImage<TPixel, VDimensio
     layerSelector->SetIndex(layer);
     layerSelector->Update();
 
-    mitk::Image::Pointer layerImage;
-    mitk::CastToMitkImage(layerSelector->GetOutput(), layerImage);
-
-    if (layer == 0)
-    {
-      labelSetImage->InitializeByLabeledImage(layerImage);
-    }
-    else
-    {
-      labelSetImage->AddLayer(layerImage);
-    }
+    mitk::Image::Pointer layerImage = mitk::GrabItkImageMemory(layerSelector->GetOutput(), nullptr, nullptr, false);
+    result.push_back(layerImage);
   }
+}
+
+std::vector<mitk::Image::Pointer> mitk::SplitVectorImage(const Image* vecImage)
+{
+  if (nullptr == vecImage)
+  {
+    mitkThrow() << "Invalid usage; nullptr passed to SplitVectorImage.";
+  }
+
+  if (vecImage->GetChannelDescriptor().GetPixelType().GetPixelType() != itk::IOPixelEnum::VECTOR)
+  {
+    mitkThrow() << "Invalid usage of SplitVectorImage; passed image is not a vector image. Present pixel type: "<< vecImage->GetChannelDescriptor().GetPixelType().GetPixelTypeAsString();
+  }
+
+  std::vector<mitk::Image::Pointer> result;
+
+  if (4 == vecImage->GetDimension())
+  {
+    AccessVectorFixedDimensionByItk_n(vecImage, ::SplitVectorImage, 4, (result));
+  }
+  else
+  {
+    AccessVectorPixelTypeByItk_n(vecImage, ::SplitVectorImage, (result));
+  }
+
+  for (auto image : result)
+  {
+    image->SetTimeGeometry(vecImage->GetTimeGeometry()->Clone());
+  }
+
+  return result;
 }
 
 mitk::LabelSetImage::Pointer mitk::ConvertImageToLabelSetImage(Image::Pointer image)
 {
-  LabelSetImage::Pointer labelSetImage;
+  std::vector<mitk::Image::Pointer> groupImages;
 
   if (image.IsNotNull())
   {
     if (image->GetChannelDescriptor().GetPixelType().GetPixelType() == itk::IOPixelEnum::VECTOR)
     {
-      if (4 == image->GetDimension())
-      {
-        AccessVectorFixedDimensionByItk_n(image, ::ConvertImageToLabelSetImage, 4, (labelSetImage));
-      }
-      else
-      {
-        AccessVectorPixelTypeByItk_n(image, ::ConvertImageToLabelSetImage, (labelSetImage));
-      }
+      groupImages = SplitVectorImage(image);
     }
     else
     {
-      labelSetImage = mitk::LabelSetImage::New();
-      labelSetImage->InitializeByLabeledImage(image);
+      groupImages.push_back(image);
     }
-    labelSetImage->SetTimeGeometry(image->GetTimeGeometry()->Clone());
   }
+  auto labelSetImage = ConvertImageVectorToLabelSetImage(groupImages, image->GetTimeGeometry());
 
   return labelSetImage;
+}
+
+mitk::LabelSetImage::Pointer mitk::ConvertImageVectorToLabelSetImage(const std::vector<mitk::Image::Pointer>& images, const mitk::TimeGeometry* timeGeometry)
+{
+  LabelSetImage::Pointer labelSetImage = mitk::LabelSetImage::New();
+
+  for (auto& groupImage : images)
+  {
+    if (groupImage== images.front())
+    {
+      labelSetImage->InitializeByLabeledImage(groupImage);
+    }
+    else
+    {
+      labelSetImage->AddLayer(groupImage);
+    }
+  }
+
+  labelSetImage->SetTimeGeometry(timeGeometry->Clone());
+  return labelSetImage;
+}
+
+mitk::LabelSet::Pointer mitk::GenerateLabelSetWithMappedValues(const LabelSet* sourceLabelset, std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping)
+{
+  if (nullptr == sourceLabelset)
+  {
+    mitkThrow() << "Invalid usage; nullptr passed as labelset to GenerateLabelSetWithMappedValues.";
+  }
+
+  auto result = LabelSet::New();
+
+  for (auto [sourceLabelID, destLabelID] : labelMapping)
+  {
+    auto clonedLabel = sourceLabelset->GetLabel(sourceLabelID)->Clone();
+    clonedLabel->SetValue(destLabelID);
+    result->AddLabel(clonedLabel, false);
+  }
+
+  return result;
 }

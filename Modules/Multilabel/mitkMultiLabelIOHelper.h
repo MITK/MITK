@@ -13,6 +13,7 @@ found in the LICENSE file.
 #ifndef mitkMultiLabelIOHelper_h
 #define mitkMultiLabelIOHelper_h
 
+#include <string_view>
 #include <MitkMultilabelExports.h>
 #include <itkSmartPointer.h>
 
@@ -27,6 +28,12 @@ namespace mitk
   class BaseProperty;
   class LabelSetImage;
   class Label;
+
+  constexpr char* const PROPERTY_NAME_TIMEGEOMETRY_TYPE = "org.mitk.timegeometry.type";
+  constexpr char* const PROPERTY_NAME_TIMEGEOMETRY_TIMEPOINTS = "org.mitk.timegeometry.timepoints";
+  constexpr char* const PROPERTY_KEY_TIMEGEOMETRY_TYPE = "org_mitk_timegeometry_type";
+  constexpr char* const PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS = "org_mitk_timegeometry_timepoints";
+  constexpr char* const PROPERTY_KEY_UID = "org_mitk_uid";
 
   /**
    * @brief The MultiLabelIOHelper is a static helper class that supports serialization of mitk::LabelSetImage

@@ -80,8 +80,8 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Image was not correctly initialized - active layer has wrong ID",
                            m_LabelSetImage->GetActiveLayer() == 0);
 
-    CPPUNIT_ASSERT_MESSAGE("Image was not correctly initialized - active label is not the exterior label",
-                           m_LabelSetImage->GetActiveLabel()->GetValue() == 0);
+    CPPUNIT_ASSERT_MESSAGE("Image was not correctly initialized - no active label should be selected",
+                           m_LabelSetImage->GetActiveLabel() == nullptr);
   }
 
   void TestAddLayer()
@@ -94,8 +94,8 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Layer was not added correctly to image - active layer has wrong ID",
                            m_LabelSetImage->GetActiveLayer() == 1);
 
-    CPPUNIT_ASSERT_MESSAGE("Layer was not added correctly to image - active label is not the exterior label",
-                           m_LabelSetImage->GetActiveLabel()->GetValue() == 0);
+    CPPUNIT_ASSERT_MESSAGE("Layer was not added correctly to image - no active label should be selected",
+                           m_LabelSetImage->GetActiveLabel() == nullptr);
 
     mitk::LabelSet::Pointer newlayer = mitk::LabelSet::New();
     mitk::Label::Pointer label1 = mitk::Label::New();
@@ -176,7 +176,7 @@ public:
     mitk::Image::Pointer image =
       mitk::IOUtil::Load<mitk::Image>(GetTestDataFilePath("Multilabel/LabelSetTestInitializeImage.nrrd"));
     m_LabelSetImage->InitializeByLabeledImage(image);
-    CPPUNIT_ASSERT_MESSAGE("Image - number of labels is not 6", m_LabelSetImage->GetNumberOfLabels() == 6);
+    CPPUNIT_ASSERT_MESSAGE("Image - number of labels is not 5", m_LabelSetImage->GetNumberOfLabels() == 5);
   }
 
   void TestGetLabelSet()
@@ -249,7 +249,7 @@ public:
     m_LabelSetImage->GetLabelSet(1)->AddLabel(label2);
     CPPUNIT_ASSERT_MESSAGE(
       "Wrong total number of labels",
-      m_LabelSetImage->GetTotalNumberOfLabels() == 4); // added 2 labels + 2 exterior default labels
+      m_LabelSetImage->GetTotalNumberOfLabels() == 2);
   }
 
   void TestExistsLabel()
@@ -388,7 +388,7 @@ public:
     m_LabelSetImage = mitk::LabelSetImage::New();
     m_LabelSetImage->InitializeByLabeledImage(image);
 
-    CPPUNIT_ASSERT_MESSAGE("Image - number of labels is not 6", m_LabelSetImage->GetNumberOfLabels() == 6);
+    CPPUNIT_ASSERT_MESSAGE("Image - number of labels is not 6", m_LabelSetImage->GetNumberOfLabels() == 5);
     // 2ndMin because of the exterior label = 0
     CPPUNIT_ASSERT_MESSAGE("Wrong MIN value", m_LabelSetImage->GetStatistics()->GetScalarValue2ndMin() == 1);
     CPPUNIT_ASSERT_MESSAGE("Wrong MAX value", m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 7);
@@ -403,7 +403,7 @@ public:
     m_LabelSetImage->RemoveLabels(labelsToBeRemoved);
 
     CPPUNIT_ASSERT_MESSAGE("Wrong number of labels after some have been removed",
-                           m_LabelSetImage->GetNumberOfLabels() == 3);
+                           m_LabelSetImage->GetNumberOfLabels() == 2);
     // Values within the image are 0, 1, 3, 5, 6, 7 - New Min / Max value should be 5 / 6
     // 2ndMin because of the exterior label = 0
     CPPUNIT_ASSERT_MESSAGE("Labels with value 1 and 3 were not removed from the image",
@@ -421,7 +421,7 @@ public:
     m_LabelSetImage = mitk::LabelSetImage::New();
     m_LabelSetImage->InitializeByLabeledImage(image);
 
-    CPPUNIT_ASSERT_MESSAGE("Image - number of labels is not 6", m_LabelSetImage->GetNumberOfLabels() == 6);
+    CPPUNIT_ASSERT_MESSAGE("Image - number of labels is not 6", m_LabelSetImage->GetNumberOfLabels() == 5);
     // 2ndMin because of the exterior label = 0
     CPPUNIT_ASSERT_MESSAGE("Wrong MIN value", m_LabelSetImage->GetStatistics()->GetScalarValue2ndMin() == 1);
     CPPUNIT_ASSERT_MESSAGE("Wrong MAX value", m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 7);
@@ -436,7 +436,7 @@ public:
     m_LabelSetImage->EraseLabels(labelsToBeErased);
 
     CPPUNIT_ASSERT_MESSAGE("Wrong number of labels since none have been removed",
-      m_LabelSetImage->GetNumberOfLabels() == 6);
+      m_LabelSetImage->GetNumberOfLabels() == 5);
     // Values within the image are 0, 1, 3, 5, 6, 7 - New Min / Max value should be 5 / 6
     // 2ndMin because of the exterior label = 0
     CPPUNIT_ASSERT_MESSAGE("Labels with value 1 and 3 were not erased from the image",
@@ -454,7 +454,7 @@ public:
     m_LabelSetImage = mitk::LabelSetImage::New();
     m_LabelSetImage->InitializeByLabeledImage(image);
 
-    CPPUNIT_ASSERT_MESSAGE("Image - number of labels is not 6", m_LabelSetImage->GetNumberOfLabels() == 6);
+    CPPUNIT_ASSERT_MESSAGE("Image - number of labels is not 6", m_LabelSetImage->GetNumberOfLabels() == 5);
     // 2ndMin because of the exterior label = 0
     CPPUNIT_ASSERT_MESSAGE("Wrong MIN value", m_LabelSetImage->GetStatistics()->GetScalarValue2ndMin() == 1);
     CPPUNIT_ASSERT_MESSAGE("Wrong MAX value", m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 7);

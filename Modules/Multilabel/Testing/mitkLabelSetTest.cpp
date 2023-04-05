@@ -78,7 +78,7 @@ public:
 
   void TestSetActiveLabel()
   {
-    CPPUNIT_ASSERT_MESSAGE("Wrong initial active label", m_LabelSet->GetActiveLabel()->GetValue() == 0);
+    CPPUNIT_ASSERT_MESSAGE("Wrong initial active label", m_LabelSet->GetActiveLabel() == nullptr);
 
     m_LabelSet->SetActiveLabel(1);
     CPPUNIT_ASSERT_MESSAGE("Wrong active label", m_LabelSet->GetActiveLabel()->GetValue() == 1);
@@ -112,7 +112,7 @@ public:
     m_LabelSet->AddLabel(newLabel);
 
     // Since label with value 1 already exists the new label will get the value m_InitialNumberOfValues
-    CPPUNIT_ASSERT_MESSAGE("Wrong label value", m_LabelSet->GetActiveLabel()->GetValue() == m_InitialNumberOfLabels);
+    CPPUNIT_ASSERT_MESSAGE("Wrong label value", m_LabelSet->GetActiveLabel()->GetValue() == m_InitialNumberOfLabels+1);
     CPPUNIT_ASSERT_MESSAGE("Wrong number of label", m_LabelSet->GetNumberOfLabels() == static_cast<decltype(m_LabelSet->GetNumberOfLabels())>(m_InitialNumberOfLabels + 1));
   }
 
@@ -121,9 +121,9 @@ public:
     const mitk::Color white(1.0f);
     const std::string name = "MyAwesomeLabel";
 
-    m_LabelSet->RenameLabel(0, name, white);
+    m_LabelSet->RenameLabel(1, name, white);
 
-    const auto* label = m_LabelSet->GetLabel(0);
+    const auto* label = m_LabelSet->GetLabel(1);
     CPPUNIT_ASSERT_MESSAGE("Wrong label name", label->GetName() == name );
 
     const auto& color = label->GetColor();
@@ -136,12 +136,12 @@ public:
 
     m_LabelSet->SetAllLabelsVisible(true);
 
-    for (mitk::LabelSet::PixelType i = 0; i < numLabels; ++i)
+    for (mitk::LabelSet::PixelType i = 1; i < numLabels; ++i)
       CPPUNIT_ASSERT_MESSAGE("Label not visible", m_LabelSet->GetLabel(i)->GetVisible() == true);
 
     m_LabelSet->SetAllLabelsVisible(false);
 
-    for (mitk::LabelSet::PixelType i = 0; i < numLabels; ++i)
+    for (mitk::LabelSet::PixelType i = 1; i < numLabels; ++i)
       CPPUNIT_ASSERT_MESSAGE("Label visible", m_LabelSet->GetLabel(i)->GetVisible() == false);
   }
 
@@ -151,12 +151,12 @@ public:
 
     m_LabelSet->SetAllLabelsLocked(true);
 
-    for (mitk::LabelSet::PixelType i = 0; i < numLabels; ++i)
+    for (mitk::LabelSet::PixelType i = 1; i < numLabels; ++i)
       CPPUNIT_ASSERT_MESSAGE("Label not locked", m_LabelSet->GetLabel(i)->GetLocked() == true);
 
     m_LabelSet->SetAllLabelsLocked(false);
 
-    for (mitk::LabelSet::PixelType i = 0; i < numLabels; ++i)
+    for (mitk::LabelSet::PixelType i = 1; i < numLabels; ++i)
       CPPUNIT_ASSERT_MESSAGE("Label locked", m_LabelSet->GetLabel(i)->GetLocked() == false);
   }
 

@@ -10,14 +10,11 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef __mitkLabelSetImageWriter__cpp
-#define __mitkLabelSetImageWriter__cpp
-
-#include "mitkLabelSetImageIO.h"
+#include "mitkMultiLabelSegmentationIO.h"
 #include "mitkBasePropertySerializer.h"
 #include "mitkIOMimeTypes.h"
 #include "mitkImageAccessByItk.h"
-#include "mitkLabelSetIOHelper.h"
+#include "mitkMultiLabelIOHelper.h"
 #include "mitkLabelSetImageConverter.h"
 #include <mitkLocaleSwitch.h>
 #include <mitkArbitraryTimeGeometry.h>
@@ -38,13 +35,9 @@ found in the LICENSE file.
 namespace mitk
 {
 
-  const char* const PROPERTY_NAME_TIMEGEOMETRY_TYPE = "org.mitk.timegeometry.type";
-  const char* const PROPERTY_NAME_TIMEGEOMETRY_TIMEPOINTS = "org.mitk.timegeometry.timepoints";
-  const char* const PROPERTY_KEY_TIMEGEOMETRY_TYPE = "org_mitk_timegeometry_type";
-  const char* const PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS = "org_mitk_timegeometry_timepoints";
-  const char* const PROPERTY_KEY_UID = "org_mitk_uid";
+  constexpr char* const MULTILABEL_SEGMENTATION_MODALITY_VALUE = "org.mitk.image.multilabel.segmentation";
 
-  LabelSetImageIO::LabelSetImageIO()
+  MultiLabelSegmentationIO::MultiLabelSegmentationIO()
     : AbstractFileIO(LabelSetImage::GetStaticNameOfClass(), IOMimeTypes::NRRD_MIMETYPE(), "MITK Multilabel Image")
   {
     this->InitializeDefaultMetaDataKeys();
@@ -53,7 +46,7 @@ namespace mitk
     this->RegisterService();
   }
 
-  IFileIO::ConfidenceLevel LabelSetImageIO::GetWriterConfidenceLevel() const
+  IFileIO::ConfidenceLevel MultiLabelSegmentationIO::GetWriterConfidenceLevel() const
   {
     if (AbstractFileIO::GetWriterConfidenceLevel() == Unsupported)
       return Unsupported;
@@ -64,7 +57,7 @@ namespace mitk
       return Unsupported;
   }
 
-  void LabelSetImageIO::Write()
+  void MultiLabelSegmentationIO::Write()
   {
     ValidateOutputLocation();
 
@@ -187,7 +180,7 @@ namespace mitk
       char valbuffer[512];
 
       sprintf(keybuffer, "modality");
-      sprintf(valbuffer, "org.mitk.image.multilabel");
+      sprintf(valbuffer, MULTILABEL_SEGMENTATION_MODALITY_VALUE);
       itk::EncapsulateMetaData<std::string>(
         nrrdImageIo->GetMetaDataDictionary(), std::string(keybuffer), std::string(valbuffer));
 
@@ -209,7 +202,7 @@ namespace mitk
         {
           tinyxml2::XMLDocument document;
           document.InsertEndChild(document.NewDeclaration());
-          auto *labelElem = mitk::LabelSetIOHelper::GetLabelAsXMLElement(document, iter->second);
+          auto *labelElem = mitk::MultiLabelIOHelper::GetLabelAsXMLElement(document, iter->second);
           document.InsertEndChild(labelElem);
           tinyxml2::XMLPrinter printer;
           document.Print(&printer);
@@ -273,7 +266,7 @@ namespace mitk
     // end image write
   }
 
-  IFileIO::ConfidenceLevel LabelSetImageIO::GetReaderConfidenceLevel() const
+  IFileIO::ConfidenceLevel MultiLabelSegmentationIO::GetReaderConfidenceLevel() const
   {
     if (AbstractFileIO::GetReaderConfidenceLevel() == Unsupported)
       return Unsupported;
@@ -285,7 +278,7 @@ namespace mitk
     itk::MetaDataDictionary imgMetaDataDictionary = io->GetMetaDataDictionary();
     std::string value("");
     itk::ExposeMetaData<std::string>(imgMetaDataDictionary, "modality", value);
-    if (value.compare("org.mitk.image.multilabel") == 0)
+    if (value.compare(MULTILABEL_SEGMENTATION_MODALITY_VALUE) == 0)
     {
       return Supported;
     }
@@ -293,7 +286,7 @@ namespace mitk
       return Unsupported;
   }
 
-  std::vector<BaseData::Pointer> LabelSetImageIO::DoRead()
+  std::vector<BaseData::Pointer> MultiLabelSegmentationIO::DoRead()
   {
     mitk::LocaleSwitch localeSwitch("C");
 
@@ -497,7 +490,7 @@ namespace mitk
         if (labelElem == nullptr)
           mitkThrow() << "Error parsing NRRD header for mitk::LabelSetImage IO";
 
-        label = mitk::LabelSetIOHelper::LoadLabelFromXMLDocument(labelElem);
+        label = mitk::MultiLabelIOHelper::LoadLabelFromXMLDocument(labelElem);
 
         if (label->GetValue() != mitk::LabelSetImage::UnlabeledLabelValue)
         {
@@ -610,7 +603,7 @@ namespace mitk
     return result;
   }
 
-  int LabelSetImageIO::GetIntByKey(const itk::MetaDataDictionary &dic, const std::string &str)
+  int MultiLabelSegmentationIO::GetIntByKey(const itk::MetaDataDictionary &dic, const std::string &str)
   {
     std::vector<std::string> imgMetaKeys = dic.GetKeys();
     std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
@@ -626,7 +619,7 @@ namespace mitk
     return 0;
   }
 
-  std::string LabelSetImageIO::GetStringByKey(const itk::MetaDataDictionary &dic, const std::string &str)
+  std::string MultiLabelSegmentationIO::GetStringByKey(const itk::MetaDataDictionary &dic, const std::string &str)
   {
     std::vector<std::string> imgMetaKeys = dic.GetKeys();
     std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
@@ -642,9 +635,9 @@ namespace mitk
     return metaString;
   }
 
-  LabelSetImageIO *LabelSetImageIO::IOClone() const { return new LabelSetImageIO(*this); }
+  MultiLabelSegmentationIO *MultiLabelSegmentationIO::IOClone() const { return new MultiLabelSegmentationIO(*this); }
 
-  void LabelSetImageIO::InitializeDefaultMetaDataKeys()
+  void MultiLabelSegmentationIO::InitializeDefaultMetaDataKeys()
   {
     this->m_DefaultMetaDataKeys.push_back("NRRD.space");
     this->m_DefaultMetaDataKeys.push_back("NRRD.kinds");
@@ -658,5 +651,3 @@ namespace mitk
   }
 
 } // namespace
-
-#endif //__mitkLabelSetImageWriter__cpp

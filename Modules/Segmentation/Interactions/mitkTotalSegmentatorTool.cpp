@@ -102,7 +102,7 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
   spCommand->SetCallback(&onPythonProcessEvent);
   spExec->AddObserver(ExternalProcessOutputEvent(), spCommand);
 
-  std::string inDir, outDir, inputImagePath, scriptPath;
+  std::string inDir, outDir, inputImagePath, outputImagePath, scriptPath;
   inDir = IOUtil::CreateTemporaryDirectory("totalseg-in-XXXXXX", this->GetMitkTempDir());
   std::ofstream tmpStream;
   inputImagePath = IOUtil::CreateTemporaryFile(tmpStream, TEMPLATE_FILENAME, inDir + IOUtil::GetDirectorySeparator());
@@ -115,13 +115,14 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
 
   IOUtil::Save(inputAtTimeStep, inputImagePath);
 
-  std::string &outputImagePath = (outDir + IOUtil::GetDirectorySeparator() + token + "_000.nii.gz");
+  outputImagePath = outDir + IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";
   bool isSubTask = false;
   if (this->GetSubTask() != DEFAULT_TOTAL_TASK)
   {
     isSubTask = true;
     outputImagePath = outDir;
   }
+
   this->run_totalsegmentator(
     spExec, inputImagePath, outputImagePath, this->GetFast(), !isSubTask, this->GetGpuId(), DEFAULT_TOTAL_TASK);
 

@@ -102,7 +102,7 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
   spCommand->SetCallback(&onPythonProcessEvent);
   spExec->AddObserver(ExternalProcessOutputEvent(), spCommand);
 
-  std::string inDir, outDir, inputImagePath, outputImagePath, scriptPath;
+  std::string inDir, outDir, inputImagePath, scriptPath;
   inDir = IOUtil::CreateTemporaryDirectory("totalseg-in-XXXXXX", this->GetMitkTempDir());
   std::ofstream tmpStream;
   inputImagePath = IOUtil::CreateTemporaryFile(tmpStream, TEMPLATE_FILENAME, inDir + IOUtil::GetDirectorySeparator());
@@ -111,27 +111,24 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
   std::string fileName = inputImagePath.substr(found + 1);
   std::string token = fileName.substr(0, fileName.find("_"));
   outDir = IOUtil::CreateTemporaryDirectory("totalseg-out-XXXXXX", this->GetMitkTempDir());
-  outputImagePath = outDir + IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";
   mitk::LabelSetImage::Pointer outputBuffer;
 
   IOUtil::Save(inputAtTimeStep, inputImagePath);
 
-  std::string *outArg = &outputImagePath;
+  std::string &outputImagePath = (outDir + IOUtil::GetDirectorySeparator() + token + "_000.nii.gz");
   bool isSubTask = false;
   if (this->GetSubTask() != DEFAULT_TOTAL_TASK)
   {
     isSubTask = true;
-    outputImagePath = outDir + IOUtil::GetDirectorySeparator() + this->GetSubTask() + ".nii.gz";
-    outArg = &outDir;
+    outputImagePath = outDir;
   }
-
   this->run_totalsegmentator(
-    spExec, inputImagePath, *outArg, this->GetFast(), !isSubTask, this->GetGpuId(), DEFAULT_TOTAL_TASK);
+    spExec, inputImagePath, outputImagePath, this->GetFast(), !isSubTask, this->GetGpuId(), DEFAULT_TOTAL_TASK);
 
   if (isSubTask)
   { // Run total segmentator again
     this->run_totalsegmentator(
-      spExec, inputImagePath, *outArg, !isSubTask, !isSubTask, this->GetGpuId(), this->GetSubTask());
+      spExec, inputImagePath, outputImagePath, !isSubTask, !isSubTask, this->GetGpuId(), this->GetSubTask());
     // Construct Label Id map
     std::vector<std::string> files = SUBTASKS_MAP.at(this->GetSubTask());
     std::map<int, std::string> labelMapSubtask;

@@ -69,6 +69,9 @@ public:
   //or instance node). If current index is at the end, an invalid index is returned.*/
   //QModelIndex PrevLabelInstanceIndex(const QModelIndex& currentIndex) const;
 
+  /** Returns a vector containing all label values of the passed currentIndex or its child items.*/
+  std::vector <LabelValueType> GetLabelsInSubTree(const QModelIndex& currentIndex) const;
+
   enum TableColumns
   {
     NAME_COL = 0,
@@ -97,7 +100,9 @@ public:
       level with only one instance).
       You can use that role if you want to assure that only one specific label instance is
       referenced by the index.*/
-    LabelInstanceValueRole = 67
+    LabelInstanceValueRole = 67,
+    /**This role returns the group ID the item/index belongs to.*/
+    GroupIDRole = 68
   };
 
   bool GetAllowVisibilityModification() const;

@@ -22,6 +22,7 @@ found in the LICENSE file.
 
 class QmitkMultiLabelTreeModel;
 class QStyledItemDelegate;
+class QWidgetAction;
 
 namespace Ui
 {
@@ -56,9 +57,27 @@ public:
   /** Returns the label that currently has the focus in the tree view (indicated by QTreeView::currentIndex,
   thus the mouse is over it and it has a dashed border line).
   The current label must not equal the seleted label(s). If the mouse
-  is not over a label (instance item), the method will return a null pointer.*/
+  is not over a label (label class or instance item), the method will return a null pointer.*/
   mitk::Label* GetCurrentLabel() const;
 
+  enum class IndexLevelType
+  {
+    Group,
+    LabelClass,
+    LabelInstance
+  };
+
+  /** Returns the level of the index currently has the focus in the tree view (indicated by QTreeView::currentIndex,
+  thus the mouse is over it and it has a dashed border line).*/
+  IndexLevelType GetCurrentLevelType() const;
+
+  /**
+  * @brief Returns the all labels values that are currently affacted.
+  Affected means that these labels (including the one returned by GetCurrentLabel) are in the subtree of the tree
+  view element that currently has the focus.
+  (indicated by QTreeView::currentIndex, thus the mouse is over it and it has a dashed border line)
+  */
+  LabelValueVectorType GetCurrentlyAffactedLabelInstances() const;
 
 Q_SIGNALS:
   /**
@@ -109,17 +128,18 @@ public Q_SLOTS:
 
   void SetDefaultLabelNaming(bool defaultLabelNaming);
 
-  /** Adds an instance of the same label/class like the label instance
-  * returned by GetCurrentLabel() to the segmentation. This new label
-  * instance is returned by the function. If the inspector has no current label,
+  /** Adds an instance of the same label/class like the first label instance
+  * indicated by GetSelectedLabels() to the segmentation. This new label
+  * instance is returned by the function. If the inspector has no selected label,
   * no new instance will be generated and nullptr will be returned.
-  * @remark The new label instance is a clone of current label instance. Therefore
+  * @remark The new label instance is a clone of the selected label instance. Therefore
   * all properties but the LabelValue will be the same.
   * @pre AllowLabeModification must be set to true.*/
   mitk::Label* AddNewLabelInstance();
 
   /** Adds a new label to the segmentation. Depending on the settings the name of
-  * the label will be either default generated or the rename delegate will be used.
+  * the label will be either default generated or the rename delegate will be used. The label
+  * will be added to the same group as the first currently selected label.
   * @pre AllowLabeModification must be set to true.*/
   mitk::Label* AddNewLabel();
 
@@ -137,6 +157,8 @@ public Q_SLOTS:
   * @pre AllowLabeModification must be set to true.*/
   void RemoveGroup();
 
+  void SetVisibilityOfAffectedLabels(bool visible) const;
+  void SetLockOfAffectedLabels(bool visible) const;
 
 protected:
   void Initialize();
@@ -160,6 +182,11 @@ protected:
 
   mitk::Label* AddNewLabelInternal(const mitk::LabelSetImage::SpatialGroupIndexType& containingGroup);
 
+  /** Adds an instance of the same label/class like the passed label value*/
+  mitk::Label* AddNewLabelInstanceInternal(mitk::Label* templateLabel);
+
+  void RemoveGroupInternal(const mitk::LabelSetImage::SpatialGroupIndexType& groupID);
+  void DeleteLabelInternal(const LabelValueVectorType& labelValues);
 
 private Q_SLOTS:
   /**
@@ -176,19 +203,22 @@ private Q_SLOTS:
 
   void OnContextMenuRequested(const QPoint&);
 
-  void OnAddLabelInstance(bool);
+  void OnAddLabel();
+  void OnAddLabelInstance();
+  void OnDeleteGroup();
+  void OnDeleteAffectedLabel();
   void OnRemoveLabels(bool);
-  void OnEraseLabels(bool);
+  void OnClearLabels(bool);
   void OnMergeLabels(bool);
 
   void OnRenameLabel(bool);
-  void OnEraseLabel(bool);
+  void OnClearLabel(bool);
 
-  void OnUnlockAllLabels(bool);
-  void OnLockAllLabels(bool);
+  void OnUnlockAffectedLabels();
+  void OnLockAffectedLabels();
 
-  void OnSetAllLabelsVisible(bool);
-  void OnSetAllLabelsInvisible(bool);
+  void OnSetAffectedLabelsVisible();
+  void OnSetAffectedLabelsInvisible();
   void OnSetOnlyActiveLabelVisible(bool);
 
   void OnItemDoubleClicked(const QModelIndex& index);
@@ -198,6 +228,8 @@ private Q_SLOTS:
   void RestoreOverrideCursor() const;
 
   void PrepareGoToLabel(LabelValueType labelID) const;
+
+  QWidgetAction* CreateOpacityAction();
 
 private:
   bool m_ShowVisibility = true;

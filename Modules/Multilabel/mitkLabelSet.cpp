@@ -206,8 +206,10 @@ void mitk::LabelSet::RemoveLabel(PixelType pixelValue)
   {
     if (ExistLabel(nextActivePixelValue))
       SetActiveLabel(nextActivePixelValue);
-    else
+    else if (!m_LabelContainer.empty())
       SetActiveLabel(m_LabelContainer.rbegin()->first);
+    else
+      SetActiveLabel(0);
   }
 
   RemoveLabelEvent.Send(pixelValue);

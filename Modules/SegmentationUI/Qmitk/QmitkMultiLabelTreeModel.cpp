@@ -166,14 +166,31 @@ public:
     return label->GetValue();
   };
 
+  /** returns a vector containing all label values of referenced by this item or its child items.*/
+  std::vector< mitk::LabelSetImage::LabelValueType> GetLabelsInSubTree() const
+  {
+    if (this->m_ItemType == ItemType::Instance)
+    {
+      return { this->GetLabelValue() };
+    }
+
+    std::vector< mitk::LabelSetImage::LabelValueType> result;
+    for (const auto child : this->m_childItems)
+    {
+      auto childresult = child->GetLabelsInSubTree();
+      result.reserve(result.size() + childresult.size());
+      result.insert(result.end(), childresult.begin(), childresult.end());
+    }
+
+    return result;
+  }
+
   std::vector<QmitkMultiLabelSegTreeItem*> m_childItems;
   QmitkMultiLabelSegTreeItem* m_parentItem = nullptr;
   ItemType m_ItemType = ItemType::Group;
   mitk::Label::Pointer m_Label;
   std::string m_ClassName;
 };
-
-
 
 QModelIndex GetIndexByItem(const QmitkMultiLabelSegTreeItem* start, const QmitkMultiLabelTreeModel* model)
 {
@@ -377,6 +394,10 @@ QVariant QmitkMultiLabelTreeModel::data(const QModelIndex &index, int role) cons
       return QVariant(label->GetValue());
     }
   }
+  else if (role == ItemModelRole::GroupIDRole)
+  {
+    return QVariant(item->GetGroupID());
+  }
 
   return QVariant();
 }
@@ -556,6 +577,23 @@ QModelIndex QmitkMultiLabelTreeModel::FirstLabelInstanceIndex(const QModelIndex&
 //or instance node). If current index is at the end, an invalid index is returned.*/
 //QModelIndex QmitkMultiLabelTreeModel::PrevLabelInstanceIndex(const QModelIndex& currentIndex) const;
 
+std::vector <QmitkMultiLabelTreeModel::LabelValueType> QmitkMultiLabelTreeModel::GetLabelsInSubTree(const QModelIndex& currentIndex) const
+{
+  const QmitkMultiLabelSegTreeItem* currentItem = nullptr;
+
+  if (!currentIndex.isValid())
+  {
+    currentItem = this->m_RootItem.get();
+  }
+  else
+  {
+    currentItem = static_cast<const QmitkMultiLabelSegTreeItem*>(currentIndex.internalPointer());
+  }
+
+  if (!currentItem) return {};
+
+  return currentItem->GetLabelsInSubTree();
+}
 
 Qt::ItemFlags QmitkMultiLabelTreeModel::flags(const QModelIndex &index) const
 {

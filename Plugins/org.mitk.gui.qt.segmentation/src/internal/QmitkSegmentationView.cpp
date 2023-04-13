@@ -661,7 +661,7 @@ void QmitkSegmentationView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*
   m_Controls->slicesInterpolator->Uninitialize();
 }
 
-void QmitkSegmentationView::RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart)
+void QmitkSegmentationView::RenderWindowPartInputChanged(mitk::IRenderWindowPart* /*renderWindowPart*/)
 {
   if (nullptr == m_RenderWindowPart)
   {

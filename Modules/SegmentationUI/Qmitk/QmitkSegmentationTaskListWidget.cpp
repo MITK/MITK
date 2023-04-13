@@ -110,8 +110,6 @@ QmitkSegmentationTaskListWidget::QmitkSegmentationTaskListWidget(QWidget* parent
 {
   m_Ui->setupUi(this);
 
-  m_Ui->selectionWidget->SetAutoSelectNewNodes(true);
-  m_Ui->selectionWidget->SetInvalidInfo(QStringLiteral("Unload everything but a single<br>segmentation task list to continue"));
   m_Ui->selectionWidget->SetNodePredicate(mitk::TNodePredicateDataType<mitk::SegmentationTaskList>::New());
 
   m_Ui->progressBar->setStyleSheet(QString("QProgressBar::chunk { background-color: %1; }").arg(QmitkStyleManager::GetIconAccentColor()));
@@ -162,6 +160,7 @@ void QmitkSegmentationTaskListWidget::SetDataStorage(mitk::DataStorage* dataStor
 {
   m_DataStorage = dataStorage;
   m_Ui->selectionWidget->SetDataStorage(dataStorage); // Triggers OnSelectionChanged()
+  m_Ui->selectionWidget->SetAutoSelectNewNodes(true);
 
   this->CheckDataStorage();
 }

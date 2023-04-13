@@ -16,90 +16,132 @@ found in the LICENSE file.
 #include <MitkCoreExports.h>
 
 #include <mitkBaseRenderer.h>
+#include <mitkCrosshairData.h>
 #include <mitkDataStorage.h>
-#include <mitkPlaneGeometry.h>
-#include <mitkTimeGeometry.h>
-
-#include <itkCommand.h>
-#include <itkObject.h>
 
 namespace mitk
 {
   /**
-   * \brief The CrosshairManager takes care of the correct settings for the plane geometries
-   *        that form the crosshair.
+   * \brief The CrosshairManager takes care of the correct settings for the crosshair.
    * 
-   * The CrosshairManager keeps track of a TimeGeometry, which is used to compute
-   * the three different plane geometries (axial, coronal, sagittal).
-   * These three plane geometries can be added to / removed from the data storage
-   * using this CrosshairManager. Adding / removing them to / from the data storage
+   * The CrosshairManager keeps track of a crosshair data node,
+   * which is used to compute the lines of a crosshair.
+   * These crosshair data node can be added to / removed from the data storage
+   * using this CrosshairManager. Adding / removing the node to / from the data storage
    * will change the rendering behavior for the crosshair - only data nodes
    * inside the data storage will be rendered.
-   * 
-   * 
    */
   class MITKCORE_EXPORT CrosshairManager : public itk::Object
   {
   public:
 
     mitkClassMacroItkParent(CrosshairManager, itk::Object);
-    mitkNewMacro2Param(Self, DataStorage*, BaseRenderer*);
-
-    itkSetObjectMacro(DataStorage, DataStorage);
-    itkSetObjectMacro(BaseRenderer, BaseRenderer);
-
-    /**
-     * \brief Set the input time geometry out of which the oriented geometries will be created.
-     */
-    void ComputeOrientedTimeGeometries(const TimeGeometry* geometry);
+    mitkNewMacro1Param(Self, BaseRenderer*);
     
+    /**
+    * \brief Set the position of the managed crosshair to the given 3D position.
+    *
+    * \pre    The crosshair data of this manager needs to be not null in order to
+    *         set a new position.
+    * \throw  mitk::Exception, if the crosshair data of this manager is null.
+    *
+    * \param selectedPoint  The 3D point that will be newly set for the crosshair data.
+    */
     void SetCrosshairPosition(const Point3D& selectedPoint);
+    /**
+    * \brief Update the position of the managed crosshair to the current slice
+    *        position of the given slice navigation controller, depending on the view
+    *        direction of the slice navigation controller.
+    *
+    * \pre    The crosshair data of this manager needs to be not null in order to
+    *         update the crosshair position.
+    * \throw  mitk::Exception, if the crosshair data of this manager is null.
+    *
+    * \param sliceNavigationController  The slice navigation controller whose current position
+    *                                   will be used for updating the corresponding 3D coordinate
+    *                                   of the crosshair data's position.
+    */
+    void UpdateCrosshairPosition(const SliceNavigationController* sliceNavigationController);
+    /**
+    * \brief Get the position of the managed crosshair.
+    *
+    * \pre    The crosshair data of this manager needs to be not null in order to
+    *         get the current crosshair position.
+    * \throw  mitk::Exception, if the crosshair data of this manager is null.
+    *
+    * \return The 3D point that represents the position of the crosshair data.
+    */
     Point3D GetCrosshairPosition() const;
-
-    void UpdateSlice(const SliceNavigationController* sliceNavigationController);
-
-    void SetCrosshairVisibility(bool visible);
-    bool GetCrosshairVisibility() const;
+    /**
+    * \brief Set the visibility of the managed crosshair to the given value.
+    *
+    * \pre    The crosshair data of this manager needs to be not null in order to
+    *         set the visibility.
+    * \throw  mitk::Exception, if the crosshair data of this manager is null.
+    *
+    * \param visible        A boolean value that will define the visibility of the crosshair.
+    * \param baseRenderer   A base renderer for which the renderer-specific visibility property
+    *                       should be set.
+    */
+    void SetCrosshairVisibility(bool visible, const BaseRenderer* baseRenderer);
+    /**
+    * \brief Get the visibility of the managed crosshair.
+    *
+    * \pre    The crosshair data of this manager needs to be not null in order to
+    *         get the visibility.
+    * \throw  mitk::Exception, if the crosshair data of this manager is null.
+    *
+    * \param baseRenderer   A base renderer for which the renderer-specific visibility property
+    *                       should be get.
+    * \return The boolean value that represents the visibility of the crosshair.
+    */
+    bool GetCrosshairVisibility(const BaseRenderer* baseRenderer) const;
+    /**
+    * \brief Set the gap size of the managed crosshair to the given value.
+    *
+    * \pre    The crosshair data of this manager needs to be not null in order to
+    *         set the gap size.
+    * \throw  mitk::Exception, if the crosshair data of this manager is null.
+    *
+    * \param gapSize  The size of the gap in the center of the crosshair.
+    */
     void SetCrosshairGap(unsigned int gapSize);
-
-    void AddPlanesToDataStorage();
-    void RemovePlanesFromDataStorage();
+    /**
+    * \brief Add the managed crosshair data node to the given data storage.
+    *
+    * \pre    The crosshair data node of this manager needs to be not null in order to
+    *         add the node to the data storage.
+    * \throw  mitk::Exception, if the crosshair data node of this manager is null.
+    * \pre    The given data storage needs to be not null in order to add the node to
+    *         the data storage.
+    * \throw  mitk::Exception, if the given data storage is null.
+    *
+    * \param dataStorage  The data storage to which the crosshair data node should be added.
+    */
+    void AddCrosshairNodeToDataStorage(DataStorage* dataStorage);
+    /**
+    * \brief Remove the managed crosshair data node from the given data storage.
+    *
+    * \pre    The crosshair data node of this manager needs to be not null in order to
+    *         remove the node from the data storage.
+    * \throw  mitk::Exception, if the crosshair data node of this manager is null.
+    * \pre    The given data storage needs to be not null in order to remove the node
+    *         from the data storage.
+    * \throw  mitk::Exception, if the given data storage is null.
+    *
+    * \param dataStorage  The data storage from which the crosshair data node should be removed.
+    */
+    void RemoveCrosshairNodeFromDataStorage(DataStorage* dataStorage);
 
   protected:
 
-    CrosshairManager(DataStorage* dataStorage, BaseRenderer* baseRenderer);
+    CrosshairManager(BaseRenderer* baseRenderer);
     ~CrosshairManager();
 
-    void InitializePlaneProperties(DataNode::Pointer planeNode, const std::string& planeName);
-    void InitializePlaneData(DataNode::Pointer planeNode, const TimeGeometry* timeGeometry, unsigned int& slice);
-    void UpdatePlaneSlice(DataNode::Pointer planeNode, const TimeGeometry* timeGeometry, unsigned int slice);
-    void SetCrosshairPosition(const Point3D& selectedPoint,
-                              DataNode::Pointer planeNode,
-                              const TimeGeometry* timeGeometry,
-                              unsigned int& slice);
-    void AddPlaneToDataStorage(DataNode::Pointer planeNode, DataNode::Pointer parent);
-
-    DataStorage* m_DataStorage;
-    BaseRenderer* m_BaseRenderer;
-
-    TimeGeometry::ConstPointer m_InputTimeGeometry;
-    TimeGeometry::Pointer m_AxialTimeGeometry;
-    TimeGeometry::Pointer m_CoronalTimeGeometry;
-    TimeGeometry::Pointer m_SagittalTimeGeometry;
-
-    unsigned int m_AxialSlice;
-    unsigned int m_CoronalSlice;
-    unsigned int m_SagittalSlice;
-
-    /**
-    * @brief The 3 helper objects which contain the plane geometry.
-    */
-    DataNode::Pointer m_AxialPlaneNode;
-    DataNode::Pointer m_CoronalPlaneNode;
-    DataNode::Pointer m_SagittalPlaneNode;
-    DataNode::Pointer m_ParentNodeForGeometryPlanes;
+    DataNode::Pointer m_CrosshairDataNode;
+    CrosshairData::Pointer m_CrosshairData;
 
   };
-} // namespace mitk
+}
 
 #endif

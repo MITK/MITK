@@ -66,6 +66,7 @@ set(CPP_FILES
   DataManagement/mitkChannelDescriptor.cpp
   DataManagement/mitkClippingProperty.cpp
   DataManagement/mitkColorProperty.cpp
+  DataManagement/mitkCrosshairData.cpp
   DataManagement/mitkDataNode.cpp
   DataManagement/mitkDataStorage.cpp
   DataManagement/mitkEnumerationProperty.cpp
@@ -279,7 +280,7 @@ set(CPP_FILES
   Rendering/mitkAnnotationUtils.cpp
   Rendering/mitkBaseRenderer.cpp
   Rendering/mitkBaseRendererHelper.cpp
-  #Rendering/mitkGLMapper.cpp Moved to deprecated LegacyGL Module
+  Rendering/mitkCrosshairVtkMapper2D.cpp
   Rendering/mitkGradientBackground.cpp
   Rendering/mitkImageVtkMapper2D.cpp
   Rendering/mitkMapper.cpp
@@ -291,7 +292,6 @@ set(CPP_FILES
   Rendering/mitkRenderWindowBase.cpp
   Rendering/mitkRenderWindow.cpp
   Rendering/mitkRenderWindowFrame.cpp
-  #Rendering/mitkSurfaceGLMapper2D.cpp Moved to deprecated LegacyGL Module
   Rendering/mitkSurfaceVtkMapper2D.cpp
   Rendering/mitkSurfaceVtkMapper3D.cpp
   Rendering/mitkVtkEventProvider.cpp

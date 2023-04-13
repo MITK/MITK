@@ -13,9 +13,16 @@ found in the LICENSE file.
 #ifndef QmitkMxNMultiWidget_h
 #define QmitkMxNMultiWidget_h
 
-// qt widgets module
 #include "MitkQtWidgetsExports.h"
+
+// qt widgets module
 #include "QmitkAbstractMultiWidget.h"
+#include <QmitkSynchronizedNodeSelectionWidget.h>
+#include <QmitkSynchronizedWidgetConnector.h>
+
+#include <nlohmann/json.hpp>
+
+class QSplitter;
 
 /**
 * @brief The 'QmitkMxNMultiWidget' is a 'QmitkAbstractMultiWidget' that is used to display multiple render windows at once.
@@ -84,8 +91,8 @@ public:
 
   mitk::SliceNavigationController* GetTimeNavigationController();
 
-  void AddPlanesToDataStorage();
-  void RemovePlanesFromDataStorage();
+  void EnableCrosshair();
+  void DisableCrosshair();
 
 public Q_SLOTS:
 
@@ -93,11 +100,14 @@ public Q_SLOTS:
   void wheelEvent(QWheelEvent* e) override;
   void mousePressEvent(QMouseEvent* e) override;
   void moveEvent(QMoveEvent* e) override;
+  void LoadLayout(const nlohmann::json* jsonData);
+  void SaveLayout(std::ostream* outStream);
 
 Q_SIGNALS:
 
   void WheelMoved(QWheelEvent *);
   void Moved();
+  void UpdateUtilityWidgetViewPlanes();
 
 protected:
 
@@ -108,9 +118,15 @@ private:
   void SetLayoutImpl() override;
   void SetInteractionSchemeImpl() override { }
 
-  void CreateRenderWindowWidget();
+  QmitkAbstractMultiWidget::RenderWindowWidgetPointer CreateRenderWindowWidget();
+  void SetInitialSelection();
+  void ToggleSynchronization(QmitkSynchronizedNodeSelectionWidget* synchronizedWidget);
+
+  static nlohmann::json BuildJSONFromLayout(const QSplitter* splitter);
+  QSplitter* BuildLayoutFromJSON(const nlohmann::json* jsonData, unsigned int* windowCounter, QSplitter* parentSplitter = nullptr);
 
   mitk::SliceNavigationController* m_TimeNavigationController;
+  std::unique_ptr<QmitkSynchronizedWidgetConnector> m_SynchronizedWidgetConnector;
 
   bool m_CrosshairVisibility;
 

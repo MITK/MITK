@@ -183,6 +183,8 @@ void QmitkMxNMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     multiWidget->SetDataStorage(GetDataStorage());
     multiWidget->InitializeMultiWidget();
     SetMultiWidget(multiWidget);
+    connect(static_cast<QmitkMxNMultiWidget*>(multiWidget), &QmitkMxNMultiWidget::LayoutChanged,
+      this, &QmitkMxNMultiWidgetEditor::OnLayoutChanged);
   }
 
   layout->addWidget(multiWidget);
@@ -234,4 +236,9 @@ void QmitkMxNMultiWidgetEditor::OnPreferencesChanged(const mitk::IPreferences* p
     mitk::InteractionSchemeSwitcher::MITKStandard);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkMxNMultiWidgetEditor::OnLayoutChanged()
+{
+  FirePropertyChange(berry::IWorkbenchPartConstants::PROP_INPUT);
 }

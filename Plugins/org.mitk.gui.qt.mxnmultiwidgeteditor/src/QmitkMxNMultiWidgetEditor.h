@@ -59,6 +59,10 @@ public:
   void OnLayoutSet(int row, int column) override;
   void OnInteractionSchemeChanged(mitk::InteractionSchemeSwitcher::InteractionScheme scheme) override;
 
+private Q_SLOTS:
+
+  void OnLayoutChanged();
+
 private:
   /**
   * @brief Overridden from QmitkAbstractRenderEditor

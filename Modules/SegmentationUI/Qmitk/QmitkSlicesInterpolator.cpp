@@ -11,6 +11,7 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include "QmitkSlicesInterpolator.h"
+#include "QmitkRenderWindow.h"
 
 #include "mitkApplyDiffImageOperation.h"
 #include "mitkColorProperty.h"
@@ -72,16 +73,36 @@ namespace
       ? dynamic_cast<T*>(dataNode->GetData())
       : nullptr;
   }
+
+  std::string MatchStdWindowNames(std::string windowName)
+  {
+    if (windowName == "stdmulti.widget0")
+    {
+      return "Axial";
+    }
+    else if (windowName == "stdmulti.widget1")
+    {
+      return "Sagittal";
+    }
+    else if (windowName == "stdmulti.widget2")
+    {
+      return "Coronal";
+    }
+    return windowName;
+  }
 }
 
 float SURFACE_COLOR_RGB[3] = {0.49f, 1.0f, 0.16f};
 
-const std::map<QAction *, mitk::SliceNavigationController *> QmitkSlicesInterpolator::createActionToSliceDimension()
+const std::map<QAction *, mitk::SliceNavigationController *> QmitkSlicesInterpolator::createActionToSlicer(const QList<QmitkRenderWindow*>& windows)
 {
   std::map<QAction *, mitk::SliceNavigationController *> actionToSliceDimension;
-  foreach (mitk::SliceNavigationController *slicer, m_ControllerToDeleteObserverTag.keys())
+  foreach (auto window, windows)
   {
-    actionToSliceDimension[new QAction(QString::fromStdString(slicer->GetViewDirectionAsString()), nullptr)] = slicer;
+    std::string windowName = window->GetRenderer()->GetName();
+    windowName = MatchStdWindowNames(windowName);
+    auto slicer = window->GetSliceNavigationController();
+    actionToSliceDimension[new QAction(QString::fromStdString(windowName), nullptr)] = slicer;
   }
 
   return actionToSliceDimension;
@@ -227,7 +248,6 @@ ModifyLabelActionTrigerred ModifyLabelProcessing(mitk::LabelSetImage* labelSetIm
 
 QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget *parent, const char * /*name*/)
   : QWidget(parent),
-    //    ACTION_TO_SLICEDIMENSION( createActionToSliceDimension() ),
     m_Interpolator(mitk::SegmentationInterpolationController::New()),
     m_SurfaceInterpolator(mitk::SurfaceInterpolationController::GetInstance()),
     m_ToolManager(nullptr),
@@ -391,10 +411,40 @@ mitk::DataStorage *QmitkSlicesInterpolator::GetDataStorage()
   }
 }
 
-void QmitkSlicesInterpolator::Initialize(mitk::ToolManager *toolManager,
-                                         const QList<mitk::SliceNavigationController *> &controllers)
+void QmitkSlicesInterpolator::InitializeWindow(QmitkRenderWindow* window)
 {
-  Q_ASSERT(!controllers.empty());
+  auto slicer = window->GetSliceNavigationController();
+
+  if (slicer == nullptr)
+  {
+    MITK_WARN << "Tried setting up interpolation for a render window that does not have a slice navigation controller set";
+    return;
+  }
+
+  // Has to be initialized
+  m_LastSNC = slicer;
+  m_TimePoints.insert(slicer, slicer->GetSelectedTimePoint());
+
+  itk::MemberCommand<QmitkSlicesInterpolator>::Pointer deleteCommand =
+    itk::MemberCommand<QmitkSlicesInterpolator>::New();
+  deleteCommand->SetCallbackFunction(this, &QmitkSlicesInterpolator::OnSliceNavigationControllerDeleted);
+  m_ControllerToDeleteObserverTag[slicer] = slicer->AddObserver(itk::DeleteEvent(), deleteCommand);
+
+  itk::MemberCommand<QmitkSlicesInterpolator>::Pointer timeChangedCommand =
+    itk::MemberCommand<QmitkSlicesInterpolator>::New();
+  timeChangedCommand->SetCallbackFunction(this, &QmitkSlicesInterpolator::OnTimeChanged);
+  m_ControllerToTimeObserverTag[slicer] = slicer->AddObserver(mitk::SliceNavigationController::TimeGeometryEvent(nullptr, 0), timeChangedCommand);
+
+  itk::MemberCommand<QmitkSlicesInterpolator>::Pointer sliceChangedCommand =
+    itk::MemberCommand<QmitkSlicesInterpolator>::New();
+  sliceChangedCommand->SetCallbackFunction(this, &QmitkSlicesInterpolator::OnSliceChanged);
+  m_ControllerToSliceObserverTag[slicer] = slicer->AddObserver(mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), sliceChangedCommand);
+}
+
+void QmitkSlicesInterpolator::Initialize(mitk::ToolManager *toolManager,
+                                         const QList<QmitkRenderWindow*>& windows)
+{
+  Q_ASSERT(!windows.empty());
 
   if (m_Initialized)
   {
@@ -417,29 +467,12 @@ void QmitkSlicesInterpolator::Initialize(mitk::ToolManager *toolManager,
       this, &QmitkSlicesInterpolator::OnToolManagerReferenceDataModified);
 
     // connect to the slice navigation controller. after each change, call the interpolator
-    foreach (mitk::SliceNavigationController *slicer, controllers)
+    foreach(auto window, windows)
     {
-      // Has to be initialized
-      m_LastSNC = slicer;
-      m_TimePoints.insert(slicer, slicer->GetSelectedTimePoint());
-
-      itk::MemberCommand<QmitkSlicesInterpolator>::Pointer deleteCommand =
-        itk::MemberCommand<QmitkSlicesInterpolator>::New();
-      deleteCommand->SetCallbackFunction(this, &QmitkSlicesInterpolator::OnSliceNavigationControllerDeleted);
-      m_ControllerToDeleteObserverTag[slicer] = slicer->AddObserver(itk::DeleteEvent(), deleteCommand);
-
-      itk::MemberCommand<QmitkSlicesInterpolator>::Pointer timeChangedCommand =
-        itk::MemberCommand<QmitkSlicesInterpolator>::New();
-      timeChangedCommand->SetCallbackFunction(this, &QmitkSlicesInterpolator::OnTimeChanged);
-      m_ControllerToTimeObserverTag[slicer] = slicer->AddObserver(mitk::SliceNavigationController::TimeGeometryEvent(nullptr, 0), timeChangedCommand);
-
-      itk::MemberCommand<QmitkSlicesInterpolator>::Pointer sliceChangedCommand =
-        itk::MemberCommand<QmitkSlicesInterpolator>::New();
-      sliceChangedCommand->SetCallbackFunction(this, &QmitkSlicesInterpolator::OnSliceChanged);
-      m_ControllerToSliceObserverTag[slicer] = slicer->AddObserver(mitk::SliceNavigationController::GeometrySliceEvent(nullptr, 0), sliceChangedCommand);
+      this->InitializeWindow(window);
     }
 
-    ACTION_TO_SLICEDIMENSION = createActionToSliceDimension();
+    m_ActionToSlicer = createActionToSlicer(windows);
   }
 
   m_Initialized = true;
@@ -454,7 +487,7 @@ void QmitkSlicesInterpolator::Uninitialize()
     m_ToolManager->ReferenceDataChanged -= mitk::MessageDelegate<QmitkSlicesInterpolator>(
       this, &QmitkSlicesInterpolator::OnToolManagerReferenceDataModified);
   }
-  foreach (mitk::SliceNavigationController *slicer, m_ControllerToSliceObserverTag.keys())
+  foreach (auto slicer, m_ControllerToTimeObserverTag.keys())
   {
     slicer->RemoveObserver(m_ControllerToDeleteObserverTag.take(slicer));
     slicer->RemoveObserver(m_ControllerToTimeObserverTag.take(slicer));
@@ -474,7 +507,7 @@ void QmitkSlicesInterpolator::Uninitialize()
   }
   m_SegmentationObserverTags.clear();
 
-  ACTION_TO_SLICEDIMENSION.clear();
+  m_ActionToSlicer.clear();
   m_ToolManager = nullptr;
 
   m_Initialized = false;
@@ -855,9 +888,7 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
   FillVector3D(origin, 0.0, 0.0, 0.0);
   slicingPlane->InitializePlane(origin, slicingPlaneNormalVector);
 
-  if (interpolatedSurface.IsNotNull() && workingNode &&
-      workingNode->IsVisible(
-        mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2"))))
+  if (interpolatedSurface.IsNotNull() && workingNode)
   {
     m_BtnApply3D->setEnabled(true);
 
@@ -890,7 +921,7 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
 
   m_BtnReinit3DInterpolation->setEnabled(true);
 
-  foreach (mitk::SliceNavigationController *slicer, m_ControllerToTimeObserverTag.keys())
+  foreach (auto slicer, m_ControllerToTimeObserverTag.keys())
   {
     slicer->GetRenderer()->RequestUpdate();
   }
@@ -1123,7 +1154,7 @@ void QmitkSlicesInterpolator::OnAcceptAllInterpolationsClicked()
 {
   QMenu orientationPopup(this);
   std::map<QAction *, mitk::SliceNavigationController *>::const_iterator it;
-  for (it = ACTION_TO_SLICEDIMENSION.begin(); it != ACTION_TO_SLICEDIMENSION.end(); it++)
+  for (it = m_ActionToSlicer.begin(); it != m_ActionToSlicer.end(); it++)
     orientationPopup.addAction(it->first);
 
   connect(&orientationPopup, SIGNAL(triggered(QAction *)), this, SLOT(OnAcceptAllPopupActivated(QAction *)));
@@ -1325,8 +1356,8 @@ void QmitkSlicesInterpolator::OnAcceptAllPopupActivated(QAction *action)
 {
   try
   {
-    std::map<QAction *, mitk::SliceNavigationController *>::const_iterator iter = ACTION_TO_SLICEDIMENSION.find(action);
-    if (iter != ACTION_TO_SLICEDIMENSION.end())
+    std::map<QAction *, mitk::SliceNavigationController *>::const_iterator iter = m_ActionToSlicer.find(action);
+    if (iter != m_ActionToSlicer.end())
     {
       mitk::SliceNavigationController *slicer = iter->second;
       AcceptAllInterpolations(slicer);
@@ -1431,8 +1462,6 @@ void QmitkSlicesInterpolator::StopUpdateInterpolationTimer()
   }
 
   m_Timer->stop();
-  mitk::RenderingManager::GetInstance()->RequestUpdate(
-    mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget3"))->GetRenderWindow());
 }
 
 void QmitkSlicesInterpolator::ChangeSurfaceColor()
@@ -1453,37 +1482,34 @@ void QmitkSlicesInterpolator::PrepareInputsFor3DInterpolation()
     auto *workingNode = m_ToolManager->GetWorkingData(0);
     if (workingNode != nullptr)
     {
-      if ((workingNode->IsVisible(mitk::BaseRenderer::GetInstance(mitk::BaseRenderer::GetRenderWindowByName("stdmulti.widget2")))))
+      int ret = QMessageBox::Yes;
+
+      if (m_SurfaceInterpolator->EstimatePortionOfNeededMemory() > 0.5)
       {
-        int ret = QMessageBox::Yes;
+        QMessageBox msgBox;
+        msgBox.setText("Due to short handed system memory the 3D interpolation may be very slow!");
+        msgBox.setInformativeText("Are you sure you want to activate the 3D interpolation?");
+        msgBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
+        ret = msgBox.exec();
+      }
 
-        if (m_SurfaceInterpolator->EstimatePortionOfNeededMemory() > 0.5)
-        {
-          QMessageBox msgBox;
-          msgBox.setText("Due to short handed system memory the 3D interpolation may be very slow!");
-          msgBox.setInformativeText("Are you sure you want to activate the 3D interpolation?");
-          msgBox.setStandardButtons(QMessageBox::No | QMessageBox::Yes);
-          ret = msgBox.exec();
-        }
+      auto labelSetImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+      auto activeLabel = labelSetImage->GetActiveLabelSet()->GetActiveLabel()->GetValue();
 
-        auto labelSetImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
-        auto activeLabel = labelSetImage->GetActiveLabelSet()->GetActiveLabel()->GetValue();
+      m_SurfaceInterpolator->AddActiveLabelContoursForInterpolation(activeLabel);
 
-        m_SurfaceInterpolator->AddActiveLabelContoursForInterpolation(activeLabel);
+      if (m_Watcher.isRunning())
+        m_Watcher.waitForFinished();
 
-        if (m_Watcher.isRunning())
-          m_Watcher.waitForFinished();
-
-        if (ret == QMessageBox::Yes)
-        {
-          //  Maybe set the segmentation node here
-          m_Future = QtConcurrent::run(this, &QmitkSlicesInterpolator::Run3DInterpolation);
-          m_Watcher.setFuture(m_Future);
-        }
-        else
-        {
-          m_CmbInterpolation->setCurrentIndex(0);
-        }
+      if (ret == QMessageBox::Yes)
+      {
+        //  Maybe set the segmentation node here
+        m_Future = QtConcurrent::run(this, &QmitkSlicesInterpolator::Run3DInterpolation);
+        m_Watcher.setFuture(m_Future);
+      }
+      else
+      {
+        m_CmbInterpolation->setCurrentIndex(0);
       }
     }
     else

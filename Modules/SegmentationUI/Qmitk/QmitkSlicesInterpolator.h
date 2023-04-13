@@ -49,6 +49,7 @@ namespace mitk
 }
 
 class QPushButton;
+class QmitkRenderWindow;
 
 enum ModifyLabelActionTrigerred
 {
@@ -86,7 +87,7 @@ public:
   /**
     To be called once before real use.
     */
-  void Initialize(mitk::ToolManager *toolManager, const QList<mitk::SliceNavigationController *> &controllers);
+  void Initialize(mitk::ToolManager *toolManager, const QList<QmitkRenderWindow*>& windows);
 
   /**
    * @brief
@@ -312,8 +313,8 @@ protected slots:
   void OnRemoveLabelSetConnection(mitk::LabelSetImage* labelSetImage, unsigned int layerID);
 
 protected:
-  const std::map<QAction *, mitk::SliceNavigationController *> createActionToSliceDimension();
-  std::map<QAction *, mitk::SliceNavigationController *> ACTION_TO_SLICEDIMENSION;
+  const std::map<QAction *, mitk::SliceNavigationController *> createActionToSlicer(const QList<QmitkRenderWindow*>& windows);
+  std::map<QAction *, mitk::SliceNavigationController *> m_ActionToSlicer;
 
   void AcceptAllInterpolations(mitk::SliceNavigationController *slicer);
 
@@ -345,6 +346,7 @@ protected:
   void SetCurrentContourListID();
 
 private:
+  void InitializeWindow(QmitkRenderWindow* window);
   void HideAllInterpolationControls();
   void Show2DInterpolationControls(bool show);
   void Show3DInterpolationControls(bool show);

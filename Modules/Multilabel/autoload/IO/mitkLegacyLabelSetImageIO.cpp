@@ -87,14 +87,14 @@ namespace mitk
     // get labels and add them as properties to the image
     char keybuffer[256];
 
-    unsigned int numberOfLayers = LegacyLabelSetImageIO::GetIntByKey(dictionary, "layers");
+    unsigned int numberOfLayers = MultiLabelIOHelper::GetIntByKey(dictionary, "layers");
     std::string _xmlStr;
     mitk::Label::Pointer label;
 
     for (unsigned int layerIdx = 0; layerIdx < numberOfLayers; layerIdx++)
     {
       sprintf(keybuffer, "layer_%03u", layerIdx);
-      int numberOfLabels = LegacyLabelSetImageIO::GetIntByKey(dictionary, keybuffer);
+      int numberOfLabels = MultiLabelIOHelper::GetIntByKey(dictionary, keybuffer);
 
       mitk::LabelSet::Pointer labelSet = mitk::LabelSet::New();
 
@@ -102,7 +102,7 @@ namespace mitk
       {
         tinyxml2::XMLDocument doc;
         sprintf(keybuffer, "label_%03u_%05d", layerIdx, labelIdx);
-        _xmlStr = LegacyLabelSetImageIO::GetStringByKey(dictionary, keybuffer);
+        _xmlStr = MultiLabelIOHelper::GetStringByKey(dictionary, keybuffer);
         doc.Parse(_xmlStr.c_str(), _xmlStr.size());
 
         auto* labelElem = doc.FirstChildElement("Label");
@@ -244,38 +244,6 @@ namespace mitk
     return result;
   }
 
-  int LegacyLabelSetImageIO::GetIntByKey(const itk::MetaDataDictionary &dic, const std::string &str)
-  {
-    std::vector<std::string> imgMetaKeys = dic.GetKeys();
-    std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
-    std::string metaString("");
-    for (; itKey != imgMetaKeys.end(); itKey++)
-    {
-      itk::ExposeMetaData<std::string>(dic, *itKey, metaString);
-      if (itKey->find(str.c_str()) != std::string::npos)
-      {
-        return atoi(metaString.c_str());
-      }
-    }
-    return 0;
-  }
-
-  std::string LegacyLabelSetImageIO::GetStringByKey(const itk::MetaDataDictionary &dic, const std::string &str)
-  {
-    std::vector<std::string> imgMetaKeys = dic.GetKeys();
-    std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
-    std::string metaString("");
-    for (; itKey != imgMetaKeys.end(); itKey++)
-    {
-      itk::ExposeMetaData<std::string>(dic, *itKey, metaString);
-      if (itKey->find(str.c_str()) != std::string::npos)
-      {
-        return metaString;
-      }
-    }
-    return metaString;
-  }
-
   LegacyLabelSetImageIO *LegacyLabelSetImageIO::Clone() const { return new LegacyLabelSetImageIO(*this); }
 
   void LegacyLabelSetImageIO::InitializeDefaultMetaDataKeys()
@@ -288,7 +256,9 @@ namespace mitk
     this->m_DefaultMetaDataKeys.push_back("label.");
     this->m_DefaultMetaDataKeys.push_back("layer.");
     this->m_DefaultMetaDataKeys.push_back("layers");
+    this->m_DefaultMetaDataKeys.push_back("modality");
     this->m_DefaultMetaDataKeys.push_back("org.mitk.label.");
+    this->m_DefaultMetaDataKeys.push_back("MITK.IO.");
   }
 
 } // namespace

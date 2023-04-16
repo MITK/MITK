@@ -13,9 +13,12 @@ found in the LICENSE file.
 #ifndef mitkMultiLabelIOHelper_h
 #define mitkMultiLabelIOHelper_h
 
-#include <string_view>
-#include <MitkMultilabelExports.h>
+#include <mitkLabelSet.h>
+
 #include <itkSmartPointer.h>
+#include <nlohmann/json.hpp>
+
+#include <MitkMultilabelExports.h>
 
 namespace tinyxml2
 {
@@ -23,11 +26,14 @@ namespace tinyxml2
   class XMLElement;
 }
 
+namespace itk
+{
+  class MetaDataDictionary;
+}
+
 namespace mitk
 {
-  class BaseProperty;
   class LabelSetImage;
-  class Label;
 
   constexpr char* const PROPERTY_NAME_TIMEGEOMETRY_TYPE = "org.mitk.timegeometry.type";
   constexpr char* const PROPERTY_NAME_TIMEGEOMETRY_TIMEPOINTS = "org.mitk.timegeometry.timepoints";
@@ -96,6 +102,22 @@ namespace mitk
      * @return true if the conversion was successful and false otherwise
      */
     static bool PropertyFromXMLElement(std::string &key, itk::SmartPointer<mitk::BaseProperty> &prop, const tinyxml2::XMLElement *elem);
+
+    /** Helper that extracts the value of a key in a meta dictionary as int.
+    * If the key does not exist 0 is returned.*/
+    static int GetIntByKey(const itk::MetaDataDictionary& dic, const std::string& key);
+    /** Helper that extracts the value of a key in a meta dictionary as string.
+    * If the key does not exist an empty string is returned.*/
+    static std::string GetStringByKey(const itk::MetaDataDictionary& dic, const std::string& key);
+
+
+    static nlohmann::json SerializeMultLabelGroupsToJSON(const mitk::LabelSetImage* inputImage);
+
+    static std::vector<LabelSet::Pointer> DeserializeMultLabelGroupsFromJSON(const nlohmann::json& listOfLabelSets);
+
+    static nlohmann::json SerializeLabelToJSON(const Label* label);
+
+    static mitk::Label::Pointer DeserializeLabelFromJSON(const nlohmann::json& labelJson);
 
   private:
     MultiLabelIOHelper();

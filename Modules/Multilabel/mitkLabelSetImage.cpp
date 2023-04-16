@@ -1070,6 +1070,11 @@ void mitk::LabelSetImage::OnGroupRemoved(SpatialGroupIndexType groupIndex)
 //  return index < m_LabelSetContainer.size();
 //}
 
+bool mitk::LabelSetImage::ExistGroup(SpatialGroupIndexType index) const
+{
+  return index < m_LabelSetContainer.size();
+}
+
 bool mitk::LabelSetImage::IsLabeInGroup(LabelValueType value) const
 {
   SpatialGroupIndexType dummy;
@@ -1146,6 +1151,42 @@ const mitk::LabelSetImage::LabelVectorType mitk::LabelSetImage::GetLabels()
   {
     result.emplace_back(label);
   }
+  return result;
+}
+
+const mitk::LabelSetImage::ConstLabelVectorType mitk::LabelSetImage::GetLabelsInGroup(SpatialGroupIndexType index) const
+{
+  if (!this->ExistGroup(index))
+  {
+    mitkThrow() << "Cannot get labels of an invalid group. Invalid group index: " << index;
+  }
+
+  mitk::LabelSetImage::ConstLabelVectorType result;
+
+  const auto labellist = m_GroupToLabelMap.find(index)->second;
+  for (const auto& labelvalue : labellist)
+  {
+    result.emplace_back(this->GetLabel(labelvalue));
+  }
+
+  return result;
+}
+
+const mitk::LabelSetImage::LabelVectorType mitk::LabelSetImage::GetLabelsInGroup(SpatialGroupIndexType index)
+{
+  if (!this->ExistGroup(index))
+  {
+    mitkThrow() << "Cannot get labels of an invalid group. Invalid group index: " << index;
+  }
+
+  mitk::LabelSetImage::LabelVectorType result;
+
+  const auto labellist = m_GroupToLabelMap[index];
+  for (const auto& labelvalue : labellist)
+  {
+    result.emplace_back(this->GetLabel(labelvalue));
+  }
+
   return result;
 }
 

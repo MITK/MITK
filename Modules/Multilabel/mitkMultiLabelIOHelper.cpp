@@ -15,6 +15,9 @@ found in the LICENSE file.
 #include "mitkLabelSetImage.h"
 #include <mitkBasePropertySerializer.h>
 
+#include "itkMetaDataDictionary.h"
+#include "itkMetaDataObject.h"
+
 #include <tinyxml2.h>
 
 namespace
@@ -277,4 +280,156 @@ bool mitk::MultiLabelIOHelper::PropertyFromXMLElement(std::string &key,
   if (prop.IsNull())
     return false;
   return true;
+}
+
+int mitk::MultiLabelIOHelper::GetIntByKey(const itk::MetaDataDictionary& dic, const std::string& str)
+{
+  std::vector<std::string> imgMetaKeys = dic.GetKeys();
+  std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
+  std::string metaString("");
+  for (; itKey != imgMetaKeys.end(); itKey++)
+  {
+    itk::ExposeMetaData<std::string>(dic, *itKey, metaString);
+    if (itKey->find(str.c_str()) != std::string::npos)
+    {
+      return atoi(metaString.c_str());
+    }
+  }
+  return 0;
+}
+
+std::string mitk::MultiLabelIOHelper::GetStringByKey(const itk::MetaDataDictionary& dic, const std::string& str)
+{
+  std::vector<std::string> imgMetaKeys = dic.GetKeys();
+  std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
+  std::string metaString("");
+  for (; itKey != imgMetaKeys.end(); itKey++)
+  {
+    itk::ExposeMetaData<std::string>(dic, *itKey, metaString);
+    if (itKey->find(str.c_str()) != std::string::npos)
+    {
+      return metaString;
+    }
+  }
+  return metaString;
+}
+
+nlohmann::json mitk::MultiLabelIOHelper::SerializeMultLabelGroupsToJSON(const mitk::LabelSetImage* inputImage)
+{
+  if (nullptr == inputImage)
+  {
+    mitkThrow() << "Invalid call of SerializeMultLabelGroupsToJSON. Passed image pointer is null.";
+  }
+
+  nlohmann::json result;
+
+  for (LabelSetImage::SpatialGroupIndexType i = 0; i < inputImage->GetNumberOfLayers(); i++)
+  {
+    nlohmann::json jgroup;
+    for (const auto label : inputImage->GetLabelsInGroup(i))
+    {
+      jgroup.emplace_back(SerializeLabelToJSON(label));
+    }
+    result.emplace_back(jgroup);
+  }
+  return result;
+};
+
+std::vector<mitk::LabelSet::Pointer> mitk::MultiLabelIOHelper::DeserializeMultLabelGroupsFromJSON(const nlohmann::json& listOfLabelSets)
+{
+  std::vector<LabelSet::Pointer> result;
+
+  for (const auto& jlabelsets : listOfLabelSets)
+  {
+    LabelSet::Pointer labelSet = LabelSet::New();
+    for (const auto& jlabel : jlabelsets)
+    {
+      auto label = DeserializeLabelFromJSON(jlabel);
+      labelSet->AddLabel(label, false);
+    }
+
+    result.emplace_back(labelSet);
+  }
+
+  return result;
+}
+
+nlohmann::json mitk::MultiLabelIOHelper::SerializeLabelToJSON(const Label* label)
+{
+  if (nullptr == label)
+  {
+    mitkThrow() << "Invalid call of GetLabelAsJSON. Passed label pointer is null.";
+  }
+
+  nlohmann::json j;
+  j["name"] = label->GetName();
+
+  j["value"] = label->GetValue();
+
+  nlohmann::json jcolor;
+  jcolor["type"] = "ColorProperty";
+  jcolor["value"] = {label->GetColor().GetRed(), label->GetColor().GetGreen(), label->GetColor().GetBlue() };
+  j["color"] = jcolor;
+
+  j["locked"] = label->GetLocked();
+  j["opacity"] = label->GetOpacity();
+  j["visible"] = label->GetVisible();
+  return j;
+};
+
+template<typename TValueType> bool GetValueFromJson(const nlohmann::json& labelJson, const std::string& key, TValueType& value)
+{
+  if (labelJson.find(key) != labelJson.end())
+  {
+    try
+    {
+      value = labelJson[key].get<TValueType>();
+      return true;
+    }
+    catch (...)
+    {
+      MITK_ERROR << "Unable to read label information from json. Value has wrong type. Failed key: " << key << "; invalid value: " << labelJson[key].dump();
+      throw;
+    }
+  }
+  return false;
+}
+
+mitk::Label::Pointer mitk::MultiLabelIOHelper::DeserializeLabelFromJSON(const nlohmann::json& labelJson)
+{
+  Label::Pointer resultLabel = Label::New();
+
+  std::string name = "Unkown label name";
+  GetValueFromJson(labelJson, "name", name);
+  resultLabel->SetName(name);
+
+  Label::PixelType value = 1;
+  GetValueFromJson(labelJson, "value", value);
+  resultLabel->SetValue(value);
+
+  if (labelJson.find("color") != labelJson.end())
+  {
+    auto jcolor = labelJson["color"]["value"];
+    Color color;
+    color.SetRed(jcolor[0].get<float>());
+    color.SetGreen(jcolor[1].get<float>());
+    color.SetBlue(jcolor[2].get<float>());
+
+    resultLabel->SetColor(color);
+  }
+
+  bool locked = false;
+  if (GetValueFromJson(labelJson, "locked", locked))
+    resultLabel->SetLocked(locked);
+
+  float opacity = 1.;
+  if (GetValueFromJson(labelJson, "opacity", opacity))
+    resultLabel->SetOpacity(opacity);
+
+
+  bool visible = true;
+  if (GetValueFromJson(labelJson, "visible", visible))
+    resultLabel->SetVisible(visible);
+
+  return resultLabel;
 }

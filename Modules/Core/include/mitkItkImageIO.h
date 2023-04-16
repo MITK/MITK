@@ -59,6 +59,13 @@ namespace mitk
     Raw means, that only the pixel data and geometry information is loaded. But e.g. no properties etc...*/
     static Image::Pointer LoadRawMitkImageFromImageIO(itk::ImageIOBase* imageIO, const std::string& path);
 
+    /** Helper function that van be used to extract a raw mitk image for the passed path using the also passed ImageIOBase instance.
+    Raw means, that only the pixel data and geometry information is loaded. But e.g. no properties etc...*/
+    static void PreparImageIOToWriteImage(itk::ImageIOBase* imageIO, const Image* image);
+
+    static void SavePropertyListAsMetaData(itk::MetaDataDictionary& dictionary, const PropertyList* properties, const std::string& mimeTypeName);
+
+
   protected:
     virtual std::vector<std::string> FixUpImageIOExtensions(const std::string &imageIOName);
     virtual void FixUpCustomMimeTypeName(const std::string &imageIOName, CustomMimeType &customMimeType);

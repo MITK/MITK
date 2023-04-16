@@ -35,10 +35,15 @@ found in the LICENSE file.
 namespace mitk
 {
 
-  constexpr char* const MULTILABEL_SEGMENTATION_MODALITY_VALUE = "org.mitk.image.multilabel.segmentation";
+  constexpr char* const MULTILABEL_SEGMENTATION_MODALITY_KEY = "modality";
+  constexpr char* const MULTILABEL_SEGMENTATION_MODALITY_VALUE = "org.mitk.multilabel.segmentation";
+  constexpr char* const MULTILABEL_SEGMENTATION_VERSION_KEY = "org.mitk.multilabel.segmentation.version";
+  constexpr int MULTILABEL_SEGMENTATION_VERSION_VALUE = 1;
+  constexpr char* const MULTILABEL_SEGMENTATION_LABELS_INFO_KEY = "org.mitk.multilabel.segmentation.labelgroups";
+  constexpr char* const MULTILABEL_SEGMENTATION_UNLABELEDLABEL_LOCK_KEY = "org.mitk.multilabel.segmentation.unlabeledlabellock";
 
   MultiLabelSegmentationIO::MultiLabelSegmentationIO()
-    : AbstractFileIO(LabelSetImage::GetStaticNameOfClass(), IOMimeTypes::NRRD_MIMETYPE(), "MITK Multilabel Image")
+    : AbstractFileIO(LabelSetImage::GetStaticNameOfClass(), IOMimeTypes::NRRD_MIMETYPE(), "MITK Multilabel Segmentation")
   {
     this->InitializeDefaultMetaDataKeys();
     AbstractFileWriter::SetRanking(10);
@@ -75,25 +80,7 @@ namespace mitk
 
     itk::NrrdImageIO::Pointer nrrdImageIo = itk::NrrdImageIO::New();
 
-    // Clone the image geometry, because we might have to change it
-    // for writing purposes
-    BaseGeometry::Pointer geometry = inputVector->GetGeometry()->Clone();
-
-    // Check if geometry information will be lost
-    if (inputVector->GetDimension() == 2 && !geometry->Is2DConvertable())
-    {
-      MITK_WARN << "Saving a 2D image with 3D geometry information. Geometry information will be lost! You might "
-                   "consider using Convert2Dto3DImageFilter before saving.";
-
-      // set matrix to identity
-      mitk::AffineTransform3D::Pointer affTrans = mitk::AffineTransform3D::New();
-      affTrans->SetIdentity();
-      mitk::Vector3D spacing = geometry->GetSpacing();
-      mitk::Point3D origin = geometry->GetOrigin();
-      geometry->SetIndexToWorldTransform(affTrans);
-      geometry->SetSpacing(spacing);
-      geometry->SetOrigin(origin);
-    }
+    ItkImageIO::PreparImageIOToWriteImage(nrrdImageIo, inputVector);
 
     LocalFile localFile(this);
     const std::string path = localFile.GetFileName();
@@ -102,159 +89,31 @@ namespace mitk
 
     try
     {
-      // Implementation of writer using itkImageIO directly. This skips the use
-      // of templated itkImageFileWriter, which saves the multiplexing on MITK side.
-
-      const unsigned int dimension = inputVector->GetDimension();
-      const unsigned int *const dimensions = inputVector->GetDimensions();
-      const mitk::PixelType pixelType = inputVector->GetPixelType();
-      const mitk::Vector3D mitkSpacing = geometry->GetSpacing();
-      const mitk::Point3D mitkOrigin = geometry->GetOrigin();
-
-      // Due to templating in itk, we are forced to save a 4D spacing and 4D Origin,
-      // though they are not supported in MITK
-      itk::Vector<double, 4u> spacing4D;
-      spacing4D[0] = mitkSpacing[0];
-      spacing4D[1] = mitkSpacing[1];
-      spacing4D[2] = mitkSpacing[2];
-      spacing4D[3] = 1; // There is no support for a 4D spacing. However, we should have a valid value here
-
-      itk::Vector<double, 4u> origin4D;
-      origin4D[0] = mitkOrigin[0];
-      origin4D[1] = mitkOrigin[1];
-      origin4D[2] = mitkOrigin[2];
-      origin4D[3] = 0; // There is no support for a 4D origin. However, we should have a valid value here
-
-      // Set the necessary information for imageIO
-      nrrdImageIo->SetNumberOfDimensions(dimension);
-      nrrdImageIo->SetPixelType(pixelType.GetPixelType());
-      nrrdImageIo->SetComponentType(static_cast<int>(pixelType.GetComponentType()) < PixelComponentUserType
-                                      ? pixelType.GetComponentType()
-                                      : itk::IOComponentEnum::UNKNOWNCOMPONENTTYPE);
-      nrrdImageIo->SetNumberOfComponents(pixelType.GetNumberOfComponents());
-
-      itk::ImageIORegion ioRegion(dimension);
-
-      for (unsigned int i = 0; i < dimension; i++)
-      {
-        nrrdImageIo->SetDimensions(i, dimensions[i]);
-        nrrdImageIo->SetSpacing(i, spacing4D[i]);
-        nrrdImageIo->SetOrigin(i, origin4D[i]);
-
-        mitk::Vector3D mitkDirection(0.0);
-        mitkDirection.SetVnlVector(geometry->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(i).as_ref());
-        itk::Vector<double, 4u> direction4D;
-        direction4D[0] = mitkDirection[0];
-        direction4D[1] = mitkDirection[1];
-        direction4D[2] = mitkDirection[2];
-
-        // MITK only supports a 3x3 direction matrix. Due to templating in itk, however, we must
-        // save a 4x4 matrix for 4D images. in this case, add an homogneous component to the matrix.
-        if (i == 3)
-        {
-          direction4D[3] = 1; // homogenous component
-        }
-        else
-        {
-          direction4D[3] = 0;
-        }
-        vnl_vector<double> axisDirection(dimension);
-        for (unsigned int j = 0; j < dimension; j++)
-        {
-          axisDirection[j] = direction4D[j] / spacing4D[i];
-        }
-        nrrdImageIo->SetDirection(i, axisDirection);
-
-        ioRegion.SetSize(i, inputVector->GetLargestPossibleRegion().GetSize(i));
-        ioRegion.SetIndex(i, inputVector->GetLargestPossibleRegion().GetIndex(i));
-      }
-
-      // use compression if available
-      nrrdImageIo->UseCompressionOn();
-
-      nrrdImageIo->SetIORegion(ioRegion);
-      nrrdImageIo->SetFileName(path);
-
-      // label set specific meta data
-      char keybuffer[512];
-      char valbuffer[512];
-
-      sprintf(keybuffer, "modality");
-      sprintf(valbuffer, MULTILABEL_SEGMENTATION_MODALITY_VALUE);
       itk::EncapsulateMetaData<std::string>(
-        nrrdImageIo->GetMetaDataDictionary(), std::string(keybuffer), std::string(valbuffer));
+        nrrdImageIo->GetMetaDataDictionary(), std::string(MULTILABEL_SEGMENTATION_MODALITY_KEY), std::string(MULTILABEL_SEGMENTATION_MODALITY_VALUE));
 
-      sprintf(keybuffer, "layers");
-      sprintf(valbuffer, "%1d", input->GetNumberOfLayers());
+      //nrrd does only support string meta information. So we have to convert before.
       itk::EncapsulateMetaData<std::string>(
-        nrrdImageIo->GetMetaDataDictionary(), std::string(keybuffer), std::string(valbuffer));
+        nrrdImageIo->GetMetaDataDictionary(), std::string(MULTILABEL_SEGMENTATION_VERSION_KEY), std::to_string(MULTILABEL_SEGMENTATION_VERSION_VALUE));
 
-      for (unsigned int layerIdx = 0; layerIdx < input->GetNumberOfLayers(); layerIdx++)
-      {
-        sprintf(keybuffer, "layer_%03u", layerIdx);                    // layer idx
-        sprintf(valbuffer, "%1u", input->GetNumberOfLabels(layerIdx)); // number of labels for the layer
-        itk::EncapsulateMetaData<std::string>(
-          nrrdImageIo->GetMetaDataDictionary(), std::string(keybuffer), std::string(valbuffer));
-
-        auto iter = input->GetLabelSet(layerIdx)->IteratorConstBegin();
-        unsigned int count(0);
-        while (iter != input->GetLabelSet(layerIdx)->IteratorConstEnd())
-        {
-          tinyxml2::XMLDocument document;
-          document.InsertEndChild(document.NewDeclaration());
-          auto *labelElem = mitk::MultiLabelIOHelper::GetLabelAsXMLElement(document, iter->second);
-          document.InsertEndChild(labelElem);
-          tinyxml2::XMLPrinter printer;
-          document.Print(&printer);
-
-          sprintf(keybuffer, "org.mitk.label_%03u_%05u", layerIdx, count);
-          itk::EncapsulateMetaData<std::string>(
-            nrrdImageIo->GetMetaDataDictionary(), std::string(keybuffer), printer.CStr());
-          ++iter;
-          ++count;
-        }
-      }
+      auto json = MultiLabelIOHelper::SerializeMultLabelGroupsToJSON(input);
+      itk::EncapsulateMetaData<std::string>(
+        nrrdImageIo->GetMetaDataDictionary(), std::string(MULTILABEL_SEGMENTATION_LABELS_INFO_KEY), json.dump());
       // end label set specific meta data
 
-      // Handle time geometry
-      const auto* arbitraryTG = dynamic_cast<const ArbitraryTimeGeometry*>(input->GetTimeGeometry());
-      if (arbitraryTG)
-      {
-        itk::EncapsulateMetaData<std::string>(nrrdImageIo->GetMetaDataDictionary(),
-          PROPERTY_KEY_TIMEGEOMETRY_TYPE,
-          ArbitraryTimeGeometry::GetStaticNameOfClass());
-
-
-        auto metaTimePoints = ConvertTimePointListToMetaDataObject(arbitraryTG);
-        nrrdImageIo->GetMetaDataDictionary().Set(PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS, metaTimePoints);
-      }
+      //nrrd does only support string meta information. So we have to convert before.
+      itk::EncapsulateMetaData<std::string>(
+        nrrdImageIo->GetMetaDataDictionary(), std::string(MULTILABEL_SEGMENTATION_UNLABELEDLABEL_LOCK_KEY), std::to_string(input->GetUnlabeledLabelLock()));
 
       // Handle properties
-      mitk::PropertyList::Pointer imagePropertyList = input->GetPropertyList();
-      for (const auto& property : *imagePropertyList->GetMap())
-      {
-        mitk::CoreServicePointer<IPropertyPersistence> propPersistenceService(mitk::CoreServices::GetPropertyPersistence());
-        IPropertyPersistence::InfoResultType infoList = propPersistenceService->GetInfo(property.first, GetMimeType()->GetName(), true);
-
-        if (infoList.empty())
-        {
-          continue;
-        }
-
-        std::string value = infoList.front()->GetSerializationFunction()(property.second);
-
-        if (value == mitk::BaseProperty::VALUE_CANNOT_BE_CONVERTED_TO_STRING)
-        {
-          continue;
-        }
-
-        std::string key = infoList.front()->GetKey();
-
-        itk::EncapsulateMetaData<std::string>(nrrdImageIo->GetMetaDataDictionary(), key, value);
-      }
+      ItkImageIO::SavePropertyListAsMetaData(nrrdImageIo->GetMetaDataDictionary(), input->GetPropertyList(), this->GetMimeType()->GetName());
 
       // Handle UID
       itk::EncapsulateMetaData<std::string>(nrrdImageIo->GetMetaDataDictionary(), PROPERTY_KEY_UID, input->GetUID());
+
+      // use compression if available
+      nrrdImageIo->UseCompressionOn();
+      nrrdImageIo->SetFileName(path);
 
       ImageReadAccessor imageAccess(inputVector);
       nrrdImageIo->Write(imageAccess.GetData());
@@ -263,7 +122,6 @@ namespace mitk
     {
       mitkThrow() << e.what();
     }
-    // end image write
   }
 
   IFileIO::ConfidenceLevel MultiLabelSegmentationIO::GetReaderConfidenceLevel() const
@@ -288,301 +146,56 @@ namespace mitk
 
   std::vector<BaseData::Pointer> MultiLabelSegmentationIO::DoRead()
   {
-    mitk::LocaleSwitch localeSwitch("C");
-
-    // begin regular image loading, adapted from mitkItkImageIO
     itk::NrrdImageIO::Pointer nrrdImageIO = itk::NrrdImageIO::New();
-    Image::Pointer image = Image::New();
 
-    const unsigned int MINDIM = 2;
-    const unsigned int MAXDIM = 4;
+    std::vector<BaseData::Pointer> result;
 
-    const std::string path = this->GetLocalFileName();
+    auto rawimage = ItkImageIO::LoadRawMitkImageFromImageIO(nrrdImageIO, this->GetLocalFileName());
 
-    MITK_INFO << "loading " << path << " via itk::ImageIOFactory... " << std::endl;
-
-    // Check to see if we can read the file given the name or prefix
-    if (path.empty())
-    {
-      mitkThrow() << "Empty filename in mitk::ItkImageIO ";
-    }
-
-    // Got to allocate space for the image. Determine the characteristics of
-    // the image.
-    nrrdImageIO->SetFileName(path);
-    nrrdImageIO->ReadImageInformation();
-
-    unsigned int ndim = nrrdImageIO->GetNumberOfDimensions();
-    if (ndim < MINDIM || ndim > MAXDIM)
-    {
-      MITK_WARN << "Sorry, only dimensions 2, 3 and 4 are supported. The given file has " << ndim
-                << " dimensions! Reading as 4D.";
-      ndim = MAXDIM;
-    }
-
-    itk::ImageIORegion ioRegion(ndim);
-    itk::ImageIORegion::SizeType ioSize = ioRegion.GetSize();
-    itk::ImageIORegion::IndexType ioStart = ioRegion.GetIndex();
-
-    unsigned int dimensions[MAXDIM];
-    dimensions[0] = 0;
-    dimensions[1] = 0;
-    dimensions[2] = 0;
-    dimensions[3] = 0;
-
-    ScalarType spacing[MAXDIM];
-    spacing[0] = 1.0f;
-    spacing[1] = 1.0f;
-    spacing[2] = 1.0f;
-    spacing[3] = 1.0f;
-
-    Point3D origin;
-    origin.Fill(0);
-
-    unsigned int i;
-    for (i = 0; i < ndim; ++i)
-    {
-      ioStart[i] = 0;
-      ioSize[i] = nrrdImageIO->GetDimensions(i);
-      if (i < MAXDIM)
-      {
-        dimensions[i] = nrrdImageIO->GetDimensions(i);
-        spacing[i] = nrrdImageIO->GetSpacing(i);
-        if (spacing[i] <= 0)
-          spacing[i] = 1.0f;
-      }
-      if (i < 3)
-      {
-        origin[i] = nrrdImageIO->GetOrigin(i);
-      }
-    }
-
-    ioRegion.SetSize(ioSize);
-    ioRegion.SetIndex(ioStart);
-
-    MITK_INFO << "ioRegion: " << ioRegion << std::endl;
-    nrrdImageIO->SetIORegion(ioRegion);
-    void *buffer = new unsigned char[nrrdImageIO->GetImageSizeInBytes()];
-    nrrdImageIO->Read(buffer);
-
-    image->Initialize(MakePixelType(nrrdImageIO), ndim, dimensions);
-    image->SetImportChannel(buffer, 0, Image::ManageMemory);
-
-    // access direction of itk::Image and include spacing
-    mitk::Matrix3D matrix;
-    matrix.SetIdentity();
-    unsigned int j, itkDimMax3 = (ndim >= 3 ? 3 : ndim);
-    for (i = 0; i < itkDimMax3; ++i)
-      for (j = 0; j < itkDimMax3; ++j)
-        matrix[i][j] = nrrdImageIO->GetDirection(j)[i];
-
-    // re-initialize PlaneGeometry with origin and direction
-    PlaneGeometry *planeGeometry = image->GetSlicedGeometry(0)->GetPlaneGeometry(0);
-    planeGeometry->SetOrigin(origin);
-    planeGeometry->GetIndexToWorldTransform()->SetMatrix(matrix);
-
-    // re-initialize SlicedGeometry3D
-    SlicedGeometry3D *slicedGeometry = image->GetSlicedGeometry(0);
-    slicedGeometry->InitializeEvenlySpaced(planeGeometry, image->GetDimension(2));
-    slicedGeometry->SetSpacing(spacing);
-
-    MITK_INFO << slicedGeometry->GetCornerPoint(false, false, false);
-    MITK_INFO << slicedGeometry->GetCornerPoint(true, true, true);
-
-    // re-initialize TimeGeometry
     const itk::MetaDataDictionary& dictionary = nrrdImageIO->GetMetaDataDictionary();
-    TimeGeometry::Pointer timeGeometry;
 
-    if (dictionary.HasKey(PROPERTY_NAME_TIMEGEOMETRY_TYPE) || dictionary.HasKey(PROPERTY_KEY_TIMEGEOMETRY_TYPE))
-    { // also check for the name because of backwards compatibility. Past code version stored with the name and not with
-      // the key
-      itk::MetaDataObject<std::string>::ConstPointer timeGeometryTypeData;
-      if (dictionary.HasKey(PROPERTY_NAME_TIMEGEOMETRY_TYPE))
-      {
-        timeGeometryTypeData =
-          dynamic_cast<const itk::MetaDataObject<std::string>*>(dictionary.Get(PROPERTY_NAME_TIMEGEOMETRY_TYPE));
-      }
-      else
-      {
-        timeGeometryTypeData =
-          dynamic_cast<const itk::MetaDataObject<std::string>*>(dictionary.Get(PROPERTY_KEY_TIMEGEOMETRY_TYPE));
-      }
-
-      if (timeGeometryTypeData->GetMetaDataObjectValue() == ArbitraryTimeGeometry::GetStaticNameOfClass())
-      {
-        MITK_INFO << "used time geometry: " << ArbitraryTimeGeometry::GetStaticNameOfClass();
-        typedef std::vector<TimePointType> TimePointVector;
-        TimePointVector timePoints;
-
-        if (dictionary.HasKey(PROPERTY_NAME_TIMEGEOMETRY_TIMEPOINTS))
-        {
-          timePoints = ConvertMetaDataObjectToTimePointList(dictionary.Get(PROPERTY_NAME_TIMEGEOMETRY_TIMEPOINTS));
-        }
-        else if (dictionary.HasKey(PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS))
-        {
-          timePoints = ConvertMetaDataObjectToTimePointList(dictionary.Get(PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS));
-        }
-
-        if (timePoints.empty())
-        {
-          MITK_ERROR << "Stored timepoints are empty. Meta information seems to bee invalid. Switch to ProportionalTimeGeometry fallback";
-        }
-        else if (timePoints.size() - 1 != image->GetDimension(3))
-        {
-          MITK_ERROR << "Stored timepoints (" << timePoints.size() - 1 << ") and size of image time dimension ("
-            << image->GetDimension(3) << ") do not match. Switch to ProportionalTimeGeometry fallback";
-        }
-        else
-        {
-          ArbitraryTimeGeometry::Pointer arbitraryTimeGeometry = ArbitraryTimeGeometry::New();
-          TimePointVector::const_iterator pos = timePoints.begin();
-          auto prePos = pos++;
-
-          for (; pos != timePoints.end(); ++prePos, ++pos)
-          {
-            arbitraryTimeGeometry->AppendNewTimeStepClone(slicedGeometry, *prePos, *pos);
-          }
-
-          timeGeometry = arbitraryTimeGeometry;
-        }
-      }
-    }
-
-    if (timeGeometry.IsNull())
-    { // Fallback. If no other valid time geometry has been created, create a ProportionalTimeGeometry
-      MITK_INFO << "used time geometry: " << ProportionalTimeGeometry::GetStaticNameOfClass();
-      ProportionalTimeGeometry::Pointer propTimeGeometry = ProportionalTimeGeometry::New();
-      propTimeGeometry->Initialize(slicedGeometry, image->GetDimension(3));
-      timeGeometry = propTimeGeometry;
-    }
-
-    image->SetTimeGeometry(timeGeometry);
-
-    buffer = nullptr;
-    MITK_INFO << "number of image components: " << image->GetPixelType().GetNumberOfComponents();
-
-    // end regular image loading
-
-    LabelSetImage::Pointer output = ConvertImageToLabelSetImage(image);
-
-    // get labels and add them as properties to the image
-    char keybuffer[256];
-
-    unsigned int numberOfLayers = GetIntByKey(dictionary, "layers");
-    std::string _xmlStr;
-    mitk::Label::Pointer label;
-
-    for (unsigned int layerIdx = 0; layerIdx < numberOfLayers; layerIdx++)
+    //check version
+    auto version = MultiLabelIOHelper::GetIntByKey(dictionary, MULTILABEL_SEGMENTATION_VERSION_KEY);
+    if (version > MULTILABEL_SEGMENTATION_VERSION_VALUE)
     {
-      sprintf(keybuffer, "layer_%03u", layerIdx);
-      int numberOfLabels = GetIntByKey(dictionary, keybuffer);
-
-      mitk::LabelSet::Pointer labelSet = mitk::LabelSet::New();
-
-      for (int labelIdx = 0; labelIdx < numberOfLabels; labelIdx++)
-      {
-        tinyxml2::XMLDocument doc;
-        sprintf(keybuffer, "label_%03u_%05d", layerIdx, labelIdx);
-        _xmlStr = GetStringByKey(dictionary, keybuffer);
-        doc.Parse(_xmlStr.c_str(), _xmlStr.size());
-
-        auto *labelElem = doc.FirstChildElement("Label");
-        if (labelElem == nullptr)
-          mitkThrow() << "Error parsing NRRD header for mitk::LabelSetImage IO";
-
-        label = mitk::MultiLabelIOHelper::LoadLabelFromXMLDocument(labelElem);
-
-        if (label->GetValue() != mitk::LabelSetImage::UnlabeledLabelValue)
-        {
-          labelSet->AddLabel(label);
-          labelSet->SetLayer(layerIdx);
-        }
-        else
-        {
-          MITK_INFO << "Multi label image contains a label specification for unlabeled pixels. This legacy information is ignored.";
-        }
-      }
-      output->AddLabelSetToLayer(layerIdx, labelSet);
+      mitkThrow() << "Data to read has unsupported version. Software is to old to ensure correct reading. Please use a compatible version of MITK or store data in another format. Version of data: " << version << "; Supported versions up to: "<<MULTILABEL_SEGMENTATION_VERSION_VALUE;
     }
 
-    for (auto iter = dictionary.Begin(), iterEnd = dictionary.End(); iter != iterEnd;
-      ++iter)
+    //get layer images
+    auto groupImages = SplitVectorImage(rawimage);
+
+    //get label set definitions
+    auto jsonStr = MultiLabelIOHelper::GetStringByKey(dictionary, MULTILABEL_SEGMENTATION_LABELS_INFO_KEY);
+    nlohmann::json jlabelsets = nlohmann::json::parse(jsonStr);
+    std::vector<mitk::LabelSet::Pointer> labelsets = MultiLabelIOHelper::DeserializeMultLabelGroupsFromJSON(jlabelsets);
+
+    if (labelsets.size() != groupImages.size())
     {
-      if (iter->second->GetMetaDataObjectTypeInfo() == typeid(std::string))
-      {
-        const std::string& key = iter->first;
-        std::string assumedPropertyName = key;
-        std::replace(assumedPropertyName.begin(), assumedPropertyName.end(), '_', '.');
+      mitkThrow() << "Loaded data is in an invalid state. Number of extracted layer images and labels sets does not match. Found layer images: " << groupImages.size() << "; found labelsets: " << labelsets.size();
+    }
 
-        std::string mimeTypeName = GetMimeType()->GetName();
+    //construct multi layer segmentation out of layers and labelset info instances
+    LabelSetImage::LabelValueType maxValue = LabelSetImage::UnlabeledLabelValue;
+    auto imageIterator = groupImages.begin();
+    std::vector<mitk::LabelSet::Pointer> adaptedLabelSets;
 
-        // Check if there is already a info for the key and our mime type.
-        mitk::CoreServicePointer<IPropertyPersistence> propPersistenceService(mitk::CoreServices::GetPropertyPersistence());
-        IPropertyPersistence::InfoResultType infoList = propPersistenceService->GetInfoByKey(key);
+    auto output = ConvertImageVectorToLabelSetImage(groupImages, rawimage->GetTimeGeometry());
 
-        auto predicate = [&mimeTypeName](const PropertyPersistenceInfo::ConstPointer& x) {
-          return x.IsNotNull() && x->GetMimeTypeName() == mimeTypeName;
-        };
-        auto finding = std::find_if(infoList.begin(), infoList.end(), predicate);
+    LabelSetImage::SpatialGroupIndexType id = 0;
+    for (auto labelset : labelsets)
+    {
+      output->AddLabelSetToLayer(id, labelset);
+      id++;
+    }
 
-        if (finding == infoList.end())
-        {
-          auto predicateWild = [](const PropertyPersistenceInfo::ConstPointer& x) {
-            return x.IsNotNull() && x->GetMimeTypeName() == PropertyPersistenceInfo::ANY_MIMETYPE_NAME();
-          };
-          finding = std::find_if(infoList.begin(), infoList.end(), predicateWild);
-        }
+    bool unlabeledLock = MultiLabelIOHelper::GetIntByKey(dictionary, MULTILABEL_SEGMENTATION_UNLABELEDLABEL_LOCK_KEY) != 0;
+    output->SetUnlabeledLabelLock(unlabeledLock);
 
-        PropertyPersistenceInfo::ConstPointer info;
-
-        if (finding != infoList.end())
-        {
-          assumedPropertyName = (*finding)->GetName();
-          info = *finding;
-        }
-        else
-        { // we have not found anything suitable so we generate our own info
-          auto newInfo = PropertyPersistenceInfo::New();
-          newInfo->SetNameAndKey(assumedPropertyName, key);
-          newInfo->SetMimeTypeName(PropertyPersistenceInfo::ANY_MIMETYPE_NAME());
-          info = newInfo;
-        }
-
-        std::string value =
-          dynamic_cast<itk::MetaDataObject<std::string>*>(iter->second.GetPointer())->GetMetaDataObjectValue();
-
-        mitk::BaseProperty::Pointer loadedProp = info->GetDeserializationFunction()(value);
-
-        if (loadedProp.IsNull())
-        {
-          MITK_ERROR << "Property cannot be correctly deserialized and is skipped. Check if data format is valid. Problematic property value string: \"" << value << "\"; Property info used to deserialized: " << info;
-          break;
-        }
-
-        output->SetProperty(assumedPropertyName.c_str(), loadedProp);
-
-        // Read properties should be persisted unless they are default properties
-        // which are written anyway
-        bool isDefaultKey = false;
-
-        for (const auto& defaultKey : m_DefaultMetaDataKeys)
-        {
-          if (defaultKey.length() <= assumedPropertyName.length())
-          {
-            // does the start match the default key
-            if (assumedPropertyName.substr(0, defaultKey.length()).find(defaultKey) != std::string::npos)
-            {
-              isDefaultKey = true;
-              break;
-            }
-          }
-        }
-
-        if (!isDefaultKey)
-        {
-          propPersistenceService->AddInfo(info);
-        }
-      }
+    //meta data handling
+    auto props = ItkImageIO::ExtractMetaDataAsPropertyList(nrrdImageIO->GetMetaDataDictionary(), this->GetMimeType()->GetName(), this->m_DefaultMetaDataKeys);
+    for (auto& [name, prop] : *(props->GetMap()))
+    {
+      output->SetProperty(name, prop->Clone()); //need to clone to avoid that all outputs pointing to the same prop instances.
     }
 
     // Handle UID
@@ -595,44 +208,10 @@ namespace mitk
         uidManipulator.SetUID(uidData->GetMetaDataObjectValue());
       }
     }
+    result.push_back(output.GetPointer());
 
     MITK_INFO << "...finished!";
-
-    std::vector<BaseData::Pointer> result;
-    result.push_back(output.GetPointer());
     return result;
-  }
-
-  int MultiLabelSegmentationIO::GetIntByKey(const itk::MetaDataDictionary &dic, const std::string &str)
-  {
-    std::vector<std::string> imgMetaKeys = dic.GetKeys();
-    std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
-    std::string metaString("");
-    for (; itKey != imgMetaKeys.end(); itKey++)
-    {
-      itk::ExposeMetaData<std::string>(dic, *itKey, metaString);
-      if (itKey->find(str.c_str()) != std::string::npos)
-      {
-        return atoi(metaString.c_str());
-      }
-    }
-    return 0;
-  }
-
-  std::string MultiLabelSegmentationIO::GetStringByKey(const itk::MetaDataDictionary &dic, const std::string &str)
-  {
-    std::vector<std::string> imgMetaKeys = dic.GetKeys();
-    std::vector<std::string>::const_iterator itKey = imgMetaKeys.begin();
-    std::string metaString("");
-    for (; itKey != imgMetaKeys.end(); itKey++)
-    {
-      itk::ExposeMetaData<std::string>(dic, *itKey, metaString);
-      if (itKey->find(str.c_str()) != std::string::npos)
-      {
-        return metaString;
-      }
-    }
-    return metaString;
   }
 
   MultiLabelSegmentationIO *MultiLabelSegmentationIO::IOClone() const { return new MultiLabelSegmentationIO(*this); }
@@ -644,10 +223,9 @@ namespace mitk
     this->m_DefaultMetaDataKeys.push_back(PROPERTY_NAME_TIMEGEOMETRY_TYPE);
     this->m_DefaultMetaDataKeys.push_back(PROPERTY_NAME_TIMEGEOMETRY_TIMEPOINTS);
     this->m_DefaultMetaDataKeys.push_back("ITK.InputFilterName");
-    this->m_DefaultMetaDataKeys.push_back("label.");
-    this->m_DefaultMetaDataKeys.push_back("layer.");
-    this->m_DefaultMetaDataKeys.push_back("layers");
-    this->m_DefaultMetaDataKeys.push_back("org.mitk.label.");
+    this->m_DefaultMetaDataKeys.push_back("org.mitk.multilabel.");
+    this->m_DefaultMetaDataKeys.push_back("MITK.IO.");
+    this->m_DefaultMetaDataKeys.push_back(MULTILABEL_SEGMENTATION_MODALITY_KEY);
   }
 
 } // namespace

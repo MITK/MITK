@@ -101,7 +101,7 @@ static void SplitVectorImage(const itk::VectorImage<TPixel, VDimensions>* image,
     layerSelector->SetIndex(layer);
     layerSelector->Update();
 
-    mitk::Image::Pointer layerImage = mitk::GrabItkImageMemory(layerSelector->GetOutput(), nullptr, nullptr, false);
+    mitk::Image::Pointer layerImage = mitk::GrabItkImageMemoryChannel(layerSelector->GetOutput(), nullptr, nullptr, false);
     result.push_back(layerImage);
   }
 }

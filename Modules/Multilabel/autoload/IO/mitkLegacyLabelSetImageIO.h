@@ -38,11 +38,6 @@ namespace mitk
 
     ConfidenceLevel GetConfidenceLevel() const override;
 
-    // -------------- LegacyLabelSetImageIO specific functions -------------
-
-    static int GetIntByKey(const itk::MetaDataDictionary &dic, const std::string &str);
-    static std::string GetStringByKey(const itk::MetaDataDictionary &dic, const std::string &str);
-
   protected:
     /**
     * @brief Reads a number of mitk::LabelSetImages from the file system

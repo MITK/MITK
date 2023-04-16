@@ -43,11 +43,6 @@ namespace mitk
     void Write() override;
     ConfidenceLevel GetWriterConfidenceLevel() const override;
 
-    // -------------- MultiLabelSegmentationIO specific functions -------------
-
-    int GetIntByKey(const itk::MetaDataDictionary &dic, const std::string &str);
-    std::string GetStringByKey(const itk::MetaDataDictionary &dic, const std::string &str);
-
   protected:
     /**
     * @brief Reads a number of mitk::LabelSetImages from the file system

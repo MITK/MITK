@@ -161,25 +161,18 @@ namespace mitk
       mitkThrow() << "Data to read has unsupported version. Software is to old to ensure correct reading. Please use a compatible version of MITK or store data in another format. Version of data: " << version << "; Supported versions up to: "<<MULTILABEL_SEGMENTATION_VERSION_VALUE;
     }
 
-    //get layer images
-    auto groupImages = SplitVectorImage(rawimage);
+    //generate multi label images
+    auto output = ConvertImageToLabelSetImage(rawimage);
 
     //get label set definitions
     auto jsonStr = MultiLabelIOHelper::GetStringByKey(dictionary, MULTILABEL_SEGMENTATION_LABELS_INFO_KEY);
     nlohmann::json jlabelsets = nlohmann::json::parse(jsonStr);
     std::vector<mitk::LabelSet::Pointer> labelsets = MultiLabelIOHelper::DeserializeMultLabelGroupsFromJSON(jlabelsets);
 
-    if (labelsets.size() != groupImages.size())
+    if (labelsets.size() != output->GetNumberOfLayers())
     {
-      mitkThrow() << "Loaded data is in an invalid state. Number of extracted layer images and labels sets does not match. Found layer images: " << groupImages.size() << "; found labelsets: " << labelsets.size();
+      mitkThrow() << "Loaded data is in an invalid state. Number of extracted layer images and labels sets does not match. Found layer images: " << output->GetNumberOfLayers() << "; found labelsets: " << labelsets.size();
     }
-
-    //construct multi layer segmentation out of layers and labelset info instances
-    LabelSetImage::LabelValueType maxValue = LabelSetImage::UnlabeledLabelValue;
-    auto imageIterator = groupImages.begin();
-    std::vector<mitk::LabelSet::Pointer> adaptedLabelSets;
-
-    auto output = ConvertImageVectorToLabelSetImage(groupImages, rawimage->GetTimeGeometry());
 
     LabelSetImage::SpatialGroupIndexType id = 0;
     for (auto labelset : labelsets)

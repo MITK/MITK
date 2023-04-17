@@ -192,6 +192,7 @@ mitk::LabelSet::Pointer mitk::GenerateLabelSetWithMappedValues(const LabelSet* s
     clonedLabel->SetValue(destLabelID);
     result->AddLabel(clonedLabel, false);
   }
+  result->SetLayer(sourceLabelset->GetLayer());
 
   return result;
 }

@@ -137,7 +137,12 @@ namespace mitk
 
     const itk::MetaDataDictionary& dictionary = nrrdImageIO->GetMetaDataDictionary();
 
-    auto groupImages = SplitVectorImage(rawimage);
+    std::vector<Image::Pointer> groupImages = { rawimage };
+    if (rawimage->GetChannelDescriptor().GetPixelType().GetPixelType() == itk::IOPixelEnum::VECTOR)
+    {
+      groupImages = SplitVectorImage(rawimage);
+    }
+
     auto labelsets = ExtractLabelSetsFromMetaData(dictionary);
 
     if (labelsets.size() != groupImages.size())
@@ -158,6 +163,7 @@ namespace mitk
       {
         auto output = ConvertImageToLabelSetImage(image);
         output->AddLabelSetToLayer(0, *labelSetIterator);
+        output->GetLabelSet(0)->SetLayer(0);
 
         //meta data handling
         for (auto& [name, prop] : *(props->GetMap()))

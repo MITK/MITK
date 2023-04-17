@@ -58,7 +58,7 @@ namespace
   QList<QmitkRenderWindow*> Get2DWindows(const QList<QmitkRenderWindow*> allWindows)
   {
     QList<QmitkRenderWindow*> all2DWindows;
-    for (auto window : allWindows)
+    for (auto* window : allWindows)
     {
       if (window->GetRenderer()->GetMapperID() == mitk::BaseRenderer::Standard2D)
       {

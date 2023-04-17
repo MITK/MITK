@@ -12,6 +12,7 @@ found in the LICENSE file.
 
 #include "QmitkSlicesInterpolator.h"
 #include "QmitkRenderWindow.h"
+#include "QmitkRenderWindowWidget.h"
 
 #include "mitkApplyDiffImageOperation.h"
 #include "mitkColorProperty.h"
@@ -73,23 +74,6 @@ namespace
       ? dynamic_cast<T*>(dataNode->GetData())
       : nullptr;
   }
-
-  std::string MatchStdWindowNames(std::string windowName)
-  {
-    if (windowName == "stdmulti.widget0")
-    {
-      return "Axial";
-    }
-    else if (windowName == "stdmulti.widget1")
-    {
-      return "Sagittal";
-    }
-    else if (windowName == "stdmulti.widget2")
-    {
-      return "Coronal";
-    }
-    return windowName;
-  }
 }
 
 float SURFACE_COLOR_RGB[3] = {0.49f, 1.0f, 0.16f};
@@ -97,10 +81,18 @@ float SURFACE_COLOR_RGB[3] = {0.49f, 1.0f, 0.16f};
 const std::map<QAction *, mitk::SliceNavigationController *> QmitkSlicesInterpolator::createActionToSlicer(const QList<QmitkRenderWindow*>& windows)
 {
   std::map<QAction *, mitk::SliceNavigationController *> actionToSliceDimension;
-  foreach (auto window, windows)
+  for (auto* window : windows)
   {
-    std::string windowName = window->GetRenderer()->GetName();
-    windowName = MatchStdWindowNames(windowName);
+    std::string windowName;
+    auto renderWindowWidget = dynamic_cast<QmitkRenderWindowWidget*>(window->parentWidget());
+    if (renderWindowWidget)
+    {
+      windowName = renderWindowWidget->GetCornerAnnotationText();
+    }
+    else
+    {
+      windowName = window->GetRenderer()->GetName();
+    }
     auto slicer = window->GetSliceNavigationController();
     actionToSliceDimension[new QAction(QString::fromStdString(windowName), nullptr)] = slicer;
   }
@@ -467,7 +459,7 @@ void QmitkSlicesInterpolator::Initialize(mitk::ToolManager *toolManager,
       this, &QmitkSlicesInterpolator::OnToolManagerReferenceDataModified);
 
     // connect to the slice navigation controller. after each change, call the interpolator
-    foreach(auto window, windows)
+    for (auto* window : windows)
     {
       this->InitializeWindow(window);
     }
@@ -487,7 +479,7 @@ void QmitkSlicesInterpolator::Uninitialize()
     m_ToolManager->ReferenceDataChanged -= mitk::MessageDelegate<QmitkSlicesInterpolator>(
       this, &QmitkSlicesInterpolator::OnToolManagerReferenceDataModified);
   }
-  foreach (auto slicer, m_ControllerToTimeObserverTag.keys())
+  for (auto* slicer : m_ControllerToTimeObserverTag.keys())
   {
     slicer->RemoveObserver(m_ControllerToDeleteObserverTag.take(slicer));
     slicer->RemoveObserver(m_ControllerToTimeObserverTag.take(slicer));
@@ -921,7 +913,7 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
 
   m_BtnReinit3DInterpolation->setEnabled(true);
 
-  foreach (auto slicer, m_ControllerToTimeObserverTag.keys())
+  for (auto* slicer : m_ControllerToTimeObserverTag.keys())
   {
     slicer->GetRenderer()->RequestUpdate();
   }
@@ -1153,8 +1145,7 @@ void QmitkSlicesInterpolator::FinishInterpolation(mitk::SliceNavigationControlle
 void QmitkSlicesInterpolator::OnAcceptAllInterpolationsClicked()
 {
   QMenu orientationPopup(this);
-  std::map<QAction *, mitk::SliceNavigationController *>::const_iterator it;
-  for (it = m_ActionToSlicer.begin(); it != m_ActionToSlicer.end(); it++)
+  for (auto it = m_ActionToSlicer.begin(); it != m_ActionToSlicer.end(); ++it)
     orientationPopup.addAction(it->first);
 
   connect(&orientationPopup, SIGNAL(triggered(QAction *)), this, SLOT(OnAcceptAllPopupActivated(QAction *)));
@@ -1356,7 +1347,7 @@ void QmitkSlicesInterpolator::OnAcceptAllPopupActivated(QAction *action)
 {
   try
   {
-    std::map<QAction *, mitk::SliceNavigationController *>::const_iterator iter = m_ActionToSlicer.find(action);
+    auto iter = m_ActionToSlicer.find(action);
     if (iter != m_ActionToSlicer.end())
     {
       mitk::SliceNavigationController *slicer = iter->second;

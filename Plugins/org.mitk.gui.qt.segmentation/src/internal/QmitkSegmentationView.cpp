@@ -53,6 +53,22 @@ found in the LICENSE file.
 
 #include <regex>
 
+namespace
+{
+  QList<QmitkRenderWindow*> Get2DWindows(const QList<QmitkRenderWindow*> allWindows)
+  {
+    QList<QmitkRenderWindow*> all2DWindows;
+    for (auto* window : allWindows)
+    {
+      if (window->GetRenderer()->GetMapperID() == mitk::BaseRenderer::Standard2D)
+      {
+        all2DWindows.append(window);
+      }
+    }
+    return all2DWindows;
+  }
+}
+
 const std::string QmitkSegmentationView::VIEW_ID = "org.mitk.views.segmentation";
 
 QmitkSegmentationView::QmitkSegmentationView()
@@ -618,12 +634,8 @@ void QmitkSegmentationView::RenderWindowPartActivated(mitk::IRenderWindowPart* r
 
   if (nullptr != m_RenderWindowPart)
   {
-    // tell the interpolation about tool manager, data storage and render window part
-    QList<mitk::SliceNavigationController*> controllers;
-    controllers.push_back(m_RenderWindowPart->GetQmitkRenderWindow("axial")->GetSliceNavigationController());
-    controllers.push_back(m_RenderWindowPart->GetQmitkRenderWindow("sagittal")->GetSliceNavigationController());
-    controllers.push_back(m_RenderWindowPart->GetQmitkRenderWindow("coronal")->GetSliceNavigationController());
-    m_Controls->slicesInterpolator->Initialize(m_ToolManager, controllers);
+    auto all2DWindows = Get2DWindows(m_RenderWindowPart->GetQmitkRenderWindows().values());
+    m_Controls->slicesInterpolator->Initialize(m_ToolManager, all2DWindows);
 
     if (!m_RenderWindowPart->HasCoupledRenderWindows())
     {
@@ -647,6 +659,18 @@ void QmitkSegmentationView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*
     mitk::MessageDelegate<QmitkSegmentationView>(this, &QmitkSegmentationView::ActiveToolChanged);
 
   m_Controls->slicesInterpolator->Uninitialize();
+}
+
+void QmitkSegmentationView::RenderWindowPartInputChanged(mitk::IRenderWindowPart* /*renderWindowPart*/)
+{
+  if (nullptr == m_RenderWindowPart)
+  {
+    return;
+  }
+
+  m_Controls->slicesInterpolator->Uninitialize();
+  auto all2DWindows = Get2DWindows(m_RenderWindowPart->GetQmitkRenderWindows().values());
+  m_Controls->slicesInterpolator->Initialize(m_ToolManager, all2DWindows);
 }
 
 void QmitkSegmentationView::OnPreferencesChanged(const mitk::IPreferences* prefs)

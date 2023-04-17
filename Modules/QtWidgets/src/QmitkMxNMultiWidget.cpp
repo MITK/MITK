@@ -456,6 +456,7 @@ void QmitkMxNMultiWidget::LoadLayout(const nlohmann::json* jsonData)
   }
 
   EnableCrosshair();
+  emit LayoutChanged();
 }
 
 void QmitkMxNMultiWidget::SaveLayout(std::ostream* outStream)

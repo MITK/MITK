@@ -1038,7 +1038,7 @@ void mitk::LabelSetImage::OnLabelRemoved(LabelValueType labelValue)
 
 void mitk::LabelSetImage::OnGroupAdded(SpatialGroupIndexType groupIndex)
 {
-  auto result = m_GroupToLabelMap.insert(std::make_pair(groupIndex, LabelValueVectorType()));
+  this->m_GroupToLabelMap.insert(std::make_pair(groupIndex, LabelValueVectorType()));
 
   this->m_GroupAddedMessage.Send(groupIndex);
 }

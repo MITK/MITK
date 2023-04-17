@@ -15,6 +15,7 @@ found in the LICENSE file.
 // mitk
 #include <mitkRenderingManager.h>
 #include <mitkLabelSetImageHelper.h>
+#include <mitkDICOMSegmentationPropertyHelper.h>
 
 // Qmitk
 #include <QmitkMultiLabelTreeModel.h>
@@ -982,6 +983,7 @@ void QmitkMultiLabelInspector::OnRenameLabel(bool /*value*/)
       label->SetName(currentLabel->GetName());
       label->SetColor(currentLabel->GetColor());
       group->UpdateLookupTable(label->GetValue());
+      mitk::DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(label);
     }
   }
 }
@@ -993,10 +995,6 @@ void QmitkMultiLabelInspector::SetLockOfAffectedLabels(bool locked) const
 
   if (!relevantLabelValues.empty())
   {
-    //we assume here that all affacted label belong to one group.
-    auto groupID = m_Segmentation->GetGroupIndexOfLabel(relevantLabelValues.front());
-    auto group = m_Segmentation->GetLabelSet(groupID);
-
     for (auto value : relevantLabelValues)
     {
       auto label = this->m_Segmentation->GetLabel(value);

@@ -35,11 +35,11 @@ namespace mitk
 {
   class LabelSetImage;
 
-  constexpr char* const PROPERTY_NAME_TIMEGEOMETRY_TYPE = "org.mitk.timegeometry.type";
-  constexpr char* const PROPERTY_NAME_TIMEGEOMETRY_TIMEPOINTS = "org.mitk.timegeometry.timepoints";
-  constexpr char* const PROPERTY_KEY_TIMEGEOMETRY_TYPE = "org_mitk_timegeometry_type";
-  constexpr char* const PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS = "org_mitk_timegeometry_timepoints";
-  constexpr char* const PROPERTY_KEY_UID = "org_mitk_uid";
+  const constexpr char* const PROPERTY_NAME_TIMEGEOMETRY_TYPE = "org.mitk.timegeometry.type";
+  const constexpr char* const PROPERTY_NAME_TIMEGEOMETRY_TIMEPOINTS = "org.mitk.timegeometry.timepoints";
+  const constexpr char* const PROPERTY_KEY_TIMEGEOMETRY_TYPE = "org_mitk_timegeometry_type";
+  const constexpr char* const PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS = "org_mitk_timegeometry_timepoints";
+  const constexpr char* const PROPERTY_KEY_UID = "org_mitk_uid";
 
   /**
    * @brief The MultiLabelIOHelper is a static helper class that supports serialization of mitk::LabelSetImage

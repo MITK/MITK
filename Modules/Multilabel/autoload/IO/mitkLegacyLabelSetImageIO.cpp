@@ -39,9 +39,9 @@ found in the LICENSE file.
 namespace mitk
 {
 
-  constexpr char* const OPTION_NAME_MULTI_LAYER = "Multi layer handling";
-  constexpr char* const OPTION_NAME_MULTI_LAYER_ADAPT = "Adapt label values";
-  constexpr char* const OPTION_NAME_MULTI_LAYER_SPLIT = "Split layers";
+  const constexpr char* const OPTION_NAME_MULTI_LAYER = "Multi layer handling";
+  const constexpr char* const OPTION_NAME_MULTI_LAYER_ADAPT = "Adapt label values";
+  const constexpr char* const OPTION_NAME_MULTI_LAYER_SPLIT = "Split layers";
 
   LegacyLabelSetImageIO::LegacyLabelSetImageIO()
     : AbstractFileReader(MitkMultilabelIOMimeTypes::LEGACYLABELSET_MIMETYPE(), "MITK LabelSetImage (legacy)")

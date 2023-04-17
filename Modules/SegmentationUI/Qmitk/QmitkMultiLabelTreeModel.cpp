@@ -396,7 +396,9 @@ QVariant QmitkMultiLabelTreeModel::data(const QModelIndex &index, int role) cons
   }
   else if (role == ItemModelRole::GroupIDRole)
   {
-    return QVariant(item->GetGroupID());
+    QVariant v;
+    v.setValue(item->GetGroupID());
+    return v;
   }
 
   return QVariant();

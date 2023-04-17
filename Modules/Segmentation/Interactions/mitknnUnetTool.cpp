@@ -25,11 +25,6 @@ namespace mitk
   MITK_TOOL_MACRO(MITKSEGMENTATION_EXPORT, nnUNetTool, "nnUNet tool");
 }
 
-mitk::nnUNetTool::nnUNetTool()
-{
-  this->SetMitkTempDir(IOUtil::CreateTemporaryDirectory("mitk-XXXXXX"));
-}
-
 mitk::nnUNetTool::~nnUNetTool()
 {
   itksys::SystemTools::RemoveADirectory(this->GetMitkTempDir());
@@ -128,6 +123,10 @@ namespace
 
 void mitk::nnUNetTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image* /*oldSegAtTimeStep*/, LabelSetImage* previewImage, TimeStepType /*timeStep*/)
 {
+  if (this->GetMitkTempDir().empty())
+  {
+    this->SetMitkTempDir(IOUtil::CreateTemporaryDirectory("mitk-XXXXXX"));
+  }
   std::string inDir, outDir, inputImagePath, outputImagePath, scriptPath;
 
   ProcessExecutor::Pointer spExec = ProcessExecutor::New();
@@ -179,9 +178,6 @@ void mitk::nnUNetTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image
   }
   catch (const mitk::Exception &e)
   {
-    /*
-    Can't throw mitk exception to the caller. Refer: T28691
-    */
     MITK_ERROR << e.GetDescription();
     return;
   }
@@ -311,9 +307,6 @@ void mitk::nnUNetTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image
   }
   catch (const mitk::Exception &e)
   {
-    /*
-    Can't throw mitk exception to the caller. Refer: T28691
-    */
     MITK_ERROR << e.GetDescription();
     return;
   }

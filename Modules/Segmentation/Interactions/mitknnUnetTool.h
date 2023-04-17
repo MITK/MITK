@@ -164,10 +164,10 @@ namespace mitk
 
   protected:
     /**
-     * @brief Construct a new nnUNet Tool object and temp directory.
+     * @brief Construct a new nnUNet Tool object.
      *
      */
-    nnUNetTool();
+    nnUNetTool() = default;
 
     /**
      * @brief Destroy the nnUNet Tool object and deletes the temp directory.

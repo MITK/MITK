@@ -197,12 +197,13 @@ std::vector<mitk::Image::ConstPointer> QmitknnUNetToolGUI::FetchMultiModalImages
   if (m_Controls.multiModalBox->isChecked() && !m_Modalities.empty())
   {
     std::set<std::string> nodeNames; // set container for keeping names of all nodes to check if they are added twice.
-    for (QmitkDataStorageComboBox *modality : m_Modalities)
-    {
-      if (nodeNames.find(modality->GetSelectedNode()->GetName()) == nodeNames.end())
+    for (QmitkSingleNodeSelectionWidget *modality : m_Modalities)
+    { 
+      mitk::DataNode::Pointer node = modality->GetSelectedNode();
+      if (nodeNames.find(node->GetName()) == nodeNames.end())
       {
-        modals.push_back(dynamic_cast<const mitk::Image *>(modality->GetSelectedNode()->GetData()));
-        nodeNames.insert(modality->GetSelectedNode()->GetName());
+        modals.push_back(dynamic_cast<const mitk::Image *>(node->GetData()));
+        nodeNames.insert(node->GetName());
       }
       else
       {
@@ -970,11 +971,17 @@ void QmitknnUNetToolGUI::OnPythonPathChanged(const QString &pyEnv)
     }
     this->OnRefreshPresssed();
     m_PythonPath = pyEnv.mid(pyEnv.indexOf(" ") + 1);
+#ifdef _WIN32
+    if (!(m_PythonPath.endsWith("Scripts", Qt::CaseInsensitive) || m_PythonPath.endsWith("Scripts/", Qt::CaseInsensitive)))
+    {
+      m_PythonPath += QDir::separator() + QString("Scripts");
+    }
+#else
     if (!(m_PythonPath.endsWith("bin", Qt::CaseInsensitive) || m_PythonPath.endsWith("bin/", Qt::CaseInsensitive)))
     {
       m_PythonPath += QDir::separator() + QString("bin");
     }
-    
+#endif
     // Export available model info as json and fill them for Download
     QString tempPath = QString::fromStdString(mitk::IOUtil::GetTempPath());
     this->ExportAvailableModelsAsJSON(tempPath);
@@ -1014,17 +1021,18 @@ void QmitknnUNetToolGUI::OnModalitiesNumberChanged(int num)
 {
   while (num > static_cast<int>(m_Modalities.size()))
   {
-    QmitkDataStorageComboBox *multiModalBox = new QmitkDataStorageComboBox(this, true);
+    QmitkSingleNodeSelectionWidget *multiModalBox = new QmitkSingleNodeSelectionWidget(this);
     mitk::nnUNetTool::Pointer tool = this->GetConnectedToolAs<mitk::nnUNetTool>();
     multiModalBox->SetDataStorage(tool->GetDataStorage());
-    multiModalBox->SetPredicate(m_MultiModalPredicate);
+    multiModalBox->SetInvalidInfo("Select corresponding modalities");
+    multiModalBox->SetNodePredicate(m_MultiModalPredicate);
     multiModalBox->setObjectName(QString("multiModal_" + QString::number(m_Modalities.size() + 1)));
     m_Controls.advancedSettingsLayout->addWidget(multiModalBox, m_UI_ROWS + m_Modalities.size() + 1, 1, 1, 3);
     m_Modalities.push_back(multiModalBox);
   }
   while (num < static_cast<int>(m_Modalities.size()) && !m_Modalities.empty())
   {
-    QmitkDataStorageComboBox *child = m_Modalities.back();
+    QmitkSingleNodeSelectionWidget *child = m_Modalities.back();
     delete child; // delete the layout item
     m_Modalities.pop_back();
   }

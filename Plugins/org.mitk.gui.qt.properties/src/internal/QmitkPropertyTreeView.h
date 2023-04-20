@@ -53,6 +53,7 @@ public:
   void SetFocus() override;
 
   void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartInputChanged(mitk::IRenderWindowPart*) override;
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart*) override;
 
 protected:
@@ -61,6 +62,8 @@ protected:
 
 private:
 
+  void ResetRenderWindowComboBox();
+  void UpdateRenderWindowComboBox(mitk::IRenderWindowPart* renderWindowPart);
   void SetAsSelectionListener(bool checked);
 
   QString GetPropertyNameOrAlias(const QModelIndex& index);

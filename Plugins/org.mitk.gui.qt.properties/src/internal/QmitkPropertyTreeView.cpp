@@ -71,26 +71,40 @@ void QmitkPropertyTreeView::SetFocus()
   m_Controls.filterLineEdit->setFocus();
 }
 
+void QmitkPropertyTreeView::ResetRenderWindowComboBox()
+{
+  m_Controls.propertyListComboBox->clear();
+  m_Controls.propertyListComboBox->addItem("Data node: common");
+  m_Controls.propertyListComboBox->addItem("Base data");
+}
+
+void QmitkPropertyTreeView::UpdateRenderWindowComboBox(mitk::IRenderWindowPart* renderWindowPart)
+{
+  this->ResetRenderWindowComboBox();
+
+  QHash<QString, QmitkRenderWindow*> renderWindows = renderWindowPart->GetQmitkRenderWindows();
+
+  for (auto renderWindowName : renderWindows.keys())
+  {
+    m_Controls.propertyListComboBox->insertItem(m_Controls.propertyListComboBox->count() - 1, QString("Data node: ") + renderWindowName);
+  }
+}
+
 void QmitkPropertyTreeView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
 {
-  if (m_Controls.propertyListComboBox->count() == 2)
-  {
-    QHash<QString, QmitkRenderWindow*> renderWindows = renderWindowPart->GetQmitkRenderWindows();
+  this->UpdateRenderWindowComboBox(renderWindowPart);
+}
 
-    Q_FOREACH(QString renderWindow, renderWindows.keys())
-    {
-      m_Controls.propertyListComboBox->insertItem(m_Controls.propertyListComboBox->count() - 1, QString("Data node: ") + renderWindow);
-    }
-  }
+void QmitkPropertyTreeView::RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart)
+{
+  this->UpdateRenderWindowComboBox(renderWindowPart);
 }
 
 void QmitkPropertyTreeView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*)
 {
   if (m_Controls.propertyListComboBox->count() > 2)
   {
-    m_Controls.propertyListComboBox->clear();
-    m_Controls.propertyListComboBox->addItem("Data node: common");
-    m_Controls.propertyListComboBox->addItem("Base data");
+    this->ResetRenderWindowComboBox();
   }
 }
 

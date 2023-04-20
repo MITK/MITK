@@ -19,6 +19,7 @@ found in the LICENSE file.
 #include <usModule.h>
 #include <usModuleContext.h>
 #include <usModuleResource.h>
+#include <filesystem>
 
 namespace mitk
 {
@@ -27,7 +28,7 @@ namespace mitk
 
 mitk::nnUNetTool::~nnUNetTool()
 {
-  itksys::SystemTools::RemoveADirectory(this->GetMitkTempDir());
+  std::filesystem::remove_all(this->GetMitkTempDir());
 }
 
 void mitk::nnUNetTool::Activated()
@@ -125,7 +126,7 @@ void mitk::nnUNetTool::DoUpdatePreview(const Image* inputAtTimeStep, const Image
 {
   if (this->GetMitkTempDir().empty())
   {
-    this->SetMitkTempDir(IOUtil::CreateTemporaryDirectory("mitk-XXXXXX"));
+    this->SetMitkTempDir(IOUtil::CreateTemporaryDirectory("mitk-nnunet-XXXXXX"));
   }
   std::string inDir, outDir, inputImagePath, outputImagePath, scriptPath;
 

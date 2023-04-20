@@ -32,7 +32,7 @@ namespace mitk
 
 mitk::TotalSegmentatorTool::~TotalSegmentatorTool()
 {
-  itksys::SystemTools::RemoveADirectory(this->GetMitkTempDir());
+  std::filesystem::remove_all(this->GetMitkTempDir());
 }
 
 mitk::TotalSegmentatorTool::TotalSegmentatorTool()

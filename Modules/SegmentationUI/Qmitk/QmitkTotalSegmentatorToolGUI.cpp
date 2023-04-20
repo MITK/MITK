@@ -420,7 +420,8 @@ void QmitkTotalSegmentatorToolGUI::OnOverrideChecked(int state)
     m_Controls.previewButton->setDisabled(true);
     if (m_IsInstalled)
     {
-      m_PythonPath = m_Installer.GetVirtualEnvPath();
+      const QString pythonPath = m_Installer.GetVirtualEnvPath();
+      m_PythonPath = this->GetExactPythonPath(pythonPath);
       this->EnableAll(m_IsInstalled);
     }
   }

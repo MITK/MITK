@@ -1005,7 +1005,7 @@ void QmitkSegmentationView::ValidateSelectionInput()
 
   if (hasReferenceNode)
   {
-    if (!referenceNode->IsVisible(nullptr))
+    if (nullptr != m_RenderWindowPart && m_RenderWindowPart->HasCoupledRenderWindows() && !referenceNode->IsVisible(nullptr))
     {
       warning += tr("The selected reference image is currently not visible!");
       toolSelectionBoxesEnabled = false;
@@ -1014,7 +1014,7 @@ void QmitkSegmentationView::ValidateSelectionInput()
 
   if (hasWorkingNode)
   {
-    if (!workingNode->IsVisible(nullptr))
+    if (nullptr != m_RenderWindowPart && m_RenderWindowPart->HasCoupledRenderWindows() && !workingNode->IsVisible(nullptr))
     {
       warning += (!warning.isEmpty() ? "<br>" : "") + tr("The selected segmentation is currently not visible!");
       toolSelectionBoxesEnabled = false;
@@ -1042,6 +1042,9 @@ void QmitkSegmentationView::ValidateSelectionInput()
   // is aligned with the geometry of the 3D render window.
   // It is not allowed to use a geometry different from the working image geometry for segmenting.
   // We only need to this if the tool selection box would be enabled without this check.
+  // Additionally this check only has to be performed for render window parts with coupled render windows.
+  // For different render window parts the user is given the option to reinitialize each render window individually
+  // (see QmitkRenderWindow::ShowOverlayMessage).
   if (toolSelectionBoxesEnabled && nullptr != m_RenderWindowPart && m_RenderWindowPart->HasCoupledRenderWindows())
   {
     const mitk::BaseGeometry* workingNodeGeometry = workingNode->GetData()->GetGeometry();

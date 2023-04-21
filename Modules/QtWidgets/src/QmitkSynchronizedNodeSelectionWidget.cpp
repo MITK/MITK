@@ -423,6 +423,14 @@ void QmitkSynchronizedNodeSelectionWidget::OnNodeAddedToStorage(const mitk::Data
     return;
   }
 
+  // For helper / hidden nodes
+  if (m_NodePredicate.IsNotNull() && !m_NodePredicate->CheckNode(node))
+  {
+    // If the node predicate does not match, do not add the node to the current selection.
+    // Leave the visibility as it is.
+    return;
+  }
+
   // The selection mode determines if we want to show all nodes from the data storage
   // or use a local selected list of nodes.
   // We need to hide each new incoming data node, if we use a local selection,
@@ -431,46 +439,43 @@ void QmitkSynchronizedNodeSelectionWidget::OnNodeAddedToStorage(const mitk::Data
   // is checked.
   // We want to add the incoming node to our selection, if the node is a child node
   // of an already selected node.
+  // Nodes added to the selection will be made visible.
   if (m_Controls.selectionModeCheckBox->isChecked() || this->IsParentNodeSelected(node))
   {
-    if (m_NodePredicate.IsNull() || m_NodePredicate->CheckNode(node))
+    auto currentSelection = this->GetCurrentInternalSelection();
+    // Check if the nodes is already part of the internal selection.
+    // That can happen if another render window already added the new node and sent out the new, updated
+    // selection to be synchronized.
+    auto finding = std::find(std::begin(currentSelection), std::end(currentSelection), node);
+    if (finding != std::end(currentSelection)) // node found
     {
-      auto currentSelection = this->GetCurrentInternalSelection();
-      // Check if the nodes is already part of the internal selection.
-      // That can happen if another render window already added the new node and sent out the new, updated
-      // selection to be synchronized.
-      auto finding = std::find(std::begin(currentSelection), std::end(currentSelection), node);
-      if (finding != std::end(currentSelection)) // node found
-      {
-        // node already part of the selection
-        return;
-      }
-
-      currentSelection.append(const_cast<mitk::DataNode*>(node));
-      this->HandleChangeOfInternalSelection(currentSelection);
+      // node already part of the selection
+      return;
     }
 
-    // For helper / hidden nodes:
-    // If the node predicate does not match, show the node but do not add
-    // it to the current selection.
-    return;
-  }
-
-  // If the model is in "local-selection" state (selectionModeCheckBox unchecked),
-  // the node needs to be hid.
-  // Here it depends on the synchronization-state which properties need
-  // to be modified.
-  if (this->IsSynchronized())
-  {
-    // If the node will not be part of the new selection, hide the node.
-    const_cast<mitk::DataNode*>(node)->SetVisibility(false);
+    currentSelection.append(const_cast<mitk::DataNode*>(node));
+    // This function will call 'QmitkSynchronizedNodeSelectionWidget::ReviseSelectionChanged'
+    // which will take care of the visibility-property for newly added node.
+    this->HandleChangeOfInternalSelection(currentSelection);
   }
   else
   {
-    // If the model is not synchronized, all nodes use renderer-specific properties.
-    // Thus we need to modify the renderer-specific properties of a new node:
-    //  - hide the node, which is not part of the selection
-    this->DeselectNode(const_cast<mitk::DataNode*>(node));
+    // If the widget is in "local-selection" state (selectionModeCheckBox unchecked),
+    // the new incoming node needs to be hid.
+    // Here it depends on the synchronization-state which properties need
+    // to be modified.
+    if (this->IsSynchronized())
+    {
+      // If the node will not be part of the new selection, hide the node.
+      const_cast<mitk::DataNode*>(node)->SetVisibility(false);
+    }
+    else
+    {
+      // If the widget is not synchronized, all nodes use renderer-specific properties.
+      // Thus we need to modify the renderer-specific properties of the node:
+      //  - hide the node, which is not part of the selection
+      this->DeselectNode(const_cast<mitk::DataNode*>(node));
+    }
   }
 }
 

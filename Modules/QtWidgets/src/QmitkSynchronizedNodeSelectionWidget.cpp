@@ -429,7 +429,9 @@ void QmitkSynchronizedNodeSelectionWidget::OnNodeAddedToStorage(const mitk::Data
   // since we do not want to show / select newly added nodes immediately.
   // We need to add the incoming node to our selection, if the selection mode check box
   // is checked.
-  if (m_Controls.selectionModeCheckBox->isChecked())
+  // We want to add the incoming node to our selection, if the node is a child node
+  // of an already selected node.
+  if (m_Controls.selectionModeCheckBox->isChecked() || this->IsParentNodeSelected(node))
   {
     if (m_NodePredicate.IsNull() || m_NodePredicate->CheckNode(node))
     {
@@ -643,6 +645,30 @@ void QmitkSynchronizedNodeSelectionWidget::RemoveFromInternalSelection(mitk::Dat
   emit SelectionModeChanged(false);
 
   this->RemoveNodeFromSelection(dataNode);
+}
+
+bool QmitkSynchronizedNodeSelectionWidget::IsParentNodeSelected(const mitk::DataNode* dataNode) const
+{
+  auto dataStorage = m_DataStorage.Lock();
+  if (dataStorage.IsNull())
+  {
+    return false;
+  }
+
+  auto currentSelection = this->GetCurrentInternalSelection();
+  auto parentNodes = dataStorage->GetSources(dataNode, m_NodePredicate, false);
+  for (auto it = parentNodes->Begin(); it != parentNodes->End(); ++it)
+  {
+    const mitk::DataNode* parentNode = it->Value();
+    auto finding = std::find(std::begin(currentSelection), std::end(currentSelection), parentNode);
+    if (finding != std::end(currentSelection)) // parent node found
+    {
+      // at least one parent node is part of the selection
+      return true;
+    }
+  }
+
+  return false;
 }
 
 void QmitkSynchronizedNodeSelectionWidget::DeselectNode(mitk::DataNode* dataNode)

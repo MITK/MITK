@@ -102,10 +102,7 @@ void QmitkPropertyTreeView::RenderWindowPartInputChanged(mitk::IRenderWindowPart
 
 void QmitkPropertyTreeView::RenderWindowPartDeactivated(mitk::IRenderWindowPart*)
 {
-  if (m_Controls.propertyListComboBox->count() > 2)
-  {
-    this->ResetRenderWindowComboBox();
-  }
+  this->ResetRenderWindowComboBox();
 }
 
 void QmitkPropertyTreeView::CreateQtPartControl(QWidget* parent)

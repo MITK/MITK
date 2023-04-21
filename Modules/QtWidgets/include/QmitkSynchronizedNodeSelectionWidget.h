@@ -88,6 +88,7 @@ private:
   void ReviseDesynchronizedSelectionChanged(const NodeList& oldInternalSelection, NodeList& newInternalSelection);
   void ReinitNode(const mitk::DataNode* dataNode);
   void RemoveFromInternalSelection(mitk::DataNode* dataNode);
+  bool IsParentNodeSelected(const mitk::DataNode* dataNode) const;
   void DeselectNode(mitk::DataNode* dataNode);
 
   Ui::QmitkSynchronizedNodeSelectionWidget m_Controls;

@@ -674,6 +674,7 @@ namespace mitk
 #endif
 
       QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+      QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
       d->m_QApp = this->getSingleMode()
         ? static_cast<QCoreApplication*>(new QmitkSingleApplication(d->m_Argc, d->m_Argv, this->getSafeMode()))

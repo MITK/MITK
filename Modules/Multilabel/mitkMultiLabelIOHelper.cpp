@@ -326,28 +326,35 @@ nlohmann::json mitk::MultiLabelIOHelper::SerializeMultLabelGroupsToJSON(const mi
   for (LabelSetImage::GroupIndexType i = 0; i < inputImage->GetNumberOfLayers(); i++)
   {
     nlohmann::json jgroup;
+    nlohmann::json jlabels;
+
     for (const auto& label : inputImage->GetLabelsInGroup(i))
     {
-      jgroup.emplace_back(SerializeLabelToJSON(label));
+      jlabels.emplace_back(SerializeLabelToJSON(label));
     }
+    jgroup["labels"] = jlabels;
     result.emplace_back(jgroup);
   }
   return result;
 };
 
-std::vector<mitk::LabelSet::Pointer> mitk::MultiLabelIOHelper::DeserializeMultLabelGroupsFromJSON(const nlohmann::json& listOfLabelSets)
+std::vector<mitk::LabelSet::Pointer> mitk::MultiLabelIOHelper::DeserializeMultiLabelGroupsFromJSON(const nlohmann::json& listOfLabelSets)
 {
   std::vector<LabelSet::Pointer> result;
 
-  for (const auto& jlabelsets : listOfLabelSets)
+  for (const auto& jlabelset : listOfLabelSets)
   {
     LabelSet::Pointer labelSet = LabelSet::New();
-    for (const auto& jlabel : jlabelsets)
+    if (jlabelset.find("labels") != jlabelset.end())
     {
-      auto label = DeserializeLabelFromJSON(jlabel);
-      labelSet->AddLabel(label, false);
-    }
+      auto jlabels = jlabelset["labels"];
 
+      for (const auto& jlabel : jlabels)
+      {
+        auto label = DeserializeLabelFromJSON(jlabel);
+        labelSet->AddLabel(label, false);
+      }
+    }
     result.emplace_back(labelSet);
   }
 

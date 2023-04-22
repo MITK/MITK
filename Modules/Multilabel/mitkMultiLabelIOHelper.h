@@ -113,7 +113,7 @@ namespace mitk
 
     static nlohmann::json SerializeMultLabelGroupsToJSON(const mitk::LabelSetImage* inputImage);
 
-    static std::vector<LabelSet::Pointer> DeserializeMultLabelGroupsFromJSON(const nlohmann::json& listOfLabelSets);
+    static std::vector<LabelSet::Pointer> DeserializeMultiLabelGroupsFromJSON(const nlohmann::json& listOfLabelSets);
 
     static nlohmann::json SerializeLabelToJSON(const Label* label);
 

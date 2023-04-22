@@ -167,7 +167,7 @@ namespace mitk
     //get label set definitions
     auto jsonStr = MultiLabelIOHelper::GetStringByKey(dictionary, MULTILABEL_SEGMENTATION_LABELS_INFO_KEY);
     nlohmann::json jlabelsets = nlohmann::json::parse(jsonStr);
-    std::vector<mitk::LabelSet::Pointer> labelsets = MultiLabelIOHelper::DeserializeMultLabelGroupsFromJSON(jlabelsets);
+    std::vector<mitk::LabelSet::Pointer> labelsets = MultiLabelIOHelper::DeserializeMultiLabelGroupsFromJSON(jlabelsets);
 
     if (labelsets.size() != output->GetNumberOfLayers())
     {

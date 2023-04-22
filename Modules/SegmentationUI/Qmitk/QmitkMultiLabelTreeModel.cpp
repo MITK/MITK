@@ -207,7 +207,7 @@ QModelIndex GetIndexByItem(const QmitkMultiLabelSegTreeItem* start, const QmitkM
   return model->index(start->Row(), 0, parentIndex);
 }
 
-QmitkMultiLabelSegTreeItem* GetGroupItem(QmitkMultiLabelTreeModel::SpatialGroupIndexType groupIndex, QmitkMultiLabelSegTreeItem* root)
+QmitkMultiLabelSegTreeItem* GetGroupItem(QmitkMultiLabelTreeModel::GroupIndexType groupIndex, QmitkMultiLabelSegTreeItem* root)
 {
   if (nullptr != root && groupIndex < root->m_childItems.size())
   {
@@ -494,7 +494,7 @@ QModelIndex QmitkMultiLabelTreeModel::indexOfLabel(mitk::Label::PixelType labelV
   return GetIndexByItem(relevantItem, this);
 }
 
-QModelIndex QmitkMultiLabelTreeModel::indexOfGroup(mitk::LabelSetImage::SpatialGroupIndexType groupIndex) const
+QModelIndex QmitkMultiLabelTreeModel::indexOfGroup(mitk::LabelSetImage::GroupIndexType groupIndex) const
 {
   auto relevantItem = GetGroupItem(groupIndex, this->m_RootItem.get());
 
@@ -777,11 +777,11 @@ void QmitkMultiLabelTreeModel::AddObserver()
       this, &QmitkMultiLabelTreeModel::OnLabelModified));
     this->m_Segmentation->AddLabelRemovedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, LabelValueType>(
       this, &QmitkMultiLabelTreeModel::OnLabelRemoved));
-    this->m_Segmentation->AddGroupAddedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, SpatialGroupIndexType>(
+    this->m_Segmentation->AddGroupAddedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, GroupIndexType>(
       this, &QmitkMultiLabelTreeModel::OnGroupAdded));
-    this->m_Segmentation->AddGroupModifiedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, SpatialGroupIndexType>(
+    this->m_Segmentation->AddGroupModifiedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, GroupIndexType>(
       this, &QmitkMultiLabelTreeModel::OnGroupModified));
-    this->m_Segmentation->AddGroupRemovedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, SpatialGroupIndexType>(
+    this->m_Segmentation->AddGroupRemovedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, GroupIndexType>(
       this, &QmitkMultiLabelTreeModel::OnGroupRemoved));
     m_Observed = true;
   }
@@ -797,11 +797,11 @@ void QmitkMultiLabelTreeModel::RemoveObserver()
       this, &QmitkMultiLabelTreeModel::OnLabelModified));
     this->m_Segmentation->RemoveLabelRemovedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, LabelValueType>(
       this, &QmitkMultiLabelTreeModel::OnLabelRemoved));
-    this->m_Segmentation->RemoveGroupAddedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, SpatialGroupIndexType>(
+    this->m_Segmentation->RemoveGroupAddedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, GroupIndexType>(
       this, &QmitkMultiLabelTreeModel::OnGroupAdded));
-    this->m_Segmentation->RemoveGroupModifiedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, SpatialGroupIndexType>(
+    this->m_Segmentation->RemoveGroupModifiedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, GroupIndexType>(
       this, &QmitkMultiLabelTreeModel::OnGroupModified));
-    this->m_Segmentation->RemoveGroupRemovedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, SpatialGroupIndexType>(
+    this->m_Segmentation->RemoveGroupRemovedListener(mitk::MessageDelegate1<QmitkMultiLabelTreeModel, GroupIndexType>(
       this, &QmitkMultiLabelTreeModel::OnGroupRemoved));
   }
   m_Observed = false;
@@ -809,7 +809,7 @@ void QmitkMultiLabelTreeModel::RemoveObserver()
 
 void QmitkMultiLabelTreeModel::OnLabelAdded(LabelValueType labelValue)
 {
-  SpatialGroupIndexType groupIndex = 0;
+  GroupIndexType groupIndex = 0;
   if (m_Segmentation->IsLabeInGroup(labelValue, groupIndex))
   {
     auto label = m_Segmentation->GetLabel(labelValue);
@@ -921,7 +921,7 @@ void QmitkMultiLabelTreeModel::OnLabelRemoved(LabelValueType labelValue)
   }
 }
 
-void QmitkMultiLabelTreeModel::OnGroupAdded(SpatialGroupIndexType groupIndex)
+void QmitkMultiLabelTreeModel::OnGroupAdded(GroupIndexType groupIndex)
 {
   if (m_ShowGroups)
   {
@@ -934,12 +934,12 @@ void QmitkMultiLabelTreeModel::OnGroupAdded(SpatialGroupIndexType groupIndex)
   }
 }
 
-void QmitkMultiLabelTreeModel::OnGroupModified(SpatialGroupIndexType /*groupIndex*/)
+void QmitkMultiLabelTreeModel::OnGroupModified(GroupIndexType /*groupIndex*/)
 {
   //currently not needed
 }
 
-void QmitkMultiLabelTreeModel::OnGroupRemoved(SpatialGroupIndexType groupIndex)
+void QmitkMultiLabelTreeModel::OnGroupRemoved(GroupIndexType groupIndex)
 {
   if (m_ShowGroups)
   {

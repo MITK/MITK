@@ -115,8 +115,7 @@ public:
    * @brief Returns all the task names present in the root node with possible duplicates.
    * Template function, type can be any of stl or Qt containers which supports push_back call.
    *
-   * @param T
-   * @param taskName
+   * @tparam T
    * @return T (any of stl or Qt containers which supports push_back call)
    */
   template <typename T>

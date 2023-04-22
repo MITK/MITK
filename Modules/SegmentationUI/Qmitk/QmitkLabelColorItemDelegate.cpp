@@ -52,20 +52,13 @@ bool QmitkLabelColorItemDelegate::editorEvent(QEvent *event, QAbstractItemModel 
 
   // make sure that we have the right event type
   QMouseEvent* mouseEvent = dynamic_cast<QMouseEvent*>(event);
-  if (!mouseEvent)
+  if (nullptr == mouseEvent || mouseEvent->type() != QEvent::MouseButtonRelease || mouseEvent->button() != Qt::LeftButton)
   {
     return false;
   }
-  else
-  {
-    if (mouseEvent->type() != QEvent::MouseButtonRelease || mouseEvent->button() != Qt::LeftButton)
-    {
-      return false;
-    }
-  }
 
-  QColor oldcolor = index.data(Qt::EditRole).value<QColor>();
-  QColor newColor = QColorDialog::getColor(oldcolor, nullptr);
+  QColor oldColor = index.data(Qt::EditRole).value<QColor>();
+  QColor newColor = QColorDialog::getColor(oldColor, nullptr);
 
   if (newColor.isValid())
   {

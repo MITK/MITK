@@ -52,7 +52,8 @@ namespace mitk
     @param mimeTypeName Mime type that should be assumed for the meta data deserialization.
     @param defaultMetaDataKeys Vector of keys that should be assumed as defaults. For defaults no PropertyInfo will be registered
     at the PropertyPersistence service, as they are assumed to be handled anyways. For all other keys an info will be registered
-    to ensure that they will be serialized again, even if unkown.*/
+    to ensure that they will be serialized again, even if unkown.
+    @param dictionary Reference to the meta data dictionary that contains the information that should be extracted.*/
     static PropertyList::Pointer ExtractMetaDataAsPropertyList(const itk::MetaDataDictionary& dictionary, const std::string& mimeTypeName, const std::vector<std::string>& defaultMetaDataKeys);
 
     /** Helper function that van be used to extract a raw mitk image for the passed path using the also passed ImageIOBase instance.

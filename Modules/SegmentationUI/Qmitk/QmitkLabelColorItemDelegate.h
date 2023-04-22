@@ -16,10 +16,11 @@ found in the LICENSE file.
 
 #include <QStyledItemDelegate>
 
-#include "MitkSegmentationUIExports.h"
+#include <MitkSegmentationUIExports.h>
 
-/** \class QmitkLabelColorItemDelegate
-\brief An item delegate for rendering and editing label color in a QMultiLabelTreeView.*/
+/**
+\brief An item delegate for rendering and editing label color in a QmitkMultiLabelTreeView.
+*/
 class MITKSEGMENTATIONUI_EXPORT QmitkLabelColorItemDelegate : public QStyledItemDelegate
 {
   Q_OBJECT

@@ -34,7 +34,7 @@ class MITKSEGMENTATIONUI_EXPORT QmitkMultiLabelTreeModel : public QAbstractItemM
 
 public:
   using LabelValueType = mitk::LabelSetImage::LabelValueType;
-  using SpatialGroupIndexType = mitk::LabelSetImage::SpatialGroupIndexType;
+  using GroupIndexType = mitk::LabelSetImage::GroupIndexType;
 
   QmitkMultiLabelTreeModel(QObject *parent = nullptr);
   ~QmitkMultiLabelTreeModel() override;
@@ -56,7 +56,7 @@ public:
   /** returns the index of a passed label value (always first column). If label value does not exist in
   segmentation or segmentation is not set an invalid index will be returned.*/
   QModelIndex indexOfLabel(mitk::Label::PixelType labelValue) const;
-  QModelIndex indexOfGroup(mitk::LabelSetImage::SpatialGroupIndexType groupIndex) const;
+  QModelIndex indexOfGroup(mitk::LabelSetImage::GroupIndexType groupIndex) const;
   /** Returns the index to the next node in the tree that behaves like an instance (label node with only one instance
   or instance node). If current index is at the end, an invalid index is returned.*/
   QModelIndex ClosestLabelInstanceIndex(const QModelIndex& currentIndex) const;
@@ -121,9 +121,9 @@ protected:
   void OnLabelAdded(LabelValueType labelValue);
   void OnLabelModified(LabelValueType labelValue);
   void OnLabelRemoved(LabelValueType labelValue);
-  void OnGroupAdded(SpatialGroupIndexType groupIndex);
-  void OnGroupModified(SpatialGroupIndexType groupIndex);
-  void OnGroupRemoved(SpatialGroupIndexType groupIndex);
+  void OnGroupAdded(GroupIndexType groupIndex);
+  void OnGroupModified(GroupIndexType groupIndex);
+  void OnGroupRemoved(GroupIndexType groupIndex);
 
 private:
   void AddObserver();

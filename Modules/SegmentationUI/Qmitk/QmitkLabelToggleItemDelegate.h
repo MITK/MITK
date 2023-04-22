@@ -17,10 +17,11 @@ found in the LICENSE file.
 #include <QStyledItemDelegate>
 #include <QIcon>
 
-#include "MitkSegmentationUIExports.h"
+#include <MitkSegmentationUIExports.h>
 
-/** \class QmitkLabelToggleItemDelegate
-\brief An item delegate for rendering and editing properties that can be toggled (e.g. visibility).*/
+/**
+\brief An item delegate for rendering and editing properties that can be toggled (e.g. visibility).
+*/
 class MITKSEGMENTATIONUI_EXPORT QmitkLabelToggleItemDelegate : public QStyledItemDelegate
 {
   Q_OBJECT

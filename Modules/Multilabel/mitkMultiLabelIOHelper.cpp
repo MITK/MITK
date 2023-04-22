@@ -323,7 +323,7 @@ nlohmann::json mitk::MultiLabelIOHelper::SerializeMultLabelGroupsToJSON(const mi
 
   nlohmann::json result;
 
-  for (LabelSetImage::SpatialGroupIndexType i = 0; i < inputImage->GetNumberOfLayers(); i++)
+  for (LabelSetImage::GroupIndexType i = 0; i < inputImage->GetNumberOfLayers(); i++)
   {
     nlohmann::json jgroup;
     for (const auto& label : inputImage->GetLabelsInGroup(i))

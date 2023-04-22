@@ -54,11 +54,11 @@ namespace mitk
     // Section that already contains declarations used in the new class.
     // So this part of the interface will stay after refactoring towards
     // the new MultiLabelSegmentation class (see T28524). This section was introduced
-    // because some of the planed features are already urgently needed.
+    // because some of the planned features are already urgently needed.
     ///////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////
 
-    using SpatialGroupIndexType = std::size_t;
+    using GroupIndexType = std::size_t;
     using LabelValueType = mitk::Label::PixelType;
     const static LabelValueType UnlabeledLabelValue = 0;
     using ConstLabelVectorType = std::vector<Label::ConstPointer>;
@@ -67,29 +67,28 @@ namespace mitk
 
     /**
      * @brief Removes the label with the given value.
-     *        The label is removed from the labelset of the given layer and
-     *        the pixel values of the image below the label are reset.
+     *        The label is removed from the labelset and
+     *        the pixel with the value of the label are set to UnlabeledLabelValue.
      * @param labelValue the pixel value of the label to be removed
      */
     void RemoveLabel(LabelValueType labelValue);
 
     /**
      * @brief Removes labels from the mitk::MultiLabelSegmentation.
-     * Calls mitk::MultiLabelSegmentation::EraseLabels() which also removes the labels from within the image.
      * If a label value does not exist, it will be ignored.
-     * @param labelValues a list of labels to be removed
+     * @param vectorOfLabelPixelValues a list of labels to be removed
      */
     void RemoveLabels(const LabelValueVectorType& vectorOfLabelPixelValues);
 
     /**
-     * @brief Removes a complete spatial group with all its labels.
-     * @remark with removing a spatial group all spatial groups with greater index will be reindexed to
-     * close the gap. So externaly stored spatial group indeces may become invalid.
-     * @param spatial group index of the spatial group that should be removed. If the spatial group does not exist, an
+     * @brief Removes a whole group including all its labels.
+     * @remark with removing a group all groups with greater index will be reindexed to
+     * close the gap. Hence externaly stored spatial group indices may become invalid.
+     * @param group Group index of the spatial group that should be removed. If the spatial group does not exist, an
      * exception will be raised.
-     * @pre spatial group index must be valid.
+     * @pre group index must be valid.
      */
-    void RemoveSpatialGroup(SpatialGroupIndexType spatielGroup);
+    void RemoveGroup(GroupIndexType group);
 
     //future declaration (T28524) currently conflicted with old declaration
     ///**
@@ -102,19 +101,22 @@ namespace mitk
     // * @param groupIndex Indexp of the spacial group which should be checked for the label
     // * @return true if the label exists otherwise false
     // */
-    //bool ExistLabel(LabelValueType value, SpatialGroupIndexType groupIndex) const;
+    //bool ExistLabel(LabelValueType value, GroupIndexType groupIndex) const;
 
     /**
-      * \brief  Returns true if the spatial group exists in the MultiLabelSegmentation instance.*/
-    bool ExistGroup(SpatialGroupIndexType index) const;
+      * @brief  Returns true if the spatial group exists in the MultiLabelSegmentation instance.
+      *
+      * @param index Group index of the group that should be checked for existance.
+      */
+    bool ExistGroup(GroupIndexType index) const;
 
     bool IsLabeInGroup(LabelValueType value) const;
-    bool IsLabeInGroup(LabelValueType value, SpatialGroupIndexType& groupIndex) const;
+    bool IsLabeInGroup(LabelValueType value, GroupIndexType& groupIndex) const;
 
     /** Returns the group id of the based label value.
     * @pre label value must exists.
     */
-    SpatialGroupIndexType GetGroupIndexOfLabel(LabelValueType value) const;
+    GroupIndexType GetGroupIndexOfLabel(LabelValueType value) const;
 
     /**
      * @brief Returns the mitk::Label with the given value.
@@ -140,8 +142,8 @@ namespace mitk
      * @return the respective vector of labels.
      * @pre group index must exist.
      */
-    const ConstLabelVectorType GetLabelsInGroup(SpatialGroupIndexType index) const;
-    const LabelVectorType GetLabelsInGroup(SpatialGroupIndexType index);
+    const ConstLabelVectorType GetLabelsInGroup(GroupIndexType index) const;
+    const LabelVectorType GetLabelsInGroup(GroupIndexType index);
 
     itkGetConstMacro(UnlabeledLabelLock, bool);
     itkSetMacro(UnlabeledLabelLock, bool);
@@ -152,7 +154,7 @@ namespace mitk
 
     using LabelEventType = Message1<LabelValueType>;
     using LabelsEventType = Message1<LabelValueVectorType>;
-    using GroupEventType = Message1<SpatialGroupIndexType>;
+    using GroupEventType = Message1<GroupIndexType>;
 
     /**
     * \brief LabelAdded is emitted whenever a new label has been added.
@@ -200,7 +202,7 @@ namespace mitk
     *
     * In difference to the other label events LabelsChanged is send only *one time* after the modification of the
     * MultiLableImage instance is finished. So e.g. even if 4 labels are changed by a merge operation, this event will
-    * only be sent one time (compared to LabelRemoved or LabelModified).
+    * only be sent once (compared to LabelRemoved or LabelModified).
     * Observers should register to this event by calling myMultiLabelSegmentation->AddLabelsChangedListener(myObject,
     * MyObject::MyMethod).
     * After registering, myObject->MyMethod() will be called every time a new label has been removed from the MultiLabelSegmentation.
@@ -221,7 +223,7 @@ namespace mitk
     * The registered method will be called with the group index of the added group.
     * @remark the usage of the message object is thread safe.
     */
-    mitkNewMessage1Macro(GroupAdded, SpatialGroupIndexType);
+    mitkNewMessage1Macro(GroupAdded, GroupIndexType);
 
     /**
     * \brief GroupModified is emitted whenever a group has been modified.
@@ -234,7 +236,7 @@ namespace mitk
     * The registered method will be called with the group index of the added group.
     * @remark the usage of the message object is thread safe.
     */
-    mitkNewMessage1Macro(GroupModified, SpatialGroupIndexType);
+    mitkNewMessage1Macro(GroupModified, GroupIndexType);
 
     /**
     * \brief GroupRemoved is emitted whenever a label has been removed.
@@ -246,17 +248,17 @@ namespace mitk
     * The registered method will be called with the group index of the removed group.*
     * @remark the usage of the message object is thread safe.
     */
-    mitkNewMessage1Macro(GroupRemoved, SpatialGroupIndexType);
+    mitkNewMessage1Macro(GroupRemoved, GroupIndexType);
 
     protected:
 
       void OnLabelAdded(LabelValueType labelValue);
-      void AddLabelToMap(LabelValueType labelValue, mitk::Label* label, SpatialGroupIndexType groupID);
+      void AddLabelToMap(LabelValueType labelValue, mitk::Label* label, GroupIndexType groupID);
       void OnLabelModified(LabelValueType labelValue);
       void OnLabelRemoved(LabelValueType labelValue);
-      void OnGroupAdded(SpatialGroupIndexType groupIndex);
-      void OnGroupModified(SpatialGroupIndexType groupIndex);
-      void OnGroupRemoved(SpatialGroupIndexType groupIndex);
+      void OnGroupAdded(GroupIndexType groupIndex);
+      void OnGroupModified(GroupIndexType groupIndex);
+      void OnGroupRemoved(GroupIndexType groupIndex);
 
       /** Reeinitalizes the internal maps based on the current layer/label content
       * of the instance. */
@@ -267,9 +269,9 @@ namespace mitk
 
       /**This type is internally used to track which label is currently
        * associated with which layer.*/
-      using GroupToLabelMapType = std::map<SpatialGroupIndexType, LabelValueVectorType>;
+      using GroupToLabelMapType = std::map<GroupIndexType, LabelValueVectorType>;
       GroupToLabelMapType m_GroupToLabelMap;
-      using LabelToGroupMapType = std::map<LabelValueType, SpatialGroupIndexType>;
+      using LabelToGroupMapType = std::map<LabelValueType, GroupIndexType>;
       LabelToGroupMapType m_LabelToGroupMap;
 
     private:
@@ -582,9 +584,9 @@ namespace mitk
   a specified destination label for a specific timestep. Function processes the whole image volume of the specified time step.
   @remark in its current implementation the function only transfers contents of the active layer of the passed LabelSetImages.
   @remark the function assumes that it is only called with source and destination image of same geometry.
-  @remark CAUTION: The function is not save, if sourceImage and destinationImage are the same instance and you transfer more then one
-  label, because the changes are made inplace for performance reasons but not in one pass. If a mapped value A equals a "old value"
-  that is later in the mapping, one ends up with a wrong transfer, as a pixel would be first mapped to A and then latter again, because
+  @remark CAUTION: The function is not save if sourceImage and destinationImage are the same instance and more than one label is transferred,
+  because the changes are made in-place for performance reasons in multiple passes. If a mapped value A equals an "old value"
+  that occurs later in the mapping, one ends up with a wrong transfer, as a pixel would be first mapped to A and then later again, because
   it is also an "old" value in the mapping table.
   @param sourceImage Pointer to the LabelSetImage which active layer should be used as source for the transfer.
   @param destinationImage Pointer to the LabelSetImage which active layer should be used as destination for the transfer.

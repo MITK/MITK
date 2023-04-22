@@ -226,7 +226,7 @@ void mitk::LabelSetImage::RemoveLayer()
   this->Modified();
 }
 
-void mitk::LabelSetImage::RemoveSpatialGroup(SpatialGroupIndexType indexToDelete)
+void mitk::LabelSetImage::RemoveGroup(GroupIndexType indexToDelete)
 {
   const auto activeIndex = GetActiveLayer();
 
@@ -307,8 +307,6 @@ unsigned int mitk::LabelSetImage::AddLayer(mitk::Image::Pointer layerImage, mitk
   }
 
   ls->SetLayer(newLabelSetId);
-  // Add exterior Label to label set
-  // mitk::Label::Pointer exteriorLabel = CreateExteriorLabel();
 
   // push a new working image for the new layer
   m_LayerContainer.push_back(layerImage);
@@ -337,7 +335,7 @@ void mitk::LabelSetImage::AddLabelSetToLayer(const unsigned int layerIdx, const 
 
   this->RegisterLabelSet(clonedLabelSet);
 
-  std::vector<SpatialGroupIndexType> addedGroups;
+  std::vector<GroupIndexType> addedGroups;
 
   if (layerIdx < m_LabelSetContainer.size())
   {
@@ -534,13 +532,11 @@ void mitk::LabelSetImage::EraseLabel(PixelType pixelValue)
 {
   try
   {
-    mitk::Image* groupImage = this;
     auto groupID = this->GetGroupIndexOfLabel(pixelValue);
 
-    if (groupID != this->GetActiveLayer())
-    {
-      groupImage = this->GetLayerImage(groupID);
-    }
+    mitk::Image* groupImage = this->GetActiveLayer() != groupID
+       ? this->GetLayerImage(groupID)
+       : this;
 
     if (4 == this->GetDimension())
     {
@@ -848,7 +844,7 @@ void mitk::LabelSetImage::MaskStampProcessing(ImageType *itkImage, mitk::Image *
     PixelType targetValue = targetIter.Get();
 
     if ((sourceValue != UnlabeledLabelValue) &&
-        (forceOverwrite || !this->IsLabelLocked(targetValue))) // skip exterior and locked labels
+        (forceOverwrite || !this->IsLabelLocked(targetValue))) // skip unlabeled pixels and locked labels
     {
       targetIter.Set(activeLabel);
     }
@@ -981,6 +977,7 @@ void mitk::LabelSetImage::MergeLabelProcessing(ImageType *itkImage, PixelType pi
 void mitk::LabelSetImage::OnLabelAdded(LabelValueType labelValue)
 {
   Label* label = nullptr;
+
   unsigned int layerID = 0;
   for (; layerID < this->GetNumberOfLayers(); ++layerID)
   {
@@ -995,7 +992,7 @@ void mitk::LabelSetImage::OnLabelAdded(LabelValueType labelValue)
   this->m_LabelAddedMessage.Send(labelValue);
 }
 
-void mitk::LabelSetImage::AddLabelToMap(LabelValueType labelValue, mitk::Label* label, SpatialGroupIndexType groupID)
+void mitk::LabelSetImage::AddLabelToMap(LabelValueType labelValue, mitk::Label* label, GroupIndexType groupID)
 {
   if (m_LabelMap.find(labelValue)!=m_LabelMap.end())
     mitkThrow() << "Segmentation is in an invalid state: Label value collision. A label was added with a LabelValue already in use. LabelValue: " << labelValue;
@@ -1036,26 +1033,26 @@ void mitk::LabelSetImage::OnLabelRemoved(LabelValueType labelValue)
   this->m_LabelRemovedMessage.Send(labelValue);
 }
 
-void mitk::LabelSetImage::OnGroupAdded(SpatialGroupIndexType groupIndex)
+void mitk::LabelSetImage::OnGroupAdded(GroupIndexType groupIndex)
 {
   this->m_GroupToLabelMap.insert(std::make_pair(groupIndex, LabelValueVectorType()));
 
   this->m_GroupAddedMessage.Send(groupIndex);
 }
 
-void mitk::LabelSetImage::OnGroupModified(SpatialGroupIndexType groupIndex)
+void mitk::LabelSetImage::OnGroupModified(GroupIndexType groupIndex)
 {
   this->m_GroupModifiedMessage.Send(groupIndex);
 }
 
-void mitk::LabelSetImage::OnGroupRemoved(SpatialGroupIndexType groupIndex)
+void mitk::LabelSetImage::OnGroupRemoved(GroupIndexType groupIndex)
 {
   this->ReinitMaps();
   this->m_GroupRemovedMessage.Send(groupIndex);
 }
 
 // future implementation for T28524
-//bool mitk::LabelSetImage::ExistLabel(LabelValueType value, SpatialGroupIndexType groupIndex) const
+//bool mitk::LabelSetImage::ExistLabel(LabelValueType value, GroupIndexType groupIndex) const
 //{
 //  auto finding = m_LabelToGroupMap.find(value);
 //  if (m_LabelToGroupMap.end() != finding)
@@ -1065,23 +1062,23 @@ void mitk::LabelSetImage::OnGroupRemoved(SpatialGroupIndexType groupIndex)
 //  return false;
 //}
 //
-//bool mitk::LabelSetImage::ExistGroup(SpatialGroupIndexType index) const
+//bool mitk::LabelSetImage::ExistGroup(GroupIndexType index) const
 //{
 //  return index < m_LabelSetContainer.size();
 //}
 
-bool mitk::LabelSetImage::ExistGroup(SpatialGroupIndexType index) const
+bool mitk::LabelSetImage::ExistGroup(GroupIndexType index) const
 {
   return index < m_LabelSetContainer.size();
 }
 
 bool mitk::LabelSetImage::IsLabeInGroup(LabelValueType value) const
 {
-  SpatialGroupIndexType dummy;
+  GroupIndexType dummy;
   return this->IsLabeInGroup(value, dummy);
 }
 
-bool mitk::LabelSetImage::IsLabeInGroup(LabelValueType value, SpatialGroupIndexType& groupIndex) const
+bool mitk::LabelSetImage::IsLabeInGroup(LabelValueType value, GroupIndexType& groupIndex) const
 {
   auto finding = m_LabelToGroupMap.find(value);
   if (m_LabelToGroupMap.end() != finding)
@@ -1092,7 +1089,7 @@ bool mitk::LabelSetImage::IsLabeInGroup(LabelValueType value, SpatialGroupIndexT
   return false;
 }
 
-mitk::LabelSetImage::SpatialGroupIndexType mitk::LabelSetImage::GetGroupIndexOfLabel(LabelValueType value) const
+mitk::LabelSetImage::GroupIndexType mitk::LabelSetImage::GetGroupIndexOfLabel(LabelValueType value) const
 {
   auto finding = m_LabelToGroupMap.find(value);
   if (m_LabelToGroupMap.end() == finding)
@@ -1154,7 +1151,7 @@ const mitk::LabelSetImage::LabelVectorType mitk::LabelSetImage::GetLabels()
   return result;
 }
 
-const mitk::LabelSetImage::ConstLabelVectorType mitk::LabelSetImage::GetLabelsInGroup(SpatialGroupIndexType index) const
+const mitk::LabelSetImage::ConstLabelVectorType mitk::LabelSetImage::GetLabelsInGroup(GroupIndexType index) const
 {
   if (!this->ExistGroup(index))
   {
@@ -1172,7 +1169,7 @@ const mitk::LabelSetImage::ConstLabelVectorType mitk::LabelSetImage::GetLabelsIn
   return result;
 }
 
-const mitk::LabelSetImage::LabelVectorType mitk::LabelSetImage::GetLabelsInGroup(SpatialGroupIndexType index)
+const mitk::LabelSetImage::LabelVectorType mitk::LabelSetImage::GetLabelsInGroup(GroupIndexType index)
 {
   if (!this->ExistGroup(index))
   {
@@ -1196,7 +1193,7 @@ void mitk::LabelSetImage::ReinitMaps()
   this->m_LabelToGroupMap.clear();
   this->m_GroupToLabelMap.clear();
 
-  for (SpatialGroupIndexType layerID = 0; layerID < this->GetNumberOfLayers(); ++layerID)
+  for (GroupIndexType layerID = 0; layerID < this->GetNumberOfLayers(); ++layerID)
   {
     auto labelSet = this->GetLabelSet(layerID);
     for (auto iter = labelSet->IteratorBegin(); iter != labelSet->IteratorEnd(); ++iter)
@@ -1494,7 +1491,7 @@ void mitk::TransferLabelContent(
   const auto sourceTimeStepCount = sourceImage->GetTimeGeometry()->CountTimeSteps();
   if (sourceTimeStepCount != destinationImage->GetTimeGeometry()->CountTimeSteps())
   {
-    mitkThrow() << "Invalid call of TransferLabelContent; images have no equal number of time steps.";
+    mitkThrow() << "Invalid call of TransferLabelContent; mismatch between images in number of time steps.";
   }
 
   for (mitk::TimeStepType i = 0; i < sourceTimeStepCount; ++i)

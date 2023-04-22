@@ -17,8 +17,8 @@ found in the LICENSE file.
 #include <mitkWeakPointer.h>
 
 #include <QWidget>
+#include <QItemSelectionModel>
 #include <QmitkMultiLabelTreeModel.h>
-#include "ui_QmitkMultiLabelInspectorControls.h"
 
 class QmitkMultiLabelTreeModel;
 class QStyledItemDelegate;
@@ -30,7 +30,8 @@ namespace Ui
 }
 
 /*
-* @brief This is an inspector that offers a simple list view on a data storage.
+* @brief This is an inspector that offers a tree view on the labels and groups of a MultiLabelSegmentation instance.
+* It also allows some manipulation operations an the labels/groups accordin to the UI/selection state.
 */
 class MITKSEGMENTATIONUI_EXPORT QmitkMultiLabelInspector : public QWidget
 {
@@ -54,10 +55,13 @@ public:
   */
   LabelValueVectorType GetSelectedLabels() const;
 
-  /** Returns the label that currently has the focus in the tree view (indicated by QTreeView::currentIndex,
-  thus the mouse is over it and it has a dashed border line).
-  The current label must not equal the seleted label(s). If the mouse
-  is not over a label (label class or instance item), the method will return a null pointer.*/
+  /** @brief Returns the label that currently has the focus in the tree view.
+   *
+   * The focus is indicated by QTreeView::currentIndex, thus the mouse is over it and it has a dashed border line.
+   *
+   * The current label must not equal the selected label(s). If the mouse is not hovering above a label
+   * (label class or instance item), the method will return nullptr.
+   */
   mitk::Label* GetCurrentLabel() const;
 
   enum class IndexLevelType
@@ -67,16 +71,18 @@ public:
     LabelInstance
   };
 
-  /** Returns the level of the index currently has the focus in the tree view (indicated by QTreeView::currentIndex,
-  thus the mouse is over it and it has a dashed border line).*/
+  /** @brief Returns the level of the index that currently has the focus in the tree view.
+   *
+   * The focus is indicated by QTreeView::currentIndex, thus the mouse is over it and it has a dashed border line.
+   */
   IndexLevelType GetCurrentLevelType() const;
 
-  /**
-  * @brief Returns the all labels values that are currently affacted.
-  Affected means that these labels (including the one returned by GetCurrentLabel) are in the subtree of the tree
-  view element that currently has the focus.
-  (indicated by QTreeView::currentIndex, thus the mouse is over it and it has a dashed border line)
-  */
+  /** @brief Returns all label values that are currently affected.
+   *
+   * Affected means that these labels (including the one returned by GetCurrentLabel) are in the subtree of the tree
+   * view element that currently has the focus (indicated by QTreeView::currentIndex, thus the mouse is over it and
+   * it has a dashed border line.
+   */
   LabelValueVectorType GetCurrentlyAffactedLabelInstances() const;
 
 Q_SIGNALS:
@@ -87,20 +93,29 @@ Q_SIGNALS:
   */
   void CurrentSelectionChanged(LabelValueVectorType labels) const;
 
-  void GoToLabel(LabelValueType label, const mitk::Point3D&) const;
+  /**
+  * @brief A signal that will be emitted if the user has requested to "go to" a certain label.
+  *
+  * Going to a label would be e.g. to focus the renderwindows on the centroid of the label.
+  * @param label The label that should be focused.
+  * @param point in World coordinate that should be focused.
+  */
+  void GoToLabel(LabelValueType label, const mitk::Point3D& point) const;
 
-  /** Signal that is emitted, if a label should be (re) named and default
-   label naming is deactivated. The instance for which a new name is requested
-   is passed with the signal.
-   @param label Pointer to the instance that needs a (new) name.
-   @param rename Indicates if it is a renaming or naming of a new label.*/
+  /** @brief Signal that is emitted, if a label should be (re)named and default
+  * label naming is deactivated.
+  *
+  * The instance for which a new name is requested is passed with the signal.
+  * @param label Pointer to the instance that needs a (new) name.
+  * @param rename Indicates if it is a renaming or naming of a new label.
+  */
   void LabelRenameRequested(mitk::Label* label, bool rename) const;
 
 public Q_SLOTS:
 
   /**
-  * @brief Transform a list label values into the new selection of the inspector.
-  * @param selectedNodes A list of selected label values.
+  * @brief Transform a list of label values into the new selection of the inspector.
+  * @param selectedLabels A list of selected label values.
   * @remark Using this method to select labels will not trigger the CurrentSelectionChanged signal. Observers
   * should regard that to avoid signal loops.
   */
@@ -113,47 +128,54 @@ public Q_SLOTS:
   */
   void SetSelectedLabel(mitk::LabelSetImage::LabelValueType selectedLabel);
 
-  /**
-  * @brief Sets the segmentation that will be used /monitored by the widget.
-  *
-  * @param segmentation      A pointer to the segmentation to set.
+  /** @brief Sets the segmentation that will be used and monitored by the widget.
   */
   void SetMultiLabelSegmentation(mitk::LabelSetImage* segmentation);
 
   void SetMultiSelectionMode(bool multiMode);
 
-  void SetAllowVisibilityModification(bool vmod);
-  void SetAllowLockModification(bool lmod);
+  void SetAllowVisibilityModification(bool visiblityMod);
+  void SetAllowLockModification(bool lockMod);
   void SetAllowLabelModification(bool labelMod);
 
   void SetDefaultLabelNaming(bool defaultLabelNaming);
 
-  /** Adds an instance of the same label/class like the first label instance
-  * indicated by GetSelectedLabels() to the segmentation. This new label
-  * instance is returned by the function. If the inspector has no selected label,
+  /** @brief Adds an instance of the same label/class like the first label instance
+  * indicated by GetSelectedLabels() to the segmentation.
+  *
+  * This new label instance is returned by the function. If the inspector has no selected label,
   * no new instance will be generated and nullptr will be returned.
-  * @remark The new label instance is a clone of the selected label instance. Therefore
-  * all properties but the LabelValue will be the same.
-  * @pre AllowLabeModification must be set to true.*/
+  *
+  * @remark The new label instance is a clone of the selected label instance.
+  * Therefore all properties but the LabelValue will be the same.
+  *
+  * @pre AllowLabeModification must be set to true.
+  */
   mitk::Label* AddNewLabelInstance();
 
-  /** Adds a new label to the segmentation. Depending on the settings the name of
+  /** @brief Adds a new label to the segmentation.
+  * Depending on the settings the name of
   * the label will be either default generated or the rename delegate will be used. The label
   * will be added to the same group as the first currently selected label.
+  *
   * @pre AllowLabeModification must be set to true.*/
   mitk::Label* AddNewLabel();
 
-  /** Removes the first currently selected label of the segmentation. If no label is selected
+  /** @brief Removes the first currently selected label of the segmentation.
+  * If no label is selected
   * nothing will happen.
+  *
   * @pre AllowLabeModification must be set to true.*/
   void RemoveLabel();
 
-  /** Adds a new group with a new label to segmentation.
+  /** @brief Adds a new group with a new label to segmentation.
+  *
   * @pre AllowLabeModification must be set to true.*/
   mitk::Label* AddNewGroup();
 
-  /** Removes the group of the first currently selected label of the segmentation. If no label is selected
-  * nothing will happen.
+  /** @brief Removes the group of the first currently selected label of the segmentation.
+  *If no label is selected nothing will happen.
+  *
   * @pre AllowLabeModification must be set to true.*/
   void RemoveGroup();
 
@@ -177,24 +199,25 @@ protected:
   LabelValueVectorType GetSelectedLabelsFromSelectionModel() const;
   void UpdateSelectionModel(const LabelValueVectorType& selectedLabels);
 
-  /** Helper that returns the label object (if multiple labels are selected the first).*/
+  /** @brief Helper that returns the label object (if multiple labels are selected the first).
+  */
   mitk::Label* GetFirstSelectedLabelObject() const;
 
-  mitk::Label* AddNewLabelInternal(const mitk::LabelSetImage::SpatialGroupIndexType& containingGroup);
+  mitk::Label* AddNewLabelInternal(const mitk::LabelSetImage::GroupIndexType& containingGroup);
 
-  /** Adds an instance of the same label/class like the passed label value*/
+  /**@brief Adds an instance of the same label/class like the passed label value
+  */
   mitk::Label* AddNewLabelInstanceInternal(mitk::Label* templateLabel);
 
-  void RemoveGroupInternal(const mitk::LabelSetImage::SpatialGroupIndexType& groupID);
+  void RemoveGroupInternal(const mitk::LabelSetImage::GroupIndexType& groupID);
   void DeleteLabelInternal(const LabelValueVectorType& labelValues);
 
 private Q_SLOTS:
-  /**
-  * @brief Transform a labels selection into a data node list and emit the 'CurrentSelectionChanged'-signal.
+  /** @brief Transform a labels selection into a data node list and emit the 'CurrentSelectionChanged'-signal.
   *
-  *   The function adds the selected nodes from the original selection that could not be modified, if
-  *   'm_SelectOnlyVisibleNodes' is false.
-  *   This slot is internally connected to the 'selectionChanged'-signal of the selection model of the private member item view.
+  * The function adds the selected nodes from the original selection that could not be modified, if
+  * m_SelectOnlyVisibleNodes is false.
+  * This slot is internally connected to the 'selectionChanged'-signal of the selection model of the private member item view.
   *
   * @param selected	The newly selected items.
   * @param deselected	The newly deselected items.
@@ -236,10 +259,18 @@ private:
   bool m_ShowLock = true;
   bool m_ShowOther = false;
 
-  /** Indicates if the context menu allows changes in visiblity.
-      Visiblity includes also color*/
+  /** @brief Indicates if the context menu allows changes in visiblity.
+  *
+  * Visiblity includes also color
+  */
   bool m_AllowVisibilityModification = true;
+
+  /** @brief Indicates if the context menu allows changes in lock state.
+  */
   bool m_AllowLockModification = true;
+
+  /** @brief Indicates if the context menu allows label modifications (adding, removing, renaming ...)
+  */
   bool m_AllowLabelModification = false;
 
   bool m_DefaultLabelNaming = true;

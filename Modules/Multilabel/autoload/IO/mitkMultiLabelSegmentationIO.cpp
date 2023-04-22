@@ -174,7 +174,7 @@ namespace mitk
       mitkThrow() << "Loaded data is in an invalid state. Number of extracted layer images and labels sets does not match. Found layer images: " << output->GetNumberOfLayers() << "; found labelsets: " << labelsets.size();
     }
 
-    LabelSetImage::SpatialGroupIndexType id = 0;
+    LabelSetImage::GroupIndexType id = 0;
     for (auto labelset : labelsets)
     {
       output->AddLabelSetToLayer(id, labelset);

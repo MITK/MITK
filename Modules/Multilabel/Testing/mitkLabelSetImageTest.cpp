@@ -74,7 +74,7 @@ public:
     mitk::BaseGeometry::Pointer labelImageGeo = m_LabelSetImage->GetGeometry();
     MITK_ASSERT_EQUAL(labelImageGeo, regularImageGeo, "LabelSetImage has wrong geometry");
 
-    // By default one layer containing the exterior label should be added
+    // By default one layer should be added
     CPPUNIT_ASSERT_MESSAGE("Image was not correctly initialized - number of layers is not one",
                            m_LabelSetImage->GetNumberOfLayers() == 1);
     CPPUNIT_ASSERT_MESSAGE("Image was not correctly initialized - active layer has wrong ID",
@@ -225,7 +225,6 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Wrong UnlabeledLabelLock default state",
       locked == false);
 
-    // Exterior label should be set automatically for each new layer
     m_LabelSetImage->SetUnlabeledLabelLock(true);
     locked = m_LabelSetImage->GetUnlabeledLabelLock();
     CPPUNIT_ASSERT_MESSAGE("Wrong UnlabeledLabelLock state",
@@ -389,7 +388,7 @@ public:
     m_LabelSetImage->InitializeByLabeledImage(image);
 
     CPPUNIT_ASSERT_MESSAGE("Image - number of labels is not 6", m_LabelSetImage->GetNumberOfLabels() == 5);
-    // 2ndMin because of the exterior label = 0
+    // 2ndMin because of unlabeled pixels = 0
     CPPUNIT_ASSERT_MESSAGE("Wrong MIN value", m_LabelSetImage->GetStatistics()->GetScalarValue2ndMin() == 1);
     CPPUNIT_ASSERT_MESSAGE("Wrong MAX value", m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 7);
 
@@ -405,7 +404,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Wrong number of labels after some have been removed",
                            m_LabelSetImage->GetNumberOfLabels() == 2);
     // Values within the image are 0, 1, 3, 5, 6, 7 - New Min / Max value should be 5 / 6
-    // 2ndMin because of the exterior label = 0
+    // 2ndMin because of unlabeled pixels = 0
     CPPUNIT_ASSERT_MESSAGE("Labels with value 1 and 3 were not removed from the image",
                            m_LabelSetImage->GetStatistics()->GetScalarValue2ndMin() == 5);
     CPPUNIT_ASSERT_MESSAGE("Label with value 7 was not removed from the image",
@@ -422,7 +421,7 @@ public:
     m_LabelSetImage->InitializeByLabeledImage(image);
 
     CPPUNIT_ASSERT_MESSAGE("Image - number of labels is not 6", m_LabelSetImage->GetNumberOfLabels() == 5);
-    // 2ndMin because of the exterior label = 0
+    // 2ndMin because of unlabeled pixels = 0
     CPPUNIT_ASSERT_MESSAGE("Wrong MIN value", m_LabelSetImage->GetStatistics()->GetScalarValue2ndMin() == 1);
     CPPUNIT_ASSERT_MESSAGE("Wrong MAX value", m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 7);
 
@@ -438,7 +437,7 @@ public:
     CPPUNIT_ASSERT_MESSAGE("Wrong number of labels since none have been removed",
       m_LabelSetImage->GetNumberOfLabels() == 5);
     // Values within the image are 0, 1, 3, 5, 6, 7 - New Min / Max value should be 5 / 6
-    // 2ndMin because of the exterior label = 0
+    // 2ndMin because of unlabeled pixels = 0
     CPPUNIT_ASSERT_MESSAGE("Labels with value 1 and 3 were not erased from the image",
       m_LabelSetImage->GetStatistics()->GetScalarValue2ndMin() == 5);
     CPPUNIT_ASSERT_MESSAGE("Label with value 7 was not erased from the image",
@@ -455,7 +454,7 @@ public:
     m_LabelSetImage->InitializeByLabeledImage(image);
 
     CPPUNIT_ASSERT_MESSAGE("Image - number of labels is not 6", m_LabelSetImage->GetNumberOfLabels() == 5);
-    // 2ndMin because of the exterior label = 0
+    // 2ndMin because of unlabeled pixels = 0
     CPPUNIT_ASSERT_MESSAGE("Wrong MIN value", m_LabelSetImage->GetStatistics()->GetScalarValue2ndMin() == 1);
     CPPUNIT_ASSERT_MESSAGE("Wrong MAX value", m_LabelSetImage->GetStatistics()->GetScalarValueMax() == 7);
 

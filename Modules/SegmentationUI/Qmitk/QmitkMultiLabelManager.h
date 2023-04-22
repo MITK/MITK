@@ -58,13 +58,22 @@ Q_SIGNALS:
   */
   void CurrentSelectionChanged(LabelValueVectorType labels);
 
-  void GoToLabel(mitk::LabelSetImage::LabelValueType label, const mitk::Point3D&) const;
+  /**
+  * @brief A signal that will be emitted if the user has requested to "go to" a certain label.
+  *
+  * Going to a label would be e.g. to focus the renderwindows on the centroid of the label.
+  * @param label The label that should be focused.
+  * @param point in World coordinate that should be focused.
+  */
+  void GoToLabel(mitk::LabelSetImage::LabelValueType label, const mitk::Point3D& point) const;
 
-  /** Signal that is emitted, if a label should be (re) named and default
-   label naming is deactivated. The instance for which a new name is requested
-   is passed with the signal.
-   @param label Pointer to the instance that needs a (new) name.
-   @param rename Indicates if it is a renaming or naming of a new label.*/
+  /** @brief Signal that is emitted, if a label should be (re)named and default
+   * label naming is deactivated.
+   *
+   * The instance for which a new name is requested is passed with the signal.
+   * @param label Pointer to the instance that needs a (new) name.
+   * @param rename Indicates if it is a renaming or naming of a new label.
+   */
   void LabelRenameRequested(mitk::Label* label, bool rename) const;
 
 public Q_SLOTS:
@@ -72,10 +81,15 @@ public Q_SLOTS:
   /**
   * @brief Transform a list label values into a model selection and set this as a new selection of the view
   *
-  * @param selectedNodes A list of data nodes that should be newly selected.
+  * @param selectedLabels A list of data nodes that should be newly selected.
   */
   void SetSelectedLabels(const LabelValueVectorType& selectedLabels);
-  void SetSelectedLabel(mitk::LabelSetImage::LabelValueType selectedLabel);
+
+  /**
+  * @brief Selects the passed label instance and sets a new selection of the view
+  *
+  * @param selectedLabel Value of the label instance that should be selected.
+  */  void SetSelectedLabel(mitk::LabelSetImage::LabelValueType selectedLabel);
 
   /**
   * @brief Sets the segmentation that will be used /monitored by the widget.

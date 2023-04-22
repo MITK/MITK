@@ -39,7 +39,7 @@ mitk::LabelSet::LabelSet(const LabelSet &other)
   {
     m_LabelContainer[otherIt->first] = otherIt->second->Clone();
 
-    itk::MemberCommand<LabelSet>::Pointer command = itk::MemberCommand<LabelSet>::New();
+    auto command = itk::MemberCommand<LabelSet>::New();
     command->SetCallbackFunction(this, &LabelSet::OnLabelModified);
     m_LabelContainer[otherIt->first]->AddObserver(itk::ModifiedEvent(), command);
   }
@@ -67,7 +67,8 @@ std::vector<mitk::LabelSet::LabelValueType> mitk::LabelSet::GetUsedLabelValues()
 void mitk::LabelSet::OnLabelModified(const Object* sender, const itk::EventObject&)
 {
   auto label = dynamic_cast<const Label*>(sender);
-  if (nullptr == label) mitkThrow() << "LabelSet is in wrong state. LabelModified event is not send by a label instance.";
+  if (nullptr == label)
+    mitkThrow() << "LabelSet is in wrong state. LabelModified event is not send by a label instance.";
 
   ModifyLabelEvent.Send(label->GetValue());
   Superclass::Modified();
@@ -127,7 +128,7 @@ mitk::Label* mitk::LabelSet::AddLabel(mitk::Label *label, bool addAsClone)
   // TODO use layer of label parameter
   newLabel->SetLayer(m_Layer);
 
-  PixelType pixelValue = newLabel->GetValue();
+  auto pixelValue = newLabel->GetValue();
   auto usedValues = this->GetUsedLabelValues();
   auto finding = std::find(usedValues.begin(), usedValues.end(), pixelValue);
 
@@ -145,7 +146,7 @@ mitk::Label* mitk::LabelSet::AddLabel(mitk::Label *label, bool addAsClone)
   // add DICOM information of the label
   DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(newLabel);
 
-  itk::MemberCommand<LabelSet>::Pointer command = itk::MemberCommand<LabelSet>::New();
+  auto command = itk::MemberCommand<LabelSet>::New();
   command->SetCallbackFunction(this, &LabelSet::OnLabelModified);
   newLabel->AddObserver(itk::ModifiedEvent(), command);
 
@@ -186,7 +187,8 @@ void mitk::LabelSet::PrintSelf(std::ostream & /*os*/, itk::Indent /*indent*/) co
 
 void mitk::LabelSet::RemoveLabel(PixelType pixelValue)
 {
-  if (LabelSetImage::UnlabeledLabelValue == pixelValue) return;
+  if (LabelSetImage::UnlabeledLabelValue == pixelValue)
+    return;
 
   auto it = m_LabelContainer.rbegin();
   PixelType nextActivePixelValue = it->first;
@@ -205,11 +207,17 @@ void mitk::LabelSet::RemoveLabel(PixelType pixelValue)
   if (m_ActiveLabelValue == pixelValue)
   {
     if (ExistLabel(nextActivePixelValue))
-      SetActiveLabel(nextActivePixelValue);
+    {
+      this->SetActiveLabel(nextActivePixelValue);
+    }
     else if (!m_LabelContainer.empty())
-      SetActiveLabel(m_LabelContainer.rbegin()->first);
+    {
+      this->SetActiveLabel(m_LabelContainer.rbegin()->first);
+    }
     else
-      SetActiveLabel(0);
+    {
+      this->SetActiveLabel(0);
+    }
   }
 
   RemoveLabelEvent.Send(pixelValue);

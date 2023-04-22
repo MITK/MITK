@@ -220,7 +220,7 @@ namespace mitk
 
       auto output = ConvertImageVectorToLabelSetImage(groupImages, rawimage->GetTimeGeometry());
 
-      LabelSetImage::SpatialGroupIndexType id = 0;
+      LabelSetImage::GroupIndexType id = 0;
       for (auto labelset : adaptedLabelSets)
       {
         output->AddLabelSetToLayer(id, labelset);

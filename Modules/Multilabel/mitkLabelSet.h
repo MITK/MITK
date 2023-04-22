@@ -61,6 +61,7 @@ namespace mitk
     /**
     * \brief RemoveLabelEvent is emitted whenever a new label has been removed from the LabelSet.
     *
+    * The registered method will be called with the label value of the removed label.
     * Observers should register to this event by calling myLabelSet->RemoveLabelEvent.AddListener(myObject,
     * MyObject::MyMethod).
     * After registering, myObject->MyMethod() will be called every time a new label has been removed from the LabelSet.
@@ -74,6 +75,7 @@ namespace mitk
     /**
     * \brief ModifyLabelEvent is emitted whenever a label has been modified from the LabelSet.
     *
+    * The registered method will be called with the label value of the modified label.
     * Observers should register to this event by calling myLabelSet->ModifyLabelEvent.AddListener(myObject,
     * MyObject::MyMethod).
     * After registering, myObject->MyMethod() will be called every time a new label has been removed from the LabelSet.
@@ -243,7 +245,7 @@ namespace mitk
                                    bool verbose);
 
   /**
-  * Methods takes a label set and generates a new label set with the same labels but updated labels values according to
+  * Method takes a label set and generates a new label set with the same labels but updated labels values according to
   * the passed labelMapping.
   * @pre sourceLabelSet is valid
   */

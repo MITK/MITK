@@ -17,7 +17,10 @@ found in the LICENSE file.
 #include <QPainter>
 #include <QMouseEvent>
 
-QmitkLabelToggleItemDelegate::QmitkLabelToggleItemDelegate(const QIcon& onIcon, const QIcon& offIcon, QObject * parent) : QStyledItemDelegate(parent), m_OnIcon(onIcon), m_OffIcon(offIcon)
+QmitkLabelToggleItemDelegate::QmitkLabelToggleItemDelegate(const QIcon& onIcon, const QIcon& offIcon, QObject * parent) 
+  :QStyledItemDelegate(parent),
+   m_OnIcon(onIcon),
+   m_OffIcon(offIcon)
 {
 }
 
@@ -64,27 +67,16 @@ bool QmitkLabelToggleItemDelegate::editorEvent(QEvent *event, QAbstractItemModel
 
   // make sure that we have the right event type
   QMouseEvent* mouseEvent = dynamic_cast<QMouseEvent*>(event);
-  if (!mouseEvent)
+  if (nullptr == mouseEvent || mouseEvent->type() != QEvent::MouseButtonRelease || mouseEvent->button() != Qt::LeftButton)
   {
     return false;
   }
-  else
-  {
-    if (mouseEvent->type() != QEvent::MouseButtonRelease || mouseEvent->button() != Qt::LeftButton)
-    {
-      return false;
-    }
-  }
 
   auto visVar = index.data(Qt::EditRole);
-  if (!visVar.isValid())
-  {
-    return model->setData(index, QVariant(true), Qt::EditRole);
-  }
-  else
-  {
-    return model->setData(index, QVariant(!(visVar.toBool())), Qt::EditRole);
-  }
+  auto data = visVar.isValid()
+     ? QVariant(!(visVar.toBool()))
+     : QVariant(true);
+  return model->setData(index, data, Qt::EditRole);
 
   return false;
 };

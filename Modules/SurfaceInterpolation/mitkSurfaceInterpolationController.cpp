@@ -245,6 +245,7 @@ void mitk::SurfaceInterpolationController::AddPlaneGeometryNodeToDataStorage(con
   planeGeometry->Map(planeGeometry->GetCenter(), p1);
   planeGeometryData->PlaceFigure(p1);
   planeGeometryData->SetCurrentControlPoint(p1);
+  planeGeometryData->SetProperty("initiallyplaced", mitk::BoolProperty::New(true));
   if (planeGeometry)
   {
     auto segmentationNode = this->GetSegmentationImageNode();

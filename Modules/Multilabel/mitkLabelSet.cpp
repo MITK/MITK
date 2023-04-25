@@ -135,7 +135,6 @@ mitk::Label* mitk::LabelSet::AddLabel(mitk::Label *label, bool addAsClone)
   if (!usedValues.empty() && usedValues.end() != finding)
   {
     pixelValue = usedValues.back()+1;
-    MITK_DEBUG << "LabelSet label collision. Tried to add a label with a value already in use. Value will be adapted. Old value: " << newLabel->GetValue() << "; new value: " << pixelValue;
     newLabel->SetValue(pixelValue);
   }
 
@@ -187,7 +186,7 @@ void mitk::LabelSet::PrintSelf(std::ostream & /*os*/, itk::Indent /*indent*/) co
 
 void mitk::LabelSet::RemoveLabel(PixelType pixelValue)
 {
-  if (LabelSetImage::UnlabeledLabelValue == pixelValue)
+  if (LabelSetImage::UnlabeledValue == pixelValue)
     return;
 
   auto it = m_LabelContainer.rbegin();

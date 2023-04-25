@@ -142,7 +142,13 @@ namespace mitk
     */
     bool ExistLabel(PixelType);
 
-    /** \brief
+    /** \brief Adds a label to the label set.
+    * @remark If the pixel value of the label is already used in the label set, the label
+    * will get a new none conflicting value assigned.
+    * @param label Instance of an label that should be added or used as template
+    * @param addAsClone flag that control if the passed instance should be added or
+    * a clone of the instance.
+    * @return Instance of the label as it was added to the label set.
     */
     mitk::Label* AddLabel(mitk::Label *label, bool addAsClone = true);
 

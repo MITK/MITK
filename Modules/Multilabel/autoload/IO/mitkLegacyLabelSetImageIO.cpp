@@ -111,7 +111,7 @@ namespace mitk
 
         label = mitk::MultiLabelIOHelper::LoadLabelFromXMLDocument(labelElem);
 
-        if (label->GetValue() != mitk::LabelSetImage::UnlabeledLabelValue)
+        if (label->GetValue() != mitk::LabelSetImage::UnlabeledValue)
         {
           labelSet->AddLabel(label);
           labelSet->SetLayer(layerIdx);
@@ -179,7 +179,7 @@ namespace mitk
     }
     else
     { //Avoid label id collision.
-      LabelSetImage::LabelValueType maxValue = LabelSetImage::UnlabeledLabelValue;
+      LabelSetImage::LabelValueType maxValue = LabelSetImage::UnlabeledValue;
       auto imageIterator = groupImages.begin();
       std::vector<mitk::LabelSet::Pointer> adaptedLabelSets;
 
@@ -193,19 +193,19 @@ namespace mitk
         { //have to use reverse loop because TransferLabelContent (used to adapt content in the same image; see below)
           //would potentially corrupt otherwise the content due to "value collision between old values still present
           //and already adapted values. By going from highest value to lowest, we avoid that.
-          if (LabelSetImage::UnlabeledLabelValue != *vIter)
+          if (LabelSetImage::UnlabeledValue != *vIter)
             labelMapping.push_back({ *vIter, *vIter + maxValue });
         }
 
 
-        if (LabelSetImage::UnlabeledLabelValue != maxValue)
+        if (LabelSetImage::UnlabeledValue != maxValue)
         {
           //adapt labelset
           auto mappedLabelSet = GenerateLabelSetWithMappedValues(labelset, labelMapping);
           adaptedLabelSets.emplace_back(mappedLabelSet);
 
           //adapt image (it is an inplace operation. the image instance stays the same.
-          TransferLabelContent(*imageIterator, *imageIterator, mappedLabelSet, LabelSetImage::UnlabeledLabelValue, LabelSetImage::UnlabeledLabelValue,
+          TransferLabelContent(*imageIterator, *imageIterator, mappedLabelSet, LabelSetImage::UnlabeledValue, LabelSetImage::UnlabeledValue,
             false, labelMapping, MultiLabelSegmentation::MergeStyle::Replace, MultiLabelSegmentation::OverwriteStyle::IgnoreLocks);
         }
         else

@@ -165,8 +165,7 @@ bool EqualLabelSelections(const QmitkMultiLabelInspector::LabelValueVectorType& 
   if (selection1.size() == selection2.size())
   {
     // lambda to compare node pointer inside both lists
-    auto lambda = [](mitk::LabelSetImage::LabelValueType lhs, mitk::LabelSetImage::LabelValueType rhs) { return lhs == rhs; };
-    return std::is_permutation(selection1.begin(), selection1.end(), selection2.begin(), selection2.end(), lambda);
+    return std::is_permutation(selection1.begin(), selection1.end(), selection2.begin());
   }
 
   return false;
@@ -387,7 +386,7 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabel()
   return AddNewLabelInternal(groupID);
 }
 
-void QmitkMultiLabelInspector::RemoveLabel()
+void QmitkMultiLabelInspector::DeleteLabel()
 {
   if (!m_AllowLabelModification)
     mitkThrow() << "QmitkMultiLabelInspector is configured incorrectly. Set AllowLabelModification to true to allow the usage of RemoveLabel.";
@@ -717,7 +716,7 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
       menu->addAction(mergeAction);
 
       QAction* removeLabelsAction = new QAction(QIcon(":/Qmitk/RemoveLabel.png"), "&Delete selected labels", this);
-      QObject::connect(removeLabelsAction, SIGNAL(triggered(bool)), this, SLOT(OnRemoveLabels(bool)));
+      QObject::connect(removeLabelsAction, SIGNAL(triggered(bool)), this, SLOT(OnDeleteLabels(bool)));
       menu->addAction(removeLabelsAction);
 
       QAction* clearLabelsAction = new QAction(QIcon(":/Qmitk/EraseLabel.png"), "&Clear selected labels", this);
@@ -737,7 +736,7 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
         menu->addAction(renameAction);
 
         QAction* removeAction = new QAction(QIcon(":/Qmitk/RemoveLabel.png"), "&Delete", this);
-        QObject::connect(removeAction, &QAction::triggered, this, &QmitkMultiLabelInspector::RemoveLabel);
+        QObject::connect(removeAction, &QAction::triggered, this, &QmitkMultiLabelInspector::DeleteLabel);
         menu->addAction(removeAction);
 
         QAction* clearAction = new QAction(QIcon(":/Qmitk/EraseLabel.png"), "&Clear content", this);
@@ -858,7 +857,7 @@ void QmitkMultiLabelInspector::OnDeleteAffectedLabel()
   }
 }
 
-void QmitkMultiLabelInspector::OnRemoveLabels(bool /*value*/)
+void QmitkMultiLabelInspector::OnDeleteLabels(bool /*value*/)
 {
   QString question = "Do you really want to remove the selected labels?";
   QMessageBox::StandardButton answerButton = QMessageBox::question(

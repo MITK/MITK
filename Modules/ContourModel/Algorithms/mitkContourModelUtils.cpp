@@ -235,7 +235,7 @@ void mitk::ContourModelUtils::FillSliceInSlice(
   }
   else
   {
-    if (paintingPixelValue != LabelSetImage::UnlabeledLabelValue)
+    if (paintingPixelValue != LabelSetImage::UnlabeledValue)
     {
       for (std::remove_const_t<decltype(numberOfPoints)> i = 0; i < numberOfPoints; ++i)
       {

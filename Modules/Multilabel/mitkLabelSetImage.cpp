@@ -260,7 +260,7 @@ void mitk::LabelSetImage::RemoveGroup(GroupIndexType indexToDelete)
 
 mitk::LabelSetImage::LabelValueVectorType mitk::LabelSetImage::GetUsedLabelValues() const
 {
-  LabelValueVectorType result = { UnlabeledLabelValue };
+  LabelValueVectorType result = { UnlabeledValue };
 
   for (auto [value, label] : m_LabelMap)
   {
@@ -303,7 +303,7 @@ unsigned int mitk::LabelSetImage::AddLayer(mitk::Image::Pointer layerImage, mitk
   else
   {
     ls = mitk::LabelSet::New();
-    ls->SetActiveLabel(UnlabeledLabelValue);
+    ls->SetActiveLabel(UnlabeledValue);
   }
 
   ls->SetLayer(newLabelSetId);
@@ -351,7 +351,7 @@ void mitk::LabelSetImage::AddLabelSetToLayer(const unsigned int layerIdx, const 
     while (layerIdx >= m_LabelSetContainer.size())
     {
       mitk::LabelSet::Pointer defaultLabelSet = mitk::LabelSet::New();
-      defaultLabelSet->SetActiveLabel(UnlabeledLabelValue);
+      defaultLabelSet->SetActiveLabel(UnlabeledValue);
       defaultLabelSet->SetLayer(m_LabelSetContainer.size());
       this->RegisterLabelSet(defaultLabelSet);
       this->ReinitMaps();
@@ -790,7 +790,7 @@ void mitk::LabelSetImage::InitializeByLabeledImageProcessing(LabelSetImageType *
     auto sourceValue = static_cast<PixelType>(sourceIter.Get());
     targetIter.Set(sourceValue);
 
-    if (LabelSetImage::UnlabeledLabelValue!=sourceValue && !this->ExistLabel(sourceValue))
+    if (LabelSetImage::UnlabeledValue!=sourceValue && !this->ExistLabel(sourceValue))
     {
       std::stringstream name;
       name << "object-" << sourceValue;
@@ -843,7 +843,7 @@ void mitk::LabelSetImage::MaskStampProcessing(ImageType *itkImage, mitk::Image *
     PixelType sourceValue = sourceIter.Get();
     PixelType targetValue = targetIter.Get();
 
-    if ((sourceValue != UnlabeledLabelValue) &&
+    if ((sourceValue != UnlabeledValue) &&
         (forceOverwrite || !this->IsLabelLocked(targetValue))) // skip unlabeled pixels and locked labels
     {
       targetIter.Set(activeLabel);
@@ -1122,7 +1122,7 @@ mitk::Label* mitk::LabelSetImage::GetLabel(LabelValueType value)
 
 bool mitk::LabelSetImage::IsLabelLocked(LabelValueType value) const
 {
-  if (value == UnlabeledLabelValue)
+  if (value == UnlabeledValue)
   {
     return m_UnlabeledLabelLock;
   }
@@ -1198,7 +1198,7 @@ void mitk::LabelSetImage::ReinitMaps()
     auto labelSet = this->GetLabelSet(layerID);
     for (auto iter = labelSet->IteratorBegin(); iter != labelSet->IteratorEnd(); ++iter)
     {
-      if (iter->first != UnlabeledLabelValue)
+      if (iter->first != UnlabeledValue)
       {
         this->AddLabelToMap(iter->first, iter->second, layerID);
       }
@@ -1463,7 +1463,7 @@ void mitk::TransferLabelContentAtTimeStep(
 
   for (const auto& [sourceLabel, newDestinationLabel] : labelMapping)
   {
-    if (LabelSetImage::UnlabeledLabelValue!=newDestinationLabel && nullptr == destinationLabelSet->GetLabel(newDestinationLabel))
+    if (LabelSetImage::UnlabeledValue!=newDestinationLabel && nullptr == destinationLabelSet->GetLabel(newDestinationLabel))
     {
       mitkThrow() << "Invalid call of TransferLabelContentAtTimeStep. Defined destination label does not exist in destinationImage. newDestinationLabel: " << newDestinationLabel;
     }
@@ -1515,13 +1515,13 @@ void mitk::TransferLabelContentAtTimeStep(
 
   for (const auto& mappingElement : labelMapping)
   {
-    if (LabelSetImage::UnlabeledLabelValue != mappingElement.first && !sourceImage->ExistLabel(mappingElement.first, sourceImage->GetActiveLayer()))
+    if (LabelSetImage::UnlabeledValue != mappingElement.first && !sourceImage->ExistLabel(mappingElement.first, sourceImage->GetActiveLayer()))
     {
       mitkThrow() << "Invalid call of TransferLabelContentAtTimeStep. Defined source label does not exist in sourceImage. SourceLabel: " << mappingElement.first;
     }
   }
 
-  TransferLabelContentAtTimeStep(sourceImage, destinationImage, destinationLabelSet, timeStep, LabelSetImage::UnlabeledLabelValue, LabelSetImage::UnlabeledLabelValue, destinationImage->GetUnlabeledLabelLock(),
+  TransferLabelContentAtTimeStep(sourceImage, destinationImage, destinationLabelSet, timeStep, LabelSetImage::UnlabeledValue, LabelSetImage::UnlabeledValue, destinationImage->GetUnlabeledLabelLock(),
     labelMapping, mergeStyle, overwriteStlye);
 }
 

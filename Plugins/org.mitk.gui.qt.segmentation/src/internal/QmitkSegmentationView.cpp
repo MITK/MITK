@@ -975,7 +975,7 @@ void QmitkSegmentationView::ValidateSelectionInput()
     numberOfLabels = labelSetImage->GetNumberOfLabels(activeLayer);
 
     if (numberOfLabels > 0)
-    m_Controls->slicesInterpolator->setEnabled(true);
+      m_Controls->slicesInterpolator->setEnabled(true);
 
     m_Controls->multiLabelWidget->SetMultiLabelSegmentation(dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData()));
   }

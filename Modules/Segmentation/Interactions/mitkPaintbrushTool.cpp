@@ -476,7 +476,7 @@ void mitk::PaintbrushTool::OnMouseReleased(StateMachineAction *, InteractionEven
   Label::PixelType activePixelValue = ContourModelUtils::GetActivePixelValue(workingImage);
   if (!m_FillMode)
   {
-    activePixelValue = LabelSetImage::UnlabeledLabelValue;
+    activePixelValue = LabelSetImage::UnlabeledValue;
   }
 
   //as paintbrush tools should always allow to manipulate active label
@@ -491,7 +491,7 @@ void mitk::PaintbrushTool::OnMouseReleased(StateMachineAction *, InteractionEven
     activeLabelClone->SetLocked(false);
   }
 
-  TransferLabelContentAtTimeStep(m_PaintingSlice, m_WorkingSlice, fillLabelSet, 0, LabelSetImage::UnlabeledLabelValue, LabelSetImage::UnlabeledLabelValue, false, { {m_InternalFillValue, activePixelValue} }, mitk::MultiLabelSegmentation::MergeStyle::Merge);
+  TransferLabelContentAtTimeStep(m_PaintingSlice, m_WorkingSlice, fillLabelSet, 0, LabelSetImage::UnlabeledValue, LabelSetImage::UnlabeledValue, false, { {m_InternalFillValue, activePixelValue} }, mitk::MultiLabelSegmentation::MergeStyle::Merge);
 
   this->WriteBackSegmentationResult(positionEvent, m_WorkingSlice->Clone());
 

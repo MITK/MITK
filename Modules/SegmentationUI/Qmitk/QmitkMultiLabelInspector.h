@@ -166,7 +166,7 @@ public Q_SLOTS:
   * nothing will happen.
   *
   * @pre AllowLabeModification must be set to true.*/
-  void RemoveLabel();
+  void DeleteLabel();
 
   /** @brief Adds a new group with a new label to segmentation.
   *
@@ -230,7 +230,7 @@ private Q_SLOTS:
   void OnAddLabelInstance();
   void OnDeleteGroup();
   void OnDeleteAffectedLabel();
-  void OnRemoveLabels(bool);
+  void OnDeleteLabels(bool);
   void OnClearLabels(bool);
   void OnMergeLabels(bool);
 

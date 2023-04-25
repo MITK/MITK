@@ -73,7 +73,7 @@ QmitkMultiLabelManager::QmitkMultiLabelManager(QWidget *parent)
 
   connect(m_Controls->btnAddLabel, &QToolButton::clicked, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::AddNewLabel);
   connect(m_Controls->btnAddInstance, &QToolButton::clicked, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::AddNewLabelInstance);
-  connect(m_Controls->btnRemoveLabel, &QToolButton::clicked, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::RemoveLabel);
+  connect(m_Controls->btnRemoveLabel, &QToolButton::clicked, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::DeleteLabel);
   connect(m_Controls->btnAddGroup, &QToolButton::clicked, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::AddNewGroup);
   connect(m_Controls->btnRemoveGroup, &QToolButton::clicked, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::RemoveGroup);
   connect(m_Controls->btnSavePreset, &QToolButton::clicked, this, &QmitkMultiLabelManager::OnSavePreset);
@@ -86,7 +86,7 @@ QmitkMultiLabelManager::QmitkMultiLabelManager(QWidget *parent)
   auto* renameLabelShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_L, Qt::CTRL | Qt::Key::Key_R), this);
   connect(renameLabelShortcut, &QShortcut::activated, this, &QmitkMultiLabelManager::OnRenameLabelShortcutActivated);
 
-  auto* newLabelShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_L, Qt::CTRL | Qt::Key::Key_N), this);
+  auto* newLabelShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_L, Qt::CTRL | Qt::Key::Key_A), this);
   connect(newLabelShortcut, &QShortcut::activated, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::AddNewLabel);
 
   this->UpdateControls();

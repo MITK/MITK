@@ -175,7 +175,7 @@ std::vector<mitk::Label::PixelType> GetPixelValuesPresentInImage(mitk::LabelSetI
   for (std::size_t i = 0; i < numberOfPixels; ++i)
   {
     mitk::Label::PixelType pixelVal = *(src + i);
-    if ( (std::find(pixelsPresent.begin(), pixelsPresent.end(), pixelVal) == pixelsPresent.end()) && (pixelVal != mitk::LabelSetImage::UnlabeledLabelValue) )
+    if ( (std::find(pixelsPresent.begin(), pixelsPresent.end(), pixelVal) == pixelsPresent.end()) && (pixelVal != mitk::LabelSetImage::UnlabeledValue) )
       pixelsPresent.push_back(pixelVal);
   }
   return pixelsPresent;

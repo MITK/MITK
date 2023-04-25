@@ -60,7 +60,7 @@ namespace mitk
 
     using GroupIndexType = std::size_t;
     using LabelValueType = mitk::Label::PixelType;
-    const static LabelValueType UnlabeledLabelValue = 0;
+    const static LabelValueType UnlabeledValue = 0;
     using ConstLabelVectorType = std::vector<Label::ConstPointer>;
     using LabelVectorType = std::vector<Label::Pointer>;
     using LabelValueVectorType = std::vector<LabelValueType>;
@@ -68,7 +68,7 @@ namespace mitk
     /**
      * @brief Removes the label with the given value.
      *        The label is removed from the labelset and
-     *        the pixel with the value of the label are set to UnlabeledLabelValue.
+     *        the pixel with the value of the label are set to UnlabeledValue.
      * @param labelValue the pixel value of the label to be removed
      */
     void RemoveLabel(LabelValueType labelValue);
@@ -649,8 +649,8 @@ namespace mitk
   @pre sourceImage and destinationImage must contain the indicated timeStep
   @pre destinationLabelSet must contain all indicated destinationLabels for mapping.*/
   MITKMULTILABEL_EXPORT void TransferLabelContentAtTimeStep(const Image* sourceImage, Image* destinationImage, const mitk::LabelSet* destinationLabelSet,
-    const TimeStepType timeStep, mitk::Label::PixelType sourceBackground = LabelSetImage::UnlabeledLabelValue,
-    mitk::Label::PixelType destinationBackground = LabelSetImage::UnlabeledLabelValue,
+    const TimeStepType timeStep, mitk::Label::PixelType sourceBackground = LabelSetImage::UnlabeledValue,
+    mitk::Label::PixelType destinationBackground = LabelSetImage::UnlabeledValue,
     bool destinationBackgroundLocked = false,
     std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping = { {1,1} },
     MultiLabelSegmentation::MergeStyle mergeStyle = MultiLabelSegmentation::MergeStyle::Replace,
@@ -661,8 +661,8 @@ namespace mitk
   For more details please see TransferLabelContentAtTimeStep.
   @sa TransferLabelContentAtTimeStep*/
   MITKMULTILABEL_EXPORT void TransferLabelContent(const Image* sourceImage, Image* destinationImage, const mitk::LabelSet* destinationLabelSet,
-    mitk::Label::PixelType sourceBackground = LabelSetImage::UnlabeledLabelValue,
-    mitk::Label::PixelType destinationBackground = LabelSetImage::UnlabeledLabelValue,
+    mitk::Label::PixelType sourceBackground = LabelSetImage::UnlabeledValue,
+    mitk::Label::PixelType destinationBackground = LabelSetImage::UnlabeledValue,
     bool destinationBackgroundLocked = false,
     std::vector<std::pair<Label::PixelType, Label::PixelType> > labelMapping = { {1,1} },
     MultiLabelSegmentation::MergeStyle mergeStyle = MultiLabelSegmentation::MergeStyle::Replace,

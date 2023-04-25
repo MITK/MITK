@@ -104,7 +104,7 @@ mitk::Image::Pointer mitk::CloseRegionTool::GenerateFillImage(const Image* worki
 
   AccessFixedDimensionByItk_n(workingSlice, DoITKRegionClosing, 2, (fillImage, seedIndex, seedLabelValue));
 
-  if (seedLabelValue == LabelSetImage::UnlabeledLabelValue)
+  if (seedLabelValue == LabelSetImage::UnlabeledValue)
   {
     return nullptr;
   }

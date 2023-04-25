@@ -341,7 +341,7 @@ namespace mitk
      * @brief Function that removes contours of a particular label when the "Remove Label" event is trigerred in the labelSetImage.
      *
      */
-    void OnRemoveLabel();
+    void OnRemoveLabel(mitk::Label::PixelType removedLabelValue);
 
     /**
      * @brief When a new contour is added to the pipeline or an existing contour is replaced,

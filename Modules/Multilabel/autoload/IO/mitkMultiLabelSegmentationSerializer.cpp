@@ -10,24 +10,24 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "mitkLabelSetImageSerializer.h"
+#include "mitkMultiLabelSegmentationSerializer.h"
 #include "mitkLabelSetImage.h"
 
 #include <itksys/SystemTools.hxx>
 
 #include <mitkIOUtil.h>
 
-MITK_REGISTER_SERIALIZER(LabelSetImageSerializer)
+MITK_REGISTER_SERIALIZER(MultiLabelSegmentationSerializer)
 
-mitk::LabelSetImageSerializer::LabelSetImageSerializer()
+mitk::MultiLabelSegmentationSerializer::MultiLabelSegmentationSerializer()
 {
 }
 
-mitk::LabelSetImageSerializer::~LabelSetImageSerializer()
+mitk::MultiLabelSegmentationSerializer::~MultiLabelSegmentationSerializer()
 {
 }
 
-std::string mitk::LabelSetImageSerializer::Serialize()
+std::string mitk::MultiLabelSegmentationSerializer::Serialize()
 {
   const auto *image = dynamic_cast<const LabelSetImage *>(m_Data.GetPointer());
   if (image == nullptr)

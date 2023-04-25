@@ -175,7 +175,7 @@ std::vector<mitk::Label::PixelType> GetPixelValuesPresentInImage(mitk::LabelSetI
   for (std::size_t i = 0; i < numberOfPixels; ++i)
   {
     mitk::Label::PixelType pixelVal = *(src + i);
-    if ( (std::find(pixelsPresent.begin(), pixelsPresent.end(), pixelVal) == pixelsPresent.end()) && (pixelVal != labelSetImage->GetExteriorLabel()->GetValue()) )
+    if ( (std::find(pixelsPresent.begin(), pixelsPresent.end(), pixelVal) == pixelsPresent.end()) && (pixelVal != mitk::LabelSetImage::UnlabeledValue) )
       pixelsPresent.push_back(pixelVal);
   }
   return pixelsPresent;
@@ -1194,17 +1194,17 @@ void QmitkSlicesInterpolator::OnAccept3DInterpolationClicked()
   auto timeStep = segmentationGeometry->TimePointToTimeStep(timePoint);
   const mitk::Label::PixelType newDestinationLabel = labelSetImage->GetActiveLabelSet()->GetActiveLabel()->GetValue();
 
-  TransferLabelContent(
+  TransferLabelContentAtTimeStep(
     interpolatedSegmentation,
     labelSetImage,
     labelSetImage->GetActiveLabelSet(),
+    timeStep,
     0,
     0,
     false,
     {{1, newDestinationLabel}},
     mitk::MultiLabelSegmentation::MergeStyle::Merge,
-    mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks,
-    timeStep);
+    mitk::MultiLabelSegmentation::OverwriteStyle::RegardLocks);
 
   // m_CmbInterpolation->setCurrentIndex(0);
   this->Show3DInterpolationResult(false);
@@ -1760,7 +1760,7 @@ void QmitkSlicesInterpolator::OnAddLabelSetConnection(unsigned int layerID)
     {
       auto workingImage = dynamic_cast<mitk::LabelSetImage *>(m_ToolManager->GetWorkingData(0)->GetData());
       auto labelSet = workingImage->GetLabelSet(layerID);
-      labelSet->RemoveLabelEvent += mitk::MessageDelegate<QmitkSlicesInterpolator>(
+      labelSet->RemoveLabelEvent += mitk::MessageDelegate1<QmitkSlicesInterpolator, mitk::Label::PixelType>(
         this, &QmitkSlicesInterpolator::OnRemoveLabel);
       labelSet->ActiveLabelEvent += mitk::MessageDelegate1<QmitkSlicesInterpolator,mitk::Label::PixelType>(
             this, &QmitkSlicesInterpolator::OnActiveLabelChanged);
@@ -1784,7 +1784,7 @@ void QmitkSlicesInterpolator::OnAddLabelSetConnection()
     try
     {
       auto workingImage = dynamic_cast<mitk::LabelSetImage *>(m_ToolManager->GetWorkingData(0)->GetData());
-      workingImage->GetActiveLabelSet()->RemoveLabelEvent += mitk::MessageDelegate<QmitkSlicesInterpolator>(
+      workingImage->GetActiveLabelSet()->RemoveLabelEvent += mitk::MessageDelegate1<QmitkSlicesInterpolator, mitk::Label::PixelType>(
         this, &QmitkSlicesInterpolator::OnRemoveLabel);
       workingImage->GetActiveLabelSet()->ActiveLabelEvent += mitk::MessageDelegate1<QmitkSlicesInterpolator,mitk::Label::PixelType>(
             this, &QmitkSlicesInterpolator::OnActiveLabelChanged);
@@ -1803,7 +1803,7 @@ void QmitkSlicesInterpolator::OnRemoveLabelSetConnection(mitk::LabelSetImage* la
 {
   size_t previousLayerID = labelSetImage->GetActiveLayer();
   labelSetImage->SetActiveLayer(layerID);
-  labelSetImage->GetActiveLabelSet()->RemoveLabelEvent -= mitk::MessageDelegate<QmitkSlicesInterpolator>(
+  labelSetImage->GetActiveLabelSet()->RemoveLabelEvent -= mitk::MessageDelegate1<QmitkSlicesInterpolator, mitk::Label::PixelType>(
         this, &QmitkSlicesInterpolator::OnRemoveLabel);
   labelSetImage->GetActiveLabelSet()->ActiveLabelEvent -= mitk::MessageDelegate1<QmitkSlicesInterpolator,mitk::Label::PixelType>(
             this, &QmitkSlicesInterpolator::OnActiveLabelChanged);
@@ -1820,7 +1820,7 @@ void QmitkSlicesInterpolator::OnRemoveLabelSetConnection()
     try
     {
       auto workingImage = dynamic_cast<mitk::LabelSetImage*>(m_ToolManager->GetWorkingData(0)->GetData());
-      workingImage->GetActiveLabelSet()->RemoveLabelEvent -= mitk::MessageDelegate<QmitkSlicesInterpolator>(
+      workingImage->GetActiveLabelSet()->RemoveLabelEvent -= mitk::MessageDelegate1<QmitkSlicesInterpolator, mitk::Label::PixelType>(
         this, &QmitkSlicesInterpolator::OnRemoveLabel);
       workingImage->GetActiveLabelSet()->ActiveLabelEvent -= mitk::MessageDelegate1<QmitkSlicesInterpolator,mitk::Label::PixelType>(
             this, &QmitkSlicesInterpolator::OnActiveLabelChanged);
@@ -1834,7 +1834,7 @@ void QmitkSlicesInterpolator::OnRemoveLabelSetConnection()
   }
 }
 
-void QmitkSlicesInterpolator::OnRemoveLabel()
+void QmitkSlicesInterpolator::OnRemoveLabel(mitk::Label::PixelType /*removedLabelValue*/)
 {
   if (m_ToolManager->GetWorkingData(0) != nullptr)
   {

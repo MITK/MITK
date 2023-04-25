@@ -72,13 +72,10 @@ private Q_SLOTS:
 
   void OnShowMarkerNodes(bool);
 
-  void OnLayersChanged();
+  void OnCurrentLabelSelectionChanged(QmitkMultiLabelManager::LabelValueVectorType labels);
 
-  void OnShowLabelTable(bool);
-
-  void OnGoToLabel(const mitk::Point3D &pos);
-
-  void OnLabelSetWidgetReset();
+  void OnGoToLabel(mitk::LabelSetImage::LabelValueType label, const mitk::Point3D&);
+  void OnLabelRenameRequested(mitk::Label* label, bool rename) const;
 
 private:
 
@@ -123,10 +120,6 @@ private:
 
   void NodeRemoved(const mitk::DataNode* node) override;
 
-  void EstablishLabelSetConnection();
-
-  void LooseLabelSetConnection();
-
   void OnAnySelectionChanged();
 
   // make sure all images / segmentations look according to the user preference settings
@@ -156,6 +149,8 @@ private:
   void UpdateWarningLabel(QString text);
 
   std::string GetDefaultLabelSetPreset() const;
+
+  mitk::LabelSetImage* GetCurrentSegmentation() const;
 
   QWidget* m_Parent;
 

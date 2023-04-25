@@ -38,7 +38,7 @@ public:
 
   QmitkMxNMultiWidget(QWidget* parent = nullptr,
                       Qt::WindowFlags f = 0,
-                      const QString& multiWidgetName = "mxnmulti");
+                      const QString& multiWidgetName = "mxn");
 
   ~QmitkMxNMultiWidget();
 

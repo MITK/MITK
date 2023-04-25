@@ -77,8 +77,9 @@ void mitk::PlanarFigureMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::
    same figure, which can happen a lot when using the MxNMultiWidget. Therefore, rendering is completely
    disabled here if the renderer in question does not belong to the StdMultiWidget.
    See T29333 */
-  std::regex pattern("^stdmulti\\.widget[0-3]$");
-  if (!std::regex_match(renderer->GetName(), pattern))
+  std::regex pattern("^mxn\\.widget");
+  std::cmatch match;
+  if (std::regex_search(renderer->GetName(), match, pattern))
     return;
 
   if (type != mitk::VtkPropRenderer::Overlay) return;

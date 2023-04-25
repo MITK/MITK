@@ -33,7 +33,7 @@ found in the LICENSE file.
 
 QmitkMxNMultiWidget::QmitkMxNMultiWidget(QWidget* parent,
                                          Qt::WindowFlags f/* = 0*/,
-                                         const QString& multiWidgetName/* = "mxnmulti"*/)
+                                         const QString& multiWidgetName/* = "mxn"*/)
   : QmitkAbstractMultiWidget(parent, f, multiWidgetName)
   , m_TimeNavigationController(nullptr)
   , m_SynchronizedWidgetConnector(std::make_unique<QmitkSynchronizedWidgetConnector>())

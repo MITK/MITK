@@ -170,7 +170,7 @@ void QmitkMxNMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
   auto multiWidget = GetMultiWidget();
   if (nullptr == multiWidget)
   {
-    multiWidget = new QmitkMxNMultiWidget(parent, 0, nullptr);
+    multiWidget = new QmitkMxNMultiWidget(parent);
 
     // create left toolbar: interaction scheme toolbar to switch how the render window navigation behaves in PACS mode
     if (nullptr == m_Impl->m_InteractionSchemeToolBar)

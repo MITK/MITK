@@ -217,6 +217,28 @@ void QmitkMovieMakerView::SetFocus()
   m_Ui->addAnimationButton->setFocus();
 }
 
+void QmitkMovieMakerView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
+{
+  auto multiWidgetEditor = dynamic_cast<berry::Object*>(renderWindowPart);
+  auto widget = static_cast<QWidget*>(m_Ui->verticalLayout_2->parent());
+  if (multiWidgetEditor && multiWidgetEditor->GetClassName() == "QmitkMxNMultiWidgetEditor")
+  {
+    widget->setEnabled(false);
+  }
+  else
+  {
+    widget->setEnabled(true);
+  }
+}
+
+void QmitkMovieMakerView::RenderWindowPartDeactivated(mitk::IRenderWindowPart* /*renderWindowPart*/)
+{
+}
+
+void QmitkMovieMakerView::RenderWindowPartInputChanged(mitk::IRenderWindowPart* /*renderWindowPart*/)
+{
+}
+
 void QmitkMovieMakerView::OnMoveAnimationUpButtonClicked()
 {
   const QItemSelection selection = m_Ui->animationTreeView->selectionModel()->selection();

@@ -14,6 +14,7 @@ found in the LICENSE file.
 #define QmitkMovieMakerView_h
 
 #include <QmitkAbstractView.h>
+#include <mitkIRenderWindowPartListener.h>
 
 #include <utility>
 #include <vector>
@@ -30,7 +31,7 @@ namespace Ui
   class QmitkMovieMakerView;
 }
 
-class QmitkMovieMakerView : public QmitkAbstractView
+class QmitkMovieMakerView : public QmitkAbstractView, public mitk::IRenderWindowPartListener
 {
   Q_OBJECT
 
@@ -42,6 +43,10 @@ public:
 
   void CreateQtPartControl(QWidget* parent) override;
   void SetFocus() override;
+
+  void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart) override;
 
 private slots:
   void OnMoveAnimationUpButtonClicked();

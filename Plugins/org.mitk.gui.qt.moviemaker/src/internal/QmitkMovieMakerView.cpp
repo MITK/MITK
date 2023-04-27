@@ -75,6 +75,7 @@ const std::string QmitkMovieMakerView::VIEW_ID = "org.mitk.views.moviemaker";
 
 QmitkMovieMakerView::QmitkMovieMakerView()
   : m_FFmpegWriter(nullptr),
+    m_Parent(nullptr),
     m_Ui(new Ui::QmitkMovieMakerView),
     m_AnimationModel(nullptr),
     m_AddAnimationMenu(nullptr),
@@ -93,6 +94,7 @@ QmitkMovieMakerView::~QmitkMovieMakerView()
 void QmitkMovieMakerView::CreateQtPartControl(QWidget* parent)
 {
   m_FFmpegWriter = new QmitkFFmpegWriter(parent);
+  m_Parent = parent;
 
   m_Ui->setupUi(parent);
 
@@ -220,15 +222,8 @@ void QmitkMovieMakerView::SetFocus()
 void QmitkMovieMakerView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
 {
   auto multiWidgetEditor = dynamic_cast<berry::Object*>(renderWindowPart);
-  auto widget = static_cast<QWidget*>(m_Ui->verticalLayout_2->parent());
-  if (multiWidgetEditor && multiWidgetEditor->GetClassName() == "QmitkMxNMultiWidgetEditor")
-  {
-    widget->setEnabled(false);
-  }
-  else
-  {
-    widget->setEnabled(true);
-  }
+  bool isMxN = nullptr != multiWidgetEditor && multiWidgetEditor->GetClassName() == "QmitkMxNMultiWidgetEditor";
+  m_Parent->setDisabled(isMxN);
 }
 
 void QmitkMovieMakerView::RenderWindowPartDeactivated(mitk::IRenderWindowPart* /*renderWindowPart*/)

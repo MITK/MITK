@@ -88,6 +88,7 @@ private:
   std::vector<std::pair<QmitkAnimationItem*, double>> GetActiveAnimations(double t) const;
 
   QmitkFFmpegWriter* m_FFmpegWriter;
+  QWidget* m_Parent;
   Ui::QmitkMovieMakerView* m_Ui;
   QStandardItemModel* m_AnimationModel;
   std::map<QString, QmitkAnimationWidget*> m_AnimationWidgets;

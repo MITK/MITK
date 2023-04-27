@@ -182,19 +182,6 @@
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="genMovieButton">
-     <property name="maximumSize">
-      <size>
-       <width>32767</width>
-       <height>23</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>Generate Movie</string>
-     </property>
-    </widget>
-   </item>
-   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>

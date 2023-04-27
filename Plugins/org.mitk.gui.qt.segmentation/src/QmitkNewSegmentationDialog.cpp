@@ -368,3 +368,34 @@ void QmitkNewSegmentationDialog::OnSuggestionSelected()
     this->UpdateColorButtonBackground();
   }
 }
+
+bool QmitkNewSegmentationDialog::DoRenameLabel(const mitk::Label* currentLabel, mitk::LabelSetImage* segmentation, QWidget* parent, Mode mode)
+{
+  if (nullptr == currentLabel) mitkThrow() << "Invalid call of QmitkNewSegmentationDialog::RenameLabel. Passed label is null.";
+  if (nullptr != segmentation && !segmentation->IsLabeInGroup(currentLabel->GetValue())) mitkThrow() << "Invalid call of QmitkNewSegmentationDialog::RenameLabel. Passed label value does not exist in segmentation.";
+  QmitkNewSegmentationDialog dialog(parent, segmentation, mode);
+
+  dialog.SetColor(currentLabel->GetColor());
+  dialog.SetName(QString::fromStdString(currentLabel->GetName()));
+
+  if (dialog.exec() == QDialog::Rejected)
+  {
+    return false;
+  }
+
+  QString segmentationName = dialog.GetName();
+  if (segmentationName.isEmpty())
+  {
+    segmentationName = "Unnamed";
+  }
+
+  if (nullptr != segmentation)
+  {
+    auto groupID = segmentation->GetGroupIndexOfLabel(currentLabel->GetValue());
+    auto group = segmentation->GetLabelSet(groupID);
+    group->RenameLabel(currentLabel->GetValue(), segmentationName.toStdString(), dialog.GetColor());
+    group->UpdateLookupTable(currentLabel->GetValue());
+  }
+
+  return true;
+}

@@ -237,43 +237,14 @@ namespace mitk
     return result;
   };
 
-  itk::MetaDataObjectBase::Pointer ConvertTimePointListToMetaDataObject(const mitk::TimeGeometry* timeGeometry)
+  Image::Pointer ItkImageIO::LoadRawMitkImageFromImageIO(itk::ImageIOBase* imageIO, const std::string& path)
   {
-    std::stringstream stream;
-    stream << timeGeometry->GetTimeBounds(0)[0];
-    const auto maxTimePoints = timeGeometry->CountTimeSteps();
-    for (TimeStepType pos = 0; pos < maxTimePoints; ++pos)
-    {
-      auto timeBounds = timeGeometry->GetTimeBounds(pos);
-
-      ///////////////////////////////////////
-      // Workaround T27883. See https://phabricator.mitk.org/T27883#219473 for more details.
-      // This workaround should be removed as soon as T28262 is solved!
-      if (pos + 1 == maxTimePoints && timeBounds[0]==timeBounds[1])
-      {
-        timeBounds[1] = timeBounds[0] + 1.;
-      }
-      // End of workaround for T27883
-      //////////////////////////////////////
-
-      stream << " " << timeBounds[1];
-    }
-    auto result = itk::MetaDataObject<std::string>::New();
-    result->SetMetaDataObjectValue(stream.str());
-    return result.GetPointer();
-  };
-
-  std::vector<BaseData::Pointer> ItkImageIO::DoRead()
-  {
-    std::vector<BaseData::Pointer> result;
-    mitk::LocaleSwitch localeSwitch("C");
+    LocaleSwitch localeSwitch("C");
 
     Image::Pointer image = Image::New();
 
     const unsigned int MINDIM = 2;
     const unsigned int MAXDIM = 4;
-
-    const std::string path = this->GetLocalFileName();
 
     MITK_INFO << "loading " << path << " via itk::ImageIOFactory... " << std::endl;
 
@@ -285,14 +256,14 @@ namespace mitk
 
     // Got to allocate space for the image. Determine the characteristics of
     // the image.
-    m_ImageIO->SetFileName(path);
-    m_ImageIO->ReadImageInformation();
+    imageIO->SetFileName(path);
+    imageIO->ReadImageInformation();
 
-    unsigned int ndim = m_ImageIO->GetNumberOfDimensions();
+    unsigned int ndim = imageIO->GetNumberOfDimensions();
     if (ndim < MINDIM || ndim > MAXDIM)
     {
       MITK_WARN << "Sorry, only dimensions 2, 3 and 4 are supported. The given file has " << ndim
-                << " dimensions! Reading as 4D.";
+        << " dimensions! Reading as 4D.";
       ndim = MAXDIM;
     }
 
@@ -319,17 +290,17 @@ namespace mitk
     for (i = 0; i < ndim; ++i)
     {
       ioStart[i] = 0;
-      ioSize[i] = m_ImageIO->GetDimensions(i);
+      ioSize[i] = imageIO->GetDimensions(i);
       if (i < MAXDIM)
       {
-        dimensions[i] = m_ImageIO->GetDimensions(i);
-        spacing[i] = m_ImageIO->GetSpacing(i);
+        dimensions[i] = imageIO->GetDimensions(i);
+        spacing[i] = imageIO->GetSpacing(i);
         if (spacing[i] <= 0)
           spacing[i] = 1.0f;
       }
       if (i < 3)
       {
-        origin[i] = m_ImageIO->GetOrigin(i);
+        origin[i] = imageIO->GetOrigin(i);
       }
     }
 
@@ -337,14 +308,14 @@ namespace mitk
     ioRegion.SetIndex(ioStart);
 
     MITK_INFO << "ioRegion: " << ioRegion << std::endl;
-    m_ImageIO->SetIORegion(ioRegion);
-    void *buffer = new unsigned char[m_ImageIO->GetImageSizeInBytes()];
-    m_ImageIO->Read(buffer);
+    imageIO->SetIORegion(ioRegion);
+    void* buffer = new unsigned char[imageIO->GetImageSizeInBytes()];
+    imageIO->Read(buffer);
 
-    image->Initialize(MakePixelType(m_ImageIO), ndim, dimensions);
+    image->Initialize(MakePixelType(imageIO), ndim, dimensions);
     image->SetImportChannel(buffer, 0, Image::ManageMemory);
 
-    const itk::MetaDataDictionary &dictionary = m_ImageIO->GetMetaDataDictionary();
+    const itk::MetaDataDictionary& dictionary = imageIO->GetMetaDataDictionary();
 
     // access direction of itk::Image and include spacing
     mitk::Matrix3D matrix;
@@ -352,15 +323,15 @@ namespace mitk
     unsigned int j, itkDimMax3 = (ndim >= 3 ? 3 : ndim);
     for (i = 0; i < itkDimMax3; ++i)
       for (j = 0; j < itkDimMax3; ++j)
-        matrix[i][j] = m_ImageIO->GetDirection(j)[i];
+        matrix[i][j] = imageIO->GetDirection(j)[i];
 
     // re-initialize PlaneGeometry with origin and direction
-    PlaneGeometry *planeGeometry = image->GetSlicedGeometry(0)->GetPlaneGeometry(0);
+    PlaneGeometry* planeGeometry = image->GetSlicedGeometry(0)->GetPlaneGeometry(0);
     planeGeometry->SetOrigin(origin);
     planeGeometry->GetIndexToWorldTransform()->SetMatrix(matrix);
 
     // re-initialize SlicedGeometry3D
-    SlicedGeometry3D *slicedGeometry = image->GetSlicedGeometry(0);
+    SlicedGeometry3D* slicedGeometry = image->GetSlicedGeometry(0);
     slicedGeometry->InitializeEvenlySpaced(planeGeometry, image->GetDimension(2));
     slicedGeometry->SetSpacing(spacing);
 
@@ -407,7 +378,7 @@ namespace mitk
         else if (timePoints.size() - 1 != image->GetDimension(3))
         {
           MITK_ERROR << "Stored timepoints (" << timePoints.size() - 1 << ") and size of image time dimension ("
-                     << image->GetDimension(3) << ") do not match. Switch to ProportionalTimeGeometry fallback";
+            << image->GetDimension(3) << ") do not match. Switch to ProportionalTimeGeometry fallback";
         }
         else
         {
@@ -437,30 +408,61 @@ namespace mitk
 
     buffer = nullptr;
     MITK_INFO << "number of image components: " << image->GetPixelType().GetNumberOfComponents();
+    return image;
+  }
+
+  itk::MetaDataObjectBase::Pointer ConvertTimePointListToMetaDataObject(const mitk::TimeGeometry* timeGeometry)
+  {
+    std::stringstream stream;
+    stream << timeGeometry->GetTimeBounds(0)[0];
+    const auto maxTimePoints = timeGeometry->CountTimeSteps();
+    for (TimeStepType pos = 0; pos < maxTimePoints; ++pos)
+    {
+      auto timeBounds = timeGeometry->GetTimeBounds(pos);
+
+      ///////////////////////////////////////
+      // Workaround T27883. See https://phabricator.mitk.org/T27883#219473 for more details.
+      // This workaround should be removed as soon as T28262 is solved!
+      if (pos + 1 == maxTimePoints && timeBounds[0]==timeBounds[1])
+      {
+        timeBounds[1] = timeBounds[0] + 1.;
+      }
+      // End of workaround for T27883
+      //////////////////////////////////////
+
+      stream << " " << timeBounds[1];
+    }
+    auto result = itk::MetaDataObject<std::string>::New();
+    result->SetMetaDataObjectValue(stream.str());
+    return result.GetPointer();
+  };
+
+  PropertyList::Pointer ItkImageIO::ExtractMetaDataAsPropertyList(const itk::MetaDataDictionary& dictionary, const std::string& mimeTypeName, const std::vector<std::string>& defaultMetaDataKeys)
+  {
+    LocaleSwitch localeSwitch("C");
+    PropertyList::Pointer result = PropertyList::New();
 
     for (auto iter = dictionary.Begin(), iterEnd = dictionary.End(); iter != iterEnd;
-         ++iter)
+      ++iter)
     {
       if (iter->second->GetMetaDataObjectTypeInfo() == typeid(std::string))
       {
-        const std::string &key = iter->first;
+        const std::string& key = iter->first;
         std::string assumedPropertyName = key;
         std::replace(assumedPropertyName.begin(), assumedPropertyName.end(), '_', '.');
 
-        std::string mimeTypeName = GetMimeType()->GetName();
-
         // Check if there is already a info for the key and our mime type.
-        mitk::CoreServicePointer<IPropertyPersistence> propPersistenceService(mitk::CoreServices::GetPropertyPersistence());
+        CoreServicePointer<IPropertyPersistence> propPersistenceService(CoreServices::GetPropertyPersistence());
         IPropertyPersistence::InfoResultType infoList = propPersistenceService->GetInfoByKey(key);
 
-        auto predicate = [&mimeTypeName](const PropertyPersistenceInfo::ConstPointer &x) {
+        auto predicate = [&mimeTypeName](const PropertyPersistenceInfo::ConstPointer& x) {
           return x.IsNotNull() && x->GetMimeTypeName() == mimeTypeName;
         };
         auto finding = std::find_if(infoList.begin(), infoList.end(), predicate);
 
         if (finding == infoList.end())
         {
-          auto predicateWild = [](const PropertyPersistenceInfo::ConstPointer &x) {
+          auto predicateWild = [](const PropertyPersistenceInfo::ConstPointer& x) {
             return x.IsNotNull() && x->GetMimeTypeName() == PropertyPersistenceInfo::ANY_MIMETYPE_NAME();
           };
           finding = std::find_if(infoList.begin(), infoList.end(), predicateWild);
@@ -492,13 +494,13 @@ namespace mitk
           break;
         }
 
-        image->SetProperty(assumedPropertyName.c_str(), loadedProp);
+        result->SetProperty(assumedPropertyName.c_str(), loadedProp);
 
         // Read properties should be persisted unless they are default properties
         // which are written anyway
         bool isDefaultKey(false);
 
-        for (const auto &defaultKey : m_DefaultMetaDataKeys)
+        for (const auto& defaultKey : defaultMetaDataKeys)
         {
           if (defaultKey.length() <= assumedPropertyName.length())
           {
@@ -516,6 +518,23 @@ namespace mitk
           propPersistenceService->AddInfo(info);
         }
       }
+    }
+    return result;
+  }
+
+  std::vector<BaseData::Pointer> ItkImageIO::DoRead()
+  {
+    std::vector<BaseData::Pointer> result;
+
+    auto image = LoadRawMitkImageFromImageIO(this->m_ImageIO, this->GetLocalFileName());
+
+    const itk::MetaDataDictionary& dictionary = this->m_ImageIO->GetMetaDataDictionary();
+
+    //meta data handling
+    auto props = ExtractMetaDataAsPropertyList(this->m_ImageIO->GetMetaDataDictionary(), this->GetMimeType()->GetName(), this->m_DefaultMetaDataKeys);
+    for (auto& [name, prop] : *(props->GetMap()))
+    {
+      image->SetProperty(name, prop);
     }
 
     // Handle UID
@@ -540,15 +559,8 @@ namespace mitk
     return m_ImageIO->CanReadFile(GetLocalFileName().c_str()) ? IFileReader::Supported : IFileReader::Unsupported;
   }
 
-  void ItkImageIO::Write()
+  void ItkImageIO::PreparImageIOToWriteImage(itk::ImageIOBase* imageIO, const Image* image)
   {
-    const auto *image = dynamic_cast<const mitk::Image *>(this->GetInput());
-
-    if (image == nullptr)
-    {
-      mitkThrow() << "Cannot write non-image data";
-    }
-
     // Switch the current locale to "C"
     LocaleSwitch localeSwitch("C");
 
@@ -560,7 +572,7 @@ namespace mitk
     if (image->GetDimension() == 2 && !geometry->Is2DConvertable())
     {
       MITK_WARN << "Saving a 2D image with 3D geometry information. Geometry information will be lost! You might "
-                   "consider using Convert2Dto3DImageFilter before saving.";
+        "consider using Convert2Dto3DImageFilter before saving.";
 
       // set matrix to identity
       mitk::AffineTransform3D::Pointer affTrans = mitk::AffineTransform3D::New();
@@ -572,6 +584,139 @@ namespace mitk
       geometry->SetOrigin(origin);
     }
 
+    // Implementation of writer using itkImageIO directly. This skips the use
+    // of templated itkImageFileWriter, which saves the multiplexing on MITK side.
+
+    const unsigned int dimension = image->GetDimension();
+    const unsigned int* const dimensions = image->GetDimensions();
+    const mitk::PixelType pixelType = image->GetPixelType();
+    const mitk::Vector3D mitkSpacing = geometry->GetSpacing();
+    const mitk::Point3D mitkOrigin = geometry->GetOrigin();
+
+    // Due to templating in itk, we are forced to save a 4D spacing and 4D Origin,
+    // though they are not supported in MITK
+    itk::Vector<double, 4u> spacing4D;
+    spacing4D[0] = mitkSpacing[0];
+    spacing4D[1] = mitkSpacing[1];
+    spacing4D[2] = mitkSpacing[2];
+    spacing4D[3] = 1; // There is no support for a 4D spacing. However, we should have a valid value here
+
+    itk::Vector<double, 4u> origin4D;
+    origin4D[0] = mitkOrigin[0];
+    origin4D[1] = mitkOrigin[1];
+    origin4D[2] = mitkOrigin[2];
+    origin4D[3] = 0; // There is no support for a 4D origin. However, we should have a valid value here
+
+    // Set the necessary information for imageIO
+    imageIO->SetNumberOfDimensions(dimension);
+    imageIO->SetPixelType(pixelType.GetPixelType());
+    imageIO->SetComponentType(static_cast<int>(pixelType.GetComponentType()) < PixelComponentUserType
+      ? pixelType.GetComponentType()
+      : itk::IOComponentEnum::UNKNOWNCOMPONENTTYPE);
+    imageIO->SetNumberOfComponents(pixelType.GetNumberOfComponents());
+
+    itk::ImageIORegion ioRegion(dimension);
+
+    for (unsigned int i = 0; i < dimension; i++)
+    {
+      imageIO->SetDimensions(i, dimensions[i]);
+      imageIO->SetSpacing(i, spacing4D[i]);
+      imageIO->SetOrigin(i, origin4D[i]);
+
+      mitk::Vector3D mitkDirection(0.0);
+      mitkDirection.SetVnlVector(geometry->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(i).as_ref());
+      itk::Vector<double, 4u> direction4D;
+      direction4D[0] = mitkDirection[0];
+      direction4D[1] = mitkDirection[1];
+      direction4D[2] = mitkDirection[2];
+
+      // MITK only supports a 3x3 direction matrix. Due to templating in itk, however, we must
+      // save a 4x4 matrix for 4D images. in this case, add an homogneous component to the matrix.
+      if (i == 3)
+      {
+        direction4D[3] = 1; // homogenous component
+      }
+      else
+      {
+        direction4D[3] = 0;
+      }
+      vnl_vector<double> axisDirection(dimension);
+      for (unsigned int j = 0; j < dimension; j++)
+      {
+        axisDirection[j] = direction4D[j] / spacing4D[i];
+      }
+      imageIO->SetDirection(i, axisDirection);
+
+      ioRegion.SetSize(i, image->GetLargestPossibleRegion().GetSize(i));
+      ioRegion.SetIndex(i, image->GetLargestPossibleRegion().GetIndex(i));
+    }
+
+    imageIO->SetIORegion(ioRegion);
+
+    // Handle time geometry
+    const auto* arbitraryTG = dynamic_cast<const ArbitraryTimeGeometry*>(image->GetTimeGeometry());
+    if (arbitraryTG)
+    {
+      itk::EncapsulateMetaData<std::string>(imageIO->GetMetaDataDictionary(),
+        PROPERTY_KEY_TIMEGEOMETRY_TYPE,
+        ArbitraryTimeGeometry::GetStaticNameOfClass());
+
+      auto metaTimePoints = ConvertTimePointListToMetaDataObject(arbitraryTG);
+      imageIO->GetMetaDataDictionary().Set(PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS, metaTimePoints);
+    }
+  }
+
+  void ItkImageIO::SavePropertyListAsMetaData(itk::MetaDataDictionary& dictionary, const PropertyList* properties, const std::string& mimeTypeName)
+  {
+    // Switch the current locale to "C"
+    LocaleSwitch localeSwitch("C");
+
+    for (const auto& property : *properties->GetMap())
+    {
+      mitk::CoreServicePointer<IPropertyPersistence> propPersistenceService(mitk::CoreServices::GetPropertyPersistence());
+      IPropertyPersistence::InfoResultType infoList = propPersistenceService->GetInfo(property.first, mimeTypeName, true);
+
+      if (infoList.empty())
+      {
+        continue;
+      }
+
+      std::string value = mitk::BaseProperty::VALUE_CANNOT_BE_CONVERTED_TO_STRING;
+      try
+      {
+        value = infoList.front()->GetSerializationFunction()(property.second);
+      }
+      catch (const std::exception& e)
+      {
+        MITK_ERROR << "Error when serializing content of property. This often indicates the use of an out dated reader. Property will not be stored. Skipped property: " << property.first << ". Reason: " << e.what();
+      }
+      catch (...)
+      {
+        MITK_ERROR << "Unknown error when serializing content of property. This often indicates the use of an out dated reader. Property will not be stored. Skipped property: " << property.first;
+      }
+
+      if (value == mitk::BaseProperty::VALUE_CANNOT_BE_CONVERTED_TO_STRING)
+      {
+        continue;
+      }
+
+      std::string key = infoList.front()->GetKey();
+
+      itk::EncapsulateMetaData<std::string>(dictionary, key, value);
+    }
+  }
+
+  void ItkImageIO::Write()
+  {
+    const auto *image = dynamic_cast<const mitk::Image *>(this->GetInput());
+
+    if (image == nullptr)
+    {
+      mitkThrow() << "Cannot write non-image data";
+    }
+
+    PreparImageIOToWriteImage(m_ImageIO, image);
+
     LocalFile localFile(this);
     const std::string path = localFile.GetFileName();
 
@@ -579,130 +724,14 @@ namespace mitk
 
     try
     {
-      // Implementation of writer using itkImageIO directly. This skips the use
-      // of templated itkImageFileWriter, which saves the multiplexing on MITK side.
-
-      const unsigned int dimension = image->GetDimension();
-      const unsigned int *const dimensions = image->GetDimensions();
-      const mitk::PixelType pixelType = image->GetPixelType();
-      const mitk::Vector3D mitkSpacing = geometry->GetSpacing();
-      const mitk::Point3D mitkOrigin = geometry->GetOrigin();
-
-      // Due to templating in itk, we are forced to save a 4D spacing and 4D Origin,
-      // though they are not supported in MITK
-      itk::Vector<double, 4u> spacing4D;
-      spacing4D[0] = mitkSpacing[0];
-      spacing4D[1] = mitkSpacing[1];
-      spacing4D[2] = mitkSpacing[2];
-      spacing4D[3] = 1; // There is no support for a 4D spacing. However, we should have a valid value here
-
-      itk::Vector<double, 4u> origin4D;
-      origin4D[0] = mitkOrigin[0];
-      origin4D[1] = mitkOrigin[1];
-      origin4D[2] = mitkOrigin[2];
-      origin4D[3] = 0; // There is no support for a 4D origin. However, we should have a valid value here
-
-      // Set the necessary information for imageIO
-      m_ImageIO->SetNumberOfDimensions(dimension);
-      m_ImageIO->SetPixelType(pixelType.GetPixelType());
-      m_ImageIO->SetComponentType(static_cast<int>(pixelType.GetComponentType()) < PixelComponentUserType
-                                    ? pixelType.GetComponentType()
-                                    : itk::IOComponentEnum::UNKNOWNCOMPONENTTYPE);
-      m_ImageIO->SetNumberOfComponents(pixelType.GetNumberOfComponents());
-
-      itk::ImageIORegion ioRegion(dimension);
-
-      for (unsigned int i = 0; i < dimension; i++)
-      {
-        m_ImageIO->SetDimensions(i, dimensions[i]);
-        m_ImageIO->SetSpacing(i, spacing4D[i]);
-        m_ImageIO->SetOrigin(i, origin4D[i]);
-
-        mitk::Vector3D mitkDirection(0.0);
-        mitkDirection.SetVnlVector(geometry->GetIndexToWorldTransform()->GetMatrix().GetVnlMatrix().get_column(i).as_ref());
-        itk::Vector<double, 4u> direction4D;
-        direction4D[0] = mitkDirection[0];
-        direction4D[1] = mitkDirection[1];
-        direction4D[2] = mitkDirection[2];
-
-        // MITK only supports a 3x3 direction matrix. Due to templating in itk, however, we must
-        // save a 4x4 matrix for 4D images. in this case, add an homogneous component to the matrix.
-        if (i == 3)
-        {
-          direction4D[3] = 1; // homogenous component
-        }
-        else
-        {
-          direction4D[3] = 0;
-        }
-        vnl_vector<double> axisDirection(dimension);
-        for (unsigned int j = 0; j < dimension; j++)
-        {
-          axisDirection[j] = direction4D[j] / spacing4D[i];
-        }
-        m_ImageIO->SetDirection(i, axisDirection);
-
-        ioRegion.SetSize(i, image->GetLargestPossibleRegion().GetSize(i));
-        ioRegion.SetIndex(i, image->GetLargestPossibleRegion().GetIndex(i));
-      }
+      // Handle properties
+      SavePropertyListAsMetaData(m_ImageIO->GetMetaDataDictionary(), image->GetPropertyList(), this->GetMimeType()->GetName());
+      // Handle UID
+      itk::EncapsulateMetaData<std::string>(m_ImageIO->GetMetaDataDictionary(), PROPERTY_KEY_UID, image->GetUID());
 
       // use compression if available
       m_ImageIO->UseCompressionOn();
-
-      m_ImageIO->SetIORegion(ioRegion);
       m_ImageIO->SetFileName(path);
-
-      // Handle time geometry
-      const auto *arbitraryTG = dynamic_cast<const ArbitraryTimeGeometry *>(image->GetTimeGeometry());
-      if (arbitraryTG)
-      {
-        itk::EncapsulateMetaData<std::string>(m_ImageIO->GetMetaDataDictionary(),
-                                              PROPERTY_KEY_TIMEGEOMETRY_TYPE,
-                                              ArbitraryTimeGeometry::GetStaticNameOfClass());
-
-        auto metaTimePoints = ConvertTimePointListToMetaDataObject(arbitraryTG);
-        m_ImageIO->GetMetaDataDictionary().Set(PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS, metaTimePoints);
-      }
-
-      // Handle properties
-      mitk::PropertyList::Pointer imagePropertyList = image->GetPropertyList();
-
-      for (const auto &property : *imagePropertyList->GetMap())
-      {
-        mitk::CoreServicePointer<IPropertyPersistence> propPersistenceService(mitk::CoreServices::GetPropertyPersistence());
-        IPropertyPersistence::InfoResultType infoList = propPersistenceService->GetInfo(property.first, GetMimeType()->GetName(), true);
-
-        if (infoList.empty())
-        {
-          continue;
-        }
-
-        std::string value = mitk::BaseProperty::VALUE_CANNOT_BE_CONVERTED_TO_STRING;
-        try
-        {
-          value = infoList.front()->GetSerializationFunction()(property.second);
-        }
-        catch (const std::exception& e)
-        {
-          MITK_ERROR << "Error when serializing content of property. This often indicates the use of an out dated reader. Property will not be stored. Skipped property: " << property.first << ". Reason: " << e.what();
-        }
-        catch (...)
-        {
-          MITK_ERROR << "Unknown error when serializing content of property. This often indicates the use of an out dated reader. Property will not be stored. Skipped property: " << property.first;
-        }
-
-        if (value == mitk::BaseProperty::VALUE_CANNOT_BE_CONVERTED_TO_STRING)
-        {
-          continue;
-        }
-
-        std::string key = infoList.front()->GetKey();
-
-        itk::EncapsulateMetaData<std::string>(m_ImageIO->GetMetaDataDictionary(), key, value);
-      }
-
-      // Handle UID
-      itk::EncapsulateMetaData<std::string>(m_ImageIO->GetMetaDataDictionary(), PROPERTY_KEY_UID, image->GetUID());
 
       ImageReadAccessor imageAccess(image);
       LocaleSwitch localeSwitch2("C");

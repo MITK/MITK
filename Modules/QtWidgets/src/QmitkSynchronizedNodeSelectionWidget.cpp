@@ -170,8 +170,15 @@ void QmitkSynchronizedNodeSelectionWidget::SetSynchronized(bool synchronize)
     auto allNodes = dataStorage->GetAll();
     for (auto& node : *allNodes)
     {
-      // Delete the relevant renderer-specific properties for the node using the current base renderer.
-      mitk::RenderWindowLayerUtilities::DeleteRenderWindowProperties(node, baseRenderer);
+      // For helper / hidden nodes:
+      // If the node predicate does not match, do not remove the renderer-specific property
+      // This is relevant for the crosshair data nodes, which are only visible inside their
+      // corresponding render window.
+      if (m_NodePredicate.IsNull() || m_NodePredicate->CheckNode(node))
+      {
+        // Delete the relevant renderer-specific properties for the node using the current base renderer.
+        mitk::RenderWindowLayerUtilities::DeleteRenderWindowProperties(node, baseRenderer);
+      }
     }
   }
   else
@@ -416,52 +423,59 @@ void QmitkSynchronizedNodeSelectionWidget::OnNodeAddedToStorage(const mitk::Data
     return;
   }
 
+  // For helper / hidden nodes
+  if (m_NodePredicate.IsNotNull() && !m_NodePredicate->CheckNode(node))
+  {
+    // If the node predicate does not match, do not add the node to the current selection.
+    // Leave the visibility as it is.
+    return;
+  }
+
   // The selection mode determines if we want to show all nodes from the data storage
   // or use a local selected list of nodes.
   // We need to hide each new incoming data node, if we use a local selection,
   // since we do not want to show / select newly added nodes immediately.
   // We need to add the incoming node to our selection, if the selection mode check box
   // is checked.
-  if (m_Controls.selectionModeCheckBox->isChecked())
+  // We want to add the incoming node to our selection, if the node is a child node
+  // of an already selected node.
+  // Nodes added to the selection will be made visible.
+  if (m_Controls.selectionModeCheckBox->isChecked() || this->IsParentNodeSelected(node))
   {
-    if (m_NodePredicate.IsNull() || m_NodePredicate->CheckNode(node))
+    auto currentSelection = this->GetCurrentInternalSelection();
+    // Check if the nodes is already part of the internal selection.
+    // That can happen if another render window already added the new node and sent out the new, updated
+    // selection to be synchronized.
+    auto finding = std::find(std::begin(currentSelection), std::end(currentSelection), node);
+    if (finding != std::end(currentSelection)) // node found
     {
-      auto currentSelection = this->GetCurrentInternalSelection();
-      // Check if the nodes is already part of the internal selection.
-      // That can happen if another render window already added the new node and sent out the new, updated
-      // selection to be synchronized.
-      auto finding = std::find(std::begin(currentSelection), std::end(currentSelection), node);
-      if (finding != std::end(currentSelection)) // node found
-      {
-        // node already part of the selection
-        return;
-      }
-
-      currentSelection.append(const_cast<mitk::DataNode*>(node));
-      this->HandleChangeOfInternalSelection(currentSelection);
+      // node already part of the selection
+      return;
     }
 
-    // For helper / hidden nodes:
-    // If the node predicate does not match, show the node but do not add
-    // it to the current selection.
-    return;
-  }
-
-  // If the model is in "local-selection" state (selectionModeCheckBox unchecked),
-  // the node needs to be hid.
-  // Here it depends on the synchronization-state which properties need
-  // to be modified.
-  if (this->IsSynchronized())
-  {
-    // If the node will not be part of the new selection, hide the node.
-    const_cast<mitk::DataNode*>(node)->SetVisibility(false);
+    currentSelection.append(const_cast<mitk::DataNode*>(node));
+    // This function will call 'QmitkSynchronizedNodeSelectionWidget::ReviseSelectionChanged'
+    // which will take care of the visibility-property for newly added node.
+    this->HandleChangeOfInternalSelection(currentSelection);
   }
   else
   {
-    // If the model is not synchronized, all nodes use renderer-specific properties.
-    // Thus we need to modify the renderer-specific properties of a new node:
-    //  - hide the node, which is not part of the selection
-    this->DeselectNode(const_cast<mitk::DataNode*>(node));
+    // If the widget is in "local-selection" state (selectionModeCheckBox unchecked),
+    // the new incoming node needs to be hid.
+    // Here it depends on the synchronization-state which properties need
+    // to be modified.
+    if (this->IsSynchronized())
+    {
+      // If the node will not be part of the new selection, hide the node.
+      const_cast<mitk::DataNode*>(node)->SetVisibility(false);
+    }
+    else
+    {
+      // If the widget is not synchronized, all nodes use renderer-specific properties.
+      // Thus we need to modify the renderer-specific properties of the node:
+      //  - hide the node, which is not part of the selection
+      this->DeselectNode(const_cast<mitk::DataNode*>(node));
+    }
   }
 }
 
@@ -636,6 +650,30 @@ void QmitkSynchronizedNodeSelectionWidget::RemoveFromInternalSelection(mitk::Dat
   emit SelectionModeChanged(false);
 
   this->RemoveNodeFromSelection(dataNode);
+}
+
+bool QmitkSynchronizedNodeSelectionWidget::IsParentNodeSelected(const mitk::DataNode* dataNode) const
+{
+  auto dataStorage = m_DataStorage.Lock();
+  if (dataStorage.IsNull())
+  {
+    return false;
+  }
+
+  auto currentSelection = this->GetCurrentInternalSelection();
+  auto parentNodes = dataStorage->GetSources(dataNode, m_NodePredicate, false);
+  for (auto it = parentNodes->Begin(); it != parentNodes->End(); ++it)
+  {
+    const mitk::DataNode* parentNode = it->Value();
+    auto finding = std::find(std::begin(currentSelection), std::end(currentSelection), parentNode);
+    if (finding != std::end(currentSelection)) // parent node found
+    {
+      // at least one parent node is part of the selection
+      return true;
+    }
+  }
+
+  return false;
 }
 
 void QmitkSynchronizedNodeSelectionWidget::DeselectNode(mitk::DataNode* dataNode)

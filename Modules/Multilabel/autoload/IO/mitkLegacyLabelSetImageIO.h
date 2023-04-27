@@ -10,10 +10,10 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkLabelSetImageIO_h
-#define mitkLabelSetImageIO_h
+#ifndef mitkLegacyLabelSetImageIO_h
+#define mitkLegacyLabelSetImageIO_h
 
-#include <mitkAbstractFileIO.h>
+#include <mitkAbstractFileReader.h>
 #include <mitkLabelSetImage.h>
 
 namespace mitk
@@ -25,28 +25,18 @@ namespace mitk
   */
   // The export macro should be removed. Currently, the unit
   // tests directly instantiate this class.
-  class LabelSetImageIO : public mitk::AbstractFileIO
+  class LegacyLabelSetImageIO : public mitk::AbstractFileReader
   {
   public:
     typedef mitk::LabelSetImage InputType;
 
-    LabelSetImageIO();
+    LegacyLabelSetImageIO();
 
     // -------------- AbstractFileReader -------------
 
     using AbstractFileReader::Read;
 
-    ConfidenceLevel GetReaderConfidenceLevel() const override;
-
-    // -------------- AbstractFileWriter -------------
-
-    void Write() override;
-    ConfidenceLevel GetWriterConfidenceLevel() const override;
-
-    // -------------- LabelSetImageIO specific functions -------------
-
-    int GetIntByKey(const itk::MetaDataDictionary &dic, const std::string &str);
-    std::string GetStringByKey(const itk::MetaDataDictionary &dic, const std::string &str);
+    ConfidenceLevel GetConfidenceLevel() const override;
 
   protected:
     /**
@@ -60,7 +50,7 @@ namespace mitk
     virtual void InitializeDefaultMetaDataKeys();
 
   private:
-    LabelSetImageIO *IOClone() const override;
+    LegacyLabelSetImageIO *Clone() const override;
 
     std::vector<std::string> m_DefaultMetaDataKeys;
   };

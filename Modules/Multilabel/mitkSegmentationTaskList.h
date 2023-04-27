@@ -82,7 +82,7 @@ namespace mitk
     std::filesystem::path GetAbsolutePath(const std::filesystem::path& path) const;
     std::filesystem::path GetInterimPath(const std::filesystem::path& path) const;
 
-    void SaveTask(size_t index, const BaseData* segmentation, bool saveAsIntermediateResult = false);
+    void SaveTask(size_t index, const BaseData* segmentation, bool saveAsInterimResult = false);
 
     std::vector<Task>::const_iterator begin() const;
     std::vector<Task>::const_iterator end() const;

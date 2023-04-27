@@ -289,7 +289,7 @@ void QmitkLabelSetWidget::OnRemoveLabel(bool /*value*/)
   if (answerButton == QMessageBox::Yes)
   {
     this->WaitCursorOn();
-    GetWorkingImage()->RemoveLabel(pixelValue, GetWorkingImage()->GetActiveLayer());
+    GetWorkingImage()->RemoveLabel(pixelValue);
     this->WaitCursorOff();
   }
 
@@ -392,7 +392,7 @@ void QmitkLabelSetWidget::OnRemoveLabels(bool /*value*/)
     }
 
     this->WaitCursorOn();
-    GetWorkingImage()->RemoveLabels(VectorOfLablePixelValues, GetWorkingImage()->GetActiveLayer());
+    GetWorkingImage()->RemoveLabels(VectorOfLablePixelValues);
     this->WaitCursorOff();
   }
 
@@ -697,6 +697,11 @@ void QmitkLabelSetWidget::InsertTableWidgetItem(mitk::Label *label)
   }
 }
 
+void QmitkLabelSetWidget::UpdateAllTableWidgetItems(mitk::Label::PixelType /*lv*/)
+{
+  this->UpdateAllTableWidgetItems();
+}
+
 void QmitkLabelSetWidget::UpdateAllTableWidgetItems()
 {
   mitk::LabelSetImage *workingImage = GetWorkingImage();
@@ -750,6 +755,11 @@ void QmitkLabelSetWidget::UpdateTableWidgetItem(QTableWidgetItem *item)
   {
     tableWidget->hideRow(item->row()); // hide exterior label
   }
+}
+
+void QmitkLabelSetWidget::ResetAllTableWidgetItems(mitk::Label::PixelType /*lv*/)
+{
+  this->ResetAllTableWidgetItems();
 }
 
 void QmitkLabelSetWidget::ResetAllTableWidgetItems()

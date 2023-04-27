@@ -624,7 +624,8 @@ void QmitkFlowApplicationWorkbenchWindowAdvisor::PostWindowCreate()
 
       for (auto viewDescriptor : viewDescriptorsInCurrentCategory)
       {
-        if (viewDescriptor->GetId() != "org.mitk.views.flow.control")
+        if (viewDescriptor->GetId() != "org.mitk.views.flow.control" &&
+            viewDescriptor->GetId() != "org.mitk.views.segmentationtasklist")
         {
           relevantViewDescriptors.push_back(viewDescriptor);
         }

@@ -26,6 +26,7 @@ found in the LICENSE file.
 
 #include <array>
 #include <vector>
+#include <regex>
 
 mitk::PlanarFigureMapper2D::PlanarFigureMapper2D()
   : m_NodeModified(true), m_NodeModifiedObserverTag(0), m_NodeModifiedObserverAdded(false), m_Initialized(false)
@@ -72,6 +73,15 @@ void mitk::PlanarFigureMapper2D::Initialize(mitk::BaseRenderer *)
 
 void mitk::PlanarFigureMapper2D::MitkRender(mitk::BaseRenderer *renderer, mitk::VtkPropRenderer::RenderType type)
 {
+  /* This is a temporary fix because the rendering of planar figures causes problems when two windows try to show the
+   same figure, which can happen a lot when using the MxNMultiWidget. Therefore, rendering is completely
+   disabled here if the renderer in question does not belong to the StdMultiWidget.
+   See T29333 */
+  std::regex pattern("^mxn\\.widget");
+  std::cmatch match;
+  if (std::regex_search(renderer->GetName(), match, pattern))
+    return;
+
   if (type != mitk::VtkPropRenderer::Overlay) return;
   if (!this->m_Initialized)
   {

@@ -30,6 +30,7 @@ namespace mitk
     mitkClassMacro(NodePredicateOr, NodePredicateCompositeBase);
     itkFactorylessNewMacro(NodePredicateOr);
     mitkNewMacro2Param(NodePredicateOr, const NodePredicateBase *, const NodePredicateBase *);
+    mitkNewMacro3Param(NodePredicateOr, const NodePredicateBase *, const NodePredicateBase *, const NodePredicateBase *);
 
     //##Documentation
     //## @brief Standard Destructor
@@ -46,6 +47,9 @@ namespace mitk
     //##Documentation
     //## @brief Convenience constructor that adds p1 and p2 to list of child predicates
     NodePredicateOr(const NodePredicateBase *p1, const NodePredicateBase *p2);
+    //##Documentation
+    //## @brief Convenience constructor that adds p1, p2 and p3 to list of child predicates
+    NodePredicateOr(const NodePredicateBase *p1, const NodePredicateBase *p2, const NodePredicateBase *p3);
   };
 
 } // namespace mitk

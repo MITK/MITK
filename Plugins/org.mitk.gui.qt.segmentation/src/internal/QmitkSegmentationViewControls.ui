@@ -103,27 +103,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QmitkLayersWidget" name="layersWidget" native="true">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QmitkLabelsWidget" name="labelsWidget" native="true">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QmitkLabelSetWidget" name="labelSetWidget" native="true">
+    <widget class="QmitkMultiLabelManager" name="multiLabelWidget" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -304,24 +284,6 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QmitkLayersWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">internal/Common/QmitkLayersWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QmitkLabelsWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">internal/Common/QmitkLabelsWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QmitkLabelSetWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">QmitkLabelSetWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>QmitkToolSelectionBox</class>
    <extends>QWidget</extends>
    <header location="global">QmitkToolSelectionBox.h</header>
@@ -335,6 +297,12 @@
    <class>QmitkSlicesInterpolator</class>
    <extends>QWidget</extends>
    <header location="global">QmitkSlicesInterpolator.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QmitkMultiLabelManager</class>
+   <extends>QWidget</extends>
+   <header>QmitkMultiLabelManager.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>

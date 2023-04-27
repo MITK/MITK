@@ -31,7 +31,6 @@ found in the LICENSE file.
 #include "mitkNodePredicateNot.h"
 #include "mitkNodePredicateOr.h"
 #include "mitkNodePredicateProperty.h"
-#include "mitkNodePredicateSource.h"
 #include "mitkStandaloneDataStorage.h"
 //#include "mitkPicFileReader.h"
 #include "mitkTestingMacros.h"

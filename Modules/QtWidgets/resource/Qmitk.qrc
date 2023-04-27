@@ -29,5 +29,6 @@
 		<file>unlock.svg</file>
 		<file>invisible.svg</file>
 		<file>visible.svg</file>
+		<file>SegmentationTaskListIcon.svg</file>
 	</qresource>
 </RCC>

@@ -111,15 +111,13 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
   std::string fileName = inputImagePath.substr(found + 1);
   std::string token = fileName.substr(0, fileName.find("_"));
   outDir = IOUtil::CreateTemporaryDirectory("totalseg-out-XXXXXX", this->GetMitkTempDir());
-  mitk::LabelSetImage::Pointer outputBuffer;
 
   IOUtil::Save(inputAtTimeStep, inputImagePath);
 
   outputImagePath = outDir + IOUtil::GetDirectorySeparator() + token + "_000.nii.gz";
-  bool isSubTask = false;
-  if (this->GetSubTask() != DEFAULT_TOTAL_TASK)
+  const bool isSubTask = (this->GetSubTask() != DEFAULT_TOTAL_TASK);
+  if (isSubTask)
   {
-    isSubTask = true;
     outputImagePath = outDir;
   }
 
@@ -132,8 +130,8 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
       spExec, inputImagePath, outputImagePath, !isSubTask, !isSubTask, this->GetGpuId(), this->GetSubTask());
     // Construct Label Id map
     std::vector<std::string> files = SUBTASKS_MAP.at(this->GetSubTask());
-    std::map<int, std::string> labelMapSubtask;
-    int labelId = 1;
+    std::map<mitk::Label::PixelType, std::string> labelMapSubtask;
+    mitk::Label::PixelType labelId = 1;
     for (auto const& file : files)
     {
       std::string labelName = file.substr(0, file.find('.'));
@@ -144,29 +142,30 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
     std::for_each(files.begin(),
                   files.end(),
                   [&](std::string &fileName) { fileName = (outDir + IOUtil::GetDirectorySeparator() + fileName); });
-    outputBuffer = AgglomerateLabelFiles(files, inputAtTimeStep->GetDimensions(), inputAtTimeStep->GetGeometry());
+    auto outputBuffer = AgglomerateLabelFiles(files, inputAtTimeStep->GetDimensions(), inputAtTimeStep->GetGeometry());
     // Assign label names to the agglomerated LabelSetImage
     this->MapLabelsToSegmentation(outputBuffer, labelMapSubtask);
+    this->TransferLabelSetImageContent(outputBuffer, previewImage, timeStep);
   }
   else
   {
     Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
-    outputBuffer = mitk::LabelSetImage::New();
+    auto outputBuffer = mitk::LabelSetImage::New();
     outputBuffer->InitializeByLabeledImage(outputImage);
     outputBuffer->SetGeometry(inputAtTimeStep->GetGeometry());
     this->MapLabelsToSegmentation(outputBuffer, m_LabelMapTotal);
+    this->TransferLabelSetImageContent(outputBuffer, previewImage, timeStep);
   }
-  this->TransferLabelSetImageContent(outputBuffer, previewImage, timeStep);
 }
 
 mitk::LabelSetImage::Pointer mitk::TotalSegmentatorTool::AgglomerateLabelFiles(std::vector<std::string> &filePaths,
                                                                                unsigned int *dimensions,
                                                                                mitk::BaseGeometry *geometry)
 {
-  int labelId = 1;
+  mitk::Label::PixelType labelId = 1;
   auto aggloLabelImage = mitk::LabelSetImage::New();
   auto initImage = mitk::Image::New();
-  initImage->Initialize(mitk::MakeScalarPixelType<int>(), 3, dimensions);
+  initImage->Initialize(mitk::MakeScalarPixelType<mitk::Label::PixelType>(), 3, dimensions);
   aggloLabelImage->Initialize(initImage);
   aggloLabelImage->SetGeometry(geometry);
   mitk::LabelSet::Pointer newlayer = mitk::LabelSet::New();
@@ -300,7 +299,7 @@ void mitk::TotalSegmentatorTool::ParseLabelNames(const std::string &fileName)
 }
 
 void mitk::TotalSegmentatorTool::MapLabelsToSegmentation(mitk::LabelSetImage::Pointer outputBuffer,
-                                                         std::map<int, std::string> &labelMap)
+                                                         std::map<mitk::Label::PixelType, std::string> &labelMap)
 {
   for (auto const &[key, val] : labelMap)
   {

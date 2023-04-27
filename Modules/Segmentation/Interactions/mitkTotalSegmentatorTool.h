@@ -100,7 +100,7 @@ namespace mitk
      * @brief Applies the m_LabelMapTotal lookup table on the output segmentation LabelSetImage.
      * 
      */
-    void MapLabelsToSegmentation(mitk::LabelSetImage::Pointer, std::map<int, std::string>&);
+    void MapLabelsToSegmentation(mitk::LabelSetImage::Pointer, std::map<mitk::Label::PixelType, std::string> &);
 
     /**
      * @brief Parses map_to_binary.py file to extract label ids and names
@@ -132,7 +132,7 @@ namespace mitk
     std::string m_PythonPath;
     std::string m_SubTask = "total";
     unsigned int m_GpuId = 0;
-    std::map<int, std::string> m_LabelMapTotal;
+    std::map<mitk::Label::PixelType, std::string> m_LabelMapTotal;
     bool m_Fast = true;
     const std::string TEMPLATE_FILENAME = "XXXXXX_000_0000.nii.gz";
     const std::string DEFAULT_TOTAL_TASK = "total";

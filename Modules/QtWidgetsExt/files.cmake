@@ -13,7 +13,6 @@ set(CPP_FILES
   QmitkCrossWidget.cpp
   QmitkEditPointDialog.cpp
   QmitkEnumerationPropertyWidget.cpp
-  QmitkFFmpegWriter.cpp
   QmitkFileChooser.cpp
   QmitkGnuplotWidget.cpp
   QmitkHistogram.cpp
@@ -57,7 +56,6 @@ set(MOC_H_FILES
   include/QmitkCrossWidget.h
   include/QmitkEditPointDialog.h
   include/QmitkEnumerationPropertyWidget.h
-  include/QmitkFFmpegWriter.h
   include/QmitkFileChooser.h
   include/QmitkGnuplotWidget.h
   include/QmitkHotkeyLineEdit.h

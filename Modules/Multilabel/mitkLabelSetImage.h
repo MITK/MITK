@@ -627,7 +627,6 @@ namespace mitk
   that is later in the mapping, one ends up with a wrong transfer, as a pixel would be first mapped to A and then latter again, because
   it is also an "old" value in the mapping table.
   @param sourceImage Pointer to the image that should be used as source for the transfer.
-  @param sourceImage Pointer to the image that should be used as source for the transfer.
   @param destinationImage Pointer to the image that should be used as destination for the transfer.
   @param destinationLabelSet Pointer to the label set specifying labels and lock states in the destination image. Unkown pixel
   values in the destinationImage will be assumed to be unlocked.

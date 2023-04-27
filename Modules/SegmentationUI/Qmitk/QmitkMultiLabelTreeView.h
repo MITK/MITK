@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKMULTILABELSEGMENTATIONTREEVIEW_H
-#define QMITKMULTILABELSEGMENTATIONTREEVIEW_H
+#ifndef QmitkMultiLabelTreeView_h
+#define QmitkMultiLabelTreeView_h
 
 #include <MitkSegmentationUIExports.h>
 
@@ -31,4 +31,4 @@ protected:
   QItemSelectionModel::SelectionFlags selectionCommand(const QModelIndex& index, const QEvent* event = nullptr) const override;
 };
 
-#endif // QMITKDATASTORAGELISTINSPECTOR_H
+#endif

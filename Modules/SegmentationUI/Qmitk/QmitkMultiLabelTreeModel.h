@@ -155,4 +155,4 @@ private:
   bool m_AllowLockModification = true;
 };
 
-#endif // mitkQmitkMultiLabelTreeModel_h
+#endif

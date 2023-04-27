@@ -10,8 +10,8 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QMITKMULTILABELSEGMENTATIONINSPECTOR_H
-#define QMITKMULTILABELSEGMENTATIONINSPECTOR_H
+#ifndef QmitkMultiLabelInspector_h
+#define QmitkMultiLabelInspector_h
 
 #include <MitkSegmentationUIExports.h>
 #include <mitkWeakPointer.h>
@@ -278,4 +278,4 @@ private:
   bool m_ModelManipulationOngoing = false;
 };
 
-#endif // QMITKDATASTORAGELISTINSPECTOR_H
+#endif

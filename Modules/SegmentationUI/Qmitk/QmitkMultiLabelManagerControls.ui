@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>312</width>
-    <height>366</height>
+    <height>66</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -165,7 +165,7 @@
    <item>
     <widget class="QmitkMultiLabelInspector" name="labelInspector" native="true">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>

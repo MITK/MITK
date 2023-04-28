@@ -362,9 +362,7 @@ void QmitkSegmentationView::OnNewSegmentation()
     auto newLabel = mitk::LabelSetImageHelper::CreateNewLabel(newLabelSetImage);
 
     if (!m_DefaultLabelNaming)
-    {
-      QmitkNewSegmentationDialog::DoRenameLabel(newLabel,nullptr,m_Parent);
-    }
+      QmitkNewSegmentationDialog::DoRenameLabel(newLabel, nullptr, m_Parent);
 
     newLabelSetImage->GetActiveLabelSet()->AddLabel(newLabel);
   }
@@ -456,11 +454,10 @@ void QmitkSegmentationView::OnLabelRenameRequested(mitk::Label* label, bool rena
   if (rename)
   {
     QmitkNewSegmentationDialog::DoRenameLabel(label, segmentation, this->m_Parent, QmitkNewSegmentationDialog::Mode::RenameLabel);
+    return;
   }
-  else
-  {
-    QmitkNewSegmentationDialog::DoRenameLabel(label, segmentation, this->m_Parent, QmitkNewSegmentationDialog::Mode::NewLabel);
-  }
+
+  QmitkNewSegmentationDialog::DoRenameLabel(label, nullptr, this->m_Parent, QmitkNewSegmentationDialog::Mode::NewLabel);
 }
 
 mitk::LabelSetImage* QmitkSegmentationView::GetCurrentSegmentation() const

@@ -323,18 +323,23 @@ QVariant QmitkMultiLabelTreeModel::data(const QModelIndex &index, int role) cons
       switch (item->m_ItemType)
       {
         case QmitkMultiLabelSegTreeItem::ItemType::Group:
-          return QVariant(QString("Group ")+QString::number(item->GetGroupID()));
+          return QVariant(QString("Group %1").arg(item->GetGroupID()));
+
         case QmitkMultiLabelSegTreeItem::ItemType::Label:
         {
           auto label = item->GetLabel();
-          if (nullptr == label) mitkThrow() << "Invalid internal state. QmitkMultiLabelTreeModel currentItem is refering to a label that does not exist.";
+
+          if (nullptr == label)
+            mitkThrow() << "Invalid internal state. QmitkMultiLabelTreeModel currentItem is refering to a label that does not exist.";
+
           QString name = QString::fromStdString(label->GetName());
+
           if (!item->HandleAsInstance())
-          {
-            name = name + QString(" (") + QString::number(item->m_childItems.size()) + QString(" instances)");
-          }
+            name = name + QString(" (%1 instances)").arg(item->m_childItems.size());
+
           return QVariant(name);
         }
+
         case QmitkMultiLabelSegTreeItem::ItemType::Instance:
         {
           auto label = item->GetLabel();
@@ -364,10 +369,6 @@ QVariant QmitkMultiLabelTreeModel::data(const QModelIndex &index, int role) cons
         {
           return QVariant(label->GetVisible());
         }
-      }
-      else
-      {
-
       }
     }
   }

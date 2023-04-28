@@ -390,19 +390,18 @@ void QmitkMultiLabelInspector::DeleteLabel()
     mitkThrow() << "QmitkMultiLabelInspector is configured incorrectly. Set AllowLabelModification to true to allow the usage of RemoveLabel.";
 
   if (m_Segmentation.IsNull())
-  {
     return;
-  }
 
-  auto currentLabel = this->GetFirstSelectedLabelObject();
-  auto question = "Do you really want to remove label \"" + QString::fromStdString(currentLabel->GetName()) + "\"?";
+  auto label = this->GetFirstSelectedLabelObject();
 
-  auto answerButton = QMessageBox::question(this, QString("Remove label"), question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
+  if (nullptr == label)
+    return;
 
-  if (answerButton == QMessageBox::Yes)
-  {
-    this->DeleteLabelInternal({ currentLabel->GetValue() });
-  }
+  auto question = "Do you really want to remove label \"" + QString::fromStdString(label->GetName()) + "\"?";
+  auto answer = QMessageBox::question(this, QString("Remove label"), question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
+
+  if (answer == QMessageBox::Yes)
+    this->DeleteLabelInternal({ label->GetValue() });
 }
 
 void QmitkMultiLabelInspector::DeleteLabelInternal(const LabelValueVectorType& labelValues)

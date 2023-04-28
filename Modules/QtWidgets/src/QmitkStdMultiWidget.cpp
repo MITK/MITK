@@ -104,22 +104,22 @@ void QmitkStdMultiWidget::InitializeMultiWidget()
 
 QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow(const QString& widgetName) const
 {
-  if ("axial" == widgetName)
+  if ("axial" == widgetName || "Axial" == widgetName)
   {
     return GetRenderWindow1();
   }
 
-  if ("sagittal" == widgetName)
+  if ("sagittal" == widgetName || "Sagittal" == widgetName)
   {
     return GetRenderWindow2();
   }
 
-  if ("coronal" == widgetName)
+  if ("coronal" == widgetName || "Coronal" == widgetName)
   {
     return GetRenderWindow3();
   }
 
-  if ("3d" == widgetName)
+  if ("3d" == widgetName || "3D" == widgetName)
   {
     return GetRenderWindow4();
   }

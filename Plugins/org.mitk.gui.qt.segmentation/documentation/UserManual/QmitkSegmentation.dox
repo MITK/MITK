@@ -31,7 +31,7 @@ The segmentation plugin offers a number of preferences which can be set via the 
 \imageMacro{QmitkSegmentationPreferences.png,"Segmentation preferences", 10.00}
 
 <ul>
-  <li> <b>Slim view:</b> Allows to show or hide the tool button description of the segmentation view
+  <li> <b>Compact view:</b> Allows to show or hide the tool button description of the segmentation view
   <li> <b>2D display:</b> Specify whether the segmentation is drawn as outline or as a transparent overlay
   <li> <b>Show only selected nodes:</b> Enable if only the selected segmentation and the reference image should be visible
   <li> <b>Smoothed surface creation:</b> Set certain smoothing parameters for surface creation

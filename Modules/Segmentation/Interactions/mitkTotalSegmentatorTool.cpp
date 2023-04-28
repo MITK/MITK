@@ -111,6 +111,7 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
   std::string fileName = inputImagePath.substr(found + 1);
   std::string token = fileName.substr(0, fileName.find("_"));
   outDir = IOUtil::CreateTemporaryDirectory("totalseg-out-XXXXXX", this->GetMitkTempDir());
+  LabelSetImage::Pointer outputBuffer;
 
   IOUtil::Save(inputAtTimeStep, inputImagePath);
 
@@ -142,27 +143,26 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
     std::for_each(files.begin(),
                   files.end(),
                   [&](std::string &fileName) { fileName = (outDir + IOUtil::GetDirectorySeparator() + fileName); });
-    auto outputBuffer = AgglomerateLabelFiles(files, inputAtTimeStep->GetDimensions(), inputAtTimeStep->GetGeometry());
+    outputBuffer = AgglomerateLabelFiles(files, inputAtTimeStep->GetDimensions(), inputAtTimeStep->GetGeometry());
     // Assign label names to the agglomerated LabelSetImage
     this->MapLabelsToSegmentation(outputBuffer, labelMapSubtask);
-    this->TransferLabelSetImageContent(outputBuffer, previewImage, timeStep);
   }
   else
   {
     Image::Pointer outputImage = IOUtil::Load<Image>(outputImagePath);
-    auto outputBuffer = mitk::LabelSetImage::New();
+    outputBuffer = mitk::LabelSetImage::New();
     outputBuffer->InitializeByLabeledImage(outputImage);
     outputBuffer->SetGeometry(inputAtTimeStep->GetGeometry());
     this->MapLabelsToSegmentation(outputBuffer, m_LabelMapTotal);
-    this->TransferLabelSetImageContent(outputBuffer, previewImage, timeStep);
   }
+  this->TransferLabelSetImageContent(outputBuffer, previewImage, timeStep);
 }
 
 mitk::LabelSetImage::Pointer mitk::TotalSegmentatorTool::AgglomerateLabelFiles(std::vector<std::string> &filePaths,
                                                                                unsigned int *dimensions,
                                                                                mitk::BaseGeometry *geometry)
 {
-  mitk::Label::PixelType labelId = 1;
+  Label::PixelType labelId = 1;
   auto aggloLabelImage = mitk::LabelSetImage::New();
   auto initImage = mitk::Image::New();
   initImage->Initialize(mitk::MakeScalarPixelType<mitk::Label::PixelType>(), 3, dimensions);
@@ -259,10 +259,12 @@ void mitk::TotalSegmentatorTool::run_totalsegmentator(ProcessExecutor::Pointer s
   {
     std::string cudaEnv = "CUDA_VISIBLE_DEVICES=" + std::to_string(gpuId);
     itksys::SystemTools::PutEnv(cudaEnv.c_str());
-
-    for (auto &arg : args)
-      MITK_INFO << arg;
-    MITK_INFO << this->GetPythonPath();
+    
+    std::stringstream logStream;
+    for (const auto &arg : args)
+      logStream << arg << " ";
+    logStream << this->GetPythonPath();
+    MITK_INFO << logStream.str();
 
     spExec->Execute(this->GetPythonPath(), command, args);
   }

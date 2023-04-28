@@ -153,8 +153,7 @@ void QmitkTotalSegmentatorToolGUI::OnInstallBtnClicked()
     isInstalled = m_Installer.SetupVirtualEnv(m_Installer.VENV_NAME);
     if (isInstalled)
     {
-      const QString pythonPath = m_Installer.GetVirtualEnvPath();
-      m_PythonPath = GetExactPythonPath(pythonPath);
+      m_PythonPath = this->GetExactPythonPath(m_Installer.GetVirtualEnvPath());
       this->WriteStatusMessage("<b>STATUS: </b>Successfully installed TotalSegmentator.");
     }
     else

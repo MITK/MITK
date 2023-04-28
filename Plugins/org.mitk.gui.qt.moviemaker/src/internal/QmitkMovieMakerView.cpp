@@ -367,13 +367,13 @@ void QmitkMovieMakerView::OnRecordButtonClicked()
   if (nullptr == renderWindow)
     return;
 
-  QString saveFileName = QFileDialog::getSaveFileName(nullptr, "Specify a filename", "", "Movie (*.mp4)");
+  QString saveFileName = QFileDialog::getSaveFileName(nullptr, "Specify a filename", "", "Movie (*.webm)");
 
   if (saveFileName.isEmpty())
     return;
 
-  if(!saveFileName.endsWith(".mp4"))
-    saveFileName += ".mp4";
+  if(!saveFileName.endsWith(".webm"))
+    saveFileName += ".webm";
 
   try
   {
@@ -412,7 +412,9 @@ void QmitkMovieMakerView::OnRecordButtonClicked()
       << "-y" // Override already existing files
       << "-r" << QString::number(m_Ui->fpsSpinBox->value()) // Framerate
       << "-i" << "%8d.png" // Input images
+      << "-c:v" << "libvpx-vp9" // VP9 codec
       << "-crf" << QString::number(18) // Quality (constant rate factor)
+      << "-b:v" << QString::number(0) // Must be 0 for constant quality
       << saveFileName); // Output video
 
     if (ffmpeg.waitForStarted())

@@ -123,6 +123,8 @@ private slots:
   void OnLabelListModified(const QStringList &list);
   // reaction to the signal "toggleOutline" from QmitkLabelSetTableWidget
   void OnToggleOutline(bool);
+  void OnRowsInserted(const QModelIndex&, int, int);
+  void OnRowsRemoved(const QModelIndex&, int, int);
 
 private:
   enum TableColumns

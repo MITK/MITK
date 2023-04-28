@@ -546,7 +546,6 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_Controls->toolSelectionBox2D->SetGenerateAccelerators(true);
    m_Controls->toolSelectionBox2D->SetToolGUIArea(m_Controls->toolGUIArea2D);
    m_Controls->toolSelectionBox2D->SetDisplayedToolGroups(segTools2D.toStdString());
-   m_Controls->toolSelectionBox2D->SetLayoutColumns(3);
    connect(m_Controls->toolSelectionBox2D, &QmitkToolSelectionBox::ToolSelected,
            this, &QmitkSegmentationView::OnManualTool2DSelected);
 
@@ -555,7 +554,6 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
    m_Controls->toolSelectionBox3D->SetGenerateAccelerators(true);
    m_Controls->toolSelectionBox3D->SetToolGUIArea(m_Controls->toolGUIArea3D);
    m_Controls->toolSelectionBox3D->SetDisplayedToolGroups(segTools3D.toStdString());
-   m_Controls->toolSelectionBox3D->SetLayoutColumns(3);
 
    m_Controls->slicesInterpolator->SetDataStorage(this->GetDataStorage());
 
@@ -680,9 +678,14 @@ void QmitkSegmentationView::OnPreferencesChanged(const mitk::IPreferences* prefs
   {
     m_Controls->multiLabelWidget->SetDefaultLabelNaming(m_DefaultLabelNaming);
 
-    bool slimView = prefs->GetBool("slim view", false);
-    m_Controls->toolSelectionBox2D->SetShowNames(!slimView);
-    m_Controls->toolSelectionBox3D->SetShowNames(!slimView);
+    bool compactView = prefs->GetBool("compact view", false);
+    int numberOfColumns = compactView ? 6 : 4;
+
+    m_Controls->toolSelectionBox2D->SetLayoutColumns(numberOfColumns);
+    m_Controls->toolSelectionBox2D->SetShowNames(!compactView);
+
+    m_Controls->toolSelectionBox3D->SetLayoutColumns(numberOfColumns);
+    m_Controls->toolSelectionBox3D->SetShowNames(!compactView);
   }
 
   m_DrawOutline = prefs->GetBool("draw outline", true);

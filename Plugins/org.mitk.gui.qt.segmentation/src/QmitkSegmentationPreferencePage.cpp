@@ -68,7 +68,7 @@ bool QmitkSegmentationPreferencePage::PerformOk()
 {
   auto* prefs = GetPreferences();
 
-  prefs->PutBool("slim view", m_Ui->slimViewCheckBox->isChecked());
+  prefs->PutBool("compact view", m_Ui->compactViewCheckBox->isChecked());
   prefs->PutBool("draw outline", m_Ui->outlineRadioButton->isChecked());
   prefs->PutBool("selection mode", m_Ui->selectionModeCheckBox->isChecked());
   prefs->Put("label set preset", m_Ui->labelSetPresetLineEdit->text().toStdString());
@@ -87,7 +87,7 @@ void QmitkSegmentationPreferencePage::Update()
 {
   auto* prefs = GetPreferences();
 
-  m_Ui->slimViewCheckBox->setChecked(prefs->GetBool("slim view", false));
+  m_Ui->compactViewCheckBox->setChecked(prefs->GetBool("compact view", false));
 
   if (prefs->GetBool("draw outline", true))
   {

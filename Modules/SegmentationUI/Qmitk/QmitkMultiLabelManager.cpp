@@ -10,7 +10,7 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#include "QmitkMultiLabelManager.h"
+#include <QmitkMultiLabelManager.h>
 
 // mitk
 #include <mitkAutoCropImageFilter.h>
@@ -39,11 +39,10 @@ found in the LICENSE file.
 #include <QShortcut>
 #include <QStringListModel>
 
-
 // itk
 #include <itksys/SystemTools.hxx>
 
-#include "ui_QmitkMultiLabelManagerControls.h"
+#include <ui_QmitkMultiLabelManagerControls.h>
 
 
 QmitkMultiLabelManager::QmitkMultiLabelManager(QWidget *parent)
@@ -67,6 +66,9 @@ QmitkMultiLabelManager::QmitkMultiLabelManager(QWidget *parent)
 
   QStringListModel *completeModel = static_cast<QStringListModel *>(m_Completer->model());
   completeModel->setStringList(GetLabelStringList());
+
+  // See T29549
+  m_Controls->labelSearchBox->hide();
 
   m_Controls->btnSavePreset->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-save.svg")));
   m_Controls->btnLoadPreset->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-open.svg")));

@@ -167,9 +167,6 @@ namespace
 
       for (auto labelIter = labelSet->IteratorConstBegin(); labelIter != labelSet->IteratorConstEnd(); ++labelIter)
       {
-        if (0 == labelIter->first)
-          continue; // Ignore background label
-
         auto name = QString::fromStdString(labelIter->second->GetName());
 
         if (!name.isEmpty()) // Potential duplicates do not matter for our purpose
@@ -369,32 +366,40 @@ void QmitkNewSegmentationDialog::OnSuggestionSelected()
   }
 }
 
-bool QmitkNewSegmentationDialog::DoRenameLabel(const mitk::Label* currentLabel, mitk::LabelSetImage* segmentation, QWidget* parent, Mode mode)
+bool QmitkNewSegmentationDialog::DoRenameLabel(mitk::Label* label, mitk::LabelSetImage* segmentation, QWidget* parent, Mode mode)
 {
-  if (nullptr == currentLabel) mitkThrow() << "Invalid call of QmitkNewSegmentationDialog::RenameLabel. Passed label is null.";
-  if (nullptr != segmentation && !segmentation->IsLabeInGroup(currentLabel->GetValue())) mitkThrow() << "Invalid call of QmitkNewSegmentationDialog::RenameLabel. Passed label value does not exist in segmentation.";
+  if (nullptr == label)
+    mitkThrow() << "Invalid call of QmitkNewSegmentationDialog::RenameLabel. Passed label is null.";
+
+  const auto labelValue = label->GetValue();
+  mitk::LabelSetImage::GroupIndexType groupIndex;
+
+  if (nullptr != segmentation && !segmentation->IsLabelInGroup(labelValue, groupIndex))
+    mitkThrow() << "Invalid call of QmitkNewSegmentationDialog::RenameLabel. Passed label value does not exist in segmentation.";
+
   QmitkNewSegmentationDialog dialog(parent, segmentation, mode);
 
-  dialog.SetColor(currentLabel->GetColor());
-  dialog.SetName(QString::fromStdString(currentLabel->GetName()));
+  dialog.SetColor(label->GetColor());
+  dialog.SetName(QString::fromStdString(label->GetName()));
 
   if (dialog.exec() == QDialog::Rejected)
-  {
     return false;
-  }
 
-  QString segmentationName = dialog.GetName();
-  if (segmentationName.isEmpty())
-  {
-    segmentationName = "Unnamed";
-  }
+  auto name = dialog.GetName();
+
+  if (name.isEmpty())
+    name = "Unnamed";
 
   if (nullptr != segmentation)
   {
-    auto groupID = segmentation->GetGroupIndexOfLabel(currentLabel->GetValue());
-    auto group = segmentation->GetLabelSet(groupID);
-    group->RenameLabel(currentLabel->GetValue(), segmentationName.toStdString(), dialog.GetColor());
-    group->UpdateLookupTable(currentLabel->GetValue());
+    auto group = segmentation->GetLabelSet(groupIndex);
+    group->RenameLabel(labelValue, name.toStdString(), dialog.GetColor());
+    group->UpdateLookupTable(labelValue);
+  }
+  else
+  {
+    label->SetName(name.toStdString());
+    label->SetColor(dialog.GetColor());
   }
 
   return true;

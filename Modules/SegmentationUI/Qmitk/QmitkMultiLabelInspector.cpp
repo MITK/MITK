@@ -342,28 +342,26 @@ mitk::Label* QmitkMultiLabelInspector::AddNewLabelInstance()
 
 mitk::Label* QmitkMultiLabelInspector::AddNewLabelInternal(const mitk::LabelSetImage::GroupIndexType& containingGroup)
 {
-  mitk::Label::Pointer newLabel = mitk::LabelSetImageHelper::CreateNewLabel(m_Segmentation);
+  auto newLabel = mitk::LabelSetImageHelper::CreateNewLabel(m_Segmentation);
 
   if (!m_DefaultLabelNaming)
-  {
     emit LabelRenameRequested(newLabel, false);
-  }
 
   auto group = m_Segmentation->GetLabelSet(containingGroup);
+
   m_ModelManipulationOngoing = true;
   group->AddLabel(newLabel, false);
   m_ModelManipulationOngoing = false;
+
   this->SetSelectedLabel(newLabel->GetValue());
 
   auto index = m_Model->indexOfLabel(newLabel->GetValue());
-  if (index.isValid())
-  {
-    m_Controls->view->expand(index.parent());
-  }
-  else
-  {
-    mitkThrow() << "Segmentation or QmitkMultiLabelTreeModel is in an invalid state. Label is not present in the model after adding it to the segmentation. Label value: " << newLabel->GetValue();
-  }
+
+  if (!index.isValid())
+    mitkThrow() << "Segmentation or QmitkMultiLabelTreeModel is in an invalid state. Label is not present in the "
+                   "model after adding it to the segmentation. Label value: " << newLabel->GetValue();
+
+  m_Controls->view->expand(index.parent());
 
   return newLabel;
 }
@@ -492,12 +490,17 @@ void QmitkMultiLabelInspector::RemoveGroupInternal(const mitk::LabelSetImage::Gr
     mitkThrow() << "QmitkMultiLabelInspector is configured incorrectly. Set AllowLabelModification to true to allow the usage of RemoveLabel.";
 
   if (m_Segmentation.IsNull())
-  {
     return;
-  }
 
   auto currentIndex = m_Model->indexOfGroup(groupID);
   auto nextIndex = m_Model->ClosestLabelInstanceIndex(currentIndex);
+
+  if (!nextIndex.isValid())
+  {
+    QMessageBox::information(this, "Delete group", "Cannot delete last remaining group. A segmentation must contain at least a single group.");
+    return;
+  }
+
   auto labelVariant = nextIndex.data(QmitkMultiLabelTreeModel::ItemModelRole::LabelInstanceValueRole);
 
   try
@@ -609,9 +612,14 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
       QObject::connect(addInstanceAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnAddLabel);
       menu->addAction(addInstanceAction);
 
-      QAction* removeAction = new QAction(QIcon(":/Qmitk/RemoveLabel.png"), "Delete group", this);
-      QObject::connect(removeAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnDeleteGroup);
-      menu->addAction(removeAction);
+      auto nextIndex = m_Model->ClosestLabelInstanceIndex(m_Controls->view->currentIndex());
+
+      if (nextIndex.isValid())
+      {
+        QAction* removeAction = new QAction(QIcon(":/Qmitk/RemoveLabel.png"), "Delete group", this);
+        QObject::connect(removeAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnDeleteGroup);
+        menu->addAction(removeAction);
+      }
     }
 
     if (m_AllowLockModification)

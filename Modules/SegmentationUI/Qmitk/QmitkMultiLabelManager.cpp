@@ -416,7 +416,6 @@ void QmitkMultiLabelManager::OnCreateDetailedSurface(bool /*triggered*/)
   }
 }
 
-
 void QmitkMultiLabelManager::OnSavePreset()
 {
 
@@ -436,7 +435,6 @@ void QmitkMultiLabelManager::OnLabelRenameRequested(mitk::Label* label, bool ren
 {
   emit LabelRenameRequested(label, rename);
 }
-
 
 void QmitkMultiLabelManager::WaitCursorOn()
 {

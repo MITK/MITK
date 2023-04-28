@@ -110,8 +110,8 @@ namespace mitk
       */
     bool ExistGroup(GroupIndexType index) const;
 
-    bool IsLabeInGroup(LabelValueType value) const;
-    bool IsLabeInGroup(LabelValueType value, GroupIndexType& groupIndex) const;
+    bool IsLabelInGroup(LabelValueType value) const;
+    bool IsLabelInGroup(LabelValueType value, GroupIndexType& groupIndex) const;
 
     /** Returns the group id of the based label value.
     * @pre label value must exists.

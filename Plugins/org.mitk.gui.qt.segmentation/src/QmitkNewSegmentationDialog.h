@@ -35,9 +35,8 @@ namespace Ui
   class QmitkNewSegmentationDialog;
 }
 
-/**
-  \brief Dialog for naming labels.
-*/
+/** \brief Dialog for naming labels.
+ */
 class MITK_QT_SEGMENTATION QmitkNewSegmentationDialog : public QDialog
 {
   Q_OBJECT
@@ -51,6 +50,13 @@ public:
     RenameLabel
   };
 
+  /** \brief Static helper function to (re)name a label.
+   *
+   * In NewLabel mode it is assumed that the label has not yet been added, hence for example a look-up table update is not done.
+   * In RenameLabel mode the segmentation (if provided) is updated.
+   */
+  static bool DoRenameLabel(mitk::Label* label, mitk::LabelSetImage* segmentation, QWidget* parent = nullptr, Mode mode = NewLabel);
+
   explicit QmitkNewSegmentationDialog(QWidget *parent = nullptr, mitk::LabelSetImage* labelSetImage = nullptr, Mode mode = NewLabel);
   ~QmitkNewSegmentationDialog() override;
 
@@ -59,10 +65,6 @@ public:
 
   void SetName(const QString& name);
   void SetColor(const mitk::Color& color);
-
-  /**Static helper function to do (re)naming of a label via the dialog class. If mode == NewLabel, the function assumes that the label is not yet
-  added, thus e.g. no lookup table update is done. In rename mode, if a segmentation is provided, the segmentation will directly be updated.*/
-  static bool DoRenameLabel(const mitk::Label* currentLabel, mitk::LabelSetImage* segmentation, QWidget* parent = nullptr, Mode mode = NewLabel);
 
 private:
   void OnAccept();

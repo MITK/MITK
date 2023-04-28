@@ -13,7 +13,7 @@ found in the LICENSE file.
 #include "QmitkLoadMultiLabelPresetAction.h"
 
 #include <mitkLabelSetImage.h>
-#include <mitkLabelSetIOHelper.h>
+#include <mitkMultiLabelIOHelper.h>
 
 #include <QFileDialog>
 
@@ -35,7 +35,7 @@ void QmitkLoadMultiLabelPresetAction::Run(const QList<mitk::DataNode::Pointer> &
     if (image.IsNull())
       continue;
 
-    mitk::LabelSetIOHelper::LoadLabelSetImagePreset(filename, image);
+    mitk::MultiLabelIOHelper::LoadLabelSetImagePreset(filename, image);
   }
 }
 

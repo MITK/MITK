@@ -20,8 +20,6 @@ found in the LICENSE file.
 
 #include "mitkNodePredicateBase.h"
 
-#include <optional>
-
 namespace Ui
 {
   class SegmentationFlowControlView;
@@ -57,12 +55,8 @@ public:
 
 protected slots:
 
-    void OnStoreButtonClicked();
     void OnAcceptButtonClicked();
-    void OnActiveTaskChanged(const std::optional<size_t>& index);
-    void OnCurrentTaskChanged(const std::optional<size_t>& index);
-    void OnStoreInterimResultShortcutActivated();
-    void OnAcceptSegmentationShortcutActivated();
+
 
 protected:
     void SetFocus() override;
@@ -78,7 +72,6 @@ protected:
     Ui::SegmentationFlowControlView* m_Controls;
 
 private:
-    QWidget *m_Parent;
     mitk::NodePredicateBase::Pointer m_SegmentationPredicate;
     mitk::NodePredicateBase::Pointer m_SegmentationTaskListPredicate;
     QString m_OutputDir;

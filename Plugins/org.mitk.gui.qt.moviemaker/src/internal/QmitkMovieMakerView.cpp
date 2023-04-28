@@ -22,22 +22,66 @@ found in the LICENSE file.
 #include "QmitkTimeSliceAnimationWidget.h"
 
 #include <mitkCoreServices.h>
+#include <mitkIOUtil.h>
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
-
-#include <mitkGL.h>
-
-#include <QmitkFFmpegWriter.h>
 
 #include <QFileDialog>
 #include <QMenu>
 #include <QMessageBox>
+#include <QProcess>
 #include <QTimer>
 
 #include <array>
+#include <filesystem>
+
+#include <vtkPNGWriter.h>
+#include <vtkWindowToImageFilter.h>
 
 namespace
 {
+  class TemporaryDirectory
+  {
+  public:
+    TemporaryDirectory()
+    {
+      try
+      {
+        m_Path = mitk::IOUtil::CreateTemporaryDirectory("MITK_MovieMaker_XXXXXX");
+      }
+      catch (...)
+      {
+      }
+    }
+
+    ~TemporaryDirectory()
+    {
+      try
+      {
+        std::filesystem::remove_all(m_Path);
+      }
+      catch (...)
+      {
+      }
+    }
+
+    bool IsValid() const
+    {
+      return !m_Path.empty() && std::filesystem::is_directory(m_Path);
+    }
+
+    std::filesystem::path GetPath() const
+    {
+      return m_Path;
+    }
+
+    TemporaryDirectory(const TemporaryDirectory&) = delete;
+    TemporaryDirectory& operator=(const TemporaryDirectory&) = delete;
+
+  private:
+    std::filesystem::path m_Path;
+  };
+
   QmitkAnimationItem* CreateDefaultAnimation(const QString& widgetKey)
   {
     if (widgetKey == "Orbit")
@@ -60,21 +104,12 @@ namespace
       ? QString::fromStdString(preferences->Get("ffmpeg", ""))
       : QString();
   }
-
-  void ReadPixels(std::unique_ptr<unsigned char[]>& frame, vtkRenderWindow* renderWindow, int x, int y, int width, int height)
-  {
-    if (nullptr == renderWindow)
-      return;
-
-    renderWindow->MakeCurrent();
-    glReadPixels(x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE, frame.get());
-  }
 }
 
 const std::string QmitkMovieMakerView::VIEW_ID = "org.mitk.views.moviemaker";
 
 QmitkMovieMakerView::QmitkMovieMakerView()
-  : m_FFmpegWriter(nullptr),
+  : m_Parent(nullptr),
     m_Ui(new Ui::QmitkMovieMakerView),
     m_AnimationModel(nullptr),
     m_AddAnimationMenu(nullptr),
@@ -92,7 +127,7 @@ QmitkMovieMakerView::~QmitkMovieMakerView()
 
 void QmitkMovieMakerView::CreateQtPartControl(QWidget* parent)
 {
-  m_FFmpegWriter = new QmitkFFmpegWriter(parent);
+  m_Parent = parent;
 
   m_Ui->setupUi(parent);
 
@@ -217,6 +252,21 @@ void QmitkMovieMakerView::SetFocus()
   m_Ui->addAnimationButton->setFocus();
 }
 
+void QmitkMovieMakerView::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart)
+{
+  auto multiWidgetEditor = dynamic_cast<berry::Object*>(renderWindowPart);
+  bool isMxN = nullptr != multiWidgetEditor && multiWidgetEditor->GetClassName() == "QmitkMxNMultiWidgetEditor";
+  m_Parent->setDisabled(isMxN);
+}
+
+void QmitkMovieMakerView::RenderWindowPartDeactivated(mitk::IRenderWindowPart* /*renderWindowPart*/)
+{
+}
+
+void QmitkMovieMakerView::RenderWindowPartInputChanged(mitk::IRenderWindowPart* /*renderWindowPart*/)
+{
+}
+
 void QmitkMovieMakerView::OnMoveAnimationUpButtonClicked()
 {
   const QItemSelection selection = m_Ui->animationTreeView->selectionModel()->selection();
@@ -307,8 +357,6 @@ void QmitkMovieMakerView::OnRecordButtonClicked()
     return;
   }
 
-  m_FFmpegWriter->SetFFmpegPath(GetFFmpegPath());
-
   auto action = m_RecordMenu->exec(QCursor::pos());
 
   if (nullptr == action)
@@ -319,58 +367,66 @@ void QmitkMovieMakerView::OnRecordButtonClicked()
   if (nullptr == renderWindow)
     return;
 
-  const int border = 3;
-  const int x = border;
-  const int y = border;
-  int width = renderWindow->GetSize()[0] - border * 2;
-  int height = renderWindow->GetSize()[1] - border * 2;
-
-  if (width & 1)
-    --width;
-
-  if (height & 1)
-    --height;
-
-  if (width < 16 || height < 16)
-    return;
-
-  m_FFmpegWriter->SetSize(width, height);
-  m_FFmpegWriter->SetFramerate(m_Ui->fpsSpinBox->value());
-
-  QString saveFileName = QFileDialog::getSaveFileName(nullptr, "Specify a filename", "", "Movie (*.mp4)");
+  QString saveFileName = QFileDialog::getSaveFileName(nullptr, "Specify a filename", "", "Movie (*.webm)");
 
   if (saveFileName.isEmpty())
     return;
 
-  if(!saveFileName.endsWith(".mp4"))
-    saveFileName += ".mp4";
-
-  m_FFmpegWriter->SetOutputPath(saveFileName);
+  if(!saveFileName.endsWith(".webm"))
+    saveFileName += ".webm";
 
   try
   {
-    auto frame = std::make_unique<unsigned char[]>(width * height * 3);
-    m_FFmpegWriter->Start();
+    // Create a temporary directory and write all frames as PNGs into this directory.
+    // Call FFmpeg to create a video from these PNG images.
+    // Delete the temporary directory afterwards.
+
+    TemporaryDirectory tempDir;
+
+    if (!tempDir.IsValid())
+      return;
+
+    auto windowToImage = vtkSmartPointer<vtkWindowToImageFilter>::New();
+    windowToImage->SetInput(renderWindow);
+
+    auto imageWriter = vtkSmartPointer<vtkPNGWriter>::New();
+    imageWriter->SetInputConnection(windowToImage->GetOutputPort());
 
     for (m_CurrentFrame = 0; m_CurrentFrame < m_NumFrames; ++m_CurrentFrame)
     {
       this->RenderCurrentFrame();
-      ReadPixels(frame, renderWindow, x, y, width, height);
-      m_FFmpegWriter->WriteFrame(frame.get());
+      windowToImage->Modified();
+
+      std::stringstream stream;
+      stream << std::setw(8) << std::setfill('0') << m_CurrentFrame << ".png";
+      auto path = tempDir.GetPath() / stream.str();
+
+      imageWriter->SetFileName(path.string().c_str());
+      imageWriter->Write();
     }
 
-    m_FFmpegWriter->Stop();
+    QProcess ffmpeg;
 
-    m_CurrentFrame = 0;
-    this->RenderCurrentFrame();
+    ffmpeg.setWorkingDirectory(QString::fromStdString(tempDir.GetPath().string()));
+    ffmpeg.start(ffmpegPath, QStringList()
+      << "-y" // Override already existing files
+      << "-r" << QString::number(m_Ui->fpsSpinBox->value()) // Framerate
+      << "-i" << "%8d.png" // Input images
+      << "-c:v" << "libvpx-vp9" // VP9 codec
+      << "-crf" << QString::number(18) // Quality (constant rate factor)
+      << "-b:v" << QString::number(0) // Must be 0 for constant quality
+      << saveFileName); // Output video
+
+    if (ffmpeg.waitForStarted())
+      ffmpeg.waitForFinished();
   }
   catch (const mitk::Exception& exception)
   {
-    m_CurrentFrame = 0;
-    this->RenderCurrentFrame();
-
     QMessageBox::critical(nullptr, "Movie Maker", exception.GetDescription());
   }
+
+  m_CurrentFrame = 0;
+  this->RenderCurrentFrame();
 }
 
 void QmitkMovieMakerView::OnRemoveAnimationButtonClicked()

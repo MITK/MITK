@@ -122,14 +122,12 @@ set(CPP_FILES
   DataManagement/mitkNodePredicateDataType.cpp
   DataManagement/mitkNodePredicateDataUID.cpp
   DataManagement/mitkNodePredicateDimension.cpp
-  DataManagement/mitkNodePredicateFirstLevel.cpp
   DataManagement/mitkNodePredicateFunction.cpp
   DataManagement/mitkNodePredicateGeometry.cpp
   DataManagement/mitkNodePredicateNot.cpp
   DataManagement/mitkNodePredicateOr.cpp
   DataManagement/mitkNodePredicateProperty.cpp
   DataManagement/mitkNodePredicateDataProperty.cpp
-  DataManagement/mitkNodePredicateSource.cpp
   DataManagement/mitkNodePredicateSubGeometry.cpp
   DataManagement/mitkNumericConstants.cpp
   DataManagement/mitkPlaneGeometry.cpp

@@ -57,27 +57,27 @@ namespace mitk
     \pre sliceImage points to a valid instance
     \pre projectedContour points to a valid instance
     */
-    [[deprecated]]
-    static void FillContourInSlice(const ContourModel *projectedContour,
+    //[[deprecated]]
+    DEPRECATED(static void FillContourInSlice(const ContourModel *projectedContour,
                                    Image *sliceImage,
                                    const Image* workingImage,
-                                   int paintingPixelValue = 1);
+                                   int paintingPixelValue = 1));
 
     /**
     \brief Fill a contour in a 2D slice with a specified pixel value.
     This overloaded version uses the contour at the passed contourTimeStep
     to fill the passed image slice.
     \deprecated Ths function is deprecated. Use FillContourInSlice2() (in
-    conjunction e.g. with TransferLabelContent()) instead.
+    conjunction e.g. with TransferLabelContentAtTimeStep()) instead.
     \pre sliceImage points to a valid instance
     \pre projectedContour points to a valid instance
     */
-    [[deprecated]]
-    static void FillContourInSlice(const ContourModel *projectedContour,
+    //[[deprecated]]
+    DEPRECATED(static void FillContourInSlice(const ContourModel *projectedContour,
                                    TimeStepType contourTimeStep,
                                    Image *sliceImage,
                                    const Image* workingImage,
-                                   int paintingPixelValue = 1);
+                                   int paintingPixelValue = 1));
 
     /**
     \brief Fill a contour in a 2D slice with a specified pixel value.

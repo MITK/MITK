@@ -11,7 +11,6 @@ found in the LICENSE file.
 ============================================================================*/
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateData.h>
-#include <mitkNodePredicateFirstLevel.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateOr.h>
 #include <mitkNodePredicateProperty.h>

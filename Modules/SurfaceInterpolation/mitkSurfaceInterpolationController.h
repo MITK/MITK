@@ -94,7 +94,6 @@ namespace mitk
     /**
      * @brief Adds new extracted contours to the list. If one or more contours at a given position
      *        already exist they will be updated respectively
-     * @param newContours the list of the contours
      */
     void AddNewContours(const std::vector<Surface::Pointer>& newContours, std::vector<const mitk::PlaneGeometry*>& contourPlanes, bool reinitializeAction = false);
 
@@ -341,7 +340,7 @@ namespace mitk
      * @brief Function that removes contours of a particular label when the "Remove Label" event is trigerred in the labelSetImage.
      *
      */
-    void OnRemoveLabel();
+    void OnRemoveLabel(mitk::Label::PixelType removedLabelValue);
 
     /**
      * @brief When a new contour is added to the pipeline or an existing contour is replaced,

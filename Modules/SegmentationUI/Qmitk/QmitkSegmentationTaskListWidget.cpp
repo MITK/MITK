@@ -16,16 +16,19 @@ found in the LICENSE file.
 #include <mitkIPreferencesService.h>
 #include <mitkIPreferences.h>
 
+#include <mitkDICOMQIPropertyHelper.h>
 #include <mitkIOUtil.h>
-#include <mitkLabelSetIOHelper.h>
+#include <mitkMultiLabelIOHelper.h>
 #include <mitkLabelSetImageHelper.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateFunction.h>
 #include <mitkRenderingManager.h>
 #include <mitkSegmentationHelper.h>
-#include <mitkDICOMQIPropertyHelper.h>
+#include <mitkToolManagerProvider.h>
 
 #include <QmitkStaticDynamicSegmentationDialog.h>
+#include <QmitkStyleManager.h>
+
 #include <QmitkStyleManager.h>
 
 #include <ui_QmitkSegmentationTaskListWidget.h>
@@ -71,6 +74,26 @@ namespace
 
     return result;
   }
+
+  mitk::DataStorage::SetOfObjects::ConstPointer GetSubset(const mitk::DataStorage* dataStorage, const mitk::NodePredicateBase* condition, const mitk::DataNode* removedDataNode)
+  {
+    auto subset = dataStorage->GetSubset(condition);
+
+    if (nullptr != removedDataNode)
+    {
+      auto actualSubset = mitk::DataStorage::SetOfObjects::New();
+
+      for (auto node : *subset)
+      {
+        if (node != removedDataNode)
+          actualSubset->push_back(node);
+      }
+
+      return actualSubset;
+    }
+
+    return subset;
+  }
 }
 
 /* This constructor has three objectives:
@@ -82,16 +105,16 @@ QmitkSegmentationTaskListWidget::QmitkSegmentationTaskListWidget(QWidget* parent
   : QWidget(parent),
     m_Ui(new Ui::QmitkSegmentationTaskListWidget),
     m_FileSystemWatcher(new QFileSystemWatcher(this)),
+    m_DataStorage(nullptr),
     m_UnsavedChanges(false)
 {
   m_Ui->setupUi(this);
 
-  m_Ui->selectionWidget->SetSelectionIsOptional(true);
-  m_Ui->selectionWidget->SetEmptyInfo(QStringLiteral("Select a segmentation task list"));
-  m_Ui->selectionWidget->SetAutoSelectNewNodes(true);
   m_Ui->selectionWidget->SetNodePredicate(mitk::TNodePredicateDataType<mitk::SegmentationTaskList>::New());
 
   m_Ui->progressBar->setStyleSheet(QString("QProgressBar::chunk { background-color: %1; }").arg(QmitkStyleManager::GetIconAccentColor()));
+
+  m_Ui->storeButton->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-save.svg")));
 
   using Self = QmitkSegmentationTaskListWidget;
 
@@ -99,6 +122,8 @@ QmitkSegmentationTaskListWidget::QmitkSegmentationTaskListWidget(QWidget* parent
   connect(m_Ui->previousButton, &QToolButton::clicked, this, &Self::OnPreviousButtonClicked);
   connect(m_Ui->nextButton, &QToolButton::clicked, this, &Self::OnNextButtonClicked);
   connect(m_Ui->loadButton, &QPushButton::clicked, this, &Self::OnLoadButtonClicked);
+  connect(m_Ui->storeButton, &QPushButton::clicked, this, &Self::OnStoreButtonClicked);
+  connect(m_Ui->acceptButton, &QPushButton::clicked, this, &Self::OnAcceptButtonClicked);
 
   connect(m_FileSystemWatcher, &QFileSystemWatcher::directoryChanged, this, &Self::OnResultDirectoryChanged);
 
@@ -116,6 +141,15 @@ QmitkSegmentationTaskListWidget::QmitkSegmentationTaskListWidget(QWidget* parent
 
   auto* loadShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key::Key_L), this);
   connect(loadShortcut, &QShortcut::activated, this, &Self::OnLoadTaskShortcutActivated);
+
+  auto* storeShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key::Key_S), parent);
+  connect(storeShortcut, &QShortcut::activated, this, &Self::OnStoreInterimResultShortcutActivated);
+
+  auto* acceptShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key::Key_A), parent);
+  connect(acceptShortcut, &QShortcut::activated, this, &Self::OnAcceptSegmentationShortcutActivated);
+
+  this->ResetControls();
+  this->CheckDataStorage();
 }
 
 QmitkSegmentationTaskListWidget::~QmitkSegmentationTaskListWidget()
@@ -126,6 +160,68 @@ void QmitkSegmentationTaskListWidget::SetDataStorage(mitk::DataStorage* dataStor
 {
   m_DataStorage = dataStorage;
   m_Ui->selectionWidget->SetDataStorage(dataStorage); // Triggers OnSelectionChanged()
+  m_Ui->selectionWidget->SetAutoSelectNewNodes(true);
+
+  this->CheckDataStorage();
+}
+
+void QmitkSegmentationTaskListWidget::CheckDataStorage(const mitk::DataNode* removedNode)
+{
+  QString warning;
+
+  if (nullptr == m_DataStorage)
+  {
+    warning = QStringLiteral(
+      "<h3>Developer warning</h3><p>Call <code>SetDataStorage()</code> to fully initialize "
+      "this instance of <code>QmitkSegmentationTaskListWidget</code>.</p>");
+  }
+  else
+  {
+    auto isTaskList = mitk::TNodePredicateDataType<mitk::SegmentationTaskList>::New();
+    auto taskListNodes = GetSubset(m_DataStorage, isTaskList, removedNode);
+
+    if (taskListNodes->empty())
+    {
+      warning = QStringLiteral(
+        "<h3>No segmentation task list found</h3><p>Load a segmentation task list to use "
+        "this plugin.</p>");
+    }
+    else if (taskListNodes->Size() > 1)
+    {
+      warning = QStringLiteral(
+        "<h3>More than one segmentation task list found</h3><p>Unload everything but a "
+        "single segmentation task list to use this plugin.</p>");
+    }
+    else
+    {
+      const auto* taskListNode = (*taskListNodes)[0].GetPointer();
+
+      auto isTaskListNode = mitk::NodePredicateFunction::New([taskListNode](const mitk::DataNode* node) {
+        return node == taskListNode;
+      });
+
+      auto isChildOfTaskListNode = mitk::NodePredicateFunction::New([this, isTaskListNode](const mitk::DataNode* node) {
+        return !m_DataStorage->GetSources(node, isTaskListNode, false)->empty();
+      });
+
+      auto isHelperObject = mitk::NodePredicateProperty::New("helper object");
+      auto isUndesiredNode = mitk::NodePredicateNot::New(mitk::NodePredicateOr::New(
+        isTaskListNode,
+        isChildOfTaskListNode,
+        isHelperObject));
+
+      if (!GetSubset(m_DataStorage, isUndesiredNode, removedNode)->empty())
+      {
+        warning = QStringLiteral(
+          "<h3>Unrelated data found</h3><p>Unload everything but a single segmentation task "
+          "list to use this plugin.</p>");
+      }
+    }
+  }
+
+  m_Ui->label->setText("<span style=\"color: " + QmitkStyleManager::GetIconAccentColor() + "\">" + warning + "</span>");
+  m_Ui->label->setVisible(!warning.isEmpty());
+  m_Ui->widget->setVisible(warning.isEmpty());
 }
 
 void QmitkSegmentationTaskListWidget::OnUnsavedChangesSaved()
@@ -178,6 +274,7 @@ void QmitkSegmentationTaskListWidget::ResetControls()
 
   this->UpdateLoadButton();
   this->UpdateDetailsLabel();
+  this->UpdateStoreAndAcceptButtons();
 }
 
 /* If the segmentation task changed, reset all member variables to expected
@@ -364,6 +461,7 @@ void QmitkSegmentationTaskListWidget::OnCurrentTaskChanged()
   this->UpdateLoadButton();
   this->UpdateNavigationButtons();
   this->UpdateDetailsLabel();
+  this->UpdateStoreAndAcceptButtons();
 }
 
 /* Update the load button according to the currently displayed task.
@@ -453,6 +551,14 @@ void QmitkSegmentationTaskListWidget::UpdateDetailsLabel()
     details += QString("<p>%1</p>").arg(stringList.join(QStringLiteral("<br>")));
 
   m_Ui->detailsLabel->setText(details);
+}
+
+void QmitkSegmentationTaskListWidget::UpdateStoreAndAcceptButtons()
+{
+  auto activeTaskIsShown = this->ActiveTaskIsShown();
+
+  m_Ui->storeButton->setVisible(activeTaskIsShown);
+  m_Ui->acceptButton->setEnabled(activeTaskIsShown);
 }
 
 /* Load/activate the currently displayed task. Unload all data nodes from
@@ -633,7 +739,7 @@ void QmitkSegmentationTaskListWidget::LoadTask(mitk::DataNode::Pointer imageNode
     if (m_TaskList->HasPreset(current))
     {
       const auto path = m_TaskList->GetAbsolutePath(m_TaskList->GetPreset(current));
-      mitk::LabelSetIOHelper::LoadLabelSetImagePreset(path.string(), segmentation);
+      mitk::MultiLabelIOHelper::LoadLabelSetImagePreset(path.string(), segmentation);
     }
     else
     {
@@ -737,7 +843,7 @@ void QmitkSegmentationTaskListWidget::SetActiveTaskIndex(const std::optional<siz
   if (m_ActiveTaskIndex != index)
   {
     m_ActiveTaskIndex = index;
-    emit ActiveTaskChanged(m_ActiveTaskIndex);
+    this->UpdateStoreAndAcceptButtons();
   }
 }
 
@@ -747,7 +853,7 @@ void QmitkSegmentationTaskListWidget::SetCurrentTaskIndex(const std::optional<si
   {
     m_CurrentTaskIndex = index;
     this->OnCurrentTaskChanged();
-    emit CurrentTaskChanged(m_CurrentTaskIndex);
+
   }
 }
 
@@ -842,4 +948,34 @@ void QmitkSegmentationTaskListWidget::OnNextTaskShortcutActivated()
 void QmitkSegmentationTaskListWidget::OnLoadTaskShortcutActivated()
 {
   m_Ui->loadButton->click();
+}
+
+void QmitkSegmentationTaskListWidget::OnStoreInterimResultShortcutActivated()
+{
+  m_Ui->storeButton->click();
+}
+
+void QmitkSegmentationTaskListWidget::OnAcceptSegmentationShortcutActivated()
+{
+  m_Ui->acceptButton->click();
+}
+
+void QmitkSegmentationTaskListWidget::OnStoreButtonClicked()
+{
+  this->SaveActiveTask(true);
+}
+
+void QmitkSegmentationTaskListWidget::OnAcceptButtonClicked()
+{
+  auto* toolManager = mitk::ToolManagerProvider::GetInstance()->GetToolManager();
+  int activeToolId = -1;
+
+  if (toolManager != nullptr)
+    activeToolId = toolManager->GetActiveToolID();
+
+  this->SaveActiveTask();
+  this->LoadNextUnfinishedTask();
+
+  if (toolManager != nullptr)
+    toolManager->ActivateTool(activeToolId);
 }

@@ -17,7 +17,7 @@ found in the LICENSE file.
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkProperties.h>
-
+#include <QmitkStyleManager.h>
 #include <QList>
 #include <QSet>
 
@@ -41,6 +41,10 @@ void QmitkNodeDescriptorManager::Initialize()
 
   auto isLabelSetImage = mitk::NodePredicateDataType::New("LabelSetImage");
   AddDescriptor(new QmitkNodeDescriptor(tr("LabelSetImage"), QString(":/Qmitk/LabelSetImage_48.png"), isLabelSetImage, this));
+
+  auto segmentationTaskListIcon = QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/SegmentationTaskListIcon.svg"));
+  auto isSegmentationTaskList = mitk::NodePredicateDataType::New("SegmentationTaskList");
+  AddDescriptor(new QmitkNodeDescriptor("SegmentationTaskList", segmentationTaskListIcon, isSegmentationTaskList, this));
 
   auto isPointSet = mitk::NodePredicateDataType::New("PointSet");
   AddDescriptor(new QmitkNodeDescriptor(tr("PointSet"), QString(":/Qmitk/PointSet_48.png"), isPointSet, this));

@@ -107,9 +107,7 @@ void mitk::FillRegionBaseTool::OnClick(StateMachineAction*, InteractionEvent* in
     return; //nothing to fill;
   }
 
-  auto label = labelSetImage->GetLabel(m_SeedLabelValue, labelSetImage->GetActiveLayer());
-
-  if (label->GetLocked() && label->GetValue()!=labelSetImage->GetActiveLabel(labelSetImage->GetActiveLayer())->GetValue())
+  if (labelSetImage->IsLabelLocked(m_SeedLabelValue) && m_SeedLabelValue!=labelSetImage->GetActiveLabel(labelSetImage->GetActiveLayer())->GetValue())
   {
     ErrorMessage.Send("Label of selected region is locked. Tool operation has no effect.");
     return;
@@ -129,7 +127,7 @@ void mitk::FillRegionBaseTool::OnClick(StateMachineAction*, InteractionEvent* in
     activeLabelClone->SetLocked(false);
   }
 
-  TransferLabelContent(fillImage, workingSlice, fillLabelSet, 0, labelSetImage->GetExteriorLabel()->GetValue(), false, { {1, m_FillLabelValue} }, m_MergeStyle);
+  TransferLabelContentAtTimeStep(fillImage, workingSlice, fillLabelSet, 0, LabelSetImage::UnlabeledValue, LabelSetImage::UnlabeledValue, false, { {1, m_FillLabelValue} }, m_MergeStyle);
 
   this->WriteBackSegmentationResult(positionEvent, workingSlice);
 

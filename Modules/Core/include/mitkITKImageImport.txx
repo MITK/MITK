@@ -184,4 +184,42 @@ mitk::Image::Pointer mitk::GrabItkImageMemory(ItkOutputImageType *itkimage,
   return resultImage;
 }
 
+template <typename ItkOutputImageType>
+mitk::Image::Pointer mitk::GrabItkImageMemoryChannel(ItkOutputImageType* itkimage,
+  const TimeGeometry* geometry,
+  mitk::Image* mitkImage,
+  bool update)
+{
+  if (update)
+    itkimage->Update();
+
+  mitk::Image::Pointer resultImage;
+  if (mitkImage != nullptr)
+  {
+    resultImage = mitkImage;
+
+    // test the pointer equality with read accessor only if mitk Image is initialized, otherwise an Exception is thrown
+    // by the ReadAccessor
+    if (mitkImage->IsInitialized())
+    {
+      // check the data pointer, for that, we need to ignore the lock of the mitkImage
+      mitk::ImageReadAccessor read_probe(mitk::Image::Pointer(mitkImage), nullptr, mitk::ImageAccessorBase::IgnoreLock);
+      if (itkimage->GetBufferPointer() == read_probe.GetData())
+        return resultImage;
+    }
+  }
+  else
+  {
+    resultImage = mitk::Image::New();
+  }
+  resultImage->InitializeByItk(itkimage);
+  resultImage->SetImportChannel(itkimage->GetBufferPointer(), 0, Image::ManageMemory);
+  itkimage->GetPixelContainer()->ContainerManageMemoryOff();
+
+  if (geometry != nullptr)
+    resultImage->SetTimeGeometry(geometry->Clone().GetPointer());
+
+  return resultImage;
+}
+
 #endif //__mitkITKImageImport_txx

@@ -72,13 +72,10 @@ private Q_SLOTS:
 
   void OnShowMarkerNodes(bool);
 
-  void OnLayersChanged();
+  void OnCurrentLabelSelectionChanged(QmitkMultiLabelManager::LabelValueVectorType labels);
 
-  void OnShowLabelTable(bool);
-
-  void OnGoToLabel(const mitk::Point3D &pos);
-
-  void OnLabelSetWidgetReset();
+  void OnGoToLabel(mitk::LabelSetImage::LabelValueType label, const mitk::Point3D&);
+  void OnLabelRenameRequested(mitk::Label* label, bool rename) const;
 
 private:
 
@@ -115,16 +112,13 @@ private:
 
   void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart) override;
 
   void OnPreferencesChanged(const mitk::IPreferences* prefs) override;
 
   void NodeAdded(const mitk::DataNode* node) override;
 
   void NodeRemoved(const mitk::DataNode* node) override;
-
-  void EstablishLabelSetConnection();
-
-  void LooseLabelSetConnection();
 
   void OnAnySelectionChanged();
 
@@ -155,6 +149,8 @@ private:
   void UpdateWarningLabel(QString text);
 
   std::string GetDefaultLabelSetPreset() const;
+
+  mitk::LabelSetImage* GetCurrentSegmentation() const;
 
   QWidget* m_Parent;
 

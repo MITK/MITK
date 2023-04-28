@@ -10,11 +10,15 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef mitkLabelSetIOHelper_h
-#define mitkLabelSetIOHelper_h
+#ifndef mitkMultiLabelIOHelper_h
+#define mitkMultiLabelIOHelper_h
+
+#include <mitkLabelSet.h>
+
+#include <itkSmartPointer.h>
+#include <nlohmann/json.hpp>
 
 #include <MitkMultilabelExports.h>
-#include <itkSmartPointer.h>
 
 namespace tinyxml2
 {
@@ -22,19 +26,28 @@ namespace tinyxml2
   class XMLElement;
 }
 
+namespace itk
+{
+  class MetaDataDictionary;
+}
+
 namespace mitk
 {
-  class BaseProperty;
   class LabelSetImage;
-  class Label;
+
+  const constexpr char* const PROPERTY_NAME_TIMEGEOMETRY_TYPE = "org.mitk.timegeometry.type";
+  const constexpr char* const PROPERTY_NAME_TIMEGEOMETRY_TIMEPOINTS = "org.mitk.timegeometry.timepoints";
+  const constexpr char* const PROPERTY_KEY_TIMEGEOMETRY_TYPE = "org_mitk_timegeometry_type";
+  const constexpr char* const PROPERTY_KEY_TIMEGEOMETRY_TIMEPOINTS = "org_mitk_timegeometry_timepoints";
+  const constexpr char* const PROPERTY_KEY_UID = "org_mitk_uid";
 
   /**
-   * @brief The LabelSetIOHelper is a static helper class that supports serialization of mitk::LabelSetImage
+   * @brief The MultiLabelIOHelper is a static helper class that supports serialization of mitk::LabelSetImage
    *
    * This class provides static functions for converting mitk::Label into XML and also allows the serialization
    * of mitk::LabelSet as presets
    */
-  class MITKMULTILABEL_EXPORT LabelSetIOHelper
+  class MITKMULTILABEL_EXPORT MultiLabelIOHelper
   {
   public:
     /**
@@ -90,8 +103,24 @@ namespace mitk
      */
     static bool PropertyFromXMLElement(std::string &key, itk::SmartPointer<mitk::BaseProperty> &prop, const tinyxml2::XMLElement *elem);
 
+    /** Helper that extracts the value of a key in a meta dictionary as int.
+    * If the key does not exist 0 is returned.*/
+    static int GetIntByKey(const itk::MetaDataDictionary& dic, const std::string& key);
+    /** Helper that extracts the value of a key in a meta dictionary as string.
+    * If the key does not exist an empty string is returned.*/
+    static std::string GetStringByKey(const itk::MetaDataDictionary& dic, const std::string& key);
+
+
+    static nlohmann::json SerializeMultLabelGroupsToJSON(const mitk::LabelSetImage* inputImage);
+
+    static std::vector<LabelSet::Pointer> DeserializeMultiLabelGroupsFromJSON(const nlohmann::json& listOfLabelSets);
+
+    static nlohmann::json SerializeLabelToJSON(const Label* label);
+
+    static mitk::Label::Pointer DeserializeLabelFromJSON(const nlohmann::json& labelJson);
+
   private:
-    LabelSetIOHelper();
+    MultiLabelIOHelper();
   };
 }
 

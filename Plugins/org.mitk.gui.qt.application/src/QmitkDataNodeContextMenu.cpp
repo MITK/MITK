@@ -132,7 +132,7 @@ void QmitkDataNodeContextMenu::InitDefaultActions()
   m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, m_RemoveAction));
 
   m_ShowSelectedNodesAction = new QmitkDataNodeShowSelectedNodesAction(m_Parent, workbenchPartSite);
-  m_RemoveAction->setIcon(QIcon(":/org.mitk.gui.qt.datamanager/ShowSelectedNode_48.png"));
+  m_ShowSelectedNodesAction->setIcon(QIcon(":/org.mitk.gui.qt.datamanager/ShowSelectedNode_48.png"));
   m_UnknownDataNodeDescriptor->AddAction(m_ShowSelectedNodesAction, true);
   m_DescriptorActionList.push_back(std::make_pair(m_UnknownDataNodeDescriptor, m_ShowSelectedNodesAction));
 

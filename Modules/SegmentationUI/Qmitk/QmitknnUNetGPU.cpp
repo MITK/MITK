@@ -33,11 +33,14 @@ QmitkGPULoader::QmitkGPULoader()
     QmitkGPUSpec spec;
     QStringList gpuDetails;
     gpuDetails = infoString.split(",");
-    spec.name = gpuDetails.at(0);
-    spec.id = count;
-    spec.memory = gpuDetails.at(1);
-    this->m_Gpus.push_back(spec);
-    ++count;
+    if(gpuDetails.count() == 2)
+    {
+      spec.name = gpuDetails.at(0);
+      spec.id = count;
+      spec.memory = gpuDetails.at(1);
+      this->m_Gpus.push_back(spec);
+      ++count;
+    }
   }
 }
 

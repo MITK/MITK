@@ -810,7 +810,7 @@ void QmitkMultiLabelTreeModel::RemoveObserver()
 void QmitkMultiLabelTreeModel::OnLabelAdded(LabelValueType labelValue)
 {
   GroupIndexType groupIndex = 0;
-  if (m_Segmentation->IsLabeInGroup(labelValue, groupIndex))
+  if (m_Segmentation->IsLabelInGroup(labelValue, groupIndex))
   {
     auto label = m_Segmentation->GetLabel(labelValue);
     if (nullptr == label) mitkThrow() << "Invalid internal state. Segmentation signaled the addition of an label that does not exist in the segmentation. Invalid label value:" << labelValue;

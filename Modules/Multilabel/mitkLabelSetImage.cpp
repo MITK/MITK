@@ -1072,13 +1072,13 @@ bool mitk::LabelSetImage::ExistGroup(GroupIndexType index) const
   return index < m_LabelSetContainer.size();
 }
 
-bool mitk::LabelSetImage::IsLabeInGroup(LabelValueType value) const
+bool mitk::LabelSetImage::IsLabelInGroup(LabelValueType value) const
 {
   GroupIndexType dummy;
-  return this->IsLabeInGroup(value, dummy);
+  return this->IsLabelInGroup(value, dummy);
 }
 
-bool mitk::LabelSetImage::IsLabeInGroup(LabelValueType value, GroupIndexType& groupIndex) const
+bool mitk::LabelSetImage::IsLabelInGroup(LabelValueType value, GroupIndexType& groupIndex) const
 {
   auto finding = m_LabelToGroupMap.find(value);
   if (m_LabelToGroupMap.end() != finding)

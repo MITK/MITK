@@ -21,7 +21,6 @@ found in the LICENSE file.
 
 class QmitkAnimationItem;
 class QmitkAnimationWidget;
-class QmitkFFmpegWriter;
 class QMenu;
 class QStandardItemModel;
 class QTimer;
@@ -87,7 +86,6 @@ private:
   QmitkAnimationItem* GetSelectedAnimationItem() const;
   std::vector<std::pair<QmitkAnimationItem*, double>> GetActiveAnimations(double t) const;
 
-  QmitkFFmpegWriter* m_FFmpegWriter;
   QWidget* m_Parent;
   Ui::QmitkMovieMakerView* m_Ui;
   QStandardItemModel* m_AnimationModel;

@@ -25,13 +25,13 @@ found in the LICENSE file.
 #include <vtkCamera.h>
 
 #include <QAction>
-#include <QFiledialog>
+#include <QFileDialog>
 #include <QTimer>
-#include <QDatetime>
-#include <QSpinbox>
-#include <QCombobox>
+#include <QDateTime>
+#include <QSpinBox>
+#include <QComboBox>
 #include <QColor>
-#include <QColordialog>
+#include <QColorDialog>
 
 #include <QApplication>
 

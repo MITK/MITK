@@ -24,16 +24,16 @@ found in the LICENSE file.
 #include <vtkRenderer.h>
 #include <vtkCamera.h>
 
-#include <qaction.h>
-#include <qfiledialog.h>
-#include <qtimer.h>
-#include <qdatetime.h>
-#include <qspinbox.h>
-#include <qcombobox.h>
-#include <qcolor.h>
-#include <qcolordialog.h>
+#include <QAction>
+#include <QFiledialog>
+#include <QTimer>
+#include <QDatetime>
+#include <QSpinbox>
+#include <QCombobox>
+#include <QColor>
+#include <QColordialog>
 
-#include "qapplication.h"
+#include <QApplication>
 
 #include "vtkImageWriter.h"
 #include "vtkJPEGWriter.h"
@@ -181,11 +181,11 @@ void QmitkScreenshotMaker::GenerateMultiplanarScreenshots()
   for (int i = 0; i < windowCount; ++i)
   {
     auto windowName = m_Controls->m_DirectionBox->itemText(i);
-    QString fileName = QString::fromStdString("/") + windowName + QString::fromStdString(".png");
+    QString fileName = QDir::separator() + windowName + QString::fromStdString(".png");
     int c = 1;
     while (QFile::exists(filePath + fileName))
     {
-      fileName = QString::fromStdString("/") + windowName + QString::fromStdString("_");
+      fileName = QDir::separator() + windowName + QString::fromStdString("_");
       fileName += QString::number(c);
       fileName += ".png";
       c++;

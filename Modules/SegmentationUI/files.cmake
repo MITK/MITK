@@ -28,6 +28,8 @@ set(CPP_FILES
   Qmitk/QmitkStaticDynamicSegmentationDialog.cpp
   Qmitk/QmitkSimpleLabelSetListWidget.cpp
   Qmitk/QmitkSegmentationTaskListWidget.cpp
+  Qmitk/QmitkTotalSegmentatorToolGUI.cpp
+  Qmitk/QmitkSetupVirtualEnvUtil.cpp
   Qmitk/QmitkMultiLabelInspector.cpp
   Qmitk/QmitkMultiLabelManager.cpp
   Qmitk/QmitkMultiLabelTreeModel.cpp
@@ -74,6 +76,8 @@ set(MOC_H_FILES
   Qmitk/QmitkStaticDynamicSegmentationDialog.h
   Qmitk/QmitkSimpleLabelSetListWidget.h
   Qmitk/QmitkSegmentationTaskListWidget.h
+  Qmitk/QmitkTotalSegmentatorToolGUI.h
+  Qmitk/QmitkSetupVirtualEnvUtil.h
   Qmitk/QmitkMultiLabelInspector.h
   Qmitk/QmitkMultiLabelManager.h
   Qmitk/QmitkMultiLabelTreeModel.h
@@ -98,6 +102,7 @@ set(UI_FILES
   Qmitk/QmitknnUNetToolGUIControls.ui
   Qmitk/QmitkEditableContourToolGUIControls.ui
   Qmitk/QmitkSegmentationTaskListWidget.ui
+  Qmitk/QmitkTotalSegmentatorGUIControls.ui
   Qmitk/QmitkMultiLabelInspectorControls.ui
   Qmitk/QmitkMultiLabelManagerControls.ui
   SegmentationUtilities/QmitkBooleanOperationsWidgetControls.ui

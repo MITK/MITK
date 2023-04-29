@@ -393,7 +393,15 @@ Remark: The tool assumes that you have a Python3 environment with nnUNet (pip) i
     current parameters will neither be checked against the existing cache nor a segmentation be loaded from it when Preview is clicked.
     -# You may always clear all the cached segmentations by clicking "Clear Cache" button.
 
-
+\subsubsection org_mitk_views_segmentationnnUNetToolMisc Miscellaneous:
+    -# In case you want to reload/reparse the folders in the "nnUNet Results Folder", eg. after adding new tasks into it, you may do so without reselecting the folder again by clicking the "Refresh Results Folder" button.
+    -# The "Advanced" > "GPU Id" combobox lists the Nvidia GPUs available by parsing the <tt>nvidia-smi</tt> utility output. In case your machine has Nvidia CUDA enabled GPUs but the <tt>nvidia-smi</tt> fails for some reason, the "GPU Id" combobox will show no entries.
+    In such a situation, it's still possible to execute inferencing by manually entering the preferred GPU Id, eg. 0 in the combobox.
+    -# The "Advanced" > "Available Models" lists the available pre-trained tasks for download. Make sure you have internet connection. Then, choose a Task from the dropdown and click the Download button. The pre-trained models for the selected Task
+    will be downloaded and placed to the <b>RESULTS_FOLDER</b> directory automatically.
+    -# In the <b>RESULTS_FOLDER</b> directory, inside the trainer-planner folder of every task, MITK keeps a "mitk_export.json" file for fast loading for multi-modal information. It is recommended not to delete this file(s) for a fast responsive UI.
+    Tip: If multi-modal information shown on MITK is not correct for a given task, you may modify this JSON file and try again.
+  
 \subsection org_mitk_views_segmentationTotalSegmentator TotalSegmentator Tool
 
 \imageMacro{QmitkSegmentation_nnUnetTool.png,"TotalSegmentator tool",10.00}
@@ -405,7 +413,7 @@ directory. Note: on Debian/Ubuntu systems, you need to install the python3-venv 
 \imageMacro{QmitkSegmentation_TotalsegmentatorTool.png, "TotalSegmentator Settings",5}
 
 \subsubsection org_mitk_views_segmentationTotalSegmentatorWorkflow Workflow:
-    -# Install TotalSegmentator: Click "Install TotalSegmentator" to install TotalSegmentator (version: 1.5.3) in a virtual environment. Make sure you have a working internet connection. This might take a while. It is a one time job, though.
+    -# Install TotalSegmentator: Click "Install TotalSegmentator" to install TotalSegmentator (version: 1.5.5) in a virtual environment. Make sure you have a working internet connection. This might take a while. It is a one time job, though.
     Once installed, the "Install TotalSegmentator" button is grayed out.
     -# If Python is not found by MITK goto "Install Options" & select the "System Python Path" drop-down to see if MITK has automatically detected other Python environments.
     Click on a fitting Python installation for TotalSegmentator to use or click "Select" in the dropdown to choose an unlisted installation of Python. Note that, while selecting an arbitrary environment folder, only select the base folder, e.g. "/usr/bin/".
@@ -415,17 +423,6 @@ directory. Note: on Debian/Ubuntu systems, you need to install the python3-venv 
     -# In the "Advanced" section, you can also activate other options like "Fast" for faster runtime and less memory requirements. Use "Fast" if you only have a CPU for inferencing.
     -# Use "Advanced" > "GPU Id" combobox to change the preferred GPU for inferencing. This is internally equivalent to setting the <b>CUDA_VISIBLE_DEVICES</b> environment variable.
     -# In case you want to use your own virtual environment containing TotalSegmentator, goto "Install Options" & check "Use Custom Installation" checkbox. Then, select the environment of your choice by using "Custom Env. Path".
-
-
-
-\subsubsection org_mitk_views_segmentationnnUNetToolMisc Miscellaneous:
-    -# In case you want to reload/reparse the folders in the "nnUNet Results Folder", eg. after adding new tasks into it, you may do so without reselecting the folder again by clicking the "Refresh Results Folder" button.
-    -# The "Advanced" > "GPU Id" combobox lists the Nvidia GPUs available by parsing the <tt>nvidia-smi</tt> utility output. In case your machine has Nvidia CUDA enabled GPUs but the <tt>nvidia-smi</tt> fails for some reason, the "GPU Id" combobox will show no entries.
-    In such a situation, it's still possible to execute inferencing by manually entering the preferred GPU Id, eg. 0 in the combobox.
-    -# The "Advanced" > "Available Models" lists the available pre-trained tasks for download. Make sure you have internet connection. Then, choose a Task from the dropdown and click the Download button. The pre-trained models for the selected Task
-    will be downloaded and placed to the <b>RESULTS_FOLDER</b> directory automatically.
-    -# In the <b>RESULTS_FOLDER</b> directory, inside the trainer-planner folder of every task, MITK keeps a "mitk_export.json" file for fast loading for multi-modal information. It is recommended not to delete this file(s) for a fast responsive UI.
-    Tip: If multi-modal information shown on MITK is not correct for a given task, you may modify this JSON file and try again.
 
 \section org_mitk_views_segmentationpostprocessing Additional things you can do with segmentations
 

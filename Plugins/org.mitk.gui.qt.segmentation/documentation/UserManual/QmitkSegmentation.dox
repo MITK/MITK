@@ -401,6 +401,28 @@ Remark: The tool assumes that you have a Python3 environment with nnUNet (pip) i
     will be downloaded and placed to the <b>RESULTS_FOLDER</b> directory automatically.
     -# In the <b>RESULTS_FOLDER</b> directory, inside the trainer-planner folder of every task, MITK keeps a "mitk_export.json" file for fast loading for multi-modal information. It is recommended not to delete this file(s) for a fast responsive UI.
     Tip: If multi-modal information shown on MITK is not correct for a given task, you may modify this JSON file and try again.
+  
+\subsection org_mitk_views_segmentationTotalSegmentator TotalSegmentator Tool
+
+\imageMacro{QmitkSegmentation_nnUnetTool.png,"TotalSegmentator tool",10.00}
+
+This tool provides a GUI to the deep learning-based segmentation algorithm called the TotalSegmentator. With this tool, you can get a segmentation mask predicted for 104 classes in CT images, loaded in MITK. 
+For a detailed explanation on tasks and supported classes etc., please refer to https://github.com/wasserth/TotalSegmentator <br>
+The tool assumes that you have Python 3 installed and available on your machine. We recommend to install TotalSegmentator via MITK. The "Install TotalSegmentator" action implicitly creates a python virtual environment in an MITK mainitained
+directory. Note: on Debian/Ubuntu systems, you need to install the python3-venv package using the following command:  `apt install python3-venv`. For best results, your machine should be ideally equipped with a CUDA-enabled GPU. 
+\imageMacro{QmitkSegmentation_TotalsegmentatorTool.png, "TotalSegmentator Settings",5}
+
+\subsubsection org_mitk_views_segmentationTotalSegmentatorWorkflow Workflow:
+    -# Install TotalSegmentator: Click "Install TotalSegmentator" to install TotalSegmentator (version: 1.5.5) in a virtual environment. Make sure you have a working internet connection. This might take a while. It is a one time job, though.
+    Once installed, the "Install TotalSegmentator" button is grayed out.
+    -# If Python is not found by MITK goto "Install Options" & select the "System Python Path" drop-down to see if MITK has automatically detected other Python environments.
+    Click on a fitting Python installation for TotalSegmentator to use or click "Select" in the dropdown to choose an unlisted installation of Python. Note that, while selecting an arbitrary environment folder, only select the base folder, e.g. "/usr/bin/".
+    No need to navigate all the way into "../usr/bin/python3", for example.
+    -# Select a specific subtask in the "Tasks" drop-downs. The default is "total" for non-specific total segmentation.
+    -# Click on "Run TotalSegmentator" for a preview.
+    -# In the "Advanced" section, you can also activate other options like "Fast" for faster runtime and less memory requirements. Use "Fast" if you only have a CPU for inferencing.
+    -# Use "Advanced" > "GPU Id" combobox to change the preferred GPU for inferencing. This is internally equivalent to setting the <b>CUDA_VISIBLE_DEVICES</b> environment variable.
+    -# In case you want to use your own virtual environment containing TotalSegmentator, goto "Install Options" & check "Use Custom Installation" checkbox. Then, select the environment of your choice by using "Custom Env. Path".
 
 \section org_mitk_views_segmentationpostprocessing Additional things you can do with segmentations
 

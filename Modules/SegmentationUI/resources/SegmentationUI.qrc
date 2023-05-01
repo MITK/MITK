@@ -25,5 +25,10 @@
     <file>CreateMask.png</file>
     <file>RandomColor.png</file>
     <file>RenameLabel.png</file>
+    <file>icon_label_add.svg</file>
+    <file>icon_label_add_instance.svg</file>
+    <file>icon_label_delete.svg</file>
+    <file>icon_group_add.svg</file>
+    <file>icon_group_delete.svg</file>
   </qresource>
 </RCC>

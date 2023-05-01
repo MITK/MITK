@@ -599,13 +599,13 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
 
     if (m_AllowLabelModification)
     {
-      QAction* addInstanceAction = new QAction(QIcon(":/Qmitk/RenameLabel.png"), "&Add label", this);
+      QAction* addInstanceAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_add.svg")), "&Add label", this);
       QObject::connect(addInstanceAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnAddLabel);
       menu->addAction(addInstanceAction);
 
       if (m_Segmentation->GetNumberOfLayers() > 1)
       {
-        QAction* removeAction = new QAction(QIcon(":/Qmitk/RemoveLabel.png"), "Delete group", this);
+        QAction* removeAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_group_delete.svg")), "Delete group", this);
         QObject::connect(removeAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnDeleteGroup);
         menu->addAction(removeAction);
       }
@@ -614,11 +614,11 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
     if (m_AllowLockModification)
     {
       menu->addSeparator();
-      QAction* lockAllAction = new QAction(QIcon(":/Qmitk/lock.png"), "Lock group", this);
+      QAction* lockAllAction = new QAction(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/lock.svg")), "Lock group", this);
       QObject::connect(lockAllAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnLockAffectedLabels);
       menu->addAction(lockAllAction);
 
-      QAction* unlockAllAction = new QAction(QIcon(":/Qmitk/unlock.png"), "Unlock group", this);
+      QAction* unlockAllAction = new QAction(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/unlock.svg")), "Unlock group", this);
       QObject::connect(unlockAllAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnUnlockAffectedLabels);
       menu->addAction(unlockAllAction);
     }
@@ -627,11 +627,11 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
     {
       menu->addSeparator();
 
-      QAction* viewAllAction = new QAction(QIcon(":/Qmitk/visible.png"), "View group", this);
+      QAction* viewAllAction = new QAction(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/visible.svg")), "View group", this);
       QObject::connect(viewAllAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnSetAffectedLabelsVisible);
       menu->addAction(viewAllAction);
 
-      QAction* hideAllAction = new QAction(QIcon(":/Qmitk/invisible.png"), "Hide group", this);
+      QAction* hideAllAction = new QAction(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/invisible.svg")), "Hide group", this);
       QObject::connect(hideAllAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnSetAffectedLabelsInvisible);
       menu->addAction(hideAllAction);
 
@@ -649,7 +649,7 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
 
     if (m_AllowLabelModification)
     {
-      QAction* addInstanceAction = new QAction(QIcon(":/Qmitk/RenameLabel.png"), "Add label instance", this);
+      QAction* addInstanceAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_add_instance.svg")), "Add label instance", this);
       QObject::connect(addInstanceAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnAddLabelInstance);
       menu->addAction(addInstanceAction);
 
@@ -665,11 +665,11 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
     if (m_AllowLockModification)
     {
       menu->addSeparator();
-      QAction* lockAllAction = new QAction(QIcon(":/Qmitk/lock.png"), "Lock label instances", this);
+      QAction* lockAllAction = new QAction(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/lock.svg")), "Lock label instances", this);
       QObject::connect(lockAllAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnLockAffectedLabels);
       menu->addAction(lockAllAction);
 
-      QAction* unlockAllAction = new QAction(QIcon(":/Qmitk/unlock.png"), "Unlock label instances", this);
+      QAction* unlockAllAction = new QAction(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/unlock.svg")), "Unlock label instances", this);
       QObject::connect(unlockAllAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnUnlockAffectedLabels);
       menu->addAction(unlockAllAction);
     }
@@ -678,15 +678,15 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
     {
       menu->addSeparator();
 
-      QAction* viewAllAction = new QAction(QIcon(":/Qmitk/visible.png"), "View label instances", this);
+      QAction* viewAllAction = new QAction(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/visible.svg")), "View label instances", this);
       QObject::connect(viewAllAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnSetAffectedLabelsVisible);
       menu->addAction(viewAllAction);
 
-      QAction* hideAllAction = new QAction(QIcon(":/Qmitk/invisible.png"), "Hide label instances", this);
+      QAction* hideAllAction = new QAction(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/invisible.svg")), "Hide label instances", this);
       QObject::connect(hideAllAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnSetAffectedLabelsInvisible);
       menu->addAction(hideAllAction);
 
-      QAction* viewOnlyAction = new QAction(QIcon(":/Qmitk/visible.png"), "View only", this);
+      QAction* viewOnlyAction = new QAction(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/visible.svg")), "View only", this);
       QObject::connect(viewOnlyAction, SIGNAL(triggered(bool)), this, SLOT(OnSetOnlyActiveLabelVisible(bool)));
       menu->addAction(viewOnlyAction);
 
@@ -724,7 +724,7 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
     {
       if (m_AllowLabelModification)
       {
-        QAction* addInstanceAction = new QAction(QIcon(":/Qmitk/RenameLabel.png"), "&Add label instance...", this);
+        QAction* addInstanceAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_add_instance.svg")), "&Add label instance...", this);
         QObject::connect(addInstanceAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnAddLabelInstance);
         menu->addAction(addInstanceAction);
 
@@ -732,7 +732,7 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
         QObject::connect(renameAction, SIGNAL(triggered(bool)), this, SLOT(OnRenameLabel(bool)));
         menu->addAction(renameAction);
 
-        QAction* removeAction = new QAction(QIcon(":/Qmitk/RemoveLabel.png"), "&Delete", this);
+        QAction* removeAction = new QAction(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_delete.svg")), "&Delete", this);
         QObject::connect(removeAction, &QAction::triggered, this, &QmitkMultiLabelInspector::DeleteLabel);
         menu->addAction(removeAction);
 
@@ -744,7 +744,7 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
       if (m_AllowVisibilityModification)
       {
         menu->addSeparator();
-        QAction* viewOnlyAction = new QAction(QIcon(":/Qmitk/visible.png"), "View only", this);
+        QAction* viewOnlyAction = new QAction(QmitkStyleManager::ThemeIcon(QLatin1String(":/Qmitk/visible.svg")), "View only", this);
         QObject::connect(viewOnlyAction, SIGNAL(triggered(bool)), this, SLOT(OnSetOnlyActiveLabelVisible(bool)));
         menu->addAction(viewOnlyAction);
 

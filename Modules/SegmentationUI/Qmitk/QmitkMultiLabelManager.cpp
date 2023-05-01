@@ -61,7 +61,6 @@ QmitkMultiLabelManager::QmitkMultiLabelManager(QWidget *parent)
   m_Controls->labelSearchBox->setCompleter(m_Completer);
 
   m_Controls->labelInspector->SetAllowLabelModification(true);
-  connect(m_Controls->labelInspector, &QmitkMultiLabelInspector::CurrentSelectionChanged, this, &QmitkMultiLabelManager::UpdateControls);
 
   connect(m_Controls->labelSearchBox, SIGNAL(returnPressed()), this, SLOT(OnSearchLabel()));
 
@@ -73,6 +72,11 @@ QmitkMultiLabelManager::QmitkMultiLabelManager(QWidget *parent)
 
   m_Controls->btnSavePreset->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-save.svg")));
   m_Controls->btnLoadPreset->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/document-open.svg")));
+  m_Controls->btnAddLabel->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_add.svg")));
+  m_Controls->btnAddInstance->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_add_instance.svg")));
+  m_Controls->btnAddGroup->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_group_add.svg")));
+  m_Controls->btnRemoveLabel->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_label_delete.svg")));
+  m_Controls->btnRemoveGroup->setIcon(QmitkStyleManager::ThemeIcon(QStringLiteral(":/Qmitk/icon_group_delete.svg")));
 
   connect(m_Controls->btnAddLabel, &QToolButton::clicked, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::AddNewLabel);
   connect(m_Controls->btnAddInstance, &QToolButton::clicked, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::AddNewLabelInstance);
@@ -84,7 +88,7 @@ QmitkMultiLabelManager::QmitkMultiLabelManager(QWidget *parent)
 
   connect(this->m_Controls->labelInspector, &QmitkMultiLabelInspector::GoToLabel, this, &QmitkMultiLabelManager::OnGoToLabel);
   connect(this->m_Controls->labelInspector, &QmitkMultiLabelInspector::LabelRenameRequested, this, &QmitkMultiLabelManager::OnLabelRenameRequested);
-  connect(this->m_Controls->labelInspector, &QmitkMultiLabelInspector::CurrentSelectionChanged, this, &QmitkMultiLabelManager::CurrentSelectionChanged);
+  connect(this->m_Controls->labelInspector, &QmitkMultiLabelInspector::CurrentSelectionChanged, this, &QmitkMultiLabelManager::OnSelectedLabelChanged);
 
   auto* renameLabelShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key::Key_L, Qt::CTRL | Qt::Key::Key_R), this);
   connect(renameLabelShortcut, &QShortcut::activated, this, &QmitkMultiLabelManager::OnRenameLabelShortcutActivated);
@@ -97,6 +101,7 @@ QmitkMultiLabelManager::QmitkMultiLabelManager(QWidget *parent)
 
 QmitkMultiLabelManager::~QmitkMultiLabelManager()
 {
+  this->SetMultiLabelSegmentation(nullptr);
   delete m_Controls;
 }
 
@@ -156,7 +161,9 @@ void QmitkMultiLabelManager::SetMultiLabelSegmentation(mitk::LabelSetImage* segm
 {
   if (segmentation != this->m_Segmentation.GetPointer())
   {
+    this->RemoveSegmentationObserver();
     m_Segmentation = segmentation;
+    this->AddSegmentationObserver();
     this->m_Controls->labelInspector->SetMultiLabelSegmentation(segmentation);
     UpdateControls();
   }
@@ -456,3 +463,51 @@ void QmitkMultiLabelManager::OnThreadedCalculationDone()
 {
   mitk::StatusBar::GetInstance()->Clear();
 }
+
+void QmitkMultiLabelManager::AddSegmentationObserver()
+{
+  if (this->m_Segmentation.IsNotNull())
+  {
+    this->m_Segmentation->AddLabelAddedListener(mitk::MessageDelegate1<QmitkMultiLabelManager, mitk::LabelSetImage::LabelValueType>(
+      this, &QmitkMultiLabelManager::OnLabelEvent));
+    this->m_Segmentation->AddLabelModifiedListener(mitk::MessageDelegate1<QmitkMultiLabelManager, mitk::LabelSetImage::LabelValueType>(
+      this, &QmitkMultiLabelManager::OnLabelEvent));
+    this->m_Segmentation->AddLabelRemovedListener(mitk::MessageDelegate1<QmitkMultiLabelManager, mitk::LabelSetImage::LabelValueType>(
+      this, &QmitkMultiLabelManager::OnLabelEvent));
+    this->m_Segmentation->AddGroupAddedListener(mitk::MessageDelegate1<QmitkMultiLabelManager, mitk::LabelSetImage::GroupIndexType>(
+      this, &QmitkMultiLabelManager::OnGroupEvent));
+    this->m_Segmentation->AddGroupModifiedListener(mitk::MessageDelegate1<QmitkMultiLabelManager, mitk::LabelSetImage::GroupIndexType>(
+      this, &QmitkMultiLabelManager::OnGroupEvent));
+    this->m_Segmentation->AddGroupRemovedListener(mitk::MessageDelegate1<QmitkMultiLabelManager, mitk::LabelSetImage::GroupIndexType>(
+      this, &QmitkMultiLabelManager::OnGroupEvent));
+  }
+}
+
+void QmitkMultiLabelManager::RemoveSegmentationObserver()
+{
+  if (this->m_Segmentation.IsNotNull())
+  {
+    this->m_Segmentation->RemoveLabelAddedListener(mitk::MessageDelegate1<QmitkMultiLabelManager, mitk::LabelSetImage::LabelValueType>(
+      this, &QmitkMultiLabelManager::OnLabelEvent));
+    this->m_Segmentation->RemoveLabelModifiedListener(mitk::MessageDelegate1<QmitkMultiLabelManager, mitk::LabelSetImage::LabelValueType>(
+      this, &QmitkMultiLabelManager::OnLabelEvent));
+    this->m_Segmentation->RemoveLabelRemovedListener(mitk::MessageDelegate1<QmitkMultiLabelManager, mitk::LabelSetImage::LabelValueType>(
+      this, &QmitkMultiLabelManager::OnLabelEvent));
+    this->m_Segmentation->RemoveGroupAddedListener(mitk::MessageDelegate1<QmitkMultiLabelManager, mitk::LabelSetImage::GroupIndexType>(
+      this, &QmitkMultiLabelManager::OnGroupEvent));
+    this->m_Segmentation->RemoveGroupModifiedListener(mitk::MessageDelegate1<QmitkMultiLabelManager, mitk::LabelSetImage::GroupIndexType>(
+      this, &QmitkMultiLabelManager::OnGroupEvent));
+    this->m_Segmentation->RemoveGroupRemovedListener(mitk::MessageDelegate1<QmitkMultiLabelManager, mitk::LabelSetImage::GroupIndexType>(
+      this, &QmitkMultiLabelManager::OnGroupEvent));
+  }
+}
+
+void QmitkMultiLabelManager::OnLabelEvent(mitk::LabelSetImage::LabelValueType /*labelValue*/)
+{
+  this->UpdateControls();
+};
+
+void QmitkMultiLabelManager::OnGroupEvent(mitk::LabelSetImage::GroupIndexType /*groupIndex*/)
+{
+  this->UpdateControls();
+};

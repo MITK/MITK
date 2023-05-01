@@ -150,6 +150,12 @@ private:
 
   void OnThreadedCalculationDone();
 
+  void AddSegmentationObserver();
+  void RemoveSegmentationObserver();
+
+  void OnLabelEvent(mitk::LabelSetImage::LabelValueType labelValue);
+  void OnGroupEvent(mitk::LabelSetImage::GroupIndexType groupIndex);
+
   Ui::QmitkMultiLabelManagerControls* m_Controls;
 
   QCompleter *m_Completer;

@@ -34,6 +34,7 @@ set(CPP_FILES
   Qmitk/QmitkMultiLabelManager.cpp
   Qmitk/QmitkMultiLabelTreeModel.cpp
   Qmitk/QmitkMultiLabelTreeView.cpp
+  Qmitk/QmitkMultiLabelPresetHelper.cpp
   Qmitk/QmitkLabelColorItemDelegate.cpp
   Qmitk/QmitkLabelToggleItemDelegate.cpp
   SegmentationUtilities/QmitkBooleanOperationsWidget.cpp
@@ -45,6 +46,9 @@ set(CPP_FILES
   SegmentationUtilities/QmitkDataSelectionWidget.cpp
 )
 
+set(H_FILES
+  Qmitk/QmitkMultiLabelPresetHelper.h
+)
 set(MOC_H_FILES
   Qmitk/QmitkSegWithPreviewToolGUIBase.h
   Qmitk/QmitkMultiLabelSegWithPreviewToolGUIBase.h

@@ -294,6 +294,7 @@ set(CPP_FILES
   Rendering/mitkRenderWindowFrame.cpp
   Rendering/mitkSurfaceVtkMapper2D.cpp
   Rendering/mitkSurfaceVtkMapper3D.cpp
+  Rendering/mitkVideoRecorder.cpp
   Rendering/mitkVtkEventProvider.cpp
   Rendering/mitkVtkMapper.cpp
   Rendering/mitkVtkPropRenderer.cpp

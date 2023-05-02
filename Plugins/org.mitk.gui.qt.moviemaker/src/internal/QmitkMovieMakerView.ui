@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>320</width>
-    <height>640</height>
+    <width>305</width>
+    <height>644</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -368,104 +368,155 @@
      <property name="title">
       <string>Playback &amp;&amp; Recording</string>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
+     <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="QToolButton" name="playButton">
-        <property name="toolTip">
-         <string>Play</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../../../org.mitk.gui.qt.ext/resources/org_mitk_icons.qrc">
-          <normaloff>:/org_mitk_icons/icons/tango/scalable/actions/media-playback-start.svg</normaloff>:/org_mitk_icons/icons/tango/scalable/actions/media-playback-start.svg</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>24</width>
-          <height>24</height>
-         </size>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-        <property name="autoRaise">
-         <bool>true</bool>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QToolButton" name="playButton">
+          <property name="toolTip">
+           <string>Play</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../../org.mitk.gui.qt.ext/resources/org_mitk_icons.qrc">
+            <normaloff>:/org_mitk_icons/icons/tango/scalable/actions/media-playback-start.svg</normaloff>:/org_mitk_icons/icons/tango/scalable/actions/media-playback-start.svg</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>24</width>
+            <height>24</height>
+           </size>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="stopButton">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="toolTip">
+           <string>Stop</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../../org.mitk.gui.qt.ext/resources/org_mitk_icons.qrc">
+            <normaloff>:/org_mitk_icons/icons/tango/scalable/actions/media-playback-stop.svg</normaloff>:/org_mitk_icons/icons/tango/scalable/actions/media-playback-stop.svg</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>24</width>
+            <height>24</height>
+           </size>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QToolButton" name="recordButton">
+          <property name="toolTip">
+           <string>Record</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../../org.mitk.gui.qt.ext/resources/org_mitk_icons.qrc">
+            <normaloff>:/org_mitk_icons/icons/tango/scalable/actions/media-record.svg</normaloff>:/org_mitk_icons/icons/tango/scalable/actions/media-record.svg</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>24</width>
+            <height>24</height>
+           </size>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="fpsSpinBox">
+          <property name="toolTip">
+           <string>Frames per second</string>
+          </property>
+          <property name="suffix">
+           <string> FPS</string>
+          </property>
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>120</number>
+          </property>
+          <property name="value">
+           <number>30</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
-       <widget class="QToolButton" name="stopButton">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="toolTip">
-         <string>Stop</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../../../org.mitk.gui.qt.ext/resources/org_mitk_icons.qrc">
-          <normaloff>:/org_mitk_icons/icons/tango/scalable/actions/media-playback-stop.svg</normaloff>:/org_mitk_icons/icons/tango/scalable/actions/media-playback-stop.svg</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>24</width>
-          <height>24</height>
-         </size>
-        </property>
-        <property name="autoRaise">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QToolButton" name="recordButton">
-        <property name="toolTip">
-         <string>Record</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../../../org.mitk.gui.qt.ext/resources/org_mitk_icons.qrc">
-          <normaloff>:/org_mitk_icons/icons/tango/scalable/actions/media-record.svg</normaloff>:/org_mitk_icons/icons/tango/scalable/actions/media-record.svg</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>24</width>
-          <height>24</height>
-         </size>
-        </property>
-        <property name="autoRaise">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSpinBox" name="fpsSpinBox">
-        <property name="toolTip">
-         <string>Frames per second</string>
-        </property>
-        <property name="suffix">
-         <string> FPS</string>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>120</number>
-        </property>
-        <property name="value">
-         <number>30</number>
-        </property>
-       </widget>
+       <layout class="QFormLayout" name="formLayout">
+        <item row="0" column="0">
+         <widget class="QLabel" name="recordingLabel">
+          <property name="text">
+           <string>Recording:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QProgressBar" name="recordingProgressBar">
+          <property name="value">
+           <number>0</number>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <property name="textVisible">
+           <bool>true</bool>
+          </property>
+          <property name="format">
+           <string>%v / %m Frames</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="encodingLabel">
+          <property name="text">
+           <string>Encoding:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QProgressBar" name="encodingProgressBar">
+          <property name="maximum">
+           <number>1</number>
+          </property>
+          <property name="value">
+           <number>0</number>
+          </property>
+          <property name="textVisible">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>

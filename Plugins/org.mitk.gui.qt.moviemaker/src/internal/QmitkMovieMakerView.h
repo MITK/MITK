@@ -16,6 +16,7 @@ found in the LICENSE file.
 #include <QmitkAbstractView.h>
 #include <mitkIRenderWindowPartListener.h>
 
+#include <memory>
 #include <utility>
 #include <vector>
 
@@ -24,6 +25,11 @@ class QmitkAnimationWidget;
 class QMenu;
 class QStandardItemModel;
 class QTimer;
+
+namespace mitk
+{
+  class VideoRecorder;
+}
 
 namespace Ui
 {
@@ -61,6 +67,7 @@ private slots:
   void OnPlayButtonToggled(bool checked);
   void OnStopButtonClicked();
   void OnRecordButtonClicked();
+  void OnEncodingFinished();
   void OnFPSSpinBoxValueChanged(int value);
   void OnTimerTimeout();
 
@@ -71,6 +78,7 @@ private:
   void InitializeAddAnimationMenu();
   void InitializePlaybackAndRecordWidgets();
   void InitializeRecordMenu();
+  void InitializeRecordingProgress();
   void InitializeTimer(QWidget* parent);
   void ConnectAnimationTreeViewWidgets();
   void ConnectAnimationWidgets();
@@ -96,6 +104,7 @@ private:
   double m_TotalDuration;
   int m_NumFrames;
   int m_CurrentFrame;
+  std::unique_ptr<mitk::VideoRecorder> m_VideoRecorder;
 };
 
 #endif

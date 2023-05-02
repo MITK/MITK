@@ -21,67 +21,18 @@ found in the LICENSE file.
 #include "QmitkTimeSliceAnimationItem.h"
 #include "QmitkTimeSliceAnimationWidget.h"
 
-#include <mitkCoreServices.h>
-#include <mitkIOUtil.h>
-#include <mitkIPreferencesService.h>
-#include <mitkIPreferences.h>
+#include <mitkVideoRecorder.h>
 
 #include <QFileDialog>
 #include <QMenu>
 #include <QMessageBox>
-#include <QProcess>
+#include <QThread>
 #include <QTimer>
 
 #include <array>
-#include <filesystem>
-
-#include <vtkPNGWriter.h>
-#include <vtkWindowToImageFilter.h>
 
 namespace
 {
-  class TemporaryDirectory
-  {
-  public:
-    TemporaryDirectory()
-    {
-      try
-      {
-        m_Path = mitk::IOUtil::CreateTemporaryDirectory("MITK_MovieMaker_XXXXXX");
-      }
-      catch (...)
-      {
-      }
-    }
-
-    ~TemporaryDirectory()
-    {
-      try
-      {
-        std::filesystem::remove_all(m_Path);
-      }
-      catch (...)
-      {
-      }
-    }
-
-    bool IsValid() const
-    {
-      return !m_Path.empty() && std::filesystem::is_directory(m_Path);
-    }
-
-    std::filesystem::path GetPath() const
-    {
-      return m_Path;
-    }
-
-    TemporaryDirectory(const TemporaryDirectory&) = delete;
-    TemporaryDirectory& operator=(const TemporaryDirectory&) = delete;
-
-  private:
-    std::filesystem::path m_Path;
-  };
-
   QmitkAnimationItem* CreateDefaultAnimation(const QString& widgetKey)
   {
     if (widgetKey == "Orbit")
@@ -96,14 +47,25 @@ namespace
     return nullptr;
   }
 
-  QString GetFFmpegPath()
+  class EncodingThread : public QThread
   {
-    auto* preferences = mitk::CoreServices::GetPreferencesService()->GetSystemPreferences()->Node("/org.mitk.gui.qt.ext.externalprograms");
+  public:
+    EncodingThread(mitk::VideoRecorder* videoRecorder, QObject* parent = nullptr)
+      : QThread(parent),
+        m_VideoRecorder(videoRecorder)
+    {
+    }
 
-    return preferences != nullptr
-      ? QString::fromStdString(preferences->Get("ffmpeg", ""))
-      : QString();
-  }
+    ~EncodingThread() override = default;
+
+  private:
+    void run() override
+    {
+      m_VideoRecorder->StopRecording();
+    }
+
+    mitk::VideoRecorder* m_VideoRecorder;
+  };
 }
 
 const std::string QmitkMovieMakerView::VIEW_ID = "org.mitk.views.moviemaker";
@@ -168,6 +130,7 @@ void QmitkMovieMakerView::InitializePlaybackAndRecordWidgets()
 {
   this->InitializeRecordMenu();
   this->ConnectPlaybackAndRecordWidgets();
+  this->InitializeRecordingProgress();
 }
 
 void QmitkMovieMakerView::InitializeAnimationModel()
@@ -206,6 +169,23 @@ void QmitkMovieMakerView::InitializeRecordMenu()
 
     m_RecordMenu->addAction(action);
   }
+}
+
+void QmitkMovieMakerView::InitializeRecordingProgress()
+{
+  m_Ui->recordingLabel->setEnabled(true);
+  m_Ui->recordingLabel->setVisible(false);
+
+  m_Ui->recordingProgressBar->setEnabled(true);
+  m_Ui->recordingProgressBar->setValue(0);
+  m_Ui->recordingProgressBar->setVisible(false);
+
+  m_Ui->encodingLabel->setEnabled(false);
+  m_Ui->encodingLabel->setVisible(false);
+
+  m_Ui->encodingProgressBar->setEnabled(false);
+  m_Ui->encodingProgressBar->setMaximum(1);
+  m_Ui->encodingProgressBar->setVisible(false);
 }
 
 void QmitkMovieMakerView::InitializeTimer(QWidget* parent)
@@ -346,14 +326,14 @@ void QmitkMovieMakerView::OnRecordButtonClicked()
   if (0 == m_NumFrames || 0.0 == m_TotalDuration)
     return;
 
-  const QString ffmpegPath = GetFFmpegPath();
+  m_VideoRecorder = std::make_unique<mitk::VideoRecorder>();
 
-  if (ffmpegPath.isEmpty())
+  if (m_VideoRecorder->GetFFmpegPath().empty())
   {
     QMessageBox::information(nullptr, "Movie Maker",
       "<p>Set path to FFmpeg (<a href=\"https://ffmpeg.org\">ffmpeg.org</a>) in preferences "
-      "(Window -> Preferences... (Ctrl+P) -> External Programs) "
-      "to be able to record your movies to video files.</p>");
+      "(Window -> Preferences... (Ctrl+P) -> Movie Maker) to be able to record your "
+      "movies to video files.</p>");
     return;
   }
 
@@ -362,71 +342,74 @@ void QmitkMovieMakerView::OnRecordButtonClicked()
   if (nullptr == action)
     return;
 
-  auto renderWindow = mitk::BaseRenderer::GetRenderWindowByName(action->data().toString().toStdString());
+  m_VideoRecorder->SetRenderWindowName(action->data().toString().toStdString());
+  m_VideoRecorder->SetFrameRate(static_cast<unsigned int>(m_Ui->fpsSpinBox->value()));
 
-  if (nullptr == renderWindow)
+  auto fileExt = QString::fromStdString(mitk::VideoRecorder::GetFileExtension(m_VideoRecorder->GetOutputFormat()));
+  QString outputPath = QFileDialog::getSaveFileName(nullptr, "Specify a filename", "", "Movie (*" + fileExt + ")");
+
+  if (outputPath.isEmpty())
     return;
 
-  QString saveFileName = QFileDialog::getSaveFileName(nullptr, "Specify a filename", "", "Movie (*.webm)");
+  if(!outputPath.endsWith(fileExt))
+    outputPath += fileExt;
 
-  if (saveFileName.isEmpty())
-    return;
+  m_VideoRecorder->SetOutputPath(outputPath.toStdString());
 
-  if(!saveFileName.endsWith(".webm"))
-    saveFileName += ".webm";
+  m_Ui->recordButton->setEnabled(false);
+
+  m_Ui->recordingProgressBar->setMaximum(m_NumFrames);
+
+  m_Ui->recordingLabel->setVisible(true);
+  m_Ui->recordingProgressBar->setVisible(true);
+
+  m_Ui->encodingLabel->setVisible(true);
+  m_Ui->encodingProgressBar->setVisible(true);
+
+  EncodingThread* encodingThread = new EncodingThread(m_VideoRecorder.get(), m_Parent);
+  connect(encodingThread, &EncodingThread::finished, this, &QmitkMovieMakerView::OnEncodingFinished);
 
   try
   {
-    // Create a temporary directory and write all frames as PNGs into this directory.
-    // Call FFmpeg to create a video from these PNG images.
-    // Delete the temporary directory afterwards.
-
-    TemporaryDirectory tempDir;
-
-    if (!tempDir.IsValid())
-      return;
-
-    auto windowToImage = vtkSmartPointer<vtkWindowToImageFilter>::New();
-    windowToImage->SetInput(renderWindow);
-
-    auto imageWriter = vtkSmartPointer<vtkPNGWriter>::New();
-    imageWriter->SetInputConnection(windowToImage->GetOutputPort());
+    m_VideoRecorder->StartRecording();
 
     for (m_CurrentFrame = 0; m_CurrentFrame < m_NumFrames; ++m_CurrentFrame)
     {
+      m_Ui->recordingProgressBar->setValue(m_CurrentFrame + 1);
+
       this->RenderCurrentFrame();
-      windowToImage->Modified();
-
-      std::stringstream stream;
-      stream << std::setw(8) << std::setfill('0') << m_CurrentFrame << ".png";
-      auto path = tempDir.GetPath() / stream.str();
-
-      imageWriter->SetFileName(path.string().c_str());
-      imageWriter->Write();
+      m_VideoRecorder->RecordFrame();
     }
 
-    QProcess ffmpeg;
+    m_Ui->encodingProgressBar->setMaximum(0);
 
-    ffmpeg.setWorkingDirectory(QString::fromStdString(tempDir.GetPath().string()));
-    ffmpeg.start(ffmpegPath, QStringList()
-      << "-y" // Override already existing files
-      << "-r" << QString::number(m_Ui->fpsSpinBox->value()) // Framerate
-      << "-i" << "%8d.png" // Input images
-      << "-c:v" << "libvpx-vp9" // VP9 codec
-      << "-crf" << QString::number(18) // Quality (constant rate factor)
-      << "-b:v" << QString::number(0) // Must be 0 for constant quality
-      << saveFileName); // Output video
+    m_Ui->encodingLabel->setEnabled(true);
+    m_Ui->encodingProgressBar->setEnabled(true);
 
-    if (ffmpeg.waitForStarted())
-      ffmpeg.waitForFinished();
+    encodingThread->start();
   }
   catch (const mitk::Exception& exception)
   {
+    if (encodingThread->isRunning())
+      encodingThread->terminate();
+
     QMessageBox::critical(nullptr, "Movie Maker", exception.GetDescription());
+
+    m_VideoRecorder = nullptr;
+    this->OnEncodingFinished();
   }
+}
+
+void QmitkMovieMakerView::OnEncodingFinished()
+{
+  m_VideoRecorder = nullptr;
+
+  this->InitializeRecordingProgress();
 
   m_CurrentFrame = 0;
   this->RenderCurrentFrame();
+
+  m_Ui->recordButton->setEnabled(true);
 }
 
 void QmitkMovieMakerView::OnRemoveAnimationButtonClicked()

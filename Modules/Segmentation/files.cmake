@@ -60,6 +60,7 @@ set(CPP_FILES
   Interactions/mitknnUnetTool.cpp
   Interactions/mitkProcessExecutor.cpp
   Interactions/mitkTotalSegmentatorTool.cpp
+  Interactions/mitkSegmentAnythingTool.cpp
   Rendering/mitkContourMapper2D.cpp
   Rendering/mitkContourSetMapper2D.cpp
   Rendering/mitkContourSetVtkMapper3D.cpp

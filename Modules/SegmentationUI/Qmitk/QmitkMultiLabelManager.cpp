@@ -25,6 +25,7 @@ found in the LICENSE file.
 
 // Qmitk
 #include <QmitkStyleManager.h>
+#include <QmitkMultiLabelPresetHelper.h>
 
 // Qt
 #include <QLabel>
@@ -79,7 +80,7 @@ QmitkMultiLabelManager::QmitkMultiLabelManager(QWidget *parent)
   connect(m_Controls->btnAddGroup, &QToolButton::clicked, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::AddNewGroup);
   connect(m_Controls->btnRemoveGroup, &QToolButton::clicked, this->m_Controls->labelInspector, &QmitkMultiLabelInspector::RemoveGroup);
   connect(m_Controls->btnSavePreset, &QToolButton::clicked, this, &QmitkMultiLabelManager::OnSavePreset);
-  connect(m_Controls->btnSavePreset, &QToolButton::clicked, this, &QmitkMultiLabelManager::OnLoadPreset);
+  connect(m_Controls->btnLoadPreset, &QToolButton::clicked, this, &QmitkMultiLabelManager::OnLoadPreset);
 
   connect(this->m_Controls->labelInspector, &QmitkMultiLabelInspector::GoToLabel, this, &QmitkMultiLabelManager::OnGoToLabel);
   connect(this->m_Controls->labelInspector, &QmitkMultiLabelInspector::LabelRenameRequested, this, &QmitkMultiLabelManager::OnLabelRenameRequested);
@@ -418,12 +419,12 @@ void QmitkMultiLabelManager::OnCreateDetailedSurface(bool /*triggered*/)
 
 void QmitkMultiLabelManager::OnSavePreset()
 {
-
+  QmitkSaveMultiLabelPreset(m_Segmentation);
 }
 
 void QmitkMultiLabelManager::OnLoadPreset()
 {
-
+  QmitkLoadMultiLabelPreset({ m_Segmentation });
 }
 
 void QmitkMultiLabelManager::OnGoToLabel(mitk::LabelSetImage::LabelValueType label, const mitk::Point3D& position) const

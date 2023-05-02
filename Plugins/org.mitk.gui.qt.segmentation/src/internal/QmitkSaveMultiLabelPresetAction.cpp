@@ -13,10 +13,7 @@ found in the LICENSE file.
 #include "QmitkSaveMultiLabelPresetAction.h"
 
 #include <mitkLabelSetImage.h>
-#include <mitkMultiLabelIOHelper.h>
-
-#include <QFileDialog>
-#include <QMessageBox>
+#include <QmitkMultiLabelPresetHelper.h>
 
 void QmitkSaveMultiLabelPresetAction::Run(const QList<mitk::DataNode::Pointer> &selectedNodes)
 {
@@ -30,19 +27,7 @@ void QmitkSaveMultiLabelPresetAction::Run(const QList<mitk::DataNode::Pointer> &
     if (image.IsNull())
       continue;
 
-    const auto filename = QFileDialog::getSaveFileName(nullptr, QStringLiteral("Save Label Set Preset"),
-      QString(), QStringLiteral("Label set preset (*.lsetp)")).toStdString();
-
-    if (filename.empty())
-      continue;
-
-    if(!mitk::MultiLabelIOHelper::SaveLabelSetImagePreset(filename, image))
-    {
-      QMessageBox::critical(nullptr, QStringLiteral("Save Label Set Preset"),
-        QString("Could not save \"%1\" as label set preset.").arg(QString::fromStdString(node->GetName())));
-      
-      continue;
-    }
+    QmitkSaveMultiLabelPreset(image);
   }
 }
 

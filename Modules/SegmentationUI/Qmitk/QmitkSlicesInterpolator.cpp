@@ -46,6 +46,7 @@ found in the LICENSE file.
 
 //  Includes for the merge operation
 #include "mitkImageToContourFilter.h"
+#include <mitkLabelSetImage.h>
 
 #include <QCheckBox>
 #include <QCursor>
@@ -922,44 +923,40 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
 
 void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
 {
-  if (m_Segmentation && m_FeedbackNode->GetData())
+  auto* workingNode = m_ToolManager->GetWorkingData(0);
+  auto* planeGeometry = m_LastSNC->GetCurrentPlaneGeometry();
+  auto* interpolatedPreview = dynamic_cast<mitk::Image*>(m_FeedbackNode->GetData());
+  if (nullptr == workingNode || nullptr == interpolatedPreview)
+    return;
+
+  auto* segmentationImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+  if (nullptr == segmentationImage)
+    return;
+
+  const auto timePoint = m_LastSNC->GetSelectedTimePoint();
+  if (!segmentationImage->GetTimeGeometry()->IsValidTimePoint(timePoint))
   {
-    // Make sure that for reslicing and overwriting the same alogrithm is used. We can specify the mode of the vtk
-    // reslicer
-    vtkSmartPointer<mitkVtkImageOverwrite> reslice = vtkSmartPointer<mitkVtkImageOverwrite>::New();
-
-    // Set slice as input
-    mitk::Image::Pointer slice = dynamic_cast<mitk::Image *>(m_FeedbackNode->GetData());
-    reslice->SetInputSlice(slice->GetSliceData()->GetVtkImageAccessor(slice)->GetVtkImageData());
-    // set overwrite mode to true to write back to the image volume
-    reslice->SetOverwriteMode(true);
-    reslice->Modified();
-
-    const auto timePoint = m_LastSNC->GetSelectedTimePoint();
-    if (!m_Segmentation->GetTimeGeometry()->IsValidTimePoint(timePoint))
-    {
-      MITK_WARN << "Cannot accept interpolation. Time point selected by SliceNavigationController is not within the time bounds of segmentation. Time point: " << timePoint;
-      return;
-    }
-
-
-    mitk::ExtractSliceFilter::Pointer extractor = mitk::ExtractSliceFilter::New(reslice);
-    extractor->SetInput(m_Segmentation);
-    const auto timeStep = m_Segmentation->GetTimeGeometry()->TimePointToTimeStep(timePoint);
-    extractor->SetTimeStep(timeStep);
-    extractor->SetWorldGeometry(m_LastSNC->GetCurrentPlaneGeometry());
-    extractor->SetVtkOutputRequest(true);
-    extractor->SetResliceTransformByGeometry(m_Segmentation->GetTimeGeometry()->GetGeometryForTimeStep(timeStep));
-    extractor->Modified();
-    extractor->Update();
-
-    // the image was modified within the pipeline, but not marked so
-    m_Segmentation->Modified();
-    m_Segmentation->GetVtkImageData()->Modified();
-
-    m_FeedbackNode->SetData(nullptr);
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    MITK_WARN << "Cannot accept interpolation. Time point selected by SliceNavigationController is not within the time bounds of segmentation. Time point: " << timePoint;
+    return;
   }
+  const auto timeStep = segmentationImage->GetTimeGeometry()->TimePointToTimeStep(timePoint);
+
+  auto interpolatedSlice = mitk::SegTool2D::GetAffectedImageSliceAs2DImage(planeGeometry, segmentationImage, timeStep)->Clone();
+  auto labelSet = segmentationImage->GetActiveLabelSet();
+  auto activeValue = labelSet->GetActiveLabel()->GetValue();
+  mitk::TransferLabelContentAtTimeStep(
+    interpolatedPreview,
+    interpolatedSlice,
+    labelSet,
+    timeStep,
+    0,
+    mitk::LabelSetImage::UnlabeledValue,
+    false,
+    { {0, mitk::LabelSetImage::UnlabeledValue}, {1, activeValue} }
+  );
+
+  mitk::SegTool2D::WriteBackSegmentationResult(workingNode, planeGeometry, interpolatedSlice, timeStep);
+  m_FeedbackNode->SetData(nullptr);
 }
 
 void QmitkSlicesInterpolator::AcceptAllInterpolations(mitk::SliceNavigationController *slicer)

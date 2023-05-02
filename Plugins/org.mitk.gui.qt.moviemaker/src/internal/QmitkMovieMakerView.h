@@ -71,6 +71,7 @@ private:
   void InitializeAddAnimationMenu();
   void InitializePlaybackAndRecordWidgets();
   void InitializeRecordMenu();
+  void InitializeRecordingProgress();
   void InitializeTimer(QWidget* parent);
   void ConnectAnimationTreeViewWidgets();
   void ConnectAnimationWidgets();

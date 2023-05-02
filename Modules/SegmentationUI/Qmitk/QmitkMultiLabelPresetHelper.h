@@ -19,7 +19,7 @@ found in the LICENSE file.
 
 /**@brief Helper function to save the label information of a passed segmentation as preset.
 *
-* Helper function triggers a file dialoge to specify the location where to store the preset.
+* Helper function triggers a file dialog to specify the location where to store the preset.
 * @pre segmentation must be a valid pointer.
 * @param segmentation pointer to the segmentation that serves as template for the preset.
 */
@@ -27,7 +27,7 @@ void MITKSEGMENTATIONUI_EXPORT QmitkSaveMultiLabelPreset(const mitk::LabelSetIma
 
 /**@brief Helper function to loads a label preset and imposes it on all passed segmentations.
 *
-* Helper function triggers a file dialoge to specify the location where to load the preset.
+* Helper function triggers a file dialog to specify the location where to load the preset.
 * @param segmentations vector of pointers to the segmentations that should be modified according to the preset.
 * Invalid segmentations (nullptr) will be ignored.
 */

@@ -491,15 +491,11 @@ void QmitkMultiLabelInspector::RemoveGroupInternal(const mitk::LabelSetImage::Gr
   if (m_Segmentation.IsNull())
     return;
 
+  if (m_Segmentation->GetNumberOfLayers() < 2)
+    return;
+
   auto currentIndex = m_Model->indexOfGroup(groupID);
   auto nextIndex = m_Model->ClosestLabelInstanceIndex(currentIndex);
-
-  if (!nextIndex.isValid())
-  {
-    QMessageBox::information(this, "Delete group", "Cannot delete last remaining group. A segmentation must contain at least a single group.");
-    return;
-  }
-
   auto labelVariant = nextIndex.data(QmitkMultiLabelTreeModel::ItemModelRole::LabelInstanceValueRole);
 
   try
@@ -544,23 +540,24 @@ void QmitkMultiLabelInspector::RemoveGroup()
     mitkThrow() << "QmitkMultiLabelInspector is configured incorrectly. Set AllowLabelModification to true to allow the usage of RemoveLabel.";
 
   if (m_Segmentation.IsNull())
+    return;
+
+  if (m_Segmentation->GetNumberOfLayers() < 2)
   {
+    QMessageBox::information(this, "Delete group", "Cannot delete last remaining group. A segmentation must contain at least a single group.");
     return;
   }
 
-  QString question = "Do you really want to delete the group of the selected label with all labels?";
-  QMessageBox::StandardButton answerButton = QMessageBox::question(
-    this, "Delete group", question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
+  auto question = QStringLiteral("Do you really want to delete the group of the selected label with all labels?");
+  auto answer = QMessageBox::question(this, "Delete group", question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
 
-  if (answerButton != QMessageBox::Yes)
-  {
+  if (answer != QMessageBox::Yes)
     return;
-  }
 
-  auto currentLabel = GetFirstSelectedLabelObject();
-  const auto currentGroup = m_Segmentation->GetGroupIndexOfLabel(currentLabel->GetValue());
+  auto selectedLabel = this->GetFirstSelectedLabelObject();
+  const auto group = m_Segmentation->GetGroupIndexOfLabel(selectedLabel->GetValue());
 
-  this->RemoveGroupInternal(currentGroup);
+  this->RemoveGroupInternal(group);
 }
 
 void QmitkMultiLabelInspector::OnDeleteGroup()
@@ -569,9 +566,7 @@ void QmitkMultiLabelInspector::OnDeleteGroup()
     mitkThrow() << "QmitkMultiLabelInspector is configured incorrectly. Set AllowLabelModification to true to allow the usage of RemoveLabel.";
 
   if (m_Segmentation.IsNull())
-  {
     return;
-  }
 
   auto currentIndex = this->m_Controls->view->currentIndex();
   auto groupIDVariant = currentIndex.data(QmitkMultiLabelTreeModel::ItemModelRole::GroupIDRole);
@@ -580,14 +575,11 @@ void QmitkMultiLabelInspector::OnDeleteGroup()
   {
     auto groupID = groupIDVariant.value<mitk::LabelSetImage::GroupIndexType>();
 
-    QString question = "Do you really want to delete the current group with all labels?";
-    QMessageBox::StandardButton answerButton = QMessageBox::question(
-      this, QString("Delete group ") + QString::number(groupID), question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
+    auto question = QStringLiteral("Do you really want to delete the current group with all labels?");
+    auto answer = QMessageBox::question(this, QString("Delete group %1").arg(groupID), question, QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
 
-    if (answerButton != QMessageBox::Yes)
-    {
+    if (answer != QMessageBox::Yes)
       return;
-    }
 
     this->RemoveGroupInternal(groupID);
   }
@@ -611,9 +603,7 @@ void QmitkMultiLabelInspector::OnContextMenuRequested(const QPoint& /*pos*/)
       QObject::connect(addInstanceAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnAddLabel);
       menu->addAction(addInstanceAction);
 
-      auto nextIndex = m_Model->ClosestLabelInstanceIndex(m_Controls->view->currentIndex());
-
-      if (nextIndex.isValid())
+      if (m_Segmentation->GetNumberOfLayers() > 1)
       {
         QAction* removeAction = new QAction(QIcon(":/Qmitk/RemoveLabel.png"), "Delete group", this);
         QObject::connect(removeAction, &QAction::triggered, this, &QmitkMultiLabelInspector::OnDeleteGroup);

@@ -10,45 +10,47 @@ found in the LICENSE file.
 
 ============================================================================*/
 
-#ifndef QmitkExternalProgramsPreferencePage_h
-#define QmitkExternalProgramsPreferencePage_h
+#ifndef QmitkMovieMakerPreferencePage_h
+#define QmitkMovieMakerPreferencePage_h
 
 #include <berryIQtPreferencePage.h>
 #include <QProcess>
-#include <QScopedPointer>
+#include <QString>
+
+class QWidget;
 
 namespace Ui
 {
-  class QmitkExternalProgramsPreferencePage;
+  class QmitkMovieMakerPreferencePage;
 }
 
-class QmitkExternalProgramsPreferencePage : public QObject, public berry::IQtPreferencePage
+class QmitkMovieMakerPreferencePage : public QObject, public berry::IQtPreferencePage
 {
   Q_OBJECT
   Q_INTERFACES(berry::IPreferencePage)
 
 public:
-  QmitkExternalProgramsPreferencePage();
-  ~QmitkExternalProgramsPreferencePage() override;
+  QmitkMovieMakerPreferencePage();
+  ~QmitkMovieMakerPreferencePage() override;
 
+  void Init(berry::IWorkbench::Pointer workbench) override;
   void CreateQtControl(QWidget* parent) override;
   QWidget* GetQtControl() const override;
-  void Init(berry::IWorkbench::Pointer) override;
-  void PerformCancel() override;
   bool PerformOk() override;
+  void PerformCancel() override;
   void Update() override;
 
 private slots:
-  void OnGnuplotButtonClicked();
-  void OnGnuplotProcessError(QProcess::ProcessError error);
-  void OnGnuplotProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);
+  void OnFFmpegButtonClicked();
+  void OnFFmpegProcessError(QProcess::ProcessError error);
+  void OnFFmpegProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
 private:
-  QScopedPointer<Ui::QmitkExternalProgramsPreferencePage> m_Ui;
+  Ui::QmitkMovieMakerPreferencePage* m_Ui;
   QWidget* m_Control;
 
-  QProcess* m_GnuplotProcess;
-  QString m_GnuplotPath;
+  QProcess* m_FFmpegProcess;
+  QString m_FFmpegPath;
 };
 
 #endif

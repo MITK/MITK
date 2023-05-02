@@ -55,7 +55,7 @@ namespace mitk
 
     void StartRecording();
     void RecordFrame() const;
-    void StopRecording();
+    int StopRecording();
 
   private:
     class Impl;

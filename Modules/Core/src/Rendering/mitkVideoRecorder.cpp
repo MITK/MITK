@@ -241,7 +241,7 @@ namespace mitk
       m_RecordingSession->RecordFrame();
     }
 
-    void StopRecording()
+    int StopRecording()
     {
       if (!this->OnAir())
         mitkThrow() << "No recording session running.";
@@ -268,9 +268,11 @@ namespace mitk
       };
 
       auto processHandle = Poco::Process::launch(ffmpegPath.string(), args, m_RecordingSession->GetFrameDir().string());
-      processHandle.wait();
+      auto exitCode = processHandle.wait();
 
       m_RecordingSession = nullptr;
+
+      return exitCode;
     }
 
   private:
@@ -352,7 +354,7 @@ void mitk::VideoRecorder::RecordFrame() const
   m_Impl->RecordFrame();
 }
 
-void mitk::VideoRecorder::StopRecording()
+int mitk::VideoRecorder::StopRecording()
 {
-  m_Impl->StopRecording();
+  return m_Impl->StopRecording();
 }

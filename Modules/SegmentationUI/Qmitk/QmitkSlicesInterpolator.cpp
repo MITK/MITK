@@ -923,35 +923,39 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationFinished()
 
 void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
 {
-  auto workingNode = m_ToolManager->GetWorkingData(0);
-  auto geometry = m_LastSNC->GetCurrentPlaneGeometry();
-  auto interpolatedPreview = dynamic_cast<mitk::Image*>(m_FeedbackNode->GetData());
+  auto* workingNode = m_ToolManager->GetWorkingData(0);
+  auto* planeGeometry = m_LastSNC->GetCurrentPlaneGeometry();
+  auto* interpolatedPreview = dynamic_cast<mitk::Image*>(m_FeedbackNode->GetData());
   if (nullptr == workingNode || nullptr == interpolatedPreview)
     return;
 
+  auto* segmentationImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+  if (nullptr == segmentationImage)
+    return;
+
   const auto timePoint = m_LastSNC->GetSelectedTimePoint();
-  if (!m_Segmentation->GetTimeGeometry()->IsValidTimePoint(timePoint))
+  if (!segmentationImage->GetTimeGeometry()->IsValidTimePoint(timePoint))
   {
     MITK_WARN << "Cannot accept interpolation. Time point selected by SliceNavigationController is not within the time bounds of segmentation. Time point: " << timePoint;
     return;
   }
-  const auto timeStep = m_Segmentation->GetTimeGeometry()->TimePointToTimeStep(timePoint);
+  const auto timeStep = segmentationImage->GetTimeGeometry()->TimePointToTimeStep(timePoint);
 
-  auto interpolationCorrectLabel = mitk::Image::New();
-  interpolationCorrectLabel->Initialize(interpolatedPreview);
-  auto labelSet = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData())->GetActiveLabelSet();
+  auto interpolatedSlice = mitk::SegTool2D::GetAffectedImageSliceAs2DImage(planeGeometry, segmentationImage, timeStep)->Clone();
+  auto labelSet = segmentationImage->GetActiveLabelSet();
   auto activeValue = labelSet->GetActiveLabel()->GetValue();
-  mitk::TransferLabelContent(
+  mitk::TransferLabelContentAtTimeStep(
     interpolatedPreview,
-    interpolationCorrectLabel,
+    interpolatedSlice,
     labelSet,
+    timeStep,
     0,
     mitk::LabelSetImage::UnlabeledValue,
     false,
     { {0, mitk::LabelSetImage::UnlabeledValue}, {1, activeValue} }
   );
 
-  mitk::SegTool2D::WriteBackSegmentationResult(workingNode, geometry, interpolationCorrectLabel, timeStep);
+  mitk::SegTool2D::WriteBackSegmentationResult(workingNode, planeGeometry, interpolatedSlice, timeStep);
   m_FeedbackNode->SetData(nullptr);
 }
 

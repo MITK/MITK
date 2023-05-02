@@ -159,9 +159,9 @@ public:
     CPPUNIT_ASSERT_EQUAL(3, model.rowCount(GetIndex(model, { 0 })));
     CPPUNIT_ASSERT(CheckModelRow(model, { 0,0 }, { QString("A (3 instances)"), QVariant(), QVariant(), QVariant() }));
     CPPUNIT_ASSERT_EQUAL(3, model.rowCount(GetIndex(model, { 0,0 })));
-    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,0 }, { QString("A #1"), QVariant(true), QVariant(QColor(1,1,1)), QVariant(true) }));
-    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,1 }, { QString("A #5"), QVariant(true), QVariant(QColor(5,5,5)), QVariant(true) }));
-    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,2 }, { QString("A #10"), QVariant(true), QVariant(QColor(10,10,10)), QVariant(true) }));
+    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,0 }, { QString("A [1]"), QVariant(true), QVariant(QColor(1,1,1)), QVariant(true) }));
+    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,1 }, { QString("A [5]"), QVariant(true), QVariant(QColor(5,5,5)), QVariant(true) }));
+    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,2 }, { QString("A [10]"), QVariant(true), QVariant(QColor(10,10,10)), QVariant(true) }));
 
     CPPUNIT_ASSERT(CheckModelRow(model, { 0,1 }, { QString("B"), QVariant(true), QVariant(QColor(4,4,4)), QVariant(true) }));
     CPPUNIT_ASSERT_EQUAL(0, model.rowCount(GetIndex(model, { 0,1 })));
@@ -226,10 +226,10 @@ public:
     CPPUNIT_ASSERT_EQUAL(3, model.rowCount(GetIndex(model, { 0 })));
     CPPUNIT_ASSERT(CheckModelRow(model, { 0,0 }, { QString("A (4 instances)"), QVariant(), QVariant(), QVariant() }));
     CPPUNIT_ASSERT_EQUAL(4, model.rowCount(GetIndex(model, { 0,0 })));
-    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,0 }, { QString("A #1"), QVariant(true), QVariant(QColor(1,1,1)), QVariant(true) }));
-    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,1 }, { QString("A #5"), QVariant(true), QVariant(QColor(5,5,5)), QVariant(true) }));
-    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,2 }, { QString("A #10"), QVariant(true), QVariant(QColor(10,10,10)), QVariant(true) }));
-    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,3 }, { QString("A #100"), QVariant(true), QVariant(QColor(100,100,100)), QVariant(false) }));
+    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,0 }, { QString("A [1]"), QVariant(true), QVariant(QColor(1,1,1)), QVariant(true) }));
+    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,1 }, { QString("A [5]"), QVariant(true), QVariant(QColor(5,5,5)), QVariant(true) }));
+    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,2 }, { QString("A [10]"), QVariant(true), QVariant(QColor(10,10,10)), QVariant(true) }));
+    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,3 }, { QString("A [100]"), QVariant(true), QVariant(QColor(100,100,100)), QVariant(false) }));
 
     CPPUNIT_ASSERT(CheckModelRow(model, { 0,1 }, { QString("B"), QVariant(true), QVariant(QColor(4,4,4)), QVariant(true) }));
     CPPUNIT_ASSERT_EQUAL(0, model.rowCount(GetIndex(model, { 0,1 })));
@@ -250,11 +250,11 @@ public:
     CPPUNIT_ASSERT_EQUAL(3, model.rowCount(GetIndex(model, { 0 })));
     CPPUNIT_ASSERT(CheckModelRow(model, { 0,0 }, { QString("A (5 instances)"), QVariant(), QVariant(), QVariant() }));
     CPPUNIT_ASSERT_EQUAL(5, model.rowCount(GetIndex(model, { 0,0 })));
-    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,0 }, { QString("A #1"), QVariant(true), QVariant(QColor(1,1,1)), QVariant(true) }));
-    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,1 }, { QString("A #5"), QVariant(true), QVariant(QColor(5,5,5)), QVariant(true) }));
-    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,2 }, { QString("A #7"), QVariant(false), QVariant(QColor(7,7,7)), QVariant(true) }));
-    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,3 }, { QString("A #10"), QVariant(true), QVariant(QColor(10,10,10)), QVariant(true) }));
-    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,4 }, { QString("A #100"), QVariant(true), QVariant(QColor(100,100,100)), QVariant(false) }));
+    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,0 }, { QString("A [1]"), QVariant(true), QVariant(QColor(1,1,1)), QVariant(true) }));
+    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,1 }, { QString("A [5]"), QVariant(true), QVariant(QColor(5,5,5)), QVariant(true) }));
+    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,2 }, { QString("A [7]"), QVariant(false), QVariant(QColor(7,7,7)), QVariant(true) }));
+    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,3 }, { QString("A [10]"), QVariant(true), QVariant(QColor(10,10,10)), QVariant(true) }));
+    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,4 }, { QString("A [100]"), QVariant(true), QVariant(QColor(100,100,100)), QVariant(false) }));
 
     CPPUNIT_ASSERT(CheckModelRow(model, { 0,1 }, { QString("B"), QVariant(true), QVariant(QColor(4,4,4)), QVariant(true) }));
     CPPUNIT_ASSERT_EQUAL(0, model.rowCount(GetIndex(model, { 0,1 })));
@@ -310,8 +310,8 @@ public:
     CPPUNIT_ASSERT_EQUAL(3, model.rowCount(GetIndex(model, { 0 })));
     CPPUNIT_ASSERT(CheckModelRow(model, { 0,0 }, { QString("A (2 instances)"), QVariant(), QVariant(), QVariant() }));
     CPPUNIT_ASSERT_EQUAL(2, model.rowCount(GetIndex(model, { 0,0 })));
-    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,0 }, { QString("A #1"), QVariant(true), QVariant(QColor(1,1,1)), QVariant(true) }));
-    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,1 }, { QString("A #10"), QVariant(true), QVariant(QColor(10,10,10)), QVariant(true) }));
+    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,0 }, { QString("A [1]"), QVariant(true), QVariant(QColor(1,1,1)), QVariant(true) }));
+    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,1 }, { QString("A [10]"), QVariant(true), QVariant(QColor(10,10,10)), QVariant(true) }));
     CPPUNIT_ASSERT(CheckModelRow(model, { 0,1 }, { QString("B"), QVariant(true), QVariant(QColor(4,4,4)), QVariant(true) }));
     CPPUNIT_ASSERT_EQUAL(0, model.rowCount(GetIndex(model, { 0,1 })));
     CPPUNIT_ASSERT(CheckModelRow(model, { 0,2 }, { QString("D"), QVariant(true), QVariant(QColor(2,2,2)), QVariant(true) }));
@@ -346,8 +346,8 @@ public:
     CPPUNIT_ASSERT_EQUAL(3, model.rowCount(GetIndex(model, { 0 })));
     CPPUNIT_ASSERT(CheckModelRow(model, { 0,0 }, { QString("A (2 instances)"), QVariant(), QVariant(), QVariant() }));
     CPPUNIT_ASSERT_EQUAL(2, model.rowCount(GetIndex(model, { 0,0 })));
-    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,0 }, { QString("A #1"), QVariant(true), QVariant(QColor(1,1,1)), QVariant(true) }));
-    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,1 }, { QString("A #5"), QVariant(true), QVariant(QColor(5,5,5)), QVariant(true) }));
+    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,0 }, { QString("A [1]"), QVariant(true), QVariant(QColor(1,1,1)), QVariant(true) }));
+    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,1 }, { QString("A [5]"), QVariant(true), QVariant(QColor(5,5,5)), QVariant(true) }));
     CPPUNIT_ASSERT(CheckModelRow(model, { 0,1 }, { QString("B"), QVariant(true), QVariant(QColor(4,4,4)), QVariant(true) }));
     CPPUNIT_ASSERT_EQUAL(0, model.rowCount(GetIndex(model, { 0,1 })));
     CPPUNIT_ASSERT(CheckModelRow(model, { 0,2 }, { QString("D"), QVariant(true), QVariant(QColor(2,2,2)), QVariant(true) }));
@@ -425,8 +425,8 @@ public:
     CPPUNIT_ASSERT_EQUAL(4, model.rowCount(GetIndex(model, { 0 })));
     CPPUNIT_ASSERT(CheckModelRow(model, { 0,0 }, { QString("A (2 instances)"), QVariant(), QVariant(), QVariant() }));
     CPPUNIT_ASSERT_EQUAL(2, model.rowCount(GetIndex(model, { 0,0 })));
-    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,0 }, { QString("A #1"), QVariant(true), QVariant(QColor(1,1,1)), QVariant(true) }));
-    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,1 }, { QString("A #10"), QVariant(true), QVariant(QColor(10,10,10)), QVariant(true) }));
+    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,0 }, { QString("A [1]"), QVariant(true), QVariant(QColor(1,1,1)), QVariant(true) }));
+    CPPUNIT_ASSERT(CheckModelRow(model, { 0,0,1 }, { QString("A [10]"), QVariant(true), QVariant(QColor(10,10,10)), QVariant(true) }));
     CPPUNIT_ASSERT(CheckModelRow(model, { 0,1 }, { QString("B"), QVariant(true), QVariant(QColor(4,4,4)), QVariant(true) }));
     CPPUNIT_ASSERT_EQUAL(0, model.rowCount(GetIndex(model, { 0,1 })));
     CPPUNIT_ASSERT(CheckModelRow(model, { 0,2 }, { QString("C"), QVariant(true), QVariant(QColor(5,5,5)), QVariant(true) }));
@@ -486,8 +486,8 @@ public:
     CPPUNIT_ASSERT_EQUAL(0, model.rowCount(GetIndex(model, { 0,0 })));
     CPPUNIT_ASSERT(CheckModelRow(model, { 0,1 }, { QString("B (2 instances)"), QVariant(), QVariant(), QVariant() }));
     CPPUNIT_ASSERT_EQUAL(2, model.rowCount(GetIndex(model, { 0,1 })));
-    CPPUNIT_ASSERT(CheckModelRow(model, { 0,1,0 }, { QString("B #4"), QVariant(true), QVariant(QColor(4,4,4)), QVariant(true) }));
-    CPPUNIT_ASSERT(CheckModelRow(model, { 0,1,1 }, { QString("B #10"), QVariant(true), QVariant(QColor(10,10,10)), QVariant(true) }));
+    CPPUNIT_ASSERT(CheckModelRow(model, { 0,1,0 }, { QString("B [4]"), QVariant(true), QVariant(QColor(4,4,4)), QVariant(true) }));
+    CPPUNIT_ASSERT(CheckModelRow(model, { 0,1,1 }, { QString("B [10]"), QVariant(true), QVariant(QColor(10,10,10)), QVariant(true) }));
     CPPUNIT_ASSERT(CheckModelRow(model, { 0,2 }, { QString("C"), QVariant(true), QVariant(QColor(5,5,5)), QVariant(true) }));
     CPPUNIT_ASSERT_EQUAL(0, model.rowCount(GetIndex(model, { 0,2 })));
     CPPUNIT_ASSERT(CheckModelRow(model, { 0,3 }, { QString("D"), QVariant(true), QVariant(QColor(2,2,2)), QVariant(true) }));
@@ -534,8 +534,8 @@ public:
     CPPUNIT_ASSERT_EQUAL(1, model.rowCount(GetIndex(model, { 2 })));
     CPPUNIT_ASSERT(CheckModelRow(model, { 2,0 }, { QString("B (2 instances)"), QVariant(), QVariant(), QVariant() }));
     CPPUNIT_ASSERT_EQUAL(2, model.rowCount(GetIndex(model, { 2,0 })));
-    CPPUNIT_ASSERT(CheckModelRow(model, { 2,0,0 }, { QString("B #9"), QVariant(false), QVariant(QColor(22,22,22)), QVariant(true) }));
-    CPPUNIT_ASSERT(CheckModelRow(model, { 2,0,1 }, { QString("B #33"), QVariant(true), QVariant(QColor(33,33,33)), QVariant(true) }));
+    CPPUNIT_ASSERT(CheckModelRow(model, { 2,0,0 }, { QString("B [9]"), QVariant(false), QVariant(QColor(22,22,22)), QVariant(true) }));
+    CPPUNIT_ASSERT(CheckModelRow(model, { 2,0,1 }, { QString("B [33]"), QVariant(true), QVariant(QColor(33,33,33)), QVariant(true) }));
   }
 
 };

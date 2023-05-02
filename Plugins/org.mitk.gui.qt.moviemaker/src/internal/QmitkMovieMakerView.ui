@@ -472,11 +472,11 @@
        </layout>
       </item>
       <item>
-       <layout class="QGridLayout" name="gridLayout_2">
+       <layout class="QFormLayout" name="formLayout">
         <item row="0" column="0">
          <widget class="QLabel" name="recordingLabel">
           <property name="text">
-           <string>Recording frames:</string>
+           <string>Recording:</string>
           </property>
          </widget>
         </item>
@@ -485,24 +485,34 @@
           <property name="value">
            <number>0</number>
           </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
           <property name="textVisible">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <property name="format">
-           <string>%p / %m</string>
+           <string>%v / %m Frames</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="0" colspan="2">
+        <item row="1" column="0">
          <widget class="QLabel" name="encodingLabel">
           <property name="text">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;Encoding video. Please wait...&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>Encoding:</string>
           </property>
-          <property name="textFormat">
-           <enum>Qt::RichText</enum>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QProgressBar" name="encodingProgressBar">
+          <property name="maximum">
+           <number>1</number>
           </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
+          <property name="value">
+           <number>0</number>
+          </property>
+          <property name="textVisible">
+           <bool>false</bool>
           </property>
          </widget>
         </item>

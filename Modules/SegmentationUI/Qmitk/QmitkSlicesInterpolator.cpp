@@ -1405,9 +1405,6 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
 
     if (workingNode)
     {
-      mitk::Image *segmentation = dynamic_cast<mitk::Image *>(workingNode->GetData());
-
-      mitk::Image::Pointer activeLabelImage = nullptr;
       auto labelSetImage = dynamic_cast<mitk::LabelSetImage *>(workingNode->GetData());
       if (nullptr == labelSetImage)
       {
@@ -1417,9 +1414,10 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
       }
 
       auto* activeLabel = labelSetImage->GetActiveLabelSet()->GetActiveLabel();
+      auto* segmentation = dynamic_cast<mitk::Image*>(workingNode->GetData());
       if (nullptr != activeLabel && nullptr != segmentation)
       {
-        activeLabelImage = labelSetImage->CreateLabelMask(activeLabel->GetValue(), true, 0);
+        auto activeLabelImage = labelSetImage->CreateLabelMask(activeLabel->GetValue(), true, 0);
         m_Interpolator->SetSegmentationVolume(activeLabelImage);
 
         if (referenceNode)

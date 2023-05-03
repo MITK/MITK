@@ -26,7 +26,7 @@ found in the LICENSE file.
 #include <vtkRenderWindow.h>
 #include <vtkWindowToImageFilter.h>
 
-#include <Poco/Process.h>
+#include <itksys/Process.h>
 
 #include <iomanip>
 #include <optional>
@@ -241,34 +241,65 @@ namespace mitk
       m_RecordingSession->RecordFrame();
     }
 
+    std::string GetFFmpegCommandLine() const
+    {
+      bool vp9 = OutputFormat::WebM_VP9 == this->GetOutputFormat();
+
+      std::stringstream stream;
+      stream << this->GetFFmpegPath()
+        << "-y" << ' '
+        << "-r " << std::to_string(this->GetFrameRate()) << ' '
+        << "-i %6d.png" << ' '
+        << "-c:v " << (vp9 ? "libvpx-vp9" : "libx264") << ' '
+        << "-crf " << (vp9 ? "31" : "23") << ' '
+        << "-pix_fmt yuv420p" << ' '
+        << "-b:v 0" << ' '
+        << this->GetOutputPath();
+
+      return stream.str();
+    }
+
+    int ExecuteFFmpeg() const
+    {
+      auto commandLine = this->GetFFmpegCommandLine();
+      auto commandLineCStr = commandLine.c_str();
+
+      auto workingDirectory = m_RecordingSession->GetFrameDir().string();
+
+      auto* ffmpeg = itksysProcess_New();
+
+      itksysProcess_SetOption(ffmpeg, itksysProcess_Option_Verbatim, 1);
+      itksysProcess_SetCommand(ffmpeg, &commandLineCStr);
+      itksysProcess_SetWorkingDirectory(ffmpeg, workingDirectory.c_str());
+
+      itksysProcess_Execute(ffmpeg);
+      itksysProcess_WaitForExit(ffmpeg, nullptr);
+
+      if (itksysProcess_State_Exited != itksysProcess_GetState(ffmpeg))
+      {
+        itksysProcess_Delete(ffmpeg);
+        mitkThrow() << "FFmpeg process did not exit as expected.";
+      }
+
+      auto exitCode = itksysProcess_GetExitValue(ffmpeg);
+
+      itksysProcess_Delete(ffmpeg);
+
+      return exitCode;
+    }
+
     int StopRecording()
     {
       if (!this->OnAir())
         mitkThrow() << "No recording session running.";
 
-      auto ffmpegPath = this->GetFFmpegPath();
-
-      if (ffmpegPath.empty())
+      if (this->GetFFmpegPath().empty())
         mitkThrow() << "Path to FFmpeg not set.";
 
       if (this->GetOutputPath().empty())
         mitkThrow() << "Path to output video file not set.";
 
-      bool vp9 = OutputFormat::WebM_VP9 == this->GetOutputFormat();
-
-      Poco::Process::Args args = {
-        "-y",
-        "-r", std::to_string(this->GetFrameRate()),
-        "-i", "%6d.png",
-        "-c:v", vp9 ? "libvpx-vp9" : "libx264",
-        "-crf", vp9 ? "31" : "23",
-        "-pix_fmt", "yuv420p",
-        "-b:v", "0",
-        this->GetOutputPath().string()
-      };
-
-      auto processHandle = Poco::Process::launch(ffmpegPath.string(), args, m_RecordingSession->GetFrameDir().string());
-      auto exitCode = processHandle.wait();
+      auto exitCode = this->ExecuteFFmpeg();
 
       m_RecordingSession = nullptr;
 

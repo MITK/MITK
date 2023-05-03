@@ -856,8 +856,12 @@ void QmitkSlicesInterpolator::Interpolate(mitk::PlaneGeometry *plane,
           auto* workingNode = m_ToolManager->GetWorkingData(0);
           if (workingNode != nullptr)
           {
-            auto activeColor = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData())->GetActiveLabelSet()->GetActiveLabel()->GetColor();
-            m_FeedbackNode->SetProperty("color", mitk::ColorProperty::New(activeColor));
+            auto* activeLabel = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData())->GetActiveLabelSet()->GetActiveLabel();
+            if (nullptr != activeLabel)
+            {
+              auto activeColor = activeLabel->GetColor();
+              m_FeedbackNode->SetProperty("color", mitk::ColorProperty::New(activeColor));
+            }
           }
         }
 
@@ -1403,19 +1407,19 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
     {
       mitk::Image *segmentation = dynamic_cast<mitk::Image *>(workingNode->GetData());
 
-      mitk::Image::Pointer activeLabelImage;
-      try
+      mitk::Image::Pointer activeLabelImage = nullptr;
+      auto labelSetImage = dynamic_cast<mitk::LabelSetImage *>(workingNode->GetData());
+      if (nullptr == labelSetImage)
       {
-        auto labelSetImage = dynamic_cast<mitk::LabelSetImage *>(workingNode->GetData());
-        activeLabelImage = labelSetImage->CreateLabelMask(labelSetImage->GetActiveLabelSet()->GetActiveLabel()->GetValue(), true, 0);
-      }
-      catch (const std::exception& e)
-      {
-        MITK_ERROR << e.what() << " | NO LABELSETIMAGE IN WORKING NODE\n";
+        MITK_ERROR << "NO LABELSETIMAGE IN WORKING NODE\n";
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+        return;
       }
 
-      if (segmentation)
+      auto* activeLabel = labelSetImage->GetActiveLabelSet()->GetActiveLabel();
+      if (nullptr != activeLabel && nullptr != segmentation)
       {
+        activeLabelImage = labelSetImage->CreateLabelMask(activeLabel->GetValue(), true, 0);
         m_Interpolator->SetSegmentationVolume(activeLabelImage);
 
         if (referenceNode)

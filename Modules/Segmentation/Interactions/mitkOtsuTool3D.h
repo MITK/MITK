@@ -54,6 +54,7 @@ namespace mitk
     OtsuTool3D() = default;
     ~OtsuTool3D() = default;
 
+    void UpdatePrepare() override;
     void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep) override;
 
     unsigned int m_NumberOfBins = 128;

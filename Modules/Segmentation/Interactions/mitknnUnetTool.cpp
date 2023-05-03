@@ -34,7 +34,7 @@ mitk::nnUNetTool::~nnUNetTool()
 void mitk::nnUNetTool::Activated()
 {
   Superclass::Activated();
-  this->SetLabelTransferMode(LabelTransferMode::AllLabels);
+  this->SetLabelTransferScope(LabelTransferScope::AllLabels);
 }
 
 void mitk::nnUNetTool::RenderOutputBuffer()

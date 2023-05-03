@@ -353,6 +353,7 @@ private:
   void CheckSupportedImageDimension();
   void WaitForFutures();
   void NodeRemoved(const mitk::DataNode* node);
+  void ClearSegmentationObservers();
 
   mitk::SegmentationInterpolationController::Pointer m_Interpolator;
   mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator;

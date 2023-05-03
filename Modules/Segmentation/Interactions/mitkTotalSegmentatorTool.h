@@ -95,21 +95,20 @@ namespace mitk
      * @brief Runs Totalsegmentator python process with desired arguments
      * 
      */
-    void run_totalsegmentator(ProcessExecutor::Pointer, const std::string&, const std::string&, bool, bool, unsigned int, const std::string&);
+    void run_totalsegmentator(ProcessExecutor*, const std::string&, const std::string&, bool, bool, unsigned int, const std::string&);
 
     /**
      * @brief Applies the m_LabelMapTotal lookup table on the output segmentation LabelSetImage.
      * 
      */
-    void MapLabelsToSegmentation(mitk::LabelSetImage::Pointer, std::map<mitk::Label::PixelType, std::string> &);
+    void MapLabelsToSegmentation(const mitk::LabelSetImage*, mitk::LabelSetImage*, std::map<mitk::Label::PixelType, std::string>&);
 
     /**
      * @brief Parses map_to_binary.py file to extract label ids and names
      * and stores as a map for reference in m_LabelMapTotal
      * 
-     * @param filePath
      */
-    void ParseLabelNames(const std::string&);
+    void ParseLabelMapTotalDefault();
 
     /**
      * @brief Get the Label Map Path from the virtual environment location
@@ -127,7 +126,7 @@ namespace mitk
      * @param geometry 
      * @return LabelSetImage::Pointer 
      */
-    LabelSetImage::Pointer AgglomerateLabelFiles(std::vector<std::string>& filePaths, unsigned int* dimension, mitk::BaseGeometry* geometry);
+    LabelSetImage::Pointer AgglomerateLabelFiles(std::vector<std::string>& filePaths, const unsigned int* dimension, mitk::BaseGeometry* geometry);
 
     std::string m_MitkTempDir;
     std::string m_PythonPath;

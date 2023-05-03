@@ -94,7 +94,7 @@ void QmitkTotalSegmentatorToolGUI::InitializeUI(QBoxLayout *mainLayout)
   QIcon deleteIcon =
     QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/edit-delete.svg"));
   QIcon arrowIcon =
-    QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/awesome/scalable/actions/go-next.svg"));
+    QmitkStyleManager::ThemeIcon(QStringLiteral(":/org_mitk_icons/icons/tango/scalable/actions/media-playback-start.svg"));
   m_Controls.clearButton->setIcon(deleteIcon);
   m_Controls.previewButton->setIcon(arrowIcon);
 

@@ -132,6 +132,7 @@ private Q_SLOTS:
 
   void OnGoToLabel(mitk::LabelSetImage::LabelValueType label, const mitk::Point3D& position) const;
   void OnLabelRenameRequested(mitk::Label* label, bool rename) const;
+  void OnModelUpdated();
 
 private:
   enum TableColumns

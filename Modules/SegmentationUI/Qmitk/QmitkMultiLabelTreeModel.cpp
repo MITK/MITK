@@ -601,6 +601,27 @@ std::vector <QmitkMultiLabelTreeModel::LabelValueType> QmitkMultiLabelTreeModel:
   return currentItem->GetLabelsInSubTree();
 }
 
+std::vector <QmitkMultiLabelTreeModel::LabelValueType> QmitkMultiLabelTreeModel::GetLabelInstancesOfSameLabelClass(const QModelIndex& currentIndex) const
+{
+  const QmitkMultiLabelSegTreeItem* currentItem = nullptr;
+
+  if (currentIndex.isValid())
+  {
+    currentItem = static_cast<const QmitkMultiLabelSegTreeItem*>(currentIndex.internalPointer());
+  }
+
+  if (!currentItem)
+    return {};
+
+  if (QmitkMultiLabelSegTreeItem::ItemType::Group == currentItem->m_ItemType)
+    return {};
+
+  if (QmitkMultiLabelSegTreeItem::ItemType::Instance == currentItem->m_ItemType)
+    currentItem = currentItem->ParentItem();
+
+  return currentItem->GetLabelsInSubTree();
+}
+
 Qt::ItemFlags QmitkMultiLabelTreeModel::flags(const QModelIndex &index) const
 {
   if (!index.isValid())

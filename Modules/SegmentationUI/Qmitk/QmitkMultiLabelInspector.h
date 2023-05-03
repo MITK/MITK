@@ -46,6 +46,9 @@ public:
   bool GetAllowVisibilityModification() const;
   bool GetAllowLockModification() const;
   bool GetAllowLabelModification() const;
+  /** Indicates if the inspector is currently modifiying the model/segmentation.
+   Thus as long as the manipulation is ongoing, one should assume the model to be in an invalid state.*/
+  bool GetModelManipulationOngoing() const;
 
   using LabelValueType = mitk::LabelSetImage::LabelValueType;
   using LabelValueVectorType = mitk::LabelSetImage::LabelValueVectorType;
@@ -85,6 +88,12 @@ public:
    */
   LabelValueVectorType GetCurrentlyAffactedLabelInstances() const;
 
+  /** @brief Returns the values of all label instances that are of the same label (class) like the first selected label instance.
+   *
+   * If no label is selected an empty vector will be returned.
+   */
+  LabelValueVectorType GetLabelInstancesOfSelectedFirstLabel() const;
+
 Q_SIGNALS:
   /**
   * @brief A signal that will be emitted if the selected labels change.
@@ -110,6 +119,9 @@ Q_SIGNALS:
   * @param rename Indicates if it is a renaming or naming of a new label.
   */
   void LabelRenameRequested(mitk::Label* label, bool rename) const;
+
+  /** @brief Signal that is emitted, if the model was updated (e.g. by a delete or add operation).*/
+  void ModelUpdated() const;
 
 public Q_SLOTS:
 
@@ -161,7 +173,14 @@ public Q_SLOTS:
   * @pre AllowLabeModification must be set to true.*/
   mitk::Label* AddNewLabel();
 
-  /** @brief Removes the first currently selected label of the segmentation.
+  /** @brief Removes the first currently selected label instance of the segmentation.
+  * If no label is selected
+  * nothing will happen.
+  *
+  * @pre AllowLabeModification must be set to true.*/
+  void DeleteLabelInstance();
+
+  /** @brief Delete the first currently selected label and all its instances of the segmentation.
   * If no label is selected
   * nothing will happen.
   *

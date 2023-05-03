@@ -72,6 +72,14 @@ public:
   /** Returns a vector containing all label values of the passed currentIndex or its child items.*/
   std::vector <LabelValueType> GetLabelsInSubTree(const QModelIndex& currentIndex) const;
 
+  /** Returns a vector containing all label values of all label instances that belong to the same label
+   * class like the passed index.
+   *
+   * If index points to a group or invalid, nothing will be returned.
+   * @pre currentIndex must be valid and point to a label (class or instance).
+   */
+  std::vector <LabelValueType> GetLabelInstancesOfSameLabelClass(const QModelIndex& currentIndex) const;
+
   enum TableColumns
   {
     NAME_COL = 0,

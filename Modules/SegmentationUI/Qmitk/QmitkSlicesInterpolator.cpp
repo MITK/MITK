@@ -487,18 +487,7 @@ void QmitkSlicesInterpolator::Uninitialize()
     slicer->RemoveObserver(m_ControllerToSliceObserverTag.take(slicer));
   }
 
-  auto dataIter = m_SegmentationObserverTags.begin();
-  while (dataIter != m_SegmentationObserverTags.end())
-  {
-    auto labelSetImage = (*dataIter).first;
-    labelSetImage->RemoveObserver((*dataIter).second);
-    for (size_t layerID = 0; layerID < labelSetImage->GetNumberOfLayers(); ++layerID)
-    {
-      this->OnRemoveLabelSetConnection(labelSetImage, layerID);
-    }
-    ++dataIter;
-  }
-  m_SegmentationObserverTags.clear();
+  this->ClearSegmentationObservers();
 
   m_ActionToSlicer.clear();
   m_ToolManager = nullptr;
@@ -662,6 +651,8 @@ void QmitkSlicesInterpolator::OnShowMarkers(bool state)
 
 void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
 {
+  this->ClearSegmentationObservers();
+
   if (m_ToolManager->GetWorkingData(0) != nullptr)
   {
     m_Segmentation = dynamic_cast<mitk::Image *>(m_ToolManager->GetWorkingData(0)->GetData());
@@ -1981,4 +1972,20 @@ void QmitkSlicesInterpolator::MergeContours(unsigned int timeStep,
 
   auto it = std::remove_if(contours.begin(), contours.end(), isContourEmpty);
   contours.erase(it, contours.end());
+}
+
+void QmitkSlicesInterpolator::ClearSegmentationObservers()
+{
+  auto dataIter = m_SegmentationObserverTags.begin();
+  while (dataIter != m_SegmentationObserverTags.end())
+  {
+    auto labelSetImage = (*dataIter).first;
+    labelSetImage->RemoveObserver((*dataIter).second);
+    for (size_t layerID = 0; layerID < labelSetImage->GetNumberOfLayers(); ++layerID)
+    {
+      this->OnRemoveLabelSetConnection(labelSetImage, layerID);
+    }
+    ++dataIter;
+  }
+  m_SegmentationObserverTags.clear();
 }

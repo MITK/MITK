@@ -37,7 +37,7 @@ mitk::TotalSegmentatorTool::~TotalSegmentatorTool()
   std::filesystem::remove_all(this->GetMitkTempDir());
 }
 
-mitk::TotalSegmentatorTool::TotalSegmentatorTool()
+mitk::TotalSegmentatorTool::TotalSegmentatorTool() : SegWithPreviewTool(true) // prevents auto-compute across all timesteps
 {
   this->IsTimePointChangeAwareOff();
 }
@@ -96,10 +96,6 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
   {
     this->SetMitkTempDir(IOUtil::CreateTemporaryDirectory("mitk-XXXXXX"));
   }
-  if (m_LabelMapTotal.empty())
-  {
-    this->ParseLabelNames(this->GetLabelMapPath());
-  }
   ProcessExecutor::Pointer spExec = ProcessExecutor::New();
   itk::CStyleCommand::Pointer spCommand = itk::CStyleCommand::New();
   spCommand->SetCallback(&onPythonProcessEvent);
@@ -146,10 +142,9 @@ void mitk::TotalSegmentatorTool::DoUpdatePreview(const Image *inputAtTimeStep,
     outputBuffer = mitk::LabelSetImage::New();
     outputBuffer->InitializeByLabeledImage(outputImage);
     outputBuffer->SetGeometry(inputAtTimeStep->GetGeometry());
-    this->MapLabelsToSegmentation(outputBuffer, m_LabelMapTotal);
   }
-
   mitk::ImageReadAccessor newMitkImgAcc(outputBuffer.GetPointer());
+  this->MapLabelsToSegmentation(outputBuffer, previewImage, m_LabelMapTotal);
   previewImage->SetVolume(newMitkImgAcc.GetData(), timeStep);
 }
 
@@ -159,26 +154,22 @@ void mitk::TotalSegmentatorTool::UpdatePrepare()
   auto preview = this->GetPreviewSegmentation();
   auto labelset = preview->GetLabelSet(preview->GetActiveLayer());
   labelset->RemoveAllLabels();
-
-  auto labelMap = m_LabelMapTotal;
+  if (m_LabelMapTotal.empty())
+  {
+    this->ParseLabelNames(this->GetLabelMapPath());
+  }
   const bool isSubTask = (this->GetSubTask() != DEFAULT_TOTAL_TASK);
   if (isSubTask)
   {
     std::vector<std::string> files = SUBTASKS_MAP.at(this->GetSubTask());
-    labelMap.clear();
+    m_LabelMapTotal.clear();
     mitk::Label::PixelType labelId = 1;
-    for (auto const& file : files)
+    for (auto const &file : files)
     {
       std::string labelName = file.substr(0, file.find('.'));
-      labelMap[labelId] = labelName;
+      m_LabelMapTotal[labelId] = labelName;
       labelId++;
     }
-  }
-
-  for (auto const& [key, val] : labelMap)
-  {
-    Label::Pointer label = Label::New(key, val);
-    labelset->AddLabel(label, false);
   }
 }
 
@@ -324,15 +315,28 @@ void mitk::TotalSegmentatorTool::ParseLabelNames(const std::string &fileName)
   }
 }
 
-void mitk::TotalSegmentatorTool::MapLabelsToSegmentation(mitk::LabelSetImage::Pointer outputBuffer,
+void mitk::TotalSegmentatorTool::MapLabelsToSegmentation(mitk::LabelSetImage::Pointer source,
+                                                         mitk::LabelSetImage::Pointer dest,
                                                          std::map<mitk::Label::PixelType, std::string> &labelMap)
 {
+  auto labelset = dest->GetLabelSet();
+  auto lookupTable = mitk::LookupTable::New();
+  lookupTable->SetType(mitk::LookupTable::LookupTableType::MULTILABEL);
   for (auto const &[key, val] : labelMap)
   {
-    mitk::Label *labelptr = outputBuffer->GetActiveLabelSet()->GetLabel(key);
-    if (nullptr != labelptr)
+    Label::Pointer templabel = source->GetActiveLabelSet()->GetLabel(key);
+    if (nullptr != templabel)
     {
-      labelptr->SetName(val);
+      Label::Pointer label = Label::New(key, val);
+      std::array<double, 3> lookupTableColor;
+      lookupTable->GetColor(key, lookupTableColor.data());
+      Color color;
+      color.SetRed(lookupTableColor[0]);
+      color.SetGreen(lookupTableColor[1]);
+      color.SetBlue(lookupTableColor[2]);
+      label->SetColor(color);
+      label->SetName(val);
+      labelset->AddLabel(label, false);
     }
   }
 }

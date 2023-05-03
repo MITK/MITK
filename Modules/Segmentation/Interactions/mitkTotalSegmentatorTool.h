@@ -101,7 +101,7 @@ namespace mitk
      * @brief Applies the m_LabelMapTotal lookup table on the output segmentation LabelSetImage.
      * 
      */
-    void MapLabelsToSegmentation(mitk::LabelSetImage::Pointer, std::map<mitk::Label::PixelType, std::string> &);
+    void MapLabelsToSegmentation(mitk::LabelSetImage::Pointer, mitk::LabelSetImage::Pointer, std::map<mitk::Label::PixelType, std::string>&);
 
     /**
      * @brief Parses map_to_binary.py file to extract label ids and names

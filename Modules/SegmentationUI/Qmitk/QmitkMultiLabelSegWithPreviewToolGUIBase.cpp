@@ -22,7 +22,7 @@ QmitkMultiLabelSegWithPreviewToolGUIBase::QmitkMultiLabelSegWithPreviewToolGUIBa
   {
     auto tool = this->GetConnectedToolAs<mitk::SegWithPreviewTool>();
     return nullptr != tool
-      ? (tool->GetLabelTransferMode() == mitk::SegWithPreviewTool::LabelTransferMode::AllLabels || !tool->GetSelectedLabels().empty()) && enabled
+      ? (tool->GetLabelTransferScope() == mitk::SegWithPreviewTool::LabelTransferScope::AllLabels || !tool->GetSelectedLabels().empty()) && enabled
       : false;
   };
 
@@ -92,7 +92,7 @@ void QmitkMultiLabelSegWithPreviewToolGUIBase::ActualizePreviewLabelVisibility()
 
       for (auto labelIter = labelSet->IteratorBegin(); labelIter != labelSet->IteratorEnd(); ++labelIter)
       {
-        bool isVisible = tool->GetLabelTransferMode() == mitk::SegWithPreviewTool::LabelTransferMode::AllLabels
+        bool isVisible = tool->GetLabelTransferScope() == mitk::SegWithPreviewTool::LabelTransferScope::AllLabels
           || (std::find(selectedLabels.begin(), selectedLabels.end(), labelIter->second->GetValue()) != selectedLabels.end());
         labelIter->second->SetVisible(isVisible);
         labelSet->UpdateLookupTable(labelIter->second->GetValue());
@@ -111,11 +111,11 @@ void QmitkMultiLabelSegWithPreviewToolGUIBase::OnRadioTransferAllClicked(bool ch
   {
     if (checked)
     {
-      tool->SetLabelTransferMode(mitk::SegWithPreviewTool::LabelTransferMode::AllLabels);
+      tool->SetLabelTransferScope(mitk::SegWithPreviewTool::LabelTransferScope::AllLabels);
     }
     else
     {
-      tool->SetLabelTransferMode(mitk::SegWithPreviewTool::LabelTransferMode::SelectedLabels);
+      tool->SetLabelTransferScope(mitk::SegWithPreviewTool::LabelTransferScope::SelectedLabels);
     }
   }
   this->ActualizePreviewLabelVisibility();

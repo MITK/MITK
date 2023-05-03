@@ -87,7 +87,8 @@ namespace mitk
      * @param timeStep
      */
     void DoUpdatePreview(const Image* inputAtTimeStep, const Image* oldSegAtTimeStep, LabelSetImage* previewImage, TimeStepType timeStep) override;
-   
+    void UpdatePrepare() override;
+
   private:
 
     /**

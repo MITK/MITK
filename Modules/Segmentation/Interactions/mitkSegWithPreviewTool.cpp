@@ -45,21 +45,31 @@ mitk::SegWithPreviewTool::~SegWithPreviewTool()
 void mitk::SegWithPreviewTool::SetMergeStyle(MultiLabelSegmentation::MergeStyle mergeStyle)
 {
   m_MergeStyle = mergeStyle;
+  this->Modified();
 }
 
 void mitk::SegWithPreviewTool::SetOverwriteStyle(MultiLabelSegmentation::OverwriteStyle overwriteStyle)
 {
   m_OverwriteStyle = overwriteStyle;
+  this->Modified();
 }
 
-void mitk::SegWithPreviewTool::SetLabelTransferMode(LabelTransferMode LabelTransferMode)
+void mitk::SegWithPreviewTool::SetLabelTransferScope(LabelTransferScope labelTransferScope)
 {
-  m_LabelTransferMode = LabelTransferMode;
+  m_LabelTransferScope = labelTransferScope;
+  this->Modified();
+}
+
+void mitk::SegWithPreviewTool::SetLabelTransferMode(LabelTransferMode labelTransferMode)
+{
+  m_LabelTransferMode = labelTransferMode;
+  this->Modified();
 }
 
 void mitk::SegWithPreviewTool::SetSelectedLabels(const SelectedLabelVectorType& labelsToTransfer)
 {
   m_SelectedLabels = labelsToTransfer;
+  this->Modified();
 }
 
 bool mitk::SegWithPreviewTool::CanHandle(const BaseData* referenceData, const BaseData* workingData) const
@@ -342,29 +352,51 @@ void mitk::SegWithPreviewTool::ResetPreviewNode()
 
 mitk::SegWithPreviewTool::LabelMappingType mitk::SegWithPreviewTool::GetLabelMapping() const
 {
+  LabelSetImage::LabelValueType offset = 0;
+  
+  if (LabelTransferMode::AddLabel == m_LabelTransferMode && LabelTransferScope::ActiveLabel!=m_LabelTransferScope)
+  {
+    //If we are not just working on active label and transfer mode is add, we need to compute an offset for adding the
+    //preview labels instat of just mapping them to existing segmentation labels.
+    const auto segmentation = this->GetTargetSegmentation();
+    if (nullptr == segmentation)
+      mitkThrow() << "Invalid state of SegWithPreviewTool. Cannot GetLabelMapping if no target segmentation is set.";
+
+    auto labels = segmentation->GetLabels();
+    auto maxLabelIter = std::max_element(std::begin(labels), std::end(labels), [](const Label::Pointer& a, const Label::Pointer& b) {
+      return a->GetValue() < b->GetValue();
+    });
+
+    if (maxLabelIter != labels.end())
+    {
+      offset = maxLabelIter->GetPointer()->GetValue();
+    }
+  }
+
   LabelMappingType labelMapping = { { this->GetUserDefinedActiveLabel(),this->GetUserDefinedActiveLabel() } };
-  if (LabelTransferMode::SelectedLabels == this->m_LabelTransferMode)
+
+  if (LabelTransferScope::SelectedLabels == this->m_LabelTransferScope)
   {
     labelMapping.clear();
     for (auto label : this->m_SelectedLabels)
     {
-      labelMapping.push_back({ label, label });
+      labelMapping.push_back({ label, label+offset });
     }
   }
-  else if (LabelTransferMode::AllLabels == this->m_LabelTransferMode)
+  else if (LabelTransferScope::AllLabels == this->m_LabelTransferScope)
   {
     labelMapping.clear();
     const auto labelSet = this->GetPreviewSegmentation()->GetActiveLabelSet();
     for (auto labelIter = labelSet->IteratorConstBegin(); labelIter != labelSet->IteratorConstEnd(); ++labelIter)
     {
-      labelMapping.push_back({ labelIter->second->GetValue(),labelIter->second->GetValue() });
+      labelMapping.push_back({ labelIter->second->GetValue(),labelIter->second->GetValue()+offset });
     }
   }
 
   return labelMapping;
 }
 
-void mitk::SegWithPreviewTool::TransferImageAtTimeStep(const Image* sourceImage, Image* destinationImage, const TimeStepType timeStep)
+void mitk::SegWithPreviewTool::TransferImageAtTimeStep(const Image* sourceImage, Image* destinationImage, const TimeStepType timeStep, const LabelMappingType& labelMapping)
 {
   try
   {
@@ -392,7 +424,6 @@ void mitk::SegWithPreviewTool::TransferImageAtTimeStep(const Image* sourceImage,
       auto sourceLSImage = dynamic_cast<const LabelSetImage*>(sourceImage);
       auto destLSImage = dynamic_cast<LabelSetImage*>(destinationImage);
 
-      auto labelMapping = this->GetLabelMapping();
       TransferLabelContentAtTimeStep(sourceLSImage, destLSImage, timeStep, labelMapping, m_MergeStyle, m_OverwriteStyle);
     }
   }
@@ -425,18 +456,19 @@ void mitk::SegWithPreviewTool::CreateResultSegmentationFromPreview()
           << " Preview segmentation and segmentation result image have different time geometries.";
       }
 
-      this->TransferPrepare();
+      auto labelMapping = this->GetLabelMapping();
+      this->PreparePreviewToResultTransfer(labelMapping);
       if (m_CreateAllTimeSteps)
       {
         for (unsigned int timeStep = 0; timeStep < previewImage->GetTimeSteps(); ++timeStep)
         {
-          this->TransferImageAtTimeStep(previewImage, resultSegmentation, timeStep);
+          this->TransferImageAtTimeStep(previewImage, resultSegmentation, timeStep, labelMapping);
         }
       }
       else
       {
         const auto timeStep = resultSegmentation->GetTimeGeometry()->TimePointToTimeStep(timePoint);
-        this->TransferImageAtTimeStep(previewImage, resultSegmentation, timeStep);
+        this->TransferImageAtTimeStep(previewImage, resultSegmentation, timeStep, labelMapping);
       }
 
       // since we are maybe working on a smaller referenceImage, pad it to the size of the original referenceImage
@@ -632,7 +664,7 @@ void mitk::SegWithPreviewTool::UpdateCleanUp()
   //reimplement in derived classes for special behavior
 }
 
-void mitk::SegWithPreviewTool::TransferLabelInformation(LabelMappingType& labelMapping,
+void mitk::SegWithPreviewTool::TransferLabelInformation(const LabelMappingType& labelMapping,
   const mitk::LabelSetImage* source, mitk::LabelSetImage* target)
 {
   for (const auto& [sourceLabel, targetLabel] : labelMapping)
@@ -653,10 +685,8 @@ void mitk::SegWithPreviewTool::TransferLabelInformation(LabelMappingType& labelM
   }
 }
 
-void mitk::SegWithPreviewTool::TransferPrepare()
+void mitk::SegWithPreviewTool::PreparePreviewToResultTransfer(const LabelMappingType& labelMapping)
 {
-  auto labelMapping = this->GetLabelMapping();
-
   DataNode::Pointer resultSegmentationNode = GetTargetSegmentationNode();
 
   if (resultSegmentationNode.IsNotNull())
@@ -717,10 +747,19 @@ std::string mitk::SegWithPreviewTool::GetCurrentSegmentationName()
     : "";
 }
 
-
 mitk::DataNode* mitk::SegWithPreviewTool::GetTargetSegmentationNode() const
 {
   return this->GetToolManager()->GetWorkingData(0);
+}
+
+mitk::LabelSetImage* mitk::SegWithPreviewTool::GetTargetSegmentation() const
+{
+  auto node = this->GetTargetSegmentationNode();
+
+  if (nullptr == node)
+    return nullptr;
+
+  return dynamic_cast<LabelSetImage*>(node->GetData());
 }
 
 void mitk::SegWithPreviewTool::TransferLabelSetImageContent(const LabelSetImage* source, LabelSetImage* target, TimeStepType timeStep)

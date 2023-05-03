@@ -74,21 +74,31 @@ namespace mitk
     void SetOverwriteStyle(MultiLabelSegmentation::OverwriteStyle overwriteStyle);
     itkGetMacro(OverwriteStyle, MultiLabelSegmentation::OverwriteStyle);
 
-    enum class LabelTransferMode
+    enum class LabelTransferScope
     {
       ActiveLabel, //Only the active label will be transfered from preview to segmentation.
       SelectedLabels, //The labels defined as selected labels will be transfered.
       AllLabels //Transfer all labels of the preview
     };
     /*itk macro was not used on purpose, to aviod the change of mtime.*/
-    void SetLabelTransferMode(LabelTransferMode LabelTransferMode);
-    itkGetMacro(LabelTransferMode, LabelTransferMode);
+    void SetLabelTransferScope(LabelTransferScope labelTransferScope);
+    itkGetMacro(LabelTransferScope, LabelTransferScope);
 
     using SelectedLabelVectorType = std::vector<Label::PixelType>;
     /** Specifies the labels that should be transfered form preview to the working image,
-      if the segmentation is confirmed. The setting will be used, if LabelTransferMode is set to "SelectedLabels".*/
+      if the segmentation is confirmed. The setting will be used, if LabelTransferScope is set to "SelectedLabels".
+      The selected label IDs corespond to the labels of the preview image.*/
     void SetSelectedLabels(const SelectedLabelVectorType& labelsToTransfer);
     itkGetMacro(SelectedLabels, SelectedLabelVectorType);
+
+    enum class LabelTransferMode
+    {
+      MapLabel, //Only the active label will be transfered from preview to segmentation.
+      AddLabel //The labels defined as selected labels will be transfered.
+    };
+    /*itk macro was not used on purpose, to aviod the change of mtime.*/
+    void SetLabelTransferMode(LabelTransferMode labelTransferMode);
+    itkGetMacro(LabelTransferMode, LabelTransferMode);
 
     bool CanHandle(const BaseData* referenceData, const BaseData* workingData) const override;
 
@@ -116,6 +126,7 @@ namespace mitk
      * @return a mitk::DataNode which contains a segmentation image
      */
     virtual DataNode* GetTargetSegmentationNode() const;
+    LabelSetImage* GetTargetSegmentation() const;
 
     /** Returns the image that contains the preview of the current segmentation.
      * Returns null if the node is not set or does not contain an image.*/
@@ -159,16 +170,19 @@ namespace mitk
     UpdatePreview. Default implementation does nothing.*/
     virtual void UpdateCleanUp();
 
+    using LabelMappingType = std::vector<std::pair<Label::PixelType, Label::PixelType> >;
+
     /** This member function offers derived classes the possibility to alter what should
     happen directly before the content of the preview is transfered to the segmentation,
     when the segmentation is confirmed. It is called by CreateResultSegmentationFromPreview.
     Default implementation ensure that all labels that will be transfered, exist in the
     segmentation. If they are not existing before the transfer, the will be added by
-    cloning the label information of the preview.*/
-    virtual void TransferPrepare();
+    cloning the label information of the preview.
+    @param labelMapping the mapping that should be used for transfering the labels.
+    */
+    virtual void PreparePreviewToResultTransfer(const LabelMappingType& labelMapping);
 
-    using LabelMappingType = std::vector<std::pair<Label::PixelType, Label::PixelType> >;
-    static void TransferLabelInformation(LabelMappingType& labelMapping,
+    static void TransferLabelInformation(const LabelMappingType& labelMapping,
       const mitk::LabelSetImage* source, mitk::LabelSetImage* target);
 
     /**Helper function that can be used to move the content of an LabelSetImage (the pixels of the active source layer and the labels).
@@ -216,7 +230,7 @@ namespace mitk
     itkGetConstObjectMacro(WorkingPlaneGeometry, PlaneGeometry);
 
   private:
-    void TransferImageAtTimeStep(const Image* sourceImage, Image* destinationImage, const TimeStepType timeStep);
+    void TransferImageAtTimeStep(const Image* sourceImage, Image* destinationImage, const TimeStepType timeStep, const LabelMappingType& labelMapping);
 
     void CreateResultSegmentationFromPreview();
 
@@ -232,6 +246,9 @@ namespace mitk
      */
     bool EnsureUpToDateUserDefinedActiveLabel();
 
+    /**Returns that label mapping between preview segmentation (first element of pair) and
+     result segmentation (second element of pair).
+     The content depends on the settings of LabelTransferMode and LabelTransferScope*/
     LabelMappingType GetLabelMapping() const;
 
     /** Node that containes the preview data generated and managed by this class or derived ones.*/
@@ -286,8 +303,10 @@ namespace mitk
       segmentation- For more details of the behavior see documentation of MultiLabelSegmentation::OverwriteStyle. */
     MultiLabelSegmentation::OverwriteStyle m_OverwriteStyle = MultiLabelSegmentation::OverwriteStyle::RegardLocks;
 
-    LabelTransferMode m_LabelTransferMode = LabelTransferMode::ActiveLabel;
+    LabelTransferScope m_LabelTransferScope = LabelTransferScope::ActiveLabel;
     SelectedLabelVectorType m_SelectedLabels = {};
+
+    LabelTransferMode m_LabelTransferMode = LabelTransferMode::MapLabel;
   };
 
 } // namespace

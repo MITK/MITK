@@ -62,7 +62,7 @@ namespace mitk
      *
      * @return                The new label.
      */
-    MITKMULTILABEL_EXPORT mitk::Label::Pointer CreateNewLabel(const LabelSetImage* labelSetImage);
+    MITKMULTILABEL_EXPORT mitk::Label::Pointer CreateNewLabel(const LabelSetImage* labelSetImage, const std::string& nameTemplate = "Label");
 
   } // namespace LabelSetImageHelper
 } // namespace mitk

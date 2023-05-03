@@ -486,7 +486,8 @@ QModelIndex QmitkMultiLabelTreeModel::indexOfLabel(mitk::Label::PixelType labelV
   if (labelValue == mitk::LabelSetImage::UnlabeledValue) return QModelIndex();
   auto relevantItem = GetInstanceItem(labelValue, this->m_RootItem.get());
 
-  if (nullptr == relevantItem) QModelIndex();
+  if (nullptr == relevantItem)
+    return QModelIndex();
 
   auto labelItem = relevantItem->ParentItem();
 

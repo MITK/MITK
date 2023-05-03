@@ -497,6 +497,10 @@ void QmitkMultiLabelInspector::DeleteLabelInternal(const LabelValueVectorType& l
       mitkThrow() << "Segmentation or QmitkMultiLabelTreeModel is in an invalid state. Label is not present in the model after adding it to the segmentation. Label value: " << newLabelValue;
     }
   }
+  else
+  {
+    this->SetSelectedLabels({});
+  }
 
   emit ModelUpdated();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();

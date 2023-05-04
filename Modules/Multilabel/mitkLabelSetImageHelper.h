@@ -59,10 +59,11 @@ namespace mitk
      *        rules of the naming to likely chose a unique color.
      *
      * @param labelSetImage   The label set image that the new label is added to
+     * @param namePrefix      The prefix of the label name that is prepended by a sequential number
      *
      * @return                The new label.
      */
-    MITKMULTILABEL_EXPORT mitk::Label::Pointer CreateNewLabel(const LabelSetImage* labelSetImage, const std::string& nameTemplate = "Label");
+    MITKMULTILABEL_EXPORT mitk::Label::Pointer CreateNewLabel(const LabelSetImage* labelSetImage, const std::string& namePrefix = "Label");
 
   } // namespace LabelSetImageHelper
 } // namespace mitk

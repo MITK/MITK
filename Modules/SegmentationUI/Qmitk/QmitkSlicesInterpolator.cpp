@@ -1566,10 +1566,18 @@ void QmitkSlicesInterpolator::OnSurfaceInterpolationInfoChanged(const itk::Event
   {
     m_3DContourNode->SetData(nullptr);
     m_InterpolatedSurfaceNode->SetData(nullptr);
-    auto *workingNode = m_ToolManager->GetWorkingData(0);
-    auto labelSetImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
-    auto activeLabel = labelSetImage->GetActiveLabelSet()->GetActiveLabel()->GetValue();
-    m_SurfaceInterpolator->AddActiveLabelContoursForInterpolation(activeLabel);
+    auto* workingNode = m_ToolManager->GetWorkingData(0);
+
+    if (workingNode == nullptr)
+      return;
+
+    auto* labelSetImage = dynamic_cast<mitk::LabelSetImage*>(workingNode->GetData());
+    auto* label = labelSetImage->GetActiveLabelSet()->GetActiveLabel();
+
+    if (label == nullptr)
+      return;
+
+    m_SurfaceInterpolator->AddActiveLabelContoursForInterpolation(label->GetValue());
     m_Future = QtConcurrent::run(this, &QmitkSlicesInterpolator::Run3DInterpolation);
     m_Watcher.setFuture(m_Future);
   }

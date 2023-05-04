@@ -64,8 +64,22 @@ namespace mitk
     itkSetMacro(PythonPath, std::string);
     itkGetConstMacro(PythonPath, std::string);
 
+    itkSetMacro(ModelType, std::string);
+    itkGetConstMacro(ModelType, std::string);
+
+    itkSetMacro(CheckpointPath, std::string);
+    itkGetConstMacro(CheckpointPath, std::string);
+
     itkSetMacro(GpuId, unsigned int);
     itkGetConstMacro(GpuId, unsigned int);
+
+    itkSetMacro(IsAuto, bool);
+    itkGetConstMacro(IsAuto, bool);
+    itkBooleanMacro(IsAuto);
+
+    itkSetMacro(IsReady, bool);
+    itkGetConstMacro(IsReady, bool);
+    itkBooleanMacro(IsReady);
 
     /**
      * @brief Static function to print out everything from itk::EventObject.
@@ -75,7 +89,7 @@ namespace mitk
     static void onPythonProcessEvent(itk::Object *, const itk::EventObject &e, void *);
 
   protected:
-    SegmentAnythingTool(); // purposely hidden
+    SegmentAnythingTool();
     ~SegmentAnythingTool() override;
 
     void ConnectActionsAndFunctions() override;
@@ -93,19 +107,26 @@ namespace mitk
 
 private:
     /**
-     * @brief Runs Totalsegmentator python process with desired arguments
+     * @brief Runs SAM python process with desired arguments to generate embeddings for the input image
      *
      */
-    void run_generate_embeddings(ProcessExecutor::Pointer, const std::string &, const std::string &, unsigned int);
+  void run_generate_embeddings(ProcessExecutor*, const std::string&, const std::string&, const std::string&, const std::string&, const unsigned int);
+    
+  void run_segmentation_from_points(ProcessExecutor *, const std::string &, const std::string &, const std::string &, const std::string &, const unsigned int);
+
 
     std::string m_MitkTempDir;
     std::string m_PythonPath;
+    std::string m_ModelType;
+    std::string m_CheckpointPath;
+
     unsigned int m_GpuId = 0;
 
     PointSet::Pointer m_PointSet;
     DataNode::Pointer m_PointSetNode;
-    PlaneGeometry::Pointer m_WorkingPlaneGeometry;
-    //std::map<PlaneGeometry*, std::string> m_PicklePathDict;
+    bool m_IsGenerateEmbeddings = true;
+    bool m_IsAuto = false;
+    bool m_IsReady = false;
     const std::string TEMPLATE_FILENAME = "XXXXXX_000_0000.nii.gz";
 
   };

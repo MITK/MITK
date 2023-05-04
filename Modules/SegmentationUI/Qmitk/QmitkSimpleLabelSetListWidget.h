@@ -49,7 +49,7 @@ protected slots:
 
 protected:
   void OnLayerChanged();
-  void OnLabelChanged();
+  void OnLabelChanged(mitk::LabelSetImage::LabelValueType lv);
 
   void OnLooseLabelSetConnection();
   void OnEstablishLabelSetConnection();

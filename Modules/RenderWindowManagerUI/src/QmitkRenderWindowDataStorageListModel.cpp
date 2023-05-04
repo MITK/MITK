@@ -286,9 +286,8 @@ bool QmitkRenderWindowDataStorageListModel::dropMimeData(const QMimeData* data, 
   return false;
 }
 
-void QmitkRenderWindowDataStorageListModel::SetControlledRenderer(mitk::RenderWindowLayerUtilities::RendererVector controlledRenderer)
+void QmitkRenderWindowDataStorageListModel::SetControlledRenderer(mitk::RenderWindowLayerUtilities::RendererVector /*controlledRenderer*/)
 {
-  m_RenderWindowLayerController->SetControlledRenderer(controlledRenderer);
   auto dataStorage = m_DataStorage.Lock();
 
   if (dataStorage.IsNotNull())
@@ -344,7 +343,7 @@ void QmitkRenderWindowDataStorageListModel::UpdateModelData()
       // update the model, so that it will be filled with the nodes of the new data storage
       beginResetModel();
       // get the current layer stack of the given base renderer
-      m_LayerStack = mitk::RenderWindowLayerUtilities::GetLayerStack(dataStorage, baseRenderer, true);
+      m_LayerStack = mitk::RenderWindowLayerUtilities::GetLayerStack(dataStorage, baseRenderer);
       endResetModel();
     }
   }

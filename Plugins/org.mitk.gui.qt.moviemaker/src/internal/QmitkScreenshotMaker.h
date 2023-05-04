@@ -77,6 +77,10 @@ public:
   /// Called when a RenderWindowPart becomes unavailable.
   ///
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  ///
+  /// Called when a RenderWindowPart changes.
+  ///
+  void RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart) override;
 
   signals:
 
@@ -101,6 +105,7 @@ protected:
 private:
 
   void OnSelectionChanged(berry::IWorkbenchPart::Pointer part, const QList<mitk::DataNode::Pointer>& nodes) override;
+  void UpdateDirectionBox(mitk::IRenderWindowPart* renderWindowPart);
 
   vtkCamera* GetCam();
   void GenerateHR3DAtlasScreenshots(QString fileName, QString filter = "");

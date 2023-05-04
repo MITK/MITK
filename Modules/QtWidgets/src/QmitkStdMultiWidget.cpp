@@ -104,22 +104,22 @@ void QmitkStdMultiWidget::InitializeMultiWidget()
 
 QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow(const QString& widgetName) const
 {
-  if ("axial" == widgetName)
+  if ("axial" == widgetName || "Axial" == widgetName)
   {
     return GetRenderWindow1();
   }
 
-  if ("sagittal" == widgetName)
+  if ("sagittal" == widgetName || "Sagittal" == widgetName)
   {
     return GetRenderWindow2();
   }
 
-  if ("coronal" == widgetName)
+  if ("coronal" == widgetName || "Coronal" == widgetName)
   {
     return GetRenderWindow3();
   }
 
-  if ("3d" == widgetName)
+  if ("3d" == widgetName || "3D" == widgetName)
   {
     return GetRenderWindow4();
   }
@@ -133,7 +133,7 @@ QmitkRenderWindow* QmitkStdMultiWidget::GetRenderWindow(const mitk::AnatomicalPl
   return GetRenderWindow(static_cast<unsigned int>(orientation));
 }
 
-void QmitkStdMultiWidget::SetReferenceGeometry(const mitk::TimeGeometry* referenceGeometry, bool resetCamera)
+void QmitkStdMultiWidget::InitializeViews(const mitk::TimeGeometry* geometry, bool resetCamera)
 {
   auto* renderingManager = mitk::RenderingManager::GetInstance();
   mitk::Point3D currentPosition = mitk::Point3D();
@@ -145,20 +145,25 @@ void QmitkStdMultiWidget::SetReferenceGeometry(const mitk::TimeGeometry* referen
 
     // store the current time step to set it again later, if the camera should not be reset
     const auto currentTimePoint = renderingManager->GetTimeNavigationController()->GetSelectedTimePoint();
-    if (referenceGeometry->IsValidTimePoint(currentTimePoint))
+    if (geometry->IsValidTimePoint(currentTimePoint))
     {
-      imageTimeStep = referenceGeometry->TimePointToTimeStep(currentTimePoint);
+      imageTimeStep = geometry->TimePointToTimeStep(currentTimePoint);
     }
   }
 
   // initialize render windows
-  renderingManager->InitializeViews(referenceGeometry, mitk::RenderingManager::REQUEST_UPDATE_ALL, resetCamera);
+  renderingManager->InitializeViews(geometry, mitk::RenderingManager::REQUEST_UPDATE_ALL, resetCamera);
 
   if (!resetCamera)
   {
     this->SetSelectedPosition(currentPosition, "");
     renderingManager->GetTimeNavigationController()->GetTime()->SetPos(imageTimeStep);
   }
+}
+
+void QmitkStdMultiWidget::SetInteractionReferenceGeometry(const mitk::TimeGeometry* /*referenceGeometry*/)
+{
+  // not implemented on purpose
 }
 
 bool QmitkStdMultiWidget::HasCoupledRenderWindows() const

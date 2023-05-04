@@ -49,6 +49,7 @@ namespace mitk
 }
 
 class QPushButton;
+class QmitkRenderWindow;
 
 enum ModifyLabelActionTrigerred
 {
@@ -86,7 +87,7 @@ public:
   /**
     To be called once before real use.
     */
-  void Initialize(mitk::ToolManager *toolManager, const QList<mitk::SliceNavigationController *> &controllers);
+  void Initialize(mitk::ToolManager *toolManager, const QList<QmitkRenderWindow*>& windows);
 
   /**
    * @brief
@@ -176,7 +177,7 @@ private:
    * @brief Function that handles label removal from the segmentation image.
    *
    */
-  void OnRemoveLabel();
+  void OnRemoveLabel(mitk::Label::PixelType removedLabelValue);
 
   /**
    * @brief Function that to changes in the segmentation image. It handles the layer removal, addition, label erasure,
@@ -312,8 +313,8 @@ protected slots:
   void OnRemoveLabelSetConnection(mitk::LabelSetImage* labelSetImage, unsigned int layerID);
 
 protected:
-  const std::map<QAction *, mitk::SliceNavigationController *> createActionToSliceDimension();
-  std::map<QAction *, mitk::SliceNavigationController *> ACTION_TO_SLICEDIMENSION;
+  const std::map<QAction *, mitk::SliceNavigationController *> createActionToSlicer(const QList<QmitkRenderWindow*>& windows);
+  std::map<QAction *, mitk::SliceNavigationController *> m_ActionToSlicer;
 
   void AcceptAllInterpolations(mitk::SliceNavigationController *slicer);
 
@@ -345,12 +346,14 @@ protected:
   void SetCurrentContourListID();
 
 private:
+  void InitializeWindow(QmitkRenderWindow* window);
   void HideAllInterpolationControls();
   void Show2DInterpolationControls(bool show);
   void Show3DInterpolationControls(bool show);
   void CheckSupportedImageDimension();
   void WaitForFutures();
   void NodeRemoved(const mitk::DataNode* node);
+  void ClearSegmentationObservers();
 
   mitk::SegmentationInterpolationController::Pointer m_Interpolator;
   mitk::SurfaceInterpolationController::Pointer m_SurfaceInterpolator;

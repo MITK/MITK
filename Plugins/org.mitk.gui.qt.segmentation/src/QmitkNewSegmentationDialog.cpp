@@ -167,9 +167,6 @@ namespace
 
       for (auto labelIter = labelSet->IteratorConstBegin(); labelIter != labelSet->IteratorConstEnd(); ++labelIter)
       {
-        if (0 == labelIter->first)
-          continue; // Ignore background label
-
         auto name = QString::fromStdString(labelIter->second->GetName());
 
         if (!name.isEmpty()) // Potential duplicates do not matter for our purpose
@@ -367,4 +364,43 @@ void QmitkNewSegmentationDialog::OnSuggestionSelected()
     m_Color = color;
     this->UpdateColorButtonBackground();
   }
+}
+
+bool QmitkNewSegmentationDialog::DoRenameLabel(mitk::Label* label, mitk::LabelSetImage* segmentation, QWidget* parent, Mode mode)
+{
+  if (nullptr == label)
+    mitkThrow() << "Invalid call of QmitkNewSegmentationDialog::RenameLabel. Passed label is null.";
+
+  const auto labelValue = label->GetValue();
+  mitk::LabelSetImage::GroupIndexType groupIndex;
+
+  if (nullptr != segmentation && !segmentation->IsLabelInGroup(labelValue, groupIndex))
+    mitkThrow() << "Invalid call of QmitkNewSegmentationDialog::RenameLabel. Passed label value does not exist in segmentation.";
+
+  QmitkNewSegmentationDialog dialog(parent, segmentation, mode);
+
+  dialog.SetColor(label->GetColor());
+  dialog.SetName(QString::fromStdString(label->GetName()));
+
+  if (dialog.exec() == QDialog::Rejected)
+    return false;
+
+  auto name = dialog.GetName();
+
+  if (name.isEmpty())
+    name = "Unnamed";
+
+  if (nullptr != segmentation)
+  {
+    auto group = segmentation->GetLabelSet(groupIndex);
+    group->RenameLabel(labelValue, name.toStdString(), dialog.GetColor());
+    group->UpdateLookupTable(labelValue);
+  }
+  else
+  {
+    label->SetName(name.toStdString());
+    label->SetColor(dialog.GetColor());
+  }
+
+  return true;
 }

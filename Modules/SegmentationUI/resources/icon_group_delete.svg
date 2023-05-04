@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xml:space="preserve"
+   style="enable-background:new 0 0 128 128;"
+   viewBox="0 0 128 128"
+   y="0px"
+   x="0px"
+   id="Ebene_1"
+   version="1.0"><metadata
+     id="metadata5100"><rdf:RDF><cc:Work
+         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
+     id="defs5098" /><style
+     id="style5057"
+     type="text/css">
+	.st0{fill:#F39200;}
+	.st1{fill:#1D1D1B;}
+	.st2{fill:#FFFFFF;}
+	.st3{fill:none;stroke:#F39200;stroke-linecap:round;stroke-miterlimit:10;}
+	.st4{fill:#F39200;stroke:#F39200;stroke-width:0.25;stroke-miterlimit:10;}
+	.st5{fill:none;stroke:#1D1D1B;stroke-linecap:round;stroke-miterlimit:10;}
+	.st6{fill:#FFFFFF;stroke:#FFFFFF;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	.st7{fill:none;stroke:#E6007E;stroke-linecap:round;stroke-miterlimit:10;}
+	.st8{fill:#009FE3;}
+	.st9{fill:#1C2E52;}
+	.st10{fill:#C0C5CD;}
+	.st11{fill:none;stroke:#1D1D1B;stroke-width:2;stroke-miterlimit:10;}
+	.st12{fill:none;stroke:#C0C5CD;stroke-width:2;stroke-miterlimit:10;}
+	.st13{fill:#0096AE;}
+	.st14{fill:none;stroke:#1D1D1B;stroke-width:7;stroke-miterlimit:10;}
+	.st15{fill:#1D1D1B;stroke:#1D1D1B;stroke-width:0.1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	.st16{fill:none;}
+	.st17{fill:none;stroke:#1D1C1B;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	.st18{fill:#1D1D1B;stroke:#FFFFFF;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	.st19{fill:none;stroke:#1D1D1B;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	.st20{fill:#E71D73;}
+	.st21{fill:#F0F0F0;}
+	.st22{fill:#E6007E;}
+	.st23{fill:none;stroke:#1D1D1B;stroke-width:3;stroke-miterlimit:10;}
+	.st24{fill:none;stroke:#1D1D1B;stroke-width:5;stroke-miterlimit:10;}
+	.st25{fill:none;stroke:#1D1D1B;stroke-width:10;stroke-miterlimit:10;}
+	.st26{fill:none;stroke:#1D1D1B;stroke-width:6;stroke-miterlimit:10;}
+	.st27{fill:#009640;}
+	.st28{fill:none;stroke:#009FE3;stroke-width:5;stroke-linejoin:round;}
+	.st29{fill:none;stroke:#009FE3;stroke-width:3;stroke-linejoin:round;}
+	.st30{fill:none;stroke:#1D1D1B;stroke-width:5;stroke-linejoin:round;}
+	.st31{fill:#51509C;}
+	.st32{fill:none;stroke:#1D1D1B;stroke-miterlimit:10;}
+	.st33{fill:none;stroke:#FFFFFF;stroke-miterlimit:10;}
+	.st34{fill:none;stroke:#FFFFFF;stroke-width:2;stroke-miterlimit:10;}
+	.st35{fill:#1D1D1B;stroke:#FFFFFF;stroke-miterlimit:10;}
+	.st36{fill:#FFFFFF;stroke:#1D1D1B;stroke-miterlimit:10;}
+	.st37{fill:none;stroke:#1D1D1B;stroke-width:2;stroke-linecap:round;stroke-miterlimit:10;}
+	.st38{fill:#009C3E;}
+	.st39{fill:#E61883;}
+	.st40{fill:#1D1D1B;stroke:#FFFFFF;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	.st41{fill:#1D1D1B;stroke:#1D1D1B;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	.st42{fill:#FFFFFF;stroke:#FFFFFF;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	.st43{fill:none;stroke:#1D1D1B;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	.st44{fill:#1D1D1B;stroke:#1D1D1B;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	.st45{fill:none;stroke:#1D1D1B;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+	.st46{fill:none;stroke:#FFFFFF;stroke-width:3;stroke-linecap:round;stroke-miterlimit:10;}
+	.st47{fill:none;stroke:#FFFFFF;stroke-width:2;stroke-linecap:round;stroke-miterlimit:10;}
+	.st48{fill:#FFFFFF;stroke:#FFFFFF;stroke-width:4;stroke-miterlimit:10;}
+	.st49{fill:none;stroke:#F39200;stroke-width:1.5;stroke-linecap:round;stroke-miterlimit:10;}
+	.st50{fill:#00FF00;}
+	.st51{fill:none;stroke:#1D1D1B;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+	.st52{fill:#FF00FF;}
+</style><path
+     id="path8623"
+     d="M 55.310547 17.390625 C 53.576697 17.390625 51.842039 17.762402 50.232422 18.507812 L 3.0039062 40.330078 C 1.1674301 41.172697 0 43.029707 0 45.039062 C -2.9605947e-016 47.048384 1.16743 48.885776 3.0039062 49.75 L 50.232422 71.572266 C 53.451656 73.063053 57.167484 73.063053 60.386719 71.572266 L 98.410156 54.003906 L 59.046875 54.003906 C 54.904911 54.003492 51.547289 50.64587 51.546875 46.503906 L 51.546875 25.503906 C 51.547289 21.361942 54.904911 18.00432 59.046875 18.003906 L 59.101562 18.003906 C 57.870721 17.597064 56.591481 17.390625 55.310547 17.390625 z M 14.498047 62.669922 L 3.0039062 67.984375 C 1.1674301 68.826994 3.2382502e-017 70.685992 0 72.695312 C -2.9605947e-016 74.704633 1.16743 76.540073 3.0039062 77.404297 L 50.232422 99.226562 C 53.451656 100.71735 57.167484 100.71735 60.386719 99.226562 L 107.61719 77.404297 C 109.45366 76.561678 110.62109 74.72624 110.62109 72.695312 C 110.62109 70.664386 109.45366 68.826994 107.61719 67.984375 L 96.123047 62.669922 L 63.283203 77.837891 C 58.227492 80.17133 52.393602 80.17133 47.337891 77.837891 L 14.498047 62.669922 z M 14.498047 90.324219 L 3.0039062 95.640625 C 1.1674301 96.483243 0 98.340292 0 100.34961 C -2.9605947e-016 102.35893 1.16743 104.19632 3.0039062 105.06055 L 50.232422 126.88281 C 53.451656 128.37359 57.167484 128.37359 60.386719 126.88281 L 107.61719 105.06055 C 109.45366 104.21793 110.62109 102.38054 110.62109 100.34961 C 110.62109 98.318686 109.45366 96.483243 107.61719 95.640625 L 96.123047 90.324219 L 63.283203 105.49219 C 58.227492 107.82563 52.393602 107.82563 47.337891 105.49219 L 14.498047 90.324219 z "
+     style="stroke-width:0.21605644;fill:#00ff00" /><rect
+     y="25.504484"
+     x="59.047188"
+     height="21"
+     width="70"
+     id="rect6222"
+     style="fill:#ff00ff;fill-opacity:1;stroke:none;stroke-width:3.42646599;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:markers fill stroke" /></svg>

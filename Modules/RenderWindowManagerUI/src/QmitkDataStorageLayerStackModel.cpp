@@ -229,6 +229,6 @@ void QmitkDataStorageLayerStackModel::UpdateModelData()
   // data storage and base renderer
   beginResetModel();
   // get the current layer stack of the given base renderer
-  m_TempLayerStack = RenderWindowLayerUtilities::GetLayerStack(m_DataStorage.Lock(), m_BaseRenderer.Lock(), true);
+  m_TempLayerStack = RenderWindowLayerUtilities::GetLayerStack(m_DataStorage.Lock(), m_BaseRenderer.Lock());
   endResetModel();
 }

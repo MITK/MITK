@@ -87,7 +87,10 @@ namespace mitk
       m_Properties[key] = newValue;
 
       if (oldValue != newValue)
+      {
+        this->OnChanged(this);
         this->OnPropertyChanged(ChangeEvent(this, key, oldValue, newValue));
+      }
     }
 
     Properties m_Properties;

@@ -24,5 +24,11 @@
 		<file>favorite_remove.svg</file>
 		<file>hourglass-half-solid.svg</file>
 		<file>times.svg</file>
+		<file>reset.svg</file>
+		<file>lock.svg</file>
+		<file>unlock.svg</file>
+		<file>invisible.svg</file>
+		<file>visible.svg</file>
+		<file>SegmentationTaskListIcon.svg</file>
 	</qresource>
 </RCC>

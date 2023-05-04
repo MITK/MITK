@@ -49,7 +49,6 @@ void QmitkDicomExternalDataWidget::CreateQtPartControl(QWidget *parent)
     m_Controls->ctkDICOMBrowser->setDICOMDatabase(m_ExternalDatabase);
 
     SetupImportDialog();
-    SetupProgressDialog();
 
     // connect buttons
     connect(m_Controls->downloadButton, SIGNAL(clicked()), this, SLOT(OnDownloadButtonClicked()));
@@ -73,11 +72,44 @@ void QmitkDicomExternalDataWidget::CreateQtPartControl(QWidget *parent)
             SIGNAL(progressDetail(QString)),
             this,
             SLOT(OnProgressDetail(const QString &)));
-    connect(m_ExternalIndexer, SIGNAL(progress(int)), m_ProgressDialog, SLOT(setValue(int)));
+    connect(m_ExternalIndexer, SIGNAL(progress(int)), this, SLOT(OnProgress(int)));
     // actually the progress dialog closes if the maximum value is reached, BUT
     // the following line is needed since the external indexer wont reach maximum value (100 % progress)
-    connect(m_ExternalIndexer, SIGNAL(indexingComplete(int, int, int, int)), m_ProgressDialog, SLOT(close()));
-    connect(m_ProgressDialog, SIGNAL(canceled()), m_ExternalIndexer, SLOT(cancel()));
+    connect(m_ExternalIndexer, SIGNAL(indexingComplete(int, int, int, int)), this, SLOT(OnIndexingComplete(int, int, int, int)));
+  }
+}
+
+void QmitkDicomExternalDataWidget::OnProgressStep(const QString& step)
+{
+  if (m_ProgressDialog == nullptr)
+    this->SetupProgressDialog();
+
+  m_ProgressStep = step;
+  m_ProgressDialog->setLabelText(step);
+}
+
+void QmitkDicomExternalDataWidget::OnProgressDetail(const QString& detail)
+{
+  if (m_ProgressDialog == nullptr)
+    this->SetupProgressDialog();
+
+  m_ProgressDialog->setLabelText(m_ProgressStep+"\n"+detail);
+}
+
+void QmitkDicomExternalDataWidget::OnProgress(int value)
+{
+  if (m_ProgressDialog == nullptr)
+    this->SetupProgressDialog();
+
+  m_ProgressDialog->setValue(value);
+}
+
+void QmitkDicomExternalDataWidget::OnIndexingComplete(int, int, int, int)
+{
+  if (m_ProgressDialog != nullptr)
+  {
+    m_ProgressDialog->close();
+    m_ProgressDialog = nullptr;
   }
 }
 
@@ -133,17 +165,6 @@ void QmitkDicomExternalDataWidget::OnViewButtonClicked()
     }
     emit SignalDicomToDataManager(eventProperty);
   }
-}
-
-void QmitkDicomExternalDataWidget::OnProgressStep(const QString& step)
-{
-  m_ProgressStep = step;
-  m_ProgressDialog->setLabelText(step);
-}
-
-void QmitkDicomExternalDataWidget::OnProgressDetail(const QString& detail)
-{
-  m_ProgressDialog->setLabelText(m_ProgressStep+"\n"+detail);
 }
 
 QStringList QmitkDicomExternalDataWidget::GetFileNamesFromIndex()
@@ -221,10 +242,14 @@ void QmitkDicomExternalDataWidget::SetupImportDialog()
 
 void QmitkDicomExternalDataWidget::SetupProgressDialog()
 {
+  if (m_ProgressDialog != nullptr)
+    return;
+
   m_ProgressDialog = new QProgressDialog("Initialization ...", "Cancel", 0, 100, this);
+  m_ProgressDialog->setAttribute(Qt::WA_DeleteOnClose);
   m_ProgressDialog->setWindowTitle("DICOM Import");
   m_ProgressDialog->setWindowModality(Qt::WindowModal);
   m_ProgressDialog->setMinimumDuration(0);
-  // FIX T20008: immediately set the progress dialog value to maximum --> will close the dialog
-  m_ProgressDialog->setValue(100);
+
+  connect(m_ProgressDialog, SIGNAL(canceled()), m_ExternalIndexer, SLOT(cancel()));
 }

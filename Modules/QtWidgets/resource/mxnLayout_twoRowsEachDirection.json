@@ -1,0 +1,52 @@
+{
+    "version": "1.0",
+    "name": "Two rows with each view direction",
+    "content": [
+        {
+            "content": [
+                {
+                    "isWindow": true,
+                    "size": 403,
+                    "viewDirection": "Axial"
+                },
+                {
+                    "isWindow": true,
+                    "size": 403,
+                    "viewDirection": "Sagittal"
+                },
+                {
+                    "isWindow": true,
+                    "size": 403,
+                    "viewDirection": "Coronal"
+                }
+            ],
+            "isWindow": false,
+            "size": 418,
+            "vertical": false
+        },
+        {
+            "content": [
+                {
+                    "isWindow": true,
+                    "size": 403,
+                    "viewDirection": "Axial"
+                },
+                {
+                    "isWindow": true,
+                    "size": 403,
+                    "viewDirection": "Sagittal"
+                },
+                {
+                    "isWindow": true,
+                    "size": 403,
+                    "viewDirection": "Coronal"
+                }
+            ],
+            "isWindow": false,
+            "size": 418,
+            "vertical": false
+        }
+    ],
+    "isWindow": false,
+    "vertical": true
+}

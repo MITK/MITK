@@ -14,23 +14,29 @@ found in the LICENSE file.
 #define QmitkMovieMakerView_h
 
 #include <QmitkAbstractView.h>
+#include <mitkIRenderWindowPartListener.h>
 
+#include <memory>
 #include <utility>
 #include <vector>
 
 class QmitkAnimationItem;
 class QmitkAnimationWidget;
-class QmitkFFmpegWriter;
 class QMenu;
 class QStandardItemModel;
 class QTimer;
+
+namespace mitk
+{
+  class VideoRecorder;
+}
 
 namespace Ui
 {
   class QmitkMovieMakerView;
 }
 
-class QmitkMovieMakerView : public QmitkAbstractView
+class QmitkMovieMakerView : public QmitkAbstractView, public mitk::IRenderWindowPartListener
 {
   Q_OBJECT
 
@@ -42,6 +48,10 @@ public:
 
   void CreateQtPartControl(QWidget* parent) override;
   void SetFocus() override;
+
+  void RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
+  void RenderWindowPartInputChanged(mitk::IRenderWindowPart* renderWindowPart) override;
 
 private slots:
   void OnMoveAnimationUpButtonClicked();
@@ -57,6 +67,7 @@ private slots:
   void OnPlayButtonToggled(bool checked);
   void OnStopButtonClicked();
   void OnRecordButtonClicked();
+  void OnEncodingFinished();
   void OnFPSSpinBoxValueChanged(int value);
   void OnTimerTimeout();
 
@@ -67,6 +78,7 @@ private:
   void InitializeAddAnimationMenu();
   void InitializePlaybackAndRecordWidgets();
   void InitializeRecordMenu();
+  void InitializeRecordingProgress();
   void InitializeTimer(QWidget* parent);
   void ConnectAnimationTreeViewWidgets();
   void ConnectAnimationWidgets();
@@ -82,7 +94,7 @@ private:
   QmitkAnimationItem* GetSelectedAnimationItem() const;
   std::vector<std::pair<QmitkAnimationItem*, double>> GetActiveAnimations(double t) const;
 
-  QmitkFFmpegWriter* m_FFmpegWriter;
+  QWidget* m_Parent;
   Ui::QmitkMovieMakerView* m_Ui;
   QStandardItemModel* m_AnimationModel;
   std::map<QString, QmitkAnimationWidget*> m_AnimationWidgets;
@@ -92,6 +104,7 @@ private:
   double m_TotalDuration;
   int m_NumFrames;
   int m_CurrentFrame;
+  std::unique_ptr<mitk::VideoRecorder> m_VideoRecorder;
 };
 
 #endif

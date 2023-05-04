@@ -12,6 +12,8 @@ found in the LICENSE file.
 
 #include "mitkOtsuSegmentationFilter.h"
 #include "itkOtsuMultipleThresholdsImageFilter.h"
+#include "itkAddImageFilter.h"
+
 #include "mitkImageAccessByItk.h"
 #include "mitkImageCast.h"
 
@@ -34,23 +36,28 @@ void AccessItkOtsuFilter(const itk::Image<TPixel, VImageDimension> *itkImage, pa
   typedef itk::Image<TPixel, VImageDimension> itkInputImageType;
   typedef itk::Image<mitk::OtsuSegmentationFilter::OutputPixelType, VImageDimension> itkOutputImageType;
   typedef itk::OtsuMultipleThresholdsImageFilter<itkInputImageType, itkOutputImageType> OtsuFilterType;
+  using AddFilterType = itk::AddImageFilter<itkOutputImageType>;
 
-  typename OtsuFilterType::Pointer filter = OtsuFilterType::New();
-  filter->SetNumberOfThresholds(params.m_NumberOfThresholds);
-  filter->SetInput(itkImage);
-  filter->SetValleyEmphasis(params.m_ValleyEmphasis);
-  filter->SetNumberOfHistogramBins(params.m_NumberOfBins);
-
+  auto otsuFilter = OtsuFilterType::New();
+  otsuFilter->SetNumberOfThresholds(params.m_NumberOfThresholds);
+  otsuFilter->SetInput(itkImage);
+  otsuFilter->SetValleyEmphasis(params.m_ValleyEmphasis);
+  otsuFilter->SetNumberOfHistogramBins(params.m_NumberOfBins);
+  auto addFilter = AddFilterType::New();
+  addFilter->SetInput1(otsuFilter->GetOutput());
+  //add 1 to every pixel because otsu also returns 0 as a label
+  //which encodes unlabeled in mitk.
+  addFilter->SetConstant2(1);
   try
   {
-    filter->Update();
+    addFilter->Update();
   }
   catch (...)
   {
     mitkThrow() << "itkOtsuFilter error.";
   }
 
-  mitk::CastToMitkImage<itkOutputImageType>(filter->GetOutput(), params.m_Image);
+  mitk::CastToMitkImage<itkOutputImageType>(addFilter->GetOutput(), params.m_Image);
   return;
 }
 

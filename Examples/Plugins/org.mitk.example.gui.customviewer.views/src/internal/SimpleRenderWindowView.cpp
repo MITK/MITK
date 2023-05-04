@@ -137,7 +137,12 @@ void SimpleRenderWindowView::ForceImmediateUpdate(mitk::RenderingManager::Reques
     GetRenderingManager()->ForceImmediateUpdateAll(requestType);
 }
 
-void SimpleRenderWindowView::SetReferenceGeometry(const mitk::TimeGeometry* /*referenceGeometry*/, bool /*resetCamera*/)
+void SimpleRenderWindowView::InitializeViews(const mitk::TimeGeometry* /*geometry*/, bool /*resetCamera*/)
+{
+  // not implemented
+}
+
+void SimpleRenderWindowView::SetInteractionReferenceGeometry(const mitk::TimeGeometry* /*referenceGeometry*/)
 {
   // not implemented
 }

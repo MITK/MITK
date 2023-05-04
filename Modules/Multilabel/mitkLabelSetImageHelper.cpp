@@ -80,51 +80,38 @@ mitk::DataNode::Pointer mitk::LabelSetImageHelper::CreateNewSegmentationNode(con
     return nullptr;
   }
 
-  // set additional image information
-  newLabelSetImage->GetExteriorLabel()->SetProperty("name.parent", mitk::StringProperty::New(referenceNode->GetName()));
-  newLabelSetImage->GetExteriorLabel()->SetProperty("name.image", mitk::StringProperty::New(newSegmentationName));
-
   auto newSegmentationNode = CreateEmptySegmentationNode(newSegmentationName);
   newSegmentationNode->SetData(newLabelSetImage);
 
   return newSegmentationNode;
 }
 
-mitk::Label::Pointer mitk::LabelSetImageHelper::CreateNewLabel(const LabelSetImage* labelSetImage)
+mitk::Label::Pointer mitk::LabelSetImageHelper::CreateNewLabel(const LabelSetImage* labelSetImage, const std::string& namePrefix)
 {
   if (nullptr == labelSetImage)
     return nullptr;
 
-  const std::regex genericLabelNameRegEx("Label ([1-9][0-9]*)");
+  const std::regex genericLabelNameRegEx(namePrefix + " ([1-9][0-9]*)");
   int maxGenericLabelNumber = 0;
 
-  std::vector<std::array<int, 3>> colorsInUse;
+  std::vector<std::array<int, 3>> colorsInUse = { {0,0,0} }; //black is always in use.
 
-  const auto numLabelSets = labelSetImage->GetNumberOfLayers();
-
-  for (std::remove_const_t<decltype(numLabelSets)> i = 0; i < numLabelSets; ++i)
+  for (auto & label : labelSetImage->GetLabels())
   {
-    auto labelSet = labelSetImage->GetLabelSet(i);
-    auto labelEndIter = labelSet->IteratorConstEnd();
+    auto labelName = label->GetName();
+    std::smatch match;
 
-    for (auto labelIter = labelSet->IteratorConstBegin(); labelIter != labelEndIter; ++labelIter)
-    {
-      auto label = labelIter->second;
-      auto labelName = label->GetName();
-      std::smatch match;
+    if (std::regex_match(labelName, match, genericLabelNameRegEx))
+      maxGenericLabelNumber = std::max(maxGenericLabelNumber, std::stoi(match[1].str()));
 
-      if (std::regex_match(labelName, match, genericLabelNameRegEx))
-        maxGenericLabelNumber = std::max(maxGenericLabelNumber, std::stoi(match[1].str()));
+    const auto quantizedLabelColor = QuantizeColor(label->GetColor().data());
 
-      const auto quantizedLabelColor = QuantizeColor(label->GetColor().data());
-
-      if (std::find(colorsInUse.begin(), colorsInUse.end(), quantizedLabelColor) == std::end(colorsInUse))
-        colorsInUse.push_back(quantizedLabelColor);
-    }
+    if (std::find(colorsInUse.begin(), colorsInUse.end(), quantizedLabelColor) == std::end(colorsInUse))
+      colorsInUse.push_back(quantizedLabelColor);
   }
 
   auto newLabel = mitk::Label::New();
-  newLabel->SetName("Label " + std::to_string(maxGenericLabelNumber + 1));
+  newLabel->SetName(namePrefix + " " + std::to_string(maxGenericLabelNumber + 1));
 
   auto lookupTable = mitk::LookupTable::New();
   lookupTable->SetType(mitk::LookupTable::LookupTableType::MULTILABEL);

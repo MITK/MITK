@@ -19,6 +19,7 @@ mitk::LabelSet::LabelSet() : m_ActiveLabelValue(0), m_Layer(0)
 {
   m_LookupTable = mitk::LookupTable::New();
   m_LookupTable->SetType(mitk::LookupTable::MULTILABEL);
+  m_ReservedLabelValuesFunctor = nullptr;
 }
 
 mitk::LabelSet::~LabelSet()
@@ -29,7 +30,7 @@ mitk::LabelSet::~LabelSet()
 mitk::LabelSet::LabelSet(const LabelSet &other)
   : itk::Object(),
     m_LookupTable(other.GetLookupTable()->Clone()),
-    m_ActiveLabelValue(other.GetActiveLabel()->GetValue()),
+    m_ActiveLabelValue(other.m_ActiveLabelValue),
     m_Layer(other.GetLayer())
 {
   // clone Labels
@@ -38,15 +39,38 @@ mitk::LabelSet::LabelSet(const LabelSet &other)
   {
     m_LabelContainer[otherIt->first] = otherIt->second->Clone();
 
-    itk::SimpleMemberCommand<LabelSet>::Pointer command = itk::SimpleMemberCommand<LabelSet>::New();
+    auto command = itk::MemberCommand<LabelSet>::New();
     command->SetCallbackFunction(this, &LabelSet::OnLabelModified);
     m_LabelContainer[otherIt->first]->AddObserver(itk::ModifiedEvent(), command);
   }
+  m_ReservedLabelValuesFunctor = other.m_ReservedLabelValuesFunctor;
 }
 
-void mitk::LabelSet::OnLabelModified()
+std::vector<mitk::LabelSet::LabelValueType> mitk::LabelSet::GetUsedLabelValues() const
 {
-  ModifyLabelEvent.Send();
+  std::vector<LabelValueType> result = { 0 };
+
+  if (m_ReservedLabelValuesFunctor != nullptr)
+  {
+    result = m_ReservedLabelValuesFunctor();
+  }
+  else
+  {
+    for (auto [value, label] : this->m_LabelContainer)
+    {
+      result.emplace_back(value);
+    }
+  }
+  return result;
+}
+
+void mitk::LabelSet::OnLabelModified(const Object* sender, const itk::EventObject&)
+{
+  auto label = dynamic_cast<const Label*>(sender);
+  if (nullptr == label)
+    mitkThrow() << "LabelSet is in wrong state. LabelModified event is not send by a label instance.";
+
+  ModifyLabelEvent.Send(label->GetValue());
   Superclass::Modified();
 }
 
@@ -93,36 +117,25 @@ bool mitk::LabelSet::ExistLabel(PixelType pixelValue)
   return m_LabelContainer.count(pixelValue) > 0 ? true : false;
 }
 
-// TODO Parameter as Smartpointer
-void mitk::LabelSet::AddLabel(mitk::Label *label)
+mitk::Label* mitk::LabelSet::AddLabel(mitk::Label *label, bool addAsClone)
 {
   unsigned int max_size = mitk::Label::MAX_LABEL_VALUE + 1;
   if (m_LabelContainer.size() >= max_size)
-    return;
+    return nullptr;
 
-  mitk::Label::Pointer newLabel(label->Clone());
+  mitk::Label::Pointer newLabel = addAsClone ? label->Clone() : Label::Pointer(label);
 
   // TODO use layer of label parameter
   newLabel->SetLayer(m_Layer);
 
-  PixelType pixelValue;
-  if (m_LabelContainer.empty())
-  {
-    pixelValue = newLabel->GetValue();
-  }
-  else
-  {
-    pixelValue = m_LabelContainer.rbegin()->first;
+  auto pixelValue = newLabel->GetValue();
+  auto usedValues = this->GetUsedLabelValues();
+  auto finding = std::find(usedValues.begin(), usedValues.end(), pixelValue);
 
-    if (pixelValue >= newLabel->GetValue() && m_LabelContainer.find(newLabel->GetValue()) != m_LabelContainer.end())
-    {
-      ++pixelValue;
-      newLabel->SetValue(pixelValue);
-    }
-    else
-    {
-      pixelValue = newLabel->GetValue();
-    }
+  if (!usedValues.empty() && usedValues.end() != finding)
+  {
+    pixelValue = usedValues.back()+1;
+    newLabel->SetValue(pixelValue);
   }
 
   // new map entry
@@ -132,22 +145,23 @@ void mitk::LabelSet::AddLabel(mitk::Label *label)
   // add DICOM information of the label
   DICOMSegmentationPropertyHelper::SetDICOMSegmentProperties(newLabel);
 
-  itk::SimpleMemberCommand<LabelSet>::Pointer command = itk::SimpleMemberCommand<LabelSet>::New();
+  auto command = itk::MemberCommand<LabelSet>::New();
   command->SetCallbackFunction(this, &LabelSet::OnLabelModified);
   newLabel->AddObserver(itk::ModifiedEvent(), command);
-  // newLabel->AddObserver(itk::ModifiedEvent(),command);
 
+  AddLabelEvent.Send(newLabel->GetValue());
   SetActiveLabel(newLabel->GetValue());
-  AddLabelEvent.Send();
   Modified();
+
+  return newLabel;
 }
 
-void mitk::LabelSet::AddLabel(const std::string &name, const mitk::Color &color)
+mitk::Label* mitk::LabelSet::AddLabel(const std::string &name, const mitk::Color &color)
 {
   mitk::Label::Pointer newLabel = mitk::Label::New();
   newLabel->SetName(name);
   newLabel->SetColor(color);
-  AddLabel(newLabel);
+  return AddLabel(newLabel);
 }
 
 void mitk::LabelSet::RenameLabel(PixelType pixelValue, const std::string &name, const mitk::Color &color)
@@ -172,6 +186,9 @@ void mitk::LabelSet::PrintSelf(std::ostream & /*os*/, itk::Indent /*indent*/) co
 
 void mitk::LabelSet::RemoveLabel(PixelType pixelValue)
 {
+  if (LabelSetImage::UnlabeledValue == pixelValue)
+    return;
+
   auto it = m_LabelContainer.rbegin();
   PixelType nextActivePixelValue = it->first;
 
@@ -189,12 +206,20 @@ void mitk::LabelSet::RemoveLabel(PixelType pixelValue)
   if (m_ActiveLabelValue == pixelValue)
   {
     if (ExistLabel(nextActivePixelValue))
-      SetActiveLabel(nextActivePixelValue);
+    {
+      this->SetActiveLabel(nextActivePixelValue);
+    }
+    else if (!m_LabelContainer.empty())
+    {
+      this->SetActiveLabel(m_LabelContainer.rbegin()->first);
+    }
     else
-      SetActiveLabel(m_LabelContainer.rbegin()->first);
+    {
+      this->SetActiveLabel(0);
+    }
   }
 
-  RemoveLabelEvent.Send();
+  RemoveLabelEvent.Send(pixelValue);
 
   Modified();
 }
@@ -204,8 +229,9 @@ void mitk::LabelSet::RemoveAllLabels()
   auto _it = IteratorBegin();
   for (; _it != IteratorConstEnd();)
   {
-    RemoveLabelEvent.Send();
+    auto labelValue = _it->first;
     m_LabelContainer.erase(_it++);
+    RemoveLabelEvent.Send(labelValue);
   }
   AllLabelsModifiedEvent.Send();
 }
@@ -301,12 +327,15 @@ bool mitk::Equal(const mitk::LabelSet &leftHandSide, const mitk::LabelSet &right
   }
 
   // m_ActiveLabel;
-  returnValue = mitk::Equal(*leftHandSide.GetActiveLabel(), *rightHandSide.GetActiveLabel(), eps, verbose);
-  if (!returnValue)
+  if (leftHandSide.GetActiveLabel() != rightHandSide.GetActiveLabel())
   {
-    MITK_INFO(verbose) << "Active label not equal.";
-    return returnValue;
-    ;
+    returnValue = mitk::Equal(*leftHandSide.GetActiveLabel(), *rightHandSide.GetActiveLabel(), eps, verbose);
+    if (!returnValue)
+    {
+      MITK_INFO(verbose) << "Active label not equal.";
+      return returnValue;
+      ;
+    }
   }
 
   // m_Layer;

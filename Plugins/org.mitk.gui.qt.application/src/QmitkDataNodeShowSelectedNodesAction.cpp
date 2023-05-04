@@ -11,7 +11,6 @@ found in the LICENSE file.
 ============================================================================*/
 
 #include <QmitkDataNodeShowSelectedNodesAction.h>
-#include <mitkNodePredicateFirstLevel.h>
 
 // mitk core
 #include <mitkRenderingManager.h>

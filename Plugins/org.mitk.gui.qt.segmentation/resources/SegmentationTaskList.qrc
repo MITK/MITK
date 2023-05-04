@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="/SegmentationTaskList">
+     <file alias="Icon">SegmentationTaskListIcon.svg</file>
+  </qresource>
+</RCC>

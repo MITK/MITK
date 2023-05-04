@@ -135,7 +135,7 @@ std::filesystem::path mitk::SegmentationTaskList::GetInterimPath(const std::file
   return interimPath.replace_extension(".interim" + path.extension().string());
 }
 
-void mitk::SegmentationTaskList::SaveTask(size_t index, const BaseData* segmentation, bool saveAsIntermediateResult)
+void mitk::SegmentationTaskList::SaveTask(size_t index, const BaseData* segmentation, bool saveAsInterimResult)
 {
   if (segmentation == nullptr)
     return;
@@ -144,13 +144,13 @@ void mitk::SegmentationTaskList::SaveTask(size_t index, const BaseData* segmenta
   auto interimPath = this->GetInterimPath(path);
 
   if (std::filesystem::exists(path))
-    saveAsIntermediateResult = false;
+    saveAsInterimResult = false;
 
-  IOUtil::Save(segmentation, saveAsIntermediateResult
+  IOUtil::Save(segmentation, saveAsInterimResult
     ? interimPath.string()
     : path.string());
 
-  if (!saveAsIntermediateResult && std::filesystem::exists(interimPath))
+  if (!saveAsInterimResult && std::filesystem::exists(interimPath))
   {
     std::error_code ec;
     std::filesystem::remove(interimPath, ec);

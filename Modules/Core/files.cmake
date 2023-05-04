@@ -66,6 +66,7 @@ set(CPP_FILES
   DataManagement/mitkChannelDescriptor.cpp
   DataManagement/mitkClippingProperty.cpp
   DataManagement/mitkColorProperty.cpp
+  DataManagement/mitkCrosshairData.cpp
   DataManagement/mitkDataNode.cpp
   DataManagement/mitkDataStorage.cpp
   DataManagement/mitkEnumerationProperty.cpp
@@ -121,14 +122,12 @@ set(CPP_FILES
   DataManagement/mitkNodePredicateDataType.cpp
   DataManagement/mitkNodePredicateDataUID.cpp
   DataManagement/mitkNodePredicateDimension.cpp
-  DataManagement/mitkNodePredicateFirstLevel.cpp
   DataManagement/mitkNodePredicateFunction.cpp
   DataManagement/mitkNodePredicateGeometry.cpp
   DataManagement/mitkNodePredicateNot.cpp
   DataManagement/mitkNodePredicateOr.cpp
   DataManagement/mitkNodePredicateProperty.cpp
   DataManagement/mitkNodePredicateDataProperty.cpp
-  DataManagement/mitkNodePredicateSource.cpp
   DataManagement/mitkNodePredicateSubGeometry.cpp
   DataManagement/mitkNumericConstants.cpp
   DataManagement/mitkPlaneGeometry.cpp
@@ -281,7 +280,7 @@ set(CPP_FILES
   Rendering/mitkAnnotationUtils.cpp
   Rendering/mitkBaseRenderer.cpp
   Rendering/mitkBaseRendererHelper.cpp
-  #Rendering/mitkGLMapper.cpp Moved to deprecated LegacyGL Module
+  Rendering/mitkCrosshairVtkMapper2D.cpp
   Rendering/mitkGradientBackground.cpp
   Rendering/mitkImageVtkMapper2D.cpp
   Rendering/mitkMapper.cpp
@@ -293,9 +292,9 @@ set(CPP_FILES
   Rendering/mitkRenderWindowBase.cpp
   Rendering/mitkRenderWindow.cpp
   Rendering/mitkRenderWindowFrame.cpp
-  #Rendering/mitkSurfaceGLMapper2D.cpp Moved to deprecated LegacyGL Module
   Rendering/mitkSurfaceVtkMapper2D.cpp
   Rendering/mitkSurfaceVtkMapper3D.cpp
+  Rendering/mitkVideoRecorder.cpp
   Rendering/mitkVtkEventProvider.cpp
   Rendering/mitkVtkMapper.cpp
   Rendering/mitkVtkPropRenderer.cpp

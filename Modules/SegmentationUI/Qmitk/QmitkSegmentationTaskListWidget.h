@@ -39,6 +39,7 @@ public:
   ~QmitkSegmentationTaskListWidget() override;
 
   void SetDataStorage(mitk::DataStorage* dataStorage);
+  void CheckDataStorage(const mitk::DataNode* removedNode = nullptr);
 
   bool ActiveTaskIsShown() const;
   void LoadNextUnfinishedTask();
@@ -63,6 +64,7 @@ private:
   void UpdateLoadButton();
   void UpdateNavigationButtons();
   void UpdateDetailsLabel();
+  void UpdateStoreAndAcceptButtons();
   void OnLoadButtonClicked();
   mitk::DataNode* GetImageDataNode(size_t index) const;
   void UnloadTasks(const mitk::DataNode* skip = nullptr);
@@ -78,6 +80,10 @@ private:
   void OnPreviousTaskShortcutActivated();
   void OnNextTaskShortcutActivated();
   void OnLoadTaskShortcutActivated();
+  void OnStoreInterimResultShortcutActivated();
+  void OnAcceptSegmentationShortcutActivated();
+  void OnStoreButtonClicked();
+  void OnAcceptButtonClicked();
 
   Ui::QmitkSegmentationTaskListWidget* m_Ui;
   QFileSystemWatcher* m_FileSystemWatcher;

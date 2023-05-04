@@ -16,11 +16,14 @@ found in the LICENSE file.
 #include <QmitkAbstractView.h>
 #include <mitkIRenderWindowPartListener.h>
 
-#include "ui_QmitkSimpleExampleViewControls.h"
-
 class QmitkStepperAdapter;
 
 class vtkRenderer;
+
+namespace Ui
+{
+  class QmitkSimpleExampleViewControls;
+}
 
 /**
  * \brief QmitkSimpleExampleView
@@ -57,9 +60,6 @@ private:
   /// writes a screenshot in JPEG or PNG format to the file fileName
   void TakeScreenshot(vtkRenderer *renderer, unsigned int magnificationFactor, QString fileName, QString filter = "");
 
-  /// returns path to the ffmpeg lib if configured in preferences
-  QString GetFFmpegPath() const;
-
 private slots:
 
   /**
@@ -76,11 +76,6 @@ private slots:
    * initialize the slice and temporal sliders according to the image dimensions
    */
   void InitNavigators();
-
-  /**
-   * generate a movie as *.avi from the active render window
-   */
-  void GenerateMovie();
 
   /// takes screenshot of the 3D window in 4x resolution of the render window
   void OnTakeHighResolutionScreenshot();

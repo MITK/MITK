@@ -18,10 +18,6 @@
     <file>UnlockExterior_48x48.png</file>
     <file>NewLabel_48x48.png</file>
     <file>NewSegmentation_48x48.png</file>
-    <file>visible.svg</file>
-    <file>invisible.svg</file>
-    <file>lock.svg</file>
-    <file>unlock.svg</file>
     <file>MergeLabels.png</file>
     <file>RemoveLabel.png</file>
     <file>EraseLabel.png</file>
@@ -29,5 +25,11 @@
     <file>CreateMask.png</file>
     <file>RandomColor.png</file>
     <file>RenameLabel.png</file>
+    <file>icon_label_add.svg</file>
+    <file>icon_label_add_instance.svg</file>
+    <file>icon_label_delete.svg</file>
+    <file>icon_label_delete_instance.svg</file>
+    <file>icon_group_add.svg</file>
+    <file>icon_group_delete.svg</file>
   </qresource>
 </RCC>

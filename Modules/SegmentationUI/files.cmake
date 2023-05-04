@@ -28,6 +28,15 @@ set(CPP_FILES
   Qmitk/QmitkStaticDynamicSegmentationDialog.cpp
   Qmitk/QmitkSimpleLabelSetListWidget.cpp
   Qmitk/QmitkSegmentationTaskListWidget.cpp
+  Qmitk/QmitkTotalSegmentatorToolGUI.cpp
+  Qmitk/QmitkSetupVirtualEnvUtil.cpp
+  Qmitk/QmitkMultiLabelInspector.cpp
+  Qmitk/QmitkMultiLabelManager.cpp
+  Qmitk/QmitkMultiLabelTreeModel.cpp
+  Qmitk/QmitkMultiLabelTreeView.cpp
+  Qmitk/QmitkMultiLabelPresetHelper.cpp
+  Qmitk/QmitkLabelColorItemDelegate.cpp
+  Qmitk/QmitkLabelToggleItemDelegate.cpp
   SegmentationUtilities/QmitkBooleanOperationsWidget.cpp
   SegmentationUtilities/QmitkContourModelToImageWidget.cpp
   SegmentationUtilities/QmitkImageMaskingWidget.cpp
@@ -37,6 +46,9 @@ set(CPP_FILES
   SegmentationUtilities/QmitkDataSelectionWidget.cpp
 )
 
+set(H_FILES
+  Qmitk/QmitkMultiLabelPresetHelper.h
+)
 set(MOC_H_FILES
   Qmitk/QmitkSegWithPreviewToolGUIBase.h
   Qmitk/QmitkMultiLabelSegWithPreviewToolGUIBase.h
@@ -68,6 +80,14 @@ set(MOC_H_FILES
   Qmitk/QmitkStaticDynamicSegmentationDialog.h
   Qmitk/QmitkSimpleLabelSetListWidget.h
   Qmitk/QmitkSegmentationTaskListWidget.h
+  Qmitk/QmitkTotalSegmentatorToolGUI.h
+  Qmitk/QmitkSetupVirtualEnvUtil.h
+  Qmitk/QmitkMultiLabelInspector.h
+  Qmitk/QmitkMultiLabelManager.h
+  Qmitk/QmitkMultiLabelTreeModel.h
+  Qmitk/QmitkMultiLabelTreeView.h
+  Qmitk/QmitkLabelColorItemDelegate.h
+  Qmitk/QmitkLabelToggleItemDelegate.h
   SegmentationUtilities/QmitkBooleanOperationsWidget.h
   SegmentationUtilities/QmitkContourModelToImageWidget.h
   SegmentationUtilities/QmitkImageMaskingWidget.h
@@ -86,6 +106,9 @@ set(UI_FILES
   Qmitk/QmitknnUNetToolGUIControls.ui
   Qmitk/QmitkEditableContourToolGUIControls.ui
   Qmitk/QmitkSegmentationTaskListWidget.ui
+  Qmitk/QmitkTotalSegmentatorGUIControls.ui
+  Qmitk/QmitkMultiLabelInspectorControls.ui
+  Qmitk/QmitkMultiLabelManagerControls.ui
   SegmentationUtilities/QmitkBooleanOperationsWidgetControls.ui
   SegmentationUtilities/QmitkContourModelToImageWidgetControls.ui
   SegmentationUtilities/QmitkImageMaskingWidgetControls.ui

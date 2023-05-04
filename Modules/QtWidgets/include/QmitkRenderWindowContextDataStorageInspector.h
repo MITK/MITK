@@ -70,8 +70,6 @@ private Q_SLOTS:
 
   void ModelRowsInserted(const QModelIndex& parent, int start, int end);
 
-  void ResetRenderer();
-
   void OnContextMenuRequested(const QPoint& pos);
   void OnReinit();
   void OnReset();

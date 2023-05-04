@@ -13,6 +13,10 @@
         </view>
   </extension>
 
+  <extension point="org.blueberry.ui.preferencePages">
+    <page id="org.mitk.gui.qt.application.MovieMakerPreferencePage" name="Movie Maker" class="QmitkMovieMakerPreferencePage" />
+  </extension>
+
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.screenshotmaker"
           name="Screenshot Maker"

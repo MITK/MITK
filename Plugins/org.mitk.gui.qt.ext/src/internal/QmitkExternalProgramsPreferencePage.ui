@@ -7,63 +7,36 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>300</height>
+    <height>152</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>External Programs</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="0">
-      <widget class="QLabel" name="ffmpegLabel">
-       <property name="text">
-        <string>FFmpeg:</string>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::PlainText</enum>
-       </property>
-       <property name="buddy">
-        <cstring>gnuplotButton</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="ffmpegLineEdit">
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="2">
-      <widget class="QToolButton" name="ffmpegButton">
-       <property name="text">
-        <string>...</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="gnuplotLabel">
-       <property name="text">
-        <string>gnuplot:</string>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::PlainText</enum>
-       </property>
-       <property name="buddy">
-        <cstring>gnuplotButton</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
+  <layout class="QFormLayout" name="formLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="gnuplotLabel">
+     <property name="text">
+      <string>gnuplot:</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::PlainText</enum>
+     </property>
+     <property name="buddy">
+      <cstring>gnuplotButton</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
       <widget class="QLineEdit" name="gnuplotLineEdit">
        <property name="readOnly">
         <bool>true</bool>
        </property>
       </widget>
      </item>
-     <item row="1" column="2">
+     <item>
       <widget class="QToolButton" name="gnuplotButton">
        <property name="text">
         <string>...</string>
@@ -71,19 +44,6 @@
       </widget>
      </item>
     </layout>
-   </item>
-   <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>248</height>
-      </size>
-     </property>
-    </spacer>
    </item>
   </layout>
  </widget>

@@ -8,6 +8,7 @@ set(MITK_CONFIG_PLUGINS
   org.mitk.gui.qt.mitkworkbench.intro
   org.mitk.gui.qt.datamanager
   org.mitk.gui.qt.stdmultiwidgeteditor
+  org.mitk.gui.qt.mxnmultiwidgeteditor
   org.mitk.gui.qt.dicombrowser
   org.mitk.gui.qt.imagenavigator
   org.mitk.gui.qt.measurementtoolbox

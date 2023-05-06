@@ -1149,21 +1149,18 @@ void mitk::SurfaceInterpolationController::OnLayerChanged()
   m_CurrentLayerIndex = currentLayer;
 }
 
-mitk::SurfaceInterpolationController::ContourPositionInformationList& mitk::SurfaceInterpolationController::GetContours(unsigned int timeStep, unsigned int layerID)
+mitk::SurfaceInterpolationController::ContourPositionInformationList* mitk::SurfaceInterpolationController::GetContours(unsigned int timeStep, unsigned int layerID)
 {
   if (m_SelectedSegmentation == nullptr)
-  {
-    MITK_ERROR << "Invalid segmentation from mitk::SurfaceInterpolationController::GetContours";
-  }
+    return nullptr;
+
   if (timeStep >= m_ListOfContours.at(m_SelectedSegmentation).size())
-  {
-    MITK_ERROR << "Invalid timeStep from mitk::SurfaceInterpolationController::GetContours";
-  }
+    return nullptr;
+
   if (layerID >= m_ListOfContours.at(m_SelectedSegmentation).at(timeStep).size())
-  {
-    MITK_ERROR << "Invalid timeStep from mitk::SurfaceInterpolationController::GetContours";
-  }
-  return m_ListOfContours.at(m_SelectedSegmentation).at(timeStep).at(layerID);
+    return nullptr;
+
+  return &m_ListOfContours[m_SelectedSegmentation][timeStep][layerID];
 }
 
 void mitk::SurfaceInterpolationController::CompleteReinitialization(const std::vector<mitk::Surface::Pointer>& contourList,
